@@ -24,7 +24,7 @@
     radial-gradient(700px 400px at -10% 20%, rgba(157, 139, 255, 0.08), transparent 60%);
   background-attachment: fixed;
   color: var(--text-primary);
-  font-family: 'Inter', 'Noto Sans JP', system-ui, -apple-system, sans-serif;
+  font-family: "Inter", "Noto Sans JP", system-ui, -apple-system, sans-serif;
   line-height: 1.8;
   -webkit-font-smoothing: antialiased;
 }
@@ -214,7 +214,7 @@
   gap: 10px;
 }
 .section h3::before {
-  content: '';
+  content: "";
   width: 6px;
   height: 6px;
   border-radius: 2px;
@@ -237,7 +237,7 @@
 .prose td code,
 .prose th code,
 .prose li code {
-  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
   font-size: 0.88em;
   background: var(--code-bg);
   color: var(--accent);
@@ -340,10 +340,10 @@
   padding: 18px 20px;
   overflow-x: auto;
   margin: 18px 0 24px;
-  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
 }
 .codeLine {
-  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
   font-size: 13.5px;
   line-height: 1.7;
   color: #cfe0ff;
@@ -438,7 +438,7 @@
   border-top: 1px solid var(--border-soft);
   color: var(--text-muted);
   font-size: 13px;
-  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
 }
 
 /* Responsive */

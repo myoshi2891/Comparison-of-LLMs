@@ -12,7 +12,7 @@ export function TocObserver() {
     const linkMap: Record<string, Element> = {};
     navLinks.forEach((a) => {
       const href = a.getAttribute("href");
-      if (href && href.startsWith("#")) {
+      if (href?.startsWith("#")) {
         linkMap[href.slice(1)] = a;
       }
     });
@@ -23,7 +23,9 @@ export function TocObserver() {
           const link = linkMap[entry.target.id];
           if (!link) return;
           if (entry.isIntersecting) {
-            navLinks.forEach((l) => l.classList.remove(styles.tocLinkActive));
+            navLinks.forEach((l) => {
+              l.classList.remove(styles.tocLinkActive);
+            });
             link.classList.add(styles.tocLinkActive);
           }
         });
@@ -31,10 +33,14 @@ export function TocObserver() {
       { rootMargin: "-20% 0px -70% 0px" }
     );
 
-    sections.forEach((s) => observer.observe(s));
+    sections.forEach((s) => {
+      observer.observe(s);
+    });
 
     return () => {
-      sections.forEach((s) => observer.unobserve(s));
+      sections.forEach((s) => {
+        observer.unobserve(s);
+      });
       observer.disconnect();
     };
   }, []);

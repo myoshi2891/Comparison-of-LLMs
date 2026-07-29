@@ -21,7 +21,9 @@
 
   --accent: #7c9eff;
 
-  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Kaku Gothic ProN", "Noto Sans JP", Meiryo, sans-serif;
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Kaku Gothic ProN", "Noto Sans JP",
+    Meiryo, sans-serif;
   --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
 
   --border-radius-md: 8px;
@@ -111,7 +113,9 @@
   font-size: 13px;
   line-height: 1.4;
   text-decoration: none;
-  transition: background 0.15s ease, color 0.15s ease;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
 }
 
 .tocLink i {

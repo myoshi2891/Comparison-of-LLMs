@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import React from "react";
+import type React from "react";
 import MermaidDiagram from "@/components/docs/MermaidDiagram";
 import styles from "./page.module.css";
 import TocObserver from "./TocObserver";
@@ -9,14 +9,6 @@ export const metadata: Metadata = {
   description:
     "Antigravity IDE における SKILL.md の設計思想・アーキテクチャ・実装パターン・運用 — 中級〜上級エンジニア向けステップバイステップ解説",
 };
-
-function Ext({ href, children }: { href: string; children: React.ReactNode }) {
-  return (
-    <a href={href} target="_blank" rel="noopener noreferrer" className={styles.link}>
-      {children}
-    </a>
-  );
-}
 
 function ExtRef({ href, children }: { href: string; children: React.ReactNode }) {
   return (
@@ -224,8 +216,9 @@ export default function AgentSkillsGuidePage() {
                   <tr className={styles.tbodyTr}>
                     <td className={styles.td}>2025-10-16</td>
                     <td className={styles.td}>
-                      Anthropicが「Agent Skills」をClaude向けに発表。エンジニアリングブログ「Equipping
-                      agents for the real world with Agent Skills」を公開
+                      Anthropicが「Agent
+                      Skills」をClaude向けに発表。エンジニアリングブログ「Equipping agents for the
+                      real world with Agent Skills」を公開
                     </td>
                   </tr>
                   <tr className={styles.tbodyTr}>
@@ -252,13 +245,15 @@ export default function AgentSkillsGuidePage() {
                   <tr className={styles.tbodyTr}>
                     <td className={styles.td}>2026-02</td>
                     <td className={styles.td}>
-                      Bosch ResearchとCarnegie Mellon大学の研究（arXiv:2602.08004）が公開スキル数の急増（約20日間で2,179件→40,000件超）を報告
+                      Bosch ResearchとCarnegie
+                      Mellon大学の研究（arXiv:2602.08004）が公開スキル数の急増（約20日間で2,179件→40,000件超）を報告
                     </td>
                   </tr>
                   <tr className={styles.tbodyTr}>
                     <td className={styles.td}>2026-現在</td>
                     <td className={styles.td}>
-                      Cursor、GitHub Copilot、VS Code、Gemini CLI、Goose、OpenCodeなど40以上のクライアントが同一フォーマットを採用
+                      Cursor、GitHub Copilot、VS Code、Gemini
+                      CLI、Goose、OpenCodeなど40以上のクライアントが同一フォーマットを採用
                     </td>
                   </tr>
                 </tbody>
@@ -305,7 +300,9 @@ export default function AgentSkillsGuidePage() {
             </div>
 
             <p className={styles.p}>
-              重要なのは、スキルに同梱されたPythonスクリプトなどの<strong>コード自体はコンテキストに読み込まれず、実行結果のみが返る</strong>という点です。これにより、ソートのような決定的処理をトークン生成で行う非効率を避けつつ、再現性のある挙動を保証できます。
+              重要なのは、スキルに同梱されたPythonスクリプトなどの
+              <strong>コード自体はコンテキストに読み込まれず、実行結果のみが返る</strong>
+              という点です。これにより、ソートのような決定的処理をトークン生成で行う非効率を避けつつ、再現性のある挙動を保証できます。
             </p>
 
             <h3 className={styles.h3}>なぜシステムプロンプトやMCPではダメなのか</h3>
@@ -358,7 +355,11 @@ export default function AgentSkillsGuidePage() {
             </div>
             <p className={styles.p}>
               この比較からもわかる通り、Agent
-              Skillsは「常時稼働する外部連携」を担うMCPを置き換えるものではなく、<strong>手続き的知識・スタイルガイド・反復可能なワークフローを、低コストでエージェントに教え込む層</strong>として補完的に機能します。
+              Skillsは「常時稼働する外部連携」を担うMCPを置き換えるものではなく、
+              <strong>
+                手続き的知識・スタイルガイド・反復可能なワークフローを、低コストでエージェントに教え込む層
+              </strong>
+              として補完的に機能します。
             </p>
           </section>
 
@@ -375,10 +376,12 @@ export default function AgentSkillsGuidePage() {
             <div className={styles.card}>
               <ul className={styles.ul} style={{ marginBottom: 0 }}>
                 <li className={styles.li}>
-                  <strong>スキルフォルダ</strong>（例: <code className={styles.inlineCode}>my-skill/</code>）
+                  <strong>スキルフォルダ</strong>（例:{" "}
+                  <code className={styles.inlineCode}>my-skill/</code>）
                   <ul className={styles.ul}>
                     <li className={styles.li}>
-                      <code className={styles.inlineCode}>SKILL.md</code> — 必須。YAMLフロントマター＋Markdown本文
+                      <code className={styles.inlineCode}>SKILL.md</code> —
+                      必須。YAMLフロントマター＋Markdown本文
                     </li>
                     <li className={styles.li}>
                       <code className={styles.inlineCode}>scripts/</code> —
@@ -386,11 +389,13 @@ export default function AgentSkillsGuidePage() {
                     </li>
                     <li className={styles.li}>
                       <code className={styles.inlineCode}>examples/</code> または
-                      <code className={styles.inlineCode}>references/</code> — 任意。参照用ドキュメント
+                      <code className={styles.inlineCode}>references/</code> —
+                      任意。参照用ドキュメント
                     </li>
                     <li className={styles.li}>
                       <code className={styles.inlineCode}>resources/</code> または
-                      <code className={styles.inlineCode}>assets/</code> — 任意。テンプレートや設定ファイル
+                      <code className={styles.inlineCode}>assets/</code> —
+                      任意。テンプレートや設定ファイル
                     </li>
                   </ul>
                 </li>
@@ -489,11 +494,13 @@ export default function AgentSkillsGuidePage() {
                 <code className={styles.inlineCode}>.agent/skills</code>
                 （単数形）も引き続きサポートしています。さらに、グローバルスコープのパスは製品ドキュメントのページによって表記が割れており（例:
                 <code className={styles.inlineCode}>~/.gemini/config/skills/</code> と
-                <code className={styles.inlineCode}>~/.gemini/antigravity/skills/</code>）、Google Developer
-                ExpertのMete Atamel氏が実機検証したブログ記事では、Antigravity本体・Antigravity
-                CLI・Antigravity
-                IDEの3つのサーフェスがそれぞれ<strong>異なるグローバルパス</strong>を参照していることが報告されています。本番運用では
-                <code className={styles.inlineCode}>Which skills are installed?</code>（IDE／Antigravity本体）や
+                <code className={styles.inlineCode}>~/.gemini/antigravity/skills/</code>）、Google
+                Developer ExpertのMete
+                Atamel氏が実機検証したブログ記事では、Antigravity本体・Antigravity CLI・Antigravity
+                IDEの3つのサーフェスがそれぞれ<strong>異なるグローバルパス</strong>
+                を参照していることが報告されています。本番運用では
+                <code className={styles.inlineCode}>Which skills are installed?</code>
+                （IDE／Antigravity本体）や
                 <code className={styles.inlineCode}>/skills</code>
                 をエージェントに尋ねて実際の認識状況を確認することが推奨されます。
               </p>
@@ -521,7 +528,8 @@ export default function AgentSkillsGuidePage() {
 
           <section id="practices" className={styles.section}>
             <h2 className={styles.h2}>
-              <span className={styles.num}>05</span>実装パターン：ステップバイステップのベストプラクティス
+              <span className={styles.num}>05</span>
+              実装パターン：ステップバイステップのベストプラクティス
             </h2>
             <p className={styles.p}>
               以下は、Anthropic公式のガイダンスとAntigravity公式ドキュメント、および実務者による検証記事を統合した実装フローです。
@@ -538,7 +546,10 @@ export default function AgentSkillsGuidePage() {
                 <div>
                   <h4 className={styles.h4}>スコープを見極める</h4>
                   <p className={styles.p}>
-                    チームのデプロイ手順やそのプロジェクト固有のビルドパイプラインは<strong>ワークスペーススコープ</strong>（Gitで共有）、個人のコミットメッセージ規約やJSON整形のような汎用ユーティリティは<strong>グローバルスコープ</strong>に置きます。
+                    チームのデプロイ手順やそのプロジェクト固有のビルドパイプラインは
+                    <strong>ワークスペーススコープ</strong>
+                    （Gitで共有）、個人のコミットメッセージ規約やJSON整形のような汎用ユーティリティは
+                    <strong>グローバルスコープ</strong>に置きます。
                   </p>
                 </div>
               </div>
@@ -547,7 +558,9 @@ export default function AgentSkillsGuidePage() {
                 <div>
                   <h4 className={styles.h4}>単一責務の原則（Keep it Atomic）</h4>
                   <p className={styles.p}>
-                    「DevOpsスキル」のような何でも屋を作るのではなく、「ステージングデプロイ」「ログ解析」「ヘルスチェック」のように<strong>タスクごとに個別のスキルへ分割</strong>します。トリガー精度の向上と保守性の両方に効きます。
+                    「DevOpsスキル」のような何でも屋を作るのではなく、「ステージングデプロイ」「ログ解析」「ヘルスチェック」のように
+                    <strong>タスクごとに個別のスキルへ分割</strong>
+                    します。トリガー精度の向上と保守性の両方に効きます。
                   </p>
                 </div>
               </div>
@@ -641,7 +654,8 @@ export default function AgentSkillsGuidePage() {
               <code className={styles.inlineCode}>awesome-claude-skills</code>、
               <code className={styles.inlineCode}>antigravity-awesome-skills</code>
               等）を利用する運用も広がっています。ある集計では、エコシステム全体で1,400件超のスキルが主要な互換クライアント（Antigravity、Claude
-              Code、Codex、Gemini CLI、Cursor、Copilot、OpenCode、Windsurfなど）を横断して共有可能な状態にあると報告されています。
+              Code、Codex、Gemini
+              CLI、Cursor、Copilot、OpenCode、Windsurfなど）を横断して共有可能な状態にあると報告されています。
             </p>
 
             <h3 className={styles.h3}>6.2 クロスプラットフォーム運用時の注意</h3>
@@ -659,13 +673,19 @@ export default function AgentSkillsGuidePage() {
                 （特定のCLIに依存したBashコマンドなど）を本文に埋め込むと、他ツールへ移植した際にそのまま動かないことがあります。移植性を重視するなら、最小限のフロントマターと特定ツールに依存しない指示文からなる「中立的なSKILL.md」として書くことが推奨されます。
               </li>
               <li className={styles.li}>
-                同時稼働ツール数の目安（20未満が推奨、10を超えたあたりから精度が劣化しやすいという報告あり）を踏まえ、スキル自体の数よりも<strong>同時にアクティブ化されうるツール／スクリプトの複雑さ</strong>を管理する視点も必要です。
+                同時稼働ツール数の目安（20未満が推奨、10を超えたあたりから精度が劣化しやすいという報告あり）を踏まえ、スキル自体の数よりも
+                <strong>同時にアクティブ化されうるツール／スクリプトの複雑さ</strong>
+                を管理する視点も必要です。
               </li>
             </ul>
 
             <h3 className={styles.h3}>6.3 セキュリティ運用（最重要）</h3>
             <p className={styles.p}>
-              Anthropic公式のガイダンスは明確です。「信頼できる提供元のスキルのみをインストールすること。信頼度の低いソースからスキルを導入する場合は、使用前に必ず内容を精査すること」。特に、同梱されたコードの依存関係や画像・スクリプトなどのリソース、そして<strong>エージェントを外部の未信頼なネットワーク先へ接続させようとする指示やコード</strong>には注意を払うべきだとされています。悪意あるスキルは、実行環境に脆弱性を持ち込んだり、エージェントにデータを不正に持ち出させたり意図しない操作を取らせたりする可能性があるためです。
+              Anthropic公式のガイダンスは明確です。「信頼できる提供元のスキルのみをインストールすること。信頼度の低いソースからスキルを導入する場合は、使用前に必ず内容を精査すること」。特に、同梱されたコードの依存関係や画像・スクリプトなどのリソース、そして
+              <strong>
+                エージェントを外部の未信頼なネットワーク先へ接続させようとする指示やコード
+              </strong>
+              には注意を払うべきだとされています。悪意あるスキルは、実行環境に脆弱性を持ち込んだり、エージェントにデータを不正に持ち出させたり意図しない操作を取らせたりする可能性があるためです。
             </p>
 
             <p className={styles.p}>
@@ -722,7 +742,9 @@ export default function AgentSkillsGuidePage() {
             </div>
 
             <p className={styles.p}>
-              これらの事例が示す教訓は、<strong>「サンドボックスや権限設定があるから安全」という前提を置かないこと</strong>です。ネイティブツール呼び出しはシェルコマンド向けの制御をすり抜けうる、外部ドキュメント経由の間接的プロンプトインジェクションはユーザーが直接入力していない指示としてエージェントに届く、という2点は、スキル自体の監査だけでなく、エージェントが呼び出すツール層全体の運用ポリシーとして押さえておく必要があります。
+              これらの事例が示す教訓は、
+              <strong>「サンドボックスや権限設定があるから安全」という前提を置かないこと</strong>
+              です。ネイティブツール呼び出しはシェルコマンド向けの制御をすり抜けうる、外部ドキュメント経由の間接的プロンプトインジェクションはユーザーが直接入力していない指示としてエージェントに届く、という2点は、スキル自体の監査だけでなく、エージェントが呼び出すツール層全体の運用ポリシーとして押さえておく必要があります。
             </p>
 
             <div className={`${styles.callout} ${styles.goodCallout}`}>
@@ -752,7 +774,9 @@ export default function AgentSkillsGuidePage() {
 
             <h3 className={styles.h3}>6.4 評価駆動での継続的改善</h3>
             <p className={styles.p}>
-              スキルは一度書いて終わりではなく、「生きたドキュメント」として運用します。実タスクでの挙動を観察し、エージェントが期待外れの経路をたどった箇所や、特定のコンテキストへの過度な依存が見られた箇所を洗い出し、SKILL.mdに反映していきます。Anthropicはこのプロセスを、事前にすべてを想定して書き切るのではなく、<strong>エージェントが実際に何を必要としているかを発見していく反復プロセス</strong>として位置づけています。
+              スキルは一度書いて終わりではなく、「生きたドキュメント」として運用します。実タスクでの挙動を観察し、エージェントが期待外れの経路をたどった箇所や、特定のコンテキストへの過度な依存が見られた箇所を洗い出し、SKILL.mdに反映していきます。Anthropicはこのプロセスを、事前にすべてを想定して書き切るのではなく、
+              <strong>エージェントが実際に何を必要としているかを発見していく反復プロセス</strong>
+              として位置づけています。
             </p>
           </section>
 
@@ -765,27 +789,31 @@ export default function AgentSkillsGuidePage() {
             </p>
 
             <pre className={styles.codePre}>
-              <span className={styles.cm}>---</span>{"\n"}
+              <span className={styles.cm}>---</span>
+              {"\n"}
               <span className={styles.kw}>name</span>: code-review{"\n"}
               <span className={styles.kw}>description</span>:{" "}
               <span className={styles.str}>
-                Reviews code changes for bugs, style issues, and best practices. Use when reviewing PRs or checking code quality.
-              </span>{"\n"}
+                Reviews code changes for bugs, style issues, and best practices. Use when reviewing
+                PRs or checking code quality.
+              </span>
+              {"\n"}
               <span className={styles.cm}>---</span>
             </pre>
 
             <pre className={styles.codePre}>
-              <span className={styles.cm}># Code Review Skill</span>{"\n\n"}
+              <span className={styles.cm}># Code Review Skill</span>
+              {"\n\n"}
               When reviewing code, follow these steps:{"\n\n"}
-              <span className={styles.cm}>## Review checklist</span>{"\n\n"}
+              <span className={styles.cm}>## Review checklist</span>
+              {"\n\n"}
               1. Correctness: Does the code do what it's supposed to?{"\n"}
               2. Edge cases: Are error conditions handled?{"\n"}
               3. Style: Does it follow project conventions?{"\n"}
               4. Performance: Are there obvious inefficiencies?{"\n\n"}
-              <span className={styles.cm}>## How to provide feedback</span>{"\n\n"}
-              - Be specific about what needs to change{"\n"}
-              - Explain why, not just what{"\n"}
-              - Suggest alternatives when possible
+              <span className={styles.cm}>## How to provide feedback</span>
+              {"\n\n"}- Be specific about what needs to change{"\n"}- Explain why, not just what
+              {"\n"}- Suggest alternatives when possible
             </pre>
 
             <p className={styles.p}>
@@ -846,98 +874,184 @@ export default function AgentSkillsGuidePage() {
           </p>
           <ol className={styles.refsOl}>
             <li className={styles.refsLi}>
-              <span className={styles.refTitle}>Anthropic Engineering Blog</span> — "Equipping agents for the real world with Agent Skills"（Barry Zhang, Keith Lazuka, Mahesh Murag 著, 2025-10-16）<br />
+              <span className={styles.refTitle}>Anthropic Engineering Blog</span> — "Equipping
+              agents for the real world with Agent Skills"（Barry Zhang, Keith Lazuka, Mahesh Murag
+              著, 2025-10-16）
+              <br />
               <ExtRef href="https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills">
                 https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills
               </ExtRef>
             </li>
             <li className={styles.refsLi}>
-              <span className={styles.refTitle}>Agent Skills オープン標準サイト</span> — agentskills.io<br />
+              <span className={styles.refTitle}>Agent Skills オープン標準サイト</span> —
+              agentskills.io
+              <br />
               <ExtRef href="https://agentskills.io/home">https://agentskills.io/home</ExtRef>
             </li>
             <li className={styles.refsLi}>
-              <span className={styles.refTitle}>Google Antigravity 公式ドキュメント</span>（Antigravity 2.0 / Customizations / Skills）<br />
-              <ExtRef href="https://antigravity.google/docs/skills">https://antigravity.google/docs/skills</ExtRef>
+              <span className={styles.refTitle}>Google Antigravity 公式ドキュメント</span>
+              （Antigravity 2.0 / Customizations / Skills）
+              <br />
+              <ExtRef href="https://antigravity.google/docs/skills">
+                https://antigravity.google/docs/skills
+              </ExtRef>
             </li>
             <li className={styles.refsLi}>
-              <span className={styles.refTitle}>Google Antigravity 公式ドキュメント</span>（Antigravity IDE / Customizations / Skills）<br />
-              <ExtRef href="https://antigravity.google/docs/ide/skills">https://antigravity.google/docs/ide/skills</ExtRef>
+              <span className={styles.refTitle}>Google Antigravity 公式ドキュメント</span>
+              （Antigravity IDE / Customizations / Skills）
+              <br />
+              <ExtRef href="https://antigravity.google/docs/ide/skills">
+                https://antigravity.google/docs/ide/skills
+              </ExtRef>
             </li>
             <li className={styles.refsLi}>
-              <span className={styles.refTitle}>Simon Willison's Weblog</span> — "Claude Skills are awesome, maybe a bigger deal than MCP"（2025-10-16）<br />
-              <ExtRef href="https://simonwillison.net/2025/Oct/16/claude-skills/">https://simonwillison.net/2025/Oct/16/claude-skills/</ExtRef>
+              <span className={styles.refTitle}>Simon Willison's Weblog</span> — "Claude Skills are
+              awesome, maybe a bigger deal than MCP"（2025-10-16）
+              <br />
+              <ExtRef href="https://simonwillison.net/2025/Oct/16/claude-skills/">
+                https://simonwillison.net/2025/Oct/16/claude-skills/
+              </ExtRef>
             </li>
             <li className={styles.refsLi}>
-              <span className={styles.refTitle}>Mete Atamel</span> — "Where does Antigravity look for Agent Skills?"<br />
-              <ExtRef href="https://atamel.dev/posts/2026/07-01_where_agy_agent_skills/">https://atamel.dev/posts/2026/07-01_where_agy_agent_skills/</ExtRef>
+              <span className={styles.refTitle}>Mete Atamel</span> — "Where does Antigravity look
+              for Agent Skills?"
+              <br />
+              <ExtRef href="https://atamel.dev/posts/2026/07-01_where_agy_agent_skills/">
+                https://atamel.dev/posts/2026/07-01_where_agy_agent_skills/
+              </ExtRef>
             </li>
             <li className={styles.refsLi}>
-              <span className={styles.refTitle}>Google Codelabs</span> — "Authoring Google Antigravity Skills"<br />
-              <ExtRef href="https://codelabs.developers.google.com/getting-started-with-antigravity-skills">https://codelabs.developers.google.com/getting-started-with-antigravity-skills</ExtRef>
+              <span className={styles.refTitle}>Google Codelabs</span> — "Authoring Google
+              Antigravity Skills"
+              <br />
+              <ExtRef href="https://codelabs.developers.google.com/getting-started-with-antigravity-skills">
+                https://codelabs.developers.google.com/getting-started-with-antigravity-skills
+              </ExtRef>
             </li>
             <li className={styles.refsLi}>
-              <span className={styles.refTitle}>Giovanni Galloro</span> — "Creating an ADK Agent Skill in Antigravity"（Google Cloud Community / Medium）<br />
-              <ExtRef href="https://medium.com/google-cloud/creating-an-adk-agent-skill-in-antigravity-0031f5f82ccb">https://medium.com/google-cloud/creating-an-adk-agent-skill-in-antigravity-0031f5f82ccb</ExtRef>
+              <span className={styles.refTitle}>Giovanni Galloro</span> — "Creating an ADK Agent
+              Skill in Antigravity"（Google Cloud Community / Medium）
+              <br />
+              <ExtRef href="https://medium.com/google-cloud/creating-an-adk-agent-skill-in-antigravity-0031f5f82ccb">
+                https://medium.com/google-cloud/creating-an-adk-agent-skill-in-antigravity-0031f5f82ccb
+              </ExtRef>
             </li>
             <li className={styles.refsLi}>
-              <span className={styles.refTitle}>Dazbo (Darren Lester)</span> — "Confused About Where to Put Your Agent Skills? (Updated for Antigravity.)"（Google Cloud Community / Medium）<br />
-              <ExtRef href="https://medium.com/google-cloud/confused-about-where-to-put-your-agent-skills-ea778f3c64f3">https://medium.com/google-cloud/confused-about-where-to-put-your-agent-skills-ea778f3c64f3</ExtRef>
+              <span className={styles.refTitle}>Dazbo (Darren Lester)</span> — "Confused About Where
+              to Put Your Agent Skills? (Updated for Antigravity.)"（Google Cloud Community /
+              Medium）
+              <br />
+              <ExtRef href="https://medium.com/google-cloud/confused-about-where-to-put-your-agent-skills-ea778f3c64f3">
+                https://medium.com/google-cloud/confused-about-where-to-put-your-agent-skills-ea778f3c64f3
+              </ExtRef>
             </li>
             <li className={styles.refsLi}>
-              <span className={styles.refTitle}>RuleSell</span> — "Google Antigravity Rules and Agent Skills: The Setup Guide"<br />
-              <ExtRef href="https://www.rulesell.com/topic/antigravity-rules">https://www.rulesell.com/topic/antigravity-rules</ExtRef>
+              <span className={styles.refTitle}>RuleSell</span> — "Google Antigravity Rules and
+              Agent Skills: The Setup Guide"
+              <br />
+              <ExtRef href="https://www.rulesell.com/topic/antigravity-rules">
+                https://www.rulesell.com/topic/antigravity-rules
+              </ExtRef>
             </li>
             <li className={styles.refsLi}>
-              <span className={styles.refTitle}>VERTU</span> — "What are Google Antigravity Skills? Build 24/7 AI Agents"<br />
-              <ExtRef href="https://vertu.com/lifestyle/mastering-google-antigravity-skills-the-ultimate-guide-to-extending-agentic-ai-in-2026">https://vertu.com/lifestyle/mastering-google-antigravity-skills-the-ultimate-guide-to-extending-agentic-ai-in-2026</ExtRef>
+              <span className={styles.refTitle}>VERTU</span> — "What are Google Antigravity Skills?
+              Build 24/7 AI Agents"
+              <br />
+              <ExtRef href="https://vertu.com/lifestyle/mastering-google-antigravity-skills-the-ultimate-guide-to-extending-agentic-ai-in-2026">
+                https://vertu.com/lifestyle/mastering-google-antigravity-skills-the-ultimate-guide-to-extending-agentic-ai-in-2026
+              </ExtRef>
             </li>
             <li className={styles.refsLi}>
-              <span className={styles.refTitle}>DEV Community</span> — "My First Experience Creating Antigravity Skills"<br />
-              <ExtRef href="https://dev.to/googleai/my-first-experience-creating-antigravity-skills-524b">https://dev.to/googleai/my-first-experience-creating-antigravity-skills-524b</ExtRef>
+              <span className={styles.refTitle}>DEV Community</span> — "My First Experience Creating
+              Antigravity Skills"
+              <br />
+              <ExtRef href="https://dev.to/googleai/my-first-experience-creating-antigravity-skills-524b">
+                https://dev.to/googleai/my-first-experience-creating-antigravity-skills-524b
+              </ExtRef>
             </li>
             <li className={styles.refsLi}>
-              <span className={styles.refTitle}>Pillar Security</span> — "Prompt Injection leads to RCE and Sandbox Escape in Antigravity"<br />
-              <ExtRef href="https://www.pillar.security/blog/prompt-injection-leads-to-rce-and-sandbox-escape-in-antigravity">https://www.pillar.security/blog/prompt-injection-leads-to-rce-and-sandbox-escape-in-antigravity</ExtRef>
+              <span className={styles.refTitle}>Pillar Security</span> — "Prompt Injection leads to
+              RCE and Sandbox Escape in Antigravity"
+              <br />
+              <ExtRef href="https://www.pillar.security/blog/prompt-injection-leads-to-rce-and-sandbox-escape-in-antigravity">
+                https://www.pillar.security/blog/prompt-injection-leads-to-rce-and-sandbox-escape-in-antigravity
+              </ExtRef>
             </li>
             <li className={styles.refsLi}>
-              <span className={styles.refTitle}>The Hacker News</span> — "Google Patches Antigravity IDE Flaw Enabling Prompt Injection Code Execution"（2026-04-21）<br />
-              <ExtRef href="https://thehackernews.com/2026/04/google-patches-antigravity-ide-flaw.html">https://thehackernews.com/2026/04/google-patches-antigravity-ide-flaw.html</ExtRef>
+              <span className={styles.refTitle}>The Hacker News</span> — "Google Patches Antigravity
+              IDE Flaw Enabling Prompt Injection Code Execution"（2026-04-21）
+              <br />
+              <ExtRef href="https://thehackernews.com/2026/04/google-patches-antigravity-ide-flaw.html">
+                https://thehackernews.com/2026/04/google-patches-antigravity-ide-flaw.html
+              </ExtRef>
             </li>
             <li className={styles.refsLi}>
-              <span className={styles.refTitle}>Dark Reading</span> — "Google Fixes Critical RCE Flaw in AI-Based 'Antigravity' Tool"（2026-04-22）<br />
-              <ExtRef href="https://www.darkreading.com/vulnerabilities-threats/google-fixes-critical-rce-flaw-ai-based-antigravity-tool">https://www.darkreading.com/vulnerabilities-threats/google-fixes-critical-rce-flaw-ai-based-antigravity-tool</ExtRef>
+              <span className={styles.refTitle}>Dark Reading</span> — "Google Fixes Critical RCE
+              Flaw in AI-Based 'Antigravity' Tool"（2026-04-22）
+              <br />
+              <ExtRef href="https://www.darkreading.com/vulnerabilities-threats/google-fixes-critical-rce-flaw-ai-based-antigravity-tool">
+                https://www.darkreading.com/vulnerabilities-threats/google-fixes-critical-rce-flaw-ai-based-antigravity-tool
+              </ExtRef>
             </li>
             <li className={styles.refsLi}>
-              <span className={styles.refTitle}>CSO Online</span> — "Prompt injection turned Google's Antigravity file search into RCE"<br />
-              <ExtRef href="https://www.csoonline.com/article/4161382/prompt-injection-turned-googles-antigravity-file-search-into-rce.html">https://www.csoonline.com/article/4161382/prompt-injection-turned-googles-antigravity-file-search-into-rce.html</ExtRef>
+              <span className={styles.refTitle}>CSO Online</span> — "Prompt injection turned
+              Google's Antigravity file search into RCE"
+              <br />
+              <ExtRef href="https://www.csoonline.com/article/4161382/prompt-injection-turned-googles-antigravity-file-search-into-rce.html">
+                https://www.csoonline.com/article/4161382/prompt-injection-turned-googles-antigravity-file-search-into-rce.html
+              </ExtRef>
             </li>
             <li className={styles.refsLi}>
-              <span className={styles.refTitle}>BDTechTalks</span> — "Antigravity prompt injection vulnerability highlights security threats of AI-powered coding tools"<br />
-              <ExtRef href="https://bdtechtalks.substack.com/p/antigravity-prompt-injection-vulnerability">https://bdtechtalks.substack.com/p/antigravity-prompt-injection-vulnerability</ExtRef>
+              <span className={styles.refTitle}>BDTechTalks</span> — "Antigravity prompt injection
+              vulnerability highlights security threats of AI-powered coding tools"
+              <br />
+              <ExtRef href="https://bdtechtalks.substack.com/p/antigravity-prompt-injection-vulnerability">
+                https://bdtechtalks.substack.com/p/antigravity-prompt-injection-vulnerability
+              </ExtRef>
             </li>
             <li className={styles.refsLi}>
-              <span className={styles.refTitle}>SwirlAI Newsletter</span> — "Agent Skills: Progressive Disclosure as a System Design Pattern"<br />
-              <ExtRef href="https://www.newsletter.swirlai.com/p/agent-skills-progressive-disclosure">https://www.newsletter.swirlai.com/p/agent-skills-progressive-disclosure</ExtRef>
+              <span className={styles.refTitle}>SwirlAI Newsletter</span> — "Agent Skills:
+              Progressive Disclosure as a System Design Pattern"
+              <br />
+              <ExtRef href="https://www.newsletter.swirlai.com/p/agent-skills-progressive-disclosure">
+                https://www.newsletter.swirlai.com/p/agent-skills-progressive-disclosure
+              </ExtRef>
             </li>
             <li className={styles.refsLi}>
-              <span className={styles.refTitle}>Firecrawl Blog</span> — "Agent Skills Explained: How SKILL.md Files Work and Why They're Everywhere"<br />
-              <ExtRef href="https://www.firecrawl.dev/blog/agent-skills">https://www.firecrawl.dev/blog/agent-skills</ExtRef>
+              <span className={styles.refTitle}>Firecrawl Blog</span> — "Agent Skills Explained: How
+              SKILL.md Files Work and Why They're Everywhere"
+              <br />
+              <ExtRef href="https://www.firecrawl.dev/blog/agent-skills">
+                https://www.firecrawl.dev/blog/agent-skills
+              </ExtRef>
             </li>
             <li className={styles.refsLi}>
-              <span className={styles.refTitle}>Ry Walker Research</span> — "Anthropic Skills (anthropics/skills)"<br />
-              <ExtRef href="https://rywalker.com/research/anthropic-skills">https://rywalker.com/research/anthropic-skills</ExtRef>
+              <span className={styles.refTitle}>Ry Walker Research</span> — "Anthropic Skills
+              (anthropics/skills)"
+              <br />
+              <ExtRef href="https://rywalker.com/research/anthropic-skills">
+                https://rywalker.com/research/anthropic-skills
+              </ExtRef>
             </li>
             <li className={styles.refsLi}>
-              <span className={styles.refTitle}>GitHub</span> — travisvn/awesome-claude-skills<br />
-              <ExtRef href="https://github.com/travisvn/awesome-claude-skills">https://github.com/travisvn/awesome-claude-skills</ExtRef>
+              <span className={styles.refTitle}>GitHub</span> — travisvn/awesome-claude-skills
+              <br />
+              <ExtRef href="https://github.com/travisvn/awesome-claude-skills">
+                https://github.com/travisvn/awesome-claude-skills
+              </ExtRef>
             </li>
             <li className={styles.refsLi}>
-              <span className={styles.refTitle}>GitHub</span> — anthropics/skills（公式Agent Skillsリポジトリ）<br />
-              <ExtRef href="https://github.com/anthropics/skills">https://github.com/anthropics/skills</ExtRef>
+              <span className={styles.refTitle}>GitHub</span> — anthropics/skills（公式Agent
+              Skillsリポジトリ）
+              <br />
+              <ExtRef href="https://github.com/anthropics/skills">
+                https://github.com/anthropics/skills
+              </ExtRef>
             </li>
           </ol>
           <p className={styles.footerNote}>
-            注記: Antigravityは2026年7月現在も活発に開発が続く製品であり、スキルの配置パスや実行モードの仕様は将来のバージョンで変更される可能性があります。実装前には必ず上記の公式ドキュメント（3・4）の最新版をご確認ください。
+            注記:
+            Antigravityは2026年7月現在も活発に開発が続く製品であり、スキルの配置パスや実行モードの仕様は将来のバージョンで変更される可能性があります。実装前には必ず上記の公式ドキュメント（3・4）の最新版をご確認ください。
           </p>
         </div>
       </footer>

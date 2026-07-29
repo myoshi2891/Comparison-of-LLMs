@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import MermaidDiagram from "@/components/docs/MermaidDiagram";
-import { TocObserver } from "./TocObserver";
 import styles from "./page.module.css";
+import { TocObserver } from "./TocObserver";
 
 export const metadata: Metadata = {
   title:
@@ -137,7 +137,9 @@ export default function AntigravitySpecPage() {
             Google Antigravityの Rules / Skills / Workflows / Artifacts 徹底ガイド
           </h1>
           <p className={styles.heroSub}>
-            対象読者：AIエージェントIDE「Google Antigravity」を初めて触る人、あるいは「AI仕様駆動開発（Spec-Driven Development, SDD）」という考え方を実務に落とし込みたい人向け。Antigravityが扱う4種類のMarkdownファイルそれぞれの役割・置き場所・書き方・ベストプラクティスを、手順を追って理解できるようにまとめました。
+            対象読者：AIエージェントIDE「Google
+            Antigravity」を初めて触る人、あるいは「AI仕様駆動開発（Spec-Driven Development,
+            SDD）」という考え方を実務に落とし込みたい人向け。Antigravityが扱う4種類のMarkdownファイルそれぞれの役割・置き場所・書き方・ベストプラクティスを、手順を追って理解できるようにまとめました。
           </p>
           <div className={styles.callout}>
             <p>
@@ -154,17 +156,27 @@ export default function AntigravitySpecPage() {
           <h2>なぜ「Markdownが仕様になる」のか</h2>
           <div className={styles.prose}>
             <p>
-              Spec-Driven Development（仕様駆動開発）とは、「なんとなく指示してAIに書かせる（vibe coding）」のではなく、
-              <strong>仕様（spec）そのものを一次情報源（source of truth）とし、コードはその仕様から導かれる成果物として扱う</strong>
-              という考え方です。GitHubのSpec Kit、AWSのKiro、Claude Codeのskills機能、CursorのPlan Modeなど、2026年時点で主要なAIコーディングツールはそれぞれ独自の形でこの思想を実装しています。
+              Spec-Driven Development（仕様駆動開発）とは、「なんとなく指示してAIに書かせる（vibe
+              coding）」のではなく、
+              <strong>
+                仕様（spec）そのものを一次情報源（source of
+                truth）とし、コードはその仕様から導かれる成果物として扱う
+              </strong>
+              という考え方です。GitHubのSpec Kit、AWSのKiro、Claude Codeのskills機能、CursorのPlan
+              Modeなど、2026年時点で主要なAIコーディングツールはそれぞれ独自の形でこの思想を実装しています。
             </p>
             <p>
-              Google Antigravityの場合、この「仕様」や「行動規範」「専門知識」「実行手順」を記述する媒体として、一貫して
+              Google
+              Antigravityの場合、この「仕様」や「行動規範」「専門知識」「実行手順」を記述する媒体として、一貫して
               <strong>プレーンなMarkdownファイル</strong>
               が使われています。これは意図的な設計判断です。Antigravityの公式ドキュメントでも、Skillsの仕組みについて、あえてMarkdownとYAMLという広く理解されているフォーマットに乗せることで、IDEの機能拡張への参入障壁を下げていると説明されています。
             </p>
             <p>
-              Antigravity自体は、VS Codeをベースにしたデスクトップ型のエージェント型開発プラットフォームで、2025年11月にGemini 3と同時に発表されました。著名な開発者であるSimon Willisonは公開直後のレビューで、Antigravityの見た目は「よくあるVS Codeフォーク」だが、内部にはいくつか興味深い新しいアイデアがあると評しています。その「新しいアイデア」の中核が、これから解説する4種類のMarkdownファイルです。
+              Antigravity自体は、VS
+              Codeをベースにしたデスクトップ型のエージェント型開発プラットフォームで、2025年11月にGemini
+              3と同時に発表されました。著名な開発者であるSimon
+              Willisonは公開直後のレビューで、Antigravityの見た目は「よくあるVS
+              Codeフォーク」だが、内部にはいくつか興味深い新しいアイデアがあると評しています。その「新しいアイデア」の中核が、これから解説する4種類のMarkdownファイルです。
             </p>
           </div>
           <a className={styles.backToTop} href="#top">
@@ -184,7 +196,9 @@ export default function AntigravitySpecPage() {
             <div className={styles.mermaidWrap}>
               <MermaidDiagram chart={DIAGRAM_0} id="diagram-0" />
             </div>
-            <div className={styles.diagramCaption}>図1：Rules / Skills / Workflows / Artifacts の関係</div>
+            <div className={styles.diagramCaption}>
+              図1：Rules / Skills / Workflows / Artifacts の関係
+            </div>
           </div>
 
           <div className={styles.prose}>
@@ -316,7 +330,12 @@ export default function AntigravitySpecPage() {
           </div>
           <div className={styles.prose}>
             <p>
-              公式ドキュメントによれば、Antigravityは現在 <code>.agents/rules</code> をデフォルトの保存場所としていますが、旧来の <code>.agent/rules</code>（<code>agent</code>が単数形）も後方互換として引き続きサポートされています。他のツールが生成した <code>.agent/</code> 構成のプロジェクトを開いても問題なく動作する、という互換性への配慮です。
+              公式ドキュメントによれば、Antigravityは現在 <code>.agents/rules</code>{" "}
+              をデフォルトの保存場所としていますが、旧来の <code>.agent/rules</code>（
+              <code>agent</code>
+              が単数形）も後方互換として引き続きサポートされています。他のツールが生成した{" "}
+              <code>.agent/</code>{" "}
+              構成のプロジェクトを開いても問題なく動作する、という互換性への配慮です。
             </p>
           </div>
 
@@ -338,7 +357,8 @@ export default function AntigravitySpecPage() {
                     <strong>Manual</strong>
                   </td>
                   <td>
-                    チャット入力欄で <code>@ルール名</code> のように明示的にメンションした時だけ適用される
+                    チャット入力欄で <code>@ルール名</code>{" "}
+                    のように明示的にメンションした時だけ適用される
                   </td>
                 </tr>
                 <tr>
@@ -351,14 +371,17 @@ export default function AntigravitySpecPage() {
                   <td>
                     <strong>Model Decision</strong>
                   </td>
-                  <td>Ruleに書かれた自然言語の説明を手がかりに、適用すべきかどうかをモデル自身が判断する</td>
+                  <td>
+                    Ruleに書かれた自然言語の説明を手がかりに、適用すべきかどうかをモデル自身が判断する
+                  </td>
                 </tr>
                 <tr>
                   <td>
                     <strong>Glob</strong>
                   </td>
                   <td>
-                    <code>*.js</code> や <code>src/**/*.ts</code> のようなglobパターンに一致するファイルを操作する時だけ適用される
+                    <code>*.js</code> や <code>{"src/**/*.ts"}</code>{" "}
+                    のようなglobパターンに一致するファイルを操作する時だけ適用される
                   </td>
                 </tr>
               </tbody>
@@ -375,7 +398,12 @@ export default function AntigravitySpecPage() {
           <h3>@ メンションで他ファイルを参照できる</h3>
           <div className={styles.prose}>
             <p>
-              Rulesファイルの中では <code>@ファイル名</code> という記法で他のファイルを参照できます。相対パスならRuleファイルからの相対位置として、絶対パスならそのまま絶対パスとして解決されます。例えば <code>@/path/to/file.md</code> はまず <code>/path/to/file.md</code> として解決を試み、存在しなければワークスペース内の <code>workspace/path/to/file.md</code> として解決されます。これにより、共通のコーディング規約ドキュメントをRuleの中から引用するといった構成が可能になります。
+              Rulesファイルの中では <code>@ファイル名</code>{" "}
+              という記法で他のファイルを参照できます。相対パスならRuleファイルからの相対位置として、絶対パスならそのまま絶対パスとして解決されます。例えば{" "}
+              <code>@/path/to/file.md</code> はまず <code>/path/to/file.md</code>{" "}
+              として解決を試み、存在しなければワークスペース内の{" "}
+              <code>workspace/path/to/file.md</code>{" "}
+              として解決されます。これにより、共通のコーディング規約ドキュメントをRuleの中から引用するといった構成が可能になります。
             </p>
           </div>
 
@@ -384,13 +412,20 @@ export default function AntigravitySpecPage() {
           <pre className={styles.codeBlock}>
             <div className={styles.codeLine}># データベース関連の制約</div>
             <div className={styles.codeLine}></div>
-            <div className={styles.codeLine}>- マイグレーションファイル（migrations/ 配下）は、明示的な確認なしに変更・削除しない</div>
-            <div className={styles.codeLine}>- Prismaスキーマを唯一の正とし、生成されたマイグレーションを手で直接編集しない</div>
-            <div className={styles.codeLine}>- 本番環境に影響するコマンドを実行する前には、必ず実行内容を要約して確認を求める</div>
+            <div className={styles.codeLine}>
+              - マイグレーションファイル（migrations/ 配下）は、明示的な確認なしに変更・削除しない
+            </div>
+            <div className={styles.codeLine}>
+              - Prismaスキーマを唯一の正とし、生成されたマイグレーションを手で直接編集しない
+            </div>
+            <div className={styles.codeLine}>
+              - 本番環境に影響するコマンドを実行する前には、必ず実行内容を要約して確認を求める
+            </div>
           </pre>
           <div className={styles.prose}>
             <p>
-              このような「やってはいけないこと（deny rule）」を明文化しておくと、後戻りできない事故（本番DBの破壊など）を未然に防げる、という指摘は複数の実務者ブログでも共通して強調されています。
+              このような「やってはいけないこと（deny
+              rule）」を明文化しておくと、後戻りできない事故（本番DBの破壊など）を未然に防げる、という指摘は複数の実務者ブログでも共通して強調されています。
             </p>
           </div>
           <a className={styles.backToTop} href="#top">
@@ -406,7 +441,11 @@ export default function AntigravitySpecPage() {
           <h3>Skillsとは何か</h3>
           <div className={styles.prose}>
             <p>
-              Skillsは、特定の作業に関する「専門知識」と「手順」、そして必要に応じて「補助スクリプト」をひとまとめにしたフォルダです。Antigravityの公式ドキュメントは、SkillsをAgent Skillsという<strong>オープンな標準規格</strong>の実装として位置づけており、<code>SKILL.md</code> というファイル形式自体はAntigravity専用ではなく、Claude Code・Cursor・Gemini CLIなど複数のエージェントツール間で共通して使えるモデル非依存のフォーマットだと説明されています。
+              Skillsは、特定の作業に関する「専門知識」と「手順」、そして必要に応じて「補助スクリプト」をひとまとめにしたフォルダです。Antigravityの公式ドキュメントは、SkillsをAgent
+              Skillsという<strong>オープンな標準規格</strong>の実装として位置づけており、
+              <code>SKILL.md</code> というファイル形式自体はAntigravity専用ではなく、Claude
+              Code・Cursor・Gemini
+              CLIなど複数のエージェントツール間で共通して使えるモデル非依存のフォーマットだと説明されています。
             </p>
           </div>
 
@@ -491,7 +530,8 @@ export default function AntigravitySpecPage() {
           </div>
           <div className={styles.prose}>
             <p>
-              Rulesと同様に、Antigravityは現在 <code>.agents/skills</code> をデフォルトとしつつ、旧 <code>.agent/skills</code> も後方互換としてサポートしています。
+              Rulesと同様に、Antigravityは現在 <code>.agents/skills</code> をデフォルトとしつつ、旧{" "}
+              <code>.agent/skills</code> も後方互換としてサポートしています。
             </p>
           </div>
 
@@ -511,21 +551,26 @@ export default function AntigravitySpecPage() {
                     <code>name</code>
                   </td>
                   <td>任意</td>
-                  <td>Skillの一意な識別子（小文字・ハイフン区切り）。省略時はフォルダ名がそのまま使われる</td>
+                  <td>
+                    Skillの一意な識別子（小文字・ハイフン区切り）。省略時はフォルダ名がそのまま使われる
+                  </td>
                 </tr>
                 <tr>
                   <td>
                     <code>description</code>
                   </td>
                   <td>必須</td>
-                  <td>Skillが何をするか、いつ使うべきかを説明する文。エージェントが「このSkillを使うべきか」を判断する材料になる</td>
+                  <td>
+                    Skillが何をするか、いつ使うべきかを説明する文。エージェントが「このSkillを使うべきか」を判断する材料になる
+                  </td>
                 </tr>
               </tbody>
             </table>
           </div>
           <div className={styles.prose}>
             <p>
-              公式ドキュメントは、descriptionを<strong>三人称で</strong>、かつエージェントがタスクとの関連性を認識しやすいキーワードを含めて書くことを推奨しています。例えば「Pythonコードに対してpytest規約に沿った単体テストを生成する」のように、具体的な動詞と対象を明示する書き方です。
+              公式ドキュメントは、descriptionを<strong>三人称で</strong>
+              、かつエージェントがタスクとの関連性を認識しやすいキーワードを含めて書くことを推奨しています。例えば「Pythonコードに対してpytest規約に沿った単体テストを生成する」のように、具体的な動詞と対象を明示する書き方です。
             </p>
           </div>
 
@@ -542,7 +587,9 @@ export default function AntigravitySpecPage() {
             <div className={styles.mermaidWrap}>
               <MermaidDiagram chart={DIAGRAM_2} id="diagram-2" />
             </div>
-            <div className={styles.diagramCaption}>図3：Skillのprogressive disclosure（段階的開示）</div>
+            <div className={styles.diagramCaption}>
+              図3：Skillのprogressive disclosure（段階的開示）
+            </div>
           </div>
 
           <div className={styles.prose}>
@@ -556,16 +603,21 @@ export default function AntigravitySpecPage() {
             <p>公式ドキュメントが挙げているポイントは次の4つです。</p>
             <ul>
               <li>
-                <strong>1つのSkillには1つの役割だけを持たせる</strong>：「何でも屋」のSkillではなく、独立したタスクごとに別々のSkillへ分割する
+                <strong>1つのSkillには1つの役割だけを持たせる</strong>
+                ：「何でも屋」のSkillではなく、独立したタスクごとに別々のSkillへ分割する
               </li>
               <li>
-                <strong>descriptionを明確に書く</strong>：エージェントがSkillを使うかどうかを判断する唯一の手がかりなので、具体性が重要
+                <strong>descriptionを明確に書く</strong>
+                ：エージェントがSkillを使うかどうかを判断する唯一の手がかりなので、具体性が重要
               </li>
               <li>
-                <strong>スクリプトは「ブラックボックス」として扱わせる</strong>：スクリプトを含む場合、エージェントにはソースコード全体を読ませるのではなく、まず <code>--help</code> を実行させて使い方を把握させる方が、コンテキストを節約できる
+                <strong>スクリプトは「ブラックボックス」として扱わせる</strong>
+                ：スクリプトを含む場合、エージェントにはソースコード全体を読ませるのではなく、まず{" "}
+                <code>--help</code> を実行させて使い方を把握させる方が、コンテキストを節約できる
               </li>
               <li>
-                <strong>複雑なSkillには判断ツリーを含める</strong>：状況に応じてどちらのアプローチを取るべきか、Skillの中に条件分岐の説明を書いておく
+                <strong>複雑なSkillには判断ツリーを含める</strong>
+                ：状況に応じてどちらのアプローチを取るべきか、Skillの中に条件分岐の説明を書いておく
               </li>
             </ul>
           </div>
@@ -575,7 +627,10 @@ export default function AntigravitySpecPage() {
           <pre className={styles.codeBlock}>
             <div className={styles.codeLine}>---</div>
             <div className={styles.codeLine}>name: code-review</div>
-            <div className={styles.codeLine}>description: コードの変更をバグ・スタイル・ベストプラクティスの観点でレビューする。PRレビューやコード品質チェックの際に使用する。</div>
+            <div className={styles.codeLine}>
+              description:
+              コードの変更をバグ・スタイル・ベストプラクティスの観点でレビューする。PRレビューやコード品質チェックの際に使用する。
+            </div>
             <div className={styles.codeLine}>---</div>
             <div className={styles.codeLine}></div>
             <div className={styles.codeLine}># コードレビューSkill</div>
@@ -585,7 +640,9 @@ export default function AntigravitySpecPage() {
             <div className={styles.codeLine}>## レビューチェックリスト</div>
             <div className={styles.codeLine}></div>
             <div className={styles.codeLine}>1. 正しさ：コードは意図通りに動作するか</div>
-            <div className={styles.codeLine}>2. エッジケース：エラー条件は適切に処理されているか</div>
+            <div className={styles.codeLine}>
+              2. エッジケース：エラー条件は適切に処理されているか
+            </div>
             <div className={styles.codeLine}>3. スタイル：プロジェクトの規約に沿っているか</div>
             <div className={styles.codeLine}>4. パフォーマンス：明らかな非効率はないか</div>
             <div className={styles.codeLine}></div>
@@ -607,7 +664,9 @@ export default function AntigravitySpecPage() {
 
           <h3>WorkflowsとRulesの違い</h3>
           <div className={styles.prose}>
-            <p>RulesとWorkflowsは、どちらもエージェントの動作をカスタマイズする仕組みですが、性質がまったく異なります。</p>
+            <p>
+              RulesとWorkflowsは、どちらもエージェントの動作をカスタマイズする仕組みですが、性質がまったく異なります。
+            </p>
           </div>
           <div className={styles.tableWrap}>
             <table>
@@ -647,18 +706,31 @@ export default function AntigravitySpecPage() {
           <h3>保存場所と呼び出し方</h3>
           <div className={styles.prose}>
             <p>
-              Workflowsもワークスペース単位・グローバル単位で保存でき、いずれもMarkdownファイルとして保存されます。作成は「Customizations」パネルの「Workflows」タブから、<code>+ Workspace</code> または <code>+ Global</code> ボタンで行います。保存後は、チャット欄で <code>/workflow-name</code> と入力するだけでいつでも呼び出せます。
+              Workflowsもワークスペース単位・グローバル単位で保存でき、いずれもMarkdownファイルとして保存されます。作成は「Customizations」パネルの「Workflows」タブから、
+              <code>+ Workspace</code> または <code>+ Global</code>{" "}
+              ボタンで行います。保存後は、チャット欄で <code>/workflow-name</code>{" "}
+              と入力するだけでいつでも呼び出せます。
             </p>
             <p>
-              コミュニティの実践報告によれば、ワークスペースWorkflowsは <code>.agent/workflows/</code>（Rules・Skillsと同様に新バージョンでは <code>.agents/workflows/</code> に移行している可能性があります）、グローバルWorkflowsは <code>~/.gemini/antigravity/global_workflows/</code> に保存されるとされています。公式ドキュメントはUI操作の説明に留まり絶対パスまでは明記していないため、実際の保存先はインストールしているAntigravityのバージョンで確認することをおすすめします。
+              コミュニティの実践報告によれば、ワークスペースWorkflowsは{" "}
+              <code>.agent/workflows/</code>（Rules・Skillsと同様に新バージョンでは{" "}
+              <code>.agents/workflows/</code>{" "}
+              に移行している可能性があります）、グローバルWorkflowsは{" "}
+              <code>~/.gemini/antigravity/global_workflows/</code>{" "}
+              に保存されるとされています。公式ドキュメントはUI操作の説明に留まり絶対パスまでは明記していないため、実際の保存先はインストールしているAntigravityのバージョンで確認することをおすすめします。
             </p>
-            <p>Workflowファイルにもタイトル・説明・手順のリストを持たせる必要があり、Rulesと同じく1ファイルあたり12,000文字までという上限があります。</p>
+            <p>
+              Workflowファイルにもタイトル・説明・手順のリストを持たせる必要があり、Rulesと同じく1ファイルあたり12,000文字までという上限があります。
+            </p>
           </div>
 
           <h3>Workflowは連鎖できる</h3>
           <div className={styles.prose}>
             <p>
-              Workflowの中から別のWorkflowを呼び出すことができます。例えば「Ship Feature」というWorkflowの手順の中に「Run Testsを呼び出す」という指示を含めておけば、<code>/ship-feature</code> の実行が自動的に <code>/run-tests</code> の実行につながります。
+              Workflowの中から別のWorkflowを呼び出すことができます。例えば「Ship
+              Feature」というWorkflowの手順の中に「Run Testsを呼び出す」という指示を含めておけば、
+              <code>/ship-feature</code> の実行が自動的に <code>/run-tests</code>{" "}
+              の実行につながります。
             </p>
           </div>
 
@@ -691,7 +763,8 @@ export default function AntigravitySpecPage() {
               Artifactは、エージェントがタスクを遂行し、その進捗や意図を人間に伝えるために生成する構造化された成果物です。リッチなMarkdown形式の計画書、コードdiff、アーキテクチャ図、画像、ブラウザ操作の録画などが含まれます。
             </p>
             <p>
-              公式ドキュメントは、Artifactsの存在意義を「非同期的な協働（asynchronous collaboration）」の実現だと説明しています。エージェントがより自律的に長時間の複雑なタスクを実行するようになるほど、人間が一つひとつのツール呼び出しを同期的に監視する必要はなくなり、代わりに主要な節目で高レベルの成果物だけをレビューすればよくなる、という発想です。
+              公式ドキュメントは、Artifactsの存在意義を「非同期的な協働（asynchronous
+              collaboration）」の実現だと説明しています。エージェントがより自律的に長時間の複雑なタスクを実行するようになるほど、人間が一つひとつのツール呼び出しを同期的に監視する必要はなくなり、代わりに主要な節目で高レベルの成果物だけをレビューすればよくなる、という発想です。
             </p>
           </div>
 
@@ -718,21 +791,27 @@ export default function AntigravitySpecPage() {
                     <strong>Task List</strong>（タスクリスト）
                   </td>
                   <td>作業中随時更新</td>
-                  <td>調査・実装・検証といったエージェントの現在の取り組み方を、生きたMarkdownのスナップショットとして可視化する</td>
+                  <td>
+                    調査・実装・検証といったエージェントの現在の取り組み方を、生きたMarkdownのスナップショットとして可視化する
+                  </td>
                 </tr>
                 <tr>
                   <td>
                     <strong>Walkthrough</strong>（完了報告）
                   </td>
                   <td>タスク完了後</td>
-                  <td>会話の中で何が行われたかを簡潔にまとめ、途中を追っていなくても状況を把握できるようにする</td>
+                  <td>
+                    会話の中で何が行われたかを簡潔にまとめ、途中を追っていなくても状況を把握できるようにする
+                  </td>
                 </tr>
                 <tr>
                   <td>
                     <strong>Screenshots / Browser Recordings</strong>
                   </td>
                   <td>ブラウザを使った検証時</td>
-                  <td>ブラウザ用のサブエージェントが取得した、フロントエンドの見た目や動作の視覚的な証拠</td>
+                  <td>
+                    ブラウザ用のサブエージェントが取得した、フロントエンドの見た目や動作の視覚的な証拠
+                  </td>
                 </tr>
                 <tr>
                   <td>
@@ -740,7 +819,8 @@ export default function AntigravitySpecPage() {
                   </td>
                   <td>プロジェクトを跨いだ知見の蓄積時</td>
                   <td>
-                    プロジェクト固有のパターンや知見を記憶し、<code>product-guidelines.md</code> のようなファイルを手動更新しなくても、エージェントが自分のスタイルを「学習」できるようにする
+                    プロジェクト固有のパターンや知見を記憶し、<code>product-guidelines.md</code>{" "}
+                    のようなファイルを手動更新しなくても、エージェントが自分のスタイルを「学習」できるようにする
                   </td>
                 </tr>
               </tbody>
@@ -750,7 +830,8 @@ export default function AntigravitySpecPage() {
           <h3>人間はArtifactsとどう関わるか（レビューのループ）</h3>
           <div className={styles.prose}>
             <p>
-              Implementation Planは、既定の設定（「常に進める」以外の設定）では、コード変更に着手する前に必ずユーザーのレビューを要求します。ユーザーはプラン全体に対して「Proceed」ボタンで承認することも、個別の行にインラインコメントを残して「もっと影響範囲を小さくしてほしい」「別の技術スタックを使ってほしい」といった修正指示を出すこともできます。コメント後も「Proceed」で先に進めるか、「Review」トグルでコメント一覧をまとめて確認してからフィードバックを送るかを選べます。
+              Implementation
+              Planは、既定の設定（「常に進める」以外の設定）では、コード変更に着手する前に必ずユーザーのレビューを要求します。ユーザーはプラン全体に対して「Proceed」ボタンで承認することも、個別の行にインラインコメントを残して「もっと影響範囲を小さくしてほしい」「別の技術スタックを使ってほしい」といった修正指示を出すこともできます。コメント後も「Proceed」で先に進めるか、「Review」トグルでコメント一覧をまとめて確認してからフィードバックを送るかを選べます。
             </p>
           </div>
 
@@ -764,16 +845,19 @@ export default function AntigravitySpecPage() {
           <h3>最重要のベストプラクティス：Planを安易に承認しない</h3>
           <div className={styles.prose}>
             <p>
-              複数の実務者ブログが共通して指摘している落とし穴は、「コーディングに早く進みたいがために、Planの段階を機械的に承認してしまう」ことです。Artifactの本質は「コードdiffを読む」から「Artifactを読む」への習慣の転換であり、Implementation Planの段階でこそ厳しく内容を吟味すべきだとされています。ここで手を抜くと、後工程での手戻りコストの方がはるかに大きくなります。
+              複数の実務者ブログが共通して指摘している落とし穴は、「コーディングに早く進みたいがために、Planの段階を機械的に承認してしまう」ことです。Artifactの本質は「コードdiffを読む」から「Artifactを読む」への習慣の転換であり、Implementation
+              Planの段階でこそ厳しく内容を吟味すべきだとされています。ここで手を抜くと、後工程での手戻りコストの方がはるかに大きくなります。
             </p>
           </div>
 
           <h3>AntigravityのArtifactsが仕様駆動開発にもたらす違い</h3>
           <div className={styles.prose}>
             <p>
-              Google Cloudのカスタマーエンジニアによる解説記事では、従来のSpec-Driven Developmentが「機能仕様・技術仕様・実装計画」といった固定のアーティファクト一式を毎回律儀に作成させる方式だったのに対し、Antigravityでは
+              Google Cloudのカスタマーエンジニアによる解説記事では、従来のSpec-Driven
+              Developmentが「機能仕様・技術仕様・実装計画」といった固定のアーティファクト一式を毎回律儀に作成させる方式だったのに対し、Antigravityでは
               <strong>モデル自身が「このタスクにはどのArtifactが必要か」を判断する</strong>
-              という違いが強調されています。例えば「タイポを直して」という単純なタスクにはImplementation Planを生成せずそのまま修正し、「認証システムをリファクタリングして」という複雑なタスクには詳細なPlanを自律的に生成する、という具合です。これにより、「シンプルな作業には仰々しすぎる」「複雑な作業には心もとない」という、固定テンプレート型の仕様駆動開発が抱えていたジレンマを緩和できるとされています。
+              という違いが強調されています。例えば「タイポを直して」という単純なタスクにはImplementation
+              Planを生成せずそのまま修正し、「認証システムをリファクタリングして」という複雑なタスクには詳細なPlanを自律的に生成する、という具合です。これにより、「シンプルな作業には仰々しすぎる」「複雑な作業には心もとない」という、固定テンプレート型の仕様駆動開発が抱えていたジレンマを緩和できるとされています。
             </p>
           </div>
           <a className={styles.backToTop} href="#top">
@@ -786,34 +870,47 @@ export default function AntigravitySpecPage() {
           <div className={styles.sectionNumber}>07 / 統合フロー</div>
           <h2>4つを組み合わせる：仕様駆動開発の実践フロー</h2>
           <div className={styles.prose}>
-            <p>ここまでのRules・Skills・Workflows・Artifactsを1つの図に統合すると、次のような循環になります。</p>
+            <p>
+              ここまでのRules・Skills・Workflows・Artifactsを1つの図に統合すると、次のような循環になります。
+            </p>
           </div>
 
           <div className={styles.diagramBlock}>
             <div className={styles.mermaidWrap}>
               <MermaidDiagram chart={DIAGRAM_5} id="diagram-5" />
             </div>
-            <div className={styles.diagramCaption}>図6：Rules / Skills / Workflows / Artifacts を統合した実践フロー</div>
+            <div className={styles.diagramCaption}>
+              図6：Rules / Skills / Workflows / Artifacts を統合した実践フロー
+            </div>
           </div>
 
           <div className={styles.prose}>
             <p>実際の運用イメージとしては、次のような役割分担になります。</p>
             <ol className={styles.steps}>
               <li>
-                <strong>Rules</strong>で「触ってはいけないもの（DBマイグレーション等）」や「常に守るべき方針（言語・フレームワークの選択等）」を定義しておく
+                <strong>Rules</strong>
+                で「触ってはいけないもの（DBマイグレーション等）」や「常に守るべき方針（言語・フレームワークの選択等）」を定義しておく
               </li>
               <li>
-                <strong>Skills</strong>で「PRレビューの手順」「安全なマイグレーション手順」「仕様駆動開発そのものの進め方」など、繰り返し使う専門知識をパッケージ化しておく
+                <strong>Skills</strong>
+                で「PRレビューの手順」「安全なマイグレーション手順」「仕様駆動開発そのものの進め方」など、繰り返し使う専門知識をパッケージ化しておく
               </li>
               <li>
-                定型作業は<strong>Workflows</strong>として<code>/deploy</code>や<code>/ship-feature</code>のようなコマンドに落とし込み、いつでも同じ手順で再実行できるようにする
+                定型作業は<strong>Workflows</strong>として<code>/deploy</code>や
+                <code>/ship-feature</code>
+                のようなコマンドに落とし込み、いつでも同じ手順で再実行できるようにする
               </li>
               <li>
-                実際の開発は、エージェントが自律的に生成する<strong>Artifacts</strong>（Plan → 実行 → Walkthrough）を人間が都度レビューしながら進める
+                実際の開発は、エージェントが自律的に生成する<strong>Artifacts</strong>（Plan → 実行
+                → Walkthrough）を人間が都度レビューしながら進める
               </li>
             </ol>
             <p>
-              Google Cloud発の解説記事が指摘するように、Antigravityは「厳格な指示で完全にAIを制御する」という従来のSDD観から一歩進み、「モデルに一定の裁量を持たせつつ、要所要所でArtifactsを介して人間がチェックする」という設計思想を採っています。GitHub Spec KitをAntigravity向けに移植したオープンソースプロジェクトも存在し、Workflows（<code>/</code>コマンド）とSkills（<code>@</code>メンション）を組み合わせて、要件定義から実装までのソフトウェア開発ライフサイクル全体を仕様駆動で進める、という応用例も報告されています。
+              Google
+              Cloud発の解説記事が指摘するように、Antigravityは「厳格な指示で完全にAIを制御する」という従来のSDD観から一歩進み、「モデルに一定の裁量を持たせつつ、要所要所でArtifactsを介して人間がチェックする」という設計思想を採っています。GitHub
+              Spec KitをAntigravity向けに移植したオープンソースプロジェクトも存在し、Workflows（
+              <code>/</code>コマンド）とSkills（<code>@</code>
+              メンション）を組み合わせて、要件定義から実装までのソフトウェア開発ライフサイクル全体を仕様駆動で進める、という応用例も報告されています。
             </p>
           </div>
           <a className={styles.backToTop} href="#top">
@@ -836,15 +933,25 @@ export default function AntigravitySpecPage() {
               <tbody>
                 <tr>
                   <td>1</td>
-                  <td>Global Ruleは「すべてのプロジェクトで常に守りたい方針」だけに絞り、プロジェクト固有の事情はWorkspace Ruleに書く</td>
+                  <td>
+                    Global
+                    Ruleは「すべてのプロジェクトで常に守りたい方針」だけに絞り、プロジェクト固有の事情はWorkspace
+                    Ruleに書く
+                  </td>
                 </tr>
                 <tr>
                   <td>2</td>
-                  <td>破壊的操作（DBマイグレーション、本番デプロイ等）は明示的な「deny rule」としてRuleに書き出す</td>
+                  <td>
+                    破壊的操作（DBマイグレーション、本番デプロイ等）は明示的な「deny
+                    rule」としてRuleに書き出す
+                  </td>
                 </tr>
                 <tr>
                   <td>3</td>
-                  <td>Ruleの発火方式（Manual/Always On/Model Decision/Glob）は、内容の重要度と適用範囲に応じて使い分ける</td>
+                  <td>
+                    Ruleの発火方式（Manual/Always On/Model
+                    Decision/Glob）は、内容の重要度と適用範囲に応じて使い分ける
+                  </td>
                 </tr>
                 <tr>
                   <td>4</td>
@@ -852,40 +959,54 @@ export default function AntigravitySpecPage() {
                 </tr>
                 <tr>
                   <td>5</td>
-                  <td>SKILL.mdのdescriptionは三人称・具体的なキーワード付きで書き、エージェントが自律的に発見できるようにする</td>
+                  <td>
+                    SKILL.mdのdescriptionは三人称・具体的なキーワード付きで書き、エージェントが自律的に発見できるようにする
+                  </td>
                 </tr>
                 <tr>
                   <td>6</td>
                   <td>
-                    Skillに補助スクリプトを含める場合は、まず <code>--help</code> で使い方を確認させる運用にし、ソース全文を読ませない
+                    Skillに補助スクリプトを含める場合は、まず <code>--help</code>{" "}
+                    で使い方を確認させる運用にし、ソース全文を読ませない
                   </td>
                 </tr>
                 <tr>
                   <td>7</td>
                   <td>
-                    繰り返し行う定型作業（デプロイ・PR対応等）は早めにWorkflow化し、<code>/コマンド</code> として再利用する
+                    繰り返し行う定型作業（デプロイ・PR対応等）は早めにWorkflow化し、
+                    <code>/コマンド</code> として再利用する
                   </td>
                 </tr>
                 <tr>
                   <td>8</td>
-                  <td>一連の作業をエージェントと手動でこなした直後は、「今の手順をWorkflowにして」と依頼して自動生成させる</td>
+                  <td>
+                    一連の作業をエージェントと手動でこなした直後は、「今の手順をWorkflowにして」と依頼して自動生成させる
+                  </td>
                 </tr>
                 <tr>
                   <td>9</td>
-                  <td>Implementation Planは自動承認（Always Proceed）に頼りきらず、特に複雑なタスクでは内容を吟味してからProceedする</td>
+                  <td>
+                    Implementation Planは自動承認（Always
+                    Proceed）に頼りきらず、特に複雑なタスクでは内容を吟味してからProceedする
+                  </td>
                 </tr>
                 <tr>
                   <td>10</td>
-                  <td>Walkthroughは、離席していた間の変更内容を追いつくための一次情報として活用する</td>
+                  <td>
+                    Walkthroughは、離席していた間の変更内容を追いつくための一次情報として活用する
+                  </td>
                 </tr>
                 <tr>
                   <td>11</td>
-                  <td>Rules・Skills・Workflowsはgit管理下に置き、チーム全体で同じ行動規範・専門知識・手順を共有する</td>
+                  <td>
+                    Rules・Skills・Workflowsはgit管理下に置き、チーム全体で同じ行動規範・専門知識・手順を共有する
+                  </td>
                 </tr>
                 <tr>
                   <td>12</td>
                   <td>
-                    <code>.agent/</code> 系と <code>.agents/</code> 系のどちらが有効になっているか、使用中のAntigravityのバージョンで確認する
+                    <code>.agent/</code> 系と <code>.agents/</code>{" "}
+                    系のどちらが有効になっているか、使用中のAntigravityのバージョンで確認する
                   </td>
                 </tr>
               </tbody>
@@ -914,7 +1035,10 @@ export default function AntigravitySpecPage() {
                   <td>
                     <strong>Planの機械的承認</strong>
                   </td>
-                  <td>コーディングに早く進みたいがためにImplementation Planを吟味せず「Proceed」してしまう</td>
+                  <td>
+                    コーディングに早く進みたいがためにImplementation
+                    Planを吟味せず「Proceed」してしまう
+                  </td>
                   <td>複雑なタスクほど、Plan段階でのレビューに時間をかける運用を徹底する</td>
                 </tr>
                 <tr>
@@ -929,7 +1053,8 @@ export default function AntigravitySpecPage() {
                     <strong>保存場所の思い込み</strong>
                   </td>
                   <td>
-                    <code>.agent/</code> と <code>.agents/</code> の新旧混在、Global/Workspaceの取り違えにより、意図したRule・Skillが読み込まれない
+                    <code>.agent/</code> と <code>.agents/</code>{" "}
+                    の新旧混在、Global/Workspaceの取り違えにより、意図したRule・Skillが読み込まれない
                   </td>
                   <td>公式ドキュメントとインストール済みバージョンの両方で保存先を確認する</td>
                 </tr>
@@ -937,22 +1062,32 @@ export default function AntigravitySpecPage() {
                   <td>
                     <strong>機密情報の書き込み</strong>
                   </td>
-                  <td>RuleやSkill、あるいはコード中のコメントにAPIキー等の機密情報を書いてしまう</td>
+                  <td>
+                    RuleやSkill、あるいはコード中のコメントにAPIキー等の機密情報を書いてしまう
+                  </td>
                   <td>機密情報は環境変数や秘密管理サービスに置き、Markdownファイルには含めない</td>
                 </tr>
                 <tr>
                   <td>
                     <strong>外部コンテンツ経由の指示注入</strong>
                   </td>
-                  <td>第三者が用意したドキュメントやコードコメントに隠された指示を、エージェントがそのまま実行してしまうリスク</td>
-                  <td>外部から取り込むファイルやリンクの内容は鵜呑みにせず、機密操作の前には人間の確認を挟む</td>
+                  <td>
+                    第三者が用意したドキュメントやコードコメントに隠された指示を、エージェントがそのまま実行してしまうリスク
+                  </td>
+                  <td>
+                    外部から取り込むファイルやリンクの内容は鵜呑みにせず、機密操作の前には人間の確認を挟む
+                  </td>
                 </tr>
                 <tr>
                   <td>
                     <strong>Workflowの1本道信仰</strong>
                   </td>
-                  <td>すべての作業をWorkflowで固定化しすぎ、モデルの自律的な判断の余地を奪ってしまう</td>
-                  <td>定型作業はWorkflow化する一方、探索的なタスクはAgentの裁量とArtifactsレビューに委ねる</td>
+                  <td>
+                    すべての作業をWorkflowで固定化しすぎ、モデルの自律的な判断の余地を奪ってしまう
+                  </td>
+                  <td>
+                    定型作業はWorkflow化する一方、探索的なタスクはAgentの裁量とArtifactsレビューに委ねる
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -967,46 +1102,69 @@ export default function AntigravitySpecPage() {
           <div className={styles.sectionNumber}>10 / 出典</div>
           <h2>参考文献・情報源</h2>
           <div className={styles.prose}>
-            <p>本ガイドは、2026年7月26日時点で参照可能な以下の一次情報・著名な開発者による解説記事をもとに作成しました。</p>
+            <p>
+              本ガイドは、2026年7月26日時点で参照可能な以下の一次情報・著名な開発者による解説記事をもとに作成しました。
+            </p>
           </div>
 
           <div className={styles.refGroupTitle}>Google公式ドキュメント</div>
           <ul className={styles.refList}>
             <li>
-              <span className={styles.refTitle}>Google Antigravity Docs, &quot;Rules&quot; / &quot;Workflows&quot;</span>
-              <Ext href="https://antigravity.google/docs/rules-workflows">https://antigravity.google/docs/rules-workflows</Ext>
+              <span className={styles.refTitle}>
+                Google Antigravity Docs, &quot;Rules&quot; / &quot;Workflows&quot;
+              </span>
+              <Ext href="https://antigravity.google/docs/rules-workflows">
+                https://antigravity.google/docs/rules-workflows
+              </Ext>
             </li>
             <li>
-              <span className={styles.refTitle}>Google Antigravity Docs, &quot;Agent Skills&quot;</span>
-              <Ext href="https://antigravity.google/docs/skills">https://antigravity.google/docs/skills</Ext>
+              <span className={styles.refTitle}>
+                Google Antigravity Docs, &quot;Agent Skills&quot;
+              </span>
+              <Ext href="https://antigravity.google/docs/skills">
+                https://antigravity.google/docs/skills
+              </Ext>
             </li>
             <li>
-              <span className={styles.refTitle}>Google Antigravity Docs, &quot;Artifacts Overview&quot;</span>
-              <Ext href="https://antigravity.google/docs/artifacts">https://antigravity.google/docs/artifacts</Ext>
+              <span className={styles.refTitle}>
+                Google Antigravity Docs, &quot;Artifacts Overview&quot;
+              </span>
+              <Ext href="https://antigravity.google/docs/artifacts">
+                https://antigravity.google/docs/artifacts
+              </Ext>
             </li>
             <li>
-              <span className={styles.refTitle}>Google Antigravity Docs, &quot;Implementation Plan&quot;</span>
+              <span className={styles.refTitle}>
+                Google Antigravity Docs, &quot;Implementation Plan&quot;
+              </span>
               <Ext href="https://antigravity.google/docs/ide/implementation-plan">
                 https://antigravity.google/docs/ide/implementation-plan
               </Ext>
             </li>
             <li>
-              <span className={styles.refTitle}>Google Antigravity Docs, &quot;Walkthrough&quot;</span>
-              <Ext href="https://antigravity.google/docs/ide/walkthrough">https://antigravity.google/docs/ide/walkthrough</Ext>
+              <span className={styles.refTitle}>
+                Google Antigravity Docs, &quot;Walkthrough&quot;
+              </span>
+              <Ext href="https://antigravity.google/docs/ide/walkthrough">
+                https://antigravity.google/docs/ide/walkthrough
+              </Ext>
             </li>
           </ul>
 
           <div className={styles.refGroupTitle}>Google公式 Codelabs</div>
           <ul className={styles.refList}>
             <li>
-              <span className={styles.refTitle}>&quot;Authoring Google Antigravity Skills&quot;</span>
+              <span className={styles.refTitle}>
+                &quot;Authoring Google Antigravity Skills&quot;
+              </span>
               <Ext href="https://codelabs.developers.google.com/getting-started-with-antigravity-skills">
                 https://codelabs.developers.google.com/getting-started-with-antigravity-skills
               </Ext>
             </li>
             <li>
               <span className={styles.refTitle}>
-                &quot;Build Autonomous Developer Pipelines using agents.md and skills.md in Antigravity&quot;
+                &quot;Build Autonomous Developer Pipelines using agents.md and skills.md in
+                Antigravity&quot;
               </span>
               <Ext href="https://codelabs.developers.google.com/autonomous-ai-developer-pipelines-antigravity">
                 https://codelabs.developers.google.com/autonomous-ai-developer-pipelines-antigravity
@@ -1034,23 +1192,25 @@ export default function AntigravitySpecPage() {
             </li>
             <li>
               <span className={styles.refTitle}>
-                Giovanni Galloro（Google Cloudカスタマーエンジニア）, &quot;How Google Antigravity is changing spec-driven
-                development&quot;
+                Giovanni Galloro（Google Cloudカスタマーエンジニア）, &quot;How Google Antigravity
+                is changing spec-driven development&quot;
               </span>
               <Ext href="https://medium.com/google-cloud/benefits-and-challenges-of-spec-driven-development-and-how-antigravity-is-changing-the-game-3343a6942330">
                 https://medium.com/google-cloud/benefits-and-challenges-of-spec-driven-development-and-how-antigravity-is-changing-the-game-3343a6942330
               </Ext>
             </li>
             <li>
-              <span className={styles.refTitle}>Amulya Bhatia, &quot;Advanced Tips for Mastering Google Antigravity&quot;</span>
+              <span className={styles.refTitle}>
+                Amulya Bhatia, &quot;Advanced Tips for Mastering Google Antigravity&quot;
+              </span>
               <Ext href="https://iamulya.one/posts/advanced-tips-for-mastering-google-antigravity/">
                 https://iamulya.one/posts/advanced-tips-for-mastering-google-antigravity/
               </Ext>
             </li>
             <li>
               <span className={styles.refTitle}>
-                Alex Merced, &quot;Context Management Strategies for Google Antigravity: A Complete Guide to the Agent-First
-                IDE&quot;
+                Alex Merced, &quot;Context Management Strategies for Google Antigravity: A Complete
+                Guide to the Agent-First IDE&quot;
               </span>
               <Ext href="https://iceberglakehouse.com/posts/2026-03-context-google-antigravity/">
                 https://iceberglakehouse.com/posts/2026-03-context-google-antigravity/
@@ -1068,8 +1228,8 @@ export default function AntigravitySpecPage() {
         </section>
 
         <footer className={styles.footer}>
-          AI仕様駆動開発とMarkdown ― Google Antigravity Rules / Skills / Workflows / Artifacts 徹底ガイド ｜
-          作成日：2026年7月26日時点の情報に基づく
+          AI仕様駆動開発とMarkdown ― Google Antigravity Rules / Skills / Workflows / Artifacts
+          徹底ガイド ｜ 作成日：2026年7月26日時点の情報に基づく
         </footer>
       </main>
     </div>

@@ -11,7 +11,9 @@
   --text: #e8edf7;
   --text-muted: #9aa8c7;
   --text-faint: #6f7f9f;
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --font-mono:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New",
+    monospace;
   --radius: 14px;
 
   display: block;
@@ -107,7 +109,9 @@
   text-decoration: none;
   font-size: 14px;
   line-height: 1.4;
-  transition: background 0.15s ease, color 0.15s ease;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
   border-left: 2px solid transparent;
 }
 
@@ -117,7 +121,9 @@
   border-radius: 50%;
   background: var(--text-faint);
   flex-shrink: 0;
-  transition: background 0.15s ease, box-shadow 0.15s ease;
+  transition:
+    background 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
 .navList a:hover {
@@ -369,7 +375,10 @@
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 20px 22px;
-  transition: border-color 0.15s ease, transform 0.15s ease, background 0.15s ease;
+  transition:
+    border-color 0.15s ease,
+    transform 0.15s ease,
+    background 0.15s ease;
 }
 
 .pointCard:hover {
@@ -418,7 +427,9 @@
   border-top: 3px solid var(--amber);
   border-radius: var(--radius);
   padding: 20px 22px;
-  transition: border-color 0.15s ease, transform 0.15s ease;
+  transition:
+    border-color 0.15s ease,
+    transform 0.15s ease;
 }
 
 .principleCard:hover {
@@ -497,7 +508,9 @@
   border-radius: 12px;
   padding: 16px 18px;
   text-decoration: none;
-  transition: border-color 0.15s ease, background 0.15s ease;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease;
 }
 
 .refCard:hover {

@@ -93,7 +93,10 @@
   padding: 6px 0 6px 14px;
   border-left: 2px solid transparent;
   margin-left: -1px;
-  transition: color 0.15s, border-color 0.15s, background 0.15s;
+  transition:
+    color 0.15s,
+    border-color 0.15s,
+    background 0.15s;
   font-size: 13.5px;
 }
 
@@ -674,7 +677,9 @@
     transform: translateX(-105%);
     visibility: hidden;
     pointer-events: none;
-    transition: transform 0.25s ease, visibility 0s 0.25s;
+    transition:
+      transform 0.25s ease,
+      visibility 0s 0.25s;
     box-shadow: 20px 0 40px rgba(0, 0, 0, 0.3);
   }
 

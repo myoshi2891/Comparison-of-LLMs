@@ -21,9 +21,7 @@ export default function TocObserver() {
       .map((id) => document.getElementById(id))
       .filter((el): el is HTMLElement => el !== null);
 
-    const links = Array.from(
-      document.querySelectorAll<HTMLAnchorElement>(`.${styles.fileTree} a`),
-    );
+    const links = Array.from(document.querySelectorAll<HTMLAnchorElement>(`.${styles.fileTree} a`));
 
     if (links.length > 0) {
       links[0].classList.add(styles.active);
@@ -44,7 +42,7 @@ export default function TocObserver() {
           }
         }
       },
-      { rootMargin: "-15% 0px -70% 0px", threshold: 0 },
+      { rootMargin: "-15% 0px -70% 0px", threshold: 0 }
     );
 
     for (const sec of sections) {

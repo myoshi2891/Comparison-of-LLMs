@@ -6,9 +6,7 @@ import styles from "./page.module.css";
 export default function TocObserver() {
   useEffect(() => {
     const sections = document.querySelectorAll(`section.${styles.section}`);
-    const links = Array.from(
-      document.querySelectorAll<HTMLAnchorElement>(`.${styles.navList} a`)
-    );
+    const links = Array.from(document.querySelectorAll<HTMLAnchorElement>(`.${styles.navList} a`));
 
     if (links.length > 0) {
       links[0].classList.add(styles.active);

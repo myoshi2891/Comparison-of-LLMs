@@ -112,9 +112,7 @@ describe("/claude/fable-5-best-practices - registration", () => {
   });
 
   it("uses the latest timeline date in the page registry", () => {
-    const entry = pageRegistry.find(
-      ({ slug }) => slug === "/claude/fable-5-best-practices",
-    );
+    const entry = pageRegistry.find(({ slug }) => slug === "/claude/fable-5-best-practices");
     expect(entry?.lastReviewed).toBe("2026-07-26");
   });
 });

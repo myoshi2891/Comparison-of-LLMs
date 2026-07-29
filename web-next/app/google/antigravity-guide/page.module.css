@@ -25,7 +25,7 @@
     radial-gradient(1100px 600px at 85% -10%, rgba(139, 124, 246, 0.16), transparent 60%),
     radial-gradient(900px 500px at -10% 10%, rgba(79, 209, 197, 0.1), transparent 55%), var(--bg);
   color: var(--text);
-  font-family: var(--font-sans, 'Inter', -apple-system, sans-serif);
+  font-family: var(--font-sans, "Inter", -apple-system, sans-serif);
   line-height: 1.75;
   font-size: 16px;
 }
@@ -157,7 +157,7 @@
 }
 
 .tocNum {
-  font-family: var(--font-mono), 'JetBrains Mono', monospace;
+  font-family: var(--font-mono), "JetBrains Mono", monospace;
   font-size: 11px;
   color: var(--violet);
   opacity: 0.8;
@@ -187,7 +187,7 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-family: var(--font-mono), 'JetBrains Mono', monospace;
+  font-family: var(--font-mono), "JetBrains Mono", monospace;
   font-size: 12px;
   font-weight: 600;
   color: var(--cyan);
@@ -266,7 +266,7 @@
 }
 
 .termTitle {
-  font-family: var(--font-mono), 'JetBrains Mono', monospace;
+  font-family: var(--font-mono), "JetBrains Mono", monospace;
   font-size: 12px;
   color: var(--text-mute);
   margin-left: 8px;
@@ -274,7 +274,7 @@
 
 .termBody {
   padding: 16px 20px;
-  font-family: var(--font-mono), 'JetBrains Mono', monospace;
+  font-family: var(--font-mono), "JetBrains Mono", monospace;
   font-size: 14px;
   line-height: 1.6;
 }
@@ -344,7 +344,7 @@
 }
 
 .idx {
-  font-family: var(--font-mono), 'JetBrains Mono', monospace;
+  font-family: var(--font-mono), "JetBrains Mono", monospace;
   color: var(--violet);
   font-size: 20px;
 }
@@ -387,7 +387,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-family: var(--font-mono), 'JetBrains Mono', monospace;
+  font-family: var(--font-mono), "JetBrains Mono", monospace;
   font-size: 12px;
   color: var(--text-mute);
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
@@ -401,7 +401,7 @@
 
 .codeBody {
   padding: 16px 20px;
-  font-family: var(--font-mono), 'JetBrains Mono', monospace;
+  font-family: var(--font-mono), "JetBrains Mono", monospace;
   font-size: 13.5px;
   line-height: 1.65;
   overflow-x: auto;
@@ -470,7 +470,7 @@
 }
 
 .table code {
-  font-family: var(--font-mono), 'JetBrains Mono', monospace;
+  font-family: var(--font-mono), "JetBrains Mono", monospace;
   background: rgba(167, 139, 250, 0.12);
   color: var(--cyan);
   padding: 2px 6px;
@@ -521,7 +521,7 @@
   padding: 40px 24px 80px;
   color: var(--text-mute);
   font-size: 13px;
-  font-family: var(--font-mono), 'JetBrains Mono', monospace;
+  font-family: var(--font-mono), "JetBrains Mono", monospace;
   text-align: center;
   border-top: 1px solid var(--border-soft);
   line-height: 1.8;

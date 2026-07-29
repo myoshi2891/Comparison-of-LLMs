@@ -16,7 +16,9 @@ describe("/google/skill-guide 契約テスト", () => {
 
   it("h1 に SKILL.md 実践ベストプラクティスガイド が含まれる", () => {
     const { container } = render(<Page />);
-    expect(container.querySelector("h1")?.textContent).toContain("SKILL.md 実践ベストプラクティスガイド");
+    expect(container.querySelector("h1")?.textContent).toContain(
+      "SKILL.md 実践ベストプラクティスガイド"
+    );
   });
 
   it("h2 が 12 本（全12セクションと一致）", () => {
@@ -53,4 +55,3 @@ describe("/google/skill-guide 契約テスト", () => {
     }
   });
 });
-

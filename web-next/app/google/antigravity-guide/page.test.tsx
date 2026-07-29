@@ -88,8 +88,10 @@ describe("/google/antigravity-guide (Antigravity CLI Complete Guide - 100% Faith
   });
 
   it("v1.1.5 以降の effort コマンドと起動フラグを案内する", () => {
+    const { container } = render(<Page />);
+    expect(container.textContent?.replace(/\s+/g, " ")).toContain("全 32 個の中核コマンド");
+
     const source = readFileSync(join(__dirname, "page.tsx"), "utf8");
-    expect(source).toContain("全 32 個の中核コマンド");
     expect(source).toContain("/effort [level]");
     expect(source).toContain("--effort");
   });

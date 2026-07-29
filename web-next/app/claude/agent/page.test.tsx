@@ -97,7 +97,7 @@ describe("/claude/agent - page structure", () => {
   it("associates every interactive checklist checkbox with its item label", () => {
     const { container } = render(<Page />);
     const checkboxes = container.querySelectorAll<HTMLInputElement>(
-      '#checklist input[type="checkbox"]',
+      '#checklist input[type="checkbox"]'
     );
     expect(checkboxes).toHaveLength(8);
     for (const checkbox of checkboxes) {

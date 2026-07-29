@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import Ext from "@/components/docs/Ext";
 import MermaidDiagram from "@/components/docs/MermaidDiagram";
+import styles from "./page.module.css";
 import SidebarToggle from "./SidebarToggle";
 import TocObserver from "./TocObserver";
-import styles from "./page.module.css";
 
 export const metadata: Metadata = {
-  title: "サブエージェント & Agent Teams 開発における Markdown ファイル ベストプラクティス | LLM コスト計算機",
+  title:
+    "サブエージェント & Agent Teams 開発における Markdown ファイル ベストプラクティス | LLM コスト計算機",
   description:
     "CLAUDE.md・サブエージェント定義・Agent Teams の全拡張レイヤーにおける Markdown ファイル（.md）の設計原則、パラメータ仕様、ユースケース別使い分けを体系的に解説する実戦ガイド。",
 };
@@ -210,7 +211,8 @@ export default function ClaudeAgentPage() {
             <h2>全体像:4つの拡張レイヤーとMarkdownの役割</h2>
             <p className={styles.lede}>
               どのレイヤーも「Markdownで振る舞いを定義する」という共通点を持ちますが、
-              <strong>ロードされるタイミングと目的</strong>が異なります。まずは地図を頭に入れましょう。
+              <strong>ロードされるタイミングと目的</strong>
+              が異なります。まずは地図を頭に入れましょう。
             </p>
 
             <div className={styles.tableWrap}>
@@ -752,7 +754,8 @@ export default function ClaudeAgentPage() {
               <p>
                 <strong>最小権限の原則:</strong>
                 読み取り専用のレビュー系には書き込み系ツールを含めない。危険操作は
-                <code>hooks</code> の<code>PreToolUse</code> でコマンド内容を検証すると、より堅牢になります。
+                <code>hooks</code> の<code>PreToolUse</code>{" "}
+                でコマンド内容を検証すると、より堅牢になります。
               </p>
             </div>
           </section>
@@ -1003,15 +1006,11 @@ export default function ClaudeAgentPage() {
                   </tr>
                   <tr>
                     <td>descriptionは動詞+条件で書く</td>
-                    <td>
-                      「〜する専門家。〜の時に使用/積極的に使用すること」の形式を徹底
-                    </td>
+                    <td>「〜する専門家。〜の時に使用/積極的に使用すること」の形式を徹底</td>
                   </tr>
                   <tr>
                     <td>本文は役割→手順→出力形式の順</td>
-                    <td>
-                      「あなたは〇〇です」→「呼び出されたら1.2.3…」→「出力は優先度別に整理」
-                    </td>
+                    <td>「あなたは〇〇です」→「呼び出されたら1.2.3…」→「出力は優先度別に整理」</td>
                   </tr>
                   <tr>
                     <td>権限は最小限から始める</td>
@@ -1111,9 +1110,7 @@ export default function ClaudeAgentPage() {
                   <input type="checkbox" />
                   <span>
                     <span className={styles.t}>危険な操作にhooksを設定したか</span>
-                    <span className={styles.d}>
-                      破壊的コマンドをPreToolUseで検証しているか
-                    </span>
+                    <span className={styles.d}>破壊的コマンドをPreToolUseで検証しているか</span>
                   </span>
                 </label>
               </li>
@@ -1131,9 +1128,7 @@ export default function ClaudeAgentPage() {
                   <input type="checkbox" />
                   <span>
                     <span className={styles.t}>ファイル担当の重複はないか</span>
-                    <span className={styles.d}>
-                      チームメイト間でファイル競合が起きない設計か
-                    </span>
+                    <span className={styles.d}>チームメイト間でファイル競合が起きない設計か</span>
                   </span>
                 </label>
               </li>
@@ -1161,8 +1156,8 @@ export default function ClaudeAgentPage() {
                 はプロジェクトの長期記憶。短く・強調構文を使い・分割しながら育てる。
               </li>
               <li>
-                <strong>サブエージェント</strong>は「YAML frontmatter +
-                システムプロンプト」で、<code>description</code>
+                <strong>サブエージェント</strong>は「YAML frontmatter + システムプロンプト」で、
+                <code>description</code>
                 の質が委譲精度を決める。最小権限のツール設計が安全性の鍵。
               </li>
               <li>
@@ -1210,8 +1205,7 @@ export default function ClaudeAgentPage() {
               </li>
               <li>
                 <span className={styles.srcTitle}>
-                  Anthropic公式ドキュメント「How Claude remembers your project(Memory /
-                  CLAUDE.md)」
+                  Anthropic公式ドキュメント「How Claude remembers your project(Memory / CLAUDE.md)」
                 </span>
                 <Ext href="https://code.claude.com/docs/en/memory">
                   https://code.claude.com/docs/en/memory

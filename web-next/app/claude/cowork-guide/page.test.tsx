@@ -21,9 +21,7 @@ describe("/claude/cowork-guide 契約テスト", () => {
 
   it("h1 に Claude Cowork 実践ガイド が含まれる", () => {
     const { container } = render(<Page />);
-    expect(container.querySelector("h1")?.textContent).toContain(
-      "Claude Cowork 実践ガイド"
-    );
+    expect(container.querySelector("h1")?.textContent).toContain("Claude Cowork 実践ガイド");
   });
 
   it("h2 が 14 本存在する（STEP 0 〜 11 + チェックリスト + 参考文献）", () => {

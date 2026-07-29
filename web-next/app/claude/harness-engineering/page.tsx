@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import MermaidDiagram from "@/components/docs/MermaidDiagram";
-import TocObserver from "./TocObserver";
 import styles from "./page.module.css";
+import TocObserver from "./TocObserver";
 
 export const metadata: Metadata = {
-  title: "ハーネスエンジニアリング入門ガイド — AIコーディングの信頼と構造を設計する | LLM Model Cost",
+  title:
+    "ハーネスエンジニアリング入門ガイド — AIコーディングの信頼と構造を設計する | LLM Model Cost",
   description:
     "プロンプトやコンテキストを超え、AIエージェントの自律性・精度・安全性を両立させる『ハーネスエンジニアリング』の全体像、5層構造、フィードフォワード/フィードバック制御、ステップバイステップ実践法を包括解説。",
 };
@@ -185,10 +186,15 @@ export default function HarnessEngineeringPage() {
             はじめに
           </h2>
           <p>
-            AIコーディングエージェント（Claude Code, Cursor, Codex など）が本格的に実務へ投入される中、エンジニアリングの焦点は単なる「プロンプトの工夫」や「コンテキストの注入」から、<strong>「エージェントを取り巻く環境全体（ハーネス）の設計」</strong>へとシフトしています。
+            AIコーディングエージェント（Claude Code, Cursor, Codex
+            など）が本格的に実務へ投入される中、エンジニアリングの焦点は単なる「プロンプトの工夫」や「コンテキストの注入」から、
+            <strong>「エージェントを取り巻く環境全体（ハーネス）の設計」</strong>
+            へとシフトしています。
           </p>
           <p>
-            どれほど優秀なモデルであっても、適切な足場（Harness）がなければ、方向を見失ったり、間違った前提で作業を続けたり、コードベースを破壊してしまいます。本ガイドでは、業界のトップ実務者（Anthropic, Thoughtworks, OpenAI, LangChain 等）の知見を統合し、実効性の高いハーネスを構築するための体系的な概念とステップを解説します。
+            どれほど優秀なモデルであっても、適切な足場（Harness）がなければ、方向を見失ったり、間違った前提で作業を続けたり、コードベースを破壊してしまいます。本ガイドでは、業界のトップ実務者（Anthropic,
+            Thoughtworks, OpenAI, LangChain
+            等）の知見を統合し、実効性の高いハーネスを構築するための体系的な概念とステップを解説します。
           </p>
         </section>
 
@@ -201,7 +207,11 @@ export default function HarnessEngineeringPage() {
 
           <h3>1.1 「ハーネス（Harness）」の基本定義</h3>
           <p>
-            ハーネスエンジニアリング（Harness Engineering）とは、<strong>LLM/AIエージェントが安全かつ自律的に高品質な成果物を生成できるように、モデルの外部に構築する「誘導（ガイド）・検証（センサー）・ツール・制約・可観測性のシステム全体」を設計・運用する技術</strong>です。
+            ハーネスエンジニアリング（Harness Engineering）とは、
+            <strong>
+              LLM/AIエージェントが安全かつ自律的に高品質な成果物を生成できるように、モデルの外部に構築する「誘導（ガイド）・検証（センサー）・ツール・制約・可観測性のシステム全体」を設計・運用する技術
+            </strong>
+            です。
           </p>
           <p>
             乗馬の「馬具（ハーネス）」が馬の強大な力を人間に制御可能にするように、あるいはモータースポーツのハーネスがドライバーを保護しながら限界走行を可能にするように、エージェントの自律性を解き放ちつつ逸脱を防ぐための「枠組み」を意味します。
@@ -259,7 +269,10 @@ export default function HarnessEngineeringPage() {
               出典
             </div>
             <div className={styles.sourceLinks}>
-              <Ext href="https://www.faros.ai/blog/harness-engineering" className={styles.sourceChip}>
+              <Ext
+                href="https://www.faros.ai/blog/harness-engineering"
+                className={styles.sourceChip}
+              >
                 Faros AI
                 <i className="ti ti-arrow-up-right" />
               </Ext>
@@ -268,17 +281,21 @@ export default function HarnessEngineeringPage() {
 
           <h3>1.3 用語の起源について</h3>
           <p>
-            「harness engineering」という言葉の起点には複数の系譜があり、単一の発明者に一意に帰属させるのは難しい状況です。
+            「harness
+            engineering」という言葉の起点には複数の系譜があり、単一の発明者に一意に帰属させるのは難しい状況です。
           </p>
           <ul>
             <li>
-              HashiCorp／Terraformの創業者である<strong>Mitchell Hashimoto</strong>は、自身のAI活用の実践原則として「エージェントが一度ミスをしたら、二度と同じミスをしないように仕組みを作り込む」という考え方を示しました。
+              HashiCorp／Terraformの創業者である<strong>Mitchell Hashimoto</strong>
+              は、自身のAI活用の実践原則として「エージェントが一度ミスをしたら、二度と同じミスをしないように仕組みを作り込む」という考え方を示しました。
             </li>
             <li>
-              LangChainの<strong>Viv Trivedy</strong>は「Agent = Model + Harness」という定式化と、ハーネスを構成する要素を体系立てて図解した記事を公開し、多くの実務者がこの図式を引用しています。
+              LangChainの<strong>Viv Trivedy</strong>は「Agent = Model +
+              Harness」という定式化と、ハーネスを構成する要素を体系立てて図解した記事を公開し、多くの実務者がこの図式を引用しています。
             </li>
             <li>
-              ThoughtworksのDistinguished Engineerである<strong>Birgitta Böckeler</strong>は、martinfowler.com上で「ガイド（フィードフォワード）」と「センサー（フィードバック）」からなる体系的なメンタルモデルを発表し、実務者コミュニティで最も引用される整理のひとつになっています。
+              ThoughtworksのDistinguished Engineerである<strong>Birgitta Böckeler</strong>
+              は、martinfowler.com上で「ガイド（フィードフォワード）」と「センサー（フィードバック）」からなる体系的なメンタルモデルを発表し、実務者コミュニティで最も引用される整理のひとつになっています。
             </li>
             <li>
               OpenAIのエンジニアリングチームは、100万行規模のプロダクトをゼロ行の手書きコードで構築した経験をもとに、この語を一般に広めました。
@@ -293,19 +310,31 @@ export default function HarnessEngineeringPage() {
               出典
             </div>
             <div className={styles.sourceLinks}>
-              <Ext href="https://mitchellh.com/writing/my-ai-adoption-journey" className={styles.sourceChip}>
+              <Ext
+                href="https://mitchellh.com/writing/my-ai-adoption-journey"
+                className={styles.sourceChip}
+              >
                 Mitchell Hashimoto
                 <i className="ti ti-arrow-up-right" />
               </Ext>
-              <Ext href="https://blog.langchain.com/the-anatomy-of-an-agent-harness/" className={styles.sourceChip}>
+              <Ext
+                href="https://blog.langchain.com/the-anatomy-of-an-agent-harness/"
+                className={styles.sourceChip}
+              >
                 LangChain Blog (Trivedy)
                 <i className="ti ti-arrow-up-right" />
               </Ext>
-              <Ext href="https://martinfowler.com/articles/harness-engineering.html" className={styles.sourceChip}>
+              <Ext
+                href="https://martinfowler.com/articles/harness-engineering.html"
+                className={styles.sourceChip}
+              >
                 Böckeler / martinfowler.com
                 <i className="ti ti-arrow-up-right" />
               </Ext>
-              <Ext href="https://openai.com/index/harness-engineering/" className={styles.sourceChip}>
+              <Ext
+                href="https://openai.com/index/harness-engineering/"
+                className={styles.sourceChip}
+              >
                 OpenAI
                 <i className="ti ti-arrow-up-right" />
               </Ext>
@@ -327,7 +356,9 @@ export default function HarnessEngineeringPage() {
 
           <div className={styles.mermaidWrap}>
             <MermaidDiagram chart={DIAGRAM_2} />
-            <p className={styles.mermaidCaption}>図: 内側（コア）から外側（利用者が組み立てる層）へ</p>
+            <p className={styles.mermaidCaption}>
+              図: 内側（コア）から外側（利用者が組み立てる層）へ
+            </p>
           </div>
 
           <ul>
@@ -335,10 +366,13 @@ export default function HarnessEngineeringPage() {
               <strong>モデル本体</strong>: 学習済みの言語モデルそのもの。
             </li>
             <li>
-              <strong>ビルダーハーネス</strong>: Claude CodeやCodexといった製品自体に組み込まれた仕組み（システムプロンプト、標準ツール、オーケストレーションロジックなど）。
+              <strong>ビルダーハーネス</strong>: Claude
+              CodeやCodexといった製品自体に組み込まれた仕組み（システムプロンプト、標準ツール、オーケストレーションロジックなど）。
             </li>
             <li>
-              <strong>ユーザーハーネス</strong>: 私たち利用者がリポジトリや開発環境に構築する仕組み（<code>CLAUDE.md</code>、カスタムフック、テスト・Lint設定、サブエージェント構成など）。
+              <strong>ユーザーハーネス</strong>:
+              私たち利用者がリポジトリや開発環境に構築する仕組み（<code>CLAUDE.md</code>
+              、カスタムフック、テスト・Lint設定、サブエージェント構成など）。
             </li>
           </ul>
           <p>
@@ -360,12 +394,17 @@ export default function HarnessEngineeringPage() {
                 <tr>
                   <td>コンテキスト &amp; メモリ管理</td>
                   <td>必要な情報のみを抽出し、トークン枯渇を防ぐ</td>
-                  <td><code>CLAUDE.md</code>、<code>.claudeignore</code>、要約（Compaction）、サブエージェント</td>
+                  <td>
+                    <code>CLAUDE.md</code>、<code>.claudeignore</code>
+                    、要約（Compaction）、サブエージェント
+                  </td>
                 </tr>
                 <tr>
                   <td>ツールオーケストレーション</td>
                   <td>エージェントの行動能力を定義・拡張する</td>
-                  <td>Bash実行、MCPサーバー、カスタムSkill（<code>SKILL.md</code>）</td>
+                  <td>
+                    Bash実行、MCPサーバー、カスタムSkill（<code>SKILL.md</code>）
+                  </td>
                 </tr>
                 <tr>
                   <td>検証ループ（センサー）</td>
@@ -380,7 +419,9 @@ export default function HarnessEngineeringPage() {
                 <tr>
                   <td>可観測性 &amp; 記録</td>
                   <td>エージェントの動作ログとコストを可視化する</td>
-                  <td>セッションログ、トークン使用量監視、進捗記録（<code>progress.txt</code>）</td>
+                  <td>
+                    セッションログ、トークン使用量監視、進捗記録（<code>progress.txt</code>）
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -391,11 +432,17 @@ export default function HarnessEngineeringPage() {
               出典
             </div>
             <div className={styles.sourceLinks}>
-              <Ext href="https://blog.langchain.com/the-anatomy-of-an-agent-harness/" className={styles.sourceChip}>
+              <Ext
+                href="https://blog.langchain.com/the-anatomy-of-an-agent-harness/"
+                className={styles.sourceChip}
+              >
                 LangChain Blog (Trivedy)
                 <i className="ti ti-arrow-up-right" />
               </Ext>
-              <Ext href="https://code.claude.com/docs/en/best-practices" className={styles.sourceChip}>
+              <Ext
+                href="https://code.claude.com/docs/en/best-practices"
+                className={styles.sourceChip}
+              >
                 Anthropic — Claude Code Best Practices
                 <i className="ti ti-arrow-up-right" />
               </Ext>
@@ -420,7 +467,10 @@ export default function HarnessEngineeringPage() {
               出典
             </div>
             <div className={styles.sourceLinks}>
-              <Ext href="https://www.faros.ai/blog/harness-engineering" className={styles.sourceChip}>
+              <Ext
+                href="https://www.faros.ai/blog/harness-engineering"
+                className={styles.sourceChip}
+              >
                 Faros AI
                 <i className="ti ti-arrow-up-right" />
               </Ext>
@@ -441,10 +491,16 @@ export default function HarnessEngineeringPage() {
           </p>
           <ul>
             <li>
-              <strong>ガイド（フィードフォワード制御）</strong>: エージェントの挙動をあらかじめ予測し、行動する<strong>前に</strong>方向づける仕組み。最初の一回で良い結果が出る確率を高める。例: <code>CLAUDE.md</code>、アーキテクチャ文書、スキル、コーディング規約。
+              <strong>ガイド（フィードフォワード制御）</strong>:
+              エージェントの挙動をあらかじめ予測し、行動する<strong>前に</strong>
+              方向づける仕組み。最初の一回で良い結果が出る確率を高める。例: <code>CLAUDE.md</code>
+              、アーキテクチャ文書、スキル、コーディング規約。
             </li>
             <li>
-              <strong>センサー（フィードバック制御）</strong>: エージェントが行動した<strong>後</strong>に観測し、自己修正を助ける仕組み。特に「LLMがそのまま読める形式のシグナル」を返すセンサー（自己修正の指示を含むLintメッセージなど）は効果が高い。例: 静的解析、テスト結果、ログ、ブラウザでの実行結果。
+              <strong>センサー（フィードバック制御）</strong>: エージェントが行動した
+              <strong>後</strong>
+              に観測し、自己修正を助ける仕組み。特に「LLMがそのまま読める形式のシグナル」を返すセンサー（自己修正の指示を含むLintメッセージなど）は効果が高い。例:
+              静的解析、テスト結果、ログ、ブラウザでの実行結果。
             </li>
           </ul>
           <p>
@@ -460,7 +516,10 @@ export default function HarnessEngineeringPage() {
               出典
             </div>
             <div className={styles.sourceLinks}>
-              <Ext href="https://martinfowler.com/articles/harness-engineering.html" className={styles.sourceChip}>
+              <Ext
+                href="https://martinfowler.com/articles/harness-engineering.html"
+                className={styles.sourceChip}
+              >
                 Böckeler / martinfowler.com
                 <i className="ti ti-arrow-up-right" />
               </Ext>
@@ -518,7 +577,9 @@ export default function HarnessEngineeringPage() {
                 </tr>
                 <tr>
                   <td>コミット前 / PR時（Pre-commit / CI）</td>
-                  <td>ユニットテスト、アドバーサリアル（対立的）サブエージェントによる自動コードレビュー</td>
+                  <td>
+                    ユニットテスト、アドバーサリアル（対立的）サブエージェントによる自動コードレビュー
+                  </td>
                 </tr>
                 <tr>
                   <td>人間による最終レビュー前</td>
@@ -536,11 +597,17 @@ export default function HarnessEngineeringPage() {
               出典
             </div>
             <div className={styles.sourceLinks}>
-              <Ext href="https://martinfowler.com/articles/harness-engineering.html" className={styles.sourceChip}>
+              <Ext
+                href="https://martinfowler.com/articles/harness-engineering.html"
+                className={styles.sourceChip}
+              >
                 Böckeler / martinfowler.com
                 <i className="ti ti-arrow-up-right" />
               </Ext>
-              <Ext href="https://martinfowler.com/articles/sensors-for-coding-agents.html" className={styles.sourceChip}>
+              <Ext
+                href="https://martinfowler.com/articles/sensors-for-coding-agents.html"
+                className={styles.sourceChip}
+              >
                 Böckeler (Sensors続編)
                 <i className="ti ti-arrow-up-right" />
               </Ext>
@@ -554,17 +621,22 @@ export default function HarnessEngineeringPage() {
             <i className="ti ti-list-check" />
             4. ステップバイステップ実践ガイド
           </h2>
-          <p>ここからは、自分のプロジェクトにハーネスを構築するための具体手順を10のステップで解説します。</p>
+          <p>
+            ここからは、自分のプロジェクトにハーネスを構築するための具体手順を10のステップで解説します。
+          </p>
 
           <div className={styles.stepTitle}>
             <i className="ti ti-file-text" />
             Step 1: CLAUDE.md / AGENTS.md を薄く保ち、指示を明確にする
           </div>
           <p>
-            <code>CLAUDE.md</code>（または<code>AGENTS.md</code>）はエージェントがセッション開始時に最初に読み込むガイドです。最大の誤解は「プロジェクトのすべてを書き込むべき」という思い込みです。
+            <code>CLAUDE.md</code>（または<code>AGENTS.md</code>
+            ）はエージェントがセッション開始時に最初に読み込むガイドです。最大の誤解は「プロジェクトのすべてを書き込むべき」という思い込みです。
           </p>
           <p>
-            ファイルが長すぎると、最も重要なルールが埋もれて無視されます。<strong>目安は50行以内</strong>とし、具体的な詳細は別ファイル（<code>docs/</code>配下）へポインタとして参照させる「段階的開示（Progressive Disclosure）」を採用します。
+            ファイルが長すぎると、最も重要なルールが埋もれて無視されます。
+            <strong>目安は50行以内</strong>とし、具体的な詳細は別ファイル（<code>docs/</code>
+            配下）へポインタとして参照させる「段階的開示（Progressive Disclosure）」を採用します。
           </p>
 
           <div className={styles.tableWrap}>
@@ -580,7 +652,9 @@ export default function HarnessEngineeringPage() {
                 <tr>
                   <td>コマンド</td>
                   <td>ビルド、テスト、Lintの実行コマンド（正確な1行）</td>
-                  <td>環境構築の長文手順（<code>init.sh</code>へ切り出す）</td>
+                  <td>
+                    環境構築の長文手順（<code>init.sh</code>へ切り出す）
+                  </td>
                 </tr>
                 <tr>
                   <td>ルール</td>
@@ -596,10 +670,12 @@ export default function HarnessEngineeringPage() {
             </table>
           </div>
 
-          <div className={styles.callout + " " + styles.calloutInfo}>
+          <div className={`${styles.callout} ${styles.calloutInfo}`}>
             <i className="ti ti-bulb" />
             <p>
-              「指示がなくてもモデルがすでに正しく行っていること」を<code>CLAUDE.md</code>に書くのはノイズになります。実際に過去にエージェントが起こした失敗から逆算して、最小限の制約を追加していく「ラチェット原則（Step 9参照）」を守りましょう。
+              「指示がなくてもモデルがすでに正しく行っていること」を<code>CLAUDE.md</code>
+              に書くのはノイズになります。実際に過去にエージェントが起こした失敗から逆算して、最小限の制約を追加していく「ラチェット原則（Step
+              9参照）」を守りましょう。
             </p>
           </div>
           <div className={styles.sourceNote}>
@@ -608,7 +684,10 @@ export default function HarnessEngineeringPage() {
               出典
             </div>
             <div className={styles.sourceLinks}>
-              <Ext href="https://code.claude.com/docs/en/best-practices" className={styles.sourceChip}>
+              <Ext
+                href="https://code.claude.com/docs/en/best-practices"
+                className={styles.sourceChip}
+              >
                 Anthropic — Claude Code Best Practices
                 <i className="ti ti-arrow-up-right" />
               </Ext>
@@ -629,10 +708,12 @@ export default function HarnessEngineeringPage() {
 
           <ol>
             <li>
-              <strong>探索</strong>: Plan Mode（変更を加えずファイル閲覧・質問のみ行うモード）に入り、関連コードを読ませる。
+              <strong>探索</strong>: Plan
+              Mode（変更を加えずファイル閲覧・質問のみ行うモード）に入り、関連コードを読ませる。
             </li>
             <li>
-              <strong>計画</strong>: 実装計画を作成させる。エディタで直接編集して調整することも可能。
+              <strong>計画</strong>:
+              実装計画を作成させる。エディタで直接編集して調整することも可能。
             </li>
             <li>
               <strong>実装</strong>: Plan Modeを解除し、計画に沿って実装・テストを書かせる。
@@ -645,7 +726,7 @@ export default function HarnessEngineeringPage() {
             </li>
           </ol>
 
-          <div className={styles.callout + " " + styles.calloutInfo}>
+          <div className={`${styles.callout} ${styles.calloutInfo}`}>
             <i className="ti ti-bulb" />
             <p>
               スコープが明確で変更が小さい作業（タイポ修正、ログ追加、変数名変更など）にまで計画フェーズを強制するとオーバーヘッドになります。「diffを一文で説明できるなら計画は省略してよい」という目安が示されています。
@@ -657,7 +738,10 @@ export default function HarnessEngineeringPage() {
               出典
             </div>
             <div className={styles.sourceLinks}>
-              <Ext href="https://code.claude.com/docs/en/best-practices" className={styles.sourceChip}>
+              <Ext
+                href="https://code.claude.com/docs/en/best-practices"
+                className={styles.sourceChip}
+              >
                 Anthropic — Claude Code Best Practices
                 <i className="ti ti-arrow-up-right" />
               </Ext>
@@ -685,12 +769,17 @@ export default function HarnessEngineeringPage() {
                 <tr>
                   <td>検証基準を与える</td>
                   <td>「メールアドレスを検証する関数を実装して」</td>
-                  <td>「validateEmail関数を書いて。テストケース例あり。実装後にテストを実行して」</td>
+                  <td>
+                    「validateEmail関数を書いて。テストケース例あり。実装後にテストを実行して」
+                  </td>
                 </tr>
                 <tr>
                   <td>UI変更を視覚的に検証する</td>
                   <td>「ダッシュボードをもっと良く見せて」</td>
-                  <td>「[スクリーンショット添付] このデザイン通りに実装し、結果を撮影して元画像と比較・修正して」</td>
+                  <td>
+                    「[スクリーンショット添付]
+                    このデザイン通りに実装し、結果を撮影して元画像と比較・修正して」
+                  </td>
                 </tr>
                 <tr>
                   <td>根本原因に対処する</td>
@@ -707,13 +796,16 @@ export default function HarnessEngineeringPage() {
               <strong>1回のプロンプト内</strong>: 同じメッセージ内でチェック実行と反復を依頼する。
             </li>
             <li>
-              <strong>セッションをまたぐ条件</strong>: <code>/goal</code>条件として設定し、別の評価者が毎ターン後に再チェックする。
+              <strong>セッションをまたぐ条件</strong>: <code>/goal</code>
+              条件として設定し、別の評価者が毎ターン後に再チェックする。
             </li>
             <li>
-              <strong>決定論的なゲート</strong>: <code>Stop</code>フックでチェックをスクリプトとして実行し、合格するまでターン終了をブロックする。
+              <strong>決定論的なゲート</strong>: <code>Stop</code>
+              フックでチェックをスクリプトとして実行し、合格するまでターン終了をブロックする。
             </li>
             <li>
-              <strong>第三者による評価</strong>: 検証用サブエージェントや、実装したエージェント自身ではなく新鮮なモデルに結果を疑わせる仕組み。
+              <strong>第三者による評価</strong>:
+              検証用サブエージェントや、実装したエージェント自身ではなく新鮮なモデルに結果を疑わせる仕組み。
             </li>
           </ul>
           <p>
@@ -725,7 +817,10 @@ export default function HarnessEngineeringPage() {
               出典
             </div>
             <div className={styles.sourceLinks}>
-              <Ext href="https://code.claude.com/docs/en/best-practices" className={styles.sourceChip}>
+              <Ext
+                href="https://code.claude.com/docs/en/best-practices"
+                className={styles.sourceChip}
+              >
                 Anthropic — Claude Code Best Practices
                 <i className="ti ti-arrow-up-right" />
               </Ext>
@@ -737,11 +832,15 @@ export default function HarnessEngineeringPage() {
             Step 4: フックで決定論的なガードレールを敷く
           </div>
           <p>
-            <code>CLAUDE.md</code>の指示はあくまで「助言」であり、エージェントが読み飛ばす可能性があります。一方<strong>フック (Hooks)</strong>は、特定のライフサイクルイベント（ツール呼び出し前後、コミット前、セッション開始時など）で自動実行されるスクリプトで、「毎回・例外なく」実行させたい処理に向いています。
+            <code>CLAUDE.md</code>
+            の指示はあくまで「助言」であり、エージェントが読み飛ばす可能性があります。一方
+            <strong>フック (Hooks)</strong>
+            は、特定のライフサイクルイベント（ツール呼び出し前後、コミット前、セッション開始時など）で自動実行されるスクリプトで、「毎回・例外なく」実行させたい処理に向いています。
           </p>
           <ul>
             <li>
-              編集のたびにLintと型チェックを走らせ、失敗のみをエージェントに伝える（成功時は無音、失敗時のみ詳細を返す「Silent on success, verbose on failure」という原則が推奨されています）
+              編集のたびにLintと型チェックを走らせ、失敗のみをエージェントに伝える（成功時は無音、失敗時のみ詳細を返す「Silent
+              on success, verbose on failure」という原則が推奨されています）
             </li>
             <li>
               <code>rm -rf</code>や<code>git push --force</code>など破壊的なコマンドをブロックする
@@ -763,14 +862,26 @@ export default function HarnessEngineeringPage() {
               <div className={styles.codeLine}>EXIT_CODE=0</div>
               <div className={styles.codeLine}>ERRORS=&quot;&quot;</div>
               <div className={styles.codeLine}>&nbsp;</div>
-              <div className={styles.codeLine}>TC_OUT=$(npm run typecheck 2&gt;&amp;1) || &#123; EXIT_CODE=$?; ERRORS=&quot;$&#123;ERRORS&#125;$&#123;TC_OUT&#125;\n&quot;; &#125;</div>
-              <div className={styles.codeLine}>LINT_OUT=$(npm run lint 2&gt;&amp;1) || &#123; LINT_STATUS=$?; [ $EXIT_CODE -eq 0 ] &amp;&amp; EXIT_CODE=$LINT_STATUS; ERRORS=&quot;$&#123;ERRORS&#125;$&#123;LINT_OUT&#125;\n&quot;; &#125;</div>
+              <div className={styles.codeLine}>
+                TC_OUT=$(npm run typecheck 2&gt;&amp;1) || &#123; EXIT_CODE=$?;
+                ERRORS=&quot;$&#123;ERRORS&#125;$&#123;TC_OUT&#125;\n&quot;; &#125;
+              </div>
+              <div className={styles.codeLine}>
+                LINT_OUT=$(npm run lint 2&gt;&amp;1) || &#123; LINT_STATUS=$?; [ $EXIT_CODE -eq 0 ]
+                &amp;&amp; EXIT_CODE=$LINT_STATUS;
+                ERRORS=&quot;$&#123;ERRORS&#125;$&#123;LINT_OUT&#125;\n&quot;; &#125;
+              </div>
               <div className={styles.codeLine}>&nbsp;</div>
               <div className={styles.codeLine}>if [ $EXIT_CODE -ne 0 ]; then</div>
-              <div className={styles.codeLine}>  printf &quot;%b&quot; &quot;$ERRORS&quot; &gt;&amp;2</div>
-              <div className={styles.codeLine}>  exit $EXIT_CODE</div>
+              <div className={styles.codeLine}>
+                {" "}
+                printf &quot;%b&quot; &quot;$ERRORS&quot; &gt;&amp;2
+              </div>
+              <div className={styles.codeLine}> exit $EXIT_CODE</div>
               <div className={styles.codeLine}>fi</div>
-              <div className={styles.codeLine}># 成功時は何も出力しない（コンテキストを汚さない）</div>
+              <div className={styles.codeLine}>
+                # 成功時は何も出力しない（コンテキストを汚さない）
+              </div>
             </div>
           </div>
 
@@ -783,11 +894,17 @@ export default function HarnessEngineeringPage() {
               出典
             </div>
             <div className={styles.sourceLinks}>
-              <Ext href="https://www.humanlayer.dev/blog/skill-issue-harness-engineering-for-coding-agents" className={styles.sourceChip}>
+              <Ext
+                href="https://www.humanlayer.dev/blog/skill-issue-harness-engineering-for-coding-agents"
+                className={styles.sourceChip}
+              >
                 HumanLayer
                 <i className="ti ti-arrow-up-right" />
               </Ext>
-              <Ext href="https://code.claude.com/docs/en/best-practices" className={styles.sourceChip}>
+              <Ext
+                href="https://code.claude.com/docs/en/best-practices"
+                className={styles.sourceChip}
+              >
                 Anthropic — Claude Code Best Practices
                 <i className="ti ti-arrow-up-right" />
               </Ext>
@@ -799,7 +916,9 @@ export default function HarnessEngineeringPage() {
             Step 5: サブエージェントでコンテキストを保護する
           </div>
           <p>
-            コンテキストウィンドウは有限であり、埋まるほどモデルの性能は劣化します（いわゆる「コンテキスト・ロット」）。<strong>サブエージェント</strong>は独立したコンテキストウィンドウで動作し、要約された結果だけを親セッションに返す「コンテキスト・ファイアウォール」として機能します。
+            コンテキストウィンドウは有限であり、埋まるほどモデルの性能は劣化します（いわゆる「コンテキスト・ロット」）。
+            <strong>サブエージェント</strong>
+            は独立したコンテキストウィンドウで動作し、要約された結果だけを親セッションに返す「コンテキスト・ファイアウォール」として機能します。
           </p>
 
           <div className={styles.mermaidWrap}>
@@ -817,7 +936,11 @@ export default function HarnessEngineeringPage() {
             Chroma社の「コンテキスト・ロット」研究では、18モデルを対象にしたneedle-in-a-haystackタスクで、コンテキストが長くなるほど性能が劣化し、質問と関連情報の意味的類似度が低いほど劣化が急になることが確認されています。サブエージェントは各タスクに「新鮮で高関連度な」コンテキストウィンドウを与えることで、この劣化を構造的に回避します。
           </p>
           <p>
-            また、実装を書いたセッション自身にレビューさせると評価が甘くなりがちなため、<strong>「実装セッションとは別の、新鮮なコンテキストのサブエージェントにdiffをレビューさせる」</strong>アドバーサリアル・レビューも推奨されています。レビュー担当には「何をチェックすべきか」を明確に絞って伝えないと、些細なスタイル指摘まで大量に報告し、過剰なリファクタリングを誘発するため注意が必要です。
+            また、実装を書いたセッション自身にレビューさせると評価が甘くなりがちなため、
+            <strong>
+              「実装セッションとは別の、新鮮なコンテキストのサブエージェントにdiffをレビューさせる」
+            </strong>
+            アドバーサリアル・レビューも推奨されています。レビュー担当には「何をチェックすべきか」を明確に絞って伝えないと、些細なスタイル指摘まで大量に報告し、過剰なリファクタリングを誘発するため注意が必要です。
           </p>
           <div className={styles.sourceNote}>
             <div className={styles.sourceNoteLabel}>
@@ -825,11 +948,17 @@ export default function HarnessEngineeringPage() {
               出典
             </div>
             <div className={styles.sourceLinks}>
-              <Ext href="https://www.humanlayer.dev/blog/skill-issue-harness-engineering-for-coding-agents" className={styles.sourceChip}>
+              <Ext
+                href="https://www.humanlayer.dev/blog/skill-issue-harness-engineering-for-coding-agents"
+                className={styles.sourceChip}
+              >
                 HumanLayer
                 <i className="ti ti-arrow-up-right" />
               </Ext>
-              <Ext href="https://code.claude.com/docs/en/best-practices" className={styles.sourceChip}>
+              <Ext
+                href="https://code.claude.com/docs/en/best-practices"
+                className={styles.sourceChip}
+              >
                 Anthropic — Claude Code Best Practices
                 <i className="ti ti-arrow-up-right" />
               </Ext>
@@ -842,17 +971,25 @@ export default function HarnessEngineeringPage() {
           </div>
           <ul>
             <li>
-              <strong>MCPサーバー</strong>: ファイルI/OやBash以外の能力（外部API、データベース、Issueトラッカーなど）をエージェントに追加する仕組み。接続したMCPサーバーのツール説明はシステムプロンプトに注入されるため、<strong>信頼できないMCPサーバーには接続しないこと</strong>が強く推奨されています。ツール説明文自体がプロンプトインジェクションの経路になり得るためです。
+              <strong>MCPサーバー</strong>:
+              ファイルI/OやBash以外の能力（外部API、データベース、Issueトラッカーなど）をエージェントに追加する仕組み。接続したMCPサーバーのツール説明はシステムプロンプトに注入されるため、
+              <strong>信頼できないMCPサーバーには接続しないこと</strong>
+              が強く推奨されています。ツール説明文自体がプロンプトインジェクションの経路になり得るためです。
             </li>
             <li>
-              <strong>スキル (Skills)</strong>: <code>SKILL.md</code>という形式で、必要なときだけ読み込まれる知識・手順書。すべてのツールやMCPを常時コンテキストに載せると性能が劣化するため、「プログレッシブ・ディスクロージャー（段階的開示）」の考え方でスキルとして切り出すのが定石です。
+              <strong>スキル (Skills)</strong>: <code>SKILL.md</code>
+              という形式で、必要なときだけ読み込まれる知識・手順書。すべてのツールやMCPを常時コンテキストに載せると性能が劣化するため、「プログレッシブ・ディスクロージャー（段階的開示）」の考え方でスキルとして切り出すのが定石です。
             </li>
           </ul>
 
-          <div className={styles.callout + " " + styles.calloutWarning}>
+          <div className={`${styles.callout} ${styles.calloutWarning}`}>
             <i className="ti ti-alert-triangle" />
             <p>
-              MCPサーバーが提供する機能が、既に学習データに含まれる有名なCLI（<code>gh</code>、<code>aws</code>、<code>gcloud</code>など）と重複している場合は、MCPサーバーを使わずCLIを直接使わせたほうが、コンテキスト効率と<code>grep</code>・<code>jq</code>などとの組み合わせやすさの点で有利になることが多いという報告もあります。
+              MCPサーバーが提供する機能が、既に学習データに含まれる有名なCLI（<code>gh</code>、
+              <code>aws</code>、<code>gcloud</code>
+              など）と重複している場合は、MCPサーバーを使わずCLIを直接使わせたほうが、コンテキスト効率と
+              <code>grep</code>・<code>jq</code>
+              などとの組み合わせやすさの点で有利になることが多いという報告もあります。
             </p>
           </div>
           <div className={styles.sourceNote}>
@@ -861,11 +998,17 @@ export default function HarnessEngineeringPage() {
               出典
             </div>
             <div className={styles.sourceLinks}>
-              <Ext href="https://code.claude.com/docs/en/best-practices" className={styles.sourceChip}>
+              <Ext
+                href="https://code.claude.com/docs/en/best-practices"
+                className={styles.sourceChip}
+              >
                 Anthropic — Claude Code Best Practices
                 <i className="ti ti-arrow-up-right" />
               </Ext>
-              <Ext href="https://www.humanlayer.dev/blog/skill-issue-harness-engineering-for-coding-agents" className={styles.sourceChip}>
+              <Ext
+                href="https://www.humanlayer.dev/blog/skill-issue-harness-engineering-for-coding-agents"
+                className={styles.sourceChip}
+              >
                 HumanLayer
                 <i className="ti ti-arrow-up-right" />
               </Ext>
@@ -890,15 +1033,22 @@ export default function HarnessEngineeringPage() {
               <tbody>
                 <tr>
                   <td>Autoモード</td>
-                  <td>別の分類モデルがコマンドをレビューし、スコープの逸脱・未知のインフラ操作・敵対的コンテンツ由来の操作のみをブロックする</td>
+                  <td>
+                    別の分類モデルがコマンドをレビューし、スコープの逸脱・未知のインフラ操作・敵対的コンテンツ由来の操作のみをブロックする
+                  </td>
                 </tr>
                 <tr>
                   <td>権限アローリスト</td>
-                  <td><code>npm run lint</code>や<code>git commit</code>など、安全と分かっている特定のコマンドのみを許可する</td>
+                  <td>
+                    <code>npm run lint</code>や<code>git commit</code>
+                    など、安全と分かっている特定のコマンドのみを許可する
+                  </td>
                 </tr>
                 <tr>
                   <td>サンドボックス</td>
-                  <td>OSレベルの隔離を有効にし、ファイルシステム・ネットワークアクセスを制限した上で自由に動かせるようにする</td>
+                  <td>
+                    OSレベルの隔離を有効にし、ファイルシステム・ネットワークアクセスを制限した上で自由に動かせるようにする
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -909,7 +1059,10 @@ export default function HarnessEngineeringPage() {
               出典
             </div>
             <div className={styles.sourceLinks}>
-              <Ext href="https://code.claude.com/docs/en/best-practices" className={styles.sourceChip}>
+              <Ext
+                href="https://code.claude.com/docs/en/best-practices"
+                className={styles.sourceChip}
+              >
                 Anthropic — Claude Code Best Practices
                 <i className="ti ti-arrow-up-right" />
               </Ext>
@@ -930,14 +1083,17 @@ export default function HarnessEngineeringPage() {
 
           <ul>
             <li>
-              <strong>初期化エージェント</strong>: 最初のセッションで、<code>init.sh</code>（開発サーバー起動スクリプト）、進捗ログファイル、初期Gitコミット、そして「合格/不合格」を持つ機能一覧ファイルをセットアップする。この機能一覧は、AIが誤って上書き・削除しにくいJSON形式で管理するのが有効だと報告されています。
+              <strong>初期化エージェント</strong>: 最初のセッションで、<code>init.sh</code>
+              （開発サーバー起動スクリプト）、進捗ログファイル、初期Gitコミット、そして「合格/不合格」を持つ機能一覧ファイルをセットアップする。この機能一覧は、AIが誤って上書き・削除しにくいJSON形式で管理するのが有効だと報告されています。
             </li>
             <li>
-              <strong>コーディングエージェント</strong>: 以降の各セッションは、まず<code>pwd</code>で作業ディレクトリを確認し、Gitログと進捗ファイルを読んで状況を把握し、機能一覧から未完了の最優先項目を選んで着手し、セッション終了時にはGitコミットと進捗更新を残す、という定型手順で「引き継ぎ」を行う。
+              <strong>コーディングエージェント</strong>: 以降の各セッションは、まず<code>pwd</code>
+              で作業ディレクトリを確認し、Gitログと進捗ファイルを読んで状況を把握し、機能一覧から未完了の最優先項目を選んで着手し、セッション終了時にはGitコミットと進捗更新を残す、という定型手順で「引き継ぎ」を行う。
             </li>
           </ul>
           <p>
-            こうして「Gitコミット履歴」「<code>progress.txt</code>」「<code>feature_list.json</code>」を組み合わせることで、コンテキストウィンドウが切れても次のセッションが即座に前回の作業を引き継ぐことができます。
+            こうして「Gitコミット履歴」「<code>progress.txt</code>」「<code>feature_list.json</code>
+            」を組み合わせることで、コンテキストウィンドウが切れても次のセッションが即座に前回の作業を引き継ぐことができます。
           </p>
           <div className={styles.sourceNote}>
             <div className={styles.sourceNoteLabel}>
@@ -945,7 +1101,10 @@ export default function HarnessEngineeringPage() {
               出典
             </div>
             <div className={styles.sourceLinks}>
-              <Ext href="https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents" className={styles.sourceChip}>
+              <Ext
+                href="https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents"
+                className={styles.sourceChip}
+              >
                 Anthropic Engineering
                 <i className="ti ti-arrow-up-right" />
               </Ext>
@@ -957,7 +1116,11 @@ export default function HarnessEngineeringPage() {
             Step 9: 「ラチェット原則」で継続的にハーネスを改善する
           </div>
           <p>
-            ハーネスは一度作って終わりの設定ファイルではなく、生き続けるシステムです。最も重要な習慣は、<strong>エージェントのミスを「一過性の失敗談」ではなく「恒久的なシグナル」として扱うこと</strong>です。
+            ハーネスは一度作って終わりの設定ファイルではなく、生き続けるシステムです。最も重要な習慣は、
+            <strong>
+              エージェントのミスを「一過性の失敗談」ではなく「恒久的なシグナル」として扱うこと
+            </strong>
+            です。
           </p>
 
           <div className={styles.mermaidWrap}>
@@ -965,15 +1128,21 @@ export default function HarnessEngineeringPage() {
           </div>
 
           <p>
-            例えば、コメントアウトされたテストを含んだPRを誤ってマージしてしまったら、それは単なる不運ではなく入力データです。次のバージョンの<code>AGENTS.md</code>には「テストをコメントアウトしない。削除するか修正すること」という一文を足し、pre-commitフックには該当パターンを検知するgrepを足し、レビュー用サブエージェントにはコメントアウトされたテストをブロッカーとして検知させる、というように三重に手当てします。
+            例えば、コメントアウトされたテストを含んだPRを誤ってマージしてしまったら、それは単なる不運ではなく入力データです。次のバージョンの
+            <code>AGENTS.md</code>
+            には「テストをコメントアウトしない。削除するか修正すること」という一文を足し、pre-commitフックには該当パターンを検知するgrepを足し、レビュー用サブエージェントにはコメントアウトされたテストをブロッカーとして検知させる、というように三重に手当てします。
           </p>
           <ul>
-            <li>制約を追加するのは、<strong>実際に起きた失敗を見たときだけ</strong>。</li>
             <li>
-              制約を取り除くのは、<strong>モデルの能力向上によってその制約が不要になったと確認できたときだけ</strong>。
+              制約を追加するのは、<strong>実際に起きた失敗を見たときだけ</strong>。
             </li>
             <li>
-              良い<code>AGENTS.md</code>のすべての行は、<strong>特定の過去の失敗にたどり着けるべき</strong>。
+              制約を取り除くのは、
+              <strong>モデルの能力向上によってその制約が不要になったと確認できたときだけ</strong>。
+            </li>
+            <li>
+              良い<code>AGENTS.md</code>のすべての行は、
+              <strong>特定の過去の失敗にたどり着けるべき</strong>。
             </li>
           </ul>
           <p>
@@ -985,7 +1154,10 @@ export default function HarnessEngineeringPage() {
               出典
             </div>
             <div className={styles.sourceLinks}>
-              <Ext href="https://addyosmani.com/blog/agent-harness-engineering/" className={styles.sourceChip}>
+              <Ext
+                href="https://addyosmani.com/blog/agent-harness-engineering/"
+                className={styles.sourceChip}
+              >
                 Addy Osmani
                 <i className="ti ti-arrow-up-right" />
               </Ext>
@@ -996,7 +1168,9 @@ export default function HarnessEngineeringPage() {
             <i className="ti ti-layers-linked" />
             Step 10: 並列化してスケールする
           </div>
-          <p>一人のエンジニアと一つのエージェントの会話、という単位に慣れたら、次はスケールさせる番です。</p>
+          <p>
+            一人のエンジニアと一つのエージェントの会話、という単位に慣れたら、次はスケールさせる番です。
+          </p>
           <div className={styles.tableWrap}>
             <table>
               <thead>
@@ -1008,19 +1182,28 @@ export default function HarnessEngineeringPage() {
               <tbody>
                 <tr>
                   <td>Worktree並列実行</td>
-                  <td>複数のCLIセッションを独立したGitチェックアウトで実行し、編集の衝突を避ける</td>
+                  <td>
+                    複数のCLIセッションを独立したGitチェックアウトで実行し、編集の衝突を避ける
+                  </td>
                 </tr>
                 <tr>
-                  <td>非対話モード (<code>claude -p</code>)</td>
+                  <td>
+                    非対話モード (<code>claude -p</code>)
+                  </td>
                   <td>CI、pre-commitフック、自動化スクリプトにエージェントを組み込む</td>
                 </tr>
                 <tr>
                   <td>Writer/Reviewerパターン</td>
-                  <td>あるセッションに実装させ、別の新鮮なコンテキストのセッションにレビューさせ、指摘を実装セッションに戻す</td>
+                  <td>
+                    あるセッションに実装させ、別の新鮮なコンテキストのセッションにレビューさせ、指摘を実装セッションに戻す
+                  </td>
                 </tr>
                 <tr>
                   <td>ファンアウト</td>
-                  <td>大規模移行などで、タスクリストをスクリプトでループしながら<code>claude -p</code>を大量に呼び出し、<code>--allowedTools</code>で権限を絞って並列実行する</td>
+                  <td>
+                    大規模移行などで、タスクリストをスクリプトでループしながら<code>claude -p</code>
+                    を大量に呼び出し、<code>--allowedTools</code>で権限を絞って並列実行する
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -1034,7 +1217,10 @@ export default function HarnessEngineeringPage() {
               出典
             </div>
             <div className={styles.sourceLinks}>
-              <Ext href="https://code.claude.com/docs/en/best-practices" className={styles.sourceChip}>
+              <Ext
+                href="https://code.claude.com/docs/en/best-practices"
+                className={styles.sourceChip}
+              >
                 Anthropic — Claude Code Best Practices
                 <i className="ti ti-arrow-up-right" />
               </Ext>
@@ -1061,28 +1247,49 @@ export default function HarnessEngineeringPage() {
               <tbody>
                 <tr>
                   <td>キッチンシンク・セッション</td>
-                  <td>1つのタスクから始めたのに無関係な質問を挟み、また元のタスクに戻る。コンテキストが無関係な情報で埋まる</td>
-                  <td>無関係なタスクの間は<code>/clear</code>でコンテキストをリセットする</td>
+                  <td>
+                    1つのタスクから始めたのに無関係な質問を挟み、また元のタスクに戻る。コンテキストが無関係な情報で埋まる
+                  </td>
+                  <td>
+                    無関係なタスクの間は<code>/clear</code>でコンテキストをリセットする
+                  </td>
                 </tr>
                 <tr>
                   <td>堂々巡りの修正</td>
-                  <td>同じ問題を2回、3回と指摘しても直らない。コンテキストが失敗した試行錯誤で汚染されている</td>
-                  <td>2回修正しても直らなければ<code>/clear</code>し、学んだことを反映したより具体的な初期プロンプトで再開する</td>
+                  <td>
+                    同じ問題を2回、3回と指摘しても直らない。コンテキストが失敗した試行錯誤で汚染されている
+                  </td>
+                  <td>
+                    2回修正しても直らなければ<code>/clear</code>
+                    し、学んだことを反映したより具体的な初期プロンプトで再開する
+                  </td>
                 </tr>
                 <tr>
-                  <td>肥大化した<code>CLAUDE.md</code></td>
-                  <td>ファイルが長すぎて、重要なルールがノイズに埋もれてエージェントに無視される</td>
-                  <td>容赦なく刈り込む。指示がなくてもエージェントが正しく動くなら削除するかフックに置き換える</td>
+                  <td>
+                    肥大化した<code>CLAUDE.md</code>
+                  </td>
+                  <td>
+                    ファイルが長すぎて、重要なルールがノイズに埋もれてエージェントに無視される
+                  </td>
+                  <td>
+                    容赦なく刈り込む。指示がなくてもエージェントが正しく動くなら削除するかフックに置き換える
+                  </td>
                 </tr>
                 <tr>
                   <td>「信頼してから検証する」の逆転</td>
                   <td>もっともらしく見える実装がエッジケースを処理できていない</td>
-                  <td>常にテスト・スクリプト・スクリーンショットなどの検証手段を用意する。検証できないものは出荷しない</td>
+                  <td>
+                    常にテスト・スクリプト・スクリーンショットなどの検証手段を用意する。検証できないものは出荷しない
+                  </td>
                 </tr>
                 <tr>
                   <td>際限のない探索</td>
-                  <td>スコープを絞らずに「調査して」と指示し、何百ものファイルを読んでコンテキストを埋め尽くす</td>
-                  <td>調査範囲を狭く指定するか、サブエージェントを使ってメインコンテキストを汚染しないようにする</td>
+                  <td>
+                    スコープを絞らずに「調査して」と指示し、何百ものファイルを読んでコンテキストを埋め尽くす
+                  </td>
+                  <td>
+                    調査範囲を狭く指定するか、サブエージェントを使ってメインコンテキストを汚染しないようにする
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -1093,7 +1300,10 @@ export default function HarnessEngineeringPage() {
               出典
             </div>
             <div className={styles.sourceLinks}>
-              <Ext href="https://code.claude.com/docs/en/best-practices" className={styles.sourceChip}>
+              <Ext
+                href="https://code.claude.com/docs/en/best-practices"
+                className={styles.sourceChip}
+              >
                 Anthropic — Claude Code Best Practices
                 <i className="ti ti-arrow-up-right" />
               </Ext>
@@ -1110,7 +1320,9 @@ export default function HarnessEngineeringPage() {
 
           <h3>6.1 すべてのコードベースが同じように「ハーネス可能」なわけではない</h3>
           <p>
-            強い静的型付け言語のコードベースには型チェックというセンサーが自然に備わっており、明確なモジュール境界はアーキテクチャ制約ルールを可能にし、Springのようなフレームワークはエージェントが気にする必要のない詳細を抽象化してくれます。これらの性質がなければ、そもそも構築できる制御の種類が限られてしまいます。Thoughtworksの同僚であるNed Letcherはこれを<strong>「アンビエント・アフォーダンス」</strong>（環境そのものがエージェントにとって読み解きやすく、扱いやすい構造的性質）と呼んでいます。
+            強い静的型付け言語のコードベースには型チェックというセンサーが自然に備わっており、明確なモジュール境界はアーキテクチャ制約ルールを可能にし、Springのようなフレームワークはエージェントが気にする必要のない詳細を抽象化してくれます。これらの性質がなければ、そもそも構築できる制御の種類が限られてしまいます。Thoughtworksの同僚であるNed
+            Letcherはこれを<strong>「アンビエント・アフォーダンス」</strong>
+            （環境そのものがエージェントにとって読み解きやすく、扱いやすい構造的性質）と呼んでいます。
           </p>
 
           <div className={styles.tableWrap}>
@@ -1152,29 +1364,34 @@ export default function HarnessEngineeringPage() {
 
           <div className={styles.definitionBlock}>
             <div className={styles.label}>関連法則: Ashbyの法則（必要多様性の法則）</div>
-            <div className={styles.formula}>
-              制御装置が持つ多様性 ≥ 制御対象が持つ多様性
-            </div>
+            <div className={styles.formula}>制御装置が持つ多様性 ≥ 制御対象が持つ多様性</div>
             <p style={{ marginTop: "10px", marginBottom: 0 }}>
-              英国のサイバネティクス学者Ross Ashbyが示した原則。逆に言えば、対象とするシステムの多様性を絞り込むほど、それを包括的に制御するハーネスを設計しやすくなる。少数のトポロジーに絞った「ハーネステンプレート」はこの法則の実践例といえる。
+              英国のサイバネティクス学者Ross
+              Ashbyが示した原則。逆に言えば、対象とするシステムの多様性を絞り込むほど、それを包括的に制御するハーネスを設計しやすくなる。少数のトポロジーに絞った「ハーネステンプレート」はこの法則の実践例といえる。
             </p>
           </div>
 
           <h3>6.3 まだ答えが出ていない領域：振る舞いハーネス</h3>
           <p>
-            構造的な保守性（重複、複雑度、カバレッジ）を扱う「保守性ハーネス」や、性能・可観測性要件を扱う「アーキテクチャ適合性ハーネス」に比べ、<strong>「アプリケーションが仕様通りに機能的に振る舞っているか」を保証する“振る舞いハーネス”は依然として未解決の課題</strong>とされています。
+            構造的な保守性（重複、複雑度、カバレッジ）を扱う「保守性ハーネス」や、性能・可観測性要件を扱う「アーキテクチャ適合性ハーネス」に比べ、
+            <strong>
+              「アプリケーションが仕様通りに機能的に振る舞っているか」を保証する“振る舞いハーネス”は依然として未解決の課題
+            </strong>
+            とされています。
           </p>
 
-          <div className={styles.callout + " " + styles.calloutWarning}>
+          <div className={`${styles.callout} ${styles.calloutWarning}`}>
             <i className="ti ti-alert-triangle" />
             <p>
-              現状の主流は、機能仕様をフィードフォワードとして与え、AIが生成したテストスイートが緑（合格）であること・カバレッジ・場合によってはミューテーションテストをフィードバックとして確認し、最後に人手のテストで補う、という組み合わせです。しかしAI生成テストへの信頼はまだ十分ではなく、「承認済みフィクスチャ（approved fixtures）」パターンなど部分的な解決策が模索されている段階です。
+              現状の主流は、機能仕様をフィードフォワードとして与え、AIが生成したテストスイートが緑（合格）であること・カバレッジ・場合によってはミューテーションテストをフィードバックとして確認し、最後に人手のテストで補う、という組み合わせです。しかしAI生成テストへの信頼はまだ十分ではなく、「承認済みフィクスチャ（approved
+              fixtures）」パターンなど部分的な解決策が模索されている段階です。
             </p>
           </div>
 
           <h3>6.4 モデルとハーネスの共進化</h3>
           <p>
-            もう一つの重要な観測は、コーディングエージェント製品は「ハーネスを内側に組み込んだ状態」で事後学習（post-training）されているという点です。そのため、あるモデルが特定のハーネス内で学習された挙動に最適化されすぎる（オーバーフィットする）ことがあり、同じモデルを別のハーネスに載せ替えるとベンチマーク順位が大きく変わる、という報告があります。これは「新しいモデルを待てば全て解決する」という考え方に対する反例であり、<strong>ハーネス側の設計にも独立した価値がある</strong>ことを示しています。
+            もう一つの重要な観測は、コーディングエージェント製品は「ハーネスを内側に組み込んだ状態」で事後学習（post-training）されているという点です。そのため、あるモデルが特定のハーネス内で学習された挙動に最適化されすぎる（オーバーフィットする）ことがあり、同じモデルを別のハーネスに載せ替えるとベンチマーク順位が大きく変わる、という報告があります。これは「新しいモデルを待てば全て解決する」という考え方に対する反例であり、
+            <strong>ハーネス側の設計にも独立した価値がある</strong>ことを示しています。
           </p>
 
           <div className={styles.mermaidWrap}>
@@ -1190,15 +1407,24 @@ export default function HarnessEngineeringPage() {
               出典
             </div>
             <div className={styles.sourceLinks}>
-              <Ext href="https://martinfowler.com/articles/harness-engineering.html" className={styles.sourceChip}>
+              <Ext
+                href="https://martinfowler.com/articles/harness-engineering.html"
+                className={styles.sourceChip}
+              >
                 Böckeler / martinfowler.com
                 <i className="ti ti-arrow-up-right" />
               </Ext>
-              <Ext href="https://addyosmani.com/blog/agent-harness-engineering/" className={styles.sourceChip}>
+              <Ext
+                href="https://addyosmani.com/blog/agent-harness-engineering/"
+                className={styles.sourceChip}
+              >
                 Addy Osmani
                 <i className="ti ti-arrow-up-right" />
               </Ext>
-              <Ext href="https://blog.langchain.com/the-anatomy-of-an-agent-harness/" className={styles.sourceChip}>
+              <Ext
+                href="https://blog.langchain.com/the-anatomy-of-an-agent-harness/"
+                className={styles.sourceChip}
+              >
                 LangChain Blog (Trivedy)
                 <i className="ti ti-arrow-up-right" />
               </Ext>
@@ -1216,7 +1442,8 @@ export default function HarnessEngineeringPage() {
             人間のエンジニアは、コードベースに対する暗黙の「ハーネス」を自然に持っています。長年の経験で身につけた規約、300行の関数を見たときの美的な違和感、「うちのチームではそうしない」という直感、そしてコミットに自分の名前が載るという社会的な責任感です。エージェントにはこれらが一切ありません。どの規約が本質的でどれが単なる慣習なのか分からず、組織の記憶も持ちません。
           </p>
           <p>
-            ハーネスは、こうした人間の開発経験が暗黙のうちに担っていたものを、明示的で検証可能な形に外部化する試みです。ただし、それにも限界があります。良いハーネスの目的は、人間の入力を完全にゼロにすることではなく、<strong>人間の判断が最も重要な場所にその入力を集中させること</strong>にあります。
+            ハーネスは、こうした人間の開発経験が暗黙のうちに担っていたものを、明示的で検証可能な形に外部化する試みです。ただし、それにも限界があります。良いハーネスの目的は、人間の入力を完全にゼロにすることではなく、
+            <strong>人間の判断が最も重要な場所にその入力を集中させること</strong>にあります。
           </p>
 
           <h4>実践上の要点</h4>
@@ -1256,11 +1483,17 @@ export default function HarnessEngineeringPage() {
               出典
             </div>
             <div className={styles.sourceLinks}>
-              <Ext href="https://martinfowler.com/articles/harness-engineering.html" className={styles.sourceChip}>
+              <Ext
+                href="https://martinfowler.com/articles/harness-engineering.html"
+                className={styles.sourceChip}
+              >
                 Böckeler / martinfowler.com
                 <i className="ti ti-arrow-up-right" />
               </Ext>
-              <Ext href="https://addyosmani.com/blog/agent-harness-engineering/" className={styles.sourceChip}>
+              <Ext
+                href="https://addyosmani.com/blog/agent-harness-engineering/"
+                className={styles.sourceChip}
+              >
                 Addy Osmani
                 <i className="ti ti-arrow-up-right" />
               </Ext>

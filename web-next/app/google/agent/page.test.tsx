@@ -103,4 +103,3 @@ describe("/google/agent - static source safety", () => {
     expect(source.includes(needle)).toBe(false);
   });
 });
-
