@@ -243,69 +243,14 @@ CSSにもフォールバックを追加:
 
 #### ② JS直接操作でノード背景のインラインstyleを上書き
 
-```js
-function applyMindmapStyle(svgEl) {
-  // ノード背景形状のinline fillをJSで直接上書き
-  const shapes = svgEl.querySelectorAll(
-    'g.mindmap-node > rect, g.mindmap-node > circle, '
-    + 'g.mindmap-node > ellipse, g.mindmap-node > polygon, g.mindmap-node > path'
-  );
-  shapes.forEach(shape => {
-    shape.style.setProperty('fill', '#1e293b', 'important');   // スレートブルー（視認性良好）
-    shape.style.setProperty('stroke', '#475569', 'important');
-    shape.style.setProperty('stroke-width', '1.5px', 'important');
-  });
-
-  // ルートノード（最初の circle/ellipse）を青グローで強調
-  const rootShape = svgEl.querySelector('g.mindmap-node > circle, g.mindmap-node > ellipse');
-  if (rootShape) {
-    rootShape.style.setProperty('fill', 'rgba(0,112,243,0.2)', 'important');
-    rootShape.style.setProperty('stroke', '#0070f3', 'important');
-    rootShape.style.setProperty('stroke-width', '2.5px', 'important');
-    rootShape.style.setProperty('filter', 'drop-shadow(0 0 10px rgba(0,112,243,0.5))', 'important');
-  }
-
-  // SVG text要素
-  svgEl.querySelectorAll('g.mindmap-node text').forEach(t => {
-    t.style.setProperty('fill', '#e2e8f0', 'important');
-  });
-
-  // foreignObject内のHTML要素（headのCSSが届かない場合の保険）
-  svgEl.querySelectorAll('g.mindmap-node foreignObject').forEach(fo => {
-    try {
-      fo.querySelectorAll('*').forEach(child => {
-        child.style.setProperty('color', '#e2e8f0', 'important');
-      });
-    } catch (e) { /* ignore */ }
-  });
-
-  // エッジ色
-  svgEl.querySelectorAll('path').forEach(p => {
-    if (p.getAttribute('fill') === 'none'
-        || p.classList.contains('mindmap-edge')
-        || p.classList.contains('edge')) {
-      p.style.setProperty('stroke', '#4b5563', 'important');
-    }
-  });
-
-  // requestAnimationFrame後に再適用（Mermaidが非同期でスタイル上書きする場合の保険）
-  requestAnimationFrame(() => {
-    svgEl.querySelectorAll('g.mindmap-node foreignObject').forEach(fo => {
-      try {
-        fo.querySelectorAll('*').forEach(child => {
-          child.style.setProperty('color', '#e2e8f0', 'important');
-        });
-      } catch (e) { /* ignore */ }
-    });
-  });
-}
-```
+> **完全実装コード**: `references/mermaid-v10-guide.md` §「applyMindmapStyle 関数」を参照。
+> 要点: `g.mindmap-node > rect/circle/ellipse` に `fill/stroke` を `setProperty(..., 'important')` で設定し、
+> `requestAnimationFrame` で遅延再適用する。
 
 #### ③ レンダー後に呼び出す
 
 ```js
 const MINDMAP_IDS = ['diag-cli', 'diag-best-practices'];
-// ...render loop内で...
 if (MINDMAP_IDS.includes(id)) {
   applyMindmapStyle(svgEl);
 }
@@ -344,7 +289,7 @@ svgEl.style.overflow = 'visible';
 ## Part 3: JSテンプレートリテラル方式（恒久対策）
 
 `<div class="mermaid">` に直接書くと、VSCode/Prettier が保存のたびにインデントを付加して構文を壊す。
-**恒久対策は JS テンプレートリテラルへの移管**。
+**恒久対策は JS テンプレートリテラルへの移管**。この方式では `-->` を `--&gt;` にエスケープする必要もなくなる。
 
 ```html
 <!-- ❌ Prettierが保存時にインデントを付加して破壊する -->
@@ -355,34 +300,10 @@ A --> B
 
 <!-- ✅ JSテンプレートリテラル方式（IDEが一切触れない） -->
 <div id="diag-0"></div>
-<script>
-const DIAGRAMS = {
-  'diag-0': `graph LR
-A --> B`,
-};
-mermaid.initialize({ startOnLoad: false });
-(async () => {
-  if (document.fonts) await document.fonts.ready; // ← 必須
-  for (const [id, src] of Object.entries(DIAGRAMS)) {
-    const { svg } = await mermaid.render('svg-' + id, src);
-    document.getElementById(id).innerHTML = svg;
-    const svgEl = document.getElementById(id).querySelector('svg');
-    if (svgEl) {
-      svgEl.removeAttribute('width');
-      svgEl.removeAttribute('height');
-      svgEl.style.display = 'block';   // ✅ SVG は既定 inline のため block 化しないと margin:0 auto が効かない
-      svgEl.style.width = 'auto';      // ✅ 実寸維持（100% は引き伸ばしになるので不可）
-      svgEl.style.maxWidth = '100%';   // ✅ コンテナ幅で上限（広い図は縮小フィット）
-      svgEl.style.height = 'auto';
-      svgEl.style.margin = '0 auto';   // ✅ 中央寄せ
-      svgEl.style.overflow = 'visible';
-    }
-  }
-})();
-</script>
 ```
 
-この方式では `-->` を `--&gt;` にエスケープする必要もなくなる。
+> **完全実装コード（mermaid.initialize + SVG後処理 + DIAGRAMS オブジェクト全体）**:
+> `references/mermaid-v10-guide.md` §「JSテンプレートリテラル完全実装例」を参照。
 
 ---
 
@@ -496,38 +417,12 @@ themeVariables: { fontSize: "1rem", ...themeVariables }
 
 **グローバルな `max-height` で全 SVG を一律制限してはならない**。コンパクトな図まで縮小されて見づらくなる。
 
-```css
-/* ❌ NG: グローバル制限 — flowchart など他の図解が小さくなりすぎる */
-.mermaidWrap :global(svg) {
-  max-height: 380px !important;
-}
-```
-
 **正解: 問題のある図解 ID だけを個別に `:global(#diag-N svg)` でピンポイント制限する。**
 
-```css
-/*
- * stateDiagram-v2 でノード数が少ない図解だけを個別に制限する。
- * 他の図解（graph TD / flowchart LR / sequenceDiagram）は自然サイズのまま。
- */
-:global(#diag-3 svg) {
-  max-height: 260px !important;
-  height: auto !important;
-  width: auto !important;
-  display: block;
-  margin: 0 auto;
-}
-
-:global(#diag-5 svg) {
-  max-height: 300px !important;
-  height: auto !important;
-  width: auto !important;
-  display: block;
-  margin: 0 auto;
-}
-```
-
-> **手順**: 全 8 図解をブラウザで目視確認し、巨大化している図の ID（`id` prop）を特定 → その ID だけに `:global(#diag-N svg)` で `max-height` を設定 → 高さが適切になるまで数値を微調整する。
+> **CSS 実装例**（`:global(#diag-N svg) { max-height: Xpx !important; ... }` のパターン）:
+> `references/mermaid-v10-guide.md` §「stateDiagram-v2 個別制限 CSS」を参照。
+>
+> **手順**: 全図解をブラウザで目視確認し、巨大化している図の ID（`id` prop）を特定 → その ID だけに `:global(#diag-N svg)` で `max-height` を設定 → 高さが適切になるまで数値を微調整する。
 
 ### テスト環境（Vitest）でのモック化
 

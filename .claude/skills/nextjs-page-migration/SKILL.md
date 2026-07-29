@@ -176,18 +176,9 @@ Phase A–F で 18 枚のガイドページが `web-next/` App Router に**全�
 ```
 
 **確認コマンド（var() 参照の棚卸し）**:
-```bash
-# page.module.css 内で定義されているローカル変数を抽出
-local_vars=$(grep -oE '^\s*--[a-zA-Z0-9_-]+\s*:' web-next/app/path/to/page.module.css | sed -E 's/^\s*(--[a-zA-Z0-9_-]+)\s*:/\1/' | sort -u)
 
-# page.module.css で参照している変数のうち、ローカル変数でも globals.css に定義されている変数でもない未定義変数だけを出力
-for var in $(grep -oE 'var\(\s*--[a-zA-Z0-9_-]+' web-next/app/path/to/page.module.css | sed -E 's/var\(\s*(--[a-zA-Z0-9_-]+)/\1/' | sort -u); do
-  # ローカル変数として定義されている場合は除外
-  echo "$local_vars" | grep -qWx "$var" && continue
-  # globals.css に定義されているか確認
-  grep -q "$var:" web-next/app/globals.css || echo "未定義の変数: $var"
-done
-```
+> 完全な bash スクリプト（ローカル変数抽出 + globals.css 照合）は
+> `references/implementation-reference.md` §「CSS Module 地雷チェック — var() 参照確認コマンド」を参照。
 
 #### コードブロック内の行区切りパターン
 
@@ -253,29 +244,16 @@ build-time ハイライトとして `shiki` を採用する。
 
 #### (b) 手書き（非 Mermaid）の図解 — flex/HTML で組んだフロー図・決定木・ステップ図
 
-命名がバラバラ（`.flow` / `.flowSteps` / `.flowRow` / `.hfFlow` / `.archRow` / `.decisionTree` …）なので**クラス名で探さない**。「色付きボックスが横に並ぶ図」を見つけたら中央寄せする。パターンは2つ:
+命名がバラバラ（`.flow` / `.flowRow` / `.hfFlow` / `.archRow` / `.decisionTree` …）なので
+**クラス名で探さない**。「色付きボックスが横に並ぶ図」を見つけたら中央寄せする。
 
-```css
-/* パターン1: 1行の横並び（min-width:max-content で自然幅＝はみ出し得る）
-   → 収まるとき中央寄せ・はみ出すとき親の overflow-x で横スクロール。
-   親フレームに overflow-x:auto があることを必ず確認する。 */
-.flow {
-  display: flex;
-  min-width: max-content;
-  width: fit-content;      /* ← 追加 */
-  margin-inline: auto;     /* ← 追加（中央寄せ） */
-}
+- **パターン1（1行横並び）**: `width: fit-content; margin-inline: auto` を追加。親に `overflow-x: auto` があることを確認する。
+- **パターン2（折り返し）**: `justify-content: center` を追加。
+- **左寄せが正しい**: 縦タイムライン・積層バー・ファイルツリー・箇条書きは触らない。
+- **決定木など**: 各行を個別中央寄せするとジグザグになるため、**ブロックごと**に `width: fit-content; max-width: 100%; margin: 0 auto`。
 
-/* パターン2: 折り返す横並び（flex-wrap:wrap）→ justify-content:center で十分 */
-.flowRow {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center; /* ← 追加 */
-}
-```
-
-- **左寄せが正しい図解もある**: 縦タイムライン（`flex-direction:column`）・積層バー・ファイルツリー・箇条書きは触らない。「横並びのボックス群」だけが対象。
-- 各行を個別に `justify-content:center` すると幅の違う行がジグザグになる図（決定木など）は、**ブロックごと中央寄せ**する（`.decisionTree { width: fit-content; max-width:100%; margin: * auto }`）。
+> CSS コードの完全パターン（パターン1/2 の詳細）は
+> `references/implementation-reference.md` §「手書き図解（非 Mermaid）中央寄せ CSS パターン」を参照。
 
 #### (c) 本文カラム幅（バランス）
 
@@ -304,21 +282,10 @@ bun run build       # Next.js production build
 
 中央寄せ・はみ出し・カラム幅は**ユニットテストで検出できない**。CSS 視覚バグを疑うときは
 **静的ビルドを別ポートで配信し、Playwright で描画座標を実測**する（`scraper/` に Playwright 導入済み）。
-dev サーバーは負荷で再コンパイル・クラッシュしやすいので、**必ず `bun run build` 後の `out/` を静的配信**する。
+**必ず `bun run build` 後の `out/` を静的配信**する（dev サーバーは負荷でクラッシュしやすいため）。
 
-```bash
-# 1) 静的ビルドを配信（クリーンURL → *.html にマップする簡易サーバ）
-cd web-next && bun run build
-python3 -c "import http.server,os;R=os.path.abspath('out');\
-H=type('H',(http.server.SimpleHTTPRequestHandler,),{'translate_path':lambda s,p:(lambda f:f+'.html' if os.path.isfile(f+'.html') else (os.path.join(f,'index.html') if os.path.isdir(f) else f))(os.path.join(R,p.split('?')[0].strip('/')) or R),'log_message':lambda *a:None});\
-http.server.HTTPServer(('127.0.0.1',8099),H).serve_forever()" &
-# 2) scraper の Playwright で各要素の bounding box を測る（左右の余白を比較）
-#    例: el と親の contentBox から leftGap / rightGap を出し、差が大きい＝左寄せ を検出
-cd scraper && uv run python <検証スクリプト>   # 図解の中央寄せ / .mermaid svg のはみ出し / 本文カラム幅
-```
-
-判定の目安: `|leftGap - rightGap| > 16px` で左右非対称（左寄せ疑い）、`svg.right > wrapper.right` で切れ、
-`<p> を直接子に持つ最幅要素 > 1520px`（1920 幅時）で本文が広すぎ。**ヒーローのメタ/バッジ行の左寄せは意図的**なので除外する。
+> 配信コマンド詳細（`python3 -c` 簡易サーバ + scraper Playwright 実行方法）・判定の目安は
+> `references/implementation-reference.md` §「Playwright 実測配信コマンド」を参照。
 
 ### Step 7: nav-links.ts / ドキュメント同期
 
@@ -351,89 +318,28 @@ function Ext({ href, children }: { href: string; children: React.ReactNode }) {
 }
 ```
 
-### コードブロック構造
-
-```tsx
-<div className={styles.codeWrap}>
-  <div className={styles.codeBar}>
-    <span>ファイル名.md</span>
-    <span className={styles.codeLang}>YAML</span>
-  </div>
-  <div className={styles.codeBody}>
-    <div className={styles.codeLine}><span className={styles.cs}>---</span></div>
-    <div className={styles.codeLine}>
-      <span className={styles.cm}>name</span>
-      <span>{": "}</span>
-      <span className={styles.cv}>{'My Agent'}</span>
-    </div>
-  </div>
-</div>
-```
+### コードブロック構造 / フッター構造
 
 > [!IMPORTANT]
-> コードブロックを構成する `.codeBar`, `.codeBody`, `.codeLine` などのCSSモジュールクラスには、必ず等幅フォント設定（`font-family: var(--font-mono), "JetBrains Mono", monospace`）を適用すること。また、`.codeBody` には適切な `line-height`（例: `1.65`）を指定して視認性を確保する。
+> `.codeBar`, `.codeBody`, `.codeLine` には必ず等幅フォント
+> （`font-family: var(--font-mono), "JetBrains Mono", monospace`）を適用。
+> `.codeBody` には `line-height: 1.65` 等を指定して視認性を確保する。
 
-### フッター構造
-
-フッターはメインコンテンツ (`<main>`) の末尾に配置し、中央寄せと等幅フォントを適用する。
-
-```css
-.pageFooter {
-  max-width: 100%;
-  margin: 0 auto;
-  padding: 40px 56px 80px;
-  color: var(--text-tertiary);
-  font-size: 12.5px;
-  font-family: var(--font-mono), "JetBrains Mono", monospace;
-  text-align: center;
-  border-top: 1px solid var(--border);
-  line-height: 1.8;
-  background: #050b12;
-}
-```
+> 完全実装コード（コードブロック JSX 全体・フッター CSS）は
+> `references/implementation-reference.md` §「コードブロック構造 完全実装例」「フッター CSS 完全実装例」を参照。
 
 ### TOC nav とスクロール自動追従 (Intersection Observer)
 
-スクロールに応じて目次（TOC）のアクティブ項目をハイライトするIntersection Observerを導入する場合、`page.tsx` を `'use client'` 化してはいけない（Next.js App Routerの仕様により `metadata` がエクスポートできなくなるため）。
+スクロールに応じて TOC のアクティブ項目をハイライトする Intersection Observer を導入する場合、
+`page.tsx` を `'use client'` 化してはいけない（`metadata` がエクスポートできなくなるため）。
 
 **推奨設計パターン**:
 1. 同一ディレクトリ内に `TocObserver.tsx` という軽量クライアントコンポーネントを新規作成する。
-2. `TocObserver` 内で `useEffect` と `IntersectionObserver` を用いて、各 `.chapter` の交差判定を行い、TOCリンクに対して直接 `classList.add(styles.tocLinkActive)` / `classList.remove(styles.tocLinkActive)` を操作する。
-3. サーバーコンポーネントである `page.tsx` から `TocObserver` をインポートし、レイアウト内に配置する。これにより、`metadata` 静的エクスポートの維持とスクロール追従機能の両立が可能になる。
+2. `TocObserver` 内で `useEffect` + `IntersectionObserver` で各 `.chapter` の交差判定を行い、TOCリンクに `classList.add/remove(styles.tocLinkActive)` を操作する。
+3. Server Component の `page.tsx` から `TocObserver` をインポートして配置する（`metadata` 維持と追従機能の両立）。
 
-```tsx
-// TocObserver.tsx
-"use client";
-import { useEffect } from "react";
-import styles from "./page.module.css";
-
-export default function TocObserver() {
-  useEffect(() => {
-    const sections = document.querySelectorAll("section.chapter");
-    const links = Array.from(document.querySelectorAll(`.${styles.tocLink}`));
-    if (links.length > 0) links[0].classList.add(styles.tocLinkActive);
-
-    const observer = new IntersectionObserver((entries) => {
-      for (const entry of entries) {
-        if (entry.isIntersecting) {
-          const id = entry.target.id;
-          for (const l of links) {
-            if (l.getAttribute("href") === `#${id}`) {
-              l.classList.add(styles.tocLinkActive);
-            } else {
-              l.classList.remove(styles.tocLinkActive);
-            }
-          }
-        }
-      }
-    }, { rootMargin: "-15% 0px -70% 0px", threshold: 0 });
-
-    for (const sec of sections) observer.observe(sec);
-    return () => observer.disconnect();
-  }, []);
-  return null;
-}
-```
+> 完全実装コード（`TocObserver.tsx` 全体 + page.tsx 呼び出し方）は
+> `references/implementation-reference.md` §「TocObserver 完全実装」を参照。
 
 ### CSS Module 複合クラス
 
@@ -445,38 +351,16 @@ export default function TocObserver() {
 
 ## WAI-ARIA パターン（インタラクティブ UI）
 
-使い分け早見表:
-
 | UI パターン | 正しい ARIA | 誤りやすい代替 |
 |---|---|---|
 | チェックボタン (on/off) | `aria-pressed={bool}` | `aria-checked`, `aria-selected` |
 | タブ切り替え | `role="tab"` + `aria-selected` | `aria-pressed`, `aria-current` |
 | ステップ現在地 | `aria-current="step"` | `aria-selected`, `aria-pressed` |
 
-**タブ UI（Roving tabindex パターン）**:
-
-```tsx
-<div role="tablist">
-  {TABS.map((t) => (
-    <button
-      key={t.id}
-      id={`tab-${t.id}`}
-      role="tab"
-      aria-selected={active === t.id}
-      aria-controls={`panel-${t.id}`}
-      tabIndex={active === t.id ? 0 : -1}
-      onClick={() => setActive(t.id)}
-    >
-      {t.label}
-    </button>
-  ))}
-</div>
-<div id={`panel-${active}`} role="tabpanel" aria-labelledby={`tab-${active}`}>
-  ...
-</div>
-```
-
 **ステップ現在地**: `aria-current={isActive ? "step" : undefined}` — `undefined` で属性自体を消す（`false` だと `aria-current="false"` が出力される）。
+
+> タブ UI 完全実装（`role="tablist"` / `role="tab"` / `tabIndex` Roving tabindex パターン）は
+> `references/implementation-reference.md` §「WAI-ARIA タブ UI 完全実装」を参照。
 
 ---
 
