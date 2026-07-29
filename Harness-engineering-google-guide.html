@@ -380,9 +380,9 @@
     </style>
   </head>
   <body>
-    <button class="nav-toggle" id="navToggle" aria-label="目次を開く">☰</button>
+    <button type="button" class="nav-toggle" id="navToggle" aria-label="目次を開く" aria-expanded="false" aria-controls="sideNav">☰</button>
     <div class="layout">
-      <nav class="side-nav" aria-label="目次">
+      <nav class="side-nav" id="sideNav" aria-label="目次">
         <div class="side-nav-title">目次</div>
         <ul>
           <li>
@@ -1551,11 +1551,13 @@ flowchart LR
         var nav = document.querySelector('.side-nav');
         if (!btn || !nav) return;
         btn.addEventListener('click', function () {
-          nav.classList.toggle('open');
+          var isOpen = nav.classList.toggle('open');
+          btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
         });
         nav.querySelectorAll('a.nav-link').forEach(function (a) {
           a.addEventListener('click', function () {
             nav.classList.remove('open');
+            btn.setAttribute('aria-expanded', 'false');
           });
         });
       })();
