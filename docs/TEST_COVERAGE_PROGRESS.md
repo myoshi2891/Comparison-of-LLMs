@@ -8,7 +8,7 @@
 
 | 項目 | 値 |
 |---|---|
-| 最終スキャン日 | 2026-07-30 |
+| 最終スキャン日 | 2026-07-29 |
 | フロントエンドテストランナー | Vitest 4.1 (jsdom 29 + @testing-library/react 16) |
 | バックエンドテストランナー | pytest 9.0 (unittest 互換) |
 | web-next テストファイル数 | 137 |
@@ -599,7 +599,7 @@ note: 同上（JS依存関係の監査ゲート）
 
 | 日付 | 変更内容 | スコア |
 |---|---|---|
-| 2026-07-30 | Claude TocObserver 3ファイルへ分岐テスト12件を追加し、全テスト件数・Unit/app・Unit/providersセルを実測同期 | 44.2% |
+| 2026-07-29 | Claude TocObserver 3ファイルへ分岐テスト12件を追加し、全テスト件数・Unit/app・Unit/providersセルを実測同期 | 44.2% |
 | 2026-07-22 | PR #126 の TOC Observer 4ファイルへ分岐テスト12件を追加し、全テスト件数と Unit/app セルを実測同期 | 44.2% |
 | 2026-07-05 | TOC scroll-spy aria-current 対応と Cursor 中級ガイドの診断テスト追加に伴い件数を実測同期 (774→778) | 44.2% |
 | 2026-07-05 | Loop Engineering 完全ガイドの Next.js 移行に伴う契約テスト追加 (+21) | 44.2% |
