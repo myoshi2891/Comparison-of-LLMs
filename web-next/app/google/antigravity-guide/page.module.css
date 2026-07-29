@@ -77,10 +77,6 @@
 
 @media (max-width: 980px) {
   .sidebar {
-    display: none;
-  }
-  .sidebarOpen {
-    display: block;
     position: fixed;
     top: var(--header-height, 60px);
     left: 0;
@@ -88,6 +84,12 @@
     height: calc(100vh - var(--header-height, 60px));
     z-index: 99;
     background: var(--bg-elevated);
+    visibility: hidden;
+    pointer-events: none;
+  }
+  .sidebarOpen {
+    visibility: visible;
+    pointer-events: auto;
   }
 }
 
