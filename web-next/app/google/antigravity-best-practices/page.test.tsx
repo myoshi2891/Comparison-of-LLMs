@@ -1,4 +1,3 @@
-/** @vitest-environment happy-dom */
 import { render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import Page, { metadata } from "./page";
@@ -35,9 +34,9 @@ describe("/google/antigravity-best-practices 契約テスト", () => {
     }
   });
 
-  it("sec-13 参考文献セクションが存在し、10 件以上の外部リンクが含まれる", () => {
+  it("sources 参考文献セクションが存在し、10 件以上の外部リンクが含まれる", () => {
     const { container } = render(<Page />);
-    const sources = container.querySelector("#sec-13");
+    const sources = container.querySelector("#sources");
     expect(sources).not.toBeNull();
     const externals = sources?.querySelectorAll('a[href^="http"]') ?? [];
     expect(externals.length).toBeGreaterThanOrEqual(10);
