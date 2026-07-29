@@ -1,8 +1,14 @@
 import { render } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import Page, { metadata } from "./page";
 
-describe("/claude/claude-cowork-guide 契約テスト", () => {
+vi.mock("@/components/docs/MermaidDiagram", () => ({
+  default: function DummyMermaidDiagram({ chart }: { chart: string }) {
+    return <pre data-testid="mermaid">{chart}</pre>;
+  },
+}));
+
+describe("/claude/cowork-guide 契約テスト", () => {
   it("metadata.title が非空文字列である", () => {
     expect(typeof metadata.title).toBe("string");
     expect((metadata.title as string).length).toBeGreaterThan(0);
@@ -13,24 +19,27 @@ describe("/claude/claude-cowork-guide 契約テスト", () => {
     expect((metadata.description as string).length).toBeGreaterThan(0);
   });
 
-  it("h1 に Claude Cowork が含まれる", () => {
+  it("h1 に Claude Cowork 実践ガイド が含まれる", () => {
     const { container } = render(<Page />);
-    expect(container.querySelector("h1")?.textContent).toContain("Claude Cowork");
+    expect(container.querySelector("h1")?.textContent).toContain(
+      "Claude Cowork 実践ガイド"
+    );
   });
 
-  it("h1 に 完全入門ガイド が含まれる", () => {
+  it("h2 が 14 本存在する（STEP 0 〜 11 + チェックリスト + 参考文献）", () => {
     const { container } = render(<Page />);
-    expect(container.querySelector("h1")?.textContent).toContain("完全入門ガイド");
+    expect(container.querySelectorAll("h2").length).toBe(14);
   });
 
-  it("h2 が 11 本（セクション数と一致）", () => {
+  it("Mermaid 図解が 8 点描画される", () => {
     const { container } = render(<Page />);
-    expect(container.querySelectorAll("h2").length).toBe(11);
+    expect(container.querySelectorAll('[data-testid="mermaid"]').length).toBe(8);
   });
 
   it("外部リンクに target=_blank と rel=noopener noreferrer が付与されている", () => {
     const { container } = render(<Page />);
     const external = Array.from(container.querySelectorAll('a[href^="http"]'));
+    expect(external.length).toBeGreaterThan(0);
     for (const a of external) {
       expect(a.getAttribute("target")).toBe("_blank");
       expect(a.getAttribute("rel")).toBe("noopener noreferrer");
