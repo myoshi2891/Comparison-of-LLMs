@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { render } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import Page, { metadata } from "./page";
@@ -93,6 +95,32 @@ describe("/google/antigravity-guide (Antigravity CLI Complete Guide - 100% Faith
     expect(text).toContain("/agents");
     expect(text).toContain("/statusline");
     expect(text).toContain("/codesearch");
+  });
+
+  it("v1.1.5 以降の effort コマンドと起動フラグを案内する", () => {
+    const source = readFileSync(join(__dirname, "page.tsx"), "utf8");
+    expect(source).toContain("全 32 個の中核コマンド");
+    expect(source).toContain("/effort [level]");
+    expect(source).toContain("--effort");
+  });
+
+  it("外部実行例を不変参照と厳密なパッケージバージョンへ固定する", () => {
+    const source = readFileSync(join(__dirname, "page.tsx"), "utf8");
+    expect(source).toContain(
+      "4a13498f354f36bc82375a1ab9a920ae364c90c8/scripts/context-bar.sh"
+    );
+    expect(source).toContain("5c5593e50a09262a80ccfae53b0167467bc7e563556a8a92543c32f796ab5e9c");
+    expect(source).toContain("snyk@1.1306.2");
+    expect(source).toContain("mcp-remote@0.1.38");
+    expect(source).toContain("@playwright/mcp@0.0.78");
+    expect(source).toContain("@modelcontextprotocol/server-github@2025.4.8");
+  });
+
+  it("MCP 設定と AGENTS.md シンボリックリンクが現行仕様に一致する", () => {
+    const source = readFileSync(join(__dirname, "page.tsx"), "utf8");
+    expect(source).toContain("~/.gemini/config/mcp_config.json");
+    expect(source).toContain('"serverUrl"');
+    expect(source).toContain("ln -s CLAUDE.md AGENTS.md");
   });
 
   it("MermaidDiagram コンポーネントが 8 つ存在する (diag-1 〜 diag-8)", () => {
