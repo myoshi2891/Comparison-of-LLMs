@@ -514,27 +514,6 @@
   overflow-x: auto;
 }
 
-/*
- * diag-3（実行モード・3状態循環）と diag-5（サブエージェントライフサイクル・5状態）は
- * stateDiagram-v2 でノード数が少なく viewBox が広くなるため文字が巨大化する。
- * 他の図解（graph TD / flowchart LR / sequenceDiagram）は自然サイズで問題なし。
- */
-:global(#diag-3 svg) {
-  max-height: 460px !important;
-  height: auto !important;
-  width: auto !important;
-  display: block;
-  margin: 0 auto;
-}
-
-:global(#diag-5 svg) {
-  max-height: 400px !important;
-  height: auto !important;
-  width: auto !important;
-  display: block;
-  margin: 0 auto;
-}
-
 /* Footer */
 .pageFooter {
   max-width: 100%;

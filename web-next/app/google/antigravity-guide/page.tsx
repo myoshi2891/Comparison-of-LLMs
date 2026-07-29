@@ -421,7 +421,7 @@ export default function AntigravityCliGuidePage() {
               </div>
 
               <div className={styles.mermaidWrap}>
-                <MermaidDiagram chart={DIAG_3} id="diag-3" />
+                <MermaidDiagram chart={DIAG_3} id="diag-3" maxHeight="460px" />
                 <div style={{ textAlign: "center", fontSize: "12px", color: "var(--text-mute)", marginTop: "8px" }}>
                   図3: Shift+Tab による実行モードの循環
                 </div>
@@ -1055,7 +1055,7 @@ export default function AntigravityCliGuidePage() {
               </p>
 
               <div className={styles.mermaidWrap}>
-                <MermaidDiagram chart={DIAG_5} id="diag-5" />
+                <MermaidDiagram chart={DIAG_5} id="diag-5" maxHeight="400px" />
                 <div style={{ textAlign: "center", fontSize: "12px", color: "var(--text-mute)", marginTop: "8px" }}>
                   図5: サブエージェントのライフサイクル
                 </div>

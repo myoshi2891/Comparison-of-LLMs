@@ -6,6 +6,8 @@ type Props = {
   id?: string;
   style?: React.CSSProperties;
   className?: string;
+  /** Optional rendered SVG height cap for unusually tall diagrams. */
+  maxHeight?: React.CSSProperties["maxHeight"];
   /** Mermaid theme. Defaults to "dark". Pass "base" for light-mode pages. */
   theme?: "dark" | "base" | "default" | "forest" | "neutral";
   /**
@@ -34,27 +36,21 @@ function applySequenceDiagramColorOverrides(
     el.style.setProperty("fill", actorTxtColor, "important");
   });
 
-  const noteBkgColor = themeVariables?.noteBkgColor ?? themeVariables?.secondaryColor ?? "#FBF0DF";
-  const noteBorderColor = themeVariables?.noteBorderColor ?? "#EACB99";
+  const noteBkgColor = themeVariables?.noteBkgColor ?? themeVariables?.secondaryColor ?? "#ffffff";
+  const noteBorderColor = themeVariables?.noteBorderColor ?? "#000000";
   const noteTxtColor =
-    themeVariables?.noteTextColor ?? themeVariables?.primaryTextColor ?? "#14161C";
+    themeVariables?.noteTextColor ?? themeVariables?.primaryTextColor ?? "#000000";
 
-  root
-    .querySelectorAll<SVGRectElement>(
-      "rect.note, rect.noteRect, g.note rect, .note rect"
-    )
-    .forEach((el) => {
-      el.style.setProperty("fill", noteBkgColor, "important");
-      el.style.setProperty("stroke", noteBorderColor, "important");
+  root.querySelectorAll<SVGRectElement>("rect.note").forEach((el) => {
+    el.style.setProperty("fill", noteBkgColor, "important");
+    el.style.setProperty("stroke", noteBorderColor, "important");
+  });
+  root.querySelectorAll<SVGTextElement>("text.noteText").forEach((el) => {
+    el.style.setProperty("fill", noteTxtColor, "important");
+    el.querySelectorAll<SVGTSpanElement>("tspan").forEach((ts) => {
+      ts.style.setProperty("fill", noteTxtColor, "important");
     });
-  root
-    .querySelectorAll<SVGTextElement>("text.noteText, g.note text, .note text")
-    .forEach((el) => {
-      el.style.setProperty("fill", noteTxtColor, "important");
-      el.querySelectorAll<SVGTSpanElement>("tspan").forEach((ts) => {
-        ts.style.setProperty("fill", noteTxtColor, "important");
-      });
-    });
+  });
 
   const signalTxtColor =
     themeVariables?.signalTextColor ?? themeVariables?.primaryTextColor ?? "#000000";
@@ -77,6 +73,7 @@ function applySequenceDiagramColorOverrides(
  * @param id - Optional ID for the inner diagram container.
  * @param style - Optional inline styles for the outer wrapper.
  * @param className - Optional additional CSS classes for the outer wrapper.
+ * @param maxHeight - Optional maximum height applied to the rendered SVG.
  * @param theme - Mermaid theme to use.
  * @param themeVariables - Optional Mermaid theme variable overrides.
  * @returns A wrapper containing the rendered Mermaid diagram.
@@ -86,6 +83,7 @@ export default function MermaidDiagram({
   id,
   style,
   className,
+  maxHeight,
   theme = "dark",
   themeVariables,
 }: Props) {
@@ -99,7 +97,7 @@ export default function MermaidDiagram({
         m.default.initialize({
           startOnLoad: false,
           theme,
-          themeVariables: { fontSize: "16px", ...themeVariables },
+          themeVariables: { ...themeVariables, fontSize: "16px" },
           flowchart: { useMaxWidth: false, htmlLabels: true },
           sequence: { useMaxWidth: false },
           mindmap: { useMaxWidth: false },
@@ -114,6 +112,7 @@ export default function MermaidDiagram({
           const svg = ref.current?.querySelector("svg");
           if (svg instanceof SVGElement) {
             svg.style.maxWidth = "100%";
+            if (maxHeight !== undefined) svg.style.maxHeight = String(maxHeight);
             svg.style.height = "auto";
           }
           // --- foreignObject 文字色後処理 ---
@@ -152,7 +151,7 @@ export default function MermaidDiagram({
     };
     // themeVariables is in the dependency array. If the caller passes an inline object,
     // it will re-initialize mermaid and cause flickering.
-  }, [chart, theme, themeVariables]);
+  }, [chart, maxHeight, theme, themeVariables]);
 
   // 2層構造でレイアウトの真実の源を一元化する:
   //   外側 = フレーム全幅（列幅）を占める
