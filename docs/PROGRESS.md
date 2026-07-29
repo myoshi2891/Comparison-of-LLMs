@@ -19,7 +19,7 @@
 
 ## 最近の追加内容
 
-- **Agent Skills 実践ガイド — Antigravity IDE における SKILL.md（/google/skill）の Pure JSX 完全置き換え移行**: `Agent-skills-antigravity-best-practices.html` を `web-next/app/google/skill/page.tsx` に Pure JSX として完全忠実移植 🚀。要約・省略なしで全10セクション（intro, origin, philosophy, architecture, antigravity, practices, operations, example, summary, references）・全表・全コードブロック・5 Mermaid図・TOCスクロール追従（`TocObserver.tsx`）・外部リンク安全属性・`page-registry.ts`（`Google` カテゴリ）登録を完了。既存の旧 `/google/skill` コンテンツと完全入れ替え完了。原本 `Agent-skills-antigravity-best-practices.html` / `Agent-skills-antigravity-best-practices.md` は `archive/html/google/` および `archive/md/google/` へ `git mv` 退避保存。契約テスト（10セクション検証）を更新。
+- **Antigravity CLI 完全ガイド（/google/antigravity-guide）の Pure JSX 完全置き換え移行**: `Antigravity-cli-guide.html` を `web-next/app/google/antigravity-guide/page.tsx` に Pure JSX として完全忠実移植 🚀。要約・省略なしで全16セクション（00〜15）・全表・全コードブロック・8 Mermaid図 (`diag-1`〜`diag-8`)・TOCスクロール追従（`TocObserver.tsx`）・外部リンク安全属性・`page-registry.ts` 登録を完了。既存の旧 `/google/antigravity-guide` コンテンツと完全入れ替え完了。原本 `Antigravity-cli-guide.html` は `archive/` へ `git mv` 退避保存。契約テストを更新し全クリア。
 
 - **ハーネスエンジニアリング入門ガイド（/claude/harness-engineering）の Pure JSX 完全置き換え移行**: `Harness-engineering-guide.html` を `web-next/app/claude/harness-engineering/page.tsx` に Pure JSX として完全忠実移植 🚀。要約・省略なしで全9セクション（intro, chapter1〜7, references）・全表・全コードブロック（hook.sh含む）・9 Mermaid図・TOCスクロール追従（`TocObserver.tsx`）・外部リンク安全属性・`page-registry.ts` 登録確認を完了。既存の旧 `harness-engineering` コンテンツと完全入れ替え完了。原本 `Harness-engineering-guide.html` / `Harness-engineering-guide.md` は `archive/html/Anthropic/` および `archive/md/Anthropic/` へ `git mv` 退避保存。契約テスト（9セクション検証）を更新。
 
