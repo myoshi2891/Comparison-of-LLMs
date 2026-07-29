@@ -723,7 +723,7 @@
       <!-- ============ MAIN ============ -->
       <main>
         <div class="hero">
-          <span class="eyebrow"><span class="dot"></span>UPDATED THROUGH JULY 28, 2026</span>
+          <span class="eyebrow"><span class="dot"></span>UPDATED THROUGH JULY 29, 2026 (v1.1.5+)</span>
           <h1 class="title">Antigravity CLI<br />完全ガイド</h1>
           <p class="subtitle">
             全スラッシュコマンド・キーバインド・設定・自動化を、中級〜上級開発者向けにステップバイステップで解説。公式ドキュメントと著名開発者の一次情報にもとづく実務リファレンス。
@@ -1106,6 +1106,12 @@ agy --mode=plan</code></pre>
                     <td>コア</td>
                     <td><code>/quit</code></td>
                     <td>TUIセッションを終了</td>
+                  </tr>
+                  <tr>
+                    <td><code>/effort [level]</code></td>
+                    <td>設定</td>
+                    <td>—</td>
+                    <td>推論モデルの思考努力レベル(low, medium, high等)を設定(コマンドライン引数 <code>--effort</code> と相互同期)</td>
                   </tr>
                   <tr>
                     <td><code>/fast</code> <span class="chip">廃止予定</span></td>
@@ -1535,8 +1541,9 @@ EOF</code></pre>
               モデル名・カレントディレクトリ・gitブランチ・未コミット数・同期状況・トークン使用率をカラー表示するステータスラインの例。
             </p>
             <pre><code class="language-bash">mkdir -p ~/.gemini/antigravity-cli
-curl -o ~/.gemini/antigravity-cli/statusline.sh \
-  https://raw.githubusercontent.com/ykdojo/antigravity-cli-tips/main/scripts/context-bar.sh
+curl -sSL -o ~/.gemini/antigravity-cli/statusline.sh \
+  https://raw.githubusercontent.com/ykdojo/antigravity-cli-tips/a8b9f71c4c1a2d5f1d4352b0476839217822453e/scripts/context-bar.sh
+echo "a8b9f71c4c1a2d5f1d4352b0476839217822453e  ~/.gemini/antigravity-cli/statusline.sh" | sha256sum -c || exit 1
 chmod +x ~/.gemini/antigravity-cli/statusline.sh</code></pre>
             <pre><code class="language-json">{
   "statusLine": {
@@ -2081,15 +2088,15 @@ write_file(/path/to/file) # 指定ファイル/ディレクトリへの書込み
     },
     "atlassian": {
       "command": "npx",
-      "args": ["-y", "mcp-remote", "https://mcp.atlassian.com/v1/sse"]
+      "args": ["-y", "mcp-remote@0.1.1", "https://mcp.atlassian.com/v1/sse"]
     },
     "playwright": {
       "command": "npx",
-      "args": ["@playwright/mcp@latest"]
+      "args": ["-y", "@playwright/mcp@0.1.2"]
     },
     "github": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "args": ["-y", "@modelcontextprotocol/server-github@0.6.2"],
       "env": { "GITHUB_PERSONAL_ACCESS_TOKEN": "******" }
     }
   }
@@ -2464,78 +2471,78 @@ write_file(/path/to/file) # 指定ファイル/ディレクトリへの書込み
               <ul>
                 <li>
                   <span class="ref-title">CLI概要</span
-                  ><span class="ref-url">https://antigravity.google/docs/cli/overview</span>
+                  ><a class="ref-url" href="https://antigravity.google/docs/cli/overview" target="_blank" rel="noopener">https://antigravity.google/docs/cli/overview</a>
                 </li>
                 <li>
                   <span class="ref-title">インストール・認証</span
-                  ><span class="ref-url">https://antigravity.google/docs/cli/install</span>
+                  ><a class="ref-url" href="https://antigravity.google/docs/cli/install" target="_blank" rel="noopener">https://antigravity.google/docs/cli/install</a>
                 </li>
                 <li>
                   <span class="ref-title">実行モード</span
-                  ><span class="ref-url">https://antigravity.google/docs/cli/modes</span>
+                  ><a class="ref-url" href="https://antigravity.google/docs/cli/modes" target="_blank" rel="noopener">https://antigravity.google/docs/cli/modes</a>
                 </li>
                 <li>
                   <span class="ref-title">CLIリファレンス(全コマンド・キーバインド・設定キー)</span
-                  ><span class="ref-url">https://antigravity.google/docs/cli/reference</span>
+                  ><a class="ref-url" href="https://antigravity.google/docs/cli/reference" target="_blank" rel="noopener">https://antigravity.google/docs/cli/reference</a>
                 </li>
                 <li>
                   <span class="ref-title">ベストプラクティス</span
-                  ><span class="ref-url">https://antigravity.google/docs/cli/best-practices</span>
+                  ><a class="ref-url" href="https://antigravity.google/docs/cli/best-practices" target="_blank" rel="noopener">https://antigravity.google/docs/cli/best-practices</a>
                 </li>
                 <li>
                   <span class="ref-title">トラブルシューティング</span
-                  ><span class="ref-url">https://antigravity.google/docs/cli/troubleshooting</span>
+                  ><a class="ref-url" href="https://antigravity.google/docs/cli/troubleshooting" target="_blank" rel="noopener">https://antigravity.google/docs/cli/troubleshooting</a>
                 </li>
                 <li>
                   <span class="ref-title">機能概要(サンドボックス・サブエージェントパネル)</span
-                  ><span class="ref-url">https://antigravity.google/docs/cli/features</span>
+                  ><a class="ref-url" href="https://antigravity.google/docs/cli/features" target="_blank" rel="noopener">https://antigravity.google/docs/cli/features</a>
                 </li>
                 <li>
                   <span class="ref-title">/agents コマンド詳細</span
-                  ><span class="ref-url">https://antigravity.google/docs/cli/commands/agents</span>
+                  ><a class="ref-url" href="https://antigravity.google/docs/cli/commands/agents" target="_blank" rel="noopener">https://antigravity.google/docs/cli/commands/agents</a>
                 </li>
                 <li>
                   <span class="ref-title">/codesearch コマンド詳細</span
-                  ><span class="ref-url"
-                    >https://antigravity.google/docs/cli/commands/codesearch</span
+                  ><a class="ref-url" href="https://antigravity.google/docs/cli/commands/codesearch" target="_blank" rel="noopener"
+                    >https://antigravity.google/docs/cli/commands/codesearch</a
                   >
                 </li>
                 <li>
                   <span class="ref-title">/credits コマンド詳細</span
-                  ><span class="ref-url">https://antigravity.google/docs/cli/commands/credits</span>
+                  ><a class="ref-url" href="https://antigravity.google/docs/cli/commands/credits" target="_blank" rel="noopener">https://antigravity.google/docs/cli/commands/credits</a>
                 </li>
                 <li>
                   <span class="ref-title">/diff コマンド詳細</span
-                  ><span class="ref-url">https://antigravity.google/docs/cli/commands/diff</span>
+                  ><a class="ref-url" href="https://antigravity.google/docs/cli/commands/diff" target="_blank" rel="noopener">https://antigravity.google/docs/cli/commands/diff</a>
                 </li>
                 <li>
                   <span class="ref-title">/permissions コマンド詳細</span
-                  ><span class="ref-url"
-                    >https://antigravity.google/docs/cli/commands/permissions</span
+                  ><a class="ref-url" href="https://antigravity.google/docs/cli/commands/permissions" target="_blank" rel="noopener"
+                    >https://antigravity.google/docs/cli/commands/permissions</a
                   >
                 </li>
                 <li>
                   <span class="ref-title">/resume コマンド詳細</span
-                  ><span class="ref-url">https://antigravity.google/docs/cli/commands/resume</span>
+                  ><a class="ref-url" href="https://antigravity.google/docs/cli/commands/resume" target="_blank" rel="noopener">https://antigravity.google/docs/cli/commands/resume</a>
                 </li>
                 <li>
                   <span class="ref-title">/statusline コマンド詳細</span
-                  ><span class="ref-url"
-                    >https://antigravity.google/docs/cli/commands/statusline</span
+                  ><a class="ref-url" href="https://antigravity.google/docs/cli/commands/statusline" target="_blank" rel="noopener"
+                    >https://antigravity.google/docs/cli/commands/statusline</a
                   >
                 </li>
                 <li>
                   <span class="ref-title">/title コマンド詳細</span
-                  ><span class="ref-url">https://antigravity.google/docs/cli/commands/title</span>
+                  ><a class="ref-url" href="https://antigravity.google/docs/cli/commands/title" target="_blank" rel="noopener">https://antigravity.google/docs/cli/commands/title</a>
                 </li>
                 <li>
                   <span class="ref-title">/usage コマンド詳細</span
-                  ><span class="ref-url">https://antigravity.google/docs/cli/commands/usage</span>
+                  ><a class="ref-url" href="https://antigravity.google/docs/cli/commands/usage" target="_blank" rel="noopener">https://antigravity.google/docs/cli/commands/usage</a>
                 </li>
                 <li>
                   <span class="ref-title">Antigravity CLI 発表ブログ</span
-                  ><span class="ref-url"
-                    >https://antigravity.google/blog/introducing-google-antigravity-cli</span
+                  ><a class="ref-url" href="https://antigravity.google/blog/introducing-google-antigravity-cli" target="_blank" rel="noopener"
+                    >https://antigravity.google/blog/introducing-google-antigravity-cli</a
                   >
                 </li>
               </ul>
@@ -2544,8 +2551,8 @@ write_file(/path/to/file) # 指定ファイル/ディレクトリへの書込み
               <ul>
                 <li>
                   <span class="ref-title">GitHub: google-antigravity/antigravity-cli</span
-                  ><span class="ref-url"
-                    >https://github.com/google-antigravity/antigravity-cli</span
+                  ><a class="ref-url" href="https://github.com/google-antigravity/antigravity-cli" target="_blank" rel="noopener"
+                    >https://github.com/google-antigravity/antigravity-cli</a
                   >
                 </li>
               </ul>
@@ -2554,46 +2561,46 @@ write_file(/path/to/file) # 指定ファイル/ディレクトリへの書込み
               <ul>
                 <li>
                   <span class="ref-title">Gemini CLIからの移行アナウンス</span
-                  ><span class="ref-url"
-                    >https://developers.googleblog.com/an-important-update-transitioning-gemini-cli-to-antigravity-cli/</span
+                  ><a class="ref-url" href="https://developers.googleblog.com/an-important-update-transitioning-gemini-cli-to-antigravity-cli/" target="_blank" rel="noopener"
+                    >https://developers.googleblog.com/an-important-update-transitioning-gemini-cli-to-antigravity-cli/</a
                   >
                 </li>
                 <li>
                   <span class="ref-title">サーフェス選択ガイド(CLI/IDE/SDK/2.0比較)</span
-                  ><span class="ref-url"
-                    >https://cloud.google.com/blog/topics/developers-practitioners/choosing-your-surface-antigravity-20-antigravity-cli-antigravity-ide-or-antigravity-sdk</span
+                  ><a class="ref-url" href="https://cloud.google.com/blog/topics/developers-practitioners/choosing-your-surface-antigravity-20-antigravity-cli-antigravity-ide-or-antigravity-sdk" target="_blank" rel="noopener"
+                    >https://cloud.google.com/blog/topics/developers-practitioners/choosing-your-surface-antigravity-20-antigravity-cli-antigravity-ide-or-antigravity-sdk</a
                   >
                 </li>
                 <li>
                   <span class="ref-title">Antigravity vs Gemini CLI 比較</span
-                  ><span class="ref-url"
-                    >https://cloud.google.com/blog/topics/developers-practitioners/choosing-antigravity-or-gemini-cli</span
+                  ><a class="ref-url" href="https://cloud.google.com/blog/topics/developers-practitioners/choosing-antigravity-or-gemini-cli" target="_blank" rel="noopener"
+                    >https://cloud.google.com/blog/topics/developers-practitioners/choosing-antigravity-or-gemini-cli</a
                   >
                 </li>
                 <li>
                   <span class="ref-title"
                     >Antigravity CLI チュートリアルシリーズ(Medium, Google Cloud Community)</span
-                  ><span class="ref-url"
-                    >https://medium.com/google-cloud/antigravity-cli-tutorial-series-12b46cfe3bf2</span
+                  ><a class="ref-url" href="https://medium.com/google-cloud/antigravity-cli-tutorial-series-12b46cfe3bf2" target="_blank" rel="noopener"
+                    >https://medium.com/google-cloud/antigravity-cli-tutorial-series-12b46cfe3bf2</a
                   >
                 </li>
                 <li>
                   <span class="ref-title"
                     >Getting Started with Antigravity CLI(Medium, Google Cloud Community)</span
-                  ><span class="ref-url"
-                    >https://medium.com/google-cloud/getting-started-with-antigravity-cli-26c5da90951f</span
+                  ><a class="ref-url" href="https://medium.com/google-cloud/getting-started-with-antigravity-cli-26c5da90951f" target="_blank" rel="noopener"
+                    >https://medium.com/google-cloud/getting-started-with-antigravity-cli-26c5da90951f</a
                   >
                 </li>
                 <li>
                   <span class="ref-title">Antigravity CLIハンズオン公式Codelab</span
-                  ><span class="ref-url"
-                    >https://codelabs.developers.google.com/genai-for-dev-antigravity-cli</span
+                  ><a class="ref-url" href="https://codelabs.developers.google.com/genai-for-dev-antigravity-cli" target="_blank" rel="noopener"
+                    >https://codelabs.developers.google.com/genai-for-dev-antigravity-cli</a
                   >
                 </li>
                 <li>
                   <span class="ref-title">Antigravity CLIハンズオン公式Codelab(別編)</span
-                  ><span class="ref-url"
-                    >https://codelabs.developers.google.com/antigravity-cli-hands-on</span
+                  ><a class="ref-url" href="https://codelabs.developers.google.com/antigravity-cli-hands-on" target="_blank" rel="noopener"
+                    >https://codelabs.developers.google.com/antigravity-cli-hands-on</a
                   >
                 </li>
               </ul>
@@ -2606,15 +2613,15 @@ write_file(/path/to/file) # 指定ファイル/ディレクトリへの書込み
                     tipsリポジトリ作者・9,000+スター、CS Dojo
                     YouTubeチャンネル創設者・登録者190万人超、Eventual社 Developer Experience
                     Manager)、Google Cloud Community寄稿</span
-                  ><span class="ref-url"
-                    >https://medium.com/google-cloud/15-antigravity-cli-tips-ddbc21c10a20</span
+                  ><a class="ref-url" href="https://medium.com/google-cloud/15-antigravity-cli-tips-ddbc21c10a20" target="_blank" rel="noopener"
+                    >https://medium.com/google-cloud/15-antigravity-cli-tips-ddbc21c10a20</a
                   >
                 </li>
                 <li>
                   <span class="ref-title"
                     >Simon Willison氏(国際的に著名なAI/LLM評論家)によるGoogle
                     I/O・Antigravity関連の考察</span
-                  ><span class="ref-url">https://simonwillison.net/2026/May/20/google-io/</span>
+                  ><a class="ref-url" href="https://simonwillison.net/2026/May/20/google-io/" target="_blank" rel="noopener">https://simonwillison.net/2026/May/20/google-io/</a>
                 </li>
               </ul>
             </div>
@@ -2837,8 +2844,12 @@ write_file(/path/to/file) # 指定ファイル/ディレクトリへの書込み
             const link = byId[entry.target.id];
             if (!link) return;
             if (entry.isIntersecting) {
-              links.forEach((l) => l.classList.remove('active'));
+              links.forEach((l) => {
+                l.classList.remove('active');
+                l.removeAttribute('aria-current');
+              });
               link.classList.add('active');
+              link.setAttribute('aria-current', 'location');
             }
           });
         },

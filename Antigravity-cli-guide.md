@@ -1,7 +1,7 @@
 # Google Antigravity CLI 完全ガイド
 ### 全コマンド・設定・ベストプラクティス徹底解説(中級〜上級者向け)
 
-> 最終更新調査日: 2026年7月28日。Antigravity CLI は現在も高頻度でアップデートされているツールです。本ガイドは公式ドキュメント (`antigravity.google/docs/cli/*`)、GitHub リポジトリ、および著名な開発者による一次情報をもとに作成していますが、コマンド仕様は今後変更される可能性があります。実行前に必ず `agy --help` または CLI 内の `/help` で最新仕様を確認してください。
+> 最終更新調査日: 2026年7月29日 (Antigravity CLI v1.1.5 以降対応)。Antigravity CLI は現在も高頻度でアップデートされているツールです。本ガイドは公式ドキュメント (`antigravity.google/docs/cli/*`)、GitHub リポジトリ、および著名な開発者による一次情報をもとに作成していますが、コマンド仕様は今後変更される可能性があります。実行前に必ず `agy --help` または CLI 内の `/help` で最新仕様を確認してください。
 
 ---
 
@@ -186,6 +186,7 @@ agy --mode=plan
 | `/credits` | アカウント | — | AI Premiumクレジット残高と購入リンクを表示 |
 | `/diff` | ユーティリティ | — | インタラクティブ差分ビューア(VCS/Turn/Commit) |
 | `/exit` | コア | `/quit` | TUIセッションを終了 |
+| `/effort [level]` | 設定 | — | 推論モデルの思考努力レベル(low, medium, high等)を設定(コマンドライン引数 `--effort` と相互同期) |
 | `/fast`※ | 設定 | — | 推論プランをバイパスする高速モード(※廃止予定、下記注記参照) |
 | `/feedback` | ユーティリティ | — | フィードバック送信パネル |
 | `/fork` | 会話 | `/branch` | 現在の会話を新しい並行セッションに複製 |
@@ -386,8 +387,9 @@ stateDiagram-v2
 
 ```bash
 mkdir -p ~/.gemini/antigravity-cli
-curl -o ~/.gemini/antigravity-cli/statusline.sh \
-  https://raw.githubusercontent.com/ykdojo/antigravity-cli-tips/main/scripts/context-bar.sh
+curl -sSL -o ~/.gemini/antigravity-cli/statusline.sh \
+  https://raw.githubusercontent.com/ykdojo/antigravity-cli-tips/a8b9f71c4c1a2d5f1d4352b0476839217822453e/scripts/context-bar.sh
+echo "a8b9f71c4c1a2d5f1d4352b0476839217822453e  ~/.gemini/antigravity-cli/statusline.sh" | sha256sum -c || exit 1
 chmod +x ~/.gemini/antigravity-cli/statusline.sh
 ```
 
@@ -622,15 +624,15 @@ Antigravity CLI は MCP を通じて Jira・Confluence・GitHub・Playwright・S
     },
     "atlassian": {
       "command": "npx",
-      "args": ["-y", "mcp-remote", "https://mcp.atlassian.com/v1/sse"]
+      "args": ["-y", "mcp-remote@0.1.1", "https://mcp.atlassian.com/v1/sse"]
     },
     "playwright": {
       "command": "npx",
-      "args": ["@playwright/mcp@latest"]
+      "args": ["-y", "@playwright/mcp@0.1.2"]
     },
     "github": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "args": ["-y", "@modelcontextprotocol/server-github@0.6.2"],
       "env": { "GITHUB_PERSONAL_ACCESS_TOKEN": "******" }
     }
   }
