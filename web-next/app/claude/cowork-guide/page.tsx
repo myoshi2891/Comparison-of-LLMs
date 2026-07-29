@@ -1154,7 +1154,7 @@ export default function Page() {
                 className={styles.refCard}
                 href="https://www.techcrunch.com/2026/01/30/anthropic-brings-agentic-plugins-to-cowork/"
               >
-                <span className={styles.refBadge}>公式</span>
+                <span className={`${styles.refBadge} ${styles.supplement}`}>第三者報道</span>
                 <span className={styles.refBody}>
                   <strong>Anthropic brings agentic plug-ins to Cowork</strong>
                   <span className={styles.refSource}>
