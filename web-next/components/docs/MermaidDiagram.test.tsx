@@ -11,6 +11,20 @@ vi.mock("mermaid", () => ({
     run: vi.fn(async ({ nodes }: { nodes: Element[] }) => {
       const target = nodes[0];
       const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      const foreignObject = document.createElementNS("http://www.w3.org/2000/svg", "foreignObject");
+      const label = document.createElementNS("http://www.w3.org/1999/xhtml", "div");
+      foreignObject.appendChild(label);
+      svg.appendChild(foreignObject);
+
+      const actor = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      actor.classList.add("actor");
+      svg.appendChild(actor);
+
+      const message = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      message.classList.add("messageText");
+      const messageLine = document.createElementNS("http://www.w3.org/2000/svg", "tspan");
+      message.appendChild(messageLine);
+      svg.appendChild(message);
       target.appendChild(svg);
     }),
   },
@@ -72,6 +86,57 @@ describe("MermaidDiagram レイアウト規約", () => {
           mindmap: expect.objectContaining({ useMaxWidth: false }),
         })
       );
+    });
+  });
+
+  it.each([
+    "default",
+    "forest",
+    "neutral",
+  ] as const)("theme=%s は明示的な themeVariables なしでは Mermaid ネイティブ色を上書きしない", async (theme) => {
+    const { container } = render(<MermaidDiagram chart="graph TD; A-->B" theme={theme} />);
+
+    await waitFor(() => expect(container.querySelector("foreignObject div")).not.toBeNull());
+    expect((container.querySelector("foreignObject div") as HTMLElement).style.color).toBe("");
+    expect((container.querySelector("text.actor") as SVGTextElement).style.fill).toBe("");
+    expect((container.querySelector("text.messageText") as SVGTextElement).style.fill).toBe("");
+  });
+
+  it("base テーマでは sequenceDiagram の文字色を補正する", async () => {
+    const { container } = render(<MermaidDiagram chart="sequenceDiagram" theme="base" />);
+
+    await waitFor(() => {
+      expect((container.querySelector("text.actor") as SVGTextElement).style.fill).toBe(
+        "rgb(0, 0, 0)"
+      );
+      expect((container.querySelector("text.messageText") as SVGTextElement).style.fill).toBe(
+        "rgb(0, 0, 0)"
+      );
+      expect(
+        (container.querySelector("text.messageText tspan") as SVGTSpanElement).style.fill
+      ).toBe("rgb(0, 0, 0)");
+    });
+  });
+
+  it("themeVariables が明示されれば default テーマでも指定色を補正に使う", async () => {
+    const { container } = render(
+      <MermaidDiagram
+        chart="sequenceDiagram"
+        theme="default"
+        themeVariables={{ primaryTextColor: "#123456", signalTextColor: "#654321" }}
+      />
+    );
+
+    await waitFor(() => {
+      expect((container.querySelector("text.actor") as SVGTextElement).style.fill).toBe(
+        "rgb(18, 52, 86)"
+      );
+      expect((container.querySelector("text.messageText") as SVGTextElement).style.fill).toBe(
+        "rgb(101, 67, 33)"
+      );
+      expect(
+        (container.querySelector("text.messageText tspan") as SVGTSpanElement).style.fill
+      ).toBe("rgb(101, 67, 33)");
     });
   });
 });

@@ -67,8 +67,10 @@ Phase A–F で 18 枚のガイドページが `web-next/` App Router に**全�
 
 ### Step 2: [Green] page.tsx の実装
 
-> **faithful 必須**: ソース HTML の **全リスト項目・全コードブロック・全 SVG・全 alert・全 table** を
-> JSX に転写すること。要約・省略・縮約は禁止。
+> [!CAUTION]
+> **100% 完全移植ルール（絶対ルール）**:
+> ソース HTML / Markdown の **要約・省略・縮約・部分抽出・代表例のみの記述は重大な規約違反** である。
+> 元ファイルの全セクション、全サブセクション、全リード文・本文段落、全リスト項目、全コードブロック、全 SVG、全 callout/alert、全 table、全参考文献/外部リンクを、何一つ落とさずに **100% 漏れなく JSX へ完全転写** すること。
 
 - **Server Component デフォルト**。`"use client"` は `useState` が必要な場合のみ
 - スタイル優先順位: Tailwind ユーティリティ → CSS Modules（`page.module.css`） → global CSS（避ける）

@@ -1,7 +1,7 @@
 # プロジェクト進捗・ステータス (PROGRESS.md)
 
 > 本ファイルは Next.js 移行完了後の保守・改善フェーズにおける開発の進捗（特にテスト関連）および品質チェックのルールを記録する。
-> - 最終更新日: **Updated 2026-07-24**
+> - 最終更新日: **Updated 2026-07-28**
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
 
@@ -12,12 +12,21 @@
 - **動作検証**:
   - `bun run build` ✅（`web-next` の全ルートが Static プリレンダリングされる。※Antigravity環境では実行禁止）
   - `bun run typecheck` ✅
-  - `bun run lint` ✅（**0 errors / 0 warnings / 0 infos**。既知の既存指摘も含め全件解消済み）
+  - `npm run lint` ⚠️（**27 errors / 2 warnings**。今回のレビュー範囲外を含む既存の未整形・semantic 診断が残るため、全体自動修正は未実施）
 - **テストの実行状況**:
-- **フロントエンド (`web-next/`)**: Vitest 実行で **1203 件すべて合格** (全 Green ✅)
+- **フロントエンド (`web-next/`)**: Vitest 実行で **1232 件すべて合格** (全 Green ✅)
   - **バックエンド (`scraper/`)**: pytest 実行で **43 件すべて合格** (全 Green ✅)
 
 ## 最近の追加内容
+
+- **レビュー追加指摘のアクセシビリティ・Mermaid・文書整合性修正**: Claude Agent / Fable 5 / AI SDD のモバイル目次で状態依存の `aria-label` と `aria-expanded` を同期し、閉状態を `visibility: hidden` + `pointer-events: none`、開状態を visible + interactive に統一。
+  Gemini 静的 HTML の目次にも一意な ID / `aria-controls` / `aria-expanded` と開閉ラベル同期を追加。Harness Mermaid ソースをカラム0へ修正し、2つの Skill HTML では描画 Promise の rejection 時に既存 SVG を保持しつつ fallback 文言を表示。
+  Claude Platform の `name` / `description` を任意とする frontmatter 説明と Fable 5 のヒーロー改訂日を基準日に同期。Vitest **1232 件** / typecheck 全 Green、lint は既存ベースラインの **27 errors / 2 warnings**（ビルド・目視確認は依頼により省略）。
+- **レビュー指摘の現行コード照合とガイド品質修正**: 静的 HTML/Markdown の Mermaid 初期化・脚注・パス・リンク・アクセシビリティを現行コードと原本に照合して修正。Next.js 側は Claude 2ページと AI SDD ガイドのモバイル TOC を Server Component 維持のまま操作部分だけ Client Component 化し、チェックボックスのラベル、装飾 SVG、流動幅レイアウト、SDD の単一 `h1`、monospace CSS 変数の自己参照を修正。共有 `MermaidDiagram` は `default` / `forest` / `neutral` のネイティブ配色を保持し、sequenceDiagram の色補正を関数抽出。`IntersectionObserver` テストモックを setupFiles へ集約し、Vitest **1232 件** / typecheck 全 Green（ビルド・目視確認は依頼により省略）。
+- **仕様駆動開発（SDD）実践ガイド ― 中級・上級エンジニア向けベストプラクティス（/sdd/spec-driven-development-guide）の Next.js 移行**: `Spec-driven-development-guide.html` を `web-next/app/sdd/spec-driven-development-guide/page.tsx` に Pure JSX として完全忠実移植 🚀。要約・省略一切なしで全16セクション・全1.1〜14.1サブセクション・全8表・全コードブロック・10 Mermaid図・全コールアウト・全58件参考文献・TOCスクロール追従（`TocObserver.tsx`）・外部リンク安全属性・`page-registry.ts`（`開発プロセス` グループ）登録を完了。メインコンテンツ幅を 100% 化し画面全幅に拡張。第11章（タイムライン型カード）、第15章（SVGアイコン付きチェックリストグリッド）、第16章（ナンバーバッジ付きカードグリッド）のデザインブラッシュアップを完了。原本 `Spec-driven-development-guide.html` は `archive/html/SDD/Spec-driven-development-guide.html` へ `git mv` 退避保存。契約テスト5件を追加。
+- **AI仕様駆動開発（Spec-Driven Development）実践ガイド（/sdd/ai-spec-driven-development-guide）の Next.js 移行とグローバルナビ同期**: `Ai-spec-driven-development-guide.html` を `web-next/app/sdd/ai-spec-driven-development-guide/page.tsx` に Pure JSX として完全忠実移植 🚀。要約・省略なしで全13章（全12セクション+参考文献）・全表・全コードブロック・6 Mermaid図・TOCスクロール追従（`TocObserver.tsx`）・外部リンク安全属性・`page-registry.ts`（`開発プロセス` グループ）登録を完了。原本 `Ai-spec-driven-development-guide.html` / `Ai-spec-driven-development-guide.md` は `archive/html/SDD/` および `archive/md/SDD/` へ `git mv` 退避。契約テスト5件を追加し全クリア。
+- **Claude Fable 5 実践活用ガイド（/claude/fable-5-best-practices）のフィールドガイド版への全面刷新**: 『地図は、現地ではない。』から始まる最新のフィールドガイド版 `Fable5-guide.html` を `web-next/app/claude/fable-5-best-practices/page.tsx` に Pure JSX として完全忠実移植 🚀。要約・省略なしで全15セクション・全表・全コードブロック・12 Mermaid図・TOCスクロール追従（`TocObserver.tsx`）・外部リンク安全属性を適用し、旧コンテンツと置き換え完了。原本 `Fable5-guide.html` は `archive/html/` へ `git mv` 退避。契約テスト6件を更新し全クリア（Vitest PASS）。
+- **Claude サブエージェント & Agent Teams ベストプラクティスガイド（/claude/agent）の刷新**: `Claude-code-subagents-agentteams-markdown-bestpractices.html` を `web-next/app/claude/agent/page.tsx` に Pure JSX として完全忠実移植 🚀。要約・省略なしで全9セクション・全表・全コードブロック・4 Mermaid図・TOCスクロール追従（`TocObserver.tsx`）・外部リンク安全属性・`page-registry.ts` 登録を完了。原本 `Claude-code-subagents-agentteams-markdown-bestpractices.html` は `archive/html/` へ `git mv` 退避。契約テスト5件を更新し全クリア（Vitest **1183 件** / pytest **43 件** 全 Green ✅）。
 - **Claude Fable 5 追加 + 参考リンク集の更新（新2社カード・リンク切れ修正）**: コスト計算機の Anthropic 料金一覧に最上位モデル **Claude Fable 5**（$10 / $50 per 1M・1M ctx）を追加（`anthropic.py` の `_FALLBACKS`/`_TAG`/`_CLS`/`_SUB_*` 先頭、TDD）。参考リンク集（`RefLinks.tsx`）へ **Moonshot(Kimi) / Zhipu(GLM)** の公式料金ページカードを追加（16→18枚）し、リンク切れ3件を修正（Claude Code pricing `docs.anthropic.com/.../pricing`→`docs.claude.com/.../costs`、Windsurf `credits-and-billing`→`docs.windsurf.com/`、Junie `junie/faq/`→`help/junie/faq.html`）。Zhipu 料金は `z.ai/pricing` が 404 のため `docs.z.ai/guides/overview/pricing` を採用。全 URL を curl 実測で検証（403 のボット保護3件・FRED の HTTP/2 quirk は切れではないと確認）。`pricing.json` 3ファイルへ Fable を反映。Vitest **1203 件** / pytest **43 件** 全 Green。
 - **Google AI スクレイパーの `price_in` 誤スクレイプバグ修正（ライブ抽出を無効化）**: `providers/google.py` の `price_in` 抽出が、料金ページ上のモデル名手前の無関係な `$` 額を拾う正規表現バグ（逆順パターン `\$X ... model_key`）で全 Google AI モデルの入力価格を汚染していた。原因調査の結果、当該ページは TOC 重複・ラベル無し価格・1モデル複数価格併記のため正規表現抽出が構造的に不安定（実測で正しく取れるモデルが 0 件）と判明。TDD で ① 逆順パターン除去 → ② `input` キーワードアンカー追加を試行するも 2 モデルが残存したため、最終的にユーザー方針で **ライブ抽出を廃止し `_FALLBACKS`(SSoT/WebSearch確定値) を決定論的に採用**（Vertex と同扱い）。`scrape()` を `_FALLBACKS` 生成のみに簡素化（`get_page_text` 不使用）、`TestGoogle` をフォールバック固定・ネット非依存へ更新、smoke で Google を分離。設計判断を CLAUDE.md に固定（スクレイプ復活の禁止）。pytest **42 件合格（据え置き）**。
 - **2026-07 月次更新: 新規2社(Moonshot(Kimi)/Zhipu(GLM))追加 + 既存6社の 2026-07 モデル刷新**: Moonshot(Kimi)（Kimi K3 / K2.6）と Zhipu(GLM)（GLM-5.2 / GLM-4.6）を新規プロバイダースクレイパーとして追加（`providers/moonshot.py` / `zhipu.py`、`cls="tag-oss"`）。既存6社（Anthropic/OpenAI/Google/AWS/DeepSeek/xAI）の `_FALLBACKS` を GPT-5.6 系・Claude Sonnet 5・Gemini 3.6 Flash / 3.5 Flash-Lite・Grok 4.5・Amazon Nova Premier / Lite 追加で刷新。フロント側は唯一のハードコード `ApiTable.tsx` の `PROVIDER_COLORS` に新2社（Moonshot(Kimi)=`#818cf8` / Zhipu(GLM)=`#f472b6`）を追加（Red→Green、色検証テスト2件）。`pricing.json` を再生成（USD/JPY 163.47）し、Google AI 全モデルの `price_in` ライブ誤スクレイプ（ページ上の無関係な `$` 額を拾う既存の正規表現バグ）と Amazon Nova Premier の `price_out` を SSoT(`_FALLBACKS`) 値へ直接補正。provider ブロックの連続性・型パリティ・build/lint/typecheck を全 Green で確認（合計 **1202 テスト合格**、pytest **42 件合格**）。

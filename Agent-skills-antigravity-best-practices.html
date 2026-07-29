@@ -1,0 +1,1535 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Agent Skills 実践ガイド — Antigravity IDE における SKILL.md</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans+JP:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+    <style>
+      :root {
+        --bg: #f3f4f3;
+        --paper: #ffffff;
+        --ink: #14161c;
+        --ink-soft: #4a4d57;
+        --line: #e1e3e6;
+        --line-strong: #c7cbd1;
+        --accent: #3648d6;
+        --accent-soft: #eceefc;
+        --accent-ink: #24309e;
+        --warn: #c97a1a;
+        --warn-soft: #fbf0df;
+        --warn-line: #eacb99;
+        --good: #157a5b;
+        --good-soft: #e4f4ee;
+        --code-bg: #191b22;
+        --code-ink: #e7e9f0;
+        --code-accent: #8fa0ff;
+        --radius: 10px;
+        --maxw: 1180px;
+        --page-max: 1640px;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: 'IBM Plex Sans JP', 'IBM Plex Sans', sans-serif;
+        font-size: 16px;
+        line-height: 1.8;
+        -webkit-font-smoothing: antialiased;
+      }
+      h1,
+      h2,
+      h3,
+      h4 {
+        font-family: 'Space Grotesk', 'IBM Plex Sans JP', sans-serif;
+        color: var(--ink);
+        letter-spacing: -0.01em;
+        line-height: 1.3;
+      }
+      a {
+        color: var(--accent);
+        text-decoration: none;
+        border-bottom: 1px solid var(--accent-soft);
+      }
+      a:hover {
+        border-bottom-color: var(--accent);
+      }
+      a:focus-visible,
+      button:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
+      }
+      code,
+      pre {
+        font-family: 'IBM Plex Mono', monospace;
+      }
+      code.inline {
+        background: var(--accent-soft);
+        color: var(--accent-ink);
+        padding: 0.12em 0.4em;
+        border-radius: 5px;
+        font-size: 0.9em;
+      }
+
+      /* ---------- Header / Hero ---------- */
+      .hero {
+        background: linear-gradient(180deg, #14161c 0%, #1d2030 100%);
+        color: #f4f5f8;
+        padding: 64px 24px 88px;
+        position: relative;
+        overflow: hidden;
+      }
+      .hero-inner {
+        max-width: var(--page-max);
+        margin: 0 auto;
+        position: relative;
+        z-index: 2;
+      }
+      .eyebrow {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 13px;
+        letter-spacing: 0.06em;
+        color: var(--code-accent);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 22px;
+      }
+      .eyebrow::before {
+        content: '▸';
+        color: var(--code-accent);
+      }
+      .hero h1 {
+        font-size: clamp(30px, 4.6vw, 46px);
+        margin: 0 0 14px;
+        color: #fff;
+      }
+      .hero .sub {
+        font-size: 18px;
+        color: #b9bdd1;
+        max-width: 680px;
+        margin: 0 0 28px;
+      }
+      .hero .meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px 22px;
+        font-size: 13.5px;
+        color: #9ba0bc;
+        font-family: 'IBM Plex Mono', monospace;
+      }
+
+      /* progressive-disclosure signature panels */
+      .layers {
+        position: absolute;
+        right: -40px;
+        top: 38px;
+        width: 420px;
+        height: 300px;
+        z-index: 1;
+        opacity: 0.95;
+      }
+      .layer {
+        position: absolute;
+        border-radius: 14px;
+        border: 1px solid rgba(143, 160, 255, 0.35);
+        background: rgba(54, 72, 214, 0.1);
+        backdrop-filter: blur(2px);
+      }
+      .layer-1 {
+        width: 300px;
+        height: 150px;
+        left: 60px;
+        top: 10px;
+      }
+      .layer-2 {
+        width: 300px;
+        height: 150px;
+        left: 35px;
+        top: 65px;
+        background: rgba(54, 72, 214, 0.16);
+      }
+      .layer-3 {
+        width: 300px;
+        height: 150px;
+        left: 10px;
+        top: 120px;
+        background: rgba(54, 72, 214, 0.24);
+      }
+      .layer span {
+        position: absolute;
+        left: 18px;
+        top: 14px;
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 12px;
+        color: #cfd5ff;
+        letter-spacing: 0.03em;
+      }
+      @media (max-width: 900px) {
+        .layers {
+          display: none;
+        }
+      }
+
+      /* ---------- Layout ---------- */
+      .wrap {
+        max-width: var(--page-max);
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: 260px 1fr;
+        gap: 44px;
+        padding: 48px 32px 100px;
+      }
+      @media (max-width: 900px) {
+        .wrap {
+          grid-template-columns: 1fr;
+          padding: 32px 18px 70px;
+        }
+      }
+      /* prose text; tables/diagrams/cards use the full column too */
+      .card {
+        max-width: 720px;
+      }
+
+      nav.toc {
+        position: sticky;
+        top: 24px;
+        align-self: start;
+        background: var(--paper);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 20px 18px;
+        max-height: calc(100vh - 48px);
+        overflow-y: auto;
+      }
+      @media (max-width: 900px) {
+        nav.toc {
+          position: static;
+          max-height: none;
+          margin-bottom: 8px;
+        }
+      }
+      nav.toc .toc-label {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 11.5px;
+        letter-spacing: 0.08em;
+        color: var(--ink-soft);
+        text-transform: uppercase;
+        margin-bottom: 10px;
+      }
+      nav.toc ol {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        counter-reset: toc;
+      }
+      nav.toc li {
+        counter-increment: toc;
+        margin: 0 0 4px;
+      }
+      nav.toc a {
+        display: block;
+        padding: 6px 8px;
+        border-radius: 6px;
+        font-size: 14px;
+        color: var(--ink-soft);
+        border-bottom: none;
+      }
+      nav.toc a::before {
+        content: counter(toc, decimal-leading-zero) '  ';
+        font-family: 'IBM Plex Mono', monospace;
+        color: var(--line-strong);
+        font-size: 12px;
+      }
+      nav.toc a:hover {
+        background: var(--accent-soft);
+        color: var(--accent-ink);
+      }
+
+      main {
+        min-width: 0;
+      }
+      section {
+        margin-bottom: 56px;
+      }
+      section h2 {
+        font-size: 26px;
+        margin: 0 0 6px;
+        padding-bottom: 12px;
+        border-bottom: 2px solid var(--ink);
+      }
+      section h2 .num {
+        color: var(--accent);
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 0.7em;
+        margin-right: 10px;
+      }
+      section h3 {
+        font-size: 19px;
+        margin: 30px 0 10px;
+        color: var(--accent-ink);
+      }
+      p {
+        margin: 0 0 16px;
+        color: var(--ink);
+      }
+      ul,
+      ol {
+        margin: 0 0 16px;
+        padding-left: 22px;
+      }
+      li {
+        margin-bottom: 6px;
+      }
+
+      /* card / callout */
+      .card {
+        background: var(--paper);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 20px 22px;
+        margin: 18px 0;
+      }
+      .callout {
+        border-radius: var(--radius);
+        padding: 16px 20px;
+        margin: 20px 0;
+        border: 1px solid var(--warn-line);
+        background: var(--warn-soft);
+      }
+      .callout .label {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 12.5px;
+        font-weight: 600;
+        color: var(--warn);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .callout.good {
+        border-color: #bfe3d3;
+        background: var(--good-soft);
+      }
+      .callout.good .label {
+        color: var(--good);
+      }
+
+      /* mermaid container */
+      .diagram {
+        background: var(--paper);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 22px 18px;
+        margin: 18px 0;
+        overflow-x: auto;
+      }
+      .diagram-caption {
+        font-size: 13px;
+        color: var(--ink-soft);
+        margin-top: 10px;
+        font-family: 'IBM Plex Mono', monospace;
+      }
+      .mermaid-target {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 60px;
+        width: 100%;
+      }
+      .mermaid-target svg {
+        width: auto;
+        max-width: 100%;
+        height: auto;
+        overflow: visible;
+      }
+
+      /* tables */
+      .table-scroll {
+        overflow-x: auto;
+        margin: 18px 0;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        background: var(--paper);
+        border-radius: var(--radius);
+        overflow: hidden;
+      }
+      caption {
+        caption-side: top;
+        text-align: left;
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 12.5px;
+        color: var(--ink-soft);
+        margin-bottom: 8px;
+      }
+      th,
+      td {
+        text-align: left;
+        padding: 10px 14px;
+        border-bottom: 1px solid var(--line);
+        font-size: 14.5px;
+        vertical-align: top;
+      }
+      thead th {
+        background: var(--ink);
+        color: #fff;
+        font-family: 'IBM Plex Mono', monospace;
+        font-weight: 500;
+        font-size: 12.5px;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+      }
+      tbody tr:nth-child(even) {
+        background: #fafafa;
+      }
+      tbody tr:last-child td {
+        border-bottom: none;
+      }
+
+      /* code blocks */
+      pre.code {
+        background: var(--code-bg);
+        color: var(--code-ink);
+        border-radius: var(--radius);
+        padding: 18px 20px;
+        overflow-x: auto;
+        font-size: 13.5px;
+        line-height: 1.7;
+        margin: 14px 0;
+      }
+      pre.code .cm {
+        color: #7c8194;
+      }
+      pre.code .kw {
+        color: var(--code-accent);
+      }
+      pre.code .str {
+        color: #b9e39a;
+      }
+
+      .step-grid {
+        display: grid;
+        gap: 14px;
+      }
+      .step {
+        display: grid;
+        grid-template-columns: 44px 1fr;
+        gap: 14px;
+        background: var(--paper);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 16px 18px;
+      }
+      .step .n {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: var(--accent);
+        color: #fff;
+        font-family: 'IBM Plex Mono', monospace;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .step h4 {
+        margin: 2px 0 6px;
+        font-size: 16px;
+      }
+      .step p {
+        margin: 0;
+        font-size: 14.5px;
+        color: var(--ink-soft);
+      }
+
+      .checklist {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+      .checklist li {
+        padding: 10px 14px 10px 40px;
+        position: relative;
+        border-bottom: 1px dashed var(--line);
+        font-size: 14.5px;
+      }
+      .checklist li:last-child {
+        border-bottom: none;
+      }
+      .checklist li::before {
+        content: '✓';
+        position: absolute;
+        left: 10px;
+        top: 9px;
+        color: var(--good);
+        font-weight: 700;
+      }
+
+      footer {
+        max-width: var(--page-max);
+        margin: 0 auto;
+        padding: 0 32px 80px;
+      }
+      .refs {
+        background: var(--paper);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 26px 28px;
+      }
+      .refs h2 {
+        font-size: 20px;
+        border: none;
+        padding: 0;
+        margin-bottom: 14px;
+      }
+      .refs ol {
+        padding-left: 20px;
+      }
+      .refs li {
+        margin-bottom: 10px;
+        font-size: 14px;
+        color: var(--ink-soft);
+      }
+      .refs li .t {
+        color: var(--ink);
+        font-weight: 600;
+      }
+      .refs a {
+        font-size: 13.5px;
+        word-break: break-all;
+      }
+      .note {
+        font-size: 13px;
+        color: var(--ink-soft);
+        margin-top: 16px;
+        padding-top: 16px;
+        border-top: 1px solid var(--line);
+      }
+    </style>
+  </head>
+  <body>
+    <header class="hero">
+      <div class="hero-inner">
+        <div class="eyebrow">SKILL.md · Agent Skills · Antigravity IDE</div>
+        <h1>Agent Skills 実践ガイド</h1>
+        <p class="sub">
+          Antigravity IDE における SKILL.md の設計思想・アーキテクチャ・実装パターン・運用 —
+          中級〜上級エンジニア向けステップバイステップ解説
+        </p>
+        <div class="meta">
+          <span>対象読者: AIエンジニア / プラットフォームエンジニア</span>
+          <span>情報基準日: 2026-07-27</span>
+          <span>形式: 設計思想 → アーキテクチャ → 実装パターン → 運用</span>
+        </div>
+      </div>
+      <div class="layers" aria-hidden="true">
+        <div class="layer layer-1"><span>Discovery</span></div>
+        <div class="layer layer-2"><span>Activation</span></div>
+        <div class="layer layer-3"><span>Execution</span></div>
+      </div>
+    </header>
+
+    <div class="wrap">
+      <nav class="toc" aria-label="目次">
+        <div class="toc-label">On this page</div>
+        <ol>
+          <li><a href="#intro">はじめに</a></li>
+          <li><a href="#origin">起源と位置づけ</a></li>
+          <li><a href="#philosophy">設計思想：段階的開示</a></li>
+          <li><a href="#architecture">アーキテクチャ</a></li>
+          <li><a href="#antigravity">Antigravityの実装仕様</a></li>
+          <li><a href="#practices">実装パターン：9ステップ</a></li>
+          <li><a href="#operations">運用</a></li>
+          <li><a href="#example">実装例</a></li>
+          <li><a href="#summary">まとめ</a></li>
+          <li><a href="#references">参考文献・情報源</a></li>
+        </ol>
+      </nav>
+
+      <main>
+        <section id="intro">
+          <h2><span class="num">00</span>はじめに</h2>
+          <p>
+            「Agent Skills」は、AIエージェントに手続き的知識（procedural
+            knowledge）や組織固有のコンテキストを、<strong>フォルダとMarkdownファイル</strong>という極めてシンプルな形式で与えるための設計パターンです。2025年10月にAnthropicがClaude向けに発表し、同年12月には
+            <code class="inline">agentskills.io</code>
+            として企業横断のオープン標準に格上げされました。Google の
+            Antigravity（IDE／CLI／SDKからなるエージェントファースト開発環境）はこの標準をネイティブでサポートしており、Claude
+            Code・OpenAI Codex・Gemini CLI・Cursor・GitHub
+            Copilotなどと<strong>同一フォーマットのSKILL.md</strong>を読み込むことができます。
+          </p>
+          <p>
+            本ガイドは機能紹介ではなく、なぜこの設計になっているのか（設計思想）、内部でどう動くのか（アーキテクチャ）、どう書けば品質が上がるのか（実装パターン）、チームでどう回すのか（運用）を、一次情報にもとづいて段階的に解説します。
+          </p>
+        </section>
+
+        <section id="origin">
+          <h2><span class="num">01</span>Agent Skills の起源と位置づけ</h2>
+          <div class="table-scroll">
+            <table>
+              <caption>
+                Agent Skills / Antigravity Skills をめぐる主な出来事
+              </caption>
+              <thead>
+                <tr>
+                  <th style="width: 20%">時期</th>
+                  <th>出来事</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>2025-10-16</td>
+                  <td>
+                    Anthropicが「Agent Skills」をClaude向けに発表。エンジニアリングブログ「Equipping
+                    agents for the real world with Agent Skills」を公開
+                  </td>
+                </tr>
+                <tr>
+                  <td>2025-10-16</td>
+                  <td>
+                    Simon Willison氏（Datasette作者、AI開発ツール評論で著名）が即日検証し「Claude
+                    Skills are awesome, maybe a bigger deal than MCP」と評価
+                  </td>
+                </tr>
+                <tr>
+                  <td>2025-12-18</td>
+                  <td>
+                    Agent Skills形式が
+                    <code class="inline">agentskills.io</code>
+                    としてオープン標準化。Anthropic以外のツールへの移植性を確保
+                  </td>
+                </tr>
+                <tr>
+                  <td>2026-01 以降</td>
+                  <td>Google AntigravityがSKILL.mdをネイティブサポートすると発表・文書化</td>
+                </tr>
+                <tr>
+                  <td>2026-02</td>
+                  <td>
+                    Bosch ResearchとCarnegie
+                    Mellon大学の研究（arXiv:2602.08004）が公開スキル数の急増（約20日間で2,179件→40,000件超）を報告
+                  </td>
+                </tr>
+                <tr>
+                  <td>2026-現在</td>
+                  <td>
+                    Cursor、GitHub Copilot、VS Code、Gemini
+                    CLI、Goose、OpenCodeなど40以上のクライアントが同一フォーマットを採用
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            ポイントは、Agent
+            Skillsが「新しいプロトコル」ではなく「Markdownファイル＋フォルダ規約」という最小限の仕様である点です。Willison氏はMCP（Model
+            Context
+            Protocol）と対比し、MCPがホスト・クライアント・サーバー・トランスポートを含む本格的なプロトコル仕様であるのに対し、SkillsはCLIツールの
+            <code class="inline">--help</code>
+            をエージェントに読ませる発想の延長線上にあり、サーバー実装が不要で導入コストが極めて低いと指摘しています。
+          </p>
+        </section>
+
+        <section id="philosophy">
+          <h2><span class="num">02</span>設計思想：Progressive Disclosure（段階的開示）</h2>
+          <p>
+            Agent Skillsの中核にある設計原則が
+            <strong>Progressive Disclosure（段階的開示）</strong>
+            です。Anthropicのエンジニアリングブログでは、これを「よく整理されたマニュアル」に例えています。目次だけをまず読み、必要な章だけを開き、さらに詳細が必要なら巻末の付録を参照する——これと同じ階層構造をコンテキストウィンドウの中で再現します。
+          </p>
+
+          <h3>三段階のロード</h3>
+          <div class="diagram">
+            <div id="diag-1" class="mermaid mermaid-target"></div>
+            <script type="text/plain" data-mermaid-src="diag-1">
+flowchart LR
+A["Discovery: 全スキルのdescriptionを事前ロード"] --> B{"タスクと意味的に関連するか"}
+B -- "関連なし" --> C["休眠状態を維持(コストほぼゼロ)"]
+B -- "関連あり" --> D["Activation: SKILL.md本文を読み込み"]
+D --> E{"追加リソースが必要か"}
+E -- "不要" --> F["第3層はスキップ"]
+E -- "必要" --> G["Execution: 関連ファイルを必要時のみ読み込み"]
+F --> H["タスク遂行"]
+G --> H
+            </script>
+            <div class="diagram-caption">図1: 段階的開示（Progressive Disclosure）の3層モデル</div>
+          </div>
+
+          <p>
+            この設計により、1スキルあたりの起動時コストは数十トークン程度に抑えられ、数十個のスキルを同時にインストールしても実用上のオーバーヘッドがほぼ発生しません。実際にAnthropic公式リポジトリの17スキルを分析した第三者調査では、本文サイズは最小で約275トークン相当から最大で約8,000トークン相当まで幅があり、中央値はおよそ2,000トークンと報告されています。
+          </p>
+
+          <h3>コンテキストウィンドウ内での実際の流れ</h3>
+          <div class="diagram">
+            <div id="diag-2" class="mermaid mermaid-target"></div>
+            <script type="text/plain" data-mermaid-src="diag-2">
+sequenceDiagram
+participant U as ユーザー
+participant C as コンテキストウィンドウ
+participant Ag as エージェント
+participant F as ファイルシステム
+U->>C: タスクを含むメッセージを送信
+Note over C: システムプロンプトと全スキルのメタデータのみ保持
+C->>Ag: タスク内容を提示
+Ag->>Ag: 関連スキルを判定
+Ag->>F: SKILL.mdを読み込み
+F-->>C: SKILL.md本文を追加
+Ag->>F: 必要に応じ関連ファイルを読み込み
+F-->>C: 関連ファイルを追加
+Ag->>U: タスクを実行して完了
+            </script>
+            <div class="diagram-caption">図2: PDFスキルを例にしたコンテキストウィンドウの推移</div>
+          </div>
+
+          <p>
+            重要なのは、スキルに同梱されたPythonスクリプトなどの<strong>コード自体はコンテキストに読み込まれず、実行結果のみが返る</strong>という点です。これにより、ソートのような決定的処理をトークン生成で行う非効率を避けつつ、再現性のある挙動を保証できます。
+          </p>
+
+          <h3>なぜシステムプロンプトやMCPではダメなのか</h3>
+          <div class="table-scroll">
+            <table>
+              <caption>
+                比較: システムプロンプト直書き / MCP / Agent Skills
+              </caption>
+              <thead>
+                <tr>
+                  <th>比較軸</th>
+                  <th>システムプロンプト直書き</th>
+                  <th>MCPサーバー</th>
+                  <th>Agent Skills（SKILL.md）</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>常時ロード</td>
+                  <td>常に全文がロード（Instruction Fatigueの原因）</td>
+                  <td>ツール定義は常時ロード</td>
+                  <td>メタデータのみ常時、本文は必要時のみ</td>
+                </tr>
+                <tr>
+                  <td>導入コスト</td>
+                  <td>低いが肥大化しやすい</td>
+                  <td>サーバー実装・ホスティングが必要</td>
+                  <td>Markdownファイル1枚から開始可能</td>
+                </tr>
+                <tr>
+                  <td>起動時トークンコスト</td>
+                  <td>会話が長くなるほど圧迫</td>
+                  <td>ツール数に比例して増大</td>
+                  <td>1スキルあたり数十トークン程度</td>
+                </tr>
+                <tr>
+                  <td>移植性</td>
+                  <td>ツール依存</td>
+                  <td>プロトコル準拠が必要</td>
+                  <td>フォルダごとコピーで他ツールへ移植可能</td>
+                </tr>
+                <tr>
+                  <td>コード実行</td>
+                  <td>不可</td>
+                  <td>サーバー側で実装次第</td>
+                  <td>スクリプトを同梱し決定的に実行可能</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            この比較からもわかる通り、Agent
+            Skillsは「常時稼働する外部連携」を担うMCPを置き換えるものではなく、<strong>手続き的知識・スタイルガイド・反復可能なワークフローを、低コストでエージェントに教え込む層</strong>として補完的に機能します。
+          </p>
+        </section>
+
+        <section id="architecture">
+          <h2><span class="num">03</span>アーキテクチャ：SKILL.md の解剖</h2>
+
+          <h3>最小構成</h3>
+          <p>
+            スキルはフォルダとして表現され、必須ファイルは
+            <code class="inline">SKILL.md</code> 一つだけです。
+          </p>
+          <div class="card">
+            <ul style="margin-bottom: 0">
+              <li>
+                <strong>スキルフォルダ</strong>（例: <code class="inline">my-skill/</code>）
+                <ul>
+                  <li>
+                    <code class="inline">SKILL.md</code> — 必須。YAMLフロントマター＋Markdown本文
+                  </li>
+                  <li>
+                    <code class="inline">scripts/</code> —
+                    任意。エージェントが呼び出す実行可能スクリプト
+                  </li>
+                  <li>
+                    <code class="inline">examples/</code> または
+                    <code class="inline">references/</code> — 任意。参照用ドキュメント
+                  </li>
+                  <li>
+                    <code class="inline">resources/</code> または
+                    <code class="inline">assets/</code> — 任意。テンプレートや設定ファイル
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+
+          <h3>YAMLフロントマターの仕様</h3>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>フィールド</th>
+                  <th>必須</th>
+                  <th>説明</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code class="inline">name</code></td>
+                  <td>任意</td>
+                  <td>
+                    スキルの一意な識別子（小文字・ハイフン区切り）。省略時はフォルダ名がそのまま使われる
+                  </td>
+                </tr>
+                <tr>
+                  <td><code class="inline">description</code></td>
+                  <td><strong>必須</strong></td>
+                  <td>
+                    スキルが何をし、いつ使うべきかを説明する文。エージェントがトリガー判定に使う唯一の材料
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>発見・起動・実行の3フェーズ</h3>
+          <div class="diagram">
+            <div id="diag-3" class="mermaid mermaid-target"></div>
+            <script type="text/plain" data-mermaid-src="diag-3">
+flowchart TD
+A["Discovery: 全スキルのname・descriptionを提示"] --> B["Activation: 関連するSKILL.md本文を読む"]
+B --> C["Execution: 指示に従いタスクを遂行"]
+            </script>
+            <div class="diagram-caption">図3: スキルのライフサイクル3フェーズ</div>
+          </div>
+          <p>
+            ユーザーは明示的にスキル名を呼び出す必要はなく、エージェントが文脈から自律的に判断します（＝セマンティックトリガリング）。ただし、確実に使わせたい場合はスキル名をプロンプト中で直接指定することも可能です。
+          </p>
+        </section>
+
+        <section id="antigravity">
+          <h2><span class="num">04</span>Antigravity IDE における実装仕様</h2>
+
+          <h3>スキルの配置場所（スコープ）</h3>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>スコープ</th>
+                  <th>パス</th>
+                  <th>用途</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>ワークスペーススコープ</td>
+                  <td>
+                    <code class="inline"
+                      >&lt;workspace-root&gt;/.agents/skills/&lt;skill-folder&gt;/</code
+                    >
+                  </td>
+                  <td>
+                    チームのデプロイ手順やテスト規約など、プロジェクト固有のワークフロー。Gitでバージョン管理し、クローンした全開発者に自動配布される
+                  </td>
+                </tr>
+                <tr>
+                  <td>グローバルスコープ</td>
+                  <td>ホームディレクトリ配下（下記コールアウト参照）</td>
+                  <td>個人のユーティリティや、全プロジェクト共通で使いたい汎用スキル</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="callout">
+            <div class="label">⚠ 実運用上のハマりどころ</div>
+            <p style="margin-bottom: 0">
+              Antigravityは現在
+              <code class="inline">.agents/skills</code
+              >（複数形）をデフォルトとしつつ、後方互換のため旧形式の
+              <code class="inline">.agent/skills</code
+              >（単数形）も引き続きサポートしています。さらに、グローバルスコープのパスは製品ドキュメントのページによって表記が割れており（例:
+              <code class="inline">~/.gemini/config/skills/</code> と
+              <code class="inline">~/.gemini/antigravity/skills/</code>）、Google Developer
+              ExpertのMete Atamel氏が実機検証したブログ記事では、Antigravity本体・Antigravity
+              CLI・Antigravity
+              IDEの3つのサーフェスがそれぞれ<strong>異なるグローバルパス</strong>を参照していることが報告されています。本番運用では
+              <code class="inline">Which skills are installed?</code>（IDE／Antigravity本体）や
+              <code class="inline">/skills</code
+              >（CLI）をエージェントに尋ねて実際の認識状況を確認することが推奨されます。
+            </p>
+          </div>
+
+          <h3>セマンティックトリガリングの仕組み</h3>
+          <div class="diagram">
+            <div id="diag-4" class="mermaid mermaid-target"></div>
+            <script type="text/plain" data-mermaid-src="diag-4">
+flowchart TD
+A["ユーザーが自然言語で指示を入力"] --> B["descriptionと意味的に照合"]
+B --> C{"合致するスキルがあるか"}
+C -- "あり" --> D["SKILL.mdをロード"]
+C -- "なし" --> E["スキルなしで応答"]
+D --> F{"スクリプト実行が必要か"}
+F -- "はい" --> G{"実行モードの確認"}
+G -- "Manual" --> H["実行許可を確認"]
+G -- "Auto・Secure" --> I["サンドボックス内で実行"]
+F -- "いいえ" --> J["指示のみで対応"]
+            </script>
+            <div class="diagram-caption">
+              図4: Antigravityにおけるセマンティックトリガリングと実行モード分岐
+            </div>
+          </div>
+
+          <p>
+            <code class="inline">description</code>
+            フィールドは三人称・具体的な動詞（「生成する」「検証する」「実行する」など）で書くことが公式に推奨されています。これは、エージェントがこの一文だけを手がかりにトリガー判定を行うためで、曖昧な説明文はスキルの不発火・誤発火に直結します。
+          </p>
+
+          <h3>実行モードとセキュリティ境界</h3>
+          <p>
+            Antigravityはスクリプト実行の安全性を担保するため、権限モデルとして「常に確認を求める」設定と「信頼済みスキルは自動実行」設定を切り替えられるほか、ネットワークアクセス禁止・ワークスペース外への書き込み禁止・全コマンドのサンドボックス化を行う最も厳格な設定（Secure
+            Mode）を提供しています。ただしこの境界がどこまで堅牢かは、後述の運用セクション（6.3）で扱う実際のインシデントも参考にしてください。
+          </p>
+        </section>
+
+        <section id="practices">
+          <h2><span class="num">05</span>実装パターン：ステップバイステップのベストプラクティス</h2>
+          <p>
+            以下は、Anthropic公式のガイダンスとAntigravity公式ドキュメント、および実務者による検証記事を統合した実装フローです。
+          </p>
+
+          <div class="diagram">
+            <div id="diag-5" class="mermaid mermaid-target"></div>
+            <script type="text/plain" data-mermaid-src="diag-5">
+flowchart TD
+S1["Step1: スコープを決める"] --> S2["Step2: 単一責務に絞る"]
+S2 --> S3["Step3: descriptionを磨く"]
+S3 --> S4["Step4: 段階的に構造化する"]
+S4 --> S5["Step5: スクリプトをブラックボックス化"]
+S5 --> S6["Step6: 判断分岐を明示する"]
+S6 --> S7["Step7: Few-shot例を追加"]
+S7 --> S8["Step8: エラー処理を明文化"]
+S8 --> S9["Step9: 評価とイテレーション"]
+            </script>
+            <div class="diagram-caption">図5: SKILL.md 実装ステップ（9段階）</div>
+          </div>
+
+          <div class="step-grid">
+            <div class="step">
+              <div class="n">1</div>
+              <div>
+                <h4>スコープを見極める</h4>
+                <p>
+                  チームのデプロイ手順やそのプロジェクト固有のビルドパイプラインは<strong>ワークスペーススコープ</strong>（Gitで共有）、個人のコミットメッセージ規約やJSON整形のような汎用ユーティリティは<strong>グローバルスコープ</strong>に置きます。
+                </p>
+              </div>
+            </div>
+            <div class="step">
+              <div class="n">2</div>
+              <div>
+                <h4>単一責務の原則（Keep it Atomic）</h4>
+                <p>
+                  「DevOpsスキル」のような何でも屋を作るのではなく、「ステージングデプロイ」「ログ解析」「ヘルスチェック」のように<strong>タスクごとに個別のスキルへ分割</strong>します。トリガー精度の向上と保守性の両方に効きます。
+                </p>
+              </div>
+            </div>
+            <div class="step">
+              <div class="n">3</div>
+              <div>
+                <h4>description（トリガー文）を磨く</h4>
+                <p>
+                  公式ドキュメントの例:
+                  <code class="inline"
+                    >Generates unit tests for Python code using pytest conventions.</code
+                  >
+                  三人称・「いつ使うか」を含めることで意味的トリガリングの精度が上がります。
+                </p>
+              </div>
+            </div>
+            <div class="step">
+              <div class="n">4</div>
+              <div>
+                <h4>本文を段階的に構造化する</h4>
+                <p>
+                  <code class="inline">SKILL.md</code>
+                  が長大になったら、使用頻度の低い詳細や排他的シナリオを
+                  <code class="inline">forms.md</code>
+                  のような別ファイルに逃がし、リンクします。第3層の読み込みが本当に必要な場合にのみ発生し、トークン効率を維持できます。
+                </p>
+              </div>
+            </div>
+            <div class="step">
+              <div class="n">5</div>
+              <div>
+                <h4>スクリプトをブラックボックスとして扱わせる</h4>
+                <p>
+                  同梱スクリプトはソース全文を読ませず、まず
+                  <code class="inline">--help</code>
+                  相当の使い方だけを確認させます。コンテキスト圧迫を避けつつ、決定的な処理はコードに委譲できます。
+                </p>
+              </div>
+            </div>
+            <div class="step">
+              <div class="n">6</div>
+              <div>
+                <h4>決定木（Decision Tree）を組み込む</h4>
+                <p>
+                  「Pythonファイルの場合はPEP
+                  8整形を適用、それ以外はスキップ」のような判断基準を本文に明記します。Antigravity公式の「複雑なスキルには決定木を含める」推奨と一致します。
+                </p>
+              </div>
+            </div>
+            <div class="step">
+              <div class="n">7</div>
+              <div>
+                <h4>Few-shot例を添える</h4>
+                <p>
+                  ユーザーの入力例とエージェントの期待挙動のペアを2〜3件示すことで、成功率が有意に向上すると報告されています。
+                </p>
+              </div>
+            </div>
+            <div class="step">
+              <div class="n">8</div>
+              <div>
+                <h4>エラーハンドリングを明示する</h4>
+                <p>
+                  「テストスクリプトが非ゼロの終了コードを返した場合はログを解析し修正案を提示する」のように、失敗時の振る舞いまで本文に書き込みます。
+                </p>
+              </div>
+            </div>
+            <div class="step">
+              <div class="n">9</div>
+              <div>
+                <h4>評価から始め、エージェントと一緒に磨き込む</h4>
+                <p>
+                  まず代表的なタスクでエージェントを動かし、つまずいた箇所を観察してからスキルを段階的に作ります。エージェント自身に「うまくいったやり方」や「よくある間違い」を振り返らせ、その学びを
+                  <code class="inline">SKILL.md</code>
+                  に反映させる反復サイクルが有効です。Antigravityの実務者ブログでも、AIが生成したスキルが最初はうまく機能しなくても、修正手順をコーディングエージェント自身に発見させて更新させることで、スキルが「生きたドキュメント」として継続的に改善される運用が紹介されています。
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="operations">
+          <h2><span class="num">06</span>運用（Operations）</h2>
+
+          <h3>6.1 バージョン管理とチーム共有</h3>
+          <p>
+            スキルは単なるフォルダなのでGitでそのままバージョン管理でき、リポジトリのルートに置けばチーム全員に自動配布されます。より広く配布したい場合は、Claude
+            Codeのプラグイン／マーケットプレイス機構（公開GitHubリポジトリ＋マニフェストファイル）のような仕組みや、コミュニティ主導のスキル集（<code
+              class="inline"
+              >awesome-claude-skills</code
+            >、<code class="inline">antigravity-awesome-skills</code>
+            等）を利用する運用も広がっています。ある集計では、エコシステム全体で1,400件超のスキルが主要な互換クライアント（Antigravity、Claude
+            Code、Codex、Gemini
+            CLI、Cursor、Copilot、OpenCode、Windsurfなど）を横断して共有可能な状態にあると報告されています。
+          </p>
+
+          <h3>6.2 クロスプラットフォーム運用時の注意</h3>
+          <ul>
+            <li>
+              各クライアントで<strong>スキルの探索パスが異なる</strong>（例: Claude Codeは
+              <code class="inline">~/.claude/skills/</code> や
+              <code class="inline">.claude/skills/</code>、Codex CLIは
+              <code class="inline">.agents/skills/</code>、Gemini CLIは
+              <code class="inline">.gemini/skills/</code
+              >）。フォーマットは共通でも配置場所はツール依存です。
+            </li>
+            <li>
+              <strong>ツール固有の実行フック</strong
+              >（特定のCLIに依存したBashコマンドなど）を本文に埋め込むと、他ツールへ移植した際にそのまま動かないことがあります。移植性を重視するなら、最小限のフロントマターと特定ツールに依存しない指示文からなる「中立的なSKILL.md」として書くことが推奨されます。
+            </li>
+            <li>
+              同時稼働ツール数の目安（20未満が推奨、10を超えたあたりから精度が劣化しやすいという報告あり）を踏まえ、スキル自体の数よりも<strong>同時にアクティブ化されうるツール／スクリプトの複雑さ</strong>を管理する視点も必要です。
+            </li>
+          </ul>
+
+          <h3>6.3 セキュリティ運用（最重要）</h3>
+          <p>
+            Anthropic公式のガイダンスは明確です。「信頼できる提供元のスキルのみをインストールすること。信頼度の低いソースからスキルを導入する場合は、使用前に必ず内容を精査すること」。特に、同梱されたコードの依存関係や画像・スクリプトなどのリソース、そして<strong>エージェントを外部の未信頼なネットワーク先へ接続させようとする指示やコード</strong>には注意を払うべきだとされています。悪意あるスキルは、実行環境に脆弱性を持ち込んだり、エージェントにデータを不正に持ち出させたり意図しない操作を取らせたりする可能性があるためです。
+          </p>
+
+          <p>
+            この懸念は理論上の話にとどまりません。2026年前半には、Antigravity自体に関わる実際のセキュリティインシデントが複数報告されています。
+          </p>
+
+          <div class="table-scroll">
+            <table>
+              <caption>
+                2026年前半に報告されたAntigravity関連のセキュリティインシデント
+              </caption>
+              <thead>
+                <tr>
+                  <th style="width: 16%">時期</th>
+                  <th style="width: 18%">報告元</th>
+                  <th>概要</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>2026-01〜02<br />（発見・修正）</td>
+                  <td>Pillar Security<br />（研究者 Dan Lisichkin氏）</td>
+                  <td>
+                    Antigravityのネイティブツール
+                    <code class="inline">find_by_name</code>
+                    のパターン引数がサニタイズされておらず、<code class="inline">fd</code>
+                    コマンドへフラグを注入することでリモートコード実行が可能だった。最も厳格な「Secure
+                    Mode」はシェルコマンド層でのみ制御を行っており、ネイティブツール呼び出しはその境界の外側で実行されるため、Secure
+                    Mode有効時でも回避が成立していた。Googleへ報告後、脆弱性報奨金制度を通じて修正・報奨が行われた。
+                  </td>
+                </tr>
+                <tr>
+                  <td>2026年</td>
+                  <td>PromptArmor</td>
+                  <td>
+                    オンライン上の一見無害な文書に埋め込まれた間接的プロンプトインジェクションが、Antigravityのエージェントにセキュリティ設定を回避させ、認証情報やソースコードを持ち出させる攻撃チェーンを実証。
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            これらの事例が示す教訓は、<strong>「サンドボックスや権限設定があるから安全」という前提を置かないこと</strong>です。ネイティブツール呼び出しはシェルコマンド向けの制御をすり抜けうる、外部ドキュメント経由の間接的プロンプトインジェクションはユーザーが直接入力していない指示としてエージェントに届く、という2点は、スキル自体の監査だけでなく、エージェントが呼び出すツール層全体の運用ポリシーとして押さえておく必要があります。
+          </p>
+
+          <div class="callout good">
+            <div class="label">✓ 運用チェックリスト</div>
+            <ul class="checklist">
+              <li>
+                スキルは信頼できる提供元（社内リポジトリ、監査済みの公開リポジトリ）からのみ導入する
+              </li>
+              <li>
+                未監査のスキルを追加する前に、SKILL.md本文・同梱スクリプト・参照リソースを人手でレビューする
+              </li>
+              <li>外部ネットワークへの接続を指示するスキルやスクリプトは特に注意深く確認する</li>
+              <li>
+                破壊的操作を伴うワークフローでは「都度確認（Manual）」モードを既定とし、自動実行は十分に検証されたスキルに限定する
+              </li>
+              <li>
+                Secure
+                Modeなどの制限設定は「効いていることが前提」ではなく、ネイティブツール層も含めて定期的に検証する
+              </li>
+              <li>
+                間接的プロンプトインジェクション（外部文書・検索結果・PRコメントなど）を想定した脅威モデルを持つ
+              </li>
+            </ul>
+          </div>
+
+          <h3>6.4 評価駆動での継続的改善</h3>
+          <p>
+            スキルは一度書いて終わりではなく、「生きたドキュメント」として運用します。実タスクでの挙動を観察し、エージェントが期待外れの経路をたどった箇所や、特定のコンテキストへの過度な依存が見られた箇所を洗い出し、SKILL.mdに反映していきます。Anthropicはこのプロセスを、事前にすべてを想定して書き切るのではなく、<strong>エージェントが実際に何を必要としているかを発見していく反復プロセス</strong>として位置づけています。
+          </p>
+        </section>
+
+        <section id="example">
+          <h2><span class="num">07</span>実装例：SKILL.md サンプル</h2>
+          <p>
+            Antigravity公式ドキュメントに掲載されているコードレビュー用スキルの例です（フロントマター＋本文の最小構成）。
+          </p>
+
+          <pre class="code"><span class="cm">---</span>
+<span class="kw">name</span>: code-review
+<span class="kw">description</span>: <span class="str">Reviews code changes for bugs, style issues, and best practices. Use when reviewing PRs or checking code quality.</span>
+<span class="cm">---</span></pre>
+
+          <pre class="code"><span class="cm"># Code Review Skill</span>
+
+When reviewing code, follow these steps:
+
+<span class="cm">## Review checklist</span>
+
+1. Correctness: Does the code do what it's supposed to?
+2. Edge cases: Are error conditions handled?
+3. Style: Does it follow project conventions?
+4. Performance: Are there obvious inefficiencies?
+
+<span class="cm">## How to provide feedback</span>
+
+- Be specific about what needs to change
+- Explain why, not just what
+- Suggest alternatives when possible</pre>
+
+          <p>
+            この最小構成に対して、本ガイドで解説したベストプラクティスを適用すると、次のような拡張が考えられます。
+          </p>
+          <ul>
+            <li>
+              大規模PR向けに「差分が500行を超える場合は先にファイル単位のサマリーを作る」という決定木を追加する
+            </li>
+            <li>
+              <code class="inline">scripts/lint_check.sh</code>
+              のような静的解析スクリプトを同梱し、「まず
+              <code class="inline">./scripts/lint_check.sh --help</code>
+              を確認してから実行する」よう指示する
+            </li>
+            <li>
+              「Pythonファイルの場合はPEP
+              8整形の観点を追加、TypeScriptファイルの場合はESLint設定を参照する」といった言語別の分岐を明記する
+            </li>
+            <li>
+              スクリプトが失敗した場合の振る舞い（ログを解析し修正案を提示する、など）を明文化する
+            </li>
+          </ul>
+        </section>
+
+        <section id="summary">
+          <h2><span class="num">08</span>まとめ</h2>
+          <ul>
+            <li>
+              Agent Skills（SKILL.md）は、<strong>Progressive Disclosure</strong
+              >という段階的開示の設計原則を核に、常時ロードされるシステムプロンプトの肥大化問題と、MCPのような重量級プロトコルを必要とする課題の両方を、フォルダとMarkdownファイルという最小限の形式で解決するパターンである
+            </li>
+            <li>
+              Antigravity
+              IDEはこの仕様をネイティブサポートし、ワークスペーススコープとグローバルスコープという2階層の配置場所、セマンティックトリガリングによる自動発火、実行モードによる安全性制御を提供する
+            </li>
+            <li>
+              ただし配置パスや実行境界の実装詳細は製品面（IDE／CLI／本体）によって差異があり、また実際にネイティブツール層の脆弱性を突いたインシデントも報告されているため、「仕様通りに動く」ことを前提とせず、都度の検証と監査を運用に組み込む必要がある
+            </li>
+            <li>
+              実装品質を左右する最大の変数はdescriptionの書き方であり、次いで本文の段階的構造化、スクリプトのブラックボックス化、決定木・Few-shot例・エラーハンドリングの明文化である
+            </li>
+            <li>
+              スキルは一度作って終わりではなく、実タスクでの挙動観察とエージェント自身による振り返りを通じて継続的に磨き込む「生きたドキュメント」として運用する
+            </li>
+          </ul>
+        </section>
+      </main>
+    </div>
+
+    <footer id="references">
+      <div class="refs">
+        <h2>参考文献・情報源（URL）</h2>
+        <p style="font-size: 14px; color: var(--ink-soft)">
+          本記事は以下の一次情報・著名な開発者/セキュリティ研究者による解説記事に基づいて作成しました（すべて2026年7月27日時点でアクセス確認）。
+        </p>
+        <ol>
+          <li>
+            <span class="t">Anthropic Engineering Blog</span> — "Equipping agents for the real world
+            with Agent Skills"（Barry Zhang, Keith Lazuka, Mahesh Murag 著, 2025-10-16）<br /><a
+              href="https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills"
+              target="_blank"
+              rel="noopener"
+              >https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills</a
+            >
+          </li>
+          <li>
+            <span class="t">Agent Skills オープン標準サイト</span> — agentskills.io<br /><a
+              href="https://agentskills.io/home"
+              target="_blank"
+              rel="noopener"
+              >https://agentskills.io/home</a
+            >
+          </li>
+          <li>
+            <span class="t">Google Antigravity 公式ドキュメント</span>（Antigravity 2.0 /
+            Customizations / Skills）<br /><a
+              href="https://antigravity.google/docs/skills"
+              target="_blank"
+              rel="noopener"
+              >https://antigravity.google/docs/skills</a
+            >
+          </li>
+          <li>
+            <span class="t">Google Antigravity 公式ドキュメント</span>（Antigravity IDE /
+            Customizations / Skills）<br /><a
+              href="https://antigravity.google/docs/ide/skills"
+              target="_blank"
+              rel="noopener"
+              >https://antigravity.google/docs/ide/skills</a
+            >
+          </li>
+          <li>
+            <span class="t">Simon Willison's Weblog</span> — "Claude Skills are awesome, maybe a
+            bigger deal than MCP"（2025-10-16）<br /><a
+              href="https://simonwillison.net/2025/Oct/16/claude-skills/"
+              target="_blank"
+              rel="noopener"
+              >https://simonwillison.net/2025/Oct/16/claude-skills/</a
+            >
+          </li>
+          <li>
+            <span class="t">Mete Atamel</span> — "Where does Antigravity look for Agent Skills?"<br /><a
+              href="https://atamel.dev/posts/2026/07-01_where_agy_agent_skills/"
+              target="_blank"
+              rel="noopener"
+              >https://atamel.dev/posts/2026/07-01_where_agy_agent_skills/</a
+            >
+          </li>
+          <li>
+            <span class="t">Google Codelabs</span> — "Authoring Google Antigravity Skills"<br /><a
+              href="https://codelabs.developers.google.com/getting-started-with-antigravity-skills"
+              target="_blank"
+              rel="noopener"
+              >https://codelabs.developers.google.com/getting-started-with-antigravity-skills</a
+            >
+          </li>
+          <li>
+            <span class="t">Giovanni Galloro</span> — "Creating an ADK Agent Skill in
+            Antigravity"（Google Cloud Community / Medium）<br /><a
+              href="https://medium.com/google-cloud/creating-an-adk-agent-skill-in-antigravity-0031f5f82ccb"
+              target="_blank"
+              rel="noopener"
+              >https://medium.com/google-cloud/creating-an-adk-agent-skill-in-antigravity-0031f5f82ccb</a
+            >
+          </li>
+          <li>
+            <span class="t">Dazbo (Darren Lester)</span> — "Confused About Where to Put Your Agent
+            Skills? (Updated for Antigravity.)"（Google Cloud Community / Medium）<br /><a
+              href="https://medium.com/google-cloud/confused-about-where-to-put-your-agent-skills-ea778f3c64f3"
+              target="_blank"
+              rel="noopener"
+              >https://medium.com/google-cloud/confused-about-where-to-put-your-agent-skills-ea778f3c64f3</a
+            >
+          </li>
+          <li>
+            <span class="t">RuleSell</span> — "Google Antigravity Rules and Agent Skills: The Setup
+            Guide"<br /><a
+              href="https://www.rulesell.com/topic/antigravity-rules"
+              target="_blank"
+              rel="noopener"
+              >https://www.rulesell.com/topic/antigravity-rules</a
+            >
+          </li>
+          <li>
+            <span class="t">VERTU</span> — "What are Google Antigravity Skills? Build 24/7 AI
+            Agents"<br /><a
+              href="https://vertu.com/lifestyle/mastering-google-antigravity-skills-the-ultimate-guide-to-extending-agentic-ai-in-2026"
+              target="_blank"
+              rel="noopener"
+              >https://vertu.com/lifestyle/mastering-google-antigravity-skills-the-ultimate-guide-to-extending-agentic-ai-in-2026</a
+            >
+          </li>
+          <li>
+            <span class="t">DEV Community</span> — "My First Experience Creating Antigravity
+            Skills"<br /><a
+              href="https://dev.to/googleai/my-first-experience-creating-antigravity-skills-524b"
+              target="_blank"
+              rel="noopener"
+              >https://dev.to/googleai/my-first-experience-creating-antigravity-skills-524b</a
+            >
+          </li>
+          <li>
+            <span class="t">Pillar Security</span> — "Prompt Injection leads to RCE and Sandbox
+            Escape in Antigravity"<br /><a
+              href="https://www.pillar.security/blog/prompt-injection-leads-to-rce-and-sandbox-escape-in-antigravity"
+              target="_blank"
+              rel="noopener"
+              >https://www.pillar.security/blog/prompt-injection-leads-to-rce-and-sandbox-escape-in-antigravity</a
+            >
+          </li>
+          <li>
+            <span class="t">The Hacker News</span> — "Google Patches Antigravity IDE Flaw Enabling
+            Prompt Injection Code Execution"（2026-04-21）<br /><a
+              href="https://thehackernews.com/2026/04/google-patches-antigravity-ide-flaw.html"
+              target="_blank"
+              rel="noopener"
+              >https://thehackernews.com/2026/04/google-patches-antigravity-ide-flaw.html</a
+            >
+          </li>
+          <li>
+            <span class="t">Dark Reading</span> — "Google Fixes Critical RCE Flaw in AI-Based
+            'Antigravity' Tool"（2026-04-22）<br /><a
+              href="https://www.darkreading.com/vulnerabilities-threats/google-fixes-critical-rce-flaw-ai-based-antigravity-tool"
+              target="_blank"
+              rel="noopener"
+              >https://www.darkreading.com/vulnerabilities-threats/google-fixes-critical-rce-flaw-ai-based-antigravity-tool</a
+            >
+          </li>
+          <li>
+            <span class="t">CSO Online</span> — "Prompt injection turned Google's Antigravity file
+            search into RCE"<br /><a
+              href="https://www.csoonline.com/article/4161382/prompt-injection-turned-googles-antigravity-file-search-into-rce.html"
+              target="_blank"
+              rel="noopener"
+              >https://www.csoonline.com/article/4161382/prompt-injection-turned-googles-antigravity-file-search-into-rce.html</a
+            >
+          </li>
+          <li>
+            <span class="t">BDTechTalks</span> — "Antigravity prompt injection vulnerability
+            highlights security threats of AI-powered coding tools"<br /><a
+              href="https://bdtechtalks.substack.com/p/antigravity-prompt-injection-vulnerability"
+              target="_blank"
+              rel="noopener"
+              >https://bdtechtalks.substack.com/p/antigravity-prompt-injection-vulnerability</a
+            >
+          </li>
+          <li>
+            <span class="t">SwirlAI Newsletter</span> — "Agent Skills: Progressive Disclosure as a
+            System Design Pattern"<br /><a
+              href="https://www.newsletter.swirlai.com/p/agent-skills-progressive-disclosure"
+              target="_blank"
+              rel="noopener"
+              >https://www.newsletter.swirlai.com/p/agent-skills-progressive-disclosure</a
+            >
+          </li>
+          <li>
+            <span class="t">Firecrawl Blog</span> — "Agent Skills Explained: How SKILL.md Files Work
+            and Why They're Everywhere"<br /><a
+              href="https://www.firecrawl.dev/blog/agent-skills"
+              target="_blank"
+              rel="noopener"
+              >https://www.firecrawl.dev/blog/agent-skills</a
+            >
+          </li>
+          <li>
+            <span class="t">Ry Walker Research</span> — "Anthropic Skills (anthropics/skills)"<br /><a
+              href="https://rywalker.com/research/anthropic-skills"
+              target="_blank"
+              rel="noopener"
+              >https://rywalker.com/research/anthropic-skills</a
+            >
+          </li>
+          <li>
+            <span class="t">GitHub</span> — travisvn/awesome-claude-skills<br /><a
+              href="https://github.com/travisvn/awesome-claude-skills"
+              target="_blank"
+              rel="noopener"
+              >https://github.com/travisvn/awesome-claude-skills</a
+            >
+          </li>
+          <li>
+            <span class="t">GitHub</span> — anthropics/skills（公式Agent Skillsリポジトリ）<br /><a
+              href="https://github.com/anthropics/skills"
+              target="_blank"
+              rel="noopener"
+              >https://github.com/anthropics/skills</a
+            >
+          </li>
+        </ol>
+        <p class="note">
+          注記:
+          Antigravityは2026年7月現在も活発に開発が続く製品であり、スキルの配置パスや実行モードの仕様は将来のバージョンで変更される可能性があります。実装前には必ず上記の公式ドキュメント（3・4）の最新版をご確認ください。
+        </p>
+      </div>
+    </footer>
+
+    <script>
+      function dedent(source) {
+        const lines = source.replace(/^\n/, '').replace(/\n[ \t]*$/, '').split('\n');
+        const indents = lines
+          .filter(function (line) {
+            return line.trim().length > 0;
+          })
+          .map(function (line) {
+            return (line.match(/^[ \t]*/) || [''])[0].length;
+          });
+        const minIndent = indents.length ? Math.min.apply(null, indents) : 0;
+        return lines
+          .map(function (line) {
+            return line.slice(minIndent);
+          })
+          .join('\n');
+      }
+
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: 'base',
+        fontSize: 16,
+        themeVariables: {
+          background: '#FFFFFF',
+          primaryColor: '#ECEEFC',
+          primaryTextColor: '#14161C',
+          primaryBorderColor: '#3648D6',
+          lineColor: '#4A4D57',
+          secondaryColor: '#FBF0DF',
+          tertiaryColor: '#E4F4EE',
+          fontFamily: 'IBM Plex Mono, monospace',
+          fontSize: '16px',
+        },
+        flowchart: { htmlLabels: true, curve: 'basis', useMaxWidth: false },
+        sequence: { useMaxWidth: false, mirrorActors: true, noteMargin: 10 },
+        securityLevel: 'loose',
+      });
+
+      (async function renderAllDiagrams() {
+        if (document.fonts) {
+          try {
+            await document.fonts.ready;
+          } catch (e) {}
+        }
+        const diagramSources = document.querySelectorAll(
+          'script[type="text/plain"][data-mermaid-src]',
+        );
+        for (const source of diagramSources) {
+          const id = source.getAttribute('data-mermaid-src');
+          if (!id) continue;
+          const container = document.getElementById(id);
+          if (!container) continue;
+          container.textContent = dedent(source.textContent || '');
+          try {
+            await mermaid.run({ nodes: [container] });
+            const svgEl = container.querySelector('svg');
+            if (svgEl) {
+              // mermaidの自然な生成サイズはpaddingの取り方次第で意図せず大きくなることがあるため、
+              // 実際に描画されたラベルのフォントサイズを測定し、1rem(16px)相当になるよう
+              // 図全体(ボックス・矢印含む)を比例スケーリングする
+              let naturalWidth = null;
+              try {
+                if (svgEl.viewBox && svgEl.viewBox.baseVal && svgEl.viewBox.baseVal.width) {
+                  naturalWidth = svgEl.viewBox.baseVal.width;
+                }
+              } catch (e) {}
+              if (!naturalWidth) {
+                const wAttr = parseFloat(svgEl.getAttribute('width'));
+                naturalWidth =
+                  isFinite(wAttr) && wAttr > 0 ? wAttr : svgEl.getBoundingClientRect().width;
+              }
+              const textEl = svgEl.querySelector(
+                '.nodeLabel, foreignObject span, foreignObject div, text',
+              );
+              let measuredFontSize = 16;
+              if (textEl) {
+                const fs = parseFloat(getComputedStyle(textEl).fontSize);
+                if (isFinite(fs) && fs > 0) measuredFontSize = fs;
+              }
+              const scale = 16 / measuredFontSize;
+              const targetWidth = Math.max(220, Math.round(naturalWidth * scale));
+
+              svgEl.removeAttribute('width');
+              svgEl.removeAttribute('height');
+              svgEl.style.display = 'block';
+              svgEl.style.width = targetWidth + 'px';
+              svgEl.style.maxWidth = '100%';
+              svgEl.style.height = 'auto';
+              svgEl.style.margin = '0 auto';
+              svgEl.style.overflow = 'visible';
+            }
+          } catch (err) {
+            container.innerHTML =
+              '<p style="color:#C97A1A;font-family:\'IBM Plex Mono\',monospace;font-size:13px;margin:0;">図の描画に失敗しました: ' +
+              String((err && err.message) || err) +
+              '</p>';
+            console.error('Mermaid render error for ' + id, err);
+          }
+        }
+      })();
+    </script>
+  </body>
+</html>

@@ -138,9 +138,9 @@ const entries: PageEntry[] = [
     provider: "claude",
     topics: ["agent"],
     summary:
-      "Claude Code v2.1.196 のサブエージェント / Agent Teams 開発で必要な CLAUDE.md・エージェント定義・MEMORY.md・README.md の役割と書き方を体系化したガイド。",
+      "サブエージェント & Agent Teams 開発における CLAUDE.md・エージェント定義・MEMORY.md・README.md の役割と書き方を体系化したベストプラクティスガイド。",
     addedAt: "2026-04-19",
-    lastReviewed: "2026-06-30",
+    lastReviewed: "2026-07-26",
   },
   {
     slug: "/claude/code-slash-commands",
@@ -176,7 +176,7 @@ const entries: PageEntry[] = [
     summary:
       "Claude Codeエンジニアのための中級〜上級者向けベストプラクティス。「指示を積み上げる」から「ゴールと検証基準を渡して任せる」へ ― Fable 5に最適化された思考法をステップバイステップで解説します。",
     addedAt: "2026-07-05",
-    lastReviewed: "2026-07-05",
+    lastReviewed: "2026-07-26",
   },
   {
     slug: "/claude/harness-engineering",
@@ -424,6 +424,26 @@ const entries: PageEntry[] = [
       "Claude / Gemini / Codex / GitHub Copilot — 4プラットフォームのドキュメントをAIツールとWebSearchで並列更新するための完全ガイド。git worktreeのセットアップから日常ワークフロー・GitHub Actions統合まで。",
     addedAt: "2026-05-08",
     lastReviewed: "2026-07-01",
+  },
+  {
+    slug: "/sdd/ai-spec-driven-development-guide",
+    title: "AI Spec-Driven Development",
+    group: "開発プロセス",
+    topics: ["sdd", "spec-driven-development", "agent", "guide"],
+    summary:
+      "初学者のためのステップバイステップ・ベストプラクティス。GitHub Spec Kit、AWS Kiro、Claude Codeなど2026年最新のSDD手法・ツール・EARS記法を網羅解説。",
+    addedAt: "2026-07-26",
+    lastReviewed: "2026-07-26",
+  },
+  {
+    slug: "/sdd/spec-driven-development-guide",
+    title: "Spec-Driven Development (中級・上級)",
+    group: "開発プロセス",
+    topics: ["sdd", "spec-driven-development", "ears", "architecture", "multi-agent"],
+    summary:
+      "バイブコーディング脱却からマルチエージェント検証、EARS記法、GitHub Spec Kit・AWS Kiro・BMAD実践まで網羅した、中級・上級エンジニア向け仕様駆動開発の実践ガイド。",
+    addedAt: "2026-07-26",
+    lastReviewed: "2026-07-26",
   },
   {
     slug: "/google/adk-best-practices",

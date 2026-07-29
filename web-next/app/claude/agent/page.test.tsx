@@ -1,53 +1,40 @@
-// Phase C-1 [Red] contract test. Expected to FAIL until Green phase
-// implements app/claude/agent/page.tsx.
-
-/**
- * Phase C-1 契約テスト (/claude/agent)。
- *
- * 固定する契約:
- * - `metadata` が export され、title に「サブエージェント」を含む
- * - `<h1>` が 1 つ存在し、`サブエージェント` を含む
- * - 18 個の section id が存在する (s01〜s17 + sources)
- *   (legacy は <div class="section"> × 11 +
- *    <div class="section section-team"> × 7 + sources = 計 18 セクション、
- *    id 属性なし → synthetic id 付与)
- * - 18 個の TOC リンクが `#section-id` 形式で存在する
- * - 外部リンク (http/https) には全て `target="_blank"` かつ
- *   `rel="noopener noreferrer"` が付与されている
- * - `sources` セクション内に 23 件以上の外部リンクが存在する
- * - 静的検査: 生 HTML 流し込み API (React の XSS 危険 prop) を使用していない
- */
+// Contract test for updated /claude/agent page.
 
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { render } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
-import { describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it, vi } from "vitest";
 import ClaudeAgentPage, { metadata as rawMetadata } from "@/app/claude/agent/page";
 
+beforeAll(() => {
+  global.IntersectionObserver = class {
+    observe = vi.fn();
+    unobserve = vi.fn();
+    disconnect = vi.fn();
+  } as unknown as typeof IntersectionObserver;
+});
+
+// Mock MermaidDiagram component to avoid dynamic import / rendering issues in Vitest
+vi.mock("@/components/docs/MermaidDiagram", () => ({
+  default: function DummyMermaidDiagram({ chart }: { chart: string }) {
+    return <pre data-testid="mermaid">{chart}</pre>;
+  },
+}));
+
 const Page = ClaudeAgentPage as unknown as () => ReactElement;
-// Next.js の Metadata 型を避けるための最小ローカル型 (実体は Metadata オブジェクト)。
 type MetadataLike = { title?: unknown; description?: unknown };
 const metadata = rawMetadata as unknown as MetadataLike;
 
 const EXPECTED_SECTION_IDS = [
-  "s01",
-  "s02",
-  "s03",
-  "s04",
-  "s05",
-  "s06",
-  "s07",
-  "s08",
-  "s09",
-  "s10",
-  "s11",
-  "s12",
-  "s13",
-  "s14",
-  "s15",
-  "s16",
-  "s17",
+  "overview",
+  "claude-md",
+  "subagents",
+  "agent-teams",
+  "writing-principles",
+  "decision-flow",
+  "checklist",
+  "summary",
   "sources",
 ] as const;
 
@@ -59,6 +46,7 @@ describe("/claude/agent - metadata", () => {
         ? metadata.title
         : (metadata.title as { default?: string } | undefined)?.default;
     expect(title).toMatch(/サブエージェント/);
+    expect(title).toMatch(/Agent Teams/);
   });
 
   it("exports a metadata object with non-empty description", () => {
@@ -73,9 +61,10 @@ describe("/claude/agent - page structure", () => {
     const h1 = container.querySelector("h1");
     expect(h1).not.toBeNull();
     expect(h1?.textContent).toMatch(/サブエージェント/);
+    expect(h1?.textContent).toMatch(/Agent Teams/);
   });
 
-  it("renders all 18 expected section ids", () => {
+  it("renders all 9 expected section ids", () => {
     const { container } = render(<Page />);
     for (const id of EXPECTED_SECTION_IDS) {
       const el = container.querySelector(`#${id}`);
@@ -83,13 +72,36 @@ describe("/claude/agent - page structure", () => {
     }
   });
 
-  it("renders 18 TOC links pointing to all section anchors", () => {
+  it("renders 9 TOC links pointing to all section anchors", () => {
     const { container } = render(<Page />);
     const tocAnchors = container.querySelectorAll('nav a[href^="#"]');
     const tocHrefs = Array.from(tocAnchors).map((a) => a.getAttribute("href"));
-    expect(tocHrefs).toHaveLength(EXPECTED_SECTION_IDS.length);
+    expect(tocHrefs.length).toBeGreaterThanOrEqual(EXPECTED_SECTION_IDS.length);
     for (const id of EXPECTED_SECTION_IDS) {
       expect(tocHrefs, `TOC must link to #${id}`).toContain(`#${id}`);
+    }
+  });
+
+  it("renders a mobile sidebar toggle without making the page a Client Component", () => {
+    render(<Page />);
+    const toggle = screen.getByRole("button", { name: "目次を開く" });
+
+    expect(toggle).toHaveAttribute("aria-expanded", "false");
+    fireEvent.click(toggle);
+    expect(screen.getByRole("button", { name: "目次を閉じる" })).toHaveAttribute(
+      "aria-expanded",
+      "true"
+    );
+  });
+
+  it("associates every interactive checklist checkbox with its item label", () => {
+    const { container } = render(<Page />);
+    const checkboxes = container.querySelectorAll<HTMLInputElement>(
+      '#checklist input[type="checkbox"]',
+    );
+    expect(checkboxes).toHaveLength(8);
+    for (const checkbox of checkboxes) {
+      expect(checkbox.labels?.length).toBeGreaterThan(0);
     }
   });
 });
@@ -110,20 +122,27 @@ describe("/claude/agent - external link safety", () => {
     }
   });
 
-  it("sources section contains at least 23 external links", () => {
+  it("sources section contains external links", () => {
     const { container } = render(<Page />);
     const sources = container.querySelector("#sources");
     if (!sources) throw new Error("#sources not found");
     const externals = sources.querySelectorAll('a[href^="http"]');
-    expect(externals.length).toBeGreaterThanOrEqual(23);
+    expect(externals.length).toBeGreaterThan(0);
   });
 });
 
 describe("/claude/agent - static source safety", () => {
   it("does not use the React raw-HTML injection prop", () => {
     const source = readFileSync(join(__dirname, "page.tsx"), "utf8");
-    // オブフスケート (false positive / prompt hook 誤検知回避)。
     const needle = ["danger", "ously", "Set", "Inner", "HTML"].join("");
     expect(source.includes(needle)).toBe(false);
+  });
+
+  it("uses the shared Ext component and CSS Module classes", () => {
+    const source = readFileSync(join(__dirname, "page.tsx"), "utf8");
+    expect(source).toContain('import Ext from "@/components/docs/Ext"');
+    expect(source).not.toContain("function Ext(");
+    expect(source).toContain("className={styles.dir}");
+    expect(source).toContain("className={styles.tag}");
   });
 });

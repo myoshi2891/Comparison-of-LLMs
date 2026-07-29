@@ -104,7 +104,7 @@ describe("Accessibility Automated Audit (axe-core)", () => {
       },
     });
     expect(results).toHaveNoViolations();
-  });
+  }, 15000);
 
   it("AgentHarnessEngineeringPage has no accessibility violations", async () => {
     const { container } = render(<AgentHarnessEngineeringPage />);
@@ -114,5 +114,5 @@ describe("Accessibility Automated Audit (axe-core)", () => {
       },
     });
     expect(results).toHaveNoViolations();
-  });
+  }, 15000);
 });

@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Updated 2026-07-24
+Updated 2026-07-28
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
@@ -29,7 +29,7 @@ update.sh  ← オーケストレーター (scrape → copy)
 │   │   ├── search/              横断検索 (F-5。自前実装。?q= / ?tag= で状態共有)
 │   │   ├── whats-new/           What's New (新着 / 最近更新を page-registry から静的生成)
 │   │   ├── globals.css          Tailwind v4 + legacy design tokens (227 行)
-│   │   └── {claude,google,codex,copilot}/{skill,agent}/ および /google/agent-harness-engineering/、/google/notebook-lm/、/google/adk-best-practices/、/google/enterprise-agent-platform/、/google/enterprise-agent-platform-intermediate/、/google/gemma-best-practices-guide/、/google/stitch-guide/、/moonshot/kimi-llm-best-practices/、/claude/managed-agents/、/claude/self-hosted-sandboxes/、/claude/code-slash-commands/、/claude/fable-5-best-practices/、/claude/skills-sh/、/claude/tag-best-practices/、/mcp/mcp-best-practices/、/mcp/mcp-best-practices-intermediate/、/code-review/coderabbit-guide/、/code-review/copilot-code-review/、/code-review/sonar-qube/、/code-review/tool-pricing/、/agent/hermes-agent-advanced-guide/、/agent/loop-engineering/、/agent/openclaw-advanced-agent-security-guide/、/agent/skills/、/vercel/sandbox/、/cursor/complete-guide/、/cursor/complete-guide-intermediate/、/security/ai-security-best-practices/、/security/ai-security-best-practices-intermediate/、/governance/ai-governance/、/local-llm/self-hosting/、/local-llm/best-practices/、/local-llm/finetuning-best-practices/、/ci-cd/ai-cicd-automation-best-practices/、/agent/context-engineering-best-practices/、/rag/embeddings-best-practices/、/multimodal/generation-best-practices/、/multimodal/image-audio-best-practices-2026/、/llm-ops/evaluation-observability/、/model-data/gpt-5-6-best-practices/、/infra/amazon-bedrock-best-practices-2026-intermediate/、/infra/amazon-bedrock-best-practices-guide/   Phase B–C および追加移行済みルート（詳細は [`docs/archive/MIGRATION_PROGRESS.md`](docs/archive/MIGRATION_PROGRESS.md)）
+│   │   └── {claude,google,codex,copilot}/{skill,agent}/ および /google/agent-harness-engineering/、/google/notebook-lm/、/google/adk-best-practices/、/google/enterprise-agent-platform/、/google/enterprise-agent-platform-intermediate/、/google/gemma-best-practices-guide/、/google/stitch-guide/、/moonshot/kimi-llm-best-practices/、/claude/managed-agents/、/claude/self-hosted-sandboxes/、/claude/code-slash-commands/、/claude/fable-5-best-practices/、/claude/skills-sh/、/claude/tag-best-practices/、/mcp/mcp-best-practices/、/mcp/mcp-best-practices-intermediate/、/code-review/coderabbit-guide/、/code-review/copilot-code-review/、/code-review/sonar-qube/、/code-review/tool-pricing/、/agent/hermes-agent-advanced-guide/、/agent/loop-engineering/、/agent/openclaw-advanced-agent-security-guide/、/agent/skills/、/vercel/sandbox/、/cursor/complete-guide/、/cursor/complete-guide-intermediate/、/security/ai-security-best-practices/、/security/ai-security-best-practices-intermediate/、/governance/ai-governance/、/local-llm/self-hosting/、/local-llm/best-practices/、/local-llm/finetuning-best-practices/、/ci-cd/ai-cicd-automation-best-practices/、/agent/context-engineering-best-practices/、/rag/embeddings-best-practices/、/multimodal/generation-best-practices/、/multimodal/image-audio-best-practices-2026/、/llm-ops/evaluation-observability/、/model-data/gpt-5-6-best-practices/、/infra/amazon-bedrock-best-practices-2026-intermediate/、/infra/amazon-bedrock-best-practices-guide/、/sdd/ai-spec-driven-development-guide/、/sdd/spec-driven-development-guide/   Phase B–C および追加移行済みルート（詳細は [`docs/archive/MIGRATION_PROGRESS.md`](docs/archive/MIGRATION_PROGRESS.md)）
 │   ├── components/
 │   │   ├── HomePage.tsx         Client Component (Phase 10)
 │   │   ├── ApiTable.tsx / SubTable.tsx / Hero.tsx / ...   (Phase 8-10 成果物)
@@ -196,6 +196,7 @@ Playwright ブラウザバイナリ（`/root/.cache/ms-playwright/`）はバイ�
 - **ナビは registry からの導出。`nav-links.ts` への直書きは禁止**（F-4' / `plans/008-nav-regrouping-f4.md`, 2026-07-14）: `web-next/components/site/nav-links.ts` は `buildNavLinks(pageRegistry)` の結果であり、手書きのリンクデータを持たない（以前は 170 行の手書きデータで registry と二重管理になっていた）。トップレベルは 8 グループ（Home / Providers / Agent 開発 / 開発プロセス / 運用・品質 / モデル・データ / 検索 / What's New。F-5 で「検索」を追加）で、**2 段ネストするのは Providers のみ**。グループの並び順とネスト対象は `web-next/lib/nav-taxonomy.ts` が持つ（registry のエントリは slug 昇順のため表示順を表現できない）。ドロップダウン内のリーフは `addedAt` 昇順 → `slug` 昇順。未知の `group` や Providers の `category` 欠落はビルド時に throw する（silent drop でページがナビから消えるのを防ぐため）
 - **横断導線（RSS / 検索 / 関連リンク）は registry からの導出**（F-3' / F-5 / F-7 / `plans/009-phase3-cross-navigation.md`, 2026-07-14）: ① **検索は自前実装で外部ライブラリを追加しない**（`web-next/lib/search.ts`）。58 ページの title/summary/topics は数十 KB であり全件走査の部分一致で十分。NFKC 正規化 + 空白区切り全トークンの AND 一致。② **タグ導線は `/search` 1 ページに集約**し `/tags/[tag]` の静的ページ群は作らない（1〜2 ページしか持たないタグで薄いページが量産されるため）。状態は `?q=` / `?tag=` の URL クエリで共有する。③ **関連リンクのスコアは決定論的**（`web-next/lib/related-pages.ts`）— 共有 topics 数 降順 → 同一 group 優先 → `addedAt` 降順 → `slug` 昇順。順序が一意でないと無関係なページ追加で全ページの関連リンクが揺れ、SSG 出力が不安定になる。④ RSS は Route Handler + `dynamic = "force-static"` で `output: 'export'` 下でも `out/rss.xml` として静的生成される
 - **page.tsx は Server Component に保つ（metadata の前提）**: Next.js の規約により `"use client"` なファイルは `export const metadata` を持てない。スクロール監視等のクライアント処理は `TocObserver.tsx` 等へ切り出し、page.tsx 自体は Server Component に保つこと。已に全体が `"use client"` になっている `/code-review/coderabbit-guide` と `/code-review/sonar-qube` は、例外的にルート単位の `layout.tsx` から metadata を供給している
+- **モバイル目次のアクセシビリティ状態を同期する**: オフキャンバス型サイドバーのトグルは `aria-expanded` と状態依存の `aria-label`（「目次を開く」/「目次を閉じる」）を同期し、`aria-controls` で一意なサイドバー ID を参照する。閉状態のサイドバーはオフスクリーン変形だけに頼らず `visibility: hidden` と `pointer-events: none` を併用し、開状態で両方を復元する
 - **Mermaid 図解レイアウトは共有コンポーネントが真実の源**（2026-07-23）: 中央寄せ・全幅フレーム・列幅への縮小フィットは `web-next/components/docs/MermaidDiagram.tsx` の2層構造（外側 `width:100%` / 内側 `.mermaid` `display:flex; justify-content:center`、`useMaxWidth:false` + `mermaid.run` 後に svg へ `max-width:100%; height:auto` を付与）が一元的に担当する。列幅に収まる図は自然サイズで中央寄せ、広い図は列幅まで縮小して中央寄せ（切れ・左寄りなし）。**各ページの `page.module.css` で `:global(.mermaid)` / `:global(svg)` の `width` / `max-width` / `display:flex` を書いて中央寄せ・スクロールを再実装しない**（`svg{width:100%}`=引き伸ばし、`svg{max-width:100%}`=縮小、override 無し=左寄せ、の三分裂を招いた経緯がある）。ページ側ラッパーは装飾（border/background/padding）および必要に応じた `overflow-x: auto` のみを担当。本文カラムの幅方針はレイアウト別に分ける: **サイドバー付きページ**（大半）は本文カラム（`.main`）を `min-width: 0` + `width: 100%` の流動幅（固定 `max-width` なし）でサイドバートラックを埋める。**単一カラム（サイドバーなし）ページ**は中央寄せコンテナに `max-width: 1440px` + `margin: 0 auto`（サイトの `.container` と同値）を用いてワイド画面でのバランスを取る。不変条件は `.claude/rules/mermaid-diagram-layout.md`、実装ガイドは `.claude/skills/fix-mermaid/SKILL.md`（Part 4）を参照
 - **3層フォールバック**: スクレイパーは「スクレイプ成功 → 既存 JSON の値 → ハードコードフォールバック」の順で価格を決定。`scrape_status` フィールド (`success` | `fallback` | `manual`) で出自を追跡
 - **Google AI/Vertex はライブ抽出を行わずフォールバック固定**（2026-07-24）: `providers/google.py` の `scrape()` は `get_page_text` を呼ばず、常に `_FALLBACKS`（WebSearch 確定値）を返す。Google AI 料金ページ (`ai.google.dev/pricing`) は ① モデル名が目次(TOC)に複数回先行出現、② 価格が `/1M` 等のアンカーを伴わない `Input price ... $1.50` ラベル、③ 1モデルに標準/キャッシュ等の複数価格が併記される、という構造のため正規表現抽出が構造的に不安定（実測で正しく取れるモデルが 0 件で、近傍の無関係な額を誤取得し `price_in` を汚染していた）。**この挙動を「スクレイプ復活」で戻さないこと**。価格改定は月次で `_FALLBACKS` を更新して反映する
@@ -243,6 +244,7 @@ Playwright ブラウザバイナリ（`/root/.cache/ms-playwright/`）はバイ�
 - 環境変数・Netlify 設定の変更
 - スタイル目的のリライト
 - **`legacy/` 配下の編集**（Phase A–F 遂行中は凍結。`.gitignore` により事故的な push は防止されているが、編集自体を避ける）
+- **元 HTML / Markdown ガイドページの要約・省略・縮約・部分抽出は一切禁止（絶対ルール）**: ガイドページの Next.js 移植および更新時、元ファイルの全セクション、全サブセクション、全段落、全リスト項目、全コードブロック、全 SVG、全 callout/alert、全 table、全参考文献/外部リンクを何一つ落とさずに **100% 漏れなく JSX へ完全移植**すること。代表例のみの抜粋や文章の要約は重大な規約違反とする。
 - **元のHTML/Markdownオリジナルファイルの完全削除は厳禁**: 移行元のファイルは絶対に削除してはならず、必ず `archive/` ディレクトリ配下に移動（`git mv` または `mv`）して退避保存すること
 
 ### 許可される変更
@@ -277,7 +279,7 @@ Build:     cd web-next && bun run build
 以下を全て確認してからコミットすること：
 
 1. `cd web-next && bun run build` が成功（※Antigravityサンドボックス環境では実行禁止。他環境やCIでは必須）
-2. `cd web-next && bun run test` が成功（1195 pass 全 Green ✅）
+2. `cd web-next && bun run test` が成功（1232 pass 全 Green ✅）
 3. `cd web-next && bun run typecheck` が成功
 4. `cd web-next && bun run lint` が成功
 5. `cd scraper && uv run pytest` が成功

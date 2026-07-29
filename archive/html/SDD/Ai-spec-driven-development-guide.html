@@ -1,0 +1,2386 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI仕様駆動開発（Spec-Driven Development）実践ガイド</title>
+    <style>
+      :root {
+        --color-background-primary: #07111e;
+        --color-background-secondary: #0d1b2e;
+        --color-background-tertiary: #142842;
+        --color-background-info: #16324f;
+        --color-background-danger: #3a1620;
+        --color-background-success: #123324;
+        --color-background-warning: #3a2c12;
+
+        --color-text-primary: #e8edf5;
+        --color-text-secondary: #a9b8cc;
+        --color-text-tertiary: #7488a3;
+        --color-text-info: #8ec6ff;
+        --color-text-danger: #ff9b9b;
+        --color-text-success: #7fe0b3;
+        --color-text-warning: #f5c76a;
+
+        --color-border-primary: #2a3f5c;
+        --color-border-secondary: #1e3049;
+        --color-border-tertiary: #16283d;
+
+        --font-sans:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Kaku Gothic ProN',
+          'Noto Sans JP', 'Yu Gothic', sans-serif;
+        --font-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+
+        --border-radius-md: 8px;
+        --border-radius-lg: 12px;
+        --border-radius-xl: 16px;
+
+        --accent: #7c9eff;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: var(--color-background-primary);
+        color: var(--color-text-primary);
+        font-family: var(--font-sans);
+        font-size: 16px;
+        line-height: 1.7;
+      }
+
+      .layout {
+        display: block;
+      }
+
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: 288px;
+        overflow-y: auto;
+        background: var(--color-background-secondary);
+        border-right: 1px solid var(--color-border-tertiary);
+        padding: 28px 22px 40px;
+      }
+
+      .sidebar .brand {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--color-text-tertiary);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        margin: 0 0 4px 2px;
+      }
+
+      .sidebar .brand-title {
+        font-size: 16px;
+        font-weight: 500;
+        color: var(--color-text-primary);
+        margin: 0 0 22px 2px;
+        line-height: 1.5;
+      }
+
+      .sidebar ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+
+      .sidebar li {
+        margin: 0;
+      }
+
+      .sidebar a {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 10px;
+        border-radius: var(--border-radius-md);
+        color: var(--color-text-secondary);
+        text-decoration: none;
+        font-size: 13.5px;
+        font-weight: 400;
+        border-left: 2px solid transparent;
+      }
+
+      .sidebar a .dot {
+        width: 6px;
+        height: 6px;
+        min-width: 6px;
+        border-radius: 50%;
+        background: var(--color-border-primary);
+      }
+
+      .sidebar a:hover {
+        background: var(--color-background-tertiary);
+        color: var(--color-text-primary);
+      }
+
+      .sidebar a.active {
+        background: var(--color-background-tertiary);
+        color: var(--color-text-primary);
+        border-left: 2px solid var(--accent);
+        font-weight: 500;
+      }
+
+      .sidebar a.active .dot {
+        background: var(--accent);
+      }
+
+      .main {
+        margin-left: 288px;
+        padding: 56px 72px 96px;
+      }
+
+      .hero {
+        border-bottom: 1px solid var(--color-border-tertiary);
+        padding-bottom: 32px;
+        margin-bottom: 36px;
+      }
+
+      .hero .kicker {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--color-text-info);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-bottom: 10px;
+      }
+
+      .hero h1 {
+        font-size: 26px;
+        font-weight: 500;
+        margin: 0 0 10px;
+        line-height: 1.4;
+      }
+
+      .hero .subtitle {
+        font-size: 17px;
+        color: var(--color-text-secondary);
+        font-weight: 400;
+        margin: 0 0 20px;
+      }
+
+      .hero .notice {
+        background: var(--color-background-tertiary);
+        border: 1px solid var(--color-border-secondary);
+        border-radius: var(--border-radius-md);
+        padding: 16px 20px;
+        font-size: 14.5px;
+        color: var(--color-text-secondary);
+      }
+
+      .hero .notice strong {
+        color: var(--color-text-primary);
+        font-weight: 500;
+      }
+
+      section {
+        margin-bottom: 56px;
+        scroll-margin-top: 24px;
+      }
+
+      h2 {
+        font-size: 18px;
+        font-weight: 500;
+        margin: 0 0 18px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid var(--color-border-tertiary);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      h2 .num {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 26px;
+        height: 26px;
+        min-width: 26px;
+        border-radius: var(--border-radius-md);
+        background: var(--color-background-tertiary);
+        border: 1px solid var(--color-border-primary);
+        color: var(--color-text-info);
+        font-size: 13px;
+        font-weight: 500;
+      }
+
+      h3 {
+        font-size: 16px;
+        font-weight: 500;
+        margin: 28px 0 12px;
+        color: var(--color-text-primary);
+      }
+
+      h4 {
+        font-size: 14.5px;
+        font-weight: 500;
+        margin: 20px 0 10px;
+        color: var(--color-text-secondary);
+      }
+
+      p {
+        margin: 0 0 14px;
+        color: var(--color-text-primary);
+      }
+
+      strong {
+        font-weight: 500;
+        color: var(--color-text-primary);
+      }
+
+      a {
+        color: var(--accent);
+      }
+
+      .cite {
+        font-size: 12.5px;
+        color: var(--color-text-tertiary);
+        text-decoration: none;
+      }
+      .cite:hover {
+        color: var(--color-text-info);
+      }
+
+      ul,
+      ol {
+        margin: 0 0 16px;
+        padding-left: 22px;
+      }
+      li {
+        margin-bottom: 8px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 18px 0 24px;
+        font-size: 14.5px;
+      }
+
+      caption {
+        text-align: left;
+        font-size: 12.5px;
+        color: var(--color-text-tertiary);
+        margin-bottom: 8px;
+        font-weight: 400;
+      }
+
+      th,
+      td {
+        border: 1px solid var(--color-border-tertiary);
+        padding: 10px 14px;
+        text-align: left;
+        vertical-align: top;
+      }
+
+      th {
+        background: var(--color-background-tertiary);
+        color: var(--color-text-secondary);
+        font-weight: 500;
+        font-size: 13.5px;
+      }
+
+      tbody tr:nth-child(even) td {
+        background: rgba(255, 255, 255, 0.02);
+      }
+
+      code {
+        font-family: var(--font-mono);
+        font-size: 13.5px;
+        background: var(--color-background-tertiary);
+        padding: 2px 6px;
+        border-radius: 4px;
+        color: var(--color-text-info);
+      }
+
+      pre {
+        background: var(--color-background-tertiary);
+        border: 1px solid var(--color-border-secondary);
+        border-radius: var(--border-radius-md);
+        padding: 16px 18px;
+        overflow-x: auto;
+        margin: 0 0 18px;
+      }
+
+      pre code {
+        background: none;
+        padding: 0;
+        color: var(--color-text-secondary);
+        font-size: 13.5px;
+        line-height: 1.6;
+      }
+
+      .callout {
+        border-radius: var(--border-radius-md);
+        padding: 16px 20px;
+        margin: 0 0 20px;
+        font-size: 14.5px;
+        border: 1px solid var(--color-border-secondary);
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+      }
+
+      .callout .icon {
+        flex: none;
+        margin-top: 2px;
+      }
+      .callout.tip {
+        background: var(--color-background-info);
+        border-color: #1f4569;
+      }
+      .callout.tip .icon svg {
+        stroke: var(--color-text-info);
+      }
+      .callout.warn {
+        background: var(--color-background-warning);
+        border-color: #5c4514;
+      }
+      .callout.warn .icon svg {
+        stroke: var(--color-text-warning);
+      }
+      .callout.danger {
+        background: var(--color-background-danger);
+        border-color: #59232f;
+      }
+      .callout.danger .icon svg {
+        stroke: var(--color-text-danger);
+      }
+      .callout p:last-child {
+        margin-bottom: 0;
+      }
+
+      .mermaid {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        margin: 8px 0 24px;
+        background: transparent;
+      }
+
+      .mermaid svg {
+        max-width: 100%;
+        height: auto;
+        overflow: visible;
+      }
+
+      /* Force edge-label contrast: mermaid's default light pill + our global
+   p/span color rules combine into low-contrast text, so both background
+   and text color are pinned explicitly here regardless of mermaid's
+   internal computed styles. */
+      .mermaid .edgeLabel rect {
+        fill: #14283f !important;
+        opacity: 1 !important;
+      }
+      .mermaid .edgeLabel,
+      .mermaid .edgeLabel p,
+      .mermaid .edgeLabel span,
+      .mermaid .labelBkg {
+        color: #e8edf5 !important;
+        background-color: #14283f !important;
+      }
+
+      .diagram-caption {
+        text-align: center;
+        font-size: 12.5px;
+        color: var(--color-text-tertiary);
+        margin: -12px 0 24px;
+      }
+
+      .checklist-table td:first-child {
+        width: 40px;
+        text-align: center;
+        color: var(--color-text-tertiary);
+      }
+
+      .footer {
+        border-top: 1px solid var(--color-border-tertiary);
+        margin-top: 60px;
+        padding-top: 28px;
+      }
+
+      .refs-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+        gap: 12px;
+      }
+
+      .ref-card {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+        padding: 14px 16px;
+        border: 1px solid var(--color-border-tertiary);
+        border-radius: var(--border-radius-md);
+        background: var(--color-background-secondary);
+        scroll-margin-top: 24px;
+        transition:
+          background-color 0.15s ease,
+          border-color 0.15s ease;
+      }
+
+      .ref-card:hover {
+        background: var(--color-background-tertiary);
+        border-color: var(--color-border-secondary);
+      }
+
+      .ref-num {
+        flex: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 26px;
+        height: 26px;
+        border-radius: var(--border-radius-md);
+        background: var(--color-background-tertiary);
+        border: 1px solid var(--color-border-primary);
+        color: var(--color-text-info);
+        font-size: 11.5px;
+        font-weight: 500;
+      }
+
+      .ref-card:hover .ref-num {
+        background: var(--color-background-primary);
+      }
+
+      .ref-body {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .ref-source {
+        margin: 0 0 3px;
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--color-text-tertiary);
+      }
+
+      .ref-title {
+        margin: 0 0 8px;
+        font-size: 13.5px;
+        line-height: 1.5;
+        color: var(--color-text-primary);
+      }
+
+      .ref-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 12.5px;
+        color: var(--accent);
+        text-decoration: none;
+        word-break: break-all;
+      }
+
+      .ref-link:hover {
+        text-decoration: underline;
+      }
+      .ref-link svg {
+        flex: none;
+        opacity: 0.75;
+      }
+
+      .footnote {
+        font-size: 13px;
+        color: var(--color-text-tertiary);
+        text-align: center;
+        margin-top: 28px;
+      }
+
+      @media (max-width: 900px) {
+        .sidebar {
+          display: none;
+        }
+        .main {
+          margin-left: 0;
+          padding: 32px 24px 72px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="layout">
+      <nav class="sidebar">
+        <p class="brand">Spec-driven development</p>
+        <p class="brand-title">AI仕様駆動開発 実践ガイド</p>
+        <ul>
+          <li>
+            <a href="#top"><span class="dot"></span>はじめに</a>
+          </li>
+          <li>
+            <a href="#ch1"><span class="dot"></span>1. なぜ今SDDなのか</a>
+          </li>
+          <li>
+            <a href="#ch2"><span class="dot"></span>2. SDDとは何か</a>
+          </li>
+          <li>
+            <a href="#ch3"><span class="dot"></span>3. 成熟度モデル</a>
+          </li>
+          <li>
+            <a href="#ch4"><span class="dot"></span>4. 主要ツール比較</a>
+          </li>
+          <li>
+            <a href="#ch5"><span class="dot"></span>5. EARS記法</a>
+          </li>
+          <li>
+            <a href="#ch6"><span class="dot"></span>6. ワークフロー実践</a>
+          </li>
+          <li>
+            <a href="#ch7"><span class="dot"></span>7. 良い仕様の書き方</a>
+          </li>
+          <li>
+            <a href="#ch8"><span class="dot"></span>8. Claude Codeでの実践</a>
+          </li>
+          <li>
+            <a href="#ch9"><span class="dot"></span>9. チェックリスト</a>
+          </li>
+          <li>
+            <a href="#ch10"><span class="dot"></span>10. 批判的視点と限界</a>
+          </li>
+          <li>
+            <a href="#ch11"><span class="dot"></span>11. 最新動向</a>
+          </li>
+          <li>
+            <a href="#ch12"><span class="dot"></span>12. まとめ</a>
+          </li>
+          <li>
+            <a href="#refs"><span class="dot"></span>参考文献</a>
+          </li>
+        </ul>
+      </nav>
+
+      <main class="main">
+        <header class="hero" id="top">
+          <p class="kicker">Beginner-friendly step-by-step guide</p>
+          <h1>AI仕様駆動開発（Spec-Driven Development）実践ガイド</h1>
+          <p class="subtitle">初学者のためのステップバイステップ・ベストプラクティス</p>
+          <div class="notice">
+            本ガイドは<strong>2026年7月25日</strong>時点で公開されている情報（GitHub、AWS、Anthropic等の一次情報、および
+            Addy Osmani、Birgitta Böckeler（Thoughtworks / Martin Fowler）、Sean
+            Grove（OpenAI）ら国際的に著名な開発者・専門家の発信内容）に基づいて作成しています。各章に根拠となる出典番号を付し、巻末の参考文献一覧にURLをまとめています。SDDは急速に変化している分野のため、最新情報は各リンク先で随時ご確認ください。
+          </div>
+        </header>
+
+        <section id="ch1">
+          <h2><span class="num">1</span>なぜ今、仕様駆動開発なのか</h2>
+          <p>
+            2025年以降、AIコーディングエージェントは急速に普及しましたが、同時に「動くコードは出てくるが、意図した通りには動かない」という問題が顕在化しました。Stack
+            Overflowの2025年開発者調査では、84%の開発者がAIツールを利用済み、あるいは利用予定と回答した一方、その出力精度を信頼していると答えたのはわずか33%にとどまり、AIツールへの肯定的な感情は2023〜2024年の70%超から2025年には60%まで低下したと報告されています。<a
+              class="cite"
+              href="#ref1"
+              >[1]</a
+            >
+          </p>
+          <p>
+            この背景には、Andrej Karpathyが2025年2月に提唱した「vibe
+            coding（バイブコーディング）」——AIに自然文で指示し、出てきたコードをそのまま受け入れる開発スタイル——の限界があります。プロトタイピングには有効な一方、保守が必要な本番システムには不向きであることが繰り返し指摘されています。<a
+              class="cite"
+              href="#ref2"
+              >[2]</a
+            ><a class="cite" href="#ref3">[3]</a>
+          </p>
+          <p>さらに、AI生成コードの品質に関する実証研究も蓄積されています。</p>
+          <table>
+            <caption>
+              表1-1. AI生成コードの品質に関する実証研究
+            </caption>
+            <thead>
+              <tr>
+                <th>調査</th>
+                <th>内容</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Yan et al. (2025)</td>
+                <td>AI生成コードの脆弱性混入率はベンチマークによって9.8%〜42.1%</td>
+              </tr>
+              <tr>
+                <td>Fu et al., ACM TOSEM (2025)</td>
+                <td>3つのAIコード生成ツールで43種類のCWE（脆弱性分類）を確認</td>
+              </tr>
+              <tr>
+                <td>2026年2月の大規模実証研究（arXiv）</td>
+                <td>本番リポジトリに残存するAI由来の不具合が11万件超に達したと報告</td>
+              </tr>
+            </tbody>
+          </table>
+          <p class="footnote" style="text-align: left; margin: -8px 0 20px">
+            出典：<a class="cite" href="#ref4">[4]</a>
+          </p>
+          <p>
+            こうした課題への対応として、「コードではなく仕様（スペック）を最初に書き、それを実行可能な契約（contract）としてAIエージェントに与える」という仕様駆動開発（Spec-Driven
+            Development, SDD）が2025〜2026年にかけて主流の実践として定着しました。<a
+              class="cite"
+              href="#ref2"
+              >[2]</a
+            ><a class="cite" href="#ref5">[5]</a>
+          </p>
+        </section>
+
+        <section id="ch2">
+          <h2><span class="num">2</span>仕様駆動開発（SDD）とは何か</h2>
+          <p>
+            SDDとは、バージョン管理された詳細な仕様書を「唯一の真実源（single source of
+            truth）」とし、人間もしくはAIエージェントがまずその仕様を書き、そこから設計・タスク分解を経て初めてコードを生成するという開発手法です。要件が変わった場合はコードを直接編集するのではなく仕様を編集し、関連コードを再生成します。<a
+              class="cite"
+              href="#ref5"
+              >[5]</a
+            >
+          </p>
+
+          <h3>2.1 思想的な起点：Sean Grove「The New Code」</h3>
+          <p>
+            この考え方が広く知られるきっかけとなったのが、OpenAIでアライメント研究に携わっていたSean
+            Groveが2025年のAI Engineer World's Fair（サンフランシスコ）で行った講演「The New
+            Code」です。<a class="cite" href="#ref1">[1]</a><a class="cite" href="#ref6">[6]</a>
+          </p>
+          <p>
+            Groveは、開発者がAIにプロンプトを与えてコードだけを残しプロンプト自体を捨てる従来のやり方を、ソースコードを捨ててバイナリだけをバージョン管理することに例え、コードはプログラマーの価値のごく一部に過ぎず、より大きな価値は意図を構造化して伝達することにあると論じました。<a
+              class="cite"
+              href="#ref6"
+              >[6]</a
+            >
+          </p>
+          <p>
+            Groveが例に挙げたのがOpenAI自身の「Model
+            Spec」——各項目に一意のIDと具体例（テストとして機能する）を持つ、バージョン管理されたMarkdown文書として公開されているモデルの振る舞い仕様です。<a
+              class="cite"
+              href="#ref1"
+              >[1]</a
+            ><a class="cite" href="#ref6">[6]</a>
+          </p>
+
+          <h3>2.2 パラダイムシフト：「コードが真実」から「意図が真実」へ</h3>
+          <p>
+            GitHubは公式ブログで、この転換を「コードが真実の源である」という前提から「意図（仕様）が真実の源である」という前提への移行だと説明しています。AIによって仕様が実行可能（executable）になったことで、ドキュメントの重要性が増したのではなく、仕様そのものが「何が作られるか」を直接決定するようになった、というのがその要点です。<a
+              class="cite"
+              href="#ref7"
+              >[7]</a
+            >
+          </p>
+          <p class="footnote" style="text-align: left">
+            出典（第2章）：<a class="cite" href="#ref1">[1]</a> <a class="cite" href="#ref2">[2]</a>
+            <a class="cite" href="#ref6">[6]</a> <a class="cite" href="#ref7">[7]</a>
+          </p>
+        </section>
+
+        <section id="ch3">
+          <h2>
+            <span class="num">3</span>成熟度モデル：Spec-first / Spec-anchored / Spec-as-source
+          </h2>
+          <p>
+            SDDという言葉は急速に広まった一方、実践のレベルはツールによって大きく異なります。ThoughtworksのBirgitta
+            Böckelerは、Martin
+            FowlerのWebサイトに掲載した分析記事の中で、SDDを3段階の成熟度として整理しました。これは2026年のarXiv論文「From
+            Code to
+            Contract」でもほぼ同じ枠組みが踏襲されており、業界で広く参照されるモデルとなっています。<a
+              class="cite"
+              href="#ref8"
+              >[8]</a
+            ><a class="cite" href="#ref9">[9]</a><a class="cite" href="#ref10">[10]</a>
+          </p>
+
+          <script type="text/plain" data-mermaid-target="dg-ladder">
+            flowchart LR
+                L1["Spec-first: 使い捨てのSpec"]:::c1 --> L2["Spec-anchored: 生きた文書として保守"]:::c2 --> L3["Spec-as-source: Specのみ人間が編集"]:::c3
+                classDef c1 fill:#3b2f6b,stroke:#c9bdf5,color:#e4defa
+                classDef c2 fill:#134e4a,stroke:#99f0e3,color:#d1faf3
+                classDef c3 fill:#5c2a1f,stroke:#ffb199,color:#ffe3d9
+          </script>
+          <pre class="mermaid" id="dg-ladder"></pre>
+          <p class="diagram-caption">図3-1. SDDの3段階成熟度モデル（Böckeler, 2026）</p>
+
+          <table>
+            <caption>
+              表3-1. 成熟度モデルの各段階
+            </caption>
+            <thead>
+              <tr>
+                <th>段階</th>
+                <th>概要</th>
+                <th>適したシーン</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Spec-first</td>
+                <td>
+                  良く練られた仕様を最初に書き、1回のタスクのAI支援開発に使う。仕様はその後破棄・放置されがち
+                </td>
+                <td>単発の機能追加、小規模な変更</td>
+              </tr>
+              <tr>
+                <td>Spec-anchored</td>
+                <td>仕様を機能の進化とともに保守し続け、「生きたドキュメント」として扱う</td>
+                <td>チーム開発、継続的なプロダクト開発</td>
+              </tr>
+              <tr>
+                <td>Spec-as-source</td>
+                <td>
+                  仕様が唯一の編集対象となり、人間はコードを直接編集しない（コードは自動生成専用）
+                </td>
+                <td>高い一貫性が求められる大規模システム（まだ発展途上）</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="callout tip">
+            <span class="icon">
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="12" cy="12" r="9"></circle>
+                <path d="M12 16v-5"></path>
+                <path d="M12 8h.01"></path>
+              </svg>
+            </span>
+            <p>
+              Böckelerは、この3段階を混同しないことが重要だと述べています。GitHub Spec
+              KitやKiroの多くの実践は「Spec-first」〜「Spec-anchored」の間にあり、「Spec-as-source」を徹底しているのはTesslのような一部のツールに限られます。<a
+                class="cite"
+                href="#ref8"
+                >[8]</a
+              >
+            </p>
+          </div>
+          <p class="footnote" style="text-align: left">
+            出典（第3章）：<a class="cite" href="#ref8">[8]</a> <a class="cite" href="#ref9">[9]</a>
+            <a class="cite" href="#ref10">[10]</a>
+          </p>
+        </section>
+
+        <section id="ch4">
+          <h2><span class="num">4</span>主要ツールエコシステム（2026年7月時点）</h2>
+          <p>
+            2025年後半から2026年にかけて、主要なAIコーディングツールの多くが独自のSDD実装を発表しました。<a
+              class="cite"
+              href="#ref5"
+              >[5]</a
+            ><a class="cite" href="#ref11">[11]</a>
+          </p>
+          <table>
+            <caption>
+              表4-1. 主要SDDツールの比較
+            </caption>
+            <thead>
+              <tr>
+                <th>ツール</th>
+                <th>提供元</th>
+                <th>中核ワークフロー</th>
+                <th>特徴</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>GitHub Spec Kit</td>
+                <td>GitHub</td>
+                <td>constitution → specify → plan → tasks → analyze → implement</td>
+                <td>
+                  MITライセンスのOSS。30以上のAIコーディングエージェント（Claude
+                  Code、Copilot、Gemini CLI等）に対応 <a class="cite" href="#ref12">[12]</a
+                  ><a class="cite" href="#ref13">[13]</a>
+                </td>
+              </tr>
+              <tr>
+                <td>AWS Kiro</td>
+                <td>Amazon</td>
+                <td>Requirements（EARS記法）→ Design → Tasks → Execution</td>
+                <td>
+                  VS
+                  Codeベースの専用IDE。保存時に自動でlint/test/セキュリティスキャンを走らせる「Hooks」機能を搭載
+                  <a class="cite" href="#ref14">[14]</a><a class="cite" href="#ref15">[15]</a>
+                </td>
+              </tr>
+              <tr>
+                <td>Claude Code</td>
+                <td>Anthropic</td>
+                <td>CLAUDE.md（憲法）→ Plan Mode → PLAN.md → Tasks → Subagentレビュー</td>
+                <td>
+                  SDDの要素をネイティブ機能として内包。CLAUDE.mdは「advisory（助言的）」、hooksは「deterministic（決定的）」という設計思想
+                  <a class="cite" href="#ref16">[16]</a><a class="cite" href="#ref17">[17]</a>
+                </td>
+              </tr>
+              <tr>
+                <td>Tessl</td>
+                <td>Tessl</td>
+                <td>Spec-as-source徹底</td>
+                <td>
+                  1対1のspec-to-codeマッピングを目指す最も急進的な実装。生成コードには編集禁止マーカーを付与（2026年時点でベータ）<a
+                    class="cite"
+                    href="#ref8"
+                    >[8]</a
+                  >
+                </td>
+              </tr>
+              <tr>
+                <td>Google Conductor / Antigravity</td>
+                <td>Google</td>
+                <td>永続的でバージョン管理されたMarkdownによるコンテキスト共有</td>
+                <td>
+                  元はGemini CLI拡張機能。2026年7月にプラグイン形式へ進化しAntigravityに対応
+                  <a class="cite" href="#ref18">[18]</a>
+                </td>
+              </tr>
+              <tr>
+                <td>OpenSpec / BMAD-METHOD</td>
+                <td>OSSコミュニティ</td>
+                <td>軽量なSDDフレームワーク</td>
+                <td>
+                  ツールによって採用の伸びに大きな差があり、半年で800%超成長したものもあれば緩やかな成長にとどまるものもある
+                  <a class="cite" href="#ref19">[19]</a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="callout tip">
+            <span class="icon">
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="12" cy="12" r="9"></circle>
+                <path d="M12 16v-5"></path>
+                <path d="M12 8h.01"></path>
+              </svg>
+            </span>
+            <p>
+              <strong>選び方の目安</strong
+              >：ポータビリティ（特定エージェントに縛られない）を重視するならGitHub Spec
+              Kit、IDE統合の完成度を重視するならAWS
+              Kiro、ターミナル中心の開発でCLAUDE.mdによる規約統合を重視するならClaude
+              Codeが出発点として挙げられています。<a class="cite" href="#ref11">[11]</a
+              ><a class="cite" href="#ref16">[16]</a>
+            </p>
+          </div>
+          <p class="footnote" style="text-align: left">
+            出典（第4章）：<a class="cite" href="#ref5">[5]</a> <a class="cite" href="#ref8">[8]</a>
+            <a class="cite" href="#ref11">[11]</a> <a class="cite" href="#ref12">[12]</a>
+            <a class="cite" href="#ref13">[13]</a> <a class="cite" href="#ref14">[14]</a>
+            <a class="cite" href="#ref15">[15]</a> <a class="cite" href="#ref16">[16]</a>
+            <a class="cite" href="#ref17">[17]</a> <a class="cite" href="#ref18">[18]</a>
+            <a class="cite" href="#ref19">[19]</a>
+          </p>
+        </section>
+
+        <section id="ch5">
+          <h2><span class="num">5</span>要件記述の基盤技術：EARS記法</h2>
+          <p>
+            多くのSDDツール（特にAWS Kiro）が要件定義部分に採用しているのが「EARS（Easy Approach to
+            Requirements Syntax）」という記法です。<a class="cite" href="#ref14">[14]</a
+            ><a class="cite" href="#ref15">[15]</a>
+          </p>
+
+          <h3>5.1 歴史</h3>
+          <p>
+            EARSは2009年、Rolls-Royce社のAlistair
+            Mavinらが、航空機エンジン制御システムの耐空性規則を分析する中で開発し、同年のIEEE
+            International Requirements Engineering Conference（RE'09）で発表されました。<a
+              class="cite"
+              href="#ref20"
+              >[20]</a
+            ><a class="cite" href="#ref21">[21]</a>
+            自然言語で書かれた要件が抱えがちな「曖昧さ・冗長さ・矛盾・実装依存の記述」といった問題を、少数のキーワードと一貫した節の順序によって軽減することを目的としています。<a
+              class="cite"
+              href="#ref20"
+              >[20]</a
+            ><a class="cite" href="#ref21">[21]</a>
+            Airbus、Bosch、Dyson、Honeywell、Intel、NASA、Siemens等、航空宇宙・自動車業界を中心に長年採用されてきた実績があり、2025年以降はAWS
+            KiroをはじめとするAI仕様駆動開発ツールに組み込まれる形で新たな注目を集めています。<a
+              class="cite"
+              href="#ref21"
+              >[21]</a
+            >
+          </p>
+
+          <h3>5.2 基本構文</h3>
+          <pre><code>While &lt;事前条件（任意）&gt;, When &lt;トリガー（任意）&gt;, the &lt;システム名&gt; shall &lt;システムの応答&gt;</code></pre>
+
+          <table>
+            <caption>
+              表5-1. EARSの要件タイプとパターン例
+            </caption>
+            <thead>
+              <tr>
+                <th>要件タイプ</th>
+                <th>パターン例</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Ubiquitous（恒常的）</td>
+                <td>The system shall encrypt all stored passwords.</td>
+              </tr>
+              <tr>
+                <td>Event-driven（イベント駆動）</td>
+                <td>
+                  When the user submits the login form, the system shall validate the credentials
+                  within 2 seconds.
+                </td>
+              </tr>
+              <tr>
+                <td>Unwanted behavior（望ましくない挙動）</td>
+                <td>
+                  If the authentication fails 5 times, then the system shall lock the account for 15
+                  minutes.
+                </td>
+              </tr>
+              <tr>
+                <td>State-driven（状態駆動）</td>
+                <td>While the account is locked, the system shall reject all login attempts.</td>
+              </tr>
+              <tr>
+                <td>Optional feature（オプション機能）</td>
+                <td>
+                  Where two-factor authentication is enabled, the system shall require a one-time
+                  code after password verification.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <p>
+            初学者は、まず「Event-driven」と「Unwanted
+            behavior」の2パターンだけでも意識して仕様を書くと、曖昧な要件がかなり減ります。
+          </p>
+          <p class="footnote" style="text-align: left">
+            出典（第5章）：<a class="cite" href="#ref14">[14]</a>
+            <a class="cite" href="#ref15">[15]</a> <a class="cite" href="#ref20">[20]</a>
+            <a class="cite" href="#ref21">[21]</a>
+          </p>
+        </section>
+
+        <section id="ch6">
+          <h2><span class="num">6</span>ステップバイステップ・ワークフロー実践</h2>
+
+          <h3>6.1 ツールに共通する一般モデル</h3>
+          <p>ツールごとに呼び方は異なりますが、根底にある流れはほぼ共通しています。</p>
+
+          <script type="text/plain" data-mermaid-target="dg-general">
+            flowchart LR
+                A["Constitution（指針）"]:::t --> B["Requirements（要件）"]:::t
+                B --> C["Design / Plan（設計）"]:::t
+                C --> D["Tasks（タスク分解）"]:::t
+                D --> E["Implementation（実装）"]:::t
+                E --> F["Verification（検証）"]:::t
+                F -->|"仕様変更・差分"| B
+                classDef t fill:#134e4a,stroke:#99f0e3,color:#d1faf3
+          </script>
+          <pre class="mermaid" id="dg-general"></pre>
+          <p class="diagram-caption">図6-1. SDDの一般的なライフサイクル</p>
+
+          <p>
+            各フェーズの間には必ず人間によるレビュー（承認ゲート）を挟むことが推奨されています。AWS
+            Kiroのドキュメントでも「要件承認後に設計へ、設計承認後にタスクへ」と各段階の間に確認ステップを置く設計になっています。<a
+              class="cite"
+              href="#ref14"
+              >[14]</a
+            ><a class="cite" href="#ref22">[22]</a>
+          </p>
+
+          <h3>6.2 GitHub Spec Kitの具体的なコマンドフロー</h3>
+
+          <script type="text/plain" data-mermaid-target="dg-speckit">
+            flowchart LR
+                C0["/speckit.constitution"]:::p --> C1["/speckit.specify"]:::p --> C2["/speckit.plan"]:::p --> C3["/speckit.tasks"]:::p --> C4["/speckit.analyze"]:::p --> C5["/speckit.implement"]:::p
+                classDef p fill:#3b2f6b,stroke:#c9bdf5,color:#e4defa
+          </script>
+          <pre class="mermaid" id="dg-speckit"></pre>
+          <p class="diagram-caption">図6-2. GitHub Spec Kitのコマンドフロー</p>
+
+          <p>
+            <code>constitution</code>ファイルは
+            <code>.specify/memory/constitution.md</code>
+            に保存され、プロジェクト固有の非交渉的なルール（禁止事項・必須事項）を定義します。この構造は9つの条項（nine-article
+            structure）で構成され、プロジェクトごとに内容をカスタマイズできる形になっています。<a
+              class="cite"
+              href="#ref23"
+              >[23]</a
+            ><a class="cite" href="#ref24">[24]</a>
+          </p>
+
+          <h3>6.3 AWS Kiroの3ドキュメント構成</h3>
+
+          <script type="text/plain" data-mermaid-target="dg-kiro">
+            flowchart LR
+                K1["自然言語のプロンプト"]:::k --> K2["requirements.md（EARS記法）"]:::k --> K3["design.md（技術設計）"]:::k --> K4["tasks.md（実装タスク）"]:::k --> K5["実装 + Hooks（lint/test/セキュリティ）"]:::k
+                classDef k fill:#5c2a1f,stroke:#ffb199,color:#ffe3d9
+          </script>
+          <pre class="mermaid" id="dg-kiro"></pre>
+          <p class="diagram-caption">図6-3. AWS Kiroの3ドキュメント構成</p>
+
+          <p>
+            Kiroでは各タスク完了後に自動でテストを実行し、要件を満たしているかを検証する仕組みが組み込まれています。また「Run
+            all
+            Tasks」機能を使うと、依存関係のないタスクを並行して実行する「Wave」単位の実行が可能です。<a
+              class="cite"
+              href="#ref22"
+              >[22]</a
+            >
+          </p>
+          <p class="footnote" style="text-align: left">
+            出典（第6章）：<a class="cite" href="#ref14">[14]</a>
+            <a class="cite" href="#ref22">[22]</a> <a class="cite" href="#ref23">[23]</a>
+            <a class="cite" href="#ref24">[24]</a>
+          </p>
+        </section>
+
+        <section id="ch7">
+          <h2><span class="num">7</span>良い仕様（スペック）の書き方 — 初学者向け5原則</h2>
+          <p>
+            Google Chromeのエンジニアリングリーダーとして知られるAddy Osmaniは、O'Reilly
+            Radarに寄稿した記事の中で、GitHub上の2,500件以上のエージェント設定ファイル分析結果を踏まえた「良い仕様を書くための5原則」を提示しています。<a
+              class="cite"
+              href="#ref25"
+              >[25]</a
+            ><a class="cite" href="#ref26">[26]</a><a class="cite" href="#ref27">[27]</a>
+          </p>
+
+          <h3>原則1：目標志向で書く（Keep it goal-oriented）</h3>
+          <p>
+            仕様の冒頭は「何を（What）」「なぜ（Why）」に集中し、実装の「どうやって（How）」は後回しにします。ユーザーストーリーと同じ要領で「誰が」「何を必要としているか」「成功とは何か」を明確にします。<a
+              class="cite"
+              href="#ref26"
+              >[26]</a
+            >
+          </p>
+
+          <h3>原則2：構造化されたドキュメントとして書く</h3>
+          <p>
+            思いつきのメモの寄せ集めではなく、PRD（Product Requirements Document）やSRS（Software
+            Requirements Specification）のように、明確なセクションを持つ文書として仕様を扱います。<a
+              class="cite"
+              href="#ref26"
+              >[26]</a
+            >
+          </p>
+
+          <h3>原則3：多く書きすぎない（instruction curseへの注意）</h3>
+          <p>
+            Stanford発の研究では、プロンプトに指示を詰め込むほどモデルが各指示に従う精度が低下する現象（いわゆる「curse
+            of
+            instructions」）が確認されています。10個の詳細ルールを並べると、モデルは最初の数個には従っても後半を見落としがちになります。したがって「長い仕様」ではなく「賢く整理された仕様」を目指すべきだとOsmaniは指摘しています。<a
+              class="cite"
+              href="#ref27"
+              >[27]</a
+            >
+          </p>
+
+          <h3>原則4：3段階の境界線（Always / Ask first / Never）を設ける</h3>
+          <p>
+            単純な「やってはいけないことリスト」よりも、3段階の境界システムの方がエージェントに明確な行動指針を与えられます。<a
+              class="cite"
+              href="#ref26"
+              >[26]</a
+            ><a class="cite" href="#ref27">[27]</a>
+          </p>
+
+          <script type="text/plain" data-mermaid-target="dg-tiers">
+            flowchart TD
+                Q["エージェントが次のアクションを取ろうとしている"]:::neutral --> A{"影響度は？"}:::neutral
+                A -->|"低リスク・定型作業"| G["Always do: 確認なしで実行"]:::ok
+                A -->|"中〜高リスクな変更"| H["Ask first: 承認を待つ"]:::warn
+                A -->|"破壊的・不可逆な操作"| N["Never do: 常に禁止"]:::bad
+                classDef neutral fill:#28303d,stroke:#cbd3de,color:#eef1f5
+                classDef ok fill:#0f3d28,stroke:#8be8bd,color:#dbf8e8
+                classDef warn fill:#4a3208,stroke:#ffd580,color:#fff2d6
+                classDef bad fill:#4a1414,stroke:#ffaaaa,color:#ffe0e0
+          </script>
+          <pre class="mermaid" id="dg-tiers"></pre>
+          <p class="diagram-caption">図7-1. 3段階の境界線による判断フロー</p>
+
+          <table>
+            <caption>
+              表7-1. 3段階境界線の例
+            </caption>
+            <thead>
+              <tr>
+                <th>区分</th>
+                <th>例</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Always do</td>
+                <td>コミット前に必ずテストを実行する／命名規約に従う</td>
+              </tr>
+              <tr>
+                <td>Ask first</td>
+                <td>データベーススキーマの変更前に確認する／新しい依存関係の追加前に確認する</td>
+              </tr>
+              <tr>
+                <td>Never do</td>
+                <td>シークレットやAPIキーをコミットしない／node_modulesやvendor配下を編集しない</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h3>原則5：自己検証を組み込む（self-verification / LLM-as-a-Judge）</h3>
+          <p>
+            実装後に「仕様の各項目を満たしているか確認し、満たしていない項目を列挙せよ」とエージェント自身に確認させる自己監査のステップを仕様に組み込むと、抜け漏れの検出率が上がります。コードスタイルや可読性のような自動テストで測りにくい観点については、別のエージェント（あるいは別プロンプト）に出力をレビューさせる「LLM-as-a-Judge」パターンも有効とされています。<a
+              class="cite"
+              href="#ref26"
+              >[26]</a
+            ><a class="cite" href="#ref27">[27]</a>
+          </p>
+
+          <div class="callout tip">
+            <span class="icon">
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="12" cy="12" r="9"></circle>
+                <path d="M12 16v-5"></path>
+                <path d="M12 8h.01"></path>
+              </svg>
+            </span>
+            <p>
+              Osmaniはこれらの原則の裏付けとして、開発者のSimon
+              Willisonが、コーディングエージェントから良い結果を引き出す感覚は人間のジュニアエンジニアをマネジメントする感覚に近いと述べていることも紹介しています。<a
+                class="cite"
+                href="#ref27"
+                >[27]</a
+              >
+            </p>
+          </div>
+          <p class="footnote" style="text-align: left">
+            出典（第7章）：<a class="cite" href="#ref25">[25]</a>
+            <a class="cite" href="#ref26">[26]</a> <a class="cite" href="#ref27">[27]</a>
+          </p>
+        </section>
+
+        <section id="ch8">
+          <h2><span class="num">8</span>Claude Codeにおける実践</h2>
+          <p>
+            Anthropic自身が公開している「Claude Code: Best practices for agentic
+            coding」では、CLAUDE.mdを活用したコンテキスト管理や、実装前に計画を立てる重要性が解説されています。<a
+              class="cite"
+              href="#ref16"
+              >[16]</a
+            >
+          </p>
+
+          <h3>8.1 CLAUDE.md ＝ プロジェクトの「憲法」</h3>
+          <p>
+            CLAUDE.mdはプロジェクトルートに置かれ、セッション開始時に自動的にコンテキストへ読み込まれるMarkdownファイルです。コーディング規約・アーキテクチャ上の決定事項・優先ライブラリ・レビューチェックリストなどを記述します。<a
+              class="cite"
+              href="#ref16"
+              >[16]</a
+            ><a class="cite" href="#ref28">[28]</a>
+            ただし、CLAUDE.mdの指示は「advisory（助言的）」であり、確率的に従われるものである点に注意が必要です。長すぎるCLAUDE.mdはかえって指示追従の精度を下げるため、「この行を削除するとClaudeがミスをするか」を基準に定期的に刈り込むことが推奨されています。<a
+              class="cite"
+              href="#ref17"
+              >[17]</a
+            >
+          </p>
+
+          <h3>8.2 Plan ModeとSubagentレビューのループ</h3>
+
+          <script type="text/plain" data-mermaid-target="dg-claudecode">
+            flowchart LR
+                P1["Explore（Plan Mode）"]:::pk --> P2["Plan（PLAN.md作成）"]:::pk --> P3["Implement"]:::pk --> P4["Subagent Review"]:::pk
+                P4 -->|"ギャップを検出"| P3
+                P4 -->|"合格・証拠を提示"| P5["Commit"]:::pk
+                classDef pk fill:#5c1f44,stroke:#f7b8dd,color:#fde3f2
+          </script>
+          <pre class="mermaid" id="dg-claudecode"></pre>
+          <p class="diagram-caption">
+            図8-1. Claude CodeにおけるPlan Mode〜Subagentレビューのループ
+          </p>
+
+          <p>
+            Anthropicの実践では、実装が完了したという「主張」をそのまま信じるのではなく、テスト出力・実行コマンドとその結果・スクリーンショットなど「証拠（evidence）」を提示させることが推奨されています。証拠を確認する方が、検証をゼロからやり直すより速いためです。<a
+              class="cite"
+              href="#ref17"
+              >[17]</a
+            >
+          </p>
+
+          <h3>8.3 Hooksによる決定的な強制</h3>
+          <p>
+            CLAUDE.mdの指示が確率的（advisory）であるのに対し、Hooksはスクリプトを自動実行する決定的（deterministic）な仕組みであり、アクションを確実に強制できます。CLAUDE.mdによる注意喚起だけでは不十分になった場合、恒久的な対策としてHooksやSkillsへ制御を移すことが推奨されています。<a
+              class="cite"
+              href="#ref17"
+              >[17]</a
+            >
+          </p>
+
+          <div class="callout warn">
+            <span class="icon">
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M12 9v4"></path>
+                <path
+                  d="M10.4 3.9 2.7 17.1a1.7 1.7 0 0 0 1.5 2.6h15.6a1.7 1.7 0 0 0 1.5-2.6L13.6 3.9a1.7 1.7 0 0 0-3.2 0Z"
+                ></path>
+                <path d="M12 16.2h.01"></path>
+              </svg>
+            </span>
+            <p>
+              Anthropicの社内チームの報告によれば、詳細な指示なしでClaude
+              Codeが小〜中規模のPRを一発で正しく仕上げる成功率はおよそ3分の1程度にとどまるとされています。1つのタスクに20の意思決定判断が含まれ、各判断の的中率を80%と仮定すると、20個すべてを事前ガイドなしで正しく判断できる確率は0.8の20乗、つまり約1%にまで下がる計算になります。レビュー済みの仕様を用意することは、Claudeが下すべきでない判断そのものを事前に排除する効果があるといえます。<a
+                class="cite"
+                href="#ref29"
+                >[29]</a
+              >
+            </p>
+          </div>
+          <p class="footnote" style="text-align: left">
+            出典（第8章）：<a class="cite" href="#ref16">[16]</a>
+            <a class="cite" href="#ref17">[17]</a> <a class="cite" href="#ref28">[28]</a>
+            <a class="cite" href="#ref29">[29]</a>
+          </p>
+        </section>
+
+        <section id="ch9">
+          <h2><span class="num">9</span>ベストプラクティス・チェックリスト</h2>
+          <table class="checklist-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>チェック項目</th>
+                <th>補足</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td>プロジェクトの「憲法（Constitution）」を最初に定義したか</td>
+                <td>
+                  非交渉的なルール・技術スタック・禁止事項を明文化
+                  <a class="cite" href="#ref23">[23]</a>
+                </td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>仕様は「What/Why」から始め、「How」は後段に回したか</td>
+                <td>
+                  実装詳細を早期に混ぜるとAIの視野が狭まる <a class="cite" href="#ref26">[26]</a>
+                </td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td>受け入れ基準をEARS記法などの構造化された形式で書いたか</td>
+                <td>
+                  曖昧さ・矛盾を減らせる <a class="cite" href="#ref14">[14]</a
+                  ><a class="cite" href="#ref20">[20]</a>
+                </td>
+              </tr>
+              <tr>
+                <td>4</td>
+                <td>Always / Ask first / Never の3段階境界を設定したか</td>
+                <td>単純な禁止リストより行動指針が明確 <a class="cite" href="#ref26">[26]</a></td>
+              </tr>
+              <tr>
+                <td>5</td>
+                <td>仕様は詰め込みすぎず、モジュール単位に分割したか</td>
+                <td>curse of instructionsを回避 <a class="cite" href="#ref27">[27]</a></td>
+              </tr>
+              <tr>
+                <td>6</td>
+                <td>各フェーズ（要件→設計→タスク→実装）の間に人間の承認ゲートを設けたか</td>
+                <td>
+                  Kiro・Spec Kitとも共通の設計原則 <a class="cite" href="#ref14">[14]</a
+                  ><a class="cite" href="#ref23">[23]</a>
+                </td>
+              </tr>
+              <tr>
+                <td>7</td>
+                <td>実装後、仕様との差分を自己検証させる仕組みを入れたか</td>
+                <td>
+                  LLM-as-a-Judgeパターンの活用 <a class="cite" href="#ref26">[26]</a
+                  ><a class="cite" href="#ref27">[27]</a>
+                </td>
+              </tr>
+              <tr>
+                <td>8</td>
+                <td>「証拠（テスト結果・実行ログ）」の提示を求めているか</td>
+                <td>主張ではなく証拠でレビューする <a class="cite" href="#ref17">[17]</a></td>
+              </tr>
+              <tr>
+                <td>9</td>
+                <td>
+                  重要な強制事項はCLAUDE.md（advisory）ではなくHooks（deterministic）に移したか
+                </td>
+                <td>恒久対策として有効 <a class="cite" href="#ref17">[17]</a></td>
+              </tr>
+              <tr>
+                <td>10</td>
+                <td>プロジェクトの規模・目的に見合ったSDDの成熟度を選んだか</td>
+                <td>オーバーヘッドと得られる制御のバランス <a class="cite" href="#ref8">[8]</a></td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section id="ch10">
+          <h2><span class="num">10</span>批判的視点と限界</h2>
+          <p>
+            SDDは万能薬ではありません。Böckelerは、GitHub Spec Kit、AWS
+            Kiro、Tesslの3ツールを実際に評価した記事の中で、以下のような課題を指摘しています。<a
+              class="cite"
+              href="#ref8"
+              >[8]</a
+            >
+          </p>
+          <ul>
+            <li>
+              <strong>レビュー負荷の増大</strong>：特にSpec
+              Kitは、1つの仕様に対して大量の反復的なMarkdownファイルを生成するため、レビューが過大になり、場合によっては通常のコードレビューの方が現実的になることがある。
+            </li>
+            <li>
+              <strong>「制御している」という錯覚</strong
+              >：複雑な指示に対してAIエージェントが一部を無視したり、逆に過剰に適用したりする挙動が観察されており、仕様を書けば完全に制御できるという前提には注意が必要。
+            </li>
+            <li>
+              <strong>小規模タスクへの不適合</strong
+              >：軽微なバグ修正のような小さな作業には、SDDの手続きがオーバーヘッドになりやすい。
+            </li>
+            <li>
+              <strong>モデル駆動開発（MDD）との歴史的な類似</strong
+              >：「Spec-as-source」という野心は、過去に十分な成果を上げられなかったモデル駆動開発の理想と重なる部分があり、LLMの非決定性がMDDの硬直性の問題をむしろ悪化させる可能性がある。
+            </li>
+            <li>
+              <strong>用語の希薄化</strong
+              >：「Spec」という言葉が単なる「詳細なプロンプト」の同義語として使われるケースが増えており、手法が確立する前に意味が拡散しつつある。
+            </li>
+          </ul>
+          <div class="callout danger">
+            <span class="icon">
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="12" cy="12" r="9"></circle>
+                <path d="M12 8v5"></path>
+                <path d="M12 16h.01"></path>
+              </svg>
+            </span>
+            <p>
+              これらを踏まえると、SDDは「常に必要な儀式」ではなく、<strong>プロジェクトの複雑さ・チーム規模・保守期間に応じて適用レベルを選ぶための道具</strong>として捉えるのが実践的です。ソロでの探索的なプロトタイピングであれば軽量なvibe
+              codingのままで構わず、本番運用・複数チーム・規制対応が絡む場面でSpec-anchored以上の厳密さを導入する、という使い分けが妥当とされています。<a
+                class="cite"
+                href="#ref8"
+                >[8]</a
+              ><a class="cite" href="#ref30">[30]</a>
+            </p>
+          </div>
+          <p class="footnote" style="text-align: left">
+            出典（第10章）：<a class="cite" href="#ref8">[8]</a>
+            <a class="cite" href="#ref30">[30]</a>
+          </p>
+        </section>
+
+        <section id="ch11">
+          <h2><span class="num">11</span>2026年7月時点の最新動向</h2>
+          <ul>
+            <li>
+              <strong>Google Conductorのプラグイン化</strong>：2026年7月16日付のGoogle Developers
+              Blogによれば、Gemini CLI拡張として始まったConductorが「Conductor
+              Plugin」として進化し、Skills・Rules・MCPサーバー・Hooksを1つのパッケージにまとめられるようになりました。あわせて新しいエージェント基盤「Antigravity」への対応も発表されています。<a
+                class="cite"
+                href="#ref18"
+                >[18]</a
+              >
+            </li>
+            <li>
+              <strong>AWS Kiroの立ち位置強化</strong>：Amazon Q
+              DeveloperがKiroへ統合される形でのサポート終了（新規ユーザー向けは2027年4月30日終了予定）が示されており、AWSは開発者向けAI投資をKiroに集約する方針を明確にしています。<a
+                class="cite"
+                href="#ref15"
+                >[15]</a
+              >
+            </li>
+            <li>
+              <strong>教育面での定着</strong>：DeepLearning.AIが2025年後半に、Sandeep
+              Dinesh氏を講師とする専門コース「Spec-Driven Development with Coding
+              Agents」を開講しており、実験的な手法から主流の実践へと移行したことを示す一つの指標とされています。<a
+                class="cite"
+                href="#ref31"
+                >[31]</a
+              >
+            </li>
+            <li>
+              <strong>業界での評価の広がり</strong>：Thoughtworks・Martin
+              Fowler・GitHub・Amazonなど複数の独立した情報源が2025〜2026年にかけてSDDを推奨する立場を示しており、ThoughtworksのTechnology
+              Radarでも採用を検討すべき技術として取り上げられています。<a class="cite" href="#ref31"
+                >[31]</a
+              >
+            </li>
+            <li>
+              <strong>OSSフレームワーク間の採用格差</strong
+              >：OpenSpecやBMAD-METHODなど軽量なOSS実装の間でも、採用の伸び方には大きな差が生じており、半年間で800%を超える成長を見せたものもあれば、緩やかな成長にとどまるものもあると報告されています。<a
+                class="cite"
+                href="#ref19"
+                >[19]</a
+              >
+            </li>
+          </ul>
+          <p class="footnote" style="text-align: left">
+            出典（第11章）：<a class="cite" href="#ref15">[15]</a>
+            <a class="cite" href="#ref18">[18]</a> <a class="cite" href="#ref19">[19]</a>
+            <a class="cite" href="#ref31">[31]</a>
+          </p>
+        </section>
+
+        <section id="ch12">
+          <h2><span class="num">12</span>まとめ</h2>
+          <p>
+            仕様駆動開発（SDD）は、「AIエージェントがコードを書く時代において、人間が生み出す最も価値の高い成果物は仕様そのものである」という認識のもとに生まれた実践です。GitHub
+            Spec Kit・AWS Kiro・Claude
+            Codeなど主要ツールはそれぞれ異なるワークフローを持ちますが、根底にある「Constitution／Steering
+            → Requirements → Design/Plan → Tasks → Implementation →
+            Verification」という流れは共通しています。
+          </p>
+          <p>初学者がまず身につけるべきは、次の3点に集約されます。</p>
+          <ol>
+            <li>
+              仕様は「What/Why」から書き始め、EARS記法のような構造化された形式で受け入れ基準を明示すること
+            </li>
+            <li>仕様を詰め込みすぎず、Always/Ask first/Neverの3段階で境界を設けること</li>
+            <li>実装は必ず人間のレビュー（承認ゲート）を挟み、「証拠」に基づいて検証すること</li>
+          </ol>
+          <p>
+            一方で、SDDはレビュー負荷の増大や小規模タスクへの不適合といった限界も指摘されています。プロジェクトの規模・重要度に応じて、Spec-first・Spec-anchored・Spec-as-sourceのどの成熟度で実践するかを選ぶことが、実務での成功の鍵となります。
+          </p>
+        </section>
+
+        <div class="footer">
+          <section id="refs">
+            <h2><span class="num">13</span>参考文献・出典一覧</h2>
+            <div class="refs-grid">
+              <div class="ref-card" id="ref1">
+                <span class="ref-num">1</span>
+                <div class="ref-body">
+                  <p class="ref-source">Augment Code</p>
+                  <p class="ref-title">
+                    6 Best Spec-Driven Development Tools for AI Coding in 2026
+                  </p>
+                  <a
+                    class="ref-link"
+                    href="https://www.augmentcode.com/tools/best-spec-driven-development-tools"
+                    target="_blank"
+                    rel="noopener"
+                    >augmentcode.com/tools/best-spec-driven-development-tools<svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                      <path d="M15 3h6v6"></path>
+                      <path d="M10 14 21 3"></path></svg
+                  ></a>
+                </div>
+              </div>
+              <div class="ref-card" id="ref2">
+                <span class="ref-num">2</span>
+                <div class="ref-body">
+                  <p class="ref-source">GitHub Blog</p>
+                  <p class="ref-title">
+                    Spec-driven development with AI: Get started with a new open source toolkit
+                  </p>
+                  <a
+                    class="ref-link"
+                    href="https://github.blog/ai-and-ml/generative-ai/spec-driven-development-with-ai-get-started-with-a-new-open-source-toolkit/"
+                    target="_blank"
+                    rel="noopener"
+                    >github.blog<svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                      <path d="M15 3h6v6"></path>
+                      <path d="M10 14 21 3"></path></svg
+                  ></a>
+                </div>
+              </div>
+              <div class="ref-card" id="ref3">
+                <span class="ref-num">3</span>
+                <div class="ref-body">
+                  <p class="ref-source">DEV Community</p>
+                  <p class="ref-title">
+                    Spec-Driven Development in 2026: What It Is, the Tooling, and How Teams Actually
+                    Use It
+                  </p>
+                  <a
+                    class="ref-link"
+                    href="https://dev.to/krlz/spec-driven-development-in-2026-what-it-is-the-tooling-and-how-teams-actually-use-it-2fk2"
+                    target="_blank"
+                    rel="noopener"
+                    >dev.to/krlz<svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                      <path d="M15 3h6v6"></path>
+                      <path d="M10 14 21 3"></path></svg
+                  ></a>
+                </div>
+              </div>
+              <div class="ref-card" id="ref4">
+                <span class="ref-num">4</span>
+                <div class="ref-body">
+                  <p class="ref-source">Augment Code</p>
+                  <p class="ref-title">What Is Spec-Driven Development? A Complete Guide</p>
+                  <a
+                    class="ref-link"
+                    href="https://www.augmentcode.com/guides/what-is-spec-driven-development"
+                    target="_blank"
+                    rel="noopener"
+                    >augmentcode.com/guides/what-is-spec-driven-development<svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                      <path d="M15 3h6v6"></path>
+                      <path d="M10 14 21 3"></path></svg
+                  ></a>
+                </div>
+              </div>
+              <div class="ref-card" id="ref5">
+                <span class="ref-num">5</span>
+                <div class="ref-body">
+                  <p class="ref-source">BCMS</p>
+                  <p class="ref-title">Spec-Driven Development (SDD): The Definitive 2026 Guide</p>
+                  <a
+                    class="ref-link"
+                    href="https://thebcms.com/blog/spec-driven-development"
+                    target="_blank"
+                    rel="noopener"
+                    >thebcms.com/blog/spec-driven-development<svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                      <path d="M15 3h6v6"></path>
+                      <path d="M10 14 21 3"></path></svg
+                  ></a>
+                </div>
+              </div>
+              <div class="ref-card" id="ref6">
+                <span class="ref-num">6</span>
+                <div class="ref-body">
+                  <p class="ref-source">Sean Grove</p>
+                  <p class="ref-title">The New Code（AI Engineer World's Fair, 2025）文字起こし</p>
+                  <a
+                    class="ref-link"
+                    href="https://lawwu.github.io/transcripts/8rABwKRsec4.html"
+                    target="_blank"
+                    rel="noopener"
+                    >lawwu.github.io/transcripts（動画: youtube.com/watch?v=8rABwKRsec4）<svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                      <path d="M15 3h6v6"></path>
+                      <path d="M10 14 21 3"></path></svg
+                  ></a>
+                </div>
+              </div>
+              <div class="ref-card" id="ref7">
+                <span class="ref-num">7</span>
+                <div class="ref-body">
+                  <p class="ref-source">GitHub Blog</p>
+                  <p class="ref-title">上記[2]と同一記事内でのパラダイムシフトに関する記述</p>
+                </div>
+              </div>
+              <div class="ref-card" id="ref8">
+                <span class="ref-num">8</span>
+                <div class="ref-body">
+                  <p class="ref-source">Birgitta Böckeler</p>
+                  <p class="ref-title">
+                    Understanding Spec-Driven-Development: Kiro, spec-kit, and
+                    Tessl（martinfowler.com）
+                  </p>
+                  <a
+                    class="ref-link"
+                    href="https://martinfowler.com/articles/exploring-gen-ai/sdd-3-tools.html"
+                    target="_blank"
+                    rel="noopener"
+                    >martinfowler.com/articles/exploring-gen-ai/sdd-3-tools.html<svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                      <path d="M15 3h6v6"></path>
+                      <path d="M10 14 21 3"></path></svg
+                  ></a>
+                </div>
+              </div>
+              <div class="ref-card" id="ref9">
+                <span class="ref-num">9</span>
+                <div class="ref-body">
+                  <p class="ref-source">Birgitta Böckeler</p>
+                  <p class="ref-title">Publications</p>
+                  <a class="ref-link" href="https://birgitta.info/" target="_blank" rel="noopener"
+                    >birgitta.info<svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                      <path d="M15 3h6v6"></path>
+                      <path d="M10 14 21 3"></path></svg
+                  ></a>
+                </div>
+              </div>
+              <div class="ref-card" id="ref10">
+                <span class="ref-num">10</span>
+                <div class="ref-body">
+                  <p class="ref-source">TrueFoundry</p>
+                  <p class="ref-title">Spec-Driven Development for AI Agents: Governing Specs</p>
+                  <a
+                    class="ref-link"
+                    href="https://www.truefoundry.com/blog/spec-driven-development-ai-agents"
+                    target="_blank"
+                    rel="noopener"
+                    >truefoundry.com/blog/spec-driven-development-ai-agents<svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                      <path d="M15 3h6v6"></path>
+                      <path d="M10 14 21 3"></path></svg
+                  ></a>
+                </div>
+              </div>
+              <div class="ref-card" id="ref11">
+                <span class="ref-num">11</span>
+                <div class="ref-body">
+                  <p class="ref-source">codemyspec</p>
+                  <p class="ref-title">Spec-Driven Development in 2026: Guide + Tool Comparison</p>
+                  <a
+                    class="ref-link"
+                    href="https://codemyspec.com/blog/spec-driven-development"
+                    target="_blank"
+                    rel="noopener"
+                    >codemyspec.com/blog/spec-driven-development<svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                      <path d="M15 3h6v6"></path>
+                      <path d="M10 14 21 3"></path></svg
+                  ></a>
+                </div>
+              </div>
+              <div class="ref-card" id="ref12">
+                <span class="ref-num">12</span>
+                <div class="ref-body">
+                  <p class="ref-source">GitHub</p>
+                  <p class="ref-title">spec-kit リポジトリ</p>
+                  <a
+                    class="ref-link"
+                    href="https://github.com/github/spec-kit"
+                    target="_blank"
+                    rel="noopener"
+                    >github.com/github/spec-kit<svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                      <path d="M15 3h6v6"></path>
+                      <path d="M10 14 21 3"></path></svg
+                  ></a>
+                </div>
+              </div>
+              <div class="ref-card" id="ref13">
+                <span class="ref-num">13</span>
+                <div class="ref-body">
+                  <p class="ref-source">MarkTechPost</p>
+                  <p class="ref-title">
+                    Meet GitHub Spec-Kit: An Open Source Toolkit for Spec-Driven Development with AI
+                    Coding Agents
+                  </p>
+                  <a
+                    class="ref-link"
+                    href="https://www.marktechpost.com/2026/05/08/meet-github-spec-kit-an-open-source-toolkit-for-spec-driven-development-with-ai-coding-agents/"
+                    target="_blank"
+                    rel="noopener"
+                    >marktechpost.com<svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                      <path d="M15 3h6v6"></path>
+                      <path d="M10 14 21 3"></path></svg
+                  ></a>
+                </div>
+              </div>
+              <div class="ref-card" id="ref14">
+                <span class="ref-num">14</span>
+                <div class="ref-body">
+                  <p class="ref-source">Carlos Biagolini</p>
+                  <p class="ref-title">
+                    What Is Spec-Driven Development and How to Implement It with Kiro（AWS in Plain
+                    English）
+                  </p>
+                  <a
+                    class="ref-link"
+                    href="https://aws.plainenglish.io/what-is-spec-driven-development-and-how-to-implement-it-with-kiro-b5846bd55869"
+                    target="_blank"
+                    rel="noopener"
+                    >aws.plainenglish.io<svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                      <path d="M15 3h6v6"></path>
+                      <path d="M10 14 21 3"></path></svg
+                  ></a>
+                </div>
+              </div>
+              <div class="ref-card" id="ref15">
+                <span class="ref-num">15</span>
+                <div class="ref-body">
+                  <p class="ref-source">Developers Digest</p>
+                  <p class="ref-title">
+                    AWS Kiro Developer Guide: The Spec-Driven IDE That Replaced Amazon Q
+                  </p>
+                  <a
+                    class="ref-link"
+                    href="https://www.developersdigest.tech/blog/aws-kiro-developer-guide-2026"
+                    target="_blank"
+                    rel="noopener"
+                    >developersdigest.tech<svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                      <path d="M15 3h6v6"></path>
+                      <path d="M10 14 21 3"></path></svg
+                  ></a>
+                </div>
+              </div>
+              <div class="ref-card" id="ref16">
+                <span class="ref-num">16</span>
+                <div class="ref-body">
+                  <p class="ref-source">Anthropic Engineering</p>
+                  <p class="ref-title">Claude Code: Best practices for agentic coding</p>
+                  <a
+                    class="ref-link"
+                    href="https://www.anthropic.com/engineering/claude-code-best-practices"
+                    target="_blank"
+                    rel="noopener"
+                    >anthropic.com/engineering/claude-code-best-practices<svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                      <path d="M15 3h6v6"></path>
+                      <path d="M10 14 21 3"></path></svg
+                  ></a>
+                </div>
+              </div>
+              <div class="ref-card" id="ref17">
+                <span class="ref-num">17</span>
+                <div class="ref-body">
+                  <p class="ref-source">Augment Code</p>
+                  <p class="ref-title">
+                    Claude Code for Spec-Driven Development: Capabilities and Limits
+                  </p>
+                  <a
+                    class="ref-link"
+                    href="https://www.augmentcode.com/guides/claude-code-spec-driven-development"
+                    target="_blank"
+                    rel="noopener"
+                    >augmentcode.com/guides/claude-code-spec-driven-development<svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                      <path d="M15 3h6v6"></path>
+                      <path d="M10 14 21 3"></path></svg
+                  ></a>
+                </div>
+              </div>
+              <div class="ref-card" id="ref18">
+                <span class="ref-num">18</span>
+                <div class="ref-body">
+                  <p class="ref-source">Google Developers Blog</p>
+                  <p class="ref-title">
+                    Evolving Spec-Driven Development: Conductor Now Supports
+                    Antigravity（2026年7月16日）
+                  </p>
+                  <a
+                    class="ref-link"
+                    href="https://developers.googleblog.com/evolving-spec-driven-development-conductor-now-supports-antigravity/"
+                    target="_blank"
+                    rel="noopener"
+                    >developers.googleblog.com<svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                      <path d="M15 3h6v6"></path>
+                      <path d="M10 14 21 3"></path></svg
+                  ></a>
+                </div>
+              </div>
+              <div class="ref-card" id="ref19">
+                <span class="ref-num">19</span>
+                <div class="ref-body">
+                  <p class="ref-source">YouTube</p>
+                  <p class="ref-title">Spec-Driven Development in 2026: What Actually Changed</p>
+                  <a
+                    class="ref-link"
+                    href="https://www.youtube.com/watch?v=b6cbxSaa4U4"
+                    target="_blank"
+                    rel="noopener"
+                    >youtube.com/watch?v=b6cbxSaa4U4<svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                      <path d="M15 3h6v6"></path>
+                      <path d="M10 14 21 3"></path></svg
+                  ></a>
+                </div>
+              </div>
+              <div class="ref-card" id="ref20">
+                <span class="ref-num">20</span>
+                <div class="ref-body">
+                  <p class="ref-source">Alistair Mavin</p>
+                  <p class="ref-title">EARS: Easy Approach to Requirements Syntax（公式ガイド）</p>
+                  <a
+                    class="ref-link"
+                    href="https://alistairmavin.com/ears/"
+                    target="_blank"
+                    rel="noopener"
+                    >alistairmavin.com/ears<svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                      <path d="M15 3h6v6"></path>
+                      <path d="M10 14 21 3"></path></svg
+                  ></a>
+                </div>
+              </div>
+              <div class="ref-card" id="ref21">
+                <span class="ref-num">21</span>
+                <div class="ref-body">
+                  <p class="ref-source">Wikipedia</p>
+                  <p class="ref-title">Easy Approach to Requirements Syntax</p>
+                  <a
+                    class="ref-link"
+                    href="https://en.wikipedia.org/wiki/Easy_Approach_to_Requirements_Syntax"
+                    target="_blank"
+                    rel="noopener"
+                    >en.wikipedia.org/wiki/Easy_Approach_to_Requirements_Syntax<svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                      <path d="M15 3h6v6"></path>
+                      <path d="M10 14 21 3"></path></svg
+                  ></a>
+                </div>
+              </div>
+              <div class="ref-card" id="ref22">
+                <span class="ref-num">22</span>
+                <div class="ref-body">
+                  <p class="ref-source">Kiro Docs</p>
+                  <p class="ref-title">Specs</p>
+                  <a
+                    class="ref-link"
+                    href="https://kiro.dev/docs/specs/"
+                    target="_blank"
+                    rel="noopener"
+                    >kiro.dev/docs/specs<svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                      <path d="M15 3h6v6"></path>
+                      <path d="M10 14 21 3"></path></svg
+                  ></a>
+                </div>
+              </div>
+              <div class="ref-card" id="ref23">
+                <span class="ref-num">23</span>
+                <div class="ref-body">
+                  <p class="ref-source">GitHub</p>
+                  <p class="ref-title">spec-kit/spec-driven.md</p>
+                  <a
+                    class="ref-link"
+                    href="https://github.com/github/spec-kit/blob/main/spec-driven.md"
+                    target="_blank"
+                    rel="noopener"
+                    >github.com/github/spec-kit/blob/main/spec-driven.md<svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                      <path d="M15 3h6v6"></path>
+                      <path d="M10 14 21 3"></path></svg
+                  ></a>
+                </div>
+              </div>
+              <div class="ref-card" id="ref24">
+                <span class="ref-num">24</span>
+                <div class="ref-body">
+                  <p class="ref-source">Spec Kit Documentation</p>
+                  <p class="ref-title">公式サイト</p>
+                  <a
+                    class="ref-link"
+                    href="https://github.github.com/spec-kit/"
+                    target="_blank"
+                    rel="noopener"
+                    >github.github.com/spec-kit<svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                      <path d="M15 3h6v6"></path>
+                      <path d="M10 14 21 3"></path></svg
+                  ></a>
+                </div>
+              </div>
+              <div class="ref-card" id="ref25">
+                <span class="ref-num">25</span>
+                <div class="ref-body">
+                  <p class="ref-source">Umesh Malik</p>
+                  <p class="ref-title">
+                    The $300K Bug That Was Never the AI's Fault — Inside Addy Osmani's Spec
+                    Framework
+                  </p>
+                  <a
+                    class="ref-link"
+                    href="https://umesh-malik.com/blog/spec-driven-development-ai-agents-addy-osmani"
+                    target="_blank"
+                    rel="noopener"
+                    >umesh-malik.com<svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                      <path d="M15 3h6v6"></path>
+                      <path d="M10 14 21 3"></path></svg
+                  ></a>
+                </div>
+              </div>
+              <div class="ref-card" id="ref26">
+                <span class="ref-num">26</span>
+                <div class="ref-body">
+                  <p class="ref-source">Addy Osmani</p>
+                  <p class="ref-title">How to write a good spec for AI agents</p>
+                  <a
+                    class="ref-link"
+                    href="https://addyosmani.com/blog/good-spec/"
+                    target="_blank"
+                    rel="noopener"
+                    >addyosmani.com/blog/good-spec<svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                      <path d="M15 3h6v6"></path>
+                      <path d="M10 14 21 3"></path></svg
+                  ></a>
+                </div>
+              </div>
+              <div class="ref-card" id="ref27">
+                <span class="ref-num">27</span>
+                <div class="ref-body">
+                  <p class="ref-source">Roger Wong</p>
+                  <p class="ref-title">
+                    How to Write a Good Spec for AI Agents（Addy OsmaniのO'Reilly Radar寄稿の解説）
+                  </p>
+                  <a
+                    class="ref-link"
+                    href="https://rogerwong.me/2026/02/how-to-write-a-good-spec-for-ai-agents"
+                    target="_blank"
+                    rel="noopener"
+                    >rogerwong.me（原文: oreilly.com/radar）<svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                      <path d="M15 3h6v6"></path>
+                      <path d="M10 14 21 3"></path></svg
+                  ></a>
+                </div>
+              </div>
+              <div class="ref-card" id="ref28">
+                <span class="ref-num">28</span>
+                <div class="ref-body">
+                  <p class="ref-source">DataCamp</p>
+                  <p class="ref-title">
+                    Spec-Driven Development with Claude Code: A Guided Tutorial
+                  </p>
+                  <a
+                    class="ref-link"
+                    href="https://www.datacamp.com/tutorial/spec-driven-development-with-claude-code"
+                    target="_blank"
+                    rel="noopener"
+                    >datacamp.com/tutorial<svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                      <path d="M15 3h6v6"></path>
+                      <path d="M10 14 21 3"></path></svg
+                  ></a>
+                </div>
+              </div>
+              <div class="ref-card" id="ref29">
+                <span class="ref-num">29</span>
+                <div class="ref-body">
+                  <p class="ref-source">Build This Now</p>
+                  <p class="ref-title">Spec-Driven Development with Claude Code</p>
+                  <a
+                    class="ref-link"
+                    href="https://www.buildthisnow.com/blog/guide/mechanics/spec-driven-development"
+                    target="_blank"
+                    rel="noopener"
+                    >buildthisnow.com<svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                      <path d="M15 3h6v6"></path>
+                      <path d="M10 14 21 3"></path></svg
+                  ></a>
+                </div>
+              </div>
+              <div class="ref-card" id="ref30">
+                <span class="ref-num">30</span>
+                <div class="ref-body">
+                  <p class="ref-source">Wikipedia</p>
+                  <p class="ref-title">Spec-driven development</p>
+                  <a
+                    class="ref-link"
+                    href="https://en.wikipedia.org/wiki/Spec-driven_development"
+                    target="_blank"
+                    rel="noopener"
+                    >en.wikipedia.org/wiki/Spec-driven_development<svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                      <path d="M15 3h6v6"></path>
+                      <path d="M10 14 21 3"></path></svg
+                  ></a>
+                </div>
+              </div>
+              <div class="ref-card" id="ref31">
+                <span class="ref-num">31</span>
+                <div class="ref-body">
+                  <p class="ref-source">AlphaSignal</p>
+                  <p class="ref-title">Spec-Driven Development is the New Default for AI Coding</p>
+                  <a
+                    class="ref-link"
+                    href="https://alphasignalai.substack.com/p/spec-driven-development-is-the-new"
+                    target="_blank"
+                    rel="noopener"
+                    >alphasignalai.substack.com<svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                      <path d="M15 3h6v6"></path>
+                      <path d="M10 14 21 3"></path></svg
+                  ></a>
+                </div>
+              </div>
+            </div>
+          </section>
+          <p class="footnote">
+            本ガイドのフローチャートはすべてMermaid記法、比較表はすべてMarkdown由来のHTMLテーブルで作成しています（ASCIIアートは使用していません）。
+          </p>
+        </div>
+      </main>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.12.0/mermaid.min.js"></script>
+    <script>
+      function dedent(str) {
+        var lines = str.replace(/^\n/, '').replace(/\s+$/, '').split('\n');
+        var indents = lines
+          .filter(function (l) {
+            return l.trim().length > 0;
+          })
+          .map(function (l) {
+            return (l.match(/^[ \t]*/) || [''])[0].length;
+          });
+        var min = indents.length ? Math.min.apply(null, indents) : 0;
+        return lines
+          .map(function (l) {
+            return l.slice(min);
+          })
+          .join('\n');
+      }
+
+      document.querySelectorAll('script[data-mermaid-target]').forEach(function (src) {
+        var target = document.getElementById(src.dataset.mermaidTarget);
+        if (target) target.textContent = dedent(src.textContent);
+      });
+
+      (async function () {
+        if (document.fonts && document.fonts.ready) {
+          await document.fonts.ready;
+        }
+        mermaid.initialize({
+          startOnLoad: false,
+          theme: 'dark',
+          securityLevel: 'loose',
+          fontFamily: 'sans-serif',
+          flowchart: { useMaxWidth: false, htmlLabels: true, nodeSpacing: 45, rankSpacing: 45 },
+          themeVariables: {
+            fontSize: '16px',
+            background: '#07111e',
+            primaryColor: '#142842',
+            primaryTextColor: '#e8edf5',
+            primaryBorderColor: '#2a3f5c',
+            lineColor: '#5b7ba3',
+            secondaryColor: '#0d1b2e',
+            tertiaryColor: '#0d1b2e',
+            edgeLabelBackground: '#14283f',
+            textColor: '#e8edf5',
+          },
+        });
+        await mermaid.run({ querySelector: '.mermaid' });
+      })();
+
+      var sections = document.querySelectorAll('main section[id]');
+      var navLinks = document.querySelectorAll('.sidebar a[href^="#"]');
+      var linkMap = new Map();
+      navLinks.forEach(function (link) {
+        linkMap.set(link.getAttribute('href').slice(1), link);
+      });
+      var observer = new IntersectionObserver(
+        function (entries) {
+          entries.forEach(function (entry) {
+            var link = linkMap.get(entry.target.id);
+            if (!link) return;
+            if (entry.isIntersecting) {
+              navLinks.forEach(function (l) {
+                l.classList.remove('active');
+              });
+              link.classList.add('active');
+            }
+          });
+        },
+        { rootMargin: '-20% 0px -70% 0px' },
+      );
+      sections.forEach(function (s) {
+        observer.observe(s);
+      });
+    </script>
+  </body>
+</html>
