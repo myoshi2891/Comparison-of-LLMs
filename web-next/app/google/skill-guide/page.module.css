@@ -120,7 +120,8 @@
   flex: 1;
   min-width: 0;
   padding: 40px 48px 80px;
-  max-width: 1140px;
+  width: 100%;
+  max-width: 100%;
 }
 
 .header {
