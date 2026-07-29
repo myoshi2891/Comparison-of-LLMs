@@ -1,5 +1,5 @@
 import { render } from "@testing-library/react";
-import { beforeEach, expect, test } from "vitest";
+import { beforeEach, expect, test, vi } from "vitest";
 import styles from "./page.module.css";
 import { TocObserver } from "./TocObserver";
 
@@ -25,7 +25,7 @@ beforeEach(() => {
     }
   }
 
-  global.IntersectionObserver = IntersectionObserverStub as unknown as typeof IntersectionObserver;
+  vi.stubGlobal("IntersectionObserver", IntersectionObserverStub);
 });
 
 test("複数の対応セクションが交差したとき DOM 上で最上位のリンクだけを有効化する", () => {

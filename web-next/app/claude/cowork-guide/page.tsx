@@ -1152,7 +1152,7 @@ export default function Page() {
               </Ext>
               <Ext
                 className={styles.refCard}
-                href="https://www.techcrunch.com/2026/01/30/anthropic-brings-agentic-plugins-to-cowork/"
+                href="https://techcrunch.com/2026/01/30/anthropic-brings-agentic-plugins-to-cowork/"
               >
                 <span className={`${styles.refBadge} ${styles.supplement}`}>第三者報道</span>
                 <span className={styles.refBody}>

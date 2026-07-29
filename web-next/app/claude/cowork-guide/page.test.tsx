@@ -57,7 +57,7 @@ describe("/claude/cowork-guide 契約テスト", () => {
   it("TechCrunchの記事を第三者報道として表示する", () => {
     const { container } = render(<Page />);
     const article = container.querySelector(
-      'a[href="https://www.techcrunch.com/2026/01/30/anthropic-brings-agentic-plugins-to-cowork/"]'
+      'a[href="https://techcrunch.com/2026/01/30/anthropic-brings-agentic-plugins-to-cowork/"]'
     );
     const badge = article?.querySelector("span");
 
