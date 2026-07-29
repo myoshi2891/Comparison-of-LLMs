@@ -19,7 +19,7 @@ vi.mock("@/components/docs/MermaidDiagram", () => ({
   },
 }));
 
-describe("/google/antigravity-guide (Antigravity CLI Complete Guide)", () => {
+describe("/google/antigravity-guide (Antigravity CLI Complete Guide - 100% Faithful)", () => {
   it("h1 の見出しテキストが一致する", () => {
     const { container } = render(<Page />);
     const h1 = container.querySelector("h1");
@@ -37,7 +37,7 @@ describe("/google/antigravity-guide (Antigravity CLI Complete Guide)", () => {
     const externalLinks = Array.from(
       container.querySelectorAll('a[href^="http"]')
     );
-    expect(externalLinks.length).toBeGreaterThan(0);
+    expect(externalLinks.length).toBeGreaterThan(20);
     for (const link of externalLinks) {
       expect(link.getAttribute("target")).toBe("_blank");
       expect(link.getAttribute("rel")).toBe("noopener noreferrer");
@@ -54,10 +54,16 @@ describe("/google/antigravity-guide (Antigravity CLI Complete Guide)", () => {
     }
   });
 
-  it("コードブロック（codeBody または pre/code）が存在する", () => {
+  it("コードブロック（codeWrap / codeBody）が存在する", () => {
     const { container } = render(<Page />);
     const codeBodies = container.querySelectorAll(`.${styles.codeBody}`);
-    expect(codeBodies.length).toBeGreaterThan(0);
+    expect(codeBodies.length).toBeGreaterThan(10);
+  });
+
+  it("テーブル (tableWrap / table) が 15 個以上存在する", () => {
+    const { container } = render(<Page />);
+    const tables = container.querySelectorAll("table");
+    expect(tables.length).toBeGreaterThanOrEqual(15);
   });
 
   it("metadata の title と description が定義されている", () => {
@@ -70,7 +76,7 @@ describe("/google/antigravity-guide (Antigravity CLI Complete Guide)", () => {
     expect(metadata.description).toContain("Antigravity CLI");
   });
 
-  it("本文に CLI 関連キーワードが含まれる", () => {
+  it("本文に CLI 関連キーワード・スラッシュコマンドがすべて含まれる", () => {
     const { container } = render(<Page />);
     const text = container.textContent ?? "";
     expect(text).toContain("Antigravity CLI");
@@ -78,6 +84,10 @@ describe("/google/antigravity-guide (Antigravity CLI Complete Guide)", () => {
     expect(text).toContain("Shared Agent Harness");
     expect(text).toContain("settings.json");
     expect(text).toContain("toolPermission");
+    expect(text).toContain("/add-dir");
+    expect(text).toContain("/agents");
+    expect(text).toContain("/statusline");
+    expect(text).toContain("/codesearch");
   });
 
   it("MermaidDiagram コンポーネントが 8 つ存在する (diag-1 〜 diag-8)", () => {
