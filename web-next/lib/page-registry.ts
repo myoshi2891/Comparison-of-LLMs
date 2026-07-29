@@ -239,15 +239,15 @@ const entries: PageEntry[] = [
   },
   {
     slug: "/claude/skill-guide-intermediate",
-    title: "Skill Guide (中級)",
+    title: "SKILL.md 実践ガイド",
     group: "Providers",
     category: "Claude",
     provider: "claude",
-    topics: ["skill", "guide"],
+    topics: ["skill", "guide", "best-practices"],
     summary:
-      "プログレッシブ・ディスクロージャー、トークン経済、動的コンテキスト注入、context:fork、エンタープライズプロビジョニングまで網羅した実践リファレンスです。",
+      "Claude Code を業務で使い込んでいる中級者〜上級者向けに、SKILL.md の設計思想・書き方・Claude Code固有のフロントマター・評価運用フローまでをステップバイステップで解説する実践ガイドです。",
     addedAt: "2026-05-02",
-    lastReviewed: "2026-06-30",
+    lastReviewed: "2026-07-29",
   },
   {
     slug: "/claude/skills-sh",
