@@ -1,19 +1,18 @@
 // Phase B-2 [Red] contract test. Expected to FAIL until Green phase
-// implements app/google/skill/page.tsx.
+// implements app/google/skill/page.tsx with Agent-skills-antigravity-best-practices.html content.
 
 /**
  * Phase B-2 契約テスト (/google/skill)。
  *
  * 固定する契約:
- * - `metadata` が export され、title に「マークダウンファイル」と
- *   「Antigravity」を含む
- * - `<h1>` が 1 つ存在し、`マークダウンファイル` を含む
- * - 11 個 of section id が存在する (overview, directory, gemini-md, rules,
- *   skills, workflows, context, artifacts, sdd, best-practices, sources)
- * - 11 個 of TOC リンクが `#section-id` 形式で存在する
+ * - `metadata` が export され、title に「Agent Skills 実践ガイド」と「Antigravity IDE」を含む
+ * - `<h1>` が 1 つ存在し、「Agent Skills 実践ガイド」を含む
+ * - 10 個の section id が存在する (intro, origin, philosophy, architecture,
+ *   antigravity, practices, operations, example, summary, references)
+ * - 10 個の TOC リンクが `#section-id` 形式で存在する
  * - 外部リンク (http/https) には全て `target="_blank"` かつ
  *   `rel="noopener noreferrer"` が付与されている
- * - `sources` セクション内に 15 件以上の外部リンクが存在する
+ * - `references` セクション内に 20 件以上の外部リンクが存在する
  * - 静的検査: 生 HTML 流し込み API (React の XSS 危険 prop) を使用していない
  */
 
@@ -22,63 +21,52 @@ import { join } from "node:path";
 import { render } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { describe, expect, it } from "vitest";
-import GeminiSkillPage, { metadata as rawMetadata } from "@/app/google/skill/page";
+import AgentSkillsPage, { metadata as rawMetadata } from "@/app/google/skill/page";
 
-const Page = GeminiSkillPage as unknown as () => ReactElement;
+const Page = AgentSkillsPage as unknown as () => ReactElement;
 // Next.js の Metadata 型を避けるための最小ローカル型 (実体は Metadata オブジェクト)。
 type MetadataLike = { title?: unknown; description?: unknown };
 const metadata = rawMetadata as unknown as MetadataLike;
 
 const EXPECTED_SECTION_IDS = [
-  "overview",
-  "directory",
-  "gemini-md",
-  "rules",
-  "skills",
-  "workflows",
-  "context",
-  "artifacts",
-  "sdd",
-  "best-practices",
-  "sources",
+  "intro",
+  "origin",
+  "philosophy",
+  "architecture",
+  "antigravity",
+  "practices",
+  "operations",
+  "example",
+  "summary",
+  "references",
 ] as const;
 
 describe("/google/skill - metadata", () => {
-  it("exports a metadata object with title containing マークダウンファイル and Antigravity", () => {
+  it("exports a metadata object with title containing Agent Skills 実践ガイド and Antigravity IDE", () => {
     expect(metadata).toBeDefined();
     const title =
       typeof metadata.title === "string"
         ? metadata.title
         : (metadata.title as { default?: string } | undefined)?.default;
-    expect(title).toMatch(/マークダウンファイル/);
-    expect(title).toMatch(/Antigravity/);
+    expect(title).toMatch(/Agent Skills 実践ガイド/);
+    expect(title).toMatch(/Antigravity IDE/);
   });
 
   it("exports a metadata object with description", () => {
     expect(typeof metadata.description).toBe("string");
     expect((metadata.description as string).length).toBeGreaterThan(0);
   });
-
-  it("reflects Google I/O 2026 announcements (Antigravity v2.0.1 / Gemini 3.5 Flash)", () => {
-    const title =
-      typeof metadata.title === "string"
-        ? metadata.title
-        : (metadata.title as { default?: string } | undefined)?.default;
-    expect(title).toMatch(/Antigravity (v)?2\.0/);
-    expect(title).toMatch(/Gemini 3\.5 Flash/);
-    expect(metadata.description as string).toMatch(/Antigravity (v)?2\.0/);
-  });
 });
 
 describe("/google/skill - page structure", () => {
-  it("renders an <h1> containing 'マークダウンファイル'", () => {
+  it("renders an <h1> containing 'Agent Skills 実践ガイド'", () => {
     const { container } = render(<Page />);
     const h1 = container.querySelector("h1");
     expect(h1).not.toBeNull();
-    expect(h1?.textContent).toMatch(/マークダウンファイル/);
+    expect(h1?.textContent).toMatch(/Agent Skills 実践ガイド/);
   });
 
-  it("renders all 11 expected section ids", () => {
+  it("renders all 10 expected section ids", () => {
     const { container } = render(<Page />);
     for (const id of EXPECTED_SECTION_IDS) {
       const el = container.querySelector(`#${id}`);
@@ -86,7 +74,7 @@ describe("/google/skill - page structure", () => {
     }
   });
 
-  it("renders 11 TOC links pointing to section anchors", () => {
+  it("renders 10 TOC links pointing to section anchors", () => {
     const { container } = render(<Page />);
     const tocAnchors = container.querySelectorAll('nav a[href^="#"]');
     const tocHrefs = Array.from(tocAnchors).map((a) => a.getAttribute("href"));
@@ -112,41 +100,14 @@ describe("/google/skill - external link safety", () => {
     }
   });
 
-  it("sources section contains at least 24 external links (≥15 baseline + 3 I/O 2026 entries + v2.0.1)", () => {
+  it("references section contains at least 20 external links", () => {
     const { container } = render(<Page />);
-    const sources = container.querySelector("#sources");
-    expect(sources).not.toBeNull();
+    const references = container.querySelector("#references");
+    expect(references).not.toBeNull();
     const externals =
-      sources?.querySelectorAll('a[href^="http"]') ??
+      references?.querySelectorAll('a[href^="http"]') ??
       ([] as unknown as NodeListOf<HTMLAnchorElement>);
-    expect(externals.length).toBeGreaterThanOrEqual(24);
-  });
-});
-
-describe("/google/skill - Google I/O 2026 content", () => {
-  it("renders Antigravity 2.0 / Gemini 3.5 Flash / I/O 2026 references in the body", () => {
-    const { container } = render(<Page />);
-    const text = container.textContent ?? "";
-    expect(text).toMatch(/Gemini 3\.5 Flash/);
-    expect(text).toMatch(/Antigravity (v)?2\.0/);
-    expect(text).toMatch(/2026-05-(19|23)/);
-    expect(text).toMatch(/Antigravity CLI/);
-  });
-
-  it("includes the three new I/O 2026 SOURCES entries and v2.0.1 by URL", () => {
-    const { container } = render(<Page />);
-    const sources = container.querySelector("#sources");
-    expect(sources).not.toBeNull();
-    const html = sources?.innerHTML ?? "";
-    const requiredUrlFragments = [
-      "blog.google/innovation-and-ai/technology/developers-tools/google-io-2026-developer-highlights",
-      "developers.googleblog.com/all-the-news-from-the-google-io-2026-developer-keynote",
-      "developers.googleblog.com/an-important-update-transitioning-gemini-cli-to-antigravity-cli",
-      "antigravity.google/changelog/v2.0.1",
-    ];
-    for (const fragment of requiredUrlFragments) {
-      expect(html).toContain(fragment);
-    }
+    expect(externals.length).toBeGreaterThanOrEqual(20);
   });
 });
 
