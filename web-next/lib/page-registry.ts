@@ -156,15 +156,15 @@ const entries: PageEntry[] = [
   },
   {
     slug: "/claude/cowork-guide",
-    title: "Cowork Guide",
+    title: "Claude Cowork 実践ガイド",
     group: "Providers",
     category: "Claude",
     provider: "claude",
     topics: ["guide"],
     summary:
-      "コードを一行も書かずに自然言語の指示だけでファイル管理・タスク自動化を実現する Anthropic のデスクトップツール「Cowork」を初学者向けにゼロから解説します。",
+      "初学者がClaude Coworkを使いこなすためのステップバイステップ・ベストプラクティス。基礎から高度な運用、Scheduled Tasks、Dispatch、10の自衛対策まで完全解説。",
     addedAt: "2026-05-03",
-    lastReviewed: "2026-06-30",
+    lastReviewed: "2026-07-29",
   },
   {
     slug: "/claude/fable-5-best-practices",
