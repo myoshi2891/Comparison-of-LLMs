@@ -476,6 +476,59 @@ return (
 
 詳細は `.claude/skills/nextjs-page-migration/SKILL.md` §「CSS Module 地雷チェックリスト」を参照。
 
+### ⚠️ `themeVariables.fontSize` に `"1rem"` を使わない（2026-07-29 追記）
+
+`MermaidDiagram.tsx` の `themeVariables.fontSize` に `"1rem"` を設定しても、図の種別によって解釈が異なり **サイズが不揃いになる**。必ず `"16px"` 等の固定ピクセル値を使うこと。
+
+```tsx
+// ✅ 固定ピクセル値 — 全図種別で一貫したベースサイズになる
+themeVariables: { fontSize: "16px", ...themeVariables }
+
+// ❌ NG — stateDiagram-v2 では巨大化し、flowchart では小さくなる
+themeVariables: { fontSize: "1rem", ...themeVariables }
+```
+
+また、CSS の `font-size` は SVG `<text>` 要素には**継承されない**（SVG は独自スコープ）ため、`.mermaidWrap { font-size: 1rem }` は何の効果もない。
+
+### ⚠️ `stateDiagram-v2` はノード数が少ないと文字が巨大化する（2026-07-29 追記）
+
+`stateDiagram-v2` はノード数が少ない（3〜5 状態程度）場合、Mermaid が広い `viewBox` を生成するため SVG を自然サイズで表示すると文字が巨大化する。`flowchart LR` はノードが密集して逆に小さくなる。
+
+**グローバルな `max-height` で全 SVG を一律制限してはならない**。コンパクトな図まで縮小されて見づらくなる。
+
+```css
+/* ❌ NG: グローバル制限 — flowchart など他の図解が小さくなりすぎる */
+.mermaidWrap :global(svg) {
+  max-height: 380px !important;
+}
+```
+
+**正解: 問題のある図解 ID だけを個別に `:global(#diag-N svg)` でピンポイント制限する。**
+
+```css
+/*
+ * stateDiagram-v2 でノード数が少ない図解だけを個別に制限する。
+ * 他の図解（graph TD / flowchart LR / sequenceDiagram）は自然サイズのまま。
+ */
+:global(#diag-3 svg) {
+  max-height: 260px !important;
+  height: auto !important;
+  width: auto !important;
+  display: block;
+  margin: 0 auto;
+}
+
+:global(#diag-5 svg) {
+  max-height: 300px !important;
+  height: auto !important;
+  width: auto !important;
+  display: block;
+  margin: 0 auto;
+}
+```
+
+> **手順**: 全 8 図解をブラウザで目視確認し、巨大化している図の ID（`id` prop）を特定 → その ID だけに `:global(#diag-N svg)` で `max-height` を設定 → 高さが適切になるまで数値を微調整する。
+
 ### テスト環境（Vitest）でのモック化
 
 ```typescript
@@ -514,3 +567,6 @@ vi.mock("@/components/docs/MermaidDiagram", () => ({
 | **SVGが縦長に拡大される・縦横比が崩れる** | SVGに `width` 属性が残ったままに `width: 100%` | `removeAttribute('width')` → `width: auto; max-width: 100%` に変更 |
 | **（web-next）図解が左寄せ・右に空白** | ページ側 `:global(.mermaid)` の幅強制、または列幅より広い図 | ページ側の幅指定を削除しコンポーネントに委譲。広い図は svg `max-width:100%` で縮小フィット（Part 4） |
 | **（web-next）図解が切れて右にスクロール** | 旧 `overflow-x` スクロール方式が残存 | svg 後処理で `max-width:100%; height:auto`（縮小フィット＝切れない）に統一（Part 4） |
+| **`stateDiagram-v2` の文字が極端に大きい** | ノード数が少なく Mermaid が広い viewBox を生成している | `themeVariables.fontSize` は `"16px"` 固定のまま変えず、問題の図解 ID だけ `:global(#diag-N svg) { max-height: Xpx !important }` でピンポイント制限（Part 4 追記参照） |
+| **図解ごとにサイズが全然バラバラ** | `themeVariables.fontSize` に `"1rem"` を使っている | `"16px"` 等の固定ピクセル値に変更。CSS `font-size` は SVG `<text>` に継承されないため `.mermaidWrap { font-size }` も無効（Part 4 追記参照） |
+| **全 SVG に `max-height` をかけたら他の図が小さくなりすぎた** | グローバル制限で正常な図まで縮小されている | グローバル `:global(svg)` 制限を削除し、巨大化した図 ID だけに `:global(#diag-N svg)` を個別設定する（Part 4 追記参照） |
