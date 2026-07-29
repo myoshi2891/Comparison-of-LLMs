@@ -19,6 +19,8 @@
 
 ## 最近の追加内容
 
+- **Google Antigravity AI仕様駆動開発ガイド（/google/agent）の Pure JSX 完全置き換え移行**: `Antigravity-spec-driven-dev-guide.html` を `web-next/app/google/agent/page.tsx` に Pure JSX として完全忠実移植 🚀。要約・省略なしで全10セクション（イントロ〜参考文献）・全表・全コードブロック・6 Mermaid図 (`diagram-0`〜`diagram-5`)・TOCスクロール追従（`TocObserver.tsx`）・外部リンク安全属性・`page-registry.ts`（`Antigravity AI仕様駆動開発`）登録を完了。既存の旧 `/google/agent`（Gemini マルチエージェント）コンテンツと完全入れ替え完了。原本 `Antigravity-spec-driven-dev-guide.html` および `Antigravity-spec-driven-dev-guide.md` は `archive/` へ `git mv` 退避保存。契約テスト（`section-1`〜`section-10` 検証）を更新。
+
 - **Antigravity CLI 完全ガイド（/google/antigravity-guide）の Pure JSX 完全置き換え移行**: `Antigravity-cli-guide.html` を `web-next/app/google/antigravity-guide/page.tsx` に Pure JSX として完全忠実移植 🚀。要約・省略なしで全16セクション（00〜15）・全表・全コードブロック・8 Mermaid図 (`diag-1`〜`diag-8`)・TOCスクロール追従（`TocObserver.tsx`）・外部リンク安全属性・`page-registry.ts` 登録を完了。既存の旧 `/google/antigravity-guide` コンテンツと完全入れ替え完了。原本 `Antigravity-cli-guide.html` は `archive/` へ `git mv` 退避保存。契約テストを更新し全クリア。
 
 - **ハーネスエンジニアリング入門ガイド（/claude/harness-engineering）の Pure JSX 完全置き換え移行**: `Harness-engineering-guide.html` を `web-next/app/claude/harness-engineering/page.tsx` に Pure JSX として完全忠実移植 🚀。要約・省略なしで全9セクション（intro, chapter1〜7, references）・全表・全コードブロック（hook.sh含む）・9 Mermaid図・TOCスクロール追従（`TocObserver.tsx`）・外部リンク安全属性・`page-registry.ts` 登録確認を完了。既存の旧 `harness-engineering` コンテンツと完全入れ替え完了。原本 `Harness-engineering-guide.html` / `Harness-engineering-guide.md` は `archive/html/Anthropic/` および `archive/md/Anthropic/` へ `git mv` 退避保存。契約テスト（9セクション検証）を更新。

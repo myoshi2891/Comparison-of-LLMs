@@ -471,15 +471,15 @@ const entries: PageEntry[] = [
   },
   {
     slug: "/google/agent",
-    title: "Agent",
+    title: "Antigravity AI仕様駆動開発",
     group: "Providers",
     category: "Google",
     provider: "google",
-    topics: ["agent"],
+    topics: ["antigravity", "spec-driven-development", "markdown", "agent"],
     summary:
-      "最新の Google Gemini CLI / Antigravity CLI (as of 2026-06)・最新の ADK (as of 2026-06)・最新のエージェント連携プロトコル (A2A/AP2/A2UI等) 時代のサブエージェント / マルチエージェント開発で必要な GEMINI.md・AGENTS.md・agent.py・agent.json・.geminiignore・settings.json の役割と書き方を体系化したガイド。Gemini CLI は 2026-06-18 に AI Pro/Ultra/無料 Code Assist 向けサンセット済（→ Antigravity CLI へ移行）。",
+      "AIエージェントIDE「Google Antigravity」が扱う4種類のMarkdownファイル（Rules / Skills / Workflows / Artifacts）の役割・置き場所・書き方・ベストプラクティスを体系化した完全ガイド。",
     addedAt: "2026-04-24",
-    lastReviewed: "2026-07-01",
+    lastReviewed: "2026-07-29",
   },
   {
     slug: "/google/agent-harness-engineering",
