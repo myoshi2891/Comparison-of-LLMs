@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Ext from "@/components/docs/Ext";
 import MermaidDiagram from "@/components/docs/MermaidDiagram";
 import styles from "./page.module.css";
 import SkillGuideClient from "./SkillGuideClient";
@@ -8,14 +9,6 @@ export const metadata: Metadata = {
   description:
     "Claude Code を業務で使い込んでいる中級者〜上級者向けに、SKILL.md の設計思想・書き方・Claude Code固有のフロントマター・評価運用フローまでをステップバイステップで解説する。",
 };
-
-function Ext({ href, children }: { href: string; children: React.ReactNode }) {
-  return (
-    <a href={href} target="_blank" rel="noopener noreferrer">
-      {children}
-    </a>
-  );
-}
 
 const DIAGRAM_DECISION = `flowchart TB
     Q["拡張したい振る舞いは?"] --> A{"毎セッション常時必要な方針か"}
@@ -101,7 +94,7 @@ export default function Page() {
     <SkillGuideClient>
       <div className={styles.hero}>
         <div className={styles.eyebrow}>
-          <i className="ti ti-brand-claude" />
+          <i aria-hidden="true" className="ti ti-brand-claude" />
           Claude Code / Agent Skills
         </div>
         <h1>SKILL.md 実践ガイド</h1>
@@ -112,15 +105,15 @@ export default function Page() {
         </p>
         <div className={styles.metaBox}>
           <div className={styles.metaChip}>
-            <i className="ti ti-target-arrow" />
+            <i aria-hidden="true" className="ti ti-target-arrow" />
             対象: 中級者〜上級者
           </div>
           <div className={styles.metaChip}>
-            <i className="ti ti-calendar" />
+            <i aria-hidden="true" className="ti ti-calendar" />
             情報基準日: 2026年7月26日
           </div>
           <div className={styles.metaChip}>
-            <i className="ti ti-list-check" />
+            <i aria-hidden="true" className="ti ti-list-check" />
             公式ドキュメント + 著名開発者の一次情報
           </div>
         </div>
@@ -128,7 +121,7 @@ export default function Page() {
 
       <section id="intro" className={styles.section}>
         <h2>
-          <i className="ti ti-info-circle" /> はじめに — なぜ今 SKILL.md なのか
+          <i aria-hidden="true" className="ti ti-info-circle" /> はじめに — なぜ今 SKILL.md なのか
         </h2>
         <p>
           Claude Code における「振る舞いの拡張」には CLAUDE.md、Skills、Subagents、MCP
@@ -189,7 +182,7 @@ export default function Page() {
 
       <section id="architecture" className={styles.section}>
         <h2>
-          <i className="ti ti-stack-2" /> Progressive Disclosure — Skillのアーキテクチャ
+          <i aria-hidden="true" className="ti ti-stack-2" /> Progressive Disclosure — Skillのアーキテクチャ
         </h2>
         <p>
           Skills
@@ -236,7 +229,7 @@ export default function Page() {
         </div>
 
         <div className={`${styles.callout} ${styles.calloutInfo}`}>
-          <i className="ti ti-bulb" />
+          <i aria-hidden="true" className="ti ti-bulb" />
           <p>
             <strong>設計の要点:</strong>
             スクリプトのコード自体はコンテキストに載らず、実行結果だけがトークンを消費する。したがって、Skillフォルダにどれだけ大量の参照資料やスクリプトを同梱しても、実際に読まれない限りコストはかからない。Simon
@@ -378,7 +371,7 @@ export default function Page() {
         </div>
 
         <span className={styles.codeLabel}>
-          <i className="ti ti-code" />
+          <i aria-hidden="true" className="ti ti-code" />
           SKILL.md 推奨例
         </span>
         <div className={styles.codeBlock}>
@@ -421,7 +414,7 @@ export default function Page() {
         <div className={styles.compareGrid}>
           <div className={`${styles.compareCard} ${styles.compareCardGood}`}>
             <div className={styles.compareLabel}>
-              <i className="ti ti-check" />
+              <i aria-hidden="true" className="ti ti-check" />
               良い例
             </div>
             <p>
@@ -430,7 +423,7 @@ export default function Page() {
           </div>
           <div className={`${styles.compareCard} ${styles.compareCardBad}`}>
             <div className={styles.compareLabel}>
-              <i className="ti ti-x" />
+              <i aria-hidden="true" className="ti ti-x" />
               避けるべき例
             </div>
             <p>ドキュメントを助けます</p>
@@ -479,7 +472,7 @@ export default function Page() {
           </table>
         </div>
         <div className={`${styles.callout} ${styles.calloutInfo}`}>
-          <i className="ti ti-bulb" />
+          <i aria-hidden="true" className="ti ti-bulb" />
           <p>
             公式ドキュメントの比喩がわかりやすい。「両側が崖の細い橋」なら低自由度(DBマイグレーションのように失敗が許されない)、「障害物のない野原」なら高自由度(コードレビューのように多様な正解がある)と例えられている。
           </p>
@@ -766,7 +759,7 @@ export default function Page() {
           </li>
         </ul>
         <div className={`${styles.callout} ${styles.calloutWarning}`}>
-          <i className="ti ti-shield-exclamation" />
+          <i aria-hidden="true" className="ti ti-shield-exclamation" />
           <p>
             Simon
             Willisonも自身の記事の中で「Skillは任意のコードを実行できる」点に触れており、信頼できる出どころのものだけを使うことが強調されている。
@@ -816,7 +809,7 @@ export default function Page() {
 
       <section id="antipatterns" className={styles.section}>
         <h2>
-          <i className="ti ti-alert-triangle" /> アンチパターン集
+          <i aria-hidden="true" className="ti ti-alert-triangle" /> アンチパターン集
         </h2>
         <div className={styles.tableWrap}>
           <table className={styles.table}>
@@ -877,42 +870,42 @@ export default function Page() {
 
       <section id="checklist" className={styles.section}>
         <h2>
-          <i className="ti ti-checklist" /> SKILL.md チェックリスト
+          <i aria-hidden="true" className="ti ti-checklist" /> SKILL.md チェックリスト
         </h2>
         <p>公開・共有する前に、以下を確認する(公式チェックリストを基に整理)。</p>
 
         <h3>基本品質</h3>
         <ul className={styles.checklist}>
           <li>
-            <i className="ti ti-square-check" />
+            <i aria-hidden="true" className="ti ti-square-check" />
             description が具体的で、鍵となる語句を含んでいる
           </li>
           <li>
-            <i className="ti ti-square-check" />
+            <i aria-hidden="true" className="ti ti-square-check" />
             description に「何をするか」と「いつ使うか」の両方がある
           </li>
           <li>
-            <i className="ti ti-square-check" />
+            <i aria-hidden="true" className="ti ti-square-check" />
             SKILL.md 本文が500行未満に収まっている
           </li>
           <li>
-            <i className="ti ti-square-check" />
+            <i aria-hidden="true" className="ti ti-square-check" />
             詳細情報は必要に応じて別ファイルに分離されている
           </li>
           <li>
-            <i className="ti ti-square-check" />
+            <i aria-hidden="true" className="ti ti-square-check" />
             時限的な情報が「旧パターン」セクションに隔離されている
           </li>
           <li>
-            <i className="ti ti-square-check" />
+            <i aria-hidden="true" className="ti ti-square-check" />
             用語が一貫している
           </li>
           <li>
-            <i className="ti ti-square-check" />
+            <i aria-hidden="true" className="ti ti-square-check" />
             例が抽象的でなく具体的である
           </li>
           <li>
-            <i className="ti ti-square-check" />
+            <i aria-hidden="true" className="ti ti-square-check" />
             ファイル参照が1階層に保たれている
           </li>
         </ul>
@@ -920,23 +913,23 @@ export default function Page() {
         <h3>コードとスクリプト</h3>
         <ul className={styles.checklist}>
           <li>
-            <i className="ti ti-square-check" />
+            <i aria-hidden="true" className="ti ti-square-check" />
             スクリプトがClaudeに丸投げせず問題を解決している
           </li>
           <li>
-            <i className="ti ti-square-check" />
+            <i aria-hidden="true" className="ti ti-square-check" />
             エラー処理が明示的で分かりやすい
           </li>
           <li>
-            <i className="ti ti-square-check" />
+            <i aria-hidden="true" className="ti ti-square-check" />
             マジックナンバーがなく、値の根拠が示されている
           </li>
           <li>
-            <i className="ti ti-square-check" />
+            <i aria-hidden="true" className="ti ti-square-check" />
             必要なパッケージが明記され、利用可能性が確認されている
           </li>
           <li>
-            <i className="ti ti-square-check" />
+            <i aria-hidden="true" className="ti ti-square-check" />
             Windowsスタイルのパスが使われていない
           </li>
         </ul>
@@ -944,15 +937,15 @@ export default function Page() {
         <h3>テスト</h3>
         <ul className={styles.checklist}>
           <li>
-            <i className="ti ti-square-check" />
+            <i aria-hidden="true" className="ti ti-square-check" />
             最低3つの評価シナリオが用意されている
           </li>
           <li>
-            <i className="ti ti-square-check" />
+            <i aria-hidden="true" className="ti ti-square-check" />
             Haiku / Sonnet / Opus など複数モデルでテスト済みである
           </li>
           <li>
-            <i className="ti ti-square-check" />
+            <i aria-hidden="true" className="ti ti-square-check" />
             実運用に近いシナリオでテスト済みである
           </li>
         </ul>
@@ -960,7 +953,7 @@ export default function Page() {
 
       <section id="summary" className={styles.section}>
         <h2>
-          <i className="ti ti-flag" /> まとめ
+          <i aria-hidden="true" className="ti ti-flag" /> まとめ
         </h2>
         <p>
           SKILL.md
@@ -973,14 +966,14 @@ export default function Page() {
 
       <section id="sources" className={styles.section}>
         <h2>
-          <i className="ti ti-books" /> 参考文献・ソース
+          <i aria-hidden="true" className="ti ti-books" /> 参考文献・ソース
         </h2>
 
         <div className={styles.sourceGroupLabel}>Anthropic 公式ドキュメント</div>
         <ul className={styles.sourcesList}>
           <li>
             <div className={styles.sourceTitle}>
-              <i className="ti ti-link" />
+              <i aria-hidden="true" className="ti ti-link" />
               Agent Skills 概要
             </div>
             <Ext href="https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview">
@@ -989,7 +982,7 @@ export default function Page() {
           </li>
           <li>
             <div className={styles.sourceTitle}>
-              <i className="ti ti-link" />
+              <i aria-hidden="true" className="ti ti-link" />
               Skill authoring best practices(本ガイドの中心的な出典)
             </div>
             <Ext href="https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices">
@@ -998,7 +991,7 @@ export default function Page() {
           </li>
           <li>
             <div className={styles.sourceTitle}>
-              <i className="ti ti-link" />
+              <i aria-hidden="true" className="ti ti-link" />
               Claude Code — Extend Claude with skills(フロントマター詳細・運用機能)
             </div>
             <Ext href="https://code.claude.com/docs/en/skills">
@@ -1007,7 +1000,7 @@ export default function Page() {
           </li>
           <li>
             <div className={styles.sourceTitle}>
-              <i className="ti ti-link" />
+              <i aria-hidden="true" className="ti ti-link" />
               Claude Code ドキュメントマップ
             </div>
             <Ext href="https://docs.anthropic.com/en/docs/claude-code/claude_code_docs_map.md">
@@ -1020,7 +1013,7 @@ export default function Page() {
         <ul className={styles.sourcesList}>
           <li>
             <div className={styles.sourceTitle}>
-              <i className="ti ti-link" />
+              <i aria-hidden="true" className="ti ti-link" />
               Equipping agents for the real world with Agent Skills(Barry Zhang, Keith Lazuka,
               Mahesh Murag 著、アーキテクチャ設計の背景解説)
             </div>
@@ -1034,7 +1027,7 @@ export default function Page() {
         <ul className={styles.sourcesList}>
           <li>
             <div className={styles.sourceTitle}>
-              <i className="ti ti-link" />
+              <i aria-hidden="true" className="ti ti-link" />
               Simon Willison(Django共同開発者)「Claude Skills are awesome, maybe a bigger deal than
               MCP」
             </div>
@@ -1044,7 +1037,7 @@ export default function Page() {
           </li>
           <li>
             <div className={styles.sourceTitle}>
-              <i className="ti ti-link" />
+              <i aria-hidden="true" className="ti ti-link" />
               Simon Willison, Skillsタグ一覧(コミュニティ動向の記録)
             </div>
             <Ext href="https://simonwillison.net/tags/skills/">
@@ -1057,7 +1050,7 @@ export default function Page() {
         <ul className={styles.sourcesList}>
           <li>
             <div className={styles.sourceTitle}>
-              <i className="ti ti-link" />
+              <i aria-hidden="true" className="ti ti-link" />
               anthropics/skills(公式オープンソースSkillsリポジトリ)
             </div>
             <Ext href="https://github.com/anthropics/skills">
@@ -1066,7 +1059,7 @@ export default function Page() {
           </li>
           <li>
             <div className={styles.sourceTitle}>
-              <i className="ti ti-link" />
+              <i aria-hidden="true" className="ti ti-link" />
               travisvn/awesome-claude-skills(コミュニティによるキュレーションリスト)
             </div>
             <Ext href="https://github.com/travisvn/awesome-claude-skills">
@@ -1076,7 +1069,7 @@ export default function Page() {
         </ul>
 
         <div className={`${styles.callout} ${styles.calloutWarning}`}>
-          <i className="ti ti-alert-triangle" />
+          <i aria-hidden="true" className="ti ti-alert-triangle" />
           <p>
             Claude
             Codeのフロントマターフィールドや挙動はバージョンにより追加・変更されることがある。本ガイドは2026年7月26日時点の公式ドキュメントに基づいており、最新の詳細は上記リンク(特に
