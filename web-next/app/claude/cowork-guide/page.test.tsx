@@ -54,6 +54,17 @@ describe("/claude/cowork-guide 契約テスト", () => {
     }
   });
 
+  it("TechCrunchの記事を第三者報道として表示する", () => {
+    const { container } = render(<Page />);
+    const article = container.querySelector(
+      'a[href="https://www.techcrunch.com/2026/01/30/anthropic-brings-agentic-plugins-to-cowork/"]'
+    );
+    const badge = article?.querySelector("span");
+
+    expect(article).not.toBeNull();
+    expect(badge?.textContent).toBe("第三者報道");
+  });
+
   it("無効化されたチェックボックスを隣接する説明文とラベルで関連付ける", () => {
     const { container } = render(<Page />);
     const checkboxes = Array.from(
