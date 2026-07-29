@@ -25,6 +25,22 @@ vi.mock("mermaid", () => ({
       const messageLine = document.createElementNS("http://www.w3.org/2000/svg", "tspan");
       message.appendChild(messageLine);
       svg.appendChild(message);
+
+      const noteRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+      noteRect.classList.add("note");
+      svg.appendChild(noteRect);
+
+      const noteText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      noteText.classList.add("noteText");
+      const noteLine = document.createElementNS("http://www.w3.org/2000/svg", "tspan");
+      noteText.appendChild(noteLine);
+      svg.appendChild(noteText);
+
+      const genericNote = document.createElementNS("http://www.w3.org/2000/svg", "g");
+      genericNote.classList.add("note");
+      genericNote.appendChild(document.createElementNS("http://www.w3.org/2000/svg", "rect"));
+      genericNote.appendChild(document.createElementNS("http://www.w3.org/2000/svg", "text"));
+      svg.appendChild(genericNote);
       target.appendChild(svg);
     }),
   },
@@ -79,13 +95,52 @@ describe("MermaidDiagram レイアウト規約", () => {
   it("initialize に flowchart・sequence・mindmap の useMaxWidth: false を渡して呼び出す", async () => {
     render(<MermaidDiagram chart="graph TD; A-->B" />);
     await waitFor(() => {
-      expect(mermaid.initialize).toHaveBeenCalledWith(
+      expect(mermaid.initialize).toHaveBeenLastCalledWith(
         expect.objectContaining({
           flowchart: expect.objectContaining({ useMaxWidth: false }),
           sequence: expect.objectContaining({ useMaxWidth: false }),
           mindmap: expect.objectContaining({ useMaxWidth: false }),
         })
       );
+    });
+  });
+
+  it("利用者指定の fontSize を保持する", async () => {
+    render(<MermaidDiagram chart="graph TD; A-->B" themeVariables={{ fontSize: "48px" }} />);
+    await waitFor(() => {
+      expect(mermaid.initialize).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          themeVariables: expect.objectContaining({ fontSize: "48px" }),
+        })
+      );
+    });
+  });
+
+  it("fontSize が未指定なら 16px を使用する", async () => {
+    render(<MermaidDiagram chart="graph TD; A-->B" />);
+    await waitFor(() => {
+      expect(mermaid.initialize).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          themeVariables: expect.objectContaining({ fontSize: "16px" }),
+        })
+      );
+    });
+  });
+
+  it("maxHeight を描画後の svg に適用する", async () => {
+    const { container } = render(<MermaidDiagram chart="stateDiagram-v2" maxHeight="460px" />);
+    await waitFor(() => {
+      expect((container.querySelector("svg") as SVGElement).style.maxHeight).toBe("460px");
+    });
+  });
+
+  it.each([
+    [320, "320px"],
+    [0, "0px"],
+  ])("数値 maxHeight=%s を CSS 値 %s として適用する", async (maxHeight, expected) => {
+    const { container } = render(<MermaidDiagram chart="stateDiagram-v2" maxHeight={maxHeight} />);
+    await waitFor(() => {
+      expect((container.querySelector("svg") as SVGElement).style.maxHeight).toBe(expected);
     });
   });
 
@@ -115,6 +170,15 @@ describe("MermaidDiagram レイアウト規約", () => {
       expect(
         (container.querySelector("text.messageText tspan") as SVGTSpanElement).style.fill
       ).toBe("rgb(0, 0, 0)");
+      expect((container.querySelector("rect.note") as SVGRectElement).style.fill).toBe(
+        "rgb(255, 255, 255)"
+      );
+      expect((container.querySelector("rect.note") as SVGRectElement).style.stroke).toBe(
+        "rgb(0, 0, 0)"
+      );
+      expect((container.querySelector("text.noteText") as SVGTextElement).style.fill).toBe(
+        "rgb(0, 0, 0)"
+      );
     });
   });
 
@@ -138,5 +202,26 @@ describe("MermaidDiagram レイアウト規約", () => {
         (container.querySelector("text.messageText tspan") as SVGTSpanElement).style.fill
       ).toBe("rgb(101, 67, 33)");
     });
+  });
+
+  it("noteTextColor は note 専用で、signalTextColor と広い .note 子孫には適用しない", async () => {
+    const { container } = render(
+      <MermaidDiagram
+        chart="sequenceDiagram"
+        theme="base"
+        themeVariables={{ noteTextColor: "#112233", signalTextColor: "#abcdef" }}
+      />
+    );
+
+    await waitFor(() => {
+      expect((container.querySelector("text.noteText") as SVGTextElement).style.fill).toBe(
+        "rgb(17, 34, 51)"
+      );
+      expect((container.querySelector("text.noteText tspan") as SVGTSpanElement).style.fill).toBe(
+        "rgb(17, 34, 51)"
+      );
+    });
+    expect((container.querySelector("g.note text") as SVGTextElement).style.fill).toBe("");
+    expect((container.querySelector("g.note rect") as SVGRectElement).style.fill).toBe("");
   });
 });

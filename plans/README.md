@@ -12,6 +12,8 @@
 
 保守同期（2026-07-28）: Fable 5 の `lastReviewed` を `2026-07-26` へ統一し、Claude / SDD ガイドのレビュー修正と契約テスト拡充後に Vitest **1232 件**の Green を確認。
 
+保守同期（2026-07-29）: Mermaid 共有 `maxHeight` API と旧 Google Skill ガイドの 301 を追加し、削除済み Google コンポーネントへの参照を解消。Vitest **1240 tests**、typecheck、lint、pytest **43 tests** はすべて Green。
+
 ## 実行順・ステータス
 
 | Plan | タイトル | 種別 | Depends on | Status |

@@ -2,1283 +2,1398 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import MermaidDiagram from "@/components/docs/MermaidDiagram";
 import styles from "./page.module.css";
+import TocObserver from "./TocObserver";
 
-const DIAG_0 = `graph LR
-subgraph WEB["Claude.ai Web Mobile"]
-W1["テキスト生成・質問回答"]
-W2["コード生成・説明"]
-W3["ファイルアップロード 単発"]
+const DIAG_LIFECYCLE = `flowchart TB
+A["1. 依頼内容を分析し計画を立てる"] --> B["2. 必要に応じて複数のサブタスクに分解する"]
+B --> C["3. Anthropicサーバー上の隔離環境でコードやコマンドを実行する"]
+C --> D["4. 複数のサブエージェントが並行して作業する"]
+D --> E["5. 完成した成果物をセッションに納品し、プレビュー・ダウンロードできるようにする"]`;
+
+const DIAG_DECISION = `flowchart TB
+Start["やりたいことは?"] --> Q1{"数回のやり取りで完結する<br>質問・相談・壁打ちか?"}
+Q1 -->|"はい"| Chat["Chat を使う"]
+Q1 -->|"いいえ"| Q2{"作業対象はコードやリポジトリか?"}
+Q2 -->|"はい"| Code["Claude Code を使う"]
+Q2 -->|"いいえ"| Q3{"複数ファイルや複数アプリ<br>を扱い成果物を作る作業か?"}
+Q3 -->|"はい"| Cowork["Claude Cowork を使う"]
+Q3 -->|"いいえ"| Chat`;
+
+const DIAG_CONTEXT = `flowchart TB
+subgraph L1["Global Instructions（全セッション共通）"]
+    G["トーン・出力形式・役割など、普遍的なルール"]
 end
-subgraph CW["Cowork Desktop"]
-C1["ファイルシステムへの直接アクセス"]
-C2["フォルダ監視・自動トリガー"]
-C3["Skills による繰り返し自動化"]
-C4["ローカルアプリとの連携"]
+subgraph L2["Folder Instructions（フォルダ単位）"]
+    F["クライアント名・専門用語・成果物フォーマットなど"]
 end
-style WEB fill:#1a2530,stroke:#58a6ff,color:#e6edf3
-style CW fill:#2a1a0a,stroke:#f97316,color:#e6edf3`;
+subgraph L3["プロンプト（タスク単位）"]
+    P["今回だけ伝える具体的な指示"]
+end
+L1 --> L2 --> L3`;
 
-const DIAG_1 = `sequenceDiagram
-participant U as ユーザー
-participant CW as Cowork
-participant FS as ファイルシステム
-participant AI as Claude AI
-U->>CW: Downloads の PDF を月別に整理して
-CW->>FS: フォルダの内容をスキャン
-FS-->>CW: ファイル一覧を返す
-CW->>AI: ファイル一覧と指示を送信
-AI-->>CW: 実行計画を生成
-Note over CW: 実行前に計画をユーザーに提示
-CW->>U: これを実行しますか
-U->>CW: OK
-CW->>FS: ファイルを移動・整理
-CW-->>U: 完了レポート`;
+const DIAG_SETUP = `flowchart TB
+S1["Step1: Coworkタブを開く"] --> S2["Step2: 作業対象を渡す（フォルダ・ファイル・コネクタ）"]
+S2 --> S3["Step3: 欲しい成果物とゴールを伝える"]
+S3 --> S4["Step4: 事前に確認したいことを質問させる"]
+S4 --> S5["Step5: 計画を確認してから実行を許可する"]
+S5 --> S6["Step6: 成果物を確認し、必要ならフィードバックする"]`;
 
-const DIAG_4 = `graph TD
-A["Inbox フォルダを監視"] --> B{新しいファイルを検知}
-B -->|PDF ファイル| C["invoice-sorter スキルを起動"]
-B -->|csv ファイル| D["data-import スキルを起動"]
-B -->|その他| E["Unsorted フォルダに移動"]
-C --> F["取引先別に Accounting フォルダに保存"]
-D --> G["Database-imports に保存して通知"]
-style A fill:#1a2530,stroke:#58a6ff,color:#e6edf3
-style F fill:#152a15,stroke:#3fb950,color:#e6edf3
-style G fill:#152a15,stroke:#3fb950,color:#e6edf3`;
+const DIAG_PERMISSION = `flowchart TB
+Task["Claudeが実行しようとするアクション"] --> Mode{"権限モードは?"}
+Mode -->|"Manual"| M1["毎回ユーザーが許可か拒否かを選択する"]
+Mode -->|"Auto"| M2["Claudeが安全性を自動レビューする"]
+Mode -->|"Skip"| M3["確認なしで即座に実行する"]
+M1 ~~~ M2 ~~~ M3
+M2 --> Check{"安全性チェックの結果は?"}
+Check -->|"安全"| Run["そのまま実行する"]
+Check -->|"危険と判定"| Block["ブロックして別の手段を探すか、ユーザーに確認する"]`;
 
-function Ext({ href, children }: { href: string; children: ReactNode }) {
+const DIAG_PLUGIN = `flowchart TB
+Plugin["Plugin（役割ごとのパッケージ）"]
+Plugin --> Skills["Skills：作業手順を定義したファイル"]
+Plugin --> Connectors["Connectors：外部サービスへの接続設定"]
+Plugin --> Commands["Slash Commands：手動実行のショートカット"]
+Plugin --> Agents["Sub-agents：専門特化した補助エージェント"]
+Skills ~~~ Connectors ~~~ Commands ~~~ Agents`;
+
+const DIAG_DISPATCH = `flowchart TB
+Phone["Claude モバイルアプリ"] -->|"タスクを送信する"| Desktop["Claude Desktop app"]
+Desktop -->|"ローカルファイル・コネクタ・スキルを使って実行する"| Work["PC上での作業実行"]
+Work -->|"結果を同期する"| Phone`;
+
+const DIAG_INJECTION = `flowchart TB
+ExtLink["信頼境界の外の情報（メール・Webページ・共有ドキュメントなど）"] --> Read["Claudeが読み取る"]
+Read --> Classifier["コンテンツ分類器が不審な指示を検知しフラグを付ける"]
+Classifier --> Agent["Claudeは元のユーザーの依頼に立ち返って判断する"]
+Agent --> Action{"書き込み系のアクションか?"}
+Action -->|"はい"| Perm["権限モードに応じて確認または自動レビューする"]
+Action -->|"いいえ（読み取りのみ）"| Continue["そのまま作業を継続する"]`;
+
+/**
+ * Renders an external link that opens in a new browser tab.
+ *
+ * @param href - The destination URL
+ * @param className - Optional CSS class name
+ * @param children - The link content
+ * @returns The rendered external link
+ */
+function Ext({
+  href,
+  className,
+  children,
+}: {
+  href: string;
+  className?: string;
+  children: ReactNode;
+}) {
   return (
-    <a href={href} target="_blank" rel="noopener noreferrer">
+    <a href={href} target="_blank" rel="noopener noreferrer" className={className}>
       {children}
     </a>
   );
 }
 
 export const metadata: Metadata = {
-  title: "Claude Cowork 完全入門ガイド",
+  title: "Claude Cowork 実践ガイド｜初心者のためのステップバイステップ・ベストプラクティス",
   description:
-    "コードを一行も書かずに自然言語の指示だけでファイル管理・タスク自動化を実現する Anthropic のデスクトップツール「Cowork」を初学者向けにゼロから解説します。",
+    "Anthropic公式ドキュメント・公式ブログとパワーユーザーの知見をもとに、Claude Coworkの基本概念からセットアップ、安全運用、Scheduled Tasks、Dispatch、10の自衛対策まで完全解説。",
 };
 
 /**
- * Renders the complete Claude Cowork beginner guide page.
+ * Renders the Claude Cowork practical guide with navigation, step-by-step guidance, safety practices, a checklist, and references.
  */
 export default function Page() {
   return (
-    <div className={styles.pageWrap}>
-      {/* ── TOP NAV ── */}
-      <nav className={styles.topnav} aria-label="ページナビゲーション">
-        <div className={styles.topnavInner}>
-          <div className={styles.topnavLogo}>
-            <span className={styles.logoPill}>Cowork</span>
-            <span className={styles.siteTitle}>完全入門ガイド</span>
-          </div>
-          <div className={styles.topnavLinks}>
-            <div className={styles.topnavGroup}>
-              <span className={styles.groupLabel}>基礎</span>
-              <a href="#what" className={styles.navLink}>
-                <span className={styles.navNum}>01</span>&nbsp;概要
-              </a>
-              <a href="#products" className={styles.navLink}>
-                <span className={styles.navNum}>02</span>&nbsp;製品比較
-              </a>
-              <a href="#setup" className={styles.navLink}>
-                <span className={styles.navNum}>03</span>&nbsp;セットアップ
-              </a>
-            </div>
-            <div className={styles.topnavGroup}>
-              <span className={styles.groupLabel}>機能</span>
-              <a href="#natural-language" className={styles.navLink}>
-                <span className={styles.navNum}>04</span>&nbsp;自然言語操作
-              </a>
-              <a href="#file-tasks" className={styles.navLink}>
-                <span className={styles.navNum}>05</span>&nbsp;タスク自動化
-              </a>
-              <a href="#skills" className={styles.navLink}>
-                <span className={styles.navNum}>06</span>&nbsp;Skills連携
-              </a>
-            </div>
-            <div className={styles.topnavGroup}>
-              <span className={styles.groupLabel}>実践</span>
-              <a href="#workflow" className={styles.navLink}>
-                <span className={styles.navNum}>07</span>&nbsp;ワークフロー
-              </a>
-              <a href="#skill-writing" className={styles.navLink}>
-                <span className={styles.navNum}>08</span>&nbsp;スキルの書き方
-              </a>
-              <a href="#best-practices" className={styles.navLink}>
-                <span className={styles.navNum}>09</span>&nbsp;ベストプラクティス
-              </a>
-              <a href="#advanced" className={styles.navLink}>
-                <span className={styles.navNum}>10</span>&nbsp;応用
-              </a>
-            </div>
-            <div className={styles.topnavGroup}>
-              <span className={styles.groupLabel}>参考</span>
-              <a href="#sources" className={styles.navLink}>
-                <span className={styles.navNum}>11</span>&nbsp;ソース
-              </a>
+    <div className={styles.layout}>
+      <TocObserver />
+      <div className={styles.layoutContainer}>
+        <nav className={styles.sidebar} id="sidebar" aria-label="目次ナビゲーション">
+          <div className={styles.brand}>
+            <div className={styles.brandBadge}>CC</div>
+            <div>
+              <div className={styles.brandName}>Claude Cowork</div>
+              <div className={styles.brandSub}>実践ガイド</div>
             </div>
           </div>
-        </div>
-      </nav>
 
-      <div className={styles.pageContent}>
-        {/* ── HERO ── */}
-        <section className={styles.hero}>
-          <div className={styles.heroBadge}>
-            Claude Cowork · 非開発者向けデスクトップ自動化ツール
-          </div>
-          <h1>
-            Claude Cowork
-            <br />
-            完全入門ガイド
-          </h1>
-          <p className={styles.heroSub}>
-            コードを一行も書かずに、自然言語の指示だけでファイル管理・タスク自動化を実現する
-            Anthropic のデスクトップツール「Cowork」を、初学者向けにゼロから解説します。 Skills
-            との連携・ベストプラクティス・実践ワークフロー例まで網羅。
-          </p>
-          <div className={styles.heroMeta}>
-            <span className={`${styles.heroChip} ${styles.chipOrange}`}>🖥️ デスクトップアプリ</span>
-            <span className={`${styles.heroChip} ${styles.chipBlue}`}>👥 非開発者向け</span>
-            <span className={`${styles.heroChip} ${styles.chipGreen}`}>⚡ Skills 対応</span>
-            <span className={`${styles.heroChip} ${styles.chipPurple}`}>🤖 Claude AI 搭載</span>
-          </div>
-        </section>
+          <div className={styles.navTitle}>目次</div>
+          <ul className={styles.navList} id="nav-list">
+            <li>
+              <a href="#step0">
+                <span className={styles.dot} />
+                Step0：Coworkとは何か
+              </a>
+            </li>
+            <li>
+              <a href="#step1">
+                <span className={styles.dot} />
+                Step1：使い分け
+              </a>
+            </li>
+            <li>
+              <a href="#step2">
+                <span className={styles.dot} />
+                Step2：環境を準備する
+              </a>
+            </li>
+            <li>
+              <a href="#step3">
+                <span className={styles.dot} />
+                Step3：フォルダとInstructions
+              </a>
+            </li>
+            <li>
+              <a href="#step4">
+                <span className={styles.dot} />
+                Step4：最初のタスク
+              </a>
+            </li>
+            <li>
+              <a href="#step5">
+                <span className={styles.dot} />
+                Step5：権限モード
+              </a>
+            </li>
+            <li>
+              <a href="#step6">
+                <span className={styles.dot} />
+                Step6：Plugins
+              </a>
+            </li>
+            <li>
+              <a href="#step7">
+                <span className={styles.dot} />
+                Step7：Scheduled Tasks
+              </a>
+            </li>
+            <li>
+              <a href="#step8">
+                <span className={styles.dot} />
+                Step8：Dispatch
+              </a>
+            </li>
+            <li>
+              <a href="#step9">
+                <span className={styles.dot} />
+                Step9：安全運用の原則
+              </a>
+            </li>
+            <li>
+              <a href="#step10">
+                <span className={styles.dot} />
+                Step10：コミュニティの知見
+              </a>
+            </li>
+            <li>
+              <a href="#step11">
+                <span className={styles.dot} />
+                Step11：落とし穴と対処
+              </a>
+            </li>
+            <li>
+              <a href="#checklist">
+                <span className={styles.dot} />
+                納品前チェックリスト
+              </a>
+            </li>
+            <li>
+              <a href="#references">
+                <span className={styles.dot} />
+                参考文献・出典
+              </a>
+            </li>
+          </ul>
+        </nav>
 
-        {/* ── 01 WHAT IS COWORK ── */}
-        <section className={styles.section} id="what">
-          <div className={styles.sectionHeader}>
-            <span className={styles.sectionNum}>01</span>
-            <h2>Cowork とは何か？</h2>
-          </div>
-          <p>
-            <strong>Cowork</strong> は Anthropic が提供するデスクトップアプリケーションです。
-            <strong>コードを一行も書かずに</strong>、自然言語（日本語・英語）の指示だけで
-            ファイル管理やタスク自動化を実現できます。
-          </p>
-          <div className={`${styles.callout} ${styles.calloutTip}`}>
-            <span className={styles.calloutIcon}>💡</span>
-            <p>
-              <strong>ひとことで言うと:</strong>
-              「AI にパソコンの操作権限を与えたもの」です。 Claude に「この 400 件の PDF
-              を要約して」「毎週月曜に売上レポートをまとめて」と話しかけるだけで実行してくれます。
+        <main className={styles.main}>
+          <header className={styles.hero}>
+            <div className={styles.eyebrow}>BETA FEATURE GUIDE · 2026.07.26 時点</div>
+            <h1>
+              Claude Cowork 実践ガイド
+              <br />
+              初心者のためのステップバイステップ・ベストプラクティス
+            </h1>
+            <p className={styles.lead}>
+              Anthropic公式ドキュメント・公式ブログと、著名なパワーユーザーの発信をもとに、Claude
+              Coworkの基本概念からセットアップ、安全な運用、応用までを順を追って解説します。
             </p>
-          </div>
-          <h3>Cowork が解決する問題</h3>
-          <div className={styles.cardGrid}>
-            <div className={styles.card}>
-              <div className={styles.cardIcon}>😩</div>
-              <div className={styles.cardTitle}>繰り返し作業の疲弊</div>
-              <div className={styles.cardDesc}>
-                毎週同じ形式でファイルを整理・リネーム・変換する単調作業を自動化。
-              </div>
+            <div className={styles.heroMeta}>
+              <span className={styles.metaChip}>最終更新：2026年7月26日</span>
+              <span className={styles.metaChip}>対象：初めてClaude Coworkに触れる方</span>
+              <span className={styles.metaChip}>形式：全12ステップ + チェックリスト</span>
             </div>
-            <div className={styles.card}>
-              <div className={styles.cardIcon}>📄</div>
-              <div className={styles.cardTitle}>大量ドキュメント処理</div>
-              <div className={styles.cardDesc}>
-                PDF・Word・Excel
-                を一括で読み取り・要約・変換。手作業では数時間かかる処理が分単位で完了。
-              </div>
-            </div>
-            <div className={styles.card}>
-              <div className={styles.cardIcon}>🔄</div>
-              <div className={styles.cardTitle}>定型ワークフロー</div>
-              <div className={styles.cardDesc}>
-                「毎朝9時に〇〇をして」「このフォルダにファイルが来たら〇〇して」などを定期実行。
-              </div>
-            </div>
-            <div className={styles.card}>
-              <div className={styles.cardIcon}>🚫</div>
-              <div className={styles.cardTitle}>プログラミング不要</div>
-              <div className={styles.cardDesc}>
-                Python・bash の知識ゼロでも、複雑な自動化タスクを自然言語で実現できる。
-              </div>
-            </div>
-          </div>
-          <h3>Cowork vs Claude.ai の違い</h3>
-          <div className={styles.mermaidWrap}>
-            <MermaidDiagram chart={DIAG_0} />
-          </div>
-          <div className={`${styles.callout} ${styles.calloutInfo}`}>
-            <span className={styles.calloutIcon}>ℹ️</span>
-            <p>
-              <strong>現在の提供状況:</strong> Cowork は 2026 年 4 月 9 日に{" "}
-              <strong>一般提供（GA）</strong>となり、Beta バッジは外れました。Pro（$20/月）以上の
-              すべての有料プランに無償で含まれ、macOS / Windows で利用できます。GA
-              では定期実行タスク、 Team/Enterprise
-              向けプラグインマーケットプレイス、ロールベースアクセス制御、利用状況分析、
-              OpenTelemetry 連携が追加されました。最新の提供状況は{" "}
-              <Ext href="https://claude.ai">claude.ai</Ext> で確認してください。
-            </p>
-          </div>
-        </section>
+          </header>
 
-        {/* ── 02 PRODUCTS ── */}
-        <section className={styles.section} id="products">
-          <div className={styles.sectionHeader}>
-            <span className={styles.sectionNum}>02</span>
-            <h2>Anthropic 製品ラインアップとの比較</h2>
-          </div>
-          <p>
-            Anthropic は Claude を複数の形態で提供しています。Cowork
-            は「デスクトップで動く非開発者向けツール」として独自のポジションを持ちます。
-          </p>
-          <div className={styles.productRow}>
-            <div className={styles.productCard}>
-              <div className={styles.productEmoji}>💬</div>
-              <div className={styles.productName}>Claude.ai</div>
-              <div className={styles.productTarget}>Web / Mobile Chat</div>
-              <div className={styles.productDesc}>日常的な質問・コード生成・文書作成</div>
-            </div>
-            <div className={`${styles.productCard} ${styles.productCardHighlight}`}>
-              <div className={styles.productEmoji}>🖥️</div>
-              <div className={styles.productName}>Cowork</div>
-              <div className={styles.productTarget}>Desktop App (GA)</div>
-              <div className={styles.productDesc}>ファイル管理・タスク自動化（非開発者）</div>
-            </div>
-            <div className={styles.productCard}>
-              <div className={styles.productEmoji}>⌨️</div>
-              <div className={styles.productName}>Claude Code</div>
-              <div className={styles.productTarget}>CLI (Terminal)</div>
-              <div className={styles.productDesc}>コードベース全体の理解・リファクタリング</div>
-            </div>
-            <div className={styles.productCard}>
-              <div className={styles.productEmoji}>🌐</div>
-              <div className={styles.productName}>Claude in Chrome</div>
-              <div className={styles.productTarget}>Browser Extension (Beta)</div>
-              <div className={styles.productDesc}>Web ブラウジングの自動化エージェント</div>
-            </div>
-            <div className={styles.productCard}>
-              <div className={styles.productEmoji}>📊</div>
-              <div className={styles.productName}>Claude in Excel</div>
-              <div className={styles.productTarget}>Spreadsheet Agent (Beta)</div>
-              <div className={styles.productDesc}>スプレッドシート操作・データ分析</div>
-            </div>
-          </div>
-          <div className={styles.tableWrap}>
-            <table>
-              <thead>
-                <tr>
-                  <th>観点</th>
-                  <th>Claude.ai</th>
-                  <th>Cowork ★</th>
-                  <th>Claude Code</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>
-                    <strong>対象ユーザー</strong>
-                  </td>
-                  <td>誰でも</td>
-                  <td>
-                    <span className={`${styles.badge} ${styles.badgeOrange}`}>非開発者</span>
-                  </td>
-                  <td>
-                    <span className={`${styles.badge} ${styles.badgeBlue}`}>開発者</span>
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <strong>ファイル直接操作</strong>
-                  </td>
-                  <td>❌</td>
-                  <td>✅ ローカル直接</td>
-                  <td>✅ リポジトリ内</td>
-                </tr>
-                <tr>
-                  <td>
-                    <strong>自動化・定期実行</strong>
-                  </td>
-                  <td>❌</td>
-                  <td>✅ トリガー設定可</td>
-                  <td>⚡ /loop コマンド</td>
-                </tr>
-                <tr>
-                  <td>
-                    <strong>Skills 連携</strong>
-                  </td>
-                  <td>✅ (claude.ai Skills)</td>
-                  <td>✅ SKILL.md 対応</td>
-                  <td>✅ SKILL.md ネイティブ</td>
-                </tr>
-                <tr>
-                  <td>
-                    <strong>プログラミング知識</strong>
-                  </td>
-                  <td>不要</td>
-                  <td>
-                    <span className={`${styles.badge} ${styles.badgeGreen}`}>不要</span>
-                  </td>
-                  <td>必要（推奨）</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <div className={`${styles.callout} ${styles.calloutTip}`}>
-            <span className={styles.calloutIcon}>🎯</span>
+          {/* ================= STEP 0 ================= */}
+          <section className={styles.section} id="step0">
+            <h2>
+              <span className={styles.stepNo}>STEP 0</span>Claude Coworkとは何か
+            </h2>
             <p>
-              <strong>選択指針:</strong>
-              「コードを書きたくないが、ファイル整理・定期レポートを自動化したい」なら
-              <strong>Cowork</strong> が最適解です。エンジニアリングチームには Claude Code、
-              日常的な質疑には Claude.ai を使い分けましょう。
+              Claude Coworkは、Claude
+              Codeが持つ「自律的にタスクをこなすエージェント機能」を、ターミナルを使わずに非エンジニアの知識労働（書類作成、リサーチ、データ整理など）向けに開放したものです。ユーザーは「欲しい結果」を説明してその場を離れ、後から完成した成果物（整形済みドキュメント、整理されたファイル、まとめられたリサーチなど）を受け取る、という使い方をします。
             </p>
-          </div>
-        </section>
+            <p>
+              Coworkのセッションは基本的にAnthropicのサーバー上でリモート実行されるため、作業内容やファイルはユーザーのClaudeアカウントに紐づき、デスクトップ・Web・モバイルのどこからでも続きを確認できます。Chat（通常の会話）とCoworkは同じメッセージ入力欄を共有しており、入力欄で「Cowork」を選ぶだけで切り替えられます。
+            </p>
 
-        {/* ── 03 SETUP ── */}
-        <section className={styles.section} id="setup">
-          <div className={styles.sectionHeader}>
-            <span className={styles.sectionNum}>03</span>
-            <h2>セットアップ手順</h2>
-          </div>
-          <p>Cowork のインストールから初期設定まで、ステップバイステップで解説します。</p>
-          <div className={styles.steps}>
-            <div className={styles.stepItem}>
-              <div className={styles.stepNum}>1</div>
-              <div className={styles.stepContent}>
-                <div className={styles.stepTitle}>Anthropic アカウントを用意する</div>
-                <div className={styles.stepDesc}>
-                  <Ext href="https://claude.ai">claude.ai</Ext> でアカウントを作成します。 Cowork は
-                  Pro プラン以上（または Team/Enterprise）で利用できます。
-                  <div className={`${styles.callout} ${styles.calloutInfo} ${styles.calloutMt}`}>
-                    <span className={styles.calloutIcon}>ℹ️</span>
-                    <p>
-                      Cowork は 2026 年 4 月 9 日より一般提供（GA）されており、Pro
-                      以上の有料プランに無償で含まれます。
-                      <Ext href="https://support.claude.com">support.claude.com</Ext>{" "}
-                      で最新状況を確認してください。
-                    </p>
-                  </div>
-                </div>
-              </div>
+            <h3>Coworkが1つのタスクをこなす流れ</h3>
+            <p className={styles.muted}>
+              Claudeはタスクを受け取ると、次のような5段階で作業を進めます。
+            </p>
+            <div className={styles.diagramWrap}>
+              <MermaidDiagram chart={DIAG_LIFECYCLE} />
             </div>
-            <div className={styles.stepItem}>
-              <div className={styles.stepNum}>2</div>
-              <div className={styles.stepContent}>
-                <div className={styles.stepTitle}>Cowork デスクトップアプリをダウンロード</div>
-                <div className={styles.stepDesc}>
-                  claude.ai のダッシュボードから「Cowork」を選択し、お使いの OS（macOS /
-                  Windows）用インストーラーをダウンロードします。
-                </div>
-              </div>
+
+            <h3>主な提供環境</h3>
+            <p>
+              Claude Coworkは有料プラン（Pro / Max / Team /
+              Enterprise）で利用でき、macOS・Windows向けのClaude
+              Desktopアプリのほか、Web版・モバイル版でもベータ提供が始まっています（Web・モバイルはMaxプランから段階的に展開中）。ローカルファイルへの直接アクセス、ブラウザ操作、コンピュータ操作（computer
+              use）を行うには、Claude Desktopアプリを起動しておく必要があります。
+            </p>
+          </section>
+
+          {/* ================= STEP 1 ================= */}
+          <section className={styles.section} id="step1">
+            <h2>
+              <span className={styles.stepNo}>STEP 1</span>Chat・Cowork・Claude Codeを使い分ける
+            </h2>
+            <p>
+              Anthropicのグロースマーケティング担当者Austin
+              Lau氏が公式ブログで示した整理によれば、3つのワークスペースは次のように使い分けるのが基本です。
+            </p>
+
+            <div className={styles.tableWrap}>
+              <table>
+                <thead>
+                  <tr>
+                    <th>ワークスペース</th>
+                    <th>向いている場面</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Chat</td>
+                    <td>数回のやり取りで完結する質問、壁打ち、ブレインストーミング</td>
+                  </tr>
+                  <tr>
+                    <td>Claude Cowork</td>
+                    <td>
+                      複数ファイル・複数アプリにまたがる作業で、最終的に「誰かに渡す成果物」ができる仕事
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Claude Code</td>
+                    <td>ソフトウェア開発。コードやリポジトリが仕事の対象になる場合</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
-            <div className={styles.stepItem}>
-              <div className={styles.stepNum}>3</div>
-              <div className={styles.stepContent}>
-                <div className={styles.stepTitle}>インストールとサインイン</div>
-                <div className={styles.stepDesc}>
-                  インストーラーを実行してアプリをインストールします。起動後、Claude.ai
-                  と同じアカウントでサインインします。
-                </div>
-              </div>
+
+            <p className={styles.muted}>
+              同ブログで紹介されている、判断に迷う具体例です（要約・翻訳）。
+            </p>
+            <div className={styles.tableWrap}>
+              <table>
+                <thead>
+                  <tr>
+                    <th>依頼の例</th>
+                    <th>適した使い方</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>次のビジネスレビューで何を話すべきか</td>
+                    <td>Chat</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      Google Driveの直近3か月分の議事録を読み、社内テンプレートでQBR資料を作って
+                    </td>
+                    <td>Cowork</td>
+                  </tr>
+                  <tr>
+                    <td>VLOOKUPの使い方を教えて</td>
+                    <td>Chat</td>
+                  </tr>
+                  <tr>
+                    <td>このスプレッドシート群のVLOOKUPを全部INDEX/MATCHに置き換えて</td>
+                    <td>Cowork</td>
+                  </tr>
+                  <tr>
+                    <td>このページのタイトルタグ案を1つ考えて</td>
+                    <td>Chat</td>
+                  </tr>
+                  <tr>
+                    <td>シートにある30ページ分のタイトルタグをCMSコネクタ経由で一括更新して</td>
+                    <td>Cowork</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
-            <div className={styles.stepItem}>
-              <div className={styles.stepNum}>4</div>
-              <div className={styles.stepContent}>
-                <div className={styles.stepTitle}>作業フォルダへのアクセス権限を設定</div>
-                <div className={styles.stepDesc}>
-                  Cowork が操作するフォルダへのアクセス許可を設定します。
-                  <div className={`${styles.callout} ${styles.calloutWarn} ${styles.calloutMt}`}>
-                    <span className={styles.calloutIcon}>⚠️</span>
-                    <p>
-                      <strong>セキュリティ注意:</strong>
-                      必要最小限のフォルダのみアクセスを許可しましょう。機密情報を含むフォルダへのアクセスは慎重に検討してください。
-                    </p>
-                  </div>
-                </div>
-              </div>
+
+            <h3>判断フロー</h3>
+            <div className={styles.diagramWrap}>
+              <MermaidDiagram chart={DIAG_DECISION} />
             </div>
-            <div className={styles.stepItem}>
-              <div className={styles.stepNum}>5</div>
-              <div className={styles.stepContent}>
-                <div className={styles.stepTitle}>動作確認 — 最初の指示を試す</div>
-                <div className={styles.stepDesc}>
-                  <div className={`${styles.codeBlock} ${styles.codeBlockMt}`}>
-                    <div className={styles.codeBlockHeader}>
-                      <div className={styles.codeBlockDots}>
-                        <div className={`${styles.dot} ${styles.dotR}`} />
-                        <div className={`${styles.dot} ${styles.dotY}`} />
-                        <div className={`${styles.dot} ${styles.dotG}`} />
-                      </div>
-                      <span className={styles.codeBlockLang}>
-                        Cowork チャット欄（最初の動作確認）
+
+            <h3>Cowork向きタスクの「5つの材料」</h3>
+            <p className={styles.muted}>
+              すべてを満たす必要はありませんが、当てはまる項目が多いほどCowork向きです。
+            </p>
+            <ul className={styles.checklist}>
+              <li>
+                <label>
+                  <input type="checkbox" disabled />
+                  <span>
+                    <strong>入力が複数ある</strong>
+                    ：複数ファイル、フォルダ全体、あるいはファイル＋コネクタの組み合わせ
+                  </span>
+                </label>
+              </li>
+              <li>
+                <label>
+                  <input type="checkbox" disabled />
+                  <span>
+                    <strong>出力がファイルになる</strong>
+                    ：共有・添付・再利用できるドキュメント、資料、スプレッドシートなど
+                  </span>
+                </label>
+              </li>
+              <li>
+                <label>
+                  <input type="checkbox" disabled />
+                  <span>
+                    <strong>繰り返し発生する</strong>
+                    ：一回きりでも構わないが、定期的に発生する作業ほど向いている
+                  </span>
+                </label>
+              </li>
+              <li>
+                <label>
+                  <input type="checkbox" disabled />
+                  <span>
+                    <strong>「良い出来」の基準を自分が知っている</strong>
+                    ：出来上がりを見て良し悪しを15秒で判断できる
+                  </span>
+                </label>
+              </li>
+              <li>
+                <label>
+                  <input type="checkbox" disabled />
+                  <span>
+                    <strong>「中間部分」が単調である</strong>
+                    ：考える部分（最初と最後）以外の抽出・突合・整形が中心
+                  </span>
+                </label>
+              </li>
+            </ul>
+          </section>
+
+          {/* ================= STEP 2 ================= */}
+          <section className={styles.section} id="step2">
+            <h2>
+              <span className={styles.stepNo}>STEP 2</span>利用環境を準備する
+            </h2>
+            <p>Coworkを使い始めるための前提条件は次のとおりです。</p>
+            <ul className={styles.plain}>
+              <li>
+                <strong>有料のClaudeプラン</strong>（Pro / Max / Team / Enterprise のいずれか）
+              </li>
+              <li>
+                <strong>ローカルファイルアクセス・ブラウザ操作・コンピュータ操作を使うには</strong>
+                ：macOSまたはWindows向けのClaude Desktopアプリを起動し、接続しておくこと
+              </li>
+              <li>
+                <strong>安定したインターネット接続</strong>（セッション中は常時必要）
+              </li>
+            </ul>
+
+            <h3>始め方</h3>
+            <ol className={styles.plain}>
+              <li>
+                Web版（claude.ai）、Claude Desktopアプリ、またはClaude
+                モバイルアプリのいずれかでClaudeを開く
+              </li>
+              <li>メッセージ入力欄で「Cowork」を選択する</li>
+              <li>やってほしいタスクを説明する</li>
+              <li>Claudeが示す進め方（プラン）を確認し、実行させる</li>
+            </ol>
+
+            <div className={styles.callout}>
+              <div className={styles.calloutTitle}>POINT</div>
+              <p>
+                デスクトップアプリを閉じたりPCがスリープしても、リモートセッション自体は継続して動作します。ただし、ローカルファイル・ブラウザ・PC操作を使うタスクでは、Claude
+                Desktopアプリを開いたままにしておく必要があります。
+              </p>
+            </div>
+          </section>
+
+          {/* ================= STEP 3 ================= */}
+          <section className={styles.section} id="step3">
+            <h2>
+              <span className={styles.stepNo}>STEP 3</span>作業フォルダとGlobal / Folder
+              Instructionsを設定する
+            </h2>
+            <p>
+              多くの実践者が口をそろえるポイントは、「良い出力とそうでない出力の差は、プロンプトの巧さではなく、事前にどれだけ豊かな文脈（コンテキスト）を渡せているかで決まる」という点です。Coworkはこの文脈を2つのレイヤーで永続的に扱えます。
+            </p>
+
+            <div className={styles.diagramWrap}>
+              <MermaidDiagram chart={DIAG_CONTEXT} />
+            </div>
+
+            <h3>Global Instructions（全セッション共通の指示）</h3>
+            <p>
+              すべてのCoworkセッションに適用される「常設の指示」です。好みのトーン、出力フォーマット、自分の役割の背景などをここに記載しておきます。
+            </p>
+            <ol className={styles.plain}>
+              <li>
+                <code>Settings &gt; Cowork</code> を開く
+              </li>
+              <li>「Global instructions」の横にある「Edit」をクリック</li>
+              <li>指示文を入力し「Save」をクリック</li>
+            </ol>
+
+            <h3>Folder Instructions（フォルダ単位の指示）</h3>
+            <p>
+              デスクトップ版でローカルフォルダを選択した際に、そのフォルダ固有の文脈を追加できる仕組みです。Claudeがセッション中に自動で更新することもあります。クライアント名や専門用語、成果物フォーマットなど、「そのフォルダの中でだけ」有効にしたいルールを書く場所です。
+            </p>
+
+            <h3>作業フォルダの設計例</h3>
+            <p>
+              Coworkは指定したフォルダの中だけを読み書きできるため、専用フォルダを1つ用意し、その中に用途別のサブフォルダを作る運用が複数の実践者から共有されています。著名なAI活用発信者のRuben
+              Hassid氏は、マスターフォルダの下に「About
+              me」「Project」「Template」「Outputs」という4つのサブフォルダを作り、そこにCoworkを向ける運用を紹介しています。
+            </p>
+
+            <div className={styles.tableWrap}>
+              <table>
+                <thead>
+                  <tr>
+                    <th>サブフォルダ例</th>
+                    <th>役割</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>About me</td>
+                    <td>自分の役割、書き方の癖、避けたい表現などをまとめたファイル</td>
+                  </tr>
+                  <tr>
+                    <td>Project</td>
+                    <td>進行中の案件に関する資料</td>
+                  </tr>
+                  <tr>
+                    <td>Template</td>
+                    <td>過去のベストな成果物（Claudeに再利用させる型）</td>
+                  </tr>
+                  <tr>
+                    <td>Outputs</td>
+                    <td>Claudeが生成した成果物の置き場</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <p className={styles.muted}>
+              低リスクなテスト用フォルダから始め、重要なファイルの入った本番フォルダにいきなりアクセスさせないことも、複数の実践者が共通して勧めているポイントです。
+            </p>
+          </section>
+
+          {/* ================= STEP 4 ================= */}
+          <section className={styles.section} id="step4">
+            <h2>
+              <span className={styles.stepNo}>STEP 4</span>最初のタスクを渡す（はじめの10分）
+            </h2>
+
+            <div className={styles.diagramWrap}>
+              <MermaidDiagram chart={DIAG_SETUP} />
+            </div>
+
+            <p>Austin Lau氏が紹介している「最初の10分」の進め方は次のとおりです。</p>
+            <ol className={styles.plain}>
+              <li>
+                <strong>何か渡す</strong>
+                ：ファイルを数点ドロップする、PC上のフォルダを指定する、よく使うアプリ（Slack、Gmail、Notionなど）を接続する
+              </li>
+              <li>
+                <strong>欲しい結果を伝える</strong>
+                ：最終的にどんな成果物が欲しいか、必要な文脈とあわせて説明する
+              </li>
+              <li>
+                <strong>自分がよく知っているタスクから始める</strong>
+                ：出来上がりの「良し悪し」を自分で判断できる仕事を選ぶ
+              </li>
+              <li>
+                <strong>事前に質問させる</strong>
+                ：プロンプトに一文を添えるだけで精度が大きく変わります。
+              </li>
+            </ol>
+
+            <div className={styles.quoteExample}>
+              「始める前に、私の依頼内容を要約して認識合わせをし、思いつく限りの確認事項を質問してください」
+            </div>
+            <p className={styles.muted}>
+              これにより、期間の範囲や「良い」の基準、Claudeが気づけないエッジケースなど、言い忘れがちな前提が事前に洗い出されます。
+            </p>
+          </section>
+
+          {/* ================= STEP 5 ================= */}
+          <section className={styles.section} id="step5">
+            <h2>
+              <span className={styles.stepNo}>STEP 5</span>権限モードを選び、安全に運用する
+            </h2>
+            <p>
+              Coworkには、Claudeが行動する前にどこまで確認を求めるかを制御する3つのモードがあります。チャット入力欄のモード切り替えからいつでも変更できます。
+            </p>
+
+            <div className={styles.tableWrap}>
+              <table>
+                <thead>
+                  <tr>
+                    <th>モード</th>
+                    <th>概要</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      Manually approve
+                      <br />
+                      <span style={{ color: "var(--text-faint)", fontSize: "14px" }}>
+                        （旧称 Ask before acting）
                       </span>
-                    </div>
-                    <pre>「デスクトップにある .txt ファイルの一覧を教えてください」</pre>
-                  </div>
-                  Cowork がファイル一覧を返してくれればセットアップ完了です。
-                </div>
-              </div>
+                    </td>
+                    <td>
+                      Claudeは行動の一つひとつで一時停止し、許可を求めます。依頼ごとに「許可」か「拒否」を選びます
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Automatically approve</td>
+                    <td>
+                      Claudeは止まらずに作業を続けますが、各行動を安全性の観点で自動レビューし、危険と判定したものは自動的にブロックします。ブロックされた場合はより安全な代替手段を探すか、直接ユーザーに確認します
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      Skip all approvals
+                      <br />
+                      <span style={{ color: "var(--text-faint)", fontSize: "14px" }}>
+                        （旧称 Act without asking）
+                      </span>
+                    </td>
+                    <td>
+                      確認も自動チェックも行わず即座に実行します。関わるすべてのファイル・接続先・アプリを完全に信頼できる場合のみ使用が推奨されています
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
-          </div>
-        </section>
 
-        {/* ── 04 NATURAL LANGUAGE ── */}
-        <section className={styles.section} id="natural-language">
-          <div className={styles.sectionHeader}>
-            <span className={styles.sectionNum}>04</span>
-            <h2>自然言語による操作 — 基本的な使い方</h2>
-          </div>
-          <p>
-            Cowork の最大の特徴は
-            <strong>「話しかけるように指示するだけ」</strong> で複雑な作業を実行できることです。
-            コマンドや構文を覚える必要はありません。
-          </p>
-          <h3>指示の書き方パターン</h3>
-          <div className={styles.compare}>
-            <div className={`${styles.compareCard} ${styles.compareCardBad}`}>
-              <div className={styles.compareLabel}>❌ 曖昧な指示（うまくいかない例）</div>
-              <pre className={styles.preCustom}>
-                {`"ファイルを整理して"
-
-"レポートを作って"
-
-"データをまとめて"`}
-              </pre>
-            </div>
-            <div className={`${styles.compareCard} ${styles.compareCardGood}`}>
-              <div className={styles.compareLabel}>✅ 具体的な指示（うまくいく例）</div>
-              <pre className={styles.preCustom}>
-                {`"~/Downloads 内の PDF を
-~/Documents/PDF_Archive/ に移動して"
-
-"~/Sales の Excel を読んで
-今月の売上合計を表にまとめて"
-
-"~/Reports の txt を全部
-1つの markdown ファイルに結合して"`}
-              </pre>
-            </div>
-          </div>
-          <h3>良い指示の3原則</h3>
-          <div className={styles.cardGrid}>
-            <div className={styles.card}>
-              <div className={styles.cardIcon}>📍</div>
-              <div className={styles.cardTitle}>場所を具体的に</div>
-              <div className={styles.cardDesc}>
-                「デスクトップの〇〇フォルダ」「~/Documents/Projects/2025/」など、フルパスに近い表現で指定する。
-              </div>
-            </div>
-            <div className={styles.card}>
-              <div className={styles.cardIcon}>🎯</div>
-              <div className={styles.cardTitle}>出力形式を指定する</div>
-              <div className={styles.cardDesc}>
-                「PDF で」「markdown で」「Excel
-                の新しいシートに」など、返してほしい形式を明記する。
-              </div>
-            </div>
-            <div className={styles.card}>
-              <div className={styles.cardIcon}>📋</div>
-              <div className={styles.cardTitle}>条件・範囲を絞る</div>
-              <div className={styles.cardDesc}>
-                「今月分だけ」「.docx のみ」「10MB 以上は除く」などの条件を付け加える。
-              </div>
-            </div>
-          </div>
-          <h3>よく使う指示パターン集</h3>
-          <div className={styles.tableWrap}>
-            <table>
-              <thead>
-                <tr>
-                  <th>カテゴリ</th>
-                  <th>指示の例</th>
-                  <th>用途</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>
-                    <strong>ファイル整理</strong>
-                  </td>
-                  <td>
-                    <code>~/Downloads の PDF を ~/Archive/年月/ に日付別に整理して</code>
-                  </td>
-                  <td>ダウンロードフォルダの定期整理</td>
-                </tr>
-                <tr>
-                  <td>
-                    <strong>一括変換</strong>
-                  </td>
-                  <td>
-                    <code>~/Docs 内の .docx を全部 PDF に変換して</code>
-                  </td>
-                  <td>書式統一・共有用変換</td>
-                </tr>
-                <tr>
-                  <td>
-                    <strong>要約・抽出</strong>
-                  </td>
-                  <td>
-                    <code>~/Contracts/ の契約書から「契約期間」と「金額」を一覧表にして</code>
-                  </td>
-                  <td>大量文書からのデータ抽出</td>
-                </tr>
-                <tr>
-                  <td>
-                    <strong>レポート生成</strong>
-                  </td>
-                  <td>
-                    <code>~/Logs の csv を読んで先週の KPI サマリーを markdown で作成して</code>
-                  </td>
-                  <td>週次・月次レポート自動化</td>
-                </tr>
-                <tr>
-                  <td>
-                    <strong>重複検出</strong>
-                  </td>
-                  <td>
-                    <code>~/Photos/ の重複ファイルを探してリストアップして（削除はしないで）</code>
-                  </td>
-                  <td>ストレージ管理</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        {/* ── 05 FILE TASKS ── */}
-        <section className={styles.section} id="file-tasks">
-          <div className={styles.sectionHeader}>
-            <span className={styles.sectionNum}>05</span>
-            <h2>ファイル・タスク自動化の仕組み</h2>
-          </div>
-          <p>Cowork がどのように動作するかを理解すると、より効果的に使えます。</p>
-          <div className={styles.mermaidWrap}>
-            <MermaidDiagram chart={DIAG_1} />
-          </div>
-          <h3>自動化トリガーの種類</h3>
-          <div className={styles.cardGrid}>
-            <div className={styles.card}>
-              <div className={styles.cardIcon}>🖱️</div>
-              <div className={styles.cardTitle}>手動実行</div>
-              <div className={styles.cardDesc}>
-                チャット欄に指示を入力して即座に実行。最もシンプルな使い方。
-              </div>
-            </div>
-            <div className={styles.card}>
-              <div className={styles.cardIcon}>📂</div>
-              <div className={styles.cardTitle}>フォルダ監視</div>
-              <div className={styles.cardDesc}>
-                「このフォルダにファイルが来たら自動で〇〇する」フォルダウォッチャー機能。
-              </div>
-            </div>
-            <div className={styles.card}>
-              <div className={styles.cardIcon}>⏰</div>
-              <div className={styles.cardTitle}>スケジュール実行</div>
-              <div className={styles.cardDesc}>
-                「毎週月曜9時に〇〇する」「毎日終業後にバックアップする」などの定期実行。
-              </div>
-            </div>
-            <div className={styles.card}>
-              <div className={styles.cardIcon}>⚡</div>
-              <div className={styles.cardTitle}>Skills 起動</div>
-              <div className={styles.cardDesc}>
-                定義済みの SKILL.md を呼び出して、標準化されたワークフローを実行。
-              </div>
-            </div>
-          </div>
-          <div className={`${styles.callout} ${styles.calloutWarn}`}>
-            <span className={styles.calloutIcon}>⚠️</span>
-            <p>
-              <strong>重要 — 「確認ファースト」の原則:</strong> Cowork
-              は破壊的な操作（ファイルの削除・上書き・大量移動）の前に
-              必ず確認ダイアログを表示します。最初のうちは「削除はしないで」「コピーだけして」など
-              安全な指示から始めることを強く推奨します。
+            <p className={styles.muted}>
+              Auto
+              モードは、外部からのデータ持ち出し（データ流出）やプロンプトインジェクションのチェックを内部的に行うぶん、他のモードより使用量（usage）を多く消費します。また、どのモードであっても、ファイルの完全削除だけは必ず明示的な許可が求められます。
             </p>
-          </div>
-        </section>
 
-        {/* ── 06 SKILLS ── */}
-        <section className={styles.section} id="skills">
-          <div className={styles.sectionHeader}>
-            <span className={styles.sectionNum}>06</span>
-            <h2>Skills との連携 — 繰り返し作業を「定義」する</h2>
-          </div>
-          <p>
-            毎回同じ指示を打ち込むのは非効率です。Cowork は <strong>SKILL.md</strong>{" "}
-            を使って繰り返し作業を「再利用可能なスキル」として登録できます。
-          </p>
-          <div className={styles.skillCmp}>
-            <div className={`${styles.skillCmpCol} ${styles.cmpBad}`}>
-              <div className={styles.colTitle}>Skills なし（毎回入力）</div>
-              <div className={styles.cmpNode}>ユーザー</div>
-              <div className={styles.cmpArr}>
-                ↓ <span>毎回この長文を入力...</span>
-              </div>
-              <div className={styles.cmpNode}>Cowork</div>
+            <div className={styles.diagramWrap}>
+              <MermaidDiagram chart={DIAG_PERMISSION} />
             </div>
-            <div className={styles.skillCmpVs}>VS</div>
-            <div className={`${styles.skillCmpCol} ${styles.cmpGood}`}>
-              <div className={styles.colTitle}>Skills あり（一言で完了）</div>
-              <div className={styles.cmpNode}>ユーザー</div>
-              <div className={styles.cmpArr}>
-                ↓ <span>/monthly-report</span>
-              </div>
-              <div className={`${styles.cmpNode} ${styles.cmpNodeAccent}`}>
-                SKILL.md<small>月次レポート手順書</small>
-              </div>
-              <div className={styles.cmpArr}>↓</div>
-              <div className={styles.cmpNode}>Cowork</div>
-              <div className={styles.cmpArr}>↓</div>
-              <div className={`${styles.cmpNode} ${styles.cmpNodeGreen}`}>月次レポート自動生成</div>
-            </div>
-          </div>
-          <h3>Skills でできること</h3>
-          <div className={styles.usecase}>
-            <div className={styles.usecaseHeader}>
-              <div className={styles.usecaseIcon}>📊</div>
-              <div className={styles.usecaseTitle}>月次レポートの自動生成</div>
-            </div>
-            <div className={styles.usecaseBody}>
-              毎月末に「~/Sales/*.csv を読んで、前月比・累計・Top5 商品を含む月次レポートを
-              ~/Reports/YYYY-MM-report.md に保存する」という手順を1つのスキルとして定義。 来月以降は{" "}
-              <code>/monthly-report</code> と入力するだけで完了。
-            </div>
-          </div>
-          <div className={styles.usecase}>
-            <div className={styles.usecaseHeader}>
-              <div className={styles.usecaseIcon}>📥</div>
-              <div className={styles.usecaseTitle}>受信メール添付ファイルの自動仕分け</div>
-            </div>
-            <div className={styles.usecaseBody}>
-              「~/Downloads に保存した請求書 PDF を読んで、取引先名・金額・日付を抽出し、
-              ~/Accounting/YYYY/MM/ に取引先名でリネームして保存する」スキルを登録。
-              月末の経費精算作業が数秒で完了。
-            </div>
-          </div>
-          <div className={styles.usecase}>
-            <div className={styles.usecaseHeader}>
-              <div className={styles.usecaseIcon}>🗂️</div>
-              <div className={styles.usecaseTitle}>プロジェクトフォルダの定期整理</div>
-            </div>
-            <div className={styles.usecaseBody}>
-              「~/Projects 内の各フォルダで、3ヶ月以上更新のないファイルを ~/Archive/ に移動し、
-              移動ログを ~/Projects/cleanup-log.txt に追記する」スキルをスケジュール実行に設定。
-            </div>
-          </div>
-        </section>
 
-        {/* ── 07 WORKFLOW ── */}
-        <section className={styles.section} id="workflow">
-          <div className={styles.sectionHeader}>
-            <span className={styles.sectionNum}>07</span>
-            <h2>典型的なワークフロー — 実践例</h2>
-          </div>
-          <p>実際のビジネスシーンで Cowork をどう使うか、3つの具体例で解説します。</p>
-          <h3>例1: 週次進捗レポートの自動化</h3>
-          <div className={styles.steps}>
-            <div className={styles.stepItem}>
-              <div className={styles.stepNum}>1</div>
-              <div className={styles.stepContent}>
-                <div className={styles.stepTitle}>作業ログの保存ルールを決める</div>
-                <div className={styles.stepDesc}>
-                  各メンバーが <code>~/TeamLogs/[名前]_YYYY-MM-DD.txt</code>{" "}
-                  に日次ログを保存するルールを決める。
-                </div>
-              </div>
+            <div className={styles.callout}>
+              <div className={styles.calloutTitle}>補足：Autoモードの背景</div>
+              <p>
+                Anthropicのエンジニアリングブログによれば、Claude
+                Codeにおける許可プロンプトのうち93%はそのまま承認されているという分析結果が、Autoモード導入の背景にあります。安全性は保ちながら「承認疲れ」を減らすことが狙いです。
+              </p>
             </div>
-            <div className={styles.stepItem}>
-              <div className={styles.stepNum}>2</div>
-              <div className={styles.stepContent}>
-                <div className={styles.stepTitle}>Cowork に指示して初回レポートを作成する</div>
-                <div className={styles.stepDesc}>
-                  <div className={`${styles.codeBlock} ${styles.codeBlockMt}`}>
-                    <div className={styles.codeBlockHeader}>
-                      <div className={styles.codeBlockDots}>
-                        <div className={`${styles.dot} ${styles.dotR}`} />
-                        <div className={`${styles.dot} ${styles.dotY}`} />
-                        <div className={`${styles.dot} ${styles.dotG}`} />
-                      </div>
-                      <span className={styles.codeBlockLang}>Cowork チャット</span>
-                    </div>
-                    <pre>{`「~/TeamLogs/ 内の今週分のログをすべて読んで、
-メンバー別の進捗・完了タスク・ブロッカーを
-markdown 形式で ~/Reports/week-YYYY-WW.md に保存して」`}</pre>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className={styles.stepItem}>
-              <div className={styles.stepNum}>3</div>
-              <div className={styles.stepContent}>
-                <div className={styles.stepTitle}>
-                  この手順を SKILL.md に定義してスケジュール化する
-                </div>
-                <div className={styles.stepDesc}>
-                  毎週金曜17時に自動実行するよう設定。翌週からは手動作業ゼロに。
-                </div>
-              </div>
-            </div>
-          </div>
-          <h3>例2: 請求書 PDF からのデータ抽出フロー</h3>
-          <div className={styles.flowStepsWrap}>
-            <div className={`${styles.fsStep} ${styles.fsStepBlue}`}>
-              <div className={styles.fsNum}>1</div>
-              <div className={styles.fsLabel}>
-                受信
-                <br />
-                <small>請求書 PDF</small>
-              </div>
-            </div>
-            <div className={styles.fsArrow}>→</div>
-            <div className={styles.fsStep}>
-              <div className={styles.fsNum}>2</div>
-              <div className={styles.fsLabel}>
-                フォルダ監視
-                <br />
-                <small>自動検知</small>
-              </div>
-            </div>
-            <div className={styles.fsArrow}>→</div>
-            <div className={styles.fsStep}>
-              <div className={styles.fsNum}>3</div>
-              <div className={styles.fsLabel}>
-                データ抽出
-                <br />
-                <small>取引先・金額・日付</small>
-              </div>
-            </div>
-            <div className={styles.fsArrow}>→</div>
-            <div className={styles.fsStep}>
-              <div className={styles.fsNum}>4</div>
-              <div className={styles.fsLabel}>
-                保存
-                <br />
-                <small>Accounting フォルダ</small>
-              </div>
-            </div>
-            <div className={styles.fsArrow}>→</div>
-            <div className={styles.fsStep}>
-              <div className={styles.fsNum}>5</div>
-              <div className={styles.fsLabel}>
-                xlsx 追記
-                <br />
-                <small>summary.xlsx</small>
-              </div>
-            </div>
-            <div className={styles.fsArrow}>→</div>
-            <div className={`${styles.fsStep} ${styles.fsStepGreen}`}>
-              <div className={styles.fsNum}>6</div>
-              <div className={styles.fsLabel}>
-                完了
-                <br />
-                <small>数秒で精算完了</small>
-              </div>
-            </div>
-          </div>
-          <h3>例3: プレゼン資料の品質チェック</h3>
-          <div className={styles.codeBlock}>
-            <div className={styles.codeBlockHeader}>
-              <div className={styles.codeBlockDots}>
-                <div className={`${styles.dot} ${styles.dotR}`} />
-                <div className={`${styles.dot} ${styles.dotY}`} />
-                <div className={`${styles.dot} ${styles.dotG}`} />
-              </div>
-              <span className={styles.codeBlockLang}>Cowork チャット — 指示例</span>
-            </div>
-            <pre>{`「~/Presentations/Q1-review.pptx を読んで、以下をチェックして：
-1. 誤字脱字
-2. 数字の一貫性（異なるスライドで同じ指標が違う数字になっていないか）
-3. 古い日付表記（2024年が残っていないか）
-結果を ~/Presentations/Q1-review-check.md に出力して」`}</pre>
-          </div>
-        </section>
 
-        {/* ── 08 SKILL-WRITING ── */}
-        <section className={styles.section} id="skill-writing">
-          <div className={styles.sectionHeader}>
-            <span className={styles.sectionNum}>08</span>
-            <h2>Cowork 向け SKILL.md の書き方</h2>
-          </div>
-          <p>
-            Skills は Cowork と Claude Code の両方で動作するオープンスタンダードです。 Cowork
-            向けスキルを書く際のポイントを解説します。
-          </p>
-          <h3>SKILL.md の基本構造（Cowork 版）</h3>
-          <div className={styles.codeBlock}>
-            <div className={styles.codeBlockHeader}>
-              <div className={styles.codeBlockDots}>
-                <div className={`${styles.dot} ${styles.dotR}`} />
-                <div className={`${styles.dot} ${styles.dotY}`} />
-                <div className={`${styles.dot} ${styles.dotG}`} />
-              </div>
-              <span className={styles.codeBlockLang}>~/.claude/skills/monthly-report/SKILL.md</span>
-            </div>
-            <pre>{`---
-name: monthly-report
-description: >
-  月次売上レポートを自動生成する。
-  「月次レポート」「今月の売上まとめ」「月末レポート作成」と
-  言われたときに使用する。
-  ~/Sales/*.csv を読み込んで markdown レポートを作成する。
-allowed-tools:
-  - Read
-  - Write
-  - Bash
----
-
-# 月次売上レポート作成スキル
-
-## 手順
-
-1. データ収集: ~/Sales/ フォルダ内の今月分 CSV を全て読み込む
-2. 集計計算:
-   - 今月の売上合計
-   - 先月比（%変化）
-   - 商品カテゴリ別の内訳
-   - Top 5 商品
-3. レポート生成: 以下のフォーマットで作成する
-4. 保存: ~/Reports/YYYY-MM-monthly-report.md として保存する
-
-## 出力フォーマット
-
-# YYYY年MM月 売上レポート
-## サマリー
-- 今月売上合計: ¥XXX,XXX
-- 先月比: +X%
-
-## カテゴリ別
-| カテゴリ | 売上 | 構成比 |
-|---------|------|--------|
-
-## 注意事項
-- 文字コードが UTF-8 でない場合は Shift-JIS として読み込む
-- 金額は円形式（¥X,XXX,XXX）で統一する`}</pre>
-          </div>
-          <h3>Cowork と Claude Code のスキルの書き方比較</h3>
-          <div className={styles.tableWrap}>
-            <table>
-              <thead>
-                <tr>
-                  <th>観点</th>
-                  <th>Cowork 向け</th>
-                  <th>Claude Code 向け</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>
-                    <strong>パス指定</strong>
-                  </td>
-                  <td>
-                    ホームディレクトリ基準（<code>~/Documents/</code>）
-                  </td>
-                  <td>
-                    リポジトリ基準（<code>./src/</code>）
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <strong>対象ファイル</strong>
-                  </td>
-                  <td>PDF・Excel・Word など業務ファイル</td>
-                  <td>ソースコード・設定ファイル</td>
-                </tr>
-                <tr>
-                  <td>
-                    <strong>description の書き方</strong>
-                  </td>
-                  <td>業務用語・日本語での自然なトリガーワード</td>
-                  <td>技術用語・コマンドライン的な表現</td>
-                </tr>
-                <tr>
-                  <td>
-                    <strong>allowed-tools</strong>
-                  </td>
-                  <td>
-                    <code>Read, Write</code>（ファイル操作中心）
-                  </td>
-                  <td>
-                    <code>Read, Edit, Bash, Grep</code>（開発ツール多め）
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <h3>スキルの配置場所</h3>
-          <div className={styles.codeBlock}>
-            <div className={styles.codeBlockHeader}>
-              <div className={styles.codeBlockDots}>
-                <div className={`${styles.dot} ${styles.dotR}`} />
-                <div className={`${styles.dot} ${styles.dotY}`} />
-                <div className={`${styles.dot} ${styles.dotG}`} />
-              </div>
-              <span className={styles.codeBlockLang}>推奨ディレクトリ構成</span>
-            </div>
-            <pre>{`~/.claude/                      ← 個人用（全デバイス共通）
-└── skills/
-    ├── monthly-report/
-    │   └── SKILL.md            ← 月次レポートスキル
-    ├── invoice-sorter/
-    │   ├── SKILL.md            ← 請求書仕分けスキル
-    │   └── scripts/
-    │       └── extract.py      ← 補助スクリプト（オプション）
-    └── weekly-cleanup/
-        └── SKILL.md            ← 週次フォルダ整理スキル`}</pre>
-          </div>
-          <div className={`${styles.callout} ${styles.calloutSuccess}`}>
-            <span className={styles.calloutIcon}>✅</span>
+            <h3>いつ「Manual」に戻すべきか</h3>
             <p>
-              <strong>Tips:</strong> <code>~/.claude/skills/</code> に置いたスキルは Cowork・Claude
-              Code・claude.ai の全プラットフォームから呼び出し可能です。
-              一度書けば、どのデバイスでも再利用できます。
+              次のような場面では、速度よりも確認を優先し「Manually
+              approve」に切り替えることが推奨されています。
             </p>
-          </div>
-        </section>
+            <ul className={styles.plain}>
+              <li>機密性の高いファイル・アカウント・サイトを扱うとき</li>
+              <li>初めて使うツール・プラグイン・サイトを扱うとき</li>
+              <li>メッセージ送信や購入など、取り消しが難しい行動を伴うとき</li>
+            </ul>
+          </section>
 
-        {/* ── 09 BEST PRACTICES ── */}
-        <section className={styles.section} id="best-practices">
-          <div className={styles.sectionHeader}>
-            <span className={styles.sectionNum}>09</span>
-            <h2>ベストプラクティス 10 則</h2>
-          </div>
-          <div className={styles.tableWrap}>
-            <table>
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>原則</th>
-                  <th>理由・解説</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>
-                    <span className={`${styles.badge} ${styles.badgeOrange}`}>01</span>
-                  </td>
-                  <td>
-                    <strong>最初は「読むだけ」から始める</strong>
-                  </td>
-                  <td>
-                    いきなりファイルを移動・削除する指示より、「一覧を教えて」「内容を要約して」から始め、動作を確認する。
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <span className={`${styles.badge} ${styles.badgeOrange}`}>02</span>
-                  </td>
-                  <td>
-                    <strong>パスは具体的に指定する</strong>
-                  </td>
-                  <td>
-                    <code>~/Documents/Projects/2025/Q1/</code>
-                    のように絶対パスに近い形で指定すると誤操作が防げる。
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <span className={`${styles.badge} ${styles.badgeOrange}`}>03</span>
-                  </td>
-                  <td>
-                    <strong>まずコピーを作ってから作業する</strong>
-                  </td>
-                  <td>
-                    「バックアップを ~/Backup/
-                    に作ってから整理して」のように、変更前のコピーを保持する習慣をつける。
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <span className={`${styles.badge} ${styles.badgeGreen}`}>04</span>
-                  </td>
-                  <td>
-                    <strong>繰り返す作業は Skills 化する</strong>
-                  </td>
-                  <td>
-                    3回以上同じ指示をしたら SKILL.md に書き起こす。description
-                    にトリガーワードを具体的に書く。
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <span className={`${styles.badge} ${styles.badgeGreen}`}>05</span>
-                  </td>
-                  <td>
-                    <strong>出力フォーマットを明示する</strong>
-                  </td>
-                  <td>
-                    「markdown で」「Excel の新しいシートに」「JSON
-                    で」など、出力形式を必ず指定する。
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <span className={`${styles.badge} ${styles.badgeBlue}`}>06</span>
-                  </td>
-                  <td>
-                    <strong>スコープを絞って実行する</strong>
-                  </td>
-                  <td>
-                    「全フォルダ」より「今月分のみ」、「全ファイル」より「.pdf
-                    のみ」のように対象を絞る。
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <span className={`${styles.badge} ${styles.badgeBlue}`}>07</span>
-                  </td>
-                  <td>
-                    <strong>ドライラン（確認のみ）を先に実行</strong>
-                  </td>
-                  <td>
-                    「実際に移動はしないで、何をするか計画だけ教えて」と先に確認してから本番実行する。
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <span className={`${styles.badge} ${styles.badgePurple}`}>08</span>
-                  </td>
-                  <td>
-                    <strong>機密情報を含むフォルダは除外設定</strong>
-                  </td>
-                  <td>
-                    パスワード管理・個人情報・財務データフォルダはアクセス権限設定から除外する。
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <span className={`${styles.badge} ${styles.badgePurple}`}>09</span>
-                  </td>
-                  <td>
-                    <strong>description は「やや強引に」書く</strong>
-                  </td>
-                  <td>
-                    Cowork（Claude）はスキルを自動発動させたがらない傾向があるため、トリガー条件を詳細かつ積極的に記述する。
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <span className={`${styles.badge} ${styles.badgeBlue}`}>10</span>
-                  </td>
-                  <td>
-                    <strong>完了後は必ずログを残す</strong>
-                  </td>
-                  <td>
-                    「処理結果を ~/Logs/cowork-YYYY-MM-DD.txt
-                    に追記して」と指示して操作履歴を保持する。
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        {/* ── 10 ADVANCED ── */}
-        <section className={styles.section} id="advanced">
-          <div className={styles.sectionHeader}>
-            <span className={styles.sectionNum}>10</span>
-            <h2>応用パターン — さらに活用する</h2>
-          </div>
-          <h3>パターン1: フォルダ監視 × Skills の組み合わせ</h3>
-          <div className={styles.mermaidWrap}>
-            <MermaidDiagram chart={DIAG_4} />
-          </div>
-          <h3>パターン2: 段階的な処理パイプライン</h3>
-          <div className={styles.codeBlock}>
-            <div className={styles.codeBlockHeader}>
-              <div className={styles.codeBlockDots}>
-                <div className={`${styles.dot} ${styles.dotR}`} />
-                <div className={`${styles.dot} ${styles.dotY}`} />
-                <div className={`${styles.dot} ${styles.dotG}`} />
-              </div>
-              <span className={styles.codeBlockLang}>Cowork チャット — パイプライン指示</span>
-            </div>
-            <pre>{`「以下の3ステップを順番に実行して：
-
-ステップ1: ~/RawData/*.csv を ~/ProcessedData/ に変換
-  - 文字コードを UTF-8 に統一
-  - 空行・重複行を除去
-
-ステップ2: ~/ProcessedData/*.csv を集計して
-  ~/Summary/monthly-summary.xlsx を作成
-
-ステップ3: ~/Summary/monthly-summary.xlsx を読んで
-  ~/Reports/monthly-report.md にサマリーを書き出す
-
-各ステップ完了時に状況を報告してください」`}</pre>
-          </div>
-          <h3>パターン3: 自己改善型スキル（上級者向け）</h3>
-          <div className={`${styles.callout} ${styles.calloutInfo}`}>
-            <span className={styles.calloutIcon}>🚀</span>
+          {/* ================= STEP 6 ================= */}
+          <section className={styles.section} id="step6">
+            <h2>
+              <span className={styles.stepNo}>STEP 6</span>
+              Plugins・Skills・Connectors・Sub-agentsで専門特化する
+            </h2>
             <p>
-              <strong>自己改善型スキル:</strong>{" "}
-              毎月のレポート作成後に「このスキルの改善点を教えて。 もし毎回同じ修正をしているなら
-              SKILL.md を更新して」と指示することで、 SKILL.md が自動的に進化していきます。これを
-              <strong>「Self-Improving Skills」</strong> パターンと呼びます。
+              Pluginsは、自分の役割・チーム・会社に合わせてClaudeの働き方をカスタマイズする単位です。1つのPluginは、Skills（作業手順）、Connectors（外部サービス接続）、Slash
+              Commands（手動実行のショートカット）、Sub-agents（補助エージェント）をひとまとめにパッケージ化したものです。
             </p>
-          </div>
-          <h3>パターン4: チームへのスキル配布</h3>
-          <div className={styles.steps}>
-            <div className={styles.stepItem}>
-              <div className={styles.stepNum}>1</div>
-              <div className={styles.stepContent}>
-                <div className={styles.stepTitle}>スキルを ZIP ファイルにまとめる</div>
-                <div className={styles.stepDesc}>
-                  <code>zip -r monthly-report.zip monthly-report/</code> で圧縮する。解凍結果が{" "}
-                  <code>monthly-report/SKILL.md</code> の構造になるよう確認する。
+
+            <div className={styles.diagramWrap}>
+              <MermaidDiagram chart={DIAG_PLUGIN} />
+            </div>
+
+            <div className={styles.tableWrap}>
+              <table>
+                <thead>
+                  <tr>
+                    <th>構成要素</th>
+                    <th>役割</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Skills</td>
+                    <td>
+                      Claudeが実行前に読み込む「このタスクの最善のやり方」を定義したファイル群
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Connectors</td>
+                    <td>Gmail、Slack、Notion、Salesforceなど外部サービスとの接続設定</td>
+                  </tr>
+                  <tr>
+                    <td>Slash Commands</td>
+                    <td>
+                      <code>/plugin:send-updates</code> のように、手動で呼び出す定型アクション
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Sub-agents</td>
+                    <td>複雑な作業を分担して並行実行する、特定領域に特化した補助エージェント</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <p>
+              Anthropicは2026年1月30日、営業・財務・法務・マーケティング・人事・エンジニアリング・デザイン・オペレーションなど、社内で使っている11種類のPluginをオープンソースとして公開しました。Plugin導入時は「そのPluginがどこまでの権限（読み取り／書き込み）を要求するか」を必ず確認することが、公式の安全ガイドでも強調されています。
+            </p>
+          </section>
+
+          {/* ================= STEP 7 ================= */}
+          <section className={styles.section} id="step7">
+            <h2>
+              <span className={styles.stepNo}>STEP 7</span>定型業務をScheduled Tasksで自動化する
+            </h2>
+            <p>
+              繰り返し発生するタスクは、<code>/schedule</code>
+              コマンドをタスク内で入力するか、左サイドバーの「Scheduled」から作成・管理できます。スケジュールされたタスクはリモートで実行されるため、PCがスリープしていたりデスクトップアプリを開いていなくても動作します。
+            </p>
+
+            <p className={styles.muted}>
+              スケジュールタスクは目を離していても動く分、次のような慎重な運用が推奨されています。
+            </p>
+            <ul className={styles.plain}>
+              <li>
+                <strong>まずは低リスクな作業から始める</strong>
+                ：要約作成や情報収集など、影響範囲の小さいものから
+              </li>
+              <li>
+                <strong>機密データや重大な操作を避ける</strong>
+                ：機密ファイルへのアクセス、メッセージ送信、購入など取り消しにくい操作は自動化しない
+              </li>
+              <li>
+                <strong>実行結果を毎回確認する</strong>
+                ：「Scheduled」ページから過去の実行結果を定期的にチェックする
+              </li>
+              <li>
+                <strong>使わないタスクは一時停止・削除する</strong>：放置せず、不要になったら止める
+              </li>
+            </ul>
+          </section>
+
+          {/* ================= STEP 8 ================= */}
+          <section className={styles.section} id="step8">
+            <h2>
+              <span className={styles.stepNo}>STEP 8</span>Dispatchでどこからでも指示する
+            </h2>
+            <p>
+              Dispatchは、モバイルアプリとClaude
+              Desktopアプリの間に「1つの継続した会話」を作る機能です。イメージとしては、PC上で動いているCoworkセッションに向けたトランシーバーのようなものです。
+            </p>
+
+            <div className={`${styles.callout} ${styles.amber}`}>
+              <div className={styles.calloutTitle}>重要な違い</div>
+              <p>
+                Dispatch経由のタスクはPC（デスクトップアプリ）上で実行されるため、リモートのクラウドセッションとは異なり、PCが起動していてClaude
+                Desktopアプリが開いている必要があります。
+              </p>
+            </div>
+
+            <div className={styles.diagramWrap}>
+              <MermaidDiagram chart={DIAG_DISPATCH} />
+            </div>
+
+            <h3>セットアップの流れ</h3>
+            <ol className={styles.plain}>
+              <li>Claude DesktopアプリとClaude モバイルアプリを最新版に更新する</li>
+              <li>Cowork内の「Dispatch」セクションからメッセージを送り始める</li>
+              <li>以後、デスクトップとモバイルの会話が自動的に同期される</li>
+            </ol>
+
+            <p className={styles.muted}>
+              Dispatchは、ファイル検索・メール要約・データベース照会といった「情報取得」系のタスクで特に安定して動作する一方、ブラウザ自動操作やアプリ間の連携アクションはまだ発展途上とされています。実際に使い込んだ複数のレビューでは、こうした操作の成功率が体感で5割程度にとどまるという報告もあります。外出先からPCの作業を進めたいときの「情報収集・下調べ」用途を中心に試すのが現実的です。
+            </p>
+          </section>
+
+          {/* ================= STEP 9 ================= */}
+          <section className={styles.section} id="step9">
+            <h2>
+              <span className={styles.stepNo}>STEP 9</span>
+              プロンプトインジェクションと安全運用の原則を理解する
+            </h2>
+            <p>
+              Coworkはローカルファイル、ブラウザ、外部アプリへのアクセスという強力な能力を持つ分、固有のリスクも伴います。公式の安全ガイドでは、リスクの大きさは「Claudeが何を読めるか」と「Claudeが何をできるか」の組み合わせで決まると説明されています。
+            </p>
+
+            <ul className={styles.plain}>
+              <li>
+                <strong>Read tools（読み取り系）</strong>
+                ：メールの受信箱を読む、画面のスクリーンショットを撮る、など
+              </li>
+              <li>
+                <strong>Write tools（書き込み系）</strong>
+                ：カレンダー予定を作る、ファイルを削除する、コマンドを実行する、画面をクリックする、など
+              </li>
+            </ul>
+            <p className={styles.muted}>
+              Write
+              toolsのほうが本質的にリスクが高いため、重要な場面では人による確認が推奨されています。
+            </p>
+
+            <h3>プロンプトインジェクションとは</h3>
+            <p>
+              信頼できる範囲（自分のファイルや会社のコミュニケーションなど、安全だと考えている情報源）の外側にある情報をClaudeが読み取ると、その中に攻撃者が仕込んだ不正な指示が紛れている可能性があります。これがプロンプトインジェクションです。例えば、メール要約を頼んだ際に、正規のメールに紛れて不正な送金や情報漏えいを促す一文が含まれているケースが想定されます。
+            </p>
+
+            <div className={styles.diagramWrap}>
+              <MermaidDiagram chart={DIAG_INJECTION} />
+            </div>
+
+            <h3>自分の身を守るための10のポイント</h3>
+            <p className={styles.muted}>
+              公式の安全ガイド「Use Claude Cowork safely」がまとめている実践です。
+            </p>
+            <div className={styles.pointsGrid}>
+              <div className={styles.pointCard}>
+                <div className={styles.pointNum}>01</div>
+                <div className={styles.pointBody}>
+                  <strong>ファイルアクセスは選択的に</strong>
+                  <span>
+                    財務書類や認証情報など機微な情報へのアクセスは避け、専用の作業フォルダを用意しバックアップを取る
+                  </span>
+                </div>
+              </div>
+              <div className={styles.pointCard}>
+                <div className={styles.pointNum}>02</div>
+                <div className={styles.pointBody}>
+                  <strong>個々のコマンドではなく「タスク全体」を監視する</strong>
+                  <span>
+                    想定外のファイルやサイトにアクセスしていないか、作業範囲が広がっていないかを見る
+                  </span>
+                </div>
+              </div>
+              <div className={styles.pointCard}>
+                <div className={styles.pointNum}>03</div>
+                <div className={styles.pointBody}>
+                  <strong>スケジュールタスクは慎重に</strong>
+                  <span>
+                    低リスクな作業から始め、機密データや不可逆な操作は避け、結果を定期的に確認する
+                  </span>
+                </div>
+              </div>
+              <div className={styles.pointCard}>
+                <div className={styles.pointNum}>04</div>
+                <div className={styles.pointBody}>
+                  <strong>リスクの大きさに応じて監視レベルを変える</strong>
+                  <span>金銭・送信・重要ファイルが絡む場面では「Manually approve」に戻す</span>
+                </div>
+              </div>
+              <div className={styles.pointCard}>
+                <div className={styles.pointNum}>05</div>
+                <div className={styles.pointBody}>
+                  <strong>コンピュータ操作（computer use）には特に注意する</strong>
+                  <span>
+                    画面操作にはサンドボックスがないため、医療ポータルや銀行、マッチングアプリなど機微なアプリはブロックしておく
+                  </span>
+                </div>
+              </div>
+              <div className={styles.pointCard}>
+                <div className={styles.pointNum}>06</div>
+                <div className={styles.pointBody}>
+                  <strong>ブラウザとWebアクセスは信頼できる範囲に限定する</strong>
+                  <span>Web上のコンテンツはプロンプトインジェクションの主要な経路になり得る</span>
+                </div>
+              </div>
+              <div className={styles.pointCard}>
+                <div className={styles.pointNum}>07</div>
+                <div className={styles.pointBody}>
+                  <strong>不慣れなMCP・Pluginには特に注意する</strong>
+                  <span>検証済みのディレクトリから入手し、要求される権限を事前に確認する</span>
+                </div>
+              </div>
+              <div className={styles.pointCard}>
+                <div className={styles.pointNum}>08</div>
+                <div className={styles.pointBody}>
+                  <strong>アプリ間のデータ連携を意識する</strong>
+                  <span>
+                    Claude for ExcelとClaude for
+                    PowerPointの併用時など、データが意図せず別アプリへ流れる場合がある
+                  </span>
+                </div>
+              </div>
+              <div className={styles.pointCard}>
+                <div className={styles.pointNum}>09</div>
+                <div className={styles.pointBody}>
+                  <strong>リモートセッションが何に到達できるかを理解する</strong>
+                  <span>
+                    Web・モバイルからのリモートセッションは、Claude
+                    Desktopアプリが起動していて接続済みのフォルダにのみ到達できる
+                  </span>
+                </div>
+              </div>
+              <div className={styles.pointCard}>
+                <div className={styles.pointNum}>10</div>
+                <div className={styles.pointBody}>
+                  <strong>不審な挙動はすぐに報告する</strong>
+                  <span>
+                    無関係な話題を始めた、予期しないリソースへのアクセスを試みた、などの兆候があればタスクを止めて報告する
+                  </span>
                 </div>
               </div>
             </div>
-            <div className={styles.stepItem}>
-              <div className={styles.stepNum}>2</div>
-              <div className={styles.stepContent}>
-                <div className={styles.stepTitle}>チームメンバーに配布（共有ドライブ経由）</div>
-                <div className={styles.stepDesc}>
-                  Teams・Slack・Google Drive 経由で ZIP ファイルを配布する。
-                </div>
-              </div>
-            </div>
-            <div className={styles.stepItem}>
-              <div className={styles.stepNum}>3</div>
-              <div className={styles.stepContent}>
-                <div className={styles.stepTitle}>各自が ~/.claude/skills/ に展開する</div>
-                <div className={styles.stepDesc}>
-                  全員が同じスキルを使うことで、アウトプットの品質が均一化される。
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className={`${styles.callout} ${styles.calloutInfo}`}>
-            <span className={styles.calloutIcon}>🏢</span>
-            <p>
-              <strong>Team / Enterprise プランでは:</strong> 管理者が Organization Skills として
-              全メンバーに一括配布・強制適用できます。
-              「デフォルト有効」か「ユーザー選択可」かを設定できるため、
-              必須ワークフローの標準化に活用できます。
+            <p className={styles.muted}>
+              Claudeが行った送信・購入・データ変更・スケジュールタスクの結果については、最終的にすべてユーザー自身の責任となる点も明記されています。
             </p>
-          </div>
-        </section>
+          </section>
 
-        {/* ── 11 SOURCES ── */}
-        <section className={styles.section} id="sources">
-          <div className={styles.sectionHeader}>
-            <span className={styles.sectionNum}>11</span>
-            <h2>ソース・参考リンク</h2>
-          </div>
-          <p>このガイドを作成するにあたり参照した公式ドキュメントとコミュニティリソースです。</p>
-          <h3>Anthropic 公式</h3>
-          <div className={styles.sourceGrid}>
-            <div className={styles.sourceCard}>
-              <div className={styles.sourceCat}>公式サポート</div>
-              <Ext href="https://support.claude.com">support.claude.com</Ext>
-              <div className={styles.sourceDesc}>
-                Claude および Cowork の利用ガイド・FAQ（最新情報はこちらを優先）
+          {/* ================= STEP 10 ================= */}
+          <section className={styles.section} id="step10">
+            <h2>
+              <span className={styles.stepNo}>STEP 10</span>コミュニティのベストプラクティスに学ぶ
+            </h2>
+            <div className={`${styles.callout} ${styles.amber}`}>
+              <div className={styles.calloutTitle}>注目の投稿</div>
+              <p>
+                Claude
+                Coworkのローンチ日（2026年1月12日）から400セッション以上を検証したという発信者Nav
+                Toor氏（@heynavtoor）は、「17 Best Practices That Make Claude Cowork 100x More
+                Powerful」という投稿で大きな反響を呼びました。この投稿は複数の二次解説やGitHub上のまとめでも取り上げられています。
+              </p>
+            </div>
+
+            <h3>中心的な主張</h3>
+            <div className={styles.principleGrid}>
+              <div className={styles.principleCard}>
+                <div className={styles.principleTag}>01</div>
+                <strong>プロンプトを磨くより、システムを作る</strong>
+                <p>
+                  ChatGPT世代は「プロンプトエンジニアリング」が報われましたが、CoworkやClaude
+                  Codeの世代では「システムエンジニアリング」——事前にどれだけ文脈・構造・制約を用意できたか——が出力の質を決める、という考え方です
+                </p>
+              </div>
+              <div className={styles.principleCard}>
+                <div className={styles.principleTag}>02</div>
+                <strong>出力が気に入らない時の自己診断</strong>
+                <p>
+                  Claudeの出力が期待外れだったとき、「これはプロンプトの問題か、それとも文脈（コンテキスト）の問題か」を自問し、多くの場合は文脈側に原因があると捉える考え方です。原因が文脈にあるとわかれば、指示ファイルに一行加えるだけで恒久的に直せます
+                </p>
+              </div>
+              <div className={styles.principleCard}>
+                <div className={styles.principleTag}>03</div>
+                <strong>コンテキストは資産として蓄積する</strong>
+                <p>
+                  Global InstructionsやFolder
+                  Instructionsに書いたファイルは、時間とともに価値が積み上がっていくため、定期的（例えば週次）に見直して更新することが勧められています
+                </p>
+              </div>
+              <div className={styles.principleCard}>
+                <div className={styles.principleTag}>04</div>
+                <strong>レイヤーを分けて管理する</strong>
+                <p>
+                  Global Instructionsは「あらゆる場面に共通する振る舞い」、Folder
+                  Instructionsは「そのプロジェクト固有の文脈」、個々のプロンプトは「今回だけのタスク」という役割分担を明確にする考え方です
+                </p>
               </div>
             </div>
-            <div className={styles.sourceCard}>
-              <div className={styles.sourceCat}>公式 — Skills 作成</div>
-              <Ext href="https://support.claude.com/en/articles/12512198-how-to-create-custom-skills">
-                How to create custom Skills
-              </Ext>
-              <div className={styles.sourceDesc}>
-                Skills の作成方法・SKILL.md フォーマットの公式解説
-              </div>
-            </div>
-            <div className={styles.sourceCard}>
-              <div className={styles.sourceCat}>公式 — Skills 使い方</div>
-              <Ext href="https://support.claude.com/en/articles/12512180-use-skills-in-claude">
-                Use Skills in Claude
-              </Ext>
-              <div className={styles.sourceDesc}>Skills の使い方・Cowork での適用方法</div>
-            </div>
-            <div className={styles.sourceCard}>
-              <div className={styles.sourceCat}>公式 — 組織展開</div>
-              <Ext href="https://support.claude.com/en/articles/13119606-provisioning-and-managing-skills-for-your-organization">
-                Provisioning Skills for Your Organization
-              </Ext>
-              <div className={styles.sourceDesc}>
-                組織向けスキルの一括配布・管理方法（Team/Enterprise）
-              </div>
-            </div>
-            <div className={styles.sourceCard}>
-              <div className={styles.sourceCat}>公式 — Claude Code Skills</div>
-              <Ext href="https://docs.anthropic.com/en/docs/claude-code/skills">
-                docs.anthropic.com — Claude Code Skills
-              </Ext>
-              <div className={styles.sourceDesc}>
-                SKILL.md の技術仕様・フロントマター全フィールド詳細
-              </div>
-            </div>
-            <div className={styles.sourceCard}>
-              <div className={styles.sourceCat}>公式 — Agent Skills</div>
-              <Ext href="https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview">
-                platform.claude.com — Agent Skills Overview
-              </Ext>
-              <div className={styles.sourceDesc}>Agent Skills のアーキテクチャと設計思想</div>
-            </div>
-          </div>
-          <h3>コミュニティリソース</h3>
-          <div className={styles.sourceGrid}>
-            <div className={styles.sourceCard}>
-              <div className={styles.sourceCat}>Sherlock.xyz</div>
-              <Ext href="https://sherlock.xyz/post/how-to-write-skills-for-claude-code-and-cowork">
-                How to Write Skills for Claude Code and Cowork
-              </Ext>
-              <div className={styles.sourceDesc}>
-                Cowork と Claude Code 両対応スキルの実践的な書き方ガイド
-              </div>
-            </div>
-            <div className={styles.sourceCard}>
-              <div className={styles.sourceCat}>Medium — Bibek Poudel</div>
-              <Ext href="https://bibek-poudel.medium.com/the-skill-md-pattern-how-to-write-ai-agent-skills-that-actually-work-72a3169dd7ee">
-                The SKILL.md Pattern: How to Write AI Agent Skills That Actually Work
-              </Ext>
-              <div className={styles.sourceDesc}>実際に動くスキルを書くための実践的パターン集</div>
-            </div>
-            <div className={styles.sourceCard}>
-              <div className={styles.sourceCat}>YouTube チュートリアル</div>
-              <Ext href="https://www.youtube.com/watch?v=Fh-aBKrG5CI">
-                Create Your First SKILL.md File
-              </Ext>
-              <div className={styles.sourceDesc}>
-                SKILL.md 作成のステップバイステップ動画チュートリアル
-              </div>
-            </div>
-            <div className={styles.sourceCard}>
-              <div className={styles.sourceCat}>Reddit — r/ClaudeAI</div>
-              <Ext href="https://www.reddit.com/r/ClaudeAI/comments/1onjxs9/how_to_set_up_claude_skills_in_15_minutes_for/">
-                How to Set Up Claude Skills in 15 Minutes (for Non-Technical People)
-              </Ext>
-              <div className={styles.sourceDesc}>
-                非技術者向けのスキルセットアップ手順（コミュニティ投稿）
-              </div>
-            </div>
-            <div className={styles.sourceCard}>
-              <div className={styles.sourceCat}>GitHub — Anthropic 公式</div>
-              <Ext href="https://github.com/anthropics/skills">
-                anthropics/skills — Public Skills Repository
-              </Ext>
-              <div className={styles.sourceDesc}>
-                Anthropic 公式のスキルサンプル集。参考実装として活用可能
-              </div>
-            </div>
-            <div className={styles.sourceCard}>
-              <div className={styles.sourceCat}>GitHub — コミュニティ</div>
-              <Ext href="https://github.com/hesreallyhim/awesome-claude-code">
-                hesreallyhim/awesome-claude-code
-              </Ext>
-              <div className={styles.sourceDesc}>
-                コミュニティが作成したスキル・ツール集。Cowork 対応のものも多数収録
-              </div>
-            </div>
-          </div>
-          <div className={`${styles.callout} ${styles.calloutWarn}`}>
-            <span className={styles.calloutIcon}>⚠️</span>
-            <p>
-              <strong>最新情報の確認を推奨:</strong> Cowork は GA 後も
-              機能追加が活発で、仕様が変わる場合があります。
-              本ガイドの内容と実際の動作が異なる場合は、
-              <Ext href="https://support.claude.com">support.claude.com</Ext>
-              の公式情報を優先してください。
+
+            <h3>常設の指示ファイルという型</h3>
+            <p className={styles.muted}>
+              複数の実践者がまとめている「常設の指示ファイル」の型としては、次の3種類が繰り返し紹介されています。
             </p>
-          </div>
-          <p className={styles.footerNote}>
-            Claude Cowork 完全入門ガイド · 2026年6月版（GA 対応） · 初学者向けベストプラクティス
-          </p>
-        </section>
+            <div className={styles.fileGrid}>
+              <div className={styles.fileCard}>
+                <div className={styles.fileTag}>identity</div>
+                <p>自分が何者で、何に取り組んでいるか</p>
+              </div>
+              <div className={styles.fileCard}>
+                <div className={styles.fileTag}>voice</div>
+                <p>自分の文体・トーン・使ってほしくない言い回し</p>
+              </div>
+              <div className={styles.fileCard}>
+                <div className={styles.fileTag}>rules</div>
+                <p>「まず尋ねる」「計画を見せる」「承認なしに削除しない」といった行動規範</p>
+              </div>
+            </div>
+            <p>
+              これらをGlobal
+              Instructionsに読み込ませておくことで、モデルを切り替えるよりも大きな出力品質の改善につながる、という指摘もあります。あわせて、Global
+              Instructionsの分量そのものが増えるほどCoworkが保持すべき前提も増えるため、役割固有・プロジェクト固有のルールはFolder
+              Instructions側に逃がし、Global
+              Instructionsは要点だけに絞るという運用も共有されています。
+            </p>
+          </section>
+
+          {/* ================= STEP 11 ================= */}
+          <section className={styles.section} id="step11">
+            <h2>
+              <span className={styles.stepNo}>STEP 11</span>よくある落とし穴とトラブルシューティング
+            </h2>
+            <div className={styles.tableWrap}>
+              <table>
+                <thead>
+                  <tr>
+                    <th>症状</th>
+                    <th>主な原因と対処</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>セッションが進むにつれ出力の質が落ちる</td>
+                    <td>
+                      コンテキストウィンドウが埋まってきているサイン。新しいセッションに切り替えるほうが、同じセッションを続けるより良い結果になりやすい
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Coworkでの記憶が引き継がれない</td>
+                    <td>
+                      Chatでの記憶は現時点でCoworkセッションに引き継がれません。Cowork内で記憶が使えるのはProjects機能を使った場合のみです
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>使用量（usage）の上限にすぐ達する</td>
+                    <td>
+                      Coworkは通常のChatより使用量を多く消費します。関連作業をまとめて1セッションで行う、単純な作業はChatに戻す、などの対策が案内されています
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>期待した場所にファイルが出力されない</td>
+                    <td>
+                      付与したファイルアクセス権限を確認し、Claudeが完了時に示した出力先を再確認する
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>タスクが途中で止まった</td>
+                    <td>
+                      ローカルセッションではDesktopアプリが常に開いていたか、PCがスリープしなかったかを確認する。リモートセッションはバックグラウンドで継続しているため、別の画面からセッションを開いて進捗を確認する
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          {/* ================= CHECKLIST ================= */}
+          <section className={styles.section} id="checklist">
+            <h2>納品前チェックリスト</h2>
+            <p className={styles.muted}>
+              Coworkにタスクを渡す前後で、以下を確認する運用がおすすめです。
+            </p>
+            <ul className={styles.checklist}>
+              <li>
+                <label>
+                  <input type="checkbox" disabled />
+                  <span>
+                    タスクは「Chatで済む質問」ではなく、本当に複数ファイル／複数アプリにまたがる成果物作成か
+                  </span>
+                </label>
+              </li>
+              <li>
+                <label>
+                  <input type="checkbox" disabled />
+                  <span>
+                    Global Instructionsに、トーン・役割・出力形式などの普遍的なルールを設定済みか
+                  </span>
+                </label>
+              </li>
+              <li>
+                <label>
+                  <input type="checkbox" disabled />
+                  <span>
+                    対象フォルダにFolder
+                    Instructions（クライアント名・専門用語・フォーマット）を設定したか
+                  </span>
+                </label>
+              </li>
+              <li>
+                <label>
+                  <input type="checkbox" disabled />
+                  <span>初回のタスクでは、実行前にClaudeへ確認質問をさせたか</span>
+                </label>
+              </li>
+              <li>
+                <label>
+                  <input type="checkbox" disabled />
+                  <span>機密情報を含むファイルやアプリを、必要以上にアクセス許可していないか</span>
+                </label>
+              </li>
+              <li>
+                <label>
+                  <input type="checkbox" disabled />
+                  <span>
+                    金銭・送信・削除など不可逆な操作を伴うタスクは「Manually
+                    approve」で運用しているか
+                  </span>
+                </label>
+              </li>
+              <li>
+                <label>
+                  <input type="checkbox" disabled />
+                  <span>
+                    スケジュールタスクは低リスクな内容から始め、定期的に実行結果を確認しているか
+                  </span>
+                </label>
+              </li>
+              <li>
+                <label>
+                  <input type="checkbox" disabled />
+                  <span>導入するPlugin・MCPの権限範囲を事前に確認したか</span>
+                </label>
+              </li>
+              <li>
+                <label>
+                  <input type="checkbox" disabled />
+                  <span>
+                    不審な挙動（無関係な話題、想定外のアクセス）がないか、作業中も目を配っているか
+                  </span>
+                </label>
+              </li>
+            </ul>
+          </section>
+
+          {/* ================= REFERENCES ================= */}
+          <section className={styles.footer} id="references">
+            <h2 style={{ fontSize: "26px", fontWeight: 900, marginBottom: "8px" }}>
+              参考文献・出典
+            </h2>
+            <p className={styles.muted}>
+              本記事は以下の一次情報・著名な開発者やパワーユーザーの発信を根拠に作成しました。すべて2026年7月26日時点でアクセス可能であることを確認しています。
+            </p>
+
+            <div className={styles.refGroupTitle}>Anthropic公式</div>
+            <div className={styles.refGrid}>
+              <Ext
+                className={styles.refCard}
+                href="https://support.claude.com/en/articles/13345190-get-started-with-claude-cowork"
+              >
+                <span className={styles.refBadge}>公式</span>
+                <span className={styles.refBody}>
+                  <strong>Get started with Claude Cowork</strong>
+                  <span className={styles.refSource}>
+                    Claude Help Center ・
+                    support.claude.com/en/articles/13345190-get-started-with-claude-cowork
+                  </span>
+                </span>
+              </Ext>
+              <Ext
+                className={styles.refCard}
+                href="https://support.claude.com/en/articles/13364135-use-claude-cowork-safely"
+              >
+                <span className={styles.refBadge}>公式</span>
+                <span className={styles.refBody}>
+                  <strong>Use Claude Cowork safely</strong>
+                  <span className={styles.refSource}>
+                    Claude Help Center ・
+                    support.claude.com/en/articles/13364135-use-claude-cowork-safely
+                  </span>
+                </span>
+              </Ext>
+              <Ext
+                className={styles.refCard}
+                href="https://claude.com/blog/best-practices-for-getting-started-with-claude-cowork"
+              >
+                <span className={styles.refBadge}>公式</span>
+                <span className={styles.refBody}>
+                  <strong>Best practices for getting started with Claude Cowork</strong>
+                  <span className={styles.refSource}>
+                    Austin Lau（Anthropic Growth Team）・ Claude Blog ・
+                    claude.com/blog/best-practices-for-getting-started-with-claude-cowork
+                  </span>
+                </span>
+              </Ext>
+              <Ext
+                className={styles.refCard}
+                href="https://support.claude.com/en/articles/13947068-assign-tasks-from-anywhere-in-claude-cowork"
+              >
+                <span className={styles.refBadge}>公式</span>
+                <span className={styles.refBody}>
+                  <strong>Assign tasks from anywhere in Claude Cowork</strong>
+                  <span className={styles.refSource}>
+                    Claude Help Center ・
+                    support.claude.com/en/articles/13947068-assign-tasks-from-anywhere-in-claude-cowork
+                  </span>
+                </span>
+              </Ext>
+              <Ext
+                className={styles.refCard}
+                href="https://www.anthropic.com/engineering/claude-code-auto-mode"
+              >
+                <span className={styles.refBadge}>公式</span>
+                <span className={styles.refBody}>
+                  <strong>
+                    How we built Claude Code auto mode: a safer way to skip permissions
+                  </strong>
+                  <span className={styles.refSource}>
+                    Anthropic Engineering ・ anthropic.com/engineering/claude-code-auto-mode
+                  </span>
+                </span>
+              </Ext>
+              <Ext className={styles.refCard} href="https://anthropic.com/news/claude-code-plugins">
+                <span className={styles.refBadge}>公式</span>
+                <span className={styles.refBody}>
+                  <strong>Customize Claude Code with plugins</strong>
+                  <span className={styles.refSource}>
+                    Anthropic News ・ anthropic.com/news/claude-code-plugins
+                  </span>
+                </span>
+              </Ext>
+              <Ext
+                className={styles.refCard}
+                href="https://techcrunch.com/2026/01/30/anthropic-brings-agentic-plugins-to-cowork/"
+              >
+                <span className={`${styles.refBadge} ${styles.supplement}`}>第三者報道</span>
+                <span className={styles.refBody}>
+                  <strong>Anthropic brings agentic plug-ins to Cowork</strong>
+                  <span className={styles.refSource}>
+                    TechCrunch（Anthropicの発表を報道）・
+                    techcrunch.com/2026/01/30/anthropic-brings-agentic-plugins-to-cowork
+                  </span>
+                </span>
+              </Ext>
+              <Ext
+                className={styles.refCard}
+                href="https://support.claude.com/en/articles/12902446-claude-in-chrome-permissions-guide"
+              >
+                <span className={styles.refBadge}>公式</span>
+                <span className={styles.refBody}>
+                  <strong>Claude in Chrome permissions guide</strong>
+                  <span className={styles.refSource}>
+                    Claude Help Center（権限モードの解説）・
+                    support.claude.com/en/articles/12902446-claude-in-chrome-permissions-guide
+                  </span>
+                </span>
+              </Ext>
+            </div>
+
+            <div className={styles.refGroupTitle}>著名な開発者・パワーユーザーの発信</div>
+            <div className={styles.refGrid}>
+              <Ext
+                className={styles.refCard}
+                href="https://note.com/_kihonushi/n/nd726246d467f?hl=en-US"
+              >
+                <span className={`${styles.refBadge} ${styles.community}`}>コミュニティ</span>
+                <span className={styles.refBody}>
+                  <strong>Nav Toor氏の「17 Best Practices」を取り上げた解説記事</strong>
+                  <span className={styles.refSource}>
+                    KiKi ・ note ・ note.com/_kihonushi/n/nd726246d467f
+                  </span>
+                </span>
+              </Ext>
+              <Ext
+                className={styles.refCard}
+                href="https://x.com/heynavtoor/status/2028148844891152554"
+              >
+                <span className={`${styles.refBadge} ${styles.community}`}>コミュニティ</span>
+                <span className={styles.refBody}>
+                  <strong>17 Best Practices That Make Claude Cowork 100x More Powerful</strong>
+                  <span className={styles.refSource}>
+                    Nav Toor（@heynavtoor）・ X ・ x.com/heynavtoor/status/2028148844891152554
+                  </span>
+                </span>
+              </Ext>
+              <Ext
+                className={styles.refCard}
+                href="https://x.com/heynavtoor/status/2026717574776631556"
+              >
+                <span className={`${styles.refBadge} ${styles.community}`}>コミュニティ</span>
+                <span className={styles.refBody}>
+                  <strong>Claude Cowork導入ガイドの投稿</strong>
+                  <span className={styles.refSource}>
+                    Nav Toor（@heynavtoor）・ X ・ x.com/heynavtoor/status/2026717574776631556
+                  </span>
+                </span>
+              </Ext>
+              <Ext
+                className={styles.refCard}
+                href="https://www.linkedin.com/posts/ruben-hassid_this-is-the-only-claude-cowork-guide-you-activity-7435202560703008792-WQm6"
+              >
+                <span className={`${styles.refBadge} ${styles.community}`}>コミュニティ</span>
+                <span className={styles.refBody}>
+                  <strong>This is the only Claude Cowork guide you need</strong>
+                  <span className={styles.refSource}>
+                    Ruben Hassid ・ LinkedIn ・ linkedin.com/posts/ruben-hassid
+                  </span>
+                </span>
+              </Ext>
+              <Ext className={styles.refCard} href="https://ruben.substack.com/p/claude-cowork-20">
+                <span className={`${styles.refBadge} ${styles.community}`}>コミュニティ</span>
+                <span className={styles.refBody}>
+                  <strong>Cowork.</strong>
+                  <span className={styles.refSource}>
+                    Ruben Hassid ・ How to AI (Substack) ・ ruben.substack.com/p/claude-cowork-20
+                  </span>
+                </span>
+              </Ext>
+              <Ext
+                className={styles.refCard}
+                href="https://claudecowork.im/blog/customize-panel-guide"
+              >
+                <span className={`${styles.refBadge} ${styles.community}`}>コミュニティ</span>
+                <span className={styles.refBody}>
+                  <strong>
+                    Claude Cowork Customize: Global Instructions, Folder Rules, and the New Settings
+                    Panel
+                  </strong>
+                  <span className={styles.refSource}>
+                    Claude Cowork Blog ・ claudecowork.im/blog/customize-panel-guide
+                  </span>
+                </span>
+              </Ext>
+              <Ext
+                className={styles.refCard}
+                href="https://github.com/TheCraigHewitt/cowork-starter-pack/blob/main/global-instructions.md"
+              >
+                <span className={`${styles.refBadge} ${styles.community}`}>コミュニティ</span>
+                <span className={styles.refBody}>
+                  <strong>cowork-starter-pack（global-instructions.md）</strong>
+                  <span className={styles.refSource}>
+                    TheCraigHewitt ・ GitHub ・ github.com/TheCraigHewitt/cowork-starter-pack
+                  </span>
+                </span>
+              </Ext>
+              <Ext
+                className={styles.refCard}
+                href="https://www.the-ai-corner.com/p/claude-best-practices-power-user-guide-2026"
+              >
+                <span className={`${styles.refBadge} ${styles.community}`}>コミュニティ</span>
+                <span className={styles.refBody}>
+                  <strong>Claude best practices 2026: the complete power user guide</strong>
+                  <span className={styles.refSource}>
+                    The AI Corner ・ the-ai-corner.com/p/claude-best-practices-power-user-guide-2026
+                  </span>
+                </span>
+              </Ext>
+              <Ext
+                className={styles.refCard}
+                href="https://thesignal.substack.com/p/how-to-run-claude-cowork-from-your"
+              >
+                <span className={`${styles.refBadge} ${styles.community}`}>コミュニティ</span>
+                <span className={styles.refBody}>
+                  <strong>How to run Claude Cowork from your phone</strong>
+                  <span className={styles.refSource}>
+                    Alex Banks ・ The Signal (Substack) ・
+                    thesignal.substack.com/p/how-to-run-claude-cowork-from-your
+                  </span>
+                </span>
+              </Ext>
+              <Ext
+                className={styles.refCard}
+                href="https://www.datacamp.com/tutorial/claude-cowork-dispatch"
+              >
+                <span className={`${styles.refBadge} ${styles.community}`}>コミュニティ</span>
+                <span className={styles.refBody}>
+                  <strong>Claude Cowork Dispatch 101: Remote Control for Desktop AI</strong>
+                  <span className={styles.refSource}>
+                    DataCamp ・ datacamp.com/tutorial/claude-cowork-dispatch
+                  </span>
+                </span>
+              </Ext>
+              <Ext
+                className={styles.refCard}
+                href="https://www.the-ai-corner.com/p/claude-dispatch-guide"
+              >
+                <span className={`${styles.refBadge} ${styles.community}`}>コミュニティ</span>
+                <span className={styles.refBody}>
+                  <strong>Claude Dispatch Guide: The AI That Works While You're Away</strong>
+                  <span className={styles.refSource}>
+                    The AI Corner ・ the-ai-corner.com/p/claude-dispatch-guide
+                  </span>
+                </span>
+              </Ext>
+            </div>
+
+            <div className={styles.refGroupTitle}>補足として参照した記事</div>
+            <div className={styles.refGrid}>
+              <Ext
+                className={styles.refCard}
+                href="https://github.com/az9713/claude-cowork-best-practices/blob/main/docs/claude_cowork_best_practices_report.md"
+              >
+                <span className={`${styles.refBadge} ${styles.supplement}`}>補足</span>
+                <span className={styles.refBody}>
+                  <strong>claude-cowork-best-practices（Nav Toor実践まとめレポート）</strong>
+                  <span className={styles.refSource}>
+                    az9713 ・ GitHub ・ github.com/az9713/claude-cowork-best-practices
+                  </span>
+                </span>
+              </Ext>
+              <Ext
+                className={styles.refCard}
+                href="https://claudiaplusai.substack.com/p/claude-cowork-starter-guide-30-examples"
+              >
+                <span className={`${styles.refBadge} ${styles.supplement}`}>補足</span>
+                <span className={styles.refBody}>
+                  <strong>Claude Cowork Starter Guide + 30 examples</strong>
+                  <span className={styles.refSource}>
+                    Claudia + AI (Substack) ・
+                    claudiaplusai.substack.com/p/claude-cowork-starter-guide-30-examples
+                  </span>
+                </span>
+              </Ext>
+              <Ext
+                className={styles.refCard}
+                href="https://tooltechsavvy.com/claude-cowork-how-to-choose-folders-wisely-and-use-instructions-for-consistent-results/"
+              >
+                <span className={`${styles.refBadge} ${styles.supplement}`}>補足</span>
+                <span className={styles.refBody}>
+                  <strong>Claude Cowork: Smart Folders & Instructions Guide</strong>
+                  <span className={styles.refSource}>
+                    ToolTechSavvy ・ tooltechsavvy.com/claude-cowork-how-to-choose-folders-wisely
+                  </span>
+                </span>
+              </Ext>
+              <Ext
+                className={styles.refCard}
+                href="https://fourhourfreedom.substack.com/p/the-claude-cowork-setup-guide-i-wish"
+              >
+                <span className={`${styles.refBadge} ${styles.supplement}`}>補足</span>
+                <span className={styles.refBody}>
+                  <strong>The Claude Cowork Setup Guide I Wish I'd Had</strong>
+                  <span className={styles.refSource}>
+                    Four Hour Freedom (Substack) ・
+                    fourhourfreedom.substack.com/p/the-claude-cowork-setup-guide-i-wish
+                  </span>
+                </span>
+              </Ext>
+            </div>
+
+            <div className={styles.noteBox}>
+              <strong>注記：</strong>Claude
+              Coworkはベータ機能であり、権限モードの名称・Dispatchの提供範囲・使用量の計算方法などは今後変更される可能性があります。実運用の前には、必ず
+              <Ext href="https://support.claude.com/en/collections/19667525-claude-cowork">
+                support.claude.com のClaude Coworkコレクション
+              </Ext>
+              で最新記事をご確認ください。
+            </div>
+
+            <footer className={styles.pageEnd}>
+              Claude Cowork 実践ガイド — 2026年7月26日時点の情報にもとづく
+            </footer>
+          </section>
+        </main>
       </div>
     </div>
   );

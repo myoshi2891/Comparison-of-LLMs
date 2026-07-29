@@ -156,15 +156,15 @@ const entries: PageEntry[] = [
   },
   {
     slug: "/claude/cowork-guide",
-    title: "Cowork Guide",
+    title: "Claude Cowork 実践ガイド",
     group: "Providers",
     category: "Claude",
     provider: "claude",
     topics: ["guide"],
     summary:
-      "コードを一行も書かずに自然言語の指示だけでファイル管理・タスク自動化を実現する Anthropic のデスクトップツール「Cowork」を初学者向けにゼロから解説します。",
+      "初学者がClaude Coworkを使いこなすためのステップバイステップ・ベストプラクティス。基礎から高度な運用、Scheduled Tasks、Dispatch、10の自衛対策まで完全解説。",
     addedAt: "2026-05-03",
-    lastReviewed: "2026-06-30",
+    lastReviewed: "2026-07-29",
   },
   {
     slug: "/claude/fable-5-best-practices",
@@ -239,15 +239,15 @@ const entries: PageEntry[] = [
   },
   {
     slug: "/claude/skill-guide-intermediate",
-    title: "Skill Guide (中級)",
+    title: "SKILL.md 実践ガイド",
     group: "Providers",
     category: "Claude",
     provider: "claude",
-    topics: ["skill", "guide"],
+    topics: ["skill", "guide", "best-practices"],
     summary:
-      "プログレッシブ・ディスクロージャー、トークン経済、動的コンテキスト注入、context:fork、エンタープライズプロビジョニングまで網羅した実践リファレンスです。",
+      "Claude Code を業務で使い込んでいる中級者〜上級者向けに、SKILL.md の設計思想・書き方・Claude Code固有のフロントマター・評価運用フローまでをステップバイステップで解説する実践ガイドです。",
     addedAt: "2026-05-02",
-    lastReviewed: "2026-06-30",
+    lastReviewed: "2026-07-29",
   },
   {
     slug: "/claude/skills-sh",
@@ -471,15 +471,15 @@ const entries: PageEntry[] = [
   },
   {
     slug: "/google/agent",
-    title: "Agent",
+    title: "Antigravity AI仕様駆動開発",
     group: "Providers",
     category: "Google",
     provider: "google",
-    topics: ["agent"],
+    topics: ["antigravity", "spec-driven-development", "markdown", "agent"],
     summary:
-      "最新の Google Gemini CLI / Antigravity CLI (as of 2026-06)・最新の ADK (as of 2026-06)・最新のエージェント連携プロトコル (A2A/AP2/A2UI等) 時代のサブエージェント / マルチエージェント開発で必要な GEMINI.md・AGENTS.md・agent.py・agent.json・.geminiignore・settings.json の役割と書き方を体系化したガイド。Gemini CLI は 2026-06-18 に AI Pro/Ultra/無料 Code Assist 向けサンセット済（→ Antigravity CLI へ移行）。",
+      "AIエージェントIDE「Google Antigravity」が扱う4種類のMarkdownファイル（Rules / Skills / Workflows / Artifacts）の役割・置き場所・書き方・ベストプラクティスを体系化した完全ガイド。",
     addedAt: "2026-04-24",
-    lastReviewed: "2026-07-01",
+    lastReviewed: "2026-07-29",
   },
   {
     slug: "/google/agent-harness-engineering",
@@ -495,15 +495,15 @@ const entries: PageEntry[] = [
   },
   {
     slug: "/google/antigravity-guide",
-    title: "Antigravity",
+    title: "Antigravity CLI 完全ガイド",
     group: "Providers",
     category: "Google",
     provider: "google",
-    topics: ["guide"],
+    topics: ["guide", "cli"],
     summary:
-      "GEMINI.md から SKILL.md・Rules・Workflows・Artifacts まで、Google Antigravity エコシステムの全体を根拠ソース付きで徹底解説。初学者でもステップバイステップで理解できるベストプラクティス完全ガイド。Antigravity 2.0 (2026-05-19, Google I/O 2026) — Antigravity CLI / SDK / Managed Agents / plugins / Gemini 3.5 Flash 対応。",
+      "Antigravity CLI (agy) の全スラッシュコマンド、キーバインド、設定ファイル (settings.json)、自動化・CI/CD連携、セキュリティモデルを包括的に解説した完全ガイド。",
     addedAt: "2026-05-08",
-    lastReviewed: "2026-07-01",
+    lastReviewed: "2026-07-28",
   },
   {
     slug: "/google/antigravity-slash-commands-guide",
@@ -555,15 +555,15 @@ const entries: PageEntry[] = [
   },
   {
     slug: "/google/skill",
-    title: "Skill",
+    title: "Agent Skills 実践ガイド",
     group: "Providers",
     category: "Google",
     provider: "google",
-    topics: ["skill"],
+    topics: ["skill", "antigravity", "guide"],
     summary:
-      "GEMINI.md / Rules / SKILL.md / Workflows / Knowledge Base / Artifacts / SDD仕様書群 — Google Antigravity の AI 仕様駆動開発を支えるマークダウンファイル群の役割・構造・ベストプラクティスを公式根拠付きで解説。Antigravity v2.0.1 (2026-05-23, 最新の安定化リリース) / Gemini 3.5 Flash 対応。Gemini CLI は 2026-06-18 に AI Pro/Ultra/無料 Code Assist 向けサンセット済（→ Antigravity CLI へ移行）。",
+      "Antigravity IDE における SKILL.md の設計思想・アーキテクチャ・実装パターン・運用を中級〜上級エンジニア向けにステップバイステップで解説する実践ガイド。",
     addedAt: "2026-04-18",
-    lastReviewed: "2026-07-01",
+    lastReviewed: "2026-07-29",
   },
   {
     slug: "/google/skill-guide",
@@ -578,16 +578,16 @@ const entries: PageEntry[] = [
     lastReviewed: "2026-07-01",
   },
   {
-    slug: "/google/skill-guide-intermediate",
-    title: "Skill Guide (中級)",
+    slug: "/google/antigravity-best-practices",
+    title: "Antigravity ベストプラクティス",
     group: "Providers",
     category: "Google",
     provider: "google",
-    topics: ["skill", "guide"],
+    topics: ["antigravity", "best-practices", "agent"],
     summary:
-      "Google Gemini CLI (v0.43.0 最終版)・Antigravity IDE (v2.0.1) における SKILL.md の設計思想、アーキテクチャ、実装パターン、運用まで。エージェント駆動開発を次のレベルに引き上げるすべての知識を網羅する。Gemini CLI は 2026-06-18 に AI Pro/Ultra/無料 Code Assist 向けサンセット済（→ Antigravity CLI へ移行）。",
+      "Google Antigravity IDE・CLI の設計思想、アーキテクチャ、Rules (GEMINI.md)、Skills (SKILL.md)、Workflows、Artifacts、Permissions、Claude Code との比較・共存戦略まで、仕様駆動開発を支えるエコシステム全容を網羅。",
     addedAt: "2026-05-07",
-    lastReviewed: "2026-07-01",
+    lastReviewed: "2026-07-29",
   },
   {
     slug: "/google/stitch-guide",

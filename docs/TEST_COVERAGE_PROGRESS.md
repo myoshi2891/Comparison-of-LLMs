@@ -8,13 +8,13 @@
 
 | 項目 | 値 |
 |---|---|
-| 最終スキャン日 | 2026-07-22 |
+| 最終スキャン日 | 2026-07-29 |
 | フロントエンドテストランナー | Vitest 4.1 (jsdom 29 + @testing-library/react 16) |
 | バックエンドテストランナー | pytest 9.0 (unittest 互換) |
-| web-next テストファイル数 | 125 |
-| web-next テストケース数 | 1195 |
+| web-next テストファイル数 | 137 |
+| web-next テストケース数 | 1259 |
 | scraper テストファイル数 | 5 |
-| scraper テストケース数 | 38 |
+| scraper テストケース数 | 43 |
 | 総合カバレッジスコア (weighted) | 44.2% |
 
 スコア計算方法: 8 カテゴリー × 8 ドメイン = 64 セルのうち N/A を除く **43 セル** を
@@ -49,7 +49,7 @@
 
 ```
 status: done
-count: 640
+count: 690
 files:
   - app/agent/context-engineering-best-practices/TocObserver.test.tsx (7)
   - app/agent/context-engineering-best-practices/page.test.tsx (8)
@@ -60,15 +60,18 @@ files:
   - app/agent/skills/page.test.tsx (7)
   - app/ci-cd/ai-cicd-automation-best-practices/TocObserver.test.tsx (7)
   - app/ci-cd/ai-cicd-automation-best-practices/page.test.tsx (8)
-  - app/claude/agent/page.test.tsx (8)
+  - app/claude/agent/page.test.tsx (11)
   - app/claude/code-slash-commands/page.test.tsx (5)
-  - app/claude/cowork-guide/page.test.tsx (7)
+  - app/claude/cowork-guide/TocObserver.test.tsx (4)
+  - app/claude/cowork-guide/page.test.tsx (9)
   - app/claude/fable-5-best-practices/TocObserver.test.tsx (3)
-  - app/claude/fable-5-best-practices/page.test.tsx (6)
+  - app/claude/fable-5-best-practices/page.test.tsx (10)
+  - app/claude/harness-engineering/TocObserver.test.tsx (4)
   - app/claude/harness-engineering/page.test.tsx (8)
   - app/claude/managed-agents/page.test.tsx (7)
   - app/claude/self-hosted-sandboxes/page.test.tsx (9)
-  - app/claude/skill-guide-intermediate/page.test.tsx (7)
+  - app/claude/skill-guide-intermediate/TocObserver.test.tsx (4)
+  - app/claude/skill-guide-intermediate/page.test.tsx (9)
   - app/claude/skill-guide/page.test.tsx (7)
   - app/claude/skill/page.test.tsx (8)
   - app/claude/skills-sh/page.test.tsx (9)
@@ -92,8 +95,11 @@ files:
   - app/google/adk-best-practices/TocObserver.test.tsx (5)
   - app/google/adk-best-practices/page.test.tsx (9)
   - app/google/agent-harness-engineering/page.test.tsx (21)
+  - app/google/agent/TocObserver.test.tsx (1)
   - app/google/agent/page.test.tsx (8)
-  - app/google/antigravity-guide/page.test.tsx (9)
+  - app/google/antigravity-best-practices/TocObserver.test.tsx (1)
+  - app/google/antigravity-best-practices/page.test.tsx (8)
+  - app/google/antigravity-guide/page.test.tsx (13)
   - app/google/antigravity-slash-commands-guide/page.test.tsx (5)
   - app/google/enterprise-agent-platform-intermediate/page.test.tsx (6)
   - app/google/enterprise-agent-platform/page.test.tsx (7)
@@ -102,16 +108,17 @@ files:
   - app/google/harness-engineering/page.test.tsx (19)
   - app/google/notebook-lm/page.test.tsx (9)
   - app/google/sandbox-best-practices/page.test.tsx (20)
-  - app/google/skill-guide-intermediate/page.test.tsx (6)
-  - app/google/skill-guide/page.test.tsx (8)
-  - app/google/skill/page.test.tsx (11)
+  - app/google/skill-guide/TocObserver.test.tsx (1)
+  - app/google/skill-guide/page.test.tsx (7)
+  - app/google/skill/TocObserver.test.tsx (1)
+  - app/google/skill/page.test.tsx (10)
   - app/google/stitch-guide/TocObserver.test.tsx (5)
   - app/google/stitch-guide/page.test.tsx (9)
   - app/governance/ai-governance/page.test.tsx (6)
   - app/infra/amazon-bedrock-best-practices-2026-intermediate/TocObserver.test.tsx (3)
-  - app/infra/amazon-bedrock-best-practices-2026-intermediate/page.test.tsx (5)
+  - app/infra/amazon-bedrock-best-practices-2026-intermediate/page.test.tsx (6)
   - app/infra/amazon-bedrock-best-practices-guide/TocObserver.test.tsx (3)
-  - app/infra/amazon-bedrock-best-practices-guide/page.test.tsx (5)
+  - app/infra/amazon-bedrock-best-practices-guide/page.test.tsx (6)
   - app/llm-ops/evaluation-observability/TocObserver.test.tsx (5)
   - app/llm-ops/evaluation-observability/page.test.tsx (9)
   - app/local-llm/best-practices/TocObserver.test.tsx (3)
@@ -131,6 +138,9 @@ files:
   - app/multimodal/image-audio-best-practices-2026/page.test.tsx (6)
   - app/rag/embeddings-best-practices/TocObserver.test.tsx (5)
   - app/rag/embeddings-best-practices/page.test.tsx (6)
+  - app/sdd/ai-spec-driven-development-guide/TocObserver.test.tsx (3)
+  - app/sdd/ai-spec-driven-development-guide/page.test.tsx (8)
+  - app/sdd/spec-driven-development-guide/page.test.tsx (6)
   - app/search/page.test.tsx (16)
   - app/security/ai-security-best-practices-intermediate/TocObserver.test.tsx (7)
   - app/security/ai-security-best-practices-intermediate/page.test.tsx (8)
@@ -201,11 +211,11 @@ note: 型↔Zodスキーマのランタイム parity + negative test（型強制
 
 ```
 status: done
-count: 13
+count: 18
 files:
-  - scraper/tests/test_providers.py (12)
+  - scraper/tests/test_providers.py (17)
   - scraper/tests/smoke/test_smoke.py::test_providers (1)
-note: 6 プロバイダーの価格抽出を success（fixture→期待値一致）/ fallback（非マッチ→全モデル fallback 値）両パスで検証
+note: 8 プロバイダーの価格抽出を success（fixture→期待値一致）/ fallback（非マッチ→全モデル fallback 値）両パスで検証
 ```
 
 ### Unit / tools
@@ -589,6 +599,7 @@ note: 同上（JS依存関係の監査ゲート）
 
 | 日付 | 変更内容 | スコア |
 |---|---|---|
+| 2026-07-29 | Claude TocObserver 3ファイルへ分岐テスト12件を追加し、全テスト件数・Unit/app・Unit/providersセルを実測同期 | 44.2% |
 | 2026-07-22 | PR #126 の TOC Observer 4ファイルへ分岐テスト12件を追加し、全テスト件数と Unit/app セルを実測同期 | 44.2% |
 | 2026-07-05 | TOC scroll-spy aria-current 対応と Cursor 中級ガイドの診断テスト追加に伴い件数を実測同期 (774→778) | 44.2% |
 | 2026-07-05 | Loop Engineering 完全ガイドの Next.js 移行に伴う契約テスト追加 (+21) | 44.2% |

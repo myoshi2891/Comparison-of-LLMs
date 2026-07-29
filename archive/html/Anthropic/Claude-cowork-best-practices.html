@@ -1578,21 +1578,6 @@
             </a>
             <a
               class="ref-card"
-              href="https://www.techcrunch.com/2026/01/30/anthropic-brings-agentic-plugins-to-cowork/"
-              target="_blank"
-              rel="noopener"
-            >
-              <span class="ref-badge">公式</span>
-              <span class="ref-body"
-                ><strong>Anthropic brings agentic plug-ins to Cowork</strong
-                ><span class="ref-source"
-                  >TechCrunch（Anthropicの発表を報道）・
-                  techcrunch.com/2026/01/30/anthropic-brings-agentic-plugins-to-cowork</span
-                ></span
-              >
-            </a>
-            <a
-              class="ref-card"
               href="https://support.claude.com/en/articles/12902446-claude-in-chrome-permissions-guide"
               target="_blank"
               rel="noopener"
@@ -1608,8 +1593,23 @@
             </a>
           </div>
 
-          <div class="ref-group-title">著名な開発者・パワーユーザーの発信</div>
+          <div class="ref-group-title">著名な開発者・パワーユーザーの発信・報道</div>
           <div class="ref-grid">
+            <a
+              class="ref-card"
+              href="https://www.techcrunch.com/2026/01/30/anthropic-brings-agentic-plugins-to-cowork/"
+              target="_blank"
+              rel="noopener"
+            >
+              <span class="ref-badge reporting">報道</span>
+              <span class="ref-body"
+                ><strong>Anthropic brings agentic plug-ins to Cowork</strong
+                ><span class="ref-source"
+                  >TechCrunch（Anthropicの発表を報道）・
+                  techcrunch.com/2026/01/30/anthropic-brings-agentic-plugins-to-cowork</span
+                ></span
+              >
+            </a>
             <a
               class="ref-card"
               href="https://note.com/_kihonushi/n/nd726246d467f?hl=en-US"
@@ -1976,7 +1976,20 @@
         }
       });
 
-      mermaid.run({ querySelector: 'pre.mermaid' });
+      async function renderMermaid() {
+        if (document.fonts && document.fonts.ready) {
+          await document.fonts.ready;
+        }
+        for (const el of document.querySelectorAll('pre.mermaid')) {
+          try {
+            await mermaid.run({ nodes: [el] });
+          } catch (err) {
+            console.error('Mermaid render failed:', err);
+            el.innerHTML = '<div class="mermaid-fallback">図解のレンダリングに失敗しました。</div>';
+          }
+        }
+      }
+      renderMermaid();
 
       // Sidebar active-link tracking
       const navLinks = Array.from(document.querySelectorAll('#nav-list a'));

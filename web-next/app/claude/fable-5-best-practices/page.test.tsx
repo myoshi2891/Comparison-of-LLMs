@@ -102,6 +102,22 @@ describe("/claude/fable-5-best-practices - page structure (Step 1)", () => {
       "false"
     );
   });
+
+  it("タイムラインの凡例と順序付きリストを正しいリスト構造で描画する", () => {
+    const { container } = render(<Page />);
+    const legend = container.querySelector(`ul.${styles.timelineLegend}`);
+    const timeline = container.querySelector(`ol.${styles.timeline}`);
+    const timelineWrap = timeline?.parentElement;
+
+    expect(legend).not.toBeNull();
+    expect(legend?.querySelectorAll(":scope > li")).toHaveLength(5);
+    expect(timelineWrap).toHaveClass(styles.timelineWrap);
+    expect(timelineWrap?.querySelector(`:scope > .${styles.timelineTrack}`)).not.toBeNull();
+    expect(timeline?.querySelector(`:scope > .${styles.timelineTrack}`)).toBeNull();
+    expect(Array.from(timeline?.children ?? []).every((child) => child.tagName === "LI")).toBe(
+      true
+    );
+  });
 });
 
 describe("/claude/fable-5-best-practices - registration", () => {
@@ -112,9 +128,7 @@ describe("/claude/fable-5-best-practices - registration", () => {
   });
 
   it("uses the latest timeline date in the page registry", () => {
-    const entry = pageRegistry.find(
-      ({ slug }) => slug === "/claude/fable-5-best-practices",
-    );
+    const entry = pageRegistry.find(({ slug }) => slug === "/claude/fable-5-best-practices");
     expect(entry?.lastReviewed).toBe("2026-07-26");
   });
 });

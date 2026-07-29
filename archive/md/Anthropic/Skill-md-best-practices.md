@@ -25,13 +25,13 @@ Claude Code における「振る舞いの拡張」には CLAUDE.md、Skills、S
 
 ```mermaid
 flowchart TB
-    Q["拡張したい振る舞いは?"] --> A{"毎セッション常に\n必要な短い方針か"}
+    Q["拡張したい振る舞いは?"] --> A{"毎セッション常に<br/>必要な短い方針か"}
     A -->|"Yes"| CM["CLAUDE.md に書く"]
-    A -->|"No"| B{"独立したコンテキストで\n実行したいタスクか"}
+    A -->|"No"| B{"独立したコンテキストで<br/>実行したいタスクか"}
     B -->|"Yes"| SA["Subagent を使う"]
-    B -->|"No"| C{"外部サービスへの\nリアルタイムアクセスが必要か"}
+    B -->|"No"| C{"外部サービスへの<br/>リアルタイムアクセスが必要か"}
     C -->|"Yes"| MCP["MCP サーバーを使う"]
-    C -->|"No"| D{"手順や知識を\n繰り返し再利用したいか"}
+    C -->|"No"| D{"手順や知識を<br/>繰り返し再利用したいか"}
     D -->|"Yes"| SK["Skill (SKILL.md) を作る"]
     D -->|"No"| P["通常のプロンプトで対応"]
 
@@ -47,13 +47,13 @@ Skills を正しく設計する上で最も重要な前提は、**すべての�
 
 ```mermaid
 flowchart TB
-    A["セッション開始"] --> B["Level 1: メタデータ\nname + description\n約100トークン/Skill"]
-    B --> C{"タスクの内容が\ndescriptionと一致するか"}
-    C -->|"一致しない"| D["それ以上は何もロードしない\nコンテキストコストはゼロ"]
-    C -->|"一致する"| E["Level 2: SKILL.md 本文を bash で読み込み\n5,000トークン未満が目安"]
-    E --> F{"本文が他ファイルを\n参照しているか"}
+    A["セッション開始"] --> B["Level 1: メタデータ<br/>name + description<br/>約100トークン/Skill"]
+    B --> C{"タスクの内容が<br/>descriptionと一致するか"}
+    C -->|"一致しない"| D["それ以上は何もロードしない<br/>コンテキストコストはゼロ"]
+    C -->|"一致する"| E["Level 2: SKILL.md 本文を bash で読み込み<br/>5,000トークン未満が目安"]
+    E --> F{"本文が他ファイルを<br/>参照しているか"}
     F -->|"なし"| G["そのままタスクを実行"]
-    F -->|"あり"| H["Level 3: 参照ファイル / スクリプト\n必要な分だけオンデマンドで読み込み"]
+    F -->|"あり"| H["Level 3: 参照ファイル / スクリプト<br/>必要な分だけオンデマンドで読み込み"]
     H --> G
 
     classDef lvl1 fill:#fdeeea,stroke:#e07856,color:#5c2a1a;
@@ -95,9 +95,9 @@ Skillは1つのディレクトリで、`SKILL.md` だけが必須です。それ
 ```mermaid
 flowchart LR
     subgraph DIR["pdf-processing/ (Skillディレクトリ)"]
-        S["SKILL.md\n必須・メイン指示"]
-        F["FORMS.md\nフォーム入力ガイド"]
-        R["REFERENCE.md\nAPIリファレンス"]
+        S["SKILL.md<br/>必須・メイン指示"]
+        F["FORMS.md<br/>フォーム入力ガイド"]
+        R["REFERENCE.md<br/>APIリファレンス"]
         SC["scripts/"]
         P1["fill_form.py"]
         V1["validate.py"]
@@ -272,13 +272,13 @@ Simon Willison も自身の記事の中で「Skillは任意のコードを実行
 
 ```mermaid
 flowchart LR
-    A1["Claude Aとスキルなしで\nタスクを実施"] --> A2["繰り返し提供している\nコンテキストを特定"]
-    A2 --> A3["Claude Aに\nSKILL.md作成を依頼"]
-    A3 --> A4["冗長な説明を削り\n簡潔化する"]
-    A4 --> B1["Claude B (Skill読込済み)で\n実タスクを実行"]
-    B1 --> B2{"想定通りに\n動作したか"}
+    A1["Claude Aとスキルなしで<br/>タスクを実施"] --> A2["繰り返し提供している<br/>コンテキストを特定"]
+    A2 --> A3["Claude Aに<br/>SKILL.md作成を依頼"]
+    A3 --> A4["冗長な説明を削り<br/>簡潔化する"]
+    A4 --> B1["Claude B (Skill読込済み)で<br/>実タスクを実行"]
+    B1 --> B2{"想定通りに<br/>動作したか"}
     B2 -->|"No"| A3
-    B2 -->|"Yes"| C["チームに共有し\nevals.json化する"]
+    B2 -->|"Yes"| C["チームに共有し<br/>evals.json化する"]
 
     classDef design fill:#efeaff,stroke:#7c5cff,color:#2a1f5c;
     classDef test fill:#e8f6f3,stroke:#2f9c8a,color:#0d3d34;

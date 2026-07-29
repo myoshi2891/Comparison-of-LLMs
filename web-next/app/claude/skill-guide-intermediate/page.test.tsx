@@ -1,11 +1,13 @@
-import { render } from "@testing-library/react";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+import { fireEvent, render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import Page, { metadata } from "./page";
 
 describe("/claude/skill-guide-intermediate 契約テスト", () => {
-  it("metadata.title が非空文字列である", () => {
+  it("metadata.title が非空文字列で SKILL.md 実践ガイド を含む", () => {
     expect(typeof metadata.title).toBe("string");
-    expect((metadata.title as string).length).toBeGreaterThan(0);
+    expect(metadata.title as string).toContain("SKILL.md 実践ガイド");
   });
 
   it("metadata.description が非空文字列である", () => {
@@ -13,24 +15,20 @@ describe("/claude/skill-guide-intermediate 契約テスト", () => {
     expect((metadata.description as string).length).toBeGreaterThan(0);
   });
 
-  it("h1 に SKILL.md が含まれる", () => {
+  it("h1 に SKILL.md 実践ガイド が含まれる", () => {
     const { container } = render(<Page />);
-    expect(container.querySelector("h1")?.textContent).toContain("SKILL.md");
+    expect(container.querySelector("h1")?.textContent).toContain("SKILL.md 実践ガイド");
   });
 
-  it("h1 に 中級者完全攻略ガイド が含まれる", () => {
+  it("h2 が 17 本（全セクション数と一致）", () => {
     const { container } = render(<Page />);
-    expect(container.querySelector("h1")?.textContent).toContain("中級者完全攻略ガイド");
-  });
-
-  it("h2 が 9 本（セクション数と一致）", () => {
-    const { container } = render(<Page />);
-    expect(container.querySelectorAll("h2").length).toBe(9);
+    expect(container.querySelectorAll("h2").length).toBe(17);
   });
 
   it("外部リンクに target=_blank と rel=noopener noreferrer が付与されている", () => {
     const { container } = render(<Page />);
     const external = Array.from(container.querySelectorAll('a[href^="http"]'));
+    expect(external.length).toBeGreaterThan(0);
     for (const a of external) {
       expect(a.getAttribute("target")).toBe("_blank");
       expect(a.getAttribute("rel")).toBe("noopener noreferrer");
@@ -45,5 +43,38 @@ describe("/claude/skill-guide-intermediate 契約テスト", () => {
     for (const a of internal) {
       expect(a.getAttribute("href")).not.toMatch(/\.html$/);
     }
+  });
+
+  it("モバイル目次トグルのラベルと展開状態が同期する", () => {
+    const { container } = render(<Page />);
+    const toggle = container.querySelector(
+      'button[aria-controls="skillSidebar"]'
+    ) as HTMLButtonElement;
+
+    expect(toggle.getAttribute("aria-label")).toBe("目次を開く");
+    expect(toggle.getAttribute("aria-expanded")).toBe("false");
+    fireEvent.click(toggle);
+    expect(toggle.getAttribute("aria-label")).toBe("目次を閉じる");
+    expect(toggle.getAttribute("aria-expanded")).toBe("true");
+  });
+
+  it("モバイル目次は閉状態で操作不可、開状態で操作可能になる", () => {
+    const css = readFileSync(join(__dirname, "page.module.css"), "utf8");
+    expect(css).toMatch(/\.sidebar\s*\{[\s\S]*visibility:\s*hidden/);
+    expect(css).toMatch(/\.sidebar\s*\{[\s\S]*pointer-events:\s*none/);
+    expect(css).toMatch(/\.sidebarOpen\s*\{[\s\S]*visibility:\s*visible/);
+    expect(css).toMatch(/\.sidebarOpen\s*\{[\s\S]*pointer-events:\s*auto/);
+  });
+
+  it("SKILL.md の name と description を必須フィールドとして説明する", () => {
+    const { container } = render(<Page />);
+    const step = container.querySelector("#step3");
+    const text = step?.textContent?.replace(/\s+/g, " ") ?? "";
+
+    expect(text).toContain("name と description は必須フィールド");
+    expect(text).toContain("ハイフンは先頭・末尾に使用不可、連続使用不可");
+    expect(text).not.toContain("任意フィールド");
+    expect(text).not.toContain("省略時");
+    expect(text).not.toContain("任意。指定する場合");
   });
 });

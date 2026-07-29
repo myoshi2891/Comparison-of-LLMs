@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import MermaidDiagram from "@/components/docs/MermaidDiagram";
+import styles from "./page.module.css";
 import Sidebar from "./Sidebar";
 import TocObserver from "./TocObserver";
-import styles from "./page.module.css";
 
 export const metadata: Metadata = {
   title: "AI仕様駆動開発（Spec-Driven Development）実践ガイド",
@@ -10,6 +10,9 @@ export const metadata: Metadata = {
     "初学者のためのステップバイステップ・ベストプラクティス。GitHub Spec Kit、AWS Kiro、Claude Codeなど2026年最新のSDD手法・ツール・EARS記法を網羅解説。",
 };
 
+/**
+ * Renders a decorative icon indicating an external link.
+ */
 function ExternalIcon() {
   return (
     <svg
@@ -30,6 +33,9 @@ function ExternalIcon() {
   );
 }
 
+/**
+ * Renders a beginner-friendly guide to AI spec-driven development, including its concepts, workflows, tools, best practices, limitations, and references.
+ */
 export default function SpecDrivenDevelopmentGuidePage() {
   return (
     <div className={styles.layout}>
@@ -42,8 +48,9 @@ export default function SpecDrivenDevelopmentGuidePage() {
           <h1>AI仕様駆動開発（Spec-Driven Development）実践ガイド</h1>
           <p className={styles.subtitle}>初学者のためのステップバイステップ・ベストプラクティス</p>
           <div className={styles.notice}>
-            本ガイドは<strong>2026年7月25日</strong>時点で公開されている情報（GitHub、AWS、Anthropic等の一次情報、および
-            Addy Osmani、Birgitta Böckeler（Thoughtworks / Martin Fowler）、Sean
+            本ガイドは<strong>2026年7月25日</strong>
+            時点で公開されている情報（GitHub、AWS、Anthropic等の一次情報、および Addy
+            Osmani、Birgitta Böckeler（Thoughtworks / Martin Fowler）、Sean
             Grove（OpenAI）ら国際的に著名な開発者・専門家の発信内容）に基づいて作成しています。各章に根拠となる出典番号を付し、巻末の参考文献一覧にURLをまとめています。SDDは急速に変化している分野のため、最新情報は各リンク先で随時ご確認ください。
           </div>
         </header>
@@ -180,7 +187,8 @@ export default function SpecDrivenDevelopmentGuidePage() {
 
         <section id="ch3" className={styles.chapter}>
           <h2>
-            <span className={styles.num}>3</span>成熟度モデル：Spec-first / Spec-anchored / Spec-as-source
+            <span className={styles.num}>3</span>成熟度モデル：Spec-first / Spec-anchored /
+            Spec-as-source
           </h2>
           <p>
             SDDという言葉は急速に広まった一方、実践のレベルはツールによって大きく異なります。ThoughtworksのBirgitta
@@ -529,8 +537,8 @@ export default function SpecDrivenDevelopmentGuidePage() {
                 <tr>
                   <td>Unwanted behavior（望ましくない挙動）</td>
                   <td>
-                    If the authentication fails 5 times, then the system shall lock the account for 15
-                    minutes.
+                    If the authentication fails 5 times, then the system shall lock the account for
+                    15 minutes.
                   </td>
                 </tr>
                 <tr>
@@ -752,7 +760,9 @@ export default function SpecDrivenDevelopmentGuidePage() {
                 </tr>
                 <tr>
                   <td>Never do</td>
-                  <td>シークレットやAPIキーをコミットしない／node_modulesやvendor配下を編集しない</td>
+                  <td>
+                    シークレットやAPIキーをコミットしない／node_modulesやvendor配下を編集しない
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -1088,7 +1098,11 @@ export default function SpecDrivenDevelopmentGuidePage() {
               </svg>
             </span>
             <p>
-              これらを踏まえると、SDDは「常に必要な儀式」ではなく、<strong>プロジェクトの複雑さ・チーム規模・保守期間に応じて適用レベルを選ぶための道具</strong>として捉えるのが実践的です。ソロでの探索的なプロトタイピングであれば軽量なvibe
+              これらを踏まえると、SDDは「常に必要な儀式」ではなく、
+              <strong>
+                プロジェクトの複雑さ・チーム規模・保守期間に応じて適用レベルを選ぶための道具
+              </strong>
+              として捉えるのが実践的です。ソロでの探索的なプロトタイピングであれば軽量なvibe
               codingのままで構わず、本番運用・複数チーム・規制対応が絡む場面でSpec-anchored以上の厳密さを導入する、という使い分けが妥当とされています。
               <a className={styles.cite} href="#ref8">
                 [8]
@@ -1259,7 +1273,9 @@ export default function SpecDrivenDevelopmentGuidePage() {
                 <span className={styles.refNum}>4</span>
                 <div className={styles.refBody}>
                   <p className={styles.refSource}>Augment Code</p>
-                  <p className={styles.refTitle}>What Is Spec-Driven Development? A Complete Guide</p>
+                  <p className={styles.refTitle}>
+                    What Is Spec-Driven Development? A Complete Guide
+                  </p>
                   <a
                     className={styles.refLink}
                     href="https://www.augmentcode.com/guides/what-is-spec-driven-development"
@@ -1275,7 +1291,9 @@ export default function SpecDrivenDevelopmentGuidePage() {
                 <span className={styles.refNum}>5</span>
                 <div className={styles.refBody}>
                   <p className={styles.refSource}>BCMS</p>
-                  <p className={styles.refTitle}>Spec-Driven Development (SDD): The Definitive 2026 Guide</p>
+                  <p className={styles.refTitle}>
+                    Spec-Driven Development (SDD): The Definitive 2026 Guide
+                  </p>
                   <a
                     className={styles.refLink}
                     href="https://thebcms.com/blog/spec-driven-development"
@@ -1291,7 +1309,9 @@ export default function SpecDrivenDevelopmentGuidePage() {
                 <span className={styles.refNum}>6</span>
                 <div className={styles.refBody}>
                   <p className={styles.refSource}>Sean Grove</p>
-                  <p className={styles.refTitle}>The New Code（AI Engineer World's Fair, 2025）文字起こし</p>
+                  <p className={styles.refTitle}>
+                    The New Code（AI Engineer World's Fair, 2025）文字起こし
+                  </p>
                   <a
                     className={styles.refLink}
                     href="https://lawwu.github.io/transcripts/8rABwKRsec4.html"
@@ -1307,7 +1327,9 @@ export default function SpecDrivenDevelopmentGuidePage() {
                 <span className={styles.refNum}>7</span>
                 <div className={styles.refBody}>
                   <p className={styles.refSource}>GitHub Blog</p>
-                  <p className={styles.refTitle}>上記[2]と同一記事内でのパラダイムシフトに関する記述</p>
+                  <p className={styles.refTitle}>
+                    上記[2]と同一記事内でのパラダイムシフトに関する記述
+                  </p>
                 </div>
               </div>
               <div className={styles.refCard} id="ref8">
@@ -1349,7 +1371,9 @@ export default function SpecDrivenDevelopmentGuidePage() {
                 <span className={styles.refNum}>10</span>
                 <div className={styles.refBody}>
                   <p className={styles.refSource}>TrueFoundry</p>
-                  <p className={styles.refTitle}>Spec-Driven Development for AI Agents: Governing Specs</p>
+                  <p className={styles.refTitle}>
+                    Spec-Driven Development for AI Agents: Governing Specs
+                  </p>
                   <a
                     className={styles.refLink}
                     href="https://www.truefoundry.com/blog/spec-driven-development-ai-agents"
@@ -1365,7 +1389,9 @@ export default function SpecDrivenDevelopmentGuidePage() {
                 <span className={styles.refNum}>11</span>
                 <div className={styles.refBody}>
                   <p className={styles.refSource}>codemyspec</p>
-                  <p className={styles.refTitle}>Spec-Driven Development in 2026: Guide + Tool Comparison</p>
+                  <p className={styles.refTitle}>
+                    Spec-Driven Development in 2026: Guide + Tool Comparison
+                  </p>
                   <a
                     className={styles.refLink}
                     href="https://codemyspec.com/blog/spec-driven-development"
@@ -1506,7 +1532,9 @@ export default function SpecDrivenDevelopmentGuidePage() {
                 <span className={styles.refNum}>19</span>
                 <div className={styles.refBody}>
                   <p className={styles.refSource}>YouTube</p>
-                  <p className={styles.refTitle}>Spec-Driven Development in 2026: What Actually Changed</p>
+                  <p className={styles.refTitle}>
+                    Spec-Driven Development in 2026: What Actually Changed
+                  </p>
                   <a
                     className={styles.refLink}
                     href="https://www.youtube.com/watch?v=b6cbxSaa4U4"
@@ -1522,7 +1550,9 @@ export default function SpecDrivenDevelopmentGuidePage() {
                 <span className={styles.refNum}>20</span>
                 <div className={styles.refBody}>
                   <p className={styles.refSource}>Alistair Mavin</p>
-                  <p className={styles.refTitle}>EARS: Easy Approach to Requirements Syntax（公式ガイド）</p>
+                  <p className={styles.refTitle}>
+                    EARS: Easy Approach to Requirements Syntax（公式ガイド）
+                  </p>
                   <a
                     className={styles.refLink}
                     href="https://alistairmavin.com/ears/"
@@ -1705,7 +1735,9 @@ export default function SpecDrivenDevelopmentGuidePage() {
                 <span className={styles.refNum}>31</span>
                 <div className={styles.refBody}>
                   <p className={styles.refSource}>AlphaSignal</p>
-                  <p className={styles.refTitle}>Spec-Driven Development is the New Default for AI Coding</p>
+                  <p className={styles.refTitle}>
+                    Spec-Driven Development is the New Default for AI Coding
+                  </p>
                   <a
                     className={styles.refLink}
                     href="https://alphasignalai.substack.com/p/spec-driven-development-is-the-new"

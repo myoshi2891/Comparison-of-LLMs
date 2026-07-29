@@ -1,1979 +1,1071 @@
 import type { Metadata } from "next";
 import MermaidDiagram from "@/components/docs/MermaidDiagram";
-import ChecklistApp from "./ChecklistApp";
-import ExamplesApp from "./ExamplesApp";
 import styles from "./page.module.css";
-import StepsApp from "./StepsApp";
-
-const MERMAID_OVERVIEW = `graph LR
-SKILL["📄 SKILL.md\\nオープンスタンダード"]
-subgraph GC["💻 Gemini CLI"]
-GCi["ターミナルネイティブ\\nAIエージェント"]
-end
-subgraph AG["🚀 Antigravity"]
-AGi["エージェントファースト IDE\\nVSCodeフォーク"]
-end
-subgraph CC["🤖 Claude Code"]
-CCi["Anthropic製\\nコーディングエージェント"]
-end
-SKILL --> GC
-SKILL --> AG
-SKILL --> CC
-style SKILL fill:#064e3b,stroke:#059669,color:#a7f3d0
-style GCi fill:#1e3a8a,stroke:#3b82f6,color:#bfdbfe
-style AGi fill:#4c1d95,stroke:#8b5cf6,color:#ddd6fe
-style CCi fill:#78350f,stroke:#d97706,color:#fde68a`;
-
-const MERMAID_WHY_COMPARE = `graph TD
-subgraph 従来の方法["❌ 従来の方法（非効率）"]
-A1["👤 ユーザー指示"] --> B1["AIエージェント"]
-B1 --> C1["📚 ドキュメント全体を読む\\n（大量トークン消費）"]
-C1 --> D1["🔥 コンテキスト飽和\\n精度低下・速度低下"]
-end
-subgraph skill_way["✅ SKILL.md を使う方法（効率的）"]
-A2["👤 ユーザー指示"] --> B2["AIエージェント"]
-B2 -->|"関連スキルを\\nオンデマンド検索"| C2["📄 SKILL.md だけ読む\\n（最小トークン消費）"]
-C2 --> D2["⚡ 高精度・高速・低コスト"]
-end
-style D1 fill:#7f1d1d,stroke:#dc2626,color:#fecaca
-style D2 fill:#064e3b,stroke:#059669,color:#a7f3d0
-style C2 fill:#1e3a8a,stroke:#3b82f6,color:#bfdbfe`;
-
-const MERMAID_WHY_LEVELS = `graph LR
-L1["🏷️ レベル1: メタデータ\\nname + description\\n常にコンテキストにある\\n～100 tokens\\nセッション開始時に読込"]
-L2["📄 レベル2: SKILL.md 本文\\nスキルが呼ばれたときのみ\\n5,000 tokens以内推奨\\n具体的な手順・制約"]
-L3["📚 レベル3: 参照ファイル\\n本文から参照された時のみ\\n容量無制限\\nAPIドキュメント等"]
-L1 -->|"スキルが選ばれたとき"| L2
-L2 -->|"本文から参照されたとき"| L3
-style L1 fill:#78350f,stroke:#f59e0b,color:#fde68a
-style L2 fill:#1e3a8a,stroke:#3b82f6,color:#bfdbfe
-style L3 fill:#064e3b,stroke:#059669,color:#a7f3d0`;
-
-const MERMAID_HOWTO = `graph LR
-A["---\\nYAML\\nフロントマター\\n---"]
-B["# Title\\nスキル名"]
-C["## Overview\\n目的・概要（1〜2文）"]
-D["## Before Starting\\n前提条件・必要な入力"]
-E["## Step-by-Step Guide\\n具体的な実行手順\\n（最重要）"]
-F["## Examples\\n入力例と出力例\\nFew-shot学習"]
-G["## Rules\\n禁止事項と推奨事項\\n❌と✅"]
-A --> B --> C --> D --> E --> F --> G
-style A fill:#78350f,stroke:#f59e0b,color:#fde68a
-style E fill:#064e3b,stroke:#059669,color:#a7f3d0
-style G fill:#4c1d95,stroke:#8b5cf6,color:#ddd6fe`;
-
-const MERMAID_INSTALL_SCOPE = `graph TB
-Root["📂 スキルの配置場所"]
-Root --> Global["🌍 グローバルスコープ\\n全プロジェクトで有効"]
-Root --> Local["📁 ワークスペーススコープ\\nそのプロジェクトのみ"]
-Global --> G1["~/.gemini/skills/\\nGemini CLI グローバル"]
-Global --> G2["~/.gemini/antigravity/skills/\\nAntigravity グローバル"]
-Local --> L1[".gemini/skills/\\nGemini CLI ローカル"]
-Local --> L2[".agent/skills/\\nAntigravity ローカル"]
-G1 -.->|"向いているスキル例"| GU["汎用スキル\\nコードレビュー・コミット\\nフォーマット等"]
-L1 -.->|"向いているスキル例"| LU["プロジェクト専用\\nデプロイ手順・独自API仕様等"]
-style Global fill:#bfdbfe,stroke:#0284c7,color:#0c4a6e
-style Local fill:#d1fae5,stroke:#059669,color:#065f46
-style GU fill:#e0f2fe,stroke:#0284c7,color:#0c4a6e
-style LU fill:#ecfdf5,stroke:#059669,color:#065f46`;
-
-const MERMAID_INSTALL_LIFECYCLE = `sequenceDiagram
-actor User as 👤 ユーザー
-participant Agent as 🤖 AIエージェント
-participant Meta as 📋 メタデータ
-participant Body as 📄 SKILL.md本文
-participant Refs as 📁 参照ファイル
-Note over Agent,Meta: 1. ディスカバリーフェーズ
-Agent->>Meta: skills/配下を走査しnameとdescriptionを抽出
-Meta-->>Agent: メタデータをシステムプロンプトに注入
-User->>Agent: "このコードをレビューして"
-Note over Agent: 2. アクティベーション判断
-Agent->>Agent: プロンプトとdescriptionを照合
-Agent->>Agent: "frontend-reviewer"が最適と判断
-Note over Agent,Body: 3. 承認とコンテキスト展開
-Agent->>User: ツール実行の承認を求める
-User->>Agent: 承認 ✅
-Agent->>Body: SKILL.md本文を読み込む
-Body-->>Agent: 手順・制約をコンテキストに展開
-Note over Agent,Refs: 4. 動的リソース読み込み
-Agent->>Refs: references/css-guidelines.md を読む
-Refs-->>Agent: スタイルガイドラインを取得
-Note over Agent,User: 5. 実行と結果返却
-Agent->>User: SKILL.mdの手順に従いレビュー結果を提示`;
-
-const MERMAID_CHECKLIST_ANTIPATTERNS = `graph TD
-A["よくある失敗"]
-A --> B["description が曖昧すぎる\\n→ スキルが呼ばれない"]
-A --> C["SKILL.md が長すぎる\\n→ コンテキストを圧迫"]
-A --> D["スキルを入れすぎる\\n→ AIが混乱\\n目安: 10〜15個以内"]
-A --> E["スクリプトに\\nハードコードされた値\\n→ 再利用できない"]
-A --> F["name がディレクトリ名と\\n不一致\\n→ 発見されない"]
-style B fill:#fecaca,stroke:#dc2626,color:#7f1d1d
-style C fill:#fecaca,stroke:#dc2626,color:#7f1d1d
-style D fill:#fecaca,stroke:#dc2626,color:#7f1d1d
-style E fill:#fecaca,stroke:#dc2626,color:#7f1d1d
-style F fill:#fecaca,stroke:#dc2626,color:#7f1d1d`;
+import TocObserver from "./TocObserver";
 
 export const metadata: Metadata = {
-  title: "SKILL.md 完全ガイド — Gemini CLI v0.43.0 (最終版) & Antigravity v2.0.1",
+  title:
+    "SKILL.md 実践ベストプラクティスガイド (Google Antigravity 対応版) | AI Model Cost Calculator",
   description:
-    "AIエージェントに「専門知識の教科書」を渡す仕組み — SKILL.md の構造・書き方・インストール手順を Gemini CLI v0.43.0 (最終版) & Antigravity v2.0.1 対応版で完全解説。Google I/O 2026 発表内容対応。Gemini CLI は 2026-06-18 に AI Pro/Ultra/無料 Code Assist 向けサンセット済（→ Antigravity CLI へ移行）。",
+    "Google Antigravity / Gemini CLI / Claude Code 対応。Agent Skills (SKILL.md) の完全解説とベストプラクティス、プログレッシブ・ディスクロージャー設計、description 記述術、指示文 vs スクリプト判断基準など。",
 };
 
-type Source = { num: string; href: string; title: string; desc: string };
+const MERMAID_LIFECYCLE = `flowchart TD
+    A["会話が開始される"] --> B["全スキルのname/descriptionのみを読み込む"]
+    B --> C{"要求とdescriptionが一致するか"}
+    C -->|"一致しない"| D["読み込まれない(コストほぼ0)"]
+    C -->|"一致する"| E["SKILL.md本文全体を読み込む"]
+    E --> F{"scripts/referencesへの参照があるか"}
+    F -->|"ある"| G["必要なファイルだけをオンデマンドで読み込み実行"]
+    F -->|"ない"| H["本文の指示だけでタスクを遂行"]
+    G --> I["タスク完了"]
+    H --> I
+    class A,B,E,G,H,I process
+    class C,F decision
+    classDef process fill:#2f2559,stroke:#b9a6f5,color:#f5f2ff
+    classDef decision fill:#0f2c2a,stroke:#5eead4,color:#eafff9`;
 
-const SOURCES: Source[] = [
-  {
-    num: "[1]",
-    href: "https://developers.googleblog.com/build-with-google-antigravity-our-new-agentic-development-platform/",
-    title: "Build with Google Antigravity — Google Developers Blog (Nov 2025)",
-    desc: "Antigravityの公式発表。エージェントファーストパラダイム・Artifacts・Knowledge Baseの設計思想",
-  },
-  {
-    num: "[2]",
-    href: "https://blog.google/innovation-and-ai/technology/developers-tools/gemini-3-developers/",
-    title: "Gemini 3 for developers: New reasoning, agentic capabilities — Google Blog",
-    desc: "Gemini 3 のエージェント能力とシステム統合理論の解説",
-  },
-  {
-    num: "[3]",
-    href: "https://antigravity.google/",
-    title: "Google Antigravity 公式サイト — antigravity.google",
-    desc: "Antigravity IDE の公式ポータル、ドキュメント、およびインストーラー",
-  },
-  {
-    num: "[4]",
-    href: "https://geminicli.com/docs/",
-    title: "Gemini CLI 公式ドキュメント — geminicli.com",
-    desc: "Gemini CLI（旧）のコア仕様、設定方法、およびコマンドリファレンス",
-  },
-  {
-    num: "[5]",
-    href: "https://github.com/google-gemini/gemini-cli/",
-    title: "Gemini CLI GitHub Repository — github.com",
-    desc: "Gemini CLI のオープンソースリポジトリと開発履歴",
-  },
-  {
-    num: "[6]",
-    href: "https://geminicli.com/docs/changelogs/",
-    title: "Gemini CLI リリースノート — geminicli.com",
-    desc: "Gemini CLI の各バージョンの更新履歴（v0.25.0〜v0.43.0）",
-  },
-  {
-    num: "[7]",
-    href: "https://codelabs.developers.google.com/getting-started-google-antigravity",
-    title: "Getting Started with Google Antigravity — Google Codelabs",
-    desc: "公式チュートリアル。Skills・Rules・Workflows・Artifactsの設定方法。GEMINI.md・.agent/ディレクトリ構造",
-  },
-  {
-    num: "[8]",
-    href: "https://codelabs.developers.google.com/getting-started-with-antigravity-skills",
-    title: "Authoring Google Antigravity Skills — Google Codelabs",
-    desc: "SKILL.mdの完全仕様。スキルディレクトリ構造（SKILL.md / scripts / references / assets）・5パターン詳解",
-  },
-  {
-    num: "[9]",
-    href: "https://medium.com/google-cloud/tutorial-getting-started-with-antigravity-skills-864041811e0d",
-    title: "How to Build Custom Skills in Google Antigravity — Google Cloud Medium (Jan 2026)",
-    desc: "Progressive Disclosure設計思想。scripts/サブディレクトリのTool Use Pattern詳細。グローバル/ワークスペーススコープ",
-  },
-  {
-    num: "[10]",
-    href: "https://medium.com/google-cloud/skills-made-easy-with-google-antigravity-and-gemini-cli-5435139b0af8",
-    title: "Skills Made Easy with Google Antigravity and Gemini CLI — Google Cloud Medium",
-    desc: "Gemini CLI と Antigravity におけるスキル共有方法の簡略解説",
-  },
-  {
-    num: "[11]",
-    href: "https://www.mintlify.com/blog/skill-md",
-    title: "skill.md: An open standard for agent skills — Mintlify",
-    desc: "エージェントスキルのオープンスタンダード共通仕様の設計思想",
-  },
-  {
-    num: "[12]",
-    href: "https://github.com/sickn33/antigravity-awesome-skills",
-    title: "antigravity-awesome-skills — GitHub (sickn33)",
-    desc: "SKILL.mdのユニバーサル規格（Claude Code / Antigravity / Cursor共通）。コミュニティスキルライブラリ",
-  },
-  {
-    num: "[13]",
-    href: "https://github.com/google-gemini/gemini-skills",
-    title: "Gemini CLI Official Skills Repository — GitHub",
-    desc: "Google公式が提供する汎用スキル定義集",
-  },
-  {
-    num: "[14]",
-    href: "https://github.com/google-gemini/gemini-cli/releases/tag/v0.34.0",
-    title: "Gemini CLI v0.34.0 Release Notes — GitHub",
-    desc: "Plan Modeのデフォルト有効化、サンドボックス化、およびセキュリティ強化仕様",
-  },
-  {
-    num: "[15]",
-    href: "https://geminicli.com/docs/plan-mode",
-    title: "Plan Mode Specification — geminicli.com",
-    desc: "/plan コマンドによる安全なコード変更計画立案プロトコル",
-  },
-  {
-    num: "[16]",
-    href: "https://geminicli.com/docs/rewind",
-    title: "/rewind Command Usage — geminicli.com",
-    desc: "セッションの巻き戻しと対話履歴トラバースのドキュメント",
-  },
-  {
-    num: "[17]",
-    href: "https://github.com/google-gemini/gemini-cli/tree/main/packages/sdk",
-    title: "Gemini CLI SDK Source Code — GitHub",
-    desc: "プログラムでカスタムエージェントスキルを制御・開発するための公式SDK",
-  },
-  {
-    num: "[18]",
-    href: "https://dev.to/googleai/unlocking-gemini-cli-with-skills-hooks-plan-mode-2bgf",
-    title: "Unlocking Gemini CLI with Skills, Hooks and Plan Mode — DEV Community",
-    desc: "CLIエージェントの拡張フックとカスタムコマンドのプロトコル解説",
-  },
-  {
-    num: "[19]",
-    href: "https://blog.google/innovation-and-ai/technology/developers-tools/google-io-2026-developer-highlights/",
-    title:
-      "I/O 2026 developer highlights: Antigravity, Gemini API, AI Studio — Google Blog (2026-05-19)",
-    desc: "Antigravity 2.0 発表。Managed Agents、Gemini 3.5 Flash、Antigravity CLI/SDK などのリリースまとめ",
-  },
-  {
-    num: "[20]",
-    href: "https://developers.googleblog.com/an-important-update-transitioning-gemini-cli-to-antigravity-cli/",
-    title:
-      "An important update: Transitioning Gemini CLI to Antigravity CLI — Google Developers Blog (2026-05-19)",
-    desc: "Gemini CLI から Go 製 Antigravity CLI への移行および統合スケジュール、既存スキルの継承ガイド",
-  },
-  {
-    num: "[21]",
-    href: "https://developers.googleblog.com/all-the-news-from-the-google-io-2026-developer-keynote/",
-    title:
-      "All the news from the Google I/O 2026 Developer keynote — Google Developers Blog (2026-05-19)",
-    desc: "Gemini 3.5 Flash / Gemini 3.5 Pro / Gemini Omni Flash の仕様と Antigravity 2.0 統合",
-  },
-];
+const MERMAID_DECISION = `flowchart TD
+    A["スキルの本文を書く"] --> B{"操作は壊れやすく厳密な手順が必要か"}
+    B -->|"はい"| C["Low freedom: 具体的なスクリプトを用意し、そのまま実行させる"]
+    B -->|"いいえ"| D{"ある程度決まったパターンが存在するか"}
+    D -->|"はい"| E["Medium freedom: パラメータ付きテンプレートや疑似コードを示す"]
+    D -->|"いいえ"| F["High freedom: 自然言語の方針とヒューリスティックを示す"]
+    class A process
+    class B,D decision
+    class C,E,F process
+    classDef process fill:#2f2559,stroke:#b9a6f5,color:#f5f2ff
+    classDef decision fill:#0f2c2a,stroke:#5eead4,color:#eafff9`;
 
 /**
- * Renders the complete SKILL.md guide page for Gemini CLI and Antigravity.
- *
- * @returns A React element containing the full multi-section guide, including diagrams, tables,
- * and embedded interactive components.
+ * Renders the SKILL.md best-practices guide with section navigation, explanatory content, and diagrams.
  */
-export default function Page() {
+export default function SkillGuidePage() {
   return (
-    <div className={styles.page}>
-      <div className={styles.wrap}>
-        {/* ===== Hero header ===== */}
-        <header className={styles.hero}>
-          <div className={styles.tagRow}>
-            <span className={`${styles.tag} ${styles.tagGreen}`}>Google Gemini / Antigravity</span>
-            <span className={`${styles.tag} ${styles.tagSky}`}>初学者向け完全ガイド</span>
-            <span className={`${styles.tag} ${styles.tagViolet}`}>2026年版</span>
-            <span className={`${styles.tag} ${styles.tagTeal}`}>Gemini CLI v0.43.0 (最終版)</span>
-            <span className={`${styles.tag} ${styles.tagIndigo}`}>Antigravity v2.0.1</span>
-            <span className={`${styles.tag} ${styles.tagOrange}`}>最終更新 2026-05-23</span>
-          </div>
-          <h1 className={styles.heroTitle}>
-            SKILL.md
+    <div className={styles.layout}>
+      <TocObserver />
+      <aside className={styles.sidebar}>
+        <div className={styles.sidebarHeader}>
+          <div className={styles.sidebarBadge}>Google Antigravity 対応</div>
+          <div className={styles.sidebarTitle}>SKILL.md 実践ベストプラクティスガイド</div>
+          <div className={styles.sidebarMeta}>
+            最終更新: 2026年7月26日
             <br />
-            <span className={styles.heroSub}>完全解剖ガイド</span>
-          </h1>
-          <p className={styles.heroLead}>
-            AIエージェントに「専門知識の教科書」を渡す — Gemini CLI &amp; Antigravity 対応版
+            オープンスタンダード仕様
+          </div>
+        </div>
+
+        <div className={styles.navGroupLabel}>目次ナビゲーション</div>
+        <a href="#sec-1" className={styles.navLink} data-toc-link>
+          1. 概要と概念
+        </a>
+        <a href="#sec-2" className={styles.navLink} data-toc-link>
+          2. Progressive Disclosure
+        </a>
+        <a href="#sec-3" className={styles.navLink} data-toc-link>
+          3. Antigravity スキル
+        </a>
+        <a href="#sec-4" className={styles.navLink} data-toc-link>
+          4. SKILL.md の基本構造
+        </a>
+        <a href="#sec-5" className={styles.navLink} data-toc-link>
+          5. 実装ステップバイステップ
+        </a>
+        <a href="#sec-6" className={styles.navLink} data-toc-link>
+          6. ライフサイクル図解
+        </a>
+        <a href="#sec-7" className={styles.navLink} data-toc-link>
+          7. 指示 vs スクリプト
+        </a>
+        <a href="#sec-8" className={styles.navLink} data-toc-link>
+          8. Claude vs Antigravity
+        </a>
+        <a href="#sec-9" className={styles.navLink} data-toc-link>
+          9. アンチパターン
+        </a>
+        <a href="#sec-10" className={styles.navLink} data-toc-link>
+          10. 実践チェックリスト
+        </a>
+        <a href="#sec-11" className={styles.navLink} data-toc-link>
+          11. まとめ
+        </a>
+        <a href="#sec-12" className={styles.navLink} data-toc-link>
+          12. 参考文献・引用ソース
+        </a>
+      </aside>
+
+      <main className={styles.main}>
+        <header className={styles.header}>
+          <div className={styles.headerBadge}>オープンスタンダード・仕様ガイド</div>
+          <h1 className={styles.title}>SKILL.md 実践ベストプラクティスガイド</h1>
+          <p className={styles.subtitle}>
+            Google Antigravity / Gemini CLI / Claude Code 対応・オープンスタンダード仕様
           </p>
-          <nav className={styles.heroNav}>
-            <a href="#overview" className={styles.navBtn}>
-              🌐 概要
-            </a>
-            <a href="#why" className={styles.navBtn}>
-              ❓ なぜ必要か
-            </a>
-            <a href="#structure" className={styles.navBtn}>
-              📁 構造
-            </a>
-            <a href="#howto" className={styles.navBtn}>
-              ✍️ 書き方
-            </a>
-            <a href="#steps" className={styles.navBtn}>
-              🚀 ステップ解説
-            </a>
-            <a href="#install" className={styles.navBtn}>
-              📦 インストール
-            </a>
-            <a href="#examples" className={styles.navBtn}>
-              💡 実例集
-            </a>
-            <a href="#checklist" className={styles.navBtn}>
-              ✅ チェックリスト
-            </a>
-            <a href="#whatsnew" className={`${styles.navBtn} ${styles.navBtnNew}`}>
-              🆕 最新情報
-            </a>
-            <a href="#sources" className={styles.navBtn}>
-              📚 参考ソース
-            </a>
-          </nav>
+
+          <div className={styles.statsGrid}>
+            <div className={styles.statCard}>
+              <div className={styles.statCardIcon}>📋</div>
+              <div className={styles.statCardValue}>12</div>
+              <div className={styles.statCardLabel}>主要セクション</div>
+            </div>
+            <div className={styles.statCard}>
+              <div className={styles.statCardIcon}>⚡</div>
+              <div className={styles.statCardValue}>3段階</div>
+              <div className={styles.statCardLabel}>段階的開示モデル</div>
+            </div>
+            <div className={styles.statCard}>
+              <div className={styles.statCardIcon}>📊</div>
+              <div className={styles.statCardValue}>2図</div>
+              <div className={styles.statCardLabel}>Mermaid図解</div>
+            </div>
+            <div className={styles.statCard}>
+              <div className={styles.statCardIcon}>📚</div>
+              <div className={styles.statCardValue}>12</div>
+              <div className={styles.statCardLabel}>参照ソース</div>
+            </div>
+          </div>
         </header>
 
-        {/* s02: overview */}
-        <section id="overview" className={styles.sec}>
-          <h2 className={styles.secTitle}>🌐 SKILL.md とは何か</h2>
-
-          {/* 3-col card grid */}
-          <div className={styles.grid3}>
-            <div className={`${styles.card} ${styles.cardGreen}`}>
-              <div className={styles.cardIcon}>📄</div>
-              <div className={styles.cardLabel}>Markdownファイル</div>
-              <div className={styles.cardDesc}>
-                AIエージェントへの「取扱説明書」。YAMLヘッダー＋指示本文で構成
-              </div>
-            </div>
-            <div className={`${styles.card} ${styles.cardSky}`}>
-              <div className={styles.cardIcon}>🧠</div>
-              <div className={styles.cardLabel}>専門知識パッケージ</div>
-              <div className={styles.cardDesc}>
-                再利用可能な知識の塊。一度書けばどのプロジェクトでも使い回せる
-              </div>
-            </div>
-            <div className={`${styles.card} ${styles.cardViolet}`}>
-              <div className={styles.cardIcon}>🌐</div>
-              <div className={styles.cardLabel}>オープンスタンダード</div>
-              <div className={styles.cardDesc}>
-                Gemini CLI・Antigravity・Claude Code など主要ツール共通対応
-              </div>
+        <section id="sec-1" className={styles.section}>
+          <h2>1. そもそも Agent Skills / SKILL.md とは何か</h2>
+          <p>
+            <strong>Agent Skills</strong>{" "}
+            は、AIコーディングエージェントに「特定タスクのやり方」を教えるための、軽量かつオープンなファイルフォーマットです。もともと
+            Anthropic が Claude 向けに設計・公開した仕組みですが、現在は特定企業に閉じない
+            <strong>オープンスタンダード</strong>として整備されており、公式サイト agentskills.io
+            にはこの仕様のリファレンス実装が置かれています。
+          </p>
+          <p>
+            一言で言えば、<strong>スキルとは「フォルダ」</strong>です。そのフォルダの中に必ず{" "}
+            <code>SKILL.md</code> というファイルが1つ存在し、そこに以下の情報が書かれています。
+          </p>
+          <ul>
+            <li>
+              <strong>メタデータ</strong>(<code>name</code> と <code>description</code>):
+              エージェントがこのスキルを「いつ使うべきか」を判断するための情報
+            </li>
+            <li>
+              <strong>本文の指示(Instructions)</strong>: 実際にタスクをどう進めるかの手順書
+            </li>
+            <li>
+              <strong>(任意)付属リソース</strong>: <code>scripts/</code>(実行スクリプト)、
+              <code>references/</code>(参考資料)、<code>assets/</code>
+              (テンプレートや画像)などのサブフォルダ
+            </li>
+          </ul>
+          <p>
+            重要なのは、SKILL.md は「システムプロンプトの一部を丸ごと常駐させる」方式とは違い、
+            <strong>必要なときだけオンデマンドで読み込まれる</strong>
+            という点です。この仕組みにより、エージェントは数十〜数百個のスキルを持っていても、コンテキストウィンドウ(会話が使える情報量の上限)を圧迫せずに済みます。
+          </p>
+          <div className={`${styles.callout} ${styles.calloutInfo}`}>
+            <div className={styles.calloutIcon}>💬</div>
+            <div>
+              <p>
+                著名なソフトウェア技術者であり Django フレームワークの共同開発者でもある Simon
+                Willison
+                氏は、自身のブログでこの仕組みについて「概念としては極めて単純」であり、トークン効率の良さの観点から
+                Model Context
+                Protocol(MCP)に匹敵する、あるいはそれ以上のインパクトを持つ可能性があると評しています。実際、氏が紹介した{" "}
+                <code>obra/superpowers</code>{" "}
+                のようなコミュニティ製スキル集は、この仕組みの実用性を示す代表例として知られています。
+              </p>
             </div>
           </div>
+          <p>
+            Google はこの Agent Skills
+            フォーマットをそのまま採用し、自社のエージェント開発プラットフォーム{" "}
+            <strong>Google Antigravity</strong> の拡張機構として組み込みました。つまり、Anthropic
+            向けに書いた SKILL.md の知識は、ほぼそのまま Antigravity
+            にも応用できます。これが本ガイドで「Antigravity 対応版」と銘打っている理由です。
+          </p>
+        </section>
 
-          {/* Quote */}
-          <div className={styles.quote}>
-            <div className={styles.quoteLabel}>💬 一言で言うと？</div>
-            <blockquote className={styles.quoteText}>
-              AIエージェントに「専門知識の教科書」を渡す仕組みです。
-              <br />
-              必要なときだけ読み込まれるので、効率よく高精度な応答が得られます。
-            </blockquote>
-          </div>
-
-          {/* Mermaid: 2ツール比較 */}
-          <h3 className={styles.secH3}>Gemini CLI vs Antigravity — 対応ツール比較</h3>
-          <div className={styles.mermaidWrap}>
-            <MermaidDiagram chart={MERMAID_OVERVIEW} />
-          </div>
-
-          {/* Comparison table */}
+        <section id="sec-2" className={styles.section}>
+          <h2>2. なぜ重要なのか: プログレッシブ・ディスクロージャーという設計思想</h2>
+          <p>
+            SKILL.md の価値を理解する鍵は <strong>progressive disclosure(段階的開示)</strong>{" "}
+            という考え方です。エージェントは以下の3段階でスキルの情報を読み込みます。
+          </p>
           <div className={styles.tableWrap}>
-            <table className={styles.table}>
+            <table>
               <thead>
                 <tr>
-                  <th className={`${styles.thGradient} ${styles.tdLeft} ${styles.thTeal}`}>項目</th>
-                  <th className={`${styles.thGradient} ${styles.thSky}`}>Gemini CLI</th>
-                  <th className={`${styles.thGradient} ${styles.thViolet}`}>Antigravity</th>
+                  <th>段階</th>
+                  <th>名称</th>
+                  <th>読み込まれるタイミング</th>
+                  <th>おおよそのトークンコスト</th>
+                  <th>内容</th>
                 </tr>
               </thead>
               <tbody>
-                <tr className={styles.tr}>
-                  <td
-                    className={`${styles.tdLeft}`}
-                    style={{ fontWeight: 600, color: "var(--text)" }}
-                  >
-                    形態
-                  </td>
-                  <td>ターミナルアプリ</td>
-                  <td>IDE（エディタ）</td>
-                </tr>
-                <tr className={styles.trEven}>
-                  <td className={styles.tdLeft} style={{ fontWeight: 600, color: "var(--text)" }}>
-                    最新バージョン
-                  </td>
+                <tr>
+                  <td>Level 1</td>
+                  <td>メタデータ</td>
+                  <td>常に(会話開始時)</td>
+                  <td>1スキルあたり約100トークン</td>
                   <td>
-                    <span className={`${styles.badge} ${styles.badgeSky}`}>v0.43.0 (最終)</span>
-                    <div className={styles.textSlateLight}>
-                      2026-05-19 / 2026-06-18 サンセット済
-                    </div>
-                    <div className={styles.versionLinks}>
-                      <a
-                        href="https://github.com/google-gemini/gemini-cli/releases"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        Releases
-                      </a>
-                      {" · "}
-                      <a
-                        href="https://geminicli.com/docs/changelogs/"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        Changelog
-                      </a>
-                    </div>
-                  </td>
-                  <td>
-                    <span className={`${styles.badge} ${styles.badgeViolet}`}>v2.0.1</span>
-                    <div className={styles.textSlateLight}>2026-05-23</div>
-                    <div className={styles.versionLinks}>
-                      <a
-                        href="https://antigravity.google/changelog"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        Changelog
-                      </a>
-                    </div>
+                    <code>name</code> と <code>description</code> のみ
                   </td>
                 </tr>
-                <tr className={styles.tr}>
-                  <td className={styles.tdLeft} style={{ fontWeight: 600, color: "var(--text)" }}>
-                    グローバルスキルパス
-                  </td>
-                  <td className={styles.mono} style={{ color: "var(--blue)", fontSize: "0.75rem" }}>
-                    {"~/.gemini/skills/"}
-                  </td>
-                  <td
-                    className={styles.mono}
-                    style={{ color: "var(--purple)", fontSize: "0.75rem" }}
-                  >
-                    {"~/.gemini/antigravity/skills/"}
-                  </td>
+                <tr>
+                  <td>Level 2</td>
+                  <td>本文の指示</td>
+                  <td>スキルが「関連あり」と判定された時</td>
+                  <td>5,000トークン未満が目安</td>
+                  <td>SKILL.md 本文全体</td>
                 </tr>
-                <tr className={styles.trEven}>
-                  <td className={styles.tdLeft} style={{ fontWeight: 600, color: "var(--text)" }}>
-                    ワークスペーススキルパス
-                  </td>
-                  <td className={styles.mono} style={{ color: "var(--blue)", fontSize: "0.75rem" }}>
-                    {".gemini/skills/"}
-                  </td>
-                  <td
-                    className={styles.mono}
-                    style={{ color: "var(--purple)", fontSize: "0.75rem" }}
-                  >
-                    {".agent/skills/"}
-                  </td>
-                </tr>
-                <tr className={styles.tr}>
-                  <td className={styles.tdLeft} style={{ fontWeight: 600, color: "var(--text)" }}>
-                    インストールコマンド
-                  </td>
-                  <td className={styles.mono} style={{ color: "var(--blue)", fontSize: "0.75rem" }}>
-                    gemini skills install
-                  </td>
-                  <td style={{ color: "var(--text-subtle)", fontSize: "0.75rem" }}>
-                    GUI または CLI
-                  </td>
-                </tr>
-                <tr className={styles.trEven}>
-                  <td className={styles.tdLeft} style={{ fontWeight: 600, color: "var(--text)" }}>
-                    SKILL.md サポート
-                  </td>
-                  <td style={{ fontWeight: 700, color: "var(--green)" }}>✅ フル対応</td>
-                  <td style={{ fontWeight: 700, color: "var(--green)" }}>✅ フル対応</td>
-                </tr>
-                <tr className={styles.tr}>
-                  <td className={styles.tdLeft} style={{ fontWeight: 600, color: "var(--text)" }}>
-                    デフォルトモデル
-                  </td>
-                  <td className={styles.mono} style={{ color: "var(--blue)", fontSize: "0.75rem" }}>
-                    Auto (Gemini 3.5)
-                    <br />
-                    <span style={{ color: "#94a3b8" }}>(タスクに応じて自動選択)</span>
-                  </td>
-                  <td
-                    className={styles.mono}
-                    style={{ color: "var(--purple)", fontSize: "0.75rem" }}
-                  >
-                    gemini-3.5-flash
-                  </td>
-                </tr>
-                <tr className={styles.trEven}>
-                  <td className={styles.tdLeft} style={{ fontWeight: 600, color: "var(--text)" }}>
-                    最高精度モデル
-                  </td>
-                  <td className={styles.mono} style={{ color: "var(--blue)", fontSize: "0.75rem" }}>
-                    gemini-3.5-pro
-                    <br />
-                    <span style={{ color: "#94a3b8" }}>
-                      (
-                      <a
-                        href="https://ai.google.dev/gemini-api/docs/models"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{ textDecoration: "underline" }}
-                      >
-                        アクセス要件を確認
-                      </a>
-                      )
-                    </span>
-                  </td>
-                  <td
-                    className={styles.mono}
-                    style={{ color: "var(--purple)", fontSize: "0.75rem" }}
-                  >
-                    gemini-3.5-pro
-                  </td>
-                </tr>
-                <tr className={styles.tr}>
-                  <td className={styles.tdLeft} style={{ fontWeight: 600, color: "var(--text)" }}>
-                    Plan Mode
-                  </td>
-                  <td style={{ fontWeight: 700, color: "#059669" }}>
-                    ✅{" "}
-                    <span className={styles.mono} style={{ fontWeight: 400, fontSize: "0.75rem" }}>
-                      /plan
-                    </span>{" "}
-                  </td>
-                  <td style={{ fontWeight: 700, color: "#059669" }}>✅ あり</td>
-                </tr>
-                <tr className={styles.trEven}>
-                  <td className={styles.tdLeft} style={{ fontWeight: 600, color: "var(--text)" }}>
-                    skill-creator メタスキル
-                  </td>
-                  <td style={{ fontWeight: 700, color: "#059669" }}>✅ 標準搭載</td>
-                  <td style={{ fontWeight: 700, color: "#059669" }}>✅ あり</td>
-                </tr>
-                <tr className={styles.tr}>
-                  <td className={styles.tdLeft} style={{ fontWeight: 600, color: "var(--text)" }}>
-                    /rewind コマンド
-                  </td>
-                  <td style={{ fontWeight: 700, color: "#059669" }}>✅</td>
-                  <td style={{ color: "#94a3b8" }}>—</td>
-                </tr>
-                <tr className={styles.trEven}>
-                  <td className={styles.tdLeft} style={{ fontWeight: 600, color: "var(--text)" }}>
-                    AGENTS.md 対応
-                  </td>
-                  <td style={{ color: "#475569", fontSize: "0.75rem" }}>
-                    ⚙️ 設定が必要
-                    <br />
-                    <span style={{ color: "#94a3b8" }}>
-                      (context.fileName に追加 / デフォルトは GEMINI.md)
-                    </span>
-                  </td>
-                  <td style={{ fontWeight: 700, color: "#059669" }}>✅ (v2.0.1)</td>
+                <tr>
+                  <td>Level 3</td>
+                  <td>付属リソース</td>
+                  <td>本文が実際にそのファイルを参照した時</td>
+                  <td>アクセスされるまで0</td>
+                  <td>scripts / references / assets 配下のファイル</td>
                 </tr>
               </tbody>
             </table>
           </div>
+          <p>
+            このおかげで、たとえば100個のスキルを用意していても、起動時のコストは「100個分の name +
+            description」だけで済み、実際に使われるスキルの本文だけが会話に読み込まれます。逆に言えば、
+            <strong>
+              「description
+              の質」がスキルの発見精度(=正しい場面で正しく起動するかどうか)を左右する最重要ポイント
+            </strong>
+            だということです。この点はステップ5-3で詳しく扱います。
+          </p>
         </section>
 
-        {/* s03: why */}
-        <section id="why" className={styles.sec}>
-          <h2 className={styles.secTitle}>❓ なぜ SKILL.md が必要なのか</h2>
+        <section id="sec-3" className={styles.section}>
+          <h2>3. Google Antigravity におけるスキルシステム</h2>
+          <p>
+            Google Antigravity
+            は「エージェントが実際に行動できる開発プラットフォーム」として設計されており、公式ドキュメントでは
+            Skills
+            を「エージェントの能力をオンデマンドで拡張する仕組み」と定義しています。Antigravity
+            側の特徴を整理すると次のとおりです。
+          </p>
 
-          {/* Red alert: context saturation */}
-          <div className={styles.alertRed}>
-            <div className={styles.alertRedTitle}>
-              🔥 コンテキスト飽和（Context Saturation）問題
+          <h3>3-1. スキルの配置場所(スコープ)</h3>
+          <div className={styles.tableWrap}>
+            <table>
+              <thead>
+                <tr>
+                  <th>配置パス</th>
+                  <th>スコープ</th>
+                  <th>主な用途</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <code>.agents/skills/&lt;skill-folder&gt;/</code>
+                  </td>
+                  <td>ワークスペース(プロジェクト)固有</td>
+                  <td>チームのデプロイ手順、テスト規約など、そのリポジトリだけで使う知識</td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>~/.gemini/config/skills/&lt;skill-folder&gt;/</code>
+                  </td>
+                  <td>グローバル(全プロジェクト共通)</td>
+                  <td>個人的によく使うユーティリティや汎用ツール</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div className={`${styles.callout} ${styles.calloutWarning}`}>
+            <div className={styles.calloutIcon}>⚠️</div>
+            <div>
+              <p>
+                Antigravity は現在 <code>.agents/skills</code>{" "}
+                をデフォルトとしていますが、旧パスである <code>.agent/skills</code>
+                (単数形)も後方互換のためにサポートされています。新規に作る場合は複数形の{" "}
+                <code>.agents/skills</code> を使うのが安全です。
+              </p>
             </div>
-            <p className={styles.alertRedBody}>
-              AIエージェントに「すべてのドキュメントを読ませる」アプローチでは、モデルの注意機構（Attention
-              Mechanism）が分散し、重要な情報を見落としたり推論精度が著しく低下します。
-              また大量のトークン消費によって速度低下・コスト増大が起きます。
-            </p>
           </div>
 
-          {/* Mermaid: 従来 vs SKILL.md */}
-          <div className={styles.mermaidWrap}>
-            <MermaidDiagram chart={MERMAID_WHY_COMPARE} />
+          <h3>3-2. Antigravity 独自のフロー</h3>
+          <p>Antigravity の公式ドキュメントによれば、スキルは以下の3工程で処理されます。</p>
+          <ol>
+            <li>
+              <strong>Discovery(発見)</strong>: 会話開始時に、利用可能な全スキルの name と
+              description の一覧をエージェントが把握する
+            </li>
+            <li>
+              <strong>Activation(発動)</strong>: タスクに関連すると判断したスキルについて、SKILL.md
+              本文全体を読み込む
+            </li>
+            <li>
+              <strong>Execution(実行)</strong>: 読み込んだ指示に従ってタスクを遂行する
+            </li>
+          </ol>
+          <p>
+            ユーザー側からスキル名を明示的に指定する必要はなく、エージェントが文脈から自動判断しますが、確実に使わせたい場合はスキル名をプロンプト内で名指しすることも可能です。
+          </p>
+
+          <h3>3-3. モデルに依存しないオープンフォーマットという強み</h3>
+          <p>
+            Antigravity のデフォルトモデルは Gemini 3 系列ですが、SKILL.md
+            フォーマット自体はモデルに依存しません。同じ SKILL.md ファイルは、Claude
+            Code、Cursor、Gemini CLI、GitHub Copilot、VS Code、OpenAI Codex など、agentskills.io
+            のクライアント一覧に掲載されている数多くのエージェントツールでそのまま利用可能です。つまり、
+            <strong>一度書けば複数のツールで使い回せる</strong>
+            という移植性が、このフォーマットの大きな価値になっています。
+          </p>
+        </section>
+
+        <section id="sec-4" className={styles.section}>
+          <h2>4. SKILL.md の基本構造</h2>
+
+          <h3>4-1. 最小構成</h3>
+          <p>
+            スキルフォルダに必須なのは <code>SKILL.md</code>{" "}
+            ファイル1つだけです。付属リソースはすべて任意です。
+          </p>
+          <ul>
+            <li>
+              <code>my-skill/SKILL.md</code> — 必須。メタデータと本文指示
+            </li>
+            <li>
+              <code>my-skill/scripts/</code> — 任意。Python・Bash・Node.js などの実行スクリプト
+            </li>
+            <li>
+              <code>my-skill/references/</code> — 任意。詳細ドキュメントやAPIリファレンス
+            </li>
+            <li>
+              <code>my-skill/assets/</code>(または <code>examples/</code>, <code>resources/</code>)
+              — 任意。テンプレートや画像、参考実装
+            </li>
+          </ul>
+
+          <h3>4-2. YAML frontmatter の必須フィールド</h3>
+          <p>
+            SKILL.md ファイルの冒頭には、<code>---</code> で囲まれた YAML frontmatter を記述します。
+          </p>
+          <div className={styles.tableWrap}>
+            <table>
+              <thead>
+                <tr>
+                  <th>フィールド</th>
+                  <th>Antigravity での扱い</th>
+                  <th>Claude Platform(Anthropic公式)での扱い</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <code>name</code>
+                  </td>
+                  <td>任意。省略時はフォルダ名がそのまま使われる</td>
+                  <td>
+                    必須。最大64文字、小文字英数字とハイフンのみ、<code>anthropic</code> や{" "}
+                    <code>claude</code> などの予約語は使用不可
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>description</code>
+                  </td>
+                  <td>必須。何をするスキルで、いつ使うべきかを明記</td>
+                  <td>必須。最大1,024文字、空文字不可、XMLタグ不可</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div className={`${styles.callout} ${styles.calloutSuccess}`}>
+            <div className={styles.calloutIcon}>✅</div>
+            <div>
+              <p>
+                <strong>実務上のポイント</strong>: Antigravity 単体では <code>name</code>{" "}
+                は省略可能ですが、複数のツール間でスキルを使い回す(移植性を確保する)ことを前提にするなら、より厳格な
+                Anthropic 側のルール(64文字以内・小文字とハイフンのみ・予約語禁止)に合わせて{" "}
+                <code>name</code>{" "}
+                を明示的に書いておくのが安全です。これにより、どちらの環境でも問題なく動作します。
+              </p>
+            </div>
           </div>
 
-          {/* Progressive disclosure */}
-          <h3 className={styles.secH3}>
-            📊 プログレッシブ・ディスクロージャー — 3段階読み込みの仕組み
+          <h3>4-3. 本文の基本テンプレート</h3>
+          <div className={styles.codeLabel}>SKILL.md</div>
+          <pre className={styles.codeBlock}>
+            <code>{`---
+name: my-skill
+description: 何をするスキルで、いつ使うべきかを明記する
+---
+
+# My Skill
+
+## When to use this skill
+
+- こういう場面で使う
+- こういう条件に該当する場合に役立つ
+
+## How to use it
+
+タスクの進め方、規約、パターンをステップバイステップで記述する`}</code>
+          </pre>
+        </section>
+
+        <section id="sec-5" className={styles.section}>
+          <h2>5. ステップバイステップ実装ガイド</h2>
+
+          <h3>
+            <span className={styles.stepBadge}>1</span>配置場所を決める
           </h3>
-          <p
-            style={{
-              color: "var(--text-subtle)",
-              fontSize: "0.875rem",
-              lineHeight: 1.75,
-              marginBottom: "1rem",
-            }}
-          >
+          <p>
+            まず、そのスキルが「特定のプロジェクトだけのもの」か「あらゆるプロジェクトで使う汎用的なもの」かを判断します。前者なら{" "}
+            <code>.agents/skills/&lt;skill-folder&gt;/</code>、後者なら{" "}
+            <code>~/.gemini/config/skills/&lt;skill-folder&gt;/</code>{" "}
+            に置きます。判断に迷ったら、最初はワークスペース側に置き、複数プロジェクトで使い回したくなった時点でグローバル側へ移動するのが安全です。
+          </p>
+
+          <h3>
+            <span className={styles.stepBadge}>2</span>フォルダと SKILL.md を作成する
+          </h3>
+          <p>
+            スキル名を決め、そのままフォルダ名にします。命名は{" "}
+            <strong>動名詞形(gerund, 動詞+ing)</strong> または名詞句が推奨されており、例として{" "}
+            <code>processing-pdfs</code>、<code>generating-unit-tests</code>、
+            <code>reviewing-code</code> のような形が挙げられます。<code>helper</code> や{" "}
+            <code>utils</code>{" "}
+            のような曖昧な名前は、後から見返したときに何のスキルか分からなくなるため避けます。
+          </p>
+
+          <h3>
+            <span className={styles.stepBadge}>3</span>description を磨き上げる
+          </h3>
+          <p>description はスキル発見(discovery)の生命線です。以下のルールを守ります。</p>
+          <ul>
+            <li>
+              <strong>三人称で書く</strong>:
+              「〜を処理する」「〜を生成する」という客観的な書き方にする。「私が〜します」「あなたは〜に使えます」のような一人称・二人称は、system
+              prompt に注入された際に発見精度を下げる要因になるため避ける
+            </li>
+            <li>
+              <strong>「何をするか」と「いつ使うか」の両方を書く</strong>: 片方だけでは不十分
+            </li>
+            <li>
+              <strong>トリガーとなるキーワードを具体的に含める</strong>:
+              ユーザーが実際に使いそうな単語を想定する
+            </li>
+            <li>
+              <strong>曖昧な表現を避ける</strong>:
+              「ドキュメントを助ける」「データを処理する」のような抽象的すぎる description
+              は、他の類似スキルとの区別がつかず、正しく発動しない原因になる
+            </li>
+          </ul>
+          <div className={styles.goodBad}>
+            <div className={`${styles.gbCard} ${styles.gbGood}`}>
+              <div className={styles.gbLabel}>✅ 良い例</div>
+              <p>
+                PDFファイルからテキストと表を抽出し、フォームへの入力や複数ファイルの結合を行う。PDF、フォーム、文書抽出に関する依頼で使用する
+              </p>
+            </div>
+            <div className={`${styles.gbCard} ${styles.gbBad}`}>
+              <div className={styles.gbLabel}>❌ 悪い例</div>
+              <p>ドキュメントの処理を手伝います</p>
+            </div>
+          </div>
+          <p>
+            さらにコミュニティのベストプラクティスとして、<code>description</code>{" "}
+            の中に「どういう場合には使わないか(Do not
+            use)」を明記しておくと、似たスキル同士が競合して誤発動する事態を防げます。これは特にスキル数が増えてきたプロジェクトで効果を発揮します。
+          </p>
+
+          <h3>
+            <span className={styles.stepBadge}>4</span>本文(Instructions)を設計する
+          </h3>
+          <p>
+            <strong>「エージェントはすでに賢い」という前提</strong>
+            に立ち、当たり前の説明を省くことが最初のコツです。たとえば「PDFとは何か」「ライブラリの使い方一般」のような一般常識の解説は不要で、実際に使うコード片や手順だけを書けば十分です。
+          </p>
+          <p>本文設計では、以下の3つの分量ルールを意識します。</p>
+          <ol>
+            <li>
+              <strong>SKILL.md 本文は500行以内に収める。</strong>それを超える情報は別ファイル(
+              <code>references/xxx.md</code> など)に切り出し、本文からリンクする
+            </li>
+            <li>
+              <strong>参照は SKILL.md から1階層だけにとどめる。</strong>SKILL.md → A.md → B.md
+              のような多段参照は、エージェントが <code>head -100</code>{" "}
+              のような部分読み込みで済ませてしまい、情報を取りこぼす原因になる。すべての参照ファイルは
+              SKILL.md から直接リンクする
+            </li>
+            <li>
+              <strong>100行を超える参照ファイルには目次を付ける。</strong>
+              部分読み込みされた場合でも、ファイル全体にどんな情報があるかをエージェントが把握できるようにするため
+            </li>
+          </ol>
+          <p>
+            また、タスクの自由度(degrees of freedom)を意識して指示の書き方を変えることも重要です。
+          </p>
+          <div className={styles.tableWrap}>
+            <table>
+              <thead>
+                <tr>
+                  <th>自由度</th>
+                  <th>使う場面</th>
+                  <th>書き方</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>High freedom</td>
+                  <td>複数の妥当な進め方がある、状況次第で判断が変わる</td>
+                  <td>自然言語での大まかな方針とヒューリスティック</td>
+                </tr>
+                <tr>
+                  <td>Medium freedom</td>
+                  <td>ある程度決まったパターンがあるが、多少の変動を許容する</td>
+                  <td>パラメータ付きのテンプレートや疑似コード</td>
+                </tr>
+                <tr>
+                  <td>Low freedom</td>
+                  <td>操作が壊れやすく、一連の手順を厳密に守る必要がある</td>
+                  <td>具体的なスクリプトをそのまま実行させ、コマンドの変更を禁止する</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            これは「崖のある狭い橋(唯一の安全な進み方しかない)なら具体的な手すりを与え、何もない野原(どう進んでも成功する)なら大まかな方向だけ示して任せる」という例えでよく説明されます。
+          </p>
+
+          <h3>
+            <span className={styles.stepBadge}>5</span>スクリプト・リソースを追加する
+          </h3>
+          <p>
+            複雑な処理や、間違えると致命的な処理(データベースの移行、フォーム一括更新など)には、エージェントに都度コードを書かせるのではなく、
+            <strong>事前に用意したスクリプトを実行させる</strong>
+            方が信頼性が高くなります。理由は次のとおりです。
+          </p>
+          <ul>
+            <li>生成コードよりも動作が安定する</li>
+            <li>
+              スクリプトのコード自体はコンテキストに読み込まれず、実行結果(出力)だけが消費される
+            </li>
+            <li>毎回同じ挙動が保証される</li>
+          </ul>
+          <p>
+            スクリプトを書く際は「動的に判断させず、エラーを解決してしまう(solve, don't
+            defer)」設計が推奨されています。たとえばファイルが存在しない場合に単に例外を投げるのではなく、デフォルト値を作成して処理を継続する、といった具合です。また、タイムアウト秒数やリトライ回数のような設定値には、なぜその数値なのかという根拠をコメントで残します(いわゆる「マジックナンバー」を避ける)。
+          </p>
+          <div className={`${styles.callout} ${styles.calloutInfo}`}>
+            <div className={styles.calloutIcon}>💡</div>
+            <div>
+              <p>
+                Antigravity
+                のコミュニティ実践では、スクリプトの中身を毎回読み込ませるのではなく「まず{" "}
+                <code>--help</code>{" "}
+                を実行させてから使わせる」という、スクリプトをブラックボックスとして扱うパターンも推奨されています。これにより、エージェントの注意がタスク本体に集中しやすくなります。
+              </p>
+            </div>
+          </div>
+
+          <h3>
+            <span className={styles.stepBadge}>6</span>セキュリティとガバナンスを組み込む
+          </h3>
+          <p>
+            スキルは「指示とコードを通じてエージェントに新しい能力を与える」仕組みであるため、悪意あるスキルは意図しないツール呼び出しやコード実行を引き起こす可能性があります。Anthropic
+            公式ドキュメントでも次の点が強調されています。
+          </p>
+          <ul>
+            <li>
+              <strong>信頼できる提供元(自作、または公式配布)のスキルのみを使う</strong>
+            </li>
+            <li>
+              SKILL.md 本文だけでなく、同梱されたスクリプトや画像などすべてのファイルを監査する
+            </li>
+            <li>
+              外部URLからデータを取得するタイプのスキルは特にリスクが高い(取得したコンテンツに悪意ある指示が混入する可能性がある)
+            </li>
+            <li>
+              機密データへのアクセス権を持つ本番環境にスキルを組み込む際は、ソフトウェアのインストールと同程度の慎重さで扱う
+            </li>
+          </ul>
+          <div className={`${styles.callout} ${styles.calloutWarning}`}>
+            <div className={styles.calloutIcon}>🔒</div>
+            <div>
+              <p>
+                Antigravity 環境では、ターミナルコマンドの実行許可を{" "}
+                <code>Settings → Security → Terminal Command Policy</code>{" "}
+                から制御できます。ターミナル操作やインフラ変更を提案するスキルには、コミュニティの実践に倣って本文中に{" "}
+                <strong>Safety セクション</strong>{" "}
+                を設け、想定されるリスクと安全策を明記しておくと安心です。
+              </p>
+            </div>
+          </div>
+
+          <h3>
+            <span className={styles.stepBadge}>7</span>テストと反復
+          </h3>
+          <p>
+            スキルは一度書いて終わりではなく、実際の利用を通じて磨き込みます。Anthropic
+            が推奨する開発フローは、<strong>評価(evaluation)を先に作ってから文書化する</strong>
+            という順序です。
+          </p>
+          <ol>
+            <li>スキルなしで代表的なタスクをエージェントにやらせ、どこでつまずくかを観察する</li>
+            <li>そのつまずきを再現する評価シナリオを3つ程度作る</li>
+            <li>スキルなしでの性能をベースラインとして記録する</li>
+            <li>ギャップを埋める最小限の指示だけを SKILL.md に書く</li>
+            <li>評価を実行し、ベースラインと比較しながら改善を繰り返す</li>
+          </ol>
+          <p>
+            また、
+            <strong>
+              1つのエージェントインスタンス(仮に「エージェントA」)にスキルの原案を書かせ、別の新しいインスタンス(「エージェントB」)にそのスキルを実際のタスクで試させる
+            </strong>
+            という二者間の反復パターンも有効です。エージェントBが情報を見つけられなかった箇所や、ルールを守れなかった箇所を観察し、その具体例をエージェントAに持ち帰って改善する、というサイクルを回します。
+          </p>
+          <p>
+            最後に、複数のモデル(軽量モデル・バランス型モデル・高性能モデルなど)で動作確認することも欠かせません。高性能なモデル向けには過剰な説明が冗長になりがちで、逆に軽量モデル向けにはガイダンス不足になりがちなため、対象とするモデルすべてで挙動を確認します。
+          </p>
+        </section>
+
+        <section id="sec-6" className={styles.section}>
+          <h2>6. スキルのライフサイクル(フローチャート)</h2>
+          <p>
+            スキルが会話の中でどう扱われるかを、discovery → activation → execution
+            の3段階で図示します。
+          </p>
+          <div className={styles.mermaidWrap}>
+            <MermaidDiagram chart={MERMAID_LIFECYCLE} />
+          </div>
+        </section>
+
+        <section id="sec-7" className={styles.section}>
+          <h2>7. 「指示文 vs スクリプト」判断フローチャート</h2>
+          <p>
+            ステップ5-4で紹介した自由度(degrees of
+            freedom)の考え方を、意思決定フローとして整理すると以下のようになります。
+          </p>
+          <div className={styles.mermaidWrap}>
+            <MermaidDiagram chart={MERMAID_DECISION} />
+          </div>
+        </section>
+
+        <section id="sec-8" className={styles.section}>
+          <h2>8. Claude Skills と Antigravity Skills の違い(比較表)</h2>
+          <p>
+            同じ SKILL.md
+            フォーマットを使っていても、プラットフォームごとに細かな実装差があります。移植性の高いスキルを書くうえで押さえておきたい違いを整理します。
+          </p>
+          <div className={styles.tableWrap}>
+            <table>
+              <thead>
+                <tr>
+                  <th>観点</th>
+                  <th>Claude(Anthropic公式)</th>
+                  <th>Google Antigravity</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <code>name</code> の必須性
+                  </td>
+                  <td>必須(64文字以内、小文字+ハイフン、予約語禁止)</td>
+                  <td>任意(省略時はフォルダ名を使用)</td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>description</code> の必須性
+                  </td>
+                  <td>必須(1,024文字以内)</td>
+                  <td>必須</td>
+                </tr>
+                <tr>
+                  <td>主な配置場所</td>
+                  <td>
+                    <code>~/.claude/skills/</code>(個人用)、<code>.claude/skills/</code>
+                    (プロジェクト用)
+                  </td>
+                  <td>
+                    <code>~/.gemini/config/skills/&lt;skill-folder&gt;/</code>(グローバル)、
+                    <code>.agents/skills/&lt;skill-folder&gt;/</code>(ワークスペース)
+                  </td>
+                </tr>
+                <tr>
+                  <td>フォーマットの立ち位置</td>
+                  <td>オリジナル策定元</td>
+                  <td>オープンスタンダードを採用した実装の1つ</td>
+                </tr>
+                <tr>
+                  <td>デフォルトの実行モデル</td>
+                  <td>Claude(Opus / Sonnet / Haiku など)</td>
+                  <td>Gemini 3系列(モデル非依存の設計)</td>
+                </tr>
+                <tr>
+                  <td>実行環境</td>
+                  <td>サンドボックス化されたコード実行コンテナ(製品により制約が異なる)</td>
+                  <td>エージェントのローカル/リモート実行環境</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div className={`${styles.callout} ${styles.calloutSuccess}`}>
+            <div className={styles.calloutIcon}>🎯</div>
+            <div>
+              <p>
+                移植性を最優先するなら、両方の制約の「厳しい方」に合わせておくのが実務上もっとも安全です。具体的には、
+                <code>name</code> は省略せずに明示し、Anthropic
+                側の文字数・命名規則をそのまま満たしておく、という方針になります。
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section id="sec-9" className={styles.section}>
+          <h2>9. よくあるアンチパターン</h2>
+          <p>
+            初学者がつまずきやすいポイントを、公式ドキュメントとコミュニティの知見からまとめます。
+          </p>
+          <ul className={styles.antiList}>
+            <li>
+              <span>❌</span>
+              <span>
+                <strong>description が曖昧すぎる</strong>: 「データを処理します」のような
+                description は、他の類似スキルと区別がつかず正しく発動しない
+              </span>
+            </li>
+            <li>
+              <span>❌</span>
+              <span>
+                <strong>参照が深すぎる</strong>: SKILL.md → 中間ファイル →
+                さらに別ファイル、という多段参照は情報の取りこぼしを招く
+              </span>
+            </li>
+            <li>
+              <span>❌</span>
+              <span>
+                <strong>選択肢を提示しすぎる</strong>:
+                「ライブラリAでもBでもCでも使える」のように並べるのではなく、デフォルトの1つを明示し、例外条件だけ補足する
+              </span>
+            </li>
+            <li>
+              <span>❌</span>
+              <span>
+                <strong>時間依存の情報を書く</strong>:
+                「2025年8月より前はこの方法、以降は別の方法」のような記述は将来的に陳腐化するため、「現行の方法」と「旧方式(折りたたみ表示)」という構成に分けておく
+              </span>
+            </li>
+            <li>
+              <span>❌</span>
+              <span>
+                <strong>Windows形式のパス区切りを使う</strong>: <code>scripts\helper.py</code>{" "}
+                のようなバックスラッシュ区切りはUnix系環境でエラーの原因になるため、常にスラッシュ区切り(
+                <code>scripts/helper.py</code>)を使う
+              </span>
+            </li>
+            <li>
+              <span>❌</span>
+              <span>
+                <strong>マジックナンバーを放置する</strong>:
+                タイムアウトやリトライ回数などの設定値に根拠のコメントを付けない
+              </span>
+            </li>
+            <li>
+              <span>❌</span>
+              <span>
+                <strong>未検証のまま信頼できないスキルを導入する</strong>:
+                出所不明のスキルは、SKILL.md本文だけでなく同梱スクリプトまで含めて監査してから使う
+              </span>
+            </li>
+          </ul>
+        </section>
+
+        <section id="sec-10" className={styles.section}>
+          <h2>10. 実践チェックリスト</h2>
+          <p>公開・共有する前に、以下の項目を確認します。</p>
+          <ul className={styles.checklist}>
+            <li>
+              <span>🔲</span>
+              <span>
+                <code>description</code> は「何をするか」と「いつ使うか」の両方を含んでいる
+              </span>
+            </li>
+            <li>
+              <span>🔲</span>
+              <span>
+                <code>description</code> は三人称で書かれている
+              </span>
+            </li>
+            <li>
+              <span>🔲</span>
+              <span>SKILL.md 本文は500行以内に収まっている(超える場合は別ファイルに分離済み)</span>
+            </li>
+            <li>
+              <span>🔲</span>
+              <span>参照ファイルは SKILL.md から1階層以内でリンクされている</span>
+            </li>
+            <li>
+              <span>🔲</span>
+              <span>100行を超える参照ファイルには目次がある</span>
+            </li>
+            <li>
+              <span>🔲</span>
+              <span>時間依存の情報は「現行の方法」と「旧方式」に分けて整理されている</span>
+            </li>
+            <li>
+              <span>🔲</span>
+              <span>用語(API endpoint / field / extract など)の表記が本文全体で統一されている</span>
+            </li>
+            <li>
+              <span>🔲</span>
+              <span>
+                スクリプトはエラーを解決する設計になっており、エージェント任せにしていない
+              </span>
+            </li>
+            <li>
+              <span>🔲</span>
+              <span>設定値(タイムアウト・リトライ回数など)に根拠のコメントがある</span>
+            </li>
+            <li>
+              <span>🔲</span>
+              <span>
+                パス区切りはすべてスラッシュ(<code>/</code>)である
+              </span>
+            </li>
+            <li>
+              <span>🔲</span>
+              <span>ターミナル操作やインフラ変更を伴うスキルには Safety セクションがある</span>
+            </li>
+            <li>
+              <span>🔲</span>
+              <span>少なくとも3つの評価シナリオでテスト済みである</span>
+            </li>
+            <li>
+              <span>🔲</span>
+              <span>複数のモデル(軽量・標準・高性能)で動作確認済みである</span>
+            </li>
+            <li>
+              <span>🔲</span>
+              <span>
+                移植性が必要な場合、<code>name</code> を明示し Anthropic 側の命名規則も満たしている
+              </span>
+            </li>
+          </ul>
+        </section>
+
+        <section id="sec-11" className={styles.section}>
+          <h2>11. まとめ</h2>
+          <p>
             SKILL.md
-            は「必要なときだけ、必要な分だけ」読み込まれます。この3段階設計によってトークン消費を極限まで抑えています。
+            は「フォルダ1つで完結する、オープンでモデル非依存の知識パッケージ」です。設計の核心は
+            progressive disclosure にあり、<code>description</code>{" "}
+            の書き方ひとつでスキルの発見精度が大きく変わります。Google Antigravity
+            はこのフォーマットをそのまま採用しているため、Anthropic
+            公式が積み上げてきたベストプラクティス(簡潔さ、自由度の使い分け、1階層参照、評価駆動の反復開発など)は、ほぼそのまま
+            Antigravity でも通用します。逆に、Antigravity 固有の配置ルール(
+            <code>.agents/skills/</code> とグローバルスコープの使い分け)やセキュリティ設定(Terminal
+            Command Policy)は、Antigravity を使う開発者が個別に押さえておくべきポイントです。
           </p>
-
-          {/* Mermaid: L1/L2/L3 levels */}
-          <div className={styles.mermaidWrap}>
-            <MermaidDiagram chart={MERMAID_WHY_LEVELS} />
-          </div>
-
-          {/* 3-col level cards */}
-          <div className={styles.grid3}>
-            <div className={styles.cardAmberLight}>
-              <div className={styles.cardLabel}>レベル1 / 常駐</div>
-              <div className={styles.cardDesc}>
-                セッション開始時に全スキルのメタデータをロード。1スキル約100トークンなので数十〜数百スキルを待機させてもOK
-              </div>
-            </div>
-            <div className={styles.cardSkyLight}>
-              <div className={styles.cardLabel}>レベル2 / オンデマンド</div>
-              <div className={styles.cardDesc}>
-                ユーザーの入力とdescriptionを意味論的に照合し、最適なスキルを特定。activate_skillツールで本文を展開
-              </div>
-            </div>
-            <div className={styles.cardEmeraldLight}>
-              <div className={styles.cardLabel}>レベル3 / 動的参照</div>
-              <div className={styles.cardDesc}>
-                本文中で参照された外部ファイルのみを動的に読み込む。スクリプトは実行結果のみがトークン消費
-              </div>
-            </div>
-          </div>
+          <p>
+            まずは小さく、単一の目的を持つスキルを1つ作り、実際のタスクで試しながら育てていくのが、遠回りのようで最も確実な近道です。
+          </p>
         </section>
 
-        {/* s04: structure */}
-        <section id="structure" className={styles.sec}>
-          <h2 className={styles.secTitle}>📁 ディレクトリ構造と SKILL.md の解剖</h2>
+        <section id="sec-12" className={styles.section}>
+          <h2>12. 参考文献・引用ソース</h2>
+          <p>
+            本ガイドは以下の一次情報(公式ドキュメント)および著名な開発者・コミュニティの発信を基に、2026年7月26日時点で確認できる情報として構成しています。
+          </p>
 
-          {/* 2-col: file tree + anatomy */}
-          <div className={styles.twoColGrid}>
-            {/* Left: file tree */}
+          <div className={styles.sourceGroupTitle}>公式ドキュメント</div>
+          <ul className={styles.sourceList}>
+            <li>
+              <span className={styles.sourceTitle}>Google Antigravity Docs — Skills</span>
+              <a
+                className={styles.sourceUrl}
+                href="https://antigravity.google/docs/ide/skills"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                https://antigravity.google/docs/ide/skills
+              </a>
+            </li>
+            <li>
+              <span className={styles.sourceTitle}>
+                Anthropic Claude Platform Docs — Agent Skills Overview
+              </span>
+              <a
+                className={styles.sourceUrl}
+                href="https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview
+              </a>
+            </li>
+            <li>
+              <span className={styles.sourceTitle}>
+                Anthropic Claude Platform Docs — Skill authoring best practices
+              </span>
+              <a
+                className={styles.sourceUrl}
+                href="https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices
+              </a>
+            </li>
+            <li>
+              <span className={styles.sourceTitle}>
+                Anthropic Engineering Blog — Equipping agents for the real world with Agent Skills
+              </span>
+              <a
+                className={styles.sourceUrl}
+                href="https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills
+              </a>
+            </li>
+            <li>
+              <span className={styles.sourceTitle}>
+                Agent Skills オープンスタンダード公式サイト
+              </span>
+              <a
+                className={styles.sourceUrl}
+                href="https://agentskills.io/home"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                https://agentskills.io/home
+              </a>
+            </li>
+            <li>
+              <span className={styles.sourceTitle}>
+                Anthropic 公式 Agent Skills リポジトリ(GitHub)
+              </span>
+              <a
+                className={styles.sourceUrl}
+                href="https://github.com/anthropics/skills"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                https://github.com/anthropics/skills
+              </a>
+            </li>
+          </ul>
+
+          <div className={styles.sourceGroupTitle}>Google Codelabs / Google Cloud コミュニティ</div>
+          <ul className={styles.sourceList}>
+            <li>
+              <span className={styles.sourceTitle}>
+                Google Codelabs — Authoring Google Antigravity Skills
+              </span>
+              <a
+                className={styles.sourceUrl}
+                href="https://codelabs.developers.google.com/getting-started-with-antigravity-skills"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                https://codelabs.developers.google.com/getting-started-with-antigravity-skills
+              </a>
+            </li>
+            <li>
+              <span className={styles.sourceTitle}>
+                Google Codelabs — Getting Started with Google Antigravity
+              </span>
+              <a
+                className={styles.sourceUrl}
+                href="https://codelabs.developers.google.com/getting-started-google-antigravity"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                https://codelabs.developers.google.com/getting-started-google-antigravity
+              </a>
+            </li>
+            <li>
+              <span className={styles.sourceTitle}>
+                Google Cloud Community(Medium)— How to Build Custom Skills in Google Antigravity: 5
+                Practical Examples
+              </span>
+              <a
+                className={styles.sourceUrl}
+                href="https://medium.com/google-cloud/tutorial-getting-started-with-antigravity-skills-864041811e0d"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                https://medium.com/google-cloud/tutorial-getting-started-with-antigravity-skills-864041811e0d
+              </a>
+            </li>
+          </ul>
+
+          <div className={styles.sourceGroupTitle}>著名な開発者・コミュニティの発信</div>
+          <ul className={styles.sourceList}>
+            <li>
+              <span className={styles.sourceTitle}>
+                Simon Willison(Django共同開発者)によるSkillsに関する一連の考察
+              </span>
+              <a
+                className={styles.sourceUrl}
+                href="https://simonwillison.net/tags/skills/"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                https://simonwillison.net/tags/skills/
+              </a>
+            </li>
+            <li>
+              <span className={styles.sourceTitle}>
+                obra/superpowers —
+                Skills作成のベストプラクティスをまとめたコミュニティリポジトリ(Simon
+                Willisonのブログでも紹介)
+              </span>
+              <a
+                className={styles.sourceUrl}
+                href="https://github.com/obra/superpowers/blob/main/skills/writing-skills/anthropic-best-practices.md"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                https://github.com/obra/superpowers/blob/main/skills/writing-skills/anthropic-best-practices.md
+              </a>
+            </li>
+            <li>
+              <span className={styles.sourceTitle}>
+                rmyndharis/antigravity-skills — Antigravity
+                Skillsのコミュニティ製コレクションと実践的な運用ルール
+              </span>
+              <a
+                className={styles.sourceUrl}
+                href="https://github.com/rmyndharis/antigravity-skills"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                https://github.com/rmyndharis/antigravity-skills
+              </a>
+            </li>
+          </ul>
+
+          <div
+            className={`${styles.callout} ${styles.calloutWarning}`}
+            style={{ marginTop: "24px" }}
+          >
+            <div className={styles.calloutIcon}>⚠️</div>
             <div>
-              <h3 className={styles.fileTreeHead}>ディレクトリ構成</h3>
-              <div className={styles.fileTree}>
-                <pre className={styles.fileTreePre}>
-                  <span className={styles.ftDir}>📁 my-skill/</span>
-                  {"\n"}
-                  {"├── "}
-                  <span className={styles.ftReq}>📄 SKILL.md</span>
-                  {"        "}
-                  <span className={styles.ftComment}>← 必須・スキルの脳</span>
-                  {"\n"}
-                  {"├── "}
-                  <span className={styles.ftOpt}>📁 scripts/</span>
-                  {"        "}
-                  <span className={styles.ftComment}>← 任意</span>
-                  {"\n"}
-                  {"│   ├── "}
-                  <span className={styles.ftOpt}>run.py</span>
-                  {"\n"}
-                  {"│   └── "}
-                  <span className={styles.ftOpt}>util.sh</span>
-                  {"\n"}
-                  {"├── "}
-                  <span className={styles.ftOpt}>📁 references/</span>
-                  {"     "}
-                  <span className={styles.ftComment}>← 任意</span>
-                  {"\n"}
-                  {"│   └── "}
-                  <span className={styles.ftOpt}>api-docs.md</span>
-                  {"\n"}
-                  {"└── "}
-                  <span className={styles.ftOpt}>📁 assets/</span>
-                  {"         "}
-                  <span className={styles.ftComment}>← 任意</span>
-                  {"\n"}
-                  {"    └── "}
-                  <span className={styles.ftOpt}>template.tsx</span>
-                </pre>
-              </div>
-              <div className={styles.legendList}>
-                <div className={styles.legendItem}>
-                  <span className={styles.legendDot} style={{ background: "#10b981" }} />
-                  <span style={{ fontWeight: 700, color: "#22c55e" }}>SKILL.md</span>
-                  <span style={{ color: "var(--text-subtle)" }}>
-                    — 必須。YAMLメタデータ＋指示本文
-                  </span>
-                </div>
-                <div className={styles.legendItem}>
-                  <span className={styles.legendDot} style={{ background: "#38bdf8" }} />
-                  <span style={{ fontWeight: 700, color: "#38bdf8" }}>scripts/</span>
-                  <span style={{ color: "var(--text-subtle)" }}>
-                    — 自動実行スクリプト（Python/Bash）
-                  </span>
-                </div>
-                <div className={styles.legendItem}>
-                  <span className={styles.legendDot} style={{ background: "#a78bfa" }} />
-                  <span style={{ fontWeight: 700, color: "#c084fc" }}>references/</span>
-                  <span style={{ color: "var(--text-subtle)" }}>
-                    — 参照ドキュメント（必要時のみ読込）
-                  </span>
-                </div>
-                <div className={styles.legendItem}>
-                  <span className={styles.legendDot} style={{ background: "#94a3b8" }} />
-                  <span style={{ fontWeight: 700, color: "var(--text)" }}>assets/</span>
-                  <span style={{ color: "var(--text-subtle)" }}>— テンプレート・静的ファイル</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Right: SKILL.md anatomy */}
-            <div>
-              <h3 className={styles.fileTreeHead}>SKILL.md の構成</h3>
-              <div className={styles.anatStack}>
-                <div className={`${styles.anatCard} ${styles.anatCardAmber}`}>
-                  <div className={styles.anatTitle} style={{ color: "#fbbf24" }}>
-                    🔑 YAMLフロントマター（必須）
-                  </div>
-                  <div className={styles.anatBody} style={{ color: "#fde68a" }}>
-                    <code className={styles.codeInlineAmber}>---</code>
-                    で囲まれたYAML形式のメタデータ。
-                    <br />
-                    <strong>name</strong>（識別子）と
-                    <strong>description</strong>（トリガー条件）が最重要
-                  </div>
-                </div>
-                <div className={styles.anatConnect}>↕</div>
-                <div className={`${styles.anatCard} ${styles.anatCardSky}`}>
-                  <div className={styles.anatTitle} style={{ color: "#60a5fa" }}>
-                    📝 マークダウン本文（必須）
-                  </div>
-                  <div className={styles.anatBody} style={{ color: "#93c5fd" }}>
-                    エージェントへの具体的な指示。以下のセクションで構成：
-                    <br />
-                    Overview → Before Starting → Step-by-Step → Examples → Rules
-                  </div>
-                </div>
-                <div className={styles.anatConnect}>↕</div>
-                <div className={`${styles.anatCard} ${styles.anatCardEmerald}`}>
-                  <div className={styles.anatTitle} style={{ color: "#34d399" }}>
-                    🔗 参照ファイルリンク（任意）
-                  </div>
-                  <div className={styles.anatBody} style={{ color: "#a7f3d0" }}>
-                    本文中で
-                    <code className={styles.codeInlineEmerald}>references/api-docs.md</code>
-                    のように外部ファイルを参照。必要時だけ読込
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* YAML front matter detail */}
-          <h3 className={styles.secH3}>YAMLフロントマター 詳細解説</h3>
-          <div className={styles.codeWrap}>
-            <div className={styles.codeBar}>
-              <span>SKILL.md</span>
-              <span className={styles.codeLang}>YAML</span>
-            </div>
-            <div className={styles.codeBody}>
-              <span className={styles.cs}>---</span>
-              {"\n"}
-              <span className={styles.cc}>
-                {"# ✅ 必須: スキルの一意な識別子（ケバブケース・英語小文字）"}
-              </span>
-              {"\n"}
-              <span className={styles.cm}>name</span>
-              {": "}
-              <span className={styles.cv}>git-commit-formatter</span>
-              {"\n\n"}
-              <span className={styles.cc}>
-                {"# ✅ 必須: 役割と機能の詳細な解説（エージェントに機能のコンテキストを伝える）"}
-              </span>
-              {"\n"}
-              <span className={styles.cm}>description</span>
-              {": "}
-              <span className={styles.cs}>|</span>
-              {"\n"}
-              {"  "}
-              <span className={styles.cv}>
-                Gitコミットメッセージを Conventional Commits 仕様に整形する。
-              </span>
-              {"\n"}
-              {"  "}
-              <span className={styles.cv}>コード変更の記録やバージョン管理時に呼び出すこと。</span>
-              {"\n\n"}
-              <span className={styles.cc}>
-                {"# ✅ 最新仕様推奨: エージェント起動トリガー（意味的に合致するキーワードを列挙）"}
-              </span>
-              {"\n"}
-              <span className={styles.cm}>triggers</span>
-              {":\n"}
-              {"  - "}
-              <span className={styles.cv}>"コミット"</span>
-              {"\n"}
-              {"  - "}
-              <span className={styles.cv}>"commit"</span>
-              {"\n"}
-              {"  - "}
-              <span className={styles.cv}>"コミットメッセージ"</span>
-              {"\n\n"}
-              <span className={styles.cc}>
-                {
-                  "# ✅ 最新仕様推奨: エージェントの使用可能ツール制限（セキュリティ・サンドボックス制御）"
-                }
-              </span>
-              {"\n"}
-              <span className={styles.cm}>allowed-tools</span>
-              {":\n"}
-              {"  - "}
-              <span className={styles.cv}>Read</span>
-              {"\n"}
-              {"  - "}
-              <span className={styles.cv}>Edit</span>
-              {"\n"}
-              {"  - "}
-              <span className={styles.cv}>Grep</span>
-              {"\n\n"}
-              <span className={styles.cc}>
-                {"# 任意: 起動モードの設定 (explicit: 手動のみ、auto: 自動実行)"}
-              </span>
-              {"\n"}
-              <span className={styles.cm}>invocation</span>
-              {": "}
-              <span className={styles.cv}>explicit</span>
-              {"\n\n"}
-              <span className={styles.cc}>{"# 任意: 依存関係（実行環境の互換性チェック）"}</span>
-              {"\n"}
-              <span className={styles.cm}>compatibility</span>
-              {":\n"}
-              {"  - "}
-              <span className={styles.cv}>git</span>
-              {"\n"}
-              {"  - "}
-              <span className={styles.cv}>{"node >= 18"}</span>
-              {"\n"}
-              <span className={styles.cs}>---</span>
-            </div>
-          </div>
-
-          {/* description warning */}
-          <div className={styles.descWarnBox}>
-            <div className={styles.descWarnTitle}>
-              ⚠️ triggers と description はエージェントの「発動スイッチ」
-            </div>
-            <div className={styles.descExGrid}>
-              <div className={styles.descExBad}>
-                <div className={styles.descExTitle} style={{ color: "#fca5a5" }}>
-                  ❌ 悪い例（トリガーや用途が曖昧）
-                </div>
-                <code className={styles.descExCode} style={{ color: "#fecaca" }}>
-                  {"description: コードをレビューするスキル。\n"}
-                  {"triggers: []"}
-                </code>
-                <div className={styles.descExNote} style={{ color: "#fda4af" }}>
-                  → AIがいつ使ってよいか判断できず発動しません
-                </div>
-              </div>
-              <div className={styles.descExGood}>
-                <div className={styles.descExTitle} style={{ color: "#86efac" }}>
-                  ✅ 良い例（明示的なトリガー定義）
-                </div>
-                <code className={styles.descExCode} style={{ color: "#a7f3d0" }}>
-                  {"description: フロントエンドコードをレビューする。\n"}
-                  {"triggers:\n"}
-                  {'  - "review"\n'}
-                  {'  - "レビュー"\n'}
-                  {'  - "PR確認"'}
-                </code>
-                <div className={styles.descExNote} style={{ color: "#a7f3d0" }}>
-                  → トリガー条件が明確で、合致した際に確実に発動します
-                </div>
-              </div>
+              <p>
+                本ガイドの内容は2026年7月26日前後にウェブ検索で確認できた情報に基づいています。Google
+                Antigravity・Claude Platform
+                ともに機能追加や仕様変更が続いている領域のため、実装前には上記の公式ドキュメントで最新情報を確認することを推奨します。
+              </p>
             </div>
           </div>
         </section>
 
-        {/* s05: howto */}
-        <section id="howto" className={styles.sec}>
-          <h2 className={styles.secTitle}>✍️ SKILL.md の書き方（推奨テンプレート）</h2>
-
-          <p
-            style={{
-              color: "var(--text-subtle)",
-              fontSize: "0.875rem",
-              lineHeight: 1.75,
-              marginBottom: "1.25rem",
-            }}
-          >
-            効果的な SKILL.md
-            は以下の標準セクション構成に従います。各セクションの役割を理解して記述しましょう。
-          </p>
-
-          {/* Mermaid: structure flow */}
-          <div className={styles.mermaidWrap}>
-            <MermaidDiagram chart={MERMAID_HOWTO} />
-          </div>
-
-          {/* Complete sample */}
-          <h3 className={styles.secH3}>✅ 完全なサンプル — frontend-reviewer スキル</h3>
-          <div className={styles.codeWrap}>
-            <div className={styles.codeBar}>
-              <span>SKILL.md</span>
-              <span className={styles.codeLang}>Markdown</span>
-            </div>
-            <div className={styles.codeBody}>
-              <span className={styles.cs}>---</span>
-              {"\n"}
-              <span className={styles.cm}>name</span>
-              {": "}
-              <span className={styles.cv}>frontend-reviewer</span>
-              {"\n"}
-              <span className={styles.cm}>description</span>
-              {": "}
-              <span className={styles.cs}>|</span>
-              {"\n"}
-              {"  "}
-              <span className={styles.cv}>
-                ReactおよびTypeScriptのフロントエンドコードをレビューし、
-              </span>
-              {"\n"}
-              {"  "}
-              <span className={styles.cv}>
-                コンポーネント設計・パフォーマンス・アクセシビリティ(a11y)の
-              </span>
-              {"\n"}
-              {"  "}
-              <span className={styles.cv}>観点から品質を向上させる際に使用する。</span>
-              {"\n"}
-              {"  "}
-              <span className={styles.cv}>
-                {"「コードレビュー」「レビュー」「PR確認」が出たら使うこと。"}
-              </span>
-              {"\n"}
-              <span className={styles.cs}>---</span>
-              {"\n\n"}
-              <span className={styles.ch}># Frontend Code Reviewer</span>
-              {"\n\n"}
-              <span className={styles.ch}>## Overview</span>
-              {"\n"}
-              {
-                "Reactコンポーネントに対して一貫性のある厳格なレビューを行い、\nパフォーマンス・型安全性・アクセシビリティを向上させる。"
-              }
-              {"\n\n"}
-              <span className={styles.ch}>## Before Starting</span>
-              {"\n"}
-              {
-                "レビューを開始する前に以下を確認すること：\n- レビュー対象ファイルのパスをユーザーから取得\n- 依存するフックやユーティリティファイルも一緒に読み込む"
-              }
-              {"\n\n"}
-              <span className={styles.ch}>## Step-by-Step Guide</span>
-              {"\n"}
-              {"1. "}
-              <span className={styles.cw}>**文脈と依存関係の解析**</span>
-              {": 対象ファイルと依存関係を追跡して読み込む\n"}
-              {"2. "}
-              <span className={styles.cw}>**静的解析のシミュレーション**</span>
-              {": 型の安全性とReactの依存配列を検証\n"}
-              {"3. "}
-              <span className={styles.cw}>**パフォーマンス評価**</span>
-              {": useMemo/useCallbackの欠落を特定\n"}
-              {"4. "}
-              <span className={styles.cw}>**a11y確認**</span>
-              {": WAI-ARIA属性・キーボードナビゲーションを確認\n"}
-              {"5. "}
-              <span className={styles.cw}>**アーティファクト生成**</span>
-              {": 修正後のコードスニペットと共に提示"}
-              {"\n\n"}
-              <span className={styles.ch}>## Examples</span>
-              {"\n"}
-              <span className={styles.cw}>**Input**</span>
-              {": "}
-              <span className={styles.cs}>{"`UserProfile.tsx`"}</span>
-              {"のパフォーマンスをレビューして\n\n"}
-              <span className={styles.cw}>**Output Structure**</span>
-              {":\n"}
-              {"1. 概要: 現在の実装におけるボトルネック\n"}
-              {"2. 修正案: "}
-              <span className={styles.cs}>{"`React.memo`"}</span>
-              {"の適用箇所と修正コード\n"}
-              {"3. 副作用の検証: 修正による影響範囲"}
-              {"\n\n"}
-              <span className={styles.ch}>## Rules</span>
-              {"\n"}
-              <span className={styles.ck}>❌</span>
-              {" 絶対に行わないこと:\n"}
-              {"- ビジネスロジックの意図を推測して勝手に変更すること\n"}
-              {"- 不明な点を質問せずに仮定で進めること\n\n"}
-              <span className={styles.cg}>✅</span>
-              {" 必ず行うこと:\n"}
-              {"- 変更提案の根拠として公式ドキュメントを引用\n"}
-              {"- "}
-              <span className={styles.cs}>{"`references/css-guidelines.md`"}</span>
-              {" を参照してスタイルをレビュー"}
-            </div>
-          </div>
-        </section>
-
-        {/* s06: steps */}
-        <section id="steps" className={styles.sec}>
-          <h2 className={styles.secTitle}>🚀 ステップバイステップ — 初めてのスキル作成</h2>
-          <StepsApp />
-        </section>
-
-        {/* s07: install */}
-        <section id="install" className={styles.sec}>
-          <h2 className={styles.secTitle}>📦 スキルのインストール方法</h2>
-
-          <h3 className={styles.secH3}>スコープ選択（どこに置くか）</h3>
-          <div className={styles.mermaidWrap}>
-            <MermaidDiagram chart={MERMAID_INSTALL_SCOPE} />
-          </div>
-
-          {/* Gemini CLI commands */}
-          <h3 className={styles.secH3}>
-            Gemini CLI コマンド一覧
-            <span style={{ fontSize: "0.875rem", fontWeight: 400, color: "var(--text-muted)" }}>
-              {" "}
-              （v0.43.0 対応）
-            </span>
-          </h3>
-          <div className={styles.codeWrap}>
-            <div className={styles.codeBar}>
-              <span>shell</span>
-              <span className={styles.codeLang}>BASH</span>
-            </div>
-            <div className={styles.codeBody}>
-              <span className={styles.cc}>{"# ✅ Git リポジトリからインストール"}</span>
-              {"\n"}
-              <span className={styles.ck}>{"gemini"}</span>
-              {" skills install https://github.com/example/my-skills.git\n\n"}
-              <span className={styles.cc}>{"# ✅ サブディレクトリを指定してインストール"}</span>
-              {"\n"}
-              <span className={styles.ck}>{"gemini"}</span>
-              {" skills install https://github.com/example/skills.git --path skills/firebase\n\n"}
-              <span className={styles.cc}>{"# ✅ ローカルディレクトリからインストール"}</span>
-              {"\n"}
-              <span className={styles.ck}>{"gemini"}</span>
-              {" skills install ./my-local-skill/\n\n"}
-              <span className={styles.cc}>{"# ✅ インストール済みスキルを一覧表示"}</span>
-              {"\n"}
-              <span className={styles.ck}>{"gemini"}</span>
-              {" skills list\n\n"}
-              <span className={styles.cc}>{"# ✅ セッション中にスキルを無効化"}</span>
-              {"\n"}
-              {"/skills disable <スキル番号>\n\n"}
-              <span className={styles.cc}>{"# ✅ スキルを更新"}</span>
-              {"\n"}
-              <span className={styles.ck}>{"gemini"}</span>
-              {" skills update\n\n"}
-              <span className={styles.cc}>
-                {"# ──────────────────────────────────────────────────"}
-              </span>
-              {"\n"}
-              <span className={styles.cc}>{"# 🆕 v0.26.0〜 skill-creator（スキル自動生成）"}</span>
-              {"\n"}
-              <span className={styles.cc}>
-                {"# チャットで「新しいスキルを作成したい」と入力するだけで起動"}
-              </span>
-              {"\n\n"}
-              <span className={styles.cc}>{"# 🆕 v0.27.0〜 /rewind（セッション履歴を遡る）"}</span>
-              {"\n"}
-              {"/rewind\n\n"}
-              <span className={styles.cc}>
-                {"# 🆕 v0.29.0〜 /plan（Plan Mode: read-only で安全に変更計画を立案）"}
-              </span>
-              {"\n"}
-              {"/plan\n\n"}
-              <span className={styles.cc}>
-                {"# 🆕 v0.33.0〜 /plan にリサーチサブエージェント内蔵（さらに精密な計画）"}
-              </span>
-              {"\n"}
-              <span className={styles.cc}>
-                {"# /plan で起動後、自動的に深い調査・アノテーションが可能"}
-              </span>
-            </div>
-          </div>
-
-          {/* skills CLI */}
-          <h3 className={styles.secH3} style={{ marginTop: "1.5rem" }}>
-            skills CLI（統合管理ツール）
-          </h3>
-          <p
-            style={{
-              color: "var(--text-subtle)",
-              fontSize: "0.875rem",
-              lineHeight: 1.75,
-              marginBottom: "0.75rem",
-            }}
-          >
-            <code
-              style={{
-                background: "var(--bg-4)",
-                color: "var(--text)",
-                padding: "0.125rem 0.5rem",
-                borderRadius: "0.25rem",
-                fontFamily: "var(--font-mono)",
-                fontSize: "0.875rem",
-              }}
-            >
-              npx skills
-            </code>{" "}
-            コマンドを使うと、Gemini CLI と Antigravity の両方に同時にスキルを追加できます。
-          </p>
-          <div className={styles.codeWrap}>
-            <div className={styles.codeBar}>
-              <span>shell</span>
-              <span className={styles.codeLang}>BASH</span>
-            </div>
-            <div className={styles.codeBody}>
-              <span className={styles.cc}>{"# Gemini CLI と Antigravity 両方に追加"}</span>
-              {"\n"}
-              <span className={styles.ck}>{"npx"}</span>
-              {" skills add firebase/agent-skills -a gemini-cli -a antigravity\n\n"}
-              <span className={styles.cc}>{"# スキルを検索"}</span>
-              {"\n"}
-              <span className={styles.ck}>{"npx"}</span>
-              {" skills find flutter\n\n"}
-              <span className={styles.cc}>{"# スキルを削除"}</span>
-              {"\n"}
-              <span className={styles.ck}>{"npx"}</span>
-              {" skills remove firebase/agent-skills\n\n"}
-              <span className={styles.cc}>{"# インストール済みスキルを一覧表示"}</span>
-              {"\n"}
-              <span className={styles.ck}>{"npx"}</span>
-              {" skills list"}
-            </div>
-          </div>
-
-          {/* Antigravity manual copy */}
-          <h3 className={styles.secH3} style={{ marginTop: "1.5rem" }}>
-            Antigravity への手動コピー
-          </h3>
-          <div className={styles.codeWrap}>
-            <div className={styles.codeBar}>
-              <span>shell</span>
-              <span className={styles.codeLang}>BASH</span>
-            </div>
-            <div className={styles.codeBody}>
-              <span className={styles.cc}>
-                {"# グローバルインストール（全プロジェクトで使えるようにする）"}
-              </span>
-              {"\n"}
-              <span className={styles.ck}>{"cp"}</span>
-              {" -r my-skill/ ~/.gemini/antigravity/skills/\n\n"}
-              <span className={styles.cc}>
-                {"# ワークスペースインストール（このプロジェクトだけ）"}
-              </span>
-              {"\n"}
-              <span className={styles.ck}>{"cp"}</span>
-              {" -r my-skill/ .agent/skills/"}
-            </div>
-          </div>
-
-          {/* Lifecycle diagram */}
-          <h3 className={styles.secH3} style={{ marginTop: "1.5rem" }}>
-            スキルが呼び出されるまでの流れ
-          </h3>
-          <div className={styles.mermaidWrap}>
-            <MermaidDiagram chart={MERMAID_INSTALL_LIFECYCLE} />
-          </div>
-        </section>
-
-        {/* s08: examples */}
-        <section id="examples" className={styles.sec}>
-          <h2 className={styles.secTitle}>💡 パターン別 実例集</h2>
-          <ExamplesApp />
-        </section>
-
-        {/* s09: checklist */}
-        <section id="checklist" className={styles.sec}>
-          <h2 className={styles.secTitle}>✅ ベストプラクティス &amp; チェックリスト</h2>
-
-          {/* Anti-patterns */}
-          <h3 className={styles.secH3}>❌ よくある失敗パターン</h3>
-          <div className={styles.mermaidWrap} style={{ marginBottom: "1.5rem" }}>
-            <MermaidDiagram chart={MERMAID_CHECKLIST_ANTIPATTERNS} />
-          </div>
-
-          {/* Interactive checklist */}
-          <ChecklistApp />
-
-          {/* Skill count guide */}
-          <h3 className={styles.secH3} style={{ marginTop: "1.5rem" }}>
-            📊 スキル数の目安
-          </h3>
-          <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-            <div className={styles.skillCountRow}>
-              <span className={styles.skillCountLabel}>1〜5個</span>
-              <div className={styles.skillCountBar}>
-                <div
-                  className={styles.skillCountFill}
-                  style={{ width: "70%", background: "#7dd3fc" }}
-                />
-              </div>
-              <span className={styles.skillCountStatus} style={{ color: "var(--blue)" }}>
-                普通
-              </span>
-            </div>
-            <div className={styles.skillCountRow}>
-              <span className={styles.skillCountLabel}>6〜10個</span>
-              <div className={styles.skillCountBar}>
-                <div
-                  className={styles.skillCountFill}
-                  style={{ width: "90%", background: "#34d399" }}
-                />
-              </div>
-              <span className={styles.skillCountStatus} style={{ color: "var(--green)" }}>
-                最適 ⭐
-              </span>
-            </div>
-            <div className={styles.skillCountRow}>
-              <span className={styles.skillCountLabel}>11〜20個</span>
-              <div className={styles.skillCountBar}>
-                <div
-                  className={styles.skillCountFill}
-                  style={{ width: "80%", background: "#facc15" }}
-                />
-              </div>
-              <span className={styles.skillCountStatus} style={{ color: "var(--orange)" }}>
-                やや多め
-              </span>
-            </div>
-            <div className={styles.skillCountRow}>
-              <span className={styles.skillCountLabel}>30個以上</span>
-              <div className={styles.skillCountBar}>
-                <div
-                  className={styles.skillCountFill}
-                  style={{ width: "40%", background: "#f87171" }}
-                />
-              </div>
-              <span className={styles.skillCountStatus} style={{ color: "var(--red)" }}>
-                非推奨
-              </span>
-            </div>
-          </div>
-
-          {/* Quick reference table */}
-          <h3 className={styles.secH3} style={{ marginTop: "1.5rem" }}>
-            📋 クイックリファレンス
-          </h3>
-          <div className={styles.tableWrap}>
-            <table className={styles.table}>
-              <thead>
-                <tr>
-                  <th
-                    className={`${styles.thGradient} ${styles.tdLeft}`}
-                    style={{ color: "var(--cyan)" }}
-                  >
-                    ツール
-                  </th>
-                  <th
-                    className={`${styles.thGradient} ${styles.tdLeft}`}
-                    style={{ color: "var(--cyan)" }}
-                  >
-                    グローバルパス
-                  </th>
-                  <th
-                    className={`${styles.thGradient} ${styles.tdLeft}`}
-                    style={{ color: "var(--cyan)" }}
-                  >
-                    ローカルパス
-                  </th>
-                  <th
-                    className={`${styles.thGradient} ${styles.tdLeft}`}
-                    style={{ color: "var(--cyan)" }}
-                  >
-                    インストールコマンド
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr className={styles.tr}>
-                  <td className={styles.tdLeft} style={{ fontWeight: 700, color: "var(--blue)" }}>
-                    Gemini CLI
-                    <br />
-                    <span className={styles.textSlateLight}>v0.43.0</span>
-                  </td>
-                  <td className={`${styles.tdLeft} ${styles.mono} ${styles.textSlate}`}>
-                    ~/.gemini/skills/
-                  </td>
-                  <td className={`${styles.tdLeft} ${styles.mono} ${styles.textSlate}`}>
-                    .gemini/skills/
-                  </td>
-                  <td className={`${styles.tdLeft} ${styles.mono} ${styles.textSlate}`}>
-                    gemini skills install &lt;url&gt;
-                  </td>
-                </tr>
-                <tr className={styles.trEven}>
-                  <td className={styles.tdLeft} style={{ fontWeight: 700, color: "var(--purple)" }}>
-                    Antigravity
-                    <br />
-                    <span className={styles.textSlateLight}>v2.0.1</span>
-                  </td>
-                  <td className={`${styles.tdLeft} ${styles.mono} ${styles.textSlate}`}>
-                    ~/.gemini/antigravity/skills/
-                  </td>
-                  <td className={`${styles.tdLeft} ${styles.mono} ${styles.textSlate}`}>
-                    .agent/skills/
-                  </td>
-                  <td className={`${styles.tdLeft} ${styles.mono} ${styles.textSlate}`}>
-                    cp -r skill/ ~/.gemini/antigravity/skills/
-                  </td>
-                </tr>
-                <tr className={styles.tr}>
-                  <td className={styles.tdLeft} style={{ fontWeight: 700, color: "var(--green)" }}>
-                    両方同時
-                  </td>
-                  <td className={styles.textSlate} colSpan={2} style={{ textAlign: "center" }}>
-                    — npx skills CLI を使用 —
-                  </td>
-                  <td className={`${styles.tdLeft} ${styles.mono} ${styles.textSlate}`}>
-                    npx skills add &lt;name&gt; -a gemini-cli -a antigravity
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        {/* s10: whatsnew */}
-        <section
-          id="whatsnew"
-          className={styles.sec}
-          style={{
-            background:
-              "linear-gradient(135deg, rgba(249, 115, 22, 0.05), rgba(245, 158, 11, 0.1))",
-            borderWidth: "2px",
-            borderStyle: "solid",
-            borderColor: "rgba(249, 115, 22, 0.3)",
-          }}
-        >
-          <h2
-            className={styles.secTitle}
-            style={{ color: "var(--orange)", borderBottomColor: "rgba(249, 115, 22, 0.3)" }}
-          >
-            🆕 最新アップデート（2026年5月23日時点）
-          </h2>
-
-          {/* 2-col: Gemini CLI + Antigravity */}
-          <div className={styles.newGrid}>
-            {/* Gemini CLI */}
-            <div
-              className={styles.newCard}
-              style={{
-                borderColor: "rgba(59, 130, 246, 0.3)",
-                background: "var(--bg-2)",
-                padding: "1.25rem",
-              }}
-            >
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "0.5rem",
-                  marginBottom: "0.75rem",
-                }}
-              >
-                <span
-                  className={styles.badge}
-                  style={{ background: "#0ea5e9", color: "#ffffff", padding: "0.25rem 0.75rem" }}
-                >
-                  Gemini CLI
-                </span>
-                <span
-                  className={styles.badge}
-                  style={{ background: "var(--blue-dim)", color: "#60a5fa" }}
-                >
-                  v0.43.0 (2026-03-17)
-                </span>
-              </div>
-              <ul
-                style={{
-                  listStyle: "none",
-                  padding: 0,
-                  margin: 0,
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "0.5rem",
-                  fontSize: "0.875rem",
-                  color: "var(--text-subtle)",
-                }}
-              >
-                <li style={{ display: "flex", alignItems: "flex-start", gap: "0.5rem" }}>
-                  <span
-                    style={{
-                      color: "#0ea5e9",
-                      fontWeight: 700,
-                      marginTop: "0.125rem",
-                      flexShrink: 0,
-                    }}
-                  >
-                    v0.26.0
-                  </span>
-                  <span>
-                    <strong>skill-creator</strong> メタスキル標準搭載 +
-                    ジェネラリストエージェント追加
-                  </span>
-                </li>
-                <li style={{ display: "flex", alignItems: "flex-start", gap: "0.5rem" }}>
-                  <span
-                    style={{
-                      color: "#0ea5e9",
-                      fontWeight: 700,
-                      marginTop: "0.125rem",
-                      flexShrink: 0,
-                    }}
-                  >
-                    v0.27.0
-                  </span>
-                  <span>
-                    <strong>/rewind</strong> コマンド追加（セッション履歴を遡る）
-                  </span>
-                </li>
-                <li style={{ display: "flex", alignItems: "flex-start", gap: "0.5rem" }}>
-                  <span
-                    style={{
-                      color: "#0ea5e9",
-                      fontWeight: 700,
-                      marginTop: "0.125rem",
-                      flexShrink: 0,
-                    }}
-                  >
-                    v0.29.0
-                  </span>
-                  <span>
-                    Gemini 3 をデフォルトモデルに採用（
-                    <code
-                      style={{
-                        background: "var(--bg-3)",
-                        color: "var(--text)",
-                        padding: "0 0.25rem",
-                        borderRadius: "0.25rem",
-                        fontSize: "0.75rem",
-                      }}
-                    >
-                      Auto (Gemini 3)
-                    </code>
-                    ）
-                  </span>
-                </li>
-                <li style={{ display: "flex", alignItems: "flex-start", gap: "0.5rem" }}>
-                  <span
-                    style={{
-                      color: "#0ea5e9",
-                      fontWeight: 700,
-                      marginTop: "0.125rem",
-                      flexShrink: 0,
-                    }}
-                  >
-                    v0.30.0
-                  </span>
-                  <span>
-                    <strong>Gemini CLI SDK</strong>（
-                    <code
-                      style={{
-                        background: "var(--bg-3)",
-                        color: "var(--text)",
-                        padding: "0 0.25rem",
-                        borderRadius: "0.25rem",
-                        fontSize: "0.75rem",
-                      }}
-                    >
-                      @google/gemini-cli-sdk
-                    </code>
-                    ）公開
-                  </span>
-                </li>
-                <li style={{ display: "flex", alignItems: "flex-start", gap: "0.5rem" }}>
-                  <span
-                    style={{
-                      color: "#0ea5e9",
-                      fontWeight: 700,
-                      marginTop: "0.125rem",
-                      flexShrink: 0,
-                    }}
-                  >
-                    v0.31.0
-                  </span>
-                  <span>
-                    <strong>gemini-3.1-pro-preview</strong>{" "}
-                    サポート追加（段階的ロールアウト・一部アカウントで利用可）
-                  </span>
-                </li>
-                <li style={{ display: "flex", alignItems: "flex-start", gap: "0.5rem" }}>
-                  <span
-                    style={{
-                      color: "#0ea5e9",
-                      fontWeight: 700,
-                      marginTop: "0.125rem",
-                      flexShrink: 0,
-                    }}
-                  >
-                    v0.33.0
-                  </span>
-                  <span>
-                    <strong>/plan にリサーチサブエージェント</strong>・アノテーション機能を追加
-                  </span>
-                </li>
-                <li style={{ display: "flex", alignItems: "flex-start", gap: "0.5rem" }}>
-                  <span
-                    style={{
-                      color: "#0ea5e9",
-                      fontWeight: 700,
-                      marginTop: "0.125rem",
-                      flexShrink: 0,
-                    }}
-                  >
-                    v0.34.0
-                  </span>
-                  <span>Plan Mode がデフォルト有効化、サンドボックス化・セキュリティ強化</span>
-                </li>
-              </ul>
-            </div>
-
-            {/* Antigravity */}
-            <div
-              className={styles.newCard}
-              style={{
-                borderColor: "rgba(168, 85, 247, 0.3)",
-                background: "var(--bg-2)",
-                padding: "1.25rem",
-              }}
-            >
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "0.5rem",
-                  marginBottom: "0.75rem",
-                }}
-              >
-                <span
-                  className={styles.badge}
-                  style={{ background: "#8b5cf6", color: "#ffffff", padding: "0.25rem 0.75rem" }}
-                >
-                  Antigravity
-                </span>
-                <span
-                  className={styles.badge}
-                  style={{ background: "var(--purple-dim)", color: "#c084fc" }}
-                >
-                  v2.0.1 (2026-05-23)
-                </span>
-              </div>
-              <ul
-                style={{
-                  listStyle: "none",
-                  padding: 0,
-                  margin: 0,
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "0.5rem",
-                  fontSize: "0.875rem",
-                  color: "var(--text-subtle)",
-                }}
-              >
-                <li style={{ display: "flex", alignItems: "flex-start", gap: "0.5rem" }}>
-                  <span
-                    style={{
-                      color: "#8b5cf6",
-                      fontWeight: 700,
-                      marginTop: "0.125rem",
-                      flexShrink: 0,
-                    }}
-                  >
-                    v2.0.1
-                  </span>
-                  <span>
-                    <strong>AGENTS.md サポート</strong> 追加（Claude Code
-                    など他ツールとルール共有可能）
-                  </span>
-                </li>
-                <li style={{ display: "flex", alignItems: "flex-start", gap: "0.5rem" }}>
-                  <span
-                    style={{
-                      color: "#8b5cf6",
-                      fontWeight: 700,
-                      marginTop: "0.125rem",
-                      flexShrink: 0,
-                    }}
-                  >
-                    v2.0.1
-                  </span>
-                  <span>
-                    トークン計算バグ修正・<strong>Auto-continue のデフォルト有効化</strong>
-                  </span>
-                </li>
-                <li style={{ display: "flex", alignItems: "flex-start", gap: "0.5rem" }}>
-                  <span
-                    style={{
-                      color: "#8b5cf6",
-                      fontWeight: 700,
-                      marginTop: "0.125rem",
-                      flexShrink: 0,
-                    }}
-                  >
-                    現在
-                  </span>
-                  <span>
-                    対応モデル:{" "}
-                    {[
-                      "gemini-3.1-pro-preview",
-                      "gemini-3-flash-preview",
-                      "claude-sonnet-4-6",
-                      "claude-opus-4-6",
-                      "gpt-oss-120b",
-                    ]
-                      .map((m, _i) => (
-                        <code
-                          key={m}
-                          style={{
-                            background: "var(--bg-3)",
-                            color: "var(--text)",
-                            padding: "0 0.25rem",
-                            borderRadius: "0.25rem",
-                            fontSize: "0.75rem",
-                          }}
-                        >
-                          {m}
-                        </code>
-                      ))
-                      .reduce<React.ReactNode[]>((acc, el, i) => {
-                        if (i !== 0) acc.push(" / ");
-                        acc.push(el);
-                        return acc;
-                      }, [])}
-                  </span>
-                </li>
-              </ul>
-            </div>
-          </div>
-
-          {/* Model table */}
-          <h3 className={styles.secH3} style={{ color: "var(--orange)", marginTop: "1.5rem" }}>
-            🤖 現在サポートされるモデル（2026年5月23日時点）
-          </h3>
-          <div className={`${styles.tableWrap} ${styles.modelTable}`}>
-            <table
-              className={styles.table}
-              style={{ background: "var(--bg-2)", borderRadius: "0.75rem", overflow: "hidden" }}
-            >
-              <thead>
-                <tr style={{ background: "rgba(249, 115, 22, 0.15)" }}>
-                  <th
-                    className={styles.tdLeft}
-                    style={{
-                      border: "1px solid rgba(249, 115, 22, 0.3)",
-                      padding: "0.5rem 1rem",
-                      fontWeight: 700,
-                      color: "var(--text)",
-                    }}
-                  >
-                    モデルID
-                  </th>
-                  <th
-                    style={{
-                      border: "1px solid rgba(249, 115, 22, 0.3)",
-                      padding: "0.5rem 1rem",
-                      fontWeight: 700,
-                      color: "var(--text)",
-                    }}
-                  >
-                    推奨用途
-                  </th>
-                  <th
-                    style={{
-                      border: "1px solid rgba(249, 115, 22, 0.3)",
-                      padding: "0.5rem 1rem",
-                      fontWeight: 700,
-                      color: "var(--text)",
-                    }}
-                  >
-                    ステータス
-                  </th>
-                  <th
-                    style={{
-                      border: "1px solid rgba(249, 115, 22, 0.3)",
-                      padding: "0.5rem 1rem",
-                      fontWeight: 700,
-                      color: "var(--text)",
-                    }}
-                  >
-                    対応ツール
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td
-                    className={`${styles.tdLeft} ${styles.mono} ${styles.textSlate}`}
-                    style={{
-                      border: "1px solid rgba(249, 115, 22, 0.2)",
-                      padding: "0.5rem 1rem",
-                      color: "var(--text-subtle)",
-                    }}
-                  >
-                    gemini-3-flash-preview
-                  </td>
-                  <td
-                    className={styles.textSlate}
-                    style={{
-                      border: "1px solid rgba(249, 115, 22, 0.2)",
-                      padding: "0.5rem 1rem",
-                      textAlign: "center",
-                      color: "var(--text-subtle)",
-                    }}
-                  >
-                    コードレビュー・テスト・実装・オーケストレーター
-                  </td>
-                  <td
-                    style={{
-                      border: "1px solid rgba(249, 115, 22, 0.2)",
-                      padding: "0.5rem 1rem",
-                      textAlign: "center",
-                    }}
-                  >
-                    <span className={`${styles.badge} ${styles.badgeGreen}`}>
-                      ✅ デフォルト推奨
-                    </span>
-                  </td>
-                  <td
-                    style={{
-                      border: "1px solid rgba(249, 115, 22, 0.2)",
-                      padding: "0.5rem 1rem",
-                      textAlign: "center",
-                    }}
-                  >
-                    <span className={`${styles.badge} ${styles.badgeGreen}`}>両方</span>
-                  </td>
-                </tr>
-                <tr style={{ background: "rgba(249, 115, 22, 0.05)" }}>
-                  <td
-                    className={`${styles.tdLeft} ${styles.mono} ${styles.textSlate}`}
-                    style={{
-                      border: "1px solid rgba(249, 115, 22, 0.2)",
-                      padding: "0.5rem 1rem",
-                      color: "var(--text-subtle)",
-                    }}
-                  >
-                    gemini-3.1-pro-preview
-                  </td>
-                  <td
-                    className={styles.textSlate}
-                    style={{
-                      border: "1px solid rgba(249, 115, 22, 0.2)",
-                      padding: "0.5rem 1rem",
-                      textAlign: "center",
-                      color: "var(--text-subtle)",
-                    }}
-                  >
-                    アーキテクチャ設計・セキュリティ監査（ARC-AGI-2: 77.1%）
-                  </td>
-                  <td
-                    style={{
-                      border: "1px solid rgba(249, 115, 22, 0.2)",
-                      padding: "0.5rem 1rem",
-                      textAlign: "center",
-                    }}
-                  >
-                    <span className={`${styles.badge} ${styles.badgeViolet}`}>
-                      ⭐ 新世代最高精度
-                    </span>
-                  </td>
-                  <td
-                    style={{
-                      border: "1px solid rgba(249, 115, 22, 0.2)",
-                      padding: "0.5rem 1rem",
-                      textAlign: "center",
-                    }}
-                  >
-                    <span className={`${styles.badge} ${styles.badgeGreen}`}>両方</span>
-                  </td>
-                </tr>
-                <tr>
-                  <td
-                    className={`${styles.tdLeft} ${styles.mono} ${styles.textSlate}`}
-                    style={{
-                      border: "1px solid rgba(249, 115, 22, 0.2)",
-                      padding: "0.5rem 1rem",
-                      color: "var(--text-subtle)",
-                    }}
-                  >
-                    gemini-2.5-flash
-                  </td>
-                  <td
-                    className={styles.textSlate}
-                    style={{
-                      border: "1px solid rgba(249, 115, 22, 0.2)",
-                      padding: "0.5rem 1rem",
-                      textAlign: "center",
-                      color: "var(--text-subtle)",
-                    }}
-                  >
-                    安定運用・コスパ重視
-                  </td>
-                  <td
-                    style={{
-                      border: "1px solid rgba(249, 115, 22, 0.2)",
-                      padding: "0.5rem 1rem",
-                      textAlign: "center",
-                    }}
-                  >
-                    <span className={`${styles.badge} ${styles.badgeSky}`}>✅ 安定版</span>
-                  </td>
-                  <td
-                    style={{
-                      border: "1px solid rgba(249, 115, 22, 0.2)",
-                      padding: "0.5rem 1rem",
-                      textAlign: "center",
-                    }}
-                  >
-                    <span
-                      className={styles.badge}
-                      style={{ background: "#ccfbf1", color: "#0f766e" }}
-                    >
-                      Gemini CLI
-                    </span>
-                  </td>
-                </tr>
-                <tr style={{ background: "rgba(249, 115, 22, 0.05)" }}>
-                  <td
-                    className={`${styles.tdLeft} ${styles.mono}`}
-                    style={{
-                      border: "1px solid rgba(249, 115, 22, 0.2)",
-                      padding: "0.5rem 1rem",
-                      color: "var(--text-muted)",
-                    }}
-                  >
-                    gemini-2.0-flash
-                  </td>
-                  <td
-                    style={{
-                      border: "1px solid rgba(249, 115, 22, 0.2)",
-                      padding: "0.5rem 1rem",
-                      textAlign: "center",
-                      color: "var(--text-muted)",
-                      fontSize: "0.75rem",
-                    }}
-                  >
-                    （廃止予定）
-                  </td>
-                  <td
-                    style={{
-                      border: "1px solid rgba(249, 115, 22, 0.2)",
-                      padding: "0.5rem 1rem",
-                      textAlign: "center",
-                    }}
-                  >
-                    <span className={`${styles.badge} ${styles.badgeRose}`}>
-                      ⚠️ 2026-06-01 廃止予定
-                    </span>
-                  </td>
-                  <td
-                    style={{
-                      border: "1px solid rgba(249, 115, 22, 0.2)",
-                      padding: "0.5rem 1rem",
-                      textAlign: "center",
-                    }}
-                  >
-                    <span
-                      className={styles.badge}
-                      style={{ background: "#ccfbf1", color: "#0f766e" }}
-                    >
-                      Gemini CLI
-                    </span>
-                  </td>
-                </tr>
-                <tr>
-                  <td
-                    className={`${styles.tdLeft} ${styles.mono} ${styles.textSlate}`}
-                    style={{
-                      border: "1px solid rgba(249, 115, 22, 0.2)",
-                      padding: "0.5rem 1rem",
-                      color: "var(--text-subtle)",
-                    }}
-                  >
-                    claude-sonnet-4-6
-                  </td>
-                  <td
-                    className={styles.textSlate}
-                    style={{
-                      border: "1px solid rgba(249, 115, 22, 0.2)",
-                      padding: "0.5rem 1rem",
-                      textAlign: "center",
-                      color: "var(--text-subtle)",
-                    }}
-                  >
-                    Anthropic モデル（Antigravity 対応）
-                  </td>
-                  <td
-                    style={{
-                      border: "1px solid rgba(249, 115, 22, 0.2)",
-                      padding: "0.5rem 1rem",
-                      textAlign: "center",
-                    }}
-                  >
-                    <span className={`${styles.badge} ${styles.badgeAmber}`}>✅ 対応</span>
-                  </td>
-                  <td
-                    style={{
-                      border: "1px solid rgba(249, 115, 22, 0.2)",
-                      padding: "0.5rem 1rem",
-                      textAlign: "center",
-                    }}
-                  >
-                    <span className={`${styles.badge} ${styles.badgeViolet}`}>Antigravity</span>
-                  </td>
-                </tr>
-                <tr style={{ background: "rgba(249, 115, 22, 0.05)" }}>
-                  <td
-                    className={`${styles.tdLeft} ${styles.mono} ${styles.textSlate}`}
-                    style={{
-                      border: "1px solid rgba(249, 115, 22, 0.2)",
-                      padding: "0.5rem 1rem",
-                      color: "var(--text-subtle)",
-                    }}
-                  >
-                    claude-opus-4-6
-                  </td>
-                  <td
-                    className={styles.textSlate}
-                    style={{
-                      border: "1px solid rgba(249, 115, 22, 0.2)",
-                      padding: "0.5rem 1rem",
-                      textAlign: "center",
-                      color: "var(--text-subtle)",
-                    }}
-                  >
-                    Anthropic 最高精度（Antigravity 対応）
-                  </td>
-                  <td
-                    style={{
-                      border: "1px solid rgba(249, 115, 22, 0.2)",
-                      padding: "0.5rem 1rem",
-                      textAlign: "center",
-                    }}
-                  >
-                    <span className={`${styles.badge} ${styles.badgeAmber}`}>✅ 対応</span>
-                  </td>
-                  <td
-                    style={{
-                      border: "1px solid rgba(249, 115, 22, 0.2)",
-                      padding: "0.5rem 1rem",
-                      textAlign: "center",
-                    }}
-                  >
-                    <span className={`${styles.badge} ${styles.badgeViolet}`}>Antigravity</span>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        {/* s11: sources */}
-        <section id="sources" className={styles.sec}>
-          <h2 className={styles.secTitle}>📚 参考ソース一覧（{SOURCES.length} 件）</h2>
-          <div className={styles.sources}>
-            {SOURCES.map((s) => (
-              <div key={s.num} className={styles.src}>
-                <span className={styles.snum}>{s.num}</span>
-                <div>
-                  <a href={s.href} target="_blank" rel="noopener noreferrer">
-                    {s.title}
-                  </a>
-                  <span className={styles.sdesc}>{s.desc}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* s12: footer */}
         <footer className={styles.footer}>
-          <div className={styles.footerTitle}>
-            SKILL.md 完全ガイド — Gemini CLI v0.43.0 (最終) &amp; Antigravity v2.0.1 対応版
-          </div>
-          <div className={styles.footerSub}>
-            Based on official documentation from Google Gemini, Antigravity, and Agent Skills Open
-            Standard
-          </div>
-          <div className={styles.footerMeta} data-last-updated="footer">
-            最終更新: 2026年5月23日
-          </div>
+          <p>
+            SKILL.md 実践ベストプラクティスガイド(Google Antigravity 対応版) —
+            2026年7月26日時点の情報に基づき作成
+          </p>
         </footer>
-      </div>
+      </main>
     </div>
   );
 }

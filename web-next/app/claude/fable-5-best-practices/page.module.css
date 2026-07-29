@@ -16,9 +16,9 @@
   --danger: #ff8080;
   --danger-soft: rgba(255, 128, 128, 0.1);
   --good: #7ee0b8;
-  --font-display: 'Space Grotesk', system-ui, -apple-system, sans-serif;
-  --font-body: 'Inter', system-ui, -apple-system, sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
+  --font-display: "Space Grotesk", system-ui, -apple-system, sans-serif;
+  --font-body: "Inter", system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
   --sidebar-w: 296px;
 
   display: flex;
@@ -32,7 +32,7 @@
 }
 
 .pageContainer::before {
-  content: '';
+  content: "";
   position: fixed;
   inset: 0;
   background-image:
@@ -123,7 +123,7 @@
 }
 
 .toc::before {
-  content: '';
+  content: "";
   position: absolute;
   left: 15px;
   top: 8px;
@@ -140,7 +140,9 @@
   color: var(--text-dim);
   text-decoration: none;
   border-radius: 8px;
-  transition: color 0.15s ease, background 0.15s ease;
+  transition:
+    color 0.15s ease,
+    background 0.15s ease;
   line-height: 1.4;
 }
 
@@ -150,7 +152,7 @@
 }
 
 .tocLink::before {
-  content: '';
+  content: "";
   position: absolute;
   left: 12px;
   top: 14px;
@@ -300,7 +302,8 @@
   color: var(--text);
 }
 
-.main ul, .main ol {
+.main ul,
+.main ol {
   margin: 0 0 24px;
   padding-left: 24px;
 }
@@ -578,12 +581,16 @@
   text-decoration: underline;
 }
 
-
 /* ---------- Custom Visual Timeline (Section 2) ---------- */
-.timeline {
+.timelineWrap {
   position: relative;
   margin: 32px 0;
+}
+
+.timeline {
+  margin: 0;
   padding-left: 0;
+  list-style: none;
 }
 
 .timelineTrack {
@@ -686,34 +693,85 @@
 }
 
 /* Phase color variants */
-.tlLaunch .timelineDot     { background: #7c9eff; }
-.tlLaunch .timelineConnector { background: rgba(124,158,255,0.3); }
-.tlLaunch .timelineCard    { background: rgba(124,158,255,0.07); border-color: #7c9eff; }
-.tlLaunch .timelineTag     { background: rgba(124,158,255,0.18); color: #a0b8ff; }
+.tlLaunch .timelineDot {
+  background: #7c9eff;
+}
+.tlLaunch .timelineConnector {
+  background: rgba(124, 158, 255, 0.3);
+}
+.tlLaunch .timelineCard {
+  background: rgba(124, 158, 255, 0.07);
+  border-color: #7c9eff;
+}
+.tlLaunch .timelineTag {
+  background: rgba(124, 158, 255, 0.18);
+  color: #a0b8ff;
+}
 
-.tlDanger .timelineDot     { background: #ff8080; }
-.tlDanger .timelineConnector { background: rgba(255,128,128,0.3); }
-.tlDanger .timelineCard    { background: rgba(255,128,128,0.07); border-color: #ff8080; }
-.tlDanger .timelineTag     { background: rgba(255,128,128,0.18); color: #ffaaaa; }
+.tlDanger .timelineDot {
+  background: #ff8080;
+}
+.tlDanger .timelineConnector {
+  background: rgba(255, 128, 128, 0.3);
+}
+.tlDanger .timelineCard {
+  background: rgba(255, 128, 128, 0.07);
+  border-color: #ff8080;
+}
+.tlDanger .timelineTag {
+  background: rgba(255, 128, 128, 0.18);
+  color: #ffaaaa;
+}
 
-.tlRecovery .timelineDot   { background: #7ee0b8; }
-.tlRecovery .timelineConnector { background: rgba(126,224,184,0.3); }
-.tlRecovery .timelineCard  { background: rgba(126,224,184,0.07); border-color: #7ee0b8; }
-.tlRecovery .timelineTag   { background: rgba(126,224,184,0.18); color: #a0eecf; }
+.tlRecovery .timelineDot {
+  background: #7ee0b8;
+}
+.tlRecovery .timelineConnector {
+  background: rgba(126, 224, 184, 0.3);
+}
+.tlRecovery .timelineCard {
+  background: rgba(126, 224, 184, 0.07);
+  border-color: #7ee0b8;
+}
+.tlRecovery .timelineTag {
+  background: rgba(126, 224, 184, 0.18);
+  color: #a0eecf;
+}
 
-.tlPromo .timelineDot      { background: #ffb873; }
-.tlPromo .timelineConnector { background: rgba(255,184,115,0.3); }
-.tlPromo .timelineCard     { background: rgba(255,184,115,0.07); border-color: #ffb873; }
-.tlPromo .timelineTag      { background: rgba(255,184,115,0.18); color: #ffd09a; }
+.tlPromo .timelineDot {
+  background: #ffb873;
+}
+.tlPromo .timelineConnector {
+  background: rgba(255, 184, 115, 0.3);
+}
+.tlPromo .timelineCard {
+  background: rgba(255, 184, 115, 0.07);
+  border-color: #ffb873;
+}
+.tlPromo .timelineTag {
+  background: rgba(255, 184, 115, 0.18);
+  color: #ffd09a;
+}
 
-.tlNew .timelineDot        { background: #c084fc; }
-.tlNew .timelineConnector  { background: rgba(192,132,252,0.3); }
-.tlNew .timelineCard       { background: rgba(192,132,252,0.07); border-color: #c084fc; }
-.tlNew .timelineTag        { background: rgba(192,132,252,0.18); color: #dbb0fe; }
+.tlNew .timelineDot {
+  background: #c084fc;
+}
+.tlNew .timelineConnector {
+  background: rgba(192, 132, 252, 0.3);
+}
+.tlNew .timelineCard {
+  background: rgba(192, 132, 252, 0.07);
+  border-color: #c084fc;
+}
+.tlNew .timelineTag {
+  background: rgba(192, 132, 252, 0.18);
+  color: #dbb0fe;
+}
 
 .timelineLegend {
   display: flex;
   flex-wrap: wrap;
+  list-style: none;
   gap: 12px 20px;
   margin: 20px 0 28px;
   padding: 14px 18px;
@@ -777,7 +835,9 @@
     transform: translateX(-100%);
     visibility: hidden;
     pointer-events: none;
-    transition: transform 0.3s ease, visibility 0s 0.3s;
+    transition:
+      transform 0.3s ease,
+      visibility 0s 0.3s;
   }
 
   .sidebarOpen {
@@ -805,7 +865,8 @@
     cursor: pointer;
   }
 
-  .section, .hero {
+  .section,
+  .hero {
     padding-left: 24px;
     padding-right: 24px;
   }

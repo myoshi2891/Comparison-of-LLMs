@@ -94,7 +94,7 @@ describe("Accessibility Automated Audit (axe-core)", () => {
       },
     });
     expect(results).toHaveNoViolations();
-  });
+  }, 15000);
 
   it("HarnessEngineeringPage has no accessibility violations", async () => {
     const { container } = render(<HarnessEngineeringPage />);

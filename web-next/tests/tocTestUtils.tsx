@@ -298,6 +298,95 @@ export function registerObserverOnlyTocSuite({
   });
 }
 
+interface BasicObserverTocConfig {
+  TocObserver: ComponentType;
+  activeClassName: string;
+  linkClassName?: string;
+  navClassName?: string;
+  sectionClassName?: string;
+}
+
+/**
+ * Registers shared coverage tests for simple IntersectionObserver-based TOCs
+ * whose link and section selectors differ between migrated guide pages.
+ */
+export function registerBasicObserverTocSuite({
+  TocObserver,
+  activeClassName,
+  linkClassName,
+  navClassName,
+  sectionClassName,
+}: BasicObserverTocConfig): void {
+  let io: IntersectionObserverController;
+
+  beforeEach(() => {
+    io = installIntersectionObserverStub();
+  });
+  afterEach(() => {
+    cleanup();
+  });
+
+  /**
+   * Renders the TOC test fixture with optional navigation links.
+   *
+   * @param withLinks - Whether to include links for the observed sections.
+   * @returns The rendered test fixture.
+   */
+  function renderToc(withLinks = true) {
+    return render(
+      <main>
+        <nav className={navClassName}>
+          {withLinks ? (
+            <>
+              <a className={linkClassName} href="#s1">
+                S1
+              </a>
+              <a className={linkClassName} href="#s2">
+                S2
+              </a>
+            </>
+          ) : null}
+        </nav>
+        <section id="s1" className={sectionClassName} />
+        <section id="s2" className={sectionClassName} />
+        <TocObserver />
+      </main>
+    );
+  }
+
+  test("observes both sections and activates the first link initially", () => {
+    const { container } = renderToc();
+    const links = container.querySelectorAll("a");
+
+    expect(io.observedTargets).toHaveLength(2);
+    expect(links[0].classList.contains(activeClassName)).toBe(true);
+  });
+
+  test("ignores non-intersecting entries and activates the matching link", () => {
+    const { container } = renderToc();
+    const links = container.querySelectorAll("a");
+    const secondSection = container.querySelector("#s2") as Element;
+
+    io.emit([{ target: secondSection, isIntersecting: false }]);
+    expect(links[0].classList.contains(activeClassName)).toBe(true);
+
+    io.emit([{ target: secondSection, isIntersecting: true }]);
+    expect(links[0].classList.contains(activeClassName)).toBe(false);
+    expect(links[1].classList.contains(activeClassName)).toBe(true);
+  });
+
+  test("handles pages without TOC links", () => {
+    renderToc(false);
+    expect(io.observedTargets).toHaveLength(2);
+  });
+
+  test("disconnects the observer on unmount", () => {
+    const { unmount } = renderToc();
+    unmount();
+    expect(io.disconnectCount).toBe(1);
+  });
+}
+
 interface ClassSelectedObserverTocConfig {
   TocObserver: ComponentType;
   linkClassName: string;

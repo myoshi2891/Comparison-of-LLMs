@@ -387,10 +387,11 @@ Coworkにタスクを渡す前後で、以下を確認する運用がおすす�
 [^4]: Assign tasks from anywhere in Claude Cowork | Claude Help Center — https://support.claude.com/en/articles/13947068-assign-tasks-from-anywhere-in-claude-cowork
 [^6]: "How we built Claude Code auto mode: a safer way to skip permissions" | Anthropic Engineering — https://www.anthropic.com/engineering/claude-code-auto-mode
 [^7]: "Customize Claude Code with plugins" | Anthropic News — https://anthropic.com/news/claude-code-plugins
-[^15]: "Anthropic brings agentic plug-ins to Cowork" | TechCrunch（Anthropicの発表を報道） — https://www.techcrunch.com/2026/01/30/anthropic-brings-agentic-plugins-to-cowork/
 [^30]: Claude in Chrome permissions guide | Claude Help Center（権限モードの解説） — https://support.claude.com/en/articles/12902446-claude-in-chrome-permissions-guide
 
-**著名な開発者・パワーユーザーの発信**
+**著名な開発者・パワーユーザーの発信・報道**
+
+[^15]: "Anthropic brings agentic plug-ins to Cowork" | TechCrunch（Anthropicの発表を報道） — https://www.techcrunch.com/2026/01/30/anthropic-brings-agentic-plugins-to-cowork/
 
 [^8]: Nav Toor氏の"17 Best Practices"を取り上げた解説記事（KiKi, note） — https://note.com/_kihonushi/n/nd726246d467f?hl=en-US
 [^9]: Nav Toor（@heynavtoor）, "17 Best Practices That Make Claude Cowork 100x More Powerful" | X — https://x.com/heynavtoor/status/2028148844891152554

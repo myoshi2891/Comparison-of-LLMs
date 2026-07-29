@@ -87,6 +87,11 @@
   status = 301
 
 [[redirects]]
+  from   = "/google/skill-guide-intermediate"
+  to     = "/google/antigravity-best-practices"
+  status = 301
+
+[[redirects]]
   from   = "/gemini/antigravity-guide.html"
   to     = "/gemini/antigravity-guide"
   status = 301

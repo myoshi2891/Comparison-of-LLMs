@@ -1,7 +1,8 @@
 # プロジェクト進捗・ステータス (PROGRESS.md)
 
 > 本ファイルは Next.js 移行完了後の保守・改善フェーズにおける開発の進捗（特にテスト関連）および品質チェックのルールを記録する。
-> - 最終更新日: **Updated 2026-07-28**
+>
+> - 最終更新日: **Updated 2026-07-29**
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
 
@@ -10,15 +11,33 @@
 - **フェーズ**: 保守・機能改善・品質強化フェーズ
 - **ブランチ**: `dev`（本番 `main` への Next.js 移行マージ完了 🚀）
 - **動作検証**:
-  - `bun run build` ✅（`web-next` の全ルートが Static プリレンダリングされる。※Antigravity環境では実行禁止）
-  - `bun run typecheck` ✅
-  - `npm run lint` ⚠️（**27 errors / 2 warnings**。今回のレビュー範囲外を含む既存の未整形・semantic 診断が残るため、全体自動修正は未実施）
+  - `npm run build` ⏭️（依頼により未実行。Antigravity環境では実行禁止、CI または他環境では必須）
+  - `npm run typecheck` ✅
+  - `npm run lint` ✅（385 files checked）
 - **テストの実行状況**:
-- **フロントエンド (`web-next/`)**: Vitest 実行で **1232 件すべて合格** (全 Green ✅)
+  - **フロントエンド (`web-next/`)**: Vitest **137 files / 1259 tests すべて合格**（収集失敗なし）
   - **バックエンド (`scraper/`)**: pytest 実行で **43 件すべて合格** (全 Green ✅)
 
 ## 最近の追加内容
 
+- **SonarQube CI のaxeタイムアウト・新規コードカバレッジ修正**: coverage計測時にAntigravity a11y監査が既定5秒でタイムアウトし、未完了axeと後続監査が競合する問題を、同規模ページと同じ15秒上限で解消。Sonarが新規コードとして検出したClaude TocObserver 3ファイルへ分岐テスト12件を追加し、対象3ファイルの行・条件カバレッジを各100%にした。目視・ビルドは依頼により省略。`npm run test:coverage` は **137 files / 1259 tests**、全体 line coverage **92.79%**、typecheck、lint **385 files / 0 diagnostics** がGreen。
+
+- **レビュー指摘の再照合とセマンティクス・安全性修正**: 現行コードで全指摘を再検証し、シェル手順の exact-line CSS 変数照合・静的サーバー PID cleanup・チェックサム失敗時停止を修正。Cowork チェックボックスのラベル関連付け、Fable 5 の凡例/タイムライン list semantics、Skill frontmatter 必須説明と命名制約、Antigravity の用語・Review Policy・SHA-256検証パス、TechCrunch出典の第三者報道ラベル、TOC の DOM 順選択、CSS font fallback、共有 `Ext`、目次データ駆動化を反映した。テストは DOM 出力ベースへ堅牢化し、共有 Mermaid は未指定時 `16px`、明示 `fontSize` は保持する契約へ更新。目視・ビルドは依頼により省略。Vitest **134 files / 1247 tests**、typecheck、lint **382 files / 0 diagnostics**、pytest **43 tests** はすべて Green。
+
+- **レビュー指摘の現行コード照合と品質修正**: Antigravity CLI ガイドを v1.1.5+ の `/effort` / `--effort`、固定コミット URL・SHA-256・厳密な MCP パッケージバージョン、現行 MCP 設定キーへ同期。削除済み Google コンポーネントへのテスト参照を除去し、共有 `MermaidDiagram` の数値 `maxHeight` を CSS px へ正規化。移行ページ群の Biome 診断もファイル単位で解消した。目視・ビルドは依頼により省略。Vitest **133 files / 1240 tests**、typecheck、lint、pytest **43 tests** はすべて Green。
+
+- **Google Antigravity 完全ガイド — エコシステムとベストプラクティス（/google/antigravity-best-practices）の Pure JSX 完全置き換え移行**: `Google-antigravity-best-practices.html` を `web-next/app/google/antigravity-best-practices/page.tsx` に Pure JSX として完全忠実移植 🚀。要約・省略なしで全15セクション（全15H2セクション、全表、全コードブロック、3 Mermaid図、全参考文献等）・TOCスクロール追従（`TocObserver.tsx`）・横幅画面いっぱい（100%）・`page-registry.ts` 登録・更新を完了。旧 `/google/skill-guide-intermediate` を新URLへ完全置き換え完了。原本 `Google-antigravity-best-practices.html` / `Google-antigravity-best-practices.md` は `archive/html/google/` および `archive/md/google/` へ `git mv` 退避保存。契約テストを更新。
+
+- **SKILL.md 実践ベストプラクティスガイド（/google/skill-guide）の Pure JSX 完全置き換え移行**: `Skill-md-antigravity-best-practices.html` を `web-next/app/google/skill-guide/page.tsx` に Pure JSX として完全忠実移植 🚀。要約・省略なしで全12セクション（全12H2セクション、全表、全コードブロック、2 Mermaid図、全参考文献等）・TOCスクロール追従（`TocObserver.tsx`）・外部リンク安全属性・`page-registry.ts` 登録確認を完了。既存の旧 `/google/skill-guide` コンテンツと完全入れ替え完了。原本 `Skill-md-antigravity-best-practices.html` / `Skill-md-antigravity-best-practices.md` は `archive/html/google/` および `archive/md/google/` へ `git mv` 退避保存。契約テスト（全12セクション検証）を更新。
+
+- **Google Antigravity AI仕様駆動開発ガイド（/google/agent）の Pure JSX 完全置き換え移行**: `Antigravity-spec-driven-dev-guide.html` を `web-next/app/google/agent/page.tsx` に Pure JSX として完全忠実移植 🚀。要約・省略なしで全10セクション（イントロ〜参考文献）・全表・全コードブロック・6 Mermaid図 (`diagram-0`〜`diagram-5`)・TOCスクロール追従（`TocObserver.tsx`）・外部リンク安全属性・`page-registry.ts`（`Antigravity AI仕様駆動開発`）登録を完了。既存の旧 `/google/agent`（Gemini マルチエージェント）コンテンツと完全入れ替え完了。原本 `Antigravity-spec-driven-dev-guide.html` および `Antigravity-spec-driven-dev-guide.md` は `archive/` へ `git mv` 退避保存。契約テスト（`section-1`〜`section-10` 検証）を更新。
+
+- **Antigravity CLI 完全ガイド（/google/antigravity-guide）の Pure JSX 完全置き換え移行**: `Antigravity-cli-guide.html` を `web-next/app/google/antigravity-guide/page.tsx` に Pure JSX として完全忠実移植 🚀。要約・省略なしで全16セクション（00〜15）・全表・全コードブロック・8 Mermaid図 (`diag-1`〜`diag-8`)・TOCスクロール追従（`TocObserver.tsx`）・外部リンク安全属性・`page-registry.ts` 登録を完了。既存の旧 `/google/antigravity-guide` コンテンツと完全入れ替え完了。原本 `Antigravity-cli-guide.html` は `archive/` へ `git mv` 退避保存。契約テストを更新し全クリア。
+
+- **ハーネスエンジニアリング入門ガイド（/claude/harness-engineering）の Pure JSX 完全置き換え移行**: `Harness-engineering-guide.html` を `web-next/app/claude/harness-engineering/page.tsx` に Pure JSX として完全忠実移植 🚀。要約・省略なしで全9セクション（intro, chapter1〜7, references）・全表・全コードブロック（hook.sh含む）・9 Mermaid図・TOCスクロール追従（`TocObserver.tsx`）・外部リンク安全属性・`page-registry.ts` 登録確認を完了。既存の旧 `harness-engineering` コンテンツと完全入れ替え完了。原本 `Harness-engineering-guide.html` / `Harness-engineering-guide.md` は `archive/html/Anthropic/` および `archive/md/Anthropic/` へ `git mv` 退避保存。契約テスト（9セクション検証）を更新。
+
+- **Claude Cowork 実践ガイド（/claude/cowork-guide）の Pure JSX 完全置き換え移行**: `Claude-cowork-best-practices.html` を `web-next/app/claude/cowork-guide/page.tsx` に Pure JSX として完全忠実移植 🚀。要約・省略なしで全12ステップ（STEP 0〜11）・納品前チェックリスト・参考文献・8 Mermaid図・TOCスクロール追従（`TocObserver.tsx`）・外部リンク安全属性・`page-registry.ts`（`Claude` カテゴリ）登録を完了。既存の旧 `cowork-guide` コンテンツと完全入れ替え完了。原本 `Claude-cowork-best-practices.html` / `Claude-cowork-best-practices.md` は `archive/html/Anthropic/` および `archive/md/Anthropic/` へ `git mv` 退避保存。契約テストを更新。
+- **SKILL.md 実践ガイド — Claude Code Agent Skills のベストプラクティス（/claude/skill-guide-intermediate）の Pure JSX 完全置き換え移行**: `Skill-md-best-practices.html` を `web-next/app/claude/skill-guide-intermediate/page.tsx` に Pure JSX として完全忠実移植 🚀。要約・省略なしで全17セクション・全表・全コードブロック・5 Mermaid図・TOCスクロール追従（`TocObserver.tsx`）・外部リンク安全属性・`page-registry.ts`（`Claude` カテゴリ）登録を完了。既存の旧 `skill-guide-intermediate` コンテンツと完全入れ替え完了。原本 `Skill-md-best-practices.html` / `Skill-md-best-practices.md` は `archive/html/Anthropic/` および `archive/md/Anthropic/` へ `git mv` 退避保存。契約テストを更新。
 - **レビュー追加指摘のアクセシビリティ・Mermaid・文書整合性修正**: Claude Agent / Fable 5 / AI SDD のモバイル目次で状態依存の `aria-label` と `aria-expanded` を同期し、閉状態を `visibility: hidden` + `pointer-events: none`、開状態を visible + interactive に統一。
   Gemini 静的 HTML の目次にも一意な ID / `aria-controls` / `aria-expanded` と開閉ラベル同期を追加。Harness Mermaid ソースをカラム0へ修正し、2つの Skill HTML では描画 Promise の rejection 時に既存 SVG を保持しつつ fallback 文言を表示。
   Claude Platform の `name` / `description` を任意とする frontmatter 説明と Fable 5 のヒーロー改訂日を基準日に同期。Vitest **1232 件** / typecheck 全 Green、lint は既存ベースラインの **27 errors / 2 warnings**（ビルド・目視確認は依頼により省略）。
@@ -30,6 +49,7 @@
 - **Claude Fable 5 追加 + 参考リンク集の更新（新2社カード・リンク切れ修正）**: コスト計算機の Anthropic 料金一覧に最上位モデル **Claude Fable 5**（$10 / $50 per 1M・1M ctx）を追加（`anthropic.py` の `_FALLBACKS`/`_TAG`/`_CLS`/`_SUB_*` 先頭、TDD）。参考リンク集（`RefLinks.tsx`）へ **Moonshot(Kimi) / Zhipu(GLM)** の公式料金ページカードを追加（16→18枚）し、リンク切れ3件を修正（Claude Code pricing `docs.anthropic.com/.../pricing`→`docs.claude.com/.../costs`、Windsurf `credits-and-billing`→`docs.windsurf.com/`、Junie `junie/faq/`→`help/junie/faq.html`）。Zhipu 料金は `z.ai/pricing` が 404 のため `docs.z.ai/guides/overview/pricing` を採用。全 URL を curl 実測で検証（403 のボット保護3件・FRED の HTTP/2 quirk は切れではないと確認）。`pricing.json` 3ファイルへ Fable を反映。Vitest **1203 件** / pytest **43 件** 全 Green。
 - **Google AI スクレイパーの `price_in` 誤スクレイプバグ修正（ライブ抽出を無効化）**: `providers/google.py` の `price_in` 抽出が、料金ページ上のモデル名手前の無関係な `$` 額を拾う正規表現バグ（逆順パターン `\$X ... model_key`）で全 Google AI モデルの入力価格を汚染していた。原因調査の結果、当該ページは TOC 重複・ラベル無し価格・1モデル複数価格併記のため正規表現抽出が構造的に不安定（実測で正しく取れるモデルが 0 件）と判明。TDD で ① 逆順パターン除去 → ② `input` キーワードアンカー追加を試行するも 2 モデルが残存したため、最終的にユーザー方針で **ライブ抽出を廃止し `_FALLBACKS`(SSoT/WebSearch確定値) を決定論的に採用**（Vertex と同扱い）。`scrape()` を `_FALLBACKS` 生成のみに簡素化（`get_page_text` 不使用）、`TestGoogle` をフォールバック固定・ネット非依存へ更新、smoke で Google を分離。設計判断を CLAUDE.md に固定（スクレイプ復活の禁止）。pytest **42 件合格（据え置き）**。
 - **2026-07 月次更新: 新規2社(Moonshot(Kimi)/Zhipu(GLM))追加 + 既存6社の 2026-07 モデル刷新**: Moonshot(Kimi)（Kimi K3 / K2.6）と Zhipu(GLM)（GLM-5.2 / GLM-4.6）を新規プロバイダースクレイパーとして追加（`providers/moonshot.py` / `zhipu.py`、`cls="tag-oss"`）。既存6社（Anthropic/OpenAI/Google/AWS/DeepSeek/xAI）の `_FALLBACKS` を GPT-5.6 系・Claude Sonnet 5・Gemini 3.6 Flash / 3.5 Flash-Lite・Grok 4.5・Amazon Nova Premier / Lite 追加で刷新。フロント側は唯一のハードコード `ApiTable.tsx` の `PROVIDER_COLORS` に新2社（Moonshot(Kimi)=`#818cf8` / Zhipu(GLM)=`#f472b6`）を追加（Red→Green、色検証テスト2件）。`pricing.json` を再生成（USD/JPY 163.47）し、Google AI 全モデルの `price_in` ライブ誤スクレイプ（ページ上の無関係な `$` 額を拾う既存の正規表現バグ）と Amazon Nova Premier の `price_out` を SSoT(`_FALLBACKS`) 値へ直接補正。provider ブロックの連続性・型パリティ・build/lint/typecheck を全 Green で確認（合計 **1202 テスト合格**、pytest **42 件合格**）。
+<!-- markdownlint-disable-next-line MD013 -->
 - **Mermaid 図解レイアウトの全サイト統一（中央寄せ・全幅・横スクロール）**: 共有コンポーネント `web-next/components/docs/MermaidDiagram.tsx` を2層構造（外側=`width:100%` / 内側=`display:flex; justify-content:center`、`useMaxWidth:false` + `mermaid.run` 後に svg へ `max-width:100%; height:auto` を付与）に変更し、**図解レイアウトの唯一の真実の源**とした。従来は約50ページの `page.module.css` が個別に `:global(.mermaid)` / `:global(svg)` の幅を強制しており、`svg{width:100%}`（引き伸ばし）／`svg{max-width:100%}`（縮小）／override 無し（左寄せ）の三分裂が起きていた。34 ページの per-page レイアウト強制ルールを削除（配色テーマルールは保持）し、`enterprise-agent-platform-intermediate` はフレーム装飾を `.diagramWrap` へ移設。併せてユーザー要望により 32 ページの本文カラムの固定 `max-width`（1000〜1200px のバラつき）を**統一の 1440px**（サイトの `.container` と同値。旧値より広くしつつワイド画面でのバランスを確保）に揃え、手書き（非 Mermaid）横並び図解の中央寄せも修正（`claude/skill`・`claude/agent`・`google/agent`・`codex/skill`・`copilot/skill`・`copilot/markdown-file-guide`・`copilot/agent`・`google/skill`・`google/antigravity-guide`）、`claude/skill-guide` は 900px 固定を外してサイドバートラックいっぱいに。Mermaid は列幅への縮小フィット＋中央寄せに変更。静的ビルドを別ポートで配信し **Playwright でレンダリング座標を実測**して全図の中央寄せ・全ページのコンテンツ幅を検証（残る左寄せ検出はヒーローのメタ/バッジ行のみで意図的）。`MermaidDiagram.test.tsx` を新設（Red→Green）、`gpt-5-6` 契約テストを新不変条件へ更新。不変条件を `.claude/rules/mermaid-diagram-layout.md` に固定し、`fix-mermaid` / `nextjs-page-migration` スキルをブラッシュアップ（合計 **1199 テスト合格**）。
 - **PR #126 SonarCloud Quality Gate の新規コードカバレッジを復旧**: Gemma、Kimi、Amazon Bedrock 2ページの `TocObserver.tsx` はページ契約テストで初期化だけが実行され、`IntersectionObserver` コールバックの32条件中26条件が未カバーだったため、新規コードカバレッジが47.7%（基準80%）まで低下していた。クラス選択型と `href` 解決型の共通テストスイートを追加し、4ファイルすべて行・条件カバレッジ100%を実測。テスト12件を追加して合計 **1195 テスト合格**とし、併せて既存ファイルのBiome指摘26 errors / 1 warningもファイル単位で全件解消した。
 - **Amazon Bedrock 活用ベストプラクティスガイドの Next.js 移行とグローバルナビ同期**: `Amazon-bedrock-best-practices-guide.html` を `web-next/app/infra/amazon-bedrock-best-practices-guide/page.tsx` に Pure JSX として完全忠実移植 🚀。要約・省略なしで全18セクション・全表・全コードブロック・6 Mermaid図・TOCスクロール追従・外部リンク安全属性・グローバルナビ（`運用・品質` グループ / `page-registry.ts`）登録を完了。原本 `Amazon-bedrock-best-practices-guide.html` は `archive/` へ `git mv` 退避。契約テスト5件を追加し全クリア（合計 **1183 テスト合格**）。
@@ -112,6 +132,7 @@
 総合的なテストカバレッジの詳細は [`docs/TEST_COVERAGE_PROGRESS.md`](TEST_COVERAGE_PROGRESS.md) および [`docs/coverage-dashboard.html`](coverage-dashboard.html) を参照のこと。
 
 ### テスト分野別のカバレッジ概要 (2026-06-01 時点)
+
 - **Unit**:
   - `app/` (全 23 ガイドページルート): ✅ 100% 契約テスト（タイトル、セクション数、rel、metadata）
   - `components/` (電卓 UI 9/9 コンポーネント): ✅ 100%
@@ -138,11 +159,13 @@
 `CLAUDE.md` の開発ルールを補完する、現在の保守フェーズで厳守すべきルールです。
 
 ### R1. Biome フォーマット・lint の適用スコープ
+
 - **禁止**: リポジトリ全体を対象とする自動修正 (`bun run lint:fix` / `biome check . --write` など引数なしの実行)
 - **理由**: 作業範囲外のファイルを意図せずフォーマットまたは修正し、差分を汚してしまうのを防ぐため。
 - **手順**: 変更したファイルのみを明示的にパス指定して実行すること (例: `bunx biome check --write web-next/app/some-page/page.tsx`)
 
 ### R2. 型定義の同期 (SSoT)
+
 - **原則**: スクレイパーの `scraper/src/scraper/models.py` (Pydantic) が Single Source of Truth (SSoT)。
 - **手順**: スキーマを変更する際は、必ず `web-next/types/pricing.ts` (TypeScript) を手動で更新し、`web-next/lib/pricing.ts` 内の `_AssertParity` が通ることを確認する。
 
@@ -174,16 +197,19 @@ cd scraper && uv run pytest
 移行（Phase 1–14, Phase A–F）が完了したため、今後は以下の継続的課題と改善に注力する。
 
 ### 1. 月次データアップデート（定常運用）
+
 毎月、各プロバイダー（Anthropic, Google, OpenAI など）の最新価格を反映させる。
 為替レート更新および `pricing.json` の型定義と `lib/pricing.ts` の `_AssertParity` の一致を確認する。
 加えて、**`/code-review/tool-pricing` の料金**（`app/code-review/tool-pricing/constants.ts`）も毎月見直す。
 各エントリの `sourceUrl`（公式 pricing ページ）を辿って `price` / `priceCheckedAt` を更新し、ページ全体の `PRICE_CHECKED_AT` を当月へ更新する。
 
 ### 2. テストカバレッジの拡充
+
 [`docs/TEST_COVERAGE_PROGRESS.md`](TEST_COVERAGE_PROGRESS.md) で `missing` または `partial` となっている領域のテストを順次追加する。
 特に **E2Eテストの導入**、**アクセシビリティ自動検証テストの追加**、**セキュリティ監査ゲートの整備** に注力する。
 
 ### 3. 表示パフォーマンスおよび Core Web Vitals の監視
+
 Netlify 上での SSG (Static Site Generation) 出力物の Lighthouse 計測を行い、LCP (Largest Contentful Paint) や INP (Interaction to Next Paint) が高スコアを維持しているか監視する。
 
 ---
@@ -227,7 +253,7 @@ Next.js 移行完了後のリポジトリ `LLM-Studies` にて、テストカバ
 Next.js 移行完了後のリポジトリ `LLM-Studies` の保守・改善作業を再開してください。
 
 - リポジトリ: LLM-Studies (Next.js 移行プロジェクトは dev/main へ完全マージ済み)
-  - 現在のステータス: docs/PROGRESS.md を参照。テストは Vitest (1203/1203 passed) / pytest (43/43 passed) で全 Green
+  - 現在のステータス: docs/PROGRESS.md を参照。Vitest は 137 files / 1259 tests passed、pytest は 43/43 passed
 - リポジトリ規約: CLAUDE.md (編集上の絶対ルール。※Antigravity環境ではビルドは実行禁止)
 
 作業方針：
