@@ -17,7 +17,7 @@ description: >
 
 # Mermaid v10 修正・スタイリングスキル
 
-Updated: 2026-07-24
+Updated: 2026-07-29
 
 ## 対象
 
@@ -397,16 +397,16 @@ return (
 
 詳細は `.claude/skills/nextjs-page-migration/SKILL.md` §「CSS Module 地雷チェックリスト」を参照。
 
-### ⚠️ `themeVariables.fontSize` に `"1rem"` を使わない（2026-07-29 追記）
+### ⚠️ `themeVariables.fontSize` は固定 px 値を使う（2026-07-29 追記）
 
-`MermaidDiagram.tsx` の `themeVariables.fontSize` に `"1rem"` を設定しても、図の種別によって解釈が異なり **サイズが不揃いになる**。必ず `"16px"` 等の固定ピクセル値を使うこと。
+`MermaidDiagram.tsx` は `themeVariables.fontSize` が未指定の場合に `"16px"` を使う。呼び出し側が指定した値は保持するが、`"1rem"` は図の種別によって解釈が異なり **サイズが不揃いになる**ため、上書きする場合も `"14px"` や `"18px"` などの固定ピクセル値を使うこと。
 
 ```tsx
-// ✅ 固定ピクセル値 — 全図種別で一貫したベースサイズになる
-themeVariables: { ...themeVariables, fontSize: "16px" }
+// ✅ 既定値は 16px。呼び出し側の固定 px 指定があれば保持する
+themeVariables: { fontSize: "16px", ...themeVariables }
 
 // ❌ NG — stateDiagram-v2 では巨大化し、flowchart では小さくなる
-themeVariables: { fontSize: "1rem", ...themeVariables }
+<MermaidDiagram chart={DIAGRAM} themeVariables={{ fontSize: "1rem" }} />
 ```
 
 SVG の `font-size` は継承可能である。ただし Mermaid が生成した SVG 内の `<text>` などに明示的な `font-size` がある場合は、その指定が継承値より優先される。そのため `.mermaidWrap { font-size: 1rem }` が効かない場合は、Mermaid 側の明示指定を確認する。
@@ -462,6 +462,6 @@ vi.mock("@/components/docs/MermaidDiagram", () => ({
 | **SVGが縦長に拡大される・縦横比が崩れる** | SVGに `width` 属性が残ったままに `width: 100%` | `removeAttribute('width')` → `width: auto; max-width: 100%` に変更 |
 | **（web-next）図解が左寄せ・右に空白** | ページ側 `:global(.mermaid)` の幅強制、または列幅より広い図 | ページ側の幅指定を削除しコンポーネントに委譲。広い図は svg `max-width:100%` で縮小フィット（Part 4） |
 | **（web-next）図解が切れて右にスクロール** | 旧 `overflow-x` スクロール方式が残存 | svg 後処理で `max-width:100%; height:auto`（縮小フィット＝切れない）に統一（Part 4） |
-| **`stateDiagram-v2` の文字が極端に大きい** | ノード数が少なく Mermaid が広い viewBox を生成している | `themeVariables.fontSize` は `"16px"` 固定のまま変えず、問題の図だけ `maxHeight` prop でピンポイント制限（Part 4 追記参照） |
-| **図解ごとにサイズが全然バラバラ** | `themeVariables.fontSize` に `"1rem"` を使っている | `"16px"` 等の固定ピクセル値に変更。SVG の `font-size` は継承可能だが、Mermaid が `<text>` などに生成した明示指定が優先される（Part 4 追記参照） |
+| **`stateDiagram-v2` の文字が極端に大きい** | ノード数が少なく Mermaid が広い viewBox を生成している | `themeVariables.fontSize` は既定の `"16px"`（または必要な固定 px 値）を使い、問題の図だけ `maxHeight` prop でピンポイント制限（Part 4 追記参照） |
+| **図解ごとにサイズが全然バラバラ** | `themeVariables.fontSize` に `"1rem"` を使っている | `"16px"` 等の固定ピクセル値に変更。未指定時はコンポーネントが `"16px"` を補い、明示した固定 px 値は保持される。SVG の `font-size` は継承可能だが、Mermaid が `<text>` などに生成した明示指定が優先される（Part 4 追記参照） |
 | **全 SVG に `max-height` をかけたら他の図が小さくなりすぎた** | グローバル制限で正常な図まで縮小されている | グローバル `:global(svg)` 制限を削除し、巨大化した図だけに `maxHeight` prop を指定する（Part 4 追記参照） |
