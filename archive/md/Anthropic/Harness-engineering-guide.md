@@ -274,10 +274,15 @@ flowchart LR
 
 ```bash
 #!/bin/bash
-set -e
-if ! OUTPUT=$(npm run typecheck 2>&1 && npm run lint 2>&1); then
-  echo "$OUTPUT" >&2
-  exit 2   # 終了コード2でエージェントに再対応を促す
+EXIT_CODE=0
+ERRORS=""
+
+TC_OUT=$(npm run typecheck 2>&1) || { EXIT_CODE=$?; ERRORS="${ERRORS}${TC_OUT}\n"; }
+LINT_OUT=$(npm run lint 2>&1) || { LINT_STATUS=$?; [ $EXIT_CODE -eq 0 ] && EXIT_CODE=$LINT_STATUS; ERRORS="${ERRORS}${LINT_OUT}\n"; }
+
+if [ $EXIT_CODE -ne 0 ]; then
+  printf "%b" "$ERRORS" >&2
+  exit $EXIT_CODE
 fi
 # 成功時は何も出力しない（コンテキストを汚さない）
 ```
