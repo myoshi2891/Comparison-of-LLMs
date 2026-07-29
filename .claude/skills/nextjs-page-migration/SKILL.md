@@ -74,8 +74,8 @@ Phase A–F で 18 枚のガイドページが `web-next/` App Router に**全�
 > 
 > **【必須検証プロセス: ラインバイライン全件要素照合監査】**
 > 実装時およびコードレビュー時には、必ず以下の **全件要素照合** を自律的に実行すること:
-> 1. **要素数カウント適合**: 原本の `<h2>`/`<h3>`数、`<table>`数、`<ul>`/`<ol>`数、`<pre>`/`<code>`数、外部リンク数をカウントし、JSX 側の要素数と完全一致することを確認する。
-> 2. **表・箇条書きの全項目走査**: 表の行数・列数、スラッシュコマンド数、設定キー数、キーショートカット数が1項目も脱落していないか、原本と1行ずつ突き合わせを行う。
+> 1. **監査対象**: 全セクション、全見出しレベル、全段落、全リスト項目、全コードブロック、全 SVG、全 callout/alert、全 table、全参考文献リンクを対象とする。
+> 2. **要素数と内容の照合**: 各監査対象の要素数をカウントして JSX 側と完全一致することを確認し、本文、表の全行・全列、箇条書き、スラッシュコマンド、設定キー、キーショートカットを原本と1件ずつ突き合わせる。
 > 3. **JSXパースチェック**: テキスト内の `<name>` や `<path>` などの山括弧が `&lt;` `&gt;` にエスケープされているか、生のバッククォートが放置されていないかを `grep_search` 等で静的スキャンする。
 
 - **Server Component デフォルト**。`"use client"` は `useState` が必要な場合のみ
@@ -416,4 +416,3 @@ cd web-next && bun run build && bun run lint && bun run test
 - **`globals.css` に存在しない CSS 変数を `var()` で参照しない** — 元 HTML の `:root` 定義は `page.module.css` の `.layout` / `.root` スコープ内に転写する（上記 CSS Module 地雷チェックリスト参照）。
 - **サイドバーの固定に `position: fixed` を無条件で使わない** — デスクトップでは `SiteHeader` の高さを考慮した `position: sticky; top: var(--header-height, 60px); height: calc(100vh - var(--header-height, 60px)); overflow-y: auto` を使用し、モバイルのオフキャンバス開閉動作に対してのみ `position: fixed` を明示的に許可する。
 - **`.sidebarToggle` のデフォルト `display: none` を省略しない** — メディアクエリ外でデフォルト非表示にし、`@media (max-width: 960px)` 内でのみ `display: flex` に上書きする。
-

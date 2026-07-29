@@ -10,12 +10,18 @@ SKILL.md 内の「→ references/implementation-reference.md 参照」が示す�
 bun run build は通っても実行時に透明・崩壊する無音バグを防ぐスクリプト。
 
 ```bash
+css_file=${1:-}
+if [ -z "$css_file" ] || [ ! -f "$css_file" ]; then
+  echo "Usage: $0 <path-to-page.module.css>" >&2
+  exit 1
+fi
+
 # page.module.css 内で定義されているローカル変数を抽出
-local_vars=$(grep -oE '^\s*--[a-zA-Z0-9_-]+\s*:' web-next/app/path/to/page.module.css \
+local_vars=$(grep -oE '^\s*--[a-zA-Z0-9_-]+\s*:' "$css_file" \
   | sed -E 's/^\s*(--[a-zA-Z0-9_-]+)\s*:/\1/' | sort -u)
 
 # 未定義変数だけを出力（ローカル定義でも globals.css 定義でもないもの）
-for var in $(grep -oE 'var\(\s*--[a-zA-Z0-9_-]+' web-next/app/path/to/page.module.css \
+for var in $(grep -oE 'var\(\s*--[a-zA-Z0-9_-]+' "$css_file" \
   | sed -E 's/var\(\s*(--[a-zA-Z0-9_-]+)/\1/' | sort -u); do
   echo "$local_vars" | grep -qWx "$var" && continue
   grep -q "$var:" web-next/app/globals.css || echo "未定義の変数: $var"
@@ -31,10 +37,10 @@ Playwright で描画座標を実測する。dev サーバーは負荷でクラ�
 
 ```bash
 # 1) 静的ビルドを配信（クリーンURL を *.html にマップする簡易サーバ）
-cd web-next && bun run build
-python3 -c "import http.server,os;R=os.path.abspath('out');H=type('H',(http.server.SimpleHTTPRequestHandler,),{'translate_path':lambda s,p:(lambda f:f+'.html' if os.path.isfile(f+'.html') else (os.path.join(f,'index.html') if os.path.isdir(f) else f))(os.path.join(R,p.split('?')[0].strip('/')) or R),'log_message':lambda *a:None});http.server.HTTPServer(('127.0.0.1',8099),H).serve_forever()" &
+(cd web-next && bun run build)
+(cd web-next && python3 -c "import http.server,os;R=os.path.abspath('out');H=type('H',(http.server.SimpleHTTPRequestHandler,),{'translate_path':lambda s,p:(lambda f:f+'.html' if os.path.isfile(f+'.html') else (os.path.join(f,'index.html') if os.path.isdir(f) else f))(os.path.join(R,p.split('?')[0].strip('/')) or R),'log_message':lambda *a:None});http.server.HTTPServer(('127.0.0.1',8099),H).serve_forever()") &
 # 2) scraper の Playwright で各要素の bounding box を測る
-cd scraper && uv run python <検証スクリプト>
+(cd scraper && uv run python <検証スクリプト>)
 ```
 
 判定の目安:
@@ -61,20 +67,25 @@ export default function TocObserver() {
   useEffect(() => {
     const sections = document.querySelectorAll("section.chapter");
     const links = Array.from(document.querySelectorAll(`.${styles.tocLink}`));
+    const intersecting = new Set<Element>();
     if (links.length > 0) links[0].classList.add(styles.tocLinkActive);
 
     const observer = new IntersectionObserver((entries) => {
       for (const entry of entries) {
-        if (entry.isIntersecting) {
-          const id = entry.target.id;
-          for (const l of links) {
-            if (l.getAttribute("href") === `#${id}`) {
-              l.classList.add(styles.tocLinkActive);
-            } else {
-              l.classList.remove(styles.tocLinkActive);
-            }
-          }
-        }
+        if (entry.isIntersecting) intersecting.add(entry.target);
+        else intersecting.delete(entry.target);
+      }
+
+      const [uppermost] = [...intersecting].sort(
+        (a, b) => a.getBoundingClientRect().top - b.getBoundingClientRect().top
+      );
+      if (!uppermost) return;
+
+      for (const link of links) {
+        link.classList.toggle(
+          styles.tocLinkActive,
+          link.getAttribute("href") === `#${uppermost.id}`
+        );
       }
     }, { rootMargin: "-15% 0px -70% 0px", threshold: 0 });
 
@@ -105,8 +116,32 @@ export default async function Page() {
 ## WAI-ARIA タブ UI 完全実装（Roving tabindex パターン）
 
 ```tsx
+const focusTab = (index: number) => {
+  const next = TABS[(index + TABS.length) % TABS.length];
+  document.getElementById(`tab-${next.id}`)?.focus();
+};
+
+const handleTabKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>, index: number) => {
+  if (event.key === "ArrowRight") {
+    event.preventDefault();
+    focusTab(index + 1);
+  } else if (event.key === "ArrowLeft") {
+    event.preventDefault();
+    focusTab(index - 1);
+  } else if (event.key === "Home") {
+    event.preventDefault();
+    focusTab(0);
+  } else if (event.key === "End") {
+    event.preventDefault();
+    focusTab(TABS.length - 1);
+  } else if (event.key === "Enter" || event.key === " ") {
+    event.preventDefault();
+    setActive(TABS[index].id);
+  }
+};
+
 <div role="tablist">
-  {TABS.map((t) => (
+  {TABS.map((t, index) => (
     <button
       key={t.id}
       id={`tab-${t.id}`}
@@ -115,6 +150,7 @@ export default async function Page() {
       aria-controls={`panel-${t.id}`}
       tabIndex={active === t.id ? 0 : -1}
       onClick={() => setActive(t.id)}
+      onKeyDown={(event) => handleTabKeyDown(event, index)}
     >
       {t.label}
     </button>
@@ -199,7 +235,7 @@ WAI-ARIA 使い分け早見表:
   max-width: 100%;
   margin: 0 auto;
   padding: 40px 56px 80px;
-  color: var(--text-tertiary);
+  color: var(--txt3);
   font-size: 12.5px;
   font-family: var(--font-mono), "JetBrains Mono", monospace;
   text-align: center;

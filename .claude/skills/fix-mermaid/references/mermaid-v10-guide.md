@@ -120,6 +120,7 @@ Mermaid v10.9.5 では `block-beta` の `style` 指令と角括弧ラベルの�
 ```html
 <!-- ✅ JSテンプレートリテラル方式（IDEが一切触れない） -->
 <div id="diag-0"></div>
+<div id="diag-1"></div>
 <script>
 const DIAGRAMS = {
   'diag-0': `graph LR

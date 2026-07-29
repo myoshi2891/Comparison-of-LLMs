@@ -403,7 +403,7 @@ return (
 
 ```tsx
 // ✅ 固定ピクセル値 — 全図種別で一貫したベースサイズになる
-themeVariables: { fontSize: "16px", ...themeVariables }
+themeVariables: { ...themeVariables, fontSize: "16px" }
 
 // ❌ NG — stateDiagram-v2 では巨大化し、flowchart では小さくなる
 themeVariables: { fontSize: "1rem", ...themeVariables }
