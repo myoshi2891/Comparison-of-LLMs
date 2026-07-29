@@ -35,9 +35,7 @@
   display: grid;
   grid-template-columns: 272px 1fr;
   min-height: 100vh;
-  max-width: 1440px;
   width: 100%;
-  margin: 0 auto;
 }
 
 @media (max-width: 980px) {
@@ -489,6 +487,7 @@
   padding: 24px;
   margin: 24px 0 32px;
   overflow-x: auto;
+  font-size: 1rem; /* Mermaid SVG の text 要素に 1rem を継承させる */
 }
 
 /* Footer */
