@@ -1279,7 +1279,7 @@ EXIT_CODE=0
 ERRORS=""
 
 TC_OUT=$(npm run typecheck 2&gt;&amp;1) || { EXIT_CODE=$?; ERRORS="${ERRORS}${TC_OUT}\n"; }
-LINT_OUT=$(npm run lint 2&gt;&amp;1) || { [ $EXIT_CODE -eq 0 ] &amp;&amp; EXIT_CODE=$?; ERRORS="${ERRORS}${LINT_OUT}\n"; }
+LINT_OUT=$(npm run lint 2&gt;&amp;1) || { LINT_STATUS=$?; [ $EXIT_CODE -eq 0 ] &amp;&amp; EXIT_CODE=$LINT_STATUS; ERRORS="${ERRORS}${LINT_OUT}\n"; }
 
 if [ $EXIT_CODE -ne 0 ]; then
   printf "%b" "$ERRORS" &gt;&amp;2
