@@ -5,8 +5,9 @@ import styles from "./page.module.css";
 
 export default function TocObserver() {
   useEffect(() => {
-    const sections = document.querySelectorAll("section[id]");
+    const sections = document.querySelectorAll("section[id], footer[id]");
     const links = Array.from(document.querySelectorAll(`.${styles.tocLink}`));
+    const intersecting = new Set<Element>();
     if (links.length > 0) {
       links[0].classList.add(styles.tocLinkActive);
     }
@@ -14,16 +15,20 @@ export default function TocObserver() {
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
-          if (entry.isIntersecting) {
-            const id = entry.target.id;
-            for (const l of links) {
-              if (l.getAttribute("href") === `#${id}`) {
-                l.classList.add(styles.tocLinkActive);
-              } else {
-                l.classList.remove(styles.tocLinkActive);
-              }
-            }
-          }
+          if (entry.isIntersecting) intersecting.add(entry.target);
+          else intersecting.delete(entry.target);
+        }
+
+        const [uppermost] = [...intersecting].sort(
+          (a, b) => a.getBoundingClientRect().top - b.getBoundingClientRect().top
+        );
+        if (!uppermost) return;
+
+        for (const link of links) {
+          link.classList.toggle(
+            styles.tocLinkActive,
+            link.getAttribute("href") === `#${uppermost.id}`
+          );
         }
       },
       { rootMargin: "-15% 0px -70% 0px", threshold: 0 }

@@ -139,12 +139,16 @@
         }
         .side-nav {
           transform: translateX(-100%);
+          visibility: hidden;
+          pointer-events: none;
           transition: transform 0.25s ease;
           z-index: 49;
           box-shadow: 20px 0 60px rgba(0, 0, 0, 0.5);
         }
         .side-nav.open {
           transform: translateX(0);
+          visibility: visible;
+          pointer-events: auto;
         }
       }
 

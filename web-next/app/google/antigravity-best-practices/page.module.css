@@ -103,6 +103,12 @@
   color: var(--color-text-primary);
 }
 
+.navLinkActive {
+  background: var(--color-background-info) !important;
+  color: var(--color-text-info) !important;
+  font-weight: 600;
+}
+
 .main {
   flex: 1;
   min-width: 0;

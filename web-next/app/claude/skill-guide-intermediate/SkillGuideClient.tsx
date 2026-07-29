@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { type ReactNode, useState } from "react";
 import styles from "./page.module.css";
 import TocObserver from "./TocObserver";
 
@@ -20,7 +20,7 @@ export default function SkillGuideClient({ children }: SkillGuideClientProps) {
         onClick={() => setSidebarOpen(!sidebarOpen)}
         aria-expanded={sidebarOpen}
         aria-controls="skillSidebar"
-        aria-label="目次を開く"
+        aria-label={sidebarOpen ? "目次を閉じる" : "目次を開く"}
       >
         <i className="ti ti-menu-2" />
       </button>

@@ -1964,7 +1964,7 @@ export default function AntigravityCliGuidePage() {
                 </div>
               </div>
               <p>
-                <code>AGENTS.md</code> にには TODO リストを書いておくのもおすすめです。「TODOリストの状況を教えて」と聞くだけで、エージェントが正確に現在地を把握して回答してくれます。
+                <code>AGENTS.md</code> には TODO リストを書いておくのもおすすめです。「TODOリストの状況を教えて」と聞くだけで、エージェントが正確に現在地を把握して回答してくれます。
               </p>
               <div className={styles.codeWrap}>
                 <div className={styles.codeBar}>

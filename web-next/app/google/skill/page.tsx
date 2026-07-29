@@ -570,7 +570,7 @@ export default function AgentSkillsGuidePage() {
                   <h4 className={styles.h4}>本文を段階的に構造化する</h4>
                   <p className={styles.p}>
                     <code className={styles.inlineCode}>SKILL.md</code>
-                    が長大になったら、使用頻度の低い詳細や排的なシナリオを
+                    が長大になったら、使用頻度の低い詳細や例外的なシナリオを
                     <code className={styles.inlineCode}>forms.md</code>
                     のような別ファイルに逃がし、リンクします。第3層の読み込みが本当に必要な場合にのみ発生し、トークン効率を維持できます。
                   </p>
