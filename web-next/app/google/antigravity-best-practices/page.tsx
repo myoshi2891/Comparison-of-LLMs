@@ -604,20 +604,22 @@ export default function AntigravityBestPracticesPage() {
           </p>
           <h3>4.4 GEMINI.md サンプル</h3>
           <div className={styles.codeLabel}>GEMINI.md</div>
-          <pre className={styles.codeBlock}><code>{`# GEMINI.md — グローバルルール
-
-## 私についてのコンテキスト
-私はフルスタックのFinanceアプリを開発するエンジニアです。
-フロントエンドはReact、バックエンドはPythonを使います。
-
-## コーディング規約
-- コミットメッセージは Conventional Commits に従う
-- すべての新規APIエンドポイントにはユニットテストを追加する
-- セキュリティ関連の変更は必ず実装計画(Plan)を提示してから着手する
-
-## 参照
-@security.md
-@testing-strategy.md`}</code></pre>
+          <div className={styles.codeBlock}>
+            <div className={styles.codeLine}><span className={styles.ch}># GEMINI.md — グローバルルール</span></div>
+            <div className={styles.codeLine}></div>
+            <div className={styles.codeLine}><span className={styles.ch}>## 私についてのコンテキスト</span></div>
+            <div className={styles.codeLine}>私はフルスタックのFinanceアプリを開発するエンジニアです。</div>
+            <div className={styles.codeLine}>フロントエンドはReact、バックエンドはPythonを使います。</div>
+            <div className={styles.codeLine}></div>
+            <div className={styles.codeLine}><span className={styles.ch}>## コーディング規約</span></div>
+            <div className={styles.codeLine}>- コミットメッセージは Conventional Commits に従う</div>
+            <div className={styles.codeLine}>- すべての新規APIエンドポイントにはユニットテストを追加する</div>
+            <div className={styles.codeLine}>- セキュリティ関連の変更は必ず実装計画(Plan)を提示してから着手する</div>
+            <div className={styles.codeLine}></div>
+            <div className={styles.codeLine}><span className={styles.ch}>## 参照</span></div>
+            <div className={styles.codeLine}><span className={styles.cv}>@security.md</span></div>
+            <div className={styles.codeLine}><span className={styles.cv}>@testing-strategy.md</span></div>
+          </div>
           <h3>4.5 GEMINI.md ベストプラクティス</h3>
           <ul>
             <li>
@@ -675,27 +677,31 @@ export default function AntigravityBestPracticesPage() {
           </p>
           <h3>5.3 SKILL.md の作り方</h3>
           <div className={styles.codeLabel}>Folder Structure</div>
-          <pre className={styles.codeBlock}><code>{`.agents/skills/
-└─ my-skill/
-    └─ SKILL.md`}</code></pre>
+          <div className={styles.codeBlock}>
+            <div className={styles.codeLine}><span className={styles.cm}>.agents/skills/</span></div>
+            <div className={styles.codeLine}>└─ <span className={styles.cv}>my-skill/</span></div>
+            <div className={styles.codeLine}>    └─ <span className={styles.ck}>SKILL.md</span></div>
+          </div>
           <div className={styles.codeLabel}>SKILL.md Template</div>
-          <pre className={styles.codeBlock}><code>{`---
-name: my-skill
-description: 特定タスクを支援する。XやYを行う必要がある時に使用する。
----
-
-# My Skill
-
-エージェントへの詳細な指示をここに書く。
-
-## このSkillを使うタイミング
-
-- こういう場合に使う
-- こういう場面で役立つ
-
-## 使い方
-
-エージェントが従うべきステップバイステップのガイダンス、規約、パターン。`}</code></pre>
+          <div className={styles.codeBlock}>
+            <div className={styles.codeLine}><span className={styles.cc}>---</span></div>
+            <div className={styles.codeLine}><span className={styles.ck}>name</span>: <span className={styles.cs}>my-skill</span></div>
+            <div className={styles.codeLine}><span className={styles.ck}>description</span>: <span className={styles.cs}>特定タスクを支援する。XやYを行う必要がある時に使用する。</span></div>
+            <div className={styles.codeLine}><span className={styles.cc}>---</span></div>
+            <div className={styles.codeLine}></div>
+            <div className={styles.codeLine}><span className={styles.ch}># My Skill</span></div>
+            <div className={styles.codeLine}></div>
+            <div className={styles.codeLine}>エージェントへの詳細な指示をここに書く。</div>
+            <div className={styles.codeLine}></div>
+            <div className={styles.codeLine}><span className={styles.ch}>## このSkillを使うタイミング</span></div>
+            <div className={styles.codeLine}></div>
+            <div className={styles.codeLine}>- こういう場合に使う</div>
+            <div className={styles.codeLine}>- こういう場面で役立つ</div>
+            <div className={styles.codeLine}></div>
+            <div className={styles.codeLine}><span className={styles.ch}>## 使い方</span></div>
+            <div className={styles.codeLine}></div>
+            <div className={styles.codeLine}>エージェントが従うべきステップバイステップのガイダンス、規約、パターン。</div>
+          </div>
           <h3>5.4 フロントマターの必須・任意フィールド</h3>
           <div className={styles.tableWrap}>
             <table>
@@ -731,30 +737,34 @@ description: 特定タスクを支援する。XやYを行う必要がある時�
             コミュニティの実践例では、これに加えて次のような拡張フィールドを独自に運用しているケースも見られます(これは公式仕様ではなく、あくまで一部開発者の運用パターンです)。
           </p>
           <div className={styles.codeLabel}>Advanced SKILL.md Frontmatter</div>
-          <pre className={styles.codeBlock}><code>{`---
-name: meta-ads-management
-description: Meta Ads Marketing API経由でキャンペーンを管理する
-version: 2.0.0
-triggers:
-  - facebook ads
-  - meta ads
-  - campaign
-access_level: restricted
-requires_approval: true    # true の場合、実行前に必ず人間の承認を挟む
-turbo_safe: false          # false の場合、自動実行(turbo)モードから除外
-model_preference: gemini-3-pro
----`}</code></pre>
+          <div className={styles.codeBlock}>
+            <div className={styles.codeLine}><span className={styles.cc}>---</span></div>
+            <div className={styles.codeLine}><span className={styles.ck}>name</span>: <span className={styles.cs}>meta-ads-management</span></div>
+            <div className={styles.codeLine}><span className={styles.ck}>description</span>: <span className={styles.cs}>Meta Ads Marketing API経由でキャンペーンを管理する</span></div>
+            <div className={styles.codeLine}><span className={styles.ck}>version</span>: <span className={styles.cs}>2.0.0</span></div>
+            <div className={styles.codeLine}><span className={styles.ck}>triggers</span>:</div>
+            <div className={styles.codeLine}>  - <span className={styles.cs}>facebook ads</span></div>
+            <div className={styles.codeLine}>  - <span className={styles.cs}>meta ads</span></div>
+            <div className={styles.codeLine}>  - <span className={styles.cs}>campaign</span></div>
+            <div className={styles.codeLine}><span className={styles.ck}>access_level</span>: <span className={styles.cs}>restricted</span></div>
+            <div className={styles.codeLine}><span className={styles.ck}>requires_approval</span>: <span className={styles.cw}>true</span>    <span className={styles.cc}># true の場合、実行前に必ず人間の承認を挟む</span></div>
+            <div className={styles.codeLine}><span className={styles.ck}>turbo_safe</span>: <span className={styles.cw}>false</span>          <span className={styles.cc}># false の場合、自動実行(turbo)モードから除外</span></div>
+            <div className={styles.codeLine}><span className={styles.ck}>model_preference</span>: <span className={styles.cs}>gemini-3-pro</span></div>
+            <div className={styles.codeLine}><span className={styles.cc}>---</span></div>
+          </div>
           <p>
             金融操作やデータ破壊的な操作を伴うSkillには、こうした「承認必須」フラグを立てておくと安全性が高まります。
           </p>
           <h3>5.5 Skillフォルダの構造</h3>
           <p><code>SKILL.md</code> だけが必須ですが、以下のような補助リソースも同梱できます。</p>
           <div className={styles.codeLabel}>Full Skill Structure</div>
-          <pre className={styles.codeBlock}><code>{`.agents/skills/my-skill/
-├─ SKILL.md       # メイン指示(必須)
-├─ scripts/       # 補助スクリプト(任意)
-├─ examples/      # 参照実装(任意)
-└─ resources/     # テンプレートなど(任意)`}</code></pre>
+          <div className={styles.codeBlock}>
+            <div className={styles.codeLine}><span className={styles.cm}>.agents/skills/my-skill/</span></div>
+            <div className={styles.codeLine}>├─ <span className={styles.ck}>SKILL.md</span>       <span className={styles.cc}># メイン指示(必須)</span></div>
+            <div className={styles.codeLine}>├─ <span className={styles.cv}>scripts/</span>       <span className={styles.cc}># 補助スクリプト(任意)</span></div>
+            <div className={styles.codeLine}>├─ <span className={styles.cv}>examples/</span>      <span className={styles.cc}># 参照実装(任意)</span></div>
+            <div className={styles.codeLine}>└─ <span className={styles.cv}>resources/</span>     <span className={styles.cc}># テンプレートなど(任意)</span></div>
+          </div>
           <h3>5.6 エージェントの利用フロー(Progressive Disclosure)</h3>
           <div className={styles.mermaidWrap}>
             <MermaidDiagram chart={MERMAID_PROGRESSIVE} />
@@ -811,16 +821,18 @@ model_preference: gemini-3-pro
             Agentの入力欄で <code>/workflow-name</code> と打つだけで実行されます。Workflow同士を連鎖させることも可能です。
           </p>
           <div className={styles.codeLabel}>/ship-feature Workflow Example</div>
-          <pre className={styles.codeBlock}><code>{`# /ship-feature
-
-## 説明
-機能開発が完了した際の一連のリリース作業を自動化する。
-
-## ステップ
-1. \`/run-tests\` を呼び出してテストスイートを実行する
-2. すべてのテストが通過したら、変更内容のCHANGELOGエントリを作成する
-3. \`/open-pr\` を呼び出してPull Requestを作成する
-4. PR説明文に、実施したテストの概要を含める`}</code></pre>
+          <div className={styles.codeBlock}>
+            <div className={styles.codeLine}><span className={styles.ch}># /ship-feature</span></div>
+            <div className={styles.codeLine}></div>
+            <div className={styles.codeLine}><span className={styles.ch}>## 説明</span></div>
+            <div className={styles.codeLine}>機能開発が完了した際の一連のリリース作業を自動化する。</div>
+            <div className={styles.codeLine}></div>
+            <div className={styles.codeLine}><span className={styles.ch}>## ステップ</span></div>
+            <div className={styles.codeLine}>1. <span className={styles.cv}>`/run-tests`</span> を呼び出してテストスイートを実行する</div>
+            <div className={styles.codeLine}>2. すべてのテストが通過したら、変更内容のCHANGELOGエントリを作成する</div>
+            <div className={styles.codeLine}>3. <span className={styles.cv}>`/open-pr`</span> を呼び出してPull Requestを作成する</div>
+            <div className={styles.codeLine}>4. PR説明文に、実施したテストの概要を含める</div>
+          </div>
           <p>
             上記の <code>/run-tests</code> や <code>/open-pr</code> のように、Workflow内から別のWorkflowを「呼び出してください」と自然文で指示するだけで連携できます。
           </p>
@@ -1056,23 +1068,29 @@ model_preference: gemini-3-pro
           </ul>
           <h3>8.4 設定例</h3>
           <div className={styles.codeLabel}>Allow List (確認なしで自動承認)</div>
-          <pre className={styles.codeBlock}><code>{`command(git)                       # 標準的なgitコマンド
-command(npm run (build|lint|test)) # 安全なnpmスクリプトを正規表現で許可
-unsandboxed(git push)              # サンドボックス外でのgit pushを許可
-write_file(src/)                   # src/配下の編集を許可
-read_url(google.com)               # Googleのサブドメインの取得を許可
-mcp(linter/*)                      # linter MCPの全ツールを許可`}</code></pre>
+          <div className={styles.codeBlock}>
+            <div className={styles.codeLine}><span className={styles.ck}>command</span>(<span className={styles.cv}>git</span>)                       <span className={styles.cc}># 標準的なgitコマンド</span></div>
+            <div className={styles.codeLine}><span className={styles.ck}>command</span>(<span className={styles.cv}>npm run (build|lint|test)</span>) <span className={styles.cc}># 安全なnpmスクリプトを正規表現で許可</span></div>
+            <div className={styles.codeLine}><span className={styles.ck}>unsandboxed</span>(<span className={styles.cv}>git push</span>)              <span className={styles.cc}># サンドボックス外でのgit pushを許可</span></div>
+            <div className={styles.codeLine}><span className={styles.ck}>write_file</span>(<span className={styles.cv}>src/</span>)                   <span className={styles.cc}># src/配下の編集を許可</span></div>
+            <div className={styles.codeLine}><span className={styles.ck}>read_url</span>(<span className={styles.cv}>google.com</span>)               <span className={styles.cc}># Googleのサブドメインの取得を許可</span></div>
+            <div className={styles.codeLine}><span className={styles.ck}>mcp</span>(<span className={styles.cv}>linter/*</span>)                      <span className={styles.cc}># linter MCPの全ツールを許可</span></div>
+          </div>
 
           <div className={styles.codeLabel}>Deny List (恒久的にブロック)</div>
-          <pre className={styles.codeBlock}><code>{`command(rm -rf)                    # 破壊的な削除をブロック
-command(sudo)                      # sudo権限をブロック
-write_file(.git/)                  # Git履歴を保護
-write_file(/home/user/.ssh)        # SSH鍵を保護`}</code></pre>
+          <div className={styles.codeBlock}>
+            <div className={styles.codeLine}><span className={styles.ck}>command</span>(<span className={styles.cw}>rm -rf</span>)                    <span className={styles.cc}># 破壊的な削除をブロック</span></div>
+            <div className={styles.codeLine}><span className={styles.ck}>command</span>(<span className={styles.cw}>sudo</span>)                      <span className={styles.cc}># sudo権限をブロック</span></div>
+            <div className={styles.codeLine}><span className={styles.ck}>write_file</span>(<span className={styles.cw}>.git/</span>)                  <span className={styles.cc}># Git履歴を保護</span></div>
+            <div className={styles.codeLine}><span className={styles.ck}>write_file</span>(<span className={styles.cw}>/home/user/.ssh</span>)        <span className={styles.cc}># SSH鍵を保護</span></div>
+          </div>
 
           <div className={styles.codeLabel}>Ask List (都度確認を求める)</div>
-          <pre className={styles.codeBlock}><code>{`command(*)                         # すべてのコマンドで確認を求める
-execute_url(aws.amazon.com)        # AWSコンソール操作時に確認
-mcp(sql/execute_mutation)          # SQLの変更系クエリ実行時に確認`}</code></pre>
+          <div className={styles.codeBlock}>
+            <div className={styles.codeLine}><span className={styles.ck}>command</span>(<span className={styles.cv}>*</span>)                         <span className={styles.cc}># すべてのコマンドで確認を求める</span></div>
+            <div className={styles.codeLine}><span className={styles.ck}>execute_url</span>(<span className={styles.cv}>aws.amazon.com</span>)        <span className={styles.cc}># AWSコンソール操作時に確認</span></div>
+            <div className={styles.codeLine}><span className={styles.ck}>mcp</span>(<span className={styles.cv}>sql/execute_mutation</span>)          <span className={styles.cc}># SQLの変更系クエリ実行時に確認</span></div>
+          </div>
 
           <h3>8.5 Terminal Sandboxing(プレビュー機能)</h3>
           <p>
@@ -1114,23 +1132,25 @@ mcp(sql/execute_mutation)          # SQLの変更系クエリ実行時に確認`
             MCPサーバーは <code>mcpServers</code> オブジェクトの下にサーバーごとの設定を並べる、共通フォーマットで定義します。
           </p>
           <div className={styles.codeLabel}>mcp_config.json</div>
-          <pre className={styles.codeBlock}><code>{`{
-  "mcpServers": {
-    "sqlite-explorer": {
-      "command": "node",
-      "args": ["/usr/local/bin/sqlite-mcp-server.js"],
-      "env": {
-        "SQLITE_DB_PATH": "/var/data/app.db"
-      }
-    },
-    "my-remote-server": {
-      "serverUrl": "https://api.example.com/mcp/",
-      "headers": {
-        "Authorization": "Bearer YOUR_API_TOKEN"
-      }
-    }
-  }
-}`}</code></pre>
+          <div className={styles.codeBlock}>
+            <div className={styles.codeLine}>&#123;</div>
+            <div className={styles.codeLine}>  <span className={styles.ck}>"mcpServers"</span>: &#123;</div>
+            <div className={styles.codeLine}>    <span className={styles.cm}>"sqlite-explorer"</span>: &#123;</div>
+            <div className={styles.codeLine}>      <span className={styles.ck}>"command"</span>: <span className={styles.cs}>"node"</span>,</div>
+            <div className={styles.codeLine}>      <span className={styles.ck}>"args"</span>: [<span className={styles.cs}>"/usr/local/bin/sqlite-mcp-server.js"</span>],</div>
+            <div className={styles.codeLine}>      <span className={styles.ck}>"env"</span>: &#123;</div>
+            <div className={styles.codeLine}>        <span className={styles.ck}>"SQLITE_DB_PATH"</span>: <span className={styles.cs}>"/var/data/app.db"</span></div>
+            <div className={styles.codeLine}>      &#125;</div>
+            <div className={styles.codeLine}>    &#125;,</div>
+            <div className={styles.codeLine}>    <span className={styles.cm}>"my-remote-server"</span>: &#123;</div>
+            <div className={styles.codeLine}>      <span className={styles.ck}>"serverUrl"</span>: <span className={styles.cs}>"https://api.example.com/mcp/"</span>,</div>
+            <div className={styles.codeLine}>      <span className={styles.ck}>"headers"</span>: &#123;</div>
+            <div className={styles.codeLine}>        <span className={styles.ck}>"Authorization"</span>: <span className={styles.cs}>"Bearer YOUR_API_TOKEN"</span></div>
+            <div className={styles.codeLine}>      &#125;</div>
+            <div className={styles.codeLine}>    &#125;</div>
+            <div className={styles.codeLine}>  &#125;</div>
+            <div className={styles.codeLine}>&#125;</div>
+          </div>
           <p>
             グローバル設定は <code>~/.gemini/config/mcp_config.json</code>、ワークスペース固有の設定は <code>.agents/mcp_config.json</code> に置きます。リモート接続では <code>serverUrl</code> フィールドが必須で、旧来の <code>url</code> や <code>httpUrl</code> は非対応になっている点に注意してください。
           </p>

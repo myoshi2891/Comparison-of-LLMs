@@ -340,10 +340,26 @@
   overflow-x: auto;
   font-family: var(--font-mono);
   font-size: 13.5px;
-  line-height: 1.6;
+  line-height: 1.65;
   color: var(--color-text-primary);
   margin-bottom: 24px;
 }
+
+.codeLine {
+  white-space: pre;
+  font-family: var(--font-mono);
+}
+
+/* Syntax Highlighting Tokens */
+.ck { color: #ff7b72; font-weight: 600; }
+.cs { color: #a5d6ff; }
+.cv { color: #79c0ff; }
+.cc { color: #6e7681; font-style: italic; }
+.ch { color: #f0883e; font-weight: bold; }
+.cm { color: #7ee787; font-weight: bold; }
+.cw { color: #d29922; }
+.ce { color: #bc8cff; }
+.cg { color: #3fb950; }
 
 .goodBad {
   display: grid;
