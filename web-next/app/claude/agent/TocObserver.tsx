@@ -3,6 +3,9 @@
 import { useEffect } from "react";
 import styles from "./page.module.css";
 
+/**
+ * Tracks the visible content section and updates the table of contents to highlight its corresponding link.
+ */
 export default function TocObserver() {
   useEffect(() => {
     const sectionIds = [

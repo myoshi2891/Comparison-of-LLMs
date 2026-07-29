@@ -93,6 +93,9 @@ const MERMAID_DECISION_TREE = `flowchart TD
     F -->|"Yes"| G["Workflowとして保存し<br/>/workflow-nameで呼出"]
     F -->|"No"| H["都度プロンプトで指示する"]`;
 
+/**
+ * Renders a comprehensive Japanese guide to Google Antigravity and its agent-first development ecosystem.
+ */
 export default function AntigravityBestPracticesPage() {
   return (
     <div className={styles.layout}>

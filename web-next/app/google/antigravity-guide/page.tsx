@@ -9,6 +9,12 @@ export const metadata: Metadata = {
     "Antigravity CLI (agy) の全スラッシュコマンド、キーバインド、設定ファイル (settings.json)、自動化・CI/CD連携、セキュリティモデルを包括的に解説した完全ガイド。",
 };
 
+/**
+ * Renders an external link that opens in a new browser tab.
+ *
+ * @param href - The URL of the external resource
+ * @param children - The link content
+ */
 function Ext({ href, children }: { href: string; children: React.ReactNode }) {
   return (
     <a href={href} target="_blank" rel="noopener noreferrer">
@@ -100,6 +106,9 @@ const DIAG_8 = `flowchart LR
   Verify -->|"失敗"| Execute
   Verify -->|"成功"| Done["完了"]`;
 
+/**
+ * Renders the Antigravity CLI reference guide, including its table of contents and comprehensive usage documentation.
+ */
 export default function AntigravityCliGuidePage() {
   return (
     <div className={styles.layout}>

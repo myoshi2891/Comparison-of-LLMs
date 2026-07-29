@@ -3,6 +3,9 @@
 import { useEffect } from "react";
 import styles from "./page.module.css";
 
+/**
+ * Tracks visible main sections and highlights the corresponding table-of-contents link.
+ */
 export default function TocObserver() {
   useEffect(() => {
     const sections = document.querySelectorAll("main section[id]");

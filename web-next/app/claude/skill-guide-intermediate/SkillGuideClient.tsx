@@ -45,6 +45,11 @@ const NAV_GROUPS = [
   },
 ] as const;
 
+/**
+ * Renders the SKILL.md guide layout with a navigable table of contents and main content.
+ *
+ * @param children - The guide content rendered in the main area
+ */
 export default function SkillGuideClient({ children }: SkillGuideClientProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 

@@ -133,6 +133,9 @@ const DIAGRAMS = {
     Q5 -- いいえ --> Sonnet`,
 };
 
+/**
+ * Renders the Claude Fable 5 practical usage guide.
+ */
 export default function Fable5BestPracticesPage() {
   return (
     <div className={styles.pageContainer}>

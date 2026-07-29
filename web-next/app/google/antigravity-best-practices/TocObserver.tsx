@@ -3,6 +3,9 @@
 import { useEffect } from "react";
 import styles from "./page.module.css";
 
+/**
+ * Synchronizes table-of-contents link highlighting with the uppermost visible section.
+ */
 export default function TocObserver() {
   useEffect(() => {
     const sections = document.querySelectorAll("main section[id]");

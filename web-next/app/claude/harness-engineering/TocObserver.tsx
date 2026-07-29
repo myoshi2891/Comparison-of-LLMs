@@ -3,6 +3,11 @@
 import { useEffect } from "react";
 import styles from "./page.module.css";
 
+/**
+ * Synchronizes the table of contents with the section currently in view.
+ *
+ * @returns `null`
+ */
 export default function TocObserver() {
   useEffect(() => {
     const sections = document.querySelectorAll("main section[id]");

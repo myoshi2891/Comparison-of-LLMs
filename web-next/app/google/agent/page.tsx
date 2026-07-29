@@ -11,6 +11,13 @@ export const metadata: Metadata = {
     "AIエージェントIDE「Google Antigravity」が扱う4種類のMarkdownファイル（Rules / Skills / Workflows / Artifacts）の役割・置き場所・書き方・ベストプラクティスを体系化した完全ガイド。",
 };
 
+/**
+ * Creates an external link that opens in a new browser tab.
+ *
+ * @param href - The destination URL
+ * @param children - The link content
+ * @returns An anchor element configured for secure external navigation
+ */
 function Ext({ href, children }: { href: string; children: ReactNode }) {
   return (
     <a href={href} target="_blank" rel="noopener noreferrer">
@@ -81,6 +88,9 @@ const DIAGRAM_5 = `flowchart TB
     Exec --> Walk["Walkthrough を生成"]
     Walk --> Done["人間が最終承認する"]`;
 
+/**
+ * Renders a comprehensive guide to Google Antigravity's Rules, Skills, Workflows, and Artifacts.
+ */
 export default function AntigravitySpecPage() {
   return (
     <div className={styles.layout}>

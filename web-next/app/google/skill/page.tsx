@@ -10,6 +10,12 @@ export const metadata: Metadata = {
     "Antigravity IDE における SKILL.md の設計思想・アーキテクチャ・実装パターン・運用 — 中級〜上級エンジニア向けステップバイステップ解説",
 };
 
+/**
+ * Renders a styled external link that opens in a new tab.
+ *
+ * @param href - The destination URL.
+ * @param children - The link content.
+ */
 function ExtRef({ href, children }: { href: string; children: React.ReactNode }) {
   return (
     <a href={href} target="_blank" rel="noopener noreferrer" className={styles.refLink}>
@@ -87,6 +93,9 @@ S6 --> S7["Step7: Few-shot例を追加"]
 S7 --> S8["Step8: エラー処理を明文化"]
 S8 --> S9["Step9: 評価とイテレーション"]`;
 
+/**
+ * Renders a Japanese guide to designing, implementing, and operating Agent Skills in Antigravity IDE.
+ */
 export default function AgentSkillsGuidePage() {
   return (
     <div className={styles.layout}>

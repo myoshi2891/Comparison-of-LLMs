@@ -30,6 +30,9 @@ function ExternalIcon() {
   );
 }
 
+/**
+ * Renders a beginner-friendly guide to AI spec-driven development, including its concepts, workflows, tools, best practices, limitations, and references.
+ */
 export default function SpecDrivenDevelopmentGuidePage() {
   return (
     <div className={styles.layout}>

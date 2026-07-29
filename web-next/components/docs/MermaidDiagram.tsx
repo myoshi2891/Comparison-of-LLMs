@@ -18,6 +18,12 @@ type Props = {
   themeVariables?: Record<string, string>;
 };
 
+/**
+ * Applies theme-based color overrides to sequence diagram actors, notes, messages, loops, and labels.
+ *
+ * @param root - The container element holding the sequence diagram SVG.
+ * @param themeVariables - Optional theme colors used to style the diagram elements.
+ */
 function applySequenceDiagramColorOverrides(
   root: HTMLElement,
   themeVariables?: Record<string, string>

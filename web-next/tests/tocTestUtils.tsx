@@ -326,6 +326,12 @@ export function registerBasicObserverTocSuite({
     cleanup();
   });
 
+  /**
+   * Renders the TOC test fixture with optional navigation links.
+   *
+   * @param withLinks - Whether to include links for the observed sections.
+   * @returns The rendered test fixture.
+   */
   function renderToc(withLinks = true) {
     return render(
       <main>

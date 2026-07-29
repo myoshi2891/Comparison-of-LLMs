@@ -37,6 +37,9 @@ const MERMAID_DECISION = `flowchart TD
     classDef process fill:#2f2559,stroke:#b9a6f5,color:#f5f2ff
     classDef decision fill:#0f2c2a,stroke:#5eead4,color:#eafff9`;
 
+/**
+ * Renders the SKILL.md best-practices guide with section navigation, explanatory content, and diagrams.
+ */
 export default function SkillGuidePage() {
   return (
     <div className={styles.layout}>

@@ -69,6 +69,13 @@ Agent --> Action{"書き込み系のアクションか?"}
 Action -->|"はい"| Perm["権限モードに応じて確認または自動レビューする"]
 Action -->|"いいえ（読み取りのみ）"| Continue["そのまま作業を継続する"]`;
 
+/**
+ * Renders an external link that opens in a new browser tab.
+ *
+ * @param href - The destination URL
+ * @param className - Optional CSS class name
+ * @param children - The link content
+ */
 function Ext({
   href,
   className,
@@ -91,6 +98,9 @@ export const metadata: Metadata = {
     "Anthropic公式ドキュメント・公式ブログとパワーユーザーの知見をもとに、Claude Coworkの基本概念からセットアップ、安全運用、Scheduled Tasks、Dispatch、10の自衛対策まで完全解説。",
 };
 
+/**
+ * Renders the Claude Cowork practical guide, including navigation, step-by-step guidance, safety practices, and references.
+ */
 export default function Page() {
   return (
     <div className={styles.layout}>

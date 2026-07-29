@@ -89,6 +89,9 @@ const DIAGRAM_EVAL = `flowchart LR
     class A1,A2,A3,A4 design;
     class B1,B2,CN test;`;
 
+/**
+ * Renders the SKILL.md practical guide, including guidance on design, authoring, evaluation, and Claude Code configuration.
+ */
 export default function Page() {
   return (
     <SkillGuideClient>

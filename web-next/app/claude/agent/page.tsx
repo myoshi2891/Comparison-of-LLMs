@@ -100,6 +100,9 @@ const AGENT_THEME_VARS: Record<string, string> = {
   signalTextColor: "#12141c",
 };
 
+/**
+ * Renders a documentation guide for Claude Code Markdown configuration and agent collaboration.
+ */
 export default function ClaudeAgentPage() {
   return (
     <SidebarToggle>

@@ -169,6 +169,9 @@ const MMD_10 = `flowchart LR
     style C fill:#1f2f3a,stroke:#61afef,color:#fff
     style E fill:#1f3a2a,stroke:#98c379,color:#fff`;
 
+/**
+ * Renders the Spec-Driven Development practice guide page.
+ */
 export default async function SpecDrivenDevelopmentGuidePage() {
   return (
     <div className={styles.layout}>

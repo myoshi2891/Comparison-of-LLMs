@@ -67,6 +67,13 @@ const DIAGRAM_9 = `flowchart LR
     C --> D["ハーネスの複雑さは縮まず移動する"]
     D -.->|"次の進化へ"| A`;
 
+/**
+ * Renders an external link that opens in a new browser tab.
+ *
+ * @param href - The destination URL.
+ * @param className - Optional CSS class name.
+ * @param children - The link content.
+ */
 function Ext({
   href,
   className,
@@ -83,6 +90,9 @@ function Ext({
   );
 }
 
+/**
+ * Renders the Harness Engineering introductory guide with chapter navigation, diagrams, and reference material.
+ */
 export default function HarnessEngineeringPage() {
   return (
     <div className={styles.layout}>
