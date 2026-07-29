@@ -11,6 +11,7 @@
   --text: #e8edf7;
   --text-muted: #9aa8c7;
   --text-faint: #6f7f9f;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   --radius: 14px;
 
   display: block;
