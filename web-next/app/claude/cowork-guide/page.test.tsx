@@ -53,4 +53,18 @@ describe("/claude/cowork-guide 契約テスト", () => {
       expect(a.getAttribute("href")).not.toMatch(/\.html$/);
     }
   });
+
+  it("無効化されたチェックボックスを隣接する説明文とラベルで関連付ける", () => {
+    const { container } = render(<Page />);
+    const checkboxes = Array.from(
+      container.querySelectorAll<HTMLInputElement>('input[type="checkbox"][disabled]')
+    );
+
+    expect(checkboxes).toHaveLength(14);
+    for (const checkbox of checkboxes) {
+      const label = checkbox.closest("label");
+      expect(label).not.toBeNull();
+      expect(label?.textContent?.trim().length).toBeGreaterThan(0);
+    }
+  });
 });
