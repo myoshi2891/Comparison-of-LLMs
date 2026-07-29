@@ -389,8 +389,8 @@ stateDiagram-v2
 ```bash
 mkdir -p ~/.gemini/antigravity-cli
 curl -sSL -o ~/.gemini/antigravity-cli/statusline.sh \
-  https://raw.githubusercontent.com/ykdojo/antigravity-cli-tips/4a13498f354f36bc82375a1ab9a920ae364c90c8/scripts/context-bar.sh
-echo "5c5593e50a09262a80ccfae53b0167467bc7e563556a8a92543c32f796ab5e9c  ~/.gemini/antigravity-cli/statusline.sh" | sha256sum -c -
+  https://raw.githubusercontent.com/ykdojo/antigravity-cli-tips/4a13498f354f36bc82375a1ab9a920ae364c90c8/scripts/context-bar.sh &&
+echo "5c5593e50a09262a80ccfae53b0167467bc7e563556a8a92543c32f796ab5e9c  ~/.gemini/antigravity-cli/statusline.sh" | sha256sum -c - &&
 chmod +x ~/.gemini/antigravity-cli/statusline.sh
 ```
 

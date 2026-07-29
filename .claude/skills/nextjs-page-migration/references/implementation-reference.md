@@ -23,7 +23,7 @@ local_vars=$(grep -oE '^\s*--[a-zA-Z0-9_-]+\s*:' "$css_file" \
 # 未定義変数だけを出力（ローカル定義でも globals.css 定義でもないもの）
 for var in $(grep -oE 'var\(\s*--[a-zA-Z0-9_-]+' "$css_file" \
   | sed -E 's/var\(\s*(--[a-zA-Z0-9_-]+)/\1/' | sort -u); do
-  echo "$local_vars" | grep -qWx -- "$var" && continue
+  echo "$local_vars" | grep -qxF -- "$var" && continue
   grep -q -- "$var:" web-next/app/globals.css || echo "未定義の変数: $var"
 done
 ```
@@ -38,7 +38,7 @@ Playwright で描画座標を実測する。dev サーバーは負荷でクラ�
 ```bash
 # 1) 静的ビルドを配信（クリーンURL を *.html にマップする簡易サーバ）
 (cd web-next && bun run build)
-(cd web-next && python3 -c "import http.server,os;R=os.path.abspath('out');H=type('H',(http.server.SimpleHTTPRequestHandler,),{'translate_path':lambda s,p:(lambda f:f+'.html' if os.path.isfile(f+'.html') else (os.path.join(f,'index.html') if os.path.isdir(f) else f))(os.path.join(R,p.split('?')[0].strip('/')) or R),'log_message':lambda *a:None});http.server.HTTPServer(('127.0.0.1',8099),H).serve_forever()") &
+python3 -c "import http.server,os;R=os.path.abspath('web-next/out');H=type('H',(http.server.SimpleHTTPRequestHandler,),{'translate_path':lambda s,p:(lambda f:f+'.html' if os.path.isfile(f+'.html') else (os.path.join(f,'index.html') if os.path.isdir(f) else f))(os.path.join(R,p.split('?')[0].strip('/')) or R),'log_message':lambda *a:None});http.server.HTTPServer(('127.0.0.1',8099),H).serve_forever()" &
 server_pid=$!
 cleanup() {
   kill "$server_pid" 2>/dev/null || true
