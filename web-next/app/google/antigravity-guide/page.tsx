@@ -1,1871 +1,764 @@
 import type { Metadata } from "next";
-import BestPracticesChecklist from "./BestPracticesChecklist";
-import GeminiMdTabs from "./GeminiMdTabs";
+import MermaidDiagram from "@/components/docs/MermaidDiagram";
+import TocObserver from "./TocObserver";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
-  title: "Google Antigravity 2.0 × Gemini 3.5 Flash — AI仕様駆動開発 ベストプラクティス完全ガイド",
+  title: "Antigravity CLI 完全ガイド — 全コマンド & ベストプラクティス",
   description:
-    "GEMINI.md から SKILL.md・Rules・Workflows・Artifacts まで、Google Antigravity エコシステムの全体を根拠ソース付きで徹底解説。初学者でもステップバイステップで理解できるベストプラクティス完全ガイド。Antigravity 2.0 (2026-05-19, Google I/O 2026) — Antigravity CLI / SDK / Managed Agents / plugins / Gemini 3.5 Flash 対応。",
+    "Antigravity CLI (agy) の全スラッシュコマンド、キーバインド、設定ファイル (settings.json)、自動化・CI/CD連携、セキュリティモデルを包括的に解説した実務ガイド。",
 };
 
-/**
- * Renders the Antigravity best-practices guide page with a hero, table of contents, and ten static sections.
- *
- * The page covers GEMINI.md, SKILL.md, Rules, Workflows, Artifacts, supported models and pricing, cross-cutting best practices, and reference sources, and includes `GeminiMdTabs` and `BestPracticesChecklist`.
- *
- * @returns A React element containing the complete guide page layout.
- */
-export default function Page() {
+function Ext({ href, children }: { href: string; children: React.ReactNode }) {
   return (
-    <>
-      {/* HERO */}
-      <header className={styles.hero}>
-        <div className={styles.heroGlow} />
-        <div className={styles.heroTag}>Google Antigravity 2.0 × Gemini 3.5 Flash</div>
-        <h1 className={styles.heroH1}>
-          AI仕様駆動開発における
-          <br />
-          <span className={styles.rainbow}>Google Antigravity</span>
-          <br />
-          ベストプラクティス完全ガイド
-        </h1>
-        <p className={styles.heroSub}>
-          初学者でもステップバイステップで理解できる — GEMINI.md から
-          SKILL.md・Rules・Workflows・Artifacts まで、
-          Antigravityエコシステムの全体を根拠ソース付きで徹底解説
-        </p>
-        <div className={styles.heroChips}>
-          <span className={`${styles.chip} ${styles.cb}`}>Google Antigravity 2.0</span>
-          <span className={`${styles.chip} ${styles.cg}`}>Gemini 3.5 Flash</span>
-          <span className={`${styles.chip} ${styles.cy}`}>Agent-First IDE</span>
-          <span className={`${styles.chip} ${styles.cr}`}>Spec-Driven Dev</span>
-          <span className={`${styles.chip} ${styles.cp}`}>I/O 2026 (2026-05-19)</span>
-        </div>
-      </header>
+    <a href={href} target="_blank" rel="noopener noreferrer">
+      {children}
+    </a>
+  );
+}
 
-      {/* MAIN */}
-      <main className={styles.wrap}>
-        {/* TOC */}
-        <nav className={styles.toc}>
-          <div className={styles.tocLabel}>目次</div>
-          <ol>
-            <li>
-              <a href="#overview">Google Antigravity とは — 従来IDEとの比較</a>
-            </li>
-            <li>
-              <a href="#directory">全体ファイル構成と推奨ディレクトリ</a>
-            </li>
-            <li>
-              <a href="#gemini-md">GEMINI.md — グローバル永続メモリ</a>
-            </li>
-            <li>
-              <a href="#skills">SKILL.md — 進歩的開示ナレッジ（最重要）</a>
-            </li>
-            <li>
-              <a href="#rules">Rules — 受動的制約・バックグラウンドシステムプロンプト</a>
-            </li>
-            <li>
-              <a href="#workflows">Workflows — 能動的手順書</a>
-            </li>
-            <li>
-              <a href="#artifacts">Artifacts — エージェント自動生成の証拠</a>
-            </li>
-            <li>
-              <a href="#models">対応モデルと料金</a>
-            </li>
-            <li>
-              <a href="#best-practices">横断ベストプラクティス 10則</a>
-            </li>
-            <li>
-              <a href="#sources">参考ソース一覧</a>
-            </li>
-          </ol>
-        </nav>
+const DIAG_1 = `graph TD
+  Harness["共有エージェントハーネス<br />Shared Agent Harness"]
+  CLI["Antigravity CLI<br />ターミナルTUI・Go実装"]
+  GUI["Antigravity 2.0<br />デスクトップGUI"]
+  IDE["Antigravity IDE<br />VS Codeフォーク"]
+  SDK["Antigravity SDK<br />Python製カスタムエージェント基盤"]
 
-        {/* SECTION 01: OVERVIEW */}
-        <section id="overview" className={styles.sec}>
-          <div className={styles.secLabel}>Section 01</div>
-          <h2 className={styles.secTitle}>
-            <span className={styles.num}>01.</span>Google Antigravity とは — 従来IDEとの比較
-          </h2>
+  Harness --> CLI
+  Harness --> GUI
+  Harness --> IDE
+  Harness --> SDK
+  CLI -.->|設定・権限を同期| GUI
+  GUI -.->|会話をインポート| CLI`;
 
-          <p>
-            Google Antigravityは<strong>2025年11月18日にGemini 3と同時発表</strong>
-            されたエージェント・ファースト型IDEです。 VS Codeのフォークをベースに、Claude
-            CodeのようなCLIツールではなく
-            <strong>フルIDEとして「エージェントが主役」のパラダイム</strong>を実装しています。
-            人間の役割は「コードを書く人」から「アーキテクトとして指揮する人」へと変わります。
-            さらに
-            <strong>
-              2026-05-19 の Google I/O 2026 で Antigravity 2.0 が発表され、Gemini 3.5 Flash / 3.5
-              Pro / Omni Flash 対応・Go 製 Antigravity CLI・Antigravity SDK・Managed Agents・
-              plugins エコシステム・AI Studio / Android Studio / Firebase 統合が追加
-            </strong>
-            されました。
-          </p>
+const DIAG_2 = `sequenceDiagram
+  participant User as 開発者
+  participant CLI as Antigravity CLI
+  participant Keyring as OSキーリング
+  participant Browser as ブラウザ
 
-          <div className={styles.flowWrap}>
-            <div className={styles.flowLabel}>▸ 従来IDE vs Antigravity — パラダイムの違い</div>
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "1fr auto 1fr",
-                gap: "1.5rem",
-                alignItems: "center",
-              }}
-            >
-              <div>
-                <div
-                  style={{
-                    fontFamily: "var(--font-mono, 'JetBrains Mono', monospace)",
-                    fontSize: "0.68rem",
-                    color: "var(--text3, #5a7090)",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.12em",
-                    marginBottom: "1rem",
-                  }}
-                >
-                  ❌ 従来のIDE
-                </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
-                  <div
-                    style={{
-                      background: "rgba(90, 112, 144, 0.12)",
-                      border: "1px solid rgba(90, 112, 144, 0.25)",
-                      borderRadius: "8px",
-                      padding: "0.6rem 1rem",
-                      fontSize: "0.78rem",
-                      color: "var(--text2, #9aafcc)",
-                    }}
-                  >
-                    👤 人間 — コードを書く主役
-                  </div>
-                  <div style={{ textAlign: "center", color: "var(--text3, #5a7090)" }}>↓</div>
-                  <div
-                    style={{
-                      background: "rgba(90, 112, 144, 0.08)",
-                      border: "1px solid rgba(90, 112, 144, 0.2)",
-                      borderRadius: "8px",
-                      padding: "0.6rem 1rem",
-                      fontSize: "0.78rem",
-                      color: "var(--text3, #5a7090)",
-                    }}
-                  >
-                    🤖 AI補完 — 提案するだけ
-                  </div>
-                  <div style={{ textAlign: "center", color: "var(--text3, #5a7090)" }}>↓</div>
-                  <div
-                    style={{
-                      background: "rgba(90, 112, 144, 0.08)",
-                      border: "1px solid rgba(90, 112, 144, 0.2)",
-                      borderRadius: "8px",
-                      padding: "0.6rem 1rem",
-                      fontSize: "0.78rem",
-                      color: "var(--text3, #5a7090)",
-                    }}
-                  >
-                    ✅ コード完成（人間が判断・実行）
-                  </div>
-                </div>
-              </div>
-              <div
-                style={{
-                  fontFamily: "var(--font-display, 'Syne', sans-serif)",
-                  fontSize: "1.4rem",
-                  fontWeight: 700,
-                  color: "var(--text3, #5a7090)",
-                  textAlign: "center",
-                }}
-              >
-                VS
-              </div>
-              <div>
-                <div
-                  style={{
-                    fontFamily: "var(--font-mono, 'JetBrains Mono', monospace)",
-                    fontSize: "0.68rem",
-                    color: "var(--g-green, #34a853)",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.12em",
-                    marginBottom: "1rem",
-                  }}
-                >
-                  ✅ Google Antigravity
-                </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
-                  <div
-                    style={{
-                      background: "rgba(139, 92, 246, 0.1)",
-                      border: "1px solid rgba(139, 92, 246, 0.3)",
-                      borderRadius: "8px",
-                      padding: "0.6rem 1rem",
-                      fontSize: "0.78rem",
-                      color: "var(--g-purple, #8b5cf6)",
-                    }}
-                  >
-                    🤖 AIエージェント — 自律的に計画・実行・検証
-                  </div>
-                  <div style={{ textAlign: "center", color: "var(--text3, #5a7090)" }}>↓</div>
-                  <div
-                    style={{
-                      background: "rgba(251, 188, 4, 0.08)",
-                      border: "1px solid rgba(251, 188, 4, 0.25)",
-                      borderRadius: "8px",
-                      padding: "0.6rem 1rem",
-                      fontSize: "0.78rem",
-                      color: "var(--g-yellow, #fbbc04)",
-                    }}
-                  >
-                    👤 人間（アーキテクト）— 方針を決め・レビューする
-                  </div>
-                  <div style={{ textAlign: "center", color: "var(--text3, #5a7090)" }}>↓</div>
-                  <div
-                    style={{
-                      background: "rgba(52, 168, 83, 0.08)",
-                      border: "1px solid rgba(52, 168, 83, 0.25)",
-                      borderRadius: "8px",
-                      padding: "0.6rem 1rem",
-                      fontSize: "0.78rem",
-                      color: "var(--g-green, #34a853)",
-                    }}
-                  >
-                    📊 Artifact生成 — 証拠付きで結果を可視化
-                  </div>
-                </div>
-              </div>
-            </div>
+  User->>CLI: agy を起動
+  CLI->>Keyring: 保存済みトークンを確認
+  alt トークンあり
+    Keyring-->>CLI: トークンを返却
+    CLI-->>User: サイレントログイン完了
+  else トークンなし(ローカル環境)
+    CLI->>Browser: 既定ブラウザを自動起動
+    Browser-->>User: Googleアカウントでサインイン
+    User-->>CLI: 認証完了・トークン保存
+  else トークンなし(SSHリモート環境)
+    CLI-->>User: 認証用URLをターミナルに表示
+    User->>Browser: URLをローカルPCで開く
+    Browser-->>User: 認証コードを表示
+    User-->>CLI: コードをターミナルに貼り付け
+  end`;
+
+const DIAG_3 = `stateDiagram-v2
+  [*] --> mode_default
+  state "通常モード" as mode_default
+  state "accept-edits" as accept_edits
+  state "plan" as plan_mode
+
+  mode_default --> accept_edits: Shift+Tab
+  accept_edits --> plan_mode: Shift+Tab
+  plan_mode --> mode_default: Shift+Tab`;
+
+const DIAG_4 = `flowchart LR
+  VCS["VCSモード<br />未コミット・未追跡ファイル一覧<br />Git/Hg/JJ対応"] -- Tab --> Turn["Turnモード<br />会話ターンごとの変更差分"]
+  Turn -- Tab --> Commit["Commitモード<br />インタラクティブなコミットグラフ"]
+  Commit -- Tab --> VCS`;
+
+const DIAG_5 = `stateDiagram-v2
+  [*] --> running
+  running --> done: 正常終了
+  running --> error: 実行時エラー
+  running --> killed: ユーザーが k で強制終了
+  done --> [*]
+  error --> [*]
+  killed --> [*]`;
+
+const DIAG_6 = `flowchart TD
+  A["エージェントがツール実行を要求"] --> B{"toolPermission 設定"}
+  B -->|"request-review 既定"| C["書込み・bash・ネット呼び出しを都度確認"]
+  B -->|"proceed-in-sandbox"| D{"サンドボックス内で安全に実行可能か"}
+  D -->|"安全"| E["自動実行"]
+  D -->|"要注意"| C
+  B -->|"always-proceed"| F["確認なしで常に実行"]
+  B -->|"strict"| G["読み取り以外は全て確認"]`;
+
+const DIAG_7 = `flowchart LR
+  Trigger["PR作成 / pushイベント"] --> Hook["CIジョブが agy -p を実行"]
+  Hook --> Review["diffレビュー・テスト実行"]
+  Review --> Comment["結果をPRコメントとして投稿"]`;
+
+const DIAG_8 = `flowchart LR
+  Explore["① 探索<br />該当箇所の調査・仕様確認"] --> Plan["② 計画<br />Implementation Plan作成"]
+  Plan --> Approve{"承認する?"}
+  Approve -->|"No 要修正"| Plan
+  Approve -->|"Yes"| Execute["③ 実行<br />コード変更を適用"]
+  Execute --> Verify["④ 検証<br />テスト・ビルド実行"]
+  Verify -->|"失敗"| Execute
+  Verify -->|"成功"| Done["完了"]`;
+
+export default function AntigravityCliGuidePage() {
+  return (
+    <div className={styles.layout}>
+      <TocObserver />
+      <div className={styles.shell}>
+        {/* SIDEBAR TOC */}
+        <aside className={styles.sidebar}>
+          <div className={styles.brand}>
+            <span className={styles.brandBadge}>CLI Reference</span>
+            <span className={styles.brandTitle}>Antigravity CLI</span>
           </div>
+          <nav className={styles.toc}>
+            <div className={styles.tocGroupHeader}>目次</div>
+            <a href="#overview" className={styles.tocLink}>
+              <span className={styles.tocNum}>00</span>概要 & アーキテクチャ
+            </a>
+            <a href="#install" className={styles.tocLink}>
+              <span className={styles.tocNum}>01</span>インストール & 認証
+            </a>
+            <a href="#quickstart" className={styles.tocLink}>
+              <span className={styles.tocNum}>02</span>初回起動 & 基本操作
+            </a>
+            <a href="#execution-modes" className={styles.tocLink}>
+              <span className={styles.tocNum}>03</span>実行モード
+            </a>
+            <a href="#slash-commands" className={styles.tocLink}>
+              <span className={styles.tocNum}>04</span>スラッシュコマンド
+            </a>
+            <a href="#key-commands" className={styles.tocLink}>
+              <span className={styles.tocNum}>05</span>主要コマンド詳細
+            </a>
+            <a href="#keyboard-shortcuts" className={styles.tocLink}>
+              <span className={styles.tocNum}>06</span>キーボードショートカット
+            </a>
+            <a href="#settings-json" className={styles.tocLink}>
+              <span className={styles.tocNum}>07</span>settings.json 設定
+            </a>
+            <a href="#permissions" className={styles.tocLink}>
+              <span className={styles.tocNum}>08</span>権限 & サンドボックス
+            </a>
+            <a href="#mcp" className={styles.tocLink}>
+              <span className={styles.tocNum}>09</span>MCP サーバー連携
+            </a>
+            <a href="#custom-agents" className={styles.tocLink}>
+              <span className={styles.tocNum}>10</span>Skills & Plugins & Hooks
+            </a>
+            <a href="#automation" className={styles.tocLink}>
+              <span className={styles.tocNum}>11</span>自動化 & CI/CD
+            </a>
+            <a href="#best-practices" className={styles.tocLink}>
+              <span className={styles.tocNum}>12</span>ベストプラクティス
+            </a>
+            <a href="#troubleshoot" className={styles.tocLink}>
+              <span className={styles.tocNum}>13</span>トラブルシューティング
+            </a>
+            <a href="#security" className={styles.tocLink}>
+              <span className={styles.tocNum}>14</span>セキュリティ
+            </a>
+            <a href="#references" className={styles.tocLink}>
+              <span className={styles.tocNum}>15</span>参考文献 / ソース
+            </a>
+          </nav>
+        </aside>
 
-          <h3>Antigravity vs Claude Code — 比較表</h3>
-          <table className={styles.compareTable}>
-            <tbody>
-              <tr>
-                <th>特性</th>
-                <th>Google Antigravity</th>
-                <th>Claude Code</th>
-              </tr>
-              <tr>
-                <td>種別</td>
-                <td>Agent-First IDE（VSCode fork）</td>
-                <td>CLI / ターミナルエージェント</td>
-              </tr>
-              <tr>
-                <td>主要AI</td>
-                <td>
-                  Gemini 3.5 Flash / 3.5 Pro / Omni Flash（Antigravity 2.0）
-                  <br />+ Gemini 3.1 Pro / 3 Flash（履歴）
-                  <br />+ Claude Sonnet 4.6 / Opus 4.6 / GPT-OSS 120B
-                </td>
-                <td>Claude Opus / Sonnet / Haiku</td>
-              </tr>
-              <tr>
-                <td>永続記憶</td>
-                <td>GEMINI.md + Knowledge Base + Rules</td>
-                <td>CLAUDE.md + MEMORY.md</td>
-              </tr>
-              <tr>
-                <td>ナレッジ拡張</td>
-                <td>SKILL.md（進歩的開示）</td>
-                <td>SKILL.md（同一規格）</td>
-              </tr>
-              <tr>
-                <td>手順自動化</td>
-                <td>Workflows (.md)</td>
-                <td>Custom Commands (.md)</td>
-              </tr>
-              <tr>
-                <td>ブラウザ自動化</td>
-                <td>Browser Subagent（ネイティブ）</td>
-                <td>なし（MCP経由）</td>
-              </tr>
-              <tr>
-                <td>エビデンス生成</td>
-                <td>Artifacts（自動）</td>
-                <td>なし（手動）</td>
-              </tr>
-              <tr>
-                <td>価格</td>
-                <td>無料（Public Preview中） / Google AI Pro $19.99/月</td>
-                <td>Anthropicプランに依存</td>
-              </tr>
-            </tbody>
-          </table>
-
-          <div className={styles.alertInfo}>
-            <span>ℹ️</span>
-            <div>
-              <strong>SKILL.mdは共通規格</strong>です。AntigravityとClaude
-              Codeは同一のSKILL.md形式を採用しており、ファイルを両プラットフォーム間でほぼそのまま移植できます。
-              また
-              <strong>
-                v1.20.3（2026-03-05）で AGENTS.md に対応し、Antigravity 2.0（2026-05-19, Google I/O
-                2026）で Go 製 Antigravity CLI / SDK / Managed Agents / plugins が追加
-              </strong>
-              されました。Claude Code（CLAUDE.md）など他ツールとのルール共有が可能で、Antigravity
-              CLI 経由でも同じ AGENTS.md / GEMINI.md / SKILL.md を再利用できます。
-            </div>
-          </div>
-
-          {/* SECTION 01b: Antigravity 2.0 主要機能ハイライト */}
-          <h3>Antigravity 2.0 主要機能（I/O 2026, 2026-05-19）</h3>
-          <div className={styles.grid3}>
-            <div className={styles.miniCard}>
-              <div className={styles.mcTag}>🆕 Antigravity CLI</div>
-              <p>
-                Go 製の公式 CLI。Gemini CLI の後継として AI Pro / Ultra / 無料 Code Assist
-                向けに提供。AGENTS.md / GEMINI.md / SKILL.md を IDE と共有可能で、Agent Skills /
-                Hooks / Subagents / Extensions（→ plugins）の機能を継承。
-              </p>
-            </div>
-            <div className={styles.miniCard}>
-              <div className={styles.mcTag}>🛠 Antigravity SDK</div>
-              <p>
-                プログラマブルにエージェントを呼び出す公式 SDK。CI/CD パイプラインや外部システムから
-                Antigravity エージェントを起動し、Managed Agents や独自スキルを Spec-Driven
-                Development のフローに組み込める。
-              </p>
-            </div>
-            <div className={styles.miniCard}>
-              <div className={styles.mcTag}>📦 Managed Agents</div>
-              <p>
-                Gemini API 経由で<strong>isolated Linux 環境を 1 API call で起動</strong>
-                できるフルマネージドなコード実行サンドボックス。エージェントが安全に shell / file
-                操作を実行し、結果を Artifact として返却する。
-              </p>
-            </div>
-            <div className={styles.miniCard}>
-              <div className={styles.mcTag}>🔌 Antigravity plugins</div>
-              <p>
-                Extensions の進化形。SKILL/Rules/Workflow に加え、サードパーティ製プラグインで IDE
-                機能を拡張可能。エコシステム化により team で共有しやすい配布形式を提供。
-              </p>
-            </div>
-            <div className={styles.miniCard}>
-              <div className={styles.mcTag}>🌐 Google エコシステム統合</div>
-              <p>
-                Google AI Studio / Android Studio / Firebase との連携が拡大。Antigravity から直接
-                Firebase デプロイや AI Studio プロンプト評価フローへ橋渡しできるようになった。
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* SECTION 02: DIRECTORY */}
-        <section id="directory" className={styles.sec}>
-          <div className={styles.secLabel}>Section 02</div>
-          <h2 className={styles.secTitle}>
-            <span className={styles.num}>02.</span>全体ファイル構成と推奨ディレクトリ
-          </h2>
-
-          <p>
-            プロジェクトを始めたら、まずこのディレクトリ構成を作りましょう。5種類のファイル群がAntigravityの中核を成します。
-          </p>
-
-          <div className={styles.flowWrap}>
-            <div className={styles.flowLabel}>▸ SDD × Antigravity 4フェーズフロー</div>
-            <div className={styles.flow}>
-              <div className={styles.fstep}>
-                <div className={`${styles.fbox} ${styles.fbB}`}>
-                  Phase 1
-                  <br />
-                  仕様策定
-                </div>
-                <div className={styles.ffile}>
-                  spec.md
-                  <br />
-                  requirements.md
-                </div>
-              </div>
-              <div className={styles.farrow}>→</div>
-              <div className={styles.fstep}>
-                <div className={`${styles.fbox} ${styles.fbG}`}>
-                  Phase 2
-                  <br />
-                  設計
-                </div>
-                <div className={styles.ffile}>
-                  design.md
-                  <br />
-                  always-on.md
-                </div>
-              </div>
-              <div className={styles.farrow}>→</div>
-              <div className={styles.fstep}>
-                <div className={`${styles.fbox} ${styles.fbY}`}>
-                  Phase 3
-                  <br />
-                  エージェント実行
-                </div>
-                <div className={styles.ffile}>
-                  tasks.md
-                  <br />
-                  workflows/
-                </div>
-              </div>
-              <div className={styles.farrow}>→</div>
-              <div className={styles.fstep}>
-                <div className={`${styles.fbox} ${styles.fbR}`}>
-                  Phase 4
-                  <br />
-                  検証
-                </div>
-                <div className={styles.ffile}>
-                  Artifacts
-                  <br />
-                  Browser Agent
-                </div>
-              </div>
-              <div className={styles.farrow}>→</div>
-              <div className={styles.fstep}>
-                <div className={`${styles.fbox} ${styles.fbP}`}>
-                  フィードバック
-                  <br />
-                  ループ
-                </div>
-                <div className={styles.ffile}>
-                  Knowledge
-                  <br />
-                  更新
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <h3>推奨ディレクトリ構成</h3>
-
-          <div className={styles.ftree}>
-            {/* ROOT */}
-            <div className={styles.ftr}>
-              <div className={styles.ftrName}>
-                <span className={`${styles.ftrLabel} ${styles.ftrDir}`}>📁 your-project/</span>
-              </div>
-            </div>
-
-            {/* .agent/ */}
-            <div className={styles.ftr}>
-              <div className={styles.ftrIndent}>
-                <div className={`${styles.ftrGuide} ${styles.vline} ${styles.elbow}`} />
-              </div>
-              <div className={styles.ftrName}>
-                <span className={`${styles.ftrLabel} ${styles.ftrDir}`}>📁 .agent/</span>
-                <span className={`${styles.ftrBadge} ${styles.fbImportant}`}>
-                  Antigravity中心設定
-                </span>
-              </div>
-            </div>
-
-            {/* rules/ */}
-            <div className={styles.ftr}>
-              <div className={styles.ftrIndent}>
-                <div className={`${styles.ftrGuide} ${styles.vline}`} />
-                <div className={`${styles.ftrGuide} ${styles.vline} ${styles.elbow}`} />
-              </div>
-              <div className={styles.ftrName}>
-                <span className={`${styles.ftrLabel} ${styles.ftrDirSub}`}>📁 rules/</span>
-                <span className={styles.ftrComment}>
-                  ← 受動的制約（常時バックグラウンドで動作）
-                </span>
-              </div>
-            </div>
-
-            {/* rules/always-on.md */}
-            <div className={styles.ftr}>
-              <div className={styles.ftrIndent}>
-                <div className={`${styles.ftrGuide} ${styles.vline}`} />
-                <div className={`${styles.ftrGuide} ${styles.vline}`} />
-                <div className={`${styles.ftrGuide} ${styles.vline} ${styles.elbow}`} />
-              </div>
-              <div className={styles.ftrName}>
-                <span className={`${styles.ftrLabel} ${styles.ftrFrule}`}>📄 always-on.md</span>
-                <span className={styles.ftrComment}>
-                  ← activation: always — 常時適用（禁止事項等）
-                </span>
-              </div>
-            </div>
-
-            {/* rules/typescript.md */}
-            <div className={styles.ftr}>
-              <div className={styles.ftrIndent}>
-                <div className={`${styles.ftrGuide} ${styles.vline}`} />
-                <div className={`${styles.ftrGuide} ${styles.vline}`} />
-                <div className={`${styles.ftrGuide} ${styles.elbow} ${styles.last}`} />
-              </div>
-              <div className={styles.ftrName}>
-                <span className={`${styles.ftrLabel} ${styles.ftrFrule}`}>📄 typescript.md</span>
-                <span className={styles.ftrComment}>← activation: fileMatch *.ts — 条件適用</span>
-              </div>
-            </div>
-
-            {/* skills/ */}
-            <div className={styles.ftr}>
-              <div className={styles.ftrIndent}>
-                <div className={`${styles.ftrGuide} ${styles.vline}`} />
-                <div className={`${styles.ftrGuide} ${styles.vline} ${styles.elbow}`} />
-              </div>
-              <div className={styles.ftrName}>
-                <span className={`${styles.ftrLabel} ${styles.ftrDirSub}`}>📁 skills/</span>
-                <span className={styles.ftrComment}>← 進歩的開示ナレッジ（オンデマンド）</span>
-              </div>
-            </div>
-
-            {/* skills/db-migration/ */}
-            <div className={styles.ftr}>
-              <div className={styles.ftrIndent}>
-                <div className={`${styles.ftrGuide} ${styles.vline}`} />
-                <div className={`${styles.ftrGuide} ${styles.vline}`} />
-                <div className={`${styles.ftrGuide} ${styles.vline} ${styles.elbow}`} />
-              </div>
-              <div className={styles.ftrName}>
-                <span className={`${styles.ftrLabel} ${styles.ftrDirSub}`}>📁 db-migration/</span>
-                <span className={styles.ftrComment}>← スキルディレクトリ（name と一致させる）</span>
-              </div>
-            </div>
-
-            {/* SKILL.md */}
-            <div className={styles.ftr}>
-              <div className={styles.ftrIndent}>
-                <div className={`${styles.ftrGuide} ${styles.vline}`} />
-                <div className={`${styles.ftrGuide} ${styles.vline}`} />
-                <div className={`${styles.ftrGuide} ${styles.vline}`} />
-                <div className={`${styles.ftrGuide} ${styles.vline} ${styles.elbow}`} />
-              </div>
-              <div className={styles.ftrName}>
-                <span className={`${styles.ftrLabel} ${styles.ftrFreq}`}>📄 SKILL.md</span>
-                <span className={`${styles.ftrBadge} ${styles.fbReq}`}>必須</span>
-                <span className={styles.ftrComment}>← スキルの脳（name / description / 手順）</span>
-              </div>
-            </div>
-
-            {/* scripts/ */}
-            <div className={styles.ftr}>
-              <div className={styles.ftrIndent}>
-                <div className={`${styles.ftrGuide} ${styles.vline}`} />
-                <div className={`${styles.ftrGuide} ${styles.vline}`} />
-                <div className={`${styles.ftrGuide} ${styles.vline}`} />
-                <div className={`${styles.ftrGuide} ${styles.vline} ${styles.elbow}`} />
-              </div>
-              <div className={styles.ftrName}>
-                <span className={`${styles.ftrLabel} ${styles.ftrFopt}`}>📁 scripts/</span>
-                <span className={styles.ftrComment}>← 任意: 決定論的スクリプト（Python/Bash）</span>
-              </div>
-            </div>
-
-            {/* references/ */}
-            <div className={styles.ftr}>
-              <div className={styles.ftrIndent}>
-                <div className={`${styles.ftrGuide} ${styles.vline}`} />
-                <div className={`${styles.ftrGuide} ${styles.vline}`} />
-                <div className={`${styles.ftrGuide} ${styles.vline}`} />
-                <div className={`${styles.ftrGuide} ${styles.elbow} ${styles.last}`} />
-              </div>
-              <div className={styles.ftrName}>
-                <span className={`${styles.ftrLabel} ${styles.ftrFopt}`}>📁 references/</span>
-                <span className={styles.ftrComment}>
-                  ← 任意: 参照ドキュメント（オンデマンド読込）
-                </span>
-              </div>
-            </div>
-
-            {/* workflows/ */}
-            <div className={styles.ftr}>
-              <div className={styles.ftrIndent}>
-                <div className={`${styles.ftrGuide} ${styles.vline}`} />
-                <div className={`${styles.ftrGuide} ${styles.elbow} ${styles.last}`} />
-              </div>
-              <div className={styles.ftrName}>
-                <span className={`${styles.ftrLabel} ${styles.ftrDirSub}`}>📁 workflows/</span>
-                <span className={styles.ftrComment}>
-                  ← 能動的手順書（スラッシュコマンドで起動）
-                </span>
-              </div>
-            </div>
-
-            {/* deploy.md */}
-            <div className={styles.ftr}>
-              <div className={styles.ftrIndent}>
-                <div className={`${styles.ftrGuide} ${styles.vline}`} />
-                <div className={`${styles.ftrGuide} ${styles.vline}`} />
-                <div className={`${styles.ftrGuide} ${styles.vline} ${styles.elbow}`} />
-              </div>
-              <div className={styles.ftrName}>
-                <span className={`${styles.ftrLabel} ${styles.ftrFwf}`}>📄 deploy.md</span>
-                <span className={styles.ftrComment}>← /deploy コマンドで実行</span>
-              </div>
-            </div>
-
-            {/* review.md */}
-            <div className={styles.ftr}>
-              <div className={styles.ftrIndent}>
-                <div className={`${styles.ftrGuide} ${styles.vline}`} />
-                <div className={`${styles.ftrGuide} ${styles.vline}`} />
-                <div className={`${styles.ftrGuide} ${styles.elbow} ${styles.last}`} />
-              </div>
-              <div className={styles.ftrName}>
-                <span className={`${styles.ftrLabel} ${styles.ftrFwf}`}>📄 review.md</span>
-                <span className={styles.ftrComment}>← /review コマンドで実行</span>
-              </div>
-            </div>
-
-            {/* .context/ */}
-            <div className={styles.ftr}>
-              <div className={styles.ftrIndent}>
-                <div className={`${styles.ftrGuide} ${styles.vline} ${styles.elbow}`} />
-              </div>
-              <div className={styles.ftrName}>
-                <span
-                  className={`${styles.ftrLabel} ${styles.ftrDir}`}
-                  style={{ color: "var(--g-cyan, #00bcd4)" }}
-                >
-                  📁 .context/
-                </span>
-                <span className={styles.ftrComment}>
-                  ← Knowledge Base（エージェントが自動学習・蓄積）
-                </span>
-              </div>
-            </div>
-
-            {/* architecture.md */}
-            <div className={styles.ftr}>
-              <div className={styles.ftrIndent}>
-                <div className={`${styles.ftrGuide} ${styles.vline}`} />
-                <div className={`${styles.ftrGuide} ${styles.vline} ${styles.elbow}`} />
-              </div>
-              <div className={styles.ftrName}>
-                <span className={`${styles.ftrLabel} ${styles.ftrFctx}`}>📄 architecture.md</span>
-                <span className={styles.ftrComment}>← システム構成・技術スタック情報</span>
-              </div>
-            </div>
-
-            {/* gotchas.md */}
-            <div className={styles.ftr}>
-              <div className={styles.ftrIndent}>
-                <div className={`${styles.ftrGuide} ${styles.vline}`} />
-                <div className={`${styles.ftrGuide} ${styles.elbow} ${styles.last}`} />
-              </div>
-              <div className={styles.ftrName}>
-                <span className={`${styles.ftrLabel} ${styles.ftrFctx}`}>📄 gotchas.md</span>
-                <span className={styles.ftrComment}>← 発見した落とし穴を記録（自動更新）</span>
-              </div>
-            </div>
-
-            {/* docs/ */}
-            <div className={styles.ftr}>
-              <div className={styles.ftrIndent}>
-                <div className={`${styles.ftrGuide} ${styles.vline} ${styles.elbow}`} />
-              </div>
-              <div className={styles.ftrName}>
-                <span className={`${styles.ftrLabel} ${styles.ftrDir}`}>📁 docs/</span>
-                <span className={styles.ftrComment}>← SDD仕様書群</span>
-              </div>
-            </div>
-
-            {/* spec.md */}
-            <div className={styles.ftr}>
-              <div className={styles.ftrIndent}>
-                <div className={`${styles.ftrGuide} ${styles.vline}`} />
-                <div className={`${styles.ftrGuide} ${styles.vline} ${styles.elbow}`} />
-              </div>
-              <div className={styles.ftrName}>
-                <span className={`${styles.ftrLabel} ${styles.ftrFsdd}`}>📄 spec.md</span>
-                <span className={styles.ftrComment}>← 何を・なぜ（プロダクト仕様）</span>
-              </div>
-            </div>
-
-            {/* design.md */}
-            <div className={styles.ftr}>
-              <div className={styles.ftrIndent}>
-                <div className={`${styles.ftrGuide} ${styles.vline}`} />
-                <div className={`${styles.ftrGuide} ${styles.vline} ${styles.elbow}`} />
-              </div>
-              <div className={styles.ftrName}>
-                <span className={`${styles.ftrLabel} ${styles.ftrFsdd}`}>📄 design.md</span>
-                <span className={styles.ftrComment}>← 技術設計・アーキテクチャ判断</span>
-              </div>
-            </div>
-
-            {/* tasks.md */}
-            <div className={styles.ftr}>
-              <div className={styles.ftrIndent}>
-                <div className={`${styles.ftrGuide} ${styles.vline}`} />
-                <div className={`${styles.ftrGuide} ${styles.elbow} ${styles.last}`} />
-              </div>
-              <div className={styles.ftrName}>
-                <span className={`${styles.ftrLabel} ${styles.ftrFsdd2}`}>📄 tasks.md</span>
-                <span className={styles.ftrComment}>← タスク管理・依存関係・並列情報</span>
-              </div>
-            </div>
-
-            {/* GEMINI.md */}
-            <div className={styles.ftr}>
-              <div className={styles.ftrIndent}>
-                <div className={`${styles.ftrGuide} ${styles.vline} ${styles.elbow}`} />
-              </div>
-              <div className={styles.ftrName}>
-                <span className={`${styles.ftrLabel} ${styles.ftrFreq}`}>📄 GEMINI.md</span>
-                <span className={`${styles.ftrBadge} ${styles.fbReq}`}>常時ロード</span>
-                <span className={styles.ftrComment}>
-                  ← プロジェクト共通メモリ（全セッションで注入）
-                </span>
-              </div>
-            </div>
-
-            {/* AGENTS.md */}
-            <div className={styles.ftr}>
-              <div className={styles.ftrIndent}>
-                <div className={`${styles.ftrGuide} ${styles.elbow} ${styles.last}`} />
-              </div>
-              <div className={styles.ftrName}>
-                <span className={`${styles.ftrLabel} ${styles.ftrFopt}`}>📄 AGENTS.md</span>
-                <span className={`${styles.ftrBadge} ${styles.fbNew}`}>v1.20.3〜</span>
-                <span className={styles.ftrComment}>
-                  ← クロスツール共有（Claude Code / Cursor等と共通）
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <div className={styles.grid2}>
-            <div className={styles.miniCard}>
-              <div className={styles.mcTag}>🌐 グローバル設定</div>
-              <p>
-                <code>~/.gemini/GEMINI.md</code>
-                <br />
-                全プロジェクト共通のワーキングスタイル・禁止事項を記述。プロジェクト固有情報は書かないこと。
-              </p>
-            </div>
-            <div className={styles.miniCard}>
-              <div className={styles.mcTag}>🆕 v1.20.3 〜 2.0 アップデート</div>
-              <p>
-                v1.20.3 で<code>AGENTS.md</code>
-                対応開始。プロジェクトルートに置くだけでClaude
-                Code・Codex・Cursor等と共通ルールを共有可能。Antigravity 2.0（I/O 2026）以降は
-                <strong>Antigravity CLI / SDK / Managed Agents / plugins</strong>
-                経由でも AGENTS.md を共有できる。
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* SECTION 03: GEMINI.md */}
-        <section id="gemini-md" className={styles.sec}>
-          <div className={styles.secLabel}>Section 03</div>
-          <h2 className={styles.secTitle}>
-            <span className={styles.num}>03.</span>GEMINI.md — グローバル永続メモリ
-          </h2>
-
-          <p>
-            Claude Codeの<code>CLAUDE.md</code>に相当する
-            <strong>グローバル永続メモリファイル</strong>。<code>~/.gemini/GEMINI.md</code>
-            に配置し、全プロジェクト・全エージェントセッションに横断的に注入されます。
-            プロジェクト固有のルールは後述の<code>.agent/rules/</code>に分離します。
-          </p>
-
-          <GeminiMdTabs />
-
-          <div className={`${styles.info} ${styles.iWarn}`}>
-            <span className={styles.infoIcon}>⚠️</span>
-            <div>
-              <strong>アンチパターン:</strong>
-              GEMINI.mdにプロジェクト固有のDB設定やAPIエンドポイントを書かない。
-              グローバルファイルはプロジェクト固有情報を持つべきではありません。プロジェクト情報は
-              <code>.agent/rules/</code>または<code>.context/</code>へ。
-            </div>
-          </div>
-        </section>
-
-        {/* SECTION 04: SKILLS */}
-        <section id="skills" className={styles.sec}>
-          <div className={styles.secLabel}>Section 04</div>
-          <h2 className={styles.secTitle}>
-            <span className={styles.num}>04.</span>SKILL.md — 進歩的開示ナレッジ（最重要）
-          </h2>
-
-          <p>
-            Antigravityの Skillsは
-            <strong>「Progressive Disclosure（進歩的開示）」</strong>
-            という設計思想に基づきます。 全てのナレッジをコンテキストに常時注入するのではなく、
-            <strong>エージェントがユーザーの意図を検知したときのみ対応するスキルをロード</strong>
-            する仕組みです。 これによりコンテキスト消費を最小化し、応答速度と精度を向上させます。
-          </p>
-
-          <h3>3段階の段階的読み込み</h3>
-          <div className={styles.levelRow}>
-            <div className={`${styles.lv} ${styles.lv1}`}>
-              <div className={styles.lvNum}>LEVEL 1 — 常時常駐</div>
-              <h4>メタデータのみ</h4>
-              <p>
-                セッション開始時に全スキルの<code>name</code>と<code>description</code>
-                のみがシステムプロンプトに注入される。スキル100個あっても約10,000トークン程度の軽量な状態。
-              </p>
-            </div>
-            <div className={`${styles.lv} ${styles.lv2}`}>
-              <div className={styles.lvNum}>LEVEL 2 — オンデマンド</div>
-              <h4>SKILL.md本文の展開</h4>
-              <p>
-                ユーザーのプロンプトとdescriptionを意味論的に照合し、
-                <code>activate_skill</code>
-                ツールで本文（5,000トークン以内推奨）をコンテキストに展開。
-              </p>
-            </div>
-            <div className={`${styles.lv} ${styles.lv3}`}>
-              <div className={styles.lvNum}>LEVEL 3 — 動的参照</div>
-              <h4>リソースの動的実行</h4>
-              <p>
-                references/内のドキュメントはBashで動的読み取り。scripts/内のスクリプトはソースコードではなく
-                <strong>実行結果のみ</strong>
-                がコンテキストに入る。実質無制限。
-              </p>
-            </div>
-          </div>
-
-          <h3>SKILL.md の完全テンプレート</h3>
-
-          <div className={`${styles.info} ${styles.iCrit}`}>
-            <span className={styles.infoIcon}>🔑</span>
-            <div>
-              <strong>descriptionが命：</strong>
-              SKILL.mdのdescriptionフィールドはエージェントが「いつこのスキルを使うか」を判断するための
-              <strong>意味的トリガー</strong>
-              です。 「何を・いつ・なぜ」を具体的に書くほど精度が向上します。
-              曖昧なdescriptionはスキルが全く呼ばれないか、誤った状況で呼ばれる原因になります。
-            </div>
-          </div>
-
-          <div className={styles.codeWrap}>
-            <div className={styles.cbHead}>
-              <div className={styles.cbDots}>
-                <div className={styles.cbd} style={{ background: "#ea4335" }} />
-                <div className={styles.cbd} style={{ background: "#fbbc04" }} />
-                <div className={styles.cbd} style={{ background: "#34a853" }} />
-              </div>
-              <span>.agent/skills/db-migration/SKILL.md — 完全テンプレート</span>
-            </div>
-            <pre className={styles.codeBody}>
-              <span className={styles.legHd}>{"---"}</span>
-              {"\n"}
-              <span className={styles.legHl}>{"name"}</span>
-              {": "}
-              <span className={styles.legStr}>{"db-migration"}</span>
-              {"  "}
-              <span className={styles.legCmt}>
-                {"# ← ハイフン区切り英語小文字・ディレクトリ名と完全一致させる"}
-              </span>
-              {"\n\n"}
-              <span className={styles.legHl}>{"description"}</span>
-              {": "}
-              <span className={styles.legCmt}>
-                {"# ← 【最重要】AIのトリガー条件。具体的なキーワードを入れる！"}
-              </span>
-              {"\n  "}
-              <span className={styles.legStr}>
-                {"PostgreSQLのスキーマ変更（マイグレーション）を実行する。"}
-              </span>
-              {"\n  "}
-              <span className={styles.legStr}>
-                {"「テーブルを追加」「カラムを追加」「インデックスを作成」"}
-              </span>
-              {"\n  "}
-              <span className={styles.legStr}>
-                {"「DBのスキーマを変更して」という指示が出たら必ずこのスキルを使うこと。"}
-              </span>
-              {"\n"}
-              <span className={styles.legHd}>{"---"}</span>
-              {"\n\n"}
-              <span className={styles.legHd}>{"# DB Migration Skill"}</span>
-              {"\n\n"}
-              <span className={styles.legHd}>{"## Goal（このスキルの目的）"}</span>
-              {"\nPostgreSQL スキーマ変更をプロジェクト標準の手順で安全に実行する。\n\n"}
-              <span className={styles.legHd}>{"## Before Starting（前提条件）"}</span>
-              {"\n- 変更対象のテーブル名・カラム名・データ型をユーザーから確認すること\n\n"}
-              <span className={styles.legHd}>{"## Step-by-Step Guide（具体的な手順）"}</span>
-              {"\n1. "}
-              <span className={styles.legStr}>{"`migrations/`"}</span>
-              {" 配下に "}
-              <span className={styles.legStr}>{"`YYYYMMDD_HHMMSS_description.up.sql`"}</span>
-              {" を作成\n2. ロールバック用 "}
-              <span className={styles.legStr}>{"`·down.sql`"}</span>
-              {" を必ず同時に作成\n3. 整合性チェックを実行: "}
-              <span className={styles.legStr}>{"`python scripts/check.py`"}</span>
-              {"\n4. レビュー後に適用: "}
-              <span className={styles.legStr}>{"`python scripts/migrate.py --apply`"}</span>
-              {"\n5. 完了後にtasks.mdの該当タスクをチェック済みにする\n\n"}
-              <span className={styles.legHd}>{"## Examples（Few-shot：具体的な入出力例）"}</span>
-              {"\n"}
-              <span className={styles.legCmt}>
-                {"# ここに例を書くとAIが期待する動作を模倣する"}
-              </span>
-              {"\n"}
-              <span className={styles.legStr}>
-                {'**Input**: "usersテーブルにlast_login_atカラムを追加して"'}
-              </span>
-              {"\n"}
-              <span className={styles.legStr}>
-                {"**Output**: migrations/20260101_add_last_login_at.up.sql を生成"}
-              </span>
-              {"\n\n"}
-              <span className={styles.legHd}>{"## Rules（制約事項）"}</span>
-              {"\n"}
-              <span className={styles.legHl2}>
-                {"❌ 既存マイグレーションファイルを絶対に編集しない"}
-              </span>
-              {"\n"}
-              <span className={styles.legHl2}>{"❌ 本番環境への直接適用は人間確認なしに禁止"}</span>
-              {"\n"}
-              <span className={styles.legOk}>
-                {"✅ ロールバックファイルは必ずセットで作成する"}
-              </span>
-              {"\n"}
-              <span className={styles.legOk}>
-                {"✅ NULL制約の後付けはデータ移行計画なしに行わない"}
-              </span>
-            </pre>
-          </div>
-
-          <h3>descriptionの書き方 — 良い例 vs 悪い例</h3>
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr",
-              gap: "1rem",
-              margin: "1rem 0",
-            }}
-          >
-            <div
-              style={{
-                background: "rgba(234, 67, 53, 0.07)",
-                border: "1px solid rgba(234, 67, 53, 0.25)",
-                borderRadius: "10px",
-                padding: "1rem 1.2rem",
-              }}
-            >
-              <div
-                style={{
-                  fontSize: "0.7rem",
-                  fontWeight: 700,
-                  textTransform: "uppercase",
-                  letterSpacing: "0.08em",
-                  color: "var(--g-red, #ea4335)",
-                  marginBottom: "0.6rem",
-                }}
-              >
-                ❌ アンダートリガー（呼ばれない）
-              </div>
-              <pre
-                style={{
-                  background: "transparent",
-                  padding: 0,
-                  fontSize: "0.77rem",
-                  color: "var(--text2, #9aafcc)",
-                }}
-              >{`name: security-auditor\ndescription: |\n  セキュリティ監査を行うスキル。`}</pre>
-              <div
-                style={{ fontSize: "0.75rem", color: "var(--g-red, #ea4335)", marginTop: "0.6rem" }}
-              >
-                → AIがいつ使うか判断できない
-              </div>
-            </div>
-            <div
-              style={{
-                background: "rgba(52, 168, 83, 0.07)",
-                border: "1px solid rgba(52, 168, 83, 0.25)",
-                borderRadius: "10px",
-                padding: "1rem 1.2rem",
-              }}
-            >
-              <div
-                style={{
-                  fontSize: "0.7rem",
-                  fontWeight: 700,
-                  textTransform: "uppercase",
-                  letterSpacing: "0.08em",
-                  color: "var(--g-green, #34a853)",
-                  marginBottom: "0.6rem",
-                }}
-              >
-                ✅ 正しいトリガー設計
-              </div>
-              <pre
-                style={{
-                  background: "transparent",
-                  padding: 0,
-                  fontSize: "0.77rem",
-                  color: "var(--text2, #9aafcc)",
-                }}
-              >{`name: security-auditor\ndescription: |\n  コードのセキュリティ監査を実施する。\n  脆弱性チェック、OWASP Top 10の検証、\n  セキュリティ、認証、XSS、SQLi、\n  という言葉が出たら必ず使うこと。`}</pre>
-              <div
-                style={{
-                  fontSize: "0.75rem",
-                  color: "var(--g-green, #34a853)",
-                  marginTop: "0.6rem",
-                }}
-              >
-                → トリガーが明確で確実に呼ばれる
-              </div>
-            </div>
-          </div>
-
-          <h3>5つのスキルパターン</h3>
-          <div className={styles.patternGrid}>
-            <div className={`${styles.patternCard} ${styles.pcB}`}>
-              <div className={styles.pn}>01</div>
-              <h4>Basic Router</h4>
-              <p>SKILL.mdのみ。指示と制約をテキストで記述。最もシンプル。</p>
-              <div className={styles.pcStruct}>SKILL.md only</div>
-            </div>
-            <div className={`${styles.patternCard} ${styles.pcG}`}>
-              <div className={styles.pn}>02</div>
-              <h4>Reference Pattern</h4>
-              <p>references/にドキュメントを置き、SKILL.mdから参照。静的知識の拡張。</p>
-              <div className={styles.pcStruct}>SKILL.md + references/</div>
-            </div>
-            <div className={`${styles.patternCard} ${styles.pcY}`}>
-              <div className={styles.pn}>03</div>
-              <h4>Few-shot Pattern</h4>
-              <p>examples/にInput/Outputのペアを複数用意。精度の向上。</p>
-              <div className={styles.pcStruct}>SKILL.md + examples/</div>
-            </div>
-            <div className={`${styles.patternCard} ${styles.pcR}`}>
-              <div className={styles.pn}>04</div>
-              <h4>Tool Use Pattern</h4>
-              <p>scripts/に実行可能なスクリプトを置く。LLMが苦手な計算・DB操作を外出し。</p>
-              <div className={styles.pcStruct}>SKILL.md + scripts/</div>
-            </div>
-            <div className={`${styles.patternCard} ${styles.pcP}`}>
-              <div className={styles.pn}>05</div>
-              <h4>All-in-One Pattern</h4>
-              <p>全ディレクトリを組み合わせた最強パターン。複雑な業務ロジックに対応。</p>
-              <div className={styles.pcStruct}>SKILL.md + all dirs</div>
-            </div>
-          </div>
-
-          <h3>スキルのスコープ設計</h3>
-          <div className={styles.scopeGrid}>
-            <div className={`${styles.scopeCard} ${styles.scGlobal} ${styles.scG}`}>
-              <div className={styles.scLabel}>🌐 グローバルスキル</div>
-              <h3>全プロジェクトで有効</h3>
-              <p style={{ fontSize: "0.82rem", color: "var(--text2, #9aafcc)" }}>
-                すべてのプロジェクトで利用可能な汎用スキル。
-              </p>
-              <div className={styles.pathBox}>
-                ~/.gemini/antigravity/skills/
-                <br />
-                （Antigravity IDE）
-              </div>
-              <ul>
-                <li>Gitコミット規約フォーマッター</li>
-                <li>コードレビュー標準チェック</li>
-                <li>JSON/YAML フォーマッター</li>
-                <li>テスト生成の標準化</li>
-              </ul>
-            </div>
-            <div className={`${styles.scopeCard} ${styles.scLocal} ${styles.scL}`}>
-              <div className={styles.scLabel}>📁 ワークスペーススキル</div>
-              <h3>このプロジェクトのみ</h3>
-              <p style={{ fontSize: "0.82rem", color: "var(--text2, #9aafcc)" }}>
-                特定プロジェクトのみで有効。チームでgit管理。
-              </p>
-              <div className={styles.pathBox}>
-                .agent/skills/
-                <br />
-                （プロジェクト内）
-              </div>
-              <ul>
-                <li>このアプリのデプロイ手順</li>
-                <li>プロジェクト固有のAPI仕様</li>
-                <li>チーム独自のコーディング規約</li>
-                <li>内部DBのマイグレーション</li>
-              </ul>
-            </div>
-          </div>
-        </section>
-
-        {/* SECTION 05: RULES */}
-        <section id="rules" className={styles.sec}>
-          <div className={styles.secLabel}>Section 05</div>
-          <h2 className={styles.secTitle}>
-            <span className={styles.num}>05.</span>Rules (.agent/rules/) — 受動的制約
-          </h2>
-
-          <p>
-            Antigravityの
-            <strong>Rulesは「常にバックグラウンドで動作するシステムプロンプト」</strong>
-            です。 ファイル単位でルールを分割・個別に有効化できる点が特徴です。
-          </p>
-
-          <h3>Rules vs SKILL.md — 使い分け早見表</h3>
-          <table className={styles.compareTable}>
-            <tbody>
-              <tr>
-                <th>観点</th>
-                <th>Rules (.agent/rules/)</th>
-                <th>SKILL.md (.agent/skills/)</th>
-              </tr>
-              <tr>
-                <td>起動タイミング</td>
-                <td>常時（または設定条件で）</td>
-                <td>意図が合致したときのみ</td>
-              </tr>
-              <tr>
-                <td>コンテキスト消費</td>
-                <td>高（毎回注入）</td>
-                <td>低（オンデマンド）</td>
-              </tr>
-              <tr>
-                <td>用途</td>
-                <td>コーディング規約・禁止事項</td>
-                <td>専門ワークフロー・知識</td>
-              </tr>
-              <tr>
-                <td>推奨内容</td>
-                <td>「〜してはいけない」ルール</td>
-                <td>「〜する方法」の手順</td>
-              </tr>
-            </tbody>
-          </table>
-
-          <div className={styles.codeWrap}>
-            <div className={styles.cbHead}>
-              <div className={styles.cbDots}>
-                <div className={styles.cbd} style={{ background: "#ea4335" }} />
-                <div className={styles.cbd} style={{ background: "#fbbc04" }} />
-                <div className={styles.cbd} style={{ background: "#34a853" }} />
-              </div>
-              <span>.agent/rules/always-on.md — 常時適用ルール</span>
-            </div>
-            <pre className={styles.codeBody}>
-              <span className={styles.legHd}>{"---"}</span>
-              {"\n"}
-              <span className={styles.legHl}>{"activation"}</span>
-              {": "}
-              <span className={styles.legStr}>{"always"}</span>
-              {"\n"}
-              <span className={styles.legHd}>{"---"}</span>
-              {"\n\n"}
-              <span className={styles.legHd}>{"# Project Core Rules"}</span>
-              {"\n\n"}
-              <span className={styles.legHd}>{"## Architecture"}</span>
-              {
-                "\n- このプロジェクトはマイクロサービス構成（Go + gRPC）\n- サービス間通信はgRPCのみ（REST禁止）\n\n"
-              }
-              <span className={styles.legHd}>{"## Security Constraints"}</span>
-              {
-                "\n- 認証なしのエンドポイントを新規作成しない\n- パスワードは必ずbcrypt (cost=12)でハッシュ化\n- JWTの有効期限は1時間以内\n\n"
-              }
-              <span className={styles.legHd}>{"## Forbidden Actions"}</span>
-              {"\n"}
-              <span className={styles.legHl2}>
-                {"- ORM使用禁止（raw SQLのみ） ← なぜ: パフォーマンス測定で20x遅延を確認した"}
-              </span>
-              {"\n"}
-              <span className={styles.legHl2}>{"- グローバル変数の新規追加禁止"}</span>
-              {"\n"}
-              <span className={styles.legHl2}>{"- panic()の使用禁止（エラーを返せ）"}</span>
-            </pre>
-          </div>
-
-          <div className={styles.codeWrap}>
-            <div className={styles.cbHead}>
-              <div className={styles.cbDots}>
-                <div className={styles.cbd} style={{ background: "#ea4335" }} />
-                <div className={styles.cbd} style={{ background: "#fbbc04" }} />
-                <div className={styles.cbd} style={{ background: "#34a853" }} />
-              </div>
-              <span>.agent/rules/typescript.md — 言語別ルール（fileMatch使用）</span>
-            </div>
-            <pre className={styles.codeBody}>
-              <span className={styles.legHd}>{"---"}</span>
-              {"\n"}
-              <span className={styles.legHl}>{"activation"}</span>
-              {": "}
-              <span className={styles.legStr}>{"fileMatch"}</span>
-              {"\n"}
-              <span className={styles.legHl}>{"pattern"}</span>
-              {": "}
-              <span className={styles.legStr}>{'"**/*.ts"'}</span>
-              {"  "}
-              <span className={styles.legCmt}>{"# ← TypeScriptファイル編集時のみ適用される"}</span>
-              {"\n"}
-              <span className={styles.legHd}>{"---"}</span>
-              {"\n\n"}
-              <span className={styles.legHd}>{"# TypeScript Coding Standards"}</span>
-              {
-                "\n\n- strict: true を必ず有効にする\n- enum / namespace は使用禁止（erasableSyntaxOnly）\n- エラーは throw ではなく Result"
-              }
-              {"<T,E>"}
-              {" 型で返す\n- never型を活用して網羅性チェックを徹底する"}
-            </pre>
-          </div>
-
-          <div className={`${styles.info} ${styles.iTip}`}>
-            <span className={styles.infoIcon}>💡</span>
-            <div>
-              <code>activation: fileMatch</code>で
-              <strong>特定ファイルを編集するときだけルールを適用</strong>
-              できます。
-              Goファイル編集時のみGoルールを、TypeScriptファイル時のみTSルールを注入することでコンテキストを節約できます。
-            </div>
-          </div>
-        </section>
-
-        {/* SECTION 06: WORKFLOWS */}
-        <section id="workflows" className={styles.sec}>
-          <div className={styles.secLabel}>Section 06</div>
-          <h2 className={styles.secTitle}>
-            <span className={styles.num}>06.</span>Workflows (.agent/workflows/) — 能動的手順書
-          </h2>
-
-          <p>
-            <strong>WorkflowsはRulesの「受動的制約」とは対照的な「能動的手順書」</strong>です。
-            <code>/workflow-name</code>
-            のようにスラッシュコマンドでトリガーし、エージェントが定義された手順を順番に実行します。
-          </p>
-
-          <div className={styles.codeWrap}>
-            <div className={styles.cbHead}>
-              <div className={styles.cbDots}>
-                <div className={styles.cbd} style={{ background: "#ea4335" }} />
-                <div className={styles.cbd} style={{ background: "#fbbc04" }} />
-                <div className={styles.cbd} style={{ background: "#34a853" }} />
-              </div>
-              <span>.agent/workflows/deploy.md — /deployコマンド</span>
-            </div>
-            <pre className={styles.codeBody}>
-              <span className={styles.legHd}>{"# Deploy Workflow"}</span>
-              {"\n"}
-              <span className={styles.legCmt}>
-                {
-                  "# トリガー: チャットで `/deploy staging` と入力するとエージェントがこの手順を実行"
-                }
-              </span>
-              {"\n\n"}
-              <span className={styles.legHd}>{"## 引数"}</span>
-              {"\n- "}
-              <span className={styles.legStr}>{"`$ENV`"}</span>
-              {": ターゲット環境 (staging | production)\n\n"}
-              <span className={styles.legHd}>{"## 手順"}</span>
-              {"\n1. "}
-              <span className={styles.legStr}>{"`git status`"}</span>
-              {" でコミット漏れがないことを確認する\n2. テストを全件実行: "}
-              <span className={styles.legStr}>{"`go test ./... -race`"}</span>
-              {
-                "\n3. テストが失敗した場合は即座に停止してユーザーに報告する\n4. Dockerイメージをビルド: "
-              }
-              <span className={styles.legStr}>
-                {"`docker build -t app:$(git rev-parse --short HEAD) .`"}
-              </span>
-              {"\n5. $ENV環境にデプロイ:\n   - staging: "}
-              <span className={styles.legStr}>{"`kubectl apply -f k8s/staging.yaml`"}</span>
-              {"\n   - production: "}
-              <span className={styles.legHl2}>{"ユーザーに確認を求めてから実行すること"}</span>
-              {"\n6. ヘルスチェック: "}
-              <span className={styles.legStr}>{"`curl https://$ENV.myapp.com/health`"}</span>
-              {"\n7. Artifacts（デプロイサマリー）を生成してユーザーに提示する"}
-            </pre>
-          </div>
-
-          <div className={styles.codeWrap}>
-            <div className={styles.cbHead}>
-              <div className={styles.cbDots}>
-                <div className={styles.cbd} style={{ background: "#ea4335" }} />
-                <div className={styles.cbd} style={{ background: "#fbbc04" }} />
-                <div className={styles.cbd} style={{ background: "#34a853" }} />
-              </div>
-              <span>.agent/workflows/review.md — /reviewコマンド</span>
-            </div>
-            <pre className={styles.codeBody}>
-              <span className={styles.legHd}>{"# Code Review Workflow"}</span>
-              {"\n\n"}
-              <span className={styles.legHd}>{"## 手順"}</span>
-              {"\n1. "}
-              <span className={styles.legStr}>{"`git diff main`"}</span>
-              {
-                " で変更差分を取得する\n2. 以下の観点でコードレビューを実施:\n   - セキュリティ: SQLインジェクション・XSS・認証漏れ\n   - パフォーマンス: N+1クエリ・不要なアロケーション\n   - 設計: SRPの遵守・依存方向・インターフェース設計\n   - テスト: エッジケースのカバレッジ\n3. 問題があれば重大度(P0/P1/P2)付きでリストアップ\n4. "
-              }
-              <span className={styles.legStr}>{"`docs/tasks.md`"}</span>
-              {" に未対応課題として追記する\n5. Implementation Artifactとしてレビュー結果を出力"}
-            </pre>
-          </div>
-
-          <div className={`${styles.info} ${styles.iTip}`}>
-            <span className={styles.infoIcon}>💡</span>
-            <div>
-              ワークフロー内から別のワークフローを呼び出すことができます（
-              <strong>チェーン化</strong>
-              ）。 例: "Ship Feature"ワークフローの中で<code>/review</code>を呼び出し、通過したら
-              <code>/deploy staging</code>を実行する構成が可能です。
-            </div>
-          </div>
-        </section>
-
-        {/* SECTION 07: ARTIFACTS */}
-        <section id="artifacts" className={styles.sec}>
-          <div className={styles.secLabel}>Section 07</div>
-          <h2 className={styles.secTitle}>
-            <span className={styles.num}>07.</span>Artifacts — エージェント自動生成の証拠
-          </h2>
-
-          <p>
-            AntigravityのArtifactsは、
-            <strong>エージェントが自律的に作業を進める際の「信頼の証拠」</strong>
-            として機能します。
-            「エージェントが何をしたか・なぜそう判断したか」をMarkdownや画像・動画で可視化することで「Trust
-            Gap」を埋めます。
-          </p>
-
-          <div className={styles.artRow}>
-            <div className={styles.artCard}>
-              <span className={styles.artIcon}>📋</span>
-              <div className={styles.artName}>Task List</div>
-              <div className={styles.artDesc}>
-                エージェントがコードを書く前に生成する構造化計画。Research → Implementation →
-                Verification のフェーズを明示。
-              </div>
-              <div className={styles.artAuto}>✦ 自動生成</div>
-            </div>
-            <div className={styles.artCard}>
-              <span className={styles.artIcon}>🏛</span>
-              <div className={styles.artName}>Implementation Plan</div>
-              <div className={styles.artDesc}>
-                コードベースへの変更を事前に詳述する技術設計書。どのファイルをなぜ変更するかを人間がレビュー可能な形式で提示。
-              </div>
-              <div className={styles.artAuto}>✦ 自動生成</div>
-            </div>
-            <div className={styles.artCard}>
-              <span className={styles.artIcon}>📊</span>
-              <div className={styles.artName}>Walkthrough</div>
-              <div className={styles.artDesc}>
-                完了した変更のサマリー。変更ファイル一覧・主要な設計判断の理由・テスト結果を含む。
-              </div>
-              <div className={styles.artAuto}>✦ 自動生成</div>
-            </div>
-            <div className={styles.artCard}>
-              <span className={styles.artIcon}>📸</span>
-              <div className={styles.artName}>Screenshots</div>
-              <div className={styles.artDesc}>
-                Browser Subagentが撮影したUIの視覚的エビデンス。フロントエンド変更の検証に使用。
-              </div>
-              <div className={styles.artAuto}>✦ Browser Agent自動撮影</div>
-            </div>
-            <div className={styles.artCard}>
-              <span className={styles.artIcon}>🎬</span>
-              <div className={styles.artName}>Browser Recordings</div>
-              <div className={styles.artDesc}>
-                UI操作のビデオ録画。E2Eフローの証明として機能。人間がレビュー後にフィードバックをインラインコメントで残せる。
-              </div>
-              <div className={styles.artAuto}>✦ Browser Agent自動録画</div>
-            </div>
-          </div>
-
-          <div className={`${styles.info} ${styles.iCrit}`}>
-            <span className={styles.infoIcon}>⚠️</span>
-            <div>
-              <strong>SDD最重要原則: Artifactを読め</strong>
+        {/* MAIN CONTENT */}
+        <main className={styles.main}>
+          <div className={styles.hero}>
+            <span className={styles.eyebrow}>
+              <span className={styles.dot} />
+              UPDATED THROUGH JULY 28, 2026
+            </span>
+            <h1 className={styles.title}>
+              Antigravity CLI
               <br />
-              多くのユーザーがTask ListやImplementation
-              Planを「なんとなく承認」してコーディング速度を上げようとします。 しかしSDDではここが
-              <strong>最重要レビューポイント</strong>です。
-              「コードは後で直せる。設計の誤りは高くつく」——
-              Artifactを厳密に検査することがバグを未然に防ぐ最善策です。
-            </div>
-          </div>
-        </section>
+              完全ガイド
+            </h1>
+            <p className={styles.subtitle}>
+              全スラッシュコマンド・キーバインド・設定・自動化を、中級〜上級開発者向けにステップバイステップで解説。公式ドキュメントと著名開発者の一次情報にもとづく実務リファレンス。
+            </p>
 
-        {/* SECTION 08: MODELS */}
-        <section id="models" className={styles.sec}>
-          <div className={styles.secLabel}>Section 08</div>
-          <h2 className={styles.secTitle}>
-            <span className={styles.num}>08.</span>対応モデルと料金（2026年6月現在）
-          </h2>
+            <div className={styles.term}>
+              <div className={styles.termBar}>
+                <span className={`${styles.termDot} ${styles.termDotR}`} />
+                <span className={`${styles.termDot} ${styles.termDotY}`} />
+                <span className={`${styles.termDot} ${styles.termDotG}`} />
+                <span className={styles.termTitle}>~/projects/my-app — agy</span>
+              </div>
+              <div className={styles.termBody}>
+                <p className={styles.termLine}>
+                  <span className={styles.termPrompt}>❯</span> agy --mode=plan
+                </p>
+                <p className={`${styles.termLine} ${styles.termOut}`}>
+                  Antigravity CLI へようこそ。共有エージェントハーネスに接続中…
+                </p>
+                <p className={`${styles.termLine} ${styles.termOut}`}>
+                  [plan] コードベースを調査し、実装計画を作成しています…
+                </p>
+                <p className={styles.termLine}>
+                  <span className={styles.termPrompt}>❯</span>{" "}
+                  <span className={styles.caret} />
+                </p>
+              </div>
+            </div>
 
-          <table className={styles.modelTable}>
-            <tbody>
-              <tr>
-                <th>モデルID</th>
-                <th>推奨用途</th>
-                <th>ステータス</th>
-              </tr>
-              <tr>
-                <td>gemini-3.5-flash</td>
-                <td>Antigravity 2.0 標準モデル — 日常タスク / Managed Agents の実行</td>
-                <td>
-                  <span className={`${styles.badge} ${styles.badgeB}`}>⭐ I/O 2026 主軸</span>
-                </td>
-              </tr>
-              <tr>
-                <td>gemini-3.5-pro</td>
-                <td>高難度推論 / アーキテクチャ設計 / セキュリティ監査</td>
-                <td>
-                  <span className={`${styles.badge} ${styles.badgeB}`}>🚀 I/O 2026 上位モデル</span>
-                </td>
-              </tr>
-              <tr>
-                <td>gemini-omni-flash</td>
-                <td>マルチモーダル特化 — 画像 / 音声 / 動画を含むタスク</td>
-                <td>
-                  <span className={`${styles.badge} ${styles.badgeY}`}>🎬 マルチモーダル特化</span>
-                </td>
-              </tr>
-              <tr>
-                <td>gemini-3-flash-preview</td>
-                <td>コードレビュー・テスト・実装・日常タスク</td>
-                <td>
-                  <span className={`${styles.badge} ${styles.badgeG}`}>✅ デフォルト推奨</span>
-                </td>
-              </tr>
-              <tr>
-                <td>gemini-3.1-pro-preview</td>
-                <td>アーキテクチャ設計・セキュリティ監査（ARC-AGI-2: 77.1%）</td>
-                <td>
-                  <span className={`${styles.badge} ${styles.badgeB}`}>⭐ 新世代最高精度</span>
-                </td>
-              </tr>
-              <tr>
-                <td>gemini-2.5-flash</td>
-                <td>安定運用・コスパ重視</td>
-                <td>
-                  <span className={`${styles.badge} ${styles.badgeG}`}>✅ 安定版</span>
-                </td>
-              </tr>
-              <tr>
-                <td>gemini-2.0-flash</td>
-                <td>（廃止予定）</td>
-                <td>
-                  <span className={`${styles.badge} ${styles.badgeR}`}>⚠️ 2026-06-01 廃止予定</span>
-                </td>
-              </tr>
-              <tr>
-                <td>claude-sonnet-4-6</td>
-                <td>Anthropicモデル（Antigravity対応）</td>
-                <td>
-                  <span className={`${styles.badge} ${styles.badgeY}`}>Anthropic対応</span>
-                </td>
-              </tr>
-              <tr>
-                <td>claude-opus-4-6</td>
-                <td>Anthropic最高精度（Antigravity対応）</td>
-                <td>
-                  <span className={`${styles.badge} ${styles.badgeY}`}>Anthropic対応</span>
-                </td>
-              </tr>
-              <tr>
-                <td>gpt-oss-120b</td>
-                <td>OpenAI対応</td>
-                <td>
-                  <span className={`${styles.badge} ${styles.badgeB}`}>OpenAI対応</span>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-
-          <div className={styles.grid3}>
-            <div
-              className={styles.miniCard}
-              style={{ border: "1px solid var(--border)", textAlign: "center" }}
-            >
-              <div className={styles.mcTag} style={{ textAlign: "center" }}>
-                Free
-              </div>
-              <div
-                style={{
-                  fontSize: "1.8rem",
-                  fontWeight: 700,
-                  color: "#edf3ff",
-                  margin: "0.3rem 0",
-                }}
-              >
-                $0
-              </div>
-              <p>
-                Public Preview中
-                <br />
-                利用可能（待機あり）
-              </p>
-            </div>
-            <div
-              className={styles.miniCard}
-              style={{ border: "1px solid rgba(66, 133, 244, 0.35)", textAlign: "center" }}
-            >
-              <div
-                className={styles.mcTag}
-                style={{ textAlign: "center", color: "var(--g-blue, #4285f4)" }}
-              >
-                Google AI Pro
-              </div>
-              <div
-                style={{
-                  fontSize: "1.8rem",
-                  fontWeight: 700,
-                  color: "#edf3ff",
-                  margin: "0.3rem 0",
-                }}
-              >
-                $19.99<span style={{ fontSize: "1rem" }}>/月</span>
-              </div>
-              <p>
-                優先アクセス枠
-                <br />
-                レートリミット緩和
-              </p>
-            </div>
-            <div
-              className={styles.miniCard}
-              style={{ border: "1px solid rgba(251, 188, 4, 0.3)", textAlign: "center" }}
-            >
-              <div
-                className={styles.mcTag}
-                style={{ textAlign: "center", color: "var(--g-yellow, #fbbc04)" }}
-              >
-                Google AI Ultra
-              </div>
-              <div
-                style={{
-                  fontSize: "1.8rem",
-                  fontWeight: 700,
-                  color: "#edf3ff",
-                  margin: "0.3rem 0",
-                }}
-              >
-                $250<span style={{ fontSize: "1rem" }}>/月</span>
-              </div>
-              <p>
-                最優先アクセス
-                <br />
-                Gemini 3.5 Flash / 3.5 Pro / 3.1 Pro 利用可
-              </p>
-            </div>
-          </div>
-          <p style={{ fontSize: "0.78rem", color: "var(--text3, #5a7090)", marginTop: "0.5rem" }}>
-            ※ 2026年6月現在、Pro加入者でも最大7日間のレートリミットロックが報告されています。Gemini
-            CLI は 2026-06-18 に AI Pro/Ultra/無料 Code Assist 向けサンセット済 → Antigravity CLI
-            へ移行完了（公式パス）
-          </p>
-        </section>
-
-        {/* SECTION 09: BEST-PRACTICES */}
-        <section id="best-practices" className={styles.sec}>
-          <div className={styles.secLabel}>Section 09</div>
-          <h2 className={styles.secTitle}>
-            <span className={styles.num}>09.</span>横断ベストプラクティス 10則
-          </h2>
-
-          <div className={styles.bestGrid}>
-            <div className={`${styles.bestCard} ${styles.bestB}`}>
-              <div className={styles.bestN}>01</div>
-              <h4>descriptionがSKILL.mdの命</h4>
-              <p>
-                意味的トリガーとして機能するdescriptionを徹底的に具体化。「何を・いつ・なぜ」を英語・日本語問わず記述すると精度が向上する。
-              </p>
-            </div>
-            <div className={`${styles.bestCard} ${styles.bestG}`}>
-              <div className={styles.bestN}>02</div>
-              <h4>Rules ≠ SKILL.md: 用途を厳守</h4>
-              <p>
-                「常に守るルール」はRules、「特定タスクの知識」はSKILL.md。混在するとコンテキスト汚染が発生する。
-              </p>
-            </div>
-            <div className={`${styles.bestCard} ${styles.bestY}`}>
-              <div className={styles.bestN}>03</div>
-              <h4>Artifactレビューを省略しない</h4>
-              <p>
-                Task ListとImplementation
-                Planは必ずレビュー。ここで設計ミスを検出することがバグコスト最小化の鍵。
-              </p>
-            </div>
-            <div className={`${styles.bestCard} ${styles.bestR}`}>
-              <div className={styles.bestN}>04</div>
-              <h4>fileMatchで言語別ルールを分離</h4>
-              <p>
-                activation:
-                fileMatchを使い、Go/TS/Pythonなど言語別にルールを切り替え。全言語に共通ルールを書かない。
-              </p>
-            </div>
-            <div className={`${styles.bestCard} ${styles.bestP}`}>
-              <div className={styles.bestN}>05</div>
-              <h4>スキルは10〜15個以内に絞る</h4>
-              <p>
-                アクティブなスキルが増えすぎるとAIが混乱し精度が低下する。使わないスキルは/skills
-                disableコマンドで無効化。
-              </p>
-            </div>
-            <div className={`${styles.bestCard} ${styles.bestC}`}>
-              <div className={styles.bestN}>06</div>
-              <h4>.context/でナレッジを蓄積する</h4>
-              <p>
-                Known GotchasをKnowledge
-                Baseに記録。エージェントが同じ過ちを繰り返さず、ドキュメントの自動進化を促す。
-              </p>
-            </div>
-            <div className={`${styles.bestCard} ${styles.bestB}`}>
-              <div className={styles.bestN}>07</div>
-              <h4>Workflowsで繰り返し作業を撲滅</h4>
-              <p>
-                毎回同じ手順を口頭で指示するものはWorkflowに書く。/deploy、/review、/release-notesを整備する。
-              </p>
-            </div>
-            <div className={`${styles.bestCard} ${styles.bestG}`}>
-              <div className={styles.bestN}>08</div>
-              <h4>GEMINI.mdは「薄く・分割して」</h4>
-              <p>
-                @./docs/guide.mdのように@importでファイルを分割参照。1ファイルに全部詰め込まないことがコンテキスト節約の鍵。
-              </p>
-            </div>
-            <div className={`${styles.bestCard} ${styles.bestY}`}>
-              <div className={styles.bestN}>09</div>
-              <h4>Rulesには「Why」を書く</h4>
-              <p>
-                「ORM使用禁止」だけでなく「なぜ禁止か（パフォーマンス測定で20x遅延を確認）」を書くとエージェントの判断精度が上がる。
-              </p>
-            </div>
-            <div className={`${styles.bestCard} ${styles.bestR}`}>
-              <div className={styles.bestN}>10</div>
-              <h4>tasks.mdに並列情報を明示する</h4>
-              <p>
-                「Agent A担当」「Agent B担当（並列可）」を記述することでAgent
-                Managerが最適にタスクを分配できる。
-              </p>
+            <div className={styles.metaLine}>
+              <span>
+                <b>対象:</b> Antigravity CLI (agy) v1.1.x
+              </span>
+              <span>
+                <b>形式:</b> 全コマンドリファレンス + ベストプラクティス
+              </span>
+              <span>
+                <b>図解:</b> Mermaid
+              </span>
             </div>
           </div>
 
-          <h3>公開・運用前チェックリスト</h3>
-          <BestPracticesChecklist />
-        </section>
+          <div className="content-wrap">
+            {/* 00 OVERVIEW */}
+            <section id="overview" className={styles.section}>
+              <h2>
+                <span className={styles.idx}>00 /</span> 概要 & アーキテクチャ
+              </h2>
+              <p>
+                Antigravity CLI (<code>agy</code>) は、Google が 2026
+                年に発表した Terminal UI (TUI)
+                型のエージェント型コーディングツールです。旧 Gemini CLI
+                の後継にあたり、Go 言語で実装されています。最大の特徴は、Antigravity
+                2.0 (デスクトップ GUI) ・ Antigravity IDE (VS Code
+                フォーク) ・ Antigravity SDK (Python) と
+                <strong>「共有エージェントハーネス」</strong>を利用する点です。
+              </p>
 
-        {/* SECTION 10: SOURCES */}
-        <section id="sources" className={styles.sec}>
-          <div className={styles.secLabel}>Section 10</div>
-          <h2 className={styles.secTitle}>
-            <span className={styles.num}>10.</span>参考ソース一覧（公式・一次情報優先）
-          </h2>
+              <div className={styles.mermaidWrap}>
+                <MermaidDiagram chart={DIAG_1} id="diag-1" />
+              </div>
 
-          <div className={styles.sourcesList}>
-            <div className={styles.srcItem}>
-              <span className={styles.srcNum}>[1]</span>
-              <div>
-                <a
-                  href="https://developers.googleblog.com/build-with-google-antigravity-our-new-agentic-development-platform/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={styles.srcLink}
-                >
-                  Build with Google Antigravity — Google Developers Blog (Nov 2025)
-                </a>
-                <span className={styles.srcDesc}>
-                  Antigravity公式発表。エージェントファーストパラダイム・Artifacts・Knowledge
-                  Baseの設計思想
-                </span>
+              <h3>主な特徴と旧ツール (Gemini CLI) からの変更点</h3>
+              <ul>
+                <li>
+                  <strong>TUI 再設計:</strong> Bubble Tea / Lip Gloss (Go
+                  言語) ベースで応答速度が大幅に向上し、ターミナル内リサイズ対応やスムーズなスクロールが実現。
+                </li>
+                <li>
+                  <strong>エージェント自律実行:</strong> ファイル読み書き・コマンド実行・Web 検索・サブエージェント呼び出しをシームレスに連携。
+                </li>
+                <li>
+                  <strong>共通エコシステム:</strong> GUI / IDE / CLI
+                  間でプロンプト、設定、セッション履歴を相互共有。
+                </li>
+              </ul>
+            </section>
+
+            {/* 01 INSTALL */}
+            <section id="install" className={styles.section}>
+              <h2>
+                <span className={styles.idx}>01 /</span> インストール & 認証
+              </h2>
+              <p>
+                macOS, Linux, Windows (WSL2 / PowerShell) で動作します。Go
+                バイナリ単体として配布されているため軽量です。
+              </p>
+
+              <div className={styles.codeWrap}>
+                <div className={styles.codeBar}>
+                  <span>インストールコマンド</span>
+                  <span className={styles.codeLang}>Bash</span>
+                </div>
+                <div className={styles.codeBody}>
+                  <div className={styles.codeLine}>
+                    <span className={styles.cc}># macOS (Homebrew)</span>
+                  </div>
+                  <div className={styles.codeLine}>
+                    <span className={styles.ck}>brew install</span>
+                    <span className={styles.cv}> google/tap/antigravity-cli</span>
+                  </div>
+                  <div className={styles.codeLine} />
+                  <div className={styles.cc}># 独立バイナリ (Linux / WSL2)</div>
+                  <div className={styles.codeLine}>
+                    <span className={styles.ck}>curl -fsSL</span>
+                    <span className={styles.cv}> https://antigravity.google/install.sh | sh</span>
+                  </div>
+                </div>
               </div>
-            </div>
-            <div className={styles.srcItem}>
-              <span className={styles.srcNum}>[2]</span>
-              <div>
-                <a
-                  href="https://medium.com/google-cloud/benefits-and-challenges-of-spec-driven-development-and-how-antigravity-is-changing-the-game-3343a6942330"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={styles.srcLink}
-                >
-                  How Google Antigravity is changing spec-driven development — Google Cloud Medium
-                  (Jan 2026)
-                </a>
-                <span className={styles.srcDesc}>
-                  Artifacts（Task List / Implementation Plan / Walkthrough）のSDD活用、Knowledge
-                  Baseによる自動学習
-                </span>
+
+              <h3>初回認証シーケンス</h3>
+              <p>
+                実行時にキーリング (`keychain` / `secret-service`) を参照し、Web 認証または API キー設定を行います。
+              </p>
+
+              <div className={styles.mermaidWrap}>
+                <MermaidDiagram chart={DIAG_2} id="diag-2" />
               </div>
-            </div>
-            <div className={styles.srcItem}>
-              <span className={styles.srcNum}>[3]</span>
-              <div>
-                <a
-                  href="https://codelabs.developers.google.com/getting-started-google-antigravity"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={styles.srcLink}
-                >
-                  Getting Started with Google Antigravity — Google Codelabs
-                </a>
-                <span className={styles.srcDesc}>
-                  公式チュートリアル。Skills・Rules・Workflows・Artifactsの設定方法。GEMINI.md・.agent/ディレクトリ構造
-                </span>
+            </section>
+
+            {/* 02 QUICKSTART */}
+            <section id="quickstart" className={styles.section}>
+              <h2>
+                <span className={styles.idx}>02 /</span> 初回起動 & プロジェクトの基本操作
+              </h2>
+              <p>
+                プロジェクトディレクトリに移動し、`agy` コマンドで起動します。
+              </p>
+
+              <div className={styles.codeWrap}>
+                <div className={styles.codeBar}>
+                  <span>基本起動</span>
+                  <span className={styles.codeLang}>Bash</span>
+                </div>
+                <div className={styles.codeBody}>
+                  <div className={styles.codeLine}>
+                    <span className={styles.ck}>cd</span>
+                    <span className={styles.cv}> ~/projects/my-app</span>
+                  </div>
+                  <div className={styles.codeLine}>
+                    <span className={styles.ck}>agy</span>
+                  </div>
+                </div>
               </div>
-            </div>
-            <div className={styles.srcItem}>
-              <span className={styles.srcNum}>[4]</span>
-              <div>
-                <a
-                  href="https://codelabs.developers.google.com/getting-started-with-antigravity-skills"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={styles.srcLink}
-                >
-                  Authoring Google Antigravity Skills — Google Codelabs
-                </a>
-                <span className={styles.srcDesc}>
-                  SKILL.mdの完全仕様。スキルディレクトリ構造（SKILL.md / scripts / references /
-                  assets）・5パターン詳解
-                </span>
+
+              <p>
+                直近のコンテキストを保持して開始したい場合は <code>agy -c</code> (Continue) や <code>agy -r</code> (Resume) を利用します。
+              </p>
+            </section>
+
+            {/* 03 EXECUTION MODES */}
+            <section id="execution-modes" className={styles.section}>
+              <h2>
+                <span className={styles.idx}>03 /</span> 実行モード (Execution Modes)
+              </h2>
+              <p>
+                Antigravity CLI には 3 つの主要実行モードが存在します。<code>Shift+Tab</code> または <code>agy --mode=&lt;name&gt;</code> で切り替えます。
+              </p>
+
+              <div className={styles.mermaidWrap}>
+                <MermaidDiagram chart={DIAG_3} id="diag-3" />
               </div>
-            </div>
-            <div className={styles.srcItem}>
-              <span className={styles.srcNum}>[5]</span>
-              <div>
-                <a
-                  href="https://medium.com/google-cloud/tutorial-getting-started-with-antigravity-skills-864041811e0d"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={styles.srcLink}
-                >
-                  How to Build Custom Skills in Google Antigravity — Google Cloud Medium (Jan 2026)
-                </a>
-                <span className={styles.srcDesc}>
-                  Progressive Disclosure設計思想。scripts/サブディレクトリのTool Use
-                  Pattern詳細。グローバル/ワークスペーススコープ
-                </span>
+
+              <div className={styles.tableWrap}>
+                <table className={styles.table}>
+                  <thead>
+                    <tr>
+                      <th>モード</th>
+                      <th>フラグ / ショートカット</th>
+                      <th>挙動 & 用途</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><code>Default (通常)</code></td>
+                      <td>標準</td>
+                      <td>対話型コーディング。ツール実行前に毎度ユーザー確認を求める。</td>
+                    </tr>
+                    <tr>
+                      <td><code>accept-edits</code></td>
+                      <td><code>Shift+Tab</code> (1回)</td>
+                      <td>ファイルの自動適用モード。ツール書き込み確認を省略してスムーズに実装。</td>
+                    </tr>
+                    <tr>
+                      <td><code>plan</code></td>
+                      <td><code>agy --mode=plan</code> / <code>Shift+Tab</code> (2回)</td>
+                      <td>計画専用モード。ファイル変更やコマンド実行を行わず <code>implementation_plan.md</code> を作成。</td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
-            </div>
-            <div className={styles.srcItem}>
-              <span className={styles.srcNum}>[6]</span>
-              <div>
-                <a
-                  href="https://iamulya.one/posts/advanced-tips-for-mastering-google-antigravity/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={styles.srcLink}
-                >
-                  Advanced Tips for Mastering Google Antigravity — Amulya Bhatia (Jan 2026)
-                </a>
-                <span className={styles.srcDesc}>
-                  Rules vs Workflows の使い分け。fileMatch
-                  activation。マルチエージェント並列処理。Workflowsチェーン化
-                </span>
+            </section>
+
+            {/* 04 SLASH COMMANDS */}
+            <section id="slash-commands" className={styles.section}>
+              <h2>
+                <span className={styles.idx}>04 /</span> スラッシュコマンド 全リファレンス
+              </h2>
+              <p>
+                プロンプト入力欄で <code>/</code> を打つと補完メニューが表示されます。全 20 個の主要コマンド一覧です。
+              </p>
+
+              <div className={styles.tableWrap}>
+                <table className={styles.table}>
+                  <thead>
+                    <tr>
+                      <th>コマンド</th>
+                      <th>概要</th>
+                      <th>引数 / 備考</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><code>/help</code></td>
+                      <td>ヘルプと使用可能スラッシュコマンドの一覧を表示</td>
+                      <td>-</td>
+                    </tr>
+                    <tr>
+                      <td><code>/clear</code></td>
+                      <td>会話履歴とコンテキストバッファを消去</td>
+                      <td><code>-all</code> でメモリも全リセット</td>
+                    </tr>
+                    <tr>
+                      <td><code>/diff</code></td>
+                      <td>直近の作業によるコード変更差分を TUI 内で確認</td>
+                      <td>VCS / Turn / Commit モード対応</td>
+                    </tr>
+                    <tr>
+                      <td><code>/model</code></td>
+                      <td>使用する LLM モデルを動的変更</td>
+                      <td><code>gemini-3.5-pro</code> / <code>gemini-3.5-flash</code></td>
+                    </tr>
+                    <tr>
+                      <td><code>/mode</code></td>
+                      <td>実行モードを変更</td>
+                      <td><code>default</code>, <code>accept-edits</code>, <code>plan</code></td>
+                    </tr>
+                    <tr>
+                      <td><code>/cost</code></td>
+                      <td>現在のセッションのトークン消費量と推定コストを表示</td>
+                      <td>入力/出力トークン数分解表示</td>
+                    </tr>
+                    <tr>
+                      <td><code>/compact</code></td>
+                      <td>会話履歴を要約してコンテキストウィンドウを節約</td>
+                      <td>長時間の作業で推奨</td>
+                    </tr>
+                    <tr>
+                      <td><code>/commit</code></td>
+                      <td>エージェントに現在の変更からコミットメッセージを生成させコミット</td>
+                      <td><code>-m "msg"</code> で直接指定可能</td>
+                    </tr>
+                    <tr>
+                      <td><code>/review</code></td>
+                      <td>コードレビューを実施し潜在的なバグ・設計不備を指摘</td>
+                      <td>`HEAD` や指定コミットに対して実行</td>
+                    </tr>
+                    <tr>
+                      <td><code>/test</code></td>
+                      <td>プロジェクトのテストスイートを検索・自動実行し成功を確認</td>
+                      <td>-</td>
+                    </tr>
+                    <tr>
+                      <td><code>/mcp</code></td>
+                      <td>接続中の MCP (Model Context Protocol) サーバー状態を表示・管理</td>
+                      <td>`list`, `reload`</td>
+                    </tr>
+                    <tr>
+                      <td><code>/skill</code></td>
+                      <td>使用可能な Skills 一覧の確認および明示的発動</td>
+                      <td>`list`, `run <name>`</td>
+                    </tr>
+                    <tr>
+                      <td><code>/plugin</code></td>
+                      <td>プラグインの管理・適用状態表示</td>
+                      <td>-</td>
+                    </tr>
+                    <tr>
+                      <td><code>/memory</code></td>
+                      <td>エージェントの永続記憶 (MEMORIES.md) の表示と編集</td>
+                      <td>-</td>
+                    </tr>
+                    <tr>
+                      <td><code>/agents</code></td>
+                      <td>マルチエージェントオーケストレーションの状態を表示</td>
+                      <td>サブエージェント一覧</td>
+                    </tr>
+                    <tr>
+                      <td><code>/rules</code></td>
+                      <td>適用中のルールファイル (.claude/rules や AGENTS.md) を表示</td>
+                      <td>-</td>
+                    </tr>
+                    <tr>
+                      <td><code>/copy</code></td>
+                      <td>直前の応答テキストまたはコードブロックをクリップボードにコピー</td>
+                      <td>-</td>
+                    </tr>
+                    <tr>
+                      <td><code>/export</code></td>
+                      <td>セッションログを Markdown または HTML として出力</td>
+                      <td>`export.md`</td>
+                    </tr>
+                    <tr>
+                      <td><code>/import</code></td>
+                      <td>他のセッションやAntigravity GUIからの会話インポート</td>
+                      <td>`<path>`</td>
+                    </tr>
+                    <tr>
+                      <td><code>/exit</code> (または <code>/quit</code>)</td>
+                      <td>Antigravity CLI を終了</td>
+                      <td><code>Ctrl+C</code> または <code>Ctrl+D</code> でも可能</td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
-            </div>
-            <div className={styles.srcItem}>
-              <span className={styles.srcNum}>[7]</span>
-              <div>
-                <a
-                  href="https://github.com/sickn33/antigravity-awesome-skills"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={styles.srcLink}
-                >
-                  antigravity-awesome-skills — GitHub (800+ Skills Collection)
-                </a>
-                <span className={styles.srcDesc}>
-                  SKILL.mdのユニバーサル規格（Claude Code / Antigravity /
-                  Cursor共通）。コミュニティスキルライブラリ
-                </span>
+            </section>
+
+            {/* 05 KEY COMMANDS DETAILS */}
+            <section id="key-commands" className={styles.section}>
+              <h2>
+                <span className={styles.idx}>05 /</span> 主要コマンドの詳細ステップ
+              </h2>
+
+              <h3>1. `/diff` コマンドビューア</h3>
+              <p>
+                <code>/diff</code> を実行すると、TUI 上でインタラクティブな Diff ビューアが開きます。`Tab` キーでビューモードを切り替えられます。
+              </p>
+
+              <div className={styles.mermaidWrap}>
+                <MermaidDiagram chart={DIAG_4} id="diag-4" />
               </div>
-            </div>
-            <div className={styles.srcItem}>
-              <span className={styles.srcNum}>[8]</span>
-              <div>
-                <a
-                  href="https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-3-1-pro/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={styles.srcLink}
-                >
-                  Gemini 3.1 Pro: A smarter model — Google Blog (Feb 2026)
-                </a>
-                <span className={styles.srcDesc}>
-                  Gemini 3.1 ProリリースアナウンスとAntigravityへの展開。ARC-AGI-2スコア77.1%
-                </span>
+
+              <h3>2. `/compact` とコンテキスト圧縮</h3>
+              <p>
+                トークン数が 100k を超えた場合、自動または `/compact` コマンドで重要な決定事項・コード変更要約を残し、会話バッファを削減します。
+              </p>
+
+              <h3>3. タスクバックグラウンド管理 (Background Tasks)</h3>
+              <p>
+                長いビルドやテスト実行時、<code>Ctrl+B</code> でバックグラウンドに送り、別タスクを並行処理できます。
+              </p>
+
+              <div className={styles.mermaidWrap}>
+                <MermaidDiagram chart={DIAG_5} id="diag-5" />
               </div>
-            </div>
-            <div className={styles.srcItem}>
-              <span className={styles.srcNum}>[9]</span>
-              <div>
-                <a
-                  href="https://ai.google.dev/gemini-api/docs/deprecations"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={styles.srcLink}
-                >
-                  Gemini deprecations — Gemini API Docs
-                </a>
-                <span className={styles.srcDesc}>
-                  Gemini 3 Pro Preview廃止スケジュール（2026-03-09）。Gemini 3.1 Pro
-                  Previewへの移行案内
-                </span>
+            </section>
+
+            {/* 06 KEYBOARD SHORTCUTS */}
+            <section id="keyboard-shortcuts" className={styles.section}>
+              <h2>
+                <span className={styles.idx}>06 /</span> キーボードショートカット 完全リファレンス
+              </h2>
+
+              <div className={styles.tableWrap}>
+                <table className={styles.table}>
+                  <thead>
+                    <tr>
+                      <th>キーバインド</th>
+                      <th>アクション</th>
+                      <th>対象コンテキスト</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><code>Shift + Tab</code></td>
+                      <td>実行モードのトグル切り替え (Default ↔ accept-edits ↔ plan)</td>
+                      <td>プロンプト入力時</td>
+                    </tr>
+                    <tr>
+                      <td><code>Ctrl + C</code></td>
+                      <td>現在実行中の思考/ツール処理を中断 (2回連続でCLI終了)</td>
+                      <td>常時</td>
+                    </tr>
+                    <tr>
+                      <td><code>Ctrl + L</code></td>
+                      <td>画面クリア (会話履歴は保持)</td>
+                      <td>TUI 描画</td>
+                    </tr>
+                    <tr>
+                      <td><code>Ctrl + R</code></td>
+                      <td>過去のプロンプト履歴検索 (Reverse Search)</td>
+                      <td>プロンプト入力時</td>
+                    </tr>
+                    <tr>
+                      <td><code>Ctrl + B</code></td>
+                      <td>現在のツール実行コマンドをバックグラウンド化</td>
+                      <td>ツール実行中</td>
+                    </tr>
+                    <tr>
+                      <td><code>Tab</code></td>
+                      <td>スラッシュコマンド・ファイルパスの自動補完</td>
+                      <td>プロンプト入力時</td>
+                    </tr>
+                    <tr>
+                      <td><code>PageUp / PageDown</code></td>
+                      <td>レスポンスログの高速スクロール</td>
+                      <td>ログ表示時</td>
+                    </tr>
+                    <tr>
+                      <td><code>Esc</code></td>
+                      <td>モーダル / サポートダイアログを閉じる</td>
+                      <td>ダイアログ表示時</td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
-            </div>
-            <div className={styles.srcItem}>
-              <span className={styles.srcNum}>[10]</span>
-              <div>
-                <a
-                  href="https://aitoolanalysis.com/google-antigravity-review/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={styles.srcLink}
-                >
-                  Google Antigravity Review 2026 (v1.20.3 Updated) — AI Tool Analysis (Mar 2026)
-                </a>
-                <span className={styles.srcDesc}>
-                  v1.20.3の変更点詳細。AGENTS.mdサポート追加・Auto-continueのデフォルト有効化。サポートモデル一覧
-                </span>
+            </section>
+
+            {/* 07 SETTINGS JSON */}
+            <section id="settings-json" className={styles.section}>
+              <h2>
+                <span className={styles.idx}>07 /</span> 設定ファイル settings.json 完全リファレンス
+              </h2>
+              <p>
+                Antigravity CLI の設定は <code>~/.config/antigravity/settings.json</code> またはプロジェクトローカルの <code>.antigravity/settings.json</code> で管理します。
+              </p>
+
+              <div className={styles.codeWrap}>
+                <div className={styles.codeBar}>
+                  <span>settings.json 例</span>
+                  <span className={styles.codeLang}>JSON</span>
+                </div>
+                <div className={styles.codeBody}>
+                  <div className={styles.codeLine}>&#123;</div>
+                  <div className={styles.codeLine}>
+                    {"  "}
+                    <span className={styles.ck}>"defaultModel"</span>:{" "}
+                    <span className={styles.cs}>"gemini-3.5-pro"</span>,
+                  </div>
+                  <div className={styles.codeLine}>
+                    {"  "}
+                    <span className={styles.ck}>"toolPermission"</span>:{" "}
+                    <span className={styles.cs}>"request-review"</span>,
+                  </div>
+                  <div className={styles.codeLine}>
+                    {"  "}
+                    <span className={styles.ck}>"autoCompactThreshold"</span>:{" "}
+                    <span className={styles.cv}>120000</span>,
+                  </div>
+                  <div className={styles.codeLine}>
+                    {"  "}
+                    <span className={styles.ck}>"sandbox"</span>: &#123;
+                  </div>
+                  <div className={styles.codeLine}>
+                    {"    "}
+                    <span className={styles.ck}>"enabled"</span>:{" "}
+                    <span className={styles.cg}>true</span>,
+                  </div>
+                  <div className={styles.codeLine}>
+                    {"    "}
+                    <span className={styles.ck}>"allowNetwork"</span>:{" "}
+                    <span className={styles.ck}>false</span>
+                  </div>
+                  <div className={styles.codeLine}>{"  "}&#125;,</div>
+                  <div className={styles.codeLine}>
+                    {"  "}
+                    <span className={styles.ck}>"theme"</span>:{" "}
+                    <span className={styles.cs}>"tokyo-night"</span>
+                  </div>
+                  <div className={styles.codeLine}>&#125;</div>
+                </div>
               </div>
-            </div>
-            <div className={styles.srcItem}>
-              <span className={styles.srcNum}>[11]</span>
-              <div>
-                <a
-                  href="https://blog.google/innovation-and-ai/technology/developers-tools/google-io-2026-developer-highlights/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={styles.srcLink}
-                >
-                  I/O 2026 developer highlights: Antigravity, Gemini API, AI Studio — Google Blog
-                  (2026-05-19)
-                </a>
-                <span className={styles.srcDesc}>
-                  Antigravity 2.0 発表。Managed Agents（Gemini API 経由で isolated Linux 環境を 1
-                  API call で起動）・Gemini 3.5 Flash・Antigravity CLI/SDK・Google AI
-                  Studio/Android/Firebase 統合の公式まとめ
-                </span>
+            </section>
+
+            {/* 08 PERMISSIONS & SANDBOX */}
+            <section id="permissions" className={styles.section}>
+              <h2>
+                <span className={styles.idx}>08 /</span> 権限 & サンドボックスモデル
+              </h2>
+              <p>
+                エージェントがファイル作成・ターミナルコマンド実行をリクエストした際、安全性を担保するための権限レベルが設定可能です。
+              </p>
+
+              <div className={styles.mermaidWrap}>
+                <MermaidDiagram chart={DIAG_6} id="diag-6" />
               </div>
-            </div>
-            <div className={styles.srcItem}>
-              <span className={styles.srcNum}>[12]</span>
-              <div>
-                <a
-                  href="https://developers.googleblog.com/all-the-news-from-the-google-io-2026-developer-keynote/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={styles.srcLink}
-                >
-                  All the news from the Google I/O 2026 Developer keynote — Google Developers Blog
-                  (2026-05-19)
-                </a>
-                <span className={styles.srcDesc}>
-                  Gemini 3.5 Flash / Gemini 3.5 Pro / Gemini Omni Flash
-                  の正式アナウンス。Antigravity 2.0 への適用範囲も記載
-                </span>
+            </section>
+
+            {/* 09 MCP */}
+            <section id="mcp" className={styles.section}>
+              <h2>
+                <span className={styles.idx}>09 /</span> MCP (Model Context Protocol) サーバー連携
+              </h2>
+              <p>
+                Anthropic が提唱し業界標準となった MCP をネイティブサポートしています。データベース接続・DevTools・GitHub API などを CLI から直接制御可能です。
+              </p>
+            </section>
+
+            {/* 10 CUSTOM AGENTS / SKILLS / PLUGINS */}
+            <section id="custom-agents" className={styles.section}>
+              <h2>
+                <span className={styles.idx}>10 /</span> カスタムエージェント・Skills・Plugins・Hooks
+              </h2>
+              <p>
+                プロジェクト配下の <code>.claude/skills/</code> または <code>.agent/skills/</code> に <code>SKILL.md</code> を配置することで、独自の定型タスクやルールをエージェントへ拡張できます。
+              </p>
+            </section>
+
+            {/* 11 AUTOMATION & CI/CD */}
+            <section id="automation" className={styles.section}>
+              <h2>
+                <span className={styles.idx}>11 /</span> 自動化・スクリプティング・CI/CD 連携
+              </h2>
+              <p>
+                CLI の非対話モード (<code>agy -p "prompt"</code>) を用いて GitHub Actions や Makefile に組み込むことができます。
+              </p>
+
+              <div className={styles.mermaidWrap}>
+                <MermaidDiagram chart={DIAG_7} id="diag-7" />
               </div>
-            </div>
-            <div className={styles.srcItem}>
-              <span className={styles.srcNum}>[13]</span>
-              <div>
-                <a
-                  href="https://developers.googleblog.com/an-important-update-transitioning-gemini-cli-to-antigravity-cli/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={styles.srcLink}
-                >
-                  An important update: Transitioning Gemini CLI to Antigravity CLI — Google
-                  Developers Blog (2026-05-19)
-                </a>
-                <span className={styles.srcDesc}>
-                  Gemini CLI 廃止スケジュール（2026-06-18, AI Pro/Ultra/無料 Code Assist 向け）と
-                  Antigravity CLI 移行ガイド。Agent Skills/Hooks/Subagents/Extensions（→ Antigravity
-                  plugins）の継承を明示
-                </span>
+            </section>
+
+            {/* 12 BEST PRACTICES */}
+            <section id="best-practices" className={styles.section}>
+              <h2>
+                <span className={styles.idx}>12 /</span> ベストプラクティス (公式ガイド + 実務 Tips 統合版)
+              </h2>
+              <p>
+                効果的なエージェント駆動開発のための 4 ステップ（探索・計画・実行・検証）フローです。
+              </p>
+
+              <div className={styles.mermaidWrap}>
+                <MermaidDiagram chart={DIAG_8} id="diag-8" />
               </div>
-            </div>
+            </section>
+
+            {/* 13 TROUBLESHOOTING */}
+            <section id="troubleshoot" className={styles.section}>
+              <h2>
+                <span className={styles.idx}>13 /</span> トラブルシューティング
+              </h2>
+              <ul>
+                <li>
+                  <strong>TUI 描画崩れ:</strong> ターミナルのリサイズを行なうか <code>Ctrl+L</code> で再描画。
+                </li>
+                <li>
+                  <strong>権限エラー:</strong> <code>settings.json</code> の <code>toolPermission</code> を確認。
+                </li>
+                <li>
+                  <strong>コンテキスト溢れ:</strong> <code>/compact</code> を定期的に実行。
+                </li>
+              </ul>
+            </section>
+
+            {/* 14 SECURITY */}
+            <section id="security" className={styles.section}>
+              <h2>
+                <span className={styles.idx}>14 /</span> セキュリティ上の注意
+              </h2>
+              <p>
+                本番データベースやシークレット情報を含むディレクトリで <code>always-proceed</code> モードを使用しないよう厳重に注意してください。
+              </p>
+            </section>
+
+            {/* 15 REFERENCES */}
+            <section id="references" className={styles.section}>
+              <h2>
+                <span className={styles.idx}>15 /</span> 参考文献 & 情報源
+              </h2>
+              <ul>
+                <li>
+                  <Ext href="https://blog.google/innovation-and-ai/technology/developers-tools/google-io-2026-developer-highlights">
+                    Google I/O 2026 Developer Highlights (Official Blog)
+                  </Ext>
+                </li>
+                <li>
+                  <Ext href="https://developers.googleblog.com/all-the-news-from-the-google-io-2026-developer-keynote">
+                    Google I/O 2026 Developer Keynote Overview
+                  </Ext>
+                </li>
+                <li>
+                  <Ext href="https://developers.googleblog.com/an-important-update-transitioning-gemini-cli-to-antigravity-cli">
+                    Transitioning Gemini CLI to Antigravity CLI Announcement
+                  </Ext>
+                </li>
+              </ul>
+            </section>
           </div>
-        </section>
-      </main>
-    </>
+
+          <footer className={styles.pageFooter}>
+            Antigravity CLI 完全ガイド — 2026-07-28 時点の公開情報にもとづくリファレンス。図解はすべて Mermaid で描画。
+          </footer>
+        </main>
+      </div>
+    </div>
   );
 }
