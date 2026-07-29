@@ -11,7 +11,7 @@
 - **ブランチ**: `dev`（本番 `main` への Next.js 移行マージ完了 🚀）
 - **動作検証**:
   - `bun run build` ✅（`web-next` の全ルートが Static プリレンダリングされる。※Antigravity環境では実行禁止）
-  - `npm run typecheck` ✅
+  - `npm run typecheck` ⚠️（削除済み Google コンポーネント5件への既存 import で失敗。今回追加したコードの型エラーは解消済み）
   - `npm run lint` ⚠️（**91 errors / 4 warnings**。今回のレビュー範囲外を含む既存の未整形・semantic 診断が残るため、全体自動修正は未実施）
 - **テストの実行状況**:
   - **フロントエンド (`web-next/`)**: Vitest の **1232 assertions はすべて合格**。ただし `tests/google-components-coverage.test.tsx` が削除済み `app/google/skill-guide/ChecklistApp` を import しており、**1 suite が収集失敗**（今回のレビュー範囲外）
@@ -19,7 +19,7 @@
 
 ## 最近の追加内容
 
-- **レビュー指摘の現行コード照合とアクセシビリティ・Mermaid・リダイレクト修正**: Google 3ページの TOC を CSS Modules のアクティブクラス、初期ハイライト、複数交差時の最上部判定へ統一し、参考文献 footer も監視対象化。Claude 中級 Skill ガイドと静的 Harness ガイドの閉じた目次を操作不可にした。共有 `MermaidDiagram` に neutral note 色、固定 `fontSize`、図単位の `maxHeight` API を追加し、Antigravity CLI の stateDiagram 2件をページ CSS から移行。旧 `/google/skill-guide-intermediate` へ 301 を追加。ビルド・目視は依頼により省略。Vitest は **1232 assertions pass / 1 suite 収集失敗**、typecheck Green、lint は既存範囲を含む **91 errors / 4 warnings**。
+- **レビュー指摘の現行コード照合とアクセシビリティ・Mermaid・リダイレクト修正**: Google 3ページの TOC を CSS Modules のアクティブクラス、初期ハイライト、複数交差時の最上部判定へ統一し、参考文献 footer も監視対象化。Claude 中級 Skill ガイドと静的 Harness ガイドの閉じた目次を操作不可にした。共有 `MermaidDiagram` に neutral note 色、固定 `fontSize`、図単位の `maxHeight` API を追加し、Antigravity CLI の stateDiagram 2件をページ CSS から移行。旧 `/google/skill-guide-intermediate` へ 301 を追加。ビルド・目視は依頼により省略。Vitest は **1232 assertions pass / 1 suite 収集失敗**。typecheck は削除済み Google コンポーネント5件への既存 import で失敗し、lint は既存範囲を含む **91 errors / 4 warnings**。
 
 - **Google Antigravity 完全ガイド — エコシステムとベストプラクティス（/google/antigravity-best-practices）の Pure JSX 完全置き換え移行**: `Google-antigravity-best-practices.html` を `web-next/app/google/antigravity-best-practices/page.tsx` に Pure JSX として完全忠実移植 🚀。要約・省略なしで全15セクション（全15H2セクション、全表、全コードブロック、3 Mermaid図、全参考文献等）・TOCスクロール追従（`TocObserver.tsx`）・横幅画面いっぱい（100%）・`page-registry.ts` 登録・更新を完了。旧 `/google/skill-guide-intermediate` を新URLへ完全置き換え完了。原本 `Google-antigravity-best-practices.html` / `Google-antigravity-best-practices.md` は `archive/html/google/` および `archive/md/google/` へ `git mv` 退避保存。契約テストを更新。
 

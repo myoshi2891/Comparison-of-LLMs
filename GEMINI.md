@@ -29,7 +29,7 @@ GEMINI.md は Gemini CLI / Gemini Code Assist 向けの入り口。
 
 ```bash
 cd web-next && bun run test        # 1232 assertions pass / 既知の1 suite収集失敗はPROGRESS参照
-cd web-next && bun run typecheck   # OK
+cd web-next && bun run typecheck   # 既知のGoogleコンポーネントimport失敗はPROGRESS参照
 cd web-next && bun run build       # 全ルートが ○ (Static)
 cd web-next && bun run lint        # 既知の全体診断はPROGRESS参照
 cd scraper && uv run pytest        # 38/38 pass（全 Green ✅）
