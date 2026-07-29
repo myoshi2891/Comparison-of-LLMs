@@ -763,8 +763,8 @@ export default function HarnessEngineeringPage() {
               <div className={styles.codeLine}>EXIT_CODE=0</div>
               <div className={styles.codeLine}>ERRORS=&quot;&quot;</div>
               <div className={styles.codeLine}>&nbsp;</div>
-              <div className={styles.codeLine}>TC_OUT=$(npm run typecheck 2&gt;&amp;1) || &#123; EXIT_CODE=$?; ERRORS=&quot;$&amp;#123;ERRORS&#125;$&amp;#123;TC_OUT&#125;\n&quot;; &#125;</div>
-              <div className={styles.codeLine}>LINT_OUT=$(npm run lint 2&gt;&amp;1) || &#123; LINT_STATUS=$?; [ $EXIT_CODE -eq 0 ] &amp;&amp; EXIT_CODE=$LINT_STATUS; ERRORS=&quot;$&amp;#123;ERRORS&#125;$&amp;#123;LINT_OUT&#125;\n&quot;; &#125;</div>
+              <div className={styles.codeLine}>TC_OUT=$(npm run typecheck 2&gt;&amp;1) || &#123; EXIT_CODE=$?; ERRORS=&quot;$&#123;ERRORS&#125;$&#123;TC_OUT&#125;\n&quot;; &#125;</div>
+              <div className={styles.codeLine}>LINT_OUT=$(npm run lint 2&gt;&amp;1) || &#123; LINT_STATUS=$?; [ $EXIT_CODE -eq 0 ] &amp;&amp; EXIT_CODE=$LINT_STATUS; ERRORS=&quot;$&#123;ERRORS&#125;$&#123;LINT_OUT&#125;\n&quot;; &#125;</div>
               <div className={styles.codeLine}>&nbsp;</div>
               <div className={styles.codeLine}>if [ $EXIT_CODE -ne 0 ]; then</div>
               <div className={styles.codeLine}>  printf &quot;%b&quot; &quot;$ERRORS&quot; &gt;&amp;2</div>

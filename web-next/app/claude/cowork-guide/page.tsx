@@ -69,9 +69,9 @@ Agent --> Action{"書き込み系のアクションか?"}
 Action -->|"はい"| Perm["権限モードに応じて確認または自動レビューする"]
 Action -->|"いいえ（読み取りのみ）"| Continue["そのまま作業を継続する"]`;
 
-function Ext({ href, children }: { href: string; children: ReactNode }) {
+function Ext({ href, className, children }: { href: string; className?: string; children: ReactNode }) {
   return (
-    <a href={href} target="_blank" rel="noopener noreferrer">
+    <a href={href} target="_blank" rel="noopener noreferrer" className={className}>
       {children}
     </a>
   );
@@ -1038,7 +1038,7 @@ export default function Page() {
 
             <div className={styles.refGroupTitle}>Anthropic公式</div>
             <div className={styles.refGrid}>
-              <Ext href="https://support.claude.com/en/articles/13345190-get-started-with-claude-cowork">
+              <Ext className={styles.refCard} href="https://support.claude.com/en/articles/13345190-get-started-with-claude-cowork">
                 <span className={styles.refBadge}>公式</span>
                 <span className={styles.refBody}>
                   <strong>Get started with Claude Cowork</strong>
@@ -1048,7 +1048,7 @@ export default function Page() {
                   </span>
                 </span>
               </Ext>
-              <Ext href="https://support.claude.com/en/articles/13364135-use-claude-cowork-safely">
+              <Ext className={styles.refCard} href="https://support.claude.com/en/articles/13364135-use-claude-cowork-safely">
                 <span className={styles.refBadge}>公式</span>
                 <span className={styles.refBody}>
                   <strong>Use Claude Cowork safely</strong>
@@ -1058,7 +1058,7 @@ export default function Page() {
                   </span>
                 </span>
               </Ext>
-              <Ext href="https://claude.com/blog/best-practices-for-getting-started-with-claude-cowork">
+              <Ext className={styles.refCard} href="https://claude.com/blog/best-practices-for-getting-started-with-claude-cowork">
                 <span className={styles.refBadge}>公式</span>
                 <span className={styles.refBody}>
                   <strong>Best practices for getting started with Claude Cowork</strong>
@@ -1068,7 +1068,7 @@ export default function Page() {
                   </span>
                 </span>
               </Ext>
-              <Ext href="https://support.claude.com/en/articles/13947068-assign-tasks-from-anywhere-in-claude-cowork">
+              <Ext className={styles.refCard} href="https://support.claude.com/en/articles/13947068-assign-tasks-from-anywhere-in-claude-cowork">
                 <span className={styles.refBadge}>公式</span>
                 <span className={styles.refBody}>
                   <strong>Assign tasks from anywhere in Claude Cowork</strong>
@@ -1078,7 +1078,7 @@ export default function Page() {
                   </span>
                 </span>
               </Ext>
-              <Ext href="https://www.anthropic.com/engineering/claude-code-auto-mode">
+              <Ext className={styles.refCard} href="https://www.anthropic.com/engineering/claude-code-auto-mode">
                 <span className={styles.refBadge}>公式</span>
                 <span className={styles.refBody}>
                   <strong>
@@ -1089,7 +1089,7 @@ export default function Page() {
                   </span>
                 </span>
               </Ext>
-              <Ext href="https://anthropic.com/news/claude-code-plugins">
+              <Ext className={styles.refCard} href="https://anthropic.com/news/claude-code-plugins">
                 <span className={styles.refBadge}>公式</span>
                 <span className={styles.refBody}>
                   <strong>Customize Claude Code with plugins</strong>
@@ -1098,7 +1098,7 @@ export default function Page() {
                   </span>
                 </span>
               </Ext>
-              <Ext href="https://www.techcrunch.com/2026/01/30/anthropic-brings-agentic-plugins-to-cowork/">
+              <Ext className={styles.refCard} href="https://www.techcrunch.com/2026/01/30/anthropic-brings-agentic-plugins-to-cowork/">
                 <span className={styles.refBadge}>公式</span>
                 <span className={styles.refBody}>
                   <strong>Anthropic brings agentic plug-ins to Cowork</strong>
@@ -1108,7 +1108,7 @@ export default function Page() {
                   </span>
                 </span>
               </Ext>
-              <Ext href="https://support.claude.com/en/articles/12902446-claude-in-chrome-permissions-guide">
+              <Ext className={styles.refCard} href="https://support.claude.com/en/articles/12902446-claude-in-chrome-permissions-guide">
                 <span className={styles.refBadge}>公式</span>
                 <span className={styles.refBody}>
                   <strong>Claude in Chrome permissions guide</strong>
@@ -1122,7 +1122,7 @@ export default function Page() {
 
             <div className={styles.refGroupTitle}>著名な開発者・パワーユーザーの発信</div>
             <div className={styles.refGrid}>
-              <Ext href="https://note.com/_kihonushi/n/nd726246d467f?hl=en-US">
+              <Ext className={styles.refCard} href="https://note.com/_kihonushi/n/nd726246d467f?hl=en-US">
                 <span className={`${styles.refBadge} ${styles.community}`}>コミュニティ</span>
                 <span className={styles.refBody}>
                   <strong>Nav Toor氏の「17 Best Practices」を取り上げた解説記事</strong>
@@ -1131,7 +1131,7 @@ export default function Page() {
                   </span>
                 </span>
               </Ext>
-              <Ext href="https://x.com/heynavtoor/status/2028148844891152554">
+              <Ext className={styles.refCard} href="https://x.com/heynavtoor/status/2028148844891152554">
                 <span className={`${styles.refBadge} ${styles.community}`}>コミュニティ</span>
                 <span className={styles.refBody}>
                   <strong>17 Best Practices That Make Claude Cowork 100x More Powerful</strong>
@@ -1140,7 +1140,7 @@ export default function Page() {
                   </span>
                 </span>
               </Ext>
-              <Ext href="https://x.com/heynavtoor/status/2026717574776631556">
+              <Ext className={styles.refCard} href="https://x.com/heynavtoor/status/2026717574776631556">
                 <span className={`${styles.refBadge} ${styles.community}`}>コミュニティ</span>
                 <span className={styles.refBody}>
                   <strong>Claude Cowork導入ガイドの投稿</strong>
@@ -1149,7 +1149,7 @@ export default function Page() {
                   </span>
                 </span>
               </Ext>
-              <Ext href="https://www.linkedin.com/posts/ruben-hassid_this-is-the-only-claude-cowork-guide-you-activity-7435202560703008792-WQm6">
+              <Ext className={styles.refCard} href="https://www.linkedin.com/posts/ruben-hassid_this-is-the-only-claude-cowork-guide-you-activity-7435202560703008792-WQm6">
                 <span className={`${styles.refBadge} ${styles.community}`}>コミュニティ</span>
                 <span className={styles.refBody}>
                   <strong>This is the only Claude Cowork guide you need</strong>
@@ -1158,7 +1158,7 @@ export default function Page() {
                   </span>
                 </span>
               </Ext>
-              <Ext href="https://ruben.substack.com/p/claude-cowork-20">
+              <Ext className={styles.refCard} href="https://ruben.substack.com/p/claude-cowork-20">
                 <span className={`${styles.refBadge} ${styles.community}`}>コミュニティ</span>
                 <span className={styles.refBody}>
                   <strong>Cowork.</strong>
@@ -1167,7 +1167,7 @@ export default function Page() {
                   </span>
                 </span>
               </Ext>
-              <Ext href="https://claudecowork.im/blog/customize-panel-guide">
+              <Ext className={styles.refCard} href="https://claudecowork.im/blog/customize-panel-guide">
                 <span className={`${styles.refBadge} ${styles.community}`}>コミュニティ</span>
                 <span className={styles.refBody}>
                   <strong>
@@ -1179,7 +1179,7 @@ export default function Page() {
                   </span>
                 </span>
               </Ext>
-              <Ext href="https://github.com/TheCraigHewitt/cowork-starter-pack/blob/main/global-instructions.md">
+              <Ext className={styles.refCard} href="https://github.com/TheCraigHewitt/cowork-starter-pack/blob/main/global-instructions.md">
                 <span className={`${styles.refBadge} ${styles.community}`}>コミュニティ</span>
                 <span className={styles.refBody}>
                   <strong>cowork-starter-pack（global-instructions.md）</strong>
@@ -1188,7 +1188,7 @@ export default function Page() {
                   </span>
                 </span>
               </Ext>
-              <Ext href="https://www.the-ai-corner.com/p/claude-best-practices-power-user-guide-2026">
+              <Ext className={styles.refCard} href="https://www.the-ai-corner.com/p/claude-best-practices-power-user-guide-2026">
                 <span className={`${styles.refBadge} ${styles.community}`}>コミュニティ</span>
                 <span className={styles.refBody}>
                   <strong>Claude best practices 2026: the complete power user guide</strong>
@@ -1197,7 +1197,7 @@ export default function Page() {
                   </span>
                 </span>
               </Ext>
-              <Ext href="https://thesignal.substack.com/p/how-to-run-claude-cowork-from-your">
+              <Ext className={styles.refCard} href="https://thesignal.substack.com/p/how-to-run-claude-cowork-from-your">
                 <span className={`${styles.refBadge} ${styles.community}`}>コミュニティ</span>
                 <span className={styles.refBody}>
                   <strong>How to run Claude Cowork from your phone</strong>
@@ -1207,7 +1207,7 @@ export default function Page() {
                   </span>
                 </span>
               </Ext>
-              <Ext href="https://www.datacamp.com/tutorial/claude-cowork-dispatch">
+              <Ext className={styles.refCard} href="https://www.datacamp.com/tutorial/claude-cowork-dispatch">
                 <span className={`${styles.refBadge} ${styles.community}`}>コミュニティ</span>
                 <span className={styles.refBody}>
                   <strong>Claude Cowork Dispatch 101: Remote Control for Desktop AI</strong>
@@ -1216,7 +1216,7 @@ export default function Page() {
                   </span>
                 </span>
               </Ext>
-              <Ext href="https://www.the-ai-corner.com/p/claude-dispatch-guide">
+              <Ext className={styles.refCard} href="https://www.the-ai-corner.com/p/claude-dispatch-guide">
                 <span className={`${styles.refBadge} ${styles.community}`}>コミュニティ</span>
                 <span className={styles.refBody}>
                   <strong>Claude Dispatch Guide: The AI That Works While You're Away</strong>
@@ -1229,7 +1229,7 @@ export default function Page() {
 
             <div className={styles.refGroupTitle}>補足として参照した記事</div>
             <div className={styles.refGrid}>
-              <Ext href="https://github.com/az9713/claude-cowork-best-practices/blob/main/docs/claude_cowork_best_practices_report.md">
+              <Ext className={styles.refCard} href="https://github.com/az9713/claude-cowork-best-practices/blob/main/docs/claude_cowork_best_practices_report.md">
                 <span className={`${styles.refBadge} ${styles.supplement}`}>補足</span>
                 <span className={styles.refBody}>
                   <strong>claude-cowork-best-practices（Nav Toor実践まとめレポート）</strong>
@@ -1238,7 +1238,7 @@ export default function Page() {
                   </span>
                 </span>
               </Ext>
-              <Ext href="https://claudiaplusai.substack.com/p/claude-cowork-starter-guide-30-examples">
+              <Ext className={styles.refCard} href="https://claudiaplusai.substack.com/p/claude-cowork-starter-guide-30-examples">
                 <span className={`${styles.refBadge} ${styles.supplement}`}>補足</span>
                 <span className={styles.refBody}>
                   <strong>Claude Cowork Starter Guide + 30 examples</strong>
@@ -1248,7 +1248,7 @@ export default function Page() {
                   </span>
                 </span>
               </Ext>
-              <Ext href="https://tooltechsavvy.com/claude-cowork-how-to-choose-folders-wisely-and-use-instructions-for-consistent-results/">
+              <Ext className={styles.refCard} href="https://tooltechsavvy.com/claude-cowork-how-to-choose-folders-wisely-and-use-instructions-for-consistent-results/">
                 <span className={`${styles.refBadge} ${styles.supplement}`}>補足</span>
                 <span className={styles.refBody}>
                   <strong>Claude Cowork: Smart Folders & Instructions Guide</strong>
@@ -1257,7 +1257,7 @@ export default function Page() {
                   </span>
                 </span>
               </Ext>
-              <Ext href="https://fourhourfreedom.substack.com/p/the-claude-cowork-setup-guide-i-wish">
+              <Ext className={styles.refCard} href="https://fourhourfreedom.substack.com/p/the-claude-cowork-setup-guide-i-wish">
                 <span className={`${styles.refBadge} ${styles.supplement}`}>補足</span>
                 <span className={styles.refBody}>
                   <strong>The Claude Cowork Setup Guide I Wish I'd Had</strong>
