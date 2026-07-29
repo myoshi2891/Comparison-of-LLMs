@@ -34,11 +34,33 @@ function applySequenceDiagramColorOverrides(
     el.style.setProperty("fill", actorTxtColor, "important");
   });
 
+  const noteBkgColor = themeVariables?.noteBkgColor ?? themeVariables?.secondaryColor ?? "#FBF0DF";
+  const noteBorderColor = themeVariables?.noteBorderColor ?? "#EACB99";
+  const noteTxtColor =
+    themeVariables?.noteTextColor ?? themeVariables?.primaryTextColor ?? "#14161C";
+
+  root
+    .querySelectorAll<SVGRectElement>(
+      "rect.note, rect.noteRect, g.note rect, .note rect"
+    )
+    .forEach((el) => {
+      el.style.setProperty("fill", noteBkgColor, "important");
+      el.style.setProperty("stroke", noteBorderColor, "important");
+    });
+  root
+    .querySelectorAll<SVGTextElement>("text.noteText, g.note text, .note text")
+    .forEach((el) => {
+      el.style.setProperty("fill", noteTxtColor, "important");
+      el.querySelectorAll<SVGTSpanElement>("tspan").forEach((ts) => {
+        ts.style.setProperty("fill", noteTxtColor, "important");
+      });
+    });
+
   const signalTxtColor =
     themeVariables?.signalTextColor ?? themeVariables?.primaryTextColor ?? "#000000";
   root
     .querySelectorAll<SVGTextElement>(
-      "text.messageText, text.loopText, text.labelText, text.noteText"
+      "text.messageText, text.loopText, text.labelText"
     )
     .forEach((el) => {
       el.style.setProperty("fill", signalTxtColor, "important");

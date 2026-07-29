@@ -36,9 +36,12 @@ const SKILL_THEME_VARS: Record<string, string> = {
   lineColor: "#4A4D57",
   secondaryColor: "#FBF0DF",
   tertiaryColor: "#E4F4EE",
-  actorBkg: "#14161C",
+  actorBkg: "#ECEEFC",
   actorBorder: "#3648D6",
-  actorTextColor: "#FFFFFF",
+  actorTextColor: "#14161C",
+  noteBkgColor: "#FBF0DF",
+  noteBorderColor: "#EACB99",
+  noteTextColor: "#C97A1A",
   signalTextColor: "#14161C",
 };
 
