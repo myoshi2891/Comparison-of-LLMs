@@ -1980,13 +1980,13 @@
         if (document.fonts && document.fonts.ready) {
           await document.fonts.ready;
         }
-        try {
-          await mermaid.run({ querySelector: 'pre.mermaid' });
-        } catch (err) {
-          console.error('Mermaid render failed:', err);
-          document.querySelectorAll('pre.mermaid').forEach((el) => {
+        for (const el of document.querySelectorAll('pre.mermaid')) {
+          try {
+            await mermaid.run({ nodes: [el] });
+          } catch (err) {
+            console.error('Mermaid render failed:', err);
             el.innerHTML = '<div class="mermaid-fallback">図解のレンダリングに失敗しました。</div>';
-          });
+          }
         }
       }
       renderMermaid();

@@ -1,4 +1,5 @@
 # Google Antigravity CLI 完全ガイド
+
 ### 全コマンド・設定・ベストプラクティス徹底解説(中級〜上級者向け)
 
 > 最終更新調査日: 2026年7月29日 (Antigravity CLI v1.1.5 以降対応)。Antigravity CLI は現在も高頻度でアップデートされているツールです。本ガイドは公式ドキュメント (`antigravity.google/docs/cli/*`)、GitHub リポジトリ、および著名な開発者による一次情報をもとに作成していますが、コマンド仕様は今後変更される可能性があります。実行前に必ず `agy --help` または CLI 内の `/help` で最新仕様を確認してください。
@@ -389,7 +390,6 @@ stateDiagram-v2
 mkdir -p ~/.gemini/antigravity-cli
 curl -sSL -o ~/.gemini/antigravity-cli/statusline.sh \
   https://raw.githubusercontent.com/ykdojo/antigravity-cli-tips/a8b9f71c4c1a2d5f1d4352b0476839217822453e/scripts/context-bar.sh
-echo "a8b9f71c4c1a2d5f1d4352b0476839217822453e  ~/.gemini/antigravity-cli/statusline.sh" | sha256sum -c || exit 1
 chmod +x ~/.gemini/antigravity-cli/statusline.sh
 ```
 
@@ -628,7 +628,7 @@ Antigravity CLI は MCP を通じて Jira・Confluence・GitHub・Playwright・S
     },
     "playwright": {
       "command": "npx",
-      "args": ["-y", "@playwright/mcp@0.1.2"]
+      "args": ["-y", "@playwright/mcp@latest"]
     },
     "github": {
       "command": "npx",

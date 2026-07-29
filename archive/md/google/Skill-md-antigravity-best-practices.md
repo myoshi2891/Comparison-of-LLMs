@@ -101,10 +101,10 @@ SKILL.md ファイルの冒頭には、`---` で囲まれた YAML frontmatter �
 
 | フィールド | Antigravity での扱い | Claude Platform(Anthropic公式)での扱い |
 |---|---|---|
-| `name` | 任意。省略時はフォルダ名がそのまま使われる | 任意。省略時は親ディレクトリ名にフォールバック。明示する場合は最大64文字、小文字英数字とハイフンのみ、`anthropic` や `claude` などの予約語は使用不可 |
-| `description` | 必須。何をするスキルで、いつ使うべきかを明記 | 任意。省略時は本文の最初の段落から自動生成。明示する場合は最大1,024文字、空文字不可、XMLタグ不可 |
+| `name` | 任意。省略時はフォルダ名がそのまま使われる | **必須**。最大64文字、小文字英数字とハイフンのみ、`anthropic` や `claude` などの予約語は使用不可 |
+| `description` | 必須。何をするスキルで、いつ使うべきかを明記 | **必須**。最大1,024文字、空文字不可、XMLタグ不可 |
 
-**実務上のポイント**: Claude Platform では `name` と `description` はどちらも省略でき、それぞれ親ディレクトリ名と本文の最初の段落から補完されます。ただし、複数のツール間でスキルを使い回す(移植性を確保する)場合は、Antigravity との互換性とツール間で一貫した発見性を保つため、両方を明示するのが安全です。`name` は Claude Platform 側の命名規則(64文字以内・小文字とハイフンのみ・予約語禁止)にも合わせてください。
+**実務上のポイント**: Claude Platform では `name` と `description` の両方が必須です。複数のツール間でスキルを使い回す場合も両方を明示し、`name` は Claude Platform 側の命名規則(64文字以内・小文字とハイフンのみ・予約語禁止)に合わせてください。
 
 ### 4-3. 本文の基本テンプレート
 
@@ -249,20 +249,18 @@ flowchart TD
 
 ---
 
-## 8. Claude Skills と Antigravity Skills の違い(比較表)
+## 8. Claude 製品群の Skills と Antigravity Skills の違い(比較表)
 
-同じ SKILL.md フォーマットを使っていても、プラットフォームごとに細かな実装差があります。移植性の高いスキルを書くうえで押さえておきたい違いを整理します。
+同じ SKILL.md フォーマットを使っていても、Claude Code、Claude Platform/API、claude.ai、Antigravity では発見・登録方法と実行環境が異なります。移植性の高いスキルを書くうえで押さえておきたい違いを整理します。
 
-| 観点 | Claude(Anthropic公式) | Google Antigravity |
-|---|---|---|
-| `name` の必須性 | 任意(省略時は親ディレクトリ名を使用。明示時は64文字以内、小文字+ハイフン、予約語禁止) | 任意(省略時はフォルダ名を使用) |
-| `description` の必須性 | 任意(省略時は本文の最初の段落から自動生成。明示時は1,024文字以内) | 必須 |
-| 主な配置場所 | `~/.claude/skills/`(個人用)、`.claude/skills/`(プロジェクト用) | `~/.gemini/config/skills/<skill-folder>/`(グローバル)、`.agents/skills/<skill-folder>/`(ワークスペース) |
-| フォーマットの立ち位置 | オリジナル策定元 | オープンスタンダードを採用した実装の1つ |
-| デフォルトの実行モデル | Claude(Opus/Sonnet/Haikuなど) | Gemini 3系列(モデル非依存の設計) |
-| 実行環境 | サンドボックス化されたコード実行コンテナ(製品により制約が異なる) | エージェントのローカル/リモート実行環境 |
+| 観点 | Claude Code | Claude Platform/API | claude.ai | Google Antigravity |
+|---|---|---|---|---|
+| `name` | 必須 | 必須(64文字以内、小文字英数字+ハイフン、予約語禁止) | 必須 | 任意(省略時はフォルダ名を使用) |
+| `description` | 必須 | 必須(1,024文字以内、空文字・XMLタグ不可) | 必須 | 必須 |
+| 発見・登録方法 | `~/.claude/skills/`(個人用)または`.claude/skills/`(プロジェクト用)へ配置してローカル発見 | ZIPまたは個別ファイルをSkills APIへアップロードし、発行された`skill_id`をAPIリクエストで指定 | スキルフォルダをZIP化し、Customize > Skillsからアップロードして有効化 | `~/.gemini/config/skills/<skill-folder>/`(グローバル)または`.agents/skills/<skill-folder>/`(ワークスペース)へ配置 |
+| 実行環境 | Claude Codeのローカル実行環境 | code executionコンテナ | claude.aiのcode execution環境 | エージェントのローカル/リモート実行環境 |
 
-移植性を最優先するなら、両方の制約の「厳しい方」に合わせておくのが実務上もっとも安全です。具体的には、`name` は省略せずに明示し、Anthropic側の文字数・命名規則をそのまま満たしておく、という方針になります。
+`~/.claude/skills/` と `.claude/skills/` はClaude Code専用のローカル発見場所であり、Claude Platform/APIやclaude.aiのアップロード先ではありません。移植性を最優先するなら、`name` と `description` を必ず明示し、Anthropic側の文字数・命名規則を満たしたうえで、利用する製品ごとの登録方法に従います。
 
 ---
 
