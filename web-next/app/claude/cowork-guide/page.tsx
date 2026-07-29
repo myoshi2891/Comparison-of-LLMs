@@ -1,8 +1,8 @@
-import type { Metadata } from "next";
-import type { ReactNode } from "react";
-import MermaidDiagram from "@/components/docs/MermaidDiagram";
-import TocObserver from "./TocObserver";
-import styles from "./page.module.css";
+import type { Metadata } from 'next';
+import type { ReactNode } from 'react';
+import MermaidDiagram from '@/components/docs/MermaidDiagram';
+import TocObserver from './TocObserver';
+import styles from './page.module.css';
 
 const DIAG_LIFECYCLE = `flowchart TB
 A["1. 依頼内容を分析し計画を立てる"] --> B["2. 必要に応じて複数のサブタスクに分解する"]
@@ -11,11 +11,11 @@ C --> D["4. 複数のサブエージェントが並行して作業する"]
 D --> E["5. 完成した成果物をセッションに納品し、プレビュー・ダウンロードできるようにする"]`;
 
 const DIAG_DECISION = `flowchart TB
-Start["やりたいことは?"] --> Q1{"数回のやり取りで完結する質問・相談・壁打ちか?"}
+Start["やりたいことは?"] --> Q1{"数回のやり取りで完結する<br>質問・相談・壁打ちか?"}
 Q1 -->|"はい"| Chat["Chat を使う"]
 Q1 -->|"いいえ"| Q2{"作業対象はコードやリポジトリか?"}
 Q2 -->|"はい"| Code["Claude Code を使う"]
-Q2 -->|"いいえ"| Q3{"複数ファイルや複数アプリを扱い成果物を作る作業か?"}
+Q2 -->|"いいえ"| Q3{"複数ファイルや複数アプリ<br>を扱い成果物を作る作業か?"}
 Q3 -->|"はい"| Cowork["Claude Cowork を使う"]
 Q3 -->|"いいえ"| Chat`;
 
@@ -78,9 +78,9 @@ function Ext({ href, children }: { href: string; children: ReactNode }) {
 }
 
 export const metadata: Metadata = {
-  title: "Claude Cowork 実践ガイド｜初心者のためのステップバイステップ・ベストプラクティス",
+  title: 'Claude Cowork 実践ガイド｜初心者のためのステップバイステップ・ベストプラクティス',
   description:
-    "Anthropic公式ドキュメント・公式ブログとパワーユーザーの知見をもとに、Claude Coworkの基本概念からセットアップ、安全運用、Scheduled Tasks、Dispatch、10の自衛対策まで完全解説。",
+    'Anthropic公式ドキュメント・公式ブログとパワーユーザーの知見をもとに、Claude Coworkの基本概念からセットアップ、安全運用、Scheduled Tasks、Dispatch、10の自衛対策まで完全解説。',
 };
 
 export default function Page() {
@@ -238,8 +238,7 @@ export default function Page() {
           {/* ================= STEP 1 ================= */}
           <section className={styles.section} id="step1">
             <h2>
-              <span className={styles.stepNo}>STEP 1</span>Chat・Cowork・Claude
-              Codeを使い分ける
+              <span className={styles.stepNo}>STEP 1</span>Chat・Cowork・Claude Codeを使い分ける
             </h2>
             <p>
               Anthropicのグロースマーケティング担当者Austin
@@ -291,8 +290,7 @@ export default function Page() {
                   </tr>
                   <tr>
                     <td>
-                      Google
-                      Driveの直近3か月分の議事録を読み、社内テンプレートでQBR資料を作って
+                      Google Driveの直近3か月分の議事録を読み、社内テンプレートでQBR資料を作って
                     </td>
                     <td>Cowork</td>
                   </tr>
@@ -535,7 +533,7 @@ export default function Page() {
                     <td>
                       Manually approve
                       <br />
-                      <span style={{ color: "var(--text-faint)", fontSize: "14px" }}>
+                      <span style={{ color: 'var(--text-faint)', fontSize: '14px' }}>
                         （旧称 Ask before acting）
                       </span>
                     </td>
@@ -553,7 +551,7 @@ export default function Page() {
                     <td>
                       Skip all approvals
                       <br />
-                      <span style={{ color: "var(--text-faint)", fontSize: "14px" }}>
+                      <span style={{ color: 'var(--text-faint)', fontSize: '14px' }}>
                         （旧称 Act without asking）
                       </span>
                     </td>
@@ -620,7 +618,9 @@ export default function Page() {
                 <tbody>
                   <tr>
                     <td>Skills</td>
-                    <td>Claudeが実行前に読み込む「このタスクの最善のやり方」を定義したファイル群</td>
+                    <td>
+                      Claudeが実行前に読み込む「このタスクの最善のやり方」を定義したファイル群
+                    </td>
                   </tr>
                   <tr>
                     <td>Connectors</td>
@@ -648,8 +648,7 @@ export default function Page() {
           {/* ================= STEP 7 ================= */}
           <section className={styles.section} id="step7">
             <h2>
-              <span className={styles.stepNo}>STEP 7</span>定型業務をScheduled
-              Tasksで自動化する
+              <span className={styles.stepNo}>STEP 7</span>定型業務をScheduled Tasksで自動化する
             </h2>
             <p>
               繰り返し発生するタスクは、<code>/schedule</code>
@@ -782,9 +781,7 @@ export default function Page() {
                 <div className={styles.pointNum}>04</div>
                 <div className={styles.pointBody}>
                   <strong>リスクの大きさに応じて監視レベルを変える</strong>
-                  <span>
-                    金銭・送信・重要ファイルが絡む場面では「Manually approve」に戻す
-                  </span>
+                  <span>金銭・送信・重要ファイルが絡む場面では「Manually approve」に戻す</span>
                 </div>
               </div>
               <div className={styles.pointCard}>
@@ -987,8 +984,7 @@ export default function Page() {
               <li>
                 <input type="checkbox" disabled aria-hidden="true" />
                 <span>
-                  Global
-                  Instructionsに、トーン・役割・出力形式などの普遍的なルールを設定済みか
+                  Global Instructionsに、トーン・役割・出力形式などの普遍的なルールを設定済みか
                 </span>
               </li>
               <li>
@@ -1004,9 +1000,7 @@ export default function Page() {
               </li>
               <li>
                 <input type="checkbox" disabled aria-hidden="true" />
-                <span>
-                  機密情報を含むファイルやアプリを、必要以上にアクセス許可していないか
-                </span>
+                <span>機密情報を含むファイルやアプリを、必要以上にアクセス許可していないか</span>
               </li>
               <li>
                 <input type="checkbox" disabled aria-hidden="true" />
@@ -1035,7 +1029,7 @@ export default function Page() {
 
           {/* ================= REFERENCES ================= */}
           <section className={styles.footer} id="references">
-            <h2 style={{ fontSize: "26px", fontWeight: 900, marginBottom: "8px" }}>
+            <h2 style={{ fontSize: '26px', fontWeight: 900, marginBottom: '8px' }}>
               参考文献・出典
             </h2>
             <p className={styles.muted}>
@@ -1140,9 +1134,7 @@ export default function Page() {
               <Ext href="https://x.com/heynavtoor/status/2028148844891152554">
                 <span className={`${styles.refBadge} ${styles.community}`}>コミュニティ</span>
                 <span className={styles.refBody}>
-                  <strong>
-                    17 Best Practices That Make Claude Cowork 100x More Powerful
-                  </strong>
+                  <strong>17 Best Practices That Make Claude Cowork 100x More Powerful</strong>
                   <span className={styles.refSource}>
                     Nav Toor（@heynavtoor）・ X ・ x.com/heynavtoor/status/2028148844891152554
                   </span>
@@ -1171,8 +1163,7 @@ export default function Page() {
                 <span className={styles.refBody}>
                   <strong>Cowork.</strong>
                   <span className={styles.refSource}>
-                    Ruben Hassid ・ How to AI (Substack) ・
-                    ruben.substack.com/p/claude-cowork-20
+                    Ruben Hassid ・ How to AI (Substack) ・ ruben.substack.com/p/claude-cowork-20
                   </span>
                 </span>
               </Ext>
@@ -1202,8 +1193,7 @@ export default function Page() {
                 <span className={styles.refBody}>
                   <strong>Claude best practices 2026: the complete power user guide</strong>
                   <span className={styles.refSource}>
-                    The AI Corner ・
-                    the-ai-corner.com/p/claude-best-practices-power-user-guide-2026
+                    The AI Corner ・ the-ai-corner.com/p/claude-best-practices-power-user-guide-2026
                   </span>
                 </span>
               </Ext>
@@ -1242,9 +1232,7 @@ export default function Page() {
               <Ext href="https://github.com/az9713/claude-cowork-best-practices/blob/main/docs/claude_cowork_best_practices_report.md">
                 <span className={`${styles.refBadge} ${styles.supplement}`}>補足</span>
                 <span className={styles.refBody}>
-                  <strong>
-                    claude-cowork-best-practices（Nav Toor実践まとめレポート）
-                  </strong>
+                  <strong>claude-cowork-best-practices（Nav Toor実践まとめレポート）</strong>
                   <span className={styles.refSource}>
                     az9713 ・ GitHub ・ github.com/az9713/claude-cowork-best-practices
                   </span>
@@ -1265,8 +1253,7 @@ export default function Page() {
                 <span className={styles.refBody}>
                   <strong>Claude Cowork: Smart Folders & Instructions Guide</strong>
                   <span className={styles.refSource}>
-                    ToolTechSavvy ・
-                    tooltechsavvy.com/claude-cowork-how-to-choose-folders-wisely
+                    ToolTechSavvy ・ tooltechsavvy.com/claude-cowork-how-to-choose-folders-wisely
                   </span>
                 </span>
               </Ext>
