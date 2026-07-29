@@ -23,8 +23,7 @@
   min-height: 100vh;
   background:
     radial-gradient(1100px 600px at 85% -10%, rgba(139, 124, 246, 0.16), transparent 60%),
-    radial-gradient(900px 500px at -10% 10%, rgba(79, 209, 197, 0.1), transparent 55%),
-    var(--bg);
+    radial-gradient(900px 500px at -10% 10%, rgba(79, 209, 197, 0.1), transparent 55%), var(--bg);
   color: var(--text);
   font-family: var(--font-sans, 'Inter', -apple-system, sans-serif);
   line-height: 1.75;
@@ -256,9 +255,15 @@
   height: 10px;
   border-radius: 50%;
 }
-.termDotR { background: #ff5f56; }
-.termDotY { background: #ffbd2e; }
-.termDotG { background: #27c93f; }
+.termDotR {
+  background: #ff5f56;
+}
+.termDotY {
+  background: #ffbd2e;
+}
+.termDotG {
+  background: #27c93f;
+}
 
 .termTitle {
   font-family: var(--font-mono), 'JetBrains Mono', monospace;
@@ -299,8 +304,13 @@
 }
 
 @keyframes blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
 }
 
 .metaLine {
@@ -351,7 +361,8 @@
   margin-bottom: 16px;
 }
 
-.section ul, .section ol {
+.section ul,
+.section ol {
   color: var(--text-soft);
   padding-left: 24px;
   margin-bottom: 20px;
@@ -402,12 +413,26 @@
 }
 
 /* Code syntax highlights helpers */
-.ck { color: #f87171; } /* Keyword */
-.cv { color: #38edf6; } /* Value/Variable */
-.cs { color: #a78bfa; } /* String */
-.cc { color: #64748b; font-style: italic; } /* Comment */
-.cm { color: #fbbf24; font-weight: 600; } /* Marker */
-.cg { color: #4ade80; } /* Green success */
+.ck {
+  color: #f87171;
+} /* Keyword */
+.cv {
+  color: #38edf6;
+} /* Value/Variable */
+.cs {
+  color: #a78bfa;
+} /* String */
+.cc {
+  color: #64748b;
+  font-style: italic;
+} /* Comment */
+.cm {
+  color: #fbbf24;
+  font-weight: 600;
+} /* Marker */
+.cg {
+  color: #4ade80;
+} /* Green success */
 
 /* Tables */
 .tableWrap {
@@ -495,7 +520,7 @@
  * 他の図解（graph TD / flowchart LR / sequenceDiagram）は自然サイズで問題なし。
  */
 :global(#diag-3 svg) {
-  max-height: 260px !important;
+  max-height: 460px !important;
   height: auto !important;
   width: auto !important;
   display: block;
@@ -503,7 +528,7 @@
 }
 
 :global(#diag-5 svg) {
-  max-height: 300px !important;
+  max-height: 400px !important;
   height: auto !important;
   width: auto !important;
   display: block;
