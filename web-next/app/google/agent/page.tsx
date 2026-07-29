@@ -1,15 +1,15 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
+import MermaidDiagram from "@/components/docs/MermaidDiagram";
+import { TocObserver } from "./TocObserver";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
   title:
-    "Gemini マルチエージェント開発 (ADK / A2A / AgentEngine) ベストプラクティス | LLM コスト計算機",
+    "AI仕様駆動開発とMarkdown ― Google Antigravityの Rules / Skills / Workflows / Artifacts 徹底ガイド | LLM コスト計算機",
   description:
-    "最新の Google Gemini CLI / Antigravity CLI (as of 2026-06)・最新の ADK (as of 2026-06)・最新のエージェント連携プロトコル (A2A/AP2/A2UI等) 時代のサブエージェント / マルチエージェント開発で必要な GEMINI.md・AGENTS.md・agent.py・agent.json・.geminiignore・settings.json の役割と書き方を体系化したガイド。Gemini CLI は 2026-06-18 に AI Pro/Ultra/無料 Code Assist 向けサンセット済（→ Antigravity CLI へ移行）。",
+    "AIエージェントIDE「Google Antigravity」が扱う4種類のMarkdownファイル（Rules / Skills / Workflows / Artifacts）の役割・置き場所・書き方・ベストプラクティスを体系化した完全ガイド。",
 };
-
-type Source = { icon: string; title: string; href: string; display: string; desc: string };
 
 function Ext({ href, children }: { href: string; children: ReactNode }) {
   return (
@@ -19,3150 +19,1059 @@ function Ext({ href, children }: { href: string; children: ReactNode }) {
   );
 }
 
-// ── SECTION METADATA ────────────────────────────────────────────────
+const DIAGRAM_0 = `flowchart TB
+    subgraph "人間が事前に定義するMarkdown"
+        direction TB
+        R["Rules<br/>行動規範・制約"]
+        S["Skills<br/>専門知識パッケージ"]
+        W["Workflows<br/>手順のマクロ"]
+        R ~~~ S ~~~ W
+    end
+    U["開発者"] -->|作成・編集| R
+    U -->|作成・編集| S
+    U -->|呼び出し登録| W
+    R -->|常時 または 条件付きで適用| A["Agent"]
+    S -->|関連しそうなら読み込み| A
+    W -->|スラッシュコマンドで起動| A
+    A -->|生成| AR["Artifacts<br/>Plan・Task List・Walkthrough等"]
+    AR -->|レビュー・コメント| U
+    U -->|Proceed または 修正指示| A`;
 
-const SECTION_IDS = [
-  "s01",
-  "s02",
-  "s03",
-  "s04",
-  "s05",
-  "s06",
-  "s07",
-  "s08",
-  "s09",
-  "s10",
-  "s11",
-  "s12",
-  "s13",
-  "s14",
-  "s15",
-  "s16",
-  "s17",
-] as const;
+const DIAGRAM_1 = `flowchart TB
+    Start["Ruleファイルを保存する"] --> Mode{"どの発火方式を選ぶか"}
+    Mode -->|Manual| M1["チャット欄で ＠ルール名 と明示的にメンションした時のみ適用"]
+    Mode -->|Always On| M2["会話開始時に毎回自動で適用"]
+    Mode -->|Model Decision| M3["説明文をもとにモデルが要否を自律判断"]
+    Mode -->|Glob| M4["指定したglobパターンに一致するファイル操作時のみ適用"]`;
 
-const SECTION_TITLES = [
-  "全体アーキテクチャと各ファイルの位置づけ",
-  "GEMINI.md / AGENT.md — コンテキストファイルの設計",
-  "AGENTS.md — クロスツール互換戦略",
-  "ADK agent.py — サブエージェント定義のベストプラクティス",
-  ".geminiignore と settings.json — 制御ファイル設計",
-  "サブエージェント ルーティング設計の意思決定ツリー",
-  "コスト最適なモデル選択戦略",
-  "絶対に避けるべき Anti-Patterns",
-  "まとめ：各ファイルの役割と設計原則",
-  "サブエージェント vs マルチエージェント — ADK × A2A × MCP × AP2/A2UI の4層構造",
-  "A2A の核心：agent.json (Agent Card) — リモートエージェントの「能力書」",
-  "マルチエージェント向け GEMINI.md — Orchestrator の「作戦指令書」",
-  "マルチエージェント agent.py — Orchestrator + RemoteA2aAgent 実装パターン",
-  "AgentEngine (Vertex AI) 本番デプロイと GEMINI.md 連携",
-  "マルチエージェント ユースケース別 設計パターン",
-  "マルチエージェント固有の Anti-Patterns — 設計・運用両面",
-  "全ファイル役割まとめ（マルチエージェント + A2A 対応版）",
-] as const;
+const DIAGRAM_2 = `flowchart LR
+    D["① Discovery<br/>会話開始時にSkill名とdescriptionの一覧だけが見える"] --> A2["② Activation<br/>タスクに関連しそうだとモデルが判断したらSKILL.md全文を読み込む"] --> E["③ Execution<br/>読み込んだ指示に従ってタスクを遂行する"]`;
 
-// Assert length matching at compile time
-const _assertLengthsMatch: (typeof SECTION_IDS)["length"] = SECTION_TITLES.length;
-void _assertLengthsMatch;
+const DIAGRAM_3 = `flowchart LR
+    U["ユーザーが /ship-feature を実行"] --> W1["Workflow: ship-feature"]
+    W1 --> C1["手順内に「Run Testsを呼び出す」と記述"]
+    C1 --> W2["Workflow: run-tests が実行される"]
+    W2 --> C2["手順内に「Deployを呼び出す」と記述"]
+    C2 --> W3["Workflow: deploy が実行される"]
+    W3 --> Done["一連の作業が完了"]`;
 
-// ── SOURCES (12 既存 + 13 新規 A2A = 25 件) ─────────────────────────
+const DIAGRAM_4 = `flowchart TB
+    Task["ユーザーがタスクを依頼する"] --> Plan["Agentが Implementation Plan を生成"]
+    Plan --> Review{"ユーザーがレビューする"}
+    Review -->|コメントして修正を依頼| Plan
+    Review -->|Proceed で承認| Exec["Agentがコード変更・テストを実行"]
+    Exec --> TaskList["Task List で進捗をリアルタイムに可視化"]
+    TaskList --> Walk["完了後 Walkthrough を生成"]
+    Walk --> Confirm["ユーザーが最終確認する"]`;
 
-const SOURCES_EXISTING: Source[] = [
-  {
-    icon: "🔵",
-    title: "Gemini CLI 公式: GEMINI.md ドキュメント",
-    href: "https://google-gemini.github.io/gemini-cli/docs/cli/gemini-md.html",
-    display: "google-gemini.github.io/gemini-cli/docs/cli/gemini-md.html",
-    desc: "階層ロード仕様・@import構文・/memory コマンド・context.fileName 設定の公式リファレンス",
-  },
-  {
-    icon: "🟢",
-    title: "Google Developers: Gemini Code Assist agent mode",
-    href: "https://developers.google.com/gemini-code-assist/docs/use-agentic-chat-pair-programmer",
-    display: "developers.google.com/gemini-code-assist/docs/use-agentic-chat-pair-programmer",
-    desc: "GEMINI.md / AGENT.md の使い方・IDE設定・MCP サーバー設定の公式ガイド",
-  },
-  {
-    icon: "🟡",
-    title: "Google Cloud Docs: Gemini Code Assist agent mode",
-    href: "https://docs.cloud.google.com/gemini/docs/codeassist/use-agentic-chat-pair-programmer",
-    display: "docs.cloud.google.com/gemini/docs/codeassist/use-agentic-chat-pair-programmer",
-    desc: "Cloud コンソール向けのエージェントモード設定・スコープ別 GEMINI.md 配置テーブル",
-  },
-  {
-    icon: "🔴",
-    title: "Android Developers: AGENTS.md ファイル",
-    href: "https://developer.android.com/studio/gemini/agent-files",
-    display: "developer.android.com/studio/gemini/agent-files",
-    desc: "Android Studio での AGENTS.md 複数ファイル配置・自動スキャン仕様",
-  },
-  {
-    icon: "🟣",
-    title: "ADK 公式: Multi-agent systems",
-    href: "https://google.github.io/adk-docs/agents/multi-agents/",
-    display: "google.github.io/adk-docs/agents/multi-agents/",
-    desc: "SequentialAgent / ParallelAgent / LoopAgent / LLM委譲の公式仕様。sub_agents・output_key の設計指針",
-  },
-  {
-    icon: "🟠",
-    title: "Google Cloud Blog: Multi-agent patterns in ADK",
-    href: "https://developers.googleblog.com/developers-guide-to-multi-agent-patterns-in-adk/",
-    display: "developers.googleblog.com/developers-guide-to-multi-agent-patterns-in-adk/",
-    desc: "description フィールドの重要性・AutoFlow メカニズム・ParallelAgent のレースコンディション対策",
-  },
-  {
-    icon: "⚪",
-    title: "Google Cloud Blog: Building Collaborative AI (ADK)",
-    href: "https://cloud.google.com/blog/topics/developers-practitioners/building-collaborative-ai-a-developers-guide-to-multi-agent-systems-with-adk",
-    display:
-      "cloud.google.com/blog/topics/developers-practitioners/building-collaborative-ai-a-developers-guide-to-multi-agent-systems-with-adk",
-    desc: "ADK エージェント階層・3種ワークフローエージェントの使い分け・通信メカニズムの詳解",
-  },
-  {
-    icon: "🔵",
-    title: "Addy Osmani: Gemini CLI Tips & Tricks",
-    href: "https://addyosmani.com/blog/gemini-cli/",
-    display: "addyosmani.com/blog/gemini-cli/",
-    desc: "GEMINI.md 実践テクニック・チェックポイント・/restore コマンド・@ファイル参照のベストプラクティス",
-  },
-  {
-    icon: "🟢",
-    title: "Google Cloud Medium: GEMINI.md hierarchy Part 1",
-    href: "https://medium.com/google-cloud/practical-gemini-cli-instruction-following-gemini-md-hierarchy-part-1-3ba241ac5496",
-    display:
-      "medium.com/google-cloud/practical-gemini-cli-instruction-following-gemini-md-hierarchy-part-1",
-    desc: "GEMINI.md 階層の実験的検証・優先度・オーバーライド挙動の実践レポート",
-  },
-  {
-    icon: "🟡",
-    title: "GitHub: AGENTS.md 標準化ディスカッション",
-    href: "https://github.com/google-gemini/gemini-cli/discussions/1471",
-    display: "github.com/google-gemini/gemini-cli/discussions/1471",
-    desc: "クロスツール AGENTS.md 標準化の提案・Gemini / Claude / Codex / Cursor の相互運用戦略の議論",
-  },
-  {
-    icon: "⚫",
-    title: "Phil Schmid: Gemini CLI Cheatsheet",
-    href: "https://www.philschmid.de/gemini-cli-cheatsheet",
-    display: "philschmid.de/gemini-cli-cheatsheet",
-    desc: "settings.json 全フィールド・.geminiignore・@import 構文の網羅的リファレンス",
-  },
-  {
-    icon: "🔴",
-    title: "Google Codelabs: Build Multi-Agent Systems with ADK",
-    href: "https://codelabs.developers.google.com/codelabs/production-ready-ai-with-gc/3-developing-agents/build-a-multi-agent-system-with-adk",
-    display: "codelabs.developers.google.com/…/build-a-multi-agent-system-with-adk",
-    desc: "SequentialAgent / LoopAgent 実装のハンズオン・session state キーテンプレート",
-  },
-];
+const DIAGRAM_5 = `flowchart TB
+    subgraph "常時ロードされるコンテキスト"
+        direction TB
+        RR["Rules"]
+        SS["Skills"]
+        RR ~~~ SS
+    end
+    WF["Workflow起動（/機能名）"] --> Plan["Implementation Plan を生成"]
+    RR -.->|制約を適用| Plan
+    SS -.->|専門知識を提供| Plan
+    Plan --> Review{"人間がレビューする"}
+    Review -->|修正を依頼| Plan
+    Review -->|Proceedで承認| Exec["実装とテストを実行"]
+    SS -.->|手順知識を提供| Exec
+    Exec --> Walk["Walkthrough を生成"]
+    Walk --> Done["人間が最終承認する"]`;
 
-const SOURCES_NEW: Source[] = [
-  {
-    icon: "🌐",
-    title: "ADK 公式: A2A Protocol 入門（Introduction to A2A）",
-    href: "https://google.github.io/adk-docs/a2a/intro/",
-    display: "google.github.io/adk-docs/a2a/intro/",
-    desc: "RemoteA2aAgent の仕組み・Exposing（to_a2a）vs Consuming・A2A Server のアーキテクチャ図の公式解説",
-  },
-  {
-    icon: "🟢",
-    title: "ADK 公式: A2A Quickstart — エージェントを公開する（Exposing）",
-    href: "https://google.github.io/adk-docs/a2a/quickstart-exposing/",
-    display: "google.github.io/adk-docs/a2a/quickstart-exposing/",
-    desc: "to_a2a() 関数・adk api_server --a2a・agent.json 配置ルール・Auto-generated Agent Card の仕様（公式一次情報）",
-  },
-  {
-    icon: "🔵",
-    title: "Google Blog: Agent2Agent (A2A) Protocol 発表",
-    href: "https://developers.googleblog.com/en/a2a-a-new-era-of-agent-interoperability/",
-    display: "developers.googleblog.com/en/a2a-a-new-era-of-agent-interoperability/",
-    desc: "A2A の設計思想・Agent Card によるディスカバリー・50 以上のパートナー企業・MCP との補完関係の公式解説（2025年4月）",
-  },
-  {
-    icon: "🟡",
-    title: "Google Cloud Blog: ADK エージェントを A2A に変換する",
-    href: "https://cloud.google.com/blog/products/ai-machine-learning/unlock-ai-agent-collaboration-convert-adk-agents-for-a2a",
-    display: "cloud.google.com/blog/…/unlock-ai-agent-collaboration-convert-adk-agents-for-a2a",
-    desc: "AgentSkill・AgentCard 実装方法・AgentTaskManager・Orchestrator の Discovery パターン・コード実例（2025年7月）",
-  },
-  {
-    icon: "🟣",
-    title: "Google Developers Blog: ADK + Interactions API（Deep Research 連携）",
-    href: "https://developers.googleblog.com/building-agents-with-the-adk-and-the-new-interactions-api/",
-    display: "developers.googleblog.com/building-agents-with-the-adk-and-the-new-interactions-api/",
-    desc: "InteractionsApiTransport で A2A ← → Gemini Deep Research Agent を接続する方法・A2A Extensions の活用（2025年12月）",
-  },
-  {
-    icon: "🟠",
-    title: "Google Codelabs: A2A Purchasing Concierge（クロスフレームワーク実例）",
-    href: "https://codelabs.developers.google.com/intro-a2a-purchasing-concierge",
-    display: "codelabs.developers.google.com/intro-a2a-purchasing-concierge",
-    desc: "ADK（Orchestrator）+ CrewAI + LangGraph の A2A 接続・AgentEngine デプロイ・agent.json 実際のサンプル・A2A 通信フロー詳解",
-  },
-  {
-    icon: "⚫",
-    title: "Harris Solangi (Medium): Building Connected AI Agents — ADK & A2A",
-    href: "https://harrissolangi.medium.com/building-connected-ai-agents-googles-adk-and-the-a2a-protocol-704ce3347cfc",
-    display:
-      "harrissolangi.medium.com/building-connected-ai-agents-googles-adk-and-the-a2a-protocol",
-    desc: 'ADK の "Agent Triangle" 原則・A2A ディスカバリーフロー・RemoteA2aAgent を「ローカルツール」として扱う設計哲学（2025年12月）',
-  },
-  {
-    icon: "🔴",
-    title: "GitGuardian Blog: Multi-Agent Security Pipeline with A2A（動的ディスカバリー実装）",
-    href: "https://blog.gitguardian.com/building-a-multi-agent-security-pipeline-with-googles-a2a-protocol-and-gitguardian/",
-    display:
-      "blog.gitguardian.com/building-a-multi-agent-security-pipeline-with-googles-a2a-protocol-and-gitguardian/",
-    desc: "Discovery Service パターンの実装コード・RemoteA2aAgent の動的生成・ハードコードなしオーケストレーション・A2A のフレームワーク非依存性実証（2025年12月）",
-  },
-  {
-    icon: "🟥",
-    title: "Gemini モデル一覧 — Gemini API 公式",
-    href: "https://ai.google.dev/gemini-api/docs/models",
-    display: "ai.google.dev/gemini-api/docs/models",
-    desc: "最新モデル一覧（2026年）— モデルID・コンテキスト長・価格はリンク先参照",
-  },
-  {
-    icon: "⛔",
-    title: "Gemini deprecations — モデル廃止スケジュール（Gemini API 公式）",
-    href: "https://ai.google.dev/gemini-api/docs/deprecations",
-    display: "ai.google.dev/gemini-api/docs/deprecations",
-    desc: "gemini-2.0-flash 廃止予定（2026-06-01）・gemini-3-pro-preview 廃止（2026-03-09）等の公式廃止スケジュール",
-  },
-  {
-    icon: "🟦",
-    title: "ADK TypeScript / JavaScript SDK — 公式 npm パッケージ（@google/adk）",
-    href: "https://github.com/google/adk-typescript",
-    display: "github.com/google/adk-typescript",
-    desc: "ADK TypeScript 1.0 GA。Python と同等の LlmAgent / SequentialAgent / ParallelAgent / LoopAgent API・A2A サポート・npm install @google/adk",
-  },
-  {
-    icon: "🟧",
-    title: "Google Developers Blog: AP2 / A2UI / AG-UI 新プロトコル発表（2026年3月18日）",
-    href: "https://developers.googleblog.com/en/new-agent-protocols-ap2-a2ui-ag-ui/",
-    display: "developers.googleblog.com/en/new-agent-protocols-ap2-a2ui-ag-ui/",
-    desc: "AP2（決済・認証）・A2UI / AG-UI（UI ストリーミング生成）の設計思想。※A2UI v0.8非推奨・v0.9推奨とスキーマ変更、AgentUITransport との統合方法",
-  },
-  {
-    icon: "🟩",
-    title: "ADK Python 2.0 GA — グラフベースワークフロー（公式ドキュメント）",
-    href: "https://google.github.io/adk-docs/agents/workflow-agents/graph/",
-    display: "google.github.io/adk-docs/agents/workflow-agents/graph/",
-    desc: "ADK 2.0 GA の GraphAgent API。DAG 形式でエージェントフローを定義・条件分岐ノード・並列ブランチ・ループをコードで宣言的に記述",
-  },
-  {
-    icon: "📢",
-    title: "ADK Python 2.0.0 GA リリースノート (2026年5月19日)",
-    href: "https://github.com/google/adk-python/releases/tag/v2.0.0",
-    display: "github.com/google/adk-python/releases/tag/v2.0.0",
-    desc: "ADK 2.0 正式リリース。グラフベースの実行エンジンへの移行、BaseNode によるエージェント設計、イベント・セッションスキーマの変更を含む破壊的変更の解説",
-  },
-];
-
-/**
- * Render the Gemini multi-agent best-practices documentation page.
- *
- * Renders a static Next.js React page that documents Gemini multi-agent development
- * patterns, file/layout conventions (GEMINI.md, AGENTS.md, agent.py, agent.json,
- * .geminiignore, settings.json), ADK/A2A/MCP/AP2/A2UI integration, example snippets,
- * decision flows, and reference sources.
- *
- * @returns The React element for the Gemini multi-agent guide page.
- */
-
-export default function GeminiAgentPage() {
+export default function AntigravitySpecPage() {
   return (
-    <div className={styles.root}>
-      <div className={styles.wrapper}>
-        {/* HERO */}
-        <div className={styles.hero}>
-          <div className={styles.heroEyebrow}>
-            🤖 Google Gemini 完全ガイド — 最新（2026年）/ Gemini CLI 最新版 / ADK 2.0 GA / A2A + AP2
-            + A2UI 対応
-          </div>
-          <h1>
-            Gemini マルチエージェント開発における
-            <br />
-            Markdown ファイル &amp; 設定ファイル ベストプラクティス
-          </h1>
-          <p>
-            <code>GEMINI.md</code> ・ <code>AGENTS.md</code> ・ <code>agent.py</code> ・{" "}
-            <code>.geminiignore</code> ・ <code>settings.json</code> に加え、
-            <strong>
-              A2A プロトコル（<code>agent.json</code> / Agent Card）・AgentEngine デプロイ・
-              マルチエージェント向け GEMINI.md 設計・<code>RemoteA2aAgent</code> 実装パターン
-            </strong>
-            まで ── Gemini エコシステムの全ファイルを体系的に解説します。
-          </p>
-          <div className={styles.heroChips}>
-            <span className={styles.heroChip}>Gemini CLI 最新版</span>
-            <span className={styles.heroChip}>Gemini Code Assist</span>
-            <span className={styles.heroChip}>ADK 2.0 GA (Python / TS / Go / Java)</span>
-            <span className={styles.heroChip}>A2A / AP2 / A2UI / AG-UI</span>
-            <span className={styles.heroChip}>AgentEngine (Vertex AI)</span>
-            <span className={styles.heroChip}>Plan Mode</span>
-            <span className={styles.heroChip}>MCP Integration</span>
-            <span className={styles.heroChip}>Android Studio</span>
+    <div className={styles.layout}>
+      <TocObserver />
+      <nav className={styles.sidebar}>
+        <div className={styles.brand}>
+          <div className={styles.brandMark}>AG</div>
+          <div className={styles.brandText}>
+            <strong>Antigravity 徹底ガイド</strong>Spec-Driven Development
           </div>
         </div>
 
-        {/* TOC */}
-        <nav className={styles.toc}>
-          <div className={styles.tocTitle}>目次</div>
-          <ol>
-            {SECTION_IDS.map((id, i) => (
-              <li key={id}>
-                <a href={`#${id}`}>{SECTION_TITLES[i]}</a>
-              </li>
-            ))}
-            <li>
-              <a href="#sources">📚 参考ソース（25 件）</a>
-            </li>
-          </ol>
-        </nav>
+        <div className={styles.navLabel}>目次</div>
+        <ul className={styles.toc}>
+          <li>
+            <a href="#section-1">1. なぜMarkdownが仕様になるのか</a>
+          </li>
+          <li>
+            <a href="#section-2">2. 全体像：4つの役割分担</a>
+          </li>
+          <li>
+            <a href="#section-3">3. Step 1：Rules</a>
+          </li>
+          <li>
+            <a href="#section-4">4. Step 2：Skills</a>
+          </li>
+          <li>
+            <a href="#section-5">5. Step 3：Workflows</a>
+          </li>
+          <li>
+            <a href="#section-6">6. Step 4：Artifacts</a>
+          </li>
+          <li>
+            <a href="#section-7">7. 実践フロー</a>
+          </li>
+          <li>
+            <a href="#section-8">8. ベストプラクティス</a>
+          </li>
+          <li>
+            <a href="#section-9">9. よくある落とし穴</a>
+          </li>
+          <li>
+            <a href="#section-10">10. 参考文献・情報源</a>
+          </li>
+        </ul>
+      </nav>
 
-        {/* s01: 全体アーキテクチャ */}
-        <section id="s01" className={styles.section}>
-          <div className={styles.sectionHead}>
-            <span className={styles.sectionNum}>1</span>
-            <h2>{SECTION_TITLES[0]}</h2>
+      <main className={styles.main}>
+        <header className={styles.hero} id="top">
+          <div className={styles.heroEyebrow}>AI Spec-Driven Development Guide</div>
+          <h1>
+            AI仕様駆動開発とMarkdown
+            <br />
+            Google Antigravityの Rules / Skills / Workflows / Artifacts 徹底ガイド
+          </h1>
+          <p className={styles.heroSub}>
+            対象読者：AIエージェントIDE「Google Antigravity」を初めて触る人、あるいは「AI仕様駆動開発（Spec-Driven Development, SDD）」という考え方を実務に落とし込みたい人向け。Antigravityが扱う4種類のMarkdownファイルそれぞれの役割・置き場所・書き方・ベストプラクティスを、手順を追って理解できるようにまとめました。
+          </p>
+          <div className={styles.callout}>
+            <p>
+              <strong>読む前に押さえておきたい1点：</strong>
+              Rules・Skills・Workflowsは「人間があらかじめ書いて渡す仕様」、Artifactsは「エージェントがタスク遂行中に生成する仕様・記録」です。
+            </p>
+            <p>この非対称性さえ理解すれば、残りはすべてその応用にすぎません。</p>
+          </div>
+        </header>
+
+        {/* 1 */}
+        <section className={styles.section} id="section-1">
+          <div className={styles.sectionNumber}>01 / イントロダクション</div>
+          <h2>なぜ「Markdownが仕様になる」のか</h2>
+          <div className={styles.prose}>
+            <p>
+              Spec-Driven Development（仕様駆動開発）とは、「なんとなく指示してAIに書かせる（vibe coding）」のではなく、
+              <strong>仕様（spec）そのものを一次情報源（source of truth）とし、コードはその仕様から導かれる成果物として扱う</strong>
+              という考え方です。GitHubのSpec Kit、AWSのKiro、Claude Codeのskills機能、CursorのPlan Modeなど、2026年時点で主要なAIコーディングツールはそれぞれ独自の形でこの思想を実装しています。
+            </p>
+            <p>
+              Google Antigravityの場合、この「仕様」や「行動規範」「専門知識」「実行手順」を記述する媒体として、一貫して
+              <strong>プレーンなMarkdownファイル</strong>
+              が使われています。これは意図的な設計判断です。Antigravityの公式ドキュメントでも、Skillsの仕組みについて、あえてMarkdownとYAMLという広く理解されているフォーマットに乗せることで、IDEの機能拡張への参入障壁を下げていると説明されています。
+            </p>
+            <p>
+              Antigravity自体は、VS Codeをベースにしたデスクトップ型のエージェント型開発プラットフォームで、2025年11月にGemini 3と同時に発表されました。著名な開発者であるSimon Willisonは公開直後のレビューで、Antigravityの見た目は「よくあるVS Codeフォーク」だが、内部にはいくつか興味深い新しいアイデアがあると評しています。その「新しいアイデア」の中核が、これから解説する4種類のMarkdownファイルです。
+            </p>
+          </div>
+          <a className={styles.backToTop} href="#top">
+            ↑ 目次へ戻る
+          </a>
+        </section>
+
+        {/* 2 */}
+        <section className={styles.section} id="section-2">
+          <div className={styles.sectionNumber}>02 / 全体像</div>
+          <h2>全体像：4つのMarkdownファイルの役割分担</h2>
+          <div className={styles.prose}>
+            <p>まず全体像を1枚の図で押さえます。</p>
           </div>
 
-          <div className={styles.card}>
+          <div className={styles.diagramBlock}>
+            <div className={styles.mermaidWrap}>
+              <MermaidDiagram chart={DIAGRAM_0} id="diagram-0" />
+            </div>
+            <div className={styles.diagramCaption}>図1：Rules / Skills / Workflows / Artifacts の関係</div>
+          </div>
+
+          <div className={styles.prose}>
             <p>
-              Gemini エコシステムでのサブエージェント開発では、
-              <strong>ツールによって Markdown ファイルの仕組みが異なります</strong>
-              。大きく 2 つのレイヤーに分けて理解することが重要です。
+              次に、それぞれの特徴を表で比較します。この4分類はAntigravityの公式ドキュメント構成（Customizations配下のSkills・Rules・Workflowsと、Artifacts配下のPlan・Walkthrough等）にそのまま対応しています。
             </p>
           </div>
 
-          {/* Context Hierarchy Diagram */}
-          <div className={styles.hierWrap}>
-            <div className={styles.hierTitle}>
-              GEMINI.md コンテキスト階層 — 読み込み優先度（低 → 高）
-            </div>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: 6,
-                flexWrap: "wrap",
-              }}
-            >
-              <div className={styles.hierCol}>
-                <div className={`${styles.hierBox} ${styles.hbGlobal}`}>
-                  🌐 Global
-                  <br />
-                  <small>~/.gemini/GEMINI.md</small>
-                </div>
-                <div className={styles.hierArrowDown}>↓</div>
-                <div
-                  style={{
-                    fontSize: 11,
-                    color: "rgba(255, 255, 255, 0.35)",
-                    textAlign: "center",
-                  }}
-                >
-                  全プロジェクト共通
-                  <br />
-                  デフォルト設定
-                </div>
-              </div>
-              <div className={styles.hierConnector}>
-                <div className={styles.hierConnectorArrow}>→</div>
-              </div>
-              <div className={styles.hierCol}>
-                <div className={`${styles.hierBox} ${styles.hbProject}`}>
-                  📁 Project Root
-                  <br />
-                  <small>./GEMINI.md</small>
-                </div>
-                <div className={styles.hierArrowDown}>↓</div>
-                <div
-                  style={{
-                    fontSize: 11,
-                    color: "rgba(255, 255, 255, 0.35)",
-                    textAlign: "center",
-                  }}
-                >
-                  プロジェクト固有
-                  <br />
-                  （git root 検出）
-                </div>
-              </div>
-              <div className={styles.hierConnector}>
-                <div className={styles.hierConnectorArrow}>→</div>
-              </div>
-              <div className={styles.hierCol}>
-                <div className={`${styles.hierBox} ${styles.hbSub}`}>
-                  📂 Sub-directory
-                  <br />
-                  <small>src/GEMINI.md 等</small>
-                </div>
-                <div className={styles.hierArrowDown}>↓</div>
-                <div
-                  style={{
-                    fontSize: 11,
-                    color: "rgba(255, 255, 255, 0.35)",
-                    textAlign: "center",
-                  }}
-                >
-                  モジュール固有
-                  <br />
-                  補足コンテキスト
-                </div>
-              </div>
-              <div className={styles.hierConnector}>
-                <div className={styles.hierConnectorArrow}>→</div>
-              </div>
-              <div className={styles.hierCol}>
-                <div className={`${styles.hierBox} ${styles.hbAuto}`}>
-                  🔍 Auto-scan
-                  <br />
-                  <small>ツールアクセス時に自動検出</small>
-                </div>
-                <div className={styles.hierArrowDown}>↓</div>
-                <div
-                  style={{
-                    fontSize: 11,
-                    color: "rgba(255, 255, 255, 0.35)",
-                    textAlign: "center",
-                  }}
-                >
-                  ファイルアクセス時
-                  <br />
-                  動的ロード
-                </div>
-              </div>
-            </div>
-            <div className={styles.hierLabel}>
-              すべてのファイルが結合されてモデルに送信される（.gitignore / .geminiignore は除外）
-            </div>
-            <div className={styles.hierPriority}>
-              優先度：Auto-scan ＞ Sub-directory ＞ Project Root ＞
-              Global（より具体的なファイルが優先）
-            </div>
-          </div>
-
-          {/* File tree SVG */}
-          <div className={styles.filetreeWrap}>
-            <div className={styles.filetreeHeader}>
-              <span className={styles.ftDot} style={{ background: "#f87171" }} />
-              <span className={styles.ftDot} style={{ background: "#fbbf24" }} />
-              <span className={styles.ftDot} style={{ background: "#34d399" }} />
-              <span
-                style={{
-                  marginLeft: 10,
-                  color: "#6b7280",
-                  fontSize: 12,
-                  fontFamily: "monospace",
-                }}
-              >
-                project-root/ — Gemini エコシステム ファイル構造
-              </span>
-            </div>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 960 760"
-              width="100%"
-              style={{ display: "block" }}
-              fontFamily="'Google Sans Mono','Fira Code','SF Mono',monospace"
-              role="img"
-              aria-label="project-root のディレクトリ構造とファイル分類凡例"
-            >
-              <title>project-root のディレクトリ構造とファイル分類凡例</title>
-              <defs>
-                <linearGradient id="gb1" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" style={{ stopColor: "#1a73e8" }} />
-                  <stop offset="100%" style={{ stopColor: "#4285f4" }} />
-                </linearGradient>
-                <linearGradient id="gb2" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" style={{ stopColor: "#1e8e3e" }} />
-                  <stop offset="100%" style={{ stopColor: "#34a853" }} />
-                </linearGradient>
-                <linearGradient id="gb3" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" style={{ stopColor: "#7c3aed" }} />
-                  <stop offset="100%" style={{ stopColor: "#8b5cf6" }} />
-                </linearGradient>
-                <linearGradient id="gb4" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" style={{ stopColor: "#d93025" }} />
-                  <stop offset="100%" style={{ stopColor: "#ea4335" }} />
-                </linearGradient>
-                <linearGradient id="gb5" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" style={{ stopColor: "#00897b" }} />
-                  <stop offset="100%" style={{ stopColor: "#26a69a" }} />
-                </linearGradient>
-              </defs>
-              <rect width="960" height="760" fill="#0a0e1a" />
-
-              {/* LEGEND */}
-              <rect
-                x="660"
-                y="18"
-                width="282"
-                height="230"
-                rx="10"
-                fill="#111827"
-                stroke="#1e2d52"
-                strokeWidth="1"
-              />
-              <text
-                x="801"
-                y="40"
-                textAnchor="middle"
-                fill="#6b7280"
-                fontSize="11"
-                letterSpacing="1"
-              >
-                LEGEND
-              </text>
-              <rect x="676" y="50" width="22" height="22" rx="5" fill="url(#gb1)" />
-              <text x="687" y="65" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
-                ①
-              </text>
-              <text x="706" y="65" fontSize="12" fill="#e2e8f0">
-                GEMINI.md / AGENT.md
-              </text>
-              <rect x="676" y="82" width="22" height="22" rx="5" fill="url(#gb2)" />
-              <text x="687" y="97" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
-                ②
-              </text>
-              <text x="706" y="97" fontSize="12" fill="#e2e8f0">
-                ADK agent.py（エージェント定義）
-              </text>
-              <rect x="676" y="114" width="22" height="22" rx="5" fill="url(#gb3)" />
-              <text x="687" y="129" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
-                ③
-              </text>
-              <text x="706" y="129" fontSize="12" fill="#e2e8f0">
-                設定・制御ファイル
-              </text>
-              <rect x="676" y="146" width="22" height="22" rx="5" fill="url(#gb4)" />
-              <text x="687" y="161" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
-                ④
-              </text>
-              <text x="706" y="161" fontSize="12" fill="#e2e8f0">
-                .geminiignore（除外ルール）
-              </text>
-              <rect x="676" y="178" width="22" height="22" rx="5" fill="url(#gb5)" />
-              <text x="687" y="193" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
-                ⑤
-              </text>
-              <text x="706" y="193" fontSize="12" fill="#e2e8f0">
-                README.md（人間向け）
-              </text>
-              <rect x="676" y="210" width="58" height="22" rx="5" fill="#374151" />
-              <text
-                x="705"
-                y="225"
-                textAnchor="middle"
-                fill="#9ca3af"
-                fontSize="11"
-                fontWeight="700"
-              >
-                📁 DIR
-              </text>
-              <text x="742" y="225" fontSize="12" fill="#6b7280">
-                ディレクトリ
-              </text>
-
-              {/* TREE LINES */}
-              <line x1="44" y1="48" x2="44" y2="696" stroke="#1e2d52" strokeWidth="1.5" />
-              <line x1="44" y1="50" x2="70" y2="50" stroke="#1e2d52" strokeWidth="1.5" />
-              <line x1="44" y1="95" x2="70" y2="95" stroke="#1e2d52" strokeWidth="1.5" />
-              <line x1="44" y1="140" x2="70" y2="140" stroke="#1e2d52" strokeWidth="1.5" />
-              <line x1="44" y1="185" x2="70" y2="185" stroke="#1e2d52" strokeWidth="1.5" />
-              <line x1="44" y1="230" x2="70" y2="230" stroke="#1e2d52" strokeWidth="1.5" />
-              <line x1="86" y1="230" x2="86" y2="260" stroke="#1e2d52" strokeWidth="1.5" />
-              <line x1="86" y1="258" x2="112" y2="258" stroke="#1e2d52" strokeWidth="1.5" />
-              <line x1="44" y1="300" x2="70" y2="300" stroke="#1e2d52" strokeWidth="1.5" />
-              <line x1="86" y1="300" x2="86" y2="390" stroke="#1e2d52" strokeWidth="1.5" />
-              <line x1="86" y1="328" x2="112" y2="328" stroke="#1e2d52" strokeWidth="1.5" />
-              <line x1="86" y1="368" x2="112" y2="368" stroke="#1e2d52" strokeWidth="1.5" />
-              <line x1="128" y1="368" x2="128" y2="398" stroke="#1e2d52" strokeWidth="1.5" />
-              <line x1="128" y1="396" x2="154" y2="396" stroke="#1e2d52" strokeWidth="1.5" />
-              <line x1="44" y1="440" x2="70" y2="440" stroke="#1e2d52" strokeWidth="1.5" />
-              <line x1="86" y1="440" x2="86" y2="560" stroke="#1e2d52" strokeWidth="1.5" />
-              <line x1="86" y1="470" x2="112" y2="470" stroke="#1e2d52" strokeWidth="1.5" />
-              <line x1="86" y1="510" x2="112" y2="510" stroke="#1e2d52" strokeWidth="1.5" />
-              <line x1="86" y1="550" x2="112" y2="550" stroke="#1e2d52" strokeWidth="1.5" />
-              <line x1="44" y1="600" x2="70" y2="600" stroke="#1e2d52" strokeWidth="1.5" />
-              <line x1="86" y1="600" x2="86" y2="638" stroke="#1e2d52" strokeWidth="1.5" />
-              <line x1="86" y1="636" x2="112" y2="636" stroke="#1e2d52" strokeWidth="1.5" />
-              <line x1="44" y1="696" x2="70" y2="696" stroke="#1e2d52" strokeWidth="1.5" />
-
-              {/* ROOT */}
-              <text x="20" y="30" fontSize="16" fill="#4285f4">
-                📁
-              </text>
-              <text x="42" y="30" fontSize="14" fontWeight="700" fill="#60a5fa">
-                project-root/
-              </text>
-
-              {/* ROW 1: GEMINI.md root */}
-              <text x="78" y="56" fontSize="14" fill="#93c5fd">
-                📄
-              </text>
-              <text x="98" y="56" fontSize="13.5" fontWeight="700" fill="#93c5fd">
-                GEMINI.md
-              </text>
-              <rect x="194" y="41" width="22" height="22" rx="5" fill="url(#gb1)" />
-              <text x="205" y="56" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
-                ①
-              </text>
-              <text x="224" y="56" fontSize="12" fill="#6b7280">
-                プロジェクト固有コンテキスト（常時ロード）
-              </text>
-              <text x="224" y="74" fontSize="11.5" fill="#4b5563">
-                ※ AGENT.md でも可（Code Assist / Android Studio）
-              </text>
-
-              {/* ROW 2: AGENTS.md */}
-              <text x="78" y="101" fontSize="14" fill="#86efac">
-                📄
-              </text>
-              <text x="98" y="101" fontSize="13.5" fontWeight="700" fill="#86efac">
-                AGENTS.md
-              </text>
-              <rect x="194" y="86" width="22" height="22" rx="5" fill="url(#gb1)" opacity="0.75" />
-              <text x="205" y="101" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
-                ①
-              </text>
-              <text x="224" y="101" fontSize="12" fill="#6b7280">
-                クロスツール互換（Claude / Codex / Cursor と共有可）
-              </text>
-
-              {/* ROW 3: .geminiignore */}
-              <text x="78" y="146" fontSize="14" fill="#fca5a5">
-                🚫
-              </text>
-              <text x="98" y="146" fontSize="13.5" fontWeight="700" fill="#fca5a5">
-                .geminiignore
-              </text>
-              <rect x="218" y="131" width="22" height="22" rx="5" fill="url(#gb4)" />
-              <text x="229" y="146" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
-                ④
-              </text>
-              <text x="248" y="146" fontSize="12" fill="#6b7280">
-                コンテキストから除外するファイル・フォルダ
-              </text>
-
-              {/* ROW 4: settings.json */}
-              <text x="78" y="191" fontSize="14" fill="#d1d5db">
-                ⚙️
-              </text>
-              <text x="98" y="191" fontSize="13.5" fontWeight="700" fill="#d1d5db">
-                settings.json
-              </text>
-              <rect x="216" y="176" width="22" height="22" rx="5" fill="url(#gb3)" />
-              <text x="227" y="191" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
-                ③
-              </text>
-              <text x="246" y="191" fontSize="12" fill="#6b7280">
-                MCP設定・context.fileName・除外ツール設定
-              </text>
-
-              {/* ROW 5: .gemini/ dir */}
-              <text x="78" y="236" fontSize="14" fill="#60a5fa">
-                📁
-              </text>
-              <text x="98" y="236" fontSize="14" fontWeight="700" fill="#60a5fa">
-                .gemini/
-              </text>
-              <text x="184" y="236" fontSize="12" fill="#4b5563">
-                ← IDE統合時の設定ディレクトリ
-              </text>
-              <text x="120" y="264" fontSize="14" fill="#d1d5db">
-                ⚙️
-              </text>
-              <text x="140" y="264" fontSize="13" fill="#d1d5db">
-                settings.json
-              </text>
-              <rect x="238" y="249" width="22" height="22" rx="5" fill="url(#gb3)" opacity="0.75" />
-              <text x="249" y="264" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
-                ③
-              </text>
-              <text x="268" y="264" fontSize="12" fill="#4b5563">
-                VS Code / IntelliJ 統合設定
-              </text>
-
-              {/* ROW 6: src/ dir */}
-              <text x="78" y="306" fontSize="14" fill="#60a5fa">
-                📁
-              </text>
-              <text x="98" y="306" fontSize="14" fontWeight="700" fill="#60a5fa">
-                src/
-              </text>
-              <text x="120" y="334" fontSize="14" fill="#93c5fd">
-                📄
-              </text>
-              <text x="140" y="334" fontSize="13" fontWeight="700" fill="#93c5fd">
-                GEMINI.md
-              </text>
-              <rect x="228" y="319" width="22" height="22" rx="5" fill="url(#gb1)" opacity="0.7" />
-              <text x="239" y="334" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
-                ①
-              </text>
-              <text x="258" y="334" fontSize="12" fill="#6b7280">
-                src/ 固有のコーディング規約・依存関係
-              </text>
-              <text x="120" y="374" fontSize="13" fill="#60a5fa">
-                📂
-              </text>
-              <text x="140" y="374" fontSize="13" fontWeight="700" fill="#60a5fa">
-                frontend/
-              </text>
-              <text x="162" y="402" fontSize="13" fill="#93c5fd">
-                📄
-              </text>
-              <text x="182" y="402" fontSize="13" fill="#93c5fd">
-                GEMINI.md
-              </text>
-              <rect x="268" y="387" width="22" height="22" rx="5" fill="url(#gb1)" opacity="0.6" />
-              <text x="279" y="402" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
-                ①
-              </text>
-              <text x="298" y="402" fontSize="12" fill="#6b7280">
-                React/Next.js固有ルール（自動スキャン）
-              </text>
-
-              {/* ROW 7: agents/ dir (ADK) */}
-              <text x="78" y="446" fontSize="14" fill="#4ade80">
-                📁
-              </text>
-              <text x="98" y="446" fontSize="14" fontWeight="700" fill="#4ade80">
-                agents/
-              </text>
-              <text x="184" y="446" fontSize="12" fill="#4b5563">
-                ← ADK サブエージェント定義
-              </text>
-              <text x="120" y="476" fontSize="14" fill="#86efac">
-                🐍
-              </text>
-              <text x="140" y="476" fontSize="13" fill="#86efac">
-                orchestrator/agent.py
-              </text>
-              <rect x="326" y="461" width="22" height="22" rx="5" fill="url(#gb2)" />
-              <text x="337" y="476" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
-                ②
-              </text>
-              <text x="356" y="476" fontSize="12" fill="#6b7280">
-                ルートエージェント定義 (instruction フィールド)
-              </text>
-              <text x="120" y="516" fontSize="14" fill="#86efac">
-                🐍
-              </text>
-              <text x="140" y="516" fontSize="13" fill="#86efac">
-                researcher/agent.py
-              </text>
-              <rect x="310" y="501" width="22" height="22" rx="5" fill="url(#gb2)" opacity="0.75" />
-              <text x="321" y="516" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
-                ②
-              </text>
-              <text x="340" y="516" fontSize="12" fill="#6b7280">
-                サブエージェント (LlmAgent)
-              </text>
-              <text x="120" y="556" fontSize="14" fill="#86efac">
-                🐍
-              </text>
-              <text x="140" y="556" fontSize="13" fill="#86efac">
-                reviewer/agent.py
-              </text>
-              <rect x="306" y="541" width="22" height="22" rx="5" fill="url(#gb2)" opacity="0.75" />
-              <text x="317" y="556" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
-                ②
-              </text>
-              <text x="336" y="556" fontSize="12" fill="#6b7280">
-                サブエージェント (LlmAgent)
-              </text>
-
-              {/* evaluations */}
-              <text x="78" y="606" fontSize="14" fill="#60a5fa">
-                📁
-              </text>
-              <text x="98" y="606" fontSize="14" fontWeight="700" fill="#60a5fa">
-                evals/
-              </text>
-              <text x="120" y="642" fontSize="13" fill="#d1d5db">
-                📝
-              </text>
-              <text x="140" y="642" fontSize="13" fill="#d1d5db">
-                eval_set.json
-              </text>
-              <rect x="270" y="627" width="22" height="22" rx="5" fill="url(#gb3)" opacity="0.75" />
-              <text x="281" y="642" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
-                ③
-              </text>
-              <text x="300" y="642" fontSize="12" fill="#6b7280">
-                ADK 評価データセット（adk eval で使用）
-              </text>
-
-              {/* README.md */}
-              <text x="78" y="702" fontSize="14" fill="#60a5fa">
-                📘
-              </text>
-              <text x="98" y="702" fontSize="14" fontWeight="700" fill="#93c5fd">
-                README.md
-              </text>
-              <rect x="204" y="687" width="22" height="22" rx="5" fill="url(#gb5)" />
-              <text x="215" y="702" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
-                ⑤
-              </text>
-              <text x="234" y="702" fontSize="12" fill="#6b7280">
-                人間向け：エージェント構成・セットアップ手順
-              </text>
-            </svg>
-          </div>
-        </section>
-
-        {/* s02: GEMINI.md / AGENT.md */}
-        <section id="s02" className={styles.section}>
-          <div className={styles.sectionHead}>
-            <span className={styles.sectionNum}>2</span>
-            <h2>
-              <span className={styles.mono}>GEMINI.md</span> /{" "}
-              <span className={styles.mono}>AGENT.md</span> — コンテキストファイルの設計
-            </h2>
-          </div>
-
-          <div className={`${styles.alert} ${styles.alertInfo}`}>
-            <span className={styles.alertIcon}>ℹ️</span>
-            <div className={styles.alertContent}>
-              <strong>GEMINI.md vs AGENT.md — ツール別対応表</strong>
-              Gemini CLI は <code>GEMINI.md</code> がデフォルト。Gemini Code Assist (VS Code /
-              Cloud) は <code>GEMINI.md</code> か <code>AGENT.md</code> を使用。Android Studio は{" "}
-              <code>AGENTS.md</code> を採用。すべて <code>settings.json</code> の{" "}
-              <code>context.fileName</code> でカスタマイズ可能です。
-            </div>
-          </div>
-
-          <div className={styles.card}>
-            <div className={styles.cardTitle}>📋 GEMINI.md に書くべきこと / 書かないべきこと</div>
-            <div className={styles.patGrid}>
-              <div className={`${styles.pat} ${styles.patOk}`}>
-                <div className={styles.patLabel}>✅ 書くべき内容</div>
-                <ul>
-                  <li>プロジェクト概要・目的（2〜4文）</li>
-                  <li>技術スタック・主要ライブラリのバージョン</li>
-                  <li>サブエージェント委譲ルール</li>
-                  <li>ビルド・テスト・デプロイコマンド</li>
-                  <li>禁止操作の明示（DB reset 等）</li>
-                  <li>
-                    <code>@./subdir/guide.md</code> でのモジュール分割参照
-                  </li>
-                  <li>コーディング規約（コンパクトに）</li>
-                  <li>重要ドキュメントへのパス参照</li>
-                </ul>
-              </div>
-              <div className={`${styles.pat} ${styles.patNg}`}>
-                <div className={styles.patLabel}>✗ 書かないべき内容</div>
-                <ul>
-                  <li>長大なコードスニペット（トークン浪費）</li>
-                  <li>過去の変更履歴・修正ログ</li>
-                  <li>ツール固有の設定（settings.json に分離）</li>
-                  <li>機密情報・API キー（.geminiignore で除外）</li>
-                  <li>すべての規約を1ファイルに詰め込む（@import で分割）</li>
-                  <li>否定形のみの指示（代替案をセットで示す）</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-
-          <div className={styles.card}>
-            <div className={styles.cardTitle}>
-              📄 実践的な GEMINI.md テンプレート（サブエージェント対応版）
-            </div>
-            <div className={styles.codeWrap}>
-              <div className={styles.codeBar}>
-                <span>GEMINI.md (project root)</span>
-                <span className={styles.lang}>Markdown</span>
-              </div>
-              <div className={styles.codeBody}>
-                <span className={styles.ch}># PROJECT: my-saas-app</span>
-                {"\n\n"}
-                <span className={styles.cm}>## Overview</span>
-                {"\n"}
-                {
-                  "Next.js 15 + Supabase + Stripe のマルチテナント SaaS。\n本番: Vercel Edge Runtime / DB: Supabase (PostgreSQL + pgvector)。\n\n"
-                }
-                <span className={styles.cm}>## Tech Stack</span>
-                {"\n"}
-                {"- Frontend: Next.js 15 App Router, TypeScript 5.x, Tailwind CSS\n"}
-                {"- Backend: Supabase Edge Functions (Deno 2.x)\n"}
-                {"- Auth: Supabase Auth + Row Level Security\n"}
-                {"- Payment: Stripe Checkout / Billing Portal / Webhooks\n"}
-                {"- AI: Gemini 2.5 Flash (via ADK), pgvector for embeddings\n\n"}
-                <span className={styles.cm}>## Build &amp; Test</span>
-                {"\n"}
-                {"- Build: "}
-                <span className={styles.cs}>`pnpm build`</span>
-                {"\n"}
-                {"- Test:  "}
-                <span className={styles.cs}>`pnpm test`</span>
-                {" (Vitest + Testing Library)\n"}
-                {"- ADK dev: "}
-                <span className={styles.cs}>`adk web`</span>
-                {" (Agent Dev UI on :8000)\n"}
-                {"- Lint:  "}
-                <span className={styles.cs}>`pnpm lint`</span>
-                {" — "}
-                <span className={styles.cw}>ESLint/Prettier に全面委任すること</span>
-                {"\n"}
-                {"- DB types: "}
-                <span className={styles.cs}>`pnpm supabase gen types`</span>
-                {"\n\n"}
-                <span className={styles.cm}>## Sub-Agent Routing</span>
-                {"\n"}
-                <span className={styles.cw}>Parallel dispatch 条件（すべて満たす場合のみ）:</span>
-                {"\n"}
-                {"- タスクが 3件以上かつ互いに独立\n"}
-                {"- 共有ファイル・共有状態なし\n"}
-                {"- ドメイン境界が明確 (frontend / backend / db / ai)\n"}
-                {"- ParallelAgent で書く場合: 各エージェントが"}
-                <span className={styles.cw}>異なるキーに書き込むこと</span>
-                {"\n\n"}
-                <span className={styles.cw}>Sequential dispatch（いずれかの条件で）:</span>
-                {"\n"}
-                {"- タスクに依存関係がある（B に A の出力が必要）\n"}
-                {"- 共有ファイルに触る処理がある\n\n"}
-                <span className={styles.cm}>## Domain Agents (ADK)</span>
-                {"\n"}
-                {"- "}
-                <span className={styles.ce}>orchestrator</span>
-                {" → ルーティングのみ、実装しない\n"}
-                {"- "}
-                <span className={styles.ce}>frontend-agent</span>
-                {" → app/, components/, styles/ のみ\n"}
-                {"- "}
-                <span className={styles.ce}>backend-agent</span>
-                {" → supabase/functions/, lib/server/ のみ\n"}
-                {"- "}
-                <span className={styles.ce}>ai-agent</span>
-                {" → lib/ai/, embeddings/, vector queries のみ\n"}
-                {"- "}
-                <span className={styles.ce}>db-agent</span>
-                {" → supabase/migrations/, schema のみ\n\n"}
-                <span className={styles.cm}>## Forbidden Operations</span>
-                {"\n"}
-                {"- "}
-                <span className={styles.cw}>`supabase db reset`</span>
-                {" は絶対に実行しない（本番データ消去）\n"}
-                {"- "}
-                <span className={styles.cw}>`.env.production`</span>
-                {" の読み書き禁止\n"}
-                {"- "}
-                <span className={styles.cw}>`--force`</span>
-                {" フラグは使わない、代わりに "}
-                <span className={styles.cs}>`--dry-run`</span>
-                {" で確認\n\n"}
-                <span className={styles.cm}>## @-imports (modular context)</span>
-                {"\n"}
-                {"@./docs/architecture.md\n"}
-                {"@./src/frontend/GEMINI.md\n"}
-                {"@./src/backend/GEMINI.md"}
-              </div>
-            </div>
-          </div>
-
-          <div className={`${styles.alert} ${styles.alertInfo}`}>
-            <span className={styles.alertIcon}>💡</span>
-            <div className={styles.alertContent}>
-              <strong>@-import 構文でファイルを分割する</strong>
-              <code>@./path/to/file.md</code> 構文で他のMarkdownファイルをインポートできます（
-              <code>.md</code>{" "}
-              ファイルのみ対応）。大きなプロジェクトでは「ルートは薄く、ドメイン別に分割」が鉄則です。CLIが正規表現でインライン展開するため、追加トークンコストなしで利用できます。
-            </div>
-          </div>
-        </section>
-
-        {/* s03: AGENTS.md */}
-        <section id="s03" className={styles.section}>
-          <div className={styles.sectionHead}>
-            <span className={styles.sectionNum}>3</span>
-            <h2>
-              <span className={styles.mono}>AGENTS.md</span> — クロスツール互換戦略
-            </h2>
-          </div>
-
-          <div className={styles.card}>
-            <p>
-              チームで <strong>Claude Code・Gemini CLI・Cursor・Codex</strong> を混在して使う場合、
-              <code>AGENTS.md</code>{" "}
-              を共通エントリポイントとして採用する戦略が推奨されています。各ツール固有の設定は別ファイルに分離し、
-              <code>AGENTS.md</code> から参照します。
-            </p>
-          </div>
-
-          <div className={styles.tblWrap}>
+          <div className={styles.tableWrap}>
             <table>
               <thead>
                 <tr>
-                  <th>ツール</th>
-                  <th>デフォルトファイル</th>
-                  <th>代替ファイル</th>
-                  <th>カスタマイズ</th>
+                  <th>項目</th>
+                  <th>Rules</th>
+                  <th>Skills</th>
+                  <th>Workflows</th>
+                  <th>Artifacts</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <td>Gemini CLI</td>
                   <td>
-                    <code>GEMINI.md</code>
+                    <strong>目的</strong>
                   </td>
-                  <td>
-                    <code>AGENTS.md</code>
-                  </td>
-                  <td>
-                    <code>settings.json context.fileName</code>
-                  </td>
+                  <td>エージェントの振る舞いを常時／条件付きで制約する「憲法」</td>
+                  <td>特定タスクのための専門知識・手順をパッケージ化する</td>
+                  <td>定型作業を手順化し、スラッシュコマンドで再実行する</td>
+                  <td>エージェントが思考・計画・実行結果を人間に伝える成果物</td>
                 </tr>
                 <tr>
-                  <td>Gemini Code Assist</td>
                   <td>
-                    <code>GEMINI.md</code>
+                    <strong>誰が作る</strong>
                   </td>
-                  <td>
-                    <code>AGENT.md</code>
-                  </td>
-                  <td>IDE設定</td>
+                  <td>人間（開発者）</td>
+                  <td>人間（開発者・チーム）</td>
+                  <td>人間（または会話履歴からエージェントが自動生成）</td>
+                  <td>エージェント自身</td>
                 </tr>
                 <tr>
-                  <td>Android Studio (Gemini)</td>
                   <td>
-                    <code>AGENTS.md</code>
+                    <strong>発火のされ方</strong>
                   </td>
-                  <td>-</td>
-                  <td>複数ファイル自動スキャン</td>
+                  <td>Manual／Always On／Model Decision／Globの4種類</td>
+                  <td>会話の文脈に応じてモデルが自律的に判断（progressive disclosure）</td>
+                  <td>
+                    <code>/workflow-name</code> のスラッシュコマンドで明示的に実行
+                  </td>
+                  <td>Planningモード中にエージェントが自動生成</td>
                 </tr>
                 <tr>
-                  <td>Claude Code</td>
                   <td>
-                    <code>CLAUDE.md</code>
+                    <strong>主な形式</strong>
                   </td>
+                  <td>Markdown単体（frontmatterなし）</td>
                   <td>
-                    <code>AGENTS.md</code> (読む)
+                    フォルダ＋<code>SKILL.md</code>（YAML frontmatter必須）
                   </td>
-                  <td>-</td>
+                  <td>Markdown（タイトル・説明・手順のリスト）</td>
+                  <td>Markdown（コードdiffや画像・録画を含む場合あり）</td>
                 </tr>
                 <tr>
-                  <td>Codex</td>
                   <td>
-                    <code>AGENTS.md</code>
+                    <strong>文字数制限</strong>
                   </td>
-                  <td>-</td>
-                  <td>-</td>
+                  <td>12,000文字</td>
+                  <td>明記なし（詳細はscripts/やresources/へ分離）</td>
+                  <td>12,000文字</td>
+                  <td>明記なし</td>
                 </tr>
                 <tr>
-                  <td>Cursor</td>
                   <td>
-                    <code>.cursorrules</code>
+                    <strong>具体例</strong>
                   </td>
-                  <td>
-                    <code>AGENTS.md</code>
-                  </td>
-                  <td>-</td>
+                  <td>「マイグレーションファイルは確認なしに変更しない」</td>
+                  <td>「PRレビューの手順」「安全なDBマイグレーション手順」</td>
+                  <td>「/ship-feature（テスト実行→デプロイを一括実行）」</td>
+                  <td>Implementation Plan、Task List、Walkthrough</td>
                 </tr>
               </tbody>
             </table>
           </div>
-
-          <div className={styles.codeWrap}>
-            <div className={styles.codeBar}>
-              <span>AGENTS.md (共通エントリポイント)</span>
-              <span className={styles.lang}>Markdown</span>
-            </div>
-            <div className={styles.codeBody}>
-              <span className={styles.ch}># Agent Rules (Cross-tool shared)</span>
-              {"\n"}
-              <span className={styles.cc}>
-                # このファイルは GEMINI.md / CLAUDE.md / Cursor などすべてのツールで共通利用
-              </span>
-              {"\n\n"}
-              <span className={styles.cm}>## Universal Rules</span>
-              {"\n"}
-              {"- コードは TypeScript strict モード\n"}
-              {"- テストなしのコードを本番にマージしない\n"}
-              {"- DB マイグレーションは必ず dry-run で確認後に実行\n"}
-              {"- セキュリティ: SQL直結は禁止、Prepared Statement 必須\n\n"}
-              <span className={styles.cm}>## Tool-Specific Context</span>
-              {"\n"}
-              <span className={styles.cc}># Gemini 固有の追加設定は GEMINI.md を参照</span>
-              {"\n"}
-              {"@./GEMINI.md "}
-              <span className={styles.cc}># Gemini CLI/Code Assist のみ有効</span>
-              {"\n\n"}
-              <span className={styles.cm}>## Agent Domains</span>
-              {"\n"}
-              {"- frontend: app/, components/, styles/, public/\n"}
-              {"- backend: supabase/, lib/server/, api/\n"}
-              {"- database: supabase/migrations/, schema files"}
-            </div>
-          </div>
+          <a className={styles.backToTop} href="#top">
+            ↑ 目次へ戻る
+          </a>
         </section>
 
-        {/* s04: ADK agent.py */}
-        <section id="s04" className={styles.section}>
-          <div className={styles.sectionHead}>
-            <span className={styles.sectionNum}>4</span>
-            <h2>
-              ADK <span className={styles.mono}>agent.py</span> —
-              サブエージェント定義のベストプラクティス
-            </h2>
-          </div>
+        {/* 3 */}
+        <section className={styles.section} id="section-3">
+          <div className={styles.sectionNumber}>03 / Step 1</div>
+          <h2>Step 1：Rules ― エージェントの行動規範を定義する</h2>
 
-          <div className={styles.card}>
+          <h3>Rulesとは何か</h3>
+          <div className={styles.prose}>
             <p>
-              Google ADK (Agent Development Kit) では、サブエージェントの「system prompt」は{" "}
-              <strong>
-                <code>instruction</code> フィールド
-              </strong>{" "}
-              に記述します。このフィールドが Claude の <code>.claude/agents/*.md</code>{" "}
-              に相当します。<code>description</code> フィールドが AutoFlow
-              ルーティングの判断基準になるため、特に重要です。
-            </p>
-            <p style={{ marginTop: 10 }}>
-              <strong>2026年5月現在のADK最新状況：</strong> <strong>ADK TypeScript 1.0</strong> が
-              GA になり、TS/JS プロジェクトでも <code>@google/adk</code>{" "}
-              パッケージで同等の機能が利用可能です。また <strong>ADK Python 2.0 GA</strong>
-              （グラフベースのワークフロー定義）が正式リリースされ、本番環境でもより複雑なエージェント
-              DAG の記述が推奨されるようになりました。
+              Rulesは、エージェントに常駐する「システムプロンプトの追加分」のようなものです。コーディング規約やアーキテクチャ上の制約、プロジェクト固有のルールを、毎回のチャットで繰り返し伝える代わりに、Markdownファイル1枚として保存しておく仕組みです。
             </p>
           </div>
 
-          <div className={`${styles.alert} ${styles.alertWarn}`}>
-            <span className={styles.alertIcon}>⚠️</span>
-            <div className={styles.alertContent}>
-              <strong>description フィールドが「APIドキュメント」</strong>
-              LLM ルーティング（AutoFlow）では、<code>description</code>{" "}
-              の内容だけを見て「どのサブエージェントに委譲するか」を判断します。曖昧な description
-              は誤ルーティングの原因になります。「いつ・何のために呼ぶか」を具体的に記述してください。
-            </div>
+          <h3>保存場所</h3>
+          <div className={styles.prose}>
+            <p>Rulesにはワークスペース単位とグローバル単位の2種類があり、保存先が異なります。</p>
           </div>
-
-          <div className={styles.codeWrap}>
-            <div className={styles.codeBar}>
-              <span>agents/orchestrator/agent.py</span>
-              <span className={styles.lang}>Python / ADK</span>
-            </div>
-            <div className={styles.codeBody}>
-              <span className={styles.cc}>
-                # agents/orchestrator/agent.py — ルートエージェント（コーディネーター）
-              </span>
-              {"\n"}
-              <span className={styles.ck}>from</span>
-              {" google.adk.agents "}
-              <span className={styles.ck}>import</span>
-              {" LlmAgent\n\n"}
-              <span className={styles.cc}># サブエージェントをインポート（先に定義が必要）</span>
-              {"\n"}
-              <span className={styles.ck}>from</span>
-              {" agents.researcher.agent "}
-              <span className={styles.ck}>import</span>
-              {" researcher_agent\n"}
-              <span className={styles.ck}>from</span>
-              {" agents.implementer.agent "}
-              <span className={styles.ck}>import</span>
-              {" implementer_agent\n"}
-              <span className={styles.ck}>from</span>
-              {" agents.reviewer.agent "}
-              <span className={styles.ck}>import</span>
-              {" reviewer_agent\n\n"}
-              {"root_agent = LlmAgent(\n"}
-              {"    "}
-              <span className={styles.cm}>name</span>
-              {"="}
-              <span className={styles.cs}>"orchestrator"</span>
-              {",\n"}
-              {"    "}
-              <span className={styles.cm}>model</span>
-              {"="}
-              <span className={styles.cs}>"gemini-3-flash-preview"</span>
-              {",  "}
-              <span className={styles.cc}># v0.29.0〜 CLI デフォルト</span>
-              {"\n"}
-              {"    "}
-              <span className={styles.cm}>description</span>
-              {"="}
-              <span className={styles.cs}>
-                "ユーザーの要求を分析し、適切なサブエージェントに委譲するコーディネーター。"
-              </span>
-              {",\n"}
-              {"    "}
-              <span className={styles.cm}>instruction</span>
-              {"="}
-              <span className={styles.cs}>
-                {
-                  '"""\nあなたは開発チームのオーケストレーターです。\nユーザーの要求を分析し、以下のルールで適切なエージェントに委譲してください。\n\n## 委譲ルール\n- 調査・情報収集 → researcher_agent\n- コード実装 → implementer_agent\n- コードレビュー → reviewer_agent\n- 複合タスク → SequentialAgent で順番に処理\n\n## 禁止事項\n- 自身でコードを書かない（必ずサブエージェントに委譲）\n- 曖昧なタスクはそのまま渡さず、明確化してから委譲\n"""'
-                }
-              </span>
-              {",\n"}
-              {"    "}
-              <span className={styles.cm}>sub_agents</span>
-              {"=[\n"}
-              {"        researcher_agent,    "}
-              <span className={styles.cc}># 調査・情報収集</span>
-              {"\n"}
-              {"        implementer_agent,   "}
-              <span className={styles.cc}># コード実装</span>
-              {"\n"}
-              {"        reviewer_agent,      "}
-              <span className={styles.cc}># コードレビュー (Read-only)</span>
-              {"\n"}
-              {"    ],\n"}
-              {")"}
-            </div>
-          </div>
-
-          <div className={styles.codeWrap}>
-            <div className={styles.codeBar}>
-              <span>agents/reviewer/agent.py</span>
-              <span className={styles.lang}>Python / ADK</span>
-            </div>
-            <div className={styles.codeBody}>
-              <span className={styles.cc}>
-                # agents/reviewer/agent.py — 特化型サブエージェント（コードレビュー専用）
-              </span>
-              {"\n"}
-              <span className={styles.ck}>from</span>
-              {" google.adk.agents "}
-              <span className={styles.ck}>import</span>
-              {" LlmAgent\n"}
-              <span className={styles.ck}>from</span>
-              {" google.adk.tools "}
-              <span className={styles.ck}>import</span>
-              {" google_search\n\n"}
-              {"reviewer_agent = LlmAgent(\n"}
-              {"    "}
-              <span className={styles.cm}>name</span>
-              {"="}
-              <span className={styles.cs}>"reviewer"</span>
-              {",\n"}
-              {"    "}
-              <span className={styles.cm}>model</span>
-              {"="}
-              <span className={styles.cs}>"gemini-3-flash-preview"</span>
-              {",  "}
-              <span className={styles.cc}># コスト最適化</span>
-              {"\n"}
-              {"    "}
-              <span className={styles.cm}>description</span>
-              {"="}
-              <span className={styles.cs}>
-                {
-                  '"""\nコードレビューを実施するエージェント。\n以下の場合に呼び出す:\n- Pull Request 作成後\n- コード変更が完了した後\n- セキュリティ・パフォーマンス確認が必要な場合\nRead-only: コードの変更は行わず、レポートのみ出力する。\n"""'
-                }
-              </span>
-              {",\n"}
-              {"    "}
-              <span className={styles.cm}>instruction</span>
-              {"="}
-              <span className={styles.cs}>
-                {
-                  '"""\nあなたはシニアエンジニアのコードレビュアーです。\n提供されたコードを以下の観点でレビューしてください。\n\n## Review Checklist\n### 🔴 Security\n- SQLインジェクション / XSS リスク\n- 認証・認可の適切な実装\n- 秘密情報のハードコードがないか\n\n### 🟡 Performance\n- N+1 クエリの有無\n- 不要な再レンダリング (React)\n- 重い処理の非同期化\n\n### 🟢 Code Quality\n- TypeScript 型安全性\n- エラーハンドリングの網羅\n- テストカバレッジ\n\n## 出力フォーマット\n```\n## Code Review Report\n### 🔴 Critical (要対応)\n### 🟡 Warning (推奨対応)\n### 🟢 Good (良い点)\n```\n"""'
-                }
-              </span>
-              {",\n"}
-              {"    "}
-              <span className={styles.cm}>tools</span>
-              {"=[],  "}
-              <span className={styles.cc}># ツールなし: Read-only のレビューのみ</span>
-              {"\n"}
-              {"    "}
-              <span className={styles.cm}>output_key</span>
-              {"="}
-              <span className={styles.cs}>"review_result"</span>
-              {",  "}
-              <span className={styles.cc}># 共有状態への書き込みキー</span>
-              {"\n"}
-              {")"}
-            </div>
-          </div>
-
-          {/* ADK agent types */}
-          <div className={styles.card}>
-            <div className={styles.cardTitle}>🔀 ADK ワークフローエージェントの選択基準</div>
-            <div className={styles.agentGrid}>
-              <div className={styles.agentCard}>
-                <div className={styles.agentCardIcon}>⛓️</div>
-                <div className={styles.agentCardTitle}>SequentialAgent</div>
-                <div className={styles.agentCardDesc}>
-                  サブエージェントを順番に実行。前のエージェントの出力を次が受け取る。依存関係がある場合に使用。
-                </div>
-                <div className={styles.agentCardEx}>例: spec → design → implement → review</div>
-              </div>
-              <div className={styles.agentCard}>
-                <div className={styles.agentCardIcon}>⚡</div>
-                <div className={styles.agentCardTitle}>ParallelAgent</div>
-                <div className={styles.agentCardDesc}>
-                  すべてのサブエージェントを並列実行。共有状態に書くため
-                  <strong>必ず異なるキーを使う</strong>こと（レースコンディション防止）。
-                </div>
-                <div className={styles.agentCardEx}>
-                  例: frontend || backend || db（独立タスク）
-                </div>
-              </div>
-              <div className={styles.agentCard}>
-                <div className={styles.agentCardIcon}>🔁</div>
-                <div className={styles.agentCardTitle}>LoopAgent</div>
-                <div className={styles.agentCardDesc}>
-                  条件を満たすまでサブエージェントを繰り返し実行。反復精緻化・ポーリング・リトライに最適。
-                </div>
-                <div className={styles.agentCardEx}>
-                  例: draft → critique → refine（品質基準達成まで）
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className={`${styles.alert} ${styles.alertDanger}`}>
-            <span className={styles.alertIcon}>🚨</span>
-            <div className={styles.alertContent}>
-              <strong>ParallelAgent の罠：共有状態のレースコンディション</strong>
-              ParallelAgent の子エージェントは
-              <strong>同じ session state を共有します</strong>
-              。複数のエージェントが同じキーに書き込むと値が上書きされます。各エージェントには必ず{" "}
-              <code>output_key="unique_key_name"</code> のように一意なキーを設定してください。
-            </div>
-          </div>
-        </section>
-
-        {/* s05: .geminiignore / settings.json */}
-        <section id="s05" className={styles.section}>
-          <div className={styles.sectionHead}>
-            <span className={styles.sectionNum}>5</span>
-            <h2>
-              <span className={styles.mono}>.geminiignore</span> と{" "}
-              <span className={styles.mono}>settings.json</span> — 制御ファイル設計
-            </h2>
-          </div>
-
-          <div className={styles.codeWrap}>
-            <div className={styles.codeBar}>
-              <span>.geminiignore</span>
-              <span className={styles.lang}>Ignore rules</span>
-            </div>
-            <div className={styles.codeBody}>
-              <span className={styles.cc}># .geminiignore — .gitignore と同じ書式</span>
-              {"\n"}
-              <span className={styles.cc}># コンテキストから除外すべきファイル・フォルダ</span>
-              {"\n\n"}
-              <span className={styles.cw}># 機密情報</span>
-              {"\n"}
-              {".env .env.*\n"}
-              <span className={styles.ck}>!.env.example</span>
-              {"  "}
-              <span className={styles.cc}># example は例外で含める</span>
-              {"\n"}
-              {"secrets/ *.key *.pem\n\n"}
-              <span className={styles.cw}># ビルド成果物（大量のトークン浪費を防ぐ）</span>
-              {"\n"}
-              {".next/ dist/ build/ node_modules/ .pnpm-store/\n\n"}
-              <span className={styles.cw}># 自動生成ファイル（LLMが読む必要がない）</span>
-              {"\n"}
-              {"*.min.js *.min.css *.map supabase/.branches/ supabase/.temp/\n\n"}
-              <span className={styles.cw}># バイナリ・メディア</span>
-              {"\n"}
-              {"*.png *.jpg *.webp *.woff2 *.pdf\n\n"}
-              <span className={styles.cw}># ログ・一時ファイル</span>
-              {"\n"}
-              {"*.log .DS_Store coverage/"}
-            </div>
-          </div>
-
-          <div className={styles.codeWrap}>
-            <div className={styles.codeBar}>
-              <span>settings.json (Gemini CLI / .gemini/)</span>
-              <span className={styles.lang}>JSON</span>
-            </div>
-            <div className={styles.codeBody}>
-              {"{\n"}
-              {"  "}
-              <span className={styles.cm}>"contextFileName"</span>
-              {": ["}
-              <span className={styles.cs}>"GEMINI.md"</span>
-              {", "}
-              <span className={styles.cs}>"AGENTS.md"</span>
-              {"],  "}
-              <span className={styles.cc}>{"// 複数ファイル対応"}</span>
-              {"\n"}
-              {"  "}
-              <span className={styles.cm}>"planMode"</span>
-              {": "}
-              <span className={styles.ck}>true</span>
-              {",\n"}
-              {"  "}
-              <span className={styles.cc}>
-                {"// Plan Mode デフォルト有効（v0.29.0〜）：read-only で安全に計画立案"}
-              </span>
-              {"\n"}
-              {"  "}
-              <span className={styles.cm}>"mcpServers"</span>
-              {": {\n"}
-              {"    "}
-              <span className={styles.cm}>"filesystem"</span>
-              {": {\n"}
-              {"      "}
-              <span className={styles.cm}>"command"</span>
-              {": "}
-              <span className={styles.cs}>"npx"</span>
-              {",\n"}
-              {"      "}
-              <span className={styles.cm}>"args"</span>
-              {": ["}
-              <span className={styles.cs}>"-y"</span>
-              {", "}
-              <span className={styles.cs}>"@modelcontextprotocol/server-filesystem"</span>
-              {", "}
-              <span className={styles.cs}>"./src"</span>
-              {"]\n"}
-              {"    },\n"}
-              {"    "}
-              <span className={styles.cm}>"github"</span>
-              {": {\n"}
-              {"      "}
-              <span className={styles.cm}>"command"</span>
-              {": "}
-              <span className={styles.cs}>"npx"</span>
-              {",\n"}
-              {"      "}
-              <span className={styles.cm}>"args"</span>
-              {": ["}
-              <span className={styles.cs}>"-y"</span>
-              {", "}
-              <span className={styles.cs}>"@modelcontextprotocol/server-github"</span>
-              {"],\n"}
-              {"      "}
-              <span className={styles.cm}>"env"</span>
-              {": {\n"}
-              {"        "}
-              <span className={styles.cm}>"GITHUB_TOKEN"</span>
-              {": "}
-              <span className={styles.cs}>
-                "${"{"}GITHUB_TOKEN{"}"}"
-              </span>
-              {"\n"}
-              {"      }\n"}
-              {"    }\n"}
-              {"  },\n"}
-              {"  "}
-              <span className={styles.cm}>"excludeTools"</span>
-              {": ["}
-              <span className={styles.cs}>"run_shell_command"</span>
-              {"],\n"}
-              {"  "}
-              <span className={styles.cc}>{"// セキュリティ: シェル実行を無効化"}</span>
-              {"\n"}
-              {"  "}
-              <span className={styles.cm}>"checkpointing"</span>
-              {": "}
-              <span className={styles.ck}>true</span>
-              {"\n"}
-              {"  "}
-              <span className={styles.cc}>{"// 変更前に自動チェックポイント保存"}</span>
-              {"\n}"}
-            </div>
-          </div>
-
-          <div className={`${styles.alert} ${styles.alertSuccess}`}>
-            <span className={styles.alertIcon}>✅</span>
-            <div className={styles.alertContent}>
-              <strong>
-                /memory・/plan・/rewind — コンテキスト＆セッション管理コマンド（2026年5月現在）
-              </strong>
-              Gemini CLI の <code>/memory show</code>{" "}
-              で現在ロードされている全コンテキストを確認できます。
-              <code>/memory refresh</code> で再スキャン、
-              <code>/memory add &lt;text&gt;</code> でグローバル GEMINI.md に即時追記が可能です。
-              <br />
-              <code>/plan</code>（v0.29.0〜）を使うと <strong>Plan Mode</strong>（read-only
-              環境）に入り、実装前に安全にコードベース分析・変更計画の立案ができます（v0.33.0〜はリサーチサブエージェントも内蔵）。
-              <br />
-              <code>/rewind</code>
-              （v0.27.0〜）でセッション履歴を遡ることができ、誤った操作のロールバックに使えます。
-            </div>
-          </div>
-        </section>
-
-        {/* s06: ルーティング設計 */}
-        <section id="s06" className={styles.section}>
-          <div className={styles.sectionHead}>
-            <span className={styles.sectionNum}>6</span>
-            <h2>サブエージェント ルーティング設計の意思決定ツリー</h2>
-          </div>
-
-          <div className={styles.flowWrap}>
-            <div className={styles.flowTitle}>
-              ADK / Gemini サブエージェント ルーティング決定フロー
-            </div>
-
-            <div className={styles.flowRow}>
-              <div className={styles.fnQ}>タスクが 3件以上ある？</div>
-              <div className={styles.fnArr}>→ NO →</div>
-              <div className={styles.fnN}>単一エージェントで処理</div>
-            </div>
-
-            <div className={styles.fnIndent}>
-              <div className={styles.flowRow} style={{ marginTop: 12 }}>
-                <div className={styles.fnLabel}>↓ YES</div>
-              </div>
-              <div className={styles.flowRow}>
-                <div className={styles.fnQ}>
-                  タスク間に依存関係がある？
-                  <br />
-                  <small style={{ fontWeight: 400, fontSize: 11 }}>
-                    (B の処理に A の出力が必要)
-                  </small>
-                </div>
-                <div className={styles.fnArr}>→ YES →</div>
-                <div className={styles.fnN}>
-                  SequentialAgent
-                  <br />
-                  <small>A → B → C</small>
-                </div>
-              </div>
-
-              <div className={styles.fnIndent}>
-                <div className={styles.flowRow} style={{ marginTop: 12 }}>
-                  <div className={styles.fnLabel}>↓ NO</div>
-                </div>
-                <div className={styles.flowRow}>
-                  <div className={styles.fnQ}>
-                    繰り返し精緻化が必要？
-                    <br />
-                    <small style={{ fontWeight: 400, fontSize: 11 }}>
-                      (品質基準達成まで繰り返す)
-                    </small>
-                  </div>
-                  <div className={styles.fnArr}>→ YES →</div>
-                  <div className={styles.fnN}>
-                    LoopAgent
-                    <br />
-                    <small>draft → critique → refine</small>
-                  </div>
-                </div>
-
-                <div className={styles.fnIndent}>
-                  <div className={styles.flowRow} style={{ marginTop: 12 }}>
-                    <div className={styles.fnLabel}>↓ NO</div>
-                  </div>
-                  <div className={styles.flowRow}>
-                    <div className={styles.fnQ}>
-                      各エージェントが異なる
-                      <br />
-                      output_key に書き込む？
-                    </div>
-                    <div className={styles.fnArr}>→ NO →</div>
-                    <div className={styles.fnN}>
-                      output_key を設計し直す
-                      <br />
-                      <small>レースコンディション防止</small>
-                    </div>
-                  </div>
-
-                  <div className={styles.fnIndent}>
-                    <div className={styles.flowRow} style={{ marginTop: 12 }}>
-                      <div className={styles.fnLabel}>↓ YES</div>
-                    </div>
-                    <div className={styles.flowRow}>
-                      <div className={styles.fnY}>
-                        ✅ ParallelAgent
-                        <br />
-                        <small>A ‖ B ‖ C（並列実行）</small>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* s07: モデル選択 */}
-        <section id="s07" className={styles.section}>
-          <div className={styles.sectionHead}>
-            <span className={styles.sectionNum}>7</span>
-            <h2>コスト最適なモデル選択戦略</h2>
-          </div>
-
-          <div className={styles.tblWrap}>
+          <div className={styles.tableWrap}>
             <table>
               <thead>
                 <tr>
-                  <th>Model</th>
-                  <th>用途</th>
-                  <th>ADK agent.py サブエージェント例</th>
-                  <th>特徴</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr style={{ opacity: 0.6 }}>
-                  <td>
-                    <code>gemini-2.0-flash</code>
-                    <br />
-                    <small style={{ color: "#e53935" }}>⚠️ 2026-06-01廃止</small>
-                  </td>
-                  <td>高速・低コスト</td>
-                  <td>コードベース探索、ファイル検索、単純変換</td>
-                  <td>
-                    <span className={`${styles.chip} ${styles.chipGreen}`}>最速</span>
-                    廃止前は探索用途のみ。<code>gemini-2.5-flash</code>へ移行推奨
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <code>gemini-2.5-flash</code>
-                  </td>
-                  <td>バランス重視</td>
-                  <td>コードレビュー、テスト生成、実装、コーディネーター</td>
-                  <td>
-                    <span className={`${styles.chip} ${styles.chipBlue}`}>安定デフォルト</span>{" "}
-                    コスパ最良
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <code>gemini-3-flash-preview</code>
-                    <br />
-                    <small style={{ color: "#1e8e3e" }}>✅ CLI デフォルト（v0.29.0〜）</small>
-                  </td>
-                  <td>次世代バランス</td>
-                  <td>コードレビュー、テスト生成、実装、コーディネーター</td>
-                  <td>
-                    <span className={`${styles.chip} ${styles.chipBlue}`}>推奨デフォルト</span>{" "}
-                    SWE-bench 76%（2.5 Pro相当）・低レイテンシ
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <code>gemini-2.5-pro</code>
-                  </td>
-                  <td>高精度・複雑推論</td>
-                  <td>アーキテクチャ設計、セキュリティ監査、ADR作成</td>
-                  <td>
-                    <span className={`${styles.chip} ${styles.chipPurple}`}>
-                      最高精度（旧世代）
-                    </span>{" "}
-                    高コスト
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <code>gemini-3.1-pro-preview</code>
-                    <br />
-                    <small style={{ color: "#1e8e3e" }}>✅ CLI v0.31.0〜対応</small>
-                  </td>
-                  <td>最新高精度推論</td>
-                  <td>アーキテクチャ設計、セキュリティ監査（ARC-AGI-2: 77.1%）</td>
-                  <td>
-                    <span className={`${styles.chip} ${styles.chipPurple}`}>新世代最高精度</span>{" "}
-                    Gemini 3 Proの2倍超推論力。AI Ultra / 有料APIキー限定
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        {/* s08: Anti-Patterns */}
-        <section id="s08" className={styles.section}>
-          <div className={styles.sectionHead}>
-            <span className={styles.sectionNum}>8</span>
-            <h2>絶対に避けるべき Anti-Patterns</h2>
-          </div>
-
-          <div className={styles.patGrid}>
-            <div className={`${styles.pat} ${styles.patNg}`}>
-              <div className={styles.patLabel}>✗ GEMINI.md の Anti-Patterns</div>
-              <ul>
-                <li>コードスタイル規約をすべて1ファイルに詰める（@import で分割）</li>
-                <li>長大なコードスニペットを埋め込む（トークン浪費）</li>
-                <li>機密情報・APIキーを記述（.geminiignore で除外）</li>
-                <li>否定形のみの指示（代替案をセットで示す）</li>
-                <li>修正履歴・変更ログを蓄積</li>
-                <li>ツール固有の設定を混在させる</li>
-              </ul>
-            </div>
-            <div className={`${styles.pat} ${styles.patNg}`}>
-              <div className={styles.patLabel}>✗ ADK agent.py / agent.ts の Anti-Patterns</div>
-              <ul>
-                <li>description が曖昧（「なんでもやる」エージェント）</li>
-                <li>ParallelAgent で同じ output_key を使う（上書き発生）</li>
-                <li>LoopAgent の終了条件を設定しない（無限ループ）</li>
-                <li>
-                  全エージェントに gemini-2.5-pro / gemini-3.1-pro-preview を使う（コスト爆発）
-                </li>
-                <li>ルートエージェントが直接コードを書く（委譲しない）</li>
-                <li>10件以上のサブエージェントを ParallelAgent で同時起動</li>
-                <li>
-                  ADK 2.0.0 で非推奨となった context.session.events.append
-                  などのイベント直接書き込みを使い続ける
-                </li>
-                <li>Plan Mode を無効化したまま本番コードベースを変更させる</li>
-              </ul>
-            </div>
-          </div>
-        </section>
-
-        {/* s09: まとめ */}
-        <section id="s09" className={styles.section}>
-          <div className={styles.sectionHead}>
-            <span className={styles.sectionNum}>9</span>
-            <h2>まとめ：各ファイルの役割と設計原則</h2>
-          </div>
-
-          <div className={styles.tblWrap}>
-            <table>
-              <thead>
-                <tr>
-                  <th>ファイル</th>
-                  <th>ツール</th>
-                  <th>読者</th>
-                  <th>設計原則</th>
-                  <th>アンチパターン</th>
+                  <th>種類</th>
+                  <th>保存場所</th>
+                  <th>適用範囲</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
+                  <td>Global Rules</td>
                   <td>
                     <code>~/.gemini/GEMINI.md</code>
                   </td>
-                  <td>CLI</td>
-                  <td>全プロジェクト共通</td>
-                  <td>個人のグローバルデフォルト。IDE・言語の好みのみ</td>
-                  <td>プロジェクト固有の内容を書く</td>
+                  <td>すべてのワークスペースに適用</td>
                 </tr>
                 <tr>
+                  <td>Workspace Rules</td>
                   <td>
-                    <code>GEMINI.md</code> (root)
+                    ワークスペース（またはgitルート）の <code>.agents/rules/</code> 配下
                   </td>
-                  <td>CLI/Code Assist</td>
-                  <td>メインエージェント（常時ロード）</td>
-                  <td>プロジェクト概要・スタック・ルーティングルール・禁止操作</td>
-                  <td>コードスニペット・機密情報・肥大化</td>
-                </tr>
-                <tr>
-                  <td>
-                    <code>src/*/GEMINI.md</code>
-                  </td>
-                  <td>CLI/Code Assist</td>
-                  <td>そのモジュール作業時のみ（Auto-scan）</td>
-                  <td>ドメイン固有ルールのみ。root と重複させない</td>
-                  <td>rootと同じ内容の重複記述</td>
-                </tr>
-                <tr>
-                  <td>
-                    <code>AGENTS.md</code>
-                  </td>
-                  <td>全ツール共通</td>
-                  <td>すべてのAIエージェント</td>
-                  <td>ツール横断の共通ルール。固有設定は@importで分離</td>
-                  <td>ツール固有の構文を混在</td>
-                </tr>
-                <tr>
-                  <td>
-                    <code>agents/*/agent.py</code>
-                    <br />
-                    <small>
-                      （または <code>agent.ts</code>）
-                    </small>
-                  </td>
-                  <td>ADK Python / ADK TypeScript</td>
-                  <td>各サブエージェント（独立コンテキスト）</td>
-                  <td>
-                    description 明確化・output_key 一意設定・ツール最小化。TSは{" "}
-                    <code>@google/adk</code>
-                  </td>
-                  <td>曖昧なdescription・output_key重複</td>
-                </tr>
-                <tr>
-                  <td>
-                    <code>.geminiignore</code>
-                  </td>
-                  <td>CLI/Code Assist</td>
-                  <td>コンテキストシステム</td>
-                  <td>機密・ビルド成果物・バイナリを除外してトークン節約</td>
-                  <td>作成しない（node_modules が全部ロードされる）</td>
-                </tr>
-                <tr>
-                  <td>
-                    <code>settings.json</code>
-                  </td>
-                  <td>CLI/IDE</td>
-                  <td>Geminiランタイム</td>
-                  <td>MCP設定・除外ツール・checkpointing・planMode の制御</td>
-                  <td>直接APIキーを記述する</td>
-                </tr>
-                <tr>
-                  <td>
-                    <code>README.md</code>
-                  </td>
-                  <td>全ツール</td>
-                  <td>人間（チームメンバー）</td>
-                  <td>エージェント構成・ADKセットアップ・pipeline図</td>
-                  <td>エージェント数が多いのに作成しない</td>
+                  <td>そのワークスペースのみ</td>
                 </tr>
               </tbody>
             </table>
           </div>
-        </section>
-
-        <hr />
-
-        {/* === MULTI-AGENT (s10〜s17) === */}
-
-        {/* s10: 4層構造 */}
-        <section id="s10" className={`${styles.section} ${styles.sectionMa}`}>
-          <div className={styles.sectionHead}>
-            <span className={styles.sectionNum}>10</span>
-            <h2>サブエージェント vs マルチエージェント — ADK × A2A × MCP × AP2/A2UI の4層構造</h2>
-          </div>
-
-          <div className={styles.maBanner}>
-            <div className={styles.maEyebrow}>
-              🌐 ADK 2.0.0 GA (2026年5月リリース) · ADK TypeScript GA · A2A Protocol (Linux
-              Foundation 移管済み) · AP2 / A2UI 新プロトコル追加
-            </div>
-            <h3>Google が推奨する 4層アーキテクチャ（2026年5月更新）</h3>
+          <div className={styles.prose}>
             <p>
-              Google のマルチエージェント設計は
-              <strong>ADK（エージェント内部ロジック）</strong>・
-              <strong>A2A プロトコル（エージェント間通信）</strong>・
-              <strong>MCP（外部ツール・データ接続）</strong>・
-              <strong>AP2 / A2UI（決済・UI）</strong>
-              の4層で構成されます。 A2A は Atlassian・SAP・Salesforce・ServiceNow など
-              <strong>50 以上のパートナー</strong>が対応するオープンスタンダードです。 ADK の{" "}
-              <code>RemoteA2aAgent</code>
-              を使えば、リモートエージェントへの接続がローカルのツール呼び出しと同じ感覚で実装できます。2026年5月更新で
-              <strong>
-                AP2（決済認証プロトコル）・A2UI（エージェント→UI
-                コンポーネント生成）・AG-UI（ストリーミングUI）
-              </strong>
-              が標準化されました。
+              公式ドキュメントによれば、Antigravityは現在 <code>.agents/rules</code> をデフォルトの保存場所としていますが、旧来の <code>.agent/rules</code>（<code>agent</code>が単数形）も後方互換として引き続きサポートされています。他のツールが生成した <code>.agent/</code> 構成のプロジェクトを開いても問題なく動作する、という互換性への配慮です。
             </p>
           </div>
 
-          {/* 3-layer stack */}
-          <div className={styles.layerStack}>
-            <div className={`${styles.layerRow} ${styles.lrAdk}`}>
-              <div className={`${styles.layerBadge} ${styles.lbAdk}`}>ADK</div>
-              <div className={styles.layerTitle}>🧠 エージェント内部ロジック</div>
-              <div className={styles.layerBody}>
-                <div className={styles.layerDesc}>
-                  agent.py の <code>instruction</code> / <code>tools</code> /{" "}
-                  <code>sub_agents</code> / <code>output_key</code> を定義。
-                  SequentialAgent・ParallelAgent・LoopAgent・GraphWorkflow でワークフローを制御。
-                </div>
-                <span className={styles.layerFile}>agents/*/agent.py</span>
-                <span className={styles.layerFile}>agents/*/GEMINI.md</span>
-              </div>
-            </div>
-            <div className={`${styles.layerRow} ${styles.lrA2a}`}>
-              <div className={`${styles.layerBadge} ${styles.lbA2a}`}>A2A</div>
-              <div className={styles.layerTitle}>🔗 エージェント間通信プロトコル</div>
-              <div className={styles.layerBody}>
-                <div className={styles.layerDesc}>
-                  Agent Card（agent.json）で能力を公開。<code>RemoteA2aAgent</code>
-                  でリモートエージェントをローカルツールとして利用。HTTPS + JSON-RPC 2.0
-                  で通信。フレームワーク・ベンダーを問わず相互接続可能。
-                </div>
-                <span className={styles.layerFile}>{"agents/{name}/agent.json"}</span>
-                <span className={styles.layerFile}>{"/.well-known/agent.json（自動生成）"}</span>
-              </div>
-            </div>
-            <div className={`${styles.layerRow} ${styles.lrMcp}`}>
-              <div className={`${styles.layerBadge} ${styles.lbMcp}`}>MCP</div>
-              <div className={styles.layerTitle}>🔧 外部ツール・データ接続</div>
-              <div className={styles.layerBody}>
-                <div className={styles.layerDesc}>
-                  エージェントが外部 API・DB・ファイルシステムに接続するための標準プロトコル。ADK は{" "}
-                  <code>MCPToolset</code> で透過的に統合。A2A と補完関係にある（MCP =
-                  ツール接続、A2A = エージェント接続）。
-                </div>
-                <span className={styles.layerFile}>{"settings.json → mcpServers"}</span>
-              </div>
-            </div>
-            <div
-              className={styles.layerRow}
-              style={{
-                background: "rgba(232,113,10,0.07)",
-                border: "1.5px solid rgba(232,113,10,0.35)",
-                borderRadius: 10,
-                padding: "14px 16px",
-                marginBottom: 10,
-              }}
-            >
-              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                <div
-                  className={styles.layerBadge}
-                  style={{
-                    background: "#e8710a",
-                    fontSize: 10,
-                    padding: "3px 7px",
-                    borderRadius: 6,
-                    color: "#fff",
-                    fontWeight: 700,
-                    whiteSpace: "nowrap",
-                    flexShrink: 0,
-                    width: "auto",
-                  }}
-                >
-                  AP2/A2UI
-                </div>
-                <div className={styles.layerTitle} style={{ color: "#fb923c" }}>
-                  💳 決済認証 &amp; UI 生成プロトコル
-                </div>
-              </div>
-              <div className={styles.layerBody}>
-                <div className={styles.layerDesc} style={{ color: "#94a3b8" }}>
-                  <strong>AP2</strong>:
-                  エージェントが決済・認証フローを標準化されたプロトコルで実行。
-                  <strong>A2UI</strong>（AG-UI）: エージェントがフロントエンド UI
-                  コンポーネントをストリーミング生成・更新（v0.8非推奨・v0.9以降推奨）。 ADK の{" "}
-                  <code>AgentUITransport</code> で React 等フロントエンドと統合可能。
-                </div>
-                <span
-                  className={styles.layerFile}
-                  style={{
-                    background: "rgba(232,113,10,0.15)",
-                    borderColor: "rgba(232,113,10,0.4)",
-                    color: "#fb923c",
-                  }}
-                >
-                  AP2: payment_auth フロー定義
-                </span>
-                <span
-                  className={styles.layerFile}
-                  style={{
-                    background: "rgba(232,113,10,0.15)",
-                    borderColor: "rgba(232,113,10,0.4)",
-                    color: "#fb923c",
-                  }}
-                >
-                  A2UI: AgentUITransport + UI イベントストリーム
-                </span>
-              </div>
-            </div>
+          <h3>発火方式（Activation）は4種類</h3>
+          <div className={styles.prose}>
+            <p>Rule単位で「いつ適用するか」を設定できます。</p>
           </div>
-
-          {/* Sub vs Multi comparison */}
-          <div className={styles.cmp2Grid}>
-            <div className={`${styles.cmp2} ${styles.cmp2Sub}`}>
-              <div className={styles.cmp2Label}>🔵 ローカル サブエージェント（ADK 内部）</div>
-              <ul>
-                <li>
-                  <strong>同一プロセス内</strong>で動作（低レイテンシ）
-                </li>
-                <li>
-                  親エージェントの<strong>セッション状態を共有</strong>
-                </li>
-                <li>
-                  <code>sub_agents</code> パラメータで<strong>静的に定義</strong>
-                </li>
-                <li>SequentialAgent / ParallelAgent / LoopAgent / GraphWorkflow で制御</li>
-                <li>
-                  <code>output_key</code> で結果を共有 state に書き込む
-                </li>
-                <li>チームが同じコードベースを管理する場合に適合</li>
-                <li>
-                  <strong>適用:</strong> 同一サービス内の処理分業・低レイテンシ重視
-                </li>
-              </ul>
-            </div>
-            <div className={`${styles.cmp2} ${styles.cmp2Mult}`}>
-              <div className={styles.cmp2Label}>🟢 リモート マルチエージェント（A2A 経由）</div>
-              <ul>
-                <li>
-                  <strong>異なるサービス・マシン</strong>上で動作（高スケーラビリティ）
-                </li>
-                <li>独立したセッション・コンテキストを保持</li>
-                <li>
-                  <code>RemoteA2aAgent</code> で<strong>動的ディスカバリー</strong>も可能
-                </li>
-                <li>Agent Card で能力を公開・JSON-RPC で通信</li>
-                <li>
-                  フレームワーク（ADK / LangGraph / CrewAI）を
-                  <strong>問わず相互接続</strong>
-                </li>
-                <li>
-                  <code>to_a2a()</code> で既存 ADK エージェントを即座に A2A 公開
-                </li>
-                <li>
-                  <strong>適用:</strong> クロスチーム・エンタープライズ・ベンダー横断ワークフロー
-                </li>
-              </ul>
-            </div>
-          </div>
-
-          {/* Architecture diagram */}
-          <div className={styles.a2aArch}>
-            <div className={styles.a2aArchTitle}>
-              A2A MULTI-AGENT ARCHITECTURE — ADK + RemoteA2aAgent + AgentEngine (Vertex AI)
-            </div>
-            <div className={styles.a2aRow}>
-              <div className={`${styles.a2aBox} ${styles.abOrch}`}>
-                🎯 Orchestrator
-                <br />
-                <small style={{ fontWeight: 400, fontSize: 10.5, color: "rgba(255,255,255,0.55)" }}>
-                  LlmAgent (ADK)
-                  <br />
-                  ルートGEMINI.md 読込
-                </small>
-              </div>
-              <div className={styles.a2aArrow}>→</div>
-              <div className={`${styles.a2aBox} ${styles.abLocal}`}>
-                ⚙️ Local Sub-Agent
-                <br />
-                <small style={{ fontWeight: 400, fontSize: 10.5, color: "rgba(255,255,255,0.55)" }}>
-                  同一プロセス
-                  <br />
-                  sub_agents で定義
-                </small>
-              </div>
-              <div className={styles.a2aArrow} style={{ fontSize: 14, opacity: 0.5 }}>
-                +
-              </div>
-              <div className={`${styles.a2aBox} ${styles.abRemote}`}>
-                🌐 RemoteA2aAgent
-                <br />
-                <small style={{ fontWeight: 400, fontSize: 10.5, color: "rgba(255,255,255,0.55)" }}>
-                  A2A クライアントプロキシ
-                  <br />
-                  別サービス・別チーム
-                </small>
-              </div>
-            </div>
-            <div className={styles.a2aLabel}>
-              ↓ RemoteA2aAgent は開発者から見ると「ローカルのツール」と同じように扱える（network
-              通信を隠蔽）
-            </div>
-            <div className={styles.a2aRow}>
-              <div className={`${styles.a2aBox} ${styles.abCard}`}>
-                📋 Agent Card
-                <br />
-                <small style={{ fontWeight: 400, fontSize: 10.5, color: "rgba(255,255,255,0.55)" }}>
-                  agent.json
-                  <br />
-                  {"/.well-known/agent.json"}
-                  <br />
-                  能力・認証・URL
-                </small>
-              </div>
-              <div className={styles.a2aArrow}>→</div>
-              <div className={`${styles.a2aBox} ${styles.abRemote}`} style={{ minWidth: 140 }}>
-                🔒 A2A Server
-                <br />
-                <small style={{ fontWeight: 400, fontSize: 10.5, color: "rgba(255,255,255,0.55)" }}>
-                  to_a2a() または
-                  <br />
-                  adk api_server --a2a
-                  <br />
-                  で自動生成
-                </small>
-              </div>
-              <div className={styles.a2aArrow}>→</div>
-              <div className={`${styles.a2aBox} ${styles.abEngine}`}>
-                ☁️ AgentEngine
-                <br />
-                <small style={{ fontWeight: 400, fontSize: 10.5, color: "rgba(255,255,255,0.55)" }}>
-                  Vertex AI 管理型
-                  <br />
-                  本番スケール
-                  <br />
-                  デプロイ
-                </small>
-              </div>
-            </div>
-            <div className={styles.a2aLabel} style={{ marginTop: 8 }}>
-              GEMINI.md はすべてのエージェントが参照するコンテキスト。agent.json（Agent
-              Card）はリモートエージェントの公開「能力書」。
-            </div>
-          </div>
-
-          {/* Decision flow: local sub vs remote */}
-          <div className={styles.dflow}>
-            <div className={styles.dflowTitle}>
-              🔍 ローカル サブエージェント vs リモート A2A — 選択フロー
-            </div>
-            <div className={styles.dflowRow}>
-              <div className={styles.dnQ}>同じコードベースで管理できるか？</div>
-              <div className={styles.dnArr}>→ Yes</div>
-              <div className={styles.dnY}>ローカル sub_agents（ADK）</div>
-            </div>
-            <div className={styles.dnInd}>
-              <div className={styles.dflowRow}>
-                <div className={styles.dnQ}>異なるチーム / フレームワーク / マシン？</div>
-                <div className={styles.dnArr}>→ Yes</div>
-                <div className={styles.dnY}>RemoteA2aAgent（A2A Protocol）</div>
-              </div>
-              <div className={styles.dnInd}>
-                <div className={styles.dflowRow}>
-                  <div className={styles.dnQ}>Agent Card を自動生成したい？</div>
-                  <div className={styles.dnArr}>→ Yes</div>
-                  <div className={styles.dnY}>to_a2a(agent) 関数</div>
-                </div>
-                <div className={styles.dflowRow}>
-                  <div className={styles.dnQ}>複数エージェントを 1サーバーで管理？</div>
-                  <div className={styles.dnArr}>→ Yes</div>
-                  <div className={styles.dnY}>adk api_server --a2a + 各 agent.json</div>
-                </div>
-                <div className={styles.dflowRow}>
-                  <div className={styles.dnQ}>本番 / スケーラブルな運用？</div>
-                  <div className={styles.dnArr}>→ Yes</div>
-                  <div className={styles.dnY}>AgentEngine (Vertex AI) にデプロイ</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* s11: agent.json */}
-        <section id="s11" className={`${styles.section} ${styles.sectionMa}`}>
-          <div className={styles.sectionHead}>
-            <span className={styles.sectionNum}>11</span>
-            <h2>
-              A2A の核心：<span className={styles.mono}>agent.json</span>（Agent Card）—
-              リモートエージェントの「能力書」
-            </h2>
-          </div>
-
-          <div className={styles.card}>
-            <p>
-              <strong>Agent Card は A2A マルチエージェント設計で最も重要なファイルです。</strong>
-              他のエージェントがこのエージェントを
-              <em>発見（Discovery）→ 理解（Capability）→ 接続（Auth）</em>
-              するための唯一の情報源です。 ADK の <code>to_a2a(agent)</code> を使えば agent.py
-              の内容から<strong>自動生成</strong>されますが、
-              <code>adk api_server --a2a</code>
-              で複数エージェントを管理する場合は<strong>手動で作成</strong>して品質を担保します。
-            </p>
-            <p style={{ marginTop: 10 }}>
-              Agent Card の <code>description</code> と <code>skills</code> フィールドが
-              Orchestrator のルーティング判断基準となるため、 ADK の <code>agent.py</code> における{" "}
-              <code>description</code>
-              と同様に<strong>「いつ使う・いつ使わない」を明記</strong>することが最重要です。
-            </p>
-          </div>
-
-          <div className={`${styles.alert} ${styles.alertInfo}`}>
-            <div className={styles.alertIcon}>ℹ️</div>
-            <div className={styles.alertContent}>
-              <strong>自動公開エンドポイント</strong>
-              ADK の <code>A2AServer</code> または
-              <code>adk api_server --a2a</code> を起動すると、
-              <code>{"/.well-known/agent.json"}</code>
-              エンドポイントで Agent Card が自動公開されます（Swagger の AI
-              版）。クライアントエージェントはこの URL にアクセスして能力をディスカバリーします。
-            </div>
-          </div>
-
-          <div className={styles.codeWrap}>
-            <div className={styles.codeBar}>
-              <span>agents/code-review/agent.json — Agent Card ベストプラクティス</span>
-              <span className={styles.lang}>JSON</span>
-            </div>
-            <div className={styles.codeBody}>
-              {"{\n"}
-              {"  "}
-              <span className={styles.cm}>"name"</span>
-              {": "}
-              <span className={styles.cs}>"code-review-agent"</span>
-              {",\n"}
-              {"  "}
-              <span className={styles.cm}>"version"</span>
-              {": "}
-              <span className={styles.cs}>"2.1.0"</span>
-              {",\n\n"}
-              {"  "}
-              <span className={styles.cc}>
-                {"// ── 【最重要】Orchestrator がルーティング判断に使うフィールド ──────────"}
-              </span>
-              {"\n"}
-              {"  "}
-              <span className={styles.cm}>"description"</span>
-              {": "}
-              <span className={styles.cs}>
-                {
-                  '"コードレビューを実施する専門エージェント。\n  【呼び出す場合】:\n  - PR 作成前のセキュリティ・品質・パフォーマンスチェック\n  - TypeScript/Python/Go コードの静的解析レポートが必要な場合\n  - コード品質スコア（0-100）と改善提案が必要な場合\n  【呼び出さない場合】:\n  - コードの実装・修正 → code-implementer-agent を使う\n  - テスト生成 → test-generator-agent を使う\n  - ドキュメント作成 → doc-writer-agent を使う"'
-                }
-              </span>
-              {",\n\n"}
-              {"  "}
-              <span className={styles.cm}>"url"</span>
-              {": "}
-              <span className={styles.cs}>"https://code-review.internal.example.com"</span>
-              {",\n\n"}
-              {"  "}
-              <span className={styles.cc}>
-                {"// ── スキル定義（Orchestrator が能力を詳細に理解するために使用）────────"}
-              </span>
-              {"\n"}
-              {"  "}
-              <span className={styles.cm}>"skills"</span>
-              {": [\n"}
-              {"    { "}
-              <span className={styles.cm}>"id"</span>
-              {": "}
-              <span className={styles.cs}>"security-review"</span>
-              {", "}
-              <span className={styles.cm}>"name"</span>
-              {": "}
-              <span className={styles.cs}>"Security Review"</span>
-              {",\n"}
-              {"      "}
-              <span className={styles.cm}>"description"</span>
-              {": "}
-              <span className={styles.cs}>
-                "SQLインジェクション・XSS・SSRF・認証バイパスを自動検出する"
-              </span>
-              {",\n"}
-              {"      "}
-              <span className={styles.cm}>"tags"</span>
-              {": ["}
-              <span className={styles.cs}>"security"</span>
-              {", "}
-              <span className={styles.cs}>"vulnerability"</span>
-              {", "}
-              <span className={styles.cs}>"owasp"</span>
-              {"],\n"}
-              {"      "}
-              <span className={styles.cm}>"examples"</span>
-              {": ["}
-              <span className={styles.cs}>"このPRにSQLインジェクションのリスクはありますか？"</span>
-              {"] },\n"}
-              {"    { "}
-              <span className={styles.cm}>"id"</span>
-              {": "}
-              <span className={styles.cs}>"performance-review"</span>
-              {",\n"}
-              {"      "}
-              <span className={styles.cm}>"name"</span>
-              {": "}
-              <span className={styles.cs}>"Performance Review"</span>
-              {",\n"}
-              {"      "}
-              <span className={styles.cm}>"description"</span>
-              {": "}
-              <span className={styles.cs}>
-                "N+1クエリ・不要な再レンダリング・O(n²)アルゴリズムを検出する"
-              </span>
-              {",\n"}
-              {"      "}
-              <span className={styles.cm}>"tags"</span>
-              {": ["}
-              <span className={styles.cs}>"performance"</span>
-              {", "}
-              <span className={styles.cs}>"optimization"</span>
-              {", "}
-              <span className={styles.cs}>"complexity"</span>
-              {"] } ],\n\n"}
-              {"  "}
-              <span className={styles.cc}>
-                {"// ── 認証（A2A は OpenAPI 互換の securitySchemes を採用）───────────────"}
-              </span>
-              {"\n"}
-              {"  "}
-              <span className={styles.cm}>"securitySchemes"</span>
-              {": { "}
-              <span className={styles.cm}>"bearerAuth"</span>
-              {": {\n"}
-              {"    "}
-              <span className={styles.cm}>"type"</span>
-              {": "}
-              <span className={styles.cs}>"http"</span>
-              {",\n"}
-              {"    "}
-              <span className={styles.cm}>"scheme"</span>
-              {": "}
-              <span className={styles.cs}>"bearer"</span>
-              {",\n"}
-              {"    "}
-              <span className={styles.cm}>"bearerFormat"</span>
-              {": "}
-              <span className={styles.cs}>"JWT"</span>
-              {"\n"}
-              {"  } },\n"}
-              {"  "}
-              <span className={styles.cm}>"security"</span>
-              {": [{ "}
-              <span className={styles.cm}>"bearerAuth"</span>
-              {": [] }],\n\n"}
-              {"  "}
-              <span className={styles.cc}>
-                {"// ── 入出力形式 ─────────────────────────────────────────────────────────"}
-              </span>
-              {"\n"}
-              {"  "}
-              <span className={styles.cm}>"defaultInputModes"</span>
-              {": ["}
-              <span className={styles.cs}>"text/plain"</span>
-              {", "}
-              <span className={styles.cs}>"application/json"</span>
-              {"],\n"}
-              {"  "}
-              <span className={styles.cm}>"defaultOutputModes"</span>
-              {": ["}
-              <span className={styles.cs}>"text/plain"</span>
-              {", "}
-              <span className={styles.cs}>"application/json"</span>
-              {"],\n\n"}
-              {"  "}
-              <span className={styles.cm}>"provider"</span>
-              {": { "}
-              <span className={styles.cm}>"organization"</span>
-              {": "}
-              <span className={styles.cs}>"Platform Engineering Team"</span>
-              {", "}
-              <span className={styles.cm}>"url"</span>
-              {": "}
-              <span className={styles.cs}>"https://internal.example.com/agents"</span>
-              {" } }"}
-            </div>
-          </div>
-
-          <div className={styles.patGrid}>
-            <div className={`${styles.pat} ${styles.patOk}`}>
-              <div className={styles.patLabel}>✅ agent.json ベストプラクティス</div>
-              <ul>
-                <li>description に「いつ使う・いつ使わない」を両方記述</li>
-                <li>skills は機能単位で細かく分割（タグ・examples 付き）</li>
-                <li>securitySchemes を必ず設定（認証なし公開は危険）</li>
-                <li>
-                  version を semantic versioning で管理（破壊的変更 = メジャーバージョンアップ）
-                </li>
-                <li>examples フィールドで Orchestrator の理解を補助</li>
-                <li>provider に連絡先・組織情報を明記（オーナー不明問題を防止）</li>
-              </ul>
-            </div>
-            <div className={`${styles.pat} ${styles.patNg}`}>
-              <div className={styles.patLabel}>✗ agent.json Anti-Patterns</div>
-              <ul>
-                <li>description が「なんでもやります」（誤ルーティングの最大要因）</li>
-                <li>securitySchemes なしで公開（セキュリティリスク）</li>
-                <li>skills を定義しない（能力発見できず Orchestrator から使われない）</li>
-                <li>url が内部 IP / localhost のまま本番公開</li>
-                <li>version を更新せず API 変更（クライアントが無警告で壊れる）</li>
-                <li>description が agent.py の instruction と乖離している</li>
-              </ul>
-            </div>
-          </div>
-        </section>
-
-        {/* s12: マルチエージェント GEMINI.md */}
-        <section id="s12" className={`${styles.section} ${styles.sectionMa}`}>
-          <div className={styles.sectionHead}>
-            <span className={styles.sectionNum}>12</span>
-            <h2>
-              マルチエージェント向け <span className={styles.mono}>GEMINI.md</span> — Orchestrator
-              の「作戦指令書」
-            </h2>
-          </div>
-
-          <div className={`${styles.alert} ${styles.alertSuccess}`}>
-            <div className={styles.alertIcon}>✅</div>
-            <div className={styles.alertContent}>
-              <strong>GEMINI.md はマルチエージェント全体の品質ゲートウェイ</strong>
-              Orchestrator は GEMINI.md を読み込んで「どのエージェントをいつ呼ぶか」を判断します。
-              サブエージェントには独立した <code>agent.py instruction</code> がありますが、
-              <strong>Orchestrator のルーティング精度は GEMINI.md の記述品質で決まります。</strong>
-              A2A リモートエージェントのエンドポイント
-              URL・ファイル所有権・フォールバック戦略を必ず記載します。
-            </div>
-          </div>
-
-          <div className={styles.codeWrap}>
-            <div className={styles.codeBar}>
-              <span>GEMINI.md — マルチエージェント向け追記テンプレート（rootに追加）</span>
-              <span className={styles.lang}>Markdown</span>
-            </div>
-            <div className={styles.codeBody}>
-              <span className={styles.ch}># PROJECT: enterprise-dev-platform</span>
-              {"\n"}
-              <span className={styles.cc}>
-                ## Stack / Overview ... （既存セクションはそのまま）
-              </span>
-              {"\n\n"}
-              <span className={styles.ch}>
-                {"## ────────────────────────────────────────────────────────────\n"}
-                {"## Multi-Agent Configuration（マルチエージェント設定）\n"}
-                {"## ────────────────────────────────────────────────────────────"}
-              </span>
-              {"\n\n"}
-              <span className={styles.ch}>
-                ### ローカル サブエージェント（同一プロセス・ADK sub_agents）
-              </span>
-              {"\n"}
-              {"同一サービス内・低レイテンシが必要な場合に使用:\n"}
-              {"| Agent name | 役割 | 書き込み可能パス |\n"}
-              {"|---|---|---|\n"}
-              {"| "}
-              <span className={styles.cs}>spec-writer</span>
-              {" | 新機能の仕様書作成 | "}
-              <span className={styles.cs}>docs/specs/</span>
-              {" |\n"}
-              {"| "}
-              <span className={styles.cs}>code-implementer</span>
-              {" | コード実装 | "}
-              <span className={styles.cs}>src/, tests/</span>
-              {" |\n"}
-              {"| "}
-              <span className={styles.cs}>test-generator</span>
-              {" | テスト生成 | "}
-              <span className={styles.cs}>tests/</span>
-              {" |\n\n"}
-              <span className={styles.cw}>
-                ファイル所有権ルール: 担当外のパスへの書き込みは禁止。
-                同一ファイルへの複数エージェント同時書き込みは禁止。
-              </span>
-              {"\n\n"}
-              <span className={styles.ch}>### リモート エージェント（A2A Protocol 経由）</span>
-              {"\n"}
-              {"別チーム・別フレームワーク・専門性が必要な場合に使用:\n"}
-              {"| Agent name | Agent Card URL | 備考 |\n"}
-              {"|---|---|---|\n"}
-              {"| "}
-              <span className={styles.cs}>code-review-agent</span>
-              {" | "}
-              <span className={styles.cv}>
-                https://review.internal.example.com/.well-known/agent.json
-              </span>
-              {" | セキュリティ・品質レビュー |\n"}
-              {"| "}
-              <span className={styles.cs}>security-scanner</span>
-              {" | "}
-              <span className={styles.cv}>
-                https://security.internal.example.com/.well-known/agent.json
-              </span>
-              {" | 本番デプロイ前必須 |\n"}
-              {"| "}
-              <span className={styles.cs}>doc-generator</span>
-              {" | "}
-              <span className={styles.cv}>
-                https://docs.internal.example.com/.well-known/agent.json
-              </span>
-              {" | API ドキュメント生成 |\n\n"}
-              <span className={styles.ch}>### A2A 通信ルール</span>
-              {"\n"}
-              {"- リモートエージェント呼び出し前に Agent Card の "}
-              <span className={styles.cs}>skills</span>
-              {" を確認して適切なエージェントを選択\n"}
-              {"- タイムアウト（> 30秒）→ ローカルフォールバックを試みる\n"}
-              {"- 認証エラー → リトライせず即座にユーザーへ報告\n"}
-              {"- リモートエージェントが「Read-only」の場合、ファイル変更は要求しない\n\n"}
-              <span className={styles.ch}>### Quality Gates（全エージェント共通）</span>
-              {"\n"}
-              {"- コード変更後: "}
-              <span className={styles.cs}>`pytest tests/`</span>
-              {" と "}
-              <span className={styles.cs}>`ruff check .`</span>
-              {" を必ず実行\n"}
-              {"- 本番デプロイ前: "}
-              <span className={styles.cs}>security-scanner</span>
-              {" エージェントを**必ず**呼ぶ\n"}
-              {"- DB マイグレーション: "}
-              <span className={styles.cs}>db-agent</span>
-              {" 経由でのみ実行（直接 SQL は禁止）\n\n"}
-              <span className={styles.ch}>
-                ### @import で分割管理（GEMINI.md が肥大化した場合）
-              </span>
-              {"\n"}
-              <span className={styles.cc}>
-                # 各エージェントのルールが多い場合は以下のように分割
-              </span>
-              {"\n"}
-              <span className={styles.cm}>@import ./agents/orchestrator/GEMINI.md</span>
-              {"  "}
-              <span className={styles.cc}># Orchestratorルーティングルール</span>
-              {"\n"}
-              <span className={styles.cm}>@import ./agents/implementer/GEMINI.md</span>
-              {"  "}
-              <span className={styles.cc}># 実装エージェント固有ルール</span>
-              {"\n"}
-              <span className={styles.cm}>@import ./docs/agent-endpoints.md</span>
-              {"  "}
-              <span className={styles.cc}># リモートエンドポイント一覧</span>
-            </div>
-          </div>
-
-          <div className={`${styles.alert} ${styles.alertWarn}`}>
-            <div className={styles.alertIcon}>⚠️</div>
-            <div className={styles.alertContent}>
-              <strong>サービス固有 GEMINI.md の配置戦略（Auto-scan 活用）</strong>
-              マルチエージェントシステムではサービス数が増えるため GEMINI.md が肥大化しやすい。
-              <code>agents/code-review/GEMINI.md</code>（レビュー固有ルール）のように
-              <strong>エージェントディレクトリ内に配置</strong>し、
-              そのエージェントが作業するときのみ Auto-scan でロードされる構成を推奨。 ルート
-              GEMINI.md からは <code>@import</code> で共通部分のみを参照させる。
-            </div>
-          </div>
-        </section>
-
-        {/* s13: agent.py 実装パターン */}
-        <section id="s13" className={`${styles.section} ${styles.sectionMa}`}>
-          <div className={styles.sectionHead}>
-            <span className={styles.sectionNum}>13</span>
-            <h2>
-              マルチエージェント <span className={styles.mono}>agent.py</span> — Orchestrator +
-              RemoteA2aAgent 実装パターン
-            </h2>
-          </div>
-
-          <div className={styles.card}>
-            <p>
-              A2A マルチエージェントでは
-              <strong>Orchestrator が RemoteA2aAgent を「ローカルのツール」として利用</strong>
-              します。 <code>RemoteA2aAgent</code> は Agent Card URL
-              を受け取り、ネットワーク通信・認証・データ形式変換をすべて隠蔽するため、
-              開発者はリモートエージェントへの接続をローカルのサブエージェント呼び出しと同じ感覚で実装できます。{" "}
-              <code>instruction</code> フィールドが実質的にそのエージェントの「内部
-              GEMINI.md」となるため、<strong>ルーティング判断の記述が最重要</strong>です。
-            </p>
-          </div>
-
-          <div className={styles.codeWrap}>
-            <div className={styles.codeBar}>
-              <span>
-                agents/orchestrator/agent.py — A2A Orchestrator 実装（SequentialAgent +
-                RemoteA2aAgent）
-              </span>
-              <span className={styles.lang}>Python</span>
-            </div>
-            <div className={styles.codeBody}>
-              <span className={styles.ck}>from</span>
-              {" google.adk.agents "}
-              <span className={styles.ck}>import</span>
-              {" LlmAgent, SequentialAgent, ParallelAgent\n"}
-              <span className={styles.ck}>from</span>
-              {" google.adk.agents.remote_a2a_agent "}
-              <span className={styles.ck}>import</span>
-              {" RemoteA2aAgent\n\n"}
-              <span className={styles.cc}>
-                {"# ═══════════════════════════════════════════════════════════════════\n"}
-                {"# ① リモート エージェント（A2A Protocol 経由 — 別サービス・別チーム）\n"}
-                {"# RemoteA2aAgent: Agent Card URL を指定するだけで接続を確立する\n"}
-                {"# ═══════════════════════════════════════════════════════════════════"}
-              </span>
-              {"\ncode_review_remote = RemoteA2aAgent(\n"}
-              {"    "}
-              <span className={styles.cm}>name</span>
-              {"="}
-              <span className={styles.cs}>"code-review-agent"</span>
-              {",\n"}
-              {"    "}
-              <span className={styles.cc}>
-                # description が Orchestrator のルーティング判断基準（Agent Card と一致させる）
-              </span>
-              {"\n"}
-              {"    "}
-              <span className={styles.cm}>description</span>
-              {"="}
-              <span className={styles.cs}>
-                {
-                  '"""\nコードレビューを実施するリモート専門エージェント（別チーム管理）。\n【呼び出す場合】: PR 作成前のセキュリティ・品質チェック\n【呼び出さない場合】: コードの実装・修正（implementer を使う）\n出力: セキュリティスコア（0-100）・改善提案・重大度別バグ一覧\n"""'
-                }
-              </span>
-              {",\n"}
-              {"    "}
-              <span className={styles.cc}>
-                # Agent Card URL: /.well-known/agent.json を自動取得してスキルと認証を確認
-              </span>
-              {"\n"}
-              {"    "}
-              <span className={styles.cm}>agent_card_url</span>
-              {"="}
-              <span className={styles.cs}>
-                "https://review.internal.example.com/.well-known/agent.json"
-              </span>
-              {",\n}\nsecurity_scanner_remote = RemoteA2aAgent(\n    "}
-              <span className={styles.cm}>name</span>
-              {"="}
-              <span className={styles.cs}>"security-scanner"</span>
-              {",\n    "}
-              <span className={styles.cm}>description</span>
-              {"="}
-              <span className={styles.cs}>
-                {
-                  '"""\nセキュリティスキャン専門エージェント（本番デプロイ前に必ず呼ぶ）。\n【呼び出す場合】: 本番デプロイ前 / 認証・認可コードの変更後\n出力: CVE レポート・OWASP スコア・修正優先度マトリクス（JSON 形式）\n"""'
-                }
-              </span>
-              {",\n    "}
-              <span className={styles.cm}>agent_card_url</span>
-              {"="}
-              <span className={styles.cs}>
-                "https://security.internal.example.com/.well-known/agent.json"
-              </span>
-              {",\n)\n\n"}
-              <span className={styles.cc}>
-                {"# ═══════════════════════════════════════════════════════════════════\n"}
-                {"# ② ローカル サブエージェント（ADK 内部 — 同一サービス）\n"}
-                {"# ═══════════════════════════════════════════════════════════════════"}
-              </span>
-              {"\nspec_writer = LlmAgent(\n    "}
-              <span className={styles.cm}>name</span>
-              {"="}
-              <span className={styles.cs}>"spec-writer"</span>
-              {",\n    "}
-              <span className={styles.cm}>model</span>
-              {"="}
-              <span className={styles.cs}>"gemini-2.5-flash"</span>
-              {",  "}
-              <span className={styles.cc}># コスト最適化: Orchestratorより軽量モデルを使用</span>
-              {"\n    "}
-              <span className={styles.cm}>description</span>
-              {"="}
-              <span className={styles.cs}>
-                "新機能の仕様書を docs/specs/ に作成する。ステータスを READY_FOR_IMPL に設定する。"
-              </span>
-              {",\n    "}
-              <span className={styles.cm}>instruction</span>
-              {"="}
-              <span className={styles.cs}>
-                {
-                  '"""\nあなたは PM ロールの仕様書作成エージェントです。\n以下の形式で docs/specs/{feature-name}.md を作成してください:\n- 機能概要（2-3文）\n- 受け入れ条件（箇条書き）\n- API エンドポイント定義（OpenAPI 形式）\n- 非機能要件（パフォーマンス・セキュリティ）\n完了後、output_key "spec_document" にファイルパスを格納すること。\n"""'
-                }
-              </span>
-              {",\n    "}
-              <span className={styles.cm}>tools</span>
-              {"=["}
-              <span className={styles.cs}>"write_file"</span>
-              {", "}
-              <span className={styles.cs}>"read_file"</span>
-              {"],\n    "}
-              <span className={styles.cm}>output_key</span>
-              {"="}
-              <span className={styles.cs}>"spec_document"</span>
-              {",\n}\nimplementer = LlmAgent(\n    "}
-              <span className={styles.cm}>name</span>
-              {"="}
-              <span className={styles.cs}>"code-implementer"</span>
-              {",\n    "}
-              <span className={styles.cm}>model</span>
-              {"="}
-              <span className={styles.cs}>"gemini-2.5-flash"</span>
-              {",\n    "}
-              <span className={styles.cm}>description</span>
-              {"="}
-              <span className={styles.cs}>
-                "spec_document の仕様に従ってコードを実装する。src/ のみ変更可能。"
-              </span>
-              {",\n    "}
-              <span className={styles.cm}>instruction</span>
-              {"="}
-              <span className={styles.cs}>
-                {
-                  '"""\n{spec_document} の仕様に従って実装してください。\n【書き込み可能】: src/, tests/ のみ\n【禁止】: docs/, agent.json, .env の変更\n- TypeScript strict モード必須\n- エラーは Result<T,E> 型（throw 禁止）\n完了後 output_key "implementation_summary" に変更ファイル一覧を格納。\n"""'
-                }
-              </span>
-              {",\n    "}
-              <span className={styles.cm}>tools</span>
-              {"=["}
-              <span className={styles.cs}>"write_file"</span>
-              {", "}
-              <span className={styles.cs}>"read_file"</span>
-              {", "}
-              <span className={styles.cs}>"run_command"</span>
-              {"],\n    "}
-              <span className={styles.cm}>output_key</span>
-              {"="}
-              <span className={styles.cs}>"implementation_summary"</span>
-              {",\n)\n\n"}
-              <span className={styles.cc}>
-                {"# ═══════════════════════════════════════════════════════════════════\n"}
-                {"# ③ Orchestrator — Sequential: 仕様 → 実装 → レビュー → セキュリティの順\n"}
-                {"# ═══════════════════════════════════════════════════════════════════"}
-              </span>
-              {"\nroot_agent = SequentialAgent(\n    "}
-              <span className={styles.cm}>name</span>
-              {"="}
-              <span className={styles.cs}>"dev-orchestrator"</span>
-              {",\n    "}
-              <span className={styles.cm}>description</span>
-              {"="}
-              <span className={styles.cs}>"開発ワークフロー全体を制御するオーケストレータ"</span>
-              {",\n    "}
-              <span className={styles.cm}>sub_agents</span>
-              {"=[\n        spec_writer,             "}
-              <span className={styles.cc}># Step 1: 仕様書作成（ローカル）</span>
-              {"\n        implementer,             "}
-              <span className={styles.cc}># Step 2: 実装（ローカル）</span>
-              {"\n        code_review_remote,      "}
-              <span className={styles.cc}># Step 3: コードレビュー（A2A リモート）</span>
-              {"\n        security_scanner_remote, "}
-              <span className={styles.cc}># Step 4: セキュリティスキャン（A2A リモート）</span>
-              {"\n    ],\n)"}
-            </div>
-          </div>
-
-          <div className={styles.codeWrap}>
-            <div className={styles.codeBar}>
-              <span>
-                既存 ADK エージェントを A2A で即座に公開（to_a2a 関数 — Agent Card 自動生成）
-              </span>
-              <span className={styles.lang}>Python</span>
-            </div>
-            <div className={styles.codeBody}>
-              <span className={styles.ck}>from</span>
-              {" google.adk.a2a.utils "}
-              <span className={styles.ck}>import</span>
-              {" to_a2a\n"}
-              <span className={styles.ck}>import</span>
-              {" uvicorn\n\n"}
-              <span className={styles.cc}>
-                {"# 既存 ADK エージェントを 1行で A2A Server として公開\n"}
-                {"# /.well-known/agent.json エンドポイントが自動生成される\n"}
-                {"# agent.py の name / description / instruction から Agent Card を構築"}
-              </span>
-              {"\na2a_app = to_a2a(root_agent)  "}
-              <span className={styles.cc}># → FastAPI/Starlette アプリが返る</span>
-              {"\n\n"}
-              <span className={styles.ck}>if</span>
-              {" __name__ == "}
-              <span className={styles.cs}>"__main__"</span>
-              {":\n    uvicorn.run(a2a_app, host="}
-              <span className={styles.cs}>"0.0.0.0"</span>
-              {", port="}
-              <span className={styles.cv}>8001</span>
-              {")\n"}
-              <span className={styles.cc}>
-                # 起動後 http://localhost:8001/.well-known/agent.json で Agent Card を確認可能
-              </span>
-              {"\n\n"}
-              <span className={styles.cc}>
-                {"# ── adk api_server アプローチ（複数エージェントを1サーバーで管理）────────\n"}
-                {"# agents/\n"}
-                {"# ├── code-review/\n"}
-                {"# │   ├── agent.py\n"}
-                {"# │   └── agent.json  ← 手動作成。このファイルがある場合だけ A2A 公開される\n"}
-                {"# ├── security/\n"}
-                {"# │   ├── agent.py\n"}
-                {"# │   └── agent.json\n"}
-                {"# └── doc-writer/\n"}
-                {"#     ├── agent.py\n"}
-                {
-                  "#     └── agent.json  ← このディレクトリは agent.json がないので A2A 公開されない\n"
-                }
-                {"#\n"}
-                {"# 起動コマンド: adk api_server --a2a agents/ --port 8080"}
-              </span>
-            </div>
-          </div>
-        </section>
-
-        {/* s14: AgentEngine */}
-        <section id="s14" className={`${styles.section} ${styles.sectionMa}`}>
-          <div className={styles.sectionHead}>
-            <span className={styles.sectionNum}>14</span>
-            <h2>
-              AgentEngine（Vertex AI）本番デプロイと <span className={styles.mono}>GEMINI.md</span>{" "}
-              連携
-            </h2>
-          </div>
-
-          <div className={styles.card}>
-            <p>
-              Google Agent Engine（Vertex AI の管理型エージェント実行基盤）にデプロイすると、
-              エージェントはスケーラブルな HTTPS エンドポイントとして公開され、A2A
-              クライアントから呼び出せるようになります。 デプロイ後は
-              <strong>
-                GEMINI.md のリモートエージェント一覧テーブルに AgentEngine の URL を記載
-              </strong>
-              し、 Orchestrator が認識できるようにします。
-            </p>
-          </div>
-
-          <div className={styles.codeWrap}>
-            <div className={styles.codeBar}>
-              <span>AgentEngine デプロイ（Vertex AI Python SDK）</span>
-              <span className={styles.lang}>Python</span>
-            </div>
-            <div className={styles.codeBody}>
-              <span className={styles.ck}>import</span>
-              {" vertexai\n"}
-              <span className={styles.ck}>from</span>
-              {" vertexai.preview "}
-              <span className={styles.ck}>import</span>
-              {" reasoning_engines\n"}
-              {"vertexai.init(project="}
-              <span className={styles.cs}>"my-gcp-project"</span>
-              {", location="}
-              <span className={styles.cs}>"us-central1"</span>
-              {")\n\n"}
-              <span className={styles.cc}>
-                {"# ADK エージェントを AgentEngine（管理型ランタイム）としてデプロイ"}
-              </span>
-              {"\ndeployed_agent = reasoning_engines.create(\n  "}
-              <span className={styles.cm}>reasoning_engine</span>
-              {"=root_agent,\n  "}
-              <span className={styles.cc}>{"# ADK エージェント（agent.py で定義）"}</span>
-              {"\n  "}
-              <span className={styles.cm}>display_name</span>
-              {"="}
-              <span className={styles.cs}>"Code Review Agent v2.1"</span>
-              {",\n  "}
-              <span className={styles.cm}>description</span>
-              {"="}
-              <span className={styles.cs}>
-                "PR レビューのセキュリティ・品質チェック専門エージェント（A2A 公開）"
-              </span>
-              {",\n  "}
-              <span className={styles.cm}>requirements</span>
-              {"=[\n    "}
-              <span className={styles.cs}>{'"google-cloud-aiplatform[adk,a2a]>=1.88"'}</span>
-              {",\n    "}
-              <span className={styles.cs}>{'"google-adk>=2.0.0"'}</span>
-              {",\n  ],\n)\n\n"}
-              <span className={styles.cc}>
-                {"# デプロイ後にエンドポイントを確認 → GEMINI.md に記載する"}
-              </span>
-              {"\n"}
-              <span className={styles.ck}>print</span>
-              {"(deployed_agent.resource_name)\n"}
-              <span className={styles.cc}>
-                {"# 出力: projects/123456/locations/us-central1/reasoningEngines/789"}
-              </span>
-              {"\n"}
-              <span className={styles.cc}>
-                {
-                  "# A2A URL 形式:\n# https://us-central1-aiplatform.googleapis.com/v1/{resource_name}/a2a"
-                }
-              </span>
-            </div>
-          </div>
-
-          <div className={styles.codeWrap}>
-            <div className={styles.codeBar}>
-              <span>
-                docs/agent-endpoints.md — GEMINI.md から @import するエンドポイント管理ファイル
-              </span>
-              <span className={styles.lang}>Markdown</span>
-            </div>
-            <div className={styles.codeBody}>
-              <span className={styles.ch}>
-                {"# Remote Agent Endpoints（AgentEngine / 自社サーバー）"}
-              </span>
-              {"\n"}
-              <span className={styles.cw}>
-                このファイルは GEMINI.md から @import される。エンドポイント変更時はここのみ更新。
-              </span>
-              {"\n\n"}
-              <span className={styles.ch}>{"## 本番環境（AgentEngine on Vertex AI）"}</span>
-              {"\n\n"}
-              {"| Agent | A2A Endpoint | Agent Card | ステータス |\n"}
-              {"|---|---|---|---|\n"}
-              {"| code-review-agent | "}
-              <span className={styles.cv}>
-                https://us-central1-aiplatform.googleapis.com/v1/projects/123/…/a2a
-              </span>
-              {" | "}
-              <span className={styles.cv}>/…/a2a/.well-known/agent.json</span>
-              {" | 🟢 稼働中 |\n"}
-              {"| security-scanner | "}
-              <span className={styles.cv}>https://security.internal.example.com</span>
-              {" | "}
-              <span className={styles.cv}>/.well-known/agent.json</span>
-              {" | 🟢 稼働中 |\n\n"}
-              <span className={styles.ch}>{"## Orchestrator のフォールバックルール"}</span>
-              {"\n"}
-              {"- AgentEngine タイムアウト（> 30秒） → ローカル実装フォールバックを試みる\n"}
-              {"- 認証エラー（401/403） → リトライせずユーザーに報告\n"}
-              {"- サービス不応答（503） → インシデントチャンネル（#agent-ops）に通知\n\n"}
-              <span className={styles.ch}>
-                {"## ローカル開発環境（adk web / adk api_server --a2a）"}
-              </span>
-              {"\n"}
-              {"| Agent | Local URL |\n"}
-              {"|---|---|\n"}
-              {"| code-review-agent | "}
-              <span className={styles.cv}>http://localhost:8001</span>
-              {" |\n"}
-              {"| security-scanner | "}
-              <span className={styles.cv}>http://localhost:8002</span>
-              {" |"}
-            </div>
-          </div>
-        </section>
-
-        {/* s15: ユースケース別 */}
-        <section id="s15" className={`${styles.section} ${styles.sectionMa}`}>
-          <div className={styles.sectionHead}>
-            <span className={styles.sectionNum}>15</span>
-            <h2>マルチエージェント ユースケース別 設計パターン</h2>
-          </div>
-
-          <div className={styles.ucGrid}>
-            <div className={styles.uc}>
-              <div className={styles.ucIcon}>🏢</div>
-              <div className={styles.ucTitle}>エンタープライズ クロスチーム協調</div>
-              <div className={styles.ucDesc}>
-                フロント・バックエンド・セキュリティチームがそれぞれ独立した A2A
-                エージェントを管理。Orchestrator が Agent Card
-                を使って最適なエージェントを自動選択。異なるフレームワーク（ADK / LangGraph /
-                CrewAI）間も A2A で接続可能。
-              </div>
-              <div className={styles.ucCode}>
-                Orchestrator (ADK)
-                <br />→ frontend-agent (LangGraph, A2A)
-                <br />→ backend-agent (ADK, A2A)
-                <br />→ security-agent (CrewAI, A2A)
-              </div>
-            </div>
-
-            <div className={styles.uc}>
-              <div className={styles.ucIcon}>🔍</div>
-              <div className={styles.ucTitle}>動的ディスカバリー（Discovery Service パターン）</div>
-              <div className={styles.ucDesc}>
-                Orchestrator がハードコードされたエージェントリストを持たず、Discovery Service
-                に問い合わせてリモートエージェントを動的に発見。
-                <code>RemoteA2aAgent</code>
-                を実行時に生成して <code>sub_agents</code> に追加する高度なパターン。
-              </div>
-              <div className={styles.ucCode}>
-                await discover_agents() # registry に問合せ
-                <br />→ RemoteA2aAgent を動的生成
-                <br />→ LlmAgent に tools として追加
-                <br />→ LLM が最適エージェントを自律選択
-              </div>
-            </div>
-
-            <div className={styles.uc}>
-              <div className={styles.ucIcon}>🔄</div>
-              <div className={styles.ucTitle}>LoopAgent + A2A レビューループ</div>
-              <div className={styles.ucDesc}>
-                実装エージェント（ローカル）がコードを書き、レビューエージェント（リモート
-                A2A）が品質評価。評価スコアが閾値を超えるまで繰り返す品質保証ループ。LoopAgent の
-                <code>max_iterations</code> で無限ループを防止。
-              </div>
-              <div className={styles.ucCode}>
-                LoopAgent(
-                <br />
-                sub_agents=[
-                <br />
-                implementer, # ローカル
-                <br />
-                code_review_remote], # A2A リモート
-                <br />
-                max_iterations=5
-                <br />) # output_key "quality_score" が80以上で終了
-              </div>
-            </div>
-
-            <div className={styles.uc}>
-              <div className={styles.ucIcon}>⚡</div>
-              <div className={styles.ucTitle}>ParallelAgent + マルチリージョン分析</div>
-              <div className={styles.ucDesc}>
-                異なるリージョン・データセンターで動く分析エージェントを ParallelAgent
-                で同時呼び出し。<code>output_key</code>
-                を必ず一意にしてレースコンディションを防止。集計エージェントが並列結果を統合。
-              </div>
-              <div className={styles.ucCode}>
-                ParallelAgent(
-                <br />
-                sub_agents=[
-                <br />
-                RemoteA2aAgent(us_analyzer, # output_key="us_result"
-                <br />
-                agent_card_url=US_URL),
-                <br />
-                RemoteA2aAgent(eu_analyzer, # output_key="eu_result"
-                <br />
-                agent_card_url=EU_URL)]
-                <br />) # ⚠ output_key は必ず一意に！
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* s16: マルチエージェント Anti-Patterns */}
-        <section id="s16" className={`${styles.section} ${styles.sectionMa}`}>
-          <div className={styles.sectionHead}>
-            <span className={styles.sectionNum}>16</span>
-            <h2>マルチエージェント固有の Anti-Patterns — 設計・運用両面</h2>
-          </div>
-
-          <div className={styles.patGrid}>
-            <div className={`${styles.pat} ${styles.patNg}`}>
-              <div className={styles.patLabel}>✗ agent.json / Agent Card の Anti-Patterns</div>
-              <ul>
-                <li>description が曖昧（「なんでもやります」A2A エージェント）</li>
-                <li>securitySchemes を設定しない（認証なし公開）</li>
-                <li>skills を定義しない（能力発見ができず Orchestrator から使われない）</li>
-                <li>agent.json の description と agent.py の instruction が乖離</li>
-                <li>version を更新せず破壊的変更（サイレントな障害の原因）</li>
-                <li>url が内部 IP のまま本番公開</li>
-              </ul>
-            </div>
-            <div className={`${styles.pat} ${styles.patNg}`}>
-              <div className={styles.patLabel}>✗ GEMINI.md / Orchestration の Anti-Patterns</div>
-              <ul>
-                <li>GEMINI.md にリモートエンドポイント URL を書かない（管理外に散乱）</li>
-                <li>ParallelAgent で同じ output_key を使う（上書き競合・最大の地雷）</li>
-                <li>LoopAgent の終了条件・max_iterations を設定しない（無限ループ）</li>
-                <li>
-                  全リモートエージェントに gemini-2.5-pro / gemini-3.1-pro-preview（コスト爆発）
-                </li>
-                <li>エージェント間のファイル所有権を定義しない（書き込み競合）</li>
-                <li>A2A タイムアウト・フォールバック戦略を GEMINI.md に記載しない</li>
-              </ul>
-            </div>
-          </div>
-        </section>
-
-        {/* s17: 全ファイル役割まとめ */}
-        <section id="s17" className={`${styles.section} ${styles.sectionMa}`}>
-          <div className={styles.sectionHead}>
-            <span className={styles.sectionNum}>17</span>
-            <h2>全ファイル役割まとめ（マルチエージェント + A2A 対応版）</h2>
-          </div>
-          <div className={styles.tblWrap}>
+          <div className={styles.tableWrap}>
             <table>
               <thead>
                 <tr>
-                  <th>ファイル</th>
-                  <th>レイヤー</th>
-                  <th>読者</th>
-                  <th>マルチエージェントでの役割</th>
-                  <th>設計原則（追記）</th>
+                  <th>発火方式</th>
+                  <th>説明</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
                   <td>
-                    <code>GEMINI.md</code> (root)
-                  </td>
-                  <td>ADK / CLI</td>
-                  <td>Orchestrator（常時ロード）</td>
-                  <td>
-                    ルーティングルール・ファイル所有権・リモートエンドポイント一覧・フォールバック戦略
+                    <strong>Manual</strong>
                   </td>
                   <td>
-                    A2A エンドポイント URL テーブルと Quality Gates を必ず記載。@import で
-                    docs/agent-endpoints.md を分離
+                    チャット入力欄で <code>@ルール名</code> のように明示的にメンションした時だけ適用される
                   </td>
                 </tr>
                 <tr>
                   <td>
-                    <code>agents/*/GEMINI.md</code>
+                    <strong>Always On</strong>
                   </td>
-                  <td>ADK</td>
-                  <td>各エージェント（Auto-scan）</td>
-                  <td>サービス固有ルール。A2A エージェントごとに独立管理</td>
-                  <td>Auto-scan で動的ロード。ルート GEMINI.md との重複を避ける</td>
+                  <td>会話が始まるたびに常に適用される</td>
                 </tr>
                 <tr>
                   <td>
-                    <code>agent.json</code>
-                    <br />
-                    （Agent Card）
+                    <strong>Model Decision</strong>
                   </td>
-                  <td>A2A</td>
-                  <td>リモートクライアントエージェント・Orchestrator</td>
-                  <td>能力公開・認証定義・スキル一覧（ディスカバリーの唯一の情報源）</td>
-                  <td>
-                    description・skills・securitySchemes は必須。version 管理を徹底。to_a2a()
-                    で自動生成も可
-                  </td>
+                  <td>Ruleに書かれた自然言語の説明を手がかりに、適用すべきかどうかをモデル自身が判断する</td>
                 </tr>
                 <tr>
                   <td>
-                    <code>agents/*/agent.py</code>
-                  </td>
-                  <td>ADK</td>
-                  <td>各エージェントランタイム</td>
-                  <td>instruction（内部 GEMINI.md 相当）・RemoteA2aAgent 定義・output_key 管理</td>
-                  <td>output_key は一意に。RemoteA2aAgent の description に呼び出し条件を明記</td>
-                </tr>
-                <tr>
-                  <td>
-                    <code>docs/agent-endpoints.md</code>
-                  </td>
-                  <td>A2A / 運用</td>
-                  <td>Orchestrator（@import）+ 人間</td>
-                  <td>AgentEngine URL・ローカル開発 URL・フォールバックルールを一元管理</td>
-                  <td>GEMINI.md から @import。エンドポイント変更はこのファイルのみ更新</td>
-                </tr>
-                <tr>
-                  <td>
-                    <code>AGENTS.md</code>
-                  </td>
-                  <td>共通</td>
-                  <td>全 AI ツール（クロスツール）</td>
-                  <td>A2A エージェント一覧・ADK パイプライン・AgentEngine エンドポイント概要</td>
-                  <td>
-                    ツール固有の詳細（agent.json
-                    URL等）はここに書かず各ファイルへ。横断的ルールのみ記載
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <code>.geminiignore</code>
-                  </td>
-                  <td>CLI</td>
-                  <td>コンテキストシステム</td>
-                  <td>agent.json（本番の認証情報含む）・.env・*.key を除外リストに追加</td>
-                  <td>
-                    <code>agent.json</code> に secrets が含まれる場合は必ず除外。node_modules・dist
-                    も忘れずに
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <code>settings.json</code>
-                  </td>
-                  <td>CLI / IDE</td>
-                  <td>Gemini ランタイム</td>
-                  <td>MCP サーバー・除外ツール・A2A クライアント設定を一元管理</td>
-                  <td>A2A サーバーの接続情報は env 変数で渡す（ハードコード禁止）</td>
-                </tr>
-                <tr>
-                  <td>
-                    <code>README.md</code>
-                  </td>
-                  <td>全ツール</td>
-                  <td>人間（チームメンバー）</td>
-                  <td>
-                    A2A エージェント一覧・agent.json URL・AgentEngine デプロイ手順・コスト試算
+                    <strong>Glob</strong>
                   </td>
                   <td>
-                    マルチエージェントアーキテクチャ図・各エージェントのオーナーチーム・フォールバック手順を記載
+                    <code>*.js</code> や <code>src/**/*.ts</code> のようなglobパターンに一致するファイルを操作する時だけ適用される
                   </td>
                 </tr>
               </tbody>
             </table>
           </div>
+
+          <div className={styles.diagramBlock}>
+            <div className={styles.mermaidWrap}>
+              <MermaidDiagram chart={DIAGRAM_1} id="diagram-1" />
+            </div>
+            <div className={styles.diagramCaption}>図2：Ruleの4つの発火方式</div>
+          </div>
+
+          <h3>@ メンションで他ファイルを参照できる</h3>
+          <div className={styles.prose}>
+            <p>
+              Rulesファイルの中では <code>@ファイル名</code> という記法で他のファイルを参照できます。相対パスならRuleファイルからの相対位置として、絶対パスならそのまま絶対パスとして解決されます。例えば <code>@/path/to/file.md</code> はまず <code>/path/to/file.md</code> として解決を試み、存在しなければワークスペース内の <code>workspace/path/to/file.md</code> として解決されます。これにより、共通のコーディング規約ドキュメントをRuleの中から引用するといった構成が可能になります。
+            </p>
+          </div>
+
+          <h3>Rulesの実例</h3>
+          <span className={styles.codeLabel}>Rule ファイル（frontmatter不要）</span>
+          <pre className={styles.codeBlock}>
+            <div className={styles.codeLine}># データベース関連の制約</div>
+            <div className={styles.codeLine}></div>
+            <div className={styles.codeLine}>- マイグレーションファイル（migrations/ 配下）は、明示的な確認なしに変更・削除しない</div>
+            <div className={styles.codeLine}>- Prismaスキーマを唯一の正とし、生成されたマイグレーションを手で直接編集しない</div>
+            <div className={styles.codeLine}>- 本番環境に影響するコマンドを実行する前には、必ず実行内容を要約して確認を求める</div>
+          </pre>
+          <div className={styles.prose}>
+            <p>
+              このような「やってはいけないこと（deny rule）」を明文化しておくと、後戻りできない事故（本番DBの破壊など）を未然に防げる、という指摘は複数の実務者ブログでも共通して強調されています。
+            </p>
+          </div>
+          <a className={styles.backToTop} href="#top">
+            ↑ 目次へ戻る
+          </a>
         </section>
 
-        <hr />
+        {/* 4 */}
+        <section className={styles.section} id="section-4">
+          <div className={styles.sectionNumber}>04 / Step 2</div>
+          <h2>Step 2：Skills ― 再利用可能な専門知識パッケージを作る</h2>
 
-        {/* sources */}
-        <section id="sources" className={styles.section}>
-          <div className={styles.sectionHead}>
-            <span className={styles.sectionNum}>📚</span>
-            <h2>参考ソース（公式・一次情報優先）</h2>
+          <h3>Skillsとは何か</h3>
+          <div className={styles.prose}>
+            <p>
+              Skillsは、特定の作業に関する「専門知識」と「手順」、そして必要に応じて「補助スクリプト」をひとまとめにしたフォルダです。Antigravityの公式ドキュメントは、SkillsをAgent Skillsという<strong>オープンな標準規格</strong>の実装として位置づけており、<code>SKILL.md</code> というファイル形式自体はAntigravity専用ではなく、Claude Code・Cursor・Gemini CLIなど複数のエージェントツール間で共通して使えるモデル非依存のフォーマットだと説明されています。
+            </p>
           </div>
-          <div className={styles.srcGrid}>
-            {SOURCES_EXISTING.map((s) => (
-              <div key={s.href} className={styles.srcCard}>
-                <div className={styles.srcIcon}>{s.icon}</div>
-                <div className={styles.srcTitle}>{s.title}</div>
-                <div className={styles.srcUrl}>
-                  <Ext href={s.href}>{s.display}</Ext>
-                </div>
-                <div className={styles.srcDesc}>{s.desc}</div>
-              </div>
-            ))}
-            {SOURCES_NEW.map((s) => (
-              <div key={s.href} className={`${styles.srcCard} ${styles.srcCardNew}`}>
-                <div className={styles.srcIcon}>{s.icon}</div>
-                <div className={styles.srcTitle}>{s.title}</div>
-                <div className={styles.srcUrl}>
-                  <Ext href={s.href}>{s.display}</Ext>
-                </div>
-                <div className={styles.srcDesc}>{s.desc}</div>
-              </div>
-            ))}
+
+          <h3>フォルダ構成</h3>
+          <div className={styles.prose}>
+            <p>
+              Skillは「フォルダ＋<code>SKILL.md</code>」という最小構成から始められます。
+            </p>
           </div>
+          <div className={styles.tableWrap}>
+            <table>
+              <thead>
+                <tr>
+                  <th>パス</th>
+                  <th>必須／任意</th>
+                  <th>役割</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <code>SKILL.md</code>
+                  </td>
+                  <td>必須</td>
+                  <td>YAML frontmatter付きの本体。専門知識・手順の説明を書く</td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>scripts/</code>
+                  </td>
+                  <td>任意</td>
+                  <td>エージェントが実行できる補助スクリプト（Python・Bash・Node等）</td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>examples/</code>
+                  </td>
+                  <td>任意</td>
+                  <td>参考実装・サンプルコード</td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>resources/</code>
+                  </td>
+                  <td>任意</td>
+                  <td>テンプレートやその他の静的アセット</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>保存場所</h3>
+          <div className={styles.prose}>
+            <p>Skillsにもワークスペース単位とグローバル単位があります。</p>
+          </div>
+          <div className={styles.tableWrap}>
+            <table>
+              <thead>
+                <tr>
+                  <th>種類</th>
+                  <th>保存場所</th>
+                  <th>用途</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Workspace Skills</td>
+                  <td>
+                    <code>&lt;ワークスペースルート&gt;/.agents/skills/&lt;skill-folder&gt;/</code>
+                  </td>
+                  <td>チームのデプロイ手順やテスト規約など、プロジェクト固有の作業</td>
+                </tr>
+                <tr>
+                  <td>Global Skills</td>
+                  <td>
+                    <code>~/.gemini/config/skills/&lt;skill-folder&gt;/</code>
+                  </td>
+                  <td>個人的によく使うユーティリティなど、全プロジェクト共通の作業</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div className={styles.prose}>
+            <p>
+              Rulesと同様に、Antigravityは現在 <code>.agents/skills</code> をデフォルトとしつつ、旧 <code>.agent/skills</code> も後方互換としてサポートしています。
+            </p>
+          </div>
+
+          <h3>SKILL.md のfrontmatterフィールド</h3>
+          <div className={styles.tableWrap}>
+            <table>
+              <thead>
+                <tr>
+                  <th>フィールド</th>
+                  <th>必須</th>
+                  <th>説明</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <code>name</code>
+                  </td>
+                  <td>任意</td>
+                  <td>Skillの一意な識別子（小文字・ハイフン区切り）。省略時はフォルダ名がそのまま使われる</td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>description</code>
+                  </td>
+                  <td>必須</td>
+                  <td>Skillが何をするか、いつ使うべきかを説明する文。エージェントが「このSkillを使うべきか」を判断する材料になる</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div className={styles.prose}>
+            <p>
+              公式ドキュメントは、descriptionを<strong>三人称で</strong>、かつエージェントがタスクとの関連性を認識しやすいキーワードを含めて書くことを推奨しています。例えば「Pythonコードに対してpytest規約に沿った単体テストを生成する」のように、具体的な動詞と対象を明示する書き方です。
+            </p>
+          </div>
+
+          <h3>Skillはどう発火するか：progressive disclosure</h3>
+          <div className={styles.prose}>
+            <p>
+              Skillsは「会話が始まった瞬間に全文が読み込まれる」わけではありません。次の3段階を踏む
+              <strong>progressive disclosure（段階的開示）</strong>
+              というパターンで動作します。
+            </p>
+          </div>
+
+          <div className={styles.diagramBlock}>
+            <div className={styles.mermaidWrap}>
+              <MermaidDiagram chart={DIAGRAM_2} id="diagram-2" />
+            </div>
+            <div className={styles.diagramCaption}>図3：Skillのprogressive disclosure（段階的開示）</div>
+          </div>
+
+          <div className={styles.prose}>
+            <p>
+              この段階的開示により、使っていないSkillの詳細情報でコンテキストウィンドウを圧迫せずに済みます。ユーザー側からSkill名を明示的に指定して使わせることも可能です。
+            </p>
+          </div>
+
+          <h3>Skills作成のベストプラクティス</h3>
+          <div className={styles.prose}>
+            <p>公式ドキュメントが挙げているポイントは次の4つです。</p>
+            <ul>
+              <li>
+                <strong>1つのSkillには1つの役割だけを持たせる</strong>：「何でも屋」のSkillではなく、独立したタスクごとに別々のSkillへ分割する
+              </li>
+              <li>
+                <strong>descriptionを明確に書く</strong>：エージェントがSkillを使うかどうかを判断する唯一の手がかりなので、具体性が重要
+              </li>
+              <li>
+                <strong>スクリプトは「ブラックボックス」として扱わせる</strong>：スクリプトを含む場合、エージェントにはソースコード全体を読ませるのではなく、まず <code>--help</code> を実行させて使い方を把握させる方が、コンテキストを節約できる
+              </li>
+              <li>
+                <strong>複雑なSkillには判断ツリーを含める</strong>：状況に応じてどちらのアプローチを取るべきか、Skillの中に条件分岐の説明を書いておく
+              </li>
+            </ul>
+          </div>
+
+          <h3>Skillsの実例</h3>
+          <span className={styles.codeLabel}>SKILL.md</span>
+          <pre className={styles.codeBlock}>
+            <div className={styles.codeLine}>---</div>
+            <div className={styles.codeLine}>name: code-review</div>
+            <div className={styles.codeLine}>description: コードの変更をバグ・スタイル・ベストプラクティスの観点でレビューする。PRレビューやコード品質チェックの際に使用する。</div>
+            <div className={styles.codeLine}>---</div>
+            <div className={styles.codeLine}></div>
+            <div className={styles.codeLine}># コードレビューSkill</div>
+            <div className={styles.codeLine}></div>
+            <div className={styles.codeLine}>コードをレビューする際は、次の手順に従うこと。</div>
+            <div className={styles.codeLine}></div>
+            <div className={styles.codeLine}>## レビューチェックリスト</div>
+            <div className={styles.codeLine}></div>
+            <div className={styles.codeLine}>1. 正しさ：コードは意図通りに動作するか</div>
+            <div className={styles.codeLine}>2. エッジケース：エラー条件は適切に処理されているか</div>
+            <div className={styles.codeLine}>3. スタイル：プロジェクトの規約に沿っているか</div>
+            <div className={styles.codeLine}>4. パフォーマンス：明らかな非効率はないか</div>
+            <div className={styles.codeLine}></div>
+            <div className={styles.codeLine}>## フィードバックの与え方</div>
+            <div className={styles.codeLine}></div>
+            <div className={styles.codeLine}>- 何を変更すべきか具体的に示す</div>
+            <div className={styles.codeLine}>- 「何を」だけでなく「なぜ」を説明する</div>
+            <div className={styles.codeLine}>- 可能であれば代替案を提示する</div>
+          </pre>
+          <a className={styles.backToTop} href="#top">
+            ↑ 目次へ戻る
+          </a>
         </section>
-      </div>
+
+        {/* 5 */}
+        <section className={styles.section} id="section-5">
+          <div className={styles.sectionNumber}>05 / Step 3</div>
+          <h2>Step 3：Workflows ― 手順を「マクロ」として自動化する</h2>
+
+          <h3>WorkflowsとRulesの違い</h3>
+          <div className={styles.prose}>
+            <p>RulesとWorkflowsは、どちらもエージェントの動作をカスタマイズする仕組みですが、性質がまったく異なります。</p>
+          </div>
+          <div className={styles.tableWrap}>
+            <table>
+              <thead>
+                <tr>
+                  <th>観点</th>
+                  <th>Rules</th>
+                  <th>Workflows</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <strong>性質</strong>
+                  </td>
+                  <td>受動的な制約（常にバックグラウンドで効いているコンテキスト）</td>
+                  <td>能動的な手順（ユーザーが明示的に呼び出して実行するタスク）</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>発生するレベル</strong>
+                  </td>
+                  <td>プロンプトレベルの継続的なガイダンス</td>
+                  <td>一連のタスクをつなぐ「トラジェクトリ」レベルの構造化された手順</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>典型的な用途</strong>
+                  </td>
+                  <td>「常にTypeScriptの厳格モードを使う」等の恒常的な方針</td>
+                  <td>「サービスをデプロイする」「PRコメントに対応する」等の繰り返し作業</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>保存場所と呼び出し方</h3>
+          <div className={styles.prose}>
+            <p>
+              Workflowsもワークスペース単位・グローバル単位で保存でき、いずれもMarkdownファイルとして保存されます。作成は「Customizations」パネルの「Workflows」タブから、<code>+ Workspace</code> または <code>+ Global</code> ボタンで行います。保存後は、チャット欄で <code>/workflow-name</code> と入力するだけでいつでも呼び出せます。
+            </p>
+            <p>
+              コミュニティの実践報告によれば、ワークスペースWorkflowsは <code>.agent/workflows/</code>（Rules・Skillsと同様に新バージョンでは <code>.agents/workflows/</code> に移行している可能性があります）、グローバルWorkflowsは <code>~/.gemini/antigravity/global_workflows/</code> に保存されるとされています。公式ドキュメントはUI操作の説明に留まり絶対パスまでは明記していないため、実際の保存先はインストールしているAntigravityのバージョンで確認することをおすすめします。
+            </p>
+            <p>Workflowファイルにもタイトル・説明・手順のリストを持たせる必要があり、Rulesと同じく1ファイルあたり12,000文字までという上限があります。</p>
+          </div>
+
+          <h3>Workflowは連鎖できる</h3>
+          <div className={styles.prose}>
+            <p>
+              Workflowの中から別のWorkflowを呼び出すことができます。例えば「Ship Feature」というWorkflowの手順の中に「Run Testsを呼び出す」という指示を含めておけば、<code>/ship-feature</code> の実行が自動的に <code>/run-tests</code> の実行につながります。
+            </p>
+          </div>
+
+          <div className={styles.diagramBlock}>
+            <div className={styles.mermaidWrap}>
+              <MermaidDiagram chart={DIAGRAM_3} id="diagram-3" />
+            </div>
+            <div className={styles.diagramCaption}>図4：Workflowの連鎖呼び出し</div>
+          </div>
+
+          <h3>エージェントにWorkflowを自動生成させる</h3>
+          <div className={styles.prose}>
+            <p>
+              Antigravityでは、Workflowを手書きするだけでなく、エージェントに「今の手順をWorkflowとして保存して」と頼むこともできます。特に、エージェントと一緒に一連の作業を手動でこなした直後にお願いすると、その会話履歴を参考にした精度の高いWorkflowを自動生成してくれます。
+            </p>
+          </div>
+          <a className={styles.backToTop} href="#top">
+            ↑ 目次へ戻る
+          </a>
+        </section>
+
+        {/* 6 */}
+        <section className={styles.section} id="section-6">
+          <div className={styles.sectionNumber}>06 / Step 4</div>
+          <h2>Step 4：Artifacts ― エージェントの思考を可視化し人間がレビューする</h2>
+
+          <h3>Artifactsとは何か</h3>
+          <div className={styles.prose}>
+            <p>
+              Artifactは、エージェントがタスクを遂行し、その進捗や意図を人間に伝えるために生成する構造化された成果物です。リッチなMarkdown形式の計画書、コードdiff、アーキテクチャ図、画像、ブラウザ操作の録画などが含まれます。
+            </p>
+            <p>
+              公式ドキュメントは、Artifactsの存在意義を「非同期的な協働（asynchronous collaboration）」の実現だと説明しています。エージェントがより自律的に長時間の複雑なタスクを実行するようになるほど、人間が一つひとつのツール呼び出しを同期的に監視する必要はなくなり、代わりに主要な節目で高レベルの成果物だけをレビューすればよくなる、という発想です。
+            </p>
+          </div>
+
+          <h3>主なArtifactの種類</h3>
+          <div className={styles.tableWrap}>
+            <table>
+              <thead>
+                <tr>
+                  <th>Artifact</th>
+                  <th>生成タイミング</th>
+                  <th>役割</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <strong>Implementation Plan</strong>（実装計画）
+                  </td>
+                  <td>コード変更を始める前</td>
+                  <td>どのファイルをどう変更するかという技術的な設計をレビューできるようにする</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>Task List</strong>（タスクリスト）
+                  </td>
+                  <td>作業中随時更新</td>
+                  <td>調査・実装・検証といったエージェントの現在の取り組み方を、生きたMarkdownのスナップショットとして可視化する</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>Walkthrough</strong>（完了報告）
+                  </td>
+                  <td>タスク完了後</td>
+                  <td>会話の中で何が行われたかを簡潔にまとめ、途中を追っていなくても状況を把握できるようにする</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>Screenshots / Browser Recordings</strong>
+                  </td>
+                  <td>ブラウザを使った検証時</td>
+                  <td>ブラウザ用のサブエージェントが取得した、フロントエンドの見た目や動作の視覚的な証拠</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>Knowledge</strong>（永続的な学習内容）
+                  </td>
+                  <td>プロジェクトを跨いだ知見の蓄積時</td>
+                  <td>
+                    プロジェクト固有のパターンや知見を記憶し、<code>product-guidelines.md</code> のようなファイルを手動更新しなくても、エージェントが自分のスタイルを「学習」できるようにする
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>人間はArtifactsとどう関わるか（レビューのループ）</h3>
+          <div className={styles.prose}>
+            <p>
+              Implementation Planは、既定の設定（「常に進める」以外の設定）では、コード変更に着手する前に必ずユーザーのレビューを要求します。ユーザーはプラン全体に対して「Proceed」ボタンで承認することも、個別の行にインラインコメントを残して「もっと影響範囲を小さくしてほしい」「別の技術スタックを使ってほしい」といった修正指示を出すこともできます。コメント後も「Proceed」で先に進めるか、「Review」トグルでコメント一覧をまとめて確認してからフィードバックを送るかを選べます。
+            </p>
+          </div>
+
+          <div className={styles.diagramBlock}>
+            <div className={styles.mermaidWrap}>
+              <MermaidDiagram chart={DIAGRAM_4} id="diagram-4" />
+            </div>
+            <div className={styles.diagramCaption}>図5：Artifactの人間参加型レビューループ</div>
+          </div>
+
+          <h3>最重要のベストプラクティス：Planを安易に承認しない</h3>
+          <div className={styles.prose}>
+            <p>
+              複数の実務者ブログが共通して指摘している落とし穴は、「コーディングに早く進みたいがために、Planの段階を機械的に承認してしまう」ことです。Artifactの本質は「コードdiffを読む」から「Artifactを読む」への習慣の転換であり、Implementation Planの段階でこそ厳しく内容を吟味すべきだとされています。ここで手を抜くと、後工程での手戻りコストの方がはるかに大きくなります。
+            </p>
+          </div>
+
+          <h3>AntigravityのArtifactsが仕様駆動開発にもたらす違い</h3>
+          <div className={styles.prose}>
+            <p>
+              Google Cloudのカスタマーエンジニアによる解説記事では、従来のSpec-Driven Developmentが「機能仕様・技術仕様・実装計画」といった固定のアーティファクト一式を毎回律儀に作成させる方式だったのに対し、Antigravityでは
+              <strong>モデル自身が「このタスクにはどのArtifactが必要か」を判断する</strong>
+              という違いが強調されています。例えば「タイポを直して」という単純なタスクにはImplementation Planを生成せずそのまま修正し、「認証システムをリファクタリングして」という複雑なタスクには詳細なPlanを自律的に生成する、という具合です。これにより、「シンプルな作業には仰々しすぎる」「複雑な作業には心もとない」という、固定テンプレート型の仕様駆動開発が抱えていたジレンマを緩和できるとされています。
+            </p>
+          </div>
+          <a className={styles.backToTop} href="#top">
+            ↑ 目次へ戻る
+          </a>
+        </section>
+
+        {/* 7 */}
+        <section className={styles.section} id="section-7">
+          <div className={styles.sectionNumber}>07 / 統合フロー</div>
+          <h2>4つを組み合わせる：仕様駆動開発の実践フロー</h2>
+          <div className={styles.prose}>
+            <p>ここまでのRules・Skills・Workflows・Artifactsを1つの図に統合すると、次のような循環になります。</p>
+          </div>
+
+          <div className={styles.diagramBlock}>
+            <div className={styles.mermaidWrap}>
+              <MermaidDiagram chart={DIAGRAM_5} id="diagram-5" />
+            </div>
+            <div className={styles.diagramCaption}>図6：Rules / Skills / Workflows / Artifacts を統合した実践フロー</div>
+          </div>
+
+          <div className={styles.prose}>
+            <p>実際の運用イメージとしては、次のような役割分担になります。</p>
+            <ol className={styles.steps}>
+              <li>
+                <strong>Rules</strong>で「触ってはいけないもの（DBマイグレーション等）」や「常に守るべき方針（言語・フレームワークの選択等）」を定義しておく
+              </li>
+              <li>
+                <strong>Skills</strong>で「PRレビューの手順」「安全なマイグレーション手順」「仕様駆動開発そのものの進め方」など、繰り返し使う専門知識をパッケージ化しておく
+              </li>
+              <li>
+                定型作業は<strong>Workflows</strong>として<code>/deploy</code>や<code>/ship-feature</code>のようなコマンドに落とし込み、いつでも同じ手順で再実行できるようにする
+              </li>
+              <li>
+                実際の開発は、エージェントが自律的に生成する<strong>Artifacts</strong>（Plan → 実行 → Walkthrough）を人間が都度レビューしながら進める
+              </li>
+            </ol>
+            <p>
+              Google Cloud発の解説記事が指摘するように、Antigravityは「厳格な指示で完全にAIを制御する」という従来のSDD観から一歩進み、「モデルに一定の裁量を持たせつつ、要所要所でArtifactsを介して人間がチェックする」という設計思想を採っています。GitHub Spec KitをAntigravity向けに移植したオープンソースプロジェクトも存在し、Workflows（<code>/</code>コマンド）とSkills（<code>@</code>メンション）を組み合わせて、要件定義から実装までのソフトウェア開発ライフサイクル全体を仕様駆動で進める、という応用例も報告されています。
+            </p>
+          </div>
+          <a className={styles.backToTop} href="#top">
+            ↑ 目次へ戻る
+          </a>
+        </section>
+
+        {/* 8 */}
+        <section className={styles.section} id="section-8">
+          <div className={styles.sectionNumber}>08 / チェックリスト</div>
+          <h2>ベストプラクティス・チェックリスト</h2>
+          <div className={styles.tableWrap}>
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>チェック項目</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1</td>
+                  <td>Global Ruleは「すべてのプロジェクトで常に守りたい方針」だけに絞り、プロジェクト固有の事情はWorkspace Ruleに書く</td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td>破壊的操作（DBマイグレーション、本番デプロイ等）は明示的な「deny rule」としてRuleに書き出す</td>
+                </tr>
+                <tr>
+                  <td>3</td>
+                  <td>Ruleの発火方式（Manual/Always On/Model Decision/Glob）は、内容の重要度と適用範囲に応じて使い分ける</td>
+                </tr>
+                <tr>
+                  <td>4</td>
+                  <td>Skillは1つにつき1つの役割だけを持たせ、「何でも屋」化させない</td>
+                </tr>
+                <tr>
+                  <td>5</td>
+                  <td>SKILL.mdのdescriptionは三人称・具体的なキーワード付きで書き、エージェントが自律的に発見できるようにする</td>
+                </tr>
+                <tr>
+                  <td>6</td>
+                  <td>
+                    Skillに補助スクリプトを含める場合は、まず <code>--help</code> で使い方を確認させる運用にし、ソース全文を読ませない
+                  </td>
+                </tr>
+                <tr>
+                  <td>7</td>
+                  <td>
+                    繰り返し行う定型作業（デプロイ・PR対応等）は早めにWorkflow化し、<code>/コマンド</code> として再利用する
+                  </td>
+                </tr>
+                <tr>
+                  <td>8</td>
+                  <td>一連の作業をエージェントと手動でこなした直後は、「今の手順をWorkflowにして」と依頼して自動生成させる</td>
+                </tr>
+                <tr>
+                  <td>9</td>
+                  <td>Implementation Planは自動承認（Always Proceed）に頼りきらず、特に複雑なタスクでは内容を吟味してからProceedする</td>
+                </tr>
+                <tr>
+                  <td>10</td>
+                  <td>Walkthroughは、離席していた間の変更内容を追いつくための一次情報として活用する</td>
+                </tr>
+                <tr>
+                  <td>11</td>
+                  <td>Rules・Skills・Workflowsはgit管理下に置き、チーム全体で同じ行動規範・専門知識・手順を共有する</td>
+                </tr>
+                <tr>
+                  <td>12</td>
+                  <td>
+                    <code>.agent/</code> 系と <code>.agents/</code> 系のどちらが有効になっているか、使用中のAntigravityのバージョンで確認する
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <a className={styles.backToTop} href="#top">
+            ↑ 目次へ戻る
+          </a>
+        </section>
+
+        {/* 9 */}
+        <section className={styles.section} id="section-9">
+          <div className={styles.sectionNumber}>09 / アンチパターン</div>
+          <h2>よくある落とし穴（アンチパターン）</h2>
+          <div className={styles.tableWrap}>
+            <table>
+              <thead>
+                <tr>
+                  <th>落とし穴</th>
+                  <th>内容</th>
+                  <th>対策</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <strong>Planの機械的承認</strong>
+                  </td>
+                  <td>コーディングに早く進みたいがためにImplementation Planを吟味せず「Proceed」してしまう</td>
+                  <td>複雑なタスクほど、Plan段階でのレビューに時間をかける運用を徹底する</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>Skillの肥大化</strong>
+                  </td>
+                  <td>1つのSKILL.mdに何でも詰め込み、「何でも屋Skill」になってしまう</td>
+                  <td>タスクの種類ごとにSkillを分割し、descriptionを具体的に保つ</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>保存場所の思い込み</strong>
+                  </td>
+                  <td>
+                    <code>.agent/</code> と <code>.agents/</code> の新旧混在、Global/Workspaceの取り違えにより、意図したRule・Skillが読み込まれない
+                  </td>
+                  <td>公式ドキュメントとインストール済みバージョンの両方で保存先を確認する</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>機密情報の書き込み</strong>
+                  </td>
+                  <td>RuleやSkill、あるいはコード中のコメントにAPIキー等の機密情報を書いてしまう</td>
+                  <td>機密情報は環境変数や秘密管理サービスに置き、Markdownファイルには含めない</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>外部コンテンツ経由の指示注入</strong>
+                  </td>
+                  <td>第三者が用意したドキュメントやコードコメントに隠された指示を、エージェントがそのまま実行してしまうリスク</td>
+                  <td>外部から取り込むファイルやリンクの内容は鵜呑みにせず、機密操作の前には人間の確認を挟む</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>Workflowの1本道信仰</strong>
+                  </td>
+                  <td>すべての作業をWorkflowで固定化しすぎ、モデルの自律的な判断の余地を奪ってしまう</td>
+                  <td>定型作業はWorkflow化する一方、探索的なタスクはAgentの裁量とArtifactsレビューに委ねる</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <a className={styles.backToTop} href="#top">
+            ↑ 目次へ戻る
+          </a>
+        </section>
+
+        {/* 10 */}
+        <section className={styles.section} id="section-10">
+          <div className={styles.sectionNumber}>10 / 出典</div>
+          <h2>参考文献・情報源</h2>
+          <div className={styles.prose}>
+            <p>本ガイドは、2026年7月26日時点で参照可能な以下の一次情報・著名な開発者による解説記事をもとに作成しました。</p>
+          </div>
+
+          <div className={styles.refGroupTitle}>Google公式ドキュメント</div>
+          <ul className={styles.refList}>
+            <li>
+              <span className={styles.refTitle}>Google Antigravity Docs, &quot;Rules&quot; / &quot;Workflows&quot;</span>
+              <Ext href="https://antigravity.google/docs/rules-workflows">https://antigravity.google/docs/rules-workflows</Ext>
+            </li>
+            <li>
+              <span className={styles.refTitle}>Google Antigravity Docs, &quot;Agent Skills&quot;</span>
+              <Ext href="https://antigravity.google/docs/skills">https://antigravity.google/docs/skills</Ext>
+            </li>
+            <li>
+              <span className={styles.refTitle}>Google Antigravity Docs, &quot;Artifacts Overview&quot;</span>
+              <Ext href="https://antigravity.google/docs/artifacts">https://antigravity.google/docs/artifacts</Ext>
+            </li>
+            <li>
+              <span className={styles.refTitle}>Google Antigravity Docs, &quot;Implementation Plan&quot;</span>
+              <Ext href="https://antigravity.google/docs/ide/implementation-plan">
+                https://antigravity.google/docs/ide/implementation-plan
+              </Ext>
+            </li>
+            <li>
+              <span className={styles.refTitle}>Google Antigravity Docs, &quot;Walkthrough&quot;</span>
+              <Ext href="https://antigravity.google/docs/ide/walkthrough">https://antigravity.google/docs/ide/walkthrough</Ext>
+            </li>
+          </ul>
+
+          <div className={styles.refGroupTitle}>Google公式 Codelabs</div>
+          <ul className={styles.refList}>
+            <li>
+              <span className={styles.refTitle}>&quot;Authoring Google Antigravity Skills&quot;</span>
+              <Ext href="https://codelabs.developers.google.com/getting-started-with-antigravity-skills">
+                https://codelabs.developers.google.com/getting-started-with-antigravity-skills
+              </Ext>
+            </li>
+            <li>
+              <span className={styles.refTitle}>
+                &quot;Build Autonomous Developer Pipelines using agents.md and skills.md in Antigravity&quot;
+              </span>
+              <Ext href="https://codelabs.developers.google.com/autonomous-ai-developer-pipelines-antigravity">
+                https://codelabs.developers.google.com/autonomous-ai-developer-pipelines-antigravity
+              </Ext>
+            </li>
+            <li>
+              <span className={styles.refTitle}>
+                &quot;Spec-Driven ADK Agent Development with Antigravity and Spec-kit&quot;
+              </span>
+              <Ext href="https://codelabs.developers.google.com/sdd-adk-antigravity">
+                https://codelabs.developers.google.com/sdd-adk-antigravity
+              </Ext>
+            </li>
+          </ul>
+
+          <div className={styles.refGroupTitle}>著名な開発者・実務者による解説記事</div>
+          <ul className={styles.refList}>
+            <li>
+              <span className={styles.refTitle}>
+                Simon Willison, &quot;Google Antigravity&quot;（Antigravity発表直後の一次レビュー）
+              </span>
+              <Ext href="https://simonwillison.net/2025/Nov/18/google-antigravity/">
+                https://simonwillison.net/2025/Nov/18/google-antigravity/
+              </Ext>
+            </li>
+            <li>
+              <span className={styles.refTitle}>
+                Giovanni Galloro（Google Cloudカスタマーエンジニア）, &quot;How Google Antigravity is changing spec-driven
+                development&quot;
+              </span>
+              <Ext href="https://medium.com/google-cloud/benefits-and-challenges-of-spec-driven-development-and-how-antigravity-is-changing-the-game-3343a6942330">
+                https://medium.com/google-cloud/benefits-and-challenges-of-spec-driven-development-and-how-antigravity-is-changing-the-game-3343a6942330
+              </Ext>
+            </li>
+            <li>
+              <span className={styles.refTitle}>Amulya Bhatia, &quot;Advanced Tips for Mastering Google Antigravity&quot;</span>
+              <Ext href="https://iamulya.one/posts/advanced-tips-for-mastering-google-antigravity/">
+                https://iamulya.one/posts/advanced-tips-for-mastering-google-antigravity/
+              </Ext>
+            </li>
+            <li>
+              <span className={styles.refTitle}>
+                Alex Merced, &quot;Context Management Strategies for Google Antigravity: A Complete Guide to the Agent-First
+                IDE&quot;
+              </span>
+              <Ext href="https://iceberglakehouse.com/posts/2026-03-context-google-antigravity/">
+                https://iceberglakehouse.com/posts/2026-03-context-google-antigravity/
+              </Ext>
+            </li>
+          </ul>
+
+          <div className={styles.noteBox}>
+            <strong>注記：</strong>
+            Workflowsの保存先の絶対パス（特にグローバルWorkflowsの格納場所）については、公式ドキュメントではUI操作のみが説明されており、ファイルシステム上のパスは明記されていません。本ガイドで示したパスはコミュニティによる実地検証の報告に基づくものであり、Antigravityのバージョンによって変わる可能性があります。実際の運用では、お使いのバージョンのCustomizationsパネルで挙動を確認してください。
+          </div>
+          <a className={styles.backToTop} href="#top">
+            ↑ 目次へ戻る
+          </a>
+        </section>
+
+        <footer className={styles.footer}>
+          AI仕様駆動開発とMarkdown ― Google Antigravity Rules / Skills / Workflows / Artifacts 徹底ガイド ｜
+          作成日：2026年7月26日時点の情報に基づく
+        </footer>
+      </main>
     </div>
   );
 }
