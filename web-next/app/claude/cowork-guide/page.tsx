@@ -333,39 +333,49 @@ export default function Page() {
             </p>
             <ul className={styles.checklist}>
               <li>
-                <input type="checkbox" disabled />
-                <span>
-                  <strong>入力が複数ある</strong>
-                  ：複数ファイル、フォルダ全体、あるいはファイル＋コネクタの組み合わせ
-                </span>
+                <label>
+                  <input type="checkbox" disabled />
+                  <span>
+                    <strong>入力が複数ある</strong>
+                    ：複数ファイル、フォルダ全体、あるいはファイル＋コネクタの組み合わせ
+                  </span>
+                </label>
               </li>
               <li>
-                <input type="checkbox" disabled />
-                <span>
-                  <strong>出力がファイルになる</strong>
-                  ：共有・添付・再利用できるドキュメント、資料、スプレッドシートなど
-                </span>
+                <label>
+                  <input type="checkbox" disabled />
+                  <span>
+                    <strong>出力がファイルになる</strong>
+                    ：共有・添付・再利用できるドキュメント、資料、スプレッドシートなど
+                  </span>
+                </label>
               </li>
               <li>
-                <input type="checkbox" disabled />
-                <span>
-                  <strong>繰り返し発生する</strong>
-                  ：一回きりでも構わないが、定期的に発生する作業ほど向いている
-                </span>
+                <label>
+                  <input type="checkbox" disabled />
+                  <span>
+                    <strong>繰り返し発生する</strong>
+                    ：一回きりでも構わないが、定期的に発生する作業ほど向いている
+                  </span>
+                </label>
               </li>
               <li>
-                <input type="checkbox" disabled />
-                <span>
-                  <strong>「良い出来」の基準を自分が知っている</strong>
-                  ：出来上がりを見て良し悪しを15秒で判断できる
-                </span>
+                <label>
+                  <input type="checkbox" disabled />
+                  <span>
+                    <strong>「良い出来」の基準を自分が知っている</strong>
+                    ：出来上がりを見て良し悪しを15秒で判断できる
+                  </span>
+                </label>
               </li>
               <li>
-                <input type="checkbox" disabled />
-                <span>
-                  <strong>「中間部分」が単調である</strong>
-                  ：考える部分（最初と最後）以外の抽出・突合・整形が中心
-                </span>
+                <label>
+                  <input type="checkbox" disabled />
+                  <span>
+                    <strong>「中間部分」が単調である</strong>
+                    ：考える部分（最初と最後）以外の抽出・突合・整形が中心
+                  </span>
+                </label>
               </li>
             </ul>
           </section>
@@ -984,53 +994,72 @@ export default function Page() {
             </p>
             <ul className={styles.checklist}>
               <li>
-                <input type="checkbox" disabled />
-                <span>
-                  タスクは「Chatで済む質問」ではなく、本当に複数ファイル／複数アプリにまたがる成果物作成か
-                </span>
+                <label>
+                  <input type="checkbox" disabled />
+                  <span>
+                    タスクは「Chatで済む質問」ではなく、本当に複数ファイル／複数アプリにまたがる成果物作成か
+                  </span>
+                </label>
               </li>
               <li>
-                <input type="checkbox" disabled />
-                <span>
-                  Global Instructionsに、トーン・役割・出力形式などの普遍的なルールを設定済みか
-                </span>
+                <label>
+                  <input type="checkbox" disabled />
+                  <span>
+                    Global Instructionsに、トーン・役割・出力形式などの普遍的なルールを設定済みか
+                  </span>
+                </label>
               </li>
               <li>
-                <input type="checkbox" disabled />
-                <span>
-                  対象フォルダにFolder
-                  Instructions（クライアント名・専門用語・フォーマット）を設定したか
-                </span>
+                <label>
+                  <input type="checkbox" disabled />
+                  <span>
+                    対象フォルダにFolder
+                    Instructions（クライアント名・専門用語・フォーマット）を設定したか
+                  </span>
+                </label>
               </li>
               <li>
-                <input type="checkbox" disabled />
-                <span>初回のタスクでは、実行前にClaudeへ確認質問をさせたか</span>
+                <label>
+                  <input type="checkbox" disabled />
+                  <span>初回のタスクでは、実行前にClaudeへ確認質問をさせたか</span>
+                </label>
               </li>
               <li>
-                <input type="checkbox" disabled />
-                <span>機密情報を含むファイルやアプリを、必要以上にアクセス許可していないか</span>
+                <label>
+                  <input type="checkbox" disabled />
+                  <span>機密情報を含むファイルやアプリを、必要以上にアクセス許可していないか</span>
+                </label>
               </li>
               <li>
-                <input type="checkbox" disabled />
-                <span>
-                  金銭・送信・削除など不可逆な操作を伴うタスクは「Manually approve」で運用しているか
-                </span>
+                <label>
+                  <input type="checkbox" disabled />
+                  <span>
+                    金銭・送信・削除など不可逆な操作を伴うタスクは「Manually
+                    approve」で運用しているか
+                  </span>
+                </label>
               </li>
               <li>
-                <input type="checkbox" disabled />
-                <span>
-                  スケジュールタスクは低リスクな内容から始め、定期的に実行結果を確認しているか
-                </span>
+                <label>
+                  <input type="checkbox" disabled />
+                  <span>
+                    スケジュールタスクは低リスクな内容から始め、定期的に実行結果を確認しているか
+                  </span>
+                </label>
               </li>
               <li>
-                <input type="checkbox" disabled />
-                <span>導入するPlugin・MCPの権限範囲を事前に確認したか</span>
+                <label>
+                  <input type="checkbox" disabled />
+                  <span>導入するPlugin・MCPの権限範囲を事前に確認したか</span>
+                </label>
               </li>
               <li>
-                <input type="checkbox" disabled />
-                <span>
-                  不審な挙動（無関係な話題、想定外のアクセス）がないか、作業中も目を配っているか
-                </span>
+                <label>
+                  <input type="checkbox" disabled />
+                  <span>
+                    不審な挙動（無関係な話題、想定外のアクセス）がないか、作業中も目を配っているか
+                  </span>
+                </label>
               </li>
             </ul>
           </section>

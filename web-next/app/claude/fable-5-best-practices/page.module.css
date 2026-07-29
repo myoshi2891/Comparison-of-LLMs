@@ -582,9 +582,13 @@
 }
 
 /* ---------- Custom Visual Timeline (Section 2) ---------- */
-.timeline {
+.timelineWrap {
   position: relative;
   margin: 32px 0;
+}
+
+.timeline {
+  margin: 0;
   padding-left: 0;
   list-style: none;
 }
@@ -767,6 +771,7 @@
 .timelineLegend {
   display: flex;
   flex-wrap: wrap;
+  list-style: none;
   gap: 12px 20px;
   margin: 20px 0 28px;
   padding: 14px 18px;

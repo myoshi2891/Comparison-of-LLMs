@@ -249,278 +249,279 @@ export default function Fable5BestPracticesPage() {
           </p>
 
           {/* Custom Visual Timeline */}
-          <fieldset className={styles.timelineLegend} aria-label="タイムライン凡例">
-            <span className={styles.legendItem}>
+          <ul className={styles.timelineLegend} aria-label="タイムライン凡例">
+            <li className={styles.legendItem}>
               <span className={styles.legendDot} style={{ background: "#7c9eff" }} />
               リリース
-            </span>
-            <span className={styles.legendItem}>
+            </li>
+            <li className={styles.legendItem}>
               <span className={styles.legendDot} style={{ background: "#ff8080" }} />
               輸出規制・停止
-            </span>
-            <span className={styles.legendItem}>
+            </li>
+            <li className={styles.legendItem}>
               <span className={styles.legendDot} style={{ background: "#7ee0b8" }} />
               規制解除・復旧
-            </span>
-            <span className={styles.legendItem}>
+            </li>
+            <li className={styles.legendItem}>
               <span className={styles.legendDot} style={{ background: "#ffb873" }} />
               プロモーション期間
-            </span>
-            <span className={styles.legendItem}>
+            </li>
+            <li className={styles.legendItem}>
               <span className={styles.legendDot} style={{ background: "#c084fc" }} />
               新モデル
-            </span>
-          </fieldset>
+            </li>
+          </ul>
 
-          <ol
-            className={styles.timeline}
-            aria-label="Claude Fable 5 / Mythos 5 タイムライン 2026年7月26日時点"
-          >
+          <div className={styles.timelineWrap}>
             <div className={styles.timelineTrack} aria-hidden="true" />
+            <ol
+              className={styles.timeline}
+              aria-label="Claude Fable 5 / Mythos 5 タイムライン 2026年7月26日時点"
+            >
+              {/* 2026-06-09 */}
+              <li className={`${styles.timelineItem} ${styles.tlLaunch}`}>
+                <div className={styles.timelineDateCol}>
+                  <span className={styles.timelineDate}>
+                    2026
+                    <br />
+                    06-09
+                  </span>
+                </div>
+                <div className={styles.timelineDotCol}>
+                  <div className={styles.timelineDot} />
+                  <div className={styles.timelineConnector} />
+                </div>
+                <div className={styles.timelineCard}>
+                  <span className={styles.timelineTag}>リリース</span>
+                  <p className={styles.timelineTitle}>Fable 5 / Mythos 5 発表・一般提供開始</p>
+                  <p className={styles.timelineDesc}>
+                    Claude Fable 5（安全分類器あり・一般公開）と Claude Mythos 5（Project Glasswing
+                    経由の限定提供）が同時リリース。Claude Code・Claude.ai・Bedrock・Google Cloud
+                    などで利用可能に。
+                  </p>
+                </div>
+              </li>
 
-            {/* 2026-06-09 */}
-            <li className={`${styles.timelineItem} ${styles.tlLaunch}`}>
-              <div className={styles.timelineDateCol}>
-                <span className={styles.timelineDate}>
-                  2026
-                  <br />
-                  06-09
-                </span>
-              </div>
-              <div className={styles.timelineDotCol}>
-                <div className={styles.timelineDot} />
-                <div className={styles.timelineConnector} />
-              </div>
-              <div className={styles.timelineCard}>
-                <span className={styles.timelineTag}>リリース</span>
-                <p className={styles.timelineTitle}>Fable 5 / Mythos 5 発表・一般提供開始</p>
-                <p className={styles.timelineDesc}>
-                  Claude Fable 5（安全分類器あり・一般公開）と Claude Mythos 5（Project Glasswing
-                  経由の限定提供）が同時リリース。Claude Code・Claude.ai・Bedrock・Google Cloud
-                  などで利用可能に。
-                </p>
-              </div>
-            </li>
+              {/* 2026-06-12 */}
+              <li className={`${styles.timelineItem} ${styles.tlDanger}`}>
+                <div className={styles.timelineDateCol}>
+                  <span className={styles.timelineDate}>
+                    2026
+                    <br />
+                    06-12
+                  </span>
+                </div>
+                <div className={styles.timelineDotCol}>
+                  <div className={styles.timelineDot} />
+                  <div className={styles.timelineConnector} />
+                </div>
+                <div className={styles.timelineCard}>
+                  <span className={styles.timelineTag}>輸出規制・停止</span>
+                  <p className={styles.timelineTitle}>
+                    米商務省 BIS が輸出規制を発動 — 全世界でアクセス停止
+                  </p>
+                  <p className={styles.timelineDesc}>
+                    Amazon の研究者が安全策を回避する脆弱性特定手法を報告。BIS が Fable 5・Mythos 5
+                    への輸出管理措置を発動。外国籍ユーザーをリアルタイムに識別できないため、Anthropic
+                    は全ユーザー向けに即時停止を実施。
+                  </p>
+                </div>
+              </li>
 
-            {/* 2026-06-12 */}
-            <li className={`${styles.timelineItem} ${styles.tlDanger}`}>
-              <div className={styles.timelineDateCol}>
-                <span className={styles.timelineDate}>
-                  2026
-                  <br />
-                  06-12
-                </span>
-              </div>
-              <div className={styles.timelineDotCol}>
-                <div className={styles.timelineDot} />
-                <div className={styles.timelineConnector} />
-              </div>
-              <div className={styles.timelineCard}>
-                <span className={styles.timelineTag}>輸出規制・停止</span>
-                <p className={styles.timelineTitle}>
-                  米商務省 BIS が輸出規制を発動 — 全世界でアクセス停止
-                </p>
-                <p className={styles.timelineDesc}>
-                  Amazon の研究者が安全策を回避する脆弱性特定手法を報告。BIS が Fable 5・Mythos 5
-                  への輸出管理措置を発動。外国籍ユーザーをリアルタイムに識別できないため、Anthropic
-                  は全ユーザー向けに即時停止を実施。
-                </p>
-              </div>
-            </li>
+              {/* 2026-06-30 */}
+              <li className={`${styles.timelineItem} ${styles.tlRecovery}`}>
+                <div className={styles.timelineDateCol}>
+                  <span className={styles.timelineDate}>
+                    2026
+                    <br />
+                    06-30
+                  </span>
+                </div>
+                <div className={styles.timelineDotCol}>
+                  <div className={styles.timelineDot} />
+                  <div className={styles.timelineConnector} />
+                </div>
+                <div className={styles.timelineCard}>
+                  <span className={styles.timelineTag}>規制解除</span>
+                  <p className={styles.timelineTitle}>米商務省が輸出規制を解除</p>
+                  <p className={styles.timelineDesc}>
+                    政府との協議が成立し、強化されたサイバーセキュリティ分類器と安全対策の導入を条件に規制が解除された。
+                  </p>
+                </div>
+              </li>
 
-            {/* 2026-06-30 */}
-            <li className={`${styles.timelineItem} ${styles.tlRecovery}`}>
-              <div className={styles.timelineDateCol}>
-                <span className={styles.timelineDate}>
-                  2026
-                  <br />
-                  06-30
-                </span>
-              </div>
-              <div className={styles.timelineDotCol}>
-                <div className={styles.timelineDot} />
-                <div className={styles.timelineConnector} />
-              </div>
-              <div className={styles.timelineCard}>
-                <span className={styles.timelineTag}>規制解除</span>
-                <p className={styles.timelineTitle}>米商務省が輸出規制を解除</p>
-                <p className={styles.timelineDesc}>
-                  政府との協議が成立し、強化されたサイバーセキュリティ分類器と安全対策の導入を条件に規制が解除された。
-                </p>
-              </div>
-            </li>
+              {/* 2026-07-01 */}
+              <li className={`${styles.timelineItem} ${styles.tlRecovery}`}>
+                <div className={styles.timelineDateCol}>
+                  <span className={styles.timelineDate}>
+                    2026
+                    <br />
+                    07-01
+                  </span>
+                </div>
+                <div className={styles.timelineDotCol}>
+                  <div className={styles.timelineDot} />
+                  <div className={styles.timelineConnector} />
+                </div>
+                <div className={styles.timelineCard}>
+                  <span className={styles.timelineTag}>復旧</span>
+                  <p className={styles.timelineTitle}>
+                    全世界でアクセス復旧 — 強化された分類器を導入
+                  </p>
+                  <p className={styles.timelineDesc}>
+                    Fable 5 の全世界アクセスが復旧。Mythos 5 は Project Glasswing
+                    経由の限定組織（米国内の信頼パートナー）向けのみ復旧。週次利用枠の 50%
+                    まで無料相当で利用できる補償期間が開始。
+                  </p>
+                </div>
+              </li>
 
-            {/* 2026-07-01 */}
-            <li className={`${styles.timelineItem} ${styles.tlRecovery}`}>
-              <div className={styles.timelineDateCol}>
-                <span className={styles.timelineDate}>
-                  2026
-                  <br />
-                  07-01
-                </span>
-              </div>
-              <div className={styles.timelineDotCol}>
-                <div className={styles.timelineDot} />
-                <div className={styles.timelineConnector} />
-              </div>
-              <div className={styles.timelineCard}>
-                <span className={styles.timelineTag}>復旧</span>
-                <p className={styles.timelineTitle}>
-                  全世界でアクセス復旧 — 強化された分類器を導入
-                </p>
-                <p className={styles.timelineDesc}>
-                  Fable 5 の全世界アクセスが復旧。Mythos 5 は Project Glasswing
-                  経由の限定組織（米国内の信頼パートナー）向けのみ復旧。週次利用枠の 50%
-                  まで無料相当で利用できる補償期間が開始。
-                </p>
-              </div>
-            </li>
+              {/* 2026-07-01〜07 */}
+              <li className={`${styles.timelineItem} ${styles.tlPromo}`}>
+                <div className={styles.timelineDateCol}>
+                  <span className={styles.timelineDate}>
+                    2026
+                    <br />
+                    07-01〜07
+                  </span>
+                </div>
+                <div className={styles.timelineDotCol}>
+                  <div className={styles.timelineDot} />
+                  <div className={styles.timelineConnector} />
+                </div>
+                <div className={styles.timelineCard}>
+                  <span className={styles.timelineTag}>プロモーション</span>
+                  <p className={styles.timelineTitle}>週次利用枠の 50% まで無料相当で利用可能</p>
+                  <p className={styles.timelineDesc}>
+                    Pro / Max / Team / 一部 Enterprise プランで Fable 5 を週次利用枠の最大 50%
+                    まで無料相当クレジットとして利用できる補償期間。
+                  </p>
+                </div>
+              </li>
 
-            {/* 2026-07-01〜07 */}
-            <li className={`${styles.timelineItem} ${styles.tlPromo}`}>
-              <div className={styles.timelineDateCol}>
-                <span className={styles.timelineDate}>
-                  2026
-                  <br />
-                  07-01〜07
-                </span>
-              </div>
-              <div className={styles.timelineDotCol}>
-                <div className={styles.timelineDot} />
-                <div className={styles.timelineConnector} />
-              </div>
-              <div className={styles.timelineCard}>
-                <span className={styles.timelineTag}>プロモーション</span>
-                <p className={styles.timelineTitle}>週次利用枠の 50% まで無料相当で利用可能</p>
-                <p className={styles.timelineDesc}>
-                  Pro / Max / Team / 一部 Enterprise プランで Fable 5 を週次利用枠の最大 50%
-                  まで無料相当クレジットとして利用できる補償期間。
-                </p>
-              </div>
-            </li>
+              {/* 2026-07-07 */}
+              <li className={`${styles.timelineItem} ${styles.tlPromo}`}>
+                <div className={styles.timelineDateCol}>
+                  <span className={styles.timelineDate}>
+                    2026
+                    <br />
+                    07-07
+                  </span>
+                </div>
+                <div className={styles.timelineDotCol}>
+                  <div className={styles.timelineDot} />
+                  <div className={styles.timelineConnector} />
+                </div>
+                <div className={styles.timelineCard}>
+                  <span className={styles.timelineTag}>延長①</span>
+                  <p className={styles.timelineTitle}>無料相当期間を 7月12日 まで第1回延長</p>
+                  <p className={styles.timelineDesc}>当初 7月7日 だった締切が延長された。</p>
+                </div>
+              </li>
 
-            {/* 2026-07-07 */}
-            <li className={`${styles.timelineItem} ${styles.tlPromo}`}>
-              <div className={styles.timelineDateCol}>
-                <span className={styles.timelineDate}>
-                  2026
-                  <br />
-                  07-07
-                </span>
-              </div>
-              <div className={styles.timelineDotCol}>
-                <div className={styles.timelineDot} />
-                <div className={styles.timelineConnector} />
-              </div>
-              <div className={styles.timelineCard}>
-                <span className={styles.timelineTag}>延長①</span>
-                <p className={styles.timelineTitle}>無料相当期間を 7月12日 まで第1回延長</p>
-                <p className={styles.timelineDesc}>当初 7月7日 だった締切が延長された。</p>
-              </div>
-            </li>
+              {/* 2026-07-12 */}
+              <li className={`${styles.timelineItem} ${styles.tlPromo}`}>
+                <div className={styles.timelineDateCol}>
+                  <span className={styles.timelineDate}>
+                    2026
+                    <br />
+                    07-12
+                  </span>
+                </div>
+                <div className={styles.timelineDotCol}>
+                  <div className={styles.timelineDot} />
+                  <div className={styles.timelineConnector} />
+                </div>
+                <div className={styles.timelineCard}>
+                  <span className={styles.timelineTag}>延長②</span>
+                  <p className={styles.timelineTitle}>無料相当期間を 7月19日 まで第2回延長</p>
+                  <p className={styles.timelineDesc}>
+                    再度の延長。この期限到来後は、Fable 5
+                    の利用に別途「使用クレジット」の有効化が必要となった。
+                  </p>
+                </div>
+              </li>
 
-            {/* 2026-07-12 */}
-            <li className={`${styles.timelineItem} ${styles.tlPromo}`}>
-              <div className={styles.timelineDateCol}>
-                <span className={styles.timelineDate}>
-                  2026
-                  <br />
-                  07-12
-                </span>
-              </div>
-              <div className={styles.timelineDotCol}>
-                <div className={styles.timelineDot} />
-                <div className={styles.timelineConnector} />
-              </div>
-              <div className={styles.timelineCard}>
-                <span className={styles.timelineTag}>延長②</span>
-                <p className={styles.timelineTitle}>無料相当期間を 7月19日 まで第2回延長</p>
-                <p className={styles.timelineDesc}>
-                  再度の延長。この期限到来後は、Fable 5
-                  の利用に別途「使用クレジット」の有効化が必要となった。
-                </p>
-              </div>
-            </li>
+              {/* 2026-07-19 */}
+              <li className={`${styles.timelineItem} ${styles.tlPromo}`}>
+                <div className={styles.timelineDateCol}>
+                  <span className={styles.timelineDate}>
+                    2026
+                    <br />
+                    07-19
+                  </span>
+                </div>
+                <div className={styles.timelineDotCol}>
+                  <div className={styles.timelineDot} />
+                  <div className={styles.timelineConnector} />
+                </div>
+                <div className={styles.timelineCard}>
+                  <span className={styles.timelineTag}>プロモーション終了</span>
+                  <p className={styles.timelineTitle}>無料相当期間終了 — 使用クレジット制に移行</p>
+                  <p className={styles.timelineDesc}>
+                    プロモーション期間が終了。以降は Pro / Max / Team / 一部 Enterprise プランでも
+                    Fable 5
+                    利用には「使用クレジット」の明示的な有効化が必要。有効化しないと週次枠到達時点でアクセスが停止。
+                  </p>
+                </div>
+              </li>
 
-            {/* 2026-07-19 */}
-            <li className={`${styles.timelineItem} ${styles.tlPromo}`}>
-              <div className={styles.timelineDateCol}>
-                <span className={styles.timelineDate}>
-                  2026
-                  <br />
-                  07-19
-                </span>
-              </div>
-              <div className={styles.timelineDotCol}>
-                <div className={styles.timelineDot} />
-                <div className={styles.timelineConnector} />
-              </div>
-              <div className={styles.timelineCard}>
-                <span className={styles.timelineTag}>プロモーション終了</span>
-                <p className={styles.timelineTitle}>無料相当期間終了 — 使用クレジット制に移行</p>
-                <p className={styles.timelineDesc}>
-                  プロモーション期間が終了。以降は Pro / Max / Team / 一部 Enterprise プランでも
-                  Fable 5
-                  利用には「使用クレジット」の明示的な有効化が必要。有効化しないと週次枠到達時点でアクセスが停止。
-                </p>
-              </div>
-            </li>
+              {/* 2026-07-24 */}
+              <li className={`${styles.timelineItem} ${styles.tlNew}`}>
+                <div className={styles.timelineDateCol}>
+                  <span className={styles.timelineDate}>
+                    2026
+                    <br />
+                    07-24
+                  </span>
+                </div>
+                <div className={styles.timelineDotCol}>
+                  <div className={styles.timelineDot} />
+                  <div className={styles.timelineConnector} />
+                </div>
+                <div className={styles.timelineCard}>
+                  <span className={styles.timelineTag}>新モデル</span>
+                  <p className={styles.timelineTitle}>
+                    Claude Opus 5 リリース — Fable 5 級性能を半額で
+                  </p>
+                  <p className={styles.timelineDesc}>
+                    Anthropic が <strong>Claude Opus 5</strong> をリリース。入力 $5 / 出力 $25（per
+                    1M tokens）と Fable 5（$10 / $50）の約半額で、近い性能を実現。Claude Max
+                    のデフォルトモデルに昇格し、Claude Pro の最上位として利用可能。
+                  </p>
+                </div>
+              </li>
 
-            {/* 2026-07-24 */}
-            <li className={`${styles.timelineItem} ${styles.tlNew}`}>
-              <div className={styles.timelineDateCol}>
-                <span className={styles.timelineDate}>
-                  2026
-                  <br />
-                  07-24
-                </span>
-              </div>
-              <div className={styles.timelineDotCol}>
-                <div className={styles.timelineDot} />
-                <div className={styles.timelineConnector} />
-              </div>
-              <div className={styles.timelineCard}>
-                <span className={styles.timelineTag}>新モデル</span>
-                <p className={styles.timelineTitle}>
-                  Claude Opus 5 リリース — Fable 5 級性能を半額で
-                </p>
-                <p className={styles.timelineDesc}>
-                  Anthropic が <strong>Claude Opus 5</strong> をリリース。入力 $5 / 出力 $25（per 1M
-                  tokens）と Fable 5（$10 / $50）の約半額で、近い性能を実現。Claude Max
-                  のデフォルトモデルに昇格し、Claude Pro の最上位として利用可能。
-                </p>
-              </div>
-            </li>
-
-            {/* 2026-07-26 (今日) */}
-            <li className={`${styles.timelineItem} ${styles.tlNew}`}>
-              <div className={styles.timelineDateCol}>
-                <span className={styles.timelineDate}>
-                  2026
-                  <br />
-                  07-26
-                </span>
-              </div>
-              <div className={styles.timelineDotCol}>
-                <div
-                  className={styles.timelineDot}
-                  style={{ boxShadow: "0 0 0 4px rgba(192,132,252,0.25)" }}
-                />
-                {/* last item — no connector */}
-              </div>
-              <div className={styles.timelineCard}>
-                <span className={styles.timelineTag}>現在</span>
-                <p className={styles.timelineTitle}>現況（7月26日時点）</p>
-                <p className={styles.timelineDesc}>
-                  Fable 5 は使用クレジット制で継続提供中。Mythos 5 は Project Glasswing
-                  経由の限定提供。Opus 5 が Claude Max のデフォルト・Claude Pro
-                  の最上位として提供開始。規制環境は引き続き流動的であり、
-                  <code>support.claude.com</code> の「Claude Fable 5 Promotional
-                  Access」記事での最新状況確認を推奨。
-                </p>
-              </div>
-            </li>
-          </ol>
+              {/* 2026-07-26 (今日) */}
+              <li className={`${styles.timelineItem} ${styles.tlNew}`}>
+                <div className={styles.timelineDateCol}>
+                  <span className={styles.timelineDate}>
+                    2026
+                    <br />
+                    07-26
+                  </span>
+                </div>
+                <div className={styles.timelineDotCol}>
+                  <div
+                    className={styles.timelineDot}
+                    style={{ boxShadow: "0 0 0 4px rgba(192,132,252,0.25)" }}
+                  />
+                  {/* last item — no connector */}
+                </div>
+                <div className={styles.timelineCard}>
+                  <span className={styles.timelineTag}>現在</span>
+                  <p className={styles.timelineTitle}>現況（7月26日時点）</p>
+                  <p className={styles.timelineDesc}>
+                    Fable 5 は使用クレジット制で継続提供中。Mythos 5 は Project Glasswing
+                    経由の限定提供。Opus 5 が Claude Max のデフォルト・Claude Pro
+                    の最上位として提供開始。規制環境は引き続き流動的であり、
+                    <code>support.claude.com</code> の「Claude Fable 5 Promotional
+                    Access」記事での最新状況確認を推奨。
+                  </p>
+                </div>
+              </li>
+            </ol>
+          </div>
           <p className={styles.diagramCaption}>
             図2-1: Claude Fable 5 / Mythos 5 タイムライン（2026年7月26日時点）
           </p>
