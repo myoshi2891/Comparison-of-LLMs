@@ -235,7 +235,7 @@
 }
 
 .highlight,
-mark {
+.section mark {
   background: rgba(255, 207, 124, 0.18);
   color: #ffe4a0;
   padding: 2px 6px;
