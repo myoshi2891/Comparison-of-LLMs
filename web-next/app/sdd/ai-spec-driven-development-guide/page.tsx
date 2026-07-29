@@ -10,6 +10,9 @@ export const metadata: Metadata = {
     "初学者のためのステップバイステップ・ベストプラクティス。GitHub Spec Kit、AWS Kiro、Claude Codeなど2026年最新のSDD手法・ツール・EARS記法を網羅解説。",
 };
 
+/**
+ * Renders a decorative icon indicating an external link.
+ */
 function ExternalIcon() {
   return (
     <svg
