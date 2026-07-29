@@ -157,7 +157,7 @@
 }
 
 .tocNum {
-  font-family: var(--font-mono), "JetBrains Mono", monospace;
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
   font-size: 11px;
   color: var(--violet);
   opacity: 0.8;
