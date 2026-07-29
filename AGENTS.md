@@ -31,7 +31,7 @@ AGENTS.md は Codex / Cursor / Cline など AGENTS.md 規約を読む AI ツー�
 ## 検証コマンド
 
 ```bash
-(cd web-next && bun run test)        # 1246 pass（全 Green ✅）
+(cd web-next && bun run test)        # 1247 pass（全 Green ✅）
 (cd web-next && bun run typecheck)   # OK
 (cd web-next && bun run build)       # Antigravity環境では実行禁止。CI / 他の許可された環境でのみ実行可
 (cd web-next && bun run lint)        # 0 件（全解消 ✅）
