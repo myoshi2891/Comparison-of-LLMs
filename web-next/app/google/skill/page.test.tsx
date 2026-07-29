@@ -82,6 +82,17 @@ describe("/google/skill - page structure", () => {
       expect(tocHrefs, `TOC must link to #${id}`).toContain(`#${id}`);
     }
   });
+
+  it("参考文献は IntersectionObserver の監視対象になる footer[id] である", () => {
+    const { container } = render(<Page />);
+    expect(container.querySelector("footer#references")).not.toBeNull();
+  });
+
+  it("本文を段階的に構造化する説明に誤字がない", () => {
+    const { container } = render(<Page />);
+    expect(container.textContent).not.toContain("排的なシナリオ");
+    expect(container.textContent).toContain("例外的なシナリオ");
+  });
 });
 
 describe("/google/skill - external link safety", () => {

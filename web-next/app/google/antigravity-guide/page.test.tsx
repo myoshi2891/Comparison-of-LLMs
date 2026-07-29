@@ -32,6 +32,11 @@ describe("/google/antigravity-guide (Antigravity CLI Complete Guide - 100% Faith
     expect(h2s).toHaveLength(16);
   });
 
+  it("AGENTS.md の説明文に重複助詞がない", () => {
+    const { container } = render(<Page />);
+    expect(container.textContent).not.toContain("にには");
+  });
+
   it("外部リンクはすべて target='_blank' と rel='noopener noreferrer' が正しい", () => {
     const { container } = render(<Page />);
     const externalLinks = Array.from(

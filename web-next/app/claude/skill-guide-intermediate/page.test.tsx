@@ -1,4 +1,6 @@
-import { render } from "@testing-library/react";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+import { fireEvent, render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import Page, { metadata } from "./page";
 
@@ -42,5 +44,25 @@ describe("/claude/skill-guide-intermediate 契約テスト", () => {
       expect(a.getAttribute("href")).not.toMatch(/\.html$/);
     }
   });
-});
 
+  it("モバイル目次トグルのラベルと展開状態が同期する", () => {
+    const { container } = render(<Page />);
+    const toggle = container.querySelector(
+      'button[aria-controls="skillSidebar"]'
+    ) as HTMLButtonElement;
+
+    expect(toggle.getAttribute("aria-label")).toBe("目次を開く");
+    expect(toggle.getAttribute("aria-expanded")).toBe("false");
+    fireEvent.click(toggle);
+    expect(toggle.getAttribute("aria-label")).toBe("目次を閉じる");
+    expect(toggle.getAttribute("aria-expanded")).toBe("true");
+  });
+
+  it("モバイル目次は閉状態で操作不可、開状態で操作可能になる", () => {
+    const css = readFileSync(join(__dirname, "page.module.css"), "utf8");
+    expect(css).toMatch(/\.sidebar\s*\{[\s\S]*visibility:\s*hidden/);
+    expect(css).toMatch(/\.sidebar\s*\{[\s\S]*pointer-events:\s*none/);
+    expect(css).toMatch(/\.sidebarOpen\s*\{[\s\S]*visibility:\s*visible/);
+    expect(css).toMatch(/\.sidebarOpen\s*\{[\s\S]*pointer-events:\s*auto/);
+  });
+});
