@@ -13,12 +13,14 @@
 - **動作検証**:
   - `npm run build` ⏭️（依頼により未実行。Antigravity環境では実行禁止、CI または他環境では必須）
   - `npm run typecheck` ✅
-  - `npm run lint` ✅（382 files checked）
+  - `npm run lint` ✅（385 files checked）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: Vitest **134 files / 1247 tests すべて合格**（収集失敗なし）
+  - **フロントエンド (`web-next/`)**: Vitest **137 files / 1259 tests すべて合格**（収集失敗なし）
   - **バックエンド (`scraper/`)**: pytest 実行で **43 件すべて合格** (全 Green ✅)
 
 ## 最近の追加内容
+
+- **SonarQube CI のaxeタイムアウト・新規コードカバレッジ修正**: coverage計測時にAntigravity a11y監査が既定5秒でタイムアウトし、未完了axeと後続監査が競合する問題を、同規模ページと同じ15秒上限で解消。Sonarが新規コードとして検出したClaude TocObserver 3ファイルへ分岐テスト12件を追加し、対象3ファイルの行・条件カバレッジを各100%にした。目視・ビルドは依頼により省略。`npm run test:coverage` は **137 files / 1259 tests**、全体 line coverage **92.79%**、typecheck、lint **385 files / 0 diagnostics** がGreen。
 
 - **レビュー指摘の再照合とセマンティクス・安全性修正**: 現行コードで全指摘を再検証し、シェル手順の exact-line CSS 変数照合・静的サーバー PID cleanup・チェックサム失敗時停止を修正。Cowork チェックボックスのラベル関連付け、Fable 5 の凡例/タイムライン list semantics、Skill frontmatter 必須説明と命名制約、Antigravity の用語・Review Policy・SHA-256検証パス、TechCrunch出典の第三者報道ラベル、TOC の DOM 順選択、CSS font fallback、共有 `Ext`、目次データ駆動化を反映した。テストは DOM 出力ベースへ堅牢化し、共有 Mermaid は未指定時 `16px`、明示 `fontSize` は保持する契約へ更新。目視・ビルドは依頼により省略。Vitest **134 files / 1247 tests**、typecheck、lint **382 files / 0 diagnostics**、pytest **43 tests** はすべて Green。
 
@@ -251,7 +253,7 @@ Next.js 移行完了後のリポジトリ `LLM-Studies` にて、テストカバ
 Next.js 移行完了後のリポジトリ `LLM-Studies` の保守・改善作業を再開してください。
 
 - リポジトリ: LLM-Studies (Next.js 移行プロジェクトは dev/main へ完全マージ済み)
-  - 現在のステータス: docs/PROGRESS.md を参照。Vitest は 134 files / 1247 tests passed、pytest は 43/43 passed
+  - 現在のステータス: docs/PROGRESS.md を参照。Vitest は 137 files / 1259 tests passed、pytest は 43/43 passed
 - リポジトリ規約: CLAUDE.md (編集上の絶対ルール。※Antigravity環境ではビルドは実行禁止)
 
 作業方針：

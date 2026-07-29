@@ -661,17 +661,17 @@
       <div class="stat" role="listitem">
         <span class="stat-index">01</span>
         <span class="stat-label">Test files · <i>web-next</i></span>
-        <span class="stat-val">125<small>vitest specs</small></span>
+        <span class="stat-val">137<small>vitest specs</small></span>
       </div>
       <div class="stat" role="listitem">
         <span class="stat-index">02</span>
         <span class="stat-label">Test cases · <i>web-next</i></span>
-        <span class="stat-val">1195<small>it/test count</small></span>
+        <span class="stat-val">1259<small>it/test count</small></span>
       </div>
       <div class="stat" role="listitem">
         <span class="stat-index">03</span>
         <span class="stat-label">Scraper tests · <i>pytest</i></span>
-        <span class="stat-val">5 / 38<small>files / cases</small></span>
+        <span class="stat-val">5 / 43<small>files / cases</small></span>
       </div>
       <div class="stat" role="listitem">
         <span class="stat-index">04</span>
@@ -932,7 +932,7 @@ var COLS = ["app","components","site","lib","types","providers","tools","core"];
 
 var CELLS = {
   unit: {
-    app:        { s:"done",    count:640, files:[
+    app:        { s:"done",    count:690, files:[
       "app/agent/context-engineering-best-practices/TocObserver.test.tsx (7)",
       "app/agent/context-engineering-best-practices/page.test.tsx (8)",
       "app/agent/hermes-agent-advanced-guide/page.test.tsx (8)",
@@ -942,15 +942,18 @@ var CELLS = {
       "app/agent/skills/page.test.tsx (7)",
       "app/ci-cd/ai-cicd-automation-best-practices/TocObserver.test.tsx (7)",
       "app/ci-cd/ai-cicd-automation-best-practices/page.test.tsx (8)",
-      "app/claude/agent/page.test.tsx (8)",
+      "app/claude/agent/page.test.tsx (11)",
       "app/claude/code-slash-commands/page.test.tsx (5)",
-      "app/claude/cowork-guide/page.test.tsx (7)",
+      "app/claude/cowork-guide/TocObserver.test.tsx (4)",
+      "app/claude/cowork-guide/page.test.tsx (9)",
       "app/claude/fable-5-best-practices/TocObserver.test.tsx (3)",
-      "app/claude/fable-5-best-practices/page.test.tsx (6)",
+      "app/claude/fable-5-best-practices/page.test.tsx (10)",
+      "app/claude/harness-engineering/TocObserver.test.tsx (4)",
       "app/claude/harness-engineering/page.test.tsx (8)",
       "app/claude/managed-agents/page.test.tsx (7)",
       "app/claude/self-hosted-sandboxes/page.test.tsx (9)",
-      "app/claude/skill-guide-intermediate/page.test.tsx (7)",
+      "app/claude/skill-guide-intermediate/TocObserver.test.tsx (4)",
+      "app/claude/skill-guide-intermediate/page.test.tsx (9)",
       "app/claude/skill-guide/page.test.tsx (7)",
       "app/claude/skill/page.test.tsx (8)",
       "app/claude/skills-sh/page.test.tsx (9)",
@@ -974,8 +977,11 @@ var CELLS = {
       "app/google/adk-best-practices/TocObserver.test.tsx (5)",
       "app/google/adk-best-practices/page.test.tsx (9)",
       "app/google/agent-harness-engineering/page.test.tsx (21)",
+      "app/google/agent/TocObserver.test.tsx (1)",
       "app/google/agent/page.test.tsx (8)",
-      "app/google/antigravity-guide/page.test.tsx (9)",
+      "app/google/antigravity-best-practices/TocObserver.test.tsx (1)",
+      "app/google/antigravity-best-practices/page.test.tsx (8)",
+      "app/google/antigravity-guide/page.test.tsx (13)",
       "app/google/antigravity-slash-commands-guide/page.test.tsx (5)",
       "app/google/enterprise-agent-platform-intermediate/page.test.tsx (6)",
       "app/google/enterprise-agent-platform/page.test.tsx (7)",
@@ -984,16 +990,17 @@ var CELLS = {
       "app/google/harness-engineering/page.test.tsx (19)",
       "app/google/notebook-lm/page.test.tsx (9)",
       "app/google/sandbox-best-practices/page.test.tsx (20)",
-      "app/google/skill-guide-intermediate/page.test.tsx (6)",
-      "app/google/skill-guide/page.test.tsx (8)",
-      "app/google/skill/page.test.tsx (11)",
+      "app/google/skill-guide/TocObserver.test.tsx (1)",
+      "app/google/skill-guide/page.test.tsx (7)",
+      "app/google/skill/TocObserver.test.tsx (1)",
+      "app/google/skill/page.test.tsx (10)",
       "app/google/stitch-guide/TocObserver.test.tsx (5)",
       "app/google/stitch-guide/page.test.tsx (9)",
       "app/governance/ai-governance/page.test.tsx (6)",
       "app/infra/amazon-bedrock-best-practices-2026-intermediate/TocObserver.test.tsx (3)",
-      "app/infra/amazon-bedrock-best-practices-2026-intermediate/page.test.tsx (5)",
+      "app/infra/amazon-bedrock-best-practices-2026-intermediate/page.test.tsx (6)",
       "app/infra/amazon-bedrock-best-practices-guide/TocObserver.test.tsx (3)",
-      "app/infra/amazon-bedrock-best-practices-guide/page.test.tsx (5)",
+      "app/infra/amazon-bedrock-best-practices-guide/page.test.tsx (6)",
       "app/llm-ops/evaluation-observability/TocObserver.test.tsx (5)",
       "app/llm-ops/evaluation-observability/page.test.tsx (9)",
       "app/local-llm/best-practices/TocObserver.test.tsx (3)",
@@ -1013,6 +1020,9 @@ var CELLS = {
       "app/multimodal/image-audio-best-practices-2026/page.test.tsx (6)",
       "app/rag/embeddings-best-practices/TocObserver.test.tsx (5)",
       "app/rag/embeddings-best-practices/page.test.tsx (6)",
+      "app/sdd/ai-spec-driven-development-guide/TocObserver.test.tsx (3)",
+      "app/sdd/ai-spec-driven-development-guide/page.test.tsx (8)",
+      "app/sdd/spec-driven-development-guide/page.test.tsx (6)",
       "app/search/page.test.tsx (16)",
       "app/security/ai-security-best-practices-intermediate/TocObserver.test.tsx (7)",
       "app/security/ai-security-best-practices-intermediate/page.test.tsx (8)",
@@ -1025,7 +1035,7 @@ var CELLS = {
     site:       { s:"done",    count:25,  files:["site/SiteHeader.test.tsx (12)","site/SiteHeaderClient.test.tsx (7)","site/DisclaimerBanner.test.tsx (6)"], note:"共通ヘッダー/バナー 3/3 網羅" },
     lib:        { s:"done",    count:93,  files:["cost.test.ts (49)","pricing.test.ts (23)","i18n.test.ts (7)","i18n.rich.test.tsx (10)","site-url.test.ts (4)"], note:"6 lib モジュール中 5 件カバー（metadata.ts / fonts.ts のみ未）" },
     types:      { s:"done",    count:23,  files:["types/pricing.test.ts (23)","lib/pricing.ts → _AssertParity (compile-time)"], note:"型↔Zodスキーマのランタイム parity + negative test（型強制拒否・必須欠落・positive制約・日付フォーマット境界）" },
-    providers:  { s:"done",    count:13,  files:["scraper/tests/test_providers.py (12)","scraper/tests/smoke/test_smoke.py::test_providers (1)"], note:"6 プロバイダーの価格抽出を success（fixture→期待値一致）/ fallback（非マッチ→全モデル fallback 値）両パスで検証" },
+    providers:  { s:"done",    count:18,  files:["scraper/tests/test_providers.py (17)","scraper/tests/smoke/test_smoke.py::test_providers (1)"], note:"8 プロバイダーの価格抽出を success（fixture→期待値一致）/ fallback（非マッチ→全モデル fallback 値）両パスで検証" },
     tools:      { s:"done",    count:17,  files:["scraper/tests/test_tools.py (16)","scraper/tests/smoke/test_smoke.py::test_tools (1)"], note:"8 ツールの価格抽出を success（fixture→monthly一致）/ fallback（非マッチ→全プラン fallback 値）両パスで検証" },
     core:       { s:"done",    count:8,   files:["test_imports.py (全モジュール import)","test_smoke.py::test_main","test_smoke.py::test_fetch_jpy_rate","test_browser.py (5)"], note:"main.py / exchange.py / browser.py 全コアモジュールのテスト網羅" }
   },
