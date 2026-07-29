@@ -4,6 +4,7 @@ import styles from "./page.module.css";
 import TocObserver from "./TocObserver";
 
 let callback: IntersectionObserverCallback | undefined;
+const readCallback = () => callback;
 
 global.IntersectionObserver = class {
   constructor(next: IntersectionObserverCallback) {
@@ -46,10 +47,12 @@ describe("antigravity-best-practices TocObserver", () => {
     expect(first.classList.contains(styles.navLinkActive)).toBe(true);
     firstSection.getBoundingClientRect = () => ({ top: 20 }) as DOMRect;
     secondSection.getBoundingClientRect = () => ({ top: 120 }) as DOMRect;
-    callback?.(
+    const observerCallback = readCallback();
+    if (!observerCallback) throw new Error("IntersectionObserver callback was not captured");
+    observerCallback(
       [
-        { isIntersecting: true, target: secondSection } as IntersectionObserverEntry,
-        { isIntersecting: true, target: firstSection } as IntersectionObserverEntry,
+        { isIntersecting: true, target: secondSection } as unknown as IntersectionObserverEntry,
+        { isIntersecting: true, target: firstSection } as unknown as IntersectionObserverEntry,
       ],
       {} as IntersectionObserver
     );

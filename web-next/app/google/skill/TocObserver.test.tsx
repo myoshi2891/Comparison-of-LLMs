@@ -4,6 +4,7 @@ import styles from "./page.module.css";
 import TocObserver from "./TocObserver";
 
 let callback: IntersectionObserverCallback | undefined;
+const readCallback = () => callback;
 const observed: Element[] = [];
 
 global.IntersectionObserver = class {
@@ -46,10 +47,12 @@ describe("google skill TocObserver", () => {
     expect(observed).toContain(references);
     summary.getBoundingClientRect = () => ({ top: 30 }) as DOMRect;
     references.getBoundingClientRect = () => ({ top: 140 }) as DOMRect;
-    callback?.(
+    const observerCallback = readCallback();
+    if (!observerCallback) throw new Error("IntersectionObserver callback was not captured");
+    observerCallback(
       [
-        { isIntersecting: true, target: references } as IntersectionObserverEntry,
-        { isIntersecting: true, target: summary } as IntersectionObserverEntry,
+        { isIntersecting: true, target: references } as unknown as IntersectionObserverEntry,
+        { isIntersecting: true, target: summary } as unknown as IntersectionObserverEntry,
       ],
       {} as IntersectionObserver
     );
