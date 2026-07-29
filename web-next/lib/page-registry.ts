@@ -578,16 +578,16 @@ const entries: PageEntry[] = [
     lastReviewed: "2026-07-01",
   },
   {
-    slug: "/google/skill-guide-intermediate",
-    title: "Skill Guide (中級)",
+    slug: "/google/antigravity-best-practices",
+    title: "Antigravity ベストプラクティス",
     group: "Providers",
     category: "Google",
     provider: "google",
-    topics: ["skill", "guide"],
+    topics: ["antigravity", "best-practices", "agent"],
     summary:
-      "Google Gemini CLI (v0.43.0 最終版)・Antigravity IDE (v2.0.1) における SKILL.md の設計思想、アーキテクチャ、実装パターン、運用まで。エージェント駆動開発を次のレベルに引き上げるすべての知識を網羅する。Gemini CLI は 2026-06-18 に AI Pro/Ultra/無料 Code Assist 向けサンセット済（→ Antigravity CLI へ移行）。",
+      "Google Antigravity IDE・CLI の設計思想、アーキテクチャ、Rules (GEMINI.md)、Skills (SKILL.md)、Workflows、Artifacts、Permissions、Claude Code との比較・共存戦略まで、仕様駆動開発を支えるエコシステム全容を網羅。",
     addedAt: "2026-05-07",
-    lastReviewed: "2026-07-01",
+    lastReviewed: "2026-07-29",
   },
   {
     slug: "/google/stitch-guide",
