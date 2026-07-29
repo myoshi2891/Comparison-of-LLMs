@@ -389,7 +389,8 @@ stateDiagram-v2
 ```bash
 mkdir -p ~/.gemini/antigravity-cli
 curl -sSL -o ~/.gemini/antigravity-cli/statusline.sh \
-  https://raw.githubusercontent.com/ykdojo/antigravity-cli-tips/a8b9f71c4c1a2d5f1d4352b0476839217822453e/scripts/context-bar.sh
+  https://raw.githubusercontent.com/ykdojo/antigravity-cli-tips/4a13498f354f36bc82375a1ab9a920ae364c90c8/scripts/context-bar.sh
+echo "5c5593e50a09262a80ccfae53b0167467bc7e563556a8a92543c32f796ab5e9c  ~/.gemini/antigravity-cli/statusline.sh" | sha256sum -c -
 chmod +x ~/.gemini/antigravity-cli/statusline.sh
 ```
 
@@ -520,9 +521,12 @@ chmod +x ~/.gemini/antigravity-cli/statusline.sh
 
 ### コマンドラインフラグによる上書き
 
-`--sandbox` や `--dangerously-skip-permissions` のように、起動時フラグは `settings.json` の値を一時的に上書きできます。設定パネルには上書き元(例: `Sandbox Mode on overridden by --sandbox`)が表示され、永続設定自体は変更されません(再起動でフラグの効果は消えます)。
+`--effort`、`--sandbox`、`--dangerously-skip-permissions` のように、起動時フラグはセッション設定や `settings.json` の値を一時的に上書きできます。`--effort` は `/effort [level]` と相互同期します。設定パネルには上書き元(例: `Sandbox Mode on overridden by --sandbox`)が表示され、永続設定自体は変更されません(再起動でフラグの効果は消えます)。
 
 ```bash
+# 推論モデルの思考努力レベルを high に設定
+agy --effort=high
+
 # 隔離環境(コンテナ/VM/専用テストマシン)で全承認を自動化する場合
 agy --dangerously-skip-permissions
 ```
@@ -595,10 +599,10 @@ Antigravity CLI は MCP を通じて Jira・Confluence・GitHub・Playwright・S
 
 **設定ファイルの場所**(Google Codelabsのハンズオン教材による記載):
 
-- グローバル設定: `~/.gemini/antigravity-cli/mcp_config.json`
+- グローバル設定: `~/.gemini/config/mcp_config.json`
 - ワークスペースローカル設定: `.agents/mcp_config.json`(プロジェクト直下)
 
-> 📝 **情報源による差異の注記**: 上記はCodelabの記載ですが、実務Tips記事側では `~/.gemini/config/mcp_config.json`(エージェント定義と同じ `~/.gemini/config/` 配下)への書き込みパーミッション例が示されています。共有(Shared)スコープの設定は `~/.gemini/config/` 配下、CLI固有の設定は `~/.gemini/antigravity-cli/` 配下、という命名分離である可能性が高いですが、手元の環境では `/mcp` コマンドの表示、または `agy --help` で実際のパスを確認することを推奨します。
+> 📝 **設定スコープの注記**: 共有(Shared)スコープの MCP 設定は `~/.gemini/config/` 配下、CLI固有の設定は `~/.gemini/antigravity-cli/` 配下に保存されます。手元の環境では `/mcp` コマンドの表示、または `agy --help` でも実際のパスを確認してください。
 
 **設定例: Context7(単一サーバー、リモートURL指定)**
 
@@ -606,7 +610,7 @@ Antigravity CLI は MCP を通じて Jira・Confluence・GitHub・Playwright・S
 {
   "mcpServers": {
     "context7": {
-      "serverURL": "https://mcp.context7.com/mcp"
+      "serverUrl": "https://mcp.context7.com/mcp"
     }
   }
 }
@@ -618,21 +622,21 @@ Antigravity CLI は MCP を通じて Jira・Confluence・GitHub・Playwright・S
 {
   "mcpServers": {
     "Snyk Security Scanner": {
-      "command": "snyk",
-      "args": ["mcp", "-t", "stdio", "--experimental"],
+      "command": "npx",
+      "args": ["-y", "snyk@1.1306.2", "mcp", "-t", "stdio", "--experimental"],
       "env": {}
     },
     "atlassian": {
       "command": "npx",
-      "args": ["-y", "mcp-remote@0.1.1", "https://mcp.atlassian.com/v1/sse"]
+      "args": ["-y", "mcp-remote@0.1.38", "https://mcp.atlassian.com/v1/sse"]
     },
     "playwright": {
       "command": "npx",
-      "args": ["-y", "@playwright/mcp@latest"]
+      "args": ["-y", "@playwright/mcp@0.0.78"]
     },
     "github": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-github@0.6.2"],
+      "args": ["-y", "@modelcontextprotocol/server-github@2025.4.8"],
       "env": { "GITHUB_PERSONAL_ACCESS_TOKEN": "******" }
     }
   }
@@ -679,7 +683,7 @@ Plugins は Skills・バックグラウンドサブエージェント・Lintル�
 **実務Tips**: Claude Codeなど他ツールも併用している場合、シンボリックリンクで指示ファイルを共有すると二重管理を避けられます。
 
 ```bash
-ln -s AGENTS.md CLAUDE.md
+ln -s CLAUDE.md AGENTS.md
 ```
 
 `AGENTS.md` にはTODOリストを書いておくのもおすすめです。
@@ -840,7 +844,7 @@ Antigravity CLI の公式GitHubリポジトリでは、AIコーディングエ�
 
 ---
 
-## 14. 参考文献・情報源(2026年7月28日時点で確認)
+## 14. 参考文献・情報源(2026年7月29日時点で確認)
 
 本ガイドは以下の一次情報源(公式ドキュメント・公式リポジトリ・Google公認Developer Advocateによる技術記事・国際的に著名なAI/開発者評論家の投稿)を根拠にしています。
 
@@ -885,4 +889,4 @@ Antigravity CLI の公式GitHubリポジトリでは、AIコーディングエ�
 
 ---
 
-> 📌 本ガイドの内容は執筆時点(2026年7月28日)の公開情報に基づきます。Antigravity CLI は数週間単位でバージョンアップされており(調査中にもv1.1.5〜v1.1.7の表記揺れを確認)、コマンド名・設定キー・ファイルパスは変更される可能性があります。重要な自動化やCI/CD組み込みの前には、必ず `agy --help` および公式ドキュメントの最新版を確認してください。
+> 📌 本ガイドの内容は2026年7月29日時点の Antigravity CLI v1.1.5 以降の公開情報に基づきます。Antigravity CLI は数週間単位でバージョンアップされており、コマンド名・設定キー・ファイルパスは変更される可能性があります。重要な自動化やCI/CD組み込みの前には、必ず `agy --help` および公式ドキュメントの最新版を確認してください。

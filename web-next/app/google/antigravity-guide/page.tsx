@@ -169,11 +169,10 @@ export default function AntigravityCliGuidePage() {
           <div className={styles.hero}>
             <span className={styles.eyebrow}>
               <span className={styles.dot} />
-              UPDATED THROUGH JULY 28, 2026
+              UPDATED THROUGH JULY 29, 2026 (v1.1.5+)
             </span>
             <h1 className={styles.title}>
-              Antigravity CLI
-              <br />
+              Antigravity CLI <br />
               完全ガイド
             </h1>
             <p className={styles.subtitle}>
@@ -206,7 +205,7 @@ export default function AntigravityCliGuidePage() {
 
             <div className={styles.metaLine}>
               <span>
-                <b>対象:</b> Antigravity CLI (agy) v1.1.x
+                <b>対象:</b> Antigravity CLI (agy) v1.1.5+
               </span>
               <span>
                 <b>形式:</b> 全コマンドリファレンス + ベストプラクティス
@@ -534,7 +533,7 @@ export default function AntigravityCliGuidePage() {
                 <span className={styles.idx}>04 /</span> スラッシュコマンド 全リファレンス
               </h2>
               <p>
-                <code>/</code> を入力するとタイプアヘッド候補メニューが開きます。以下は公式リファレンスに掲載されている全 31 個の中核コマンド一覧です。
+                <code>/</code> を入力するとタイプアヘッド候補メニューが開きます。以下は公式リファレンスに掲載されている全 32 個の中核コマンド一覧です。
               </p>
 
               <div className={styles.tableWrap}>
@@ -613,6 +612,12 @@ export default function AntigravityCliGuidePage() {
                       <td>コア</td>
                       <td><code>/quit</code></td>
                       <td>TUI セッションを終了</td>
+                    </tr>
+                    <tr>
+                      <td><code>/effort [level]</code></td>
+                      <td>設定</td>
+                      <td>—</td>
+                      <td>推論モデルの思考努力レベル (low / medium / high 等) を設定。起動時の <code>--effort</code> と相互同期</td>
                     </tr>
                     <tr>
                       <td><code>/fast</code> (廃止予定)</td>
@@ -1152,11 +1157,15 @@ export default function AntigravityCliGuidePage() {
                     <span className={styles.cv}> ~/.gemini/antigravity-cli</span>
                   </div>
                   <div className={styles.codeLine}>
-                    <span className={styles.ck}>curl -o</span>
+                    <span className={styles.ck}>curl -fsSL -o</span>
                     <span className={styles.cv}> ~/.gemini/antigravity-cli/statusline.sh \</span>
                   </div>
                   <div className={styles.codeLine}>
-                    <span className={styles.cv}>  https://raw.githubusercontent.com/ykdojo/antigravity-cli-tips/main/scripts/context-bar.sh</span>
+                    <span className={styles.cv}>  https://raw.githubusercontent.com/ykdojo/antigravity-cli-tips/4a13498f354f36bc82375a1ab9a920ae364c90c8/scripts/context-bar.sh</span>
+                  </div>
+                  <div className={styles.codeLine}>
+                    <span className={styles.ck}>echo</span>
+                    <span className={styles.cv}> "5c5593e50a09262a80ccfae53b0167467bc7e563556a8a92543c32f796ab5e9c  ~/.gemini/antigravity-cli/statusline.sh" | sha256sum -c -</span>
                   </div>
                   <div className={styles.codeLine}>
                     <span className={styles.ck}>chmod +x</span>
@@ -1602,7 +1611,7 @@ export default function AntigravityCliGuidePage() {
 
               <h3>コマンドラインフラグによる上書き</h3>
               <p>
-                <code>--sandbox</code> や <code>--dangerously-skip-permissions</code> のように、起動時フラグは <code>settings.json</code> の値を一時的に上書きできます。設定パネルには上書き元が表示され、永続設定自体は変更されません (再起動でフラグの効果は消えます)。
+                <code>--effort</code>、<code>--sandbox</code>、<code>--dangerously-skip-permissions</code> のように、起動時フラグはセッション設定や <code>settings.json</code> の値を一時的に上書きできます。<code>--effort</code> は <code>/effort [level]</code> と相互同期します。設定パネルには上書き元が表示され、永続設定自体は変更されません (再起動でフラグの効果は消えます)。
               </p>
               <div className={styles.codeWrap}>
                 <div className={styles.codeBar}>
@@ -1610,6 +1619,13 @@ export default function AntigravityCliGuidePage() {
                   <span className={styles.codeLang}>Bash</span>
                 </div>
                 <div className={styles.codeBody}>
+                  <div className={styles.codeLine}>
+                    <span className={styles.cc}># 推論モデルの思考努力レベルを high に設定</span>
+                  </div>
+                  <div className={styles.codeLine}>
+                    <span className={styles.ck}>agy</span>
+                    <span className={styles.cv}> --effort=high</span>
+                  </div>
                   <div className={styles.codeLine}>
                     <span className={styles.cc}># 隔離環境 (コンテナ/VM/専用テストマシン) で全承認を自動化する場合</span>
                   </div>
@@ -1762,14 +1778,14 @@ export default function AntigravityCliGuidePage() {
 
               <p><strong>設定ファイルの場所</strong> (Google Codelabs のハンズオン教材による記載):</p>
               <ul>
-                <li>グローバル設定: <code>~/.gemini/antigravity-cli/mcp_config.json</code></li>
+                <li>グローバル設定: <code>~/.gemini/config/mcp_config.json</code></li>
                 <li>ワークスペースローカル設定: <code>.agents/mcp_config.json</code> (プロジェクト直下)</li>
               </ul>
 
               <div className={`${styles.callout} ${styles.calloutInfo}`}>
                 <div className={styles.calloutTitle}>情報源の差異</div>
                 <p>
-                  上記は Codelab の記載ですが、実務 Tips 記事側では <code>~/.gemini/config/mcp_config.json</code> (エージェント定義と同じ <code>~/.gemini/config/</code> 配下) への書き込みパーミッション例が示されています。共有 (Shared) スコープの設定は <code>~/.gemini/config/</code> 配下、CLI 固有の設定は <code>~/.gemini/antigravity-cli/</code> 配下、という命名分離の可能性が高いですが、手元の環境では <code>/mcp</code> コマンドの表示、または <code>agy --help</code> で実際のパスを確認することを推奨します。
+                  共有 (Shared) スコープの MCP 設定は <code>~/.gemini/config/</code> 配下、CLI 固有の設定は <code>~/.gemini/antigravity-cli/</code> 配下に保存されます。手元の環境では <code>/mcp</code> コマンドの表示、または <code>agy --help</code> でも実際のパスを確認してください。
                 </p>
               </div>
 
@@ -1791,7 +1807,7 @@ export default function AntigravityCliGuidePage() {
                   </div>
                   <div className={styles.codeLine}>
                     {"      "}
-                    <span className={styles.ck}>"serverURL"</span>:{" "}
+                    <span className={styles.ck}>"serverUrl"</span>:{" "}
                     <span className={styles.cs}>"https://mcp.context7.com/mcp"</span>
                   </div>
                   <div className={styles.codeLine}>{"    "}&#125;</div>
@@ -1819,11 +1835,11 @@ export default function AntigravityCliGuidePage() {
                   <div className={styles.codeLine}>
                     {"      "}
                     <span className={styles.ck}>"command"</span>:{" "}
-                    <span className={styles.cs}>"snyk"</span>,
+                    <span className={styles.cs}>"npx"</span>,
                   </div>
                   <div className={styles.codeLine}>
                     {"      "}
-                    <span className={styles.ck}>"args"</span>: [<span className={styles.cs}>"mcp"</span>, <span className={styles.cs}>"-t"</span>, <span className={styles.cs}>"stdio"</span>, <span className={styles.cs}>"--experimental"</span>],
+                    <span className={styles.ck}>"args"</span>: [<span className={styles.cs}>"-y"</span>, <span className={styles.cs}>"snyk@1.1306.2"</span>, <span className={styles.cs}>"mcp"</span>, <span className={styles.cs}>"-t"</span>, <span className={styles.cs}>"stdio"</span>, <span className={styles.cs}>"--experimental"</span>],
                   </div>
                   <div className={styles.codeLine}>
                     {"      "}
@@ -1841,7 +1857,7 @@ export default function AntigravityCliGuidePage() {
                   </div>
                   <div className={styles.codeLine}>
                     {"      "}
-                    <span className={styles.ck}>"args"</span>: [<span className={styles.cs}>"-y"</span>, <span className={styles.cs}>"mcp-remote"</span>, <span className={styles.cs}>"https://mcp.atlassian.com/v1/sse"</span>]
+                    <span className={styles.ck}>"args"</span>: [<span className={styles.cs}>"-y"</span>, <span className={styles.cs}>"mcp-remote@0.1.38"</span>, <span className={styles.cs}>"https://mcp.atlassian.com/v1/sse"</span>]
                   </div>
                   <div className={styles.codeLine}>{"    "}&#125;,</div>
                   <div className={styles.codeLine}>
@@ -1855,7 +1871,7 @@ export default function AntigravityCliGuidePage() {
                   </div>
                   <div className={styles.codeLine}>
                     {"      "}
-                    <span className={styles.ck}>"args"</span>: [<span className={styles.cs}>"@playwright/mcp@latest"</span>]
+                    <span className={styles.ck}>"args"</span>: [<span className={styles.cs}>"-y"</span>, <span className={styles.cs}>"@playwright/mcp@0.0.78"</span>]
                   </div>
                   <div className={styles.codeLine}>{"    "}&#125;,</div>
                   <div className={styles.codeLine}>
@@ -1869,7 +1885,7 @@ export default function AntigravityCliGuidePage() {
                   </div>
                   <div className={styles.codeLine}>
                     {"      "}
-                    <span className={styles.ck}>"args"</span>: [<span className={styles.cs}>"-y"</span>, <span className={styles.cs}>"@modelcontextprotocol/server-github"</span>],
+                    <span className={styles.ck}>"args"</span>: [<span className={styles.cs}>"-y"</span>, <span className={styles.cs}>"@modelcontextprotocol/server-github@2025.4.8"</span>],
                   </div>
                   <div className={styles.codeLine}>
                     {"      "}
@@ -1959,7 +1975,7 @@ export default function AntigravityCliGuidePage() {
                 <div className={styles.codeBody}>
                   <div className={styles.codeLine}>
                     <span className={styles.ck}>ln -s</span>
-                    <span className={styles.cv}> AGENTS.md CLAUDE.md</span>
+                    <span className={styles.cv}> CLAUDE.md AGENTS.md</span>
                   </div>
                 </div>
               </div>
@@ -2262,7 +2278,7 @@ export default function AntigravityCliGuidePage() {
                 <span className={styles.idx}>15 /</span> 参考文献 & 情報源
               </h2>
               <p>
-                本ガイドは以下の一次情報源 (公式ドキュメント・公式リポジトリ・Google 公認 Developer Advocate による技術記事・国際的に著名な AI/開発者評論家の投稿) を根拠にしています。確認日は 2026 年 7 月 28 日です。
+                本ガイドは以下の一次情報源 (公式ドキュメント・公式リポジトリ・Google 公認 Developer Advocate による技術記事・国際的に著名な AI/開発者評論家の投稿) を根拠にしています。確認日は 2026 年 7 月 29 日です。
               </p>
 
               <div>
@@ -2367,14 +2383,14 @@ export default function AntigravityCliGuidePage() {
               <div className={`${styles.callout} ${styles.calloutWarn}`} style={{ marginTop: "24px" }}>
                 <div className={styles.calloutTitle}>留意事項</div>
                 <p>
-                  本ガイドの内容は執筆時点 (2026 年 7 月 28 日) の公開情報に基づきます。Antigravity CLI は数週間単位でバージョンアップされており (調査中にも v1.1.5〜v1.1.7 の表記揺れを確認)、コマンド名・設定キー・ファイルパスは変更される可能性があります。重要な自動化や CI/CD 組み込みの前には、必ず <code>agy --help</code> および公式ドキュメントの最新版を確認してください。
+                  本ガイドの内容は 2026 年 7 月 29 日時点の Antigravity CLI v1.1.5 以降の公開情報に基づきます。Antigravity CLI は数週間単位でバージョンアップされており、コマンド名・設定キー・ファイルパスは変更される可能性があります。重要な自動化や CI/CD 組み込みの前には、必ず <code>agy --help</code> および公式ドキュメントの最新版を確認してください。
                 </p>
               </div>
             </section>
           </div>
 
           <footer className={styles.pageFooter}>
-            Antigravity CLI 完全ガイド — 2026-07-28 時点の公開情報にもとづく非公式リファレンス。図解はすべて Mermaid で描画。
+            Antigravity CLI 完全ガイド — 2026-07-29 / v1.1.5+ 時点の公開情報にもとづく非公式リファレンス。図解はすべて Mermaid で描画。
           </footer>
         </main>
       </div>

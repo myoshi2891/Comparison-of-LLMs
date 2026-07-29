@@ -6,13 +6,7 @@ import Page, { metadata } from "./page";
 import styles from "./page.module.css";
 
 vi.mock("@/components/docs/MermaidDiagram", () => ({
-  default: function DummyMermaidDiagram({
-    chart,
-    id,
-  }: {
-    chart: string;
-    id?: string;
-  }) {
+  default: function DummyMermaidDiagram({ chart, id }: { chart: string; id?: string }) {
     return (
       <div data-testid="mermaid" id={id}>
         <pre>{chart}</pre>
@@ -41,9 +35,7 @@ describe("/google/antigravity-guide (Antigravity CLI Complete Guide - 100% Faith
 
   it("外部リンクはすべて target='_blank' と rel='noopener noreferrer' が正しい", () => {
     const { container } = render(<Page />);
-    const externalLinks = Array.from(
-      container.querySelectorAll('a[href^="http"]')
-    );
+    const externalLinks = Array.from(container.querySelectorAll('a[href^="http"]'));
     expect(externalLinks.length).toBeGreaterThan(20);
     for (const link of externalLinks) {
       expect(link.getAttribute("target")).toBe("_blank");
@@ -53,9 +45,7 @@ describe("/google/antigravity-guide (Antigravity CLI Complete Guide - 100% Faith
 
   it("内部リンクに .html 拡張子が含まれない", () => {
     const { container } = render(<Page />);
-    const internalLinks = Array.from(
-      container.querySelectorAll('a[href^="/"]')
-    );
+    const internalLinks = Array.from(container.querySelectorAll('a[href^="/"]'));
     for (const link of internalLinks) {
       expect(link.getAttribute("href")).not.toMatch(/\.html$/);
     }
@@ -106,9 +96,7 @@ describe("/google/antigravity-guide (Antigravity CLI Complete Guide - 100% Faith
 
   it("外部実行例を不変参照と厳密なパッケージバージョンへ固定する", () => {
     const source = readFileSync(join(__dirname, "page.tsx"), "utf8");
-    expect(source).toContain(
-      "4a13498f354f36bc82375a1ab9a920ae364c90c8/scripts/context-bar.sh"
-    );
+    expect(source).toContain("4a13498f354f36bc82375a1ab9a920ae364c90c8/scripts/context-bar.sh");
     expect(source).toContain("5c5593e50a09262a80ccfae53b0167467bc7e563556a8a92543c32f796ab5e9c");
     expect(source).toContain("snyk@1.1306.2");
     expect(source).toContain("mcp-remote@0.1.38");
@@ -120,7 +108,8 @@ describe("/google/antigravity-guide (Antigravity CLI Complete Guide - 100% Faith
     const source = readFileSync(join(__dirname, "page.tsx"), "utf8");
     expect(source).toContain("~/.gemini/config/mcp_config.json");
     expect(source).toContain('"serverUrl"');
-    expect(source).toContain("ln -s CLAUDE.md AGENTS.md");
+    expect(source).toContain(">ln -s</span>");
+    expect(source).toContain("> CLAUDE.md AGENTS.md</span>");
   });
 
   it("MermaidDiagram コンポーネントが 8 つ存在する (diag-1 〜 diag-8)", () => {
