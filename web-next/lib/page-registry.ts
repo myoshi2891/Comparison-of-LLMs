@@ -555,15 +555,15 @@ const entries: PageEntry[] = [
   },
   {
     slug: "/google/skill",
-    title: "Skill",
+    title: "Agent Skills 実践ガイド",
     group: "Providers",
     category: "Google",
     provider: "google",
-    topics: ["skill"],
+    topics: ["skill", "antigravity", "guide"],
     summary:
-      "GEMINI.md / Rules / SKILL.md / Workflows / Knowledge Base / Artifacts / SDD仕様書群 — Google Antigravity の AI 仕様駆動開発を支えるマークダウンファイル群の役割・構造・ベストプラクティスを公式根拠付きで解説。Antigravity v2.0.1 (2026-05-23, 最新の安定化リリース) / Gemini 3.5 Flash 対応。Gemini CLI は 2026-06-18 に AI Pro/Ultra/無料 Code Assist 向けサンセット済（→ Antigravity CLI へ移行）。",
+      "Antigravity IDE における SKILL.md の設計思想・アーキテクチャ・実装パターン・運用を中級〜上級エンジニア向けにステップバイステップで解説する実践ガイド。",
     addedAt: "2026-04-18",
-    lastReviewed: "2026-07-01",
+    lastReviewed: "2026-07-29",
   },
   {
     slug: "/google/skill-guide",

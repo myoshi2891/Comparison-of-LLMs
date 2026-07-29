@@ -19,6 +19,8 @@
 
 ## 最近の追加内容
 
+- **Agent Skills 実践ガイド — Antigravity IDE における SKILL.md（/google/skill）の Pure JSX 完全置き換え移行**: `Agent-skills-antigravity-best-practices.html` を `web-next/app/google/skill/page.tsx` に Pure JSX として完全忠実移植 🚀。要約・省略なしで全10セクション（intro, origin, philosophy, architecture, antigravity, practices, operations, example, summary, references）・全表・全コードブロック・5 Mermaid図・TOCスクロール追従（`TocObserver.tsx`）・外部リンク安全属性・`page-registry.ts`（`Google` カテゴリ）登録を完了。既存の旧 `/google/skill` コンテンツと完全入れ替え完了。原本 `Agent-skills-antigravity-best-practices.html` / `Agent-skills-antigravity-best-practices.md` は `archive/html/google/` および `archive/md/google/` へ `git mv` 退避保存。契約テスト（10セクション検証）を更新。
+
 - **ハーネスエンジニアリング入門ガイド（/claude/harness-engineering）の Pure JSX 完全置き換え移行**: `Harness-engineering-guide.html` を `web-next/app/claude/harness-engineering/page.tsx` に Pure JSX として完全忠実移植 🚀。要約・省略なしで全9セクション（intro, chapter1〜7, references）・全表・全コードブロック（hook.sh含む）・9 Mermaid図・TOCスクロール追従（`TocObserver.tsx`）・外部リンク安全属性・`page-registry.ts` 登録確認を完了。既存の旧 `harness-engineering` コンテンツと完全入れ替え完了。原本 `Harness-engineering-guide.html` / `Harness-engineering-guide.md` は `archive/html/Anthropic/` および `archive/md/Anthropic/` へ `git mv` 退避保存。契約テスト（9セクション検証）を更新。
 
 - **Claude Cowork 実践ガイド（/claude/cowork-guide）の Pure JSX 完全置き換え移行**: `Claude-cowork-best-practices.html` を `web-next/app/claude/cowork-guide/page.tsx` に Pure JSX として完全忠実移植 🚀。要約・省略なしで全12ステップ（STEP 0〜11）・納品前チェックリスト・参考文献・8 Mermaid図・TOCスクロール追従（`TocObserver.tsx`）・外部リンク安全属性・`page-registry.ts`（`Claude` カテゴリ）登録を完了。既存の旧 `cowork-guide` コンテンツと完全入れ替え完了。原本 `Claude-cowork-best-practices.html` / `Claude-cowork-best-practices.md` は `archive/html/Anthropic/` および `archive/md/Anthropic/` へ `git mv` 退避保存。契約テストを更新。
