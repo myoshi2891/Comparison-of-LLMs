@@ -16,18 +16,24 @@ export function TocObserver() {
         linkMap[href.slice(1)] = a;
       }
     });
+    const intersecting = new Set<Element>();
 
     const observer = new IntersectionObserver(
       (entries) => {
-        entries.forEach((entry) => {
-          const link = linkMap[entry.target.id];
-          if (!link) return;
-          if (entry.isIntersecting) {
-            navLinks.forEach((l) => {
-              l.classList.remove(styles.tocLinkActive);
-            });
-            link.classList.add(styles.tocLinkActive);
-          }
+        for (const entry of entries) {
+          if (!linkMap[entry.target.id]) continue;
+          if (entry.isIntersecting) intersecting.add(entry.target);
+          else intersecting.delete(entry.target);
+        }
+
+        const [topmost] = [...intersecting].sort((a, b) => {
+          if (a === b) return 0;
+          return a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1;
+        });
+        if (!topmost) return;
+
+        navLinks.forEach((link) => {
+          link.classList.toggle(styles.tocLinkActive, link === linkMap[topmost.id]);
         });
       },
       { rootMargin: "-20% 0px -70% 0px" }
