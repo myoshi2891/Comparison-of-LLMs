@@ -50,6 +50,7 @@ paths:
 ### ステップ 2: Green（最小実装と成功）
 
 - テストをパスさせるための最小限のコードを `web-next/app/` または `web-next/components/` 等に実装。
+- **HTML/Markdown からのガイドページ移行時は、原本とのラインバイライン全件要素照合監査（セクション数・表の行数/項目数・コードブロック数・参考文献数のカウント一致および未エスケープ文字スキャン）を厳格に実施してから Green コミットを行うこと。** 要約・省略は即時規約違反となる。
 - **新規ページを追加した場合、`web-next/lib/page-registry.ts` への登録を含めて初めて Green とする。**
   レジストリは鮮度表示・What's New・sitemap・**ナビゲーション**の導出元であり、未登録のページは
   どこからも辿れない。`tests/page-registry-coverage.test.ts` と `tests/nav-derivation.test.ts` が
