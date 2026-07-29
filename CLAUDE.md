@@ -279,7 +279,7 @@ Build:     cd web-next && bun run build
 以下を全て確認してからコミットすること：
 
 1. `cd web-next && bun run build` が成功（※Antigravityサンドボックス環境では実行禁止。他環境やCIでは必須）
-2. `cd web-next && bun run test`（1232 assertions pass。既知の収集失敗は `docs/PROGRESS.md` を参照）
+2. `cd web-next && bun run test` が完全に成功（1240 tests pass。収集失敗もブロッキング失敗として原因を調査する）
 3. `cd web-next && bun run typecheck` が成功
 4. `cd web-next && bun run lint` が成功
 5. `cd scraper && uv run pytest` が成功
@@ -314,6 +314,7 @@ Phase A–F 遂行中、新規ガイドページ (`claude/`, `gemini/`, `codex/`
 `legacy/` 配下の **18 HTML** は `.gitignore` により remote から隔離済。Phase A–F で `web-next/app/*` の page.tsx への置換が**全完了**。
 移行計画詳細は **[`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](docs/archive/NEXTJS_PHASE_A_F_PLAN.md)** を参照（アーカイブ）。
 現在の進捗は **[`docs/PROGRESS.md`](docs/PROGRESS.md)** を、過去の移行進捗詳細は **[`docs/archive/MIGRATION_PROGRESS.md`](docs/archive/MIGRATION_PROGRESS.md)** を参照。
+
 - **オリジナルファイルの保存**: 移行元の HTML / Markdown オリジナルファイルは勝手に削除せず、必ず `archive/` ディレクトリ配下に退避させて保存すること。
 
 #### AI モデルバージョンの扱い

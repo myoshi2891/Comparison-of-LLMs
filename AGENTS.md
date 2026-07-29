@@ -31,11 +31,11 @@ AGENTS.md は Codex / Cursor / Cline など AGENTS.md 規約を読む AI ツー�
 ## 検証コマンド
 
 ```bash
-cd web-next && bun run test        # 1183 pass（全 Green ✅）
+cd web-next && bun run test        # 1240 pass（全 Green ✅）
 cd web-next && bun run typecheck   # OK
 cd web-next && bun run build       # 全ルートが ○ (Static)
 cd web-next && bun run lint        # 0 件（全解消 ✅）
-cd scraper && uv run pytest        # 38/38 pass（全 Green ✅）
+cd scraper && uv run pytest        # 43/43 pass（全 Green ✅）
 ```
 
 ## 次セッション再開プロンプト
