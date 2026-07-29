@@ -73,6 +73,7 @@ const DIAGRAM_9 = `flowchart LR
  * @param href - The destination URL.
  * @param className - Optional CSS class name.
  * @param children - The link content.
+ * @returns An anchor element configured for external navigation.
  */
 function Ext({
   href,

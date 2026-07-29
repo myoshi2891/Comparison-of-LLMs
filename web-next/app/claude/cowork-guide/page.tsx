@@ -75,6 +75,7 @@ Action -->|"いいえ（読み取りのみ）"| Continue["そのまま作業を�
  * @param href - The destination URL
  * @param className - Optional CSS class name
  * @param children - The link content
+ * @returns The rendered external link
  */
 function Ext({
   href,
@@ -99,7 +100,7 @@ export const metadata: Metadata = {
 };
 
 /**
- * Renders the Claude Cowork practical guide, including navigation, step-by-step guidance, safety practices, and references.
+ * Renders the Claude Cowork practical guide with navigation, step-by-step guidance, safety practices, a checklist, and references.
  */
 export default function Page() {
   return (

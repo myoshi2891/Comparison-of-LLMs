@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import styles from "./page.module.css";
 
 /**
- * Keeps the table of contents link for the uppermost visible section active.
+ * Keeps the table-of-contents link for the uppermost visible section active.
  */
 export default function TocObserver() {
   useEffect(() => {
