@@ -489,12 +489,23 @@
   overflow-x: auto;
 }
 
-/* 図解の高さを統一: stateDiagram は viewBox が広くなり巨大化するため上限を設ける */
-.mermaidWrap :global(svg) {
-  max-height: 380px;
+/*
+ * diag-3（実行モード・3状態循環）と diag-5（サブエージェントライフサイクル・5状態）は
+ * stateDiagram-v2 でノード数が少なく viewBox が広くなるため文字が巨大化する。
+ * 他の図解（graph TD / flowchart LR / sequenceDiagram）は自然サイズで問題なし。
+ */
+:global(#diag-3 svg) {
+  max-height: 260px !important;
   height: auto !important;
   width: auto !important;
-  max-width: 100% !important;
+  display: block;
+  margin: 0 auto;
+}
+
+:global(#diag-5 svg) {
+  max-height: 300px !important;
+  height: auto !important;
+  width: auto !important;
   display: block;
   margin: 0 auto;
 }
