@@ -360,7 +360,7 @@ export default function Page() {
                   <code className={styles.codeInline}>name</code>
                 </td>
                 <td>
-                  必須。最大64文字、小文字英数字とハイフンのみ、XMLタグ不可、予約語(anthropic,
+                  必須。最大64文字、小文字英数字とハイフンのみ。ハイフンは先頭・末尾に使用不可、連続使用不可。XMLタグ不可、予約語(anthropic,
                   claude)不可
                 </td>
               </tr>
