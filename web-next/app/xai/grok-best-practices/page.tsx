@@ -427,7 +427,10 @@ export default function GrokBestPracticesPage() {
 
           <div className={styles.codeLabel}>bash</div>
           <pre className={styles.codeBlockPre}>
-            <code>export XAI_API_KEY=&quot;your_api_key&quot;</code>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>export</span> XAI_API_KEY=
+              <span className={styles.cs}>&quot;your_api_key&quot;</span>
+            </div>
           </pre>
 
           <p>
@@ -435,7 +438,9 @@ export default function GrokBestPracticesPage() {
           </p>
           <div className={styles.codeLabel}>bash（.env）</div>
           <pre className={styles.codeBlockPre}>
-            <code>XAI_API_KEY=your_api_key</code>
+            <div className={styles.codeLine}>
+              XAI_API_KEY=<span className={styles.cs}>your_api_key</span>
+            </div>
           </pre>
 
           <div className={`${styles.callout} ${styles.calloutDanger}`}>
@@ -466,43 +471,100 @@ export default function GrokBestPracticesPage() {
           <h3>3.1 SDK インストール</h3>
           <div className={styles.codeLabel}>bash</div>
           <pre className={styles.codeBlockPre}>
-            <code>
-              pip install xai-sdk{"\n"}
-              pip install openai{"\n"}
-              npm install ai @ai-sdk/xai zod{"\n"}
-              npm install openai
-            </code>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>pip</span> install xai-sdk
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>pip</span> install openai
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>npm</span> install ai @ai-sdk/xai zod
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>npm</span> install openai
+            </div>
           </pre>
 
           <h3>3.2 最初のリクエスト（Python / xai-sdk）</h3>
           <div className={styles.codeLabel}>python</div>
           <pre className={styles.codeBlockPre}>
-            <code>
-              import os{"\n"}
-              from xai_sdk import Client{"\n"}
-              from xai_sdk.chat import user{"\n\n"}
-              client = Client(api_key=os.getenv(&quot;XAI_API_KEY&quot;)){"\n\n"}
-              chat = client.chat.create(model=&quot;grok-4.5&quot;){"\n"}
-              chat.append(user(&quot;Fix this function and explain the bug: function
-              median(a)&#123;a.sort();return a[a.length/2]&#125;&quot;)){"\n\n"}
-              print(chat.sample().content)
-            </code>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>import</span> os
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>from</span> xai_sdk{" "}
+              <span className={styles.ck}>import</span> Client
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>from</span> xai_sdk.chat{" "}
+              <span className={styles.ck}>import</span> user
+            </div>
+            <div className={styles.codeLine} />
+            <div className={styles.codeLine}>
+              client = <span className={styles.fn}>Client</span>(api_key=os.
+              <span className={styles.fn}>getenv</span>(
+              <span className={styles.cs}>&quot;XAI_API_KEY&quot;</span>))
+            </div>
+            <div className={styles.codeLine} />
+            <div className={styles.codeLine}>
+              chat = client.chat.<span className={styles.fn}>create</span>(model=
+              <span className={styles.cs}>&quot;grok-4.5&quot;</span>)
+            </div>
+            <div className={styles.codeLine}>
+              chat.<span className={styles.fn}>append</span>(<span className={styles.fn}>user</span>
+              (
+              <span className={styles.cs}>
+                &quot;Fix this function and explain the bug: function median(a)&#123;a.sort();return
+                a[a.length/2]&#125;&quot;
+              </span>
+              ))
+            </div>
+            <div className={styles.codeLine} />
+            <div className={styles.codeLine}>
+              <span className={styles.fn}>print</span>(chat.
+              <span className={styles.fn}>sample</span>().content)
+            </div>
           </pre>
 
           <h3>3.3 最初のリクエスト（OpenAI 互換 SDK）</h3>
           <div className={styles.codeLabel}>python</div>
           <pre className={styles.codeBlockPre}>
-            <code>
-              from openai import OpenAI{"\n\n"}
-              client = OpenAI({"\n"}
-              {"    "}api_key=&quot;&lt;YOUR_XAI_API_KEY_HERE&gt;&quot;,{"\n"}
-              {"    "}base_url=&quot;https://api.x.ai/v1&quot;,{"\n"}){"\n\n"}
-              response = client.responses.create({"\n"}
-              {"    "}model=&quot;grok-4.5&quot;,{"\n"}
-              {"    "}input=&quot;Fix this function and explain the bug: function
-              median(a)&#123;a.sort();return a[a.length/2]&#125;&quot;,{"\n"}){"\n\n"}
-              print(response.output_text)
-            </code>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>from</span> openai{" "}
+              <span className={styles.ck}>import</span> OpenAI
+            </div>
+            <div className={styles.codeLine} />
+            <div className={styles.codeLine}>
+              client = <span className={styles.fn}>OpenAI</span>(
+            </div>
+            <div className={styles.codeLine}>
+              {"    "}api_key=
+              <span className={styles.cs}>&quot;&lt;YOUR_XAI_API_KEY_HERE&gt;&quot;</span>,
+            </div>
+            <div className={styles.codeLine}>
+              {"    "}base_url=<span className={styles.cs}>&quot;https://api.x.ai/v1&quot;</span>,
+            </div>
+            <div className={styles.codeLine}>)</div>
+            <div className={styles.codeLine} />
+            <div className={styles.codeLine}>
+              response = client.responses.<span className={styles.fn}>create</span>(
+            </div>
+            <div className={styles.codeLine}>
+              {"    "}model=<span className={styles.cs}>&quot;grok-4.5&quot;</span>,
+            </div>
+            <div className={styles.codeLine}>
+              {"    "}input=
+              <span className={styles.cs}>
+                &quot;Fix this function and explain the bug: function median(a)&#123;a.sort();return
+                a[a.length/2]&#125;&quot;
+              </span>
+              ,
+            </div>
+            <div className={styles.codeLine}>)</div>
+            <div className={styles.codeLine} />
+            <div className={styles.codeLine}>
+              <span className={styles.fn}>print</span>(response.output_text)
+            </div>
           </pre>
 
           <div className={`${styles.callout} ${styles.calloutInfo}`}>
@@ -588,23 +650,63 @@ export default function GrokBestPracticesPage() {
           <h3>4.3 コード例</h3>
           <div className={styles.codeLabel}>python</div>
           <pre className={styles.codeBlockPre}>
-            <code>
-              import os{"\n"}
-              from xai_sdk import Client{"\n"}
-              from xai_sdk.chat import system, user{"\n\n"}
-              client = Client({"\n"}
-              {"    "}api_key=os.getenv(&quot;XAI_API_KEY&quot;),{"\n"}
-              {"    "}timeout=3600,{"\n"}){"\n\n"}
-              chat = client.chat.create({"\n"}
-              {"    "}model=&quot;grok-4.5&quot;,{"\n"}
-              {"    "}reasoning_effort=&quot;high&quot;,{"\n"}
-              {"    "}messages=[system(&quot;You are a highly intelligent AI assistant.&quot;)],
-              {"\n"}){"\n"}
-              chat.append(user(&quot;Find all prime numbers p such that p^2 + 2 is also prime. Prove
-              your answer.&quot;)){"\n\n"}
-              response = chat.sample(){"\n"}
-              print(response.content)
-            </code>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>import</span> os
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>from</span> xai_sdk{" "}
+              <span className={styles.ck}>import</span> Client
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>from</span> xai_sdk.chat{" "}
+              <span className={styles.ck}>import</span> system, user
+            </div>
+            <div className={styles.codeLine} />
+            <div className={styles.codeLine}>
+              client = <span className={styles.fn}>Client</span>(
+            </div>
+            <div className={styles.codeLine}>
+              {"    "}api_key=os.<span className={styles.fn}>getenv</span>(
+              <span className={styles.cs}>&quot;XAI_API_KEY&quot;</span>),
+            </div>
+            <div className={styles.codeLine}>
+              {"    "}timeout=<span className={styles.cv}>3600</span>,
+            </div>
+            <div className={styles.codeLine}>)</div>
+            <div className={styles.codeLine} />
+            <div className={styles.codeLine}>
+              chat = client.chat.<span className={styles.fn}>create</span>(
+            </div>
+            <div className={styles.codeLine}>
+              {"    "}model=<span className={styles.cs}>&quot;grok-4.5&quot;</span>,
+            </div>
+            <div className={styles.codeLine}>
+              {"    "}reasoning_effort=<span className={styles.cs}>&quot;high&quot;</span>,
+            </div>
+            <div className={styles.codeLine}>
+              {"    "}messages=[<span className={styles.fn}>system</span>(
+              <span className={styles.cs}>
+                &quot;You are a highly intelligent AI assistant.&quot;
+              </span>
+              )],
+            </div>
+            <div className={styles.codeLine}>)</div>
+            <div className={styles.codeLine}>
+              chat.<span className={styles.fn}>append</span>(<span className={styles.fn}>user</span>
+              (
+              <span className={styles.cs}>
+                &quot;Find all prime numbers p such that p^2 + 2 is also prime. Prove your
+                answer.&quot;
+              </span>
+              ))
+            </div>
+            <div className={styles.codeLine} />
+            <div className={styles.codeLine}>
+              response = chat.<span className={styles.fn}>sample</span>()
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.fn}>print</span>(response.content)
+            </div>
           </pre>
 
           <h3>4.4 推論トレースの活用</h3>
@@ -658,42 +760,131 @@ export default function GrokBestPracticesPage() {
           <h3>5.2 ツール定義の基本パターン</h3>
           <div className={styles.codeLabel}>python</div>
           <pre className={styles.codeBlockPre}>
-            <code>
-              import os{"\n"}
-              import json{"\n"}
-              from xai_sdk import Client{"\n"}
-              from xai_sdk.chat import user, tool, tool_result{"\n\n"}
-              client = Client(api_key=os.getenv(&quot;XAI_API_KEY&quot;)){"\n\n"}
-              tools = [{"\n"}
-              {"    "}tool({"\n"}
-              {"        "}name=&quot;get_temperature&quot;,{"\n"}
-              {"        "}description=&quot;Get current temperature for a location&quot;,{"\n"}
-              {"        "}parameters=&#123;{"\n"}
-              {"            "}&quot;type&quot;: &quot;object&quot;,{"\n"}
-              {"            "}&quot;properties&quot;: &#123;{"\n"}
-              {"                "}&quot;location&quot;: &#123;&quot;type&quot;: &quot;string&quot;,
-              &quot;description&quot;: &quot;City name&quot;&#125;,{"\n"}
-              {"                "}&quot;unit&quot;: &#123;&quot;type&quot;: &quot;string&quot;,
-              &quot;enum&quot;: [&quot;celsius&quot;, &quot;fahrenheit&quot;], &quot;default&quot;:
-              &quot;fahrenheit&quot;&#125;{"\n"}
-              {"            "}&#125;,{"\n"}
-              {"            "}&quot;required&quot;: [&quot;location&quot;]{"\n"}
-              {"        "}&#125;,{"\n"}
-              {"    "}),{"\n"}]{"\n\n"}
-              chat = client.chat.create(model=&quot;grok-4.5&quot;, tools=tools){"\n"}
-              chat.append(user(&quot;What is the temperature in San Francisco?&quot;)){"\n"}
-              response = chat.sample(){"\n\n"}
-              if response.tool_calls:{"\n"}
-              {"    "}chat.append(response){"\n"}
-              {"    "}for tc in response.tool_calls:{"\n"}
-              {"        "}args = json.loads(tc.function.arguments){"\n"}
-              {"        "}result = &#123;&quot;location&quot;: args[&quot;location&quot;],
-              &quot;temperature&quot;: 59, &quot;unit&quot;: args.get(&quot;unit&quot;,
-              &quot;fahrenheit&quot;)&#125;{"\n"}
-              {"        "}chat.append(tool_result(json.dumps(result))){"\n"}
-              {"    "}response = chat.sample(){"\n\n"}
-              print(response.content)
-            </code>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>import</span> os
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>import</span> json
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>from</span> xai_sdk{" "}
+              <span className={styles.ck}>import</span> Client
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>from</span> xai_sdk.chat{" "}
+              <span className={styles.ck}>import</span> user, tool, tool_result
+            </div>
+            <div className={styles.codeLine} />
+            <div className={styles.codeLine}>
+              client = <span className={styles.fn}>Client</span>(api_key=os.
+              <span className={styles.fn}>getenv</span>(
+              <span className={styles.cs}>&quot;XAI_API_KEY&quot;</span>))
+            </div>
+            <div className={styles.codeLine} />
+            <div className={styles.codeLine}>tools = [</div>
+            <div className={styles.codeLine}>
+              {"    "}
+              <span className={styles.fn}>tool</span>(
+            </div>
+            <div className={styles.codeLine}>
+              {"        "}name=<span className={styles.cs}>&quot;get_temperature&quot;</span>,
+            </div>
+            <div className={styles.codeLine}>
+              {"        "}description=
+              <span className={styles.cs}>&quot;Get current temperature for a location&quot;</span>,
+            </div>
+            <div className={styles.codeLine}>{"        "}parameters=&#123;</div>
+            <div className={styles.codeLine}>
+              {"            "}
+              <span className={styles.cs}>&quot;type&quot;</span>:{" "}
+              <span className={styles.cs}>&quot;object&quot;</span>,
+            </div>
+            <div className={styles.codeLine}>
+              {"            "}
+              <span className={styles.cs}>&quot;properties&quot;</span>: &#123;
+            </div>
+            <div className={styles.codeLine}>
+              {"                "}
+              <span className={styles.cs}>&quot;location&quot;</span>: &#123;
+              <span className={styles.cs}>&quot;type&quot;</span>:{" "}
+              <span className={styles.cs}>&quot;string&quot;</span>,{" "}
+              <span className={styles.cs}>&quot;description&quot;</span>:{" "}
+              <span className={styles.cs}>&quot;City name&quot;</span>&#125;,
+            </div>
+            <div className={styles.codeLine}>
+              {"                "}
+              <span className={styles.cs}>&quot;unit&quot;</span>: &#123;
+              <span className={styles.cs}>&quot;type&quot;</span>:{" "}
+              <span className={styles.cs}>&quot;string&quot;</span>,{" "}
+              <span className={styles.cs}>&quot;enum&quot;</span>: [
+              <span className={styles.cs}>&quot;celsius&quot;</span>,{" "}
+              <span className={styles.cs}>&quot;fahrenheit&quot;</span>],{" "}
+              <span className={styles.cs}>&quot;default&quot;</span>:{" "}
+              <span className={styles.cs}>&quot;fahrenheit&quot;</span>&#125;
+            </div>
+            <div className={styles.codeLine}>{"            "}&#125;,</div>
+            <div className={styles.codeLine}>
+              {"            "}
+              <span className={styles.cs}>&quot;required&quot;</span>: [
+              <span className={styles.cs}>&quot;location&quot;</span>]
+            </div>
+            <div className={styles.codeLine}>{"        "}&#125;,</div>
+            <div className={styles.codeLine}>{"    "}),</div>
+            <div className={styles.codeLine}>]</div>
+            <div className={styles.codeLine} />
+            <div className={styles.codeLine}>
+              chat = client.chat.<span className={styles.fn}>create</span>(model=
+              <span className={styles.cs}>&quot;grok-4.5&quot;</span>, tools=tools)
+            </div>
+            <div className={styles.codeLine}>
+              chat.<span className={styles.fn}>append</span>(<span className={styles.fn}>user</span>
+              (
+              <span className={styles.cs}>
+                &quot;What is the temperature in San Francisco?&quot;
+              </span>
+              ))
+            </div>
+            <div className={styles.codeLine}>
+              response = chat.<span className={styles.fn}>sample</span>()
+            </div>
+            <div className={styles.codeLine} />
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>if</span> response.tool_calls:
+            </div>
+            <div className={styles.codeLine}>
+              {"    "}chat.<span className={styles.fn}>append</span>(response)
+            </div>
+            <div className={styles.codeLine}>
+              {"    "}
+              <span className={styles.ck}>for</span> tc <span className={styles.ck}>in</span>{" "}
+              response.tool_calls:
+            </div>
+            <div className={styles.codeLine}>
+              {"        "}args = json.<span className={styles.fn}>loads</span>
+              (tc.function.arguments)
+            </div>
+            <div className={styles.codeLine}>
+              {"        "}result = &#123;<span className={styles.cs}>&quot;location&quot;</span>:
+              args[<span className={styles.cs}>&quot;location&quot;</span>],{" "}
+              <span className={styles.cs}>&quot;temperature&quot;</span>:{" "}
+              <span className={styles.cv}>59</span>,{" "}
+              <span className={styles.cs}>&quot;unit&quot;</span>: args.
+              <span className={styles.fn}>get</span>(
+              <span className={styles.cs}>&quot;unit&quot;</span>,{" "}
+              <span className={styles.cs}>&quot;fahrenheit&quot;</span>)&#125;
+            </div>
+            <div className={styles.codeLine}>
+              {"        "}chat.<span className={styles.fn}>append</span>(
+              <span className={styles.fn}>tool_result</span>(json.
+              <span className={styles.fn}>dumps</span>(result)))
+            </div>
+            <div className={styles.codeLine}>
+              {"    "}response = chat.<span className={styles.fn}>sample</span>()
+            </div>
+            <div className={styles.codeLine} />
+            <div className={styles.codeLine}>
+              <span className={styles.fn}>print</span>(response.content)
+            </div>
           </pre>
 
           <h3>5.3 ツール選択の制御（tool_choice）</h3>
@@ -906,39 +1097,111 @@ export default function GrokBestPracticesPage() {
           <h3>6.4 実装例：請求書（Invoice）データの抽出</h3>
           <div className={styles.codeLabel}>python</div>
           <pre className={styles.codeBlockPre}>
-            <code>
-              import os{"\n"}
-              from datetime import date{"\n"}
-              from enum import Enum{"\n"}
-              from pydantic import BaseModel, Field{"\n"}
-              from xai_sdk import Client{"\n"}
-              from xai_sdk.chat import system, user{"\n\n"}
-              class Currency(str, Enum):{"\n"}
-              {"    "}USD = &quot;USD&quot;{"\n"}
-              {"    "}EUR = &quot;EUR&quot;{"\n"}
-              {"    "}GBP = &quot;GBP&quot;{"\n\n"}
-              class LineItem(BaseModel):{"\n"}
-              {"    "}description: str = Field(description=&quot;Description of the item or
-              service&quot;){"\n"}
-              {"    "}quantity: int = Field(description=&quot;Number of units&quot;, ge=1){"\n"}
-              {"    "}unit_price: float = Field(description=&quot;Price per unit&quot;, ge=0)
-              {"\n\n"}
-              class Invoice(BaseModel):{"\n"}
-              {"    "}vendor_name: str{"\n"}
-              {"    "}invoice_number: str{"\n"}
-              {"    "}invoice_date: date{"\n"}
-              {"    "}line_items: list[LineItem]{"\n"}
-              {"    "}total_amount: float = Field(ge=0){"\n"}
-              {"    "}currency: Currency{"\n\n"}
-              client = Client(api_key=os.getenv(&quot;XAI_API_KEY&quot;)){"\n"}
-              chat = client.chat.create(model=&quot;grok-4.5&quot;){"\n"}
-              chat.append(system(&quot;Given a raw invoice, extract the invoice data into JSON
-              format.&quot;)){"\n"}
-              chat.append(user(&quot;Vendor: Acme Corp | Invoice: INV-1042 | Date: 2026-07-01 |
-              Service: Consulting, 8 hours at $10.00 | Total: $80.00 USD&quot;)){"\n\n"}
-              response, invoice = chat.parse(Invoice){"\n"}
-              print(invoice.vendor_name, invoice.total_amount, invoice.currency)
-            </code>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>import</span> os
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>from</span> datetime{" "}
+              <span className={styles.ck}>import</span> date
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>from</span> enum <span className={styles.ck}>import</span>{" "}
+              Enum
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>from</span> pydantic{" "}
+              <span className={styles.ck}>import</span> BaseModel, Field
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>from</span> xai_sdk{" "}
+              <span className={styles.ck}>import</span> Client
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>from</span> xai_sdk.chat{" "}
+              <span className={styles.ck}>import</span> system, user
+            </div>
+            <div className={styles.codeLine} />
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>class</span> <span className={styles.ce}>Currency</span>
+              (str, Enum):
+            </div>
+            <div className={styles.codeLine}>
+              {"    "}USD = <span className={styles.cs}>&quot;USD&quot;</span>
+            </div>
+            <div className={styles.codeLine}>
+              {"    "}EUR = <span className={styles.cs}>&quot;EUR&quot;</span>
+            </div>
+            <div className={styles.codeLine}>
+              {"    "}GBP = <span className={styles.cs}>&quot;GBP&quot;</span>
+            </div>
+            <div className={styles.codeLine} />
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>class</span> <span className={styles.ce}>LineItem</span>
+              (BaseModel):
+            </div>
+            <div className={styles.codeLine}>
+              {"    "}description: str = <span className={styles.fn}>Field</span>(description=
+              <span className={styles.cs}>&quot;Description of the item or service&quot;</span>)
+            </div>
+            <div className={styles.codeLine}>
+              {"    "}quantity: int = <span className={styles.fn}>Field</span>(description=
+              <span className={styles.cs}>&quot;Number of units&quot;</span>, ge=
+              <span className={styles.cv}>1</span>)
+            </div>
+            <div className={styles.codeLine}>
+              {"    "}unit_price: float = <span className={styles.fn}>Field</span>(description=
+              <span className={styles.cs}>&quot;Price per unit&quot;</span>, ge=
+              <span className={styles.cv}>0</span>)
+            </div>
+            <div className={styles.codeLine} />
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>class</span> <span className={styles.ce}>Invoice</span>
+              (BaseModel):
+            </div>
+            <div className={styles.codeLine}>{"    "}vendor_name: str</div>
+            <div className={styles.codeLine}>{"    "}invoice_number: str</div>
+            <div className={styles.codeLine}>{"    "}invoice_date: date</div>
+            <div className={styles.codeLine}>{"    "}line_items: list[LineItem]</div>
+            <div className={styles.codeLine}>
+              {"    "}total_amount: float = <span className={styles.fn}>Field</span>(ge=
+              <span className={styles.cv}>0</span>)
+            </div>
+            <div className={styles.codeLine}>{"    "}currency: Currency</div>
+            <div className={styles.codeLine} />
+            <div className={styles.codeLine}>
+              client = <span className={styles.fn}>Client</span>(api_key=os.
+              <span className={styles.fn}>getenv</span>(
+              <span className={styles.cs}>&quot;XAI_API_KEY&quot;</span>))
+            </div>
+            <div className={styles.codeLine}>
+              chat = client.chat.<span className={styles.fn}>create</span>(model=
+              <span className={styles.cs}>&quot;grok-4.5&quot;</span>)
+            </div>
+            <div className={styles.codeLine}>
+              chat.<span className={styles.fn}>append</span>(
+              <span className={styles.fn}>system</span>(
+              <span className={styles.cs}>
+                &quot;Given a raw invoice, extract the invoice data into JSON format.&quot;
+              </span>
+              ))
+            </div>
+            <div className={styles.codeLine}>
+              chat.<span className={styles.fn}>append</span>(<span className={styles.fn}>user</span>
+              (
+              <span className={styles.cs}>
+                &quot;Vendor: Acme Corp | Invoice: INV-1042 | Date: 2026-07-01 | Service:
+                Consulting, 8 hours at $10.00 | Total: $80.00 USD&quot;
+              </span>
+              ))
+            </div>
+            <div className={styles.codeLine} />
+            <div className={styles.codeLine}>
+              response, invoice = chat.<span className={styles.fn}>parse</span>(Invoice)
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.fn}>print</span>(invoice.vendor_name, invoice.total_amount,
+              invoice.currency)
+            </div>
           </pre>
 
           <h3>6.5 ツールと構造化出力の組み合わせ</h3>
@@ -970,13 +1233,25 @@ export default function GrokBestPracticesPage() {
 
           <div className={styles.codeLabel}>python</div>
           <pre className={styles.codeBlockPre}>
-            <code>
-              from xai_sdk.tools import web_search{"\n\n"}
-              chat = client.chat.create({"\n"}
-              {"    "}model=&quot;grok-4.5&quot;,{"\n"}
-              {"    "}tools=[web_search()],{"\n"}){"\n"}
-              chat.append(user(&quot;What is xAI?&quot;))
-            </code>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>from</span> xai_sdk.tools{" "}
+              <span className={styles.ck}>import</span> web_search
+            </div>
+            <div className={styles.codeLine} />
+            <div className={styles.codeLine}>
+              chat = client.chat.<span className={styles.fn}>create</span>(
+            </div>
+            <div className={styles.codeLine}>
+              {"    "}model=<span className={styles.cs}>&quot;grok-4.5&quot;</span>,
+            </div>
+            <div className={styles.codeLine}>
+              {"    "}tools=[<span className={styles.fn}>web_search</span>()],
+            </div>
+            <div className={styles.codeLine}>)</div>
+            <div className={styles.codeLine}>
+              chat.<span className={styles.fn}>append</span>(<span className={styles.fn}>user</span>
+              (<span className={styles.cs}>&quot;What is xAI?&quot;</span>))
+            </div>
           </pre>
 
           <h3>7.1 主なパラメータ</h3>
@@ -1157,17 +1432,43 @@ export default function GrokBestPracticesPage() {
           <h3>9.2 実装パターン（エージェントループ内で N ターンごとに圧縮）</h3>
           <div className={styles.codeLabel}>python</div>
           <pre className={styles.codeBlockPre}>
-            <code>
-              compact_every = 5{"\n"}
-              for turn in range(1, 100):{"\n"}
-              {"    "}chat.append(user(input(&quot;You: &quot;))){"\n"}
-              {"    "}response = chat.sample(){"\n"}
-              {"    "}chat.append(response){"\n\n"}
-              {"    "}if turn % compact_every == 0:{"\n"}
-              {"        "}compact = chat.compact(){"\n"}
-              {"        "}print(f&quot;dropped &#123;compact.dropped_message_count&#125; messages,
-              tokens used: &#123;compact.usage.total_tokens&#125;&quot;)
-            </code>
+            <div className={styles.codeLine}>
+              compact_every = <span className={styles.cv}>5</span>
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>for</span> turn <span className={styles.ck}>in</span>{" "}
+              <span className={styles.fn}>range</span>(<span className={styles.cv}>1</span>,{" "}
+              <span className={styles.cv}>100</span>):
+            </div>
+            <div className={styles.codeLine}>
+              {"    "}chat.<span className={styles.fn}>append</span>(
+              <span className={styles.fn}>user</span>(<span className={styles.fn}>input</span>(
+              <span className={styles.cs}>&quot;You: &quot;</span>)))
+            </div>
+            <div className={styles.codeLine}>
+              {"    "}response = chat.<span className={styles.fn}>sample</span>()
+            </div>
+            <div className={styles.codeLine}>
+              {"    "}chat.<span className={styles.fn}>append</span>(response)
+            </div>
+            <div className={styles.codeLine} />
+            <div className={styles.codeLine}>
+              {"    "}
+              <span className={styles.ck}>if</span> turn % compact_every =={" "}
+              <span className={styles.cv}>0</span>:
+            </div>
+            <div className={styles.codeLine}>
+              {"        "}compact = chat.<span className={styles.fn}>compact</span>()
+            </div>
+            <div className={styles.codeLine}>
+              {"        "}
+              <span className={styles.fn}>print</span>(f
+              <span className={styles.cs}>
+                &quot;dropped &#123;compact.dropped_message_count&#125; messages, tokens used:
+                &#123;compact.usage.total_tokens&#125;&quot;
+              </span>
+              )
+            </div>
           </pre>
 
           <h3>9.3 制約と注意点</h3>
@@ -1292,22 +1593,58 @@ export default function GrokBestPracticesPage() {
           <h3>10.3 429エラーへの対処（指数バックオフ）</h3>
           <div className={styles.codeLabel}>python</div>
           <pre className={styles.codeBlockPre}>
-            <code>
-              import os{"\n"}
-              import time{"\n"}
-              from openai import OpenAI, RateLimitError{"\n\n"}
-              client = OpenAI(base_url=&quot;https://api.x.ai/v1&quot;,
-              api_key=os.getenv(&quot;XAI_API_KEY&quot;)){"\n\n"}
-              def request_with_backoff(messages, max_retries=5):{"\n"}
-              {"    "}for attempt in range(max_retries):{"\n"}
-              {"        "}try:{"\n"}
-              {"            "}return client.chat.completions.create(model=&quot;grok-4.5&quot;,
-              messages=messages){"\n"}
-              {"        "}except RateLimitError:{"\n"}
-              {"            "}wait = 2 ** attempt{"\n"}
-              {"            "}time.sleep(wait){"\n"}
-              {"    "}raise
-            </code>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>import</span> os
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>import</span> time
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>from</span> openai{" "}
+              <span className={styles.ck}>import</span> OpenAI, RateLimitError
+            </div>
+            <div className={styles.codeLine} />
+            <div className={styles.codeLine}>
+              client = <span className={styles.fn}>OpenAI</span>(base_url=
+              <span className={styles.cs}>&quot;https://api.x.ai/v1&quot;</span>, api_key=os.
+              <span className={styles.fn}>getenv</span>(
+              <span className={styles.cs}>&quot;XAI_API_KEY&quot;</span>))
+            </div>
+            <div className={styles.codeLine} />
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>def</span>{" "}
+              <span className={styles.fn}>request_with_backoff</span>(messages, max_retries=
+              <span className={styles.cv}>5</span>):
+            </div>
+            <div className={styles.codeLine}>
+              {"    "}
+              <span className={styles.ck}>for</span> attempt <span className={styles.ck}>in</span>{" "}
+              <span className={styles.fn}>range</span>(max_retries):
+            </div>
+            <div className={styles.codeLine}>
+              {"        "}
+              <span className={styles.ck}>try</span>:
+            </div>
+            <div className={styles.codeLine}>
+              {"            "}
+              <span className={styles.ck}>return</span> client.chat.completions.
+              <span className={styles.fn}>create</span>(model=
+              <span className={styles.cs}>&quot;grok-4.5&quot;</span>, messages=messages)
+            </div>
+            <div className={styles.codeLine}>
+              {"        "}
+              <span className={styles.ck}>except</span> RateLimitError:
+            </div>
+            <div className={styles.codeLine}>
+              {"            "}wait = <span className={styles.cv}>2</span> ** attempt
+            </div>
+            <div className={styles.codeLine}>
+              {"            "}time.<span className={styles.fn}>sleep</span>(wait)
+            </div>
+            <div className={styles.codeLine}>
+              {"    "}
+              <span className={styles.ck}>raise</span>
+            </div>
           </pre>
 
           <h3>10.4 エラーハンドリングのフロー</h3>
@@ -1649,17 +1986,34 @@ export default function GrokBestPracticesPage() {
           <h3>13.2 システムプロンプトの実例</h3>
           <div className={styles.codeLabel}>system prompt</div>
           <pre className={styles.codeBlockPre}>
-            <code>
-              You are a senior backend engineer with access to web search and code execution tools.
-              {"\n"}
-              When solving problems:{"\n"}
-              1. State your reasoning plan before taking any action{"\n"}
-              2. Use search to verify external facts, library versions, or API specs before assuming
-              {"\n"}
-              3. Execute and test code, don&apos;t just write it{"\n"}
-              4. If a test fails, diagnose and fix before moving on{"\n"}
-              5. Rate your final output 1-10 and flag any remaining uncertainties
-            </code>
+            <div className={styles.codeLine}>
+              <span className={styles.cs}>
+                You are a senior backend engineer with access to web search and code execution
+                tools.
+              </span>
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ch}>When solving problems:</span>
+            </div>
+            <div className={styles.codeLine}>
+              1. <span className={styles.ck}>State your reasoning plan</span> before taking any
+              action
+            </div>
+            <div className={styles.codeLine}>
+              2. <span className={styles.ck}>Use search to verify</span> external facts, library
+              versions, or API specs before assuming
+            </div>
+            <div className={styles.codeLine}>
+              3. <span className={styles.ck}>Execute and test code</span>, don&apos;t just write it
+            </div>
+            <div className={styles.codeLine}>
+              4. <span className={styles.ck}>If a test fails</span>, diagnose and fix before moving
+              on
+            </div>
+            <div className={styles.codeLine}>
+              5. <span className={styles.ck}>Rate your final output 1-10</span> and flag any
+              remaining uncertainties
+            </div>
           </pre>
           <p>
             このようにシステムプロンプトで「思考の型」を明示することで、モデルが根拠のないAPIエンドポイントを想定してしまう、といった典型的な失敗を減らせます。

@@ -287,7 +287,7 @@
   overflow-x: auto;
   font-family: var(--font-mono), "SF Mono", Consolas, monospace;
   font-size: 13.5px;
-  line-height: 1.6;
+  line-height: 1.65;
   color: var(--color-text-primary);
   margin-bottom: 20px;
 }
@@ -295,6 +295,48 @@
 .codeBlockPre code {
   font-family: var(--font-mono), "SF Mono", Consolas, monospace;
 }
+
+.codeLine {
+  font-family: var(--font-mono), "SF Mono", Consolas, monospace;
+  white-space: pre;
+}
+
+/* Code Highlighting Classes */
+.ck {
+  color: #ff7b72;
+  font-weight: 500;
+} /* Keyword / Red */
+.cs {
+  color: #a5d6ff;
+} /* String / Light Blue */
+.cv {
+  color: #79c0ff;
+} /* Value / Blue */
+.cm {
+  color: #7ee787;
+  font-weight: 600;
+} /* Marker / Green bold */
+.cw {
+  color: #d29922;
+  font-weight: 600;
+} /* Warning / Yellow */
+.ce {
+  color: #bc8cff;
+} /* Enum / Special / Purple */
+.cc {
+  color: #8b949e;
+  font-style: italic;
+} /* Comment / Muted Gray */
+.cg {
+  color: #3fb950;
+} /* Success / Green */
+.ch {
+  color: #f0883e;
+  font-weight: 700;
+} /* Heading / Orange bold */
+.fn {
+  color: #d2a8ff;
+} /* Function name / Purple */
 
 .docSection table {
   width: 100%;
