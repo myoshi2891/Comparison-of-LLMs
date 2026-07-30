@@ -331,12 +331,12 @@ export default function DeepSeekLlmPage() {
           </div>
 
           <div className={`${styles.callout} ${styles.calloutWarn}`}>
-            <div className={styles.calloutTitle}>⚠️ 旧モデル名廃止の予告（2026年7月24日）</div>
+            <div className={styles.calloutTitle}>⚠️ 旧モデル名提供終了（2026年7月24日廃止済み）</div>
             <p>
               旧モデルエイリアスである <code className={styles.inlineCode}>deepseek-chat</code>
               （DeepSeek-V3実体）および <code className={styles.inlineCode}>deepseek-reasoner</code>
-              （DeepSeek-R1実体）は、<strong>2026年7月24日に完全廃止</strong>
-              されます。新規開発では必ず{" "}
+              （DeepSeek-R1実体）は、<strong>2026年7月24日をもって提供終了（完全廃止）</strong>
+              となりました。現在は利用できません。新規開発では必ず{" "}
               <code className={styles.inlineCode}>deepseek-v4-flash</code> または{" "}
               <code className={styles.inlineCode}>deepseek-v4-pro</code> を指定してください。
             </p>
@@ -411,6 +411,9 @@ export default function DeepSeekLlmPage() {
             </div>
             <div className={styles.codeBody}>
               <div className={styles.codeLine}>
+                <span className={styles.ck}>import</span> os
+              </div>
+              <div className={styles.codeLine}>
                 <span className={styles.ck}>from</span> openai{" "}
                 <span className={styles.ck}>import</span> OpenAI
               </div>
@@ -419,7 +422,7 @@ export default function DeepSeekLlmPage() {
                 client = <span className={styles.fn}>OpenAI</span>(
               </div>
               <div className={styles.codeLine}>
-                {"  "}api_key=<span className={styles.cs}>"your_deepseek_api_key"</span>,
+                {"  "}api_key=os.environ[<span className={styles.cs}>"DEEPSEEK_API_KEY"</span>],
               </div>
               <div className={styles.codeLine}>
                 {"  "}base_url=<span className={styles.cs}>"https://api.deepseek.com"</span>
@@ -809,20 +812,76 @@ export default function DeepSeekLlmPage() {
               <div className={styles.codeLine}>]</div>
               <div className={styles.codeLine}></div>
               <div className={styles.codeLine}>
+                messages = [{"{"}
+                <span className={styles.cs}>"role"</span>: <span className={styles.cs}>"user"</span>
+                , <span className={styles.cs}>"content"</span>:{" "}
+                <span className={styles.cs}>"杭州の天気は？"</span>
+                {"}"}]
+              </div>
+              <div className={styles.codeLine}>
                 response = client.chat.completions.<span className={styles.fn}>create</span>(
               </div>
               <div className={styles.codeLine}>
                 {"  "}model=<span className={styles.cs}>"deepseek-v4-pro"</span>,
               </div>
-              <div className={styles.codeLine}>
-                {"  "}messages=[{"{"}
-                <span className={styles.cs}>"role"</span>: <span className={styles.cs}>"user"</span>
-                , <span className={styles.cs}>"content"</span>:{" "}
-                <span className={styles.cs}>"杭州の天気は？"</span>
-                {"}"}],
-              </div>
+              <div className={styles.codeLine}>{"  "}messages=messages,</div>
               <div className={styles.codeLine}>{"  "}tools=tools</div>
               <div className={styles.codeLine}>)</div>
+              <div className={styles.codeLine}></div>
+              <div className={styles.codeLine}>
+                msg = response.choices[<span className={styles.cv}>0</span>].message
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.ck}>if</span> msg.tool_calls:
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}messages.append(msg)
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}<span className={styles.ck}>for</span> tool_call{" "}
+                <span className={styles.ck}>in</span> msg.tool_calls:
+              </div>
+              <div className={styles.codeLine}>
+                {"    "}<span className={styles.ck}>if</span> tool_call.function.name =={" "}
+                <span className={styles.cs}>"get_weather"</span>:
+              </div>
+              <div className={styles.codeLine}>
+                {"      "}result = <span className={styles.fn}>get_weather</span>(location=<span className={styles.cs}>"杭州"</span>)
+              </div>
+              <div className={styles.codeLine}>
+                {"      "}messages.append({"{"}
+              </div>
+              <div className={styles.codeLine}>
+                {"        "}<span className={styles.cs}>"role"</span>: <span className={styles.cs}>"tool"</span>,
+              </div>
+              <div className={styles.codeLine}>
+                {"        "}<span className={styles.cs}>"tool_call_id"</span>: tool_call.id,
+              </div>
+              <div className={styles.codeLine}>
+                {"        "}<span className={styles.cs}>"content"</span>: result
+              </div>
+              <div className={styles.codeLine}>
+                {"      "}{"}"})
+              </div>
+              <div className={styles.codeLine}></div>
+              <div className={styles.codeLine}>
+                {"  "}final_resp = client.chat.completions.<span className={styles.fn}>create</span>(
+              </div>
+              <div className={styles.codeLine}>
+                {"    "}model=<span className={styles.cs}>"deepseek-v4-pro"</span>,
+              </div>
+              <div className={styles.codeLine}>
+                {"    "}messages=messages,
+              </div>
+              <div className={styles.codeLine}>
+                {"    "}tools=tools
+              </div>
+              <div className={styles.codeLine}>
+                {"  "})
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}<span className={styles.fn}>print</span>(final_resp.choices[<span className={styles.cv}>0</span>].message.content)
+              </div>
             </div>
           </div>
         </section>
