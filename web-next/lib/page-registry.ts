@@ -301,15 +301,15 @@ const entries: PageEntry[] = [
   },
   {
     slug: "/codex/agent",
-    title: "Agent",
+    title: "OpenAI Codex サブエージェント開発ガイド",
     group: "Providers",
     category: "Codex",
     provider: "codex",
-    topics: ["agent"],
+    topics: ["agent", "codex", "multiagent"],
     summary:
-      "OpenAI Codex CLI (v0.142.4, 2026-06-29 最新版) および Agents SDK を使ったサブエージェント / マルチエージェント開発で必要な AGENTS.md・AGENTS.override.md・SKILL.md・config.toml の役割と書き方を体系化したガイド。初学者向け 7 ステップ入門から PM 駆動 SDD パターンまで網羅。GPT-5.5 / GPT-5-Codex 対応、Codex Remote GA。",
+      "AGENTS.md・AGENTS.override.md・SKILL.md・config.toml・requirements.toml で構築するマルチエージェントワークフローの完全ガイド。",
     addedAt: "2026-04-26",
-    lastReviewed: "2026-07-01",
+    lastReviewed: "2026-07-30",
   },
   {
     slug: "/codex/harness-engineering",
