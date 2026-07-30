@@ -189,29 +189,46 @@ AGENTS.mdが肥大化してきたら、本体は簡潔に保ち、計画・レ�
 
 ### 設定レイヤーの重なり方と優先順位
 
-設定の解釈優先順位は、最高優先度のMDM設定から順に適用され、最後に管理者適用制限で上書き・検証されます。
+設定は**デフォルト値の階層構造（Managed Defaults）**と、それらを絶対に上書き・制限する**管理者制約（Administration Constraints）**の2軸で整理されます。
+
+#### 1. 設定デフォルト階層 (Managed Defaults)
+
+下位のデフォルト値が上位の設定によって上書きされる基本の適用順序です。CLIの `-c` 引数やオプションは実行時の一時的な個別設定として適用され、管理者の制約を迂回するものではありません。なお、リポジトリ固有の `.codex/config.toml` は信頼済みプロジェクト（trusted project）でのみ自動的に読み込まれます。
 
 ```mermaid
 flowchart TD
-    MDM["1. MDM settings (最高優先度)"] --> SYS_MNG["2. System-managed settings<br/>(managed_config.toml / requirements.toml)"]
-    SYS_MNG --> CLI["3. CLI & -c overrides"]
-    CLI --> USER["4. User settings (~/.codex/config.toml)"]
-    USER --> SYS["5. System settings"]
-    SYS --> DEF["6. Built-in defaults (既定値)"]
-    DEF --> ADMIN["管理者適用制限 (最終適用・制約の確立)"]
+    MDM["1. MDM settings (組織・端末プロファイル)"] --> MNG["2. managed_config.toml (管理者提供デフォルト)"]
+    MNG --> USER["3. ~/.codex/config.toml (ユーザー個人設定)"]
+    USER --> PROJ["4. .codex/config.toml (信頼済みプロジェクト設定)"]
+    PROJ --> SYS["5. System settings (/etc/codex/config.toml 等)"]
+    SYS --> DEF["6. Built-in defaults (組み込み既定値)"]
 ```
 
 | レイヤー | 場所 | 備考 |
 |---|---|---|
-| MDM設定 | MDMプロファイル | 組織・端末レベルの最優先ポリシー |
-| システム管理設定 | `managed_config.toml` / `requirements.toml` | システム管理者が適用する共通設定 |
-| CLI & -c 上書き | コマンドライン引数 (`--sandbox`, `-c` 等) | 実行時の一時的オーバーライド |
+| MDM設定 | MDMプロファイル | 端末・組織レベルの最優先ポリシー |
+| 管理者デフォルト | `managed_config.toml` | 管理者が全ユーザーに配布する共通デフォルト値 |
 | ユーザー設定 | `~/.codex/config.toml` | 個人の既定値(モデル・推論レベル・スレッド制限等) |
-| システム設定 | `/etc/codex/config.toml` 等 | OS/システムレベルの既定値 |
-| 組み込み既定値 | Codex内蔵デフォルト | 設定未指定時のデフォルト動作 |
-| スレッド上限キー | `agents.max_concurrent_threads_per_session` | 現行キー。`agents.max_threads` はレガシー別名。※`agents.max_depth` はV1でのみ有効でV2では無視 |
+| プロジェクト設定 | `.codex/config.toml` | **信頼済みプロジェクト**でのみ自動的に読み込まれるリポジトリ設定 |
+| システム設定 | `/etc/codex/config.toml` 等 | OS/システムレベルの標準設定 |
+| 組み込み既定値 | Codex内蔵デフォルト | 設定未指定時の既定動作 |
 
-公式のおすすめパターンは、**個人の既定値は `~/.codex/config.toml`、リポジトリ固有の挙動は `.codex/config.toml`、一時的な変更のみコマンドライン引数で**、というシンプルな役割分担です。
+#### 2. 最高優先度の管理者制約 (Administration Constraints)
+
+管理者が強制適用するセキュリティ制約や利用上限は、上記のデフォルト設定階層とは独立した最高優先度のレイヤーとして検証・適用されます。
+
+```mermaid
+flowchart TD
+    REQ["requirements.toml (最高優先度の管理者制約)"] --> EVAL["設定値・実行制限の検証・強制適用"]
+    EVAL --> EXEC["Codex実行コンテキスト"]
+```
+
+| 制約ファイル | 役割・適用規則 |
+|---|---|
+| `requirements.toml` | **最高優先度の不可逆な管理者制約**。ユーザー設定やCLI引数の如何に関わらず、セキュリティ方針や制限を強制適用します。 |
+| スレッド上限キー | `agents.max_concurrent_threads_per_session` が現行キー。`agents.max_threads` はレガシー別名。※`agents.max_depth` はV1でのみ有効 |
+
+公式のおすすめパターンは、**個人の既定値は `~/.codex/config.toml`、信頼済みリポジトリ固有の挙動は `.codex/config.toml`、一時的な変更のみコマンドライン引数で**、というシンプルな役割分担です。
 
 ### サンドボックスと承認ポリシー
 
@@ -294,7 +311,7 @@ Codex Appでは差分パネルで変更をその場でレビューでき、行�
 - プロンプトに情報を貼り付け続けるのではなく、Codexにツールを使わせたい
 - 複数ユーザー・複数プロジェクトで再利用できる連携にしたい
 
-MCPの依存関係は `agents/openai.yaml` に宣言することを推奨します（Codexがサーバーの自動インストール・自動構成・自動接続を行うわけではないため、依存関係の明示的宣言として活用します）。
+MCPサーバーの直接設定はサブエージェント設定ファイル内の `[mcp_servers.<name>]` ブロックで行います。`agents/openai.yaml` はSkillやツールの依存関係宣言に限定して使用し、一般的なMCPサーバーの設定場所として使用しない点に注意してください。
 
 CodexはSTDIOサーバーとOAuth対応のStreamable HTTPサーバーの両方をサポートしています。Codex Appでは「Settings → MCP servers」から候補のサーバーを見つけて接続でき、CLIでは `codex mcp add` で名前・URLなどを指定して追加できます。
 
