@@ -189,33 +189,49 @@ AGENTS.mdが肥大化してきたら、本体は簡潔に保ち、計画・レ�
 
 ### 設定レイヤーの重なり方と優先順位
 
-設定は**デフォルト値の階層構造（Managed Defaults）**と、それらを絶対に上書き・制限する**管理者制約（Administration Constraints）**の2軸で整理されます。
+設定は**通常の設定解決（Standard Configuration Resolution）**、**管理者提供デフォルト（Managed Defaults）**、および最高優先度の**管理者制約（Administration Constraints）**に分離して整理されます。
 
-#### 1. 設定デフォルト階層 (Managed Defaults)
+#### 1. 通常の設定解決 (Standard Configuration Resolution)
 
-優先度の高い設定層が下位の既定値を順に上書きする基本の適用順序です。フローの矢印（`-->`）は**優先度の低下（より上位の設定層が後続の下位レイヤーの既定値を上書きする優先順位）**を示しています。CLIの `-c` 引数やオプションは実行時の一時的な個別設定として最優先で適用され、管理者の制約を迂回するものではありません。なお、リポジトリ固有の `.codex/config.toml` は信頼済みプロジェクト（trusted project）でのみ自動的に読み込まれ、ユーザー設定よりも上位の優先度として適用されます。
+通常の設定ファイルおよび実行時オプションの適用優先順位です。CLI の `-c` / `--config` 引数や個別フラグが最優先され、信頼済みプロジェクト設定、プロファイル設定、ユーザー設定、システム設定、組み込みデフォルトの順で上書き解決されます。
 
 ```mermaid
 flowchart TD
-    MDM["1. MDM settings (組織・端末プロファイル)"] --> MNG["2. managed_config.toml (管理者提供デフォルト)"]
-    MNG --> PROJ["3. .codex/config.toml (信頼済みプロジェクト設定)"]
-    PROJ --> USER["4. ~/.codex/config.toml (ユーザー個人設定)"]
+    CLI["1. CLI flags / --config (実行時一時設定)"] --> PROJ["2. .codex/config.toml (信頼済みプロジェクト設定)"]
+    PROJ --> PROF["3. Profile settings (アクティブプロファイル)"]
+    PROF --> USER["4. ~/.codex/config.toml (ユーザー個人設定)"]
     USER --> SYS["5. System settings (/etc/codex/config.toml 等)"]
     SYS --> DEF["6. Built-in defaults (組み込み既定値)"]
 ```
 
 | レイヤー | 場所 | 備考 |
 |---|---|---|
-| MDM設定 | MDMプロファイル | 端末・組織レベルの最優先ポリシー |
-| 管理者デフォルト | `managed_config.toml` | 管理者が全ユーザーに配布する共通デフォルト値 |
-| プロジェクト設定 | `.codex/config.toml` | **信頼済みプロジェクト**でのみ自動的に読み込まれるリポジトリ設定（ユーザー設定を上書き） |
+| CLI引数 | `-c` / `--config` / 各種フラグ | 実行時の一時的な最優先指定 |
+| プロジェクト設定 | `.codex/config.toml` | **信頼済みプロジェクト**でのみ自動的に読み込まれるリポジトリ設定 |
+| プロファイル設定 | アクティブプロファイル指定 | 設定プロファイルによる一括構成 |
 | ユーザー設定 | `~/.codex/config.toml` | 個人の既定値(モデル・推論レベル・スレッド制限等) |
 | システム設定 | `/etc/codex/config.toml` 等 | OS/システムレベルの標準設定 |
 | 組み込み既定値 | Codex内蔵デフォルト | 設定未指定時の既定動作 |
 
-#### 2. 最高優先度の管理者制約 (Administration Constraints)
+#### 2. 管理者提供デフォルト (Managed Defaults)
 
-管理者が強制適用するセキュリティ制約や利用上限は、上記のデフォルト設定階層とは独立した最高優先度のレイヤーとして検証・適用されます。
+組織や端末の管理者がユーザー環境に対して提供するデフォルト構成の優先階層です。MDMプロファイルおよび `managed_config.toml` は、ユーザーのベース設定や CLI の `--config` よりも優先して適用される関係にあります。
+
+```mermaid
+flowchart TD
+    MDM["1. MDM settings (組織・端末プロファイル)"] --> MNG["2. managed_config.toml (管理者提供デフォルト)"]
+    MNG --> BASE["3. User base config / CLI options (ユーザー・CLI設定)"]
+```
+
+| レイヤー | 場所 | 備考 |
+|---|---|---|
+| MDM設定 | MDMプロファイル | 端末・組織レベルの最優先ポリシー |
+| 管理者デフォルト | `managed_config.toml` | **CLI の `--config` やユーザー設定よりも優先**して適用される管理者配布既定値 |
+| ユーザーベース設定 | `~/.codex/config.toml` / CLI | ユーザー環境およびCLIによる基本設定 |
+
+#### 3. 最高優先度の管理者制約 (Administration Constraints)
+
+管理者が強制適用するセキュリティ制約や利用上限は、上記のデフォルト階層および設定解決とは独立した最高優先度のレイヤーとして検証・適用されます。
 
 ```mermaid
 flowchart TD
@@ -228,7 +244,7 @@ flowchart TD
 | `requirements.toml` | **最高優先度の不可逆な管理者制約**。ユーザー設定やCLI引数の如何に関わらず、セキュリティ方針や制限を強制適用します。 |
 | スレッド上限キー | `agents.max_concurrent_threads_per_session` が現行キー。`agents.max_threads` はレガシー別名。※`agents.max_depth` はV1でのみ有効 |
 
-公式のおすすめパターンは、**個人の既定値は `~/.codex/config.toml`、信頼済みリポジトリ固有の挙動は `.codex/config.toml`（ユーザー設定を上書き）、一時的な変更のみコマンドライン引数で**、というシンプルな役割分担です。
+公式のおすすめパターンは、**通常の設定解決においては `~/.codex/config.toml` を個人の既定値とし、信頼済みリポジトリ固有の挙動は `.codex/config.toml` で定義しつつ、一時的な変更のみ CLI 引数で行う**という役割分担です。組織レベルで統一・強制する設定については `managed_config.toml` や `requirements.toml` で管理します。
 
 ### サンドボックスと承認ポリシー
 
