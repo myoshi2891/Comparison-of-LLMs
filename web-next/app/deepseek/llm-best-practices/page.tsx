@@ -1,3 +1,10 @@
+/**
+ * DeepSeek LLM ベストプラクティスガイド 2026 (/deepseek/llm-best-practices)
+ *
+ * DeepSeek-V3 / R1 / V4 モデル選定、Thinking Mode、Context Caching、Function Calling、
+ * Anthropic API互換連携を網羅する 100% Faithful 完全忠実移植ページ。
+ */
+
 import type { Metadata } from "next";
 import MermaidDiagram from "@/components/docs/MermaidDiagram";
 import TocObserver from "./TocObserver";
