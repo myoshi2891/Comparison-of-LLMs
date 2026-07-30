@@ -47,7 +47,7 @@ const DIAGRAM_1 = `flowchart TB
         direction TB
         C1["DeepSeek-V4 Preview 公開 (4/24)"]
         C2["deepseek-v4-pro / deepseek-v4-flash 提供開始"]
-        C3["旧モデル名 deepseek-chat/reasoner 廃止予定 (7/24)"]
+        C3["旧モデル名 deepseek-chat/reasoner 廃止済み (7/24)"]
         C1 --> C2 --> C3
     end
 
@@ -226,7 +226,7 @@ export default function DeepSeekLlmPage() {
             </div>
             <div className={styles.metaItem}>
               <span className={styles.metaLabel}>最終更新:</span>
-              <span className={styles.metaVal}>2026年7月16日</span>
+              <span className={styles.metaVal}>2026年7月30日</span>
             </div>
           </div>
         </header>
@@ -742,6 +742,9 @@ export default function DeepSeekLlmPage() {
               <span>tool_calls.py</span>
             </div>
             <div className={styles.codeBody}>
+              <div className={styles.codeLine}>
+                <span className={styles.ck}>import</span> json
+              </div>
               <div className={styles.codeLine}>tools = [</div>
               <div className={styles.codeLine}>
                 {"  "}
@@ -846,7 +849,10 @@ export default function DeepSeekLlmPage() {
                 <span className={styles.cs}>"get_weather"</span>:
               </div>
               <div className={styles.codeLine}>
-                {"      "}result = <span className={styles.fn}>get_weather</span>(location=<span className={styles.cs}>"杭州"</span>)
+                {"      "}args = json.<span className={styles.fn}>loads</span>(tool_call.function.arguments)
+              </div>
+              <div className={styles.codeLine}>
+                {"      "}result = <span className={styles.fn}>get_weather</span>(location=args.<span className={styles.fn}>get</span>(<span className={styles.cs}>"location"</span>))
               </div>
               <div className={styles.codeLine}>
                 {"      "}messages.append({"{"}
@@ -881,6 +887,12 @@ export default function DeepSeekLlmPage() {
               </div>
               <div className={styles.codeLine}>
                 {"  "}<span className={styles.fn}>print</span>(final_resp.choices[<span className={styles.cv}>0</span>].message.content)
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.ck}>else</span>:
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}<span className={styles.fn}>print</span>(msg.content)
               </div>
             </div>
           </div>
@@ -1200,7 +1212,7 @@ export default function DeepSeekLlmPage() {
               [ ] API Base URL が{" "}
               <code className={styles.inlineCode}>https://api.deepseek.com</code> であることを確認
             </li>
-            <li>[ ] 2026年7月24日の完全廃止前にテスト環境で動作検証を完了</li>
+            <li>[ ] 2026年7月24日の完全廃止後に新モデル環境での動作検証を完了</li>
           </ul>
         </section>
 
