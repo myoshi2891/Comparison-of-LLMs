@@ -1,3 +1,4 @@
+
 # Google サンドボックス技術 完全ガイド
 
 ## AIエージェント・API・コンテナ・C/C++・ブラウザ、5領域のベストプラクティスをステップバイステップで理解する
@@ -23,6 +24,7 @@
 ---
 
 <a id="section-1"></a>
+
 ## 1. はじめに:なぜ「サンドボックス」が必要なのか
 
 「サンドボックス(sandbox)」とは、信頼できないコードやデータを、ホストシステム(OS本体・他のプロセス・他の顧客のデータなど)から隔離された領域の中だけで実行させるための仕組みです。子どもが砂場の外に砂をこぼさないのと同じように、「万が一そのコードが悪意を持っていたり、バグを含んでいたりしても、被害が砂場の外に漏れない」ことを保証するのが目的です。
@@ -38,6 +40,7 @@ Googleはこの課題に対して、単一の万能な解決策ではなく、**
 ---
 
 <a id="section-2"></a>
+
 ## 2. 全体マップ:Googleの5つのサンドボックス領域
 
 ```mermaid
@@ -70,6 +73,7 @@ flowchart TB
 ---
 
 <a id="section-3"></a>
+
 ## 3. 領域① AIエージェントのサンドボックス
 
 ### 3-1. なぜAIエージェント専用の隔離が必要か
@@ -117,6 +121,7 @@ Agent Development Kit(ADK)の公式安全設計ドキュメントでも、「コ
 ---
 
 <a id="section-4"></a>
+
 ## 4. 領域② APIのサンドボックス
 
 ### 4-1. Apigeeにおける「サンドボックス環境」の考え方
@@ -145,6 +150,7 @@ flowchart LR
 ---
 
 <a id="section-5"></a>
+
 ## 5. 領域③ コンテナのサンドボックス
 
 ### 5-1. gVisorの基本アーキテクチャ(再掲・詳細版)
@@ -174,6 +180,7 @@ Googleのサーバーレス製品群(App Engine、Cloud Run、Cloud Functions)�
 ---
 
 <a id="section-6"></a>
+
 ## 6. 領域④ C/C++のサンドボックス
 
 ### 6-1. Sandbox2:プログラム全体・一部を隔離する
@@ -234,6 +241,7 @@ Google Developersの公式ページでは、用途別に複数のサンドボッ
 ---
 
 <a id="section-7"></a>
+
 ## 7. 領域⑤ ブラウザのサンドボックス
 
 ### 7-1. Chromeのマルチプロセスアーキテクチャ
@@ -281,6 +289,7 @@ flowchart LR
 ---
 
 <a id="section-8"></a>
+
 ## 8. 意思決定フロー:自分のケースにはどのサンドボックス技術を選ぶべきか
 
 ここまでの5領域を踏まえて、「自分は何を隔離したいのか」から逆引きできる意思決定フローにまとめました。
@@ -301,6 +310,7 @@ flowchart TD
 ---
 
 <a id="section-9"></a>
+
 ## 9. 横断ベストプラクティス早見表
 
 5つの領域を貫く共通原則を、実務でチェックリストとして使える形にまとめました。
@@ -316,11 +326,13 @@ flowchart TD
 ---
 
 <a id="section-10"></a>
+
 ## 10. 参考文献・出典URL
 
 本ガイドの作成にあたり、以下のGoogle公式ドキュメント・Google公式ブログ・著名なセキュリティエンジニア/開発者による技術記事を参照しました。
 
 ### Google公式:サンドボックス技術全般
+
 - Code Sandboxing(Google for Developers、Sandbox2/SAPI/gVisor等の比較表): https://developers.google.com/code-sandboxing
 - Sandbox2 Explained: https://developers.google.com/code-sandboxing/sandbox2/explained
 - Sandboxed API (SAPI) 概要: https://developers.google.com/code-sandboxing/sandboxed-api
@@ -329,6 +341,7 @@ flowchart TD
 - google/sandboxed-api (GitHub): https://github.com/google/sandboxed-api
 
 ### ① AIエージェント
+
 - GKE Sandbox(GKEセキュリティ公式ドキュメント): https://docs.cloud.google.com/kubernetes-engine/docs/concepts/sandbox-pods
 - Isolate AI code execution with Agent Sandbox: https://docs.cloud.google.com/kubernetes-engine/docs/how-to/agent-sandbox
 - Bringing you Agent Sandbox on GKE and Agent Substrate(Google Cloud Blog): https://cloud.google.com/blog/products/containers-kubernetes/bringing-you-agent-sandbox-on-gke-and-agent-substrate
@@ -343,6 +356,7 @@ flowchart TD
 - Deploying Secure AI Agents on GKE(Google Codelabs): https://codelabs.developers.google.com/codelabs/gke/ai-agents-on-gke
 
 ### ② API
+
 - Apigee API Management(製品ページ): https://cloud.google.com/apigee
 - Best practices for securing your applications and APIs using Apigee: https://docs.cloud.google.com/architecture/best-practices-securing-applications-and-apis-using-apigee
 - Advanced API Security best practices(Apigee公式): https://docs.cloud.google.com/apigee/docs/api-security/best-practices
@@ -350,6 +364,7 @@ flowchart TD
 - Top Sandbox Development Environment Best Practices Guide(DigitalAPI): https://www.digitalapi.ai/blogs/what-are-the-best-practices-for-managing-a-sandbox-development-environment
 
 ### ③ コンテナ
+
 - GKE Sandbox(概念ドキュメント): https://docs.cloud.google.com/kubernetes-engine/docs/concepts/sandbox-pods
 - Harden workload isolation with GKE Sandbox(手順ドキュメント): https://docs.cloud.google.com/kubernetes-engine/docs/how-to/sandbox-pods
 - gVisor公式サイト: https://gvisor.dev/
@@ -357,10 +372,12 @@ flowchart TD
 - Improved gVisor file system performance for GKE, Cloud Run, App Engine and Cloud Functions(Google Cloud Blog): https://cloud.google.com/blog/products/containers-kubernetes/gvisor-file-system-improvements-for-gke-and-serverless
 
 ### ④ C/C++
+
 - Sandbox2 Explained: https://developers.google.com/code-sandboxing/sandbox2/explained
 - Sandboxed API README(GitHub): https://github.com/google/sandboxed-api/blob/main/README.md
 
 ### ⑤ ブラウザ
+
 - Site Isolation Design Document(Chromium公式): https://www.chromium.org/developers/design-documents/site-isolation/
 - Secure Architecture(Chromium Security公式): https://www.chromium.org/Home/chromium-security/guts/
 - The V8 Sandbox(V8公式ブログ、Samuel Groß氏): https://v8.dev/blog/sandbox
