@@ -387,7 +387,7 @@ export default function DeepSeekLlmPage() {
             </div>
             <div className={styles.codeBody}>
               <div className={styles.codeLine}>
-                export DEEPSEEK_API_KEY="sk-xxxxxxxxxxxxxxxxxxxxxxxx"
+                <span className={styles.ck}>export</span> DEEPSEEK_API_KEY=<span className={styles.cs}>"sk-xxxxxxxxxxxxxxxxxxxxxxxx"</span>
               </div>
             </div>
           </div>
@@ -419,29 +419,47 @@ export default function DeepSeekLlmPage() {
               <span>first_call.py</span>
             </div>
             <div className={styles.codeBody}>
-              <div className={styles.codeLine}>from openai import OpenAI</div>
-              <div className={styles.codeLine}></div>
-              <div className={styles.codeLine}>client = OpenAI(</div>
-              <div className={styles.codeLine}> api_key="your_deepseek_api_key",</div>
-              <div className={styles.codeLine}> base_url="https://api.deepseek.com"</div>
-              <div className={styles.codeLine}>)</div>
-              <div className={styles.codeLine}></div>
-              <div className={styles.codeLine}>response = client.chat.completions.create(</div>
-              <div className={styles.codeLine}> model="deepseek-v4-flash",</div>
-              <div className={styles.codeLine}> messages=[</div>
               <div className={styles.codeLine}>
-                {' '}
-                {'{'}"role": "system", "content": "あなたは優秀なアシスタントです。"{'}'},
+                <span className={styles.ck}>from</span> openai <span className={styles.ck}>import</span> OpenAI
+              </div>
+              <div className={styles.codeLine}></div>
+              <div className={styles.codeLine}>
+                client = <span className={styles.fn}>OpenAI</span>(
               </div>
               <div className={styles.codeLine}>
-                {' '}
-                {'{'}"role": "user", "content": "DeepSeek APIの特徴を簡潔に教えてください。"{'}'}
+                {"  "}api_key=<span className={styles.cs}>"your_deepseek_api_key"</span>,
               </div>
-              <div className={styles.codeLine}> ],</div>
-              <div className={styles.codeLine}> stream=False</div>
+              <div className={styles.codeLine}>
+                {"  "}base_url=<span className={styles.cs}>"https://api.deepseek.com"</span>
+              </div>
               <div className={styles.codeLine}>)</div>
               <div className={styles.codeLine}></div>
-              <div className={styles.codeLine}>print(response.choices[0].message.content)</div>
+              <div className={styles.codeLine}>
+                response = client.chat.completions.<span className={styles.fn}>create</span>(
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}model=<span className={styles.cs}>"deepseek-v4-flash"</span>,
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}messages=[
+              </div>
+              <div className={styles.codeLine}>
+                {"    "}{'{'}<span className={styles.cs}>"role"</span>: <span className={styles.cs}>"system"</span>, <span className={styles.cs}>"content"</span>: <span className={styles.cs}>"あなたは優秀なアシスタントです。"</span>{'}'},
+              </div>
+              <div className={styles.codeLine}>
+                {"    "}{'{'}<span className={styles.cs}>"role"</span>: <span className={styles.cs}>"user"</span>, <span className={styles.cs}>"content"</span>: <span className={styles.cs}>"DeepSeek APIの特徴を簡潔に教えてください。"</span>{'}'}
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}],
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}stream=<span className={styles.ce}>False</span>
+              </div>
+              <div className={styles.codeLine}>)</div>
+              <div className={styles.codeLine}></div>
+              <div className={styles.codeLine}>
+                <span className={styles.fn}>print</span>(response.choices[<span className={styles.cv}>0</span>].message.content)
+              </div>
             </div>
           </div>
 
@@ -550,29 +568,45 @@ export default function DeepSeekLlmPage() {
             </div>
             <div className={styles.codeBody}>
               <div className={styles.codeLine}>
-                messages = [{'{'}"role": "user", "content": "9.11 と 9.8 はどちらが大きい？"{'}'}]
+                messages = [{"{"}<span className={styles.cs}>"role"</span>: <span className={styles.cs}>"user"</span>, <span className={styles.cs}>"content"</span>: <span className={styles.cs}>"9.11 と 9.8 はどちらが大きい？"</span>{"}"}]
               </div>
               <div className={styles.codeLine}></div>
-              <div className={styles.codeLine}>response = client.chat.completions.create(</div>
-              <div className={styles.codeLine}> model="deepseek-v4-pro",</div>
-              <div className={styles.codeLine}> messages=messages,</div>
-              <div className={styles.codeLine}> reasoning_effort="high",</div>
               <div className={styles.codeLine}>
-                {' '}
-                extra_body={'{'}"thinking": {'{'}"type": "enabled"{'}'}
-                {'}'}
+                response = client.chat.completions.<span className={styles.fn}>create</span>(
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}model=<span className={styles.cs}>"deepseek-v4-pro"</span>,
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}messages=messages,
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}reasoning_effort=<span className={styles.cs}>"high"</span>,
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}extra_body={"{"}<span className={styles.cs}>"thinking"</span>: {"{"}<span className={styles.cs}>"type"</span>: <span className={styles.cs}>"enabled"</span>{"}"}{"}"}
               </div>
               <div className={styles.codeLine}>)</div>
               <div className={styles.codeLine}></div>
-              <div className={styles.codeLine}># 思考プロセスの取得</div>
               <div className={styles.codeLine}>
-                reasoning = getattr(response.choices[0].message, 'reasoning_content', None)
+                <span className={styles.cc}># 思考プロセスの取得</span>
               </div>
-              <div className={styles.codeLine}>print("--- 思考過程 ---")</div>
-              <div className={styles.codeLine}>print(reasoning)</div>
+              <div className={styles.codeLine}>
+                reasoning = <span className={styles.fn}>getattr</span>(response.choices[<span className={styles.cv}>0</span>].message, <span className={styles.cs}>'reasoning_content'</span>, <span className={styles.ce}>None</span>)
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.fn}>print</span>(<span className={styles.cs}>"--- 思考過程 ---"</span>)
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.fn}>print</span>(reasoning)
+              </div>
               <div className={styles.codeLine}></div>
-              <div className={styles.codeLine}>print("--- 最終回答 ---")</div>
-              <div className={styles.codeLine}>print(response.choices[0].message.content)</div>
+              <div className={styles.codeLine}>
+                <span className={styles.fn}>print</span>(<span className={styles.cs}>"--- 最終回答 ---"</span>)
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.fn}>print</span>(response.choices[<span className={styles.cv}>0</span>].message.content)
+              </div>
             </div>
           </div>
 
@@ -611,22 +645,24 @@ export default function DeepSeekLlmPage() {
             </div>
             <div className={styles.codeBody}>
               <div className={styles.codeLine}>
-                messages = [{'{'}"role": "user", "content": "世界一高い山は？"{'}'}]
+                messages = [{"{"}<span className={styles.cs}>"role"</span>: <span className={styles.cs}>"user"</span>, <span className={styles.cs}>"content"</span>: <span className={styles.cs}>"世界一高い山は？"</span>{"}"}]
               </div>
               <div className={styles.codeLine}>
-                response = client.chat.completions.create(model="deepseek-v4-pro",
-                messages=messages)
+                response = client.chat.completions.<span className={styles.fn}>create</span>(model=<span className={styles.cs}>"deepseek-v4-pro"</span>, messages=messages)
               </div>
-              <div className={styles.codeLine}>messages.append(response.choices[0].message)</div>
+              <div className={styles.codeLine}>
+                messages.<span className={styles.fn}>append</span>(response.choices[<span className={styles.cv}>0</span>].message)
+              </div>
               <div className={styles.codeLine}></div>
               <div className={styles.codeLine}>
-                messages.append({'{'}"role": "user", "content": "では2番目に高いのは？"{'}'})
+                messages.<span className={styles.fn}>append</span>({"{"}<span className={styles.cs}>"role"</span>: <span className={styles.cs}>"user"</span>, <span className={styles.cs}>"content"</span>: <span className={styles.cs}>"では2番目に高いのは？"</span>{"}"})
               </div>
               <div className={styles.codeLine}>
-                response = client.chat.completions.create(model="deepseek-v4-pro",
-                messages=messages)
+                response = client.chat.completions.<span className={styles.fn}>create</span>(model=<span className={styles.cs}>"deepseek-v4-pro"</span>, messages=messages)
               </div>
-              <div className={styles.codeLine}>messages.append(response.choices[0].message)</div>
+              <div className={styles.codeLine}>
+                messages.<span className={styles.fn}>append</span>(response.choices[<span className={styles.cv}>0</span>].message)
+              </div>
             </div>
           </div>
 
@@ -675,32 +711,34 @@ export default function DeepSeekLlmPage() {
             </div>
             <div className={styles.codeBody}>
               <div className={styles.codeLine}>tools = [</div>
-              <div className={styles.codeLine}> {'{'}</div>
-              <div className={styles.codeLine}> "type": "function",</div>
-              <div className={styles.codeLine}> "function": {'{'}</div>
-              <div className={styles.codeLine}> "name": "get_weather",</div>
-              <div className={styles.codeLine}> "description": "指定した場所の天気を取得する",</div>
-              <div className={styles.codeLine}> "parameters": {'{'}</div>
-              <div className={styles.codeLine}> "type": "object",</div>
-              <div className={styles.codeLine}> "properties": {'{'}</div>
-              <div className={styles.codeLine}>
-                {' '}
-                "location": {'{'}"type": "string", "description": "都市名"{'}'}
-              </div>
-              <div className={styles.codeLine}> {'}'},</div>
-              <div className={styles.codeLine}> "required": ["location"]</div>
-              <div className={styles.codeLine}> {'}'}</div>
-              <div className={styles.codeLine}> {'}'}</div>
-              <div className={styles.codeLine}> {'}'}</div>
+              <div className={styles.codeLine}>{"  "}{"{"}</div>
+              <div className={styles.codeLine}>{"    "}<span className={styles.cs}>"type"</span>: <span className={styles.cs}>"function"</span>,</div>
+              <div className={styles.codeLine}>{"    "}<span className={styles.cs}>"function"</span>: {"{"}</div>
+              <div className={styles.codeLine}>{"      "}<span className={styles.cs}>"name"</span>: <span className={styles.cs}>"get_weather"</span>,</div>
+              <div className={styles.codeLine}>{"      "}<span className={styles.cs}>"description"</span>: <span className={styles.cs}>"指定した場所の天気を取得する"</span>,</div>
+              <div className={styles.codeLine}>{"      "}<span className={styles.cs}>"parameters"</span>: {"{"}</div>
+              <div className={styles.codeLine}>{"        "}<span className={styles.cs}>"type"</span>: <span className={styles.cs}>"object"</span>,</div>
+              <div className={styles.codeLine}>{"        "}<span className={styles.cs}>"properties"</span>: {"{"}</div>
+              <div className={styles.codeLine}>{"          "}<span className={styles.cs}>"location"</span>: {"{"}<span className={styles.cs}>"type"</span>: <span className={styles.cs}>"string"</span>, <span className={styles.cs}>"description"</span>: <span className={styles.cs}>"都市名"</span>{"}"}</div>
+              <div className={styles.codeLine}>{"        "}{"}"},</div>
+              <div className={styles.codeLine}>{"        "}<span className={styles.cs}>"required"</span>: [<span className={styles.cs}>"location"</span>]</div>
+              <div className={styles.codeLine}>{"      "}{"}"}</div>
+              <div className={styles.codeLine}>{"    "}{"}"}</div>
+              <div className={styles.codeLine}>{"  "}{"}"}</div>
               <div className={styles.codeLine}>]</div>
               <div className={styles.codeLine}></div>
-              <div className={styles.codeLine}>response = client.chat.completions.create(</div>
-              <div className={styles.codeLine}> model="deepseek-v4-pro",</div>
               <div className={styles.codeLine}>
-                {' '}
-                messages=[{'{'}"role": "user", "content": "杭州の天気は？"{'}'}],
+                response = client.chat.completions.<span className={styles.fn}>create</span>(
               </div>
-              <div className={styles.codeLine}> tools=tools</div>
+              <div className={styles.codeLine}>
+                {"  "}model=<span className={styles.cs}>"deepseek-v4-pro"</span>,
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}messages=[{"{"}<span className={styles.cs}>"role"</span>: <span className={styles.cs}>"user"</span>, <span className={styles.cs}>"content"</span>: <span className={styles.cs}>"杭州の天気は？"</span>{"}"}],
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}tools=tools
+              </div>
               <div className={styles.codeLine}>)</div>
             </div>
           </div>
@@ -726,22 +764,26 @@ export default function DeepSeekLlmPage() {
               <span>json_mode.py</span>
             </div>
             <div className={styles.codeBody}>
-              <div className={styles.codeLine}>response = client.chat.completions.create(</div>
-              <div className={styles.codeLine}> model="deepseek-v4-pro",</div>
-              <div className={styles.codeLine}> messages=[</div>
               <div className={styles.codeLine}>
-                {' '}
-                {'{'}"role": "system", "content": "必ずJSONオブジェクト形式で出力してください。"
-                {'}'},
+                response = client.chat.completions.<span className={styles.fn}>create</span>(
               </div>
               <div className={styles.codeLine}>
-                {' '}
-                {'{'}"role": "user", "content": "東京の基本情報をJSONで出力して。"{'}'}
+                {"  "}model=<span className={styles.cs}>"deepseek-v4-pro"</span>,
               </div>
-              <div className={styles.codeLine}> ],</div>
               <div className={styles.codeLine}>
-                {' '}
-                response_format={'{'}"type": "json_object"{'}'}
+                {"  "}messages=[
+              </div>
+              <div className={styles.codeLine}>
+                {"    "}{"{"}<span className={styles.cs}>"role"</span>: <span className={styles.cs}>"system"</span>, <span className={styles.cs}>"content"</span>: <span className={styles.cs}>"必ずJSONオブジェクト形式で出力してください。"</span>{"}"},
+              </div>
+              <div className={styles.codeLine}>
+                {"    "}{"{"}<span className={styles.cs}>"role"</span>: <span className={styles.cs}>"user"</span>, <span className={styles.cs}>"content"</span>: <span className={styles.cs}>"東京の基本情報をJSONで出力して。"</span>{"}"}
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}],
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}response_format={"{"}<span className={styles.cs}>"type"</span>: <span className={styles.cs}>"json_object"</span>{"}"}
               </div>
               <div className={styles.codeLine}>)</div>
             </div>
@@ -869,15 +911,17 @@ export default function DeepSeekLlmPage() {
               <span>user_id.py</span>
             </div>
             <div className={styles.codeBody}>
-              <div className={styles.codeLine}>response = client.chat.completions.create(</div>
-              <div className={styles.codeLine}> model="deepseek-v4-pro",</div>
               <div className={styles.codeLine}>
-                {' '}
-                messages=[{'{'}"role": "user", "content": "Hello!"{'}'}],
+                response = client.chat.completions.<span className={styles.fn}>create</span>(
               </div>
               <div className={styles.codeLine}>
-                {' '}
-                extra_body={'{'}"user_id": "your_user_id"{'}'},
+                {"  "}model=<span className={styles.cs}>"deepseek-v4-pro"</span>,
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}messages=[{"{"}<span className={styles.cs}>"role"</span>: <span className={styles.cs}>"user"</span>, <span className={styles.cs}>"content"</span>: <span className={styles.cs}>"Hello!"</span>{"}"}],
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}extra_body={"{"}<span className={styles.cs}>"user_id"</span>: <span className={styles.cs}>"your_user_id"</span>{"}"},
               </div>
               <div className={styles.codeLine}>)</div>
             </div>
@@ -909,12 +953,14 @@ export default function DeepSeekLlmPage() {
             </div>
             <div className={styles.codeBody}>
               <div className={styles.codeLine}>
-                export ANTHROPIC_BASE_URL="https://api.deepseek.com/anthropic"
+                <span className={styles.ck}>export</span> ANTHROPIC_BASE_URL=<span className={styles.cs}>"https://api.deepseek.com/anthropic"</span>
               </div>
               <div className={styles.codeLine}>
-                export ANTHROPIC_API_KEY="your_deepseek_api_key"
+                <span className={styles.ck}>export</span> ANTHROPIC_API_KEY=<span className={styles.cs}>"your_deepseek_api_key"</span>
               </div>
-              <div className={styles.codeLine}>claude --model deepseek-v4-pro</div>
+              <div className={styles.codeLine}>
+                claude --model deepseek-v4-pro
+              </div>
             </div>
           </div>
         </section>
