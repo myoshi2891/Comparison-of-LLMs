@@ -2,7 +2,7 @@
 
 > 本ファイルは Next.js 移行完了後の保守・改善フェーズにおける開発の進捗（特にテスト関連）および品質チェックのルールを記録する。
 >
-> - 最終更新日: **Updated 2026-07-29**
+> - 最終更新日: **Updated 2026-07-30**
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
 
@@ -19,6 +19,8 @@
   - **バックエンド (`scraper/`)**: pytest 実行で **43 件すべて合格** (全 Green ✅)
 
 ## 最近の追加内容
+
+- **OpenAI Codex サブエージェント開発ベストプラクティス完全ガイド（/codex/agent）の Pure JSX 完全置き換え移行**: `Openai-codex-agents-multiagent-best-practices.html` を `web-next/app/codex/agent/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。要約・省略一切なしで全20セクション（前提, Step 1〜18, 参考文献）、全表、全コードブロック、7 Mermaid図 (`DIAGRAM_1`〜`DIAGRAM_14`)、全チェックリスト、全参考文献リンク、TOCスクロール追従（`TocObserver.tsx`）、外部リンク安全属性、`page-registry.ts`（`OpenAI Codex サブエージェント開発ガイド`）登録を完了。既存の旧 `/codex/agent` コンテンツと完全入れ替え完了。原本 `Openai-codex-agents-multiagent-best-practices.html` および `.md` はユーザー指定の `archive/html/OpenAI/` および `archive/md/OpenAI/` へ `git mv` 退避保存。契約テスト8件を更新し全クリア（Vitest **137 files / 1259 tests** 全 Green ✅）。
 
 - **SonarQube CI のaxeタイムアウト・新規コードカバレッジ修正**: coverage計測時にAntigravity a11y監査が既定5秒でタイムアウトし、未完了axeと後続監査が競合する問題を、同規模ページと同じ15秒上限で解消。Sonarが新規コードとして検出したClaude TocObserver 3ファイルへ分岐テスト12件を追加し、対象3ファイルの行・条件カバレッジを各100%にした。目視・ビルドは依頼により省略。`bun run test:coverage` は **137 files / 1259 tests**、全体 line coverage **92.79%**、typecheck、lint **385 files / 0 diagnostics** がGreen。
 
