@@ -20,6 +20,8 @@
 
 ## 最近の追加内容
 
+- **xAI Grok API 実践ベストプラクティスガイド（/xai/grok-best-practices-intermediate）の Pure JSX 移行と Providers ナビ同期**: `Xai-grok-best-practices-intermediate.html` を `web-next/app/xai/grok-best-practices-intermediate/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。要約・省略なしで全15セクション（Hero + 15H2セクション）・全表・全コードブロック・11 Mermaid図・TOCスクロール追従（`TocObserver.tsx`）・外部リンク安全属性・Providers グループ配下（xAI）ナビゲーション追加（`page-registry.ts`）を完了。原本 `Xai-grok-best-practices-intermediate.html` は `archive/Xai-grok-best-practices-intermediate.html` へ `git mv` 退避保存。契約テスト2件（メタデータ・JSXツリー構造検証）を追加。
+
 - **xAI Grok 完全ガイド（/xai/grok-best-practices）の Pure JSX 移行と Providers ナビ同期**: `Xai-grok-best-practices.html` を `web-next/app/xai/grok-best-practices/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。要約・省略なしで全18セクション（Hero + 18H2セクション）・全表・全コードブロック・5 Mermaid図・TOCスクロール追従（`TocObserver.tsx`）・外部リンク安全属性・Providers グループ配下（xAI）ナビゲーション追加（`nav-taxonomy.ts` / `page-registry.ts`）を完了。原本 `Xai-grok-best-practices.html` は `archive/html/xAI/Xai-grok-best-practices.html` へ `git mv` 退避保存。契約テスト5件（タイトル、18H2セクション、5 Mermaid図、外部リンク・内部リンク検証）を追加し全クリア（Vitest **139 files / 1269 tests** 全 Green ✅）。
 
 - **DeepSeek LLM ベストプラクティスガイド（/deepseek/llm-best-practices）の Pure JSX 移行と Providers ナビ同期**: `Deepseek-llm.html` を `web-next/app/deepseek/llm-best-practices/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。要約・省略なしで全18セクション（Hero + 17H2セクション）・全表・全コードブロック・8 Mermaid図・TOCスクロール追従（`TocObserver.tsx`）・外部リンク安全属性・Providers グループ配下ナビゲーション追加（`nav-taxonomy.ts` / `page-registry.ts`）を完了。原本 `Deepseek-llm.html` は `archive/html/DeepSeek/Deepseek-llm.html` へ `git mv` 退避保存。契約テスト5件（タイトル、17H2セクション、8 Mermaid図、外部リンク・内部リンク検証）を追加し全クリア（Vitest **138 files / 1264 tests** 全 Green ✅）。
