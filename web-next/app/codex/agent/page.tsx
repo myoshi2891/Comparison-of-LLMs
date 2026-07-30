@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import MermaidDiagram from "@/components/docs/MermaidDiagram";
-import TocObserver from "./TocObserver";
 import styles from "./page.module.css";
+import TocObserver from "./TocObserver";
 
 export const metadata: Metadata = {
   title: "OpenAI Codex サブエージェント開発ベストプラクティス完全ガイド | LLM コスト計算機",
@@ -88,7 +88,12 @@ export default function CodexAgentPage() {
   return (
     <div className={styles.layout}>
       <TocObserver />
-      <button className={styles.sidebarToggle} id="sidebarToggle" aria-label="メニュー">
+      <button
+        type="button"
+        className={styles.sidebarToggle}
+        id="sidebarToggle"
+        aria-label="メニュー"
+      >
         ☰
       </button>
       <aside className={styles.sidebar} id="sidebar">
@@ -101,10 +106,7 @@ export default function CodexAgentPage() {
         <nav>
           <ul className={styles.navList}>
             <li>
-              <a
-                href="#この記事の前提-requirementsmdについて一点補足"
-                className={styles.navLink}
-              >
+              <a href="#この記事の前提-requirementsmdについて一点補足" className={styles.navLink}>
                 この記事の前提: 「REQUIREMENTS.md」について一点補足
               </a>
             </li>
@@ -114,18 +116,12 @@ export default function CodexAgentPage() {
               </a>
             </li>
             <li>
-              <a
-                href="#step-2-agentsmd--基本のプロジェクト指示ファイル"
-                className={styles.navLink}
-              >
+              <a href="#step-2-agentsmd--基本のプロジェクト指示ファイル" className={styles.navLink}>
                 Step 2. AGENTS.md ― 基本のプロジェクト指示ファイル
               </a>
             </li>
             <li>
-              <a
-                href="#step-3-agentsoverridemd--一時的な上書きレイヤー"
-                className={styles.navLink}
-              >
+              <a href="#step-3-agentsoverridemd--一時的な上書きレイヤー" className={styles.navLink}>
                 Step 3. AGENTS.override.md ― 一時的な上書きレイヤー
               </a>
             </li>
@@ -145,10 +141,7 @@ export default function CodexAgentPage() {
               </a>
             </li>
             <li>
-              <a
-                href="#step-7-requirementstoml--管理者施行の強制設定"
-                className={styles.navLink}
-              >
+              <a href="#step-7-requirementstoml--管理者施行の強制設定" className={styles.navLink}>
                 Step 7. requirements.toml ― 管理者施行の強制設定
               </a>
             </li>
@@ -253,8 +246,11 @@ export default function CodexAgentPage() {
         </h2>
         <p>
           ご依頼の中で <code>REQUIREMENTS.md</code> という名称が挙がっていますが、Codex
-          エコシステムに実在するのは <strong><code>requirements.toml</code></strong>（Markdown
-          ではなく TOML 形式の管理者施行ファイル）です。本ガイドでは実際の仕様に忠実に{" "}
+          エコシステムに実在するのは{" "}
+          <strong>
+            <code>requirements.toml</code>
+          </strong>
+          （Markdown ではなく TOML 形式の管理者施行ファイル）です。本ガイドでは実際の仕様に忠実に{" "}
           <code>requirements.toml</code>{" "}
           として解説します。名前は近いものの、役割・書式・配置場所はまったく別物なので、移行時に検索して見つからず戸惑わないよう最初に明記しておきます。
         </p>
@@ -310,9 +306,7 @@ export default function CodexAgentPage() {
                 <td>
                   <code>config.toml</code>
                 </td>
-                <td>
-                  モデル・承認方針・サンドボックス・MCP・サブエージェントなどランタイム設定
-                </td>
+                <td>モデル・承認方針・サンドボックス・MCP・サブエージェントなどランタイム設定</td>
                 <td>TOML</td>
                 <td>システム / ユーザー / プロジェクト / プロファイル</td>
               </tr>
@@ -351,8 +345,8 @@ export default function CodexAgentPage() {
             配下は変更禁止」のように、検証可能な具体指示に寄せる。
           </li>
           <li>
-            <strong>強制力のあるインフラと組み合わせる。</strong> <code>AGENTS.md</code> に書いたルールは
-            pre-commit
+            <strong>強制力のあるインフラと組み合わせる。</strong> <code>AGENTS.md</code>{" "}
+            に書いたルールは pre-commit
             フック・リンター・型チェッカーと組み合わせることで、エージェントが同じミスを繰り返さないよう「システム側で気づける」ようにする。
           </li>
           <li>
@@ -367,8 +361,9 @@ export default function CodexAgentPage() {
           Step 3. AGENTS.override.md ― 一時的な上書きレイヤー
         </h2>
         <p>
-          <code>AGENTS.override.md</code> は同じディレクトリにある <code>AGENTS.md</code>{" "}
-          を<strong>完全に置き換える</strong>ための仕組みです。「一部だけ変更したい」場合の差分ファイルではなく、その階層で発見されると{" "}
+          <code>AGENTS.override.md</code> は同じディレクトリにある <code>AGENTS.md</code> を
+          <strong>完全に置き換える</strong>
+          ための仕組みです。「一部だけ変更したい」場合の差分ファイルではなく、その階層で発見されると{" "}
           <code>AGENTS.md</code> は無視され、<code>override</code>{" "}
           ファイルの内容だけが採用されます。
         </p>
@@ -405,8 +400,7 @@ export default function CodexAgentPage() {
             </strong>
             : <code>AGENTS.md</code>{" "}
             が見つからない階層で代わりに読み込むファイル名のリストを指定可能。既存の{" "}
-            <code>README</code>{" "}
-            や社内規約ファイル名をそのまま流用したい場合に使う。
+            <code>README</code> や社内規約ファイル名をそのまま流用したい場合に使う。
           </li>
           <li>
             <strong>
@@ -419,7 +413,8 @@ export default function CodexAgentPage() {
             <strong>
               <code>model_instructions_file</code>
             </strong>
-            : <code>AGENTS.md</code> の自動読み込みそのものを別ファイルで完全に置き換えるための設定キー(旧名{" "}
+            : <code>AGENTS.md</code>{" "}
+            の自動読み込みそのものを別ファイルで完全に置き換えるための設定キー(旧名{" "}
             <code>experimental_instructions_file</code>{" "}
             は非推奨、新設定への移行が必要)。階層探索ロジックごと差し替える強力なオプションなので、通常は{" "}
             <code>AGENTS.md</code>/<code>AGENTS.override.md</code> の組み合わせで足りることが多い。
@@ -431,7 +426,8 @@ export default function CodexAgentPage() {
         <p>
           <code>config.toml</code>{" "}
           はモデル選択・承認ポリシー・サンドボックスモード・MCPサーバー・サブエージェント上限など、Codex
-          の<strong>振る舞い</strong>を決めるランタイム設定です。指示ファイル(AGENTS.md系)とは異なるレイヤーで、以下の順に解決されます。
+          の<strong>振る舞い</strong>
+          を決めるランタイム設定です。指示ファイル(AGENTS.md系)とは異なるレイヤーで、以下の順に解決されます。
         </p>
         <div className={styles.mermaidWrap}>
           <MermaidDiagram chart={DIAGRAM_5} />
@@ -446,8 +442,8 @@ export default function CodexAgentPage() {
           </li>
           <li>
             「プロジェクト設定が効かない」という相談の多くは、実は該当キーが
-            <strong>プロジェクトスコープでは無視される予約キー</strong>(<code>model_provider</code>・
-            <code>notify</code>・<code>profile</code>{" "}
+            <strong>プロジェクトスコープでは無視される予約キー</strong>(<code>model_provider</code>
+            ・<code>notify</code>・<code>profile</code>{" "}
             など、認証やテレメトリに関わるもの)であるケースです。これらはユーザースコープの{" "}
             <code>~/.codex/config.toml</code> で設定する必要があります。
           </li>
@@ -493,7 +489,8 @@ export default function CodexAgentPage() {
                   <code>model_provider</code>, <code>model_providers.&lt;id&gt;</code>
                 </td>
                 <td>
-                  組み込み(<code>openai</code>/<code>ollama</code>/<code>lmstudio</code>)以外の独自プロバイダ定義
+                  組み込み(<code>openai</code>/<code>ollama</code>/<code>lmstudio</code>
+                  )以外の独自プロバイダ定義
                 </td>
               </tr>
               <tr>
@@ -511,8 +508,7 @@ export default function CodexAgentPage() {
               <tr>
                 <td>ネットワーク</td>
                 <td>
-                  <code>features.network_proxy</code>,{" "}
-                  <code>features.network_proxy.domains</code>
+                  <code>features.network_proxy</code>, <code>features.network_proxy.domains</code>
                 </td>
                 <td>ドメイン単位の allow/deny を伴うネットワークプロキシ機能</td>
               </tr>
@@ -557,8 +553,7 @@ export default function CodexAgentPage() {
           を使うのが現行の正しい方法です。
         </p>
         <p>
-          以下は、上記キーの一部を実際に組み合わせた <code>~/.codex/config.toml</code>{" "}
-          の例です。
+          以下は、上記キーの一部を実際に組み合わせた <code>~/.codex/config.toml</code> の例です。
         </p>
         <div className={styles.codeBlock}>
           <div className={styles.codeBar}>
@@ -617,12 +612,10 @@ export default function CodexAgentPage() {
               <span className={styles.ch}>[agents]</span>
             </div>
             <div className={styles.codeLine}>
-              <span className={styles.ck}>max_depth</span> ={" "}
-              <span className={styles.cv}>2</span>
+              <span className={styles.ck}>max_depth</span> = <span className={styles.cv}>2</span>
             </div>
             <div className={styles.codeLine}>
-              <span className={styles.ck}>max_threads</span> ={" "}
-              <span className={styles.cv}>4</span>
+              <span className={styles.ck}>max_threads</span> = <span className={styles.cv}>4</span>
             </div>
             <div className={styles.codeLine} />
             <div className={styles.codeLine}>
@@ -630,17 +623,14 @@ export default function CodexAgentPage() {
             </div>
             <div className={styles.codeLine}>
               <span className={styles.ck}>config_file</span> ={" "}
-              <span className={styles.cs}>
-                &quot;~/.codex/agents/security-reviewer.toml&quot;
-              </span>
+              <span className={styles.cs}>&quot;~/.codex/agents/security-reviewer.toml&quot;</span>
             </div>
             <div className={styles.codeLine} />
             <div className={styles.codeLine}>
               <span className={styles.ch}>[features.network_proxy]</span>
             </div>
             <div className={styles.codeLine}>
-              <span className={styles.ck}>enabled</span> ={" "}
-              <span className={styles.cm}>true</span>
+              <span className={styles.ck}>enabled</span> = <span className={styles.cm}>true</span>
             </div>
             <div className={styles.codeLine}>
               <span className={styles.ck}>domains</span> = &#123;{" "}
@@ -657,21 +647,25 @@ export default function CodexAgentPage() {
           Step 7. requirements.toml ― 管理者施行の強制設定
         </h2>
         <p>
-          <code>requirements.toml</code> は、個人やプロジェクトの <code>config.toml</code>{" "}
-          では<strong>上書きできない</strong>
+          <code>requirements.toml</code> は、個人やプロジェクトの <code>config.toml</code> では
+          <strong>上書きできない</strong>
           、組織のセキュリティチームが強制する設定です。「ユーザーの利便性のための既定値」ではなく「絶対に譲れない下限・上限」を書く場所だと考えてください。
         </p>
         <p>主な特徴:</p>
         <ul>
           <li>
-            クラウドポリシー、macOS/Windows の MDM(Jamf・Kandji・Mosyle等)、あるいは単純なファイル配布の3経路で組織全体に配布可能。
+            クラウドポリシー、macOS/Windows の
+            MDM(Jamf・Kandji・Mosyle等)、あるいは単純なファイル配布の3経路で組織全体に配布可能。
           </li>
           <li>
             例: <code>approval_policy = "never"</code> や{" "}
             <code>sandbox_mode = "danger-full-access"</code> を組織全体で禁止する、といった強制。
           </li>
           <li>
-            併用される <strong><code>managed_config.toml</code></strong>{" "}
+            併用される{" "}
+            <strong>
+              <code>managed_config.toml</code>
+            </strong>{" "}
             は「ソフトな既定値」を配布するためのファイルで、ユーザーが必要なら上書きできる点が{" "}
             <code>requirements.toml</code> との決定的な違いです。「ハードな制約は{" "}
             <code>requirements.toml</code>、ソフトな既定値は <code>managed_config.toml</code>{" "}
@@ -703,7 +697,9 @@ export default function CodexAgentPage() {
           <strong>Progressive Disclosure(段階的開示)</strong> というロード方式です。
         </p>
         <ul>
-          <li>Codex は起動時、各スキルの<strong>説明(description)だけ</strong>を読み込みます。</li>
+          <li>
+            Codex は起動時、各スキルの<strong>説明(description)だけ</strong>を読み込みます。
+          </li>
           <li>
             タスクに関連しそうだと判断したスキルについてのみ、<code>SKILL.md</code>{" "}
             の本文やスクリプト・参照資料をその都度ロードします。
@@ -736,8 +732,7 @@ export default function CodexAgentPage() {
         </div>
         <p>
           スキルが MCP サーバーに依存する場合は <code>agents/openai.yaml</code>{" "}
-          にその依存関係を宣言しておくと、Codex
-          が自動的にインストール・接続まで面倒を見てくれます。
+          にその依存関係を宣言しておくと、Codex が自動的にインストール・接続まで面倒を見てくれます。
         </p>
         <hr />
 
@@ -747,7 +742,8 @@ export default function CodexAgentPage() {
         </p>
         <ul>
           <li>
-            スキルは開発者がレビュー・統合したうえで、<strong>特定のプロダクトワークフローに紐づけて</strong>エンドユーザーに提供する。
+            スキルは開発者がレビュー・統合したうえで、
+            <strong>特定のプロダクトワークフローに紐づけて</strong>エンドユーザーに提供する。
           </li>
           <li>
             エンドユーザーが任意のスキルを自由に選べる状態を避ける(スコープを絞ったUX経由でのみ呼び出す)。
@@ -760,7 +756,8 @@ export default function CodexAgentPage() {
             の指示で十分な場合が多く、「繰り返し使う複雑な手順・スクリプト・参照資料が伴うもの」こそスキル化する価値がある、という使い分けが実務的です。
           </li>
           <li>
-            社内で頻繁に使うスキルは<strong>プラグイン</strong>としてパッケージ化し、マーケットプレイス経由でチーム配布すると、hooks
+            社内で頻繁に使うスキルは<strong>プラグイン</strong>
+            としてパッケージ化し、マーケットプレイス経由でチーム配布すると、hooks
             やスキルをまとめて一貫バージョンで展開できます。
           </li>
         </ul>
@@ -780,7 +777,8 @@ export default function CodexAgentPage() {
         </div>
         <p>
           大きなタスクを1本のスレッドで処理し続けると、探索過程のログやコマンド出力が蓄積して
-          <strong>コンテキスト汚染</strong>が起こり、それが進行すると関連情報が埋もれて応答品質が落ちる
+          <strong>コンテキスト汚染</strong>
+          が起こり、それが進行すると関連情報が埋もれて応答品質が落ちる
           <strong>コンテキスト腐敗(Context Rot)</strong>
           につながります。サブエージェントは、ノイズの多い調査やバッチ作業を隔離したスレッドに切り出し、要約だけをメインへ返すことでこれを防ぎます。
         </p>
@@ -893,9 +891,7 @@ export default function CodexAgentPage() {
             <div className={styles.codeLine}>
               認証・認可・シークレット管理・依存パッケージの既知脆弱性のみに焦点を当て、
             </div>
-            <div className={styles.codeLine}>
-              スタイルや命名規則には言及しないでください。
-            </div>
+            <div className={styles.codeLine}>スタイルや命名規則には言及しないでください。</div>
             <div className={styles.codeLine}>
               <span className={styles.cs}>&quot;&quot;&quot;</span>
             </div>
@@ -941,7 +937,8 @@ export default function CodexAgentPage() {
         </div>
         <p>
           このパターンは <code>worker</code>{" "}
-          系エージェントが得意とする領域で、CSVの行数分だけワーカーを起動し、<code>max_concurrency</code>{" "}
+          系エージェントが得意とする領域で、CSVの行数分だけワーカーを起動し、
+          <code>max_concurrency</code>{" "}
           で同時実行数を絞りつつ、各ワーカーが結果を1回だけ報告して指定した出力CSVに集約させます。大量の定型タスクをレビュー可能な単位に分割したいときの定番構成です。
         </p>
         <p>
@@ -969,18 +966,12 @@ export default function CodexAgentPage() {
             <div className={styles.codeLine}>
               components.csv の各行についてworkerサブエージェントを1つずつ起動し、
             </div>
-            <div className={styles.codeLine}>
-              max_concurrency=3で並列実行してください。
-            </div>
+            <div className={styles.codeLine}>max_concurrency=3で並列実行してください。</div>
             <div className={styles.codeLine}>
               各workerはpathの配下でdeprecated APIの呼び出しを検出し、
             </div>
-            <div className={styles.codeLine}>
-              report_agent_job_resultで結果を1回だけ報告し、
-            </div>
-            <div className={styles.codeLine}>
-              最終的にresults.csvへ集約してください。
-            </div>
+            <div className={styles.codeLine}>report_agent_job_resultで結果を1回だけ報告し、</div>
+            <div className={styles.codeLine}>最終的にresults.csvへ集約してください。</div>
           </div>
         </div>
         <hr />
@@ -1000,8 +991,7 @@ export default function CodexAgentPage() {
           など)は、探索系のエージェントには高め、定型的なバッチワーカーには低めに設定するなど、エージェントごとの{" "}
           <code>config.toml</code> 参照(<code>agents.&lt;name&gt;.config_file</code>
           )で個別最適化するのが実務的です。モデル名やバリアントは頻繁に更新されるため、実際に指定する前に{" "}
-          <code>codex models</code>{" "}
-          や利用中のプロバイダのカタログで最新の識別子を確認してください。
+          <code>codex models</code> や利用中のプロバイダのカタログで最新の識別子を確認してください。
         </p>
         <hr />
 
@@ -1013,9 +1003,9 @@ export default function CodexAgentPage() {
           にはこれを扱う2つの仕組みがあります。
         </p>
         <p>
-          <strong>Hooks</strong>: <code>PermissionRequest</code> 型のフックでコマンド実行前に allow/deny
-          を判定し、複数のフックが競合した場合は deny が優先されます。<code>PostToolUse</code> フックは
-          Bash・<code>apply_patch</code>
+          <strong>Hooks</strong>: <code>PermissionRequest</code> 型のフックでコマンド実行前に
+          allow/deny を判定し、複数のフックが競合した場合は deny が優先されます。
+          <code>PostToolUse</code> フックは Bash・<code>apply_patch</code>
           ・MCPツール呼び出しの後に発火しますが、まだ全てのシェル呼び出しを捕捉できるわけではない点(新しい{" "}
           <code>unified_exec</code> 系統は途上)には注意が必要です。プロジェクトローカルの hooks
           は、そのプロジェクトが信頼済みの場合のみ読み込まれます。
@@ -1023,8 +1013,8 @@ export default function CodexAgentPage() {
         <p>
           <strong>Rules(execpolicy)</strong>: <code>.rules</code> ファイル(Starlark構文)で{" "}
           <code>
-            prefix_rule(pattern=..., decision=&quot;allow&quot;|&quot;prompt&quot;|&quot;forbidden&quot;,
-            justification=...)
+            prefix_rule(pattern=...,
+            decision=&quot;allow&quot;|&quot;prompt&quot;|&quot;forbidden&quot;, justification=...)
           </code>{" "}
           を定義し、コマンドの引数列とパターンを照合します。複数ルールが一致した場合は最も制限の強い判定(
           <code>forbidden</code> &gt; <code>prompt</code> &gt; <code>allow</code>
@@ -1060,10 +1050,7 @@ export default function CodexAgentPage() {
             <div className={styles.codeLine}>
               {"  "}
               <span className={styles.cv}>justification</span> ={" "}
-              <span className={styles.cs}>
-                &quot;リモートへの反映は必ず人間の確認を挟む&quot;
-              </span>
-              ,
+              <span className={styles.cs}>&quot;リモートへの反映は必ず人間の確認を挟む&quot;</span>,
             </div>
             <div className={styles.codeLine}>)</div>
             <div className={styles.codeLine} />
@@ -1111,10 +1098,7 @@ export default function CodexAgentPage() {
             <div className={styles.codeLine}>
               {"  "}
               <span className={styles.cv}>justification</span> ={" "}
-              <span className={styles.cs}>
-                &quot;読み取り専用のgh操作は常に許可&quot;
-              </span>
-              ,
+              <span className={styles.cs}>&quot;読み取り専用のgh操作は常に許可&quot;</span>,
             </div>
             <div className={styles.codeLine}>)</div>
           </div>
@@ -1126,15 +1110,9 @@ export default function CodexAgentPage() {
             <span className={styles.codeLang}>bash</span>
           </div>
           <div className={styles.codeBody}>
-            <div className={styles.codeLine}>
-              codex execpolicy check --pretty \
-            </div>
-            <div className={styles.codeLine}>
-              {"  "}--rules ~/.codex/rules/default.rules \
-            </div>
-            <div className={styles.codeLine}>
-              {"  "}-- git push origin main
-            </div>
+            <div className={styles.codeLine}>codex execpolicy check --pretty \</div>
+            <div className={styles.codeLine}>{"  "}--rules ~/.codex/rules/default.rules \</div>
+            <div className={styles.codeLine}>{"  "}-- git push origin main</div>
           </div>
         </div>
         <hr />
@@ -1199,8 +1177,7 @@ export default function CodexAgentPage() {
           <li>
             <input type="checkbox" readOnly id="check-9" />
             <label htmlFor="check-9">
-              <code>.rules</code> ファイルを <code>codex execpolicy check</code>{" "}
-              で事前検証したか
+              <code>.rules</code> ファイルを <code>codex execpolicy check</code> で事前検証したか
             </label>
           </li>
         </ul>
@@ -1249,9 +1226,8 @@ export default function CodexAgentPage() {
               <tr>
                 <td>hooks が急に効かなくなった</td>
                 <td>
-                  <code>requirements.toml</code> の{" "}
-                  <code>allow_managed_hooks_only = true</code> により、管理外の hooks
-                  が無効化されている
+                  <code>requirements.toml</code> の <code>allow_managed_hooks_only = true</code>{" "}
+                  により、管理外の hooks が無効化されている
                 </td>
                 <td>管理者に確認し、必要な hooks を管理レイヤー側で登録してもらう</td>
               </tr>
@@ -1358,13 +1334,15 @@ export default function CodexAgentPage() {
               </Ext>
             </li>
             <li className={styles.refItem}>
-              Simon Willison「Use subagents and custom agents in Codex」(GA発表・組み込み3エージェント・カスタムTOML定義):{" "}
+              Simon Willison「Use subagents and custom agents in
+              Codex」(GA発表・組み込み3エージェント・カスタムTOML定義):{" "}
               <Ext href="https://simonwillison.net/2026/Mar/16/codex-subagents/">
                 https://simonwillison.net/2026/Mar/16/codex-subagents/
               </Ext>
             </li>
             <li className={styles.refItem}>
-              Firecrawl「Multi-Agent Orchestration With Codex」(PRレビュー3分割パターン、レビュー負荷への言及):{" "}
+              Firecrawl「Multi-Agent Orchestration With
+              Codex」(PRレビュー3分割パターン、レビュー負荷への言及):{" "}
               <Ext href="https://www.firecrawl.dev/blog/codex-multi-agent-orchestration">
                 https://www.firecrawl.dev/blog/codex-multi-agent-orchestration
               </Ext>

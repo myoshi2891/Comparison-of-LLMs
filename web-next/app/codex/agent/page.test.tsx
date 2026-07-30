@@ -23,7 +23,7 @@ const Page = CodexAgentPage as unknown as () => ReactElement;
 type MetadataLike = { title?: unknown; description?: unknown };
 const metadata = rawMetadata as unknown as MetadataLike;
 
-export const EXPECTED_SECTION_IDS = [
+const EXPECTED_SECTION_IDS = [
   "この記事の前提-requirementsmdについて一点補足",
   "step-1-codex-エコシステム全体像",
   "step-2-agentsmd--基本のプロジェクト指示ファイル",
@@ -67,7 +67,9 @@ describe("/codex/agent - page structure", () => {
     const { container } = render(<Page />);
     const h1 = container.querySelector("h1");
     expect(h1).not.toBeNull();
-    expect(h1?.textContent).toMatch(/OpenAI Codex サブエージェント開発ベストプラクティス完全ガイド/);
+    expect(h1?.textContent).toMatch(
+      /OpenAI Codex サブエージェント開発ベストプラクティス完全ガイド/
+    );
   });
 
   it("renders all 20 expected section ids", () => {

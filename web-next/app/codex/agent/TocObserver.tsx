@@ -18,11 +18,15 @@ export default function TocObserver() {
       const handleLinkClick = () => {
         sidebar.classList.remove(styles.sidebarOpen);
       };
-      navLinks.forEach((link) => link.addEventListener("click", handleLinkClick));
+      navLinks.forEach((link) => {
+        link.addEventListener("click", handleLinkClick);
+      });
 
       return () => {
         btn.removeEventListener("click", handleToggle);
-        navLinks.forEach((link) => link.removeEventListener("click", handleLinkClick));
+        navLinks.forEach((link) => {
+          link.removeEventListener("click", handleLinkClick);
+        });
       };
     }
   }, []);
@@ -46,7 +50,9 @@ export default function TocObserver() {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             const id = entry.target.id;
-            links.forEach((l) => l.classList.remove(styles.navLinkActive));
+            links.forEach((l) => {
+              l.classList.remove(styles.navLinkActive);
+            });
             const activeLink = linkMap.get(id);
             if (activeLink) {
               activeLink.classList.add(styles.navLinkActive);
@@ -57,7 +63,9 @@ export default function TocObserver() {
       { rootMargin: "-80px 0px -70% 0px", threshold: 0 }
     );
 
-    headings.forEach((h) => observer.observe(h));
+    headings.forEach((h) => {
+      observer.observe(h);
+    });
     return () => observer.disconnect();
   }, []);
 
