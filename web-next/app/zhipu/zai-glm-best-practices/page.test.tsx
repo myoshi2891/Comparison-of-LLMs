@@ -4,7 +4,9 @@ import Page, { metadata } from "./page";
 
 describe("ZaiGlmBestPracticesPage", () => {
   it("exports valid metadata with title and description", () => {
-    expect(metadata.title).toBe("Z.ai (GLM) LLM ベストプラクティスガイド | AI Model Cost Calculator");
+    expect(metadata.title).toBe(
+      "Z.ai (GLM) LLM ベストプラクティスガイド | AI Model Cost Calculator"
+    );
     expect(metadata.description).toContain("Z.ai(GLM) LLMの初学者向け実践ベストプラクティスガイド");
   });
 

@@ -313,15 +313,36 @@
 }
 
 /* Code Highlight Tokens */
-.ck { color: #ff7b72; }
-.cs { color: #a5d6ff; }
-.cv { color: #79c0ff; }
-.cw { color: #d29922; }
-.ce { color: #bc8cff; }
-.cc { color: #8ea3c4; font-style: italic; }
-.cg { color: #34d399; }
-.cm { color: #34d399; font-weight: bold; }
-.ch { color: #f0883e; font-weight: bold; }
+.ck {
+  color: #ff7b72;
+}
+.cs {
+  color: #a5d6ff;
+}
+.cv {
+  color: #79c0ff;
+}
+.cw {
+  color: #d29922;
+}
+.ce {
+  color: #bc8cff;
+}
+.cc {
+  color: #8ea3c4;
+  font-style: italic;
+}
+.cg {
+  color: #34d399;
+}
+.cm {
+  color: #34d399;
+  font-weight: bold;
+}
+.ch {
+  color: #f0883e;
+  font-weight: bold;
+}
 
 /* Checklist */
 .checklist {
@@ -428,7 +449,9 @@
     width: 280px;
     height: 100vh;
     transform: translateX(-100%);
-    transition: transform 0.25s ease, visibility 0.25s ease;
+    transition:
+      transform 0.25s ease,
+      visibility 0.25s ease;
     visibility: hidden;
     pointer-events: none;
     z-index: 100;

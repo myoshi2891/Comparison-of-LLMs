@@ -11,9 +11,7 @@ vi.mock("@/components/docs/MermaidDiagram", () => ({
 
 describe("xAI Grok Best Practices Page", () => {
   it("exports valid metadata with title and description", () => {
-    expect(metadata.title).toBe(
-      "xAI の LLM（Grok）完全ガイド ― 初学者のためのベストプラクティス"
-    );
+    expect(metadata.title).toBe("xAI の LLM（Grok）完全ガイド ― 初学者のためのベストプラクティス");
     expect(metadata.description).toContain("xAI API（Grok モデル群）");
   });
 

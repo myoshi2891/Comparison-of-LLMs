@@ -76,7 +76,11 @@ export default function GrokBestPracticesPage() {
       <TocObserver />
       <aside className={styles.sidebar}>
         <div className={styles.sidebarBrand}>
-          <i className="ti ti-bolt" aria-hidden="true" style={{ color: "var(--c-teal-500)", fontSize: "20px" }} />
+          <i
+            className="ti ti-bolt"
+            aria-hidden="true"
+            style={{ color: "var(--c-teal-500)", fontSize: "20px" }}
+          />
           <span className={styles.sidebarBrandTitle}>xAI Grok Guide</span>
         </div>
         <nav>
@@ -293,7 +297,7 @@ export default function GrokBestPracticesPage() {
                 </td>
                 <td>500k</td>
                 <td>$2.00</td>
-                <td>$0.50</td>
+                <td>$0.30 (&lt;200k) / $0.60 (≥200k)</td>
                 <td>$6.00</td>
                 <td>エージェント型ツール呼び出し、幻覚が少ない、推論強度を調整可能</td>
               </tr>
@@ -1643,7 +1647,8 @@ export default function GrokBestPracticesPage() {
             </div>
             <div className={styles.codeLine}>
               {"    "}
-              <span className={styles.ck}>raise</span>
+              <span className={styles.ck}>raise</span> RuntimeError(
+              <span className={styles.cs}>&quot;Maximum retries exceeded&quot;</span>)
             </div>
           </pre>
 
@@ -1697,7 +1702,7 @@ export default function GrokBestPracticesPage() {
                 <td>grok-4.5</td>
                 <td>500k</td>
                 <td>$2.00</td>
-                <td>$0.50</td>
+                <td>$0.30 (&lt;200k) / $0.60 (≥200k)</td>
                 <td>$6.00</td>
               </tr>
               <tr>

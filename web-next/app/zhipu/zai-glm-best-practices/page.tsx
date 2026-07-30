@@ -23,7 +23,7 @@ export default function ZaiGlmBestPracticesPage() {
     <div className={styles.layout}>
       <TocObserver />
       <SidebarToggle />
-      <nav className={styles.sidebar}>
+      <nav className={styles.sidebar} id="sidebar">
         <div className={styles.brand}>Z.ai GLM ガイド</div>
         <div className={styles.tocNav}>
           <a href="#intro" className={styles.tocLink}>
@@ -1127,26 +1127,35 @@ export default function ZaiGlmBestPracticesPage() {
             </div>
             <div className={styles.codeLine}></div>
             <div className={styles.codeLine}>tools = [&#123;</div>
-            <div className={styles.codeLine}>    &quot;type&quot;: &quot;function&quot;,</div>
-            <div className={styles.codeLine}>    &quot;function&quot;: &#123;</div>
-            <div className={styles.codeLine}>        &quot;name&quot;: &quot;get_weather&quot;,</div>
-            <div className={styles.codeLine}>        &quot;description&quot;: &quot;指定した都市の現在の天気情報を取得する&quot;,</div>
-            <div className={styles.codeLine}>        &quot;parameters&quot;: &#123;</div>
-            <div className={styles.codeLine}>            &quot;type&quot;: &quot;object&quot;,</div>
-            <div className={styles.codeLine}>            &quot;properties&quot;: &#123;</div>
-            <div className={styles.codeLine}>                &quot;city&quot;: &#123;&quot;type&quot;: &quot;string&quot;, &quot;description&quot;: &quot;都市名。例: 東京、大阪&quot;&#125;</div>
-            <div className={styles.codeLine}>            &#125;,</div>
-            <div className={styles.codeLine}>            &quot;required&quot;: [&quot;city&quot;],</div>
-            <div className={styles.codeLine}>        &#125;,</div>
-            <div className={styles.codeLine}>    &#125;,</div>
+            <div className={styles.codeLine}> &quot;type&quot;: &quot;function&quot;,</div>
+            <div className={styles.codeLine}> &quot;function&quot;: &#123;</div>
+            <div className={styles.codeLine}> &quot;name&quot;: &quot;get_weather&quot;,</div>
+            <div className={styles.codeLine}>
+              {" "}
+              &quot;description&quot;: &quot;指定した都市の現在の天気情報を取得する&quot;,
+            </div>
+            <div className={styles.codeLine}> &quot;parameters&quot;: &#123;</div>
+            <div className={styles.codeLine}> &quot;type&quot;: &quot;object&quot;,</div>
+            <div className={styles.codeLine}> &quot;properties&quot;: &#123;</div>
+            <div className={styles.codeLine}>
+              {" "}
+              &quot;city&quot;: &#123;&quot;type&quot;: &quot;string&quot;, &quot;description&quot;:
+              &quot;都市名。例: 東京、大阪&quot;&#125;
+            </div>
+            <div className={styles.codeLine}> &#125;,</div>
+            <div className={styles.codeLine}> &quot;required&quot;: [&quot;city&quot;],</div>
+            <div className={styles.codeLine}> &#125;,</div>
+            <div className={styles.codeLine}> &#125;,</div>
             <div className={styles.codeLine}>&#125;]</div>
             <div className={styles.codeLine}></div>
             <div className={styles.codeLine}>
-              messages = [&#123;&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;東京の天気は?&quot;&#125;]
+              messages = [&#123;&quot;role&quot;: &quot;user&quot;, &quot;content&quot;:
+              &quot;東京の天気は?&quot;&#125;]
             </div>
             <div className={styles.codeLine}>response = client.chat.completions.create(</div>
             <div className={styles.codeLine}>
-              {"    "}model=&quot;glm-5.2&quot;, messages=messages, tools=tools, tool_choice=&quot;auto&quot;
+              {"    "}model=&quot;glm-5.2&quot;, messages=messages, tools=tools,
+              tool_choice=&quot;auto&quot;
             </div>
             <div className={styles.codeLine}>)</div>
             <div className={styles.codeLine}></div>
@@ -1154,16 +1163,27 @@ export default function ZaiGlmBestPracticesPage() {
             <div className={styles.codeLine}>messages.append(message.model_dump())</div>
             <div className={styles.codeLine}></div>
             <div className={styles.codeLine}>if message.tool_calls:</div>
-            <div className={styles.codeLine}>    for call in message.tool_calls:</div>
-            <div className={styles.codeLine}>        args = json.loads(call.function.arguments)</div>
-            <div className={styles.codeLine}>        weather = &#123;&quot;city&quot;: args[&quot;city&quot;], &quot;temperature&quot;: &quot;22C&quot;, &quot;condition&quot;: &quot;晴れ&quot;&#125;</div>
-            <div className={styles.codeLine}>        messages.append(&#123;</div>
-            <div className={styles.codeLine}>            &quot;role&quot;: &quot;tool&quot;,</div>
-            <div className={styles.codeLine}>            &quot;content&quot;: json.dumps(weather, ensure_ascii=False),</div>
-            <div className={styles.codeLine}>            &quot;tool_call_id&quot;: call.id,</div>
-            <div className={styles.codeLine}>        &#125;)</div>
-            <div className={styles.codeLine}>        final = client.chat.completions.create(model=&quot;glm-5.2&quot;, messages=messages, tools=tools)</div>
-            <div className={styles.codeLine}>        print(final.choices[0].message.content)</div>
+            <div className={styles.codeLine}> for call in message.tool_calls:</div>
+            <div className={styles.codeLine}> args = json.loads(call.function.arguments)</div>
+            <div className={styles.codeLine}>
+              {" "}
+              weather = &#123;&quot;city&quot;: args[&quot;city&quot;], &quot;temperature&quot;:
+              &quot;22C&quot;, &quot;condition&quot;: &quot;晴れ&quot;&#125;
+            </div>
+            <div className={styles.codeLine}> messages.append(&#123;</div>
+            <div className={styles.codeLine}> &quot;role&quot;: &quot;tool&quot;,</div>
+            <div className={styles.codeLine}>
+              {" "}
+              &quot;content&quot;: json.dumps(weather, ensure_ascii=False),
+            </div>
+            <div className={styles.codeLine}> &quot;tool_call_id&quot;: call.id,</div>
+            <div className={styles.codeLine}> &#125;)</div>
+            <div className={styles.codeLine}>
+              {" "}
+              final = client.chat.completions.create(model=&quot;glm-5.2&quot;, messages=messages,
+              tools=tools)
+            </div>
+            <div className={styles.codeLine}> print(final.choices[0].message.content)</div>
           </div>
 
           <div className={styles.card}>

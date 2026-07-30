@@ -1,23 +1,27 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styles from "./page.module.css";
 
 export default function SidebarToggle() {
   const [isOpen, setIsOpen] = useState(false);
 
-  const toggleSidebar = () => {
-    const nextState = !isOpen;
-    setIsOpen(nextState);
+  useEffect(() => {
     const sidebar = document.getElementById("sidebar");
     if (sidebar) {
-      if (nextState) {
+      if (isOpen) {
         sidebar.classList.add(styles.sidebarOpen);
       } else {
         sidebar.classList.remove(styles.sidebarOpen);
       }
     }
-  };
+  }, [isOpen]);
+
+  useEffect(() => {
+    const handleClose = () => setIsOpen(false);
+    window.addEventListener("close-codex-sidebar", handleClose);
+    return () => window.removeEventListener("close-codex-sidebar", handleClose);
+  }, []);
 
   return (
     <button
@@ -27,7 +31,7 @@ export default function SidebarToggle() {
       aria-label={isOpen ? "メニューを閉じる" : "メニューを開く"}
       aria-expanded={isOpen}
       aria-controls="sidebar"
-      onClick={toggleSidebar}
+      onClick={() => setIsOpen((prev) => !prev)}
     >
       ☰
     </button>

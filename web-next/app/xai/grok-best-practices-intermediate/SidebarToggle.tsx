@@ -25,7 +25,7 @@ export default function SidebarToggle() {
       className={styles.sidebarToggle}
       aria-label={isOpen ? "メニューを閉じる" : "メニューを開く"}
       aria-expanded={isOpen}
-      aria-controls="side-nav"
+      aria-controls="grok-sidebar"
       onClick={handleToggle}
     >
       <span>☰ メニュー</span>

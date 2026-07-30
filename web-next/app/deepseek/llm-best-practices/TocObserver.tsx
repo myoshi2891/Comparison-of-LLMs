@@ -8,6 +8,7 @@ export default function DeepSeekTocObserver() {
     <TocObserver
       navLinkClassName={styles.navLink}
       activeClassName={styles.active}
+      chapterSelector="header[id], section"
     />
   );
 }

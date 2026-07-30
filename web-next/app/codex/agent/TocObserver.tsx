@@ -10,12 +10,7 @@ export default function TocObserver() {
     if (sidebar) {
       const navLinks = sidebar.querySelectorAll(`.${styles.navLink}`);
       const handleLinkClick = () => {
-        sidebar.classList.remove(styles.sidebarOpen);
-        const toggleBtn = document.getElementById("sidebarToggle");
-        if (toggleBtn) {
-          toggleBtn.setAttribute("aria-expanded", "false");
-          toggleBtn.setAttribute("aria-label", "メニューを開く");
-        }
+        window.dispatchEvent(new CustomEvent("close-codex-sidebar"));
       };
       navLinks.forEach((link) => {
         link.addEventListener("click", handleLinkClick);
