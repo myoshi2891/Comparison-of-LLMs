@@ -15,10 +15,12 @@
   - `bun run typecheck` ✅
   - `bun run lint` ✅（385 files checked）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: Vitest **137 files / 1259 tests すべて合格**（収集失敗なし）
+  - **フロントエンド (`web-next/`)**: Vitest **138 files / 1264 tests すべて合格**（収集失敗なし）
   - **バックエンド (`scraper/`)**: pytest 実行で **43 件すべて合格** (全 Green ✅)
 
 ## 最近の追加内容
+
+- **DeepSeek LLM ベストプラクティスガイド（/deepseek/llm-best-practices）の Pure JSX 移行と Providers ナビ同期**: `Deepseek-llm.html` を `web-next/app/deepseek/llm-best-practices/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。要約・省略なしで全18セクション（Hero + 17H2セクション）・全表・全コードブロック・8 Mermaid図・TOCスクロール追従（`TocObserver.tsx`）・外部リンク安全属性・Providers グループ配下ナビゲーション追加（`nav-taxonomy.ts` / `page-registry.ts`）を完了。原本 `Deepseek-llm.html` は `archive/html/DeepSeek/Deepseek-llm.html` へ `git mv` 退避保存。契約テスト5件（タイトル、17H2セクション、8 Mermaid図、外部リンク・内部リンク検証）を追加し全クリア（Vitest **138 files / 1264 tests** 全 Green ✅）。
 
 - **OpenAI Codex サブエージェント開発ベストプラクティス完全ガイド（/codex/agent）の Pure JSX 完全置き換え移行**: `Openai-codex-agents-multiagent-best-practices.html` を `web-next/app/codex/agent/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。要約・省略一切なしで全20セクション（前提, Step 1〜18, 参考文献）、全表、全コードブロック、7 Mermaid図 (`DIAGRAM_1`〜`DIAGRAM_14`)、全チェックリスト、全参考文献リンク、TOCスクロール追従（`TocObserver.tsx`）、外部リンク安全属性、`page-registry.ts`（`OpenAI Codex サブエージェント開発ガイド`）登録を完了。既存の旧 `/codex/agent` コンテンツと完全入れ替え完了。原本 `Openai-codex-agents-multiagent-best-practices.html` および `.md` はユーザー指定の `archive/html/OpenAI/` および `archive/md/OpenAI/` へ `git mv` 退避保存。契約テスト8件を更新し全クリア（Vitest **137 files / 1259 tests** 全 Green ✅）。
 
