@@ -868,6 +868,30 @@ const entries: PageEntry[] = [
     addedAt: "2026-07-30",
     lastReviewed: "2026-07-30",
   },
+  {
+    slug: "/xai/grok-best-practices-intermediate",
+    title: "xAI Grok API 実践ベストプラクティスガイド",
+    description:
+      "モデル選定からエージェント型ツール、マルチエージェントリサーチ、Prompt Caching、コスト最適化まで。中級〜上級エンジニアが本番導入する際に押さえるべきポイントをステップバイステップで解説します。",
+    group: "Providers",
+    category: "xAI",
+    provider: "xai",
+    topics: [
+      "xai",
+      "grok",
+      "best-practices",
+      "api",
+      "reasoning",
+      "structured-outputs",
+      "function-calling",
+      "multi-agent",
+      "prompt-caching",
+    ],
+    summary:
+      "モデル選定からエージェント型ツール、マルチエージェントリサーチ、Prompt Caching、コスト最適化まで、xAI Grok APIの本番導入・実践ベストプラクティスガイド。",
+    addedAt: "2026-07-30",
+    lastReviewed: "2026-07-30",
+  },
 ];
 
 /** ビルド時検証: 不正なエントリはここで例外になり、壊れたデータのまま配信されない。 */
