@@ -126,12 +126,13 @@ sequenceDiagram
 
 ```mermaid
 flowchart TB
-    A["CLIフラグ / -c key=value（セッション限定）"] --> E["合成された希望設定"]
-    B["プロジェクトスコープ .codex/config.toml（ルート→CWD、信頼済みのみ）"] --> E
-    C["プロファイル --profile 指定時の設定ファイル"] --> E
-    D["ユーザースコープ ~/.codex/config.toml"] --> E
-    E --> F["requirements.toml による検証（管理者施行の上限・強制値）"]
-    F --> G["最終的な実行時設定"]
+    M["1. MDM設定（最高優先度）"] --> S["2. システム管理設定（managed_config.toml / requirements.toml）"]
+    S --> C["3. CLIおよび -c オーバーライド（セッション限定）"]
+    C --> U["4. ユーザー設定（~/.codex/config.toml / --profile）"]
+    U --> P["5. システム設定（.codex/config.toml）"]
+    P --> D["6. 組み込みデフォルト（Built-in defaults）"]
+    D --> V["7. 管理者強制制限の適用（Administrator-enforced limits）"]
+    V --> F["8. 最終的な実行時設定"]
 ```
 
 実務上のポイント:
@@ -153,7 +154,7 @@ flowchart TB
 | プロバイダ | `model_provider`, `model_providers.<id>` | 組み込み(`openai`/`ollama`/`lmstudio`)以外の独自プロバイダ定義 |
 | 承認/サンドボックス | `approval_policy`, `sandbox_mode`, `approval_policy.granular.*` | `untrusted`/`on-request`/`never` などの承認方針と、`sandbox_approval`・`skill_approval`・`mcp_elicitations` の粒度別トグル |
 | ネットワーク | `features.network_proxy`, `features.network_proxy.domains` | ドメイン単位の allow/deny を伴うネットワークプロキシ機能 |
-| サブエージェント | `agents.<name>.config_file`, `agents.max_depth`, `agents.max_threads`, `features.multi_agent` | カスタムエージェント定義への参照、再帰の深さ・並列数の上限、マルチエージェント機能全体のオン/オフ |
+| サブエージェント | `agents.<name>.config_file`, `agents.max_concurrent_threads_per_session` (旧: `agents.max_threads`), `agents.max_depth` (V1のみ有効), `features.multi_agent` | カスタムエージェント定義への参照、同時並列スレッド数の上限（`agents.max_threads` はレガシー別名）、再帰の深さ上限（V1のみ有効・V2では無視）、マルチエージェント機能全体のオン/オフ |
 | Hooks | `[hooks]`(インライン)または `hooks.json` | ライフサイクルフックの定義(後述) |
 | MCP | `mcp_servers.<id>` | Model Context Protocol サーバーの登録 |
 | その他 | `file_opener`, `request_max_retries`, `stream_max_retries`, `notify`, `otel` | エディタ連携・リトライ・通知・テレメトリ |
@@ -192,7 +193,7 @@ Skill は「フォルダ + `SKILL.md`(メタデータ)+ 必要に応じたスク
 | ローカル実行(local shell) | インフラを自前管理したい場合に、実行をローカル環境に閉じ込める |
 | ホスト型コンテナ実行 | Codex 側が用意するコンテナで実行。コンテナのライフサイクルに合わせてマウントしたファイルも保持・破棄される |
 
-スキルが MCP サーバーに依存する場合は `agents/openai.yaml` にその依存関係を宣言しておくと、Codex が自動的にインストール・接続まで面倒を見てくれます。
+スキルが MCP サーバーに依存する場合は `agents/openai.yaml` にその依存関係を宣言しておくことが推奨されます（Codex は依存関係の宣言に対応しますが、自動的にサーバーをインストール・設定・接続するわけではない点に注意してください）。
 
 ---
 
@@ -231,7 +232,7 @@ flowchart LR
 
 ## Step 11. カスタムサブエージェント定義ファイル
 
-組み込みの3エージェントに加えて、`~/.codex/agents/` 配下に TOML ファイルを置くことで独自のサブエージェントを定義できます。名前を指定して呼び出せるほか、エージェントごとに異なるモデルを割り当てることも可能です(例: 高速性を優先するなら `gpt-5.3-codex-spark` を指定するなど)。
+組み込みの3エージェントに加えて、ユーザー単位の `~/.codex/agents/` やプロジェクトルートの `.codex/agents/` 配下に TOML ファイルを置くことで独自のサブエージェントを定義できます（後者のプロジェクトルート配置はチーム共有用のエージェント定義として利用できます）。名前を指定して呼び出せるほか、エージェントごとに異なるモデルを割り当てることも可能です。
 
 サブエージェントのオーケストレーションは Codex 本体が受け持ち、次のような操作を内部的に扱います。
 
@@ -243,7 +244,7 @@ flowchart LR
 | `wait_agent` | サブエージェントの完了を待機 |
 | `close_agent` | サブエージェントのスレッドを終了 |
 
-`config.toml` 側では `agents.max_depth`(何段まで入れ子でサブエージェントを起動できるか)と `agents.max_threads`(同時並列数)で暴走を防ぎます。トリガーは特別なコマンドではなく自然言語で構いません。「レビュー観点ごとにエージェントを1つずつ立ち上げて、すべて完了したら結果をまとめて」と指示するだけで、Codex が複数スレッドを開いて集約します。
+`config.toml` 側では `agents.max_concurrent_threads_per_session`(同時並列数。旧表記: `agents.max_threads`)や、V1でのみ有効な `agents.max_depth`(V2では無視)で暴走を防ぎます。トリガーは特別なコマンドではなく自然言語で構いません。「レビュー観点ごとにエージェントを1つずつ立ち上げて、すべて完了したら結果をまとめて」と指示するだけで、Codex が複数スレッドを開いて集約します。
 
 ---
 
@@ -294,13 +295,11 @@ flowchart TB
 ```mermaid
 flowchart TB
     A["サブエージェントのタスク性質は？"] --> B{"曖昧・多段階・要検証？"}
-    B -- Yes --> C["gpt-5.5（高能力の起点として推奨）"]
-    B -- No --> D{"低遅延・大量の対話的反復が必要？"}
-    D -- Yes --> E["gpt-5.3-codex-spark（Cerebras上で高速動作）"]
-    D -- No --> F["gpt-5.4（安定版の既定ワークフロー）"]
+    B -- Yes --> C["gpt-5.6（最高精度の選定）"]
+    B -- No --> D["gpt-5.6-terra（バランス・速度重視）"]
 ```
 
-加えて `model_reasoning_effort`(例: `xhigh`)や `model_reasoning_summary`(`detailed` など)は、探索系のエージェントには高め、定型的なバッチワーカーには低めに設定するなど、エージェントごとの `config.toml` 参照(`agents.<name>.config_file`)で個別最適化するのが実務的です。モデル名やバリアントは頻繁に更新されるため、実際に指定する前に `codex models` や利用中のプロバイダのカタログで最新の識別子を確認してください。
+加えて `model_reasoning_effort`(例: `xhigh`)や `model_reasoning_summary`(`detailed` など)は、探索系のエージェントには高め、定型的なバッチワーカーには低めに設定するなど、各 `config.toml` の `agents.default_subagent_model` や関連キーで個別最適化するのが実務的です。モデル名やバリアントは頻繁に更新されるため、実際に指定する前に `codex models` や利用中のプロバイダのカタログで最新の識別子を確認してください。
 
 ---
 
@@ -322,7 +321,7 @@ flowchart TB
 - [ ] `config.toml` の変更が想定のスコープ(ユーザー/プロジェクト/プロファイル)で効いているか、予約キーで無視されていないか
 - [ ] 組織で譲れない制約(承認ポリシーやサンドボックスモードの下限)は `requirements.toml` に、単なる既定値は `managed_config.toml` に分離しているか
 - [ ] スキルはエンドユーザーが任意選択できる状態になっていないか、書き込み系スキルに承認ゲートがあるか
-- [ ] サブエージェントの並列度(`agents.max_threads`)と再帰深さ(`agents.max_depth`)に上限を設定しているか
+- [ ] サブエージェントの並列度(`agents.max_concurrent_threads_per_session`、旧表記: `agents.max_threads`)に上限を設定しているか(なお `agents.max_depth` はV1のみ有効・V2では無視)
 - [ ] マルチエージェント運用のレビュー体制(誰が・どれだけの頻度で結果をレビューするか)を並列化前に決めているか
 - [ ] `.rules` ファイルを `codex execpolicy check` で事前検証したか
 
@@ -336,7 +335,7 @@ flowchart TB
 | `AGENTS.md` の指示が反映されない | 同階層に `AGENTS.override.md` が存在し、そちらが優先されている | override ファイルの有無を確認し、意図しないものであれば削除する |
 | 指示の一部が無視されている | 連結後の合計サイズが `project_doc_max_bytes` を超えて切り詰められている | 重要な指示をファイル先頭に移動する、または上限を引き上げる |
 | hooks が急に効かなくなった | `requirements.toml` の `allow_managed_hooks_only = true` により、管理外の hooks が無効化されている | 管理者に確認し、必要な hooks を管理レイヤー側で登録してもらう |
-| サブエージェントがコストを消費しすぎる | 並列度・再帰深さの上限が未設定、またはモデル選定が一律で高コストなものになっている | `agents.max_threads`/`agents.max_depth` を設定し、探索系タスクには軽量なモデルを割り当てる |
+| サブエージェントがコストを消費しすぎる | 並列度の上限が未設定、またはモデル選定が一律で高コストなものになっている | `agents.max_concurrent_threads_per_session`(旧: `agents.max_threads`)を設定し、探索系タスクには軽量なモデルを割り当てる |
 
 ---
 
