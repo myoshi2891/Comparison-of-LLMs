@@ -1086,11 +1086,7 @@ flowchart LR
           6-2. Sandboxed API(SAPI):ライブラリ単位でサンドボックス化する
         </h3>
         <p>
-          Sandbox2をそのまま使う場合、プロジェクトごとにポリシーやプロセス間のデータ交換の仕組みをゼロから設計し直す必要がありました。<strong
-            >Sandboxed
-            API(SAPI)<strong>はこの負担を解消するために作られたオープンソースプロジェクトで、Sandbox2を基盤にしながら「C/C++の</strong>ライブラリ単位</strong
-          >」でサンドボックス化できるようにします。開発チームのモットーは "Sandbox once, use
-          anywhere"(一度サンドボックス化すれば、どこでも使い回せる)です。
+          Sandbox2をそのまま使う場合、プロジェクトごとにポリシーやプロセス間のデータ交換の仕組みをゼロから設計し直す必要がありました。<strong>Sandboxed API(SAPI)</strong>はこの負担を解消するために作られたオープンソースプロジェクトで、Sandbox2を基盤にしながら「<strong>C/C++のライブラリ単位</strong>」でサンドボックス化できるようにします。開発チームのモットーは "Sandbox once, use anywhere"(一度サンドボックス化すれば、どこでも使い回せる)です。
         </p>
         <pre class="mermaid">
 flowchart LR
@@ -1731,22 +1727,22 @@ flowchart TD
         );
         if (navLinks.length === 0) return;
         var linkByHash = {};
-        navLinks.forEach(function (a) {
-          linkByHash[a.getAttribute('href')] = a;
-        });
-
-        // Observe the visible heading that follows each anchor, not the zero-height anchor itself
-        // (a zero-area target can fail to register as "intersecting" in some browsers).
         var hashBySection = new Map();
+        var sections = [];
+
         navLinks.forEach(function (a) {
-          var anchor = document.querySelector(a.getAttribute('href'));
+          var href = a.getAttribute('href');
+          linkByHash[href] = a;
+          var anchor = document.querySelector(href);
           if (!anchor) return;
           var wrapper = anchor.closest('p') || anchor;
           var el = wrapper.nextElementSibling;
           while (el && el.tagName !== 'H2') el = el.nextElementSibling;
-          if (el) hashBySection.set(el, a.getAttribute('href'));
+          if (el) {
+            hashBySection.set(el, href);
+            sections.push(el);
+          }
         });
-        var sections = Array.from(hashBySection.keys());
 
         var highlightObserver = new IntersectionObserver(
           function (entries) {
