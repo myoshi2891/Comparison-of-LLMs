@@ -186,15 +186,29 @@ AGENTS.mdが肥大化してきたら、本体は簡潔に保ち、計画・レ�
 
 複数セッション・複数サーフェスにまたがって挙動を安定させるには、`config.toml` による設定が欠かせません。CLI・IDE拡張・Codex Appは同じ設定レイヤーを共有します。
 
-### 設定レイヤーの重なり方
+### 設定レイヤーの重なり方と優先順位
+
+設定の解釈優先順位は、最高優先度のMDM設定から順に適用され、最後に管理者適用制限で上書き・検証されます。
+
+```mermaid
+flowchart TD
+    MDM["1. MDM settings (最高優先度)"] --> SYS_MNG["2. System-managed settings<br/>(managed_config.toml / requirements.toml)"]
+    SYS_MNG --> CLI["3. CLI & -c overrides"]
+    CLI --> USER["4. User settings (~/.codex/config.toml)"]
+    USER --> SYS["5. System settings"]
+    SYS --> DEF["6. Built-in defaults (既定値)"]
+    DEF --> ADMIN["管理者適用制限 (最終適用・制約の確立)"]
+```
 
 | レイヤー | 場所 | 備考 |
 |---|---|---|
-| 管理者設定(Managed configuration) | `requirements.toml` など | 組織が強制するガードレール。例: `approval_policy = "never"` や `sandbox_mode = "danger-full-access"` の禁止 |
-| ユーザー設定 | `~/.codex/config.toml` | 個人のデフォルト全般(モデル・推論レベル・サンドボックス等) |
-| プロファイル | `--profile NAME` で選択する `$CODEX_HOME/<name>.config.toml` | 用途別(厳格モード/自動モード等)の切り替え |
-| プロジェクト設定 | `.codex/config.toml`(リポジトリルート) | リポジトリ固有の挙動。ただし `approval_policy` や `sandbox_mode` などセキュリティに関わる一部キーは安全のため無視される、と報告されています |
-| CLIフラグ | `--sandbox`、`-a` など | その場限りの明示的な上書き |
+| MDM設定 | MDMプロファイル | 組織・端末レベルの最優先ポリシー |
+| システム管理設定 | `managed_config.toml` / `requirements.toml` | システム管理者が適用する共通設定 |
+| CLI & -c 上書き | コマンドライン引数 (`--sandbox`, `-c` 等) | 実行時の一時的オーバーライド |
+| ユーザー設定 | `~/.codex/config.toml` | 個人の既定値(モデル・推論レベル・スレッド制限等) |
+| システム設定 | `/etc/codex/config.toml` 等 | OS/システムレベルの既定値 |
+| 組み込み既定値 | Codex内蔵デフォルト | 設定未指定時のデフォルト動作 |
+| スレッド上限キー | `agents.max_concurrent_threads_per_session` | 現行キー。`agents.max_threads` はレガシー別名。※`agents.max_depth` はV1でのみ有効でV2では無視 |
 
 公式のおすすめパターンは、**個人の既定値は `~/.codex/config.toml`、リポジトリ固有の挙動は `.codex/config.toml`、一時的な変更のみコマンドライン引数で**、というシンプルな役割分担です。
 
@@ -231,11 +245,16 @@ flowchart TD
 
 ```toml
 # ~/.codex/config.toml (個人のデフォルト例)
-model = "gpt-5.5"
+model = "gpt-5.6"
 approval_policy = "on-request"
 sandbox_mode = "workspace-write"
 model_reasoning_effort = "medium"
 plan_mode_reasoning_effort = "high"
+
+[agents]
+# 並行スレッド数の現行キー(agents.max_threads はレガシー別名。agents.max_depth はV1のみ有効でV2では無視)
+max_concurrent_threads_per_session = 4
+default_subagent_model = "gpt-5.6-terra"
 
 [features]
 goals = true
@@ -274,6 +293,8 @@ Codex Appでは差分パネルで変更をその場でレビューでき、行�
 - プロンプトに情報を貼り付け続けるのではなく、Codexにツールを使わせたい
 - 複数ユーザー・複数プロジェクトで再利用できる連携にしたい
 
+MCPの依存関係は `agents/openai.yaml` に宣言することを推奨します（Codexがサーバーの自動インストール・自動構成・自動接続を行うわけではないため、依存関係の明示的宣言として活用します）。
+
 CodexはSTDIOサーバーとOAuth対応のStreamable HTTPサーバーの両方をサポートしています。Codex Appでは「Settings → MCP servers」から候補のサーバーを見つけて接続でき、CLIでは `codex mcp add` で名前・URLなどを指定して追加できます。
 
 大事な原則として、公式ガイドは「本当にワークフローを解放するツールだけを追加すること。最初から使っているツール全部を繋ごうとしないこと」と述べています。まず1〜2個、明らかに手作業のループを取り除けるツールから始め、そこから広げていくのが現実的です。
@@ -310,7 +331,7 @@ Skillは1つの仕事に絞ってスコープを設定し、2〜3個の具体的
 
 ### サブエージェントによる並列実行
 
-大きなタスクは、束縛された(スコープの明確な)作業を子エージェントに委任することで並列化できます。`.codex/agents/` 配下にTOMLファイルとしてサブエージェントを定義できます。
+大きなタスクは、束縛された(スコープの明確な)作業を子エージェントに委任することで並列化できます。個人用としてユーザー単位の `~/.codex/agents/`、チーム共有用としてプロジェクトルートの `.codex/agents/` 配下にTOMLファイルとしてサブエージェントを定義できます。名前指定やモデル割り当てなどの設定オプションを定義可能です。
 
 ```toml
 # .codex/agents/security-reviewer.toml
@@ -321,6 +342,19 @@ developer_instructions = """
 認証・認可、シークレット漏洩、インジェクションの可能性を確認してください。
 """
 ```
+
+#### モデル選定フローと設定の参照
+
+サブエージェントに割り当てるモデルは、タスクの性質に応じて最適化します。個別設定の参照は各 `config.toml` の `agents.default_subagent_model` を確認・指定します。
+
+```mermaid
+flowchart TD
+    Task{サブエージェントのタスク性質}
+    Task -- 曖昧・多段階・要検証 --> M1["gpt-5.6<br/>(深い推論・高度な検証)"]
+    Task -- バランス・速度重視 --> M2["gpt-5.6-terra<br/>(高速・標準作業)"]
+```
+
+また、セッションあたりの並行スレッド上限は現行キー `agents.max_concurrent_threads_per_session` を使用します（`agents.max_threads` はレガシー別名として維持。なお `agents.max_depth` はV1でのみ有効でV2では無視されます）。
 
 ```mermaid
 flowchart TD
@@ -453,6 +487,9 @@ Codexは「毎回ゼロから指示する一回限りのアシスタント」で
 - [ ] 複雑・曖昧なタスクでは `/plan` や `/goal` を使って計画・完了条件を先に固めているか
 - [ ] チームの規約・検証手順をAGENTS.mdに書き、プロンプトで毎回繰り返していないか
 - [ ] `~/.codex/config.toml` と `.codex/config.toml` で個人設定とプロジェクト設定を役割分担しているか
+- [ ] スレッド並行上限設定で現行キー `agents.max_concurrent_threads_per_session`（レガシー別名 `agents.max_threads`）を使用し、`agents.max_depth`（V1限定・V2無視）を考慮しているか
+- [ ] サブエージェントのデフォルトモデル設定を各 `config.toml` の `agents.default_subagent_model` で確認・指定し、`gpt-5.6` または `gpt-5.6-terra` を設定しているか
+- [ ] MCPの依存関係を `agents/openai.yaml` に宣言しているか
 - [ ] サンドボックス・承認ポリシーを用途(初回調査/通常開発/CI)に応じて使い分けているか
 - [ ] テスト・Lint・差分レビューをワークフローに組み込み、`/review` やAGENTS.md経由のレビュー観点を活用しているか
 - [ ] リポジトリ外のコンテキストが必要な場面でMCPを検討しているか(ただし繋ぎすぎに注意)
