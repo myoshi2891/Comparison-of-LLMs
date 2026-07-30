@@ -633,7 +633,7 @@
   <body>
     <div class="bg-glow"></div>
     <div class="top-accent-bar"></div>
-    <button class="sidebar-toggle" id="sidebarToggle" aria-label="メニューを開閉">☰</button>
+    <button class="sidebar-toggle" id="sidebarToggle" aria-label="目次を開く" aria-expanded="false">☰</button>
 
     <div class="layout">
       <nav class="sidebar" id="sidebar">
@@ -1721,14 +1721,17 @@ flowchart TD
         if (!btn || !sidebar) return;
         btn.setAttribute('aria-controls', 'sidebar');
         btn.setAttribute('aria-expanded', 'false');
+        btn.setAttribute('aria-label', '目次を開く');
         btn.addEventListener('click', function () {
           var isOpen = sidebar.classList.toggle('open');
           btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+          btn.setAttribute('aria-label', isOpen ? '目次を閉じる' : '目次を開く');
         });
         document.querySelectorAll('.nav-list a').forEach(function (a) {
           a.addEventListener('click', function () {
             sidebar.classList.remove('open');
             btn.setAttribute('aria-expanded', 'false');
+            btn.setAttribute('aria-label', '目次を開く');
           });
         });
       })();

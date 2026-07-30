@@ -397,7 +397,7 @@
   </head>
   <body>
     <div class="layout">
-      <button type="button" class="sidebar-toggle" id="sidebarToggle" aria-label="メニュー" aria-expanded="false" aria-controls="sidebar">☰</button>
+      <button type="button" class="sidebar-toggle" id="sidebarToggle" aria-label="メニューを開く" aria-expanded="false" aria-controls="sidebar">☰</button>
       <aside class="sidebar" id="sidebar">
         <div class="sidebar-brand">OpenAI Codex <span>サブエージェント</span> ガイド</div>
         <div class="sidebar-sub">AGENTS.md・config.toml・requirements.toml 実践ガイド</div>
@@ -1521,11 +1521,13 @@ prefix_rule(
         btn.addEventListener('click', function () {
           var isOpen = sidebar.classList.toggle('open');
           btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+          btn.setAttribute('aria-label', isOpen ? 'メニューを閉じる' : 'メニューを開く');
         });
         sidebar.querySelectorAll('.nav-link').forEach(function (a) {
           a.addEventListener('click', function () {
             sidebar.classList.remove('open');
             btn.setAttribute('aria-expanded', 'false');
+            btn.setAttribute('aria-label', 'メニューを開く');
           });
         });
       })();

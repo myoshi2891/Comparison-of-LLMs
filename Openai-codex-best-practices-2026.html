@@ -11,9 +11,9 @@
       rel="stylesheet"
     />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/ini.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha384-0Y9cMcep0hv2aLlERfDZI1xuSlWpetVlpi5P3/iX87ktdkV8yIQXkVI633Tco7OS" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/ini.min.js" integrity="sha384-5KK4C3c6TryLXy2VSsEBZJ+KV4X4KuNurqkP2VjZW9e+zuXxWRqhOaWcFXbwxPZm" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js" integrity="sha384-OiB5ILRFSPWMhF/JWLUiRheXrMaJDWkpZe6xA4toJJxf/mF/GDWgdxC91WbP82IW" crossorigin="anonymous"></script>
     <style>
       :root {
         --bg: #f6f5f1;
@@ -198,12 +198,15 @@
           var(--bg);
       }
       .hero-inner {
-        max-width: 1360px;
+        max-width: 820px;
         margin: 0 auto;
-        display: grid;
-        grid-template-columns: 1.15fr 0.85fr;
-        gap: 48px;
-        align-items: center;
+        display: flex;
+        flex-direction: column;
+        gap: 36px;
+      }
+      .hero-inner .term {
+        max-width: 600px;
+        width: 100%;
       }
       .eyebrow {
         display: inline-flex;
@@ -608,6 +611,14 @@
         margin: 0 auto;
         overflow: visible;
       }
+      .diagram .mermaid-render svg text,
+      .diagram .mermaid-render svg tspan,
+      .diagram .mermaid-render svg .nodeLabel,
+      .diagram .mermaid-render svg .edgeLabel,
+      .diagram .mermaid-render svg .actor-line ~ text,
+      .diagram .mermaid-render svg foreignObject div {
+        font-size: 1rem !important;
+      }
       .diagram .mermaid-render .mm-error {
         font-family: var(--mono);
         font-size: 12.5px;
@@ -746,21 +757,17 @@
           z-index: 80;
           background: var(--surface);
           transform: translateX(-100%);
-          transition: transform 0.25s ease, visibility 0.25s ease;
+          transition: transform 0.25s ease;
           box-shadow: 20px 0 40px rgba(0, 0, 0, 0.15);
-          visibility: hidden;
-          pointer-events: none;
         }
         nav.toc.open {
           transform: translateX(0);
-          visibility: visible;
-          pointer-events: auto;
         }
         .topbar {
           display: flex;
         }
         .hero-inner {
-          grid-template-columns: 1fr;
+          max-width: 100%;
         }
         .content,
         .hero {
@@ -783,7 +790,7 @@
 
     <div class="topbar">
       <span class="brand">CODEX / BEST PRACTICES</span>
-      <button id="navToggle" type="button" aria-label="目次を開く" aria-expanded="false" aria-controls="tocNav">☰ 目次</button>
+      <button id="navToggle" aria-label="目次を開く">☰ 目次</button>
     </div>
 
     <div class="shell">
@@ -978,7 +985,7 @@
               出力が指示するアクション(ファイル読み書き・コマンド実行・ツール呼び出し)を実行する」というループを、タスクが完了するかユーザーがキャンセルするまで繰り返します。
             </p>
             <div class="diagram">
-              <pre id="diag-loop" class="mermaid-render mermaid"></pre>
+              <div id="diag-loop" class="mermaid-render"></div>
             </div>
             <p>
               スレッド内の情報はすべてモデルのコンテキストウィンドウに収まる必要があります。長時間タスクでは自動的に<strong>Compaction(圧縮)</strong>が働き、関連情報を要約しながら作業を継続します。この仕組みを理解しておくと、長時間タスクの後半で挙動が変わる理由を把握しやすくなります。
@@ -1105,7 +1112,7 @@
             </ol>
 
             <div class="diagram">
-              <pre id="diag-plan" class="mermaid-render mermaid"></pre>
+              <div id="diag-plan" class="mermaid-render"></div>
             </div>
 
             <p>
@@ -1155,7 +1162,7 @@
               AGENTS.mdは複数の階層に置くことができ、<strong>より作業ディレクトリに近い、具体的なファイルが優先</strong>されます。
             </p>
             <div class="diagram">
-              <pre id="diag-agents" class="mermaid-render mermaid"></pre>
+              <div id="diag-agents" class="mermaid-render"></div>
             </div>
             <p>
               例えば、モノレポのルートに「<code>pnpm test</code
@@ -1290,7 +1297,7 @@
             </div>
 
             <div class="diagram">
-              <pre id="diag-sandbox" class="mermaid-render mermaid"></pre>
+              <div id="diag-sandbox" class="mermaid-render"></div>
             </div>
             <p>
               公式ガイドは「コーディングエージェントに不慣れなうちは既定の権限のまま始め、信頼できるリポジトリや用途が明確になってから緩めるように」と明確に助言しています。<code>danger-full-access</code>(CLIでは<code>--dangerously-bypass-approvals-and-sandbox</code>という別名でも呼ばれます)は最終手段として扱うべきです。
@@ -1430,7 +1437,7 @@ args = ["-y", "@example/jira-mcp"]</code></pre>
               大きなタスクは、スコープの明確な作業を子エージェントに委任することで並列化できます。<code>.codex/agents/</code>配下にTOMLファイルとしてサブエージェントを定義できます。
             </p>
             <div class="diagram">
-              <pre id="diag-subagents" class="mermaid-render mermaid"></pre>
+              <div id="diag-subagents" class="mermaid-render"></div>
             </div>
             <p>
               サブエージェントは並列化による速度向上と引き換えに、単一エージェントで実行する場合より多くのトークンを消費すると報告されています。コスト管理の観点では、親エージェントは高めの推論レベル、定型作業を担う子エージェントは低めという配分が現実的です。
@@ -1504,7 +1511,7 @@ codex exec --skip-git-repo-check --sandbox read-only "このディレクトリ�
             </p>
 
             <div class="diagram">
-              <pre id="diag-cicd" class="mermaid-render mermaid"></pre>
+              <div id="diag-cicd" class="mermaid-render"></div>
             </div>
 
             <div class="callout warn">
@@ -1714,66 +1721,90 @@ codex exec --skip-git-repo-check --sandbox read-only "このディレクトリ�
             </p>
             <ul class="checklist">
               <li>
-                <input type="checkbox" disabled aria-hidden="true" /><span
-                  >プロンプトにGoal・Context・Constraints・Done
-                  whenの4要素を意識して書いているか</span
+                <label for="chk-1"
+                  ><input type="checkbox" id="chk-1" /><span
+                    >プロンプトにGoal・Context・Constraints・Done
+                    whenの4要素を意識して書いているか</span
+                  ></label
                 >
               </li>
               <li>
-                <input type="checkbox" disabled aria-hidden="true" /><span
-                  >タスクの複雑さに応じてReasoning Effortを使い分けているか(既定はmedium)</span
+                <label for="chk-2"
+                  ><input type="checkbox" id="chk-2" /><span
+                    >タスクの複雑さに応じてReasoning Effortを使い分けているか(既定はmedium)</span
+                  ></label
                 >
               </li>
               <li>
-                <input type="checkbox" disabled aria-hidden="true" /><span
-                  >複雑・曖昧なタスクでは<code>/plan</code>や<code>/goal</code>で完了条件を先に固めているか</span
+                <label for="chk-3"
+                  ><input type="checkbox" id="chk-3" /><span
+                    >複雑・曖昧なタスクでは<code>/plan</code>や<code>/goal</code>で完了条件を先に固めているか</span
+                  ></label
                 >
               </li>
               <li>
-                <input type="checkbox" disabled aria-hidden="true" /><span
-                  >チームの規約・検証手順をAGENTS.mdに書き、プロンプトで繰り返していないか</span
+                <label for="chk-4"
+                  ><input type="checkbox" id="chk-4" /><span
+                    >チームの規約・検証手順をAGENTS.mdに書き、プロンプトで繰り返していないか</span
+                  ></label
                 >
               </li>
               <li>
-                <input type="checkbox" disabled aria-hidden="true" /><span
-                  ><code>~/.codex/config.toml</code
-                  >と<code>.codex/config.toml</code>で個人設定とプロジェクト設定を役割分担しているか</span
+                <label for="chk-5"
+                  ><input type="checkbox" id="chk-5" /><span
+                    ><code>~/.codex/config.toml</code
+                    >と<code>.codex/config.toml</code>で個人設定とプロジェクト設定を役割分担しているか</span
+                  ></label
                 >
               </li>
               <li>
-                <input type="checkbox" disabled aria-hidden="true" /><span
-                  >サンドボックス・承認ポリシーを用途に応じて使い分けているか</span
+                <label for="chk-6"
+                  ><input type="checkbox" id="chk-6" /><span
+                    >サンドボックス・承認ポリシーを用途に応じて使い分けているか</span
+                  ></label
                 >
               </li>
               <li>
-                <input type="checkbox" disabled aria-hidden="true" /><span
-                  >テスト・Lint・差分レビューをワークフローに組み込んでいるか</span
+                <label for="chk-7"
+                  ><input type="checkbox" id="chk-7" /><span
+                    >テスト・Lint・差分レビューをワークフローに組み込んでいるか</span
+                  ></label
                 >
               </li>
               <li>
-                <input type="checkbox" disabled aria-hidden="true" /><span
-                  >リポジトリ外のコンテキストが必要な場面でMCPを検討しているか(繋ぎすぎに注意)</span
+                <label for="chk-8"
+                  ><input type="checkbox" id="chk-8" /><span
+                    >リポジトリ外のコンテキストが必要な場面でMCPを検討しているか(繋ぎすぎに注意)</span
+                  ></label
                 >
               </li>
               <li>
-                <input type="checkbox" disabled aria-hidden="true" /><span
-                  >繰り返し行っている作業をSkillに切り出しているか</span
+                <label for="chk-9"
+                  ><input type="checkbox" id="chk-9" /><span
+                    >繰り返し行っている作業をSkillに切り出しているか</span
+                  ></label
                 >
               </li>
               <li>
-                <input type="checkbox" disabled aria-hidden="true" /><span
-                  >安定したワークフローだけをAutomationsに切り出しているか</span
+                <label for="chk-10"
+                  ><input type="checkbox" id="chk-10" /><span
+                    >安定したワークフローだけをAutomationsに切り出しているか</span
+                  ></label
                 >
               </li>
               <li>
-                <input type="checkbox" disabled aria-hidden="true" /><span
-                  >並列作業ではgit worktreeでスレッドを分離しているか</span
+                <label for="chk-11"
+                  ><input type="checkbox" id="chk-11" /><span
+                    >並列作業ではgit worktreeでスレッドを分離しているか</span
+                  ></label
                 >
               </li>
               <li>
-                <input type="checkbox" disabled aria-hidden="true" /><span
-                  >CI/CDでは公式Actionや<code>codex exec</code
-                  >を使い、APIキーをジョブ全体に晒していないか</span
+                <label for="chk-12"
+                  ><input type="checkbox" id="chk-12" /><span
+                    >CI/CDでは公式Actionや<code>codex exec</code
+                    >を使い、APIキーをジョブ全体に晒していないか</span
+                  ></label
                 >
               </li>
             </ul>
@@ -2251,62 +2282,71 @@ Action->>PR: レビューコメントを投稿
 PR-->>Dev: 修正提案を確認しマージ判断`,
       };
 
-      mermaid.initialize({
-        startOnLoad: false,
-        theme: 'base',
-        themeVariables: {
-          primaryColor: '#E9EFFA',
-          primaryTextColor: '#1A1B22',
-          primaryBorderColor: '#2954A6',
-          lineColor: '#2954A6',
-          secondaryColor: '#F6ECD8',
-          secondaryBorderColor: '#A6791F',
-          tertiaryColor: '#FFFFFF',
-          fontFamily: 'Zen Kaku Gothic New, Noto Sans JP, sans-serif',
-          fontSize: '16px',
-          actorBkg: '#E9EFFA',
-          actorBorder: '#2954A6',
-          actorTextColor: '#1A1B22',
-          signalColor: '#2954A6',
-          signalTextColor: '#1A1B22',
-        },
-        flowchart: { curve: 'basis', htmlLabels: true, useMaxWidth: false },
-        sequence: { useMaxWidth: false, mirrorActors: false, noteMargin: 10 },
-        securityLevel: 'loose',
-      });
-
-      (async () => {
-        if (document.fonts && document.fonts.ready) {
-          try {
-            await document.fonts.ready;
-          } catch (e) {}
-        }
-        for (const [id, src] of Object.entries(DIAGRAMS)) {
+      if (!window.mermaid?.initialize) {
+        for (const id of Object.keys(DIAGRAMS)) {
           const target = document.getElementById(id);
-          if (!target) continue;
-          try {
-            const { svg } = await mermaid.render('svg-' + id, src);
-            target.innerHTML = svg;
-            const svgEl = target.querySelector('svg');
-            if (svgEl) {
-              svgEl.removeAttribute('width');
-              svgEl.removeAttribute('height');
-              svgEl.style.display = 'block';
-              svgEl.style.width = 'auto';
-              svgEl.style.maxWidth = '100%';
-              svgEl.style.height = 'auto';
-              svgEl.style.margin = '0 auto';
-              svgEl.style.overflow = 'visible';
-            }
-          } catch (err) {
-            target.innerHTML =
-              '<div class="mm-error">図の描画に失敗しました: ' +
-              (err && err.message ? err.message : err) +
-              '</div>';
-            console.error('Mermaid render failed for', id, err);
+          if (target) {
+            target.textContent = 'Mermaidライブラリが読み込めないため、図を表示できません。';
           }
         }
-      })();
+      } else {
+        window.mermaid.initialize({
+          startOnLoad: false,
+          theme: 'base',
+          themeVariables: {
+            primaryColor: '#E9EFFA',
+            primaryTextColor: '#1A1B22',
+            primaryBorderColor: '#2954A6',
+            lineColor: '#2954A6',
+            secondaryColor: '#F6ECD8',
+            secondaryBorderColor: '#A6791F',
+            tertiaryColor: '#FFFFFF',
+            fontFamily: 'Zen Kaku Gothic New, Noto Sans JP, sans-serif',
+            fontSize: '1rem',
+            actorBkg: '#E9EFFA',
+            actorBorder: '#2954A6',
+            actorTextColor: '#1A1B22',
+            signalColor: '#2954A6',
+            signalTextColor: '#1A1B22',
+          },
+          flowchart: { curve: 'basis', htmlLabels: true, useMaxWidth: false },
+          sequence: { useMaxWidth: false, mirrorActors: true, noteMargin: 10 },
+          securityLevel: 'loose',
+        });
+
+        (async () => {
+          if (document.fonts && document.fonts.ready) {
+            try {
+              await document.fonts.ready;
+            } catch (e) {}
+          }
+          for (const [id, src] of Object.entries(DIAGRAMS)) {
+            const target = document.getElementById(id);
+            if (!target) continue;
+            try {
+              const { svg } = await window.mermaid.render('svg-' + id, src);
+              target.innerHTML = svg;
+              const svgEl = target.querySelector('svg');
+              if (svgEl) {
+                svgEl.removeAttribute('width');
+                svgEl.removeAttribute('height');
+                svgEl.style.display = 'block';
+                svgEl.style.width = 'auto';
+                svgEl.style.maxWidth = '100%';
+                svgEl.style.height = 'auto';
+                svgEl.style.margin = '0 auto';
+                svgEl.style.overflow = 'visible';
+              }
+            } catch (err) {
+              target.innerHTML =
+                '<div class="mm-error">図の描画に失敗しました: ' +
+                (err && err.message ? err.message : err) +
+                '</div>';
+              console.error('Mermaid render failed for', id, err);
+            }
+          }
+        })();
+      }
 
       /* progress bar */
       const bar = document.getElementById('progress');
@@ -2321,20 +2361,13 @@ PR-->>Dev: 修正提案を確認しマージ判断`,
       /* mobile nav toggle */
       const tocNav = document.getElementById('tocNav');
       const navToggle = document.getElementById('navToggle');
-      if (navToggle && tocNav) {
-        navToggle.setAttribute('aria-controls', 'tocNav');
-        navToggle.setAttribute('aria-expanded', 'false');
+      navToggle &&
         navToggle.addEventListener('click', () => {
-          const isOpen = tocNav.classList.toggle('open');
-          navToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+          tocNav.classList.toggle('open');
         });
-        tocNav.querySelectorAll('a').forEach((a) => {
-          a.addEventListener('click', () => {
-            tocNav.classList.remove('open');
-            navToggle.setAttribute('aria-expanded', 'false');
-          });
-        });
-      }
+      tocNav.querySelectorAll('a').forEach((a) => {
+        a.addEventListener('click', () => tocNav.classList.remove('open'));
+      });
 
       /* active section highlight */
       const links = [...tocNav.querySelectorAll('a')];
@@ -2356,17 +2389,6 @@ PR-->>Dev: 修正提案を確認しマージ判断`,
         { rootMargin: '-15% 0px -75% 0px', threshold: 0 },
       );
       sections.forEach((s) => io.observe(s));
-
-      /* checklist: clicking anywhere on the row toggles the checkbox */
-      document.querySelectorAll('.checklist li').forEach((li) => {
-        const box = li.querySelector('input[type="checkbox"]');
-        if (!box) return;
-        li.addEventListener('click', (e) => {
-          if (e.target !== box) {
-            box.checked = !box.checked;
-          }
-        });
-      });
 
       /* back to top */
       const toTop = document.getElementById('toTop');

@@ -1412,7 +1412,7 @@
                   <td>サーバーを識別するラベル</td>
                 </tr>
                 <tr>
-                  <td><code>allowed_tools</code></td>
+                  <td><code>allowed_tool_names</code></td>
                   <td>—</td>
                   <td>許可する特定ツール名のリスト（省略時は全ツール許可）</td>
                 </tr>
@@ -1444,7 +1444,7 @@
 
           <div class="callout">
             <strong>ベストプラクティス:</strong>
-            <code>allowed_tools</code>
+            <code>allowed_tool_names</code>
             で必要最小限のツールに絞り、コンテキスト消費と意図しない書き込み操作のリスクを同時に削減します。複数サーバー使用時は
             <code>server_label</code>/<code>server_description</code> を明確にし、常に HTTPS +
             適切な認証を使用してください。なお xAI 自身も
@@ -1978,8 +1978,9 @@
                     try:
                         return client.chat.completions.create(model="grok-4.5", messages=messages)
                     except RateLimitError:
+                        if attempt == max_retries - 1:
+                            raise
                         time.sleep(2 ** attempt)
-                raise
           </script>
 
           <p class="dim">
@@ -2077,7 +2078,7 @@
           <ul>
             <li>
               <strong>最小権限化</strong>:
-              <code>allowed_tools</code>
+              <code>allowed_tool_names</code>
               で必要なものだけを許可し、意図しない書き込み操作のリスクとコンテキスト消費を削減する。
             </li>
             <li>
@@ -2173,7 +2174,7 @@
             <li>
               <label
                 ><input type="checkbox" disabled /> Remote MCP Tools に
-                <code>allowed_tools</code> で最小権限を設定したか</label
+                <code>allowed_tool_names</code> で最小権限を設定したか</label
               >
             </li>
             <li>
@@ -2425,8 +2426,8 @@
       </main>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.12.0/mermaid.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha384-0Y9cMcep0hv2aLlERfDZI1xuSlWpetVlpi5P3/iX87ktdkV8yIQXkVI633Tco7OS" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.12.0/mermaid.min.js" integrity="sha512-5TKaYvhenABhlGIKSxAWLFJBZCSQw7HTV7aL1dJcBokM/+3PNtfgJFlv8E6Us/B1VMlQ4u8sPzjudL9TEQ06ww==" crossorigin="anonymous"></script>
     <script>
       // ---------------------------------------------------------------
       // dedent(): script[type="text/plain"] 内の raw テキストからエディタの

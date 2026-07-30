@@ -954,7 +954,7 @@
     </button>
 
     <div class="mobile-topbar">
-      <button class="hamburger" id="hamburgerBtn" type="button" aria-label="目次を開く" aria-expanded="false">
+      <button class="hamburger" id="hamburgerBtn" type="button" aria-label="目次を開く" aria-expanded="false" aria-controls="sidebar">
         <span></span>
       </button>
       <span class="brand">Markdown実践ガイド / SDD</span>
@@ -2548,11 +2548,13 @@
         sidebar.classList.remove('open');
         backdrop.classList.remove('open');
         hamburgerBtn.setAttribute('aria-expanded', 'false');
+        hamburgerBtn.setAttribute('aria-label', '目次を開く');
       }
       function toggleSidebar() {
         const isOpen = sidebar.classList.toggle('open');
         backdrop.classList.toggle('open', isOpen);
         hamburgerBtn.setAttribute('aria-expanded', String(isOpen));
+        hamburgerBtn.setAttribute('aria-label', isOpen ? '目次を閉じる' : '目次を開く');
       }
       hamburgerBtn.addEventListener('click', toggleSidebar);
       backdrop.addEventListener('click', closeSidebar);
