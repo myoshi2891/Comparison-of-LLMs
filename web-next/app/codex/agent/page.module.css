@@ -12,7 +12,14 @@
   --border: rgba(124, 158, 255, 0.16);
   --sidebar-w: 300px;
   --mono: var(--font-mono, "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace);
-  --sans: var(--font-sans, "Noto Sans JP", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
+  --sans: var(
+    --font-sans,
+    "Noto Sans JP",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif
+  );
 
   display: flex;
   min-height: 100vh;
@@ -253,18 +260,40 @@
 
 .codeLine {
   white-space: pre;
+  min-height: 1.7em;
 }
 
 /* Syntax highlight token helpers */
-.ck { color: #ff7b72; }
-.cs { color: #a5d6ff; }
-.cv { color: #79c0ff; }
-.cc { color: #6c7aa0; font-style: italic; }
-.ch { color: #f0883e; font-weight: 700; }
-.cm { color: #7ee787; font-weight: 700; }
-.cw { color: #d29922; }
-.ce { color: #bc8cff; }
-.cg { color: #3fb950; }
+.ck {
+  color: #ff7b72;
+}
+.cs {
+  color: #a5d6ff;
+}
+.cv {
+  color: #79c0ff;
+}
+.cc {
+  color: #6c7aa0;
+  font-style: italic;
+}
+.ch {
+  color: #f0883e;
+  font-weight: 700;
+}
+.cm {
+  color: #7ee787;
+  font-weight: 700;
+}
+.cw {
+  color: #d29922;
+}
+.ce {
+  color: #bc8cff;
+}
+.cg {
+  color: #3fb950;
+}
 
 /* ---------- Mermaid Container ---------- */
 .mermaidWrap {

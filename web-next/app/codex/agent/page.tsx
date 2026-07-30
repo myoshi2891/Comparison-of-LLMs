@@ -566,7 +566,7 @@ export default function CodexAgentPage() {
                 #:schema https://developers.openai.com/codex/config-schema.json
               </span>
             </div>
-            <div className={styles.codeLine} />
+            <div className={styles.codeLine}> </div>
             <div className={styles.codeLine}>
               <span className={styles.ck}>model</span> ={" "}
               <span className={styles.cs}>&quot;gpt-5.4&quot;</span>
@@ -591,7 +591,7 @@ export default function CodexAgentPage() {
               <span className={styles.ck}>sandbox_mode</span> ={" "}
               <span className={styles.cs}>&quot;workspace-write&quot;</span>
             </div>
-            <div className={styles.codeLine} />
+            <div className={styles.codeLine}> </div>
             <div className={styles.codeLine}>
               <span className={styles.ch}>[approval_policy.granular]</span>
             </div>
@@ -607,7 +607,7 @@ export default function CodexAgentPage() {
               <span className={styles.ck}>mcp_elicitations</span> ={" "}
               <span className={styles.ck}>false</span>
             </div>
-            <div className={styles.codeLine} />
+            <div className={styles.codeLine}> </div>
             <div className={styles.codeLine}>
               <span className={styles.ch}>[agents]</span>
             </div>
@@ -617,7 +617,7 @@ export default function CodexAgentPage() {
             <div className={styles.codeLine}>
               <span className={styles.ck}>max_threads</span> = <span className={styles.cv}>4</span>
             </div>
-            <div className={styles.codeLine} />
+            <div className={styles.codeLine}> </div>
             <div className={styles.codeLine}>
               <span className={styles.ch}>[agents.security_reviewer]</span>
             </div>
@@ -625,7 +625,7 @@ export default function CodexAgentPage() {
               <span className={styles.ck}>config_file</span> ={" "}
               <span className={styles.cs}>&quot;~/.codex/agents/security-reviewer.toml&quot;</span>
             </div>
-            <div className={styles.codeLine} />
+            <div className={styles.codeLine}> </div>
             <div className={styles.codeLine}>
               <span className={styles.ch}>[features.network_proxy]</span>
             </div>
@@ -880,7 +880,7 @@ export default function CodexAgentPage() {
               <span className={styles.ck}>sandbox_mode</span> ={" "}
               <span className={styles.cs}>&quot;read-only&quot;</span>
             </div>
-            <div className={styles.codeLine} />
+            <div className={styles.codeLine}> </div>
             <div className={styles.codeLine}>
               <span className={styles.ck}>instructions</span> ={" "}
               <span className={styles.cs}>&quot;&quot;&quot;</span>
@@ -1053,7 +1053,7 @@ export default function CodexAgentPage() {
               <span className={styles.cs}>&quot;リモートへの反映は必ず人間の確認を挟む&quot;</span>,
             </div>
             <div className={styles.codeLine}>)</div>
-            <div className={styles.codeLine} />
+            <div className={styles.codeLine}> </div>
             <div className={styles.codeLine}>
               <span className={styles.ck}>prefix_rule</span>(
             </div>
@@ -1077,7 +1077,7 @@ export default function CodexAgentPage() {
               ,
             </div>
             <div className={styles.codeLine}>)</div>
-            <div className={styles.codeLine} />
+            <div className={styles.codeLine}> </div>
             <div className={styles.codeLine}>
               <span className={styles.ck}>prefix_rule</span>(
             </div>
