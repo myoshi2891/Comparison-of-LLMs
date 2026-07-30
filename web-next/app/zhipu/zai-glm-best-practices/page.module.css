@@ -214,6 +214,43 @@
   font-family: var(--font-mono);
 }
 
+/* Code Highlighting Classes */
+.ck {
+  color: #ff7b72;
+  font-weight: 500;
+}
+.cs {
+  color: #a5d6ff;
+}
+.cv {
+  color: #79c0ff;
+}
+.cm {
+  color: #7ee787;
+  font-weight: 600;
+}
+.cw {
+  color: #d29922;
+  font-weight: 600;
+}
+.ce {
+  color: #bc8cff;
+}
+.cc {
+  color: #8b949e;
+  font-style: italic;
+}
+.cg {
+  color: #3fb950;
+}
+.ch {
+  color: #f0883e;
+  font-weight: 700;
+}
+.fn {
+  color: #d2a8ff;
+}
+
 .tableWrap {
   overflow-x: auto;
   margin: 20px 0;

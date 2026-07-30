@@ -497,33 +497,48 @@ export default function ZaiGlmBestPracticesPage() {
           </p>
 
           <div className={styles.preBlock}>
-            <div className={styles.codeLine}>pip install zai-sdk</div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>pip</span> install zai-sdk
+            </div>
           </div>
 
           <div className={styles.preBlock}>
-            <div className={styles.codeLine}>from zai import ZaiClient</div>
-            <div className={styles.codeLine}></div>
             <div className={styles.codeLine}>
-              client = ZaiClient(api_key=&quot;YOUR_API_KEY&quot;)
+              <span className={styles.ck}>from</span> zai <span className={styles.ck}>import</span>{" "}
+              ZaiClient
             </div>
-            <div className={styles.codeLine}></div>
-            <div className={styles.codeLine}>response = client.chat.completions.create(</div>
-            <div className={styles.codeLine}> model=&quot;glm-5.2&quot;,</div>
-            <div className={styles.codeLine}> messages=[</div>
+            <div className={styles.codeLine} />
             <div className={styles.codeLine}>
-              {" "}
-              &#123;&quot;role&quot;: &quot;system&quot;, &quot;content&quot;:
-              &quot;あなたは有能なアシスタントです。&quot;&#125;,
+              client = <span className={styles.fn}>ZaiClient</span>(api_key=
+              <span className={styles.cs}>&quot;YOUR_API_KEY&quot;</span>)
+            </div>
+            <div className={styles.codeLine} />
+            <div className={styles.codeLine}>
+              response = client.chat.completions.<span className={styles.fn}>create</span>(
             </div>
             <div className={styles.codeLine}>
-              {" "}
-              &#123;&quot;role&quot;: &quot;user&quot;, &quot;content&quot;:
-              &quot;自己紹介をしてください。&quot;&#125;,
+              {"    "}model=<span className={styles.cs}>&quot;glm-5.2&quot;</span>,
             </div>
-            <div className={styles.codeLine}> ],</div>
+            <div className={styles.codeLine}>{"    "}messages=[</div>
+            <div className={styles.codeLine}>
+              {"        "}&#123;<span className={styles.cs}>&quot;role&quot;</span>:{" "}
+              <span className={styles.cs}>&quot;system&quot;</span>,{" "}
+              <span className={styles.cs}>&quot;content&quot;</span>:{" "}
+              <span className={styles.cs}>&quot;あなたは有能なアシスタントです。&quot;</span>&#125;,
+            </div>
+            <div className={styles.codeLine}>
+              {"        "}&#123;<span className={styles.cs}>&quot;role&quot;</span>:{" "}
+              <span className={styles.cs}>&quot;user&quot;</span>,{" "}
+              <span className={styles.cs}>&quot;content&quot;</span>:{" "}
+              <span className={styles.cs}>&quot;自己紹介をしてください。&quot;</span>&#125;,
+            </div>
+            <div className={styles.codeLine}>{"    "}],</div>
             <div className={styles.codeLine}>)</div>
-            <div className={styles.codeLine}></div>
-            <div className={styles.codeLine}>print(response.choices[0].message.content)</div>
+            <div className={styles.codeLine} />
+            <div className={styles.codeLine}>
+              <span className={styles.fn}>print</span>(response.choices[
+              <span className={styles.cv}>0</span>].message.content)
+            </div>
           </div>
 
           <p className={styles.p}>
@@ -533,25 +548,40 @@ export default function ZaiGlmBestPracticesPage() {
           </p>
 
           <div className={styles.preBlock}>
-            <div className={styles.codeLine}>from openai import OpenAI</div>
-            <div className={styles.codeLine}></div>
-            <div className={styles.codeLine}>client = OpenAI(</div>
-            <div className={styles.codeLine}> api_key=&quot;YOUR_ZAI_API_KEY&quot;,</div>
             <div className={styles.codeLine}>
-              {" "}
-              base_url=&quot;https://api.z.ai/api/paas/v4/&quot;,
+              <span className={styles.ck}>from</span> openai{" "}
+              <span className={styles.ck}>import</span> OpenAI
+            </div>
+            <div className={styles.codeLine} />
+            <div className={styles.codeLine}>
+              client = <span className={styles.fn}>OpenAI</span>(
+            </div>
+            <div className={styles.codeLine}>
+              {"    "}api_key=<span className={styles.cs}>&quot;YOUR_ZAI_API_KEY&quot;</span>,
+            </div>
+            <div className={styles.codeLine}>
+              {"    "}base_url=
+              <span className={styles.cs}>&quot;https://api.z.ai/api/paas/v4/&quot;</span>,
             </div>
             <div className={styles.codeLine}>)</div>
-            <div className={styles.codeLine}></div>
-            <div className={styles.codeLine}>completion = client.chat.completions.create(</div>
-            <div className={styles.codeLine}> model=&quot;glm-5.2&quot;,</div>
+            <div className={styles.codeLine} />
             <div className={styles.codeLine}>
-              {" "}
-              messages=[&#123;&quot;role&quot;: &quot;user&quot;, &quot;content&quot;:
-              &quot;こんにちは&quot;&#125;],
+              completion = client.chat.completions.<span className={styles.fn}>create</span>(
+            </div>
+            <div className={styles.codeLine}>
+              {"    "}model=<span className={styles.cs}>&quot;glm-5.2&quot;</span>,
+            </div>
+            <div className={styles.codeLine}>
+              {"    "}messages=[&#123;<span className={styles.cs}>&quot;role&quot;</span>:{" "}
+              <span className={styles.cs}>&quot;user&quot;</span>,{" "}
+              <span className={styles.cs}>&quot;content&quot;</span>:{" "}
+              <span className={styles.cs}>&quot;こんにちは&quot;</span>&#125;],
             </div>
             <div className={styles.codeLine}>)</div>
-            <div className={styles.codeLine}>print(completion.choices[0].message.content)</div>
+            <div className={styles.codeLine}>
+              <span className={styles.fn}>print</span>(completion.choices[
+              <span className={styles.cv}>0</span>].message.content)
+            </div>
           </div>
 
           <p className={styles.p}>
@@ -561,19 +591,29 @@ export default function ZaiGlmBestPracticesPage() {
           </p>
 
           <div className={styles.preBlock}>
-            <div className={styles.codeLine}>response = client.chat.completions.create(</div>
-            <div className={styles.codeLine}> model=&quot;glm-5.2&quot;,</div>
             <div className={styles.codeLine}>
-              {" "}
-              messages=[&#123;&quot;role&quot;: &quot;user&quot;, &quot;content&quot;:
-              &quot;この設計案のトレードオフを整理して&quot;&#125;],
+              response = client.chat.completions.<span className={styles.fn}>create</span>(
             </div>
             <div className={styles.codeLine}>
-              {" "}
-              thinking=&#123;&quot;type&quot;: &quot;enabled&quot;&#125;,
+              {"    "}model=<span className={styles.cs}>&quot;glm-5.2&quot;</span>,
             </div>
-            <div className={styles.codeLine}> reasoning_effort=&quot;max&quot;,</div>
-            <div className={styles.codeLine}> max_tokens=32000,</div>
+            <div className={styles.codeLine}>
+              {"    "}messages=[&#123;<span className={styles.cs}>&quot;role&quot;</span>:{" "}
+              <span className={styles.cs}>&quot;user&quot;</span>,{" "}
+              <span className={styles.cs}>&quot;content&quot;</span>:{" "}
+              <span className={styles.cs}>&quot;この設計案のトレードオフを整理して&quot;</span>
+              &#125;],
+            </div>
+            <div className={styles.codeLine}>
+              {"    "}thinking=&#123;<span className={styles.cs}>&quot;type&quot;</span>:{" "}
+              <span className={styles.cs}>&quot;enabled&quot;</span>&#125;,
+            </div>
+            <div className={styles.codeLine}>
+              {"    "}reasoning_effort=<span className={styles.cs}>&quot;max&quot;</span>,
+            </div>
+            <div className={styles.codeLine}>
+              {"    "}max_tokens=<span className={styles.cv}>32000</span>,
+            </div>
             <div className={styles.codeLine}>)</div>
           </div>
 
@@ -948,31 +988,67 @@ export default function ZaiGlmBestPracticesPage() {
           </p>
 
           <div className={styles.preBlock}>
-            <div className={styles.codeLine}>response = client.chat.completions.create(</div>
-            <div className={styles.codeLine}> model=&quot;glm-5.2&quot;,</div>
             <div className={styles.codeLine}>
-              {" "}
-              messages=[&#123;&quot;role&quot;: &quot;user&quot;, &quot;content&quot;:
-              &quot;春をテーマにした短い文章を書いて&quot;&#125;],
+              response = client.chat.completions.<span className={styles.fn}>create</span>(
             </div>
-            <div className={styles.codeLine}> stream=True,</div>
+            <div className={styles.codeLine}>
+              {"    "}model=<span className={styles.cs}>&quot;glm-5.2&quot;</span>,
+            </div>
+            <div className={styles.codeLine}>
+              {"    "}messages=[&#123;<span className={styles.cs}>&quot;role&quot;</span>:{" "}
+              <span className={styles.cs}>&quot;user&quot;</span>,{" "}
+              <span className={styles.cs}>&quot;content&quot;</span>:{" "}
+              <span className={styles.cs}>&quot;春をテーマにした短い文章を書いて&quot;</span>
+              &#125;],
+            </div>
+            <div className={styles.codeLine}>
+              {"    "}stream=<span className={styles.ce}>True</span>,
+            </div>
             <div className={styles.codeLine}>)</div>
-            <div className={styles.codeLine}></div>
-            <div className={styles.codeLine}>collected = &quot;&quot;</div>
-            <div className={styles.codeLine}>for chunk in response:</div>
-            <div className={styles.codeLine}> if not chunk.choices:</div>
-            <div className={styles.codeLine}> continue</div>
-            <div className={styles.codeLine}> delta = chunk.choices[0].delta</div>
-            <div className={styles.codeLine}> if getattr(delta, &quot;content&quot;, None):</div>
-            <div className={styles.codeLine}> collected += delta.content</div>
+            <div className={styles.codeLine} />
             <div className={styles.codeLine}>
-              {" "}
-              print(delta.content, end=&quot;&quot;, flush=True)
+              collected = <span className={styles.cs}>&quot;&quot;</span>
             </div>
-            <div className={styles.codeLine}> if chunk.choices[0].finish_reason:</div>
             <div className={styles.codeLine}>
-              {" "}
-              print(f&quot;\n完了理由: &#123;chunk.choices[0].finish_reason&#125;&quot;)
+              <span className={styles.ck}>for</span> chunk <span className={styles.ck}>in</span>{" "}
+              response:
+            </div>
+            <div className={styles.codeLine}>
+              {"    "}
+              <span className={styles.ck}>if not</span> chunk.choices:
+            </div>
+            <div className={styles.codeLine}>
+              {"        "}
+              <span className={styles.ck}>continue</span>
+            </div>
+            <div className={styles.codeLine}>
+              {"    "}delta = chunk.choices[<span className={styles.cv}>0</span>].delta
+            </div>
+            <div className={styles.codeLine}>
+              {"    "}
+              <span className={styles.ck}>if</span> <span className={styles.fn}>getattr</span>
+              (delta, <span className={styles.cs}>&quot;content&quot;</span>,{" "}
+              <span className={styles.ce}>None</span>):
+            </div>
+            <div className={styles.codeLine}>{"        "}collected += delta.content</div>
+            <div className={styles.codeLine}>
+              {"        "}
+              <span className={styles.fn}>print</span>(delta.content, end=
+              <span className={styles.cs}>&quot;&quot;</span>, flush=
+              <span className={styles.ce}>True</span>)
+            </div>
+            <div className={styles.codeLine}>
+              {"    "}
+              <span className={styles.ck}>if</span> chunk.choices[
+              <span className={styles.cv}>0</span>].finish_reason:
+            </div>
+            <div className={styles.codeLine}>
+              {"        "}
+              <span className={styles.fn}>print</span>(f
+              <span className={styles.cs}>
+                &quot;\n完了理由: &#123;chunk.choices[0].finish_reason&#125;&quot;
+              </span>
+              )
             </div>
           </div>
 
@@ -1162,52 +1238,84 @@ export default function ZaiGlmBestPracticesPage() {
           </p>
 
           <div className={styles.preBlock}>
-            <div className={styles.codeLine}>import json</div>
-            <div className={styles.codeLine}>from zai import ZaiClient</div>
-            <div className={styles.codeLine}></div>
             <div className={styles.codeLine}>
-              client = ZaiClient(api_key=&quot;YOUR_API_KEY&quot;)
-            </div>
-            <div className={styles.codeLine}></div>
-            <div className={styles.codeLine}>schema_prompt = &quot;&quot;&quot;</div>
-            <div className={styles.codeLine}>以下のJSON形式で感情分析結果を返してください:</div>
-            <div className={styles.codeLine}>&#123;</div>
-            <div className={styles.codeLine}>
-              {" "}
-              &quot;sentiment&quot;: &quot;positive/negative/neutral&quot;,
-            </div>
-            <div className={styles.codeLine}> &quot;confidence&quot;: 0.95,</div>
-            <div className={styles.codeLine}>
-              {" "}
-              &quot;keywords&quot;: [&quot;キーワード1&quot;, &quot;キーワード2&quot;]
-            </div>
-            <div className={styles.codeLine}>&#125;</div>
-            <div className={styles.codeLine}>&quot;&quot;&quot;</div>
-            <div className={styles.codeLine}></div>
-            <div className={styles.codeLine}>response = client.chat.completions.create(</div>
-            <div className={styles.codeLine}> model=&quot;glm-5.2&quot;,</div>
-            <div className={styles.codeLine}> messages=[</div>
-            <div className={styles.codeLine}>
-              {" "}
-              &#123;&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: schema_prompt&#125;,
+              <span className={styles.ck}>import</span> json
             </div>
             <div className={styles.codeLine}>
-              {" "}
-              &#123;&quot;role&quot;: &quot;user&quot;, &quot;content&quot;:
-              &quot;今日は天気が良くて気分がいい!&quot;&#125;,
+              <span className={styles.ck}>from</span> zai <span className={styles.ck}>import</span>{" "}
+              ZaiClient
             </div>
-            <div className={styles.codeLine}> ],</div>
+            <div className={styles.codeLine} />
             <div className={styles.codeLine}>
-              {" "}
-              response_format=&#123;&quot;type&quot;: &quot;json_object&quot;&#125;,
+              client = <span className={styles.fn}>ZaiClient</span>(api_key=
+              <span className={styles.cs}>&quot;YOUR_API_KEY&quot;</span>)
+            </div>
+            <div className={styles.codeLine} />
+            <div className={styles.codeLine}>
+              schema_prompt = <span className={styles.cs}>&quot;&quot;&quot;</span>
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.cs}>以下のJSON形式で感情分析結果を返してください:</span>
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.cs}>&#123;</span>
+            </div>
+            <div className={styles.codeLine}>
+              {"  "}
+              <span className={styles.cs}>
+                &quot;sentiment&quot;: &quot;positive/negative/neutral&quot;,
+              </span>
+            </div>
+            <div className={styles.codeLine}>
+              {"  "}
+              <span className={styles.cs}>&quot;confidence&quot;: 0.95,</span>
+            </div>
+            <div className={styles.codeLine}>
+              {"  "}
+              <span className={styles.cs}>
+                &quot;keywords&quot;: [&quot;キーワード1&quot;, &quot;キーワード2&quot;]
+              </span>
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.cs}>&#125;</span>
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.cs}>&quot;&quot;&quot;</span>
+            </div>
+            <div className={styles.codeLine} />
+            <div className={styles.codeLine}>
+              response = client.chat.completions.<span className={styles.fn}>create</span>(
+            </div>
+            <div className={styles.codeLine}>
+              {"    "}model=<span className={styles.cs}>&quot;glm-5.2&quot;</span>,
+            </div>
+            <div className={styles.codeLine}>{"    "}messages=[</div>
+            <div className={styles.codeLine}>
+              {"        "}&#123;<span className={styles.cs}>&quot;role&quot;</span>:{" "}
+              <span className={styles.cs}>&quot;system&quot;</span>,{" "}
+              <span className={styles.cs}>&quot;content&quot;</span>: schema_prompt&#125;,
+            </div>
+            <div className={styles.codeLine}>
+              {"        "}&#123;<span className={styles.cs}>&quot;role&quot;</span>:{" "}
+              <span className={styles.cs}>&quot;user&quot;</span>,{" "}
+              <span className={styles.cs}>&quot;content&quot;</span>:{" "}
+              <span className={styles.cs}>&quot;今日は天気が良くて気分がいい!&quot;</span>&#125;,
+            </div>
+            <div className={styles.codeLine}>{"    "}],</div>
+            <div className={styles.codeLine}>
+              {"    "}response_format=&#123;<span className={styles.cs}>&quot;type&quot;</span>:{" "}
+              <span className={styles.cs}>&quot;json_object&quot;</span>&#125;,
             </div>
             <div className={styles.codeLine}>)</div>
-            <div className={styles.codeLine}></div>
+            <div className={styles.codeLine} />
             <div className={styles.codeLine}>
-              result = json.loads(response.choices[0].message.content)
+              result = json.<span className={styles.fn}>loads</span>(response.choices[
+              <span className={styles.cv}>0</span>].message.content)
             </div>
             <div className={styles.codeLine}>
-              print(result[&quot;sentiment&quot;], result[&quot;confidence&quot;])
+              <span className={styles.fn}>print</span>(result[
+              <span className={styles.cs}>&quot;sentiment&quot;</span>], result[
+              <span className={styles.cs}>&quot;confidence&quot;</span>])
             </div>
           </div>
 
@@ -1217,29 +1325,53 @@ export default function ZaiGlmBestPracticesPage() {
           </p>
 
           <div className={styles.preBlock}>
-            <div className={styles.codeLine}>from jsonschema import validate</div>
-            <div className={styles.codeLine}></div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>from</span> jsonschema{" "}
+              <span className={styles.ck}>import</span> validate
+            </div>
+            <div className={styles.codeLine} />
             <div className={styles.codeLine}>schema = &#123;</div>
-            <div className={styles.codeLine}> &quot;type&quot;: &quot;object&quot;,</div>
-            <div className={styles.codeLine}> &quot;properties&quot;: &#123;</div>
             <div className={styles.codeLine}>
-              {" "}
-              &quot;sentiment&quot;: &#123;&quot;type&quot;: &quot;string&quot;, &quot;enum&quot;:
-              [&quot;positive&quot;, &quot;negative&quot;, &quot;neutral&quot;]&#125;,
+              {"    "}
+              <span className={styles.cs}>&quot;type&quot;</span>:{" "}
+              <span className={styles.cs}>&quot;object&quot;</span>,
             </div>
             <div className={styles.codeLine}>
-              {" "}
-              &quot;confidence&quot;: &#123;&quot;type&quot;: &quot;number&quot;,
-              &quot;minimum&quot;: 0, &quot;maximum&quot;: 1&#125;,
+              {"    "}
+              <span className={styles.cs}>&quot;properties&quot;</span>: &#123;
             </div>
-            <div className={styles.codeLine}> &#125;,</div>
             <div className={styles.codeLine}>
-              {" "}
-              &quot;required&quot;: [&quot;sentiment&quot;, &quot;confidence&quot;],
+              {"        "}
+              <span className={styles.cs}>&quot;sentiment&quot;</span>: &#123;
+              <span className={styles.cs}>&quot;type&quot;</span>:{" "}
+              <span className={styles.cs}>&quot;string&quot;</span>,{" "}
+              <span className={styles.cs}>&quot;enum&quot;</span>: [
+              <span className={styles.cs}>&quot;positive&quot;</span>,{" "}
+              <span className={styles.cs}>&quot;negative&quot;</span>,{" "}
+              <span className={styles.cs}>&quot;neutral&quot;</span>]&#125;,
+            </div>
+            <div className={styles.codeLine}>
+              {"        "}
+              <span className={styles.cs}>&quot;confidence&quot;</span>: &#123;
+              <span className={styles.cs}>&quot;type&quot;</span>:{" "}
+              <span className={styles.cs}>&quot;number&quot;</span>,{" "}
+              <span className={styles.cs}>&quot;minimum&quot;</span>:{" "}
+              <span className={styles.cv}>0</span>,{" "}
+              <span className={styles.cs}>&quot;maximum&quot;</span>:{" "}
+              <span className={styles.cv}>1</span>&#125;,
+            </div>
+            <div className={styles.codeLine}>{"    "}&#125;,</div>
+            <div className={styles.codeLine}>
+              {"    "}
+              <span className={styles.cs}>&quot;required&quot;</span>: [
+              <span className={styles.cs}>&quot;sentiment&quot;</span>,{" "}
+              <span className={styles.cs}>&quot;confidence&quot;</span>],
             </div>
             <div className={styles.codeLine}>&#125;</div>
-            <div className={styles.codeLine}></div>
-            <div className={styles.codeLine}>validate(instance=result, schema=schema)</div>
+            <div className={styles.codeLine} />
+            <div className={styles.codeLine}>
+              <span className={styles.fn}>validate</span>(instance=result, schema=schema)
+            </div>
           </div>
 
           <div className={styles.card}>
@@ -1295,16 +1427,24 @@ export default function ZaiGlmBestPracticesPage() {
           </div>
 
           <div className={styles.preBlock}>
-            <div className={styles.codeLine}>response = client.chat.completions.create(</div>
-            <div className={styles.codeLine}> model=&quot;glm-5.2&quot;,</div>
-            <div className={styles.codeLine}> messages=[...],</div>
+            <div className={styles.codeLine}>
+              response = client.chat.completions.<span className={styles.fn}>create</span>(
+            </div>
+            <div className={styles.codeLine}>
+              {"    "}model=<span className={styles.cs}>&quot;glm-5.2&quot;</span>,
+            </div>
+            <div className={styles.codeLine}>{"    "}messages=[...],</div>
             <div className={styles.codeLine}>)</div>
             <div className={styles.codeLine}>usage = response.usage</div>
             <div className={styles.codeLine}>
-              print(&quot;total prompt tokens:&quot;, usage.prompt_tokens)
+              <span className={styles.fn}>print</span>(
+              <span className={styles.cs}>&quot;total prompt tokens:&quot;</span>,
+              usage.prompt_tokens)
             </div>
             <div className={styles.codeLine}>
-              print(&quot;cached tokens:&quot;, usage.prompt_tokens_details.cached_tokens)
+              <span className={styles.fn}>print</span>(
+              <span className={styles.cs}>&quot;cached tokens:&quot;</span>,
+              usage.prompt_tokens_details.cached_tokens)
             </div>
           </div>
 
@@ -1345,15 +1485,25 @@ export default function ZaiGlmBestPracticesPage() {
 
           <div className={styles.preBlock}>
             <div className={styles.codeLine}>&#123;</div>
-            <div className={styles.codeLine}> &quot;error&quot;: &#123;</div>
-            <div className={styles.codeLine}> &quot;code&quot;: &quot;1214&quot;,</div>
             <div className={styles.codeLine}>
-              {" "}
-              &quot;message&quot;: &quot;Parameter `$&#123;field&#125;` is invalid. Please check the
-              documentation.&quot;
+              {"  "}
+              <span className={styles.cs}>&quot;error&quot;</span>: &#123;
             </div>
-            <div className={styles.codeLine}> &#123;</div>
-            <div className={styles.codeLine}>&#123;</div>
+            <div className={styles.codeLine}>
+              {"    "}
+              <span className={styles.cs}>&quot;code&quot;</span>:{" "}
+              <span className={styles.cs}>&quot;1214&quot;</span>,
+            </div>
+            <div className={styles.codeLine}>
+              {"    "}
+              <span className={styles.cs}>&quot;message&quot;</span>:{" "}
+              <span className={styles.cs}>
+                &quot;Parameter `$&#123;field&#125;` is invalid. Please check the
+                documentation.&quot;
+              </span>
+            </div>
+            <div className={styles.codeLine}>{"  "}&#125;</div>
+            <div className={styles.codeLine}>&#125;</div>
           </div>
 
           <h3 className={styles.h3}>主要なエラーコード一覧(公式APIリファレンス確認済み)</h3>
@@ -1759,10 +1909,12 @@ export default function ZaiGlmBestPracticesPage() {
 
           <div className={styles.preBlock}>
             <div className={styles.codeLine}>
-              export ANTHROPIC_BASE_URL=&quot;https://api.z.ai/api/anthropic&quot;
+              <span className={styles.ck}>export</span> ANTHROPIC_BASE_URL=
+              <span className={styles.cs}>&quot;https://api.z.ai/api/anthropic&quot;</span>
             </div>
             <div className={styles.codeLine}>
-              export ANTHROPIC_AUTH_TOKEN=&quot;YOUR_ZAI_API_KEY&quot;
+              <span className={styles.ck}>export</span> ANTHROPIC_AUTH_TOKEN=
+              <span className={styles.cs}>&quot;YOUR_ZAI_API_KEY&quot;</span>
             </div>
           </div>
 
