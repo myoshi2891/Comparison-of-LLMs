@@ -837,62 +837,103 @@ export default function DeepSeekLlmPage() {
               <div className={styles.codeLine}>
                 <span className={styles.ck}>if</span> msg.tool_calls:
               </div>
+              <div className={styles.codeLine}>{"  "}messages.append(msg)</div>
               <div className={styles.codeLine}>
-                {"  "}messages.append(msg)
-              </div>
-              <div className={styles.codeLine}>
-                {"  "}<span className={styles.ck}>for</span> tool_call{" "}
+                {"  "}
+                <span className={styles.ck}>for</span> tool_call{" "}
                 <span className={styles.ck}>in</span> msg.tool_calls:
               </div>
               <div className={styles.codeLine}>
-                {"    "}<span className={styles.ck}>if</span> tool_call.function.name =={" "}
+                {"    "}
+                <span className={styles.ck}>if</span> tool_call.function.name =={" "}
                 <span className={styles.cs}>"get_weather"</span>:
               </div>
               <div className={styles.codeLine}>
-                {"      "}args = json.<span className={styles.fn}>loads</span>(tool_call.function.arguments)
+                {"      "}
+                <span className={styles.ck}>try</span>:
               </div>
               <div className={styles.codeLine}>
-                {"      "}result = <span className={styles.fn}>get_weather</span>(location=args.<span className={styles.fn}>get</span>(<span className={styles.cs}>"location"</span>))
+                {"        "}args = json.<span className={styles.fn}>loads</span>
+                (tool_call.function.arguments)
+              </div>
+              <div className={styles.codeLine}>
+                {"        "}loc = args.<span className={styles.fn}>get</span>(
+                <span className={styles.cs}>"location"</span>) <span className={styles.ck}>if</span>{" "}
+                <span className={styles.fn}>isinstance</span>(args,{" "}
+                <span className={styles.fn}>dict</span>) <span className={styles.ck}>else</span>{" "}
+                <span className={styles.ck}>None</span>
+              </div>
+              <div className={styles.codeLine}>
+                {"        "}
+                <span className={styles.ck}>if</span> <span className={styles.fn}>isinstance</span>
+                (loc, <span className={styles.fn}>str</span>) <span className={styles.ck}>and</span>{" "}
+                loc.<span className={styles.fn}>strip</span>():
+              </div>
+              <div className={styles.codeLine}>
+                {"          "}result = <span className={styles.fn}>get_weather</span>(location=loc)
+              </div>
+              <div className={styles.codeLine}>
+                {"        "}
+                <span className={styles.ck}>else</span>:
+              </div>
+              <div className={styles.codeLine}>
+                {"          "}result = json.<span className={styles.fn}>dumps</span>({"{"}
+                <span className={styles.cs}>"error"</span>:{" "}
+                <span className={styles.cs}>"Invalid location argument"</span>
+                {"}"})
+              </div>
+              <div className={styles.codeLine}>
+                {"      "}
+                <span className={styles.ck}>except</span> json.JSONDecodeError:
+              </div>
+              <div className={styles.codeLine}>
+                {"        "}result = json.<span className={styles.fn}>dumps</span>({"{"}
+                <span className={styles.cs}>"error"</span>:{" "}
+                <span className={styles.cs}>"Invalid JSON arguments"</span>
+                {"}"})
               </div>
               <div className={styles.codeLine}>
                 {"      "}messages.append({"{"}
               </div>
               <div className={styles.codeLine}>
-                {"        "}<span className={styles.cs}>"role"</span>: <span className={styles.cs}>"tool"</span>,
+                {"        "}
+                <span className={styles.cs}>"role"</span>: <span className={styles.cs}>"tool"</span>
+                ,
               </div>
               <div className={styles.codeLine}>
-                {"        "}<span className={styles.cs}>"tool_call_id"</span>: tool_call.id,
+                {"        "}
+                <span className={styles.cs}>"tool_call_id"</span>: tool_call.id,
               </div>
               <div className={styles.codeLine}>
-                {"        "}<span className={styles.cs}>"content"</span>: result
+                {"        "}
+                <span className={styles.cs}>"content"</span>: result
               </div>
               <div className={styles.codeLine}>
-                {"      "}{"}"})
+                {"      "}
+                {"}"})
               </div>
               <div className={styles.codeLine}></div>
               <div className={styles.codeLine}>
-                {"  "}final_resp = client.chat.completions.<span className={styles.fn}>create</span>(
+                {"  "}final_resp = client.chat.completions.<span className={styles.fn}>create</span>
+                (
               </div>
               <div className={styles.codeLine}>
                 {"    "}model=<span className={styles.cs}>"deepseek-v4-pro"</span>,
               </div>
+              <div className={styles.codeLine}>{"    "}messages=messages,</div>
+              <div className={styles.codeLine}>{"    "}tools=tools</div>
+              <div className={styles.codeLine}>{"  "})</div>
               <div className={styles.codeLine}>
-                {"    "}messages=messages,
-              </div>
-              <div className={styles.codeLine}>
-                {"    "}tools=tools
-              </div>
-              <div className={styles.codeLine}>
-                {"  "})
-              </div>
-              <div className={styles.codeLine}>
-                {"  "}<span className={styles.fn}>print</span>(final_resp.choices[<span className={styles.cv}>0</span>].message.content)
+                {"  "}
+                <span className={styles.fn}>print</span>(final_resp.choices[
+                <span className={styles.cv}>0</span>].message.content)
               </div>
               <div className={styles.codeLine}>
                 <span className={styles.ck}>else</span>:
               </div>
               <div className={styles.codeLine}>
-                {"  "}<span className={styles.fn}>print</span>(msg.content)
+                {"  "}
+                <span className={styles.fn}>print</span>(msg.content)
               </div>
             </div>
           </div>
