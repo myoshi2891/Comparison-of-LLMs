@@ -193,14 +193,14 @@ AGENTS.mdが肥大化してきたら、本体は簡潔に保ち、計画・レ�
 
 #### 1. 設定デフォルト階層 (Managed Defaults)
 
-下位のデフォルト値が上位の設定によって上書きされる基本の適用順序です。CLIの `-c` 引数やオプションは実行時の一時的な個別設定として適用され、管理者の制約を迂回するものではありません。なお、リポジトリ固有の `.codex/config.toml` は信頼済みプロジェクト（trusted project）でのみ自動的に読み込まれます。
+優先度の高い設定層が下位の既定値を順に上書きする基本の適用順序です。フローの矢印（`-->`）は**優先度の低下（より上位の設定層が後続の下位レイヤーの既定値を上書きする優先順位）**を示しています。CLIの `-c` 引数やオプションは実行時の一時的な個別設定として最優先で適用され、管理者の制約を迂回するものではありません。なお、リポジトリ固有の `.codex/config.toml` は信頼済みプロジェクト（trusted project）でのみ自動的に読み込まれ、ユーザー設定よりも上位の優先度として適用されます。
 
 ```mermaid
 flowchart TD
     MDM["1. MDM settings (組織・端末プロファイル)"] --> MNG["2. managed_config.toml (管理者提供デフォルト)"]
-    MNG --> USER["3. ~/.codex/config.toml (ユーザー個人設定)"]
-    USER --> PROJ["4. .codex/config.toml (信頼済みプロジェクト設定)"]
-    PROJ --> SYS["5. System settings (/etc/codex/config.toml 等)"]
+    MNG --> PROJ["3. .codex/config.toml (信頼済みプロジェクト設定)"]
+    PROJ --> USER["4. ~/.codex/config.toml (ユーザー個人設定)"]
+    USER --> SYS["5. System settings (/etc/codex/config.toml 等)"]
     SYS --> DEF["6. Built-in defaults (組み込み既定値)"]
 ```
 
@@ -208,8 +208,8 @@ flowchart TD
 |---|---|---|
 | MDM設定 | MDMプロファイル | 端末・組織レベルの最優先ポリシー |
 | 管理者デフォルト | `managed_config.toml` | 管理者が全ユーザーに配布する共通デフォルト値 |
+| プロジェクト設定 | `.codex/config.toml` | **信頼済みプロジェクト**でのみ自動的に読み込まれるリポジトリ設定（ユーザー設定を上書き） |
 | ユーザー設定 | `~/.codex/config.toml` | 個人の既定値(モデル・推論レベル・スレッド制限等) |
-| プロジェクト設定 | `.codex/config.toml` | **信頼済みプロジェクト**でのみ自動的に読み込まれるリポジトリ設定 |
 | システム設定 | `/etc/codex/config.toml` 等 | OS/システムレベルの標準設定 |
 | 組み込み既定値 | Codex内蔵デフォルト | 設定未指定時の既定動作 |
 
@@ -228,7 +228,7 @@ flowchart TD
 | `requirements.toml` | **最高優先度の不可逆な管理者制約**。ユーザー設定やCLI引数の如何に関わらず、セキュリティ方針や制限を強制適用します。 |
 | スレッド上限キー | `agents.max_concurrent_threads_per_session` が現行キー。`agents.max_threads` はレガシー別名。※`agents.max_depth` はV1でのみ有効 |
 
-公式のおすすめパターンは、**個人の既定値は `~/.codex/config.toml`、信頼済みリポジトリ固有の挙動は `.codex/config.toml`、一時的な変更のみコマンドライン引数で**、というシンプルな役割分担です。
+公式のおすすめパターンは、**個人の既定値は `~/.codex/config.toml`、信頼済みリポジトリ固有の挙動は `.codex/config.toml`（ユーザー設定を上書き）、一時的な変更のみコマンドライン引数で**、というシンプルな役割分担です。
 
 ### サンドボックスと承認ポリシー
 
