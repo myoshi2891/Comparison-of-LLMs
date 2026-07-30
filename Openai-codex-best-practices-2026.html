@@ -11,6 +11,9 @@
       rel="stylesheet"
     />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/ini.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
     <style>
       :root {
         --bg: #f6f5f1;
@@ -103,7 +106,7 @@
       .shell {
         display: grid;
         grid-template-columns: 270px minmax(0, 1fr);
-        max-width: 1320px;
+        max-width: 1760px;
         margin: 0 auto;
       }
       nav.toc {
@@ -181,21 +184,21 @@
         min-width: 0;
       }
       .content {
-        max-width: 760px;
+        max-width: 1180px;
         margin: 0 auto;
-        padding: 0 44px;
+        padding: 0 56px;
       }
 
       /* ---------- hero ---------- */
       .hero {
-        padding: 64px 44px 46px;
+        padding: 64px 56px 46px;
         border-bottom: 1px solid var(--border);
         background:
           radial-gradient(900px 420px at 85% -10%, var(--accent-soft) 0%, transparent 60%),
           var(--bg);
       }
       .hero-inner {
-        max-width: 1010px;
+        max-width: 1360px;
         margin: 0 auto;
         display: grid;
         grid-template-columns: 1.15fr 0.85fr;
@@ -472,6 +475,43 @@
         margin: -6px 0 8px;
         text-transform: uppercase;
       }
+      /* highlight.js token colors, tuned to the page palette */
+      .hljs-attr,
+      .hljs-attribute,
+      .hljs-variable {
+        color: var(--code-accent);
+      }
+      .hljs-string,
+      .hljs-symbol {
+        color: #b7d99a;
+      }
+      .hljs-number,
+      .hljs-literal {
+        color: #e8b168;
+      }
+      .hljs-comment {
+        color: #6b6f87;
+        font-style: italic;
+      }
+      .hljs-keyword,
+      .hljs-built_in,
+      .hljs-name,
+      .hljs-selector-tag {
+        color: #d89be0;
+      }
+      .hljs-section,
+      .hljs-title {
+        color: #f2c572;
+        font-weight: 600;
+      }
+      .hljs-punctuation,
+      .hljs-operator {
+        color: #8a8fa8;
+      }
+      .hljs-meta {
+        color: var(--code-accent);
+        opacity: 0.8;
+      }
 
       /* ---------- callouts ---------- */
       .callout {
@@ -554,10 +594,26 @@
         margin: 0 0 24px;
         overflow-x: auto;
       }
-      .diagram .mermaid {
+      .diagram .mermaid-render {
         display: flex;
         justify-content: center;
-        min-width: 520px;
+        align-items: center;
+        min-height: 80px;
+      }
+      .diagram .mermaid-render svg {
+        display: block;
+        width: auto;
+        max-width: 100%;
+        height: auto;
+        margin: 0 auto;
+        overflow: visible;
+      }
+      .diagram .mermaid-render .mm-error {
+        font-family: var(--mono);
+        font-size: 12.5px;
+        color: var(--danger);
+        padding: 10px 4px;
+        text-align: center;
       }
 
       /* ---------- checklist ---------- */
@@ -570,22 +626,37 @@
         display: flex;
         gap: 12px;
         align-items: flex-start;
-        padding: 11px 4px;
+        padding: 11px 8px;
         border-bottom: 1px dashed var(--border);
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background 0.15s;
+      }
+      .checklist li:hover {
+        background: var(--accent-soft);
       }
       .checklist li:last-child {
         border-bottom: none;
       }
       .checklist input {
         margin-top: 4px;
-        width: 16px;
-        height: 16px;
+        width: 17px;
+        height: 17px;
         accent-color: var(--accent);
         flex: none;
+        cursor: pointer;
       }
       .checklist span {
         color: var(--ink-soft);
         font-size: 14.5px;
+        transition: opacity 0.15s;
+      }
+      .checklist li:has(input:checked) {
+        background: var(--good-soft);
+      }
+      .checklist li:has(input:checked) span {
+        text-decoration: line-through;
+        opacity: 0.6;
       }
 
       /* ---------- references ---------- */
@@ -675,11 +746,15 @@
           z-index: 80;
           background: var(--surface);
           transform: translateX(-100%);
-          transition: transform 0.25s ease;
+          transition: transform 0.25s ease, visibility 0.25s ease;
           box-shadow: 20px 0 40px rgba(0, 0, 0, 0.15);
+          visibility: hidden;
+          pointer-events: none;
         }
         nav.toc.open {
           transform: translateX(0);
+          visibility: visible;
+          pointer-events: auto;
         }
         .topbar {
           display: flex;
@@ -708,7 +783,7 @@
 
     <div class="topbar">
       <span class="brand">CODEX / BEST PRACTICES</span>
-      <button id="navToggle" aria-label="目次を開く">☰ 目次</button>
+      <button id="navToggle" type="button" aria-label="目次を開く" aria-expanded="false" aria-controls="tocNav">☰ 目次</button>
     </div>
 
     <div class="shell">
@@ -903,14 +978,7 @@
               出力が指示するアクション(ファイル読み書き・コマンド実行・ツール呼び出し)を実行する」というループを、タスクが完了するかユーザーがキャンセルするまで繰り返します。
             </p>
             <div class="diagram">
-              <div class="mermaid">
-                flowchart TD A[ユーザーがプロンプトを送信] --> B[Codexがモデルを呼び出す] B -->
-                C{モデル出力に基づき行動を決定} C --> D[ファイルの読み取り・編集] C -->
-                E["コマンド実行 (shell / apply_patch)"] C --> F[MCPツールの呼び出し] D -->
-                G[実行結果をコンテキストへ反映] E --> G F --> G G --> H{タスクは完了したか?} H --
-                未完了・コンテキストが逼迫 --> I["Compaction: 古い情報を要約して圧縮"] I --> B H --
-                未完了 --> B H -- 完了 --> J[結果を提示しレビュー待ち]
-              </div>
+              <pre id="diag-loop" class="mermaid-render mermaid"></pre>
             </div>
             <p>
               スレッド内の情報はすべてモデルのコンテキストウィンドウに収まる必要があります。長時間タスクでは自動的に<strong>Compaction(圧縮)</strong>が働き、関連情報を要約しながら作業を継続します。この仕組みを理解しておくと、長時間タスクの後半で挙動が変わる理由を把握しやすくなります。
@@ -1037,14 +1105,7 @@
             </ol>
 
             <div class="diagram">
-              <div class="mermaid">
-                flowchart TD T[新しいタスクが来た] --> Q{タスクの性質は?} Q --
-                小さく明確・1ターンで完結 --> A[通常のプロンプトを直接送る] Q --
-                複雑・曖昧で設計が必要 --> B["/plan で計画を立てさせる<br />(必要なら「まず質問して」と依頼)"]
-                Q -- ゴールは明確だが道筋が不確実で<br />複数ターンかかる --> C["/goal
-                で永続的な目標を設定<br />(完了条件=検証可能な証拠)"] B --> D[計画をレビューし承認]
-                D --> E[実装を開始] C --> F["Codexが自律的にplan→act→testを繰り返す"]
-              </div>
+              <pre id="diag-plan" class="mermaid-render mermaid"></pre>
             </div>
 
             <p>
@@ -1094,13 +1155,7 @@
               AGENTS.mdは複数の階層に置くことができ、<strong>より作業ディレクトリに近い、具体的なファイルが優先</strong>されます。
             </p>
             <div class="diagram">
-              <div class="mermaid">
-                flowchart LR subgraph P["優先度: 低 → 高(具体的なものが勝つ)"] direction LR G["①
-                ~/.codex/AGENTS.md<br />個人のグローバル既定値"] --> R["② リポジトリ直下
-                AGENTS.md<br />チーム共通ルール"] R --> S["③ サブディレクトリ AGENTS.md<br />例:
-                apps/web/AGENTS.md"] S --> O["④ AGENTS.override.md<br />一時的なローカル上書き"] end
-                O --> X[Codexセッション開始時に統合され読み込まれる]
-              </div>
+              <pre id="diag-agents" class="mermaid-render mermaid"></pre>
             </div>
             <p>
               例えば、モノレポのルートに「<code>pnpm test</code
@@ -1235,24 +1290,14 @@
             </div>
 
             <div class="diagram">
-              <div class="mermaid">
-                flowchart TD Start[新しいCodexセッションを開始する] --> Q1{リポジトリ/環境の性質は?}
-                Q1 -- 初めて使う・信頼度が低い --> R1["sandbox_mode = read-only<br />approval_policy
-                = on-request"] Q1 -- 普段使いのローカル開発 --> R2["sandbox_mode =
-                workspace-write<br />approval_policy = on-request<br />(推奨される既定の落としどころ)"]
-                Q1 -- CI/使い捨ての隔離環境 --> R3["sandbox_mode = workspace-write または
-                danger-full-access<br />approval_policy = never<br />(環境自体で隔離)"] R1 -->
-                Note1["ネットワークアクセスや<br />ワークスペース外への操作は都度承認"] R2 -->
-                Note2["プロジェクト内の編集・テスト・整形は自動<br />それ以外は承認を要求"] R3 -->
-                Note3["人間の承認なしで完結<br />=環境の隔離が唯一の安全網"]
-              </div>
+              <pre id="diag-sandbox" class="mermaid-render mermaid"></pre>
             </div>
             <p>
               公式ガイドは「コーディングエージェントに不慣れなうちは既定の権限のまま始め、信頼できるリポジトリや用途が明確になってから緩めるように」と明確に助言しています。<code>danger-full-access</code>(CLIでは<code>--dangerously-bypass-approvals-and-sandbox</code>という別名でも呼ばれます)は最終手段として扱うべきです。
             </p>
 
             <p class="code-label">~/.codex/config.toml — 個人のデフォルト例</p>
-            <pre><code>model = "gpt-5.5"
+            <pre><code class="language-toml">model = "gpt-5.5"
 approval_policy = "on-request"
 sandbox_mode = "workspace-write"
 model_reasoning_effort = "medium"
@@ -1262,7 +1307,7 @@ plan_mode_reasoning_effort = "high"
 goals = true</code></pre>
 
             <p class="code-label">.codex/config.toml — プロジェクト固有の例</p>
-            <pre><code>[mcp_servers.jira]
+            <pre><code class="language-toml">[mcp_servers.jira]
 command = "npx"
 args = ["-y", "@example/jira-mcp"]</code></pre>
           </section>
@@ -1354,7 +1399,7 @@ args = ["-y", "@example/jira-mcp"]</code></pre>
               Appすべてで同じように使えます。
             </p>
             <p class="code-label">典型的なディレクトリ構成(オープンなAgent Skills標準準拠)</p>
-            <pre><code>my-skill/
+            <pre><code class="nohighlight">my-skill/
 ├── SKILL.md          # 必須: 指示内容
 ├── scripts/          # 任意: 実行可能スクリプト
 ├── references/       # 任意: 参考ドキュメント
@@ -1385,12 +1430,7 @@ args = ["-y", "@example/jira-mcp"]</code></pre>
               大きなタスクは、スコープの明確な作業を子エージェントに委任することで並列化できます。<code>.codex/agents/</code>配下にTOMLファイルとしてサブエージェントを定義できます。
             </p>
             <div class="diagram">
-              <div class="mermaid">
-                flowchart TD P["親エージェント(メインスレッド)"] --> S1["サブエージェントA<br />(セキュリティレビュー担当)"]
-                P --> S2["サブエージェントB<br />(テスト作成担当)"] P --> S3["サブエージェントC<br />(コードベース探索担当)"]
-                S1 --> M[結果をメインスレッドに集約] S2 --> M S3 --> M M -->
-                P2[親エージェントが統合し次の行動を決定]
-              </div>
+              <pre id="diag-subagents" class="mermaid-render mermaid"></pre>
             </div>
             <p>
               サブエージェントは並列化による速度向上と引き換えに、単一エージェントで実行する場合より多くのトークンを消費すると報告されています。コスト管理の観点では、親エージェントは高めの推論レベル、定型作業を担う子エージェントは低めという配分が現実的です。
@@ -1445,7 +1485,7 @@ args = ["-y", "@example/jira-mcp"]</code></pre>
               >を備えており、これがCI/CD統合の入口になります。
             </p>
             <p class="code-label">bash — 基本的な使い方</p>
-            <pre><code>codex exec "失敗しているテストをすべて修正して"
+            <pre><code class="language-bash">codex exec "失敗しているテストをすべて修正して"
 
 # 前回のセッションを再開して2段階のパイプラインにする
 codex exec "レースコンディションがないかレビューして"
@@ -1464,16 +1504,7 @@ codex exec --skip-git-repo-check --sandbox read-only "このディレクトリ�
             </p>
 
             <div class="diagram">
-              <div class="mermaid">
-                sequenceDiagram participant Dev as 開発者 participant GH as GitHub participant
-                Action as openai/codex-action participant Codex as Codex CLI (codex exec)
-                participant PR as プルリクエスト Dev->>GH: プルリクエストを作成 GH->>Action:
-                ワークフローをトリガー Action->>Action: CLIをインストールしResponses
-                APIプロキシを起動 Action->>Codex: codex exec --sandbox workspace-write
-                --safety-strategy drop-sudo Codex->>Codex: 差分を解析しレビュー観点を評価
-                Codex-->>Action: レビュー結果/パッチを返却 Action->>PR: レビューコメントを投稿
-                PR-->>Dev: 修正提案を確認しマージ判断
-              </div>
+              <pre id="diag-cicd" class="mermaid-render mermaid"></pre>
             </div>
 
             <div class="callout warn">
@@ -1683,64 +1714,64 @@ codex exec --skip-git-repo-check --sandbox read-only "このディレクトリ�
             </p>
             <ul class="checklist">
               <li>
-                <input type="checkbox" disabled /><span
+                <input type="checkbox" disabled aria-hidden="true" /><span
                   >プロンプトにGoal・Context・Constraints・Done
                   whenの4要素を意識して書いているか</span
                 >
               </li>
               <li>
-                <input type="checkbox" disabled /><span
+                <input type="checkbox" disabled aria-hidden="true" /><span
                   >タスクの複雑さに応じてReasoning Effortを使い分けているか(既定はmedium)</span
                 >
               </li>
               <li>
-                <input type="checkbox" disabled /><span
+                <input type="checkbox" disabled aria-hidden="true" /><span
                   >複雑・曖昧なタスクでは<code>/plan</code>や<code>/goal</code>で完了条件を先に固めているか</span
                 >
               </li>
               <li>
-                <input type="checkbox" disabled /><span
+                <input type="checkbox" disabled aria-hidden="true" /><span
                   >チームの規約・検証手順をAGENTS.mdに書き、プロンプトで繰り返していないか</span
                 >
               </li>
               <li>
-                <input type="checkbox" disabled /><span
+                <input type="checkbox" disabled aria-hidden="true" /><span
                   ><code>~/.codex/config.toml</code
                   >と<code>.codex/config.toml</code>で個人設定とプロジェクト設定を役割分担しているか</span
                 >
               </li>
               <li>
-                <input type="checkbox" disabled /><span
+                <input type="checkbox" disabled aria-hidden="true" /><span
                   >サンドボックス・承認ポリシーを用途に応じて使い分けているか</span
                 >
               </li>
               <li>
-                <input type="checkbox" disabled /><span
+                <input type="checkbox" disabled aria-hidden="true" /><span
                   >テスト・Lint・差分レビューをワークフローに組み込んでいるか</span
                 >
               </li>
               <li>
-                <input type="checkbox" disabled /><span
+                <input type="checkbox" disabled aria-hidden="true" /><span
                   >リポジトリ外のコンテキストが必要な場面でMCPを検討しているか(繋ぎすぎに注意)</span
                 >
               </li>
               <li>
-                <input type="checkbox" disabled /><span
+                <input type="checkbox" disabled aria-hidden="true" /><span
                   >繰り返し行っている作業をSkillに切り出しているか</span
                 >
               </li>
               <li>
-                <input type="checkbox" disabled /><span
+                <input type="checkbox" disabled aria-hidden="true" /><span
                   >安定したワークフローだけをAutomationsに切り出しているか</span
                 >
               </li>
               <li>
-                <input type="checkbox" disabled /><span
+                <input type="checkbox" disabled aria-hidden="true" /><span
                   >並列作業ではgit worktreeでスレッドを分離しているか</span
                 >
               </li>
               <li>
-                <input type="checkbox" disabled /><span
+                <input type="checkbox" disabled aria-hidden="true" /><span
                   >CI/CDでは公式Actionや<code>codex exec</code
                   >を使い、APIキーをジョブ全体に晒していないか</span
                 >
@@ -2141,8 +2172,87 @@ codex exec --skip-git-repo-check --sandbox read-only "このディレクトリ�
     </button>
 
     <script>
+      if (window.hljs) {
+        hljs.configure({ ignoreUnescapedHTML: true });
+        hljs.highlightAll();
+      }
+
+      /* ---------------------------------------------------------------
+   Mermaid diagrams: rendered from JS template literals (not raw
+   <div class="mermaid"> text) so that no formatter/indentation can
+   ever corrupt the diagram source. Each statement sits on its own
+   line at column 0 inside the backtick string.
+--------------------------------------------------------------- */
+      const DIAGRAMS = {
+        'diag-loop': `flowchart TD
+A["ユーザーがプロンプトを送信"] --> B["Codexがモデルを呼び出す"]
+B --> C{"モデル出力に基づき行動を決定"}
+C --> D["ファイルの読み取り・編集"]
+C --> E["コマンド実行(shell / apply_patch)"]
+C --> F["MCPツールの呼び出し"]
+D --> G["実行結果をコンテキストへ反映"]
+E --> G
+F --> G
+G --> H{"タスクは完了したか?"}
+H -- "未完了・コンテキストが逼迫" --> I["Compaction: 古い情報を要約して圧縮"]
+I --> B
+H -- "未完了" --> B
+H -- "完了" --> J["結果を提示しレビュー待ち"]`,
+
+        'diag-plan': `flowchart TD
+T["新しいタスクが来た"] --> Q{"タスクの性質は?"}
+Q -- "小さく明確・1ターンで完結" --> A["通常のプロンプトを直接送る"]
+Q -- "複雑・曖昧で設計が必要" --> B["/plan で計画を立てさせる<br/>(必要なら「まず質問して」と依頼)"]
+Q -- "ゴールは明確だが道筋が不確実で複数ターンかかる" --> C["/goal で永続的な目標を設定<br/>(完了条件=検証可能な証拠)"]
+B --> D["計画をレビューし承認"]
+D --> E["実装を開始"]
+C --> F["Codexが自律的にplan→act→testを繰り返す"]`,
+
+        'diag-agents': `flowchart LR
+subgraph P["優先度: 低 から 高(具体的なものが勝つ)"]
+direction LR
+G["1. ~/.codex/AGENTS.md<br/>個人のグローバル既定値"] --> R["2. リポジトリ直下 AGENTS.md<br/>チーム共通ルール"]
+R --> S["3. サブディレクトリ AGENTS.md<br/>例: apps/web/AGENTS.md"]
+S --> O["4. AGENTS.override.md<br/>一時的なローカル上書き"]
+end
+O --> X["Codexセッション開始時に統合され読み込まれる"]`,
+
+        'diag-sandbox': `flowchart TD
+Start["新しいCodexセッションを開始する"] --> Q1{"リポジトリ/環境の性質は?"}
+Q1 -- "初めて使う・信頼度が低い" --> R1["sandbox_mode = read-only<br/>approval_policy = on-request"]
+Q1 -- "普段使いのローカル開発" --> R2["sandbox_mode = workspace-write<br/>approval_policy = on-request<br/>(推奨される既定の落としどころ)"]
+Q1 -- "CI/使い捨ての隔離環境" --> R3["sandbox_mode = workspace-write または danger-full-access<br/>approval_policy = never<br/>(環境自体で隔離)"]
+R1 --> Note1["ネットワークアクセスや<br/>ワークスペース外への操作は都度承認"]
+R2 --> Note2["プロジェクト内の編集・テスト・整形は自動<br/>それ以外は承認を要求"]
+R3 --> Note3["人間の承認なしで完結<br/>=環境の隔離が唯一の安全網"]`,
+
+        'diag-subagents': `flowchart TD
+P["親エージェント(メインスレッド)"] --> S1["サブエージェントA<br/>(セキュリティレビュー担当)"]
+P --> S2["サブエージェントB<br/>(テスト作成担当)"]
+P --> S3["サブエージェントC<br/>(コードベース探索担当)"]
+S1 --> M["結果をメインスレッドに集約"]
+S2 --> M
+S3 --> M
+M --> P2["親エージェントが統合し次の行動を決定"]`,
+
+        'diag-cicd': `sequenceDiagram
+participant Dev as 開発者
+participant GH as GitHub
+participant Action as codex-action
+participant Codex as Codex CLI
+participant PR as プルリクエスト
+Dev->>GH: プルリクエストを作成
+GH->>Action: ワークフローをトリガー
+Action->>Action: CLIをインストールしAPIプロキシを起動
+Action->>Codex: codex exec --sandbox workspace-write
+Codex->>Codex: 差分を解析しレビュー観点を評価
+Codex-->>Action: レビュー結果を返却
+Action->>PR: レビューコメントを投稿
+PR-->>Dev: 修正提案を確認しマージ判断`,
+      };
+
       mermaid.initialize({
-        startOnLoad: true,
+        startOnLoad: false,
         theme: 'base',
         themeVariables: {
           primaryColor: '#E9EFFA',
@@ -2153,16 +2263,50 @@ codex exec --skip-git-repo-check --sandbox read-only "このディレクトリ�
           secondaryBorderColor: '#A6791F',
           tertiaryColor: '#FFFFFF',
           fontFamily: 'Zen Kaku Gothic New, Noto Sans JP, sans-serif',
-          fontSize: '13.5px',
+          fontSize: '16px',
           actorBkg: '#E9EFFA',
           actorBorder: '#2954A6',
           actorTextColor: '#1A1B22',
           signalColor: '#2954A6',
           signalTextColor: '#1A1B22',
         },
-        flowchart: { curve: 'basis', htmlLabels: true },
+        flowchart: { curve: 'basis', htmlLabels: true, useMaxWidth: false },
+        sequence: { useMaxWidth: false, mirrorActors: false, noteMargin: 10 },
         securityLevel: 'loose',
       });
+
+      (async () => {
+        if (document.fonts && document.fonts.ready) {
+          try {
+            await document.fonts.ready;
+          } catch (e) {}
+        }
+        for (const [id, src] of Object.entries(DIAGRAMS)) {
+          const target = document.getElementById(id);
+          if (!target) continue;
+          try {
+            const { svg } = await mermaid.render('svg-' + id, src);
+            target.innerHTML = svg;
+            const svgEl = target.querySelector('svg');
+            if (svgEl) {
+              svgEl.removeAttribute('width');
+              svgEl.removeAttribute('height');
+              svgEl.style.display = 'block';
+              svgEl.style.width = 'auto';
+              svgEl.style.maxWidth = '100%';
+              svgEl.style.height = 'auto';
+              svgEl.style.margin = '0 auto';
+              svgEl.style.overflow = 'visible';
+            }
+          } catch (err) {
+            target.innerHTML =
+              '<div class="mm-error">図の描画に失敗しました: ' +
+              (err && err.message ? err.message : err) +
+              '</div>';
+            console.error('Mermaid render failed for', id, err);
+          }
+        }
+      })();
 
       /* progress bar */
       const bar = document.getElementById('progress');
@@ -2177,13 +2321,20 @@ codex exec --skip-git-repo-check --sandbox read-only "このディレクトリ�
       /* mobile nav toggle */
       const tocNav = document.getElementById('tocNav');
       const navToggle = document.getElementById('navToggle');
-      navToggle &&
+      if (navToggle && tocNav) {
+        navToggle.setAttribute('aria-controls', 'tocNav');
+        navToggle.setAttribute('aria-expanded', 'false');
         navToggle.addEventListener('click', () => {
-          tocNav.classList.toggle('open');
+          const isOpen = tocNav.classList.toggle('open');
+          navToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
         });
-      tocNav.querySelectorAll('a').forEach((a) => {
-        a.addEventListener('click', () => tocNav.classList.remove('open'));
-      });
+        tocNav.querySelectorAll('a').forEach((a) => {
+          a.addEventListener('click', () => {
+            tocNav.classList.remove('open');
+            navToggle.setAttribute('aria-expanded', 'false');
+          });
+        });
+      }
 
       /* active section highlight */
       const links = [...tocNav.querySelectorAll('a')];
@@ -2205,6 +2356,17 @@ codex exec --skip-git-repo-check --sandbox read-only "このディレクトリ�
         { rootMargin: '-15% 0px -75% 0px', threshold: 0 },
       );
       sections.forEach((s) => io.observe(s));
+
+      /* checklist: clicking anywhere on the row toggles the checkbox */
+      document.querySelectorAll('.checklist li').forEach((li) => {
+        const box = li.querySelector('input[type="checkbox"]');
+        if (!box) return;
+        li.addEventListener('click', (e) => {
+          if (e.target !== box) {
+            box.checked = !box.checked;
+          }
+        });
+      });
 
       /* back to top */
       const toTop = document.getElementById('toTop');

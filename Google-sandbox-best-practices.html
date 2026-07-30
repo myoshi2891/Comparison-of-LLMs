@@ -248,6 +248,15 @@
         -webkit-text-fill-color: transparent;
         background-clip: text;
       }
+      @media (forced-colors: active) {
+        h1 {
+          background: none;
+          -webkit-background-clip: border-box;
+          background-clip: border-box;
+          -webkit-text-fill-color: CanvasText;
+          color: CanvasText;
+        }
+      }
       .lede {
         font-size: 1.1rem;
         color: var(--text-dim);
@@ -1710,12 +1719,16 @@ flowchart TD
         var btn = document.getElementById('sidebarToggle');
         var sidebar = document.getElementById('sidebar');
         if (!btn || !sidebar) return;
+        btn.setAttribute('aria-controls', 'sidebar');
+        btn.setAttribute('aria-expanded', 'false');
         btn.addEventListener('click', function () {
-          sidebar.classList.toggle('open');
+          var isOpen = sidebar.classList.toggle('open');
+          btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
         });
         document.querySelectorAll('.nav-list a').forEach(function (a) {
           a.addEventListener('click', function () {
             sidebar.classList.remove('open');
+            btn.setAttribute('aria-expanded', 'false');
           });
         });
       })();
@@ -1773,7 +1786,7 @@ flowchart TD
           try {
             mermaid.initialize({
               startOnLoad: false,
-              securityLevel: 'loose',
+              securityLevel: 'strict',
               theme: 'base',
               themeVariables: {
                 background: '#07111e',
@@ -1792,7 +1805,7 @@ flowchart TD
                 fontSize: '16px',
                 fontFamily: '"Noto Sans JP",sans-serif',
               },
-              flowchart: { useMaxWidth: false, htmlLabels: true, curve: 'basis' },
+              flowchart: { useMaxWidth: false, curve: 'basis' },
             });
             var run = function () {
               try {
