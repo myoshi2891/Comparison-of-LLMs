@@ -15,7 +15,7 @@
   - `bun run typecheck` ✅
   - `bun run lint` ✅（385 files checked）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: Vitest **140 files / 1274 tests すべて合格**（収集失敗なし）
+  - **フロントエンド (`web-next/`)**: Vitest **141 files / 1281 tests すべて合格**（収集失敗なし）
   - **バックエンド (`scraper/`)**: pytest 実行で **43 件すべて合格** (全 Green ✅)
 
 ## 最近の追加内容
