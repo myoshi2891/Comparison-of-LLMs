@@ -2433,11 +2433,11 @@ When solving problems:
         });
 
         document.fonts.ready.then(function () {
-          var blocks = document.querySelectorAll('pre.mermaid');
+          var blocks = document.querySelectorAll('div.mermaid');
           blocks.forEach(function (el) {
             el.style.overflow = 'visible';
           });
-          mermaid.run({ querySelector: 'pre.mermaid' });
+          mermaid.run({ querySelector: 'div.mermaid' });
         });
       })();
     </script>

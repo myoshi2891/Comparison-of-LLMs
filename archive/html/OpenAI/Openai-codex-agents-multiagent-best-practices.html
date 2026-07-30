@@ -371,12 +371,16 @@
       @media (max-width: 880px) {
         .sidebar {
           transform: translateX(-100%);
-          transition: transform 0.2s ease;
+          transition: transform 0.2s ease, visibility 0.2s ease;
           width: min(80vw, 320px);
           box-shadow: 2px 0 24px rgba(0, 0, 0, 0.4);
+          visibility: hidden;
+          pointer-events: none;
         }
         .sidebar.open {
           transform: translateX(0);
+          visibility: visible;
+          pointer-events: auto;
         }
         .sidebar-toggle {
           display: flex;
@@ -393,7 +397,7 @@
   </head>
   <body>
     <div class="layout">
-      <button class="sidebar-toggle" id="sidebarToggle" aria-label="メニュー">☰</button>
+      <button type="button" class="sidebar-toggle" id="sidebarToggle" aria-label="メニュー" aria-expanded="false" aria-controls="sidebar">☰</button>
       <aside class="sidebar" id="sidebar">
         <div class="sidebar-brand">OpenAI Codex <span>サブエージェント</span> ガイド</div>
         <div class="sidebar-sub">AGENTS.md・config.toml・requirements.toml 実践ガイド</div>
@@ -1044,8 +1048,8 @@ flowchart LR
     H --&gt; A</pre
         >
         <p>
-          大きなタスクを1本のスレッドで処理し続けると、探索過程のログやコマンド出力が蓄積して<strong>コンテキスト汚染</strong>が起こり、それが進行すると関連情報が埋もれて応答品質が落ちる**コンテキスト腐敗(Context
-          Rot)**につながります。サブエージェントは、ノイズの多い調査やバッチ作業を隔離したスレッドに切り出し、要約だけをメインへ返すことでこれを防ぎます。
+          大きなタスクを1本のスレッドで処理し続けると、探索過程のログやコマンド出力が蓄積して<strong>コンテキスト汚染</strong>が起こり、それが進行すると関連情報が埋もれて応答品質が落ちる<em>コンテキスト腐敗(Context
+          Rot)</em>につながります。サブエージェントは、ノイズの多い調査やバッチ作業を隔離したスレッドに切り出し、要約だけをメインへ返すことでこれを防ぎます。
         </p>
         <p>
           ただし無料ではありません。公式ドキュメントも警告している通り、サブエージェントは同等の単一エージェント実行より<strong>多くのトークンを消費</strong>します。著名な開発者
@@ -1515,11 +1519,13 @@ prefix_rule(
         var sidebar = document.getElementById('sidebar');
         if (!btn || !sidebar) return;
         btn.addEventListener('click', function () {
-          sidebar.classList.toggle('open');
+          var isOpen = sidebar.classList.toggle('open');
+          btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
         });
         sidebar.querySelectorAll('.nav-link').forEach(function (a) {
           a.addEventListener('click', function () {
             sidebar.classList.remove('open');
+            btn.setAttribute('aria-expanded', 'false');
           });
         });
       })();

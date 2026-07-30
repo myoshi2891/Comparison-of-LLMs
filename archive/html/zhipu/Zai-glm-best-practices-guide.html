@@ -622,13 +622,13 @@ flowchart LR
           <div class="mermaid-wrap">
             <pre class="mermaid">
 flowchart TD
-    A["タスクの性質を確認"] --> B{"複雑な推論や長時間の\nエージェント型タスクか?"}
-    B -->|"Yes"| C["GLM-5.2\n(1Mコンテキスト, reasoning_effort=max)"]
-    B -->|"No"| D{"コストを最優先したいか?"}
-    D -->|"Yes"| E["GLM-4.5-Flash / GLM-4.7-Flash\n(無料枠)"]
-    D -->|"No"| F{"画像や動画の理解が必要か?"}
-    F -->|"Yes"| G["GLM-5V-Turbo / GLM-4.6V"]
-    F -->|"No"| H["GLM-5.1 / GLM-4.6 / GLM-4.7\n(汎用バランス型)"]
+    A["タスクの性質を確認"] --> B["`複雑な推論や長時間の<br/>エージェント型タスクか?`"]
+    B -->|"Yes"| C["`GLM-5.2<br/>(1Mコンテキスト, reasoning_effort=max)`"]
+    B -->|"No"| D["`コストを最優先したいか?`"]
+    D -->|"Yes"| E["`GLM-4.5-Flash / GLM-4.7-Flash<br/>(無料枠)`"]
+    D -->|"No"| F["`画像や動画の理解が必要か?`"]
+    F -->|"Yes"| G["`GLM-5V-Turbo / GLM-4.6V`"]
+    F -->|"No"| H["`GLM-5.1 / GLM-4.6 / GLM-4.7<br/>(汎用バランス型)`"]
   </pre
             >
           </div>
@@ -2092,7 +2092,7 @@ flowchart TD
       </main>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.12.0/mermaid.min.js" integrity="sha512-5TKaYvhenABhlGIKSxAWLFJBZCSQw7HTV7aL1dJcBokM/+3PNtfgJFlv8E6Us/B1VMlQ4u8sPzjudL9TEQ06ww==" crossorigin="anonymous"></script>
     <script>
       mermaid.initialize({
         startOnLoad: false,

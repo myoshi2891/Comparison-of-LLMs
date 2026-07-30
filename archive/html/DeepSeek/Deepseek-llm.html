@@ -629,7 +629,7 @@
     </style>
   </head>
   <body>
-    <button class="sidebar-toggle" id="sidebarToggle" aria-label="メニューを開く">☰</button>
+    <button type="button" class="sidebar-toggle" id="sidebarToggle" aria-label="メニューを開く" aria-expanded="false">☰</button>
 
     <div class="layout">
       <nav class="sidebar" id="sidebar">
@@ -2466,11 +2466,20 @@
 
       targets.forEach((t) => observer.observe(t));
 
-      // ---------- mobile sidebar toggle ----------
       const sidebar = document.getElementById('sidebar');
       const toggleBtn = document.getElementById('sidebarToggle');
-      toggleBtn.addEventListener('click', () => sidebar.classList.toggle('open'));
-      navLinks.forEach((l) => l.addEventListener('click', () => sidebar.classList.remove('open')));
+      toggleBtn.addEventListener('click', () => {
+        const isOpen = sidebar.classList.toggle('open');
+        toggleBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        toggleBtn.setAttribute('aria-label', isOpen ? 'メニューを閉じる' : 'メニューを開く');
+      });
+      navLinks.forEach((l) =>
+        l.addEventListener('click', () => {
+          sidebar.classList.remove('open');
+          toggleBtn.setAttribute('aria-expanded', 'false');
+          toggleBtn.setAttribute('aria-label', 'メニューを開く');
+        })
+      );
     </script>
   </body>
 </html>
