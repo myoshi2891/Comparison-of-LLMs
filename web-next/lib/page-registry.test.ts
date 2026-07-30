@@ -85,7 +85,7 @@ describe("pageRegistry", () => {
   });
 
   it("provider は既知のプロバイダーのみ", () => {
-    const known = ["claude", "google", "codex", "copilot", "moonshot"];
+    const known = ["claude", "google", "codex", "copilot", "moonshot", "deepseek", "xai"];
     for (const entry of pageRegistry) {
       if (entry.provider) expect(known).toContain(entry.provider);
     }

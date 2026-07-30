@@ -34,7 +34,7 @@ export const NESTED_GROUPS = ["Providers"] as const satisfies readonly NavGroup[
 
 /** ネストするグループの 2 段目の並び順。ここに無いカテゴリは導出時に throw される。 */
 export const CATEGORY_ORDER: Partial<Record<NavGroup, readonly string[]>> = {
-  Providers: ["Claude", "Google", "Codex", "Copilot", "Moonshot", "DeepSeek"],
+  Providers: ["Claude", "Google", "Codex", "Copilot", "Moonshot", "DeepSeek", "xAI"],
 };
 
 /**

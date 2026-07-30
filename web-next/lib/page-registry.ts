@@ -43,7 +43,7 @@ export const PageEntrySchema = z
     /** ナビ 2 段目の表示ラベル。2 段ネストするグループ（= Providers）でのみ必須。 */
     category: z.string().min(1).optional(),
     /** プロバイダー系ページのみ。識別子であり表示ラベルではない（表示は category）。 */
-    provider: z.enum(["claude", "google", "codex", "copilot", "moonshot", "deepseek"]).optional(),
+    provider: z.enum(["claude", "google", "codex", "copilot", "moonshot", "deepseek", "xai"]).optional(),
     /** 横断検索・関連リンク (F-5 / F-7) 用のトピックタグ */
     topics: z.array(z.string()),
     /** 一覧・What's New に出す 1〜2 文の要約 */
@@ -851,6 +851,20 @@ const entries: PageEntry[] = [
     topics: ["deepseek", "llm", "best-practices", "api", "thinking-mode"],
     summary:
       "DeepSeek-V3 / R1 / V4 などのモデル選定、Thinking Mode（思考モード）、Context Caching、Function Calling、Anthropic API互換連携までの初学者向け実践ベストプラクティスガイド。",
+    addedAt: "2026-07-30",
+    lastReviewed: "2026-07-30",
+  },
+  {
+    slug: "/xai/grok-best-practices",
+    title: "xAI Grok ガイド",
+    description:
+      "xAI API（Grok モデル群）をこれから使い始めるエンジニア・QAエンジニア向けに、モデル選定からセキュリティ運用まで、ステップバイステップで解説します。",
+    group: "Providers",
+    category: "xAI",
+    provider: "xai",
+    topics: ["xai", "grok", "best-practices", "api", "reasoning"],
+    summary:
+      "xAI API（Grok モデル群）をこれから使い始めるエンジニア・QAエンジニア向けに、モデル選定からセキュリティ運用まで、ステップバイステップで解説します。",
     addedAt: "2026-07-30",
     lastReviewed: "2026-07-30",
   },

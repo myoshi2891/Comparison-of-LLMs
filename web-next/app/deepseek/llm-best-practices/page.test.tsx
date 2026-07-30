@@ -15,7 +15,7 @@ describe("DeepSeek LLM Best Practices Page", () => {
     const h1 = container.querySelector("h1");
     expect(h1).not.toBeNull();
     expect(h1?.textContent?.replace(/\s+/g, " ").trim()).toContain(
-      "DeepSeek LLM ベストプラクティスガイド 〜初学者向けステップバイステップ解説〜"
+      "DeepSeek LLM ベストプラクティスガイド〜初学者向けステップバイステップ解説〜"
     );
   });
 
