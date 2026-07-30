@@ -15,10 +15,12 @@
   - `bun run typecheck` ✅
   - `bun run lint` ✅（385 files checked）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: Vitest **139 files / 1269 tests すべて合格**（収集失敗なし）
+  - **フロントエンド (`web-next/`)**: Vitest **140 files / 1274 tests すべて合格**（収集失敗なし）
   - **バックエンド (`scraper/`)**: pytest 実行で **43 件すべて合格** (全 Green ✅)
 
 ## 最近の追加内容
+
+- **Z.ai (GLM) LLM ベストプラクティスガイド（/zhipu/zai-glm-best-practices）の Pure JSX 移行と Providers ナビ同期**: `Zai-glm-best-practices-guide.html` を `web-next/app/zhipu/zai-glm-best-practices/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。要約・省略なしで全17セクション（Hero + 17H2セクション）・全表・全コードブロック・8 Mermaid図・TOCスクロール追従（`TocObserver.tsx`）・外部リンク安全属性・Providers グループ配下（Zhipu(GLM)）ナビゲーション追加（`nav-taxonomy.ts` / `page-registry.ts`）を完了。原本 `Zai-glm-best-practices-guide.html` は `archive/html/zhipu/Zai-glm-best-practices-guide.html` へ `git mv` 退避保存。契約テスト5件（タイトル、17H2セクション、8 Mermaid図、外部リンク・内部リンク検証）を追加し全クリア（Vitest **140 files / 1274 tests** 全 Green ✅）。
 
 - **xAI Grok API 実践ベストプラクティスガイド（/xai/grok-best-practices-intermediate）の Pure JSX 移行と Providers ナビ同期**: `Xai-grok-best-practices-intermediate.html` を `web-next/app/xai/grok-best-practices-intermediate/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。要約・省略なしで全15セクション（Hero + 15H2セクション）・全表・全コードブロック・11 Mermaid図・TOCスクロール追従（`TocObserver.tsx`）・外部リンク安全属性・Providers グループ配下（xAI）ナビゲーション追加（`page-registry.ts`）を完了。原本 `Xai-grok-best-practices-intermediate.html` は `archive/Xai-grok-best-practices-intermediate.html` へ `git mv` 退避保存。契約テスト2件（メタデータ・JSXツリー構造検証）を追加。
 
