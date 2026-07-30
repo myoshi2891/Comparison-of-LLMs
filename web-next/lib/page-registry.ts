@@ -43,7 +43,7 @@ export const PageEntrySchema = z
     /** ナビ 2 段目の表示ラベル。2 段ネストするグループ（= Providers）でのみ必須。 */
     category: z.string().min(1).optional(),
     /** プロバイダー系ページのみ。識別子であり表示ラベルではない（表示は category）。 */
-    provider: z.enum(["claude", "google", "codex", "copilot", "moonshot"]).optional(),
+    provider: z.enum(["claude", "google", "codex", "copilot", "moonshot", "deepseek"]).optional(),
     /** 横断検索・関連リンク (F-5 / F-7) 用のトピックタグ */
     topics: z.array(z.string()),
     /** 一覧・What's New に出す 1〜2 文の要約 */
@@ -839,6 +839,20 @@ const entries: PageEntry[] = [
       "Moonshot AI が開発する Kimi K1.5 / K2 / K3 の超長文文脈（Long Context）処理、思考モード（Kimi Thinking）、Function Calling、マルチモーダル等の活用方法とベストプラクティスを解説する完全ガイド。",
     addedAt: "2026-07-22",
     lastReviewed: "2026-07-22",
+  },
+  {
+    slug: "/deepseek/llm-best-practices",
+    title: "DeepSeek LLM ガイド",
+    description:
+      "DeepSeek-V3 / R1 / V4 などのモデル選定、Thinking Mode（思考モード）、Context Caching、Function Calling、Anthropic API互換連携までの初学者向け実践ベストプラクティスガイド。",
+    group: "Providers",
+    category: "DeepSeek",
+    provider: "deepseek",
+    topics: ["deepseek", "llm", "best-practices", "api", "thinking-mode"],
+    summary:
+      "DeepSeek-V3 / R1 / V4 などのモデル選定、Thinking Mode（思考モード）、Context Caching、Function Calling、Anthropic API互換連携までの初学者向け実践ベストプラクティスガイド。",
+    addedAt: "2026-07-30",
+    lastReviewed: "2026-07-30",
   },
 ];
 
