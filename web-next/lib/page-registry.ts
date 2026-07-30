@@ -43,7 +43,9 @@ export const PageEntrySchema = z
     /** ナビ 2 段目の表示ラベル。2 段ネストするグループ（= Providers）でのみ必須。 */
     category: z.string().min(1).optional(),
     /** プロバイダー系ページのみ。識別子であり表示ラベルではない（表示は category）。 */
-    provider: z.enum(["claude", "google", "codex", "copilot", "moonshot", "deepseek", "xai"]).optional(),
+    provider: z
+      .enum(["claude", "google", "codex", "copilot", "moonshot", "deepseek", "xai", "zhipu"])
+      .optional(),
     /** 横断検索・関連リンク (F-5 / F-7) 用のトピックタグ */
     topics: z.array(z.string()),
     /** 一覧・What's New に出す 1〜2 文の要約 */
@@ -889,6 +891,28 @@ const entries: PageEntry[] = [
     ],
     summary:
       "モデル選定からエージェント型ツール、マルチエージェントリサーチ、Prompt Caching、コスト最適化まで、xAI Grok APIの本番導入・実践ベストプラクティスガイド。",
+    addedAt: "2026-07-30",
+    lastReviewed: "2026-07-30",
+  },
+  {
+    slug: "/zhipu/zai-glm-best-practices",
+    title: "Z.ai (GLM) ベストプラクティス",
+    description:
+      "Z.ai(GLM) LLMの初学者向け実践ベストプラクティスガイド。モデル選定、API仕様、Deep Thinking、Structured Output、Context Caching、GLM Coding Planまで徹底解説。",
+    group: "Providers",
+    category: "Zhipu(GLM)",
+    provider: "zhipu",
+    topics: [
+      "zhipu",
+      "glm",
+      "llm",
+      "best-practices",
+      "deep-thinking",
+      "structured-outputs",
+      "context-caching",
+    ],
+    summary:
+      "Z.ai(GLM) LLMの初学者向け実践ベストプラクティスガイド。モデル選定、API仕様、Deep Thinking、Structured Output、Context Caching、GLM Coding Planまで徹底解説。",
     addedAt: "2026-07-30",
     lastReviewed: "2026-07-30",
   },

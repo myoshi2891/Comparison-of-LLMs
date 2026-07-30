@@ -5,7 +5,7 @@ import Page from "./page";
 describe("ZaiGlmBestPracticesPage", () => {
   it("renders main heading (h1)", async () => {
     const page = await Page();
-    const { container } = render(page);
+    render(page);
     const h1 = screen.getByRole("heading", { level: 1 });
     expect(h1).toBeDefined();
     expect(h1.textContent).toContain("初学者向けステップバイステップ解説");
