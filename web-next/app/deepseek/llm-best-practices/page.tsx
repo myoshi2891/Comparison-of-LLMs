@@ -61,7 +61,7 @@ const DIAGRAM_2 = `flowchart LR
     R -->|"5. JSON返却"| U`;
 
 const DIAGRAM_3 = `flowchart TD
-    Start["タスクの発生"] --> Q1{"高い推論能力<br>（数学・難解なコード・論理パズル）<br>が必須？"}
+    Start["タスクの発生"] --> Q1{"高い推論能力<br/>（数学・難解なコード・論理パズル）<br/>が必須？"}
     Q1 -- はい --> Q2{"予算・応答速度より<br/>精度を最優先？"}
     Q2 -- はい --> Pro["deepseek-v4-pro を選択"]
     Q2 -- いいえ --> Flash1["deepseek-v4-flash（思考モード）で試す"]
