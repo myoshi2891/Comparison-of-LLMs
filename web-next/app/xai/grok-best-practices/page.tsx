@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import MermaidDiagram from "@/components/docs/MermaidDiagram";
-import TocObserver from "./TocObserver";
 import styles from "./page.module.css";
+import TocObserver from "./TocObserver";
 
 export const metadata: Metadata = {
   title: "xAI の LLM（Grok）完全ガイド ― 初学者のためのベストプラクティス",
@@ -82,62 +82,80 @@ export default function GrokBestPracticesPage() {
         <nav>
           <div className={styles.navGroupTitle}>概要 &amp; 導入</div>
           <a className={styles.navLink} href="#overview">
-            <i className="ti ti-info-circle" />0. xAI と Grok とは
+            <i className="ti ti-info-circle" />
+            0. xAI と Grok とは
           </a>
           <a className={styles.navLink} href="#workflow">
-            <i className="ti ti-route" />1. 利用開始ワークフロー
+            <i className="ti ti-route" />
+            1. 利用開始ワークフロー
           </a>
 
           <div className={styles.navGroupTitle}>ステップバイステップ</div>
           <a className={styles.navLink} href="#step1">
-            <i className="ti ti-box" />Step1: モデルを選ぶ
+            <i className="ti ti-box" />
+            Step1: モデルを選ぶ
           </a>
           <a className={styles.navLink} href="#step2">
-            <i className="ti ti-key" />Step2: アカウント &amp; キー
+            <i className="ti ti-key" />
+            Step2: アカウント &amp; キー
           </a>
           <a className={styles.navLink} href="#step3">
-            <i className="ti ti-code" />Step3: SDK &amp; リクエスト
+            <i className="ti ti-code" />
+            Step3: SDK &amp; リクエスト
           </a>
           <a className={styles.navLink} href="#step4">
-            <i className="ti ti-brain" />Step4: Reasoning モデル
+            <i className="ti ti-brain" />
+            Step4: Reasoning モデル
           </a>
           <a className={styles.navLink} href="#step5">
-            <i className="ti ti-tools" />Step5: Function Calling
+            <i className="ti ti-tools" />
+            Step5: Function Calling
           </a>
           <a className={styles.navLink} href="#step6">
-            <i className="ti ti-brackets" />Step6: Structured Outputs
+            <i className="ti ti-brackets" />
+            Step6: Structured Outputs
           </a>
           <a className={styles.navLink} href="#step7">
-            <i className="ti ti-world" />Step7: Web &amp; X 検索
+            <i className="ti ti-world" />
+            Step7: Web &amp; X 検索
           </a>
           <a className={styles.navLink} href="#step8">
-            <i className="ti ti-database" />Step8: Prompt Caching
+            <i className="ti ti-database" />
+            Step8: Prompt Caching
           </a>
           <a className={styles.navLink} href="#step9">
-            <i className="ti ti-arrows-minimize" />Step9: Context Compaction
+            <i className="ti ti-arrows-minimize" />
+            Step9: Context Compaction
           </a>
           <a className={styles.navLink} href="#step10">
-            <i className="ti ti-refresh-alert" />Step10: レート制限
+            <i className="ti ti-refresh-alert" />
+            Step10: レート制限
           </a>
           <a className={styles.navLink} href="#step11">
-            <i className="ti ti-coin" />Step11: 料金体系
+            <i className="ti ti-coin" />
+            Step11: 料金体系
           </a>
 
           <div className={styles.navGroupTitle}>ガバナンス</div>
           <a className={styles.navLink} href="#security">
-            <i className="ti ti-shield-lock" />セキュリティ/プライバシー
+            <i className="ti ti-shield-lock" />
+            セキュリティ/プライバシー
           </a>
           <a className={styles.navLink} href="#prompting">
-            <i className="ti ti-message-2" />プロンプト設計
+            <i className="ti ti-message-2" />
+            プロンプト設計
           </a>
           <a className={styles.navLink} href="#antipatterns">
-            <i className="ti ti-alert-triangle" />アンチパターン
+            <i className="ti ti-alert-triangle" />
+            アンチパターン
           </a>
           <a className={styles.navLink} href="#checklist">
-            <i className="ti ti-checklist" />チェックリスト
+            <i className="ti ti-checklist" />
+            チェックリスト
           </a>
           <a className={styles.navLink} href="#references">
-            <i className="ti ti-books" />参考資料
+            <i className="ti ti-books" />
+            参考資料
           </a>
         </nav>
       </aside>
@@ -145,7 +163,8 @@ export default function GrokBestPracticesPage() {
       <main className={styles.main}>
         <div className={styles.pageHeader}>
           <div className={styles.eyebrow}>
-            <i className="ti ti-bolt" />AI ENGINEERING GUIDE
+            <i className="ti ti-bolt" />
+            AI ENGINEERING GUIDE
           </div>
           <h1>xAI の LLM（Grok）完全ガイド ― 初学者のためのベストプラクティス</h1>
           <p className={styles.lead}>
@@ -154,23 +173,28 @@ export default function GrokBestPracticesPage() {
           </p>
           <div className={styles.metaRow}>
             <span className={styles.metaChip}>
-              <i className="ti ti-calendar" />情報時点: 2026年7月15日
+              <i className="ti ti-calendar" />
+              情報時点: 2026年7月15日
             </span>
             <span className={styles.metaChip}>
-              <i className="ti ti-users" />対象: 初学者〜中級エンジニア
+              <i className="ti ti-users" />
+              対象: 初学者〜中級エンジニア
             </span>
             <span className={styles.metaChip}>
-              <i className="ti ti-brand-python" />コード例: Python 中心
+              <i className="ti ti-brand-python" />
+              コード例: Python 中心
             </span>
             <span className={styles.metaChip}>
-              <i className="ti ti-link" />出典: docs.x.ai 公式ドキュメント
+              <i className="ti ti-link" />
+              出典: docs.x.ai 公式ドキュメント
             </span>
           </div>
         </div>
 
         <section className={styles.docSection} id="overview">
           <h2>
-            <i className="ti ti-info-circle" />0. xAI と Grok とは
+            <i className="ti ti-info-circle" />
+            0. xAI と Grok とは
           </h2>
           <p>
             xAI は Grok シリーズの
@@ -182,7 +206,10 @@ export default function GrokBestPracticesPage() {
 
           <div className={styles.cardGrid}>
             <div className={styles.card}>
-              <i className="ti ti-message-chatbot" style={{ fontSize: "24px", color: "var(--c-teal-500)" }} />
+              <i
+                className="ti ti-message-chatbot"
+                style={{ fontSize: "24px", color: "var(--c-teal-500)" }}
+              />
               <h4>Grok（コンシューマーアプリ）</h4>
               <p>チャット・画像生成・リアルタイム検索を行うエンドユーザー向けアシスタント。</p>
               <Ext href="https://grok.com/">
@@ -212,15 +239,16 @@ export default function GrokBestPracticesPage() {
             を組み込む開発者を対象に、ステップバイステップでベストプラクティスを解説します。
           </p>
           <div className={styles.sourceNote}>
-            <i className="ti ti-external-link" />出典:{" "}
-            <Ext href="https://docs.x.ai/overview">docs.x.ai/overview</Ext> /{" "}
+            <i className="ti ti-external-link" />
+            出典: <Ext href="https://docs.x.ai/overview">docs.x.ai/overview</Ext> /{" "}
             <Ext href="https://grok.com/">grok.com</Ext>
           </div>
         </section>
 
         <section className={styles.docSection} id="workflow">
           <h2>
-            <i className="ti ti-route" />1. 全体像を掴む：利用開始までのワークフロー
+            <i className="ti ti-route" />
+            1. 全体像を掴む：利用開始までのワークフロー
           </h2>
           <p>
             初めて xAI API
@@ -231,8 +259,8 @@ export default function GrokBestPracticesPage() {
             <MermaidDiagram chart={MERMAID_DIAGRAM_1} />
           </div>
           <div className={styles.sourceNote}>
-            <i className="ti ti-external-link" />出典:{" "}
-            <Ext href="https://docs.x.ai/developers/quickstart">Quickstart | xAI Docs</Ext>
+            <i className="ti ti-external-link" />
+            出典: <Ext href="https://docs.x.ai/developers/quickstart">Quickstart | xAI Docs</Ext>
             （最終更新 2026年7月3日）
           </div>
         </section>
@@ -304,8 +332,8 @@ export default function GrokBestPracticesPage() {
             </tbody>
           </table>
           <div className={styles.sourceNote}>
-            <i className="ti ti-external-link" />出典:{" "}
-            <Ext href="https://docs.x.ai/developers/models">Models | xAI Docs</Ext>
+            <i className="ti ti-external-link" />
+            出典: <Ext href="https://docs.x.ai/developers/models">Models | xAI Docs</Ext>
             （最終更新 2026年7月9日）、
             <Ext href="https://docs.x.ai/developers/pricing">Pricing | xAI Docs</Ext>
             （最終更新 2026年7月3日）
@@ -348,9 +376,9 @@ export default function GrokBestPracticesPage() {
             <i className="ti ti-alert-triangle" />
             <div className={styles.calloutBody}>
               <div className={styles.calloutTitle}>初学者が特に見落としやすいポイント</div>
-              Grok は学習データ以降の出来事を知りません。最新情報が必要な場合は Web Search / X Search
-              ツールを有効化する必要があります。grok-4.5 の知識カットオフは <strong>2026年2月1日</strong>{" "}
-              です。
+              Grok は学習データ以降の出来事を知りません。最新情報が必要な場合は Web Search / X
+              Search ツールを有効化する必要があります。grok-4.5 の知識カットオフは{" "}
+              <strong>2026年2月1日</strong> です。
             </div>
           </div>
           <ul>
@@ -359,18 +387,20 @@ export default function GrokBestPracticesPage() {
               <code>png</code>。画像枚数の上限はありません。
             </li>
             <li>
-              <code>grok-4.20</code> 以降のモデルでは <code>logprobs</code> / <code>top_logprobs</code>{" "}
+              <code>grok-4.20</code> 以降のモデルでは <code>logprobs</code> /{" "}
+              <code>top_logprobs</code>{" "}
               パラメータは無視されます（エラーにはならず黙って無視される点に注意）。
             </li>
             <li>
-              モデル名には3種類のエイリアスがあります。<code>&lt;modelname&gt;</code>{" "}
-              は最新安定版、<code>&lt;modelname&gt;-latest</code> は最新版全般、
+              モデル名には3種類のエイリアスがあります。<code>&lt;modelname&gt;</code> は最新安定版、
+              <code>&lt;modelname&gt;-latest</code> は最新版全般、
               <code>&lt;modelname&gt;-&lt;date&gt;</code>{" "}
               は特定リリースに固定されます。再現性が必要なワークフローでは日付付きエイリアスを使うのがベストプラクティスです。
             </li>
           </ul>
           <div className={styles.sourceNote}>
-            <i className="ti ti-external-link" />出典:{" "}
+            <i className="ti ti-external-link" />
+            出典:{" "}
             <Ext href="https://docs.x.ai/developers/models#additional-information-regarding-models">
               Models | xAI Docs — Additional Information
             </Ext>
@@ -387,7 +417,9 @@ export default function GrokBestPracticesPage() {
               でアカウントを作成し、クレジットをチャージします。
             </li>
             <li>
-              <Ext href="https://console.x.ai/team/default/api-keys">console.x.ai の API Keys ページ</Ext>{" "}
+              <Ext href="https://console.x.ai/team/default/api-keys">
+                console.x.ai の API Keys ページ
+              </Ext>{" "}
               で API キーを発行します。
             </li>
             <li>環境変数として設定します。</li>
@@ -415,8 +447,8 @@ export default function GrokBestPracticesPage() {
             </div>
           </div>
           <div className={styles.sourceNote}>
-            <i className="ti ti-external-link" />出典:{" "}
-            <Ext href="https://docs.x.ai/developers/quickstart">Quickstart | xAI Docs</Ext>
+            <i className="ti ti-external-link" />
+            出典: <Ext href="https://docs.x.ai/developers/quickstart">Quickstart | xAI Docs</Ext>
           </div>
         </section>
 
@@ -451,7 +483,8 @@ export default function GrokBestPracticesPage() {
               from xai_sdk.chat import user{"\n\n"}
               client = Client(api_key=os.getenv(&quot;XAI_API_KEY&quot;)){"\n\n"}
               chat = client.chat.create(model=&quot;grok-4.5&quot;){"\n"}
-              chat.append(user(&quot;Fix this function and explain the bug: function median(a)&#123;a.sort();return a[a.length/2]&#125;&quot;)){"\n\n"}
+              chat.append(user(&quot;Fix this function and explain the bug: function
+              median(a)&#123;a.sort();return a[a.length/2]&#125;&quot;)){"\n\n"}
               print(chat.sample().content)
             </code>
           </pre>
@@ -463,12 +496,11 @@ export default function GrokBestPracticesPage() {
               from openai import OpenAI{"\n\n"}
               client = OpenAI({"\n"}
               {"    "}api_key=&quot;&lt;YOUR_XAI_API_KEY_HERE&gt;&quot;,{"\n"}
-              {"    "}base_url=&quot;https://api.x.ai/v1&quot;,{"\n"}
-              ){"\n\n"}
+              {"    "}base_url=&quot;https://api.x.ai/v1&quot;,{"\n"}){"\n\n"}
               response = client.responses.create({"\n"}
               {"    "}model=&quot;grok-4.5&quot;,{"\n"}
-              {"    "}input=&quot;Fix this function and explain the bug: function median(a)&#123;a.sort();return a[a.length/2]&#125;&quot;,{"\n"}
-              ){"\n\n"}
+              {"    "}input=&quot;Fix this function and explain the bug: function
+              median(a)&#123;a.sort();return a[a.length/2]&#125;&quot;,{"\n"}){"\n\n"}
               print(response.output_text)
             </code>
           </pre>
@@ -477,13 +509,14 @@ export default function GrokBestPracticesPage() {
             <i className="ti ti-bulb" />
             <div className={styles.calloutBody}>
               <div className={styles.calloutTitle}>ベストプラクティス</div>
-              新規プロジェクトでは <code>/v1/responses</code>（Responses API）の利用が推奨されています。Chat
+              新規プロジェクトでは <code>/v1/responses</code>（Responses
+              API）の利用が推奨されています。Chat
               Completions（レガシー）からの移行ガイドも用意されています。
             </div>
           </div>
           <div className={styles.sourceNote}>
-            <i className="ti ti-external-link" />出典:{" "}
-            <Ext href="https://docs.x.ai/developers/quickstart">Quickstart | xAI Docs</Ext>
+            <i className="ti ti-external-link" />
+            出典: <Ext href="https://docs.x.ai/developers/quickstart">Quickstart | xAI Docs</Ext>
             （最終更新 2026年7月3日）、
             <Ext href="https://docs.x.ai/developers/model-capabilities/text/comparison">
               Migrating to Responses API
@@ -496,13 +529,14 @@ export default function GrokBestPracticesPage() {
             <span className={styles.stepNumber}>4</span>Step4：Reasoning（推論）モデルを使いこなす
           </h2>
           <p>
-            grok-4.5 は回答前に「考える」推論モデルです。数学・論理パズル・複雑な分析タスクに強みがあります。
+            grok-4.5
+            は回答前に「考える」推論モデルです。数学・論理パズル・複雑な分析タスクに強みがあります。
           </p>
 
           <h3>4.1 reasoning_effort パラメータ</h3>
           <p>
-            推論にどれだけ計算リソースを使うかを制御します。指定しない場合のデフォルトは <code>&quot;high&quot;</code>{" "}
-            で、推論そのものを完全に無効化することはできません。
+            推論にどれだけ計算リソースを使うかを制御します。指定しない場合のデフォルトは{" "}
+            <code>&quot;high&quot;</code> で、推論そのものを完全に無効化することはできません。
           </p>
 
           <table>
@@ -541,8 +575,8 @@ export default function GrokBestPracticesPage() {
           <div className={`${styles.callout} ${styles.calloutWarning}`}>
             <i className="ti ti-alert-triangle" />
             <div className={styles.calloutBody}>
-              推論モデルでは <code>presencePenalty</code>、<code>frequencyPenalty</code>、<code>stop</code>{" "}
-              パラメータは使用できません（指定するとエラーになります）。
+              推論モデルでは <code>presencePenalty</code>、<code>frequencyPenalty</code>、
+              <code>stop</code> パラメータは使用できません（指定するとエラーになります）。
             </div>
           </div>
 
@@ -560,14 +594,14 @@ export default function GrokBestPracticesPage() {
               from xai_sdk.chat import system, user{"\n\n"}
               client = Client({"\n"}
               {"    "}api_key=os.getenv(&quot;XAI_API_KEY&quot;),{"\n"}
-              {"    "}timeout=3600,{"\n"}
-              ){"\n\n"}
+              {"    "}timeout=3600,{"\n"}){"\n\n"}
               chat = client.chat.create({"\n"}
               {"    "}model=&quot;grok-4.5&quot;,{"\n"}
               {"    "}reasoning_effort=&quot;high&quot;,{"\n"}
-              {"    "}messages=[system(&quot;You are a highly intelligent AI assistant.&quot;)],{"\n"}
-              ){"\n"}
-              chat.append(user(&quot;Find all prime numbers p such that p^2 + 2 is also prime. Prove your answer.&quot;)){"\n\n"}
+              {"    "}messages=[system(&quot;You are a highly intelligent AI assistant.&quot;)],
+              {"\n"}){"\n"}
+              chat.append(user(&quot;Find all prime numbers p such that p^2 + 2 is also prime. Prove
+              your answer.&quot;)){"\n\n"}
               response = chat.sample(){"\n"}
               print(response.content)
             </code>
@@ -583,7 +617,8 @@ export default function GrokBestPracticesPage() {
               を指定すると暗号化された推論内容を取得でき、後続の会話に文脈として渡すことができます。
             </li>
             <li>
-              grok-4.5 では推論内容の要約（Summarized Reasoning Content）をストリーミングで取得できます。
+              grok-4.5 では推論内容の要約（Summarized Reasoning
+              Content）をストリーミングで取得できます。
             </li>
           </ul>
 
@@ -596,7 +631,8 @@ export default function GrokBestPracticesPage() {
             </div>
           </div>
           <div className={styles.sourceNote}>
-            <i className="ti ti-external-link" />出典:{" "}
+            <i className="ti ti-external-link" />
+            出典:{" "}
             <Ext href="https://docs.x.ai/developers/model-capabilities/text/reasoning">
               Reasoning | xAI Docs
             </Ext>
@@ -606,7 +642,8 @@ export default function GrokBestPracticesPage() {
 
         <section className={styles.docSection} id="step5">
           <h2>
-            <span className={styles.stepNumber}>5</span>Step5：Function Calling（関数呼び出し）のベストプラクティス
+            <span className={styles.stepNumber}>5</span>Step5：Function
+            Calling（関数呼び出し）のベストプラクティス
           </h2>
           <p>
             Function Calling を使うと、モデルがデータベースや外部 API
@@ -634,13 +671,15 @@ export default function GrokBestPracticesPage() {
               {"        "}parameters=&#123;{"\n"}
               {"            "}&quot;type&quot;: &quot;object&quot;,{"\n"}
               {"            "}&quot;properties&quot;: &#123;{"\n"}
-              {"                "}&quot;location&quot;: &#123;&quot;type&quot;: &quot;string&quot;, &quot;description&quot;: &quot;City name&quot;&#125;,{"\n"}
-              {"                "}&quot;unit&quot;: &#123;&quot;type&quot;: &quot;string&quot;, &quot;enum&quot;: [&quot;celsius&quot;, &quot;fahrenheit&quot;], &quot;default&quot;: &quot;fahrenheit&quot;&#125;{"\n"}
+              {"                "}&quot;location&quot;: &#123;&quot;type&quot;: &quot;string&quot;,
+              &quot;description&quot;: &quot;City name&quot;&#125;,{"\n"}
+              {"                "}&quot;unit&quot;: &#123;&quot;type&quot;: &quot;string&quot;,
+              &quot;enum&quot;: [&quot;celsius&quot;, &quot;fahrenheit&quot;], &quot;default&quot;:
+              &quot;fahrenheit&quot;&#125;{"\n"}
               {"            "}&#125;,{"\n"}
               {"            "}&quot;required&quot;: [&quot;location&quot;]{"\n"}
               {"        "}&#125;,{"\n"}
-              {"    "}),{"\n"}
-              ]{"\n\n"}
+              {"    "}),{"\n"}]{"\n\n"}
               chat = client.chat.create(model=&quot;grok-4.5&quot;, tools=tools){"\n"}
               chat.append(user(&quot;What is the temperature in San Francisco?&quot;)){"\n"}
               response = chat.sample(){"\n\n"}
@@ -648,7 +687,9 @@ export default function GrokBestPracticesPage() {
               {"    "}chat.append(response){"\n"}
               {"    "}for tc in response.tool_calls:{"\n"}
               {"        "}args = json.loads(tc.function.arguments){"\n"}
-              {"        "}result = &#123;&quot;location&quot;: args[&quot;location&quot;], &quot;temperature&quot;: 59, &quot;unit&quot;: args.get(&quot;unit&quot;, &quot;fahrenheit&quot;)&#125;{"\n"}
+              {"        "}result = &#123;&quot;location&quot;: args[&quot;location&quot;],
+              &quot;temperature&quot;: 59, &quot;unit&quot;: args.get(&quot;unit&quot;,
+              &quot;fahrenheit&quot;)&#125;{"\n"}
               {"        "}chat.append(tool_result(json.dumps(result))){"\n"}
               {"    "}response = chat.sample(){"\n\n"}
               print(response.content)
@@ -684,7 +725,10 @@ export default function GrokBestPracticesPage() {
               </tr>
               <tr>
                 <td>
-                  <code>&#123;&quot;type&quot;: &quot;function&quot;, &quot;function&quot;: &#123;&quot;name&quot;: &quot;...&quot;&#125;&#125;</code>
+                  <code>
+                    &#123;&quot;type&quot;: &quot;function&quot;, &quot;function&quot;:
+                    &#123;&quot;name&quot;: &quot;...&quot;&#125;&#125;
+                  </code>
                 </td>
                 <td>特定のツールを強制的に呼ばせる</td>
               </tr>
@@ -694,7 +738,8 @@ export default function GrokBestPracticesPage() {
           <h3>5.4 ベストプラクティス</h3>
           <ul>
             <li>
-              <strong>並列関数呼び出しはデフォルトで有効</strong>です。1回のレスポンスに複数の <code>tool_call</code>{" "}
+              <strong>並列関数呼び出しはデフォルトで有効</strong>です。1回のレスポンスに複数の{" "}
+              <code>tool_call</code>{" "}
               が含まれる可能性があるため、必ず全件をループ処理してください。無効化したい場合は{" "}
               <code>parallel_tool_calls: false</code> を指定します。
             </li>
@@ -706,13 +751,14 @@ export default function GrokBestPracticesPage() {
               フィールドは、モデルが「いつこのツールを使うべきか」を判断する材料になるため、曖昧さを排除した明確な説明を書くことが品質に直結します。
             </li>
             <li>
-              Pydantic（Python）や Zod（JavaScript）でスキーマを定義すると、型安全性を保ちながら JSON
-              Schema を自動生成できます。
+              Pydantic（Python）や Zod（JavaScript）でスキーマを定義すると、型安全性を保ちながら
+              JSON Schema を自動生成できます。
             </li>
             <li>
-              <code>parameters</code> のルートは必ず <code>object</code> 型（または全分岐が object の{" "}
-              <code>oneOf</code>/<code>anyOf</code>）である必要があります。スカラー値や配列をルートに置くと{" "}
-              <code>400</code> エラーになります。
+              <code>parameters</code> のルートは必ず <code>object</code> 型（または全分岐が object
+              の <code>oneOf</code>/<code>anyOf</code>
+              ）である必要があります。スカラー値や配列をルートに置くと <code>400</code>{" "}
+              エラーになります。
             </li>
             <li>
               組み込みツール（Web Search・X Search
@@ -721,7 +767,8 @@ export default function GrokBestPracticesPage() {
             </li>
           </ul>
           <div className={styles.sourceNote}>
-            <i className="ti ti-external-link" />出典:{" "}
+            <i className="ti ti-external-link" />
+            出典:{" "}
             <Ext href="https://docs.x.ai/developers/tools/function-calling">
               Function Calling | xAI Docs
             </Ext>
@@ -731,7 +778,8 @@ export default function GrokBestPracticesPage() {
 
         <section className={styles.docSection} id="step6">
           <h2>
-            <span className={styles.stepNumber}>6</span>Step6：Structured Outputs（構造化出力）を活用する
+            <span className={styles.stepNumber}>6</span>Step6：Structured
+            Outputs（構造化出力）を活用する
           </h2>
           <p>
             自由形式のテキストではなく、あらかじめ定義した JSON
@@ -741,12 +789,14 @@ export default function GrokBestPracticesPage() {
           <h3>6.1 2つの利用方法</h3>
           <ol>
             <li>
-              <strong>response_format パラメータ</strong>：<code>type</code> を <code>&quot;json_schema&quot;</code>{" "}
-              にしてスキーマを指定（最も柔軟）。<code>&quot;json_object&quot;</code>（任意の整形済みJSON）や{" "}
+              <strong>response_format パラメータ</strong>：<code>type</code> を{" "}
+              <code>&quot;json_schema&quot;</code> にしてスキーマを指定（最も柔軟）。
+              <code>&quot;json_object&quot;</code>（任意の整形済みJSON）や{" "}
               <code>&quot;text&quot;</code>（デフォルト、自由形式）も選択可能。
             </li>
             <li>
-              <strong>Function Calling 経由</strong>：ツールの引数は常にスキーマに厳密準拠して生成されます（
+              <strong>Function Calling 経由</strong>
+              ：ツールの引数は常にスキーマに厳密準拠して生成されます（
               <code>strict</code> は暗黙的に常に <code>true</code>）。
             </li>
           </ol>
@@ -762,8 +812,8 @@ export default function GrokBestPracticesPage() {
             <tbody>
               <tr>
                 <td>
-                  <code>string</code> / <code>number</code> / <code>integer</code> / <code>boolean</code> /{" "}
-                  <code>null</code>
+                  <code>string</code> / <code>number</code> / <code>integer</code> /{" "}
+                  <code>boolean</code> / <code>null</code>
                 </td>
                 <td>基本型</td>
               </tr>
@@ -802,8 +852,8 @@ export default function GrokBestPracticesPage() {
             </tbody>
           </table>
           <p className={styles.muted}>
-            <code>additionalProperties</code> はデフォルトで <code>false</code>（明示的に <code>true</code>{" "}
-            を指定しない限り追加プロパティ不可）。
+            <code>additionalProperties</code> はデフォルトで <code>false</code>（明示的に{" "}
+            <code>true</code> を指定しない限り追加プロパティ不可）。
           </p>
 
           <h3>6.3 制約の保証範囲</h3>
@@ -846,7 +896,8 @@ export default function GrokBestPracticesPage() {
           <div className={`${styles.callout} ${styles.calloutWarning}`}>
             <i className="ti ti-alert-triangle" />
             <div className={styles.calloutBody}>
-              <code>not</code>、<code>if</code>/<code>then</code>/<code>else</code>、複数の <code>allOf</code>
+              <code>not</code>、<code>if</code>/<code>then</code>/<code>else</code>、複数の{" "}
+              <code>allOf</code>
               、上表にない <code>format</code>{" "}
               値は「ベストエフォート」（モデルが概ね守るが厳密には保証されない）扱いです。厳密な準拠が必要な場合はアプリ側でバリデーションを行うことが推奨されています。
             </div>
@@ -867,9 +918,11 @@ export default function GrokBestPracticesPage() {
               {"    "}EUR = &quot;EUR&quot;{"\n"}
               {"    "}GBP = &quot;GBP&quot;{"\n\n"}
               class LineItem(BaseModel):{"\n"}
-              {"    "}description: str = Field(description=&quot;Description of the item or service&quot;){"\n"}
+              {"    "}description: str = Field(description=&quot;Description of the item or
+              service&quot;){"\n"}
               {"    "}quantity: int = Field(description=&quot;Number of units&quot;, ge=1){"\n"}
-              {"    "}unit_price: float = Field(description=&quot;Price per unit&quot;, ge=0){"\n\n"}
+              {"    "}unit_price: float = Field(description=&quot;Price per unit&quot;, ge=0)
+              {"\n\n"}
               class Invoice(BaseModel):{"\n"}
               {"    "}vendor_name: str{"\n"}
               {"    "}invoice_number: str{"\n"}
@@ -879,8 +932,10 @@ export default function GrokBestPracticesPage() {
               {"    "}currency: Currency{"\n\n"}
               client = Client(api_key=os.getenv(&quot;XAI_API_KEY&quot;)){"\n"}
               chat = client.chat.create(model=&quot;grok-4.5&quot;){"\n"}
-              chat.append(system(&quot;Given a raw invoice, extract the invoice data into JSON format.&quot;)){"\n"}
-              chat.append(user(&quot;Vendor: Acme Corp | Invoice: INV-1042 | Date: 2026-07-01 | Service: Consulting, 8 hours at $10.00 | Total: $80.00 USD&quot;)){"\n\n"}
+              chat.append(system(&quot;Given a raw invoice, extract the invoice data into JSON
+              format.&quot;)){"\n"}
+              chat.append(user(&quot;Vendor: Acme Corp | Invoice: INV-1042 | Date: 2026-07-01 |
+              Service: Consulting, 8 hours at $10.00 | Total: $80.00 USD&quot;)){"\n\n"}
               response, invoice = chat.parse(Invoice){"\n"}
               print(invoice.vendor_name, invoice.total_amount, invoice.currency)
             </code>
@@ -890,10 +945,12 @@ export default function GrokBestPracticesPage() {
           <p>
             Web Search
             などのエージェント型ツールでも、カスタム関数呼び出しでも、最終出力を型安全なスキーマに強制することができます（Grok
-            4 系モデルで対応）。これにより「ツールで情報収集 → 決まった形式で返す」というワークフローが実現します。
+            4 系モデルで対応）。これにより「ツールで情報収集 →
+            決まった形式で返す」というワークフローが実現します。
           </p>
           <div className={styles.sourceNote}>
-            <i className="ti ti-external-link" />出典:{" "}
+            <i className="ti ti-external-link" />
+            出典:{" "}
             <Ext href="https://docs.x.ai/developers/model-capabilities/text/structured-outputs">
               Structured Outputs | xAI Docs
             </Ext>
@@ -903,11 +960,12 @@ export default function GrokBestPracticesPage() {
 
         <section className={styles.docSection} id="step7">
           <h2>
-            <span className={styles.stepNumber}>7</span>Step7：Web検索・X検索ツールでリアルタイム性を確保する
+            <span className={styles.stepNumber}>7</span>
+            Step7：Web検索・X検索ツールでリアルタイム性を確保する
           </h2>
           <p>
-            Grok モデルは学習データ以降の情報を持たないため、最新情報が必要な場合は必ず Web Search / X Search
-            ツールを有効化します。
+            Grok モデルは学習データ以降の情報を持たないため、最新情報が必要な場合は必ず Web Search /
+            X Search ツールを有効化します。
           </p>
 
           <div className={styles.codeLabel}>python</div>
@@ -916,8 +974,7 @@ export default function GrokBestPracticesPage() {
               from xai_sdk.tools import web_search{"\n\n"}
               chat = client.chat.create({"\n"}
               {"    "}model=&quot;grok-4.5&quot;,{"\n"}
-              {"    "}tools=[web_search()],{"\n"}
-              ){"\n"}
+              {"    "}tools=[web_search()],{"\n"}){"\n"}
               chat.append(user(&quot;What is xAI?&quot;))
             </code>
           </pre>
@@ -942,7 +999,8 @@ export default function GrokBestPracticesPage() {
                   <code>excluded_domains</code>
                 </td>
                 <td>
-                  特定ドメインを検索対象から除外（最大5件、<code>allowed_domains</code> と同時指定不可）
+                  特定ドメインを検索対象から除外（最大5件、<code>allowed_domains</code>{" "}
+                  と同時指定不可）
                 </td>
               </tr>
               <tr>
@@ -960,7 +1018,8 @@ export default function GrokBestPracticesPage() {
             </tbody>
           </table>
           <div className={styles.sourceNote}>
-            <i className="ti ti-external-link" />出典:{" "}
+            <i className="ti ti-external-link" />
+            出典:{" "}
             <Ext href="https://docs.x.ai/developers/tools/web-search">Web Search | xAI Docs</Ext>
             （最終更新 2026年5月27日）
           </div>
@@ -968,7 +1027,8 @@ export default function GrokBestPracticesPage() {
 
         <section className={styles.docSection} id="step8">
           <h2>
-            <span className={styles.stepNumber}>8</span>Step8：Prompt Caching でコストと遅延を削減する
+            <span className={styles.stepNumber}>8</span>Step8：Prompt Caching
+            でコストと遅延を削減する
           </h2>
           <p>
             同じプレフィックス（システムプロンプトや会話履歴の先頭部分）を繰り返し送信する場合、キャッシュを活用することで入力トークンのコストと初回応答までの遅延（レイテンシ）を大幅に削減できます。これは公式ドキュメントが明示的に「ベストプラクティス」として列挙している数少ないセクションです。
@@ -978,12 +1038,14 @@ export default function GrokBestPracticesPage() {
           <ol>
             <li>
               <strong>
-                x-grok-conv-id（Chat Completions）または prompt_cache_key（Responses API）を必ず設定する
+                x-grok-conv-id（Chat Completions）または prompt_cache_key（Responses
+                API）を必ず設定する
               </strong>
               — 同一サーバーにリクエストをルーティングし、キャッシュヒット率を最大化します。
             </li>
             <li>
-              <strong>安定した会話IDを使う</strong> — UUID やアプリケーションのセッションIDが適しています。
+              <strong>安定した会話IDを使う</strong> — UUID
+              やアプリケーションのセッションIDが適しています。
             </li>
             <li>
               <strong>過去のメッセージを変更しない</strong> —
@@ -1055,19 +1117,23 @@ export default function GrokBestPracticesPage() {
             </div>
           </div>
           <div className={styles.sourceNote}>
-            <i className="ti ti-external-link" />出典:{" "}
+            <i className="ti ti-external-link" />
+            出典:{" "}
             <Ext href="https://docs.x.ai/developers/advanced-api-usage/prompt-caching/best-practices">
               Prompt Caching: Best Practices &amp; FAQ | xAI Docs
             </Ext>
             （最終更新 2026年3月16日）、
-            <Ext href="https://docs.x.ai/developers/grok-4-5#important-details">grok-4.5 | xAI Docs</Ext>
+            <Ext href="https://docs.x.ai/developers/grok-4-5#important-details">
+              grok-4.5 | xAI Docs
+            </Ext>
             （最終更新 2026年7月8日）
           </div>
         </section>
 
         <section className={styles.docSection} id="step9">
           <h2>
-            <span className={styles.stepNumber}>9</span>Step9：長時間のエージェントループと Context Compaction
+            <span className={styles.stepNumber}>9</span>Step9：長時間のエージェントループと Context
+            Compaction
           </h2>
           <p>
             数千トークンを超える長い会話では、フォローアップのたびに過去の全メッセージを再送信することになり、入力トークンのコストが膨らみます。Context
@@ -1077,9 +1143,12 @@ export default function GrokBestPracticesPage() {
           <h3>9.1 圧縮すべきタイミング（すべて満たす場合）</h3>
           <ul>
             <li>
-              会話が大きくなり、各呼び出しの <code>input_tokens</code> がコストやレイテンシを悪化させている
+              会話が大きくなり、各呼び出しの <code>input_tokens</code>{" "}
+              がコストやレイテンシを悪化させている
             </li>
-            <li>モデルに過去のやり取りを覚えていてほしい（覚えなくてよいなら新規会話を始めるだけでよい）</li>
+            <li>
+              モデルに過去のやり取りを覚えていてほしい（覚えなくてよいなら新規会話を始めるだけでよい）
+            </li>
             <li>
               現在のウィンドウがまだモデルのコンテキスト上限に収まっている（圧縮は既に上限超過したリクエストを救済できません）
             </li>
@@ -1096,16 +1165,20 @@ export default function GrokBestPracticesPage() {
               {"    "}chat.append(response){"\n\n"}
               {"    "}if turn % compact_every == 0:{"\n"}
               {"        "}compact = chat.compact(){"\n"}
-              {"        "}print(f&quot;dropped &#123;compact.dropped_message_count&#125; messages, tokens used: &#123;compact.usage.total_tokens&#125;&quot;)
+              {"        "}print(f&quot;dropped &#123;compact.dropped_message_count&#125; messages,
+              tokens used: &#123;compact.usage.total_tokens&#125;&quot;)
             </code>
           </pre>
 
           <h3>9.3 制約と注意点</h3>
           <ul>
-            <li>既にコンテキスト上限を超えている会話は圧縮できません（圧縮前にプルーニングや分割が必要）。</li>
+            <li>
+              既にコンテキスト上限を超えている会話は圧縮できません（圧縮前にプルーニングや分割が必要）。
+            </li>
             <li>1リクエストにつき圧縮は1回まで。</li>
             <li>
-              <code>encrypted_content</code> は不透明なブロブとして扱うこと。パース・編集・手動マージをしてはいけません。
+              <code>encrypted_content</code>{" "}
+              は不透明なブロブとして扱うこと。パース・編集・手動マージをしてはいけません。
             </li>
             <li>再圧縮は可能です。圧縮後さらに会話が長くなった場合、再度圧縮できます。</li>
             <li>
@@ -1117,7 +1190,8 @@ export default function GrokBestPracticesPage() {
             </li>
           </ul>
           <div className={styles.sourceNote}>
-            <i className="ti ti-external-link" />出典:{" "}
+            <i className="ti ti-external-link" />
+            出典:{" "}
             <Ext href="https://docs.x.ai/developers/advanced-api-usage/context-compaction">
               Context Compaction | xAI Docs
             </Ext>
@@ -1132,7 +1206,8 @@ export default function GrokBestPracticesPage() {
 
           <h3>10.1 レート制限の仕組み</h3>
           <p>
-            xAI API は RPS（1秒あたりのリクエスト数）と TPM（1分あたりのトークン数）の2軸で制限されます。制限値はチーム累計支出額に基づく「Tier（階層）」によって自動的に引き上げられます。
+            xAI API は RPS（1秒あたりのリクエスト数）と
+            TPM（1分あたりのトークン数）の2軸で制限されます。制限値はチーム累計支出額に基づく「Tier（階層）」によって自動的に引き上げられます。
           </p>
 
           <table>
@@ -1210,7 +1285,8 @@ export default function GrokBestPracticesPage() {
           </table>
           <p className={styles.muted}>
             TPM
-            にカウントされるもの：プロンプトトークン（テキスト・画像・音声）、完了トークン、推論トークン、そしてキャッシュされたプロンプトトークンも含まれます（課金は割引されますが TPM 消費としてはカウントされる点に注意）。
+            にカウントされるもの：プロンプトトークン（テキスト・画像・音声）、完了トークン、推論トークン、そしてキャッシュされたプロンプトトークンも含まれます（課金は割引されますが
+            TPM 消費としてはカウントされる点に注意）。
           </p>
 
           <h3>10.3 429エラーへの対処（指数バックオフ）</h3>
@@ -1220,11 +1296,13 @@ export default function GrokBestPracticesPage() {
               import os{"\n"}
               import time{"\n"}
               from openai import OpenAI, RateLimitError{"\n\n"}
-              client = OpenAI(base_url=&quot;https://api.x.ai/v1&quot;, api_key=os.getenv(&quot;XAI_API_KEY&quot;)){"\n\n"}
+              client = OpenAI(base_url=&quot;https://api.x.ai/v1&quot;,
+              api_key=os.getenv(&quot;XAI_API_KEY&quot;)){"\n\n"}
               def request_with_backoff(messages, max_retries=5):{"\n"}
               {"    "}for attempt in range(max_retries):{"\n"}
               {"        "}try:{"\n"}
-              {"            "}return client.chat.completions.create(model=&quot;grok-4.5&quot;, messages=messages){"\n"}
+              {"            "}return client.chat.completions.create(model=&quot;grok-4.5&quot;,
+              messages=messages){"\n"}
               {"        "}except RateLimitError:{"\n"}
               {"            "}wait = 2 ** attempt{"\n"}
               {"            "}time.sleep(wait){"\n"}
@@ -1243,18 +1321,20 @@ export default function GrokBestPracticesPage() {
               <strong>支出を増やす</strong>：累計支出に応じて Tier は自動的に引き上げられます。
             </li>
             <li>
-              <strong>引き上げをリクエストする</strong>：追加支出なしで制限を引き上げたい場合や Tier 4
-              を超える制限が必要な場合、
-              <Ext href="https://console.x.ai/team/default/rate-limits">xAI Console</Ext> から申請できます。
+              <strong>引き上げをリクエストする</strong>：追加支出なしで制限を引き上げたい場合や Tier
+              4 を超える制限が必要な場合、
+              <Ext href="https://console.x.ai/team/default/rate-limits">xAI Console</Ext>{" "}
+              から申請できます。
             </li>
             <li>
-              <strong>セールスに問い合わせる</strong>：エンタープライズ規模のキャパシティが必要な場合は{" "}
-              <code>sales@x.ai</code> へ連絡します。
+              <strong>セールスに問い合わせる</strong>
+              ：エンタープライズ規模のキャパシティが必要な場合は <code>sales@x.ai</code>{" "}
+              へ連絡します。
             </li>
           </ul>
           <div className={styles.sourceNote}>
-            <i className="ti ti-external-link" />出典:{" "}
-            <Ext href="https://docs.x.ai/developers/rate-limits">Rate Limits | xAI Docs</Ext>
+            <i className="ti ti-external-link" />
+            出典: <Ext href="https://docs.x.ai/developers/rate-limits">Rate Limits | xAI Docs</Ext>
             （最終更新 2026年6月20日）
           </div>
         </section>
@@ -1396,7 +1476,9 @@ export default function GrokBestPracticesPage() {
               </tr>
             </tbody>
           </table>
-          <p className={styles.muted}>grok-4.3・grok-4.20系は20%割引、それ以外のモデルは割引対象外です。</p>
+          <p className={styles.muted}>
+            grok-4.3・grok-4.20系は20%割引、それ以外のモデルは割引対象外です。
+          </p>
 
           <h3>11.4 Priority Processing（優先処理）</h3>
           <p>
@@ -1430,15 +1512,16 @@ export default function GrokBestPracticesPage() {
             </tbody>
           </table>
           <div className={styles.sourceNote}>
-            <i className="ti ti-external-link" />出典:{" "}
-            <Ext href="https://docs.x.ai/developers/pricing">Pricing | xAI Docs</Ext>
+            <i className="ti ti-external-link" />
+            出典: <Ext href="https://docs.x.ai/developers/pricing">Pricing | xAI Docs</Ext>
             （最終更新 2026年7月3日）
           </div>
         </section>
 
         <section className={styles.docSection} id="security">
           <h2>
-            <i className="ti ti-shield-lock" />12. セキュリティとデータプライバシーのベストプラクティス
+            <i className="ti ti-shield-lock" />
+            12. セキュリティとデータプライバシーのベストプラクティス
           </h2>
           <p>
             AIエンジニアリングにおいてガバナンス・セキュリティ要件を考慮することは重要です。xAI API
@@ -1459,10 +1542,13 @@ export default function GrokBestPracticesPage() {
             エンタープライズアカウント限定の機能で、有効化するとリクエスト・レスポンスデータが一切保存されません（応答が返された時点で記録が残りません）。
           </p>
           <ul>
-            <li>モデレーション（安全性チェック）はリアルタイムで実施されますが、結果は保存されません。</li>
             <li>
-              全レスポンスに <code>x-zero-data-retention</code> ヘッダー（<code>&quot;true&quot;</code> /{" "}
-              <code>&quot;false&quot;</code>）が付与され、プログラム的に ZDR の有効性を確認できます。
+              モデレーション（安全性チェック）はリアルタイムで実施されますが、結果は保存されません。
+            </li>
+            <li>
+              全レスポンスに <code>x-zero-data-retention</code> ヘッダー（
+              <code>&quot;true&quot;</code> / <code>&quot;false&quot;</code>
+              ）が付与され、プログラム的に ZDR の有効性を確認できます。
             </li>
             <li>
               ZDR 環境下では <code>previous_response_id</code>{" "}
@@ -1513,7 +1599,8 @@ export default function GrokBestPracticesPage() {
             </div>
           </div>
           <div className={styles.sourceNote}>
-            <i className="ti ti-external-link" />出典:{" "}
+            <i className="ti ti-external-link" />
+            出典:{" "}
             <Ext href="https://docs.x.ai/developers/faq/security">
               FAQ - xAI API Security | xAI Docs
             </Ext>
@@ -1523,7 +1610,8 @@ export default function GrokBestPracticesPage() {
 
         <section className={styles.docSection} id="prompting">
           <h2>
-            <i className="ti ti-message-2" />13. プロンプト設計のベストプラクティス
+            <i className="ti ti-message-2" />
+            13. プロンプト設計のベストプラクティス
           </h2>
           <p>
             Grok に限らず LLM 全般に通じる原則ですが、xAI API
@@ -1541,8 +1629,8 @@ export default function GrokBestPracticesPage() {
               ：「説明して」ではなく「〇〇について、△△字以内で、□□向けに、具体例を1つ含めて説明して」のように、タスク・分量・対象読者・出力形式を具体化する。
             </li>
             <li>
-              <strong>長い・複雑な指示は構造化する</strong>：Markdown の見出しや箇条書き（あるいは XML
-              タグ）でタスク・制約・コンテキストを分離すると、モデルの情報抽出精度が上がります。
+              <strong>長い・複雑な指示は構造化する</strong>：Markdown の見出しや箇条書き（あるいは
+              XML タグ）でタスク・制約・コンテキストを分離すると、モデルの情報抽出精度が上がります。
             </li>
             <li>
               <strong>エビデンス・根拠を要求する</strong>
@@ -1562,10 +1650,12 @@ export default function GrokBestPracticesPage() {
           <div className={styles.codeLabel}>system prompt</div>
           <pre className={styles.codeBlockPre}>
             <code>
-              You are a senior backend engineer with access to web search and code execution tools.{"\n"}
+              You are a senior backend engineer with access to web search and code execution tools.
+              {"\n"}
               When solving problems:{"\n"}
               1. State your reasoning plan before taking any action{"\n"}
-              2. Use search to verify external facts, library versions, or API specs before assuming{"\n"}
+              2. Use search to verify external facts, library versions, or API specs before assuming
+              {"\n"}
               3. Execute and test code, don&apos;t just write it{"\n"}
               4. If a test fails, diagnose and fix before moving on{"\n"}
               5. Rate your final output 1-10 and flag any remaining uncertainties
@@ -1575,7 +1665,8 @@ export default function GrokBestPracticesPage() {
             このようにシステムプロンプトで「思考の型」を明示することで、モデルが根拠のないAPIエンドポイントを想定してしまう、といった典型的な失敗を減らせます。
           </p>
           <div className={styles.sourceNote}>
-            <i className="ti ti-external-link" />出典:{" "}
+            <i className="ti ti-external-link" />
+            出典:{" "}
             <Ext href="https://docs.x.ai/developers/tools/function-calling">
               Function Calling | xAI Docs
             </Ext>
@@ -1589,7 +1680,8 @@ export default function GrokBestPracticesPage() {
 
         <section className={styles.docSection} id="antipatterns">
           <h2>
-            <i className="ti ti-alert-triangle" />14. よくある落とし穴（アンチパターン）チェックリスト
+            <i className="ti ti-alert-triangle" />
+            14. よくある落とし穴（アンチパターン）チェックリスト
           </h2>
           <table>
             <thead>
@@ -1669,34 +1761,41 @@ export default function GrokBestPracticesPage() {
 
         <section className={styles.docSection} id="checklist">
           <h2>
-            <i className="ti ti-checklist" />15. まとめ：ベストプラクティス チェックリスト
+            <i className="ti ti-checklist" />
+            15. まとめ：ベストプラクティス チェックリスト
           </h2>
           <ul className={styles.checklist}>
             <li>
-              <i className="ti ti-square" />用途に応じて適切なモデル（基本は grok-4.5）を選定した
+              <i className="ti ti-square" />
+              用途に応じて適切なモデル（基本は grok-4.5）を選定した
             </li>
             <li>
               <i className="ti ti-square" />
               APIキーを環境変数で管理し、コードにハードコーディングしていない
             </li>
             <li>
-              <i className="ti ti-square" />タスクの難易度に応じて reasoning_effort を調整している
+              <i className="ti ti-square" />
+              タスクの難易度に応じて reasoning_effort を調整している
             </li>
             <li>
-              <i className="ti ti-square" />ツールの description を具体的に記述し、並列呼び出しに対応している
+              <i className="ti ti-square" />
+              ツールの description を具体的に記述し、並列呼び出しに対応している
             </li>
             <li>
-              <i className="ti ti-square" />型安全性が必要な場面で Structured Outputs（Pydantic/Zod）を使っている
+              <i className="ti ti-square" />
+              型安全性が必要な場面で Structured Outputs（Pydantic/Zod）を使っている
             </li>
             <li>
-              <i className="ti ti-square" />リアルタイム情報が必要な場合は Web Search / X Search を有効化している
+              <i className="ti ti-square" />
+              リアルタイム情報が必要な場合は Web Search / X Search を有効化している
             </li>
             <li>
               <i className="ti ti-square" />
               prompt_cache_key（または x-grok-conv-id）を設定し、静的コンテンツを先頭に配置している
             </li>
             <li>
-              <i className="ti ti-square" />長時間のエージェントループでは Context Compaction を活用している
+              <i className="ti ti-square" />
+              長時間のエージェントループでは Context Compaction を活用している
             </li>
             <li>
               <i className="ti ti-square" />
@@ -1708,14 +1807,16 @@ export default function GrokBestPracticesPage() {
             </li>
             <li>
               <i className="ti ti-square" />
-              機密性の高いデータを扱う場合は ZDR やコンプライアンス要件（SOC 2 / HIPAA BAA）を確認している
+              機密性の高いデータを扱う場合は ZDR やコンプライアンス要件（SOC 2 / HIPAA
+              BAA）を確認している
             </li>
           </ul>
         </section>
 
         <section className={styles.docSection} id="references">
           <h2>
-            <i className="ti ti-books" />16. 参考資料・出典URL一覧
+            <i className="ti ti-books" />
+            16. 参考資料・出典URL一覧
           </h2>
           <p>
             本ガイドの各セクションは、以下の一次情報源（xAI公式ドキュメント）を参照して作成しました（すべて2026年7月15日時点でアクセス可能な内容）。
@@ -1768,7 +1869,9 @@ export default function GrokBestPracticesPage() {
                 <td>grok-4.5 詳細</td>
                 <td>grok-4.5</td>
                 <td>
-                  <Ext href="https://docs.x.ai/developers/grok-4-5">docs.x.ai/developers/grok-4-5</Ext>
+                  <Ext href="https://docs.x.ai/developers/grok-4-5">
+                    docs.x.ai/developers/grok-4-5
+                  </Ext>
                 </td>
                 <td>2026年7月8日</td>
               </tr>
@@ -1846,7 +1949,9 @@ export default function GrokBestPracticesPage() {
                 <td>料金体系</td>
                 <td>Pricing</td>
                 <td>
-                  <Ext href="https://docs.x.ai/developers/pricing">docs.x.ai/developers/pricing</Ext>
+                  <Ext href="https://docs.x.ai/developers/pricing">
+                    docs.x.ai/developers/pricing
+                  </Ext>
                 </td>
                 <td>2026年7月3日</td>
               </tr>
