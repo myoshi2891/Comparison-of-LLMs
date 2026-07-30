@@ -185,7 +185,7 @@ export default function Page() {
 
       <section id="architecture" className={styles.section}>
         <h2>
-          <i aria-hidden="true" className="ti ti-stack-2" /> Progressive Disclosure —
+          <i aria-hidden="true" className="ti ti-stack-2" /> Progressive Disclosure —<br />
           Skillのアーキテクチャ
         </h2>
         <p>
