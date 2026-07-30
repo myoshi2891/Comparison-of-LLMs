@@ -414,13 +414,17 @@
     left: 0;
     height: 100vh;
     transform: translateX(-100%);
-    transition: transform 0.2s ease;
+    transition: transform 0.2s ease, visibility 0.2s ease;
     width: min(80vw, 320px);
     box-shadow: 2px 0 24px rgba(0, 0, 0, 0.4);
+    visibility: hidden;
+    pointer-events: none;
   }
 
   .sidebarOpen {
     transform: translateX(0);
+    visibility: visible;
+    pointer-events: auto;
   }
 
   .sidebarToggle {

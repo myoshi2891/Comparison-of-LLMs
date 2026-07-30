@@ -1,8 +1,13 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import Page from "./page";
+import Page, { metadata } from "./page";
 
 describe("ZaiGlmBestPracticesPage", () => {
+  it("exports valid metadata with title and description", () => {
+    expect(metadata.title).toBe("Z.ai (GLM) LLM ベストプラクティスガイド | AI Model Cost Calculator");
+    expect(metadata.description).toContain("Z.ai(GLM) LLMの初学者向け実践ベストプラクティスガイド");
+  });
+
   it("renders main heading (h1)", async () => {
     const page = await Page();
     render(page);

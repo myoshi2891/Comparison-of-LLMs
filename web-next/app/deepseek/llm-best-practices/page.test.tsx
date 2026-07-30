@@ -1,6 +1,6 @@
 import { render } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import Page from "./page";
+import Page, { metadata } from "./page";
 
 // MermaidDiagram のモック
 vi.mock("@/components/docs/MermaidDiagram", () => ({
@@ -10,6 +10,13 @@ vi.mock("@/components/docs/MermaidDiagram", () => ({
 }));
 
 describe("DeepSeek LLM Best Practices Page", () => {
+  it("exports valid metadata with title and description", () => {
+    expect(metadata.title).toBe(
+      "DeepSeek LLM ベストプラクティスガイド — 初学者向けステップバイステップ解説"
+    );
+    expect(metadata.description).toContain("DeepSeek-V3 / R1 / V4");
+  });
+
   it("renders page title correctly in h1", () => {
     const { container } = render(<Page />);
     const h1 = container.querySelector("h1");

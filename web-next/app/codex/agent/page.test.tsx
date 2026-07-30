@@ -88,10 +88,8 @@ describe("/codex/agent - page structure", () => {
     expect(tocNav, "TOC nav element must exist").not.toBeUndefined();
     const tocAnchors = tocNav?.querySelectorAll('a[href^="#"]') ?? [];
     const tocHrefs = Array.from(tocAnchors).map((a) => a.getAttribute("href"));
-    expect(tocHrefs).toHaveLength(20);
-    for (const id of EXPECTED_SECTION_IDS) {
-      expect(tocHrefs, `TOC must link to #${id}`).toContain(`#${id}`);
-    }
+    const expectedHrefs = EXPECTED_SECTION_IDS.map((id) => `#${id}`);
+    expect(tocHrefs).toEqual(expectedHrefs);
   });
 });
 

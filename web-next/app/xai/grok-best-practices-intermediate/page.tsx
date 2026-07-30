@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import MermaidDiagram from '@/components/docs/MermaidDiagram';
 import styles from './page.module.css';
+import SidebarToggle from './SidebarToggle';
 import TocObserver from './TocObserver';
 
 export const metadata: Metadata = {
@@ -161,6 +162,7 @@ export default function GrokBestPracticesIntermediatePage() {
   return (
     <div className={styles.layout}>
       <TocObserver activeClass={styles.active} />
+      <SidebarToggle />
       <aside className={styles.sidebar}>
         <div className={styles.brand}>
           Grok / xAI API

@@ -108,6 +108,7 @@
 .main {
   flex: 1;
   min-width: 0;
+  width: 100%;
   padding: 40px 48px 80px 48px;
 }
 

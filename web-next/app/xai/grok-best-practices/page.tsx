@@ -38,9 +38,9 @@ K --> N["セキュリティ設定<br/>鍵管理・ZDR"]`;
 const MERMAID_DIAGRAM_2 = `flowchart TD
 Start["タスクの性質を確認"] --> Q1{"レイテンシが最優先か"}
 Q1 -- はい --> Low["reasoning_effort = low"]
-Q1 -- いいえ --> Q2{"複雑なデータ分析\n長文コンテキストか"}
+Q1 -- いいえ --> Q2{"複雑なデータ分析<br/>長文コンテキストか"}
 Q2 -- はい --> Med["reasoning_effort = medium"]
-Q2 -- いいえ --> Q3{"数学の証明\n多段階ロジック\n競技レベルの難問か"}
+Q2 -- いいえ --> Q3{"数学の証明<br/>多段階ロジック<br/>競技レベルの難問か"}
 Q3 -- はい --> High["reasoning_effort = high（デフォルト）"]
 Q3 -- いいえ --> Med`;
 
@@ -76,17 +76,17 @@ export default function GrokBestPracticesPage() {
       <TocObserver />
       <aside className={styles.sidebar}>
         <div className={styles.sidebarBrand}>
-          <i className="ti ti-bolt" style={{ color: "var(--c-teal-500)", fontSize: "20px" }} />
+          <i className="ti ti-bolt" aria-hidden="true" style={{ color: "var(--c-teal-500)", fontSize: "20px" }} />
           <span className={styles.sidebarBrandTitle}>xAI Grok Guide</span>
         </div>
         <nav>
           <div className={styles.navGroupTitle}>概要 &amp; 導入</div>
           <a className={styles.navLink} href="#overview">
-            <i className="ti ti-info-circle" />
+            <i className="ti ti-info-circle" aria-hidden="true" />
             0. xAI と Grok とは
           </a>
           <a className={styles.navLink} href="#workflow">
-            <i className="ti ti-route" />
+            <i className="ti ti-route" aria-hidden="true" />
             1. 利用開始ワークフロー
           </a>
 

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import MermaidDiagram from "@/components/docs/MermaidDiagram";
 import styles from "./page.module.css";
+import SidebarToggle from "./SidebarToggle";
 import TocObserver from "./TocObserver";
 
 export const metadata: Metadata = {
@@ -88,14 +89,7 @@ export default function CodexAgentPage() {
   return (
     <div className={styles.layout}>
       <TocObserver />
-      <button
-        type="button"
-        className={styles.sidebarToggle}
-        id="sidebarToggle"
-        aria-label="メニュー"
-      >
-        ☰
-      </button>
+      <SidebarToggle />
       <aside className={styles.sidebar} id="sidebar">
         <div className={styles.sidebarBrand}>
           OpenAI Codex <span>サブエージェント</span> ガイド

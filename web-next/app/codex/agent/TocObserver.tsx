@@ -5,25 +5,23 @@ import styles from "./page.module.css";
 
 export default function TocObserver() {
   useEffect(() => {
-    // 1. Sidebar Toggle for Mobile
-    const btn = document.getElementById("sidebarToggle");
+    // Nav link click closes mobile sidebar
     const sidebar = document.getElementById("sidebar");
-    if (btn && sidebar) {
-      const handleToggle = () => {
-        sidebar.classList.toggle(styles.sidebarOpen);
-      };
-      btn.addEventListener("click", handleToggle);
-
+    if (sidebar) {
       const navLinks = sidebar.querySelectorAll(`.${styles.navLink}`);
       const handleLinkClick = () => {
         sidebar.classList.remove(styles.sidebarOpen);
+        const toggleBtn = document.getElementById("sidebarToggle");
+        if (toggleBtn) {
+          toggleBtn.setAttribute("aria-expanded", "false");
+          toggleBtn.setAttribute("aria-label", "メニューを開く");
+        }
       };
       navLinks.forEach((link) => {
         link.addEventListener("click", handleLinkClick);
       });
 
       return () => {
-        btn.removeEventListener("click", handleToggle);
         navLinks.forEach((link) => {
           link.removeEventListener("click", handleLinkClick);
         });
