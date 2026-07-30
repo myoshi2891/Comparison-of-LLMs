@@ -5,15 +5,15 @@
  * Anthropic API互換連携を網羅する 100% Faithful 完全忠実移植ページ。
  */
 
-import type { Metadata } from "next";
-import MermaidDiagram from "@/components/docs/MermaidDiagram";
-import TocObserver from "./TocObserver";
-import styles from "./page.module.css";
+import type { Metadata } from 'next';
+import MermaidDiagram from '@/components/docs/MermaidDiagram';
+import TocObserver from './TocObserver';
+import styles from './page.module.css';
 
 export const metadata: Metadata = {
-  title: "DeepSeek LLM ベストプラクティスガイド — 初学者向けステップバイステップ解説",
+  title: 'DeepSeek LLM ベストプラクティスガイド — 初学者向けステップバイステップ解説',
   description:
-    "DeepSeek-V3 / R1 / V4 などのモデル選定、Thinking Mode（思考モード）、Context Caching、Function Calling、Anthropic API互換連携までの初学者向け実践ベストプラクティスガイド。",
+    'DeepSeek-V3 / R1 / V4 などのモデル選定、Thinking Mode（思考モード）、Context Caching、Function Calling、Anthropic API互換連携までの初学者向け実践ベストプラクティスガイド。',
 };
 
 function Ext({ href, children }: { href: string; children: React.ReactNode }) {
@@ -61,7 +61,7 @@ const DIAGRAM_2 = `flowchart LR
     R -->|"5. JSON返却"| U`;
 
 const DIAGRAM_3 = `flowchart TD
-    Start["タスクの発生"] --> Q1{"高い推論能力（数学・難解なコード・論理パズル）が必須？"}
+    Start["タスクの発生"] --> Q1{"高い推論能力<br>（数学・難解なコード・論理パズル）<br>が必須？"}
     Q1 -- はい --> Q2{"予算・応答速度より
 精度を最優先？"}
     Q2 -- はい --> Pro["deepseek-v4-pro を選択"]
@@ -223,7 +223,8 @@ export default function DeepSeekLlmPage() {
           </h1>
           <p className={styles.lead}>
             中国発のオープン重みLLM「DeepSeek」のAPI仕様・モデル選定・思考モード（Thinking
-            Mode）・Context Caching・Function Calling・Anthropic互換API連携まで、初学者が本番システムで活用するためのベストプラクティスを網羅的に解説します。
+            Mode）・Context Caching・Function
+            Calling・Anthropic互換API連携まで、初学者が本番システムで活用するためのベストプラクティスを網羅的に解説します。
           </p>
 
           <div className={styles.metaGrid}>
@@ -250,16 +251,23 @@ export default function DeepSeekLlmPage() {
           <h2>1. DeepSeekとは何か</h2>
           <p>
             DeepSeek（ディープシーク）は、高性能な大言語モデル（LLM）および推論モデル（Reasoning
-            Model）を開発するAI研究機関・企業です。GPT-4クラスやClaude 3.5 Sonnetクラスの性能を、従来の1/10〜1/50という低価格・省リソースで実現し、世界的な注目を集めました。
+            Model）を開発するAI研究機関・企業です。GPT-4クラスやClaude 3.5
+            Sonnetクラスの性能を、従来の1/10〜1/50という低価格・省リソースで実現し、世界的な注目を集めました。
           </p>
           <p>
-            公式ホストの DeepSeek API は、<strong>OpenAI API と互換のある形式（JSON schema）</strong>および<strong>Anthropic API 互換形式</strong>の双方を提供しており、既存のOpenAI SDKやClaude用ツール（Claude CodeやCursorなど）からエンドポイントとモデル名を差し替えるだけで利用できます。
+            公式ホストの DeepSeek API は、
+            <strong>OpenAI API と互換のある形式（JSON schema）</strong>および
+            <strong>Anthropic API 互換形式</strong>の双方を提供しており、既存のOpenAI
+            SDKやClaude用ツール（Claude
+            CodeやCursorなど）からエンドポイントとモデル名を差し替えるだけで利用できます。
           </p>
 
           <div className={styles.callout}>
             <div className={styles.calloutTitle}>💡 なぜ今DeepSeekなのか？</div>
             <p>
-              圧倒的なコストパフォーマンス（Context Caching適用時で1Mトークンあたり数セント〜十数セント）に加え、思考プロセスを出力する推論モデル（Thinking Mode）がAPIレベルで標準サポートされているため、複雑なコード生成や論理的推論、マルチステップなエージェント（Agent）構築において強力な選択肢となっています。
+              圧倒的なコストパフォーマンス（Context
+              Caching適用時で1Mトークンあたり数セント〜十数セント）に加え、思考プロセスを出力する推論モデル（Thinking
+              Mode）がAPIレベルで標準サポートされているため、複雑なコード生成や論理的推論、マルチステップなエージェント（Agent）構築において強力な選択肢となっています。
             </p>
           </div>
         </section>
@@ -273,7 +281,8 @@ export default function DeepSeekLlmPage() {
 
           <h3>モデル進化の歴史（タイムライン図）</h3>
           <div className={styles.diagramCard}>
-            <MermaidDiagram chart={DIAGRAM_1} caption="図1: DeepSeekモデル進化のタイムライン（2024年〜2026年）" />
+            <MermaidDiagram chart={DIAGRAM_1} />
+            <div className={styles.diagramCaption}>図1: DeepSeekモデル進化のタイムライン（2024年〜2026年）</div>
           </div>
 
           <h3>現行モデル比較表（2026年7月16日時点）</h3>
@@ -334,7 +343,12 @@ export default function DeepSeekLlmPage() {
           <div className={`${styles.callout} ${styles.calloutWarn}`}>
             <div className={styles.calloutTitle}>⚠️ 旧モデル名廃止の予告（2026年7月24日）</div>
             <p>
-              旧モデルエイリアスである <code className={styles.inlineCode}>deepseek-chat</code>（DeepSeek-V3実体）および <code className={styles.inlineCode}>deepseek-reasoner</code>（DeepSeek-R1実体）は、<strong>2026年7月24日に完全廃止</strong>されます。新規開発では必ず <code className={styles.inlineCode}>deepseek-v4-flash</code> または <code className={styles.inlineCode}>deepseek-v4-pro</code> を指定してください。
+              旧モデルエイリアスである <code className={styles.inlineCode}>deepseek-chat</code>
+              （DeepSeek-V3実体）および <code className={styles.inlineCode}>deepseek-reasoner</code>
+              （DeepSeek-R1実体）は、<strong>2026年7月24日に完全廃止</strong>
+              されます。新規開発では必ず{' '}
+              <code className={styles.inlineCode}>deepseek-v4-flash</code> または{' '}
+              <code className={styles.inlineCode}>deepseek-v4-pro</code> を指定してください。
             </p>
           </div>
         </section>
@@ -348,16 +362,21 @@ export default function DeepSeekLlmPage() {
           <p>DeepSeek APIを利用するための準備手順です。</p>
           <ol>
             <li>
-              公式プラットフォーム（<Ext href="https://platform.deepseek.com">platform.deepseek.com</Ext>）へアクセスしアカウントを作成します。
+              公式プラットフォーム（
+              <Ext href="https://platform.deepseek.com">platform.deepseek.com</Ext>
+              ）へアクセスしアカウントを作成します。
             </li>
             <li>
-              ダッシュボードの「API Keys」メニューから「Create new API key」をクリックし、キーを生成・保存します。（キーは一度しか表示されません）
+              ダッシュボードの「API Keys」メニューから「Create new API
+              key」をクリックし、キーを生成・保存します。（キーは一度しか表示されません）
             </li>
             <li>
-              「Top up」メニューからクレジットカードまたはPayPal等でクレジットをチャージします（従量課金制・最低5ドル程度からチャージ可能）。
+              「Top
+              up」メニューからクレジットカードまたはPayPal等でクレジットをチャージします（従量課金制・最低5ドル程度からチャージ可能）。
             </li>
             <li>
-              環境変数 <code className={styles.inlineCode}>DEEPSEEK_API_KEY</code> に取得したAPIキーを設定します。
+              環境変数 <code className={styles.inlineCode}>DEEPSEEK_API_KEY</code>{' '}
+              に取得したAPIキーを設定します。
             </li>
           </ol>
 
@@ -367,7 +386,9 @@ export default function DeepSeekLlmPage() {
               <span>env_setup.sh</span>
             </div>
             <div className={styles.codeBody}>
-              <div className={styles.codeLine}>export DEEPSEEK_API_KEY="sk-xxxxxxxxxxxxxxxxxxxxxxxx"</div>
+              <div className={styles.codeLine}>
+                export DEEPSEEK_API_KEY="sk-xxxxxxxxxxxxxxxxxxxxxxxx"
+              </div>
             </div>
           </div>
         </section>
@@ -379,12 +400,16 @@ export default function DeepSeekLlmPage() {
           </div>
           <h2>はじめてのAPI呼び出し</h2>
           <p>
-            DeepSeek APIはOpenAI SDKと完全互換です。Pythonの <code className={styles.inlineCode}>openai</code> パッケージをそのまま使用し、<code className={styles.inlineCode}>base_url="https://api.deepseek.com"</code> を指定するだけで動作します。
+            DeepSeek APIはOpenAI SDKと完全互換です。Pythonの{' '}
+            <code className={styles.inlineCode}>openai</code> パッケージをそのまま使用し、
+            <code className={styles.inlineCode}>base_url="https://api.deepseek.com"</code>{' '}
+            を指定するだけで動作します。
           </p>
 
           <h3>呼び出しの全体フロー</h3>
           <div className={styles.diagramCard}>
-            <MermaidDiagram chart={DIAGRAM_2} caption="図2: DeepSeek APIリクエストの全体フロー" />
+            <MermaidDiagram chart={DIAGRAM_2} />
+            <div className={styles.diagramCaption}>図2: DeepSeek APIリクエストの全体フロー</div>
           </div>
 
           <h3>実装例（Python / OpenAI SDK形式）</h3>
@@ -397,17 +422,23 @@ export default function DeepSeekLlmPage() {
               <div className={styles.codeLine}>from openai import OpenAI</div>
               <div className={styles.codeLine}></div>
               <div className={styles.codeLine}>client = OpenAI(</div>
-              <div className={styles.codeLine}>    api_key="your_deepseek_api_key",</div>
-              <div className={styles.codeLine}>    base_url="https://api.deepseek.com"</div>
+              <div className={styles.codeLine}> api_key="your_deepseek_api_key",</div>
+              <div className={styles.codeLine}> base_url="https://api.deepseek.com"</div>
               <div className={styles.codeLine}>)</div>
               <div className={styles.codeLine}></div>
               <div className={styles.codeLine}>response = client.chat.completions.create(</div>
-              <div className={styles.codeLine}>    model="deepseek-v4-flash",</div>
-              <div className={styles.codeLine}>    messages=[</div>
-              <div className={styles.codeLine}>        {"{"}"role": "system", "content": "あなたは優秀なアシスタントです。"{"}"},</div>
-              <div className={styles.codeLine}>        {"{"}"role": "user", "content": "DeepSeek APIの特徴を簡潔に教えてください。"{"}"}</div>
-              <div className={styles.codeLine}>    ],</div>
-              <div className={styles.codeLine}>    stream=False</div>
+              <div className={styles.codeLine}> model="deepseek-v4-flash",</div>
+              <div className={styles.codeLine}> messages=[</div>
+              <div className={styles.codeLine}>
+                {' '}
+                {'{'}"role": "system", "content": "あなたは優秀なアシスタントです。"{'}'},
+              </div>
+              <div className={styles.codeLine}>
+                {' '}
+                {'{'}"role": "user", "content": "DeepSeek APIの特徴を簡潔に教えてください。"{'}'}
+              </div>
+              <div className={styles.codeLine}> ],</div>
+              <div className={styles.codeLine}> stream=False</div>
               <div className={styles.codeLine}>)</div>
               <div className={styles.codeLine}></div>
               <div className={styles.codeLine}>print(response.choices[0].message.content)</div>
@@ -415,14 +446,18 @@ export default function DeepSeekLlmPage() {
           </div>
 
           <div className={styles.bestPractice}>
-            <strong>ベストプラクティス:</strong> APIキーはコードに直接ハードコードせず、必ず環境変数 <code className={styles.inlineCode}>DEEPSEEK_API_KEY</code> から読み込む設計にしてください。
+            <strong>ベストプラクティス:</strong> APIキーはコードに直接ハードコードせず、必ず環境変数{' '}
+            <code className={styles.inlineCode}>DEEPSEEK_API_KEY</code>{' '}
+            から読み込む設計にしてください。
           </div>
 
           <div className={styles.refbox}>
             <div className={styles.refboxTitle}>参照URL</div>
             <ul>
               <li>
-                <Ext href="https://api-docs.deepseek.com/quick_start/first_instruction">https://api-docs.deepseek.com/quick_start/first_instruction</Ext>
+                <Ext href="https://api-docs.deepseek.com/quick_start/first_instruction">
+                  https://api-docs.deepseek.com/quick_start/first_instruction
+                </Ext>
               </li>
             </ul>
           </div>
@@ -434,10 +469,13 @@ export default function DeepSeekLlmPage() {
             <span className={styles.stepNum}>STEP 03</span>
           </div>
           <h2>モデル選定のベストプラクティス</h2>
-          <p>ユースケースや予算に応じて、最適なモデルを選択するためのフローチャートと決定基準です。</p>
+          <p>
+            ユースケースや予算に応じて、最適なモデルを選択するためのフローチャートと決定基準です。
+          </p>
 
           <div className={styles.diagramCard}>
-            <MermaidDiagram chart={DIAGRAM_3} caption="図3: モデル選定ディシジョンツリー" />
+            <MermaidDiagram chart={DIAGRAM_3} />
+            <div className={styles.diagramCaption}>図3: モデル選定ディシジョンツリー</div>
           </div>
 
           <h3>選定の基準まとめ</h3>
@@ -453,17 +491,23 @@ export default function DeepSeekLlmPage() {
               <tbody>
                 <tr>
                   <td>コーディングエージェント、複雑な多段階Agentタスク</td>
-                  <td><code className={styles.inlineCode}>deepseek-v4-pro</code></td>
+                  <td>
+                    <code className={styles.inlineCode}>deepseek-v4-pro</code>
+                  </td>
                   <td>複雑な文脈理解と厳密なステップ実行力。最大16K出力対応。</td>
                 </tr>
                 <tr>
                   <td>高頻度なチャット、リアルタイム要約、コスト重視タスク</td>
-                  <td><code className={styles.inlineCode}>deepseek-v4-flash</code></td>
+                  <td>
+                    <code className={styles.inlineCode}>deepseek-v4-flash</code>
+                  </td>
                   <td>超高速かつ超低コスト（入力 $0.075 / 出力 $0.30）。</td>
                 </tr>
                 <tr>
                   <td>難解な数学問題、アルゴリズム開発、論理検証</td>
-                  <td><code className={styles.inlineCode}>deepseek-v4-pro</code> (Thinking)</td>
+                  <td>
+                    <code className={styles.inlineCode}>deepseek-v4-pro</code> (Thinking)
+                  </td>
                   <td>思考モードを有効化し、思考ログを出力させることで最高精度を達成。</td>
                 </tr>
               </tbody>
@@ -478,18 +522,24 @@ export default function DeepSeekLlmPage() {
           </div>
           <h2>Thinking Mode（思考モード）の使い方</h2>
           <p>
-            DeepSeek V4 シリーズでは、OpenAI o1/o3 シリーズと同様に、回答の前に「思考プロセス（Reasoning Content）」を出力する思考モードが統合されています。
+            DeepSeek V4 シリーズでは、OpenAI o1/o3
+            シリーズと同様に、回答の前に「思考プロセス（Reasoning
+            Content）」を出力する思考モードが統合されています。
           </p>
 
           <div className={styles.callout}>
             <div className={styles.calloutTitle}>💡 思考モードの出力形式</div>
             <p>
-              思考モードが有効な場合、レスポンスの message オブジェクト内に <code className={styles.inlineCode}>reasoning_content</code> フィールドが追加され、思考過程テキストが格納されます。最終回答は従来の <code className={styles.inlineCode}>content</code> フィールドに入ります。
+              思考モードが有効な場合、レスポンスの message オブジェクト内に{' '}
+              <code className={styles.inlineCode}>reasoning_content</code>{' '}
+              フィールドが追加され、思考過程テキストが格納されます。最終回答は従来の{' '}
+              <code className={styles.inlineCode}>content</code> フィールドに入ります。
             </p>
           </div>
 
           <div className={styles.diagramCard}>
-            <MermaidDiagram chart={DIAGRAM_4} caption="図4: マルチターンにおける reasoning_content 引き継ぎのルール" />
+            <MermaidDiagram chart={DIAGRAM_4} />
+            <div className={styles.diagramCaption}>図4: マルチターンにおける reasoning_content 引き継ぎのルール</div>
           </div>
 
           <h3>Python実装例</h3>
@@ -499,17 +549,25 @@ export default function DeepSeekLlmPage() {
               <span>thinking_mode.py</span>
             </div>
             <div className={styles.codeBody}>
-              <div className={styles.codeLine}>messages = [{"{"}"role": "user", "content": "9.11 と 9.8 はどちらが大きい？"{"}"}]</div>
+              <div className={styles.codeLine}>
+                messages = [{'{'}"role": "user", "content": "9.11 と 9.8 はどちらが大きい？"{'}'}]
+              </div>
               <div className={styles.codeLine}></div>
               <div className={styles.codeLine}>response = client.chat.completions.create(</div>
-              <div className={styles.codeLine}>    model="deepseek-v4-pro",</div>
-              <div className={styles.codeLine}>    messages=messages,</div>
-              <div className={styles.codeLine}>    reasoning_effort="high",</div>
-              <div className={styles.codeLine}>    extra_body={"{"}"thinking": {"{"}"type": "enabled"{"}"}{"}"}</div>
+              <div className={styles.codeLine}> model="deepseek-v4-pro",</div>
+              <div className={styles.codeLine}> messages=messages,</div>
+              <div className={styles.codeLine}> reasoning_effort="high",</div>
+              <div className={styles.codeLine}>
+                {' '}
+                extra_body={'{'}"thinking": {'{'}"type": "enabled"{'}'}
+                {'}'}
+              </div>
               <div className={styles.codeLine}>)</div>
               <div className={styles.codeLine}></div>
               <div className={styles.codeLine}># 思考プロセスの取得</div>
-              <div className={styles.codeLine}>reasoning = getattr(response.choices[0].message, 'reasoning_content', None)</div>
+              <div className={styles.codeLine}>
+                reasoning = getattr(response.choices[0].message, 'reasoning_content', None)
+              </div>
               <div className={styles.codeLine}>print("--- 思考過程 ---")</div>
               <div className={styles.codeLine}>print(reasoning)</div>
               <div className={styles.codeLine}></div>
@@ -521,7 +579,11 @@ export default function DeepSeekLlmPage() {
           <div className={`${styles.callout} ${styles.calloutWarn}`}>
             <div className={styles.calloutTitle}>⚠️ 注意: マルチターン会話での引き継ぎルール</div>
             <p>
-              Tool Calls（Function Calling）を伴うマルチターン会話で思考モードを使用する場合、次ターンの送信時に前のレスポンスに含まれていた <code className={styles.inlineCode}>reasoning_content</code> をメッセージ履歴に保持したまま送信してください。これを削除して送信すると API が 400 エラーを返却します。
+              Tool Calls（Function
+              Calling）を伴うマルチターン会話で思考モードを使用する場合、次ターンの送信時に前のレスポンスに含まれていた{' '}
+              <code className={styles.inlineCode}>reasoning_content</code>{' '}
+              をメッセージ履歴に保持したまま送信してください。これを削除して送信すると API が 400
+              エラーを返却します。
             </p>
           </div>
         </section>
@@ -532,10 +594,14 @@ export default function DeepSeekLlmPage() {
             <span className={styles.stepNum}>STEP 05</span>
           </div>
           <h2>マルチターン会話の実装</h2>
-          <p>文脈（Context）を保持して会話を継続する場合、過去のやり取りを <code className={styles.inlineCode}>messages</code> 配列に追加して毎回送信します。</p>
+          <p>
+            文脈（Context）を保持して会話を継続する場合、過去のやり取りを{' '}
+            <code className={styles.inlineCode}>messages</code> 配列に追加して毎回送信します。
+          </p>
 
           <div className={styles.diagramCard}>
-            <MermaidDiagram chart={DIAGRAM_5} caption="図5: マルチターン会話のコンテキスト連結" />
+            <MermaidDiagram chart={DIAGRAM_5} />
+            <div className={styles.diagramCaption}>図5: マルチターン会話のコンテキスト連結</div>
           </div>
 
           <div className={styles.codeBlock}>
@@ -544,25 +610,39 @@ export default function DeepSeekLlmPage() {
               <span>multi_turn.py</span>
             </div>
             <div className={styles.codeBody}>
-              <div className={styles.codeLine}>messages = [{"{"}"role": "user", "content": "世界一高い山は？"{"}"}]</div>
-              <div className={styles.codeLine}>response = client.chat.completions.create(model="deepseek-v4-pro", messages=messages)</div>
+              <div className={styles.codeLine}>
+                messages = [{'{'}"role": "user", "content": "世界一高い山は？"{'}'}]
+              </div>
+              <div className={styles.codeLine}>
+                response = client.chat.completions.create(model="deepseek-v4-pro",
+                messages=messages)
+              </div>
               <div className={styles.codeLine}>messages.append(response.choices[0].message)</div>
               <div className={styles.codeLine}></div>
-              <div className={styles.codeLine}>messages.append({"{"}"role": "user", "content": "では2番目に高いのは？"{"}"})</div>
-              <div className={styles.codeLine}>response = client.chat.completions.create(model="deepseek-v4-pro", messages=messages)</div>
+              <div className={styles.codeLine}>
+                messages.append({'{'}"role": "user", "content": "では2番目に高いのは？"{'}'})
+              </div>
+              <div className={styles.codeLine}>
+                response = client.chat.completions.create(model="deepseek-v4-pro",
+                messages=messages)
+              </div>
               <div className={styles.codeLine}>messages.append(response.choices[0].message)</div>
             </div>
           </div>
 
           <div className={styles.bestPractice}>
-            <strong>ベストプラクティス:</strong> 会話履歴が長くなるほどトークン消費が増えるため、Step 8のContext Cachingと組み合わせて、履歴の「共通接頭辞」を維持する設計（システムプロンプトを変えない、履歴を編集しない）にするとキャッシュヒット率が向上します。
+            <strong>ベストプラクティス:</strong>{' '}
+            会話履歴が長くなるほどトークン消費が増えるため、Step 8のContext
+            Cachingと組み合わせて、履歴の「共通接頭辞」を維持する設計（システムプロンプトを変えない、履歴を編集しない）にするとキャッシュヒット率が向上します。
           </div>
 
           <div className={styles.refbox}>
             <div className={styles.refboxTitle}>参照URL</div>
             <ul>
               <li>
-                <Ext href="https://api-docs.deepseek.com/guides/multi_round_chat">https://api-docs.deepseek.com/guides/multi_round_chat</Ext>
+                <Ext href="https://api-docs.deepseek.com/guides/multi_round_chat">
+                  https://api-docs.deepseek.com/guides/multi_round_chat
+                </Ext>
               </li>
             </ul>
           </div>
@@ -575,12 +655,16 @@ export default function DeepSeekLlmPage() {
           </div>
           <h2>Function Calling（Tool Calls）の活用</h2>
           <p>
-            Tool Callsは、モデルが外部関数（天気取得API、DB検索など）を呼び出して能力を拡張する仕組みです。<strong>モデル自身は関数を実行しません。</strong>関数を呼ぶ「意図」と「引数」を返すだけで、実際の実行と結果の返却はアプリケーション側の責務です。
+            Tool
+            Callsは、モデルが外部関数（天気取得API、DB検索など）を呼び出して能力を拡張する仕組みです。
+            <strong>モデル自身は関数を実行しません。</strong>
+            関数を呼ぶ「意図」と「引数」を返すだけで、実際の実行と結果の返却はアプリケーション側の責務です。
           </p>
 
           <h3>非思考モードでの基本フロー</h3>
           <div className={styles.diagramCard}>
-            <MermaidDiagram chart={DIAGRAM_6} caption="図6: Tool Calls（Function Calling）の基本シーケンス" />
+            <MermaidDiagram chart={DIAGRAM_6} />
+            <div className={styles.diagramCaption}>図6: Tool Calls（Function Calling）の基本シーケンス</div>
           </div>
 
           <h3>実装例</h3>
@@ -591,26 +675,32 @@ export default function DeepSeekLlmPage() {
             </div>
             <div className={styles.codeBody}>
               <div className={styles.codeLine}>tools = [</div>
-              <div className={styles.codeLine}>    {"{"}</div>
-              <div className={styles.codeLine}>        "type": "function",</div>
-              <div className={styles.codeLine}>        "function": {"{"}</div>
-              <div className={styles.codeLine}>            "name": "get_weather",</div>
-              <div className={styles.codeLine}>            "description": "指定した場所の天気を取得する",</div>
-              <div className={styles.codeLine}>            "parameters": {"{"}</div>
-              <div className={styles.codeLine}>                "type": "object",</div>
-              <div className={styles.codeLine}>                "properties": {"{"}</div>
-              <div className={styles.codeLine}>                    "location": {"{"}"type": "string", "description": "都市名"{"}"}</div>
-              <div className={styles.codeLine}>                {"}"},</div>
-              <div className={styles.codeLine}>                "required": ["location"]</div>
-              <div className={styles.codeLine}>            {"}"}</div>
-              <div className={styles.codeLine}>        {"}"}</div>
-              <div className={styles.codeLine}>    {"}"}</div>
+              <div className={styles.codeLine}> {'{'}</div>
+              <div className={styles.codeLine}> "type": "function",</div>
+              <div className={styles.codeLine}> "function": {'{'}</div>
+              <div className={styles.codeLine}> "name": "get_weather",</div>
+              <div className={styles.codeLine}> "description": "指定した場所の天気を取得する",</div>
+              <div className={styles.codeLine}> "parameters": {'{'}</div>
+              <div className={styles.codeLine}> "type": "object",</div>
+              <div className={styles.codeLine}> "properties": {'{'}</div>
+              <div className={styles.codeLine}>
+                {' '}
+                "location": {'{'}"type": "string", "description": "都市名"{'}'}
+              </div>
+              <div className={styles.codeLine}> {'}'},</div>
+              <div className={styles.codeLine}> "required": ["location"]</div>
+              <div className={styles.codeLine}> {'}'}</div>
+              <div className={styles.codeLine}> {'}'}</div>
+              <div className={styles.codeLine}> {'}'}</div>
               <div className={styles.codeLine}>]</div>
               <div className={styles.codeLine}></div>
               <div className={styles.codeLine}>response = client.chat.completions.create(</div>
-              <div className={styles.codeLine}>    model="deepseek-v4-pro",</div>
-              <div className={styles.codeLine}>    messages=[{"{"}"role": "user", "content": "杭州の天気は？"{"}"}],</div>
-              <div className={styles.codeLine}>    tools=tools</div>
+              <div className={styles.codeLine}> model="deepseek-v4-pro",</div>
+              <div className={styles.codeLine}>
+                {' '}
+                messages=[{'{'}"role": "user", "content": "杭州の天気は？"{'}'}],
+              </div>
+              <div className={styles.codeLine}> tools=tools</div>
               <div className={styles.codeLine}>)</div>
             </div>
           </div>
@@ -623,7 +713,11 @@ export default function DeepSeekLlmPage() {
           </div>
           <h2>構造化出力（JSON Mode / strictモード）</h2>
           <p>
-            APIからの出力を厳格なJSONオブジェクトとして受け取るための設定です。<code className={styles.inlineCode}>response_format={"{"}"type": "json_object"{"}"}</code> を指定します。
+            APIからの出力を厳格なJSONオブジェクトとして受け取るための設定です。
+            <code className={styles.inlineCode}>
+              response_format={'{'}"type": "json_object"{'}'}
+            </code>{' '}
+            を指定します。
           </p>
 
           <div className={styles.codeBlock}>
@@ -633,18 +727,29 @@ export default function DeepSeekLlmPage() {
             </div>
             <div className={styles.codeBody}>
               <div className={styles.codeLine}>response = client.chat.completions.create(</div>
-              <div className={styles.codeLine}>    model="deepseek-v4-pro",</div>
-              <div className={styles.codeLine}>    messages=[</div>
-              <div className={styles.codeLine}>        {"{"}"role": "system", "content": "必ずJSONオブジェクト形式で出力してください。"{"}"},</div>
-              <div className={styles.codeLine}>        {"{"}"role": "user", "content": "東京の基本情報をJSONで出力して。"{"}"}</div>
-              <div className={styles.codeLine}>    ],</div>
-              <div className={styles.codeLine}>    response_format={"{"}"type": "json_object"{"}"}</div>
+              <div className={styles.codeLine}> model="deepseek-v4-pro",</div>
+              <div className={styles.codeLine}> messages=[</div>
+              <div className={styles.codeLine}>
+                {' '}
+                {'{'}"role": "system", "content": "必ずJSONオブジェクト形式で出力してください。"
+                {'}'},
+              </div>
+              <div className={styles.codeLine}>
+                {' '}
+                {'{'}"role": "user", "content": "東京の基本情報をJSONで出力して。"{'}'}
+              </div>
+              <div className={styles.codeLine}> ],</div>
+              <div className={styles.codeLine}>
+                {' '}
+                response_format={'{'}"type": "json_object"{'}'}
+              </div>
               <div className={styles.codeLine}>)</div>
             </div>
           </div>
 
           <div className={styles.bestPractice}>
-            <strong>注意点:</strong> JSON Modeを使用する場合、プロンプト（systemまたはuserメッセージ）内に必ず「JSON」という単語を含めてください。含めない場合はエラーとなるか意図しない出力になります。
+            <strong>注意点:</strong> JSON
+            Modeを使用する場合、プロンプト（systemまたはuserメッセージ）内に必ず「JSON」という単語を含めてください。含めない場合はエラーとなるか意図しない出力になります。
           </div>
         </section>
 
@@ -655,11 +760,15 @@ export default function DeepSeekLlmPage() {
           </div>
           <h2>Context Caching でコストを最大95%削減する</h2>
           <p>
-            DeepSeek APIは、リクエスト間で共通するプロンプト接頭辞（Prefix）を自動的にディスク/メモリにキャッシュする <strong>Context Caching（KV Cache）</strong> を標準搭載しています。ユーザー側で特別なAPI呼び出しは不要で、条件を満たすと自動的にキャッシュヒット割引が適用されます。
+            DeepSeek
+            APIは、リクエスト間で共通するプロンプト接頭辞（Prefix）を自動的にディスク/メモリにキャッシュする{' '}
+            <strong>Context Caching（KV Cache）</strong>{' '}
+            を標準搭載しています。ユーザー側で特別なAPI呼び出しは不要で、条件を満たすと自動的にキャッシュヒット割引が適用されます。
           </p>
 
           <div className={styles.diagramCard}>
-            <MermaidDiagram chart={DIAGRAM_7} caption="図7: Context Cachingにおけるキャッシュ持続化の3パターン" />
+            <MermaidDiagram chart={DIAGRAM_7} />
+            <div className={styles.diagramCaption}>図7: Context Cachingにおけるキャッシュ持続化の3パターン</div>
           </div>
 
           <div className={styles.tableWrap}>
@@ -672,11 +781,15 @@ export default function DeepSeekLlmPage() {
               </thead>
               <tbody>
                 <tr>
-                  <td><code className={styles.inlineCode}>prompt_cache_hit_tokens</code></td>
+                  <td>
+                    <code className={styles.inlineCode}>prompt_cache_hit_tokens</code>
+                  </td>
                   <td>入力のうちキャッシュヒットしたトークン数（格安料金が適用）</td>
                 </tr>
                 <tr>
-                  <td><code className={styles.inlineCode}>prompt_cache_miss_tokens</code></td>
+                  <td>
+                    <code className={styles.inlineCode}>prompt_cache_miss_tokens</code>
+                  </td>
                   <td>入力のうちキャッシュミスしたトークン数（通常入力料金）</td>
                 </tr>
               </tbody>
@@ -686,8 +799,14 @@ export default function DeepSeekLlmPage() {
           <div className={styles.bestPractice}>
             <strong>ベストプラクティス:</strong>
             <ul>
-              <li>システムプロンプトや長文コンテキスト（ドキュメント等）を<strong>常に会話の先頭に固定配置</strong>し、後半にだけ質問を変えて送信すると、共通接頭辞がキャッシュされてコストが大幅に下がります。</li>
-              <li>キャッシュはベストエフォートであり100%のヒットを保証しません。未使用キャッシュは一定時間でクリアされます。</li>
+              <li>
+                システムプロンプトや長文コンテキスト（ドキュメント等）を
+                <strong>常に会話の先頭に固定配置</strong>
+                し、後半にだけ質問を変えて送信すると、共通接頭辞がキャッシュされてコストが大幅に下がります。
+              </li>
+              <li>
+                キャッシュはベストエフォートであり100%のヒットを保証しません。未使用キャッシュは一定時間でクリアされます。
+              </li>
             </ul>
           </div>
 
@@ -695,7 +814,9 @@ export default function DeepSeekLlmPage() {
             <div className={styles.refboxTitle}>参照URL</div>
             <ul>
               <li>
-                <Ext href="https://api-docs.deepseek.com/guides/kv_cache">https://api-docs.deepseek.com/guides/kv_cache</Ext>
+                <Ext href="https://api-docs.deepseek.com/guides/kv_cache">
+                  https://api-docs.deepseek.com/guides/kv_cache
+                </Ext>
               </li>
             </ul>
           </div>
@@ -730,13 +851,16 @@ export default function DeepSeekLlmPage() {
             </table>
           </div>
           <ul>
-            <li>上限はAPIキー単位ではなく<strong>アカウント単位</strong>で計算されます</li>
+            <li>
+              上限はAPIキー単位ではなく<strong>アカウント単位</strong>で計算されます
+            </li>
             <li>上限を超えると HTTP 429 が返却されます</li>
           </ul>
 
           <h3>user_id によるアイソレーション</h3>
           <p>
-            <code className={styles.inlineCode}>user_id</code> パラメータを渡すことで、自社サービス内のエンドユーザー単位で「コンテンツ安全性」「KVCacheの分離」「スケジューリング」を分離管理できます。
+            <code className={styles.inlineCode}>user_id</code>{' '}
+            パラメータを渡すことで、自社サービス内のエンドユーザー単位で「コンテンツ安全性」「KVCacheの分離」「スケジューリング」を分離管理できます。
           </p>
 
           <div className={styles.codeBlock}>
@@ -746,16 +870,23 @@ export default function DeepSeekLlmPage() {
             </div>
             <div className={styles.codeBody}>
               <div className={styles.codeLine}>response = client.chat.completions.create(</div>
-              <div className={styles.codeLine}>    model="deepseek-v4-pro",</div>
-              <div className={styles.codeLine}>    messages=[{"{"}"role": "user", "content": "Hello!"{"}"}],</div>
-              <div className={styles.codeLine}>    extra_body={"{"}"user_id": "your_user_id"{"}"},</div>
+              <div className={styles.codeLine}> model="deepseek-v4-pro",</div>
+              <div className={styles.codeLine}>
+                {' '}
+                messages=[{'{'}"role": "user", "content": "Hello!"{'}'}],
+              </div>
+              <div className={styles.codeLine}>
+                {' '}
+                extra_body={'{'}"user_id": "your_user_id"{'}'},
+              </div>
               <div className={styles.codeLine}>)</div>
             </div>
           </div>
 
           <h3>エラーハンドリングのベストプラクティスフロー</h3>
           <div className={styles.diagramCard}>
-            <MermaidDiagram chart={DIAGRAM_8} caption="図8: エラーハンドリングのベストプラクティスフロー" />
+            <MermaidDiagram chart={DIAGRAM_8} />
+            <div className={styles.diagramCaption}>図8: エラーハンドリングのベストプラクティスフロー</div>
           </div>
         </section>
 
@@ -766,7 +897,9 @@ export default function DeepSeekLlmPage() {
           </div>
           <h2>Anthropic API互換とコーディングエージェント連携</h2>
           <p>
-            DeepSeek APIはAnthropic API形式のエンドポイント（<code className={styles.inlineCode}>https://api.deepseek.com/anthropic</code>）も提供しています。これにより、Claude CodeなどのAnthropicツールから直接利用可能です。
+            DeepSeek APIはAnthropic API形式のエンドポイント（
+            <code className={styles.inlineCode}>https://api.deepseek.com/anthropic</code>
+            ）も提供しています。これにより、Claude CodeなどのAnthropicツールから直接利用可能です。
           </p>
 
           <div className={styles.codeBlock}>
@@ -775,8 +908,12 @@ export default function DeepSeekLlmPage() {
               <span>claude_code_setup.sh</span>
             </div>
             <div className={styles.codeBody}>
-              <div className={styles.codeLine}>export ANTHROPIC_BASE_URL="https://api.deepseek.com/anthropic"</div>
-              <div className={styles.codeLine}>export ANTHROPIC_API_KEY="your_deepseek_api_key"</div>
+              <div className={styles.codeLine}>
+                export ANTHROPIC_BASE_URL="https://api.deepseek.com/anthropic"
+              </div>
+              <div className={styles.codeLine}>
+                export ANTHROPIC_API_KEY="your_deepseek_api_key"
+              </div>
               <div className={styles.codeLine}>claude --model deepseek-v4-pro</div>
             </div>
           </div>
@@ -789,7 +926,9 @@ export default function DeepSeekLlmPage() {
           </div>
           <h2>料金とトークン管理のベストプラクティス</h2>
           <p>
-            DeepSeek APIは非常に安価ですが、大規模な並列処理を行う場合は適切な管理が推奨されます。ダッシュボードで利用上限額（Usage Limit）を設定し、不要なリトライを防ぐ実装を行ってください。
+            DeepSeek
+            APIは非常に安価ですが、大規模な並列処理を行う場合は適切な管理が推奨されます。ダッシュボードで利用上限額（Usage
+            Limit）を設定し、不要なリトライを防ぐ実装を行ってください。
           </p>
         </section>
 
@@ -812,7 +951,10 @@ export default function DeepSeekLlmPage() {
                 <tr>
                   <td>モデル選定</td>
                   <td>標準は Flash、高度タスクは Pro</td>
-                  <td>基本は <code className={styles.inlineCode}>deepseek-v4-flash</code> で十分。厳密な思考やコード生成のみ Pro を採用。</td>
+                  <td>
+                    基本は <code className={styles.inlineCode}>deepseek-v4-flash</code>{' '}
+                    で十分。厳密な思考やコード生成のみ Pro を採用。
+                  </td>
                 </tr>
                 <tr>
                   <td>コスト最適化</td>
@@ -836,9 +978,19 @@ export default function DeepSeekLlmPage() {
           </div>
           <h2>移行チェックリスト（旧モデル廃止対応）</h2>
           <ul>
-            <li>[ ] <code className={styles.inlineCode}>deepseek-chat</code> の記述を <code className={styles.inlineCode}>deepseek-v4-flash</code> または <code className={styles.inlineCode}>deepseek-v4-pro</code> へ変更</li>
-            <li>[ ] <code className={styles.inlineCode}>deepseek-reasoner</code> の記述を <code className={styles.inlineCode}>deepseek-v4-pro</code> (Thinking Mode) へ変更</li>
-            <li>[ ] API Base URL が <code className={styles.inlineCode}>https://api.deepseek.com</code> であることを確認</li>
+            <li>
+              [ ] <code className={styles.inlineCode}>deepseek-chat</code> の記述を{' '}
+              <code className={styles.inlineCode}>deepseek-v4-flash</code> または{' '}
+              <code className={styles.inlineCode}>deepseek-v4-pro</code> へ変更
+            </li>
+            <li>
+              [ ] <code className={styles.inlineCode}>deepseek-reasoner</code> の記述を{' '}
+              <code className={styles.inlineCode}>deepseek-v4-pro</code> (Thinking Mode) へ変更
+            </li>
+            <li>
+              [ ] API Base URL が{' '}
+              <code className={styles.inlineCode}>https://api.deepseek.com</code> であることを確認
+            </li>
             <li>[ ] 2026年7月24日の完全廃止前にテスト環境で動作検証を完了</li>
           </ul>
         </section>
@@ -852,13 +1004,16 @@ export default function DeepSeekLlmPage() {
           <div className={styles.callout}>
             <div className={styles.calloutTitle}>Q. API呼び出しで 402 エラーが返されます</div>
             <p>
-              アカウントのチャージ残高が不足しています。ダッシュボードの「Top up」メニューからクレジットを追加してください。
+              アカウントのチャージ残高が不足しています。ダッシュボードの「Top
+              up」メニューからクレジットを追加してください。
             </p>
           </div>
           <div className={styles.callout}>
             <div className={styles.calloutTitle}>Q. 思考モードで 400 エラーが発生します</div>
             <p>
-              マルチターン会話で前のレスポンスの <code className={styles.inlineCode}>reasoning_content</code> を削除していないか確認してください。メッセージ履歴に含めたまま再送する必要があります。
+              マルチターン会話で前のレスポンスの{' '}
+              <code className={styles.inlineCode}>reasoning_content</code>{' '}
+              を削除していないか確認してください。メッセージ履歴に含めたまま再送する必要があります。
             </p>
           </div>
         </section>
@@ -872,16 +1027,22 @@ export default function DeepSeekLlmPage() {
           <div className={styles.refbox}>
             <ul>
               <li>
-                <Ext href="https://api-docs.deepseek.com/">DeepSeek API Documentation (Official)</Ext>
+                <Ext href="https://api-docs.deepseek.com/">
+                  DeepSeek API Documentation (Official)
+                </Ext>
               </li>
               <li>
                 <Ext href="https://platform.deepseek.com/">DeepSeek Platform Dashboard</Ext>
               </li>
               <li>
-                <Ext href="https://api-docs.deepseek.com/guides/kv_cache">DeepSeek KV Cache Documentation</Ext>
+                <Ext href="https://api-docs.deepseek.com/guides/kv_cache">
+                  DeepSeek KV Cache Documentation
+                </Ext>
               </li>
               <li>
-                <Ext href="https://api-docs.deepseek.com/guides/multi_round_chat">DeepSeek Multi-round Chat Guide</Ext>
+                <Ext href="https://api-docs.deepseek.com/guides/multi_round_chat">
+                  DeepSeek Multi-round Chat Guide
+                </Ext>
               </li>
             </ul>
           </div>
