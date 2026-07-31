@@ -373,6 +373,12 @@
   white-space: pre;
 }
 
+.ind1 { padding-left: 1.25rem; }
+.ind2 { padding-left: 2.5rem; }
+.ind3 { padding-left: 3.75rem; }
+.ind4 { padding-left: 5rem; }
+.ind5 { padding-left: 6.25rem; }
+
 /* Syntax highlight token classes */
 .ck {
   color: #ff7b72;

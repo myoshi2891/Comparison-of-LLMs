@@ -562,8 +562,8 @@ export default function VercelEveBeginnerGuidePage() {
                   <span className={styles.cw}> defineAgent</span>
                   <span className={styles.cs}>(&#123;</span>
                 </div>
-                <div className={styles.codeLine}>
-                  <span className={styles.cv}> model: </span>
+                <div className={`${styles.codeLine} ${styles.ind1}`}>
+                  <span className={styles.cv}>model: </span>
                   <span className={styles.cs}>&apos;anthropic/claude-sonnet-5&apos;,</span>
                 </div>
                 <div className={styles.codeLine}>
@@ -614,40 +614,35 @@ export default function VercelEveBeginnerGuidePage() {
                   <span className={styles.cw}> defineTool</span>
                   <span className={styles.cs}>(&#123;</span>
                 </div>
-                <div className={styles.codeLine}>
-                  <span className={styles.cv}> description: </span>
-                  <span className={styles.cs}>
-                    &apos;注文番号から配送ステータスを取得する&apos;,
-                  </span>
+                <div className={`${styles.codeLine} ${styles.ind1}`}>
+                  <span className={styles.cv}>description: </span>
+                  <span className={styles.cs}>&apos;注文番号から配送ステータスを取得する&apos;,</span>
                 </div>
-                <div className={styles.codeLine}>
-                  <span className={styles.cv}> inputSchema: z.object</span>
+                <div className={`${styles.codeLine} ${styles.ind1}`}>
+                  <span className={styles.cv}>inputSchema: z.object</span>
                   <span className={styles.cs}>(&#123;</span>
                 </div>
-                <div className={styles.codeLine}>
-                  <span className={styles.cv}> orderId: z.string().describe</span>
+                <div className={`${styles.codeLine} ${styles.ind2}`}>
+                  <span className={styles.cv}>orderId: z.string().describe</span>
                   <span className={styles.cs}>(&apos;例: ORD-10234&apos;),</span>
                 </div>
-                <div className={styles.codeLine}>
-                  <span className={styles.cs}> &#125;),</span>
+                <div className={`${styles.codeLine} ${styles.ind1}`}>
+                  <span className={styles.cs}>&#125;),</span>
                 </div>
-                <div className={styles.codeLine}>
-                  <span className={styles.ck}> async</span>
+                <div className={`${styles.codeLine} ${styles.ind1}`}>
+                  <span className={styles.ck}>async</span>
                   <span className={styles.cw}> execute</span>
                   <span className={styles.cs}>(&#123; orderId &#125;) &#123;</span>
                 </div>
-                <div className={styles.codeLine}>
+                <div className={`${styles.codeLine} ${styles.ind2}`}>
                   <span className={styles.cc}>{"// 実際には社内APIやDBを呼び出す"}</span>
                 </div>
-                <div className={styles.codeLine}>
-                  <span className={styles.ck}> return</span>
-                  <span className={styles.cs}>
-                    &#123; orderId, status: &apos;発送済み&apos;, carrier: &apos;ヤマト運輸&apos;
-                    &#125;;
-                  </span>
+                <div className={`${styles.codeLine} ${styles.ind2}`}>
+                  <span className={styles.ck}>return</span>
+                  <span className={styles.cs}> &#123; orderId, status: &apos;発送済み&apos;, carrier: &apos;ヤマト運輸&apos; &#125;;</span>
                 </div>
-                <div className={styles.codeLine}>
-                  <span className={styles.cs}> &#125;,</span>
+                <div className={`${styles.codeLine} ${styles.ind1}`}>
+                  <span className={styles.cs}>&#125;,</span>
                 </div>
                 <div className={styles.codeLine}>
                   <span className={styles.cs}>&#125;);</span>
@@ -843,43 +838,43 @@ export default function VercelEveBeginnerGuidePage() {
                   <span className={styles.cw}> defineTool</span>
                   <span className={styles.cs}>(&#123;</span>
                 </div>
-                <div className={styles.codeLine}>
-                  <span className={styles.cv}> description: </span>
+                <div className={`${styles.codeLine} ${styles.ind1}`}>
+                  <span className={styles.cv}>description: </span>
                   <span className={styles.cs}>&apos;返金を実行する&apos;,</span>
                 </div>
-                <div className={styles.codeLine}>
-                  <span className={styles.cv}> inputSchema: z.object</span>
+                <div className={`${styles.codeLine} ${styles.ind1}`}>
+                  <span className={styles.cv}>inputSchema: z.object</span>
                   <span className={styles.cs}>(&#123;</span>
                 </div>
-                <div className={styles.codeLine}>
-                  <span className={styles.cv}> orderId: z.string(),</span>
+                <div className={`${styles.codeLine} ${styles.ind2}`}>
+                  <span className={styles.cv}>orderId: z.string(),</span>
                 </div>
-                <div className={styles.codeLine}>
-                  <span className={styles.cv}> amountJpy: z.number(),</span>
+                <div className={`${styles.codeLine} ${styles.ind2}`}>
+                  <span className={styles.cv}>amountJpy: z.number(),</span>
                 </div>
-                <div className={styles.codeLine}>
-                  <span className={styles.cs}> &#125;),</span>
+                <div className={`${styles.codeLine} ${styles.ind1}`}>
+                  <span className={styles.cs}>&#125;),</span>
                 </div>
-                <div className={styles.codeLine}>
-                  <span className={styles.cv}> needsApproval: </span>
+                <div className={`${styles.codeLine} ${styles.ind1}`}>
+                  <span className={styles.cv}>needsApproval: </span>
                   <span className={styles.cs}>
                     (&#123; toolInput &#125;) =&gt; toolInput.amountJpy &gt; 50000,
                   </span>
                 </div>
-                <div className={styles.codeLine}>
-                  <span className={styles.ck}> async</span>
+                <div className={`${styles.codeLine} ${styles.ind1}`}>
+                  <span className={styles.ck}>async</span>
                   <span className={styles.cw}> execute</span>
                   <span className={styles.cs}>(&#123; orderId, amountJpy &#125;) &#123;</span>
                 </div>
-                <div className={styles.codeLine}>
+                <div className={`${styles.codeLine} ${styles.ind2}`}>
                   <span className={styles.cc}>{"// 実際の返金処理"}</span>
                 </div>
-                <div className={styles.codeLine}>
-                  <span className={styles.ck}> return</span>
+                <div className={`${styles.codeLine} ${styles.ind2}`}>
+                  <span className={styles.ck}>return</span>
                   <span className={styles.cs}> &#123; orderId, refunded: amountJpy &#125;;</span>
                 </div>
-                <div className={styles.codeLine}>
-                  <span className={styles.cs}> &#125;,</span>
+                <div className={`${styles.codeLine} ${styles.ind1}`}>
+                  <span className={styles.cs}>&#125;,</span>
                 </div>
                 <div className={styles.codeLine}>
                   <span className={styles.cs}>&#125;);</span>
@@ -927,14 +922,14 @@ export default function VercelEveBeginnerGuidePage() {
                   <span className={styles.cw}> defineAgent</span>
                   <span className={styles.cs}>(&#123;</span>
                 </div>
-                <div className={styles.codeLine}>
-                  <span className={styles.cv}> description: </span>
+                <div className={`${styles.codeLine} ${styles.ind1}`}>
+                  <span className={styles.cv}>description: </span>
                   <span className={styles.cs}>
                     &apos;問い合わせ内容の背景調査に特化し、親エージェントに要約を返す&apos;,
                   </span>
                 </div>
-                <div className={styles.codeLine}>
-                  <span className={styles.cv}> model: </span>
+                <div className={`${styles.codeLine} ${styles.ind1}`}>
+                  <span className={styles.cv}>model: </span>
                   <span className={styles.cs}>&apos;anthropic/claude-opus-4-8&apos;,</span>
                 </div>
                 <div className={styles.codeLine}>
@@ -1004,29 +999,29 @@ export default function VercelEveBeginnerGuidePage() {
                   <span className={styles.cw}> defineMcpClientConnection</span>
                   <span className={styles.cs}>(&#123;</span>
                 </div>
-                <div className={styles.codeLine}>
-                  <span className={styles.cv}> url: </span>
+                <div className={`${styles.codeLine} ${styles.ind1}`}>
+                  <span className={styles.cv}>url: </span>
                   <span className={styles.cs}>&apos;https://mcp.linear.app/sse&apos;,</span>
                 </div>
-                <div className={styles.codeLine}>
-                  <span className={styles.cv}> description: </span>
+                <div className={`${styles.codeLine} ${styles.ind1}`}>
+                  <span className={styles.cv}>description: </span>
                   <span className={styles.cs}>
                     &apos;自社Linearワークスペース：課題・プロジェクト・サイクル・コメント&apos;,
                   </span>
                 </div>
-                <div className={styles.codeLine}>
-                  <span className={styles.cv}> auth: </span>
+                <div className={`${styles.codeLine} ${styles.ind1}`}>
+                  <span className={styles.cv}>auth: </span>
                   <span className={styles.cs}>&#123;</span>
                 </div>
-                <div className={styles.codeLine}>
-                  <span className={styles.ck}> getToken: async</span>
+                <div className={`${styles.codeLine} ${styles.ind2}`}>
+                  <span className={styles.ck}>getToken: async</span>
                   <span className={styles.cs}>
                     {" "}
                     () =&gt; (&#123; token: process.env.LINEAR_API_TOKEN! &#125;),
                   </span>
                 </div>
-                <div className={styles.codeLine}>
-                  <span className={styles.cs}> &#125;,</span>
+                <div className={`${styles.codeLine} ${styles.ind1}`}>
+                  <span className={styles.cs}>&#125;,</span>
                 </div>
                 <div className={styles.codeLine}>
                   <span className={styles.cs}>&#125;);</span>
@@ -1139,48 +1134,48 @@ export default function VercelEveBeginnerGuidePage() {
                   <span className={styles.cw}> defineSchedule</span>
                   <span className={styles.cs}>(&#123;</span>
                 </div>
-                <div className={styles.codeLine}>
-                  <span className={styles.cv}> cron: </span>
+                <div className={`${styles.codeLine} ${styles.ind1}`}>
+                  <span className={styles.cv}>cron: </span>
                   <span className={styles.cs}>&apos;0 9 * * 1&apos;,</span>
-                  <span className={styles.cc}>{"// 毎週月曜9:00 UTC"}</span>
+                  <span className={styles.cc}>{" // 毎週月曜9:00 UTC"}</span>
                 </div>
-                <div className={styles.codeLine}>
-                  <span className={styles.ck}> async</span>
+                <div className={`${styles.codeLine} ${styles.ind1}`}>
+                  <span className={styles.ck}>async</span>
                   <span className={styles.cw}> run</span>
                   <span className={styles.cs}>
                     (&#123; receive, waitUntil, appAuth &#125;) &#123;
                   </span>
                 </div>
-                <div className={styles.codeLine}>
-                  <span className={styles.cw}> waitUntil</span>
+                <div className={`${styles.codeLine} ${styles.ind2}`}>
+                  <span className={styles.cw}>waitUntil</span>
                   <span className={styles.cs}>(</span>
                 </div>
-                <div className={styles.codeLine}>
-                  <span className={styles.cw}> receive</span>
+                <div className={`${styles.codeLine} ${styles.ind3}`}>
+                  <span className={styles.cw}>receive</span>
                   <span className={styles.cs}>(slack, &#123;</span>
                 </div>
-                <div className={styles.codeLine}>
-                  <span className={styles.cv}> message: </span>
+                <div className={`${styles.codeLine} ${styles.ind4}`}>
+                  <span className={styles.cv}>message: </span>
                   <span className={styles.cs}>
                     &apos;先週の問い合わせ件数と主要トピックをまとめて投稿して&apos;,
                   </span>
                 </div>
-                <div className={styles.codeLine}>
-                  <span className={styles.cv}> target: </span>
+                <div className={`${styles.codeLine} ${styles.ind4}`}>
+                  <span className={styles.cv}>target: </span>
                   <span className={styles.cs}>&#123; channelId: &apos;C0123ABC&apos; &#125;,</span>
                 </div>
-                <div className={styles.codeLine}>
-                  <span className={styles.cv}> auth: </span>
+                <div className={`${styles.codeLine} ${styles.ind4}`}>
+                  <span className={styles.cv}>auth: </span>
                   <span className={styles.cs}>appAuth,</span>
                 </div>
-                <div className={styles.codeLine}>
-                  <span className={styles.cs}> &#125;),</span>
+                <div className={`${styles.codeLine} ${styles.ind3}`}>
+                  <span className={styles.cs}>&#125;),</span>
                 </div>
-                <div className={styles.codeLine}>
-                  <span className={styles.cs}> );</span>
+                <div className={`${styles.codeLine} ${styles.ind2}`}>
+                  <span className={styles.cs}>);</span>
                 </div>
-                <div className={styles.codeLine}>
-                  <span className={styles.cs}> &#125;,</span>
+                <div className={`${styles.codeLine} ${styles.ind1}`}>
+                  <span className={styles.cs}>&#125;,</span>
                 </div>
                 <div className={styles.codeLine}>
                   <span className={styles.cs}>&#125;);</span>
@@ -1229,32 +1224,32 @@ export default function VercelEveBeginnerGuidePage() {
                   <span className={styles.cw}> defineEval</span>
                   <span className={styles.cs}>(&#123;</span>
                 </div>
-                <div className={styles.codeLine}>
-                  <span className={styles.cv}> description: </span>
+                <div className={`${styles.codeLine} ${styles.ind1}`}>
+                  <span className={styles.cv}>description: </span>
                   <span className={styles.cs}>
                     &apos;高額返金は必ず承認待ちになり、判断根拠を提示する&apos;,
                   </span>
                 </div>
-                <div className={styles.codeLine}>
-                  <span className={styles.ck}> async</span>
+                <div className={`${styles.codeLine} ${styles.ind1}`}>
+                  <span className={styles.ck}>async</span>
                   <span className={styles.cw}> test</span>
                   <span className={styles.cs}>(t) &#123;</span>
                 </div>
-                <div className={styles.codeLine}>
-                  <span className={styles.ck}> await</span>
+                <div className={`${styles.codeLine} ${styles.ind2}`}>
+                  <span className={styles.ck}>await</span>
                   <span className={styles.cv}> t.send</span>
                   <span className={styles.cs}>(&apos;注文ORD-99の8万円を返金して&apos;);</span>
                 </div>
-                <div className={styles.codeLine}>
-                  <span className={styles.cv}> t.calledTool</span>
+                <div className={`${styles.codeLine} ${styles.ind2}`}>
+                  <span className={styles.cv}>t.calledTool</span>
                   <span className={styles.cs}>(&apos;process_refund&apos;);</span>
                 </div>
-                <div className={styles.codeLine}>
-                  <span className={styles.cv}> t.check</span>
+                <div className={`${styles.codeLine} ${styles.ind2}`}>
+                  <span className={styles.cv}>t.check</span>
                   <span className={styles.cs}>(t.reply, includes(&apos;承認&apos;));</span>
                 </div>
-                <div className={styles.codeLine}>
-                  <span className={styles.cs}> &#125;,</span>
+                <div className={`${styles.codeLine} ${styles.ind1}`}>
+                  <span className={styles.cs}>&#125;,</span>
                 </div>
                 <div className={styles.codeLine}>
                   <span className={styles.cs}>&#125;);</span>
@@ -1351,37 +1346,37 @@ export default function VercelEveBeginnerGuidePage() {
                   <span className={styles.cw}> defineInstrumentation</span>
                   <span className={styles.cs}>(&#123;</span>
                 </div>
-                <div className={styles.codeLine}>
-                  <span className={styles.cv}> setup: </span>
+                <div className={`${styles.codeLine} ${styles.ind1}`}>
+                  <span className={styles.cv}>setup: </span>
                   <span className={styles.cs}>(&#123; agentName &#125;) =&gt;</span>
                 </div>
-                <div className={styles.codeLine}>
-                  <span className={styles.cw}> registerOTel</span>
+                <div className={`${styles.codeLine} ${styles.ind2}`}>
+                  <span className={styles.cw}>registerOTel</span>
                   <span className={styles.cs}>(&#123;</span>
                 </div>
-                <div className={styles.codeLine}>
-                  <span className={styles.cv}> serviceName: agentName,</span>
+                <div className={`${styles.codeLine} ${styles.ind3}`}>
+                  <span className={styles.cv}>serviceName: agentName,</span>
                 </div>
-                <div className={styles.codeLine}>
-                  <span className={styles.cv}> traceExporter: </span>
+                <div className={`${styles.codeLine} ${styles.ind3}`}>
+                  <span className={styles.cv}>traceExporter: </span>
                   <span className={styles.ck}>new</span>
                   <span className={styles.cw}> BraintrustExporter</span>
                   <span className={styles.cs}>(&#123;</span>
                 </div>
-                <div className={styles.codeLine}>
-                  <span className={styles.cv}> parent: </span>
+                <div className={`${styles.codeLine} ${styles.ind4}`}>
+                  <span className={styles.cv}>parent: </span>
                   <span className={styles.cs}>`project_name:$&#123;agentName&#125;`,</span>
                 </div>
-                <div className={styles.codeLine}>
-                  <span className={styles.cv}> filterAISpans: </span>
+                <div className={`${styles.codeLine} ${styles.ind4}`}>
+                  <span className={styles.cv}>filterAISpans: </span>
                   <span className={styles.ck}>true</span>
                   <span className={styles.cs}>,</span>
                 </div>
-                <div className={styles.codeLine}>
-                  <span className={styles.cs}> &#125;),</span>
+                <div className={`${styles.codeLine} ${styles.ind3}`}>
+                  <span className={styles.cs}>&#125;),</span>
                 </div>
-                <div className={styles.codeLine}>
-                  <span className={styles.cs}> &#125;),</span>
+                <div className={`${styles.codeLine} ${styles.ind2}`}>
+                  <span className={styles.cs}>&#125;),</span>
                 </div>
                 <div className={styles.codeLine}>
                   <span className={styles.cs}>&#125;);</span>
@@ -1436,16 +1431,16 @@ export default function VercelEveBeginnerGuidePage() {
                 <span className={styles.cv}> eveChannel.send</span>
                 <span className={styles.cs}>(&#123;</span>
               </div>
-              <div className={styles.codeLine}>
-                <span className={styles.cv}> to: </span>
+              <div className={`${styles.codeLine} ${styles.ind1}`}>
+                <span className={styles.cv}>to: </span>
                 <span className={styles.cs}>&apos;ops-agent&apos;,</span>
               </div>
-              <div className={styles.codeLine}>
-                <span className={styles.cv}> type: </span>
+              <div className={`${styles.codeLine} ${styles.ind1}`}>
+                <span className={styles.cv}>type: </span>
                 <span className={styles.cs}>&apos;article.published&apos;,</span>
               </div>
-              <div className={styles.codeLine}>
-                <span className={styles.cv}> payload: </span>
+              <div className={`${styles.codeLine} ${styles.ind1}`}>
+                <span className={styles.cv}>payload: </span>
                 <span className={styles.cs}>
                   &#123; slug: &apos;new-feature-announcement&apos; &#125;,
                 </span>
