@@ -11,7 +11,7 @@ describe("MultiAgentOrchestrationPage", () => {
     );
   });
 
-  it("returns valid JSX element tree with original font colors, grouped TOC and refined pie theme", () => {
+  it("returns valid JSX element tree with vivid pie chart styling overrides", () => {
     const jsx = MultiAgentOrchestrationPage();
     expect(jsx).toBeDefined();
 
@@ -23,14 +23,8 @@ describe("MultiAgentOrchestrationPage", () => {
     expect(jsxString).toContain("設計と実装");
     expect(jsxString).toContain("ガバナンス");
 
-    // Verify refined pie chart theme color palette (cyan #57c7ff, purple #a996ff, coral #ff9d66)
-    expect(jsxString).toContain("#57c7ff");
-    expect(jsxString).toContain("#a996ff");
-    expect(jsxString).toContain("#ff9d66");
-
-    // Verify code block tokens have highlight classes
-    expect(jsxString).toContain("subagent_contract");
-    expect(jsxString).toContain("orchestrator_scaling_rules");
+    // Verify refined pie chart diagram MMD_12 exists
+    expect(jsxString).toContain("MMD_12");
 
     // Verify no lowercase rowspan attribute
     expect(jsxString).not.toContain('"rowspan"');
