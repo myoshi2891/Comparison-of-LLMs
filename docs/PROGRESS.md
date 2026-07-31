@@ -15,10 +15,12 @@
   - `bun run typecheck` ✅
   - `bun run lint` ✅（385 files checked）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: Vitest **143 files / 1290 tests すべて合格**（収集失敗なし）
+  - **フロントエンド (`web-next/`)**: Vitest **144 files / 1295 tests すべて合格**（収集失敗なし）
   - **バックエンド (`scraper/`)**: pytest 実行で **43 件すべて合格** (全 Green ✅)
 
 ## 最近の追加内容
+
+- **Vercel eve 完全ガイド（/vercel/eve-beginner-guide）の Pure JSX 移行と Agent 開発 ナビ同期**: `Vercel-eve-beginner-guide.html` を `web-next/app/vercel/eve-beginner-guide/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。要約・省略なしで全11セクション（Hero + 11H2セクション + 参考文献一覧）・全表・全コードブロック・8 Mermaid図 (`diagram-arch`, `diagram-mapping`, `diagram-session`, `diagram-approval`, `diagram-sandbox`, `diagram-channel`, `diagram-cicd`, `diagram-fleet`)・TOCスクロール追従（`TocObserver.tsx`）・外部リンク安全属性・`page-registry.ts`（`Agent 開発` グループ）登録を完了。原本 `Vercel-eve-beginner-guide.html` は `archive/html/Vercel/Vercel-eve-beginner-guide.html` へ `git mv` 退避保存。契約テスト5件（タイトル、11H2セクション、8 Mermaid図、外部リンク・内部リンク検証）を追加し全クリア（Vitest **144 files / 1295 tests** 全 Green ✅）。
 
 - **マルチエージェントオーケストレーション ベストプラクティスガイド 2026（/agent/multi-agent-orchestration）の Pure JSX 移行と ナビ同期**: `Multi-agent-orchestration.html` を `web-next/app/agent/multi-agent-orchestration/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。要約・省略なしで全17セクション（Intro, Step1〜11, アンチパターン, 全体ワークフロー, まとめ, 参考文献）・全表・全コードブロック・14 Mermaid図・TOCスクロール追従（`TocObserver.tsx`）・外部リンク安全属性・`page-registry.ts`（`Agent 開発` グループ）登録を完了。原本 `Multi-agent-orchestration.html` は指定の `archive/html/agent/Multi-agent-orchestration.html` へ `git mv` 退避保存。契約テスト5件（タイトル、17H2セクション、外部リンク、クリーン内部リンク、14Mermaid図）を追加し全クリア。
 
