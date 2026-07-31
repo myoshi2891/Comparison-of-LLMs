@@ -559,7 +559,7 @@
 }
 
 @media (max-width: 960px) {
-  .layout {
+  .pageContainer {
     flex-direction: column;
   }
   .sidebar {

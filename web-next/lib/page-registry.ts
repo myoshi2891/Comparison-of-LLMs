@@ -124,7 +124,9 @@ const entries: PageEntry[] = [
   },
   {
     slug: "/agent/multi-agent-orchestration-best-practices",
-    title: "Multi-Agent Orchestration",
+    title: "マルチエージェント・オーケストレーション実践ガイド",
+    description:
+      "Anthropicのリサーチシステム、5つの基本パターン、MAST失敗モード分類、MCP/A2Aプロトコル等を網羅したマルチエージェント・オーケストレーション実践ガイド。",
     group: "Agent 開発",
     topics: ["agent", "multi-agent", "orchestration", "architecture", "mcp"],
     summary:
@@ -134,11 +136,13 @@ const entries: PageEntry[] = [
   },
   {
     slug: "/agent/multi-agent-orchestration",
-    title: "マルチエージェントオーケストレーション",
+    title: "マルチエージェントオーケストレーション ベストプラクティスガイド",
+    description:
+      "2026年最新のマルチエージェントオーケストレーション実践ガイド。Anthropic、Google、OpenAIの最新プラクティスに基づくアーキテクチャ、協調パターン、プロトコル（MCP/A2A）、可観測性、セキュリティを完全解説。",
     group: "Agent 開発",
     topics: ["agent", "multi-agent", "orchestration", "mcp", "a2a"],
     summary:
-      "2026年最新のマルチエージェントオーケストレーション実践ガイド。Anthropic、Google、OpenAIの最新プラクティスに基づくアーキテクチャ、協調パターン、プロトコル（MCP/A2A）、可観測性、セキュリティを完全解説。",
+      "2026年最新のマルチエージェントオーケストレーション実践ガイド。Anthropic、Google、OpenAIの最新プラクティスに基づくアーキテクチャ、協調パターン、プロトコル、可観測性、セキュリティを完全解説。",
     addedAt: "2026-07-31",
     lastReviewed: "2026-07-31",
   },
@@ -844,7 +848,7 @@ const entries: PageEntry[] = [
     group: "Agent 開発",
     topics: ["agent", "vercel", "eve", "workflow", "sandbox"],
     summary:
-      "「エージェントはディレクトリである」という思想のもと、永続実行・サンドボックス・承認フロー・可観測性を標準搭載したVercelのオープンソース・エージェントフレームワーク eve の完全解説ガイド。",
+      "Vercelのオープンソース・エージェントフレームワーク eve の永続実行・サンドボックス・承認フロー・可観測性を完全解説する初学者向けガイド。",
     addedAt: "2026-07-31",
     lastReviewed: "2026-07-31",
   },
