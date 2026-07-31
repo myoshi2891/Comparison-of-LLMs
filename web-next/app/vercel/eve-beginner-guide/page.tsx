@@ -3,6 +3,8 @@ import MermaidDiagram from "@/components/docs/MermaidDiagram";
 import styles from "./page.module.css";
 import { TocObserver } from "./TocObserver";
 
+const FONT_1REM = { fontSize: "16px" };
+
 export const metadata: Metadata = {
   title: "Vercel eve 完全ガイド ― 初学者のためのステップバイステップ・ベストプラクティス",
   description:
@@ -325,7 +327,7 @@ export default function VercelEveBeginnerGuidePage() {
             <span className={styles.subNum}>1-3</span>全体アーキテクチャ
           </h3>
           <div className={styles.diagramWrap}>
-            <MermaidDiagram chart={DIAGRAM_ARCH} />
+            <MermaidDiagram chart={DIAGRAM_ARCH} themeVariables={FONT_1REM} />
           </div>
           <p className={styles.diagramCaption}>
             図1：eveのランタイムはVercelの各プロダクト（Workflows / Sandbox / AI Gateway / Connect /
@@ -444,7 +446,7 @@ export default function VercelEveBeginnerGuidePage() {
             <span className={styles.subNum}>2-2</span>ファイル配置がそのまま機能になる仕組み
           </h3>
           <div className={styles.diagramWrap}>
-            <MermaidDiagram chart={DIAGRAM_MAPPING} />
+            <MermaidDiagram chart={DIAGRAM_MAPPING} themeVariables={FONT_1REM} />
           </div>
           <p className={styles.diagramCaption}>
             図2：ファイルの配置場所がそのままeveランタイムへの配線になる
@@ -741,7 +743,7 @@ export default function VercelEveBeginnerGuidePage() {
             </div>
             <p>セッション・ターン・ストリームの関係を図解すると次のようになります。</p>
             <div className={styles.diagramWrap}>
-              <MermaidDiagram chart={DIAGRAM_SESSION} />
+              <MermaidDiagram chart={DIAGRAM_SESSION} themeVariables={FONT_1REM} />
             </div>
             <p className={styles.diagramCaption}>
               図3：セッション内の1ターンが処理される流れ。各ステップがチェックポイントされる
@@ -885,7 +887,7 @@ export default function VercelEveBeginnerGuidePage() {
             </div>
             <p>承認フローの状態遷移は次のとおりです。</p>
             <div className={styles.diagramWrap}>
-              <MermaidDiagram chart={DIAGRAM_APPROVAL} />
+              <MermaidDiagram chart={DIAGRAM_APPROVAL} themeVariables={FONT_1REM} />
             </div>
             <p className={styles.diagramCaption}>図4：承認ゲートを持つツールの状態遷移</p>
             <div className={styles.quoteBlock}>
@@ -960,7 +962,7 @@ export default function VercelEveBeginnerGuidePage() {
               Sandbox（マイクロVM）、ローカルではDockerなどが使われます。
             </p>
             <div className={styles.diagramWrap}>
-              <MermaidDiagram chart={DIAGRAM_SANDBOX} />
+              <MermaidDiagram chart={DIAGRAM_SANDBOX} themeVariables={FONT_1REM} />
             </div>
             <p className={styles.diagramCaption}>図5：サンドボックス採用の判断フロー</p>
             <p>
@@ -1093,7 +1095,7 @@ export default function VercelEveBeginnerGuidePage() {
               </p>
             </div>
             <div className={styles.diagramWrap}>
-              <MermaidDiagram chart={DIAGRAM_CHANNEL} />
+              <MermaidDiagram chart={DIAGRAM_CHANNEL} themeVariables={FONT_1REM} />
             </div>
             <p className={styles.diagramCaption}>図6：Slack連携時のイベント到達経路</p>
             <p>
@@ -1298,7 +1300,7 @@ export default function VercelEveBeginnerGuidePage() {
               Instant Rollback で即座に前バージョンへ戻せます。
             </p>
             <div className={styles.diagramWrap}>
-              <MermaidDiagram chart={DIAGRAM_CICD} />
+              <MermaidDiagram chart={DIAGRAM_CICD} themeVariables={FONT_1REM} />
             </div>
             <p className={styles.diagramCaption}>
               図7：コミットから本番反映までのCI/CDパイプライン
@@ -1457,7 +1459,7 @@ export default function VercelEveBeginnerGuidePage() {
             <span className={styles.subNum}>5-3</span>マルチエージェント構成図
           </h3>
           <div className={styles.diagramWrap}>
-            <MermaidDiagram chart={DIAGRAM_FLEET} />
+            <MermaidDiagram chart={DIAGRAM_FLEET} themeVariables={FONT_1REM} />
           </div>
           <p className={styles.diagramCaption}>
             図8：3体編成のマルチエージェント構成。機械同士のハンドオフ(実線)と人間の監督(点線+Slack)が分離されている

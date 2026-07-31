@@ -9,32 +9,6 @@ export const metadata: Metadata = {
     "Anthropicのリサーチシステム、5つの基本パターン、MAST失敗モード分類、MCP/A2Aプロトコル等を網羅したマルチエージェント・オーケストレーション実践ガイド。",
 };
 
-const PIE_THEME_VARS = {
-  pie1: "#57c7ff",
-  pie2: "#a996ff",
-  pie3: "#ff9d66",
-  pieTitleTextColor: "#ffffff",
-  pieSectionTextColor: "#07111e",
-  pieLegendTextColor: "#dfe8fa",
-  pieStrokeColor: "#07111e",
-  pieStrokeWidth: "2px",
-  pieOuterLineColor: "#dfe8fa",
-};
-
-function Ext({
-  href,
-  children,
-}: {
-  href: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <a href={href} target="_blank" rel="noopener noreferrer">
-      {children}
-    </a>
-  );
-}
-
 const MMD_1 = `flowchart TD
                   Y1["<b>2023</b><br/>AutoGen論文発表<br/>(会話型マルチエージェントの提案)"]
                   Y2["<b>2024</b><br/>MCP(Model Context Protocol)発表"]
@@ -294,7 +268,7 @@ export default function MultiAgentOrchestrationPage() {
               2026年、マルチエージェント・オーケストレーションは「実験的な流行り物」から「本番アーキテクチャの選択肢の一つ」へと位置づけが変わりました。Gartnerの予測では、2026年末までに企業アプリケーションの40%がタスク特化型のAIエージェントを組み込むとされており、これは2025年時点の5%未満から急激な伸びです。
             </p>
 
-            <div className={styles.diagramWrap}><MermaidDiagram chart={MMD_1} caption="図1: マルチエージェント・オーケストレーションの成熟度推移" /><div className={styles.diagramCaption}>図1: マルチエージェント・オーケストレーションの成熟度推移</div></div>
+            <div className={styles.diagramWrap}><MermaidDiagram chart={MMD_1} /><div className={styles.diagramCaption}>図1: マルチエージェント・オーケストレーションの成熟度推移</div></div>
             
 
             <h3>1.1 しかし「多いほど良い」わけではない</h3>
@@ -423,19 +397,19 @@ export default function MultiAgentOrchestrationPage() {
               </table>
             </div>
 
-            <div className={styles.diagramWrap}><MermaidDiagram chart={MMD_2_1} caption="図2-①: Prompt Chaining(逐次連鎖)" /><div className={styles.diagramCaption}>図2-①: Prompt Chaining(逐次連鎖)</div></div>
+            <div className={styles.diagramWrap}><MermaidDiagram chart={MMD_2_1} /><div className={styles.diagramCaption}>図2-①: Prompt Chaining(逐次連鎖)</div></div>
             
 
-            <div className={styles.diagramWrap}><MermaidDiagram chart={MMD_2_2} caption="図2-②: Routing(振り分け)" /><div className={styles.diagramCaption}>図2-②: Routing(振り分け)</div></div>
+            <div className={styles.diagramWrap}><MermaidDiagram chart={MMD_2_2} /><div className={styles.diagramCaption}>図2-②: Routing(振り分け)</div></div>
             
 
-            <div className={styles.diagramWrap}><MermaidDiagram chart={MMD_2_3} caption="図2-③: Parallelization(並列化)" /><div className={styles.diagramCaption}>図2-③: Parallelization(並列化)</div></div>
+            <div className={styles.diagramWrap}><MermaidDiagram chart={MMD_2_3} /><div className={styles.diagramCaption}>図2-③: Parallelization(並列化)</div></div>
             
 
-            <div className={styles.diagramWrap}><MermaidDiagram chart={MMD_2_4} caption="図2-④: Orchestrator-Workers" /><div className={styles.diagramCaption}>図2-④: Orchestrator-Workers</div></div>
+            <div className={styles.diagramWrap}><MermaidDiagram chart={MMD_2_4} /><div className={styles.diagramCaption}>図2-④: Orchestrator-Workers</div></div>
             
 
-            <div className={styles.diagramWrap}><MermaidDiagram chart={MMD_2_5} caption="図2-⑤: Evaluator-Optimizer(評価・最適化ループ)" /><div className={styles.diagramCaption}>図2-⑤: Evaluator-Optimizer(評価・最適化ループ)</div></div>
+            <div className={styles.diagramWrap}><MermaidDiagram chart={MMD_2_5} /><div className={styles.diagramCaption}>図2-⑤: Evaluator-Optimizer(評価・最適化ループ)</div></div>
             
 
             <h3>2.1 マルチエージェントとの関係</h3>
@@ -450,6 +424,7 @@ export default function MultiAgentOrchestrationPage() {
                   <a
                     href="https://www.anthropic.com/engineering/building-effective-agents"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >Building effective agents — Anthropic Engineering</a
                   >
                 </li>
@@ -457,6 +432,7 @@ export default function MultiAgentOrchestrationPage() {
                   <a
                     href="https://simonwillison.net/2024/Dec/20/building-effective-agents/"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >Building effective agents(要約と論評)— Simon Willison</a
                   >
                 </li>
@@ -464,11 +440,12 @@ export default function MultiAgentOrchestrationPage() {
                   <a
                     href="https://pub.towardsai.net/agent-workflow-patterns-beyond-anthropics-playbook-1bd76a48d63d"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >Agent Workflow Patterns — Beyond Anthropic's Playbook — Towards AI</a
                   >
                 </li>
                 <li>
-                  <a href="https://arxiv.org/pdf/2606.24937" target="_blank"
+                  <a href="https://arxiv.org/pdf/2606.24937" target="_blank" rel="noopener noreferrer"
                     >The Hitchhiker's Guide to Agentic AI: From Foundations to Systems —
                     arXiv:2606.24937</a
                   >
@@ -477,6 +454,7 @@ export default function MultiAgentOrchestrationPage() {
                   <a
                     href="https://www.baeldung.com/spring-ai-building-effective-agents"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >Building Effective Agents with Spring AI — Baeldung</a
                   >
                 </li>
@@ -497,7 +475,7 @@ export default function MultiAgentOrchestrationPage() {
               中心となる「リード(オーケストレーター)エージェント」がタスクを分解し、専門化された「サブエージェント(ワーカー)」に委任し、結果を統合するパターンです。ワーカー同士は直接会話しません。Anthropicのマルチエージェント・リサーチシステムがこの代表例であり、詳細は次章で深掘りします。
             </p>
 
-            <div className={styles.diagramWrap}><MermaidDiagram chart={MMD_3} caption="図3: オーケストレーター・ワーカー型" /><div className={styles.diagramCaption}>図3: オーケストレーター・ワーカー型</div></div>
+            <div className={styles.diagramWrap}><MermaidDiagram chart={MMD_3} /><div className={styles.diagramCaption}>図3: オーケストレーター・ワーカー型</div></div>
             
 
             <p>
@@ -512,7 +490,7 @@ export default function MultiAgentOrchestrationPage() {
               SDK、CrewAIの階層Processなど)ことから、実務上の出発点として推奨されています。
             </p>
 
-            <div className={styles.diagramWrap}><MermaidDiagram chart={MMD_4} caption="図4: スーパーバイザー型の対話フロー例" /><div className={styles.diagramCaption}>図4: スーパーバイザー型の対話フロー例</div></div>
+            <div className={styles.diagramWrap}><MermaidDiagram chart={MMD_4} /><div className={styles.diagramCaption}>図4: スーパーバイザー型の対話フロー例</div></div>
             
 
             <h3>3.3 スウォーム型(Swarm / Peer-to-Peer)</h3>
@@ -522,7 +500,7 @@ export default function MultiAgentOrchestrationPage() {
               SDKの<code>handoffs</code>機能がこれに該当します。レイテンシは低い(仲介者を挟まないため)反面、経路の追跡が難しく、完全連結型のスウォームでは、エージェント数の増加に伴い障害点の組み合わせが<strong>組合せ的に爆発</strong>します(4エージェントで6通り、10エージェントで45通りの相互作用パス)。8エージェントを超えると、この失敗表面積はEnd-to-Endテストでカバーしきれなくなるとされ、階層型オーケストレーションへの切り替えが信頼性上の要件になります。
             </p>
 
-            <div className={styles.diagramWrap}><MermaidDiagram chart={MMD_5} caption="図5: スウォーム型(完全連結)" /><div className={styles.diagramCaption}>図5: スウォーム型(完全連結)</div></div>
+            <div className={styles.diagramWrap}><MermaidDiagram chart={MMD_5} /><div className={styles.diagramCaption}>図5: スウォーム型(完全連結)</div></div>
             
 
             <h3>3.4 階層型マルチレベル・スーパーバイザー(Hierarchical Multi-Level Supervisor)</h3>
@@ -532,7 +510,7 @@ export default function MultiAgentOrchestrationPage() {
               responsibility)が明確になる一方、末端のワーカーからトップレベルの意思決定までのレイテンシが積み重なります。
             </p>
 
-            <div className={styles.diagramWrap}><MermaidDiagram chart={MMD_6} caption="図6: 階層型マルチレベル・スーパーバイザー" /><div className={styles.diagramCaption}>図6: 階層型マルチレベル・スーパーバイザー</div></div>
+            <div className={styles.diagramWrap}><MermaidDiagram chart={MMD_6} /><div className={styles.diagramCaption}>図6: 階層型マルチレベル・スーパーバイザー</div></div>
             
 
             <h3>3.5 パイプライン型(Pipeline)</h3>
@@ -546,7 +524,7 @@ export default function MultiAgentOrchestrationPage() {
               複数のエージェントが同じ問題に対して独立した見解を出し、互いの見解を批評しあった上で合意形成する、あるいは審判(judge)役のエージェントが最終判断を下すパターンです。Evaluator-Optimizerのマルチエージェント拡張とも言えます。コストはおよそ2.5倍に跳ね上がりますが、多角的検証が必要な高stakesの意思決定(医療・法務・金融のリスク評価など)では投資対効果が見合います。
             </p>
 
-            <div className={styles.diagramWrap}><MermaidDiagram chart={MMD_7} caption="図7: ディベート型" /><div className={styles.diagramCaption}>図7: ディベート型</div></div>
+            <div className={styles.diagramWrap}><MermaidDiagram chart={MMD_7} /><div className={styles.diagramCaption}>図7: ディベート型</div></div>
             
 
             <h3>3.7 パターン比較表</h3>
@@ -667,7 +645,7 @@ export default function MultiAgentOrchestrationPage() {
             </p>
 
             <h3>4.1 全体アーキテクチャ</h3>
-            <div className={styles.diagramWrap}><MermaidDiagram chart={MMD_8} caption="図8: Anthropicマルチエージェント・リサーチシステムの全体構造" /><div className={styles.diagramCaption}>図8: Anthropicマルチエージェント・リサーチシステムの全体構造</div></div>
+            <div className={styles.diagramWrap}><MermaidDiagram chart={MMD_8} /><div className={styles.diagramCaption}>図8: Anthropicマルチエージェント・リサーチシステムの全体構造</div></div>
             
 
             <p>構成要素は3種類です。</p>
@@ -865,7 +843,7 @@ export default function MultiAgentOrchestrationPage() {
               サブエージェント・アーキテクチャは、コンテキストウィンドウの制約を回避するもう一つの手段です。1つのエージェントがプロジェクト全体の状態を維持し続けようとするのではなく、専門化されたサブエージェントがクリーンなコンテキストウィンドウで焦点を絞ったタスクを処理します。
             </p>
 
-            <div className={styles.diagramWrap}><MermaidDiagram chart={MMD_9} caption="図9: サブエージェントによるコンテキスト分離" /><div className={styles.diagramCaption}>図9: サブエージェントによるコンテキスト分離</div></div>
+            <div className={styles.diagramWrap}><MermaidDiagram chart={MMD_9} /><div className={styles.diagramCaption}>図9: サブエージェントによるコンテキスト分離</div></div>
             
 
             <p>Claude Agent SDKでは、サブエージェントはデフォルトで以下の性質を持ちます。</p>
@@ -1049,7 +1027,7 @@ export default function MultiAgentOrchestrationPage() {
               Kernelプロジェクトからの移行ガイドを公式に提供しています。
             </p>
 
-            <div className={styles.diagramWrap}><MermaidDiagram chart={MMD_10} caption="図10: Microsoft Agent Frameworkへの統合" /><div className={styles.diagramCaption}>図10: Microsoft Agent Frameworkへの統合</div></div>
+            <div className={styles.diagramWrap}><MermaidDiagram chart={MMD_10} /><div className={styles.diagramCaption}>図10: Microsoft Agent Frameworkへの統合</div></div>
             
 
             <h3>6.3 選定時の判断軸</h3>
@@ -1081,6 +1059,7 @@ export default function MultiAgentOrchestrationPage() {
                   <a
                     href="https://www.truefoundry.com/blog/multi-agent-orchestration-tools"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >Which are the Best Multi-Agent Orchestration Tools in 2026? — TrueFoundry</a
                   >
                 </li>
@@ -1088,6 +1067,7 @@ export default function MultiAgentOrchestrationPage() {
                   <a
                     href="https://www.truefoundry.com/blog/multi-agent-orchestration-frameworks"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >Top Multi-Agent Orchestration Frameworks for 2026 — TrueFoundry</a
                   >
                 </li>
@@ -1095,6 +1075,7 @@ export default function MultiAgentOrchestrationPage() {
                   <a
                     href="https://devblogs.microsoft.com/agent-framework/migrate-your-semantic-kernel-and-autogen-projects-to-microsoft-agent-framework-release-candidate/"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >Migrate your Semantic Kernel and AutoGen projects to Microsoft Agent Framework
                     — Microsoft DevBlogs(一次情報)</a
                   >
@@ -1103,6 +1084,7 @@ export default function MultiAgentOrchestrationPage() {
                   <a
                     href="https://visualstudiomagazine.com/articles/2026/04/06/microsoft-ships-production-ready-agent-framework-1-0-for-net-and-python.aspx"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >Microsoft Ships Production-Ready Agent Framework 1.0 for .NET and Python —
                     Visual Studio Magazine</a
                   >
@@ -1111,6 +1093,7 @@ export default function MultiAgentOrchestrationPage() {
                   <a
                     href="https://learn.microsoft.com/en-us/agent-framework/overview/"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >Agent Framework overview — Microsoft Learn(一次情報)</a
                   >
                 </li>
@@ -1118,11 +1101,12 @@ export default function MultiAgentOrchestrationPage() {
                   <a
                     href="https://openai.github.io/openai-agents-python/multi_agent/"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >Multi-agent orchestration — OpenAI Agents SDK Docs(一次情報)</a
                   >
                 </li>
                 <li>
-                  <a href="https://openai.github.io/openai-agents-python/handoffs/" target="_blank"
+                  <a href="https://openai.github.io/openai-agents-python/handoffs/" target="_blank" rel="noopener noreferrer"
                     >Handoffs — OpenAI Agents SDK Docs(一次情報)</a
                   >
                 </li>
@@ -1139,7 +1123,7 @@ export default function MultiAgentOrchestrationPage() {
             </p>
 
             <h3>7.1 2つのプロトコルの役割分担</h3>
-            <div className={styles.diagramWrap}><MermaidDiagram chart={MMD_11} caption="図11: MCPとA2Aのレイヤー分担" /><div className={styles.diagramCaption}>図11: MCPとA2Aのレイヤー分担</div></div>
+            <div className={styles.diagramWrap}><MermaidDiagram chart={MMD_11} /><div className={styles.diagramCaption}>図11: MCPとA2Aのレイヤー分担</div></div>
             
 
             <ul>
@@ -1176,6 +1160,7 @@ export default function MultiAgentOrchestrationPage() {
                   <a
                     href="https://www.programming-helper.com/tech/agent-to-agent-protocol-2026-google-a2a-standard"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >A2A: The Agent Interoperability Standard That's Reshaping 2026 — Programming
                     Helper</a
                   >
@@ -1184,6 +1169,7 @@ export default function MultiAgentOrchestrationPage() {
                   <a
                     href="https://galileo.ai/blog/google-agent2agent-a2a-protocol-guide"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >What Is Google's Agent2Agent (A2A) Protocol? — Galileo AI</a
                   >
                 </li>
@@ -1191,6 +1177,7 @@ export default function MultiAgentOrchestrationPage() {
                   <a
                     href="https://zylos.ai/research/2026-02-15-agent-to-agent-communication-protocols/"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >Agent-to-Agent Communication Protocols in 2026 — Zylos AI Research</a
                   >
                 </li>
@@ -1198,16 +1185,17 @@ export default function MultiAgentOrchestrationPage() {
                   <a
                     href="https://www.glukhov.org/ai-systems/comparisons/a2a-protocol-2026-adoption"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >A2A Protocol Adoption in 2026 — Glukhov.org</a
                   >
                 </li>
                 <li>
-                  <a href="https://atlan.com/know/google-a2a-protocol/" target="_blank"
+                  <a href="https://atlan.com/know/google-a2a-protocol/" target="_blank" rel="noopener noreferrer"
                     >What is Google's Agent2Agent Protocol (A2A)? — Atlan</a
                   >
                 </li>
                 <li>
-                  <a href="https://www.ibm.com/think/topics/agent2agent-protocol" target="_blank"
+                  <a href="https://www.ibm.com/think/topics/agent2agent-protocol" target="_blank" rel="noopener noreferrer"
                     >Agent2Agent Protocol — IBM Think</a
                   >
                 </li>
@@ -1228,7 +1216,7 @@ export default function MultiAgentOrchestrationPage() {
             </p>
 
             <h3>8.1 3大分類と発生率</h3>
-            <div className={styles.diagramWrap}><MermaidDiagram chart={MMD_12} caption="図12: MASTにおける失敗カテゴリの発生比率(概算)" /><div className={styles.diagramCaption}>図12: MASTにおける失敗カテゴリの発生比率(概算)</div></div>
+            <div className={styles.diagramWrap}><MermaidDiagram chart={MMD_12} /><div className={styles.diagramCaption}>図12: MASTにおける失敗カテゴリの発生比率(概算)</div></div>
             
 
             <h3>8.2 14の具体的な失敗モード</h3>
@@ -1244,7 +1232,7 @@ export default function MultiAgentOrchestrationPage() {
                 </thead>
                 <tbody>
                   <tr>
-                    <td rowSpan="5"><strong>① 仕様・システム設計の問題</strong><br />(約41.8%)</td>
+                    <td rowSpan={5}><strong>① 仕様・システム設計の問題</strong><br />(約41.8%)</td>
                     <td>FM-1.1</td>
                     <td>タスク仕様違反</td>
                     <td>エージェントがタスクの要件・制約に従わない</td>
@@ -1270,7 +1258,7 @@ export default function MultiAgentOrchestrationPage() {
                     <td>いつ処理を終えるべきかの判断基準を認識していない</td>
                   </tr>
                   <tr>
-                    <td rowSpan="6"><strong>② エージェント間の不整合</strong><br />(約36.9%)</td>
+                    <td rowSpan={6}><strong>② エージェント間の不整合</strong><br />(約36.9%)</td>
                     <td>FM-2.1</td>
                     <td>会話のリセット</td>
                     <td>進行中の文脈を不必要に消去・再開してしまう</td>
@@ -1301,7 +1289,7 @@ export default function MultiAgentOrchestrationPage() {
                     <td>内部の推論結果と実際に取った行動が矛盾する</td>
                   </tr>
                   <tr>
-                    <td rowSpan="3"><strong>③ タスク検証の失敗</strong><br />(約21.3%)</td>
+                    <td rowSpan={3}><strong>③ タスク検証の失敗</strong><br />(約21.3%)</td>
                     <td>FM-3.1</td>
                     <td>早すぎる終了</td>
                     <td>タスクが未完了なのに完了したと判断してしまう</td>
@@ -1380,7 +1368,7 @@ export default function MultiAgentOrchestrationPage() {
             </p>
 
             <h3>9.1 マルチエージェント特有のリスク</h3>
-            <div className={styles.diagramWrap}><MermaidDiagram chart={MMD_13} caption="図13: 連鎖的プロンプトインジェクションのリスク経路" /><div className={styles.diagramCaption}>図13: 連鎖的プロンプトインジェクションのリスク経路</div></div>
+            <div className={styles.diagramWrap}><MermaidDiagram chart={MMD_13} /><div className={styles.diagramCaption}>図13: 連鎖的プロンプトインジェクションのリスク経路</div></div>
             
 
             <ul>
@@ -1485,7 +1473,7 @@ export default function MultiAgentOrchestrationPage() {
             </p>
 
             <h3>10.1 なぜ従来型のロギングでは不十分か</h3>
-            <div className={styles.diagramWrap}><MermaidDiagram chart={MMD_14} caption="図14: 従来型ログとマルチエージェント・トレースの違い" /><div className={styles.diagramCaption}>図14: 従来型ログとマルチエージェント・トレースの違い</div></div>
+            <div className={styles.diagramWrap}><MermaidDiagram chart={MMD_14} /><div className={styles.diagramCaption}>図14: 従来型ログとマルチエージェント・トレースの違い</div></div>
             
 
             <p>
@@ -1588,7 +1576,7 @@ export default function MultiAgentOrchestrationPage() {
             </p>
 
             <h3>11.1 コスト構造の可視化</h3>
-            <div className={styles.diagramWrap}><MermaidDiagram chart={MMD_15} caption="図15: マルチエージェントのコスト構造" /><div className={styles.diagramCaption}>図15: マルチエージェントのコスト構造</div></div>
+            <div className={styles.diagramWrap}><MermaidDiagram chart={MMD_15} /><div className={styles.diagramCaption}>図15: マルチエージェントのコスト構造</div></div>
             
 
             <h3>11.2 主要な最適化戦略</h3>
@@ -1705,7 +1693,7 @@ export default function MultiAgentOrchestrationPage() {
 
             <p>ここまでの内容を統合し、実務で使える意思決定フローチャートとして整理します。</p>
 
-            <div className={styles.diagramWrap}><MermaidDiagram chart={MMD_16} caption="図16: マルチエージェント採用の意思決定フロー" /><div className={styles.diagramCaption}>図16: マルチエージェント採用の意思決定フロー</div></div>
+            <div className={styles.diagramWrap}><MermaidDiagram chart={MMD_16} /><div className={styles.diagramCaption}>図16: マルチエージェント採用の意思決定フロー</div></div>
             
 
             <h3>12.1 判断チェックリスト</h3>
@@ -1751,7 +1739,7 @@ export default function MultiAgentOrchestrationPage() {
               ここでは、オーケストレーター・ワーカー型のマルチエージェントシステムを実装する際の標準的な進め方を、実務の順序に沿って解説します。
             </p>
 
-            <div className={styles.diagramWrap}><MermaidDiagram chart={MMD_17} caption="図17: 実装の8ステップ" /><div className={styles.diagramCaption}>図17: 実装の8ステップ</div></div>
+            <div className={styles.diagramWrap}><MermaidDiagram chart={MMD_17} /><div className={styles.diagramCaption}>図17: 実装の8ステップ</div></div>
             
 
             <h3>ステップ① 単一エージェントのベースラインを必ず先に作る</h3>
@@ -1832,6 +1820,7 @@ export default function MultiAgentOrchestrationPage() {
                   <a
                     href="https://www.anthropic.com/engineering/building-agents-with-the-claude-agent-sdk"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >Building agents with the Claude Agent SDK — Anthropic Engineering(一次情報)</a
                   >
                 </li>
@@ -1839,6 +1828,7 @@ export default function MultiAgentOrchestrationPage() {
                   <a
                     href="https://www.anthropic.com/engineering/multi-agent-research-system"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >How we built our multi-agent research system — Anthropic
                     Engineering(一次情報)</a
                   >
@@ -1862,7 +1852,7 @@ export default function MultiAgentOrchestrationPage() {
                 </thead>
                 <tbody>
                   <tr>
-                    <td rowSpan="3"><strong>設計判断</strong></td>
+                    <td rowSpan={3}><strong>設計判断</strong></td>
                     <td>
                       単一エージェントのベースラインと比較し、マルチエージェント化の効果を定量的に確認したか
                     </td>
@@ -1876,7 +1866,7 @@ export default function MultiAgentOrchestrationPage() {
                     </td>
                   </tr>
                   <tr>
-                    <td rowSpan="3"><strong>コンテキスト設計</strong></td>
+                    <td rowSpan={3}><strong>コンテキスト設計</strong></td>
                     <td>
                       各サブエージェントに4部構成の契約(目的・出力形式・ツールガイダンス・境界)を与えているか
                     </td>
@@ -1890,7 +1880,7 @@ export default function MultiAgentOrchestrationPage() {
                     <td>長時間稼働セッション向けにコンパクション(圧縮)戦略を用意したか</td>
                   </tr>
                   <tr>
-                    <td rowSpan="2"><strong>信頼性</strong></td>
+                    <td rowSpan={2}><strong>信頼性</strong></td>
                     <td>
                       MASTの3大失敗カテゴリ(仕様・不整合・検証)それぞれに対する具体的な緩和策を実装したか
                     </td>
@@ -1899,7 +1889,7 @@ export default function MultiAgentOrchestrationPage() {
                     <td>検証エージェントまたはルールベースの最終チェックを組み込んでいるか</td>
                   </tr>
                   <tr>
-                    <td rowSpan="3"><strong>セキュリティ</strong></td>
+                    <td rowSpan={3}><strong>セキュリティ</strong></td>
                     <td>最小権限の原則でツールアクセスをスコープダウンしたか</td>
                   </tr>
                   <tr>
@@ -1909,14 +1899,14 @@ export default function MultiAgentOrchestrationPage() {
                     <td>OWASPのエージェント的アプリケーション向けリスク項目と照合したか</td>
                   </tr>
                   <tr>
-                    <td rowSpan="2"><strong>可観測性・評価</strong></td>
+                    <td rowSpan={2}><strong>可観測性・評価</strong></td>
                     <td>トレーシング基盤を導入し、因果関係を含むログを記録しているか</td>
                   </tr>
                   <tr>
                     <td>LLM-as-judgeと人間レビューを組み合わせた評価パイプラインを用意したか</td>
                   </tr>
                   <tr>
-                    <td rowSpan="2"><strong>コスト管理</strong></td>
+                    <td rowSpan={2}><strong>コスト管理</strong></td>
                     <td>モデルルーティングとプロンプトキャッシングを実装したか</td>
                   </tr>
                   <tr>

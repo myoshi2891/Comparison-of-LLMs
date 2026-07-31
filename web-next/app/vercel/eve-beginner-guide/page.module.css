@@ -28,8 +28,8 @@
   font-family: var(--font-sans, "Inter", sans-serif);
   line-height: 1.85;
   font-size: 16px;
-  max-width: 1440px;
-  margin: 0 auto;
+  max-width: 100%;
+  margin: 0;
 }
 
 .sidebar {
