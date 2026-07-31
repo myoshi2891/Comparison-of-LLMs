@@ -2,7 +2,7 @@
 
 > 本ファイルは Next.js 移行完了後の保守・改善フェーズにおける開発の進捗（特にテスト関連）および品質チェックのルールを記録する。
 >
-> - 最終更新日: **Updated 2026-07-29**
+> - 最終更新日: **Updated 2026-07-30**
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
 
@@ -11,16 +11,26 @@
 - **フェーズ**: 保守・機能改善・品質強化フェーズ
 - **ブランチ**: `dev`（本番 `main` への Next.js 移行マージ完了 🚀）
 - **動作検証**:
-  - `npm run build` ⏭️（依頼により未実行。Antigravity環境では実行禁止、CI または他環境では必須）
-  - `npm run typecheck` ✅
-  - `npm run lint` ✅（385 files checked）
+  - `bun run build` ⏭️（依頼により未実行。Antigravity環境では実行禁止、CI または他環境では必須）
+  - `bun run typecheck` ✅
+  - `bun run lint` ✅（385 files checked）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: Vitest **137 files / 1259 tests すべて合格**（収集失敗なし）
+  - **フロントエンド (`web-next/`)**: Vitest **141 files / 1281 tests すべて合格**（収集失敗なし）
   - **バックエンド (`scraper/`)**: pytest 実行で **43 件すべて合格** (全 Green ✅)
 
 ## 最近の追加内容
 
-- **SonarQube CI のaxeタイムアウト・新規コードカバレッジ修正**: coverage計測時にAntigravity a11y監査が既定5秒でタイムアウトし、未完了axeと後続監査が競合する問題を、同規模ページと同じ15秒上限で解消。Sonarが新規コードとして検出したClaude TocObserver 3ファイルへ分岐テスト12件を追加し、対象3ファイルの行・条件カバレッジを各100%にした。目視・ビルドは依頼により省略。`npm run test:coverage` は **137 files / 1259 tests**、全体 line coverage **92.79%**、typecheck、lint **385 files / 0 diagnostics** がGreen。
+- **Z.ai (GLM) LLM ベストプラクティスガイド（/zhipu/zai-glm-best-practices）の Pure JSX 移行と Providers ナビ同期**: `Zai-glm-best-practices-guide.html` を `web-next/app/zhipu/zai-glm-best-practices/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。要約・省略なしで全17セクション（Hero + 17H2セクション）・全表・全コードブロック・8 Mermaid図・TOCスクロール追従（`TocObserver.tsx`）・外部リンク安全属性・Providers グループ配下（Zhipu(GLM)）ナビゲーション追加（`nav-taxonomy.ts` / `page-registry.ts`）を完了。原本 `Zai-glm-best-practices-guide.html` は `archive/html/zhipu/Zai-glm-best-practices-guide.html` へ `git mv` 退避保存。契約テスト5件（タイトル、17H2セクション、8 Mermaid図、外部リンク・内部リンク検証）を追加し全クリア（Vitest **140 files / 1274 tests** 全 Green ✅）。
+
+- **xAI Grok API 実践ベストプラクティスガイド（/xai/grok-best-practices-intermediate）の Pure JSX 移行と Providers ナビ同期**: `Xai-grok-best-practices-intermediate.html` を `web-next/app/xai/grok-best-practices-intermediate/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。要約・省略なしで全15セクション（Hero + 15H2セクション）・全表・全コードブロック・11 Mermaid図・TOCスクロール追従（`TocObserver.tsx`）・外部リンク安全属性・Providers グループ配下（xAI）ナビゲーション追加（`page-registry.ts`）を完了。原本 `Xai-grok-best-practices-intermediate.html` は `archive/Xai-grok-best-practices-intermediate.html` へ `git mv` 退避保存。契約テスト2件（メタデータ・JSXツリー構造検証）を追加。
+
+- **xAI Grok 完全ガイド（/xai/grok-best-practices）の Pure JSX 移行と Providers ナビ同期**: `Xai-grok-best-practices.html` を `web-next/app/xai/grok-best-practices/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。要約・省略なしで全18セクション（Hero + 18H2セクション）・全表・全コードブロック・5 Mermaid図・TOCスクロール追従（`TocObserver.tsx`）・外部リンク安全属性・Providers グループ配下（xAI）ナビゲーション追加（`nav-taxonomy.ts` / `page-registry.ts`）を完了。原本 `Xai-grok-best-practices.html` は `archive/html/xAI/Xai-grok-best-practices.html` へ `git mv` 退避保存。契約テスト5件（タイトル、18H2セクション、5 Mermaid図、外部リンク・内部リンク検証）を追加し全クリア（Vitest **139 files / 1269 tests** 全 Green ✅）。
+
+- **DeepSeek LLM ベストプラクティスガイド（/deepseek/llm-best-practices）の Pure JSX 移行と Providers ナビ同期**: `Deepseek-llm.html` を `web-next/app/deepseek/llm-best-practices/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。要約・省略なしで全18セクション（Hero + 17H2セクション）・全表・全コードブロック・8 Mermaid図・TOCスクロール追従（`TocObserver.tsx`）・外部リンク安全属性・Providers グループ配下ナビゲーション追加（`nav-taxonomy.ts` / `page-registry.ts`）を完了。原本 `Deepseek-llm.html` は `archive/html/DeepSeek/Deepseek-llm.html` へ `git mv` 退避保存。契約テスト5件（タイトル、17H2セクション、8 Mermaid図、外部リンク・内部リンク検証）を追加し全クリア（Vitest **138 files / 1264 tests** 全 Green ✅）。
+
+- **OpenAI Codex サブエージェント開発ベストプラクティス完全ガイド（/codex/agent）の Pure JSX 完全置き換え移行**: `Openai-codex-agents-multiagent-best-practices.html` を `web-next/app/codex/agent/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。要約・省略一切なしで全20セクション（前提, Step 1〜18, 参考文献）、全表、全コードブロック、7 Mermaid図 (`DIAGRAM_1`〜`DIAGRAM_14`)、全チェックリスト、全参考文献リンク、TOCスクロール追従（`TocObserver.tsx`）、外部リンク安全属性、`page-registry.ts`（`OpenAI Codex サブエージェント開発ガイド`）登録を完了。既存の旧 `/codex/agent` コンテンツと完全入れ替え完了。原本 `Openai-codex-agents-multiagent-best-practices.html` および `.md` はユーザー指定の `archive/html/OpenAI/` および `archive/md/OpenAI/` へ `git mv` 退避保存。契約テスト8件を更新し全クリア（Vitest **137 files / 1259 tests** 全 Green ✅）。
+
+- **SonarQube CI のaxeタイムアウト・新規コードカバレッジ修正**: coverage計測時にAntigravity a11y監査が既定5秒でタイムアウトし、未完了axeと後続監査が競合する問題を、同規模ページと同じ15秒上限で解消。Sonarが新規コードとして検出したClaude TocObserver 3ファイルへ分岐テスト12件を追加し、対象3ファイルの行・条件カバレッジを各100%にした。目視・ビルドは依頼により省略。`bun run test:coverage` は **137 files / 1259 tests**、全体 line coverage **92.79%**、typecheck、lint **385 files / 0 diagnostics** がGreen。
 
 - **レビュー指摘の再照合とセマンティクス・安全性修正**: 現行コードで全指摘を再検証し、シェル手順の exact-line CSS 変数照合・静的サーバー PID cleanup・チェックサム失敗時停止を修正。Cowork チェックボックスのラベル関連付け、Fable 5 の凡例/タイムライン list semantics、Skill frontmatter 必須説明と命名制約、Antigravity の用語・Review Policy・SHA-256検証パス、TechCrunch出典の第三者報道ラベル、TOC の DOM 順選択、CSS font fallback、共有 `Ext`、目次データ駆動化を反映した。テストは DOM 出力ベースへ堅牢化し、共有 Mermaid は未指定時 `16px`、明示 `fontSize` は保持する契約へ更新。目視・ビルドは依頼により省略。Vitest **134 files / 1247 tests**、typecheck、lint **382 files / 0 diagnostics**、pytest **43 tests** はすべて Green。
 

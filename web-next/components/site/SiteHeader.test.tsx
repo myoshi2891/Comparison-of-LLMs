@@ -88,28 +88,31 @@ describe("SiteHeader dropdown rendering", () => {
 });
 
 describe("SiteHeader nested sub-dropdown rendering (Providers only)", () => {
-  it("renders 5 sub-dropdowns (Claude / Google / Codex / Copilot / Moonshot) under Providers", () => {
+  it("renders 8 sub-dropdowns (Claude / Google / Codex / Copilot / Moonshot / DeepSeek / xAI / Zhipu(GLM)) under Providers", () => {
     const { container } = render(<SiteHeader pathname="/" />);
     const subs = container.querySelectorAll("li.ch-subdropdown");
-    expect(subs.length).toBe(5);
+    expect(subs.length).toBe(8);
     expect(Array.from(subs).map((li) => li.querySelector("button")?.textContent)).toEqual([
       "Claude",
       "Google",
       "Codex",
       "Copilot",
       "Moonshot",
+      "DeepSeek",
+      "xAI",
+      "Zhipu(GLM)",
     ]);
   });
 
   it("each sub-dropdown has a toggle with aria-haspopup and a .ch-subsubmenu <ul>", () => {
     const { container } = render(<SiteHeader pathname="/" />);
     const toggles = container.querySelectorAll("li.ch-subdropdown > .ch-subdropdown-toggle");
-    expect(toggles.length).toBe(5);
+    expect(toggles.length).toBe(8);
     toggles.forEach((btn) => {
       expect(btn.getAttribute("aria-haspopup")).toBe("true");
     });
     const subsubmenus = container.querySelectorAll("li.ch-subdropdown > ul.ch-subsubmenu");
-    expect(subsubmenus.length).toBe(5);
+    expect(subsubmenus.length).toBe(8);
     subsubmenus.forEach((ul) => {
       expect(ul.querySelectorAll("li").length).toBeGreaterThan(0);
     });

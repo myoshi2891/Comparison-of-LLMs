@@ -43,7 +43,9 @@ export const PageEntrySchema = z
     /** ナビ 2 段目の表示ラベル。2 段ネストするグループ（= Providers）でのみ必須。 */
     category: z.string().min(1).optional(),
     /** プロバイダー系ページのみ。識別子であり表示ラベルではない（表示は category）。 */
-    provider: z.enum(["claude", "google", "codex", "copilot", "moonshot"]).optional(),
+    provider: z
+      .enum(["claude", "google", "codex", "copilot", "moonshot", "deepseek", "xai", "zhipu"])
+      .optional(),
     /** 横断検索・関連リンク (F-5 / F-7) 用のトピックタグ */
     topics: z.array(z.string()),
     /** 一覧・What's New に出す 1〜2 文の要約 */
@@ -301,15 +303,15 @@ const entries: PageEntry[] = [
   },
   {
     slug: "/codex/agent",
-    title: "Agent",
+    title: "OpenAI Codex サブエージェント開発ガイド",
     group: "Providers",
     category: "Codex",
     provider: "codex",
-    topics: ["agent"],
+    topics: ["agent", "codex", "multiagent"],
     summary:
-      "OpenAI Codex CLI (v0.142.4, 2026-06-29 最新版) および Agents SDK を使ったサブエージェント / マルチエージェント開発で必要な AGENTS.md・AGENTS.override.md・SKILL.md・config.toml の役割と書き方を体系化したガイド。初学者向け 7 ステップ入門から PM 駆動 SDD パターンまで網羅。GPT-5.5 / GPT-5-Codex 対応、Codex Remote GA。",
+      "AGENTS.md・AGENTS.override.md・SKILL.md・config.toml・requirements.toml で構築するマルチエージェントワークフローの完全ガイド。",
     addedAt: "2026-04-26",
-    lastReviewed: "2026-07-01",
+    lastReviewed: "2026-07-30",
   },
   {
     slug: "/codex/harness-engineering",
@@ -839,6 +841,80 @@ const entries: PageEntry[] = [
       "Moonshot AI が開発する Kimi K1.5 / K2 / K3 の超長文文脈（Long Context）処理、思考モード（Kimi Thinking）、Function Calling、マルチモーダル等の活用方法とベストプラクティスを解説する完全ガイド。",
     addedAt: "2026-07-22",
     lastReviewed: "2026-07-22",
+  },
+  {
+    slug: "/deepseek/llm-best-practices",
+    title: "DeepSeek LLM ガイド",
+    description:
+      "DeepSeek-V3 / R1 / V4 などのモデル選定、Thinking Mode（思考モード）、Context Caching、Function Calling、Anthropic API互換連携までの初学者向け実践ベストプラクティスガイド。",
+    group: "Providers",
+    category: "DeepSeek",
+    provider: "deepseek",
+    topics: ["deepseek", "llm", "best-practices", "api", "thinking-mode"],
+    summary:
+      "DeepSeek-V3 / R1 / V4 などのモデル選定、Thinking Mode（思考モード）、Context Caching、Function Calling、Anthropic API互換連携までの初学者向け実践ベストプラクティスガイド。",
+    addedAt: "2026-07-30",
+    lastReviewed: "2026-07-30",
+  },
+  {
+    slug: "/xai/grok-best-practices",
+    title: "xAI Grok ガイド",
+    description:
+      "xAI API（Grok モデル群）をこれから使い始めるエンジニア・QAエンジニア向けに、モデル選定からセキュリティ運用まで、ステップバイステップで解説します。",
+    group: "Providers",
+    category: "xAI",
+    provider: "xai",
+    topics: ["xai", "grok", "best-practices", "api", "reasoning"],
+    summary:
+      "xAI API（Grok モデル群）をこれから使い始めるエンジニア・QAエンジニア向けに、モデル選定からセキュリティ運用まで、ステップバイステップで解説します。",
+    addedAt: "2026-07-30",
+    lastReviewed: "2026-07-30",
+  },
+  {
+    slug: "/xai/grok-best-practices-intermediate",
+    title: "xAI Grok API 実践ベストプラクティスガイド",
+    description:
+      "モデル選定からエージェント型ツール、マルチエージェントリサーチ、Prompt Caching、コスト最適化まで。中級〜上級エンジニアが本番導入する際に押さえるべきポイントをステップバイステップで解説します。",
+    group: "Providers",
+    category: "xAI",
+    provider: "xai",
+    topics: [
+      "xai",
+      "grok",
+      "best-practices",
+      "api",
+      "reasoning",
+      "structured-outputs",
+      "function-calling",
+      "multi-agent",
+      "prompt-caching",
+    ],
+    summary:
+      "モデル選定からエージェント型ツール、マルチエージェントリサーチ、Prompt Caching、コスト最適化まで、xAI Grok APIの本番導入・実践ベストプラクティスガイド。",
+    addedAt: "2026-07-30",
+    lastReviewed: "2026-07-30",
+  },
+  {
+    slug: "/zhipu/zai-glm-best-practices",
+    title: "Z.ai (GLM) ベストプラクティス",
+    description:
+      "Z.ai(GLM) LLMの初学者向け実践ベストプラクティスガイド。モデル選定、API仕様、Deep Thinking、Structured Output、Context Caching、GLM Coding Planまで徹底解説。",
+    group: "Providers",
+    category: "Zhipu(GLM)",
+    provider: "zhipu",
+    topics: [
+      "zhipu",
+      "glm",
+      "llm",
+      "best-practices",
+      "deep-thinking",
+      "structured-outputs",
+      "context-caching",
+    ],
+    summary:
+      "Z.ai(GLM) LLMの初学者向け実践ベストプラクティスガイド。モデル選定、API仕様、Deep Thinking、Structured Output、Context Caching、GLM Coding Planまで徹底解説。",
+    addedAt: "2026-07-30",
+    lastReviewed: "2026-07-30",
   },
 ];
 

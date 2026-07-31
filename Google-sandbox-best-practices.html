@@ -1,0 +1,1837 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      Google サンドボックス技術 完全ガイド ― AIエージェント・API・コンテナ・C/C++・ブラウザ
+    </title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@11.16.0/dist/mermaid.min.js"></script>
+    <style>
+      :root {
+        --bg: #07111e;
+        --bg-elevated: #0c1830;
+        --bg-card: #0f1b30;
+        --bg-card-hover: #132242;
+        --border: #1e2f4d;
+        --border-soft: #182742;
+        --text: #e8edf7;
+        --text-dim: #9fb0cc;
+        --text-faint: #6b7d9c;
+        --accent: #7c9eff;
+        --accent-glow: rgba(124, 158, 255, 0.18);
+        --accent-2: #69e2c4;
+        --accent-3: #f2b84b;
+
+        /* Per-domain accent palette */
+        --c-agent: #7c9eff;
+        --c-api: #5eead4;
+        --c-container: #f2b84b;
+        --c-cpp: #fb7185;
+        --c-browser: #c4b5fd;
+
+        --code-bg: #0a1526;
+        --sidebar-w: 300px;
+        --radius: 14px;
+        --font-jp:
+          'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'Hiragino Kaku Gothic ProN',
+          'Yu Gothic', sans-serif;
+        --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+        overflow-x: hidden;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--font-jp);
+        font-size: 16px;
+        line-height: 1.9;
+        -webkit-font-smoothing: antialiased;
+        overflow-x: hidden;
+      }
+      a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+      hr {
+        border: none;
+        border-top: 1px solid var(--border-soft);
+        margin: 2.5rem 0;
+      }
+
+      /* ---------- Decorative background ---------- */
+      .bg-glow {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+        background:
+          radial-gradient(760px 480px at 14% -6%, rgba(124, 158, 255, 0.16), transparent 60%),
+          radial-gradient(620px 420px at 92% 8%, rgba(105, 226, 196, 0.1), transparent 60%),
+          radial-gradient(900px 600px at 60% 110%, rgba(242, 184, 75, 0.06), transparent 60%);
+      }
+      .top-accent-bar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        z-index: 100;
+        background: linear-gradient(
+          90deg,
+          var(--c-agent),
+          var(--c-api),
+          var(--c-container),
+          var(--c-cpp),
+          var(--c-browser)
+        );
+      }
+
+      /* ---------- Layout ---------- */
+      .layout {
+        display: block;
+        position: relative;
+        z-index: 1;
+      }
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: var(--sidebar-w);
+        height: 100vh;
+        overflow-y: auto;
+        background: var(--bg-elevated);
+        border-right: 1px solid var(--border-soft);
+        box-shadow: 8px 0 32px rgba(0, 0, 0, 0.35);
+        padding: 1.75rem 1.25rem 3rem;
+        z-index: 50;
+      }
+      .sidebar::-webkit-scrollbar {
+        width: 6px;
+      }
+      .sidebar::-webkit-scrollbar-thumb {
+        background: var(--border);
+        border-radius: 3px;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1.25rem;
+        border-bottom: 1px solid var(--border-soft);
+      }
+      .brand-badge {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, var(--accent), #4f6fd1);
+        box-shadow: 0 4px 14px var(--accent-glow);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 900;
+        color: #04101f;
+        font-size: 1rem;
+        flex-shrink: 0;
+      }
+      .brand-text {
+        font-size: 0.82rem;
+        color: var(--text-dim);
+        line-height: 1.4;
+      }
+      .brand-text strong {
+        display: block;
+        color: var(--text);
+        font-size: 0.95rem;
+      }
+
+      .nav-group-label {
+        font-size: 0.72rem;
+        letter-spacing: 0.08em;
+        color: var(--text-faint);
+        text-transform: uppercase;
+        margin: 1.4rem 0 0.5rem;
+        padding: 0 0.5rem;
+      }
+      .nav-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+      .nav-list li {
+        margin: 1px 0;
+      }
+      .nav-list a {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        padding: 0.5rem 0.7rem;
+        border-radius: 9px;
+        color: var(--text-dim);
+        font-size: 0.88rem;
+        border-left: 2px solid transparent;
+        transition:
+          background 0.15s,
+          color 0.15s,
+          border-color 0.15s;
+      }
+      .nav-list a:hover {
+        background: var(--bg-card);
+        color: var(--text);
+        text-decoration: none;
+      }
+      .nav-list a.active {
+        background: var(--accent-glow);
+        color: var(--accent);
+        border-left-color: var(--accent);
+        font-weight: 500;
+      }
+      .nav-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        flex-shrink: 0;
+        background: var(--dot, var(--text-faint));
+        box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.03);
+      }
+      .sidebar-toggle {
+        display: none;
+        position: fixed;
+        top: 0.85rem;
+        left: 1rem;
+        z-index: 60;
+        width: 42px;
+        height: 42px;
+        border-radius: 10px;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        color: var(--text);
+        font-size: 1.1rem;
+        cursor: pointer;
+      }
+
+      .main {
+        margin-left: var(--sidebar-w);
+        padding: 3.5rem 4vw 6rem;
+        position: relative;
+      }
+
+      /* ---------- Typography ---------- */
+      h1 {
+        font-size: 2.3rem;
+        font-weight: 900;
+        line-height: 1.35;
+        margin: 0 0 0.5rem;
+        background: linear-gradient(
+          90deg,
+          var(--text) 10%,
+          var(--accent) 65%,
+          var(--accent-2) 100%
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+      @media (forced-colors: active) {
+        h1 {
+          background: none;
+          -webkit-background-clip: border-box;
+          background-clip: border-box;
+          -webkit-text-fill-color: CanvasText;
+          color: CanvasText;
+        }
+      }
+      .lede {
+        font-size: 1.1rem;
+        color: var(--text-dim);
+        max-width: 80ch;
+        margin: 0 0 1.5rem;
+      }
+      h2 {
+        font-size: 1.55rem;
+        font-weight: 700;
+        color: var(--text);
+        margin: 3.2rem 0 1.1rem;
+        padding-top: 1.6rem;
+        border-top: 1px solid var(--border-soft);
+        scroll-margin-top: 2rem;
+        display: flex;
+        align-items: center;
+        gap: 0.7rem;
+      }
+      .layout h2:first-of-type {
+        border-top: none;
+        padding-top: 0;
+      }
+      h2.domain-h2 {
+        border-top: 2px solid var(--domain, var(--border-soft));
+        position: relative;
+      }
+      .domain-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 2.6rem;
+        height: 2rem;
+        padding: 0 0.55rem;
+        border-radius: 8px;
+        background: color-mix(in srgb, var(--domain) 18%, var(--bg-card));
+        color: var(--domain);
+        border: 1px solid color-mix(in srgb, var(--domain) 45%, var(--border-soft));
+        font-size: 0.78rem;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        font-family: var(--font-mono);
+        flex-shrink: 0;
+      }
+      h3 {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--accent);
+        margin: 2.2rem 0 0.9rem;
+        scroll-margin-top: 2rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      h3.domain-h3 {
+        color: var(--domain, var(--accent));
+      }
+      h3.domain-h3::before {
+        content: '';
+        width: 7px;
+        height: 7px;
+        border-radius: 2px;
+        background: var(--domain, var(--accent));
+        display: inline-block;
+        transform: rotate(45deg);
+        flex-shrink: 0;
+      }
+      p {
+        margin: 0 0 1.1rem;
+        color: var(--text);
+      }
+      ul,
+      ol {
+        margin: 0 0 1.2rem;
+        padding-left: 1.5rem;
+      }
+      li {
+        margin-bottom: 0.55rem;
+        color: var(--text);
+      }
+      li strong {
+        color: var(--text);
+      }
+      strong {
+        color: #fff;
+        font-weight: 700;
+      }
+      blockquote {
+        position: relative;
+        margin: 1.5rem 0;
+        padding: 1.1rem 1.4rem 1.1rem 3rem;
+        background: var(--bg-card);
+        border: 1px solid var(--border-soft);
+        border-left: 3px solid var(--accent);
+        border-radius: 0 10px 10px 0;
+        color: var(--text-dim);
+      }
+      blockquote::before {
+        content: 'i';
+        position: absolute;
+        left: 1rem;
+        top: 1.15rem;
+        width: 1.3rem;
+        height: 1.3rem;
+        border-radius: 50%;
+        background: var(--accent-glow);
+        color: var(--accent);
+        font-family: var(--font-mono);
+        font-weight: 700;
+        font-size: 0.8rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-style: normal;
+      }
+      blockquote p {
+        margin: 0;
+      }
+      code {
+        font-family: var(--font-mono);
+        background: var(--code-bg);
+        border: 1px solid var(--border-soft);
+        padding: 0.15em 0.4em;
+        border-radius: 5px;
+        font-size: 0.86em;
+        color: var(--accent-2);
+        overflow-wrap: break-word;
+        word-break: break-word;
+      }
+
+      /* ---------- Quick-nav domain grid (replaces plain TOC) ---------- */
+      .quicknav-label {
+        font-size: 0.78rem;
+        letter-spacing: 0.1em;
+        color: var(--text-faint);
+        text-transform: uppercase;
+        margin: 2.4rem 0 0.9rem;
+        font-weight: 700;
+      }
+      .quicknav-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+      }
+      .quicknav-card {
+        display: block;
+        min-width: 0;
+        background: var(--bg-card);
+        border: 1px solid var(--border-soft);
+        border-radius: var(--radius);
+        padding: 1.2rem 1.3rem;
+        text-decoration: none;
+        color: var(--text);
+        position: relative;
+        overflow: hidden;
+        transition:
+          transform 0.18s ease,
+          box-shadow 0.18s ease,
+          border-color 0.18s ease;
+      }
+      .quicknav-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: var(--domain);
+      }
+      .quicknav-card:hover {
+        text-decoration: none;
+        transform: translateY(-3px);
+        border-color: color-mix(in srgb, var(--domain) 50%, var(--border-soft));
+        box-shadow: 0 14px 30px rgba(0, 0, 0, 0.35);
+      }
+      .quicknav-head {
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+        margin-bottom: 0.55rem;
+      }
+      .quicknav-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 2.4rem;
+        height: 1.85rem;
+        padding: 0 0.5rem;
+        border-radius: 7px;
+        background: color-mix(in srgb, var(--domain) 18%, var(--bg-card));
+        color: var(--domain);
+        border: 1px solid color-mix(in srgb, var(--domain) 45%, var(--border-soft));
+        font-family: var(--font-mono);
+        font-weight: 700;
+        font-size: 0.74rem;
+        flex-shrink: 0;
+      }
+      .quicknav-title {
+        font-weight: 700;
+        font-size: 1.02rem;
+        color: var(--text);
+      }
+      .quicknav-desc {
+        font-size: 0.86rem;
+        color: var(--text-dim);
+        line-height: 1.65;
+        margin: 0;
+      }
+      .quicknav-card.span-full {
+        grid-column: 1 / -1;
+      }
+
+      /* ---------- Mermaid ---------- */
+      pre.mermaid {
+        width: 100%;
+        display: flex;
+        justify-content: safe center;
+        overflow-x: auto;
+        background: var(--bg-card);
+        border: 1px solid var(--border-soft);
+        border-radius: var(--radius);
+        padding: 1.8rem 1.4rem;
+        margin: 1.8rem 0;
+        box-shadow:
+          inset 0 1px 0 rgba(255, 255, 255, 0.02),
+          0 10px 24px rgba(0, 0, 0, 0.22);
+      }
+      pre.mermaid svg {
+        max-width: none;
+      }
+
+      /* ---------- Tables ---------- */
+      .table-scroll {
+        overflow-x: auto;
+        margin: 1.6rem 0;
+        border: 1px solid var(--border-soft);
+        border-radius: var(--radius);
+        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.22);
+      }
+      table {
+        width: 100%;
+        min-width: 600px;
+        border-collapse: collapse;
+        font-size: 0.92rem;
+      }
+      th,
+      td {
+        padding: 0.85rem 1rem;
+        text-align: left;
+        border-bottom: 1px solid var(--border-soft);
+        overflow-wrap: break-word;
+        vertical-align: top;
+      }
+      th {
+        background: linear-gradient(180deg, var(--bg-card-hover), var(--bg-elevated));
+        color: var(--accent);
+        font-weight: 700;
+        white-space: nowrap;
+      }
+      tr:last-child td {
+        border-bottom: none;
+      }
+      tbody tr {
+        transition: background 0.12s;
+      }
+      tbody tr:hover {
+        background: var(--bg-card-hover);
+      }
+
+      /* ---------- Reference card grid ---------- */
+      .ref-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1.1rem;
+        margin: 1.6rem 0 2rem;
+      }
+      .ref-card {
+        min-width: 0;
+        background: var(--bg-card);
+        border: 1px solid var(--border-soft);
+        border-radius: var(--radius);
+        padding: 1.3rem 1.4rem;
+        transition:
+          border-color 0.18s ease,
+          box-shadow 0.18s ease,
+          transform 0.18s ease;
+      }
+      .ref-card:hover {
+        border-color: color-mix(in srgb, var(--accent) 40%, var(--border-soft));
+        box-shadow: 0 14px 30px rgba(0, 0, 0, 0.3);
+        transform: translateY(-2px);
+      }
+      .ref-card h3 {
+        margin: 0 0 0.8rem;
+        font-size: 1.02rem;
+      }
+      .ref-card ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+      .ref-card li {
+        margin: 0;
+        border-top: 1px solid var(--border-soft);
+      }
+      .ref-card li:first-child {
+        border-top: none;
+      }
+      .ref-card li a {
+        display: flex;
+        gap: 0.55rem;
+        align-items: baseline;
+        padding: 0.62rem 0;
+        color: var(--text-dim);
+        font-size: 0.86rem;
+        line-height: 1.55;
+        overflow-wrap: break-word;
+        word-break: break-all;
+        min-width: 0;
+      }
+      .ref-card li a:hover {
+        color: var(--accent);
+        text-decoration: none;
+      }
+      .ref-icon {
+        color: var(--accent);
+        flex-shrink: 0;
+        font-size: 0.8rem;
+      }
+
+      /* ---------- Anchors ---------- */
+      a[id^='section-'] {
+        display: block;
+        position: relative;
+        top: -1rem;
+        visibility: hidden;
+      }
+
+      /* ---------- Footer note ---------- */
+      .main > blockquote:last-of-type {
+        margin-top: 3rem;
+      }
+
+      /* ---------- Mobile ---------- */
+      @media (max-width: 900px) {
+        .sidebar-toggle {
+          display: block;
+        }
+        .sidebar {
+          transform: translateX(-100%);
+          transition: transform 0.25s ease;
+          box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
+        }
+        .sidebar.open {
+          transform: translateX(0);
+        }
+        .main {
+          margin-left: 0;
+          padding: 5rem 5vw 4rem;
+        }
+        .ref-grid,
+        .quicknav-grid {
+          grid-template-columns: minmax(0, 1fr);
+        }
+        h1 {
+          font-size: 1.7rem;
+        }
+        h2 {
+          flex-wrap: wrap;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="bg-glow"></div>
+    <div class="top-accent-bar"></div>
+    <button class="sidebar-toggle" id="sidebarToggle" type="button" aria-controls="sidebar" aria-label="目次を開く" aria-expanded="false">☰</button>
+
+    <div class="layout">
+      <nav class="sidebar" id="sidebar">
+        <div class="brand">
+          <div class="brand-badge">GS</div>
+          <div class="brand-text"><strong>Google Sandbox</strong>完全ガイド</div>
+        </div>
+        <div class="nav-group-label">目次</div>
+        <ul class="nav-list">
+          <li>
+            <a href="#section-1" data-nav><span class="nav-dot"></span>1. はじめに</a>
+          </li>
+          <li>
+            <a href="#section-2" data-nav><span class="nav-dot"></span>2. 全体マップ</a>
+          </li>
+          <li>
+            <a href="#section-3" data-nav
+              ><span class="nav-dot" style="--dot: var(--c-agent)"></span>3. ① AIエージェント</a
+            >
+          </li>
+          <li>
+            <a href="#section-4" data-nav
+              ><span class="nav-dot" style="--dot: var(--c-api)"></span>4. ② API</a
+            >
+          </li>
+          <li>
+            <a href="#section-5" data-nav
+              ><span class="nav-dot" style="--dot: var(--c-container)"></span>5. ③ コンテナ</a
+            >
+          </li>
+          <li>
+            <a href="#section-6" data-nav
+              ><span class="nav-dot" style="--dot: var(--c-cpp)"></span>6. ④ C/C++</a
+            >
+          </li>
+          <li>
+            <a href="#section-7" data-nav
+              ><span class="nav-dot" style="--dot: var(--c-browser)"></span>7. ⑤ ブラウザ</a
+            >
+          </li>
+          <li>
+            <a href="#section-8" data-nav><span class="nav-dot"></span>8. 意思決定フロー</a>
+          </li>
+          <li>
+            <a href="#section-9" data-nav><span class="nav-dot"></span>9. 横断ベストプラクティス</a>
+          </li>
+          <li>
+            <a href="#section-10" data-nav><span class="nav-dot"></span>10. 参考文献・出典URL</a>
+          </li>
+        </ul>
+      </nav>
+
+      <main class="main">
+        <h1>Google サンドボックス技術 完全ガイド</h1>
+        <p class="lede">
+          AIエージェント・API・コンテナ・C/C++・ブラウザ、5領域のベストプラクティスをステップバイステップで理解する
+        </p>
+        <blockquote>
+          <p>
+            対象読者:サンドボックス技術の初学者〜中級エンジニア<br />情報基準日:2026年7月27日時点(以降の変更は各社公式ドキュメントで要確認)
+          </p>
+        </blockquote>
+
+        <div class="quicknav-label">5つの領域をひと目で</div>
+        <div class="quicknav-grid">
+          <a class="quicknav-card" href="#section-3" style="--domain: var(--c-agent)">
+            <div class="quicknav-head">
+              <span class="quicknav-badge">AI</span
+              ><span class="quicknav-title">AIエージェント</span>
+            </div>
+            <p class="quicknav-desc">
+              GKE Agent Sandbox(gVisor)とGemini Code Executionで、生成されたコードを隔離実行
+            </p>
+          </a>
+          <a class="quicknav-card" href="#section-4" style="--domain: var(--c-api)">
+            <div class="quicknav-head">
+              <span class="quicknav-badge">API</span><span class="quicknav-title">API</span>
+            </div>
+            <p class="quicknav-desc">Apigeeの環境分離とセキュリティポリシーでAPIレイヤーを保護</p>
+          </a>
+          <a class="quicknav-card" href="#section-5" style="--domain: var(--c-container)">
+            <div class="quicknav-head">
+              <span class="quicknav-badge">CT</span><span class="quicknav-title">コンテナ</span>
+            </div>
+            <p class="quicknav-desc">
+              gVisorのカーネルレベル分離でGKE・Cloud Run・App Engineを保護
+            </p>
+          </a>
+          <a class="quicknav-card" href="#section-6" style="--domain: var(--c-cpp)">
+            <div class="quicknav-head">
+              <span class="quicknav-badge">C+</span><span class="quicknav-title">C/C++</span>
+            </div>
+            <p class="quicknav-desc">Sandbox2とSandboxed API(SAPI)でネイティブライブラリを隔離</p>
+          </a>
+          <a class="quicknav-card span-full" href="#section-7" style="--domain: var(--c-browser)">
+            <div class="quicknav-head">
+              <span class="quicknav-badge">WEB</span><span class="quicknav-title">ブラウザ</span>
+            </div>
+            <p class="quicknav-desc">
+              マルチプロセス構造・Site Isolation・V8 Sandboxによる多層防御
+            </p>
+          </a>
+        </div>
+
+        <hr />
+
+        <hr />
+        <p><a id="section-1"></a></p>
+        <h2 id="1-はじめになぜサンドボックスが必要なのか">
+          1. はじめに:なぜ「サンドボックス」が必要なのか
+        </h2>
+        <p>
+          「サンドボックス(sandbox)」とは、信頼できないコードやデータを、ホストシステム(OS本体・他のプロセス・他の顧客のデータなど)から隔離された領域の中だけで実行させるための仕組みです。子どもが砂場の外に砂をこぼさないのと同じように、「万が一そのコードが悪意を持っていたり、バグを含んでいたりしても、被害が砂場の外に漏れない」ことを保証するのが目的です。
+        </p>
+        <p>Googleがサンドボックスを重視する背景には、次の3つの共通した脅威があります。</p>
+        <ul>
+          <li>
+            <strong>信頼できない入力の実行</strong
+            >:AIエージェントが生成したコード、ユーザーがアップロードしたファイル、サードパーティのライブラリなど、開発者自身がレビューしきれないコードを動かす機会が増え続けている
+          </li>
+          <li>
+            <strong>マルチテナンシー</strong
+            >:クラウド上では複数の顧客・複数のワークロードが同じ物理ハードウェアを共有するため、1つのワークロードの侵害が他のワークロードに波及してはならない
+          </li>
+          <li>
+            <strong>メモリ安全性が保証できない領域の存在</strong
+            >:C/C++やJavaScriptエンジンのように、言語仕様上メモリ安全性を完全には保証できない領域が、今なお本番システムの中核に存在する
+          </li>
+        </ul>
+        <p>
+          Googleはこの課題に対して、単一の万能な解決策ではなく、<strong>隔離したい対象のレイヤーごとに専用のサンドボックス技術を使い分ける</strong>という設計思想を取っています。本ガイドでは、その中でも特に問い合わせの多い次の5領域を、ステップバイステップのベストプラクティスとして整理します。
+        </p>
+        <hr />
+        <p><a id="section-2"></a></p>
+        <h2 id="2-全体マップgoogleの5つのサンドボックス領域">
+          2. 全体マップ:Googleの5つのサンドボックス領域
+        </h2>
+        <pre class="mermaid">
+flowchart TB
+    A["Google のサンドボックス戦略&lt;br/&gt;(隔離レイヤーごとの使い分け)"]
+    A --&gt; B["① AIエージェント"]
+    A --&gt; C["② API"]
+    A --&gt; D["③ コンテナ"]
+    A --&gt; E["④ C / C++"]
+    A --&gt; F["⑤ ブラウザ"]
+
+    B --&gt; B1["GKE Agent Sandbox (gVisor)"]
+    B --&gt; B2["Gemini Code Execution"]
+
+    C --&gt; C1["Apigee サンドボックス環境"]
+    C --&gt; C2["Cloud Armor / WAAP"]
+
+    D --&gt; D1["GKE Sandbox (gVisor)"]
+    D --&gt; D2["Cloud Run / App Engine / Functions"]
+
+    E --&gt; E1["Sandbox2"]
+    E --&gt; E2["Sandboxed API (SAPI)"]
+
+    F --&gt; F1["マルチプロセス + Site Isolation"]
+    F --&gt; F2["V8 Sandbox"]</pre
+        >
+        <p>
+          この図からもわかるとおり、5つの領域の多くが「gVisor」という同一のオープンソース技術を土台にしていることが特徴です。gVisorはGoogle社内で長年本番ワークロードの隔離に使われてきた実績をもとにオープンソース化された、ユーザー空間でLinuxカーネルAPIを再実装する「アプリケーションカーネル」です。まずこの共通基盤を理解しておくと、以降の各領域の理解が格段に速くなります。
+        </p>
+        <hr />
+        <p><a id="section-3"></a></p>
+        <h2
+          class="domain-h2"
+          id="3-領域①-aiエージェントのサンドボックス"
+          style="--domain: var(--c-agent)"
+        >
+          <span class="domain-badge">AI</span>3. 領域① AIエージェントのサンドボックス
+        </h2>
+        <h3
+          class="domain-h3"
+          id="3-1-なぜaiエージェント専用の隔離が必要か"
+          style="--domain: var(--c-agent)"
+        >
+          3-1. なぜAIエージェント専用の隔離が必要か
+        </h3>
+        <p>
+          AIエージェントは、LLMが生成した非決定的なコードをその場で実行したり、外部ツールを自律的に呼び出したりします。これは「常に信頼できない入力を、常に本番同然の権限で実行し続ける」ことに等しく、通常のアプリケーションよりもはるかに広い攻撃対象領域を生み出します。GoogleはこれをGKE(Google
+          Kubernetes Engine)向けの<strong>Agent Sandbox</strong>と、Gemini APIやAgent
+          Platform向けの<strong>Code Execution</strong>という2つの製品ラインで解決しています。
+        </p>
+        <h3
+          class="domain-h3"
+          id="3-2-gke-agent-sandboxアーキテクチャ"
+          style="--domain: var(--c-agent)"
+        >
+          3-2. GKE Agent Sandbox:アーキテクチャ
+        </h3>
+        <p>
+          GKE Agent Sandboxは、Kubernetes SIG
+          Apps配下でオープンソース開発されているKubernetesネイティブな拡張機能です。gVisorによるカーネルレベルの隔離を、<code>Sandbox</code>・<code>SandboxTemplate</code>・<code>SandboxClaim</code>という3つの新しいKubernetesカスタムリソースを通じて提供します。
+        </p>
+        <p>gVisorの内部は「Sentry」と「Gofer」という2つのコンポーネントで構成されます。</p>
+        <pre class="mermaid">
+flowchart LR
+    App["エージェントが生成した&lt;br/&gt;コード / プロセス"] --&gt; Sentry["gVisor Sentry&lt;br/&gt;(ユーザー空間の疑似カーネル)"]
+    Sentry --&gt; Gofer["gVisor Gofer&lt;br/&gt;(ファイルI/Oプロキシ)"]
+    Gofer --&gt; Kernel["ホストのLinuxカーネル"]
+    Sentry -.-&gt;|直接到達は不可| Kernel</pre
+        >
+        <p>
+          Sentryはエージェントが発行するすべてのシステムコール(<code>exec</code>や<code>socket</code>など)を横取りし、ホストカーネルに直接触れさせない「偽のカーネル」として振る舞います。ファイルシステム操作だけは別プロセスのGoferが仲介するため、たとえSentryに未知の脆弱性があっても、ファイルシステムへの被害範囲を最小化できます。
+        </p>
+        <h3
+          class="domain-h3"
+          id="3-3-ステップバイステップ導入のベストプラクティス"
+          style="--domain: var(--c-agent)"
+        >
+          3-3. ステップバイステップ:導入のベストプラクティス
+        </h3>
+        <ol type="1">
+          <li>
+            <strong>隔離(ISOLATE)</strong
+            >:非決定的なエージェントのコード・ツール実行・ユーザー入力処理はすべてGKE Agent
+            Sandbox(gVisor)上で実行し、RCE(リモートコード実行)攻撃をサンドボックス内に封じ込める
+          </li>
+          <li>
+            <strong>高速化(ACCELERATE)</strong
+            >:サンドボックスの起動レイテンシを隠すため、事前にプロビジョニングされた「ウォームプール」を用意する。さらにコスト削減のため、アイドル状態のエージェントは「コールドプール(サスペンド状態のVM)」に退避させ、Pod
+            Snapshotsで低コストに復元する
+          </li>
+          <li>
+            <strong>権限の制限(RESTRICT・ID)</strong>:Workload Identity
+            Federationを使い、エージェントごとに使い捨ての最小権限IAMアイデンティティを付与する
+          </li>
+          <li>
+            <strong>通信の制限(RESTRICT・Network)</strong>:デフォルト拒否(default-deny)のKubernetes
+            NetworkPolicyを設定し、エージェントが必要とするDNS・メタデータ・APIエンドポイントだけを明示的に許可リスト化する
+          </li>
+          <li>
+            <strong>多層防御を過信しない</strong>:gVisor・Workload Identity・VPC Service
+            Controlsをすべて設定しても、それらは「許可されたチャネルの中で行われる正規の操作」しか防げない。プロンプトインジェクションによって、許可済みのAPI呼び出し経由でデータが持ち出されるリスクは別途モニタリングで検知する必要がある、と複数のセキュリティ研究者が指摘している
+          </li>
+        </ol>
+        <h3
+          class="domain-h3"
+          id="3-4-gemini-api--agent-platform-の-code-execution"
+          style="--domain: var(--c-agent)"
+        >
+          3-4. Gemini API / Agent Platform の Code Execution
+        </h3>
+        <p>
+          GKE以外にも、Gemini APIおよびGemini Enterprise Agent Platformが提供する<strong
+            >Code Execution</strong
+          >ツールを使えば、GKEにデプロイしなくてもマネージドなサンドボックスでPythonコードを実行できます。特徴は次のとおりです。
+        </p>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr class="header">
+                <th>特徴</th>
+                <th>内容</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="odd">
+                <td>起動速度</td>
+                <td>1秒未満でサンドボックスを作成・実行可能</td>
+              </tr>
+              <tr class="even">
+                <td>ファイル入出力</td>
+                <td>リクエスト/レスポンス全体で最大100MBまで対応</td>
+              </tr>
+              <tr class="odd">
+                <td>状態保持</td>
+                <td>実行状態(メモリ)を最大14日間保持(TTLで調整可能)</td>
+              </tr>
+              <tr class="even">
+                <td>デフォルトのネットワーク</td>
+                <td>無効(明示的な許可リストを設定しない限りアウトバウンド通信不可)</td>
+              </tr>
+              <tr class="odd">
+                <td>対応フレームワーク</td>
+                <td>
+                  特定のフレームワークに依存せず、任意のエージェント実装・任意のモデルから利用可能
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          Agent Development
+          Kit(ADK)の公式安全設計ドキュメントでも、「コード実行は特にセキュリティ上の影響が大きい特殊なツールであり、モデルが生成したコードがローカル環境を侵害しないよう、必ずサンドボックス化しなければならない」と明記されています。あわせてModel
+          ArmorプラグインやPII
+          redactionプラグインといった、入出力を検査する追加のガードレールも推奨されています。
+        </p>
+        <hr />
+        <p><a id="section-4"></a></p>
+        <h2 class="domain-h2" id="4-領域②-apiのサンドボックス" style="--domain: var(--c-api)">
+          <span class="domain-badge">API</span>4. 領域② APIのサンドボックス
+        </h2>
+        <h3
+          class="domain-h3"
+          id="4-1-apigeeにおけるサンドボックス環境の考え方"
+          style="--domain: var(--c-api)"
+        >
+          4-1. Apigeeにおける「サンドボックス環境」の考え方
+        </h3>
+        <p>
+          API領域での「サンドボックス」は、これまでの実行時隔離とは意味合いが少し異なります。Apigee(Googleのネイティブなフルライフサイクル
+          API管理製品)における「環境(environment)」は、<strong>APIプロキシを実行するための隔離されたコンテキスト</strong>を指し、公式ドキュメントでも「サンドボックス」と表現されています。1つの組織の中に複数の環境(開発用・テスト用・本番用など)を作成し、プロキシのデプロイ先を環境ごとに分離するのが基本設計です。
+        </p>
+        <pre class="mermaid">
+flowchart LR
+    Client["クライアント"] --&gt; GFE["Google Front End&lt;br/&gt;(TLS終端)"]
+    GFE --&gt; Proxy["Apigee APIプロキシ&lt;br/&gt;(環境=サンドボックス)"]
+    Proxy --&gt; Policy1["トラフィック管理&lt;br/&gt;ポリシー"]
+    Proxy --&gt; Policy2["メッセージレベル&lt;br/&gt;保護ポリシー"]
+    Proxy --&gt; Policy3["セキュリティポリシー&lt;br/&gt;(RBAC / OAuth等)"]
+    Proxy --&gt; Backend["バックエンドサービス"]</pre
+        >
+        <h3
+          class="domain-h3"
+          id="4-2-ステップバイステップapiサンドボックスのベストプラクティス"
+          style="--domain: var(--c-api)"
+        >
+          4-2. ステップバイステップ:APIサンドボックスのベストプラクティス
+        </h3>
+        <ol type="1">
+          <li>
+            <strong>環境を目的別に分離する</strong
+            >:hybrid構成では、1つの環境に大量のプロキシを詰め込まず、複数の環境を作り、環境ごとにデプロイするプロキシ数を絞ることが推奨されている
+          </li>
+          <li>
+            <strong>デフォルトポリシーを有効化する</strong
+            >:Apigeeが提供する3種類の既定ポリシー(トラフィック管理・メッセージレベル保護・セキュリティ)をプロキシ層にアタッチする
+          </li>
+          <li>
+            <strong>IPアドレス/地理情報によるアクセス制御にはCloud Armorを使う</strong
+            >:Apigee自体のポリシーだけでなく、Cloud Armorと組み合わせたWAAP(Web App and API
+            Protection)構成が推奨されている
+          </li>
+          <li>
+            <strong>クライアントIP解決を環境ごとにカスタマイズする</strong
+            >:プロキシ経由のリクエストでは<code>X-Forwarded-For</code>ヘッダーの保持設定が必要になるケースがあり、デフォルトのIP解決アルゴリズムが合わない場合は環境単位でカスタマイズできる
+          </li>
+          <li>
+            <strong>開発者向けサンドボックスは60日間の無償トライアルで検証する</strong
+            >:本番導入前に、Apigeeの試用サンドボックス環境でAPI設計を検証してから、本番の環境構成に反映するワークフローが一般的
+          </li>
+          <li>
+            <strong>モックとの併用(一般的なAPIサンドボックス設計のベストプラクティス)</strong
+            >:OpenAPI仕様からモックエンドポイントを自動生成できるAPI管理プラットフォームの機能を活用し、モックとAPI仕様を常に同期させ、成功シナリオだけでなくエラーシナリオも用意し、CI/CDパイプラインに組み込むことが、業界全体のAPIサンドボックス運用における共通ベストプラクティスとして紹介されている
+          </li>
+        </ol>
+        <hr />
+        <p><a id="section-5"></a></p>
+        <h2
+          class="domain-h2"
+          id="5-領域③-コンテナのサンドボックス"
+          style="--domain: var(--c-container)"
+        >
+          <span class="domain-badge">CT</span>5. 領域③ コンテナのサンドボックス
+        </h2>
+        <h3
+          class="domain-h3"
+          id="5-1-gvisorの基本アーキテクチャ再掲詳細版"
+          style="--domain: var(--c-container)"
+        >
+          5-1. gVisorの基本アーキテクチャ(再掲・詳細版)
+        </h3>
+        <p>
+          コンテナ領域におけるGoogleの主力技術は、AIエージェント領域でも登場した<strong>gVisor</strong>そのものです。通常のコンテナはホストカーネルを直接共有するため、1つのコンテナ内のカーネル脆弱性が、ノード全体・他の全コンテナに波及するリスクを抱えます。gVisorは、コンテナが発行するシステムコールをユーザー空間の「Sentry」で受け止め、seccomp-bpfによるシステムコールフィルタリングでさらに一段階の防御を重ねます。
+        </p>
+        <pre class="mermaid">
+flowchart LR
+    Container["コンテナ内アプリケーション"] --&gt; Sentry2["gVisor Sentry&lt;br/&gt;(ユーザー空間カーネル)"]
+    Sentry2 --&gt; Seccomp["seccomp-bpf&lt;br/&gt;システムコールフィルタ"]
+    Seccomp --&gt; HostKernel["ホストのLinuxカーネル"]</pre
+        >
+        <p>
+          Googleのサーバーレス製品群(App Engine、Cloud Run、Cloud
+          Functions)はいずれも、アプリケーションワークロードの隔離にgVisorを採用しています。Cloud
+          Runの場合、各インスタンスは仮想マシンモニター(VMM)によって他のインスタンスから隔離され、さらにコンテナ境界の強制とseccompによるシステムコールフィルタリングが重ねられる多層防御構成になっています。
+        </p>
+        <h3
+          class="domain-h3"
+          id="5-2-ステップバイステップgke-sandboxの有効化手順"
+          style="--domain: var(--c-container)"
+        >
+          5-2. ステップバイステップ:GKE Sandboxの有効化手順
+        </h3>
+        <ol type="1">
+          <li>
+            <strong>専用ノードプールを作成する</strong>:GKE
+            SandboxはデフォルトのノードプールにはEnableできない。Standardクラスタでは、すべてのワークロードをサンドボックス化する場合でも、GKE
+            Sandboxを有効化していないノードプールを最低1つ残す必要がある
+          </li>
+          <li>
+            <strong>イメージタイプを揃える</strong
+            >:ノードプールのイメージタイプは「Container-Optimized OS with
+            Containerd(<code>cos_containerd</code>)」のみがサポート対象
+          </li>
+          <li>
+            <strong>RuntimeClassを確認する</strong
+            >:ノードプール作成後、GKEが自動的に<code>gvisor</code>という名前のRuntimeClassを作成する。<code
+              >kubectl get runtimeclass gvisor</code
+            >で存在を確認する
+          </li>
+          <li>
+            <strong>Podスペックでサンドボックスを指定する</strong
+            >:隔離したいPodのマニフェストに<code>runtimeClassName: gvisor</code>を追加する
+          </li>
+          <li>
+            <strong>リソース上限を必ず設定する</strong>:GKE
+            Sandboxを使う場合でも、すべてのコンテナにリソース制限(CPU/メモリ)を指定し、不良コードや悪意あるアプリケーションがノードのリソースを枯渇させないようにする
+          </li>
+          <li>
+            <strong>GPU/TPUワークロードでの注意点</strong>:GKE
+            SandboxはNVIDIAドライバの脆弱性すべてを緩和するわけではないが、Linuxカーネルの脆弱性に対する保護は維持される。またGPUタイムシェアリングはGPUが完全に隔離されないため、GKE
+            Sandboxとの併用は非推奨とされている
+          </li>
+          <li>
+            <strong>ログとモニタリングを有効化する</strong
+            >:必須ではないが、gVisorのメッセージがログに残るよう、クラスタの機能設定でLogging/Monitoringを有効化することが推奨されている
+          </li>
+          <li>
+            <strong>チェックポイント/リストア機能を活用する</strong
+            >:gVisorはコンテナのチェックポイント・リストアに対応しており、ウォームアップ済みサービスのキャッシュ、他マシンでのワークロード再開、実行状態のスナップショット取得、フォレンジック用の状態保存などに活用できる
+          </li>
+        </ol>
+        <hr />
+        <p><a id="section-6"></a></p>
+        <h2 class="domain-h2" id="6-領域④-ccのサンドボックス" style="--domain: var(--c-cpp)">
+          <span class="domain-badge">C+</span>6. 領域④ C/C++のサンドボックス
+        </h2>
+        <h3
+          class="domain-h3"
+          id="6-1-sandbox2プログラム全体一部を隔離する"
+          style="--domain: var(--c-cpp)"
+        >
+          6-1. Sandbox2:プログラム全体・一部を隔離する
+        </h3>
+        <p>
+          <strong>Sandbox2</strong
+          >は、Linux向けのオープンソースC++セキュリティサンドボックスで、Google内のセキュリティチームが開発・保守しています。Linuxのnamespace、リソース制限、そしてseccomp-bpfによるシステムコールフィルタを組み合わせて、プログラム全体、あるいはプログラムの一部分だけを隔離できます。
+        </p>
+        <p>
+          seccomp-bpfは、Secure Computing
+          Mode(seccomp)を拡張したLinuxカーネルの機能です。素のseccompは<code>exit</code>・<code>sigreturn</code>・<code>read</code>・<code>write</code>の4つしか許可しませんが、seccomp-bpfはBPF(Berkeley
+          Packet
+          Filter)プログラムでシステムコールごとに柔軟な判定ロジックを書けるようにし、許可・ダミー値を返す・プロセス終了・シグナル送出・トレーサーへの通知、といった細かい制御を可能にします。
+        </p>
+        <pre class="mermaid">
+flowchart LR
+    Policy["Sandbox Policy&lt;br/&gt;(許可するsyscallを定義)"] --&gt; Executor["Executor&lt;br/&gt;(信頼済みの管理プロセス)"]
+    Executor --&gt;|ポリシーを適用して起動| Sandboxee["Sandboxee&lt;br/&gt;(隔離対象プロセス)"]
+    Sandboxee --&gt;|許可済みsyscallのみ通過| Kernel3["Linuxカーネル"]</pre
+        >
+        <h3
+          class="domain-h3"
+          id="6-2-sandboxed-apisapiライブラリ単位でサンドボックス化する"
+          style="--domain: var(--c-cpp)"
+        >
+          6-2. Sandboxed API(SAPI):ライブラリ単位でサンドボックス化する
+        </h3>
+        <p>
+          Sandbox2をそのまま使う場合、プロジェクトごとにポリシーやプロセス間のデータ交換の仕組みをゼロから設計し直す必要がありました。<strong>Sandboxed API(SAPI)</strong>はこの負担を解消するために作られたオープンソースプロジェクトで、Sandbox2を基盤にしながら「<strong>C/C++のライブラリ単位</strong>」でサンドボックス化できるようにします。開発チームのモットーは "Sandbox once, use anywhere"(一度サンドボックス化すれば、どこでも使い回せる)です。
+        </p>
+        <pre class="mermaid">
+flowchart LR
+    HostCode["ホストコード&lt;br/&gt;(信頼済みプログラム本体)"] --&gt; SapiObject["SAPI Object"]
+    SapiObject --&gt;|RPC呼び出し| RpcStub["RPC Stub"]
+    RpcStub --&gt; SandboxedLib["サンドボックス化された&lt;br/&gt;C/C++ライブラリ(Sandbox2内)"]</pre
+        >
+        <p>
+          SAPIライブラリはそれぞれ、必要最小限のシステムコール/リソースだけを許可するタイトなセキュリティポリシーを個別に持てる点が、プロジェクト全体で1つの巨大なポリシーを共有する従来型のサンドボックス設計との大きな違いです。
+        </p>
+        <h3
+          class="domain-h3"
+          id="6-3-ステップバイステップzlibをsapiでサンドボックス化する例"
+          style="--domain: var(--c-cpp)"
+        >
+          6-3. ステップバイステップ:zlibをSAPIでサンドボックス化する例
+        </h3>
+        <p>公式のGetting Startedガイドで紹介されている典型的な流れは次のとおりです。</p>
+        <ol type="1">
+          <li>
+            <strong>サンドボックス化したいライブラリの関数を洗い出す</strong
+            >:今回の例ではzlibの<code>deflate()</code>など、実際に使う関数だけを対象にする
+          </li>
+          <li>
+            <strong>アンサンドボックス版のホストコードをまず動かす</strong
+            >:最初はライブラリを直接呼び出す通常のプログラムとして実装し、動作を確認する
+          </li>
+          <li>
+            <strong><code>sapi_library</code>ビルドルールを定義する</strong
+            >:Bazel/CMakeのビルドルールでSAPIライブラリを生成する
+          </li>
+          <li>
+            <strong>SAPI ObjectとRPC Stubの自動生成を確認する</strong
+            >:ビルドプロセス中にSAPIが自動生成するため、開発者がRPCの配線を手書きする必要はない
+          </li>
+          <li>
+            <strong>ホストコードをSAPI呼び出しに置き換える</strong
+            >:<code>sapi::Sandbox</code>でサンドボックスオブジェクトを作成し、生成されたAPIクラス経由で関数を呼び出すようにホストコードを書き換える
+          </li>
+          <li>
+            <strong>必要に応じて専用のsandbox policyを書く</strong
+            >:デフォルトポリシーで足りない場合は、<code>sandbox.h</code>ヘッダーファイルに許可するシステムコール・ファイルアクセス範囲を定義し、<code>sapi_library</code>ルールに渡す
+          </li>
+          <li>
+            <strong>Transactionsモジュールで監視・自動再起動を設定する</strong
+            >:セキュリティ違反・クラッシュ・リソース枯渇でライブラリが落ちた場合に自動的に再起動する高レベルAPIも用意されている
+          </li>
+        </ol>
+        <h3 class="domain-h3" id="6-4-cc領域における他の選択肢比較" style="--domain: var(--c-cpp)">
+          6-4. C/C++領域における他の選択肢比較
+        </h3>
+        <p>
+          Google Developersの公式ページでは、用途別に複数のサンドボックス技術が一覧化されています。
+        </p>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr class="header">
+                <th>製品</th>
+                <th>概要</th>
+                <th>主な用途</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="odd">
+                <td>Sandbox2</td>
+                <td>
+                  namespace・リソース制限・seccomp-bpfを用いたLinuxサンドボックス。SAPIの基盤技術
+                </td>
+                <td>汎用サンドボックス</td>
+              </tr>
+              <tr class="even">
+                <td>gVisor</td>
+                <td>
+                  システムコールをアプリケーションカーネルとして実装。ptraceまたはハードウェア仮想化でインターセプト
+                </td>
+                <td>汎用サンドボックス</td>
+              </tr>
+              <tr class="odd">
+                <td>Bubblewrap</td>
+                <td>user namespaceのサブセットで実装。Flatpakの実行エンジンとしても利用</td>
+                <td>CLIツール</td>
+              </tr>
+              <tr class="even">
+                <td>Minijail</td>
+                <td>ChromeOS/Androidで使われるサンドボックス・封じ込めツール</td>
+                <td>CLIツール</td>
+              </tr>
+              <tr class="odd">
+                <td>NSJail</td>
+                <td>
+                  namespace・リソース制限・seccomp-bpfによるプロセス隔離。独自DSLのKafelにも対応
+                </td>
+                <td>CLIツール</td>
+              </tr>
+              <tr class="even">
+                <td>Sandboxed API (SAPI)</td>
+                <td>Sandbox2を使ったC/C++ライブラリの再利用可能なサンドボックス</td>
+                <td>C/C++コード</td>
+              </tr>
+              <tr class="odd">
+                <td>Native Client(NaCl)</td>
+                <td>
+                  <strong>非推奨</strong
+                  >。x86/LLVMバイトコードの制限されたサブセットにコンパイルして隔離。後継のWebAssembly設計に影響を与えた
+                </td>
+                <td>C/C++コード(廃止)</td>
+              </tr>
+              <tr class="even">
+                <td>WebAssembly (WASM)</td>
+                <td>移植可能なバイナリフォーマット。隔離された実行環境でモジュールを実行</td>
+                <td>C/C++コード</td>
+              </tr>
+              <tr class="odd">
+                <td>RLBox</td>
+                <td>
+                  C++17で書かれたサンドボックスAPI。NaCl・WASM・リモートプロセスなど複数の実行バックエンドを選択可能
+                </td>
+                <td>C/C++コード</td>
+              </tr>
+              <tr class="even">
+                <td>Flatpak</td>
+                <td>
+                  Bubblewrapを土台にしたLinuxデスクトップアプリ向けサンドボックス。パッケージング・配布に重点
+                </td>
+                <td>デスクトップアプリ</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <hr />
+        <p><a id="section-7"></a></p>
+        <h2
+          class="domain-h2"
+          id="7-領域⑤-ブラウザのサンドボックス"
+          style="--domain: var(--c-browser)"
+        >
+          <span class="domain-badge">WEB</span>7. 領域⑤ ブラウザのサンドボックス
+        </h2>
+        <h3
+          class="domain-h3"
+          id="7-1-chromeのマルチプロセスアーキテクチャ"
+          style="--domain: var(--c-browser)"
+        >
+          7-1. Chromeのマルチプロセスアーキテクチャ
+        </h3>
+        <p>
+          Chromeのセキュリティ設計の中核は「サンドボックス化されたマルチプロセスアーキテクチャ」です。DOMのレンダリング・スクリプト実行・メディアデコードなど、Web由来の攻撃対象領域の大部分は、権限を持たない「レンダラープロセス」に閉じ込められます。唯一「ブラウザプロセス」だけが、ファイルシステムやネットワークに直接アクセスできる無サンドボックスの特権プロセスとして動作します。
+        </p>
+        <pre class="mermaid">
+flowchart TB
+    Browser["ブラウザプロセス&lt;br/&gt;(無サンドボックス・特権)"]
+    Browser --&gt; RendererA["レンダラープロセスA&lt;br/&gt;(サイトA専用・サンドボックス化)"]
+    Browser --&gt; RendererB["レンダラープロセスB&lt;br/&gt;(サイトB専用・サンドボックス化)"]
+    Browser --&gt; GPU["GPUプロセス&lt;br/&gt;(サンドボックス化)"]
+    Browser --&gt; Network["ネットワークプロセス"]
+    RendererA -.-&gt;|IPC経由のみ| Browser
+    RendererB -.-&gt;|IPC経由のみ| Browser</pre
+        >
+        <h3
+          class="domain-h3"
+          id="7-2-site-isolationサイトをまたいだデータ漏洩を防ぐ"
+          style="--domain: var(--c-browser)"
+        >
+          7-2. Site Isolation:サイトをまたいだデータ漏洩を防ぐ
+        </h3>
+        <p>
+          Chrome 67(デスクトップ、全サイト対象)およびChrome
+          77(Android、ログイン済みサイト対象)からデフォルトで有効化されているのが<strong
+            >Site Isolation</strong
+          >です。目的は「1つのレンダラープロセスには、最大でも1つのWebサイト由来のページしか含めない」ことを保証し、レンダラープロセスに脆弱性があっても、他サイトのCookieやデータへのアクセスを遮断することにあります。ブラウザプロセスは、どのサイトが専用プロセスを必要とするかに基づいて、各レンダラープロセスのCookieや他リソースへのアクセスを制限します。
+        </p>
+        <h3
+          class="domain-h3"
+          id="7-3-v8-sandboxjavascriptエンジン自体を隔離する"
+          style="--domain: var(--c-browser)"
+        >
+          7-3. V8 Sandbox:JavaScriptエンジン自体を隔離する
+        </h3>
+        <p>
+          Site Isolationがプロセス間の隔離だとすれば、<strong>V8 Sandbox</strong
+          >はプロセス<strong>内</strong>の隔離です。V8のセキュリティ技術リードであるSamuel
+          Groß氏によれば、今日発見・悪用されるV8の脆弱性のほぼすべてに共通するのは、「コンパイラとランタイムがほぼ例外なくV8のHeapObjectインスタンスだけを操作するため、最終的なメモリ破壊が必ずV8ヒープの内部で発生する」という点です。
+        </p>
+        <p>
+          V8
+          Sandboxは、V8が実行するコードを、プロセスの仮想アドレス空間の一部(=サンドボックス、64bit環境で最大1TB分を予約)に限定し、それ以外のメモリ領域からは切り離します。サンドボックス外のメモリにアクセスできるすべてのデータ型を「サンドボックス互換」の代替型に置き換えることで、たとえV8内でメモリ破壊が起きても、サンドボックスの外側には影響が及ばない設計です。Chrome
+          123から、Android・ChromeOS・Linux・macOS・Windowsの全プラットフォームでデフォルト有効化されており、SpeedometerやJetStreamのベンチマークでは、性能オーバーヘッドは約1%に抑えられています。
+        </p>
+        <pre class="mermaid">
+flowchart LR
+    JS["JavaScript / WebAssembly&lt;br/&gt;コード"] --&gt; V8Heap["V8ヒープ&lt;br/&gt;(サンドボックス化されたメモリ領域)"]
+    V8Heap --&gt;|メモリ破壊が発生しても脱出不可| Boundary["サンドボックス境界"]
+    Boundary -.-&gt;|通常はアクセス不可| ProcessMemory["レンダラープロセスの&lt;br/&gt;その他のメモリ"]</pre
+        >
+        <h3
+          class="domain-h3"
+          id="7-4-chrome拡張機能開発者向けsandboxディレクティブのベストプラクティス"
+          style="--domain: var(--c-browser)"
+        >
+          7-4. Chrome拡張機能開発者向け:sandboxディレクティブのベストプラクティス
+        </h3>
+        <p>
+          ブラウザ本体だけでなく、拡張機能を開発する側にもGoogleが公式に推奨するサンドボックス機構があります。Manifest
+          V3の<code>sandbox</code>プロパティを使うと、拡張機能内の特定のページを「一意のオリジンを持つサンドボックス」として動作させられます。
+        </p>
+        <ol type="1">
+          <li>
+            <strong
+              ><code>eval</code>やインラインスクリプトが必要なページだけをsandbox指定する</strong
+            >:サンドボックス化されたページは拡張機能全体のCSP(コンテンツセキュリティポリシー)の対象外になり、独自のCSPを持てるため、<code>eval()</code>やインラインスクリプトの実行が可能になる
+          </li>
+          <li>
+            <strong>拡張機能APIへの直接アクセスはできない前提で設計する</strong
+            >:サンドボックス化ページは拡張機能API・非サンドボックスページへの直接アクセスができず、<code>postMessage()</code>経由でのみ通信できる
+          </li>
+          <li>
+            <strong>CSPを絞り込む場合は<code>sandbox</code>ディレクティブを外さない</strong
+            >:デフォルトのCSP値は<code
+              >sandbox allow-scripts allow-forms allow-popups allow-modals; script-src 'self'
+              'unsafe-inline' 'unsafe-eval'; child-src 'self';</code
+            >。これをより厳しく絞り込むことは可能だが、<code>sandbox</code>ディレクティブ自体は必須で、<code>allow-same-origin</code>トークンは指定できない
+          </li>
+          <li>
+            <strong>外部Webコンテンツの読み込みは避ける</strong>:Chrome
+            57以降、サンドボックス化ページの中に外部Webコンテンツ(埋め込みフレーム・スクリプトを含む)を読み込むことはできない。外部コンテンツが必要な場合は<code>webview</code>を使う
+          </li>
+          <li>
+            <strong>通常の拡張機能ページのCSPも最小権限に保つ</strong
+            >:通常のページ(<code>extension_pages</code>)側では、Chromeが強制する最小CSP(<code
+              >script-src 'self' 'wasm-unsafe-eval'; object-src 'self';</code
+            >)より緩和することはできない仕様になっている
+          </li>
+        </ol>
+        <hr />
+        <p><a id="section-8"></a></p>
+        <h2 id="8-意思決定フロー自分のケースにはどのサンドボックス技術を選ぶべきか">
+          8. 意思決定フロー:自分のケースにはどのサンドボックス技術を選ぶべきか
+        </h2>
+        <p>
+          ここまでの5領域を踏まえて、「自分は何を隔離したいのか」から逆引きできる意思決定フローにまとめました。
+        </p>
+        <pre class="mermaid">
+flowchart TD
+    Start["何を隔離したいか?"] --&gt; Q1{"AIエージェントが&lt;br/&gt;生成したコードを実行する"}
+    Q1 --&gt;|はい| A1["GKE Agent Sandbox&lt;br/&gt;または Gemini Code Execution"]
+    Q1 --&gt;|いいえ| Q2{"C/C++のライブラリや&lt;br/&gt;バイナリを隔離したい"}
+    Q2 --&gt;|はい| A2["Sandbox2 / Sandboxed API (SAPI)"]
+    Q2 --&gt;|いいえ| Q3{"コンテナ全体を&lt;br/&gt;カーネルから隔離したい"}
+    Q3 --&gt;|はい| A3["gVisor / GKE Sandbox"]
+    Q3 --&gt;|いいえ| Q4{"ブラウザや拡張機能の&lt;br/&gt;コンテンツを隔離したい"}
+    Q4 --&gt;|はい| A4["Site Isolation / V8 Sandbox&lt;br/&gt;/ 拡張機能sandboxディレクティブ"]
+    Q4 --&gt;|いいえ| A5["Apigee等でAPIレイヤーを保護"]</pre
+        >
+        <hr />
+        <p><a id="section-9"></a></p>
+        <h2 id="9-横断ベストプラクティス早見表">9. 横断ベストプラクティス早見表</h2>
+        <p>5つの領域を貫く共通原則を、実務でチェックリストとして使える形にまとめました。</p>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr class="header">
+                <th>原則</th>
+                <th>AIエージェント</th>
+                <th>API</th>
+                <th>コンテナ</th>
+                <th>C/C++</th>
+                <th>ブラウザ</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="odd">
+                <td><strong>最小権限</strong></td>
+                <td>Workload Identity Federationで使い捨てIAM</td>
+                <td>RBAC・OAuthスコープの絞り込み</td>
+                <td>サンドボックス化ノードプールの分離</td>
+                <td>ポリシーで許可syscallを最小化</td>
+                <td>拡張機能CSPを最小権限に</td>
+              </tr>
+              <tr class="even">
+                <td><strong>デフォルト拒否</strong></td>
+                <td>ネットワークポリシーで通信先を許可リスト化</td>
+                <td>Cloud Armorでの地理/IP制御</td>
+                <td>GPUタイムシェアリングを避ける等の制約順守</td>
+                <td>seccomp-bpfでsyscallをデフォルト拒否</td>
+                <td>サンドボックス化ページに<code>allow-same-origin</code>を付けない</td>
+              </tr>
+              <tr class="odd">
+                <td><strong>多層防御</strong></td>
+                <td>gVisor+ID+ネットワークを重ねても過信しない</td>
+                <td>トラフィック管理+メッセージ保護+セキュリティポリシー</td>
+                <td>VMM境界+コンテナ境界+seccomp</td>
+                <td>namespace+リソース制限+seccomp-bpf</td>
+                <td>マルチプロセス+Site Isolation+V8 Sandbox</td>
+              </tr>
+              <tr class="even">
+                <td><strong>状態管理/リソース制御</strong></td>
+                <td>Pod Snapshotsでウォーム/コールドプール</td>
+                <td>環境ごとにデプロイ数を制限</td>
+                <td>全コンテナにリソース上限を設定</td>
+                <td>Transactionsで異常時に自動再起動</td>
+                <td>プロセスクラッシュ時も他タブは継続動作</td>
+              </tr>
+              <tr class="odd">
+                <td><strong>監視・可観測性</strong></td>
+                <td>トレーシングでツール呼び出しを可視化</td>
+                <td>Advanced API Securityでクライアント挙動を分析</td>
+                <td>gVisorログのLogging/Monitoring連携</td>
+                <td>セキュリティ違反のログ記録</td>
+                <td>サンドボックス違反の検知</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <hr />
+        <p><a id="section-10"></a></p>
+        <h2 id="10-参考文献出典url">10. 参考文献・出典URL</h2>
+        <p>
+          本ガイドの作成にあたり、以下のGoogle公式ドキュメント・Google公式ブログ・著名なセキュリティエンジニア/開発者による技術記事を参照しました。
+        </p>
+        <div class="ref-grid">
+          <div class="ref-card">
+            <h3 id="google公式サンドボックス技術全般">Google公式:サンドボックス技術全般</h3>
+            <ul>
+              <li>
+                Code Sandboxing(Google for Developers、Sandbox2/SAPI/gVisor等の比較表):
+                <span class="ref-icon">↗</span
+                ><a href="https://developers.google.com/code-sandboxing"
+                  >https://developers.google.com/code-sandboxing</a
+                >
+              </li>
+              <li>
+                Sandbox2 Explained: <span class="ref-icon">↗</span
+                ><a href="https://developers.google.com/code-sandboxing/sandbox2/explained"
+                  >https://developers.google.com/code-sandboxing/sandbox2/explained</a
+                >
+              </li>
+              <li>
+                Sandboxed API (SAPI) 概要: <span class="ref-icon">↗</span
+                ><a href="https://developers.google.com/code-sandboxing/sandboxed-api"
+                  >https://developers.google.com/code-sandboxing/sandboxed-api</a
+                >
+              </li>
+              <li>
+                SAPI Explained: <span class="ref-icon">↗</span
+                ><a href="https://developers.google.com/code-sandboxing/sandboxed-api/explained"
+                  >https://developers.google.com/code-sandboxing/sandboxed-api/explained</a
+                >
+              </li>
+              <li>
+                SAPI Getting Started: <span class="ref-icon">↗</span
+                ><a
+                  href="https://developers.google.com/code-sandboxing/sandboxed-api/getting-started"
+                  >https://developers.google.com/code-sandboxing/sandboxed-api/getting-started</a
+                >
+              </li>
+              <li>
+                google/sandboxed-api (GitHub): <span class="ref-icon">↗</span
+                ><a href="https://github.com/google/sandboxed-api"
+                  >https://github.com/google/sandboxed-api</a
+                >
+              </li>
+            </ul>
+          </div>
+          <div class="ref-card">
+            <h3 id="①-aiエージェント">① AIエージェント</h3>
+            <ul>
+              <li>
+                GKE Sandbox(GKEセキュリティ公式ドキュメント): <span class="ref-icon">↗</span
+                ><a
+                  href="https://docs.cloud.google.com/kubernetes-engine/docs/concepts/sandbox-pods"
+                  >https://docs.cloud.google.com/kubernetes-engine/docs/concepts/sandbox-pods</a
+                >
+              </li>
+              <li>
+                Isolate AI code execution with Agent Sandbox: <span class="ref-icon">↗</span
+                ><a href="https://docs.cloud.google.com/kubernetes-engine/docs/how-to/agent-sandbox"
+                  >https://docs.cloud.google.com/kubernetes-engine/docs/how-to/agent-sandbox</a
+                >
+              </li>
+              <li>
+                Bringing you Agent Sandbox on GKE and Agent Substrate(Google Cloud Blog):
+                <span class="ref-icon">↗</span
+                ><a
+                  href="https://cloud.google.com/blog/products/containers-kubernetes/bringing-you-agent-sandbox-on-gke-and-agent-substrate"
+                  >https://cloud.google.com/blog/products/containers-kubernetes/bringing-you-agent-sandbox-on-gke-and-agent-substrate</a
+                >
+              </li>
+              <li>
+                Safety and Security for AI Agents(Agent Development Kit公式):
+                <span class="ref-icon">↗</span
+                ><a href="https://google.github.io/adk-docs/safety/"
+                  >https://google.github.io/adk-docs/safety/</a
+                >
+              </li>
+              <li>
+                Code Execution(Gemini Enterprise Agent Platform公式): <span class="ref-icon">↗</span
+                ><a
+                  href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/scale/sandbox/code-execution-overview"
+                  >https://docs.cloud.google.com/gemini-enterprise-agent-platform/scale/sandbox/code-execution-overview</a
+                >
+              </li>
+              <li>
+                Sandboxes overview(Gemini Enterprise Agent Platform公式):
+                <span class="ref-icon">↗</span
+                ><a
+                  href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/scale/sandbox"
+                  >https://docs.cloud.google.com/gemini-enterprise-agent-platform/scale/sandbox</a
+                >
+              </li>
+              <li>
+                Agents Overview(Gemini API公式): <span class="ref-icon">↗</span
+                ><a href="https://ai.google.dev/gemini-api/docs/agents"
+                  >https://ai.google.dev/gemini-api/docs/agents</a
+                >
+              </li>
+              <li>
+                A Deep Dive into GKE Sandbox for Agents(The New Stack、Darryl K. Taft氏):
+                <span class="ref-icon">↗</span
+                ><a
+                  href="https://thenewstack.io/google-cloud-a-deep-dive-into-gke-sandbox-for-agents/"
+                  >https://thenewstack.io/google-cloud-a-deep-dive-into-gke-sandbox-for-agents/</a
+                >
+              </li>
+              <li>
+                Google Announces GKE Agent Sandbox and Hypercluster at Next '26(InfoQ、Google Cloud
+                AmbassadorのAlex Gkiouros氏の見解を含む): <span class="ref-icon">↗</span
+                ><a href="https://www.infoq.com/news/2026/05/gke-agent-sandbox-hypercluster/"
+                  >https://www.infoq.com/news/2026/05/gke-agent-sandbox-hypercluster/</a
+                >
+              </li>
+              <li>
+                Securing AI Agents on GKE(ARMO、Shauli Rozen氏): <span class="ref-icon">↗</span
+                ><a href="https://www.armosec.io/blog/sandboxing-ai-agents-gke-workload-identity/"
+                  >https://www.armosec.io/blog/sandboxing-ai-agents-gke-workload-identity/</a
+                >
+              </li>
+              <li>
+                GKE Agent SandboxとGKE Pod Snapshots(Rahul Ranganathan氏、Google Cloud
+                Community/Medium ― ISOLATE/ACCELERATE/RESTRICTのフレームワークの出典):
+                <span class="ref-icon">↗</span
+                ><a
+                  href="https://medium.com/google-cloud/gke-agent-sandbox-and-gke-pod-snapshots-zero-trust-security-for-ai-agents-at-scale-559261ee20b5"
+                  >https://medium.com/google-cloud/gke-agent-sandbox-and-gke-pod-snapshots-zero-trust-security-for-ai-agents-at-scale-559261ee20b5</a
+                >
+              </li>
+              <li>
+                Deploying Secure AI Agents on GKE(Google Codelabs): <span class="ref-icon">↗</span
+                ><a href="https://codelabs.developers.google.com/codelabs/gke/ai-agents-on-gke"
+                  >https://codelabs.developers.google.com/codelabs/gke/ai-agents-on-gke</a
+                >
+              </li>
+            </ul>
+          </div>
+          <div class="ref-card">
+            <h3 id="②-api">② API</h3>
+            <ul>
+              <li>
+                Apigee API Management(製品ページ): <span class="ref-icon">↗</span
+                ><a href="https://cloud.google.com/apigee">https://cloud.google.com/apigee</a>
+              </li>
+              <li>
+                Best practices for securing your applications and APIs using Apigee:
+                <span class="ref-icon">↗</span
+                ><a
+                  href="https://docs.cloud.google.com/architecture/best-practices-securing-applications-and-apis-using-apigee"
+                  >https://docs.cloud.google.com/architecture/best-practices-securing-applications-and-apis-using-apigee</a
+                >
+              </li>
+              <li>
+                Advanced API Security best practices(Apigee公式): <span class="ref-icon">↗</span
+                ><a href="https://docs.cloud.google.com/apigee/docs/api-security/best-practices"
+                  >https://docs.cloud.google.com/apigee/docs/api-security/best-practices</a
+                >
+              </li>
+              <li>
+                About environments(Apigee hybrid公式、環境=サンドボックスの定義):
+                <span class="ref-icon">↗</span
+                ><a href="https://cloud.google.com/apigee/docs/hybrid/v1.9/environments-about"
+                  >https://cloud.google.com/apigee/docs/hybrid/v1.9/environments-about</a
+                >
+              </li>
+              <li>
+                Top Sandbox Development Environment Best Practices Guide(DigitalAPI):
+                <span class="ref-icon">↗</span
+                ><a
+                  href="https://www.digitalapi.ai/blogs/what-are-the-best-practices-for-managing-a-sandbox-development-environment"
+                  >https://www.digitalapi.ai/blogs/what-are-the-best-practices-for-managing-a-sandbox-development-environment</a
+                >
+              </li>
+            </ul>
+          </div>
+          <div class="ref-card">
+            <h3 id="③-コンテナ">③ コンテナ</h3>
+            <ul>
+              <li>
+                GKE Sandbox(概念ドキュメント): <span class="ref-icon">↗</span
+                ><a
+                  href="https://docs.cloud.google.com/kubernetes-engine/docs/concepts/sandbox-pods"
+                  >https://docs.cloud.google.com/kubernetes-engine/docs/concepts/sandbox-pods</a
+                >
+              </li>
+              <li>
+                Harden workload isolation with GKE Sandbox(手順ドキュメント):
+                <span class="ref-icon">↗</span
+                ><a href="https://docs.cloud.google.com/kubernetes-engine/docs/how-to/sandbox-pods"
+                  >https://docs.cloud.google.com/kubernetes-engine/docs/how-to/sandbox-pods</a
+                >
+              </li>
+              <li>
+                gVisor公式サイト: <span class="ref-icon">↗</span
+                ><a href="https://gvisor.dev/">https://gvisor.dev/</a>
+              </li>
+              <li>
+                Security design overview(Cloud Run公式): <span class="ref-icon">↗</span
+                ><a href="https://docs.cloud.google.com/run/docs/securing/security"
+                  >https://docs.cloud.google.com/run/docs/securing/security</a
+                >
+              </li>
+              <li>
+                Improved gVisor file system performance for GKE, Cloud Run, App Engine and Cloud
+                Functions(Google Cloud Blog): <span class="ref-icon">↗</span
+                ><a
+                  href="https://cloud.google.com/blog/products/containers-kubernetes/gvisor-file-system-improvements-for-gke-and-serverless"
+                  >https://cloud.google.com/blog/products/containers-kubernetes/gvisor-file-system-improvements-for-gke-and-serverless</a
+                >
+              </li>
+            </ul>
+          </div>
+          <div class="ref-card">
+            <h3 id="④-cc">④ C/C++</h3>
+            <ul>
+              <li>
+                Sandbox2 Explained: <span class="ref-icon">↗</span
+                ><a href="https://developers.google.com/code-sandboxing/sandbox2/explained"
+                  >https://developers.google.com/code-sandboxing/sandbox2/explained</a
+                >
+              </li>
+              <li>
+                Sandboxed API README(GitHub): <span class="ref-icon">↗</span
+                ><a href="https://github.com/google/sandboxed-api/blob/main/README.md"
+                  >https://github.com/google/sandboxed-api/blob/main/README.md</a
+                >
+              </li>
+            </ul>
+          </div>
+          <div class="ref-card">
+            <h3 id="⑤-ブラウザ">⑤ ブラウザ</h3>
+            <ul>
+              <li>
+                Site Isolation Design Document(Chromium公式): <span class="ref-icon">↗</span
+                ><a href="https://www.chromium.org/developers/design-documents/site-isolation/"
+                  >https://www.chromium.org/developers/design-documents/site-isolation/</a
+                >
+              </li>
+              <li>
+                Secure Architecture(Chromium Security公式): <span class="ref-icon">↗</span
+                ><a href="https://www.chromium.org/Home/chromium-security/guts/"
+                  >https://www.chromium.org/Home/chromium-security/guts/</a
+                >
+              </li>
+              <li>
+                The V8 Sandbox(V8公式ブログ、Samuel Groß氏): <span class="ref-icon">↗</span
+                ><a href="https://v8.dev/blog/sandbox">https://v8.dev/blog/sandbox</a>
+              </li>
+              <li>
+                The V8 Heap Sandbox, OffensiveCon 2024講演資料(Samuel Groß氏):
+                <span class="ref-icon">↗</span
+                ><a
+                  href="https://saelo.github.io/presentations/offensivecon_24_the_v8_heap_sandbox.pdf"
+                  >https://saelo.github.io/presentations/offensivecon_24_the_v8_heap_sandbox.pdf</a
+                >
+              </li>
+              <li>
+                Google Chrome Adds V8 Sandbox(The Hacker News): <span class="ref-icon">↗</span
+                ><a href="https://thehackernews.com/2024/04/google-chrome-adds-v8-sandbox-new.html"
+                  >https://thehackernews.com/2024/04/google-chrome-adds-v8-sandbox-new.html</a
+                >
+              </li>
+              <li>
+                Manifest - Sandbox(Chrome Extensions公式、Manifest V3):
+                <span class="ref-icon">↗</span
+                ><a href="https://developer.chrome.com/docs/extensions/reference/manifest/sandbox"
+                  >https://developer.chrome.com/docs/extensions/reference/manifest/sandbox</a
+                >
+              </li>
+              <li>
+                Manifest - Content Security Policy(Chrome Extensions公式):
+                <span class="ref-icon">↗</span
+                ><a
+                  href="https://developer.chrome.com/docs/extensions/reference/manifest/content-security-policy"
+                  >https://developer.chrome.com/docs/extensions/reference/manifest/content-security-policy</a
+                >
+              </li>
+              <li>
+                Cleanly Escaping the Chrome Sandbox(Theori Blog): <span class="ref-icon">↗</span
+                ><a href="https://theori.io/blog/cleanly-escaping-the-chrome-sandbox"
+                  >https://theori.io/blog/cleanly-escaping-the-chrome-sandbox</a
+                >
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <hr />
+        <blockquote>
+          <p>
+            <strong>免責事項</strong
+            >:本ガイドは2026年7月27日時点で確認できた公開情報に基づいています。GKE Agent
+            SandboxやGemini Enterprise Agent
+            Platform関連の一部機能はPre-GA(プレビュー)段階の製品を含むため、実際の導入前には必ずGoogle
+            Cloud公式ドキュメントの最新版を確認してください。
+          </p>
+        </blockquote>
+      </main>
+    </div>
+
+    <script>
+      // ---------- Sidebar toggle (mobile) ----------
+      (function () {
+        var btn = document.getElementById('sidebarToggle');
+        var sidebar = document.getElementById('sidebar');
+        if (!btn || !sidebar) return;
+        btn.setAttribute('aria-controls', 'sidebar');
+        btn.setAttribute('aria-expanded', 'false');
+        btn.setAttribute('aria-label', '目次を開く');
+        btn.addEventListener('click', function () {
+          var isOpen = sidebar.classList.toggle('open');
+          btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+          btn.setAttribute('aria-label', isOpen ? '目次を閉じる' : '目次を開く');
+        });
+        document.querySelectorAll('.nav-list a').forEach(function (a) {
+          a.addEventListener('click', function () {
+            sidebar.classList.remove('open');
+            btn.setAttribute('aria-expanded', 'false');
+            btn.setAttribute('aria-label', '目次を開く');
+          });
+        });
+      })();
+
+      // ---------- Scroll-spy: two independent observers ----------
+      (function () {
+        var navLinks = Array.prototype.slice.call(
+          document.querySelectorAll('.nav-list a[data-nav]'),
+        );
+        if (navLinks.length === 0) return;
+        var linkByHash = {};
+        var hashBySection = new Map();
+        var sections = [];
+
+        navLinks.forEach(function (a) {
+          var href = a.getAttribute('href');
+          linkByHash[href] = a;
+          var anchor = document.querySelector(href);
+          if (!anchor) return;
+          var wrapper = anchor.closest('p') || anchor;
+          var el = wrapper.nextElementSibling;
+          while (el && el.tagName !== 'H2') el = el.nextElementSibling;
+          if (el) {
+            hashBySection.set(el, href);
+            sections.push(el);
+          }
+        });
+
+        var highlightObserver = new IntersectionObserver(
+          function (entries) {
+            entries.forEach(function (entry) {
+              if (entry.isIntersecting) {
+                var hash = hashBySection.get(entry.target);
+                if (!hash) return;
+                navLinks.forEach(function (a) {
+                  a.classList.remove('active');
+                });
+                var link = linkByHash[hash];
+                if (link) link.classList.add('active');
+              }
+            });
+          },
+          { root: null, rootMargin: '-15% 0px -75% 0px', threshold: 0 },
+        );
+
+        sections.forEach(function (s) {
+          highlightObserver.observe(s);
+        });
+      })();
+
+      // ---------- Mermaid init (isolated, guarded) ----------
+      (function () {
+        function renderMermaid() {
+          if (typeof mermaid === 'undefined') return;
+          try {
+            mermaid.initialize({
+              startOnLoad: false,
+              securityLevel: 'strict',
+              theme: 'base',
+              themeVariables: {
+                background: '#07111e',
+                primaryColor: '#12213d',
+                primaryTextColor: '#e8edf7',
+                primaryBorderColor: '#7c9eff',
+                lineColor: '#7c9eff',
+                secondaryColor: '#0f1b30',
+                tertiaryColor: '#0f1b30',
+                textColor: '#e8edf7',
+                mainBkg: '#12213d',
+                nodeBorder: '#7c9eff',
+                clusterBkg: '#0c1830',
+                clusterBorder: '#2a3f66',
+                edgeLabelBackground: '#0f1b30',
+                fontSize: '16px',
+                fontFamily: '"Noto Sans JP",sans-serif',
+              },
+              flowchart: { useMaxWidth: false, curve: 'basis' },
+            });
+            var run = function () {
+              try {
+                mermaid.run({ querySelector: 'pre.mermaid' });
+              } catch (e) {
+                console.error('mermaid render error', e);
+              }
+            };
+            if (document.fonts && document.fonts.ready) {
+              document.fonts.ready.then(run).catch(run);
+            } else {
+              run();
+            }
+          } catch (e) {
+            console.error('mermaid init error', e);
+          }
+        }
+        if (document.readyState === 'complete' || document.readyState === 'interactive') {
+          renderMermaid();
+        } else {
+          document.addEventListener('DOMContentLoaded', renderMermaid);
+        }
+      })();
+    </script>
+  </body>
+</html>

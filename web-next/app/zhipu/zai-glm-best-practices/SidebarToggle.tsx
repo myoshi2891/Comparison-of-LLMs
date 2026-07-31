@@ -1,0 +1,40 @@
+"use client";
+
+import { useState } from "react";
+import styles from "./page.module.css";
+
+/**
+ * Renders a button that toggles the sidebar's open state.
+ *
+ * @returns A sidebar toggle button with state-aware accessibility attributes and icon
+ */
+export default function SidebarToggle() {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const handleToggle = () => {
+    const nextState = !isOpen;
+    setIsOpen(nextState);
+    const sidebar = document.getElementById("sidebar");
+    if (sidebar) {
+      if (nextState) {
+        sidebar.classList.add(styles.sidebarOpen);
+      } else {
+        sidebar.classList.remove(styles.sidebarOpen);
+      }
+    }
+  };
+
+  return (
+    <button
+      type="button"
+      className={styles.sidebarToggle}
+      aria-label={isOpen ? "メニューを閉じる" : "メニューを開く"}
+      aria-expanded={isOpen}
+      aria-controls="sidebar"
+      onClick={handleToggle}
+    >
+      <span>目次メニュー</span>
+      <span>{isOpen ? "✕" : "☰"}</span>
+    </button>
+  );
+}
