@@ -88,7 +88,7 @@ describe("SiteHeader dropdown rendering", () => {
 });
 
 describe("SiteHeader nested sub-dropdown rendering (Providers only)", () => {
-  it("renders 8 sub-dropdowns (Claude / Google / Codex / Copilot / Moonshot / DeepSeek / xAI / Zhipu(GLM)) under Providers", () => {
+  it("renders 8 sub-dropdowns (Claude / Google / Codex / Microsoft / Moonshot / DeepSeek / xAI / Zhipu(GLM)) under Providers", () => {
     const { container } = render(<SiteHeader pathname="/" />);
     const subs = container.querySelectorAll("li.ch-subdropdown");
     expect(subs.length).toBe(8);
@@ -96,7 +96,7 @@ describe("SiteHeader nested sub-dropdown rendering (Providers only)", () => {
       "Claude",
       "Google",
       "Codex",
-      "Copilot",
+      "Microsoft",
       "Moonshot",
       "DeepSeek",
       "xAI",
