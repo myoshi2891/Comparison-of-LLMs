@@ -11,18 +11,18 @@ describe("MultiAgentOrchestrationPage", () => {
     );
   });
 
-  it("returns valid JSX element tree with fixed top padding and highlighted code blocks", () => {
+  it("returns valid JSX element tree with BOTH code blocks (subagent_contract & orchestrator_scaling_rules)", () => {
     const jsx = MultiAgentOrchestrationPage();
     expect(jsx).toBeDefined();
 
     const jsxString = JSON.stringify(jsx);
 
-    // Verify section anchors for smooth navigation without header overlap
-    expect(jsxString).toContain('id="sec-8"');
-
-    // Verify code block tokens have highlight classes applied in JSX
+    // Verify BOTH code block 1 and code block 2 exist in JSX element tree
     expect(jsxString).toContain("subagent_contract");
     expect(jsxString).toContain("orchestrator_scaling_rules");
+
+    // Verify section anchors
+    expect(jsxString).toContain('id="sec-13"');
 
     // Verify no lowercase rowspan attribute
     expect(jsxString).not.toContain('"rowspan"');
