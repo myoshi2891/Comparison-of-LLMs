@@ -112,14 +112,16 @@ function applyPieChartColorOverrides(root: HTMLElement, theme?: string): void {
 
   const legendTextColor = isDark ? "#e8eef5" : "#07111e";
   root
-    .querySelectorAll<SVGTextElement>("g.legend text, .legend text, text.legend")
+    .querySelectorAll<SVGTextElement>(
+      "g.legend text, .legend text, text.legend, .pieTitleText"
+    )
     .forEach((el) => {
       el.style.setProperty("fill", legendTextColor, "important");
     });
 
   const sliceTextColor = isDark ? "#ffffff" : "#07111e";
   root
-    .querySelectorAll<SVGTextElement>("text.slice, .slice text, g text.slice, .pieTitleText")
+    .querySelectorAll<SVGTextElement>("text.slice, .slice text, g text.slice")
     .forEach((el) => {
       el.style.setProperty("fill", sliceTextColor, "important");
       el.style.setProperty("font-weight", "700", "important");
