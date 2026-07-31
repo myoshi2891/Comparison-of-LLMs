@@ -3,6 +3,11 @@
 import { useEffect, useState } from "react";
 import styles from "./page.module.css";
 
+/**
+ * Provides a button for toggling the sidebar visibility.
+ *
+ * @returns A button that controls the sidebar's open state.
+ */
 export default function SidebarToggle() {
   const [isOpen, setIsOpen] = useState(false);
 

@@ -10,6 +10,12 @@ export const metadata: Metadata = {
     "モデル選定からエージェント型ツール、マルチエージェントリサーチ、Prompt Caching、コスト最適化まで。中級〜上級エンジニアが本番導入する際に押さえるべきポイントをステップバイステップで解説します。",
 };
 
+/**
+ * Renders an external link that opens in a new browser tab.
+ *
+ * @param href - The destination URL.
+ * @param children - The link content.
+ */
 function Ext({ href, children }: { href: string; children: React.ReactNode }) {
   return (
     <a href={href} target="_blank" rel="noopener noreferrer">
@@ -158,6 +164,9 @@ const MERMAID_DIAGRAM_11 = `flowchart TD
     H -- はい --> I["Priority Processing (2倍課金)"]
     H -- いいえ --> J["reasoning_effort を low/medium に調整"]`;
 
+/**
+ * Renders an intermediate-to-advanced practical guide to the xAI Grok API.
+ */
 export default function GrokBestPracticesIntermediatePage() {
   return (
     <div className={styles.layout}>

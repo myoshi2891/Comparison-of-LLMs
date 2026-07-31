@@ -3,6 +3,11 @@
 import { useState } from "react";
 import styles from "./page.module.css";
 
+/**
+ * Renders a button that toggles the sidebar visibility.
+ *
+ * @returns A sidebar toggle button with localized accessibility labels
+ */
 export default function SidebarToggle() {
   const [isOpen, setIsOpen] = useState(false);
 

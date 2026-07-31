@@ -9,6 +9,12 @@ export const metadata: Metadata = {
     "xAI API（Grok モデル群）をこれから使い始めるエンジニア・QAエンジニア向けに、モデル選定からセキュリティ運用まで、ステップバイステップで解説します。",
 };
 
+/**
+ * Renders an external link that opens in a new tab.
+ *
+ * @param href - The destination URL
+ * @param children - The link content
+ */
 function Ext({ href, children }: { href: string; children: React.ReactNode }) {
   return (
     <a href={href} target="_blank" rel="noopener noreferrer">
@@ -70,6 +76,9 @@ D --> E["ツール利用の判断基準を<br/>システムプロンプトで指
 E --> F["まず小さく試し、<br/>結果を見て反復改善"]
 F --> G["高品質な出力"]`;
 
+/**
+ * Renders a step-by-step guide to using xAI's Grok API, including model selection, integration, optimization, security, and governance practices.
+ */
 export default function GrokBestPracticesPage() {
   return (
     <div className={styles.layout}>

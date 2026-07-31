@@ -8,6 +8,14 @@ interface TocObserverProps {
   activeClass: string;
 }
 
+/**
+ * Synchronizes navigation link highlighting with the sections currently in view.
+ *
+ * @param navSelector - CSS selector for the navigation links
+ * @param sectionSelector - CSS selector for the observed sections
+ * @param activeClass - CSS class applied to the link for the visible section
+ * @returns `null`
+ */
 export default function TocObserver({
   navSelector = "#side-nav a",
   sectionSelector = "section.block",
