@@ -32,9 +32,12 @@ function applySequenceDiagramColorOverrides(
   const isDark = theme === "dark";
   const defaultTxt = isDark ? "#e2e8f0" : "#000000";
 
-  const actorBkgColor = themeVariables?.actorBkg ?? themeVariables?.primaryColor ?? (isDark ? "#1e293b" : "#ffffff");
+  const actorBkgColor =
+    themeVariables?.actorBkg ?? themeVariables?.primaryColor ?? (isDark ? "#1e293b" : "#ffffff");
   const actorBorderColor =
-    themeVariables?.actorBorder ?? themeVariables?.primaryBorderColor ?? (isDark ? "#3b82f6" : "#000000");
+    themeVariables?.actorBorder ??
+    themeVariables?.primaryBorderColor ??
+    (isDark ? "#3b82f6" : "#000000");
   const actorTxtColor =
     themeVariables?.actorTextColor ?? themeVariables?.primaryTextColor ?? defaultTxt;
 
@@ -46,7 +49,10 @@ function applySequenceDiagramColorOverrides(
     el.style.setProperty("fill", actorTxtColor, "important");
   });
 
-  const noteBkgColor = themeVariables?.noteBkgColor ?? themeVariables?.secondaryColor ?? (isDark ? "#1e293b" : "#ffffff");
+  const noteBkgColor =
+    themeVariables?.noteBkgColor ??
+    themeVariables?.secondaryColor ??
+    (isDark ? "#1e293b" : "#ffffff");
   const noteBorderColor = themeVariables?.noteBorderColor ?? (isDark ? "#64748b" : "#000000");
   const noteTxtColor =
     themeVariables?.noteTextColor ?? themeVariables?.primaryTextColor ?? defaultTxt;
@@ -62,24 +68,53 @@ function applySequenceDiagramColorOverrides(
     });
   });
 
-  const signalTxtColor =
-    themeVariables?.signalTextColor ?? themeVariables?.primaryTextColor ?? defaultTxt;
-  root
-    .querySelectorAll<SVGTextElement>("text.messageText, text.loopText, text.labelText")
-    .forEach((el) => {
-      el.style.setProperty("fill", signalTxtColor, "important");
-      el.querySelectorAll<SVGTSpanElement>("tspan").forEach((ts) => {
-        ts.style.setProperty("fill", signalTxtColor, "important");
-      });
+  const messageTxtColor =
+    themeVariables?.messageTextColor ??
+    themeVariables?.signalTextColor ??
+    themeVariables?.primaryTextColor ??
+    defaultTxt;
+  root.querySelectorAll<SVGTextElement>("text.messageText").forEach((el) => {
+    el.style.setProperty("fill", messageTxtColor, "important");
+    el.querySelectorAll<SVGTSpanElement>("tspan").forEach((ts) => {
+      ts.style.setProperty("fill", messageTxtColor, "important");
     });
+  });
 
-  if (isDark) {
-    root.querySelectorAll<SVGPathElement | SVGLineElement>("path.messageLine0, path.messageLine1, line.messageLine0, line.messageLine1").forEach((el) => {
-      el.style.setProperty("stroke", "#94a3b8", "important");
+  const loopTxtColor =
+    themeVariables?.loopTextColor ??
+    themeVariables?.signalTextColor ??
+    themeVariables?.primaryTextColor ??
+    defaultTxt;
+  root.querySelectorAll<SVGTextElement>("text.loopText").forEach((el) => {
+    el.style.setProperty("fill", loopTxtColor, "important");
+    el.querySelectorAll<SVGTSpanElement>("tspan").forEach((ts) => {
+      ts.style.setProperty("fill", loopTxtColor, "important");
+    });
+  });
+
+  const labelTxtColor =
+    themeVariables?.labelTextColor ??
+    themeVariables?.signalTextColor ??
+    themeVariables?.primaryTextColor ??
+    defaultTxt;
+  root.querySelectorAll<SVGTextElement>("text.labelText").forEach((el) => {
+    el.style.setProperty("fill", labelTxtColor, "important");
+    el.querySelectorAll<SVGTSpanElement>("tspan").forEach((ts) => {
+      ts.style.setProperty("fill", labelTxtColor, "important");
+    });
+  });
+
+  const messageLines = root.querySelectorAll<SVGPathElement | SVGLineElement>(
+    "path.messageLine0, path.messageLine1, line.messageLine0, line.messageLine1"
+  );
+  if (messageLines.length > 0) {
+    const signalLineColor = themeVariables?.signalColor ?? "#94a3b8";
+    messageLines.forEach((el) => {
+      el.style.setProperty("stroke", signalLineColor, "important");
     });
     root.querySelectorAll<SVGPathElement>("marker path").forEach((el) => {
-      el.style.setProperty("fill", "#94a3b8", "important");
-      el.style.setProperty("stroke", "#94a3b8", "important");
+      el.style.setProperty("fill", signalLineColor, "important");
+      el.style.setProperty("stroke", signalLineColor, "important");
     });
   }
 }
@@ -102,6 +137,12 @@ function applyPieChartColorOverrides(
     "#5eead4",
     "#ffd166",
     "#ef476f",
+    "#38bdf8",
+    "#c084fc",
+    "#fb923c",
+    "#2dd4bf",
+    "#facc15",
+    "#f43f5e",
   ];
 
   const pieStrokeColor = themeVariables?.pieStrokeColor ?? "#07111e";
@@ -110,8 +151,7 @@ function applyPieChartColorOverrides(
   const slices = root.querySelectorAll<SVGPathElement>("path.pieCircle");
   slices.forEach((el, idx) => {
     const pieKey = `pie${idx + 1}`;
-    const color =
-      themeVariables?.[pieKey] ?? defaultPieColors[idx % defaultPieColors.length];
+    const color = themeVariables?.[pieKey] ?? defaultPieColors[idx % defaultPieColors.length];
     el.style.setProperty("fill", color, "important");
     el.style.setProperty("stroke", pieStrokeColor, "important");
     el.style.setProperty("stroke-width", "2px", "important");
@@ -123,8 +163,7 @@ function applyPieChartColorOverrides(
   );
   legendRects.forEach((el, idx) => {
     const pieKey = `pie${idx + 1}`;
-    const color =
-      themeVariables?.[pieKey] ?? defaultPieColors[idx % defaultPieColors.length];
+    const color = themeVariables?.[pieKey] ?? defaultPieColors[idx % defaultPieColors.length];
     el.style.setProperty("fill", color, "important");
     el.style.setProperty("stroke", pieStrokeColor, "important");
   });
@@ -142,21 +181,16 @@ function applyPieChartColorOverrides(
     themeVariables?.primaryTextColor ??
     (isDark ? "#e8eef5" : "#07111e");
   root
-    .querySelectorAll<SVGTextElement>(
-      "g.legend text, .legend text, text.legend"
-    )
+    .querySelectorAll<SVGTextElement>("g.legend text, .legend text, text.legend")
     .forEach((el) => {
       el.style.setProperty("fill", legendTextColor, "important");
     });
 
-  const sliceTextColor =
-    themeVariables?.pieSectionTextColor ?? (isDark ? "#ffffff" : "#07111e");
-  root
-    .querySelectorAll<SVGTextElement>("text.slice, .slice text, g text.slice")
-    .forEach((el) => {
-      el.style.setProperty("fill", sliceTextColor, "important");
-      el.style.setProperty("font-weight", "700", "important");
-    });
+  const sliceTextColor = themeVariables?.pieSectionTextColor ?? (isDark ? "#ffffff" : "#07111e");
+  root.querySelectorAll<SVGTextElement>("text.slice, .slice text, g text.slice").forEach((el) => {
+    el.style.setProperty("fill", sliceTextColor, "important");
+    el.style.setProperty("font-weight", "700", "important");
+  });
 }
 
 /**
@@ -181,12 +215,20 @@ export default function MermaidDiagram({
   themeVariables,
 }: Props) {
   const ref = useRef<HTMLDivElement>(null);
+  const renderCountRef = useRef<number>(0);
 
   useEffect(() => {
+    const currentToken = ++renderCountRef.current;
     let active = true;
+
+    const isCurrent = () =>
+      active && ref.current !== null && currentToken === renderCountRef.current;
+
     void import("mermaid")
       .then(async (m) => {
-        if (!active || !ref.current) return;
+        if (!isCurrent()) return;
+
+        // Dynamic theme & variables configuration bound to the active generation token
         m.default.initialize({
           startOnLoad: false,
           theme,
@@ -195,14 +237,19 @@ export default function MermaidDiagram({
           sequence: { useMaxWidth: false },
           mindmap: { useMaxWidth: false },
         });
-        ref.current.textContent = chart;
-        ref.current.removeAttribute("data-processed");
+
+        if (!isCurrent()) return;
+        const targetEl = ref.current;
+        if (!targetEl) return;
+
+        targetEl.textContent = chart;
+        targetEl.removeAttribute("data-processed");
+
         try {
-          await m.default.run({ nodes: [ref.current] });
-          // 列幅より広い図は列幅まで縮小して中央に収める（切れ・左寄りを防ぐ）。
-          // mermaid は useMaxWidth:false 時に svg へ自然サイズの inline style を付けるため、
-          // inline を上書きして max-width:100% / height:auto を強制する。
-          const svg = ref.current?.querySelector("svg");
+          await m.default.run({ nodes: [targetEl] });
+          if (!isCurrent()) return;
+
+          const svg = targetEl.querySelector("svg");
           if (svg instanceof SVGElement) {
             svg.style.maxWidth = "100%";
             if (maxHeight !== undefined) {
@@ -215,48 +262,40 @@ export default function MermaidDiagram({
             }
             svg.style.height = "auto";
           }
-          // --- foreignObject 文字色後処理 ---
-          // htmlLabels:true の場合、flowchart ノードラベルは SVG <foreignObject> 内の HTML として
-          // レンダーされる。この HTML 要素には themeVariables.primaryTextColor が CSS カスケードで
-          // 届かない（SVG 内の <style> は foreignObject 内 HTML に非カスケード）。
-          // base テーマ、または明示的な themeVariables がある場合のみ補正する。
-          // ref: fix-mermaid SKILL Part 2-4
-          if (ref.current) {
-            if (theme === "base" || theme === "dark" || themeVariables !== undefined) {
-              const textColor =
-                themeVariables?.primaryTextColor ??
-                (theme === "dark" ? "#e2e8f0" : "#000000");
-              ref.current.querySelectorAll("foreignObject *").forEach((el) => {
-                (el as HTMLElement).style.setProperty("color", textColor, "important");
-              });
 
-              applySequenceDiagramColorOverrides(ref.current, themeVariables, theme);
-            }
+          if (!isCurrent()) return;
 
-            applyPieChartColorOverrides(ref.current, themeVariables, theme);
+          if (theme === "base" || theme === "dark" || themeVariables !== undefined) {
+            const textColor =
+              themeVariables?.primaryTextColor ?? (theme === "dark" ? "#e2e8f0" : "#000000");
+            targetEl.querySelectorAll("foreignObject *").forEach((el) => {
+              (el as HTMLElement).style.setProperty("color", textColor, "important");
+            });
+
+            if (!isCurrent()) return;
+            applySequenceDiagramColorOverrides(targetEl, themeVariables, theme);
           }
+
+          if (!isCurrent()) return;
+          applyPieChartColorOverrides(targetEl, themeVariables, theme);
         } catch (err) {
           console.error("[MermaidDiagram] render failed:", err);
-          if (active && ref.current) {
+          if (isCurrent() && ref.current) {
             ref.current.textContent = "⚠️ ダイアグラムを描画できませんでした";
           }
         }
       })
       .catch((err: unknown) => {
-        console.error("[MermaidDiagram] load failed:", err);
+        if (isCurrent()) {
+          console.error("[MermaidDiagram] load failed:", err);
+        }
       });
+
     return () => {
       active = false;
     };
-    // themeVariables is in the dependency array. If the caller passes an inline object,
-    // it will re-initialize mermaid and cause flickering.
   }, [chart, maxHeight, theme, themeVariables]);
 
-  // 2層構造でレイアウトの真実の源を一元化する:
-  //   外側 = フレーム全幅（列幅）を占める
-  //   内側 = flex 中央寄せ。svg は max-width:100% で列幅に収まるよう縮小（上の useEffect で付与）
-  // これにより、列幅に収まる図は自然サイズで中央寄せ、広い図は縮小して中央寄せとなり、
-  // 切れ・左寄りが発生しない。ページ側で width/max-width を強制する必要はない。
   return (
     <div className={`mermaid-scroll ${className || ""}`} style={{ ...style, width: "100%" }}>
       <div
