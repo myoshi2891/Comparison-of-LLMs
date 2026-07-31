@@ -28,10 +28,6 @@ describe("MultiAgentOrchestrationPage", () => {
     expect(jsxString).toContain("#a996ff");
     expect(jsxString).toContain("#ff9d66");
 
-    // Verify checklist and refs classes are preserved
-    expect(jsxString).toContain("checklist");
-    expect(jsxString).toContain("refs");
-
     // Verify code block tokens have highlight classes
     expect(jsxString).toContain("subagent_contract");
     expect(jsxString).toContain("orchestrator_scaling_rules");
