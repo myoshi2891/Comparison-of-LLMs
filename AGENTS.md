@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Updated 2026-07-30
+Updated 2026-07-31
 
 AGENTS.md は Codex / Cursor / Cline など AGENTS.md 規約を読む AI ツール向けの入り口。
 本リポジトリでは **CLAUDE.md が正本** とし、AGENTS.md はその委譲 pointer として機能する。
