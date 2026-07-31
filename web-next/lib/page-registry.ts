@@ -837,6 +837,18 @@ const entries: PageEntry[] = [
     lastReviewed: "2026-07-01",
   },
   {
+    slug: "/vercel/eve-beginner-guide",
+    title: "Vercel eve 完全ガイド ― 初学者のためのステップバイステップ・ベストプラクティス",
+    description:
+      "「エージェントはディレクトリである」という思想のもと、永続実行・サンドボックス・承認フロー・可観測性を標準搭載したVercelのオープンソース・エージェントフレームワーク eve の完全解説ガイド。",
+    group: "Agent 開発",
+    topics: ["agent", "vercel", "eve", "workflow", "sandbox"],
+    summary:
+      "「エージェントはディレクトリである」という思想のもと、永続実行・サンドボックス・承認フロー・可観測性を標準搭載したVercelのオープンソース・エージェントフレームワーク eve の完全解説ガイド。",
+    addedAt: "2026-07-31",
+    lastReviewed: "2026-07-31",
+  },
+  {
     slug: "/claude/tag-best-practices",
     title: "Claude Tag 活用ガイド ― 中級者〜上級者向けベストプラクティス",
     description:
