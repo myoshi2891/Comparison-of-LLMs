@@ -1192,7 +1192,7 @@ export default function MultiAgentOrchestrationPage() {
                 </thead>
                 <tbody>
                   <tr>
-                    <td rowspan="5"><strong>① 仕様・システム設計の問題</strong><br />(約41.8%)</td>
+                    <td rowSpan="5"><strong>① 仕様・システム設計の問題</strong><br />(約41.8%)</td>
                     <td>FM-1.1</td>
                     <td>タスク仕様違反</td>
                     <td>エージェントがタスクの要件・制約に従わない</td>
@@ -1218,7 +1218,7 @@ export default function MultiAgentOrchestrationPage() {
                     <td>いつ処理を終えるべきかの判断基準を認識していない</td>
                   </tr>
                   <tr>
-                    <td rowspan="6"><strong>② エージェント間の不整合</strong><br />(約36.9%)</td>
+                    <td rowSpan="6"><strong>② エージェント間の不整合</strong><br />(約36.9%)</td>
                     <td>FM-2.1</td>
                     <td>会話のリセット</td>
                     <td>進行中の文脈を不必要に消去・再開してしまう</td>
@@ -1249,7 +1249,7 @@ export default function MultiAgentOrchestrationPage() {
                     <td>内部の推論結果と実際に取った行動が矛盾する</td>
                   </tr>
                   <tr>
-                    <td rowspan="3"><strong>③ タスク検証の失敗</strong><br />(約21.3%)</td>
+                    <td rowSpan="3"><strong>③ タスク検証の失敗</strong><br />(約21.3%)</td>
                     <td>FM-3.1</td>
                     <td>早すぎる終了</td>
                     <td>タスクが未完了なのに完了したと判断してしまう</td>
@@ -1812,7 +1812,7 @@ export default function MultiAgentOrchestrationPage() {
                 </thead>
                 <tbody>
                   <tr>
-                    <td rowspan="3"><strong>設計判断</strong></td>
+                    <td rowSpan="3"><strong>設計判断</strong></td>
                     <td>
                       単一エージェントのベースラインと比較し、マルチエージェント化の効果を定量的に確認したか
                     </td>
@@ -1826,7 +1826,7 @@ export default function MultiAgentOrchestrationPage() {
                     </td>
                   </tr>
                   <tr>
-                    <td rowspan="3"><strong>コンテキスト設計</strong></td>
+                    <td rowSpan="3"><strong>コンテキスト設計</strong></td>
                     <td>
                       各サブエージェントに4部構成の契約(目的・出力形式・ツールガイダンス・境界)を与えているか
                     </td>
@@ -1840,7 +1840,7 @@ export default function MultiAgentOrchestrationPage() {
                     <td>長時間稼働セッション向けにコンパクション(圧縮)戦略を用意したか</td>
                   </tr>
                   <tr>
-                    <td rowspan="2"><strong>信頼性</strong></td>
+                    <td rowSpan="2"><strong>信頼性</strong></td>
                     <td>
                       MASTの3大失敗カテゴリ(仕様・不整合・検証)それぞれに対する具体的な緩和策を実装したか
                     </td>
@@ -1849,7 +1849,7 @@ export default function MultiAgentOrchestrationPage() {
                     <td>検証エージェントまたはルールベースの最終チェックを組み込んでいるか</td>
                   </tr>
                   <tr>
-                    <td rowspan="3"><strong>セキュリティ</strong></td>
+                    <td rowSpan="3"><strong>セキュリティ</strong></td>
                     <td>最小権限の原則でツールアクセスをスコープダウンしたか</td>
                   </tr>
                   <tr>
@@ -1859,14 +1859,14 @@ export default function MultiAgentOrchestrationPage() {
                     <td>OWASPのエージェント的アプリケーション向けリスク項目と照合したか</td>
                   </tr>
                   <tr>
-                    <td rowspan="2"><strong>可観測性・評価</strong></td>
+                    <td rowSpan="2"><strong>可観測性・評価</strong></td>
                     <td>トレーシング基盤を導入し、因果関係を含むログを記録しているか</td>
                   </tr>
                   <tr>
                     <td>LLM-as-judgeと人間レビューを組み合わせた評価パイプラインを用意したか</td>
                   </tr>
                   <tr>
-                    <td rowspan="2"><strong>コスト管理</strong></td>
+                    <td rowSpan="2"><strong>コスト管理</strong></td>
                     <td>モデルルーティングとプロンプトキャッシングを実装したか</td>
                   </tr>
                   <tr>
