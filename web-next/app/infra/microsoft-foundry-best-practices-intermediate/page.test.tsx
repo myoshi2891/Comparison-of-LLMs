@@ -30,6 +30,9 @@ describe("MicrosoftFoundryBestPracticesIntermediatePage", () => {
 
     const h2s = container.querySelectorAll("h2");
     expect(h2s.length).toBe(17);
+
+    const mermaidDiagrams = container.querySelectorAll(".mermaid");
+    expect(mermaidDiagrams.length).toBe(9);
   });
 
   it("has target='_blank' and rel='noopener noreferrer' on external links", () => {

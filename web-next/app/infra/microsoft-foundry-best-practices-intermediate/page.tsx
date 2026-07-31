@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import Ext from "@/components/docs/Ext";
 import MermaidDiagram from "@/components/docs/MermaidDiagram";
+import SidebarToggle from "./SidebarToggle";
 import TocObserver from "./TocObserver";
 import styles from "./page.module.css";
 
@@ -8,20 +10,6 @@ export const metadata: Metadata = {
   description:
     "Microsoft Foundry（旧Azure AI Studio/Azure AI Foundry）を用いたAIアプリ・エージェント開発のステップバイステップ・ベストプラクティスガイド。",
 };
-
-function Ext({
-  href,
-  children,
-}: {
-  href: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <a href={href} target="_blank" rel="noopener noreferrer">
-      {children}
-    </a>
-  );
-}
 
 const MMD_1 = `flowchart TB
     subgraph Client["クライアント層"]
@@ -184,7 +172,8 @@ export default function MicrosoftFoundryBestPracticesIntermediatePage() {
     <div className={styles.layout}>
       <TocObserver />
       <div className={styles.container}>
-        <aside className={styles.sidebar}>
+        <SidebarToggle />
+        <aside className={styles.sidebar} id="foundry-intermediate-sidebar">
           <div className={styles.brand}>
             <div className={styles.brandMark}>MF</div>
             <div className={styles.brandText}>

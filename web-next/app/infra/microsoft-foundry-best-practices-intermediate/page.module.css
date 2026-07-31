@@ -586,11 +586,14 @@
     top: 0;
     left: 0;
     height: 100vh;
+    width: 82vw;
     transform: translateX(-100%);
     transition: transform 0.3s ease;
+    z-index: 40;
   }
   .sidebarOpen {
     transform: translateX(0);
+    width: 82vw;
   }
   .main {
     margin-left: 0;
