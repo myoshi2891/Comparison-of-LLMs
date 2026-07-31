@@ -848,7 +848,7 @@ const entries: PageEntry[] = [
     group: "Agent 開発",
     topics: ["agent", "vercel", "eve", "workflow", "sandbox"],
     summary:
-      "Vercelのオープンソース・エージェントフレームワーク eve の永続実行・サンドボックス・承認フロー・可観測性を完全解説する初学者向けガイド。",
+      "Vercel の OSS エージェントフレームワーク eve を、永続実行・サンドボックス・承認フロー・可観測性の観点で初学者向けに解説する。",
     addedAt: "2026-07-31",
     lastReviewed: "2026-07-31",
   },
