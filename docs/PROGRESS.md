@@ -15,10 +15,18 @@
   - `bun run typecheck` ✅
   - `bun run lint` ✅（385 files checked）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: Vitest **144 files / 1295 tests すべて合格**（収集失敗なし）
+  - **フロントエンド (`web-next/`)**: Vitest **147 files / 1303 tests すべて合格**（収集失敗なし）
   - **バックエンド (`scraper/`)**: pytest 実行で **43 件すべて合格** (全 Green ✅)
 
 ## 最近の追加内容
+
+- **マルチエージェント関連ページ・CSS・Mermaidテーマ・レジストリのリファクタリングと修正**:
+  - `MermaidDiagram.tsx`: テーマに応じた Mermaid pie chart の動的テキスト色適用および `foreignObject` スコープ修正。
+  - `/agent/multi-agent-orchestration-best-practices`: CSS モジュール名修正 (`styles.calloutWarn`, `styles.calloutDanger`, `styles.pageFooter`, `.contentInner`)、`rel="noopener noreferrer"` の追加、および `@testing-library/react` による DOM レンダリング検証テストへの変更。
+  - `/agent/multi-agent-orchestration`: `--font-mono` の自己参照解消、`p` のスコープ付き適用、`.tiTiCircleCheck` アイコンの定義、および Step 7〜11 / 31件の参考文献 / footer-note の 100% 忠実補完。
+  - `/vercel/eve-beginner-guide`: モバイル用 960px メディアクエリの `flex-direction: column` を `.pageContainer` に適用。
+  - `page-registry.ts`: `/agent/multi-agent-orchestration-best-practices` と `/agent/multi-agent-orchestration` のタイトル・説明を `metadata.title` に合わせ区別化し、`/vercel/eve-beginner-guide` の `summary` 重複を改善。
+  - `PROGRESS.md`: Microsoft Foundry ガイドのアーカイブ記録パスを `archive/html/MicroSoft/` に統一。 (Vitest **147 files / 1303 tests** 全 Green ✅)
 
 - **Vercel eve 完全ガイド（/vercel/eve-beginner-guide）の Pure JSX 移行と Agent 開発 ナビ同期**: `Vercel-eve-beginner-guide.html` を `web-next/app/vercel/eve-beginner-guide/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。要約・省略なしで全11セクション（Hero + 11H2セクション + 参考文献一覧）・全表・全コードブロック・8 Mermaid図 (`diagram-arch`, `diagram-mapping`, `diagram-session`, `diagram-approval`, `diagram-sandbox`, `diagram-channel`, `diagram-cicd`, `diagram-fleet`)・TOCスクロール追従（`TocObserver.tsx`）・外部リンク安全属性・`page-registry.ts`（`Agent 開発` グループ）登録を完了。原本 `Vercel-eve-beginner-guide.html` は `archive/html/Vercel/Vercel-eve-beginner-guide.html` へ `git mv` 退避保存。契約テスト5件（タイトル、11H2セクション、8 Mermaid図、外部リンク・内部リンク検証）を追加し全クリア（Vitest **144 files / 1295 tests** 全 Green ✅）。
 
