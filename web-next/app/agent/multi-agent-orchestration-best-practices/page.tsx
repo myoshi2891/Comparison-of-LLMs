@@ -1771,6 +1771,31 @@ export default function MultiAgentOrchestrationPage() {
             </p>
 
             <div className={styles.codeBody}>
+              <div className={styles.codeLine}><span className={styles.cc}># サブエージェント定義の例(Claude Agent SDK的な構成をイメージした疑似コード)</span></div>
+              <div className={styles.codeLine}><span className={styles.ck}>subagent_contract</span> = &#123;</div>
+              <div className={styles.codeLine}>    <span className={styles.cs}>&quot;objective&quot;</span>: <span className={styles.cv}>&quot;2025年〜2026年における半導体サプライチェーンの構造変化を調査する&quot;</span>,</div>
+              <div className={styles.codeLine}>    <span className={styles.cs}>&quot;output_format&quot;</span>: &#123;</div>
+              <div className={styles.codeLine}>        <span className={styles.cs}>&quot;summary&quot;</span>: <span className={styles.cv}>&quot;文字数600字以内の要約&quot;</span>,</div>
+              <div className={styles.codeLine}>        <span className={styles.cs}>&quot;key_findings&quot;</span>: <span className={styles.cv}>&quot;箇条書き5件以内&quot;</span>,</div>
+              <div className={styles.codeLine}>        <span className={styles.cs}>&quot;sources&quot;</span>: <span className={styles.cv}>&quot;出典URLのリスト&quot;</span>,</div>
+              <div className={styles.codeLine}>    &#125;,</div>
+              <div className={styles.codeLine}>    <span className={styles.cs}>&quot;tool_guidance&quot;</span>: [</div>
+              <div className={styles.codeLine}>        <span className={styles.cv}>&quot;web_search を優先し、一次情報(企業IR・政府統計)を web_fetch で深掘りする&quot;</span>,</div>
+              <div className={styles.codeLine}>        <span className={styles.cv}>&quot;SEO最適化されたまとめサイトより、学術論文・公式発表を優先する&quot;</span>,</div>
+              <div className={styles.codeLine}>    ],</div>
+              <div className={styles.codeLine}>    <span className={styles.cs}>&quot;boundaries&quot;</span>: [</div>
+              <div className={styles.codeLine}>        <span className={styles.cv}>&quot;2021年の半導体不足の歴史的経緯には立ち入らない(別サブエージェントが担当)&quot;</span>,</div>
+              <div className={styles.codeLine}>        <span className={styles.cv}>&quot;個別企業の株価予測は行わない&quot;</span>,</div>
+              <div className={styles.codeLine}>    ],</div>
+              <div className={styles.codeLine}>&#125;</div>
+            </div>
+
+            <h3>ステップ④ オーケストレーターを実装する</h3>
+            <p>
+              4.4節の「努力量をタスクの複雑さにスケーリングさせる」原則に沿って、オーケストレーターのシステムプロンプトに明確なルールを埋め込みます。
+            </p>
+
+            <div className={styles.codeBody}>
               <div className={styles.codeLine}><span className={styles.ck}>orchestrator_scaling_rules</span> = <span className={styles.cs}>&quot;&quot;&quot;</span></div>
               <div className={styles.codeLine}><span className={styles.cm}>タスクの複雑さに応じて、生成するサブエージェント数とツール呼び出し回数を決定すること:</span></div>
               <div className={styles.codeLine}><span className={styles.cg}>- 単純な事実確認:</span> <span className={styles.cv}>1エージェント、3〜10回のツール呼び出し</span></div>
@@ -1779,7 +1804,6 @@ export default function MultiAgentOrchestrationPage() {
               <div className={styles.codeLine}><span className={styles.cw}>サブエージェントを生成する前に、まず拡張思考で分解計画を書き出すこと。</span></div>
               <div className={styles.codeLine}><span className={styles.cs}>&quot;&quot;&quot;</span></div>
             </div>
-            
 
             <h3>ステップ⑤ コンテキスト分離を実装する</h3>
             <p>
