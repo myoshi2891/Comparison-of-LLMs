@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import MermaidDiagram from "@/components/docs/MermaidDiagram";
-import TocObserver from "./TocObserver";
 import styles from "./page.module.css";
+import TocObserver from "./TocObserver";
 
 export const metadata: Metadata = {
-  title: "マルチエージェントオーケストレーション ベストプラクティスガイド | AI Model Cost Calculator",
+  title:
+    "マルチエージェントオーケストレーション ベストプラクティスガイド | AI Model Cost Calculator",
   description:
     "2026年最新のマルチエージェントオーケストレーション実践ガイド。Anthropic、Google、OpenAIの最新プラクティスに基づくアーキテクチャ、協調パターン、プロトコル（MCP/A2A）、可観測性、セキュリティを完全解説。",
 };
@@ -240,7 +241,9 @@ export default function MultiAgentOrchestrationPage() {
         <section id="why-now" className={styles.section}>
           <h2 className={styles.sectionTitle}>2. なぜ今マルチエージェントが注目されているのか</h2>
           <p>
-            2026年現在、フロンティアLLM（Claude 4、GPT-5.6、Gemini 3.6等）の性能向上に伴い、AIに対する要求が「一問一答」から「長期的なタスク自動化（Agentic Workflows）」へと変化しています。
+            2026年現在、フロンティアLLM（Claude 4、GPT-5.6、Gemini
+            3.6等）の性能向上に伴い、AIに対する要求が「一問一答」から「長期的なタスク自動化（Agentic
+            Workflows）」へと変化しています。
           </p>
           <p>
             単一エージェントで巨大なプロンプトと膨大なツールを与えると、アテンションの散乱、コンテキストウィンドウの消費、ツール誤用、命令無視などの限界に直面します。これを解決するため、責務とコンテキストを分離するマルチエージェント設計が標準的となっています。
@@ -251,7 +254,11 @@ export default function MultiAgentOrchestrationPage() {
         <section id="step1" className={styles.section}>
           <h2 className={styles.sectionTitle}>Step1: シングル vs マルチの判断基準</h2>
           <p>
-            マルチエージェント設計を導入する前に、まず「本当にマルチエージェントが必要か」を慎重に判断する必要があります。マルチエージェント化は複雑性とコストを跳ね上げるため、<strong>シングルエージェントで解決できる問題にはシングルエージェントを採用するのが最大の原則</strong>です。
+            マルチエージェント設計を導入する前に、まず「本当にマルチエージェントが必要か」を慎重に判断する必要があります。マルチエージェント化は複雑性とコストを跳ね上げるため、
+            <strong>
+              シングルエージェントで解決できる問題にはシングルエージェントを採用するのが最大の原則
+            </strong>
+            です。
           </p>
           <p>
             Anthropicのガイドラインでは、以下の3つの条件のうち1つ以上を満たす場合にのみマルチエージェント化を検討することを推奨しています。
@@ -260,15 +267,21 @@ export default function MultiAgentOrchestrationPage() {
           <div className={styles.grid3}>
             <div className={styles.card}>
               <div className={styles.cardTitle}>1. コンテキスト限界</div>
-              <p>単一エージェントのコンテキスト（アテンション）が溢れ、過去の指示やコンテキストを忘れ始める場合。</p>
+              <p>
+                単一エージェントのコンテキスト（アテンション）が溢れ、過去の指示やコンテキストを忘れ始める場合。
+              </p>
             </div>
             <div className={styles.card}>
               <div className={styles.cardTitle}>2. 明確な並列化機会</div>
-              <p>タスクが完全に独立した複数のサブタスクに分解でき、並行して処理することでレイテンシを大幅に短縮できる場合。</p>
+              <p>
+                タスクが完全に独立した複数のサブタスクに分解でき、並行して処理することでレイテンシを大幅に短縮できる場合。
+              </p>
             </div>
             <div className={styles.card}>
               <div className={styles.cardTitle}>3. 専門特化の必要性</div>
-              <p>異なるツール群や背景知識、相反するロール（開発者と安全検証者など）を完全に分離する必要がある場合。</p>
+              <p>
+                異なるツール群や背景知識、相反するロール（開発者と安全検証者など）を完全に分離する必要がある場合。
+              </p>
             </div>
           </div>
 
@@ -289,20 +302,29 @@ export default function MultiAgentOrchestrationPage() {
 
         {/* Section 4: Step 2 */}
         <section id="step2" className={styles.section}>
-          <h2 className={styles.sectionTitle}>Step2: タスク分解の設計原則(Context-Centric Decomposition)</h2>
+          <h2 className={styles.sectionTitle}>
+            Step2: タスク分解の設計原則(Context-Centric Decomposition)
+          </h2>
           <p>
-            マルチエージェント化を決めた後、最も重要な設計判断は「<strong>どうやって作業をエージェント間に分割するか</strong>」です。ここでチームが最も頻繁に間違える判断でもあります。
+            マルチエージェント化を決めた後、最も重要な設計判断は「
+            <strong>どうやって作業をエージェント間に分割するか</strong>
+            」です。ここでチームが最も頻繁に間違える判断でもあります。
           </p>
 
           <div className={styles.subsection}>
-            <h3 className={styles.subsectionTitle}>2-1. Problem-Centric(作業種別による分解)は非推奨</h3>
+            <h3 className={styles.subsectionTitle}>
+              2-1. Problem-Centric(作業種別による分解)は非推奨
+            </h3>
             <p>
-              「実装担当」「テスト担当」「レビュー担当」のように<strong>作業の種類</strong>で分割すると、ハンドオフのたびにコンテキストが失われ、常に調整コストが発生します。実際にソフトウェア開発ロールごとにサブエージェントを分けた実験では、実作業よりも調整(coordination)にトークンを多く消費したという報告があります。
+              「実装担当」「テスト担当」「レビュー担当」のように<strong>作業の種類</strong>
+              で分割すると、ハンドオフのたびにコンテキストが失われ、常に調整コストが発生します。実際にソフトウェア開発ロールごとにサブエージェントを分けた実験では、実作業よりも調整(coordination)にトークンを多く消費したという報告があります。
             </p>
           </div>
 
           <div className={styles.subsection}>
-            <h3 className={styles.subsectionTitle}>2-2. Context-Centric(コンテキスト境界による分解)が有効</h3>
+            <h3 className={styles.subsectionTitle}>
+              2-2. Context-Centric(コンテキスト境界による分解)が有効
+            </h3>
             <p>
               「必要なコンテキストの境界」で分割するのが原則です。たとえば1つの機能を実装するエージェントは、そのテストも担当すべきです。すでに実装の背景知識を持っているためです。分割してよいのは、コンテキストが本当に独立している場合に限ります。
             </p>
@@ -324,7 +346,9 @@ export default function MultiAgentOrchestrationPage() {
 
           <div className={styles.mermaidWrap}>
             <MermaidDiagram chart={DIAGRAM_2} />
-            <div className={styles.mermaidCaption}>図2: Problem-centric分解 と Context-centric分解の比較</div>
+            <div className={styles.mermaidCaption}>
+              図2: Problem-centric分解 と Context-centric分解の比較
+            </div>
           </div>
 
           <div className={styles.callout}>
@@ -341,7 +365,11 @@ export default function MultiAgentOrchestrationPage() {
         <section id="step3" className={styles.section}>
           <h2 className={styles.sectionTitle}>Step3: 協調パターン(Coordination Pattern)を選ぶ</h2>
           <p>
-            タスク分解の方針が決まったら、次に「エージェント同士がどう協調するか」というコーディネーションパターンを選びます。2026年4月にAnthropicが公開した整理では、以下の5つのパターンが実運用で定着しています。<strong>最初はもっとも単純なパターンから始め、限界にぶつかったら次のパターンへ進化させる</strong>のが推奨アプローチです。
+            タスク分解の方針が決まったら、次に「エージェント同士がどう協調するか」というコーディネーションパターンを選びます。2026年4月にAnthropicが公開した整理では、以下の5つのパターンが実運用で定着しています。
+            <strong>
+              最初はもっとも単純なパターンから始め、限界にぶつかったら次のパターンへ進化させる
+            </strong>
+            のが推奨アプローチです。
           </p>
 
           <div className={styles.subsection}>
@@ -354,15 +382,19 @@ export default function MultiAgentOrchestrationPage() {
               <div className={styles.mermaidCaption}>図3: Generator-Verifierパターン</div>
             </div>
             <p>
-              <strong>向いている用途:</strong> コード生成(1体が実装しもう1体がテストを実行する)、ファクトチェック、ルーブリック採点、コンプライアンス確認など、出力品質が重要で評価基準を明文化できる領域。
+              <strong>向いている用途:</strong>{" "}
+              コード生成(1体が実装しもう1体がテストを実行する)、ファクトチェック、ルーブリック採点、コンプライアンス確認など、出力品質が重要で評価基準を明文化できる領域。
             </p>
             <p>
-              <strong>弱点:</strong> 検証者の基準が曖昧だと「とりあえずOK」を出す「お墨付き」問題が起きます。生成とレビューが同程度に難しいタスクでは、検証者が問題を確実に検出できない場合もあります。また収束しない場合に備えて最大反復回数とフォールバック(人間へのエスカレーション、注意書き付きでベスト出力を返すなど)を必ず設定します。
+              <strong>弱点:</strong>{" "}
+              検証者の基準が曖昧だと「とりあえずOK」を出す「お墨付き」問題が起きます。生成とレビューが同程度に難しいタスクでは、検証者が問題を確実に検出できない場合もあります。また収束しない場合に備えて最大反復回数とフォールバック(人間へのエスカレーション、注意書き付きでベスト出力を返すなど)を必ず設定します。
             </p>
           </div>
 
           <div className={styles.subsection}>
-            <h3 className={styles.subsectionTitle}>3-2. Orchestrator-Subagent(オーケストレーター-サブエージェント)</h3>
+            <h3 className={styles.subsectionTitle}>
+              3-2. Orchestrator-Subagent(オーケストレーター-サブエージェント)
+            </h3>
             <p>
               階層構造が特徴です。リード(Lead)エージェントが計画・委任・統合を行い、サブエージェントはリードから割り当てられた特定の責務のみを実行し結果を返します。
             </p>
@@ -371,10 +403,13 @@ export default function MultiAgentOrchestrationPage() {
               <div className={styles.mermaidCaption}>図4: Orchestrator-Subagentパターン</div>
             </div>
             <p>
-              <strong>向いている用途:</strong> タスク分解が明確でサブタスク間の依存が少ない場合。たとえばプルリクエストのレビューで、セキュリティ・テストカバレッジ・スタイル・アーキテクチャ整合性をそれぞれ専門サブエージェントに割り当て、最後に統合するケース。Claude Codeのバックグラウンドサブエージェント機能もこのパターンを採用しています。
+              <strong>向いている用途:</strong>{" "}
+              タスク分解が明確でサブタスク間の依存が少ない場合。たとえばプルリクエストのレビューで、セキュリティ・テストカバレッジ・スタイル・アーキテクチャ整合性をそれぞれ専門サブエージェントに割り当て、最後に統合するケース。Claude
+              Codeのバックグラウンドサブエージェント機能もこのパターンを採用しています。
             </p>
             <p>
-              <strong>弱点:</strong> オーケストレーターが情報のボトルネックになります。あるサブエージェントの発見が別のサブエージェントの分析に関係する場合、その情報はオーケストレーターを経由しなければならず、何度もハンドオフを重ねるうちに重要な詳細が失われがちです。また明示的に並列化しない限り逐次実行になり、速度面のメリットを得られないままマルチエージェントのコストだけがかかることがあります。
+              <strong>弱点:</strong>{" "}
+              オーケストレーターが情報のボトルネックになります。あるサブエージェントの発見が別のサブエージェントの分析に関係する場合、その情報はオーケストレーターを経由しなければならず、何度もハンドオフを重ねるうちに重要な詳細が失われがちです。また明示的に並列化しない限り逐次実行になり、速度面のメリットを得られないままマルチエージェントのコストだけがかかることがあります。
             </p>
           </div>
 
@@ -388,13 +423,16 @@ export default function MultiAgentOrchestrationPage() {
               <div className={styles.mermaidCaption}>図5: Agent Teamsパターン</div>
             </div>
             <p>
-              Orchestrator-Subagentとの違いは「ワーカーの永続性」です。オーケストレーターは1つの束縛されたサブタスクのためにサブエージェントを起動し、結果を返したら終了させますが、Agent Teamsのワーカーは多数の割り当てにまたがって稼働し続け、ドメイン知識を蓄積していきます。
+              Orchestrator-Subagentとの違いは「ワーカーの永続性」です。オーケストレーターは1つの束縛されたサブタスクのためにサブエージェントを起動し、結果を返したら終了させますが、Agent
+              Teamsのワーカーは多数の割り当てにまたがって稼働し続け、ドメイン知識を蓄積していきます。
             </p>
             <p>
-              <strong>向いている用途:</strong> 大規模なコードベースのフレームワーク移行のように、サービスごとに独立した依存関係・テストスイート・デプロイ設定を持つ場合。各ワーカーはその担当領域に習熟していきます。
+              <strong>向いている用途:</strong>{" "}
+              大規模なコードベースのフレームワーク移行のように、サービスごとに独立した依存関係・テストスイート・デプロイ設定を持つ場合。各ワーカーはその担当領域に習熟していきます。
             </p>
             <p>
-              <strong>弱点:</strong> 独立性が前提条件です。1つのワーカーの作業が別のワーカーに影響する場合、互いに気づけず、出力が衝突する可能性があります。完了検出も難しく(あるワーカーは2分で終わり、別のワーカーは20分かかるなど)、共有リソース(同じコードベースやDB)への同時書き込みには衝突解決の仕組みが必要です。
+              <strong>弱点:</strong>{" "}
+              独立性が前提条件です。1つのワーカーの作業が別のワーカーに影響する場合、互いに気づけず、出力が衝突する可能性があります。完了検出も難しく(あるワーカーは2分で終わり、別のワーカーは20分かかるなど)、共有リソース(同じコードベースやDB)への同時書き込みには衝突解決の仕組みが必要です。
             </p>
           </div>
 
@@ -408,27 +446,33 @@ export default function MultiAgentOrchestrationPage() {
               <div className={styles.mermaidCaption}>図6: Message Busパターン</div>
             </div>
             <p>
-              <strong>向いている用途:</strong> セキュリティオペレーションの自動化のように、ワークフローが決められたシーケンスではなくイベント発生に応じて動的に変化するパイプライン。新しいエージェント種別を後から追加しても既存の接続を書き換える必要がありません。
+              <strong>向いている用途:</strong>{" "}
+              セキュリティオペレーションの自動化のように、ワークフローが決められたシーケンスではなくイベント発生に応じて動的に変化するパイプライン。新しいエージェント種別を後から追加しても既存の接続を書き換える必要がありません。
             </p>
             <p>
-              <strong>弱点:</strong> イベント駆動の柔軟性はトレーサビリティを犠牲にします。1つのアラートが5つのエージェントにまたがる連鎖を引き起こすと、何が起きたかを把握するには丁寧なログと相関分析が必要になります。ルーティングの精度も重要で、ルーターが誤分類・見落としをすると「サイレント障害(クラッシュせずに何も処理しない)」が起きます。
+              <strong>弱点:</strong>{" "}
+              イベント駆動の柔軟性はトレーサビリティを犠牲にします。1つのアラートが5つのエージェントにまたがる連鎖を引き起こすと、何が起きたかを把握するには丁寧なログと相関分析が必要になります。ルーティングの精度も重要で、ルーターが誤分類・見落としをすると「サイレント障害(クラッシュせずに何も処理しない)」が起きます。
             </p>
           </div>
 
           <div className={styles.subsection}>
             <h3 className={styles.subsectionTitle}>3-5. Shared State(共有ステート)</h3>
             <p>
-              これまでのパターンはすべて中央の管理役(オーケストレーター、チームリード、ルーター)が情報の流れを管理していました。Shared Stateはその仲介者を排除し、全エージェントが直接読み書きできる永続ストアを通じて協調します。
+              これまでのパターンはすべて中央の管理役(オーケストレーター、チームリード、ルーター)が情報の流れを管理していました。Shared
+              Stateはその仲介者を排除し、全エージェントが直接読み書きできる永続ストアを通じて協調します。
             </p>
             <div className={styles.mermaidWrap}>
               <MermaidDiagram chart={DIAGRAM_7} />
               <div className={styles.mermaidCaption}>図7: Shared Stateパターン</div>
             </div>
             <p>
-              <strong>向いている用途:</strong> 複数のエージェントが複雑な問いの異なる側面を調査し、互いの発見が他の調査に影響するリサーチ統合システム。学術文献担当が発見した重要な研究者情報を、業界分析担当がすぐに参照できます。単一障害点(コーディネーターやルーターの停止)を排除できる点も利点です。
+              <strong>向いている用途:</strong>{" "}
+              複数のエージェントが複雑な問いの異なる側面を調査し、互いの発見が他の調査に影響するリサーチ統合システム。学術文献担当が発見した重要な研究者情報を、業界分析担当がすぐに参照できます。単一障害点(コーディネーターやルーターの停止)を排除できる点も利点です。
             </p>
             <p>
-              <strong>弱点:</strong> 明示的な調整がないため、重複作業や矛盾するアプローチが起きやすくなります。より深刻なのは「反応ループ」です。AがBへの気づきを書き込み、BがそれをもとにAへの追記を書き込み…と収束しない堂々巡りが起き、トークンを消費し続けます。重複書き込みにはロックやバージョニングといった技術的対策がありますが、反応ループには時間予算・収束閾値(Nサイクル新しい発見がなければ終了)・十分な回答が揃ったかを判断する専任エージェントなど、<strong>明示的な終了条件</strong>を最初から設計する必要があります。
+              <strong>弱点:</strong>{" "}
+              明示的な調整がないため、重複作業や矛盾するアプローチが起きやすくなります。より深刻なのは「反応ループ」です。AがBへの気づきを書き込み、BがそれをもとにAへの追記を書き込み…と収束しない堂々巡りが起き、トークンを消費し続けます。重複書き込みにはロックやバージョニングといった技術的対策がありますが、反応ループには時間予算・収束閾値(Nサイクル新しい発見がなければ終了)・十分な回答が揃ったかを判断する専任エージェントなど、
+              <strong>明示的な終了条件</strong>を最初から設計する必要があります。
             </p>
           </div>
 
@@ -491,28 +535,40 @@ export default function MultiAgentOrchestrationPage() {
         <section id="step4" className={styles.section}>
           <h2 className={styles.sectionTitle}>Step4: 早期合格(Early Victory)問題への対策</h2>
           <p>
-            検証サブエージェント(Verifier)を導入する際、最も頻繁に発生するバグが「早期合格(Early Victory)問題」です。検証エージェントが十分にテストを実行せず、生成エージェントの出力を「問題なし」と安易に承認してしまう現象です。
+            検証サブエージェント(Verifier)を導入する際、最も頻繁に発生するバグが「早期合格(Early
+            Victory)問題」です。検証エージェントが十分にテストを実行せず、生成エージェントの出力を「問題なし」と安易に承認してしまう現象です。
           </p>
 
           <p>対策として、以下の3つのテクニックを組み込む必要があります。</p>
           <ul className={styles.checklist}>
             <li className={styles.checklistItem}>
               <i className={styles.tiTiCircleCheck ?? ""} />
-              <span><strong>ブラックボックス検証を徹底する:</strong> 検証エージェントには生成プロンプトや中間思考を見せず、純粋な出力成果物とテスト仕様のみを与える。</span>
+              <span>
+                <strong>ブラックボックス検証を徹底する:</strong>{" "}
+                検証エージェントには生成プロンプトや中間思考を見せず、純粋な出力成果物とテスト仕様のみを与える。
+              </span>
             </li>
             <li className={styles.checklistItem}>
               <i className={styles.tiTiCircleCheck ?? ""} />
-              <span><strong>ネガティブテストを含める:</strong> あえて失敗すべきテストケースや不正入力を与え、検証エージェントが正しく失敗を検出できるかを試す。</span>
+              <span>
+                <strong>ネガティブテストを含める:</strong>{" "}
+                あえて失敗すべきテストケースや不正入力を与え、検証エージェントが正しく失敗を検出できるかを試す。
+              </span>
             </li>
             <li className={styles.checklistItem}>
               <i className={styles.tiTiCircleCheck ?? ""} />
-              <span><strong>明示的な判定基準を与える:</strong> 「全ユニットテストを実行しパスしたログを確認するまでPASSを出してはならない」という行動規約をプロンプトで要求する。</span>
+              <span>
+                <strong>明示的な判定基準を与える:</strong>{" "}
+                「全ユニットテストを実行しパスしたログを確認するまでPASSを出してはならない」という行動規約をプロンプトで要求する。
+              </span>
             </li>
           </ul>
 
           <div className={styles.mermaidWrap}>
             <MermaidDiagram chart={DIAGRAM_8} />
-            <div className={styles.mermaidCaption}>図8: 検証サブエージェントと早期合格問題への対策フロー</div>
+            <div className={styles.mermaidCaption}>
+              図8: 検証サブエージェントと早期合格問題への対策フロー
+            </div>
           </div>
 
           <div className={styles.callout}>
@@ -527,16 +583,21 @@ export default function MultiAgentOrchestrationPage() {
 
         {/* Section 7: Step 5 */}
         <section id="step5" className={styles.section}>
-          <h2 className={styles.sectionTitle}>Step5: エージェント間通信プロトコルを設計する(MCPとA2A)</h2>
+          <h2 className={styles.sectionTitle}>
+            Step5: エージェント間通信プロトコルを設計する(MCPとA2A)
+          </h2>
           <p>
             エージェントを協調させるには、「ツールへのアクセス」と「エージェント同士の連携」という2つの異なるレイヤーの通信を標準化する必要があります。この2つを混同するのが2026年時点で最もよくある設計ミスの一つです。
           </p>
           <ul>
             <li>
-              <strong>MCP(Model Context Protocol):</strong> Anthropicが2024年11月に公開したオープン標準で、エージェントがツール・データソース・外部サービスにアクセスする方法を統一します。垂直方向(エージェント→外部世界)の接続を担います。
+              <strong>MCP(Model Context Protocol):</strong>{" "}
+              Anthropicが2024年11月に公開したオープン標準で、エージェントがツール・データソース・外部サービスにアクセスする方法を統一します。垂直方向(エージェント→外部世界)の接続を担います。
             </li>
             <li>
-              <strong>A2A(Agent2Agent Protocol):</strong> Googleが2025年4月に発表し、その後Linux Foundationに寄贈されたオープン標準で、異なるベンダー・異なるモデル基盤で構築されたエージェント同士が発見・通信・協調するための水平方向の接続を担います。各エージェントは自身の能力とエンドポイントを記述した「Agent Card」を公開し、他のエージェントがそれを参照して委任先を判断します。
+              <strong>A2A(Agent2Agent Protocol):</strong> Googleが2025年4月に発表し、その後Linux
+              Foundationに寄贈されたオープン標準で、異なるベンダー・異なるモデル基盤で構築されたエージェント同士が発見・通信・協調するための水平方向の接続を担います。各エージェントは自身の能力とエンドポイントを記述した「Agent
+              Card」を公開し、他のエージェントがそれを参照して委任先を判断します。
             </li>
           </ul>
 
@@ -585,7 +646,8 @@ export default function MultiAgentOrchestrationPage() {
           </div>
 
           <p>
-            実務では<strong>両方を併用する</strong>のが一般的です。エージェント内部のツール呼び出しはMCPで、組織や基盤モデルをまたぐエージェント間の委任はA2Aで処理するハイブリッド構成が2026年の主流です。
+            実務では<strong>両方を併用する</strong>
+            のが一般的です。エージェント内部のツール呼び出しはMCPで、組織や基盤モデルをまたぐエージェント間の委任はA2Aで処理するハイブリッド構成が2026年の主流です。
           </p>
 
           <div className={styles.callout}>
@@ -631,7 +693,9 @@ export default function MultiAgentOrchestrationPage() {
                   <td>Claude Agent SDK</td>
                   <td>Anthropic</td>
                   <td>Orchestrator-Subagent</td>
-                  <td>エージェントループ・並列ツール実行・フックを標準提供。Temporalと組み合わせて耐久実行を構築するのが定番構成</td>
+                  <td>
+                    エージェントループ・並列ツール実行・フックを標準提供。Temporalと組み合わせて耐久実行を構築するのが定番構成
+                  </td>
                   <td>コーディングエージェント、本番グレードの独自オーケストレーション</td>
                 </tr>
                 <tr>
@@ -645,7 +709,9 @@ export default function MultiAgentOrchestrationPage() {
                   <td>CrewAI</td>
                   <td>CrewAI</td>
                   <td>Orchestrator-Subagent/Sequential</td>
-                  <td>Role・Goal・Backstoryというロールベースの抽象化で素早く着手できる。単純作業ではトークン消費が重くなりやすい</td>
+                  <td>
+                    Role・Goal・Backstoryというロールベースの抽象化で素早く着手できる。単純作業ではトークン消費が重くなりやすい
+                  </td>
                   <td>業務ワークフロー自動化、コンテンツパイプライン</td>
                 </tr>
                 <tr>
@@ -674,12 +740,15 @@ export default function MultiAgentOrchestrationPage() {
           </div>
 
           <p>
-            Google ADKは、決定的オーケストレーション(コードで明示的に流れを定義する)と動的委任(モデル自身がどのエージェントに処理させるか判断する)の2方式を提供している点が特徴です。
+            Google
+            ADKは、決定的オーケストレーション(コードで明示的に流れを定義する)と動的委任(モデル自身がどのエージェントに処理させるか判断する)の2方式を提供している点が特徴です。
           </p>
 
           <div className={styles.mermaidWrap}>
             <MermaidDiagram chart={DIAGRAM_10} />
-            <div className={styles.mermaidCaption}>図10: Google ADKにおけるSequential + Loop構成の例</div>
+            <div className={styles.mermaidCaption}>
+              図10: Google ADKにおけるSequential + Loop構成の例
+            </div>
           </div>
 
           <div className={styles.callout}>
@@ -699,10 +768,22 @@ export default function MultiAgentOrchestrationPage() {
             Anthropicのリサーチシステムでは、リードエージェントが調査計画を記憶(Memory)システムに保存し続けることで、会話がモデルのコンテキストウィンドウの上限(20万トークン超)を超えても計画や発見を失わないようにしています。マルチエージェント設計では次の点を押さえておきましょう。
           </p>
           <ul>
-            <li><strong>サブエージェントは要約だけを返す:</strong> フルの調査結果ではなく、要点を凝縮した情報だけをオーケストレーターに返却し、メインのコンテキストを汚染しないようにする</li>
-            <li><strong>計画をメモリに永続化する:</strong> 長時間稼働するタスクでは、コンテキストが切り詰められても計画を再構築できるよう、外部メモリに定期的に書き出す</li>
-            <li><strong>ツール数が15〜20を超えたら再検討する:</strong> モデルがツール選択に多くの注意を割かれるようになったら、動的にツールを発見できる仕組みの導入や、マルチエージェント化を検討するタイミング</li>
-            <li><strong>コンテキスト圧縮(Compaction)を活用する:</strong> 近年のコンテキスト管理技術の進歩により、単一エージェントでも長時間の会話履歴を維持しやすくなっており、マルチエージェント化の閾値は今後も変化していく</li>
+            <li>
+              <strong>サブエージェントは要約だけを返す:</strong>{" "}
+              フルの調査結果ではなく、要点を凝縮した情報だけをオーケストレーターに返却し、メインのコンテキストを汚染しないようにする
+            </li>
+            <li>
+              <strong>計画をメモリに永続化する:</strong>{" "}
+              長時間稼働するタスクでは、コンテキストが切り詰められても計画を再構築できるよう、外部メモリに定期的に書き出す
+            </li>
+            <li>
+              <strong>ツール数が15〜20を超えたら再検討する:</strong>{" "}
+              モデルがツール選択に多くの注意を割かれるようになったら、動的にツールを発見できる仕組みの導入や、マルチエージェント化を検討するタイミング
+            </li>
+            <li>
+              <strong>コンテキスト圧縮(Compaction)を活用する:</strong>{" "}
+              近年のコンテキスト管理技術の進歩により、単一エージェントでも長時間の会話履歴を維持しやすくなっており、マルチエージェント化の閾値は今後も変化していく
+            </li>
           </ul>
         </section>
 
@@ -713,14 +794,25 @@ export default function MultiAgentOrchestrationPage() {
             マルチエージェントシステムは非決定的に振る舞うため、ループに陥ったり、存在しない情報源を探し続けたり、不要なステータス更新でお互いを中断させ合ったりする失敗モードが起こり得ます。本番運用のために以下の仕組みを導入します。
           </p>
           <ul>
-            <li><strong>チェックポインティング:</strong> 実行途中の状態を定期的に保存し、失敗時に最初からやり直すのではなく直前のチェックポイントから再開できるようにする</li>
-            <li><strong>リトライロジック:</strong> 一時的な失敗(APIタイムアウトなど)には自動再試行を設定するが、最大試行回数を設けて無限ループを防ぐ</li>
-            <li><strong>レインボーデプロイメント:</strong> 新旧バージョンを並行稼働させ、進行中のセッションを壊さずに安全に切り替える</li>
+            <li>
+              <strong>チェックポインティング:</strong>{" "}
+              実行途中の状態を定期的に保存し、失敗時に最初からやり直すのではなく直前のチェックポイントから再開できるようにする
+            </li>
+            <li>
+              <strong>リトライロジック:</strong>{" "}
+              一時的な失敗(APIタイムアウトなど)には自動再試行を設定するが、最大試行回数を設けて無限ループを防ぐ
+            </li>
+            <li>
+              <strong>レインボーデプロイメント:</strong>{" "}
+              新旧バージョンを並行稼働させ、進行中のセッションを壊さずに安全に切り替える
+            </li>
           </ul>
 
           <div className={styles.mermaidWrap}>
             <MermaidDiagram chart={DIAGRAM_11} />
-            <div className={styles.mermaidCaption}>図11: チェックポイント/リトライによる耐障害性フロー</div>
+            <div className={styles.mermaidCaption}>
+              図11: チェックポイント/リトライによる耐障害性フロー
+            </div>
           </div>
         </section>
 
@@ -728,7 +820,8 @@ export default function MultiAgentOrchestrationPage() {
         <section id="step9" className={styles.section}>
           <h2 className={styles.sectionTitle}>Step9: セキュリティとガードレール</h2>
           <p>
-            複数エージェントが連携するシステムは、単一エージェントのガードレールでは対処しきれないリスクを抱えます。OWASPが2026年に公開した「Top 10 for Agentic Applications(ASI)」では、エージェント特有のリスクが体系化されています。
+            複数エージェントが連携するシステムは、単一エージェントのガードレールでは対処しきれないリスクを抱えます。OWASPが2026年に公開した「Top
+            10 for Agentic Applications(ASI)」では、エージェント特有のリスクが体系化されています。
           </p>
 
           <div className={`${styles.callout} ${styles.calloutDanger}`}>
@@ -740,7 +833,9 @@ export default function MultiAgentOrchestrationPage() {
 
           <div className={styles.mermaidWrap}>
             <MermaidDiagram chart={DIAGRAM_12} />
-            <div className={styles.mermaidCaption}>図12: マルチエージェント間の信頼境界とガードレール配置</div>
+            <div className={styles.mermaidCaption}>
+              図12: マルチエージェント間の信頼境界とガードレール配置
+            </div>
           </div>
         </section>
 
@@ -751,14 +846,24 @@ export default function MultiAgentOrchestrationPage() {
             マルチエージェントシステムは非決定的であるため、従来型アプリケーションのログ監視だけでは不十分です。「最終出力は間違っていたが、どのエージェントが原因か分からない」状態を避けるための可観測性設計が不可欠です。
           </p>
           <ol>
-            <li><strong>分散トレーシング:</strong> エージェント間の呼び出しをまたいでスパン(span)を親子関係のまま記録する</li>
-            <li><strong>評価フレームワーク(LLM-as-a-Judge):</strong> 高速・低コストなモデルを使い、正確性・関連性をスコアリングする</li>
-            <li><strong>リアルタイムログ:</strong> 即座のデバッグを可能にする</li>
+            <li>
+              <strong>分散トレーシング:</strong>{" "}
+              エージェント間の呼び出しをまたいでスパン(span)を親子関係のまま記録する
+            </li>
+            <li>
+              <strong>評価フレームワーク(LLM-as-a-Judge):</strong>{" "}
+              高速・低コストなモデルを使い、正確性・関連性をスコアリングする
+            </li>
+            <li>
+              <strong>リアルタイムログ:</strong> 即座のデバッグを可能にする
+            </li>
           </ol>
 
           <div className={styles.mermaidWrap}>
             <MermaidDiagram chart={DIAGRAM_13} />
-            <div className={styles.mermaidCaption}>図13: マルチエージェントのトレーシングと評価パイプライン</div>
+            <div className={styles.mermaidCaption}>
+              図13: マルチエージェントのトレーシングと評価パイプライン
+            </div>
           </div>
 
           <div className={styles.tableWrapper}>
@@ -776,7 +881,9 @@ export default function MultiAgentOrchestrationPage() {
                 </tr>
                 <tr>
                   <td>Braintrust</td>
-                  <td>本番トレースをそのまま評価用データセット化するTrace-to-Evalワークフローが特徴</td>
+                  <td>
+                    本番トレースをそのまま評価用データセット化するTrace-to-Evalワークフローが特徴
+                  </td>
                 </tr>
                 <tr>
                   <td>MLflow</td>
@@ -811,7 +918,9 @@ export default function MultiAgentOrchestrationPage() {
                 <tr>
                   <td>同等タスクでのトークン消費倍率</td>
                   <td>シングルエージェント比で約3〜10倍</td>
-                  <td>エージェントごとに個別のコンテキストを持ち、調整メッセージのやり取りでコストが発生するため</td>
+                  <td>
+                    エージェントごとに個別のコンテキストを持ち、調整メッセージのやり取りでコストが発生するため
+                  </td>
                 </tr>
                 <tr>
                   <td>深いリサーチ用途でのトークン消費倍率</td>
@@ -821,7 +930,9 @@ export default function MultiAgentOrchestrationPage() {
                 <tr>
                   <td>リード+並列サブエージェント構成の性能改善</td>
                   <td>単体エージェント比で約90.2%向上</td>
-                  <td>Claude Opus 4をリード、Claude Sonnet 4をサブエージェントとした構成での評価</td>
+                  <td>
+                    Claude Opus 4をリード、Claude Sonnet 4をサブエージェントとした構成での評価
+                  </td>
                 </tr>
                 <tr>
                   <td>単純なタスクでシングルエージェントが優位だった割合</td>
@@ -854,7 +965,9 @@ export default function MultiAgentOrchestrationPage() {
                 <tr>
                   <td>見栄えの良さでパターンを選ぶ</td>
                   <td>実際の問題に合わないパターンを採用し、不要な調整コストが発生する</td>
-                  <td>最もシンプルなパターンから始め、限界にぶつかってから次のパターンへ進化させる</td>
+                  <td>
+                    最もシンプルなパターンから始め、限界にぶつかってから次のパターンへ進化させる
+                  </td>
                 </tr>
                 <tr>
                   <td>Problem-centricな分解</td>
@@ -883,7 +996,9 @@ export default function MultiAgentOrchestrationPage() {
                 </tr>
                 <tr>
                   <td>可観測性を後回しにする</td>
-                  <td>本番障害が起きた際にどのエージェント・どのツール呼び出しが原因か分からない</td>
+                  <td>
+                    本番障害が起きた際にどのエージェント・どのツール呼び出しが原因か分からない
+                  </td>
                   <td>初期段階から分散トレーシングと評価フレームワークを組み込む</td>
                 </tr>
                 <tr>
@@ -915,9 +1030,18 @@ export default function MultiAgentOrchestrationPage() {
             マルチエージェントオーケストレーションは強力ですが、あらゆる場面に適した万能解ではありません。設計に着手する前に、次の3点を必ず確認してください。
           </p>
           <ol>
-            <li><strong>本当に正当化される制約があるか</strong>(コンテキスト限界・並列化の機会・専門特化の必要性)</li>
-            <li><strong>分解は作業種別ではなくコンテキスト境界に基づいているか</strong></li>
-            <li><strong>サブエージェントが完全なコンテキストなしで検証できる明確なポイントがあるか</strong></li>
+            <li>
+              <strong>本当に正当化される制約があるか</strong>
+              (コンテキスト限界・並列化の機会・専門特化の必要性)
+            </li>
+            <li>
+              <strong>分解は作業種別ではなくコンテキスト境界に基づいているか</strong>
+            </li>
+            <li>
+              <strong>
+                サブエージェントが完全なコンテキストなしで検証できる明確なポイントがあるか
+              </strong>
+            </li>
           </ol>
           <p>
             最もシンプルなアプローチから始め、根拠が積み上がってから複雑さを追加していくことが、2026年時点での最も確実なベストプラクティスです。

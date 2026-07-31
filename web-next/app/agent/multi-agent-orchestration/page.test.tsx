@@ -37,8 +37,8 @@ describe("MultiAgentOrchestrationPage", () => {
 
   it("ensures all internal links are clean URLs without .html extension", () => {
     const { container } = render(<Page />);
-    const internalLinks = Array.from(container.querySelectorAll("a")).filter(
-      (a) => a.getAttribute("href")?.startsWith("/")
+    const internalLinks = Array.from(container.querySelectorAll("a")).filter((a) =>
+      a.getAttribute("href")?.startsWith("/")
     );
     for (const link of internalLinks) {
       expect(link.getAttribute("href")).not.toContain(".html");

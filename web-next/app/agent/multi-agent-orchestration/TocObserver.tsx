@@ -5,9 +5,7 @@ import styles from "./page.module.css";
 
 export default function TocObserver() {
   useEffect(() => {
-    const navLinks = document.querySelectorAll<HTMLAnchorElement>(
-      `.${styles.tocNav} a`
-    );
+    const navLinks = document.querySelectorAll<HTMLAnchorElement>(`.${styles.tocNav} a`);
     const idToLink: Record<string, HTMLAnchorElement> = {};
     for (const a of Array.from(navLinks)) {
       const href = a.getAttribute("href");
