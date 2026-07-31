@@ -20,6 +20,8 @@
 
 ## 最近の追加内容
 
+- **マルチエージェント・オーケストレーション実践ガイド（/agent/multi-agent-orchestration-best-practices）の Pure JSX 移行と ナビ同期**: `Multi-agent-orchestration-best-practices.html` を `web-next/app/agent/multi-agent-orchestration-best-practices/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。要約・省略なしで全15セクション（Hero + 14H2セクション + 参考文献一覧）・全表・全コードブロック・21 Mermaid図・TOCスクロール追従（`TocObserver.tsx`）・外部リンク安全属性・`page-registry.ts`（`Agent 開発` グループ）登録を完了。原本 `Multi-agent-orchestration-best-practices.html` は `archive/html/Multi-agent-orchestration-best-practices.html` へ `git mv` 退避保存。契約テストを追加しクリア。
+
 - **Microsoft Foundry 実践ベストプラクティスガイド（/infra/microsoft-foundry-best-practices-intermediate）の Pure JSX 移行と Providers ナビ同期**: `Microsoft-foundry-best-practices-intermediate.html` を `web-next/app/infra/microsoft-foundry-best-practices-intermediate/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。要約・省略なしで全17セクション（Hero + 17H2セクション）・全表・全コードブロック・9 Mermaid図・TOCスクロール追従（`TocObserver.tsx`）・外部リンク安全属性・`page-registry.ts` 登録を完了。原本 `Microsoft-foundry-best-practices-intermediate.html` は `archive/html/Microsoft-foundry-best-practices-intermediate.html` へ `git mv` 退避保存。契約テスト4件（タイトル、17H2セクション、外部リンク検証）を追加し全クリア（Vitest **143 files / 1290 tests** 全 Green ✅）。
 
 - **Providers ナビの Copilot から Microsoft への変更および Microsoft Foundry ガイドのコードハイライト追記**: `nav-taxonomy.ts` および `page-registry.ts` において、`Providers` グループ配下の `Copilot` カテゴリ名を `Microsoft` に更新 🚀。旧 `/copilot/*` ページ群（Agent, GitHub Copilot, Markdown Guide, Skill）に加え、新規追加した `/infra/microsoft-foundry-best-practices-guide` も `Providers -> Microsoft` 配下に登録。併せて Foundry ガイド内の bash / python コードブロックに対し構文ハイライト（`styles.ck`, `styles.cm`, `styles.cs`, `styles.cv`, `styles.cc`, `styles.fn`）を追加。関連する全ナビ導出テスト・SiteHeader テストを同期・更新し全クリア（Vitest **142 files / 1286 tests** 全 Green ✅）。
