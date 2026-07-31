@@ -71,6 +71,45 @@ function applySequenceDiagramColorOverrides(
 }
 
 /**
+ * Applies vibrant color overrides to Mermaid pie chart slices, legends, and slice texts.
+ *
+ * @param root - The container element holding the pie chart SVG.
+ */
+function applyPieChartColorOverrides(root: HTMLElement): void {
+  const pieColors = ["#57c7ff", "#a996ff", "#ff9d66", "#5eead4", "#ffd166", "#ef476f"];
+  const slices = root.querySelectorAll<SVGPathElement>("path.pieCircle");
+  slices.forEach((el, idx) => {
+    const color = pieColors[idx % pieColors.length];
+    el.style.setProperty("fill", color, "important");
+    el.style.setProperty("stroke", "#07111e", "important");
+    el.style.setProperty("stroke-width", "2px", "important");
+    el.style.setProperty("opacity", "0.95", "important");
+  });
+
+  const legendRects = root.querySelectorAll<SVGRectElement>(
+    "g.legend rect, .legend rect, svg rect[class*='legend']"
+  );
+  legendRects.forEach((el, idx) => {
+    const color = pieColors[idx % pieColors.length];
+    el.style.setProperty("fill", color, "important");
+    el.style.setProperty("stroke", "#07111e", "important");
+  });
+
+  root
+    .querySelectorAll<SVGTextElement>("g.legend text, .legend text, text.legend")
+    .forEach((el) => {
+      el.style.setProperty("fill", "#e8eef5", "important");
+    });
+
+  root
+    .querySelectorAll<SVGTextElement>("text.slice, .slice text, g text.slice, .pieTitleText")
+    .forEach((el) => {
+      el.style.setProperty("fill", "#ffffff", "important");
+      el.style.setProperty("font-weight", "700", "important");
+    });
+}
+
+/**
  * Renders a Mermaid diagram and updates it when its source or rendering options change.
  *
  * @param chart - Mermaid diagram source text.
@@ -146,6 +185,9 @@ export default function MermaidDiagram({
             // 矢印上のラベル（messageText）・ループラベル（loopText）・条件ラベル（labelText）も
             // SVG <text> 要素。themeVariables.signalTextColor が届かない場合のフォールバック。
             applySequenceDiagramColorOverrides(ref.current, themeVariables);
+          }
+          if (ref.current) {
+            applyPieChartColorOverrides(ref.current);
           }
         } catch (err) {
           console.error("[MermaidDiagram] render failed:", err);

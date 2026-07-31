@@ -484,3 +484,56 @@
     padding: 36px 22px 100px;
   }
 }
+
+/* ---------- Mermaid Pie Chart Vivid Colors Overrides ---------- */
+.diagramWrap :global(svg path.pieCircle:nth-of-type(1)),
+.diagramWrap :global(svg .legend:nth-of-type(1) rect),
+.diagramWrap :global(svg .legend:nth-child(1) rect),
+.diagramWrap :global(svg g.legend:nth-of-type(1) rect) {
+  fill: #57c7ff !important; /* 領域1: シアン 41.8% */
+  stroke: #07111e !important;
+  stroke-width: 2px !important;
+  opacity: 0.95 !important;
+}
+
+.diagramWrap :global(svg path.pieCircle:nth-of-type(2)),
+.diagramWrap :global(svg .legend:nth-of-type(2) rect),
+.diagramWrap :global(svg .legend:nth-child(2) rect),
+.diagramWrap :global(svg g.legend:nth-of-type(2) rect) {
+  fill: #a996ff !important; /* 領域2: パープル 36.9% */
+  stroke: #07111e !important;
+  stroke-width: 2px !important;
+  opacity: 0.95 !important;
+}
+
+.diagramWrap :global(svg path.pieCircle:nth-of-type(3)),
+.diagramWrap :global(svg .legend:nth-of-type(3) rect),
+.diagramWrap :global(svg .legend:nth-child(3) rect),
+.diagramWrap :global(svg g.legend:nth-of-type(3) rect) {
+  fill: #ff9d66 !important; /* 領域3: コーラル 21.3% */
+  stroke: #07111e !important;
+  stroke-width: 2px !important;
+  opacity: 0.95 !important;
+}
+
+.diagramWrap :global(svg .pieTitleText) {
+  fill: #ffffff !important;
+  font-weight: 700 !important;
+}
+
+.diagramWrap :global(svg text.slice),
+.diagramWrap :global(svg .pieTitleText),
+.diagramWrap :global(svg .slice text),
+.diagramWrap :global(svg g text.slice) {
+  fill: #ffffff !important;
+  font-weight: 700 !important;
+  font-size: 15px !important;
+}
+
+.diagramWrap :global(svg .legend text),
+.diagramWrap :global(svg g.legend text) {
+  fill: #e8eef5 !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+}
+
