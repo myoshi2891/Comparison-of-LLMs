@@ -650,6 +650,20 @@ const entries: PageEntry[] = [
     lastReviewed: "2026-07-31",
   },
   {
+    slug: "/infra/microsoft-foundry-best-practices-intermediate",
+    title: "Microsoft Foundry 実践ベストプラクティスガイド",
+    description:
+      "Microsoft Foundry（旧Azure AI Studio/Azure AI Foundry）を用いたAIアプリ・エージェント開発のステップバイステップ・ベストプラクティスガイド。",
+    group: "Providers",
+    category: "Microsoft",
+    provider: "microsoft",
+    topics: ["foundry", "azure", "infra", "rag", "agent", "guardrails"],
+    summary:
+      "Microsoft Foundry（旧Azure AI Studio/Azure AI Foundry）を用いたAIアプリ・エージェント開発のステップバイステップ・ベストプラクティスガイド。",
+    addedAt: "2026-07-31",
+    lastReviewed: "2026-07-31",
+  },
+  {
     slug: "/llm-ops/evaluation-observability",
     title: "Evaluation & Observability",
     group: "運用・品質",
