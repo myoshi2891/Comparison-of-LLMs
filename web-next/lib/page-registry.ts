@@ -133,6 +133,16 @@ const entries: PageEntry[] = [
     lastReviewed: "2026-07-31",
   },
   {
+    slug: "/agent/multi-agent-orchestration",
+    title: "マルチエージェントオーケストレーション",
+    group: "Agent 開発",
+    topics: ["agent", "multi-agent", "orchestration", "mcp", "a2a"],
+    summary:
+      "2026年最新のマルチエージェントオーケストレーション実践ガイド。Anthropic、Google、OpenAIの最新プラクティスに基づくアーキテクチャ、協調パターン、プロトコル（MCP/A2A）、可観測性、セキュリティを完全解説。",
+    addedAt: "2026-07-31",
+    lastReviewed: "2026-07-31",
+  },
+  {
     slug: "/ci-cd/ai-cicd-automation-best-practices",
     title: "AI CI/CD Automation",
     group: "開発プロセス",
