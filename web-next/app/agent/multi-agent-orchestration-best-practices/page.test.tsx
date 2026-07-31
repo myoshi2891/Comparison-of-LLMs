@@ -11,7 +11,7 @@ describe("MultiAgentOrchestrationPage", () => {
     );
   });
 
-  it("returns valid JSX element tree with vivid pie chart styling overrides", () => {
+  it("returns valid JSX element tree with full code block syntax highlights and inline code styling", () => {
     const jsx = MultiAgentOrchestrationPage();
     expect(jsx).toBeDefined();
 
@@ -20,11 +20,11 @@ describe("MultiAgentOrchestrationPage", () => {
     // Verify TOC navigation groups exist
     expect(jsxString).toContain("はじめに");
     expect(jsxString).toContain("アーキテクチャ");
-    expect(jsxString).toContain("設計と実装");
-    expect(jsxString).toContain("ガバナンス");
 
-    // Verify refined pie chart diagram MMD_12 exists
-    expect(jsxString).toContain("MMD_12");
+    // Verify code block tokens have syntax highlight classes
+    expect(jsxString).toContain("subagent_contract");
+    expect(jsxString).toContain("orchestrator_scaling_rules");
+    expect(jsxString).toContain("codeBody");
 
     // Verify no lowercase rowspan attribute
     expect(jsxString).not.toContain('"rowspan"');
