@@ -300,18 +300,18 @@ export default function MicrosoftFoundryBestPracticesPage() {
             <div className={styles.codeBlock}>
               <div className={styles.codeBar}>bash</div>
               <div className={styles.codeBody}>
-                <div className={styles.codeLine}>az login</div>
+                <div className={styles.codeLine}><span className={styles.cm}>az</span> login</div>
                 <div className={styles.codeLine}></div>
-                <div className={styles.codeLine}>az group create --name my-foundry-rg --location eastus</div>
+                <div className={styles.codeLine}><span className={styles.cm}>az</span> group create <span className={styles.ck}>--name</span> my-foundry-rg <span className={styles.ck}>--location</span> eastus</div>
                 <div className={styles.codeLine}></div>
-                <div className={styles.codeLine}>az cognitiveservices account create \</div>
-                <div className={styles.codeLine}>  --name my-foundry-resource \</div>
-                <div className={styles.codeLine}>  --resource-group my-foundry-rg \</div>
-                <div className={styles.codeLine}>  --kind AIServices \</div>
-                <div className={styles.codeLine}>  --sku S0 \</div>
-                <div className={styles.codeLine}>  --location eastus \</div>
-                <div className={styles.codeLine}>  --custom-domain my-foundry-resource \</div>
-                <div className={styles.codeLine}>  --allow-project-management true</div>
+                <div className={styles.codeLine}><span className={styles.cm}>az</span> cognitiveservices account create \</div>
+                <div className={styles.codeLine}>  <span className={styles.ck}>--name</span> my-foundry-resource \</div>
+                <div className={styles.codeLine}>  <span className={styles.ck}>--resource-group</span> my-foundry-rg \</div>
+                <div className={styles.codeLine}>  <span className={styles.ck}>--kind</span> AIServices \</div>
+                <div className={styles.codeLine}>  <span className={styles.ck}>--sku</span> S0 \</div>
+                <div className={styles.codeLine}>  <span className={styles.ck}>--location</span> eastus \</div>
+                <div className={styles.codeLine}>  <span className={styles.ck}>--custom-domain</span> my-foundry-resource \</div>
+                <div className={styles.codeLine}>  <span className={styles.ck}>--allow-project-management</span> true</div>
               </div>
             </div>
             <h3>ベストプラクティス</h3>
@@ -412,23 +412,23 @@ export default function MicrosoftFoundryBestPracticesPage() {
             <div className={styles.codeBlock}>
               <div className={styles.codeBar}>python</div>
               <div className={styles.codeBody}>
-                <div className={styles.codeLine}>from azure.identity import DefaultAzureCredential</div>
-                <div className={styles.codeLine}>from azure.ai.projects import AIProjectClient</div>
+                <div className={styles.codeLine}><span className={styles.ck}>from</span> azure.identity <span className={styles.ck}>import</span> DefaultAzureCredential</div>
+                <div className={styles.codeLine}><span className={styles.ck}>from</span> azure.ai.projects <span className={styles.ck}>import</span> AIProjectClient</div>
                 <div className={styles.codeLine}></div>
-                <div className={styles.codeLine}># 形式: &quot;https://resource_name.ai.azure.com/api/projects/project_name&quot;</div>
-                <div className={styles.codeLine}>PROJECT_ENDPOINT = &quot;your_project_endpoint&quot;</div>
+                <div className={styles.codeLine}><span className={styles.cc}># 形式: &quot;https://resource_name.ai.azure.com/api/projects/project_name&quot;</span></div>
+                <div className={styles.codeLine}><span className={styles.cv}>PROJECT_ENDPOINT</span> = <span className={styles.cs}>&quot;your_project_endpoint&quot;</span></div>
                 <div className={styles.codeLine}></div>
-                <div className={styles.codeLine}>project = AIProjectClient(</div>
-                <div className={styles.codeLine}>    endpoint=PROJECT_ENDPOINT,</div>
-                <div className={styles.codeLine}>    credential=DefaultAzureCredential(),</div>
+                <div className={styles.codeLine}>project = <span className={styles.fn}>AIProjectClient</span>(</div>
+                <div className={styles.codeLine}>    endpoint=<span className={styles.cv}>PROJECT_ENDPOINT</span>,</div>
+                <div className={styles.codeLine}>    credential=<span className={styles.fn}>DefaultAzureCredential</span>(),</div>
                 <div className={styles.codeLine}>)</div>
-                <div className={styles.codeLine}>openai = project.get_openai_client()</div>
+                <div className={styles.codeLine}>openai = project.<span className={styles.fn}>get_openai_client</span>()</div>
                 <div className={styles.codeLine}></div>
-                <div className={styles.codeLine}>response = openai.responses.create(</div>
-                <div className={styles.codeLine}>    model=&quot;gpt-5-mini&quot;,</div>
-                <div className={styles.codeLine}>    input=&quot;日本の人口はおよそ何人ですか？&quot;,</div>
+                <div className={styles.codeLine}>response = openai.responses.<span className={styles.fn}>create</span>(</div>
+                <div className={styles.codeLine}>    model=<span className={styles.cs}>&quot;gpt-5-mini&quot;</span>,</div>
+                <div className={styles.codeLine}>    input=<span className={styles.cs}>&quot;日本の人口はおよそ何人ですか？&quot;</span>,</div>
                 <div className={styles.codeLine}>)</div>
-                <div className={styles.codeLine}>print(response.output_text)</div>
+                <div className={styles.codeLine}><span className={styles.fn}>print</span>(response.output_text)</div>
               </div>
             </div>
             <h3>ベストプラクティス</h3>

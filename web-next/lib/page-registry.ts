@@ -44,7 +44,7 @@ export const PageEntrySchema = z
     category: z.string().min(1).optional(),
     /** プロバイダー系ページのみ。識別子であり表示ラベルではない（表示は category）。 */
     provider: z
-      .enum(["claude", "google", "codex", "copilot", "moonshot", "deepseek", "xai", "zhipu"])
+      .enum(["claude", "google", "codex", "copilot", "microsoft", "moonshot", "deepseek", "xai", "zhipu"])
       .optional(),
     /** 横断検索・関連リンク (F-5 / F-7) 用のトピックタグ */
     topics: z.array(z.string()),
@@ -353,8 +353,8 @@ const entries: PageEntry[] = [
     slug: "/copilot/agent",
     title: "Agent",
     group: "Providers",
-    category: "Copilot",
-    provider: "copilot",
+    category: "Microsoft",
+    provider: "microsoft",
     topics: ["agent"],
     summary:
       "GitHub Copilot .agent.md の完全ベストプラクティスガイド。フロントマター全仕様・ステップバイステップ作成・Handoffs（エージェント連鎖）・Subagents（サブエージェント）・MCP統合・マルチエージェント設計パターン・トラブルシューティングを 2026年6月最新版の公式ドキュメント準拠で解説。Cloud agent GA・組織/エンタープライズエージェント（JetBrains）・Copilot code review の AGENTS.md 対応に対応。",
@@ -365,8 +365,8 @@ const entries: PageEntry[] = [
     slug: "/copilot/github-copilot",
     title: "GitHub Copilot",
     group: "Providers",
-    category: "Copilot",
-    provider: "copilot",
+    category: "Microsoft",
+    provider: "microsoft",
     topics: ["copilot"],
     summary:
       "2026年6月最新版 — 初学者からエキスパートまで対応したステップバイステップのAIコーディングアシスタント活用法。Cloud agent GA・従量課金（AI Credits）・Copilot code review の AGENTS.md 対応を反映。",
@@ -377,8 +377,8 @@ const entries: PageEntry[] = [
     slug: "/copilot/markdown-file-guide",
     title: "Markdown Guide",
     group: "Providers",
-    category: "Copilot",
-    provider: "copilot",
+    category: "Microsoft",
+    provider: "microsoft",
     topics: ["guide"],
     summary:
       "copilot-instructions.md / .instructions.md / .prompt.md / .chatmode.md / .agent.md / AGENTS.md / SKILL.md / MCP / Plan Mode — Copilotの全カスタマイズファイル・新機能を根拠ソース付きで徹底解説。Copilot code review の AGENTS.md 対応（2026-06-18）・Cloud agent GA を反映。",
@@ -389,8 +389,8 @@ const entries: PageEntry[] = [
     slug: "/copilot/skill",
     title: "Skill",
     group: "Providers",
-    category: "Copilot",
-    provider: "copilot",
+    category: "Microsoft",
+    provider: "microsoft",
     topics: ["skill"],
     summary:
       "GitHub Copilot Coding Agent / VS Code Agent Mode / Copilot CLI 対応の SKILL.md ガイド。フロントマター完全仕様・Progressive Disclosure 3段階ローディング・ステップバイステップ作成・実践テンプレート集・トラブルシューティングを 2026年6月最新版の公式ドキュメント根拠付きで徹底解説。Copilot code review は AGENTS.md 対応（2026-06-18）、Cloud agent は GA。",
@@ -640,7 +640,9 @@ const entries: PageEntry[] = [
     title: "Microsoft Foundry 活用ガイド",
     description:
       "Microsoft Foundry（旧Azure AI Studio/Azure AI Foundry）を用いたAIアプリ・エージェント開発のステップバイステップ・ベストプラクティスガイド。",
-    group: "運用・品質",
+    group: "Providers",
+    category: "Microsoft",
+    provider: "microsoft",
     topics: ["foundry", "azure", "infra", "rag", "agent", "guardrails"],
     summary:
       "Microsoft Foundry（旧Azure AI Studio/Azure AI Foundry）を用いたAIアプリ・エージェント開発のステップバイステップ・ベストプラクティスガイド。",

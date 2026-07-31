@@ -276,6 +276,33 @@
   white-space: pre;
 }
 
+.ck {
+  color: #ff7b72;
+  font-weight: 600;
+}
+
+.cs {
+  color: #a5d6ff;
+}
+
+.cv {
+  color: #79c0ff;
+}
+
+.cc {
+  color: #8b949e;
+  font-style: italic;
+}
+
+.cm {
+  color: #7ee787;
+  font-weight: bold;
+}
+
+.fn {
+  color: #d2a8ff;
+}
+
 .diagramWrap {
   border: 1px solid var(--border);
   border-radius: 8px;
