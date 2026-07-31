@@ -600,6 +600,7 @@ export default function MultiAgentOrchestrationPage() {
                   <a
                     href="https://www.digitalapplied.com/blog/multi-agent-orchestration-5-patterns-that-work"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >Multi-Agent Orchestration: 5 Patterns That Work in 2026 — Digital Applied</a
                   >
                 </li>
@@ -607,30 +608,31 @@ export default function MultiAgentOrchestrationPage() {
                   <a
                     href="https://beam.ai/agentic-insights/multi-agent-orchestration-patterns-production"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >6 Multi-Agent Orchestration Patterns for Production (2026) — Beam AI</a
                   >
                 </li>
                 <li>
-                  <a href="https://www.augmentcode.com/guides/swarm-vs-supervisor" target="_blank"
+                  <a href="https://www.augmentcode.com/guides/swarm-vs-supervisor" target="_blank" rel="noopener noreferrer"
                     >Swarm vs. Supervisor: Multi-Agent Architecture Guide — Augment Code</a
                   >
                 </li>
                 <li>
                   <a
                     href="https://lilys.ai/en/notes/langgraph-swarm-20260202/langgraph-hierarchical-supervisor-swarm-ai-agents"
-                    target="_blank"
+                    target="_blank" rel="noopener noreferrer"
                     >LangGraph Advanced – Hierarchical Multi-Level Supervisor & Swarm Agents</a
                   >
                 </li>
                 <li>
                   <a
                     href="https://dev.to/focused_dot_io/multi-agent-orchestration-in-langgraph-supervisor-vs-swarm-tradeoffs-and-architecture-1b7e"
-                    target="_blank"
+                    target="_blank" rel="noopener noreferrer"
                     >Multi-Agent Orchestration in LangGraph: Supervisor vs Swarm — DEV Community</a
                   >
                 </li>
                 <li>
-                  <a href="https://pypi.org/project/langgraph-supervisor/" target="_blank"
+                  <a href="https://pypi.org/project/langgraph-supervisor/" target="_blank" rel="noopener noreferrer"
                     >langgraph-supervisor · PyPI</a
                   >
                 </li>
@@ -792,6 +794,7 @@ export default function MultiAgentOrchestrationPage() {
                   <a
                     href="https://www.anthropic.com/engineering/multi-agent-research-system"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >How we built our multi-agent research system — Anthropic
                     Engineering(一次情報)</a
                   >
@@ -800,6 +803,7 @@ export default function MultiAgentOrchestrationPage() {
                   <a
                     href="https://blog.bytebytego.com/p/how-anthropic-built-a-multi-agent"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >How Anthropic Built a Multi-Agent Research System — ByteByteGo</a
                   >
                 </li>
@@ -807,6 +811,7 @@ export default function MultiAgentOrchestrationPage() {
                   <a
                     href="https://theaiengineer.substack.com/p/how-anthropic-built-multi-agent-deep"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >Anthropic's Multi-Agent Research Architecture Explained — The AI Engineer</a
                   >
                 </li>
@@ -814,6 +819,7 @@ export default function MultiAgentOrchestrationPage() {
                   <a
                     href="https://claude.com/blog/building-multi-agent-systems-when-and-how-to-use-them"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >When to use multi-agent systems (and when not to) — Claude by Anthropic</a
                   >
                 </li>
@@ -821,6 +827,7 @@ export default function MultiAgentOrchestrationPage() {
                   <a
                     href="https://fountaincity.tech/resources/blog/anthropic-multi-agent-blueprint-production/"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >Anthropic's Multi-Agent Blueprint: What Production Adds — Fountain City</a
                   >
                 </li>
@@ -828,6 +835,7 @@ export default function MultiAgentOrchestrationPage() {
                   <a
                     href="https://www.zenml.io/llmops-database/building-a-multi-agent-research-system-for-complex-information-tasks"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >Anthropic: Building a Multi-Agent Research System — ZenML LLMOps Database</a
                   >
                 </li>
@@ -914,6 +922,7 @@ export default function MultiAgentOrchestrationPage() {
                   <a
                     href="https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >Effective context engineering for AI agents — Anthropic
                     Engineering(一次情報)</a
                   >
@@ -922,23 +931,24 @@ export default function MultiAgentOrchestrationPage() {
                   <a
                     href="https://www.anthropic.com/engineering/building-agents-with-the-claude-agent-sdk"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >Building agents with the Claude Agent SDK — Anthropic Engineering(一次情報)</a
                   >
                 </li>
                 <li>
-                  <a href="https://platform.claude.com/docs/en/agent-sdk/subagents" target="_blank"
+                  <a href="https://platform.claude.com/docs/en/agent-sdk/subagents" target="_blank" rel="noopener noreferrer"
                     >Subagents in the SDK — Claude API Docs(一次情報)</a
                   >
                 </li>
                 <li>
                   <a
                     href="https://www.augmentcode.com/guides/anthropic-agent-sdk-what-ships-vs-what-you-build"
-                    target="_blank"
+                    target="_blank" rel="noopener noreferrer"
                     >Anthropic Agent SDK: What It Ships vs. What It Leaves to You — Augment Code</a
                   >
                 </li>
                 <li>
-                  <a href="https://arxiv.org/pdf/2508.08322" target="_blank"
+                  <a href="https://arxiv.org/pdf/2508.08322" target="_blank" rel="noopener noreferrer"
                     >Context Engineering for Multi-Agent LLM Code Assistants — arXiv:2508.08322</a
                   >
                 </li>
@@ -1341,17 +1351,17 @@ export default function MultiAgentOrchestrationPage() {
               <div className={styles.refsTitle}>参考文献</div>
               <ul>
                 <li>
-                  <a href="https://arxiv.org/abs/2503.13657" target="_blank"
+                  <a href="https://arxiv.org/abs/2503.13657" target="_blank" rel="noopener noreferrer"
                     >Why Do Multi-Agent LLM Systems Fail? — arXiv:2503.13657(一次情報/論文)</a
                   >
                 </li>
                 <li>
-                  <a href="https://arxiv.org/pdf/2601.17915" target="_blank"
+                  <a href="https://arxiv.org/pdf/2601.17915" target="_blank" rel="noopener noreferrer"
                     >Multi-Agent System Failure Taxonomy(詳細版PDF)— arXiv:2601.17915</a
                   >
                 </li>
                 <li>
-                  <a href="https://galileo.ai/blog/agent-failure-modes-guide" target="_blank"
+                  <a href="https://galileo.ai/blog/agent-failure-modes-guide" target="_blank" rel="noopener noreferrer"
                     >Agent Failure Modes: A Practical Guide — Galileo AI</a
                   >
                 </li>
@@ -1359,6 +1369,7 @@ export default function MultiAgentOrchestrationPage() {
                   <a
                     href="https://futureagi.substack.com/p/why-do-multi-agent-llm-systems-fail"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >Why Do Multi-Agent LLM Systems Fail?(要約と論評)— Future AGI</a
                   >
                 </li>
@@ -1450,6 +1461,7 @@ export default function MultiAgentOrchestrationPage() {
                   <a
                     href="https://webyot.in/learning/ai-app-security-2026-prompt-injection-guardrails"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >AI App Security 2026: Prompt Injection & Guardrails — Webyot</a
                   >
                 </li>
@@ -1457,6 +1469,7 @@ export default function MultiAgentOrchestrationPage() {
                   <a
                     href="https://www.getmaxim.ai/articles/the-complete-ai-guardrails-implementation-guide-for-2026/"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >The Complete AI Guardrails Implementation Guide for 2026 — Maxim AI</a
                   >
                 </li>
@@ -1464,6 +1477,7 @@ export default function MultiAgentOrchestrationPage() {
                   <a
                     href="https://www.augmentcode.com/guides/multi-agent-ai-security-risks-compliance-fixes"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >Multi-Agent AI Security Risks, Compliance & Fixes — Augment Code</a
                   >
                 </li>
@@ -1553,6 +1567,7 @@ export default function MultiAgentOrchestrationPage() {
                   <a
                     href="https://www.confident-ai.com/knowledge-base/compare/best-ai-agent-observability-tools-2026"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >Best AI Agent Observability Tools 2026 — Confident AI</a
                   >
                 </li>
@@ -1560,6 +1575,7 @@ export default function MultiAgentOrchestrationPage() {
                   <a
                     href="https://www.firecrawl.dev/blog/best-llm-observability-tools"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >Best LLM Observability Tools — Firecrawl</a
                   >
                 </li>
@@ -1567,6 +1583,7 @@ export default function MultiAgentOrchestrationPage() {
                   <a
                     href="https://langfuse.com/blog/2024-07-ai-agent-observability-with-langfuse"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >AI Agent Observability with Langfuse — Langfuse Blog(一次情報)</a
                   >
                 </li>
@@ -1661,6 +1678,7 @@ export default function MultiAgentOrchestrationPage() {
                   <a
                     href="https://zylos.ai/research/2026-02-19-ai-agent-cost-optimization-token-economics/"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >AI Agent Cost Optimization & Token Economics — Zylos AI Research</a
                   >
                 </li>
@@ -1668,6 +1686,7 @@ export default function MultiAgentOrchestrationPage() {
                   <a
                     href="https://harnessengineering.academy/blog/cost-optimization-production-ai-agents-token-budgets-model-selection-caching/"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >Cost Optimization for Production AI Agents: Token Budgets, Model Selection,
                     Caching — Harness Engineering Academy</a
                   >
@@ -1676,6 +1695,7 @@ export default function MultiAgentOrchestrationPage() {
                   <a
                     href="https://www.requesty.ai/blog/ai-agent-cost-optimization-how-to-cut-llm-spend-by-80-percent-with-routing"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >AI Agent Cost Optimization: How to Cut LLM Spend by 80% with Routing —
                     Requesty</a
                   >
@@ -1684,6 +1704,7 @@ export default function MultiAgentOrchestrationPage() {
                   <a
                     href="https://www.anthropic.com/engineering/multi-agent-research-system"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >How we built our multi-agent research system — Anthropic
                     Engineering(トークン経済性の一次情報)</a
                   >
@@ -1724,6 +1745,7 @@ export default function MultiAgentOrchestrationPage() {
                   <a
                     href="https://claude.com/blog/building-multi-agent-systems-when-and-how-to-use-them"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >When to use multi-agent systems (and when not to) — Claude by Anthropic</a
                   >
                 </li>
@@ -1731,6 +1753,7 @@ export default function MultiAgentOrchestrationPage() {
                   <a
                     href="https://beam.ai/agentic-insights/multi-agent-orchestration-patterns-production"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >6 Multi-Agent Orchestration Patterns for Production (2026) — Beam AI</a
                   >
                 </li>
@@ -1971,6 +1994,7 @@ export default function MultiAgentOrchestrationPage() {
                 <a
                   href="https://www.anthropic.com/engineering/multi-agent-research-system"
                   target="_blank"
+                  rel="noopener noreferrer"
                   >https://www.anthropic.com/engineering/multi-agent-research-system</a
                 >
               </li>
@@ -1978,6 +2002,7 @@ export default function MultiAgentOrchestrationPage() {
                 <a
                   href="https://www.anthropic.com/engineering/building-effective-agents"
                   target="_blank"
+                  rel="noopener noreferrer"
                   >https://www.anthropic.com/engineering/building-effective-agents</a
                 >
               </li>
@@ -1985,6 +2010,7 @@ export default function MultiAgentOrchestrationPage() {
                 <a
                   href="https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents"
                   target="_blank"
+                  rel="noopener noreferrer"
                   >https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents</a
                 >
               </li>
@@ -1992,11 +2018,12 @@ export default function MultiAgentOrchestrationPage() {
                 <a
                   href="https://www.anthropic.com/engineering/building-agents-with-the-claude-agent-sdk"
                   target="_blank"
+                  rel="noopener noreferrer"
                   >https://www.anthropic.com/engineering/building-agents-with-the-claude-agent-sdk</a
                 >
               </li>
               <li>
-                <a href="https://platform.claude.com/docs/en/agent-sdk/subagents" target="_blank"
+                <a href="https://platform.claude.com/docs/en/agent-sdk/subagents" target="_blank" rel="noopener noreferrer"
                   >https://platform.claude.com/docs/en/agent-sdk/subagents</a
                 >
               </li>
@@ -2004,6 +2031,7 @@ export default function MultiAgentOrchestrationPage() {
                 <a
                   href="https://claude.com/blog/building-multi-agent-systems-when-and-how-to-use-them"
                   target="_blank"
+                  rel="noopener noreferrer"
                   >https://claude.com/blog/building-multi-agent-systems-when-and-how-to-use-them</a
                 >
               </li>
@@ -2012,22 +2040,22 @@ export default function MultiAgentOrchestrationPage() {
             <h3>学術論文</h3>
             <ul>
               <li>
-                <a href="https://arxiv.org/abs/2503.13657" target="_blank"
+                <a href="https://arxiv.org/abs/2503.13657" target="_blank" rel="noopener noreferrer"
                   >https://arxiv.org/abs/2503.13657</a
                 >(MAST: Why Do Multi-Agent LLM Systems Fail?)
               </li>
               <li>
-                <a href="https://arxiv.org/pdf/2601.17915" target="_blank"
+                <a href="https://arxiv.org/pdf/2601.17915" target="_blank" rel="noopener noreferrer"
                   >https://arxiv.org/pdf/2601.17915</a
                 >(MAST詳細版)
               </li>
               <li>
-                <a href="https://arxiv.org/pdf/2606.24937" target="_blank"
+                <a href="https://arxiv.org/pdf/2606.24937" target="_blank" rel="noopener noreferrer"
                   >https://arxiv.org/pdf/2606.24937</a
                 >(The Hitchhiker's Guide to Agentic AI)
               </li>
               <li>
-                <a href="https://arxiv.org/pdf/2508.08322" target="_blank"
+                <a href="https://arxiv.org/pdf/2508.08322" target="_blank" rel="noopener noreferrer"
                   >https://arxiv.org/pdf/2508.08322</a
                 >(Context Engineering for Multi-Agent LLM Code Assistants)
               </li>
@@ -2039,6 +2067,7 @@ export default function MultiAgentOrchestrationPage() {
                 <a
                   href="https://learn.microsoft.com/en-us/agent-framework/overview/"
                   target="_blank"
+                  rel="noopener noreferrer"
                   >https://learn.microsoft.com/en-us/agent-framework/overview/</a
                 >
               </li>
@@ -2046,21 +2075,22 @@ export default function MultiAgentOrchestrationPage() {
                 <a
                   href="https://devblogs.microsoft.com/agent-framework/migrate-your-semantic-kernel-and-autogen-projects-to-microsoft-agent-framework-release-candidate/"
                   target="_blank"
+                  rel="noopener noreferrer"
                   >https://devblogs.microsoft.com/agent-framework/migrate-your-semantic-kernel-and-autogen-projects-to-microsoft-agent-framework-release-candidate/</a
                 >
               </li>
               <li>
-                <a href="https://openai.github.io/openai-agents-python/multi_agent/" target="_blank"
+                <a href="https://openai.github.io/openai-agents-python/multi_agent/" target="_blank" rel="noopener noreferrer"
                   >https://openai.github.io/openai-agents-python/multi_agent/</a
                 >
               </li>
               <li>
-                <a href="https://openai.github.io/openai-agents-python/handoffs/" target="_blank"
+                <a href="https://openai.github.io/openai-agents-python/handoffs/" target="_blank" rel="noopener noreferrer"
                   >https://openai.github.io/openai-agents-python/handoffs/</a
                 >
               </li>
               <li>
-                <a href="https://pypi.org/project/langgraph-supervisor/" target="_blank"
+                <a href="https://pypi.org/project/langgraph-supervisor/" target="_blank" rel="noopener noreferrer"
                   >https://pypi.org/project/langgraph-supervisor/</a
                 >
               </li>
@@ -2068,6 +2098,7 @@ export default function MultiAgentOrchestrationPage() {
                 <a
                   href="https://langfuse.com/blog/2024-07-ai-agent-observability-with-langfuse"
                   target="_blank"
+                  rel="noopener noreferrer"
                   >https://langfuse.com/blog/2024-07-ai-agent-observability-with-langfuse</a
                 >
               </li>
@@ -2079,6 +2110,7 @@ export default function MultiAgentOrchestrationPage() {
                 <a
                   href="https://www.digitalapplied.com/blog/multi-agent-orchestration-5-patterns-that-work"
                   target="_blank"
+                  rel="noopener noreferrer"
                   >https://www.digitalapplied.com/blog/multi-agent-orchestration-5-patterns-that-work</a
                 >
               </li>
@@ -2086,6 +2118,7 @@ export default function MultiAgentOrchestrationPage() {
                 <a
                   href="https://www.truefoundry.com/blog/multi-agent-orchestration-tools"
                   target="_blank"
+                  rel="noopener noreferrer"
                   >https://www.truefoundry.com/blog/multi-agent-orchestration-tools</a
                 >
               </li>
@@ -2093,6 +2126,7 @@ export default function MultiAgentOrchestrationPage() {
                 <a
                   href="https://www.truefoundry.com/blog/multi-agent-orchestration-frameworks"
                   target="_blank"
+                  rel="noopener noreferrer"
                   >https://www.truefoundry.com/blog/multi-agent-orchestration-frameworks</a
                 >
               </li>
@@ -2100,11 +2134,12 @@ export default function MultiAgentOrchestrationPage() {
                 <a
                   href="https://beam.ai/agentic-insights/multi-agent-orchestration-patterns-production"
                   target="_blank"
+                  rel="noopener noreferrer"
                   >https://beam.ai/agentic-insights/multi-agent-orchestration-patterns-production</a
                 >
               </li>
               <li>
-                <a href="https://www.augmentcode.com/guides/swarm-vs-supervisor" target="_blank"
+                <a href="https://www.augmentcode.com/guides/swarm-vs-supervisor" target="_blank" rel="noopener noreferrer"
                   >https://www.augmentcode.com/guides/swarm-vs-supervisor</a
                 >
               </li>
@@ -2112,6 +2147,7 @@ export default function MultiAgentOrchestrationPage() {
                 <a
                   href="https://www.augmentcode.com/guides/anthropic-agent-sdk-what-ships-vs-what-you-build"
                   target="_blank"
+                  rel="noopener noreferrer"
                   >https://www.augmentcode.com/guides/anthropic-agent-sdk-what-ships-vs-what-you-build</a
                 >
               </li>
@@ -2119,6 +2155,7 @@ export default function MultiAgentOrchestrationPage() {
                 <a
                   href="https://www.augmentcode.com/guides/multi-agent-ai-security-risks-compliance-fixes"
                   target="_blank"
+                  rel="noopener noreferrer"
                   >https://www.augmentcode.com/guides/multi-agent-ai-security-risks-compliance-fixes</a
                 >
               </li>
@@ -2126,6 +2163,7 @@ export default function MultiAgentOrchestrationPage() {
                 <a
                   href="https://lilys.ai/en/notes/langgraph-swarm-20260202/langgraph-hierarchical-supervisor-swarm-ai-agents"
                   target="_blank"
+                  rel="noopener noreferrer"
                   >https://lilys.ai/en/notes/langgraph-swarm-20260202/langgraph-hierarchical-supervisor-swarm-ai-agents</a
                 >
               </li>
@@ -2133,6 +2171,7 @@ export default function MultiAgentOrchestrationPage() {
                 <a
                   href="https://dev.to/focused_dot_io/multi-agent-orchestration-in-langgraph-supervisor-vs-swarm-tradeoffs-and-architecture-1b7e"
                   target="_blank"
+                  rel="noopener noreferrer"
                   >https://dev.to/focused_dot_io/multi-agent-orchestration-in-langgraph-supervisor-vs-swarm-tradeoffs-and-architecture-1b7e</a
                 >
               </li>
@@ -2140,6 +2179,7 @@ export default function MultiAgentOrchestrationPage() {
                 <a
                   href="https://blog.bytebytego.com/p/how-anthropic-built-a-multi-agent"
                   target="_blank"
+                  rel="noopener noreferrer"
                   >https://blog.bytebytego.com/p/how-anthropic-built-a-multi-agent</a
                 >
               </li>
@@ -2147,6 +2187,7 @@ export default function MultiAgentOrchestrationPage() {
                 <a
                   href="https://theaiengineer.substack.com/p/how-anthropic-built-multi-agent-deep"
                   target="_blank"
+                  rel="noopener noreferrer"
                   >https://theaiengineer.substack.com/p/how-anthropic-built-multi-agent-deep</a
                 >
               </li>
@@ -2154,6 +2195,7 @@ export default function MultiAgentOrchestrationPage() {
                 <a
                   href="https://fountaincity.tech/resources/blog/anthropic-multi-agent-blueprint-production/"
                   target="_blank"
+                  rel="noopener noreferrer"
                   >https://fountaincity.tech/resources/blog/anthropic-multi-agent-blueprint-production/</a
                 >
               </li>
@@ -2161,6 +2203,7 @@ export default function MultiAgentOrchestrationPage() {
                 <a
                   href="https://www.zenml.io/llmops-database/building-a-multi-agent-research-system-for-complex-information-tasks"
                   target="_blank"
+                  rel="noopener noreferrer"
                   >https://www.zenml.io/llmops-database/building-a-multi-agent-research-system-for-complex-information-tasks</a
                 >
               </li>
@@ -2168,6 +2211,7 @@ export default function MultiAgentOrchestrationPage() {
                 <a
                   href="https://www.programming-helper.com/tech/agent-to-agent-protocol-2026-google-a2a-standard"
                   target="_blank"
+                  rel="noopener noreferrer"
                   >https://www.programming-helper.com/tech/agent-to-agent-protocol-2026-google-a2a-standard</a
                 >
               </li>
@@ -2175,6 +2219,7 @@ export default function MultiAgentOrchestrationPage() {
                 <a
                   href="https://galileo.ai/blog/google-agent2agent-a2a-protocol-guide"
                   target="_blank"
+                  rel="noopener noreferrer"
                   >https://galileo.ai/blog/google-agent2agent-a2a-protocol-guide</a
                 >
               </li>
@@ -2182,6 +2227,7 @@ export default function MultiAgentOrchestrationPage() {
                 <a
                   href="https://zylos.ai/research/2026-02-15-agent-to-agent-communication-protocols/"
                   target="_blank"
+                  rel="noopener noreferrer"
                   >https://zylos.ai/research/2026-02-15-agent-to-agent-communication-protocols/</a
                 >
               </li>
@@ -2189,21 +2235,22 @@ export default function MultiAgentOrchestrationPage() {
                 <a
                   href="https://www.glukhov.org/ai-systems/comparisons/a2a-protocol-2026-adoption"
                   target="_blank"
+                  rel="noopener noreferrer"
                   >https://www.glukhov.org/ai-systems/comparisons/a2a-protocol-2026-adoption</a
                 >
               </li>
               <li>
-                <a href="https://atlan.com/know/google-a2a-protocol/" target="_blank"
+                <a href="https://atlan.com/know/google-a2a-protocol/" target="_blank" rel="noopener noreferrer"
                   >https://atlan.com/know/google-a2a-protocol/</a
                 >
               </li>
               <li>
-                <a href="https://www.ibm.com/think/topics/agent2agent-protocol" target="_blank"
+                <a href="https://www.ibm.com/think/topics/agent2agent-protocol" target="_blank" rel="noopener noreferrer"
                   >https://www.ibm.com/think/topics/agent2agent-protocol</a
                 >
               </li>
               <li>
-                <a href="https://galileo.ai/blog/agent-failure-modes-guide" target="_blank"
+                <a href="https://galileo.ai/blog/agent-failure-modes-guide" target="_blank" rel="noopener noreferrer"
                   >https://galileo.ai/blog/agent-failure-modes-guide</a
                 >
               </li>
@@ -2211,6 +2258,7 @@ export default function MultiAgentOrchestrationPage() {
                 <a
                   href="https://futureagi.substack.com/p/why-do-multi-agent-llm-systems-fail"
                   target="_blank"
+                  rel="noopener noreferrer"
                   >https://futureagi.substack.com/p/why-do-multi-agent-llm-systems-fail</a
                 >
               </li>
@@ -2218,6 +2266,7 @@ export default function MultiAgentOrchestrationPage() {
                 <a
                   href="https://webyot.in/learning/ai-app-security-2026-prompt-injection-guardrails"
                   target="_blank"
+                  rel="noopener noreferrer"
                   >https://webyot.in/learning/ai-app-security-2026-prompt-injection-guardrails.html</a
                 >
               </li>
@@ -2225,6 +2274,7 @@ export default function MultiAgentOrchestrationPage() {
                 <a
                   href="https://www.getmaxim.ai/articles/the-complete-ai-guardrails-implementation-guide-for-2026/"
                   target="_blank"
+                  rel="noopener noreferrer"
                   >https://www.getmaxim.ai/articles/the-complete-ai-guardrails-implementation-guide-for-2026/</a
                 >
               </li>
@@ -2232,6 +2282,7 @@ export default function MultiAgentOrchestrationPage() {
                 <a
                   href="https://www.confident-ai.com/knowledge-base/compare/best-ai-agent-observability-tools-2026"
                   target="_blank"
+                  rel="noopener noreferrer"
                   >https://www.confident-ai.com/knowledge-base/compare/best-ai-agent-observability-tools-2026</a
                 >
               </li>
@@ -2239,6 +2290,7 @@ export default function MultiAgentOrchestrationPage() {
                 <a
                   href="https://www.firecrawl.dev/blog/best-llm-observability-tools"
                   target="_blank"
+                  rel="noopener noreferrer"
                   >https://www.firecrawl.dev/blog/best-llm-observability-tools</a
                 >
               </li>
@@ -2246,6 +2298,7 @@ export default function MultiAgentOrchestrationPage() {
                 <a
                   href="https://zylos.ai/research/2026-02-19-ai-agent-cost-optimization-token-economics/"
                   target="_blank"
+                  rel="noopener noreferrer"
                   >https://zylos.ai/research/2026-02-19-ai-agent-cost-optimization-token-economics/</a
                 >
               </li>
@@ -2253,6 +2306,7 @@ export default function MultiAgentOrchestrationPage() {
                 <a
                   href="https://harnessengineering.academy/blog/cost-optimization-production-ai-agents-token-budgets-model-selection-caching/"
                   target="_blank"
+                  rel="noopener noreferrer"
                   >https://harnessengineering.academy/blog/cost-optimization-production-ai-agents-token-budgets-model-selection-caching/</a
                 >
               </li>
@@ -2260,6 +2314,7 @@ export default function MultiAgentOrchestrationPage() {
                 <a
                   href="https://www.requesty.ai/blog/ai-agent-cost-optimization-how-to-cut-llm-spend-by-80-percent-with-routing"
                   target="_blank"
+                  rel="noopener noreferrer"
                   >https://www.requesty.ai/blog/ai-agent-cost-optimization-how-to-cut-llm-spend-by-80-percent-with-routing</a
                 >
               </li>
@@ -2267,6 +2322,7 @@ export default function MultiAgentOrchestrationPage() {
                 <a
                   href="https://visualstudiomagazine.com/articles/2026/04/06/microsoft-ships-production-ready-agent-framework-1-0-for-net-and-python.aspx"
                   target="_blank"
+                  rel="noopener noreferrer"
                   >https://visualstudiomagazine.com/articles/2026/04/06/microsoft-ships-production-ready-agent-framework-1-0-for-net-and-python.aspx</a
                 >
               </li>
@@ -2274,6 +2330,7 @@ export default function MultiAgentOrchestrationPage() {
                 <a
                   href="https://simonwillison.net/2024/Dec/20/building-effective-agents/"
                   target="_blank"
+                  rel="noopener noreferrer"
                   >https://simonwillison.net/2024/Dec/20/building-effective-agents/</a
                 >
               </li>
@@ -2281,6 +2338,7 @@ export default function MultiAgentOrchestrationPage() {
                 <a
                   href="https://pub.towardsai.net/agent-workflow-patterns-beyond-anthropics-playbook-1bd76a48d63d"
                   target="_blank"
+                  rel="noopener noreferrer"
                   >https://pub.towardsai.net/agent-workflow-patterns-beyond-anthropics-playbook-1bd76a48d63d</a
                 >
               </li>
@@ -2288,6 +2346,7 @@ export default function MultiAgentOrchestrationPage() {
                 <a
                   href="https://www.baeldung.com/spring-ai-building-effective-agents"
                   target="_blank"
+                  rel="noopener noreferrer"
                   >https://www.baeldung.com/spring-ai-building-effective-agents</a
                 >
               </li>
