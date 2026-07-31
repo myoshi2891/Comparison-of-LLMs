@@ -189,14 +189,17 @@ export default function MermaidDiagram({
           // base テーマ、または明示的な themeVariables がある場合のみ補正する。
           // ref: fix-mermaid SKILL Part 2-4
           if (ref.current) {
-            const textColor =
-              themeVariables?.primaryTextColor ??
-              (theme === "dark" ? "#e2e8f0" : "#000000");
-            ref.current.querySelectorAll("foreignObject *").forEach((el) => {
-              (el as HTMLElement).style.setProperty("color", textColor, "important");
-            });
+            if (theme === "base" || theme === "dark" || themeVariables !== undefined) {
+              const textColor =
+                themeVariables?.primaryTextColor ??
+                (theme === "dark" ? "#e2e8f0" : "#000000");
+              ref.current.querySelectorAll("foreignObject *").forEach((el) => {
+                (el as HTMLElement).style.setProperty("color", textColor, "important");
+              });
 
-            applySequenceDiagramColorOverrides(ref.current, themeVariables, theme);
+              applySequenceDiagramColorOverrides(ref.current, themeVariables, theme);
+            }
+
             applyPieChartColorOverrides(ref.current, theme);
           }
         } catch (err) {
