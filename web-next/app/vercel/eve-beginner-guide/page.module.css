@@ -21,15 +21,22 @@
   --radius: 12px;
   --sidebar-w: 300px;
 
-  display: flex;
+  display: block;
+  width: 100%;
   min-height: 100vh;
   background: var(--bg);
   color: var(--text);
   font-family: var(--font-sans, "Inter", sans-serif);
   line-height: 1.85;
   font-size: 16px;
-  max-width: 100%;
-  margin: 0;
+}
+
+.pageContainer {
+  display: flex;
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  position: relative;
 }
 
 .sidebar {
@@ -410,6 +417,22 @@
   padding: 1.5rem;
   margin: 1.6rem 0;
   overflow-x: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.diagramWrap :global(svg) {
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto;
+  display: block;
+}
+
+.diagramWrapSmall {
+  max-width: 640px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .diagramCaption {
@@ -417,6 +440,7 @@
   font-size: 0.82rem;
   color: var(--muted);
   margin-top: 0.6rem;
+  width: 100%;
 }
 
 .tableWrap {

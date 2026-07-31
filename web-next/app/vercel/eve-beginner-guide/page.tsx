@@ -119,7 +119,8 @@ export default function VercelEveBeginnerGuidePage() {
   return (
     <div className={styles.layout}>
       <TocObserver />
-      <aside className={styles.sidebar} id="sidebar">
+      <div className={styles.pageContainer}>
+        <aside className={styles.sidebar} id="sidebar">
         <div className={styles.brand}>
           <div className={styles.brandMark}>ev</div>
           <div className={styles.brandText}>
@@ -2018,6 +2019,7 @@ export default function VercelEveBeginnerGuidePage() {
           ）の最新版を確認してください。
         </footer>
       </main>
+      </div>
     </div>
   );
 }
