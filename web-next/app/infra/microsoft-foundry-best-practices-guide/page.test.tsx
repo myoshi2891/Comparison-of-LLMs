@@ -2,6 +2,8 @@ import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import Page from "./page";
 
+import styles from "./page.module.css";
+
 vi.mock("@/components/docs/MermaidDiagram", () => ({
   default: function DummyMermaidDiagram({ chart, id }: { chart: string; id?: string }) {
     return (
@@ -49,7 +51,8 @@ describe("Microsoft Foundry Best Practices Guide Page", () => {
 
   it("renders code blocks with syntax highlighting container", () => {
     const { container } = render(<Page />);
-    const codeBlocks = container.querySelectorAll("pre");
+    const codeBlocks = container.querySelectorAll(`.${styles.codeBlock}`);
     expect(codeBlocks.length).toBeGreaterThan(0);
+    expect(container.textContent).toMatch(/bash|python/);
   });
 });

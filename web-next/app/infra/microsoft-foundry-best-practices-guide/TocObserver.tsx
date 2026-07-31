@@ -18,7 +18,7 @@ interface TocObserverProps {
  */
 export function TocObserver({
   navSelector = "#side-nav a",
-  sectionSelector = "section.section[id]",
+  sectionSelector = "section[id]",
   activeClass,
 }: TocObserverProps) {
   useEffect(() => {

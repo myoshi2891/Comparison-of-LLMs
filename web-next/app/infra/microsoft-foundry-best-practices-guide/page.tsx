@@ -106,7 +106,7 @@ const DIAGRAM_05 = `flowchart TD
 export default function MicrosoftFoundryBestPracticesPage() {
   return (
     <div className={styles.layout}>
-      <TocObserver activeClass={styles.active} navSelector="#side-nav a" sectionSelector="section.section[id]" />
+      <TocObserver activeClass={styles.active} navSelector="#side-nav a" sectionSelector="main section[id]" />
 
       <aside className={styles.sidebar}>
         <div className={styles.brand}>Microsoft Foundry</div>
@@ -757,22 +757,34 @@ export default function MicrosoftFoundryBestPracticesPage() {
 
         <section className={styles.section} id="s13">
           <h2>
-            <span className={styles.num}>13</span>チェックリスト
+            <span className={styles.num}>13</span>ベストプラクティス総合チェックリスト
           </h2>
           <div className={styles.prose}>
-            <p>本番デプロイ前に確認すべき必須項目一覧です。</p>
             <ul className={styles.checklist}>
-              <li>新規リソースグループを作成し、プロジェクトと関連リソースを一元管理している</li>
-              <li>APIキー認証ではなく、DefaultAzureCredential（マネージドID）を利用している</li>
-              <li>タスク要件（精度・レイテンシ・コスト）に合わせたモデル選定を行っている</li>
-              <li>RAG構成において、複数の検索アルゴリズム（Vector/Semantic/Hybrid）を比較評価済みである</li>
-              <li>プロンプト・会話履歴・ツール呼び出し・トークン消費量をトレーシング可能にしている</li>
-              <li>Azure Monitorと連携し、品質（Groundedness等）やコストを本番環境で継続モニタリングしている</li>
-              <li>ネットワーク分離（Private Link / BYO VNet）を設計・導入している</li>
-              <li>RBAC（最小権限の原則）を適用し、プロジェクト単位でアクセス制御を行っている</li>
-              <li>Content Safety / Prompt Shields などのガードレールを設定している</li>
+              <li>プロジェクトは目的別（サンドボックス／本番）に分離されている</li>
+              <li>チームメンバーの権限はEntraセキュリティグループ単位で管理されている</li>
+              <li>モデル選定は成功基準（精度・レイテンシ・コスト）を先に定義してから行っている</li>
+              <li>
+                認証はAPIキーではなくマネージドID（<code>DefaultAzureCredential</code>）を使っている
+              </li>
+              <li>エージェントの指示文にツール選択の判断基準を明記している</li>
+              <li>ツールの出力は未検証の入力として扱い、機密情報をログ・トレースに残していない</li>
+              <li>RAGの検索パラメータをGroundedness/Relevance評価で比較検証してから採用している</li>
+              <li>評価・トレース・監視データをAzure Monitorに集約している</li>
+              <li>
+                エージェントごとに独立したID（Microsoft Entra Agent ID）とRBACスコープを設計している
+              </li>
+              <li>本番環境ではプライベートエンドポイント／BYO VNetを既定にしている</li>
+              <li>
+                コストをタスク種別ごとにプロファイリングし、ルーティング・バッチ・キャッシュ・PTUを使い分けている
+              </li>
+              <li>
+                コンテンツフィルター・Prompt Shields・Groundedness Detectionを本番前に有効化している
+              </li>
               <li>Red-teamingや敵対的テストを開発初期から実施している</li>
-              <li>実行環境（Copilot Studio／Prompt Agent／Hosted Agent／Foundry Local）の選択基準をチームで明文化している</li>
+              <li>
+                実行環境（Copilot Studio／Prompt Agent／Hosted Agent／Foundry Local）の選択基準をチームで明文化している
+              </li>
             </ul>
           </div>
         </section>
