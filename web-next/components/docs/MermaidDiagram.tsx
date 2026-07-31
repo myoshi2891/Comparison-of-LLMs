@@ -89,7 +89,8 @@ function applySequenceDiagramColorOverrides(
  *
  * @param root - The container element holding the pie chart SVG.
  */
-function applyPieChartColorOverrides(root: HTMLElement): void {
+function applyPieChartColorOverrides(root: HTMLElement, theme?: string): void {
+  const isDark = theme === "dark";
   const pieColors = ["#57c7ff", "#a996ff", "#ff9d66", "#5eead4", "#ffd166", "#ef476f"];
   const slices = root.querySelectorAll<SVGPathElement>("path.pieCircle");
   slices.forEach((el, idx) => {
@@ -109,16 +110,18 @@ function applyPieChartColorOverrides(root: HTMLElement): void {
     el.style.setProperty("stroke", "#07111e", "important");
   });
 
+  const legendTextColor = isDark ? "#e8eef5" : "#07111e";
   root
     .querySelectorAll<SVGTextElement>("g.legend text, .legend text, text.legend")
     .forEach((el) => {
-      el.style.setProperty("fill", "#e8eef5", "important");
+      el.style.setProperty("fill", legendTextColor, "important");
     });
 
+  const sliceTextColor = isDark ? "#ffffff" : "#07111e";
   root
     .querySelectorAll<SVGTextElement>("text.slice, .slice text, g text.slice, .pieTitleText")
     .forEach((el) => {
-      el.style.setProperty("fill", "#ffffff", "important");
+      el.style.setProperty("fill", sliceTextColor, "important");
       el.style.setProperty("font-weight", "700", "important");
     });
 }
@@ -194,7 +197,7 @@ export default function MermaidDiagram({
             });
 
             applySequenceDiagramColorOverrides(ref.current, themeVariables, theme);
-            applyPieChartColorOverrides(ref.current);
+            applyPieChartColorOverrides(ref.current, theme);
           }
         } catch (err) {
           console.error("[MermaidDiagram] render failed:", err);
