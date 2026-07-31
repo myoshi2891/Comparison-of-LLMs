@@ -44,7 +44,7 @@ export const PageEntrySchema = z
     category: z.string().min(1).optional(),
     /** プロバイダー系ページのみ。識別子であり表示ラベルではない（表示は category）。 */
     provider: z
-      .enum(["claude", "google", "codex", "copilot", "microsoft", "moonshot", "deepseek", "xai", "zhipu"])
+      .enum(["claude", "google", "codex", "microsoft", "moonshot", "deepseek", "xai", "zhipu"])
       .optional(),
     /** 横断検索・関連リンク (F-5 / F-7) 用のトピックタグ */
     topics: z.array(z.string()),
@@ -673,13 +673,13 @@ const entries: PageEntry[] = [
     slug: "/infra/microsoft-foundry-best-practices-intermediate",
     title: "Microsoft Foundry 実践ベストプラクティスガイド",
     description:
-      "Microsoft Foundry（旧Azure AI Studio/Azure AI Foundry）を用いたAIアプリ・エージェント開発のステップバイステップ・ベストプラクティスガイド。",
+      "Microsoft Foundry（旧Azure AI Studio/Azure AI Foundry）の Agent Service・Hosted Agent・Foundry Local・Foundry IQ を含む中級・実践向けアーキテクチャと運用ベストプラクティスガイド。",
     group: "Providers",
     category: "Microsoft",
     provider: "microsoft",
-    topics: ["foundry", "azure", "infra", "rag", "agent", "guardrails"],
+    topics: ["foundry", "azure", "infra", "agent", "hosted-agent", "foundry-local", "meai"],
     summary:
-      "Microsoft Foundry（旧Azure AI Studio/Azure AI Foundry）を用いたAIアプリ・エージェント開発のステップバイステップ・ベストプラクティスガイド。",
+      "Foundry Agent Service、Hosted Agent、Foundry Local、Foundry IQ などを活用したエンタープライズ AI エージェント開発・アクセスの設計と運用の実践ガイド。",
     addedAt: "2026-07-31",
     lastReviewed: "2026-07-31",
   },
