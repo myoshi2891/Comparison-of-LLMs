@@ -215,7 +215,7 @@ export default function MultiAgentOrchestrationPage() {
               <div className={styles.metaCardLabel}>対象読者</div>
               <div className={styles.metaCardVal}>AIアーキテクト / エンジニア</div>
             </div>
-            <div className={styles.metaCardCard ?? styles.metaCard}>
+            <div className={styles.metaCard}>
               <div className={styles.metaCardLabel}>主要プロトコル</div>
               <div className={styles.metaCardVal}>MCP / A2A Protocol</div>
             </div>
@@ -542,21 +542,21 @@ export default function MultiAgentOrchestrationPage() {
           <p>対策として、以下の3つのテクニックを組み込む必要があります。</p>
           <ul className={styles.checklist}>
             <li className={styles.checklistItem}>
-              <i className={styles.tiTiCircleCheck ?? ""} />
+              <i className={styles.tiTiCircleCheck} />
               <span>
                 <strong>ブラックボックス検証を徹底する:</strong>{" "}
                 検証エージェントには生成プロンプトや中間思考を見せず、純粋な出力成果物とテスト仕様のみを与える。
               </span>
             </li>
             <li className={styles.checklistItem}>
-              <i className={styles.tiTiCircleCheck ?? ""} />
+              <i className={styles.tiTiCircleCheck} />
               <span>
                 <strong>ネガティブテストを含める:</strong>{" "}
                 あえて失敗すべきテストケースや不正入力を与え、検証エージェントが正しく失敗を検出できるかを試す。
               </span>
             </li>
             <li className={styles.checklistItem}>
-              <i className={styles.tiTiCircleCheck ?? ""} />
+              <i className={styles.tiTiCircleCheck} />
               <span>
                 <strong>明示的な判定基準を与える:</strong>{" "}
                 「全ユニットテストを実行しパスしたログを確認するまでPASSを出してはならない」という行動規約をプロンプトで要求する。

@@ -21,7 +21,7 @@
   --color-border-tertiary: #1a1e24;
 
   --font-sans: "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Segoe UI", -apple-system, sans-serif;
-  --font-mono: var(--font-mono, "JetBrains Mono"), "SFMono-Regular", Consolas, monospace;
+  --font-mono-local: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
 
   --border-radius-md: 8px;
   --border-radius-lg: 12px;
@@ -240,7 +240,7 @@
   gap: 8px;
 }
 
-p {
+.layout p {
   margin: 0 0 16px;
   color: var(--color-text-secondary);
 }
@@ -377,20 +377,20 @@ p {
 }
 
 .codeBar {
-  background: var(--color-background-secondary);
-  padding: 10px 18px;
-  font-family: var(--font-mono);
-  font-size: 13px;
-  color: var(--color-text-tertiary);
+  background: var(--color-background-tertiary);
+  padding: 8px 16px;
   border-bottom: 1px solid var(--color-border-primary);
+  font-size: 12px;
+  font-family: var(--font-mono, var(--font-mono-local));
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
 .codeBody {
-  padding: 18px;
-  font-family: var(--font-mono);
+  padding: 16px;
+  margin: 0;
+  font-family: var(--font-mono, var(--font-mono-local));
   font-size: 13.5px;
   line-height: 1.65;
   overflow-x: auto;
@@ -469,6 +469,26 @@ p {
   width: fit-content;
   max-width: 100%;
   margin-inline: auto;
+}
+
+.footerNote {
+  margin-top: 24px;
+  font-size: 12px;
+  color: var(--color-text-tertiary);
+  font-family: var(--font-mono, var(--font-mono-local));
+}
+
+.tiTiCircleCheck {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  color: var(--color-text-success);
+  margin-right: 0.5em;
+  vertical-align: -0.125em;
+}
+.tiTiCircleCheck::before {
+  content: "✓";
+  font-weight: bold;
 }
 
 .pageFooter {
