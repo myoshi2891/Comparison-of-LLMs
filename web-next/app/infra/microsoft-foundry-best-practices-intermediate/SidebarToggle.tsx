@@ -26,9 +26,13 @@ export default function SidebarToggle() {
       setIsOpen(false);
     };
 
-    links.forEach((link) => link.addEventListener("click", handleLinkClick));
+    links.forEach((link) => {
+      link.addEventListener("click", handleLinkClick);
+    });
     return () => {
-      links.forEach((link) => link.removeEventListener("click", handleLinkClick));
+      links.forEach((link) => {
+        link.removeEventListener("click", handleLinkClick);
+      });
     };
   }, []);
 

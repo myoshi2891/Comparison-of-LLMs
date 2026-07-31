@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import Ext from "@/components/docs/Ext";
 import MermaidDiagram from "@/components/docs/MermaidDiagram";
+import styles from "./page.module.css";
 import SidebarToggle from "./SidebarToggle";
 import TocObserver from "./TocObserver";
-import styles from "./page.module.css";
 
 export const metadata: Metadata = {
   title: "Microsoft Foundry 実践ベストプラクティスガイド",
@@ -295,8 +295,7 @@ export default function MicrosoftFoundryBestPracticesIntermediatePage() {
           <header className={styles.hero} id="intro">
             <div className={styles.heroKicker}>● 2026年7月17日時点の情報でブラッシュアップ</div>
             <h1>
-              Microsoft Foundry{" "}
-              <br />
+              Microsoft Foundry <br />
               <span className={styles.gradientText}>実践ベストプラクティスガイド</span>
             </h1>
             <p className={styles.subtitle}>
@@ -306,26 +305,38 @@ export default function MicrosoftFoundryBestPracticesIntermediatePage() {
             </p>
 
             <div className={styles.heroMeta}>
-              <span className={styles.chip}>対象: アプリ開発者 / MLエンジニア / プラットフォームエンジニア</span>
+              <span className={styles.chip}>
+                対象: アプリ開発者 / MLエンジニア / プラットフォームエンジニア
+              </span>
               <span className={styles.chip}>形式: Mermaid図解 9点 + 比較表 15点以上</span>
-              <span className={styles.chip}>出典: 公式ドキュメント約35件 + ブログ/開発者投稿 約25件</span>
+              <span className={styles.chip}>
+                出典: 公式ドキュメント約35件 + ブログ/開発者投稿 約25件
+              </span>
             </div>
 
             <div className={styles.statRow}>
               <div className={styles.stat}>
-                <div className={styles.num}>80<small>K+</small></div>
+                <div className={styles.num}>
+                  80<small>K+</small>
+                </div>
                 <div className={styles.label}>Foundry利用企業数</div>
               </div>
               <div className={styles.stat}>
-                <div className={styles.num}>80<small>%</small></div>
+                <div className={styles.num}>
+                  80<small>%</small>
+                </div>
                 <div className={styles.label}>Fortune 500における採用率</div>
               </div>
               <div className={styles.stat}>
-                <div className={styles.num}>11<small>K+</small></div>
+                <div className={styles.num}>
+                  11<small>K+</small>
+                </div>
                 <div className={styles.label}>モデルカタログ数</div>
               </div>
               <div className={styles.stat}>
-                <div className={styles.num}>36<small>%</small></div>
+                <div className={styles.num}>
+                  36<small>%</small>
+                </div>
                 <div className={styles.label}>Agentic Retrieval導入時の関連性向上</div>
               </div>
             </div>
@@ -369,7 +380,9 @@ export default function MicrosoftFoundryBestPracticesIntermediatePage() {
           </section>
 
           <section className={styles.section} id="sec-0">
-            <div className={styles.eyebrow}><span className={styles.line}></span>CHAPTER 0</div>
+            <div className={styles.eyebrow}>
+              <span className={styles.line}></span>CHAPTER 0
+            </div>
             <h2>重要な前提知識：Foundryのリブランディング</h2>
             <p>
               質問文にある2つのURLはいずれも現在生きていますが、内容は大きくアップデートされています。まず押さえておくべき変遷は次の通りです。
@@ -397,7 +410,9 @@ export default function MicrosoftFoundryBestPracticesIntermediatePage() {
                   </tr>
                   <tr>
                     <td>2026年（現行）</td>
-                    <td><strong>Microsoft Foundry</strong></td>
+                    <td>
+                      <strong>Microsoft Foundry</strong>
+                    </td>
                     <td>
                       新 Foundry ポータル（<Ext href="https://ai.azure.com">ai.azure.com</Ext>）
                     </td>
@@ -407,12 +422,17 @@ export default function MicrosoftFoundryBestPracticesIntermediatePage() {
             </div>
 
             <p>
-              <code className={styles.inlineCode}>azure-ai-services</code> というAzureサービスブランドも
+              <code className={styles.inlineCode}>azure-ai-services</code>{" "}
+              というAzureサービスブランドも
               <strong>Foundry Tools</strong> に統合されました。Hub＋Azure OpenAI＋Azure AI
               Servicesという複数リソースモデルは、単一の
               <strong>Foundryリソース（プロジェクトを内包）</strong> に統合されています。またAgent
               APIも「Assistants API（Agents v0.5/v1、Threads/Messages/Runs/Assistants
-              という概念）」から「<strong>Responses API（Agents v2、Conversations/Items/Responses/Agent Versions という概念）</strong>」へ刷新されました。
+              という概念）」から「
+              <strong>
+                Responses API（Agents v2、Conversations/Items/Responses/Agent Versions という概念）
+              </strong>
+              」へ刷新されました。
             </p>
 
             <p>
@@ -452,8 +472,12 @@ export default function MicrosoftFoundryBestPracticesIntermediatePage() {
                   </tr>
                   <tr>
                     <td>APIバージョニング</td>
-                    <td>月次の <code className={styles.inlineCode}>api-version</code> パラメータ</td>
-                    <td><code className={styles.inlineCode}>/openai/v1/</code> の安定ルート</td>
+                    <td>
+                      月次の <code className={styles.inlineCode}>api-version</code> パラメータ
+                    </td>
+                    <td>
+                      <code className={styles.inlineCode}>/openai/v1/</code> の安定ルート
+                    </td>
                   </tr>
                   <tr>
                     <td>リソースモデル</td>
@@ -463,11 +487,14 @@ export default function MicrosoftFoundryBestPracticesIntermediatePage() {
                   <tr>
                     <td>SDK</td>
                     <td>
-                      複数パッケージ（<code className={styles.inlineCode}>azure-ai-inference</code>等）、5つ以上のエンドポイント
+                      複数パッケージ（<code className={styles.inlineCode}>azure-ai-inference</code>
+                      等）、5つ以上のエンドポイント
                     </td>
                     <td>
-                      統合プロジェクトクライアント（<code className={styles.inlineCode}>azure-ai-projects</code> 2.x）+{" "}
-                      <code className={styles.inlineCode}>OpenAI()</code>、単一プロジェクトエンドポイント
+                      統合プロジェクトクライアント（
+                      <code className={styles.inlineCode}>azure-ai-projects</code> 2.x）+{" "}
+                      <code className={styles.inlineCode}>OpenAI()</code>
+                      、単一プロジェクトエンドポイント
                     </td>
                   </tr>
                   <tr>
@@ -500,11 +527,15 @@ export default function MicrosoftFoundryBestPracticesIntermediatePage() {
           </section>
 
           <section className={styles.section} id="sec-1">
-            <div className={styles.eyebrow}><span className={styles.line}></span>CHAPTER 1</div>
+            <div className={styles.eyebrow}>
+              <span className={styles.line}></span>CHAPTER 1
+            </div>
             <h2>Microsoft Foundryとは何か</h2>
             <p>
               公式には「エンタープライズ向けAIオペレーション、モデル構築者、アプリケーション開発のための統合Azure
-              PaaS」と定義されています。単なるモデルホスティングサービスではなく、<strong>エージェント、モデル、ツールを単一の管理グループの下に統合</strong>し、トレーシング・モニタリング・評価・エンタープライズ向けのセットアップ構成を最初から組み込んでいる点が特徴です。RBAC・ネットワーキング・ポリシーもすべて単一のAzureリソースプロバイダー名前空間の下で一元管理されます。
+              PaaS」と定義されています。単なるモデルホスティングサービスではなく、
+              <strong>エージェント、モデル、ツールを単一の管理グループの下に統合</strong>
+              し、トレーシング・モニタリング・評価・エンタープライズ向けのセットアップ構成を最初から組み込んでいる点が特徴です。RBAC・ネットワーキング・ポリシーもすべて単一のAzureリソースプロバイダー名前空間の下で一元管理されます。
             </p>
             <p className={styles.source}>
               出典:{" "}
@@ -535,7 +566,8 @@ export default function MicrosoftFoundryBestPracticesIntermediatePage() {
             <p className={styles.source}>
               出典:{" "}
               <Ext href="https://www.infoq.com/news/2026/06/microsoft-foundry-agents/">
-                Microsoft Foundry Adds Runtime, Tooling, and Governance for Production Agents – InfoQ
+                Microsoft Foundry Adds Runtime, Tooling, and Governance for Production Agents –
+                InfoQ
               </Ext>
             </p>
 
@@ -543,7 +575,9 @@ export default function MicrosoftFoundryBestPracticesIntermediatePage() {
               この「ランタイム／ツール／メモリ／グラウンディング／モデル／可観測性／ガバナンス」という7つの柱は、そのまま本ガイドの構成（4〜10章）の骨格にもなっています。
             </p>
 
-            <h3><span className={styles.hNum}>1.1</span>全体アーキテクチャ</h3>
+            <h3>
+              <span className={styles.hNum}>1.1</span>全体アーキテクチャ
+            </h3>
             <div className={styles.diagramFrame}>
               <MermaidDiagram chart={MMD_1} />
               <div className={styles.diagramCaption}>図1: Microsoft Foundry 全体アーキテクチャ</div>
@@ -553,10 +587,13 @@ export default function MicrosoftFoundryBestPracticesIntermediatePage() {
               <Ext href="https://azure.microsoft.com/en-us/products/ai-foundry/">
                 Microsoft Foundry 製品ページ
               </Ext>{" "}
-              の構成要素（Models / Agent Service and frameworks / Knowledge and Tools / Observability and trust / Local and edge）を統合
+              の構成要素（Models / Agent Service and frameworks / Knowledge and Tools /
+              Observability and trust / Local and edge）を統合
             </p>
 
-            <h3><span className={styles.hNum}>1.2</span>誰がFoundryを使うべきか</h3>
+            <h3>
+              <span className={styles.hNum}>1.2</span>誰がFoundryを使うべきか
+            </h3>
             <p>公式ドキュメントは3つの主要な利用者像を挙げています。</p>
             <div className={styles.tableWrap}>
               <table>
@@ -618,43 +655,91 @@ export default function MicrosoftFoundryBestPracticesIntermediatePage() {
           </section>
 
           <section className={styles.section} id="sec-2">
-            <div className={styles.eyebrow}><span className={styles.line}></span>CHAPTER 2</div>
+            <div className={styles.eyebrow}>
+              <span className={styles.line}></span>CHAPTER 2
+            </div>
             <h2>ステップバイステップ・セットアップ</h2>
 
-            <h3><span className={styles.hNum}>STEP 1</span>Azureアカウントの準備</h3>
+            <h3>
+              <span className={styles.hNum}>STEP 1</span>Azureアカウントの準備
+            </h3>
             <p>
               Foundryの探索自体はAzureアカウントなしで可能ですが、実際にエージェントを構築・デプロイするにはAzureサブスクリプションが必要です。
             </p>
 
-            <h3><span className={styles.hNum}>STEP 2</span>Foundryリソースとプロジェクトの作成</h3>
+            <h3>
+              <span className={styles.hNum}>STEP 2</span>Foundryリソースとプロジェクトの作成
+            </h3>
             <p>
-              新しいFoundryリソースモデルでは、1つのFoundryリソースの下に複数の「プロジェクト」を作成できます。プロジェクト単位でRBAC・ネットワーク・接続先を分離できるため、<strong>チームや環境（Dev/Test/Prod）ごとにプロジェクトを分ける</strong>のが基本方針です。
+              新しいFoundryリソースモデルでは、1つのFoundryリソースの下に複数の「プロジェクト」を作成できます。プロジェクト単位でRBAC・ネットワーク・接続先を分離できるため、
+              <strong>チームや環境（Dev/Test/Prod）ごとにプロジェクトを分ける</strong>
+              のが基本方針です。
             </p>
 
-            <h3><span className={styles.hNum}>STEP 3</span>SDKのインストールと認証</h3>
+            <h3>
+              <span className={styles.hNum}>STEP 3</span>SDKのインストールと認証
+            </h3>
             <p>
               <code className={styles.inlineCode}>DefaultAzureCredential</code>（Microsoft Entra
               ID認証）を使い、APIキーの手動管理を避けるのがセキュリティ上のベストプラクティスです（詳細は7章）。
             </p>
 
-            <h3><span className={styles.hNum}>STEP 4</span>最初のAPI呼び出し</h3>
+            <h3>
+              <span className={styles.hNum}>STEP 4</span>最初のAPI呼び出し
+            </h3>
             <div className={styles.codeBar}>python</div>
             <div className={`${styles.codeBlock} ${styles.hasCodeBar}`}>
-              <div className={styles.codeLine}><span className={styles.ck}>from</span><span className={styles.cs}> azure.identity </span><span className={styles.ck}>import</span><span className={styles.cv}> DefaultAzureCredential</span></div>
-              <div className={styles.codeLine}><span className={styles.ck}>from</span><span className={styles.cs}> azure.ai.projects </span><span className={styles.ck}>import</span><span className={styles.cv}> AIProjectClient</span></div>
+              <div className={styles.codeLine}>
+                <span className={styles.ck}>from</span>
+                <span className={styles.cs}> azure.identity </span>
+                <span className={styles.ck}>import</span>
+                <span className={styles.cv}> DefaultAzureCredential</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.ck}>from</span>
+                <span className={styles.cs}> azure.ai.projects </span>
+                <span className={styles.ck}>import</span>
+                <span className={styles.cv}> AIProjectClient</span>
+              </div>
               <div className={styles.codeLine}></div>
-              <div className={styles.codeLine}><span className={styles.cc}># 形式: &quot;https://resource_name.ai.azure.com/api/projects/project_name&quot;</span></div>
-              <div className={styles.codeLine}><span className={styles.cv}>PROJECT_ENDPOINT</span> = <span className={styles.cs}>&quot;your_project_endpoint&quot;</span></div>
+              <div className={styles.codeLine}>
+                <span className={styles.cc}>
+                  # 形式: &quot;https://resource_name.ai.azure.com/api/projects/project_name&quot;
+                </span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.cv}>PROJECT_ENDPOINT</span> ={" "}
+                <span className={styles.cs}>&quot;your_project_endpoint&quot;</span>
+              </div>
               <div className={styles.codeLine}></div>
-              <div className={styles.codeLine}><span className={styles.cv}>project</span> = AIProjectClient(</div>
-              <div className={styles.codeLine}>    endpoint=<span className={styles.cv}>PROJECT_ENDPOINT</span>,</div>
-              <div className={styles.codeLine}>    credential=DefaultAzureCredential(),</div>
+              <div className={styles.codeLine}>
+                <span className={styles.cv}>project</span> = AIProjectClient(
+              </div>
+              <div className={styles.codeLine}>
+                {" "}
+                endpoint=<span className={styles.cv}>PROJECT_ENDPOINT</span>,
+              </div>
+              <div className={styles.codeLine}> credential=DefaultAzureCredential(),</div>
               <div className={styles.codeLine}>)</div>
-              <div className={styles.codeLine}><span className={styles.cv}>openai</span> = project.get_openai_client()</div>
+              <div className={styles.codeLine}>
+                <span className={styles.cv}>openai</span> = project.get_openai_client()
+              </div>
               <div className={styles.codeLine}></div>
-              <div className={styles.codeLine}><span className={styles.cv}>response</span> = openai.responses.create(</div>
-              <div className={styles.codeLine}>    model=<span className={styles.cs}>&quot;gpt-5-mini&quot;</span>,</div>
-              <div className={styles.codeLine}>    input=<span className={styles.cs}>&quot;What is the size of France in square miles?&quot;</span>,</div>
+              <div className={styles.codeLine}>
+                <span className={styles.cv}>response</span> = openai.responses.create(
+              </div>
+              <div className={styles.codeLine}>
+                {" "}
+                model=<span className={styles.cs}>&quot;gpt-5-mini&quot;</span>,
+              </div>
+              <div className={styles.codeLine}>
+                {" "}
+                input=
+                <span className={styles.cs}>
+                  &quot;What is the size of France in square miles?&quot;
+                </span>
+                ,
+              </div>
               <div className={styles.codeLine}>)</div>
               <div className={styles.codeLine}>print(response.output_text)</div>
             </div>
@@ -662,16 +747,21 @@ export default function MicrosoftFoundryBestPracticesIntermediatePage() {
               出典:{" "}
               <Ext href="https://learn.microsoft.com/en-us/azure/foundry/what-is-foundry?tabs=python">
                 What is Microsoft Foundry? – Microsoft Learn
-              </Ext>（Python/C#/TypeScript/REST全パターンが公式ページに掲載）
+              </Ext>
+              （Python/C#/TypeScript/REST全パターンが公式ページに掲載）
             </p>
 
-            <h3><span className={styles.hNum}>2.1</span>リクエストのライフサイクル</h3>
+            <h3>
+              <span className={styles.hNum}>2.1</span>リクエストのライフサイクル
+            </h3>
             <div className={styles.diagramFrame}>
               <MermaidDiagram chart={MMD_2} />
               <div className={styles.diagramCaption}>図2: 最初のAPI呼び出しのシーケンス</div>
             </div>
 
-            <h3><span className={styles.hNum}>STEP 5</span>開発サーフェスの選択</h3>
+            <h3>
+              <span className={styles.hNum}>STEP 5</span>開発サーフェスの選択
+            </h3>
             <p>Foundryは複数の開発サーフェスをサポートしているため、目的に応じて入口を選びます。</p>
             <div className={styles.tableWrap}>
               <table>
@@ -742,10 +832,14 @@ export default function MicrosoftFoundryBestPracticesIntermediatePage() {
           </section>
 
           <section className={styles.section} id="sec-3">
-            <div className={styles.eyebrow}><span className={styles.line}></span>CHAPTER 3</div>
+            <div className={styles.eyebrow}>
+              <span className={styles.line}></span>CHAPTER 3
+            </div>
             <h2>モデル選定とModel Router戦略</h2>
 
-            <h3><span className={styles.hNum}>3.1</span>モデルファミリーの選び方</h3>
+            <h3>
+              <span className={styles.hNum}>3.1</span>モデルファミリーの選び方
+            </h3>
             <p>
               Foundryは1,900以上（カタログ全体では11,000以上）のモデルをMicrosoft、OpenAI、Anthropic、Mistral、xAI、Meta、DeepSeek、Hugging
               Faceなどから提供しています。まず主要ファミリーの使い分けを押さえましょう。
@@ -825,7 +919,9 @@ export default function MicrosoftFoundryBestPracticesIntermediatePage() {
               </Ext>
             </p>
 
-            <h3><span className={styles.hNum}>3.2</span>Model Routerによるコストとパフォーマンスの両立</h3>
+            <h3>
+              <span className={styles.hNum}>3.2</span>Model Routerによるコストとパフォーマンスの両立
+            </h3>
             <p>
               Model
               Routerは、アプリケーションとモデル群の間に位置する推論レイヤーで、プロンプトの複雑さ・タスク種別・必要な能力を分析し、実行時に最適なモデルへ自動的にルーティングします。アプリケーションコード側の変更は不要です。
@@ -842,7 +938,9 @@ export default function MicrosoftFoundryBestPracticesIntermediatePage() {
             </p>
 
             <div className={styles.callout}>
-              <div className={styles.calloutTitle}>実装上の注意点（開発者コミュニティからの実践知）</div>
+              <div className={styles.calloutTitle}>
+                実装上の注意点（開発者コミュニティからの実践知）
+              </div>
               <ul>
                 <li>
                   レート制限（TPM）はModel
@@ -863,11 +961,14 @@ export default function MicrosoftFoundryBestPracticesIntermediatePage() {
           </section>
 
           <section className={styles.section} id="sec-4">
-            <div className={styles.eyebrow}><span className={styles.line}></span>CHAPTER 4</div>
+            <div className={styles.eyebrow}>
+              <span className={styles.line}></span>CHAPTER 4
+            </div>
             <h2>エージェント開発のベストプラクティス</h2>
 
             <h3>
-              <span className={styles.hNum}>4.1</span>Prompt Agent vs Hosted Agent vs Copilot Studio の選択
+              <span className={styles.hNum}>4.1</span>Prompt Agent vs Hosted Agent vs Copilot Studio
+              の選択
             </h3>
             <p>Foundry Agent Serviceは大きく分けて次の2つのランタイムを提供します。</p>
             <ul>
@@ -896,7 +997,8 @@ export default function MicrosoftFoundryBestPracticesIntermediatePage() {
               出典:{" "}
               <Ext href="https://byteiota.com/foundry-agent-service-ga/">
                 Microsoft Foundry Agent Service Is GA – byteiota
-              </Ext>,{" "}
+              </Ext>
+              ,{" "}
               <Ext href="https://www.bighatgroup.com/blog/microsoft-foundry-hosted-agents-enterprise-guide-april-2026/">
                 Microsoft Foundry Hosted Agents: What Enterprise IT Should Do Now – Big Hat Group
               </Ext>
@@ -905,7 +1007,9 @@ export default function MicrosoftFoundryBestPracticesIntermediatePage() {
             <p>以下は、実務でどのランタイムを選ぶべきかの判断フローです。</p>
             <div className={styles.diagramFrame}>
               <MermaidDiagram chart={MMD_3} />
-              <div className={styles.diagramCaption}>図3: エージェント実行ランタイムの意思決定フロー</div>
+              <div className={styles.diagramCaption}>
+                図3: エージェント実行ランタイムの意思決定フロー
+              </div>
             </div>
             <p className={styles.source}>
               出典:{" "}
@@ -915,15 +1019,20 @@ export default function MicrosoftFoundryBestPracticesIntermediatePage() {
               の意思決定フレームワークを基に図解
             </p>
 
-            <h3><span className={styles.hNum}>4.2</span>ツール利用のベストプラクティス（公式ガイダンス）</h3>
+            <h3>
+              <span className={styles.hNum}>4.2</span>
+              ツール利用のベストプラクティス（公式ガイダンス）
+            </h3>
             <p>
               Microsoft Learnの「Tool best practices for Microsoft Foundry Agent
               Service」は、以下を明確に推奨しています。
             </p>
             <ol>
               <li>
-                <strong><code className={styles.inlineCode}>tool_choice</code> で決定論的な制御を行う</strong>:
-                モデルにツール選択を委ねきらず、必要な場面では明示的に制御する。
+                <strong>
+                  <code className={styles.inlineCode}>tool_choice</code> で決定論的な制御を行う
+                </strong>
+                : モデルにツール選択を委ねきらず、必要な場面では明示的に制御する。
               </li>
               <li>
                 <strong>指示にツールの目的を明記する</strong>:
@@ -954,7 +1063,9 @@ export default function MicrosoftFoundryBestPracticesIntermediatePage() {
               </Ext>
             </p>
 
-            <h3><span className={styles.hNum}>4.3</span>メモリ機能の活用</h3>
+            <h3>
+              <span className={styles.hNum}>4.3</span>メモリ機能の活用
+            </h3>
             <p>
               Build 2026でパブリックプレビューとなったFoundry Agent
               Serviceのメモリ機能は3種類あります。
@@ -974,7 +1085,9 @@ export default function MicrosoftFoundryBestPracticesIntermediatePage() {
                   </tr>
                   <tr>
                     <td>User memory（ユーザー記憶）</td>
-                    <td>セッションを跨いだ好みや事実を記憶する（例：「乳製品アレルギーがある」）</td>
+                    <td>
+                      セッションを跨いだ好みや事実を記憶する（例：「乳製品アレルギーがある」）
+                    </td>
                   </tr>
                   <tr>
                     <td>Session memory（セッション記憶）</td>
@@ -985,7 +1098,11 @@ export default function MicrosoftFoundryBestPracticesIntermediatePage() {
             </div>
             <p>
               Tau-benchの初期結果では、Procedural
-              memoryの導入によりタスク成功率が絶対値で7〜14ポイント向上し、コストはベースラインとほぼ変わらないと報告されています。<strong>まずはテスト用エージェントでメモリを有効化し、タスク成功率・ツール呼び出し回数・トークン使用量を有効化前後で比較する</strong>ことが推奨アクションです。
+              memoryの導入によりタスク成功率が絶対値で7〜14ポイント向上し、コストはベースラインとほぼ変わらないと報告されています。
+              <strong>
+                まずはテスト用エージェントでメモリを有効化し、タスク成功率・ツール呼び出し回数・トークン使用量を有効化前後で比較する
+              </strong>
+              ことが推奨アクションです。
             </p>
             <p className={styles.source}>
               出典:{" "}
@@ -994,10 +1111,12 @@ export default function MicrosoftFoundryBestPracticesIntermediatePage() {
               </Ext>
             </p>
 
-            <h3><span className={styles.hNum}>4.4</span>プロンプト設計と非決定性への向き合い方</h3>
+            <h3>
+              <span className={styles.hNum}>4.4</span>プロンプト設計と非決定性への向き合い方
+            </h3>
             <div className={styles.quoteBlock}>
-              「あいまいで抽象度の高い指示は、たいてい良い結果を生まない」— Scott Hanselman（Microsoft
-              VP, 開発者コミュニティ担当）
+              「あいまいで抽象度の高い指示は、たいてい良い結果を生まない」— Scott
+              Hanselman（Microsoft VP, 開発者コミュニティ担当）
             </div>
             <p>
               国際的に著名なMicrosoftの開発者コミュニティ担当バイスプレジデントであるScott
@@ -1027,12 +1146,17 @@ export default function MicrosoftFoundryBestPracticesIntermediatePage() {
           </section>
 
           <section className={styles.section} id="sec-5">
-            <div className={styles.eyebrow}><span className={styles.line}></span>CHAPTER 5</div>
+            <div className={styles.eyebrow}>
+              <span className={styles.line}></span>CHAPTER 5
+            </div>
             <h2>マルチエージェント・オーケストレーション</h2>
 
-            <h3><span className={styles.hNum}>5.1</span>Microsoft Agent Frameworkの位置づけ</h3>
+            <h3>
+              <span className={styles.hNum}>5.1</span>Microsoft Agent Frameworkの位置づけ
+            </h3>
             <p>
-              Microsoft Agent Framework（MAF）は、AutoGenの「シンプルなエージェント抽象化」とSemantic
+              Microsoft Agent
+              Framework（MAF）は、AutoGenの「シンプルなエージェント抽象化」とSemantic
               Kernelの「エンタープライズ機能（セッションベースの状態管理、型安全性、ミドルウェア、テレメトリ）」を統合した後継フレームワークです。両者を開発していたチーム自身が作った直系の後継であり、さらにグラフベースのワークフローによる明示的なマルチエージェント制御を追加しています。
             </p>
             <p className={styles.source}>
@@ -1046,7 +1170,9 @@ export default function MicrosoftFoundryBestPracticesIntermediatePage() {
               MAFは公式に以下のオーケストレーションパターンを組み込みでサポートしています（人間参加型のツール承認や情報リクエストによる一時停止もサポート）。
             </p>
 
-            <h3><span className={styles.hNum}>5.2</span>4つの基本オーケストレーションパターン</h3>
+            <h3>
+              <span className={styles.hNum}>5.2</span>4つの基本オーケストレーションパターン
+            </h3>
             <div className={styles.diagramFrame}>
               <MermaidDiagram chart={MMD_4} />
               <div className={styles.diagramCaption}>
@@ -1057,7 +1183,8 @@ export default function MicrosoftFoundryBestPracticesIntermediatePage() {
               出典:{" "}
               <Ext href="https://learn.microsoft.com/en-us/agent-framework/workflows/orchestrations/">
                 Workflow orchestrations in Agent Framework – Microsoft Learn
-              </Ext>,{" "}
+              </Ext>
+              ,{" "}
               <Ext href="https://github.com/microsoft/agent-framework">
                 GitHub - microsoft/agent-framework
               </Ext>
@@ -1073,7 +1200,9 @@ export default function MicrosoftFoundryBestPracticesIntermediatePage() {
               </Ext>
             </p>
 
-            <h3><span className={styles.hNum}>5.3</span>サブエージェント指示設計のベストプラクティス</h3>
+            <h3>
+              <span className={styles.hNum}>5.3</span>サブエージェント指示設計のベストプラクティス
+            </h3>
             <p>
               Microsoft Copilot
               Studioのマルチエージェントガイダンスは、Foundry上のエージェント設計にもそのまま適用できる重要な注意点を挙げています。
@@ -1084,7 +1213,9 @@ export default function MicrosoftFoundryBestPracticesIntermediatePage() {
                 ことを親エージェントの指示に明記する（例：「あなたがユーザーと会話する唯一のエージェントです。すべての子エージェントの結果を1つの応答にまとめてください」）。
               </li>
               <li>
-                <strong>サブエージェントには「自分はサブエージェントである」と明示的に伝える</strong>
+                <strong>
+                  サブエージェントには「自分はサブエージェントである」と明示的に伝える
+                </strong>
                 。これを怠ると、サブエージェントは単独のエージェントとして振る舞い、ユーザーへ直接（重複した、または断片的な）メッセージを送ってしまう。
               </li>
               <li>
@@ -1101,10 +1232,14 @@ export default function MicrosoftFoundryBestPracticesIntermediatePage() {
           </section>
 
           <section className={styles.section} id="sec-6">
-            <div className={styles.eyebrow}><span className={styles.line}></span>CHAPTER 6</div>
+            <div className={styles.eyebrow}>
+              <span className={styles.line}></span>CHAPTER 6
+            </div>
             <h2>RAGとナレッジグラウンディング（Foundry IQ）</h2>
 
-            <h3><span className={styles.hNum}>6.1</span>Foundry IQとAzure AI Searchの関係</h3>
+            <h3>
+              <span className={styles.hNum}>6.1</span>Foundry IQとAzure AI Searchの関係
+            </h3>
             <p>
               Foundry IQは、Azure AI
               Searchの進化形として位置づけられる統合ナレッジ層です。複数のナレッジソース（社内文書、SharePoint、Fabric、Web検索など）をエージェントから見て単一の「ナレッジベース」として抽象化し、権限を意識したグラウンディングを提供します。
@@ -1117,7 +1252,8 @@ export default function MicrosoftFoundryBestPracticesIntermediatePage() {
             </p>
 
             <p>
-              従来のRAGが「1回のクエリで検索して回答する」パターンだったのに対し、<strong>エージェント型検索（Agentic Retrieval）</strong>
+              従来のRAGが「1回のクエリで検索して回答する」パターンだったのに対し、
+              <strong>エージェント型検索（Agentic Retrieval）</strong>
               はLLMによるクエリプランニングを組み込み、複雑な質問を複数の焦点を絞ったサブクエリへ分解し、並列実行した上で構造化されたグラウンディングデータを返します。マイクロソフトの実測では、このAgentic
               Retrievalの導入により応答の関連性が36%向上したと報告されています。
             </p>
@@ -1129,7 +1265,9 @@ export default function MicrosoftFoundryBestPracticesIntermediatePage() {
               </Ext>
             </p>
 
-            <h3><span className={styles.hNum}>6.2</span>RAGパイプラインのシーケンス</h3>
+            <h3>
+              <span className={styles.hNum}>6.2</span>RAGパイプラインのシーケンス
+            </h3>
             <div className={styles.diagramFrame}>
               <MermaidDiagram chart={MMD_5} />
               <div className={styles.diagramCaption}>
@@ -1144,7 +1282,9 @@ export default function MicrosoftFoundryBestPracticesIntermediatePage() {
               </Ext>
             </p>
 
-            <h3><span className={styles.hNum}>6.3</span>RAG品質評価の「トライアド」</h3>
+            <h3>
+              <span className={styles.hNum}>6.3</span>RAG品質評価の「トライアド」
+            </h3>
             <p>
               RAGエージェントを本番投入する前に、reference-freeな「RAGトライアド評価器」で品質を検証するのが公式に推奨されるベストプラクティスです。
             </p>
@@ -1163,7 +1303,9 @@ export default function MicrosoftFoundryBestPracticesIntermediatePage() {
                   </tr>
                   <tr>
                     <td>Groundedness（根拠性）</td>
-                    <td>生成された応答は検索結果に基づいており、捏造（ハルシネーション）がないか</td>
+                    <td>
+                      生成された応答は検索結果に基づいており、捏造（ハルシネーション）がないか
+                    </td>
                   </tr>
                   <tr>
                     <td>Relevance（関連性）</td>
@@ -1182,7 +1324,8 @@ export default function MicrosoftFoundryBestPracticesIntermediatePage() {
               出典:{" "}
               <Ext href="https://techcommunity.microsoft.com/blog/azure-ai-foundry-blog/the-future-of-ai-evaluating-and-optimizing-custom-rag-agents-using-azure-ai-foun/4455215">
                 Evaluating and Optimizing RAG Agents with Azure AI Foundry
-              </Ext>,{" "}
+              </Ext>
+              ,{" "}
               <Ext href="https://devblogs.microsoft.com/foundry/how-to-debug-and-optimize-rag-agents-in-azure-ai-foundry/">
                 How to debug and optimize RAG agents in Microsoft Foundry – Foundry Blog
               </Ext>
@@ -1190,10 +1333,14 @@ export default function MicrosoftFoundryBestPracticesIntermediatePage() {
           </section>
 
           <section className={styles.section} id="sec-7">
-            <div className={styles.eyebrow}><span className={styles.line}></span>CHAPTER 7</div>
+            <div className={styles.eyebrow}>
+              <span className={styles.line}></span>CHAPTER 7
+            </div>
             <h2>セキュリティとネットワーク分離</h2>
 
-            <h3><span className={styles.hNum}>7.1</span>最小権限アクセスとIDの原則</h3>
+            <h3>
+              <span className={styles.hNum}>7.1</span>最小権限アクセスとIDの原則
+            </h3>
             <p>Azure AIセキュリティのベストプラクティスは、次の3点を柱にしています。</p>
             <ol>
               <li>
@@ -1202,8 +1349,8 @@ export default function MicrosoftFoundryBestPracticesIntermediatePage() {
               </li>
               <li>
                 <strong>最小権限のRBACを構成する</strong>:
-                プロジェクトまたはワークスペース単位で組み込みロールを割り当て、Microsoft Entra Agent
-                IDを使ってエージェントのアイデンティティにスコープの狭い短命トークンを与える。
+                プロジェクトまたはワークスペース単位で組み込みロールを割り当て、Microsoft Entra
+                Agent IDを使ってエージェントのアイデンティティにスコープの狭い短命トークンを与える。
               </li>
               <li>
                 <strong>承認済みモデルのみをデプロイする</strong>:
@@ -1219,12 +1366,18 @@ export default function MicrosoftFoundryBestPracticesIntermediatePage() {
 
             <div className={styles.callout}>
               <p>
-                <strong>APIキーの利用は避け、マネージドID（<code className={styles.inlineCode}>DefaultAzureCredential</code>など）による認証をデフォルトにする</strong>
+                <strong>
+                  APIキーの利用は避け、マネージドID（
+                  <code className={styles.inlineCode}>DefaultAzureCredential</code>
+                  など）による認証をデフォルトにする
+                </strong>
                 ことが、資格情報のローテーション管理を不要にする最も効果的な一手です。
               </p>
             </div>
 
-            <h3><span className={styles.hNum}>7.2</span>Foundry RBACロール（名称変更に注意）</h3>
+            <h3>
+              <span className={styles.hNum}>7.2</span>Foundry RBACロール（名称変更に注意）
+            </h3>
             <p>
               2026年に入り、FoundryのRBACロールは名称が変更されています。役割IDとコア権限自体は変わっていませんが、ドキュメントやチュートリアルによって新旧の名称が混在している点に注意してください。
             </p>
@@ -1263,7 +1416,9 @@ export default function MicrosoftFoundryBestPracticesIntermediatePage() {
               </Ext>
             </p>
 
-            <h3><span className={styles.hNum}>7.3</span>マネージドネットワーク分離モード</h3>
+            <h3>
+              <span className={styles.hNum}>7.3</span>マネージドネットワーク分離モード
+            </h3>
             <p>
               FoundryのHub/リソースには <code className={styles.inlineCode}>managedNetwork</code>
               プロパティがあり、3つの分離モードから選択します。本番環境で機密データを扱う場合の目標状態は{" "}
@@ -1302,20 +1457,26 @@ export default function MicrosoftFoundryBestPracticesIntermediatePage() {
             <p className={styles.source}>
               出典:{" "}
               <Ext href="https://protego.me/blog/azure-ai-foundry-security-threat-model-rbac-governance">
-                Azure AI Foundry Security: Threat Model, RBAC, and Data Governance Controls – Protego
+                Azure AI Foundry Security: Threat Model, RBAC, and Data Governance Controls –
+                Protego
               </Ext>
             </p>
 
-            <h3><span className={styles.hNum}>7.4</span>ネットワーク分離アーキテクチャ</h3>
+            <h3>
+              <span className={styles.hNum}>7.4</span>ネットワーク分離アーキテクチャ
+            </h3>
             <div className={styles.diagramFrame}>
               <MermaidDiagram chart={MMD_6} />
-              <div className={styles.diagramCaption}>図6: インバウンド／アウトバウンド分離とBYO VNet構成</div>
+              <div className={styles.diagramCaption}>
+                図6: インバウンド／アウトバウンド分離とBYO VNet構成
+              </div>
             </div>
             <p className={styles.source}>
               出典:{" "}
               <Ext href="https://learn.microsoft.com/en-us/azure/foundry/how-to/configure-private-link">
                 How to configure network isolation for Microsoft Foundry – Microsoft Learn
-              </Ext>,{" "}
+              </Ext>
+              ,{" "}
               <Ext href="https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/virtual-networks">
                 Set up private networking for Foundry Agent Service – Microsoft Learn
               </Ext>
@@ -1345,13 +1506,18 @@ export default function MicrosoftFoundryBestPracticesIntermediatePage() {
           </section>
 
           <section className={styles.section} id="sec-8">
-            <div className={styles.eyebrow}><span className={styles.line}></span>CHAPTER 8</div>
+            <div className={styles.eyebrow}>
+              <span className={styles.line}></span>CHAPTER 8
+            </div>
             <h2>ガードレールと責任あるAI</h2>
 
-            <h3><span className={styles.hNum}>8.1</span>4つの介入ポイント</h3>
+            <h3>
+              <span className={styles.hNum}>8.1</span>4つの介入ポイント
+            </h3>
             <p>
               Foundryのガードレール機構は、Azure AI Content
-              Safetyの分類モデルを活用し、リクエストのライフサイクル上の<strong>4つの介入ポイント</strong>でリスクを検出します。
+              Safetyの分類モデルを活用し、リクエストのライフサイクル上の
+              <strong>4つの介入ポイント</strong>でリスクを検出します。
             </p>
             <div className={styles.diagramFrame}>
               <MermaidDiagram chart={MMD_7} />
@@ -1366,7 +1532,9 @@ export default function MicrosoftFoundryBestPracticesIntermediatePage() {
               </Ext>
             </p>
 
-            <h3><span className={styles.hNum}>8.2</span>各コントロールの役割</h3>
+            <h3>
+              <span className={styles.hNum}>8.2</span>各コントロールの役割
+            </h3>
             <div className={styles.tableWrap}>
               <table>
                 <thead>
@@ -1379,7 +1547,8 @@ export default function MicrosoftFoundryBestPracticesIntermediatePage() {
                   <tr>
                     <td>Prompt Shields + Spotlighting</td>
                     <td>
-                      直接的なプロンプトインジェクションだけでなく、検索結果やドキュメントに埋め込まれた<strong>間接的な</strong>インジェクション攻撃を検出する
+                      直接的なプロンプトインジェクションだけでなく、検索結果やドキュメントに埋め込まれた
+                      <strong>間接的な</strong>インジェクション攻撃を検出する
                     </td>
                   </tr>
                   <tr>
@@ -1410,11 +1579,14 @@ export default function MicrosoftFoundryBestPracticesIntermediatePage() {
             <p className={styles.source}>
               出典:{" "}
               <Ext href="https://jameswestall.com/2026/01/13/content-safety-agents-task-adherence-prompt-shields/">
-                Azure AI Content Safety for Agents: Task Adherence, Prompt Shields, and PII Filters – James Westall
+                Azure AI Content Safety for Agents: Task Adherence, Prompt Shields, and PII Filters
+                – James Westall
               </Ext>
             </p>
 
-            <h3><span className={styles.hNum}>8.3</span>ガイド付きセットアップの活用</h3>
+            <h3>
+              <span className={styles.hNum}>8.3</span>ガイド付きセットアップの活用
+            </h3>
             <p>
               Foundryポータルの「ガイド付きガードレール設定」では、次のような質問に答えるだけで推奨コントロールが提示されます。
             </p>
@@ -1438,10 +1610,14 @@ export default function MicrosoftFoundryBestPracticesIntermediatePage() {
           </section>
 
           <section className={styles.section} id="sec-9">
-            <div className={styles.eyebrow}><span className={styles.line}></span>CHAPTER 9</div>
+            <div className={styles.eyebrow}>
+              <span className={styles.line}></span>CHAPTER 9
+            </div>
             <h2>可観測性（トレーシング・評価・モニタリング）</h2>
 
-            <h3><span className={styles.hNum}>9.1</span>OpenTelemetryを中核とした設計思想</h3>
+            <h3>
+              <span className={styles.hNum}>9.1</span>OpenTelemetryを中核とした設計思想
+            </h3>
             <p>
               Foundryの可観測性はOpenTelemetry（OTel）標準の上に構築されており、Azure Monitor /
               Application Insightsと統合されています。LangChain、LangGraph、OpenAI Agents
@@ -1477,11 +1653,14 @@ export default function MicrosoftFoundryBestPracticesIntermediatePage() {
             <p className={styles.source}>
               出典:{" "}
               <Ext href="https://itnext.io/you-cant-debug-what-you-can-t-see-ai-observability-with-opentelemetry-microsoft-foundry-f90407b90e17">
-                You Can't Debug What You Can't See: AI Observability with OpenTelemetry + Microsoft Foundry – itnext.io
+                You Can't Debug What You Can't See: AI Observability with OpenTelemetry + Microsoft
+                Foundry – itnext.io
               </Ext>
             </p>
 
-            <h3><span className={styles.hNum}>9.2</span>可観測性パイプライン</h3>
+            <h3>
+              <span className={styles.hNum}>9.2</span>可観測性パイプライン
+            </h3>
             <div className={styles.diagramFrame}>
               <MermaidDiagram chart={MMD_8} />
               <div className={styles.diagramCaption}>
@@ -1492,13 +1671,16 @@ export default function MicrosoftFoundryBestPracticesIntermediatePage() {
               出典:{" "}
               <Ext href="https://learn.microsoft.com/en-us/azure/foundry-classic/how-to/develop/trace-agents-sdk">
                 Trace and Observe AI Agents in Microsoft Foundry – Microsoft Learn
-              </Ext>,{" "}
+              </Ext>
+              ,{" "}
               <Ext href="https://learn.microsoft.com/en-us/azure/foundry/observability/how-to/trace-agent-setup">
                 Set Up Tracing for AI Agents in Microsoft Foundry – Microsoft Learn
               </Ext>
             </p>
 
-            <h3><span className={styles.hNum}>9.3</span>実装のベストプラクティス</h3>
+            <h3>
+              <span className={styles.hNum}>9.3</span>実装のベストプラクティス
+            </h3>
             <ul>
               <li>
                 <strong>一貫したスパン属性を使う</strong>:
@@ -1532,10 +1714,14 @@ export default function MicrosoftFoundryBestPracticesIntermediatePage() {
           </section>
 
           <section className={styles.section} id="sec-10">
-            <div className={styles.eyebrow}><span className={styles.line}></span>CHAPTER 10</div>
+            <div className={styles.eyebrow}>
+              <span className={styles.line}></span>CHAPTER 10
+            </div>
             <h2>コスト最適化とFinOps</h2>
 
-            <h3><span className={styles.hNum}>10.1</span>「トークン単価」から「タスク完了単価」へ</h3>
+            <h3>
+              <span className={styles.hNum}>10.1</span>「トークン単価」から「タスク完了単価」へ
+            </h3>
             <div className={styles.callout}>
               <p>
                 <strong>
@@ -1556,7 +1742,9 @@ export default function MicrosoftFoundryBestPracticesIntermediatePage() {
               </Ext>
             </p>
 
-            <h3><span className={styles.hNum}>10.2</span>実践的なコスト最適化戦略</h3>
+            <h3>
+              <span className={styles.hNum}>10.2</span>実践的なコスト最適化戦略
+            </h3>
             <div className={styles.tableWrap}>
               <table>
                 <thead>
@@ -1607,9 +1795,11 @@ export default function MicrosoftFoundryBestPracticesIntermediatePage() {
               出典:{" "}
               <Ext href="https://github.com/MicrosoftDocs/azure-ai-docs/blob/main/articles/foundry/concepts/manage-costs.md">
                 azure-ai-docs: manage-costs.md – GitHub
-              </Ext>,{" "}
+              </Ext>
+              ,{" "}
               <Ext href="https://jonnychipz.com/2026/01/30/cost-management-and-optimisation-strategies-for-ai-applications-on-azure-ai-foundry/">
-                Cost Management and Optimisation Strategies for AI Applications on Azure AI Foundry – Jonny Chipz
+                Cost Management and Optimisation Strategies for AI Applications on Azure AI Foundry
+                – Jonny Chipz
               </Ext>
             </p>
 
@@ -1630,21 +1820,28 @@ export default function MicrosoftFoundryBestPracticesIntermediatePage() {
           </section>
 
           <section className={styles.section} id="sec-11">
-            <div className={styles.eyebrow}><span className={styles.line}></span>CHAPTER 11</div>
+            <div className={styles.eyebrow}>
+              <span className={styles.line}></span>CHAPTER 11
+            </div>
             <h2>CI/CDとGenAIOps</h2>
 
-            <h3><span className={styles.hNum}>11.1</span>プロンプトもコードとして扱う</h3>
+            <h3>
+              <span className={styles.hNum}>11.1</span>プロンプトもコードとして扱う
+            </h3>
             <p>
               AIエージェントの本番運用で最も見落とされがちなのは、「システムプロンプトのたった一語の変更が、ロジックの書き換えと同じくらいエージェントの振る舞いを大きく変えうる」という点です。ベストプラクティスとしては、プロンプトをコードと一緒にGitで管理し、パイプラインのメタデータで使用バージョンを明示的に参照し、特定コミットの再実行が常に同じ振る舞いを再現できるようにする（そのためにはプロンプトのバージョンごとの不変性が前提になる）ことが挙げられます。
             </p>
             <p className={styles.source}>
               出典:{" "}
               <Ext href="https://techcommunity.microsoft.com/blog/azureinfrastructureblog/cicd-as-a-platform-shipping-microservices-and-ai-agents-with-reusable-github-act/4504550">
-                CI/CD as a Platform: Shipping Microservices and AI Agents with Reusable GitHub Actions Workflows – Microsoft Community Hub
+                CI/CD as a Platform: Shipping Microservices and AI Agents with Reusable GitHub
+                Actions Workflows – Microsoft Community Hub
               </Ext>
             </p>
 
-            <h3><span className={styles.hNum}>11.2</span>CI/CDパイプライン全体像</h3>
+            <h3>
+              <span className={styles.hNum}>11.2</span>CI/CDパイプライン全体像
+            </h3>
             <div className={styles.diagramFrame}>
               <MermaidDiagram chart={MMD_9} />
               <div className={styles.diagramCaption}>
@@ -1660,8 +1857,8 @@ export default function MicrosoftFoundryBestPracticesIntermediatePage() {
 
             <p>
               このパターンは、GitHub ActionsとAzure
-              DevOpsの双方に対応する形でリファレンス実装が公開されています。パイプラインは「CIビルド →
-              CI評価 → CD Dev → CD Test → CD Production」という4段階で構成され、GitHub
+              DevOpsの双方に対応する形でリファレンス実装が公開されています。パイプラインは「CIビルド
+              → CI評価 → CD Dev → CD Test → CD Production」という4段階で構成され、GitHub
               Environmentsによる承認ゲートやOIDCワークロードIDフェデレーションによるパスワードレスなAzure認証を採用することで、資格情報をパイプライン内に一切保存しない設計が推奨されています。
             </p>
             <p className={styles.source}>
@@ -1671,7 +1868,9 @@ export default function MicrosoftFoundryBestPracticesIntermediatePage() {
               </Ext>
             </p>
 
-            <h3><span className={styles.hNum}>11.3</span>CI/CDにおける評価ゲートの実装</h3>
+            <h3>
+              <span className={styles.hNum}>11.3</span>CI/CDにおける評価ゲートの実装
+            </h3>
             <p>
               Foundryは「Run an evaluation in GitHub Action」というGitHub
               Actionを公式に提供しており、テストクエリと評価器のリストを含むデータセットを渡すだけで、エージェントを呼び出して評価を実行し、サマリーレポートを生成できます。評価結果には信頼区間と統計的有意性の検定が含まれており、変化が意味のあるものか、単なる偶然のばらつきかを判定できます。
@@ -1686,7 +1885,8 @@ export default function MicrosoftFoundryBestPracticesIntermediatePage() {
               出典:{" "}
               <Ext href="https://learn.microsoft.com/en-us/azure/foundry/how-to/evaluation-github-action">
                 How to run an evaluation in GitHub Action – Microsoft Learn
-              </Ext>,{" "}
+              </Ext>
+              ,{" "}
               <Ext href="https://techcommunity.microsoft.com/blog/educatordeveloperblog/cicd-for-ai-agents-on-microsoft-foundry/4522218">
                 CI/CD for AI Agents on Microsoft Foundry – Microsoft Community Hub
               </Ext>
@@ -1694,10 +1894,14 @@ export default function MicrosoftFoundryBestPracticesIntermediatePage() {
           </section>
 
           <section className={styles.section} id="sec-12">
-            <div className={styles.eyebrow}><span className={styles.line}></span>CHAPTER 12</div>
+            <div className={styles.eyebrow}>
+              <span className={styles.line}></span>CHAPTER 12
+            </div>
             <h2>ファインチューニングと蒸留</h2>
 
-            <h3><span className={styles.hNum}>12.1</span>手法の使い分け</h3>
+            <h3>
+              <span className={styles.hNum}>12.1</span>手法の使い分け
+            </h3>
             <p>Foundryは複数のカスタマイズ手法を提供しており、目的に応じて使い分けます。</p>
             <div className={styles.tableWrap}>
               <table>
@@ -1742,7 +1946,8 @@ export default function MicrosoftFoundryBestPracticesIntermediatePage() {
               出典:{" "}
               <Ext href="https://learn.microsoft.com/en-us/azure/foundry/openai/concepts/fine-tuning-considerations">
                 Microsoft Foundry fine-tuning considerations – Microsoft Learn
-              </Ext>,{" "}
+              </Ext>
+              ,{" "}
               <Ext href="https://devblogs.microsoft.com/foundry/the-developers-guide-to-smarter-fine-tuning/">
                 The Developer's Guide to Smarter Fine-tuning – Foundry Blog
               </Ext>
@@ -1759,7 +1964,9 @@ export default function MicrosoftFoundryBestPracticesIntermediatePage() {
               </Ext>
             </p>
 
-            <h3><span className={styles.hNum}>12.2</span>実務プロセス</h3>
+            <h3>
+              <span className={styles.hNum}>12.2</span>実務プロセス
+            </h3>
             <ol>
               <li>
                 <strong>データ準備</strong>:
@@ -1805,7 +2012,9 @@ export default function MicrosoftFoundryBestPracticesIntermediatePage() {
           </section>
 
           <section className={styles.section} id="sec-13">
-            <div className={styles.eyebrow}><span className={styles.line}></span>CHAPTER 13</div>
+            <div className={styles.eyebrow}>
+              <span className={styles.line}></span>CHAPTER 13
+            </div>
             <h2>Well-Architected Frameworkの適用</h2>
             <p>
               Azure Well-Architected
@@ -1854,9 +2063,11 @@ export default function MicrosoftFoundryBestPracticesIntermediatePage() {
               出典:{" "}
               <Ext href="https://learn.microsoft.com/en-us/azure/well-architected/ai/get-started">
                 AI workloads on Azure – Microsoft Azure Well-Architected Framework
-              </Ext>,{" "}
+              </Ext>
+              ,{" "}
               <Ext href="https://techcommunity.microsoft.com/blog/azurearchitectureblog/designing-ai-workloads-with-the-azure-well-architected-framework/4452252">
-                Designing AI Workloads with the Azure Well-Architected Framework – Microsoft Community Hub
+                Designing AI Workloads with the Azure Well-Architected Framework – Microsoft
+                Community Hub
               </Ext>
             </p>
 
@@ -1871,7 +2082,9 @@ export default function MicrosoftFoundryBestPracticesIntermediatePage() {
             </p>
 
             <p>
-              公式のベースラインリファレンスアーキテクチャとしては、「Baseline Microsoft Foundry chat reference architecture」（プライベートネットワーキング、ゾーン冗長性、厳格なセキュリティ制御を重視）と、それをAzureランディングゾーンに組み込んだ拡張版が公開されており、Foundry
+              公式のベースラインリファレンスアーキテクチャとしては、「Baseline Microsoft Foundry
+              chat reference
+              architecture」（プライベートネットワーキング、ゾーン冗長性、厳格なセキュリティ制御を重視）と、それをAzureランディングゾーンに組み込んだ拡張版が公開されており、Foundry
               Agent Service・Azure OpenAI・App
               Serviceをプライベートかつネットワーク分離された環境内で連携させ、Azure
               Firewallで保護しつつゾーン冗長で高可用性を実現する構成が示されています。新規に本番アーキテクチャを設計する際は、まずこのベースラインを起点にするのが効率的です。
@@ -1885,7 +2098,9 @@ export default function MicrosoftFoundryBestPracticesIntermediatePage() {
           </section>
 
           <section className={styles.section} id="sec-14">
-            <div className={styles.eyebrow}><span className={styles.line}></span>CHAPTER 14</div>
+            <div className={styles.eyebrow}>
+              <span className={styles.line}></span>CHAPTER 14
+            </div>
             <h2>よくあるアンチパターンと落とし穴</h2>
             <p>
               ここまでの調査で繰り返し登場した、実務でつまずきやすいポイントをアンチパターンとしてまとめます。
@@ -1974,7 +2189,9 @@ export default function MicrosoftFoundryBestPracticesIntermediatePage() {
           </section>
 
           <section className={styles.section} id="sec-15">
-            <div className={styles.eyebrow}><span className={styles.line}></span>CHAPTER 15</div>
+            <div className={styles.eyebrow}>
+              <span className={styles.line}></span>CHAPTER 15
+            </div>
             <h2>本番デプロイ前チェックリスト</h2>
             <ul className={styles.checklist}>
               <li>
@@ -2007,8 +2224,10 @@ export default function MicrosoftFoundryBestPracticesIntermediatePage() {
                 Relevanceを継続的に評価する仕組みがある（6.3章）
               </li>
               <li>
-                <span className={styles.checkBox}></span>本番Hub/プロジェクトはプライベートエンドポイントで受信を、<code className={styles.inlineCode}>AllowOnlyApprovedOutbound</code>で送信を分離している（7.3,
-                7.4章）
+                <span className={styles.checkBox}></span>
+                本番Hub/プロジェクトはプライベートエンドポイントで受信を、
+                <code className={styles.inlineCode}>AllowOnlyApprovedOutbound</code>
+                で送信を分離している（7.3, 7.4章）
               </li>
               <li>
                 <span className={styles.checkBox}></span>RBACは最小権限で構成され、Entra Agent
@@ -2048,7 +2267,9 @@ export default function MicrosoftFoundryBestPracticesIntermediatePage() {
           </section>
 
           <section className={styles.section} id="sec-16">
-            <div className={styles.eyebrow}><span className={styles.line}></span>CHAPTER 16</div>
+            <div className={styles.eyebrow}>
+              <span className={styles.line}></span>CHAPTER 16
+            </div>
             <h2>参考文献・ソースURL一覧</h2>
 
             <h3>公式ドキュメント・製品ページ（Microsoft Learn / Azure）</h3>
@@ -2259,12 +2480,14 @@ export default function MicrosoftFoundryBestPracticesIntermediatePage() {
               </li>
               <li>
                 <Ext href="https://techcommunity.microsoft.com/blog/azure-ai-foundry-blog/foundry-iq-boost-response-relevance-by-36-with-agentic-retrieval/4470720">
-                  Foundry IQ: boost response relevance by 36% with agentic retrieval – Microsoft Community Hub
+                  Foundry IQ: boost response relevance by 36% with agentic retrieval – Microsoft
+                  Community Hub
                 </Ext>
               </li>
               <li>
                 <Ext href="https://techcommunity.microsoft.com/blog/azure-ai-foundry-blog/the-future-of-ai-evaluating-and-optimizing-custom-rag-agents-using-azure-ai-foun/4455215">
-                  Evaluating and Optimizing RAG Agents with Azure AI Foundry – Microsoft Community Hub
+                  Evaluating and Optimizing RAG Agents with Azure AI Foundry – Microsoft Community
+                  Hub
                 </Ext>
               </li>
               <li>
@@ -2274,12 +2497,14 @@ export default function MicrosoftFoundryBestPracticesIntermediatePage() {
               </li>
               <li>
                 <Ext href="https://techcommunity.microsoft.com/blog/azure-ai-foundry-blog/monitoring--observability-in-microsoft-foundry-part-2-configuration-and-operatio/4532674">
-                  Monitoring &amp; Observability in Microsoft Foundry Part 2 – Microsoft Community Hub
+                  Monitoring &amp; Observability in Microsoft Foundry Part 2 – Microsoft Community
+                  Hub
                 </Ext>
               </li>
               <li>
                 <Ext href="https://techcommunity.microsoft.com/blog/azureinfrastructureblog/cicd-as-a-platform-shipping-microservices-and-ai-agents-with-reusable-github-act/4504550">
-                  CI/CD as a Platform: Shipping Microservices and AI Agents with Reusable GitHub Actions Workflows – Microsoft Community Hub
+                  CI/CD as a Platform: Shipping Microservices and AI Agents with Reusable GitHub
+                  Actions Workflows – Microsoft Community Hub
                 </Ext>
               </li>
               <li>
@@ -2294,7 +2519,8 @@ export default function MicrosoftFoundryBestPracticesIntermediatePage() {
               </li>
               <li>
                 <Ext href="https://techcommunity.microsoft.com/blog/azurearchitectureblog/designing-ai-workloads-with-the-azure-well-architected-framework/4452252">
-                  Designing AI Workloads with the Azure Well-Architected Framework – Microsoft Community Hub
+                  Designing AI Workloads with the Azure Well-Architected Framework – Microsoft
+                  Community Hub
                 </Ext>
               </li>
             </ul>
@@ -2315,7 +2541,9 @@ export default function MicrosoftFoundryBestPracticesIntermediatePage() {
                   SE Radio 711: Scott Hanselman on AI-Assisted Development Tools
                 </Ext>
                 <br />
-                <span className={styles.refNote}>Microsoft VP, Scott Hanselmanへのインタビュー</span>
+                <span className={styles.refNote}>
+                  Microsoft VP, Scott Hanselmanへのインタビュー
+                </span>
               </li>
               <li>
                 <Ext href="https://www.aol.com/microsoft-cto-says-number-people-203002589.html">
@@ -2346,17 +2574,20 @@ export default function MicrosoftFoundryBestPracticesIntermediatePage() {
               </li>
               <li>
                 <Ext href="https://protego.me/blog/azure-ai-foundry-security-threat-model-rbac-governance">
-                  Azure AI Foundry Security: Threat Model, RBAC, and Data Governance Controls – Protego
+                  Azure AI Foundry Security: Threat Model, RBAC, and Data Governance Controls –
+                  Protego
                 </Ext>
               </li>
               <li>
                 <Ext href="https://jameswestall.com/2026/01/13/content-safety-agents-task-adherence-prompt-shields/">
-                  Azure AI Content Safety for Agents: Task Adherence, Prompt Shields, and PII Filters – James Westall
+                  Azure AI Content Safety for Agents: Task Adherence, Prompt Shields, and PII
+                  Filters – James Westall
                 </Ext>
               </li>
               <li>
                 <Ext href="https://itnext.io/you-cant-debug-what-you-can-t-see-ai-observability-with-opentelemetry-microsoft-foundry-f90407b90e17">
-                  You Can't Debug What You Can't See: AI Observability with OpenTelemetry + Microsoft Foundry – itnext.io
+                  You Can't Debug What You Can't See: AI Observability with OpenTelemetry +
+                  Microsoft Foundry – itnext.io
                 </Ext>
               </li>
               <li>
@@ -2367,7 +2598,8 @@ export default function MicrosoftFoundryBestPracticesIntermediatePage() {
               <li>
                 <span className={styles.badge}>MVP</span>
                 <Ext href="https://jonnychipz.com/2026/01/30/cost-management-and-optimisation-strategies-for-ai-applications-on-azure-ai-foundry/">
-                  Cost Management and Optimisation Strategies for AI Applications on Azure AI Foundry – Jonny Chipz
+                  Cost Management and Optimisation Strategies for AI Applications on Azure AI
+                  Foundry – Jonny Chipz
                 </Ext>
               </li>
               <li>

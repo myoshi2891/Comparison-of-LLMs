@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import SidebarToggle from "./SidebarToggle";
 import styles from "./page.module.css";
+import SidebarToggle from "./SidebarToggle";
 
 describe("SidebarToggle component", () => {
   it("toggles aria-expanded, aria-label, and sidebarOpen class", () => {
