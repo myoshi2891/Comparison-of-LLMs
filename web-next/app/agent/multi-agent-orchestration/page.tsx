@@ -758,6 +758,21 @@ export default function MultiAgentOrchestrationPage() {
                 Best Multi-agent Orchestration Frameworks in 2026 — TrueFoundry
               </Ext>
             </p>
+            <p>
+              <Ext href="https://www.augmentcode.com/tools/multi-agent-orchestration-platforms-build-vs-buy">
+                7 Multi-Agent Orchestration Platforms: Build vs Buy in 2026 — Augment Code
+              </Ext>
+            </p>
+            <p>
+              <Ext href="https://developers.googleblog.com/developers-guide-to-multi-agent-patterns-in-adk/">
+                Developer's guide to multi-agent patterns in ADK — Google Developers Blog
+              </Ext>
+            </p>
+            <p>
+              <Ext href="https://aipractitioner.substack.com/p/google-adk-explained-building-multi">
+                Google ADK Explained: Building Multi-Agent Systems (Part 1) — The AI Practitioner
+              </Ext>
+            </p>
           </div>
         </section>
 
@@ -785,13 +800,22 @@ export default function MultiAgentOrchestrationPage() {
               近年のコンテキスト管理技術の進歩により、単一エージェントでも長時間の会話履歴を維持しやすくなっており、マルチエージェント化の閾値は今後も変化していく
             </li>
           </ul>
+
+          <div className={styles.callout}>
+            <div className={styles.calloutTitle}>参照URL</div>
+            <p>
+              <Ext href="https://claude.com/blog/building-multi-agent-systems-when-and-how-to-use-them">
+                Building multi-agent systems: When and how to use them — Claude by Anthropic
+              </Ext>
+            </p>
+          </div>
         </section>
 
         {/* Section 10: Step 8 */}
         <section id="step8" className={styles.section}>
           <h2 className={styles.sectionTitle}>Step8: エラーハンドリングと耐障害性</h2>
           <p>
-            マルチエージェントシステムは非決定的に振る舞うため、ループに陥ったり、存在しない情報源を探し続けたり、不要なステータス更新でお互いを中断させ合ったりする失敗モードが起こり得ます。本番運用のために以下の仕組みを導入します。
+            マルチエージェントシステムは非決定的に振る舞うため、ループに陥ったり、存在しない情報源を探し続けたり、不要なステータス更新でお互いを中断させ合ったりする失敗モードが起こり得ます。Anthropicのリサーチシステムでは、本番運用のために以下の仕組みを導入しています。
           </p>
           <ul>
             <li>
@@ -803,7 +827,7 @@ export default function MultiAgentOrchestrationPage() {
               一時的な失敗(APIタイムアウトなど)には自動再試行を設定するが、最大試行回数を設けて無限ループを防ぐ
             </li>
             <li>
-              <strong>レインボーデプロイメント:</strong>{" "}
+              <strong>レインボーデプロイメント(Rainbow Deployment):</strong>{" "}
               新旧バージョンを並行稼働させ、進行中のセッションを壊さずに安全に切り替える
             </li>
           </ul>
@@ -813,6 +837,24 @@ export default function MultiAgentOrchestrationPage() {
             <div className={styles.mermaidCaption}>
               図11: チェックポイント/リトライによる耐障害性フロー
             </div>
+          </div>
+
+          <p>
+            また、生成→検証ループや共有ステートパターンでは「収束しない」ことそのものが失敗モードになるため、<strong>最大反復回数・時間予算・収束閾値(N回連続で新しい発見がない場合は終了)</strong>を設計段階で必ず定義しておく必要があります。
+          </p>
+
+          <div className={styles.callout}>
+            <div className={styles.calloutTitle}>参照URL</div>
+            <p>
+              <Ext href="https://www.centific.com/blog/anthropic-s-multi-agent-research-system-raises-the-bar-for-open-ended-ai-reasoning">
+                Anthropic's multi-agent research system raises the bar for open-ended AI reasoning — Centific
+              </Ext>
+            </p>
+            <p>
+              <Ext href="https://claude.com/blog/multi-agent-coordination-patterns">
+                Multi-agent coordination patterns: Five approaches and when to use them — Claude by Anthropic
+              </Ext>
+            </p>
           </div>
         </section>
 
@@ -827,9 +869,37 @@ export default function MultiAgentOrchestrationPage() {
           <div className={`${styles.callout} ${styles.calloutDanger}`}>
             <div className={styles.calloutTitle}>プロンプトインジェクションの連鎖</div>
             <p>
-              あるエージェントの出力が次のエージェントの入力になる構成では、1箇所で成功したインジェクションが後続のすべての層に伝播します。
+              あるエージェントの出力が次のエージェントの入力になる構成では、1箇所で成功したインジェクションが後続のすべての層に伝播します。中間の「信頼された」エージェントが検出マーカーを取り除きつつ悪意ある指示を再フォーマットしてしまい、むしろ下流でより効果的になるケースも報告されており、「伝言ゲームで自然に弱まる」という直感は必ずしも正しくありません。
             </p>
           </div>
+
+          <p>
+            その他の主なリスクとしては、エージェント同士が互いを無条件に信頼することによる<strong>権限昇格</strong>、規制対象データが共有ステートやメッセージバスを通じてドメイン境界を越えて漏れる<strong>越境的な情報漏洩</strong>、フレームワークが依存するパッケージが侵害される<strong>サプライチェーンの脆弱性</strong>などがあります。
+          </p>
+
+          <p>対策の基本方針は「Least Agency(最小権限の原則をエージェントに適用したもの)」です。</p>
+          <ul>
+            <li>
+              <strong>ツールのホワイトリスト化とエージェントごとのスコープ制御:</strong>{" "}
+              各エージェントが必要最小限の権限だけを持つようにする
+            </li>
+            <li>
+              <strong>高リスク操作には人間の承認ステップを挟む:</strong>{" "}
+              送金・アクセス権付与・データ削除などは自動実行させない
+            </li>
+            <li>
+              <strong>入出力フィルタリングと異常検知:</strong>{" "}
+              想定外の出力長、外部ドメインへのリクエスト、想定していないコードスニペットの出現などを監視する
+            </li>
+            <li>
+              <strong>監査ログの整備:</strong>{" "}
+              エージェント間のやり取りを後から追跡・検証できるようにする
+            </li>
+            <li>
+              <strong>継続的なレッドチーミング:</strong>{" "}
+              新しいインジェクション手法に対して定期的に防御をテストし更新する
+            </li>
+          </ul>
 
           <div className={styles.mermaidWrap}>
             <MermaidDiagram chart={DIAGRAM_12} />
@@ -837,22 +907,47 @@ export default function MultiAgentOrchestrationPage() {
               図12: マルチエージェント間の信頼境界とガードレール配置
             </div>
           </div>
+
+          <div className={styles.callout}>
+            <div className={styles.calloutTitle}>参照URL</div>
+            <p>
+              <Ext href="https://www.augmentcode.com/guides/multi-agent-ai-security-risks-compliance-fixes">
+                Multi-Agent AI Security: Enterprise Risks, Compliance, and Mitigation — Augment Code
+              </Ext>
+            </p>
+            <p>
+              <Ext href="https://www.practical-devsecops.com/owasp-top-10-agentic-applications/">
+                OWASP Top 10 for Agentic Applications for 2026 — Practical DevSecOps
+              </Ext>
+            </p>
+            <p>
+              <Ext href="https://www.helpnetsecurity.com/2026/06/11/owasp-prompt-injection-ai-security-failures/">
+                Prompt injection still drives most agentic AI security failures in production — Help Net Security
+              </Ext>
+            </p>
+            <p>
+              <Ext href="https://www.trydeepteam.com/docs/frameworks-owasp-top-10-for-agentic-applications">
+                OWASP Top 10 for Agents 2026 — DeepTeam
+              </Ext>
+            </p>
+          </div>
         </section>
 
         {/* Section 12: Step 10 */}
         <section id="step10" className={styles.section}>
           <h2 className={styles.sectionTitle}>Step10: 可観測性(Observability)と評価(Evaluation)</h2>
           <p>
-            マルチエージェントシステムは非決定的であるため、従来型アプリケーションのログ監視だけでは不十分です。「最終出力は間違っていたが、どのエージェントが原因か分からない」状態を避けるための可観測性設計が不可欠です。
+            マルチエージェントシステムは非決定的であるため、従来型アプリケーションのログ監視だけでは不十分です。「最終出力は間違っていたが、どのエージェントが原因で、どのツール呼び出しが不正な結果を返し、推論チェーンのどこで崩れたのか分からない」という状態を避けるための可観測性設計が不可欠です。
           </p>
+          <p>有効な可観測性スタックは、次の3本柱で構成されます。</p>
           <ol>
             <li>
               <strong>分散トレーシング:</strong>{" "}
-              エージェント間の呼び出しをまたいでスパン(span)を親子関係のまま記録する
+              エージェント間の呼び出しをまたいでスパン(span)を親子関係のまま記録し、どのエージェント・どのツール呼び出しが問題を起こしたかを再構築できるようにする
             </li>
             <li>
               <strong>評価フレームワーク(LLM-as-a-Judge):</strong>{" "}
-              高速・低コストなモデルを使い、正確性・関連性をスコアリングする
+              高速・低コストなモデルを使い、正確性・関連性・忠実性などをリアルタイムでスコアリングする
             </li>
             <li>
               <strong>リアルタイムログ:</strong> 即座のデバッグを可能にする
@@ -865,6 +960,10 @@ export default function MultiAgentOrchestrationPage() {
               図13: マルチエージェントのトレーシングと評価パイプライン
             </div>
           </div>
+
+          <p>
+            Anthropic自身も、リサーチシステムの評価にLLMによる自動評価と人間評価の両方を用いています。LLMは正確性やソースの質を評価するのに向いていますが、SEO最適化されたコンテンツへの過度な依存など微妙な問題は人間の評価者でなければ気づけないことがあるため、両者を組み合わせています。また、プロンプトやエージェントの挙動が時間とともにどう変化しているかを継続的に監視することも重要です。
+          </p>
 
           <div className={styles.tableWrapper}>
             <table>
@@ -896,13 +995,37 @@ export default function MultiAgentOrchestrationPage() {
               </tbody>
             </table>
           </div>
+
+          <div className={styles.callout}>
+            <div className={styles.calloutTitle}>参照URL</div>
+            <p>
+              <Ext href="https://mlflow.org/top-5-agent-observability-tools/">
+                Top 5 LLM and Agent Observability Tools in 2026 — MLflow
+              </Ext>
+            </p>
+            <p>
+              <Ext href="https://futureagi.com/blog/trace-debug-multi-agent-systems-observability-guide/">
+                Multi-Agent Tracing 2026: traceAI, OTel, Span Hierarchy — FutureAGI
+              </Ext>
+            </p>
+            <p>
+              <Ext href="https://www.braintrust.dev/articles/agent-observability-complete-guide-2026">
+                Agent observability: The complete guide for 2026 — Braintrust
+              </Ext>
+            </p>
+            <p>
+              <Ext href="https://arize.com/ai-agents/agent-observability/">
+                Agent Observability and Tracing — Arize
+              </Ext>
+            </p>
+          </div>
         </section>
 
         {/* Section 13: Step 11 */}
         <section id="step11" className={styles.section}>
           <h2 className={styles.sectionTitle}>Step11: コストとレイテンシのマネジメント</h2>
           <p>
-            マルチエージェント化は品質・網羅性を高める一方で、必ずコストとレイテンシのトレードオフを伴います。
+            マルチエージェント化は品質・網羅性を高める一方で、必ずコストとレイテンシのトレードオフを伴います。設計段階で次の数値感を持っておくと判断がぶれません。
           </p>
 
           <div className={styles.tableWrapper}>
@@ -919,7 +1042,7 @@ export default function MultiAgentOrchestrationPage() {
                   <td>同等タスクでのトークン消費倍率</td>
                   <td>シングルエージェント比で約3〜10倍</td>
                   <td>
-                    エージェントごとに個別のコンテキストを持ち、調整メッセージのやり取りでコストが発生するため
+                    エージェントごとに個別のコンテキストを持ち、調整メッセージのやり取りと結果要約のたびにコストが発生するため
                   </td>
                 </tr>
                 <tr>
@@ -931,7 +1054,7 @@ export default function MultiAgentOrchestrationPage() {
                   <td>リード+並列サブエージェント構成の性能改善</td>
                   <td>単体エージェント比で約90.2%向上</td>
                   <td>
-                    Claude Opus 4をリード、Claude Sonnet 4をサブエージェントとした構成での評価
+                    Claude Opus 4をリード、Claude Sonnet 4をサブエージェントとした構成でのAnthropic社内リサーチ評価
                   </td>
                 </tr>
                 <tr>
@@ -946,6 +1069,34 @@ export default function MultiAgentOrchestrationPage() {
                 </tr>
               </tbody>
             </table>
+          </div>
+
+          <p>
+            コストを抑えるための実践的な対策としては、生成には高性能・高コストなモデルを、検証や単純作業には安価で高速なモデルを充てる「Maker-Checker」構成、逐次実行で消化できる部分は無理に並列化しない、ツール数が多いエージェントには動的なツール検索の仕組みを導入してトークン消費を抑える、といった方法が有効です。
+          </p>
+
+          <div className={styles.callout}>
+            <div className={styles.calloutTitle}>参照URL</div>
+            <p>
+              <Ext href="https://beam.ai/agentic-insights/multi-agent-orchestration-patterns-production">
+                6 Multi-Agent Orchestration Patterns for Production (2026) — Beam.ai
+              </Ext>
+            </p>
+            <p>
+              <Ext href="https://fountaincity.tech/resources/blog/anthropic-multi-agent-blueprint-production/">
+                Anthropic's Multi-Agent Blueprint: What Production Adds — Fountain City
+              </Ext>
+            </p>
+            <p>
+              <Ext href="https://flocker.md/blog/anthropic-openai-agent-orchestration/">
+                Anthropic and OpenAI Agent Orchestration: Where the Giants Stand in 2026 — Flocker
+              </Ext>
+            </p>
+            <p>
+              <Ext href="https://www.augmentcode.com/tools/multi-agent-orchestration-platforms-build-vs-buy">
+                7 Multi-Agent Orchestration Platforms: Build vs Buy in 2026 — Augment Code
+              </Ext>
+            </p>
           </div>
         </section>
 
@@ -1008,6 +1159,15 @@ export default function MultiAgentOrchestrationPage() {
                 </tr>
               </tbody>
             </table>
+          </div>
+
+          <div className={styles.callout}>
+            <div className={styles.calloutTitle}>参照URL</div>
+            <p>
+              <Ext href="https://claude.com/blog/multi-agent-coordination-patterns">
+                Multi-agent coordination patterns: Five approaches and when to use them — Claude by Anthropic
+              </Ext>
+            </p>
           </div>
         </section>
 
@@ -1077,7 +1237,136 @@ export default function MultiAgentOrchestrationPage() {
                 7 Multi-Agent Orchestration Platforms: Build vs Buy in 2026 — Augment Code
               </Ext>
             </li>
+            <li>
+              <Ext href="https://www.codebridge.tech/articles/mastering-multi-agent-orchestration-coordination-is-the-new-scale-frontier">
+                Multi-Agent AI Orchestration Guide &amp; 2026 Updates — Codebridge
+              </Ext>
+            </li>
+            <li>
+              <Ext href="https://www.hubstic.com/resources/blog/multi-agent-orchestration-guide">
+                Multi-Agent Orchestration Explained: Business Guide 2026 — Hubstic
+              </Ext>
+            </li>
+            <li>
+              <Ext href="https://claude.com/blog/building-multi-agent-systems-when-and-how-to-use-them">
+                Building multi-agent systems: When and how to use them — Claude by Anthropic
+              </Ext>
+            </li>
+            <li>
+              <Ext href="https://claude.com/blog/multi-agent-coordination-patterns">
+                Multi-agent coordination patterns: Five approaches and when to use them — Claude by Anthropic
+              </Ext>
+            </li>
+            <li>
+              <Ext href="https://www.anthropic.com/engineering/multi-agent-research-system">
+                How we built our multi-agent research system — Anthropic Engineering
+              </Ext>
+            </li>
+            <li>
+              <Ext href="https://www.centific.com/blog/anthropic-s-multi-agent-research-system-raises-the-bar-for-open-ended-ai-reasoning">
+                Anthropic's multi-agent research system raises the bar for open-ended AI reasoning — Centific
+              </Ext>
+            </li>
+            <li>
+              <Ext href="https://flocker.md/blog/anthropic-openai-agent-orchestration/">
+                Anthropic and OpenAI Agent Orchestration: Where the Giants Stand in 2026 — Flocker
+              </Ext>
+            </li>
+            <li>
+              <Ext href="https://fountaincity.tech/resources/blog/anthropic-multi-agent-blueprint-production/">
+                Anthropic's Multi-Agent Blueprint: What Production Adds — Fountain City
+              </Ext>
+            </li>
+            <li>
+              <Ext href="https://beam.ai/agentic-insights/agent2agent-vs-mcp-2026-ai-agent-stack">
+                Agent2Agent vs MCP: 2 Protocols Your 2026 Stack Needs — Beam.ai
+              </Ext>
+            </li>
+            <li>
+              <Ext href="https://onereach.ai/blog/guide-choosing-mcp-vs-a2a-protocols/">
+                MCP vs A2A: Protocols for Multi-Agent Collaboration 2026 — OneReach.ai
+              </Ext>
+            </li>
+            <li>
+              <Ext href="https://zuplo.com/blog/agent-protocol-stack-mcp-a2a-acp-2026">
+                MCP, A2A, and Where ACP Went — Zuplo
+              </Ext>
+            </li>
+            <li>
+              <Ext href="https://dev.to/pockit_tools/mcp-vs-a2a-the-complete-guide-to-ai-agent-protocols-in-2026-30li">
+                MCP vs A2A: The Complete Guide to AI Agent Protocols in 2026 — DEV Community
+              </Ext>
+            </li>
+            <li>
+              <Ext href="https://aipractitioner.substack.com/p/google-adk-explained-building-multi">
+                Google ADK Explained: Building Multi-Agent Systems (Part 1) — The AI Practitioner
+              </Ext>
+            </li>
+            <li>
+              <Ext href="https://aipractitioner.substack.com/p/google-adk-multi-agent-orchestration">
+                Google ADK Multi-Agent Orchestration (Part 2) — The AI Practitioner
+              </Ext>
+            </li>
+            <li>
+              <Ext href="https://developers.googleblog.com/developers-guide-to-multi-agent-patterns-in-adk/">
+                Developer's guide to multi-agent patterns in ADK — Google Developers Blog
+              </Ext>
+            </li>
+            <li>
+              <Ext href="https://codelabs.developers.google.com/codelabs/production-ready-ai-with-gc/3-developing-agents/build-a-multi-agent-system-with-adk">
+                Build Multi-Agent Systems with ADK — Google Codelabs
+              </Ext>
+            </li>
+            <li>
+              <Ext href="https://fast.io/resources/best-observability-stacks-for-multi-agent-systems/">
+                7 Best Observability Stacks for Multi-Agent Systems (2026) — Fastio
+              </Ext>
+            </li>
+            <li>
+              <Ext href="https://futureagi.com/blog/trace-debug-multi-agent-systems-observability-guide/">
+                Multi-Agent Tracing 2026: traceAI, OTel, Span Hierarchy — FutureAGI
+              </Ext>
+            </li>
+            <li>
+              <Ext href="https://mlflow.org/top-5-agent-observability-tools/">
+                Top 5 LLM and Agent Observability Tools in 2026 — MLflow
+              </Ext>
+            </li>
+            <li>
+              <Ext href="https://www.braintrust.dev/articles/agent-observability-complete-guide-2026">
+                Agent observability: The complete guide for 2026 — Braintrust
+              </Ext>
+            </li>
+            <li>
+              <Ext href="https://arize.com/ai-agents/agent-observability/">
+                Agent Observability and Tracing — Arize
+              </Ext>
+            </li>
+            <li>
+              <Ext href="https://www.augmentcode.com/guides/multi-agent-ai-security-risks-compliance-fixes">
+                Multi-Agent AI Security: Enterprise Risks, Compliance, and Mitigation — Augment Code
+              </Ext>
+            </li>
+            <li>
+              <Ext href="https://www.practical-devsecops.com/owasp-top-10-agentic-applications/">
+                OWASP Top 10 for Agentic Applications for 2026 — Practical DevSecOps
+              </Ext>
+            </li>
+            <li>
+              <Ext href="https://www.helpnetsecurity.com/2026/06/11/owasp-prompt-injection-ai-security-failures/">
+                Prompt injection still drives most agentic AI security failures in production — Help Net Security
+              </Ext>
+            </li>
+            <li>
+              <Ext href="https://www.trydeepteam.com/docs/frameworks-owasp-top-10-for-agentic-applications">
+                OWASP Top 10 for Agents 2026 — DeepTeam
+              </Ext>
+            </li>
           </ol>
+
+          <div className={styles.footerNote}>
+            本ガイドは2026年7月時点で公開されている情報をもとに作成しています。フレームワークやプロトコルの仕様は更新が早い領域のため、実装時は各公式ドキュメントの最新版もあわせてご確認ください。
+          </div>
         </section>
 
         <footer className={styles.pageFooter}>
