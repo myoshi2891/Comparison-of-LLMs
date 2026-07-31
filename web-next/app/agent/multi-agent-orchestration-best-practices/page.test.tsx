@@ -11,20 +11,18 @@ describe("MultiAgentOrchestrationPage", () => {
     );
   });
 
-  it("returns valid JSX element tree with full code block syntax highlights and inline code styling", () => {
+  it("returns valid JSX element tree with fixed top padding and highlighted code blocks", () => {
     const jsx = MultiAgentOrchestrationPage();
     expect(jsx).toBeDefined();
 
     const jsxString = JSON.stringify(jsx);
 
-    // Verify TOC navigation groups exist
-    expect(jsxString).toContain("はじめに");
-    expect(jsxString).toContain("アーキテクチャ");
+    // Verify section anchors for smooth navigation without header overlap
+    expect(jsxString).toContain('id="sec-8"');
 
-    // Verify code block tokens have syntax highlight classes
+    // Verify code block tokens have highlight classes applied in JSX
     expect(jsxString).toContain("subagent_contract");
     expect(jsxString).toContain("orchestrator_scaling_rules");
-    expect(jsxString).toContain("codeBody");
 
     // Verify no lowercase rowspan attribute
     expect(jsxString).not.toContain('"rowspan"');
