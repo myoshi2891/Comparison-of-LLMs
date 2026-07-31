@@ -299,6 +299,7 @@ export default function MultiAgentOrchestrationPage() {
                   <a
                     href="https://www.digitalapplied.com/blog/multi-agent-orchestration-5-patterns-that-work"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >Multi-Agent Orchestration: 5 Patterns That Work in 2026 — Digital Applied</a
                   >
                 </li>
@@ -306,6 +307,7 @@ export default function MultiAgentOrchestrationPage() {
                   <a
                     href="https://www.truefoundry.com/blog/multi-agent-orchestration-tools"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >Which are the Best Multi-Agent Orchestration Tools in 2026? — TrueFoundry</a
                   >
                 </li>
@@ -313,6 +315,7 @@ export default function MultiAgentOrchestrationPage() {
                   <a
                     href="https://beam.ai/agentic-insights/multi-agent-orchestration-patterns-production"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >6 Multi-Agent Orchestration Patterns for Production (2026) — Beam AI</a
                   >
                 </li>
@@ -320,11 +323,15 @@ export default function MultiAgentOrchestrationPage() {
                   <a
                     href="https://claude.com/blog/building-multi-agent-systems-when-and-how-to-use-them"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >When to use multi-agent systems (and when not to) — Claude by Anthropic</a
                   >
                 </li>
                 <li>
-                  <a href="https://arxiv.org/abs/2503.13657" target="_blank"
+                  <a
+                    href="https://arxiv.org/abs/2503.13657"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     >Why Do Multi-Agent LLM Systems Fail? — arXiv:2503.13657</a
                   >
                 </li>
@@ -677,7 +684,7 @@ export default function MultiAgentOrchestrationPage() {
             </p>
 
             <h3>4.3 適用すべきでないドメイン</h3>
-            <div className={styles.callout + " " + styles.warn}>
+            <div className={styles.callout + " " + styles.calloutWarn}>
               Anthropicのブログは非常に率直にこう述べています:「すべてのエージェントが同じコンテキストを共有する必要がある、あるいはエージェント間に多くの依存関係があるドメインは、現状のマルチエージェントシステムには適していない」
             </div>
             <p>
@@ -1326,7 +1333,7 @@ export default function MultiAgentOrchestrationPage() {
               </li>
             </ul>
 
-            <div className={styles.callout + " " + styles.danger}>
+            <div className={styles.callout + " " + styles.calloutDanger}>
               論文の著者らは、既存の介入策(改善されたプロンプト設計・より明確な役割仕様など)がFM-1.1や検証関連の失敗を実質的に減らせることを示す一方で、<strong>MASの性能向上は依然として人気ベンチマークにおいて最小限にとどまっている</strong>とも指摘しており、「マルチエージェント化すれば自動的に賢くなる」という前提そのものへの警鐘となっています。
             </div>
 
@@ -2286,13 +2293,13 @@ export default function MultiAgentOrchestrationPage() {
               </li>
             </ul>
 
-            <div className={styles.callout + " " + styles.warn}>
+            <div className={styles.callout + " " + styles.calloutWarn}>
               <strong>免責事項:</strong> 上記のうち一部の業界分析記事(TrueFoundry, Zylos AI
               Research, Beam AI, Augment Code
               など)は一次情報ではなく第三者による分析・まとめ記事です。実装の意思決定に用いる際は、可能な限りAnthropic公式ドキュメントや各フレームワークの公式リファレンス、および査読前論文の原文を優先して確認してください。
             </div>
 
-            <footer className={styles.docFooter}>
+            <footer className={styles.pageFooter}>
               マルチエージェント・オーケストレーション実践ガイド — 2026年7月版 · 全15セクション
             </footer>
           </section>

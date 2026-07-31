@@ -162,6 +162,11 @@
   padding: 48px 64px 120px;
 }
 
+.contentInner {
+  width: 100%;
+  max-width: 100%;
+}
+
 .hero {
   margin-bottom: 24px;
 }
