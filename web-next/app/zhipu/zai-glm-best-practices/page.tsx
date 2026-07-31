@@ -10,6 +10,12 @@ export const metadata: Metadata = {
     "Z.ai(GLM) LLMの初学者向け実践ベストプラクティスガイド。モデル選定、API仕様、Deep Thinking、Structured Output、Context Caching、GLM Coding Planまで徹底解説。",
 };
 
+/**
+ * Renders an external link that opens in a new browser tab.
+ *
+ * @param href - The destination URL
+ * @param children - The link content
+ */
 function Ext({ href, children }: { href: string; children: React.ReactNode }) {
   return (
     <a href={href} target="_blank" rel="noopener noreferrer" className={styles.a}>
@@ -18,6 +24,9 @@ function Ext({ href, children }: { href: string; children: React.ReactNode }) {
   );
 }
 
+/**
+ * Renders a step-by-step guide to Z.ai GLM models, APIs, integrations, and operational best practices.
+ */
 export default function ZaiGlmBestPracticesPage() {
   return (
     <div className={styles.layout}>

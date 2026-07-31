@@ -10,6 +10,12 @@ export const metadata: Metadata = {
     "AGENTS.md・AGENTS.override.md・SKILL.md・config.toml・requirements.toml で構築するマルチエージェントワークフローの完全ガイド",
 };
 
+/**
+ * Renders an external link that opens in a new browser tab.
+ *
+ * @param href - The destination URL
+ * @param children - The link content
+ */
 function Ext({ href, children }: { href: string; children: React.ReactNode }) {
   return (
     <a href={href} target="_blank" rel="noopener noreferrer">
@@ -85,6 +91,9 @@ const DIAGRAM_14 = `flowchart TB
     D -- Yes --> E["gpt-5.3-codex-spark（Cerebras上で高速動作）"]
     D -- No --> F["gpt-5.4（安定版の既定ワークフロー）"]`;
 
+/**
+ * Renders a comprehensive Japanese guide to OpenAI Codex subagent development.
+ */
 export default function CodexAgentPage() {
   return (
     <div className={styles.layout}>

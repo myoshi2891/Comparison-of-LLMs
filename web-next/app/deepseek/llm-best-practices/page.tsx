@@ -16,6 +16,12 @@ export const metadata: Metadata = {
     "DeepSeek-V3 / R1 / V4 などのモデル選定、Thinking Mode（思考モード）、Context Caching、Function Calling、Anthropic API互換連携までの初学者向け実践ベストプラクティスガイド。",
 };
 
+/**
+ * Renders an external link that opens in a new browser tab.
+ *
+ * @param href - The destination URL
+ * @param children - The link content
+ */
 function Ext({ href, children }: { href: string; children: React.ReactNode }) {
   return (
     <a href={href} target="_blank" rel="noopener noreferrer">
@@ -120,6 +126,9 @@ const DIAGRAM_8 = `flowchart TD
     Wait --> Send
     Retry --> Send`;
 
+/**
+ * Renders a step-by-step guide to DeepSeek LLM API usage and best practices.
+ */
 export default function DeepSeekLlmPage() {
   return (
     <div className={styles.layout}>

@@ -3,6 +3,11 @@
 import { useEffect } from "react";
 import styles from "./page.module.css";
 
+/**
+ * Manages sidebar link behavior and highlights the table-of-contents link for the visible heading.
+ *
+ * @returns `null`
+ */
 export default function TocObserver() {
   useEffect(() => {
     // Nav link click closes mobile sidebar

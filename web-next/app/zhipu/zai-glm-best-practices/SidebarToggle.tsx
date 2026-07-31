@@ -3,6 +3,11 @@
 import { useState } from "react";
 import styles from "./page.module.css";
 
+/**
+ * Renders a button that toggles the sidebar's open state.
+ *
+ * @returns A sidebar toggle button with state-aware accessibility attributes and icon
+ */
 export default function SidebarToggle() {
   const [isOpen, setIsOpen] = useState(false);
 
