@@ -10,192 +10,192 @@ export const metadata: Metadata = {
 };
 
 const MMD_1 = `flowchart TD
-                  Y1["<b>2023</b><br/>AutoGen論文発表<br/>(会話型マルチエージェントの提案)"]
-                  Y2["<b>2024</b><br/>MCP(Model Context Protocol)発表"]
-                  Y3["<b>2025年4月</b><br/>Anthropicマルチエージェント・リサーチシステム公開<br/>/ OpenAI Agents SDK / Google A2Aプロトコル発表"]
-                  Y4["<b>2025年6月</b><br/>A2AがLinux Foundationに寄贈"]
-                  Y5["<b>2025年10月</b><br/>Microsoft Agent Framework<br/>(AutoGen+Semantic Kernel統合)プレビュー"]
-                  Y6["<b>2026年前半</b><br/>A2A v1.0 / Microsoft Agent Framework 1.0 GA<br/>/ LangGraph・CrewAIの本番機能拡充"]
-                  Y7["<b>2026年中盤</b><br/>「5〜6パターンへの収斂」が業界コンセンサスに"]
+Y1["<b>2023</b><br/>AutoGen論文発表<br/>(会話型マルチエージェントの提案)"]
+Y2["<b>2024</b><br/>MCP(Model Context Protocol)発表"]
+Y3["<b>2025年4月</b><br/>Anthropicマルチエージェント・リサーチシステム公開<br/>/ OpenAI Agents SDK / Google A2Aプロトコル発表"]
+Y4["<b>2025年6月</b><br/>A2AがLinux Foundationに寄贈"]
+Y5["<b>2025年10月</b><br/>Microsoft Agent Framework<br/>(AutoGen+Semantic Kernel統合)プレビュー"]
+Y6["<b>2026年前半</b><br/>A2A v1.0 / Microsoft Agent Framework 1.0 GA<br/>/ LangGraph・CrewAIの本番機能拡充"]
+Y7["<b>2026年中盤</b><br/>「5〜6パターンへの収斂」が業界コンセンサスに"]
 
-                  Y1 --> Y2 --> Y3 --> Y4 --> Y5 --> Y6 --> Y7
+Y1 --> Y2 --> Y3 --> Y4 --> Y5 --> Y6 --> Y7
 
-                  classDef node fill:#123049,stroke:#57c7ff,stroke-width:1.5px,color:#e8eef5,text-align:left;
-                  class Y1,Y2,Y3,Y4,Y5,Y6,Y7 node;`;
+classDef node fill:#123049,stroke:#57c7ff,stroke-width:1.5px,color:#e8eef5,text-align:left;
+class Y1,Y2,Y3,Y4,Y5,Y6,Y7 node;`;
 const MMD_2_1 = `flowchart LR
-                  A1[LLM呼び出し1] --> A2[ゲート/検証] --> A3[LLM呼び出し2] --> A4[出力]`;
+A1[LLM呼び出し1] --> A2[ゲート/検証] --> A3[LLM呼び出し2] --> A4[出力]`;
 const MMD_2_2 = `flowchart LR
-                  B1[入力] --> B2{分類LLM}
-                  B2 -->|簡単| B3[軽量モデル]
-                  B2 -->|複雑| B4[高性能モデル]`;
+B1[入力] --> B2{分類LLM}
+B2 -->|簡単| B3[軽量モデル]
+B2 -->|複雑| B4[高性能モデル]`;
 const MMD_2_3 = `flowchart LR
-                  C1[タスク] --> C2[分割]
-                  C2 --> C3a[並列LLM A]
-                  C2 --> C3b[並列LLM B]
-                  C2 --> C3c[並列LLM C]
-                  C3a --> C4[集約]
-                  C3b --> C4
-                  C3c --> C4`;
+C1[タスク] --> C2[分割]
+C2 --> C3a[並列LLM A]
+C2 --> C3b[並列LLM B]
+C2 --> C3c[並列LLM C]
+C3a --> C4[集約]
+C3b --> C4
+C3c --> C4`;
 const MMD_2_4 = `flowchart LR
-                  D1[オーケストレーター] --> D2[タスク分解]
-                  D2 --> D3a[ワーカー1]
-                  D2 --> D3b[ワーカー2]
-                  D3a --> D4[統合]
-                  D3b --> D4`;
+D1[オーケストレーター] --> D2[タスク分解]
+D2 --> D3a[ワーカー1]
+D2 --> D3b[ワーカー2]
+D3a --> D4[統合]
+D3b --> D4`;
 const MMD_2_5 = `flowchart LR
-                  E1[生成モデル] --> E2[評価モデル]
-                  E2 -->|要修正| E1
-                  E2 -->|合格| E3[最終出力]`;
+E1[生成モデル] --> E2[評価モデル]
+E2 -->|要修正| E1
+E2 -->|合格| E3[最終出力]`;
 const MMD_3 = `flowchart TD
-                  U[ユーザー] --> O[オーケストレーター<br/>/ リードエージェント]
-                  O --> W1[ワーカー1<br/>専門タスクA]
-                  O --> W2[ワーカー2<br/>専門タスクB]
-                  O --> W3[ワーカー3<br/>専門タスクC]
-                  W1 -.結果のみ返す.-> O
-                  W2 -.結果のみ返す.-> O
-                  W3 -.結果のみ返す.-> O
-                  O --> R[統合・合成]
-                  R --> U`;
+U[ユーザー] --> O[オーケストレーター<br/>/ リードエージェント]
+O --> W1[ワーカー1<br/>専門タスクA]
+O --> W2[ワーカー2<br/>専門タスクB]
+O --> W3[ワーカー3<br/>専門タスクC]
+W1 -.結果のみ返す.-> O
+W2 -.結果のみ返す.-> O
+W3 -.結果のみ返す.-> O
+O --> R[統合・合成]
+R --> U`;
 const MMD_4 = `sequenceDiagram
-                  participant User as ユーザー
-                  participant Sup as スーパーバイザー
-                  participant Bill as 請求エージェント
-                  participant Tech as 技術サポートエージェント
+participant User as ユーザー
+participant Sup as スーパーバイザー
+participant Bill as 請求エージェント
+participant Tech as 技術サポートエージェント
 
-                  User->>Sup: 複合的な問い合わせ
-                  Sup->>Sup: 意図を分類
-                  Sup->>Tech: SSO不具合を委任
-                  Tech-->>Sup: 対応結果を返却
-                  Sup->>Bill: 料金プラン変更を委任
-                  Bill-->>Sup: 対応結果を返却
-                  Sup->>User: 統合した回答`;
+User->>Sup: 複合的な問い合わせ
+Sup->>Sup: 意図を分類
+Sup->>Tech: SSO不具合を委任
+Tech-->>Sup: 対応結果を返却
+Sup->>Bill: 料金プラン変更を委任
+Bill-->>Sup: 対応結果を返却
+Sup->>User: 統合した回答`;
 const MMD_5 = `flowchart LR
-                  A((エージェントA)) <--> B((エージェントB))
-                  B <--> C((エージェントC))
-                  A <--> C
-                  C <--> D((エージェントD))
-                  A <--> D
-                  B <--> D`;
+A((エージェントA)) <--> B((エージェントB))
+B <--> C((エージェントC))
+A <--> C
+C <--> D((エージェントD))
+A <--> D
+B <--> D`;
 const MMD_6 = `flowchart TD
-                  Top[トップレベル<br/>スーパーバイザー] --> RS[リサーチ<br/>チームスーパーバイザー]
-                  Top --> MS[数理計算<br/>チームスーパーバイザー]
-                  RS --> RA1[リサーチエージェント1]
-                  RS --> RA2[リサーチエージェント2]
-                  MS --> MA1[数理エージェント1]`;
+Top[トップレベル<br/>スーパーバイザー] --> RS[リサーチ<br/>チームスーパーバイザー]
+Top --> MS[数理計算<br/>チームスーパーバイザー]
+RS --> RA1[リサーチエージェント1]
+RS --> RA2[リサーチエージェント2]
+MS --> MA1[数理エージェント1]`;
 const MMD_7 = `flowchart TD
-                  Q[問い] --> P1[視点A エージェント]
-                  Q --> P2[視点B エージェント]
-                  Q --> P3[視点C エージェント]
-                  P1 --> J{審判/合意形成<br/>エージェント}
-                  P2 --> J
-                  P3 --> J
-                  J --> F[最終結論]`;
+Q[問い] --> P1[視点A エージェント]
+Q --> P2[視点B エージェント]
+Q --> P3[視点C エージェント]
+P1 --> J{審判/合意形成<br/>エージェント}
+P2 --> J
+P3 --> J
+J --> F[最終結論]`;
 const MMD_8 = `flowchart TD
-                  U[ユーザーのクエリ] --> LR[Lead Researcher<br/>リード・エージェント]
-                  LR -->|戦略を記憶に保存| MEM[(メモリ<br/>200Kトークン超の<br/>コンテキスト対策)]
-                  LR --> S1[サブエージェント1<br/>独自コンテキスト]
-                  LR --> S2[サブエージェント2<br/>独自コンテキスト]
-                  LR --> S3[サブエージェント3<br/>独自コンテキスト]
-                  S1 --> T1[検索ツール群を<br/>反復使用]
-                  S2 --> T2[検索ツール群を<br/>反復使用]
-                  S3 --> T3[検索ツール群を<br/>反復使用]
-                  T1 --> D1[凝縮された知見を返却]
-                  T2 --> D2[凝縮された知見を返却]
-                  T3 --> D3[凝縮された知見を返却]
-                  D1 --> LR
-                  D2 --> LR
-                  D3 --> LR
-                  LR -->|十分な情報が<br/>集まるまで反復| LR
-                  LR --> CA[Citation Agent<br/>引用エージェント]
-                  CA --> OUT[最終レポート<br/>+ 引用付き]`;
+U[ユーザーのクエリ] --> LR[Lead Researcher<br/>リード・エージェント]
+LR -->|戦略を記憶に保存| MEM[(メモリ<br/>200Kトークン超の<br/>コンテキスト対策)]
+LR --> S1[サブエージェント1<br/>独自コンテキスト]
+LR --> S2[サブエージェント2<br/>独自コンテキスト]
+LR --> S3[サブエージェント3<br/>独自コンテキスト]
+S1 --> T1[検索ツール群を<br/>反復使用]
+S2 --> T2[検索ツール群を<br/>反復使用]
+S3 --> T3[検索ツール群を<br/>反復使用]
+T1 --> D1[凝縮された知見を返却]
+T2 --> D2[凝縮された知見を返却]
+T3 --> D3[凝縮された知見を返却]
+D1 --> LR
+D2 --> LR
+D3 --> LR
+LR -->|十分な情報が<br/>集まるまで反復| LR
+LR --> CA[Citation Agent<br/>引用エージェント]
+CA --> OUT[最終レポート<br/>+ 引用付き]`;
 const MMD_9 = `flowchart LR
-                  subgraph Main["メインエージェント(オーケストレーター)"]
-                      direction TB
-                      M1[高レベルの計画を保持]
-                  end
-                  subgraph Sub1["サブエージェント1"]
-                      direction TB
-                      S1[数万トークン規模で<br/>深く探索]
-                  end
-                  subgraph Sub2["サブエージェント2"]
-                      direction TB
-                      S2[独立したコンテキスト<br/>ウィンドウで並列作業]
-                  end
-                  Main -- タスク委任 --> Sub1
-                  Main -- タスク委任 --> Sub2
-                  Sub1 -- 凝縮された要約<br/>(1,000〜2,000トークン)--> Main
-                  Sub2 -- 凝縮された要約<br/>(1,000〜2,000トークン)--> Main`;
+subgraph Main["メインエージェント(オーケストレーター)"]
+direction TB
+M1[高レベルの計画を保持]
+end
+subgraph Sub1["サブエージェント1"]
+direction TB
+S1[数万トークン規模で<br/>深く探索]
+end
+subgraph Sub2["サブエージェント2"]
+direction TB
+S2[独立したコンテキスト<br/>ウィンドウで並列作業]
+end
+Main -- タスク委任 --> Sub1
+Main -- タスク委任 --> Sub2
+Sub1 -- 凝縮された要約<br/>(1,000〜2,000トークン)--> Main
+Sub2 -- 凝縮された要約<br/>(1,000〜2,000トークン)--> Main`;
 const MMD_10 = `flowchart LR
-                  subgraph Before["〜2025年"]
-                      AG[AutoGen<br/>研究指向<br/>マルチエージェント会話]
-                      SK[Semantic Kernel<br/>エンタープライズ指向<br/>本番運用機能]
-                  end
-                  subgraph After["2026年〜"]
-                      AF[Microsoft Agent Framework<br/>統合後継製品]
-                  end
-                  AG --> AF
-                  SK --> AF`;
+subgraph Before["〜2025年"]
+AG[AutoGen<br/>研究指向<br/>マルチエージェント会話]
+SK[Semantic Kernel<br/>エンタープライズ指向<br/>本番運用機能]
+end
+subgraph After["2026年〜"]
+AF[Microsoft Agent Framework<br/>統合後継製品]
+end
+AG --> AF
+SK --> AF`;
 const MMD_11 = `flowchart TB
-                  subgraph L1["レイヤー1: エージェント間通信(A2A)"]
-                      AgA[エージェントA<br/>組織1] <-->|Agent Card経由で<br/>能力を発見・タスク委任| AgB[エージェントB<br/>組織2]
-                  end
-                  subgraph L2["レイヤー2: エージェント-ツール通信(MCP)"]
-                      AgA --> MCP1[MCPサーバー<br/>DB / API / ファイル]
-                      AgB --> MCP2[MCPサーバー<br/>DB / API / ファイル]
-                  end`;
+subgraph L1["レイヤー1: エージェント間通信(A2A)"]
+AgA[エージェントA<br/>組織1] <-->|Agent Card経由で<br/>能力を発見・タスク委任| AgB[エージェントB<br/>組織2]
+end
+subgraph L2["レイヤー2: エージェント-ツール通信(MCP)"]
+AgA --> MCP1[MCPサーバー<br/>DB / API / ファイル]
+AgB --> MCP2[MCPサーバー<br/>DB / API / ファイル]
+end`;
 const MMD_12 = `pie showData
-                  "仕様・システム設計の問題" : 41.8
-                  "エージェント間の不整合" : 36.9
-                  "タスク検証の失敗" : 21.3`;
+"仕様・システム設計の問題" : 41.8
+"エージェント間の不整合" : 36.9
+"タスク検証の失敗" : 21.3`;
 const MMD_13 = `flowchart TD
-                  ATT[悪意ある入力<br/>プロンプトインジェクション] --> A1[エージェント1<br/>Web検索担当]
-                  A1 -->|汚染された結果を<br/>そのまま転送| A2[エージェント2<br/>コード実行担当]
-                  A2 -->|権限昇格された<br/>コマンドを実行| SYS[システムリソース]
+ATT[悪意ある入力<br/>プロンプトインジェクション] --> A1[エージェント1<br/>Web検索担当]
+A1 -->|汚染された結果を<br/>そのまま転送| A2[エージェント2<br/>コード実行担当]
+A2 -->|権限昇格された<br/>コマンドを実行| SYS[システムリソース]
 
-                  style ATT fill:#5a1a1a,color:#fff
-                  style SYS fill:#5a1a1a,color:#fff`;
+style ATT fill:#5a1a1a,color:#fff
+style SYS fill:#5a1a1a,color:#fff`;
 const MMD_14 = `flowchart LR
-                  subgraph Trad["従来型アプリのログ"]
-                      L1[単一の実行パス] --> L2[決定的な入出力]
-                  end
-                  subgraph MAS["マルチエージェントの<br/>トレース"]
-                      T1[分岐する意思決定] --> T2[並列実行される<br/>複数エージェント]
-                      T2 --> T3[ツール呼び出しの連鎖]
-                      T3 --> T4[非決定的な最終出力]
-                  end`;
+subgraph Trad["従来型アプリのログ"]
+L1[単一の実行パス] --> L2[決定的な入出力]
+end
+subgraph MAS["マルチエージェントの<br/>トレース"]
+T1[分岐する意思決定] --> T2[並列実行される<br/>複数エージェント]
+T2 --> T3[ツール呼び出しの連鎖]
+T3 --> T4[非決定的な最終出力]
+end`;
 const MMD_15 = `flowchart TD
-                  Q[1回のユーザークエリ] --> LR[リードエージェント<br/>トークン消費: 1x]
-                  LR --> S1[サブエージェント1<br/>独自コンテキストで<br/>トークン消費: 数x]
-                  LR --> S2[サブエージェント2<br/>独自コンテキストで<br/>トークン消費: 数x]
-                  LR --> S3[サブエージェント3<br/>独自コンテキストで<br/>トークン消費: 数x]
-                  S1 --> Sum[合計: 単一エージェント比<br/>約15倍のトークン消費]
-                  S2 --> Sum
-                  S3 --> Sum`;
+Q[1回のユーザークエリ] --> LR[リードエージェント<br/>トークン消費: 1x]
+LR --> S1[サブエージェント1<br/>独自コンテキストで<br/>トークン消費: 数x]
+LR --> S2[サブエージェント2<br/>独自コンテキストで<br/>トークン消費: 数x]
+LR --> S3[サブエージェント3<br/>独自コンテキストで<br/>トークン消費: 数x]
+S1 --> Sum[合計: 単一エージェント比<br/>約15倍のトークン消費]
+S2 --> Sum
+S3 --> Sum`;
 const MMD_16 = `flowchart TD
-                  Start[タスクを検討] --> Q1{サブタスクは<br/>真に独立しているか?<br/>互いに依存しないか}
-                  Q1 -->|依存関係が強い| Single1[単一エージェント<br/>または直列パイプラインで十分]
-                  Q1 -->|独立している| Q2{単一エージェント+<br/>優れたプロンプト設計で<br/>同等の精度に届くか?}
-                  Q2 -->|届く| Single2[単一エージェントの<br/>プロンプト改善を優先]
-                  Q2 -->|届かない・<br/>規模的に不可能| Q3{コスト増<br/>約2〜15倍を<br/>正当化できるか?}
-                  Q3 -->|正当化できない| Single3[単一エージェントで妥協<br/>または範囲を絞る]
-                  Q3 -->|正当化できる| Q4{高stakesで<br/>多角的検証が<br/>必要か?}
-                  Q4 -->|はい| Debate[ディベート型 /<br/>Evaluator-Optimizerループ]
-                  Q4 -->|いいえ| Q5{エージェント数の<br/>見込みは?}
-                  Q5 -->|少数・専門領域が<br/>明確に分離| Swarm[スウォーム型<br/>ハンドオフ]
-                  Q5 -->|多数 or 動的な<br/>タスク分解が必要| Q6{組織階層のような<br/>多段階構造が必要か?}
-                  Q6 -->|はい| Hier[階層型<br/>マルチレベル・スーパーバイザー]
-                  Q6 -->|いいえ| OW[オーケストレーター・ワーカー型<br/>またはスーパーバイザー型]`;
+Start[タスクを検討] --> Q1{サブタスクは<br/>真に独立しているか?<br/>互いに依存しないか}
+Q1 -->|依存関係が強い| Single1[単一エージェント<br/>または直列パイプラインで十分]
+Q1 -->|独立している| Q2{単一エージェント+<br/>優れたプロンプト設計で<br/>同等の精度に届くか?}
+Q2 -->|届く| Single2[単一エージェントの<br/>プロンプト改善を優先]
+Q2 -->|届かない・<br/>規模的に不可能| Q3{コスト増<br/>約2〜15倍を<br/>正当化できるか?}
+Q3 -->|正当化できない| Single3[単一エージェントで妥協<br/>または範囲を絞る]
+Q3 -->|正当化できる| Q4{高stakesで<br/>多角的検証が<br/>必要か?}
+Q4 -->|はい| Debate[ディベート型 /<br/>Evaluator-Optimizerループ]
+Q4 -->|いいえ| Q5{エージェント数の<br/>見込みは?}
+Q5 -->|少数・専門領域が<br/>明確に分離| Swarm[スウォーム型<br/>ハンドオフ]
+Q5 -->|多数 or 動的な<br/>タスク分解が必要| Q6{組織階層のような<br/>多段階構造が必要か?}
+Q6 -->|はい| Hier[階層型<br/>マルチレベル・スーパーバイザー]
+Q6 -->|いいえ| OW[オーケストレーター・ワーカー型<br/>またはスーパーバイザー型]`;
 const MMD_17 = `flowchart TB
-                  subgraph R1
-                      direction LR
-                      S1["① 単一エージェントの<br/>ベースライン構築"] --> S2["② タスク分解<br/>可能性の検証"] --> S3["③ サブエージェント<br/>契約の設計"] --> S4["④ オーケストレーター<br/>の実装"]
-                  end
-                  subgraph R2
-                      direction LR
-                      S5["⑤ コンテキスト<br/>分離の実装"] --> S6["⑥ 評価・可観測性<br/>の組み込み"] --> S7["⑦ ガードレールと<br/>コスト上限の設定"] --> S8["⑧ 段階的<br/>ロールアウト"]
-                  end
-                  S4 --> S5
-                  R1 ~~~ R2`;
+subgraph R1
+direction LR
+S1["① 単一エージェントの<br/>ベースライン構築"] --> S2["② タスク分解<br/>可能性の検証"] --> S3["③ サブエージェント<br/>契約の設計"] --> S4["④ オーケストレーター<br/>の実装"]
+end
+subgraph R2
+direction LR
+S5["⑤ コンテキスト<br/>分離の実装"] --> S6["⑥ 評価・可観測性<br/>の組み込み"] --> S7["⑦ ガードレールと<br/>コスト上限の設定"] --> S8["⑧ 段階的<br/>ロールアウト"]
+end
+S4 --> S5
+R1 ~~~ R2`;
 
 export default function MultiAgentOrchestrationPage() {
   return (
