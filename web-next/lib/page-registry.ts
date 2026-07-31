@@ -123,6 +123,16 @@ const entries: PageEntry[] = [
     lastReviewed: "2026-07-05",
   },
   {
+    slug: "/agent/multi-agent-orchestration-best-practices",
+    title: "Multi-Agent Orchestration",
+    group: "Agent 開発",
+    topics: ["agent", "multi-agent", "orchestration", "architecture", "mcp"],
+    summary:
+      "Anthropicのリサーチシステム、5つの基本パターン、MAST失敗モード分類、MCP/A2Aプロトコル等を網羅したマルチエージェント・オーケストレーション実践ガイド。",
+    addedAt: "2026-07-31",
+    lastReviewed: "2026-07-31",
+  },
+  {
     slug: "/ci-cd/ai-cicd-automation-best-practices",
     title: "AI CI/CD Automation",
     group: "開発プロセス",

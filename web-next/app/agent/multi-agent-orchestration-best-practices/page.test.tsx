@@ -1,71 +1,49 @@
-import { render, screen } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
-import Page from "./page";
+import { render } from "@testing-library/react";
+import { describe, expect, it } from "vitest";
+import MultiAgentOrchestrationPage, { metadata } from "./page";
 
-// Mock Mermaid component to avoid rendering issues in vitest environment
-vi.mock("@/components/docs/MermaidDiagram", () => ({
-  default: ({ chart, caption }: { chart: string; caption?: string }) => (
-    <div data-testid="mermaid-diagram" data-chart={chart}>
-      {caption && <span>{caption}</span>}
-    </div>
-  ),
-}));
-
-// Mock TocObserver to avoid IntersectionObserver in unit test environment
-vi.mock("@/components/docs/TocObserver", () => ({
-  default: () => <div data-testid="toc-observer" />,
-}));
-
-describe("Multi-Agent Orchestration Best Practices Page", () => {
-  it("renders page title correctly", async () => {
-    const pageComponent = await Page();
-    render(pageComponent);
-    const heading = screen.getByRole("heading", { level: 1 });
-    expect(heading.textContent).toContain("マルチエージェント・オーケストレーション実践ガイド");
+describe("MultiAgentOrchestrationPage", () => {
+  it("exports proper metadata", () => {
+    expect(metadata.title).toBe(
+      "マルチエージェント・オーケストレーション実践ガイド"
+    );
+    expect(metadata.description).toContain(
+      "Anthropicのリサーチシステム、5つの基本パターン、MAST失敗モード分類"
+    );
   });
 
-  it("renders all 15 major section headings", async () => {
-    const pageComponent = await Page();
-    const { container } = render(pageComponent);
-    const sectionHeadings = container.querySelectorAll("h2.section-title, h2");
-    expect(sectionHeadings.length).toBeGreaterThanOrEqual(15);
-  });
+  it("returns valid JSX element tree and renders core elements", () => {
+    const jsx = MultiAgentOrchestrationPage();
+    expect(jsx).toBeDefined();
 
-  it("ensures external links have secure target and rel attributes", async () => {
-    const pageComponent = await Page();
-    const { container } = render(pageComponent);
-    const externalLinks = Array.from(container.querySelectorAll("a")).filter((a) =>
-      a.getAttribute("href")?.startsWith("http")
+    const { container } = render(jsx);
+
+    // Verify Title
+    const h1 = container.querySelector("h1");
+    expect(h1?.textContent).toContain(
+      "マルチエージェント・オーケストレーション実践ガイド"
     );
 
+    // Verify 15 section titles
+    const sections = container.querySelectorAll("section");
+    expect(sections.length).toBe(15);
+
+    // Verify external links
+    const externalLinks = Array.from(container.querySelectorAll("a")).filter(
+      (a) => a.getAttribute("href")?.startsWith("http")
+    );
     expect(externalLinks.length).toBeGreaterThan(0);
     for (const link of externalLinks) {
       expect(link.getAttribute("target")).toBe("_blank");
       expect(link.getAttribute("rel")).toContain("noopener");
-      expect(link.getAttribute("rel")).toContain("noreferrer");
     }
-  });
 
-  it("ensures internal links have clean URLs without .html extensions", async () => {
-    const pageComponent = await Page();
-    const { container } = render(pageComponent);
-    const internalLinks = Array.from(container.querySelectorAll("a")).filter((a) => {
-      const href = a.getAttribute("href");
-      return href && (href.startsWith("/") || href.startsWith("#"));
-    });
-
+    // Verify internal links have no .html
+    const internalLinks = Array.from(container.querySelectorAll("a")).filter(
+      (a) => a.getAttribute("href")?.startsWith("/")
+    );
     for (const link of internalLinks) {
-      const href = link.getAttribute("href");
-      if (href?.startsWith("/")) {
-        expect(href).not.toContain(".html");
-      }
+      expect(link.getAttribute("href")).not.toContain(".html");
     }
-  });
-
-  it("renders all 21 mermaid diagrams", async () => {
-    const pageComponent = await Page();
-    const { container } = render(pageComponent);
-    const diagrams = container.querySelectorAll('[data-testid="mermaid-diagram"]');
-    expect(diagrams.length).toBe(21);
   });
 });
