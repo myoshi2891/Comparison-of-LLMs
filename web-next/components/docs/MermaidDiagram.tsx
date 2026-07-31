@@ -89,37 +89,68 @@ function applySequenceDiagramColorOverrides(
  *
  * @param root - The container element holding the pie chart SVG.
  */
-function applyPieChartColorOverrides(root: HTMLElement, theme?: string): void {
+function applyPieChartColorOverrides(
+  root: HTMLElement,
+  themeVariables?: Record<string, string>,
+  theme: string = "dark"
+): void {
   const isDark = theme === "dark";
-  const pieColors = ["#57c7ff", "#a996ff", "#ff9d66", "#5eead4", "#ffd166", "#ef476f"];
+  const defaultPieColors = [
+    "#57c7ff",
+    "#a996ff",
+    "#ff9d66",
+    "#5eead4",
+    "#ffd166",
+    "#ef476f",
+  ];
+
+  const pieStrokeColor = themeVariables?.pieStrokeColor ?? "#07111e";
+  const pieOpacity = themeVariables?.pieOpacity ?? "0.95";
+
   const slices = root.querySelectorAll<SVGPathElement>("path.pieCircle");
   slices.forEach((el, idx) => {
-    const color = pieColors[idx % pieColors.length];
+    const pieKey = `pie${idx + 1}`;
+    const color =
+      themeVariables?.[pieKey] ?? defaultPieColors[idx % defaultPieColors.length];
     el.style.setProperty("fill", color, "important");
-    el.style.setProperty("stroke", "#07111e", "important");
+    el.style.setProperty("stroke", pieStrokeColor, "important");
     el.style.setProperty("stroke-width", "2px", "important");
-    el.style.setProperty("opacity", "0.95", "important");
+    el.style.setProperty("opacity", pieOpacity, "important");
   });
 
   const legendRects = root.querySelectorAll<SVGRectElement>(
     "g.legend rect, .legend rect, svg rect[class*='legend']"
   );
   legendRects.forEach((el, idx) => {
-    const color = pieColors[idx % pieColors.length];
+    const pieKey = `pie${idx + 1}`;
+    const color =
+      themeVariables?.[pieKey] ?? defaultPieColors[idx % defaultPieColors.length];
     el.style.setProperty("fill", color, "important");
-    el.style.setProperty("stroke", "#07111e", "important");
+    el.style.setProperty("stroke", pieStrokeColor, "important");
   });
 
-  const legendTextColor = isDark ? "#e8eef5" : "#07111e";
+  const titleTextColor =
+    themeVariables?.pieTitleTextColor ??
+    themeVariables?.primaryTextColor ??
+    (isDark ? "#e8eef5" : "#07111e");
+  root.querySelectorAll<SVGTextElement>(".pieTitleText").forEach((el) => {
+    el.style.setProperty("fill", titleTextColor, "important");
+  });
+
+  const legendTextColor =
+    themeVariables?.pieLegendTextColor ??
+    themeVariables?.primaryTextColor ??
+    (isDark ? "#e8eef5" : "#07111e");
   root
     .querySelectorAll<SVGTextElement>(
-      "g.legend text, .legend text, text.legend, .pieTitleText"
+      "g.legend text, .legend text, text.legend"
     )
     .forEach((el) => {
       el.style.setProperty("fill", legendTextColor, "important");
     });
 
-  const sliceTextColor = isDark ? "#ffffff" : "#07111e";
+  const sliceTextColor =
+    themeVariables?.pieSectionTextColor ?? (isDark ? "#ffffff" : "#07111e");
   root
     .querySelectorAll<SVGTextElement>("text.slice, .slice text, g text.slice")
     .forEach((el) => {
@@ -202,7 +233,7 @@ export default function MermaidDiagram({
               applySequenceDiagramColorOverrides(ref.current, themeVariables, theme);
             }
 
-            applyPieChartColorOverrides(ref.current, theme);
+            applyPieChartColorOverrides(ref.current, themeVariables, theme);
           }
         } catch (err) {
           console.error("[MermaidDiagram] render failed:", err);
