@@ -9,6 +9,18 @@ export const metadata: Metadata = {
     "Anthropicのリサーチシステム、5つの基本パターン、MAST失敗モード分類、MCP/A2Aプロトコル等を網羅したマルチエージェント・オーケストレーション実践ガイド。",
 };
 
+const PIE_THEME_VARS = {
+  pie1: "#57c7ff",
+  pie2: "#a996ff",
+  pie3: "#5eead4",
+  pieTitleTextColor: "#ffffff",
+  pieSectionTextColor: "#07111e",
+  pieLegendTextColor: "#e8eef5",
+  pieStrokeColor: "#07111e",
+  pieStrokeWidth: "2px",
+  pieOuterLineColor: "#e8eef5",
+};
+
 function Ext({
   href,
   children,
@@ -218,8 +230,25 @@ export default function MultiAgentOrchestrationPage() {
       <div className={styles.pageContainer}>
         <aside className={styles.sidebar}>
           <div className={styles.sidebarBrand}>Multi-Agent Guide</div>
-          <nav className={styles.tocNav}>
-
+                    <nav className={styles.tocNav}>
+            <div className={styles.tocGroupLabel}>目次</div>
+            <ul>
+              <li><a href="#sec-1" className={styles.tocLink}><span className={styles.num}>01</span>なぜ今マルチエージェントか</a></li>
+              <li><a href="#sec-2" className={styles.tocLink}><span className={styles.num}>02</span>基礎: 5つのワークフロー</a></li>
+              <li><a href="#sec-3" className={styles.tocLink}><span className={styles.num}>03</span>アーキテクチャ全カタログ</a></li>
+              <li><a href="#sec-4" className={styles.tocLink}><span className={styles.num}>04</span>Anthropicリサーチシステム</a></li>
+              <li><a href="#sec-5" className={styles.tocLink}><span className={styles.num}>05</span>コンテキスト・エンジニアリング</a></li>
+              <li><a href="#sec-6" className={styles.tocLink}><span className={styles.num}>06</span>主要フレームワーク比較</a></li>
+              <li><a href="#sec-7" className={styles.tocLink}><span className={styles.num}>07</span>プロトコル: MCPとA2A</a></li>
+              <li><a href="#sec-8" className={styles.tocLink}><span className={styles.num}>08</span>失敗モード分類(MAST)</a></li>
+              <li><a href="#sec-9" className={styles.tocLink}><span className={styles.num}>09</span>セキュリティとガードレール</a></li>
+              <li><a href="#sec-10" className={styles.tocLink}><span className={styles.num}>10</span>可観測性と評価</a></li>
+              <li><a href="#sec-11" className={styles.tocLink}><span className={styles.num}>11</span>コスト最適化とトークン管理</a></li>
+              <li><a href="#sec-12" className={styles.tocLink}><span className={styles.num}>12</span>意思決定フレームワーク</a></li>
+              <li><a href="#sec-13" className={styles.tocLink}><span className={styles.num}>13</span>ステップバイステップ実装</a></li>
+              <li><a href="#sec-14" className={styles.tocLink}><span className={styles.num}>14</span>チェックリストとまとめ</a></li>
+              <li><a href="#sec-15" className={styles.tocLink}><span className={styles.num}>15</span>参考文献一覧</a></li>
+            </ul>
           </nav>
         </aside>
 

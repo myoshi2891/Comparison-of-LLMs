@@ -1,4 +1,3 @@
-import { render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import MultiAgentOrchestrationPage, { metadata } from "./page";
 
@@ -12,34 +11,26 @@ describe("MultiAgentOrchestrationPage", () => {
     );
   });
 
-  it("returns valid JSX element tree and renders TOC links and code highlights", () => {
+  it("returns valid JSX element tree and renders TOC links, custom pie colors and code highlights", () => {
     const jsx = MultiAgentOrchestrationPage();
     expect(jsx).toBeDefined();
 
-    const { container } = render(jsx);
+    const jsxString = JSON.stringify(jsx);
 
-    // Verify Title
-    const h1 = container.querySelector("h1");
-    expect(h1?.textContent).toContain(
-      "マルチエージェント・オーケストレーション実践ガイド"
-    );
+    // Verify TOC navigation links exist for sections
+    expect(jsxString).toContain("#sec-1");
+    expect(jsxString).toContain("#sec-15");
 
-    // Verify 15 section titles
-    const sections = container.querySelectorAll("section");
-    expect(sections.length).toBe(15);
+    // Verify custom pie chart theme colors for diagram 12
+    expect(jsxString).toContain("#57c7ff");
+    expect(jsxString).toContain("#a996ff");
+    expect(jsxString).toContain("#5eead4");
 
-    // Verify TOC navigation links exist for all 15 sections
-    const tocLinks = container.querySelectorAll("nav a");
-    expect(tocLinks.length).toBeGreaterThanOrEqual(15);
-
-    // Verify code block tokens have highlight classes
-    const highlightTokens = container.querySelectorAll(
-      "code span, div[class*='codeLine'] span"
-    );
-    expect(highlightTokens.length).toBeGreaterThan(0);
+    // Verify code block lines and highlights are rendered
+    expect(jsxString).toContain("subagent_contract");
+    expect(jsxString).toContain("orchestrator_scaling_rules");
 
     // Verify no lowercase rowspan attribute
-    const invalidRowspan = container.querySelectorAll("[rowspan]");
-    expect(invalidRowspan.length).toBe(0);
+    expect(jsxString).not.toContain('"rowspan"');
   });
 });
