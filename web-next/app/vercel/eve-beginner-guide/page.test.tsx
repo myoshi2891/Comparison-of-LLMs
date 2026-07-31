@@ -13,9 +13,7 @@ describe("VercelEveBeginnerGuidePage", () => {
     render(<Page />);
     const heading = screen.getByRole("heading", { level: 1 });
     expect(heading.textContent).toContain("Vercel eve 完全ガイド");
-    expect(heading.textContent).toContain(
-      "初学者のためのステップバイステップ・ベストプラクティス",
-    );
+    expect(heading.textContent).toContain("初学者のためのステップバイステップ・ベストプラクティス");
   });
 
   it("renders all 11 h2 sections", () => {
@@ -32,8 +30,8 @@ describe("VercelEveBeginnerGuidePage", () => {
 
   it("adds safety attributes to all external links", () => {
     const { container } = render(<Page />);
-    const externalLinks = Array.from(container.querySelectorAll("a")).filter(
-      (a) => a.getAttribute("href")?.startsWith("http"),
+    const externalLinks = Array.from(container.querySelectorAll("a")).filter((a) =>
+      a.getAttribute("href")?.startsWith("http")
     );
     expect(externalLinks.length).toBeGreaterThan(0);
     for (const link of externalLinks) {
@@ -46,9 +44,7 @@ describe("VercelEveBeginnerGuidePage", () => {
   it("uses clean internal links without .html extension", () => {
     const { container } = render(<Page />);
     const internalLinks = Array.from(container.querySelectorAll("a")).filter(
-      (a) =>
-        a.getAttribute("href")?.startsWith("/") ||
-        a.getAttribute("href")?.startsWith("#"),
+      (a) => a.getAttribute("href")?.startsWith("/") || a.getAttribute("href")?.startsWith("#")
     );
     for (const link of internalLinks) {
       expect(link.getAttribute("href")).not.toMatch(/\.html$/);

@@ -117,7 +117,10 @@
   padding: 0.5rem 0.7rem;
   border-radius: 8px;
   border-left: 2px solid transparent;
-  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease,
+    border-color 0.15s ease;
 }
 
 .sidebarNav a:hover {
@@ -364,13 +367,29 @@
 }
 
 /* Syntax highlight token classes */
-.ck { color: #ff7b72; } /* keyword */
-.cs { color: #a5d6ff; } /* string/punct */
-.cv { color: #79c0ff; } /* value/var */
-.cm { color: #7ee787; font-weight: bold; } /* marker/section */
-.cw { color: #d29922; } /* warn/func */
-.cc { color: #8b949e; font-style: italic; } /* comment */
-.cg { color: #3fb950; } /* green/success */
+.ck {
+  color: #ff7b72;
+} /* keyword */
+.cs {
+  color: #a5d6ff;
+} /* string/punct */
+.cv {
+  color: #79c0ff;
+} /* value/var */
+.cm {
+  color: #7ee787;
+  font-weight: bold;
+} /* marker/section */
+.cw {
+  color: #d29922;
+} /* warn/func */
+.cc {
+  color: #8b949e;
+  font-style: italic;
+} /* comment */
+.cg {
+  color: #3fb950;
+} /* green/success */
 
 .fileLabel {
   color: var(--text-dim);

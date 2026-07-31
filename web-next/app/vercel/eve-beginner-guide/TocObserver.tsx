@@ -23,15 +23,19 @@ export function TocObserver() {
           const link = linkMap.get(entry.target.id);
           if (!link) return;
           if (entry.isIntersecting) {
-            links.forEach((l) => l.classList.remove(styles.active));
+            links.forEach((l) => {
+              l.classList.remove(styles.active);
+            });
             link.classList.add(styles.active);
           }
         });
       },
-      { rootMargin: "-15% 0px -70% 0px", threshold: 0 },
+      { rootMargin: "-15% 0px -70% 0px", threshold: 0 }
     );
 
-    sections.forEach((s) => observer.observe(s));
+    sections.forEach((s) => {
+      observer.observe(s);
+    });
     return () => observer.disconnect();
   }, []);
 

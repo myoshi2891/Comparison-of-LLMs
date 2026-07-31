@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import MermaidDiagram from "@/components/docs/MermaidDiagram";
-import { TocObserver } from "./TocObserver";
 import styles from "./page.module.css";
+import { TocObserver } from "./TocObserver";
 
 export const metadata: Metadata = {
   title: "Vercel eve 完全ガイド ― 初学者のためのステップバイステップ・ベストプラクティス",
@@ -340,7 +340,8 @@ export default function VercelEveBeginnerGuidePage() {
           </h2>
           <p>
             eve における「エージェント」とは、<code>agent/</code>
-            ディレクトリ配下に置かれたファイル群のことです。ファイルの<strong>置き場所</strong>そのものが設定になっており、明示的な登録処理（レジストリへの追加など）は一切不要です。
+            ディレクトリ配下に置かれたファイル群のことです。ファイルの<strong>置き場所</strong>
+            そのものが設定になっており、明示的な登録処理（レジストリへの追加など）は一切不要です。
           </p>
 
           <h3>
@@ -559,7 +560,7 @@ export default function VercelEveBeginnerGuidePage() {
                   <span className={styles.cs}>(&#123;</span>
                 </div>
                 <div className={styles.codeLine}>
-                  <span className={styles.cv}>  model: </span>
+                  <span className={styles.cv}> model: </span>
                   <span className={styles.cs}>&apos;anthropic/claude-sonnet-5&apos;,</span>
                 </div>
                 <div className={styles.codeLine}>
@@ -581,7 +582,8 @@ export default function VercelEveBeginnerGuidePage() {
             </div>
             <p>
               <code>agent/tools/</code>
-              配下の1ファイルが1つのツールになり、<strong>ファイル名がそのままモデルに見えるツール名</strong>になります。
+              配下の1ファイルが1つのツールになり、
+              <strong>ファイル名がそのままモデルに見えるツール名</strong>になります。
             </p>
             <span className={styles.fileLabel}>
               <code>agent/tools/lookup_order.ts</code>
@@ -610,41 +612,39 @@ export default function VercelEveBeginnerGuidePage() {
                   <span className={styles.cs}>(&#123;</span>
                 </div>
                 <div className={styles.codeLine}>
-                  <span className={styles.cv}>  description: </span>
+                  <span className={styles.cv}> description: </span>
                   <span className={styles.cs}>
                     &apos;注文番号から配送ステータスを取得する&apos;,
                   </span>
                 </div>
                 <div className={styles.codeLine}>
-                  <span className={styles.cv}>  inputSchema: z.object</span>
+                  <span className={styles.cv}> inputSchema: z.object</span>
                   <span className={styles.cs}>(&#123;</span>
                 </div>
                 <div className={styles.codeLine}>
-                  <span className={styles.cv}>    orderId: z.string().describe</span>
-                  <span className={styles.cs}>
-                    (&apos;例: ORD-10234&apos;),
-                  </span>
+                  <span className={styles.cv}> orderId: z.string().describe</span>
+                  <span className={styles.cs}>(&apos;例: ORD-10234&apos;),</span>
                 </div>
                 <div className={styles.codeLine}>
-                  <span className={styles.cs}>  &#125;),</span>
+                  <span className={styles.cs}> &#125;),</span>
                 </div>
                 <div className={styles.codeLine}>
-                  <span className={styles.ck}>  async</span>
+                  <span className={styles.ck}> async</span>
                   <span className={styles.cw}> execute</span>
                   <span className={styles.cs}>(&#123; orderId &#125;) &#123;</span>
                 </div>
                 <div className={styles.codeLine}>
-                  <span className={styles.cc}>    // 実際には社内APIやDBを呼び出す</span>
+                  <span className={styles.cc}>{"// 実際には社内APIやDBを呼び出す"}</span>
                 </div>
                 <div className={styles.codeLine}>
-                  <span className={styles.ck}>    return</span>
+                  <span className={styles.ck}> return</span>
                   <span className={styles.cs}>
-                    &#123; orderId, status: &apos;発送済み&apos;, carrier:
-                    &apos;ヤマト運輸&apos; &#125;;
+                    &#123; orderId, status: &apos;発送済み&apos;, carrier: &apos;ヤマト運輸&apos;
+                    &#125;;
                   </span>
                 </div>
                 <div className={styles.codeLine}>
-                  <span className={styles.cs}>  &#125;,</span>
+                  <span className={styles.cs}> &#125;,</span>
                 </div>
                 <div className={styles.codeLine}>
                   <span className={styles.cs}>&#125;);</span>
@@ -660,7 +660,8 @@ export default function VercelEveBeginnerGuidePage() {
             </div>
             <p>
               eveの開発ループは、Next.jsの <code>localhost:3000</code>{" "}
-              を眺める感覚とは異なります。ターミナルUI（TUI）にドロップされ、<strong>エージェントと会話しながら</strong>開発を進めるのが基本形です。
+              を眺める感覚とは異なります。ターミナルUI（TUI）にドロップされ、
+              <strong>エージェントと会話しながら</strong>開発を進めるのが基本形です。
             </p>
             <div className={styles.codeBlock}>
               <div className={styles.codeHeader}>
@@ -668,9 +669,7 @@ export default function VercelEveBeginnerGuidePage() {
               </div>
               <div className={styles.codeBody}>
                 <div className={styles.codeLine}>
-                  <span className={styles.cc}>
-                    # 通常はTUIで対話しながら開発する
-                  </span>
+                  <span className={styles.cc}># 通常はTUIで対話しながら開発する</span>
                 </div>
                 <div className={styles.codeLine}>
                   <span className={styles.ck}>npx</span>
@@ -710,10 +709,7 @@ export default function VercelEveBeginnerGuidePage() {
                 </div>
                 <div className={styles.codeLine}>
                   <span className={styles.ck}>curl</span>
-                  <span className={styles.cv}>
-                    {" "}
-                    -X POST http://127.0.0.1:3000/eve/v1/session \
-                  </span>
+                  <span className={styles.cv}> -X POST http://127.0.0.1:3000/eve/v1/session \</span>
                 </div>
                 <div className={styles.codeLine}>
                   <span className={styles.cv}>
@@ -765,7 +761,8 @@ export default function VercelEveBeginnerGuidePage() {
               <h4>スキル（skills/）で手続き知識を分離する</h4>
             </div>
             <p>
-              「常に守るべきルール」は <code>instructions.md</code> に、「特定の話題の時だけ必要な手順書」は <code>skills/</code>{" "}
+              「常に守るべきルール」は <code>instructions.md</code>{" "}
+              に、「特定の話題の時だけ必要な手順書」は <code>skills/</code>{" "}
               に分離します。こうすることで、システムプロンプトが肥大化してコンテキストを圧迫するのを防げます。
             </p>
             <span className={styles.fileLabel}>
@@ -844,47 +841,42 @@ export default function VercelEveBeginnerGuidePage() {
                   <span className={styles.cs}>(&#123;</span>
                 </div>
                 <div className={styles.codeLine}>
-                  <span className={styles.cv}>  description: </span>
+                  <span className={styles.cv}> description: </span>
                   <span className={styles.cs}>&apos;返金を実行する&apos;,</span>
                 </div>
                 <div className={styles.codeLine}>
-                  <span className={styles.cv}>  inputSchema: z.object</span>
+                  <span className={styles.cv}> inputSchema: z.object</span>
                   <span className={styles.cs}>(&#123;</span>
                 </div>
                 <div className={styles.codeLine}>
-                  <span className={styles.cv}>    orderId: z.string(),</span>
+                  <span className={styles.cv}> orderId: z.string(),</span>
                 </div>
                 <div className={styles.codeLine}>
-                  <span className={styles.cv}>    amountJpy: z.number(),</span>
+                  <span className={styles.cv}> amountJpy: z.number(),</span>
                 </div>
                 <div className={styles.codeLine}>
-                  <span className={styles.cs}>  &#125;),</span>
+                  <span className={styles.cs}> &#125;),</span>
                 </div>
                 <div className={styles.codeLine}>
-                  <span className={styles.cv}>  needsApproval: </span>
+                  <span className={styles.cv}> needsApproval: </span>
                   <span className={styles.cs}>
                     (&#123; toolInput &#125;) =&gt; toolInput.amountJpy &gt; 50000,
                   </span>
                 </div>
                 <div className={styles.codeLine}>
-                  <span className={styles.ck}>  async</span>
+                  <span className={styles.ck}> async</span>
                   <span className={styles.cw}> execute</span>
-                  <span className={styles.cs}>
-                    (&#123; orderId, amountJpy &#125;) &#123;
-                  </span>
+                  <span className={styles.cs}>(&#123; orderId, amountJpy &#125;) &#123;</span>
                 </div>
                 <div className={styles.codeLine}>
-                  <span className={styles.cc}>    // 実際の返金処理</span>
+                  <span className={styles.cc}>{"// 実際の返金処理"}</span>
                 </div>
                 <div className={styles.codeLine}>
-                  <span className={styles.ck}>    return</span>
-                  <span className={styles.cs}>
-                    {" "}
-                    &#123; orderId, refunded: amountJpy &#125;;
-                  </span>
+                  <span className={styles.ck}> return</span>
+                  <span className={styles.cs}> &#123; orderId, refunded: amountJpy &#125;;</span>
                 </div>
                 <div className={styles.codeLine}>
-                  <span className={styles.cs}>  &#125;,</span>
+                  <span className={styles.cs}> &#125;,</span>
                 </div>
                 <div className={styles.codeLine}>
                   <span className={styles.cs}>&#125;);</span>
@@ -908,7 +900,9 @@ export default function VercelEveBeginnerGuidePage() {
               <h4>サブエージェントに委譲する</h4>
             </div>
             <p>
-              サブエージェントは「スキル」と違い、<strong>独立した会話履歴と状態を持つ別のエージェント</strong>です。並列作業、専門特化、権限の絞り込みに向いています。
+              サブエージェントは「スキル」と違い、
+              <strong>独立した会話履歴と状態を持つ別のエージェント</strong>
+              です。並列作業、専門特化、権限の絞り込みに向いています。
             </p>
             <span className={styles.fileLabel}>
               <code>agent/subagents/researcher/agent.ts</code>
@@ -931,16 +925,14 @@ export default function VercelEveBeginnerGuidePage() {
                   <span className={styles.cs}>(&#123;</span>
                 </div>
                 <div className={styles.codeLine}>
-                  <span className={styles.cv}>  description: </span>
+                  <span className={styles.cv}> description: </span>
                   <span className={styles.cs}>
                     &apos;問い合わせ内容の背景調査に特化し、親エージェントに要約を返す&apos;,
                   </span>
                 </div>
                 <div className={styles.codeLine}>
-                  <span className={styles.cv}>  model: </span>
-                  <span className={styles.cs}>
-                    &apos;anthropic/claude-opus-4-8&apos;,
-                  </span>
+                  <span className={styles.cv}> model: </span>
+                  <span className={styles.cs}>&apos;anthropic/claude-opus-4-8&apos;,</span>
                 </div>
                 <div className={styles.codeLine}>
                   <span className={styles.cs}>&#125;);</span>
@@ -973,7 +965,11 @@ export default function VercelEveBeginnerGuidePage() {
             <p className={styles.diagramCaption}>図5：サンドボックス採用の判断フロー</p>
             <p>
               Roboto Studio
-              の事例では、コンテンツ運用エージェントは「ページを読み、APIを叩き、REST経由でコミットするだけ」なのでサンドボックスを一切使っておらず、逆に自社のバックグラウンドコーディングエージェント（Satoru）はリポジトリのクローンとコード実行を行うためサンドボックスが必須、という明確な使い分けをしています。<strong>「カタログに載っているから」という理由だけでサンドボックスのような重い機能を導入しない</strong>ことが、実務上のアンチパターン回避として重要です。
+              の事例では、コンテンツ運用エージェントは「ページを読み、APIを叩き、REST経由でコミットするだけ」なのでサンドボックスを一切使っておらず、逆に自社のバックグラウンドコーディングエージェント（Satoru）はリポジトリのクローンとコード実行を行うためサンドボックスが必須、という明確な使い分けをしています。
+              <strong>
+                「カタログに載っているから」という理由だけでサンドボックスのような重い機能を導入しない
+              </strong>
+              ことが、実務上のアンチパターン回避として重要です。
             </p>
           </div>
 
@@ -995,10 +991,7 @@ export default function VercelEveBeginnerGuidePage() {
               <div className={styles.codeBody}>
                 <div className={styles.codeLine}>
                   <span className={styles.ck}>import</span>
-                  <span className={styles.cs}>
-                    {" "}
-                    &#123; defineMcpClientConnection &#125;{" "}
-                  </span>
+                  <span className={styles.cs}> &#123; defineMcpClientConnection &#125; </span>
                   <span className={styles.ck}>from</span>
                   <span className={styles.cs}> &apos;eve/connections&apos;;</span>
                 </div>
@@ -1009,27 +1002,28 @@ export default function VercelEveBeginnerGuidePage() {
                   <span className={styles.cs}>(&#123;</span>
                 </div>
                 <div className={styles.codeLine}>
-                  <span className={styles.cv}>  url: </span>
-                  <span className={styles.cs}>
-                    &apos;https://mcp.linear.app/sse&apos;,
-                  </span>
+                  <span className={styles.cv}> url: </span>
+                  <span className={styles.cs}>&apos;https://mcp.linear.app/sse&apos;,</span>
                 </div>
                 <div className={styles.codeLine}>
-                  <span className={styles.cv}>  description: </span>
+                  <span className={styles.cv}> description: </span>
                   <span className={styles.cs}>
                     &apos;自社Linearワークスペース：課題・プロジェクト・サイクル・コメント&apos;,
                   </span>
                 </div>
                 <div className={styles.codeLine}>
-                  <span className={styles.cv}>  auth: </span>
+                  <span className={styles.cv}> auth: </span>
                   <span className={styles.cs}>&#123;</span>
                 </div>
                 <div className={styles.codeLine}>
-                  <span className={styles.ck}>    getToken: async</span>
-                  <span className={styles.cs}> () =&gt; (&#123; token: process.env.LINEAR_API_TOKEN! &#125;),</span>
+                  <span className={styles.ck}> getToken: async</span>
+                  <span className={styles.cs}>
+                    {" "}
+                    () =&gt; (&#123; token: process.env.LINEAR_API_TOKEN! &#125;),
+                  </span>
                 </div>
                 <div className={styles.codeLine}>
-                  <span className={styles.cs}>  &#125;,</span>
+                  <span className={styles.cs}> &#125;,</span>
                 </div>
                 <div className={styles.codeLine}>
                   <span className={styles.cs}>&#125;);</span>
@@ -1083,7 +1077,7 @@ export default function VercelEveBeginnerGuidePage() {
                   </span>
                 </div>
                 <div className={styles.codeLine}>
-                  <span className={styles.cv}>    --trigger-path /eve/v1/slack</span>
+                  <span className={styles.cv}> --trigger-path /eve/v1/slack</span>
                 </div>
               </div>
             </div>
@@ -1091,7 +1085,9 @@ export default function VercelEveBeginnerGuidePage() {
               <div className={styles.calloutTitle}>🚨 最重要の落とし穴</div>
               <p>
                 <code>--trigger-path /eve/v1/slack</code> を付け忘れると、Vercel
-                Connectはデフォルトのパスにイベントを送り続けますが、eveはそのパスを待ち受けていないため、<strong>404もエラーバナーも一切出ないまま、Slackイベントが静かに失われます</strong>。Agent
+                Connectはデフォルトのパスにイベントを送り続けますが、eveはそのパスを待ち受けていないため、
+                <strong>404もエラーバナーも一切出ないまま、Slackイベントが静かに失われます</strong>
+                。Agent
                 Runsダッシュボードにも記録が一切残らないため、原因究明が非常に困難です。Zachary
                 Proser氏はこの問題を「ボットが静かに沈黙する」と表現し、Slack連携直後にボットが応答しない場合は、まずコード側ではなくトリガーパスの設定を疑うべきだと強調しています。
               </p>
@@ -1141,49 +1137,47 @@ export default function VercelEveBeginnerGuidePage() {
                   <span className={styles.cs}>(&#123;</span>
                 </div>
                 <div className={styles.codeLine}>
-                  <span className={styles.cv}>  cron: </span>
+                  <span className={styles.cv}> cron: </span>
                   <span className={styles.cs}>&apos;0 9 * * 1&apos;,</span>
-                  <span className={styles.cc}> // 毎週月曜9:00 UTC</span>
+                  <span className={styles.cc}>{"// 毎週月曜9:00 UTC"}</span>
                 </div>
                 <div className={styles.codeLine}>
-                  <span className={styles.ck}>  async</span>
+                  <span className={styles.ck}> async</span>
                   <span className={styles.cw}> run</span>
                   <span className={styles.cs}>
                     (&#123; receive, waitUntil, appAuth &#125;) &#123;
                   </span>
                 </div>
                 <div className={styles.codeLine}>
-                  <span className={styles.cw}>    waitUntil</span>
+                  <span className={styles.cw}> waitUntil</span>
                   <span className={styles.cs}>(</span>
                 </div>
                 <div className={styles.codeLine}>
-                  <span className={styles.cw}>      receive</span>
+                  <span className={styles.cw}> receive</span>
                   <span className={styles.cs}>(slack, &#123;</span>
                 </div>
                 <div className={styles.codeLine}>
-                  <span className={styles.cv}>        message: </span>
+                  <span className={styles.cv}> message: </span>
                   <span className={styles.cs}>
                     &apos;先週の問い合わせ件数と主要トピックをまとめて投稿して&apos;,
                   </span>
                 </div>
                 <div className={styles.codeLine}>
-                  <span className={styles.cv}>        target: </span>
-                  <span className={styles.cs}>
-                    &#123; channelId: &apos;C0123ABC&apos; &#125;,
-                  </span>
+                  <span className={styles.cv}> target: </span>
+                  <span className={styles.cs}>&#123; channelId: &apos;C0123ABC&apos; &#125;,</span>
                 </div>
                 <div className={styles.codeLine}>
-                  <span className={styles.cv}>        auth: </span>
+                  <span className={styles.cv}> auth: </span>
                   <span className={styles.cs}>appAuth,</span>
                 </div>
                 <div className={styles.codeLine}>
-                  <span className={styles.cs}>      &#125;),</span>
+                  <span className={styles.cs}> &#125;),</span>
                 </div>
                 <div className={styles.codeLine}>
-                  <span className={styles.cs}>    );</span>
+                  <span className={styles.cs}> );</span>
                 </div>
                 <div className={styles.codeLine}>
-                  <span className={styles.cs}>  &#125;,</span>
+                  <span className={styles.cs}> &#125;,</span>
                 </div>
                 <div className={styles.codeLine}>
                   <span className={styles.cs}>&#125;);</span>
@@ -1233,37 +1227,31 @@ export default function VercelEveBeginnerGuidePage() {
                   <span className={styles.cs}>(&#123;</span>
                 </div>
                 <div className={styles.codeLine}>
-                  <span className={styles.cv}>  description: </span>
+                  <span className={styles.cv}> description: </span>
                   <span className={styles.cs}>
                     &apos;高額返金は必ず承認待ちになり、判断根拠を提示する&apos;,
                   </span>
                 </div>
                 <div className={styles.codeLine}>
-                  <span className={styles.ck}>  async</span>
+                  <span className={styles.ck}> async</span>
                   <span className={styles.cw}> test</span>
                   <span className={styles.cs}>(t) &#123;</span>
                 </div>
                 <div className={styles.codeLine}>
-                  <span className={styles.ck}>    await</span>
+                  <span className={styles.ck}> await</span>
                   <span className={styles.cv}> t.send</span>
-                  <span className={styles.cs}>
-                    (&apos;注文ORD-99の8万円を返金して&apos;);
-                  </span>
+                  <span className={styles.cs}>(&apos;注文ORD-99の8万円を返金して&apos;);</span>
                 </div>
                 <div className={styles.codeLine}>
-                  <span className={styles.cv}>    t.calledTool</span>
-                  <span className={styles.cs}>
-                    (&apos;process_refund&apos;);
-                  </span>
+                  <span className={styles.cv}> t.calledTool</span>
+                  <span className={styles.cs}>(&apos;process_refund&apos;);</span>
                 </div>
                 <div className={styles.codeLine}>
-                  <span className={styles.cv}>    t.check</span>
-                  <span className={styles.cs}>
-                    (t.reply, includes(&apos;承認&apos;));
-                  </span>
+                  <span className={styles.cv}> t.check</span>
+                  <span className={styles.cs}>(t.reply, includes(&apos;承認&apos;));</span>
                 </div>
                 <div className={styles.codeLine}>
-                  <span className={styles.cs}>  &#125;,</span>
+                  <span className={styles.cs}> &#125;,</span>
                 </div>
                 <div className={styles.codeLine}>
                   <span className={styles.cs}>&#125;);</span>
@@ -1312,7 +1300,9 @@ export default function VercelEveBeginnerGuidePage() {
             <div className={styles.diagramWrap}>
               <MermaidDiagram chart={DIAGRAM_CICD} />
             </div>
-            <p className={styles.diagramCaption}>図7：コミットから本番反映までのCI/CDパイプライン</p>
+            <p className={styles.diagramCaption}>
+              図7：コミットから本番反映までのCI/CDパイプライン
+            </p>
           </div>
 
           <div className={styles.step}>
@@ -1342,10 +1332,7 @@ export default function VercelEveBeginnerGuidePage() {
                 </div>
                 <div className={styles.codeLine}>
                   <span className={styles.ck}>import</span>
-                  <span className={styles.cs}>
-                    {" "}
-                    &#123; defineInstrumentation &#125;{" "}
-                  </span>
+                  <span className={styles.cs}> &#123; defineInstrumentation &#125; </span>
                   <span className={styles.ck}>from</span>
                   <span className={styles.cs}> &apos;eve/instrumentation&apos;;</span>
                 </div>
@@ -1362,38 +1349,36 @@ export default function VercelEveBeginnerGuidePage() {
                   <span className={styles.cs}>(&#123;</span>
                 </div>
                 <div className={styles.codeLine}>
-                  <span className={styles.cv}>  setup: </span>
+                  <span className={styles.cv}> setup: </span>
                   <span className={styles.cs}>(&#123; agentName &#125;) =&gt;</span>
                 </div>
                 <div className={styles.codeLine}>
-                  <span className={styles.cw}>    registerOTel</span>
+                  <span className={styles.cw}> registerOTel</span>
                   <span className={styles.cs}>(&#123;</span>
                 </div>
                 <div className={styles.codeLine}>
-                  <span className={styles.cv}>      serviceName: agentName,</span>
+                  <span className={styles.cv}> serviceName: agentName,</span>
                 </div>
                 <div className={styles.codeLine}>
-                  <span className={styles.cv}>      traceExporter: </span>
+                  <span className={styles.cv}> traceExporter: </span>
                   <span className={styles.ck}>new</span>
                   <span className={styles.cw}> BraintrustExporter</span>
                   <span className={styles.cs}>(&#123;</span>
                 </div>
                 <div className={styles.codeLine}>
-                  <span className={styles.cv}>        parent: </span>
-                  <span className={styles.cs}>
-                    `project_name:$&#123;agentName&#125;`,
-                  </span>
+                  <span className={styles.cv}> parent: </span>
+                  <span className={styles.cs}>`project_name:$&#123;agentName&#125;`,</span>
                 </div>
                 <div className={styles.codeLine}>
-                  <span className={styles.cv}>        filterAISpans: </span>
+                  <span className={styles.cv}> filterAISpans: </span>
                   <span className={styles.ck}>true</span>
                   <span className={styles.cs}>,</span>
                 </div>
                 <div className={styles.codeLine}>
-                  <span className={styles.cs}>      &#125;),</span>
+                  <span className={styles.cs}> &#125;),</span>
                 </div>
                 <div className={styles.codeLine}>
-                  <span className={styles.cs}>    &#125;),</span>
+                  <span className={styles.cs}> &#125;),</span>
                 </div>
                 <div className={styles.codeLine}>
                   <span className={styles.cs}>&#125;);</span>
@@ -1440,7 +1425,7 @@ export default function VercelEveBeginnerGuidePage() {
               <div className={styles.codeLine}>&nbsp;</div>
               <div className={styles.codeLine}>
                 <span className={styles.cc}>
-                  // 記事公開エージェントが、公開直後に運用エージェントへ通知する
+                  {"// 記事公開エージェントが、公開直後に運用エージェントへ通知する"}
                 </span>
               </div>
               <div className={styles.codeLine}>
@@ -1449,15 +1434,15 @@ export default function VercelEveBeginnerGuidePage() {
                 <span className={styles.cs}>(&#123;</span>
               </div>
               <div className={styles.codeLine}>
-                <span className={styles.cv}>  to: </span>
+                <span className={styles.cv}> to: </span>
                 <span className={styles.cs}>&apos;ops-agent&apos;,</span>
               </div>
               <div className={styles.codeLine}>
-                <span className={styles.cv}>  type: </span>
+                <span className={styles.cv}> type: </span>
                 <span className={styles.cs}>&apos;article.published&apos;,</span>
               </div>
               <div className={styles.codeLine}>
-                <span className={styles.cv}>  payload: </span>
+                <span className={styles.cv}> payload: </span>
                 <span className={styles.cs}>
                   &#123; slug: &apos;new-feature-announcement&apos; &#125;,
                 </span>
@@ -1534,7 +1519,8 @@ export default function VercelEveBeginnerGuidePage() {
                 <tr>
                   <td>4</td>
                   <td>
-                    ベータ期間中は<code>eve</code>・<code>@ai-sdk</code>・<code>@vercel/connect</code>のバージョンをピン留めし、lockfileをコミットする
+                    ベータ期間中は<code>eve</code>・<code>@ai-sdk</code>・
+                    <code>@vercel/connect</code>のバージョンをピン留めし、lockfileをコミットする
                   </td>
                   <td>
                     クリーンインストールでCANARYビルドが混入し、型検証エラーで実行が壊れた実例がある
@@ -1544,8 +1530,8 @@ export default function VercelEveBeginnerGuidePage() {
                 <tr>
                   <td>5</td>
                   <td>
-                    SlackなどのチャネルをVercel
-                    Connectで接続する際は<code>--trigger-path</code>を必ず指定する
+                    SlackなどのチャネルをVercel Connectで接続する際は<code>--trigger-path</code>
+                    を必ず指定する
                   </td>
                   <td>
                     指定漏れは404すら出ない「サイレント障害」になり、デバッグが極めて困難になる
@@ -1577,7 +1563,8 @@ export default function VercelEveBeginnerGuidePage() {
                 <tr>
                   <td>9</td>
                   <td>
-                    コーディングエージェントにeveを実装させる際は、必ず<code>eve.dev/docs</code>や<code>node_modules/eve/docs</code>を読ませてから着手させる
+                    コーディングエージェントにeveを実装させる際は、必ず<code>eve.dev/docs</code>や
+                    <code>node_modules/eve/docs</code>を読ませてから着手させる
                   </td>
                   <td>
                     eveはリリース直後で学習データに存在しないため、放置すると古い（実際には存在しない）パターンで実装してしまう
@@ -1741,9 +1728,7 @@ export default function VercelEveBeginnerGuidePage() {
           <div className={styles.quoteBlock}>
             すでにVercelとAI
             SDKで生活しているなら、eveはそのスタックにファイルシステムとデプロイボタンを与えてくれたような感覚になる。一方、マルチクラウドや自己ホストが要件なら、eveのVercelネイティブな前提はメリットよりコストの方が大きい。
-            <cite>
-              Zachary Proser（WorkOS、元Pinecone / Cloudflare / Gruntwork）
-            </cite>
+            <cite>Zachary Proser（WorkOS、元Pinecone / Cloudflare / Gruntwork）</cite>
           </div>
         </section>
 
@@ -1753,7 +1738,9 @@ export default function VercelEveBeginnerGuidePage() {
             <span className={styles.num}>09</span> 料金とリソース制限の考え方
           </h2>
           <p>
-            eve自体に専用の課金体系があるわけではなく、<strong>利用したVercelのリソースと、モデル・サードパーティサービスの利用量</strong>に応じて課金されます。
+            eve自体に専用の課金体系があるわけではなく、
+            <strong>利用したVercelのリソースと、モデル・サードパーティサービスの利用量</strong>
+            に応じて課金されます。
           </p>
           <div className={styles.tableWrap}>
             <table>
@@ -1853,19 +1840,13 @@ export default function VercelEveBeginnerGuidePage() {
               </span>
             </li>
             <li>
-              <span className={styles.refName}>
-                eve 公式ドキュメント（Getting Started）
-              </span>
+              <span className={styles.refName}>eve 公式ドキュメント（Getting Started）</span>
               <span className={styles.refUrl}>
-                <Ext href="https://vercel.com/docs/eve">
-                  https://vercel.com/docs/eve
-                </Ext>
+                <Ext href="https://vercel.com/docs/eve">https://vercel.com/docs/eve</Ext>
               </span>
             </li>
             <li>
-              <span className={styles.refName}>
-                eve Concepts（アーキテクチャ詳細）
-              </span>
+              <span className={styles.refName}>eve Concepts（アーキテクチャ詳細）</span>
               <span className={styles.refUrl}>
                 <Ext href="https://vercel.com/docs/eve/concepts">
                   https://vercel.com/docs/eve/concepts
@@ -1889,9 +1870,7 @@ export default function VercelEveBeginnerGuidePage() {
               </span>
             </li>
             <li>
-              <span className={styles.refName}>
-                公式ローンチブログ「Introducing eve」
-              </span>
+              <span className={styles.refName}>公式ローンチブログ「Introducing eve」</span>
               <span className={styles.refUrl}>
                 <Ext href="https://vercel.com/blog/introducing-eve">
                   https://vercel.com/blog/introducing-eve
@@ -1921,9 +1900,7 @@ export default function VercelEveBeginnerGuidePage() {
             <li>
               <span className={styles.refName}>GitHubリポジトリ</span>
               <span className={styles.refUrl}>
-                <Ext href="https://github.com/vercel/eve">
-                  https://github.com/vercel/eve
-                </Ext>
+                <Ext href="https://github.com/vercel/eve">https://github.com/vercel/eve</Ext>
               </span>
             </li>
           </ul>
@@ -1932,8 +1909,8 @@ export default function VercelEveBeginnerGuidePage() {
           <ul className={styles.refList}>
             <li>
               <span className={styles.refName}>
-                Zachary Proser（WorkOS、元Pinecone/Cloudflare/Gruntwork）「Reviewing Vercel&apos;s eve
-                agent framework by hiring my website three AI employees」
+                Zachary Proser（WorkOS、元Pinecone/Cloudflare/Gruntwork）「Reviewing Vercel&apos;s
+                eve agent framework by hiring my website three AI employees」
               </span>
               <span className={styles.refUrl}>
                 <Ext href="https://zackproser.com/blog/reviewing-vercels-eve-agent-framework">
@@ -1978,8 +1955,7 @@ export default function VercelEveBeginnerGuidePage() {
             </li>
             <li>
               <span className={styles.refName}>
-                InfoQ「Vercel Introduces Eve, an Open-Source Framework for Building AI
-                Agents」
+                InfoQ「Vercel Introduces Eve, an Open-Source Framework for Building AI Agents」
               </span>
               <span className={styles.refUrl}>
                 <Ext href="https://www.infoq.com/news/2026/06/vercel-eve-agents/">
@@ -2021,8 +1997,8 @@ export default function VercelEveBeginnerGuidePage() {
             </li>
             <li>
               <span className={styles.refName}>
-                DevClass「Vercel debuts eve open source agent framework, tries to fix shadow AI
-                with Passport」
+                DevClass「Vercel debuts eve open source agent framework, tries to fix shadow AI with
+                Passport」
               </span>
               <span className={styles.refUrl}>
                 <Ext href="https://www.devclass.com/devops/2026/06/23/vercel-debuts-eve-open-source-agent-framework-tries-to-fix-shadow-ai-with-passport/5260169">
@@ -2035,8 +2011,7 @@ export default function VercelEveBeginnerGuidePage() {
 
         <footer className={styles.pageFooter}>
           本ガイドはeveがパブリックベータの時点（2026年7月17日）の情報に基づいています。eveはGA（正式リリース）に向けて仕様が変わる可能性があるため、実装前に必ず公式ドキュメント（
-          <Ext href="https://vercel.com/docs/eve">vercel.com/docs/eve</Ext>
-          ／
+          <Ext href="https://vercel.com/docs/eve">vercel.com/docs/eve</Ext>／
           <Ext href="https://eve.dev/docs">eve.dev/docs</Ext>
           ）の最新版を確認してください。
         </footer>
