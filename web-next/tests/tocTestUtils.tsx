@@ -566,6 +566,114 @@ export function registerHrefResolvedObserverTocSuite({
   });
 }
 
+interface NavScopedHrefTocConfig {
+  TocObserver: ComponentType;
+  /** リンクを内包するナビゲーションコンテナの className（`.${navClassName} a` で検索される） */
+  navClassName: string;
+  /** アクティブなリンクへ付与される className */
+  activeClassName: string;
+}
+
+/**
+ * Registers a shared test suite for TOC observers that resolve section targets from hash links within a navigation container.
+ *
+ * @param TocObserver - The TOC observer component under test.
+ * @param navClassName - The navigation container's class name.
+ * @param activeClassName - The class applied to the link for the intersecting section.
+ */
+export function registerNavScopedHrefTocSuite({
+  TocObserver,
+  navClassName,
+  activeClassName,
+}: NavScopedHrefTocConfig): void {
+  let io: IntersectionObserverController;
+
+  beforeEach(() => {
+    io = installIntersectionObserverStub();
+  });
+  afterEach(() => {
+    cleanup();
+  });
+
+  /**
+   * Renders a navigation with hash links and optional target sections for TOC tests.
+   *
+   * @param includeSections - Whether to render the sections targeted by the hash links.
+   * @returns The rendered test result.
+   */
+  function renderToc(includeSections = true) {
+    return render(
+      <div>
+        <nav className={navClassName}>
+          <a href="#s1">S1</a>
+          <a href="#s2">S2</a>
+          {/* ハッシュ以外の href（`startsWith("#")` の false 分岐） */}
+          <a href="external.html">External</a>
+          {/* 解決できない href（`getElementById` が null を返す分岐） */}
+          <a href="#missing">Missing target</a>
+        </nav>
+        {includeSections ? (
+          <>
+            <section id="s1" />
+            <section id="s2" />
+          </>
+        ) : null}
+        <TocObserver />
+      </div>
+    );
+  }
+
+  test("observes only hash links whose target exists", () => {
+    renderToc();
+    expect(io.observedTargets.map((target) => target.id)).toEqual(["s1", "s2"]);
+  });
+
+  test("ignores non-intersecting entries and activates the matching link", () => {
+    const { container } = renderToc();
+    const links = container.querySelectorAll(`.${navClassName} a`);
+    const secondSection = container.querySelector("#s2") as Element;
+
+    io.emit([{ target: secondSection, isIntersecting: false }]);
+    expect(Array.from(links).some((link) => link.classList.contains(activeClassName))).toBe(false);
+
+    io.emit([{ target: secondSection, isIntersecting: true }]);
+    expect(links[0].classList.contains(activeClassName)).toBe(false);
+    expect(links[1].classList.contains(activeClassName)).toBe(true);
+  });
+
+  test("moves the active class when another section intersects", () => {
+    const { container } = renderToc();
+    const links = container.querySelectorAll(`.${navClassName} a`);
+
+    io.emit([{ target: container.querySelector("#s2") as Element, isIntersecting: true }]);
+    io.emit([{ target: container.querySelector("#s1") as Element, isIntersecting: true }]);
+
+    expect(links[0].classList.contains(activeClassName)).toBe(true);
+    expect(links[1].classList.contains(activeClassName)).toBe(false);
+  });
+
+  test("ignores entries whose target has no matching TOC link", () => {
+    const { container } = renderToc();
+    const links = container.querySelectorAll(`.${navClassName} a`);
+    const unknown = document.createElement("section");
+    unknown.id = "unknown";
+
+    io.emit([{ target: unknown, isIntersecting: true }]);
+    expect(Array.from(links).some((link) => link.classList.contains(activeClassName))).toBe(false);
+  });
+
+  test("observes nothing when no target section exists", () => {
+    renderToc(false);
+    expect(io.observedTargets).toHaveLength(0);
+  });
+
+  test("disconnects the observer on unmount", () => {
+    const { unmount } = renderToc();
+    unmount();
+    expect(io.disconnectCount).toBe(1);
+  });
+}
+
 interface SidebarTocConfig {
   TocObserver: ComponentType;
   styles: Styles;

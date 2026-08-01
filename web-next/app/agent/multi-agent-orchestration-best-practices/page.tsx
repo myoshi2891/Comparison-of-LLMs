@@ -1,516 +1,280 @@
-<!doctype html>
-<html lang="ja">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>マルチエージェント・オーケストレーション実践ガイド | 2026年7月版</title>
+import type { Metadata } from "next";
+import MermaidDiagram from "@/components/docs/MermaidDiagram";
+import TocObserver from "./TocObserver";
+import styles from "./page.module.css";
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
-      rel="stylesheet"
-    />
+export const metadata: Metadata = {
+  title: "マルチエージェント・オーケストレーション実践ガイド",
+  description:
+    "Anthropicのリサーチシステム、5つの基本パターン、MAST失敗モード分類、MCP/A2Aプロトコル等を網羅したマルチエージェント・オーケストレーション実践ガイド。",
+};
 
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css"
-    />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+const MMD_1 = `flowchart TD
+Y1["<b>2023</b><br/>AutoGen論文発表<br/>(会話型マルチエージェントの提案)"]
+Y2["<b>2024</b><br/>MCP(Model Context Protocol)発表"]
+Y3["<b>2025年4月</b><br/>Anthropicマルチエージェント・リサーチシステム公開<br/>/ OpenAI Agents SDK / Google A2Aプロトコル発表"]
+Y4["<b>2025年6月</b><br/>A2AがLinux Foundationに寄贈"]
+Y5["<b>2025年10月</b><br/>Microsoft Agent Framework<br/>(AutoGen+Semantic Kernel統合)プレビュー"]
+Y6["<b>2026年前半</b><br/>A2A v1.0 / Microsoft Agent Framework 1.0 GA<br/>/ LangGraph・CrewAIの本番機能拡充"]
+Y7["<b>2026年中盤</b><br/>「5〜6パターンへの収斂」が業界コンセンサスに"]
 
-    <style>
-      :root {
-        --bg: #07111e;
-        --bg-elevated: #0d1a2b;
-        --bg-card: #0f2036;
-        --border: rgba(148, 163, 184, 0.14);
-        --border-strong: rgba(148, 163, 184, 0.28);
-        --text: #e8eef5;
-        --text-dim: #93a5bb;
-        --text-faint: #5f7288;
-        --accent: #57c7ff;
-        --accent-2: #a996ff;
-        --accent-soft: rgba(87, 199, 255, 0.12);
-        --warn: #ff9d66;
-        --warn-soft: rgba(255, 157, 102, 0.1);
-        --danger: #ff6b6b;
-        --danger-soft: rgba(255, 107, 107, 0.1);
-        --good: #5eead4;
-        --radius: 14px;
-        --sidebar-w: 308px;
-      }
+Y1 --> Y2 --> Y3 --> Y4 --> Y5 --> Y6 --> Y7
 
-      * {
-        box-sizing: border-box;
-      }
-      html {
-        scroll-behavior: smooth;
-      }
+classDef node fill:#123049,stroke:#57c7ff,stroke-width:1.5px,color:#e8eef5,text-align:left;
+class Y1,Y2,Y3,Y4,Y5,Y6,Y7 node;`;
+const MMD_2_1 = `flowchart LR
+A1[LLM呼び出し1] --> A2[ゲート/検証] --> A3[LLM呼び出し2] --> A4[出力]`;
+const MMD_2_2 = `flowchart LR
+B1[入力] --> B2{分類LLM}
+B2 -->|簡単| B3[軽量モデル]
+B2 -->|複雑| B4[高性能モデル]`;
+const MMD_2_3 = `flowchart LR
+C1[タスク] --> C2[分割]
+C2 --> C3a[並列LLM A]
+C2 --> C3b[並列LLM B]
+C2 --> C3c[並列LLM C]
+C3a --> C4[集約]
+C3b --> C4
+C3c --> C4`;
+const MMD_2_4 = `flowchart LR
+D1[オーケストレーター] --> D2[タスク分解]
+D2 --> D3a[ワーカー1]
+D2 --> D3b[ワーカー2]
+D3a --> D4[統合]
+D3b --> D4`;
+const MMD_2_5 = `flowchart LR
+E1[生成モデル] --> E2[評価モデル]
+E2 -->|要修正| E1
+E2 -->|合格| E3[最終出力]`;
+const MMD_3 = `flowchart TD
+U[ユーザー] --> O[オーケストレーター<br/>/ リードエージェント]
+O --> W1[ワーカー1<br/>専門タスクA]
+O --> W2[ワーカー2<br/>専門タスクB]
+O --> W3[ワーカー3<br/>専門タスクC]
+W1 -.結果のみ返す.-> O
+W2 -.結果のみ返す.-> O
+W3 -.結果のみ返す.-> O
+O --> R[統合・合成]
+R --> U`;
+const MMD_4 = `sequenceDiagram
+participant User as ユーザー
+participant Sup as スーパーバイザー
+participant Bill as 請求エージェント
+participant Tech as 技術サポートエージェント
 
-      body {
-        margin: 0;
-        background: var(--bg);
-        color: var(--text);
-        font-family: 'Inter', sans-serif;
-        font-size: 16px;
-        line-height: 1.75;
-        -webkit-font-smoothing: antialiased;
-      }
+User->>Sup: 複合的な問い合わせ
+Sup->>Sup: 意図を分類
+Sup->>Tech: SSO不具合を委任
+Tech-->>Sup: 対応結果を返却
+Sup->>Bill: 料金プラン変更を委任
+Bill-->>Sup: 対応結果を返却
+Sup->>User: 統合した回答`;
+const MMD_5 = `flowchart LR
+A((エージェントA)) <--> B((エージェントB))
+B <--> C((エージェントC))
+A <--> C
+C <--> D((エージェントD))
+A <--> D
+B <--> D`;
+const MMD_6 = `flowchart TD
+Top[トップレベル<br/>スーパーバイザー] --> RS[リサーチ<br/>チームスーパーバイザー]
+Top --> MS[数理計算<br/>チームスーパーバイザー]
+RS --> RA1[リサーチエージェント1]
+RS --> RA2[リサーチエージェント2]
+MS --> MA1[数理エージェント1]`;
+const MMD_7 = `flowchart TD
+Q[問い] --> P1[視点A エージェント]
+Q --> P2[視点B エージェント]
+Q --> P3[視点C エージェント]
+P1 --> J{審判/合意形成<br/>エージェント}
+P2 --> J
+P3 --> J
+J --> F[最終結論]`;
+const MMD_8 = `flowchart TD
+U[ユーザーのクエリ] --> LR[Lead Researcher<br/>リード・エージェント]
+LR -->|戦略を記憶に保存| MEM[(メモリ<br/>200Kトークン超の<br/>コンテキスト対策)]
+LR --> S1[サブエージェント1<br/>独自コンテキスト]
+LR --> S2[サブエージェント2<br/>独自コンテキスト]
+LR --> S3[サブエージェント3<br/>独自コンテキスト]
+S1 --> T1[検索ツール群を<br/>反復使用]
+S2 --> T2[検索ツール群を<br/>反復使用]
+S3 --> T3[検索ツール群を<br/>反復使用]
+T1 --> D1[凝縮された知見を返却]
+T2 --> D2[凝縮された知見を返却]
+T3 --> D3[凝縮された知見を返却]
+D1 --> LR
+D2 --> LR
+D3 --> LR
+LR -->|十分な情報が<br/>集まるまで反復| LR
+LR --> CA[Citation Agent<br/>引用エージェント]
+CA --> OUT[最終レポート<br/>+ 引用付き]`;
+const MMD_9 = `flowchart LR
+subgraph Main["メインエージェント(オーケストレーター)"]
+direction TB
+M1[高レベルの計画を保持]
+end
+subgraph Sub1["サブエージェント1"]
+direction TB
+S1[数万トークン規模で<br/>深く探索]
+end
+subgraph Sub2["サブエージェント2"]
+direction TB
+S2[独立したコンテキスト<br/>ウィンドウで並列作業]
+end
+Main -- タスク委任 --> Sub1
+Main -- タスク委任 --> Sub2
+Sub1 -- 凝縮された要約<br/>(1,000〜2,000トークン)--> Main
+Sub2 -- 凝縮された要約<br/>(1,000〜2,000トークン)--> Main`;
+const MMD_10 = `flowchart LR
+subgraph Before["〜2025年"]
+AG[AutoGen<br/>研究指向<br/>マルチエージェント会話]
+SK[Semantic Kernel<br/>エンタープライズ指向<br/>本番運用機能]
+end
+subgraph After["2026年〜"]
+AF[Microsoft Agent Framework<br/>統合後継製品]
+end
+AG --> AF
+SK --> AF`;
+const MMD_11 = `flowchart TB
+subgraph L1["レイヤー1: エージェント間通信(A2A)"]
+AgA[エージェントA<br/>組織1] <-->|Agent Card経由で<br/>能力を発見・タスク委任| AgB[エージェントB<br/>組織2]
+end
+subgraph L2["レイヤー2: エージェント-ツール通信(MCP)"]
+AgA --> MCP1[MCPサーバー<br/>DB / API / ファイル]
+AgB --> MCP2[MCPサーバー<br/>DB / API / ファイル]
+end`;
+const MMD_12 = `pie showData
+"仕様・システム設計の問題" : 41.8
+"エージェント間の不整合" : 36.9
+"タスク検証の失敗" : 21.3`;
+const MMD_13 = `flowchart TD
+ATT[悪意ある入力<br/>プロンプトインジェクション] --> A1[エージェント1<br/>Web検索担当]
+A1 -->|汚染された結果を<br/>そのまま転送| A2[エージェント2<br/>コード実行担当]
+A2 -->|権限昇格された<br/>コマンドを実行| SYS[システムリソース]
 
-      h1,
-      h2,
-      h3,
-      h4 {
-        font-family: 'Space Grotesk', sans-serif;
-        color: #fff;
-        line-height: 1.3;
-        letter-spacing: -0.01em;
-      }
+style ATT fill:#5a1a1a,color:#fff
+style SYS fill:#5a1a1a,color:#fff`;
+const MMD_14 = `flowchart LR
+subgraph Trad["従来型アプリのログ"]
+L1[単一の実行パス] --> L2[決定的な入出力]
+end
+subgraph MAS["マルチエージェントの<br/>トレース"]
+T1[分岐する意思決定] --> T2[並列実行される<br/>複数エージェント]
+T2 --> T3[ツール呼び出しの連鎖]
+T3 --> T4[非決定的な最終出力]
+end`;
+const MMD_15 = `flowchart TD
+Q[1回のユーザークエリ] --> LR[リードエージェント<br/>トークン消費: 1x]
+LR --> S1[サブエージェント1<br/>独自コンテキストで<br/>トークン消費: 数x]
+LR --> S2[サブエージェント2<br/>独自コンテキストで<br/>トークン消費: 数x]
+LR --> S3[サブエージェント3<br/>独自コンテキストで<br/>トークン消費: 数x]
+S1 --> Sum[合計: 単一エージェント比<br/>約15倍のトークン消費]
+S2 --> Sum
+S3 --> Sum`;
+const MMD_16 = `flowchart TD
+Start[タスクを検討] --> Q1{サブタスクは<br/>真に独立しているか?<br/>互いに依存しないか}
+Q1 -->|依存関係が強い| Single1[単一エージェント<br/>または直列パイプラインで十分]
+Q1 -->|独立している| Q2{単一エージェント+<br/>優れたプロンプト設計で<br/>同等の精度に届くか?}
+Q2 -->|届く| Single2[単一エージェントの<br/>プロンプト改善を優先]
+Q2 -->|届かない・<br/>規模的に不可能| Q3{コスト増<br/>約2〜15倍を<br/>正当化できるか?}
+Q3 -->|正当化できない| Single3[単一エージェントで妥協<br/>または範囲を絞る]
+Q3 -->|正当化できる| Q4{高stakesで<br/>多角的検証が<br/>必要か?}
+Q4 -->|はい| Debate[ディベート型 /<br/>Evaluator-Optimizerループ]
+Q4 -->|いいえ| Q5{エージェント数の<br/>見込みは?}
+Q5 -->|少数・専門領域が<br/>明確に分離| Swarm[スウォーム型<br/>ハンドオフ]
+Q5 -->|多数 or 動的な<br/>タスク分解が必要| Q6{組織階層のような<br/>多段階構造が必要か?}
+Q6 -->|はい| Hier[階層型<br/>マルチレベル・スーパーバイザー]
+Q6 -->|いいえ| OW[オーケストレーター・ワーカー型<br/>またはスーパーバイザー型]`;
+const MMD_17 = `flowchart TB
+subgraph R1
+direction LR
+S1["① 単一エージェントの<br/>ベースライン構築"] --> S2["② タスク分解<br/>可能性の検証"] --> S3["③ サブエージェント<br/>契約の設計"] --> S4["④ オーケストレーター<br/>の実装"]
+end
+subgraph R2
+direction LR
+S5["⑤ コンテキスト<br/>分離の実装"] --> S6["⑥ 評価・可観測性<br/>の組み込み"] --> S7["⑦ ガードレールと<br/>コスト上限の設定"] --> S8["⑧ 段階的<br/>ロールアウト"]
+end
+S4 --> S5
+R1 ~~~ R2`;
 
-      code,
-      pre,
-      .mono {
-        font-family: 'JetBrains Mono', monospace;
-      }
+/**
+ * Renders the Japanese guide to multi-agent orchestration best practices.
+ *
+ * @returns The guide page with navigation, diagrams, implementation guidance, and references.
+ */
+export default function MultiAgentOrchestrationPage() {
+  return (
+    <div className={styles.layout}>
+      <TocObserver />
+      <div className={styles.pageContainer}>
+        <aside className={styles.sidebar}>
+          <div className={styles.brand}>
+            <span className={styles.brandKicker}>Best Practices Guide · 2026.07</span>
+            <span className={styles.brandTitle}>マルチエージェント・<br />オーケストレーション実践ガイド</span>
+            <span className={styles.brandSub}>中級〜上級エンジニア向け</span>
+          </div>
 
-      a {
-        color: var(--accent);
-        text-decoration: none;
-      }
-      a:hover {
-        text-decoration: underline;
-      }
+          <div className={styles.navGroupLabel}>はじめに</div>
+          <nav className={styles.tocNav}>
+            <ul>
+              <li><a href="#sec-1" className={styles.tocLink}><span className={styles.num}>01</span>なぜ今マルチエージェントか</a></li>
+              <li><a href="#sec-2" className={styles.tocLink}><span className={styles.num}>02</span>5つのワークフローパターン</a></li>
+            </ul>
+          </nav>
 
-      /* ===== レイアウト: プロース幅は制限しない(フル幅) ===== */
-      .layout {
-        display: flex;
-        width: 100%;
-        max-width: none;
-        min-height: 100vh;
-      }
+          <div className={styles.navGroupLabel}>アーキテクチャ</div>
+          <nav className={styles.tocNav}>
+            <ul>
+              <li><a href="#sec-3" className={styles.tocLink}><span className={styles.num}>03</span>全カタログ</a></li>
+              <li><a href="#sec-4" className={styles.tocLink}><span className={styles.num}>04</span>Anthropicリサーチシステム</a></li>
+              <li><a href="#sec-5" className={styles.tocLink}><span className={styles.num}>05</span>コンテキスト・エンジニアリング</a></li>
+              <li><a href="#sec-6" className={styles.tocLink}><span className={styles.num}>06</span>主要フレームワーク比較</a></li>
+              <li><a href="#sec-7" className={styles.tocLink}><span className={styles.num}>07</span>プロトコル: MCPとA2A</a></li>
+            </ul>
+          </nav>
 
-      .sidebar {
-        width: var(--sidebar-w);
-        flex-shrink: 0;
-        position: fixed;
-        top: 0;
-        left: 0;
-        bottom: 0;
-        overflow-y: auto;
-        background: var(--bg-elevated);
-        border-right: 1px solid var(--border);
-        padding: 32px 22px 60px;
-        z-index: 10;
-      }
+          <div className={styles.navGroupLabel}>設計と実装</div>
+          <nav className={styles.tocNav}>
+            <ul>
+              <li><a href="#sec-8" className={styles.tocLink}><span className={styles.num}>08</span>失敗モード分類(MAST)</a></li>
+              <li><a href="#sec-9" className={styles.tocLink}><span className={styles.num}>09</span>セキュリティとガードレール</a></li>
+              <li><a href="#sec-10" className={styles.tocLink}><span className={styles.num}>10</span>可観測性と評価</a></li>
+              <li><a href="#sec-11" className={styles.tocLink}><span className={styles.num}>11</span>コスト最適化とトークン管理</a></li>
+            </ul>
+          </nav>
 
-      .sidebar::-webkit-scrollbar {
-        width: 6px;
-      }
-      .sidebar::-webkit-scrollbar-thumb {
-        background: var(--border-strong);
-        border-radius: 3px;
-      }
+          <div className={styles.navGroupLabel}>ガバナンス</div>
+          <nav className={styles.tocNav}>
+            <ul>
+              <li><a href="#sec-12" className={styles.tocLink}><span className={styles.num}>12</span>意思決定フレームワーク</a></li>
+              <li><a href="#sec-13" className={styles.tocLink}><span className={styles.num}>13</span>ステップバイステップ実装</a></li>
+              <li><a href="#sec-14" className={styles.tocLink}><span className={styles.num}>14</span>チェックリストとまとめ</a></li>
+              <li><a href="#sec-15" className={styles.tocLink}><span className={styles.num}>15</span>参考文献一覧</a></li>
+            </ul>
+          </nav>
+        </aside>
 
-      .brand {
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-        margin-bottom: 28px;
-        padding-bottom: 20px;
-        border-bottom: 1px solid var(--border);
-      }
-      .brand .kicker {
-        font-size: 11px;
-        letter-spacing: 0.14em;
-        color: var(--accent);
-        font-weight: 600;
-        text-transform: uppercase;
-      }
-      .brand .title {
-        font-size: 17px;
-        font-weight: 700;
-        color: #fff;
-      }
-      .brand .sub {
-        font-size: 12.5px;
-        color: var(--text-faint);
-      }
+        <div className={styles.content}>
 
-      .nav-group-label {
-        font-size: 10.5px;
-        letter-spacing: 0.12em;
-        text-transform: uppercase;
-        color: var(--text-faint);
-        margin: 20px 0 8px;
-        font-weight: 600;
-      }
-
-      .nav-list {
-        list-style: none;
-        margin: 0;
-        padding: 0;
-      }
-      .nav-list li {
-        margin: 1px 0;
-      }
-      .nav-list a {
-        display: block;
-        padding: 7px 10px;
-        border-radius: 8px;
-        font-size: 13.5px;
-        color: var(--text-dim);
-        transition:
-          background 0.15s,
-          color 0.15s;
-        white-space: normal;
-      }
-      .nav-list a:hover {
-        background: var(--accent-soft);
-        color: var(--text);
-        text-decoration: none;
-      }
-      .nav-list a.active {
-        background: var(--accent-soft);
-        color: var(--accent);
-        font-weight: 600;
-      }
-
-      .content {
-        margin-left: var(--sidebar-w);
-        width: 100%;
-        max-width: none;
-        padding: 56px 64px 120px;
-      }
-      .content-inner {
-        width: 100%;
-        max-width: none;
-      }
-
-      .hero {
-        margin-bottom: 12px;
-      }
-      .hero .kicker {
-        font-size: 12px;
-        letter-spacing: 0.16em;
-        text-transform: uppercase;
-        color: var(--accent);
-        font-weight: 600;
-        margin-bottom: 14px;
-        display: block;
-      }
-      .hero h1 {
-        font-size: clamp(28px, 3.4vw, 42px);
-        margin: 0 0 14px;
-      }
-      .hero .lead {
-        color: var(--text-dim);
-        font-size: 16px;
-        max-width: none;
-        line-height: 1.8;
-      }
-
-      .callout {
-        border: 1px solid var(--border);
-        background: var(--bg-card);
-        border-left: 3px solid var(--accent);
-        border-radius: 10px;
-        padding: 18px 22px;
-        margin: 22px 0;
-        font-size: 15px;
-        color: var(--text-dim);
-      }
-      .callout.warn {
-        border-left-color: var(--warn);
-        background: var(--warn-soft);
-      }
-      .callout.danger {
-        border-left-color: var(--danger);
-        background: var(--danger-soft);
-      }
-      .callout strong {
-        color: #fff;
-      }
-
-      section.doc-section {
-        padding-top: 64px;
-        margin-top: -24px;
-        border-top: 1px solid var(--border);
-        margin-bottom: 8px;
-      }
-      section.doc-section:first-of-type {
-        border-top: none;
-      }
-
-      .section-eyebrow {
-        font-size: 12px;
-        color: var(--accent);
-        font-weight: 600;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        margin-bottom: 6px;
-      }
-
-      h2.section-title {
-        font-size: clamp(22px, 2.4vw, 30px);
-        margin: 0 0 22px;
-        padding-bottom: 16px;
-        border-bottom: 1px solid var(--border);
-      }
-
-      h3 {
-        font-size: 19px;
-        margin: 34px 0 14px;
-        color: var(--accent-2);
-      }
-
-      p {
-        margin: 0 0 16px;
-        max-width: none;
-      }
-      ul,
-      ol {
-        margin: 0 0 16px;
-        padding-left: 22px;
-      }
-      li {
-        margin-bottom: 6px;
-      }
-
-      /* ===== 表 ===== */
-      .table-wrap {
-        overflow-x: auto;
-        margin: 22px 0;
-        border: 1px solid var(--border);
-        border-radius: 10px;
-      }
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 14.5px;
-      }
-      thead th {
-        background: var(--bg-card);
-        color: #fff;
-        text-align: left;
-        padding: 12px 16px;
-        font-weight: 600;
-        border-bottom: 1px solid var(--border-strong);
-        white-space: nowrap;
-      }
-      tbody td {
-        padding: 11px 16px;
-        border-bottom: 1px solid var(--border);
-        color: var(--text-dim);
-        vertical-align: top;
-      }
-      tbody tr:last-child td {
-        border-bottom: none;
-      }
-      tbody tr:hover td {
-        background: rgba(87, 199, 255, 0.04);
-      }
-      td strong,
-      th strong {
-        color: #fff;
-      }
-
-      /* ===== コードブロック ===== */
-      pre.code-block {
-        background: #0a1420;
-        border: 1px solid var(--border);
-        border-radius: 10px;
-        padding: 18px 20px;
-        overflow-x: auto;
-        margin: 20px 0;
-        font-size: 13.5px;
-        line-height: 1.65;
-      }
-      pre.code-block code {
-        font-family: 'JetBrains Mono', monospace;
-        background: none;
-      }
-
-      /* ===== Mermaid: 中央寄せ、縮小防止、はみ出し時は横スクロール ===== */
-      .diagram-wrap {
-        margin: 26px 0;
-        background: var(--bg-card);
-        border: 1px solid var(--border);
-        border-radius: var(--radius);
-        padding: 24px;
-        overflow-x: auto;
-      }
-      pre.mermaid {
-        width: 100%;
-        display: flex;
-        justify-content: center;
-        margin: 0;
-        background: none;
-        border: none;
-        padding: 0;
-      }
-      .diagram-caption {
-        text-align: center;
-        font-size: 12.5px;
-        color: var(--text-faint);
-        margin-top: 12px;
-      }
-
-      /* ===== 参考文献 ===== */
-      .refs {
-        margin: 26px 0 10px;
-        padding: 18px 22px;
-        background: var(--bg-elevated);
-        border: 1px solid var(--border);
-        border-radius: 10px;
-      }
-      .refs .refs-title {
-        font-size: 12px;
-        font-weight: 700;
-        color: var(--accent);
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-        margin-bottom: 10px;
-      }
-      .refs ul {
-        margin: 0;
-        padding-left: 20px;
-      }
-      .refs li {
-        font-size: 13.5px;
-        color: var(--text-dim);
-        margin-bottom: 5px;
-      }
-
-      /* ===== チェックリスト ===== */
-      .checklist {
-        list-style: none;
-        padding: 0;
-        margin: 0 0 16px;
-      }
-      .checklist li {
-        display: flex;
-        gap: 10px;
-        align-items: flex-start;
-        padding: 8px 0;
-        border-bottom: 1px dashed var(--border);
-        color: var(--text-dim);
-        font-size: 14.5px;
-      }
-      .checklist li:last-child {
-        border-bottom: none;
-      }
-      .checklist li::before {
-        content: '';
-        flex-shrink: 0;
-        width: 16px;
-        height: 16px;
-        margin-top: 3px;
-        border-radius: 4px;
-        border: 1.5px solid var(--accent);
-        background: var(--accent-soft);
-      }
-
-      footer.doc-footer {
-        margin-top: 70px;
-        padding-top: 26px;
-        border-top: 1px solid var(--border);
-        color: var(--text-faint);
-        font-size: 13px;
-      }
-
-      @media (max-width: 980px) {
-        .sidebar {
-          display: none;
-        }
-        .content {
-          margin-left: 0;
-          padding: 36px 22px 100px;
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <div class="layout">
-      <aside class="sidebar">
-        <div class="brand">
-          <span class="kicker">Best Practices Guide · 2026.07</span>
-          <span class="title">マルチエージェント・<br />オーケストレーション実践ガイド</span>
-          <span class="sub">中級〜上級エンジニア向け</span>
-        </div>
-
-        <div class="nav-group-label">はじめに</div>
-        <ul class="nav-list">
-          <li><a href="#sec-1">1. なぜ今マルチエージェントか</a></li>
-          <li><a href="#sec-2">2. 5つのワークフローパターン</a></li>
-        </ul>
-
-        <div class="nav-group-label">アーキテクチャ</div>
-        <ul class="nav-list">
-          <li><a href="#sec-3">3. アーキテクチャ全カタログ</a></li>
-          <li><a href="#sec-4">4. Anthropicリサーチシステム</a></li>
-          <li><a href="#sec-5">5. コンテキスト・エンジニアリング</a></li>
-          <li><a href="#sec-6">6. フレームワーク比較</a></li>
-          <li><a href="#sec-7">7. MCPとA2A</a></li>
-        </ul>
-
-        <div class="nav-group-label">信頼性と運用</div>
-        <ul class="nav-list">
-          <li><a href="#sec-8">8. 失敗モード分類(MAST)</a></li>
-          <li><a href="#sec-9">9. セキュリティとガードレール</a></li>
-          <li><a href="#sec-10">10. 可観測性と評価</a></li>
-          <li><a href="#sec-11">11. コスト最適化</a></li>
-        </ul>
-
-        <div class="nav-group-label">実践</div>
-        <ul class="nav-list">
-          <li><a href="#sec-12">12. 意思決定フレームワーク</a></li>
-          <li><a href="#sec-13">13. ステップバイステップ実装</a></li>
-          <li><a href="#sec-14">14. チェックリストとまとめ</a></li>
-          <li><a href="#sec-15">15. 参考文献一覧</a></li>
-        </ul>
-      </aside>
-
-      <main class="content">
-        <div class="content-inner">
-          <div class="hero">
-            <span class="kicker">Multi-Agent Orchestration · Best Practices</span>
+        <div className={styles.contentInner}>
+          <div className={styles.hero}>
+            <span className={styles.kicker}>Multi-Agent Orchestration · Best Practices</span>
             <h1>マルチエージェント・オーケストレーション実践ガイド</h1>
-            <p class="lead">
+            <p className={styles.lead}>
               本ガイドは2026年7月時点でWeb上に公開されている一次情報(Anthropic公式ブログ・各フレームワーク公式ドキュメント・査読前論文を含む学術論文・業界分析記事)を調査し、要点を整理したものです。各セクション末尾に参照元URLを明記しています。マルチエージェントの世界は変化が速いため、実装時は必ずリンク先の一次情報で最新仕様を確認してください。
             </p>
           </div>
 
-          <section class="doc-section" id="sec-1">
-            <div class="section-eyebrow">Section 01</div>
-            <h2 class="section-title">なぜ今マルチエージェントか ― 期待と現実</h2>
+          <section className={styles.docSection} id="sec-1">
+            <div className={styles.sectionEyebrow}>Section 01</div>
+            <h2 className={styles.sectionTitle}>なぜ今マルチエージェントか ― 期待と現実</h2>
 
             <p>
               2026年、マルチエージェント・オーケストレーションは「実験的な流行り物」から「本番アーキテクチャの選択肢の一つ」へと位置づけが変わりました。Gartnerの予測では、2026年末までに企業アプリケーションの40%がタスク特化型のAIエージェントを組み込むとされており、これは2025年時点の5%未満から急激な伸びです。
             </p>
 
-            <div class="diagram-wrap">
-              <pre class="mermaid" id="diagram-1"></pre>
-              <div class="diagram-caption">
-                図1: マルチエージェント・オーケストレーションの成熟度推移
-              </div>
-            </div>
-            <script type="text/plain" data-target="diagram-1">
-              flowchart TD
-                  Y1["<b>2023</b><br/>AutoGen論文発表<br/>(会話型マルチエージェントの提案)"]
-                  Y2["<b>2024</b><br/>MCP(Model Context Protocol)発表"]
-                  Y3["<b>2025年4月</b><br/>Anthropicマルチエージェント・リサーチシステム公開<br/>/ OpenAI Agents SDK / Google A2Aプロトコル発表"]
-                  Y4["<b>2025年6月</b><br/>A2AがLinux Foundationに寄贈"]
-                  Y5["<b>2025年10月</b><br/>Microsoft Agent Framework<br/>(AutoGen+Semantic Kernel統合)プレビュー"]
-                  Y6["<b>2026年前半</b><br/>A2A v1.0 / Microsoft Agent Framework 1.0 GA<br/>/ LangGraph・CrewAIの本番機能拡充"]
-                  Y7["<b>2026年中盤</b><br/>「5〜6パターンへの収斂」が業界コンセンサスに"]
-
-                  Y1 --> Y2 --> Y3 --> Y4 --> Y5 --> Y6 --> Y7
-
-                  classDef node fill:#123049,stroke:#57c7ff,stroke-width:1.5px,color:#e8eef5,text-align:left;
-                  class Y1,Y2,Y3,Y4,Y5,Y6,Y7 node;
-            </script>
+            <div className={styles.diagramWrap}><MermaidDiagram chart={MMD_1} /><div className={styles.diagramCaption}>図1: マルチエージェント・オーケストレーションの成熟度推移</div></div>
+            
 
             <h3>1.1 しかし「多いほど良い」わけではない</h3>
             <p>マルチエージェント導入を検討する前に必ず押さえておくべき事実があります。</p>
@@ -528,18 +292,19 @@
               </li>
             </ul>
 
-            <div class="callout">
+            <div className={styles.callout}>
               <strong>結論:</strong>
               マルチエージェントは「デフォルトの選択肢」ではなく、「単一エージェント+優れたプロンプト・ツール設計では解決できない、明確な理由がある場合にのみ採用するアーキテクチャ」として扱うべきです。この前提を念頭に置いた上で、以降のベストプラクティスを読み進めてください。
             </div>
 
-            <div class="refs">
-              <div class="refs-title">参考文献</div>
+            <div className={styles.refs}>
+              <div className={styles.refsTitle}>参考文献</div>
               <ul>
                 <li>
                   <a
                     href="https://www.digitalapplied.com/blog/multi-agent-orchestration-5-patterns-that-work"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >Multi-Agent Orchestration: 5 Patterns That Work in 2026 — Digital Applied</a
                   >
                 </li>
@@ -547,6 +312,7 @@
                   <a
                     href="https://www.truefoundry.com/blog/multi-agent-orchestration-tools"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >Which are the Best Multi-Agent Orchestration Tools in 2026? — TrueFoundry</a
                   >
                 </li>
@@ -554,6 +320,7 @@
                   <a
                     href="https://beam.ai/agentic-insights/multi-agent-orchestration-patterns-production"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >6 Multi-Agent Orchestration Patterns for Production (2026) — Beam AI</a
                   >
                 </li>
@@ -561,11 +328,15 @@
                   <a
                     href="https://claude.com/blog/building-multi-agent-systems-when-and-how-to-use-them"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >When to use multi-agent systems (and when not to) — Claude by Anthropic</a
                   >
                 </li>
                 <li>
-                  <a href="https://arxiv.org/abs/2503.13657" target="_blank"
+                  <a
+                    href="https://arxiv.org/abs/2503.13657"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     >Why Do Multi-Agent LLM Systems Fail? — arXiv:2503.13657</a
                   >
                 </li>
@@ -573,9 +344,9 @@
             </div>
           </section>
 
-          <section class="doc-section" id="sec-2">
-            <div class="section-eyebrow">Section 02</div>
-            <h2 class="section-title">基礎: Anthropicの5つのワークフローパターン</h2>
+          <section className={styles.docSection} id="sec-2">
+            <div className={styles.sectionEyebrow}>Section 02</div>
+            <h2 className={styles.sectionTitle}>基礎: Anthropicの5つのワークフローパターン</h2>
 
             <p>
               マルチエージェント設計に入る前に、土台となる「エージェント的ワークフロー」の基本パターンを押さえる必要があります。Anthropicのエンジニアリングブログ
@@ -583,7 +354,7 @@
               は、最もシンプルで組み合わせ可能な5つのパターンを定義しており、これは2026年時点でも業界の共通言語として広く引用され続けています。
             </p>
 
-            <div class="table-wrap">
+            <div className={styles.tableWrap}>
               <table>
                 <thead>
                   <tr>
@@ -638,77 +409,34 @@
               </table>
             </div>
 
-            <div class="diagram-wrap">
-              <pre class="mermaid" id="diagram-2-1"></pre>
-              <div class="diagram-caption">図2-①: Prompt Chaining(逐次連鎖)</div>
-            </div>
-            <script type="text/plain" data-target="diagram-2-1">
-              flowchart LR
-                  A1[LLM呼び出し1] --> A2[ゲート/検証] --> A3[LLM呼び出し2] --> A4[出力]
-            </script>
+            <div className={styles.diagramWrap}><MermaidDiagram chart={MMD_2_1} /><div className={styles.diagramCaption}>図2-①: Prompt Chaining(逐次連鎖)</div></div>
+            
 
-            <div class="diagram-wrap">
-              <pre class="mermaid" id="diagram-2-2"></pre>
-              <div class="diagram-caption">図2-②: Routing(振り分け)</div>
-            </div>
-            <script type="text/plain" data-target="diagram-2-2">
-              flowchart LR
-                  B1[入力] --> B2{分類LLM}
-                  B2 -->|簡単| B3[軽量モデル]
-                  B2 -->|複雑| B4[高性能モデル]
-            </script>
+            <div className={styles.diagramWrap}><MermaidDiagram chart={MMD_2_2} /><div className={styles.diagramCaption}>図2-②: Routing(振り分け)</div></div>
+            
 
-            <div class="diagram-wrap">
-              <pre class="mermaid" id="diagram-2-3"></pre>
-              <div class="diagram-caption">図2-③: Parallelization(並列化)</div>
-            </div>
-            <script type="text/plain" data-target="diagram-2-3">
-              flowchart LR
-                  C1[タスク] --> C2[分割]
-                  C2 --> C3a[並列LLM A]
-                  C2 --> C3b[並列LLM B]
-                  C2 --> C3c[並列LLM C]
-                  C3a --> C4[集約]
-                  C3b --> C4
-                  C3c --> C4
-            </script>
+            <div className={styles.diagramWrap}><MermaidDiagram chart={MMD_2_3} /><div className={styles.diagramCaption}>図2-③: Parallelization(並列化)</div></div>
+            
 
-            <div class="diagram-wrap">
-              <pre class="mermaid" id="diagram-2-4"></pre>
-              <div class="diagram-caption">図2-④: Orchestrator-Workers</div>
-            </div>
-            <script type="text/plain" data-target="diagram-2-4">
-              flowchart LR
-                  D1[オーケストレーター] --> D2[タスク分解]
-                  D2 --> D3a[ワーカー1]
-                  D2 --> D3b[ワーカー2]
-                  D3a --> D4[統合]
-                  D3b --> D4
-            </script>
+            <div className={styles.diagramWrap}><MermaidDiagram chart={MMD_2_4} /><div className={styles.diagramCaption}>図2-④: Orchestrator-Workers</div></div>
+            
 
-            <div class="diagram-wrap">
-              <pre class="mermaid" id="diagram-2-5"></pre>
-              <div class="diagram-caption">図2-⑤: Evaluator-Optimizer(評価・最適化ループ)</div>
-            </div>
-            <script type="text/plain" data-target="diagram-2-5">
-              flowchart LR
-                  E1[生成モデル] --> E2[評価モデル]
-                  E2 -->|要修正| E1
-                  E2 -->|合格| E3[最終出力]
-            </script>
+            <div className={styles.diagramWrap}><MermaidDiagram chart={MMD_2_5} /><div className={styles.diagramCaption}>図2-⑤: Evaluator-Optimizer(評価・最適化ループ)</div></div>
+            
 
             <h3>2.1 マルチエージェントとの関係</h3>
             <p>
               重要なのは、④Orchestrator-Workersと③Parallelizationの2つが、この後説明する「マルチエージェント・アーキテクチャ」の理論的な起源になっているという点です。単一エージェントのワークフローパターンの延長線上に、自律性の高いマルチエージェントシステムが存在すると理解すると設計判断がしやすくなります。
             </p>
 
-            <div class="refs">
-              <div class="refs-title">参考文献</div>
+            <div className={styles.refs}>
+              <div className={styles.refsTitle}>参考文献</div>
               <ul>
                 <li>
                   <a
                     href="https://www.anthropic.com/engineering/building-effective-agents"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >Building effective agents — Anthropic Engineering</a
                   >
                 </li>
@@ -716,6 +444,7 @@
                   <a
                     href="https://simonwillison.net/2024/Dec/20/building-effective-agents/"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >Building effective agents(要約と論評)— Simon Willison</a
                   >
                 </li>
@@ -723,11 +452,12 @@
                   <a
                     href="https://pub.towardsai.net/agent-workflow-patterns-beyond-anthropics-playbook-1bd76a48d63d"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >Agent Workflow Patterns — Beyond Anthropic's Playbook — Towards AI</a
                   >
                 </li>
                 <li>
-                  <a href="https://arxiv.org/pdf/2606.24937" target="_blank"
+                  <a href="https://arxiv.org/pdf/2606.24937" target="_blank" rel="noopener noreferrer"
                     >The Hitchhiker's Guide to Agentic AI: From Foundations to Systems —
                     arXiv:2606.24937</a
                   >
@@ -736,6 +466,7 @@
                   <a
                     href="https://www.baeldung.com/spring-ai-building-effective-agents"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >Building Effective Agents with Spring AI — Baeldung</a
                   >
                 </li>
@@ -743,9 +474,9 @@
             </div>
           </section>
 
-          <section class="doc-section" id="sec-3">
-            <div class="section-eyebrow">Section 03</div>
-            <h2 class="section-title">マルチエージェント・アーキテクチャ全カタログ</h2>
+          <section className={styles.docSection} id="sec-3">
+            <div className={styles.sectionEyebrow}>Section 03</div>
+            <h2 className={styles.sectionTitle}>マルチエージェント・アーキテクチャ全カタログ</h2>
 
             <p>
               単一エージェントのワークフローパターンを踏まえた上で、複数の自律的エージェントが協調する際の代表的なトポロジー(構造パターン)を整理します。2026年時点の業界分析では「5〜6パターンへの収斂」がコンセンサスになりつつあります。
@@ -756,22 +487,8 @@
               中心となる「リード(オーケストレーター)エージェント」がタスクを分解し、専門化された「サブエージェント(ワーカー)」に委任し、結果を統合するパターンです。ワーカー同士は直接会話しません。Anthropicのマルチエージェント・リサーチシステムがこの代表例であり、詳細は次章で深掘りします。
             </p>
 
-            <div class="diagram-wrap">
-              <pre class="mermaid" id="diagram-3"></pre>
-              <div class="diagram-caption">図3: オーケストレーター・ワーカー型</div>
-            </div>
-            <script type="text/plain" data-target="diagram-3">
-              flowchart TD
-                  U[ユーザー] --> O[オーケストレーター<br/>/ リードエージェント]
-                  O --> W1[ワーカー1<br/>専門タスクA]
-                  O --> W2[ワーカー2<br/>専門タスクB]
-                  O --> W3[ワーカー3<br/>専門タスクC]
-                  W1 -.結果のみ返す.-> O
-                  W2 -.結果のみ返す.-> O
-                  W3 -.結果のみ返す.-> O
-                  O --> R[統合・合成]
-                  R --> U
-            </script>
+            <div className={styles.diagramWrap}><MermaidDiagram chart={MMD_3} /><div className={styles.diagramCaption}>図3: オーケストレーター・ワーカー型</div></div>
+            
 
             <p>
               <strong>特徴</strong>:
@@ -785,25 +502,8 @@
               SDK、CrewAIの階層Processなど)ことから、実務上の出発点として推奨されています。
             </p>
 
-            <div class="diagram-wrap">
-              <pre class="mermaid" id="diagram-4"></pre>
-              <div class="diagram-caption">図4: スーパーバイザー型の対話フロー例</div>
-            </div>
-            <script type="text/plain" data-target="diagram-4">
-              sequenceDiagram
-                  participant User as ユーザー
-                  participant Sup as スーパーバイザー
-                  participant Bill as 請求エージェント
-                  participant Tech as 技術サポートエージェント
-
-                  User->>Sup: 複合的な問い合わせ
-                  Sup->>Sup: 意図を分類
-                  Sup->>Tech: SSO不具合を委任
-                  Tech-->>Sup: 対応結果を返却
-                  Sup->>Bill: 料金プラン変更を委任
-                  Bill-->>Sup: 対応結果を返却
-                  Sup->>User: 統合した回答
-            </script>
+            <div className={styles.diagramWrap}><MermaidDiagram chart={MMD_4} /><div className={styles.diagramCaption}>図4: スーパーバイザー型の対話フロー例</div></div>
+            
 
             <h3>3.3 スウォーム型(Swarm / Peer-to-Peer)</h3>
             <p>
@@ -812,19 +512,8 @@
               SDKの<code>handoffs</code>機能がこれに該当します。レイテンシは低い(仲介者を挟まないため)反面、経路の追跡が難しく、完全連結型のスウォームでは、エージェント数の増加に伴い障害点の組み合わせが<strong>組合せ的に爆発</strong>します(4エージェントで6通り、10エージェントで45通りの相互作用パス)。8エージェントを超えると、この失敗表面積はEnd-to-Endテストでカバーしきれなくなるとされ、階層型オーケストレーションへの切り替えが信頼性上の要件になります。
             </p>
 
-            <div class="diagram-wrap">
-              <pre class="mermaid" id="diagram-5"></pre>
-              <div class="diagram-caption">図5: スウォーム型(完全連結)</div>
-            </div>
-            <script type="text/plain" data-target="diagram-5">
-              flowchart LR
-                  A((エージェントA)) <--> B((エージェントB))
-                  B <--> C((エージェントC))
-                  A <--> C
-                  C <--> D((エージェントD))
-                  A <--> D
-                  B <--> D
-            </script>
+            <div className={styles.diagramWrap}><MermaidDiagram chart={MMD_5} /><div className={styles.diagramCaption}>図5: スウォーム型(完全連結)</div></div>
+            
 
             <h3>3.4 階層型マルチレベル・スーパーバイザー(Hierarchical Multi-Level Supervisor)</h3>
             <p>
@@ -833,18 +522,8 @@
               responsibility)が明確になる一方、末端のワーカーからトップレベルの意思決定までのレイテンシが積み重なります。
             </p>
 
-            <div class="diagram-wrap">
-              <pre class="mermaid" id="diagram-6"></pre>
-              <div class="diagram-caption">図6: 階層型マルチレベル・スーパーバイザー</div>
-            </div>
-            <script type="text/plain" data-target="diagram-6">
-              flowchart TD
-                  Top[トップレベル<br/>スーパーバイザー] --> RS[リサーチ<br/>チームスーパーバイザー]
-                  Top --> MS[数理計算<br/>チームスーパーバイザー]
-                  RS --> RA1[リサーチエージェント1]
-                  RS --> RA2[リサーチエージェント2]
-                  MS --> MA1[数理エージェント1]
-            </script>
+            <div className={styles.diagramWrap}><MermaidDiagram chart={MMD_6} /><div className={styles.diagramCaption}>図6: 階層型マルチレベル・スーパーバイザー</div></div>
+            
 
             <h3>3.5 パイプライン型(Pipeline)</h3>
             <p>
@@ -857,23 +536,11 @@
               複数のエージェントが同じ問題に対して独立した見解を出し、互いの見解を批評しあった上で合意形成する、あるいは審判(judge)役のエージェントが最終判断を下すパターンです。Evaluator-Optimizerのマルチエージェント拡張とも言えます。コストはおよそ2.5倍に跳ね上がりますが、多角的検証が必要な高stakesの意思決定(医療・法務・金融のリスク評価など)では投資対効果が見合います。
             </p>
 
-            <div class="diagram-wrap">
-              <pre class="mermaid" id="diagram-7"></pre>
-              <div class="diagram-caption">図7: ディベート型</div>
-            </div>
-            <script type="text/plain" data-target="diagram-7">
-              flowchart TD
-                  Q[問い] --> P1[視点A エージェント]
-                  Q --> P2[視点B エージェント]
-                  Q --> P3[視点C エージェント]
-                  P1 --> J{審判/合意形成<br/>エージェント}
-                  P2 --> J
-                  P3 --> J
-                  J --> F[最終結論]
-            </script>
+            <div className={styles.diagramWrap}><MermaidDiagram chart={MMD_7} /><div className={styles.diagramCaption}>図7: ディベート型</div></div>
+            
 
             <h3>3.7 パターン比較表</h3>
-            <div class="table-wrap">
+            <div className={styles.tableWrap}>
               <table>
                 <thead>
                   <tr>
@@ -931,13 +598,14 @@
               </table>
             </div>
 
-            <div class="refs">
-              <div class="refs-title">参考文献</div>
+            <div className={styles.refs}>
+              <div className={styles.refsTitle}>参考文献</div>
               <ul>
                 <li>
                   <a
                     href="https://www.digitalapplied.com/blog/multi-agent-orchestration-5-patterns-that-work"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >Multi-Agent Orchestration: 5 Patterns That Work in 2026 — Digital Applied</a
                   >
                 </li>
@@ -945,30 +613,31 @@
                   <a
                     href="https://beam.ai/agentic-insights/multi-agent-orchestration-patterns-production"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >6 Multi-Agent Orchestration Patterns for Production (2026) — Beam AI</a
                   >
                 </li>
                 <li>
-                  <a href="https://www.augmentcode.com/guides/swarm-vs-supervisor" target="_blank"
+                  <a href="https://www.augmentcode.com/guides/swarm-vs-supervisor" target="_blank" rel="noopener noreferrer"
                     >Swarm vs. Supervisor: Multi-Agent Architecture Guide — Augment Code</a
                   >
                 </li>
                 <li>
                   <a
                     href="https://lilys.ai/en/notes/langgraph-swarm-20260202/langgraph-hierarchical-supervisor-swarm-ai-agents"
-                    target="_blank"
+                    target="_blank" rel="noopener noreferrer"
                     >LangGraph Advanced – Hierarchical Multi-Level Supervisor & Swarm Agents</a
                   >
                 </li>
                 <li>
                   <a
                     href="https://dev.to/focused_dot_io/multi-agent-orchestration-in-langgraph-supervisor-vs-swarm-tradeoffs-and-architecture-1b7e"
-                    target="_blank"
+                    target="_blank" rel="noopener noreferrer"
                     >Multi-Agent Orchestration in LangGraph: Supervisor vs Swarm — DEV Community</a
                   >
                 </li>
                 <li>
-                  <a href="https://pypi.org/project/langgraph-supervisor/" target="_blank"
+                  <a href="https://pypi.org/project/langgraph-supervisor/" target="_blank" rel="noopener noreferrer"
                     >langgraph-supervisor · PyPI</a
                   >
                 </li>
@@ -976,9 +645,9 @@
             </div>
           </section>
 
-          <section class="doc-section" id="sec-4">
-            <div class="section-eyebrow">Section 04</div>
-            <h2 class="section-title">
+          <section className={styles.docSection} id="sec-4">
+            <div className={styles.sectionEyebrow}>Section 04</div>
+            <h2 className={styles.sectionTitle}>
               ディープダイブ: Anthropicのマルチエージェント・リサーチシステム
             </h2>
 
@@ -990,32 +659,8 @@
             </p>
 
             <h3>4.1 全体アーキテクチャ</h3>
-            <div class="diagram-wrap">
-              <pre class="mermaid" id="diagram-8"></pre>
-              <div class="diagram-caption">
-                図8: Anthropicマルチエージェント・リサーチシステムの全体構造
-              </div>
-            </div>
-            <script type="text/plain" data-target="diagram-8">
-              flowchart TD
-                  U[ユーザーのクエリ] --> LR[Lead Researcher<br/>リード・エージェント]
-                  LR -->|戦略を記憶に保存| MEM[(メモリ<br/>200Kトークン超の<br/>コンテキスト対策)]
-                  LR --> S1[サブエージェント1<br/>独自コンテキスト]
-                  LR --> S2[サブエージェント2<br/>独自コンテキスト]
-                  LR --> S3[サブエージェント3<br/>独自コンテキスト]
-                  S1 --> T1[検索ツール群を<br/>反復使用]
-                  S2 --> T2[検索ツール群を<br/>反復使用]
-                  S3 --> T3[検索ツール群を<br/>反復使用]
-                  T1 --> D1[凝縮された知見を返却]
-                  T2 --> D2[凝縮された知見を返却]
-                  T3 --> D3[凝縮された知見を返却]
-                  D1 --> LR
-                  D2 --> LR
-                  D3 --> LR
-                  LR -->|十分な情報が<br/>集まるまで反復| LR
-                  LR --> CA[Citation Agent<br/>引用エージェント]
-                  CA --> OUT[最終レポート<br/>+ 引用付き]
-            </script>
+            <div className={styles.diagramWrap}><MermaidDiagram chart={MMD_8} /><div className={styles.diagramCaption}>図8: Anthropicマルチエージェント・リサーチシステムの全体構造</div></div>
+            
 
             <p>構成要素は3種類です。</p>
             <ul>
@@ -1046,7 +691,7 @@
             </p>
 
             <h3>4.3 適用すべきでないドメイン</h3>
-            <div class="callout warn">
+            <div className={styles.callout + " " + styles.calloutWarn}>
               Anthropicのブログは非常に率直にこう述べています:「すべてのエージェントが同じコンテキストを共有する必要がある、あるいはエージェント間に多くの依存関係があるドメインは、現状のマルチエージェントシステムには適していない」
             </div>
             <p>
@@ -1058,7 +703,7 @@
               Anthropicが試行錯誤の末にたどり着いた、マルチエージェント・プロンプトエンジニアリングの主要原則を整理します。
             </p>
 
-            <div class="table-wrap">
+            <div className={styles.tableWrap}>
               <table>
                 <thead>
                   <tr>
@@ -1147,13 +792,14 @@
               </li>
             </ul>
 
-            <div class="refs">
-              <div class="refs-title">参考文献</div>
+            <div className={styles.refs}>
+              <div className={styles.refsTitle}>参考文献</div>
               <ul>
                 <li>
                   <a
                     href="https://www.anthropic.com/engineering/multi-agent-research-system"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >How we built our multi-agent research system — Anthropic
                     Engineering(一次情報)</a
                   >
@@ -1162,6 +808,7 @@
                   <a
                     href="https://blog.bytebytego.com/p/how-anthropic-built-a-multi-agent"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >How Anthropic Built a Multi-Agent Research System — ByteByteGo</a
                   >
                 </li>
@@ -1169,6 +816,7 @@
                   <a
                     href="https://theaiengineer.substack.com/p/how-anthropic-built-multi-agent-deep"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >Anthropic's Multi-Agent Research Architecture Explained — The AI Engineer</a
                   >
                 </li>
@@ -1176,6 +824,7 @@
                   <a
                     href="https://claude.com/blog/building-multi-agent-systems-when-and-how-to-use-them"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >When to use multi-agent systems (and when not to) — Claude by Anthropic</a
                   >
                 </li>
@@ -1183,6 +832,7 @@
                   <a
                     href="https://fountaincity.tech/resources/blog/anthropic-multi-agent-blueprint-production/"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >Anthropic's Multi-Agent Blueprint: What Production Adds — Fountain City</a
                   >
                 </li>
@@ -1190,6 +840,7 @@
                   <a
                     href="https://www.zenml.io/llmops-database/building-a-multi-agent-research-system-for-complex-information-tasks"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >Anthropic: Building a Multi-Agent Research System — ZenML LLMOps Database</a
                   >
                 </li>
@@ -1197,9 +848,9 @@
             </div>
           </section>
 
-          <section class="doc-section" id="sec-5">
-            <div class="section-eyebrow">Section 05</div>
-            <h2 class="section-title">コンテキスト・エンジニアリングと状態管理</h2>
+          <section className={styles.docSection} id="sec-5">
+            <div className={styles.sectionEyebrow}>Section 05</div>
+            <h2 className={styles.sectionTitle}>コンテキスト・エンジニアリングと状態管理</h2>
 
             <p>
               マルチエージェントシステムの実装品質を分けるのは、突き詰めれば「各エージェントに何を、いつ見せるか」という<strong>コンテキスト・エンジニアリング</strong>の設計です。Anthropicのエンジニアリングブログ
@@ -1212,29 +863,8 @@
               サブエージェント・アーキテクチャは、コンテキストウィンドウの制約を回避するもう一つの手段です。1つのエージェントがプロジェクト全体の状態を維持し続けようとするのではなく、専門化されたサブエージェントがクリーンなコンテキストウィンドウで焦点を絞ったタスクを処理します。
             </p>
 
-            <div class="diagram-wrap">
-              <pre class="mermaid" id="diagram-9"></pre>
-              <div class="diagram-caption">図9: サブエージェントによるコンテキスト分離</div>
-            </div>
-            <script type="text/plain" data-target="diagram-9">
-              flowchart LR
-                  subgraph Main["メインエージェント(オーケストレーター)"]
-                      direction TB
-                      M1[高レベルの計画を保持]
-                  end
-                  subgraph Sub1["サブエージェント1"]
-                      direction TB
-                      S1[数万トークン規模で<br/>深く探索]
-                  end
-                  subgraph Sub2["サブエージェント2"]
-                      direction TB
-                      S2[独立したコンテキスト<br/>ウィンドウで並列作業]
-                  end
-                  Main -- タスク委任 --> Sub1
-                  Main -- タスク委任 --> Sub2
-                  Sub1 -- 凝縮された要約<br/>(1,000〜2,000トークン)--> Main
-                  Sub2 -- 凝縮された要約<br/>(1,000〜2,000トークン)--> Main
-            </script>
+            <div className={styles.diagramWrap}><MermaidDiagram chart={MMD_9} /><div className={styles.diagramCaption}>図9: サブエージェントによるコンテキスト分離</div></div>
+            
 
             <p>Claude Agent SDKでは、サブエージェントはデフォルトで以下の性質を持ちます。</p>
             <ul>
@@ -1290,13 +920,14 @@
               </li>
             </ul>
 
-            <div class="refs">
-              <div class="refs-title">参考文献</div>
+            <div className={styles.refs}>
+              <div className={styles.refsTitle}>参考文献</div>
               <ul>
                 <li>
                   <a
                     href="https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >Effective context engineering for AI agents — Anthropic
                     Engineering(一次情報)</a
                   >
@@ -1305,23 +936,24 @@
                   <a
                     href="https://www.anthropic.com/engineering/building-agents-with-the-claude-agent-sdk"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >Building agents with the Claude Agent SDK — Anthropic Engineering(一次情報)</a
                   >
                 </li>
                 <li>
-                  <a href="https://platform.claude.com/docs/en/agent-sdk/subagents" target="_blank"
+                  <a href="https://platform.claude.com/docs/en/agent-sdk/subagents" target="_blank" rel="noopener noreferrer"
                     >Subagents in the SDK — Claude API Docs(一次情報)</a
                   >
                 </li>
                 <li>
                   <a
                     href="https://www.augmentcode.com/guides/anthropic-agent-sdk-what-ships-vs-what-you-build"
-                    target="_blank"
+                    target="_blank" rel="noopener noreferrer"
                     >Anthropic Agent SDK: What It Ships vs. What It Leaves to You — Augment Code</a
                   >
                 </li>
                 <li>
-                  <a href="https://arxiv.org/pdf/2508.08322" target="_blank"
+                  <a href="https://arxiv.org/pdf/2508.08322" target="_blank" rel="noopener noreferrer"
                     >Context Engineering for Multi-Agent LLM Code Assistants — arXiv:2508.08322</a
                   >
                 </li>
@@ -1329,9 +961,9 @@
             </div>
           </section>
 
-          <section class="doc-section" id="sec-6">
-            <div class="section-eyebrow">Section 06</div>
-            <h2 class="section-title">主要フレームワーク比較(2026年中期時点)</h2>
+          <section className={styles.docSection} id="sec-6">
+            <div className={styles.sectionEyebrow}>Section 06</div>
+            <h2 className={styles.sectionTitle}>主要フレームワーク比較(2026年中期時点)</h2>
 
             <p>
               2025年後半〜2026年前半にかけて、マルチエージェント・フレームワークの勢力図は大きく動きました。特にMicrosoftがAutoGenとSemantic
@@ -1340,7 +972,7 @@
             </p>
 
             <h3>6.1 フレームワーク一覧</h3>
-            <div class="table-wrap">
+            <div className={styles.tableWrap}>
               <table>
                 <thead>
                   <tr>
@@ -1417,22 +1049,8 @@
               Kernelプロジェクトからの移行ガイドを公式に提供しています。
             </p>
 
-            <div class="diagram-wrap">
-              <pre class="mermaid" id="diagram-10"></pre>
-              <div class="diagram-caption">図10: Microsoft Agent Frameworkへの統合</div>
-            </div>
-            <script type="text/plain" data-target="diagram-10">
-              flowchart LR
-                  subgraph Before["〜2025年"]
-                      AG[AutoGen<br/>研究指向<br/>マルチエージェント会話]
-                      SK[Semantic Kernel<br/>エンタープライズ指向<br/>本番運用機能]
-                  end
-                  subgraph After["2026年〜"]
-                      AF[Microsoft Agent Framework<br/>統合後継製品]
-                  end
-                  AG --> AF
-                  SK --> AF
-            </script>
+            <div className={styles.diagramWrap}><MermaidDiagram chart={MMD_10} /><div className={styles.diagramCaption}>図10: Microsoft Agent Frameworkへの統合</div></div>
+            
 
             <h3>6.3 選定時の判断軸</h3>
             <ul>
@@ -1456,13 +1074,14 @@
               </li>
             </ul>
 
-            <div class="refs">
-              <div class="refs-title">参考文献</div>
+            <div className={styles.refs}>
+              <div className={styles.refsTitle}>参考文献</div>
               <ul>
                 <li>
                   <a
                     href="https://www.truefoundry.com/blog/multi-agent-orchestration-tools"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >Which are the Best Multi-Agent Orchestration Tools in 2026? — TrueFoundry</a
                   >
                 </li>
@@ -1470,6 +1089,7 @@
                   <a
                     href="https://www.truefoundry.com/blog/multi-agent-orchestration-frameworks"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >Top Multi-Agent Orchestration Frameworks for 2026 — TrueFoundry</a
                   >
                 </li>
@@ -1477,6 +1097,7 @@
                   <a
                     href="https://devblogs.microsoft.com/agent-framework/migrate-your-semantic-kernel-and-autogen-projects-to-microsoft-agent-framework-release-candidate/"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >Migrate your Semantic Kernel and AutoGen projects to Microsoft Agent Framework
                     — Microsoft DevBlogs(一次情報)</a
                   >
@@ -1485,6 +1106,7 @@
                   <a
                     href="https://visualstudiomagazine.com/articles/2026/04/06/microsoft-ships-production-ready-agent-framework-1-0-for-net-and-python.aspx"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >Microsoft Ships Production-Ready Agent Framework 1.0 for .NET and Python —
                     Visual Studio Magazine</a
                   >
@@ -1493,6 +1115,7 @@
                   <a
                     href="https://learn.microsoft.com/en-us/agent-framework/overview/"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >Agent Framework overview — Microsoft Learn(一次情報)</a
                   >
                 </li>
@@ -1500,11 +1123,12 @@
                   <a
                     href="https://openai.github.io/openai-agents-python/multi_agent/"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >Multi-agent orchestration — OpenAI Agents SDK Docs(一次情報)</a
                   >
                 </li>
                 <li>
-                  <a href="https://openai.github.io/openai-agents-python/handoffs/" target="_blank"
+                  <a href="https://openai.github.io/openai-agents-python/handoffs/" target="_blank" rel="noopener noreferrer"
                     >Handoffs — OpenAI Agents SDK Docs(一次情報)</a
                   >
                 </li>
@@ -1512,29 +1136,17 @@
             </div>
           </section>
 
-          <section class="doc-section" id="sec-7">
-            <div class="section-eyebrow">Section 07</div>
-            <h2 class="section-title">相互運用性プロトコル: MCPとA2A</h2>
+          <section className={styles.docSection} id="sec-7">
+            <div className={styles.sectionEyebrow}>Section 07</div>
+            <h2 className={styles.sectionTitle}>相互運用性プロトコル: MCPとA2A</h2>
 
             <p>
               マルチエージェントシステムが複数の組織・ベンダーをまたぐようになるにつれ、「エージェントがツールとどう話すか」と「エージェントが別のエージェントとどう話すか」を分離して標準化する動きが加速しました。
             </p>
 
             <h3>7.1 2つのプロトコルの役割分担</h3>
-            <div class="diagram-wrap">
-              <pre class="mermaid" id="diagram-11"></pre>
-              <div class="diagram-caption">図11: MCPとA2Aのレイヤー分担</div>
-            </div>
-            <script type="text/plain" data-target="diagram-11">
-              flowchart TB
-                  subgraph L1["レイヤー1: エージェント間通信(A2A)"]
-                      AgA[エージェントA<br/>組織1] <-->|Agent Card経由で<br/>能力を発見・タスク委任| AgB[エージェントB<br/>組織2]
-                  end
-                  subgraph L2["レイヤー2: エージェント-ツール通信(MCP)"]
-                      AgA --> MCP1[MCPサーバー<br/>DB / API / ファイル]
-                      AgB --> MCP2[MCPサーバー<br/>DB / API / ファイル]
-                  end
-            </script>
+            <div className={styles.diagramWrap}><MermaidDiagram chart={MMD_11} /><div className={styles.diagramCaption}>図11: MCPとA2Aのレイヤー分担</div></div>
+            
 
             <ul>
               <li>
@@ -1563,13 +1175,14 @@
               v1.0は2026年初頭に安定版として確定し、エンタープライズ導入における「マルチベンダー・エージェントメッシュ」構築の基盤として位置づけられています。
             </p>
 
-            <div class="refs">
-              <div class="refs-title">参考文献</div>
+            <div className={styles.refs}>
+              <div className={styles.refsTitle}>参考文献</div>
               <ul>
                 <li>
                   <a
                     href="https://www.programming-helper.com/tech/agent-to-agent-protocol-2026-google-a2a-standard"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >A2A: The Agent Interoperability Standard That's Reshaping 2026 — Programming
                     Helper</a
                   >
@@ -1578,6 +1191,7 @@
                   <a
                     href="https://galileo.ai/blog/google-agent2agent-a2a-protocol-guide"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >What Is Google's Agent2Agent (A2A) Protocol? — Galileo AI</a
                   >
                 </li>
@@ -1585,6 +1199,7 @@
                   <a
                     href="https://zylos.ai/research/2026-02-15-agent-to-agent-communication-protocols/"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >Agent-to-Agent Communication Protocols in 2026 — Zylos AI Research</a
                   >
                 </li>
@@ -1592,16 +1207,17 @@
                   <a
                     href="https://www.glukhov.org/ai-systems/comparisons/a2a-protocol-2026-adoption"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >A2A Protocol Adoption in 2026 — Glukhov.org</a
                   >
                 </li>
                 <li>
-                  <a href="https://atlan.com/know/google-a2a-protocol/" target="_blank"
+                  <a href="https://atlan.com/know/google-a2a-protocol/" target="_blank" rel="noopener noreferrer"
                     >What is Google's Agent2Agent Protocol (A2A)? — Atlan</a
                   >
                 </li>
                 <li>
-                  <a href="https://www.ibm.com/think/topics/agent2agent-protocol" target="_blank"
+                  <a href="https://www.ibm.com/think/topics/agent2agent-protocol" target="_blank" rel="noopener noreferrer"
                     >Agent2Agent Protocol — IBM Think</a
                   >
                 </li>
@@ -1609,9 +1225,9 @@
             </div>
           </section>
 
-          <section class="doc-section" id="sec-8">
-            <div class="section-eyebrow">Section 08</div>
-            <h2 class="section-title">失敗モード分類(MAST)と対策</h2>
+          <section className={styles.docSection} id="sec-8">
+            <div className={styles.sectionEyebrow}>Section 08</div>
+            <h2 className={styles.sectionTitle}>失敗モード分類(MAST)と対策</h2>
 
             <p>
               カリフォルニア大学バークレー校を含む研究チームが発表した論文
@@ -1622,19 +1238,11 @@
             </p>
 
             <h3>8.1 3大分類と発生率</h3>
-            <div class="diagram-wrap">
-              <pre class="mermaid" id="diagram-12"></pre>
-              <div class="diagram-caption">図12: MASTにおける失敗カテゴリの発生比率(概算)</div>
-            </div>
-            <script type="text/plain" data-target="diagram-12">
-              pie showData
-                  "仕様・システム設計の問題" : 41.8
-                  "エージェント間の不整合" : 36.9
-                  "タスク検証の失敗" : 21.3
-            </script>
+            <div className={styles.diagramWrap}><MermaidDiagram chart={MMD_12} /><div className={styles.diagramCaption}>図12: MASTにおける失敗カテゴリの発生比率(概算)</div></div>
+            
 
             <h3>8.2 14の具体的な失敗モード</h3>
-            <div class="table-wrap">
+            <div className={styles.tableWrap}>
               <table>
                 <thead>
                   <tr>
@@ -1646,7 +1254,7 @@
                 </thead>
                 <tbody>
                   <tr>
-                    <td rowspan="5"><strong>① 仕様・システム設計の問題</strong><br />(約41.8%)</td>
+                    <td rowSpan={5}><strong>① 仕様・システム設計の問題</strong><br />(約41.8%)</td>
                     <td>FM-1.1</td>
                     <td>タスク仕様違反</td>
                     <td>エージェントがタスクの要件・制約に従わない</td>
@@ -1672,7 +1280,7 @@
                     <td>いつ処理を終えるべきかの判断基準を認識していない</td>
                   </tr>
                   <tr>
-                    <td rowspan="6"><strong>② エージェント間の不整合</strong><br />(約36.9%)</td>
+                    <td rowSpan={6}><strong>② エージェント間の不整合</strong><br />(約36.9%)</td>
                     <td>FM-2.1</td>
                     <td>会話のリセット</td>
                     <td>進行中の文脈を不必要に消去・再開してしまう</td>
@@ -1703,7 +1311,7 @@
                     <td>内部の推論結果と実際に取った行動が矛盾する</td>
                   </tr>
                   <tr>
-                    <td rowspan="3"><strong>③ タスク検証の失敗</strong><br />(約21.3%)</td>
+                    <td rowSpan={3}><strong>③ タスク検証の失敗</strong><br />(約21.3%)</td>
                     <td>FM-3.1</td>
                     <td>早すぎる終了</td>
                     <td>タスクが未完了なのに完了したと判断してしまう</td>
@@ -1740,25 +1348,25 @@
               </li>
             </ul>
 
-            <div class="callout danger">
+            <div className={styles.callout + " " + styles.calloutDanger}>
               論文の著者らは、既存の介入策(改善されたプロンプト設計・より明確な役割仕様など)がFM-1.1や検証関連の失敗を実質的に減らせることを示す一方で、<strong>MASの性能向上は依然として人気ベンチマークにおいて最小限にとどまっている</strong>とも指摘しており、「マルチエージェント化すれば自動的に賢くなる」という前提そのものへの警鐘となっています。
             </div>
 
-            <div class="refs">
-              <div class="refs-title">参考文献</div>
+            <div className={styles.refs}>
+              <div className={styles.refsTitle}>参考文献</div>
               <ul>
                 <li>
-                  <a href="https://arxiv.org/abs/2503.13657" target="_blank"
+                  <a href="https://arxiv.org/abs/2503.13657" target="_blank" rel="noopener noreferrer"
                     >Why Do Multi-Agent LLM Systems Fail? — arXiv:2503.13657(一次情報/論文)</a
                   >
                 </li>
                 <li>
-                  <a href="https://arxiv.org/pdf/2601.17915" target="_blank"
+                  <a href="https://arxiv.org/pdf/2601.17915" target="_blank" rel="noopener noreferrer"
                     >Multi-Agent System Failure Taxonomy(詳細版PDF)— arXiv:2601.17915</a
                   >
                 </li>
                 <li>
-                  <a href="https://galileo.ai/blog/agent-failure-modes-guide" target="_blank"
+                  <a href="https://galileo.ai/blog/agent-failure-modes-guide" target="_blank" rel="noopener noreferrer"
                     >Agent Failure Modes: A Practical Guide — Galileo AI</a
                   >
                 </li>
@@ -1766,6 +1374,7 @@
                   <a
                     href="https://futureagi.substack.com/p/why-do-multi-agent-llm-systems-fail"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >Why Do Multi-Agent LLM Systems Fail?(要約と論評)— Future AGI</a
                   >
                 </li>
@@ -1773,28 +1382,17 @@
             </div>
           </section>
 
-          <section class="doc-section" id="sec-9">
-            <div class="section-eyebrow">Section 09</div>
-            <h2 class="section-title">セキュリティとガードレール</h2>
+          <section className={styles.docSection} id="sec-9">
+            <div className={styles.sectionEyebrow}>Section 09</div>
+            <h2 className={styles.sectionTitle}>セキュリティとガードレール</h2>
 
             <p>
               マルチエージェントシステムは単一エージェントよりも攻撃対象領域(アタックサーフェス)が広がります。エージェント間のハンドオフやツール呼び出しの連鎖そのものが新たな脆弱性の経路になり得るためです。
             </p>
 
             <h3>9.1 マルチエージェント特有のリスク</h3>
-            <div class="diagram-wrap">
-              <pre class="mermaid" id="diagram-13"></pre>
-              <div class="diagram-caption">図13: 連鎖的プロンプトインジェクションのリスク経路</div>
-            </div>
-            <script type="text/plain" data-target="diagram-13">
-              flowchart TD
-                  ATT[悪意ある入力<br/>プロンプトインジェクション] --> A1[エージェント1<br/>Web検索担当]
-                  A1 -->|汚染された結果を<br/>そのまま転送| A2[エージェント2<br/>コード実行担当]
-                  A2 -->|権限昇格された<br/>コマンドを実行| SYS[システムリソース]
-
-                  style ATT fill:#5a1a1a,color:#fff
-                  style SYS fill:#5a1a1a,color:#fff
-            </script>
+            <div className={styles.diagramWrap}><MermaidDiagram chart={MMD_13} /><div className={styles.diagramCaption}>図13: 連鎖的プロンプトインジェクションのリスク経路</div></div>
+            
 
             <ul>
               <li>
@@ -1812,7 +1410,7 @@
             </ul>
 
             <h3>9.2 防御原則</h3>
-            <div class="table-wrap">
+            <div className={styles.tableWrap}>
               <table>
                 <thead>
                   <tr>
@@ -1861,13 +1459,14 @@
               10」を拡張し、エージェント的アプリケーション特有のリスク(プロンプトインジェクションの連鎖、過剰な自律性、不適切な出力の取り扱いなど)を明文化しています。マルチエージェントシステムの設計時には、これらの標準を参照しながら脅威モデリングを行うことが2026年時点のベストプラクティスとして定着しています。
             </p>
 
-            <div class="refs">
-              <div class="refs-title">参考文献</div>
+            <div className={styles.refs}>
+              <div className={styles.refsTitle}>参考文献</div>
               <ul>
                 <li>
                   <a
-                    href="https://webyot.in/learning/ai-app-security-2026-prompt-injection-guardrails.html"
+                    href="https://webyot.in/learning/ai-app-security-2026-prompt-injection-guardrails"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >AI App Security 2026: Prompt Injection & Guardrails — Webyot</a
                   >
                 </li>
@@ -1875,6 +1474,7 @@
                   <a
                     href="https://www.getmaxim.ai/articles/the-complete-ai-guardrails-implementation-guide-for-2026/"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >The Complete AI Guardrails Implementation Guide for 2026 — Maxim AI</a
                   >
                 </li>
@@ -1882,6 +1482,7 @@
                   <a
                     href="https://www.augmentcode.com/guides/multi-agent-ai-security-risks-compliance-fixes"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >Multi-Agent AI Security Risks, Compliance & Fixes — Augment Code</a
                   >
                 </li>
@@ -1889,39 +1490,24 @@
             </div>
           </section>
 
-          <section class="doc-section" id="sec-10">
-            <div class="section-eyebrow">Section 10</div>
-            <h2 class="section-title">可観測性(オブザーバビリティ)と評価</h2>
+          <section className={styles.docSection} id="sec-10">
+            <div className={styles.sectionEyebrow}>Section 10</div>
+            <h2 className={styles.sectionTitle}>可観測性(オブザーバビリティ)と評価</h2>
 
             <p>
               マルチエージェントシステムは非決定的(non-deterministic)であり、同じ入力でも実行のたびに異なる経路をたどることがあります。これにより、従来型のソフトウェアテストの発想だけでは不十分になり、専用の可観測性基盤が不可欠になります。
             </p>
 
             <h3>10.1 なぜ従来型のロギングでは不十分か</h3>
-            <div class="diagram-wrap">
-              <pre class="mermaid" id="diagram-14"></pre>
-              <div class="diagram-caption">
-                図14: 従来型ログとマルチエージェント・トレースの違い
-              </div>
-            </div>
-            <script type="text/plain" data-target="diagram-14">
-              flowchart LR
-                  subgraph Trad["従来型アプリのログ"]
-                      L1[単一の実行パス] --> L2[決定的な入出力]
-                  end
-                  subgraph MAS["マルチエージェントの<br/>トレース"]
-                      T1[分岐する意思決定] --> T2[並列実行される<br/>複数エージェント]
-                      T2 --> T3[ツール呼び出しの連鎖]
-                      T3 --> T4[非決定的な最終出力]
-                  end
-            </script>
+            <div className={styles.diagramWrap}><MermaidDiagram chart={MMD_14} /><div className={styles.diagramCaption}>図14: 従来型ログとマルチエージェント・トレースの違い</div></div>
+            
 
             <p>
               単一のログ行ではなく、「どのエージェントが」「どの時点で」「どのツールを」「どんな理由で」呼び出したかという<strong>因果関係を含んだトレース</strong>を記録する必要があります。
             </p>
 
             <h3>10.2 主要な可観測性ツール</h3>
-            <div class="table-wrap">
+            <div className={styles.tableWrap}>
               <table>
                 <thead>
                   <tr>
@@ -1979,13 +1565,14 @@
               </li>
             </ul>
 
-            <div class="refs">
-              <div class="refs-title">参考文献</div>
+            <div className={styles.refs}>
+              <div className={styles.refsTitle}>参考文献</div>
               <ul>
                 <li>
                   <a
                     href="https://www.confident-ai.com/knowledge-base/compare/best-ai-agent-observability-tools-2026"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >Best AI Agent Observability Tools 2026 — Confident AI</a
                   >
                 </li>
@@ -1993,6 +1580,7 @@
                   <a
                     href="https://www.firecrawl.dev/blog/best-llm-observability-tools"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >Best LLM Observability Tools — Firecrawl</a
                   >
                 </li>
@@ -2000,6 +1588,7 @@
                   <a
                     href="https://langfuse.com/blog/2024-07-ai-agent-observability-with-langfuse"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >AI Agent Observability with Langfuse — Langfuse Blog(一次情報)</a
                   >
                 </li>
@@ -2007,32 +1596,20 @@
             </div>
           </section>
 
-          <section class="doc-section" id="sec-11">
-            <div class="section-eyebrow">Section 11</div>
-            <h2 class="section-title">コスト最適化とトークン管理</h2>
+          <section className={styles.docSection} id="sec-11">
+            <div className={styles.sectionEyebrow}>Section 11</div>
+            <h2 className={styles.sectionTitle}>コスト最適化とトークン管理</h2>
 
             <p>
               4.2節で見た通り、マルチエージェントシステムは通常のチャット対話の<strong>約15倍</strong>のトークンを消費します。この経済性を無視した設計は、本番運用でのコスト超過に直結します。
             </p>
 
             <h3>11.1 コスト構造の可視化</h3>
-            <div class="diagram-wrap">
-              <pre class="mermaid" id="diagram-15"></pre>
-              <div class="diagram-caption">図15: マルチエージェントのコスト構造</div>
-            </div>
-            <script type="text/plain" data-target="diagram-15">
-              flowchart TD
-                  Q[1回のユーザークエリ] --> LR[リードエージェント<br/>トークン消費: 1x]
-                  LR --> S1[サブエージェント1<br/>独自コンテキストで<br/>トークン消費: 数x]
-                  LR --> S2[サブエージェント2<br/>独自コンテキストで<br/>トークン消費: 数x]
-                  LR --> S3[サブエージェント3<br/>独自コンテキストで<br/>トークン消費: 数x]
-                  S1 --> Sum[合計: 単一エージェント比<br/>約15倍のトークン消費]
-                  S2 --> Sum
-                  S3 --> Sum
-            </script>
+            <div className={styles.diagramWrap}><MermaidDiagram chart={MMD_15} /><div className={styles.diagramCaption}>図15: マルチエージェントのコスト構造</div></div>
+            
 
             <h3>11.2 主要な最適化戦略</h3>
-            <div class="table-wrap">
+            <div className={styles.tableWrap}>
               <table>
                 <thead>
                   <tr>
@@ -2099,13 +1676,14 @@
               </li>
             </ul>
 
-            <div class="refs">
-              <div class="refs-title">参考文献</div>
+            <div className={styles.refs}>
+              <div className={styles.refsTitle}>参考文献</div>
               <ul>
                 <li>
                   <a
                     href="https://zylos.ai/research/2026-02-19-ai-agent-cost-optimization-token-economics/"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >AI Agent Cost Optimization & Token Economics — Zylos AI Research</a
                   >
                 </li>
@@ -2113,6 +1691,7 @@
                   <a
                     href="https://harnessengineering.academy/blog/cost-optimization-production-ai-agents-token-budgets-model-selection-caching/"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >Cost Optimization for Production AI Agents: Token Budgets, Model Selection,
                     Caching — Harness Engineering Academy</a
                   >
@@ -2121,6 +1700,7 @@
                   <a
                     href="https://www.requesty.ai/blog/ai-agent-cost-optimization-how-to-cut-llm-spend-by-80-percent-with-routing"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >AI Agent Cost Optimization: How to Cut LLM Spend by 80% with Routing —
                     Requesty</a
                   >
@@ -2129,6 +1709,7 @@
                   <a
                     href="https://www.anthropic.com/engineering/multi-agent-research-system"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >How we built our multi-agent research system — Anthropic
                     Engineering(トークン経済性の一次情報)</a
                   >
@@ -2137,37 +1718,19 @@
             </div>
           </section>
 
-          <section class="doc-section" id="sec-12">
-            <div class="section-eyebrow">Section 12</div>
-            <h2 class="section-title">
+          <section className={styles.docSection} id="sec-12">
+            <div className={styles.sectionEyebrow}>Section 12</div>
+            <h2 className={styles.sectionTitle}>
               意思決定フレームワーク: いつマルチエージェントを使うべきか
             </h2>
 
             <p>ここまでの内容を統合し、実務で使える意思決定フローチャートとして整理します。</p>
 
-            <div class="diagram-wrap">
-              <pre class="mermaid" id="diagram-16"></pre>
-              <div class="diagram-caption">図16: マルチエージェント採用の意思決定フロー</div>
-            </div>
-            <script type="text/plain" data-target="diagram-16">
-              flowchart TD
-                  Start[タスクを検討] --> Q1{サブタスクは<br/>真に独立しているか?<br/>互いに依存しないか}
-                  Q1 -->|依存関係が強い| Single1[単一エージェント<br/>または直列パイプラインで十分]
-                  Q1 -->|独立している| Q2{単一エージェント+<br/>優れたプロンプト設計で<br/>同等の精度に届くか?}
-                  Q2 -->|届く| Single2[単一エージェントの<br/>プロンプト改善を優先]
-                  Q2 -->|届かない・<br/>規模的に不可能| Q3{コスト増<br/>約2〜15倍を<br/>正当化できるか?}
-                  Q3 -->|正当化できない| Single3[単一エージェントで妥協<br/>または範囲を絞る]
-                  Q3 -->|正当化できる| Q4{高stakesで<br/>多角的検証が<br/>必要か?}
-                  Q4 -->|はい| Debate[ディベート型 /<br/>Evaluator-Optimizerループ]
-                  Q4 -->|いいえ| Q5{エージェント数の<br/>見込みは?}
-                  Q5 -->|少数・専門領域が<br/>明確に分離| Swarm[スウォーム型<br/>ハンドオフ]
-                  Q5 -->|多数 or 動的な<br/>タスク分解が必要| Q6{組織階層のような<br/>多段階構造が必要か?}
-                  Q6 -->|はい| Hier[階層型<br/>マルチレベル・スーパーバイザー]
-                  Q6 -->|いいえ| OW[オーケストレーター・ワーカー型<br/>またはスーパーバイザー型]
-            </script>
+            <div className={styles.diagramWrap}><MermaidDiagram chart={MMD_16} /><div className={styles.diagramCaption}>図16: マルチエージェント採用の意思決定フロー</div></div>
+            
 
             <h3>12.1 判断チェックリスト</h3>
-            <ul class="checklist">
+            <ul className={styles.checklist}>
               <li>サブタスクの独立性を検証したか(依存関係グラフを一度書き出す)</li>
               <li>単一エージェントのベースラインを必ず先に構築し、比較対象としたか</li>
               <li>コスト試算(トークン消費倍率 × 想定リクエスト数)を事前に見積もったか</li>
@@ -2180,13 +1743,14 @@
               <li>可観測性基盤(トレーシング)を本番導入前に用意したか</li>
             </ul>
 
-            <div class="refs">
-              <div class="refs-title">参考文献</div>
+            <div className={styles.refs}>
+              <div className={styles.refsTitle}>参考文献</div>
               <ul>
                 <li>
                   <a
                     href="https://claude.com/blog/building-multi-agent-systems-when-and-how-to-use-them"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >When to use multi-agent systems (and when not to) — Claude by Anthropic</a
                   >
                 </li>
@@ -2194,6 +1758,7 @@
                   <a
                     href="https://beam.ai/agentic-insights/multi-agent-orchestration-patterns-production"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >6 Multi-Agent Orchestration Patterns for Production (2026) — Beam AI</a
                   >
                 </li>
@@ -2201,31 +1766,16 @@
             </div>
           </section>
 
-          <section class="doc-section" id="sec-13">
-            <div class="section-eyebrow">Section 13</div>
-            <h2 class="section-title">ステップバイステップ実装ガイド</h2>
+          <section className={styles.docSection} id="sec-13">
+            <div className={styles.sectionEyebrow}>Section 13</div>
+            <h2 className={styles.sectionTitle}>ステップバイステップ実装ガイド</h2>
 
             <p>
               ここでは、オーケストレーター・ワーカー型のマルチエージェントシステムを実装する際の標準的な進め方を、実務の順序に沿って解説します。
             </p>
 
-            <div class="diagram-wrap">
-              <pre class="mermaid" id="diagram-17"></pre>
-              <div class="diagram-caption">図17: 実装の8ステップ</div>
-            </div>
-            <script type="text/plain" data-target="diagram-17">
-              flowchart TB
-                  subgraph R1
-                      direction LR
-                      S1["① 単一エージェントの<br/>ベースライン構築"] --> S2["② タスク分解<br/>可能性の検証"] --> S3["③ サブエージェント<br/>契約の設計"] --> S4["④ オーケストレーター<br/>の実装"]
-                  end
-                  subgraph R2
-                      direction LR
-                      S5["⑤ コンテキスト<br/>分離の実装"] --> S6["⑥ 評価・可観測性<br/>の組み込み"] --> S7["⑦ ガードレールと<br/>コスト上限の設定"] --> S8["⑧ 段階的<br/>ロールアウト"]
-                  end
-                  S4 --> S5
-                  R1 ~~~ R2
-            </script>
+            <div className={styles.diagramWrap}><MermaidDiagram chart={MMD_17} /><div className={styles.diagramCaption}>図17: 実装の8ステップ</div></div>
+            
 
             <h3>ステップ① 単一エージェントのベースラインを必ず先に作る</h3>
             <p>
@@ -2243,42 +1793,40 @@
               Agent SDKスタイルの疑似コード例です。
             </p>
 
-            <pre class="code-block"><code class="language-python" id="code-1"></code></pre>
-            <script type="text/plain" data-target-code="code-1">
-              # サブエージェント定義の例(Claude Agent SDK的な構成をイメージした疑似コード)
-              subagent_contract = {
-                  "objective": "2025年〜2026年における半導体サプライチェーンの構造変化を調査する",
-                  "output_format": {
-                      "summary": "文字数600字以内の要約",
-                      "key_findings": "箇条書き5件以内",
-                      "sources": "出典URLのリスト",
-                  },
-                  "tool_guidance": [
-                      "web_search を優先し、一次情報(企業IR・政府統計)を web_fetch で深掘りする",
-                      "SEO最適化されたまとめサイトより、学術論文・公式発表を優先する",
-                  ],
-                  "boundaries": [
-                      "2021年の半導体不足の歴史的経緯には立ち入らない(別サブエージェントが担当)",
-                      "個別企業の株価予測は行わない",
-                  ],
-              }
-            </script>
+            <div className={styles.codeBody}>
+              <div className={styles.codeLine}><span className={styles.cc}># サブエージェント定義の例(Claude Agent SDK的な構成をイメージした疑似コード)</span></div>
+              <div className={styles.codeLine}><span className={styles.ck}>subagent_contract</span> = &#123;</div>
+              <div className={styles.codeLine}>    <span className={styles.cs}>&quot;objective&quot;</span>: <span className={styles.cv}>&quot;2025年〜2026年における半導体サプライチェーンの構造変化を調査する&quot;</span>,</div>
+              <div className={styles.codeLine}>    <span className={styles.cs}>&quot;output_format&quot;</span>: &#123;</div>
+              <div className={styles.codeLine}>        <span className={styles.cs}>&quot;summary&quot;</span>: <span className={styles.cv}>&quot;文字数600字以内の要約&quot;</span>,</div>
+              <div className={styles.codeLine}>        <span className={styles.cs}>&quot;key_findings&quot;</span>: <span className={styles.cv}>&quot;箇条書き5件以内&quot;</span>,</div>
+              <div className={styles.codeLine}>        <span className={styles.cs}>&quot;sources&quot;</span>: <span className={styles.cv}>&quot;出典URLのリスト&quot;</span>,</div>
+              <div className={styles.codeLine}>    &#125;,</div>
+              <div className={styles.codeLine}>    <span className={styles.cs}>&quot;tool_guidance&quot;</span>: [</div>
+              <div className={styles.codeLine}>        <span className={styles.cv}>&quot;web_search を優先し、一次情報(企業IR・政府統計)を web_fetch で深掘りする&quot;</span>,</div>
+              <div className={styles.codeLine}>        <span className={styles.cv}>&quot;SEO最適化されたまとめサイトより、学術論文・公式発表を優先する&quot;</span>,</div>
+              <div className={styles.codeLine}>    ],</div>
+              <div className={styles.codeLine}>    <span className={styles.cs}>&quot;boundaries&quot;</span>: [</div>
+              <div className={styles.codeLine}>        <span className={styles.cv}>&quot;2021年の半導体不足の歴史的経緯には立ち入らない(別サブエージェントが担当)&quot;</span>,</div>
+              <div className={styles.codeLine}>        <span className={styles.cv}>&quot;個別企業の株価予測は行わない&quot;</span>,</div>
+              <div className={styles.codeLine}>    ],</div>
+              <div className={styles.codeLine}>&#125;</div>
+            </div>
 
             <h3>ステップ④ オーケストレーターを実装する</h3>
             <p>
               4.4節の「努力量をタスクの複雑さにスケーリングさせる」原則に沿って、オーケストレーターのシステムプロンプトに明確なルールを埋め込みます。
             </p>
 
-            <pre class="code-block"><code class="language-python" id="code-2"></code></pre>
-            <script type="text/plain" data-target-code="code-2">
-              orchestrator_scaling_rules = """
-              タスクの複雑さに応じて、生成するサブエージェント数とツール呼び出し回数を決定すること:
-              - 単純な事実確認: 1エージェント、3〜10回のツール呼び出し
-              - 直接比較(2〜3項目): 2〜4サブエージェント、各10〜15回のツール呼び出し
-              - 複雑な多面的調査: 10以上のサブエージェント、明確な役割分担を伴う
-              サブエージェントを生成する前に、まず拡張思考で分解計画を書き出すこと。
-              """
-            </script>
+            <div className={styles.codeBody}>
+              <div className={styles.codeLine}><span className={styles.ck}>orchestrator_scaling_rules</span> = <span className={styles.cs}>&quot;&quot;&quot;</span></div>
+              <div className={styles.codeLine}><span className={styles.cm}>タスクの複雑さに応じて、生成するサブエージェント数とツール呼び出し回数を決定すること:</span></div>
+              <div className={styles.codeLine}><span className={styles.cg}>- 単純な事実確認:</span> <span className={styles.cv}>1エージェント、3〜10回のツール呼び出し</span></div>
+              <div className={styles.codeLine}><span className={styles.cg}>- 直接比較(2〜3項目):</span> <span className={styles.cv}>2〜4サブエージェント、各10〜15回のツール呼び出し</span></div>
+              <div className={styles.codeLine}><span className={styles.cg}>- 複雑な多面的調査:</span> <span className={styles.cv}>10以上のサブエージェント、明確な役割分担を伴う</span></div>
+              <div className={styles.codeLine}><span className={styles.cw}>サブエージェントを生成する前に、まず拡張思考で分解計画を書き出すこと。</span></div>
+              <div className={styles.codeLine}><span className={styles.cs}>&quot;&quot;&quot;</span></div>
+            </div>
 
             <h3>ステップ⑤ コンテキスト分離を実装する</h3>
             <p>
@@ -2300,13 +1848,14 @@
               4.6節でAnthropicが言及した「中断のないレインボーデプロイ」のように、本番トラフィックの一部だけに新しいエージェント構成を適用し、失敗率・コスト・レイテンシを監視しながら段階的に展開範囲を広げます。
             </p>
 
-            <div class="refs">
-              <div class="refs-title">参考文献</div>
+            <div className={styles.refs}>
+              <div className={styles.refsTitle}>参考文献</div>
               <ul>
                 <li>
                   <a
                     href="https://www.anthropic.com/engineering/building-agents-with-the-claude-agent-sdk"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >Building agents with the Claude Agent SDK — Anthropic Engineering(一次情報)</a
                   >
                 </li>
@@ -2314,6 +1863,7 @@
                   <a
                     href="https://www.anthropic.com/engineering/multi-agent-research-system"
                     target="_blank"
+                    rel="noopener noreferrer"
                     >How we built our multi-agent research system — Anthropic
                     Engineering(一次情報)</a
                   >
@@ -2322,12 +1872,12 @@
             </div>
           </section>
 
-          <section class="doc-section" id="sec-14">
-            <div class="section-eyebrow">Section 14</div>
-            <h2 class="section-title">チェックリストとまとめ</h2>
+          <section className={styles.docSection} id="sec-14">
+            <div className={styles.sectionEyebrow}>Section 14</div>
+            <h2 className={styles.sectionTitle}>チェックリストとまとめ</h2>
 
             <h3>14.1 本番導入前の最終チェックリスト</h3>
-            <div class="table-wrap">
+            <div className={styles.tableWrap}>
               <table>
                 <thead>
                   <tr>
@@ -2337,7 +1887,7 @@
                 </thead>
                 <tbody>
                   <tr>
-                    <td rowspan="3"><strong>設計判断</strong></td>
+                    <td rowSpan={3}><strong>設計判断</strong></td>
                     <td>
                       単一エージェントのベースラインと比較し、マルチエージェント化の効果を定量的に確認したか
                     </td>
@@ -2351,7 +1901,7 @@
                     </td>
                   </tr>
                   <tr>
-                    <td rowspan="3"><strong>コンテキスト設計</strong></td>
+                    <td rowSpan={3}><strong>コンテキスト設計</strong></td>
                     <td>
                       各サブエージェントに4部構成の契約(目的・出力形式・ツールガイダンス・境界)を与えているか
                     </td>
@@ -2365,7 +1915,7 @@
                     <td>長時間稼働セッション向けにコンパクション(圧縮)戦略を用意したか</td>
                   </tr>
                   <tr>
-                    <td rowspan="2"><strong>信頼性</strong></td>
+                    <td rowSpan={2}><strong>信頼性</strong></td>
                     <td>
                       MASTの3大失敗カテゴリ(仕様・不整合・検証)それぞれに対する具体的な緩和策を実装したか
                     </td>
@@ -2374,7 +1924,7 @@
                     <td>検証エージェントまたはルールベースの最終チェックを組み込んでいるか</td>
                   </tr>
                   <tr>
-                    <td rowspan="3"><strong>セキュリティ</strong></td>
+                    <td rowSpan={3}><strong>セキュリティ</strong></td>
                     <td>最小権限の原則でツールアクセスをスコープダウンしたか</td>
                   </tr>
                   <tr>
@@ -2384,14 +1934,14 @@
                     <td>OWASPのエージェント的アプリケーション向けリスク項目と照合したか</td>
                   </tr>
                   <tr>
-                    <td rowspan="2"><strong>可観測性・評価</strong></td>
+                    <td rowSpan={2}><strong>可観測性・評価</strong></td>
                     <td>トレーシング基盤を導入し、因果関係を含むログを記録しているか</td>
                   </tr>
                   <tr>
                     <td>LLM-as-judgeと人間レビューを組み合わせた評価パイプラインを用意したか</td>
                   </tr>
                   <tr>
-                    <td rowspan="2"><strong>コスト管理</strong></td>
+                    <td rowSpan={2}><strong>コスト管理</strong></td>
                     <td>モデルルーティングとプロンプトキャッシングを実装したか</td>
                   </tr>
                   <tr>
@@ -2436,9 +1986,9 @@
             </ol>
           </section>
 
-          <section class="doc-section" id="sec-15">
-            <div class="section-eyebrow">Section 15</div>
-            <h2 class="section-title">参考文献一覧</h2>
+          <section className={styles.docSection} id="sec-15">
+            <div className={styles.sectionEyebrow}>Section 15</div>
+            <h2 className={styles.sectionTitle}>参考文献一覧</h2>
             <p>
               本ガイド全体で参照した一次情報・技術記事・学術論文のURLを集約します(セクションごとの参考文献と重複を含みます)。
             </p>
@@ -2449,6 +1999,7 @@
                 <a
                   href="https://www.anthropic.com/engineering/multi-agent-research-system"
                   target="_blank"
+                  rel="noopener noreferrer"
                   >https://www.anthropic.com/engineering/multi-agent-research-system</a
                 >
               </li>
@@ -2456,6 +2007,7 @@
                 <a
                   href="https://www.anthropic.com/engineering/building-effective-agents"
                   target="_blank"
+                  rel="noopener noreferrer"
                   >https://www.anthropic.com/engineering/building-effective-agents</a
                 >
               </li>
@@ -2463,6 +2015,7 @@
                 <a
                   href="https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents"
                   target="_blank"
+                  rel="noopener noreferrer"
                   >https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents</a
                 >
               </li>
@@ -2470,11 +2023,12 @@
                 <a
                   href="https://www.anthropic.com/engineering/building-agents-with-the-claude-agent-sdk"
                   target="_blank"
+                  rel="noopener noreferrer"
                   >https://www.anthropic.com/engineering/building-agents-with-the-claude-agent-sdk</a
                 >
               </li>
               <li>
-                <a href="https://platform.claude.com/docs/en/agent-sdk/subagents" target="_blank"
+                <a href="https://platform.claude.com/docs/en/agent-sdk/subagents" target="_blank" rel="noopener noreferrer"
                   >https://platform.claude.com/docs/en/agent-sdk/subagents</a
                 >
               </li>
@@ -2482,6 +2036,7 @@
                 <a
                   href="https://claude.com/blog/building-multi-agent-systems-when-and-how-to-use-them"
                   target="_blank"
+                  rel="noopener noreferrer"
                   >https://claude.com/blog/building-multi-agent-systems-when-and-how-to-use-them</a
                 >
               </li>
@@ -2490,22 +2045,22 @@
             <h3>学術論文</h3>
             <ul>
               <li>
-                <a href="https://arxiv.org/abs/2503.13657" target="_blank"
+                <a href="https://arxiv.org/abs/2503.13657" target="_blank" rel="noopener noreferrer"
                   >https://arxiv.org/abs/2503.13657</a
                 >(MAST: Why Do Multi-Agent LLM Systems Fail?)
               </li>
               <li>
-                <a href="https://arxiv.org/pdf/2601.17915" target="_blank"
+                <a href="https://arxiv.org/pdf/2601.17915" target="_blank" rel="noopener noreferrer"
                   >https://arxiv.org/pdf/2601.17915</a
                 >(MAST詳細版)
               </li>
               <li>
-                <a href="https://arxiv.org/pdf/2606.24937" target="_blank"
+                <a href="https://arxiv.org/pdf/2606.24937" target="_blank" rel="noopener noreferrer"
                   >https://arxiv.org/pdf/2606.24937</a
                 >(The Hitchhiker's Guide to Agentic AI)
               </li>
               <li>
-                <a href="https://arxiv.org/pdf/2508.08322" target="_blank"
+                <a href="https://arxiv.org/pdf/2508.08322" target="_blank" rel="noopener noreferrer"
                   >https://arxiv.org/pdf/2508.08322</a
                 >(Context Engineering for Multi-Agent LLM Code Assistants)
               </li>
@@ -2517,6 +2072,7 @@
                 <a
                   href="https://learn.microsoft.com/en-us/agent-framework/overview/"
                   target="_blank"
+                  rel="noopener noreferrer"
                   >https://learn.microsoft.com/en-us/agent-framework/overview/</a
                 >
               </li>
@@ -2524,21 +2080,22 @@
                 <a
                   href="https://devblogs.microsoft.com/agent-framework/migrate-your-semantic-kernel-and-autogen-projects-to-microsoft-agent-framework-release-candidate/"
                   target="_blank"
+                  rel="noopener noreferrer"
                   >https://devblogs.microsoft.com/agent-framework/migrate-your-semantic-kernel-and-autogen-projects-to-microsoft-agent-framework-release-candidate/</a
                 >
               </li>
               <li>
-                <a href="https://openai.github.io/openai-agents-python/multi_agent/" target="_blank"
+                <a href="https://openai.github.io/openai-agents-python/multi_agent/" target="_blank" rel="noopener noreferrer"
                   >https://openai.github.io/openai-agents-python/multi_agent/</a
                 >
               </li>
               <li>
-                <a href="https://openai.github.io/openai-agents-python/handoffs/" target="_blank"
+                <a href="https://openai.github.io/openai-agents-python/handoffs/" target="_blank" rel="noopener noreferrer"
                   >https://openai.github.io/openai-agents-python/handoffs/</a
                 >
               </li>
               <li>
-                <a href="https://pypi.org/project/langgraph-supervisor/" target="_blank"
+                <a href="https://pypi.org/project/langgraph-supervisor/" target="_blank" rel="noopener noreferrer"
                   >https://pypi.org/project/langgraph-supervisor/</a
                 >
               </li>
@@ -2546,6 +2103,7 @@
                 <a
                   href="https://langfuse.com/blog/2024-07-ai-agent-observability-with-langfuse"
                   target="_blank"
+                  rel="noopener noreferrer"
                   >https://langfuse.com/blog/2024-07-ai-agent-observability-with-langfuse</a
                 >
               </li>
@@ -2557,6 +2115,7 @@
                 <a
                   href="https://www.digitalapplied.com/blog/multi-agent-orchestration-5-patterns-that-work"
                   target="_blank"
+                  rel="noopener noreferrer"
                   >https://www.digitalapplied.com/blog/multi-agent-orchestration-5-patterns-that-work</a
                 >
               </li>
@@ -2564,6 +2123,7 @@
                 <a
                   href="https://www.truefoundry.com/blog/multi-agent-orchestration-tools"
                   target="_blank"
+                  rel="noopener noreferrer"
                   >https://www.truefoundry.com/blog/multi-agent-orchestration-tools</a
                 >
               </li>
@@ -2571,6 +2131,7 @@
                 <a
                   href="https://www.truefoundry.com/blog/multi-agent-orchestration-frameworks"
                   target="_blank"
+                  rel="noopener noreferrer"
                   >https://www.truefoundry.com/blog/multi-agent-orchestration-frameworks</a
                 >
               </li>
@@ -2578,11 +2139,12 @@
                 <a
                   href="https://beam.ai/agentic-insights/multi-agent-orchestration-patterns-production"
                   target="_blank"
+                  rel="noopener noreferrer"
                   >https://beam.ai/agentic-insights/multi-agent-orchestration-patterns-production</a
                 >
               </li>
               <li>
-                <a href="https://www.augmentcode.com/guides/swarm-vs-supervisor" target="_blank"
+                <a href="https://www.augmentcode.com/guides/swarm-vs-supervisor" target="_blank" rel="noopener noreferrer"
                   >https://www.augmentcode.com/guides/swarm-vs-supervisor</a
                 >
               </li>
@@ -2590,6 +2152,7 @@
                 <a
                   href="https://www.augmentcode.com/guides/anthropic-agent-sdk-what-ships-vs-what-you-build"
                   target="_blank"
+                  rel="noopener noreferrer"
                   >https://www.augmentcode.com/guides/anthropic-agent-sdk-what-ships-vs-what-you-build</a
                 >
               </li>
@@ -2597,6 +2160,7 @@
                 <a
                   href="https://www.augmentcode.com/guides/multi-agent-ai-security-risks-compliance-fixes"
                   target="_blank"
+                  rel="noopener noreferrer"
                   >https://www.augmentcode.com/guides/multi-agent-ai-security-risks-compliance-fixes</a
                 >
               </li>
@@ -2604,6 +2168,7 @@
                 <a
                   href="https://lilys.ai/en/notes/langgraph-swarm-20260202/langgraph-hierarchical-supervisor-swarm-ai-agents"
                   target="_blank"
+                  rel="noopener noreferrer"
                   >https://lilys.ai/en/notes/langgraph-swarm-20260202/langgraph-hierarchical-supervisor-swarm-ai-agents</a
                 >
               </li>
@@ -2611,6 +2176,7 @@
                 <a
                   href="https://dev.to/focused_dot_io/multi-agent-orchestration-in-langgraph-supervisor-vs-swarm-tradeoffs-and-architecture-1b7e"
                   target="_blank"
+                  rel="noopener noreferrer"
                   >https://dev.to/focused_dot_io/multi-agent-orchestration-in-langgraph-supervisor-vs-swarm-tradeoffs-and-architecture-1b7e</a
                 >
               </li>
@@ -2618,6 +2184,7 @@
                 <a
                   href="https://blog.bytebytego.com/p/how-anthropic-built-a-multi-agent"
                   target="_blank"
+                  rel="noopener noreferrer"
                   >https://blog.bytebytego.com/p/how-anthropic-built-a-multi-agent</a
                 >
               </li>
@@ -2625,6 +2192,7 @@
                 <a
                   href="https://theaiengineer.substack.com/p/how-anthropic-built-multi-agent-deep"
                   target="_blank"
+                  rel="noopener noreferrer"
                   >https://theaiengineer.substack.com/p/how-anthropic-built-multi-agent-deep</a
                 >
               </li>
@@ -2632,6 +2200,7 @@
                 <a
                   href="https://fountaincity.tech/resources/blog/anthropic-multi-agent-blueprint-production/"
                   target="_blank"
+                  rel="noopener noreferrer"
                   >https://fountaincity.tech/resources/blog/anthropic-multi-agent-blueprint-production/</a
                 >
               </li>
@@ -2639,6 +2208,7 @@
                 <a
                   href="https://www.zenml.io/llmops-database/building-a-multi-agent-research-system-for-complex-information-tasks"
                   target="_blank"
+                  rel="noopener noreferrer"
                   >https://www.zenml.io/llmops-database/building-a-multi-agent-research-system-for-complex-information-tasks</a
                 >
               </li>
@@ -2646,6 +2216,7 @@
                 <a
                   href="https://www.programming-helper.com/tech/agent-to-agent-protocol-2026-google-a2a-standard"
                   target="_blank"
+                  rel="noopener noreferrer"
                   >https://www.programming-helper.com/tech/agent-to-agent-protocol-2026-google-a2a-standard</a
                 >
               </li>
@@ -2653,6 +2224,7 @@
                 <a
                   href="https://galileo.ai/blog/google-agent2agent-a2a-protocol-guide"
                   target="_blank"
+                  rel="noopener noreferrer"
                   >https://galileo.ai/blog/google-agent2agent-a2a-protocol-guide</a
                 >
               </li>
@@ -2660,6 +2232,7 @@
                 <a
                   href="https://zylos.ai/research/2026-02-15-agent-to-agent-communication-protocols/"
                   target="_blank"
+                  rel="noopener noreferrer"
                   >https://zylos.ai/research/2026-02-15-agent-to-agent-communication-protocols/</a
                 >
               </li>
@@ -2667,21 +2240,22 @@
                 <a
                   href="https://www.glukhov.org/ai-systems/comparisons/a2a-protocol-2026-adoption"
                   target="_blank"
+                  rel="noopener noreferrer"
                   >https://www.glukhov.org/ai-systems/comparisons/a2a-protocol-2026-adoption</a
                 >
               </li>
               <li>
-                <a href="https://atlan.com/know/google-a2a-protocol/" target="_blank"
+                <a href="https://atlan.com/know/google-a2a-protocol/" target="_blank" rel="noopener noreferrer"
                   >https://atlan.com/know/google-a2a-protocol/</a
                 >
               </li>
               <li>
-                <a href="https://www.ibm.com/think/topics/agent2agent-protocol" target="_blank"
+                <a href="https://www.ibm.com/think/topics/agent2agent-protocol" target="_blank" rel="noopener noreferrer"
                   >https://www.ibm.com/think/topics/agent2agent-protocol</a
                 >
               </li>
               <li>
-                <a href="https://galileo.ai/blog/agent-failure-modes-guide" target="_blank"
+                <a href="https://galileo.ai/blog/agent-failure-modes-guide" target="_blank" rel="noopener noreferrer"
                   >https://galileo.ai/blog/agent-failure-modes-guide</a
                 >
               </li>
@@ -2689,13 +2263,15 @@
                 <a
                   href="https://futureagi.substack.com/p/why-do-multi-agent-llm-systems-fail"
                   target="_blank"
+                  rel="noopener noreferrer"
                   >https://futureagi.substack.com/p/why-do-multi-agent-llm-systems-fail</a
                 >
               </li>
               <li>
                 <a
-                  href="https://webyot.in/learning/ai-app-security-2026-prompt-injection-guardrails.html"
+                  href="https://webyot.in/learning/ai-app-security-2026-prompt-injection-guardrails"
                   target="_blank"
+                  rel="noopener noreferrer"
                   >https://webyot.in/learning/ai-app-security-2026-prompt-injection-guardrails.html</a
                 >
               </li>
@@ -2703,6 +2279,7 @@
                 <a
                   href="https://www.getmaxim.ai/articles/the-complete-ai-guardrails-implementation-guide-for-2026/"
                   target="_blank"
+                  rel="noopener noreferrer"
                   >https://www.getmaxim.ai/articles/the-complete-ai-guardrails-implementation-guide-for-2026/</a
                 >
               </li>
@@ -2710,6 +2287,7 @@
                 <a
                   href="https://www.confident-ai.com/knowledge-base/compare/best-ai-agent-observability-tools-2026"
                   target="_blank"
+                  rel="noopener noreferrer"
                   >https://www.confident-ai.com/knowledge-base/compare/best-ai-agent-observability-tools-2026</a
                 >
               </li>
@@ -2717,6 +2295,7 @@
                 <a
                   href="https://www.firecrawl.dev/blog/best-llm-observability-tools"
                   target="_blank"
+                  rel="noopener noreferrer"
                   >https://www.firecrawl.dev/blog/best-llm-observability-tools</a
                 >
               </li>
@@ -2724,6 +2303,7 @@
                 <a
                   href="https://zylos.ai/research/2026-02-19-ai-agent-cost-optimization-token-economics/"
                   target="_blank"
+                  rel="noopener noreferrer"
                   >https://zylos.ai/research/2026-02-19-ai-agent-cost-optimization-token-economics/</a
                 >
               </li>
@@ -2731,6 +2311,7 @@
                 <a
                   href="https://harnessengineering.academy/blog/cost-optimization-production-ai-agents-token-budgets-model-selection-caching/"
                   target="_blank"
+                  rel="noopener noreferrer"
                   >https://harnessengineering.academy/blog/cost-optimization-production-ai-agents-token-budgets-model-selection-caching/</a
                 >
               </li>
@@ -2738,6 +2319,7 @@
                 <a
                   href="https://www.requesty.ai/blog/ai-agent-cost-optimization-how-to-cut-llm-spend-by-80-percent-with-routing"
                   target="_blank"
+                  rel="noopener noreferrer"
                   >https://www.requesty.ai/blog/ai-agent-cost-optimization-how-to-cut-llm-spend-by-80-percent-with-routing</a
                 >
               </li>
@@ -2745,6 +2327,7 @@
                 <a
                   href="https://visualstudiomagazine.com/articles/2026/04/06/microsoft-ships-production-ready-agent-framework-1-0-for-net-and-python.aspx"
                   target="_blank"
+                  rel="noopener noreferrer"
                   >https://visualstudiomagazine.com/articles/2026/04/06/microsoft-ships-production-ready-agent-framework-1-0-for-net-and-python.aspx</a
                 >
               </li>
@@ -2752,6 +2335,7 @@
                 <a
                   href="https://simonwillison.net/2024/Dec/20/building-effective-agents/"
                   target="_blank"
+                  rel="noopener noreferrer"
                   >https://simonwillison.net/2024/Dec/20/building-effective-agents/</a
                 >
               </li>
@@ -2759,6 +2343,7 @@
                 <a
                   href="https://pub.towardsai.net/agent-workflow-patterns-beyond-anthropics-playbook-1bd76a48d63d"
                   target="_blank"
+                  rel="noopener noreferrer"
                   >https://pub.towardsai.net/agent-workflow-patterns-beyond-anthropics-playbook-1bd76a48d63d</a
                 >
               </li>
@@ -2766,132 +2351,26 @@
                 <a
                   href="https://www.baeldung.com/spring-ai-building-effective-agents"
                   target="_blank"
+                  rel="noopener noreferrer"
                   >https://www.baeldung.com/spring-ai-building-effective-agents</a
                 >
               </li>
             </ul>
 
-            <div class="callout warn">
+            <div className={styles.callout + " " + styles.calloutWarn}>
               <strong>免責事項:</strong> 上記のうち一部の業界分析記事(TrueFoundry, Zylos AI
               Research, Beam AI, Augment Code
               など)は一次情報ではなく第三者による分析・まとめ記事です。実装の意思決定に用いる際は、可能な限りAnthropic公式ドキュメントや各フレームワークの公式リファレンス、および査読前論文の原文を優先して確認してください。
             </div>
 
-            <footer class="doc-footer">
+            <footer className={styles.pageFooter}>
               マルチエージェント・オーケストレーション実践ガイド — 2026年7月版 · 全15セクション
             </footer>
           </section>
         </div>
-      </main>
+      
+        </div>
+      </div>
     </div>
-
-    <script>
-      // ===== dedent: エディタによる自動整形(インデント変化)に対して堅牢化 =====
-      function dedent(str) {
-        const lines = str.replace(/\r\n/g, '\n').split('\n');
-        while (lines.length && lines[0].trim() === '') lines.shift();
-        while (lines.length && lines[lines.length - 1].trim() === '') lines.pop();
-        const indents = lines
-          .filter((l) => l.trim() !== '')
-          .map((l) => (l.match(/^ */) || [''])[0].length);
-        const minIndent = indents.length ? Math.min(...indents) : 0;
-        return lines.map((l) => l.slice(minIndent)).join('\n');
-      }
-
-      // ===== Mermaidダイアグラムの注入(textContent経由、innerHTMLは使わない) =====
-      document.querySelectorAll('script[type="text/plain"][data-target]').forEach(function (src) {
-        const targetEl = document.getElementById(src.getAttribute('data-target'));
-        if (targetEl) {
-          targetEl.textContent = dedent(src.textContent);
-        }
-      });
-
-      // ===== コードブロックの注入 + highlight.js =====
-      document
-        .querySelectorAll('script[type="text/plain"][data-target-code]')
-        .forEach(function (src) {
-          const targetEl = document.getElementById(src.getAttribute('data-target-code'));
-          if (targetEl) {
-            targetEl.textContent = dedent(src.textContent);
-            if (window.hljs) {
-              hljs.highlightElement(targetEl);
-            }
-          }
-        });
-
-      // ===== Mermaid初期化(ダークネイビー基調のカスタムテーマ) =====
-      mermaid.initialize({
-        startOnLoad: false,
-        theme: 'dark',
-        themeVariables: {
-          background: '#0f2036',
-          primaryColor: '#123049',
-          primaryTextColor: '#e8eef5',
-          primaryBorderColor: '#57c7ff',
-          lineColor: '#57c7ff',
-          secondaryColor: '#1a2f47',
-          tertiaryColor: '#0d1a2b',
-          textColor: '#e8eef5',
-          mainBkg: '#123049',
-          nodeBorder: '#57c7ff',
-          clusterBkg: '#0d1a2b',
-          clusterBorder: 'rgba(148,163,184,0.28)',
-          edgeLabelBackground: '#0d1a2b',
-          fontFamily: 'Inter, sans-serif',
-          pie1: '#57c7ff',
-          pie2: '#a996ff',
-          pie3: '#ff9d66',
-          pieOuterStrokeColor: 'rgba(148,163,184,0.28)',
-          pieTitleTextColor: '#e8eef5',
-          pieSectionTextColor: '#0a1420',
-          pieLegendTextColor: '#e8eef5',
-          fontSize: '16px',
-        },
-        flowchart: {
-          curve: 'basis',
-          htmlLabels: true,
-          nodeSpacing: 36,
-          rankSpacing: 52,
-          padding: 14,
-        },
-        sequence: {
-          actorFontSize: 15,
-          messageFontSize: 14,
-          noteFontSize: 14,
-          boxMargin: 12,
-        },
-        timeline: { padding: 12 },
-        securityLevel: 'loose',
-      });
-
-      mermaid.run({ querySelector: '.mermaid' });
-
-      // ===== サイドバーのアクティブセクション追跡(IntersectionObserver) =====
-      (function () {
-        const sections = document.querySelectorAll('section.doc-section[id]');
-        const navLinks = document.querySelectorAll('.nav-list a');
-
-        function setActive(id) {
-          navLinks.forEach(function (a) {
-            a.classList.toggle('active', a.getAttribute('href') === '#' + id);
-          });
-        }
-
-        const observer = new IntersectionObserver(
-          function (entries) {
-            entries.forEach(function (entry) {
-              if (entry.isIntersecting) {
-                setActive(entry.target.id);
-              }
-            });
-          },
-          { rootMargin: '-20% 0px -60% 0px', threshold: 0 },
-        );
-
-        sections.forEach(function (sec) {
-          observer.observe(sec);
-        });
-      })();
-    </script>
-  </body>
-</html>
+  );
+}

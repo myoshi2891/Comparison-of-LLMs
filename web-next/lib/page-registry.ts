@@ -44,7 +44,7 @@ export const PageEntrySchema = z
     category: z.string().min(1).optional(),
     /** プロバイダー系ページのみ。識別子であり表示ラベルではない（表示は category）。 */
     provider: z
-      .enum(["claude", "google", "codex", "copilot", "moonshot", "deepseek", "xai", "zhipu"])
+      .enum(["claude", "google", "codex", "microsoft", "moonshot", "deepseek", "xai", "zhipu"])
       .optional(),
     /** 横断検索・関連リンク (F-5 / F-7) 用のトピックタグ */
     topics: z.array(z.string()),
@@ -121,6 +121,30 @@ const entries: PageEntry[] = [
       "Agent Skillsの仕組みと使い方を、Kaggle Whitepaperとagentskills.io、Anthropic公式ドキュメントをもとに初学者向けにステップバイステップで解説するガイドです。",
     addedAt: "2026-07-05",
     lastReviewed: "2026-07-05",
+  },
+  {
+    slug: "/agent/multi-agent-orchestration-best-practices",
+    title: "マルチエージェント・オーケストレーション実践ガイド",
+    description:
+      "Anthropicのリサーチシステム、5つの基本パターン、MAST失敗モード分類、MCP/A2Aプロトコル等を網羅したマルチエージェント・オーケストレーション実践ガイド。",
+    group: "Agent 開発",
+    topics: ["agent", "multi-agent", "orchestration", "architecture", "mcp"],
+    summary:
+      "Anthropicのリサーチシステム、5つの基本パターン、MAST失敗モード分類、MCP/A2Aプロトコル等を網羅したマルチエージェント・オーケストレーション実践ガイド。",
+    addedAt: "2026-07-31",
+    lastReviewed: "2026-07-31",
+  },
+  {
+    slug: "/agent/multi-agent-orchestration",
+    title: "マルチエージェントオーケストレーション ベストプラクティスガイド",
+    description:
+      "2026年最新のマルチエージェントオーケストレーション実践ガイド。Anthropic、Google、OpenAIの最新プラクティスに基づくアーキテクチャ、協調パターン、プロトコル（MCP/A2A）、可観測性、セキュリティを完全解説。",
+    group: "Agent 開発",
+    topics: ["agent", "multi-agent", "orchestration", "mcp", "a2a"],
+    summary:
+      "2026年最新のマルチエージェントオーケストレーション実践ガイド。Anthropic、Google、OpenAIの最新プラクティスに基づくアーキテクチャ、協調パターン、プロトコル、可観測性、セキュリティを完全解説。",
+    addedAt: "2026-07-31",
+    lastReviewed: "2026-07-31",
   },
   {
     slug: "/ci-cd/ai-cicd-automation-best-practices",
@@ -353,8 +377,8 @@ const entries: PageEntry[] = [
     slug: "/copilot/agent",
     title: "Agent",
     group: "Providers",
-    category: "Copilot",
-    provider: "copilot",
+    category: "Microsoft",
+    provider: "microsoft",
     topics: ["agent"],
     summary:
       "GitHub Copilot .agent.md の完全ベストプラクティスガイド。フロントマター全仕様・ステップバイステップ作成・Handoffs（エージェント連鎖）・Subagents（サブエージェント）・MCP統合・マルチエージェント設計パターン・トラブルシューティングを 2026年6月最新版の公式ドキュメント準拠で解説。Cloud agent GA・組織/エンタープライズエージェント（JetBrains）・Copilot code review の AGENTS.md 対応に対応。",
@@ -365,8 +389,8 @@ const entries: PageEntry[] = [
     slug: "/copilot/github-copilot",
     title: "GitHub Copilot",
     group: "Providers",
-    category: "Copilot",
-    provider: "copilot",
+    category: "Microsoft",
+    provider: "microsoft",
     topics: ["copilot"],
     summary:
       "2026年6月最新版 — 初学者からエキスパートまで対応したステップバイステップのAIコーディングアシスタント活用法。Cloud agent GA・従量課金（AI Credits）・Copilot code review の AGENTS.md 対応を反映。",
@@ -377,8 +401,8 @@ const entries: PageEntry[] = [
     slug: "/copilot/markdown-file-guide",
     title: "Markdown Guide",
     group: "Providers",
-    category: "Copilot",
-    provider: "copilot",
+    category: "Microsoft",
+    provider: "microsoft",
     topics: ["guide"],
     summary:
       "copilot-instructions.md / .instructions.md / .prompt.md / .chatmode.md / .agent.md / AGENTS.md / SKILL.md / MCP / Plan Mode — Copilotの全カスタマイズファイル・新機能を根拠ソース付きで徹底解説。Copilot code review の AGENTS.md 対応（2026-06-18）・Cloud agent GA を反映。",
@@ -389,8 +413,8 @@ const entries: PageEntry[] = [
     slug: "/copilot/skill",
     title: "Skill",
     group: "Providers",
-    category: "Copilot",
-    provider: "copilot",
+    category: "Microsoft",
+    provider: "microsoft",
     topics: ["skill"],
     summary:
       "GitHub Copilot Coding Agent / VS Code Agent Mode / Copilot CLI 対応の SKILL.md ガイド。フロントマター完全仕様・Progressive Disclosure 3段階ローディング・ステップバイステップ作成・実践テンプレート集・トラブルシューティングを 2026年6月最新版の公式ドキュメント根拠付きで徹底解説。Copilot code review は AGENTS.md 対応（2026-06-18）、Cloud agent は GA。",
@@ -636,6 +660,34 @@ const entries: PageEntry[] = [
     lastReviewed: "2026-07-22",
   },
   {
+    slug: "/infra/microsoft-foundry-best-practices-guide",
+    title: "Microsoft Foundry 活用ガイド",
+    description:
+      "Microsoft Foundry（旧Azure AI Studio/Azure AI Foundry）を用いたAIアプリ・エージェント開発のステップバイステップ・ベストプラクティスガイド。",
+    group: "Providers",
+    category: "Microsoft",
+    provider: "microsoft",
+    topics: ["foundry", "azure", "infra", "rag", "agent", "guardrails"],
+    summary:
+      "Microsoft Foundry（旧Azure AI Studio/Azure AI Foundry）を用いたAIアプリ・エージェント開発のステップバイステップ・ベストプラクティスガイド。",
+    addedAt: "2026-07-31",
+    lastReviewed: "2026-07-31",
+  },
+  {
+    slug: "/infra/microsoft-foundry-best-practices-intermediate",
+    title: "Microsoft Foundry 実践ベストプラクティスガイド",
+    description:
+      "Microsoft Foundry（旧Azure AI Studio/Azure AI Foundry）の Agent Service・Hosted Agent・Foundry Local・Foundry IQ を含む中級・実践向けアーキテクチャと運用ベストプラクティスガイド。",
+    group: "Providers",
+    category: "Microsoft",
+    provider: "microsoft",
+    topics: ["foundry", "azure", "infra", "agent", "hosted-agent", "foundry-local", "meai"],
+    summary:
+      "Foundry Agent Service、Hosted Agent、Foundry Local、Foundry IQ などを活用したエンタープライズ AI エージェント開発・アクセスの設計と運用の実践ガイド。",
+    addedAt: "2026-07-31",
+    lastReviewed: "2026-07-31",
+  },
+  {
     slug: "/llm-ops/evaluation-observability",
     title: "Evaluation & Observability",
     group: "運用・品質",
@@ -787,6 +839,18 @@ const entries: PageEntry[] = [
       "信頼できないコードをミリ秒単位で安全に実行できる Linux マイクロVM。初学者でもわかるステップバイステップ解説＋ベストプラクティス付き。",
     addedAt: "2026-06-16",
     lastReviewed: "2026-07-01",
+  },
+  {
+    slug: "/vercel/eve-beginner-guide",
+    title: "Vercel eve 完全ガイド ― 初学者のためのステップバイステップ・ベストプラクティス",
+    description:
+      "「エージェントはディレクトリである」という思想のもと、永続実行・サンドボックス・承認フロー・可観測性を標準搭載したVercelのオープンソース・エージェントフレームワーク eve の完全解説ガイド。",
+    group: "Agent 開発",
+    topics: ["agent", "vercel", "eve", "workflow", "sandbox"],
+    summary:
+      "Vercel の OSS エージェントフレームワーク eve を、永続実行・サンドボックス・承認フロー・可観測性の観点で初学者向けに解説する。",
+    addedAt: "2026-07-31",
+    lastReviewed: "2026-07-31",
   },
   {
     slug: "/claude/tag-best-practices",
