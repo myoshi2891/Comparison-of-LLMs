@@ -1,0 +1,1694 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      OpenAI Codexにおけるハーネスエンジニアリング実践ガイド | ハーネスエンジニアリング実践ガイド
+    </title>
+    <style>
+      :root {
+        --bg: #07111e;
+        --bg-panel: #0c1a2e;
+        --bg-card: #0e1f36;
+        --border: #1c2e46;
+        --text: #e7ecf5;
+        --text-dim: #9fb0c9;
+        --text-faint: #6c7d97;
+        --accent: #7c9eff;
+        --accent-soft: rgba(124, 158, 255, 0.14);
+        --accent-2: #5ee6c4;
+        --sidebar-w: 300px;
+        --font-sans:
+          'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'Noto Sans JP', 'Yu Gothic UI', system-ui,
+          -apple-system, 'Segoe UI', Roboto, sans-serif;
+        --font-mono:
+          ui-monospace, 'SFMono-Regular', 'Menlo', 'Consolas', 'Liberation Mono', monospace;
+        --layer1: #7c9eff;
+        --layer2: #5ee6c4;
+        --layer3: #f2c94c;
+        --layer4: #f2789a;
+        --layer5: #b39ddb;
+        --layer6: #56ccf2;
+        --layer7: #ff8a65;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        overflow-x: hidden;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--font-sans);
+        font-size: 16px;
+        line-height: 1.85;
+        -webkit-font-smoothing: antialiased;
+        position: relative;
+      }
+      a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+
+      /* ---------- Top gradient accent bar ---------- */
+      .top-bar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(
+          90deg,
+          var(--layer1),
+          var(--layer2),
+          var(--layer3),
+          var(--layer4),
+          var(--layer5),
+          var(--layer6),
+          var(--layer7)
+        );
+        z-index: 80;
+      }
+
+      /* ---------- Decorative background glow ---------- */
+      .bg-glow {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+        overflow: hidden;
+      }
+      .bg-glow::before,
+      .bg-glow::after {
+        content: '';
+        position: absolute;
+        width: 640px;
+        height: 640px;
+        border-radius: 50%;
+        filter: blur(120px);
+        opacity: 0.16;
+      }
+      .bg-glow::before {
+        top: -220px;
+        left: calc(var(--sidebar-w) + 60px);
+        background: var(--accent);
+      }
+      .bg-glow::after {
+        top: 900px;
+        right: -200px;
+        background: var(--accent-2);
+        opacity: 0.1;
+      }
+
+      /* ---------- Layout ---------- */
+      .layout {
+        display: block;
+        position: relative;
+        z-index: 1;
+      }
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: var(--sidebar-w);
+        background: var(--bg-panel);
+        border-right: 1px solid var(--border);
+        overflow-y: auto;
+        padding: 32px 22px 40px;
+        z-index: 40;
+      }
+      .sidebar .brand {
+        font-size: 0.78rem;
+        letter-spacing: 0.08em;
+        color: var(--accent);
+        text-transform: uppercase;
+        margin-bottom: 6px;
+        font-weight: 700;
+      }
+      .sidebar .brand-sub {
+        font-size: 0.82rem;
+        color: var(--text-faint);
+        margin-bottom: 26px;
+        line-height: 1.6;
+      }
+      .sidebar nav ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+      .sidebar nav li {
+        margin-bottom: 2px;
+      }
+      .sidebar nav a {
+        display: block;
+        padding: 9px 12px;
+        border-radius: 8px;
+        color: var(--text-dim);
+        font-size: 0.92rem;
+        line-height: 1.5;
+        border-left: 2px solid transparent;
+        transition:
+          background 0.15s ease,
+          color 0.15s ease,
+          border-color 0.15s ease;
+      }
+      .sidebar nav a:hover {
+        background: var(--accent-soft);
+        color: var(--text);
+        text-decoration: none;
+      }
+      .sidebar nav a.active {
+        background: var(--accent-soft);
+        color: var(--accent);
+        border-left-color: var(--accent);
+        font-weight: 600;
+      }
+
+      .menu-toggle {
+        display: none;
+        position: fixed;
+        top: 18px;
+        left: 14px;
+        z-index: 60;
+        width: 42px;
+        height: 42px;
+        border-radius: 10px;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        color: var(--text);
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        cursor: pointer;
+      }
+      .sidebar-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(3, 8, 16, 0.6);
+        z-index: 35;
+      }
+
+      .main {
+        margin-left: var(--sidebar-w);
+        padding: 60px 64px 100px;
+        position: relative;
+        z-index: 1;
+      }
+
+      /* ---------- Hero ---------- */
+      .hero {
+        margin-bottom: 48px;
+        padding-bottom: 34px;
+        border-bottom: 1px solid var(--border);
+        position: relative;
+      }
+      .hero .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--accent-2);
+        font-size: 0.85rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        font-weight: 700;
+        margin-bottom: 16px;
+      }
+      .hero .eyebrow::before {
+        content: '';
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--accent-2);
+        box-shadow: 0 0 12px var(--accent-2);
+      }
+      .hero h1 {
+        font-size: 2.35rem;
+        line-height: 1.4;
+        margin: 0 0 16px;
+        color: #fff;
+        font-weight: 800;
+        letter-spacing: -0.01em;
+      }
+      .hero .subtitle {
+        font-size: 1.2rem;
+        color: var(--text-dim);
+        margin: 0 0 20px;
+        font-weight: 500;
+      }
+      .hero .meta {
+        font-size: 0.88rem;
+        color: var(--text-faint);
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px 18px;
+      }
+
+      /* ---------- Quick-nav (7-layer model) ---------- */
+      .quicknav-wrap {
+        margin: 52px 0 56px;
+      }
+      .quicknav-kicker {
+        font-size: 0.82rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        font-weight: 700;
+        color: var(--text-faint);
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .quicknav-kicker::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: var(--border);
+      }
+      .quicknav-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 14px;
+      }
+      .quicknav-card {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-top: 3px solid var(--layer-color, var(--accent));
+        border-radius: 12px;
+        padding: 18px 18px 20px;
+        min-width: 0;
+        color: var(--text);
+        text-decoration: none;
+        transition:
+          transform 0.18s ease,
+          box-shadow 0.18s ease,
+          border-color 0.18s ease;
+      }
+      .quicknav-card:hover {
+        text-decoration: none;
+        transform: translateY(-4px);
+        box-shadow:
+          0 14px 28px -12px rgba(0, 0, 0, 0.55),
+          0 0 0 1px var(--layer-color, var(--accent)) inset;
+      }
+      .quicknav-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 34px;
+        height: 26px;
+        border-radius: 7px;
+        background: color-mix(in srgb, var(--layer-color, var(--accent)) 18%, transparent);
+        color: var(--layer-color, var(--accent));
+        font-weight: 800;
+        font-size: 0.8rem;
+        letter-spacing: 0.02em;
+      }
+      .quicknav-title {
+        font-weight: 700;
+        font-size: 0.98rem;
+        color: #fff;
+        line-height: 1.45;
+      }
+      .quicknav-desc {
+        font-size: 0.83rem;
+        color: var(--text-dim);
+        line-height: 1.6;
+      }
+
+      /* ---------- Prose ---------- */
+      .prose {
+        width: 100%;
+      }
+      .prose h2 {
+        display: flex;
+        align-items: baseline;
+        gap: 16px;
+        font-size: 1.55rem;
+        color: #fff;
+        margin: 64px 0 22px;
+        padding-top: 10px;
+        font-weight: 800;
+        scroll-margin-top: 24px;
+        border-top: 1px solid var(--border);
+      }
+      .prose h2:first-of-type {
+        margin-top: 0;
+        border-top: none;
+        padding-top: 0;
+      }
+      .h2-badge {
+        flex: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        background: var(--accent-soft);
+        color: var(--accent);
+        font-size: 1.05rem;
+        font-weight: 800;
+      }
+      .h2-text {
+        line-height: 1.4;
+      }
+
+      .prose h3 {
+        font-size: 1.15rem;
+        color: var(--accent);
+        margin: 36px 0 14px;
+        font-weight: 700;
+        scroll-margin-top: 24px;
+      }
+      .prose h3.layer-1,
+      .prose h3.layer-2,
+      .prose h3.layer-3,
+      .prose h3.layer-4,
+      .prose h3.layer-5,
+      .prose h3.layer-6,
+      .prose h3.layer-7 {
+        color: var(--layer-color);
+        border-left: 3px solid var(--layer-color);
+        padding-left: 12px;
+      }
+      .prose p {
+        margin: 0 0 18px;
+        color: var(--text);
+      }
+      .prose ul,
+      .prose ol {
+        margin: 0 0 18px;
+        padding-left: 1.5em;
+      }
+      .prose li {
+        margin-bottom: 8px;
+      }
+      .prose hr {
+        border: none;
+        border-top: 1px solid var(--border);
+        margin: 44px 0;
+      }
+      .prose strong {
+        color: #fff;
+      }
+
+      .prose p.callout {
+        background: linear-gradient(135deg, var(--accent-soft), transparent);
+        border: 1px solid var(--border);
+        border-left: 3px solid var(--accent);
+        border-radius: 10px;
+        padding: 18px 22px;
+        margin: 26px 0 26px;
+        font-size: 1.02rem;
+        color: var(--text);
+      }
+
+      code:not(pre code) {
+        font-family: var(--font-mono);
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        padding: 0.1em 0.4em;
+        border-radius: 5px;
+        font-size: 0.9em;
+        color: var(--accent-2);
+        overflow-wrap: break-word;
+        word-break: break-word;
+      }
+
+      /* ---------- Mermaid ---------- */
+      pre.mermaid {
+        width: 100%;
+        display: flex;
+        justify-content: safe center;
+        overflow-x: auto;
+        margin: 30px 0 32px;
+        background: var(--bg-panel);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 26px 18px;
+        position: relative;
+        box-shadow: 0 18px 40px -24px rgba(0, 0, 0, 0.6);
+      }
+      pre.mermaid svg .node rect,
+      pre.mermaid svg .node polygon {
+        rx: 6px;
+      }
+
+      /* ---------- Tables ---------- */
+      .table-scroll {
+        width: 100%;
+        overflow-x: auto;
+        margin: 26px 0 32px;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        min-width: 560px;
+        font-size: 0.92rem;
+      }
+      th,
+      td {
+        padding: 12px 16px;
+        text-align: left;
+        border-bottom: 1px solid var(--border);
+        overflow-wrap: break-word;
+        word-break: break-word;
+        vertical-align: top;
+      }
+      thead th {
+        background: var(--bg-panel);
+        color: var(--accent);
+        font-weight: 700;
+        white-space: nowrap;
+      }
+      tbody tr:hover {
+        background: rgba(124, 158, 255, 0.05);
+      }
+      tbody tr:last-child td {
+        border-bottom: none;
+      }
+
+      /* ---------- Reference cards ---------- */
+      .ref-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+        margin: 26px 0 10px;
+      }
+      .ref-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 20px 22px;
+        min-width: 0;
+        overflow-wrap: break-word;
+        word-break: break-word;
+        transition:
+          transform 0.18s ease,
+          box-shadow 0.18s ease;
+      }
+      .ref-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 14px 28px -16px rgba(0, 0, 0, 0.55);
+      }
+      .ref-card h3 {
+        margin-top: 0;
+        border: none;
+        padding-left: 0;
+      }
+      .ref-card ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+      .ref-card li {
+        margin-bottom: 12px;
+        font-size: 0.88rem;
+        color: var(--text-dim);
+        line-height: 1.6;
+      }
+      .ref-card li:last-child {
+        margin-bottom: 0;
+      }
+      .ref-card a {
+        color: var(--accent);
+        word-break: break-all;
+      }
+      .ref-card a:hover {
+        color: var(--accent-2);
+      }
+
+      footer.page-footer {
+        margin-top: 64px;
+        padding-top: 26px;
+        border-top: 1px solid var(--border);
+        color: var(--text-faint);
+        font-size: 0.82rem;
+      }
+
+      /* ---------- Mobile ---------- */
+      @media (max-width: 900px) {
+        .menu-toggle {
+          display: flex;
+        }
+        .sidebar {
+          transform: translateX(-100%);
+          transition: transform 0.2s ease;
+          box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
+        }
+        .sidebar.open {
+          transform: translateX(0);
+        }
+        .sidebar-overlay.open {
+          display: block;
+        }
+        .main {
+          margin-left: 0;
+          padding: 84px 20px 70px;
+        }
+        .hero h1 {
+          font-size: 1.55rem;
+        }
+        .hero .subtitle {
+          font-size: 1rem;
+        }
+        .quicknav-grid {
+          grid-template-columns: 1fr;
+        }
+        .ref-grid {
+          grid-template-columns: 1fr;
+        }
+        .prose h2 {
+          flex-wrap: wrap;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="top-bar"></div>
+    <div class="bg-glow"></div>
+    <button class="menu-toggle" id="menuToggle" aria-label="メニューを開く">☰</button>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <div class="layout">
+      <aside class="sidebar" id="sidebar">
+        <div class="brand">OpenAI Codex Guide</div>
+        <div class="brand-sub">ハーネスエンジニアリング実践ガイド — 評価基盤編</div>
+        <nav>
+          <ul>
+            <li>
+              <a
+                href="#1-はじめに--なぜ評価基盤がハーネスエンジニアリングの核心なのか"
+                class="active"
+                >1. はじめに — なぜ「評価基盤」がハーネスエンジニアリングの核心なのか</a
+              >
+            </li>
+            <li>
+              <a href="#2-ハーネスエンジニアリングとは何か">2. ハーネスエンジニアリングとは何か</a>
+            </li>
+            <li>
+              <a href="#3-なぜ評価が継続的でなければならないのか"
+                >3. なぜ評価が「継続的」でなければならないのか</a
+              >
+            </li>
+            <li>
+              <a href="#4-評価基盤の7層モデル--詳細解説">4. 評価基盤の7層モデル — 詳細解説</a>
+            </li>
+            <li>
+              <a href="#5-ステップバイステップ実装ガイド">5. ステップバイステップ実装ガイド</a>
+            </li>
+            <li><a href="#6-ハーネス成熟度チェックリスト">6. ハーネス成熟度チェックリスト</a></li>
+            <li><a href="#7-アンチパターン">7. アンチパターン</a></li>
+            <li><a href="#8-まとめ">8. まとめ</a></li>
+            <li><a href="#9-参考文献">9. 参考文献</a></li>
+          </ul>
+        </nav>
+      </aside>
+
+      <main class="main">
+        <div class="hero">
+          <div class="eyebrow">Harness Engineering &middot; Evaluation Infrastructure</div>
+          <h1>OpenAI Codexにおけるハーネスエンジニアリング実践ガイド</h1>
+          <p class="subtitle">AIエージェントの品質を自動・継続的に測定する評価基盤の設計</p>
+          <p class="meta">
+            <span
+              >対象読者: Codex CLI / Codex cloud
+              を用いたエージェント駆動開発に取り組む中級〜上級エンジニア</span
+            >
+            <span>2026年7月29日時点の情報に基づく</span>
+          </p>
+        </div>
+
+        <article class="prose">
+          <p>
+            対象読者: Codex CLI / Codex cloud
+            を用いたエージェント駆動開発に取り組む中級〜上級エンジニア
+          </p>
+          <hr />
+          <h2 id="1-はじめに--なぜ評価基盤がハーネスエンジニアリングの核心なのか">
+            <span class="h2-badge">1</span
+            ><span class="h2-text"
+              >はじめに — なぜ「評価基盤」がハーネスエンジニアリングの核心なのか</span
+            >
+          </h2>
+          <p>
+            2026年2月、OpenAIはエンジニアリングブログで「Harness engineering: leveraging Codex in an
+            agent-first world」という記事を公開した。著者はOpenAIのRyan
+            Lopopolo氏で、3人のエンジニアチームが5ヶ月間、<strong>人間が一行もコードを書かずに</strong>約100万行・1,500件のマージ済みプルリクエストからなる本番プロダクトを構築した実験の報告である。
+          </p>
+          <p>
+            この実験が示した最大の教訓は、エージェントの能力そのものよりも「エージェントを取り巻く環境設計」が開発速度と品質を決定づけるという点にある。人間エンジニアの役割は「コードを書くこと」から「環境を設計し、意図を仕様化し、フィードバックループを構築すること」へ移行した。この環境設計とフィードバックループの総体こそが「ハーネス」であり、それを専門的に設計・運用する営みが「ハーネスエンジニアリング」と呼ばれる。
+          </p>
+          <p class="callout">
+            そして、エージェントのスループットが人間のレビュー能力を軽々と超えていく状況では、<strong>「良し悪しをどう機械的・継続的に判定するか」という評価基盤こそがハーネスの生命線になる</strong>。人間が全PRを読んでレビューするモデルは、1エンジニアあたり1日3.5件のPRが生成される環境ではそもそも成立しない。したがって、ハーネスエンジニアリングの実務は、突き詰めれば「エージェントの出力品質を自動的・継続的に測定し、悪化を検知し、改善サイクルへ差し戻す仕組み」を組み立てる作業に等しい。本ガイドはこの評価基盤の部分に焦点を絞り、OpenAI
+            Codexというプラットフォーム上でそれをどう実装するかをステップバイステップで解説する。
+          </p>
+          <hr />
+          <h2 id="2-ハーネスエンジニアリングとは何か">
+            <span class="h2-badge">2</span
+            ><span class="h2-text">ハーネスエンジニアリングとは何か</span>
+          </h2>
+          <h3 id="21-コンテキストエンジニアリングとの違い">
+            2.1 コンテキストエンジニアリングとの違い
+          </h3>
+          <p>
+            「コンテキストエンジニアリング」が問う問いは「エージェントに何を見せるべきか」であるのに対し、「ハーネスエンジニアリング」が問う問いは「システムは何を防ぎ、何を測定し、何を修正すべきか」である。前者がインプット側の設計だとすれば、後者はアウトプットの検証・強制・フィードバックの設計だと言える。
+          </p>
+          <p>両者は排他的ではなく、実際には積層する関係にある。</p>
+          <pre class="mermaid">
+flowchart TB
+    A["Layer 1: セッション内自己検証&lt;br/&gt;(Ralph Wiggum Loop)"] --&gt; B["Layer 2: リポジトリの&lt;br/&gt;メカニカル強制"]
+    B --&gt; C["Layer 3: ランタイム&lt;br/&gt;オブザーバビリティ検証"]
+    C --&gt; D["Layer 4: CI/CD 非対話型&lt;br/&gt;品質ゲート (codex exec)"]
+    D --&gt; E["Layer 5: プラットフォーム Evals&lt;br/&gt;(Traces→Graders→Datasets)"]
+    E --&gt; F["Layer 6: 外部標準ベンチマーク&lt;br/&gt;(SWE-bench / Terminal-Bench)"]
+    F --&gt; G["Layer 7: 継続的セキュリティ評価&lt;br/&gt;(Codex Security CLI)"]</pre
+          >
+          <p>
+            この7層モデルは、評価がかかる範囲の「近さ」で並べたものである。Layer
+            1はエージェント自身がその場で行う自己採点、Layer
+            7は業界全体で共有される外部標準に基づく評価であり、下に行くほど客観性は増すがフィードバックは遅くなる。優れたハーネスは、この全レイヤーを同時に運用し、速いフィードバック(Layer
+            1〜2)で日々の逸脱を潰しながら、遅いフィードバック(Layer
+            5〜7)で長期的な方向性を検証する。
+          </p>
+          <h3 id="22-openaiの実証実験が示した構造">2.2 OpenAIの実証実験が示した構造</h3>
+          <p>
+            Ryan
+            Lopopolo氏の報告によれば、2025年8月末に空のGitリポジトリへの最初のコミットが行われ、リポジトリ構造・CI設定・フォーマットルール・パッケージマネージャ設定・アプリケーションフレームワークに至るまで、初期スキャフォールド自体がCodex
+            CLI(GPT-5使用)によって生成された。5ヶ月後、リポジトリは約100万行規模となり、3人だったチームは7人に拡大したが、1人あたりのPRスループットはむしろ増加した。同記事はこの体制を「Humans
+            steer. Agents execute.」という一言で要約している。
+          </p>
+          <p>
+            重要なのは、エージェントが生成した成果物には「プロダクトコードとテスト」だけでなく、「CI設定とリリースツール」「内部開発者ツール」「ドキュメントと設計履歴」、そして本ガイドの主題である評価ハーネス(Evaluation
+            harnesses)自体が含まれていたと明記されている点である。つまりOpenAI自身の実験においても、評価基盤はエージェントが自ら構築・改良する対象として扱われていた。
+          </p>
+          <p>
+            参考:
+            <a href="https://openai.com/index/harness-engineering/"
+              >Harness engineering: leveraging Codex in an agent-first world (openai.com)</a
+            >
+          </p>
+          <hr />
+          <h2 id="3-なぜ評価が継続的でなければならないのか">
+            <span class="h2-badge">3</span
+            ><span class="h2-text">なぜ評価が「継続的」でなければならないのか</span>
+          </h2>
+          <h3 id="31-スループット増大とヒューマンqaのボトルネック化">
+            3.1 スループット増大とヒューマンQAのボトルネック化
+          </h3>
+          <p>
+            コード生成のスループットが増えるほど、ボトルネックは「コードを書く速度」から「品質を確認する速度」へ移動する。OpenAIの実験では、これに対応するためにアプリケーションのUI・ログ・メトリクス自体をCodexが直接読み書きできる形にする「アプリケーションの可読化(legibility)」が進められた。git
+            worktreeごとにアプリを起動できるようにし、Chrome DevTools
+            ProtocolをエージェントランタイムにMCP経由で組み込むことで、Codexはバグを再現し、修正を検証し、UI挙動を自ら推論できるようになった。
+          </p>
+          <h3 id="32-エントロピーは自然に増大する">3.2 エントロピーは自然に増大する</h3>
+          <p class="callout">
+            エージェントは既存パターンを模倣するため、リポジトリ内に不揃いな実装や最適でないパターンが一度でも紛れ込むと、それが複製され続けドリフトが蓄積する。OpenAIのチームは当初、毎週金曜日(稼働時間の20%)を「AIスロップ」の手作業クリーンアップに費やしていたが、これはスケールしないことが早々に判明した。最終的な解は「golden
+            principles」と呼ぶ機械的なルール群をリポジトリに直接エンコードし、定期的なクリーンアップエージェントが逸脱をスキャンして品質グレードを更新し、的を絞ったリファクタリングPRを開くという、継続的な「ガベージコレクション」に相当する仕組みだった。技術的負債は複利で膨らむ高利子の借金に似ており、少しずつ返済し続ける方が、溜め込んで痛みを伴う形で一括処理するより常に有利だという整理である。
+          </p>
+          <p>
+            この「継続的に少しずつ検出・修正する」設計思想こそが、次章で扱う評価基盤の各レイヤーに共通する原則である。
+          </p>
+          <hr />
+          <div class="quicknav-wrap">
+            <div class="quicknav-kicker">評価基盤の7層モデル — クイックナビゲーション</div>
+            <div class="quicknav-grid">
+              <a
+                class="quicknav-card"
+                href="#41-layer-1-セッション内自己検証ループralph-wiggum-loop"
+                style="--layer-color: #7c9eff"
+                ><span class="quicknav-badge">L1</span
+                ><span class="quicknav-title">セッション内自己検証ループ(Ralph Wiggum Loop)</span
+                ><span class="quicknav-desc"
+                  >エージェント自身がその場で行う自己レビュー。最速だが最も主観的なフィードバック。</span
+                ></a
+              ><a
+                class="quicknav-card"
+                href="#42-layer-2-リポジトリレベルのメカニカル強制"
+                style="--layer-color: #5ee6c4"
+                ><span class="quicknav-badge">L2</span
+                ><span class="quicknav-title">リポジトリレベルのメカニカル強制</span
+                ><span class="quicknav-desc"
+                  >Linter・構造テスト・QUALITY_SCORE.mdでリポジトリの構造そのものを強制する。</span
+                ></a
+              ><a
+                class="quicknav-card"
+                href="#43-layer-3-ランタイムオブザーバビリティによる実行時検証"
+                style="--layer-color: #f2c94c"
+                ><span class="quicknav-badge">L3</span
+                ><span class="quicknav-title">ランタイム・オブザーバビリティによる実行時検証</span
+                ><span class="quicknav-desc"
+                  >Vector→Victoria Logs/Metrics/TracesでCodex自身が実行時の挙動を検証する。</span
+                ></a
+              ><a
+                class="quicknav-card"
+                href="#44-layer-4-cicdにおける非対話型品質ゲートcodex-exec"
+                style="--layer-color: #f2789a"
+                ><span class="quicknav-badge">L4</span
+                ><span class="quicknav-title">CI/CDにおける非対話型品質ゲート(codex exec)</span
+                ><span class="quicknav-desc"
+                  >codex exec --output-schemaでPRごとに構造化された合否判定を返す。</span
+                ></a
+              ><a
+                class="quicknav-card"
+                href="#45-layer-5-プラットフォームevals--tracesgradersdatasetseval-runsのフライホイール"
+                style="--layer-color: #b39ddb"
+                ><span class="quicknav-badge">L5</span
+                ><span class="quicknav-title"
+                  >プラットフォームEvals — Traces・Graders・Datasets・Eval
+                  Runsのフライホイール</span
+                ><span class="quicknav-desc"
+                  >Traces→Graders→Datasets→Eval
+                  Runsのフライホイールで継続的にベンチマークする。</span
+                ></a
+              ><a
+                class="quicknav-card"
+                href="#46-layer-6-外部標準ベンチマーク--swe-bench-verifiedとterminal-bench-20--harbor"
+                style="--layer-color: #56ccf2"
+                ><span class="quicknav-badge">L6</span
+                ><span class="quicknav-title"
+                  >外部標準ベンチマーク — SWE-bench VerifiedとTerminal-Bench 2.0 / Harbor</span
+                ><span class="quicknav-desc"
+                  >SWE-Bench VerifiedやTerminal-Bench 2.0で業界標準に対する立ち位置を測る。</span
+                ></a
+              ><a
+                class="quicknav-card"
+                href="#47-layer-7-継続的セキュリティ評価codex-security-cli"
+                style="--layer-color: #ff8a65"
+                ><span class="quicknav-badge">L7</span
+                ><span class="quicknav-title">継続的セキュリティ評価(Codex Security CLI)</span
+                ><span class="quicknav-desc"
+                  >Codex Security CLIによる継続的な脆弱性スキャンとSARIF連携。</span
+                ></a
+              >
+            </div>
+          </div>
+          <h2 id="4-評価基盤の7層モデル--詳細解説">
+            <span class="h2-badge">4</span
+            ><span class="h2-text">評価基盤の7層モデル — 詳細解説</span>
+          </h2>
+          <h3
+            class="layer-1"
+            id="41-layer-1-セッション内自己検証ループralph-wiggum-loop"
+            style="--layer-color: #7c9eff"
+          >
+            4.1 Layer 1: セッション内自己検証ループ(Ralph Wiggum Loop)
+          </h3>
+          <p>
+            もっとも速いフィードバックは、エージェント自身がその場で行う自己レビューである。OpenAIのハーネスでは、Codexに対して「自分の変更をローカルでレビューし、ローカル/クラウド双方で追加のエージェントレビューを要求し、人間またはエージェントからのフィードバックに対応し、すべてのレビュアーが満足するまでループする」ことを指示している。この反復パターンは、Geoffrey
+            Huntley氏が命名した「Ralph Wiggum Loop」(単純な
+            <code>while :; do cat PROMPT.md | agent; done</code>
+            型のループ)の一種として、OpenAIの記事内でも明示的に言及されている。
+          </p>
+          <pre class="mermaid">
+sequenceDiagram
+    participant Eng as エンジニア
+    participant Codex as Codexエージェント
+    participant Local as ローカル自己レビュー
+    participant Cloud as クラウドエージェントレビュー
+    participant PR as プルリクエスト
+
+    Eng-&gt;&gt;Codex: タスクをプロンプトで指示
+    Codex-&gt;&gt;Codex: 変更を実装
+    Codex-&gt;&gt;Local: 自分の変更をローカルでレビュー依頼
+    Local--&gt;&gt;Codex: フィードバックを返却
+    Codex-&gt;&gt;Cloud: 追加のエージェントレビューを要求
+    Cloud--&gt;&gt;Codex: 指摘事項を返却
+    Codex-&gt;&gt;Codex: フィードバックへ対応し修正
+    Codex-&gt;&gt;PR: 全レビュアーが満足するまでループ後PRを作成
+    PR--&gt;&gt;Eng: 人間レビューは任意(必須ではない)</pre
+          >
+          <p>
+            このレイヤーの評価基準は、人間が書いた固定チェックリストではなく、Codex自身が読み書きできる
+            <code>gh</code>
+            コマンド・ローカルスクリプト・リポジトリ埋め込みのSkillといった標準開発ツールを介して動的に決まる。人間がCLIへコピー&amp;ペーストして文脈を渡す必要がない点が要である。
+          </p>
+          <h3
+            class="layer-2"
+            id="42-layer-2-リポジトリレベルのメカニカル強制"
+            style="--layer-color: #5ee6c4"
+          >
+            4.2 Layer 2: リポジトリレベルのメカニカル強制
+          </h3>
+          <p>
+            Layer 1は「本人任せ」の評価だが、Layer
+            2は「構造そのものが逸脱を許さない」設計である。OpenAIのハーネスでは、各ビジネスドメインを固定の層(Types
+            → Config → Repo → Providers → Service → Runtime →
+            UI)に分割し、依存方向を厳格に制限している。横断的関心事(認証・コネクタ・テレメトリ・フィーチャーフラグ)は「Providers」という単一の明示的インターフェースを通じてのみ入り込める。
+          </p>
+          <pre class="mermaid">
+flowchart LR
+    Types["Types"] --&gt; Config["Config"]
+    Config --&gt; Repo["Repo"]
+    Repo --&gt; Service["Service"]
+    Utils["Utils"] --&gt; Providers["Providers"]
+    Providers --&gt; Service
+    Service --&gt; Runtime["Runtime"]
+    Runtime --&gt; UI["UI"]</pre
+          >
+          <p>
+            この依存方向は人間のレビューではなく、Codex自身が生成したカスタムLinterと構造テストによって機械的に強制される。構造化ロギングやスキーマ・型の命名規則、ファイルサイズ上限、プラットフォーム固有の信頼性要件も同様にカスタムLintでチェックされる。Lintのエラーメッセージには、その場でエージェントへ是正手順を注入できるよう、修復手順そのものが埋め込まれている点が実務上のポイントである。
+          </p>
+          <p>
+            さらに、リポジトリの <code>docs/</code> ディレクトリには
+            <code>QUALITY_SCORE.md</code>
+            のような「各プロダクトドメイン・各アーキテクチャ層を採点し、経時的なギャップを追跡する」文書が置かれ、これ自体がエージェントによって定期的に更新される。加えて「doc-gardening」エージェントが、実際のコード挙動と乖離した古いドキュメントをスキャンし、修正PRを自動的に開く。これらは、コードそのものではなく「リポジトリの整合性・鮮度」を継続測定する評価基盤の一形態である。
+          </p>
+          <p>
+            参考:
+            <a href="https://openai.com/index/harness-engineering/"
+              >Harness engineering: leveraging Codex in an agent-first world (openai.com)</a
+            >
+            /
+            <a href="https://cookbook.openai.com/articles/codex_exec_plans"
+              >Using PLANS.md for multi-hour problem solving (OpenAI Cookbook)</a
+            >
+          </p>
+          <h3
+            class="layer-3"
+            id="43-layer-3-ランタイムオブザーバビリティによる実行時検証"
+            style="--layer-color: #f2c94c"
+          >
+            4.3 Layer 3: ランタイム・オブザーバビリティによる実行時検証
+          </h3>
+          <p>
+            静的な構造チェックだけでは「動くかどうか」は分からない。OpenAIのハーネスは、ログ・メトリクス・トレースをVectorで収集し、Victoria
+            Logs / Victoria Metrics / Victoria
+            Tracesへファンアウトするローカル観測可能性スタックを、git
+            worktreeごとにエフェメラルに立ち上げている。Codexはこれを LogQL・PromQL・TraceQL
+            で問い合わせ、相関分析を行った上で修正を実装し、アプリを再起動して同じワークロードやUIシナリオを再実行するというループを回す。
+          </p>
+          <pre class="mermaid">
+flowchart LR
+    App["アプリ (worktreeごとに起動)"] --&gt;|"ログ/メトリクス/トレース"| Vector["Vector"]
+    Vector --&gt; Logs["Victoria Logs (LogQL)"]
+    Vector --&gt; Metrics["Victoria Metrics (PromQL)"]
+    Vector --&gt; Traces["Victoria Traces (TraceQL)"]
+    Logs --&gt; Codex["Codexが問い合わせ・相関分析"]
+    Metrics --&gt; Codex
+    Traces --&gt; Codex
+    Codex --&gt; Fix["修正を実装"]
+    Fix --&gt; Restart["アプリを再起動"]
+    Restart --&gt; Rerun["ワークロード/UIシナリオを再実行"]
+    Rerun --&gt; App</pre
+          >
+          <p>
+            このレイヤーによって、「サービス起動を800ミリ秒未満で完了させる」「4つの重要なユーザージャーニーのどのスパンも2秒を超えない」といった、これまで自然言語では扱いにくかった性能要件がCodexにとって実行可能なタスクになる。あわせて、Chrome
+            DevTools
+            Protocolをランタイムに組み込み、DOMスナップショット・スクリーンショット・ナビゲーションを扱うSkillを用意することで、Codexはブラウザ操作を伴うUIバグの再現・修正検証も自律的に行えるようになる。単一のCodex実行が(人間が眠っている間に)6時間以上にわたり1つのタスクへ取り組み続けるケースも珍しくないという。
+          </p>
+          <h3
+            class="layer-4"
+            id="44-layer-4-cicdにおける非対話型品質ゲートcodex-exec"
+            style="--layer-color: #f2789a"
+          >
+            4.4 Layer 4: CI/CDにおける非対話型品質ゲート(codex exec)
+          </h3>
+          <p>
+            ここからは、エージェントの実行そのものを人間の監督なしにパイプライン化するレイヤーである。Codex
+            CLIには
+            <code>codex exec</code>
+            という非対話モードが用意されており、対話TUIを開かずにスクリプトやCIジョブから起動できる。実行結果は終了コードで成否を判定でき、<code
+              >--json</code
+            >
+            フラグで各イベント(コマンド実行・ファイル変更・エージェントメッセージ)を構造化されたJSONLストリームとして取得できるため、下流ツールでの機械的な判定に使いやすい。
+          </p>
+          <p>
+            さらに <code>--output-schema</code> を指定すると、最終出力をJSON
+            Schemaに準拠させることができる。たとえばPRレビューを「severity(重大度)」「issues(配列)」「summary(要約)」を持つ構造で返させれば、<code
+              >jq</code
+            >
+            や後続のGitHub PRコメント投稿ツールへそのまま渡せる、採点可能なデータになる。
+          </p>
+          <pre class="mermaid">
+flowchart TB
+    PR["プルリクエスト作成/更新"] --&gt; Action["openai/codex-action (GitHub Action)"]
+    Action --&gt; Exec["codex exec --sandbox read-only --output-schema"]
+    Exec --&gt; Schema["JSON Schema準拠の構造化出力&lt;br/&gt;(severity / issues / summary)"]
+    Schema --&gt; Gate{"重大度しきい値を超えるか?"}
+    Gate --&gt;|"Yes"| Block["マージをブロックし修正を要求"]
+    Gate --&gt;|"No"| Merge["自動マージ or 人間レビューへ"]</pre
+          >
+          <p>
+            GitHub Actions環境では、CLIを自前でインストールしAPIキーを渡すよりも
+            <code>openai/codex-action</code> を使う方が安全とされている。このアクションはCodex
+            CLIのインストールとResponses
+            APIプロキシの起動を代行し、リポジトリを直接チェックアウトするジョブに
+            <code>OPENAI_API_KEY</code>
+            をジョブレベル環境変数として置かないよう案内している(ビルドスクリプトやテスト、依存パッケージのライフサイクルフック経由でキーが読み取られる懸念があるため)。CI専用には
+            <code>CODEX_API_KEY</code> という別名の環境変数を使うのが定石である。
+          </p>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr class="header">
+                  <th>フラグ / 環境変数</th>
+                  <th>用途</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="odd">
+                  <td><code>codex exec "&lt;task&gt;"</code></td>
+                  <td>
+                    非対話モードでタスクを1回実行し、標準エラーへ進捗、標準出力へ最終メッセージを出す
+                  </td>
+                </tr>
+                <tr class="even">
+                  <td><code>--json</code></td>
+                  <td>
+                    各イベントを構造化JSONLとしてストリーム出力し、<code>jq</code>
+                    等で機械的に解析する
+                  </td>
+                </tr>
+                <tr class="odd">
+                  <td><code>--output-schema &lt;file&gt;</code></td>
+                  <td>
+                    最終出力をJSON Schemaに準拠させ、severityなどのフィールドで自動採点しやすくする
+                  </td>
+                </tr>
+                <tr class="even">
+                  <td><code>--ephemeral</code></td>
+                  <td>セッションのrolloutファイルをディスクへ永続化しない(CIで推奨)</td>
+                </tr>
+                <tr class="odd">
+                  <td><code>--sandbox read-only / workspace-write</code></td>
+                  <td>エージェントに与える権限範囲を明示指定する</td>
+                </tr>
+                <tr class="even">
+                  <td><code>CODEX_API_KEY</code></td>
+                  <td>
+                    CI専用の資格情報(<code>OPENAI_API_KEY</code>
+                    をジョブ環境変数に直接置くことは非推奨)
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            参考:
+            <a href="https://developers.openai.com/codex/non-interactive-mode"
+              >Non-interactive mode (developers.openai.com)</a
+            >
+            /
+            <a href="https://developers.openai.com/codex/github-action"
+              >Codex GitHub Action (developers.openai.com)</a
+            >
+          </p>
+          <h3
+            class="layer-5"
+            id="45-layer-5-プラットフォームevals--tracesgradersdatasetseval-runsのフライホイール"
+            style="--layer-color: #b39ddb"
+          >
+            4.5 Layer 5: プラットフォームEvals — Traces・Graders・Datasets・Eval
+            Runsのフライホイール
+          </h3>
+          <p>
+            Codex自体のCI組み込みが「タスクが1件成功したか」を判定するのに対し、OpenAI
+            PlatformのEvals機能群は「エージェントの振る舞いが時間軸・変更軸でどう変化しているか」を体系的に追跡するためのものである。公式ドキュメントは、この評価基盤を次の順序で育てていくことを推奨している。
+          </p>
+          <ol type="1">
+            <li>
+              <strong>Trace grading(トレース評価)</strong>:
+              まだ挙動をデバッグしている段階では、1回の実行におけるモデル呼び出し・ツール呼び出し・ガードレール・ハンドオフの一連の記録である「トレース」を採取し、それをGraderで採点する。「正しいツールを選んだか」「ハンドオフは適切なタイミングで発生したか」「ワークフローが指示や安全ポリシーに違反していないか」といった問いに答えるのに向く。
+            </li>
+            <li>
+              <strong>Datasets &amp; Eval Runs(データセットと評価実行)</strong>:
+              「良い」の基準が固まったら、個別トレースの確認から、再現可能なデータセットと評価実行(Eval
+              Run)へ移行する。これにより、プロンプトやモデルの変更を継続的にベンチマークし、時系列で比較できるようになる。
+            </li>
+            <li>
+              <strong>外部モデルとの比較やバッチ評価</strong>など高度な機能が必要な場合は、Evals
+              APIをデータセットと組み合わせて使う。
+            </li>
+          </ol>
+          <pre class="mermaid">
+flowchart LR
+    Traces["Traces&lt;br/&gt;(モデル呼び出し/ツール呼び出し/ハンドオフの記録)"] --&gt; Graders["Graders&lt;br/&gt;(string_check/python/score_model等)"]
+    Graders --&gt; Datasets["Datasets&lt;br/&gt;(代表的ケースを蓄積)"]
+    Datasets --&gt; Runs["Eval Runs&lt;br/&gt;(プロンプト/モデル比較)"]
+    Runs --&gt; Improve["プロンプト・ツール構成・ルーティングを改善"]
+    Improve --&gt; Traces</pre
+          >
+          <p>Graderには複数の型があり、判定したい品質の性質に応じて使い分ける。</p>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr class="header">
+                  <th>グレーダー種類</th>
+                  <th>判定方法</th>
+                  <th>適したケース</th>
+                  <th>出力</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="odd">
+                  <td><code>string_check</code></td>
+                  <td>
+                    <code>eq</code> / <code>ne</code> / <code>like</code> /
+                    <code>ilike</code> による文字列比較
+                  </td>
+                  <td>決定的な正解文字列がある場合</td>
+                  <td>0 または 1</td>
+                </tr>
+                <tr class="even">
+                  <td><code>text_similarity</code></td>
+                  <td>
+                    <code>fuzzy_match</code> / <code>bleu</code> /
+                    <code>rouge_l</code> などの類似度指標
+                  </td>
+                  <td>表現ゆれはあるが意味的に近い正解がある場合</td>
+                  <td>0.0〜1.0</td>
+                </tr>
+                <tr class="odd">
+                  <td><code>python</code> (<code>PythonGrader</code>)</td>
+                  <td>任意のPythonコードを実行し <code>grade</code> 関数の戻り値を採点に使う</td>
+                  <td>テスト実行結果・静的解析結果など機械的に判定できるもの</td>
+                  <td>浮動小数点値</td>
+                </tr>
+                <tr class="even">
+                  <td><code>score_model</code> (<code>ScoreModelGrader</code>)</td>
+                  <td>LLMに0.0〜1.0のスコアを付けさせる</td>
+                  <td>文章のトーンや設計の妥当性など主観が絡む品質評価</td>
+                  <td>0.0〜1.0</td>
+                </tr>
+                <tr class="odd">
+                  <td><code>label_model</code> (<code>LabelModelGrader</code>)</td>
+                  <td>LLMにカテゴリラベルを付与させ、合格ラベル集合と照合する</td>
+                  <td>合格/不合格、深刻度カテゴリなどの分類</td>
+                  <td>ラベル文字列</td>
+                </tr>
+                <tr class="even">
+                  <td><code>multi_grader</code> (<code>MultiGrader</code>)</td>
+                  <td>複数グレーダーの結果を計算式で合成する</td>
+                  <td>複数基準を重み付けして総合スコアにしたい場合</td>
+                  <td>合成スコア</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            なお、モデルグレーダーを使う際は「グレーダーハッキング(reward
+            hacking)」に注意する必要がある。モデルが採点基準の弱点を学習してしまい、モデルグレーダーの評価では高得点でも、専門家による人手評価では低品質という乖離が生じることがある。これを検知するために、モデルグレーダーによる評価と専門家による人手評価の両方を定期的に突き合わせることが推奨されている。
+          </p>
+          <p>
+            参考:
+            <a href="https://developers.openai.com/api/docs/guides/agent-evals"
+              >Evaluate agent workflows (developers.openai.com)</a
+            >
+            /
+            <a href="https://developers.openai.com/api/docs/guides/graders"
+              >Graders (developers.openai.com)</a
+            >
+          </p>
+          <h3
+            class="layer-6"
+            id="46-layer-6-外部標準ベンチマーク--swe-bench-verifiedとterminal-bench-20--harbor"
+            style="--layer-color: #56ccf2"
+          >
+            4.6 Layer 6: 外部標準ベンチマーク — SWE-bench VerifiedとTerminal-Bench 2.0 / Harbor
+          </h3>
+          <p>
+            自社ハーネス内部の評価だけでは、「今使っているモデルやエージェント設定が業界の到達点に対してどの位置にあるか」は分からない。ここで外部の標準ベンチマークが役割を果たす。
+          </p>
+          <p>
+            <strong>SWE-Bench Verified</strong>は、実世界のGitHub
+            issue解決能力を人手検証済みのタスクセットで測る、コーディングエージェント評価のデファクトスタンダードの一つである。著名な独立系のAI論評者であるSimon
+            Willison氏は、2025年11月のGPT-5.1-Codex-Max発表時に、OpenAIが自己申告したSWE-Bench
+            Verifiedスコアが reasoning
+            effort「high」で76.5%、新設の「xhigh」で77.9%だったと報告しており、これはGemini 3
+            Pro(76.2%)やClaude Sonnet 4.5(77.2%)をわずかに上回る水準だったと分析している。
+          </p>
+          <p>
+            <strong>Terminal-Bench 2.0</strong>は、Stanford大学とLaude Instituteが主導し、Snorkel
+            AIなどが貢献するオープンな端末操作エージェント評価ベンチマークである。89件のタスクがそれぞれ独立したDockerコンテナで実行され、シェルスクリプティング、システム管理、暗号、COBOLの現代化、科学技術系Pythonの移植など16カテゴリにまたがる難易度別タスクで構成される。同時にリリースされた<strong>Harbor</strong>は、クラウド上のコンテナへ並列にロールアウトを展開できる評価ハーネスで、Daytona・Modalなど複数プロバイダに対応し、任意のエージェントアーキテクチャに対して汎用的に使えるよう設計されている。VentureBeatの報道によれば、Terminal-Bench
+            2.0発表当初のリーダーボードではOpenAIのCodex
+            CLIが49.6%のタスク成功率で首位に立っていた。Simon
+            Willison氏も、GPT-5.1-Codex-MaxがTerminal Bench 2.0で58.1%を記録し、Gemini 3
+            Pro(54.2%)やSonnet 4.5(42.8%)を上回ったと報告している。
+          </p>
+          <pre class="mermaid">
+flowchart TB
+    Suite["Terminal-Bench 2.0&lt;br/&gt;(89タスク・コンテナ隔離)"] --&gt; Harbor["Harbor評価ハーネス&lt;br/&gt;(クラウド並列ロールアウト)"]
+    Harbor --&gt; Agents["Codex CLI / Claude Code / 他エージェント"]
+    Agents --&gt; Verify["コンテナ内Verifierが合否判定"]
+    Verify --&gt; Board["リーダーボード集計"]
+    Board --&gt; Decision["自社ハーネスのモデル/設定選定に反映"]</pre
+          >
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr class="header">
+                  <th>ベンチマーク</th>
+                  <th>測定対象</th>
+                  <th>特徴</th>
+                  <th>参考スコア(2025年11月時点、自己申告含む)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="odd">
+                  <td>SWE-Bench Verified</td>
+                  <td>実世界のGitHub issue解決</td>
+                  <td>人手検証済みタスクセット</td>
+                  <td>GPT-5.1-Codex-Max: high 76.5% / xhigh 77.9%</td>
+                </tr>
+                <tr class="even">
+                  <td>Terminal-Bench 2.0</td>
+                  <td>端末操作タスク(89件・コンテナ隔離)</td>
+                  <td>Harborによる並列コンテナ評価、milestone報酬</td>
+                  <td>GPT-5.1-Codex-Max: 58.1%(初期リーダーボードではCodex CLIが49.6%で首位)</td>
+                </tr>
+                <tr class="odd">
+                  <td>HumanEval</td>
+                  <td>関数単位のコード生成</td>
+                  <td>pass@1 / pass@100</td>
+                  <td>参考: 初代Codex 12Bモデルでpass@1 28.8%</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            社内ハーネスの設計にこれらのベンチマークを組み込む実務上の意義は、単に「流行りの数字を追う」ことではない。むしろ、自社のタスク分布に近い公開ベンチマークのサブセットを定点観測し、モデルのバージョンアップやreasoning
+            effortの変更が自社ワークロードにどう波及するかを、外部の再現可能な基準に照らして事前に把握することにある。
+          </p>
+          <p>
+            参考:
+            <a href="https://simonwillison.net/tags/gpt-codex/">Simon Willison on gpt-codex</a> /
+            <a href="https://simonwillison.net/tags/evals/">Simon Willison on evals</a> /
+            <a
+              href="https://venturebeat.com/ai/terminal-bench-2-0-launches-alongside-harbor-a-new-framework-for-testing"
+              >Terminal-Bench 2.0 launches alongside Harbor (VentureBeat)</a
+            >
+            /
+            <a href="https://www.tbench.ai/news/announcement-2-0"
+              >Introducing Terminal-Bench 2.0 and Harbor (tbench.ai)</a
+            >
+          </p>
+          <h3
+            class="layer-7"
+            id="47-layer-7-継続的セキュリティ評価codex-security-cli"
+            style="--layer-color: #ff8a65"
+          >
+            4.7 Layer 7: 継続的セキュリティ評価(Codex Security CLI)
+          </h3>
+          <p>
+            品質測定はコードの正しさだけでなく、セキュリティ面の継続監査も含む。OpenAIは2026年7月末、内部では「Aardvark」と呼ばれていたセキュリティレビュー機能を、Apache
+            2.0ライセンスのオープンソースCLIツール
+            <code>@openai/codex-security</code>
+            として公開した。このツールは単一リポジトリのスキャンだけでなく、GitHub上のリポジトリをまとめて検出する、あるいはCSVインベントリから再開可能なキャンペーンとして実行する「bulk-scan」に対応しており、組織全体のリポジトリ群を継続的に棚卸しする用途を想定している。
+          </p>
+          <p>
+            CI組み込みの観点では、プルリクエストの差分だけを対象にスキャンする
+            <code>--diff</code>
+            オプション、結果をSARIF形式でアップロードするサポート、重大度に基づくポリシー設定が提供されている。認証面では、対話的な利用ではChatGPTサインインが使われる一方、CIやJSON/JSONL出力など非対話コンテキストでは環境変数のAPIキーがデフォルトで使われるという振り分けになっている。スキャン結果は人間可読な
+            <code>report.md</code> に加え、<code>findings.json</code> や
+            <code>coverage.json</code> といった機械可読アーティファクトとしても出力されるため、Layer
+            4のCIゲートやLayer 5のダッシュボードへそのまま接続できる。
+          </p>
+          <p>
+            参考:
+            <a href="https://github.com/openai/codex-security">openai/codex-security (GitHub)</a> /
+            <a href="https://developers.openai.com/codex/security"
+              >Codex Security (developers.openai.com)</a
+            >
+            /
+            <a
+              href="https://the-decoder.com/openai-open-sources-codex-security-cli-to-help-developers-find-and-fix-vulnerabilities-from-the-command-line/"
+              >OpenAI open-sources Codex Security CLI (the-decoder.com)</a
+            >
+          </p>
+          <hr />
+          <h2 id="5-ステップバイステップ実装ガイド">
+            <span class="h2-badge">5</span
+            ><span class="h2-text">ステップバイステップ実装ガイド</span>
+          </h2>
+          <p>
+            以下は、上記7層モデルを実際のリポジトリへ段階的に導入する際の推奨順序である。小さなプロジェクトであっても、Step
+            1〜4は初日から着手できる規模感で設計してある。
+          </p>
+          <h3 id="step-1-agentsmdを目次として設計する">
+            Step 1: AGENTS.mdを「目次」として設計する
+          </h3>
+          <p>
+            OpenAIのチームは当初「一つの巨大なAGENTS.md」を試みたが、これは失敗パターンだと結論づけている。理由は、コンテキストが希少資源であり巨大な指示ファイルがタスクやコードそのものを押し出してしまうこと、すべてが「重要」だと何も重要でなくなること、モノリシックなファイルは即座に陳腐化すること、そして単一の塊は機械的なチェック(網羅性・鮮度・所有者・相互リンク)になじまないことである。
+          </p>
+          <p>
+            そこでAGENTS.mdは百科事典ではなく「目次」として扱い、実体は
+            <code>docs/design-docs/</code> <code>docs/exec-plans/</code>
+            <code>docs/product-specs/</code>
+            <code>docs/references/</code>
+            といった構造化ディレクトリに置く。専用のLinterとCIジョブが、この知識ベースが最新で相互リンクされ正しく構造化されているかを検証し、実態と乖離した記述を検出する「doc-gardening」エージェントが定期的に修正PRを開く。これ自体が、リポジトリのドキュメント品質を継続測定する評価基盤の一部である。
+          </p>
+          <h3 id="step-2-plansmdexecplansで長時間タスクの検証可能性を担保する">
+            Step 2: PLANS.md(ExecPlans)で長時間タスクの検証可能性を担保する
+          </h3>
+          <p>
+            複雑な機能追加やリファクタリングでは、単発のプロンプトではなく「ExecPlan」という生きた設計文書を使う。OpenAI
+            Cookbookが公開しているテンプレートは、<code>Progress</code>(チェックリスト形式の進捗)・<code
+              >Surprises &amp; Discoveries</code
+            >(想定外の発見)・<code>Decision Log</code>(意思決定記録)・<code
+              >Outcomes &amp; Retrospective</code
+            >(成果の振り返り)という4つの必須セクションを持つことを要求する。これらのセクションは、7時間を超えるような長時間の単一エージェント実行であっても、途中経過と意思決定の根拠を後から検証可能にするための「監査ログ」として機能する。評価基盤の観点では、このExecPlanこそが「その変更が何を達成しようとしたか」という受け入れ基準(Acceptance)の一次情報源になる。
+          </p>
+          <h3 id="step-3-アーキテクチャをメカニカルに強制する">
+            Step 3: アーキテクチャをメカニカルに強制する
+          </h3>
+          <p>
+            4.2節で述べたレイヤードアーキテクチャとカスタムLinterを整備する。ポイントは、実装の細部を規定するのではなく「不変条件(invariant)」だけを強制することである。境界でのデータ形状のパースを義務付けるが、それをZodで行うかどうかは指定しない、といった具合に、境界は厳格に・境界内の自由度は大きく保つのが基本方針である。
+          </p>
+          <h3 id="step-4-ローカルオブザーバビリティスタックを構築する">
+            Step 4: ローカルオブザーバビリティスタックを構築する
+          </h3>
+          <p>
+            4.3節のVector→Victoria
+            Logs/Metrics/Tracesのようなスタックをworktreeごとにエフェメラルに立ち上げられるようにする。最初から完璧な可観測性を目指す必要はなく、「サービス起動時間」や「重要ユーザージャーニーのレイテンシ」など、まず1〜2個の定量指標をCodexが自分で問い合わせられるようにするところから始めるのが現実的である。
+          </p>
+          <h3 id="step-5-codex-execでcicdに非対話型の品質ゲートを組み込む">
+            Step 5: codex execでCI/CDに非対話型の品質ゲートを組み込む
+          </h3>
+          <p>
+            4.4節の <code>openai/codex-action</code> と
+            <code>codex exec --output-schema</code>
+            を使い、PRごとに構造化された品質レポートを生成する。最初のうちはブロッキングではなく「コメントを残すだけ」の緩いゲートから始め、誤検知率が十分下がった段階で重大度に応じたマージブロックへ昇格させると、開発フローへの摩擦を抑えられる。
+          </p>
+          <h3 id="step-6-openai-evals-apiでドメイン固有のグレーダーを構築する">
+            Step 6: OpenAI Evals APIでドメイン固有のグレーダーを構築する
+          </h3>
+          <p>
+            Traceを最初は目視で確認し、「良い」の基準が言語化できたら、その基準を4.5節のグレーダー(string_check・python・score_model・label_modelなど)としてコード化し、DatasetとEval
+            Runへ昇格させる。重要なのは、最初から巨大な評価スイートを作ろうとしないことである。1〜2個の高頻度な失敗モードに対応するグレーダーから始め、Eval
+            Runの結果を見ながら段階的に拡張するのが、Traces→Graders→Datasets→Eval
+            Runsというフライホイールの回し方として推奨されている進め方である。
+          </p>
+          <h3 id="step-7-外部ベンチマークで継続的にモデル設定を評価する">
+            Step 7: 外部ベンチマークで継続的にモデル/設定を評価する
+          </h3>
+          <p>
+            4.6節のSWE-Bench VerifiedやTerminal-Bench
+            2.0/Harborのような外部ベンチマークを、モデルのバージョンアップやreasoning
+            effort変更のたびに(あるいは定期的に)自社のタスク分布に近いサブセットで再実行し、内部Eval
+            Runの結果と突き合わせる。これにより、「モデルが賢くなった」という抽象的な期待と、「自社の具体的なワークロードでも実際に改善したか」という実測を切り分けられる。
+          </p>
+          <h3 id="step-8-codex-security-cliで継続的セキュリティスキャンを組み込む">
+            Step 8: Codex Security CLIで継続的セキュリティスキャンを組み込む
+          </h3>
+          <p>
+            4.7節のツールをまずは非クリティカルな1つのサービスに対してローカル実行し、誤検知傾向を把握したうえで、PR差分スキャン(<code>--diff</code>)をCIに追加し、重大度「high」以上のみをブロック対象とするような段階的な導入が現実的である。組織全体のリポジトリ棚卸しにはbulk-scanを用いる。
+          </p>
+          <h3 id="step-9-エントロピー対策--golden-principlesとgarbage-collection">
+            Step 9: エントロピー対策 — Golden PrinciplesとGarbage Collection
+          </h3>
+          <p>
+            Step
+            1〜8がすべて機能しても、時間とともにパターンの不揃いは蓄積する。3.2節で述べた通り、これに対する解は人手による一括クリーンアップではなく、機械的なルール(golden
+            principles)をリポジトリに明文化し、定期実行される背景タスクが逸脱をスキャンして品質グレードを更新し、小さなリファクタリングPRを自動的に開き続けることである。1分以内でレビューでき自動マージできる粒度に保つことが、このループが破綻しない鍵になる。
+          </p>
+          <hr />
+          <h2 id="6-ハーネス成熟度チェックリスト">
+            <span class="h2-badge">6</span><span class="h2-text">ハーネス成熟度チェックリスト</span>
+          </h2>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr class="header">
+                  <th>観点</th>
+                  <th>未成熟な状態</th>
+                  <th>成熟した状態</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="odd">
+                  <td>指示ファイル</td>
+                  <td>AGENTS.mdが数千行の百科事典で常に陳腐化している</td>
+                  <td>
+                    AGENTS.mdは目次に徹し、詳細は<code>docs/</code>配下でLintにより鮮度検証される
+                  </td>
+                </tr>
+                <tr class="even">
+                  <td>アーキテクチャ強制</td>
+                  <td>コードレビューでスタイルを都度指摘している</td>
+                  <td>カスタムLinter/構造テストが依存方向を機械的にブロックする</td>
+                </tr>
+                <tr class="odd">
+                  <td>実行時検証</td>
+                  <td>手元で目視確認してからデプロイする</td>
+                  <td>
+                    worktreeごとの観測可能性スタックをCodexがLogQL/PromQL/TraceQLで自己検証する
+                  </td>
+                </tr>
+                <tr class="even">
+                  <td>CIゲート</td>
+                  <td>人間が全PRを読んでからマージする</td>
+                  <td>
+                    <code>codex exec --output-schema</code>が構造化された合否判定をPRごとに返す
+                  </td>
+                </tr>
+                <tr class="odd">
+                  <td>品質評価</td>
+                  <td>「なんとなく良さそう」で判断している</td>
+                  <td>Traces→Graders→Datasets→Eval Runsのフライホイールで定量追跡している</td>
+                </tr>
+                <tr class="even">
+                  <td>モデル選定</td>
+                  <td>発表時のベンチマーク数値だけで乗り換える</td>
+                  <td>
+                    自社タスク分布に近い外部ベンチマークのサブセットと内部Eval Runを突き合わせる
+                  </td>
+                </tr>
+                <tr class="odd">
+                  <td>セキュリティ</td>
+                  <td>気づいたときに手動でレビューする</td>
+                  <td>Codex Security CLIによる継続スキャンとSARIF連携がCIに組み込まれている</td>
+                </tr>
+                <tr class="even">
+                  <td>技術的負債</td>
+                  <td>定期的な一括クリーンアップ(週次の手作業日など)</td>
+                  <td>Golden Principles + 背景クリーンアップエージェントによる日次の小さな返済</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <hr />
+          <h2 id="7-アンチパターン">
+            <span class="h2-badge">7</span><span class="h2-text">アンチパターン</span>
+          </h2>
+          <ul>
+            <li>
+              <strong>巨大な単一AGENTS.md</strong>:
+              すべてを1ファイルに詰め込むと、コンテキストを圧迫しつつも即座に陳腐化し、機械的な検証もできなくなる。
+            </li>
+            <li>
+              <strong>人間レビューをボトルネックとして温存する</strong>:
+              エージェントのスループットが人間の目視レビュー速度を超えた段階で、全件人間レビューを維持しようとすると、せっかくの速度向上が失われる。
+            </li>
+            <li>
+              <strong>モデルグレーダーだけに依存する</strong>:
+              score_model/label_modelのようなモデルグレーダーのみに頼ると、グレーダーハッキング(reward
+              hacking)によってモデルグレーダー上のスコアは高いのに実際の品質は低い、という乖離に気づけなくなる。定期的な人手評価との突き合わせが必要である。
+            </li>
+            <li>
+              <strong>発表ベンチマーク数値の鵜呑み</strong>: SWE-Bench VerifiedやTerminal-Bench
+              2.0のスコアは自己申告や特定タスク分布に基づくものであり、自社ワークロードでの実測(内部Eval
+              Run)と併せて解釈する必要がある。
+            </li>
+            <li>
+              <strong>CI/CDの資格情報をジョブ環境変数に直置きする</strong>:
+              リポジトリを直接チェックアウトするジョブに<code>OPENAI_API_KEY</code>をジョブレベル環境変数として設定すると、ビルドスクリプトや依存パッケージのライフサイクルフック経由で漏えいするリスクがある。CI専用の<code>CODEX_API_KEY</code>や、<code>openai/codex-action</code>が提供するプロキシ経由の運用が推奨される。
+            </li>
+            <li>
+              <strong>一括クリーンアップへの先送り</strong>:
+              技術的負債の返済を「まとまった時間ができたら」に先送りすると、複利的に膨らんだ負債を痛みを伴う形で処理する羽目になる。小さく・頻繁に返済する設計の方が総コストは低い。
+            </li>
+          </ul>
+          <hr />
+          <h2 id="8-まとめ"><span class="h2-badge">8</span><span class="h2-text">まとめ</span></h2>
+          <p>
+            OpenAI
+            Codexにおけるハーネスエンジニアリングは、「エージェントに何を書かせるか」の設計から、「エージェントが書いたものをどう継続的に検証し、悪化をどう検知し、改善サイクルへどう差し戻すか」という評価基盤の設計へと重心を移す営みである。本ガイドで整理した7層モデル——セッション内自己検証、リポジトリのメカニカル強制、ランタイム・オブザーバビリティ、CI/CDの非対話型ゲート、プラットフォームEvals、外部標準ベンチマーク、継続的セキュリティ評価——は、それぞれフィードバック速度と客観性のトレードオフが異なる。単一のレイヤーに頼るのではなく、速いレイヤーで日々の逸脱を吸収しながら、遅いレイヤーで長期的な方向性を検証するという多層防御的な設計が、エージェントのスループットが人間の監督能力を上回る時代における現実的な解である。
+          </p>
+          <hr />
+          <h2 id="9-参考文献">
+            <span class="h2-badge">9</span><span class="h2-text">参考文献</span>
+          </h2>
+          <div class="ref-grid">
+            <div class="ref-card">
+              <h3 id="openai公式ソース">OpenAI公式ソース</h3>
+              <ul>
+                <li>
+                  OpenAI. "Harness engineering: leveraging Codex in an agent-first world."
+                  (2026年2月11日) —
+                  <a href="https://openai.com/index/harness-engineering/"
+                    >↗ https://openai.com/index/harness-engineering/</a
+                  >
+                </li>
+                <li>
+                  OpenAI Developers. "Non-interactive mode." —
+                  <a href="https://developers.openai.com/codex/non-interactive-mode"
+                    >↗ https://developers.openai.com/codex/non-interactive-mode</a
+                  >
+                </li>
+                <li>
+                  OpenAI Developers. "Codex GitHub Action." —
+                  <a href="https://developers.openai.com/codex/github-action"
+                    >↗ https://developers.openai.com/codex/github-action</a
+                  >
+                </li>
+                <li>
+                  OpenAI Cookbook. Aaron Friel. "Using PLANS.md for multi-hour problem solving." —
+                  <a href="https://cookbook.openai.com/articles/codex_exec_plans"
+                    >↗ https://cookbook.openai.com/articles/codex_exec_plans</a
+                  >
+                </li>
+                <li>
+                  OpenAI Developers. "Evaluate agent workflows." —
+                  <a href="https://developers.openai.com/api/docs/guides/agent-evals"
+                    >↗ https://developers.openai.com/api/docs/guides/agent-evals</a
+                  >
+                </li>
+                <li>
+                  OpenAI Developers. "Graders." —
+                  <a href="https://developers.openai.com/api/docs/guides/graders"
+                    >↗ https://developers.openai.com/api/docs/guides/graders</a
+                  >
+                </li>
+                <li>
+                  OpenAI. GitHub. "codex-security." —
+                  <a href="https://github.com/openai/codex-security"
+                    >↗ https://github.com/openai/codex-security</a
+                  >
+                </li>
+                <li>
+                  OpenAI Developers. "Codex Security." —
+                  <a href="https://developers.openai.com/codex/security"
+                    >↗ https://developers.openai.com/codex/security</a
+                  >
+                </li>
+              </ul>
+            </div>
+            <div class="ref-card">
+              <h3 id="外部評価ベンチマーク研究機関">外部評価ベンチマーク・研究機関</h3>
+              <ul>
+                <li>
+                  Stanford University / Laude Institute. "Introducing Terminal-Bench 2.0 and
+                  Harbor." —
+                  <a href="https://www.tbench.ai/news/announcement-2-0"
+                    >↗ https://www.tbench.ai/news/announcement-2-0</a
+                  >
+                </li>
+                <li>
+                  Snorkel AI. "Terminal-Bench 2.0: Raising the bar for AI agent evaluation." —
+                  <a
+                    href="https://snorkel.ai/blog/terminal-bench-2-0-raising-the-bar-for-ai-agent-evaluation/"
+                    >↗
+                    https://snorkel.ai/blog/terminal-bench-2-0-raising-the-bar-for-ai-agent-evaluation/</a
+                  >
+                </li>
+              </ul>
+            </div>
+            <div class="ref-card">
+              <h3 id="著名な開発者による分析">著名な開発者による分析</h3>
+              <ul>
+                <li>
+                  Simon Willison. "Simon Willison on gpt-codex" (タグページ) —
+                  <a href="https://simonwillison.net/tags/gpt-codex/"
+                    >↗ https://simonwillison.net/tags/gpt-codex/</a
+                  >
+                </li>
+                <li>
+                  Simon Willison. "Simon Willison on evals" (タグページ) —
+                  <a href="https://simonwillison.net/tags/evals/"
+                    >↗ https://simonwillison.net/tags/evals/</a
+                  >
+                </li>
+              </ul>
+            </div>
+            <div class="ref-card">
+              <h3 id="業界メディア報道">業界メディア報道</h3>
+              <ul>
+                <li>
+                  InfoQ. "OpenAI Introduces Harness Engineering: Codex Agents Power Large-Scale
+                  Software Development." —
+                  <a href="https://www.infoq.com/news/2026/02/openai-harness-engineering-codex/"
+                    >↗ https://www.infoq.com/news/2026/02/openai-harness-engineering-codex/</a
+                  >
+                </li>
+                <li>
+                  Milvus Blog. "What Is Harness Engineering for AI Agents?" —
+                  <a href="https://milvus.io/blog/harness-engineering-ai-agents.md"
+                    >↗ https://milvus.io/blog/harness-engineering-ai-agents.md</a
+                  >
+                </li>
+                <li>
+                  VentureBeat. "Terminal-Bench 2.0 launches alongside Harbor, a new framework for
+                  testing agents in containers." —
+                  <a
+                    href="https://venturebeat.com/ai/terminal-bench-2-0-launches-alongside-harbor-a-new-framework-for-testing"
+                    >↗
+                    https://venturebeat.com/ai/terminal-bench-2-0-launches-alongside-harbor-a-new-framework-for-testing</a
+                  >
+                </li>
+                <li>
+                  The Decoder. "OpenAI open-sources Codex Security CLI to help developers find and
+                  fix vulnerabilities from the command line." —
+                  <a
+                    href="https://the-decoder.com/openai-open-sources-codex-security-cli-to-help-developers-find-and-fix-vulnerabilities-from-the-command-line/"
+                    >↗
+                    https://the-decoder.com/openai-open-sources-codex-security-cli-to-help-developers-find-and-fix-vulnerabilities-from-the-command-line/</a
+                  >
+                </li>
+              </ul>
+            </div>
+          </div>
+        </article>
+
+        <footer class="page-footer">
+          本ガイドは2026年7月29日時点で公開されている一次情報(OpenAI公式ブログ・公式ドキュメント)および著名な開発者・研究機関の分析記事をもとに作成しています。詳細な出典は「9.
+          参考文献」を参照してください。
+        </footer>
+      </main>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.12.0/mermaid.min.js"></script>
+    <script>
+      (function () {
+        var toggle = document.getElementById('menuToggle');
+        var sidebar = document.getElementById('sidebar');
+        var overlay = document.getElementById('sidebarOverlay');
+        function closeSidebar() {
+          sidebar.classList.remove('open');
+          overlay.classList.remove('open');
+        }
+        function openSidebar() {
+          sidebar.classList.add('open');
+          overlay.classList.add('open');
+        }
+        if (toggle) {
+          toggle.addEventListener('click', function () {
+            if (sidebar.classList.contains('open')) {
+              closeSidebar();
+            } else {
+              openSidebar();
+            }
+          });
+        }
+        if (overlay) {
+          overlay.addEventListener('click', closeSidebar);
+        }
+        var navLinks = document.querySelectorAll('.sidebar nav a');
+        navLinks.forEach(function (a) {
+          a.addEventListener('click', function () {
+            closeSidebar();
+          });
+        });
+
+        var headingIdToLink = new Map();
+        navLinks.forEach(function (a) {
+          var href = a.getAttribute('href');
+          if (href && href.charAt(0) === '#') {
+            headingIdToLink.set(href.slice(1), a);
+          }
+        });
+        var headings = Array.from(document.querySelectorAll('.prose h2'));
+        if (headings.length && 'IntersectionObserver' in window) {
+          var spy = new IntersectionObserver(
+            function (entries) {
+              entries.forEach(function (entry) {
+                if (entry.isIntersecting) {
+                  var link = headingIdToLink.get(entry.target.id);
+                  if (link) {
+                    navLinks.forEach(function (l) {
+                      l.classList.remove('active');
+                    });
+                    link.classList.add('active');
+                  }
+                }
+              });
+            },
+            { root: null, rootMargin: '-15% 0px -75% 0px', threshold: 0 },
+          );
+          headings.forEach(function (h) {
+            spy.observe(h);
+          });
+        }
+      })();
+    </script>
+    <script>
+      (function () {
+        function initMermaid() {
+          if (typeof mermaid === 'undefined') {
+            console.error('mermaid failed to load');
+            return;
+          }
+          try {
+            mermaid.initialize({
+              startOnLoad: false,
+              theme: 'base',
+              securityLevel: 'loose',
+              themeVariables: {
+                fontSize: '16px',
+                fontFamily:
+                  '"Hiragino Kaku Gothic ProN","Hiragino Sans","Noto Sans JP",system-ui,sans-serif',
+                background: '#0c1a2e',
+                primaryColor: '#12233c',
+                primaryTextColor: '#e7ecf5',
+                primaryBorderColor: '#7c9eff',
+                lineColor: '#7c9eff',
+                secondaryColor: '#0e1f36',
+                tertiaryColor: '#0e1f36',
+                textColor: '#e7ecf5',
+                mainBkg: '#12233c',
+                nodeBorder: '#7c9eff',
+                clusterBkg: '#0e1f36',
+                clusterBorder: '#2a3f5c',
+                edgeLabelBackground: '#0c1a2e',
+                actorBkg: '#12233c',
+                actorBorder: '#7c9eff',
+                actorTextColor: '#e7ecf5',
+                signalColor: '#9fb0c9',
+                signalTextColor: '#e7ecf5',
+              },
+              flowchart: { useMaxWidth: false, htmlLabels: true, curve: 'basis' },
+              sequence: { useMaxWidth: false },
+            });
+            var run = function () {
+              try {
+                mermaid.run({ querySelector: 'pre.mermaid' });
+              } catch (e) {
+                console.error('mermaid run error', e);
+              }
+            };
+            if (document.fonts && document.fonts.ready) {
+              document.fonts.ready.then(run);
+            } else {
+              run();
+            }
+          } catch (e) {
+            console.error('mermaid init error', e);
+          }
+        }
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', initMermaid);
+        } else {
+          initMermaid();
+        }
+      })();
+    </script>
+  </body>
+</html>

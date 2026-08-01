@@ -11,9 +11,9 @@
       rel="stylesheet"
     />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha384-0Y9cMcep0hv2aLlERfDZI1xuSlWpetVlpi5P3/iX87ktdkV8yIQXkVI633Tco7OS" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/ini.min.js" integrity="sha384-5KK4C3c6TryLXy2VSsEBZJ+KV4X4KuNurqkP2VjZW9e+zuXxWRqhOaWcFXbwxPZm" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js" integrity="sha384-OiB5ILRFSPWMhF/JWLUiRheXrMaJDWkpZe6xA4toJJxf/mF/GDWgdxC91WbP82IW" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/ini.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
     <style>
       :root {
         --bg: #f6f5f1;
@@ -88,7 +88,7 @@
       .topbar .brand {
         font-family: var(--display-en);
         font-weight: 700;
-        font-size: 15px;
+        font-size: 16px;
         color: var(--accent-ink);
       }
       .topbar button {
@@ -97,7 +97,7 @@
         padding: 8px 12px;
         border-radius: 10px;
         font-family: var(--body-jp);
-        font-size: 13px;
+        font-size: 16px;
         cursor: pointer;
         color: var(--ink);
       }
@@ -121,7 +121,7 @@
       nav.toc .brand {
         font-family: var(--display-en);
         font-weight: 700;
-        font-size: 14px;
+        font-size: 16px;
         letter-spacing: 0.06em;
         color: var(--accent-ink);
         text-transform: uppercase;
@@ -134,7 +134,7 @@
         letter-spacing: 0;
         color: var(--ink-faint);
         font-weight: 400;
-        font-size: 12px;
+        font-size: 16px;
         margin-top: 4px;
       }
       nav.toc ol {
@@ -152,7 +152,7 @@
         padding: 7px 10px 7px 8px;
         margin: 1px 0;
         border-radius: 8px;
-        font-size: 13.5px;
+        font-size: 16px;
         color: var(--ink-soft);
         text-decoration: none;
         border-left: 2px solid transparent;
@@ -165,7 +165,7 @@
         content: counter(toc, decimal-leading-zero) '  ';
         font-family: var(--mono);
         color: var(--ink-faint);
-        font-size: 11px;
+        font-size: 16px;
         margin-right: 2px;
       }
       nav.toc a:hover {
@@ -198,14 +198,13 @@
           var(--bg);
       }
       .hero-inner {
-        max-width: 820px;
+        max-width: 1180px;
         margin: 0 auto;
         display: flex;
         flex-direction: column;
         gap: 36px;
       }
       .hero-inner .term {
-        max-width: 600px;
         width: 100%;
       }
       .eyebrow {
@@ -213,7 +212,7 @@
         align-items: center;
         gap: 8px;
         font-family: var(--mono);
-        font-size: 12px;
+        font-size: 16px;
         letter-spacing: 0.08em;
         color: var(--accent-ink);
         background: var(--accent-soft);
@@ -238,12 +237,10 @@
         color: var(--ink-soft);
         font-size: 16.5px;
         margin: 0 0 22px;
-        max-width: 52ch;
       }
       .hero p.lead {
         color: var(--ink-soft);
-        font-size: 15px;
-        max-width: 56ch;
+        font-size: 16px;
         margin: 0;
       }
       .hero p.lead b {
@@ -283,30 +280,35 @@
       .term-title {
         margin-left: 8px;
         font-family: var(--mono);
-        font-size: 11px;
+        font-size: 16px;
         color: #8a8fa8;
       }
       .term-body {
         padding: 18px 18px 22px;
         font-family: var(--mono);
-        font-size: 12.6px;
+        font-size: 16px;
         color: var(--code-ink);
         min-height: 190px;
+        text-align: left;
       }
       .term-line {
-        margin: 0 0 9px;
+        margin: 0 0 10px;
         white-space: pre-wrap;
+        line-height: 1.55;
+        text-align: left;
       }
       .term-line .prompt {
         color: #7fe0b0;
+        font-weight: 600;
       }
       .term-line .path {
         color: var(--code-accent);
+        font-weight: 600;
       }
-      .term-line .muted {
+      .term-line.muted {
         color: #7a7f98;
       }
-      .term-line .ok {
+      .term-line.ok {
         color: #7fe0b0;
       }
       .cursor {
@@ -341,7 +343,7 @@
         align-items: center;
         gap: 8px;
         font-family: var(--mono);
-        font-size: 12px;
+        font-size: 16px;
         letter-spacing: 0.08em;
         color: var(--gold);
         margin-bottom: 10px;
@@ -401,14 +403,14 @@
         border-collapse: collapse;
         width: 100%;
         min-width: 560px;
-        font-size: 14.2px;
+        font-size: 16px;
         background: var(--surface);
       }
       caption {
         caption-side: top;
         text-align: left;
         font-family: var(--mono);
-        font-size: 11.5px;
+        font-size: 16px;
         letter-spacing: 0.05em;
         color: var(--ink-faint);
         padding: 10px 16px 0;
@@ -419,7 +421,7 @@
         color: var(--accent-ink);
         text-align: left;
         font-weight: 600;
-        font-size: 12.6px;
+        font-size: 16px;
         letter-spacing: 0.02em;
         padding: 12px 16px;
         border-bottom: 1px solid var(--border);
@@ -443,7 +445,7 @@
       }
       code {
         font-family: var(--mono);
-        font-size: 0.9em;
+        font-size: 1em;
         background: var(--accent-soft);
         color: var(--accent-ink);
         padding: 0.15em 0.42em;
@@ -458,7 +460,7 @@
         padding: 18px 20px;
         overflow-x: auto;
         font-family: var(--mono);
-        font-size: 13px;
+        font-size: 16px;
         line-height: 1.7;
         margin: 0 0 22px;
         border: 1px solid #262a3a;
@@ -472,7 +474,7 @@
       }
       .code-label {
         font-family: var(--mono);
-        font-size: 11px;
+        font-size: 16px;
         color: var(--ink-faint);
         letter-spacing: 0.05em;
         margin: -6px 0 8px;
@@ -558,7 +560,7 @@
       }
       .callout .label {
         font-family: var(--mono);
-        font-size: 11px;
+        font-size: 16px;
         letter-spacing: 0.06em;
         text-transform: uppercase;
         display: block;
@@ -576,7 +578,7 @@
       blockquote.voice .who {
         font-family: var(--display-en);
         font-weight: 700;
-        font-size: 13.5px;
+        font-size: 16px;
         color: var(--gold);
         display: block;
         margin-bottom: 8px;
@@ -585,7 +587,7 @@
       blockquote.voice p {
         color: var(--ink);
         margin-bottom: 0;
-        font-size: 15px;
+        font-size: 16px;
       }
 
       /* ---------- mermaid ---------- */
@@ -611,6 +613,19 @@
         margin: 0 auto;
         overflow: visible;
       }
+      /* flowchart-type diagrams render oversized once the content column is wide;
+   cap them individually so they stay proportionate. The CI/CD sequence
+   diagram needs its full width for 5 actor columns, so it's left alone.
+   !important is required because the render script sets an inline
+   max-width:100% on the <svg> after mermaid.render(), and inline styles
+   otherwise beat even ID selectors. */
+      #diag-loop svg,
+      #diag-plan svg,
+      #diag-agents svg,
+      #diag-sandbox svg,
+      #diag-subagents svg {
+        max-width: 760px !important;
+      }
       .diagram .mermaid-render svg text,
       .diagram .mermaid-render svg tspan,
       .diagram .mermaid-render svg .nodeLabel,
@@ -621,7 +636,7 @@
       }
       .diagram .mermaid-render .mm-error {
         font-family: var(--mono);
-        font-size: 12.5px;
+        font-size: 16px;
         color: var(--danger);
         padding: 10px 4px;
         text-align: center;
@@ -659,7 +674,7 @@
       }
       .checklist span {
         color: var(--ink-soft);
-        font-size: 14.5px;
+        font-size: 16px;
         transition: opacity 0.15s;
       }
       .checklist li:has(input:checked) {
@@ -682,7 +697,7 @@
       .src-list li {
         padding: 10px 0;
         border-bottom: 1px solid var(--border);
-        font-size: 13.8px;
+        font-size: 16px;
         display: flex;
         flex-direction: column;
         gap: 2px;
@@ -698,7 +713,7 @@
         color: var(--ink-faint);
         text-decoration: none;
         font-family: var(--mono);
-        font-size: 12px;
+        font-size: 16px;
       }
       .src-list a:hover {
         color: var(--accent-ink);
@@ -711,7 +726,7 @@
         margin: 0 auto;
         padding: 38px 44px 10px;
         color: var(--ink-faint);
-        font-size: 12.5px;
+        font-size: 16px;
         border-top: 1px solid var(--border);
       }
 
@@ -757,15 +772,11 @@
           z-index: 80;
           background: var(--surface);
           transform: translateX(-100%);
-          transition: transform 0.25s ease, visibility 0.25s ease;
-          visibility: hidden;
-          pointer-events: none;
+          transition: transform 0.25s ease;
           box-shadow: 20px 0 40px rgba(0, 0, 0, 0.15);
         }
         nav.toc.open {
           transform: translateX(0);
-          visibility: visible;
-          pointer-events: auto;
         }
         .topbar {
           display: flex;
@@ -781,7 +792,7 @@
       }
       @media (max-width: 600px) {
         .term-body {
-          font-size: 11.4px;
+          font-size: 16px;
         }
         h1.title {
           font-size: 26px;
@@ -794,7 +805,7 @@
 
     <div class="topbar">
       <span class="brand">CODEX / BEST PRACTICES</span>
-      <button id="navToggle" type="button" aria-label="目次を開く" aria-expanded="false">☰ 目次</button>
+      <button id="navToggle" aria-label="目次を開く">☰ 目次</button>
     </div>
 
     <div class="shell">
@@ -853,13 +864,10 @@
               </div>
               <div class="term-body">
                 <p class="term-line">
-                  <span class="prompt">$</span> codex --sandbox workspace-write
+                  <span class="prompt">$</span> codex 「本番リリースに向けてテストを安定させて」
                 </p>
                 <p class="term-line muted">reading AGENTS.md ... 3 files found</p>
                 <p class="term-line muted">approval_policy: on-request</p>
-                <p class="term-line">
-                  <span class="path">/goal</span> 本番リリースに向けてテストを安定させる
-                </p>
                 <p class="term-line muted">plan → act → test を繰り返し中 ...</p>
                 <p class="term-line ok">✓ tests passing (14/14) — done.</p>
                 <p class="term-line"><span class="prompt">$</span> <span class="cursor"></span></p>
@@ -1725,90 +1733,66 @@ codex exec --skip-git-repo-check --sandbox read-only "このディレクトリ�
             </p>
             <ul class="checklist">
               <li>
-                <label for="chk-1"
-                  ><input type="checkbox" id="chk-1" /><span
-                    >プロンプトにGoal・Context・Constraints・Done
-                    whenの4要素を意識して書いているか</span
-                  ></label
+                <input type="checkbox" /><span
+                  >プロンプトにGoal・Context・Constraints・Done
+                  whenの4要素を意識して書いているか</span
                 >
               </li>
               <li>
-                <label for="chk-2"
-                  ><input type="checkbox" id="chk-2" /><span
-                    >タスクの複雑さに応じてReasoning Effortを使い分けているか(既定はmedium)</span
-                  ></label
+                <input type="checkbox" /><span
+                  >タスクの複雑さに応じてReasoning Effortを使い分けているか(既定はmedium)</span
                 >
               </li>
               <li>
-                <label for="chk-3"
-                  ><input type="checkbox" id="chk-3" /><span
-                    >複雑・曖昧なタスクでは<code>/plan</code>や<code>/goal</code>で完了条件を先に固めているか</span
-                  ></label
+                <input type="checkbox" /><span
+                  >複雑・曖昧なタスクでは<code>/plan</code>や<code>/goal</code>で完了条件を先に固めているか</span
                 >
               </li>
               <li>
-                <label for="chk-4"
-                  ><input type="checkbox" id="chk-4" /><span
-                    >チームの規約・検証手順をAGENTS.mdに書き、プロンプトで繰り返していないか</span
-                  ></label
+                <input type="checkbox" /><span
+                  >チームの規約・検証手順をAGENTS.mdに書き、プロンプトで繰り返していないか</span
                 >
               </li>
               <li>
-                <label for="chk-5"
-                  ><input type="checkbox" id="chk-5" /><span
-                    ><code>~/.codex/config.toml</code
-                    >と<code>.codex/config.toml</code>で個人設定とプロジェクト設定を役割分担しているか</span
-                  ></label
+                <input type="checkbox" /><span
+                  ><code>~/.codex/config.toml</code
+                  >と<code>.codex/config.toml</code>で個人設定とプロジェクト設定を役割分担しているか</span
                 >
               </li>
               <li>
-                <label for="chk-6"
-                  ><input type="checkbox" id="chk-6" /><span
-                    >サンドボックス・承認ポリシーを用途に応じて使い分けているか</span
-                  ></label
+                <input type="checkbox" /><span
+                  >サンドボックス・承認ポリシーを用途に応じて使い分けているか</span
                 >
               </li>
               <li>
-                <label for="chk-7"
-                  ><input type="checkbox" id="chk-7" /><span
-                    >テスト・Lint・差分レビューをワークフローに組み込んでいるか</span
-                  ></label
+                <input type="checkbox" /><span
+                  >テスト・Lint・差分レビューをワークフローに組み込んでいるか</span
                 >
               </li>
               <li>
-                <label for="chk-8"
-                  ><input type="checkbox" id="chk-8" /><span
-                    >リポジトリ外のコンテキストが必要な場面でMCPを検討しているか(繋ぎすぎに注意)</span
-                  ></label
+                <input type="checkbox" /><span
+                  >リポジトリ外のコンテキストが必要な場面でMCPを検討しているか(繋ぎすぎに注意)</span
                 >
               </li>
               <li>
-                <label for="chk-9"
-                  ><input type="checkbox" id="chk-9" /><span
-                    >繰り返し行っている作業をSkillに切り出しているか</span
-                  ></label
+                <input type="checkbox" /><span
+                  >繰り返し行っている作業をSkillに切り出しているか</span
                 >
               </li>
               <li>
-                <label for="chk-10"
-                  ><input type="checkbox" id="chk-10" /><span
-                    >安定したワークフローだけをAutomationsに切り出しているか</span
-                  ></label
+                <input type="checkbox" /><span
+                  >安定したワークフローだけをAutomationsに切り出しているか</span
                 >
               </li>
               <li>
-                <label for="chk-11"
-                  ><input type="checkbox" id="chk-11" /><span
-                    >並列作業ではgit worktreeでスレッドを分離しているか</span
-                  ></label
+                <input type="checkbox" /><span
+                  >並列作業ではgit worktreeでスレッドを分離しているか</span
                 >
               </li>
               <li>
-                <label for="chk-12"
-                  ><input type="checkbox" id="chk-12" /><span
-                    >CI/CDでは公式Actionや<code>codex exec</code
-                    >を使い、APIキーをジョブ全体に晒していないか</span
-                  ></label
+                <input type="checkbox" /><span
+                  >CI/CDでは公式Actionや<code>codex exec</code
+                  >を使い、APIキーをジョブ全体に晒していないか</span
                 >
               </li>
             </ul>
@@ -2286,73 +2270,69 @@ Action->>PR: レビューコメントを投稿
 PR-->>Dev: 修正提案を確認しマージ判断`,
       };
 
-      if (!window.mermaid?.initialize) {
-        for (const id of Object.keys(DIAGRAMS)) {
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: 'base',
+        themeVariables: {
+          primaryColor: '#E9EFFA',
+          primaryTextColor: '#1A1B22',
+          primaryBorderColor: '#2954A6',
+          lineColor: '#2954A6',
+          secondaryColor: '#F6ECD8',
+          secondaryBorderColor: '#A6791F',
+          tertiaryColor: '#FFFFFF',
+          fontFamily: 'Zen Kaku Gothic New, Noto Sans JP, sans-serif',
+          fontSize: '1rem',
+          actorBkg: '#E9EFFA',
+          actorBorder: '#2954A6',
+          actorTextColor: '#1A1B22',
+          signalColor: '#2954A6',
+          signalTextColor: '#1A1B22',
+        },
+        flowchart: {
+          curve: 'basis',
+          htmlLabels: true,
+          useMaxWidth: false,
+          nodeSpacing: 28,
+          rankSpacing: 38,
+          padding: 12,
+        },
+        sequence: { useMaxWidth: false, mirrorActors: true, noteMargin: 10 },
+        securityLevel: 'loose',
+      });
+
+      (async () => {
+        if (document.fonts && document.fonts.ready) {
+          try {
+            await document.fonts.ready;
+          } catch (e) {}
+        }
+        for (const [id, src] of Object.entries(DIAGRAMS)) {
           const target = document.getElementById(id);
-          if (target) {
-            target.textContent = 'Mermaidライブラリが読み込めないため、図を表示できません。';
+          if (!target) continue;
+          try {
+            const { svg } = await mermaid.render('svg-' + id, src);
+            target.innerHTML = svg;
+            const svgEl = target.querySelector('svg');
+            if (svgEl) {
+              svgEl.removeAttribute('width');
+              svgEl.removeAttribute('height');
+              svgEl.style.display = 'block';
+              svgEl.style.width = 'auto';
+              svgEl.style.maxWidth = '100%';
+              svgEl.style.height = 'auto';
+              svgEl.style.margin = '0 auto';
+              svgEl.style.overflow = 'visible';
+            }
+          } catch (err) {
+            target.innerHTML =
+              '<div class="mm-error">図の描画に失敗しました: ' +
+              (err && err.message ? err.message : err) +
+              '</div>';
+            console.error('Mermaid render failed for', id, err);
           }
         }
-      } else {
-        window.mermaid.initialize({
-          startOnLoad: false,
-          theme: 'base',
-          themeVariables: {
-            primaryColor: '#E9EFFA',
-            primaryTextColor: '#1A1B22',
-            primaryBorderColor: '#2954A6',
-            lineColor: '#2954A6',
-            secondaryColor: '#F6ECD8',
-            secondaryBorderColor: '#A6791F',
-            tertiaryColor: '#FFFFFF',
-            fontFamily: 'Zen Kaku Gothic New, Noto Sans JP, sans-serif',
-            fontSize: '1rem',
-            actorBkg: '#E9EFFA',
-            actorBorder: '#2954A6',
-            actorTextColor: '#1A1B22',
-            signalColor: '#2954A6',
-            signalTextColor: '#1A1B22',
-          },
-          flowchart: { curve: 'basis', htmlLabels: true, useMaxWidth: false },
-          sequence: { useMaxWidth: false, mirrorActors: true, noteMargin: 10 },
-          securityLevel: 'loose',
-        });
-
-        (async () => {
-          if (document.fonts && document.fonts.ready) {
-            try {
-              await document.fonts.ready;
-            } catch (e) {}
-          }
-          for (const [id, src] of Object.entries(DIAGRAMS)) {
-            const target = document.getElementById(id);
-            if (!target) continue;
-            try {
-              const { svg } = await window.mermaid.render('svg-' + id, src);
-              target.innerHTML = svg;
-              const svgEl = target.querySelector('svg');
-              if (svgEl) {
-                svgEl.removeAttribute('width');
-                svgEl.removeAttribute('height');
-                svgEl.style.display = 'block';
-                svgEl.style.width = 'auto';
-                svgEl.style.maxWidth = '100%';
-                svgEl.style.height = 'auto';
-                svgEl.style.margin = '0 auto';
-                svgEl.style.overflow = 'visible';
-              }
-            } catch (err) {
-              const errDiv = document.createElement('div');
-              errDiv.className = 'mm-error';
-              errDiv.textContent =
-                '図の描画に失敗しました: ' +
-                (err && err.message ? err.message : err);
-              target.replaceChildren(errDiv);
-              console.error('Mermaid render failed for', id, err);
-            }
-          }
-        })();
-      }
+      })();
 
       /* progress bar */
       const bar = document.getElementById('progress');
@@ -2367,21 +2347,13 @@ PR-->>Dev: 修正提案を確認しマージ判断`,
       /* mobile nav toggle */
       const tocNav = document.getElementById('tocNav');
       const navToggle = document.getElementById('navToggle');
-      function setNavState(open) {
-        if (!tocNav || !navToggle) return;
-        tocNav.classList.toggle('open', open);
-        navToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-        navToggle.setAttribute('aria-label', open ? '目次を閉じる' : '目次を開く');
-      }
-      if (navToggle && tocNav) {
+      navToggle &&
         navToggle.addEventListener('click', () => {
-          const isOpen = tocNav.classList.contains('open');
-          setNavState(!isOpen);
+          tocNav.classList.toggle('open');
         });
-        tocNav.querySelectorAll('a').forEach((a) => {
-          a.addEventListener('click', () => setNavState(false));
-        });
-      }
+      tocNav.querySelectorAll('a').forEach((a) => {
+        a.addEventListener('click', () => tocNav.classList.remove('open'));
+      });
 
       /* active section highlight */
       const links = [...tocNav.querySelectorAll('a')];
@@ -2403,6 +2375,17 @@ PR-->>Dev: 修正提案を確認しマージ判断`,
         { rootMargin: '-15% 0px -75% 0px', threshold: 0 },
       );
       sections.forEach((s) => io.observe(s));
+
+      /* checklist: clicking anywhere on the row toggles the checkbox */
+      document.querySelectorAll('.checklist li').forEach((li) => {
+        const box = li.querySelector('input[type="checkbox"]');
+        if (!box) return;
+        li.addEventListener('click', (e) => {
+          if (e.target !== box) {
+            box.checked = !box.checked;
+          }
+        });
+      });
 
       /* back to top */
       const toTop = document.getElementById('toTop');
