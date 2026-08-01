@@ -574,7 +574,16 @@
   </head>
   <body>
     <div class="layout">
-      <button class="menu-toggle" id="menuToggle" aria-label="メニュー">☰</button>
+      <button
+        type="button"
+        class="menu-toggle"
+        id="menuToggle"
+        aria-label="メニュー"
+        aria-controls="sidebar"
+        aria-expanded="false"
+      >
+        ☰
+      </button>
 
       <aside class="sidebar" id="sidebar">
         <div class="brand">
@@ -1705,10 +1714,12 @@ flowchart TB
         if (!btn || !sidebar) return;
         btn.addEventListener('click', function () {
           sidebar.classList.toggle('open');
+          btn.setAttribute('aria-expanded', String(sidebar.classList.contains('open')));
         });
         sidebar.querySelectorAll('a').forEach(function (a) {
           a.addEventListener('click', function () {
             sidebar.classList.remove('open');
+            btn.setAttribute('aria-expanded', 'false');
           });
         });
       })();

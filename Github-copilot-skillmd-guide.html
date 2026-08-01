@@ -449,7 +449,16 @@
   </head>
   <body>
     <div class="top-bar"></div>
-    <button class="sidebar-toggle" id="sidebarToggle" aria-label="目次を開閉">☰ 目次</button>
+    <button
+      type="button"
+      class="sidebar-toggle"
+      id="sidebarToggle"
+      aria-label="目次を開閉"
+      aria-controls="sidebar"
+      aria-expanded="false"
+    >
+      ☰ 目次
+    </button>
     <div class="layout">
       <nav class="sidebar" id="sidebar">
         <p class="sidebar-title">GitHub Copilot Agent Skills</p>
@@ -2049,10 +2058,12 @@ flowchart TB
         if (!btn || !sidebar) return;
         btn.addEventListener('click', function () {
           sidebar.classList.toggle('open');
+          btn.setAttribute('aria-expanded', String(sidebar.classList.contains('open')));
         });
         sidebar.querySelectorAll('.nav-link').forEach(function (a) {
           a.addEventListener('click', function () {
             sidebar.classList.remove('open');
+            btn.setAttribute('aria-expanded', 'false');
           });
         });
       })();
