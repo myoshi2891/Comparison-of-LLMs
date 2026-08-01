@@ -1,0 +1,2762 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      GitHub Copilot .agent.md 実践ガイド ― Custom Agents / Handoffs / Subagents / MCP /
+      マルチエージェント設計
+    </title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css"
+    />
+    <style>
+      :root {
+        --bg: #07111e;
+        --bg-elevated: #0d1b2e;
+        --bg-sidebar: #0a1626;
+        --bg-card: #0f2038;
+        --border: #1c3252;
+        --border-soft: #152740;
+        --text: #e7ecf7;
+        --muted: #9fb0c9;
+        --accent: #7c9eff;
+        --accent-2: #a78bfa;
+        --good: #7be0b8;
+        --warn: #ffd479;
+        --bad: #ff9b9b;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family:
+          'Hiragino Kaku Gothic ProN',
+          'Hiragino Sans',
+          'Yu Gothic',
+          -apple-system,
+          BlinkMacSystemFont,
+          'Segoe UI',
+          sans-serif;
+        font-size: 16px;
+        line-height: 1.8;
+        -webkit-font-smoothing: antialiased;
+      }
+      a {
+        color: var(--accent);
+      }
+      .layout {
+        display: block;
+      }
+
+      /* ---- Sidebar ---- */
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 300px;
+        height: 100vh;
+        overflow-y: auto;
+        background: var(--bg-sidebar);
+        border-right: 1px solid var(--border);
+        padding: 2.25rem 1.5rem 3rem;
+      }
+      .sidebar .brand {
+        display: block;
+        color: var(--text);
+        font-weight: 700;
+        font-size: 1.2rem;
+        letter-spacing: 0.02em;
+        margin-bottom: 0.4rem;
+      }
+      .sidebar .brand-sub {
+        display: block;
+        color: var(--muted);
+        font-size: 1rem;
+        margin-bottom: 2rem;
+      }
+      .sidebar nav ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+      .sidebar nav li {
+        margin-bottom: 0.15rem;
+      }
+      .sidebar nav a {
+        display: block;
+        color: var(--muted);
+        text-decoration: none;
+        padding: 0.6rem 0.8rem;
+        border-radius: 8px;
+        font-size: 1rem;
+        line-height: 1.4;
+        transition:
+          background 0.15s ease,
+          color 0.15s ease;
+        border-left: 3px solid transparent;
+      }
+      .sidebar nav a:hover {
+        color: var(--text);
+        background: var(--bg-card);
+      }
+      .sidebar nav a.active {
+        color: var(--accent);
+        background: rgba(124, 158, 255, 0.12);
+        border-left: 3px solid var(--accent);
+        font-weight: 600;
+      }
+      .sidebar .updated {
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--border);
+        color: var(--muted);
+        font-size: 1rem;
+      }
+
+      /* ---- Content ---- */
+      .content {
+        margin-left: 300px;
+        padding: 4rem 4.5rem 8rem;
+        max-width: none;
+      }
+      .hero {
+        max-width: none;
+        padding-bottom: 2.5rem;
+        margin-bottom: 3rem;
+        border-bottom: 1px solid var(--border);
+      }
+      .hero .eyebrow {
+        display: inline-block;
+        color: var(--accent);
+        background: rgba(124, 158, 255, 0.12);
+        border: 1px solid rgba(124, 158, 255, 0.35);
+        border-radius: 999px;
+        padding: 0.3rem 0.9rem;
+        font-size: 1rem;
+        margin-bottom: 1.25rem;
+      }
+      .hero h1 {
+        font-size: 2.5rem;
+        line-height: 1.35;
+        margin: 0 0 1rem;
+        background: linear-gradient(135deg, var(--accent), var(--accent-2));
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        color: var(--accent);
+      }
+      .hero .subtitle {
+        color: var(--muted);
+        font-size: 1.2rem;
+        line-height: 1.8;
+        max-width: none;
+      }
+      .hero .meta {
+        margin-top: 1.5rem;
+        color: var(--muted);
+        font-size: 1rem;
+      }
+
+      .section {
+        max-width: none;
+        margin-bottom: 4.5rem;
+      }
+      .section > .section-number {
+        color: var(--accent);
+        font-size: 1rem;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        margin-bottom: 0.5rem;
+      }
+      .section h2 {
+        font-size: 1.85rem;
+        color: var(--text);
+        border-left: 4px solid var(--accent);
+        padding-left: 1rem;
+        margin: 0 0 1.5rem;
+      }
+      .section h3 {
+        font-size: 1.3rem;
+        color: var(--accent);
+        margin: 2.25rem 0 1rem;
+      }
+      .prose {
+        max-width: none;
+        color: var(--text);
+      }
+      .prose p {
+        margin: 1rem 0;
+        font-size: 1.05rem;
+      }
+      .prose ul,
+      .prose ol {
+        margin: 1rem 0;
+        padding-left: 1.5rem;
+        font-size: 1.05rem;
+      }
+      .prose li {
+        margin: 0.4rem 0;
+      }
+      .prose strong {
+        color: var(--text);
+      }
+
+      /* ---- Tables ---- */
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 1.75rem 0;
+        background: var(--bg-elevated);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        overflow: hidden;
+        font-size: 1rem;
+      }
+      th,
+      td {
+        padding: 0.9rem 1.1rem;
+        text-align: left;
+        border-bottom: 1px solid var(--border);
+        vertical-align: top;
+        line-height: 1.6;
+      }
+      th {
+        background: #122238;
+        color: var(--accent);
+        font-weight: 600;
+        font-size: 1rem;
+      }
+      tr:last-child td {
+        border-bottom: none;
+      }
+      td code,
+      th code {
+        background: var(--bg-sidebar);
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        padding: 0.1rem 0.4rem;
+        font-size: 1rem;
+        color: var(--accent);
+      }
+
+      /* ---- Code blocks ---- */
+      pre {
+        background: var(--bg-sidebar);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 1.4rem 1.6rem;
+        overflow-x: auto;
+        margin: 1.75rem 0;
+      }
+      pre code.hljs {
+        background: transparent;
+        padding: 0;
+        font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+        font-size: 1rem;
+        line-height: 1.75;
+      }
+      .code-label {
+        display: inline-block;
+        color: var(--muted);
+        font-size: 1rem;
+        margin: 0 0 0.5rem;
+        letter-spacing: 0.03em;
+      }
+      :not(pre) > code {
+        background: var(--bg-elevated);
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        padding: 0.15rem 0.4rem;
+        font-size: 1rem;
+        color: var(--accent);
+      }
+
+      /* ---- Mermaid ---- */
+      .mermaid-wrapper {
+        overflow-x: auto;
+        margin: 2rem 0;
+        padding: 1.75rem;
+        background: var(--bg-elevated);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+      }
+      .mermaid-caption {
+        color: var(--muted);
+        font-size: 1rem;
+        margin: 0 0 1rem;
+      }
+      pre.mermaid {
+        width: 100%;
+        display: flex;
+        justify-content: safe center;
+        margin: 0;
+        background: transparent;
+        border: none;
+        padding: 0;
+        overflow: visible;
+      }
+      .mermaid-wrapper svg {
+        max-width: none;
+        height: auto;
+        flex-shrink: 0;
+      }
+
+      /* ---- Boundary badges ---- */
+      .boundary-list {
+        list-style: none;
+        padding: 0;
+        margin: 1.25rem 0;
+      }
+      .boundary-list li {
+        padding: 0.65rem 1rem;
+        border-radius: 8px;
+        margin-bottom: 0.6rem;
+        background: var(--bg-elevated);
+        border: 1px solid var(--border);
+        font-size: 1.05rem;
+      }
+      .b-ok {
+        border-left: 4px solid var(--good);
+      }
+      .b-ask {
+        border-left: 4px solid var(--warn);
+      }
+      .b-no {
+        border-left: 4px solid var(--bad);
+      }
+
+      /* ---- Callout ---- */
+      .callout {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-left: 4px solid var(--accent);
+        border-radius: 10px;
+        padding: 1.25rem 1.5rem;
+        margin: 1.75rem 0;
+        font-size: 1.05rem;
+      }
+      .callout.warn {
+        border-left-color: var(--warn);
+      }
+      .callout strong {
+        color: var(--accent);
+      }
+
+      /* ---- Best-practice cards (Section 9) ---- */
+      .practice-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.1rem;
+        margin: 2rem 0;
+      }
+      .practice-card {
+        position: relative;
+        background: var(--bg-elevated);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 1.5rem 1.5rem 1.5rem 1.4rem;
+        transition:
+          border-color 0.15s ease,
+          background 0.15s ease;
+      }
+      .practice-card:hover {
+        border-color: rgba(124, 158, 255, 0.5);
+        background: var(--bg-card);
+      }
+      .practice-card .num {
+        display: block;
+        font-size: 1.9rem;
+        font-weight: 800;
+        line-height: 1;
+        letter-spacing: -0.02em;
+        margin-bottom: 0.75rem;
+        background: linear-gradient(135deg, var(--accent), var(--accent-2));
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        color: var(--accent);
+      }
+      .practice-card h4 {
+        margin: 0 0 0.5rem;
+        font-size: 1.15rem;
+        color: var(--text);
+        line-height: 1.5;
+      }
+      .practice-card p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 1.02rem;
+        line-height: 1.75;
+      }
+      .practice-card code {
+        background: var(--bg-sidebar);
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        padding: 0.1rem 0.4rem;
+        font-size: 1rem;
+        color: var(--accent);
+      }
+      @media (max-width: 700px) {
+        .practice-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      /* ---- Footer / References (Section 10) ---- */
+      .footer {
+        max-width: none;
+        padding-top: 2.5rem;
+        border-top: 1px solid var(--border);
+        color: var(--muted);
+        font-size: 1rem;
+      }
+      .footer h2 {
+        font-size: 1.6rem;
+        color: var(--text);
+        border-left: 4px solid var(--accent);
+        padding-left: 1rem;
+      }
+      .ref-group {
+        margin: 2.25rem 0;
+      }
+      .ref-group-title {
+        display: flex;
+        align-items: baseline;
+        gap: 0.65rem;
+        color: var(--text);
+        font-size: 1.15rem;
+        font-weight: 700;
+        margin: 0 0 1rem;
+      }
+      .ref-group-title .count {
+        color: var(--muted);
+        font-weight: 400;
+        font-size: 1rem;
+      }
+      .ref-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 0.85rem;
+      }
+      .ref-card {
+        display: block;
+        background: var(--bg-elevated);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 1.05rem 1.3rem;
+        text-decoration: none;
+        transition:
+          border-color 0.15s ease,
+          background 0.15s ease;
+      }
+      .ref-card:hover {
+        border-color: var(--accent);
+        background: var(--bg-card);
+      }
+      .ref-card-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+        margin-bottom: 0.55rem;
+      }
+      .ref-tag {
+        display: inline-block;
+        font-size: 1rem;
+        font-weight: 600;
+        border-radius: 999px;
+        padding: 0.15rem 0.75rem;
+        border: 1px solid rgba(124, 158, 255, 0.35);
+        color: var(--accent);
+        background: rgba(124, 158, 255, 0.12);
+        white-space: nowrap;
+      }
+      .ref-tag.community {
+        color: var(--accent-2);
+        background: rgba(167, 139, 250, 0.12);
+        border-color: rgba(167, 139, 250, 0.35);
+      }
+      .ref-tag.issue {
+        color: var(--warn);
+        background: rgba(255, 212, 121, 0.12);
+        border-color: rgba(255, 212, 121, 0.4);
+      }
+      .ref-date {
+        color: var(--muted);
+        font-size: 1rem;
+      }
+      .ref-card-title {
+        display: block;
+        color: var(--text);
+        font-size: 1.08rem;
+        font-weight: 600;
+        line-height: 1.6;
+        margin-bottom: 0.5rem;
+      }
+      .ref-card-url {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        color: var(--muted);
+        font-size: 1rem;
+        font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+        word-break: break-all;
+      }
+      .ref-card-url svg {
+        flex-shrink: 0;
+        opacity: 0.75;
+      }
+      .ref-card:hover .ref-card-url {
+        color: var(--accent);
+      }
+
+      @media (max-width: 960px) {
+        .sidebar {
+          position: static;
+          width: auto;
+          height: auto;
+          border-right: none;
+          border-bottom: 1px solid var(--border);
+        }
+        .content {
+          margin-left: 0;
+          padding: 2.5rem 1.5rem 5rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="layout">
+      <aside class="sidebar">
+        <span class="brand">.agent.md 実践ガイド</span>
+        <span class="brand-sub">GitHub Copilot Custom Agents</span>
+        <nav>
+          <ul>
+            <li><a href="#overview">1. .agent.md とは何か</a></li>
+            <li><a href="#frontmatter">2. フロントマター全仕様</a></li>
+            <li><a href="#stepbystep">3. ステップバイステップ作成</a></li>
+            <li><a href="#handoffs">4. Handoffs(エージェント連鎖)</a></li>
+            <li><a href="#subagents">5. Subagents(サブエージェント)</a></li>
+            <li><a href="#mcp">6. MCP統合</a></li>
+            <li><a href="#patterns">7. マルチエージェント設計</a></li>
+            <li><a href="#troubleshooting">8. トラブルシューティング</a></li>
+            <li><a href="#bestpractices">9. ベストプラクティス総まとめ</a></li>
+            <li><a href="#references">10. 参考文献</a></li>
+          </ul>
+        </nav>
+        <div class="updated">最終更新: 2026年7月31日時点の公開情報に基づく</div>
+      </aside>
+
+      <main class="content">
+        <header class="hero">
+          <span class="eyebrow">GitHub Copilot / VS Code / Copilot CLI / Cloud Agent</span>
+          <h1>
+            .agent.md 実践ガイド<br />Custom
+            Agents・Handoffs・Subagents・MCP・マルチエージェント設計
+          </h1>
+          <p class="subtitle">
+            中級者から上級者向けに、フロントマター全仕様からトラブルシューティングまでをステップバイステップで解説します。図解はすべてMermaid、表はすべてMarkdown/HTMLテーブルで構成し、ASCIIアートは使用していません。
+          </p>
+          <p class="meta">
+            対象読者: VS Code / Copilot CLI / GitHub.com Cloud Agent で
+            <code>.agent.md</code>
+            によるカスタムエージェントをすでに触ったことがあり、Handoffs・Subagents・MCP統合・マルチエージェント設計まで踏み込みたい方。
+          </p>
+        </header>
+
+        <!-- 1. Overview -->
+        <section class="section" id="overview">
+          <div class="section-number">SECTION 1</div>
+          <h2>1. .agent.md とは何か</h2>
+          <div class="prose">
+            <p>
+              <code>.agent.md</code> は、GitHub Copilot
+              に「特定の役割(ペルソナ)」「使えるツール」「振る舞いのルール」をまとめて持たせるための、YAMLフロントマター付きMarkdownファイルです。以前は「custom
+              chat modes」と呼ばれていましたが、名称が「custom agents」に統一されました。既存の
+              <code>.chatmode.md</code> ファイルがあれば、拡張子を
+              <code>.agent.md</code> に変更するだけで移行できます。
+            </p>
+            <p>
+              <code>.agent.md</code>
+              が解決する課題はシンプルです。汎用の「なんでも屋」エージェントに毎回同じ前提知識やツール制限を説明し直すのは非効率です。プランナー、実装者、セキュリティレビュアーといった役割ごとにファイルを分けておけば、ドロップダウンやスラッシュコマンドで切り替えるだけで、その役割に最適化されたツールセットと指示が適用されます。
+            </p>
+            <p>
+              <code>.agent.md</code>
+              が置かれる代表的な場所は次の3プラットフォームです。挙動やフロントマターの一部フィールドがプラットフォームごとに微妙に異なるため、第2章の全仕様表で必ず確認してください。
+            </p>
+          </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th>プラットフォーム</th>
+                <th>主な用途</th>
+                <th>参照ディレクトリ(既定)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>VS Code(Copilot Chat)</td>
+                <td>エディタ内での対話・編集・計画</td>
+                <td>
+                  <code>.github/agents/</code>(ワークスペース)/
+                  <code>~/.copilot/agents</code>(ユーザー)
+                </td>
+              </tr>
+              <tr>
+                <td>GitHub Copilot CLI</td>
+                <td>ターミナル駆動のワークフロー自動化</td>
+                <td><code>.github/agents/</code></td>
+              </tr>
+              <tr>
+                <td>GitHub Copilot Cloud Agent(GitHub.com)</td>
+                <td>Issue割り当てによる自律実行</td>
+                <td>リポジトリ内のエージェントプロファイル</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="prose">
+            <p>
+              なお VS Code は <code>.claude/agents</code> フォルダ内の
+              <code>.md</code> ファイル(Claude Code
+              のサブエージェント形式)も自動検出し、ツール名をVS
+              Code側の名称にマッピングします。両フォーマットを使い分ければ、同じエージェント定義をVS
+              CodeとClaude Codeの間で使い回すことも可能です。
+            </p>
+          </div>
+        </section>
+
+        <!-- 2. Frontmatter -->
+        <section class="section" id="frontmatter">
+          <div class="section-number">SECTION 2</div>
+          <h2>2. フロントマター全仕様</h2>
+          <div class="prose">
+            <p>
+              <code>.agent.md</code>
+              のフロントマターはYAMLで記述し、本体(Markdown)がシステムプロンプトとしてユーザーの入力の前に挿入されます。フィールドの意味はプラットフォームによって一部異なるため、まずVS
+              Code版の全フィールドを網羅し、その後にGitHub Copilot Cloud
+              Agent版との差分を整理します。
+            </p>
+          </div>
+
+          <h3>2.1 VS Code版フロントマター全フィールド</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>フィールド</th>
+                <th>型</th>
+                <th>必須</th>
+                <th>説明</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>description</code></td>
+                <td>string</td>
+                <td>推奨</td>
+                <td>
+                  エージェントの概要。チャット入力欄のプレースホルダーやエージェント選択ピッカーに表示される。
+                </td>
+              </tr>
+              <tr>
+                <td><code>name</code></td>
+                <td>string</td>
+                <td>任意</td>
+                <td>表示名。省略時はファイル名が使われる。</td>
+              </tr>
+              <tr>
+                <td><code>argument-hint</code></td>
+                <td>string</td>
+                <td>任意</td>
+                <td>チャット入力欄に薄字で表示される入力ヒント。</td>
+              </tr>
+              <tr>
+                <td><code>tools</code></td>
+                <td>string[]</td>
+                <td>推奨</td>
+                <td>
+                  利用可能な組み込みツール・ツールセット・MCPツール・拡張機能提供ツールの一覧。<code
+                    >&lt;サーバー名&gt;/*</code
+                  >
+                  でMCPサーバーの全ツールを一括指定できる。
+                </td>
+              </tr>
+              <tr>
+                <td><code>agents</code></td>
+                <td>string[]</td>
+                <td>任意</td>
+                <td>
+                  このエージェントがサブエージェントとして呼び出せるエージェント名の許可リスト。<code
+                    >*</code
+                  >
+                  は全許可、空配列 <code>[]</code> はサブエージェント利用を禁止。指定する場合は
+                  <code>tools</code> に <code>agent</code> ツールを含める必要がある。
+                </td>
+              </tr>
+              <tr>
+                <td><code>model</code></td>
+                <td>string | string[]</td>
+                <td>任意</td>
+                <td>
+                  使用するモデル。配列で指定すると先頭から順に利用可能なモデルを試す(フォールバック)。省略時はモデルピッカーで選択中のモデルを使用。
+                </td>
+              </tr>
+              <tr>
+                <td><code>reasoningEffort</code></td>
+                <td>low | medium | high</td>
+                <td>任意</td>
+                <td>
+                  推論の強度をエージェント単位で固定する(例: 整形専用エージェントは
+                  low、セキュリティレビューは high)。
+                </td>
+              </tr>
+              <tr>
+                <td><code>user-invocable</code></td>
+                <td>boolean</td>
+                <td>任意(既定 true)</td>
+                <td>
+                  <code>false</code>
+                  にするとエージェント選択ドロップダウンから隠れ、サブエージェントとしてのみ呼び出し可能になる。
+                </td>
+              </tr>
+              <tr>
+                <td><code>disable-model-invocation</code></td>
+                <td>boolean</td>
+                <td>任意(既定 false)</td>
+                <td>
+                  <code>true</code>
+                  にすると他のエージェントからサブエージェントとして呼ばれなくなる(ユーザーが明示的に選んだ時のみ動作)。
+                </td>
+              </tr>
+              <tr>
+                <td><code>infer</code></td>
+                <td>boolean</td>
+                <td>非推奨</td>
+                <td>
+                  旧仕様。<code>user-invocable</code> と
+                  <code>disable-model-invocation</code> に置き換え済み。
+                </td>
+              </tr>
+              <tr>
+                <td><code>target</code></td>
+                <td>vscode | github-copilot</td>
+                <td>任意</td>
+                <td>エージェントの対象環境。</td>
+              </tr>
+              <tr>
+                <td><code>mcp-servers</code></td>
+                <td>object[]</td>
+                <td>任意</td>
+                <td>
+                  <code>target: github-copilot</code>
+                  のカスタムエージェントで使うMCPサーバー設定(JSON)。
+                </td>
+              </tr>
+              <tr>
+                <td><code>handoffs</code></td>
+                <td>object[]</td>
+                <td>任意</td>
+                <td>
+                  チャット応答後に表示する「次のエージェントへの引き継ぎ」ボタンの定義。詳細は第4章。
+                </td>
+              </tr>
+              <tr>
+                <td><code>handoffs[].label</code></td>
+                <td>string</td>
+                <td>Handoffs使用時必須</td>
+                <td>ボタンに表示するテキスト。</td>
+              </tr>
+              <tr>
+                <td><code>handoffs[].agent</code></td>
+                <td>string</td>
+                <td>Handoffs使用時必須</td>
+                <td>切り替え先のエージェント識別子。</td>
+              </tr>
+              <tr>
+                <td><code>handoffs[].prompt</code></td>
+                <td>string</td>
+                <td>任意</td>
+                <td>切り替え先に送信するプロンプト文。</td>
+              </tr>
+              <tr>
+                <td><code>handoffs[].send</code></td>
+                <td>boolean</td>
+                <td>任意(既定 false)</td>
+                <td>
+                  <code>true</code> なら自動送信、<code>false</code>
+                  ならプロンプトを入力欄にプリフィルするだけ。
+                </td>
+              </tr>
+              <tr>
+                <td><code>handoffs[].model</code></td>
+                <td>string</td>
+                <td>任意</td>
+                <td>
+                  Handoff実行時に使うモデル。<code>GPT-5 (copilot)</code> のように「モデル名
+                  (ベンダー)」形式で指定。
+                </td>
+              </tr>
+              <tr>
+                <td><code>hooks</code>(プレビュー)</td>
+                <td>object</td>
+                <td>任意</td>
+                <td>
+                  このエージェントが有効な間だけ動作するフック(例:
+                  編集後に自動フォーマッタを実行)。<code>chat.useCustomAgentHooks</code>
+                  の有効化が必要。
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="callout">
+            <strong>補足:</strong>
+            <code>tools</code>
+            に指定したツールがその時点で利用不可な場合、そのツールは黙って無視されます(エラーにはなりません)。
+          </div>
+
+          <h3>2.2 Claude形式(.claude/agents)との違い</h3>
+          <div class="prose">
+            <p>
+              VS Codeは <code>.claude/agents</code> フォルダ内のプレーンな
+              <code>.md</code> ファイル(Claude Code
+              のサブエージェント形式)も検出します。フィールド名と型が異なる点に注意してください。
+            </p>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>フィールド</th>
+                <th>型</th>
+                <th>説明</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>name</code></td>
+                <td>string(必須)</td>
+                <td>エージェント名</td>
+              </tr>
+              <tr>
+                <td><code>description</code></td>
+                <td>string</td>
+                <td>エージェントの役割</td>
+              </tr>
+              <tr>
+                <td><code>tools</code></td>
+                <td>カンマ区切り文字列</td>
+                <td>
+                  例: <code>"Read, Grep, Glob, Bash"</code>。VS
+                  Code側のツール名に自動マッピングされる。
+                </td>
+              </tr>
+              <tr>
+                <td><code>disallowedTools</code></td>
+                <td>カンマ区切り文字列</td>
+                <td>ブロックするツール</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="prose">
+            <p>
+              VS CodeネイティブのYAML配列形式(<code>tools: ['edit', 'search']</code
+              >)と、Claude形式のカンマ区切り文字列形式の両方がサポートされているため、混同しないよう注意してください。
+            </p>
+          </div>
+
+          <h3>2.3 GitHub Copilot Cloud Agent(GitHub.com)版との差分</h3>
+          <div class="prose">
+            <p>
+              GitHub.com上のCopilot Cloud
+              Agent(Issueへのアサインで動く自律エージェント)向けの設定リファレンスでは、フィールド自体はVS
+              Code版とほぼ共通ですが、<strong
+                >「handoffs」と「argument-hint」は現時点でCloud Agentでは無視される</strong
+              >という重要な違いがあります。つまり、これらのフィールドを含むエージェントファイルをそのままCloud
+              Agentで使っても、VS
+              Codeのような引き継ぎボタンは表示されません。複数プラットフォームでエージェントファイルを共有する場合は、この非対応差分をチーム内ドキュメントに明記しておくべきです。
+            </p>
+          </div>
+
+          <h3>2.4 GitHub Copilot CLI版のポイント</h3>
+          <div class="prose">
+            <p>
+              CLIでは
+              <code>.github/agents/&lt;name&gt;.agent.md</code>
+              という命名規則でエージェントプロファイルを配置します。フロントマターの基本構造はVS
+              Code版と共通ですが、CLI特有の運用として以下が挙げられます。
+            </p>
+            <ul>
+              <li>エージェントは <code>/agent</code> スラッシュコマンドで選択する。</li>
+              <li>
+                Agent Coordination
+                Protocol(ACP)対応クライアント(Zedやエディタプラグイン、CI連携ツールなど)は、<code
+                  >agent</code
+                >
+                セッション設定オプションでプログラム的にエージェントを切り替えられる。
+              </li>
+              <li>
+                ACPクライアントは、エージェントが多段階タスクを進める様子を示す「ライブプラン」も受け取れるため、ターン完了を待たずに進捗表示ができる。
+              </li>
+            </ul>
+          </div>
+
+          <h3>2.5 基本サンプル</h3>
+          <span class="code-label">accessibility.agent.md</span>
+          <pre><code class="hljs language-yaml" data-inject="code-2-5"></code><script type="text/plain" data-inject="code-2-5">
+---
+description: 'Web accessibility(WCAG 2.1/2.2)とインクルーシブUXの専門アシスタント'
+name: 'Accessibility Expert'
+model: GPT-5.2
+tools: ['codebase', 'edit/editFiles', 'web/fetch', 'runTests', 'problems']
+---
+
+# Accessibility Expert
+
+あなたはWCAG 2.1/2.2に精通したアクセシビリティの専門家です。デザイナー、開発者、QA向けに
+実務的なガイダンスを提供してください。
+</script></pre>
+        </section>
+
+        <!-- 3. Step by step -->
+        <section class="section" id="stepbystep">
+          <div class="section-number">SECTION 3</div>
+          <h2>3. ステップバイステップ作成ガイド</h2>
+          <div class="prose">
+            <p>
+              GitHubが2,500件超の公開
+              <code>agents.md</code>
+              ファイルを分析した結果によれば、うまく機能しているファイルには共通のパターンがあります。「あなたは親切なコーディングアシスタントです」のような曖昧な指示は機能せず、「あなたはReactコンポーネントのテストを書くテストエンジニアであり、このサンプルに従い、ソースコードは絶対に変更しません」のように具体的である必要があります。以下のステップは、この分析結果と公式ドキュメントの作成フローを統合したものです。
+            </p>
+
+            <h3>ステップ0: 1つのタスクに絞る</h3>
+            <p>
+              「汎用ヘルパー」を作らないことが最初の分岐点です。ドキュメント執筆、テスト作成、Lint修正、API実装、開発環境デプロイなど、<strong>具体的なジョブを1つだけ</strong>選びます。欲張って複数の役割を1つのエージェントに詰め込むと、後述する「巨大エージェント」アンチパターンに陥ります。
+            </p>
+
+            <h3>ステップ1: 配置場所を決める</h3>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>スコープ</th>
+                <th>既定の配置場所</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>ワークスペース(チーム共有)</td>
+                <td><code>.github/agents/</code> フォルダ</td>
+              </tr>
+              <tr>
+                <td>ワークスペース(Claude形式)</td>
+                <td><code>.claude/agents/</code> フォルダ</td>
+              </tr>
+              <tr>
+                <td>ユーザープロファイル(個人・全ワークスペース共通)</td>
+                <td><code>~/.copilot/agents</code> またはVS Codeユーザーデータ</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="prose">
+            <p>
+              チームで共有する場合はワークスペーススコープ(<code>.github/agents/</code>)を選び、Gitでバージョン管理してレビュー対象にするのが基本です。モノレポでは
+              <code>chat.useCustomizationsInParentRepositories</code>
+              を有効にすると、親リポジトリルートのエージェントも検出できます。
+            </p>
+
+            <h3>ステップ2: フロントマターを書く</h3>
+            <p>
+              最低限、<code>name</code> と <code>description</code> があれば動作します。慣れてきたら
+              <code>tools</code> で権限を絞り込み、<code>model</code> で適切なモデルを固定します。VS
+              Codeでは <code>/agents</code> とチャット欄に打つと「Configure Custom
+              Agents」メニューが開き、GUIからも作成できます。AIに生成させる場合は Agent モードで
+              <code>/create-agent</code>
+              と打ち、「セキュリティレビューエージェント」のように役割を説明すると、AIが確認質問をしながら適切なフロントマターと指示を含む
+              <code>.agent.md</code>
+              を生成してくれます。既存の会話から「このタスク用のエージェントを作って」と頼んで抽出することもできます。
+            </p>
+
+            <h3>ステップ3: 本文を「6つの核」で構成する</h3>
+            <p>
+              2,500件の分析から導かれた、成果を出しているエージェントファイルに共通する6領域です。
+            </p>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>領域</th>
+                <th>書くべき内容</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>コマンド</td>
+                <td>
+                  <code>npm test</code>、<code>pytest -v</code>
+                  のように、フラグ込みの実行可能コマンドを早い段階に書く
+                </td>
+              </tr>
+              <tr>
+                <td>テスト</td>
+                <td>テストフレームワークと実行方法、成功基準</td>
+              </tr>
+              <tr>
+                <td>プロジェクト構造</td>
+                <td>ディレクトリごとの役割(読む場所・書く場所を明示)</td>
+              </tr>
+              <tr>
+                <td>コードスタイル</td>
+                <td>実際のコード例を1つ見せる(説明文3段落より効果的)</td>
+              </tr>
+              <tr>
+                <td>Gitワークフロー</td>
+                <td>コミット前に何を実行すべきか、ブランチ運用</td>
+              </tr>
+              <tr>
+                <td>境界(バウンダリ)</td>
+                <td>触ってはいけないもの(シークレット、<code>vendor/</code>、本番設定など)</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="prose">
+            <p>
+              コマンドは早めに書くこと、説明より実例を優先すること、そして「絶対にシークレットをコミットしない」のような境界線を明示することが、分析上もっとも効果があった項目として挙げられています。
+            </p>
+
+            <h3>ステップ4: バウンダリを3段階で明文化する</h3>
+            <p>
+              「常にやってよいこと」「先に確認すること」「絶対にやらないこと」の3層構造にすると、破壊的なミスを防ぎやすくなります。
+            </p>
+          </div>
+          <ul class="boundary-list">
+            <li class="b-ok">
+              ✅ 常に実行してよい:
+              <code>docs/</code> への新規ファイル作成、スタイルガイドの遵守、<code
+                >markdownlint</code
+              >
+              の実行
+            </li>
+            <li class="b-ask">⚠️ 先に確認する: 既存ドキュメントの大幅な書き換え</li>
+            <li class="b-no">
+              🚫 絶対にしない:
+              <code>src/</code> 配下のコード変更、設定ファイルの編集、シークレットのコミット
+            </li>
+          </ul>
+
+          <div class="prose">
+            <h3>ステップ5: テストして、失敗から育てる</h3>
+            <p>
+              最良のエージェントファイルは、事前の完璧な設計ではなく反復から生まれます。まずは最小構成(名前・説明・ペルソナ)で動かし、エージェントが間違えたポイントに合わせてルールを足していくアプローチが推奨されています。
+            </p>
+
+            <h3>ステップ6: プロトタイプ→計画→実装→レビューのハーネスに乗せる</h3>
+            <p>
+              GitHub社内でAI活用を推進するBurke
+              Hollandは、ツールや裏技を積み上げるより「ハーネス(Copilotという実行基盤そのもの)を深く理解する」ことが生産性向上の本質だと述べています。実務では、<code
+                >.agent.md</code
+              >
+              単体よりも次のようなワークフロー全体の中に位置づけるほうが効果的です。
+            </p>
+            <ol>
+              <li>
+                <strong>プロトタイプ</strong>:
+                実装前にHTMLモックやMermaid図で複数案を並べ、要件の曖昧さを可視化する。
+              </li>
+              <li>
+                <strong>計画(Plan mode)</strong>:
+                <code>/plan</code> で実装計画を立てさせ、想定していなかったエッジケースを洗い出す。
+              </li>
+              <li>
+                <strong>実装(Autopilot)</strong>:
+                計画の各項目を完了させるまで反復させる。この段階でCopilotは内部的に、読み取り中心の作業には軽量サブエージェント、複雑な作業にはより大きなモデルのサブエージェントを自動選択する。
+              </li>
+              <li>
+                <strong>人間によるレビューと反復</strong>:
+                出力を「まあ良い」で妥協せず、具体的な修正を会話的に伝える。
+              </li>
+              <li>
+                <strong>ラバーダックレビュー</strong>:
+                別系統のモデルに実装をレビューさせ、モデルごとの死角を補い合う。
+              </li>
+            </ol>
+            <p>
+              この一連の流れの中で
+              <code>.agent.md</code> は「毎回繰り返す前提説明を自動化する部品」として機能します。
+            </p>
+            <h3>3.1 作成ワークフロー図</h3>
+          </div>
+
+          <div class="mermaid-wrapper">
+            <p class="mermaid-caption">図1: .agent.md 作成ワークフロー</p>
+            <pre class="mermaid" data-inject-target="mermaid-1"></pre>
+            <script type="text/plain" data-inject="mermaid-1">
+              flowchart TB
+                  A[タスクを1つ選ぶ] --> B["配置場所を決める(workspace / user)"]
+                  B --> C[フロントマターを書く]
+                  C --> D["本文を6領域で構成する<br/>コマンド・テスト・構造・スタイル・Git・境界"]
+                  D --> E["3段階の境界を明文化<br/>常に許可 / 要確認 / 禁止"]
+                  E --> F[小さく動かして試す]
+                  F --> G{意図通りに<br/>動作したか}
+                  G -- いいえ --> H[失敗パターンをルールに追記]
+                  H --> F
+                  G -- はい --> I[チームと共有<br/>.github/agents にコミット]
+                  I --> J[利用状況を見ながら継続改善]
+            </script>
+          </div>
+        </section>
+
+        <!-- 4. Handoffs -->
+        <section class="section" id="handoffs">
+          <div class="section-number">SECTION 4</div>
+          <h2>4. Handoffs(エージェント連鎖)</h2>
+          <div class="prose">
+            <h3>4.1 概念</h3>
+            <p>
+              Handoffsは、チャット応答が完了したあとに「次のエージェントへ進む」ボタンを表示し、文脈と(必要なら)事前入力済みプロンプトを引き継ぎながらエージェントを切り替える機能です。開発者が各ステップをレビュー・承認してから次に進める、段階的なワークフローの統制に向いています。
+            </p>
+            <p>代表的な連鎖パターンは次の3つです。</p>
+            <ul>
+              <li>
+                <strong>計画 → 実装</strong>:
+                計画エージェントで計画を生成し、実装エージェントへ引き継いでコーディングを開始する。
+              </li>
+              <li>
+                <strong>実装 → レビュー</strong>:
+                実装が終わったらコードレビューエージェントに切り替え、品質・セキュリティを確認する。
+              </li>
+              <li>
+                <strong>失敗するテストを書く → 成功させる</strong>:
+                先に失敗するテストを生成し(実装より差分が小さくレビューしやすい)、そのテストを通す実装へ引き継ぐ。
+              </li>
+            </ul>
+
+            <h3>4.2 フロントマター構文</h3>
+          </div>
+          <span class="code-label">frontmatter</span>
+          <pre><code class="hljs language-yaml" data-inject="code-4-2"></code><script type="text/plain" data-inject="code-4-2">
+---
+description: 新機能の実装計画を生成する
+tools: ['search', 'web']
+handoffs:
+  - label: 実装を開始する
+    agent: implementation
+    prompt: 上記の計画に沿って実装してください。
+    send: false
+    model: GPT-5.2 (copilot)
+---
+</script></pre>
+          <div class="prose">
+            <p>
+              ユーザーがHandoffボタンを押すと、対象エージェントに切り替わり、プロンプトが入力欄にプリフィルされます。<code
+                >send: true</code
+              >
+              にすると、そのプロンプトは自動送信され、次の工程がすぐに始まります。
+            </p>
+            <h3>4.3 実例: Planner → Implementer</h3>
+          </div>
+          <span class="code-label">planner.agent.md</span>
+          <pre><code class="hljs language-yaml" data-inject="code-4-3"></code><script type="text/plain" data-inject="code-4-3">
+---
+description: 新機能や既存コードのリファクタリングの実装計画を生成する。
+name: Planner
+tools: ['web/fetch', 'search/codebase', 'search/usages']
+model: ['Claude Opus 4.5', 'GPT-5.2']
+handoffs:
+  - label: 計画を実装する
+    agent: agent
+    prompt: 上記の計画を実装してください。
+    send: false
+---
+# Planning instructions
+あなたはプランニングモードで動作します。コードは変更せず、実装計画のみを生成してください。
+
+計画は以下のセクションを含むMarkdown文書とします。
+* Overview: 機能やリファクタリングの概要
+* Requirements: 要件一覧
+* Implementation Steps: 実装手順の詳細
+* Testing: 検証すべきテストの一覧
+</script></pre>
+
+          <div class="prose">
+            <h3>4.4 プラットフォーム間の注意点</h3>
+            <p>
+              <code>handoffs</code> はVS Codeのカスタムエージェント機能として設計されており、<strong
+                >GitHub Copilot Cloud
+                Agent(GitHub.com)では現時点でこのフィールドが無視されます</strong
+              >。同じエージェントファイル群を複数プラットフォームで共有する場合、「VS
+              Codeでは引き継ぎボタンが出るが、Cloud
+              Agentでは出ない」という差異をREADME等に明記しておくことをおすすめします。Copilot
+              CLIでは、Handoffsに相当する連鎖体験は <code>/fleet</code> や
+              <code>/research</code>
+              のようなオーケストレーション系スラッシュコマンドで代替されます(詳細は第5章)。
+            </p>
+            <h3>4.5 Handoffsの流れ</h3>
+          </div>
+
+          <div class="mermaid-wrapper">
+            <p class="mermaid-caption">図2: Handoffsによる段階的ワークフロー</p>
+            <pre class="mermaid" data-inject-target="mermaid-2"></pre>
+            <script type="text/plain" data-inject="mermaid-2">
+              flowchart LR
+                  subgraph Plan["Planner エージェント"]
+                      P1[要件を分析]
+                      P2[実装計画を生成]
+                  end
+                  subgraph Impl["Implementer エージェント"]
+                      I1[計画を1手順ずつ実装]
+                      I2[テストを実行]
+                  end
+                  subgraph Review["Reviewer エージェント"]
+                      R1[品質とセキュリティを確認]
+                  end
+                  P1 --> P2
+                  P2 -- "Handoffボタン: 実装を開始する" --> I1
+                  I1 --> I2
+                  I2 -- "Handoffボタン: レビューに回す" --> R1
+            </script>
+          </div>
+        </section>
+
+        <!-- 5. Subagents -->
+        <section class="section" id="subagents">
+          <div class="section-number">SECTION 5</div>
+          <h2>5. Subagents(サブエージェント)</h2>
+          <div class="prose">
+            <h3>5.1 エージェントとサブエージェントの違い</h3>
+            <p>
+              エージェント(主エージェント)はユーザーが選ぶ、あるいはワークフロー用に構成される「セッションの顔」であり、会話全体の文脈と目標を保持し続けます。一方サブエージェントは、主エージェントが起動する一時的なワーカーであり、独立した(分離された)文脈の中で狭いタスクだけを実行し、結果を主エージェントに要約して返します。
+            </p>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>観点</th>
+                <th>エージェント</th>
+                <th>サブエージェント</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>起動方法</td>
+                <td>ユーザーが選択、またはワークフロー用に設定</td>
+                <td>別のエージェント(オーケストレーター)が起動</td>
+              </tr>
+              <tr>
+                <td>生存期間</td>
+                <td>会話・セッションを通じて持続</td>
+                <td>委任されたタスクの間だけ存在</td>
+              </tr>
+              <tr>
+                <td>文脈</td>
+                <td>会話全体の目標を保持</td>
+                <td>タスクに限定した独立した文脈</td>
+              </tr>
+              <tr>
+                <td>役割</td>
+                <td>タスク全体を統括</td>
+                <td>1つの絞り込まれた作業を実行</td>
+              </tr>
+              <tr>
+                <td>出力</td>
+                <td>ユーザーと直接対話</td>
+                <td>主エージェントに結果を返し、主エージェントが統合する</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="prose">
+            <h3>5.2 サブエージェントが有効な場面</h3>
+            <ul>
+              <li>
+                実装前の技術調査(ライブラリ比較・既存パターンの分析)を、主エージェントの文脈を汚さずに行いたいとき
+              </li>
+              <li>
+                リファクタリングやレビューで、複数の観点(重複コード検出・デッドコード・エラーハンドリング・セキュリティ)を並列に洗い出したいとき
+              </li>
+              <li>
+                複数のアプローチ(例: Redisキャッシュ vs インメモリLRU vs
+                ハイブリッド)を比較検討したいとき
+              </li>
+              <li>
+                異なるモデルに同じ問題を検証させ、意見が一致する点・しない点を洗い出したいとき(マルチモデル・コンセンサス)
+              </li>
+            </ul>
+
+            <h3>5.3 呼び出し方(VS Code)</h3>
+            <p>
+              サブエージェントは基本的に<strong>エージェント主導(agent-initiated)</strong>であり、ユーザーが逐一「サブエージェントを実行して」と書く必要はありません。主エージェントが「この部分は文脈分離が有効だ」と判断した時点で自律的に起動します。これを機能させるには
+              <code>tools</code> に <code>agent</code>(内部的には
+              <code>runSubagent</code>)ツールを含めておく必要があります。
+            </p>
+          </div>
+          <span class="code-label">document-feature.agent.md</span>
+          <pre><code class="hljs language-yaml" data-inject="code-5-3"></code><script type="text/plain" data-inject="code-5-3">
+---
+name: document-feature
+tools: ['agent', 'read', 'search', 'edit']
+---
+新機能の実装詳細を調査するサブエージェントを実行し、ユーザー向けドキュメントに関係する
+情報だけを返してください。そのうえで docs/ フォルダを更新してください。
+</script></pre>
+          <div class="prose">
+            <p>
+              プロンプト側で「独立した調査として」「並列で分析して」のように書くことで、サブエージェントへの委任を促すこともできます。
+            </p>
+
+            <h3>5.4 サブエージェントとしてのカスタムエージェント</h3>
+            <p>
+              既定では、サブエージェントは主セッションのモデル・ツールをそのまま引き継ぎます。カスタムエージェントをサブエージェントとして走らせると、そのエージェント自身の
+              <code>model</code
+              >・<code>tools</code>・指示が優先されます。呼び出し制御は次の2つのフィールドで行います。
+            </p>
+            <ul>
+              <li>
+                <code>user-invocable: false</code> …
+                エージェント選択ドロップダウンには表示されず、サブエージェントとしてのみ利用可能
+              </li>
+              <li>
+                <code>disable-model-invocation: true</code> …
+                他のエージェントからサブエージェントとして呼ばれなくなる(ユーザーが明示的に選んだ場合のみ動作)
+              </li>
+            </ul>
+          </div>
+          <span class="code-label">internal-helper.agent.md</span>
+          <pre><code class="hljs language-yaml" data-inject="code-5-4"></code><script type="text/plain" data-inject="code-5-4">
+---
+name: internal-helper
+user-invocable: false
+---
+このエージェントはサブエージェントとしてのみ呼び出せます。
+</script></pre>
+
+          <div class="prose">
+            <h3>5.5 呼び出せるサブエージェントを制限する(実験的機能)</h3>
+            <p>
+              既定では
+              <code>disable-model-invocation: true</code>
+              を持たないすべてのカスタムエージェントがサブエージェント候補になります。名前や説明が似ているエージェントが複数あると、意図しないエージェントが選ばれることがあるため、<code
+                >agents</code
+              >
+              プロパティで許可リストを明示できます。
+            </p>
+            <ul>
+              <li>
+                特定のエージェント名の配列(例: <code>['Red', 'Green', 'Refactor']</code>)を指定 →
+                それだけを許可
+              </li>
+              <li><code>*</code> → すべて許可(既定動作)</li>
+              <li><code>[]</code> → サブエージェントの利用自体を禁止</li>
+            </ul>
+          </div>
+          <span class="code-label">tdd.agent.md</span>
+          <pre><code class="hljs language-yaml" data-inject="code-5-5"></code><script type="text/plain" data-inject="code-5-5">
+---
+name: TDD
+tools: ['agent']
+agents: ['Red', 'Green', 'Refactor']
+---
+テスト駆動開発でこの機能を実装してください。以下の手順でサブエージェントを使います。
+1. Red エージェントで失敗するテストを書く
+2. Green エージェントでテストを通すコードを実装する
+3. Refactor エージェントでコード品質を改善する
+</script></pre>
+          <div class="prose">
+            <p>
+              <code>agents</code> 配列に明示的に列挙されたエージェントは、<code
+                >disable-model-invocation: true</code
+              >
+              の設定より優先されます。つまり「一般的にはサブエージェントとして使われたくないが、特定のコーディネーターからは呼ばれてよい」というエージェントを作れます。
+            </p>
+
+            <h3>5.6 ネストしたサブエージェント(再帰)</h3>
+            <p>
+              既定ではサブエージェントはさらにサブエージェントを生成できません。これは、エージェントが誤って自分自身をループ呼び出しする無限再帰を防ぐためです。分割統治(divide-and-conquer)のような再帰的な委任が必要な場合は、<code
+                >chat.subagents.allowInvocationsFromSubagents</code
+              >
+              設定(既定
+              false)を有効にします。有効化すると、最大ネスト深度5までサブエージェントが自身のサブエージェントを生成できます。
+            </p>
+          </div>
+          <span class="code-label">recursive-processor.agent.md</span>
+          <pre><code class="hljs language-yaml" data-inject="code-5-6"></code><script type="text/plain" data-inject="code-5-6">
+---
+name: RecursiveProcessor
+tools: ['agent', 'read', 'search']
+agents: [RecursiveProcessor]
+argument-hint: 処理対象の項目リスト
+---
+リストを分割統治で処理します。
+- 項目が5個より多い場合、半分に分割してそれぞれをRecursiveProcessorサブエージェントに委任する
+- 4個以下ならその場で直接処理する
+- 各サブエージェントの結果を統合して最終結果とする
+</script></pre>
+
+          <div class="prose">
+            <h3>5.7 サブエージェントのモデル選択優先順位</h3>
+            <p>サブエージェント実行時のモデルは、次の優先順位で決まります。</p>
+            <ol>
+              <li>
+                主エージェントが <code>runSubagent</code> ツール呼び出し時に明示的に指定したモデル
+              </li>
+              <li>
+                サブエージェント自身の <code>.agent.md</code> フロントマターの <code>model</code>
+              </li>
+              <li>親の会話を実行しているメインモデル</li>
+            </ol>
+            <p>
+              なお、要求されたモデルは主モデルのコスト階層を超えられません。より高価なモデルを要求した場合は主モデルにフォールバックします。
+            </p>
+
+            <h3>5.8 GitHub Copilot CLIでのオーケストレーション</h3>
+            <p>
+              VS Codeの <code>agent</code> ツールに相当する体験として、Copilot CLIには
+              <code>/fleet</code>
+              というエンドユーザー向けのオーケストレーションコマンドがあります。大きな目標を分解し、複数のバックグラウンドサブエージェントを起動し、依存関係を尊重しながら結果を統合します。
+            </p>
+          </div>
+          <span class="code-label">terminal</span>
+          <pre><code class="hljs language-bash" data-inject="code-5-8"></code><script type="text/plain" data-inject="code-5-8">
+/fleet 認証まわりのドキュメントを更新し、認証サービスをリファクタリングし、関連テストを追加して。
+
+# 非対話実行の場合
+copilot -p "/fleet 認証まわりのドキュメントを更新し、認証サービスをリファクタリングし、関連テストを追加して。" --no-ask-user
+</script></pre>
+          <div class="prose">
+            <p>
+              また
+              <code>/research</code>
+              は、1つのトピックを複数の調査スレッドに分解し、並列サブエージェントとして実行してから構造化レポートに統合する、組み込みのオーケストレーションコマンドです。自分でマルチエージェントパターンを組まなくても、単発の質問より深く信頼性の高い調査結果が得られます。
+            </p>
+
+            <h3>5.9 サブエージェントの並列度・深度制御</h3>
+            <p>
+              利用量ベース課金のユーザーは、<code>/settings</code>
+              からサブエージェントの<strong>同時実行数</strong>と<strong>深度の上限</strong>を設定できます。同時実行数は並列に走るサブエージェントの数、深度上限は委任が何階層まで連鎖できるかを制御し、複雑なオーケストレーションタスクにおけるリソース消費を予測可能にします。
+            </p>
+
+            <h3>5.10 サブエージェントの実行フロー</h3>
+          </div>
+
+          <div class="mermaid-wrapper">
+            <p class="mermaid-caption">図3: サブエージェントの実行フロー</p>
+            <pre class="mermaid" data-inject-target="mermaid-3"></pre>
+            <script type="text/plain" data-inject="mermaid-3">
+              flowchart TB
+                  U[ユーザーが複雑なタスクを依頼] --> M[主エージェントがタスクを分析]
+                  M --> D{文脈分離が<br/>有効な部分がある}
+                  D -- なし --> S[主エージェントが直接処理]
+                  D -- あり --> R["agent ツールで<br/>サブエージェントを起動"]
+                  R --> W1[サブエージェント1: 調査]
+                  R --> W2[サブエージェント2: 実装案A]
+                  R --> W3[サブエージェント3: 実装案B]
+                  W1 --> C[主エージェントが結果を統合]
+                  W2 --> C
+                  W3 --> C
+                  C --> O[ユーザーへ最終結果を提示]
+            </script>
+          </div>
+        </section>
+
+        <!-- 6. MCP -->
+        <section class="section" id="mcp">
+          <div class="section-number">SECTION 6</div>
+          <h2>6. MCP統合</h2>
+          <div class="prose">
+            <h3>6.1 MCPとは</h3>
+            <p>
+              Model Context
+              Protocol(MCP)は、AIモデルを外部ツールやサービスに接続するためのオープンな標準規格です。GitHub
+              CopilotにおいてMCPサーバーは、ファイル操作・データベース・外部APIなどのための「ツール」を提供します。MCPサーバーは、ツールに加えて「リソース(読み取り専用の文脈データ)」「プロンプト(定型プロンプトのテンプレート)」「MCP
+              Apps(チャット内に直接描画されるフォームやビジュアライゼーションなどの対話型UI)」も提供できます。
+            </p>
+
+            <h3>6.2 エージェントからMCPツールを使う</h3>
+            <p>
+              <code>.agent.md</code> の
+              <code>tools</code>
+              配列にMCPサーバー名(またはツール名)を追加するだけで、そのエージェントはMCPツールを利用できます。サーバーの全ツールを含めたい場合は
+              <code>&lt;サーバー名&gt;/*</code> という記法を使います。
+            </p>
+          </div>
+          <span class="code-label">database-administrator.agent.md</span>
+          <pre><code class="hljs language-yaml" data-inject="code-6-2"></code><script type="text/plain" data-inject="code-6-2">
+---
+name: 'Database Administrator'
+description: 'PostgreSQLのパフォーマンスチューニング・クエリ最適化・スキーマ設計の専門DBA'
+tools: ['codebase', 'terminal', 'postgres/*']
+---
+</script></pre>
+          <div class="prose">
+            <p>
+              この設定があると、エージェントは実際のデータベースに対して
+              <code>EXPLAIN ANALYZE</code>
+              を実行してボトルネックを特定したり、実データの分布に基づいてインデックスを提案したりできます。MCPサーバーがなければ、エージェントはデータベース構造やパフォーマンス特性を推測するしかありません。
+            </p>
+
+            <h3>6.3 mcp.json によるサーバー設定(VS Code)</h3>
+            <p>
+              MCPサーバーはワークスペース単位(<code>.vscode/mcp.json</code>)、またはユーザープロファイル単位で設定します。
+            </p>
+          </div>
+          <span class="code-label">.vscode/mcp.json</span>
+          <pre><code class="hljs language-json" data-inject="code-6-3"></code><script type="text/plain" data-inject="code-6-3">
+{
+  "servers": {
+    "github": {
+      "type": "http",
+      "url": "https://api.githubcopilot.com/mcp"
+    },
+    "playwright": {
+      "command": "npx",
+      "args": ["-y", "@microsoft/mcp-server-playwright"]
+    }
+  }
+}
+</script></pre>
+          <div class="prose">
+            <p>
+              APIキーなどの機密情報はJSONに直書きせず、<code>${input:variableName}</code>
+              のような入力変数を使うことが強く推奨されています。VS
+              Codeが実行時にプロンプトを出し、コミットされるファイルにシークレットが残らないようにできます。
+            </p>
+
+            <h3>6.4 Copilot CLIでのMCP設定ファイル優先順位</h3>
+            <p>Copilot CLIは、次の順序でMCPサーバー定義を探索します。</p>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>ファイル</th>
+                <th>スコープ</th>
+                <th>備考</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>.mcp.json</code></td>
+                <td>リポジトリルート</td>
+                <td>チーム共有設定として推奨</td>
+              </tr>
+              <tr>
+                <td><code>.github/mcp.json</code></td>
+                <td><code>.github/</code> フォルダ</td>
+                <td>自動読み込みされるワークスペース設定</td>
+              </tr>
+              <tr>
+                <td><code>.vscode/mcp.json</code></td>
+                <td>VS Codeワークスペース</td>
+                <td>VS Code互換設定</td>
+              </tr>
+              <tr>
+                <td><code>devcontainer.json</code></td>
+                <td>Dev Container</td>
+                <td>コンテナ内実行時に利用可能</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="callout warn">
+            <strong>重要な安全対策:</strong> ワークスペースのMCPサーバーは「フォルダ信頼(folder
+            trust)」が確認された後にのみ起動します。明示的に信頼していないフォルダの設定ファイルに書かれたMCPサーバーは起動しないため、信頼していないリポジトリの悪意あるMCPサーバー設定から保護されます。
+          </div>
+
+          <div class="prose">
+            <h3>6.5 認証とサンドボックス</h3>
+            <p>MCPサーバーの認証方式は多岐にわたります。</p>
+            <ul>
+              <li>
+                <strong>OAuth</strong>: ブラウザリダイレクトとトークン保存をCLI/エディタが自動処理
+              </li>
+              <li>
+                <strong>client_credentials グラント</strong>:
+                ブラウザのないヘッドレス環境(CI/CDなど)向けのマシン間認証
+              </li>
+              <li>
+                <strong>デバイスコードフロー(RFC 8628)</strong>:
+                ヘッドレス/CI環境でブラウザリダイレクトが使えない場合の自動フォールバック
+              </li>
+              <li>
+                <strong>環境変数によるAPIキー</strong>:
+                <code>env</code> フィールド経由で渡し、設定ファイルには直書きしない
+              </li>
+            </ul>
+            <p>
+              macOSとLinuxでは、ローカルで動くstdio型MCPサーバーに対してサンドボックス化を有効にできます。<code
+                >sandboxEnabled: true</code
+              >
+              を設定すると、そのサーバーがアクセスできるファイルパスとネットワークドメインを明示的に許可したものだけに制限できます。サンドボックス化されたサーバーのツール呼び出しは、制御された環境内で実行されるため自動承認されます(Windowsでは現時点で非対応)。
+            </p>
+          </div>
+          <span class="code-label">.vscode/mcp.json(サンドボックス設定)</span>
+          <pre><code class="hljs language-json" data-inject="code-6-5"></code><script type="text/plain" data-inject="code-6-5">
+{
+  "servers": {
+    "myServer": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@example/mcp-server"],
+      "sandboxEnabled": true
+    }
+  },
+  "sandbox": {
+    "filesystem": { "allowWrite": ["${workspaceFolder}"] },
+    "network": { "allowedDomains": ["api.example.com"] }
+  }
+}
+</script></pre>
+
+          <div class="prose">
+            <h3>6.6 GitHub Copilot Cloud Agent向けの mcp-servers フィールド</h3>
+            <p>
+              <code>target: github-copilot</code> のカスタムエージェントでは、<code
+                >mcp-servers</code
+              >
+              フロントマターフィールドにMCPサーバー設定(JSON)を直接記述できます。VS Code版が外部の
+              <code>mcp.json</code> を参照するのに対し、Cloud
+              Agent版はエージェントファイル自体にMCP設定を持たせられる点が異なります。
+            </p>
+            <h3>6.7 アーキテクチャ概観</h3>
+          </div>
+
+          <div class="mermaid-wrapper">
+            <p class="mermaid-caption">図4: .agent.md ・MCPサーバー・外部システムの関係</p>
+            <pre class="mermaid" data-inject-target="mermaid-4"></pre>
+            <script type="text/plain" data-inject="mermaid-4">
+              flowchart TB
+                  subgraph Editor["エディタ / CLI / Cloud Agent"]
+                      Agent[".agent.md<br/>tools に MCPサーバー名を指定"]
+                  end
+                  subgraph MCPLayer["MCP レイヤー"]
+                      S1["MCPサーバー: Postgres<br/>ツール提供"]
+                      S2["MCPサーバー: GitHub<br/>リソース提供"]
+                      S3["MCPサーバー: Figma<br/>プロンプト/MCP Apps"]
+                  end
+                  subgraph External["外部システム"]
+                      DB[(データベース)]
+                      API[外部API]
+                      Design[デザインツール]
+                  end
+                  Agent -->|ツール呼び出し| S1
+                  Agent -->|ツール呼び出し| S2
+                  Agent -->|ツール呼び出し| S3
+                  S1 --> DB
+                  S2 --> API
+                  S3 --> Design
+            </script>
+          </div>
+
+          <div class="prose">
+            <h3>6.8 トラブルシューティングの要点(概要)</h3>
+            <p>
+              MCP固有のトラブルシューティングは第8章にまとめていますが、まず押さえるべき基本動線は次の3つです。
+            </p>
+            <ol>
+              <li>
+                サーバーが起動しない/接続が切れる場合、チャットビューにエラーインジケーターが表示されるので選択して出力ログを確認する
+              </li>
+              <li>
+                コマンドパレットの
+                <strong>MCP: List Servers</strong> からサーバーごとの状態確認・再起動ができる
+              </li>
+              <li>
+                CLIでは <code>/mcp show</code>(全サーバー一覧)や
+                <code>/mcp show &lt;name&gt;</code
+                >(個別サーバー詳細)でstderr出力込みの失敗理由を素早く特定できる
+              </li>
+            </ol>
+          </div>
+        </section>
+
+        <!-- 7. Patterns -->
+        <section class="section" id="patterns">
+          <div class="section-number">SECTION 7</div>
+          <h2>7. マルチエージェント設計パターン</h2>
+          <div class="prose">
+            <p>
+              <code>.agent.md</code>
+              の真価は、単体のペルソナ切り替えよりも、複数のエージェントを役割分担させる「オーケストレーション」で発揮されます。ここでは実務でよく使われる設計パターンを、実装例つきで紹介します。
+            </p>
+            <h3>7.1 パターン比較表</h3>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>パターン</th>
+                <th>目的</th>
+                <th>主な構成要素</th>
+                <th>向いている場面</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Coordinator &amp; Worker</td>
+                <td>全体の流れを統括しつつ、専門特化したワーカーに委任する</td>
+                <td>コーディネーター1体 + ワーカー複数体(<code>agents</code> で許可リスト化)</td>
+                <td>機能開発全体(計画→実装→レビュー)のように、明確な工程がある場合</td>
+              </tr>
+              <tr>
+                <td>Multi-perspective Review</td>
+                <td>同じ成果物を複数の視点から独立してレビューする</td>
+                <td>並列サブエージェント(正確性・品質・セキュリティ・アーキテクチャ)</td>
+                <td>コードレビュー、設計レビューなど「見落とし」を減らしたい場合</td>
+              </tr>
+              <tr>
+                <td>Research → Act</td>
+                <td>調査と実行を分離し、主文脈を汚さない</td>
+                <td>調査用サブエージェント → 実装エージェント</td>
+                <td>未知のライブラリ選定、既存パターンの調査が必要な実装</td>
+              </tr>
+              <tr>
+                <td>Recursive Divide &amp; Conquer</td>
+                <td>大きなタスクを再帰的に分割する</td>
+                <td>自己参照する <code>agents</code> プロパティ、ネスト許可設定</td>
+                <td>大量データ処理、大規模リストの一括処理</td>
+              </tr>
+              <tr>
+                <td>Red/Green/Refactor(TDD)</td>
+                <td>テスト駆動開発の3工程をエージェントごとに分離する</td>
+                <td>許可リストで固定された専用サブエージェント3体</td>
+                <td>テスト駆動開発を厳密に運用したいチーム</td>
+              </tr>
+              <tr>
+                <td>Handoffsチェーン</td>
+                <td>人間のレビューを挟みながら段階的に進める</td>
+                <td><code>handoffs</code> フロントマター</td>
+                <td>各工程で承認を得たい、監査性を重視する場合</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="prose">
+            <h3>7.2 Coordinator &amp; Worker(コーディネーター &amp; ワーカー)</h3>
+            <p>
+              コーディネーターは全体のワークフローを管理し、専門特化したサブエージェントにサブタスクを委任します。各ワーカーは読み取り専用ツールだけを持つプランナーや、編集権限を持つ実装者など、必要な権限だけを個別に持てます。
+            </p>
+          </div>
+          <span class="code-label">feature-builder.agent.md</span>
+          <pre><code class="hljs language-yaml" data-inject="code-7-2a"></code><script type="text/plain" data-inject="code-7-2a">
+---
+name: Feature Builder
+tools: ['agent', 'edit', 'search', 'read']
+agents: ['Planner', 'Plan Architect', 'Implementer', 'Reviewer']
+---
+あなたは機能開発のコーディネーターです。各機能要求について次の手順を踏みます。
+
+1. Planner エージェントで機能をタスクに分解する
+2. Plan Architect エージェントで計画をコードベースの既存パターンと照合する
+3. アーキテクトが再利用可能なパターンやライブラリを指摘したら、Plannerへフィードバックし計画を更新する
+4. Implementer エージェントで各タスクのコードを書く
+5. Reviewer エージェントで実装を確認する
+6. レビューアが問題を指摘したら、再度Implementerエージェントで修正する
+
+各フェーズが収束するまで、計画とアーキテクチャの往復、レビューと実装の往復を繰り返してください。
+</script></pre>
+          <span class="code-label">implementer.agent.md(軽量モデルを優先)</span>
+          <pre><code class="hljs language-yaml" data-inject="code-7-2b"></code><script type="text/plain" data-inject="code-7-2b">
+---
+name: Implementer
+user-invocable: false
+model: ['Claude Haiku 4.5 (copilot)', 'Gemini 3 Flash (Preview) (copilot)']
+---
+割り当てられたタスクを実装するコードを書いてください。
+</script></pre>
+
+          <div class="prose">
+            <h3>7.3 Multi-perspective Review(多視点レビュー)</h3>
+            <p>
+              コードレビューは1回のパスだけでは見落としが生じがちです。異なる視点を並列サブエージェントとして走らせ、あとから統合するとレビュー品質が上がります。
+            </p>
+          </div>
+          <span class="code-label">thorough-reviewer.agent.md</span>
+          <pre><code class="hljs language-yaml" data-inject="code-7-3"></code><script type="text/plain" data-inject="code-7-3">
+---
+name: Thorough Reviewer
+tools: ['agent', 'read', 'search']
+---
+あなたは複数の視点を同時にレビューします。各視点を独立した並列サブエージェントとして実行し、
+互いの結果に引きずられないようにしてください。
+
+レビュー依頼を受けたら、以下を並列サブエージェントとして実行します。
+- 正確性レビュアー: ロジックの誤り、エッジケース、型の問題
+- コード品質レビュアー: 可読性、命名、重複
+- セキュリティレビュアー: 入力検証、インジェクションリスク、データ漏えい
+- アーキテクチャレビュアー: 既存パターンとの整合性、設計の一貫性
+
+全サブエージェントの完了後、優先度付きサマリーに統合してください。致命的な問題とnice-to-have
+を区別し、良かった点にも触れてください。
+</script></pre>
+          <div class="prose">
+            <p>
+              より細かく制御したい場合、各視点を専用のカスタムエージェントとして切り出し、セキュリティレビュアーにはセキュリティ特化MCPサーバー、コード品質レビュアーには社内Lint
+              CLIツールを個別に持たせる、といった拡張も可能です。
+            </p>
+
+            <h3>7.4 Research → Act(調査してから実行)</h3>
+            <p>
+              未知の技術選定が絡む実装では、先に調査専用のサブエージェントで選択肢を洗い出し、主エージェントの文脈をきれいに保ったまま実装フェーズへ進むパターンが有効です。
+            </p>
+          </div>
+          <span class="code-label">プロンプト例</span>
+          <pre><code class="hljs language-plaintext" data-inject="code-7-4"></code><script type="text/plain" data-inject="code-7-4">
+このAPIにキャッシュ機能を実装したいので、次の3案について独立調査を行ってください。
+1. Redisベースのキャッシュ設計
+2. LRU削除つきインメモリキャッシュ設計
+3. 階層型(ハイブリッド)キャッシュ設計
+
+結果を比較し、この用途に最適な案を推奨してください。
+</script></pre>
+          <div class="prose">
+            <p>
+              主エージェントは最終的な推奨結果だけを受け取るため、実装作業に入る際の文脈がノイズで汚れません。
+            </p>
+
+            <h3>7.5 Recursive Divide &amp; Conquer(再帰的な分割統治)</h3>
+            <p>
+              大量の項目を処理する場合、自分自身をサブエージェントとして再帰的に呼び出すパターンが使えます(第5.6節参照)。既定では無効な「ネストしたサブエージェント」設定を有効化する必要がある点に注意してください。
+            </p>
+
+            <h3>7.6 Red/Green/Refactor(TDDパターン)</h3>
+            <p>
+              汎用的なコーディングエージェントに丸投げすると、テスト駆動開発の各工程が曖昧になりがちです。専用の3エージェントに許可リストで固定すると、意図しない汎用エージェントが選ばれる事故を防げます(第5.5節のサンプル参照)。
+            </p>
+
+            <h3>7.7 マルチエージェント設計のフロー</h3>
+          </div>
+
+          <div class="mermaid-wrapper">
+            <p class="mermaid-caption">図5: Coordinator &amp; Worker パターンの全体フロー</p>
+            <pre class="mermaid" data-inject-target="mermaid-5"></pre>
+            <script type="text/plain" data-inject="mermaid-5">
+              flowchart TB
+                  Req[機能要求] --> Coord["Coordinator エージェント<br/>agents で許可リストを制御"]
+                  Coord --> Plan[Planner]
+                  Plan --> Arch["Plan Architect<br/>既存パターンと照合"]
+                  Arch -- 差し戻し --> Plan
+                  Arch -- 承認 --> Impl[Implementer]
+                  Impl --> Rev[Reviewer]
+                  Rev -- 修正依頼 --> Impl
+                  Rev -- 承認 --> Done[マージ可能な成果物]
+            </script>
+          </div>
+
+          <div class="prose">
+            <h3>7.8 設計上の指針</h3>
+            <ul>
+              <li>
+                <strong>1エージェント1ペルソナ</strong
+                >を守る。セキュリティ・テスト・ドキュメント・デプロイを1体に詰め込まず、専用エージェントに分割し、共通処理はスキルとして切り出す。
+              </li>
+              <li>
+                コーディネーターには
+                <code>agents</code>
+                の許可リストを必ず設定する。似た名前・説明を持つエージェントが複数あると、意図しないエージェントが選ばれるリスクが高まる。
+              </li>
+              <li>
+                ワーカーエージェントは既定で
+                <code>user-invocable: false</code>
+                にして、ピッカーを汚さずサブエージェント専用にしておく。
+              </li>
+              <li>
+                コストの異なるモデルをワーカーごとに使い分ける。要求モデルは主モデルのコスト階層を超えられない点に注意。
+              </li>
+              <li>
+                「ハーネスの単純さ」を忘れない。すべてのタスクにオーケストレーションが必要なわけではなく、単一ファイルで完結する作業にサブエージェントは不要というのが実務者の共通見解です。
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- 8. Troubleshooting -->
+        <section class="section" id="troubleshooting">
+          <div class="section-number">SECTION 8</div>
+          <h2>8. トラブルシューティング</h2>
+          <div class="prose">
+            <h3>8.1 まず使うべき診断ツール</h3>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>ツール</th>
+                <th>できること</th>
+                <th>開き方</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Agent Debug Log パネル(プレビュー)</td>
+                <td>
+                  ツール呼び出し順序、LLMリクエスト、トークン使用量、カスタマイズファイルの検出過程、エラーを時系列で確認
+                </td>
+                <td>チャットビューの「…」メニュー→「Show Agent Debug Logs」</td>
+              </tr>
+              <tr>
+                <td>Chat Debug View</td>
+                <td>各LLMリクエスト/レスポンスの生データ(システムプロンプト全文含む)を確認</td>
+                <td>チャットビューの「…」メニュー→「Show Chat Debug View」</td>
+              </tr>
+              <tr>
+                <td><code>/troubleshoot</code> スラッシュコマンド</td>
+                <td>
+                  直近セッションのデバッグログをAIに解析させる。<code>#session</code>
+                  で過去セッションも指定可能
+                </td>
+                <td>
+                  チャット入力欄に直接入力(<code>github.copilot.chat.agentDebugLog.enabled</code>
+                  の有効化が必要)
+                </td>
+              </tr>
+              <tr>
+                <td>Diagnostics(チャットカスタマイズ診断)</td>
+                <td>
+                  読み込まれているエージェント・プロンプトファイル・指示ファイル・スキルとそのエラーを一覧表示
+                </td>
+                <td>チャットビューを右クリック→「Diagnostics」</td>
+              </tr>
+              <tr>
+                <td>ログレベル Trace</td>
+                <td>GitHub Copilot / GitHub Copilot Chat 拡張機能の詳細ログ</td>
+                <td>コマンドパレット「Developer: Set Log Level」→ Trace</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="prose">
+            <h3>8.2 よくある問題と対処</h3>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>症状</th>
+                <th>主な原因</th>
+                <th>対処</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>エージェントがドロップダウン・ピッカーに出てこない</td>
+                <td>
+                  <code>user-invocable: false</code>
+                  になっている、ファイルが検出対象パス外にある、拡張機能/プラグイン側の既知バグ
+                </td>
+                <td>
+                  フロントマターを確認し、<code>.github/agents/</code>
+                  配下にあるか確認。IDEによっては再読み込みが必要な既知バグが報告されているため拡張機能を最新化する
+                </td>
+              </tr>
+              <tr>
+                <td>ファイルを開いている間だけエージェントが表示される</td>
+                <td>
+                  一部IDE統合(例:
+                  Xcode向けCopilot)でファイルシステム監視が未実装という既知の不具合が報告されている
+                </td>
+                <td>
+                  該当拡張機能のIssueトラッカーで状況を確認し、当面は該当ファイルを開いた状態で作業する
+                </td>
+              </tr>
+              <tr>
+                <td>サブエージェントとして一覧に出ない/呼ばれない</td>
+                <td>
+                  <code>tools</code> に <code>agent</code> が含まれていない、<code
+                    >disable-model-invocation: true</code
+                  >
+                  になっている、コーディネーター側の <code>agents</code> 許可リストに含まれていない
+                </td>
+                <td>
+                  <code>tools: ['agent', ...]</code> を確認し、コーディネーター側の
+                  <code>agents</code> 配列に対象エージェント名を追加する
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  ユーザーレベルのエージェント(<code>~/.copilot/agents</code>)が読み込まれない
+                </td>
+                <td>
+                  CLI/SDKのバージョンやクライアント実装によって、ユーザーレベルのエージェント読み込みが未対応・不具合を抱えている場合がある
+                </td>
+                <td>
+                  CLI/拡張機能を最新版に更新し、改善しない場合はリポジトリレベル(<code>.github/agents/</code>)に一時的にコピーして回避する
+                </td>
+              </tr>
+              <tr>
+                <td>Handoffsボタンが出ない</td>
+                <td>
+                  Cloud Agent環境で使っている(現時点で
+                  <code>handoffs</code> は無視される)、<code>send</code>/<code>label</code>/<code
+                    >agent</code
+                  >
+                  のいずれかが未設定
+                </td>
+                <td>
+                  VS Codeで動作確認する。Cloud
+                  Agentでは引き継ぎUIが出ない仕様であることをチームに共有する
+                </td>
+              </tr>
+              <tr>
+                <td>モデル指定でエラーになる/意図したモデルが使われない</td>
+                <td>
+                  <code>model</code>
+                  に配列を渡した際のクライアント側実装差異、指定したモデル名の表記揺れ
+                </td>
+                <td>
+                  まずは単一の文字列で動作確認し、正しいモデル名(ベンダー表記込み)を公式ドキュメントで確認してから配列化する
+                </td>
+              </tr>
+              <tr>
+                <td>MCPサーバーが起動しない</td>
+                <td>
+                  実行コマンド(<code>npx</code>/<code>python</code>等)がPATH上にない、必須の環境変数(接続文字列やAPIキー)が未設定
+                </td>
+                <td>
+                  CLIでは失敗時にstderr出力がそのまま警告に表示されるため、そこに書かれた原因(例:
+                  環境変数未設定)を確認する
+                </td>
+              </tr>
+              <tr>
+                <td>MCPサーバーで認証エラー(401など)</td>
+                <td>トークン期限切れ、認証情報の設定漏れ</td>
+                <td>
+                  <code>/mcp auth</code> で再認証する。設定ファイルの
+                  <code>env</code> フィールドを見直す
+                </td>
+              </tr>
+              <tr>
+                <td>MCPサーバーが組織ポリシーでブロックされる</td>
+                <td>組織レベルでMCPサーバーの許可リストが設定されている</td>
+                <td>管理者に許可リストを確認し、承認済みの代替サーバーに切り替える</td>
+              </tr>
+              <tr>
+                <td>MCPサーバーがワークスペースで一切起動しない</td>
+                <td>フォルダ信頼(folder trust)が未確認のまま</td>
+                <td>
+                  フォルダを信頼するダイアログで承認する。信頼していないリポジトリでは意図的に起動しない仕様であることを理解する
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="prose">
+            <h3>8.3 MCP診断コマンド早見表</h3>
+          </div>
+          <span class="code-label">Copilot CLI</span>
+          <pre><code class="hljs language-bash" data-inject="code-8-3"></code><script type="text/plain" data-inject="code-8-3">
+# サーバー一覧と状態を確認(Copilot CLI)
+/mcp show
+
+# 特定サーバーの詳細を確認
+/mcp show postgres
+
+# レジストリからサーバーを検索・追加
+/mcp registry
+/mcp install @modelcontextprotocol/server-postgres
+
+# 再認証
+/mcp auth
+</script></pre>
+          <div class="prose">
+            <p>
+              VS Codeでは、コマンドパレットから <strong>MCP: List Servers</strong> →
+              対象サーバーを選択 → <strong>Show Output</strong>(ログ表示)/
+              <strong>Restart Server</strong>(再起動)という流れが基本の診断フローです。
+            </p>
+            <h3>8.4 トラブルシューティングの判断フロー</h3>
+          </div>
+
+          <div class="mermaid-wrapper">
+            <p class="mermaid-caption">図6: トラブルシューティングの判断フロー</p>
+            <pre class="mermaid" data-inject-target="mermaid-6"></pre>
+            <script type="text/plain" data-inject="mermaid-6">
+              flowchart TB
+                  Start[エージェントが期待通り動かない] --> Q1{エージェント自体が<br/>ピッカーに出るか}
+                  Q1 -- 出ない --> F1["frontmatterの user-invocable / 配置パスを確認<br/>IDE再読み込み・拡張機能更新"]
+                  Q1 -- 出る --> Q2{サブエージェントとして<br/>呼ばれるべきなのに呼ばれない}
+                  Q2 -- はい --> F2["tools に agent があるか確認<br/>コーディネーターの agents 許可リストを確認"]
+                  Q2 -- いいえ --> Q3{MCPツールが<br/>使えない}
+                  Q3 -- はい --> F3["/mcp show でサーバー状態を確認<br/>stderr出力・env設定・folder trustを確認"]
+                  Q3 -- いいえ --> Q4{Handoffsボタンが<br/>出ない}
+                  Q4 -- はい --> F4["Cloud Agentでは handoffs が無視される仕様と一致していないか確認"]
+                  Q4 -- いいえ --> F5["Agent Debug Log / Chat Debug View で<br/>実際に送信されたプロンプトとツール呼び出しを確認"]
+            </script>
+          </div>
+
+          <div class="prose">
+            <h3>8.5 セキュリティ関連の注意</h3>
+            <p>
+              <code>.agent.md</code>
+              はツールアクセスを制限できる仕組みそのものが安全機構でもあります。セキュリティ上重要なワークフローでは、読み取り専用ツールだけを持つエージェントを作り、意図しない変更を防ぎます。リポジトリで共有するエージェントは、最小権限の原則に沿ってツール一覧と指示内容をレビューしてください。自律実行を強めるモード(いわゆる「YOLOモード」/
+              Allow All)を使う場合、ローカルマシンで直接実行せず、GitHub CodespacesやDev
+              Containerのようなサンドボックス環境で動かすことが推奨されています。
+            </p>
+          </div>
+        </section>
+
+        <!-- 9. Best practices -->
+        <section class="section" id="bestpractices">
+          <div class="section-number">SECTION 9</div>
+          <h2>9. ベストプラクティス総まとめ</h2>
+          <div class="prose">
+            <p>
+              ここまでの各章から、実務で優先度の高い10項目を並べました。番号は本ガイド内での重要度順の目安であり、上から順にチェックしていくと抜け漏れが少なくなります。
+            </p>
+          </div>
+          <div class="practice-grid">
+            <div class="practice-card">
+              <span class="num">01</span>
+              <h4>1エージェント1ジョブ</h4>
+              <p>
+                「なんでも屋」を作らず、テスト・ドキュメント・Lint・API実装のように具体的な役割ごとに分割する。
+              </p>
+            </div>
+            <div class="practice-card">
+              <span class="num">02</span>
+              <h4>本文は説明よりコード例</h4>
+              <p>実際のコードスタイル例1つは、説明文3段落分の価値がある。</p>
+            </div>
+            <div class="practice-card">
+              <span class="num">03</span>
+              <h4>境界を3層で明文化する</h4>
+              <p>
+                常に許可 / 要確認 /
+                禁止の3層構造にする。特に「シークレットを絶対にコミットしない」は最も効果的な制約として繰り返し報告されている。
+              </p>
+            </div>
+            <div class="practice-card">
+              <span class="num">04</span>
+              <h4>ツールは最小権限</h4>
+              <p>
+                プランナーやレビュアーには読み取り専用ツールだけを与え、実装者にのみ編集権限を与える。
+              </p>
+            </div>
+            <div class="practice-card">
+              <span class="num">05</span>
+              <h4>サブエージェントは許可リストで制御する</h4>
+              <p>
+                似た名前のエージェントが複数あるコーディネーターほど、<code>agents</code>
+                の明示指定が重要になる。
+              </p>
+            </div>
+            <div class="practice-card">
+              <span class="num">06</span>
+              <h4>Handoffsとサブエージェントを使い分ける</h4>
+              <p>
+                人間の承認を挟みたい段階的フローにはHandoffs、文脈分離や並列化が主目的ならサブエージェント。
+              </p>
+            </div>
+            <div class="practice-card">
+              <span class="num">07</span>
+              <h4>プラットフォーム差異を文書化する</h4>
+              <p>
+                <code>handoffs</code> / <code>argument-hint</code> がCloud Agentで無視されるなど、VS
+                Code・CLI・Cloud Agent間の非互換フィールドをチームで共有する。
+              </p>
+            </div>
+            <div class="practice-card">
+              <span class="num">08</span>
+              <h4>反復して育てる</h4>
+              <p>
+                最小構成から始め、エージェントが間違えた箇所にルールを足していく。最初から完璧な設計を狙わない。
+              </p>
+            </div>
+            <div class="practice-card">
+              <span class="num">09</span>
+              <h4>診断ツールを先に使う</h4>
+              <p>
+                「動かない」と感じたら、まずAgent Debug LogやChat Debug View、<code>/mcp show</code>
+                のような一次情報を確認してから設定を推測で変更する。
+              </p>
+            </div>
+            <div class="practice-card">
+              <span class="num">10</span>
+              <h4>ハーネス全体を理解する</h4>
+              <p>
+                <code>.agent.md</code>
+                は魔法の呪文ではなく、プロトタイプ→計画→実装→レビューという既存ワークフローを支える部品の1つとして位置づける。
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- 10. References -->
+        <footer class="footer" id="references">
+          <h2>10. 参考文献</h2>
+          <div class="prose">
+            <p>
+              本ガイドは2026年7月31日時点で確認できた以下の一次情報・実務者による公開情報に基づいています。カテゴリごとに分類し、根拠となるURLをあわせて記載しています。
+            </p>
+          </div>
+
+          <div class="ref-group">
+            <div class="ref-group-title">公式ドキュメント <span class="count">(6件)</span></div>
+            <div class="ref-grid">
+              <a
+                class="ref-card"
+                href="https://docs.github.com/en/copilot/reference/custom-agents-configuration"
+                target="_blank"
+                rel="noopener"
+              >
+                <div class="ref-card-top"><span class="ref-tag">GitHub Docs</span></div>
+                <span class="ref-card-title"
+                  >Configuration reference for GitHub Copilot agents</span
+                >
+                <span class="ref-card-url"
+                  ><svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M7 17L17 7" />
+                    <path d="M7 7h10v10" /></svg
+                  >docs.github.com/en/copilot/reference/custom-agents-configuration</span
+                >
+              </a>
+              <a
+                class="ref-card"
+                href="https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/customize-cloud-agent/create-custom-agents"
+                target="_blank"
+                rel="noopener"
+              >
+                <div class="ref-card-top"><span class="ref-tag">GitHub Docs</span></div>
+                <span class="ref-card-title">Creating custom agents for Copilot cloud agent</span>
+                <span class="ref-card-url"
+                  ><svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M7 17L17 7" />
+                    <path d="M7 7h10v10" /></svg
+                  >docs.github.com/.../customize-cloud-agent/create-custom-agents</span
+                >
+              </a>
+              <a
+                class="ref-card"
+                href="https://code.visualstudio.com/docs/agent-customization/custom-agents"
+                target="_blank"
+                rel="noopener"
+              >
+                <div class="ref-card-top"><span class="ref-tag">VS Code Docs</span></div>
+                <span class="ref-card-title">Custom agents in VS Code</span>
+                <span class="ref-card-url"
+                  ><svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M7 17L17 7" />
+                    <path d="M7 7h10v10" /></svg
+                  >code.visualstudio.com/docs/agent-customization/custom-agents</span
+                >
+              </a>
+              <a
+                class="ref-card"
+                href="https://code.visualstudio.com/docs/agents/subagents"
+                target="_blank"
+                rel="noopener"
+              >
+                <div class="ref-card-top"><span class="ref-tag">VS Code Docs</span></div>
+                <span class="ref-card-title">Subagents in Visual Studio Code</span>
+                <span class="ref-card-url"
+                  ><svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M7 17L17 7" />
+                    <path d="M7 7h10v10" /></svg
+                  >code.visualstudio.com/docs/agents/subagents</span
+                >
+              </a>
+              <a
+                class="ref-card"
+                href="https://code.visualstudio.com/docs/agent-customization/mcp-servers"
+                target="_blank"
+                rel="noopener"
+              >
+                <div class="ref-card-top"><span class="ref-tag">VS Code Docs</span></div>
+                <span class="ref-card-title">Add and manage MCP servers in VS Code</span>
+                <span class="ref-card-url"
+                  ><svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M7 17L17 7" />
+                    <path d="M7 7h10v10" /></svg
+                  >code.visualstudio.com/docs/agent-customization/mcp-servers</span
+                >
+              </a>
+              <a
+                class="ref-card"
+                href="https://code.visualstudio.com/docs/agents/agent-troubleshooting/troubleshooting"
+                target="_blank"
+                rel="noopener"
+              >
+                <div class="ref-card-top"><span class="ref-tag">VS Code Docs</span></div>
+                <span class="ref-card-title">Troubleshoot AI in Visual Studio Code</span>
+                <span class="ref-card-url"
+                  ><svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M7 17L17 7" />
+                    <path d="M7 7h10v10" /></svg
+                  >code.visualstudio.com/docs/agents/agent-troubleshooting/troubleshooting</span
+                >
+              </a>
+            </div>
+          </div>
+
+          <div class="ref-group">
+            <div class="ref-group-title">
+              実務者による解説記事・コミュニティリソース <span class="count">(7件)</span>
+            </div>
+            <div class="ref-grid">
+              <a
+                class="ref-card"
+                href="https://github.blog/ai-and-ml/github-copilot/the-harness-is-all-you-need-mostly/"
+                target="_blank"
+                rel="noopener"
+              >
+                <div class="ref-card-top">
+                  <span class="ref-tag community">GitHub Blog</span
+                  ><span class="ref-date">Burke Holland ・ 2026年7月27日</span>
+                </div>
+                <span class="ref-card-title">The harness is all you need (mostly)</span>
+                <span class="ref-card-url"
+                  ><svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M7 17L17 7" />
+                    <path d="M7 7h10v10" /></svg
+                  >github.blog/ai-and-ml/github-copilot/the-harness-is-all-you-need-mostly</span
+                >
+              </a>
+              <a
+                class="ref-card"
+                href="https://github.blog/ai-and-ml/github-copilot/how-to-write-a-great-agents-md-lessons-from-over-2500-repositories/"
+                target="_blank"
+                rel="noopener"
+              >
+                <div class="ref-card-top">
+                  <span class="ref-tag community">GitHub Blog</span
+                  ><span class="ref-date">Matt Nigh ・ 2025年11月19日</span>
+                </div>
+                <span class="ref-card-title"
+                  >How to write a great agents.md: Lessons from over 2,500 repositories</span
+                >
+                <span class="ref-card-url"
+                  ><svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M7 17L17 7" />
+                    <path d="M7 7h10v10" /></svg
+                  >github.blog/.../how-to-write-a-great-agents-md-lessons-from-over-2500-repositories</span
+                >
+              </a>
+              <a
+                class="ref-card"
+                href="https://github.blog/ai-and-ml/github-copilot/from-one-off-prompts-to-workflows-how-to-use-custom-agents-in-github-copilot-cli/"
+                target="_blank"
+                rel="noopener"
+              >
+                <div class="ref-card-top">
+                  <span class="ref-tag community">GitHub Blog</span
+                  ><span class="ref-date">Jacklyn Carroll ・ 2026年6月9日</span>
+                </div>
+                <span class="ref-card-title"
+                  >From one-off prompts to workflows: How to use custom agents in GitHub Copilot
+                  CLI</span
+                >
+                <span class="ref-card-url"
+                  ><svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M7 17L17 7" />
+                    <path d="M7 7h10v10" /></svg
+                  >github.blog/.../from-one-off-prompts-to-workflows-how-to-use-custom-agents-in-github-copilot-cli</span
+                >
+              </a>
+              <a
+                class="ref-card"
+                href="https://awesome-copilot.github.com/learning-hub/agents-and-subagents/"
+                target="_blank"
+                rel="noopener"
+              >
+                <div class="ref-card-top">
+                  <span class="ref-tag community">Awesome Copilot</span>
+                </div>
+                <span class="ref-card-title">Agents and Subagents</span>
+                <span class="ref-card-url"
+                  ><svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M7 17L17 7" />
+                    <path d="M7 7h10v10" /></svg
+                  >awesome-copilot.github.com/learning-hub/agents-and-subagents</span
+                >
+              </a>
+              <a
+                class="ref-card"
+                href="https://awesome-copilot.github.com/learning-hub/building-custom-agents/"
+                target="_blank"
+                rel="noopener"
+              >
+                <div class="ref-card-top">
+                  <span class="ref-tag community">Awesome Copilot</span>
+                </div>
+                <span class="ref-card-title">Building Custom Agents</span>
+                <span class="ref-card-url"
+                  ><svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M7 17L17 7" />
+                    <path d="M7 7h10v10" /></svg
+                  >awesome-copilot.github.com/learning-hub/building-custom-agents</span
+                >
+              </a>
+              <a
+                class="ref-card"
+                href="https://awesome-copilot.github.com/learning-hub/understanding-mcp-servers/"
+                target="_blank"
+                rel="noopener"
+              >
+                <div class="ref-card-top">
+                  <span class="ref-tag community">Awesome Copilot</span>
+                </div>
+                <span class="ref-card-title">Understanding MCP Servers</span>
+                <span class="ref-card-url"
+                  ><svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M7 17L17 7" />
+                    <path d="M7 7h10v10" /></svg
+                  >awesome-copilot.github.com/learning-hub/understanding-mcp-servers</span
+                >
+              </a>
+              <a
+                class="ref-card"
+                href="https://github.com/github/awesome-copilot/blob/main/docs/README.agents.md"
+                target="_blank"
+                rel="noopener"
+              >
+                <div class="ref-card-top">
+                  <span class="ref-tag community">GitHub Repository</span>
+                </div>
+                <span class="ref-card-title"
+                  >awesome-copilot リポジトリ サンプルエージェント集(context7.agent.md ほか)</span
+                >
+                <span class="ref-card-url"
+                  ><svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M7 17L17 7" />
+                    <path d="M7 7h10v10" /></svg
+                  >github.com/github/awesome-copilot/blob/main/docs/README.agents.md</span
+                >
+              </a>
+            </div>
+          </div>
+
+          <div class="ref-group">
+            <div class="ref-group-title">
+              既知の不具合・コミュニティ報告 <span class="count">(3件)</span>
+            </div>
+            <div class="ref-grid">
+              <a
+                class="ref-card"
+                href="https://youtrack.jetbrains.com/projects/LLM/issues/LLM-24292/Custom-Agent-does-not-show-in-the-dropdown-of-GitHub-Copilot"
+                target="_blank"
+                rel="noopener"
+              >
+                <div class="ref-card-top">
+                  <span class="ref-tag issue">Issue Tracker</span
+                  ><span class="ref-date">JetBrains YouTrack ・ LLM-24292</span>
+                </div>
+                <span class="ref-card-title"
+                  >Custom Agent does not show in the dropdown of GitHub Copilot</span
+                >
+                <span class="ref-card-url"
+                  ><svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M7 17L17 7" />
+                    <path d="M7 7h10v10" /></svg
+                  >youtrack.jetbrains.com/projects/LLM/issues/LLM-24292</span
+                >
+              </a>
+              <a
+                class="ref-card"
+                href="https://github.com/github/CopilotForXcode/issues/728"
+                target="_blank"
+                rel="noopener"
+              >
+                <div class="ref-card-top">
+                  <span class="ref-tag issue">Issue Tracker</span
+                  ><span class="ref-date">github/CopilotForXcode ・ #728</span>
+                </div>
+                <span class="ref-card-title"
+                  >Custom agents not appearing in dropdown unless agent files are open in
+                  editor</span
+                >
+                <span class="ref-card-url"
+                  ><svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M7 17L17 7" />
+                    <path d="M7 7h10v10" /></svg
+                  >github.com/github/CopilotForXcode/issues/728</span
+                >
+              </a>
+              <a
+                class="ref-card"
+                href="https://github.com/github/copilot-cli/issues/452"
+                target="_blank"
+                rel="noopener"
+              >
+                <div class="ref-card-top">
+                  <span class="ref-tag issue">Issue Tracker</span
+                  ><span class="ref-date">github/copilot-cli ・ #452</span>
+                </div>
+                <span class="ref-card-title"
+                  >User-level custom agents not loading from ~/.copilot/agents</span
+                >
+                <span class="ref-card-url"
+                  ><svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M7 17L17 7" />
+                    <path d="M7 7h10v10" /></svg
+                  >github.com/github/copilot-cli/issues/452</span
+                >
+              </a>
+            </div>
+          </div>
+
+          <div class="callout warn">
+            <strong>注記:</strong> GitHub
+            Copilotのエージェント関連機能(Handoffs・Subagents・MCP連携・スラッシュコマンド等)は2026年に入ってからも継続的に更新されています。本ガイド内のバージョン番号や挙動は執筆時点のものであり、実装前に必ず上記の公式ドキュメントで最新仕様を確認してください。
+          </div>
+        </footer>
+      </main>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.12.0/mermaid.min.js"></script>
+    <script>
+      function dedent(str) {
+        var lines = str
+          .replace(/^\n/, '')
+          .replace(/\n[ \t]*$/, '')
+          .split('\n');
+        var indents = lines
+          .filter(function (l) {
+            return l.trim().length > 0;
+          })
+          .map(function (l) {
+            return (l.match(/^[ \t]*/) || [''])[0].length;
+          });
+        var min = indents.length ? Math.min.apply(null, indents) : 0;
+        return lines
+          .map(function (l) {
+            return l.slice(min);
+          })
+          .join('\n');
+      }
+
+      document.addEventListener('DOMContentLoaded', function () {
+        // 1) Inject dedented text into code blocks and highlight them.
+        document
+          .querySelectorAll('script[type="text/plain"][data-inject]')
+          .forEach(function (script) {
+            var key = script.getAttribute('data-inject');
+            var codeTarget = document.querySelector('code[data-inject="' + key + '"]');
+            if (codeTarget) {
+              codeTarget.textContent = dedent(script.textContent);
+              if (window.hljs) {
+                hljs.highlightElement(codeTarget);
+              }
+              return;
+            }
+            var mermaidTarget = document.querySelector(
+              'pre.mermaid[data-inject-target="' + key + '"]',
+            );
+            if (mermaidTarget) {
+              mermaidTarget.textContent = dedent(script.textContent);
+            }
+          });
+
+        // 2) Initialize Mermaid with the dark-navy theme and render all diagrams.
+        if (window.mermaid) {
+          mermaid.initialize({
+            startOnLoad: false,
+            theme: 'base',
+            securityLevel: 'loose',
+            themeVariables: {
+              background: '#07111e',
+              primaryColor: '#132a4a',
+              primaryBorderColor: '#7c9eff',
+              primaryTextColor: '#e7ecf7',
+              lineColor: '#7c9eff',
+              secondaryColor: '#0d1b2e',
+              tertiaryColor: '#0d1b2e',
+              clusterBkg: '#0d1f36',
+              clusterBorder: '#3a5a8a',
+              edgeLabelBackground: '#0d1b2e',
+              fontSize: '16px',
+            },
+            flowchart: {
+              useMaxWidth: false,
+              htmlLabels: true,
+              subGraphTitleMargin: { top: 10, bottom: 28 },
+            },
+          });
+          mermaid.run({ querySelector: '.mermaid' }).then(function () {
+            document.querySelectorAll('.mermaid-wrapper svg').forEach(function (svg) {
+              svg.style.maxWidth = 'none';
+              svg.style.height = 'auto';
+              svg.style.flexShrink = '0';
+            });
+          });
+        }
+
+        // 3) Sidebar active-link highlighting via IntersectionObserver.
+        var sections = document.querySelectorAll('.section, .footer');
+        var links = document.querySelectorAll('.sidebar nav a');
+        var linkMap = {};
+        links.forEach(function (l) {
+          linkMap[l.getAttribute('href').slice(1)] = l;
+        });
+
+        var observer = new IntersectionObserver(
+          function (entries) {
+            entries.forEach(function (entry) {
+              if (entry.isIntersecting) {
+                links.forEach(function (l) {
+                  l.classList.remove('active');
+                });
+                var link = linkMap[entry.target.id];
+                if (link) {
+                  link.classList.add('active');
+                }
+              }
+            });
+          },
+          { rootMargin: '-20% 0px -70% 0px' },
+        );
+
+        sections.forEach(function (s) {
+          observer.observe(s);
+        });
+      });
+    </script>
+  </body>
+</html>

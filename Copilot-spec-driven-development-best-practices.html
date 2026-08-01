@@ -1,0 +1,1881 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GitHub Copilot AI仕様駆動開発 ベストプラクティスガイド</title>
+    <style>
+      :root {
+        --color-background-primary: #07111e;
+        --color-background-secondary: #0d1b2e;
+        --color-background-tertiary: #132540;
+        --color-background-info: #12233f;
+        --color-background-danger: #3a1f22;
+        --color-background-success: #16332a;
+        --color-background-warning: #3a2e14;
+
+        --color-text-primary: #e9edf5;
+        --color-text-secondary: #a9b8cc;
+        --color-text-tertiary: #6d7f96;
+        --color-text-info: #7fb0ff;
+        --color-text-danger: #ff8f8f;
+        --color-text-success: #6ee7a0;
+        --color-text-warning: #ffcf6b;
+
+        --color-border-primary: #3a5478;
+        --color-border-secondary: #2a3f5c;
+        --color-border-tertiary: #1c2e46;
+
+        --accent: #7c9eff;
+
+        --font-sans:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Kaku Gothic ProN',
+          'Noto Sans JP', 'Yu Gothic', 'Meiryo', sans-serif;
+        --font-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+
+        --border-radius-md: 8px;
+        --border-radius-lg: 12px;
+        --border-radius-xl: 16px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: var(--color-background-primary);
+        color: var(--color-text-primary);
+        font-family: var(--font-sans);
+        font-size: 16px;
+        line-height: 1.7;
+        font-weight: 400;
+      }
+
+      a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+
+      code,
+      pre,
+      kbd {
+        font-family: var(--font-mono);
+        font-size: 13px;
+      }
+
+      code {
+        background: var(--color-background-tertiary);
+        border: 1px solid var(--color-border-tertiary);
+        border-radius: 4px;
+        padding: 1px 6px;
+        color: var(--color-text-info);
+        font-size: 13px;
+      }
+
+      pre {
+        background: var(--color-background-secondary);
+        border: 1px solid var(--color-border-tertiary);
+        border-radius: var(--border-radius-md);
+        padding: 16px 18px;
+        overflow-x: auto;
+        margin: 16px 0;
+      }
+
+      pre code {
+        background: none;
+        border: none;
+        padding: 0;
+        color: inherit;
+        font-size: 13px;
+        line-height: 1.6;
+      }
+
+      .layout {
+        display: block;
+      }
+
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: 272px;
+        overflow-y: auto;
+        background: var(--color-background-secondary);
+        border-right: 1px solid var(--color-border-tertiary);
+        padding: 28px 18px 40px 18px;
+      }
+
+      .sidebar-brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 0 10px 20px 10px;
+        border-bottom: 1px solid var(--color-border-tertiary);
+        margin-bottom: 16px;
+      }
+
+      .sidebar-brand i {
+        font-size: 20px;
+        color: var(--accent);
+      }
+
+      .sidebar-brand span {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--color-text-secondary);
+        letter-spacing: 0.02em;
+      }
+
+      .sidebar-nav {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+
+      .sidebar-nav li {
+        margin-bottom: 2px;
+      }
+
+      .sidebar-nav a {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 10px;
+        border-radius: var(--border-radius-md);
+        color: var(--color-text-secondary);
+        font-size: 13px;
+        font-weight: 400;
+        line-height: 1.4;
+      }
+
+      .sidebar-nav a i {
+        font-size: 15px;
+        width: 18px;
+        flex-shrink: 0;
+        color: var(--color-text-tertiary);
+      }
+
+      .sidebar-nav a:hover {
+        background: var(--color-background-tertiary);
+        text-decoration: none;
+        color: var(--color-text-primary);
+      }
+
+      .sidebar-nav a.active {
+        background: var(--color-background-tertiary);
+        color: var(--color-text-primary);
+        font-weight: 500;
+        border: 1px solid var(--color-border-secondary);
+      }
+
+      .sidebar-nav a.active i {
+        color: var(--accent);
+      }
+
+      .content {
+        margin-left: 272px;
+        padding: 48px 56px 90px 56px;
+      }
+
+      .hero {
+        border-bottom: 1px solid var(--color-border-tertiary);
+        padding-bottom: 28px;
+        margin-bottom: 32px;
+      }
+
+      .hero .kicker {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        color: var(--color-text-tertiary);
+        font-weight: 500;
+        margin-bottom: 10px;
+      }
+
+      .hero h1 {
+        font-size: 26px;
+        font-weight: 500;
+        margin: 0 0 10px 0;
+        line-height: 1.4;
+      }
+
+      .hero .lead {
+        font-size: 16px;
+        color: var(--color-text-secondary);
+        margin: 0 0 16px 0;
+      }
+
+      .meta-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        font-size: 13px;
+        color: var(--color-text-tertiary);
+      }
+
+      .meta-row span {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .meta-row i {
+        color: var(--color-text-tertiary);
+        font-size: 14px;
+      }
+
+      .callout {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+        border-radius: var(--border-radius-md);
+        padding: 14px 18px;
+        margin: 20px 0;
+        border: 1px solid var(--color-border-secondary);
+        font-size: 14px;
+      }
+
+      .callout i {
+        font-size: 18px;
+        margin-top: 1px;
+        flex-shrink: 0;
+      }
+
+      .callout-warning {
+        background: var(--color-background-warning);
+        border-color: #5a4620;
+      }
+      .callout-warning i {
+        color: var(--color-text-warning);
+      }
+
+      section {
+        margin-bottom: 52px;
+        scroll-margin-top: 28px;
+      }
+
+      h2 {
+        font-size: 18px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid var(--color-border-tertiary);
+        margin: 0 0 20px 0;
+      }
+
+      h2 .step-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 26px;
+        height: 22px;
+        padding: 0 6px;
+        border-radius: var(--border-radius-md);
+        background: var(--color-background-tertiary);
+        border: 1px solid var(--color-border-secondary);
+        color: var(--accent);
+        font-size: 12px;
+        font-weight: 500;
+      }
+
+      h3 {
+        font-size: 16px;
+        font-weight: 500;
+        margin: 28px 0 12px 0;
+        color: var(--color-text-primary);
+      }
+
+      p {
+        margin: 0 0 14px 0;
+        color: var(--color-text-secondary);
+      }
+      p strong,
+      li strong {
+        color: var(--color-text-primary);
+        font-weight: 500;
+      }
+
+      ul,
+      ol {
+        color: var(--color-text-secondary);
+        padding-left: 22px;
+        margin: 0 0 16px 0;
+      }
+      li {
+        margin-bottom: 8px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 18px 0;
+        font-size: 13px;
+        border: 1px solid var(--color-border-tertiary);
+        border-radius: var(--border-radius-md);
+        overflow: hidden;
+      }
+
+      thead th {
+        background: var(--color-background-tertiary);
+        color: var(--color-text-primary);
+        font-weight: 500;
+        text-align: left;
+        padding: 10px 14px;
+        border-bottom: 1px solid var(--color-border-secondary);
+      }
+
+      tbody td {
+        padding: 10px 14px;
+        border-bottom: 1px solid var(--color-border-tertiary);
+        color: var(--color-text-secondary);
+        vertical-align: top;
+      }
+
+      tbody tr:last-child td {
+        border-bottom: none;
+      }
+      tbody td code {
+        white-space: nowrap;
+      }
+
+      .diagram-wrap {
+        border: 1px solid var(--color-border-tertiary);
+        border-radius: var(--border-radius-lg);
+        background: var(--color-background-secondary);
+        padding: 20px;
+        margin: 20px 0;
+      }
+
+      pre.mermaid {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        margin: 0;
+        background: none;
+        border: none;
+        padding: 0;
+      }
+
+      .diagram-error {
+        color: var(--color-text-danger);
+        font-size: 13px;
+      }
+
+      .checklist {
+        list-style: none;
+        padding-left: 0;
+      }
+      .checklist li {
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+        padding: 8px 0;
+        border-bottom: 1px solid var(--color-border-tertiary);
+      }
+      .checklist li:last-child {
+        border-bottom: none;
+      }
+      .checklist i {
+        color: var(--color-text-tertiary);
+        font-size: 16px;
+        margin-top: 2px;
+        flex-shrink: 0;
+      }
+
+      .ref-group {
+        margin-bottom: 24px;
+      }
+      .ref-group h3 {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+        color: var(--color-text-tertiary);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        margin: 0 0 12px 0;
+      }
+      .ref-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+      .ref-list li {
+        padding: 10px 0;
+        border-bottom: 1px solid var(--color-border-tertiary);
+        font-size: 13px;
+      }
+      .ref-list li:last-child {
+        border-bottom: none;
+      }
+      .ref-list .ref-title {
+        color: var(--color-text-primary);
+        font-weight: 500;
+        display: block;
+        margin-bottom: 3px;
+      }
+      .ref-list .ref-url {
+        color: var(--color-text-tertiary);
+        word-break: break-all;
+      }
+
+      .footer {
+        border-top: 1px solid var(--color-border-tertiary);
+        padding-top: 20px;
+        color: var(--color-text-tertiary);
+        font-size: 13px;
+      }
+
+      @media (max-width: 900px) {
+        .sidebar {
+          display: none;
+        }
+        .content {
+          margin-left: 0;
+          padding: 32px 20px 70px 20px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="layout">
+      <nav class="sidebar">
+        <div class="sidebar-brand">
+          <i class="ti ti-brand-github-copilot"></i>
+          <span>COPILOT SDD GUIDE</span>
+        </div>
+        <ul class="sidebar-nav">
+          <li>
+            <a href="#overview"><i class="ti ti-layout-dashboard"></i>全体像</a>
+          </li>
+          <li>
+            <a href="#step-instructions"
+              ><i class="ti ti-file-text"></i>Step 1: copilot-instructions.md</a
+            >
+          </li>
+          <li>
+            <a href="#step-path-instructions"
+              ><i class="ti ti-git-branch"></i>Step 2: .instructions.md / AGENTS.md</a
+            >
+          </li>
+          <li>
+            <a href="#step-prompt-files"><i class="ti ti-terminal-2"></i>Step 3: .prompt.md</a>
+          </li>
+          <li>
+            <a href="#step-custom-agents"><i class="ti ti-users-group"></i>Step 4: .agent.md</a>
+          </li>
+          <li>
+            <a href="#step-skills"><i class="ti ti-puzzle"></i>Step 5: SKILL.md</a>
+          </li>
+          <li>
+            <a href="#step-mcp"><i class="ti ti-plug-connected"></i>Step 6: MCP</a>
+          </li>
+          <li>
+            <a href="#step-plan-mode"><i class="ti ti-route"></i>Step 7: Plan Mode</a>
+          </li>
+          <li>
+            <a href="#sdd"><i class="ti ti-clipboard-list"></i>Spec Kitと仕様駆動開発</a>
+          </li>
+          <li>
+            <a href="#security"><i class="ti ti-shield-check"></i>セキュリティ</a>
+          </li>
+          <li>
+            <a href="#maturity"><i class="ti ti-trending-up"></i>成熟度モデル</a>
+          </li>
+          <li>
+            <a href="#references"><i class="ti ti-books"></i>参考文献</a>
+          </li>
+        </ul>
+      </nav>
+
+      <main class="content">
+        <header class="hero">
+          <div class="kicker">
+            <i class="ti ti-brand-github-copilot"></i>GITHUB COPILOT / AI SPEC-DRIVEN DEVELOPMENT
+          </div>
+          <h1>GitHub Copilot AI仕様駆動開発 ベストプラクティスガイド</h1>
+          <p class="lead">
+            copilot-instructions.md / .instructions.md / .prompt.md / .chatmode.md / .agent.md /
+            SKILL.md / MCP / Plan Mode
+            を、中級〜上級エンジニア向けにステップバイステップで解説します。
+          </p>
+          <div class="meta-row">
+            <span
+              ><i class="ti ti-users"></i>対象読者:
+              中級〜上級のソフトウェアエンジニア・AIエンジニア</span
+            >
+            <span><i class="ti ti-calendar"></i>情報基準日: 2026年7月31日</span>
+          </div>
+          <div class="callout callout-warning">
+            <i class="ti ti-alert-triangle"></i>
+            <div>
+              本ガイドで扱う機能の多くはプレビュー(public
+              preview)段階であり、UI・ファイル配置・コマンド名は今後変更される可能性があります。特に「カスタムチャットモード」から「カスタムエージェント」への名称変更のように、記事執筆時点でも仕様が流動的な部分があるため、実装前に必ず本文末の参考文献で最新仕様を確認してください。
+            </div>
+          </div>
+        </header>
+
+        <section id="overview">
+          <h2>
+            <i class="ti ti-layout-dashboard"></i>全体像:Copilotのコンテキストはどう組み立てられるか
+          </h2>
+          <p>
+            GitHub
+            Copilotは1回のリクエストごとに、複数のレイヤーから集めた情報を統合してモデルに渡しています。これらのレイヤーを正しく使い分けることが、AI仕様駆動開発（Spec-Driven
+            Development, SDD）の土台になります。
+          </p>
+
+          <div class="diagram-wrap">
+            <div class="mermaid-target" data-target-id="diagram-0"></div>
+          </div>
+          <script type="text/plain" class="mermaid-source" data-target-id="diagram-0">
+            flowchart TB
+                subgraph AO["常時適用されるレイヤー (Always-on)"]
+                    A["Personal Instructions<br/>個人のユーザー設定"]
+                    B["Organization Instructions<br/>組織/Enterprise設定"]
+                    C["Repository Instructions<br/>copilot-instructions.md / AGENTS.md"]
+                    D[".instructions.md<br/>applyTo で条件付き適用"]
+                end
+                subgraph OD["呼び出したときだけ適用されるレイヤー (On-demand)"]
+                    E[".prompt.md<br/>/コマンドで手動起動"]
+                    F[".agent.md（旧 .chatmode.md）<br/>役割・ツールセットを切替"]
+                    G["SKILL.md<br/>description との一致で自動ロード"]
+                end
+                subgraph EXT["外部連携レイヤー"]
+                    H["MCP Servers<br/>ツール・データソースの接続"]
+                end
+                A --> M["1回のリクエストごとに<br/>Copilotがコンテキストを統合"]
+                B --> M
+                C --> M
+                D --> M
+                M --> E
+                M --> F
+                M --> G
+                M --> H
+
+                classDef purple fill:#2f2a52,stroke:#b6a6f0,color:#efe9fd;
+                classDef teal fill:#113f3b,stroke:#7fd9c9,color:#e3faf5;
+                classDef coral fill:#4a2620,stroke:#f0a688,color:#fbe4da;
+                class A,B,C,D purple;
+                class E,F,G teal;
+                class H,M coral;
+          </script>
+
+          <p>
+            VS Codeの公式ドキュメントによれば、複数の指示が衝突した場合は「Personal
+            instructions（個人設定）が最も優先され、その後 Repository instructions（<code
+              >.github/copilot-instructions.md</code
+            >
+            または <code>AGENTS.md</code>）、Organization
+            instructions（組織設定）の順に適用される」とされています（GitHub.com上のCopilot
+            Chatではこの優先順位が異なる場合があるため、利用面ごとに公式ドキュメントを確認してください）。
+          </p>
+
+          <p>以下は、どのファイル/機能をいつ使うべきかの判断フローです。</p>
+
+          <div class="diagram-wrap">
+            <div class="mermaid-target" data-target-id="diagram-1"></div>
+          </div>
+          <script type="text/plain" class="mermaid-source" data-target-id="diagram-1">
+            flowchart TD
+                Q1{"このルールは常に<br/>適用したいか?"}
+                Q1 -->|"はい・リポジトリ全体"| R1["copilot-instructions.md<br/>または AGENTS.md"]
+                Q1 -->|"はい・特定言語/ディレクトリのみ"| R2[".instructions.md<br/>applyTo で限定"]
+                Q1 -->|"いいえ・手動で呼び出したい"| Q2{"再利用したいのは何か?"}
+                Q2 -->|"定型プロンプト・単発タスク"| R3[".prompt.md<br/>/command"]
+                Q2 -->|"AIの役割・使えるツール・モデル"| R4[".agent.md<br/>カスタムエージェント"]
+                Q2 -->|"手順書・スクリプト付き専門知識"| R5["SKILL.md<br/>description一致で自動ロード"]
+                Q1 -->|"外部システムのデータ/操作が必要"| R6["MCP サーバー"]
+
+                classDef decision fill:#16233a,stroke:#47607f,color:#d7e0ec;
+                classDef result fill:#113f3b,stroke:#7fd9c9,color:#e3faf5;
+                class Q1,Q2 decision;
+                class R1,R2,R3,R4,R5,R6 result;
+          </script>
+
+          <p>まずは全体像を俯瞰する一覧表です。</p>
+
+          <table>
+            <thead>
+              <tr>
+                <th>機能</th>
+                <th>ファイル / 場所</th>
+                <th>スコープ</th>
+                <th>発動方法</th>
+                <th>主な用途</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Repository instructions</td>
+                <td><code>.github/copilot-instructions.md</code></td>
+                <td>リポジトリ全体</td>
+                <td>自動（常時）</td>
+                <td>技術スタック、ビルド/テスト手順、コーディング規約</td>
+              </tr>
+              <tr>
+                <td>Path-specific instructions</td>
+                <td><code>.github/instructions/*.instructions.md</code></td>
+                <td><code>applyTo</code> で指定したパス/言語のみ</td>
+                <td>自動（条件付き）</td>
+                <td>言語別・ディレクトリ別の詳細ルール</td>
+              </tr>
+              <tr>
+                <td>AGENTS.md</td>
+                <td>リポジトリルートの <code>AGENTS.md</code></td>
+                <td>リポジトリ全体（複数のAIツール共通）</td>
+                <td>自動（常時）</td>
+                <td>Copilot以外のエージェントとも共有する規約</td>
+              </tr>
+              <tr>
+                <td>Prompt files</td>
+                <td><code>.github/prompts/*.prompt.md</code></td>
+                <td>単発タスク</td>
+                <td>手動（<code>/command</code>）</td>
+                <td>定型作業をスラッシュコマンド化</td>
+              </tr>
+              <tr>
+                <td>Custom agents（旧Custom chat modes）</td>
+                <td><code>.github/agents/*.agent.md</code></td>
+                <td>セッション/タスク単位</td>
+                <td>手動（エージェント選択）</td>
+                <td>役割・ツールセット・モデルの切り替え</td>
+              </tr>
+              <tr>
+                <td>Agent Skills</td>
+                <td><code>.github/skills/&lt;name&gt;/SKILL.md</code></td>
+                <td>タスク単位</td>
+                <td>自動（description一致で動的ロード）</td>
+                <td>手続き的知識、スクリプト、テンプレートの束</td>
+              </tr>
+              <tr>
+                <td>MCP</td>
+                <td><code>.vscode/mcp.json</code> など</td>
+                <td>ツール/データ接続</td>
+                <td>自動（Agent modeが解決）</td>
+                <td>外部システムとの連携</td>
+              </tr>
+              <tr>
+                <td>Plan Mode</td>
+                <td>機能（専用ファイル形式なし）</td>
+                <td>セッション単位</td>
+                <td>手動（モード切替）</td>
+                <td>実装前の要件確認・合意形成</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section id="step-instructions">
+          <h2><span class="step-badge">1</span>copilot-instructions.md — リポジトリ全体のルール</h2>
+
+          <h3>概要</h3>
+          <p>
+            <code>.github/copilot-instructions.md</code>
+            は、リポジトリのルートに置く単一のMarkdownファイルです。VS
+            Codeが自動検出し、そのワークスペース内のすべてのチャットリクエストに適用されます。Copilot
+            Chat・Copilot coding agent・Copilot code reviewの全てが参照します。
+          </p>
+
+          <h3>ベストプラクティス</h3>
+          <ol>
+            <li>
+              <strong>簡潔・具体的に書く</strong>: GitHub公式ブログの「5
+              tips」でも、完璧を目指しすぎず「不完全な instructions
+              ファイルでも、何も無いよりずっと良い」と述べられています。まず小さく始めて、ドキュメントのように継続的に更新するのが推奨されています。
+            </li>
+            <li>
+              <strong>必ずコミットする</strong>:
+              ローカルにしか無いファイルはチーム全体に効果がありません。リポジトリにコミットして初めて全員の環境で機能します。
+            </li>
+            <li>
+              <strong>矛盾を避ける</strong>:
+              実際のコードベースと矛盾する指示（例:「コールバックを使わない」と書いてあるのに実装の4割がコールバックを使っている）は、Copilotの出力を不安定にします。既存コードを整理するか、例外を明記しましょう。
+            </li>
+            <li>
+              <strong>曖昧な指示を避ける</strong>:
+              「良いコードを書いて」のような抽象的な指示ではなく、「観測可能でチェック可能なルール」を書くことが効果的だとされています。
+            </li>
+            <li>
+              <strong>長すぎないようにする</strong>:
+              指示ファイルが長大になりすぎる（目安として1000行超）と、Copilot code
+              reviewなどの一部機能で挙動が不安定になることが報告されています。短く、見出しと箇条書きで構造化しましょう。
+            </li>
+            <li>
+              <strong>自動生成を活用する</strong>: GitHub上のCopilot coding
+              agentには、リポジトリを解析して
+              <code>copilot-instructions.md</code>
+              の叩き台を生成する機能があります。まずAIに生成させ、人間がレビュー・調整する流れが効率的です。
+            </li>
+            <li>
+              <strong>動作確認する</strong>: VS CodeのCopilot Chatで「<code>@github</code>
+              このプロジェクトの copilot-instructions.md
+              にあるコーディング規約を要約して」のように尋ね、正確な要約が返ってくるかで読み込まれているか検証できます。
+            </li>
+          </ol>
+
+          <h3>サンプル</h3>
+          <pre><code># Project Guidelines
+
+This is a Go-based backend with a Ruby client for specific API endpoints.
+
+## Stack
+- Language: Go 1.23 (backend), Ruby 3.3 (client SDK)
+- Test: `go test ./...` / `bundle exec rspec`
+- Lint: `golangci-lint run`
+
+## Conventions
+- Prefer table-driven tests in Go.
+- All exported functions require doc comments.
+- Do not introduce new third-party HTTP clients; use the internal `httpx` wrapper.
+
+## Ask before assuming
+If requirements are ambiguous, ask a clarifying question instead of guessing.</code></pre>
+        </section>
+
+        <section id="step-path-instructions">
+          <h2><span class="step-badge">2</span>.instructions.md — パス限定ルールと AGENTS.md</h2>
+
+          <h3>.instructions.md</h3>
+          <p>
+            リポジトリ全体ではなく「Pythonファイルのときだけ」「<code>src/api/</code>
+            配下だけ」といった条件付きルールを与えたい場合は、<code>.github/instructions/</code>
+            配下に <code>*.instructions.md</code> ファイルを作成します。YAMLフロントマターの
+            <code>applyTo</code> フィールドでglobパターンを指定します。
+          </p>
+
+          <pre><code>---
+applyTo: "**/*.py"
+---
+# Python Code Standards
+- Use Python 3.11+ features
+- Follow PEP 8
+- Use type hints for all function parameters and returns
+- Prefer pathlib over os.path</code></pre>
+
+          <pre><code>---
+applyTo: "src/api/**/*"
+---
+# API Development Standards
+- Use RESTful conventions
+- Return proper HTTP status codes
+- Validate all input data
+- Use async/await for database operations</code></pre>
+
+          <p>
+            <strong>使い分けの目安</strong>: まず単一の
+            <code>copilot-instructions.md</code>
+            でプロジェクト全体の規約から始め、フロントエンドとバックエンドで求めるスタイルが違う、認証やインフラなど特に慎重に扱いたい領域があるといった「差分」が出てきたタイミングで
+            <code>.instructions.md</code> を追加していくのが実務上のおすすめです。
+          </p>
+
+          <h3>AGENTS.md との違い</h3>
+          <p>
+            似た名前の <code>AGENTS.md</code> は、GitHub
+            Copilot専用ではなく、Codexやその他多くのAIコーディングツールが共通で読み込むオープンなフォーマットです。VS
+            Codeも
+            <code>AGENTS.md</code>
+            をサポートしており、「複数のAIエージェントを併用するプロジェクトでは
+            <code>AGENTS.md</code>、Copilot専用なら
+            <code>copilot-instructions.md</code
+            >」という使い分けが公式ドキュメントで案内されています。
+          </p>
+
+          <table>
+            <thead>
+              <tr>
+                <th>比較項目</th>
+                <th>copilot-instructions.md</th>
+                <th>AGENTS.md</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>対象ツール</td>
+                <td>GitHub Copilotファミリー</td>
+                <td>Copilot・Codexなど複数の対応ツール</td>
+              </tr>
+              <tr>
+                <td>位置づけ</td>
+                <td>Copilot向けの「常時適用ルール」</td>
+                <td>複数エージェント共通の「リポジトリのREADME」的存在</td>
+              </tr>
+              <tr>
+                <td>使い分けの目安</td>
+                <td>Copilotのみを使うチーム</td>
+                <td>複数のAIコーディングツールを併用するチーム</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <p>
+            さらにややこしいのが、後述する
+            <code>.agent.md</code>（カスタムエージェント）との混同です。開発者Hidde de
+            Smetのブログ記事が端的にまとめている通り、<strong
+              ><code>AGENTS.md</code>
+              は「リポジトリの中でどう振る舞うべきか」を伝えるプロジェクトガイダンスであるのに対し、<code
+                >.agent.md</code
+              >
+              は「プランナー」「セキュリティレビュアー」のような特定の役割（ペルソナ）を定義するカスタムエージェントのプロファイルです</strong
+            >。名前は似ていますが役割は別物なので注意してください。
+          </p>
+        </section>
+
+        <section id="step-prompt-files">
+          <h2><span class="step-badge">3</span>.prompt.md — 再利用可能なスラッシュコマンド</h2>
+
+          <h3>概要</h3>
+          <p>
+            Custom instructionsが「常に効くルール」であるのに対し、Prompt
+            filesは「必要なときだけ手動で呼び出すタスクテンプレート」です。<code
+              >.github/prompts/</code
+            >
+            配下に <code>*.prompt.md</code> として保存すると、VS Code・Visual
+            Studio・JetBrainsのCopilot Chatで
+            <code>/ファイル名</code> と入力するだけで呼び出せます。
+          </p>
+
+          <div class="diagram-wrap">
+            <div class="mermaid-target" data-target-id="diagram-2"></div>
+          </div>
+          <script type="text/plain" class="mermaid-source" data-target-id="diagram-2">
+            flowchart LR
+                U["ユーザーが<br/>/explain-code と入力"] --> F["explain-code.prompt.md<br/>を読み込み"]
+                F --> Ag["Agent modeで実行<br/>(frontmatterのagent/tools/modelに従う)"]
+                Ag --> Out["結果を返す"]
+
+                classDef purple fill:#2f2a52,stroke:#b6a6f0,color:#efe9fd;
+                class U,F,Ag,Out purple;
+          </script>
+
+          <h3>フロントマター</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>フィールド</th>
+                <th>説明</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>description</code></td>
+                <td>チャット入力欄にプレースホルダーとして表示される説明文</td>
+              </tr>
+              <tr>
+                <td><code>agent</code>（旧 <code>mode</code>）</td>
+                <td>実行時のエージェント種別（例: <code>agent</code>）</td>
+              </tr>
+              <tr>
+                <td><code>model</code></td>
+                <td>使用するモデル（未指定時はモデルピッカーの選択値）</td>
+              </tr>
+              <tr>
+                <td><code>tools</code></td>
+                <td>
+                  利用可能なツール/ツールセット名のリスト（組み込みツール・MCPツール・拡張機能のツールを含む）
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h3>サンプル</h3>
+          <pre><code>---
+description: "Generate a new React form component"
+agent: agent
+tools: ["search/codebase"]
+---
+Your goal is to generate a new React form component based on the templates
+in this repo's `src/components/forms` directory. Ask for the form name and
+fields if not provided.</code></pre>
+
+          <p>計画レビューを強制したい場合の例（実装前に必ず計画を作らせるパターン）:</p>
+          <pre><code>---
+description: "Draft a step-by-step implementation plan before editing any files"
+agent: agent
+---
+Before making any changes, draft a numbered implementation plan: the files
+you intend to touch, the reasoning for each change, and any risks. Ask
+clarifying questions if the request is ambiguous. Wait for explicit approval
+before editing.</code></pre>
+
+          <p>
+            VS Codeには
+            <code>/create-prompt</code>
+            というコマンドもあり、「やりたいことを説明するだけで、適切なfrontmatter付きの
+            <code>.prompt.md</code>
+            を自動生成してくれる」機能も用意されています。ゼロから書くよりも、まずAIに叩き台を作らせて調整する方が効率的です。
+          </p>
+
+          <p>
+            <strong>「Prompt files / Custom agents / Skills、どれを使うべきか」の判断基準</strong
+            >として、VS Code公式ドキュメントは「軽量で単発のタスクにはPrompt
+            filesを、複雑なワークフローの自動化にはSkillsやCustom
+            agentsを」という指針を示しています。
+          </p>
+        </section>
+
+        <section id="step-custom-agents">
+          <h2><span class="step-badge">4</span>.chatmode.md → .agent.md — カスタムエージェント</h2>
+
+          <h3>重要な仕様変更</h3>
+          <p>
+            かつて「Custom Chat Modes」と呼ばれ
+            <code>.chatmode.md</code> ファイルで定義されていた機能は、VS
+            Code公式ドキュメントの記載によれば<strong
+              >「Custom Agents」に名称変更され、ファイル拡張子も
+              <code>.agent.md</code> に変わりました</strong
+            >。機能自体は同じですが、用語とファイル形式が更新されています。既存の
+            <code>.chatmode.md</code> ファイルは、<code>.agent.md</code>
+            にリネームして所定の場所（<code>chat.agentFilesLocations</code>
+            で設定するディレクトリ、リポジトリでは典型的に
+            <code>.github/agents/</code>）に置き直すことで引き続き利用できます。
+          </p>
+
+          <div class="diagram-wrap">
+            <div class="mermaid-target" data-target-id="diagram-3"></div>
+          </div>
+          <script type="text/plain" class="mermaid-source" data-target-id="diagram-3">
+            flowchart LR
+                Old[".chatmode.md<br/>(旧: Custom Chat Modes)"] -->|"リネーム"| New[".agent.md<br/>(新: Custom Agents)"]
+                New --> Loc[".github/agents/<br/>または ユーザープロファイル"]
+
+                classDef coral fill:#4a2620,stroke:#f0a688,color:#fbe4da;
+                classDef teal fill:#113f3b,stroke:#7fd9c9,color:#e3faf5;
+                class Old coral;
+                class New,Loc teal;
+          </script>
+
+          <h3>何のためのファイルか</h3>
+          <p>
+            Custom
+            agentsは「読み取り専用ツールしか使えないPlanning用エージェント」「ファイル編集もできるImplementation用エージェント」のように、<strong>タスクごとに使えるツール・モデル・振る舞いを切り替える</strong>ための仕組みです。ローカルのAgent
+            modeだけでなく、バックグラウンド実行のクラウドエージェントでも同じ設定を再利用できます。
+          </p>
+
+          <h3>フロントマター</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>フィールド</th>
+                <th>説明</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>description</code></td>
+                <td>エージェント選択時に表示される説明</td>
+              </tr>
+              <tr>
+                <td><code>tools</code></td>
+                <td>利用可能なツール（YAML配列）</td>
+              </tr>
+              <tr>
+                <td><code>model</code></td>
+                <td>使用モデル（未指定時はモデルピッカーの選択値）</td>
+              </tr>
+              <tr>
+                <td><code>handoffs</code></td>
+                <td>
+                  応答完了後に提案される「次の一手」（別のエージェント/プロンプトへの引き継ぎボタン）
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <p>
+            VS Codeは <code>.github/agents/*.agent.md</code> に加え、<code>.claude/agents/</code>
+            配下のClaude Code形式（サブエージェント）の
+            <code>.md</code> ファイルも自動認識します。Claude形式のカンマ区切りツール指定は、VS
+            Code用のツール名に自動マッピングされるため、<strong
+              >同じエージェント定義をVS CodeとClaude Codeで共有できる</strong
+            >という互換性が確保されています。
+          </p>
+
+          <h3>サンプル: プランニング専用エージェント</h3>
+          <pre><code>---
+description: "Explore the codebase and draft a plan. Never edit files directly."
+tools: ["search/codebase", "readFile"]
+model: Claude Sonnet
+---
+You are a planning specialist. Investigate the codebase using read-only
+tools, identify open questions, and produce a numbered implementation plan.
+Do not edit or create files. Hand off to the implementation agent once the
+plan is approved.</code></pre>
+        </section>
+
+        <section id="step-skills">
+          <h2><span class="step-badge">5</span>SKILL.md — Agent Skills（手続き的知識）</h2>
+
+          <h3>概要</h3>
+          <p>
+            SKILL.mdは、Anthropicが提唱し
+            <code>agentskills.io</code> としてオープン仕様化された形式で、GitHub Copilotだけでなく
+            Claude Code・Cursor・Codex
+            CLIなど複数のエージェントで共通して読み込める「再利用可能な手続き的知識のパッケージ」です。GitHub公式ドキュメントも「Agent
+            Skills is an open standard, used by a range of different agents」と明記しています。
+          </p>
+
+          <h3>Instructions（常時適用）との違い</h3>
+          <ul>
+            <li>
+              <code>copilot-instructions.md</code> /
+              <code>.instructions.md</code>
+              は<strong>常時適用される「あるべき論」</strong>（コーディング規約など）
+            </li>
+            <li>
+              SKILL.mdは<strong>特定のタスクが来たときだけオンデマンドでロードされる「専門的な手順」</strong>（スクリプトやテンプレート付きの実行手順）
+            </li>
+          </ul>
+          <p>
+            この違いにより、多数のスキルをインストールしてもコンテキストウィンドウを圧迫しない設計になっています。これを実現する仕組みが<strong
+              >Progressive Disclosure（段階的開示）</strong
+            >です。
+          </p>
+
+          <div class="diagram-wrap">
+            <div class="mermaid-target" data-target-id="diagram-4"></div>
+          </div>
+          <script type="text/plain" class="mermaid-source" data-target-id="diagram-4">
+            flowchart TB
+                L1["Level 1: Discovery<br/>全SKILL.mdの description だけを常時スキャン"] --> L2["Level 2: Instructions<br/>関連しそうなSKILL.md本文を読み込む"]
+                L2 --> L3["Level 3: Resources<br/>スクリプト・参照資料・テンプレートを必要時にのみ読み込む"]
+
+                classDef teal fill:#113f3b,stroke:#7fd9c9,color:#e3faf5;
+                class L1,L2,L3 teal;
+          </script>
+
+          <h3>ディレクトリ構成</h3>
+          <pre><code>your-repo/
+└── .github/
+    └── skills/
+        └── webapp-testing/
+            ├── SKILL.md        # 必須: メタデータ + 手順
+            ├── scripts/        # 任意: 実行可能なスクリプト
+            ├── references/     # 任意: 参照ドキュメント
+            └── assets/         # 任意: テンプレート・リソース</code></pre>
+
+          <p>
+            プロジェクト固有のスキルは <code>.github/skills</code>（または
+            <code>.claude/skills</code>、<code>.agents/skills</code>）に、個人用の横断的なスキルは
+            <code>~/.copilot/skills</code>（または <code>~/.agents/skills</code>）に置きます。
+          </p>
+
+          <h3>SKILL.mdのサンプル</h3>
+          <pre><code>---
+name: webapp-testing
+description: >-
+  Assists with web application test strategies and automated test creation.
+  Use when the user asks about testing, test coverage, or writing E2E tests.
+---
+## Procedure
+1. Analyze the target code and determine the appropriate testing strategy.
+2. Create test files following the Arrange-Act-Assert (AAA) pattern.
+3. Run the tests and report the results.</code></pre>
+
+          <h3>description の書き方が命</h3>
+          <p>
+            Copilotは、ユーザーの発言と各SKILL.mdの
+            <code>description</code>
+            フィールドを照合して、どのスキルをロードするか判断します。「レビューして」「バグを見つけて」など<strong
+              >複数の言い回しを想定した具体的な description</strong
+            >を書くことが、意図通りにスキルを発火させるコツです。GitHub公式のAgent
+            Skillsガイドでも、Anthropic発の
+            <code>skill-creator</code>
+            スキルを使ってスキル自体をAIに生成させる方法が紹介されています（<code
+              >anthropics/skills</code
+            >
+            リポジトリで公開）。
+          </p>
+        </section>
+
+        <section id="step-mcp">
+          <h2><span class="step-badge">6</span>MCP — 外部ツール・データソースとの接続</h2>
+
+          <h3>概要</h3>
+          <p>
+            Model Context
+            Protocol（MCP）は、LLMアプリケーションが外部のツールやデータソースとやり取りするためのオープンな標準規格です。VS
+            Codeでは
+            <code>.vscode/mcp.json</code>
+            をリポジトリにコミットすることで、チーム全員がそのMCPサーバーを共有できます。
+          </p>
+
+          <h3>設定ファイルの注意点</h3>
+          <pre><code>{
+  "servers": {
+    "github": {
+      "type": "http",
+      "url": "https://api.githubcopilot.com/mcp/"
+    },
+    "playwright": {
+      "command": "npx",
+      "args": ["-y", "@playwright/mcp@latest"]
+    }
+  }
+}</code></pre>
+
+          <p>
+            ルートキーは <strong><code>servers</code></strong> です。Cursor や Claude Desktop
+            の設定ファイルでは
+            <code>mcpServers</code>
+            が使われているため、他ツールの設定をそのままコピー&amp;ペーストすると動かないというのが「よくある設定ミス」として複数の解説記事で指摘されています。
+          </p>
+
+          <h3>トランスポートの種類</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>トランスポート</th>
+                <th>説明</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>stdio</code></td>
+                <td>ローカルのサブプロセスとして起動する標準的なMCP方式。多くのサーバーが採用</td>
+              </tr>
+              <tr>
+                <td><code>http</code>（Streamable HTTP）</td>
+                <td>リモートエンドポイントに接続する現行の推奨方式</td>
+              </tr>
+              <tr>
+                <td><code>sse</code></td>
+                <td>レガシーなServer-Sent Events方式。MCP仕様上は非推奨だが後方互換のため対応</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <p>
+            Agent
+            modeでのみMCPツールは有効になり、AskモードやEditモードでは利用できない点にも注意してください。
+          </p>
+
+          <h3>利用範囲</h3>
+          <p>
+            MCPはVS Codeだけでなく、Copilot CLI・Copilot cloud agent・Copilot code review・GitHub
+            Copilotアプリなど、Copilotファミリー全体で利用可能です。ただし、CLIの設定ファイル形式はVS
+            Codeの
+            <code>.vscode/mcp.json</code>
+            とは別物なので、CLIでMCPを使う場合は専用の設定手順を公式ドキュメントで確認してください。組織/Enterpriseプランでは「MCP
+            servers in Copilot」ポリシーが既定で無効になっているため、管理者による有効化が必要です。
+          </p>
+        </section>
+
+        <section id="step-plan-mode">
+          <h2><span class="step-badge">7</span>Plan Mode — 実装前に合意形成する</h2>
+
+          <h3>なぜPlan Modeが必要か</h3>
+          <p>
+            エージェントに大きめのタスクを依頼すると「気づいたら大量のファイルが書き換わっていて、それは望んでいた実装ではなかった」という失敗が起きやすいものです。Plan
+            Modeは、<strong>コードを一切変更せずに、読み取り専用ツールで調査・質問・計画立案だけを行うモード</strong>です。
+          </p>
+
+          <p>
+            Visual Studioには2026年5月に専用の「Plan
+            agent」が導入されました。公式ブログによれば、その流れは次の通りです。
+          </p>
+
+          <div class="diagram-wrap">
+            <div class="mermaid-target" data-target-id="diagram-5"></div>
+          </div>
+          <script type="text/plain" class="mermaid-source" data-target-id="diagram-5">
+            flowchart TB
+                S1["Explore and clarify<br/>読み取り専用ツールでコードベースを調査し、<br/>曖昧な点は質問する"] --> S2["Draft and refine<br/>詳細な実装計画を作成し、一緒にレビューする"]
+                S2 --> S3["Edit the plan directly<br/>計画は .copilot/plans/plan-{title}.md<br/>として保存され、直接編集できる"]
+                S3 --> S4["Implement<br/>『Implement plan』を押すまで<br/>コードは一切変更されない"]
+
+                classDef purple fill:#2f2a52,stroke:#b6a6f0,color:#efe9fd;
+                class S1,S2,S3,S4 purple;
+          </script>
+
+          <p>
+            計画は自動的にMarkdownファイルとして保存されるため、そのままチームにレビュー共有したり、Gitで履歴管理したりできます。
+          </p>
+
+          <h3>実践例: Burke Hollandの「ハーネス」ワークフロー</h3>
+          <p>
+            GitHub公式ブログ（2026年7月27日、著者Burke
+            Holland）で紹介されている実践的なワークフローは、Plan
+            Modeを中心に据えたステップです。派手なツールや秘伝のプロンプトではなく、「ハーネス（Copilotそのもの）を理解して使いこなすこと」こそが生産性向上の鍵だと述べられています。
+          </p>
+
+          <div class="diagram-wrap">
+            <div class="mermaid-target" data-target-id="diagram-6"></div>
+          </div>
+          <script type="text/plain" class="mermaid-source" data-target-id="diagram-6">
+            flowchart TB
+                P1["1. プロトタイピング<br/>複数案をモックで比較する"] --> P2["2. Plan Mode<br/>/plan で要件を詰める・質問に答える"]
+                P2 --> P3["3. Autopilot<br/>計画に沿って自律的に実装するループ"]
+                P3 --> P4["4. 人間によるレビューと反復"]
+                P4 --> P5["5. Rubber Duck Review<br/>別系統のモデルにセカンドオピニオンを求める"]
+                P5 -->|"要修正"| P3
+                P5 -->|"承認"| P6["6. コミット・PR作成"]
+
+                classDef coral fill:#4a2620,stroke:#f0a688,color:#fbe4da;
+                classDef teal fill:#113f3b,stroke:#7fd9c9,color:#e3faf5;
+                class P1,P2,P3,P4,P5 coral;
+                class P6 teal;
+          </script>
+
+          <p>ポイントは次の通りです。</p>
+          <ul>
+            <li>
+              <strong>プロトタイピングを軽視しない</strong>:
+              「日付ピッカーを20パターンモックアップして」のように、実装前にビジュアルで比較することで、テキストだけでは気づけない要求の細部（年→月→日とズームする体験など）が見えてきます。
+            </li>
+            <li>
+              <strong>Plan Modeでは提案を鵜呑みにしない</strong>:
+              計画立案の価値は「AIの提案を全部受け入れること」ではなく、「人間が深く関与し、モデルを導くこと」にあります。Matt
+              Pocockが公開している <code>grill-me</code> という追加スキルを組み合わせる（<code
+                >/plan /grill-me ...</code
+              >）と、より突っ込んだ質問をエージェントにさせることもできます。
+            </li>
+            <li>
+              <strong>Autopilotは「計画を守らせるループ」</strong>:
+              計画の各項目を実際にやり遂げたかを確認しながら実行を続ける仕組みで、単純な自動実行とは異なります。
+            </li>
+            <li>
+              <strong>Rubber Duck Reviewは別モデル系統によるレビュー</strong>:
+              例えばGPT系で実装した場合はClaude系にレビューを依頼するなど、学習データや癖の異なるモデル同士でクロスチェックすることで見落としを減らせます。
+            </li>
+          </ul>
+          <p>
+            同記事は「今日の魔法のようなテクニックも、明日にはアンチパターンになりうる。ハーネスを理解していればそれで十分」と結んでおり、機能を追いかけすぎず基本のワークフローを固めることの重要性を強調しています。
+          </p>
+        </section>
+
+        <section id="sdd">
+          <h2><i class="ti ti-clipboard-list"></i>仕様駆動開発（SDD）への統合: GitHub Spec Kit</h2>
+
+          <p>
+            Plan Modeが「その場限りの計画」であるのに対し、<strong>GitHub Spec Kit</strong
+            >は「仕様(spec)・計画(plan)・タスク(tasks)をリポジトリに永続化されたMarkdown成果物として残す」ためのオープンソースツールキットです。Microsoft
+            for Developersのブログによれば、Spec Kitは
+            <code>.specify</code> フォルダにSDD用テンプレート（spec/plan/tasksの雛形）を、<code
+              >.github</code
+            >
+            などエージェント固有のフォルダにプロンプト定義を配置します。
+          </p>
+
+          <div class="diagram-wrap">
+            <div class="mermaid-target" data-target-id="diagram-7"></div>
+          </div>
+          <script type="text/plain" class="mermaid-source" data-target-id="diagram-7">
+            flowchart LR
+                C["constitution.md<br/>プロジェクトの<br/>非交渉的な原則"] --> S["/specify<br/>spec.md を生成"]
+                S --> P["/plan<br/>plan.md（技術方針）を生成"]
+                P --> T["/tasks<br/>tasks.md（実行可能な単位に分解）"]
+                T --> I["/implement<br/>タスクごとに<br/>段階的にコード生成"]
+                I --> Rev{"人間による<br/>チェックポイント"}
+                Rev -->|"要修正"| P
+                Rev -->|"承認"| Done["PR作成・マージ"]
+
+                classDef purple fill:#2f2a52,stroke:#b6a6f0,color:#efe9fd;
+                classDef gray fill:#16233a,stroke:#47607f,color:#d7e0ec;
+                classDef teal fill:#113f3b,stroke:#7fd9c9,color:#e3faf5;
+                class C,S,P,T,I purple;
+                class Rev gray;
+                class Done teal;
+          </script>
+
+          <h3>4つの成果物</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>成果物</th>
+                <th>役割</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>constitution.md</code></td>
+                <td>プロジェクト全体で守るべき非交渉的な原則（品質基準、禁止事項など）</td>
+              </tr>
+              <tr>
+                <td><code>spec.md</code></td>
+                <td>
+                  「何を作るか」。ユーザーゴール・シナリオ・受け入れ基準（実装詳細は含めない）
+                </td>
+              </tr>
+              <tr>
+                <td><code>plan.md</code></td>
+                <td>「どう作るか」。使用する技術スタックや既存パターンとの整合性</td>
+              </tr>
+              <tr>
+                <td><code>tasks.md</code></td>
+                <td>実行可能な最小単位に分解したタスクリスト</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h3>実務上のコツ</h3>
+          <ul>
+            <li>
+              <strong>一気に生成させない</strong>:
+              <code>/implement</code>
+              を一度に全部走らせるのではなく、フェーズやタスク単位で段階的に生成し、都度レビューすることが強調されています。小さく検証しながら進めることで、間違った方向に進んだ場合の手戻りを最小化できます。
+            </li>
+            <li>
+              <strong>整合性チェックを使う</strong>:
+              spec/plan/tasksの間で矛盾（ディレクトリの想定違い、要件の抜け漏れなど）を検出するコマンドも用意されており、実装に入る前の最終確認に活用します。
+            </li>
+            <li>
+              <strong>Copilot専用ではない</strong>:
+              <code>specify init --ai copilot</code> のようにAIツールを指定して初期化でき、Claude
+              CodeやCursor、Geminiなど他ツールでも同じSDDプロセスを使い回せます。
+            </li>
+          </ul>
+
+          <h3>Plan Mode との使い分け</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>観点</th>
+                <th>Plan Mode（IDE組み込み）</th>
+                <th>GitHub Spec Kit（SDD）</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>成果物</td>
+                <td>セッション内の計画（Visual Studioでは <code>.copilot/plans/</code> に保存）</td>
+                <td>
+                  <code>spec.md</code> / <code>plan.md</code> /
+                  <code>tasks.md</code> としてリポジトリにコミット
+                </td>
+              </tr>
+              <tr>
+                <td>適した規模</td>
+                <td>単機能・単一PR程度の作業</td>
+                <td>複数人・複数PRにまたがる大きめの機能開発</td>
+              </tr>
+              <tr>
+                <td>目的</td>
+                <td>「実装前に一呼吸おく」その場の合意形成</td>
+                <td>仕様そのものをチームの生きたドキュメントとして残す</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <p>
+            どちらか一方を選ぶというより、<strong
+              >小さな作業にはPlan Mode、機能単位の大きな作業にはSpec Kitによるフル装備のSDD</strong
+            >、という併用が現実的な落としどころです。仕様駆動開発の専門解説記事でも、「フルスペックのSDDは計画コストやレビューのボトルネックという税金を伴うため、その税金に見合う規模かどうかを見極めるべき」という指摘がされています。
+          </p>
+        </section>
+
+        <section id="security">
+          <h2><i class="ti ti-shield-check"></i>セキュリティとガバナンスの勘所</h2>
+
+          <p>
+            AIエージェントが「読む」コンテキストが増えるほど、悪意のある指示が紛れ込む余地（プロンプトインジェクション）も増えます。GitHub自身のセキュリティブログでも、VS
+            Codeにおける対策として次のような機能追加が説明されています。
+          </p>
+
+          <table>
+            <thead>
+              <tr>
+                <th>リスク</th>
+                <th>具体例</th>
+                <th>主な対策</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>間接プロンプトインジェクション</td>
+                <td>Issueやコードコメント、ファイルの中に隠された指示にAgent modeが従ってしまう</td>
+                <td>
+                  使用可能なツールの一覧表示、ツールの手動選択、ワークスペース外のファイル読み書き時の確認ダイアログ
+                </td>
+              </tr>
+              <tr>
+                <td>信頼できないMCPサーバー</td>
+                <td>未検証のMCPサーバーが機密情報を持ち出す、あるいは不正な操作を行う</td>
+                <td>
+                  MCPサーバー起動前の信頼確認ダイアログ、組織による許可リスト、サンドボックス化
+                </td>
+              </tr>
+              <tr>
+                <td>シークレットの漏洩</td>
+                <td>プロンプトや生成コードに認証情報が紛れ込む</td>
+                <td>Secret scanning + push protection、Content exclusions設定</td>
+              </tr>
+              <tr>
+                <td>生成コードの脆弱性</td>
+                <td>一見正しく見えるが入力検証が甘いコードが生成される</td>
+                <td>人間によるレビューを必須化、Copilot Autofix等の静的解析との併用</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <p>実務上のポイントは次の通りです。</p>
+          <ul>
+            <li>
+              <strong>MCPサーバーは信頼できる提供元に限定する</strong>:
+              組織として許可するMCPサーバーの一覧を定義し、未検証の外部提供元をブロックすることが推奨されています。
+            </li>
+            <li>
+              <strong>YOLOモード（Allow All）は隔離環境で使う</strong>: Burke
+              Hollandの記事でも「エージェントに全自動での実行権限を与える場合は、GitHub
+              Codespacesやdev
+              containerのようなサンドボックス上で行うべきで、特に業務データを扱う場合はローカルマシンで実行すべきではない」と明確に注意喚起されています。
+            </li>
+            <li>
+              <strong>常に人間のレビューを最終防波堤にする</strong>:
+              instructions・skills・MCPをどれだけ整えても、生成されたコード・実行されたコマンドの最終承認は人間が担うという原則は変わりません。
+            </li>
+          </ul>
+        </section>
+
+        <section id="maturity">
+          <h2><i class="ti ti-trending-up"></i>成熟度モデルとチェックリスト</h2>
+
+          <p>チームでの導入は、次のように段階を踏むのが現実的です。</p>
+
+          <table>
+            <thead>
+              <tr>
+                <th>段階</th>
+                <th>やること</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Crawl（開始期）</strong></td>
+                <td>
+                  <code>.github/copilot-instructions.md</code>
+                  を1本作成しコミットする。まずは技術スタック・ビルド/テストコマンドなど最低限の情報から
+                </td>
+              </tr>
+              <tr>
+                <td><strong>Walk（定着期）</strong></td>
+                <td>
+                  差分の大きい領域（認証・課金・インフラなど）に
+                  <code>.instructions.md</code> を追加。よく使う定型作業を
+                  <code>.prompt.md</code> 化する
+                </td>
+              </tr>
+              <tr>
+                <td><strong>Run（高度化期）</strong></td>
+                <td>
+                  役割別のCustom agent（<code>.agent.md</code>）、チーム共有のAgent
+                  Skills（SKILL.md）、MCPによる外部連携を整備。大きな機能開発ではGitHub Spec
+                  KitでSDDを回す
+                </td>
+              </tr>
+              <tr>
+                <td><strong>継続運用</strong></td>
+                <td>
+                  月次でCopilotの利用状況・アウトカム・コスト・インシデントをレビューし、エビデンスに基づいて適用範囲を広げる
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h3>最終チェックリスト</h3>
+          <ul class="checklist">
+            <li>
+              <i class="ti ti-square"></i
+              ><span
+                ><code>.github/copilot-instructions.md</code>
+                はリポジトリにコミットされているか</span
+              >
+            </li>
+            <li>
+              <i class="ti ti-square"></i
+              ><span
+                >指示ファイルは矛盾なく、具体的で観測可能な表現になっているか（1000行を超えていないか）</span
+              >
+            </li>
+            <li>
+              <i class="ti ti-square"></i
+              ><span
+                >パス限定のルールが必要な領域に <code>.instructions.md</code> を用意しているか</span
+              >
+            </li>
+            <li>
+              <i class="ti ti-square"></i
+              ><span
+                >繰り返し行うタスクを <code>.prompt.md</code> 化してチームで共有しているか</span
+              >
+            </li>
+            <li>
+              <i class="ti ti-square"></i
+              ><span
+                >Planning用とImplementation用でツール権限を分けたCustom
+                agent（<code>.agent.md</code>）を用意しているか</span
+              >
+            </li>
+            <li>
+              <i class="ti ti-square"></i
+              ><span
+                >チーム固有の手順をSKILL.mdとして言語化し、<code>description</code>
+                を具体的に書いているか</span
+              >
+            </li>
+            <li>
+              <i class="ti ti-square"></i
+              ><span
+                >MCPサーバーは信頼できる提供元に限定し、YOLOモードは隔離環境でのみ使っているか</span
+              >
+            </li>
+            <li>
+              <i class="ti ti-square"></i
+              ><span
+                >大きな機能開発の前に、Plan Mode（または Spec Kitの
+                spec/plan/tasks）で合意形成しているか</span
+              >
+            </li>
+            <li>
+              <i class="ti ti-square"></i
+              ><span>生成物は必ず人間がレビューしてからマージしているか</span>
+            </li>
+          </ul>
+        </section>
+
+        <section id="references">
+          <h2><i class="ti ti-books"></i>参考文献</h2>
+
+          <div class="ref-group">
+            <h3><i class="ti ti-file-certificate"></i>公式ドキュメント・一次情報</h3>
+            <ul class="ref-list">
+              <li>
+                <span class="ref-title"
+                  >GitHub Docs — Best practices for using GitHub Copilot to work on tasks</span
+                ><span class="ref-url"
+                  >https://docs.github.com/copilot/how-tos/agents/copilot-coding-agent/best-practices-for-using-copilot-to-work-on-tasks</span
+                >
+              </li>
+              <li>
+                <span class="ref-title">GitHub Docs — Best practices for GitHub Copilot CLI</span
+                ><span class="ref-url"
+                  >https://docs.github.com/en/copilot/how-tos/copilot-cli/cli-best-practices</span
+                >
+              </li>
+              <li>
+                <span class="ref-title">GitHub Docs — Your first custom instructions</span
+                ><span class="ref-url"
+                  >https://docs.github.com/en/copilot/tutorials/customization-library/custom-instructions/your-first-custom-instructions</span
+                >
+              </li>
+              <li>
+                <span class="ref-title"
+                  >GitHub Docs — About customizing GitHub Copilot responses</span
+                ><span class="ref-url"
+                  >https://docs.github.com/copilot/concepts/about-customizing-github-copilot-chat-responses</span
+                >
+              </li>
+              <li>
+                <span class="ref-title">GitHub Docs — Your first prompt file</span
+                ><span class="ref-url"
+                  >https://docs.github.com/en/copilot/tutorials/customization-library/prompt-files/your-first-prompt-file</span
+                >
+              </li>
+              <li>
+                <span class="ref-title">VS Code Docs — Use prompt files in VS Code</span
+                ><span class="ref-url"
+                  >https://code.visualstudio.com/docs/agent-customization/prompt-files</span
+                >
+              </li>
+              <li>
+                <span class="ref-title">VS Code Docs — Use custom instructions in VS Code</span
+                ><span class="ref-url"
+                  >https://code.visualstudio.com/docs/agent-customization/custom-instructions</span
+                >
+              </li>
+              <li>
+                <span class="ref-title">VS Code Docs — Custom agents in VS Code</span
+                ><span class="ref-url"
+                  >https://code.visualstudio.com/docs/agent-customization/custom-agents</span
+                >
+              </li>
+              <li>
+                <span class="ref-title"
+                  >microsoft/vscode-docs — Custom chat modes（旧仕様の一次資料）</span
+                ><span class="ref-url"
+                  >https://github.com/microsoft/vscode-docs/blob/main/docs/copilot/customization/custom-chat-modes.md</span
+                >
+              </li>
+              <li>
+                <span class="ref-title"
+                  >Visual Studio Blog — Custom Agents in Visual Studio: Built in and Build-Your-Own
+                  agents</span
+                ><span class="ref-url"
+                  >https://devblogs.microsoft.com/visualstudio/custom-agents-in-visual-studio-built-in-and-build-your-own-agents/</span
+                >
+              </li>
+              <li>
+                <span class="ref-title"
+                  >Visual Studio Blog — Plan Before You Build: Introducing the Plan agent in Visual
+                  Studio</span
+                ><span class="ref-url"
+                  >https://devblogs.microsoft.com/visualstudio/plan-before-you-build-introducing-the-plan-agent-in-visual-studio/</span
+                >
+              </li>
+              <li>
+                <span class="ref-title">GitHub Docs — About agent skills</span
+                ><span class="ref-url"
+                  >https://docs.github.com/en/copilot/concepts/agents/about-agent-skills</span
+                >
+              </li>
+              <li>
+                <span class="ref-title"
+                  >GitHub Docs — Adding agent skills for GitHub Copilot CLI</span
+                ><span class="ref-url"
+                  >https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/add-skills</span
+                >
+              </li>
+              <li>
+                <span class="ref-title"
+                  >Microsoft Learn — Use Agent Skills with GitHub Copilot (Visual Studio)</span
+                ><span class="ref-url"
+                  >https://learn.microsoft.com/en-us/visualstudio/ide/copilot-agent-skills?view=visualstudio</span
+                >
+              </li>
+              <li>
+                <span class="ref-title"
+                  >GitHub Changelog — GitHub Copilot now supports Agent Skills</span
+                ><span class="ref-url"
+                  >https://github.blog/changelog/2025-12-18-github-copilot-now-supports-agent-skills/</span
+                >
+              </li>
+              <li>
+                <span class="ref-title"
+                  >GitHub Changelog — Copilot code review: Agent skills and MCP now generally
+                  available</span
+                ><span class="ref-url"
+                  >https://github.blog/changelog/2026-07-29-copilot-code-review-agent-skills-and-mcp-now-generally-available/</span
+                >
+              </li>
+              <li>
+                <span class="ref-title"
+                  >GitHub Docs — Extending GitHub Copilot Chat with MCP servers</span
+                ><span class="ref-url"
+                  >https://docs.github.com/en/copilot/how-tos/provide-context/use-mcp-in-your-ide/extend-copilot-chat-with-mcp</span
+                >
+              </li>
+              <li>
+                <span class="ref-title">GitHub Docs — About Model Context Protocol (MCP)</span
+                ><span class="ref-url"
+                  >https://docs.github.com/en/copilot/concepts/context/mcp</span
+                >
+              </li>
+              <li>
+                <span class="ref-title">VS Code Docs — MCP configuration reference</span
+                ><span class="ref-url"
+                  >https://code.visualstudio.com/docs/agents/reference/mcp-configuration</span
+                >
+              </li>
+              <li>
+                <span class="ref-title"
+                  >GitHub Blog（Security）— Safeguarding VS Code against prompt injections</span
+                ><span class="ref-url"
+                  >https://github.blog/security/vulnerability-research/safeguarding-vs-code-against-prompt-injections/</span
+                >
+              </li>
+              <li>
+                <span class="ref-title"
+                  >Microsoft for Developers — Diving Into Spec-Driven Development With GitHub Spec
+                  Kit</span
+                ><span class="ref-url"
+                  >https://developer.microsoft.com/blog/spec-driven-development-spec-kit/</span
+                >
+              </li>
+              <li>
+                <span class="ref-title"
+                  >GitHub Blog — Spec-driven development with AI: Get started with a new open source
+                  toolkit</span
+                ><span class="ref-url"
+                  >https://github.blog/ai-and-ml/generative-ai/spec-driven-development-with-ai-get-started-with-a-new-open-source-toolkit/</span
+                >
+              </li>
+              <li>
+                <span class="ref-title">GitHub Spec Kit 公式サイト</span
+                ><span class="ref-url">https://github.github.com/spec-kit/</span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="ref-group">
+            <h3><i class="ti ti-user-star"></i>著名な開発者・実務者による解説</h3>
+            <ul class="ref-list">
+              <li>
+                <span class="ref-title"
+                  >Burke Holland（GitHub, Staff DevRel）— The harness is all you need (mostly)</span
+                ><span class="ref-url"
+                  >https://github.blog/ai-and-ml/github-copilot/the-harness-is-all-you-need-mostly/</span
+                >
+              </li>
+              <li>
+                <span class="ref-title"
+                  >Burke Holland — Essential custom instructions for GitHub Copilot</span
+                ><span class="ref-url"
+                  >https://burkeholland.github.io/posts/essential-custom-instructions/</span
+                >
+              </li>
+              <li>
+                <span class="ref-title"
+                  >GitHub Blog（Burke Holland 寄稿含む）— 5 tips for writing better custom
+                  instructions for Copilot</span
+                ><span class="ref-url"
+                  >https://github.blog/ai-and-ml/github-copilot/5-tips-for-writing-better-custom-instructions-for-copilot/</span
+                >
+              </li>
+              <li>
+                <span class="ref-title"
+                  >GitHub Blog — Unlocking the full power of Copilot code review: Master your
+                  instructions files</span
+                ><span class="ref-url"
+                  >https://github.blog/ai-and-ml/github-copilot/unlocking-the-full-power-of-copilot-code-review-master-your-instructions-files/</span
+                >
+              </li>
+              <li>
+                <span class="ref-title"
+                  >VS Code Blog（Rob Conery, Burke Holland）— Context is all you need: Better AI
+                  results with custom instructions</span
+                ><span class="ref-url"
+                  >https://code.visualstudio.com/blogs/2025/03/26/custom-instructions</span
+                >
+              </li>
+              <li>
+                <span class="ref-title"
+                  >Hidde de Smet — AGENTS.md vs .agent.md: repo rules and custom agent roles
+                  explained</span
+                ><span class="ref-url">https://hiddedesmet.com/agent-md-explained</span>
+              </li>
+              <li>
+                <span class="ref-title">Matt Pocock — grill-me skill</span
+                ><span class="ref-url">https://www.skills.sh/mattpocock/skills/grill-me</span>
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <div class="footer">
+          本ガイドはあくまで2026年7月31日時点の情報に基づく解説です。GitHub
+          Copilotの機能は頻繁に更新されるため、導入前には必ず最新の公式ドキュメントをご確認ください。
+        </div>
+      </main>
+    </div>
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/@tabler/icons-webfont@latest/dist/tabler-icons.min.css"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.12.0/mermaid.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script>
+      function dedent(str) {
+        var lines = str.replace(/^\n/, '').replace(/\s+$/, '').split('\n');
+        var indents = lines
+          .filter(function (l) {
+            return l.trim().length > 0;
+          })
+          .map(function (l) {
+            return l.match(/^\s*/)[0].length;
+          });
+        var min = indents.length ? Math.min.apply(null, indents) : 0;
+        return lines
+          .map(function (l) {
+            return l.slice(min);
+          })
+          .join('\n');
+      }
+
+      async function renderDiagrams() {
+        if (document.fonts && document.fonts.ready) {
+          await document.fonts.ready;
+        }
+        mermaid.initialize({
+          startOnLoad: false,
+          theme: 'dark',
+          securityLevel: 'loose',
+          fontFamily: 'inherit',
+          flowchart: { useMaxWidth: false, htmlLabels: true },
+        });
+
+        var sources = document.querySelectorAll('script.mermaid-source');
+        var index = 0;
+        for (var i = 0; i < sources.length; i++) {
+          var block = sources[i];
+          var targetId = block.getAttribute('data-target-id');
+          var target = document.querySelector('.mermaid-target[data-target-id="' + targetId + '"]');
+          var source = dedent(block.textContent);
+          var renderId = 'mermaid-render-' + index++;
+          try {
+            var result = await mermaid.render(renderId, source);
+            var wrapper = document.createElement('pre');
+            wrapper.className = 'mermaid';
+            wrapper.innerHTML = result.svg;
+            target.appendChild(wrapper);
+            var svgEl = wrapper.querySelector('svg');
+            if (svgEl) {
+              svgEl.removeAttribute('width');
+              svgEl.removeAttribute('height');
+              svgEl.style.maxWidth = '100%';
+              svgEl.style.height = 'auto';
+              var vb = svgEl.getAttribute('viewBox');
+              if (vb) {
+                var parts = vb.split(' ').map(Number);
+                parts[3] = parts[3] + 15;
+                svgEl.setAttribute('viewBox', parts.join(' '));
+              }
+            }
+          } catch (e) {
+            target.innerHTML =
+              '<p class="diagram-error">Diagram failed to render: ' +
+              (e && e.message ? e.message : e) +
+              '</p>';
+            console.error(e);
+          }
+        }
+      }
+
+      function setupActiveNav() {
+        var sections = document.querySelectorAll('main section[id]');
+        var navLinks = document.querySelectorAll('.sidebar-nav a');
+        var observer = new IntersectionObserver(
+          function (entries) {
+            entries.forEach(function (entry) {
+              if (entry.isIntersecting) {
+                navLinks.forEach(function (l) {
+                  l.classList.remove('active');
+                });
+                var link = document.querySelector(
+                  '.sidebar-nav a[href="#' + entry.target.id + '"]',
+                );
+                if (link) link.classList.add('active');
+              }
+            });
+          },
+          { rootMargin: '-20% 0px -70% 0px' },
+        );
+        sections.forEach(function (s) {
+          observer.observe(s);
+        });
+      }
+
+      window.addEventListener('DOMContentLoaded', function () {
+        renderDiagrams().then(function () {
+          if (window.hljs) {
+            hljs.highlightAll();
+          }
+          setupActiveNav();
+        });
+      });
+    </script>
+  </body>
+</html>
