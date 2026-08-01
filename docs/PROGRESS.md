@@ -2,7 +2,7 @@
 
 > 本ファイルは Next.js 移行完了後の保守・改善フェーズにおける開発の進捗（特にテスト関連）および品質チェックのルールを記録する。
 >
-> - 最終更新日: **Updated 2026-08-01**
+> - 最終更新日: **Updated 2026-08-02**
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
 
@@ -19,6 +19,8 @@
   - **バックエンド (`scraper/`)**: pytest 実行で **43 件すべて合格** (全 Green ✅)
 
 ## 最近の追加内容
+
+- **GitHub Copilot ガイド原稿3件の追加と公開ページ対応**: `Github-copilot-agent-md-guide.md` / `.html`（`.agent.md` のフロントマター、Handoffs、Subagents、MCP、マルチエージェント設計）を `/copilot/agent`、`Github-copilot-skillmd-guide.md` / `.html`（SKILL.md、Progressive Disclosure、実践テンプレート、トラブルシューティング）を `/copilot/skill`、`Copilot-spec-driven-development-best-practices.html`（Copilot の instructions / prompt / agent / skill / MCP / Plan Mode を使う仕様駆動開発）を `/copilot/markdown-file-guide` の公開内容として追加。レビュー再照合では、各原稿のモバイル目次、ARIA 状態、Mermaid エラー処理、Markdown 表示、CDN SRI を修正し、共有 `MermaidDiagram` の一時描画要素をビューポート外へ配置した。目視・ビルドは依頼により省略。Vitest **152 files / 1348 tests** と typecheck、対象2ファイルの Biome は Green。全体 lint は作業範囲外の既存12 diagnosticsで失敗（432 files checked）。
 
 - **コンテキストエンジニアリング入門（/agent/context-engineering-best-practices）のデザイン改善**: 1440px のサイドバー付きドキュメントシェル、ヒーローと章見出し、表・図解枠・出典・callout・コード・チェックリストの視覚階層をページ固有 CSS で再設計。Mermaid のレイアウト責務は共有コンポーネントに維持し、モバイル目次の `aria-controls`・状態ラベル・非表示制御、キーボードフォーカス、モーション抑制も追加。目視・ビルドは依頼により省略。Vitest **152 files / 1348 tests** と typecheck、対象3ファイルの Biome は Green。全体 lint は作業範囲外の既存未コミットファイルにある12件のフォーマット診断で失敗したため、対象外ファイルは変更せず記録のみとした。
 
