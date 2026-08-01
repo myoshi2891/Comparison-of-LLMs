@@ -1,6 +1,6 @@
 import { render, waitFor } from "@testing-library/react";
 import mermaid from "mermaid";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import MermaidDiagram from "./MermaidDiagram";
 
 // mermaid の動的 import を無害化。実描画の代わりに run が対象ノードへ代表 SVG を挿入し、
@@ -41,6 +41,51 @@ vi.mock("mermaid", () => ({
       genericNote.appendChild(document.createElementNS("http://www.w3.org/2000/svg", "rect"));
       genericNote.appendChild(document.createElementNS("http://www.w3.org/2000/svg", "text"));
       svg.appendChild(genericNote);
+
+      // ── sequenceDiagram の残り要素（アクター矩形・loop/label ラベル・シグナル線）──
+      const ns = "http://www.w3.org/2000/svg";
+      const withTspan = (className: string) => {
+        const text = document.createElementNS(ns, "text");
+        text.classList.add(className);
+        text.appendChild(document.createElementNS(ns, "tspan"));
+        return text;
+      };
+
+      const actorRect = document.createElementNS(ns, "rect");
+      actorRect.classList.add("actor");
+      svg.appendChild(actorRect);
+      svg.appendChild(withTspan("loopText"));
+      svg.appendChild(withTspan("labelText"));
+
+      const signalLine = document.createElementNS(ns, "path");
+      signalLine.classList.add("messageLine0");
+      svg.appendChild(signalLine);
+      const marker = document.createElementNS(ns, "marker");
+      marker.appendChild(document.createElementNS(ns, "path"));
+      svg.appendChild(marker);
+
+      // ── pieChart 要素（スライス 2 枚・凡例・タイトル・スライス内テキスト）──
+      for (let i = 0; i < 2; i += 1) {
+        const slice = document.createElementNS(ns, "path");
+        slice.classList.add("pieCircle");
+        svg.appendChild(slice);
+      }
+      const legend = document.createElementNS(ns, "g");
+      legend.classList.add("legend");
+      for (let i = 0; i < 2; i += 1) {
+        legend.appendChild(document.createElementNS(ns, "rect"));
+      }
+      legend.appendChild(document.createElementNS(ns, "text"));
+      svg.appendChild(legend);
+
+      const pieTitle = document.createElementNS(ns, "text");
+      pieTitle.classList.add("pieTitleText");
+      svg.appendChild(pieTitle);
+
+      const sliceText = document.createElementNS(ns, "text");
+      sliceText.classList.add("slice");
+      svg.appendChild(sliceText);
+
       target.appendChild(svg);
     }),
   },
@@ -223,5 +268,238 @@ describe("MermaidDiagram レイアウト規約", () => {
     });
     expect((container.querySelector("g.note text") as SVGTextElement).style.fill).toBe("");
     expect((container.querySelector("g.note rect") as SVGRectElement).style.fill).toBe("");
+  });
+});
+
+describe("MermaidDiagram sequenceDiagram 配色補正", () => {
+  it("dark テーマでは既定のダーク配色をアクター・ノート・ラベルへ適用する", async () => {
+    const { container } = render(<MermaidDiagram chart="sequenceDiagram" theme="dark" />);
+
+    await waitFor(() => {
+      expect((container.querySelector("rect.actor") as SVGRectElement).style.fill).toBe(
+        "rgb(30, 41, 59)"
+      );
+    });
+    expect((container.querySelector("rect.actor") as SVGRectElement).style.stroke).toBe(
+      "rgb(59, 130, 246)"
+    );
+    expect((container.querySelector("text.actor") as SVGTextElement).style.fill).toBe(
+      "rgb(226, 232, 240)"
+    );
+    expect((container.querySelector("rect.note") as SVGRectElement).style.stroke).toBe(
+      "rgb(100, 116, 139)"
+    );
+    expect((container.querySelector("text.loopText") as SVGTextElement).style.fill).toBe(
+      "rgb(226, 232, 240)"
+    );
+    expect((container.querySelector("text.labelText tspan") as SVGTSpanElement).style.fill).toBe(
+      "rgb(226, 232, 240)"
+    );
+    // 注: foreignObject 配下の color 上書きは jsdom では検証できない。
+    // nwsapi は camelCase の型セレクタ + 子孫結合子を querySelector では解決するが
+    // querySelectorAll では 0 件を返すため、コンポーネント側の
+    // querySelectorAll("foreignObject *") が jsdom 上でだけ空になる（実ブラウザは正常）。
+  });
+
+  it("シグナル線と矢印マーカーへ signalColor を適用する", async () => {
+    const { container } = render(
+      <MermaidDiagram
+        chart="sequenceDiagram"
+        theme="base"
+        themeVariables={{ signalColor: "#ff0000" }}
+      />
+    );
+
+    await waitFor(() => {
+      expect((container.querySelector("path.messageLine0") as SVGPathElement).style.stroke).toBe(
+        "rgb(255, 0, 0)"
+      );
+    });
+    const markerPath = container.querySelector("marker path") as SVGPathElement;
+    expect(markerPath.style.fill).toBe("rgb(255, 0, 0)");
+    expect(markerPath.style.stroke).toBe("rgb(255, 0, 0)");
+  });
+
+  it("signalColor 未指定なら既定のシグナル線色を使う", async () => {
+    const { container } = render(<MermaidDiagram chart="sequenceDiagram" theme="dark" />);
+
+    await waitFor(() => {
+      expect((container.querySelector("path.messageLine0") as SVGPathElement).style.stroke).toBe(
+        "rgb(148, 163, 184)"
+      );
+    });
+  });
+
+  it("actorBkg / actorBorder / actorTextColor の明示指定を優先する", async () => {
+    const { container } = render(
+      <MermaidDiagram
+        chart="sequenceDiagram"
+        theme="base"
+        themeVariables={{
+          actorBkg: "#010203",
+          actorBorder: "#040506",
+          actorTextColor: "#070809",
+          loopTextColor: "#0a0b0c",
+          labelTextColor: "#0d0e0f",
+        }}
+      />
+    );
+
+    await waitFor(() => {
+      expect((container.querySelector("rect.actor") as SVGRectElement).style.fill).toBe(
+        "rgb(1, 2, 3)"
+      );
+    });
+    expect((container.querySelector("rect.actor") as SVGRectElement).style.stroke).toBe(
+      "rgb(4, 5, 6)"
+    );
+    expect((container.querySelector("text.actor") as SVGTextElement).style.fill).toBe(
+      "rgb(7, 8, 9)"
+    );
+    expect((container.querySelector("text.loopText") as SVGTextElement).style.fill).toBe(
+      "rgb(10, 11, 12)"
+    );
+    expect((container.querySelector("text.labelText") as SVGTextElement).style.fill).toBe(
+      "rgb(13, 14, 15)"
+    );
+  });
+});
+
+describe("MermaidDiagram pieChart 配色補正", () => {
+  it("themeVariables 未指定ならスライスと凡例へ既定パレットを順番に適用する", async () => {
+    const { container } = render(<MermaidDiagram chart="pie" />);
+
+    await waitFor(() => {
+      const slices = container.querySelectorAll<SVGPathElement>("path.pieCircle");
+      expect(slices[0].style.fill).toBe("rgb(87, 199, 255)");
+      expect(slices[1].style.fill).toBe("rgb(169, 150, 255)");
+    });
+
+    const slices = container.querySelectorAll<SVGPathElement>("path.pieCircle");
+    expect(slices[0].style.stroke).toBe("rgb(7, 17, 30)");
+    expect(slices[0].style.opacity).toBe("0.95");
+    expect(slices[0].style.getPropertyValue("stroke-width")).toBe("2px");
+
+    const legendRects = container.querySelectorAll<SVGRectElement>("g.legend rect");
+    expect(legendRects[0].style.fill).toBe("rgb(87, 199, 255)");
+    expect(legendRects[1].style.fill).toBe("rgb(169, 150, 255)");
+
+    // dark（既定）テーマのテキスト色
+    expect((container.querySelector(".pieTitleText") as SVGTextElement).style.fill).toBe(
+      "rgb(232, 238, 245)"
+    );
+    expect((container.querySelector("g.legend text") as SVGTextElement).style.fill).toBe(
+      "rgb(232, 238, 245)"
+    );
+    const sliceText = container.querySelector("text.slice") as SVGTextElement;
+    expect(sliceText.style.fill).toBe("rgb(255, 255, 255)");
+    expect(sliceText.style.getPropertyValue("font-weight")).toBe("700");
+  });
+
+  it("pieN / pieStrokeColor / pieOpacity の明示指定を優先する", async () => {
+    const { container } = render(
+      <MermaidDiagram
+        chart="pie"
+        themeVariables={{
+          pie1: "#111111",
+          pie2: "#222222",
+          pieStrokeColor: "#333333",
+          pieOpacity: "0.5",
+          pieTitleTextColor: "#444444",
+          pieLegendTextColor: "#555555",
+          pieSectionTextColor: "#666666",
+        }}
+      />
+    );
+
+    await waitFor(() => {
+      const slices = container.querySelectorAll<SVGPathElement>("path.pieCircle");
+      expect(slices[0].style.fill).toBe("rgb(17, 17, 17)");
+      expect(slices[1].style.fill).toBe("rgb(34, 34, 34)");
+    });
+
+    const slices = container.querySelectorAll<SVGPathElement>("path.pieCircle");
+    expect(slices[0].style.stroke).toBe("rgb(51, 51, 51)");
+    expect(slices[0].style.opacity).toBe("0.5");
+    expect((container.querySelector(".pieTitleText") as SVGTextElement).style.fill).toBe(
+      "rgb(68, 68, 68)"
+    );
+    expect((container.querySelector("g.legend text") as SVGTextElement).style.fill).toBe(
+      "rgb(85, 85, 85)"
+    );
+    expect((container.querySelector("text.slice") as SVGTextElement).style.fill).toBe(
+      "rgb(102, 102, 102)"
+    );
+  });
+
+  it("ライトテーマ（base）ではタイトル・凡例・スライス文字を暗色にする", async () => {
+    const { container } = render(<MermaidDiagram chart="pie" theme="base" />);
+
+    await waitFor(() => {
+      expect((container.querySelector(".pieTitleText") as SVGTextElement).style.fill).toBe(
+        "rgb(7, 17, 30)"
+      );
+    });
+    expect((container.querySelector("g.legend text") as SVGTextElement).style.fill).toBe(
+      "rgb(7, 17, 30)"
+    );
+    expect((container.querySelector("text.slice") as SVGTextElement).style.fill).toBe(
+      "rgb(7, 17, 30)"
+    );
+  });
+});
+
+describe("MermaidDiagram 失敗時と世代管理", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("描画に失敗したらエラーメッセージへ差し替える", async () => {
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    vi.mocked(mermaid.run).mockRejectedValueOnce(new Error("bad syntax"));
+
+    const { container } = render(<MermaidDiagram chart="graph TD; A--" />);
+
+    await waitFor(() => {
+      expect(container.querySelector<HTMLElement>(".mermaid")?.textContent).toBe(
+        "⚠️ ダイアグラムを描画できませんでした"
+      );
+    });
+    expect(consoleError).toHaveBeenCalledWith("[MermaidDiagram] render failed:", expect.any(Error));
+  });
+
+  it("世代が更新された後は古い描画結果を反映しない", async () => {
+    let releaseFirstRun: (() => void) | undefined;
+    vi.mocked(mermaid.run).mockImplementationOnce(
+      () =>
+        new Promise<void>((resolve) => {
+          releaseFirstRun = () => {
+            resolve();
+          };
+        })
+    );
+
+    const { container, rerender } = render(<MermaidDiagram chart="graph TD; A-->B" />);
+    await waitFor(() => expect(releaseFirstRun).toBeDefined());
+
+    // 先行描画が未完了のまま chart を差し替える（世代トークンが進む）
+    rerender(<MermaidDiagram chart="graph TD; B-->C" />);
+    releaseFirstRun?.();
+
+    await waitFor(() => {
+      expect(container.querySelector("svg")).not.toBeNull();
+    });
+    // 後発の描画のみが svg を 1 つ挿入し、古い世代の後処理は行われない
+    expect(container.querySelectorAll("svg")).toHaveLength(1);
+  });
+
+  it("アンマウント済みなら描画処理を開始しない", async () => {
+    const initializeCalls = vi.mocked(mermaid.initialize).mock.calls.length;
+    const { unmount } = render(<MermaidDiagram chart="graph TD; A-->B" />);
+    unmount();
+
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(vi.mocked(mermaid.initialize).mock.calls.length).toBe(initializeCalls);
   });
 });
