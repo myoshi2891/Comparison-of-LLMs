@@ -551,11 +551,15 @@
         }
         .sidebar {
           transform: translateX(-100%);
-          transition: transform 0.2s ease;
+          visibility: hidden;
+          pointer-events: none;
+          transition: transform 0.2s ease, visibility 0.2s ease;
           box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
         }
         .sidebar.open {
           transform: translateX(0);
+          visibility: visible;
+          pointer-events: auto;
         }
         .sidebar-overlay.open {
           display: block;
@@ -585,7 +589,7 @@
   <body>
     <div class="top-bar"></div>
     <div class="bg-glow"></div>
-    <button class="menu-toggle" id="menuToggle" aria-label="メニューを開く">☰</button>
+    <button type="button" class="menu-toggle" id="menuToggle" aria-label="メニューを開く" aria-expanded="false" aria-controls="sidebar">☰</button>
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
     <div class="layout">
@@ -1565,7 +1569,7 @@ flowchart TB
       </main>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.12.0/mermaid.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.12.0/mermaid.min.js" integrity="sha512-5TKaYvhenABhlGIKSxAWLFJBZCSQw7HTV7aL1dJcBokM/+3PNtfgJFlv8E6Us/B1VMlQ4u8sPzjudL9TEQ06ww==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script>
       (function () {
         var toggle = document.getElementById('menuToggle');
@@ -1574,10 +1578,18 @@ flowchart TB
         function closeSidebar() {
           sidebar.classList.remove('open');
           overlay.classList.remove('open');
+          if (toggle) {
+            toggle.setAttribute('aria-expanded', 'false');
+            toggle.setAttribute('aria-label', 'メニューを開く');
+          }
         }
         function openSidebar() {
           sidebar.classList.add('open');
           overlay.classList.add('open');
+          if (toggle) {
+            toggle.setAttribute('aria-expanded', 'true');
+            toggle.setAttribute('aria-label', 'メニューを閉じる');
+          }
         }
         if (toggle) {
           toggle.addEventListener('click', function () {
@@ -1675,7 +1687,7 @@ flowchart TB
               }
             };
             if (document.fonts && document.fonts.ready) {
-              document.fonts.ready.then(run);
+              document.fonts.ready.then(run).catch(run);
             } else {
               run();
             }
