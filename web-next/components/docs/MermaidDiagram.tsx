@@ -239,17 +239,16 @@ export default function MermaidDiagram({
         });
 
         if (!isCurrent()) return;
-        const targetEl = ref.current;
-        if (!targetEl) return;
+        if (!ref.current) return;
 
-        targetEl.textContent = chart;
-        delete targetEl.dataset.processed;
+        const tempEl = document.createElement("div");
+        tempEl.textContent = chart;
 
         try {
-          await m.default.run({ nodes: [targetEl] });
-          if (!isCurrent()) return;
+          await m.default.run({ nodes: [tempEl] });
+          if (!isCurrent() || !ref.current) return;
 
-          const svg = targetEl.querySelector("svg");
+          const svg = tempEl.querySelector("svg");
           if (svg instanceof SVGElement) {
             svg.style.maxWidth = "100%";
             if (maxHeight !== undefined) {
@@ -263,24 +262,23 @@ export default function MermaidDiagram({
             svg.style.height = "auto";
           }
 
-          if (!isCurrent()) return;
-
           if (theme === "base" || theme === "dark" || themeVariables !== undefined) {
             const textColor =
               themeVariables?.primaryTextColor ?? (theme === "dark" ? "#e2e8f0" : "#000000");
-            targetEl.querySelectorAll("foreignObject *").forEach((el) => {
+            tempEl.querySelectorAll("foreignObject *").forEach((el) => {
               (el as HTMLElement).style.setProperty("color", textColor, "important");
             });
 
-            if (!isCurrent()) return;
-            applySequenceDiagramColorOverrides(targetEl, themeVariables, theme);
+            applySequenceDiagramColorOverrides(tempEl, themeVariables, theme);
           }
 
-          if (!isCurrent()) return;
-          applyPieChartColorOverrides(targetEl, themeVariables, theme);
+          applyPieChartColorOverrides(tempEl, themeVariables, theme);
+
+          if (!isCurrent() || !ref.current) return;
+          ref.current.replaceChildren(...tempEl.childNodes);
         } catch (err) {
-          console.error("[MermaidDiagram] render failed:", err);
           if (isCurrent() && ref.current) {
+            console.error("[MermaidDiagram] render failed:", err);
             ref.current.textContent = "⚠️ ダイアグラムを描画できませんでした";
           }
         }
