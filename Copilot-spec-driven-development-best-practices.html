@@ -353,16 +353,19 @@
         background: var(--color-background-secondary);
         padding: 20px;
         margin: 20px 0;
+        overflow-x: auto;
       }
 
       pre.mermaid {
-        width: 100%;
-        display: flex;
-        justify-content: center;
         margin: 0;
         background: none;
         border: none;
         padding: 0;
+        font-family: var(--font-sans);
+      }
+
+      pre.mermaid * {
+        font-family: var(--font-sans) !important;
       }
 
       .diagram-error {
@@ -373,22 +376,72 @@
       .checklist {
         list-style: none;
         padding-left: 0;
+        margin: 0;
       }
       .checklist li {
-        display: flex;
-        gap: 10px;
-        align-items: flex-start;
-        padding: 8px 0;
         border-bottom: 1px solid var(--color-border-tertiary);
       }
       .checklist li:last-child {
         border-bottom: none;
       }
-      .checklist i {
-        color: var(--color-text-tertiary);
-        font-size: 16px;
-        margin-top: 2px;
+
+      .check-item {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+        padding: 10px 4px;
+        cursor: pointer;
+        margin: 0;
+      }
+
+      .check-input {
+        position: absolute;
+        opacity: 0;
+        width: 1px;
+        height: 1px;
+        pointer-events: none;
+      }
+
+      .check-box {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 18px;
+        height: 18px;
+        margin-top: 1px;
         flex-shrink: 0;
+        border: 1px solid var(--color-border-primary);
+        border-radius: 4px;
+        background: var(--color-background-tertiary);
+      }
+
+      .check-box i {
+        font-size: 13px;
+        color: var(--color-background-primary);
+        visibility: hidden;
+      }
+
+      .check-input:checked + .check-box {
+        background: var(--accent);
+        border-color: var(--accent);
+      }
+
+      .check-input:checked + .check-box i {
+        visibility: visible;
+      }
+
+      .check-input:focus-visible + .check-box {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
+      }
+
+      .check-text {
+        color: var(--color-text-secondary);
+      }
+
+      .check-input:checked ~ .check-text {
+        color: var(--color-text-tertiary);
+        text-decoration: line-through;
       }
 
       .ref-group {
@@ -539,18 +592,18 @@
           </div>
           <script type="text/plain" class="mermaid-source" data-target-id="diagram-0">
             flowchart TB
-                subgraph AO["常時適用されるレイヤー (Always-on)"]
+                subgraph AO["常時適用 (Always-on)"]
                     A["Personal Instructions<br/>個人のユーザー設定"]
                     B["Organization Instructions<br/>組織/Enterprise設定"]
                     C["Repository Instructions<br/>copilot-instructions.md / AGENTS.md"]
                     D[".instructions.md<br/>applyTo で条件付き適用"]
                 end
-                subgraph OD["呼び出したときだけ適用されるレイヤー (On-demand)"]
+                subgraph OD["呼び出し時のみ (On-demand)"]
                     E[".prompt.md<br/>/コマンドで手動起動"]
                     F[".agent.md（旧 .chatmode.md）<br/>役割・ツールセットを切替"]
                     G["SKILL.md<br/>description との一致で自動ロード"]
                 end
-                subgraph EXT["外部連携レイヤー"]
+                subgraph EXT["外部連携 (External)"]
                     H["MCP Servers<br/>ツール・データソースの接続"]
                 end
                 A --> M["1回のリクエストごとに<br/>Copilotがコンテキストを統合"]
@@ -1484,60 +1537,90 @@ description: >-
           <h3>最終チェックリスト</h3>
           <ul class="checklist">
             <li>
-              <i class="ti ti-square"></i
-              ><span
-                ><code>.github/copilot-instructions.md</code>
-                はリポジトリにコミットされているか</span
+              <label class="check-item"
+                ><input type="checkbox" class="check-input" /><span class="check-box"
+                  ><i class="ti ti-check"></i></span
+                ><span class="check-text"
+                  ><code>.github/copilot-instructions.md</code>
+                  はリポジトリにコミットされているか</span
+                ></label
               >
             </li>
             <li>
-              <i class="ti ti-square"></i
-              ><span
-                >指示ファイルは矛盾なく、具体的で観測可能な表現になっているか（1000行を超えていないか）</span
+              <label class="check-item"
+                ><input type="checkbox" class="check-input" /><span class="check-box"
+                  ><i class="ti ti-check"></i></span
+                ><span class="check-text"
+                  >指示ファイルは矛盾なく、具体的で観測可能な表現になっているか（1000行を超えていないか）</span
+                ></label
               >
             </li>
             <li>
-              <i class="ti ti-square"></i
-              ><span
-                >パス限定のルールが必要な領域に <code>.instructions.md</code> を用意しているか</span
+              <label class="check-item"
+                ><input type="checkbox" class="check-input" /><span class="check-box"
+                  ><i class="ti ti-check"></i></span
+                ><span class="check-text"
+                  >パス限定のルールが必要な領域に
+                  <code>.instructions.md</code> を用意しているか</span
+                ></label
               >
             </li>
             <li>
-              <i class="ti ti-square"></i
-              ><span
-                >繰り返し行うタスクを <code>.prompt.md</code> 化してチームで共有しているか</span
+              <label class="check-item"
+                ><input type="checkbox" class="check-input" /><span class="check-box"
+                  ><i class="ti ti-check"></i></span
+                ><span class="check-text"
+                  >繰り返し行うタスクを <code>.prompt.md</code> 化してチームで共有しているか</span
+                ></label
               >
             </li>
             <li>
-              <i class="ti ti-square"></i
-              ><span
-                >Planning用とImplementation用でツール権限を分けたCustom
-                agent（<code>.agent.md</code>）を用意しているか</span
+              <label class="check-item"
+                ><input type="checkbox" class="check-input" /><span class="check-box"
+                  ><i class="ti ti-check"></i></span
+                ><span class="check-text"
+                  >Planning用とImplementation用でツール権限を分けたCustom
+                  agent（<code>.agent.md</code>）を用意しているか</span
+                ></label
               >
             </li>
             <li>
-              <i class="ti ti-square"></i
-              ><span
-                >チーム固有の手順をSKILL.mdとして言語化し、<code>description</code>
-                を具体的に書いているか</span
+              <label class="check-item"
+                ><input type="checkbox" class="check-input" /><span class="check-box"
+                  ><i class="ti ti-check"></i></span
+                ><span class="check-text"
+                  >チーム固有の手順をSKILL.mdとして言語化し、<code>description</code>
+                  を具体的に書いているか</span
+                ></label
               >
             </li>
             <li>
-              <i class="ti ti-square"></i
-              ><span
-                >MCPサーバーは信頼できる提供元に限定し、YOLOモードは隔離環境でのみ使っているか</span
+              <label class="check-item"
+                ><input type="checkbox" class="check-input" /><span class="check-box"
+                  ><i class="ti ti-check"></i></span
+                ><span class="check-text"
+                  >MCPサーバーは信頼できる提供元に限定し、YOLOモードは隔離環境でのみ使っているか</span
+                ></label
               >
             </li>
             <li>
-              <i class="ti ti-square"></i
-              ><span
-                >大きな機能開発の前に、Plan Mode（または Spec Kitの
-                spec/plan/tasks）で合意形成しているか</span
+              <label class="check-item"
+                ><input type="checkbox" class="check-input" /><span class="check-box"
+                  ><i class="ti ti-check"></i></span
+                ><span class="check-text"
+                  >大きな機能開発の前に、Plan Mode（または Spec Kitの
+                  spec/plan/tasks）で合意形成しているか</span
+                ></label
               >
             </li>
             <li>
-              <i class="ti ti-square"></i
-              ><span>生成物は必ず人間がレビューしてからマージしているか</span>
+              <label class="check-item"
+                ><input type="checkbox" class="check-input" /><span class="check-box"
+                  ><i class="ti ti-check"></i></span
+                ><span class="check-text"
+                  >生成物は必ず人間がレビューしてからマージしているか</span
+                ></label
+              >
             </li>
           </ul>
         </section>
@@ -1803,8 +1886,19 @@ description: >-
           startOnLoad: false,
           theme: 'dark',
           securityLevel: 'loose',
-          fontFamily: 'inherit',
-          flowchart: { useMaxWidth: false, htmlLabels: true },
+          fontFamily:
+            '"Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+          fontSize: 16,
+          themeVariables: {
+            fontSize: '16px',
+            fontFamily:
+              '"Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+          },
+          flowchart: {
+            useMaxWidth: false,
+            htmlLabels: true,
+            subGraphTitleMargin: { top: 10, bottom: 14 },
+          },
         });
 
         var sources = document.querySelectorAll('script.mermaid-source');
@@ -1825,14 +1919,44 @@ description: >-
             if (svgEl) {
               svgEl.removeAttribute('width');
               svgEl.removeAttribute('height');
-              svgEl.style.maxWidth = '100%';
-              svgEl.style.height = 'auto';
-              var vb = svgEl.getAttribute('viewBox');
-              if (vb) {
-                var parts = vb.split(' ').map(Number);
-                parts[3] = parts[3] + 15;
-                svgEl.setAttribute('viewBox', parts.join(' '));
+              svgEl.style.overflow = 'visible';
+
+              // Mermaid's own viewBox is sized from node/edge layout and does not
+              // always account for subgraph title text overflowing its cluster box
+              // (long bilingual labels in particular). Measure the actual rendered
+              // bounding box of everything in the SVG and use that instead, so no
+              // title text gets silently clipped at the canvas edge.
+              var pad = 10;
+              var innerG = svgEl.querySelector('g');
+              var bbox = null;
+              try {
+                bbox = (innerG || svgEl).getBBox();
+              } catch (e) {
+                bbox = null;
               }
+
+              if (bbox && bbox.width > 0 && bbox.height > 0) {
+                var minX = bbox.x - pad;
+                var minY = bbox.y - pad;
+                var w = bbox.width + pad * 2;
+                var h = bbox.height + pad * 2;
+                svgEl.setAttribute('viewBox', minX + ' ' + minY + ' ' + w + ' ' + h);
+                svgEl.style.width = w + 'px';
+              } else {
+                var vb = svgEl.getAttribute('viewBox');
+                if (vb) {
+                  var parts = vb.split(' ').map(Number);
+                  parts[3] = parts[3] + 15;
+                  svgEl.setAttribute('viewBox', parts.join(' '));
+                  svgEl.style.width = parts[2] + 'px';
+                }
+              }
+              // Fixed natural pixel width: never stretched to fill a wide column,
+              // never shrunk below its authored size, so node text renders at a
+              // true 1rem (16px) in every diagram regardless of container width.
+              svgEl.style.height = 'auto';
+              svgEl.style.display = 'block';
+              svgEl.style.margin = '0 auto';
             }
           } catch (e) {
             target.innerHTML =
