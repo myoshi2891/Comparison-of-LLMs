@@ -186,7 +186,7 @@ function applyPieChartColorOverrides(
       el.style.setProperty("fill", legendTextColor, "important");
     });
 
-  const sliceTextColor = themeVariables?.pieSectionTextColor ?? (isDark ? "#ffffff" : "#07111e");
+  const sliceTextColor = themeVariables?.pieSectionTextColor ?? "#07111e";
   root.querySelectorAll<SVGTextElement>("text.slice, .slice text, g text.slice").forEach((el) => {
     el.style.setProperty("fill", sliceTextColor, "important");
     el.style.setProperty("font-weight", "700", "important");
@@ -243,7 +243,7 @@ export default function MermaidDiagram({
         if (!targetEl) return;
 
         targetEl.textContent = chart;
-        targetEl.removeAttribute("data-processed");
+        delete targetEl.dataset.processed;
 
         try {
           await m.default.run({ nodes: [targetEl] });

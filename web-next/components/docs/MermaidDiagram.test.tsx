@@ -392,7 +392,7 @@ describe("MermaidDiagram pieChart 配色補正", () => {
       "rgb(232, 238, 245)"
     );
     const sliceText = container.querySelector("text.slice") as SVGTextElement;
-    expect(sliceText.style.fill).toBe("rgb(255, 255, 255)");
+    expect(sliceText.style.fill).toBe("rgb(7, 17, 30)");
     expect(sliceText.style.getPropertyValue("font-weight")).toBe("700");
   });
 
