@@ -356,6 +356,11 @@
         padding: 24px 18px 16px;
         margin: 0 0 12px;
       }
+      .diagram-error {
+        color: var(--red);
+        font-size: 13px;
+        text-align: center;
+      }
       .diagram-card .mermaid {
         display: block;
         width: fit-content;
@@ -1912,19 +1917,30 @@ Code -. 齟齬が見つかれば更新 .-> R`,
         if (document.fonts) await document.fonts.ready;
         for (const [id, source] of Object.entries(DIAGRAMS)) {
           const container = document.getElementById(id);
-          const { svg } = await mermaid.render(`svg-${id}`, source);
-          container.innerHTML = svg;
-          const svgElement = container.querySelector('svg');
-          if (svgElement) {
-            const naturalWidth = svgElement.viewBox.baseVal.width;
-            svgElement.removeAttribute('width');
-            svgElement.removeAttribute('height');
-            svgElement.style.display = 'block';
-            svgElement.style.width = `${naturalWidth}px`;
-            svgElement.style.maxWidth = '100%';
-            svgElement.style.height = 'auto';
-            svgElement.style.margin = '0 auto';
-            svgElement.style.overflow = 'visible';
+          if (!container) continue;
+          try {
+            const { svg } = await mermaid.render(`svg-${id}`, source);
+            container.innerHTML = svg;
+            const svgElement = container.querySelector('svg');
+            if (svgElement) {
+              const naturalWidth = svgElement.viewBox.baseVal.width;
+              svgElement.removeAttribute('width');
+              svgElement.removeAttribute('height');
+              svgElement.style.display = 'block';
+              svgElement.style.width = `${naturalWidth}px`;
+              svgElement.style.maxWidth = '100%';
+              svgElement.style.height = 'auto';
+              svgElement.style.margin = '0 auto';
+              svgElement.style.overflow = 'visible';
+            }
+          } catch (error) {
+            const errorElement = document.createElement('p');
+            errorElement.className = 'diagram-error';
+            errorElement.textContent =
+              'Diagram failed to render: ' +
+              (error && error.message ? error.message : error);
+            container.replaceChildren(errorElement);
+            console.error(error);
           }
         }
       })();

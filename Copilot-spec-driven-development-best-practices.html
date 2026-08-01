@@ -2005,10 +2005,11 @@ description: >-
               svgEl.style.margin = '0 auto';
             }
           } catch (e) {
-            target.innerHTML =
-              '<p class="diagram-error">Diagram failed to render: ' +
-              (e && e.message ? e.message : e) +
-              '</p>';
+            var errorElement = document.createElement('p');
+            errorElement.className = 'diagram-error';
+            errorElement.textContent =
+              'Diagram failed to render: ' + (e && e.message ? e.message : e);
+            target.replaceChildren(errorElement);
             console.error(e);
           }
         }

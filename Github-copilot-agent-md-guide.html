@@ -2719,13 +2719,18 @@ tools: ['agent', 'read', 'search']
               subGraphTitleMargin: { top: 10, bottom: 28 },
             },
           });
-          mermaid.run({ querySelector: '.mermaid' }).then(function () {
-            document.querySelectorAll('.mermaid-wrapper svg').forEach(function (svg) {
-              svg.style.maxWidth = 'none';
-              svg.style.height = 'auto';
-              svg.style.flexShrink = '0';
+          mermaid
+            .run({ querySelector: '.mermaid' })
+            .then(function () {
+              document.querySelectorAll('.mermaid-wrapper svg').forEach(function (svg) {
+                svg.style.maxWidth = 'none';
+                svg.style.height = 'auto';
+                svg.style.flexShrink = '0';
+              });
+            })
+            .catch(function (e) {
+              console.error('mermaid render error', e);
             });
-          });
         }
 
         // 3) Sidebar active-link highlighting via IntersectionObserver.
