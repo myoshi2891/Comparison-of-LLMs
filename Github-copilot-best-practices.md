@@ -1,5 +1,5 @@
 # GitHub Copilot 実践ベストプラクティスガイド
-### 中級者〜上級者のためのステップバイステップ活用法(2026年7月31日時点)
+中級者〜上級者のためのステップバイステップ活用法(2026年7月31日時点)
 
 GitHub Copilotは、単なる「コード補完ツール」から「エージェント・ハーネス(agent harness)」へと姿を変えました。Chat・CLI・Coding Agent・Code Review・Spaces——複数の製品面が同じ推論基盤を共有し、Ask/Edit/Agentという3つのモード、カスタムインストラクション、MCP(Model Context Protocol)、サブエージェントといった仕組みで構成されています。
 

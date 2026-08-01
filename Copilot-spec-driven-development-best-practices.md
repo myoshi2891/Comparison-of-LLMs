@@ -27,6 +27,7 @@
 ---
 
 <a id="1"></a>
+
 ## 1. 全体像:Copilotのコンテキストはどう組み立てられるか
 
 GitHub Copilotは1回のリクエストごとに、複数のレイヤーから集めた情報を統合してモデルに渡しています。これらのレイヤーを正しく使い分けることが、AI仕様駆動開発（Spec-Driven Development, SDD）の土台になります。
@@ -89,6 +90,7 @@ flowchart TD
 ---
 
 <a id="2"></a>
+
 ## 2. Step 1: copilot-instructions.md — リポジトリ全体のルール
 
 ### 概要
@@ -129,6 +131,7 @@ If requirements are ambiguous, ask a clarifying question instead of guessing.
 ---
 
 <a id="3"></a>
+
 ## 3. Step 2: .instructions.md — パス限定ルールと AGENTS.md
 
 ### .instructions.md
@@ -174,6 +177,7 @@ applyTo: "src/api/**/*"
 ---
 
 <a id="4"></a>
+
 ## 4. Step 3: .prompt.md — 再利用可能なスラッシュコマンド
 
 ### 概要
@@ -229,6 +233,7 @@ VS Codeには `/create-prompt` というコマンドもあり、「やりたい�
 ---
 
 <a id="5"></a>
+
 ## 5. Step 4: .chatmode.md → .agent.md — カスタムエージェント
 
 ### 重要な仕様変更
@@ -273,6 +278,7 @@ plan is approved.
 ---
 
 <a id="6"></a>
+
 ## 6. Step 5: SKILL.md — Agent Skills（手続き的知識）
 
 ### 概要
@@ -329,6 +335,7 @@ Copilotは、ユーザーの発言と各SKILL.mdの `description` フィール�
 ---
 
 <a id="7"></a>
+
 ## 7. Step 6: MCP — 外部ツール・データソースとの接続
 
 ### 概要
@@ -371,6 +378,7 @@ MCPはVS Codeだけでなく、Copilot CLI・Copilot cloud agent・Copilot code 
 ---
 
 <a id="8"></a>
+
 ## 8. Step 7: Plan Mode — 実装前に合意形成する
 
 ### なぜPlan Modeが必要か
@@ -414,6 +422,7 @@ flowchart TB
 ---
 
 <a id="9"></a>
+
 ## 9. 仕様駆動開発（SDD）への統合: GitHub Spec Kit
 
 Plan Modeが「その場限りの計画」であるのに対し、**GitHub Spec Kit**は「仕様(spec)・計画(plan)・タスク(tasks)をリポジトリに永続化されたMarkdown成果物として残す」ためのオープンソースツールキットです。Microsoft for Developersのブログによれば、Spec Kitは `.specify` フォルダにSDD用テンプレート（spec/plan/tasksの雛形）を、`.github` などエージェント固有のフォルダにプロンプト定義を配置します。
@@ -457,6 +466,7 @@ flowchart LR
 ---
 
 <a id="10"></a>
+
 ## 10. セキュリティとガバナンスの勘所
 
 AIエージェントが「読む」コンテキストが増えるほど、悪意のある指示が紛れ込む余地（プロンプトインジェクション）も増えます。GitHub自身のセキュリティブログでも、VS Codeにおける対策として次のような機能追加が説明されています。
@@ -477,6 +487,7 @@ AIエージェントが「読む」コンテキストが増えるほど、悪意
 ---
 
 <a id="11"></a>
+
 ## 11. 成熟度モデルとチェックリスト
 
 チームでの導入は、次のように段階を踏むのが現実的です。
@@ -503,6 +514,7 @@ AIエージェントが「読む」コンテキストが増えるほど、悪意
 ---
 
 <a id="12"></a>
+
 ## 12. 参考文献
 
 ### 公式ドキュメント・一次情報
