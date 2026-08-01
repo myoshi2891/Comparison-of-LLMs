@@ -493,15 +493,27 @@ describe("MermaidDiagram 失敗時と世代管理", () => {
     const appendChildSpy = vi.spyOn(document.body, "appendChild");
     const removeChildSpy = vi.spyOn(document.body, "removeChild");
 
-    render(<MermaidDiagram chart="graph TD; A-->B" />);
+    try {
+      render(<MermaidDiagram chart="graph TD; A-->B" />);
 
-    await waitFor(() => {
-      expect(appendChildSpy).toHaveBeenCalled();
-      expect(removeChildSpy).toHaveBeenCalled();
-    });
+      await waitFor(() => {
+        const tempEl = appendChildSpy.mock.calls
+          .map(([node]) => node)
+          .find(
+            (node): node is HTMLDivElement =>
+              node instanceof HTMLDivElement && node.style.visibility === "hidden"
+          );
 
-    appendChildSpy.mockRestore();
-    removeChildSpy.mockRestore();
+        expect(tempEl).toBeDefined();
+        expect(tempEl?.style.top).toBe("-9999px");
+        expect(tempEl?.style.left).toBe("-9999px");
+        expect(appendChildSpy).toHaveBeenCalledWith(tempEl);
+        expect(removeChildSpy).toHaveBeenCalledWith(tempEl);
+      });
+    } finally {
+      appendChildSpy.mockRestore();
+      removeChildSpy.mockRestore();
+    }
   });
 
   it("世代が更新された後は古い描画結果を反映しない", async () => {
