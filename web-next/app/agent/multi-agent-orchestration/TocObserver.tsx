@@ -3,6 +3,9 @@
 import { useEffect } from "react";
 import styles from "./page.module.css";
 
+/**
+ * Highlights the table-of-contents link for the section currently visible in the viewport.
+ */
 export default function TocObserver() {
   useEffect(() => {
     const navLinks = document.querySelectorAll<HTMLAnchorElement>(`.${styles.tocNav} a`);

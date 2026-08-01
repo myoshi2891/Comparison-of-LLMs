@@ -10,6 +10,12 @@ export const metadata: Metadata = {
     "2026年最新のマルチエージェントオーケストレーション実践ガイド。Anthropic、Google、OpenAIの最新プラクティスに基づくアーキテクチャ、協調パターン、プロトコル（MCP/A2A）、可観測性、セキュリティを完全解説。",
 };
 
+/**
+ * Renders an external link that opens in a new browser tab.
+ *
+ * @param href - The destination URL
+ * @param children - The content displayed inside the link
+ */
 function Ext({ href, children }: { href: string; children: React.ReactNode }) {
   return (
     <a href={href} target="_blank" rel="noopener noreferrer">
@@ -147,6 +153,9 @@ const DIAGRAM_14 = `flowchart TD
     S11 --> Done["本番デプロイと継続的モニタリング"]
     Done -.->|"問題発生時はパターンを見直す"| S3`;
 
+/**
+ * Renders a Japanese guide to designing, implementing, and operating multi-agent orchestration systems.
+ */
 export default function MultiAgentOrchestrationPage() {
   return (
     <div className={styles.layout}>

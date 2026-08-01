@@ -575,11 +575,11 @@ interface NavScopedHrefTocConfig {
 }
 
 /**
- * ナビゲーションコンテナのクラスでリンクをスコープ検索し、href から
- * `getElementById` で監視対象を解決する TocObserver 向けの共通スイートを登録する。
+ * Registers a shared test suite for TOC observers that resolve section targets from hash links within a navigation container.
  *
- * 対象は `.${navClassName} a` → `idToLink` マップを構築し、IntersectionObserver の
- * 交差時にアクティブクラスを付け替える実装（multi-agent-orchestration 系 / foundry intermediate）。
+ * @param TocObserver - The TOC observer component under test.
+ * @param navClassName - The navigation container's class name.
+ * @param activeClassName - The class applied to the link for the intersecting section.
  */
 export function registerNavScopedHrefTocSuite({
   TocObserver,
@@ -596,10 +596,10 @@ export function registerNavScopedHrefTocSuite({
   });
 
   /**
-   * ナビとセクションを描画する。
+   * Renders a navigation with hash links and optional target sections for TOC tests.
    *
-   * @param includeSections - href が指すセクションを描画するかどうか
-   * @returns 描画結果
+   * @param includeSections - Whether to render the sections targeted by the hash links.
+   * @returns The rendered test result.
    */
   function renderToc(includeSections = true) {
     return render(

@@ -3,6 +3,9 @@
 import { useEffect } from "react";
 import styles from "./page.module.css";
 
+/**
+ * Tracks the active table-of-contents link as its corresponding heading enters the viewport.
+ */
 export default function TocObserver() {
   useEffect(() => {
     const navLinks = document.querySelectorAll<HTMLAnchorElement>(

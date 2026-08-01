@@ -11,6 +11,12 @@ export const metadata: Metadata = {
     "「エージェントはディレクトリである」という思想のもと、永続実行・サンドボックス・承認フロー・可観測性を標準搭載したVercelのオープンソース・エージェントフレームワーク eve の完全解説ガイド。",
 };
 
+/**
+ * Renders an external link that opens in a new tab.
+ *
+ * @param href - The destination URL
+ * @param children - The link content
+ */
 function Ext({ href, children }: { href: string; children: React.ReactNode }) {
   return (
     <a href={href} target="_blank" rel="noopener noreferrer">
@@ -115,6 +121,9 @@ const DIAGRAM_FLEET = `flowchart TD
     Growth -.->|状態を通知・承認依頼| Slack
     Human -->|Slackから承認/却下| Slack`;
 
+/**
+ * Presents a Japanese beginner guide to Vercel's eve agent framework, including setup, production features, best practices, and reference material.
+ */
 export default function VercelEveBeginnerGuidePage() {
   return (
     <div className={styles.layout}>

@@ -9,6 +9,12 @@ export const metadata: Metadata = {
     "Microsoft Foundry（旧Azure AI Studio/Azure AI Foundry）を用いたAIアプリ・エージェント開発のステップバイステップ・ベストプラクティスガイド。",
 };
 
+/**
+ * Renders an external link that opens in a new tab.
+ *
+ * @param href - The destination URL
+ * @param children - The link content
+ */
 function Ext({ href, children }: { href: string; children: React.ReactNode }) {
   return (
     <a href={href} target="_blank" rel="noopener noreferrer">
@@ -103,6 +109,9 @@ const DIAGRAM_05 = `flowchart TD
     Q3 -->|クラウドで常時運用| HA["Hosted Agent<br/>Foundry Agent Service"]
     Q3 -->|オフライン・オンデバイス| FL["Foundry Local"]`;
 
+/**
+ * Renders a step-by-step guide to Microsoft Foundry best practices.
+ */
 export default function MicrosoftFoundryBestPracticesPage() {
   return (
     <div className={styles.layout}>

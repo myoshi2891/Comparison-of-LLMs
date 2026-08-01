@@ -167,6 +167,9 @@ const MMD_9 = `flowchart TB
     Prod --> ProdMonitor["本番継続評価<br/>サンプリングトラフィックで監視"]
     ProdMonitor -->|"品質劣化を検知"| Rollback["自動ロールバック / 再評価トリガー"]`;
 
+/**
+ * Renders the Microsoft Foundry practical best practices guide with navigation, diagrams, and reference content.
+ */
 export default function MicrosoftFoundryBestPracticesIntermediatePage() {
   return (
     <div className={styles.layout}>
