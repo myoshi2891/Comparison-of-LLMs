@@ -2364,13 +2364,26 @@ PR-->>Dev: 修正提案を確認しマージ判断`,
       /* mobile nav toggle */
       const tocNav = document.getElementById('tocNav');
       const navToggle = document.getElementById('navToggle');
-      navToggle &&
+      const setNavState = (isOpen) => {
+        if (tocNav) {
+          tocNav.classList.toggle('open', isOpen);
+        }
+        if (navToggle) {
+          navToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+          navToggle.setAttribute('aria-label', isOpen ? '目次を閉じる' : '目次を開く');
+        }
+      };
+      if (navToggle) {
         navToggle.addEventListener('click', () => {
-          tocNav.classList.toggle('open');
+          const isOpen = !tocNav.classList.contains('open');
+          setNavState(isOpen);
         });
-      tocNav.querySelectorAll('a').forEach((a) => {
-        a.addEventListener('click', () => tocNav.classList.remove('open'));
-      });
+      }
+      if (tocNav) {
+        tocNav.querySelectorAll('a').forEach((a) => {
+          a.addEventListener('click', () => setNavState(false));
+        });
+      }
 
       /* active section highlight */
       const links = [...tocNav.querySelectorAll('a')];
