@@ -40,7 +40,8 @@ export default function Page() {
         type="button"
         className={styles.sidebarToggle}
         id="sidebarToggle"
-        aria-label="目次を開閉する"
+        aria-label="目次を開く"
+        aria-controls="sidebar"
         aria-expanded="false"
       >
         ☰
