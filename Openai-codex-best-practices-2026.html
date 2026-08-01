@@ -2274,69 +2274,82 @@ Action->>PR: レビューコメントを投稿
 PR-->>Dev: 修正提案を確認しマージ判断`,
       };
 
-      mermaid.initialize({
-        startOnLoad: false,
-        theme: 'base',
-        themeVariables: {
-          primaryColor: '#E9EFFA',
-          primaryTextColor: '#1A1B22',
-          primaryBorderColor: '#2954A6',
-          lineColor: '#2954A6',
-          secondaryColor: '#F6ECD8',
-          secondaryBorderColor: '#A6791F',
-          tertiaryColor: '#FFFFFF',
-          fontFamily: 'Zen Kaku Gothic New, Noto Sans JP, sans-serif',
-          fontSize: '1rem',
-          actorBkg: '#E9EFFA',
-          actorBorder: '#2954A6',
-          actorTextColor: '#1A1B22',
-          signalColor: '#2954A6',
-          signalTextColor: '#1A1B22',
-        },
-        flowchart: {
-          curve: 'basis',
-          htmlLabels: true,
-          useMaxWidth: false,
-          nodeSpacing: 28,
-          rankSpacing: 38,
-          padding: 12,
-        },
-        sequence: { useMaxWidth: false, mirrorActors: true, noteMargin: 10 },
-        securityLevel: 'loose',
-      });
-
-      (async () => {
-        if (document.fonts && document.fonts.ready) {
-          try {
-            await document.fonts.ready;
-          } catch (e) {}
-        }
-        for (const [id, src] of Object.entries(DIAGRAMS)) {
+      if (typeof mermaid === 'undefined') {
+        for (const id of Object.keys(DIAGRAMS)) {
           const target = document.getElementById(id);
-          if (!target) continue;
-          try {
-            const { svg } = await mermaid.render('svg-' + id, src);
-            target.innerHTML = svg;
-            const svgEl = target.querySelector('svg');
-            if (svgEl) {
-              svgEl.removeAttribute('width');
-              svgEl.removeAttribute('height');
-              svgEl.style.display = 'block';
-              svgEl.style.width = 'auto';
-              svgEl.style.maxWidth = '100%';
-              svgEl.style.height = 'auto';
-              svgEl.style.margin = '0 auto';
-              svgEl.style.overflow = 'visible';
-            }
-          } catch (err) {
-            target.innerHTML =
-              '<div class="mm-error">図の描画に失敗しました: ' +
-              (err && err.message ? err.message : err) +
-              '</div>';
-            console.error('Mermaid render failed for', id, err);
+          if (target) {
+            const errorEl = document.createElement('div');
+            errorEl.className = 'mm-error';
+            errorEl.textContent = '図の描画に失敗しました: Mermaidライブラリを読み込めませんでした';
+            target.replaceChildren(errorEl);
           }
         }
-      })();
+      } else {
+        mermaid.initialize({
+          startOnLoad: false,
+          theme: 'base',
+          themeVariables: {
+            primaryColor: '#E9EFFA',
+            primaryTextColor: '#1A1B22',
+            primaryBorderColor: '#2954A6',
+            lineColor: '#2954A6',
+            secondaryColor: '#F6ECD8',
+            secondaryBorderColor: '#A6791F',
+            tertiaryColor: '#FFFFFF',
+            fontFamily: 'Zen Kaku Gothic New, Noto Sans JP, sans-serif',
+            fontSize: '1rem',
+            actorBkg: '#E9EFFA',
+            actorBorder: '#2954A6',
+            actorTextColor: '#1A1B22',
+            signalColor: '#2954A6',
+            signalTextColor: '#1A1B22',
+          },
+          flowchart: {
+            curve: 'basis',
+            htmlLabels: true,
+            useMaxWidth: false,
+            nodeSpacing: 28,
+            rankSpacing: 38,
+            padding: 12,
+          },
+          sequence: { useMaxWidth: false, mirrorActors: true, noteMargin: 10 },
+          securityLevel: 'loose',
+        });
+
+        (async () => {
+          if (document.fonts && document.fonts.ready) {
+            try {
+              await document.fonts.ready;
+            } catch (e) {}
+          }
+          for (const [id, src] of Object.entries(DIAGRAMS)) {
+            const target = document.getElementById(id);
+            if (!target) continue;
+            try {
+              const { svg } = await mermaid.render('svg-' + id, src);
+              target.innerHTML = svg;
+              const svgEl = target.querySelector('svg');
+              if (svgEl) {
+                svgEl.removeAttribute('width');
+                svgEl.removeAttribute('height');
+                svgEl.style.display = 'block';
+                svgEl.style.width = 'auto';
+                svgEl.style.maxWidth = '100%';
+                svgEl.style.height = 'auto';
+                svgEl.style.margin = '0 auto';
+                svgEl.style.overflow = 'visible';
+              }
+            } catch (err) {
+              const errorEl = document.createElement('div');
+              errorEl.className = 'mm-error';
+              errorEl.textContent =
+                '図の描画に失敗しました: ' + (err && err.message ? err.message : String(err));
+              target.replaceChildren(errorEl);
+              console.error('Mermaid render failed for', id, err);
+            }
+          }
+        })();
+      }
 
       /* progress bar */
       const bar = document.getElementById('progress');
