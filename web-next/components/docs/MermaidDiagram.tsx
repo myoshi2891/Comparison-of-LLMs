@@ -17,6 +17,35 @@ type Props = {
    */
   themeVariables?: Record<string, string>;
 };
+/**
+ * Normalizes any thrown value into an Error instance with detailed message and optional diagram context.
+ * Prevents console.error from outputting an empty object `{}`.
+ */
+function normalizeError(err: unknown, chartInfo?: string): Error {
+  const context = chartInfo ? ` [chart: "${chartInfo}"]` : "";
+  if (err instanceof Error) {
+    if (chartInfo && !err.message.includes(chartInfo)) {
+      const normalized = new Error(`${err.message}${context}`);
+      normalized.stack = err.stack;
+      return normalized;
+    }
+    return err;
+  }
+  let message = "";
+  if (typeof err === "string") {
+    message = err;
+  } else if (typeof err === "object" && err !== null) {
+    try {
+      const json = JSON.stringify(err);
+      message = json !== "{}" ? json : String(err);
+    } catch {
+      message = String(err);
+    }
+  } else {
+    message = String(err);
+  }
+  return new Error(`${message || "Unknown error"}${context}`);
+}
 
 /**
  * Applies theme-based color overrides to sequence diagram actors, notes, messages, loops, and labels.
@@ -242,7 +271,11 @@ export default function MermaidDiagram({
         if (!ref.current) return;
 
         const tempEl = document.createElement("div");
+        tempEl.style.position = "absolute";
+        tempEl.style.visibility = "hidden";
+        tempEl.style.pointerEvents = "none";
         tempEl.textContent = chart;
+        document.body.appendChild(tempEl);
 
         try {
           await m.default.run({ nodes: [tempEl] });
@@ -278,14 +311,19 @@ export default function MermaidDiagram({
           ref.current.replaceChildren(...tempEl.childNodes);
         } catch (err) {
           if (isCurrent() && ref.current) {
-            console.error("[MermaidDiagram] render failed:", err);
+            const chartSnippet = chart.trim().slice(0, 60).replace(/\s+/g, " ");
+            console.error("[MermaidDiagram] render failed:", normalizeError(err, chartSnippet));
             ref.current.textContent = "⚠️ ダイアグラムを描画できませんでした";
+          }
+        } finally {
+          if (tempEl.parentNode === document.body) {
+            document.body.removeChild(tempEl);
           }
         }
       })
       .catch((err: unknown) => {
         if (isCurrent()) {
-          console.error("[MermaidDiagram] load failed:", err);
+          console.error("[MermaidDiagram] load failed:", normalizeError(err));
         }
       });
 

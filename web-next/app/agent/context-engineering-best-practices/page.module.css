@@ -19,15 +19,13 @@
   background:
     radial-gradient(circle at 82% 2%, rgba(94, 234, 212, 0.09), transparent 28rem),
     linear-gradient(180deg, #081421 0%, var(--page-bg) 42%, #050b12 100%);
-  border-inline: 1px solid rgba(148, 178, 214, 0.08);
-  box-shadow: 0 0 80px rgba(0, 0, 0, 0.18);
   color: var(--text);
   font-family: var(--font-sans), "Inter", sans-serif;
   font-size: 1rem;
   line-height: 1.75;
   width: 100%;
-  max-width: 1440px;
-  margin: 0 auto;
+  max-width: none;
+  margin: 0;
   position: relative;
 }
 

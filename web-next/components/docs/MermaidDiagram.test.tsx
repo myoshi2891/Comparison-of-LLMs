@@ -466,6 +466,42 @@ describe("MermaidDiagram 失敗時と世代管理", () => {
       );
     });
     expect(consoleError).toHaveBeenCalledWith("[MermaidDiagram] render failed:", expect.any(Error));
+    const errorArg = consoleError.mock.calls[0][1] as Error;
+    expect(errorArg.message).toContain("bad syntax");
+    expect(errorArg.message).toContain('chart: "graph TD; A--"');
+  });
+
+  it("非Errorオブジェクトや空オブジェクトが例外としてスローされた場合も正規化してログ出力する", async () => {
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    vi.mocked(mermaid.run).mockRejectedValueOnce({});
+
+    render(<MermaidDiagram chart="graph TD; X-->Y" />);
+
+    await waitFor(() => {
+      expect(consoleError).toHaveBeenCalledWith(
+        "[MermaidDiagram] render failed:",
+        expect.any(Error)
+      );
+    });
+    const errorArg = consoleError.mock.calls[0][1] as Error;
+    expect(errorArg).toBeInstanceOf(Error);
+    expect(errorArg.message).not.toBe("{}");
+    expect(errorArg.message).toContain('chart: "graph TD; X-->Y"');
+  });
+
+  it("描画処理中に一時 DOM 要素が body へ追加され、完了・失敗後に確実に削除される", async () => {
+    const appendChildSpy = vi.spyOn(document.body, "appendChild");
+    const removeChildSpy = vi.spyOn(document.body, "removeChild");
+
+    render(<MermaidDiagram chart="graph TD; A-->B" />);
+
+    await waitFor(() => {
+      expect(appendChildSpy).toHaveBeenCalled();
+      expect(removeChildSpy).toHaveBeenCalled();
+    });
+
+    appendChildSpy.mockRestore();
+    removeChildSpy.mockRestore();
   });
 
   it("世代が更新された後は古い描画結果を反映しない", async () => {
