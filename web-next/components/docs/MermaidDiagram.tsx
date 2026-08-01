@@ -275,6 +275,8 @@ export default function MermaidDiagram({
 
         const tempEl = document.createElement("div");
         tempEl.style.position = "absolute";
+        tempEl.style.top = "-9999px";
+        tempEl.style.left = "-9999px";
         tempEl.style.visibility = "hidden";
         tempEl.style.pointerEvents = "none";
         tempEl.textContent = chart;
