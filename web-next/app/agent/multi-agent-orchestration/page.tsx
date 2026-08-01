@@ -154,7 +154,7 @@ const DIAGRAM_14 = `flowchart TD
     Done -.->|"問題発生時はパターンを見直す"| S3`;
 
 /**
- * Renders a Japanese guide to designing, implementing, and operating multi-agent orchestration systems.
+ * Renders a Japanese guide covering the design, implementation, and operation of multi-agent orchestration systems.
  */
 export default function MultiAgentOrchestrationPage() {
   return (
