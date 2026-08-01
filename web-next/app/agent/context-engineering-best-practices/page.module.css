@@ -404,11 +404,13 @@
 
 /* Tables */
 .tableWrap {
+  position: relative;
   overflow-x: auto;
-  margin: 22px 0 28px;
-  border: 1px solid rgba(148, 178, 214, 0.14);
-  border-radius: 14px;
-  background: #0d1b2e;
+  margin: 26px 0 32px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: rgba(13, 27, 46, 0.78);
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.14);
 }
 
 .tableWrap table {
@@ -421,9 +423,9 @@
 .tableWrap th,
 .tableWrap td {
   text-align: left !important;
-  padding: 14px 16px;
-  border-bottom: 1px solid rgba(148, 178, 214, 0.14);
-  color: #a9bad9;
+  padding: 15px 18px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-subtle);
   vertical-align: top;
   font-family: inherit;
 }
@@ -433,9 +435,9 @@
   font-size: 11.5px;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: #5eead4;
-  background: #11213a;
-  border-bottom: 1px solid rgba(148, 178, 214, 0.28);
+  color: var(--accent);
+  background: rgba(17, 33, 58, 0.96);
+  border-bottom: 1px solid var(--border-strong);
   white-space: nowrap;
 }
 
@@ -444,11 +446,17 @@
 }
 
 .tableWrap tr:hover {
-  background: rgba(94, 234, 212, 0.03);
+  background: rgba(94, 234, 212, 0.045);
 }
 
 .tableWrap td strong {
-  color: #e9eefb;
+  color: var(--text);
+}
+
+.tableWrap a {
+  color: var(--accent);
+  font-weight: 650;
+  text-underline-offset: 3px;
 }
 
 /* Callouts / Cards */
@@ -528,28 +536,79 @@
   text-decoration: underline;
 }
 
-/* Mermaid Diagrams */
-.diagram {
-  border: 1px solid rgba(148, 178, 214, 0.14);
-  background: #0d1b2e;
-  border-radius: 14px;
-  padding: 28px;
-  margin: 26px 0;
-  overflow-x: auto;
+.sourceNote {
+  margin-top: 30px;
+  padding: 18px 20px;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 12px;
+  background: rgba(13, 27, 46, 0.72);
 }
 
-.diagramCaption {
+.sourceNoteTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  color: var(--accent);
+  font-family: var(--font-mono), "JetBrains Mono", monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.sourceNote ul {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.sourceNote li {
+  color: var(--text-muted);
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.sourceNote a {
+  color: var(--accent);
+  overflow-wrap: anywhere;
+  text-underline-offset: 3px;
+}
+
+/* Mermaid wrappers only provide decoration; MermaidDiagram owns SVG layout. */
+.diagramContainer {
+  overflow-x: auto;
+  margin: 30px 0 34px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background:
+    linear-gradient(180deg, rgba(17, 33, 58, 0.84), rgba(13, 27, 46, 0.72)), var(--surface);
+  box-shadow: 0 20px 54px rgba(0, 0, 0, 0.16);
+}
+
+.diagramTitle {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-subtle);
   font-family: var(--font-mono), "JetBrains Mono", monospace;
   font-size: 11.5px;
-  color: #5f7396;
-  margin-top: 14px;
-  text-align: center;
+  letter-spacing: 0.02em;
 }
 
-.mermaid {
-  display: flex;
-  justify-content: center;
+.diagramTitle i {
+  color: var(--accent-warm);
+  font-size: 16px;
+}
+
+.mermaidDiagram {
   width: 100%;
+  padding: clamp(20px, 4vw, 36px);
 }
 
 /* Checklist */
@@ -567,12 +626,19 @@
   gap: 12px;
   align-items: flex-start;
   font-size: 15px;
-  color: #a9bad9;
-  background: #0d1b2e;
-  border: 1px solid rgba(148, 178, 214, 0.14);
+  color: var(--text-subtle);
+  background: linear-gradient(135deg, rgba(13, 27, 46, 0.92), rgba(17, 33, 58, 0.58));
+  border: 1px solid var(--border);
   border-radius: 10px;
   padding: 14px 16px;
   line-height: 1.6;
+}
+
+.checklist li > i {
+  flex: 0 0 auto;
+  margin-top: 3px;
+  color: var(--accent);
+  font-size: 18px;
 }
 
 .checklist .box {
@@ -722,14 +788,15 @@
 .callout {
   display: flex;
   gap: 12px;
-  padding: 16px 18px;
-  border-radius: 12px;
-  margin: 20px 0 28px;
-  border: 1px solid rgba(148, 178, 214, 0.14);
-  background: #16161a;
+  padding: 18px 20px;
+  border-radius: 14px;
+  margin: 24px 0 30px;
+  border: 1px solid var(--border);
+  background: var(--surface-soft);
   font-size: 14.5px;
   line-height: 1.65;
-  color: #a9bad9;
+  color: var(--text-subtle);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.1);
 }
 
 .callout i {
@@ -739,8 +806,8 @@
 }
 
 .calloutInfo {
-  background: #12203a;
-  border-color: rgba(124, 179, 255, 0.2);
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.12), rgba(13, 27, 46, 0.78));
+  border-color: rgba(124, 179, 255, 0.24);
 }
 
 .calloutInfo i {
@@ -748,8 +815,8 @@
 }
 
 .calloutWarning {
-  background: #2b2313;
-  border-color: rgba(240, 198, 116, 0.2);
+  background: linear-gradient(135deg, rgba(242, 180, 101, 0.12), rgba(13, 27, 46, 0.78));
+  border-color: rgba(240, 198, 116, 0.24);
 }
 
 .calloutWarning i {
@@ -761,38 +828,40 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  margin: 44px 0 14px;
+  margin: 48px 0 16px;
 }
 
 .stepNumber {
-  width: 30px;
-  height: 30px;
-  border-radius: 8px;
-  background: #1e1e24;
-  border: 1px solid #3d3d48;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: var(--accent-soft);
+  border: 1px solid rgba(94, 234, 212, 0.24);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 13px;
   font-weight: 500;
-  color: #7cb3ff;
+  color: var(--accent);
   flex-shrink: 0;
 }
 
 .stepTitle {
-  font-size: 16px;
-  font-weight: 500;
-  color: #e9e9ee;
+  color: var(--text);
+  font-family: var(--font-display), "Space Grotesk", sans-serif;
+  font-size: 18px;
+  font-weight: 620;
 }
 
 /* Code Block Styles (Monospace compliant) */
 .codeWrap {
-  margin: 8px 0 24px;
-  border: 1px solid rgba(148, 178, 214, 0.14);
-  border-radius: 8px;
+  margin: 14px 0 28px;
+  border: 1px solid var(--border-strong);
+  border-radius: 12px;
   overflow: hidden;
-  background: #1e1e24;
+  background: #07101c;
   font-family: var(--font-mono), "JetBrains Mono", monospace;
+  box-shadow: 0 16px 42px rgba(0, 0, 0, 0.2);
 }
 
 .codeBar {
@@ -800,8 +869,8 @@
   justify-content: space-between;
   align-items: center;
   padding: 8px 16px;
-  background: #16161a;
-  border-bottom: 1px solid rgba(148, 178, 214, 0.14);
+  background: rgba(17, 33, 58, 0.9);
+  border-bottom: 1px solid var(--border);
   font-size: 12px;
   color: #6f6f7d;
 }
@@ -811,7 +880,7 @@
 }
 
 .codeBody {
-  padding: 16px;
+  padding: 18px 20px;
   font-size: 13px;
   line-height: 1.65;
   overflow-x: auto;
@@ -968,11 +1037,13 @@
 
 /* Summary Card */
 .summaryCard {
-  padding: 22px 24px;
-  background: #16161a;
-  border: 1px solid rgba(148, 178, 214, 0.14);
-  border-radius: 12px;
+  padding: clamp(24px, 4vw, 36px);
+  background:
+    linear-gradient(135deg, rgba(94, 234, 212, 0.09), transparent 42%), rgba(13, 27, 46, 0.9);
+  border: 1px solid rgba(94, 234, 212, 0.18);
+  border-radius: 18px;
   margin: 8px 0 24px;
+  box-shadow: 0 20px 54px rgba(0, 0, 0, 0.16);
 }
 
 .summaryCard p:last-child {
