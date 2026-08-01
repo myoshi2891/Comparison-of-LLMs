@@ -197,6 +197,11 @@ end
 S4 --> S5
 R1 ~~~ R2`;
 
+/**
+ * Renders the Japanese guide to multi-agent orchestration best practices.
+ *
+ * @returns The guide page with navigation, diagrams, implementation guidance, and references.
+ */
 export default function MultiAgentOrchestrationPage() {
   return (
     <div className={styles.layout}>

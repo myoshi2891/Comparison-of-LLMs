@@ -48,10 +48,11 @@ function normalizeError(err: unknown, chartInfo?: string): Error {
 }
 
 /**
- * Applies theme-based color overrides to sequence diagram actors, notes, messages, loops, and labels.
+ * Applies theme and configurable color overrides to sequence diagram elements.
  *
  * @param root - The container element holding the sequence diagram SVG.
- * @param themeVariables - Optional theme colors used to style the diagram elements.
+ * @param themeVariables - Optional colors used to style diagram elements.
+ * @param theme - The active theme used to select default colors.
  */
 function applySequenceDiagramColorOverrides(
   root: HTMLElement,
@@ -149,9 +150,11 @@ function applySequenceDiagramColorOverrides(
 }
 
 /**
- * Applies vibrant color overrides to Mermaid pie chart slices, legends, and slice texts.
+ * Applies color and text styling to pie chart slices, legends, titles, and labels.
  *
  * @param root - The container element holding the pie chart SVG.
+ * @param themeVariables - Optional color and opacity overrides for pie chart elements.
+ * @param theme - The active theme used to select default text colors.
  */
 function applyPieChartColorOverrides(
   root: HTMLElement,
@@ -226,13 +229,13 @@ function applyPieChartColorOverrides(
  * Renders a Mermaid diagram and updates it when its source or rendering options change.
  *
  * @param chart - Mermaid diagram source text.
- * @param id - Optional ID for the inner diagram container.
+ * @param id - Optional ID for the diagram container.
  * @param style - Optional inline styles for the outer wrapper.
- * @param className - Optional additional CSS classes for the outer wrapper.
- * @param maxHeight - Optional maximum height applied to the rendered SVG.
+ * @param className - Optional CSS classes for the outer wrapper.
+ * @param maxHeight - Optional maximum height for the rendered SVG.
  * @param theme - Mermaid theme to use.
  * @param themeVariables - Optional Mermaid theme variable overrides.
- * @returns A wrapper containing the rendered Mermaid diagram.
+ * @returns A wrapper containing the rendered diagram.
  */
 export default function MermaidDiagram({
   chart,

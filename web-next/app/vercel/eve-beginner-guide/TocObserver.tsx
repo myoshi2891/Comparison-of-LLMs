@@ -3,6 +3,9 @@
 import { useEffect } from "react";
 import styles from "./page.module.css";
 
+/**
+ * Synchronizes the sidebar navigation with the document section currently in view.
+ */
 export function TocObserver() {
   useEffect(() => {
     const sections = document.querySelectorAll("main section[id]");
