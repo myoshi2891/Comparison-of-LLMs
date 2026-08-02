@@ -3,11 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Googleにおける Harness Engineering 実践ガイド</title>
+    <title>Hermes Agent ベストプラクティスガイド ― 中級者から上級者向け</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap"
       rel="stylesheet"
     />
     <link
@@ -17,21 +17,32 @@
     <style>
       :root {
         --bg: #07111e;
-        --bg-panel: #0c1930;
-        --bg-panel-2: #0f2038;
-        --border: #1c2f4d;
-        --text: #dbe6f5;
-        --text-dim: #8fa3c2;
-        --text-dimmer: #5c7295;
+        --bg-elevated: #0d1c30;
+        --bg-card: #0f2138;
+        --border: #1d3350;
+        --border-soft: #152742;
+        --text: #dde6f2;
+        --text-dim: #8fa4c2;
+        --text-faint: #5d7495;
         --accent: #7c9eff;
-        --accent-2: #5ce6c8;
-        --accent-warm: #ffb37c;
-        --code-bg: #0a1626;
-        --radius: 10px;
-        --maxw: 1400px;
+        --accent-soft: rgba(124, 158, 255, 0.12);
+        --c-overview: #7c9eff;
+        --c-data: #5eead4;
+        --c-skills: #c9a7ff;
+        --c-exec: #ffc46b;
+        --c-ops: #ff8b9e;
+        --radius: 12px;
+        --font-body:
+          'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Yu Gothic',
+          sans-serif;
+        --font-mono: 'JetBrains Mono', 'SF Mono', Consolas, monospace;
       }
       * {
         box-sizing: border-box;
+      }
+      html,
+      body {
+        overflow-x: hidden;
       }
       html {
         scroll-behavior: smooth;
@@ -40,1484 +51,1913 @@
         margin: 0;
         background: var(--bg);
         color: var(--text);
-        font-family: 'Noto Sans JP', 'Hiragino Kaku Gothic ProN', sans-serif;
-        line-height: 1.85;
+        font-family: var(--font-body);
         font-size: 16px;
+        line-height: 1.85;
         -webkit-font-smoothing: antialiased;
       }
-      ::selection {
-        background: var(--accent);
-        color: #04070d;
-      }
-
-      /* ---------- layout ---------- */
-      .layout {
-        display: block;
-        width: 100%;
-        padding: 0;
-      }
-      .side-nav {
+      body::before {
+        content: '';
         position: fixed;
-        top: 0;
-        left: 0;
-        width: 280px;
-        height: 100vh;
-        overflow-y: auto;
-        padding: 32px 20px 32px 24px;
-        border-right: 1px solid var(--border);
-        background: var(--bg);
-      }
-      .side-nav-title {
-        font-size: 12px;
-        letter-spacing: 0.12em;
-        text-transform: uppercase;
-        color: var(--text-dimmer);
-        margin-bottom: 14px;
-        font-weight: 700;
-      }
-      .side-nav ul {
-        list-style: none;
-        margin: 0;
-        padding: 0;
-      }
-      .side-nav li {
-        margin: 0;
-      }
-      .side-nav a.nav-link {
-        display: block;
-        padding: 8px 10px;
-        margin: 1px 0;
-        border-radius: 8px;
-        color: var(--text-dim);
-        text-decoration: none;
-        font-size: 13.5px;
-        line-height: 1.5;
-        border-left: 2px solid transparent;
-        transition:
-          background 0.15s ease,
-          color 0.15s ease,
-          border-color 0.15s ease;
-      }
-      .side-nav a.nav-link:hover {
-        background: var(--bg-panel-2);
-        color: var(--text);
-      }
-      .side-nav a.nav-link.active {
-        color: var(--accent);
-        background: var(--bg-panel-2);
-        border-left-color: var(--accent);
-        font-weight: 700;
-      }
-      .nav-toggle {
-        display: none;
-        position: fixed;
-        z-index: 50;
-        top: 16px;
-        left: 16px;
-        width: 44px;
-        height: 44px;
-        border-radius: 10px;
-        border: 1px solid var(--border);
-        background: var(--bg-panel);
-        color: var(--text);
-        font-size: 18px;
-        cursor: pointer;
-      }
-      .main {
-        margin-left: 280px;
-        padding: 56px 56px 100px;
-        width: auto;
-        max-width: none;
-      }
-      @media (max-width: 900px) {
-        .main {
-          margin-left: 0;
-          padding: 88px 20px 100px;
-        }
-        .nav-toggle {
-          display: block;
-        }
-        .side-nav {
-          transform: translateX(-100%);
-          visibility: hidden;
-          pointer-events: none;
-          transition: transform 0.25s ease;
-          z-index: 49;
-          box-shadow: 20px 0 60px rgba(0, 0, 0, 0.5);
-        }
-        .side-nav.open {
-          transform: translateX(0);
-          visibility: visible;
-          pointer-events: auto;
-        }
-      }
-
-      /* ---------- typography (full width, no narrow reading column) ---------- */
-      h1 {
-        font-size: clamp(28px, 4vw, 42px);
-        font-weight: 900;
-        line-height: 1.3;
-        margin: 0 0 8px;
-        background: linear-gradient(90deg, #fff, var(--accent) 70%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-      }
-      h1 + h3 {
-        font-weight: 500;
-        color: var(--text-dim);
-        font-size: 18px;
-        margin: 0 0 28px;
-        border: none;
-      }
-      h2 {
-        font-size: clamp(22px, 3vw, 30px);
-        font-weight: 900;
-        color: #fff;
-        margin: 64px 0 20px;
-        padding-top: 20px;
-        border-top: 1px solid var(--border);
-        scroll-margin-top: 24px;
-      }
-      .layout > .main > h2:first-of-type {
-        border-top: none;
-        padding-top: 0;
-      }
-      h3 {
-        font-size: clamp(18px, 2.2vw, 22px);
-        font-weight: 700;
-        color: var(--accent-2);
-        margin: 36px 0 14px;
-        scroll-margin-top: 24px;
-      }
-      p {
-        margin: 0 0 18px;
-        color: var(--text);
-      }
-      strong {
-        color: #fff;
-        font-weight: 700;
-      }
-      ul,
-      ol {
-        margin: 0 0 20px;
-        padding-left: 1.5em;
-      }
-      li {
-        margin: 0 0 8px;
-      }
-      blockquote {
-        margin: 0 0 28px;
-        padding: 16px 22px;
-        background: var(--bg-panel);
-        border-left: 3px solid var(--accent);
-        border-radius: 0 var(--radius) var(--radius) 0;
-        color: var(--text-dim);
-      }
-      blockquote p:last-child {
-        margin-bottom: 0;
-      }
-      hr {
-        border: none;
-        border-top: 1px solid var(--border);
-        margin: 40px 0;
+        inset: 0;
+        background:
+          radial-gradient(
+            ellipse 900px 500px at 12% -10%,
+            rgba(124, 158, 255, 0.16),
+            transparent 60%
+          ),
+          radial-gradient(ellipse 700px 500px at 100% 8%, rgba(94, 234, 212, 0.08), transparent 55%);
+        pointer-events: none;
+        z-index: 0;
       }
       a {
         color: var(--accent);
-        text-decoration: underline;
-        text-decoration-color: rgba(124, 158, 255, 0.35);
-        text-underline-offset: 3px;
+        text-decoration: none;
       }
       a:hover {
-        text-decoration-color: var(--accent);
+        text-decoration: underline;
       }
-
       code {
-        font-family: 'JetBrains Mono', monospace;
+        font-family: var(--font-mono);
         font-size: 0.88em;
-        background: var(--code-bg);
-        color: var(--accent-warm);
-        padding: 0.15em 0.4em;
+        background: rgba(124, 158, 255, 0.1);
+        padding: 0.14em 0.42em;
         border-radius: 5px;
+        color: #bcd2ff;
+        overflow-wrap: break-word;
       }
       pre {
-        background: var(--code-bg);
+        position: relative;
+        background: #0a1729 !important;
         border: 1px solid var(--border);
         border-radius: var(--radius);
-        padding: 18px 20px;
+        padding: 1.15rem 1.3rem;
         overflow-x: auto;
-        margin: 0 0 28px;
+        margin: 1.4rem 0;
       }
       pre code {
         background: none;
         padding: 0;
-        color: var(--text);
-        font-size: 14px;
+        color: inherit;
+        font-size: 0.86rem;
         line-height: 1.7;
+        overflow-wrap: normal;
       }
-      pre code.hljs {
-        background: none !important;
-        padding: 0 !important;
+      pre.mermaid {
+        background: var(--bg-card) !important;
+        border: 1px solid var(--border-soft);
+        padding: 1.6rem;
+        display: flex;
+        justify-content: center;
+        overflow-x: auto;
+      }
+      pre.mermaid svg {
+        max-width: 100%;
+        height: auto;
       }
 
-      /* ---------- tables ---------- */
+      /* ---------- Layout ---------- */
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: 288px;
+        background: var(--bg-elevated);
+        border-right: 1px solid var(--border-soft);
+        overflow-y: auto;
+        padding: 1.9rem 1.3rem 3rem;
+        z-index: 20;
+      }
+      .sidebar::-webkit-scrollbar {
+        width: 6px;
+      }
+      .sidebar::-webkit-scrollbar-thumb {
+        background: var(--border);
+        border-radius: 3px;
+      }
+      .brand {
+        font-weight: 900;
+        font-size: 1.02rem;
+        letter-spacing: 0.02em;
+        margin-bottom: 0.2rem;
+        color: #fff;
+      }
+      .brand-sub {
+        font-size: 0.74rem;
+        color: var(--text-faint);
+        margin-bottom: 1.8rem;
+        line-height: 1.6;
+      }
+      .nav-group {
+        margin-bottom: 1.5rem;
+      }
+      .nav-group-label {
+        font-size: 0.68rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--group-color, var(--text-faint));
+        margin-bottom: 0.55rem;
+        padding-left: 0.6rem;
+        border-left: 2px solid var(--group-color, var(--border));
+      }
+      .nav-link {
+        display: block;
+        font-size: 0.83rem;
+        color: var(--text-dim);
+        padding: 0.42rem 0.6rem 0.42rem 0.85rem;
+        border-left: 2px solid transparent;
+        border-radius: 0 6px 6px 0;
+        margin-bottom: 0.05rem;
+        transition:
+          background 0.15s,
+          color 0.15s,
+          border-color 0.15s;
+      }
+      .nav-link:hover {
+        color: var(--text);
+        text-decoration: none;
+        background: rgba(255, 255, 255, 0.03);
+      }
+      .nav-link.active {
+        color: #fff;
+        border-left-color: var(--group-color, var(--accent));
+        background: rgba(255, 255, 255, 0.045);
+        font-weight: 500;
+      }
+
+      .main {
+        margin-left: 288px;
+        position: relative;
+        z-index: 1;
+        padding: 0 3.4rem 6rem;
+      }
+      .hero {
+        padding: 4.4rem 0 3rem;
+        max-width: none;
+      }
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.74rem;
+        letter-spacing: 0.1em;
+        color: var(--accent);
+        background: var(--accent-soft);
+        border: 1px solid rgba(124, 158, 255, 0.3);
+        padding: 0.32rem 0.85rem;
+        border-radius: 999px;
+        margin-bottom: 1.5rem;
+        font-weight: 500;
+      }
+      .hero h1 {
+        font-size: 2.5rem;
+        font-weight: 900;
+        line-height: 1.35;
+        margin: 0 0 1.3rem;
+        color: #fff;
+        letter-spacing: 0.01em;
+      }
+      .hero .subtitle {
+        font-size: 0.98rem;
+        color: var(--text-dim);
+        line-height: 1.9;
+        max-width: 1100px;
+      }
+      .content {
+        max-width: none;
+      }
+      .content h2 {
+        font-size: 1.55rem;
+        font-weight: 700;
+        color: #fff;
+        margin: 3.6rem 0 1.3rem;
+        padding-top: 1.6rem;
+        border-top: 1px solid var(--border-soft);
+        scroll-margin-top: 2rem;
+      }
+      .content > h2:first-of-type {
+        border-top: none;
+        padding-top: 0;
+        margin-top: 0;
+      }
+      .content h3 {
+        font-size: 1.14rem;
+        font-weight: 700;
+        color: #eaf0fa;
+        margin: 2.2rem 0 0.9rem;
+        scroll-margin-top: 2rem;
+      }
+      .content p {
+        color: var(--text);
+        margin: 0.9rem 0;
+      }
+      .content ul,
+      .content ol {
+        padding-left: 1.4rem;
+        margin: 0.9rem 0;
+        color: var(--text);
+      }
+      .content li {
+        margin: 0.4rem 0;
+      }
+      .content blockquote {
+        margin: 1.4rem 0;
+        padding: 1rem 1.3rem;
+        border-left: 3px solid var(--accent);
+        background: var(--accent-soft);
+        border-radius: 0 8px 8px 0;
+        color: var(--text-dim);
+      }
+      .content hr {
+        border: none;
+        border-top: 1px solid var(--border-soft);
+        margin: 2.6rem 0;
+      }
+      .content strong {
+        color: #fff;
+        font-weight: 700;
+      }
+
+      /* ---------- Tables ---------- */
       .table-scroll {
         overflow-x: auto;
-        margin: 0 0 28px;
-        border: 1px solid var(--border);
+        margin: 1.4rem 0;
         border-radius: var(--radius);
+        border: 1px solid var(--border-soft);
       }
       table {
         border-collapse: collapse;
         width: 100%;
-        min-width: 600px;
-        font-size: 14.5px;
+        min-width: 560px;
+        font-size: 0.88rem;
       }
-      th,
-      td {
-        padding: 11px 16px;
-        text-align: left;
-        border-bottom: 1px solid var(--border);
-        overflow-wrap: break-word;
-      }
-      th {
-        background: var(--bg-panel-2);
+      thead th {
+        background: var(--bg-card);
         color: #fff;
+        text-align: left;
+        padding: 0.75rem 1rem;
         font-weight: 700;
+        border-bottom: 1px solid var(--border);
         white-space: nowrap;
       }
-      tr:last-child td {
+      tbody td {
+        padding: 0.72rem 1rem;
+        border-bottom: 1px solid var(--border-soft);
+        color: var(--text-dim);
+        overflow-wrap: break-word;
+      }
+      tbody tr:last-child td {
         border-bottom: none;
       }
       tbody tr:hover {
-        background: rgba(124, 158, 255, 0.05);
+        background: rgba(255, 255, 255, 0.02);
       }
 
-      /* ---------- mermaid ---------- */
-      pre.mermaid {
-        background: var(--bg-panel);
-        border: 1px solid var(--border);
-        width: 100%;
-        display: flex;
-        justify-content: safe center;
-        padding: 24px 12px;
-        overflow-x: auto;
-      }
-      pre.mermaid svg {
-        height: auto;
-      }
-
-      /* ---------- reference card grid ---------- */
+      /* ---------- Reference grid ---------- */
       .ref-grid {
         display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 20px;
-        margin: 24px 0 32px;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1rem;
+        margin: 1.6rem 0;
       }
-      @media (max-width: 800px) {
+      .ref-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border-soft);
+        border-radius: var(--radius);
+        padding: 1.2rem 1.35rem;
+      }
+      .ref-card h4 {
+        margin: 0 0 0.7rem;
+        font-size: 0.86rem;
+        color: var(--accent);
+        font-weight: 700;
+      }
+      .ref-card ul {
+        margin: 0;
+        padding-left: 1.1rem;
+      }
+      .ref-card li {
+        margin: 0.5rem 0;
+        font-size: 0.83rem;
+        color: var(--text-dim);
+        line-height: 1.6;
+      }
+      .ref-card li a {
+        word-break: break-all;
+      }
+      @media (max-width: 760px) {
         .ref-grid {
           grid-template-columns: 1fr;
         }
       }
-      .ref-card {
-        background: var(--bg-panel);
-        border: 1px solid var(--border);
-        border-radius: var(--radius);
-        padding: 22px 24px;
-      }
-      .ref-card h3 {
-        margin-top: 0;
-      }
-      .ref-card ul {
-        padding-left: 0;
-        list-style: none;
-        margin-bottom: 0;
-      }
-      .ref-card li {
-        margin: 0 0 12px;
-        padding-bottom: 12px;
-        border-bottom: 1px solid var(--border);
-        font-size: 14px;
-        color: var(--text-dim);
-      }
-      .ref-card li:last-child {
-        border-bottom: none;
-        margin-bottom: 0;
-        padding-bottom: 0;
-      }
-      .ref-card li a {
-        display: block;
-        margin-top: 4px;
-        color: var(--accent);
-        font-size: 13px;
-        word-break: break-all;
-      }
 
-      /* ---------- checklist styling ---------- */
-      ul.task-list {
+      /* ---------- Checklist grid ---------- */
+      ul.checklist-grid {
         list-style: none;
-        padding-left: 0;
+        padding: 0;
+        margin: 1.4rem 0;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 0.65rem;
+        align-items: stretch;
       }
-      ul.task-list li {
-        background: var(--bg-panel);
-        border: 1px solid var(--border);
-        border-radius: 8px;
-        padding: 10px 16px;
-        margin-bottom: 8px;
+      ul.checklist-grid li {
+        margin: 0;
       }
-      ul.task-list input[type='checkbox'] {
-        margin-right: 10px;
-        accent-color: var(--accent);
-        transform: scale(1.15);
-      }
-      ul.task-list label {
+      .checklist-item {
         display: flex;
-        align-items: center;
-        cursor: default;
+        align-items: flex-start;
+        gap: 0.65rem;
+        background: var(--bg-card);
+        border: 1px solid var(--border-soft);
+        border-radius: 9px;
+        padding: 0.75rem 0.95rem;
+        font-size: 0.85rem;
+        color: var(--text-dim);
+        line-height: 1.55;
+        cursor: pointer;
+        height: 100%;
+      }
+      .checklist-item input {
+        margin-top: 0.2rem;
+        width: 15px;
+        height: 15px;
+        accent-color: var(--accent);
+        flex: 0 0 15px;
+      }
+      .checklist-item .checklist-text {
+        flex: 1 1 0%;
+        min-width: 0;
+      }
+      @media (max-width: 760px) {
+        ul.checklist-grid {
+          grid-template-columns: 1fr;
+        }
       }
 
-      footer.note {
-        margin-top: 40px;
-        color: var(--text-dimmer);
-        font-size: 13.5px;
+      /* ---------- Misc ---------- */
+      .reveal {
+        opacity: 0;
+        transform: translateY(14px);
+        transition:
+          opacity 0.6s ease,
+          transform 0.6s ease;
+      }
+      .reveal.in {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .menu-toggle {
+        display: none;
+      }
+
+      @media (max-width: 960px) {
+        .sidebar {
+          transform: translateX(-100%);
+          transition: transform 0.25s ease;
+          box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
+        }
+        .sidebar.open {
+          transform: translateX(0);
+        }
+        .main {
+          margin-left: 0;
+          padding: 0 1.3rem 4rem;
+        }
+        .hero {
+          padding: 5.2rem 0 2.4rem;
+        }
+        .hero h1 {
+          font-size: 1.7rem;
+        }
+        .menu-toggle {
+          display: flex;
+          position: fixed;
+          top: 1rem;
+          left: 1rem;
+          z-index: 30;
+          width: 42px;
+          height: 42px;
+          align-items: center;
+          justify-content: center;
+          background: var(--bg-elevated);
+          border: 1px solid var(--border);
+          border-radius: 9px;
+          color: #fff;
+          font-size: 1.1rem;
+        }
+        .ref-grid,
+        ul.checklist-grid {
+          grid-template-columns: 1fr;
+        }
       }
     </style>
   </head>
   <body>
-    <button type="button" class="nav-toggle" id="navToggle" aria-label="目次を開く" aria-expanded="false" aria-controls="sideNav">☰</button>
-    <div class="layout">
-      <nav class="side-nav" id="sideNav" aria-label="目次">
-        <div class="side-nav-title">目次</div>
+    <button class="menu-toggle" id="menuToggle" aria-label="メニュー">&#9776;</button>
+
+    <nav class="sidebar" id="sidebar">
+      <div class="brand">Hermes Agent</div>
+      <div class="brand-sub">ベストプラクティスガイド<br />中級者〜上級者向け</div>
+      <div class="nav-group" style="--group-color: var(--c-overview)">
+        <div class="nav-group-label">概要とアーキテクチャ</div>
+        <a class="nav-link" href="#1-hermes-agentとは何か">1. Hermes Agentとは何か</a>
+        <a class="nav-link" href="#2-アーキテクチャ概観">2. アーキテクチャ概観</a>
+      </div>
+      <div class="nav-group" style="--group-color: var(--c-data)">
+        <div class="nav-group-label">セットアップとメモリ</div>
+        <a class="nav-link" href="#3-セットアップとプロファイル運用のベストプラクティス"
+          >3. セットアップとプロファイル運用のベストプラクティス</a
+        >
+        <a class="nav-link" href="#4-メモリシステム設計のベストプラクティス"
+          >4. メモリシステム設計のベストプラクティス</a
+        >
+      </div>
+      <div class="nav-group" style="--group-color: var(--c-skills)">
+        <div class="nav-group-label">スキルとコンテキスト</div>
+        <a class="nav-link" href="#5-スキルシステムとprogressive-disclosure"
+          >5. スキルシステムとProgressive Disclosure</a
+        >
+        <a class="nav-link" href="#6-curatorによるスキルの自動メンテナンス"
+          >6. Curatorによるスキルの自動メンテナンス</a
+        >
+        <a class="nav-link" href="#7-コンテキストファイル戦略agentsmd--soulmd"
+          >7. コンテキストファイル戦略（AGENTS.md / SOUL.md）</a
+        >
+      </div>
+      <div class="nav-group" style="--group-color: var(--c-exec)">
+        <div class="nav-group-label">実行系機能</div>
+        <a class="nav-link" href="#8-サブエージェント委任delegation"
+          >8. サブエージェント委任（Delegation）</a
+        >
+        <a class="nav-link" href="#9-execute_codeによるトークン最適化"
+          >9. execute_codeによるトークン最適化</a
+        >
+        <a class="nav-link" href="#10-persistent-goalsgoal-ralph-loopの実践"
+          >10. Persistent Goals（/goal）― Ralph loopの実践</a
+        >
+        <a class="nav-link" href="#11-cron自動化のベストプラクティス"
+          >11. Cron自動化のベストプラクティス</a
+        >
+        <a class="nav-link" href="#12-mcp統合のベストプラクティス"
+          >12. MCP統合のベストプラクティス</a
+        >
+      </div>
+      <div class="nav-group" style="--group-color: var(--c-ops)">
+        <div class="nav-group-label">本番運用</div>
+        <a class="nav-link" href="#13-本番運用のセキュリティチェックリスト"
+          >13. 本番運用のセキュリティ・チェックリスト</a
+        >
+        <a class="nav-link" href="#14-コスト最適化とプロンプトキャッシュ"
+          >14. コスト最適化とプロンプトキャッシュ</a
+        >
+        <a class="nav-link" href="#15-トラブルシューティング">15. トラブルシューティング</a>
+        <a class="nav-link" href="#16-ベストプラクティス総括チェックリスト"
+          >16. ベストプラクティス総括チェックリスト</a
+        >
+        <a class="nav-link" href="#17-参考文献出典">17. 参考文献・出典</a>
+      </div>
+    </nav>
+
+    <div class="main">
+      <div class="hero">
+        <span class="eyebrow">HERMES AGENT &middot; NOUS RESEARCH</span>
+        <h1>Hermes Agent ベストプラクティスガイド<br />― 中級者から上級者向け</h1>
+        <p class="subtitle">
+          Nous Research製オープンソース自己改善型AIエージェント「Hermes
+          Agent」を、実運用レベルで使いこなすためのステップバイステップ解説。対象読者は、CLI／エージェント系ツールの利用経験があり、メモリ設計・スキル運用・マルチエージェント委任・本番セキュリティまで踏み込みたい中級〜上級エンジニア。情報基準日:
+          2026年8月2日(Hermes Agent公式ドキュメント/GitHubリポジトリの内容に基づく)。
+        </p>
+      </div>
+      <div class="content">
+        <hr />
+        <h2 id="1-hermes-agentとは何か">1. Hermes Agentとは何か</h2>
+        <p>
+          Hermes Agentは、AI基盤研究企業Nous
+          Research（Hermesモデルシリーズ、分散学習フレームワークDisTrO、分散学習ネットワークPsycheなどで知られる）が開発したMITライセンスのオープンソース自律AIエージェントである。GitHubリポジトリ<code>NousResearch/hermes-agent</code>は2026年8月時点で20万スターを超える規模に成長しており、公式には「The
+          agent that grows with you（あなたと共に成長するエージェント）」と位置づけられている。
+        </p>
+        <p>
+          Hermes
+          Agentが他のコーディング特化エージェント（IDE常駐型のコパイロット）や単発のチャットボットラッパーと一線を画す最大の特徴は、<strong>組み込みの学習ループ</strong>を持つ点にある。
+        </p>
+        <ul>
+          <li>タスク実行の経験から**スキル（procedural memory）**を自律生成する</li>
+          <li>生成したスキルを使用しながら自己改善する</li>
+          <li>過去の会話をFTS5全文検索で横断的に参照する</li>
+          <li>ユーザーの好み・環境情報を**メモリ（MEMORY.md / USER.md）**として蓄積する</li>
+        </ul>
+        <p>
+          ローカルのlocalバックエンドはもちろん、Docker・SSH・Singularity・Daytona・Modal・Vercel
+          Sandboxなど6種類のターミナルバックエンドで動作し、$5程度のVPSからGPUクラスタ、アイドル時にほぼ課金されないサーバーレス基盤まで、実行環境を選ばない。Telegram・Discord・Slack・WhatsApp・Signal・Matrix・Mattermost・Email・SMSなど20以上のメッセージングプラットフォームに単一のゲートウェイプロセスから同時接続できる。
+        </p>
+        <h3 id="11-業界での位置づけ">1.1 業界での位置づけ</h3>
+        <p>
+          2026年前半、Peter
+          Steinberger氏が公開したエージェント「OpenClaw」が爆発的に普及したことを受け、その数週間後にNous
+          ResearchがHermesを競合として投入した経緯がある。両者は設計思想が異なり、OpenClawが多チャンネル対応の中央ゲートウェイ型アーキテクチャを志向するのに対し、Hermesは自己改善ループ（スキル自動生成・メモリ蓄積）に重きを置く。2026年5月時点でOpenRouter上の1日あたりトークン生成量でHermesがOpenClawを上回り首位に立ったと報じられている。同年7月にはNous
+          ResearchがRobot
+          Ventures主導・USV参加のラウンドで評価額15億ドル規模の資金調達を進めていると報じられた。
+        </p>
+        <p>
+          OpenClawからの移行者向けに<code>hermes claw migrate</code
+          >コマンドが用意されており、SOUL.md相当のペルソナファイル、メモリ、スキル、コマンド許可リスト、メッセージング設定、APIキーなどを自動的に取り込める。
+        </p>
+        <h3 id="12-全体像を一目で">1.2 全体像を一目で</h3>
+        <pre class="mermaid">
+flowchart LR
+    subgraph Entry["エントリーポイント"]
+        CLI["CLI (hermes)"]
+        GW["Gateway（Telegram/Discord/Slack等）"]
+        CRON["Cron Scheduler"]
+        ACP["ACP（VS Code/Zed/JetBrains）"]
+    end
+
+    Entry --&gt; Agent["AIAgent（会話ループの中核）"]
+
+    Agent --&gt; Prompt["Prompt Builder&lt;br/&gt;system_prompt.py"]
+    Agent --&gt; Provider["Provider Runtime&lt;br/&gt;18+プロバイダ解決"]
+    Agent --&gt; Tools["Tool Dispatch&lt;br/&gt;70+ツール / 28 toolset"]
+
+    Tools --&gt; Terminal["Terminal（6バックエンド）"]
+    Tools --&gt; MCP["MCPクライアント"]
+    Tools --&gt; Skills["Skills System"]
+    Tools --&gt; Memory["Memory Manager"]
+
+    Agent --&gt; Session["Session Storage&lt;br/&gt;SQLite + FTS5"]</pre
+        >
+        <p>
+          この後の章では、この図の各コンポーネントを実務でどう設定・運用すべきかを順に掘り下げる。
+        </p>
+        <hr />
+        <h2 id="2-アーキテクチャ概観">2. アーキテクチャ概観</h2>
+        <h3 id="21-ディレクトリ構成の要点">2.1 ディレクトリ構成の要点</h3>
+        <p>
+          Hermes
+          Agentのソースツリーは大きく分けて次の要素で構成される（実装を読む・パッチを当てる際の道しるべとして把握しておくとよい）。
+        </p>
         <ul>
           <li>
-            <a href="#この記事で学べること" class="nav-link" data-target="この記事で学べること"
-              >この記事で学べること</a
-            >
+            <code>run_agent.py</code> ―
+            <code>AIAgent</code
+            >本体。プロバイダ選択・プロンプト構築・ツール実行・リトライ・フォールバック・圧縮・永続化を司る会話ループ
+          </li>
+          <li><code>cli.py</code> ― <code>HermesCLI</code>、対話型ターミナルUI</li>
+          <li>
+            <code>agent/</code> ―
+            プロンプト組み立て（<code>prompt_builder.py</code>）、コンテキスト圧縮（<code>context_compressor.py</code>）、Anthropicプロンプトキャッシュ（<code>prompt_caching.py</code>）など
           </li>
           <li>
-            <a
-              href="#1-harness-engineeringとは何か"
-              class="nav-link"
-              data-target="1-harness-engineeringとは何か"
-              >1. Harness Engineeringとは何か</a
-            >
+            <code>hermes_cli/</code> ― サブコマンド群、認証・プロバイダ解決、プラグインマネージャ
           </li>
           <li>
-            <a
-              href="#2-なぜ今ハーネスが必要なのか"
-              class="nav-link"
-              data-target="2-なぜ今ハーネスが必要なのか"
-              >2. なぜ今ハーネスが必要なのか</a
-            >
+            <code>tools/</code> ―
+            ツール実装。1ファイル1ツールが原則で、インポート時に<code>registry.register()</code>を呼んで自己登録する
           </li>
           <li>
-            <a
-              href="#3-ハーネスの構造--agent-harnessとuser-harness"
-              class="nav-link"
-              data-target="3-ハーネスの構造--agent-harnessとuser-harness"
-              >3. ハーネスの構造 ― Agent HarnessとUser Harness</a
-            >
+            <code>gateway/</code> ―
+            メッセージングゲートウェイ本体。20種のプラットフォームアダプタを収録
           </li>
+          <li><code>cron/</code> ― スケジューラ</li>
           <li>
-            <a
-              href="#4-feedforwardguidesとfeedbacksensors"
-              class="nav-link"
-              data-target="4-feedforwardguidesとfeedbacksensors"
-              >4. Feedforward（Guides）とFeedback（Sensors）</a
-            >
+            <code>skills/</code> と <code>optional-skills/</code> ―
+            バンドル済みスキルと任意インストール可能な公式スキル
           </li>
-          <li>
-            <a
-              href="#5-computationalとinferential"
-              class="nav-link"
-              data-target="5-computationalとinferential"
-              >5. ComputationalとInferential</a
-            >
-          </li>
-          <li>
-            <a href="#6-3つの統制次元" class="nav-link" data-target="6-3つの統制次元"
-              >6. 3つの統制次元</a
-            >
-          </li>
-          <li>
-            <a
-              href="#7-harness-engineeringとspec-driven-developmentの関係"
-              class="nav-link"
-              data-target="7-harness-engineeringとspec-driven-developmentの関係"
-              >7. Harness EngineeringとSpec-Driven Developmentの関係</a
-            >
-          </li>
-          <li>
-            <a
-              href="#8-googleにおける実践の全体像"
-              class="nav-link"
-              data-target="8-googleにおける実践の全体像"
-              >8. Googleにおける実践の全体像</a
-            >
-          </li>
-          <li>
-            <a
-              href="#9-ステップバイステップ実践ガイド"
-              class="nav-link"
-              data-target="9-ステップバイステップ実践ガイド"
-              >9. ステップバイステップ実践ガイド</a
-            >
-          </li>
-          <li>
-            <a
-              href="#10-変更のライフサイクルにおける配置keep-quality-left"
-              class="nav-link"
-              data-target="10-変更のライフサイクルにおける配置keep-quality-left"
-              >10. 変更のライフサイクルにおける配置（Keep Quality Left）</a
-            >
-          </li>
-          <li>
-            <a
-              href="#11-アンチパターンと落とし穴"
-              class="nav-link"
-              data-target="11-アンチパターンと落とし穴"
-              >11. アンチパターンと落とし穴</a
-            >
-          </li>
-          <li>
-            <a
-              href="#12-業界の広がり--openaiとの比較"
-              class="nav-link"
-              data-target="12-業界の広がり--openaiとの比較"
-              >12. 業界の広がり ― OpenAIとの比較</a
-            >
-          </li>
-          <li>
-            <a href="#13-実践チェックリスト" class="nav-link" data-target="13-実践チェックリスト"
-              >13. 実践チェックリスト</a
-            >
-          </li>
-          <li><a href="#14-まとめ" class="nav-link" data-target="14-まとめ">14. まとめ</a></li>
-          <li>
-            <a href="#15-参考文献" class="nav-link" data-target="15-参考文献">15. 参考文献</a>
-          </li>
+          <li><code>tests/</code> ― 約1,250ファイル・25,000件規模のpytestスイート</li>
         </ul>
-      </nav>
-      <main class="main">
-        <h1 id="googleにおける-harness-engineering-実践ガイド">
-          Googleにおける Harness Engineering 実践ガイド
-        </h1>
-        <h3 id="-ai仕様駆動開発spec-driven-developmentを支える制御層の設計-">
-          ― AI仕様駆動開発(Spec-Driven Development)を支える「制御層」の設計 ―
+        <h3 id="22-データフロー">2.2 データフロー</h3>
+        <pre class="mermaid">
+sequenceDiagram
+    participant U as ユーザー
+    participant CLI as HermesCLI
+    participant Agent as AIAgent
+    participant Prov as Provider Runtime
+    participant Tool as Tool Registry
+    participant DB as SessionDB
+
+    U-&gt;&gt;CLI: 入力
+    CLI-&gt;&gt;Agent: run_conversation()
+    Agent-&gt;&gt;Agent: build_system_prompt()
+    Agent-&gt;&gt;Prov: resolve_runtime_provider()
+    Prov--&gt;&gt;Agent: api_mode / credentials
+    Agent-&gt;&gt;Tool: API呼び出し（tool_calls検出）
+    Tool--&gt;&gt;Agent: 実行結果
+    Agent-&gt;&gt;DB: 会話を保存
+    Agent--&gt;&gt;CLI: 最終応答
+    CLI--&gt;&gt;U: 表示</pre
+        >
+        <pre class="mermaid">
+sequenceDiagram
+    participant P as プラットフォーム（Telegram等）
+    participant Adp as Adapter
+    participant GW as GatewayRunner
+    participant Agent as AIAgent
+
+    P-&gt;&gt;Adp: メッセージイベント
+    Adp-&gt;&gt;GW: MessageEvent
+    GW-&gt;&gt;GW: ユーザー認可チェック
+    GW-&gt;&gt;GW: セッションキー解決
+    GW-&gt;&gt;Agent: 履歴付きAIAgent生成
+    Agent--&gt;&gt;GW: 応答
+    GW--&gt;&gt;Adp: 配信
+    Adp--&gt;&gt;P: 送信</pre
+        >
+        <pre class="mermaid">
+sequenceDiagram
+    participant Sch as Scheduler
+    participant Job as jobs.json
+    participant Agent as 新規AIAgent
+    participant Deliv as 配信先
+
+    Sch-&gt;&gt;Job: 60秒ごとにtick
+    Job--&gt;&gt;Sch: 期限到来ジョブ取得
+    Sch-&gt;&gt;Agent: 履歴なしで新規生成
+    Sch-&gt;&gt;Agent: 添付スキルを注入
+    Agent-&gt;&gt;Agent: プロンプトを実行
+    Agent--&gt;&gt;Deliv: 結果を配信
+    Sch-&gt;&gt;Job: next_run_atを更新</pre
+        >
+        <h3 id="23-設計原則">2.3 設計原則</h3>
+        <p>
+          公式ドキュメントが明示する設計原則は、カスタマイズや障害対応を行う際の判断基準として有用である。
+        </p>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr class="header">
+                <th>原則</th>
+                <th>実務上の意味</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="odd">
+                <td>プロンプトの安定性</td>
+                <td>
+                  システムプロンプトはセッション中に変化しない。<code>/model</code>など明示的な操作を除き、キャッシュを破壊する変更は起きない
+                </td>
+              </tr>
+              <tr class="even">
+                <td>実行の可観測性</td>
+                <td>
+                  すべてのツール呼び出しはコールバック経由でユーザーに可視化される（CLIのスピナー、ゲートウェイのチャットメッセージ）
+                </td>
+              </tr>
+              <tr class="odd">
+                <td>中断可能性</td>
+                <td>API呼び出しやツール実行はユーザー入力やシグナルでいつでも中断できる</td>
+              </tr>
+              <tr class="even">
+                <td>プラットフォーム非依存のコア</td>
+                <td>
+                  <code>AIAgent</code
+                  >は1クラスでCLI・ゲートウェイ・ACP・バッチ・APIサーバーを兼ねる。差異はエントリーポイント側に閉じ込める
+                </td>
+              </tr>
+              <tr class="odd">
+                <td>疎結合</td>
+                <td>
+                  MCP・プラグイン・メモリプロバイダ・RL環境などのオプション機構はレジストリパターンと<code>check_fn</code>ゲーティングで実現し、ハード依存にしない
+                </td>
+              </tr>
+              <tr class="even">
+                <td>プロファイル分離</td>
+                <td>
+                  <code>hermes -p &lt;name&gt;</code
+                  >でプロファイルごとにHERMES_HOME・設定・メモリ・セッション・ゲートウェイPIDが独立し、複数プロファイルを同時実行できる
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          <strong>実務Tips</strong>:
+          個人用と業務用、あるいは検証用と本番用のエージェントを分けたい場合は、複数の<code>.hermes</code>ディレクトリを作るのではなく<code
+            >hermes profile create &lt;name&gt;</code
+          >でプロファイルを切ることを推奨する。プロファイルごとにスキル・メモリ・cronジョブが完全に独立するため、実験的な設定変更が本番プロファイルに波及しない。
+        </p>
+        <hr />
+        <h2 id="3-セットアップとプロファイル運用のベストプラクティス">
+          3. セットアップとプロファイル運用のベストプラクティス
+        </h2>
+        <h3 id="31-インストール">3.1 インストール</h3>
+        <p>Linux / macOS / WSL2 / Termux（Android）は以下のワンライナーで導入できる。</p>
+        <pre><code class="language-bash">curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash</code></pre>
+        <p>
+          Windowsはネイティブ対応しており、PowerShellで以下を実行する（WSL2を経由する必要はない）。
+        </p>
+        <pre><code class="language-powershell">iex (irm https://hermes-agent.nousresearch.com/install.ps1)</code></pre>
+        <p>
+          インストーラはuv・Python 3.11・Node.js・ripgrep・ffmpeg・ポータブルGit
+          Bash（MinGit）まで自動導入する。既存のGitがあればそれを優先利用し、システムのGit環境には干渉しない。
+        </p>
+        <h3 id="32-モデルプロバイダの選定">3.2 モデルプロバイダの選定</h3>
+        <p>
+          Nous
+          Portal・OpenRouter・OpenAI・Anthropic・Google・その他OpenAI互換エンドポイントまで対応する。プロバイダごとに個別のAPIキーを管理したくない場合は、次の1コマンドでNous
+          Portal経由のOAuthとTool
+          Gateway（Web検索・画像生成・TTS・クラウドブラウザ）を一括有効化できる。
+        </p>
+        <pre><code class="language-bash">hermes setup --portal</code></pre>
+        <p>
+          モデルの切り替えはセッション中いつでも<code>/model</code>で可能だが、後述するプロンプトキャッシュの観点から、切り替え頻度は最小限にとどめるのがベストプラクティスである。
+        </p>
+        <h3 id="33-プロファイル分離とバックアップ">3.3 プロファイル分離とバックアップ</h3>
+        <ul>
+          <li>
+            検証用スキルをバンドルなしのクリーンな状態で試したい場合は<code
+              >hermes profile create research --no-skills</code
+            >で空のプロファイルを作る
+          </li>
+          <li>
+            既存プロファイルをバンドルスキルなしに切り替えたい場合は<code
+              >hermes skills opt-out</code
+            >（<code>--remove</code>で未編集のバンドルスキルも削除）
+          </li>
+          <li>定期的に<code>hermes update</code>でセキュリティパッチを取り込む</li>
+        </ul>
+        <hr />
+        <h2 id="4-メモリシステム設計のベストプラクティス">
+          4. メモリシステム設計のベストプラクティス
+        </h2>
+        <h3 id="41-2つのメモリストア">4.1 2つのメモリストア</h3>
+        <p>Hermesのメモリは意図的に<strong>厳格な文字数上限</strong>を持つ2ファイル構成である。</p>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr class="header">
+                <th>ファイル</th>
+                <th>用途</th>
+                <th>上限</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="odd">
+                <td><code>MEMORY.md</code></td>
+                <td>エージェント自身のメモ（環境情報・規約・学んだ教訓）</td>
+                <td>約2,200文字（≒800トークン）</td>
+              </tr>
+              <tr class="even">
+                <td><code>USER.md</code></td>
+                <td>ユーザープロファイル（好み・コミュニケーションスタイル）</td>
+                <td>約1,375文字（≒500トークン）</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          両ファイルは<code>~/.hermes/memories/</code>に保存され、セッション開始時に<strong>フローズンスナップショット</strong>としてシステムプロンプトへ注入される。この設計はプロンプトキャッシュを維持するための意図的なトレードオフであり、セッション中にエージェントがメモリを追加・削除しても、その変更はディスクには即時反映される一方、システムプロンプト上の表示は次回セッション開始まで更新されない。
+        </p>
+        <h3 id="42-何を保存し何を保存しないか">4.2 何を保存し、何を保存しないか</h3>
+        <p><strong>保存すべきもの（エージェントが自動的に行う）</strong></p>
+        <ul>
+          <li>ユーザーの技術的な好み（「TypeScriptを使う」など）→ <code>user</code></li>
+          <li>環境事実（OS・ミドルウェアのバージョンなど）→ <code>memory</code></li>
+          <li>
+            訂正（「Dockerコマンドにsudoは不要、ユーザーはdockerグループに所属」など）→
+            <code>memory</code>
+          </li>
+          <li>プロジェクト規約（インデント幅・命名規則など）→ <code>memory</code></li>
+          <li>完了した作業の記録 → <code>memory</code></li>
+        </ul>
+        <p><strong>保存すべきでないもの</strong></p>
+        <ul>
+          <li>曖昧すぎる情報（「Pythonについて質問された」）</li>
+          <li>再検索で容易に得られる一般知識</li>
+          <li>生データダンプ（大きなコードブロック・ログファイル）</li>
+          <li>セッション限りの一時的な文脈</li>
+          <li>すでにAGENTS.md/SOUL.mdに書かれている内容の重複</li>
+        </ul>
+        <h3 id="43-容量管理の実務">4.3 容量管理の実務</h3>
+        <p>
+          メモリは自動圧縮されない。上限を超える書き込みはエラーとして拒否され、エージェントは既存エントリを<code>replace</code>で統合するか<code>remove</code>で削除してから再試行する必要がある。<strong>容量が80%を超えた時点で統合する</strong>運用がベストプラクティスとして明示されている。良いエントリの例は次のように情報密度が高く簡潔である。
+        </p>
+        <pre><code class="language-plaintext">このプロジェクト ~/code/api はGo 1.22・sqlcでDBクエリ・chiルータを使用。
+テストは 'make test'。CI はGitHub Actions。</code></pre>
+        <p>
+          逆に「ユーザーは1月5日にプロジェクトについて質問し…」のような冗長な記述や、「ユーザーはプロジェクトを持っている」のような曖昧な記述は避けるべきである。
+        </p>
+        <h3 id="44-書き込み承認ゲートwrite_approval">
+          4.4 書き込み承認ゲート（<code>write_approval</code>）
         </h3>
-        <blockquote>
-          <p>
-            対象読者：AIコーディングエージェント（Antigravity、Gemini CLI、Claude
-            Code、Codex等）を業務で使い始めたばかりのエンジニア・QAエンジニア
-            前提知識：不要（用語はすべて本文中で定義します）
-          </p>
-        </blockquote>
-        <hr />
-        <h2 id="この記事で学べること">この記事で学べること</h2>
-        <ul>
-          <li>
-            「Harness
-            Engineering（ハーネスエンジニアリング）」という新しい概念が、なぜ2026年に入って急速に注目されているのか
-          </li>
-          <li>ハーネスが具体的に何を指すのか（Guides／Sensors、Computational／Inferential）</li>
-          <li>Harness EngineeringとSpec-Driven Development（仕様駆動開発）がどう補完し合うのか</li>
-          <li>
-            Googleが自社のエージェント製品（Google Antigravity／ADK／Agent
-            Skills）でこの考え方をどう実装しているか
-          </li>
-          <li>自分のプロジェクトで今日から始められる、ステップバイステップの実践手順</li>
-        </ul>
-        <hr />
-        <h2 id="1-harness-engineeringとは何か">1. Harness Engineeringとは何か</h2>
-        <h3 id="11-agent--model--harnessという定式">1.1 「Agent = Model + Harness」という定式</h3>
-        <p>2026年前半、AIコーディングエージェント界隈で急速に広まった等式があります。</p>
-        <pre><code>Agent（エージェント） = Model（モデル） + Harness（ハーネス）</code></pre>
         <p>
-          これは「エージェントの性能は、モデル単体の賢さだけでは決まらない。モデルの周りに何を組み立てるかで決まる」という考え方です。ハーネス（harness）はもともと「馬具」「安全ベルト」を意味する英単語で、ここでは「モデルを制御し、方向づけ、安全に走らせるための仕組み一式」を指す比喩として使われています。
+          デフォルトではエージェントはメモリ・スキルへ自由に書き込む。誤った推測を保存されるのを防ぎたい場合は、次のように承認制へ切り替えられる。
         </p>
+        <pre><code class="language-yaml">memory:
+  write_approval: true   # true = 保存前に承認が必要
+skills:
+  write_approval: true</code></pre>
         <p>
-          具体的には、システムプロンプト、コード検索の仕組み、ツール呼び出しの設計、テストやリンター、レビューの手順、プロジェクトのルール文書など、<strong>モデル本体を除いたエージェントを取り巻くすべて</strong>がハーネスに含まれます。
+          有効化すると、対話的CLIではその場でインラインに承認を求められ、メッセージングプラットフォームやバックグラウンドの自己改善レビューからの書き込みは<code
+            >/memory pending</code
+          >・<code>/skills pending</code
+          >でステージングされ、<code>approve</code>/<code>reject</code>で個別に判断できる。「エージェントが自分について誤った前提を保存してしまった」という問題への直接的な解決策である。
         </p>
-        <h3 id="12-用語の起源">1.2 用語の起源</h3>
+        <h3 id="45-メモリ-vs-セッション検索">4.5 メモリ vs セッション検索</h3>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr class="header">
+                <th>観点</th>
+                <th>永続メモリ</th>
+                <th>セッション検索（<code>session_search</code>）</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="odd">
+                <td>容量</td>
+                <td>約1,300トークン相当</td>
+                <td>無制限（全セッション）</td>
+              </tr>
+              <tr class="even">
+                <td>速度</td>
+                <td>即時（システムプロンプト内）</td>
+                <td>FTS5クエリで約20ms</td>
+              </tr>
+              <tr class="odd">
+                <td>コスト</td>
+                <td>毎回のプロンプトにトークンコストが発生</td>
+                <td>オンデマンド、LLM呼び出し不要</td>
+              </tr>
+              <tr class="even">
+                <td>用途</td>
+                <td>常に必要な重要事実</td>
+                <td>「先週これについて話したか」の検索</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
         <p>
-          「Harness Engineering」という言葉自体は、Terraformの生みの親として知られるMitchell
-          Hashimotoが2026年初頭に提唱したとされています。その原則は「エージェントが同じ間違いを一度でも犯したら、二度と同じ間違いをしないよう、その場でハーネス側に修正を組み込む」というものでした。
+          <strong>使い分けの指針</strong>:
+          「常にコンテキストにあるべき事実」はメモリへ、「特定の過去の会話を思い出したい」場合はセッション検索へ、と役割を明確に分離する。
         </p>
+        <h3 id="46-外部メモリプロバイダ">4.6 外部メモリプロバイダ</h3>
         <p>
-          この考え方はすぐにOpenAI、そしてソフトウェア工学の分野で長年発信を続けてきたMartin
-          Fowler（Thoughtworks）のサイトへと広がります。特に、Thoughtworksのディスティングイッシュト・エンジニアであるBirgitta
-          Böckelerが2026年4月に公開した記事「Harness engineering for coding agent
-          users」は、この概念を体系立てて整理した基礎文献として、以後多くの実践者に引用されています。本ガイドの用語整理も、主にこの記事の枠組みに沿っています。
-        </p>
-        <p>
-          Googleの文脈では、この考え方は「Google
-          Antigravity」というAIファーストの開発環境や、「Agent Development Kit
-          (ADK)」、そして後述する「Agent
-          Skills」というオープンな仕組みを通じて、非常に具体的なプロダクトの形に落とし込まれています。
-        </p>
-        <hr />
-        <h2 id="2-なぜ今ハーネスが必要なのか">2. なぜ今ハーネスが必要なのか</h2>
-        <h3 id="21-vibe-codingの限界">2.1 Vibe Codingの限界</h3>
-        <p>
-          「Vibe
-          Coding（ヴァイブコーディング）」とは、仕様書を書かずに、その場の感覚（vibe）でAIに指示を出しながらコードを生成させていくスタイルを指す言葉です。プロトタイプや使い捨てスクリプトには向いていますが、次のような理由でプロダクションコードには向きません。
-        </p>
-        <ul>
-          <li>コードベースが大きくなると、機能同士が干渉し始める</li>
-          <li>
-            数週間後にコードを見返しても、「なぜこの実装にしたのか」という意思決定の記録が残っていない
-          </li>
-          <li>AIが生成した内容を「なんとなく動いているから」という理由で受け入れてしまう</li>
-        </ul>
-        <p>
-          このように、動くけれどもチームのアーキテクチャ基準やセキュリティ要件、非機能要件を満たさないコードは、しばしば「AI
-          Slop（AIのゴミ、无秩序に生成された低品質コード）」と呼ばれます。
-        </p>
-        <h3 id="22-信頼のギャップ">2.2 信頼のギャップ</h3>
-        <p>
-          人間のソフトウェアエンジニアがAI生成コードに対して抱く不信感には、構造的な理由があります。LLMは非決定的であり、チームやプロジェクト固有の文脈を知らず、そしてコードを「理解」しているのではなくトークンの並びとして扱っています。
-        </p>
-        <p>Böckelerの整理によれば、優れたハーネスは次の2つを実現します。</p>
-        <ol type="1">
-          <li>エージェントが<strong>最初の試みで</strong>良い結果を出す確率を高める</li>
-          <li>
-            問題が人間の目に触れる前に、エージェント自身が<strong>自己修正</strong>できるフィードバックループを提供する
-          </li>
-        </ol>
-        <p>
-          結果として、人間によるレビューの手間が減り、システム全体の品質が上がり、無駄なトークン消費も減らせる、というのがハーネスに投資する動機です。
+          MEMORY.md/USER.mdを超える深いメモリが必要な場合、Honcho・OpenViking・Mem0・Hindsight・Holographic・RetainDB・ByteRover・Supermemoryの8種の外部メモリプロバイダプラグインが用意されている。これらは組み込みメモリを置き換えるのではなく<strong>並行して動作</strong>し、知識グラフ・意味検索・自動事実抽出・セッション横断のユーザーモデリングを追加する。<code
+            >hermes memory setup</code
+          >で対話的に選択できる。
         </p>
         <hr />
-        <h2 id="3-ハーネスの構造--agent-harnessとuser-harness">
-          3. ハーネスの構造 ― Agent HarnessとUser Harness
+        <h2 id="5-スキルシステムとprogressive-disclosure">
+          5. スキルシステムとProgressive Disclosure
+        </h2>
+        <h3 id="51-3段階のロード方式">5.1 3段階のロード方式</h3>
+        <p>
+          スキルは<a href="https://agentskills.io">agentskills.io</a
+          >のオープン標準に準拠した、オンデマンドで読み込まれる知識ドキュメントである。トークン効率を保つため次の3段階で開示される。
+        </p>
+        <pre class="mermaid">
+flowchart LR
+    L0["Level 0&lt;br/&gt;skills_list()&lt;br/&gt;名前+説明のみ（約3千トークン）"] --&gt; L1["Level 1&lt;br/&gt;skill_view(name)&lt;br/&gt;SKILL.md全文"]
+    L1 --&gt; L2["Level 2&lt;br/&gt;skill_view(name, path)&lt;br/&gt;参照ファイル個別"]</pre
+        >
+        <p>
+          エージェントは実際に必要になった時だけ完全な内容をロードする。すべてのスキルは<code>~/.hermes/skills/</code>を単一の情報源として保持され、<code>external_dirs</code>設定で共有ディレクトリ（複数ツール共通の<code>~/.agents/skills/</code>など）を追加でスキャンさせることもできる。
+        </p>
+        <h3 id="52-skillmdフォーマットの要点">5.2 SKILL.mdフォーマットの要点</h3>
+        <pre><code class="language-yaml">---
+name: my-skill
+description: このスキルが何をするかの簡潔な説明
+version: 1.0.0
+platforms: [macos, linux]
+metadata:
+  hermes:
+    tags: [python, automation]
+    category: devops
+    fallback_for_toolsets: [web]     # 条件付き活性化：このtoolsetが無い時だけ表示
+    requires_toolsets: [terminal]    # 条件付き活性化：このtoolsetがある時だけ表示
+---</code></pre>
+        <p>
+          <code>fallback_for_toolsets</code>は特に有用なパターンで、有料ツール（例:
+          Web検索）が利用不可の時にだけ無料の代替スキル（DuckDuckGo検索など）を表示させる、というフォールバック設計を宣言的に書ける。
+        </p>
+        <h3 id="53-learnでスキルを素早く作る">5.3 <code>/learn</code>でスキルを素早く作る</h3>
+        <p>
+          手作業でSKILL.mdを書く代わりに、<code>/learn</code>はエージェントに既存の知識・資料からスキルを自動生成させるコマンドである。
+        </p>
+        <pre><code class="language-bash">/learn ~/projects/acme-sdk のRESTクライアントを、認証とページネーションに焦点を当てて
+/learn https://docs.example.com/api/quickstart
+/learn さっきやったステージングサーバーへのデプロイ手順</code></pre>
+        <p>
+          CLI・ゲートウェイ・TUI・ダッシュボードのいずれからでも同じように動作し、実際に稼働中のエージェントが情報収集からSKILL.md執筆まで行うため、専用の取り込みエンジンは存在しない。
+        </p>
+        <h3 id="54-スキルバンドルで複数スキルを1コマンド化">
+          5.4 スキルバンドルで複数スキルを1コマンド化
+        </h3>
+        <p>
+          頻繁に組み合わせて使うスキル群は、YAMLベースの「バンドル」として1つのスラッシュコマンドにまとめられる。
+        </p>
+        <pre><code class="language-bash">hermes bundles create backend-dev \
+  --skill github-code-review \
+  --skill test-driven-development \
+  --skill github-pr-workflow \
+  -d "バックエンド機能開発：レビュー・テスト・PRワークフロー"</code></pre>
+        <p>
+          以後<code>/backend-dev 認証ミドルウェアをリファクタリングして</code
+          >と打つだけで、3つのスキルが同時にロードされる。バンドルはスキル名の衝突時に個別スキルより優先される点に注意する。
+        </p>
+        <h3 id="55-エージェントによる自己改善skill_manage">
+          5.5 エージェントによる自己改善（<code>skill_manage</code>）
+        </h3>
+        <p>
+          エージェントは複雑なタスク（5回以上のツール呼び出し）を完了した後、エラーから抜け出す方法を発見した後、あるいはユーザーに訂正された後に、自発的にスキルを作成する。<code
+            >create</code
+          >
+          / <code>patch</code>（推奨・差分のみで効率的）/ <code>edit</code> / <code>delete</code> /
+          <code>write_file</code> / <code>remove_file</code>の6アクションがある。
+        </p>
+        <h3 id="56-skills-hubとトラストレベル">5.6 Skills Hubとトラスト・レベル</h3>
+        <p>
+          外部のスキルエコシステムとして、公式オプションスキル・skills.sh（Vercel運営）・well-known
+          エンドポイント（<code>/.well-known/skills/index.json</code>）・GitHubタップ（openai/skills、anthropics/skills、huggingface/skills、NVIDIA/skillsなど）・ClawHub・LobeHub・browse.sh（Browserbase運営の200以上のサイト別ブラウザ自動化スキル集）が統合されている。
+        </p>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr class="header">
+                <th>トラストレベル</th>
+                <th>ソース</th>
+                <th>ポリシー</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="odd">
+                <td><code>builtin</code></td>
+                <td>Hermes本体に同梱</td>
+                <td>常に信頼</td>
+              </tr>
+              <tr class="even">
+                <td><code>official</code></td>
+                <td>リポジトリの<code>optional-skills/</code></td>
+                <td>組み込み信頼、警告表示なし</td>
+              </tr>
+              <tr class="odd">
+                <td><code>trusted</code></td>
+                <td>openai/skills、anthropics/skills等の指定レジストリ</td>
+                <td>コミュニティより緩やかなポリシー</td>
+              </tr>
+              <tr class="even">
+                <td><code>community</code></td>
+                <td>skills.sh・well-known・カスタムGitHubリポジトリ等</td>
+                <td>
+                  危険でない指摘は<code>--force</code>で上書き可能。<code>dangerous</code>判定は上書き不可
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          すべてのハブ経由インストールは、データ漏洩・プロンプトインジェクション・破壊的コマンド・サプライチェーン兆候を検査するセキュリティスキャナを通過する。<strong
+            >未検証のコミュニティスキルを本番プロファイルにインストールする前には、必ず<code
+              >hermes skills inspect</code
+            >でプレビューする</strong
+          >のがベストプラクティスである。
+        </p>
+        <hr />
+        <h2 id="6-curatorによるスキルの自動メンテナンス">
+          6. Curatorによるスキルの自動メンテナンス
         </h2>
         <p>
-          「ハーネス」という言葉は、どの立場で使うかによって指すものが変わります。Böckelerはこれを3つの同心円で説明しています。
+          エージェントが問題を解決するたびにスキルを保存し続けると、似たようなスキルが乱立してカタログを汚染し、トークンを浪費する。Curatorはこれを防ぐバックグラウンドメンテナンス機構である。
+        </p>
+        <h3 id="61-ライフサイクル">6.1 ライフサイクル</h3>
+        <pre class="mermaid">
+flowchart LR
+    Active["active&lt;br/&gt;（通常使用中）"] --&gt;|30日未使用| Stale["stale&lt;br/&gt;（休眠候補）"]
+    Stale --&gt;|90日未使用| Archived["archived&lt;br/&gt;（.archive/へ退避）"]
+    Archived --&gt;|hermes curator restore| Active
+    Pin["hermes curator pin"] -.自動遷移を無効化.-&gt; Active</pre
+        >
+        <p>
+          Curatorが管理するのは「<strong>エージェント作成</strong>」と明示的にマークされたスキルのみである。具体的には、バックグラウンドの自己改善レビュー（約10ターンごとに実行）が生成したアンブレラスキルがこれに該当し、ユーザーが手動作成したスキルや、フォアグラウンド会話中にエージェントへ依頼して作らせたスキルは対象外となる。バンドル済み・ハブインストール済みスキルは原則対象外だが、<code
+            >curator.prune_builtins: true</code
+          >（デフォルト）の場合のみ、未使用のバンドルスキルが90日後にアーカイブされる（削除ではなく退避）。
+        </p>
+        <h3 id="62-実行タイミングと安全策">6.2 実行タイミングと安全策</h3>
+        <p>
+          Curatorはcronデーモンではなく、<strong>非アクティブ検知</strong>によって起動する。CLIセッション開始時、およびゲートウェイのcronティッカー内で、前回実行から<code>interval_hours</code>（デフォルト7日）が経過し、かつ<code>min_idle_hours</code>（デフォルト2時間）以上アイドルであった場合にのみバックグラウンドフォークとして走る。新規インストール直後は最初の実行が1インターバル分先送りされ、ユーザーがスキルライブラリを確認したりピン留めしたりする猶予が確保される。
+        </p>
+        <p>実行は2フェーズに分かれる。</p>
+        <ol type="1">
+          <li>
+            <strong>自動遷移</strong>（決定的・LLM不使用）: 30日/90日ルールによる<code
+              >active → stale → archived</code
+            >の遷移
+          </li>
+          <li>
+            <strong>LLM統合レビュー</strong>（デフォルトOFF、<code>curator.consolidate: true</code
+            >で有効化）: 補助モデルが重複スキルの統合・パッチ・アーカイブを提案する
+          </li>
+        </ol>
+        <h3 id="63-バックアップとロールバック">6.3 バックアップとロールバック</h3>
+        <p>
+          実際のCurator実行の前には必ず<code>~/.hermes/skills/.curator_backups/</code>にtar.gzスナップショットが作成される。想定外の変更があった場合は次の1コマンドで即座に復元できる。
+        </p>
+        <pre><code class="language-bash">hermes curator rollback        # 最新スナップショットへ復元（確認あり）
+hermes curator rollback --list # スナップショット一覧</code></pre>
+        <p>
+          ロールバック自体も「ロールバック前」のスナップショットを取ってから実行されるため、誤ロールバックすら取り消せる。<strong>本番運用では<code>curator.backup.enabled</code>を明示的にtrueのままにしておくこと</strong>、そして<code>/plan</code>のようなスラッシュコマンドが依存する保護対象ビルトインスキルは、<code>prune_builtins</code>設定に関わらずCuratorの候補リストから常に除外される点も押さえておきたい。
+        </p>
+        <hr />
+        <h2 id="7-コンテキストファイル戦略agentsmd--soulmd">
+          7. コンテキストファイル戦略（AGENTS.md / SOUL.md）
+        </h2>
+        <h3 id="71-優先順位システム">7.1 優先順位システム</h3>
+        <p>
+          プロジェクトコンテキストファイルは<strong>1セッションにつき1種類のみ</strong>ロードされる。優先順位は次の通りで、最初に見つかったものが採用される。
+        </p>
+        <p>
+          <code>.hermes.md</code>（<code>HERMES.md</code>も可）→ <code>AGENTS.md</code> →
+          <code>CLAUDE.md</code> → <code>.cursorrules</code>
+        </p>
+        <p>
+          一方、<code>SOUL.md</code>は常に独立してロードされる（Hermesインスタンス全体のペルソナ層）。<code>HERMES_HOME</code>直下からのみ読み込まれ、作業ディレクトリは探索しない。
+        </p>
+        <h3 id="72-段階的サブディレクトリ発見">7.2 段階的サブディレクトリ発見</h3>
+        <p>
+          モノレポで各サブディレクトリに個別の規約がある場合、起動時にすべてを読み込む必要はない。エージェントが<code>read_file</code>や<code>terminal</code>でそのディレクトリに触れた瞬間に、該当する<code>AGENTS.md</code>が遅延発見されてツール結果に注入される仕組みになっている。
+        </p>
+        <pre><code class="language-plaintext">my-project/
+  AGENTS.md              ← セッション開始時にロード
+  frontend/AGENTS.md     ← frontend/ 配下を読んだ時に発見
+  backend/AGENTS.md      ← backend/ 配下を読んだ時に発見</code></pre>
+        <p>
+          この設計には2つの利点がある。第一にシステムプロンプトが肥大化しない。第二にプロンプトキャッシュが維持される（サブディレクトリのヒントは会話履歴に追記されるだけで、システムプロンプト自体は変化しない）。
+        </p>
+        <h3 id="73-効果的なagentsmdの書き方">7.3 効果的なAGENTS.mdの書き方</h3>
+        <p>公式のベストプラクティスとして次の5点が挙げられている。</p>
+        <ol type="1">
+          <li>
+            <strong>簡潔に保つ</strong> —
+            設定した<code>context_file_max_chars</code>（デフォルト2万文字）以内に収める。毎ターン読み込まれるコストを意識する
+          </li>
+          <li>
+            <strong>見出しで構造化する</strong> —
+            アーキテクチャ・規約・注意事項を<code>##</code>セクションで分ける
+          </li>
+          <li><strong>具体例を含める</strong> — 望ましいコードパターン・API形状・命名規則を示す</li>
+          <li>
+            <strong>やってはいけないことを明記する</strong> —
+            「マイグレーションファイルを直接編集しない」など
+          </li>
+          <li>
+            <strong>重要なパス・ポート番号を列挙する</strong> —
+            エージェントがターミナルコマンドで使う
+          </li>
+        </ol>
+        <h3 id="74-プロンプトインジェクション対策">7.4 プロンプトインジェクション対策</h3>
+        <p>
+          すべてのコンテキストファイルは読み込み前にスキャンされ、「以前の指示を無視しろ」といった指示上書き試行、非表示のHTMLコメント、認証情報の窃取パターン（<code
+            >curl ... $API_KEY</code
+          >など）、不可視Unicode文字（ゼロ幅スペース、双方向オーバーライド）が検出されるとブロックされる。<strong>共有リポジトリ内のAGENTS.mdは、この自動スキャンだけに頼らず、自分でも内容を確認する</strong>ことが推奨されている。
+        </p>
+        <hr />
+        <h2 id="8-サブエージェント委任delegation">8. サブエージェント委任（Delegation）</h2>
+        <h3 id="81-サブエージェントは何も知らない">8.1 サブエージェントは「何も知らない」</h3>
+        <p>
+          <code>delegate_task</code
+          >が生成する子エージェントは完全にフレッシュな会話から始まる。親の会話履歴・過去のツール呼び出し・議論内容について一切の知識を持たない。したがって、<code>goal</code>と<code>context</code>パラメータに<strong>子が必要とするすべて</strong>を明示的に渡す必要がある。
+        </p>
+        <pre><code class="language-python"># 悪い例：「そのエラー」が何か子には分からない
+delegate_task(goal="そのエラーを直して")
+
+# 良い例：子が必要とする情報を全て含む
+delegate_task(
+    goal="api/handlers.py の TypeError を修正",
+    context="""47行目でTypeError: 'NoneType' object has no attribute 'get'。
+    process_request() が parse_body() からNoneを受け取っている。
+    プロジェクトは /home/user/myproject、Python 3.11。"""
+)</code></pre>
+        <h3 id="82-単発-vs-並列バッチ">8.2 単発 vs 並列バッチ</h3>
+        <pre><code class="language-python"># 単発
+delegate_task(goal="テスト失敗の原因を調査", context="...")
+
+# 並列バッチ（デフォルト最大3並列、設定変更可）
+delegate_task(tasks=[
+    {"goal": "話題Aを調査", "context": "..."},
+    {"goal": "話題Bを調査", "context": "..."},
+    {"goal": "ビルドを修正", "context": "..."},
+])</code></pre>
+        <h3 id="83-深さ制限とオーケストレーション">8.3 深さ制限とオーケストレーション</h3>
+        <p>
+          デフォルトでは委任は<strong>フラット</strong>（親→子の1階層のみ、子はさらに委任できない）。多段階ワークフロー（調査→統合など）が必要な場合のみ、<code>role="orchestrator"</code>の子を作る。
         </p>
         <pre class="mermaid">
 flowchart TB
-    U["User Harness（ユーザーハーネス）&lt;br/&gt;一番外側の層 ― 自分たちで追加する仕組み"] --&gt; G["Agent Harness（エージェントハーネス）&lt;br/&gt;その内側 ― 製品にあらかじめ内蔵された基盤"] --&gt; M(("モデル（LLM）&lt;br/&gt;中心 ― 推論エンジンそのもの"))</pre
+    Parent["親エージェント（depth 0）"] --&gt; Leaf1["leaf子（depth 1）&lt;br/&gt;これ以上委任不可"]
+    Parent --&gt; Orch["orchestrator子（depth 1）&lt;br/&gt;max_spawn_depthを引き上げた場合のみ委任可"]
+    Orch --&gt; GrandLeaf["leaf孫（depth 2）"]</pre
         >
+        <p>
+          <code>max_spawn_depth: 3</code>かつ<code>max_concurrent_children: 3</code
+          >を組み合わせると理論上3×3×3=27の並列leafエージェントが生まれうる点はコスト上の注意点として明記されている。深さを上げる際は意図的に行うべきである。
+        </p>
+        <h3 id="84-delegate_task-と-execute_code-の使い分け">
+          8.4 delegate_task と execute_code の使い分け
+        </h3>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr class="header">
+                <th>観点</th>
+                <th><code>delegate_task</code></th>
+                <th><code>execute_code</code></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="odd">
+                <td>推論</td>
+                <td>フルLLM推論ループ</td>
+                <td>Pythonコード実行のみ（推論なし）</td>
+              </tr>
+              <tr class="even">
+                <td>コンテキスト</td>
+                <td>独立した新規会話</td>
+                <td>会話なし、スクリプトのみ</td>
+              </tr>
+              <tr class="odd">
+                <td>並列性</td>
+                <td>デフォルト3並列</td>
+                <td>単一スクリプト</td>
+              </tr>
+              <tr class="even">
+                <td>向いている用途</td>
+                <td>判断・推論を要する複雑なタスク</td>
+                <td>機械的な多段パイプライン</td>
+              </tr>
+              <tr class="odd">
+                <td>トークンコスト</td>
+                <td>高い（フルLLMループ）</td>
+                <td>低い（標準出力のみ返る）</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          <strong>判断基準</strong>:
+          サブタスクが推論・判断・多段階の問題解決を要するなら<code>delegate_task</code>、機械的なデータ処理やスクリプト化されたワークフローなら<code>execute_code</code>を選ぶ。
+        </p>
+        <h3 id="85-恒久実行が必要な場合">8.5 恒久実行が必要な場合</h3>
+        <p>
+          セッションが閉じられても・プロセスが再起動してもタスクを継続させたい場合、<code>delegate_task</code>は不向きである（プロセス再起動後の子は<code>unknown</code>扱いになり再開されない）。代わりに以下を使う。
+        </p>
         <ul>
-          <li><strong>モデル</strong>：LLM本体。推論エンジンそのもの</li>
           <li>
-            <strong>Agent Harness（ビルダーハーネス）</strong>：Google Antigravity、Claude
-            Code、Codexといった製品自体に組み込まれているシステムプロンプト、コード取得の仕組み、オーケストレーション機構など
+            <code>cronjob(action="create")</code> ―
+            独立したエージェント実行としてスケジュールし、親ターンの中断の影響を受けない
           </li>
           <li>
-            <strong>User Harness（ユーザーハーネス）</strong
-            >：私たちユーザーが、自分たちのリポジトリやユースケースに合わせて追加で組み立てる仕組み（ルール文書、Skill、リンター設定、CIチェックなど）
+            <code>terminal(background=True, notify_on_complete=True)</code> ―
+            長時間シェルコマンドをバックグラウンドで継続
           </li>
         </ul>
+        <hr />
+        <h2 id="9-execute_codeによるトークン最適化">9. execute_codeによるトークン最適化</h2>
         <p>
-          本ガイドで「Harness Engineering」と呼ぶ場合、主にこの一番外側の<strong
-            >User Harnessをどう設計するか</strong
-          >という実践を指しています。
+          <code>execute_code</code
+          >は、Hermesツールをプログラム的に呼び出すPythonスクリプトをエージェントに書かせ、多段階ワークフローを1回のLLMターンに圧縮する仕組みである。スクリプトは子プロセスとして動作し、Unixドメインソケット経由のRPCでツールを呼び出す。<strong>中間結果はコンテキストウィンドウに一切入らず、<code>print()</code>の出力のみがLLMに返る</strong>点が最大の利点である。
+        </p>
+        <pre><code class="language-python">from hermes_tools import web_search, web_extract
+import json
+
+results = web_search("Rust async runtime 比較 2025", limit=5)
+summaries = []
+for r in results["data"]["web"]:
+    page = web_extract([r["url"]])
+    for p in page.get("results", []):
+        if p.get("content"):
+            summaries.append({"title": r["title"], "excerpt": p["content"][:500]})
+
+print(json.dumps(summaries, ensure_ascii=False, indent=2))</code></pre>
+        <h3 id="91-使うべき場面">9.1 使うべき場面</h3>
+        <ul>
+          <li>3回以上のツール呼び出しに処理ロジックが挟まる場合</li>
+          <li>大量データのフィルタリングや条件分岐</li>
+          <li>検索結果に対するループ処理</li>
+        </ul>
+        <h3 id="92-実行モードとリソース制限">9.2 実行モードとリソース制限</h3>
+        <p>
+          <code>code_execution.mode</code
+          >は<code>project</code>（デフォルト、アクティブな仮想環境のPythonを使用し作業ディレクトリもセッションと同じ）と<code>strict</code>（Hermes自身のPythonを使い、隔離された一時ディレクトリで実行）の2種類がある。再現性を最優先するCI的な用途では<code>strict</code>、通常の開発作業では<code>project</code>が適する。
+        </p>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr class="header">
+                <th>リソース</th>
+                <th>上限</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="odd">
+                <td>タイムアウト</td>
+                <td>300秒（SIGTERM→5秒後SIGKILL）</td>
+              </tr>
+              <tr class="even">
+                <td>標準出力</td>
+                <td>50KB（超過分は切り詰め）</td>
+              </tr>
+              <tr class="odd">
+                <td>標準エラー</td>
+                <td>10KB（非ゼロ終了時のみ出力に含まれる）</td>
+              </tr>
+              <tr class="even">
+                <td>ツール呼び出し回数</td>
+                <td>実行あたり50回</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          セキュリティ面では、子プロセスは<code>KEY</code> / <code>TOKEN</code> /
+          <code>SECRET</code> / <code>PASSWORD</code> / <code>CREDENTIAL</code> /
+          <code>AUTH</code
+          >を含む環境変数名をすべて除去した最小権限環境で動く。スキルが<code>required_environment_variables</code>を宣言していれば、そのスキルロード後は該当変数のみ自動的に通過する。この仕組みにより「任意コード実行だが秘密情報は漏れない」というバランスを取っている。
+        </p>
+        <p>
+          <strong>プラットフォーム制限</strong>:
+          Unixドメインソケットに依存するため<strong>Linux/macOSのみ</strong>対応。Windowsでは自動的に無効化され、通常の逐次ツール呼び出しにフォールバックする。
         </p>
         <hr />
-        <h2 id="4-feedforwardguidesとfeedbacksensors">
-          4. Feedforward（Guides）とFeedback（Sensors）
+        <h2 id="10-persistent-goalsgoal-ralph-loopの実践">
+          10. Persistent Goals（/goal）― Ralph loopの実践
         </h2>
-        <p>ハーネスを構成する要素は、大きく2つの働きに分類できます。</p>
+        <h3 id="101-概要と出典">10.1 概要と出典</h3>
+        <p>
+          <code>/goal</code
+          >は、ターンをまたいで生き続ける目標をエージェントに与える機能である。毎ターン後、補助モデル（judge）がゴールが達成されたかを判定し、未達なら継続プロンプトを自動投入して作業を続けさせる。これはOpenAIのCodex
+          CLI 0.128.0（Eric Traut氏実装）が普及させた「Ralph
+          loop」パターンへの、Hermes独自実装によるオマージュである。「ゴールが達成されるまで止まらない」という中核アイデアはCodex由来であることが公式ドキュメントに明記されている。
+        </p>
+        <h3 id="102-使うべき場面">10.2 使うべき場面</h3>
+        <p>
+          「3回も『続けて』と言うことになりそうなタスク」がまさに<code>/goal</code>の適用対象である。
+        </p>
+        <ul>
+          <li><code>src/</code>内のすべてのlintエラーを修正し<code>ruff check</code>を通す</li>
+          <li>リポジトリYの機能Xをテスト込みで移植し、CIをグリーンにする</li>
+          <li>セッションID漂流の原因を調査してレポートを書く</li>
+        </ul>
+        <p>1ターンで完結するタスクには不要である。</p>
+        <h3 id="103-動作の仕組み">10.3 動作の仕組み</h3>
+        <pre class="mermaid">
+flowchart TB
+    Set["/goal でゴール設定&lt;br/&gt;（デフォルト20ターン予算）"] --&gt; Turn["1ターン実行"]
+    Turn --&gt; Judge["補助モデルによる判定&lt;br/&gt;done or continue"]
+    Judge --&gt;|continue| Turn
+    Judge --&gt;|done| Done["✓ ゴール達成"]
+    Turn -.ターン予算超過.-&gt; Pause["⏸ 一時停止&lt;br/&gt;/goal resume で再開"]</pre
+        >
+        <p>
+          judgeは意図的に保守的に設計されており、「応答が明示的にゴール完了を確認している」「成果物が明確に生成されている」「ゴールが達成不能・ブロックされている」場合のみ<code>done</code>と判定する。judge自体がエラーを返した場合は<code>continue</code>扱いとなり（フェイルオープン）、暴走を防ぐ最終防波堤はターン予算（デフォルト20、<code>goals.max_turns</code>で変更可）である。
+        </p>
+        <h3 id="104-実務上の注意点">10.4 実務上の注意点</h3>
         <ul>
           <li>
-            <strong>Guides（フィードフォワード制御）</strong
-            >：エージェントが行動を起こす<strong>前に</strong>、望ましくない出力をあらかじめ予測して防ぐ仕組み。例：コーディング規約を書いたルール文書、Skill、テンプレート
+            ゴール実行中にユーザーが実際にメッセージを送ると、それは継続ループより<strong>常に優先</strong>される
           </li>
           <li>
-            <strong>Sensors（フィードバック制御）</strong
-            >：エージェントが行動を起こした<strong>後に</strong>観察し、自己修正を促す仕組み。例：リンターのエラーメッセージ、自動テスト、レビューエージェントの指摘
+            ゴール実行中に<strong>新しい</strong>ゴールを設定しようとすると拒否される。先に<code>/stop</code>してから再設定する
+          </li>
+          <li>
+            継続プロンプトは通常のuser
+            roleメッセージとして追記されるだけで、システムプロンプトを変更しないため、20ターンのゴール実行は20ターンの通常会話と<strong>同じキャッシュコスト</strong>で済む
+          </li>
+          <li>
+            judgeの誤判定（早すぎる<code>done</code>、または<code>continue</code>し続ける）はどちらも起こりうる。前者は追加メッセージで継続させ、後者はターン予算が保険になる
           </li>
         </ul>
+        <hr />
+        <h2 id="11-cron自動化のベストプラクティス">11. Cron自動化のベストプラクティス</h2>
+        <h3 id="111-スケジュール形式">11.1 スケジュール形式</h3>
+        <pre><code class="language-plaintext">30m             → 30分後に1回
+every 2h        → 2時間ごとに繰り返し
+0 9 * * *       → 毎日9:00（cron式）
+0 9 * * 1-5     → 平日9:00
+2026-03-15T09:00:00 → 特定日時に1回（ISO形式）</code></pre>
+        <h3 id="112-自己完結したプロンプトが必須">11.2 自己完結したプロンプトが必須</h3>
         <p>
-          重要なのは、この2つはセットで機能するという点です。フィードバックだけに頼ると、エージェントは何度も同じ間違いを繰り返します。逆にフィードフォワードだけでは、そのルールが実際に守られているかどうかを確認する手段がありません。
+          Cronジョブは<strong>完全にフレッシュなセッション</strong>で実行される。スキルが提供しない情報はすべてプロンプト自体に含める必要がある。
+        </p>
+        <pre><code class="language-plaintext">悪い例: 「サーバーの件を確認して」
+良い例: 「192.168.1.100にdeployユーザーでSSHし、
+        systemctl status nginx でnginxの稼働を確認し、
+        https://example.com がHTTP 200を返すか検証して」</code></pre>
+        <h3 id="113-ジョブの連鎖context_from">11.3 ジョブの連鎖（<code>context_from</code>）</h3>
+        <p>
+          複数ジョブをパイプライン化したい場合、<code>context_from</code>で前段ジョブの最新出力を後段ジョブのプロンプトへ自動的に前置できる。
         </p>
         <pre class="mermaid">
 flowchart LR
-    H["人間（エンジニア）"] --&gt;|"設計・改善する"| G["Guides&lt;br/&gt;(Feedforward)"]
-    H --&gt;|"設計・改善する"| S["Sensors&lt;br/&gt;(Feedback)"]
-    G --&gt;|"事前に行動を誘導"| A["コーディングエージェント"]
-    A --&gt;|"コード・PRを生成"| O["成果物"]
-    O --&gt; S
-    S --&gt;|"自己修正シグナルを返す"| A
-    S --&gt;|"繰り返し起きる問題を報告"| H</pre
+    J1["Job1: 収集&lt;br/&gt;HN上位10件を取得しraw.mdへ"] --&gt;|context_from| J2["Job2: 選別&lt;br/&gt;スコアリングしranked.mdへ"]
+    J2 --&gt;|context_from| J3["Job3: 配信&lt;br/&gt;ツイート下書き3本を作りTelegramへ"]</pre
         >
+        <pre><code class="language-python">cronjob(action="create", prompt="...", schedule="0 7 * * *", name="AI News Collector")
+cronjob(action="create", prompt="...", schedule="30 7 * * *",
+        context_from="&lt;job1_id&gt;", name="AI News Triage")
+cronjob(action="create", prompt="...", schedule="0 8 * * *",
+        context_from="&lt;job2_id&gt;", name="AI News Brief")</code></pre>
         <p>
-          人間の役割は、このループを**ステアリング（操縦）**することです。同じ問題が2回、3回と繰り返し発生したら、それはハーネス側（GuideかSensorのどちらか、あるいは両方）を改善すべきというサインになります。
+          各ジョブは<code>context_from</code>が指す先の<strong>直近の完了済み出力</strong>を読むだけで、他ジョブの完了を待つわけではない点に注意する。
         </p>
-        <hr />
-        <h2 id="5-computationalとinferential">5. ComputationalとInferential</h2>
-        <p>Guide・Sensorには、それぞれ実行方式による違いもあります。</p>
-        <div class="table-scroll">
-          <table>
-            <thead>
-              <tr class="header">
-                <th>分類</th>
-                <th>特徴</th>
-                <th>実行主体</th>
-                <th>速度・コスト</th>
-                <th>具体例</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr class="odd">
-                <td><strong>Computational（計算的）</strong></td>
-                <td>決定的（deterministic）で高速</td>
-                <td>CPU</td>
-                <td>ミリ秒〜秒単位、安価で信頼性が高い</td>
-                <td>テスト、リンター、型チェッカー、構造解析</td>
-              </tr>
-              <tr class="even">
-                <td><strong>Inferential（推論的）</strong></td>
-                <td>意味的な判断、非決定的</td>
-                <td>GPU/NPU（LLM自身）</td>
-                <td>数秒〜数十秒、高コストで結果がばらつく</td>
-                <td>AIによるコードレビュー、"LLM as judge"</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <p>
-          Computationalなセンサーは、あらゆる変更のたびに安価に実行できる一方、意味的な妥当性までは判断できません。Inferentialなセンサーはコストが高く非決定的ですが、豊かな文脈判断ができ、強力なモデルと組み合わせることで信頼性を高められます。
-        </p>
-        <p>Böckelerの記事にある整理表を、日本語でまとめ直すと次のようになります。</p>
-        <div class="table-scroll">
-          <table>
-            <thead>
-              <tr class="header">
-                <th>対象</th>
-                <th>方向</th>
-                <th>種別</th>
-                <th>実装例</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr class="odd">
-                <td>コーディング規約</td>
-                <td>Feedforward</td>
-                <td>Inferential</td>
-                <td>AGENTS.md、Skill</td>
-              </tr>
-              <tr class="even">
-                <td>新規プロジェクトの初期化手順</td>
-                <td>Feedforward</td>
-                <td>両方</td>
-                <td>手順を書いたSkill＋ブートストラップスクリプト</td>
-              </tr>
-              <tr class="odd">
-                <td>コード変換（Codemod）</td>
-                <td>Feedforward</td>
-                <td>Computational</td>
-                <td>自動リファクタリングツール</td>
-              </tr>
-              <tr class="even">
-                <td>構造テスト</td>
-                <td>Feedback</td>
-                <td>Computational</td>
-                <td>モジュール境界違反を検出するアーキテクチャテスト</td>
-              </tr>
-              <tr class="odd">
-                <td>レビュー手順</td>
-                <td>Feedback</td>
-                <td>Inferential</td>
-                <td>レビュー用Skill</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <hr />
-        <h2 id="6-3つの統制次元">6. 3つの統制次元</h2>
-        <p>
-          ハーネスが「何を」規律づけようとしているのかを整理すると、次の3つのカテゴリに分けられます。難易度も大きく異なります。
-        </p>
-        <div class="table-scroll">
-          <table>
-            <thead>
-              <tr class="header">
-                <th>統制次元</th>
-                <th>保証したいこと</th>
-                <th>Feedforwardの例</th>
-                <th>Feedbackの例</th>
-                <th>現在の成熟度</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr class="odd">
-                <td><strong>保守性ハーネス</strong><br />(Maintainability)</td>
-                <td>コードの重複排除・複雑度・スタイルの一貫性</td>
-                <td>AGENTS.md、Skill、Lint設定</td>
-                <td>静的解析、カバレッジ計測、循環的複雑度チェック</td>
-                <td>高い（既存ツールが豊富）</td>
-              </tr>
-              <tr class="even">
-                <td><strong>アーキテクチャ適合性ハーネス</strong><br />(Architecture Fitness)</td>
-                <td>性能・可観測性など非機能要件の維持</td>
-                <td>性能要件を書いたSkill、ロギング規約</td>
-                <td>性能テスト、ログ品質のレビュー</td>
-                <td>中程度</td>
-              </tr>
-              <tr class="odd">
-                <td><strong>振る舞いハーネス</strong><br />(Behaviour)</td>
-                <td>機能仕様どおりに動作しているか</td>
-                <td>機能仕様（spec）</td>
-                <td>テストスイート、手動テスト、承認済みフィクスチャ</td>
-                <td>低い（未解決の課題が多い）</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <p>
-          保守性は既存の静的解析ツールが流用できるため比較的簡単ですが、「振る舞いが仕様どおりか」を機械的に判定する方法は、業界全体でまだ発展途上です。AIが生成したテストスイートが本当に正しい振る舞いを検証できているかどうかを、AI自身に評価させることには限界があるためです。
-        </p>
-        <hr />
-        <h2 id="7-harness-engineeringとspec-driven-developmentの関係">
-          7. Harness EngineeringとSpec-Driven Developmentの関係
-        </h2>
-        <p>
-          ここまで見てきたハーネスの仕組みは、<strong>何を規律づけるべきかという「基準」がなければ機能しません</strong>。その基準を提供するのがSpec-Driven
-          Development（SDD、仕様駆動開発）です。
-        </p>
-        <p>
-          SDDとは、コードを書く前に「何を作るのか」「誰のためか」「成功基準は何か」を明文化した<strong>仕様書（spec）を主たる成果物</strong>として扱う開発手法です。コードは、その仕様から導かれる派生物という位置づけになります。
-        </p>
-        <ul>
-          <li>
-            <strong>SDDがなければ</strong
-            >：ハーネスが具体的に何を強制すればよいのか、参照する対象がありません
-          </li>
-          <li>
-            <strong>ハーネスがなければ</strong
-            >：仕様書を書いても、それが実際に守られているかを確認する手段がありません
-          </li>
-        </ul>
-        <p>
-          つまり、<strong>SDDが「規律の対象」を用意し、ハーネスが「規律を強制する仕組み」を提供する</strong>という、補完関係にあります。この考え方は複数の実践者が独立に強調しており、Harness
-          EngineeringはSpec-Driven
-          Developmentという土台があって初めて実用的になる、という指摘は業界内でも共通認識になりつつあります。
-        </p>
-        <hr />
-        <h2 id="8-googleにおける実践の全体像">8. Googleにおける実践の全体像</h2>
-        <p>
-          ここからは、Googleがこの理論をどう具体的なプロダクトに落とし込んでいるかを見ていきます。
-        </p>
-        <h3 id="81-google-antigravity">8.1 Google Antigravity</h3>
-        <p>
-          Google Antigravityは、Google
-          DeepMindが手がける「エージェントファースト」の開発環境です。エディタ・ターミナル・統合ブラウザを横断してエージェントを動かし、コード変更だけでなく、タスクリストやスクリーンショット、テスト出力といった「Artifacts（証跡）」を生成することで、人間が信頼して検証できるようにする設計思想を持っています。
-        </p>
-        <p>
-          ターミナル向けの軽量版として、Go言語で書かれたTUI（Terminal User Interface）である
-          <strong>Antigravity CLI（<code>agy</code>コマンド）</strong>
-          も提供されています。これはデスクトップ版のAntigravity
-          2.0と同じエージェントハーネスに接続しています。
-        </p>
-        <h3 id="82-agent-skillsgoogleskillsaddy-osmaniのagent-skills">
-          8.2 Agent Skills（google/skills、Addy Osmaniのagent-skills）
+        <h3 id="114-コストゼロのゲートwakeagent">
+          11.4 コストゼロのゲート：<code>wakeAgent</code>
         </h3>
         <p>
-          「Skill」とは、エージェントに特定タスクの方法論やドメイン知識を教える、軽量で移植可能な仕組みです。<code>SKILL.md</code>というMarkdownファイル1枚（＋任意のスクリプトやテンプレート）で構成されており、次の3段階の「プログレッシブ・ディスクロージャー（段階的開示）」でコンテキストウィンドウを節約します。
+          高頻度（1〜5分おき）のポーリングジョブで、状態に変化がない限りLLMを起動したくない場合、事前チェックスクリプトの最終行に次を出力させることで、そのティックのエージェント起動自体をスキップできる。
         </p>
-        <ol type="1">
-          <li>
-            <strong>Discovery（発見）</strong
-            >：起動時、エージェントはすべてのSkillの名前と説明（メタデータ、数百トークン程度）だけを読み込む
-          </li>
-          <li>
-            <strong>Activation（活性化）</strong
-            >：今のタスクがSkillの説明と一致したときだけ、<code>SKILL.md</code>本体（数千トークン程度）を読み込む
-          </li>
-          <li>
-            <strong>Execution（実行）</strong
-            >：必要に応じて、Skillに同梱されたスクリプトや参考資料を読み込む
-          </li>
-        </ol>
+        <pre><code class="language-json">{"wakeAgent": false}</code></pre>
         <p>
-          Googleは2026年のCloud Next（Google Cloudの年次イベント）で、BigQuery・Cloud
-          Run・Firebase・GKE・Gemini APIなどに関する公式Skill集を
-          <strong><code>github.com/google/skills</code></strong>
-          としてオープンソース公開しました。これにより、エージェントは古い学習データに頼るのではなく、Google製品に関する最新かつ正確な知識を都度読み込めるようになります。
+          ファイル変更ゲート・外部フラグゲート・SQL件数ゲートなど、この仕組みで大半の「変化があった時だけ動かす」ユースケースを$0で実現できる。さらに徹底したいなら、LLMを一切介さない<strong
+            >no-agent モード</strong
+          >（<code>no_agent=True</code>）でスクリプトの標準出力をそのまま配信するワークドッグ運用も可能である。
         </p>
+        <h3 id="115-モデルプロバイダのスナップショット">
+          11.5 モデル・プロバイダのスナップショット
+        </h3>
         <p>
-          もう一つ重要な取り組みが、Google
-          Chromeのエンジニアリングディレクターであり、フロントエンド分野で国際的に著名な開発者でもある
-          <strong>Addy Osmani</strong> が個人で公開した
-          <strong><code>addyosmani/agent-skills</code></strong>
-          です。これはGoogle社内のエンジニアリング文化（設計ドキュメント→レビュー→実装→可読性レビュー→リリースチェックリストという一連の流れや、「Software
-          Engineering at
-          Google」に登場するHyrumの法則、テストピラミッド、Beyonceルール、トランクベース開発などの考え方）を、20〜24個の構造化されたSkillとして蒸留し、一般公開したものです。
+          未指定（provider/modelを明示しない）で作成されたジョブは、作成時点のグローバルデフォルトを<strong>スナップショット</strong>する。後でグローバルデフォルトを変更しても、そのジョブは<strong>フェイルクローズ</strong>する（推論を呼ばず、実行をスキップしてアラートを送る）。これは「意図せず有料プロバイダへ切り替わって課金される」事故を防ぐ設計であり、変更を追随させたい場合は明示的にジョブを更新してピン留めし直す必要がある。
         </p>
-        <ul>
-          <li>
-            <code>DEFINE → PLAN → BUILD → VERIFY → REVIEW → SHIP</code>
-            という開発ライフサイクル全体をカバー
-          </li>
-          <li>
-            <code>/spec</code> <code>/plan</code> <code>/build</code> <code>/test</code>
-            <code>/review</code> <code>/ship</code> などのスラッシュコマンドで各フェーズを起動
-          </li>
-          <li>
-            各Skillには「アンチ合理化テーブル」が含まれ、「テストは後で書きます」のようなエージェントの言い訳を先回りして封じる設計になっている
-          </li>
-          <li>
-            Claude Code、Cursor、Gemini CLI、Windsurf、GitHub
-            Copilot、Kiroなど複数のツールで動作する
-          </li>
-        </ul>
-        <h3 id="83-agent-development-kitadk">8.3 Agent Development Kit（ADK）</h3>
+        <h3 id="116-ワークディレクトリとagentsmd">11.6 ワークディレクトリとAGENTS.md</h3>
         <p>
-          ADKはGoogleが提供するAIエージェント構築フレームワークです。ADK自体にもSkillの仕組み（<code>SkillToolset</code>）が組み込まれており、L1メタデータ（約100トークン）→L2命令本体（5,000トークン未満）→L3リソース、という前述と同様の段階的開示パターンを採用しています。
+          Cronジョブはデフォルトでどのリポジトリからも切り離されて動く（AGENTS.md等はロードされない）。<code>workdir</code>を指定するとそのディレクトリのAGENTS.md/CLAUDE.md/.cursorrulesが注入され、terminal・file系ツールもそのディレクトリを基準に動作する。ただし<code>workdir</code>付きジョブは並列プールではなく<strong>シーケンシャル</strong>に実行される点（プロセスグローバルなcwd状態の衝突を避けるため）は把握しておく必要がある。
         </p>
         <hr />
-        <h2 id="9-ステップバイステップ実践ガイド">9. ステップバイステップ実践ガイド</h2>
-        <p>
-          ここからは、実際にGoogle Antigravity（またはAntigravity
-          CLI）を題材に、ゼロからハーネスを組み立てていく手順を追っていきます。他のエージェント（Gemini
-          CLI、Claude Code等）でも考え方はそのまま応用できます。
-        </p>
-        <h3 id="step-1エージェントハーネスを選ぶ">Step 1：エージェントハーネスを選ぶ</h3>
-        <p>
-          まず、どの製品の上に自分たちのUser
-          Harnessを構築するかを決めます。Antigravityは「タスクのスループット（実装・テスト・検証を一気通貫でこなす力）」に強みがあり、Artifactsによる証跡管理を重視する現場に向いています。比較として、他の代表的な選択肢との違いを整理します。
-        </p>
-        <div class="table-scroll">
-          <table>
-            <thead>
-              <tr class="header">
-                <th>製品</th>
-                <th>強み</th>
-                <th>向いている場面</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr class="odd">
-                <td><strong>Google Antigravity</strong></td>
-                <td>
-                  エディタ・ターミナル・ブラウザ横断のオーケストレーションと検証、Artifactsによる証跡管理
-                </td>
-                <td>エンドツーエンドのタスク処理能力を重視したい場合</td>
-              </tr>
-              <tr class="even">
-                <td><strong>Cursor</strong></td>
-                <td>エディタ内での高速な反復（Tab補完、インライン編集）</td>
-                <td>エディタでの作業速度そのものを重視したい場合</td>
-              </tr>
-              <tr class="odd">
-                <td><strong>Kiro</strong></td>
-                <td>要件・設計・タスクを明示的に前面へ出したSpec-Driven Development、フック機構</td>
-                <td>最初から本番運用を見据えた仕様駆動を徹底したい場合</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <h3 id="step-2プロジェクトコンテキストをブートストラップするrules">
-          Step 2：プロジェクトコンテキストをブートストラップする（Rules）
-        </h3>
-        <p>Antigravityには3階層のコンテキストがあります。</p>
-        <div class="table-scroll">
-          <table>
-            <thead>
-              <tr class="header">
-                <th>階層</th>
-                <th>保存場所（例）</th>
-                <th>性質</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr class="odd">
-                <td><strong>Rules</strong></td>
-                <td><code>.agents/rules/</code></td>
-                <td>常時有効。すべての会話で読み込まれる</td>
-              </tr>
-              <tr class="even">
-                <td><strong>Skills</strong></td>
-                <td><code>.agents/skills/</code></td>
-                <td>オンデマンド。タスクが一致したときだけ読み込まれる</td>
-              </tr>
-              <tr class="odd">
-                <td><strong>Workflows</strong></td>
-                <td><code>.agents/workflows/</code></td>
-                <td>スラッシュコマンドで手動起動する定型プロセス</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <p>
-          既存のリポジトリ（READMEが古い、ドキュメントが更新されていないなど、よくある現場の状態）を対象にする場合、最初にやるべきことは「今のコードベースを理解したコンテキスト文書」を作ることです。<code>repo-research</code>のようなSkillを使い、次のように指示します。
-        </p>
-        <pre><code class="language-plaintext">このリポジトリを調査して、プロジェクトコンテキスト文書を作成してください</code></pre>
-        <p>
-          これにより、技術スタック・ディレクトリ構成・データモデル・外部連携などをまとめた<code>.agents/rules/project-context.md</code>が生成されます。以後のすべての会話がこの文書を自動的に参照するようになります。
-        </p>
-        <h3 id="step-3プロジェクト憲法constitutionを定義する">
-          Step 3：プロジェクト憲法（Constitution）を定義する
-        </h3>
-        <p>
-          次に、「非交渉の原則（non-negotiable
-          principles）」を定めた<strong>プロジェクト憲法</strong>を用意します。これは<code>.specify/memory/constitution.md</code>のようなファイルに保存され、後述するSDDサイクルの「計画」フェーズと「分析」フェーズで、この憲法に違反していないかが自動的にチェックされます。
-        </p>
-        <pre><code class="language-plaintext">/speckit.constitution
-このプロジェクトは1人の開発者が保守する小規模なエージェントです。
-以下の3原則を設定してください：
-(1) すべてのデータベース操作はツール定義ファイル経由で行い、
-    コード内に生SQLやORMを書かない
-(2) セッション状態は標準の仕組みだけを使い、独自の状態管理を作らない
-(3) シンプルさを最優先し、既存のファイル・命名規則を厳密に踏襲する</code></pre>
-        <p>
-          憲法が空のテンプレートのままだと、計画・分析フェーズのチェックには「照合する対象が何もない」状態になってしまいます。プロジェクトの規模やチーム体制に応じて、原則の数や内容は調整してください（チーム開発であれば、コードレビュー・テスト規律・可観測性・APIバージョニングなどの原則を追加するのが一般的です）。
-        </p>
-        <h3 id="step-4skillsでフィードフォワードを設計する">
-          Step 4：Skillsでフィードフォワードを設計する
-        </h3>
-        <p>Skillには大きく3つのカテゴリがあります。目的に応じて組み合わせます。</p>
-        <div class="table-scroll">
-          <table>
-            <thead>
-              <tr class="header">
-                <th>カテゴリ</th>
-                <th>役割</th>
-                <th>例</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr class="odd">
-                <td><strong>ドメイン知識</strong></td>
-                <td>特定の技術・APIについての正確な最新知識を与える</td>
-                <td><code>google/skills</code>（BigQuery、Cloud Run等）</td>
-              </tr>
-              <tr class="even">
-                <td><strong>方法論</strong></td>
-                <td>開発の進め方そのものを規律づける（Spec-Driven Developmentを強制する等）</td>
-                <td><code>obra/superpowers</code></td>
-              </tr>
-              <tr class="odd">
-                <td><strong>効率化</strong></td>
-                <td>トークン消費を抑え、やり取りを簡潔にする</td>
-                <td><code>JuliusBrussee/caveman</code></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <p>Skillなしでエージェントに機能追加を依頼すると、次の2つのギャップが生まれがちです。</p>
-        <ol type="1">
-          <li>
-            <strong>プロセスのギャップ</strong
-            >：構造がないと、エージェントはいきなりコードを書き始めてしまう。小さな修正なら問題ありませんが、複数ファイル・複数エンドポイントに影響する機能では、実装がバラバラになり、決定の記録も残りません
-          </li>
-          <li>
-            <strong>知識のギャップ</strong>：学習データが古く、非推奨のAPIやスキーマを使ってしまう
-          </li>
-        </ol>
-        <p>方法論Skillが(1)を、ドメイン知識Skillが(2)を埋める役割を担います。</p>
-        <h3 id="step-5mcpで知識ギャップを埋める">Step 5：MCPで知識ギャップを埋める</h3>
+        <h2 id="12-mcp統合のベストプラクティス">12. MCP統合のベストプラクティス</h2>
+        <h3 id="121-サーバー種別と設定">12.1 サーバー種別と設定</h3>
         <p>
           MCP（Model Context
-          Protocol）は、エージェントが外部システムと接続するための標準プロトコルです。BigQueryを例にすると、MCPサーバーに接続することで、エージェントは学習データにある古いスキーマ情報に頼るのではなく、<strong>実際のテーブル定義をその場で確認しながら</strong>仕様書やコードを生成できます。
+          Protocol）は外部ツールサーバーに接続する標準規格である。Hermesはstdioサーバー（ローカルサブプロセス）とHTTPサーバー（リモートエンドポイント）の両方を同じ設定ファイルで扱える。
         </p>
-        <pre><code class="language-json">{
-  "mcpServers": {
-    "bigquery": {
-      "serverUrl": "https://bigquery.googleapis.com/mcp",
-      "transport": "http",
-      "authProviderType": "google_credentials"
-    }
-  }
-}</code></pre>
-        <blockquote>
-          <p>
-            注意：MCPサーバーは既定で読み取り専用とは限りません。エージェントが生成したSQLをそのまま実行できてしまう場合があるため、本番環境ではIAMによるアクセス制御（読み取り専用の強制など）を必ず設定してください。
-          </p>
-        </blockquote>
-        <h3 id="step-6spec-driven-developmentサイクルを回す">
-          Step 6：Spec-Driven Developmentサイクルを回す
+        <pre><code class="language-yaml">mcp_servers:
+  filesystem:
+    command: "npx"
+    args: ["-y", "@modelcontextprotocol/server-filesystem", "/home/user/projects"]
+
+  linear:
+    url: "https://mcp.linear.app/mcp"
+    auth: oauth</code></pre>
+        <p>
+          OAuth
+          2.1が必要なホスト型MCPサーバー（Linear・Sentry・Atlassian・Asana・Figma・Stripeなど）は<code
+            >auth: oauth</code
+          >を指定するだけで、Hermesがディスカバリ・動的クライアント登録・PKCE・トークンリフレッシュまで面倒を見る。
+        </p>
+        <h3 id="122-ツール単位のフィルタリング">12.2 ツール単位のフィルタリング</h3>
+        <p>
+          サーバー丸ごとではなく、公開するツールを絞り込むのがセキュリティ上のベストプラクティスである。
+        </p>
+        <pre><code class="language-yaml">mcp_servers:
+  stripe:
+    url: "https://mcp.stripe.com"
+    tools:
+      exclude: [delete_customer, refund_payment]</code></pre>
+        <p>
+          <code>include</code
+          >（ホワイトリスト）と<code>exclude</code>（ブラックリスト）が両方指定された場合は<code>include</code>が優先される。すべてのツールがフィルタで除外され、かつリソース/プロンプトのユーティリティラッパーも無効化されている場合、Hermesはそのサーバーの空のツールセットを作らない（ツール一覧を汚さない）。
+        </p>
+        <h3 id="123-一意名前空間">12.3 一意名前空間</h3>
+        <p>
+          MCPツールは<code>mcp_&lt;server名&gt;_&lt;tool名&gt;</code>の形式で自動的にプレフィックスされ、組み込みツールと衝突しない。例えば<code>github</code>サーバーの<code>create-issue</code>ツールは<code>mcp_github_create_issue</code>として登録される。
+        </p>
+        <h3 id="124-並列実行と信頼できる用途のみ許可">12.4 並列実行と信頼できる用途のみ許可</h3>
+        <p>
+          読み取り専用の問い合わせなど、同時実行しても安全なツールに限り<code
+            >supports_parallel_tool_calls: true</code
+          >を設定すると並列実行が有効になる。書き込みを伴うツールや共有状態に触れるツールでは、競合状態のリスクを検証してから有効化すべきである。
+        </p>
+        <h3 id="125-資格情報の分離">12.5 資格情報の分離</h3>
+        <p>
+          stdioサーバーのサブプロセスには、ホストのシェル環境がそのまま渡ることはない。<code
+            >PATH</code
+          >
+          / <code>HOME</code> / <code>USER</code> /
+          <code>LANG</code
+          >などの安全な変数と、<code>env:</code>で明示的に指定した変数のみが渡される。エラーメッセージ中のGitHub
+          PAT・OpenAI形式キー・Bearerトークンなどは自動的に<code>[REDACTED]</code>へ置換される。
+        </p>
+        <h3 id="126-カタログ経由インストールの信頼モデル">
+          12.6 カタログ経由インストールの信頼モデル
         </h3>
         <p>
-          いよいよ「仕様を書いてからコードを生成する」中心のサイクルに入ります。GoogleのAntigravity関連コードラボでは、GitHubの<code>spec-kit</code>をベースにした、次の8フェーズのパイプラインが紹介されています。
-        </p>
-        <pre class="mermaid">
-flowchart TD
-    C0["/speckit.constitution&lt;br/&gt;プロジェクト憲法を定義"] --&gt; C1["/speckit.specify&lt;br/&gt;spec.md：何を作るか"]
-    C1 --&gt; C2{"/speckit.clarify（任意）&lt;br/&gt;曖昧な点を質問し反映"}
-    C2 --&gt; C3["/speckit.plan&lt;br/&gt;plan.md：どう作るか"]
-    C3 --&gt; C4["/speckit.tasks&lt;br/&gt;tasks.md：作業の分解"]
-    C4 --&gt; C5{"/speckit.analyze（任意）&lt;br/&gt;リスク・矛盾のチェック"}
-    C5 --&gt; C6["/speckit.implement&lt;br/&gt;コード生成・実装"]
-    C6 --&gt; C7{"人間レビュー&lt;br/&gt;仕様との整合性を確認"}
-    C7 --&gt;|"差分あり・要修正"| C1
-    C7 --&gt;|"承認"| C8["マージ・完了"]</pre
-        >
-        <div class="table-scroll">
-          <table>
-            <thead>
-              <tr class="header">
-                <th>フェーズ</th>
-                <th>コマンド</th>
-                <th>生成物</th>
-                <th>目的</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr class="odd">
-                <td>憲法策定</td>
-                <td><code>/speckit.constitution</code></td>
-                <td><code>constitution.md</code></td>
-                <td>非交渉の原則を定義（Step 3で実施済み）</td>
-              </tr>
-              <tr class="even">
-                <td>仕様化</td>
-                <td><code>/speckit.specify</code></td>
-                <td><code>spec.md</code></td>
-                <td>「何を作るか」をユーザー視点・技術非依存で記述</td>
-              </tr>
-              <tr class="odd">
-                <td>明確化（任意）</td>
-                <td><code>/speckit.clarify</code></td>
-                <td>更新された<code>spec.md</code></td>
-                <td>仕様の曖昧な箇所を質問し、回答を仕様へ反映</td>
-              </tr>
-              <tr class="even">
-                <td>計画</td>
-                <td><code>/speckit.plan</code></td>
-                <td><code>plan.md</code>、<code>data-model.md</code>、<code>research.md</code></td>
-                <td>「どう作るか」＝技術的アプローチ・データモデル・調査結果</td>
-              </tr>
-              <tr class="odd">
-                <td>タスク分解</td>
-                <td><code>/speckit.tasks</code></td>
-                <td><code>tasks.md</code></td>
-                <td>計画を実行可能な最小単位に分割（優先度・ファイルパス付き）</td>
-              </tr>
-              <tr class="even">
-                <td>分析（任意）</td>
-                <td><code>/speckit.analyze</code></td>
-                <td>分析レポート</td>
-                <td>タスクの抜け漏れ・矛盾・リスクを事前に検出</td>
-              </tr>
-              <tr class="odd">
-                <td>実装</td>
-                <td><code>/speckit.implement</code></td>
-                <td>コード変更</td>
-                <td>タスクを一つずつ実行し、チェックオフしていく</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <p>
-          ポイントは、<code>spec.md</code>が「何を」「誰のために」を記述し、実装の詳細（SQLテーブル名やAPI呼び出しの中身など）にはあえて触れない、という点です。実装の詳細は次の<code>plan.md</code>フェーズに委ねられます。各成果物はリポジトリに保存され、Gitでバージョン管理されるため、会話が途中で途切れても、あるいは後から見返しても、意思決定の記録が失われません。
-        </p>
-        <h3 id="step-7subagent駆動開発で実装する">Step 7：Subagent駆動開発で実装する</h3>
-        <p>
-          大きめの機能では、単一のエージェントがすべてを順番にこなすのではなく、役割分担された複数のサブエージェントにタスクを委譲する「Subagent駆動開発」が推奨されています。
-        </p>
-        <pre class="mermaid">
-sequenceDiagram
-    participant U as 開発者
-    participant M as メインエージェント
-    participant TI as Task Implementer
-    participant TR as Task Reviewer
-    participant FR as Final Code Reviewer
-    U-&gt;&gt;M: spec / planを承認
-    M-&gt;&gt;TI: タスク1を委譲
-    TI--&gt;&gt;M: 実装をコミット
-    M-&gt;&gt;TR: 実装のレビューを依頼
-    TR--&gt;&gt;M: 指摘、または承認
-    M-&gt;&gt;TI: タスク2を委譲（並列実行も可）
-    TI--&gt;&gt;M: 実装をコミット
-    M-&gt;&gt;FR: 全体を横断した最終レビュー
-    FR--&gt;&gt;U: レビュー結果のサマリーを報告</pre
-        >
-        <ul>
-          <li><strong>Task Implementer</strong>：計画中の特定タスクを実装する</li>
-          <li><strong>Task Reviewer</strong>：実装をspecと照らし合わせてレビューする</li>
-          <li><strong>Final Code Reviewer</strong>：全変更を横断した最終確認を行う</li>
-        </ul>
-        <p>
-          サブエージェントは個別のコンテキストウィンドウで作業するため、メインスレッドが実行ログで埋め尽くされることを防ぎ、並列実行も可能になります。
-        </p>
-        <h3 id="step-8フィードバックセンサーで検証する">
-          Step 8：フィードバックセンサーで検証する
-        </h3>
-        <p>
-          実装が完了したら、Step
-          5で選んだComputational／Inferentialなセンサーを実際に走らせて検証します。
-        </p>
-        <ul>
-          <li>
-            <strong>Computational</strong
-            >：型チェック、リンター、既存テストスイート、構造テスト（モジュール境界違反の検出など）
-          </li>
-          <li>
-            <strong>Inferential</strong
-            >：レビューエージェントによるコード品質判定、意味的な重複やオーバーエンジニアリングの検出
-          </li>
-        </ul>
-        <p>
-          一つのコツとして、Fowlerの記事では「センサーの出力はLLMが読みやすい形にする」ことが推奨されています。たとえば、単に「エラー」とだけ表示するのではなく、「このリンタールールに違反しています。修正するには〇〇してください」という<strong>自己修正の指示を含んだメッセージ</strong>をエージェントに返すと、人間を介さずにその場で直させやすくなります。
-        </p>
-        <h3 id="step-9ステアリングループでハーネスを継続的に改善する">
-          Step 9：ステアリングループでハーネスを継続的に改善する
-        </h3>
-        <p>
-          Harness
-          Engineeringは一度設定して終わりではなく、<strong>継続的なエンジニアリング実践</strong>です。同じ問題が繰り返し発生したら、それはハーネス（Guide・Sensorのどちらか、あるいは両方）を改善すべきサインです。
-        </p>
-        <ul>
-          <li>
-            頻発するミスに気づいたら → 新しいルールをRulesやSkillに追記する（Feedforward強化）
-          </li>
-          <li>
-            センサーがすり抜けを許した問題があれば →
-            新しい静的解析やテストを追加する（Feedback強化）
-          </li>
-          <li>
-            モデルの性能が上がり、あるルールが不要になったと感じたら →
-            そのハーネス部品を思い切って削除する
-          </li>
-        </ul>
-        <p>
-          最後の点は見落とされがちですが重要です。ハーネスの各部品は「モデルの限界を補うため」に存在しているので、その限界がなくなればハーネスも軽くしてよい、という発想です。
+          <code>hermes mcp catalog</code> /
+          <code>hermes mcp install &lt;name&gt;</code
+          >で導入できる公式カタログエントリはNousのPRレビューを経ているが、それでも**<code>source:</code>のリポジトリと<code>bootstrap</code>コマンドは自分の目で確認する**ことが推奨されている。マニフェストは<code>optional-mcps/&lt;name&gt;/manifest.yaml</code>としてGitHub上で公開されており、インストール前にレビューできる。
         </p>
         <hr />
-        <h2 id="10-変更のライフサイクルにおける配置keep-quality-left">
-          10. 変更のライフサイクルにおける配置（Keep Quality Left）
+        <h2 id="13-本番運用のセキュリティチェックリスト">
+          13. 本番運用のセキュリティ・チェックリスト
         </h2>
-        <p>
-          すべてのチェックを同じタイミングで行う必要はありません。コストと速度に応じて、変更のライフサイクルに沿って配置します。
-        </p>
+        <p>Hermesのセキュリティモデルは8層の多重防御として設計されている。</p>
         <pre class="mermaid">
-flowchart LR
-    subgraph Pre["コミット前"]
-        F1["リンター / 高速テストスイート"]
-    end
-    subgraph PR["PR作成時"]
-        F2["レビューエージェント / 静的解析"]
-    end
-    subgraph CI["統合パイプライン"]
-        F3["ミューテーションテスト / アーキテクチャレビュー"]
-    end
-    subgraph Prod["継続的モニタリング"]
-        F4["SLO監視 / ログ異常検知 / 依存関係スキャン"]
-    end
-    Pre --&gt; PR --&gt; CI --&gt; Prod
-    F4 -.-&gt;|"ドリフトを検出したら差し戻す"| Pre</pre
+flowchart TB
+    L1["1. ユーザー認可&lt;br/&gt;許可リスト・DMペアリング"]
+    L2["2. 危険コマンド承認&lt;br/&gt;Human-in-the-loop"]
+    L3["3. ファイル書き込み安全性&lt;br/&gt;拒否リスト・HERMES_WRITE_SAFE_ROOT"]
+    L4["4. コンテナ隔離&lt;br/&gt;Docker/Singularity/Modal"]
+    L5["5. MCP資格情報フィルタリング"]
+    L6["6. コンテキストファイルスキャン&lt;br/&gt;プロンプトインジェクション検知"]
+    L7["7. セッション間隔離&lt;br/&gt;cronパストラバーサル対策込み"]
+    L8["8. 入力サニタイズ&lt;br/&gt;作業ディレクトリの許可リスト検証"]
+    L1 --&gt; L2 --&gt; L3 --&gt; L4 --&gt; L5 --&gt; L6 --&gt; L7 --&gt; L8</pre
         >
-        <ul>
-          <li>
-            <strong>速く安いチェック</strong
-            >は、コミット前・統合前のできるだけ左（早い段階）で実行する
-          </li>
-          <li>
-            <strong>高価なチェック</strong
-            >（ミューテーションテスト、大局的なアーキテクチャレビューなど）は、統合後のパイプラインで、高速チェックの再実行と合わせて行う
-          </li>
-          <li>
-            <strong>継続的なドリフト検知</strong
-            >（デッドコード検出、テストカバレッジの質の分析、依存関係スキャナー）は、変更のたびにではなく、常時バックグラウンドで実行する
-          </li>
-        </ul>
-        <p>問題を見つけるタイミングが早いほど、修正コストは小さくなります。</p>
-        <hr />
-        <h2 id="11-アンチパターンと落とし穴">11. アンチパターンと落とし穴</h2>
+        <h3 id="131-危険コマンド承認">13.1 危険コマンド承認</h3>
+        <p>
+          承認モードは<code>smart</code>（補助LLMがリスクを判定、低リスクは自動承認・高リスクは自動拒否・不明確なものは人間に確認）、<code>manual</code>（常に確認）、<code>off</code>（<code>--yolo</code>相当、全チェック無効）の3種類。<strong>本番のゲートウェイでは<code>off</code>を使わない</strong>のが原則である。
+        </p>
+        <p>
+          さらに、<code>--yolo</code>や<code>approvals.mode: off</code
+          >を設定していても絶対に実行されない<strong>ハードラインブロックリスト</strong>が存在する。<code
+            >rm -rf /</code
+          >、フォーク爆弾、マウント済みルートデバイスへの<code>mkfs</code>、<code
+            >dd if=/dev/zero of=/dev/sd*</code
+          >などが該当し、これは承認レイヤーより手前でコマンドを止める、上書き不可能な床（floor）として機能する。
+        </p>
+        <p>
+          ユーザー定義の拒否ルール<code>approvals.deny</code>は、この床の一段上にある編集可能なガードレールで、<code>--yolo</code>より先に評価される。
+        </p>
+        <pre><code class="language-yaml">approvals:
+  deny:
+    - "git push --force*"
+    - "*curl*|*sh*"</code></pre>
+        <h3 id="132-コンテナバックエンドの選定">13.2 コンテナ・バックエンドの選定</h3>
         <div class="table-scroll">
           <table>
             <thead>
               <tr class="header">
-                <th>アンチパターン</th>
-                <th>何が起きるか</th>
-                <th>対策</th>
+                <th>バックエンド</th>
+                <th>隔離</th>
+                <th>危険コマンドチェック</th>
+                <th>適する用途</th>
               </tr>
             </thead>
             <tbody>
               <tr class="odd">
-                <td>巨大な単一ルールファイル</td>
+                <td>local</td>
+                <td>なし（ホスト上で実行）</td>
+                <td>実施される</td>
+                <td>開発・信頼できるユーザー</td>
+              </tr>
+              <tr class="even">
+                <td>ssh</td>
+                <td>リモートマシン</td>
+                <td>実施される</td>
+                <td>別サーバーでの実行</td>
+              </tr>
+              <tr class="odd">
+                <td>docker</td>
+                <td>コンテナ</td>
+                <td>スキップ（コンテナが境界）</td>
+                <td>本番ゲートウェイ</td>
+              </tr>
+              <tr class="even">
+                <td>modal / daytona</td>
+                <td>クラウドサンドボックス</td>
+                <td>スキップ</td>
+                <td>スケーラブルなクラウド隔離</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          本番のメッセージングゲートウェイでは、危険コマンド承認そのものを不要にする<strong
+            >コンテナバックエンド（Docker/Modal/Daytona/Vercel Sandbox）の採用</strong
+          >が推奨されている。コンテナはケイパビリティを<code>ALL</code>ドロップした上で必要最小限（<code>DAC_OVERRIDE</code>・<code>CHOWN</code>・<code>FOWNER</code>）のみ再付与し、<code>no-new-privileges</code>・プロセス数制限・サイズ制限付き<code>tmpfs</code>が既定で適用される。
+        </p>
+        <h3 id="133-ゲートウェイ認可">13.3 ゲートウェイ認可</h3>
+        <p>
+          <strong><code>GATEWAY_ALLOW_ALL_USERS=true</code>を本番で使わない</strong
+          >ことが最重要事項である。プラットフォーム別許可リスト（<code>TELEGRAM_ALLOWED_USERS</code>など）かDMペアリング（ワンタイムコード＋所有者承認）を使う。認可チェックの優先順位は「プラットフォーム別all-allowフラグ
+          → DMペアリング承認済みリスト → プラットフォーム別許可リスト → グローバル許可リスト →
+          グローバルall-allow → デフォルト拒否」の順である。
+        </p>
+        <h3 id="134-ssrf対策とwebアクセス方針">13.4 SSRF対策とWebアクセス方針</h3>
+        <p>
+          Web検索・抽出・ブラウザ・vision URL取得はすべて、RFC
+          1918プライベートアドレス・ループバック・リンクローカル（クラウドメタデータ<code>169.254.169.254</code>含む）・CGNAT空間へのアクセスをデフォルトでブロックする。DNS解決失敗もfail-closed（ブロック扱い）として扱われ、リダイレクトチェーンもホップごとに再検証される。社内サービスへのアクセスを意図的に許可する必要がある特殊な環境でのみ<code
+            >security.allow_private_urls: true</code
+          >を検討する。
+        </p>
+        <h3 id="135-tirithによる実行前スキャン">13.5 Tirithによる実行前スキャン</h3>
+        <p>
+          コマンド実行前に<a href="https://github.com/sheeki03/tirith">tirith</a
+          >というコンテンツレベルのスキャナが追加で動作し、ホモグラフURLスプーフィング（国際化ドメイン攻撃）やパイプ・トゥ・インタープリタパターン（`curl
+          | bash`など）をパターンマッチだけでは検出できない粒度で検知する。
+        </p>
+        <h3 id="136-サプライチェーンアドバイザリ">13.6 サプライチェーン・アドバイザリ</h3>
+        <p>
+          既知の侵害されたパッケージバージョン（例として2026年5月の<code>mistralai 2.4.6</code
+          >汚染事案が挙げられている）に一致するPythonパッケージがアクティブなvenvにないか、起動時に検査される。<code
+            >hermes doctor</code
+          >で詳細な是正手順を確認できる。
+        </p>
+        <h3 id="137-本番デプロイチェックリスト">13.7 本番デプロイ・チェックリスト</h3>
+        <ol type="1">
+          <li>
+            明示的な許可リストを設定する（<code>GATEWAY_ALLOW_ALL_USERS=true</code>は使わない）
+          </li>
+          <li>コンテナバックエンド（<code>terminal.backend: docker</code>等）を使う</li>
+          <li>CPU・メモリ・ディスクのリソース制限を適切に設定する</li>
+          <li><code>.env</code>のパーミッションを<code>chmod 600</code>にする</li>
+          <li>DMペアリングを有効化し、ユーザーIDのハードコードを避ける</li>
+          <li><code>command_allowlist</code>を定期的に監査する</li>
+          <li><code>terminal.cwd</code>を機密ディレクトリに設定しない</li>
+          <li>ゲートウェイをrootで実行しない</li>
+          <li><code>~/.hermes/logs/</code>を監視する</li>
+          <li><code>hermes update</code>を定期的に実行する</li>
+        </ol>
+        <hr />
+        <h2 id="14-コスト最適化とプロンプトキャッシュ">14. コスト最適化とプロンプトキャッシュ</h2>
+        <h3 id="141-プロンプトキャッシュを壊さない">14.1 プロンプトキャッシュを壊さない</h3>
+        <p>
+          多くのLLMプロバイダは会話プレフィックス（システムプロンプト＋履歴）をキャッシュする。システムプロンプトが安定していれば（同じコンテキストファイル、同じメモリ）、以降のメッセージはキャッシュヒットにより大幅に安価になる。キャッシュはモデルとアカウントに紐づくため、<code>/model</code>での明示的切り替え、自動プロバイダフォールバック、資格情報プールのローテーションはいずれも<strong>次のターンで会話全体を通常価格で再読み込みさせる</strong>。長いセッションでの頻繁なモデル切り替えはコストを大きく押し上げる。
+        </p>
+        <h3 id="142-実務上のコスト削減パターン">14.2 実務上のコスト削減パターン</h3>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr class="header">
+                <th>手法</th>
+                <th>効果</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="odd">
+                <td><code>/compress</code>を早めに使う</td>
+                <td>会話履歴を要約し、トークン数を大幅に削減</td>
+              </tr>
+              <tr class="even">
+                <td><code>delegate_task</code>で並列調査</td>
+                <td>各サブエージェントの最終要約のみが親のコンテキストに戻る</td>
+              </tr>
+              <tr class="odd">
+                <td><code>execute_code</code>でバッチ処理</td>
+                <td>中間ツール結果がコンテキストに入らず、<code>print()</code>のみ返る</td>
+              </tr>
+              <tr class="even">
+                <td>cronの<code>enabled_toolsets</code>を絞る</td>
+                <td>使わないtoolset（browser・delegationなど）を毎回のツールスキーマから除外</td>
+              </tr>
+              <tr class="odd">
+                <td>補助タスク（curator・goal judge・background review）を安価なモデルへ</td>
+                <td>メイン会話のキャッシュとは独立して低コスト化できる</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <h3 id="143-補助モデルのルーティング">14.3 補助モデルのルーティング</h3>
+        <p>
+          curator・goal
+          judge・memory/skillのバックグラウンドレビューは、いずれも独立した「補助タスク」スロットとして扱われ、メインモデルとは別のプロバイダ/モデルを指定できる。
+        </p>
+        <pre><code class="language-yaml">auxiliary:
+  background_review:
+    provider: openrouter
+    model: google/gemini-3-flash-preview
+  goal_judge:
+    provider: openrouter
+    model: google/gemini-3-flash-preview</code></pre>
+        <p>
+          メインモデルと異なるモデルを指定した場合、そのレビューはメインの会話プレフィックスキャッシュを再利用できないため、直近ターン＋古い部分の要約という「ダイジェスト」形式で会話を再現し、新しいキャッシュへの書き込みコストを最小化する設計になっている。
+        </p>
+        <hr />
+        <h2 id="15-トラブルシューティング">15. トラブルシューティング</h2>
+        <pre class="mermaid">
+flowchart TB
+    Start["問題が発生"] --&gt; Q1{"MCPツールが&lt;br/&gt;見えない?"}
+    Q1 --&gt;|Yes| Q1a{"サーバーは&lt;br/&gt;接続済み?"}
+    Q1a --&gt;|No| Fix1["hermes mcp login /&lt;br/&gt;OAuth再認証"]
+    Q1a --&gt;|Yes| Fix2["tools.include/excludeの&lt;br/&gt;設定を確認"]
+    Q1 --&gt;|No| Q2{"承認プロンプトが&lt;br/&gt;出ない?"}
+    Q2 --&gt;|Yes| Fix3["approvals.mode /&lt;br/&gt;command_allowlistを確認"]
+    Q2 --&gt;|No| Q3{"メモリ/スキルが&lt;br/&gt;更新されない?"}
+    Q3 --&gt;|Yes| Fix4["write_approvalの&lt;br/&gt;pendingキューを確認"]
+    Q3 --&gt;|No| Q4{"Cronジョブが&lt;br/&gt;実行されない?"}
+    Q4 --&gt;|Yes| Fix5["hermes cron status /&lt;br/&gt;runsで履歴確認"]</pre
+        >
+        <h3 id="151-よくある落とし穴">15.1 よくある落とし穴</h3>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr class="header">
+                <th>症状</th>
+                <th>主な原因</th>
+                <th>対処</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="odd">
+                <td>MCPツールが一覧に出ない</td>
+                <td>サーバー未接続・フィルタで除外・<code>enabled: false</code></td>
+                <td><code>/reload-mcp</code>後にログ確認、<code>tools.include</code>を見直す</td>
+              </tr>
+              <tr class="even">
+                <td>Docker内でユーザーがpairing approveできない</td>
+                <td><code>docker exec</code>がデフォルトでrootになりファイル権限が合わない</td>
+                <td><code>docker exec -u hermes ...</code>で実行する</td>
+              </tr>
+              <tr class="odd">
+                <td>cronジョブが急に課金モデルに切り替わって驚いた</td>
+                <td>グローバルデフォルト変更前に作成したジョブがスナップショットを保持</td>
                 <td>
-                  すべてが「重要」だと書かれた結果、実質何も守られない。ファイルはすぐに陳腐化し、機械的な検証もできない
+                  ジョブは意図通りフェイルクローズしている。明示的に<code>provider</code>/<code>model</code>をピン留めする
                 </td>
-                <td>Rules／Skillを機能単位に分割し、常時読み込む部分は「地図」に留める</td>
               </tr>
               <tr class="even">
-                <td>フィードバックのみに依存</td>
-                <td>エージェントが同じ間違いを何度も繰り返す</td>
-                <td>頻発する間違いはフィードフォワード（ルール）側に反映する</td>
+                <td>OAuth MCPサーバーでトークンが取得できているように見えるが実際は失敗</td>
+                <td>
+                  一部プロバイダ（Google
+                  Drive等）が動的クライアント登録を拒否しつつ<code>tools/list</code>は無認証で応答する
+                </td>
+                <td>
+                  独自OAuthクライアントを作成し<code>oauth.client_id</code>/<code>client_secret</code>を設定する
+                </td>
               </tr>
               <tr class="odd">
-                <td>フィードフォワードのみに依存</td>
-                <td>ルールを書いても、実際に守られているか確認できない</td>
-                <td>対応するセンサー（テスト・リンター）を必ずセットで用意する</td>
+                <td>長時間セッションで応答が遅い・高コスト</td>
+                <td>プロンプトキャッシュが頻繁なモデル切り替えで破棄されている</td>
+                <td>モデル切り替え頻度を下げる、<code>/compress</code>を使う</td>
               </tr>
               <tr class="even">
-                <td>AI生成テストへの過信</td>
-                <td>テストが「グリーン」であることと「仕様どおりの振る舞い」であることは別問題</td>
-                <td>承認済みフィクスチャ等のパターンを併用し、人間によるレビューを残す</td>
-              </tr>
-              <tr class="odd">
-                <td>ハーネスを一度作って放置する</td>
-                <td>モデルが進化しても、不要になった制約が残り続け、逆に足かせになる</td>
-                <td>ステアリングループを回し、定期的にハーネスを棚卸しする</td>
-              </tr>
-              <tr class="even">
-                <td>プロジェクト憲法を空テンプレートのまま放置</td>
-                <td>計画・分析フェーズのチェックが「照合対象なし」で機能しなくなる</td>
-                <td>最低限の原則（3つ程度でも可）を必ず明文化する</td>
-              </tr>
-              <tr class="odd">
-                <td>すべてを一つのエージェントに任せる</td>
-                <td>大きなタスクで実行ログがコンテキストを埋め尽くす</td>
-                <td>Subagent駆動開発でタスクを分割・並列化する</td>
+                <td>Windowsでexecute_codeが動かない</td>
+                <td>Unixドメインソケット非対応</td>
+                <td>仕様通り。<code>terminal</code>ツールへのフォールバックを前提に設計する</td>
               </tr>
             </tbody>
           </table>
         </div>
         <hr />
-        <h2 id="12-業界の広がり--openaiとの比較">12. 業界の広がり ― OpenAIとの比較</h2>
-        <p>
-          Googleだけでなく、他社もそれぞれのやり方でハーネスの設計に取り組んでいます。比較のために、OpenAIがCodexエージェントを使い、人間がコードを一切手で書かずに約100万行規模のプロダクトを開発した事例を簡単に紹介します。
-        </p>
-        <ul>
+        <h2 id="16-ベストプラクティス総括チェックリスト">
+          16. ベストプラクティス総括チェックリスト
+        </h2>
+        <ul class="task-list checklist-grid">
           <li>
-            巨大な単一の指示ファイルではなく、短い案内文書（目次の役割）から、詳細なドキュメント群へのリンクをたどらせる構成にした
+            <label class="checklist-item"
+              ><input type="checkbox" /><span class="checklist-text"
+                >プロファイルを用途別（開発／本番／検証）に分離している</span
+              ></label
+            >
           </li>
-          <li>レイヤードアーキテクチャを、独自のリンターと構造テストで機械的に強制した</li>
           <li>
-            「AIのゴミ（AI
-            Slop）」を人間が毎週手作業で片付けるのは持続不可能だったため、方針をコードに落とし込み、定期的にドリフトを検出して自動でリファクタリングPRを送る仕組み（ゴミ収集になぞらえて「ガベージコレクション」と呼ばれる）を構築した
+            <label class="checklist-item"
+              ><input type="checkbox" /><span class="checklist-text"
+                >MEMORY.md/USER.mdの容量が80%を超えたら統合する運用にしている</span
+              ></label
+            >
+          </li>
+          <li>
+            <label class="checklist-item"
+              ><input type="checkbox" /><span class="checklist-text"
+                >メモリ・スキルの<code>write_approval</code>を、信頼度に応じて有効化するか判断済み</span
+              ></label
+            >
+          </li>
+          <li>
+            <label class="checklist-item"
+              ><input type="checkbox" /><span class="checklist-text"
+                >AGENTS.mdは<code>context_file_max_chars</code>以内に収め、やってはいけないことを明記している</span
+              ></label
+            >
+          </li>
+          <li>
+            <label class="checklist-item"
+              ><input type="checkbox" /><span class="checklist-text"
+                >サブエージェントへの委任では<code>goal</code>と<code>context</code>に必要な情報を過不足なく詰めている</span
+              ></label
+            >
+          </li>
+          <li>
+            <label class="checklist-item"
+              ><input type="checkbox" /><span class="checklist-text"
+                >恒久実行が必要な処理は<code>delegate_task</code>ではなく<code>cronjob</code>/<code
+                  >background terminal</code
+                >を使っている</span
+              ></label
+            >
+          </li>
+          <li>
+            <label class="checklist-item"
+              ><input type="checkbox" /><span class="checklist-text"
+                >Cronジョブのプロンプトは完全に自己完結している</span
+              ></label
+            >
+          </li>
+          <li>
+            <label class="checklist-item"
+              ><input type="checkbox" /><span class="checklist-text"
+                >高頻度ポーリングジョブには<code>wakeAgent</code>ゲートを設けてLLM起動コストを削減している</span
+              ></label
+            >
+          </li>
+          <li>
+            <label class="checklist-item"
+              ><input type="checkbox" /><span class="checklist-text"
+                >本番ゲートウェイは<code>GATEWAY_ALLOW_ALL_USERS=true</code>を使わず、許可リストかDMペアリングを使っている</span
+              ></label
+            >
+          </li>
+          <li>
+            <label class="checklist-item"
+              ><input type="checkbox" /><span class="checklist-text"
+                >本番ゲートウェイはコンテナバックエンド（Docker/Modal/Daytona）で動かしている</span
+              ></label
+            >
+          </li>
+          <li>
+            <label class="checklist-item"
+              ><input type="checkbox" /><span class="checklist-text"
+                >MCPサーバーは<code>tools.include</code>/<code>exclude</code>でツール単位に絞り込んでいる</span
+              ></label
+            >
+          </li>
+          <li>
+            <label class="checklist-item"
+              ><input type="checkbox" /><span class="checklist-text"
+                >コミュニティ製スキル・MCPは<code>hermes skills inspect</code
+                >等でレビューしてから導入している</span
+              ></label
+            >
+          </li>
+          <li>
+            <label class="checklist-item"
+              ><input type="checkbox" /><span class="checklist-text"
+                >モデル切り替え頻度を抑え、プロンプトキャッシュのヒット率を意識している</span
+              ></label
+            >
+          </li>
+          <li>
+            <label class="checklist-item"
+              ><input type="checkbox" /><span class="checklist-text"
+                >Curatorのバックアップ（<code>curator.backup.enabled</code>）を有効なままにしている</span
+              ></label
+            >
+          </li>
+          <li>
+            <label class="checklist-item"
+              ><input type="checkbox" /><span class="checklist-text"
+                ><code>hermes update</code>を定期的に実行しセキュリティパッチを取り込んでいる</span
+              ></label
+            >
           </li>
         </ul>
-        <p>
-          Googleのアプローチ（Antigravity＋spec-kit＋Agent
-          Skills）と比べると、目指す方向性（仕様を先に固定する、ルールを構造化して機械的に検証する、継続的にドリフトを検出する）には共通点が多く、Harness
-          Engineeringが特定のベンダーに依存しない、業界横断の実践知になりつつあることがうかがえます。
-        </p>
         <hr />
-        <h2 id="13-実践チェックリスト">13. 実践チェックリスト</h2>
-        <p>導入時に確認したい項目をまとめました。</p>
-        <ul class="task-list">
-          <li>
-            <label
-              ><input type="checkbox" />プロジェクトコンテキスト文書（Rules）を用意したか</label
-            >
-          </li>
-          <li>
-            <label
-              ><input
-                type="checkbox"
-              />プロジェクト憲法（非交渉の原則）を最低限でも明文化したか</label
-            >
-          </li>
-          <li>
-            <label
-              ><input
-                type="checkbox"
-              />方法論・ドメイン知識・効率化の3種類のSkillをそれぞれ検討したか</label
-            >
-          </li>
-          <li>
-            <label
-              ><input
-                type="checkbox"
-              />MCP等で「実際のデータ・スキーマ」にエージェントがアクセスできるようにしたか</label
-            >
-          </li>
-          <li>
-            <label
-              ><input
-                type="checkbox"
-              />仕様（spec）→計画（plan）→タスク分解→実装、というサイクルを踏んでいるか</label
-            >
-          </li>
-          <li>
-            <label
-              ><input
-                type="checkbox"
-              />Computationalなセンサー（リンター・テスト・構造チェック）を用意したか</label
-            >
-          </li>
-          <li>
-            <label
-              ><input
-                type="checkbox"
-              />Inferentialなセンサー（レビューエージェント）を、コストに見合う範囲で導入したか</label
-            >
-          </li>
-          <li>
-            <label
-              ><input
-                type="checkbox"
-              />センサーのメッセージは、エージェントが自己修正しやすい形になっているか</label
-            >
-          </li>
-          <li>
-            <label
-              ><input
-                type="checkbox"
-              />変更のライフサイクル（コミット前／PR／CI／継続監視）に応じてチェックを分散させたか</label
-            >
-          </li>
-          <li>
-            <label
-              ><input
-                type="checkbox"
-              />同じ問題が繰り返し起きていないか、定期的にハーネスを棚卸ししているか</label
-            >
-          </li>
-        </ul>
-        <hr />
-        <h2 id="14-まとめ">14. まとめ</h2>
+        <h2 id="17-参考文献出典">17. 参考文献・出典</h2>
         <p>
-          Harness
-          Engineeringは、「AIコーディングエージェントの性能はモデル単体では決まらず、その周りに何を構築するかで決まる」という認識から生まれた、比較的新しいエンジニアリング実践です。
+          本ガイドは以下の一次情報源（Hermes
+          Agent公式ドキュメント・公式GitHubリポジトリ）および、国際的な技術メディア・著名開発者の発信に基づいて作成した。
         </p>
-        <ul>
-          <li>
-            ハーネスは**Guides（事前の誘導）<strong>と</strong>Sensors（事後の自己修正）**の両輪で成り立つ
-          </li>
-          <li>
-            実行方式には**Computational（決定的）<strong>と</strong>Inferential（推論的）**の2種類があり、コストと信頼性のトレードオフがある
-          </li>
-          <li>
-            規律の対象は<strong>保守性・アーキテクチャ適合性・振る舞い</strong>の3次元に分けられ、難易度はこの順で上がっていく
-          </li>
-          <li>
-            ハーネスが機能するには、規律の基準を与える<strong>Spec-Driven Development</strong
-            >が土台として必要になる
-          </li>
-          <li>
-            Googleは、この考え方をGoogle Antigravity、Agent Skills（<code>google/skills</code>、Addy
-            Osmaniの<code>agent-skills</code>）、ADKといった具体的な製品・オープンソースの形に落とし込んでいる
-          </li>
-          <li>
-            ハーネスは一度作って終わりではなく、<strong>ステアリングループ</strong>を回しながら継続的に改善し、モデルの進化に応じて不要な部分は削っていく実践である
-          </li>
-        </ul>
-        <p>
-          まずは自分のリポジトリに、小さなプロジェクトコンテキストと2〜3個の原則を書いた憲法を用意するところから始めてみてください。
-        </p>
-        <hr />
-        <h2 id="15-参考文献">15. 参考文献</h2>
         <div class="ref-grid">
           <div class="ref-card">
-            <h3 id="harness-engineeringの基礎理論">Harness Engineeringの基礎理論</h3>
+            <h4>公式ドキュメント・リポジトリ</h4>
             <ul>
               <li>
-                Birgitta Böckeler（Thoughtworks）, "Harness engineering for coding agent users,"
-                martinfowler.com, 2026年4月2日
-                <a href="https://martinfowler.com/articles/harness-engineering.html"
-                  >↗ https://martinfowler.com/articles/harness-engineering.html</a
+                Hermes Agent公式ドキュメント トップ:
+                <a href="https://hermes-agent.nousresearch.com/docs/"
+                  >https://hermes-agent.nousresearch.com/docs/</a
                 >
               </li>
               <li>
-                Loiane Groner, "Harness Engineering: The Missing Layer in Specs-Driven AI
-                Development," 2026年4月14日
+                GitHubリポジトリ（README）:
+                <a href="https://github.com/nousresearch/hermes-agent"
+                  >https://github.com/nousresearch/hermes-agent</a
+                >
+              </li>
+              <li>
+                Architecture:
+                <a href="https://hermes-agent.nousresearch.com/docs/developer-guide/architecture"
+                  >https://hermes-agent.nousresearch.com/docs/developer-guide/architecture</a
+                >
+              </li>
+              <li>
+                Security:
+                <a href="https://hermes-agent.nousresearch.com/docs/user-guide/security"
+                  >https://hermes-agent.nousresearch.com/docs/user-guide/security</a
+                >
+              </li>
+              <li>
+                Skills System:
+                <a href="https://hermes-agent.nousresearch.com/docs/user-guide/features/skills"
+                  >https://hermes-agent.nousresearch.com/docs/user-guide/features/skills</a
+                >
+              </li>
+              <li>
+                Curator:
+                <a href="https://hermes-agent.nousresearch.com/docs/user-guide/features/curator"
+                  >https://hermes-agent.nousresearch.com/docs/user-guide/features/curator</a
+                >
+              </li>
+              <li>
+                Persistent Memory:
+                <a href="https://hermes-agent.nousresearch.com/docs/user-guide/features/memory"
+                  >https://hermes-agent.nousresearch.com/docs/user-guide/features/memory</a
+                >
+              </li>
+              <li>
+                Context Files:
                 <a
-                  href="https://loiane.com/2026/04/harness-engineering-missing-layer-specs-driven-ai-development/"
-                  >↗
-                  https://loiane.com/2026/04/harness-engineering-missing-layer-specs-driven-ai-development/</a
+                  href="https://hermes-agent.nousresearch.com/docs/user-guide/features/context-files"
+                  >https://hermes-agent.nousresearch.com/docs/user-guide/features/context-files</a
                 >
               </li>
               <li>
-                Nestr Blog, "What Is Harness Engineering? How the Newest AI Agent Discipline Maps to
-                Organisational Governance"（Mitchell Hashimotoによる用語提唱の経緯を含む）
-                <a href="https://nestr.io/blog/harness-engineering-ai-agents"
-                  >↗ https://nestr.io/blog/harness-engineering-ai-agents</a
+                MCP (Model Context Protocol):
+                <a href="https://hermes-agent.nousresearch.com/docs/user-guide/features/mcp"
+                  >https://hermes-agent.nousresearch.com/docs/user-guide/features/mcp</a
+                >
+              </li>
+              <li>
+                Subagent Delegation:
+                <a href="https://hermes-agent.nousresearch.com/docs/user-guide/features/delegation"
+                  >https://hermes-agent.nousresearch.com/docs/user-guide/features/delegation</a
+                >
+              </li>
+              <li>
+                Code Execution:
+                <a
+                  href="https://hermes-agent.nousresearch.com/docs/user-guide/features/code-execution"
+                  >https://hermes-agent.nousresearch.com/docs/user-guide/features/code-execution</a
+                >
+              </li>
+              <li>
+                Persistent Goals(/goal):
+                <a href="https://hermes-agent.nousresearch.com/docs/user-guide/features/goals"
+                  >https://hermes-agent.nousresearch.com/docs/user-guide/features/goals</a
+                >
+              </li>
+              <li>
+                Scheduled Tasks (Cron):
+                <a href="https://hermes-agent.nousresearch.com/docs/user-guide/features/cron"
+                  >https://hermes-agent.nousresearch.com/docs/user-guide/features/cron</a
+                >
+              </li>
+              <li>
+                Tips &amp; Best Practices（公式ベストプラクティス集）:
+                <a href="https://hermes-agent.nousresearch.com/docs/guides/tips"
+                  >https://hermes-agent.nousresearch.com/docs/guides/tips</a
+                >
+              </li>
+              <li>
+                llms.txt（ドキュメント全体の索引）:
+                <a
+                  href="https://hermes-agent.nousresearch.com/docs/assets/files/llms-faaf9398aa5828403fd56f6be7989c9f.txt"
+                  >https://hermes-agent.nousresearch.com/docs/assets/files/llms-faaf9398aa5828403fd56f6be7989c9f.txt</a
                 >
               </li>
             </ul>
           </div>
           <div class="ref-card">
-            <h3 id="googleでの実践">Googleでの実践</h3>
+            <h4>業界動向・第三者メディア（国際的な技術メディア）</h4>
             <ul>
               <li>
-                Addy Osmani（Google Chrome Engineering Director）, "Agent Skills"
-                <a href="https://addyosmani.com/blog/agent-skills/"
-                  >↗ https://addyosmani.com/blog/agent-skills/</a
-                >
-              </li>
-              <li>
-                addyosmani/agent-skills（GitHubリポジトリ）
-                <a href="https://github.com/addyosmani/agent-skills"
-                  >↗ https://github.com/addyosmani/agent-skills</a
-                >
-              </li>
-              <li>
-                Google Cloud Blog, "Level Up Your Agents: Announcing Google's Official Skills
-                Repository," 2026年4月22日
+                TechCrunch「Hermes agent maker Nous Research in talks for new funding at $1.5B
+                valuation」:
                 <a
-                  href="https://cloud.google.com/blog/topics/developers-practitioners/level-up-your-agents-announcing-googles-official-skills-repository"
-                  >↗
-                  https://cloud.google.com/blog/topics/developers-practitioners/level-up-your-agents-announcing-googles-official-skills-repository</a
+                  href="https://techcrunch.com/2026/07/13/hermes-agent-maker-nous-research-in-talks-for-new-funding-at-1-5b-valuation/"
+                  >https://techcrunch.com/2026/07/13/hermes-agent-maker-nous-research-in-talks-for-new-funding-at-1-5b-valuation/</a
                 >
               </li>
               <li>
-                Google Developers Blog, "Developer's Guide to Building ADK Agents with Skills"
+                MarkTechPost「OpenClaw vs Hermes Agent: Why Nous Research's Self-Improving Agent Now
+                Leads OpenRouter's Global Rankings」:
                 <a
-                  href="https://developers.googleblog.com/developers-guide-to-building-adk-agents-with-skills/"
-                  >↗
-                  https://developers.googleblog.com/developers-guide-to-building-adk-agents-with-skills/</a
+                  href="https://www.marktechpost.com/2026/05/10/openclaw-vs-hermes-agent-why-nous-researchs-self-improving-agent-now-leads-openrouters-global-rankings/"
+                  >https://www.marktechpost.com/2026/05/10/openclaw-vs-hermes-agent-why-nous-researchs-self-improving-agent-now-leads-openrouters-global-rankings/</a
                 >
               </li>
               <li>
-                Google Codelabs, "Spec-Driven Development with Antigravity CLI — Structured Agent
-                Workflows with Skills and MCP"
-                <a href="https://codelabs.developers.google.com/sdd-agy-cli"
-                  >↗ https://codelabs.developers.google.com/sdd-agy-cli</a
+                Simon Willison（Nous Research関連の継続的な技術解説）:
+                <a href="https://simonwillison.net/tags/nous-research/"
+                  >https://simonwillison.net/tags/nous-research/</a
                 >
               </li>
               <li>
-                Google Codelabs, "Spec-Driven ADK Agent Development with Antigravity and Spec-kit"
-                <a href="https://codelabs.developers.google.com/sdd-adk-antigravity"
-                  >↗ https://codelabs.developers.google.com/sdd-adk-antigravity</a
-                >
-              </li>
-              <li>
-                Giovanni Galloro, "How Google Antigravity is changing spec-driven development,"
-                Google Cloud Community (Medium)
-                <a
-                  href="https://medium.com/google-cloud/benefits-and-challenges-of-spec-driven-development-and-how-antigravity-is-changing-the-game-3343a6942330"
-                  >↗
-                  https://medium.com/google-cloud/benefits-and-challenges-of-spec-driven-development-and-how-antigravity-is-changing-the-game-3343a6942330</a
-                >
-              </li>
-              <li>
-                Yannipeng, "Mastering Multi-Agent Orchestration in Google Antigravity," Google Cloud
-                Community (Medium), 2026年7月
-                <a
-                  href="https://medium.com/google-cloud/mastering-multi-agent-orchestration-in-google-antigravity-2e73500d25fb"
-                  >↗
-                  https://medium.com/google-cloud/mastering-multi-agent-orchestration-in-google-antigravity-2e73500d25fb</a
-                >
-              </li>
-              <li>
-                GitHub, spec-kit（GitHub製のSpec-Driven Developmentフレームワーク）
-                <a href="https://github.com/github/spec-kit"
-                  >↗ https://github.com/github/spec-kit</a
-                >
-              </li>
-              <li>
-                Scalable Path, "Google Antigravity Review: DeepMind's Agent-First Bet on Faster,
-                Safer Software Development"
-                <a href="https://www.scalablepath.com/ai/google-antigravity-review"
-                  >↗ https://www.scalablepath.com/ai/google-antigravity-review</a
+                Turing Post「Hermes vs OpenClaw」:
+                <a href="https://www.turingpost.com/p/hermes"
+                  >https://www.turingpost.com/p/hermes</a
                 >
               </li>
             </ul>
           </div>
           <div class="ref-card">
-            <h3 id="業界の広がり比較参考">業界の広がり（比較参考）</h3>
+            <h4>関連プロジェクト・エコシステム</h4>
             <ul>
               <li>
-                Ryan Lopopolo（OpenAI）, "Harness engineering: leveraging Codex in an agent-first
-                world," openai.com, 2026年2月11日
-                <a href="https://openai.com/index/harness-engineering/"
-                  >↗ https://openai.com/index/harness-engineering/</a
-                >
+                agentskills.io（オープンスキル標準）:
+                <a href="https://agentskills.io">https://agentskills.io</a>
               </li>
               <li>
-                Addo Zhang, "From Idea to Release: A Complete Harness Engineering Practice," Medium,
-                2026年5月
-                <a
-                  href="https://addozhang.medium.com/from-idea-to-release-a-complete-harness-engineering-practice-b995180e63e8"
-                  >↗
-                  https://addozhang.medium.com/from-idea-to-release-a-complete-harness-engineering-practice-b995180e63e8</a
-                >
+                skills.sh（Vercel運営のスキルディレクトリ）:
+                <a href="https://skills.sh/">https://skills.sh/</a>
+              </li>
+              <li>
+                tirith（実行前セキュリティスキャナ）:
+                <a href="https://github.com/sheeki03/tirith">https://github.com/sheeki03/tirith</a>
+              </li>
+              <li>
+                OpenAI Codex CLI（<code>/goal</code>のRalph loop着想元）:
+                <a href="https://github.com/openai/codex">https://github.com/openai/codex</a>
               </li>
             </ul>
           </div>
@@ -1525,135 +1965,94 @@ flowchart LR
         <hr />
         <p>
           <em
-            >本ガイドは2026年7月27日時点で参照可能な一次情報・技術記事をもとに作成しています。Google
-            Antigravity、ADK、Agent
-            Skills等は現在も活発に更新されているプロダクトのため、実際の導入にあたっては上記リンク先の最新版ドキュメントも合わせてご確認ください。</em
+            >本ガイドはHermes
+            Agentの公開ドキュメント（2026年8月2日時点）を基に作成した。Hermesは開発の速いプロジェクトであり、設定キー名やデフォルト値は将来のリリースで変更される可能性がある。最新情報は上記の公式ドキュメントを参照されたい。</em
           >
         </p>
-      </main>
+      </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/mermaid@11.12.0/dist/mermaid.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/json.min.js"></script>
-    <script>
-      // ---------- syntax highlighting (highlight.js) ----------
-      (function () {
+    <script type="module">
+      import mermaid from 'https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.12.0/mermaid.esm.min.mjs';
+
+      document.fonts.ready.then(() => {
         try {
-          if (typeof hljs === 'undefined') return;
-          document.querySelectorAll('pre code').forEach(function (block) {
-            hljs.highlightElement(block);
+          mermaid.initialize({
+            startOnLoad: false,
+            theme: 'base',
+            themeVariables: {
+              background: '#0f2138',
+              primaryColor: '#132a45',
+              primaryTextColor: '#dde6f2',
+              primaryBorderColor: '#2c4468',
+              lineColor: '#5b7396',
+              secondaryColor: '#0f2138',
+              tertiaryColor: '#0a1729',
+              fontFamily: 'Noto Sans JP, sans-serif',
+              fontSize: '14px',
+            },
+            securityLevel: 'loose',
           });
+          mermaid.run({ querySelector: '.mermaid' });
         } catch (e) {
-          console.error('highlight.js init failed', e);
+          console.error('mermaid init failed', e);
         }
-      })();
+      });
 
-      // ---------- sidebar toggle (mobile) ----------
-      (function () {
-        var btn = document.getElementById('navToggle');
-        var nav = document.querySelector('.side-nav');
-        if (!btn || !nav) return;
-        btn.addEventListener('click', function () {
-          var isOpen = nav.classList.toggle('open');
-          btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      try {
+        hljs.highlightAll();
+      } catch (e) {
+        console.error('hljs failed', e);
+      }
+    </script>
+
+    <script>
+      const toggle = document.getElementById('menuToggle');
+      const sidebar = document.getElementById('sidebar');
+      if (toggle) {
+        toggle.addEventListener('click', () => sidebar.classList.toggle('open'));
+        document.querySelectorAll('.nav-link').forEach((a) => {
+          a.addEventListener('click', () => sidebar.classList.remove('open'));
         });
-        nav.querySelectorAll('a.nav-link').forEach(function (a) {
-          a.addEventListener('click', function () {
-            nav.classList.remove('open');
-            btn.setAttribute('aria-expanded', 'false');
+      }
+
+      // Reveal-on-scroll
+      const revealTargets = document.querySelectorAll(
+        '.content > h2, .content > h3, .content > p, .content > ul, .content > ol, .content > .table-scroll, .content > pre, .content > blockquote, .content > div',
+      );
+      revealTargets.forEach((el) => el.classList.add('reveal'));
+      const revealObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((e) => {
+            if (e.isIntersecting) {
+              e.target.classList.add('in');
+              revealObserver.unobserve(e.target);
+            }
           });
-        });
-      })();
+        },
+        { rootMargin: '0px 0px -8% 0px', threshold: 0.01 },
+      );
+      revealTargets.forEach((el) => revealObserver.observe(el));
 
-      // ---------- mermaid init (isolated, guarded) ----------
-      // フォント読み込み完了を待ってから描画する。
-      // (Webフォントの読み込み前にテキスト幅を計測すると、
-      //  ノード/サブグラフの箱がテキストより小さく計算され、文字が重なる原因になる)
-      (function () {
-        function renderMermaid() {
-          try {
-            if (typeof mermaid === 'undefined') return;
-            var fontFamily = '"Noto Sans JP","Hiragino Kaku Gothic ProN",sans-serif';
-            mermaid.initialize({
-              startOnLoad: false,
-              theme: 'base',
-              securityLevel: 'loose',
-              themeVariables: {
-                fontFamily: fontFamily,
-                fontSize: '16px',
-                background: '#0c1930',
-                primaryColor: '#132844',
-                primaryTextColor: '#dbe6f5',
-                primaryBorderColor: '#7c9eff',
-                lineColor: '#7c9eff',
-                secondaryColor: '#0f2038',
-                tertiaryColor: '#0a1626',
-                textColor: '#dbe6f5',
-                mainBkg: '#132844',
-                nodeBorder: '#7c9eff',
-                clusterBkg: '#0f2038',
-                clusterBorder: '#2a4570',
-                edgeLabelBackground: '#0c1930',
-                actorBkg: '#132844',
-                actorBorder: '#7c9eff',
-                actorTextColor: '#dbe6f5',
-                signalColor: '#7c9eff',
-                signalTextColor: '#dbe6f5',
-              },
-              flowchart: { useMaxWidth: false, htmlLabels: true, curve: 'basis' },
-              sequence: { useMaxWidth: false },
-            });
-            mermaid.run({ querySelector: 'pre.mermaid' });
-          } catch (e) {
-            console.error('mermaid init failed', e);
-          }
-        }
-        if (document.fonts && document.fonts.ready) {
-          document.fonts.ready.then(renderMermaid);
-        } else {
-          renderMermaid();
-        }
-      })();
-
-      // ---------- scroll-spy (dual IntersectionObserver pattern) ----------
-      (function () {
-        var navLinks = Array.prototype.slice.call(document.querySelectorAll('.nav-link'));
-        if (!navLinks.length) return;
-        var linkByTarget = {};
-        navLinks.forEach(function (a) {
-          linkByTarget[a.dataset.target] = a;
-        });
-
-        var sections = navLinks
-          .map(function (a) {
-            return document.getElementById(a.dataset.target);
-          })
-          .filter(Boolean);
-
-        function setActive(id) {
-          navLinks.forEach(function (a) {
-            a.classList.remove('active');
+      // Scroll-spy for sidebar nav
+      const navLinks = Array.from(document.querySelectorAll('.nav-link'));
+      const linkMap = new Map(navLinks.map((a) => [a.getAttribute('href').slice(1), a]));
+      const headings = Array.from(document.querySelectorAll('.content h2[id]'));
+      const spyObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            const link = linkMap.get(entry.target.id);
+            if (!link) return;
+            if (entry.isIntersecting) {
+              navLinks.forEach((a) => a.classList.remove('active'));
+              link.classList.add('active');
+            }
           });
-          var link = linkByTarget[id];
-          if (link) link.classList.add('active');
-        }
-
-        var spy = new IntersectionObserver(
-          function (entries) {
-            entries.forEach(function (entry) {
-              if (entry.isIntersecting) {
-                setActive(entry.target.id);
-              }
-            });
-          },
-          { root: null, rootMargin: '-15% 0px -75% 0px', threshold: 0 },
-        );
-
-        sections.forEach(function (s) {
-          spy.observe(s);
-        });
-      })();
+        },
+        { rootMargin: '-15% 0px -75% 0px', threshold: 0 },
+      );
+      headings.forEach((h) => spyObserver.observe(h));
     </script>
   </body>
 </html>
