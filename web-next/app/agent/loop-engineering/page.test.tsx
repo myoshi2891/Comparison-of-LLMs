@@ -19,8 +19,12 @@ const metadata = rawMetadata as unknown as MetadataLike;
 
 // MermaidDiagram は useEffect 内で mermaid を動的 import するためモック
 vi.mock("@/components/docs/MermaidDiagram", () => ({
-  default: function DummyMermaidDiagram({ chart }: { chart: string }) {
-    return <pre data-testid="mermaid">{chart}</pre>;
+  default: function DummyMermaidDiagram({ chart, id }: { chart: string; id?: string }) {
+    return (
+      <pre id={id} data-testid="mermaid">
+        {chart}
+      </pre>
+    );
   },
 }));
 
@@ -145,6 +149,14 @@ describe("/agent/loop-engineering - page structure", () => {
     expect(container.querySelector("#diag-15")).not.toBeNull();
   });
 
+  it("renders every Mermaid diagram id exactly once", () => {
+    const { container } = render(<Page />);
+
+    for (let diagramNumber = 1; diagramNumber <= 15; diagramNumber += 1) {
+      expect(container.querySelectorAll(`#diag-${diagramNumber}`)).toHaveLength(1);
+    }
+  });
+
   it("renders the terminology hierarchy table", () => {
     const { container } = render(<Page />);
     const table = container.querySelector("table");
@@ -207,6 +219,8 @@ describe("/agent/loop-engineering - static source safety", () => {
     const css = readFileSync(join(__dirname, "page.module.css"), "utf8");
 
     expect(css).not.toMatch(/\.mermaidContainer\s+svg\s*\{/);
-    expect(css).not.toMatch(/\.mermaidContainer\s*\{[^}]*\b(?:display|justify-content|width|max-width)\s*:/s);
+    expect(css).not.toMatch(
+      /\.mermaidContainer\s*\{[^}]*\b(?:display|justify-content|width|max-width)\s*:/s
+    );
   });
 });
