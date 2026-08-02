@@ -6,23 +6,23 @@
 
 ## 目次
 
-1. CodeRabbitとは何か：アーキテクチャを理解する
-2. 導入のロールアウト戦略（ステップバイステップ）
-3. 設定の基本：`.coderabbit.yaml`とレビュープロファイル
-4. 設定の優先順位を制御する：グローバルオーバーライド・中央設定・継承
-5. パスベースのレビュー制御を使い分ける
-6. ast-grepによる構造的レビュールール（上級者向け）
-7. 自動レビューの挙動を制御する（`auto_review`）
-8. Learningsでチームの好みを学習させる
-9. Pre-Merge ChecksとCustom Checksで品質ゲートを敷く
-10. Finishing Touches：ワンクリックのエージェント的アクション
-11. WalkthroughとCodeRabbit Review（Change Stack）を使いこなす
-12. Knowledge Baseで文脈を拡張する
-13. IDE拡張機能とCLIツールでシフトレフトする
-14. 複数のAIレビューツールを組み合わせる考え方（多層防御）
-15. 実運用で直面する課題と対処法（アンチパターン集）
-16. まとめ：ベストプラクティス一覧表
-17. 参考文献
+1. [CodeRabbitとは何か：アーキテクチャを理解する](#1-coderabbitとは何かアーキテクチャを理解する)
+2. [導入のロールアウト戦略（ステップバイステップ）](#2-導入のロールアウト戦略ステップバイステップ)
+3. [設定の基本：.coderabbit.yamlとレビュープロファイル](#3-設定の基本coderabbityamlとレビュープロファイル)
+4. [設定の優先順位を制御する：グローバルオーバーライド・中央設定・継承](#4-設定の優先順位を制御するグローバルオーバーライド中央設定継承)
+5. [パスベースのレビュー制御を使い分ける](#5-パスベースのレビュー制御を使い分ける)
+6. [ast-grepによる構造的レビュールール（上級者向け）](#6-ast-grepによる構造的レビュールール上級者向け)
+7. [自動レビューの挙動を制御する（auto_review）](#7-自動レビューの挙動を制御するauto_review)
+8. [Learningsでチームの好みを学習させる](#8-learningsでチームの好みを学習させる)
+9. [Pre-Merge ChecksとCustom Checksで品質ゲートを敷く](#9-pre-merge-checksとcustom-checksで品質ゲートを敷く)
+10. [Finishing Touches：ワンクリックのエージェント的アクション](#10-finishing-touchesワンクリックのエージェント的アクション)
+11. [WalkthroughとCodeRabbit Review（Change Stack）を使いこなす](#11-walkthroughとcoderabbit-reviewchange-stackを使いこなす)
+12. [Knowledge Baseで文脈を拡張する](#12-knowledge-baseで文脈を拡張する)
+13. [IDE拡張機能とCLIツールでシフトレフトする](#13-ide拡張機能とcliツールでシフトレフトする)
+14. [複数のAIレビューツールを組み合わせる考え方（多層防御）](#14-複数のaiレビューツールを組み合わせる考え方多層防御)
+15. [実運用で直面する課題と対処法（アンチパターン集）](#15-実運用で直面する課題と対処法アンチパターン集)
+16. [まとめ：ベストプラクティス一覧表](#16-まとめベストプラクティス一覧表)
+17. [参考文献](#17-参考文献)
 
 ---
 
@@ -107,7 +107,7 @@ chat:
 | `language` | enum | `en-US` | レビュー・チャットで使う言語（ISOコード） |
 | `tone_instructions` | string | `""` | レビューやチャットの語り口（250文字まで） |
 | `reviews.profile` | enum | `chill` | `chill` / `assertive` |
-| `reviews.request_changes_workflow` | boolean | `false` | 指摘がすべて解消されると自動でApproveする |
+| `reviews.request_changes_workflow` | boolean | `false` | 有効化すると「Request changes」を発行して指摘の解消・Pre-Merge Check通過までマージをブロックし、全件解決後に自動Approveする |
 | `reviews.high_level_summary` | boolean | `true` | PR概要欄への要約生成 |
 | `reviews.sequence_diagrams` | boolean | `true` | Walkthrough内のMermaidシーケンス図生成 |
 | `reviews.collapse_walkthrough` | boolean | `true` | Walkthroughを折りたたみ表示にする |
@@ -453,7 +453,7 @@ Finishing Touchesは、レビュー後にワンクリックで実行できるエ
 | コードの簡潔化 | `@coderabbitai simplify` | 新規PRまたはコミット | GitHub |
 | Autofix | `@coderabbitai autofix` / `@coderabbitai autofix stacked pr` | ブランチへのコミットまたはスタックPR | GitHub, GitLab, Azure DevOps, Bitbucket |
 | カスタムレシピ | `@coderabbitai run <レシピ名>` | ブランチへのコミットまたはスタックPR | GitHub |
-| マージコンフリクト解消 | `@coderabbitai fix merge conflict` | マージコミット | GitHub, GitLab |
+| マージコンフリクト解消 | `@coderabbitai resolve merge conflict` | マージコミット | GitHub, GitLab |
 
 ```mermaid
 sequenceDiagram
