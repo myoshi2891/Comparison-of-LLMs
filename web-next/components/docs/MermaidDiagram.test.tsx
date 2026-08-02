@@ -574,7 +574,7 @@ describe("MermaidDiagram 失敗時と世代管理", () => {
     });
   });
 
-  it("foreignObject の文字色を明示テーマの primaryTextColor で補正する", async () => {
+  it("foreignObject の文字色と行高を補正する", async () => {
     const defaultRun = vi.mocked(mermaid.run).getMockImplementation();
     expect(defaultRun).toBeDefined();
     vi.mocked(mermaid.run).mockImplementationOnce(async (args) => {
@@ -601,6 +601,9 @@ describe("MermaidDiagram 失敗時と世代管理", () => {
     await waitFor(() => {
       expect((container.querySelector("foreignObject div") as HTMLElement).style.color).toBe(
         "rgb(18, 52, 86)"
+      );
+      expect((container.querySelector("foreignObject div") as HTMLElement).style.lineHeight).toBe(
+        "1.2"
       );
     });
   });
