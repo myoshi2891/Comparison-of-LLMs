@@ -179,6 +179,18 @@ describe("MermaidDiagram レイアウト規約", () => {
     });
   });
 
+  it("flowchartHtmlLabels=false を Mermaid 初期化設定へ渡す", async () => {
+    render(<MermaidDiagram chart="flowchart TD; A-->B" flowchartHtmlLabels={false} />);
+
+    await waitFor(() => {
+      expect(mermaid.initialize).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          flowchart: expect.objectContaining({ htmlLabels: false }),
+        })
+      );
+    });
+  });
+
   it("利用者指定の fontSize を保持する", async () => {
     render(<MermaidDiagram chart="graph TD; A-->B" themeVariables={{ fontSize: "48px" }} />);
     await waitFor(() => {
