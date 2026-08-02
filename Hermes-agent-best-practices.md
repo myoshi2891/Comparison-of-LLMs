@@ -787,11 +787,13 @@ curator・goal judge・memory/skillのバックグラウンドレビューは、
 auxiliary:
   background_review:
     provider: openrouter
-    model: google/gemini-3-flash-preview
+    model: <低コストかつ十分な品質のモデル>
   goal_judge:
     provider: openrouter
-    model: google/gemini-3-flash-preview
+    model: <判定精度を満たすモデル>
 ```
+
+補助モデルは固定せず、タスクに必要な品質・レイテンシ・コストと、利用中のプロバイダで選択可能なモデルを基準に選ぶ。`background_review`は要約・分類品質と低コストを、`goal_judge`は目標達成を安定して判定できる精度を優先する。
 
 メインモデルと異なるモデルを指定した場合、そのレビューはメインの会話プレフィックスキャッシュを再利用できないため、直近ターン＋古い部分の要約という「ダイジェスト」形式で会話を再現し、新しいキャッシュへの書き込みコストを最小化する設計になっている。
 

@@ -96,7 +96,6 @@ CLIでは `.github/agents/<name>.agent.md` という命名規則でエージェ�
 ---
 description: 'Web accessibility(WCAG 2.1/2.2)とインクルーシブUXの専門アシスタント'
 name: 'Accessibility Expert'
-model: GPT-5.2
 tools: ['search/codebase', 'edit/editFiles', 'web/fetch', 'runTests', 'problems']
 ---
 
@@ -105,6 +104,8 @@ tools: ['search/codebase', 'edit/editFiles', 'web/fetch', 'runTests', 'problems'
 あなたはWCAG 2.1/2.2に精通したアクセシビリティの専門家です。デザイナー、開発者、QA向けに
 実務的なガイダンスを提供してください。
 ```
+
+この基本サンプルでは`model`を省略し、利用環境で選択されているモデルを継承します。特定のモデルが必要な場合のみ、利用環境で選択可能なモデルを確認して指定してください。
 
 ---
 
