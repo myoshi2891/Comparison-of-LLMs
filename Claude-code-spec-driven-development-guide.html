@@ -1937,8 +1937,7 @@ Code -. 齟齬が見つかれば更新 .-> R`,
             const errorElement = document.createElement('p');
             errorElement.className = 'diagram-error';
             errorElement.textContent =
-              'Diagram failed to render: ' +
-              (error && error.message ? error.message : error);
+              'Diagram failed to render: ' + (error && error.message ? error.message : error);
             container.replaceChildren(errorElement);
             console.error(error);
           }
