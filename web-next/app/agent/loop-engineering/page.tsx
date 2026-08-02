@@ -1,4 +1,4 @@
-import MermaidDiagram from "@/components/docs/MermaidDiagram";
+import SharedMermaidDiagram from "@/components/docs/MermaidDiagram";
 import styles from "./page.module.css";
 import TocObserver from "./TocObserver";
 
@@ -272,6 +272,10 @@ const LOOP_THEME_VARS: Record<string, string> = {
   secondaryColor: "#FBF0DF",
   tertiaryColor: "#F1EEFB",
 };
+
+function MermaidDiagram(props: React.ComponentProps<typeof SharedMermaidDiagram>) {
+  return <SharedMermaidDiagram {...props} flowchartHtmlLabels={false} />;
+}
 
 function Ext({ href, children }: { href: string; children: React.ReactNode }) {
   return (

@@ -8,6 +8,8 @@ type Props = {
   className?: string;
   /** Optional rendered SVG height cap for unusually tall diagrams. */
   maxHeight?: React.CSSProperties["maxHeight"];
+  /** Use Mermaid HTML labels for flowcharts. Disable when scaled labels overflow their nodes. */
+  flowchartHtmlLabels?: boolean;
   /** Mermaid theme. Defaults to "dark". Pass "base" for light-mode pages. */
   theme?: "dark" | "base" | "default" | "forest" | "neutral";
   /**
@@ -17,6 +19,18 @@ type Props = {
    */
   themeVariables?: Record<string, string>;
 };
+
+let mermaidRenderQueue: Promise<void> = Promise.resolve();
+
+function enqueueMermaidRender<T>(render: () => Promise<T>): Promise<T> {
+  const queued = mermaidRenderQueue.then(render, render);
+  mermaidRenderQueue = queued.then(
+    () => undefined,
+    () => undefined
+  );
+  return queued;
+}
+
 /**
  * Normalizes any thrown value into an Error instance with detailed message and optional diagram context.
  * Prevents console.error from outputting an empty object `{}`.
@@ -233,6 +247,7 @@ function applyPieChartColorOverrides(
  * @param style - Optional inline styles for the outer wrapper.
  * @param className - Optional CSS classes for the outer wrapper.
  * @param maxHeight - Optional maximum height for the rendered SVG.
+ * @param flowchartHtmlLabels - Whether flowcharts use foreignObject-based HTML labels.
  * @param theme - Mermaid theme to use.
  * @param themeVariables - Optional Mermaid theme variable overrides.
  * @returns A wrapper containing the rendered diagram.
@@ -243,6 +258,7 @@ export default function MermaidDiagram({
   style,
   className,
   maxHeight,
+  flowchartHtmlLabels = true,
   theme = "dark",
   themeVariables,
 }: Props) {
@@ -257,75 +273,84 @@ export default function MermaidDiagram({
       active && ref.current !== null && currentToken === renderCountRef.current;
 
     void import("mermaid")
-      .then(async (m) => {
-        if (!isCurrent()) return;
+      .then((m) =>
+        enqueueMermaidRender(async () => {
+          if (!isCurrent()) return;
 
-        // Dynamic theme & variables configuration bound to the active generation token
-        m.default.initialize({
-          startOnLoad: false,
-          theme,
-          themeVariables: { fontSize: "16px", ...themeVariables },
-          flowchart: { useMaxWidth: false, htmlLabels: true },
-          sequence: { useMaxWidth: false },
-          mindmap: { useMaxWidth: false },
-        });
+          // Dynamic theme & variables configuration bound to the active generation token
+          m.default.initialize({
+            startOnLoad: false,
+            theme,
+            themeVariables: { fontSize: "16px", ...themeVariables },
+            flowchart: { useMaxWidth: false, htmlLabels: flowchartHtmlLabels },
+            sequence: { useMaxWidth: false },
+            mindmap: { useMaxWidth: false },
+          });
 
-        if (!isCurrent()) return;
-        if (!ref.current) return;
+          if (!isCurrent()) return;
+          if (!ref.current) return;
 
-        const tempEl = document.createElement("div");
-        tempEl.style.position = "absolute";
-        tempEl.style.top = "-9999px";
-        tempEl.style.left = "-9999px";
-        tempEl.style.visibility = "hidden";
-        tempEl.style.pointerEvents = "none";
-        tempEl.textContent = chart;
-        document.body.appendChild(tempEl);
+          if (document.fonts) {
+            await document.fonts.ready;
+          }
+          if (!isCurrent()) return;
 
-        try {
-          await m.default.run({ nodes: [tempEl] });
-          if (!isCurrent() || !ref.current) return;
+          const tempEl = document.createElement("div");
+          tempEl.style.position = "absolute";
+          tempEl.style.top = "-9999px";
+          tempEl.style.left = "-9999px";
+          tempEl.style.visibility = "hidden";
+          tempEl.style.pointerEvents = "none";
+          tempEl.textContent = chart;
+          document.body.appendChild(tempEl);
 
-          const svg = tempEl.querySelector("svg");
-          if (svg instanceof SVGElement) {
-            svg.style.maxWidth = "100%";
-            if (maxHeight !== undefined) {
-              svg.style.maxHeight =
-                typeof maxHeight === "number"
-                  ? maxHeight === 0
-                    ? "0"
-                    : `${maxHeight}px`
-                  : maxHeight;
+          try {
+            await m.default.run({ nodes: [tempEl] });
+            if (!isCurrent() || !ref.current) return;
+
+            const svg = tempEl.querySelector("svg");
+            if (svg instanceof SVGElement) {
+              svg.style.maxWidth = "100%";
+              if (maxHeight !== undefined) {
+                svg.style.maxHeight =
+                  typeof maxHeight === "number"
+                    ? maxHeight === 0
+                      ? "0"
+                      : `${maxHeight}px`
+                    : maxHeight;
+              }
+              svg.style.height = "auto";
             }
-            svg.style.height = "auto";
-          }
 
-          if (theme === "base" || theme === "dark" || themeVariables !== undefined) {
-            const textColor =
-              themeVariables?.primaryTextColor ?? (theme === "dark" ? "#e2e8f0" : "#000000");
-            tempEl.querySelectorAll("foreignObject *").forEach((el) => {
-              (el as HTMLElement).style.setProperty("color", textColor, "important");
-            });
+            if (theme === "base" || theme === "dark" || themeVariables !== undefined) {
+              const textColor =
+                themeVariables?.primaryTextColor ?? (theme === "dark" ? "#e2e8f0" : "#000000");
+              tempEl.querySelectorAll("foreignObject *").forEach((el) => {
+                const htmlElement = el as HTMLElement;
+                htmlElement.style.setProperty("color", textColor, "important");
+                htmlElement.style.setProperty("line-height", "1.2", "important");
+              });
 
-            applySequenceDiagramColorOverrides(tempEl, themeVariables, theme);
-          }
+              applySequenceDiagramColorOverrides(tempEl, themeVariables, theme);
+            }
 
-          applyPieChartColorOverrides(tempEl, themeVariables, theme);
+            applyPieChartColorOverrides(tempEl, themeVariables, theme);
 
-          if (!isCurrent() || !ref.current) return;
-          ref.current.replaceChildren(...tempEl.childNodes);
-        } catch (err) {
-          if (isCurrent() && ref.current) {
-            const chartSnippet = chart.trim().slice(0, 60).replace(/\s+/g, " ");
-            console.error("[MermaidDiagram] render failed:", normalizeError(err, chartSnippet));
-            ref.current.textContent = "⚠️ ダイアグラムを描画できませんでした";
+            if (!isCurrent() || !ref.current) return;
+            ref.current.replaceChildren(...tempEl.childNodes);
+          } catch (err) {
+            if (isCurrent() && ref.current) {
+              const chartSnippet = chart.trim().slice(0, 60).replace(/\s+/g, " ");
+              console.error("[MermaidDiagram] render failed:", normalizeError(err, chartSnippet));
+              ref.current.textContent = "⚠️ ダイアグラムを描画できませんでした";
+            }
+          } finally {
+            if (tempEl.parentNode === document.body) {
+              document.body.removeChild(tempEl);
+            }
           }
-        } finally {
-          if (tempEl.parentNode === document.body) {
-            document.body.removeChild(tempEl);
-          }
-        }
-      })
+        })
+      )
       .catch((err: unknown) => {
         if (isCurrent()) {
           console.error("[MermaidDiagram] load failed:", normalizeError(err));
@@ -335,7 +360,7 @@ export default function MermaidDiagram({
     return () => {
       active = false;
     };
-  }, [chart, maxHeight, theme, themeVariables]);
+  }, [chart, flowchartHtmlLabels, maxHeight, theme, themeVariables]);
 
   return (
     <div className={`mermaid-scroll ${className || ""}`} style={{ ...style, width: "100%" }}>
