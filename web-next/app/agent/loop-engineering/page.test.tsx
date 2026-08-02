@@ -229,4 +229,22 @@ describe("/agent/loop-engineering - static source safety", () => {
 
     expect(css).not.toMatch(/:global\(\.label\)[\s\S]*?fill:\s*var\(--ink\)\s*!important/);
   });
+
+  it("uses sufficiently dark fills whenever Mermaid diagram nodes use white text", () => {
+    const source = readFileSync(join(__dirname, "page.tsx"), "utf8");
+    const lowContrastFills = [
+      "#95a5a6",
+      "#3498db",
+      "#e67e22",
+      "#e74c3c",
+      "#27ae60",
+      "#f39c12",
+      "#8e44ad",
+      "#1abc9c",
+    ];
+
+    for (const fill of lowContrastFills) {
+      expect(source).not.toContain(`fill:${fill},color:#fff`);
+    }
+  });
 });
