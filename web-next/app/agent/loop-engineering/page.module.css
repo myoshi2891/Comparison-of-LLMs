@@ -517,20 +517,6 @@
   stroke-width: 1.5px;
 }
 
-.pageWrap :global(.mermaid) :global(.label),
-.pageWrap :global(.mermaid) :global(.label) span,
-.pageWrap :global(.mermaid) :global(.label) text,
-.pageWrap :global(.mermaid) :global(.edgeLabel),
-.pageWrap :global(.mermaid) :global(.edgeLabel) span,
-.pageWrap :global(.mermaid) :global(.edgeLabel) p,
-.pageWrap :global(.mermaid) :global(.messageText),
-.pageWrap :global(.mermaid) :global(.loopText),
-.pageWrap :global(.mermaid) :global(text),
-.pageWrap :global(.mermaid) :global(text.actor) {
-  color: var(--ink) !important;
-  fill: var(--ink) !important;
-}
-
 .pageWrap :global(.mermaid) :global(.edgePath) :global(.path),
 .pageWrap :global(.mermaid) :global(.messageLine0),
 .pageWrap :global(.mermaid) :global(.messageLine1),

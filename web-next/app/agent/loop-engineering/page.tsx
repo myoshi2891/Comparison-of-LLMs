@@ -33,10 +33,10 @@ const DIAGRAMS = {
   A -->|"進化"| B
   B -->|"進化"| C
   C -->|"進化"| D
-  style A fill:#95a5a6,color:#fff
-  style B fill:#3498db,color:#fff
-  style C fill:#e67e22,color:#fff
-  style D fill:#e74c3c,color:#fff`,
+  style A fill:#546e7a,color:#fff
+  style B fill:#1565c0,color:#fff
+  style C fill:#a64b00,color:#fff
+  style D fill:#c62828,color:#fff`,
   diag3: `flowchart LR
   GOAL(["🎯 ゴール／仕様を定義する<br />（人間の仕事）"]) --> LOOP
   subgraph LOOP["🔁 ループ（自動で回り続ける）"]
@@ -46,9 +46,9 @@ const DIAGRAMS = {
     DECIDE -->|"No：やり直す"| DO
     DECIDE -->|"Yes：完了"| STOP(["✅ 停止する"])
   end
-  style GOAL fill:#3498db,color:#fff
-  style STOP fill:#27ae60,color:#fff
-  style DECIDE fill:#f39c12,color:#fff`,
+  style GOAL fill:#1565c0,color:#fff
+  style STOP fill:#1b5e20,color:#fff
+  style DECIDE fill:#8a5a00,color:#fff`,
   diag4: `graph TD
   subgraph EXT["🌍 外部フィードバックループ（数時間〜数週間）"]
     direction TB
@@ -84,11 +84,11 @@ const DIAGRAMS = {
   V --> P
   P --> S
   S -->|"次の周回へ"| D
-  style D fill:#3498db,color:#fff
-  style H fill:#8e44ad,color:#fff
-  style V fill:#e74c3c,color:#fff
-  style P fill:#27ae60,color:#fff
-  style S fill:#f39c12,color:#fff`,
+  style D fill:#1565c0,color:#fff
+  style H fill:#6a1b9a,color:#fff
+  style V fill:#c62828,color:#fff
+  style P fill:#1b5e20,color:#fff
+  style S fill:#8a5a00,color:#fff`,
   diag6: `graph TD
   subgraph PARTS["🧩 ループを構成する6つの部品"]
     P1["⏰ Automations<br />（自動起動の仕組み）"]
@@ -103,12 +103,12 @@ const DIAGRAMS = {
   P5 -.->|"実現する"| VER["Verification"]
   P6 -.->|"実現する"| PERS["Persistence"]
   P1 -.->|"実現する"| SCHED["Scheduling"]
-  style P1 fill:#3498db,color:#fff
-  style P2 fill:#8e44ad,color:#fff
-  style P3 fill:#27ae60,color:#fff
-  style P4 fill:#e67e22,color:#fff
-  style P5 fill:#e74c3c,color:#fff
-  style P6 fill:#f39c12,color:#fff`,
+  style P1 fill:#1565c0,color:#fff
+  style P2 fill:#6a1b9a,color:#fff
+  style P3 fill:#1b5e20,color:#fff
+  style P4 fill:#a64b00,color:#fff
+  style P5 fill:#c62828,color:#fff
+  style P6 fill:#8a5a00,color:#fff`,
   diag7: `flowchart LR
   subgraph BAD["❌ 自己採点（避けるべき）"]
     direction TB
@@ -124,8 +124,8 @@ const DIAGRAMS = {
   end
   style BAD fill:#fde8e8
   style GOOD fill:#e8fde8
-  style B3 fill:#e74c3c,color:#fff
-  style G4 fill:#27ae60,color:#fff`,
+  style B3 fill:#c62828,color:#fff
+  style G4 fill:#1b5e20,color:#fff`,
   diag8: `flowchart TD
   START(["開始"]) --> READ["PROMPT.md を読み込む"]
   READ --> RUN["エージェントが1セッション実行<br />（TODOリストから最重要タスクを1つだけ選ぶ）"]
@@ -136,8 +136,8 @@ const DIAGRAMS = {
   REGEN --> READ
   RESULT -->|"人間が介入すべき異常"| HUMAN(["🧑 人間が観察・チューニング"])
   HUMAN --> READ
-  style START fill:#3498db,color:#fff
-  style HUMAN fill:#e74c3c,color:#fff`,
+  style START fill:#1565c0,color:#fff
+  style HUMAN fill:#c62828,color:#fff`,
   diag9: `flowchart TD
   S1["Step 1<br />検証可能なタスクを選ぶ"] --> S2["Step 2<br />『完了』の基準を決める"]
   S2 --> S3["Step 3<br />Verifierを設計する"]
@@ -146,21 +146,21 @@ const DIAGRAMS = {
   S5 --> S6["Step 6<br />スケジューリングで自動化する"]
   S6 --> S7["Step 7<br />観察・チューニング・コスト管理をする"]
   S7 -->|"改善を反映"| S1
-  style S1 fill:#3498db,color:#fff
-  style S2 fill:#8e44ad,color:#fff
-  style S3 fill:#e74c3c,color:#fff
-  style S4 fill:#27ae60,color:#fff
-  style S5 fill:#e67e22,color:#fff
-  style S6 fill:#f39c12,color:#fff
-  style S7 fill:#1abc9c,color:#fff`,
+  style S1 fill:#1565c0,color:#fff
+  style S2 fill:#6a1b9a,color:#fff
+  style S3 fill:#c62828,color:#fff
+  style S4 fill:#1b5e20,color:#fff
+  style S5 fill:#a64b00,color:#fff
+  style S6 fill:#8a5a00,color:#fff
+  style S7 fill:#00796b,color:#fff`,
   diag10: `graph TD
   STOP["🛑 停止条件を3種類用意する"]
   STOP --> C1["① 成功条件<br />仕様を満たし、テストが全て通った"]
   STOP --> C2["② 上限条件<br />最大イテレーション回数・最大予算に達した"]
   STOP --> C3["③ 異常検知条件<br />同じ失敗を繰り返している（無進捗）"]
-  style C1 fill:#27ae60,color:#fff
-  style C2 fill:#f39c12,color:#fff
-  style C3 fill:#e74c3c,color:#fff`,
+  style C1 fill:#1b5e20,color:#fff
+  style C2 fill:#8a5a00,color:#fff
+  style C3 fill:#c62828,color:#fff`,
   diag11: `graph TD
   TRIAGE["トリアージ結果<br />（複数の要修正項目）"] --> W1["Worktree A<br />（issue #101用）"]
   TRIAGE --> W2["Worktree B<br />（issue #102用）"]
@@ -172,7 +172,7 @@ const DIAGRAMS = {
   VER2 --> MERGE
   VER3 --> MERGE
   style TRIAGE fill:#2c3e50,color:#fff
-  style MERGE fill:#27ae60,color:#fff`,
+  style MERGE fill:#1b5e20,color:#fff`,
   diag12: `sequenceDiagram
   participant CRON as ⏰ スケジューラ
   participant DISC as 🔍 発見エージェント
@@ -206,11 +206,11 @@ const DIAGRAMS = {
   RISK --> R4["🪞 自己採点バイアス<br />生成モデル自身に判定させると<br />甘い評価になりがち"]
   RISK --> R5["📊 サンプリングバイアス<br />ツールベンダーの成功事例は<br />すでにそのツールを使いこなす人からのデータ"]
   style RISK fill:#2c3e50,color:#fff
-  style R1 fill:#e74c3c,color:#fff
-  style R2 fill:#e74c3c,color:#fff
-  style R3 fill:#e74c3c,color:#fff
-  style R4 fill:#e74c3c,color:#fff
-  style R5 fill:#e74c3c,color:#fff`,
+  style R1 fill:#c62828,color:#fff
+  style R2 fill:#c62828,color:#fff
+  style R3 fill:#c62828,color:#fff
+  style R4 fill:#c62828,color:#fff
+  style R5 fill:#c62828,color:#fff`,
   diag14: `graph TD
   LV0["Level 0：手動プロンプト<br />すべてのやり取りを人間が毎回入力する"]
   LV1["Level 1：単発の自動化<br />1つのタスクをcronで一度だけ自動実行する"]
@@ -223,12 +223,12 @@ const DIAGRAMS = {
   LV2 --> LV3
   LV3 --> LV4
   LV4 --> LV5
-  style LV0 fill:#e74c3c,color:#fff
-  style LV1 fill:#e67e22,color:#fff
-  style LV2 fill:#f39c12,color:#fff
-  style LV3 fill:#27ae60,color:#fff
-  style LV4 fill:#3498db,color:#fff
-  style LV5 fill:#8e44ad,color:#fff`,
+  style LV0 fill:#c62828,color:#fff
+  style LV1 fill:#a64b00,color:#fff
+  style LV2 fill:#8a5a00,color:#fff
+  style LV3 fill:#1b5e20,color:#fff
+  style LV4 fill:#1565c0,color:#fff
+  style LV5 fill:#6a1b9a,color:#fff`,
   diag15: `flowchart TD
   CHECK["🔍 ループの健全性チェック"]
   Q1{"停止条件（成功・上限・無進捗）<br />を3種類とも設定しているか？"}
@@ -253,12 +253,12 @@ const DIAGRAMS = {
   Q4 -->|"Yes"| Q5
   Q5 -->|"No"| FIX5
   Q5 -->|"Yes"| HEALTHY
-  style HEALTHY fill:#27ae60,color:#fff
-  style FIX1 fill:#3498db,color:#fff
-  style FIX2 fill:#3498db,color:#fff
-  style FIX3 fill:#3498db,color:#fff
-  style FIX4 fill:#3498db,color:#fff
-  style FIX5 fill:#3498db,color:#fff`,
+  style HEALTHY fill:#1b5e20,color:#fff
+  style FIX1 fill:#1565c0,color:#fff
+  style FIX2 fill:#1565c0,color:#fff
+  style FIX3 fill:#1565c0,color:#fff
+  style FIX4 fill:#1565c0,color:#fff
+  style FIX5 fill:#1565c0,color:#fff`,
 };
 
 /** Mermaid theme variables matching the legacy HTML (theme: "base"). */

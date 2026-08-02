@@ -363,7 +363,11 @@ export default function MermaidDiagram({
   }, [chart, flowchartHtmlLabels, maxHeight, theme, themeVariables]);
 
   return (
-    <div className={`mermaid-scroll ${className || ""}`} style={{ ...style, width: "100%" }}>
+    <div
+      className={`mermaid-scroll ${className || ""}`}
+      data-mermaid-theme={theme}
+      style={{ ...style, width: "100%" }}
+    >
       <div
         id={id}
         className="mermaid"
