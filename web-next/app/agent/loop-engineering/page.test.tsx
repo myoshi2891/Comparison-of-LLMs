@@ -223,4 +223,10 @@ describe("/agent/loop-engineering - static source safety", () => {
       /\.mermaidContainer\s*\{[^}]*\b(?:display|justify-content|width|max-width)\s*:/s
     );
   });
+
+  it("does not override Mermaid node text colors with a page-wide important rule", () => {
+    const css = readFileSync(join(__dirname, "page.module.css"), "utf8");
+
+    expect(css).not.toMatch(/:global\(\.label\)[\s\S]*?fill:\s*var\(--ink\)\s*!important/);
+  });
 });
