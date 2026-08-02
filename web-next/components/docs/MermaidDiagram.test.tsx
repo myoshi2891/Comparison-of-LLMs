@@ -127,6 +127,12 @@ describe("MermaidDiagram レイアウト規約", () => {
     expect(outer.classList.contains("customFrame")).toBe(true);
   });
 
+  it("現在の Mermaid テーマを外側ラッパーへ公開する", () => {
+    const { container } = render(<MermaidDiagram chart="graph TD; A-->B" theme="base" />);
+
+    expect((container.firstElementChild as HTMLElement).dataset.mermaidTheme).toBe("base");
+  });
+
   it("Webフォントの読み込み完了後に Mermaid を描画する", async () => {
     const originalFonts = Object.getOwnPropertyDescriptor(document, "fonts");
     let resolveFonts!: () => void;
