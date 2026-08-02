@@ -15,10 +15,12 @@
   - `bun run typecheck` ✅
   - `npm run lint` ⚠️（432 files checked。作業範囲外の既存未コミットファイルに12 diagnostics）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: Vitest **152 files / 1348 tests すべて合格**（収集失敗なし）
+  - **フロントエンド (`web-next/`)**: Vitest **152 files / 1357 tests すべて合格**（収集失敗なし）
   - **バックエンド (`scraper/`)**: pytest 実行で **43 件すべて合格** (全 Green ✅)
 
 ## 最近の追加内容
+
+- **SonarQube 新規コードカバレッジ修正**: `MermaidDiagram` の例外型別正規化、初期化失敗、`foreignObject` 配色、一時描画要素の競合 cleanup を検証する9ケースを追加。対象ファイルは line coverage **100%**、branch coverage **94.53%**、function coverage **100%**、全体 line coverage **92.25%**。目視・ビルドは依頼により省略。Vitest **152 files / 1357 tests** と typecheck は Green。
 
 - **GitHub Copilot ガイド原稿3件の追加と公開ページ対応**: `Github-copilot-agent-md-guide.md` / `.html`（`.agent.md` のフロントマター、Handoffs、Subagents、MCP、マルチエージェント設計）を `/copilot/agent`、`Github-copilot-skillmd-guide.md` / `.html`（SKILL.md、Progressive Disclosure、実践テンプレート、トラブルシューティング）を `/copilot/skill`、`Copilot-spec-driven-development-best-practices.html`（Copilot の instructions / prompt / agent / skill / MCP / Plan Mode を使う仕様駆動開発）を `/copilot/markdown-file-guide` の公開内容として追加。レビュー再照合では、各原稿のモバイル目次、ARIA 状態、Mermaid エラー処理、Markdown 表示、CDN SRI を修正し、共有 `MermaidDiagram` の一時描画要素をビューポート外へ配置した。目視・ビルドは依頼により省略。Vitest **152 files / 1348 tests** と typecheck、対象2ファイルの Biome は Green。全体 lint は作業範囲外の既存12 diagnosticsで失敗（432 files checked）。
 
@@ -287,7 +289,7 @@ Next.js 移行完了後のリポジトリ `LLM-Studies` にて、テストカバ
 Next.js 移行完了後のリポジトリ `LLM-Studies` の保守・改善作業を再開してください。
 
 - リポジトリ: LLM-Studies (Next.js 移行プロジェクトは dev/main へ完全マージ済み)
-  - 現在のステータス: docs/PROGRESS.md を参照。Vitest は 137 files / 1259 tests passed、pytest は 43/43 passed
+  - 現在のステータス: docs/PROGRESS.md を参照。Vitest は 152 files / 1357 tests passed、pytest は 43/43 passed
 - リポジトリ規約: CLAUDE.md (編集上の絶対ルール。※Antigravity環境ではビルドは実行禁止)
 
 作業方針：
