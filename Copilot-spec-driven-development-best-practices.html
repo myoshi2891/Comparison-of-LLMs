@@ -520,9 +520,11 @@
           z-index: 50;
           transform: translateX(-100%);
           transition: transform 0.25s ease;
+          visibility: hidden;
         }
         .sidebar.open {
           transform: translateX(0);
+          visibility: visible;
         }
         .sidebar-overlay.open {
           display: block;
