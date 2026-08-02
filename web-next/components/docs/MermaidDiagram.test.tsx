@@ -489,6 +489,116 @@ describe("MermaidDiagram 失敗時と世代管理", () => {
     expect(errorArg.message).toContain('chart: "graph TD; X-->Y"');
   });
 
+  it.each<[string, unknown, string]>([
+    ["文字列", "parser unavailable", "parser unavailable"],
+    ["空文字列", "", "Unknown error"],
+    ["数値", 503, "503"],
+    ["null", null, "null"],
+    ["内容を持つオブジェクト", { code: "PARSE_ERROR" }, '{"code":"PARSE_ERROR"}'],
+  ])("%s の描画例外も Error へ正規化する", async (_label, thrown, expectedMessage) => {
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    vi.mocked(mermaid.run).mockRejectedValueOnce(thrown);
+
+    render(<MermaidDiagram chart="graph TD; X-->Y" />);
+
+    await waitFor(() => {
+      expect(consoleError).toHaveBeenCalledWith(
+        "[MermaidDiagram] render failed:",
+        expect.any(Error)
+      );
+    });
+    const errorArg = consoleError.mock.calls[0][1] as Error;
+    expect(errorArg.message).toContain(expectedMessage);
+    expect(errorArg.message).toContain('chart: "graph TD; X-->Y"');
+  });
+
+  it("循環参照を含む描画例外も安全に Error へ正規化する", async () => {
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const circular: { self?: unknown } = {};
+    circular.self = circular;
+    vi.mocked(mermaid.run).mockRejectedValueOnce(circular);
+
+    render(<MermaidDiagram chart="graph TD; X-->Y" />);
+
+    await waitFor(() => {
+      expect(consoleError).toHaveBeenCalledWith(
+        "[MermaidDiagram] render failed:",
+        expect.any(Error)
+      );
+    });
+    const errorArg = consoleError.mock.calls[0][1] as Error;
+    expect(errorArg.message).toContain("[object Object]");
+    expect(errorArg.message).toContain('chart: "graph TD; X-->Y"');
+  });
+
+  it("初期化に失敗したら Error を正規化して load failed としてログ出力する", async () => {
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const initializeError = new Error("initialize failed");
+    vi.mocked(mermaid.initialize).mockImplementationOnce(() => {
+      throw initializeError;
+    });
+
+    render(<MermaidDiagram chart="graph TD; A-->B" />);
+
+    await waitFor(() => {
+      expect(consoleError).toHaveBeenCalledWith("[MermaidDiagram] load failed:", initializeError);
+    });
+  });
+
+  it("foreignObject の文字色を明示テーマの primaryTextColor で補正する", async () => {
+    const defaultRun = vi.mocked(mermaid.run).getMockImplementation();
+    expect(defaultRun).toBeDefined();
+    vi.mocked(mermaid.run).mockImplementationOnce(async (args) => {
+      await defaultRun?.(args);
+      const target = args?.nodes?.[0] as HTMLElement;
+      const label = target.querySelector("foreignObject div");
+      const querySelectorAll = target.querySelectorAll.bind(target);
+      vi.spyOn(target, "querySelectorAll").mockImplementation((selectors: string) => {
+        if (selectors === "foreignObject *" && label) {
+          return [label] as unknown as NodeListOf<Element>;
+        }
+        return querySelectorAll(selectors);
+      });
+    });
+
+    const { container } = render(
+      <MermaidDiagram
+        chart="sequenceDiagram"
+        theme="base"
+        themeVariables={{ primaryTextColor: "#123456" }}
+      />
+    );
+
+    await waitFor(() => {
+      expect((container.querySelector("foreignObject div") as HTMLElement).style.color).toBe(
+        "rgb(18, 52, 86)"
+      );
+    });
+  });
+
+  it("一時要素が描画中に外された場合は cleanup で二重削除しない", async () => {
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const removeChildSpy = vi.spyOn(document.body, "removeChild");
+    vi.mocked(mermaid.run).mockImplementationOnce(async (args) => {
+      document.body.removeChild(args?.nodes?.[0] as Node);
+      throw new Error("detached while rendering");
+    });
+
+    try {
+      render(<MermaidDiagram chart="graph TD; A-->B" />);
+
+      await waitFor(() => {
+        expect(consoleError).toHaveBeenCalledWith(
+          "[MermaidDiagram] render failed:",
+          expect.any(Error)
+        );
+      });
+      expect(removeChildSpy).toHaveBeenCalledTimes(1);
+    } finally {
+      removeChildSpy.mockRestore();
+    }
+  });
+
   it("描画処理中に一時 DOM 要素が body へ追加され、完了・失敗後に確実に削除される", async () => {
     const appendChildSpy = vi.spyOn(document.body, "appendChild");
     const removeChildSpy = vi.spyOn(document.body, "removeChild");
