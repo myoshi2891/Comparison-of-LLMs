@@ -125,6 +125,35 @@ describe("MermaidDiagram レイアウト規約", () => {
     expect(outer.classList.contains("customFrame")).toBe(true);
   });
 
+  it("Webフォントの読み込み完了後に Mermaid を描画する", async () => {
+    const originalFonts = Object.getOwnPropertyDescriptor(document, "fonts");
+    let resolveFonts!: () => void;
+    const fontsReady = new Promise<void>((resolve) => {
+      resolveFonts = resolve;
+    });
+    Object.defineProperty(document, "fonts", {
+      configurable: true,
+      value: { ready: fontsReady },
+    });
+    vi.mocked(mermaid.run).mockClear();
+
+    try {
+      render(<MermaidDiagram chart="graph TD; A-->B" />);
+
+      await waitFor(() => expect(mermaid.initialize).toHaveBeenCalled());
+      expect(mermaid.run).not.toHaveBeenCalled();
+
+      resolveFonts();
+      await waitFor(() => expect(mermaid.run).toHaveBeenCalledTimes(1));
+    } finally {
+      if (originalFonts) {
+        Object.defineProperty(document, "fonts", originalFonts);
+      } else {
+        Reflect.deleteProperty(document, "fonts");
+      }
+    }
+  });
+
   it("描画後に生成された svg へ max-width:100% / height:auto を後付けする（列幅への縮小フィット）", async () => {
     const { container } = render(<MermaidDiagram chart="graph TD; A-->B" />);
 
