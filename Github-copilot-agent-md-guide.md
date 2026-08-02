@@ -20,7 +20,7 @@
 
 ## 1. `.agent.md` とは何か
 
-`.agent.md` は、GitHub Copilot に「特定の役割(ペルソナ)」「使えるツール」「振る舞いのルール」をまとめて持たせるための、YAMLフロントマター付きMarkdownファイルです。以前は「custom chat modes」と呼ばれていましたが、名称が「custom agents」に統一されました。既存の `.chatmode.md` ファイルがあれば、拡張子を `.agent.md` に変更するだけで移行できます。
+`.agent.md` は、GitHub Copilot に「特定の役割(ペルソナ)」「使えるツール」「振る舞いのルール」をまとめて持たせるための、YAMLフロントマター付きMarkdownファイルです。以前は「custom chat modes」と呼ばれていましたが、名称が「custom agents」に統一されました。既存の `.chatmode.md` ファイルを移行するには、拡張子を `.agent.md` に変更したうえで、VS Code の既定検索先である `.github/agents/` または `.claude/agents/` へ移動します。`chat.agentFilesLocations` を設定している場合は、その指定先へ移動することもできます。
 
 `.agent.md` が解決する課題はシンプルです。汎用の「なんでも屋」エージェントに毎回同じ前提知識やツール制限を説明し直すのは非効率です。プランナー、実装者、セキュリティレビュアーといった役割ごとにファイルを分けておけば、ドロップダウンやスラッシュコマンドで切り替えるだけで、その役割に最適化されたツールセットと指示が適用されます。
 
@@ -50,12 +50,11 @@
 | `tools` | string[] | 推奨 | 利用可能な組み込みツール・ツールセット・MCPツール・拡張機能提供ツールの一覧。`<サーバー名>/*` でMCPサーバーの全ツールを一括指定できる。 |
 | `agents` | string[] | 任意 | このエージェントがサブエージェントとして呼び出せるエージェント名の許可リスト。`*` は全許可、空配列 `[]` はサブエージェント利用を禁止。指定する場合は `tools` に `agent` ツールを含める必要がある。 |
 | `model` | string \| string[] | 任意 | 使用するモデル。配列で指定すると先頭から順に利用可能なモデルを試す(フォールバック)。省略時はモデルピッカーで選択中のモデルを使用。 |
-| `reasoningEffort` | `low`\|`medium`\|`high` | 任意 | 推論の強度をエージェント単位で固定する(例: 整形専用エージェントは `low`、セキュリティレビューは `high`)。 |
 | `user-invocable` | boolean | 任意(既定 `true`) | `false` にするとエージェント選択ドロップダウンから隠れ、サブエージェントとしてのみ呼び出し可能になる。 |
 | `disable-model-invocation` | boolean | 任意(既定 `false`) | `true` にすると他のエージェントからサブエージェントとして呼ばれなくなる(ユーザーが明示的に選んだ時のみ動作)。 |
 | `infer` | boolean | **非推奨** | 旧仕様。`user-invocable` と `disable-model-invocation` に置き換え済み。`infer: true`(既定)はピッカー表示とサブエージェント利用の両方を許可し、`infer: false` は両方を隠していた。 |
 | `target` | `vscode`\|`github-copilot` | 任意 | エージェントの対象環境。 |
-| `mcp-servers` | object[] | 任意 | `target: github-copilot` のカスタムエージェントで使うMCPサーバー設定(JSON)。 |
+| `mcp-servers` | object | 任意 | `target: github-copilot` のカスタムエージェントで使うMCPサーバー設定(JSON)。 |
 | `handoffs` | object[] | 任意 | チャット応答後に表示する「次のエージェントへの引き継ぎ」ボタンの定義。詳細は[第4章](#4-handoffsエージェント連鎖)。 |
 | `handoffs[].label` | string | Handoffs使用時必須 | ボタンに表示するテキスト。 |
 | `handoffs[].agent` | string | Handoffs使用時必須 | 切り替え先のエージェント識別子。 |
@@ -98,7 +97,7 @@ CLIでは `.github/agents/<name>.agent.md` という命名規則でエージェ�
 description: 'Web accessibility(WCAG 2.1/2.2)とインクルーシブUXの専門アシスタント'
 name: 'Accessibility Expert'
 model: GPT-5.2
-tools: ['codebase', 'edit/editFiles', 'web/fetch', 'runTests', 'problems']
+tools: ['search/codebase', 'edit/editFiles', 'web/fetch', 'runTests', 'problems']
 ---
 
 # Accessibility Expert
