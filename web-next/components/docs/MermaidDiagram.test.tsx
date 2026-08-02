@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { render, waitFor } from "@testing-library/react";
 import mermaid from "mermaid";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -493,6 +495,13 @@ describe("MermaidDiagram pieChart 配色補正", () => {
 describe("MermaidDiagram 失敗時と世代管理", () => {
   afterEach(() => {
     vi.restoreAllMocks();
+  });
+
+  it("複数図の Mermaid 描画を直列実行する", () => {
+    const source = readFileSync(join(__dirname, "MermaidDiagram.tsx"), "utf8");
+
+    expect(source).toContain("enqueueMermaidRender");
+    expect(source).toMatch(/enqueueMermaidRender\(async \(\) =>/);
   });
 
   it("描画に失敗したらエラーメッセージへ差し替える", async () => {
