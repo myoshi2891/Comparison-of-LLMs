@@ -17,7 +17,7 @@
 7. [コンテキストファイル戦略（AGENTS.md / SOUL.md）](#7-コンテキストファイル戦略agentsmd--soulmd)
 8. [サブエージェント委任（Delegation）](#8-サブエージェント委任delegation)
 9. [execute_codeによるトークン最適化](#9-execute_codeによるトークン最適化)
-10. [Persistent Goals（/goal）― Ralph loopの実践](#10-persistent-goalsgoal--ralph-loopの実践)
+10. [Persistent Goals（/goal）― Ralph loopの実践](#10-persistent-goalsgoal-ralph-loopの実践)
 11. [Cron自動化のベストプラクティス](#11-cron自動化のベストプラクティス)
 12. [MCP統合のベストプラクティス](#12-mcp統合のベストプラクティス)
 13. [本番運用のセキュリティ・チェックリスト](#13-本番運用のセキュリティチェックリスト)
