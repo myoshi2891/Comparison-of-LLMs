@@ -453,7 +453,7 @@ export default function Page() {
 
             <h3>1.2　何が変わったのか：一言でいうと</h3>
             <figure className={styles.diagram}>
-              <div id="diag-1" className={styles.mermaidContainer}>
+              <div className={styles.mermaidContainer}>
                 <MermaidDiagram
                   chart={DIAGRAMS.diag1}
                   id="diag-1"
@@ -519,7 +519,7 @@ export default function Page() {
             </p>
 
             <figure className={styles.diagram}>
-              <div id="diag-2" className={styles.mermaidContainer}>
+              <div className={styles.mermaidContainer}>
                 <MermaidDiagram
                   chart={DIAGRAMS.diag2}
                   id="diag-2"
@@ -611,7 +611,7 @@ export default function Page() {
             </div>
 
             <figure className={styles.diagram}>
-              <div id="diag-3" className={styles.mermaidContainer}>
+              <div className={styles.mermaidContainer}>
                 <MermaidDiagram
                   chart={DIAGRAMS.diag3}
                   id="diag-3"
@@ -693,7 +693,7 @@ export default function Page() {
             </p>
 
             <figure className={styles.diagram}>
-              <div id="diag-4" className={styles.mermaidContainer}>
+              <div className={styles.mermaidContainer}>
                 <MermaidDiagram
                   chart={DIAGRAMS.diag4}
                   id="diag-4"
@@ -789,7 +789,7 @@ export default function Page() {
             </p>
 
             <figure className={styles.diagram}>
-              <div id="diag-5" className={styles.mermaidContainer}>
+              <div className={styles.mermaidContainer}>
                 <MermaidDiagram
                   chart={DIAGRAMS.diag5}
                   id="diag-5"
@@ -891,7 +891,7 @@ export default function Page() {
             </p>
 
             <figure className={styles.diagram}>
-              <div id="diag-6" className={styles.mermaidContainer}>
+              <div className={styles.mermaidContainer}>
                 <MermaidDiagram
                   chart={DIAGRAMS.diag6}
                   id="diag-6"
@@ -1004,7 +1004,7 @@ export default function Page() {
             </p>
 
             <figure className={styles.diagram}>
-              <div id="diag-7" className={styles.mermaidContainer}>
+              <div className={styles.mermaidContainer}>
                 <MermaidDiagram
                   chart={DIAGRAMS.diag7}
                   id="diag-7"
@@ -1165,7 +1165,7 @@ export default function Page() {
             </p>
 
             <figure className={styles.diagram}>
-              <div id="diag-8" className={styles.mermaidContainer}>
+              <div className={styles.mermaidContainer}>
                 <MermaidDiagram
                   chart={DIAGRAMS.diag8}
                   id="diag-8"
@@ -1259,7 +1259,7 @@ export default function Page() {
             </p>
 
             <figure className={styles.diagram}>
-              <div id="diag-9" className={styles.mermaidContainer}>
+              <div className={styles.mermaidContainer}>
                 <MermaidDiagram
                   chart={DIAGRAMS.diag9}
                   id="diag-9"
@@ -1316,7 +1316,7 @@ export default function Page() {
             </p>
 
             <figure className={styles.diagram}>
-              <div id="diag-10" className={styles.mermaidContainer}>
+              <div className={styles.mermaidContainer}>
                 <MermaidDiagram
                   chart={DIAGRAMS.diag10}
                   id="diag-10"
@@ -1468,7 +1468,7 @@ export default function Page() {
             </ul>
 
             <figure className={styles.diagram}>
-              <div id="diag-11" className={styles.mermaidContainer}>
+              <div className={styles.mermaidContainer}>
                 <MermaidDiagram
                   chart={DIAGRAMS.diag11}
                   id="diag-11"
@@ -1554,7 +1554,7 @@ export default function Page() {
             </p>
 
             <figure className={styles.diagram}>
-              <div id="diag-12" className={styles.mermaidContainer}>
+              <div className={styles.mermaidContainer}>
                 <MermaidDiagram
                   chart={DIAGRAMS.diag12}
                   id="diag-12"
@@ -1830,7 +1830,7 @@ export default function Page() {
             </p>
 
             <figure className={styles.diagram}>
-              <div id="diag-13" className={styles.mermaidContainer}>
+              <div className={styles.mermaidContainer}>
                 <MermaidDiagram
                   chart={DIAGRAMS.diag13}
                   id="diag-13"
@@ -1964,7 +1964,7 @@ export default function Page() {
 
             <h3>13.1　Loop Engineering成熟度モデル</h3>
             <figure className={styles.diagram}>
-              <div id="diag-14" className={styles.mermaidContainer}>
+              <div className={styles.mermaidContainer}>
                 <MermaidDiagram
                   chart={DIAGRAMS.diag14}
                   id="diag-14"
@@ -1979,7 +1979,7 @@ export default function Page() {
             <p>自分のループが健全かどうか、導入後に振り返るためのチェックリストです。</p>
 
             <figure className={styles.diagram}>
-              <div id="diag-15" className={styles.mermaidContainer}>
+              <div className={styles.mermaidContainer}>
                 <MermaidDiagram
                   chart={DIAGRAMS.diag15}
                   id="diag-15"
