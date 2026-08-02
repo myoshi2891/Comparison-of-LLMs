@@ -202,4 +202,11 @@ describe("/agent/loop-engineering - static source safety", () => {
     const needle = ["danger", "ously", "Set", "Inner", "HTML"].join("");
     expect(source.includes(needle)).toBe(false);
   });
+
+  it("delegates Mermaid SVG sizing and centering to the shared component", () => {
+    const css = readFileSync(join(__dirname, "page.module.css"), "utf8");
+
+    expect(css).not.toMatch(/\.mermaidContainer\s+svg\s*\{/);
+    expect(css).not.toMatch(/\.mermaidContainer\s*\{[^}]*\b(?:display|justify-content|width|max-width)\s*:/s);
+  });
 });
