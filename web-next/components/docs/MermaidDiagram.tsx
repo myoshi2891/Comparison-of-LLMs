@@ -291,7 +291,10 @@ export default function MermaidDiagram({
           if (!ref.current) return;
 
           if (document.fonts) {
-            await document.fonts.ready;
+            await Promise.race([
+              document.fonts.ready,
+              new Promise((resolve) => setTimeout(resolve, 3000)),
+            ]);
           }
           if (!isCurrent()) return;
 

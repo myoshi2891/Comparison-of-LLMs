@@ -227,7 +227,7 @@ describe("/agent/loop-engineering - static source safety", () => {
   it("does not override Mermaid node text colors with a page-wide important rule", () => {
     const css = readFileSync(join(__dirname, "page.module.css"), "utf8");
 
-    expect(css).not.toMatch(/:global\(\.label\)[\s\S]*?fill:\s*var\(--ink\)\s*!important/);
+    expect(css).not.toMatch(/:global\(\.label\)[^{]*\{[^}]*fill:\s*var\(--ink\)\s*!important/);
   });
 
   it("uses sufficiently dark fills whenever Mermaid diagram nodes use white text", () => {
