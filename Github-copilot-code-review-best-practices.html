@@ -1,0 +1,2031 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      GitHub Copilot Code Review 実践ガイド ― 中級〜上級エンジニアのためのベストプラクティス
+    </title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css"
+    />
+    <style>
+      :root {
+        --bg: #07111e;
+        --bg-elevated: #0d1c30;
+        --bg-elevated-2: #101f36;
+        --border: rgba(124, 158, 255, 0.16);
+        --border-strong: rgba(124, 158, 255, 0.32);
+        --text: #dbe4f3;
+        --text-dim: #93a3c4;
+        --text-faint: #5f7092;
+        --accent: #7c9eff;
+        --accent-soft: rgba(124, 158, 255, 0.12);
+        --accent-2: #9d8cff;
+        --high: #ff7a7a;
+        --high-bg: rgba(255, 122, 122, 0.12);
+        --medium: #ffb454;
+        --medium-bg: rgba(255, 180, 84, 0.12);
+        --low: #4ade80;
+        --low-bg: rgba(74, 222, 128, 0.12);
+        --code-bg: #0a1626;
+        --sidebar-w: 296px;
+        --font-sans:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Sans',
+          'Hiragino Kaku Gothic ProN', 'Noto Sans JP', 'Yu Gothic UI', Meiryo, sans-serif;
+        --font-mono:
+          ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        background: var(--bg);
+        background-image:
+          radial-gradient(
+            ellipse 900px 500px at 85% -10%,
+            rgba(124, 158, 255, 0.1),
+            transparent 60%
+          ),
+          radial-gradient(
+            ellipse 700px 500px at -10% 40%,
+            rgba(157, 140, 255, 0.06),
+            transparent 60%
+          );
+        background-attachment: fixed;
+        color: var(--text);
+        font-family: var(--font-sans);
+        line-height: 1.75;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+      a:focus-visible,
+      button:focus-visible,
+      summary:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
+        border-radius: 4px;
+      }
+
+      .layout {
+        display: block;
+        max-width: none;
+      }
+
+      /* ---------- Sidebar ---------- */
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: var(--sidebar-w);
+        height: 100vh;
+        overflow-y: auto;
+        background: var(--bg-elevated);
+        border-right: 1px solid var(--border);
+        padding: 1.75rem 1.4rem 3rem;
+        z-index: 40;
+        transition: transform 0.25s ease;
+      }
+      .sidebar::-webkit-scrollbar {
+        width: 8px;
+      }
+      .sidebar::-webkit-scrollbar-thumb {
+        background: var(--border-strong);
+        border-radius: 8px;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        margin-bottom: 1.6rem;
+        padding-bottom: 1.4rem;
+        border-bottom: 1px solid var(--border);
+      }
+      .brand-mark {
+        width: 34px;
+        height: 34px;
+        border-radius: 9px;
+        background: linear-gradient(135deg, var(--accent), var(--accent-2));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        font-size: 1.05rem;
+      }
+      .brand-text {
+        font-size: 0.86rem;
+        line-height: 1.3;
+        color: var(--text-dim);
+      }
+      .brand-text strong {
+        display: block;
+        color: var(--text);
+        font-size: 0.94rem;
+        letter-spacing: 0.01em;
+      }
+
+      .nav-group-label {
+        font-size: 0.68rem;
+        text-transform: uppercase;
+        letter-spacing: 0.09em;
+        color: var(--text-faint);
+        margin: 1.3rem 0 0.5rem;
+        padding: 0 0.5rem;
+      }
+      .nav-group-label:first-of-type {
+        margin-top: 0;
+      }
+
+      nav.toc ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+      nav.toc a {
+        display: flex;
+        align-items: baseline;
+        gap: 0.55rem;
+        padding: 0.44rem 0.55rem;
+        border-radius: 7px;
+        font-size: 0.855rem;
+        color: var(--text-dim);
+        border-left: 2px solid transparent;
+      }
+      nav.toc a .n {
+        font-family: var(--font-mono);
+        font-size: 0.72rem;
+        color: var(--text-faint);
+        min-width: 1.3em;
+      }
+      nav.toc a:hover {
+        background: var(--accent-soft);
+        color: var(--text);
+        text-decoration: none;
+      }
+      nav.toc a.active {
+        background: var(--accent-soft);
+        color: var(--accent);
+        border-left-color: var(--accent);
+        font-weight: 600;
+      }
+      nav.toc a.active .n {
+        color: var(--accent);
+      }
+
+      .sidebar-toggle {
+        display: none;
+        position: fixed;
+        top: 1rem;
+        left: 1rem;
+        z-index: 60;
+        width: 42px;
+        height: 42px;
+        border-radius: 10px;
+        background: var(--bg-elevated-2);
+        border: 1px solid var(--border-strong);
+        color: var(--text);
+        font-size: 1.1rem;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+      }
+      .sidebar-backdrop {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(3, 8, 16, 0.6);
+        z-index: 39;
+      }
+
+      /* ---------- Main ---------- */
+      .main {
+        margin-left: var(--sidebar-w);
+        max-width: none;
+        padding: 0 0 6rem;
+      }
+
+      .hero {
+        max-width: none;
+        padding: 4.6rem 3.4rem 3.2rem;
+        border-bottom: 1px solid var(--border);
+      }
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.75rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--accent);
+        background: var(--accent-soft);
+        border: 1px solid var(--border-strong);
+        padding: 0.32rem 0.8rem;
+        border-radius: 999px;
+        margin-bottom: 1.3rem;
+      }
+      .hero h1 {
+        font-size: clamp(1.9rem, 3.2vw, 2.7rem);
+        line-height: 1.28;
+        margin: 0 0 1rem;
+        letter-spacing: -0.01em;
+        background: linear-gradient(100deg, #f2f6ff 10%, var(--accent) 55%, var(--accent-2) 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+      .hero .lede {
+        color: var(--text-dim);
+        font-size: 1.05rem;
+        max-width: none;
+      }
+      .hero-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.6rem 1rem;
+        margin-top: 1.6rem;
+        font-size: 0.84rem;
+        color: var(--text-faint);
+      }
+      .hero-meta span {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+      }
+      .hero-meta strong {
+        color: var(--text-dim);
+        font-weight: 600;
+      }
+
+      .callout {
+        margin: 1.6rem 0 0;
+        padding: 1rem 1.2rem;
+        background: var(--bg-elevated);
+        border: 1px solid var(--border);
+        border-left: 3px solid var(--accent);
+        border-radius: 10px;
+        font-size: 0.92rem;
+        color: var(--text-dim);
+      }
+      .callout strong {
+        color: var(--text);
+      }
+      .callout.warn {
+        border-left-color: var(--medium);
+      }
+      .callout.warn strong {
+        color: var(--medium);
+      }
+
+      section.section {
+        max-width: none;
+        padding: 3.2rem 3.4rem;
+        border-bottom: 1px solid var(--border);
+        scroll-margin-top: 2rem;
+      }
+      section.section:last-of-type {
+        border-bottom: none;
+      }
+
+      .step-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-family: var(--font-mono);
+        font-size: 0.78rem;
+        color: var(--accent);
+        background: var(--accent-soft);
+        border: 1px solid var(--border-strong);
+        padding: 0.28rem 0.7rem;
+        border-radius: 999px;
+        margin-bottom: 0.9rem;
+      }
+
+      h2 {
+        font-size: 1.55rem;
+        margin: 0 0 1.1rem;
+        letter-spacing: -0.005em;
+        color: #f2f6ff;
+      }
+      h3 {
+        font-size: 1.14rem;
+        margin: 2rem 0 0.8rem;
+        color: #eaf0fc;
+      }
+      h4 {
+        font-size: 0.98rem;
+        margin: 1.4rem 0 0.6rem;
+        color: var(--text);
+      }
+
+      .prose,
+      .prose p,
+      .prose li {
+        max-width: none;
+        overflow-wrap: break-word;
+      }
+      .prose * {
+        overflow-wrap: break-word;
+      }
+      .prose p {
+        color: var(--text-dim);
+        margin: 0 0 1.05rem;
+      }
+      .prose ul,
+      .prose ol {
+        color: var(--text-dim);
+        padding-left: 1.3rem;
+        margin: 0 0 1.1rem;
+      }
+      .prose li {
+        margin: 0.4rem 0;
+      }
+      .prose li::marker {
+        color: var(--accent);
+      }
+      .prose strong {
+        color: var(--text);
+        font-weight: 650;
+      }
+      .prose code {
+        font-family: var(--font-mono);
+        font-size: 0.86em;
+        background: var(--code-bg);
+        border: 1px solid var(--border);
+        padding: 0.12em 0.42em;
+        border-radius: 5px;
+        color: #c9d6f2;
+        overflow-wrap: break-word;
+      }
+
+      sup.cite a {
+        font-size: 0.72em;
+        color: var(--accent);
+        font-weight: 600;
+        text-decoration: none;
+        padding: 0 0.05em;
+      }
+      sup.cite a:hover {
+        text-decoration: underline;
+      }
+
+      /* ---------- Tables ---------- */
+      .table-wrap {
+        overflow-x: auto;
+        margin: 1.4rem 0 1.7rem;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.88rem;
+        min-width: 520px;
+      }
+      thead th {
+        text-align: left;
+        background: var(--bg-elevated-2);
+        color: var(--text);
+        font-weight: 650;
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid var(--border-strong);
+        white-space: nowrap;
+      }
+      tbody td {
+        padding: 0.75rem 1rem;
+        color: var(--text-dim);
+        border-bottom: 1px solid var(--border);
+        vertical-align: top;
+      }
+      tbody tr:last-child td {
+        border-bottom: none;
+      }
+      tbody tr:hover {
+        background: rgba(124, 158, 255, 0.045);
+      }
+      td.mono,
+      th.mono {
+        font-family: var(--font-mono);
+        font-size: 0.82rem;
+        color: #c9d6f2;
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        font-size: 0.76rem;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        padding: 0.2rem 0.6rem;
+        border-radius: 999px;
+        white-space: nowrap;
+      }
+      .badge.high {
+        color: var(--high);
+        background: var(--high-bg);
+        border: 1px solid rgba(255, 122, 122, 0.35);
+      }
+      .badge.medium {
+        color: var(--medium);
+        background: var(--medium-bg);
+        border: 1px solid rgba(255, 180, 84, 0.35);
+      }
+      .badge.low {
+        color: var(--low);
+        background: var(--low-bg);
+        border: 1px solid rgba(74, 222, 128, 0.35);
+      }
+
+      /* ---------- Mermaid diagrams ---------- */
+      .diagram {
+        margin: 1.6rem 0 1.9rem;
+      }
+      .diagram-caption {
+        font-size: 0.82rem;
+        color: var(--text-faint);
+        margin-top: 0.7rem;
+        text-align: center;
+      }
+      .mermaid-wrapper {
+        width: 100%;
+        overflow-x: auto;
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        background: var(--bg-elevated);
+        padding: 1.6rem 1rem;
+      }
+      pre.mermaid {
+        width: 100%;
+        margin: 0;
+        display: flex;
+        justify-content: safe center;
+      }
+      .mermaid-wrapper svg {
+        max-width: none;
+        height: auto;
+        flex-shrink: 0;
+      }
+      .mermaid-loading {
+        color: var(--text-faint);
+        font-size: 0.85rem;
+        text-align: center;
+        padding: 1rem;
+      }
+
+      /* ---------- Code blocks ---------- */
+      .code-block {
+        margin: 1.2rem 0 1.6rem;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        overflow: hidden;
+        background: var(--code-bg);
+      }
+      .code-block .code-label {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.55rem 1rem;
+        background: var(--bg-elevated-2);
+        border-bottom: 1px solid var(--border);
+        font-family: var(--font-mono);
+        font-size: 0.76rem;
+        color: var(--text-faint);
+      }
+      .code-block pre {
+        margin: 0;
+        padding: 1.1rem 1.2rem;
+        overflow-x: auto;
+      }
+      .code-block code {
+        font-family: var(--font-mono);
+        font-size: 0.84rem;
+        line-height: 1.65;
+        background: transparent !important;
+      }
+
+      /* ---------- Checklist ---------- */
+      .checklist {
+        list-style: none;
+        padding: 0;
+        margin: 1.4rem 0;
+      }
+      .checklist li {
+        position: relative;
+        padding: 0.6rem 0.2rem 0.6rem 1.95rem;
+        border-bottom: 1px dashed var(--border);
+        color: var(--text-dim);
+        font-size: 0.93rem;
+        overflow-wrap: break-word;
+      }
+      .checklist li:last-child {
+        border-bottom: none;
+      }
+      .checklist li::before {
+        content: '';
+        position: absolute;
+        left: 0.2rem;
+        top: 0.8rem;
+        width: 17px;
+        height: 17px;
+        border: 1.5px solid var(--border-strong);
+        border-radius: 5px;
+        background: var(--bg-elevated);
+      }
+
+      /* ---------- Card grid (roadmap phases, tips) ---------- */
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+        gap: 1rem;
+        margin: 1.5rem 0;
+      }
+      .card {
+        background: var(--bg-elevated);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 1.2rem 1.3rem;
+      }
+      .card h4 {
+        margin: 0 0 0.5rem;
+        color: var(--text);
+        font-size: 0.95rem;
+      }
+      .card p {
+        margin: 0;
+        color: var(--text-dim);
+        font-size: 0.87rem;
+      }
+      .card .tag {
+        display: inline-block;
+        font-family: var(--font-mono);
+        font-size: 0.72rem;
+        color: var(--accent);
+        background: var(--accent-soft);
+        padding: 0.15rem 0.5rem;
+        border-radius: 6px;
+        margin-bottom: 0.6rem;
+      }
+
+      /* ---------- References ---------- */
+      .ref-group h3 {
+        margin-top: 2.2rem;
+      }
+      ol.ref-list {
+        padding-left: 1.4rem;
+        margin: 0.8rem 0 0;
+      }
+      ol.ref-list li {
+        margin: 0.7rem 0;
+        color: var(--text-dim);
+        font-size: 0.92rem;
+      }
+      .ref-url {
+        display: block;
+        word-break: break-all;
+        font-family: var(--font-mono);
+        font-size: 0.79rem;
+        color: var(--accent);
+        margin-top: 0.15rem;
+      }
+      .ref-date {
+        color: var(--text-faint);
+        font-size: 0.82rem;
+      }
+
+      footer.page-footer {
+        padding: 2.6rem 3.4rem 4rem;
+        color: var(--text-faint);
+        font-size: 0.83rem;
+      }
+      footer.page-footer a {
+        color: var(--text-dim);
+      }
+
+      @media (max-width: 980px) {
+        .sidebar {
+          transform: translateX(-100%);
+          box-shadow: 0 0 40px rgba(0, 0, 0, 0.4);
+        }
+        .sidebar.open {
+          transform: translateX(0);
+        }
+        .sidebar-backdrop.open {
+          display: block;
+        }
+        .sidebar-toggle {
+          display: flex;
+        }
+        .main {
+          margin-left: 0;
+        }
+        .hero,
+        section.section,
+        footer.page-footer {
+          padding-left: 1.5rem;
+          padding-right: 1.5rem;
+        }
+        .hero {
+          padding-top: 4.4rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <button class="sidebar-toggle" id="sidebarToggle" aria-label="目次を開閉">☰</button>
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+    <div class="layout">
+      <aside class="sidebar" id="sidebar">
+        <div class="brand">
+          <div class="brand-mark">🧭</div>
+          <div class="brand-text"><strong>Copilot Code Review</strong>実践ガイド</div>
+        </div>
+        <nav class="toc" aria-label="目次">
+          <div class="nav-group-label">はじめに</div>
+          <ul>
+            <li>
+              <a href="#intro"><span class="n">00</span>本ガイドについて</a>
+            </li>
+            <li>
+              <a href="#overview"><span class="n">01</span>Code Reviewとは何か</a>
+            </li>
+          </ul>
+          <div class="nav-group-label">ステップバイステップ</div>
+          <ul>
+            <li>
+              <a href="#step1"><span class="n">02</span>レビューを起動する</a>
+            </li>
+            <li>
+              <a href="#step2"><span class="n">03</span>カスタムインストラクション</a>
+            </li>
+            <li>
+              <a href="#step3"><span class="n">04</span>Agent SkillsとMCP</a>
+            </li>
+            <li>
+              <a href="#step4"><span class="n">05</span>コメントを運用する</a>
+            </li>
+            <li>
+              <a href="#step5"><span class="n">06</span>限界と人間レビュー</a>
+            </li>
+            <li>
+              <a href="#step6"><span class="n">07</span>セキュリティとガバナンス</a>
+            </li>
+          </ul>
+          <div class="nav-group-label">導入・比較</div>
+          <ul>
+            <li>
+              <a href="#comparison"><span class="n">08</span>他ツールとの位置づけ</a>
+            </li>
+            <li>
+              <a href="#roadmap"><span class="n">09</span>チーム導入ロードマップ</a>
+            </li>
+            <li>
+              <a href="#checklist"><span class="n">10</span>チェックリスト</a>
+            </li>
+            <li>
+              <a href="#summary"><span class="n">11</span>まとめ</a>
+            </li>
+          </ul>
+          <div class="nav-group-label">出典</div>
+          <ul>
+            <li>
+              <a href="#references"><span class="n">12</span>参考文献・出典</a>
+            </li>
+          </ul>
+        </nav>
+      </aside>
+
+      <main class="main">
+        <div class="hero">
+          <span class="eyebrow">GitHub Copilot &middot; Code Review</span>
+          <h1>
+            GitHub Copilot Code Review 実践ガイド<br />中級〜上級エンジニアのためのベストプラクティス
+          </h1>
+          <p class="lede prose">
+            Pull
+            Requestの一次レビューをAIに任せるための、設定・カスタムインストラクション・セキュリティ・チーム運用までをステップバイステップで解説します。
+          </p>
+          <div class="hero-meta">
+            <span><strong>情報基準日:</strong>&nbsp;2026年8月1日</span>
+            <span
+              ><strong>対象読者:</strong>&nbsp;GitHub
+              Copilotの基本操作を経験した中級〜上級エンジニア</span
+            >
+            <span><strong>出典数:</strong>&nbsp;25件(公式ドキュメント・Changelog・実務者記事)</span>
+          </div>
+          <div class="callout">
+            本ガイドは2026年8月1日時点の公開情報をもとに作成しています。GitHub Copilot Code
+            Reviewは更新頻度が高い機能のため、実際に導入する際は必ず<a
+              href="https://github.blog/changelog/label/copilot/"
+              target="_blank"
+              rel="noopener"
+              >GitHub Changelog</a
+            >で最新の挙動を確認してください。
+          </div>
+        </div>
+
+        <!-- ============ はじめに ============ -->
+        <section class="section prose" id="intro">
+          <h2>はじめに</h2>
+          <p>
+            GitHub Copilot Code Review(以下Copilot Code Review)は、Pull
+            Request(PR)の差分に対してAIが自動でインラインコメントを付ける機能です。2025年前半に一般提供が始まって以降、2026年に入ってからはエージェント的なアーキテクチャへの刷新、Agent
+            SkillsやMCP(Model Context
+            Protocol)サーバーとの連携、severity(重大度)表示、ネットワークアクセス制御(Firewall)など、短期間で多くの機能が追加されています。
+          </p>
+          <p>
+            本ガイドは、すでにGitHub
+            Copilotの基本機能(補完・Chat)を使ったことがある中級〜上級者を対象に、Copilot Code
+            Reviewを<strong>チームの開発フローに安全かつ効果的に組み込む</strong>ための考え方と手順をステップバイステップで解説します。個々のボタン操作の解説よりも、「何を」「なぜ」設定するのかという設計判断に重点を置いています。
+          </p>
+        </section>
+
+        <!-- ============ Overview ============ -->
+        <section class="section prose" id="overview">
+          <h2>GitHub Copilot Code Reviewとは何か</h2>
+
+          <h3>何をしてくれるのか</h3>
+          <p>
+            Copilot Code
+            ReviewはPRの差分・タイトル・本文・リポジトリのカスタム指示などをまとめてコンテキストとして与えられたLLMが解析し、行単位のインラインコメントとしてPRに投稿する機能です。解析は静的なものであり、実際にコードを実行したりテストを走らせたりはしません。バグや論理エラー、セキュリティ上の懸念、パフォーマンスの問題、言語・フレームワークのベストプラクティス違反などを検出範囲としています<sup
+              class="cite"
+              ><a href="#ref-1">[1]</a></sup
+            ><sup class="cite"><a href="#ref-7">[7]</a></sup
+            >。
+          </p>
+          <p>
+            レビューを担当するモデルは固定ではなく、GPT系・Claude
+            Opus系・Gemini系など複数のモデルを組み合わせて使う設計になっており、レビューごとに使用されるモデルが変わり得る点も押さえておく必要があります<sup
+              class="cite"
+              ><a href="#ref-17">[17]</a></sup
+            >。
+          </p>
+          <p>
+            Copilotのレビューは常に「Comment」種別で投稿され、「Approve」や「Request
+            changes」にはなりません。したがって、必須レビュー(Required
+            reviewers)としてはカウントされず、マージ判定をブロックすることもありません。最終的な承認権限は常に人間のレビュアーに残ります<sup
+              class="cite"
+              ><a href="#ref-2">[2]</a></sup
+            >。
+          </p>
+
+          <h3>処理の流れ(アーキテクチャ)</h3>
+          <div class="diagram">
+            <div class="mermaid-wrapper">
+              <div class="mermaid-loading">図を読み込み中…</div>
+              <script type="text/plain" class="mermaid-source">
+                flowchart TB
+                    A["入力処理<br/>PR差分 + タイトル/本文 + カスタム指示を統合"] --> B["言語モデル解析<br/>GPT系 / Claude Opus系 / Gemini系 等を使い分け"]
+                    B --> C["応答生成<br/>指摘 + severity + 修正提案(自然言語/コード)"]
+                    C --> D["出力整形<br/>PRのインライン差分コメントとして投稿"]
+              </script>
+            </div>
+            <p class="diagram-caption">図1. Copilot Code Reviewの内部処理フロー</p>
+          </div>
+
+          <p>
+            2026年6月には、Copilot
+            CLI/SDKに組み込まれているファイル探索ツールをレビュー処理そのものにも使うよう内部実装が刷新され、レビュー品質を維持したままコストが約20%削減されたと報告されています。この変更に合わせて「Medium
+            analysis depth」という解析の深さを選べるパブリックプレビューも展開されています<sup
+              class="cite"
+              ><a href="#ref-11">[11]</a></sup
+            >。
+          </p>
+
+          <h3>利用できる環境</h3>
+          <p>
+            Copilot Code ReviewはGitHub.com上のPR画面のほか、Visual Studio(17.14以降)やVS
+            Code、CLIなど複数の環境から呼び出せます。GitHub.com上では、PRの「Reviewers」からCopilotを選んで「Request」をクリックするだけで、通常30秒以内にレビューが投稿されます<sup
+              class="cite"
+              ><a href="#ref-2">[2]</a></sup
+            >。組織のCopilotライセンスを持たないメンバーでも、管理者が許可していればレビューを受け取れる場合があります<sup
+              class="cite"
+              ><a href="#ref-2">[2]</a></sup
+            >。
+          </p>
+        </section>
+
+        <!-- ============ Step 1 ============ -->
+        <section class="section prose" id="step1">
+          <span class="step-badge">STEP 1</span>
+          <h2>レビューを起動する</h2>
+          <p>
+            Copilotにレビューを依頼する方法は「都度手動でリクエストする」か「自動化する」かの二択です。チームで運用するなら、早い段階で自動化の範囲を決めておくことをおすすめします。
+          </p>
+
+          <div class="diagram">
+            <div class="mermaid-wrapper">
+              <div class="mermaid-loading">図を読み込み中…</div>
+              <script type="text/plain" class="mermaid-source">
+                flowchart TB
+                    Start["自動化のレベルを決める"] --> Triage{"どの範囲で有効化する?"}
+                    Triage -->|"自分のPRだけ"| P["個人設定<br/>Your Copilot > Automatic code review"]
+                    Triage -->|"1つのリポジトリ"| R["リポジトリRuleset<br/>Automatically request Copilot code review"]
+                    Triage -->|"組織全体"| O["組織Ruleset<br/>Repository Rulesetsを一括適用"]
+                    P --> Merge["PR作成/更新時にCopilotが自動レビュー"]
+                    R --> Merge
+                    O --> Merge
+                    Merge --> End["レビューコメントがPRに投稿される"]
+              </script>
+            </div>
+            <p class="diagram-caption">図2. 自動レビューを有効化するまでの意思決定フロー</p>
+          </div>
+
+          <ul>
+            <li>
+              <strong>個人設定</strong>: プロフィールの「Your Copilot」から「Automatic code
+              review」を有効化すると、自分が開いたすべてのPRが自動レビュー対象になります。この設定はCopilot
+              Pro / Pro+ / Maxプランでのみ利用できます<sup class="cite"
+                ><a href="#ref-5">[5]</a></sup
+              >。
+            </li>
+            <li>
+              <strong>リポジトリRuleset</strong>: リポジトリのSettings &gt; Rules &gt;
+              Rulesetsで「Automatically request Copilot code review」を有効化します。「Review new
+              pushes」を有効にすると新しいコミットのたびに再レビューされ、「Review draft pull
+              requests」を有効にするとドラフトPRの段階からフィードバックを得られます<sup
+                class="cite"
+                ><a href="#ref-5">[5]</a></sup
+              >。2025年9月からは、この自動レビュー設定が「Require a pull request before
+              merging」の付随設定ではなく、独立したルールとして設定できるようになったため、マージ保護(ブランチ保護)を強制せずに自動レビューだけを導入することも可能です<sup
+                class="cite"
+                ><a href="#ref-14">[14]</a></sup
+              >。
+            </li>
+            <li>
+              <strong>組織/Enterpriseレベル</strong>: Enterprise管理者は「AI controls」からCopilot
+              Code Reviewを「Enabled everywhere」または「Let organizations
+              decide」として一括制御でき、組織Rulesetsを使えば多数のリポジトリに同じ自動レビュー方針を適用できます<sup
+                class="cite"
+                ><a href="#ref-6">[6]</a></sup
+              >。ただし、Push毎・ドラフト時のレビューを有効にするほど開発者への通知は増えるため、ノイズとのバランスを意識する必要があります<sup
+                class="cite"
+                ><a href="#ref-6">[6]</a></sup
+              >。
+            </li>
+          </ul>
+
+          <div class="callout">
+            <strong>実務Tips:</strong>
+            いきなり組織全体に自動レビューを強制するのではなく、まず1〜2個のリポジトリでPR作成時のみの自動レビューから始め、チームの反応(コメントの採用率・却下率)を見てからPush毎レビューやドラフトレビューを追加する、という段階導入が推奨されます<sup
+              class="cite"
+              ><a href="#ref-3">[3]</a></sup
+            ><sup class="cite"><a href="#ref-19">[19]</a></sup
+            >。
+          </div>
+        </section>
+
+        <!-- ============ Step 2 ============ -->
+        <section class="section prose" id="step2">
+          <span class="step-badge">STEP 2</span>
+          <h2>カスタムインストラクションを設計する</h2>
+          <p>
+            Copilot Code
+            Reviewは、そのままでも一般的なコーディング標準に基づいてレビューしますが、真価を発揮するのはリポジトリ固有の文脈(意図的な設計判断、重点的に見てほしい箇所、テストや実装に関するチームの基準など)を教えたときです<sup
+              class="cite"
+              ><a href="#ref-25">[3]</a></sup
+            >。
+          </p>
+
+          <h3>3種類の指示ファイル</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>ファイル</th>
+                  <th>適用範囲</th>
+                  <th>主な用途</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="mono">.github/copilot-instructions.md</td>
+                  <td>リポジトリ全体</td>
+                  <td>
+                    コーディング規約・レビュー観点・組織横断の期待値など、常に考慮してほしい内容
+                  </td>
+                </tr>
+                <tr>
+                  <td class="mono">
+                    .github/instructions/*.instructions.md<br />(<code>applyTo</code>フロントマター付き)
+                  </td>
+                  <td>指定したパス/言語のみ</td>
+                  <td>
+                    特定言語・特定ディレクトリだけに適用したいルール(例:
+                    フロントエンドのアクセシビリティ、Pythonの型ヒント等)
+                  </td>
+                </tr>
+                <tr>
+                  <td class="mono">AGENTS.md</td>
+                  <td>リポジトリ全体</td>
+                  <td>
+                    プロジェクトの構造や「意図的にこうなっている」文脈など、レビュー品質を上げるための背景情報
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            さらに、2026年に入ってからは<code>REVIEW.md</code>・<code>GEMINI.md</code>・<code>CLAUDE.md</code>といった他のAIツール向けの指示ファイルも自動的に読み込まれるようになり、チームがどこにガイドラインを書いていても一貫して反映されるようになりました<sup
+              class="cite"
+              ><a href="#ref-10">[10]</a></sup
+            >。以前はCopilot Enterprise向けに「Coding
+            guidelines」というUIベースの別機能がプライベートプレビューで提供されていましたが、この<code>*.instructions.md</code>ベースの仕組みに統合される形で段階的に廃止されています<sup
+              class="cite"
+              ><a href="#ref-15">[15]</a></sup
+            >。
+          </p>
+
+          <h4><code>*.instructions.md</code>ファイルの例</h4>
+          <div class="code-block">
+            <div class="code-label">
+              <span>.github/instructions/frontend.instructions.md</span><span>yaml + markdown</span>
+            </div>
+            <pre><code class="language-yaml" id="code-instructions"></code></pre>
+          </div>
+
+          <p>
+            特定のファイルをCopilot code reviewだけ、あるいはCopilot cloud
+            agentだけに読ませたくない場合は、フロントマターに<code>excludeAgent: code-review</code
+            >または<code>excludeAgent: cloud-agent</code
+            >を指定することで、そのファイルを対象エージェントから除外できます<sup class="cite"
+              ><a href="#ref-31">[31]</a></sup
+            >。
+          </p>
+
+          <h3>指示ファイルをどこに書くか判断する</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>目的</th>
+                  <th>使うファイル</th>
+                  <th>備考</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>リポジトリ全体で常に守ってほしい規約を書きたい</td>
+                  <td class="mono">copilot-instructions.md</td>
+                  <td>最初に書くべき基本ファイル</td>
+                </tr>
+                <tr>
+                  <td>特定言語・特定ディレクトリだけにルールを絞りたい</td>
+                  <td class="mono">*.instructions.md + applyTo</td>
+                  <td>言語ごとのルールを copilot-instructions.md から移すと精度が上がる</td>
+                </tr>
+                <tr>
+                  <td>Copilot code reviewとcloud agentで挙動を変えたい</td>
+                  <td class="mono">excludeAgent フロントマター</td>
+                  <td>片方のエージェントにだけ読ませたい指示に使う</td>
+                </tr>
+                <tr>
+                  <td>チーム独自のツールや社内標準を反映したい</td>
+                  <td class="mono">.github/skills/配下のSKILL.md</td>
+                  <td>レビュー専用にするなら code-review のようなレビュー用途とわかる名前にする</td>
+                </tr>
+                <tr>
+                  <td>外部システム(課題管理・ドキュメント等)の情報を参照したい</td>
+                  <td>リポジトリのMCPサーバー設定</td>
+                  <td>ツール呼び出しは読み取り専用に限定される</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>効果的な書き方</h3>
+          <p>
+            GitHub自身が公開しているガイドによれば、Copilot Code
+            Reviewの指示ファイルは非決定的(non-deterministic)であり、すべての指示に毎回100%従うわけではありません。そのため、以下のような書き方が推奨されています<sup
+              class="cite"
+              ><a href="#ref-3">[3]</a></sup
+            ><sup class="cite"><a href="#ref-16">[16]</a></sup
+            >。
+          </p>
+          <ul>
+            <li>最小限の指示から始め、実際のレビュー結果を見ながら段階的に追加する。</li>
+            <li>見出しと箇条書きで構造化し、長い説明文ではなく短い命令形の指示にする。</li>
+            <li>
+              1つの指示ファイルはおよそ1,000行を超えないようにする。それ以上長くなると、指示の遵守精度が落ちる傾向がある<sup
+                class="cite"
+                ><a href="#ref-3">[3]</a></sup
+              >。
+            </li>
+            <li>
+              抽象的な指示より、具体例を添えた指示のほうが伝わりやすい(例:「良いコードを書いて」ではなく「この関数のように早期returnでネストを浅くして」)。
+            </li>
+            <li>
+              どうしても100%守らせたいルール(セキュリティの必須要件など)は、Copilotへの指示だけに頼らず、Linterや静的解析ツールなど決定的な仕組みでも担保する<sup
+                class="cite"
+                ><a href="#ref-19">[19]</a></sup
+              >。
+            </li>
+          </ul>
+          <p>
+            2026年6月には、<code>copilot-instructions.md</code>・<code>*.instructions.md</code>の合計文字数に課されていた4,000文字の上限が撤廃され、より柔軟にカスタマイズできるようになりました<sup
+              class="cite"
+              ><a href="#ref-13">[13]</a></sup
+            >。また、組織レベルの指示もCopilot Code Reviewが考慮するようになっています<sup
+              class="cite"
+              ><a href="#ref-15">[15]</a></sup
+            >。
+          </p>
+        </section>
+
+        <!-- ============ Step 3 ============ -->
+        <section class="section prose" id="step3">
+          <span class="step-badge">STEP 3</span>
+          <h2>Agent SkillsとMCPで文脈を拡張する</h2>
+          <p>
+            2026年7月29日、Copilot Code ReviewにおけるAgent SkillsとMCPサーバー連携が、Copilot
+            Pro・Pro+・Business・Enterpriseの全有償プランで一般提供(GA)になりました<sup class="cite"
+              ><a href="#ref-9">[9]</a></sup
+            >。これはMCPの2026-07-28版仕様が正式リリースされた翌日というタイミングでもあり、MCP対応が「アーリーアダプター向けの機能」から「プラン選定時のチェック項目」へと位置づけを変えた出来事として注目されています<sup
+              class="cite"
+              ><a href="#ref-14">[14]</a></sup
+            >。
+          </p>
+
+          <div class="grid">
+            <div class="card">
+              <span class="tag">Agent Skills</span>
+              <h4>.github/skills/配下のSKILL.md</h4>
+              <p>
+                社内ツールやコーディング標準に関する文脈をレビュー時に注入。レビュー用途であることが伝わるよう、ディレクトリ名は
+                <code>code-review</code> のようにレビュー指向の名前にすることが推奨されています<sup
+                  class="cite"
+                  ><a href="#ref-12">[12]</a></sup
+                >。
+              </p>
+            </div>
+            <div class="card">
+              <span class="tag">MCPサーバー</span>
+              <h4>読み取り専用の外部連携</h4>
+              <p>
+                課題管理・ドキュメント・サービスカタログ等の情報をレビューに取り込む。GitHub
+                MCPサーバーとPlaywright
+                MCPサーバーはデフォルトで有効。全ツール呼び出しは読み取り専用に制限<sup class="cite"
+                  ><a href="#ref-9">[9]</a></sup
+                ><sup class="cite"><a href="#ref-12">[12]</a></sup
+                >。
+              </p>
+            </div>
+            <div class="card">
+              <span class="tag">可視化</span>
+              <h4>アトリビューション表示</h4>
+              <p>
+                Agent
+                SkillsやMCPの文脈を使って生成されたコメントには利用元が明示され、セッションログからどのツールが呼ばれたか確認できます<sup
+                  class="cite"
+                  ><a href="#ref-9">[9]</a></sup
+                ><sup class="cite"><a href="#ref-12">[12]</a></sup
+                >。
+              </p>
+            </div>
+          </div>
+
+          <p>
+            PR本文に課題番号やインシデントIDなどMCP経由で参照できる識別子を明記すると、Copilotがその文脈をより積極的に利用する傾向があります<sup
+              class="cite"
+              ><a href="#ref-12">[12]</a></sup
+            >。対応言語の壁を越えたい場合、Web検索ツールを備えたMCPサーバーやPlaywright経由で最新のセキュリティ勧告・イディオムを調べさせる
+            <code>.agent.md</code>
+            レビュアーを自作し、根拠となる情報源を引用させるという応用例も紹介されています<sup
+              class="cite"
+              ><a href="#ref-18">[18]</a></sup
+            >。
+          </p>
+        </section>
+
+        <!-- ============ Step 4 ============ -->
+        <section class="section prose" id="step4">
+          <span class="step-badge">STEP 4</span>
+          <h2>レビューコメントを運用する</h2>
+
+          <h3>コメントの構造</h3>
+          <p>
+            Copilotのレビューコメントは通常、問題点の説明・重大度・(可能な場合は)ワンクリックで適用できる修正提案という構成になっています<sup
+              class="cite"
+              ><a href="#ref-6">[6]</a></sup
+            >。2026年5月には、似た指摘をまとめてグループ化する機能と、severity(重大度)ラベルがコメントの右上に表示される機能が追加され、大規模PRでもどこから対応すべきか判断しやすくなりました<sup
+              class="cite"
+              ><a href="#ref-7">[7]</a></sup
+            >。
+          </p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Severity</th>
+                  <th>目安</th>
+                  <th>推奨対応</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="badge high">High</span></td>
+                  <td>バグ・セキュリティ上の懸念など、放置するとインシデントにつながりうる指摘</td>
+                  <td>マージ前に必ず精査し、対応または明示的な却下理由を残す</td>
+                </tr>
+                <tr>
+                  <td><span class="badge medium">Medium</span></td>
+                  <td>保守性・パフォーマンスなど、後々の負債になりうる指摘</td>
+                  <td>可能な範囲で対応し、対応しない場合はコメントで理由を残す</td>
+                </tr>
+                <tr>
+                  <td><span class="badge low">Low</span></td>
+                  <td>スタイルや軽微な改善提案</td>
+                  <td>チームの余力に応じて対応。無理に全件消化しようとしない</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>コメントへの対応フロー</h3>
+          <div class="diagram">
+            <div class="mermaid-wrapper">
+              <div class="mermaid-loading">図を読み込み中…</div>
+              <script type="text/plain" class="mermaid-source">
+                flowchart TB
+                    A["PR作成 (Draftも可)"] --> B["Copilot code reviewを起動<br/>(自動設定 または 手動Request)"]
+                    B --> C["レビューコメント生成<br/>severity: High / Medium / Low"]
+                    C --> D{"開発者が内容を確認"}
+                    D -->|"妥当な指摘"| E["提案を適用 または 手動修正"]
+                    D -->|"誤検知/対象外"| F["コメントをResolve"]
+                    E --> G["人間レビュアーが最終レビュー"]
+                    F --> G
+                    G --> H{"Approve?"}
+                    H -->|"Yes"| I["マージ"]
+                    H -->|"No / 追加修正"| B
+              </script>
+            </div>
+            <p class="diagram-caption">図3. レビューコメントへの標準的な対応フロー</p>
+          </div>
+
+          <p>
+            Copilotの提案は1件ずつ、あるいは複数まとめて1つのコミットとして適用できます。自分で修正するのではなく、提案の実装ごとCopilot
+            cloud agentに任せることも可能です<sup class="cite"><a href="#ref-6">[6]</a></sup
+            >。Copilotのレビューコメントは人間のレビューコメントと同様に、リアクションを付けたり返信したり、Resolve/Hideしたりできますが、Copilotへの返信コメントはCopilot自身には見えず、Copilotから返信が来ることもない点は覚えておく必要があります<sup
+              class="cite"
+              ><a href="#ref-2">[2]</a></sup
+            >。
+          </p>
+        </section>
+
+        <!-- ============ Step 5 ============ -->
+        <section class="section prose" id="step5">
+          <span class="step-badge">STEP 5</span>
+          <h2>限界を理解し、人間レビューと組み合わせる</h2>
+          <p>
+            GitHub自身の「Responsible use」ドキュメントは、Copilot Code
+            Reviewの既知の弱点として、見逃し(false negative)・誤検知(false
+            positive)・不正確な修正提案・学習データに起因するバイアスを明記しており、セキュリティ上のすべての問題を検出できるわけではなく、脆弱性を含むコードを提案する可能性もあるため過信すべきではないとしています<sup
+              class="cite"
+              ><a href="#ref-7">[7]</a></sup
+            >。
+          </p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>限界</th>
+                  <th>内容</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>誤検知(false positive)</td>
+                  <td>
+                    実務者の報告では、Copilotのレビューコメントのうちおおよそ15〜25%が誤りか、的外れか、曖昧すぎて役に立たないケースだとされています<sup
+                      class="cite"
+                      ><a href="#ref-17">[17]</a></sup
+                    >。
+                  </td>
+                </tr>
+                <tr>
+                  <td>見逃し(false negative)</td>
+                  <td>
+                    権限昇格や設計レベルのセキュリティ上の欠陥など、ファイルをまたぐ文脈が必要な問題を見逃す傾向が指摘されています<sup
+                      class="cite"
+                      ><a href="#ref-18">[18]</a></sup
+                    >。
+                  </td>
+                </tr>
+                <tr>
+                  <td>対応言語</td>
+                  <td>
+                    公式にサポートされる出力言語は英語のみです<sup class="cite"
+                      ><a href="#ref-7">[7]</a></sup
+                    >。日本語での応答は copilot-instructions.md
+                    等で明示的に指示できますが、公式サポート対象外である点に注意してください。
+                  </td>
+                </tr>
+                <tr>
+                  <td>学習しない</td>
+                  <td>
+                    特定のレビューコメントを繰り返し却下しても、Copilotがその傾向を学習して次回から抑制することはありません。同種の指摘を出し続ける前提でチーム運用を設計する必要があります<sup
+                      class="cite"
+                      ><a href="#ref-17">[17]</a></sup
+                    >。
+                  </td>
+                </tr>
+                <tr>
+                  <td>静的解析のみ</td>
+                  <td>
+                    コードを実際に実行したりテストを走らせたりはしないため、実行時にしか顕在化しない問題は検出対象外です<sup
+                      class="cite"
+                      ><a href="#ref-1">[1]</a></sup
+                    >。
+                  </td>
+                </tr>
+                <tr>
+                  <td>マージをブロックしない</td>
+                  <td>
+                    「Comment」レビューのみのため、必須承認としてカウントされず、マージの可否は人間の判断に委ねられます<sup
+                      class="cite"
+                      ><a href="#ref-2">[2]</a></sup
+                    >。
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            ある分析記事によれば、Copilot Code
+            Reviewが実際にフィードバックを返すのはPRレビューの約71%で、フィードバックがある場合の平均コメント数はおよそ5.1件、残り約29%では「特に指摘なし」として静かに終わるとされています。指摘があれば何でも出す方針ではなく、価値がないと判断すればコメントしない設計は、開発者がコメントを読み続けてくれるための工夫だと分析されています<sup
+              class="cite"
+              ><a href="#ref-23">[23]</a></sup
+            >。
+          </p>
+
+          <h3>チーム運用上の推奨事項</h3>
+          <ul>
+            <li>
+              <strong>却下してよい文化をつくる:</strong>
+              誤検知が一定割合発生する前提に立ち、「Copilotのコメントを却下するのは普通のこと」という規範をチームで共有します<sup
+                class="cite"
+                ><a href="#ref-17">[17]</a></sup
+              >。
+            </li>
+            <li>
+              <strong>PRは小さく保つ:</strong>
+              2,000行規模のPRをレビューで救ってくれることは期待せず、人間にとってもAIにとっても妥当な粒度までPRを分割することが、そもそもの前提として推奨されています<sup
+                class="cite"
+                ><a href="#ref-22">[22]</a></sup
+              >。
+            </li>
+            <li>
+              <strong>必須要件はLinter/静的解析で担保する:</strong>
+              セキュリティ上絶対に守らせたいルールは、Copilotへの指示だけでなく決定的なツール(SAST、Linter、Secret
+              Scanning等)でも二重に担保します<sup class="cite"><a href="#ref-17">[17]</a></sup
+              ><sup class="cite"><a href="#ref-19">[19]</a></sup
+              >。
+            </li>
+            <li>
+              <strong>人間レビューを省略しない:</strong>
+              Copilotのレビューは「一次スクリーニング」であり、最終承認・アーキテクチャ判断・ドメイン知識が必要な判断は引き続き人間が担います<sup
+                class="cite"
+                ><a href="#ref-3">[3]</a></sup
+              ><sup class="cite"><a href="#ref-19">[19]</a></sup
+              >。
+            </li>
+          </ul>
+        </section>
+
+        <!-- ============ Step 6 ============ -->
+        <section class="section prose" id="step6">
+          <span class="step-badge">STEP 6</span>
+          <h2>セキュリティとガバナンスを固める</h2>
+
+          <h3>Content Exclusion(コンテンツ除外)の適用範囲を正しく理解する</h3>
+          <p>
+            リポジトリ管理者はContent
+            Exclusion機能を使って、機密ファイル(認証情報、課金データ、独自アルゴリズム等)をCopilotの補完・Chat・Code
+            Reviewの対象から除外できます。除外されたファイルはCopilot Code
+            Reviewでもレビュー対象になりません<sup class="cite"><a href="#ref-8">[8]</a></sup
+            ><sup class="cite"><a href="#ref-58">[58]</a></sup
+            >。
+          </p>
+
+          <div class="callout warn">
+            <strong>重要な注意点:</strong>
+            GitHub公式ドキュメントおよびGitHub社員による解説記事の双方が指摘しているとおり、Content
+            ExclusionはCopilot CLI、Copilot cloud
+            agent、およびIDEのAgentモードには適用されません<sup class="cite"
+              ><a href="#ref-8">[8]</a></sup
+            ><sup class="cite"><a href="#ref-20">[20]</a></sup
+            >。これらのエージェント的な機能はツール呼び出しでファイルを直接読み書きできるため、リポジトリレベルの除外設定をすり抜けて除外対象ファイルの内容にアクセスできてしまう可能性があります。Code
+            Reviewだけを使っている分には保護されますが、同じリポジトリでCLIやcloud
+            agentも使っているチームは、この境界を正しく認識しておく必要があります<sup class="cite"
+              ><a href="#ref-20">[20]</a></sup
+            >。
+          </div>
+
+          <h3>Copilot Code Review自体のセキュリティ制御</h3>
+          <div class="diagram">
+            <div class="mermaid-wrapper">
+              <div class="mermaid-loading">図を読み込み中…</div>
+              <script type="text/plain" class="mermaid-source">
+                flowchart TB
+                    L1["レイヤー1: Content Exclusion<br/>機密ファイルをレビュー対象から除外"] --> L2["レイヤー2: Firewall<br/>Copilotのネットワークアクセスを制御"]
+                    L2 --> L3["レイヤー3: MCP read-only制約<br/>ツール呼び出しを読み取り専用に限定"]
+                    L3 --> L4["レイヤー4: CODEOWNERS<br/>設定ファイル自体の変更を承認制に"]
+              </script>
+            </div>
+            <p class="diagram-caption">図4. Copilot Code Reviewにおける多層防御</p>
+          </div>
+
+          <ul>
+            <li>
+              <strong>Firewall:</strong> 2026年7月17日のアップデートで、Copilot Code
+              Review用のネットワークアクセス制御(Firewall)がCopilot cloud
+              agentとは独立して設定できるようになりました。デフォルトで全リポジトリに対して有効です。セルフホストランナーでは現時点でFirewallがサポートされていない点に注意してください<sup
+                class="cite"
+                ><a href="#ref-10">[10]</a></sup
+              >。
+            </li>
+            <li>
+              <strong>MCP read-only制約:</strong> 前述のとおり、Code
+              ReviewからのMCPツール呼び出しは読み取り専用に限定されています<sup class="cite"
+                ><a href="#ref-9">[9]</a></sup
+              >。
+            </li>
+            <li>
+              <strong>CODEOWNERS:</strong>
+              <code>copilot-instructions.md</code
+              >・<code>*.instructions.md</code>・<code>.github/skills/</code>・MCP設定など、レビューの挙動を左右する設定ファイル自体を誰が変更できるかも重要なガバナンス項目です。これらのパスにCODEOWNERSを設定し、変更に承認を必須にすることを推奨します(GitHub社員のブログで紹介されているエージェント一般向けの多層防御の考え方を、Code
+              Review用の設定ファイル保護にも応用したものです)<sup class="cite"
+                ><a href="#ref-20">[20]</a></sup
+              >。
+            </li>
+            <li>
+              <strong>カスタム実行環境:</strong>
+              <code>.github/workflows/copilot-code-review.yml</code
+              >を使うと、依存関係のインストールやツールのセットアップなど、Copilot Code
+              Reviewの実行環境自体をリポジトリ単位で設定できます。ランナーの種類も組織のCopilot設定から独立して構成可能です<sup
+                class="cite"
+                ><a href="#ref-10">[10]</a></sup
+              ><sup class="cite"><a href="#ref-9">[9]</a></sup
+              >。
+            </li>
+          </ul>
+
+          <h3>エンタープライズでの一括ガバナンス</h3>
+          <p>
+            Enterprise管理者は「AI controls」からCopilot Code
+            Reviewを機能単位で有効/無効化でき、自動レビューを組織横断で強制することも、各組織の裁量に委ねることもできます。標準を一貫させたい場合は自動レビューポリシーを有効にしますが、Push毎・ドラフト時のレビューを増やすほど開発者に届く通知も増える点はトレードオフとして意識してください<sup
+              class="cite"
+              ><a href="#ref-6">[6]</a></sup
+            >。
+          </p>
+        </section>
+
+        <!-- ============ Comparison ============ -->
+        <section class="section prose" id="comparison">
+          <h2>他のAIコードレビューツールとの位置づけ</h2>
+          <p>
+            Copilot Code
+            Reviewは「GitHubエコシステムに完全統合されたゼロフリクションな選択肢」として評価される一方、専業のAIコードレビューツールと比較すると精度や機能面で見劣りするという評価も複数の比較記事で共通しています。
+          </p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>観点</th>
+                  <th>GitHub Copilot Code Review</th>
+                  <th>専業レビューツール(CodeRabbit等)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>導入のしやすさ</td>
+                  <td>
+                    Copilotを契約していればレビュー機能も含まれており追加費用なしで開始可能<sup
+                      class="cite"
+                      ><a href="#ref-21">[21]</a></sup
+                    >
+                  </td>
+                  <td>別途契約・別料金が必要</td>
+                </tr>
+                <tr>
+                  <td>対応プラットフォーム</td>
+                  <td>
+                    GitHubのみ<sup class="cite"><a href="#ref-21">[21]</a></sup>
+                  </td>
+                  <td>
+                    GitLab・Bitbucket・Azure DevOps等、複数プラットフォームに対応する製品もある<sup
+                      class="cite"
+                      ><a href="#ref-21">[21]</a></sup
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>精度傾向</td>
+                  <td>
+                    ある独立ベンチマークでは適合率(precision)がやや高く、再現率(recall)は低めと報告(検出は少ないが誤りも少ない)<sup
+                      class="cite"
+                      ><a href="#ref-21">[21]</a></sup
+                    >
+                  </td>
+                  <td>
+                    同ベンチマークでは再現率が高めで、より多くの問題を検出する一方、誤検知もやや増える傾向<sup
+                      class="cite"
+                      ><a href="#ref-21">[21]</a></sup
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>カスタマイズ性</td>
+                  <td>copilot-instructions.md 等による指示のカスタマイズが可能</td>
+                  <td>
+                    学習型のフィルタリングなど、より高度なノイズ抑制機構を持つ製品もある<sup
+                      class="cite"
+                      ><a href="#ref-24">[24]</a></sup
+                    >
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            2026年2月には、DeepMind・Anthropic・Metaの研究者が設立した研究機関Martianが、レビューツールを販売する立場にない独立機関として初めてAIコードレビューエージェントのベンチマークを公開し、ベンダー自身が「自社が勝つベンチマーク」を発表し合う状況に一石を投じたと報じられています<sup
+              class="cite"
+              ><a href="#ref-21">[21]</a></sup
+            >。
+          </p>
+
+          <div class="callout">
+            <strong>実務上の指針:</strong>
+            すでにGitHubとCopilotのエコシステムにいるチームは、まずCopilot Code
+            Reviewを標準の一次レビューとして導入し、自分たちのコードベースで十分な検出力があるかを評価したうえで、ギャップが許容できない場合に専業ツールを追加するという段階的なアプローチが多くの比較記事で共通して推奨されています<sup
+              class="cite"
+              ><a href="#ref-1">[1]</a></sup
+            ><sup class="cite"><a href="#ref-21">[21]</a></sup
+            >。
+          </div>
+        </section>
+
+        <!-- ============ Roadmap ============ -->
+        <section class="section prose" id="roadmap">
+          <h2>チーム導入ロードマップ</h2>
+
+          <div class="diagram">
+            <div class="mermaid-wrapper">
+              <div class="mermaid-loading">図を読み込み中…</div>
+              <script type="text/plain" class="mermaid-source">
+                flowchart TB
+                    P1["フェーズ1: 個人トライアル<br/>数名が手動リクエストで試用"] --> P2["フェーズ2: リポジトリ導入<br/>copilot-instructions.md整備 + 自動レビュー有効化"]
+                    P2 --> P3["フェーズ3: 組織展開<br/>組織Ruleset・Agent Skills・MCPの標準化"]
+                    P3 --> P4["フェーズ4: 計測と改善<br/>採用率とfalse positive率をモニタリングし指示を継続改善"]
+              </script>
+            </div>
+            <p class="diagram-caption">図5. 段階的な導入ロードマップ</p>
+          </div>
+
+          <div class="grid">
+            <div class="card">
+              <span class="tag">Phase 1</span>
+              <h4>個人トライアル</h4>
+              <p>
+                数名の開発者が手動でレビューをリクエストし、指摘の質・自分たちのコードベースとの相性を確認します。
+              </p>
+            </div>
+            <div class="card">
+              <span class="tag">Phase 2</span>
+              <h4>リポジトリ導入</h4>
+              <p>
+                <code>copilot-instructions.md</code
+                >を最小構成で用意し、PR作成時のみの自動レビューを有効化します。過剰な指示を書かず、実際のレビュー結果を見ながら反復的に育てます<sup
+                  class="cite"
+                  ><a href="#ref-3">[3]</a></sup
+                >。
+              </p>
+            </div>
+            <div class="card">
+              <span class="tag">Phase 3</span>
+              <h4>組織展開</h4>
+              <p>
+                複数リポジトリに展開する段階で、Agent SkillsやMCPサーバー、Firewall・Content
+                Exclusion・CODEOWNERSといったガバナンス設定を標準化します。
+              </p>
+            </div>
+            <div class="card">
+              <span class="tag">Phase 4</span>
+              <h4>計測と改善</h4>
+              <p>
+                コメントの採用率・却下率、レビューにかかる時間、誤検知の傾向などを定期的にモニタリングし、指示ファイルを継続的にチューニングします<sup
+                  class="cite"
+                  ><a href="#ref-3">[3]</a></sup
+                ><sup class="cite"><a href="#ref-19">[19]</a></sup
+                >。
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============ Checklist ============ -->
+        <section class="section prose" id="checklist">
+          <h2>納品前・運用開始前チェックリスト</h2>
+          <ul class="checklist">
+            <li>
+              <code>copilot-instructions.md</code
+              >はリポジトリ全体の規約に絞り、言語・パス固有のルールは<code>*.instructions.md</code>へ分離した
+            </li>
+            <li>各指示ファイルはおよそ1,000行以内に収まっている</li>
+            <li>
+              レビュー専用のAgent
+              Skillには<code>code-review</code>のようなレビュー用途とわかる名前を付けた
+            </li>
+            <li>
+              MCPサーバー連携が必要な場合、「Allow Copilot to use MCP tools when reviewing pull
+              requests」の設定を確認した
+            </li>
+            <li>
+              自動レビューの範囲(個人/リポジトリ/組織)と、Push毎・ドラフト時レビューの要否を決定した
+            </li>
+            <li>
+              機密ファイルにContent Exclusionを設定し、かつそれがCLI/cloud
+              agent/Agentモードには適用されないことをチームに周知した
+            </li>
+            <li>Firewall(ネットワークアクセス制御)が意図した設定になっていることを確認した</li>
+            <li>
+              <code>copilot-instructions.md</code
+              >・<code>.github/skills/</code>・MCP設定にCODEOWNERSを設定し、無断変更を防いだ
+            </li>
+            <li>「Copilotのコメントを却下してよい」というチーム規範を共有した</li>
+            <li>セキュリティ上の必須要件はLinter/SAST等の決定的なツールでも別途担保した</li>
+            <li>
+              Copilotのレビューは「Comment」のみでマージをブロックしないことをチームに周知した
+            </li>
+            <li>導入後の効果測定(採用率・却下率・レビュー時間)の方法を決めた</li>
+          </ul>
+        </section>
+
+        <!-- ============ Summary ============ -->
+        <section class="section prose" id="summary">
+          <h2>まとめ</h2>
+          <p>
+            GitHub Copilot Code
+            Reviewは、GitHubのPRワークフローに深く統合された「一次レビュアー」として、明白なミスの早期発見や人間レビュアーの負荷軽減に貢献するツールです。ただし、誤検知や見逃しが一定割合存在すること、学習しないこと、静的解析にとどまることなど、既知の限界を理解したうえで、カスタムインストラクション・Agent
+            Skills・MCP・セキュリティ設定を丁寧に設計し、人間レビューと役割分担することが、実務で成果を出すための鍵になります。
+          </p>
+        </section>
+
+        <!-- ============ References ============ -->
+        <section class="section prose" id="references">
+          <h2>参考文献・出典</h2>
+
+          <div class="ref-group">
+            <h3>公式ドキュメント(GitHub Docs)</h3>
+            <ol class="ref-list">
+              <li id="ref-1">
+                Best practices for using GitHub Copilot<a
+                  class="ref-url"
+                  href="https://docs.github.com/en/copilot/get-started/best-practices"
+                  target="_blank"
+                  rel="noopener"
+                  >https://docs.github.com/en/copilot/get-started/best-practices</a
+                >
+              </li>
+              <li id="ref-2">
+                Using GitHub Copilot code review<a
+                  class="ref-url"
+                  href="https://docs.github.com/copilot/using-github-copilot/code-review/using-copilot-code-review"
+                  target="_blank"
+                  rel="noopener"
+                  >https://docs.github.com/copilot/using-github-copilot/code-review/using-copilot-code-review</a
+                >
+              </li>
+              <li id="ref-3">
+                Using custom instructions to unlock the power of Copilot code review<a
+                  class="ref-url"
+                  href="https://docs.github.com/en/copilot/tutorials/customize-code-review"
+                  target="_blank"
+                  rel="noopener"
+                  >https://docs.github.com/en/copilot/tutorials/customize-code-review</a
+                >
+              </li>
+              <li id="ref-5">
+                Configuring automatic code review by GitHub Copilot<a
+                  class="ref-url"
+                  href="https://docs.github.com/en/copilot/how-tos/copilot-on-github/set-up-copilot/configure-automatic-review"
+                  target="_blank"
+                  rel="noopener"
+                  >https://docs.github.com/en/copilot/how-tos/copilot-on-github/set-up-copilot/configure-automatic-review</a
+                >
+              </li>
+              <li id="ref-6">
+                Enabling GitHub Copilot code review in your enterprise<a
+                  class="ref-url"
+                  href="https://docs.github.com/en/copilot/how-tos/administer-copilot/manage-for-enterprise/manage-agents/enable-copilot-code-review"
+                  target="_blank"
+                  rel="noopener"
+                  >https://docs.github.com/en/copilot/how-tos/administer-copilot/manage-for-enterprise/manage-agents/enable-copilot-code-review</a
+                >
+              </li>
+              <li id="ref-7">
+                Responsible use of GitHub Copilot code review<a
+                  class="ref-url"
+                  href="https://docs.github.com/copilot/responsible-use-of-github-copilot-features/responsible-use-of-github-copilot-code-review"
+                  target="_blank"
+                  rel="noopener"
+                  >https://docs.github.com/copilot/responsible-use-of-github-copilot-features/responsible-use-of-github-copilot-code-review</a
+                >
+              </li>
+              <li id="ref-8">
+                Excluding content from GitHub Copilot<a
+                  class="ref-url"
+                  href="https://docs.github.com/en/copilot/how-tos/configure-content-exclusion/exclude-content-from-copilot"
+                  target="_blank"
+                  rel="noopener"
+                  >https://docs.github.com/en/copilot/how-tos/configure-content-exclusion/exclude-content-from-copilot</a
+                >
+              </li>
+              <li id="ref-31">
+                Adding custom instructions for GitHub Copilot CLI(excludeAgent)<a
+                  class="ref-url"
+                  href="https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/add-custom-instructions"
+                  target="_blank"
+                  rel="noopener"
+                  >https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/add-custom-instructions</a
+                >
+              </li>
+              <li id="ref-58">
+                About content exclusion for Copilot(コードレビューへの適用範囲)<a
+                  class="ref-url"
+                  href="https://docs.github.com/zh/enterprise-cloud@latest/copilot/managing-copilot/managing-github-copilot-in-your-organization/managing-github-copilot-features-in-your-organization/testing-changes-to-content-exclusions-in-your-ide"
+                  target="_blank"
+                  rel="noopener"
+                  >https://docs.github.com/zh/enterprise-cloud@latest/copilot/...content-exclusions-in-your-ide</a
+                >
+              </li>
+            </ol>
+          </div>
+
+          <div class="ref-group">
+            <h3>公式ブログ・Changelog(GitHub Blog)</h3>
+            <ol class="ref-list" start="9">
+              <li id="ref-9">
+                Copilot code review: Agent skills and MCP now generally available
+                <span class="ref-date">(2026年7月29日)</span
+                ><a
+                  class="ref-url"
+                  href="https://github.blog/changelog/2026-07-29-copilot-code-review-agent-skills-and-mcp-now-generally-available/"
+                  target="_blank"
+                  rel="noopener"
+                  >https://github.blog/changelog/2026-07-29-copilot-code-review-agent-skills-and-mcp-now-generally-available/</a
+                >
+              </li>
+              <li id="ref-10">
+                Copilot code review: Customization and configurability improvements
+                <span class="ref-date">(2026年7月17日)</span
+                ><a
+                  class="ref-url"
+                  href="https://github.blog/changelog/2026-07-17-copilot-code-review-customization-and-configurability-improvements/"
+                  target="_blank"
+                  rel="noopener"
+                  >https://github.blog/changelog/2026-07-17-copilot-code-review-customization-and-configurability-improvements/</a
+                >
+              </li>
+              <li id="ref-11">
+                Copilot code review: Analysis depth and efficiency updates
+                <span class="ref-date">(2026年6月25日)</span
+                ><a
+                  class="ref-url"
+                  href="https://github.blog/changelog/2026-06-25-copilot-code-review-analysis-depth-and-efficiency-updates/"
+                  target="_blank"
+                  rel="noopener"
+                  >https://github.blog/changelog/2026-06-25-copilot-code-review-analysis-depth-and-efficiency-updates/</a
+                >
+              </li>
+              <li id="ref-12">
+                Using GitHub Copilot code review(Agent Skills / MCP設定詳細)<a
+                  class="ref-url"
+                  href="https://docs.github.com/copilot/using-github-copilot/code-review/using-copilot-code-review"
+                  target="_blank"
+                  rel="noopener"
+                  >https://docs.github.com/copilot/using-github-copilot/code-review/using-copilot-code-review</a
+                >
+              </li>
+              <li id="ref-13">
+                Copilot code review: New configurations and controls
+                <span class="ref-date">(2026年6月12日)</span
+                ><a
+                  class="ref-url"
+                  href="https://github.blog/changelog/2026-06-12-copilot-code-review-new-configurations-and-controls/"
+                  target="_blank"
+                  rel="noopener"
+                  >https://github.blog/changelog/2026-06-12-copilot-code-review-new-configurations-and-controls/</a
+                >
+              </li>
+              <li id="ref-14">
+                MCP Adoption Week: Copilot Code Review Goes GA
+                <span class="ref-date">(2026年7月)</span
+                ><a
+                  class="ref-url"
+                  href="https://www.digitalapplied.com/blog/mcp-adoption-week-copilot-code-review-ga"
+                  target="_blank"
+                  rel="noopener"
+                  >https://www.digitalapplied.com/blog/mcp-adoption-week-copilot-code-review-ga</a
+                >
+              </li>
+              <li id="ref-15">
+                Copilot code review: Path-scoped custom instruction file support
+                <span class="ref-date">(2025年9月3日)</span
+                ><a
+                  class="ref-url"
+                  href="https://github.blog/changelog/2025-09-03-copilot-code-review-path-scoped-custom-instruction-file-support/"
+                  target="_blank"
+                  rel="noopener"
+                  >https://github.blog/changelog/2025-09-03-copilot-code-review-path-scoped-custom-instruction-file-support/</a
+                >
+              </li>
+              <li id="ref-16">
+                Unlocking the full power of Copilot code review: Master your instructions files
+                <span class="ref-date">(2026年4月17日)</span
+                ><a
+                  class="ref-url"
+                  href="https://github.blog/ai-and-ml/github-copilot/unlocking-the-full-power-of-copilot-code-review-master-your-instructions-files/"
+                  target="_blank"
+                  rel="noopener"
+                  >https://github.blog/ai-and-ml/github-copilot/unlocking-the-full-power-of-copilot-code-review-master-your-instructions-files/</a
+                >
+              </li>
+            </ol>
+          </div>
+
+          <div class="ref-group">
+            <h3>コミュニティ・実務者による記事(著名/国際的な開発者・実務者の投稿)</h3>
+            <ol class="ref-list" start="17">
+              <li id="ref-17">
+                Rahul Singh, "GitHub Copilot Code Review: Complete Guide (2026)", DEV Community
+                <span class="ref-date">(2026年4月2日)</span
+                ><a
+                  class="ref-url"
+                  href="https://dev.to/rahulxsingh/github-copilot-code-review-complete-guide-2026-255h"
+                  target="_blank"
+                  rel="noopener"
+                  >https://dev.to/rahulxsingh/github-copilot-code-review-complete-guide-2026-255h</a
+                >
+              </li>
+              <li id="ref-18">
+                pwd9000, "Mastering Code Reviews with GitHub Copilot: The Definitive Guide", DEV
+                Community <span class="ref-date">(2026年5月27日)</span
+                ><a
+                  class="ref-url"
+                  href="https://dev.to/pwd9000/mastering-code-reviews-with-github-copilot-the-definitive-guide-3nfp"
+                  target="_blank"
+                  rel="noopener"
+                  >https://dev.to/pwd9000/mastering-code-reviews-with-github-copilot-the-definitive-guide-3nfp</a
+                >
+              </li>
+              <li id="ref-19">
+                Mrinal Maheshwari, "GitHub Copilot Code Review: Guidelines, Best Practices, and How
+                to Integrate It into Your PR Workflow" <span class="ref-date">(2026年1月12日)</span
+                ><a
+                  class="ref-url"
+                  href="https://blog.mrinalmaheshwari.com/github-copilot-code-review-guidelines-best-practices-and-how-to-integrate-it-into-your-pr-b4518073b4c9"
+                  target="_blank"
+                  rel="noopener"
+                  >https://blog.mrinalmaheshwari.com/github-copilot-code-review-guidelines-best-practices-and-how-to-integrate-it-into-your-pr-b4518073b4c9</a
+                >
+              </li>
+              <li id="ref-20">
+                Anton Sizikov(GitHub社員), "Copilot Content Exclusions: Four Layers of Defense"
+                <span class="ref-date">(2026年3月13日)</span
+                ><a
+                  class="ref-url"
+                  href="https://blog.cloud-eng.nl/2026/03/13/copilot-content-exclusions-four-layers/"
+                  target="_blank"
+                  rel="noopener"
+                  >https://blog.cloud-eng.nl/2026/03/13/copilot-content-exclusions-four-layers/</a
+                >
+              </li>
+              <li id="ref-21">
+                "10 Best AI Code Review Tools in 2026 (Ranked by Independent Benchmark)", CodeAnt
+                AI<a
+                  class="ref-url"
+                  href="https://codeant.ai/blogs/best-ai-code-review-tools"
+                  target="_blank"
+                  rel="noopener"
+                  >https://codeant.ai/blogs/best-ai-code-review-tools</a
+                >
+              </li>
+              <li id="ref-22">
+                "GitHub Copilot Code Review in 2026: What It Does and Misses"
+                <span class="ref-date">(2026年4月10日)</span
+                ><a
+                  class="ref-url"
+                  href="https://refacto.ai/blog/github-copilot-code-review-in-2026-what-it-does-well-and-where-it-falls-short/"
+                  target="_blank"
+                  rel="noopener"
+                  >https://refacto.ai/blog/github-copilot-code-review-in-2026-what-it-does-well-and-where-it-falls-short/</a
+                >
+              </li>
+              <li id="ref-23">
+                同上(GitHubのレビュー実施率・平均コメント数に関する分析部分)<a
+                  class="ref-url"
+                  href="https://refacto.ai/blog/github-copilot-code-review-in-2026-what-it-does-well-and-where-it-falls-short/"
+                  target="_blank"
+                  rel="noopener"
+                  >https://refacto.ai/blog/github-copilot-code-review-in-2026-what-it-does-well-and-where-it-falls-short/</a
+                >
+              </li>
+              <li id="ref-24">
+                "CodeRabbit vs GitHub Copilot Code Review (2026): Benchmarks, Pricing, Features"
+                <span class="ref-date">(2026年3月14日)</span
+                ><a
+                  class="ref-url"
+                  href="https://www.morphllm.com/comparisons/coderabbit-vs-copilot"
+                  target="_blank"
+                  rel="noopener"
+                  >https://www.morphllm.com/comparisons/coderabbit-vs-copilot</a
+                >
+              </li>
+              <li id="ref-25">
+                Simon Willison, Posts tagged "github-copilot" ― GitHub
+                Copilotのエージェント化やモデル変更を継続的に追跡している著名な開発者のブログ<a
+                  class="ref-url"
+                  href="https://simonwillison.net/tags/github-copilot/"
+                  target="_blank"
+                  rel="noopener"
+                  >https://simonwillison.net/tags/github-copilot/</a
+                >
+              </li>
+            </ol>
+          </div>
+
+          <div class="callout">
+            <strong>注:</strong>
+            上記のうち14・17・18・19・20・21・22・23・24は第三者(比較サイト・個人ブログ)による分析記事であり、数値や評価は執筆時点のものです。導入判断の際は必ず一次情報である公式ドキュメント(1〜13、16、31、58)と最新の<a
+              href="https://github.blog/changelog/label/copilot/"
+              target="_blank"
+              rel="noopener"
+              >GitHub Changelog</a
+            >を優先して確認してください。
+          </div>
+        </section>
+
+        <footer class="page-footer">
+          <p>
+            本ページはMermaid.js(バージョン固定CDN配信)とhighlight.jsを用いて描画しています。オフライン環境や社内ネットワークでCDNへのアクセスが制限されている場合、図表・シンタックスハイライトが正しく表示されないことがあります。
+          </p>
+        </footer>
+      </main>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.12.0/mermaid.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/yaml.min.js"></script>
+    <script>
+      // ---------- dedent helper ----------
+      function dedent(str) {
+        const lines = str.replace(/^\n/, '').replace(/\s+$/, '').split('\n');
+        let minIndent = Infinity;
+        for (const line of lines) {
+          if (line.trim().length === 0) continue;
+          const m = line.match(/^(\s*)/);
+          minIndent = Math.min(minIndent, m[1].length);
+        }
+        if (!isFinite(minIndent)) minIndent = 0;
+        return lines.map((l) => l.slice(minIndent)).join('\n');
+      }
+
+      // ---------- inject instructions.md example code block (safe: textContent, not innerHTML) ----------
+      const instructionsExample = `---
+applyTo:
+  - "webapp/src/**"
+  - "ui/components/**"
+---
+アクセシビリティ(ARIA属性、フォーカス管理)を重視してください。
+デザイントークンの利用を優先してください。
+legacy/配下の非推奨コンポーネントの利用を検出したら指摘してください。`;
+      document.getElementById('code-instructions').textContent = instructionsExample;
+
+      // ---------- Mermaid ----------
+      if (window.mermaid) {
+        mermaid.initialize({
+          startOnLoad: false,
+          theme: 'base',
+          themeVariables: {
+            darkMode: true,
+            background: '#0d1c30',
+            primaryColor: '#132540',
+            primaryTextColor: '#dbe4f3',
+            primaryBorderColor: '#7c9eff',
+            lineColor: '#7c9eff',
+            secondaryColor: '#101f36',
+            tertiaryColor: '#0d1c30',
+            fontFamily:
+              '-apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans", "Noto Sans JP", sans-serif',
+            fontSize: '16px',
+            edgeLabelBackground: '#0d1c30',
+          },
+          flowchart: {
+            useMaxWidth: false,
+            htmlLabels: true,
+            curve: 'basis',
+          },
+          securityLevel: 'loose',
+        });
+      }
+
+      async function renderMermaidDiagrams() {
+        const wrappers = document.querySelectorAll('.mermaid-wrapper');
+        let idx = 0;
+        for (const wrapper of wrappers) {
+          const src = wrapper.querySelector('script.mermaid-source');
+          const loading = wrapper.querySelector('.mermaid-loading');
+          if (!src) continue;
+          const code = dedent(src.textContent);
+          const id = 'mmd-diagram-' + idx++;
+          try {
+            const { svg } = await mermaid.render(id, code);
+            const holder = document.createElement('pre');
+            holder.className = 'mermaid';
+            holder.innerHTML = svg;
+            wrapper.innerHTML = '';
+            wrapper.appendChild(holder);
+          } catch (err) {
+            if (loading)
+              loading.textContent =
+                '図の読み込みに失敗しました(ネットワーク制限の可能性があります)';
+            console.error('Mermaid render error:', err);
+          }
+        }
+      }
+
+      // ---------- Sidebar active-section highlighting ----------
+      function setupSidebarObserver() {
+        const links = Array.from(document.querySelectorAll('nav.toc a[href^="#"]'));
+        const map = new Map();
+        links.forEach((a) => {
+          const id = a.getAttribute('href').slice(1);
+          const el = document.getElementById(id);
+          if (el) map.set(el, a);
+        });
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              const link = map.get(entry.target);
+              if (!link) return;
+              if (entry.isIntersecting) {
+                links.forEach((l) => l.classList.remove('active'));
+                link.classList.add('active');
+              }
+            });
+          },
+          { rootMargin: '-20% 0px -70% 0px' },
+        );
+        map.forEach((link, el) => observer.observe(el));
+      }
+
+      // ---------- Mobile sidebar toggle ----------
+      function setupSidebarToggle() {
+        const sidebar = document.getElementById('sidebar');
+        const toggle = document.getElementById('sidebarToggle');
+        const backdrop = document.getElementById('sidebarBackdrop');
+        function close() {
+          sidebar.classList.remove('open');
+          backdrop.classList.remove('open');
+        }
+        toggle.addEventListener('click', () => {
+          sidebar.classList.toggle('open');
+          backdrop.classList.toggle('open');
+        });
+        backdrop.addEventListener('click', close);
+        sidebar.querySelectorAll('a').forEach((a) => a.addEventListener('click', close));
+      }
+
+      document.addEventListener('DOMContentLoaded', async () => {
+        await renderMermaidDiagrams();
+        setupSidebarObserver();
+        setupSidebarToggle();
+        if (window.hljs) {
+          document.querySelectorAll('.code-block code').forEach((el) => hljs.highlightElement(el));
+        }
+      });
+    </script>
+  </body>
+</html>
