@@ -545,9 +545,13 @@ describe("MermaidDiagram 失敗時と世代管理", () => {
     } finally {
       // ゲートと共有レンダーキューを解放し、直列化が後続テストへ漏れないようにする。
       releaseFirst();
-      await waitFor(() => {
-        expect(startedRuns).toBe(2);
-      });
+      try {
+        await waitFor(() => {
+          expect(startedRuns).toBe(2);
+        });
+      } catch {
+        // クリーンアップの失敗で元のテスト失敗を隠さない。
+      }
       runMock.mockImplementation(originalRun);
     }
   });
