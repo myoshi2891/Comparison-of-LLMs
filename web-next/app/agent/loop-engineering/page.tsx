@@ -278,6 +278,12 @@ type MermaidDiagramProps = Readonly<
   Omit<React.ComponentProps<typeof SharedMermaidDiagram>, "flowchartHtmlLabels">
 >;
 
+/**
+ * Renders a Mermaid diagram with HTML flowchart labels disabled.
+ *
+ * @param props - The diagram properties.
+ * @returns The rendered Mermaid diagram.
+ */
 function MermaidDiagram(props: MermaidDiagramProps) {
   return <SharedMermaidDiagram {...props} flowchartHtmlLabels={false} />;
 }
