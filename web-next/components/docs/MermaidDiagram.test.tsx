@@ -501,18 +501,55 @@ describe("MermaidDiagram 失敗時と世代管理", () => {
     vi.restoreAllMocks();
   });
 
-  it("複数図の Mermaid 描画を直列実行する", async () => {
-    const { container, rerender } = render(<MermaidDiagram id="diag-a" chart="graph TD; A" />);
+  it("複数図の Mermaid 描画を直列実行する（先行図の完了まで後続図は開始しない）", async () => {
+    const runMock = vi.mocked(mermaid.run);
+    const originalRun = runMock.getMockImplementation();
+    if (!originalRun) {
+      throw new Error("mermaid.run のモック実装が失われている");
+    }
 
-    await waitFor(() => {
-      expect(container.querySelector("svg")).not.toBeNull();
+    let releaseFirst: () => void = () => undefined;
+    const firstGate = new Promise<void>((resolve) => {
+      releaseFirst = resolve;
+    });
+    let startedRuns = 0;
+    runMock.mockImplementation(async (options) => {
+      startedRuns += 1;
+      // 1件目はゲートが開くまで完了させず、2件目が先行しないことを観測できるようにする。
+      if (startedRuns === 1) await firstGate;
+      await originalRun(options);
     });
 
-    rerender(<MermaidDiagram id="diag-a" chart="graph TD; B" />);
+    const first = render(<MermaidDiagram id="diag-a" chart="graph TD; A" />);
+    try {
+      await waitFor(() => {
+        expect(startedRuns).toBe(1);
+      });
 
-    await waitFor(() => {
-      expect(container.querySelector("svg")).not.toBeNull();
-    });
+      const second = render(<MermaidDiagram id="diag-b" chart="graph TD; B" />);
+      // 共有キューは 1件目の完了まで 2件目の run を開始させない（= 直列実行）
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      expect(startedRuns).toBe(1);
+      expect(first.container.querySelector("#diag-a svg")).toBeNull();
+      expect(second.container.querySelector("#diag-b svg")).toBeNull();
+
+      releaseFirst();
+
+      await waitFor(() => {
+        expect(first.container.querySelector("#diag-a svg")).not.toBeNull();
+      });
+      await waitFor(() => {
+        expect(second.container.querySelector("#diag-b svg")).not.toBeNull();
+      });
+      expect(startedRuns).toBe(2);
+    } finally {
+      // ゲートと共有レンダーキューを解放し、直列化が後続テストへ漏れないようにする。
+      releaseFirst();
+      await waitFor(() => {
+        expect(startedRuns).toBe(2);
+      });
+      runMock.mockImplementation(originalRun);
+    }
   });
 
   it("描画に失敗したらエラーメッセージへ差し替える", async () => {
