@@ -32,6 +32,9 @@ const DIAGRAMS = {
     "flowchart LR\nsubgraph 原因\n    A1[ハルシネーションが記録され続ける]\n    A2[コンテキストが長くなりすぎる]\n    A3[無関係な情報やツールが多すぎる]\n    A4[矛盾する情報や指示が混在する]\nend\nsubgraph 症状\n    B1[コンテキスト汚染]\n    B2[コンテキスト散漫]\n    B3[コンテキスト混乱]\n    B4[コンテキスト衝突]\nend\nA1 --> B1\nA2 --> B2\nA3 --> B3\nA4 --> B4",
 };
 
+/**
+ * Renders the context engineering guide page with navigation, instructional content, diagrams, and references.
+ */
 export default function Page() {
   return (
     <div className={styles.pageWrap}>

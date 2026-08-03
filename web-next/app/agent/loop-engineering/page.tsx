@@ -282,6 +282,12 @@ function MermaidDiagram(props: MermaidDiagramProps) {
   return <SharedMermaidDiagram {...props} flowchartHtmlLabels={false} />;
 }
 
+/**
+ * Renders an external link that opens in a new browser tab.
+ *
+ * @param href - The destination URL
+ * @param children - The link content
+ */
 function Ext({ href, children }: { href: string; children: React.ReactNode }) {
   return (
     <a href={href} target="_blank" rel="noopener noreferrer external">
@@ -290,6 +296,9 @@ function Ext({ href, children }: { href: string; children: React.ReactNode }) {
   );
 }
 
+/**
+ * Renders the complete Loop Engineering guide page.
+ */
 export default function Page() {
   return (
     <div className={styles.pageWrap}>

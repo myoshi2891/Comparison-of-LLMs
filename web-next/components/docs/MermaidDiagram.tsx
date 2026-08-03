@@ -24,6 +24,13 @@ let mermaidRenderQueue: Promise<void> = Promise.resolve();
 
 const MERMAID_RENDER_TIMEOUT_MS = 15000;
 
+/**
+ * Resolves with the promise's value or completes without a value after the specified duration.
+ *
+ * @param promise - The promise to await
+ * @param ms - The maximum wait duration in milliseconds
+ * @returns The promise's resolved value, or `undefined` if the duration elapses first
+ */
 function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T | void> {
   return Promise.race([
     promise,
@@ -33,6 +40,12 @@ function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T | void> {
   ]);
 }
 
+/**
+ * Queues a Mermaid render so it runs after previously queued renders.
+ *
+ * @param render - The asynchronous rendering operation to execute
+ * @returns The rendering operation's result
+ */
 function enqueueMermaidRender<T>(render: () => Promise<T>): Promise<T> {
   const queued = mermaidRenderQueue.then(render, render);
   mermaidRenderQueue = withTimeout(queued, MERMAID_RENDER_TIMEOUT_MS).then(
@@ -43,8 +56,11 @@ function enqueueMermaidRender<T>(render: () => Promise<T>): Promise<T> {
 }
 
 /**
- * Normalizes any thrown value into an Error instance with detailed message and optional diagram context.
- * Prevents console.error from outputting an empty object `{}`.
+ * Converts an unknown thrown value into an `Error` with an informative message and optional chart context.
+ *
+ * @param err - The thrown value to normalize
+ * @param chartInfo - Optional chart information to include in the error message
+ * @returns An `Error` representing the thrown value
  */
 function normalizeError(err: unknown, chartInfo?: string): Error {
   const context = chartInfo ? ` [chart: "${chartInfo}"]` : "";
