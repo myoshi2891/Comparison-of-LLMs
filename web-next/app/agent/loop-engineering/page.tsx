@@ -273,7 +273,12 @@ const LOOP_THEME_VARS: Record<string, string> = {
   tertiaryColor: "#F1EEFB",
 };
 
-function MermaidDiagram(props: React.ComponentProps<typeof SharedMermaidDiagram>) {
+// flowchartHtmlLabels は常にラッパー側で false に固定するため、呼び出し側から受け取らない。
+type MermaidDiagramProps = Readonly<
+  Omit<React.ComponentProps<typeof SharedMermaidDiagram>, "flowchartHtmlLabels">
+>;
+
+function MermaidDiagram(props: MermaidDiagramProps) {
   return <SharedMermaidDiagram {...props} flowchartHtmlLabels={false} />;
 }
 
