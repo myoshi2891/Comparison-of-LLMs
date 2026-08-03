@@ -1,0 +1,2105 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GitHub Copilot Agent Skills 実践ガイド ― SKILL.md 完全仕様</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css"
+    />
+    <style>
+      :root {
+        --bg: #07111e;
+        --bg-elevated: #0d1a2b;
+        --bg-card: #101f33;
+        --border: #1c3252;
+        --text: #d7e2f2;
+        --text-dim: #93a6c2;
+        --accent: #7c9eff;
+        --accent-soft: rgba(124, 158, 255, 0.12);
+        --code-bg: #0b1626;
+        --sidebar-w: 300px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        overflow-x: hidden;
+        background: var(--bg);
+        color: var(--text);
+        font-family:
+          'Hiragino Kaku Gothic ProN',
+          'Yu Gothic',
+          'Segoe UI',
+          system-ui,
+          -apple-system,
+          sans-serif;
+        line-height: 1.85;
+        font-size: 16px;
+      }
+
+      body {
+        background:
+          radial-gradient(circle at 15% 8%, rgba(124, 158, 255, 0.1), transparent 45%),
+          radial-gradient(circle at 85% 92%, rgba(124, 158, 255, 0.06), transparent 40%), var(--bg);
+      }
+
+      a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+
+      .top-bar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #7c9eff, #9d7cff, #7cf0ff, #7c9eff);
+        background-size: 300% 100%;
+        z-index: 100;
+        animation: barflow 12s linear infinite;
+      }
+      @keyframes barflow {
+        0% {
+          background-position: 0% 0;
+        }
+        100% {
+          background-position: 300% 0;
+        }
+      }
+
+      .layout {
+        display: block;
+      }
+
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: var(--sidebar-w);
+        overflow-y: auto;
+        padding: 28px 20px 40px;
+        border-right: 1px solid var(--border);
+        background: var(--bg-elevated);
+        z-index: 50;
+      }
+
+      .sidebar-title {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: var(--text);
+        margin: 0 0 4px;
+      }
+      .sidebar-sub {
+        font-size: 0.78rem;
+        color: var(--text-dim);
+        margin: 0 0 20px;
+      }
+
+      .nav-link {
+        display: block;
+        padding: 7px 10px;
+        margin-bottom: 2px;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        color: var(--text-dim);
+        border-left: 2px solid transparent;
+        transition:
+          background 0.15s,
+          color 0.15s,
+          border-color 0.15s;
+      }
+      .nav-link:hover {
+        background: var(--accent-soft);
+        color: var(--text);
+        text-decoration: none;
+      }
+      .nav-link.active {
+        color: var(--accent);
+        background: var(--accent-soft);
+        border-left: 2px solid var(--accent);
+        font-weight: 600;
+      }
+
+      .main {
+        margin-left: var(--sidebar-w);
+        padding: 48px 56px 96px;
+      }
+
+      .hero {
+        margin-bottom: 40px;
+      }
+      .hero h1 {
+        font-size: 1.9rem;
+        line-height: 1.5;
+        margin: 0 0 16px;
+        background: linear-gradient(90deg, #ffffff, #b9caee);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+      .hero blockquote {
+        margin: 0;
+        padding: 14px 18px;
+        border-left: 3px solid var(--accent);
+        background: var(--bg-card);
+        border-radius: 0 8px 8px 0;
+        color: var(--text-dim);
+        font-size: 0.95rem;
+      }
+      .hero blockquote p {
+        margin: 0;
+      }
+
+      h2 {
+        font-size: 1.5rem;
+        margin: 56px 0 20px;
+        padding-top: 12px;
+        border-top: 1px solid var(--border);
+        color: #f0f4ff;
+      }
+      h3 {
+        font-size: 1.18rem;
+        margin: 32px 0 14px;
+        color: #dbe6fb;
+      }
+      h4 {
+        font-size: 1.02rem;
+        margin: 24px 0 10px;
+        color: var(--accent);
+      }
+
+      p,
+      li {
+        color: var(--text);
+      }
+      p {
+        margin: 0 0 16px;
+      }
+
+      ul,
+      ol {
+        padding-left: 1.4em;
+        margin: 0 0 16px;
+      }
+      li {
+        margin-bottom: 6px;
+      }
+      li > ul,
+      li > ol {
+        margin-top: 6px;
+      }
+
+      hr {
+        border: none;
+        border-top: 1px solid var(--border);
+        margin: 40px 0;
+      }
+
+      blockquote:not(.hero blockquote) {
+        margin: 16px 0;
+        padding: 12px 18px;
+        border-left: 3px solid #4a5f8a;
+        background: var(--bg-card);
+        border-radius: 0 8px 8px 0;
+        color: var(--text-dim);
+      }
+      blockquote p {
+        margin: 0;
+      }
+
+      strong {
+        color: #f3f6ff;
+      }
+
+      code:not(pre code) {
+        background: var(--code-bg);
+        color: #ffd479;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 0.88em;
+        font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+        overflow-wrap: break-word;
+        word-break: break-word;
+      }
+
+      pre {
+        background: var(--code-bg);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 18px 20px;
+        overflow-x: auto;
+        margin: 0 0 20px;
+      }
+      pre code {
+        background: none;
+        padding: 0;
+        color: inherit;
+        font-size: 0.86rem;
+        font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+      }
+
+      pre.mermaid {
+        width: 100%;
+        display: flex;
+        justify-content: safe center;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        overflow-x: auto;
+        padding: 24px;
+      }
+
+      .table-scroll {
+        overflow-x: auto;
+        margin: 0 0 24px;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        min-width: 620px;
+        font-size: 0.9rem;
+      }
+      th,
+      td {
+        padding: 10px 14px;
+        text-align: left;
+        border-bottom: 1px solid var(--border);
+        overflow-wrap: break-word;
+      }
+      th {
+        background: var(--bg-elevated);
+        color: #f0f4ff;
+        font-weight: 700;
+        white-space: nowrap;
+      }
+      tr:last-child td {
+        border-bottom: none;
+      }
+      tr:hover td {
+        background: rgba(124, 158, 255, 0.05);
+      }
+
+      .ref-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+        margin: 24px 0 40px;
+      }
+      .ref-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 16px 18px;
+        transition:
+          transform 0.15s,
+          box-shadow 0.15s,
+          border-color 0.15s;
+        min-width: 0;
+      }
+      .ref-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+        border-color: var(--accent);
+      }
+      .ref-card h3 {
+        margin: 0 0 10px;
+        font-size: 1rem;
+        color: var(--accent);
+      }
+      .ref-card ul {
+        margin: 0;
+        padding-left: 0;
+        list-style: none;
+      }
+      .ref-card li {
+        margin-bottom: 8px;
+        font-size: 0.86rem;
+      }
+      .ref-card li a {
+        color: var(--text-dim);
+        overflow-wrap: break-word;
+        word-break: break-word;
+      }
+      .ref-card li a:hover {
+        color: var(--accent);
+      }
+
+      .checklist-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 8px 8px 8px 8px;
+        margin: 0 0 32px;
+      }
+      .checklist-card ul.task-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+      .checklist-card ul.task-list li {
+        margin: 0;
+        border-bottom: 1px solid var(--border);
+      }
+      .checklist-card ul.task-list li:last-child {
+        border-bottom: none;
+      }
+      .checklist-card ul.task-list li label {
+        display: flex;
+        align-items: flex-start;
+        gap: 14px;
+        padding: 14px 16px;
+        cursor: pointer;
+        border-radius: 8px;
+        transition: background 0.15s;
+      }
+      .checklist-card ul.task-list li label:hover {
+        background: var(--accent-soft);
+      }
+      .checklist-card ul.task-list input[type='checkbox'] {
+        appearance: none;
+        -webkit-appearance: none;
+        flex: 0 0 auto;
+        width: 20px;
+        height: 20px;
+        margin-top: 1px;
+        border: 2px solid #4a5f8a;
+        border-radius: 5px;
+        background: var(--code-bg);
+        position: relative;
+        cursor: pointer;
+        transition:
+          background 0.15s,
+          border-color 0.15s;
+      }
+      .checklist-card ul.task-list input[type='checkbox']:hover {
+        border-color: var(--accent);
+      }
+      .checklist-card ul.task-list input[type='checkbox']:checked {
+        background: var(--accent);
+        border-color: var(--accent);
+      }
+      .checklist-card ul.task-list input[type='checkbox']:checked::after {
+        content: '';
+        position: absolute;
+        left: 6px;
+        top: 2px;
+        width: 5px;
+        height: 10px;
+        border: solid #07111e;
+        border-width: 0 2px 2px 0;
+        transform: rotate(45deg);
+      }
+      .checklist-card ul.task-list li:has(input:checked) label {
+        color: var(--text-dim);
+      }
+      .checklist-card ul.task-list li:has(input:checked) label {
+        text-decoration: line-through;
+        text-decoration-color: #4a5f8a;
+      }
+
+      .sidebar-toggle {
+        display: none;
+        position: fixed;
+        top: 14px;
+        left: 14px;
+        z-index: 120;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        color: var(--text);
+        border-radius: 8px;
+        padding: 8px 12px;
+        font-size: 0.85rem;
+      }
+
+      @media (max-width: 900px) {
+        .sidebar {
+          transform: translateX(-100%);
+          transition: transform 0.2s ease;
+          width: 82vw;
+          max-width: 320px;
+        }
+        .sidebar.open {
+          transform: translateX(0);
+        }
+        .main {
+          margin-left: 0;
+          padding: 88px 20px 64px;
+        }
+        .sidebar-toggle {
+          display: block;
+        }
+        .ref-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="top-bar"></div>
+    <button
+      type="button"
+      class="sidebar-toggle"
+      id="sidebarToggle"
+      aria-label="目次を開閉"
+      aria-controls="sidebar"
+      aria-expanded="false"
+    >
+      ☰ 目次
+    </button>
+    <div class="layout">
+      <nav class="sidebar" id="sidebar">
+        <p class="sidebar-title">GitHub Copilot Agent Skills</p>
+        <p class="sidebar-sub">SKILL.md 実践ガイド</p>
+        <a href="#このガイドについて" class="nav-link" data-target="このガイドについて"
+          >このガイドについて</a
+        >
+        <a href="#1-agent-skills-とは何か" class="nav-link" data-target="1-agent-skills-とは何か"
+          >1. Agent Skills とは何か</a
+        >
+        <a
+          href="#2-標準化の経緯とタイムライン"
+          class="nav-link"
+          data-target="2-標準化の経緯とタイムライン"
+          >2. 標準化の経緯とタイムライン</a
+        >
+        <a
+          href="#3-3段階ローディングprogressive-disclosure完全解説"
+          class="nav-link"
+          data-target="3-3段階ローディングprogressive-disclosure完全解説"
+          >3. 3段階ローディング(Progressive Disclosure)完全解説</a
+        >
+        <a href="#4-フロントマター完全仕様" class="nav-link" data-target="4-フロントマター完全仕様"
+          >4. フロントマター完全仕様</a
+        >
+        <a
+          href="#5-ディレクトリ構造とスコープ"
+          class="nav-link"
+          data-target="5-ディレクトリ構造とスコープ"
+          >5. ディレクトリ構造とスコープ</a
+        >
+        <a
+          href="#6-ステップバイステップ作成ガイド"
+          class="nav-link"
+          data-target="6-ステップバイステップ作成ガイド"
+          >6. ステップバイステップ作成ガイド</a
+        >
+        <a
+          href="#7-github-cligh-skillによるスキル管理"
+          class="nav-link"
+          data-target="7-github-cligh-skillによるスキル管理"
+          >7. GitHub CLI(gh skill)によるスキル管理</a
+        >
+        <a href="#8-実践テンプレート集" class="nav-link" data-target="8-実践テンプレート集"
+          >8. 実践テンプレート集</a
+        >
+        <a
+          href="#9-copilotの各サーフェスでの挙動差分"
+          class="nav-link"
+          data-target="9-copilotの各サーフェスでの挙動差分"
+          >9. Copilotの各サーフェスでの挙動差分</a
+        >
+        <a
+          href="#10-skills-vs-custom-instructions-vs-mcp-vs-subagents"
+          class="nav-link"
+          data-target="10-skills-vs-custom-instructions-vs-mcp-vs-subagents"
+          >10. Skills vs Custom Instructions vs MCP vs Subagents</a
+        >
+        <a
+          href="#11-セキュリティベストプラクティス"
+          class="nav-link"
+          data-target="11-セキュリティベストプラクティス"
+          >11. セキュリティベストプラクティス</a
+        >
+        <a
+          href="#12-トラブルシューティング完全ガイド"
+          class="nav-link"
+          data-target="12-トラブルシューティング完全ガイド"
+          >12. トラブルシューティング完全ガイド</a
+        >
+        <a
+          href="#13-ベストプラクティスチェックリスト"
+          class="nav-link"
+          data-target="13-ベストプラクティスチェックリスト"
+          >13. ベストプラクティスチェックリスト</a
+        >
+        <a href="#14-まとめ" class="nav-link" data-target="14-まとめ">14. まとめ</a>
+        <a href="#参考文献出典" class="nav-link" data-target="参考文献出典">参考文献・出典</a>
+      </nav>
+      <main class="main">
+        <div class="hero">
+          <h1>
+            GitHub Copilot Agent Skills 実践ガイド ― SKILL.md
+            完全仕様・3段階ローディング・テンプレート集・トラブルシューティング
+          </h1>
+        </div>
+
+        <blockquote>
+          <p>
+            対象読者: GitHub Copilot(VS Code / Visual Studio / JetBrains / Copilot CLI / Copilot
+            cloud agent / Copilot code review)を業務で使い込んでいる中級〜上級エンジニア。Custom
+            Instructions や MCP
+            はひと通り使ったことがあり、次のステップとして「再利用可能な手順知識」を SKILL.md
+            として整備したい人を想定している。
+          </p>
+        </blockquote>
+        <hr />
+        <h2 id="このガイドについて">このガイドについて</h2>
+        <p>
+          GitHub Copilot は 2025年12月18日、Agent Skills(SKILL.md)への対応を発表した。これはもともと
+          Anthropic が Claude 向けに 2025年10月16日に発表した仕組みで、同年12月18日に
+          <code>agentskills.io</code> でベンダー中立のオープン仕様として公開されたものである。現在は
+          GitHub Copilot・OpenAI Codex・Cursor・Gemini CLI・Snowflake Cortex Code など 40
+          前後のプラットフォームが同一フォーマットをサポートしており、「一度書けば複数のコーディングエージェントで動く」共通言語になりつつある。
+        </p>
+        <p>本ガイドは次の5点を柱に、ステップバイステップで解説する。</p>
+        <ol type="1">
+          <li>
+            <strong>フロントマター完全仕様</strong> ― <code>name</code> / <code>description</code> /
+            <code>license</code> / <code>compatibility</code> / <code>metadata</code> /
+            <code>allowed-tools</code> の全フィールド
+          </li>
+          <li>
+            <strong>3段階ローディング(Progressive Disclosure)</strong> ― Discovery / Activation /
+            Execution という3段階の設計思想とコンテキストコスト
+          </li>
+          <li>
+            <strong>ステップバイステップ作成</strong> ―
+            何もない状態から実運用可能なスキルを作るまでの手順
+          </li>
+          <li><strong>実践テンプレート集</strong> ― そのままコピーして使える5種類のテンプレート</li>
+          <li>
+            <strong>トラブルシューティング</strong> ― 実際に GitHub / VS Code の Issue
+            で報告された不具合を基にした症状別の対処表
+          </li>
+        </ol>
+        <p>
+          ASCII アートによる図解は使用せず、フローチャートは Mermaid、構造の一覧は Markdown
+          の表・箇条書きで統一する。
+        </p>
+        <hr />
+        <h2 id="1-agent-skills-とは何か">1. Agent Skills とは何か</h2>
+        <h3 id="11-定義">1.1 定義</h3>
+        <p>
+          Agent
+          Skills(エージェントスキル)は、指示・スクリプト・参考資料をまとめたフォルダであり、Copilot
+          のようなコーディングエージェントがタスクに関連すると判断したときにだけ動的に読み込む仕組みである。GitHub
+          の公式ドキュメントは次のように説明している。
+        </p>
+        <blockquote>
+          <p>
+            Agent skills are folders of instructions, scripts, and resources that Copilot can load
+            when relevant to improve its performance in specialized tasks.
+          </p>
+        </blockquote>
+        <p>
+          Anthropic
+          のエンジニアリングブログでは、スキルを作ることを「新入社員向けのオンボーディングガイドを作ること」に例えている。ユースケースごとに専用のエージェントを個別に構築するのではなく、手順知識(procedural
+          knowledge)を再利用可能な部品として切り出し、汎用エージェントに後から着せていくイメージである。
+        </p>
+        <h3 id="12-なぜ生まれたのか">1.2 なぜ生まれたのか</h3>
+        <p>
+          Custom
+          Instructions(<code>.github/copilot-instructions.md</code>)は「このリポジトリではこう書く」という常時読み込みのベースラインには向いているが、全タスクに常時注入されるためコンテキストを消費し続ける。一方
+          MCP
+          はサーバー経由で外部ツールやデータにアクセスする仕組みであり、手順そのもの(「PDFのフォームはこう埋める」「障害調査はこの順で行う」)を教えるのには向いていない。Agent
+          Skills はこの間を埋める第三の手段として設計された。
+        </p>
+        <h3 id="13-エコシステムにおける位置づけ">1.3 エコシステムにおける位置づけ</h3>
+        <p>Copilot をカスタマイズする手段は大きく4種類あり、それぞれ役割が異なる。</p>
+        <pre class="mermaid">
+flowchart TB
+    A[開発者のリクエスト] --&gt; B{Copilotが判断}
+    B --&gt; C[Custom Instructions&lt;br/&gt;常時読み込み・低詳細度]
+    B --&gt; D[Agent Skills&lt;br/&gt;必要時のみ読み込み・高詳細度]
+    B --&gt; E[MCPサーバー&lt;br/&gt;外部ツール・データ接続]
+    B --&gt; F[カスタムエージェント&lt;br/&gt;独立したペルソナ・権限セット]
+    C --&gt; G[コーディング規約・常に守るべきルール]
+    D --&gt; H[特定タスクの再現可能な手順書]
+    E --&gt; I[Issue追跡・DB・社内API等の実データ]
+    F --&gt; J[レビュー専任・実装専任などの人格分離]</pre
+        >
+        <p>
+          GitHub 公式ドキュメントも「Custom Instructions
+          はほぼ全タスクに関係する簡潔な情報に、Skills
+          は関係するときだけ参照すべき詳細な情報に使う」ことを推奨している。
+        </p>
+        <hr />
+        <h2 id="2-標準化の経緯とタイムライン">2. 標準化の経緯とタイムライン</h2>
+        <p>
+          Agent Skills
+          が単一ベンダーの機能からオープン標準になるまでの流れを押さえておくと、なぜ「GitHub
+          CopilotのSKILL.md」という言い方が成立するのかが理解しやすくなる。
+        </p>
+        <pre class="mermaid">
+flowchart TB
+    T1["2025年10月16日&lt;br/&gt;Anthropicが「Agent Skills」を発表&lt;br/&gt;(Claude.ai / Claude Code向け)"] --&gt; T2
+    T2["2025年12月18日&lt;br/&gt;agentskills.io としてオープン仕様公開&lt;br/&gt;同日 GitHub Copilotが対応を発表"] --&gt; T3
+    T3["2026年1月上旬&lt;br/&gt;VS Code 安定版でSkillsサポート開始&lt;br/&gt;(発表時点ではInsidersのみ)"] --&gt; T4
+    T4["2026年2月上旬&lt;br/&gt;Snyk「ToxicSkills」調査発表&lt;br/&gt;公開スキルの3割超に脆弱性"] --&gt; T5
+    T5["2026年上半期&lt;br/&gt;OpenAI Codex・Cursor・Gemini CLI等&lt;br/&gt;40前後のプラットフォームへ対応拡大"] --&gt; T6
+    T6["2026年7月29日&lt;br/&gt;Copilot code reviewでの&lt;br/&gt;Agent Skills / MCP対応がGA"]</pre
+        >
+        <p>
+          ポイントは、Anthropic が仕様を Apache 2.0(コード)/
+          CC-BY-4.0(ドキュメント)で公開し、Agentic AI Foundation
+          が仕様のスチュワードとなったことで、「Claude用の機能」から「業界横断のフォーマット」に性格が変わった点である。GitHub
+          Copilot がそのまま
+          <code>.claude/skills</code>
+          ディレクトリのスキルを自動的に拾えるのも、この仕様の共通化が背景にある。
+        </p>
+        <hr />
+        <h2 id="3-3段階ローディングprogressive-disclosure完全解説">
+          3. 3段階ローディング(Progressive Disclosure)完全解説
+        </h2>
+        <h3 id="31-各社の呼称比較">3.1 各社の呼称比較</h3>
+        <p>
+          3段階ローディングは提唱元や実装によって呼び方が微妙に異なる。混乱を避けるため対応表を示す。
+        </p>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr class="header">
+                <th>段階</th>
+                <th>agentskills.io / Anthropic</th>
+                <th>GitHub Copilot文脈</th>
+                <th>Microsoft Agent Framework</th>
+                <th>読み込まれるもの</th>
+                <th>目安コスト</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="odd">
+                <td>第1段階</td>
+                <td>Discovery(発見)</td>
+                <td>起動時のメタデータ注入</td>
+                <td>Advertise(広告)</td>
+                <td><code>name</code> + <code>description</code> のみ、全スキル分</td>
+                <td>約100トークン/スキル</td>
+              </tr>
+              <tr class="even">
+                <td>第2段階</td>
+                <td>Activation(活性化)</td>
+                <td>スキル読み込み</td>
+                <td>Load(読み込み)</td>
+                <td><code>SKILL.md</code> 本文全体</td>
+                <td>5,000トークン未満を推奨</td>
+              </tr>
+              <tr class="odd">
+                <td>第3段階</td>
+                <td>Execution(実行)</td>
+                <td>リソース参照</td>
+                <td>Read resources(資源読み込み)</td>
+                <td>
+                  <code>scripts/</code> <code>references/</code> <code>assets/</code> 配下のファイル
+                </td>
+                <td>必要になった分だけ</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          Microsoft Agent Framework のドキュメントでは <code>load_skill</code> ツールや
+          <code>read_skill_resource</code>
+          ツールという形で、この2段階目・3段階目の読み込みを明示的なツール呼び出しとして実装している例もある。呼称は違えど、<strong>「まず名前と説明だけを全件読む」→「関連しそうなものだけ本文を読む」→「本当に必要になったファイルだけをさらに読む」</strong>という3層構造は共通である。
+        </p>
+        <h3 id="32-コンテキストウィンドウでの動き">3.2 コンテキストウィンドウでの動き</h3>
+        <p>
+          Anthropic のエンジニアリングブログが示す PDF スキルの例を基に、Copilot
+          がスキルを起動してから実行に至るまでのシーケンスを図示する。
+        </p>
+        <pre class="mermaid">
+sequenceDiagram
+    participant U as 開発者
+    participant C as Copilot(エージェント)
+    participant S as SKILL.mdとリソース群
+
+    Note over C: 起動時: 全スキルの name/description を&lt;br/&gt;システムプロンプトに事前ロード(第1段階)
+    U-&gt;&gt;C: 「このPDFのフォームを埋めて」
+    C-&gt;&gt;C: descriptionと突き合わせて関連スキルを判定
+    C-&gt;&gt;S: pdf/SKILL.md を読み込み(第2段階)
+    S--&gt;&gt;C: 本文の手順・使用可能なスクリプト一覧を返す
+    C-&gt;&gt;S: forms.md を追加で読み込み(第3段階)
+    S--&gt;&gt;C: フォーム入力の詳細手順を返す
+    C-&gt;&gt;S: スクリプトをコードとして実行(内容は読み込まない)
+    S--&gt;&gt;C: 実行結果のみを返す
+    C--&gt;&gt;U: フォーム入力済みPDFを提示</pre
+        >
+        <p>
+          ここで重要なのは、Claude(あるいは Copilot
+          の基盤モデル)がスクリプトを「コードとして実行」する場合、そのスクリプトのソースコード自体をコンテキストに読み込む必要がない点である。ソート処理を例に取れば、トークン生成でソートさせるより実際のソートアルゴリズムを実行させたほうが高速かつ決定的であり、これは
+          Agent Skills がコード実行環境を持つエージェント向けに設計されている理由の一つでもある。
+        </p>
+        <h3 id="33-トークンコストの実測値">3.3 トークンコストの実測値</h3>
+        <p>
+          独立した計測(SwirlAI による Anthropic
+          公式17スキルの調査)では、第1段階のディスカバリーコストは平均約80トークン、範囲としては約55〜235トークンとされている。20個のスキルを導入した場合、全文を毎回読み込むと18,000トークンを超えるところ、メタデータのみなら約1,000トークン程度に抑えられるという試算もあり、これが「50個以上のスキルを導入してもパフォーマンスが劣化しにくい」設計上の根拠になっている。
+        </p>
+        <hr />
+        <h2 id="4-フロントマター完全仕様">4. フロントマター完全仕様</h2>
+        <p>
+          <code>SKILL.md</code> は YAML フロントマター + Markdown 本文という構成を取る。ここでは
+          <code>agentskills.io</code> の仕様書と GitHub
+          公式ドキュメントの両方を突き合わせ、全フィールドを一覧化する。
+        </p>
+        <h3 id="41-フィールド一覧">4.1 フィールド一覧</h3>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr class="header">
+                <th>フィールド</th>
+                <th>必須</th>
+                <th>型</th>
+                <th>制約</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="odd">
+                <td><code>name</code></td>
+                <td>必須</td>
+                <td>文字列</td>
+                <td>
+                  最大64文字。小文字英数字とハイフンのみ。先頭・末尾にハイフン不可。連続ハイフン不可。親ディレクトリ名と一致させる必要がある
+                </td>
+              </tr>
+              <tr class="even">
+                <td><code>description</code></td>
+                <td>必須</td>
+                <td>文字列</td>
+                <td>1〜1024文字。「何をするか」と「いつ使うか」の両方を記述する</td>
+              </tr>
+              <tr class="odd">
+                <td><code>license</code></td>
+                <td>任意</td>
+                <td>文字列</td>
+                <td>ライセンス名、またはバンドルされたライセンスファイルへの言及</td>
+              </tr>
+              <tr class="even">
+                <td><code>compatibility</code></td>
+                <td>任意</td>
+                <td>文字列</td>
+                <td>
+                  最大500文字。対象製品・必要なシステムパッケージ・ネットワークアクセスの要否などを記述
+                </td>
+              </tr>
+              <tr class="odd">
+                <td><code>metadata</code></td>
+                <td>任意</td>
+                <td>キー値マップ</td>
+                <td>
+                  仕様で定義されていない追加情報を格納する自由領域。キー名の衝突を避けるため独自性の高い名前を推奨
+                </td>
+              </tr>
+              <tr class="even">
+                <td><code>allowed-tools</code></td>
+                <td>任意(実験的)</td>
+                <td>スペース区切り文字列</td>
+                <td>確認なしで実行してよいツールの事前承認リスト</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          <code>gh skill install</code> でスキルを導入した場合、上記に加えて
+          <strong>provenance(来歴)メタデータ</strong>(取得元リポジトリ・ref・tree SHA)が
+          <code>metadata</code> フィールド相当の情報としてフロントマターに書き込まれる。これは
+          <code>gh skill update</code> が上流の変更を検知するために使われる。
+        </p>
+        <h3 id="42-最小構成の例">4.2 最小構成の例</h3>
+        <pre class="yaml"><code class="language-yaml">---
+name: skill-name
+description: A description of what this skill does and when to use it.
+---</code></pre>
+        <h3 id="43-name-フィールドの命名規則">4.3 name フィールドの命名規則</h3>
+        <ul>
+          <li>1〜64文字</li>
+          <li>
+            Unicode の小文字英数字(<code>a-z</code>,
+            <code>0-9</code>)とハイフン(<code>-</code>)のみ使用可能
+          </li>
+          <li>ハイフンで始まる・終わることは不可</li>
+          <li>連続するハイフン(<code>--</code>)は不可</li>
+          <li>親ディレクトリ名と完全一致させる</li>
+        </ul>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr class="header">
+                <th>例</th>
+                <th>判定</th>
+                <th>理由</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="odd">
+                <td><code>pdf-processing</code></td>
+                <td>有効</td>
+                <td>小文字・ハイフン区切りのみ</td>
+              </tr>
+              <tr class="even">
+                <td><code>PDF-Processing</code></td>
+                <td>無効</td>
+                <td>大文字を含む</td>
+              </tr>
+              <tr class="odd">
+                <td><code>-pdf</code></td>
+                <td>無効</td>
+                <td>ハイフンで始まっている</td>
+              </tr>
+              <tr class="even">
+                <td><code>pdf--processing</code></td>
+                <td>無効</td>
+                <td>連続ハイフン</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <h3 id="44-description-フィールドの書き方--trigger-triad">
+          4.4 description フィールドの書き方 ― Trigger Triad
+        </h3>
+        <p>
+          <code>description</code> は Copilot
+          が数十〜数百のスキルの中から「今どれを読み込むべきか」を判断する唯一の材料であり、事実上ここに全てのトリガー精度がかかっている。複数の実践ガイドが共通して挙げる要点は次の3つ(いわゆる
+          Trigger Triad)である。
+        </p>
+        <ol type="1">
+          <li><strong>能力(Capability)</strong> ― 動詞と目的語で「何をするスキルか」を明示する</li>
+          <li>
+            <strong>文脈(Context)</strong> ―
+            「いつ使うべきか」をユーザーが実際にタイプしそうな語彙で列挙する
+          </li>
+          <li>
+            <strong>除外条件(Negative trigger)</strong> ―
+            誤発火を防ぐため「こういうときは使わない」を明記する
+          </li>
+        </ol>
+        <p>
+          必ず<strong>三人称</strong>で書くことも共通ルールである。<code>description</code>
+          はシステムプロンプトにそのまま注入されるため、視点が一人称・二人称に揺れると発見精度が落ちるとされている。
+        </p>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr class="header">
+                <th>良い例</th>
+                <th>悪い例</th>
+                <th>問題点</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="odd">
+                <td><code>Processes Excel files and generates reports.</code></td>
+                <td><code>I can help you process Excel files.</code></td>
+                <td>一人称視点でシステムプロンプトと不整合を起こす</td>
+              </tr>
+              <tr class="even">
+                <td>
+                  <code
+                    >Use when the user asks to write tests, add test coverage, or create test files.
+                    Do not use when the user asks to run existing tests or fix failing tests.</code
+                  >
+                </td>
+                <td><code>For test coverage</code></td>
+                <td>抽象的すぎてトリガー語彙が不足、除外条件もない</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <h3 id="45-説明文のテスト手法">4.5 説明文のテスト手法</h3>
+        <p>
+          <code>agentskills.io</code> の「Optimizing skill
+          descriptions」ガイドは、次の3種類のプロンプトで手動テストすることを推奨している。
+        </p>
+        <ul>
+          <li><strong>直接的リクエスト</strong>: 「コードをレビューして」→ 発火すべき</li>
+          <li>
+            <strong>間接的リクエスト</strong>:
+            「認証モジュールを変更したんだけど、確認してもらえる?」→ これも発火すべき
+          </li>
+          <li>
+            <strong>否定ケース</strong>: 「テストを実行して」→
+            コードレビュー用スキルは発火してはいけない
+          </li>
+        </ul>
+        <p>
+          間接的リクエストで発火しない場合はトリガー語彙を追加し、否定ケースで誤発火する場合は
+          <code>description</code> に「Do not use
+          when...」を追加する、というのが基本的な改善ループになる。
+        </p>
+        <h3 id="46-allowed-tools-フィールドとセキュリティ">
+          4.6 allowed-tools フィールドとセキュリティ
+        </h3>
+        <p>
+          <code>allowed-tools</code>
+          は「確認なしで実行してよいツール」を事前承認するフィールドである。GitHub
+          公式ドキュメントは次の警告を明記している。
+        </p>
+        <blockquote>
+          <p>
+            Only pre-approve the <code>shell</code> or <code>bash</code> tools if you have reviewed
+            this skill and any referenced scripts, and you fully trust their source. Pre-approving
+            <code>shell</code> or <code>bash</code> removes the confirmation step for running
+            terminal commands and can allow attacker-controlled skills or prompt injections to
+            execute arbitrary commands in your environment.
+          </p>
+        </blockquote>
+        <pre class="yaml"><code class="language-yaml">---
+name: image-convert
+description: Converts SVG images to PNG format. Use when asked to convert SVG files.
+allowed-tools: shell
+---</code></pre>
+        <p>
+          <code>agentskills.io</code>
+          仕様上の記法例では、ツールをワイルドカードで細かく絞り込むこともできる。
+        </p>
+        <pre
+          class="yaml"
+        ><code class="language-yaml">allowed-tools: Bash(git:*) Bash(jq:*) Read</code></pre>
+        <p>
+          <code>shell</code> や <code>bash</code> を丸ごと許可するのではなく、<code
+            >Bash(git:*)</code
+          >
+          のように許可するコマンドの範囲を絞ることで、事前承認の範囲を最小化できる。
+        </p>
+        <hr />
+        <h2 id="5-ディレクトリ構造とスコープ">5. ディレクトリ構造とスコープ</h2>
+        <h3 id="51-基本構造">5.1 基本構造</h3>
+        <p>
+          スキルは最低限
+          <code>SKILL.md</code>
+          一つを含むディレクトリであり、以下のオプションディレクトリを併せ持てる。
+        </p>
+        <ul>
+          <li>
+            <code>skill-name/</code>
+            <ul>
+              <li><code>SKILL.md</code> ― 必須。メタデータ+指示</li>
+              <li><code>scripts/</code> ― 任意。実行可能なコード(Python・Bash・JavaScriptなど)</li>
+              <li>
+                <code>references/</code> ―
+                任意。詳細なドキュメント(<code>REFERENCE.md</code>、<code>FORMS.md</code>、<code
+                  >finance.md</code
+                >
+                など)
+              </li>
+              <li>
+                <code>assets/</code> ― 任意。テンプレート・画像・データファイルなどの静的リソース
+              </li>
+            </ul>
+          </li>
+        </ul>
+        <p>
+          参照は SKILL.md
+          からの相対パスで行い、参照の連鎖は1階層にとどめることが推奨されている(深いネストは追跡コストが増える)。
+        </p>
+        <h3 id="52-プロジェクトスキル-vs-パーソナルスキル">
+          5.2 プロジェクトスキル vs パーソナルスキル
+        </h3>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr class="header">
+                <th>種別</th>
+                <th>用途</th>
+                <th>配置場所</th>
+                <th>共有範囲</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="odd">
+                <td>プロジェクトスキル</td>
+                <td>単一リポジトリに固有</td>
+                <td>
+                  <code>.github/skills/</code>、<code>.claude/skills/</code>、<code
+                    >.agents/skills/</code
+                  >
+                </td>
+                <td>ソース管理経由でチーム全員に共有</td>
+              </tr>
+              <tr class="even">
+                <td>パーソナルスキル</td>
+                <td>全プロジェクト横断</td>
+                <td><code>~/.copilot/skills/</code>、<code>~/.agents/skills/</code></td>
+                <td>自分のマシンのみ、リポジトリにはコミットされない</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          VS Code は
+          <code>chat.agentSkillsLocations</code>
+          設定を使うことで、上記以外の任意のパスを追加の探索対象に加えることもできる。複数リポジトリをまたいでスキルを共有したい場合に利用される。
+        </p>
+        <h3 id="53-各エージェントホストでの対応状況">5.3 各エージェントホストでの対応状況</h3>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr class="header">
+                <th>ホスト</th>
+                <th>対応スコープ</th>
+                <th>備考</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="odd">
+                <td>VS Code(agent mode)</td>
+                <td>プロジェクト・パーソナル両方</td>
+                <td>
+                  2026年1月上旬に安定版へ展開。<code>/skills</code> でConfigure Skillsパネルを開ける
+                </td>
+              </tr>
+              <tr class="even">
+                <td>Visual Studio 2026 Insiders</td>
+                <td>プロジェクト・パーソナル両方</td>
+                <td>
+                  Copilot
+                  Chatの工具アイコンからSkillsパネルを開き、GUIでの新規作成・編集・診断表示に対応
+                </td>
+              </tr>
+              <tr class="odd">
+                <td>JetBrains IDEs</td>
+                <td>プロジェクト・パーソナル両方</td>
+                <td>agent mode 経由でVS Codeと同等の探索ロジック</td>
+              </tr>
+              <tr class="even">
+                <td>Copilot CLI</td>
+                <td>プロジェクト・パーソナル両方</td>
+                <td><code>/skills list</code> / <code>/skills reload</code> で確認・再読み込み</td>
+              </tr>
+              <tr class="odd">
+                <td>Copilot cloud agent</td>
+                <td>プロジェクトスキルのみ</td>
+                <td>リポジトリにコミットされた <code>.github/skills</code> などを参照</td>
+              </tr>
+              <tr class="even">
+                <td>Copilot code review</td>
+                <td>プロジェクトスキルのみ(2026年7月29日GA)</td>
+                <td>
+                  レビュー用スキルは
+                  <code>code-review</code>
+                  のようなレビュー特化のディレクトリ名にすると確実に使われやすい
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <hr />
+        <h2 id="6-ステップバイステップ作成ガイド">6. ステップバイステップ作成ガイド</h2>
+        <p>
+          ここからは実際に手を動かしながら、ゼロから実運用可能なスキルを作る手順を追う。題材は「GitHub
+          Actionsの失敗を調査する」スキルとする。
+        </p>
+        <pre class="mermaid">
+flowchart TB
+    S1["Step 1&lt;br/&gt;繰り返しているタスクを特定する"] --&gt; S2
+    S2["Step 2&lt;br/&gt;skillsディレクトリと&lt;br/&gt;スキル用サブディレクトリを作成"] --&gt; S3
+    S3["Step 3&lt;br/&gt;SKILL.mdのフロントマターを書く&lt;br/&gt;(name / description)"] --&gt; S4
+    S4["Step 4&lt;br/&gt;本文にステップバイステップの&lt;br/&gt;手順・例・エッジケースを書く"] --&gt; S5
+    S5["Step 5&lt;br/&gt;必要ならscripts/references/assetsを追加し&lt;br/&gt;allowed-toolsを検討"] --&gt; S6
+    S6["Step 6&lt;br/&gt;直接・間接・否定の3パターンで&lt;br/&gt;発火テストを行う"] --&gt; S7
+    S7["Step 7&lt;br/&gt;チームに配布&lt;br/&gt;(コミット or gh skill publish)"] --&gt; S8
+    S8["Step 8&lt;br/&gt;実運用しながら&lt;br/&gt;descriptionと本文を反復改善"]</pre
+        >
+        <h3 id="step-1-繰り返しているタスクを特定する">Step 1: 繰り返しているタスクを特定する</h3>
+        <p>
+          同じプロンプトを複数の会話で繰り返しタイプしている、あるいは特定のレビュー観点やデバッグ手順を毎回口頭で説明しているなら、それがスキル化の候補である。Anthropic
+          のガイドラインは「代表的なタスクでエージェントを実際に動かし、つまずく箇所や追加コンテキストが必要になる箇所を観察する」ことを最初のステップとして推奨している。
+        </p>
+        <h3 id="step-2-ディレクトリを作成する">Step 2: ディレクトリを作成する</h3>
+        <pre
+          class="bash"
+        ><code class="language-bash">mkdir -p .github/skills/github-actions-failure-debugging</code></pre>
+        <p>
+          サブディレクトリ名は小文字・ハイフン区切りにする。これは後述の
+          <code>name</code> フィールドと一致させる必要があるためである。
+        </p>
+        <h3 id="step-3-フロントマターを書く">Step 3: フロントマターを書く</h3>
+        <pre class="yaml"><code class="language-yaml">---
+name: github-actions-failure-debugging
+description: Guide for debugging failing GitHub Actions workflows. Use this when asked to debug failing GitHub Actions workflows.
+---</code></pre>
+        <h3 id="step-4-本文を書く">Step 4: 本文を書く</h3>
+        <pre
+          class="markdown"
+        ><code class="language-markdown">To debug failing GitHub Actions workflows in a pull request, follow this process, using tools provided from the GitHub MCP Server:
+
+1. Use the `list_workflow_runs` tool to look up recent workflow runs for the pull request and their status
+2. Use the `summarize_job_log_failures` tool to get an AI summary of the logs for failed jobs, to understand what went wrong without filling your context window with thousands of lines of logs
+3. If you still need more information, use the `get_job_logs` or `get_workflow_run_logs` tool to get the full, detailed failure logs
+4. Try to reproduce the failure yourself in your own environment
+5. Fix the failing build. If you were able to reproduce the failure yourself, make sure it is fixed before committing your changes</code></pre>
+        <p>
+          本文の分量は<strong>500行未満</strong>を目安にする。それを超える場合は
+          <code>references/</code> にファイルを分割し、SKILL.md からリンクする形にする。Anthropic
+          のガイドラインでは「SKILL.md本文は5,000トークン未満が理想」ともされており、行数だけでなくトークン量にも意識を向けるとよい。
+        </p>
+        <h3 id="step-5-スクリプトを追加する任意">Step 5: スクリプトを追加する(任意)</h3>
+        <pre><code>.github/skills/image-convert/
+  SKILL.md
+  convert-svg-to-png.sh</code></pre>
+        <p>
+          スキルが起動されると、Copilot
+          はそのスキルディレクトリ内の全ファイルを自動的に発見し、<code>SKILL.md</code>
+          の指示と一緒に利用可能にする。本文中でスクリプトの呼び出し方を明記すること。
+        </p>
+        <pre
+          class="markdown"
+        ><code class="language-markdown">When asked to convert an SVG to PNG, run the `convert-svg-to-png.sh`
+script from this skill's base directory, passing the input SVG file
+path as the first argument.</code></pre>
+        <h3 id="step-6-発火テストを行う">Step 6: 発火テストを行う</h3>
+        <p>
+          前述の「直接的リクエスト」「間接的リクエスト」「否定ケース」の3パターンで実際にプロンプトを投げ、期待通りに発火するかを確認する。反応が悪い場合は
+          <code>description</code> のトリガー語彙を見直す。本文の指示を直す前に、まず
+          <code>description</code> を疑うのが定石である。
+        </p>
+        <h3 id="step-7-チームに配布する">Step 7: チームに配布する</h3>
+        <p>
+          <code>.github/skills/</code>
+          配下に置いてコミットすれば、リポジトリをクローンした全員が自動的にそのスキルを利用できるようになる。公開スキルリポジトリとして運用する場合は、後述の
+          <code>gh skill publish</code> を使って検証・公開する。
+        </p>
+        <h3 id="step-8-反復改善する">Step 8: 反復改善する</h3>
+        <p>
+          Anthropic
+          のガイドラインが強調するのは「Claudeの視点で考える」ことである。実際の利用シーンでスキルがどう使われたかを観察し、想定外の挙動や特定の文脈への過度な依存がないかを確認する。うまくいかなかった場合はエージェント自身に「何が問題だったか」を振り返らせ、そのフィードバックを本文に反映する、というループを回す。
+        </p>
+        <hr />
+        <h2 id="7-github-cligh-skillによるスキル管理">7. GitHub CLI(gh skill)によるスキル管理</h2>
+        <p>
+          GitHub CLI 2.90.0 以降では
+          <code>gh skill</code>
+          サブコマンド(パブリックプレビュー)を使い、スキルの検索・プレビュー・インストール・更新・公開を行える。
+        </p>
+        <pre class="mermaid">
+sequenceDiagram
+    participant D as 開発者
+    participant CLI as GitHub CLI(gh skill)
+    participant Repo as スキル配布用リポジトリ
+
+    D-&gt;&gt;CLI: gh skill search TOPIC
+    CLI-&gt;&gt;Repo: TOPICに関連するスキルを検索
+    Repo--&gt;&gt;CLI: 候補一覧を返す
+    D-&gt;&gt;CLI: gh skill preview OWNER/REPO SKILL
+    CLI-&gt;&gt;Repo: SKILL.mdとファイルツリーを取得
+    Repo--&gt;&gt;CLI: 内容をターミナルに表示(未インストール)
+    D-&gt;&gt;CLI: gh skill install OWNER/REPO SKILL
+    CLI-&gt;&gt;Repo: 該当スキルを取得
+    CLI--&gt;&gt;D: 正しいディレクトリへ配置し、provenanceメタデータを付与
+    Note over D,CLI: 後日...
+    D-&gt;&gt;CLI: gh skill update --all
+    CLI-&gt;&gt;Repo: provenance情報を基に上流の変更を確認
+    Repo--&gt;&gt;CLI: 差分があれば通知・更新</pre
+        >
+        <h3 id="71-検索プレビューインストール">7.1 検索・プレビュー・インストール</h3>
+        <pre class="bash"><code class="language-bash"># トピックでスキルを検索
+gh skill search TOPIC
+
+# インストール前に内容を確認(SKILL.mdとファイルツリーを表示するだけ)
+gh skill preview OWNER/REPOSITORY SKILL
+
+# インストール(対話形式。リポジトリ指定なしでも起動可能)
+gh skill install OWNER/REPOSITORY
+
+# 特定のスキルを直接指定してインストール
+gh skill install github/awesome-copilot documentation-writer
+
+# バージョンやSHAを指定
+gh skill install github/awesome-copilot documentation-writer@v1.2.0
+
+# 特定バージョンに固定し、以後のupdateから除外する
+gh skill install github/awesome-copilot documentation-writer --pin v1.2.0
+
+# 別のエージェントホスト・スコープを指定
+gh skill install github/awesome-copilot documentation-writer --agent claude-code --scope user</code></pre>
+        <p><code>@VERSION</code> 記法と <code>--pin</code> は併用できない(どちらか一方を使う)。</p>
+        <blockquote>
+          <p>
+            <strong>警告</strong>: スキルは GitHub
+            による検証を受けていない。プロンプトインジェクションや隠れた指示、悪意あるスクリプトが含まれている可能性があるため、インストール前に必ず
+            <code>gh skill preview</code> で内容を確認すること。
+          </p>
+        </blockquote>
+        <h3 id="72-更新公開">7.2 更新・公開</h3>
+        <pre class="bash"><code class="language-bash"># 更新可能なスキルを対話的に確認
+gh skill update
+
+# 特定のスキルだけ更新
+gh skill update SKILL
+
+# 全スキルを確認なしで一括更新
+gh skill update --all
+
+# 仕様違反やリモート設定(タグ保護・secret scanning等)を検証するのみ
+gh skill publish --dry-run
+
+# メタデータの不備を自動修正するのみ(公開はしない)
+gh skill publish --fix
+
+# 検証のうえ公開
+gh skill publish</code></pre>
+        <p>
+          ピン留めされたスキルは
+          <code>update</code> の対象から除外される。ピン留めを更新したい場合は新しい
+          <code>--pin</code> 値で再インストールする。
+        </p>
+        <hr />
+        <h2 id="8-実践テンプレート集">8. 実践テンプレート集</h2>
+        <p>そのまま利用できる5種類のテンプレートを、用途別に示す。</p>
+        <h3 id="81-最小構成テンプレート">8.1 最小構成テンプレート</h3>
+        <p>必須フィールドのみで動く、最小のスキル。まずはここから始めるとよい。</p>
+        <pre class="markdown"><code class="language-markdown">---
+name: commit-message-writer
+description: Writes Conventional Commits-style commit messages from a diff. Use when the user asks to write a commit message, summarize staged changes, or asks "what should I commit this as".
+---
+
+Given the currently staged diff, write a single Conventional Commits-style
+commit message:
+
+1. Determine the type (feat, fix, docs, refactor, test, chore, etc.)
+2. Determine the scope from the most-changed directory or module
+3. Write a subject line under 72 characters, imperative mood, no trailing period
+4. If the diff touches more than one concern, add a body with bullet points
+5. Do not fabricate a scope or type that isn't supported by the diff</code></pre>
+        <h3 id="82-スクリプト実行テンプレート">8.2 スクリプト実行テンプレート</h3>
+        <p>決定的な処理はコードに任せ、SKILL.md は「いつ・どう呼ぶか」だけを担う設計。</p>
+        <pre class="markdown"><code class="language-markdown">---
+name: image-convert
+description: Converts SVG images to PNG format. Use when asked to convert SVG files or generate PNG assets from vector sources.
+allowed-tools: Bash(convert-svg-to-png.sh:*)
+---
+
+When asked to convert an SVG to PNG, run the `convert-svg-to-png.sh` script
+from this skill's base directory, passing:
+
+1. The input SVG file path as the first argument
+2. The desired output width in pixels as the second argument (default: 512)
+
+If the script exits with a non-zero status, report the exact stderr output
+to the user rather than retrying silently.</code></pre>
+        <pre><code>.github/skills/image-convert/
+  SKILL.md
+  convert-svg-to-png.sh</code></pre>
+        <h3 id="83-コードレビュー特化テンプレート">8.3 コードレビュー特化テンプレート</h3>
+        <p>
+          Copilot code review が自動的に利用しやすいよう、ディレクトリ名を
+          <code>code-review</code> にする例。
+        </p>
+        <pre class="markdown"><code class="language-markdown">---
+name: code-review
+description: Applies this team's code review checklist. Use when reviewing a pull request, or when the user asks to review code, find bugs, or check for security issues.
+---
+
+When reviewing a pull request, check the following in order:
+
+1. **Correctness**: Does the diff match the linked issue/PR description?
+2. **Tests**: Are new code paths covered? Flag any untested branching logic.
+3. **Security**: Look for hardcoded secrets, unsanitized input passed to
+   shell/SQL/HTML contexts, and missing authorization checks.
+4. **Style**: Defer to the repository's linter config; only flag style
+   issues the linter doesn't already catch.
+5. **Naming &amp; readability**: Flag unclear names only when they would
+   confuse a future maintainer, not for personal preference.
+
+Do not comment on formatting that an autoformatter would already fix.</code></pre>
+        <h3 id="84-複数ファイル参照テンプレートreferencesを使う例">
+          8.4 複数ファイル参照テンプレート(references/を使う例)
+        </h3>
+        <p>本文が肥大化しそうな場合に、詳細をファイル分割する構成。</p>
+        <pre class="markdown"><code class="language-markdown">---
+name: pdf-processing
+description: Extracts text and tables from PDF files, fills PDF forms, and merges multiple PDFs. Use when working with PDF documents or when the user mentions PDFs, forms, or document extraction.
+---
+
+For general PDF text/table extraction, use `scripts/extract.py` directly.
+
+For form-filling tasks, see [the form-filling guide](references/FORMS.md)
+before making any changes — form field names are not always self-explanatory.
+
+For merging or splitting PDFs, see [the reference guide](references/REFERENCE.md).</code></pre>
+        <pre><code>pdf-processing/
+  SKILL.md
+  references/
+    FORMS.md
+    REFERENCE.md
+  scripts/
+    extract.py</code></pre>
+        <p>
+          参照は SKILL.md からの相対パスで1階層にとどめ、<code>FORMS.md</code>
+          からさらに別のファイルを参照するような深いネストは避ける。
+        </p>
+        <h3 id="85-チーム共有テンプレート複数サーフェス横断">
+          8.5 チーム共有テンプレート(複数サーフェス横断)
+        </h3>
+        <p>
+          VS Code・Copilot CLI・cloud agent・code review
+          のすべてから同じ挙動を期待する、チーム標準化向けの構成。
+        </p>
+        <pre class="markdown"><code class="language-markdown">---
+name: incident-triage
+description: Triages production incidents and failed deployments using the team's runbook. Use when the user reports a production incident, a failed deployment, or asks "what's going on with prod".
+compatibility: Requires access to the GitHub MCP Server and the team's status-page API
+---
+
+1. Check the status page and recent deploy history for correlated changes
+2. Use `list_workflow_runs` to check for recently failed deployment workflows
+3. Classify severity using the team's SEV1–SEV4 rubric (see references/severity.md)
+4. Draft an incident summary using the template in assets/incident-template.md
+5. Do not page anyone directly — only draft the summary for a human to send</code></pre>
+        <pre><code>.github/skills/incident-triage/
+  SKILL.md
+  references/
+    severity.md
+  assets/
+    incident-template.md</code></pre>
+        <p>
+          <code>.github/skills/</code> にコミットしておけば、VS Code・JetBrains・Copilot CLI・cloud
+          agent・code review のいずれからアクセスしても同じ手順書を参照する。
+        </p>
+        <hr />
+        <h2 id="9-copilotの各サーフェスでの挙動差分">9. Copilotの各サーフェスでの挙動差分</h2>
+        <p>
+          同じ
+          <code>SKILL.md</code>
+          でも、動作するサーフェスによって細かな挙動差がある。特にトラブルシューティング時に「なぜこの環境だけ動かないのか」を切り分ける際の材料になる。
+        </p>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr class="header">
+                <th>サーフェス</th>
+                <th>スキル一覧・再読み込みの手段</th>
+                <th>既知の注意点</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="odd">
+                <td>VS Code(安定版・Insiders)</td>
+                <td>チャットで <code>/skills</code> と入力し Configure Skills パネルを開く</td>
+                <td>
+                  Insiders版で
+                  <code>.agents/skills</code>
+                  が一時的に認識されなくなる回帰が報告されたことがある。<code>.github/skills</code>
+                  へ退避すると解消するケースが確認されている
+                </td>
+              </tr>
+              <tr class="even">
+                <td>Visual Studio 2026 Insiders</td>
+                <td>
+                  Copilot
+                  Chatの工具アイコン→Skillsパネル。編集・ファイルの場所を開く・検索・診断表示が可能
+                </td>
+                <td>Skillsパネルからの新規作成にはVisual Studio 2026 Insiders 18.6以降が必要</td>
+              </tr>
+              <tr class="odd">
+                <td>Copilot CLI</td>
+                <td><code>/skills list</code> / <code>/skills reload</code></td>
+                <td>
+                  VS Codeでは認識されるスキルがCopilot
+                  CLI側では認識されない不具合が報告されている。<code>/skills reload</code>
+                  を実行しても解消しない場合は、CLIとVS
+                  Codeのバージョン差やワーキングディレクトリの違いを疑う
+                </td>
+              </tr>
+              <tr class="even">
+                <td>WSL2上のパーソナルスキル</td>
+                <td><code>~/.copilot/skills/</code> に配置</td>
+                <td>
+                  WSL2環境でスキル自体は検出されるがSKILL.mdの自動読み込みが失敗する事例が報告されている。マルチルートワークスペースに含める形で回避できたという報告がある
+                </td>
+              </tr>
+              <tr class="odd">
+                <td>Copilot code review</td>
+                <td>
+                  <code>.github/skills</code> 配下、<code>code-review</code> のような名前を推奨
+                </td>
+                <td>
+                  2026年7月29日にAgent
+                  SkillsとMCPの組み合わせがGA。すべてのMCPツール呼び出しは読み取り専用に制限される
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          これらは断続的に修正が入る領域であるため、再現する場合は GitHub の
+          <code>microsoft/vscode</code> リポジトリや <code>github/copilot-cli</code> リポジトリの
+          Issue で同様の報告がないかを確認するのが早い。
+        </p>
+        <hr />
+        <h2 id="10-skills-vs-custom-instructions-vs-mcp-vs-subagents">
+          10. Skills vs Custom Instructions vs MCP vs Subagents
+        </h2>
+        <h3 id="101-比較表">10.1 比較表</h3>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr class="header">
+                <th>観点</th>
+                <th>Custom Instructions</th>
+                <th>Agent Skills</th>
+                <th>MCP</th>
+                <th>カスタムエージェント/Subagents</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="odd">
+                <td>読み込みタイミング</td>
+                <td>常時(全タスク)</td>
+                <td>関連時のみ(3段階)</td>
+                <td>ツール呼び出し時</td>
+                <td>セッション全体を専有</td>
+              </tr>
+              <tr class="even">
+                <td>主な用途</td>
+                <td>コーディング規約・常時ルール</td>
+                <td>再現可能な手順・チェックリスト</td>
+                <td>外部データ・ツールへの接続</td>
+                <td>独立した権限・ペルソナでのタスク実行</td>
+              </tr>
+              <tr class="odd">
+                <td>ファイル形式</td>
+                <td>単一Markdownファイル</td>
+                <td>フォルダ(SKILL.md+付随資料)</td>
+                <td>サーバー設定(URL/コマンド)</td>
+                <td>設定ファイル(エージェント定義)</td>
+              </tr>
+              <tr class="even">
+                <td>コンテキストコスト</td>
+                <td>高い(毎回全文)</td>
+                <td>低い(メタデータのみ既定)</td>
+                <td>呼び出し時のみ</td>
+                <td>高い(専用コンテキスト)</td>
+              </tr>
+              <tr class="odd">
+                <td>組み合わせ</td>
+                <td>可能</td>
+                <td>Skillsが複数同時にアクティブになりうる</td>
+                <td>Skills内からMCPツールを呼べる</td>
+                <td>Subagentの内部でSkillsを使える</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <h3 id="102-使い分けフローチャート">10.2 使い分けフローチャート</h3>
+        <pre class="mermaid">
+flowchart TB
+    Q1{ほぼ全タスクに&lt;br/&gt;常に関係する情報か?} --&gt;|Yes| A[Custom Instructions]
+    Q1 --&gt;|No| Q2{外部システムの&lt;br/&gt;実データ・ツール呼び出しが必要か?}
+    Q2 --&gt;|Yes| B[MCPサーバー]
+    Q2 --&gt;|No| Q3{独立した権限・ペルソナで&lt;br/&gt;タスクを丸ごと任せたいか?}
+    Q3 --&gt;|Yes| C[カスタムエージェント/Subagent]
+    Q3 --&gt;|No| D[Agent Skills&lt;br/&gt;再現可能な手順書として切り出す]</pre
+        >
+        <p>
+          Skills
+          は単一のツール呼び出しではなく、かといって完全に自律したエージェントハーネスでもない。「有能なエージェントが適切なタイミングで適用し、タスクが終われば脇に置く、再利用可能な手順」という中間的な位置づけであることを踏まえて使い分けるとよい。
+        </p>
+        <hr />
+        <h2 id="11-セキュリティベストプラクティス">11. セキュリティベストプラクティス</h2>
+        <h3 id="111-公開スキルエコシステムの実態調査">11.1 公開スキルエコシステムの実態調査</h3>
+        <p>
+          セキュリティベンダー Snyk は2026年2月5日、ClawHub と skills.sh
+          から集めた3,984件のスキルを対象にした初の包括的な監査結果「ToxicSkills」を公表した。
+        </p>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr class="header">
+                <th>指標</th>
+                <th>数値</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="odd">
+                <td>調査対象スキル数</td>
+                <td>3,984件</td>
+              </tr>
+              <tr class="even">
+                <td>何らかのセキュリティ上の問題を含むスキルの割合</td>
+                <td>36.82%(1,467件)</td>
+              </tr>
+              <tr class="odd">
+                <td>クリティカルな問題を含むスキルの割合</td>
+                <td>13.4%(534件)</td>
+              </tr>
+              <tr class="even">
+                <td>主な問題の種類</td>
+                <td>
+                  プロンプトインジェクション、ハードコードされたAPIキー、安全でない認証情報の扱い、危険なサードパーティコンテンツ露出
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          別の独立調査(42,447件のスキルを対象)では、プロンプトインジェクションの発生率が26.1%、悪意ある意図が疑われるものが5.2%とされており、調査対象や手法が違っても「公開スキルの一定割合に何らかのリスクがある」という傾向は一致している。ClawHub(OpenClaw向けの公開レジストリ)では2026年1月、2,857件中341件が単一の攻撃キャンペーン「ClawHavoc」由来のマルウェア(Atomic
+          Stealer)配布に関与していたことも報告されている。
+        </p>
+        <h3 id="112-anthropicが推奨するセキュリティ手順">
+          11.2 Anthropicが推奨するセキュリティ手順
+        </h3>
+        <p>
+          Agent Skills を最初に設計した Anthropic
+          自身のエンジニアリングブログは、次の手順を推奨している。
+        </p>
+        <ol type="1">
+          <li><strong>信頼できる提供元からのみスキルをインストールする</strong></li>
+          <li>信頼度の低い提供元のスキルを使う場合は、導入前に<strong>徹底的に監査する</strong></li>
+          <li>
+            まずスキルディレクトリ内の全ファイルの中身を読み、特にコードの依存関係や画像・スクリプトなどのバンドルリソースに注意を払う
+          </li>
+          <li>
+            スキル内の指示やコードが、信頼できない外部ネットワーク先への接続を
+            Claude(あるいはCopilot)に指示していないか特に注意する
+          </li>
+        </ol>
+        <p>
+          GitHub 公式ドキュメントも同様に、<code>gh skill install</code> の前に必ず
+          <code>gh skill preview</code> で
+          <code>SKILL.md</code> とファイルツリーを確認することを警告として明記している。
+        </p>
+        <h3 id="113-実務での防御策チェックリスト">11.3 実務での防御策チェックリスト</h3>
+        <ul>
+          <li>
+            <code>allowed-tools</code> に <code>shell</code> /
+            <code>bash</code> を丸ごと許可しない。許可する場合は
+            <code>Bash(git:*)</code> のようにコマンド単位で絞り込む
+          </li>
+          <li>
+            未知のスキルは
+            <code>gh skill preview</code> またはリポジトリを直接クローンして中身を読んでから導入する
+          </li>
+          <li>
+            スキル内に URL への
+            <code>curl | bash</code> のような外部ダウンロード指示がないか確認する
+          </li>
+          <li>
+            組織導入時は、Snyk の <code>agent-scan</code>(旧称 <code>mcp-scan</code> を統合した Evo
+            プラットフォームのスキャナー)のような専用スキャンツールでの定期監査を検討する
+          </li>
+          <li>
+            リポジトリにコミットするプロジェクトスキルは、通常のコードと同じ PR
+            レビュープロセスを通す
+          </li>
+        </ul>
+        <hr />
+        <h2 id="12-トラブルシューティング完全ガイド">12. トラブルシューティング完全ガイド</h2>
+        <h3 id="121-症状別の原因と対処">12.1 症状別の原因と対処</h3>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr class="header">
+                <th>症状</th>
+                <th>よくある原因</th>
+                <th>対処</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="odd">
+                <td>スキルが全く発火しない</td>
+                <td><code>description</code> が抽象的すぎる、または一人称で書かれている</td>
+                <td>
+                  三人称に書き直し、Trigger
+                  Triad(能力・文脈・除外条件)に沿って具体的なトリガー語彙を追加する
+                </td>
+              </tr>
+              <tr class="even">
+                <td>直接的な指示では発火するが間接的な指示では発火しない</td>
+                <td>トリガー語彙の不足</td>
+                <td>
+                  ユーザーが実際に使いそうな類義語・言い回しを <code>description</code> に追加する
+                </td>
+              </tr>
+              <tr class="odd">
+                <td>関係ないタスクでも誤発火する</td>
+                <td><code>description</code> が広すぎる</td>
+                <td>「Do not use when...」という除外条件を追加する</td>
+              </tr>
+              <tr class="even">
+                <td><code>name</code> は正しいのにスキル自体が認識されない</td>
+                <td>ディレクトリ名と <code>name</code> フィールドが一致していない</td>
+                <td>仕様上 <code>name</code> は親ディレクトリ名と一致必須。両者を揃える</td>
+              </tr>
+              <tr class="odd">
+                <td>VS Code では見えるのに Copilot CLI では見えない</td>
+                <td>サーフェスごとの探索ロジックの差、キャッシュの不整合</td>
+                <td>
+                  <code>/skills reload</code> を試す。改善しない場合はCLIとVS
+                  Code拡張のバージョン差分を確認し、既知のIssueを検索する
+                </td>
+              </tr>
+              <tr class="even">
+                <td>Insiders版で <code>.agents/skills</code> のスキルが急に見えなくなった</td>
+                <td>特定バージョンでの回帰(regression)</td>
+                <td>
+                  一時的な回避策として <code>.github/skills</code> に配置し直す。VS
+                  Codeを最新の安定版に更新する
+                </td>
+              </tr>
+              <tr class="odd">
+                <td>WSL2環境でパーソナルスキルが検出はされるが読み込まれない</td>
+                <td>環境固有の不具合(原因未特定)</td>
+                <td>スキルフォルダをマルチルートワークスペースに含める形で回避できた報告がある</td>
+              </tr>
+              <tr class="even">
+                <td><code>allowed-tools</code> を設定したのに毎回確認を求められる</td>
+                <td>フィールド名や記法の誤り、対応していないツール名を指定している</td>
+                <td>
+                  実験的フィールドであるため、使用しているCopilotのバージョンでの対応状況を確認し、スペース区切りの記法(<code
+                    >Bash(git:*) Read</code
+                  >
+                  など)を再確認する
+                </td>
+              </tr>
+              <tr class="odd">
+                <td>SKILL.md本文が長すぎて挙動が不安定</td>
+                <td>500行/5,000トークンの目安を超過し、指示の優先順位が埋もれている</td>
+                <td>重要なルールを先頭に移動し、詳細情報は <code>references/</code> に分割する</td>
+              </tr>
+              <tr class="even">
+                <td>部分的にしか指示に従わない</td>
+                <td>SKILL.mdが長い・曖昧、番号付き手順になっていない</td>
+                <td>重要なルールを先頭に、番号付きステップとして明確化する</td>
+              </tr>
+              <tr class="odd">
+                <td>スクリプトが実行されない</td>
+                <td>
+                  Agent modeではなくAsk
+                  modeになっている、スクリプトのパス・ランタイム(node/python等)が利用できない
+                </td>
+                <td>Agent modeであることを確認し、スクリプトパスと実行環境を検証する</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <h3 id="122-デバッグ用の判断フロー">12.2 デバッグ用の判断フロー</h3>
+        <pre class="mermaid">
+flowchart TB
+    P["スキルが期待通りに動かない"] --&gt; D1{そもそも一覧に表示されるか?&lt;br/&gt;/skills で確認}
+    D1 --&gt;|表示されない| F1["name とディレクトリ名の一致、&lt;br/&gt;配置パスを再確認"]
+    D1 --&gt;|表示される| D2{直接的な指示でも発火しないか?}
+    D2 --&gt;|発火しない| F2["descriptionが一人称・抽象的でないか確認し、&lt;br/&gt;Trigger Triadで書き直す"]
+    D2 --&gt;|発火する| D3{間接的な指示では発火しないか?}
+    D3 --&gt;|発火しない| F3["トリガー語彙(類義語・言い回し)を&lt;br/&gt;descriptionへ追加"]
+    D3 --&gt;|発火する| D4{無関係なタスクでも誤発火するか?}
+    D4 --&gt;|誤発火する| F4["Do not use when... を&lt;br/&gt;descriptionへ追加"]
+    D4 --&gt;|しない| D5{発火はするが指示に&lt;br/&gt;正しく従わないか?}
+    D5 --&gt;|従わない| F5["本文を500行/5000トークン以内に整理し、&lt;br/&gt;重要ルールを先頭へ、詳細はreferencesへ分割"]
+    D5 --&gt;|従う| F6["サーフェス固有の既知の不具合を疑い、&lt;br/&gt;GitHub Issueを検索"]</pre
+        >
+        <hr />
+        <h2 id="13-ベストプラクティスチェックリスト">13. ベストプラクティスチェックリスト</h2>
+        <div class="checklist-card">
+          <ul class="task-list">
+            <li>
+              <label
+                ><input type="checkbox" /><code>name</code>
+                はディレクトリ名と完全一致しているか</label
+              >
+            </li>
+            <li>
+              <label
+                ><input type="checkbox" /><code>description</code>
+                は三人称で、「何をするか」と「いつ使うか」の両方を含んでいるか</label
+              >
+            </li>
+            <li>
+              <label
+                ><input type="checkbox" /><code>description</code> に除外条件(Do not use
+                when...)が必要な場合は書かれているか</label
+              >
+            </li>
+            <li>
+              <label
+                ><input
+                  type="checkbox"
+                />直接的・間接的・否定的の3パターンで発火テストを行ったか</label
+              >
+            </li>
+            <li>
+              <label
+                ><input
+                  type="checkbox"
+                />本文は500行未満、目安として5,000トークン未満に収まっているか</label
+              >
+            </li>
+            <li>
+              <label
+                ><input type="checkbox" />詳細情報は
+                <code>references/</code> に分割し、参照は1階層以内に抑えているか</label
+              >
+            </li>
+            <li>
+              <label
+                ><input type="checkbox" /><code>allowed-tools</code> で <code>shell</code>/<code
+                  >bash</code
+                >
+                を丸ごと許可していないか。絞り込めるなら絞り込んだか</label
+              >
+            </li>
+            <li>
+              <label
+                ><input type="checkbox" />チーム共有が目的なら
+                <code>.github/skills/</code> にコミットし、通常のPRレビューを通しているか</label
+              >
+            </li>
+            <li>
+              <label
+                ><input type="checkbox" />未知の提供元のスキルは
+                <code>gh skill preview</code> で内容を確認してからインストールしているか</label
+              >
+            </li>
+            <li>
+              <label
+                ><input type="checkbox" />コードレビュー用途なら、ディレクトリ名を
+                <code>code-review</code> のようなレビュー特化の名前にしているか</label
+              >
+            </li>
+          </ul>
+        </div>
+        <hr />
+        <h2 id="14-まとめ">14. まとめ</h2>
+        <p>
+          GitHub Copilot における SKILL.md
+          は、単なる「Copilot独自の新機能」ではなく、Anthropic発の設計思想が
+          <code>agentskills.io</code>
+          というオープン標準を経て業界横断のフォーマットになった結果、Copilotにも採用されたものである。3段階ローディングという設計思想を理解しておけば、「なぜdescriptionだけがこれほど重要視されるのか」「なぜ本文を500行未満に保つべきなのか」といった個々のベストプラクティスの理由が自然につながって見えてくる。
+        </p>
+        <p>
+          一方で、標準化のスピードの速さと裏腹に、公開スキルエコシステムの3割超に何らかのセキュリティ上の問題が見つかっているという調査結果もある。フォーマットの仕様を理解することと同じくらい、「信頼できる提供元か」「<code
+            >allowed-tools</code
+          >
+          を安易に広げすぎていないか」を意識する運用姿勢が欠かせない。
+        </p>
+        <hr />
+        <h2 id="参考文献出典">参考文献・出典</h2>
+        <div class="ref-grid">
+          <div class="ref-card">
+            <h3 id="github公式ドキュメント">GitHub公式ドキュメント</h3>
+            <ul>
+              <li>
+                About agent skills —
+                <a href="https://docs.github.com/en/copilot/concepts/agents/about-agent-skills"
+                  >↗ https://docs.github.com/en/copilot/concepts/agents/about-agent-skills</a
+                >
+              </li>
+              <li>
+                Adding agent skills for GitHub Copilot —
+                <a
+                  href="https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/customize-cloud-agent/add-skills"
+                  >↗
+                  https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/customize-cloud-agent/add-skills</a
+                >
+              </li>
+              <li>
+                Adding agent skills for GitHub Copilot CLI —
+                <a
+                  href="https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/add-skills"
+                  >↗
+                  https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/add-skills</a
+                >
+              </li>
+              <li>
+                GitHub Copilot now supports Agent Skills(Changelog, 2025年12月18日) —
+                <a
+                  href="https://github.blog/changelog/2025-12-18-github-copilot-now-supports-agent-skills/"
+                  >↗
+                  https://github.blog/changelog/2025-12-18-github-copilot-now-supports-agent-skills/</a
+                >
+              </li>
+              <li>
+                Copilot code review: Agent skills and MCP now generally available(Changelog,
+                2026年7月29日) —
+                <a
+                  href="https://github.blog/changelog/2026-07-29-copilot-code-review-agent-skills-and-mcp-now-generally-available/"
+                  >↗
+                  https://github.blog/changelog/2026-07-29-copilot-code-review-agent-skills-and-mcp-now-generally-available/</a
+                >
+              </li>
+              <li>
+                The harness is all you need (mostly) — Burke Holland, GitHub Blog(2026年7月27日) —
+                <a
+                  href="https://github.blog/ai-and-ml/github-copilot/the-harness-is-all-you-need-mostly/"
+                  >↗
+                  https://github.blog/ai-and-ml/github-copilot/the-harness-is-all-you-need-mostly/</a
+                >
+              </li>
+            </ul>
+          </div>
+          <div class="ref-card">
+            <h3 id="オープン仕様agentskillsio">オープン仕様(agentskills.io)</h3>
+            <ul>
+              <li>
+                Agent Skills — Specification —
+                <a href="https://agentskills.io/specification"
+                  >↗ https://agentskills.io/specification</a
+                >
+              </li>
+              <li>
+                agentskills/agentskills(GitHubリポジトリ) —
+                <a href="https://github.com/agentskills/agentskills"
+                  >↗ https://github.com/agentskills/agentskills</a
+                >
+              </li>
+              <li>
+                Optimizing skill descriptions —
+                <a href="https://agentskills.io/skill-creation/optimizing-descriptions"
+                  >↗ https://agentskills.io/skill-creation/optimizing-descriptions</a
+                >
+              </li>
+            </ul>
+          </div>
+          <div class="ref-card">
+            <h3 id="anthropic公式">Anthropic公式</h3>
+            <ul>
+              <li>
+                Equipping agents for the real world with Agent Skills(2025年10月16日) —
+                <a
+                  href="https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills"
+                  >↗
+                  https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills</a
+                >
+              </li>
+              <li>
+                Skill authoring best practices —
+                <a
+                  href="https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices"
+                  >↗
+                  https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices</a
+                >
+              </li>
+              <li>
+                anthropics/skills(公式スキルリポジトリ) —
+                <a href="https://github.com/anthropics/skills"
+                  >↗ https://github.com/anthropics/skills</a
+                >
+              </li>
+            </ul>
+          </div>
+          <div class="ref-card">
+            <h3 id="microsoft公式">Microsoft公式</h3>
+            <ul>
+              <li>
+                Agent Skills | Microsoft Learn(Microsoft Agent Framework) —
+                <a href="https://learn.microsoft.com/en-us/agent-framework/agents/skills"
+                  >↗ https://learn.microsoft.com/en-us/agent-framework/agents/skills</a
+                >
+              </li>
+              <li>
+                Use Agent Skills with GitHub Copilot - Visual Studio(Windows) —
+                <a
+                  href="https://learn.microsoft.com/en-us/visualstudio/ide/copilot-agent-skills?view=visualstudio"
+                  >↗
+                  https://learn.microsoft.com/en-us/visualstudio/ide/copilot-agent-skills?view=visualstudio</a
+                >
+              </li>
+              <li>
+                Agent Skills in Visual Studio: Teach Copilot How Your Team Works(Visual Studio Blog)
+                —
+                <a href="https://devblogs.microsoft.com/visualstudio/agent-skills-in-visual-studio/"
+                  >↗ https://devblogs.microsoft.com/visualstudio/agent-skills-in-visual-studio/</a
+                >
+              </li>
+            </ul>
+          </div>
+          <div class="ref-card">
+            <h3 id="著名開発者による技術解説">著名開発者による技術解説</h3>
+            <ul>
+              <li>
+                Simon Willison, "Claude Skills are awesome, maybe a bigger deal than
+                MCP"(2025年10月16日) —
+                <a href="https://simonwillison.net/2025/Oct/16/claude-skills/"
+                  >↗ https://simonwillison.net/2025/Oct/16/claude-skills/</a
+                >
+              </li>
+            </ul>
+          </div>
+          <div class="ref-card">
+            <h3 id="セキュリティ研究">セキュリティ研究</h3>
+            <ul>
+              <li>
+                Snyk, "Snyk Finds Prompt Injection in 36%, 1467 Malicious Payloads in a ToxicSkills
+                Study"(2026年2月5日) —
+                <a href="https://snyk.io/blog/toxicskills-malicious-ai-agent-skills-clawhub/"
+                  >↗ https://snyk.io/blog/toxicskills-malicious-ai-agent-skills-clawhub/</a
+                >
+              </li>
+              <li>
+                Snyk, "From SKILL.md to Shell Access in Three Lines of Markdown"(2026年2月3日) —
+                <a href="https://snyk.io/articles/skill-md-shell-access/"
+                  >↗ https://snyk.io/articles/skill-md-shell-access/</a
+                >
+              </li>
+              <li>
+                Snyk, "Securing the Agent Skill Ecosystem"(2026年2月17日) —
+                <a href="https://snyk.io/blog/snyk-vercel-securing-agent-skill-ecosystem/"
+                  >↗ https://snyk.io/blog/snyk-vercel-securing-agent-skill-ecosystem/</a
+                >
+              </li>
+            </ul>
+          </div>
+          <div class="ref-card">
+            <h3 id="コミュニティgithub-issue">コミュニティ・GitHub Issue</h3>
+            <ul>
+              <li>
+                <code>[Copilot/Insiders] .agents/skills folder no longer works</code> —
+                microsoft/vscode Issue #295766 —
+                <a href="https://github.com/microsoft/vscode/issues/295766"
+                  >↗ https://github.com/microsoft/vscode/issues/295766</a
+                >
+              </li>
+              <li>
+                <code
+                  >skill in .github/skills/&lt;skill-name&gt;/SKILL.md doesn't load
+                  automatically</code
+                >
+                — microsoft/vscode Issue #287235 —
+                <a href="https://github.com/microsoft/vscode/issues/287235"
+                  >↗ https://github.com/microsoft/vscode/issues/287235</a
+                >
+              </li>
+              <li>
+                <code>VScode chat can see Skills, copilot-cli can't in same repo</code> —
+                github/copilot-cli Issue #1101 —
+                <a href="https://github.com/github/copilot-cli/issues/1101"
+                  >↗ https://github.com/github/copilot-cli/issues/1101</a
+                >
+              </li>
+              <li>
+                <code>Skills in repo not discovered by copilot cli</code> — github/copilot-cli Issue
+                #1080 —
+                <a href="https://github.com/github/copilot-cli/issues/1080"
+                  >↗ https://github.com/github/copilot-cli/issues/1080</a
+                >
+              </li>
+            </ul>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.12.0/mermaid.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script>
+      // --- Mermaid rendering (isolated, guarded) ---
+      (function initMermaid() {
+        try {
+          if (typeof mermaid === 'undefined') return;
+          mermaid.initialize({
+            startOnLoad: false,
+            theme: 'dark',
+            securityLevel: 'loose',
+            themeVariables: {
+              fontFamily: 'Hiragino Kaku Gothic ProN, Yu Gothic, Segoe UI, sans-serif',
+              fontSize: '16px',
+              background: '#0d1a2b',
+              primaryColor: '#16294a',
+              primaryTextColor: '#e6edfb',
+              primaryBorderColor: '#7c9eff',
+              lineColor: '#7c9eff',
+              secondaryColor: '#1c3252',
+              tertiaryColor: '#101f33',
+              noteBkgColor: '#16294a',
+              noteTextColor: '#d7e2f2',
+              noteBorderColor: '#7c9eff',
+              actorBkg: '#16294a',
+              actorBorder: '#7c9eff',
+              actorTextColor: '#e6edfb',
+              signalColor: '#93a6c2',
+              signalTextColor: '#d7e2f2',
+            },
+            flowchart: { useMaxWidth: false, htmlLabels: true, curve: 'basis' },
+            sequence: { useMaxWidth: false },
+          });
+          var render = function () {
+            mermaid.run({ querySelector: 'pre.mermaid' }).catch(function (e) {
+              console.error('mermaid render error', e);
+            });
+          };
+          if (document.fonts && document.fonts.ready) {
+            document.fonts.ready.then(render);
+          } else {
+            render();
+          }
+        } catch (e) {
+          console.error('mermaid init failed', e);
+        }
+      })();
+
+      // --- highlight.js (isolated, guarded) ---
+      (function initHighlight() {
+        try {
+          if (typeof hljs === 'undefined') return;
+          document.querySelectorAll("pre code[class*='language-']").forEach(function (block) {
+            hljs.highlightElement(block);
+          });
+        } catch (e) {
+          console.error('highlight.js init failed', e);
+        }
+      })();
+
+      // --- Sidebar toggle (mobile) ---
+      (function initSidebarToggle() {
+        var btn = document.getElementById('sidebarToggle');
+        var sidebar = document.getElementById('sidebar');
+        if (!btn || !sidebar) return;
+        btn.addEventListener('click', function () {
+          sidebar.classList.toggle('open');
+          btn.setAttribute('aria-expanded', String(sidebar.classList.contains('open')));
+        });
+        sidebar.querySelectorAll('.nav-link').forEach(function (a) {
+          a.addEventListener('click', function () {
+            sidebar.classList.remove('open');
+            btn.setAttribute('aria-expanded', 'false');
+          });
+        });
+      })();
+
+      // --- Scroll-spy (dual observer pattern) ---
+      (function initScrollSpy() {
+        var navLinks = Array.prototype.slice.call(document.querySelectorAll('.nav-link'));
+        if (!navLinks.length) return;
+        var map = new Map();
+        navLinks.forEach(function (a) {
+          var id = a.getAttribute('data-target');
+          var heading = document.getElementById(id);
+          if (heading) map.set(heading, a);
+        });
+
+        var setActive = function (heading) {
+          navLinks.forEach(function (a) {
+            a.classList.remove('active');
+          });
+          var link = map.get(heading);
+          if (link) link.classList.add('active');
+        };
+
+        var highlightObserver = new IntersectionObserver(
+          function (entries) {
+            entries.forEach(function (entry) {
+              if (entry.isIntersecting) setActive(entry.target);
+            });
+          },
+          { root: null, rootMargin: '-15% 0px -75% 0px', threshold: 0 },
+        );
+
+        map.forEach(function (_, heading) {
+          highlightObserver.observe(heading);
+        });
+      })();
+    </script>
+  </body>
+</html>

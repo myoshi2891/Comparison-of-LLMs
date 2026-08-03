@@ -90,6 +90,10 @@ describe("/agent/context-engineering-best-practices - page structure", () => {
     for (const id of EXPECTED_SECTION_IDS) {
       expect(tocHrefs, `TOC must link to #${id}`).toContain(`#${id}`);
     }
+
+    const toggle = container.querySelector("#sidebarToggle");
+    expect(toggle?.getAttribute("aria-controls")).toBe("sidebar");
+    expect(toggle?.getAttribute("aria-label")).toBe("目次を開く");
   });
 });
 

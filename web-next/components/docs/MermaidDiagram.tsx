@@ -8,6 +8,8 @@ type Props = {
   className?: string;
   /** Optional rendered SVG height cap for unusually tall diagrams. */
   maxHeight?: React.CSSProperties["maxHeight"];
+  /** Use Mermaid HTML labels for flowcharts. Disable when scaled labels overflow their nodes. */
+  flowchartHtmlLabels?: boolean;
   /** Mermaid theme. Defaults to "dark". Pass "base" for light-mode pages. */
   theme?: "dark" | "base" | "default" | "forest" | "neutral";
   /**
@@ -17,6 +19,74 @@ type Props = {
    */
   themeVariables?: Record<string, string>;
 };
+
+let mermaidRenderQueue: Promise<void> = Promise.resolve();
+
+const MERMAID_RENDER_TIMEOUT_MS = 15000;
+
+/**
+ * Resolves with the promise's value or completes without a value after the specified duration.
+ *
+ * @param promise - The promise to await
+ * @param ms - The maximum wait duration in milliseconds
+ * @returns The promise's resolved value, or `undefined` if the duration elapses first
+ */
+function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T | void> {
+  return Promise.race([
+    promise,
+    new Promise<void>((resolve) => {
+      setTimeout(resolve, ms);
+    }),
+  ]);
+}
+
+/**
+ * Queues a Mermaid render so it runs after previously queued renders.
+ *
+ * @param render - The asynchronous rendering operation to execute
+ * @returns The rendering operation's result
+ */
+function enqueueMermaidRender<T>(render: () => Promise<T>): Promise<T> {
+  const queued = mermaidRenderQueue.then(render, render);
+  mermaidRenderQueue = withTimeout(queued, MERMAID_RENDER_TIMEOUT_MS).then(
+    () => undefined,
+    () => undefined
+  );
+  return queued;
+}
+
+/**
+ * Converts an unknown thrown value into an `Error` with an informative message and optional chart context.
+ *
+ * @param err - The thrown value to normalize
+ * @param chartInfo - Optional chart information to include in the error message
+ * @returns An `Error` representing the thrown value
+ */
+function normalizeError(err: unknown, chartInfo?: string): Error {
+  const context = chartInfo ? ` [chart: "${chartInfo}"]` : "";
+  if (err instanceof Error) {
+    if (chartInfo && !err.message.includes(chartInfo)) {
+      const normalized = new Error(`${err.message}${context}`);
+      normalized.stack = err.stack;
+      return normalized;
+    }
+    return err;
+  }
+  let message = "";
+  if (typeof err === "string") {
+    message = err;
+  } else if (typeof err === "object" && err !== null) {
+    try {
+      const json = JSON.stringify(err);
+      message = json !== "{}" ? json : String(err);
+    } catch {
+      message = String(err);
+    }
+  } else {
+    message = String(err);
+  }
+  return new Error(`${message || "Unknown error"}${context}`);
+}
 
 /**
  * Applies theme and configurable color overrides to sequence diagram elements.
@@ -204,6 +274,7 @@ function applyPieChartColorOverrides(
  * @param style - Optional inline styles for the outer wrapper.
  * @param className - Optional CSS classes for the outer wrapper.
  * @param maxHeight - Optional maximum height for the rendered SVG.
+ * @param flowchartHtmlLabels - Whether flowcharts use foreignObject-based HTML labels.
  * @param theme - Mermaid theme to use.
  * @param themeVariables - Optional Mermaid theme variable overrides.
  * @returns A wrapper containing the rendered diagram.
@@ -214,6 +285,7 @@ export default function MermaidDiagram({
   style,
   className,
   maxHeight,
+  flowchartHtmlLabels = true,
   theme = "dark",
   themeVariables,
 }: Props) {
@@ -228,77 +300,104 @@ export default function MermaidDiagram({
       active && ref.current !== null && currentToken === renderCountRef.current;
 
     void import("mermaid")
-      .then(async (m) => {
-        if (!isCurrent()) return;
+      .then((m) =>
+        enqueueMermaidRender(async () => {
+          if (!isCurrent()) return;
 
-        // Dynamic theme & variables configuration bound to the active generation token
-        m.default.initialize({
-          startOnLoad: false,
-          theme,
-          themeVariables: { fontSize: "16px", ...themeVariables },
-          flowchart: { useMaxWidth: false, htmlLabels: true },
-          sequence: { useMaxWidth: false },
-          mindmap: { useMaxWidth: false },
-        });
+          // Dynamic theme & variables configuration bound to the active generation token
+          m.default.initialize({
+            startOnLoad: false,
+            theme,
+            themeVariables: { fontSize: "16px", ...themeVariables },
+            flowchart: { useMaxWidth: false, htmlLabels: flowchartHtmlLabels },
+            sequence: { useMaxWidth: false },
+            mindmap: { useMaxWidth: false },
+          });
 
-        if (!isCurrent()) return;
-        if (!ref.current) return;
+          if (!isCurrent()) return;
+          if (!ref.current) return;
 
-        const tempEl = document.createElement("div");
-        tempEl.textContent = chart;
+          if (document.fonts) {
+            await Promise.race([
+              document.fonts.ready,
+              new Promise((resolve) => setTimeout(resolve, 3000)),
+            ]);
+          }
+          if (!isCurrent()) return;
 
-        try {
-          await m.default.run({ nodes: [tempEl] });
-          if (!isCurrent() || !ref.current) return;
+          const tempEl = document.createElement("div");
+          tempEl.style.position = "absolute";
+          tempEl.style.top = "-9999px";
+          tempEl.style.left = "-9999px";
+          tempEl.style.visibility = "hidden";
+          tempEl.style.pointerEvents = "none";
+          tempEl.textContent = chart;
+          document.body.appendChild(tempEl);
 
-          const svg = tempEl.querySelector("svg");
-          if (svg instanceof SVGElement) {
-            svg.style.maxWidth = "100%";
-            if (maxHeight !== undefined) {
-              svg.style.maxHeight =
-                typeof maxHeight === "number"
-                  ? maxHeight === 0
-                    ? "0"
-                    : `${maxHeight}px`
-                  : maxHeight;
+          try {
+            await m.default.run({ nodes: [tempEl] });
+            if (!isCurrent() || !ref.current) return;
+
+            const svg = tempEl.querySelector("svg");
+            if (svg instanceof SVGElement) {
+              svg.style.maxWidth = "100%";
+              if (maxHeight !== undefined) {
+                svg.style.maxHeight =
+                  typeof maxHeight === "number"
+                    ? maxHeight === 0
+                      ? "0"
+                      : `${maxHeight}px`
+                    : maxHeight;
+              }
+              svg.style.height = "auto";
             }
-            svg.style.height = "auto";
+
+            if (theme === "base" || theme === "dark" || themeVariables !== undefined) {
+              const textColor =
+                themeVariables?.primaryTextColor ?? (theme === "dark" ? "#e2e8f0" : "#000000");
+              tempEl.querySelectorAll("foreignObject *").forEach((el) => {
+                const htmlElement = el as HTMLElement;
+                htmlElement.style.setProperty("color", textColor, "important");
+                htmlElement.style.setProperty("line-height", "1.2", "important");
+              });
+
+              applySequenceDiagramColorOverrides(tempEl, themeVariables, theme);
+            }
+
+            applyPieChartColorOverrides(tempEl, themeVariables, theme);
+
+            if (!isCurrent() || !ref.current) return;
+            ref.current.replaceChildren(...tempEl.childNodes);
+          } catch (err) {
+            if (isCurrent() && ref.current) {
+              const chartSnippet = chart.trim().slice(0, 60).replace(/\s+/g, " ");
+              console.error("[MermaidDiagram] render failed:", normalizeError(err, chartSnippet));
+              ref.current.textContent = "⚠️ ダイアグラムを描画できませんでした";
+            }
+          } finally {
+            if (tempEl.parentNode === document.body) {
+              document.body.removeChild(tempEl);
+            }
           }
-
-          if (theme === "base" || theme === "dark" || themeVariables !== undefined) {
-            const textColor =
-              themeVariables?.primaryTextColor ?? (theme === "dark" ? "#e2e8f0" : "#000000");
-            tempEl.querySelectorAll("foreignObject *").forEach((el) => {
-              (el as HTMLElement).style.setProperty("color", textColor, "important");
-            });
-
-            applySequenceDiagramColorOverrides(tempEl, themeVariables, theme);
-          }
-
-          applyPieChartColorOverrides(tempEl, themeVariables, theme);
-
-          if (!isCurrent() || !ref.current) return;
-          ref.current.replaceChildren(...tempEl.childNodes);
-        } catch (err) {
-          if (isCurrent() && ref.current) {
-            console.error("[MermaidDiagram] render failed:", err);
-            ref.current.textContent = "⚠️ ダイアグラムを描画できませんでした";
-          }
-        }
-      })
+        })
+      )
       .catch((err: unknown) => {
         if (isCurrent()) {
-          console.error("[MermaidDiagram] load failed:", err);
+          console.error("[MermaidDiagram] load failed:", normalizeError(err));
         }
       });
 
     return () => {
       active = false;
     };
-  }, [chart, maxHeight, theme, themeVariables]);
+  }, [chart, flowchartHtmlLabels, maxHeight, theme, themeVariables]);
 
   return (
-    <div className={`mermaid-scroll ${className || ""}`} style={{ ...style, width: "100%" }}>
+    <div
+      className={`mermaid-scroll ${className || ""}`}
+      data-mermaid-theme={theme}
+      style={{ ...style, width: "100%" }}
+    >
       <div
         id={id}
         className="mermaid"

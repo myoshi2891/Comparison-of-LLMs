@@ -23,7 +23,7 @@ const DIAGRAMS = {
   wsci: "flowchart TB\nCore[有限のコンテキストウィンドウ]\nCore --> Write[Write コンテキストウィンドウの外に書き出す]\nCore --> Select[Select 必要な情報だけを取り込む]\nCore --> Compress[Compress 要約して圧縮する]\nCore --> Isolate[Isolate サブエージェントへ分離する]",
 
   compaction:
-    "sequenceDiagram\nU as ユーザー\nA as エージェント\nC as コンテキストウィンドウ\nU->>A: 長時間タスクを依頼する\nloop 会話が続く限り\n    A->>C: メッセージやツール結果を追加する\nend\nC-->>A: トークン上限に近づいたことを検知する\nA->>A: これまでの内容を要約する\nA->>C: 要約と直近の重要情報だけを残す\nA->>U: 作業を継続する",
+    "sequenceDiagram\nparticipant U as ユーザー\nparticipant A as エージェント\nparticipant C as コンテキストウィンドウ\nU->>A: 長時間タスクを依頼する\nloop 会話が続く限り\n    A->>C: メッセージやツール結果を追加する\nend\nC-->>A: トークン上限に近づいたことを検知する\nA->>A: これまでの内容を要約する\nA->>C: 要約と直近の重要情報だけを残す\nA->>U: 作業を継続する",
 
   subagent:
     "flowchart TD\nLead[リードエージェント 計画と統合を担当]\nLead --> Sub1[サブエージェント1 調査タスクAを担当]\nLead --> Sub2[サブエージェント2 調査タスクBを担当]\nLead --> Sub3[サブエージェント3 調査タスクCを担当]\nSub1 --> Summary1[凝縮された要約]\nSub2 --> Summary2[凝縮された要約]\nSub3 --> Summary3[凝縮された要約]\nSummary1 --> Merge[リードエージェントによる統合結果]\nSummary2 --> Merge\nSummary3 --> Merge",
@@ -32,15 +32,19 @@ const DIAGRAMS = {
     "flowchart LR\nsubgraph 原因\n    A1[ハルシネーションが記録され続ける]\n    A2[コンテキストが長くなりすぎる]\n    A3[無関係な情報やツールが多すぎる]\n    A4[矛盾する情報や指示が混在する]\nend\nsubgraph 症状\n    B1[コンテキスト汚染]\n    B2[コンテキスト散漫]\n    B3[コンテキスト混乱]\n    B4[コンテキスト衝突]\nend\nA1 --> B1\nA2 --> B2\nA3 --> B3\nA4 --> B4",
 };
 
+/**
+ * Renders the context engineering guide page with navigation, instructional content, diagrams, and references.
+ */
 export default function Page() {
   return (
-    <div className={styles.docWrapper}>
+    <div className={styles.pageWrap}>
       <TocObserver />
       <button
         type="button"
         className={styles.sidebarToggle}
         id="sidebarToggle"
-        aria-label="目次を開閉する"
+        aria-label="目次を開く"
+        aria-controls="sidebar"
         aria-expanded="false"
       >
         ☰

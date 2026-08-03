@@ -125,6 +125,41 @@ describe("MermaidDiagram レイアウト規約", () => {
     expect(outer.classList.contains("customFrame")).toBe(true);
   });
 
+  it("現在の Mermaid テーマを外側ラッパーへ公開する", () => {
+    const { container } = render(<MermaidDiagram chart="graph TD; A-->B" theme="base" />);
+
+    expect((container.firstElementChild as HTMLElement).dataset.mermaidTheme).toBe("base");
+  });
+
+  it("Webフォントの読み込み完了後に Mermaid を描画する", async () => {
+    const originalFonts = Object.getOwnPropertyDescriptor(document, "fonts");
+    let resolveFonts!: () => void;
+    const fontsReady = new Promise<void>((resolve) => {
+      resolveFonts = resolve;
+    });
+    Object.defineProperty(document, "fonts", {
+      configurable: true,
+      value: { ready: fontsReady },
+    });
+    vi.mocked(mermaid.run).mockClear();
+
+    try {
+      render(<MermaidDiagram chart="graph TD; A-->B" />);
+
+      await waitFor(() => expect(mermaid.initialize).toHaveBeenCalled());
+      expect(mermaid.run).not.toHaveBeenCalled();
+
+      resolveFonts();
+      await waitFor(() => expect(mermaid.run).toHaveBeenCalledTimes(1));
+    } finally {
+      if (originalFonts) {
+        Object.defineProperty(document, "fonts", originalFonts);
+      } else {
+        Reflect.deleteProperty(document, "fonts");
+      }
+    }
+  });
+
   it("描画後に生成された svg へ max-width:100% / height:auto を後付けする（列幅への縮小フィット）", async () => {
     const { container } = render(<MermaidDiagram chart="graph TD; A-->B" />);
 
@@ -145,6 +180,18 @@ describe("MermaidDiagram レイアウト規約", () => {
           flowchart: expect.objectContaining({ useMaxWidth: false }),
           sequence: expect.objectContaining({ useMaxWidth: false }),
           mindmap: expect.objectContaining({ useMaxWidth: false }),
+        })
+      );
+    });
+  });
+
+  it("flowchartHtmlLabels=false を Mermaid 初期化設定へ渡す", async () => {
+    render(<MermaidDiagram chart="flowchart TD; A-->B" flowchartHtmlLabels={false} />);
+
+    await waitFor(() => {
+      expect(mermaid.initialize).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          flowchart: expect.objectContaining({ htmlLabels: false }),
         })
       );
     });
@@ -454,6 +501,61 @@ describe("MermaidDiagram 失敗時と世代管理", () => {
     vi.restoreAllMocks();
   });
 
+  it("複数図の Mermaid 描画を直列実行する（先行図の完了まで後続図は開始しない）", async () => {
+    const runMock = vi.mocked(mermaid.run);
+    const originalRun = runMock.getMockImplementation();
+    if (!originalRun) {
+      throw new Error("mermaid.run のモック実装が失われている");
+    }
+
+    let releaseFirst: () => void = () => undefined;
+    const firstGate = new Promise<void>((resolve) => {
+      releaseFirst = resolve;
+    });
+    let startedRuns = 0;
+    runMock.mockImplementation(async (options) => {
+      startedRuns += 1;
+      // 1件目はゲートが開くまで完了させず、2件目が先行しないことを観測できるようにする。
+      if (startedRuns === 1) await firstGate;
+      await originalRun(options);
+    });
+
+    const first = render(<MermaidDiagram id="diag-a" chart="graph TD; A" />);
+    try {
+      await waitFor(() => {
+        expect(startedRuns).toBe(1);
+      });
+
+      const second = render(<MermaidDiagram id="diag-b" chart="graph TD; B" />);
+      // 共有キューは 1件目の完了まで 2件目の run を開始させない（= 直列実行）
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      expect(startedRuns).toBe(1);
+      expect(first.container.querySelector("#diag-a svg")).toBeNull();
+      expect(second.container.querySelector("#diag-b svg")).toBeNull();
+
+      releaseFirst();
+
+      await waitFor(() => {
+        expect(first.container.querySelector("#diag-a svg")).not.toBeNull();
+      });
+      await waitFor(() => {
+        expect(second.container.querySelector("#diag-b svg")).not.toBeNull();
+      });
+      expect(startedRuns).toBe(2);
+    } finally {
+      // ゲートと共有レンダーキューを解放し、直列化が後続テストへ漏れないようにする。
+      releaseFirst();
+      try {
+        await waitFor(() => {
+          expect(startedRuns).toBe(2);
+        });
+      } catch {
+        // クリーンアップの失敗で元のテスト失敗を隠さない。
+      }
+      runMock.mockImplementation(originalRun);
+    }
+  });
+
   it("描画に失敗したらエラーメッセージへ差し替える", async () => {
     const consoleError = vi.spyOn(console, "error").mockImplementation(() => undefined);
     vi.mocked(mermaid.run).mockRejectedValueOnce(new Error("bad syntax"));
@@ -466,6 +568,167 @@ describe("MermaidDiagram 失敗時と世代管理", () => {
       );
     });
     expect(consoleError).toHaveBeenCalledWith("[MermaidDiagram] render failed:", expect.any(Error));
+    const errorArg = consoleError.mock.calls[0][1] as Error;
+    expect(errorArg.message).toContain("bad syntax");
+    expect(errorArg.message).toContain('chart: "graph TD; A--"');
+  });
+
+  it("非Errorオブジェクトや空オブジェクトが例外としてスローされた場合も正規化してログ出力する", async () => {
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    vi.mocked(mermaid.run).mockRejectedValueOnce({});
+
+    render(<MermaidDiagram chart="graph TD; X-->Y" />);
+
+    await waitFor(() => {
+      expect(consoleError).toHaveBeenCalledWith(
+        "[MermaidDiagram] render failed:",
+        expect.any(Error)
+      );
+    });
+    const errorArg = consoleError.mock.calls[0][1] as Error;
+    expect(errorArg).toBeInstanceOf(Error);
+    expect(errorArg.message).not.toBe("{}");
+    expect(errorArg.message).toContain('chart: "graph TD; X-->Y"');
+  });
+
+  it.each<[string, unknown, string]>([
+    ["文字列", "parser unavailable", "parser unavailable"],
+    ["空文字列", "", "Unknown error"],
+    ["数値", 503, "503"],
+    ["null", null, "null"],
+    ["内容を持つオブジェクト", { code: "PARSE_ERROR" }, '{"code":"PARSE_ERROR"}'],
+  ])("%s の描画例外も Error へ正規化する", async (_label, thrown, expectedMessage) => {
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    vi.mocked(mermaid.run).mockRejectedValueOnce(thrown);
+
+    render(<MermaidDiagram chart="graph TD; X-->Y" />);
+
+    await waitFor(() => {
+      expect(consoleError).toHaveBeenCalledWith(
+        "[MermaidDiagram] render failed:",
+        expect.any(Error)
+      );
+    });
+    const errorArg = consoleError.mock.calls[0][1] as Error;
+    expect(errorArg.message).toContain(expectedMessage);
+    expect(errorArg.message).toContain('chart: "graph TD; X-->Y"');
+  });
+
+  it("循環参照を含む描画例外も安全に Error へ正規化する", async () => {
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const circular: { self?: unknown } = {};
+    circular.self = circular;
+    vi.mocked(mermaid.run).mockRejectedValueOnce(circular);
+
+    render(<MermaidDiagram chart="graph TD; X-->Y" />);
+
+    await waitFor(() => {
+      expect(consoleError).toHaveBeenCalledWith(
+        "[MermaidDiagram] render failed:",
+        expect.any(Error)
+      );
+    });
+    const errorArg = consoleError.mock.calls[0][1] as Error;
+    expect(errorArg.message).toContain("[object Object]");
+    expect(errorArg.message).toContain('chart: "graph TD; X-->Y"');
+  });
+
+  it("初期化に失敗したら Error を正規化して load failed としてログ出力する", async () => {
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const initializeError = new Error("initialize failed");
+    vi.mocked(mermaid.initialize).mockImplementationOnce(() => {
+      throw initializeError;
+    });
+
+    render(<MermaidDiagram chart="graph TD; A-->B" />);
+
+    await waitFor(() => {
+      expect(consoleError).toHaveBeenCalledWith("[MermaidDiagram] load failed:", initializeError);
+    });
+  });
+
+  it("foreignObject の文字色と行高を補正する", async () => {
+    const defaultRun = vi.mocked(mermaid.run).getMockImplementation();
+    expect(defaultRun).toBeDefined();
+    vi.mocked(mermaid.run).mockImplementationOnce(async (args) => {
+      await defaultRun?.(args);
+      const target = args?.nodes?.[0] as HTMLElement;
+      const label = target.querySelector("foreignObject div");
+      const querySelectorAll = target.querySelectorAll.bind(target);
+      vi.spyOn(target, "querySelectorAll").mockImplementation((selectors: string) => {
+        if (selectors === "foreignObject *" && label) {
+          return [label] as unknown as NodeListOf<Element>;
+        }
+        return querySelectorAll(selectors);
+      });
+    });
+
+    const { container } = render(
+      <MermaidDiagram
+        chart="sequenceDiagram"
+        theme="base"
+        themeVariables={{ primaryTextColor: "#123456" }}
+      />
+    );
+
+    await waitFor(() => {
+      expect((container.querySelector("foreignObject div") as HTMLElement).style.color).toBe(
+        "rgb(18, 52, 86)"
+      );
+      expect((container.querySelector("foreignObject div") as HTMLElement).style.lineHeight).toBe(
+        "1.2"
+      );
+    });
+  });
+
+  it("一時要素が描画中に外された場合は cleanup で二重削除しない", async () => {
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const removeChildSpy = vi.spyOn(document.body, "removeChild");
+    vi.mocked(mermaid.run).mockImplementationOnce(async (args) => {
+      document.body.removeChild(args?.nodes?.[0] as Node);
+      throw new Error("detached while rendering");
+    });
+
+    try {
+      render(<MermaidDiagram chart="graph TD; A-->B" />);
+
+      await waitFor(() => {
+        expect(consoleError).toHaveBeenCalledWith(
+          "[MermaidDiagram] render failed:",
+          expect.any(Error)
+        );
+      });
+      expect(removeChildSpy).toHaveBeenCalledTimes(1);
+    } finally {
+      removeChildSpy.mockRestore();
+    }
+  });
+
+  it("描画処理中に一時 DOM 要素が body へ追加され、完了・失敗後に確実に削除される", async () => {
+    const appendChildSpy = vi.spyOn(document.body, "appendChild");
+    const removeChildSpy = vi.spyOn(document.body, "removeChild");
+
+    try {
+      render(<MermaidDiagram chart="graph TD; A-->B" />);
+
+      await waitFor(() => {
+        const tempEl = appendChildSpy.mock.calls
+          .map(([node]) => node)
+          .find(
+            (node): node is HTMLDivElement =>
+              node instanceof HTMLDivElement && node.style.visibility === "hidden"
+          );
+
+        expect(tempEl).toBeDefined();
+        expect(tempEl?.style.top).toBe("-9999px");
+        expect(tempEl?.style.left).toBe("-9999px");
+        expect(appendChildSpy).toHaveBeenCalledWith(tempEl);
+        expect(removeChildSpy).toHaveBeenCalledWith(tempEl);
+      });
+    } finally {
+      appendChildSpy.mockRestore();
+      removeChildSpy.mockRestore();
+    }
   });
 
   it("世代が更新された後は古い描画結果を反映しない", async () => {

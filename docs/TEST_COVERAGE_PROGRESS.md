@@ -8,11 +8,11 @@
 
 | 項目 | 値 |
 |---|---|
-| 最終スキャン日 | 2026-07-29 |
+| 最終スキャン日 | 2026-08-02 |
 | フロントエンドテストランナー | Vitest 4.1 (jsdom 29 + @testing-library/react 16) |
 | バックエンドテストランナー | pytest 9.0 (unittest 互換) |
-| web-next テストファイル数 | 137 |
-| web-next テストケース数 | 1259 |
+| web-next テストファイル数 | 152 |
+| web-next テストケース数 | 1357 |
 | scraper テストファイル数 | 5 |
 | scraper テストケース数 | 43 |
 | 総合カバレッジスコア (weighted) | 44.2% |
@@ -155,19 +155,23 @@ note: 全68 page.tsxルートの契約と主要TocObserverのスクロール追�
 
 ```
 status: done
-count: 146
+count: 191
 files:
-  - components/ApiTable.test.tsx (25)
+  - components/ApiTable.test.tsx (27)
   - components/SubTable.test.tsx (21)
   - components/ScenarioSelector.test.tsx (23)
   - components/HomePage.test.tsx (16)
   - components/Hero.test.tsx (12)
   - components/MathSection.test.tsx (11)
   - components/DualCell.test.tsx (10)
-  - components/RefLinks.test.tsx (18)
+  - components/RefLinks.test.tsx (19)
   - components/LanguageToggle.test.tsx (8)
+  - components/docs/CodeCopyButton.test.tsx (3)
+  - components/docs/Ext.test.tsx (1)
+  - components/docs/MermaidDiagram.test.tsx (36)
+  - components/docs/TocObserver.test.tsx (2)
   - tests/interactive-checklist.test.tsx (2)
-note: 電卓 UI 9/9 コンポーネント網羅 + InteractiveChecklist トグルおよび再初期化テスト
+note: 電卓 UI 9/9、共有 docs 4/4、InteractiveChecklist の単体テストを網羅
 ```
 
 ### Unit / site
@@ -599,6 +603,7 @@ note: 同上（JS依存関係の監査ゲート）
 
 | 日付 | 変更内容 | スコア |
 |---|---|---|
+| 2026-08-02 | MermaidDiagram の例外・配色・cleanup 分岐テスト9件を追加し、全テスト件数と Unit/components セルを実測同期 | 44.2% |
 | 2026-07-29 | Claude TocObserver 3ファイルへ分岐テスト12件を追加し、全テスト件数・Unit/app・Unit/providersセルを実測同期 | 44.2% |
 | 2026-07-22 | PR #126 の TOC Observer 4ファイルへ分岐テスト12件を追加し、全テスト件数と Unit/app セルを実測同期 | 44.2% |
 | 2026-07-05 | TOC scroll-spy aria-current 対応と Cursor 中級ガイドの診断テスト追加に伴い件数を実測同期 (774→778) | 44.2% |

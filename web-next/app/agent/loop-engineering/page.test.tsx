@@ -19,8 +19,12 @@ const metadata = rawMetadata as unknown as MetadataLike;
 
 // MermaidDiagram は useEffect 内で mermaid を動的 import するためモック
 vi.mock("@/components/docs/MermaidDiagram", () => ({
-  default: function DummyMermaidDiagram({ chart }: { chart: string }) {
-    return <pre data-testid="mermaid">{chart}</pre>;
+  default: function DummyMermaidDiagram({ chart, id }: { chart: string; id?: string }) {
+    return (
+      <pre id={id} data-testid="mermaid">
+        {chart}
+      </pre>
+    );
   },
 }));
 
@@ -145,6 +149,14 @@ describe("/agent/loop-engineering - page structure", () => {
     expect(container.querySelector("#diag-15")).not.toBeNull();
   });
 
+  it("renders every Mermaid diagram id exactly once", () => {
+    const { container } = render(<Page />);
+
+    for (let diagramNumber = 1; diagramNumber <= 15; diagramNumber += 1) {
+      expect(container.querySelectorAll(`#diag-${diagramNumber}`)).toHaveLength(1);
+    }
+  });
+
   it("renders the terminology hierarchy table", () => {
     const { container } = render(<Page />);
     const table = container.querySelector("table");
@@ -201,5 +213,46 @@ describe("/agent/loop-engineering - static source safety", () => {
     const source = readFileSync(join(__dirname, "page.tsx"), "utf8");
     const needle = ["danger", "ously", "Set", "Inner", "HTML"].join("");
     expect(source.includes(needle)).toBe(false);
+  });
+
+  it("delegates Mermaid SVG sizing and centering to the shared component", () => {
+    const css = readFileSync(join(__dirname, "page.module.css"), "utf8");
+
+    expect(css).not.toMatch(/\.mermaidContainer\s+svg\s*\{/);
+    expect(css).not.toMatch(
+      /\.mermaidContainer\s*\{[^}]*\b(?:display|justify-content|width|max-width)\s*:/s
+    );
+  });
+
+  it("does not override Mermaid node text colors with a page-wide important rule", () => {
+    const css = readFileSync(join(__dirname, "page.module.css"), "utf8");
+
+    expect(css).not.toMatch(/:global\(\.label\)[^{]*\{[^}]*fill:\s*var\(--ink\)\s*!important/);
+  });
+
+  it("uses sufficiently dark fills whenever Mermaid diagram nodes use white text", () => {
+    const source = readFileSync(join(__dirname, "page.tsx"), "utf8");
+    const lowContrastFills = [
+      "#95a5a6",
+      "#3498db",
+      "#e67e22",
+      "#e74c3c",
+      "#27ae60",
+      "#f39c12",
+      "#8e44ad",
+      "#1abc9c",
+    ];
+
+    // Mermaid は `fill:#xxx,color:#fff` の区切り・大文字小文字・宣言順を緩く受け付けるため、
+    // 表記ゆれを含めて低コントラストの組み合わせを検出する。
+    for (const fill of lowContrastFills) {
+      const white = "#(?:fff|ffffff)";
+      expect(source).not.toMatch(
+        new RegExp(`fill\\s*:\\s*${fill}[,\\s]+color\\s*:\\s*${white}\\b`, "i")
+      );
+      expect(source).not.toMatch(
+        new RegExp(`color\\s*:\\s*${white}[,\\s]+fill\\s*:\\s*${fill}\\b`, "i")
+      );
+    }
   });
 });
