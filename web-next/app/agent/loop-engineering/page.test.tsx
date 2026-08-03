@@ -243,8 +243,16 @@ describe("/agent/loop-engineering - static source safety", () => {
       "#1abc9c",
     ];
 
+    // Mermaid は `fill:#xxx,color:#fff` の区切り・大文字小文字・宣言順を緩く受け付けるため、
+    // 表記ゆれを含めて低コントラストの組み合わせを検出する。
     for (const fill of lowContrastFills) {
-      expect(source).not.toContain(`fill:${fill},color:#fff`);
+      const white = "#(?:fff|ffffff)";
+      expect(source).not.toMatch(
+        new RegExp(`fill\\s*:\\s*${fill}[,\\s]+color\\s*:\\s*${white}\\b`, "i")
+      );
+      expect(source).not.toMatch(
+        new RegExp(`color\\s*:\\s*${white}[,\\s]+fill\\s*:\\s*${fill}\\b`, "i")
+      );
     }
   });
 });
