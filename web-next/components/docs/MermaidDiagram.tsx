@@ -22,9 +22,20 @@ type Props = {
 
 let mermaidRenderQueue: Promise<void> = Promise.resolve();
 
+const MERMAID_RENDER_TIMEOUT_MS = 15000;
+
+function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T | void> {
+  return Promise.race([
+    promise,
+    new Promise<void>((resolve) => {
+      setTimeout(resolve, ms);
+    }),
+  ]);
+}
+
 function enqueueMermaidRender<T>(render: () => Promise<T>): Promise<T> {
   const queued = mermaidRenderQueue.then(render, render);
-  mermaidRenderQueue = queued.then(
+  mermaidRenderQueue = withTimeout(queued, MERMAID_RENDER_TIMEOUT_MS).then(
     () => undefined,
     () => undefined
   );
