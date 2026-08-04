@@ -300,46 +300,6 @@
         color: var(--text-dim);
       }
 
-      /* ---------- TOC quick-nav grid ---------- */
-
-      .toc-grid {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 10px;
-        margin: 0 0 36px;
-      }
-
-      .toc-card {
-        display: block;
-        padding: 13px 16px;
-        background: var(--bg-card);
-        border: 1px solid var(--border);
-        border-radius: 10px;
-        color: var(--text);
-        text-decoration: none;
-        font-size: 0.9rem;
-        line-height: 1.5;
-        transition:
-          border-color 0.15s ease,
-          transform 0.15s ease,
-          background 0.15s ease;
-        overflow-wrap: break-word;
-        word-break: break-word;
-        min-width: 0;
-      }
-
-      .toc-card:hover {
-        border-color: var(--accent);
-        background: var(--bg-elevated);
-        transform: translateY(-1px);
-      }
-
-      @media (max-width: 720px) {
-        .toc-grid {
-          grid-template-columns: 1fr;
-        }
-      }
-
       /* ---------- Tables ---------- */
 
       .table-scroll {
@@ -449,13 +409,65 @@
 
       /* ---------- Checklist ---------- */
 
-      .checklist-card {
-        list-style: none;
-        padding: 6px;
+      .checklist-wrap {
         margin: 0 0 28px;
         background: var(--bg-card);
         border: 1px solid var(--border);
         border-radius: 12px;
+        overflow: hidden;
+      }
+
+      .checklist-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 14px 18px;
+        background: var(--bg-elevated);
+        border-bottom: 1px solid var(--border-soft);
+      }
+
+      .checklist-header-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: var(--accent-soft);
+        color: var(--accent-strong);
+        font-size: 0.8rem;
+        flex-shrink: 0;
+      }
+
+      .checklist-header-title {
+        font-weight: 700;
+        color: var(--text);
+        font-size: 0.95rem;
+      }
+
+      .checklist-counter {
+        margin-left: auto;
+        font-size: 0.8rem;
+        color: var(--text-dimmer);
+        background: var(--bg);
+        border: 1px solid var(--border-soft);
+        padding: 4px 11px;
+        border-radius: 999px;
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+      }
+
+      .checklist-counter.all-done {
+        color: var(--green);
+        border-color: #4ade8055;
+        background: #4ade8014;
+      }
+
+      .checklist-card {
+        list-style: none;
+        padding: 6px;
+        margin: 0;
+        border-radius: 0;
       }
 
       .checklist-card li {
@@ -510,6 +522,133 @@
       .checklist-card li:has(input:checked) label {
         text-decoration: line-through;
         color: var(--text-dimmer);
+      }
+
+      /* ---------- Warning / anti-pattern cards ---------- */
+
+      .warning-grid-label {
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+        color: var(--text-dimmer);
+        margin: 0 0 14px;
+        font-weight: 700;
+      }
+
+      .warning-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+        margin: 0 0 20px;
+      }
+
+      @media (max-width: 900px) {
+        .warning-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .warning-card {
+        display: flex;
+        gap: 14px;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-left: 3px solid var(--red);
+        border-radius: 12px;
+        padding: 16px 18px;
+        min-width: 0;
+      }
+
+      .warning-icon {
+        flex-shrink: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: #f8717120;
+        color: var(--red);
+        font-size: 0.95rem;
+      }
+
+      .warning-body {
+        min-width: 0;
+      }
+
+      .warning-body strong {
+        display: block;
+        color: var(--text);
+        font-size: 0.95rem;
+        margin-bottom: 6px;
+      }
+
+      .warning-body p {
+        margin: 0;
+        color: var(--text-dim);
+        font-size: 0.88rem;
+      }
+
+      /* ---------- Principle cards (summary section) ---------- */
+
+      .principle-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 16px;
+        margin: 22px 0 26px;
+      }
+
+      @media (max-width: 1000px) {
+        .principle-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .principle-card {
+        background: linear-gradient(160deg, var(--bg-card) 0%, var(--bg-elevated) 100%);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 22px 20px;
+        min-width: 0;
+        position: relative;
+      }
+
+      .principle-num {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        background: var(--accent-soft);
+        color: var(--accent-strong);
+        font-weight: 800;
+        font-size: 1.05rem;
+        margin-bottom: 14px;
+      }
+
+      .principle-body strong {
+        display: block;
+        color: var(--text);
+        font-size: 0.98rem;
+        margin-bottom: 8px;
+        line-height: 1.6;
+      }
+
+      .principle-body p {
+        margin: 0;
+        color: var(--text-dim);
+        font-size: 0.88rem;
+      }
+
+      .closing-statement {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-top: 3px solid var(--accent);
+        border-radius: 12px;
+        padding: 20px 24px;
+        color: var(--text-dim);
+        font-size: 0.95rem;
       }
 
       /* ---------- Reference card grid ---------- */
@@ -685,38 +824,7 @@
             2026年8月2日時点のSonar公式ドキュメント（docs.sonarsource.com）および業界動向をもとに構成。バージョン名・機能名は執筆時点のものであり、Sonarの高頻度リリースにより変更される可能性がある点に留意してください。
           </p>
         </blockquote>
-        <h2 id="目次">目次</h2>
-        <div class="toc-grid">
-          <a class="toc-card" href="#1-sonarqubeの現在地2026年の全体像"
-            >SonarQubeの現在地：2026年の全体像</a
-          ><a class="toc-card" href="#2-エディション選定community-buildからdata-centerまで"
-            >エディション選定：Community BuildからData Centerまで</a
-          ><a class="toc-card" href="#3-clean-as-you-code新規コードにフォーカスする哲学"
-            >Clean as You Code：新規コードにフォーカスする哲学</a
-          ><a class="toc-card" href="#4-clean-code-taxonomyと3つのsoftware-qualities"
-            >Clean Code Taxonomyと3つのSoftware Qualities</a
-          ><a class="toc-card" href="#5-quality-gate設計のベストプラクティス"
-            >Quality Gate設計のベストプラクティス</a
-          ><a class="toc-card" href="#6-quality-profileとルールチューニング"
-            >Quality Profileとルールチューニング</a
-          ><a class="toc-card" href="#7-issueライフサイクル管理とトリアージ"
-            >Issueライフサイクル管理とトリアージ</a
-          ><a class="toc-card" href="#8-security-hotspotレビューワークフロー"
-            >Security Hotspotレビューワークフロー</a
-          ><a class="toc-card" href="#9-シフトレフトsonarqube-for-ideとローカル解析"
-            >シフトレフト：SonarQube for IDEとローカル解析</a
-          ><a class="toc-card" href="#10-cicdパイプライン統合とプルリクエストデコレーション"
-            >CI/CDパイプライン統合とプルリクエストデコレーション</a
-          ><a class="toc-card" href="#11-aiネイティブ時代のコードレビューacdcとsonar-vortex"
-            >AIネイティブ時代のコードレビュー：AC/DCとSonar Vortex</a
-          ><a class="toc-card" href="#12-他のaiレビューツールとの併用戦略"
-            >他のAIレビューツールとの併用戦略</a
-          ><a class="toc-card" href="#13-よくあるアンチパターンと対策"
-            >よくあるアンチパターンと対策</a
-          ><a class="toc-card" href="#14-導入運用チェックリスト">導入〜運用チェックリスト</a
-          ><a class="toc-card" href="#15-まとめ">まとめ</a
-          ><a class="toc-card" href="#16-参考文献出典">参考文献・出典</a>
-        </div>
+
         <hr />
         <h2 id="1-sonarqubeの現在地2026年の全体像">1. SonarQubeの現在地：2026年の全体像</h2>
         <p>
@@ -786,13 +894,11 @@
         MCP["SonarQube MCP Server"]
     end
 
-    IDE --&gt;|保存時にローカル解析| Server
-    IDE --&gt;|保存時にローカル解析| Cloud
+    IDE --&gt;|保存時にローカル解析| Platform
     Agent --&gt;|自然言語で問い合わせ| MCP
     MCP --&gt; Server
     MCP --&gt; Cloud
-    Scanner --&gt;|解析結果を送信| Server
-    Scanner --&gt;|解析結果を送信| Cloud
+    Scanner --&gt;|解析結果を送信| Platform
     Server --&gt; GateCheck
     Cloud --&gt; GateCheck
     GateCheck --&gt;|Pass / Fail| PR["プルリクエストへの<br/>デコレーション"]</pre>
@@ -1573,134 +1679,182 @@ jobs:
     Q2 --&gt;|"No（技術的負債として先送り）"| Q3{"リスクは<br/>ビジネス上<br/>許容範囲か"}
     Q3 --&gt;|"Yes"| A3["Acceptedにして理由をコメント<br/>棚卸し対象として記録"]
     Q3 --&gt;|"No"| A4["優先度を上げてバックログ化<br/>放置しない"]</pre>
-        <p><strong>特に注意すべきアンチパターン:</strong></p>
-        <ul>
-          <li>
-            <strong>既存コード全体にQuality Gate条件を適用する</strong>：Clean as You
-            Codeの思想に反し、レガシー資産の重みで新規コードの評価まで歪める。新規コード条件を中心に据える
-          </li>
-          <li>
-            <strong>False Positiveの濫用</strong>：本当は妥当な指摘を「面倒だから」という理由でFalse
-            Positiveにする運用が常態化すると、指標が形骸化する。権限管理とコメント必須化で歯止めをかける
-          </li>
-          <li>
-            <strong>Quality Gateを一度作ったら放置する</strong
-            >：プロジェクトの成熟度や技術スタックの変化に合わせて定期的に見直さないと、厳しすぎる／緩すぎるゲートのまま固定化する
-          </li>
-          <li>
-            <strong>CI側だけに解析を任せてIDE統合を怠る</strong
-            >：フィードバックが遅く、修正コストが跳ね上がる。シフトレフトを組織のデフォルトにする
-          </li>
-          <li>
-            <strong>AIレビューツールとの役割分担を決めないまま両方導入する</strong
-            >：同じ種類の指摘が重複し、レビューのノイズが増えて開発者の信頼を失う
-          </li>
-          <li>
-            <strong>Security Hotspotを「Issueより優先度が低い」と誤解して放置する</strong
-            >：レビュー率100%をQuality Gate条件に含めることで、構造的に防止する
-          </li>
-        </ul>
+        <p class="warning-grid-label">特に注意すべきアンチパターン</p>
+        <div class="warning-grid">
+          <div class="warning-card">
+            <span class="warning-icon">⚠</span>
+            <div class="warning-body">
+              <strong>既存コード全体にQuality Gate条件を適用する</strong>
+              <p>
+                Clean as You
+                Codeの思想に反し、レガシー資産の重みで新規コードの評価まで歪める。新規コード条件を中心に据える
+              </p>
+            </div>
+          </div>
+          <div class="warning-card">
+            <span class="warning-icon">⚠</span>
+            <div class="warning-body">
+              <strong>False Positiveの濫用</strong>
+              <p>
+                本当は妥当な指摘を「面倒だから」という理由でFalse
+                Positiveにする運用が常態化すると、指標が形骸化する。権限管理とコメント必須化で歯止めをかける
+              </p>
+            </div>
+          </div>
+          <div class="warning-card">
+            <span class="warning-icon">⚠</span>
+            <div class="warning-body">
+              <strong>Quality Gateを一度作ったら放置する</strong>
+              <p>
+                プロジェクトの成熟度や技術スタックの変化に合わせて定期的に見直さないと、厳しすぎる／緩すぎるゲートのまま固定化する
+              </p>
+            </div>
+          </div>
+          <div class="warning-card">
+            <span class="warning-icon">⚠</span>
+            <div class="warning-body">
+              <strong>CI側だけに解析を任せてIDE統合を怠る</strong>
+              <p>
+                フィードバックが遅く、修正コストが跳ね上がる。シフトレフトを組織のデフォルトにする
+              </p>
+            </div>
+          </div>
+          <div class="warning-card">
+            <span class="warning-icon">⚠</span>
+            <div class="warning-body">
+              <strong>AIレビューツールとの役割分担を決めないまま両方導入する</strong>
+              <p>同じ種類の指摘が重複し、レビューのノイズが増えて開発者の信頼を失う</p>
+            </div>
+          </div>
+          <div class="warning-card">
+            <span class="warning-icon">⚠</span>
+            <div class="warning-body">
+              <strong>Security Hotspotを「Issueより優先度が低い」と誤解して放置する</strong>
+              <p>レビュー率100%をQuality Gate条件に含めることで、構造的に防止する</p>
+            </div>
+          </div>
+        </div>
         <hr />
         <h2 id="14-導入運用チェックリスト">14. 導入〜運用チェックリスト</h2>
-        <ul class="task-list checklist-card">
-          <li>
-            <label
-              ><input type="checkbox" />エディション（Community Build / Developer / Enterprise /
-              Data Center / Cloud）をブランチ運用の要件から選定した</label
-            >
-          </li>
-          <li>
-            <label
-              ><input type="checkbox" />New Code Definitionを<code>Reference branch</code>（例:
-              <code>main</code>）ベースで設定した</label
-            >
-          </li>
-          <li>
-            <label
-              ><input type="checkbox" /><code>Sonar way</code>を土台にQuality
-              Gateを設計し、全体コードではなく新規コード条件を中心に据えた</label
-            >
-          </li>
-          <li>
-            <label
-              ><input type="checkbox" />Quality
-              Profileを組織共通のベースから継承する形で運用し、プロジェクト差分だけを子プロファイルで管理している</label
-            >
-          </li>
-          <li>
-            <label
-              ><input type="checkbox" />Issueトリアージ（Accepted / False
-              Positive判定）のレビュー時間をスプリントに組み込んだ</label
-            >
-          </li>
-          <li>
-            <label
-              ><input type="checkbox" />Security Hotspotのレビュー率100%をQuality
-              Gate条件に含めた</label
-            >
-          </li>
-          <li>
-            <label
-              ><input type="checkbox" />SonarQube for IDEをConnected
-              Modeでチーム全体に展開した</label
-            >
-          </li>
-          <li>
-            <label
-              ><input
-                type="checkbox"
-              />CI/CDにプルリクエストデコレーション＋ブランチ保護ルールを設定し、Quality Gate
-              Redでマージ不可にした</label
-            >
-          </li>
-          <li>
-            <label
-              ><input type="checkbox" /><code>fetch-depth: 0</code>など、SCM
-              blame情報が正しく取得できるCI設定を確認した</label
-            >
-          </li>
-          <li>
-            <label
-              ><input type="checkbox" />AI CodeFix / AI Code Assurance / MCP
-              Serverなど、AI関連機能の要否をチームのAI活用度に応じて評価した</label
-            >
-          </li>
-          <li>
-            <label
-              ><input
-                type="checkbox"
-              />他のAIレビューツールと併用する場合、役割分担をドキュメント化した</label
-            >
-          </li>
-          <li>
-            <label
-              ><input type="checkbox" />半年〜1年に一度、Quality Gate・Quality
-              Profileの妥当性を棚卸しする運用を定めた</label
-            >
-          </li>
-        </ul>
+        <div class="checklist-wrap">
+          <div class="checklist-header">
+            <span class="checklist-header-icon">✓</span
+            ><span class="checklist-header-title">チェックリスト</span
+            ><span class="checklist-counter" id="checklistCounter">0 / 12 完了</span>
+          </div>
+          <ul class="task-list checklist-card">
+            <li>
+              <label
+                ><input type="checkbox" />エディション（Community Build / Developer / Enterprise /
+                Data Center / Cloud）をブランチ運用の要件から選定した</label
+              >
+            </li>
+            <li>
+              <label
+                ><input type="checkbox" />New Code Definitionを<code>Reference branch</code>（例:
+                <code>main</code>）ベースで設定した</label
+              >
+            </li>
+            <li>
+              <label
+                ><input type="checkbox" /><code>Sonar way</code>を土台にQuality
+                Gateを設計し、全体コードではなく新規コード条件を中心に据えた</label
+              >
+            </li>
+            <li>
+              <label
+                ><input type="checkbox" />Quality
+                Profileを組織共通のベースから継承する形で運用し、プロジェクト差分だけを子プロファイルで管理している</label
+              >
+            </li>
+            <li>
+              <label
+                ><input type="checkbox" />Issueトリアージ（Accepted / False
+                Positive判定）のレビュー時間をスプリントに組み込んだ</label
+              >
+            </li>
+            <li>
+              <label
+                ><input type="checkbox" />Security Hotspotのレビュー率100%をQuality
+                Gate条件に含めた</label
+              >
+            </li>
+            <li>
+              <label
+                ><input type="checkbox" />SonarQube for IDEをConnected
+                Modeでチーム全体に展開した</label
+              >
+            </li>
+            <li>
+              <label
+                ><input
+                  type="checkbox"
+                />CI/CDにプルリクエストデコレーション＋ブランチ保護ルールを設定し、Quality Gate
+                Redでマージ不可にした</label
+              >
+            </li>
+            <li>
+              <label
+                ><input type="checkbox" /><code>fetch-depth: 0</code>など、SCM
+                blame情報が正しく取得できるCI設定を確認した</label
+              >
+            </li>
+            <li>
+              <label
+                ><input type="checkbox" />AI CodeFix / AI Code Assurance / MCP
+                Serverなど、AI関連機能の要否をチームのAI活用度に応じて評価した</label
+              >
+            </li>
+            <li>
+              <label
+                ><input
+                  type="checkbox"
+                />他のAIレビューツールと併用する場合、役割分担をドキュメント化した</label
+              >
+            </li>
+            <li>
+              <label
+                ><input type="checkbox" />半年〜1年に一度、Quality Gate・Quality
+                Profileの妥当性を棚卸しする運用を定めた</label
+              >
+            </li>
+          </ul>
+        </div>
         <hr />
         <h2 id="15-まとめ">15. まとめ</h2>
         <p>
           SonarQubeを使ったコードレビューのベストプラクティスは、突き詰めると次の3つの原則に集約されます。
         </p>
-        <ol type="1">
-          <li>
-            <strong>新規コードにフォーカスする</strong>（Clean as You
-            Code）ことで、レガシー資産の重みに埋もれず、開発者一人ひとりの当事者意識を維持する
-          </li>
-          <li>
-            <strong
-              >決定論的な解析を「絶対に守るライン」、AIレビューを「文脈理解の補助」として役割分担する</strong
-            >ことで、監査可能性と柔軟性を両立する
-          </li>
-          <li>
-            <strong
-              >レビューをCIの1ステップに閉じ込めず、IDEでのシフトレフトからAIエージェントのコーディングループの内側まで、開発フロー全体に埋め込む</strong
-            >
-          </li>
-        </ol>
-        <p>
+        <div class="principle-grid">
+          <div class="principle-card">
+            <span class="principle-num">1</span>
+            <div class="principle-body">
+              <strong>新規コードにフォーカスする</strong>
+              <p>
+                （Clean as You
+                Code）ことで、レガシー資産の重みに埋もれず、開発者一人ひとりの当事者意識を維持する
+              </p>
+            </div>
+          </div>
+          <div class="principle-card">
+            <span class="principle-num">2</span>
+            <div class="principle-body">
+              <strong
+                >決定論的な解析を「絶対に守るライン」、AIレビューを「文脈理解の補助」として役割分担する</strong
+              >
+              <p>ことで、監査可能性と柔軟性を両立する</p>
+            </div>
+          </div>
+          <div class="principle-card">
+            <span class="principle-num">3</span>
+            <div class="principle-body">
+              <strong
+                >レビューをCIの1ステップに閉じ込めず、IDEでのシフトレフトからAIエージェントのコーディングループの内側まで、開発フロー全体に埋め込む</strong
+              >
+            </div>
+          </div>
+        </div>
+        <p class="closing-statement">
           2026年のSonarQubeは、AC/DC（Agent Centric Development Cycle）というフレームワークの下でAI
           CodeFix、Agentic Analysis、Sonar Vortex、Remediation
           Agentといった機能群を急速に拡張しており、「静的解析ツール」から「AI生成コードを含むあらゆるコードの検証プラットフォーム」への転換の途上にあります。ツールの機能を追いかけるだけでなく、Clean
@@ -2102,6 +2256,28 @@ jobs:
         Array.from(map.keys()).forEach(function (heading) {
           spyObserver.observe(heading);
         });
+      })();
+
+      // ---------- Checklist progress counter ----------
+      (function () {
+        var wrap = document.querySelector('.checklist-wrap');
+        var counter = document.getElementById('checklistCounter');
+        if (!wrap || !counter) return;
+        var boxes = Array.from(wrap.querySelectorAll('input[type="checkbox"]'));
+        var total = boxes.length;
+
+        function update() {
+          var done = boxes.filter(function (b) {
+            return b.checked;
+          }).length;
+          counter.textContent = done + ' / ' + total + ' 完了';
+          counter.classList.toggle('all-done', done === total);
+        }
+
+        boxes.forEach(function (b) {
+          b.addEventListener('change', update);
+        });
+        update();
       })();
 
       // ---------- Mermaid ----------
