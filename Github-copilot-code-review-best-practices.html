@@ -18,8 +18,8 @@
         --border: rgba(124, 158, 255, 0.16);
         --border-strong: rgba(124, 158, 255, 0.32);
         --text: #dbe4f3;
-        --text-dim: #93a3c4;
-        --text-faint: #5f7092;
+        --text-dim: #c6d2e9;
+        --text-faint: #9aaed6;
         --accent: #7c9eff;
         --accent-soft: rgba(124, 158, 255, 0.12);
         --accent-2: #9d8cff;
@@ -519,32 +519,141 @@
       }
 
       /* ---------- Checklist ---------- */
+      .checklist-header {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.8rem;
+        margin-bottom: 0.3rem;
+      }
+      .checklist-header h2 {
+        margin: 0;
+      }
+      .checklist-controls {
+        display: flex;
+        align-items: center;
+        gap: 0.9rem;
+        flex-shrink: 0;
+      }
+      .checklist-progress {
+        font-family: var(--font-mono);
+        font-size: 0.82rem;
+        color: var(--accent);
+        background: var(--accent-soft);
+        border: 1px solid var(--border-strong);
+        padding: 0.28rem 0.7rem;
+        border-radius: 999px;
+        white-space: nowrap;
+      }
+      .checklist-reset {
+        font-family: var(--font-sans);
+        font-size: 0.8rem;
+        color: var(--text-dim);
+        background: transparent;
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        padding: 0.28rem 0.85rem;
+        cursor: pointer;
+        transition:
+          border-color 0.15s,
+          color 0.15s;
+      }
+      .checklist-reset:hover {
+        border-color: var(--border-strong);
+        color: var(--text);
+      }
+      .checklist-hint {
+        color: var(--text-faint);
+        font-size: 0.82rem;
+        margin: 0 0 0.4rem;
+      }
+
       .checklist {
         list-style: none;
         padding: 0;
-        margin: 1.4rem 0;
+        margin: 1rem 0;
       }
-      .checklist li {
-        position: relative;
-        padding: 0.6rem 0.2rem 0.6rem 1.95rem;
+      .check-item {
         border-bottom: 1px dashed var(--border);
-        color: var(--text-dim);
-        font-size: 0.93rem;
-        overflow-wrap: break-word;
       }
-      .checklist li:last-child {
+      .check-item:last-child {
         border-bottom: none;
       }
-      .checklist li::before {
-        content: '';
+      .check-item label {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+        padding: 0.65rem 0.2rem;
+        cursor: pointer;
+      }
+      .check-box-wrap {
+        position: relative;
+        flex-shrink: 0;
+        width: 18px;
+        height: 18px;
+        margin-top: 0.15rem;
+      }
+      .check-input {
         position: absolute;
-        left: 0.2rem;
-        top: 0.8rem;
-        width: 17px;
-        height: 17px;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        opacity: 0;
+        cursor: pointer;
+        z-index: 1;
+      }
+      .check-box {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         border: 1.5px solid var(--border-strong);
         border-radius: 5px;
         background: var(--bg-elevated);
+        transition:
+          background 0.15s,
+          border-color 0.15s;
+        pointer-events: none;
+      }
+      .check-box::after {
+        content: '';
+        width: 9px;
+        height: 5px;
+        border-left: 2px solid #061020;
+        border-bottom: 2px solid #061020;
+        transform: rotate(-45deg) translate(0.5px, -1px);
+        opacity: 0;
+        transition: opacity 0.1s;
+      }
+      .check-input:checked ~ .check-box {
+        background: var(--accent);
+        border-color: var(--accent);
+      }
+      .check-input:checked ~ .check-box::after {
+        opacity: 1;
+      }
+      .check-input:focus-visible ~ .check-box {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
+      }
+      .check-text {
+        flex: 1;
+        min-width: 0;
+        color: var(--text-dim);
+        font-size: 0.93rem;
+        overflow-wrap: break-word;
+        transition:
+          opacity 0.15s,
+          color 0.15s;
+      }
+      .check-item.done .check-text {
+        color: var(--text-faint);
+        text-decoration: line-through;
+        text-decoration-color: var(--text-faint);
+        opacity: 0.75;
       }
 
       /* ---------- Card grid (roadmap phases, tips) ---------- */
@@ -582,29 +691,119 @@
       }
 
       /* ---------- References ---------- */
-      .ref-group h3 {
-        margin-top: 2.2rem;
+      .ref-group {
+        margin-bottom: 2.4rem;
       }
-      ol.ref-list {
-        padding-left: 1.4rem;
-        margin: 0.8rem 0 0;
+      .ref-group:last-of-type {
+        margin-bottom: 0;
       }
-      ol.ref-list li {
-        margin: 0.7rem 0;
-        color: var(--text-dim);
-        font-size: 0.92rem;
+      .ref-group-head {
+        display: flex;
+        align-items: baseline;
+        gap: 0.7rem;
+        margin: 2.2rem 0 0.2rem;
       }
-      .ref-url {
-        display: block;
-        word-break: break-all;
+      .ref-group:first-of-type .ref-group-head {
+        margin-top: 0;
+      }
+      .ref-group-head h3 {
+        margin: 0;
+      }
+      .ref-group-count {
         font-family: var(--font-mono);
-        font-size: 0.79rem;
-        color: var(--accent);
-        margin-top: 0.15rem;
-      }
-      .ref-date {
+        font-size: 0.76rem;
         color: var(--text-faint);
-        font-size: 0.82rem;
+        background: var(--bg-elevated);
+        border: 1px solid var(--border);
+        padding: 0.15rem 0.55rem;
+        border-radius: 999px;
+        white-space: nowrap;
+      }
+
+      .ref-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 0.85rem;
+        margin: 1rem 0 0;
+      }
+      @media (min-width: 900px) {
+        .ref-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+
+      .ref-card {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.85rem;
+        min-width: 0;
+        padding: 0.95rem 1.05rem;
+        background: var(--bg-elevated);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        text-decoration: none;
+        transition:
+          border-color 0.15s,
+          background 0.15s,
+          transform 0.15s;
+      }
+      .ref-card:hover {
+        border-color: var(--border-strong);
+        background: var(--bg-elevated-2);
+        transform: translateY(-1px);
+        text-decoration: none;
+      }
+      .ref-card-index {
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 2.15rem;
+        height: 2.15rem;
+        border-radius: 8px;
+        background: var(--accent-soft);
+        border: 1px solid var(--border-strong);
+        color: var(--accent);
+        font-family: var(--font-mono);
+        font-size: 0.76rem;
+        font-weight: 700;
+      }
+      .ref-card-body {
+        min-width: 0;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 0.32rem;
+      }
+      .ref-card-title {
+        color: var(--text);
+        font-size: 0.9rem;
+        font-weight: 650;
+        line-height: 1.5;
+        overflow-wrap: break-word;
+      }
+      .ref-card-date {
+        color: var(--text-faint);
+        font-size: 0.76rem;
+        font-family: var(--font-mono);
+      }
+      .ref-card-url {
+        display: flex;
+        align-items: baseline;
+        gap: 0.3rem;
+        color: var(--accent);
+        font-family: var(--font-mono);
+        font-size: 0.76rem;
+        overflow-wrap: break-word;
+        word-break: break-all;
+      }
+      .ref-card-url .go {
+        flex-shrink: 0;
+        font-family: var(--font-sans);
+        color: var(--text-faint);
+      }
+      .ref-card:hover .ref-card-url .go {
+        color: var(--accent);
       }
 
       footer.page-footer {
@@ -726,7 +925,7 @@
               ><strong>対象読者:</strong>&nbsp;GitHub
               Copilotの基本操作を経験した中級〜上級エンジニア</span
             >
-            <span><strong>出典数:</strong>&nbsp;25件(公式ドキュメント・Changelog・実務者記事)</span>
+            <span><strong>出典数:</strong>&nbsp;26件(公式ドキュメント・Changelog・実務者記事)</span>
           </div>
           <div class="callout">
             本ガイドは2026年8月1日時点の公開情報をもとに作成しています。GitHub Copilot Code
@@ -1546,39 +1745,166 @@
 
         <!-- ============ Checklist ============ -->
         <section class="section prose" id="checklist">
-          <h2>納品前・運用開始前チェックリスト</h2>
-          <ul class="checklist">
-            <li>
-              <code>copilot-instructions.md</code
-              >はリポジトリ全体の規約に絞り、言語・パス固有のルールは<code>*.instructions.md</code>へ分離した
+          <div class="checklist-header">
+            <h2>納品前・運用開始前チェックリスト</h2>
+            <div class="checklist-controls">
+              <span class="checklist-progress" id="checklistProgress">0 / 12 完了</span>
+              <button type="button" class="checklist-reset" id="checklistReset">リセット</button>
+            </div>
+          </div>
+          <p class="checklist-hint">
+            チェック状態はこのブラウザに自動保存されます(他の人には共有されません)。
+          </p>
+          <ul class="checklist" id="checklistList">
+            <li class="check-item">
+              <label
+                ><span class="check-box-wrap"
+                  ><input type="checkbox" class="check-input" data-key="chk-01" /><span
+                    class="check-box"
+                    aria-hidden="true"
+                  ></span></span
+                ><span class="check-text"
+                  ><code>copilot-instructions.md</code
+                  >はリポジトリ全体の規約に絞り、言語・パス固有のルールは<code>*.instructions.md</code>へ分離した</span
+                ></label
+              >
             </li>
-            <li>各指示ファイルはおよそ1,000行以内に収まっている</li>
-            <li>
-              レビュー専用のAgent
-              Skillには<code>code-review</code>のようなレビュー用途とわかる名前を付けた
+            <li class="check-item">
+              <label
+                ><span class="check-box-wrap"
+                  ><input type="checkbox" class="check-input" data-key="chk-02" /><span
+                    class="check-box"
+                    aria-hidden="true"
+                  ></span></span
+                ><span class="check-text"
+                  >各指示ファイルはおよそ1,000行以内に収まっている</span
+                ></label
+              >
             </li>
-            <li>
-              MCPサーバー連携が必要な場合、「Allow Copilot to use MCP tools when reviewing pull
-              requests」の設定を確認した
+            <li class="check-item">
+              <label
+                ><span class="check-box-wrap"
+                  ><input type="checkbox" class="check-input" data-key="chk-03" /><span
+                    class="check-box"
+                    aria-hidden="true"
+                  ></span></span
+                ><span class="check-text"
+                  >レビュー専用のAgent
+                  Skillには<code>code-review</code>のようなレビュー用途とわかる名前を付けた</span
+                ></label
+              >
             </li>
-            <li>
-              自動レビューの範囲(個人/リポジトリ/組織)と、Push毎・ドラフト時レビューの要否を決定した
+            <li class="check-item">
+              <label
+                ><span class="check-box-wrap"
+                  ><input type="checkbox" class="check-input" data-key="chk-04" /><span
+                    class="check-box"
+                    aria-hidden="true"
+                  ></span></span
+                ><span class="check-text"
+                  >MCPサーバー連携が必要な場合、「Allow Copilot to use MCP tools when reviewing pull
+                  requests」の設定を確認した</span
+                ></label
+              >
             </li>
-            <li>
-              機密ファイルにContent Exclusionを設定し、かつそれがCLI/cloud
-              agent/Agentモードには適用されないことをチームに周知した
+            <li class="check-item">
+              <label
+                ><span class="check-box-wrap"
+                  ><input type="checkbox" class="check-input" data-key="chk-05" /><span
+                    class="check-box"
+                    aria-hidden="true"
+                  ></span></span
+                ><span class="check-text"
+                  >自動レビューの範囲(個人/リポジトリ/組織)と、Push毎・ドラフト時レビューの要否を決定した</span
+                ></label
+              >
             </li>
-            <li>Firewall(ネットワークアクセス制御)が意図した設定になっていることを確認した</li>
-            <li>
-              <code>copilot-instructions.md</code
-              >・<code>.github/skills/</code>・MCP設定にCODEOWNERSを設定し、無断変更を防いだ
+            <li class="check-item">
+              <label
+                ><span class="check-box-wrap"
+                  ><input type="checkbox" class="check-input" data-key="chk-06" /><span
+                    class="check-box"
+                    aria-hidden="true"
+                  ></span></span
+                ><span class="check-text"
+                  >機密ファイルにContent Exclusionを設定し、かつそれがCLI/cloud
+                  agent/Agentモードには適用されないことをチームに周知した</span
+                ></label
+              >
             </li>
-            <li>「Copilotのコメントを却下してよい」というチーム規範を共有した</li>
-            <li>セキュリティ上の必須要件はLinter/SAST等の決定的なツールでも別途担保した</li>
-            <li>
-              Copilotのレビューは「Comment」のみでマージをブロックしないことをチームに周知した
+            <li class="check-item">
+              <label
+                ><span class="check-box-wrap"
+                  ><input type="checkbox" class="check-input" data-key="chk-07" /><span
+                    class="check-box"
+                    aria-hidden="true"
+                  ></span></span
+                ><span class="check-text"
+                  >Firewall(ネットワークアクセス制御)が意図した設定になっていることを確認した</span
+                ></label
+              >
             </li>
-            <li>導入後の効果測定(採用率・却下率・レビュー時間)の方法を決めた</li>
+            <li class="check-item">
+              <label
+                ><span class="check-box-wrap"
+                  ><input type="checkbox" class="check-input" data-key="chk-08" /><span
+                    class="check-box"
+                    aria-hidden="true"
+                  ></span></span
+                ><span class="check-text"
+                  ><code>copilot-instructions.md</code
+                  >・<code>.github/skills/</code>・MCP設定にCODEOWNERSを設定し、無断変更を防いだ</span
+                ></label
+              >
+            </li>
+            <li class="check-item">
+              <label
+                ><span class="check-box-wrap"
+                  ><input type="checkbox" class="check-input" data-key="chk-09" /><span
+                    class="check-box"
+                    aria-hidden="true"
+                  ></span></span
+                ><span class="check-text"
+                  >「Copilotのコメントを却下してよい」というチーム規範を共有した</span
+                ></label
+              >
+            </li>
+            <li class="check-item">
+              <label
+                ><span class="check-box-wrap"
+                  ><input type="checkbox" class="check-input" data-key="chk-10" /><span
+                    class="check-box"
+                    aria-hidden="true"
+                  ></span></span
+                ><span class="check-text"
+                  >セキュリティ上の必須要件はLinter/SAST等の決定的なツールでも別途担保した</span
+                ></label
+              >
+            </li>
+            <li class="check-item">
+              <label
+                ><span class="check-box-wrap"
+                  ><input type="checkbox" class="check-input" data-key="chk-11" /><span
+                    class="check-box"
+                    aria-hidden="true"
+                  ></span></span
+                ><span class="check-text"
+                  >Copilotのレビューは「Comment」のみでマージをブロックしないことをチームに周知した</span
+                ></label
+              >
+            </li>
+            <li class="check-item">
+              <label
+                ><span class="check-box-wrap"
+                  ><input type="checkbox" class="check-input" data-key="chk-12" /><span
+                    class="check-box"
+                    aria-hidden="true"
+                  ></span></span
+                ><span class="check-text"
+                  >導入後の効果測定(採用率・却下率・レビュー時間)の方法を決めた</span
+                ></label
+              >
+            </li>
           </ul>
         </section>
 
@@ -1597,283 +1923,527 @@
           <h2>参考文献・出典</h2>
 
           <div class="ref-group">
-            <h3>公式ドキュメント(GitHub Docs)</h3>
-            <ol class="ref-list">
-              <li id="ref-1">
-                Best practices for using GitHub Copilot<a
-                  class="ref-url"
-                  href="https://docs.github.com/en/copilot/get-started/best-practices"
-                  target="_blank"
-                  rel="noopener"
-                  >https://docs.github.com/en/copilot/get-started/best-practices</a
+            <div class="ref-group-head">
+              <h3>公式ドキュメント(GitHub Docs)</h3>
+              <span class="ref-group-count">9件</span>
+            </div>
+            <div class="ref-grid">
+              <a
+                class="ref-card"
+                id="ref-1"
+                href="https://docs.github.com/en/copilot/get-started/best-practices"
+                target="_blank"
+                rel="noopener"
+              >
+                <span class="ref-card-index">01</span>
+                <span class="ref-card-body"
+                  ><span class="ref-card-title">Best practices for using GitHub Copilot</span
+                  ><span class="ref-card-url"
+                    >docs.github.com/en/copilot/get-started/best-practices<span class="go"
+                      >↗</span
+                    ></span
+                  ></span
                 >
-              </li>
-              <li id="ref-2">
-                Using GitHub Copilot code review<a
-                  class="ref-url"
-                  href="https://docs.github.com/copilot/using-github-copilot/code-review/using-copilot-code-review"
-                  target="_blank"
-                  rel="noopener"
-                  >https://docs.github.com/copilot/using-github-copilot/code-review/using-copilot-code-review</a
+              </a>
+              <a
+                class="ref-card"
+                id="ref-2"
+                href="https://docs.github.com/copilot/using-github-copilot/code-review/using-copilot-code-review"
+                target="_blank"
+                rel="noopener"
+              >
+                <span class="ref-card-index">02</span>
+                <span class="ref-card-body"
+                  ><span class="ref-card-title">Using GitHub Copilot code review</span
+                  ><span class="ref-card-url"
+                    >docs.github.com/copilot/using-github-copilot/code-review/using-copilot-code-review<span
+                      class="go"
+                      >↗</span
+                    ></span
+                  ></span
                 >
-              </li>
-              <li id="ref-3">
-                Using custom instructions to unlock the power of Copilot code review<a
-                  class="ref-url"
-                  href="https://docs.github.com/en/copilot/tutorials/customize-code-review"
-                  target="_blank"
-                  rel="noopener"
-                  >https://docs.github.com/en/copilot/tutorials/customize-code-review</a
+              </a>
+              <a
+                class="ref-card"
+                id="ref-3"
+                href="https://docs.github.com/en/copilot/tutorials/customize-code-review"
+                target="_blank"
+                rel="noopener"
+              >
+                <span class="ref-card-index">03</span>
+                <span class="ref-card-body"
+                  ><span class="ref-card-title"
+                    >Using custom instructions to unlock the power of Copilot code review</span
+                  ><span class="ref-card-url"
+                    >docs.github.com/en/copilot/tutorials/customize-code-review<span class="go"
+                      >↗</span
+                    ></span
+                  ></span
                 >
-              </li>
-              <li id="ref-5">
-                Configuring automatic code review by GitHub Copilot<a
-                  class="ref-url"
-                  href="https://docs.github.com/en/copilot/how-tos/copilot-on-github/set-up-copilot/configure-automatic-review"
-                  target="_blank"
-                  rel="noopener"
-                  >https://docs.github.com/en/copilot/how-tos/copilot-on-github/set-up-copilot/configure-automatic-review</a
+              </a>
+              <a
+                class="ref-card"
+                id="ref-5"
+                href="https://docs.github.com/en/copilot/how-tos/copilot-on-github/set-up-copilot/configure-automatic-review"
+                target="_blank"
+                rel="noopener"
+              >
+                <span class="ref-card-index">05</span>
+                <span class="ref-card-body"
+                  ><span class="ref-card-title"
+                    >Configuring automatic code review by GitHub Copilot</span
+                  ><span class="ref-card-url"
+                    >docs.github.com/en/copilot/how-tos/copilot-on-github/set-up-copilot/configure-automatic-review<span
+                      class="go"
+                      >↗</span
+                    ></span
+                  ></span
                 >
-              </li>
-              <li id="ref-6">
-                Enabling GitHub Copilot code review in your enterprise<a
-                  class="ref-url"
-                  href="https://docs.github.com/en/copilot/how-tos/administer-copilot/manage-for-enterprise/manage-agents/enable-copilot-code-review"
-                  target="_blank"
-                  rel="noopener"
-                  >https://docs.github.com/en/copilot/how-tos/administer-copilot/manage-for-enterprise/manage-agents/enable-copilot-code-review</a
+              </a>
+              <a
+                class="ref-card"
+                id="ref-6"
+                href="https://docs.github.com/en/copilot/how-tos/administer-copilot/manage-for-enterprise/manage-agents/enable-copilot-code-review"
+                target="_blank"
+                rel="noopener"
+              >
+                <span class="ref-card-index">06</span>
+                <span class="ref-card-body"
+                  ><span class="ref-card-title"
+                    >Enabling GitHub Copilot code review in your enterprise</span
+                  ><span class="ref-card-url"
+                    >docs.github.com/en/copilot/how-tos/administer-copilot/manage-for-enterprise/manage-agents/enable-copilot-code-review<span
+                      class="go"
+                      >↗</span
+                    ></span
+                  ></span
                 >
-              </li>
-              <li id="ref-7">
-                Responsible use of GitHub Copilot code review<a
-                  class="ref-url"
-                  href="https://docs.github.com/copilot/responsible-use-of-github-copilot-features/responsible-use-of-github-copilot-code-review"
-                  target="_blank"
-                  rel="noopener"
-                  >https://docs.github.com/copilot/responsible-use-of-github-copilot-features/responsible-use-of-github-copilot-code-review</a
+              </a>
+              <a
+                class="ref-card"
+                id="ref-7"
+                href="https://docs.github.com/copilot/responsible-use-of-github-copilot-features/responsible-use-of-github-copilot-code-review"
+                target="_blank"
+                rel="noopener"
+              >
+                <span class="ref-card-index">07</span>
+                <span class="ref-card-body"
+                  ><span class="ref-card-title">Responsible use of GitHub Copilot code review</span
+                  ><span class="ref-card-url"
+                    >docs.github.com/copilot/responsible-use-of-github-copilot-features/responsible-use-of-github-copilot-code-review<span
+                      class="go"
+                      >↗</span
+                    ></span
+                  ></span
                 >
-              </li>
-              <li id="ref-8">
-                Excluding content from GitHub Copilot<a
-                  class="ref-url"
-                  href="https://docs.github.com/en/copilot/how-tos/configure-content-exclusion/exclude-content-from-copilot"
-                  target="_blank"
-                  rel="noopener"
-                  >https://docs.github.com/en/copilot/how-tos/configure-content-exclusion/exclude-content-from-copilot</a
+              </a>
+              <a
+                class="ref-card"
+                id="ref-8"
+                href="https://docs.github.com/en/copilot/how-tos/configure-content-exclusion/exclude-content-from-copilot"
+                target="_blank"
+                rel="noopener"
+              >
+                <span class="ref-card-index">08</span>
+                <span class="ref-card-body"
+                  ><span class="ref-card-title">Excluding content from GitHub Copilot</span
+                  ><span class="ref-card-url"
+                    >docs.github.com/en/copilot/how-tos/configure-content-exclusion/exclude-content-from-copilot<span
+                      class="go"
+                      >↗</span
+                    ></span
+                  ></span
                 >
-              </li>
-              <li id="ref-31">
-                Adding custom instructions for GitHub Copilot CLI(excludeAgent)<a
-                  class="ref-url"
-                  href="https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/add-custom-instructions"
-                  target="_blank"
-                  rel="noopener"
-                  >https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/add-custom-instructions</a
+              </a>
+              <a
+                class="ref-card"
+                id="ref-31"
+                href="https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/add-custom-instructions"
+                target="_blank"
+                rel="noopener"
+              >
+                <span class="ref-card-index">31</span>
+                <span class="ref-card-body"
+                  ><span class="ref-card-title"
+                    >Adding custom instructions for GitHub Copilot CLI(excludeAgent)</span
+                  ><span class="ref-card-url"
+                    >docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/add-custom-instructions<span
+                      class="go"
+                      >↗</span
+                    ></span
+                  ></span
                 >
-              </li>
-              <li id="ref-58">
-                About content exclusion for Copilot(コードレビューへの適用範囲)<a
-                  class="ref-url"
-                  href="https://docs.github.com/zh/enterprise-cloud@latest/copilot/managing-copilot/managing-github-copilot-in-your-organization/managing-github-copilot-features-in-your-organization/testing-changes-to-content-exclusions-in-your-ide"
-                  target="_blank"
-                  rel="noopener"
-                  >https://docs.github.com/zh/enterprise-cloud@latest/copilot/...content-exclusions-in-your-ide</a
+              </a>
+              <a
+                class="ref-card"
+                id="ref-58"
+                href="https://docs.github.com/zh/enterprise-cloud@latest/copilot/managing-copilot/managing-github-copilot-in-your-organization/managing-github-copilot-features-in-your-organization/testing-changes-to-content-exclusions-in-your-ide"
+                target="_blank"
+                rel="noopener"
+              >
+                <span class="ref-card-index">58</span>
+                <span class="ref-card-body"
+                  ><span class="ref-card-title"
+                    >About content exclusion for Copilot(コードレビューへの適用範囲)</span
+                  ><span class="ref-card-url"
+                    >docs.github.com/.../testing-changes-to-content-exclusions-in-your-ide<span
+                      class="go"
+                      >↗</span
+                    ></span
+                  ></span
                 >
-              </li>
-            </ol>
+              </a>
+            </div>
           </div>
 
           <div class="ref-group">
-            <h3>公式ブログ・Changelog(GitHub Blog)</h3>
-            <ol class="ref-list" start="9">
-              <li id="ref-9">
-                Copilot code review: Agent skills and MCP now generally available
-                <span class="ref-date">(2026年7月29日)</span
-                ><a
-                  class="ref-url"
-                  href="https://github.blog/changelog/2026-07-29-copilot-code-review-agent-skills-and-mcp-now-generally-available/"
-                  target="_blank"
-                  rel="noopener"
-                  >https://github.blog/changelog/2026-07-29-copilot-code-review-agent-skills-and-mcp-now-generally-available/</a
+            <div class="ref-group-head">
+              <h3>公式ブログ・Changelog(GitHub Blog)</h3>
+              <span class="ref-group-count">8件</span>
+            </div>
+            <div class="ref-grid">
+              <a
+                class="ref-card"
+                id="ref-9"
+                href="https://github.blog/changelog/2026-07-29-copilot-code-review-agent-skills-and-mcp-now-generally-available/"
+                target="_blank"
+                rel="noopener"
+              >
+                <span class="ref-card-index">09</span>
+                <span class="ref-card-body"
+                  ><span class="ref-card-title"
+                    >Copilot code review: Agent skills and MCP now generally available</span
+                  ><span class="ref-card-date">2026年7月29日</span
+                  ><span class="ref-card-url"
+                    >github.blog/changelog/.../agent-skills-and-mcp-now-generally-available<span
+                      class="go"
+                      >↗</span
+                    ></span
+                  ></span
                 >
-              </li>
-              <li id="ref-10">
-                Copilot code review: Customization and configurability improvements
-                <span class="ref-date">(2026年7月17日)</span
-                ><a
-                  class="ref-url"
-                  href="https://github.blog/changelog/2026-07-17-copilot-code-review-customization-and-configurability-improvements/"
-                  target="_blank"
-                  rel="noopener"
-                  >https://github.blog/changelog/2026-07-17-copilot-code-review-customization-and-configurability-improvements/</a
+              </a>
+              <a
+                class="ref-card"
+                id="ref-10"
+                href="https://github.blog/changelog/2026-07-17-copilot-code-review-customization-and-configurability-improvements/"
+                target="_blank"
+                rel="noopener"
+              >
+                <span class="ref-card-index">10</span>
+                <span class="ref-card-body"
+                  ><span class="ref-card-title"
+                    >Copilot code review: Customization and configurability improvements</span
+                  ><span class="ref-card-date">2026年7月17日</span
+                  ><span class="ref-card-url"
+                    >github.blog/changelog/.../customization-and-configurability-improvements<span
+                      class="go"
+                      >↗</span
+                    ></span
+                  ></span
                 >
-              </li>
-              <li id="ref-11">
-                Copilot code review: Analysis depth and efficiency updates
-                <span class="ref-date">(2026年6月25日)</span
-                ><a
-                  class="ref-url"
-                  href="https://github.blog/changelog/2026-06-25-copilot-code-review-analysis-depth-and-efficiency-updates/"
-                  target="_blank"
-                  rel="noopener"
-                  >https://github.blog/changelog/2026-06-25-copilot-code-review-analysis-depth-and-efficiency-updates/</a
+              </a>
+              <a
+                class="ref-card"
+                id="ref-11"
+                href="https://github.blog/changelog/2026-06-25-copilot-code-review-analysis-depth-and-efficiency-updates/"
+                target="_blank"
+                rel="noopener"
+              >
+                <span class="ref-card-index">11</span>
+                <span class="ref-card-body"
+                  ><span class="ref-card-title"
+                    >Copilot code review: Analysis depth and efficiency updates</span
+                  ><span class="ref-card-date">2026年6月25日</span
+                  ><span class="ref-card-url"
+                    >github.blog/changelog/.../analysis-depth-and-efficiency-updates<span class="go"
+                      >↗</span
+                    ></span
+                  ></span
                 >
-              </li>
-              <li id="ref-12">
-                Using GitHub Copilot code review(Agent Skills / MCP設定詳細)<a
-                  class="ref-url"
-                  href="https://docs.github.com/copilot/using-github-copilot/code-review/using-copilot-code-review"
-                  target="_blank"
-                  rel="noopener"
-                  >https://docs.github.com/copilot/using-github-copilot/code-review/using-copilot-code-review</a
+              </a>
+              <a
+                class="ref-card"
+                id="ref-12"
+                href="https://docs.github.com/copilot/using-github-copilot/code-review/using-copilot-code-review"
+                target="_blank"
+                rel="noopener"
+              >
+                <span class="ref-card-index">12</span>
+                <span class="ref-card-body"
+                  ><span class="ref-card-title"
+                    >Using GitHub Copilot code review(Agent Skills / MCP設定詳細)</span
+                  ><span class="ref-card-url"
+                    >docs.github.com/copilot/using-github-copilot/code-review/using-copilot-code-review<span
+                      class="go"
+                      >↗</span
+                    ></span
+                  ></span
                 >
-              </li>
-              <li id="ref-13">
-                Copilot code review: New configurations and controls
-                <span class="ref-date">(2026年6月12日)</span
-                ><a
-                  class="ref-url"
-                  href="https://github.blog/changelog/2026-06-12-copilot-code-review-new-configurations-and-controls/"
-                  target="_blank"
-                  rel="noopener"
-                  >https://github.blog/changelog/2026-06-12-copilot-code-review-new-configurations-and-controls/</a
+              </a>
+              <a
+                class="ref-card"
+                id="ref-13"
+                href="https://github.blog/changelog/2026-06-12-copilot-code-review-new-configurations-and-controls/"
+                target="_blank"
+                rel="noopener"
+              >
+                <span class="ref-card-index">13</span>
+                <span class="ref-card-body"
+                  ><span class="ref-card-title"
+                    >Copilot code review: New configurations and controls</span
+                  ><span class="ref-card-date">2026年6月12日</span
+                  ><span class="ref-card-url"
+                    >github.blog/changelog/.../new-configurations-and-controls<span class="go"
+                      >↗</span
+                    ></span
+                  ></span
                 >
-              </li>
-              <li id="ref-14">
-                MCP Adoption Week: Copilot Code Review Goes GA
-                <span class="ref-date">(2026年7月)</span
-                ><a
-                  class="ref-url"
-                  href="https://www.digitalapplied.com/blog/mcp-adoption-week-copilot-code-review-ga"
-                  target="_blank"
-                  rel="noopener"
-                  >https://www.digitalapplied.com/blog/mcp-adoption-week-copilot-code-review-ga</a
+              </a>
+              <a
+                class="ref-card"
+                id="ref-14"
+                href="https://www.digitalapplied.com/blog/mcp-adoption-week-copilot-code-review-ga"
+                target="_blank"
+                rel="noopener"
+              >
+                <span class="ref-card-index">14</span>
+                <span class="ref-card-body"
+                  ><span class="ref-card-title">MCP Adoption Week: Copilot Code Review Goes GA</span
+                  ><span class="ref-card-date">2026年7月</span
+                  ><span class="ref-card-url"
+                    >digitalapplied.com/blog/mcp-adoption-week-copilot-code-review-ga<span
+                      class="go"
+                      >↗</span
+                    ></span
+                  ></span
                 >
-              </li>
-              <li id="ref-15">
-                Copilot code review: Path-scoped custom instruction file support
-                <span class="ref-date">(2025年9月3日)</span
-                ><a
-                  class="ref-url"
-                  href="https://github.blog/changelog/2025-09-03-copilot-code-review-path-scoped-custom-instruction-file-support/"
-                  target="_blank"
-                  rel="noopener"
-                  >https://github.blog/changelog/2025-09-03-copilot-code-review-path-scoped-custom-instruction-file-support/</a
+              </a>
+              <a
+                class="ref-card"
+                id="ref-15"
+                href="https://github.blog/changelog/2025-09-03-copilot-code-review-path-scoped-custom-instruction-file-support/"
+                target="_blank"
+                rel="noopener"
+              >
+                <span class="ref-card-index">15</span>
+                <span class="ref-card-body"
+                  ><span class="ref-card-title"
+                    >Copilot code review: Path-scoped custom instruction file support</span
+                  ><span class="ref-card-date">2025年9月3日</span
+                  ><span class="ref-card-url"
+                    >github.blog/changelog/.../path-scoped-custom-instruction-file-support<span
+                      class="go"
+                      >↗</span
+                    ></span
+                  ></span
                 >
-              </li>
-              <li id="ref-16">
-                Unlocking the full power of Copilot code review: Master your instructions files
-                <span class="ref-date">(2026年4月17日)</span
-                ><a
-                  class="ref-url"
-                  href="https://github.blog/ai-and-ml/github-copilot/unlocking-the-full-power-of-copilot-code-review-master-your-instructions-files/"
-                  target="_blank"
-                  rel="noopener"
-                  >https://github.blog/ai-and-ml/github-copilot/unlocking-the-full-power-of-copilot-code-review-master-your-instructions-files/</a
+              </a>
+              <a
+                class="ref-card"
+                id="ref-16"
+                href="https://github.blog/ai-and-ml/github-copilot/unlocking-the-full-power-of-copilot-code-review-master-your-instructions-files/"
+                target="_blank"
+                rel="noopener"
+              >
+                <span class="ref-card-index">16</span>
+                <span class="ref-card-body"
+                  ><span class="ref-card-title"
+                    >Unlocking the full power of Copilot code review: Master your instructions
+                    files</span
+                  ><span class="ref-card-date">2026年4月17日</span
+                  ><span class="ref-card-url"
+                    >github.blog/ai-and-ml/.../master-your-instructions-files<span class="go"
+                      >↗</span
+                    ></span
+                  ></span
                 >
-              </li>
-            </ol>
+              </a>
+            </div>
           </div>
 
           <div class="ref-group">
-            <h3>コミュニティ・実務者による記事(著名/国際的な開発者・実務者の投稿)</h3>
-            <ol class="ref-list" start="17">
-              <li id="ref-17">
-                Rahul Singh, "GitHub Copilot Code Review: Complete Guide (2026)", DEV Community
-                <span class="ref-date">(2026年4月2日)</span
-                ><a
-                  class="ref-url"
-                  href="https://dev.to/rahulxsingh/github-copilot-code-review-complete-guide-2026-255h"
-                  target="_blank"
-                  rel="noopener"
-                  >https://dev.to/rahulxsingh/github-copilot-code-review-complete-guide-2026-255h</a
+            <div class="ref-group-head">
+              <h3>コミュニティ・実務者による記事</h3>
+              <span class="ref-group-count">9件</span>
+            </div>
+            <p
+              class="prose"
+              style="margin: -0.2rem 0 0.2rem; color: var(--text-faint); font-size: 0.85rem"
+            >
+              著名/国際的な開発者・実務者による分析記事
+            </p>
+            <div class="ref-grid">
+              <a
+                class="ref-card"
+                id="ref-17"
+                href="https://dev.to/rahulxsingh/github-copilot-code-review-complete-guide-2026-255h"
+                target="_blank"
+                rel="noopener"
+              >
+                <span class="ref-card-index">17</span>
+                <span class="ref-card-body"
+                  ><span class="ref-card-title"
+                    >Rahul Singh, "GitHub Copilot Code Review: Complete Guide (2026)", DEV
+                    Community</span
+                  ><span class="ref-card-date">2026年4月2日</span
+                  ><span class="ref-card-url"
+                    >dev.to/rahulxsingh/github-copilot-code-review-complete-guide-2026-255h<span
+                      class="go"
+                      >↗</span
+                    ></span
+                  ></span
                 >
-              </li>
-              <li id="ref-18">
-                pwd9000, "Mastering Code Reviews with GitHub Copilot: The Definitive Guide", DEV
-                Community <span class="ref-date">(2026年5月27日)</span
-                ><a
-                  class="ref-url"
-                  href="https://dev.to/pwd9000/mastering-code-reviews-with-github-copilot-the-definitive-guide-3nfp"
-                  target="_blank"
-                  rel="noopener"
-                  >https://dev.to/pwd9000/mastering-code-reviews-with-github-copilot-the-definitive-guide-3nfp</a
+              </a>
+              <a
+                class="ref-card"
+                id="ref-18"
+                href="https://dev.to/pwd9000/mastering-code-reviews-with-github-copilot-the-definitive-guide-3nfp"
+                target="_blank"
+                rel="noopener"
+              >
+                <span class="ref-card-index">18</span>
+                <span class="ref-card-body"
+                  ><span class="ref-card-title"
+                    >pwd9000, "Mastering Code Reviews with GitHub Copilot: The Definitive Guide",
+                    DEV Community</span
+                  ><span class="ref-card-date">2026年5月27日</span
+                  ><span class="ref-card-url"
+                    >dev.to/pwd9000/mastering-code-reviews-with-github-copilot-the-definitive-guide-3nfp<span
+                      class="go"
+                      >↗</span
+                    ></span
+                  ></span
                 >
-              </li>
-              <li id="ref-19">
-                Mrinal Maheshwari, "GitHub Copilot Code Review: Guidelines, Best Practices, and How
-                to Integrate It into Your PR Workflow" <span class="ref-date">(2026年1月12日)</span
-                ><a
-                  class="ref-url"
-                  href="https://blog.mrinalmaheshwari.com/github-copilot-code-review-guidelines-best-practices-and-how-to-integrate-it-into-your-pr-b4518073b4c9"
-                  target="_blank"
-                  rel="noopener"
-                  >https://blog.mrinalmaheshwari.com/github-copilot-code-review-guidelines-best-practices-and-how-to-integrate-it-into-your-pr-b4518073b4c9</a
+              </a>
+              <a
+                class="ref-card"
+                id="ref-19"
+                href="https://blog.mrinalmaheshwari.com/github-copilot-code-review-guidelines-best-practices-and-how-to-integrate-it-into-your-pr-b4518073b4c9"
+                target="_blank"
+                rel="noopener"
+              >
+                <span class="ref-card-index">19</span>
+                <span class="ref-card-body"
+                  ><span class="ref-card-title"
+                    >Mrinal Maheshwari, "GitHub Copilot Code Review: Guidelines, Best Practices, and
+                    How to Integrate It into Your PR Workflow"</span
+                  ><span class="ref-card-date">2026年1月12日</span
+                  ><span class="ref-card-url"
+                    >blog.mrinalmaheshwari.com/.../how-to-integrate-it-into-your-pr<span class="go"
+                      >↗</span
+                    ></span
+                  ></span
                 >
-              </li>
-              <li id="ref-20">
-                Anton Sizikov(GitHub社員), "Copilot Content Exclusions: Four Layers of Defense"
-                <span class="ref-date">(2026年3月13日)</span
-                ><a
-                  class="ref-url"
-                  href="https://blog.cloud-eng.nl/2026/03/13/copilot-content-exclusions-four-layers/"
-                  target="_blank"
-                  rel="noopener"
-                  >https://blog.cloud-eng.nl/2026/03/13/copilot-content-exclusions-four-layers/</a
+              </a>
+              <a
+                class="ref-card"
+                id="ref-20"
+                href="https://blog.cloud-eng.nl/2026/03/13/copilot-content-exclusions-four-layers/"
+                target="_blank"
+                rel="noopener"
+              >
+                <span class="ref-card-index">20</span>
+                <span class="ref-card-body"
+                  ><span class="ref-card-title"
+                    >Anton Sizikov(GitHub社員), "Copilot Content Exclusions: Four Layers of
+                    Defense"</span
+                  ><span class="ref-card-date">2026年3月13日</span
+                  ><span class="ref-card-url"
+                    >blog.cloud-eng.nl/2026/03/13/copilot-content-exclusions-four-layers<span
+                      class="go"
+                      >↗</span
+                    ></span
+                  ></span
                 >
-              </li>
-              <li id="ref-21">
-                "10 Best AI Code Review Tools in 2026 (Ranked by Independent Benchmark)", CodeAnt
-                AI<a
-                  class="ref-url"
-                  href="https://codeant.ai/blogs/best-ai-code-review-tools"
-                  target="_blank"
-                  rel="noopener"
-                  >https://codeant.ai/blogs/best-ai-code-review-tools</a
+              </a>
+              <a
+                class="ref-card"
+                id="ref-21"
+                href="https://codeant.ai/blogs/best-ai-code-review-tools"
+                target="_blank"
+                rel="noopener"
+              >
+                <span class="ref-card-index">21</span>
+                <span class="ref-card-body"
+                  ><span class="ref-card-title"
+                    >"10 Best AI Code Review Tools in 2026 (Ranked by Independent Benchmark)",
+                    CodeAnt AI</span
+                  ><span class="ref-card-url"
+                    >codeant.ai/blogs/best-ai-code-review-tools<span class="go">↗</span></span
+                  ></span
                 >
-              </li>
-              <li id="ref-22">
-                "GitHub Copilot Code Review in 2026: What It Does and Misses"
-                <span class="ref-date">(2026年4月10日)</span
-                ><a
-                  class="ref-url"
-                  href="https://refacto.ai/blog/github-copilot-code-review-in-2026-what-it-does-well-and-where-it-falls-short/"
-                  target="_blank"
-                  rel="noopener"
-                  >https://refacto.ai/blog/github-copilot-code-review-in-2026-what-it-does-well-and-where-it-falls-short/</a
+              </a>
+              <a
+                class="ref-card"
+                id="ref-22"
+                href="https://refacto.ai/blog/github-copilot-code-review-in-2026-what-it-does-well-and-where-it-falls-short/"
+                target="_blank"
+                rel="noopener"
+              >
+                <span class="ref-card-index">22</span>
+                <span class="ref-card-body"
+                  ><span class="ref-card-title"
+                    >"GitHub Copilot Code Review in 2026: What It Does and Misses"</span
+                  ><span class="ref-card-date">2026年4月10日</span
+                  ><span class="ref-card-url"
+                    >refacto.ai/blog/.../what-it-does-well-and-where-it-falls-short<span class="go"
+                      >↗</span
+                    ></span
+                  ></span
                 >
-              </li>
-              <li id="ref-23">
-                同上(GitHubのレビュー実施率・平均コメント数に関する分析部分)<a
-                  class="ref-url"
-                  href="https://refacto.ai/blog/github-copilot-code-review-in-2026-what-it-does-well-and-where-it-falls-short/"
-                  target="_blank"
-                  rel="noopener"
-                  >https://refacto.ai/blog/github-copilot-code-review-in-2026-what-it-does-well-and-where-it-falls-short/</a
+              </a>
+              <a
+                class="ref-card"
+                id="ref-23"
+                href="https://refacto.ai/blog/github-copilot-code-review-in-2026-what-it-does-well-and-where-it-falls-short/"
+                target="_blank"
+                rel="noopener"
+              >
+                <span class="ref-card-index">23</span>
+                <span class="ref-card-body"
+                  ><span class="ref-card-title"
+                    >同上(GitHubのレビュー実施率・平均コメント数に関する分析部分)</span
+                  ><span class="ref-card-url"
+                    >refacto.ai/blog/.../what-it-does-well-and-where-it-falls-short<span class="go"
+                      >↗</span
+                    ></span
+                  ></span
                 >
-              </li>
-              <li id="ref-24">
-                "CodeRabbit vs GitHub Copilot Code Review (2026): Benchmarks, Pricing, Features"
-                <span class="ref-date">(2026年3月14日)</span
-                ><a
-                  class="ref-url"
-                  href="https://www.morphllm.com/comparisons/coderabbit-vs-copilot"
-                  target="_blank"
-                  rel="noopener"
-                  >https://www.morphllm.com/comparisons/coderabbit-vs-copilot</a
+              </a>
+              <a
+                class="ref-card"
+                id="ref-24"
+                href="https://www.morphllm.com/comparisons/coderabbit-vs-copilot"
+                target="_blank"
+                rel="noopener"
+              >
+                <span class="ref-card-index">24</span>
+                <span class="ref-card-body"
+                  ><span class="ref-card-title"
+                    >"CodeRabbit vs GitHub Copilot Code Review (2026): Benchmarks, Pricing,
+                    Features"</span
+                  ><span class="ref-card-date">2026年3月14日</span
+                  ><span class="ref-card-url"
+                    >morphllm.com/comparisons/coderabbit-vs-copilot<span class="go">↗</span></span
+                  ></span
                 >
-              </li>
-              <li id="ref-25">
-                Simon Willison, Posts tagged "github-copilot" ― GitHub
-                Copilotのエージェント化やモデル変更を継続的に追跡している著名な開発者のブログ<a
-                  class="ref-url"
-                  href="https://simonwillison.net/tags/github-copilot/"
-                  target="_blank"
-                  rel="noopener"
-                  >https://simonwillison.net/tags/github-copilot/</a
+              </a>
+              <a
+                class="ref-card"
+                id="ref-25"
+                href="https://simonwillison.net/tags/github-copilot/"
+                target="_blank"
+                rel="noopener"
+              >
+                <span class="ref-card-index">25</span>
+                <span class="ref-card-body"
+                  ><span class="ref-card-title">Simon Willison, Posts tagged "github-copilot"</span
+                  ><span class="ref-card-url"
+                    >simonwillison.net/tags/github-copilot<span class="go">↗</span></span
+                  ></span
                 >
-              </li>
-            </ol>
+              </a>
+            </div>
           </div>
 
           <div class="callout">
@@ -2018,10 +2588,75 @@ legacy/配下の非推奨コンポーネントの利用を検出したら指摘�
         sidebar.querySelectorAll('a').forEach((a) => a.addEventListener('click', close));
       }
 
+      // ---------- Checklist (persisted via localStorage) ----------
+      const CHECKLIST_STORAGE_KEY = 'copilotCodeReviewGuide.checklist.v1';
+
+      function loadChecklistState() {
+        try {
+          const raw = window.localStorage.getItem(CHECKLIST_STORAGE_KEY);
+          return raw ? JSON.parse(raw) : {};
+        } catch (err) {
+          console.warn('Checklist state unavailable (localStorage blocked):', err);
+          return {};
+        }
+      }
+
+      function saveChecklistState(state) {
+        try {
+          window.localStorage.setItem(CHECKLIST_STORAGE_KEY, JSON.stringify(state));
+        } catch (err) {
+          console.warn('Could not persist checklist state:', err);
+        }
+      }
+
+      function setupChecklist() {
+        const list = document.getElementById('checklistList');
+        if (!list) return;
+        const checkboxes = Array.from(list.querySelectorAll('.check-input'));
+        const progressEl = document.getElementById('checklistProgress');
+        const resetBtn = document.getElementById('checklistReset');
+        let state = loadChecklistState();
+
+        function updateProgress() {
+          const done = checkboxes.filter((cb) => cb.checked).length;
+          if (progressEl) progressEl.textContent = `${done} / ${checkboxes.length} 完了`;
+        }
+
+        function applyState() {
+          checkboxes.forEach((cb) => {
+            const key = cb.dataset.key;
+            const checked = !!state[key];
+            cb.checked = checked;
+            cb.closest('.check-item').classList.toggle('done', checked);
+          });
+          updateProgress();
+        }
+
+        checkboxes.forEach((cb) => {
+          cb.addEventListener('change', () => {
+            state[cb.dataset.key] = cb.checked;
+            cb.closest('.check-item').classList.toggle('done', cb.checked);
+            saveChecklistState(state);
+            updateProgress();
+          });
+        });
+
+        if (resetBtn) {
+          resetBtn.addEventListener('click', () => {
+            state = {};
+            saveChecklistState(state);
+            applyState();
+          });
+        }
+
+        applyState();
+      }
+
       document.addEventListener('DOMContentLoaded', async () => {
         await renderMermaidDiagrams();
         setupSidebarObserver();
         setupSidebarToggle();
+        setupChecklist();
         if (window.hljs) {
           document.querySelectorAll('.code-block code').forEach((el) => hljs.highlightElement(el));
         }
