@@ -88,7 +88,7 @@ Copilot Code Reviewは、そのままでも一般的なコーディング標準�
 | ファイル | 適用範囲 | 主な用途 |
 |---|---|---|
 | `.github/copilot-instructions.md` | リポジトリ全体 | コーディング規約・レビュー観点・組織横断の期待値など、常に考慮してほしい内容 |
-| `.github/instructions/*.instructions.md`(`applyTo`フロントマター付き) | 指定したパス/言語のみ | 特定言語・特定ディレクトリだけに適用したいルール(例: フロントエンドのアクセシビリティ、Pythonの型ヒート等) |
+| `.github/instructions/*.instructions.md`(`applyTo`フロントマター付き) | 指定したパス/言語のみ | 特定言語・特定ディレクトリだけに適用したいルール(例: フロントエンドのアクセシビリティ、Pythonの型ヒント等) |
 | `AGENTS.md`(リポジトリルート) | リポジトリ全体 | プロジェクトの構造や「意図的にこうなっている」文脈など、レビュー品質を上げるための背景情報 |
 
 さらに、2026年に入ってからは`REVIEW.md`・`GEMINI.md`・`CLAUDE.md`といった他のAIツール向けの指示ファイルも自動的に読み込まれるようになり、チームがどこにガイドラインを書いていても一貫して反映されるようになりました<sup>[10]</sup>。以前はCopilot Enterprise向けに「Coding guidelines」というUIベースの別機能がプライベートプレビューで提供されていましたが、この`*.instructions.md`ベースの仕組みに統合される形で段階的に廃止されています<sup>[15]</sup>。
@@ -299,6 +299,8 @@ GitHub Copilot Code Reviewは、GitHubのPRワークフローに深く統合さ�
 6. [Enabling GitHub Copilot code review in your enterprise](https://docs.github.com/en/copilot/how-tos/administer-copilot/manage-for-enterprise/manage-agents/enable-copilot-code-review)
 7. [Responsible use of GitHub Copilot code review](https://docs.github.com/copilot/responsible-use-of-github-copilot-features/responsible-use-of-github-copilot-code-review)
 8. [Excluding content from GitHub Copilot](https://docs.github.com/en/copilot/how-tos/configure-content-exclusion/exclude-content-from-copilot)
+31. [Adding custom instructions for GitHub Copilot CLI(excludeAgent)](https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/add-custom-instructions)
+58. [Testing changes to content exclusions in your IDE](https://docs.github.com/zh/enterprise-cloud@latest/copilot/managing-copilot/managing-github-copilot-in-your-organization/managing-github-copilot-features-in-your-organization/testing-changes-to-content-exclusions-in-your-ide)
 
 ### 公式ブログ・Changelog(GitHub Blog)
 
@@ -323,4 +325,4 @@ GitHub Copilot Code Reviewは、GitHubのPRワークフローに深く統合さ�
 24. [CodeRabbit vs GitHub Copilot Code Review (2026): Benchmarks, Pricing, Features](https://www.morphllm.com/comparisons/coderabbit-vs-copilot)(2026年3月14日)
 25. Simon Willison, [Posts tagged "github-copilot"](https://simonwillison.net/tags/github-copilot/) — GitHub Copilotのエージェント化やモデル変更を継続的に追跡している著名な開発者のブログ。Copilot CLIやプラン変更などの一次情報源へのリンク集としても有用です。
 
-> 注: 上記のうち14・17・21〜24は第三者(比較サイト・個人ブログ)による分析記事であり、数値や評価は執筆時点のものです。導入判断の際は必ず一次情報である公式ドキュメント(1〜13、16)と最新のGitHub Changelogを優先して確認してください。
+> 注: 上記のうち14・17〜24は第三者(比較サイト・個人ブログ)による分析記事であり、数値や評価は執筆時点のものです。導入判断の際は必ず一次情報である公式ドキュメント(1〜13、16、31、58)と最新のGitHub Changelogを優先して確認してください。
