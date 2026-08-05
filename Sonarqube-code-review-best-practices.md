@@ -334,7 +334,7 @@ CI/CDでの検出だけに頼ると、フィードバックループが遅く、
 
 プルリクエストデコレーションは、SonarQubeの解析結果をレビュープロセスに組み込む上で最も投資対効果の高い設定の一つです。マージ前にインラインコメントとQuality Gateのステータスチェックが表示されるため、「後から見つかる」から「マージ前に防ぐ」へと運用が変わります。
 
-以下はGitHub Actionsを使った代表的な構成例です（`sonarqube-scan-action` v5系以降の構成に準拠）。
+以下はGitHub Actionsを使った代表的な構成例です（`sonarqube-scan-action` v5系以降の構成に準拠。`sonarqube-quality-gate-action` は公式サンプルで `@master` または `@v1` 等のタグが参照されており、アクション間でバージョン指定が異なります）。
 
 ```yaml
 name: SonarQube Analysis
@@ -369,6 +369,7 @@ jobs:
 設定時のベストプラクティス:
 
 - **`fetch-depth: 0`を必ず設定する**：浅いクローンのままだとSCM blame情報（誰がどの行を書いたか）が不正確になり、Issueの自動アサインが機能しません
+- **アクションのバージョン指定とコミットSHAピン留め（サプライチェーン対策）**：公式サンプル構成（`sonarqube-scan-action@v5` や `sonarqube-quality-gate-action@master`）をベースにしつつ、セキュリティ厳格化やビルド再現性の確保が必要な場合は `uses: SonarSource/sonarqube-scan-action@<full-commit-sha>` のように完全なコミットSHAへの固定を推進してください
 - **`sonar.qualitygate.wait=true`は乱用しない**：このパラメータをつけるとスキャナーがQuality Gate判定を待ってから終了するためワークフロー時間が伸びます。デプロイをブロックする用途以外では、プルリクエストデコレーション（自動で表示される）に任せるのが推奨です
 - **Quality Gate Check Actionを別ステップに分離する**：スキャン自体の成否とQuality Gateの合否を分けることで、失敗原因の切り分けが容易になります
 - **モノレポの場合はパスフィルタで対象を絞る**：変更のあったサービスのみをスキャンすることで、CI時間とライセンス消費（LOCベース課金）の両方を抑制できます
