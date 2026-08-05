@@ -845,7 +845,7 @@
     </style>
   </head>
   <body>
-    <button class="sidebar-toggle" id="sidebarToggle" aria-label="目次を開閉">☰</button>
+    <button type="button" class="sidebar-toggle" id="sidebarToggle" aria-label="目次を開閉">☰</button>
     <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
 
     <div class="layout">
@@ -1097,7 +1097,7 @@
             Copilot Code
             Reviewは、そのままでも一般的なコーディング標準に基づいてレビューしますが、真価を発揮するのはリポジトリ固有の文脈(意図的な設計判断、重点的に見てほしい箇所、テストや実装に関するチームの基準など)を教えたときです<sup
               class="cite"
-              ><a href="#ref-25">[3]</a></sup
+              ><a href="#ref-25">[25]</a></sup
             >。
           </p>
 
@@ -2594,7 +2594,9 @@ legacy/配下の非推奨コンポーネントの利用を検出したら指摘�
       function loadChecklistState() {
         try {
           const raw = window.localStorage.getItem(CHECKLIST_STORAGE_KEY);
-          return raw ? JSON.parse(raw) : {};
+          if (!raw) return {};
+          const parsed = JSON.parse(raw);
+          return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
         } catch (err) {
           console.warn('Checklist state unavailable (localStorage blocked):', err);
           return {};
