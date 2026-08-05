@@ -474,7 +474,7 @@
     </style>
   </head>
   <body>
-    <button class="sidebar-toggle" id="sidebarToggle" aria-label="メニュー切り替え">☰</button>
+    <button type="button" class="sidebar-toggle" id="sidebarToggle" aria-label="メニュー切り替え">☰</button>
 
     <div class="layout">
       <nav class="sidebar" id="sidebar">
@@ -855,7 +855,7 @@ chat:
                   <td><code>reviews.request_changes_workflow</code></td>
                   <td>boolean</td>
                   <td><code>false</code></td>
-                  <td>指摘がすべて解消されると自動でApproveする</td>
+                  <td>フィードバックをRequest changesとして投稿・レビュー要求に対応し、全指摘事項の解消およびマージ前チェック通過後にのみApproveへ切り替える</td>
                 </tr>
                 <tr class="odd">
                   <td><code>reviews.high_level_summary</code></td>
@@ -1543,7 +1543,7 @@ flowchart TD
                 </tr>
                 <tr class="even">
                   <td>マージコンフリクト解消</td>
-                  <td><code>@coderabbitai fix merge conflict</code></td>
+                  <td><code>@coderabbitai resolve merge conflict</code></td>
                   <td>マージコミット</td>
                   <td>GitHub, GitLab</td>
                 </tr>
@@ -1870,7 +1870,7 @@ sequenceDiagram
                   <td>自社の評価基準・ハーネスに基づく</td>
                 </tr>
                 <tr class="even">
-                  <td>independent Martianベンチマーク（2026年1〜2月）</td>
+                  <td>独立系Martianベンチマーク（2026年1〜2月）</td>
                   <td>CodeRabbitがF1トップ、精度約49%</td>
                   <td>Addy Osmaniが引用する独立評価</td>
                 </tr>
@@ -2489,6 +2489,11 @@ sequenceDiagram
         if (btn && sidebar) {
           btn.addEventListener('click', function () {
             sidebar.classList.toggle('open');
+          });
+          sidebar.querySelectorAll('.nav-link').forEach(function (link) {
+            link.addEventListener('click', function () {
+              sidebar.classList.remove('open');
+            });
           });
         }
       })();
