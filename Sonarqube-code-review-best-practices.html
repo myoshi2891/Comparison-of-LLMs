@@ -206,6 +206,8 @@
         color: var(--text);
         font-weight: 700;
         scroll-margin-top: 24px;
+        opacity: 0;
+        transition: opacity 0.4s ease;
       }
 
       .main h2:first-of-type {
@@ -757,7 +759,7 @@
     </style>
   </head>
   <body>
-    <button class="sidebar-toggle" id="sidebarToggle" aria-label="メニューを開閉">☰</button>
+    <button type="button" class="sidebar-toggle" id="sidebarToggle" aria-label="メニューを開閉">☰</button>
 
     <div class="layout">
       <aside class="sidebar" id="sidebar">
@@ -1036,7 +1038,7 @@
           Smell」という3分類の課題モデルから、<strong>Clean Code Taxonomy</strong>
           という、より構造化された分類体系へ段階的に移行しています。中級者以上が押さえておくべきは、この分類が「コードの属性（なぜ問題か）」と「ソフトウェアの品質特性（何に影響するか）」を明確に分けている点です。
         </p>
-        <p>**Clean Code属性（4分類）**は、コードがクリーンであるための特性です。</p>
+        <p><strong>Clean Code属性（4分類）</strong>は、コードがクリーンであるための特性です。</p>
         <div class="table-scroll">
           <table>
             <thead>
