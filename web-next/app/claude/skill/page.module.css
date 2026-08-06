@@ -424,6 +424,10 @@
   margin-top: 2px;
   accent-color: var(--accent);
   cursor: pointer;
+  appearance: auto;
+  -webkit-appearance: checkbox;
+  background: #fff;
+  color-scheme: light;
 }
 
 .checklist label span {

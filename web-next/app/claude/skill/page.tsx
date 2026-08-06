@@ -17,6 +17,29 @@ function Ext({ href, children }: { href: string; children: React.ReactNode }) {
   );
 }
 
+const MERMAID_THEME_VARS = {
+  background: "#FAF8F4",
+  primaryColor: "#F1ECE3",
+  primaryTextColor: "#23201D",
+  primaryBorderColor: "#D97757",
+  lineColor: "#8A8478",
+  secondaryColor: "#EFE3D6",
+  secondaryTextColor: "#23201D",
+  secondaryBorderColor: "#D97757",
+  tertiaryColor: "#FFFFFF",
+  tertiaryTextColor: "#23201D",
+  tertiaryBorderColor: "#D97757",
+  actorBkg: "#F1ECE3",
+  actorBorder: "#D97757",
+  actorTextColor: "#23201D",
+  signalColor: "#8A8478",
+  signalTextColor: "#23201D",
+  fontFamily: "Inter, sans-serif",
+  fontSize: "16px",
+  clusterBkg: "#F7F2EA",
+  clusterBorder: "#D9CFBE",
+} as const;
+
 const DIAGRAM_WORKFLOW = `flowchart TD
 A["アイデア・要望"] --> B["Specify: 要件定義<br/>(requirements.md / spec.md)"]
 B --> C{"要件レビュー<br/>合意できたか"}
@@ -242,7 +265,12 @@ export default function ClaudeSkillPage() {
           </p>
 
           <div className={styles.diagramCard}>
-            <MermaidDiagram chart={DIAGRAM_WORKFLOW} id="diagram-workflow" />
+            <MermaidDiagram
+              chart={DIAGRAM_WORKFLOW}
+              id="diagram-workflow"
+              theme="base"
+              themeVariables={MERMAID_THEME_VARS}
+            />
           </div>
           <p className={styles.figCaption}>Fig.1 ― 仕様駆動開発の基本ワークフロー</p>
 
@@ -713,7 +741,12 @@ export default function ClaudeSkillPage() {
           </p>
 
           <div className={styles.diagramCard}>
-            <MermaidDiagram chart={DIAGRAM_LOGIN_SEQUENCE} id="diagram-login-sequence" />
+            <MermaidDiagram
+              chart={DIAGRAM_LOGIN_SEQUENCE}
+              id="diagram-login-sequence"
+              theme="base"
+              themeVariables={MERMAID_THEME_VARS}
+            />
           </div>
           <p className={styles.figCaption}>Fig.2 ― design.mdに埋め込むシーケンス図の例</p>
 
@@ -805,7 +838,12 @@ export default function ClaudeSkillPage() {
           </p>
 
           <div className={styles.diagramCard}>
-            <MermaidDiagram chart={DIAGRAM_IMPLEMENTATION} id="diagram-implementation" />
+            <MermaidDiagram
+              chart={DIAGRAM_IMPLEMENTATION}
+              id="diagram-implementation"
+              theme="base"
+              themeVariables={MERMAID_THEME_VARS}
+            />
           </div>
           <p className={styles.figCaption}>Fig.3 ― Anthropic推奨の4段階ワークフロー</p>
 
@@ -1006,7 +1044,12 @@ export default function ClaudeSkillPage() {
           </p>
 
           <div className={styles.diagramCard}>
-            <MermaidDiagram chart={DIAGRAM_CONTEXT_LOADING} id="diagram-context-loading" />
+            <MermaidDiagram
+              chart={DIAGRAM_CONTEXT_LOADING}
+              id="diagram-context-loading"
+              theme="base"
+              themeVariables={MERMAID_THEME_VARS}
+            />
           </div>
           <p className={styles.figCaption}>Fig.4 ― ファイルの読み込みタイミング</p>
 
@@ -1114,7 +1157,12 @@ export default function ClaudeSkillPage() {
           </div>
 
           <div className={styles.diagramCard}>
-            <MermaidDiagram chart={DIAGRAM_DATA_FLOW} id="diagram-data-flow" />
+            <MermaidDiagram
+              chart={DIAGRAM_DATA_FLOW}
+              id="diagram-data-flow"
+              theme="base"
+              themeVariables={MERMAID_THEME_VARS}
+            />
           </div>
           <p className={styles.figCaption}>Fig.5 ― ツール横断で共通する基本データフロー</p>
 
@@ -1220,9 +1268,9 @@ export default function ClaudeSkillPage() {
             ）は指摘しています。うまく機能しているファイルは、行動を3段階に分けて明示しているのが特徴です。
           </p>
           <div className={styles.chipRow}>
-            <span className={`${styles.chip} ${styles.chipOn}`}>✅ 常にやってよい</span>
-            <span className={`${styles.chip} ${styles.chipOn}`}>⚠️ 確認してから</span>
-            <span className={`${styles.chip} ${styles.chipOn}`}>🚫 絶対にダメ</span>
+            <span className={styles.chip}>✅ 常にやってよい</span>
+            <span className={styles.chip}>⚠️ 確認してから</span>
+            <span className={styles.chip}>🚫 絶対にダメ</span>
           </div>
           <div className={styles.tableWrap}>
             <table>
@@ -1514,10 +1562,6 @@ export default function ClaudeSkillPage() {
           </p>
         </section>
       </main>
-      <TocObserver
-        backToTopClass={styles.backToTop}
-        backToTopVisibleClass={styles.backToTopVisible}
-      />
     </div>
   );
 }
