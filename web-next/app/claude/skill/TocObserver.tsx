@@ -17,14 +17,26 @@ export default function TocObserver({
     const sidebar = document.getElementById("sidebar");
 
     const handleToggle = () => {
-      sidebar?.classList.toggle("open");
+      const isOpen = sidebar?.getAttribute("data-open") === "true";
+      const nextState = !isOpen;
+      if (sidebar) {
+        sidebar.setAttribute("data-open", String(nextState));
+      }
+      if (menuToggle) {
+        menuToggle.setAttribute("aria-expanded", String(nextState));
+      }
     };
 
     menuToggle?.addEventListener("click", handleToggle);
 
     const tocLinks = document.querySelectorAll("nav a[href^='#']");
     const handleTocClick = () => {
-      sidebar?.classList.remove("open");
+      if (sidebar) {
+        sidebar.setAttribute("data-open", "false");
+      }
+      if (menuToggle) {
+        menuToggle.setAttribute("aria-expanded", "false");
+      }
     };
 
     for (const a of Array.from(tocLinks)) {
