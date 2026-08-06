@@ -1,33 +1,30 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect } from "react";
 
-interface Props {
+interface TocObserverProps {
   backToTopClass?: string;
   backToTopVisibleClass?: string;
 }
 
-export default function TocObserver({ backToTopClass, backToTopVisibleClass }: Props) {
-  const [backVisible, setBackVisible] = useState(false);
-  const sidebarRef = useRef<HTMLElement | null>(null);
-
+export default function TocObserver({
+  backToTopClass,
+  backToTopVisibleClass,
+}: TocObserverProps = {}) {
   useEffect(() => {
     // 1. Mobile menu toggle
     const menuToggle = document.getElementById("menuToggle");
-    const sidebar = document.getElementById("sidebar") as HTMLElement | null;
-    sidebarRef.current = sidebar;
+    const sidebar = document.getElementById("sidebar");
 
     const handleToggle = () => {
-      if (sidebar) {
-        sidebar.dataset.open = sidebar.dataset.open === "true" ? "false" : "true";
-      }
+      sidebar?.classList.toggle("open");
     };
 
     menuToggle?.addEventListener("click", handleToggle);
 
     const tocLinks = document.querySelectorAll("nav a[href^='#']");
     const handleTocClick = () => {
-      if (sidebar) sidebar.dataset.open = "false";
+      sidebar?.classList.remove("open");
     };
 
     for (const a of Array.from(tocLinks)) {
@@ -39,7 +36,11 @@ export default function TocObserver({ backToTopClass, backToTopVisibleClass }: P
     const setActive = (id: string) => {
       for (const a of Array.from(tocLinks)) {
         const href = a.getAttribute("href");
-        (a as HTMLElement).dataset.active = href === `#${id}` ? "true" : "false";
+        if (href === `#${id}`) {
+          a.classList.add("toc-active");
+        } else {
+          a.classList.remove("toc-active");
+        }
       }
     };
 
@@ -58,31 +59,35 @@ export default function TocObserver({ backToTopClass, backToTopVisibleClass }: P
       observer.observe(section);
     }
 
-    // 3. Back to top scroll visibility
+    // 3. Back to top button visibility scroll handling
+    const backToTopBtn =
+      document.getElementById("backToTop") ||
+      (backToTopClass ? document.querySelector(`.${backToTopClass}`) : null);
     const handleScroll = () => {
-      setBackVisible(window.scrollY > 400);
+      if (!backToTopBtn || !backToTopVisibleClass) return;
+      if (window.scrollY > 300) {
+        backToTopBtn.classList.add(backToTopVisibleClass);
+      } else {
+        backToTopBtn.classList.remove(backToTopVisibleClass);
+      }
     };
-    window.addEventListener("scroll", handleScroll, { passive: true });
+
+    if (backToTopBtn && backToTopVisibleClass) {
+      window.addEventListener("scroll", handleScroll, { passive: true });
+      handleScroll();
+    }
 
     return () => {
       menuToggle?.removeEventListener("click", handleToggle);
       for (const a of Array.from(tocLinks)) {
         a.removeEventListener("click", handleTocClick);
       }
+      if (backToTopBtn && backToTopVisibleClass) {
+        window.removeEventListener("scroll", handleScroll);
+      }
       observer.disconnect();
-      window.removeEventListener("scroll", handleScroll);
     };
-  }, []);
+  }, [backToTopClass, backToTopVisibleClass]);
 
-  return (
-    <button
-      id="backToTop"
-      type="button"
-      aria-label="ページトップへ戻る"
-      className={`${backToTopClass ?? ""} ${backVisible ? (backToTopVisibleClass ?? "") : ""}`.trim()}
-      onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-    >
-      ↑
-    </button>
-  );
+  return null;
 }

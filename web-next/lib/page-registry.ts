@@ -241,13 +241,13 @@ const entries: PageEntry[] = [
   },
   {
     slug: "/claude/skill",
-    title: "Skill",
+    title: "Claude Codeで始めるAI仕様駆動開発 ― Markdownファイル完全ガイド",
     group: "Providers",
     category: "Claude",
     provider: "claude",
     topics: ["skill"],
     summary:
-      "CLAUDE.md / spec.md / requirements.md / design.md / tasks.md / MEMORY.md / SKILL.md など、Claude Code の仕様駆動開発 (SDD) を支えるマークダウンファイル群の役割・構造・ベストプラクティスを公式根拠付きで解説。",
+      "CLAUDE.mdからrequirements.md、design.md、tasks.mdまで。各Markdownファイルの役割・構造・ベストプラクティスを、初学者でも迷わないようステップバイステップで解説します。",
     addedAt: "2026-04-18",
     lastReviewed: "2026-08-06",
   },

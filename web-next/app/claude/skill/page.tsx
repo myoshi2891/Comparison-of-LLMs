@@ -92,7 +92,10 @@ Code -. 齟齬が見つかれば更新 .-> R`;
 export default function ClaudeSkillPage() {
   return (
     <div className={styles.layout}>
-      <TocObserver />
+      <TocObserver
+        backToTopClass={styles.backToTop}
+        backToTopVisibleClass={styles.backToTopVisible}
+      />
       <button
         className={styles.sidebarToggle}
         id="menuToggle"
@@ -1268,9 +1271,9 @@ export default function ClaudeSkillPage() {
             ）は指摘しています。うまく機能しているファイルは、行動を3段階に分けて明示しているのが特徴です。
           </p>
           <div className={styles.chipRow}>
-            <span className={styles.chip}>✅ 常にやってよい</span>
-            <span className={styles.chip}>⚠️ 確認してから</span>
-            <span className={styles.chip}>🚫 絶対にダメ</span>
+            <span className={`${styles.chip} ${styles.chipOn}`}>✅ 常にやってよい</span>
+            <span className={`${styles.chip} ${styles.chipOn}`}>⚠️ 確認してから</span>
+            <span className={`${styles.chip} ${styles.chipOn}`}>🚫 絶対にダメ</span>
           </div>
           <div className={styles.tableWrap}>
             <table>

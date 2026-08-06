@@ -12,7 +12,7 @@
  *   `diagram-context-loading`, `diagram-data-flow`) が存在する
  * - 外部リンク (http/https) には全て `target="_blank"` かつ
  *   `rel="noopener noreferrer"` が付与されている
- * - `s14` (参考文献・出典) セクション内に 15 件以上の外部リンクが存在する
+ * - `s14` (参考文献・出典) セクション内に 14 件以上の外部リンクが存在する
  * - 静的検査: 生 HTML 流し込み API (React の XSS 危険 prop) を使用していない
  */
 

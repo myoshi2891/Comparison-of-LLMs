@@ -203,7 +203,7 @@
 .content section {
   max-width: var(--max-w);
   margin-bottom: 64px;
-  scroll-margin-top: 32px;
+  scroll-margin-top: calc(var(--header-height, 60px) + 20px);
 }
 
 .secEyebrow {
