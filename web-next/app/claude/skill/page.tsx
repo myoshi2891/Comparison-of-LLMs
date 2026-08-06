@@ -1220,9 +1220,9 @@ export default function ClaudeSkillPage() {
             ）は指摘しています。うまく機能しているファイルは、行動を3段階に分けて明示しているのが特徴です。
           </p>
           <div className={styles.chipRow}>
-            <span className={styles.chip}>✅ 常にやってよい</span>
-            <span className={styles.chip}>⚠️ 確認してから</span>
-            <span className={styles.chip}>🚫 絶対にダメ</span>
+            <span className={`${styles.chip} ${styles.chipOn}`}>✅ 常にやってよい</span>
+            <span className={`${styles.chip} ${styles.chipOn}`}>⚠️ 確認してから</span>
+            <span className={`${styles.chip} ${styles.chipOn}`}>🚫 絶対にダメ</span>
           </div>
           <div className={styles.tableWrap}>
             <table>
@@ -1514,6 +1514,10 @@ export default function ClaudeSkillPage() {
           </p>
         </section>
       </main>
+      <TocObserver
+        backToTopClass={styles.backToTop}
+        backToTopVisibleClass={styles.backToTopVisible}
+      />
     </div>
   );
 }

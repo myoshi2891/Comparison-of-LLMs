@@ -1,22 +1,33 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 
-export default function TocObserver() {
+interface Props {
+  backToTopClass?: string;
+  backToTopVisibleClass?: string;
+}
+
+export default function TocObserver({ backToTopClass, backToTopVisibleClass }: Props) {
+  const [backVisible, setBackVisible] = useState(false);
+  const sidebarRef = useRef<HTMLElement | null>(null);
+
   useEffect(() => {
     // 1. Mobile menu toggle
     const menuToggle = document.getElementById("menuToggle");
-    const sidebar = document.getElementById("sidebar");
+    const sidebar = document.getElementById("sidebar") as HTMLElement | null;
+    sidebarRef.current = sidebar;
 
     const handleToggle = () => {
-      sidebar?.classList.toggle("open");
+      if (sidebar) {
+        sidebar.dataset.open = sidebar.dataset.open === "true" ? "false" : "true";
+      }
     };
 
     menuToggle?.addEventListener("click", handleToggle);
 
     const tocLinks = document.querySelectorAll("nav a[href^='#']");
     const handleTocClick = () => {
-      sidebar?.classList.remove("open");
+      if (sidebar) sidebar.dataset.open = "false";
     };
 
     for (const a of Array.from(tocLinks)) {
@@ -28,11 +39,7 @@ export default function TocObserver() {
     const setActive = (id: string) => {
       for (const a of Array.from(tocLinks)) {
         const href = a.getAttribute("href");
-        if (href === `#${id}`) {
-          a.classList.add("toc-active");
-        } else {
-          a.classList.remove("toc-active");
-        }
+        (a as HTMLElement).dataset.active = href === `#${id}` ? "true" : "false";
       }
     };
 
@@ -51,14 +58,31 @@ export default function TocObserver() {
       observer.observe(section);
     }
 
+    // 3. Back to top scroll visibility
+    const handleScroll = () => {
+      setBackVisible(window.scrollY > 400);
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+
     return () => {
       menuToggle?.removeEventListener("click", handleToggle);
       for (const a of Array.from(tocLinks)) {
         a.removeEventListener("click", handleTocClick);
       }
       observer.disconnect();
+      window.removeEventListener("scroll", handleScroll);
     };
   }, []);
 
-  return null;
+  return (
+    <button
+      id="backToTop"
+      type="button"
+      aria-label="ページトップへ戻る"
+      className={`${backToTopClass ?? ""} ${backVisible ? (backToTopVisibleClass ?? "") : ""}`.trim()}
+      onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+    >
+      ↑
+    </button>
+  );
 }
