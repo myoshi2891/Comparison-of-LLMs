@@ -474,7 +474,7 @@
     </style>
   </head>
   <body>
-    <button type="button" class="sidebar-toggle" id="sidebarToggle" aria-label="メニュー切り替え">☰</button>
+    <button type="button" class="sidebar-toggle" id="sidebarToggle" aria-label="メニュー切り替え" aria-controls="sidebar" aria-expanded="false">☰</button>
 
     <div class="layout">
       <nav class="sidebar" id="sidebar">
@@ -2487,12 +2487,46 @@ sequenceDiagram
         var btn = document.getElementById('sidebarToggle');
         var sidebar = document.getElementById('sidebar');
         if (btn && sidebar) {
+          function closeSidebar() {
+            sidebar.classList.remove('open');
+            btn.setAttribute('aria-expanded', 'false');
+            if (window.innerWidth <= 900) {
+              sidebar.setAttribute('aria-hidden', 'true');
+            }
+          }
+
+          function openSidebar() {
+            sidebar.classList.add('open');
+            btn.setAttribute('aria-expanded', 'true');
+            sidebar.removeAttribute('aria-hidden');
+          }
+
           btn.addEventListener('click', function () {
-            sidebar.classList.toggle('open');
+            var isOpen = sidebar.classList.contains('open');
+            if (isOpen) {
+              closeSidebar();
+            } else {
+              openSidebar();
+            }
           });
+
           sidebar.querySelectorAll('.nav-link').forEach(function (link) {
             link.addEventListener('click', function () {
-              sidebar.classList.remove('open');
+              closeSidebar();
+              var targetId = link.getAttribute('href');
+              if (targetId && targetId.startsWith('#')) {
+                var target = document.querySelector(targetId);
+                if (target) {
+                  if (!target.hasAttribute('tabindex')) {
+                    target.setAttribute('tabindex', '-1');
+                  }
+                  target.focus();
+                } else {
+                  btn.focus();
+                }
+              } else {
+                btn.focus();
+              }
             });
           });
         }
