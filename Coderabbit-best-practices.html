@@ -2487,18 +2487,28 @@ sequenceDiagram
         var btn = document.getElementById('sidebarToggle');
         var sidebar = document.getElementById('sidebar');
         if (btn && sidebar) {
+          function syncSidebarState() {
+            var isMobile = window.innerWidth <= 900;
+            var isOpen = sidebar.classList.contains('open');
+            if (isMobile && !isOpen) {
+              sidebar.setAttribute('aria-hidden', 'true');
+              sidebar.setAttribute('inert', '');
+            } else {
+              sidebar.removeAttribute('aria-hidden');
+              sidebar.removeAttribute('inert');
+            }
+          }
+
           function closeSidebar() {
             sidebar.classList.remove('open');
             btn.setAttribute('aria-expanded', 'false');
-            if (window.innerWidth <= 900) {
-              sidebar.setAttribute('aria-hidden', 'true');
-            }
+            syncSidebarState();
           }
 
           function openSidebar() {
             sidebar.classList.add('open');
             btn.setAttribute('aria-expanded', 'true');
-            sidebar.removeAttribute('aria-hidden');
+            syncSidebarState();
           }
 
           btn.addEventListener('click', function () {
@@ -2509,6 +2519,9 @@ sequenceDiagram
               openSidebar();
             }
           });
+
+          window.addEventListener('resize', syncSidebarState);
+          syncSidebarState();
 
           sidebar.querySelectorAll('.nav-link').forEach(function (link) {
             link.addEventListener('click', function () {
