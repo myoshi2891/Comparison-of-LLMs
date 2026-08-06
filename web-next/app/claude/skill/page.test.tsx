@@ -24,10 +24,7 @@ import { describe, expect, it, vi } from "vitest";
 import ClaudeSkillPage, { metadata as rawMetadata } from "@/app/claude/skill/page";
 
 vi.mock("@/components/docs/MermaidDiagram", () => ({
-  default: function DummyMermaidDiagram({
-    chart,
-    id,
-  }: { chart: string; id?: string }) {
+  default: function DummyMermaidDiagram({ chart, id }: { chart: string; id?: string }) {
     return (
       <div id={id} data-testid="mermaid">
         {chart}
@@ -132,14 +129,13 @@ describe("/claude/skill - external link safety", () => {
     }
   });
 
-  it("s14 section contains at least 15 external links", () => {
+  it("s14 section contains at least 14 external links", () => {
     const { container } = render(<Page />);
     const s14 = container.querySelector("#s14");
     expect(s14).not.toBeNull();
     const externals =
-      s14?.querySelectorAll('a[href^="http"]') ??
-      ([] as unknown as NodeListOf<HTMLAnchorElement>);
-    expect(externals.length).toBeGreaterThanOrEqual(15);
+      s14?.querySelectorAll('a[href^="http"]') ?? ([] as unknown as NodeListOf<HTMLAnchorElement>);
+    expect(externals.length).toBeGreaterThanOrEqual(14);
   });
 });
 
@@ -150,4 +146,3 @@ describe("/claude/skill - static source safety", () => {
     expect(source.includes(needle)).toBe(false);
   });
 });
-

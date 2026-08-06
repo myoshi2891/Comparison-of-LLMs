@@ -249,7 +249,7 @@ const entries: PageEntry[] = [
     summary:
       "CLAUDE.md / spec.md / requirements.md / design.md / tasks.md / MEMORY.md / SKILL.md など、Claude Code の仕様駆動開発 (SDD) を支えるマークダウンファイル群の役割・構造・ベストプラクティスを公式根拠付きで解説。",
     addedAt: "2026-04-18",
-    lastReviewed: "2026-07-01",
+    lastReviewed: "2026-08-06",
   },
   {
     slug: "/claude/skill-guide",
