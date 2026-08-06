@@ -1,5 +1,5 @@
 import { fireEvent, render } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import TocObserver from "./TocObserver";
 
 global.IntersectionObserver = class {
@@ -58,5 +58,23 @@ describe("Claude skill TocObserver - mobile sidebar contract", () => {
     fireEvent.click(tocLink);
     expect(sidebar.getAttribute("data-open")).toBe("false");
     expect(menuToggle.getAttribute("aria-expanded")).toBe("false");
+  });
+
+  it("handles back to top click", () => {
+    const scrollToMock = vi.fn();
+    window.scrollTo = scrollToMock;
+
+    const { container } = render(
+      <div>
+        <button id="backToTop" type="button">
+          ↑
+        </button>
+        <TocObserver backToTopClass="backToTop" backToTopVisibleClass="visible" />
+      </div>
+    );
+
+    const backToTopBtn = container.querySelector("#backToTop") as HTMLButtonElement;
+    fireEvent.click(backToTopBtn);
+    expect(scrollToMock).toHaveBeenCalledWith({ top: 0, behavior: "smooth" });
   });
 });

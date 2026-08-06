@@ -101,7 +101,6 @@ export default function ClaudeSkillPage() {
         className={styles.backToTop}
         id="backToTop"
         aria-label="ページ上部へ戻る"
-        onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
       >
         ↑
       </button>

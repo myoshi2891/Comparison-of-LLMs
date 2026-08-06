@@ -71,7 +71,7 @@ export default function TocObserver({
       observer.observe(section);
     }
 
-    // 3. Back to top button visibility scroll handling
+    // 3. Back to top button visibility scroll handling & click behavior
     const backToTopBtn =
       document.getElementById("backToTop") ||
       (backToTopClass ? document.querySelector(`.${backToTopClass}`) : null);
@@ -83,10 +83,16 @@ export default function TocObserver({
         backToTopBtn.classList.remove(backToTopVisibleClass);
       }
     };
+    const handleBackToTop = () => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    };
 
-    if (backToTopBtn && backToTopVisibleClass) {
-      window.addEventListener("scroll", handleScroll, { passive: true });
-      handleScroll();
+    if (backToTopBtn) {
+      backToTopBtn.addEventListener("click", handleBackToTop);
+      if (backToTopVisibleClass) {
+        window.addEventListener("scroll", handleScroll, { passive: true });
+        handleScroll();
+      }
     }
 
     return () => {
@@ -94,8 +100,11 @@ export default function TocObserver({
       for (const a of Array.from(tocLinks)) {
         a.removeEventListener("click", handleTocClick);
       }
-      if (backToTopBtn && backToTopVisibleClass) {
-        window.removeEventListener("scroll", handleScroll);
+      if (backToTopBtn) {
+        backToTopBtn.removeEventListener("click", handleBackToTop);
+        if (backToTopVisibleClass) {
+          window.removeEventListener("scroll", handleScroll);
+        }
       }
       observer.disconnect();
     };
