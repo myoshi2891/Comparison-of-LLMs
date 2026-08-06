@@ -111,6 +111,12 @@ describe("/claude/skill - page structure", () => {
       expect(el, `Mermaid diagram id="${id}" must exist`).not.toBeNull();
     }
   });
+
+  it("renders the back to top button element", () => {
+    const { container } = render(<Page />);
+    const backToTopBtn = container.querySelector("#backToTop");
+    expect(backToTopBtn).not.toBeNull();
+  });
 });
 
 describe("/claude/skill - external link safety", () => {

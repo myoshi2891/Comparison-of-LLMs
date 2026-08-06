@@ -97,6 +97,15 @@ export default function ClaudeSkillPage() {
         backToTopVisibleClass={styles.backToTopVisible}
       />
       <button
+        type="button"
+        className={styles.backToTop}
+        id="backToTop"
+        aria-label="ページ上部へ戻る"
+        onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+      >
+        ↑
+      </button>
+      <button
         className={styles.sidebarToggle}
         id="menuToggle"
         aria-label="メニュー開閉"
