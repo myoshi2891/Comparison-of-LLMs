@@ -21,7 +21,7 @@ describe("Claude skill TocObserver - mobile sidebar contract", () => {
         <button id="menuToggle" aria-label="メニュー開閉" type="button">
           ≡
         </button>
-        <nav id="sidebar" data-open="false">
+        <nav id="sidebar">
           <ul className="toc">
             <li>
               <a href="#s0">はじめに</a>
@@ -39,7 +39,8 @@ describe("Claude skill TocObserver - mobile sidebar contract", () => {
     const sidebar = container.querySelector("#sidebar") as HTMLElement;
     const tocLink = container.querySelector('a[href="#s0"]') as HTMLAnchorElement;
 
-    expect(sidebar.getAttribute("data-open")).toBe("false");
+    expect(sidebar.hasAttribute("data-open")).toBe(false);
+    expect(menuToggle.hasAttribute("aria-expanded")).toBe(false);
 
     // Toggle open
     fireEvent.click(menuToggle);
