@@ -293,7 +293,7 @@ const entries: PageEntry[] = [
     topics: ["code-review", "review", "guide"],
     summary: "AI コードレビューツール CodeRabbit の導入・設定・運用を解説する実践ガイド。",
     addedAt: "2026-06-01",
-    lastReviewed: "2026-06-30",
+    lastReviewed: "2026-08-07",
   },
   {
     slug: "/code-review/copilot-code-review",
