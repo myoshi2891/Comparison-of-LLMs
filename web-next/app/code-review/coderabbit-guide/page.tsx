@@ -1,10 +1,9 @@
 import MermaidDiagram from "@/components/docs/MermaidDiagram";
-import TocObserver from "./TocObserver";
 import styles from "./page.module.css";
+import TocObserver from "./TocObserver";
 
 const MERMAID_THEME_VARS = {
-  fontFamily:
-    'Inter, -apple-system, "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif',
+  fontFamily: 'Inter, -apple-system, "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif',
   fontSize: "16px",
   background: "#0c1830",
   primaryColor: "#132449",
@@ -308,11 +307,7 @@ export default function Page() {
             </a>
           </li>
           <li>
-            <a
-              href="#17-参考文献"
-              className={styles.navLink}
-              data-id="17-参考文献"
-            >
+            <a href="#17-参考文献" className={styles.navLink} data-id="17-参考文献">
               17. 参考文献
             </a>
           </li>
@@ -321,9 +316,7 @@ export default function Page() {
 
       <main className={styles.main}>
         <section className={styles.hero}>
-          <div className={styles.heroEyebrow}>
-            Intermediate &mdash; Advanced Guide
-          </div>
+          <div className={styles.heroEyebrow}>Intermediate &mdash; Advanced Guide</div>
           <h1>
             CodeRabbit実践ガイド
             <br />
@@ -334,15 +327,10 @@ export default function Page() {
             Osmaniをはじめとする著名な開発者・コミュニティの実務レポートに基づく、設定・自動化・エージェント機能・複数ツール運用までを網羅したステップバイステップガイド。
           </p>
           <div className={styles.quickNav}>
-            <a
-              className={styles.qnCard}
-              href="#1-coderabbitとは何かアーキテクチャを理解する"
-            >
+            <a className={styles.qnCard} href="#1-coderabbitとは何かアーキテクチャを理解する">
               <span className={styles.qnNum}>01</span>
               <span className={styles.qnTitle}>基礎とロールアウト</span>
-              <span className={styles.qnDesc}>
-                導入戦略とアーキテクチャの全体像
-              </span>
+              <span className={styles.qnDesc}>導入戦略とアーキテクチャの全体像</span>
             </a>
 
             <a
@@ -351,9 +339,7 @@ export default function Page() {
             >
               <span className={styles.qnNum}>02</span>
               <span className={styles.qnTitle}>設定と自動化</span>
-              <span className={styles.qnDesc}>
-                YAML設定・優先順位・パス制御・自動レビュー
-              </span>
+              <span className={styles.qnDesc}>YAML設定・優先順位・パス制御・自動レビュー</span>
             </a>
 
             <a
@@ -373,17 +359,13 @@ export default function Page() {
             >
               <span className={styles.qnNum}>04</span>
               <span className={styles.qnTitle}>実運用と統合</span>
-              <span className={styles.qnDesc}>
-                IDE/CLI・多層防御・アンチパターン
-              </span>
+              <span className={styles.qnDesc}>IDE/CLI・多層防御・アンチパターン</span>
             </a>
 
             <a className={styles.qnCard} href="#17-参考文献">
               <span className={styles.qnNum}>05</span>
               <span className={styles.qnTitle}>参考文献</span>
-              <span className={styles.qnDesc}>
-                公式ドキュメントと開発者コミュニティの一次情報
-              </span>
+              <span className={styles.qnDesc}>公式ドキュメントと開発者コミュニティの一次情報</span>
             </a>
           </div>
         </section>
@@ -395,8 +377,7 @@ export default function Page() {
           <p>
             情報源は、CodeRabbit公式ドキュメント（docs.coderabbit.ai、2026年8月2日時点の内容）に加え、著名な開発者・組織による実務レポートを参照しています。特に、Google
             Chrome/Web Vitalsチームでの活動やエンジニアリング関連の著作で知られるAddy
-            Osmaniが2026年に公開した「Agentic Code Review」（O&apos;Reilly Radar
-            /
+            Osmaniが2026年に公開した「Agentic Code Review」（O&apos;Reilly Radar /
             addyosmani.com）は、CodeRabbitを含む複数のAIレビューツールを実PRで並行比較した第一級の一次情報として繰り返し引用します。ベンチマーク数値やコミュニティの声はソースによって前提が異なるため、複数の視点を併記し、断定は避けています。
           </p>
 
@@ -422,8 +403,8 @@ export default function Page() {
             </li>
             <li>
               <strong>専門エージェント群の並列稼働</strong>
-              ：Review・Verification・Chat・Pre-Merge
-              Checks・Finishing Touchesという役割ごとに専用のエージェントが動く
+              ：Review・Verification・Chat・Pre-Merge Checks・Finishing
+              Touchesという役割ごとに専用のエージェントが動く
             </li>
             <li>
               <strong>Living Memory（生きた記憶）</strong>
@@ -469,16 +450,12 @@ export default function Page() {
               <tbody>
                 <tr>
                   <td>1</td>
-                  <td>
-                    Quickstartで1つのリポジトリにGitHub/GitLab Appを接続する
-                  </td>
+                  <td>Quickstartで1つのリポジトリにGitHub/GitLab Appを接続する</td>
                   <td>数分でPRレビューが動く状態を作る</td>
                 </tr>
                 <tr>
                   <td>2</td>
-                  <td>
-                    デフォルト設定のまま1〜2週間運用し、何が役に立ち、何がノイズかを観察する
-                  </td>
+                  <td>デフォルト設定のまま1〜2週間運用し、何が役に立ち、何がノイズかを観察する</td>
                   <td>過剰なpath_instructionsを先回りで書かない</td>
                 </tr>
                 <tr>
@@ -499,23 +476,17 @@ export default function Page() {
                 </tr>
                 <tr>
                   <td>5</td>
-                  <td>
-                    フロントエンド・バックエンドを含む3〜5リポジトリに拡大する
-                  </td>
+                  <td>フロントエンド・バックエンドを含む3〜5リポジトリに拡大する</td>
                   <td>技術スタックごとの挙動差を確認する</td>
                 </tr>
                 <tr>
                   <td>6</td>
-                  <td>
-                    GitHub Appを「All repositories」モードに切り替え、全社展開する
-                  </td>
+                  <td>GitHub Appを「All repositories」モードに切り替え、全社展開する</td>
                   <td>一元管理に移行する</td>
                 </tr>
                 <tr>
                   <td>7</td>
-                  <td>
-                    月次でダッシュボードとLearningsを棚卸しし、設定を見直す
-                  </td>
+                  <td>月次でダッシュボードとLearningsを棚卸しし、設定を見直す</td>
                   <td>形骸化・陳腐化を防ぐ</td>
                 </tr>
               </tbody>
@@ -536,33 +507,49 @@ export default function Page() {
 
           <div className={styles.codeBlock}>
             <div className={styles.codeLine}>
-              # yaml-language-server:
-              $schema=https://coderabbit.ai/integrations/schema.v2.json
-            </div>
-            <div className={styles.codeLine}>language: &quot;ja-JP&quot;</div>
-            <div className={styles.codeLine}>reviews:</div>
-            <div className={styles.codeLine}>
-              &nbsp;&nbsp;profile: &quot;chill&quot;
+              <span className={styles.cc}>
+                # yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+              </span>
             </div>
             <div className={styles.codeLine}>
-              &nbsp;&nbsp;request_changes_workflow: false
+              <span className={styles.cv}>language</span>:{" "}
+              <span className={styles.cs}>&quot;ja-JP&quot;</span>
             </div>
             <div className={styles.codeLine}>
-              &nbsp;&nbsp;high_level_summary: true
+              <span className={styles.cm}>reviews</span>:
             </div>
             <div className={styles.codeLine}>
-              &nbsp;&nbsp;poem: false
-            </div>
-            <div className={styles.codeLine}>&nbsp;&nbsp;path_filters:</div>
-            <div className={styles.codeLine}>
-              &nbsp;&nbsp;&nbsp;&nbsp;- &quot;!dist/**&quot;
+              &nbsp;&nbsp;<span className={styles.cv}>profile</span>:{" "}
+              <span className={styles.cs}>&quot;chill&quot;</span>
             </div>
             <div className={styles.codeLine}>
-              &nbsp;&nbsp;&nbsp;&nbsp;- &quot;!**/*.min.js&quot;
+              &nbsp;&nbsp;
+              <span className={styles.cv}>request_changes_workflow</span>:{" "}
+              <span className={styles.ck}>false</span>
             </div>
-            <div className={styles.codeLine}>chat:</div>
             <div className={styles.codeLine}>
-              &nbsp;&nbsp;auto_reply: true
+              &nbsp;&nbsp;<span className={styles.cv}>high_level_summary</span>:{" "}
+              <span className={styles.ck}>true</span>
+            </div>
+            <div className={styles.codeLine}>
+              &nbsp;&nbsp;<span className={styles.cv}>poem</span>:{" "}
+              <span className={styles.ck}>false</span>
+            </div>
+            <div className={styles.codeLine}>
+              &nbsp;&nbsp;<span className={styles.cv}>path_filters</span>:
+            </div>
+            <div className={styles.codeLine}>
+              &nbsp;&nbsp;&nbsp;&nbsp;- <span className={styles.cs}>&quot;!dist/**&quot;</span>
+            </div>
+            <div className={styles.codeLine}>
+              &nbsp;&nbsp;&nbsp;&nbsp;- <span className={styles.cs}>&quot;!**/*.min.js&quot;</span>
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.cm}>chat</span>:
+            </div>
+            <div className={styles.codeLine}>
+              &nbsp;&nbsp;<span className={styles.cv}>auto_reply</span>:{" "}
+              <span className={styles.ck}>true</span>
             </div>
           </div>
 
@@ -692,17 +679,14 @@ export default function Page() {
                   <td>
                     <code>true</code>
                   </td>
-                  <td>
-                    変更内容にちなんだ詩の生成（オフにして実務的にする例も多い）
-                  </td>
+                  <td>変更内容にちなんだ詩の生成（オフにして実務的にする例も多い）</td>
                 </tr>
               </tbody>
             </table>
           </div>
           <hr />
           <h2 id="4-設定の優先順位を制御するグローバルオーバーライド中央設定継承">
-            4.
-            設定の優先順位を制御する：グローバルオーバーライド・中央設定・継承
+            4. 設定の優先順位を制御する：グローバルオーバーライド・中央設定・継承
           </h2>
           <p>
             複数の設定手段（YAMLファイル、中央リポジトリ、Web
@@ -764,16 +748,13 @@ export default function Page() {
               <tbody>
                 <tr>
                   <td>オブジェクト</td>
-                  <td>
-                    深いマージ。子の値が各階層で親の値を上書きする
-                  </td>
+                  <td>深いマージ。子の値が各階層で親の値を上書きする</td>
                 </tr>
                 <tr>
                   <td>配列</td>
                   <td>
-                    子側の項目を先頭にし、<code>path</code> /{" "}
-                    <code>label</code> / <code>name</code> / <code>id</code> /{" "}
-                    <code>key</code>
+                    子側の項目を先頭にし、<code>path</code> / <code>label</code> / <code>name</code>{" "}
+                    / <code>id</code> / <code>key</code>
                     で重複排除しながら親側のユニークな項目を追加する
                   </td>
                 </tr>
@@ -825,9 +806,7 @@ export default function Page() {
                   <td>
                     <code>reviews.path_instructions</code>
                   </td>
-                  <td>
-                    「APIコントローラでは認可漏れを重点確認して」など
-                  </td>
+                  <td>「APIコントローラでは認可漏れを重点確認して」など</td>
                 </tr>
                 <tr>
                   <td>
@@ -838,17 +817,13 @@ export default function Page() {
                     などを自動検出して規約として適用する
                   </td>
                   <td>追加設定不要（自動検出）</td>
-                  <td>
-                    既にAIコーディングエージェント向けの規約がある場合
-                  </td>
+                  <td>既にAIコーディングエージェント向けの規約がある場合</td>
                 </tr>
                 <tr>
                   <td>
                     <strong>Custom Checks</strong>
                   </td>
-                  <td>
-                    合否をはっきり判定できる基準をマージ前ゲートとして定義する
-                  </td>
+                  <td>合否をはっきり判定できる基準をマージ前ゲートとして定義する</td>
                   <td>
                     <code>reviews.pre_merge_checks.custom_checks</code>
                   </td>
@@ -860,9 +835,7 @@ export default function Page() {
               </tbody>
             </table>
           </div>
-          <p>
-            この4つをどう使い分けるかを整理すると、次のような判断フローになります。
-          </p>
+          <p>この4つをどう使い分けるかを整理すると、次のような判断フローになります。</p>
 
           <div className={styles.mermaidWrap}>
             <MermaidDiagram
@@ -876,16 +849,19 @@ export default function Page() {
           <h3 id="path-instructionsの実例">Path Instructionsの実例</h3>
 
           <div className={styles.codeBlock}>
-            <div className={styles.codeLine}>reviews:</div>
             <div className={styles.codeLine}>
-              &nbsp;&nbsp;path_instructions:
+              <span className={styles.cm}>reviews</span>:
             </div>
             <div className={styles.codeLine}>
-              &nbsp;&nbsp;&nbsp;&nbsp;- path:
-              &quot;src/controllers/**&quot;
+              &nbsp;&nbsp;<span className={styles.cv}>path_instructions</span>:
             </div>
             <div className={styles.codeLine}>
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;instructions: |
+              &nbsp;&nbsp;&nbsp;&nbsp;- <span className={styles.cv}>path</span>:{" "}
+              <span className={styles.cs}>&quot;src/controllers/**&quot;</span>
+            </div>
+            <div className={styles.codeLine}>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              <span className={styles.cv}>instructions</span>: |
             </div>
             <div className={styles.codeLine}>
               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-
@@ -896,10 +872,12 @@ export default function Page() {
               ORMを迂回した直接のDBクエリがあれば指摘する
             </div>
             <div className={styles.codeLine}>
-              &nbsp;&nbsp;&nbsp;&nbsp;- path: &quot;docs/**.md&quot;
+              &nbsp;&nbsp;&nbsp;&nbsp;- <span className={styles.cv}>path</span>:{" "}
+              <span className={styles.cs}>&quot;docs/**.md&quot;</span>
             </div>
             <div className={styles.codeLine}>
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;instructions: |
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              <span className={styles.cv}>instructions</span>: |
             </div>
             <div className={styles.codeLine}>
               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;明瞭さ・正確さ・網羅性を確認し、非推奨APIへの言及があれば指摘する
@@ -912,9 +890,7 @@ export default function Page() {
             に登録してしまうケースです。これは「そのファイル自体をコードとしてレビューする」設定になってしまい、「そのファイルの内容を規約として使う」設定にはなりません。規約として使いたい場合はCode
             Guidelinesの<code>filePatterns</code>を使います。
           </p>
-          <h3 id="code-guidelinesの自動検出対象">
-            Code Guidelinesの自動検出対象
-          </h3>
+          <h3 id="code-guidelinesの自動検出対象">Code Guidelinesの自動検出対象</h3>
           <div className={styles.tableScroll}>
             <table>
               <thead>
@@ -944,8 +920,7 @@ export default function Page() {
                 </tr>
                 <tr>
                   <td>
-                    <code>**/.cursorrules</code>,{" "}
-                    <code>**/.cursor/rules/*</code>
+                    <code>**/.cursorrules</code>, <code>**/.cursor/rules/*</code>
                   </td>
                   <td>Cursor</td>
                 </tr>
@@ -980,8 +955,8 @@ export default function Page() {
           </h3>
           <p>
             <code>@coderabbitai emit path instructions</code>
-            とコメントすると、過去7日間にCodeRabbitが提案したpath
-            instructionを収集し、既存の<code>.coderabbit.yaml</code>
+            とコメントすると、過去7日間にCodeRabbitが提案したpath instructionを収集し、既存の
+            <code>.coderabbit.yaml</code>
             を上書きせずにマージしたPRを自動で開いてくれます。手作業でYAMLを編集する前に、まずこのコマンドを試す価値があります。
           </p>
           <hr />
@@ -997,22 +972,15 @@ export default function Page() {
           <div className={styles.codeBlock}>
             <div className={styles.codeLine}>reviews:</div>
             <div className={styles.codeLine}>&nbsp;&nbsp;tools:</div>
-            <div className={styles.codeLine}>
-              &nbsp;&nbsp;&nbsp;&nbsp;ast-grep:
-            </div>
+            <div className={styles.codeLine}>&nbsp;&nbsp;&nbsp;&nbsp;ast-grep:</div>
             <div className={styles.codeLine}>
               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;essential_rules: true
             </div>
+            <div className={styles.codeLine}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;rule_dirs:</div>
             <div className={styles.codeLine}>
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;rule_dirs:
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- &quot;custom-rules&quot;
             </div>
-            <div className={styles.codeLine}>
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-
-              &quot;custom-rules&quot;
-            </div>
-            <div className={styles.codeLine}>
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;packages:
-            </div>
+            <div className={styles.codeLine}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;packages:</div>
             <div className={styles.codeLine}>
               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-
               &quot;myorg/awesome-review-rules&quot;
@@ -1032,22 +1000,21 @@ export default function Page() {
                 <tr>
                   <td>Atomic rule</td>
                   <td>
-                    <code>pattern</code> / <code>kind</code> /{" "}
-                    <code>regex</code> によるASTノードの基本一致判定
+                    <code>pattern</code> / <code>kind</code> / <code>regex</code>{" "}
+                    によるASTノードの基本一致判定
                   </td>
                 </tr>
                 <tr>
                   <td>Relational rule</td>
                   <td>
-                    <code>inside</code> / <code>has</code> / <code>follows</code>{" "}
-                    / <code>precedes</code> によるノード間の関係判定
+                    <code>inside</code> / <code>has</code> / <code>follows</code> /{" "}
+                    <code>precedes</code> によるノード間の関係判定
                   </td>
                 </tr>
                 <tr>
                   <td>Composite rule</td>
                   <td>
-                    <code>all</code> / <code>any</code> / <code>not</code>{" "}
-                    による論理結合
+                    <code>all</code> / <code>any</code> / <code>not</code> による論理結合
                   </td>
                 </tr>
               </tbody>
@@ -1061,9 +1028,7 @@ export default function Page() {
           </p>
 
           <div className={styles.codeBlock}>
-            <div className={styles.codeLine}>
-              id: no-console-except-error
-            </div>
+            <div className={styles.codeLine}>id: no-console-except-error</div>
             <div className={styles.codeLine}>language: typescript</div>
             <div className={styles.codeLine}>
               message: &quot;catchブロック以外でのconsole出力は禁止です&quot;
@@ -1073,19 +1038,15 @@ export default function Page() {
             <div className={styles.codeLine}>
               &nbsp;&nbsp;&nbsp;&nbsp;- pattern: console.error($$$)
             </div>
-            <div className={styles.codeLine}>
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;not:
-            </div>
+            <div className={styles.codeLine}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;not:</div>
             <div className={styles.codeLine}>
               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;inside:
             </div>
             <div className={styles.codeLine}>
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;kind:
-              catch_clause
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;kind: catch_clause
             </div>
             <div className={styles.codeLine}>
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;stopBy:
-              end
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;stopBy: end
             </div>
             <div className={styles.codeLine}>
               &nbsp;&nbsp;&nbsp;&nbsp;- pattern: console.$METHOD($$$)
@@ -1131,8 +1092,8 @@ export default function Page() {
                     小さなコミットが大量に積まれるアクティブブランチでレビュー回数を節約したい
                   </td>
                   <td>
-                    <code>auto_pause_after_reviewed_commits</code> を{" "}
-                    <code>1</code>〜<code>2</code> に設定
+                    <code>auto_pause_after_reviewed_commits</code> を <code>1</code>〜<code>2</code>{" "}
+                    に設定
                   </td>
                 </tr>
                 <tr>
@@ -1146,8 +1107,7 @@ export default function Page() {
                 <tr>
                   <td>WIP・生成コード・自動化PRをスキップしたい</td>
                   <td>
-                    <code>ignore_title_keywords</code> に <code>WIP</code>{" "}
-                    などを追加
+                    <code>ignore_title_keywords</code> に <code>WIP</code> などを追加
                   </td>
                 </tr>
                 <tr>
@@ -1162,54 +1122,71 @@ export default function Page() {
           </div>
 
           <div className={styles.codeBlock}>
-            <div className={styles.codeLine}>reviews:</div>
-            <div className={styles.codeLine}>&nbsp;&nbsp;auto_review:</div>
             <div className={styles.codeLine}>
-              &nbsp;&nbsp;&nbsp;&nbsp;enabled: true
+              <span className={styles.cm}>reviews</span>:
             </div>
             <div className={styles.codeLine}>
-              &nbsp;&nbsp;&nbsp;&nbsp;auto_incremental_review: true
+              &nbsp;&nbsp;<span className={styles.cv}>auto_review</span>:
             </div>
             <div className={styles.codeLine}>
-              &nbsp;&nbsp;&nbsp;&nbsp;auto_pause_after_reviewed_commits: 5
+              &nbsp;&nbsp;&nbsp;&nbsp;<span className={styles.cv}>enabled</span>:{" "}
+              <span className={styles.ck}>true</span>
             </div>
             <div className={styles.codeLine}>
-              &nbsp;&nbsp;&nbsp;&nbsp;drafts: false
+              &nbsp;&nbsp;&nbsp;&nbsp;
+              <span className={styles.cv}>auto_incremental_review</span>:{" "}
+              <span className={styles.ck}>true</span>
             </div>
             <div className={styles.codeLine}>
-              &nbsp;&nbsp;&nbsp;&nbsp;base_branches:
+              &nbsp;&nbsp;&nbsp;&nbsp;
+              <span className={styles.cv}>auto_pause_after_reviewed_commits</span>:{" "}
+              <span className={styles.fn}>5</span>
             </div>
             <div className={styles.codeLine}>
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- &quot;develop&quot;
+              &nbsp;&nbsp;&nbsp;&nbsp;<span className={styles.cv}>drafts</span>:{" "}
+              <span className={styles.ck}>false</span>
             </div>
             <div className={styles.codeLine}>
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- &quot;release/.*&quot;
+              &nbsp;&nbsp;&nbsp;&nbsp;<span className={styles.cv}>base_branches</span>:
             </div>
             <div className={styles.codeLine}>
-              &nbsp;&nbsp;&nbsp;&nbsp;ignore_title_keywords:
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-{" "}
+              <span className={styles.cs}>&quot;develop&quot;</span>
             </div>
             <div className={styles.codeLine}>
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- &quot;WIP&quot;
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-{" "}
+              <span className={styles.cs}>&quot;release/.*&quot;</span>
             </div>
             <div className={styles.codeLine}>
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- &quot;[skip
-              review]&quot;
+              &nbsp;&nbsp;&nbsp;&nbsp;
+              <span className={styles.cv}>ignore_title_keywords</span>:
             </div>
             <div className={styles.codeLine}>
-              &nbsp;&nbsp;&nbsp;&nbsp;labels:
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-{" "}
+              <span className={styles.cs}>&quot;WIP&quot;</span>
             </div>
             <div className={styles.codeLine}>
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-
-              &quot;!do-not-review&quot;
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-{" "}
+              <span className={styles.cs}>&quot;[skip review]&quot;</span>
             </div>
             <div className={styles.codeLine}>
-              &nbsp;&nbsp;&nbsp;&nbsp;ignore_usernames:
+              &nbsp;&nbsp;&nbsp;&nbsp;<span className={styles.cv}>labels</span>:
             </div>
             <div className={styles.codeLine}>
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- &quot;dependabot[bot]&quot;
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-{" "}
+              <span className={styles.cs}>&quot;!do-not-review&quot;</span>
             </div>
             <div className={styles.codeLine}>
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- &quot;renovate[bot]&quot;
+              &nbsp;&nbsp;&nbsp;&nbsp;
+              <span className={styles.cv}>ignore_usernames</span>:
+            </div>
+            <div className={styles.codeLine}>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-{" "}
+              <span className={styles.cs}>&quot;dependabot[bot]&quot;</span>
+            </div>
+            <div className={styles.codeLine}>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-{" "}
+              <span className={styles.cs}>&quot;renovate[bot]&quot;</span>
             </div>
           </div>
 
@@ -1225,14 +1202,11 @@ export default function Page() {
           </div>
 
           <p>
-            <strong>注意点</strong>：
-            <code>auto_pause_after_reviewed_commits</code>を<code>0</code>
+            <strong>注意点</strong>：<code>auto_pause_after_reviewed_commits</code>を<code>0</code>
             にして「常に全部レビューする」設定にすると、アクティブなブランチではレビュー回数の上限（プランごとの1時間あたりの割り当て）をすぐに消費してしまいます。プラン上限に頻繁に当たる場合は、まずこの値を絞ることを検討してください。
           </p>
           <hr />
-          <h2 id="8-learningsでチームの好みを学習させる">
-            8. Learningsでチームの好みを学習させる
-          </h2>
+          <h2 id="8-learningsでチームの好みを学習させる">8. Learningsでチームの好みを学習させる</h2>
           <p>
             Learningsは、PRやIssueのコメントでのやり取りからCodeRabbitが学習する「チームの好み」の内部データベースです。フォーマルな設定変更をするほどではないが、今後も繰り返し適用してほしい方針に向いています。
           </p>
@@ -1279,9 +1253,7 @@ export default function Page() {
                   <td>
                     <code>auto</code>（既定）
                   </td>
-                  <td>
-                    公開リポジトリでは当該リポジトリのみ、非公開では組織全体のLearningsを適用
-                  </td>
+                  <td>公開リポジトリでは当該リポジトリのみ、非公開では組織全体のLearningsを適用</td>
                   <td>公開/非公開リポジトリが混在する組織</td>
                 </tr>
                 <tr>
@@ -1298,9 +1270,7 @@ export default function Page() {
                     <code>global</code>
                   </td>
                   <td>常に組織全体のLearningsを適用</td>
-                  <td>
-                    セキュリティ方針や命名規則など、組織横断で統一したい標準がある場合
-                  </td>
+                  <td>セキュリティ方針や命名規則など、組織横断で統一したい標準がある場合</td>
                 </tr>
               </tbody>
             </table>
@@ -1327,8 +1297,7 @@ export default function Page() {
               Learningsは陳腐化する。四半期に一度、廃止したパターンやチーム決定を参照しているLearningsを棚卸しし、矛盾するものは追加せず更新・削除する
             </li>
             <li>
-              CodeRabbitがLearningsを無視しているように見える場合は、Path
-              Instructionsとの競合（Path
+              CodeRabbitがLearningsを無視しているように見える場合は、Path Instructionsとの競合（Path
               Instructionsのほうが優先される）を疑い、必要であれば「回答前に必ずLearningsを確認すること」という補強ルールを追加する
             </li>
           </ul>
@@ -1375,52 +1344,59 @@ export default function Page() {
             </table>
           </div>
           <p>
-            各チェックは<code>off</code> / <code>warning</code> /{" "}
-            <code>error</code>
-            の3段階で設定できます。<code>error</code>は
-            <code>request_changes_workflow</code>
+            各チェックは<code>off</code> / <code>warning</code> / <code>error</code>
+            の3段階で設定できます。<code>error</code>は<code>request_changes_workflow</code>
             と組み合わせるとマージをブロックします。
           </p>
 
           <div className={styles.codeBlock}>
-            <div className={styles.codeLine}>reviews:</div>
             <div className={styles.codeLine}>
-              &nbsp;&nbsp;pre_merge_checks:
+              <span className={styles.cm}>reviews</span>:
             </div>
             <div className={styles.codeLine}>
-              &nbsp;&nbsp;&nbsp;&nbsp;docstrings:
+              &nbsp;&nbsp;<span className={styles.cv}>pre_merge_checks</span>:
             </div>
             <div className={styles.codeLine}>
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;mode: &quot;error&quot;
+              &nbsp;&nbsp;&nbsp;&nbsp;<span className={styles.cv}>docstrings</span>:
             </div>
             <div className={styles.codeLine}>
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;threshold: 85
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span className={styles.cv}>mode</span>:{" "}
+              <span className={styles.cs}>&quot;error&quot;</span>
             </div>
             <div className={styles.codeLine}>
-              &nbsp;&nbsp;&nbsp;&nbsp;title:
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span className={styles.cv}>threshold</span>:{" "}
+              <span className={styles.fn}>85</span>
             </div>
             <div className={styles.codeLine}>
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;mode: &quot;warning&quot;
+              &nbsp;&nbsp;&nbsp;&nbsp;<span className={styles.cv}>title</span>:
             </div>
             <div className={styles.codeLine}>
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;requirements:
-              &quot;命令形の動詞で始め、50文字以内に収める&quot;
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span className={styles.cv}>mode</span>:{" "}
+              <span className={styles.cs}>&quot;warning&quot;</span>
             </div>
             <div className={styles.codeLine}>
-              &nbsp;&nbsp;&nbsp;&nbsp;custom_checks:
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span className={styles.cv}>requirements</span>:{" "}
+              <span className={styles.cs}>&quot;命令形の動詞で始め、50文字以内に収める&quot;</span>
             </div>
             <div className={styles.codeLine}>
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- name:
-              &quot;破壊的変更の文書化&quot;
+              &nbsp;&nbsp;&nbsp;&nbsp;<span className={styles.cv}>custom_checks</span>:
             </div>
             <div className={styles.codeLine}>
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;mode:
-              &quot;warning&quot;
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span className={styles.cv}>name</span>:{" "}
+              <span className={styles.cs}>&quot;破壊的変更の文書化&quot;</span>
             </div>
             <div className={styles.codeLine}>
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;instructions:
-              &quot;公開API・CLIフラグ・環境変数・DBスキーマへの破壊的変更は、PR説明のBreaking
-              ChangeセクションとCHANGELOG.mdの両方に記載されていること。内部限定の変更は除く。&quot;
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              <span className={styles.cv}>mode</span>:{" "}
+              <span className={styles.cs}>&quot;warning&quot;</span>
+            </div>
+            <div className={styles.codeLine}>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              <span className={styles.cv}>instructions</span>:{" "}
+              <span className={styles.cs}>
+                &quot;公開API・CLIフラグ・環境変数・DBスキーマへの破壊的変更は、PR説明のBreaking
+                ChangeセクションとCHANGELOG.mdの両方に記載されていること。内部限定の変更は除く。&quot;
+              </span>
             </div>
           </div>
 
@@ -1444,17 +1420,11 @@ export default function Page() {
               </thead>
               <tbody>
                 <tr>
-                  <td>
-                    変更ファイル・コードスニペット・関連するGit履歴の参照
-                  </td>
-                  <td>
-                    テストスイートの実行（依存関係が未インストール）
-                  </td>
+                  <td>変更ファイル・コードスニペット・関連するGit履歴の参照</td>
+                  <td>テストスイートの実行（依存関係が未インストール）</td>
                 </tr>
                 <tr>
-                  <td>
-                    PRタイトル・説明・紐づくIssue・レビュー内の議論の参照
-                  </td>
+                  <td>PRタイトル・説明・紐づくIssue・レビュー内の議論の参照</td>
                   <td>
                     <code>node_modules</code>・<code>dist</code>
                     ・ビルド成果物へのアクセス
@@ -1466,9 +1436,7 @@ export default function Page() {
                 </tr>
                 <tr>
                   <td>サンドボックス化されたシェルコマンドでの調査</td>
-                  <td>
-                    特定行へのインラインコメント投稿（結果はサマリー表のみ）
-                  </td>
+                  <td>特定行へのインラインコメント投稿（結果はサマリー表のみ）</td>
                 </tr>
                 <tr>
                   <td>公開ドキュメントへのWebアクセス、接続済みMCPツール</td>
@@ -1494,16 +1462,12 @@ export default function Page() {
                 </tr>
                 <tr>
                   <td>取得不能な情報を要求</td>
-                  <td>
-                    「@security-teamの承認済みであることを確認して」
-                  </td>
+                  <td>「@security-teamの承認済みであることを確認して」</td>
                   <td>エージェントは承認状況を確認できない</td>
                 </tr>
                 <tr>
                   <td>主観的な推測</td>
-                  <td>
-                    「明らかなパフォーマンス改善余地があるか評価して」
-                  </td>
+                  <td>「明らかなパフォーマンス改善余地があるか評価して」</td>
                   <td>明確な判定基準がなく主観的</td>
                 </tr>
               </tbody>
@@ -1522,8 +1486,8 @@ export default function Page() {
 
           <p>
             <code>
-              @coderabbitai evaluate custom pre-merge check --name &lt;名前&gt;
-              --instructions &lt;本文&gt;
+              @coderabbitai evaluate custom pre-merge check --name &lt;名前&gt; --instructions
+              &lt;本文&gt;
             </code>
             とコメントすると、設定に保存する前にロジックをテストできます。本番投入前に必ず試すことを推奨します。
           </p>
@@ -1582,9 +1546,7 @@ export default function Page() {
                 <tr>
                   <td>カスタムレシピ</td>
                   <td>
-                    <code>
-                      @coderabbitai run &lt;レシピ名&gt;
-                    </code>
+                    <code>@coderabbitai run &lt;レシピ名&gt;</code>
                   </td>
                   <td>ブランチへのコミットまたはスタックPR</td>
                   <td>GitHub</td>
@@ -1628,9 +1590,7 @@ export default function Page() {
           </p>
           <ul>
             <li>変更ファイルの要約（関連ファイルはグループ化される）</li>
-            <li>
-              Mermaidによるシーケンス図（コンポーネント間のやり取りが変わるPRのみ生成）
-            </li>
+            <li>Mermaidによるシーケンス図（コンポーネント間のやり取りが変わるPRのみ生成）</li>
             <li>レビュー工数の見積もり（1＝些細、5＝非常に複雑）</li>
             <li>紐づくIssue・関連PR・推奨レビュアー・推奨ラベル</li>
             <li>変更内容にちなんだ詩（無効化も可能）</li>
@@ -1709,17 +1669,13 @@ export default function Page() {
             この2軸を使うと、<code>assertive</code>
             プロファイルで指摘件数が増えても、「CriticalとMajorだけまず見る」という運用でノイズを実質的に抑えられます。
           </p>
-          <h3 id="coderabbit-reviewchange-stack">
-            CodeRabbit Review（Change Stack）
-          </h3>
+          <h3 id="coderabbit-reviewchange-stack">CodeRabbit Review（Change Stack）</h3>
           <p>
             AIエージェントが一度に大量のファイルを変更するPRが増える中、GitHubの既定の差分表示（アルファベット順のフラットなファイル一覧）は論理的な依存関係を表現できません。CodeRabbit
             Reviewは、PRを「コホート（関連する変更のまとまり）」と「レイヤー（読む順序）」に再構成し、データ構造や契約の変更を、それに依存する呼び出し側やテストより先に読めるようにします。
           </p>
           <ul>
-            <li>
-              左パネル：コホート／レイヤーのナビゲーションと全ファイル一覧
-            </li>
+            <li>左パネル：コホート／レイヤーのナビゲーションと全ファイル一覧</li>
             <li>
               中央パネル：現在のレイヤーに絞った差分（変数名クリックで定義・参照元にジャンプするCode
               Peek機能付き）
@@ -1729,16 +1685,13 @@ export default function Page() {
           <p>
             キーボード操作にも対応しており、<code>J</code>で次のレイヤー、
             <code>K</code>で前のレイヤー、<code>Z</code>
-            でフォーカスモードの切り替えができます。この機能はWalkthroughコメントの「Review
-            Change Stack →」ボタンから開き、レビュアーごとの任意選択（オプトイン）のため、従来のGitHubレビュー体験を好むメンバーには影響しません。
+            でフォーカスモードの切り替えができます。この機能はWalkthroughコメントの「Review Change
+            Stack
+            →」ボタンから開き、レビュアーごとの任意選択（オプトイン）のため、従来のGitHubレビュー体験を好むメンバーには影響しません。
           </p>
           <hr />
-          <h2 id="12-knowledge-baseで文脈を拡張する">
-            12. Knowledge Baseで文脈を拡張する
-          </h2>
-          <p>
-            Knowledge Baseは、コード自体を超えた文脈をレビューに供給する仕組みの総称です。
-          </p>
+          <h2 id="12-knowledge-baseで文脈を拡張する">12. Knowledge Baseで文脈を拡張する</h2>
+          <p>Knowledge Baseは、コード自体を超えた文脈をレビューに供給する仕組みの総称です。</p>
 
           <div className={styles.mermaidWrap}>
             <MermaidDiagram
@@ -1753,9 +1706,10 @@ export default function Page() {
           <p>
             CodeRabbitはMCPの<strong>クライアント</strong>
             として動作し、接続済みのMCPサーバー（社内Wiki、Figma、Issueトラッカーなど）からレビュー中に情報を取得します。使用状況はWalkthroughの「Additional
-            context used」に明示されるため、何を参照したかが監査可能です。接続数の上限はプランによって異なり（Pro:5、Pro+:15、Enterprise:20）、
-            <code>knowledge_base.mcp.usage</code>で<code>auto</code> /{" "}
-            <code>enabled</code> / <code>disabled</code>を切り替えられます。
+            context
+            used」に明示されるため、何を参照したかが監査可能です。接続数の上限はプランによって異なり（Pro:5、Pro+:15、Enterprise:20）、
+            <code>knowledge_base.mcp.usage</code>で<code>auto</code> / <code>enabled</code> /{" "}
+            <code>disabled</code>を切り替えられます。
           </p>
           <h3 id="multi-repo-analysis">Multi-Repo Analysis</h3>
           <p>
@@ -1763,16 +1717,22 @@ export default function Page() {
           </p>
 
           <div className={styles.codeBlock}>
-            <div className={styles.codeLine}>knowledge_base:</div>
             <div className={styles.codeLine}>
-              &nbsp;&nbsp;linked_repositories:
+              <span className={styles.cm}>knowledge_base</span>:
             </div>
             <div className={styles.codeLine}>
-              &nbsp;&nbsp;&nbsp;&nbsp;- repository: &quot;myorg/backend-api&quot;
+              &nbsp;&nbsp;<span className={styles.cv}>linked_repositories</span>:
             </div>
             <div className={styles.codeLine}>
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;instructions:
-              &quot;REST APIエンドポイントとデータベースモデルを含む&quot;
+              &nbsp;&nbsp;&nbsp;&nbsp;- <span className={styles.cv}>repository</span>:{" "}
+              <span className={styles.cs}>&quot;myorg/backend-api&quot;</span>
+            </div>
+            <div className={styles.codeLine}>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              <span className={styles.cv}>instructions</span>:{" "}
+              <span className={styles.cs}>
+                &quot;REST APIエンドポイントとデータベースモデルを含む&quot;
+              </span>
             </div>
           </div>
 
@@ -1801,8 +1761,8 @@ export default function Page() {
                 <tr>
                   <td>Agent Type</td>
                   <td>
-                    Native / Claude Code / Codex CLI / Cline / Roo / Kilo Code /
-                    Augment Code / OpenCode / Clipboard 等
+                    Native / Claude Code / Codex CLI / Cline / Roo / Kilo Code / Augment Code /
+                    OpenCode / Clipboard 等
                   </td>
                   <td>Native</td>
                 </tr>
@@ -1821,28 +1781,41 @@ export default function Page() {
           </div>
           <p>
             「Fix with AI」機能を使う際、どのコーディングエージェントに修正案を渡すかをAgent
-            Typeで選べます。コミットのたびに毎回確認したくない場合はAuto Review
-            Modeを<code>Auto</code>に、逆に慎重に運用したい場合は
+            Typeで選べます。コミットのたびに毎回確認したくない場合はAuto Review Modeを
+            <code>Auto</code>に、逆に慎重に運用したい場合は
             <code>Prompt</code>のままにしておくのが妥当です。
           </p>
           <h3 id="cliツール">CLIツール</h3>
 
           <div className={styles.codeBlock}>
-            <div className={styles.codeLine}># インストール</div>
             <div className={styles.codeLine}>
-              curl -fsSL https://cli.coderabbit.ai/install.sh | sh
+              <span className={styles.cc}># インストール</span>
             </div>
-            <div className={styles.codeLine}></div>
-            <div className={styles.codeLine}># 認証</div>
-            <div className={styles.codeLine}>cr auth login</div>
-            <div className={styles.codeLine}></div>
             <div className={styles.codeLine}>
-              # レビュー実行（現在のGitリポジトリの差分を解析）
+              <span className={styles.ck}>curl</span> -fsSL https://cli.coderabbit.ai/install.sh |{" "}
+              <span className={styles.ck}>sh</span>
             </div>
-            <div className={styles.codeLine}>cr</div>
-            <div className={styles.codeLine}></div>
-            <div className={styles.codeLine}># セットアップ診断</div>
-            <div className={styles.codeLine}>cr doctor</div>
+            <div className={styles.codeLine} />
+            <div className={styles.codeLine}>
+              <span className={styles.cc}># 認証</span>
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>cr</span> auth login
+            </div>
+            <div className={styles.codeLine} />
+            <div className={styles.codeLine}>
+              <span className={styles.cc}># レビュー実行（現在のGitリポジトリの差分を解析）</span>
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>cr</span>
+            </div>
+            <div className={styles.codeLine} />
+            <div className={styles.codeLine}>
+              <span className={styles.cc}># セットアップ診断</span>
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>cr</span> doctor
+            </div>
           </div>
 
           <p>CLIには3つの出力モードがあります。</p>
@@ -1859,9 +1832,7 @@ export default function Page() {
                   <td>
                     <code>--plain</code>（既定）
                   </td>
-                  <td>
-                    詳細な修正提案付きのテキスト出力。人間が読む用途
-                  </td>
+                  <td>詳細な修正提案付きのテキスト出力。人間が読む用途</td>
                 </tr>
                 <tr>
                   <td>
@@ -1891,9 +1862,7 @@ export default function Page() {
               <code>cr --agent</code>
               をバックグラウンドで実行させる（レビューは7〜30分以上かかることがあるため、待機中に他の作業を進める）
             </li>
-            <li>
-              完了したら「重大な指摘のみ修正し、些末な指摘（nits）は無視する」よう指示する
-            </li>
+            <li>完了したら「重大な指摘のみ修正し、些末な指摘（nits）は無視する」よう指示する</li>
             <li>
               修正後にもう一度<code>cr --agent</code>
               を実行し、新しい問題を作り込んでいないか確認する
@@ -1926,9 +1895,7 @@ export default function Page() {
             BugBotの4つのAIレビューツールを、3週間半にわたり146件の実PRに並行適用した結果が紹介されています。
           </p>
           <ul>
-            <li>
-              検出されたfindingsの総数は679件、重複を除いた指摘箇所は617箇所
-            </li>
+            <li>検出されたfindingsの総数は679件、重複を除いた指摘箇所は617箇所</li>
             <li>
               そのうち
               <strong>93.4%は4ツール中ちょうど1つだけ</strong>が検出したもの
@@ -1939,9 +1906,7 @@ export default function Page() {
           <p>
             Osmaniはこの結果を「単一ツールを信頼していた時代は構造的に終わった。各ツールは異なる視点で異なる問題を見ている」と評しています。
           </p>
-          <h3 id="ベンチマーク数値の解釈には注意が必要">
-            ベンチマーク数値の解釈には注意が必要
-          </h3>
+          <h3 id="ベンチマーク数値の解釈には注意が必要">ベンチマーク数値の解釈には注意が必要</h3>
           <p>
             CodeRabbitの精度に関する数値は、出典によって大きく異なります。これは対象PRの母集団や評価基準が異なるためで、「どれか一つが間違っている」という単純な話ではありません。
           </p>
@@ -1957,9 +1922,7 @@ export default function Page() {
               <tbody>
                 <tr>
                   <td>CodeRabbit自社ベンチマーク</td>
-                  <td>
-                    F1 51.5%（Copilotは44.5%）、再現率52.5%（Copilotは36.7%）
-                  </td>
+                  <td>F1 51.5%（Copilotは44.5%）、再現率52.5%（Copilotは36.7%）</td>
                   <td>自社の評価基準・ハーネスに基づく</td>
                 </tr>
                 <tr>
@@ -1969,12 +1932,8 @@ export default function Page() {
                 </tr>
                 <tr>
                   <td>独立した309PRのベンチマーク</td>
-                  <td>
-                    CodeRabbit 44%、GitHub Copilot 54%、Greptile 82%
-                  </td>
-                  <td>
-                    評価基準・PR母集団がCodeRabbit自社ベンチマークと異なる
-                  </td>
+                  <td>CodeRabbit 44%、GitHub Copilot 54%、Greptile 82%</td>
+                  <td>評価基準・PR母集団がCodeRabbit自社ベンチマークと異なる</td>
                 </tr>
               </tbody>
             </table>
@@ -2010,9 +1969,7 @@ export default function Page() {
               によるオンデマンド運用に切り替える
             </li>
           </ul>
-          <h3 id="料金モデルとスケール時のコスト">
-            料金モデルとスケール時のコスト
-          </h3>
+          <h3 id="料金モデルとスケール時のコスト">料金モデルとスケール時のコスト</h3>
           <p>
             2026年8月時点の公式プランは次の通りです（価格は変更される可能性があるため、最終確認は公式の料金ページで行ってください）。
           </p>
@@ -2034,16 +1991,12 @@ export default function Page() {
                 <tr>
                   <td>Pro</td>
                   <td>$24 / $30（1開発者あたり月額）</td>
-                  <td>
-                    PRレビュー、高いレート制限、Knowledge Base、Autofix
-                  </td>
+                  <td>PRレビュー、高いレート制限、Knowledge Base、Autofix</td>
                 </tr>
                 <tr>
                   <td>Pro+</td>
                   <td>$48 / $60（1開発者あたり月額）</td>
-                  <td>
-                    Pro全機能＋Coding Plan、ユニットテスト生成、マージコンフリクト解消
-                  </td>
+                  <td>Pro全機能＋Coding Plan、ユニットテスト生成、マージコンフリクト解消</td>
                 </tr>
                 <tr>
                   <td>Enterprise</td>
@@ -2064,7 +2017,8 @@ export default function Page() {
           </p>
           <h3 id="静的解析ツールの重複">静的解析ツールの重複</h3>
           <p>
-            CodeRabbit Proには40以上のLinter・SASTツール連携が含まれますが、CIで既に同じLinterを実行しているチームも多いはずです。既存記事では、CIとの重複自体は「PR上に直接インラインコメントとして出るため、CIログをスクロールして探すより速い」というメリットがあるとされる一方、ESLintのように既にCIで厳格に運用しているツールは
+            CodeRabbit
+            Proには40以上のLinter・SASTツール連携が含まれますが、CIで既に同じLinterを実行しているチームも多いはずです。既存記事では、CIとの重複自体は「PR上に直接インラインコメントとして出るため、CIログをスクロールして探すより速い」というメリットがあるとされる一方、ESLintのように既にCIで厳格に運用しているツールは
             <code>reviews.tools.eslint.enabled: false</code>
             のように個別に無効化し、重複した指摘を減らす調整が有効です。
           </p>
@@ -2073,9 +2027,7 @@ export default function Page() {
             PRが大きいほど、AIレビューの見落としと的外れな指摘の両方が増える傾向が指摘されています。小さいPRは人間にとってのレビュー容易性を高めるだけでなく、CodeRabbitの解析精度そのものにも直結します。「PRが小説のように長い場合は、まず分割する」という原則は、AIレビュー導入後も変わらない基本です。
           </p>
           <hr />
-          <h2 id="16-まとめベストプラクティス一覧表">
-            16. まとめ：ベストプラクティス一覧表
-          </h2>
+          <h2 id="16-まとめベストプラクティス一覧表">16. まとめ：ベストプラクティス一覧表</h2>
           <div className={styles.tableScroll}>
             <table>
               <thead>
@@ -2087,9 +2039,7 @@ export default function Page() {
               <tbody>
                 <tr>
                   <td>導入</td>
-                  <td>
-                    1リポジトリで観察→最小設定→パイロット→段階拡大→月次棚卸し、の順で進める
-                  </td>
+                  <td>1リポジトリで観察→最小設定→パイロット→段階拡大→月次棚卸し、の順で進める</td>
                 </tr>
                 <tr>
                   <td>プロファイル</td>
@@ -2146,9 +2096,7 @@ export default function Page() {
                 </tr>
                 <tr>
                   <td>コスト管理</td>
-                  <td>
-                    座席課金の積み上がりを見越し、必要に応じて従量課金やCLI中心運用も検討する
-                  </td>
+                  <td>座席課金の積み上がりを見越し、必要に応じて従量課金やCLI中心運用も検討する</td>
                 </tr>
               </tbody>
             </table>
@@ -2162,9 +2110,7 @@ export default function Page() {
                 <li>
                   <span className={styles.refIcon}>↗</span>
                   <span className={styles.refText}>
-                    <span className={styles.refLabel}>
-                      CodeRabbitアーキテクチャ概要
-                    </span>
+                    <span className={styles.refLabel}>CodeRabbitアーキテクチャ概要</span>
                     <Ext href="https://docs.coderabbit.ai/overview/architecture">
                       https://docs.coderabbit.ai/overview/architecture
                     </Ext>
@@ -2173,9 +2119,7 @@ export default function Page() {
                 <li>
                   <span className={styles.refIcon}>↗</span>
                   <span className={styles.refText}>
-                    <span className={styles.refLabel}>
-                      コードレビュー概要
-                    </span>
+                    <span className={styles.refLabel}>コードレビュー概要</span>
                     <Ext href="https://docs.coderabbit.ai/guides/code-review-overview">
                       https://docs.coderabbit.ai/guides/code-review-overview
                     </Ext>
@@ -2184,9 +2128,7 @@ export default function Page() {
                 <li>
                   <span className={styles.refIcon}>↗</span>
                   <span className={styles.refText}>
-                    <span className={styles.refLabel}>
-                      YAML設定ガイド
-                    </span>
+                    <span className={styles.refLabel}>YAML設定ガイド</span>
                     <Ext href="https://docs.coderabbit.ai/getting-started/yaml-configuration">
                       https://docs.coderabbit.ai/getting-started/yaml-configuration
                     </Ext>
@@ -2195,9 +2137,7 @@ export default function Page() {
                 <li>
                   <span className={styles.refIcon}>↗</span>
                   <span className={styles.refText}>
-                    <span className={styles.refLabel}>
-                      設定の全体像と優先順位
-                    </span>
+                    <span className={styles.refLabel}>設定の全体像と優先順位</span>
                     <Ext href="https://docs.coderabbit.ai/guides/configuration-overview">
                       https://docs.coderabbit.ai/guides/configuration-overview
                     </Ext>
@@ -2215,9 +2155,7 @@ export default function Page() {
                 <li>
                   <span className={styles.refIcon}>↗</span>
                   <span className={styles.refText}>
-                    <span className={styles.refLabel}>
-                      パスベースのレビュー指示
-                    </span>
+                    <span className={styles.refLabel}>パスベースのレビュー指示</span>
                     <Ext href="https://docs.coderabbit.ai/configuration/path-instructions">
                       https://docs.coderabbit.ai/configuration/path-instructions
                     </Ext>
@@ -2226,9 +2164,7 @@ export default function Page() {
                 <li>
                   <span className={styles.refIcon}>↗</span>
                   <span className={styles.refText}>
-                    <span className={styles.refLabel}>
-                      ast-grepによる構造的指示
-                    </span>
+                    <span className={styles.refLabel}>ast-grepによる構造的指示</span>
                     <Ext href="https://docs.coderabbit.ai/configuration/ast-grep-instructions">
                       https://docs.coderabbit.ai/configuration/ast-grep-instructions
                     </Ext>
@@ -2264,9 +2200,7 @@ export default function Page() {
                 <li>
                   <span className={styles.refIcon}>↗</span>
                   <span className={styles.refText}>
-                    <span className={styles.refLabel}>
-                      Multi-Repo Analysis
-                    </span>
+                    <span className={styles.refLabel}>Multi-Repo Analysis</span>
                     <Ext href="https://docs.coderabbit.ai/knowledge-base/multi-repo-analysis">
                       https://docs.coderabbit.ai/knowledge-base/multi-repo-analysis
                     </Ext>
@@ -2311,9 +2245,7 @@ export default function Page() {
                 <li>
                   <span className={styles.refIcon}>↗</span>
                   <span className={styles.refText}>
-                    <span className={styles.refLabel}>
-                      CodeRabbit Review（Change Stack）
-                    </span>
+                    <span className={styles.refLabel}>CodeRabbit Review（Change Stack）</span>
                     <Ext href="https://docs.coderabbit.ai/pr-reviews/coderabbit-review">
                       https://docs.coderabbit.ai/pr-reviews/coderabbit-review
                     </Ext>
@@ -2331,9 +2263,7 @@ export default function Page() {
                 <li>
                   <span className={styles.refIcon}>↗</span>
                   <span className={styles.refText}>
-                    <span className={styles.refLabel}>
-                      Finishing Touches概要
-                    </span>
+                    <span className={styles.refLabel}>Finishing Touches概要</span>
                     <Ext href="https://docs.coderabbit.ai/finishing-touches/index">
                       https://docs.coderabbit.ai/finishing-touches/index
                     </Ext>
@@ -2342,9 +2272,7 @@ export default function Page() {
                 <li>
                   <span className={styles.refIcon}>↗</span>
                   <span className={styles.refText}>
-                    <span className={styles.refLabel}>
-                      レビューコマンド一覧
-                    </span>
+                    <span className={styles.refLabel}>レビューコマンド一覧</span>
                     <Ext href="https://docs.coderabbit.ai/reference/review-commands">
                       https://docs.coderabbit.ai/reference/review-commands
                     </Ext>
@@ -2362,9 +2290,7 @@ export default function Page() {
                 <li>
                   <span className={styles.refIcon}>↗</span>
                   <span className={styles.refText}>
-                    <span className={styles.refLabel}>
-                      IDE/CLIレビュー概要
-                    </span>
+                    <span className={styles.refLabel}>IDE/CLIレビュー概要</span>
                     <Ext href="https://docs.coderabbit.ai/overview/ide-cli-review">
                       https://docs.coderabbit.ai/overview/ide-cli-review
                     </Ext>
@@ -2391,9 +2317,7 @@ export default function Page() {
                 <li>
                   <span className={styles.refIcon}>↗</span>
                   <span className={styles.refText}>
-                    <span className={styles.refLabel}>
-                      VS Code拡張機能の設定
-                    </span>
+                    <span className={styles.refLabel}>VS Code拡張機能の設定</span>
                     <Ext href="https://docs.coderabbit.ai/ide/vscode-config">
                       https://docs.coderabbit.ai/ide/vscode-config
                     </Ext>
@@ -2402,9 +2326,7 @@ export default function Page() {
                 <li>
                   <span className={styles.refIcon}>↗</span>
                   <span className={styles.refText}>
-                    <span className={styles.refLabel}>
-                      CodeRabbit Plan概要
-                    </span>
+                    <span className={styles.refLabel}>CodeRabbit Plan概要</span>
                     <Ext href="https://docs.coderabbit.ai/plan/index">
                       https://docs.coderabbit.ai/plan/index
                     </Ext>
@@ -2428,8 +2350,7 @@ export default function Page() {
                   <span className={styles.refIcon}>↗</span>
                   <span className={styles.refText}>
                     <span className={styles.refLabel}>
-                      Addy Osmani, &quot;Agentic Code Review&quot;（O&apos;Reilly
-                      Radarへの転載）
+                      Addy Osmani, &quot;Agentic Code Review&quot;（O&apos;Reilly Radarへの転載）
                     </span>
                     <Ext href="https://www.oreilly.com/radar/agentic-code-review/">
                       https://www.oreilly.com/radar/agentic-code-review/
@@ -2451,8 +2372,7 @@ export default function Page() {
                   <span className={styles.refIcon}>↗</span>
                   <span className={styles.refText}>
                     <span className={styles.refLabel}>
-                      Daniel Moka, &quot;Code Review with AI: Best
-                      Practices&quot;
+                      Daniel Moka, &quot;Code Review with AI: Best Practices&quot;
                     </span>
                     <Ext href="https://craftbettersoftware.com/p/code-review-with-ai-best-practices">
                       https://craftbettersoftware.com/p/code-review-with-ai-best-practices
@@ -2474,8 +2394,7 @@ export default function Page() {
                   <span className={styles.refIcon}>↗</span>
                   <span className={styles.refText}>
                     <span className={styles.refLabel}>
-                      DeepSource, &quot;7 Best AI Code Review Tools for
-                      2026&quot;
+                      DeepSource, &quot;7 Best AI Code Review Tools for 2026&quot;
                     </span>
                     <Ext href="https://deepsource.com/resources/ai-code-review-tools">
                       https://deepsource.com/resources/ai-code-review-tools
@@ -2497,8 +2416,7 @@ export default function Page() {
                   <span className={styles.refIcon}>↗</span>
                   <span className={styles.refText}>
                     <span className={styles.refLabel}>
-                      CodeRabbit公式ブログ, &quot;State of AI vs Human Code
-                      Generation Report&quot;:
+                      CodeRabbit公式ブログ, &quot;State of AI vs Human Code Generation Report&quot;:
                     </span>
                     <Ext href="https://www.coderabbit.ai/blog/state-of-ai-vs-human-code-generation-report">
                       https://www.coderabbit.ai/blog/state-of-ai-vs-human-code-generation-report
@@ -2509,8 +2427,7 @@ export default function Page() {
                   <span className={styles.refIcon}>↗</span>
                   <span className={styles.refText}>
                     <span className={styles.refLabel}>
-                      Surmado Blog,
-                      CodeRabbit代替ツールの比較（料金面の課題整理）
+                      Surmado Blog, CodeRabbit代替ツールの比較（料金面の課題整理）
                     </span>
                     <Ext href="https://www.surmado.com/blog/best-coderabbit-alternatives-2026">
                       https://www.surmado.com/blog/best-coderabbit-alternatives-2026
@@ -2529,8 +2446,7 @@ export default function Page() {
         </article>
 
         <footer className={styles.pageFooter}>
-          情報源: docs.coderabbit.ai(2026年8月2日時点) / Addy Osmani, Daniel
-          Moka
+          情報源: docs.coderabbit.ai(2026年8月2日時点) / Addy Osmani, Daniel Moka
           ほか各種一次情報。料金・仕様は変更される可能性があるため、最終確認は公式サイトで行ってください。
         </footer>
       </main>

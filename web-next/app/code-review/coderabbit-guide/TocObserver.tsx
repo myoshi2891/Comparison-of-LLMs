@@ -11,7 +11,9 @@ export default function TocObserver() {
   useEffect(() => {
     const sidebar = document.getElementById("sidebar");
     const toggleBtn = document.getElementById("sidebarToggle");
-    const navLinks = Array.from(document.querySelectorAll<HTMLAnchorElement>(".nav-link, [data-id]"));
+    const navLinks = Array.from(
+      document.querySelectorAll<HTMLAnchorElement>(".nav-link, [data-id]")
+    );
 
     // Mobile sidebar toggle handler
     const handleToggleClick = () => {
@@ -71,7 +73,9 @@ export default function TocObserver() {
       }
     );
 
-    headings.forEach((heading) => observer.observe(heading));
+    headings.forEach((heading) => {
+      observer.observe(heading);
+    });
 
     return () => {
       if (toggleBtn) {
@@ -80,7 +84,9 @@ export default function TocObserver() {
       navLinks.forEach((link) => {
         link.removeEventListener("click", handleNavLinkClick);
       });
-      headings.forEach((heading) => observer.unobserve(heading));
+      headings.forEach((heading) => {
+        observer.unobserve(heading);
+      });
       observer.disconnect();
     };
   }, []);
