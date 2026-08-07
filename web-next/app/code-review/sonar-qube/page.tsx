@@ -739,7 +739,7 @@ export default function SonarQubeGuidePage() {
         </ul>
 
         <div className={styles.mermaidWrap}>
-          <MermaidDiagram chart={DIAG_7} />
+          <MermaidDiagram chart={DIAG_7} maxHeight="280px" />
         </div>
 
         <hr />
@@ -804,7 +804,7 @@ export default function SonarQubeGuidePage() {
         </ol>
 
         <div className={styles.mermaidWrap}>
-          <MermaidDiagram chart={DIAG_8} />
+          <MermaidDiagram chart={DIAG_8} maxHeight="280px" />
         </div>
 
         <p>
