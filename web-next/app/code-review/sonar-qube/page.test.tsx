@@ -22,7 +22,7 @@ describe("/code-review/sonar-qube", () => {
     const { container } = render(<Page />);
     const h1 = container.querySelector("h1");
     expect(h1?.textContent?.replace(/\s+/g, " ").trim()).toBe(
-      "SonarQubeコードレビュー実践ガイド 中級者〜上級者のためのベストプラクティス",
+      "SonarQubeコードレビュー実践ガイド中級者〜上級者のためのベストプラクティス",
     );
   });
 

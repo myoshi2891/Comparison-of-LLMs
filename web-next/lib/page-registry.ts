@@ -307,13 +307,13 @@ const entries: PageEntry[] = [
   },
   {
     slug: "/code-review/sonar-qube",
-    title: "SonarQube Guide",
+    title: "SonarQube 実践ガイド",
     group: "開発プロセス",
     topics: ["code-review", "review"],
     summary:
-      "SonarQube による静的解析とコード品質ゲートの実践ガイド。CI 連携とカバレッジ計測を解説。",
+      "Quality Gate設計からIssueトリアージ、CI/CD統合、そしてAC/DC時代のAIコーディングエージェント連携まで。SonarQube公式ドキュメントと業界動向をもとに解説。",
     addedAt: "2026-06-01",
-    lastReviewed: "2026-06-30",
+    lastReviewed: "2026-08-07",
   },
   {
     slug: "/code-review/tool-pricing",
