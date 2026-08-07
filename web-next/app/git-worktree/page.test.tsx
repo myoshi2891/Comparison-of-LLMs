@@ -2,6 +2,7 @@ import { render } from "@testing-library/react";
 import type { Metadata } from "next";
 import { describe, expect, it, vi } from "vitest";
 import Page, { metadata } from "./page";
+import styles from "./page.module.css";
 
 // MermaidDiagram は useEffect 内で mermaid を動的 import するためモック
 vi.mock("@/components/docs/MermaidDiagram", () => ({
@@ -45,5 +46,15 @@ describe("/git-worktree page", () => {
     const meta = metadata as Metadata;
     expect(typeof meta.title).toBe("string");
     expect(meta.title).toContain("git worktreeで実現する並列開発ベストプラクティスガイド");
+  });
+
+  it("すべてのコードブロックが行区切り（codeLine）かつシンタックスハイライトクラスを含んでいる", () => {
+    const { container } = render(<Page />);
+    const codeBlocks = Array.from(container.querySelectorAll(`.${styles.codeBlock}`));
+    expect(codeBlocks.length).toBeGreaterThan(0);
+    for (const block of codeBlocks) {
+      const codeLines = block.querySelectorAll(`.${styles.codeLine}`);
+      expect(codeLines.length).toBeGreaterThan(0);
+    }
   });
 });

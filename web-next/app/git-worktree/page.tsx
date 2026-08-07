@@ -485,47 +485,88 @@ export default function GitWorktreePage() {
               <p>
                 <strong>現在のブランチ構成を確認する</strong>
               </p>
-              <pre className={styles.codeBlock}>
-                <code>git branch -a git worktree list</code>
-              </pre>
+              <div className={styles.codeBlock}>
+                <div className={styles.codeLine}>
+                  <span className={styles.ck}>git</span>
+                  <span className={styles.fn}> branch</span>
+                  <span className={styles.cm}> -a</span>
+                </div>
+                <div className={styles.codeLine}>
+                  <span className={styles.ck}>git</span>
+                  <span className={styles.fn}> worktree</span>
+                  <span className={styles.cm}> list</span>
+                </div>
+              </div>
             </li>
             <li>
               <p>
                 <strong>新しいworktreeを作成する(既存ブランチの場合)</strong>
               </p>
-              <pre className={styles.codeBlock}>
-                <code>git worktree add ../my-project-feat-auth feat/auth</code>
-              </pre>
+              <div className={styles.codeBlock}>
+                <div className={styles.codeLine}>
+                  <span className={styles.ck}>git</span>
+                  <span className={styles.fn}> worktree</span>
+                  <span className={styles.cm}> add</span>
+                  <span className={styles.cs}> ../my-project-feat-auth</span>
+                  <span className={styles.cv}> feat/auth</span>
+                </div>
+              </div>
             </li>
             <li>
               <p>
                 <strong>新しいworktreeを作成する(新規ブランチを同時に切る場合)</strong>
               </p>
-              <pre className={styles.codeBlock}>
-                <code>
-                  git worktree add -b feat/payment-refactor ../my-project-payment-refactor
-                  origin/main
-                </code>
-              </pre>
+              <div className={styles.codeBlock}>
+                <div className={styles.codeLine}>
+                  <span className={styles.ck}>git</span>
+                  <span className={styles.fn}> worktree</span>
+                  <span className={styles.cm}> add -b</span>
+                  <span className={styles.cv}> feat/payment-refactor</span>
+                  <span className={styles.cs}> ../my-project-payment-refactor</span>
+                  <span className={styles.cv}> origin/main</span>
+                </div>
+              </div>
             </li>
             <li>
               <p>
                 <strong>作成されたworktreeに移動して作業する</strong>
               </p>
-              <pre className={styles.codeBlock}>
-                <code>cd ../my-project-feat-auth git status</code>
-              </pre>
+              <div className={styles.codeBlock}>
+                <div className={styles.codeLine}>
+                  <span className={styles.ck}>cd</span>
+                  <span className={styles.cs}> ../my-project-feat-auth</span>
+                </div>
+                <div className={styles.codeLine}>
+                  <span className={styles.ck}>git</span>
+                  <span className={styles.fn}> status</span>
+                </div>
+              </div>
             </li>
             <li>
               <p>
                 <strong>作業が終わったら安全に片付ける</strong>
               </p>
-              <pre className={styles.codeBlock}>
-                <code>
-                  cd ../my-project # メインの作業ディレクトリへ戻る git worktree remove
-                  ../my-project-feat-auth git worktree prune -v # 管理情報の掃除(念のため)
-                </code>
-              </pre>
+              <div className={styles.codeBlock}>
+                <div className={styles.codeLine}>
+                  <span className={styles.ck}>cd</span>
+                  <span className={styles.cs}> ../my-project</span>
+                  {"           "}
+                  <span className={styles.cc}># メインの作業ディレクトリへ戻る</span>
+                </div>
+                <div className={styles.codeLine}>
+                  <span className={styles.ck}>git</span>
+                  <span className={styles.fn}> worktree</span>
+                  <span className={styles.cm}> remove</span>
+                  <span className={styles.cs}> ../my-project-feat-auth</span>
+                </div>
+                <div className={styles.codeLine}>
+                  <span className={styles.ck}>git</span>
+                  <span className={styles.fn}> worktree</span>
+                  <span className={styles.cm}> prune -v</span>
+                  {"      "}
+                  <span className={styles.cc}># 管理情報の掃除(念のため)</span>
+                </div>
+              </div>
             </li>
           </ol>
           <blockquote>
@@ -588,14 +629,36 @@ export default function GitWorktreePage() {
             +
             複数worktreeという構成をベストプラクティスとして紹介しています。「作業対象になりうるメインの作業ディレクトリ」という特別扱いが存在しないため、全worktreeが対等に扱え、命名の一貫性も保ちやすいという利点があります。
           </p>
-          <pre className={styles.codeBlock}>
-            <code>
-              # パターンB: bareリポジトリから始める git clone --bare
-              https://github.com/your-org/your-project.git your-project.git cd your-project.git git
-              worktree add ../your-project/main main git worktree add ../your-project/feat-auth
-              feat/auth
-            </code>
-          </pre>
+          <div className={styles.codeBlock}>
+            <div className={styles.codeLine}>
+              <span className={styles.cc}># パターンB: bareリポジトリから始める</span>
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>git</span>
+              <span className={styles.fn}> clone</span>
+              <span className={styles.cm}> --bare</span>
+              <span className={styles.cs}> https://github.com/your-org/your-project.git</span>
+              <span className={styles.cv}> your-project.git</span>
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>cd</span>
+              <span className={styles.cs}> your-project.git</span>
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>git</span>
+              <span className={styles.fn}> worktree</span>
+              <span className={styles.cm}> add</span>
+              <span className={styles.cs}> ../your-project/main</span>
+              <span className={styles.cv}> main</span>
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>git</span>
+              <span className={styles.fn}> worktree</span>
+              <span className={styles.cm}> add</span>
+              <span className={styles.cs}> ../your-project/feat-auth</span>
+              <span className={styles.cv}> feat/auth</span>
+            </div>
+          </div>
 
           <h3 id="42-命名規則">4.2 命名規則</h3>
           <p>
@@ -762,16 +825,50 @@ export default function GitWorktreePage() {
             <code className={styles.inlineCode}>node_modules</code>
             が実体を持たずシンボリックリンクのみで構成される運用を、マルチエージェント開発向けの推奨パターンとして公開しています。この設定では、新しいworktreeを追加してもパッケージは既にグローバルストアに存在するため、インストールがほぼ瞬時に終わります。ただし、この共有ストアは「同じ信頼境界内にいる」エージェント・利用者同士でのみ使うべきで、互いに信頼できないエージェント間で書き込み可能な共有ストアを使うことは避けるべきだと明記されています。
           </p>
-          <pre className={styles.codeBlock}>
-            <code>
-              # pnpmのグローバル仮想ストアを有効化する例(.npmrc または pnpm-workspace.yaml) echo
-              &quot;enable-global-virtual-store=true&quot; &gt;&gt; .npmrc #
-              bareリポジトリ構成での運用例 git clone --bare
-              https://github.com/your-org/your-monorepo.git your-monorepo cd your-monorepo git
-              worktree add ./main main git worktree add ./feature-auth feat/auth # ←
-              node_modulesは即座に利用可能
-            </code>
-          </pre>
+          <div className={styles.codeBlock}>
+            <div className={styles.codeLine}>
+              <span className={styles.cc}>
+                # pnpmのグローバル仮想ストアを有効化する例(.npmrc または pnpm-workspace.yaml)
+              </span>
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>echo</span>
+              <span className={styles.cs}> &quot;enable-global-virtual-store=true&quot;</span>
+              <span className={styles.cm}> &gt;&gt;</span>
+              <span className={styles.cv}> .npmrc</span>
+            </div>
+            <div className={styles.codeLine} />
+            <div className={styles.codeLine}>
+              <span className={styles.cc}># bareリポジトリ構成での運用例</span>
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>git</span>
+              <span className={styles.fn}> clone</span>
+              <span className={styles.cm}> --bare</span>
+              <span className={styles.cs}> https://github.com/your-org/your-monorepo.git</span>
+              <span className={styles.cv}> your-monorepo</span>
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>cd</span>
+              <span className={styles.cs}> your-monorepo</span>
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>git</span>
+              <span className={styles.fn}> worktree</span>
+              <span className={styles.cm}> add</span>
+              <span className={styles.cs}> ./main</span>
+              <span className={styles.cv}> main</span>
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>git</span>
+              <span className={styles.fn}> worktree</span>
+              <span className={styles.cm}> add</span>
+              <span className={styles.cs}> ./feature-auth</span>
+              <span className={styles.cv}> feat/auth</span>
+              {"   "}
+              <span className={styles.cc}># ← node_modulesは即座に利用可能</span>
+            </div>
+          </div>
           <p>
             symlinkによる直接共有(
             <code className={styles.inlineCode}>ln -s ../myapp/node_modules node_modules</code>
@@ -785,12 +882,18 @@ export default function GitWorktreePage() {
             <code className={styles.inlineCode}>.env</code>
             も同様にGit管理外であることが多いため、worktreeを作るたびに手動でコピーする必要があります。
           </p>
-          <pre className={styles.codeBlock}>
-            <code>
-              # .env.example をリポジトリにコミットしておき、各worktreeで複製する運用 cp
-              .env.example .env
-            </code>
-          </pre>
+          <div className={styles.codeBlock}>
+            <div className={styles.codeLine}>
+              <span className={styles.cc}>
+                # .env.example をリポジトリにコミットしておき、各worktreeで複製する運用
+              </span>
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>cp</span>
+              <span className={styles.cs}> .env.example</span>
+              <span className={styles.cv}> .env</span>
+            </div>
+          </div>
 
           <h3 id="63-pythonuvvenvの場合">6.3 Python(uv/venv)の場合</h3>
           <p>
@@ -832,14 +935,35 @@ export default function GitWorktreePage() {
               データベースも同様に、worktreeごとにスキーマやDBブランチ(マネージドDBのbranching機能)を分ける
             </li>
           </ul>
-          <pre className={styles.codeBlock}>
-            <code>
-              # シンプルなポート自動割り当ての例(worktree名のハッシュ下位2桁を使う)
-              WORKTREE_NAME=$(basename &quot;$PWD&quot;) PORT_OFFSET=$(( 0x$(echo -n
-              &quot;$WORKTREE_NAME&quot; | md5sum | cut -c1-2) % 50 )) echo &quot;PORT=$((3000 +
-              PORT_OFFSET))&quot; &gt;&gt; .env
-            </code>
-          </pre>
+          <div className={styles.codeBlock}>
+            <div className={styles.codeLine}>
+              <span className={styles.cc}>
+                # シンプルなポート自動割り当ての例(worktree名のハッシュ下位2桁を使う)
+              </span>
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.cv}>WORKTREE_NAME</span>
+              <span className={styles.ck}>=$</span>
+              <span className={styles.cs}>(basename &quot;$PWD&quot;)</span>
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.cv}>PORT_OFFSET</span>
+              <span className={styles.ck}>=$((</span>
+              <span className={styles.cv}> 0x</span>
+              <span className={styles.ck}>$</span>
+              <span className={styles.cs}>
+                (echo -n &quot;$WORKTREE_NAME&quot; | md5sum | cut -c1-2)
+              </span>
+              <span className={styles.cm}> % 50 </span>
+              <span className={styles.ck}>))</span>
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>echo</span>
+              <span className={styles.cs}> &quot;PORT=$((3000 + PORT_OFFSET))&quot;</span>
+              <span className={styles.cm}> &gt;&gt;</span>
+              <span className={styles.cv}> .env</span>
+            </div>
+          </div>
 
           <h2 id="8-自動化スクリプトとgit-hooks">
             <span className={styles.chapterNum}>8</span>
@@ -850,19 +974,95 @@ export default function GitWorktreePage() {
             <code className={styles.inlineCode}>.env</code>コピー →
             ポート設定」を手動で行うのは非効率です。シェル関数として1コマンド化しておくと運用が大幅に楽になります。
           </p>
-          <pre className={styles.codeBlock}>
-            <code>
-              # ~/.zshrc または ~/.bashrc に追加する例 gwt() &#123; local branch=&quot;$1&quot;
-              local dir=&quot;../$(basename &quot;$(pwd)&quot;)-$(echo &quot;$branch&quot; | tr
-              &apos;/&apos; &apos;-&apos;)&quot; git worktree add -b &quot;$branch&quot;
-              &quot;$dir&quot; origin/main cd &quot;$dir&quot; || return #
-              依存関係のセットアップ(プロジェクトに応じて調整) if [ -f pnpm-lock.yaml ]; then pnpm
-              install elif [ -f package-lock.json ]; then npm ci fi # .envの用意 [ -f
-              ../&quot;$(basename &quot;$(dirname &quot;$dir&quot;)&quot;)&quot;/.env ] &amp;&amp;
-              cp ../&quot;$(basename &quot;$(dirname &quot;$dir&quot;)&quot;)&quot;/.env .env echo
-              &quot;worktree &apos;$dir&apos; の準備が完了しました&quot; &#125;
-            </code>
-          </pre>
+          <div className={styles.codeBlock}>
+            <div className={styles.codeLine}>
+              <span className={styles.cc}># ~/.zshrc または ~/.bashrc に追加する例</span>
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.fn}>gwt</span>
+              <span className={styles.ck}>() &#123;</span>
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}> local </span>
+              <span className={styles.cv}>branch</span>
+              <span className={styles.ck}>=</span>
+              <span className={styles.cs}>&quot;$1&quot;</span>
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}> local </span>
+              <span className={styles.cv}>dir</span>
+              <span className={styles.ck}>=</span>
+              <span className={styles.cs}>
+                &quot;../$(basename &quot;$(pwd)&quot;)-$(echo &quot;$branch&quot; | tr
+                &apos;/&apos; &apos;-&apos;)&quot;
+              </span>
+            </div>
+            <div className={styles.codeLine} />
+            <div className={styles.codeLine}>
+              <span className={styles.ck}> git</span>
+              <span className={styles.fn}> worktree</span>
+              <span className={styles.cm}> add -b</span>
+              <span className={styles.cs}> &quot;$branch&quot; &quot;$dir&quot;</span>
+              <span className={styles.cv}> origin/main</span>
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}> cd</span>
+              <span className={styles.cs}> &quot;$dir&quot;</span>
+              <span className={styles.ck}> || return</span>
+            </div>
+            <div className={styles.codeLine} />
+            <div className={styles.codeLine}>
+              <span className={styles.cc}> # 依存関係のセットアップ(プロジェクトに応じて調整)</span>
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}> if</span>
+              <span className={styles.cm}> [ -f pnpm-lock.yaml ]</span>
+              <span className={styles.ck}>; then</span>
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}> pnpm</span>
+              <span className={styles.fn}> install</span>
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}> elif</span>
+              <span className={styles.cm}> [ -f package-lock.json ]</span>
+              <span className={styles.ck}>; then</span>
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}> npm</span>
+              <span className={styles.fn}> ci</span>
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}> fi</span>
+            </div>
+            <div className={styles.codeLine} />
+            <div className={styles.codeLine}>
+              <span className={styles.cc}> # .envの用意</span>
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.cm}>
+                {" "}
+                [ -f ../&quot;$(basename &quot;$(dirname &quot;$dir&quot;)&quot;)&quot;/.env ]
+              </span>
+              <span className={styles.ck}> &amp;&amp; cp</span>
+              <span className={styles.cs}>
+                {" "}
+                ../&quot;$(basename &quot;$(dirname &quot;$dir&quot;)&quot;)&quot;/.env
+              </span>
+              <span className={styles.cv}> .env</span>
+            </div>
+            <div className={styles.codeLine} />
+            <div className={styles.codeLine}>
+              <span className={styles.ck}> echo</span>
+              <span className={styles.cs}>
+                {" "}
+                &quot;worktree &apos;$dir&apos; の準備が完了しました&quot;
+              </span>
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>&#125;</span>
+            </div>
+          </div>
           <p>
             Gitフックを使う場合は、<code className={styles.inlineCode}>core.hooksPath</code>
             をリポジトリ共通の場所に向けておくと、全worktreeで同じフック(例:{" "}

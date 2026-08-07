@@ -295,7 +295,42 @@
   margin: 0 0 26px;
   font-size: 13.6px;
   line-height: 1.7;
-  font-family: var(--font-mono);
+  font-family: var(--font-mono), "JetBrains Mono", Consolas, Menlo, monospace;
+  color: var(--text);
+}
+
+.codeLine {
+  white-space: pre;
+  min-height: 1.7em;
+}
+
+.ck {
+  color: #ff7b72;
+  font-weight: 600;
+}
+.cs {
+  color: #a5d6ff;
+}
+.cv {
+  color: #79c0ff;
+}
+.cc {
+  color: #8b949e;
+  font-style: italic;
+}
+.cm {
+  color: #7ee787;
+  font-weight: bold;
+}
+.fn {
+  color: #d2a8ff;
+}
+.cw {
+  color: #d29922;
+  font-weight: 600;
+}
+.ce {
+  color: #bc8cff;
 }
 
 .mermaidWrap {
