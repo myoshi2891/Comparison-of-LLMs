@@ -20,15 +20,12 @@ const CHECKLIST_ITEMS = [
     Quality
     Profileを組織共通のベースから継承する形で運用し、プロジェクト差分だけを子プロファイルで管理している
   </>,
-  <>
-    Issueトリアージ（Accepted / False
-    Positive判定）のレビュー時間をスプリントに組み込んだ
-  </>,
+  <>Issueトリアージ（Accepted / False Positive判定）のレビュー時間をスプリントに組み込んだ</>,
   <>Security Hotspotのレビュー率100%をQuality Gate条件に含めた</>,
   <>SonarQube for IDEをConnected Modeでチーム全体に展開した</>,
   <>
-    CI/CDにプルリクエストデコレーション＋ブランチ保護ルールを設定し、Quality
-    Gate Redでマージ不可にした
+    CI/CDにプルリクエストデコレーション＋ブランチ保護ルールを設定し、Quality Gate
+    Redでマージ不可にした
   </>,
   <>
     <code>fetch-depth: 0</code>など、SCM blame情報が正しく取得できるCI設定を確認した
@@ -38,15 +35,12 @@ const CHECKLIST_ITEMS = [
     Serverなど、AI関連機能の要否をチームのAI活用度に応じて評価した
   </>,
   <>他のAIレビューツールと併用する場合、役割分担をドキュメント化した</>,
-  <>
-    半年〜1年に一度、Quality Gate・Quality
-    Profileの妥当性を棚卸しする運用を定めた
-  </>,
+  <>半年〜1年に一度、Quality Gate・Quality Profileの妥当性を棚卸しする運用を定めた</>,
 ];
 
 export default function Checklist() {
   const [checkedItems, setCheckedItems] = useState<boolean[]>(
-    new Array(CHECKLIST_ITEMS.length).fill(false),
+    new Array(CHECKLIST_ITEMS.length).fill(false)
   );
 
   const toggleItem = (index: number) => {
@@ -65,9 +59,7 @@ export default function Checklist() {
       <div className={styles.checklistHeader}>
         <span className={styles.checklistHeaderIcon}>✓</span>
         <span className={styles.checklistHeaderTitle}>チェックリスト</span>
-        <span
-          className={`${styles.checklistCounter} ${isAllDone ? styles.allDone : ""}`}
-        >
+        <span className={`${styles.checklistCounter} ${isAllDone ? styles.allDone : ""}`}>
           {doneCount} / {CHECKLIST_ITEMS.length} 完了
         </span>
       </div>
@@ -75,13 +67,10 @@ export default function Checklist() {
         {CHECKLIST_ITEMS.map((item, idx) => {
           const isChecked = checkedItems[idx];
           return (
-            <li key={idx} className={isChecked ? styles.checkedLi : ""}>
+            /* biome-ignore lint/suspicious/noArrayIndexKey: items are static and constant in order */
+            <li key={`chk-${idx}`} className={isChecked ? styles.checkedLi : ""}>
               <label>
-                <input
-                  type="checkbox"
-                  checked={isChecked}
-                  onChange={() => toggleItem(idx)}
-                />
+                <input type="checkbox" checked={isChecked} onChange={() => toggleItem(idx)} />
                 <span>{item}</span>
               </label>
             </li>

@@ -6,9 +6,7 @@ export default function TocObserver() {
   useEffect(() => {
     const sidebar = document.getElementById("sidebar");
     const toggleBtn = document.getElementById("sidebarToggle");
-    const navLinks = Array.from(
-      document.querySelectorAll<HTMLAnchorElement>("#sidebar nav a"),
-    );
+    const navLinks = Array.from(document.querySelectorAll<HTMLAnchorElement>("#sidebar nav a"));
 
     const handleToggleClick = () => {
       if (sidebar) {
@@ -37,9 +35,7 @@ export default function TocObserver() {
       link.addEventListener("click", handleNavLinkClick);
     });
 
-    const headings = Array.from(
-      document.querySelectorAll<HTMLElement>("main h2[id]"),
-    );
+    const headings = Array.from(document.querySelectorAll<HTMLElement>("main h2[id]"));
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -62,7 +58,7 @@ export default function TocObserver() {
       {
         rootMargin: "-15% 0px -75% 0px",
         threshold: 0,
-      },
+      }
     );
 
     headings.forEach((heading) => {

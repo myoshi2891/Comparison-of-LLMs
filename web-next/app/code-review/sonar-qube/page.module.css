@@ -16,7 +16,7 @@
   --red: #f87171;
   --amber: #fbbf24;
   --sidebar-w: 296px;
-  --font-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
 
   display: block;
   background: var(--bg);
@@ -151,12 +151,7 @@
   font-size: 2.5rem;
   line-height: 1.35;
   margin: 0 0 14px;
-  background: linear-gradient(
-    120deg,
-    #ffffff 0%,
-    var(--accent-strong) 60%,
-    var(--accent) 100%
-  );
+  background: linear-gradient(120deg, #ffffff 0%, var(--accent-strong) 60%, var(--accent) 100%);
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -427,7 +422,7 @@
   background: var(--bg-elevated);
 }
 
-.checklistCard input[type='checkbox'] {
+.checklistCard input[type="checkbox"] {
   appearance: none;
   -webkit-appearance: none;
   width: 19px;
@@ -441,13 +436,13 @@
   cursor: pointer;
 }
 
-.checklistCard input[type='checkbox']:checked {
+.checklistCard input[type="checkbox"]:checked {
   background: var(--accent);
   border-color: var(--accent);
 }
 
-.checklistCard input[type='checkbox']:checked::after {
-  content: '';
+.checklistCard input[type="checkbox"]:checked::after {
+  content: "";
   position: absolute;
   left: 5px;
   top: 1px;

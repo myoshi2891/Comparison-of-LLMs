@@ -1,3 +1,4 @@
+/* biome-ignore-all lint/suspicious/noTemplateCurlyInString: code examples contain bash/yaml variables */
 import type { Metadata } from "next";
 import MermaidDiagram from "@/components/docs/MermaidDiagram";
 import Checklist from "./Checklist";
@@ -5,8 +6,7 @@ import styles from "./page.module.css";
 import TocObserver from "./TocObserver";
 
 export const metadata: Metadata = {
-  title:
-    "SonarQubeコードレビュー実践ガイド ― 中級者〜上級者のためのベストプラクティス",
+  title: "SonarQubeコードレビュー実践ガイド ― 中級者〜上級者のためのベストプラクティス",
   description:
     "Quality Gate設計からIssueトリアージ、CI/CD統合、そしてAC/DC時代のAIコーディングエージェント連携まで。SonarQube公式ドキュメントと業界動向をもとに、ステップバイステップで整理しています。",
 };
@@ -183,15 +183,11 @@ export default function SonarQubeGuidePage() {
       <aside className={styles.sidebar} id="sidebar">
         <div className={styles.sidebarBrand}>
           <span className={styles.sidebarBrandDot} />
-          <span className={styles.sidebarBrandText}>
-            SonarQube Code Review Guide
-          </span>
+          <span className={styles.sidebarBrandText}>SonarQube Code Review Guide</span>
         </div>
         <p className={styles.sidebarLabel}>目次</p>
         <nav className={styles.sidebarNav}>
-          <a href="#1-sonarqubeの現在地2026年の全体像">
-            1. SonarQubeの現在地：2026年の全体像
-          </a>
+          <a href="#1-sonarqubeの現在地2026年の全体像">1. SonarQubeの現在地：2026年の全体像</a>
           <a href="#2-エディション選定community-buildからdata-centerまで">
             2. エディション選定：Community BuildからData Centerまで
           </a>
@@ -222,12 +218,8 @@ export default function SonarQubeGuidePage() {
           <a href="#11-aiネイティブ時代のコードレビューacdcとsonar-vortex">
             11. AIネイティブ時代のコードレビュー：AC/DCとSonar Vortex
           </a>
-          <a href="#12-他のaiレビューツールとの併用戦略">
-            12. 他のAIレビューツールとの併用戦略
-          </a>
-          <a href="#13-よくあるアンチパターンと対策">
-            13. よくあるアンチパターンと対策
-          </a>
+          <a href="#12-他のaiレビューツールとの併用戦略">12. 他のAIレビューツールとの併用戦略</a>
+          <a href="#13-よくあるアンチパターンと対策">13. よくあるアンチパターンと対策</a>
           <a href="#14-導入運用チェックリスト">14. 導入〜運用チェックリスト</a>
           <a href="#15-まとめ">15. まとめ</a>
           <a href="#16-参考文献出典">16. 参考文献・出典</a>
@@ -259,9 +251,7 @@ export default function SonarQubeGuidePage() {
 
         <hr />
 
-        <h2 id="1-sonarqubeの現在地2026年の全体像">
-          1. SonarQubeの現在地：2026年の全体像
-        </h2>
+        <h2 id="1-sonarqubeの現在地2026年の全体像">1. SonarQubeの現在地：2026年の全体像</h2>
         <p>
           SonarQube（開発元:
           Sonar社）は2006年の登場以来、静的解析（SAST）とコード品質管理の業界標準的ポジションを維持してきたプラットフォームです。7,000万行規模のコードベースから個人開発まで、40以上の言語・フレームワーク・IaC技術に対応し、7,000,000人以上の開発者、400,000以上の組織で利用されています。
@@ -292,9 +282,7 @@ export default function SonarQubeGuidePage() {
                 <td>
                   <strong>SonarQube Community Build</strong>
                 </td>
-                <td>
-                  無料・OSSビルド。毎月リリースされる独自のバージョニング体系
-                </td>
+                <td>無料・OSSビルド。毎月リリースされる独自のバージョニング体系</td>
               </tr>
               <tr>
                 <td>SonarCloud</td>
@@ -318,11 +306,11 @@ export default function SonarQubeGuidePage() {
 
         <p>
           さらに2025年には、SonarQube ServerとSonarQube
-          Cloudのバージョニングがカレンダーバージョニング（例:{" "}
-          <code>2026.1</code>、<code>2026.2</code>
+          Cloudのバージョニングがカレンダーバージョニング（例: <code>2026.1</code>、
+          <code>2026.2</code>
           ）に統一され、年1回のLong-Term Active（LTA）リリース（2026年は
-          <code>2026.1</code>）を軸に運用する体制に移行しました。Community
-          Buildは<code>YY.M.0.BuildNumber</code>
+          <code>2026.1</code>）を軸に運用する体制に移行しました。Community Buildは
+          <code>YY.M.0.BuildNumber</code>
           形式で毎月リリースされ、LTAの概念を持たない点がServerとの大きな違いです。
         </p>
         <p>
@@ -374,25 +362,19 @@ export default function SonarQubeGuidePage() {
               <tr>
                 <td>SonarQube Server Enterprise Edition</td>
                 <td>可</td>
-                <td>
-                  テイント解析、ポートフォリオ管理、コンプライアンスレポート
-                </td>
+                <td>テイント解析、ポートフォリオ管理、コンプライアンスレポート</td>
                 <td>複数チーム・複数プロジェクトの大規模組織</td>
               </tr>
               <tr>
                 <td>SonarQube Server Data Center Edition</td>
                 <td>可</td>
-                <td>
-                  高可用性、水平スケーリング、ゼロダウンタイムアップグレード
-                </td>
+                <td>高可用性、水平スケーリング、ゼロダウンタイムアップグレード</td>
                 <td>ミッションクリティカルな大規模基盤</td>
               </tr>
               <tr>
                 <td>SonarQube Cloud（Free/Team/Enterprise）</td>
                 <td>Freeから可（5万行まで）</td>
-                <td>
-                  インフラ管理不要、GitHub/GitLab/Bitbucket/Azure DevOps連携
-                </td>
+                <td>インフラ管理不要、GitHub/GitLab/Bitbucket/Azure DevOps連携</td>
                 <td>インフラ運用を持ちたくない全規模のチーム</td>
               </tr>
             </tbody>
@@ -402,12 +384,11 @@ export default function SonarQubeGuidePage() {
         <p>実務上の判断基準は次の3つに集約されます。</p>
         <ul>
           <li>
-            <strong>プルリクエストベースの開発フローを使うか</strong> →
-            使うなら最低でもDeveloper EditionかSonarQube Cloud（Free可）が必須ライン
+            <strong>プルリクエストベースの開発フローを使うか</strong> → 使うなら最低でもDeveloper
+            EditionかSonarQube Cloud（Free可）が必須ライン
           </li>
           <li>
-            <strong>データ主権・エアギャップ要件があるか</strong> →
-            あれば自己ホストのServer系一択
+            <strong>データ主権・エアギャップ要件があるか</strong> → あれば自己ホストのServer系一択
           </li>
           <li>
             <strong>コードベース規模とライセンス費用のバランス</strong> →
@@ -415,8 +396,7 @@ export default function SonarQubeGuidePage() {
           </li>
         </ul>
         <p>
-          なお、SonarQube Advanced Security（2025年提供開始）はEnterprise
-          Edition／Enterprise
+          なお、SonarQube Advanced Security（2025年提供開始）はEnterprise Edition／Enterprise
           Cloud向けのアドオンで、依存関係の脆弱性検出（SCA）、悪意あるパッケージ検出、ライセンスコンプライアンス、CycloneDX/SPDX形式でのSBOM生成をカバーします。単なるコード品質ツールから、サプライチェーンセキュリティまで含む「検証プラットフォーム」へと役割が広がっている点は、エディション選定時に加味すべきポイントです。
         </p>
 
@@ -435,8 +415,7 @@ export default function SonarQubeGuidePage() {
         </p>
         <ul>
           <li>
-            数年分のレガシーコードの技術的負債を前に、Quality
-            Gateが恒久的に赤のまま形骸化する
+            数年分のレガシーコードの技術的負債を前に、Quality Gateが恒久的に赤のまま形骸化する
           </li>
           <li>新しく書いたコードが高品質でも、既存コードの負債に埋もれて評価されない</li>
           <li>「誰が悪いのか」が不明確になり、チームの当事者意識が薄れる</li>
@@ -515,9 +494,7 @@ export default function SonarQubeGuidePage() {
               <tr>
                 <td>Adaptable（適応性）</td>
                 <td>単一責任・重複排除・モジュール化・テストがされている</td>
-                <td>
-                  高凝集な関数、重複コードの排除、十分なテストカバレッジ
-                </td>
+                <td>高凝集な関数、重複コードの排除、十分なテストカバレッジ</td>
               </tr>
               <tr>
                 <td>Responsible（責任）</td>
@@ -529,8 +506,8 @@ export default function SonarQubeGuidePage() {
         </div>
 
         <p>
-          これらの属性に問題があると、最終的に{" "}
-          <strong>Software Qualities（3つの品質特性）</strong> に影響します。
+          これらの属性に問題があると、最終的に <strong>Software Qualities（3つの品質特性）</strong>{" "}
+          に影響します。
         </p>
 
         <div className={styles.tableScroll}>
@@ -577,15 +554,13 @@ export default function SonarQubeGuidePage() {
 
         <hr />
 
-        <h2 id="5-quality-gate設計のベストプラクティス">
-          5. Quality Gate設計のベストプラクティス
-        </h2>
+        <h2 id="5-quality-gate設計のベストプラクティス">5. Quality Gate設計のベストプラクティス</h2>
         <p>
           Quality
           Gateは「このプロジェクトはリリース可能か」という一つの問いに答えるための、条件のセットです。組み込みの{" "}
           <code>Sonar way</code> Quality
-          Gateは、SonarSourceによって提供・維持される読み取り専用のゲートで、Clean as
-          You Codeを体現するベストプラクティスとして機能します。
+          Gateは、SonarSourceによって提供・維持される読み取り専用のゲートで、Clean as You
+          Codeを体現するベストプラクティスとして機能します。
         </p>
 
         <p>
@@ -657,9 +632,7 @@ export default function SonarQubeGuidePage() {
 
         <hr />
 
-        <h2 id="6-quality-profileとルールチューニング">
-          6. Quality Profileとルールチューニング
-        </h2>
+        <h2 id="6-quality-profileとルールチューニング">6. Quality Profileとルールチューニング</h2>
         <p>
           Quality
           Profileは、言語ごとに「どのルールを有効化するか」「重要度をどう設定するか」を定義する設定セットです。SonarQubeは6,500以上の決定論的ルールを提供しており、これを無調整のまま大規模プロジェクトに適用すると、初回スキャンだけで数千件のIssueが検出されることも珍しくありません。
@@ -677,9 +650,7 @@ export default function SonarQubeGuidePage() {
             ：ゼロから設計するのではなく、SonarSourceが継続的にメンテナンスするデフォルトを土台にする
           </li>
           <li>
-            <strong>
-              プロジェクトの技術スタックに合わせてカスタムプロファイルを作成する
-            </strong>
+            <strong>プロジェクトの技術スタックに合わせてカスタムプロファイルを作成する</strong>
             ：フレームワーク固有の警告（例:
             特定のテストフレームワークでは誤検知になりやすいルール）を無効化する
           </li>
@@ -703,9 +674,7 @@ export default function SonarQubeGuidePage() {
 
         <hr />
 
-        <h2 id="7-issueライフサイクル管理とトリアージ">
-          7. Issueライフサイクル管理とトリアージ
-        </h2>
+        <h2 id="7-issueライフサイクル管理とトリアージ">7. Issueライフサイクル管理とトリアージ</h2>
         <p>
           検出されたIssueをどう扱うかは、チームのコードレビュー文化そのものを反映します。SonarQubeのIssueステータスモデルは近年整理され、
           <code>Confirmed</code>（確認済み）や<code>Resolve as Fixed</code>
@@ -760,9 +729,7 @@ export default function SonarQubeGuidePage() {
             権限が必要です。誰でも自己判断で握りつぶせない設計になっている点を、チーム運用でも尊重するべきです
           </li>
           <li>
-            <strong>
-              特定ルールでFalse Positiveが頻発する場合はプロファイル側を見直す
-            </strong>
+            <strong>特定ルールでFalse Positiveが頻発する場合はプロファイル側を見直す</strong>
             ：個別のIssueを握りつぶすのではなく、ルール自体が自分たちのプロジェクトに合っていないというシグナルとして扱う
           </li>
           <li>
@@ -777,9 +744,7 @@ export default function SonarQubeGuidePage() {
 
         <hr />
 
-        <h2 id="8-security-hotspotレビューワークフロー">
-          8. Security Hotspotレビューワークフロー
-        </h2>
+        <h2 id="8-security-hotspotレビューワークフロー">8. Security Hotspotレビューワークフロー</h2>
         <p>
           Security
           HotspotはVulnerability（脆弱性）とは異なる概念です。Vulnerabilityは「ほぼ確実に問題があるコード」を指すのに対し、Security
@@ -812,34 +777,30 @@ export default function SonarQubeGuidePage() {
               </tr>
               <tr>
                 <td>Safe</td>
-                <td>
-                  レビューの結果、他の防御層により対応不要と判断した
-                </td>
+                <td>レビューの結果、他の防御層により対応不要と判断した</td>
               </tr>
             </tbody>
           </table>
         </div>
 
         <p>
-          レビュー時にSonarQubeが提示する3つの観点（What's the risk / Are you at
-          risk / How can you fix it）に沿って判断するのが標準的な手順です。
+          レビュー時にSonarQubeが提示する3つの観点（What's the risk / Are you at risk / How can you
+          fix it）に沿って判断するのが標準的な手順です。
         </p>
 
         <ol>
           <li>
-            <strong>What's the risk?</strong>{" "}
-            タブでそのHotspotがなぜ検出されたかを理解する
+            <strong>What's the risk?</strong> タブでそのHotspotがなぜ検出されたかを理解する
           </li>
           <li>
-            <strong>Are you at risk?</strong> タブの「Ask Yourself Whether」の質問リストに沿って、自分たちのコンテキストで本当にリスクがあるかを判定する
+            <strong>Are you at risk?</strong> タブの「Ask Yourself
+            Whether」の質問リストに沿って、自分たちのコンテキストで本当にリスクがあるかを判定する
           </li>
           <li>
             リスクがあると判断した場合、<strong>How can you fix it?</strong>{" "}
             タブの推奨されるセキュアコーディングプラクティスに沿って修正する
           </li>
-          <li>
-            最終的にFixed（修正済み）またはSafe（対応不要）のステータスを設定する
-          </li>
+          <li>最終的にFixed（修正済み）またはSafe（対応不要）のステータスを設定する</li>
         </ol>
 
         <div className={styles.mermaidWrap}>
@@ -847,8 +808,7 @@ export default function SonarQubeGuidePage() {
         </div>
 
         <p>
-          Quality Gateの条件に「新規コードのSecurity
-          Hotspotレビュー率100%」を含めるのがSonar
+          Quality Gateの条件に「新規コードのSecurity Hotspotレビュー率100%」を含めるのがSonar
           wayのデフォルトです。これにより、「未レビューのHotspotを放置したままリリースする」という事態を構造的に防止できます。レビュー優先度は高い順に並べ替えられるため、まずは高優先度のHotspotから着手するのが定石です。
         </p>
 
@@ -866,8 +826,8 @@ export default function SonarQubeGuidePage() {
         <p>シフトレフトを機能させる実務上のポイント:</p>
         <ul>
           <li>
-            <strong>Connected Modeを使う</strong>：SonarQube for
-            IDEをSonarQube Server／Cloudに接続すると、サーバー側のQuality
+            <strong>Connected Modeを使う</strong>：SonarQube for IDEをSonarQube
+            Server／Cloudに接続すると、サーバー側のQuality
             Profile設定がIDEにも同期され、「IDEでは指摘されなかったのにCIで落ちた」というギャップを防げます
           </li>
           <li>
@@ -876,8 +836,8 @@ export default function SonarQubeGuidePage() {
             CodeFix、後述）をワンクリックで適用できるため、修正の心理的ハードルが下がります
           </li>
           <li>
-            <strong>エディタ非依存の拡張性</strong>：Eclipse、Visual
-            Studio、VS Code、IntelliJ IDEAに加え、Cursor・Windsurfなど「AIネイティブ」なエディタにも対応が広がっている点は、AIエージェント併用時代のシフトレフト戦略として重要です
+            <strong>エディタ非依存の拡張性</strong>：Eclipse、Visual Studio、VS Code、IntelliJ
+            IDEAに加え、Cursor・Windsurfなど「AIネイティブ」なエディタにも対応が広がっている点は、AIエージェント併用時代のシフトレフト戦略として重要です
           </li>
         </ul>
 
@@ -900,32 +860,26 @@ export default function SonarQubeGuidePage() {
           <div className={styles.codeLine}>name: SonarQube Analysis</div>
           <div className={styles.codeLine} />
           <div className={styles.codeLine}>on:</div>
-          <div className={styles.codeLine}>  push:</div>
-          <div className={styles.codeLine}>    branches: [main]</div>
-          <div className={styles.codeLine}>  pull_request:</div>
-          <div className={styles.codeLine}>
-            {"    types: [opened, synchronize, reopened]"}
-          </div>
+          <div className={styles.codeLine}> push:</div>
+          <div className={styles.codeLine}> branches: [main]</div>
+          <div className={styles.codeLine}> pull_request:</div>
+          <div className={styles.codeLine}>{"    types: [opened, synchronize, reopened]"}</div>
           <div className={styles.codeLine} />
           <div className={styles.codeLine}>jobs:</div>
-          <div className={styles.codeLine}>  sonarqube:</div>
-          <div className={styles.codeLine}>    runs-on: ubuntu-latest</div>
-          <div className={styles.codeLine}>    steps:</div>
-          <div className={styles.codeLine}>
-            {"      - uses: actions/checkout@v4"}
-          </div>
-          <div className={styles.codeLine}>        with:</div>
+          <div className={styles.codeLine}> sonarqube:</div>
+          <div className={styles.codeLine}> runs-on: ubuntu-latest</div>
+          <div className={styles.codeLine}> steps:</div>
+          <div className={styles.codeLine}>{"      - uses: actions/checkout@v4"}</div>
+          <div className={styles.codeLine}> with:</div>
           <div className={styles.codeLine}>
             {"          fetch-depth: 0   # blame情報を正確にするため全履歴を取得"}
           </div>
           <div className={styles.codeLine} />
-          <div className={styles.codeLine}>
-            {"      - name: SonarQube Scan"}
-          </div>
+          <div className={styles.codeLine}>{"      - name: SonarQube Scan"}</div>
           <div className={styles.codeLine}>
             {"        uses: SonarSource/sonarqube-scan-action@v5"}
           </div>
-          <div className={styles.codeLine}>        env:</div>
+          <div className={styles.codeLine}> env:</div>
           <div className={styles.codeLine}>
             {"          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}"}
           </div>
@@ -933,16 +887,12 @@ export default function SonarQubeGuidePage() {
             {"          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}"}
           </div>
           <div className={styles.codeLine} />
+          <div className={styles.codeLine}>{"      - name: SonarQube Quality Gate check"}</div>
           <div className={styles.codeLine}>
-            {"      - name: SonarQube Quality Gate check"}
+            {"        uses: SonarSource/sonarqube-quality-gate-action@master"}
           </div>
-          <div className={styles.codeLine}>
-            {
-              "        uses: SonarSource/sonarqube-quality-gate-action@master"
-            }
-          </div>
-          <div className={styles.codeLine}>        timeout-minutes: 5</div>
-          <div className={styles.codeLine}>        env:</div>
+          <div className={styles.codeLine}> timeout-minutes: 5</div>
+          <div className={styles.codeLine}> env:</div>
           <div className={styles.codeLine}>
             {"          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}"}
           </div>
@@ -954,7 +904,8 @@ export default function SonarQubeGuidePage() {
             <strong>
               <code>fetch-depth: 0</code>を必ず設定する
             </strong>
-            ：浅いクローンのままだとSCM blame情報（誰がどの行を書いたか）が不正確になり、Issueの自動アサインが機能しません
+            ：浅いクローンのままだとSCM
+            blame情報（誰がどの行を書いたか）が不正確になり、Issueの自動アサインが機能しません
           </li>
           <li>
             <strong>
@@ -1007,15 +958,13 @@ export default function SonarQubeGuidePage() {
                 <td>AI CodeFix</td>
                 <td>検出されたIssueに対し、LLMによる修正案を自動生成</td>
                 <td>
-                  GA（一般提供）。Enterprise/Data Center、SonarQube
-                  CloudのTeam/Enterprise向け
+                  GA（一般提供）。Enterprise/Data Center、SonarQube CloudのTeam/Enterprise向け
                 </td>
               </tr>
               <tr>
                 <td>AI Code Assurance</td>
                 <td>
-                  AI生成コードを含むプロジェクトにラベル付けし、より厳格なQuality
-                  Gateを自動適用
+                  AI生成コードを含むプロジェクトにラベル付けし、より厳格なQuality Gateを自動適用
                 </td>
                 <td>提供中</td>
               </tr>
@@ -1043,9 +992,7 @@ export default function SonarQubeGuidePage() {
               </tr>
               <tr>
                 <td>SonarQube Remediation Agent</td>
-                <td>
-                  バックグラウンドで自律的に技術的負債を検出・修正するエージェント
-                </td>
+                <td>バックグラウンドで自律的に技術的負債を検出・修正するエージェント</td>
                 <td>GA</td>
               </tr>
             </tbody>
@@ -1053,8 +1000,7 @@ export default function SonarQubeGuidePage() {
         </div>
 
         <p>
-          このアーキテクチャの核心は、著名なエンジニアリングブロガーであるAddy
-          Osmani氏（Google
+          このアーキテクチャの核心は、著名なエンジニアリングブロガーであるAddy Osmani氏（Google
           Chrome関連のエンジニアリングリーダーとして知られる）が指摘する
           <strong>「maker-checker split（作る側と検証する側を分離する）」</strong>
           という原則です。同氏は2026年6月、「無人で回り続けるループは、無人でミスを重ねるループでもある」という趣旨の指摘をしており、Sonarはこれを引用する形で、コードを生成するモデルと、それを検証する仕組みを意図的に分離する設計思想（同社はこれを「ゼロトラスト」なコード検証と呼んでいます）を採用しています。
@@ -1066,9 +1012,7 @@ export default function SonarQubeGuidePage() {
         </p>
 
         <ul>
-          <li>
-            個人開発では、テストスイートを安全網としながら高速に検証するワークフローが現実的
-          </li>
+          <li>個人開発では、テストスイートを安全網としながら高速に検証するワークフローが現実的</li>
           <li>
             チーム開発では、複数人が関わる分コードの寿命とミスのコストが上がるため、人間によるレビューは「AIが見落とすもの」（ロードマップとの整合性、組織的な意思決定）に焦点を移しつつ、なくならない
           </li>
@@ -1089,9 +1033,7 @@ export default function SonarQubeGuidePage() {
 
         <hr />
 
-        <h2 id="12-他のaiレビューツールとの併用戦略">
-          12. 他のAIレビューツールとの併用戦略
-        </h2>
+        <h2 id="12-他のaiレビューツールとの併用戦略">12. 他のAIレビューツールとの併用戦略</h2>
         <p>
           2026年の実務者コミュニティでは、SonarQubeを「唯一のレビューツール」として使うのではなく、
           <strong>
@@ -1144,21 +1086,15 @@ export default function SonarQubeGuidePage() {
 
         <ol>
           <li>
-            <strong>
-              SonarQube（+ Quality Gate）を必須のマージゲートとして固定する
-            </strong>
+            <strong>SonarQube（+ Quality Gate）を必須のマージゲートとして固定する</strong>
             ：決定論的でぶれない基準は「絶対に守るライン」として機能させる
           </li>
           <li>
-            <strong>
-              AIレビューツールをコンテキストレビューの補助として並走させる
-            </strong>
+            <strong>AIレビューツールをコンテキストレビューの補助として並走させる</strong>
             ：ビジネスロジックの妥当性やレビューコメントの自然言語での要約などは、AI側の得意領域に任せる
           </li>
           <li>
-            <strong>
-              重複ノイズを避けるため、どちらが何を指摘する役割かをチームで明文化する
-            </strong>
+            <strong>重複ノイズを避けるため、どちらが何を指摘する役割かをチームで明文化する</strong>
             ：両方が同じ種類の指摘（フォーマットなど）をコメントすると、レビュー体験がかえって悪化します
           </li>
         </ol>
@@ -1170,12 +1106,8 @@ export default function SonarQubeGuidePage() {
 
         <hr />
 
-        <h2 id="13-よくあるアンチパターンと対策">
-          13. よくあるアンチパターンと対策
-        </h2>
-        <p>
-          中級〜上級チームでも陥りやすい代表的なアンチパターンを、判断フローの形で整理します。
-        </p>
+        <h2 id="13-よくあるアンチパターンと対策">13. よくあるアンチパターンと対策</h2>
+        <p>中級〜上級チームでも陥りやすい代表的なアンチパターンを、判断フローの形で整理します。</p>
 
         <div className={styles.mermaidWrap}>
           <MermaidDiagram chart={DIAG_13} />
@@ -1224,23 +1156,15 @@ export default function SonarQubeGuidePage() {
           <div className={styles.warningCard}>
             <span className={styles.warningIcon}>⚠</span>
             <div className={styles.warningBody}>
-              <strong>
-                AIレビューツールとの役割分担を決めないまま両方導入する
-              </strong>
-              <p>
-                同じ種類の指摘が重複し、レビューのノイズが増えて開発者の信頼を失う
-              </p>
+              <strong>AIレビューツールとの役割分担を決めないまま両方導入する</strong>
+              <p>同じ種類の指摘が重複し、レビューのノイズが増えて開発者の信頼を失う</p>
             </div>
           </div>
           <div className={styles.warningCard}>
             <span className={styles.warningIcon}>⚠</span>
             <div className={styles.warningBody}>
-              <strong>
-                Security Hotspotを「Issueより優先度が低い」と誤解して放置する
-              </strong>
-              <p>
-                レビュー率100%をQuality Gate条件に含めることで、構造的に防止する
-              </p>
+              <strong>Security Hotspotを「Issueより優先度が低い」と誤解して放置する</strong>
+              <p>レビュー率100%をQuality Gate条件に含めることで、構造的に防止する</p>
             </div>
           </div>
         </div>
@@ -1288,9 +1212,8 @@ export default function SonarQubeGuidePage() {
         </div>
 
         <p className={styles.closingStatement}>
-          2026年のSonarQubeは、AC/DC（Agent Centric Development
-          Cycle）というフレームワークの下でAI CodeFix、Agentic Analysis、Sonar
-          Vortex、Remediation
+          2026年のSonarQubeは、AC/DC（Agent Centric Development Cycle）というフレームワークの下でAI
+          CodeFix、Agentic Analysis、Sonar Vortex、Remediation
           Agentといった機能群を急速に拡張しており、「静的解析ツール」から「AI生成コードを含むあらゆるコードの検証プラットフォーム」への転換の途上にあります。ツールの機能を追いかけるだけでなく、Clean
           as You CodeとClean Code
           Taxonomyという不変の設計思想を理解しておくことが、この変化の速い領域で判断を誤らないための土台になります。
@@ -1306,9 +1229,7 @@ export default function SonarQubeGuidePage() {
               <span className={styles.refIcon}>↗</span>
               <span>
                 Sonar Documentation トップページ{" "}
-                <Ext href="https://docs.sonarsource.com/">
-                  https://docs.sonarsource.com/
-                </Ext>
+                <Ext href="https://docs.sonarsource.com/">https://docs.sonarsource.com/</Ext>
               </span>
             </div>
             <div className={styles.refRow}>
@@ -1332,8 +1253,7 @@ export default function SonarQubeGuidePage() {
             <div className={styles.refRow}>
               <span className={styles.refIcon}>↗</span>
               <span>
-                Clean Code benefits: the software qualities（SonarQube Server
-                10.8）{" "}
+                Clean Code benefits: the software qualities（SonarQube Server 10.8）{" "}
                 <Ext href="https://docs.sonarsource.com/sonarqube-server/10.8/core-concepts/clean-code/software-qualities">
                   https://docs.sonarsource.com/sonarqube-server/10.8/core-concepts/clean-code/software-qualities
                 </Ext>
@@ -1436,8 +1356,7 @@ export default function SonarQubeGuidePage() {
             <div className={styles.refRow}>
               <span className={styles.refIcon}>↗</span>
               <span>
-                Sonar Streamlines Product Naming（ブランド統合の発表,
-                2024年10月）{" "}
+                Sonar Streamlines Product Naming（ブランド統合の発表, 2024年10月）{" "}
                 <Ext href="https://www.sonarsource.com/company/press-releases/sonar-streamlines-product-naming-to-reflect-core-mission-of-code-quality-and-security/">
                   https://www.sonarsource.com/company/press-releases/sonar-streamlines-product-naming-to-reflect-core-mission-of-code-quality-and-security/
                 </Ext>
@@ -1496,8 +1415,8 @@ export default function SonarQubeGuidePage() {
             <div className={styles.refRow}>
               <span className={styles.refIcon}>↗</span>
               <span>
-                SonarQube Agentic Analysis: Verify AI code as it is
-                generated（Security Boulevard, 2026年3月）{" "}
+                SonarQube Agentic Analysis: Verify AI code as it is generated（Security Boulevard,
+                2026年3月）{" "}
                 <Ext href="https://securityboulevard.com/2026/03/sonarqube-agentic-analysis-verify-ai-code-as-it-is-generated/">
                   https://securityboulevard.com/2026/03/sonarqube-agentic-analysis-verify-ai-code-as-it-is-generated/
                 </Ext>
@@ -1506,8 +1425,8 @@ export default function SonarQubeGuidePage() {
             <div className={styles.refRow}>
               <span className={styles.refIcon}>↗</span>
               <span>
-                AI Code Review 2026: SonarQube vs CodeRabbit vs Copilot
-                Compared（Lushbinary, 実務比較記事）{" "}
+                AI Code Review 2026: SonarQube vs CodeRabbit vs Copilot Compared（Lushbinary,
+                実務比較記事）{" "}
                 <Ext href="https://lushbinary.com/blog/ai-code-review-tools-comparison-automated-pr-review/">
                   https://lushbinary.com/blog/ai-code-review-tools-comparison-automated-pr-review/
                 </Ext>
@@ -1557,8 +1476,7 @@ export default function SonarQubeGuidePage() {
         <div className={styles.pageFooter}>
           作成日:
           2026年8月時点の情報にもとづく。Sonar社の高頻度リリースにより、機能名・バージョン・提供段階は変更される可能性があります。最新情報は{" "}
-          <Ext href="https://docs.sonarsource.com/">docs.sonarsource.com</Ext>{" "}
-          を参照してください。
+          <Ext href="https://docs.sonarsource.com/">docs.sonarsource.com</Ext> を参照してください。
         </div>
       </main>
     </div>
