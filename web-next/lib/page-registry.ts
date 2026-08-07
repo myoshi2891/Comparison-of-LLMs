@@ -443,13 +443,13 @@ const entries: PageEntry[] = [
   },
   {
     slug: "/git-worktree",
-    title: "Git Worktree",
+    title: "git worktreeで実現する並列開発ベストプラクティスガイド",
     group: "開発プロセス",
-    topics: ["worktree"],
+    topics: ["worktree", "git"],
     summary:
-      "Claude / Gemini / Codex / GitHub Copilot — 4プラットフォームのドキュメントをAIツールとWebSearchで並列更新するための完全ガイド。git worktreeのセットアップから日常ワークフロー・GitHub Actions統合まで。",
+      "AIコーディングエージェント時代に再注目される git worktree。内部構造からClaude Code / OpenAI Codex / Cursorとの統合、依存関係の分離、トラブルシューティングまでをステップバイステップで解説します。",
     addedAt: "2026-05-08",
-    lastReviewed: "2026-07-01",
+    lastReviewed: "2026-08-07",
   },
   {
     slug: "/sdd/ai-spec-driven-development-guide",

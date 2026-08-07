@@ -47,4 +47,3 @@ describe("/git-worktree page", () => {
     expect(meta.title).toContain("git worktreeで実現する並列開発ベストプラクティスガイド");
   });
 });
-
