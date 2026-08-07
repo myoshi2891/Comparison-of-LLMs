@@ -17,10 +17,10 @@ export default function TocObserver({
     const sidebar = document.getElementById("sidebar");
 
     const handleToggle = () => {
-      const isOpen = sidebar?.getAttribute("data-open") === "true";
+      const isOpen = sidebar?.dataset.open === "true";
       const nextState = !isOpen;
       if (sidebar) {
-        sidebar.setAttribute("data-open", String(nextState));
+        sidebar.dataset.open = String(nextState);
       }
       if (menuToggle) {
         menuToggle.setAttribute("aria-expanded", String(nextState));
@@ -32,7 +32,7 @@ export default function TocObserver({
     const tocLinks = document.querySelectorAll("nav a[href^='#']");
     const handleTocClick = () => {
       if (sidebar) {
-        sidebar.setAttribute("data-open", "false");
+        sidebar.dataset.open = "false";
       }
       if (menuToggle) {
         menuToggle.setAttribute("aria-expanded", "false");
