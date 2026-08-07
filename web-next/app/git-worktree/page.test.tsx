@@ -5,20 +5,23 @@ import Page, { metadata } from "./page";
 
 // MermaidDiagram は useEffect 内で mermaid を動的 import するためモック
 vi.mock("@/components/docs/MermaidDiagram", () => ({
-  default: () => null,
+  default: function DummyMermaidDiagram({ chart }: { chart: string }) {
+    return <pre data-testid="mermaid">{chart}</pre>;
+  },
 }));
 
 describe("/git-worktree page", () => {
-  it("h1 にタイトルテキストが含まれる", () => {
+  it("h1 にタイトルテキスト「git worktreeで実現する並列開発ベストプラクティスガイド」が含まれる", () => {
     const { container } = render(<Page />);
     const h1 = container.querySelector("h1");
-    expect(h1?.textContent).toContain("git worktree");
+    expect(h1?.textContent).toContain("git worktreeで実現する");
+    expect(h1?.textContent).toContain("並列開発ベストプラクティスガイド");
   });
 
-  it("8 セクション（section タグ）が存在する", () => {
+  it("15 個の主要セクション（h2 または section）が存在する", () => {
     const { container } = render(<Page />);
-    const sections = container.querySelectorAll("section");
-    expect(sections.length).toBeGreaterThanOrEqual(8);
+    const h2List = container.querySelectorAll("h2");
+    expect(h2List.length).toBeGreaterThanOrEqual(15);
   });
 
   it("外部リンクに target=_blank と rel=noopener noreferrer が付与されている", () => {
@@ -38,9 +41,10 @@ describe("/git-worktree page", () => {
     }
   });
 
-  it("metadata が export されている", () => {
+  it("metadata が export されており適切なタイトルが含まれる", () => {
     const meta = metadata as Metadata;
     expect(typeof meta.title).toBe("string");
-    expect(meta.title).toContain("git worktree");
+    expect(meta.title).toContain("git worktreeで実現する並列開発ベストプラクティスガイド");
   });
 });
+
