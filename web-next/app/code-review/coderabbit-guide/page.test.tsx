@@ -53,6 +53,13 @@ describe("/code-review/coderabbit-guide", () => {
     const codeBlocks = container.querySelectorAll("pre, code");
     expect(codeBlocks.length).toBeGreaterThan(0);
   });
+
+  it("カスタムレシピのプラン別上限を表示する", () => {
+    const { container } = render(<Page />);
+    expect(container.textContent).toContain(
+      "Pro+・Enterpriseプランにおいてリポジトリごとに最大20件"
+    );
+  });
 });
 
 describe("/code-review/coderabbit-guide metadata", () => {
@@ -68,4 +75,3 @@ describe("/code-review/coderabbit-guide metadata", () => {
     expect((meta.description ?? "").length).toBeGreaterThan(20);
   });
 });
-
