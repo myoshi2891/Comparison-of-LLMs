@@ -32,10 +32,10 @@ const DIAGRAM_1 = `flowchart TB
     Memory --> Output["レビューコメント・Walkthrough・提案の生成"]`;
 
 const DIAGRAM_2 = `flowchart TB
-    P1["優先度1 リポジトリ内の .coderabbit.yaml"] --> P2["優先度2 中央リポジトリの coderabbit/.coderabbit.yaml"]
-    P2 --> P3["優先度3 リポジトリ設定 Web UI"]
-    P3 --> P4["優先度4 組織設定 Web UI"]
-    P4 --> P5["優先度5 Workspace UI Enterpriseのみ"]
+    P1["優先度1 Workspace global overrides Enterpriseのみ"] --> P2["優先度2 Organization global overrides"]
+    P2 --> P3["優先度3 Repository / Global / Central YAML"]
+    P3 --> P4["優先度4 Environment YAML Self-hosted YAML_CONFIG"]
+    P4 --> P5["優先度5 UI 設定 リポジトリ・組織・Workspace UI"]
     P5 --> P6["優先度6 スキーマのデフォルト値"]`;
 
 const DIAGRAM_3 = `flowchart LR
@@ -365,7 +365,9 @@ export default function Page() {
             <a className={styles.qnCard} href="#17-参考文献">
               <span className={styles.qnNum}>05</span>
               <span className={styles.qnTitle}>参考文献</span>
-              <span className={styles.qnDesc}>公式ドキュメントと開発者コミュニティの一次情報</span>
+              <span className={styles.qnDesc}>
+                公式ドキュメント、著者ブログ、サードパーティ分析、コミュニティ議論
+              </span>
             </a>
           </div>
         </section>
@@ -375,10 +377,10 @@ export default function Page() {
             対象読者は、CodeRabbitを既に導入済み、またはこれから本格導入しようとしている中級〜上級のソフトウェアエンジニア・QAエンジニアです。単なる機能紹介にとどまらず、実運用でつまずきやすいポイントとその回避策、そして「なぜその設定が推奨されるのか」という背景まで踏み込んで解説します。
           </p>
           <p>
-            情報源は、CodeRabbit公式ドキュメント（docs.coderabbit.ai、2026年8月8日時点の内容）に加え、著名な開発者・組織による実務レポートを参照しています。特に、Google
+            情報源は、CodeRabbit公式ドキュメント（docs.coderabbit.ai、2026年8月8日時点の内容）をはじめ、著者ブログ、サードパーティ分析、コミュニティ議論などを参照しています。特に、Google
             Chrome/Web Vitalsチームでの活動やエンジニアリング関連の著作で知られるAddy
             Osmaniが2026年に公開した「Agentic Code Review」（O&apos;Reilly Radar /
-            addyosmani.com）は、CodeRabbitを含む複数のAIレビューツールを実PRで並行比較した第一級の一次情報として繰り返し引用します。ベンチマーク数値やコミュニティの声はソースによって前提が異なるため、複数の視点を併記し、断定は避けています。
+            addyosmani.com）は、他エンジニアの実験結果を報告するブログベースの解説情報として引用します。ベンチマーク数値やコミュニティの声はソースによって前提が異なるため、複数の視点を併記し、断定は避けています。
           </p>
 
           <hr />
@@ -709,24 +711,24 @@ export default function Page() {
 
           <h3 id="self-hosted構成での優先順位">Self-Hosted構成での優先順位</h3>
           <p>
-            CodeRabbit Cloudに連携したSelf-Hosted Git provider組織では、
+            CodeRabbit Cloudに連携したSelf-Hosted Git provider組織およびSelf-Hosted
+            deploymentでは、公式の優先順位に従って設定が評価されます。環境変数
             <code>YAML_CONFIG</code>
-            がSelf-Hosted限定の設定源として中央YAMLとUI設定の間に加わります。
+            （Environment YAML）はSelf-Hosted限定の設定源としてRepository/Central
+            YAMLの後かつUI設定より優先されます。
           </p>
           <ol>
+            <li>Workspace global overrides（Enterpriseのみ）</li>
+            <li>Organization global overrides</li>
             <li>
-              リポジトリ内の <code>.coderabbit.yaml</code>
+              Repository / Central YAML（リポジトリ内または中央リポジトリの{" "}
+              <code>.coderabbit.yaml</code>）
             </li>
             <li>
-              中央リポジトリの <code>.coderabbit.yaml</code>
+              Environment YAML（環境変数 <code>YAML_CONFIG</code>、Self-Hosted限定）
             </li>
-            <li>
-              環境変数 <code>YAML_CONFIG</code>（Self-Hosted限定）
-            </li>
-            <li>リポジトリ設定 Web UI</li>
-            <li>組織設定 Web UI</li>
-            <li>Workspace UI（Enterpriseのみ）</li>
-            <li>スキーマ既定値</li>
+            <li>UI 設定（リポジトリ設定 Web UI、組織設定 Web UI、Workspace UI）</li>
+            <li>スキーマのデフォルト値（Defaults）</li>
           </ol>
           <p>
             完全なSelf-Hosted
@@ -2481,14 +2483,15 @@ export default function Page() {
 
           <blockquote className={styles.noteCard}>
             <p>
-              注：料金・プラン内容・ベンチマーク数値は変更が早い領域です。導入判断の最終確認は必ず公式サイト（coderabbit.ai）および上記の一次情報源で行ってください。
+              注：料金・プラン内容・ベンチマーク数値は変更が早い領域です。導入判断の最終確認は必ず公式サイト（coderabbit.ai）および上記の各情報源で行ってください。
             </p>
           </blockquote>
         </article>
 
         <footer className={styles.pageFooter}>
-          情報源: docs.coderabbit.ai(2026年8月8日時点) / Addy Osmani, Daniel Moka
-          ほか各種一次情報。料金・仕様は変更される可能性があるため、最終確認は公式サイトで行ってください。
+          情報源: docs.coderabbit.ai(2026年8月8日時点) /
+          公式ドキュメント・著者ブログ・サードパーティ分析・コミュニティ議論（Addy Osmani, Daniel
+          Moka 等）。料金・仕様は変更される可能性があるため、最終確認は公式サイトで行ってください。
         </footer>
       </main>
     </div>
