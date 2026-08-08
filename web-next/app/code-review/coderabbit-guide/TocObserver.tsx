@@ -15,14 +15,21 @@ export default function TocObserver() {
       document.querySelectorAll<HTMLAnchorElement>(".nav-link, [data-id]")
     );
 
+    const syncToggleState = (isOpen: boolean) => {
+      if (toggleBtn) {
+        toggleBtn.setAttribute("aria-expanded", String(isOpen));
+        toggleBtn.setAttribute("aria-label", isOpen ? "目次を閉じる" : "目次を開く");
+      }
+    };
+
+    syncToggleState(sidebar?.dataset.open === "true");
+
     // Mobile sidebar toggle handler
     const handleToggleClick = () => {
       if (sidebar) {
         const isOpen = sidebar.dataset.open === "true";
         sidebar.dataset.open = isOpen ? "false" : "true";
-        if (toggleBtn) {
-          toggleBtn.setAttribute("aria-expanded", isOpen ? "false" : "true");
-        }
+        syncToggleState(!isOpen);
       }
     };
 
@@ -34,9 +41,7 @@ export default function TocObserver() {
     const handleNavLinkClick = () => {
       if (sidebar && window.innerWidth <= 900) {
         sidebar.dataset.open = "false";
-        if (toggleBtn) {
-          toggleBtn.setAttribute("aria-expanded", "false");
-        }
+        syncToggleState(false);
       }
     };
 

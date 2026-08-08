@@ -148,7 +148,7 @@ export default function Page() {
         type="button"
         className={styles.sidebarToggle}
         id="sidebarToggle"
-        aria-label="メニュー切り替え"
+        aria-label="目次を開く"
         aria-controls="sidebar"
         aria-expanded="false"
       >

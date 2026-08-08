@@ -67,7 +67,7 @@ export default function TocObserver() {
       type="button"
       className={styles.menuToggle}
       id="menuToggle"
-      aria-label="メニュー"
+      aria-label={isOpen ? "目次を閉じる" : "目次を開く"}
       aria-controls="gitWorktreeSidebar"
       aria-expanded={isOpen}
       onClick={toggleMenu}

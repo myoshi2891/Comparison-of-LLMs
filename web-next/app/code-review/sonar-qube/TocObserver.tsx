@@ -8,18 +8,23 @@ export default function TocObserver() {
     const toggleBtn = document.getElementById("sidebarToggle");
     const navLinks = Array.from(document.querySelectorAll<HTMLAnchorElement>("#sidebar nav a"));
 
+    const syncToggleState = (isOpen: boolean) => {
+      if (toggleBtn) {
+        toggleBtn.setAttribute("aria-expanded", String(isOpen));
+        toggleBtn.setAttribute("aria-label", isOpen ? "目次を閉じる" : "目次を開く");
+      }
+    };
+
     if (sidebar && toggleBtn) {
       const initialOpen = sidebar.dataset.open === "true";
-      toggleBtn.setAttribute("aria-expanded", initialOpen ? "true" : "false");
+      syncToggleState(initialOpen);
     }
 
     const handleToggleClick = () => {
       if (sidebar) {
         const isOpen = sidebar.dataset.open === "true";
         sidebar.dataset.open = isOpen ? "false" : "true";
-        if (toggleBtn) {
-          toggleBtn.setAttribute("aria-expanded", isOpen ? "false" : "true");
-        }
+        syncToggleState(!isOpen);
       }
     };
 
@@ -30,9 +35,7 @@ export default function TocObserver() {
     const handleNavLinkClick = () => {
       if (sidebar && window.innerWidth <= 900) {
         sidebar.dataset.open = "false";
-        if (toggleBtn) {
-          toggleBtn.setAttribute("aria-expanded", "false");
-        }
+        syncToggleState(false);
       }
     };
 
