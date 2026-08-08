@@ -1,102 +1,138 @@
-"use client";
-
-import { useEffect, useRef } from "react";
-import CodeCopyButton from "@/components/docs/CodeCopyButton";
 import MermaidDiagram from "@/components/docs/MermaidDiagram";
 import styles from "./page.module.css";
+import TocObserver from "./TocObserver";
 
-// ── MERMAID DIAGRAMS ──
-const DIAG_PR_FLOW = `flowchart TD
-A([PR Open / Push]) --> B[Webhook 受信]
-B --> C{自動レビュー設定?}
-C -- No --> D([待機: 手動コマンド待ち])
-C -- Yes --> E["Cloud Sandbox 起動\\nリポジトリフルクローン"]
-E --> F[Knowledge Base 読込]
-F --> G[Learnings DB 照合]
-G --> H{並列解析}
-H --> I[40+ 静的解析ツール]
-H --> J[LLM コード理解エージェント]
-H --> K[イシュートラッカー連携]
-I --> L[結果集約]
-J --> L
-K --> L
-L --> M["Verification エージェント\\n誤検知フィルタリング"]
-M --> N[Walkthrough コメント生成]
-N --> O[インライン Review コメント]
-O --> P([PR コメント投稿])
-P --> Q{Finishing Touches}
-Q --> R[Autofix / Unit Test / Docstring 等]
+const MERMAID_THEME_VARS = {
+  fontFamily: 'Inter, -apple-system, "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif',
+  fontSize: "16px",
+  background: "#0c1830",
+  primaryColor: "#132449",
+  primaryTextColor: "#dbe4ff",
+  primaryBorderColor: "#7c9eff",
+  lineColor: "#7c9eff",
+  secondaryColor: "#101f3d",
+  tertiaryColor: "#0c1830",
+  noteBkgColor: "#132449",
+  noteTextColor: "#dbe4ff",
+  noteBorderColor: "#7c9eff",
+  actorBkg: "#132449",
+  actorTextColor: "#dbe4ff",
+  actorBorder: "#7c9eff",
+  signalColor: "#dbe4ff",
+  signalTextColor: "#dbe4ff",
+} as const;
 
-style A fill:#0d1117,stroke:#00f5ff,color:#e2e8f0
-style P fill:#0d1117,stroke:#39ff14,color:#e2e8f0
-style H fill:#111827,stroke:#b347ea,color:#e2e8f0
-style M fill:#111827,stroke:#ffb800,color:#e2e8f0`;
+const DIAGRAM_1 = `flowchart TB
+    PR["Pull Requestが作成される"] --> Clone["サンドボックスへリポジトリ全体をクローン"]
+    Clone --> SAST["40以上の静的解析・Linter・SASTツール"]
+    Clone --> Explore["エージェントによる自律的なコードベース探索"]
+    SAST --> Agents["専門エージェント群 Review・Verification・Chat・Pre-Merge Checks・Finishing Touches"]
+    Explore --> Agents
+    Agents --> Memory["Living Memory Learnings・Code Guidelines・過去PR履歴"]
+    Memory --> Output["レビューコメント・Walkthrough・提案の生成"]`;
 
-const DIAG_FINISHING_TOUCHES = `flowchart LR
-A([PR レビュー完了]) --> B["Walkthrough コメント\\n✨ Finishing Touches セクション"]
-B --> C{トリガー方法}
-C --> D["チェックボックスをクリック\\nGitHub PR のみ"]
-C --> E["コマンドをコメント\\n全プラットフォーム"]
-D --> F[Sandbox 実行環境]
-E --> F
-F --> G{アクション種別}
-G --> H["Autofix\\n未解決指摘を修正"]
-G --> I["Unit Test\\nテストファイル生成"]
-G --> J["Docstring\\n18+ 言語対応"]
-G --> K["Custom Recipe\\n定義済みタスク実行"]
-H --> L([コミット or\\nスタック PR として出力])
-I --> L
-J --> M([別 PR として出力])
-K --> L
+const DIAGRAM_2 = `flowchart TB
+    P1["優先度1 Workspace global overrides Enterpriseのみ"] --> P2["優先度2 Organization global overrides"]
+    P2 --> P3["優先度3 Repository / Global / Central YAML"]
+    P3 --> P4["優先度4 Environment YAML Self-hosted YAML_CONFIG"]
+    P4 --> P5["優先度5 UI 設定 リポジトリ・組織・Workspace UI"]
+    P5 --> P6["優先度6 スキーマのデフォルト値"]`;
 
-style A fill:#0d1117,stroke:#00f5ff,color:#e2e8f0
-style L fill:#0d1117,stroke:#39ff14,color:#e2e8f0
-style M fill:#0d1117,stroke:#b347ea,color:#e2e8f0`;
+const DIAGRAM_3 = `flowchart LR
+    Repo["リポジトリYAML inheritance:true"] --> Central["中央YAML inheritance:true"]
+    Central --> OrgUI["組織UI設定 inheritance:false"]
+    OrgUI --> Stop["ここでマージ停止"]`;
 
-const DIAG_PIPELINE = `sequenceDiagram
-participant Dev as 開発者
-participant PR as GitHub PR
-participant CI as CI/CD (CircleCI 等)
-participant CR as CodeRabbit
+const DIAGRAM_4 = `flowchart TD
+    Start["レビューの挙動を変えたい"] --> Q1{"そのファイル自体を対象外にしたいか"}
+    Q1 -->|"はい"| PF["Path Filtersで除外"]
+    Q1 -->|"いいえ"| Q2{"特定ディレクトリに追加の観点が必要か"}
+    Q2 -->|"はい"| PI["Path Instructionsを追加"]
+    Q2 -->|"いいえ"| Q3{"AGENTS.md CLAUDE.md 等の既存規約があるか"}
+    Q3 -->|"はい"| CG["Code Guidelinesとして自動適用されているか確認"]
+    Q3 -->|"いいえ"| Q4{"機械的にpass fail判定できるルールか"}
+    Q4 -->|"はい"| CC["Custom Checksでpass fail条件を定義"]
+    Q4 -->|"いいえ"| Learn["Learningsとして会話の中で教える"]`;
 
-Dev->>PR: プッシュ & PR 作成
-PR->>CI: Webhook トリガー
-CI-->>PR: ✗ ビルド失敗 (GitHub Checks)
-PR->>CR: Checks 失敗通知
-CR->>CI: ビルドログ取得
-CR->>CR: 失敗原因とコードを照合
-CR->>PR: 失敗行にインライン修正提案
-Dev->>PR: 提案を確認・適用
-PR->>CI: 再実行
-CI-->>PR: ✓ 成功`;
+const DIAGRAM_5 = `flowchart TD
+    Open["PRがオープンされる"] --> CheckUser{"ignore_usernamesに一致するか"}
+    CheckUser -->|"はい"| Skip["レビューをスキップ"]
+    CheckUser -->|"いいえ"| CheckTitle{"ignore_title_keywordsに一致するか"}
+    CheckTitle -->|"はい"| Skip
+    CheckTitle -->|"いいえ"| CheckDraft{"ドラフトかつ drafts:false か"}
+    CheckDraft -->|"はい"| Skip
+    CheckDraft -->|"いいえ"| CheckLabel{"labels条件を満たすか"}
+    CheckLabel -->|"いいえ"| Skip
+    CheckLabel -->|"はい"| Review["フルレビューを実行"]
+    Review --> Push["新しいコミットがpushされる"]
+    Push --> Incremental{"auto_incremental_review:true か"}
+    Incremental -->|"いいえ"| Wait["手動コマンドを待機"]
+    Incremental -->|"はい"| CountCheck{"pause閾値に到達したか"}
+    CountCheck -->|"いいえ"| Review2["差分のみ増分レビュー"]
+    CountCheck -->|"はい"| Paused["自動レビューを一時停止"]
+    Review2 --> Push
+    Paused --> Manual["@coderabbitai review で再開"]`;
 
-const DIAG_LEARNINGS = `flowchart TD
-A([PR レビュー]) --> B[CodeRabbit がコメント]
-B --> C{チームが反応}
-C --> D[同意: コメントを解決]
-C --> E[異議: 理由付きで反論]
-E --> F[Learning DB に追加]
-F --> G[次回レビューに反映]
-H([四半期定期メンテ]) --> I[Learnings ダッシュボード確認]
-I --> J{使用状況確認}
-J --> K[Never Used: 削除候補]
-J --> L[矛盾する Learning: 解消]
-J --> M[古い規約: 更新]
-K --> N([クリーンな Knowledge Base])
-L --> N
-M --> N
-N --> A
+const DIAGRAM_6 = `sequenceDiagram
+    participant Dev as 開発者
+    participant CR as CodeRabbit
+    participant DB as Learningsデータベース
+    Dev->>CR: PRのコメントに返信し理由を説明する
+    CR->>CR: 方針転換すべき内容かを判定する
+    CR->>DB: 新しいLearningを作成する
+    CR-->>Dev: Learnings Addedとして返信に明記する
+    Note over DB: 承認遅延の設定がある場合はAdmin承認待ちになる
+    Dev->>CR: 後日、別のPRを作成する
+    CR->>DB: 該当スコープのLearningsを読み込む
+    DB-->>CR: 過去の指摘方針を返す
+    CR-->>Dev: 学習済みの方針を反映してレビューする`;
 
-style A fill:#0d1117,stroke:#00f5ff,color:#e2e8f0
-style N fill:#0d1117,stroke:#39ff14,color:#e2e8f0
-style H fill:#111827,stroke:#ffb800,color:#e2e8f0`;
+const DIAGRAM_7 = `flowchart TD
+    PR["Pull Request"] --> Built["組み込みチェック docstrings title description issue_assessment"]
+    PR --> Custom["カスタムチェック 自然言語のpass fail条件"]
+    Built --> Result{"結果"}
+    Custom --> Result
+    Result -->|"Passed"| Merge["マージ可能"]
+    Result -->|"Warning"| MergeWarn["警告付きでマージ可能"]
+    Result -->|"Error かつ request_changes_workflow"| Block["マージがブロックされる"]
+    Result -->|"Inconclusive"| Review["人間が確認"]
+    Block -->|"Ignore failed checksを選択"| Merge`;
 
-interface ExtProps {
-  href: string;
-  children: React.ReactNode;
-}
+const DIAGRAM_8 = `sequenceDiagram
+    participant Dev as 開発者
+    participant CR as CodeRabbit
+    participant Repo as リポジトリ
+    Dev->>CR: "@coderabbitai generate docstrings"
+    CR->>Repo: 変更された関数を解析する
+    CR->>Repo: docstringを追加した新規PRを作成する
+    Dev->>CR: "@coderabbitai autofix"
+    CR->>Repo: レビュー指摘を修正しコミットする
+    Dev->>CR: "@coderabbitai run cleanup-imports"
+    CR->>Repo: カスタムレシピを実行しコミットする`;
 
-function Ext({ href, children }: ExtProps) {
+const DIAGRAM_9 = `flowchart TB
+    CG["Code Guidelines AGENTS.md CLAUDE.md 等"] --> Agent["レビューエージェント"]
+    Learn["Learnings 過去のフィードバック"] --> Agent
+    MCP["MCP Servers 社内ドキュメント Figma Jira 等"] --> Agent
+    Web["Web Search 公開情報"] --> Agent
+    Multi["Multi-Repo Analysis 連携リポジトリ"] --> Agent
+    Agent --> Comment["文脈を反映したレビューコメント"]`;
+
+const DIAGRAM_10 = `sequenceDiagram
+    participant Dev as 開発者
+    participant Agent as コーディングエージェント
+    participant CLI as CodeRabbit CLI
+    Dev->>Agent: 機能を実装してCodeRabbitでレビューして
+    Agent->>Agent: 機能を実装する
+    Agent->>CLI: "cr --agent"をバックグラウンドで実行
+    CLI-->>Agent: 構造化JSONで指摘一覧を返す
+    Agent->>Agent: 重大な指摘のみを選別する
+    Agent->>Agent: 指摘に基づき修正を実装する
+    Agent->>CLI: "cr --agent"を再実行（2回目）
+    CLI-->>Agent: 残存する重大指摘がないことを確認
+    Agent-->>Dev: 完了報告と対応内容の要約`;
+
+function Ext({ href, children }: { href: string; children: React.ReactNode }) {
   return (
     <a href={href} target="_blank" rel="noopener noreferrer">
       {children}
@@ -104,2705 +140,2359 @@ function Ext({ href, children }: ExtProps) {
   );
 }
 
-/**
- * Renders the CodeRabbit guide page.
- *
- * Displays the full chaptered documentation layout, reference links, embedded diagrams, copyable code samples, and viewport-triggered progress bar animations.
- */
 export default function Page() {
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const progressBars = containerRef.current?.querySelectorAll(`.${styles.progressBar}`);
-    if (!progressBars) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) {
-            const bar = entry.target as HTMLElement;
-            bar.style.animationPlayState = "running";
-          }
-        }
-      },
-      { threshold: 0.3 }
-    );
-
-    for (const bar of Array.from(progressBars)) {
-      const b = bar as HTMLElement;
-      b.style.animationPlayState = "paused";
-      observer.observe(b);
-    }
-
-    return () => {
-      observer.disconnect();
-    };
-  }, []);
-
   return (
-    <div ref={containerRef} className={styles.layout}>
-      {/* NAV */}
-      <nav className={styles.innerNav}>
-        <div className={styles.navInner}>
-          <a href="#top" className={styles.navLogo}>
-            🐰 CR Guide
-          </a>
-          <a href="#ch1" className={styles.navLink}>
-            1. Architecture
-          </a>
-          <a href="#ch2" className={styles.navLink}>
-            2. Configuration
-          </a>
-          <a href="#ch3" className={styles.navLink}>
-            3. Knowledge Base
-          </a>
-          <a href="#ch4" className={styles.navLink}>
-            4. Commands
-          </a>
-          <a href="#ch5" className={styles.navLink}>
-            5. Finishing Touches
-          </a>
-          <a href="#ch6" className={styles.navLink}>
-            6. MCP
-          </a>
-          <a href="#ch7" className={styles.navLink}>
-            7. Tools / CI
-          </a>
-          <a href="#ch8" className={styles.navLink}>
-            8. Advanced
-          </a>
-          <a href="#refs" className={styles.navLink}>
-            References
-          </a>
+    <div className={styles.layout}>
+      <TocObserver />
+      <button
+        type="button"
+        className={styles.sidebarToggle}
+        id="sidebarToggle"
+        aria-label="目次を開く"
+        aria-controls="sidebar"
+        aria-expanded="false"
+      >
+        ☰
+      </button>
+
+      <nav className={styles.sidebar} id="sidebar">
+        <div className={styles.sidebarBrand}>
+          <span className={styles.logoDot} />
+          <span>CodeRabbit実践ガイド</span>
         </div>
+        <div className={styles.sidebarLabel}>目次</div>
+        <ul className={styles.navList}>
+          <li>
+            <a
+              href="#1-coderabbitとは何かアーキテクチャを理解する"
+              className={styles.navLink}
+              data-id="1-coderabbitとは何かアーキテクチャを理解する"
+            >
+              1. CodeRabbitとは何か：アーキテクチャを理解する
+            </a>
+          </li>
+          <li>
+            <a
+              href="#2-導入のロールアウト戦略ステップバイステップ"
+              className={styles.navLink}
+              data-id="2-導入のロールアウト戦略ステップバイステップ"
+            >
+              2. 導入のロールアウト戦略（ステップバイステップ）
+            </a>
+          </li>
+          <li>
+            <a
+              href="#3-設定の基本coderabbityamlとレビュープロファイル"
+              className={styles.navLink}
+              data-id="3-設定の基本coderabbityamlとレビュープロファイル"
+            >
+              3. 設定の基本：.coderabbit.yamlとレビュープロファイル
+            </a>
+          </li>
+          <li>
+            <a
+              href="#4-設定の優先順位を制御するグローバルオーバーライド中央設定継承"
+              className={styles.navLink}
+              data-id="4-設定の優先順位を制御するグローバルオーバーライド中央設定継承"
+            >
+              4. 設定の優先順位を制御する：グローバルオーバーライド・中央設定・継承
+            </a>
+          </li>
+          <li>
+            <a
+              href="#5-パスベースのレビュー制御を使い分ける"
+              className={styles.navLink}
+              data-id="5-パスベースのレビュー制御を使い分ける"
+            >
+              5. パスベースのレビュー制御を使い分ける
+            </a>
+          </li>
+          <li>
+            <a
+              href="#6-ast-grepによる構造的レビュールール上級者向け"
+              className={styles.navLink}
+              data-id="6-ast-grepによる構造的レビュールール上級者向け"
+            >
+              6. ast-grepによる構造的レビュールール（上級者向け）
+            </a>
+          </li>
+          <li>
+            <a
+              href="#7-自動レビューの挙動を制御するauto_review"
+              className={styles.navLink}
+              data-id="7-自動レビューの挙動を制御するauto_review"
+            >
+              7. 自動レビューの挙動を制御する（auto_review）
+            </a>
+          </li>
+          <li>
+            <a
+              href="#8-learningsでチームの好みを学習させる"
+              className={styles.navLink}
+              data-id="8-learningsでチームの好みを学習させる"
+            >
+              8. Learningsでチームの好みを学習させる
+            </a>
+          </li>
+          <li>
+            <a
+              href="#9-pre-merge-checksとcustom-checksで品質ゲートを敷く"
+              className={styles.navLink}
+              data-id="9-pre-merge-checksとcustom-checksで品質ゲートを敷く"
+            >
+              9. Pre-Merge ChecksとCustom Checksで品質ゲートを敷く
+            </a>
+          </li>
+          <li>
+            <a
+              href="#10-finishing-touchesワンクリックのエージェント的アクション"
+              className={styles.navLink}
+              data-id="10-finishing-touchesワンクリックのエージェント的アクション"
+            >
+              10. Finishing Touches：ワンクリックのエージェント的アクション
+            </a>
+          </li>
+          <li>
+            <a
+              href="#11-walkthroughとcoderabbit-reviewchange-stackを使いこなす"
+              className={styles.navLink}
+              data-id="11-walkthroughとcoderabbit-reviewchange-stackを使いこなす"
+            >
+              11. WalkthroughとCodeRabbit Review（Change Stack）を使いこなす
+            </a>
+          </li>
+          <li>
+            <a
+              href="#12-knowledge-baseで文脈を拡張する"
+              className={styles.navLink}
+              data-id="12-knowledge-baseで文脈を拡張する"
+            >
+              12. Knowledge Baseで文脈を拡張する
+            </a>
+          </li>
+          <li>
+            <a
+              href="#13-ide拡張機能とcliツールでシフトレフトする"
+              className={styles.navLink}
+              data-id="13-ide拡張機能とcliツールでシフトレフトする"
+            >
+              13. IDE拡張機能とCLIツールでシフトレフトする
+            </a>
+          </li>
+          <li>
+            <a
+              href="#14-複数のaiレビューツールを組み合わせる考え方多層防御"
+              className={styles.navLink}
+              data-id="14-複数のaiレビューツールを組み合わせる考え方多層防御"
+            >
+              14. 複数のAIレビューツールを組み合わせる考え方（多層防御）
+            </a>
+          </li>
+          <li>
+            <a
+              href="#15-実運用で直面する課題と対処法アンチパターン集"
+              className={styles.navLink}
+              data-id="15-実運用で直面する課題と対処法アンチパターン集"
+            >
+              15. 実運用で直面する課題と対処法（アンチパターン集）
+            </a>
+          </li>
+          <li>
+            <a
+              href="#16-まとめベストプラクティス一覧表"
+              className={styles.navLink}
+              data-id="16-まとめベストプラクティス一覧表"
+            >
+              16. まとめ：ベストプラクティス一覧表
+            </a>
+          </li>
+          <li>
+            <a href="#17-参考文献" className={styles.navLink} data-id="17-参考文献">
+              17. 参考文献
+            </a>
+          </li>
+        </ul>
       </nav>
 
-      <main className={styles.main} id="top">
-        {/* ══════════════ HERO ══════════════ */}
+      <main className={styles.main}>
         <section className={styles.hero}>
-          <div className={styles.heroTag}>🚀 CodeRabbit 完全活用ガイド — 2026</div>
+          <div className={styles.heroEyebrow}>Intermediate &mdash; Advanced Guide</div>
           <h1>
-            Ship Better Code, <br />
-            <span>AI がレビューする時代</span>の
+            CodeRabbit実践ガイド
             <br />
-            実践マスターガイド
+            中級者から上級者のためのベストプラクティス
           </h1>
-          <p
-            style={{
-              color: "var(--text-muted)",
-              maxWidth: "540px",
-              margin: "0.8rem auto 0",
-              fontSize: "1rem",
-            }}
-          >
-            中上級者向け。アーキテクチャの深部から高度なカスタマイズ・MCP連携・AI
-            エージェント活用まで完全網羅。
+          <p className={styles.heroLede}>
+            公式ドキュメント(docs.coderabbit.ai)と、Addy
+            Osmaniをはじめとする著名な開発者・コミュニティの実務レポートに基づく、設定・自動化・エージェント機能・複数ツール運用までを網羅したステップバイステップガイド。
           </p>
-          <div className={styles.heroMeta}>
-            <span className={`${styles.heroBadge} ${styles.badgeGreen}`}>中〜上級者対象</span>
-            <span className={`${styles.heroBadge} ${styles.badgeCyan}`}>Chapter 8 構成</span>
-            <span className={`${styles.heroBadge} ${styles.badgePink}`}>最新: 2026-06</span>
-            <span className={`${styles.heroBadge} ${styles.badgeAmber}`}>公式 docs 一次情報源</span>
-          </div>
-        </section>
-
-        {/* ══════════════ KEY METRICS ══════════════ */}
-        <div className={styles.metricGrid}>
-          <div className={styles.metricCard}>
-            <div className={styles.metricVal}>
-              40<span style={{ fontSize: "1.2rem" }}>+</span>
-            </div>
-            <div className={styles.metricLabel}>静的解析ツール対応</div>
-          </div>
-          <div className={styles.metricCard}>
-            <div className={styles.metricVal}>5</div>
-            <div className={styles.metricLabel}>対応 Git プラットフォーム</div>
-          </div>
-          <div className={styles.metricCard}>
-            <div className={styles.metricVal}>20</div>
-            <div className={styles.metricLabel}>MCP サーバー接続数（Enterprise）</div>
-          </div>
-          <div className={styles.metricCard}>
-            <div className={styles.metricVal}>
-              18<span style={{ fontSize: "1.2rem" }}>+</span>
-            </div>
-            <div className={styles.metricLabel}>Docstring 対応言語</div>
-          </div>
-          <div className={styles.metricCard}>
-            <div className={styles.metricVal}>6</div>
-            <div className={styles.metricLabel}>Finishing Touches 種類</div>
-          </div>
-        </div>
-
-        {/* ══════════════ TOC ══════════════ */}
-        <div className={styles.tocGrid}>
-          <a href="#ch1" className={styles.tocCard}>
-            <div className={styles.tocNum}>Chapter 01</div>
-            <div className={styles.tocTitle}>アーキテクチャ詳解</div>
-          </a>
-          <a href="#ch2" className={styles.tocCard}>
-            <div className={styles.tocNum}>Chapter 02</div>
-            <div className={styles.tocTitle}>設定の完全制御</div>
-          </a>
-          <a href="#ch3" className={styles.tocCard}>
-            <div className={styles.tocNum}>Chapter 03</div>
-            <div className={styles.tocTitle}>Knowledge Base & Learnings</div>
-          </a>
-          <a href="#ch4" className={styles.tocCard}>
-            <div className={styles.tocNum}>Chapter 04</div>
-            <div className={styles.tocTitle}>コマンド & チャット</div>
-          </a>
-          <a href="#ch5" className={styles.tocCard}>
-            <div className={styles.tocNum}>Chapter 05</div>
-            <div className={styles.tocTitle}>Finishing Touches</div>
-          </a>
-          <a href="#ch6" className={styles.tocCard}>
-            <div className={styles.tocNum}>Chapter 06</div>
-            <div className={styles.tocTitle}>MCP 統合</div>
-          </a>
-          <a href="#ch7" className={styles.tocCard}>
-            <div className={styles.tocNum}>Chapter 07</div>
-            <div className={styles.tocTitle}>ツール & CI/CD 連携</div>
-          </a>
-          <a href="#ch8" className={styles.tocCard}>
-            <div className={styles.tocNum}>Chapter 08</div>
-            <div className={styles.tocTitle}>上級テクニック</div>
-          </a>
-        </div>
-
-        <hr className={styles.divider} />
-
-        {/* ══════════════ CH1: ARCHITECTURE ══════════════ */}
-        <section className={styles.chapter} id="ch1">
-          <div className={styles.chapterHeader}>
-            <div className={styles.chapterNum}>1</div>
-            <h2 className={styles.chapterTitle}>
-              <span>アーキテクチャ</span>詳解{" "}
-              <span className={`${styles.klevel} ${styles.kl1}`}>K-Level: 理解</span>
-            </h2>
-          </div>
-
-          <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>1.1 CodeRabbit の本質とは？</h3>
-            <p className={styles.paragraph}>
-              <strong>定義：</strong>CodeRabbit は単なる &quot;LLM に diff を渡すツール&quot;
-              ではなく、複数の AI エージェントを並列オーケストレーションする{" "}
-              <em>本番グレードの AI インフラ</em> です。
-            </p>
-            <p className={styles.paragraph}>
-              <strong>理由：</strong>
-              コードは差分だけでは意味が確定しない。認証ミドルウェアの変更が正しいかどうかは、リポジトリ全体・過去の
-              PR・リンクしたイシューを統合しないと判定できないからです。
-            </p>
-
-            <div className={styles.archLayers}>
-              <div className={`${styles.archRow} ${styles.green}`}>
-                <div className={styles.archLabel}>Cloud Sandbox</div>
-                <div className={styles.archDesc}>
-                  リポジトリをフルクローンした隔離実行環境。全静的解析・SAST はここで動作
-                </div>
-              </div>
-              <div className={`${styles.archRow} ${styles.cyan}`}>
-                <div className={styles.archLabel}>Multi-Model Analysis</div>
-                <div className={styles.archDesc}>
-                  40+ 静的解析ツール + 複数 LLM
-                  を並列実行。言語・フレームワーク別に最適なモデルを選択
-                </div>
-              </div>
-              <div className={`${styles.archRow} ${styles.pink}`}>
-                <div className={styles.archLabel}>Agentic Exploration</div>
-                <div className={styles.archDesc}>
-                  コードベース全体を自律的に調査。依存関係・型定義・テストを参照しながらコンテキスト構築
-                </div>
-              </div>
-              <div className={`${styles.archRow} ${styles.amber}`}>
-                <div className={styles.archLabel}>Specialized Agents</div>
-                <div className={styles.archDesc}>
-                  Review / Verification / Chat / Pre-Merge Checks / Finishing Touches の 5
-                  エージェントが協調動作
-                </div>
-              </div>
-              <div className={`${styles.archRow} ${styles.purple}`}>
-                <div className={styles.archLabel}>Living Memory</div>
-                <div className={styles.archDesc}>
-                  Learnings DB + Knowledge
-                  Base。フィードバックを記憶し、次回以降の精度を継続的に向上
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>1.2 PR レビューの処理フロー</h3>
-
-            <div className={styles.mermaidWrap}>
-              <div id="mermaid-pr-flow">
-                <MermaidDiagram chart={DIAG_PR_FLOW} />
-              </div>
-            </div>
-
-            <div className={`${styles.callout} ${styles.info}`}>
-              <span className={styles.calloutIcon}>💡</span>
-              <div className={styles.calloutBody}>
-                <strong>Verification Agent の重要性：</strong>LLM
-                単体の出力をそのまま投稿するとハルシネーションが混入します。Verification Agent
-                が他の解析結果とクロスチェックすることで、誤検知を大幅に削減しています。
-              </div>
-            </div>
-          </div>
-
-          <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>1.3 対応プラットフォーム</h3>
-            <div className={styles.tableWrap}>
-              <table className={styles.table}>
-                <thead className={styles.thead}>
-                  <tr>
-                    <th className={styles.th}>プラットフォーム</th>
-                    <th className={styles.th}>タイプ</th>
-                    <th className={styles.th}>主な認証方式</th>
-                    <th className={styles.th}>Finishing Touches</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td className={styles.td}>GitHub.com</td>
-                    <td className={styles.td}>SaaS</td>
-                    <td className={styles.td}>GitHub App</td>
-                    <td className={styles.td}>フルサポート</td>
-                  </tr>
-                  <tr>
-                    <td className={styles.td}>GitHub Enterprise Server</td>
-                    <td className={styles.td}>Self-hosted</td>
-                    <td className={styles.td}>OAuth App + Webhook</td>
-                    <td className={styles.td}>フルサポート</td>
-                  </tr>
-                  <tr>
-                    <td className={styles.td}>GitLab.com</td>
-                    <td className={styles.td}>SaaS</td>
-                    <td className={styles.td}>Personal/Group Access Token</td>
-                    <td className={styles.td}>Autofix, Docstring, Merge Conflict</td>
-                  </tr>
-                  <tr>
-                    <td className={styles.td}>Azure DevOps</td>
-                    <td className={styles.td}>SaaS</td>
-                    <td className={styles.td}>Personal Access Token</td>
-                    <td className={styles.td}>Docstring のみ</td>
-                  </tr>
-                  <tr>
-                    <td className={styles.td}>Bitbucket Cloud</td>
-                    <td className={styles.td}>SaaS</td>
-                    <td className={styles.td}>App Password</td>
-                    <td className={styles.td}>Docstring のみ</td>
-                  </tr>
-                  <tr>
-                    <td className={styles.td}>Bitbucket Data Center</td>
-                    <td className={styles.td}>Self-hosted</td>
-                    <td className={styles.td}>HTTP Access Token</td>
-                    <td className={styles.td}>Docstring のみ</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          {/* Chapter 1 refs */}
-          <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>📚 Chapter 1 参考 URL</h3>
-            <div className={styles.refGrid}>
-              <div className={styles.refCard}>
-                <div className={styles.refCat}>【公式 Docs】アーキテクチャ</div>
-                <Ext href="https://docs.coderabbit.ai/overview/architecture.md">
-                  https://docs.coderabbit.ai/overview/architecture.md
-                </Ext>
-              </div>
-              <div className={styles.refCard}>
-                <div className={styles.refCat}>【公式 Docs】PR レビュー概要</div>
-                <Ext href="https://docs.coderabbit.ai/overview/pull-request-review.md">
-                  https://docs.coderabbit.ai/overview/pull-request-review.md
-                </Ext>
-              </div>
-              <div className={styles.refCard}>
-                <div className={styles.refCat}>【公式 Docs】プラットフォーム一覧</div>
-                <Ext href="https://docs.coderabbit.ai/platforms/overview.md">
-                  https://docs.coderabbit.ai/platforms/overview.md
-                </Ext>
-              </div>
-              <div className={styles.refCard}>
-                <div className={styles.refCat}>【公式 Docs】GitHub 連携</div>
-                <Ext href="https://docs.coderabbit.ai/platforms/github-com.md">
-                  https://docs.coderabbit.ai/platforms/github-com.md
-                </Ext>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <hr className={styles.divider} />
-
-        {/* ══════════════ CH2: CONFIGURATION ══════════════ */}
-        <section className={styles.chapter} id="ch2">
-          <div className={styles.chapterHeader}>
-            <div className={styles.chapterNum}>2</div>
-            <h2 className={styles.chapterTitle}>
-              <span>設定の</span>完全制御{" "}
-              <span className={`${styles.klevel} ${styles.kl2}`}>K-Level: 適用</span>
-            </h2>
-          </div>
-
-          <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>2.1 設定の優先度ヒエラルキー</h3>
-            <p className={styles.paragraph}>
-              <strong>定義：</strong>CodeRabbit の設定は 6
-              層の優先度ピラミッドで管理されます。上位レイヤーが下位を上書きします（設定継承を有効化しない限り）。
-            </p>
-
-            <div className={styles.pyramid}>
-              <div
-                className={styles.pyramidLevel}
-                style={{
-                  width: "220px",
-                  background: "rgba(255, 45, 120, 0.2)",
-                  border: "1px solid var(--neon-pink)",
-                  color: "var(--neon-pink)",
-                }}
-              >
-                Priority 0 — Global Overrides
-              </div>
-              <div
-                className={styles.pyramidLevel}
-                style={{
-                  width: "280px",
-                  background: "rgba(0, 245, 255, 0.15)",
-                  border: "1px solid var(--neon-cyan)",
-                  color: "var(--neon-cyan)",
-                }}
-              >
-                Priority 1 — .coderabbit.yaml (リポジトリ)
-              </div>
-              <div
-                className={styles.pyramidLevel}
-                style={{
-                  width: "340px",
-                  background: "rgba(57, 255, 20, 0.1)",
-                  border: "1px solid var(--neon-green)",
-                  color: "var(--neon-green)",
-                }}
-              >
-                Priority 2 — Central Repository
-              </div>
-              <div
-                className={styles.pyramidLevel}
-                style={{
-                  width: "400px",
-                  background: "rgba(179, 71, 234, 0.1)",
-                  border: "1px solid var(--neon-purple)",
-                  color: "var(--neon-purple)",
-                }}
-              >
-                Priority 3 — Repository Settings (UI)
-              </div>
-              <div
-                className={styles.pyramidLevel}
-                style={{
-                  width: "460px",
-                  background: "rgba(255, 184, 0, 0.08)",
-                  border: "1px solid var(--neon-amber)",
-                  color: "var(--neon-amber)",
-                }}
-              >
-                Priority 4 — Organization Settings (UI)
-              </div>
-              <div
-                className={styles.pyramidLevel}
-                style={{
-                  width: "520px",
-                  background: "rgba(100, 116, 139, 0.1)",
-                  border: "1px solid #64748b",
-                  color: "#64748b",
-                }}
-              >
-                Priority 5 — Default Settings
-              </div>
-            </div>
-
-            <div className={`${styles.callout} ${styles.warning}`}>
-              <span className={styles.calloutIcon}>⚠️</span>
-              <div className={styles.calloutBody}>
-                <strong>重要：</strong>
-                設定はデフォルトで「マージ」されません。上位レイヤーが全体を置き換えます。
-                <code>configuration_inheritance: true</code>
-                を明示的に有効化した場合のみ、親レイヤーの設定がマージされます。
-              </div>
-            </div>
-          </div>
-
-          <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>2.2 .coderabbit.yaml — 推奨構成の完全形</h3>
-            <p className={styles.paragraph}>
-              <strong>理由：</strong>YAML
-              ファイルをリポジトリに含めることで、設定変更をコードレビューのワークフローに乗せられます（GitOps）。
-            </p>
-
-            <div className={styles.compareGrid}>
-              <div className={`${styles.compareCard} ${styles.good}`}>
-                <div className={styles.compareHead}>✅ 本番推奨構成（上級）</div>
-                <div className={styles.compareBody}>
-                  <div className={styles.codeLine}>
-                    <span className={styles.codeComment}>
-                      # yaml-language-server:
-                      $schema=https://coderabbit.ai/integrations/schema.v2.json
-                    </span>
-                  </div>
-                  <div className={styles.codeLine}>
-                    <span className={styles.codeKeyword}>language</span>:{" "}
-                    <span className={styles.codeString}>&quot;ja-JP&quot;</span>
-                  </div>
-                  <div className={styles.codeLine} />
-                  <div className={styles.codeLine}>
-                    <span className={styles.codeKeyword}>reviews</span>:
-                  </div>
-                  <div className={styles.codeLine}>
-                    {"  "}
-                    <span className={styles.codeKeyword}>profile</span>:{" "}
-                    <span className={styles.codeString}>&quot;assertive&quot;</span>
-                  </div>
-                  <div className={styles.codeLine}>
-                    {"  "}
-                    <span className={styles.codeKeyword}>request_changes_workflow</span>:{" "}
-                    <span className={styles.codeGreen}>true</span>
-                  </div>
-                  <div className={styles.codeLine}>
-                    {"  "}
-                    <span className={styles.codeKeyword}>high_level_summary</span>:{" "}
-                    <span className={styles.codeGreen}>true</span>
-                  </div>
-                  <div className={styles.codeLine}>
-                    {"  "}
-                    <span className={styles.codeKeyword}>auto_review</span>:
-                  </div>
-                  <div className={styles.codeLine}>
-                    {"    "}
-                    <span className={styles.codeKeyword}>enabled</span>:{" "}
-                    <span className={styles.codeGreen}>true</span>
-                  </div>
-                  <div className={styles.codeLine}>
-                    {"    "}
-                    <span className={styles.codeKeyword}>drafts</span>:{" "}
-                    <span className={styles.codePink}>false</span>
-                  </div>
-                  <div className={styles.codeLine}>
-                    {"  "}
-                    <span className={styles.codeKeyword}>base_branches</span>:
-                  </div>
-                  <div className={styles.codeLine}>
-                    {"    "}- <span className={styles.codeString}>&quot;main&quot;</span>
-                  </div>
-                  <div className={styles.codeLine}>
-                    {"    "}- <span className={styles.codeString}>&quot;develop&quot;</span>
-                  </div>
-                  <div className={styles.codeLine}>
-                    {"  "}
-                    <span className={styles.codeKeyword}>path_instructions</span>:
-                  </div>
-                  <div className={styles.codeLine}>
-                    {"    "}- <span className={styles.codeKeyword}>path</span>:{" "}
-                    <span className={styles.codeString}>&quot;src/api/**&quot;</span>
-                  </div>
-                  <div className={styles.codeLine}>
-                    {"      "}
-                    <span className={styles.codeKeyword}>instructions</span>:{" "}
-                    <span className={styles.codeString}>|</span>
-                  </div>
-                  <div className={styles.codeLine}>
-                    {
-                      "        認証・認可・入力バリデーションに集中。 ORM をバイパスする直接 DB クエリに警告。"
-                    }
-                  </div>
-                  <div className={styles.codeLine}>
-                    {"    "}- <span className={styles.codeKeyword}>path</span>:{" "}
-                    <span className={styles.codeString}>&quot;tests/**&quot;</span>
-                  </div>
-                  <div className={styles.codeLine}>
-                    {"      "}
-                    <span className={styles.codeKeyword}>instructions</span>:{" "}
-                    <span className={styles.codeString}>|</span>
-                  </div>
-                  <div className={styles.codeLine}>
-                    {
-                      "        エッジケース・エラーパスのカバレッジを確認。 テスト名が意図を明確に表しているか評価。"
-                    }
-                  </div>
-                  <div className={styles.codeLine}>
-                    {"  "}
-                    <span className={styles.codeKeyword}>path_filters</span>:
-                  </div>
-                  <div className={styles.codeLine}>
-                    {"    "}-{" "}
-                    <span className={styles.codeString}>&quot;!**/generated/**&quot;</span>
-                  </div>
-                  <div className={styles.codeLine}>
-                    {"    "}- <span className={styles.codeString}>&quot;!**/*.pb.go&quot;</span>
-                  </div>
-                  <div className={styles.codeLine} />
-                  <div className={styles.codeLine}>
-                    <span className={styles.codeKeyword}>knowledge_base</span>:
-                  </div>
-                  <div className={styles.codeLine}>
-                    {"  "}
-                    <span className={styles.codeKeyword}>learnings</span>:
-                  </div>
-                  <div className={styles.codeLine}>
-                    {"    "}
-                    <span className={styles.codeKeyword}>scope</span>:{" "}
-                    <span className={styles.codeString}>&quot;local&quot;</span>
-                  </div>
-                  <div className={styles.codeLine}>
-                    {"  "}
-                    <span className={styles.codeKeyword}>issues</span>:
-                  </div>
-                  <div className={styles.codeLine}>
-                    {"    "}
-                    <span className={styles.codeKeyword}>scope</span>:{" "}
-                    <span className={styles.codeString}>&quot;auto&quot;</span>
-                  </div>
-                </div>
-              </div>
-              <div className={`${styles.compareCard} ${styles.bad}`}>
-                <div className={styles.compareHead}>❌ アンチパターン（最小設定のみ）</div>
-                <div className={styles.compareBody}>
-                  <div className={styles.codeLine}>
-                    <span className={styles.codeComment}># 設定なし＝デフォルト頼り</span>
-                  </div>
-                  <div className={styles.codeLine}>
-                    <span className={styles.codeComment}># 問題:</span>
-                  </div>
-                  <div className={styles.codeLine}>
-                    <span className={styles.codeComment}>
-                      # - 生成コード・lock ファイルもレビュー対象になる
-                    </span>
-                  </div>
-                  <div className={styles.codeLine}>
-                    <span className={styles.codeComment}>
-                      # - ドラフト PR にも自動レビューが走りクレジットを消費
-                    </span>
-                  </div>
-                  <div className={styles.codeLine}>
-                    <span className={styles.codeComment}>
-                      # - path_instructions なしで全ファイルに汎用レビュー
-                    </span>
-                  </div>
-                  <div className={styles.codeLine}>
-                    <span className={styles.codeComment}>
-                      # - learnings がクロスリポジトリ汚染を起こす可能性
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>2.3 Path Instructions — 精密レビューの設計</h3>
-            <p className={styles.paragraph}>
-              <strong>定義：</strong>glob
-              パターンでファイルパスを指定し、そのパスのファイルに対してのみ適用されるレビュー指示を設定する機能です。
-            </p>
-
-            <h4 className={styles.subsectionTitle}>よく使うパターン別 Path Instructions 例</h4>
-            <div className={styles.codeWrap}>
-              <div className={styles.codeBar}>
-                <span>.coderabbit.yaml</span>
-                <span className={styles.codeLang}>YAML</span>
-                <CodeCopyButton
-                  className={styles.codeCopy}
-                  text={`reviews:\n  path_instructions:\n    # API エンドポイント: セキュリティ重視\n    - path: "src/controllers/**"\n      instructions: |\n        - 認証・認可の欠落を必ず指摘。\n        - SQL インジェクション・XSS の可能性を確認。\n        - レート制限の実装を確認。\n\n    # インフラコード: 破壊的変更に敏感\n    - path: "**/*.tf"\n      instructions: |\n        - terraform destroy に相当する変更は必ず警告。\n        - 最小権限の原則に違反する IAM 設定を指摘。\n\n    # マイグレーション: 不可逆操作の検出\n    - path: "db/migrations/**"\n      instructions: |\n        - DROP TABLE / TRUNCATE を検出したら危険として警告。\n        - ダウンタイムを伴うロックが発生するか評価。\n\n    # フロントエンド: アクセシビリティ\n    - path: "src/components/**"\n      instructions: |\n        - WCAG 2.1 準拠（aria-label, alt テキスト等）を確認。\n        - console.log の残存を指摘。`}
-                />
-              </div>
-              <div className={styles.codeBody}>
-                <div className={styles.codeLine}>
-                  <span className={styles.codeKeyword}>reviews</span>:
-                </div>
-                <div className={styles.codeLine}>
-                  {"  "}
-                  <span className={styles.codeKeyword}>path_instructions</span>:
-                </div>
-                <div className={styles.codeLine}>
-                  {"    "}
-                  <span className={styles.codeComment}># API エンドポイント: セキュリティ重視</span>
-                </div>
-                <div className={styles.codeLine}>
-                  {"    "}- <span className={styles.codeKeyword}>path</span>:{" "}
-                  <span className={styles.codeString}>&quot;src/controllers/**&quot;</span>
-                </div>
-                <div className={styles.codeLine}>
-                  {"      "}
-                  <span className={styles.codeKeyword}>instructions</span>:{" "}
-                  <span className={styles.codeString}>|</span>
-                </div>
-                <div className={styles.codeLine}>{"        - 認証・認可の欠落を必ず指摘。"}</div>
-                <div className={styles.codeLine}>
-                  {"        - SQL インジェクション・XSS の可能性を確認。"}
-                </div>
-                <div className={styles.codeLine}>{"        - レート制限の実装を確認。"}</div>
-                <div className={styles.codeLine} />
-                <div className={styles.codeLine}>
-                  {"    "}
-                  <span className={styles.codeComment}># インフラコード: 破壊的変更に敏感</span>
-                </div>
-                <div className={styles.codeLine}>
-                  {"    "}- <span className={styles.codeKeyword}>path</span>:{" "}
-                  <span className={styles.codeString}>&quot;**/*.tf&quot;</span>
-                </div>
-                <div className={styles.codeLine}>
-                  {"      "}
-                  <span className={styles.codeKeyword}>instructions</span>:{" "}
-                  <span className={styles.codeString}>|</span>
-                </div>
-                <div className={styles.codeLine}>
-                  {"        - terraform destroy に相当する変更は必ず警告。"}
-                </div>
-                <div className={styles.codeLine}>
-                  {"        - 最小権限の原則に違反する IAM 設定を指摘。"}
-                </div>
-                <div className={styles.codeLine} />
-                <div className={styles.codeLine}>
-                  {"    "}
-                  <span className={styles.codeComment}># マイグレーション: 不可逆操作の検出</span>
-                </div>
-                <div className={styles.codeLine}>
-                  {"    "}- <span className={styles.codeKeyword}>path</span>:{" "}
-                  <span className={styles.codeString}>&quot;db/migrations/**&quot;</span>
-                </div>
-                <div className={styles.codeLine}>
-                  {"      "}
-                  <span className={styles.codeKeyword}>instructions</span>:{" "}
-                  <span className={styles.codeString}>|</span>
-                </div>
-                <div className={styles.codeLine}>
-                  {"        - DROP TABLE / TRUNCATE を検出したら危険として警告。"}
-                </div>
-                <div className={styles.codeLine}>
-                  {"        - ダウンタイムを伴うロックが発生するか評価。"}
-                </div>
-                <div className={styles.codeLine} />
-                <div className={styles.codeLine}>
-                  {"    "}
-                  <span className={styles.codeComment}># フロントエンド: アクセシビリティ</span>
-                </div>
-                <div className={styles.codeLine}>
-                  {"    "}- <span className={styles.codeKeyword}>path</span>:{" "}
-                  <span className={styles.codeString}>&quot;src/components/**&quot;</span>
-                </div>
-                <div className={styles.codeLine}>
-                  {"      "}
-                  <span className={styles.codeKeyword}>instructions</span>:{" "}
-                  <span className={styles.codeString}>|</span>
-                </div>
-                <div className={styles.codeLine}>
-                  {"        - WCAG 2.1 準拠（aria-label, alt テキスト等）を確認。"}
-                </div>
-                <div className={styles.codeLine}>{"        - console.log の残存を指摘。"}</div>
-              </div>
-            </div>
-
-            <div className={`${styles.callout} ${styles.info}`}>
-              <span className={styles.calloutIcon}>💡</span>
-              <div className={styles.calloutBody}>
-                glob パターンは
-                <Ext href="https://github.com/isaacs/minimatch">minimatch</Ext>
-                形式。<code>**</code>{" "}
-                は任意のディレクトリ深度にマッチします。パスフィルター（除外）は
-                <code>!</code> プレフィックスで指定。
-              </div>
-            </div>
-          </div>
-
-          <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>2.4 Central Configuration — 組織全体の一元管理</h3>
-            <p className={styles.paragraph}>
-              <strong>理由：</strong>50 リポジトリに個別 YAML
-              を配置するのは運用上のオーバーヘッドになります。Central Configuration を使うと
-              <code>coderabbit</code> という専用リポジトリ 1 か所だけ管理すれば済みます。
-            </p>
-
-            <ul className={styles.stepList}>
-              <li>
-                <span className={styles.stepNum}>1</span>
-                <div className={styles.stepContent}>
-                  組織内に <code>coderabbit</code> という名前のリポジトリを作成する
-                </div>
-              </li>
-              <li>
-                <span className={styles.stepNum}>2</span>
-                <div className={styles.stepContent}>
-                  そのリポジトリのルートに <code>.coderabbit.yaml</code> を配置する
-                </div>
-              </li>
-              <li>
-                <span className={styles.stepNum}>3</span>
-                <div className={styles.stepContent}>
-                  個別
-                  <code>.coderabbit.yaml</code> を持たないリポジトリには自動的にこの設定が適用される
-                </div>
-              </li>
-              <li>
-                <span className={styles.stepNum}>4</span>
-                <div className={styles.stepContent}>
-                  個別リポジトリに
-                  <code>.coderabbit.yaml</code> を置くと、中央設定より優先される（Priority 1 &gt;
-                  2）
-                </div>
-              </li>
-            </ul>
-          </div>
-
-          {/* Ch2 refs */}
-          <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>📚 Chapter 2 参考 URL</h3>
-            <div className={styles.refGrid}>
-              <div className={styles.refCard}>
-                <div className={styles.refCat}>【公式 Docs】設定概要</div>
-                <Ext href="https://docs.coderabbit.ai/guides/configuration-overview.md">
-                  https://docs.coderabbit.ai/guides/configuration-overview.md
-                </Ext>
-              </div>
-              <div className={styles.refCard}>
-                <div className={styles.refCat}>【公式 Docs】YAML 設定</div>
-                <Ext href="https://docs.coderabbit.ai/getting-started/yaml-configuration.md">
-                  https://docs.coderabbit.ai/getting-started/yaml-configuration.md
-                </Ext>
-              </div>
-              <div className={styles.refCard}>
-                <div className={styles.refCat}>【公式 Docs】Path Instructions</div>
-                <Ext href="https://docs.coderabbit.ai/configuration/path-instructions.md">
-                  https://docs.coderabbit.ai/configuration/path-instructions.md
-                </Ext>
-              </div>
-              <div className={styles.refCard}>
-                <div className={styles.refCat}>【公式 Docs】Central Configuration</div>
-                <Ext href="https://docs.coderabbit.ai/configuration/central-configuration.md">
-                  https://docs.coderabbit.ai/configuration/central-configuration.md
-                </Ext>
-              </div>
-              <div className={styles.refCard}>
-                <div className={styles.refCat}>【公式 Docs】設定継承</div>
-                <Ext href="https://docs.coderabbit.ai/configuration/configuration-inheritance.md">
-                  https://docs.coderabbit.ai/configuration/configuration-inheritance.md
-                </Ext>
-              </div>
-              <div className={styles.refCard}>
-                <div className={styles.refCat}>【公式 Docs】Configuration Reference</div>
-                <Ext href="https://docs.coderabbit.ai/reference/configuration.md">
-                  https://docs.coderabbit.ai/reference/configuration.md
-                </Ext>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <hr className={styles.divider} />
-
-        {/* ══════════════ CH3: KNOWLEDGE BASE ══════════════ */}
-        <section className={styles.chapter} id="ch3">
-          <div className={styles.chapterHeader}>
-            <div className={styles.chapterNum}>3</div>
-            <h2 className={styles.chapterTitle}>
-              <span>Knowledge Base</span> &amp; Learnings
-              <span className={`${styles.klevel} ${styles.kl2}`}>K-Level: 適用</span>
-            </h2>
-          </div>
-
-          <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>3.1 Knowledge Base の全体像</h3>
-            <p className={styles.paragraph}>
-              CodeRabbit のレビュー精度は
-              <strong>Knowledge Base</strong> の充実度に比例します。Knowledge Base は 5
-              つのソースで構成されます。
-            </p>
-
-            <div className={styles.archLayers}>
-              <div className={`${styles.archRow} ${styles.cyan}`}>
-                <div className={styles.archLabel}>Learnings</div>
-                <div className={styles.archDesc}>
-                  チャットから自然言語で追加される動的なレビュー優先事項。フィードバックループにより自動進化
-                </div>
-              </div>
-              <div className={`${styles.archRow} ${styles.green}`}>
-                <div className={styles.archLabel}>Code Guidelines</div>
-                <div className={styles.archDesc}>
-                  .cursorrules / CLAUDE.md / AGENTS.md を自動検出。AI
-                  コーディングエージェントと共有可能
-                </div>
-              </div>
-              <div className={`${styles.archRow} ${styles.amber}`}>
-                <div className={styles.archLabel}>Multi-Repo Analysis</div>
-                <div className={styles.archDesc}>
-                  関連リポジトリをリンクして API 破壊的変更・依存不整合をクロスリポジトリで検出
-                </div>
-              </div>
-              <div className={`${styles.archRow} ${styles.pink}`}>
-                <div className={styles.archLabel}>MCP Servers</div>
-                <div className={styles.archDesc}>
-                  Notion / Jira / SonarQube 等の外部ツールからレビューコンテキストを動的取得
-                </div>
-              </div>
-              <div className={`${styles.archRow} ${styles.purple}`}>
-                <div className={styles.archLabel}>Web Search</div>
-                <div className={styles.archDesc}>
-                  セキュリティ脆弱性・最新 API 情報をリアルタイムに検索してレビューに反映
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>3.2 Learnings — AI を育てる</h3>
-            <p className={styles.paragraph}>
-              <strong>定義：</strong>PR コメントを通じて自然言語でレビュー優先事項を CodeRabbit
-              に記憶させる仕組みです。組織の Git
-              プラットフォームに紐づいた内部データベースに保存されます。
-            </p>
-
-            <h4 className={styles.subsectionTitle}>Learning を追加する 3 パターン</h4>
-
-            <ul className={styles.stepList}>
-              <li>
-                <span className={styles.stepNum}>1</span>
-                <div className={styles.stepContent}>
-                  <strong>コメント返信で追加（最も推奨）</strong>
-                  <br />
-                  CodeRabbit のインラインコメントに直接返信する。文脈が最も豊富に保存される。
-                  <div className={styles.codeWrap} style={{ marginTop: "0.5rem" }}>
-                    <div className={styles.codeBar}>
-                      <span>PR Reply</span>
-                      <CodeCopyButton
-                        className={styles.codeCopy}
-                        text={`@coderabbitai 認証ミドルウェアではネストした try-catch より アーリーリターン + 固有エラーコードを使います。モニタリングツールがエラーコードで追跡できるため。`}
-                      />
-                    </div>
-                    <div className={styles.codeBody}>
-                      <div className={styles.codeLine}>
-                        <span className={styles.codeGreen}>@coderabbitai</span>{" "}
-                        <span className={styles.codeString}>
-                          認証ミドルウェアではネストした try-catch より アーリーリターン +
-                          固有エラーコードを使います。モニタリングツールがエラーコードで追跡できるため。
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </li>
-              <li>
-                <span className={styles.stepNum}>2</span>
-                <div className={styles.stepContent}>
-                  <strong>ファイルインポートで一括追加</strong>
-                  <br />
-                  既存ドキュメント（コーディング規約等）を一気にインポート。
-                  <div className={styles.codeWrap} style={{ marginTop: "0.5rem" }}>
-                    <div className={styles.codeBar}>
-                      <span>PR Comment</span>
-                      <CodeCopyButton
-                        className={styles.codeCopy}
-                        text={`@coderabbitai add a learning using docs/coding-standards.md`}
-                      />
-                    </div>
-                    <div className={styles.codeBody}>
-                      <div className={styles.codeLine}>
-                        <span className={styles.codeGreen}>@coderabbitai</span>{" "}
-                        <span className={styles.codeString}>
-                          add a learning using docs/coding-standards.md
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </li>
-              <li>
-                <span className={styles.stepNum}>3</span>
-                <div className={styles.stepContent}>
-                  <strong>CSV インポートで組織移行時に転送</strong>
-                  <br />
-                  旧アカウントからエクスポートした CSV を新 PR にアップして移行。
-                  <div className={styles.codeWrap} style={{ marginTop: "0.5rem" }}>
-                    <div className={styles.codeBar}>
-                      <span>PR Comment</span>
-                      <CodeCopyButton
-                        className={styles.codeCopy}
-                        text={`@coderabbitai import file my_learnings.csv as Learnings data for future use`}
-                      />
-                    </div>
-                    <div className={styles.codeBody}>
-                      <div className={styles.codeLine}>
-                        <span className={styles.codeGreen}>@coderabbitai</span>{" "}
-                        <span className={styles.codeString}>
-                          import file my_learnings.csv as Learnings data for future use
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </li>
-            </ul>
-
-            <h4 className={styles.subsectionTitle}>効果的な Learning の書き方</h4>
-            <div className={styles.compareGrid}>
-              <div className={`${styles.compareCard} ${styles.good}`}>
-                <div className={styles.compareHead}>✅ 効果的（理由を含む）</div>
-                <div className={styles.compareBody}>
-                  <div className={styles.codeLine}>
-                    <span className={styles.codeGreen}>@coderabbitai</span> ユーザー ID
-                    をエラーメッセージに含めないでください。
-                  </div>
-                  <div className={styles.codeLine}>
-                    <span className={styles.codeCyan}>理由:</span>{" "}
-                    エラーログは外部モニタリングサービスに送信されるため。ユーザーコンテキストは
-                    トレーシングシステムで別途追跡しています。
-                  </div>
-                </div>
-              </div>
-              <div className={`${styles.compareCard} ${styles.bad}`}>
-                <div className={styles.compareHead}>❌ 非効果的（理由なし）</div>
-                <div className={styles.compareBody}>
-                  <div className={styles.codeLine}>
-                    <span className={styles.codeGreen}>@coderabbitai</span>{" "}
-                    エラーメッセージにユーザー IDを入れるな。
-                  </div>
-                  <div className={styles.codeLine} />
-                  <div className={styles.codeLine}>
-                    <span className={styles.codeComment}>
-                      {"// 理由がないと類似状況で正しく適用されない"}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <h4 className={styles.subsectionTitle}>Learnings スコープ設定</h4>
-            <div className={styles.tableWrap}>
-              <table className={styles.table}>
-                <thead className={styles.thead}>
-                  <tr>
-                    <th className={styles.th}>スコープ</th>
-                    <th className={styles.th}>挙動</th>
-                    <th className={styles.th}>推奨ユースケース</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td className={styles.td}>
-                      <code>auto</code>（デフォルト）
-                    </td>
-                    <td className={styles.td}>public: リポジトリのみ / private: 組織全体</td>
-                    <td className={styles.td}>混在環境のデフォルト</td>
-                  </tr>
-                  <tr>
-                    <td className={styles.td}>
-                      <code>local</code>
-                    </td>
-                    <td className={styles.td}>そのリポジトリのみ</td>
-                    <td className={styles.td}>Python / React 等 異なる技術スタックが混在</td>
-                  </tr>
-                  <tr>
-                    <td className={styles.td}>
-                      <code>global</code>
-                    </td>
-                    <td className={styles.td}>組織全リポジトリに適用</td>
-                    <td className={styles.td}>セキュリティ要件・命名規則が全社統一</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>
-              3.3 Code Guidelines — 既存ドキュメントを即座に活用
-            </h3>
-            <p className={styles.paragraph}>
-              CodeRabbit は以下のファイルをリポジトリ内で<strong>自動検出</strong>
-              し、レビュー基準として適用します。設定不要です。
-            </p>
-
-            <div className={styles.tableWrap}>
-              <table className={styles.table}>
-                <thead className={styles.thead}>
-                  <tr>
-                    <th className={styles.th}>ファイル名</th>
-                    <th className={styles.th}>説明</th>
-                    <th className={styles.th}>AI コーディングエージェントとの共有</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td className={styles.td}>
-                      <code>CLAUDE.md</code>
-                    </td>
-                    <td className={styles.td}>Anthropic Claude 向けエージェント指示</td>
-                    <td className={styles.td}>Claude Code / Cursor で共有可</td>
-                  </tr>
-                  <tr>
-                    <td className={styles.td}>
-                      <code>.cursorrules</code>
-                    </td>
-                    <td className={styles.td}>Cursor IDE のルール定義</td>
-                    <td className={styles.td}>Cursor で共有可</td>
-                  </tr>
-                  <tr>
-                    <td className={styles.td}>
-                      <code>AGENTS.md</code>
-                    </td>
-                    <td className={styles.td}>汎用エージェント指示ファイル</td>
-                    <td className={styles.td}>多くのエージェントで共有可</td>
-                  </tr>
-                  <tr>
-                    <td className={styles.td}>
-                      <code>.github/copilot-instructions.md</code>
-                    </td>
-                    <td className={styles.td}>GitHub Copilot 向け指示</td>
-                    <td className={styles.td}>Copilot で共有可</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-            <div className={`${styles.alert} ${styles.green}`}>
-              💡 <strong>CLAUDE.md が既に存在するなら</strong>、CodeRabbit
-              は追加設定なしにその内容をレビュー基準として使用します。プロジェクトの規約を一元管理できます。
-            </div>
-          </div>
-
-          {/* Ch3 refs */}
-          <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>📚 Chapter 3 参考 URL</h3>
-            <div className={styles.refGrid}>
-              <div className={styles.refCard}>
-                <div className={styles.refCat}>【公式 Docs】Knowledge Base 概要</div>
-                <Ext href="https://docs.coderabbit.ai/knowledge-base/index.md">
-                  https://docs.coderabbit.ai/knowledge-base/index.md
-                </Ext>
-              </div>
-              <div className={styles.refCard}>
-                <div className={styles.refCat}>【公式 Docs】Learnings</div>
-                <Ext href="https://docs.coderabbit.ai/knowledge-base/learnings.md">
-                  https://docs.coderabbit.ai/knowledge-base/learnings.md
-                </Ext>
-              </div>
-              <div className={styles.refCard}>
-                <div className={styles.refCat}>【公式 Docs】Code Guidelines</div>
-                <Ext href="https://docs.coderabbit.ai/knowledge-base/code-guidelines.md">
-                  https://docs.coderabbit.ai/knowledge-base/code-guidelines.md
-                </Ext>
-              </div>
-              <div className={styles.refCard}>
-                <div className={styles.refCat}>【公式 Docs】Multi-Repo Analysis</div>
-                <Ext href="https://docs.coderabbit.ai/knowledge-base/multi-repo-analysis.md">
-                  https://docs.coderabbit.ai/knowledge-base/multi-repo-analysis.md
-                </Ext>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <hr className={styles.divider} />
-
-        {/* ══════════════ CH4: COMMANDS ══════════════ */}
-        <section className={styles.chapter} id="ch4">
-          <div className={styles.chapterHeader}>
-            <div className={styles.chapterNum}>4</div>
-            <h2 className={styles.chapterTitle}>
-              <span>コマンド</span> &amp; チャット活用{" "}
-              <span className={`${styles.klevel} ${styles.kl1}`}>K-Level: 記憶</span>
-            </h2>
-          </div>
-
-          <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>4.1 コアコマンド完全リファレンス</h3>
-
-            <div className={styles.tableWrap}>
-              <table className={styles.table}>
-                <thead className={styles.thead}>
-                  <tr>
-                    <th className={styles.th}>コマンド</th>
-                    <th className={styles.th}>効果</th>
-                    <th className={styles.th}>用途</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td className={styles.td}>
-                      <code>@coderabbitai review</code>
-                    </td>
-                    <td className={styles.td}>前回以降の差分を増分レビュー</td>
-                    <td className={styles.td}>新しいコミット後に素早く確認</td>
-                  </tr>
-                  <tr>
-                    <td className={styles.td}>
-                      <code>@coderabbitai full review</code>
-                    </td>
-                    <td className={styles.td}>PR 全体をゼロからレビュー</td>
-                    <td className={styles.td}>大規模リファクタリング後</td>
-                  </tr>
-                  <tr>
-                    <td className={styles.td}>
-                      <code>@coderabbitai pause</code>
-                    </td>
-                    <td className={styles.td}>自動レビューを一時停止</td>
-                    <td className={styles.td}>WIP コミット中のノイズ削減</td>
-                  </tr>
-                  <tr>
-                    <td className={styles.td}>
-                      <code>@coderabbitai resume</code>
-                    </td>
-                    <td className={styles.td}>自動レビューを再開</td>
-                    <td className={styles.td}>pause 解除</td>
-                  </tr>
-                  <tr>
-                    <td className={styles.td}>
-                      <code>@coderabbitai resolve</code>
-                    </td>
-                    <td className={styles.td}>全コメントを解決済みにする</td>
-                    <td className={styles.td}>一括クリーンアップ</td>
-                  </tr>
-                  <tr>
-                    <td className={styles.td}>
-                      <code>@coderabbitai summary</code>
-                    </td>
-                    <td className={styles.td}>PR 説明の要約を更新</td>
-                    <td className={styles.td}>変更内容が大きく変わった後</td>
-                  </tr>
-                  <tr>
-                    <td className={styles.td}>
-                      <code>@coderabbitai generate sequence diagram</code>
-                    </td>
-                    <td className={styles.td}>シーケンス図を生成して投稿</td>
-                    <td className={styles.td}>設計レビュー前の可視化</td>
-                  </tr>
-                  <tr>
-                    <td className={styles.td}>
-                      <code>@coderabbitai configuration</code>
-                    </td>
-                    <td className={styles.td}>現在の設定を表示</td>
-                    <td className={styles.td}>設定確認・デバッグ</td>
-                  </tr>
-                  <tr>
-                    <td className={styles.td}>
-                      <code>@coderabbitai help</code>
-                    </td>
-                    <td className={styles.td}>クイックリファレンスを表示</td>
-                    <td className={styles.td}>コマンド一覧を確認</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-            <div className={`${styles.callout} ${styles.info}`}>
-              <span className={styles.calloutIcon}>💡</span>
-              <div className={styles.calloutBody}>
-                <code>@coderabbitai review</code> と <code>full review</code> の違いに注意。
-                <code>review</code> は増分（前回以降の変更のみ）、<code>full review</code> は PR
-                全体を再評価します。大幅なリベース後は <code>full review</code> を使用してください。
-              </div>
-            </div>
-          </div>
-
-          <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>4.2 インタラクティブチャットの活用パターン</h3>
-            <p className={styles.paragraph}>
-              コマンド以外にも、CodeRabbit とのチャットによって様々な高度な活用が可能です。
-            </p>
-
-            <div className={styles.examGrid}>
-              <div className={styles.examCard}>
-                <div className={styles.examTitle}>🔍 コードの深堀り質問</div>
-                <div className={styles.examStars}>★★★★☆</div>
-                <div className={styles.examDesc}>
-                  「この関数の時間計算量を教えて」「このパターンのメモリリークリスクは？」など、特定コードへの質問
-                </div>
-              </div>
-              <div className={styles.examCard}>
-                <div className={styles.examTitle}>📝 Learning の即座追加</div>
-                <div className={styles.examStars}>★★★★★</div>
-                <div className={styles.examDesc}>
-                  コメント返信で理由付きの優先事項を伝えると、次回から自動適用される
-                </div>
-              </div>
-              <div className={styles.examCard}>
-                <div className={styles.examTitle}>🔧 改善案の依頼</div>
-                <div className={styles.examStars}>★★★★☆</div>
-                <div className={styles.examDesc}>
-                  「このコードをより関数型スタイルに書き直して」「エラーハンドリングを強化するには？」
-                </div>
-              </div>
-              <div className={styles.examCard}>
-                <div className={styles.examTitle}>📊 設計レビュー</div>
-                <div className={styles.examStars}>★★★☆☆</div>
-                <div className={styles.examDesc}>
-                  シーケンス図生成を活用して、PR の変更が設計意図と一致しているか確認
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>4.3 PR Description で自動レビューを制御</h3>
-
-            <div className={styles.codeWrap}>
-              <div className={styles.codeBar}>
-                <span>PR Description</span>
-                <CodeCopyButton
-                  className={styles.codeCopy}
-                  text={`## Summary\nこのPRはユーザー認証フローのリファクタリングです。\n\n## レビュー対象外（意図的な変更）\n@coderabbitai ignore # ← PR全体の自動レビューを無効化\n\n## または特定コミットのみ除外したい場合\n# コミットメッセージに [skip ci] を含める`}
-                />
-              </div>
-              <div className={styles.codeBody}>
-                <div className={styles.codeLine}>
-                  <span className={styles.codeComment}>## Summary</span>
-                </div>
-                <div className={styles.codeLine}>
-                  <span className={styles.codeComment}>
-                    このPRはユーザー認証フローのリファクタリングです。
-                  </span>
-                </div>
-                <div className={styles.codeLine} />
-                <div className={styles.codeLine}>
-                  <span className={styles.codeComment}>## レビュー対象外（意図的な変更）</span>
-                </div>
-                <div className={styles.codeLine}>
-                  <span className={styles.codeGreen}>@coderabbitai ignore</span>{" "}
-                  <span className={styles.codeAmber}># ← PR全体の自動レビューを無効化</span>
-                </div>
-                <div className={styles.codeLine} />
-                <div className={styles.codeLine}>
-                  <span className={styles.codeComment}>
-                    ## または特定コミットのみ除外したい場合
-                  </span>
-                </div>
-                <div className={styles.codeLine}>
-                  <span className={styles.codeComment}>
-                    # コミットメッセージに [skip ci] を含める
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Ch4 refs */}
-          <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>📚 Chapter 4 参考 URL</h3>
-            <div className={styles.refGrid}>
-              <div className={styles.refCard}>
-                <div className={styles.refCat}>【公式 Docs】コマンド管理</div>
-                <Ext href="https://docs.coderabbit.ai/guides/commands.md">
-                  https://docs.coderabbit.ai/guides/commands.md
-                </Ext>
-              </div>
-              <div className={styles.refCard}>
-                <div className={styles.refCat}>【公式 Docs】レビューコマンドリファレンス</div>
-                <Ext href="https://docs.coderabbit.ai/reference/review-commands.md">
-                  https://docs.coderabbit.ai/reference/review-commands.md
-                </Ext>
-              </div>
-              <div className={styles.refCard}>
-                <div className={styles.refCat}>【公式 Docs】インタラクティブチャット</div>
-                <Ext href="https://docs.coderabbit.ai/guide/chat.md">
-                  https://docs.coderabbit.ai/guide/chat.md
-                </Ext>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <hr className={styles.divider} />
-
-        {/* ══════════════ CH5: FINISHING TOUCHES ══════════════ */}
-        <section className={styles.chapter} id="ch5">
-          <div className={styles.chapterHeader}>
-            <div className={styles.chapterNum}>5</div>
-            <h2 className={styles.chapterTitle}>
-              <span>Finishing Touches</span> — AI が仕上げる
-              <span className={`${styles.klevel} ${styles.kl3}`}>K-Level: 応用</span>
-            </h2>
-          </div>
-
-          <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>5.1 Finishing Touches 全機能マップ</h3>
-
-            <div className={styles.tableWrap}>
-              <table className={styles.table}>
-                <thead className={styles.thead}>
-                  <tr>
-                    <th className={styles.th}>機能</th>
-                    <th className={styles.th}>コマンド</th>
-                    <th className={styles.th}>出力</th>
-                    <th className={styles.th}>プラン</th>
-                    <th className={styles.th}>対応 PF</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td className={styles.td}>
-                      🔧 <strong>Autofix</strong>
-                    </td>
-                    <td className={styles.td}>
-                      <code>@coderabbitai autofix</code>
-                    </td>
-                    <td className={styles.td}>コミット or スタック PR</td>
-                    <td className={styles.td}>Pro+</td>
-                    <td className={styles.td}>GitHub / GitLab</td>
-                  </tr>
-                  <tr>
-                    <td className={styles.td}>
-                      📝 <strong>Docstring 生成</strong>
-                    </td>
-                    <td className={styles.td}>
-                      <code>@coderabbitai generate docstrings</code>
-                    </td>
-                    <td className={styles.td}>別 PR として作成</td>
-                    <td className={styles.td}>Pro+</td>
-                    <td className={styles.td}>全プラットフォーム</td>
-                  </tr>
-                  <tr>
-                    <td className={styles.td}>
-                      🔀 <strong>マージコンフリクト解消</strong>
-                    </td>
-                    <td className={styles.td}>
-                      <code>@coderabbitai fix merge conflict</code>
-                    </td>
-                    <td className={styles.td}>マージコミット</td>
-                    <td className={styles.td}>Pro+</td>
-                    <td className={styles.td}>GitHub / GitLab</td>
-                  </tr>
-                  <tr>
-                    <td className={styles.td}>
-                      🧪 <strong>ユニットテスト生成</strong>
-                    </td>
-                    <td className={styles.td}>
-                      <code>@coderabbitai generate unit tests</code>
-                    </td>
-                    <td className={styles.td}>PR or コミット</td>
-                    <td className={styles.td}>Pro+</td>
-                    <td className={styles.td}>GitHub のみ</td>
-                  </tr>
-                  <tr>
-                    <td className={styles.td}>
-                      ✨ <strong>コード簡略化</strong>
-                    </td>
-                    <td className={styles.td}>
-                      <code>@coderabbitai simplify</code>
-                    </td>
-                    <td className={styles.td}>PR or コミット</td>
-                    <td className={styles.td}>Pro+</td>
-                    <td className={styles.td}>GitHub のみ</td>
-                  </tr>
-                  <tr>
-                    <td className={styles.td}>
-                      📜 <strong>Custom Recipe</strong>
-                    </td>
-                    <td className={styles.td}>
-                      <code>@coderabbitai run &lt;recipe&gt;</code>
-                    </td>
-                    <td className={styles.td}>コミット or スタック PR</td>
-                    <td className={styles.td}>Pro+</td>
-                    <td className={styles.td}>GitHub のみ</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>
-              5.2 Custom Recipes — チームの繰り返しタスクを自動化
-            </h3>
-            <p className={styles.paragraph}>
-              <strong>定義：</strong>
-              チームが頻繁に行う定型作業をレシピとして定義し、ワンコマンドで実行させる機能。
-            </p>
-            <p className={styles.paragraph}>
-              <strong>具体例：</strong>CHANGELOG 更新・import
-              整理・型チェック強化・国際化対応確認など。
-            </p>
-
-            <div className={styles.codeWrap}>
-              <div className={styles.codeBar}>
-                <span>.coderabbit.yaml</span>
-                <span className={styles.codeLang}>YAML</span>
-                <CodeCopyButton
-                  className={styles.codeCopy}
-                  text={`finishing_touches:\n  custom_recipes:\n    - name: "add-changelog-entry"\n      description: "CHANGELOG.md にこの PR のエントリを追加"\n      instructions: |\n        PR の内容を分析し、CHANGELOG.md の [Unreleased] セクションに適切なエントリを追加してください。\n        形式: \`- [Fix/Feature/Chore] 変更内容の簡潔な説明 (#PR番号)\`\n\n    - name: "enforce-strict-types"\n      description: "any 型を排除して厳密型に変換"\n      instructions: |\n        変更されたTypeScriptファイル内の any 型を 適切な型に置き換えてください。\n        unknown を中間型として使う場合はコメントで説明を追加。`}
-                />
-              </div>
-              <div className={styles.codeBody}>
-                <div className={styles.codeLine}>
-                  <span className={styles.codeKeyword}>finishing_touches</span>:
-                </div>
-                <div className={styles.codeLine}>
-                  {"  "}
-                  <span className={styles.codeKeyword}>custom_recipes</span>:
-                </div>
-                <div className={styles.codeLine}>
-                  {"    "}- <span className={styles.codeKeyword}>name</span>:{" "}
-                  <span className={styles.codeString}>&quot;add-changelog-entry&quot;</span>
-                </div>
-                <div className={styles.codeLine}>
-                  {"      "}
-                  <span className={styles.codeKeyword}>description</span>:{" "}
-                  <span className={styles.codeString}>
-                    &quot;CHANGELOG.md にこの PR のエントリを追加&quot;
-                  </span>
-                </div>
-                <div className={styles.codeLine}>
-                  {"      "}
-                  <span className={styles.codeKeyword}>instructions</span>:{" "}
-                  <span className={styles.codeString}>|</span>
-                </div>
-                <div className={styles.codeLine}>
-                  {
-                    "        PR の内容を分析し、CHANGELOG.md の [Unreleased] セクションに適切なエントリを追加してください。"
-                  }
-                </div>
-                <div className={styles.codeLine}>
-                  {"        形式: `- [Fix/Feature/Chore] 変更内容 of 簡潔な説明 (#PR番号)`"}
-                </div>
-                <div className={styles.codeLine} />
-                <div className={styles.codeLine}>
-                  {"    "}- <span className={styles.codeKeyword}>name</span>:{" "}
-                  <span className={styles.codeString}>&quot;enforce-strict-types&quot;</span>
-                </div>
-                <div className={styles.codeLine}>
-                  {"      "}
-                  <span className={styles.codeKeyword}>description</span>:{" "}
-                  <span className={styles.codeString}>
-                    &quot;any 型を排除して厳密型に変換&quot;
-                  </span>
-                </div>
-                <div className={styles.codeLine}>
-                  {"      "}
-                  <span className={styles.codeKeyword}>instructions</span>:{" "}
-                  <span className={styles.codeString}>|</span>
-                </div>
-                <div className={styles.codeLine}>
-                  {
-                    "        変更されたTypeScriptファイル内の any 型を 適切な型に置き換えてください。"
-                  }
-                </div>
-                <div className={styles.codeLine}>
-                  {"        unknown を中間型として使う場合はコメントで説明を追加。"}
-                </div>
-              </div>
-            </div>
-
-            <h4 className={styles.subsectionTitle}>使い方</h4>
-            <div className={styles.codeWrap}>
-              <div className={styles.codeBar}>
-                <span>PR Comment</span>
-                <CodeCopyButton
-                  className={styles.codeCopy}
-                  text={`@coderabbitai run add-changelog-entry\n@coderabbitai run enforce-strict-types`}
-                />
-              </div>
-              <div className={styles.codeBody}>
-                <div className={styles.codeLine}>
-                  <span className={styles.codeComment}># PR コメントでレシピを実行</span>
-                </div>
-                <div className={styles.codeLine}>
-                  <span className={styles.codeGreen}>@coderabbitai</span>{" "}
-                  <span className={styles.codeString}>run add-changelog-entry</span>
-                </div>
-                <div className={styles.codeLine}>
-                  <span className={styles.codeGreen}>@coderabbitai</span>{" "}
-                  <span className={styles.codeString}>run enforce-strict-types</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>5.3 Finishing Touches のトリガーフロー</h3>
-
-            <div className={styles.mermaidWrap}>
-              <div id="mermaid-finishing-touches">
-                <MermaidDiagram chart={DIAG_FINISHING_TOUCHES} />
-              </div>
-            </div>
-          </div>
-
-          {/* Ch5 refs */}
-          <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>📚 Chapter 5 参考 URL</h3>
-            <div className={styles.refGrid}>
-              <div className={styles.refCard}>
-                <div className={styles.refCat}>【公式 Docs】Finishing Touches 概要</div>
-                <Ext href="https://docs.coderabbit.ai/finishing-touches/index.md">
-                  https://docs.coderabbit.ai/finishing-touches/index.md
-                </Ext>
-              </div>
-              <div className={styles.refCard}>
-                <div className={styles.refCat}>【公式 Docs】Autofix</div>
-                <Ext href="https://docs.coderabbit.ai/finishing-touches/autofix.md">
-                  https://docs.coderabbit.ai/finishing-touches/autofix.md
-                </Ext>
-              </div>
-              <div className={styles.refCard}>
-                <div className={styles.refCat}>【公式 Docs】Docstring 生成</div>
-                <Ext href="https://docs.coderabbit.ai/finishing-touches/docstrings.md">
-                  https://docs.coderabbit.ai/finishing-touches/docstrings.md
-                </Ext>
-              </div>
-              <div className={styles.refCard}>
-                <div className={styles.refCat}>【公式 Docs】Unit Test 生成</div>
-                <Ext href="https://docs.coderabbit.ai/finishing-touches/unit-test-generation.md">
-                  https://docs.coderabbit.ai/finishing-touches/unit-test-generation.md
-                </Ext>
-              </div>
-              <div className={styles.refCard}>
-                <div className={styles.refCat}>【公式 Docs】Custom Recipes</div>
-                <Ext href="https://docs.coderabbit.ai/finishing-touches/custom-finishing-touches.md">
-                  https://docs.coderabbit.ai/finishing-touches/custom-finishing-touches.md
-                </Ext>
-              </div>
-              <div className={styles.refCard}>
-                <div className={styles.refCat}>【公式 Docs】マージコンフリクト解消</div>
-                <Ext href="https://docs.coderabbit.ai/finishing-touches/resolve-merge-conflict.md">
-                  https://docs.coderabbit.ai/finishing-touches/resolve-merge-conflict.md
-                </Ext>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <hr className={styles.divider} />
-
-        {/* ══════════════ CH6: MCP ══════════════ */}
-        <section className={styles.chapter} id="ch6">
-          <div className={styles.chapterHeader}>
-            <div className={styles.chapterNum}>6</div>
-            <h2 className={styles.chapterTitle}>
-              <span>MCP</span> 統合 — コンテキストを無限に拡張{" "}
-              <span className={`${styles.klevel} ${styles.kl3}`}>K-Level: 応用</span>
-            </h2>
-          </div>
-
-          <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>6.1 MCP とは何か、なぜ重要か</h3>
-            <p className={styles.paragraph}>
-              <strong>定義：</strong>Model Context Protocol (MCP) は Anthropic
-              が提唱した標準インターフェース。CodeRabbit は MCP クライアントとして動作し、あらゆる
-              MCP サーバーに接続して外部データをレビューコンテキストに組み込みます。
-            </p>
-            <p className={styles.paragraph}>
-              <strong>理由：</strong>
-              コードレビューの精度は「コンテキストの豊富さ」に依存します。設計書・テスト結果・イシュー要件・パフォーマンスデータを参照することで、コードの「正しさ」をより深く評価できます。
-            </p>
-
-            <div className={styles.metricGrid}>
-              <div className={styles.metricCard}>
-                <div className={styles.metricVal}>5</div>
-                <div className={styles.metricLabel}>MCP 接続数 (Pro)</div>
-              </div>
-              <div className={styles.metricCard}>
-                <div className={styles.metricVal}>15</div>
-                <div className={styles.metricLabel}>MCP 接続数 (Pro+)</div>
-              </div>
-              <div className={styles.metricCard}>
-                <div className={styles.metricVal}>20</div>
-                <div className={styles.metricLabel}>MCP 接続数 (Enterprise)</div>
-              </div>
-            </div>
-          </div>
-
-          <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>6.2 MCP 設定手順</h3>
-
-            <ul className={styles.stepList}>
-              <li>
-                <span className={styles.stepNum}>1</span>
-                <div className={styles.stepContent}>
-                  <Ext href="https://app.coderabbit.ai/integrations">
-                    app.coderabbit.ai/integrations
-                  </Ext>{" "}
-                  → MCP タブへ移動
-                </div>
-              </li>
-              <li>
-                <span className={styles.stepNum}>2</span>
-                <div className={styles.stepContent}>
-                  <strong>New MCP Server</strong> をクリック。サーバー URL と名前を入力
-                </div>
-              </li>
-              <li>
-                <span className={styles.stepNum}>3</span>
-                <div className={styles.stepContent}>認証フロー（OAuth / API キー等）を完了</div>
-              </li>
-              <li>
-                <span className={styles.stepNum}>4</span>
-                <div className={styles.stepContent}>個別ツールの有効/無効を切り替え</div>
-              </li>
-              <li>
-                <span className={styles.stepNum}>5</span>
-                <div className={styles.stepContent}>
-                  <strong>User guidance</strong> フィールドに CodeRabbit
-                  への使い方説明を記述（次節参照）
-                </div>
-              </li>
-            </ul>
-          </div>
-
-          <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>6.3 User Guidance — AI に使い方を教える</h3>
-            <p className={styles.paragraph}>
-              <strong>定義：</strong>MCP サーバーを利用する際に AI
-              エージェントが最初に読むフリーテキスト指示。
-            </p>
-
-            <div className={styles.compareGrid}>
-              <div className={`${styles.compareCard} ${styles.good}`}>
-                <div className={styles.compareHead}>✅ Notion MCP 向け優れた User Guidance</div>
-                <div className={styles.compareBody}>
-                  <div className={styles.codeLine}>
-                    <span className={styles.codeCyan}>
-                      このNotionワークスペースはエンジニアリング文書を含みます。
-                    </span>
-                  </div>
-                  <div className={styles.codeLine}>
-                    コードレビューでは &quot;Engineering&quot; スペースを参照してください:
-                  </div>
-                  <div className={styles.codeLine}>
-                    - &quot;Architecture Decisions&quot;: 設計の根拠
-                  </div>
-                  <div className={styles.codeLine}>
-                    - &quot;API Contracts&quot;: インターフェース仕様
-                  </div>
-                  <div className={styles.codeLine}>
-                    - &quot;Service Runbooks&quot;: 運用コンテキスト
-                  </div>
-                  <div className={styles.codeLine}>
-                    HR / Finance スペースの内容は取得しないでください。
-                  </div>
-                </div>
-              </div>
-              <div className={`${styles.compareCard} ${styles.bad}`}>
-                <div className={styles.compareHead}>❌ 不十分な User Guidance</div>
-                <div className={styles.compareBody}>
-                  <div className={styles.codeLine}>
-                    <span className={styles.codePink}>Notion のドキュメントを使ってください。</span>
-                  </div>
-                  <div className={styles.codeLine} />
-                  <div className={styles.codeLine}>
-                    <span className={styles.codeComment}>{"// 問題:"}</span>
-                  </div>
-                  <div className={styles.codeLine}>
-                    <span className={styles.codeComment}>{"// - どのスペースを見るか不明"}</span>
-                  </div>
-                  <div className={styles.codeLine}>
-                    <span className={styles.codeComment}>{"// - レビューとの関連性不明"}</span>
-                  </div>
-                  <div className={styles.codeLine}>
-                    <span className={styles.codeComment}>{"// - 不要なページも取得される"}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <h4 className={styles.subsectionTitle}>URL テンプレートプレースホルダー</h4>
-            <p className={styles.paragraph}>
-              MCP の User Guidance 内で PR 固有の値を動的に展開できます。
-            </p>
-
-            <div className={styles.codeWrap}>
-              <div className={styles.codeBar}>
-                <span>Placeholder config</span>
-                <CodeCopyButton
-                  className={styles.codeCopy}
-                  text={`# Jenkins Organization Folder の例\nJenkins ビルド URL パターン: https://jenkins.company.com/job/{workspace}/job/{repo}/job/PR-{pr}/\n\n# SonarQube プロジェクトキー規約\nSonarQube プロジェクトキー形式: {org}_{repo}\nダッシュボード URL: https://sonar.company.com/dashboard?id={org}_{repo}`}
-                />
-              </div>
-              <div className={styles.codeBody}>
-                <div className={styles.codeLine}>
-                  <span className={styles.codeComment}># Jenkins Organization Folder の例</span>
-                </div>
-                <div className={styles.codeLine}>
-                  <span className={styles.codeGreen}>Jenkins ビルド URL パターン:</span>{" "}
-                  <span className={styles.codeString}>
-                    https://jenkins.company.com/job/&#123;workspace&#125;/job/&#123;repo&#125;/job/PR-&#123;pr&#125;/
-                  </span>
-                </div>
-                <div className={styles.codeLine} />
-                <div className={styles.codeLine}>
-                  <span className={styles.codeComment}># SonarQube プロジェクトキー規約</span>
-                </div>
-                <div className={styles.codeLine}>
-                  <span className={styles.codeGreen}>SonarQube プロジェクトキー形式:</span>{" "}
-                  <span className={styles.codeAmber}>&#123;org&#125;_&#123;repo&#125;</span>
-                </div>
-                <div className={styles.codeLine}>
-                  <span className={styles.codeGreen}>ダッシュボード URL:</span>{" "}
-                  <span className={styles.codeString}>
-                    https://sonar.company.com/dashboard?id=&#123;org&#125;_&#123;repo&#125;
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <div className={styles.tableWrap}>
-              <table className={styles.table}>
-                <thead className={styles.thead}>
-                  <tr>
-                    <th className={styles.th}>プレースホルダー</th>
-                    <th className={styles.th}>展開される値</th>
-                    <th className={styles.th}>例</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td className={styles.td}>
-                      <code>&#123;repo&#125;</code> / <code>&#123;repository&#125;</code>
-                    </td>
-                    <td className={styles.td}>リポジトリ名</td>
-                    <td className={styles.td}>
-                      <code>my-backend</code>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className={styles.td}>
-                      <code>&#123;pr&#125;</code> / <code>&#123;pr number&#125;</code>
-                    </td>
-                    <td className={styles.td}>PR 番号</td>
-                    <td className={styles.td}>
-                      <code>42</code>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className={styles.td}>
-                      <code>&#123;workspace&#125;</code> / <code>&#123;org&#125;</code>
-                    </td>
-                    <td className={styles.td}>組織名</td>
-                    <td className={styles.td}>
-                      <code>acme-corp</code>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className={styles.td}>
-                      <code>&#123;project&#125;</code>
-                    </td>
-                    <td className={styles.td}>Azure DevOps プロジェクト名</td>
-                    <td className={styles.td}>
-                      <code>MyProject</code>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          {/* Ch6 refs */}
-          <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>📚 Chapter 6 参考 URL</h3>
-            <div className={styles.refGrid}>
-              <div className={styles.refCard}>
-                <div className={styles.refCat}>【公式 Docs】MCP サーバー統合</div>
-                <Ext href="https://docs.coderabbit.ai/integrations/mcp-servers.md">
-                  https://docs.coderabbit.ai/integrations/mcp-servers.md
-                </Ext>
-              </div>
-              <div className={styles.refCard}>
-                <div className={styles.refCat}>【公式 Docs】Knowledge Base - MCP コンテキスト</div>
-                <Ext href="https://docs.coderabbit.ai/knowledge-base/mcp-context.md">
-                  https://docs.coderabbit.ai/knowledge-base/mcp-context.md
-                </Ext>
-              </div>
-              <div className={styles.refCard}>
-                <div className={styles.refCat}>【公式 Docs】Slack Agent 接続</div>
-                <Ext href="https://docs.coderabbit.ai/slack-agent/connections.md">
-                  https://docs.coderabbit.ai/slack-agent/connections.md
-                </Ext>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <hr className={styles.divider} />
-
-        {/* ══════════════ CH7: TOOLS / CI ══════════════ */}
-        <section className={styles.chapter} id="ch7">
-          <div className={styles.chapterHeader}>
-            <div className={styles.chapterNum}>7</div>
-            <h2 className={styles.chapterTitle}>
-              <span>ツール</span> &amp; CI/CD 連携{" "}
-              <span className={`${styles.klevel} ${styles.kl2}`}>K-Level: 適用</span>
-            </h2>
-          </div>
-
-          <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>7.1 40+ 静的解析ツールの自動統合</h3>
-            <p className={styles.paragraph}>
-              CodeRabbit
-              は各言語の代表的な静的解析ツールを自動実行し、結果をインラインコメントに統合します。設定ファイルが存在すればそれを優先使用します。
-            </p>
-
-            <div className={styles.progressList}>
-              <div className={styles.progressItem}>
-                <div className={styles.progressLabel}>
-                  <span>JavaScript / TypeScript</span>
-                  <span style={{ color: "var(--neon-cyan)" }}>ESLint + Biome + Oxlint</span>
-                </div>
-                <div className={styles.progressBarBg}>
-                  <div
-                    className={styles.progressBar}
-                    style={{
-                      width: "95%",
-                      background: "linear-gradient(90deg, var(--neon-cyan), var(--neon-purple))",
-                      // @ts-expect-error custom property trigger
-                      "--target-width": "95%",
-                    }}
-                  />
-                </div>
-              </div>
-              <div className={styles.progressItem}>
-                <div className={styles.progressLabel}>
-                  <span>Python</span>
-                  <span style={{ color: "var(--neon-green)" }}>Ruff + Flake8 + Pylint</span>
-                </div>
-                <div className={styles.progressBarBg}>
-                  <div
-                    className={styles.progressBar}
-                    style={{
-                      width: "90%",
-                      background: "linear-gradient(90deg, var(--neon-green), var(--neon-cyan))",
-                      // @ts-expect-error custom property trigger
-                      "--target-width": "90%",
-                    }}
-                  />
-                </div>
-              </div>
-              <div className={styles.progressItem}>
-                <div className={styles.progressLabel}>
-                  <span>Go</span>
-                  <span style={{ color: "var(--neon-amber)" }}>golangci-lint</span>
-                </div>
-                <div className={styles.progressBarBg}>
-                  <div
-                    className={styles.progressBar}
-                    style={{
-                      width: "88%",
-                      background: "linear-gradient(90deg, var(--neon-amber), var(--neon-green))",
-                      // @ts-expect-error custom property trigger
-                      "--target-width": "88%",
-                    }}
-                  />
-                </div>
-              </div>
-              <div className={styles.progressItem}>
-                <div className={styles.progressLabel}>
-                  <span>Rust</span>
-                  <span style={{ color: "var(--neon-pink)" }}>Clippy</span>
-                </div>
-                <div className={styles.progressBarBg}>
-                  <div
-                    className={styles.progressBar}
-                    style={{
-                      width: "85%",
-                      background: "linear-gradient(90deg, var(--neon-pink), var(--neon-amber))",
-                      // @ts-expect-error custom property trigger
-                      "--target-width": "85%",
-                    }}
-                  />
-                </div>
-              </div>
-              <div className={styles.progressItem}>
-                <div className={styles.progressLabel}>
-                  <span>セキュリティ全般</span>
-                  <span style={{ color: "var(--neon-purple)" }}>
-                    Semgrep + OpenGrep + Betterleaks + Trivy
-                  </span>
-                </div>
-                <div className={styles.progressBarBg}>
-                  <div
-                    className={styles.progressBar}
-                    style={{
-                      width: "92%",
-                      background: "linear-gradient(90deg, var(--neon-purple), var(--neon-pink))",
-                      // @ts-expect-error custom property trigger
-                      "--target-width": "92%",
-                    }}
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className={styles.tableWrap}>
-              <table className={styles.table}>
-                <thead className={styles.thead}>
-                  <tr>
-                    <th className={styles.th}>カテゴリ</th>
-                    <th className={styles.th}>対応ツール（抜粋）</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td className={styles.td}>JavaScript/TS</td>
-                    <td className={styles.td}>ESLint, Biome, Oxlint, ember-template-lint</td>
-                  </tr>
-                  <tr>
-                    <td className={styles.td}>Python</td>
-                    <td className={styles.td}>Ruff, Flake8, Pylint, Bandit</td>
-                  </tr>
-                  <tr>
-                    <td className={styles.td}>Java/Kotlin</td>
-                    <td className={styles.td}>PMD, Detekt</td>
-                  </tr>
-                  <tr>
-                    <td className={styles.td}>Ruby</td>
-                    <td className={styles.td}>RuboCop</td>
-                  </tr>
-                  <tr>
-                    <td className={styles.td}>PHP</td>
-                    <td className={styles.td}>PHPCS, PHPMD, PHPStan</td>
-                  </tr>
-                  <tr>
-                    <td className={styles.td}>Go</td>
-                    <td className={styles.td}>golangci-lint</td>
-                  </tr>
-                  <tr>
-                    <td className={styles.td}>Rust</td>
-                    <td className={styles.td}>Clippy</td>
-                  </tr>
-                  <tr>
-                    <td className={styles.td}>Swift</td>
-                    <td className={styles.td}>SwiftLint</td>
-                  </tr>
-                  <tr>
-                    <td className={styles.td}>CSS</td>
-                    <td className={styles.td}>Stylelint</td>
-                  </tr>
-                  <tr>
-                    <td className={styles.td}>Infra/Config</td>
-                    <td className={styles.td}>Checkov, TFLint, Hadolint, actionlint, YAMLlint</td>
-                  </tr>
-                  <tr>
-                    <td className={styles.td}>セキュリティ</td>
-                    <td className={styles.td}>
-                      Semgrep, OpenGrep, Trivy, TruffleHog, OSV-Scanner, Betterleaks
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className={styles.td}>SQL</td>
-                    <td className={styles.td}>SQLFluff</td>
-                  </tr>
-                  <tr>
-                    <td className={styles.td}>Shell</td>
-                    <td className={styles.td}>ShellCheck</td>
-                  </tr>
-                  <tr>
-                    <td className={styles.td}>Markdown</td>
-                    <td className={styles.td}>markdownlint, LanguageTool</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>7.2 CI/CD パイプライン解析</h3>
-            <p className={styles.paragraph}>
-              <strong>定義：</strong>CodeRabbit は CI/CD
-              の失敗ログを読み取り、失敗した箇所のコードラインに直接修正提案を投稿します。
-            </p>
-
-            <div className={styles.mermaidWrap}>
-              <div id="mermaid-pipeline">
-                <MermaidDiagram chart={DIAG_PIPELINE} />
-              </div>
-            </div>
-
-            <h4 className={styles.subsectionTitle}>CircleCI 連携設定例</h4>
-            <div className={styles.codeWrap}>
-              <div className={styles.codeBar}>
-                <span>.coderabbit.yaml</span>
-                <span className={styles.codeLang}>YAML</span>
-                <CodeCopyButton
-                  className={styles.codeCopy}
-                  text={`integrations:\n  circleci:\n    enabled: true`}
-                />
-              </div>
-              <div className={styles.codeBody}>
-                <div className={styles.codeLine}>
-                  <span className={styles.codeKeyword}>integrations</span>:
-                </div>
-                <div className={styles.codeLine}>
-                  {"  "}
-                  <span className={styles.codeKeyword}>circleci</span>:
-                </div>
-                <div className={styles.codeLine}>
-                  {"    "}
-                  <span className={styles.codeKeyword}>enabled</span>:{" "}
-                  <span className={styles.codeGreen}>true</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>7.3 IDE・CLI 連携</h3>
-            <p className={styles.paragraph}>PR を開く前の段階でもコードレビューが可能です。</p>
-
-            <div className={styles.examGrid}>
-              <div className={styles.examCard}>
-                <div className={styles.examTitle}>🖥️ VS Code / Cursor / Windsurf</div>
-                <div className={styles.examStars}>★★★★★</div>
-                <div className={styles.examDesc}>
-                  IDE 拡張をインストールするだけでコミット前にリアルタイムレビューを取得
-                </div>
-              </div>
-              <div className={styles.examCard}>
-                <div className={styles.examTitle}>💻 CLI ツール</div>
-                <div className={styles.examStars}>★★★★☆</div>
-                <div className={styles.examDesc}>
-                  Claude Code / Cursor / Codex / Gemini に CodeRabbit
-                  プラグインを組み込んで自律レビュー
-                </div>
-              </div>
-            </div>
-
-            <div className={styles.codeWrap}>
-              <div className={styles.codeBar}>
-                <span>CLI commands</span>
-                <CodeCopyButton
-                  className={styles.codeCopy}
-                  text={`claude install coderabbit-skill\n\ncoderabbit review --diff HEAD~1`}
-                />
-              </div>
-              <div className={styles.codeBody}>
-                <div className={styles.codeLine}>
-                  <span className={styles.codeComment}>
-                    # Claude Code での CodeRabbit CLI スキル追加
-                  </span>
-                </div>
-                <div className={styles.codeLine}>
-                  <span className={styles.codeGreen}>claude</span>{" "}
-                  <span className={styles.codeString}>install coderabbit-skill</span>
-                </div>
-                <div className={styles.codeLine} />
-                <div className={styles.codeLine}>
-                  <span className={styles.codeComment}># 手動 CLI レビュー実行</span>
-                </div>
-                <div className={styles.codeLine}>
-                  <span className={styles.codeGreen}>coderabbit</span>{" "}
-                  <span className={styles.codeString}>review --diff HEAD~1</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Ch7 refs */}
-          <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>📚 Chapter 7 参考 URL</h3>
-            <div className={styles.refGrid}>
-              <div className={styles.refCard}>
-                <div className={styles.refCat}>【公式 Docs】ツール一覧</div>
-                <Ext href="https://docs.coderabbit.ai/tools/index.md">
-                  https://docs.coderabbit.ai/tools/index.md
-                </Ext>
-              </div>
-              <div className={styles.refCard}>
-                <div className={styles.refCat}>【公式 Docs】CI/CD パイプライン解析</div>
-                <Ext href="https://docs.coderabbit.ai/pr-reviews/cicd-pipeline-analysis.md">
-                  https://docs.coderabbit.ai/pr-reviews/cicd-pipeline-analysis.md
-                </Ext>
-              </div>
-              <div className={styles.refCard}>
-                <div className={styles.refCat}>【公式 Docs】CircleCI 連携</div>
-                <Ext href="https://docs.coderabbit.ai/integrations/circleci.md">
-                  https://docs.coderabbit.ai/integrations/circleci.md
-                </Ext>
-              </div>
-              <div className={styles.refCard}>
-                <div className={styles.refCat}>【公式 Docs】IDE 拡張</div>
-                <Ext href="https://docs.coderabbit.ai/ide/index.md">
-                  https://docs.coderabbit.ai/ide/index.md
-                </Ext>
-              </div>
-              <div className={styles.refCard}>
-                <div className={styles.refCat}>【公式 Docs】CLI ツール</div>
-                <Ext href="https://docs.coderabbit.ai/cli/index.md">
-                  https://docs.coderabbit.ai/cli/index.md
-                </Ext>
-              </div>
-              <div className={styles.refCard}>
-                <div className={styles.refCat}>【公式 Docs】Claude Code 連携</div>
-                <Ext href="https://docs.coderabbit.ai/cli/claude-code-integration.md">
-                  https://docs.coderabbit.ai/cli/claude-code-integration.md
-                </Ext>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <hr className={styles.divider} />
-
-        {/* ══════════════ CH8: ADVANCED ══════════════ */}
-        <section className={styles.chapter} id="ch8">
-          <div className={styles.chapterHeader}>
-            <div className={styles.chapterNum}>8</div>
-            <h2 className={styles.chapterTitle}>
-              <span>上級テクニック</span> — 真のエキスパートへ{" "}
-              <span className={`${styles.klevel} ${styles.kl3}`}>K-Level: 創造</span>
-            </h2>
-          </div>
-
-          <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>8.1 ast-grep による構文精密レビュー</h3>
-            <p className={styles.paragraph}>
-              <strong>定義：</strong>
-              AST（抽象構文木）ベースのパターンマッチングで、テキスト検索では発見できない構造的なコードパターンを検出します。
-            </p>
-
-            <div className={styles.codeWrap}>
-              <div className={styles.codeBar}>
-                <span>ast-grep config</span>
-                <CodeCopyButton
-                  className={styles.codeCopy}
-                  text={`reviews:\n  path_instructions:\n    - path: "src/**/*.ts"\n      instructions: |\n        Use ast-grep to detect any usage of \`document.write()\`. This is banned in our codebase due to XSS risks.\n\n# ast-grep ルールファイル (.ast-grep/rules/no-console.yaml)\nid: no-console-log\nlanguage: TypeScript\nrule:\n  pattern: console.log($$$)\nmessage: 本番コードに console.log を残さないでください\nseverity: warning`}
-                />
-              </div>
-              <div className={styles.codeBody}>
-                <div className={styles.codeLine}>
-                  <span className={styles.codeKeyword}>reviews</span>:
-                </div>
-                <div className={styles.codeLine}>
-                  {"  "}
-                  <span className={styles.codeKeyword}>path_instructions</span>:
-                </div>
-                <div className={styles.codeLine}>
-                  {"    "}- <span className={styles.codeKeyword}>path</span>:{" "}
-                  <span className={styles.codeString}>&quot;src{`/**/`}*.ts&quot;</span>
-                </div>
-                <div className={styles.codeLine}>
-                  {"      "}
-                  <span className={styles.codeKeyword}>instructions</span>:{" "}
-                  <span className={styles.codeString}>|</span>
-                </div>
-                <div className={styles.codeLine}>
-                  {
-                    "        Use ast-grep to detect any usage of `document.write()`. This is banned in our codebase due to XSS risks."
-                  }
-                </div>
-                <div className={styles.codeLine} />
-                <div className={styles.codeLine}>
-                  <span className={styles.codeComment}>
-                    # ast-grep ルールファイル (.ast-grep/rules/no-console.yaml)
-                  </span>
-                </div>
-                <div className={styles.codeLine}>
-                  <span className={styles.codeKeyword}>id</span>:{" "}
-                  <span className={styles.codeString}>no-console-log</span>
-                </div>
-                <div className={styles.codeLine}>
-                  <span className={styles.codeKeyword}>language</span>:{" "}
-                  <span className={styles.codeString}>TypeScript</span>
-                </div>
-                <div className={styles.codeLine}>
-                  <span className={styles.codeKeyword}>rule</span>:
-                </div>
-                <div className={styles.codeLine}>
-                  {"  "}
-                  <span className={styles.codeKeyword}>pattern</span>:{" "}
-                  <span className={styles.codeString}>console.log($$$)</span>
-                </div>
-                <div className={styles.codeLine}>
-                  <span className={styles.codeKeyword}>message</span>:{" "}
-                  <span className={styles.codeString}>
-                    本番コードに console.log を残さないでください
-                  </span>
-                </div>
-                <div className={styles.codeLine}>
-                  <span className={styles.codeKeyword}>severity</span>:{" "}
-                  <span className={styles.codeString}>warning</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>8.2 Pre-Merge Checks — マージ前の品質ゲート</h3>
-            <p className={styles.paragraph}>
-              <strong>定義：</strong>PR
-              マージ前に自動実行されるカスタム検証ロジック。自然言語で条件を定義できます。
-            </p>
-
-            <div className={styles.codeWrap}>
-              <div className={styles.codeBar}>
-                <span>.coderabbit.yaml</span>
-                <span className={styles.codeLang}>YAML</span>
-                <CodeCopyButton
-                  className={styles.codeCopy}
-                  text={`reviews:\n  custom_checks:\n    - name: "migration-has-rollback"\n      description: "DBマイグレーションには必ずロールバックが必要"\n      instructions: |\n        db/migrations/ 配下のファイルが変更されている場合: up() / down() の両メソッドが存在することを確認。 down() が存在しない場合は FAIL。\n\n    - name: "no-secrets-in-code"\n      description: "ハードコードされた認証情報の検出"\n      instructions: |\n        API キー・パスワード・トークンのハードコーディングを検出。 環境変数 (process.env.*) 経由でない認証情報は FAIL。`}
-                />
-              </div>
-              <div className={styles.codeBody}>
-                <div className={styles.codeLine}>
-                  <span className={styles.codeKeyword}>reviews</span>:
-                </div>
-                <div className={styles.codeLine}>
-                  {"  "}
-                  <span className={styles.codeKeyword}>custom_checks</span>:
-                </div>
-                <div className={styles.codeLine}>
-                  {"    "}- <span className={styles.codeKeyword}>name</span>:{" "}
-                  <span className={styles.codeString}>&quot;migration-has-rollback&quot;</span>
-                </div>
-                <div className={styles.codeLine}>
-                  {"      "}
-                  <span className={styles.codeKeyword}>description</span>:{" "}
-                  <span className={styles.codeString}>
-                    &quot;DBマイグレーションには必ずロールバックが必要&quot;
-                  </span>
-                </div>
-                <div className={styles.codeLine}>
-                  {"      "}
-                  <span className={styles.codeKeyword}>instructions</span>:{" "}
-                  <span className={styles.codeString}>|</span>
-                </div>
-                <div className={styles.codeLine}>
-                  {
-                    "        db/migrations/ 配下のファイルが変更されている場合: up() / down() の両メソッドが存在することを確認。 down() が存在しない場合は FAIL。"
-                  }
-                </div>
-                <div className={styles.codeLine} />
-                <div className={styles.codeLine}>
-                  {"    "}- <span className={styles.codeKeyword}>name</span>:{" "}
-                  <span className={styles.codeString}>&quot;no-secrets-in-code&quot;</span>
-                </div>
-                <div className={styles.codeLine}>
-                  {"      "}
-                  <span className={styles.codeKeyword}>description</span>:{" "}
-                  <span className={styles.codeString}>
-                    &quot;ハードコードされた認証情報の検出&quot;
-                  </span>
-                </div>
-                <div className={styles.codeLine}>
-                  {"      "}
-                  <span className={styles.codeKeyword}>instructions</span>:{" "}
-                  <span className={styles.codeString}>|</span>
-                </div>
-                <div className={styles.codeLine}>
-                  {
-                    "        API キー・パスワード・トークンのハードコーディングを検出。 環境変数 (process.env.*) 経由でない認証情報は FAIL。"
-                  }
-                </div>
-              </div>
-            </div>
-
-            <div className={`${styles.callout} ${styles.warning}`}>
-              <span className={styles.calloutIcon}>⚠️</span>
-              <div className={styles.calloutBody}>
-                <strong>Pre-Merge Checks は GitHub Status Check として統合されます。</strong>PR
-                のマージブロック条件として設定できます（Branch Protection Rules
-                との組み合わせ推奨）。
-              </div>
-            </div>
-          </div>
-
-          <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>8.3 Global Overrides — コンプライアンス強制</h3>
-            <p className={styles.paragraph}>
-              <strong>定義：</strong>組織管理者のみが設定でき、全リポジトリの個別 YAML
-              を含めたあらゆる設定より優先される最強レイヤー。
-            </p>
-
-            <div className={`${styles.callout} ${styles.danger}`}>
-              <span className={styles.calloutIcon}>🚨</span>
-              <div className={styles.calloutBody}>
-                <strong>Global Overrides は全リポジトリに強制適用されます。</strong>
-                誤った設定は組織全体のレビューワークフローに影響するため、必ずステージング環境でテストしてから適用してください。
-              </div>
-            </div>
-
-            <div className={styles.codeWrap}>
-              <div className={styles.codeBar}>
-                <span>Global Overrides</span>
-                <CodeCopyButton
-                  className={styles.codeCopy}
-                  text={`reviews:\n  profile: "assertive"\n  path_instructions:\n    - path: "**/*.sql"\n      instructions: |\n        DROP TABLE / TRUNCATE を含む文を発見した場合、 必ず DANGER レベルで警告。承認なしのマージを禁止。`}
-                />
-              </div>
-              <div className={styles.codeBody}>
-                <div className={styles.codeLine}>
-                  <span className={styles.codeComment}>
-                    # Organization Settings → Global Overrides
-                  </span>
-                </div>
-                <div className={styles.codeLine}>
-                  <span className={styles.codeComment}>
-                    # yaml-language-server:
-                    $schema=https://coderabbit.ai/integrations/schema.v2.json
-                  </span>
-                </div>
-                <div className={styles.codeLine}>
-                  <span className={styles.codeKeyword}>reviews</span>:
-                </div>
-                <div className={styles.codeLine}>
-                  {"  "}
-                  <span className={styles.codeKeyword}>profile</span>:{" "}
-                  <span className={styles.codeString}>&quot;assertive&quot;</span>
-                </div>
-                <div className={styles.codeLine}>
-                  {"  "}
-                  <span className={styles.codeKeyword}>path_instructions</span>:
-                </div>
-                <div className={styles.codeLine}>
-                  {"    "}- <span className={styles.codeKeyword}>path</span>:{" "}
-                  <span className={styles.codeString}>&quot;**/*.sql&quot;</span>
-                </div>
-                <div className={styles.codeLine}>
-                  {"      "}
-                  <span className={styles.codeKeyword}>instructions</span>:{" "}
-                  <span className={styles.codeString}>|</span>
-                </div>
-                <div className={styles.codeLine}>
-                  {
-                    "        DROP TABLE / TRUNCATE を含む文を発見した場合、 必ず DANGER レベルで警告。承認なしのマージを禁止。"
-                  }
-                </div>
-                <div className={styles.codeLine} />
-                <div className={styles.codeLine}>
-                  <span className={styles.codeComment}>
-                    # スカラー: 上書き / オブジェクト: 再帰的マージ
-                  </span>
-                </div>
-                <div className={styles.codeLine}>
-                  <span className={styles.codeComment}>
-                    # 配列: キーで照合後マージ (path_instructions は path がキー)
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>8.4 Learnings の健全性維持サイクル</h3>
-
-            <div className={styles.mermaidWrap}>
-              <div id="mermaid-learnings">
-                <MermaidDiagram chart={DIAG_LEARNINGS} />
-              </div>
-            </div>
-
-            <h4 className={styles.subsectionTitle}>運用ベストプラクティス</h4>
-            <ul className={styles.stepList}>
-              <li>
-                <span className={styles.stepNum}>Q</span>
-                <div className={styles.stepContent}>
-                  <strong>四半期レビュー：</strong>古い・矛盾する Learning
-                  を特定して削除。技術スタックが変わった後は特に重要
-                </div>
-              </li>
-              <li>
-                <span className={styles.stepNum}>🔍</span>
-                <div className={styles.stepContent}>
-                  <strong>類似検索を活用：</strong>「error
-                  handling」「authentication」等のキーワードで意味的に類似した Learning を一括確認
-                </div>
-              </li>
-              <li>
-                <span className={styles.stepNum}>⚡</span>
-                <div className={styles.stepContent}>
-                  <strong>Learning が無視される場合：</strong>「Before responding, review all
-                  Learnings to ensure none are ignored.」という補強ルールを追加
-                </div>
-              </li>
-            </ul>
-          </div>
-
-          <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>
-              8.5 Slack Agent — AI エージェントをワークスペースに
-            </h3>
-            <p className={styles.paragraph}>
-              CodeRabbit Agent for Slack は Slack 上で直接 AI コーディング支援を実現します。
-            </p>
-
-            <div className={styles.trendCard}>
-              <div className={styles.trendTag}>🔮 最新機能</div>
-              <div className={styles.trendTitle}>スコープ管理による権限制御</div>
-              <div className={styles.trendBody}>
-                Slack
-                チャンネルごとに「スコープ」を設定し、アクセス可能なリポジトリ・外部ツール・消費上限を個別管理。本番リポジトリへのアクセスを制限しつつ、開発リポジトリでは広い権限を付与するような細粒度制御が可能。
-              </div>
-            </div>
-
-            <div className={styles.trendCard}>
-              <div className={styles.trendTag}>🔮 最新機能</div>
-              <div className={styles.trendTitle}>Automations — 定期実行タスク</div>
-              <div className={styles.trendBody}>
-                Slack Agent のオートメーション機能により、「毎週月曜に未解決 PR の要約を投稿」「CI
-                失敗時に自動分析を実行」といったスケジュールトリガーを設定可能。
-              </div>
-            </div>
-          </div>
-
-          {/* Ch8 refs */}
-          <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>📚 Chapter 8 参考 URL</h3>
-            <div className={styles.refGrid}>
-              <div className={styles.refCard}>
-                <div className={styles.refCat}>【公式 Docs】ast-grep 指示</div>
-                <Ext href="https://docs.coderabbit.ai/configuration/ast-grep-instructions.md">
-                  https://docs.coderabbit.ai/configuration/ast-grep-instructions.md
-                </Ext>
-              </div>
-              <div className={styles.refCard}>
-                <div className={styles.refCat}>【公式 Docs】Custom Checks</div>
-                <Ext href="https://docs.coderabbit.ai/pr-reviews/custom-checks.md">
-                  https://docs.coderabbit.ai/pr-reviews/custom-checks.md
-                </Ext>
-              </div>
-              <div className={styles.refCard}>
-                <div className={styles.refCat}>【公式 Docs】Pre-Merge Checks</div>
-                <Ext href="https://docs.coderabbit.ai/pr-reviews/pre-merge-checks.md">
-                  https://docs.coderabbit.ai/pr-reviews/pre-merge-checks.md
-                </Ext>
-              </div>
-              <div className={styles.refCard}>
-                <div className={styles.refCat}>【公式 Docs】Slack Agent</div>
-                <Ext href="https://docs.coderabbit.ai/slack-agent/index.md">
-                  https://docs.coderabbit.ai/slack-agent/index.md
-                </Ext>
-              </div>
-              <div className={styles.refCard}>
-                <div className={styles.refCat}>【公式 Docs】Scopes</div>
-                <Ext href="https://docs.coderabbit.ai/slack-agent/scopes.md">
-                  https://docs.coderabbit.ai/slack-agent/scopes.md
-                </Ext>
-              </div>
-              <div className={styles.refCard}>
-                <div className={styles.refCat}>【公式 Docs】Automations</div>
-                <Ext href="https://docs.coderabbit.ai/slack-agent/automations.md">
-                  https://docs.coderabbit.ai/slack-agent/automations.md
-                </Ext>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <hr className={styles.divider} />
-
-        {/* ══════════════ REFERENCES ══════════════ */}
-        <section className={styles.chapter} id="refs">
-          <div className={styles.chapterHeader}>
-            <div
-              className={styles.chapterNum}
-              style={{ borderColor: "var(--neon-amber)", color: "var(--neon-amber)" }}
+          <div className={styles.quickNav}>
+            <a className={styles.qnCard} href="#1-coderabbitとは何かアーキテクチャを理解する">
+              <span className={styles.qnNum}>01</span>
+              <span className={styles.qnTitle}>基礎とロールアウト</span>
+              <span className={styles.qnDesc}>導入戦略とアーキテクチャの全体像</span>
+            </a>
+
+            <a
+              className={styles.qnCard}
+              href="#4-設定の優先順位を制御するグローバルオーバーライド中央設定継承"
             >
-              📚
-            </div>
-            <h2 className={styles.chapterTitle}>
-              全参考 <span>URL 一覧</span>
-            </h2>
-          </div>
+              <span className={styles.qnNum}>02</span>
+              <span className={styles.qnTitle}>設定と自動化</span>
+              <span className={styles.qnDesc}>YAML設定・優先順位・パス制御・自動レビュー</span>
+            </a>
 
-          <h3 className={styles.sectionTitle}>🏠 公式ドキュメント（一次情報源）</h3>
-          <div className={styles.refGrid}>
-            <div className={styles.refCard}>
-              <div className={styles.refCat}>【公式 Docs】ホーム</div>
-              <Ext href="https://docs.coderabbit.ai/">https://docs.coderabbit.ai/</Ext>
-            </div>
-            <div className={styles.refCard}>
-              <div className={styles.refCat}>【公式 Docs】完全インデックス</div>
-              <Ext href="https://docs.coderabbit.ai/llms.txt">
-                https://docs.coderabbit.ai/llms.txt
-              </Ext>
-            </div>
-            <div className={styles.refCard}>
-              <div className={styles.refCat}>【公式 App】Web アプリ</div>
-              <Ext href="https://app.coderabbit.ai/">https://app.coderabbit.ai/</Ext>
-            </div>
-            <div className={styles.refCard}>
-              <div className={styles.refCat}>【公式】料金プラン</div>
-              <Ext href="https://coderabbit.ai/pricing">https://coderabbit.ai/pricing</Ext>
-            </div>
-            <div className={styles.refCard}>
-              <div className={styles.refCat}>【公式 Schema】設定スキーマ</div>
-              <Ext href="https://coderabbit.ai/integrations/schema.v2.json">
-                https://coderabbit.ai/integrations/schema.v2.json
-              </Ext>
-            </div>
-            <div className={styles.refCard}>
-              <div className={styles.refCat}>【公式 App】Learnings ダッシュボード</div>
-              <Ext href="https://app.coderabbit.ai/learnings">
-                https://app.coderabbit.ai/learnings
-              </Ext>
-            </div>
-            <div className={styles.refCard}>
-              <div className={styles.refCat}>【公式 App】MCP 統合設定</div>
-              <Ext href="https://app.coderabbit.ai/integrations">
-                https://app.coderabbit.ai/integrations
-              </Ext>
-            </div>
-            <div className={styles.refCard}>
-              <div className={styles.refCat}>【公式 Docs】Quickstart</div>
-              <Ext href="https://docs.coderabbit.ai/getting-started/quickstart.md">
-                https://docs.coderabbit.ai/getting-started/quickstart.md
-              </Ext>
-            </div>
-          </div>
+            <a
+              className={styles.qnCard}
+              href="#10-finishing-touchesワンクリックのエージェント的アクション"
+            >
+              <span className={styles.qnNum}>03</span>
+              <span className={styles.qnTitle}>エージェント機能</span>
+              <span className={styles.qnDesc}>
+                Pre-Merge Checks・Finishing Touches・Walkthrough
+              </span>
+            </a>
 
-          <h3 className={styles.sectionTitle} style={{ marginTop: "1.5rem" }}>
-            🔧 設定・カスタマイズ関連
-          </h3>
-          <div className={styles.refGrid}>
-            <div className={styles.refCard}>
-              <div className={styles.refCat}>【公式 Docs】Configuration Reference</div>
-              <Ext href="https://docs.coderabbit.ai/reference/configuration.md">
-                https://docs.coderabbit.ai/reference/configuration.md
-              </Ext>
-            </div>
-            <div className={styles.refCard}>
-              <div className={styles.refCat}>【公式 Docs】YAML Validator</div>
-              <Ext href="https://docs.coderabbit.ai/configuration/yaml-validator.md">
-                https://docs.coderabbit.ai/configuration/yaml-validator.md
-              </Ext>
-            </div>
-            <div className={styles.refCard}>
-              <div className={styles.refCat}>【公式 Docs】自動レビュー制御</div>
-              <Ext href="https://docs.coderabbit.ai/configuration/auto-review.md">
-                https://docs.coderabbit.ai/configuration/auto-review.md
-              </Ext>
-            </div>
-            <div className={styles.refCard}>
-              <div className={styles.refCat}>【公式 Docs】組織設定</div>
-              <Ext href="https://docs.coderabbit.ai/guides/organization-settings.md">
-                https://docs.coderabbit.ai/guides/organization-settings.md
-              </Ext>
-            </div>
-            <div className={styles.refCard}>
-              <div className={styles.refCat}>【公式 Docs】設定例 (Django)</div>
-              <Ext href="https://docs.coderabbit.ai/configuration/example/python/django.md">
-                https://docs.coderabbit.ai/configuration/example/python/django.md
-              </Ext>
-            </div>
-            <div className={styles.refCard}>
-              <div className={styles.refCat}>【公式 Docs】設定例 (Expo)</div>
-              <Ext href="https://docs.coderabbit.ai/configuration/example/typescript/expo.md">
-                https://docs.coderabbit.ai/configuration/example/typescript/expo.md
-              </Ext>
-            </div>
-          </div>
+            <a
+              className={styles.qnCard}
+              href="#14-複数のaiレビューツールを組み合わせる考え方多層防御"
+            >
+              <span className={styles.qnNum}>04</span>
+              <span className={styles.qnTitle}>実運用と統合</span>
+              <span className={styles.qnDesc}>IDE/CLI・多層防御・アンチパターン</span>
+            </a>
 
-          <h3 className={styles.sectionTitle} style={{ marginTop: "1.5rem" }}>
-            🤖 エージェント・AI 関連
-          </h3>
-          <div className={styles.refGrid}>
-            <div className={styles.refCard}>
-              <div className={styles.refCat}>【公式 Docs】CodeRabbit Plan 概要</div>
-              <Ext href="https://docs.coderabbit.ai/plan/index.md">
-                https://docs.coderabbit.ai/plan/index.md
-              </Ext>
-            </div>
-            <div className={styles.refCard}>
-              <div className={styles.refCat}>【公式 Docs】Agent Handoff</div>
-              <Ext href="https://docs.coderabbit.ai/plan/agent-handoff.md">
-                https://docs.coderabbit.ai/plan/agent-handoff.md
-              </Ext>
-            </div>
-            <div className={styles.refCard}>
-              <div className={styles.refCat}>【公式 Docs】Slop Detection</div>
-              <Ext href="https://docs.coderabbit.ai/pr-reviews/slop-detection.md">
-                https://docs.coderabbit.ai/pr-reviews/slop-detection.md
-              </Ext>
-            </div>
-            <div className={styles.refCard}>
-              <div className={styles.refCat}>【公式 Docs】Coding Plan 作成</div>
-              <Ext href="https://docs.coderabbit.ai/plan/create-plan.md">
-                https://docs.coderabbit.ai/plan/create-plan.md
-              </Ext>
-            </div>
-          </div>
-
-          <h3 className={styles.sectionTitle} style={{ marginTop: "1.5rem" }}>
-            📊 管理・エンタープライズ
-          </h3>
-          <div className={styles.refGrid}>
-            <div className={styles.refCard}>
-              <div className={styles.refCat}>【公式 Docs】管理概要</div>
-              <Ext href="https://docs.coderabbit.ai/management/index.md">
-                https://docs.coderabbit.ai/management/index.md
-              </Ext>
-            </div>
-            <div className={styles.refCard}>
-              <div className={styles.refCat}>【公式 Docs】Enterprise SSO</div>
-              <Ext href="https://docs.coderabbit.ai/management/sso/index.md">
-                https://docs.coderabbit.ai/management/sso/index.md
-              </Ext>
-            </div>
-            <div className={styles.refCard}>
-              <div className={styles.refCat}>【公式 Docs】監査ログ</div>
-              <Ext href="https://docs.coderabbit.ai/management/audit-logs.md">
-                https://docs.coderabbit.ai/management/audit-logs.md
-              </Ext>
-            </div>
-            <div className={styles.refCard}>
-              <div className={styles.refCat}>【公式 Docs】カスタムロール</div>
-              <Ext href="https://docs.coderabbit.ai/management/custom-roles.md">
-                https://docs.coderabbit.ai/management/custom-roles.md
-              </Ext>
-            </div>
-            <div className={styles.refCard}>
-              <div className={styles.refCat}>【公式 Docs】レポート</div>
-              <Ext href="https://docs.coderabbit.ai/management/reports/index.md">
-                https://docs.coderabbit.ai/management/reports/index.md
-              </Ext>
-            </div>
-            <div className={styles.refCard}>
-              <div className={styles.refCat}>【公式 Docs】Glossary</div>
-              <Ext href="https://docs.coderabbit.ai/reference/glossary.md">
-                https://docs.coderabbit.ai/reference/glossary.md
-              </Ext>
-            </div>
-          </div>
-
-          <h3 className={styles.sectionTitle} style={{ marginTop: "1.5rem" }}>
-            🌐 外部参考資料
-          </h3>
-          <div className={styles.refGrid}>
-            <div className={styles.refCard}>
-              <div className={styles.refCat}>【公式 Blog】CodeRabbit ブログ</div>
-              <Ext href="https://coderabbit.ai/blog">https://coderabbit.ai/blog</Ext>
-            </div>
-            <div className={styles.refCard}>
-              <div className={styles.refCat}>【コミュニティ】Discord</div>
-              <Ext href="https://discord.gg/coderabbit">https://discord.gg/coderabbit</Ext>
-            </div>
-            <div className={styles.refCard}>
-              <div className={styles.refCat}>【外部ライブラリ】minimatch (glob パターン)</div>
-              <Ext href="https://github.com/isaacs/minimatch">
-                https://github.com/isaacs/minimatch
-              </Ext>
-            </div>
-            <div className={styles.refCard}>
-              <div className={styles.refCat}>【外部 Docs】MCP プロトコル仕様</div>
-              <Ext href="https://modelcontextprotocol.io/">https://modelcontextprotocol.io/</Ext>
-            </div>
-          </div>
-
-          <div
-            style={{
-              textAlign: "center",
-              marginTop: "3rem",
-              color: "var(--text-muted)",
-              fontFamily: "var(--font-mono)",
-              fontSize: "0.85rem",
-            }}
-          >
-            <p>
-              Generated: 2026-06 | Source:{" "}
-              <Ext href="https://docs.coderabbit.ai/">docs.coderabbit.ai</Ext> (一次情報源)
-            </p>
-            <p style={{ marginTop: "0.3rem" }}>
-              CodeRabbit 公式ドキュメントに基づく中上級者向けガイド
-            </p>
+            <a className={styles.qnCard} href="#17-参考文献">
+              <span className={styles.qnNum}>05</span>
+              <span className={styles.qnTitle}>参考文献</span>
+              <span className={styles.qnDesc}>
+                公式ドキュメント、著者ブログ、サードパーティ分析、コミュニティ議論
+              </span>
+            </a>
           </div>
         </section>
+
+        <article className={styles.content}>
+          <p>
+            対象読者は、CodeRabbitを既に導入済み、またはこれから本格導入しようとしている中級〜上級のソフトウェアエンジニア・QAエンジニアです。単なる機能紹介にとどまらず、実運用でつまずきやすいポイントとその回避策、そして「なぜその設定が推奨されるのか」という背景まで踏み込んで解説します。
+          </p>
+          <p>
+            情報源は、CodeRabbit公式ドキュメント（docs.coderabbit.ai、2026年8月8日時点の内容）をはじめ、著者ブログ、サードパーティ分析、コミュニティ議論などを参照しています。特に、Google
+            Chrome/Web Vitalsチームでの活動やエンジニアリング関連の著作で知られるAddy
+            Osmaniが2026年に公開した「Agentic Code Review」（O&apos;Reilly Radar /
+            addyosmani.com）は、他エンジニアの実験結果を報告するブログベースの解説情報として引用します。ベンチマーク数値やコミュニティの声はソースによって前提が異なるため、複数の視点を併記し、断定は避けています。
+          </p>
+
+          <hr />
+          <h2 id="1-coderabbitとは何かアーキテクチャを理解する">
+            1. CodeRabbitとは何か：アーキテクチャを理解する
+          </h2>
+          <p>
+            CodeRabbitは「差分だけを見てLLMに投げる」単純なツールではありません。公式ドキュメントは、1件のレビューのたびに以下を組み合わせた本格的なAIインフラを動かしていると説明しています。
+          </p>
+          <ul>
+            <li>
+              <strong>サンドボックス化されたクラウド実行</strong>
+              ：レビュー対象のリポジトリ全体を隔離環境にクローンして解析する
+            </li>
+            <li>
+              <strong>多次元コード解析</strong>
+              ：40種類以上の静的解析ツール・Linter・SASTツールを横断的に実行する
+            </li>
+            <li>
+              <strong>エージェント的探索</strong>
+              ：コードベースを自律的に調べて文脈を集める
+            </li>
+            <li>
+              <strong>専門エージェント群の並列稼働</strong>
+              ：Review・Verification・Chat・Pre-Merge Checks・Finishing
+              Touchesという役割ごとに専用のエージェントが動く
+            </li>
+            <li>
+              <strong>Living Memory（生きた記憶）</strong>
+              ：フィードバック・過去のPR・Issue・コーディング規約から学習し続ける
+            </li>
+            <li>
+              <strong>エンタープライズ統合</strong>
+              ：Jira、Linear、Slack、MCPサーバーなど既存の開発ワークフローと接続する
+            </li>
+          </ul>
+          <p>この全体像を図にすると次のようになります。</p>
+
+          <div className={styles.mermaidWrap}>
+            <MermaidDiagram
+              chart={DIAGRAM_1}
+              id="diagram-1"
+              theme="base"
+              themeVariables={MERMAID_THEME_VARS}
+            />
+          </div>
+
+          <p>
+            <strong>実務上の含意</strong>
+            ：CodeRabbitは単発のLLM呼び出しではなく、複数のツールとエージェントの合議で結論を出しています。そのため「なぜこの指摘が出たのか」を理解するには、後述するKnowledge
+            Base（学習内容）や設定の優先順位を理解しておく必要があります。
+          </p>
+          <hr />
+          <h2 id="2-導入のロールアウト戦略ステップバイステップ">
+            2. 導入のロールアウト戦略（ステップバイステップ）
+          </h2>
+          <p>
+            いきなり全社的に「assertive」プロファイルで全リポジトリに展開するのは推奨されません。複数の実務ガイドが共通して勧めるのは、小さく始めて段階的に広げるアプローチです。
+          </p>
+          <div className={styles.tableScroll}>
+            <table>
+              <thead>
+                <tr>
+                  <th>ステップ</th>
+                  <th>内容</th>
+                  <th>目的</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1</td>
+                  <td>Quickstartで1つのリポジトリにGitHub/GitLab Appを接続する</td>
+                  <td>数分でPRレビューが動く状態を作る</td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td>デフォルト設定のまま1〜2週間運用し、何が役に立ち、何がノイズかを観察する</td>
+                  <td>過剰なpath_instructionsを先回りで書かない</td>
+                </tr>
+                <tr>
+                  <td>3</td>
+                  <td>
+                    最小限の<code>.coderabbit.yaml</code>
+                    （プロファイルと明らかなノイズファイルの除外）を作成する
+                  </td>
+                  <td>「毎回同じ理由で無視しているコメント」を減らす</td>
+                </tr>
+                <tr>
+                  <td>4</td>
+                  <td>
+                    パイロットチームからのフィードバックを収集し、誤検知（false
+                    positive）のパターンを特定する
+                  </td>
+                  <td>path_instructionsやCustom Checksの土台を作る</td>
+                </tr>
+                <tr>
+                  <td>5</td>
+                  <td>フロントエンド・バックエンドを含む3〜5リポジトリに拡大する</td>
+                  <td>技術スタックごとの挙動差を確認する</td>
+                </tr>
+                <tr>
+                  <td>6</td>
+                  <td>GitHub Appを「All repositories」モードに切り替え、全社展開する</td>
+                  <td>一元管理に移行する</td>
+                </tr>
+                <tr>
+                  <td>7</td>
+                  <td>月次でダッシュボードとLearningsを棚卸しし、設定を見直す</td>
+                  <td>形骸化・陳腐化を防ぐ</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            この進め方はdev.to上の実践ガイド群でも共通して推奨されており、「2週間ほど誤検知を能動的に修正したチームは、静かに無視し続けたチームよりも最終的な精度が大きく上がる」という指摘があります。ステップ7のブランチ保護についても、CodeRabbitのチェックを「必須」にするのではなく、会話の解決（コメントへの返信）を必須にすることで、開発者が指摘を読む習慣を作りつつ、AIの判断だけでマージを止めない運用が現実的だとされています。
+          </p>
+          <hr />
+          <h2 id="3-設定の基本coderabbityamlとレビュープロファイル">
+            3. 設定の基本：<code>.coderabbit.yaml</code>
+            とレビュープロファイル
+          </h2>
+          <p>
+            設定ファイルはリポジトリのルートに<code>.coderabbit.yaml</code>
+            として置きます。レビュー対象のブランチにあるファイルが自動的に検出・適用されます。
+          </p>
+
+          <div className={styles.codeBlock}>
+            <div className={styles.codeLine}>
+              <span className={styles.cc}>
+                # yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+              </span>
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.cv}>language</span>:{" "}
+              <span className={styles.cs}>&quot;ja-JP&quot;</span>
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.cm}>reviews</span>:
+            </div>
+            <div className={styles.codeLine}>
+              &nbsp;&nbsp;<span className={styles.cv}>profile</span>:{" "}
+              <span className={styles.cs}>&quot;chill&quot;</span>
+            </div>
+            <div className={styles.codeLine}>
+              &nbsp;&nbsp;
+              <span className={styles.cv}>request_changes_workflow</span>:{" "}
+              <span className={styles.ck}>false</span>
+            </div>
+            <div className={styles.codeLine}>
+              &nbsp;&nbsp;<span className={styles.cv}>high_level_summary</span>:{" "}
+              <span className={styles.ck}>true</span>
+            </div>
+            <div className={styles.codeLine}>
+              &nbsp;&nbsp;<span className={styles.cv}>poem</span>:{" "}
+              <span className={styles.ck}>false</span>
+            </div>
+            <div className={styles.codeLine}>
+              &nbsp;&nbsp;<span className={styles.cv}>path_filters</span>:
+            </div>
+            <div className={styles.codeLine}>
+              &nbsp;&nbsp;&nbsp;&nbsp;- <span className={styles.cs}>&quot;!dist/**&quot;</span>
+            </div>
+            <div className={styles.codeLine}>
+              &nbsp;&nbsp;&nbsp;&nbsp;- <span className={styles.cs}>&quot;!**/*.min.js&quot;</span>
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.cm}>chat</span>:
+            </div>
+            <div className={styles.codeLine}>
+              &nbsp;&nbsp;<span className={styles.cv}>auto_reply</span>:{" "}
+              <span className={styles.ck}>true</span>
+            </div>
+          </div>
+
+          <p>
+            既存のWeb UI設定をYAMLに移行したい場合は、PR上で
+            <code>@coderabbitai configuration</code>
+            とコメントすると、現在有効になっている設定が「どの設定源から来たか」を示すコメント付きでYAML形式で返されます。これをそのまま
+            <code>.coderabbit.yaml</code>にコピーするのが最も確実な出発点です。
+          </p>
+          <h3 id="レビュープロファイルchill-と-assertive">
+            レビュープロファイル：<code>chill</code> と <code>assertive</code>
+          </h3>
+          <ul>
+            <li>
+              <strong>
+                <code>chill</code>（デフォルト）
+              </strong>
+              ：軽めのフィードバック。指摘件数を絞りたいチーム向け
+            </li>
+            <li>
+              <strong>
+                <code>assertive</code>
+              </strong>
+              ：より網羅的なフィードバック。ただし「ネチネチしている」と感じられるほど指摘が増える可能性がある
+            </li>
+          </ul>
+          <p>
+            実際にMonterailの検証記事では、初期状態のCodeRabbitは「かなり多くのコメントを生成した」ため、
+            <code>.coderabbit.yaml</code>
+            のチューニングに時間を投資する必要があったと報告されています。プロファイルを
+            <code>assertive</code>
+            に上げる前に、まず<code>chill</code>
+            ＋path_instructionsの組み合わせでノイズを減らす方向を試すのが安全です。
+          </p>
+          <h3 id="よく使う一般設定">よく使う一般設定</h3>
+          <div className={styles.tableScroll}>
+            <table>
+              <thead>
+                <tr>
+                  <th>設定キー</th>
+                  <th>型</th>
+                  <th>デフォルト</th>
+                  <th>用途</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <code>language</code>
+                  </td>
+                  <td>enum</td>
+                  <td>
+                    <code>en-US</code>
+                  </td>
+                  <td>レビュー・チャットで使う言語（ISOコード）</td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>tone_instructions</code>
+                  </td>
+                  <td>string</td>
+                  <td>
+                    <code>&quot;&quot;</code>
+                  </td>
+                  <td>レビューやチャットの語り口（250文字まで）</td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>reviews.profile</code>
+                  </td>
+                  <td>enum</td>
+                  <td>
+                    <code>chill</code>
+                  </td>
+                  <td>
+                    <code>chill</code> / <code>assertive</code>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>reviews.request_changes_workflow</code>
+                  </td>
+                  <td>boolean</td>
+                  <td>
+                    <code>false</code>
+                  </td>
+                  <td>
+                    フィードバックをRequest
+                    changesとして投稿・レビュー要求に対応し、全指摘事項の解消およびマージ前チェック通過後にのみApproveへ切り替える
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>reviews.high_level_summary</code>
+                  </td>
+                  <td>boolean</td>
+                  <td>
+                    <code>true</code>
+                  </td>
+                  <td>PR概要欄への要約生成</td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>reviews.sequence_diagrams</code>
+                  </td>
+                  <td>boolean</td>
+                  <td>
+                    <code>true</code>
+                  </td>
+                  <td>Walkthrough内のMermaidシーケンス図生成</td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>reviews.collapse_walkthrough</code>
+                  </td>
+                  <td>boolean</td>
+                  <td>
+                    <code>true</code>
+                  </td>
+                  <td>Walkthroughを折りたたみ表示にする</td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>reviews.poem</code>
+                  </td>
+                  <td>boolean</td>
+                  <td>
+                    <code>true</code>
+                  </td>
+                  <td>変更内容にちなんだ詩の生成（オフにして実務的にする例も多い）</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <hr />
+          <h2 id="4-設定の優先順位を制御するグローバルオーバーライド中央設定継承">
+            4. 設定の優先順位を制御する：グローバルオーバーライド・中央設定・継承
+          </h2>
+          <p>
+            複数の設定手段（YAMLファイル、中央リポジトリ、Web
+            UIの組織/リポジトリ設定）を併用すると、「どれが実際に効いているのか」が分からなくなりがちです。CodeRabbitは既定では設定源をマージせず、最も優先度の高い1つだけを採用します。
+          </p>
+          <h3 id="cloud-saas構成での優先順位">Cloud / SaaS構成での優先順位</h3>
+          <p>
+            本ガイドの通常構成はCodeRabbit Cloud / SaaSを対象とします。Workspace設定とWorkspace
+            Global OverrideはEnterprise Workspace契約でのみ利用できます。
+          </p>
+
+          <div className={styles.mermaidWrap}>
+            <MermaidDiagram
+              chart={DIAGRAM_2}
+              id="diagram-2"
+              theme="base"
+              themeVariables={MERMAID_THEME_VARS}
+            />
+          </div>
+
+          <h3 id="self-hosted構成での優先順位">Self-Hosted構成での優先順位</h3>
+          <p>
+            CodeRabbit Cloudに連携したSelf-Hosted Git provider組織およびSelf-Hosted
+            deploymentでは、公式の優先順位に従って設定が評価されます。環境変数
+            <code>YAML_CONFIG</code>
+            （Environment YAML）はSelf-Hosted限定の設定源としてRepository/Central
+            YAMLの後かつUI設定より優先されます。
+          </p>
+          <ol>
+            <li>Workspace global overrides（Enterpriseのみ）</li>
+            <li>Organization global overrides</li>
+            <li>
+              Repository / Central YAML（リポジトリ内または中央リポジトリの{" "}
+              <code>.coderabbit.yaml</code>）
+            </li>
+            <li>
+              Environment YAML（環境変数 <code>YAML_CONFIG</code>、Self-Hosted限定）
+            </li>
+            <li>UI 設定（リポジトリ設定 Web UI、組織設定 Web UI、Workspace UI）</li>
+            <li>スキーマのデフォルト値（Defaults）</li>
+          </ol>
+          <p>
+            完全なSelf-Hosted
+            deployment（Enterprise）の公開hierarchy表は、リポジトリYAML、中央YAML、
+            <code>YAML_CONFIG</code>
+            、スキーマ既定値の4層だけを掲載しています。上記のUI層はCodeRabbit
+            Cloudに連携したSelf-Hosted Git
+            provider組織に対する記述であり、air-gapped環境には適用しません。
+            <code>YAML_CONFIG</code>
+            がSelf-Hosted限定である根拠は、公式のConfiguration InheritanceページがEnvironment
+            YAMLをSelf-Hosted deployment固有の設定源として明記しているためです。
+          </p>
+
+          <p>
+            継承（inheritance）を使わない場合、たとえば組織設定と中央設定の両方でタイムアウト値を指定していても、リポジトリの
+            <code>.coderabbit.yaml</code>
+            がタイムアウトに一切触れていなければ、CodeRabbitは（組織設定でも中央設定でもなく）スキーマのデフォルト値を使います。「上位の設定を継承しつつ一部だけ上書きする」という直感的な挙動ではない点に注意してください。
+          </p>
+          <h3 id="グローバルオーバーライド">グローバルオーバーライド</h3>
+          <p>
+            Workspace Global OverrideおよびOrganization Global
+            Overrideは、通常の設定階層における固定の最上位ソースではなく、継承チェーンの解決後に適用される最終マージ層です。Organization
+            AdminがOrganization Global Overrideを、Enterprise Workspaceの管理者がWorkspace Global
+            Overrideを編集でき、両方が同じキーを設定した場合はWorkspace側が優先されます。コンプライアンス上どうしても外せないポリシー（例：全リポジトリで
+            <code>assertive</code>
+            プロファイルを強制する、特定のpath_instructionsを必須にする）に使います。オブジェクトは再帰的にマージされ、配列は
+            <code>path</code>
+            などのキーで重複排除されながら結合され、スカラー値は単純に上書きされます。
+          </p>
+          <h3 id="継承configuration-inheritanceの有効化">
+            継承（Configuration Inheritance）の有効化
+          </h3>
+          <p>
+            デフォルトでは継承は無効です。<code>.coderabbit.yaml</code>
+            のルートに<code>inheritance: true</code>
+            を追加すると、親レベル（中央設定や組織UI設定）とマージされるようになります。チェーンは、
+            <code>inheritance: true</code>
+            が設定されている限り上位へと辿り、<code>inheritance: false</code>
+            （または未設定）のレベルで停止します。
+          </p>
+
+          <div className={styles.mermaidWrap}>
+            <MermaidDiagram
+              chart={DIAGRAM_3}
+              id="diagram-3"
+              theme="base"
+              themeVariables={MERMAID_THEME_VARS}
+            />
+          </div>
+
+          <p>マージの挙動は型によって異なります。</p>
+          <div className={styles.tableScroll}>
+            <table>
+              <thead>
+                <tr>
+                  <th>型</th>
+                  <th>マージ挙動</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>オブジェクト</td>
+                  <td>深いマージ。子の値が各階層で親の値を上書きする</td>
+                </tr>
+                <tr>
+                  <td>配列</td>
+                  <td>
+                    子側の項目を先頭にし、<code>path</code> / <code>label</code> / <code>name</code>{" "}
+                    / <code>id</code> / <code>key</code>
+                    で重複排除しながら親側のユニークな項目を追加する
+                  </td>
+                </tr>
+                <tr>
+                  <td>スカラー</td>
+                  <td>子の値が定義されていれば、それが優先される</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            <strong>実務上のコツ</strong>：継承を有効にした後は、必ずPR上で
+            <code>@coderabbitai configuration</code>
+            を実行し、各設定値がどの階層から来たかを示す注釈付きの解決済みYAMLを確認してください。「意図せず組織設定が効いていない」といった事故は、この確認を怠ったチームで頻発します。
+          </p>
+          <hr />
+          <h2 id="5-パスベースのレビュー制御を使い分ける">
+            5. パスベースのレビュー制御を使い分ける
+          </h2>
+          <p>
+            CodeRabbitには、似ているようで役割が異なる4つの仕組みがあります。混同するとコメント過多や設定の重複を招くため、まず違いを整理します。
+          </p>
+          <div className={styles.tableScroll}>
+            <table>
+              <thead>
+                <tr>
+                  <th>仕組み</th>
+                  <th>何をするか</th>
+                  <th>設定場所</th>
+                  <th>向いているケース</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <strong>Path Filters</strong>
+                  </td>
+                  <td>特定のパスをレビュー対象から完全に除外する</td>
+                  <td>
+                    <code>reviews.path_filters</code>
+                  </td>
+                  <td>ロックファイル・生成コード・バイナリなど</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>Path Instructions</strong>
+                  </td>
+                  <td>特定のパスに追加の観点を与える（除外はしない）</td>
+                  <td>
+                    <code>reviews.path_instructions</code>
+                  </td>
+                  <td>「APIコントローラでは認可漏れを重点確認して」など</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>Code Guidelines</strong>
+                  </td>
+                  <td>
+                    既存の<code>AGENTS.md</code>や<code>CLAUDE.md</code>
+                    などを自動検出して規約として適用する
+                  </td>
+                  <td>追加設定不要（自動検出）</td>
+                  <td>既にAIコーディングエージェント向けの規約がある場合</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>Custom Checks</strong>
+                  </td>
+                  <td>合否をはっきり判定できる基準をマージ前ゲートとして定義する</td>
+                  <td>
+                    <code>reviews.pre_merge_checks.custom_checks</code>
+                  </td>
+                  <td>
+                    「新規の<code>.java</code>
+                    ファイルを禁止する」など機械的に判定できるルール
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>この4つをどう使い分けるかを整理すると、次のような判断フローになります。</p>
+
+          <div className={styles.mermaidWrap}>
+            <MermaidDiagram
+              chart={DIAGRAM_4}
+              id="diagram-4"
+              theme="base"
+              themeVariables={MERMAID_THEME_VARS}
+            />
+          </div>
+
+          <h3 id="path-instructionsの実例">Path Instructionsの実例</h3>
+
+          <div className={styles.codeBlock}>
+            <div className={styles.codeLine}>
+              <span className={styles.cm}>reviews</span>:
+            </div>
+            <div className={styles.codeLine}>
+              &nbsp;&nbsp;<span className={styles.cv}>path_instructions</span>:
+            </div>
+            <div className={styles.codeLine}>
+              &nbsp;&nbsp;&nbsp;&nbsp;- <span className={styles.cv}>path</span>:{" "}
+              <span className={styles.cs}>&quot;src/controllers/**&quot;</span>
+            </div>
+            <div className={styles.codeLine}>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              <span className={styles.cv}>instructions</span>: |
+            </div>
+            <div className={styles.codeLine}>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-
+              認証・認可・入力バリデーションを重点的に確認する
+            </div>
+            <div className={styles.codeLine}>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-
+              ORMを迂回した直接のDBクエリがあれば指摘する
+            </div>
+            <div className={styles.codeLine}>
+              &nbsp;&nbsp;&nbsp;&nbsp;- <span className={styles.cv}>path</span>:{" "}
+              <span className={styles.cs}>&quot;docs/**.md&quot;</span>
+            </div>
+            <div className={styles.codeLine}>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              <span className={styles.cv}>instructions</span>: |
+            </div>
+            <div className={styles.codeLine}>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;明瞭さ・正確さ・網羅性を確認し、非推奨APIへの言及があれば指摘する
+            </div>
+          </div>
+
+          <p>
+            <strong>よくある間違い</strong>：<code>AGENTS.md</code>
+            のようなガイドラインファイル名を<code>path_instructions</code>
+            に登録してしまうケースです。これは「そのファイル自体をコードとしてレビューする」設定になってしまい、「そのファイルの内容を規約として使う」設定にはなりません。規約として使いたい場合はCode
+            Guidelinesの<code>filePatterns</code>を使います。
+          </p>
+          <h3 id="code-guidelinesの自動検出対象">Code Guidelinesの自動検出対象</h3>
+          <div className={styles.tableScroll}>
+            <table>
+              <thead>
+                <tr>
+                  <th>ファイルパターン</th>
+                  <th>対応ツール</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <code>**/AGENTS.md</code>, <code>**/AGENT.md</code>
+                  </td>
+                  <td>汎用AIエージェント指示</td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>**/CLAUDE.md</code>
+                  </td>
+                  <td>Claude Code</td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>**/GEMINI.md</code>
+                  </td>
+                  <td>Gemini CLI</td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>**/.cursorrules</code>, <code>**/.cursor/rules/*</code>
+                  </td>
+                  <td>Cursor</td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>.github/copilot-instructions.md</code>
+                  </td>
+                  <td>GitHub Copilot</td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>**/.windsurfrules</code>
+                  </td>
+                  <td>Windsurf</td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>**/.clinerules/*</code>
+                  </td>
+                  <td>Cline</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            これらはディレクトリ単位でスコープされます。たとえば
+            <code>src/frontend/CLAUDE.md</code>
+            はそのディレクトリ配下にしか適用されません。モノレポで領域ごとに規約を分けたい場合に有効です。
+          </p>
+          <h3 id="蓄積したpath-instructionsをコマンドで反映する">
+            蓄積したPath Instructionsをコマンドで反映する
+          </h3>
+          <p>
+            <code>@coderabbitai emit path instructions</code>
+            とコメントすると、過去7日間にCodeRabbitが提案したpath instructionを収集し、既存の
+            <code>.coderabbit.yaml</code>
+            を上書きせずにマージしたPRを自動で開いてくれます。手作業でYAMLを編集する前に、まずこのコマンドを試す価値があります。
+          </p>
+          <hr />
+          <h2 id="6-ast-grepによる構造的レビュールール上級者向け">
+            6. ast-grepによる構造的レビュールール（上級者向け）
+          </h2>
+          <p>
+            <code>ast-grep</code>
+            は、tree-sitterパーサーを使ってAST（抽象構文木）パターンでコードを検索するRust製ツールです（作者：Herrington
+            Darkholme）。YAMLの学習コストはありますが、「文字列一致では表現できない構造的な禁止パターン」を定義できます。
+          </p>
+
+          <div className={styles.codeBlock}>
+            <div className={styles.codeLine}>reviews:</div>
+            <div className={styles.codeLine}>&nbsp;&nbsp;tools:</div>
+            <div className={styles.codeLine}>&nbsp;&nbsp;&nbsp;&nbsp;ast-grep:</div>
+            <div className={styles.codeLine}>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;essential_rules: true
+            </div>
+            <div className={styles.codeLine}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;rule_dirs:</div>
+            <div className={styles.codeLine}>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- &quot;custom-rules&quot;
+            </div>
+            <div className={styles.codeLine}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;packages:</div>
+            <div className={styles.codeLine}>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-
+              &quot;myorg/awesome-review-rules&quot;
+            </div>
+          </div>
+
+          <p>ルールは3つのカテゴリの組み合わせで構成されます。</p>
+          <div className={styles.tableScroll}>
+            <table>
+              <thead>
+                <tr>
+                  <th>カテゴリ</th>
+                  <th>内容</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Atomic rule</td>
+                  <td>
+                    <code>pattern</code> / <code>kind</code> / <code>regex</code>{" "}
+                    によるASTノードの基本一致判定
+                  </td>
+                </tr>
+                <tr>
+                  <td>Relational rule</td>
+                  <td>
+                    <code>inside</code> / <code>has</code> / <code>follows</code> /{" "}
+                    <code>precedes</code> によるノード間の関係判定
+                  </td>
+                </tr>
+                <tr>
+                  <td>Composite rule</td>
+                  <td>
+                    <code>all</code> / <code>any</code> / <code>not</code> による論理結合
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            <strong>
+              実例：catchブロック以外での<code>console.log</code>
+              系呼び出しを禁止する
+            </strong>
+          </p>
+
+          <div className={styles.codeBlock}>
+            <div className={styles.codeLine}>id: no-console-except-error</div>
+            <div className={styles.codeLine}>language: typescript</div>
+            <div className={styles.codeLine}>
+              message: &quot;catchブロック以外でのconsole出力は禁止です&quot;
+            </div>
+            <div className={styles.codeLine}>rule:</div>
+            <div className={styles.codeLine}>&nbsp;&nbsp;any:</div>
+            <div className={styles.codeLine}>
+              &nbsp;&nbsp;&nbsp;&nbsp;- pattern: console.error($$$)
+            </div>
+            <div className={styles.codeLine}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;not:</div>
+            <div className={styles.codeLine}>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;inside:
+            </div>
+            <div className={styles.codeLine}>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;kind: catch_clause
+            </div>
+            <div className={styles.codeLine}>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;stopBy: end
+            </div>
+            <div className={styles.codeLine}>
+              &nbsp;&nbsp;&nbsp;&nbsp;- pattern: console.$METHOD($$$)
+            </div>
+            <div className={styles.codeLine}>constraints:</div>
+            <div className={styles.codeLine}>&nbsp;&nbsp;METHOD:</div>
+            <div className={styles.codeLine}>
+              &nbsp;&nbsp;&nbsp;&nbsp;regex: &quot;log|debug|warn&quot;
+            </div>
+          </div>
+
+          <p>
+            CodeRabbitは<code>ast-grep-essentials</code>
+            というセキュリティ寄りの既定ルールパックを提供しており、
+            <code>essential_rules: true</code>
+            だけで有効化できます。カスタムルールを作る前に、まずこの既定パックが自分たちのニーズをどこまでカバーするかを確認するのが効率的です。
+          </p>
+          <p>
+            <strong>注意</strong>
+            ：ast-grepベースのコンテキストは自動レビュー時にのみ有効で、チャットでは使えません。設計を試すときは公式のast-grep
+            Playgroundでルールを検証してから組み込むと手戻りが減ります。
+          </p>
+          <hr />
+          <h2 id="7-自動レビューの挙動を制御するauto_review">
+            7. 自動レビューの挙動を制御する（<code>auto_review</code>）
+          </h2>
+          <p>
+            デフォルトでは、CodeRabbitはデフォルトブランチ向けの非ドラフトPRをすべて自動レビューします。
+            <code>auto_review</code>
+            の設定群で、この挙動を細かく制御できます。
+          </p>
+          <div className={styles.tableScroll}>
+            <table>
+              <thead>
+                <tr>
+                  <th>目的</th>
+                  <th>推奨設定</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    小さなコミットが大量に積まれるアクティブブランチでレビュー回数を節約したい
+                  </td>
+                  <td>
+                    <code>auto_pause_after_reviewed_commits</code> を <code>1</code>〜<code>2</code>{" "}
+                    に設定
+                  </td>
+                </tr>
+                <tr>
+                  <td>準備が整ったPRだけレビューしたい</td>
+                  <td>
+                    <code>enabled: false</code> にし、<code>labels</code>{" "}
+                    にレビュー準備完了ラベル（例：<code>review-ready</code>
+                    ）を設定
+                  </td>
+                </tr>
+                <tr>
+                  <td>WIP・生成コード・自動化PRをスキップしたい</td>
+                  <td>
+                    <code>ignore_title_keywords</code> に <code>WIP</code> などを追加
+                  </td>
+                </tr>
+                <tr>
+                  <td>自動レビューを完全に止め、手動運用に切り替えたい</td>
+                  <td>
+                    <code>enabled: false</code> にし、
+                    <code>@coderabbitai review</code> を使う
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div className={styles.codeBlock}>
+            <div className={styles.codeLine}>
+              <span className={styles.cm}>reviews</span>:
+            </div>
+            <div className={styles.codeLine}>
+              &nbsp;&nbsp;<span className={styles.cv}>auto_review</span>:
+            </div>
+            <div className={styles.codeLine}>
+              &nbsp;&nbsp;&nbsp;&nbsp;<span className={styles.cv}>enabled</span>:{" "}
+              <span className={styles.ck}>true</span>
+            </div>
+            <div className={styles.codeLine}>
+              &nbsp;&nbsp;&nbsp;&nbsp;
+              <span className={styles.cv}>auto_incremental_review</span>:{" "}
+              <span className={styles.ck}>true</span>
+            </div>
+            <div className={styles.codeLine}>
+              &nbsp;&nbsp;&nbsp;&nbsp;
+              <span className={styles.cv}>auto_pause_after_reviewed_commits</span>:{" "}
+              <span className={styles.fn}>5</span>
+            </div>
+            <div className={styles.codeLine}>
+              &nbsp;&nbsp;&nbsp;&nbsp;<span className={styles.cv}>drafts</span>:{" "}
+              <span className={styles.ck}>false</span>
+            </div>
+            <div className={styles.codeLine}>
+              &nbsp;&nbsp;&nbsp;&nbsp;<span className={styles.cv}>base_branches</span>:
+            </div>
+            <div className={styles.codeLine}>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-{" "}
+              <span className={styles.cs}>&quot;develop&quot;</span>
+            </div>
+            <div className={styles.codeLine}>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-{" "}
+              <span className={styles.cs}>&quot;release/.*&quot;</span>
+            </div>
+            <div className={styles.codeLine}>
+              &nbsp;&nbsp;&nbsp;&nbsp;
+              <span className={styles.cv}>ignore_title_keywords</span>:
+            </div>
+            <div className={styles.codeLine}>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-{" "}
+              <span className={styles.cs}>&quot;WIP&quot;</span>
+            </div>
+            <div className={styles.codeLine}>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-{" "}
+              <span className={styles.cs}>&quot;[skip review]&quot;</span>
+            </div>
+            <div className={styles.codeLine}>
+              &nbsp;&nbsp;&nbsp;&nbsp;<span className={styles.cv}>labels</span>:
+            </div>
+            <div className={styles.codeLine}>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-{" "}
+              <span className={styles.cs}>&quot;!do-not-review&quot;</span>
+            </div>
+            <div className={styles.codeLine}>
+              &nbsp;&nbsp;&nbsp;&nbsp;
+              <span className={styles.cv}>ignore_usernames</span>:
+            </div>
+            <div className={styles.codeLine}>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-{" "}
+              <span className={styles.cs}>&quot;dependabot[bot]&quot;</span>
+            </div>
+            <div className={styles.codeLine}>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-{" "}
+              <span className={styles.cs}>&quot;renovate[bot]&quot;</span>
+            </div>
+          </div>
+
+          <p>判定の流れを図にすると以下の通りです。</p>
+
+          <div className={styles.mermaidWrap}>
+            <MermaidDiagram
+              chart={DIAGRAM_5}
+              id="diagram-5"
+              theme="base"
+              themeVariables={MERMAID_THEME_VARS}
+            />
+          </div>
+
+          <p>
+            <strong>注意点</strong>：<code>auto_pause_after_reviewed_commits</code>を<code>0</code>
+            にして「常に全部レビューする」設定にすると、アクティブなブランチではレビュー回数の上限（プランごとの1時間あたりの割り当て）をすぐに消費してしまいます。プラン上限に頻繁に当たる場合は、まずこの値を絞ることを検討してください。
+          </p>
+          <hr />
+          <h2 id="8-learningsでチームの好みを学習させる">8. Learningsでチームの好みを学習させる</h2>
+          <p>
+            Learningsは、PRやIssueのコメントでのやり取りからCodeRabbitが学習する「チームの好み」の内部データベースです。フォーマルな設定変更をするほどではないが、今後も繰り返し適用してほしい方針に向いています。
+          </p>
+          <h3 id="効果的なlearningsの作り方">効果的なLearningsの作り方</h3>
+          <ol>
+            <li>
+              <p>
+                <strong>パターンか一度きりかを見極める</strong>
+                ：移行中の一時的な例外にはLearningsを作らず、コメントを解決するだけにとどめる。チーム全体に適用すべき方針だけをLearning化する。
+              </p>
+            </li>
+            <li>
+              <p>
+                <strong>「何を」ではなく「なぜ」を伝える</strong>
+                ：理由を説明すると、似ているが完全に同一ではない状況にも正しく適用されやすくなる。
+              </p>
+              <blockquote>
+                <p>
+                  効果が薄い例：「catchブロックのネストは提案しないで」
+                  <br />
+                  効果的な例：「認証ミドルウェアではネストしたtry-catchではなく、早期returnとエラーコードを使う方針にしている。理由は本番でのデバッグ容易性とモニタリングツールとの相性のため」
+                </p>
+              </blockquote>
+            </li>
+            <li>
+              <p>
+                <strong>特定の行コメントへの返信で伝える</strong>
+                ：PR全体への一般的なコメントよりも、該当行への返信のほうが文脈が伝わり、精度の高いLearningになる。
+              </p>
+            </li>
+          </ol>
+          <h3 id="スコープの選び方">スコープの選び方</h3>
+          <div className={styles.tableScroll}>
+            <table>
+              <thead>
+                <tr>
+                  <th>スコープ</th>
+                  <th>挙動</th>
+                  <th>向いているケース</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <code>auto</code>（既定）
+                  </td>
+                  <td>公開リポジトリでは当該リポジトリのみ、非公開では組織全体のLearningsを適用</td>
+                  <td>公開/非公開リポジトリが混在する組織</td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>local</code>
+                  </td>
+                  <td>常に当該リポジトリのLearningsのみ適用</td>
+                  <td>
+                    PythonバックエンドとReactフロントエンドなど、技術スタックが大きく異なるリポジトリが混在する組織（相互汚染の防止）
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>global</code>
+                  </td>
+                  <td>常に組織全体のLearningsを適用</td>
+                  <td>セキュリティ方針や命名規則など、組織横断で統一したい標準がある場合</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>学習フローを図示すると次のようになります。</p>
+
+          <div className={styles.mermaidWrap}>
+            <MermaidDiagram
+              chart={DIAGRAM_6}
+              id="diagram-6"
+              theme="base"
+              themeVariables={MERMAID_THEME_VARS}
+            />
+          </div>
+
+          <h3 id="運用と保守">運用と保守</h3>
+          <ul>
+            <li>
+              新しく作られたチャット由来のLearningsを即時反映せず、管理者の承認を挟みたい場合は
+              <code>knowledge_base.learnings.approval_delay</code>
+              を1〜30日の範囲で設定する（既定は<code>0</code>で即時反映）
+            </li>
+            <li>
+              Learningsは陳腐化する。四半期に一度、廃止したパターンやチーム決定を参照しているLearningsを棚卸しし、矛盾するものは追加せず更新・削除する
+            </li>
+            <li>
+              CodeRabbitがLearningsを無視しているように見える場合は、Path Instructionsとの競合（Path
+              Instructionsのほうが優先される）を疑い、必要であれば「回答前に必ずLearningsを確認すること」という補強ルールを追加する
+            </li>
+          </ul>
+          <hr />
+          <h2 id="9-pre-merge-checksとcustom-checksで品質ゲートを敷く">
+            9. Pre-Merge ChecksとCustom Checksで品質ゲートを敷く
+          </h2>
+          <p>
+            Pre-Merge
+            Checksは、マージ前の品質ゲートをAIエージェントで自動判定する機能です。組み込みチェックとカスタムチェックの2種類があります。
+          </p>
+          <h3 id="組み込みチェック">組み込みチェック</h3>
+          <div className={styles.tableScroll}>
+            <table>
+              <thead>
+                <tr>
+                  <th>チェック</th>
+                  <th>内容</th>
+                  <th>既定閾値</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Docstring Coverage</td>
+                  <td>PR内のdocstringカバレッジを検証</td>
+                  <td>80%</td>
+                </tr>
+                <tr>
+                  <td>Pull Request Title</td>
+                  <td>タイトルが変更内容を正確に反映しているか検証</td>
+                  <td>チーム指定の要件</td>
+                </tr>
+                <tr>
+                  <td>Pull Request Description</td>
+                  <td>説明がテンプレートに沿っているか検証</td>
+                  <td>-</td>
+                </tr>
+                <tr>
+                  <td>Issue Assessment</td>
+                  <td>紐づいたIssueに対応できているか検証</td>
+                  <td>-</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            各チェックは<code>off</code> / <code>warning</code> / <code>error</code>
+            の3段階で設定できます。<code>error</code>は<code>request_changes_workflow</code>
+            と組み合わせるとマージをブロックします。
+          </p>
+
+          <div className={styles.codeBlock}>
+            <div className={styles.codeLine}>
+              <span className={styles.cm}>reviews</span>:
+            </div>
+            <div className={styles.codeLine}>
+              &nbsp;&nbsp;<span className={styles.cv}>pre_merge_checks</span>:
+            </div>
+            <div className={styles.codeLine}>
+              &nbsp;&nbsp;&nbsp;&nbsp;<span className={styles.cv}>docstrings</span>:
+            </div>
+            <div className={styles.codeLine}>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span className={styles.cv}>mode</span>:{" "}
+              <span className={styles.cs}>&quot;error&quot;</span>
+            </div>
+            <div className={styles.codeLine}>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span className={styles.cv}>threshold</span>:{" "}
+              <span className={styles.fn}>85</span>
+            </div>
+            <div className={styles.codeLine}>
+              &nbsp;&nbsp;&nbsp;&nbsp;<span className={styles.cv}>title</span>:
+            </div>
+            <div className={styles.codeLine}>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span className={styles.cv}>mode</span>:{" "}
+              <span className={styles.cs}>&quot;warning&quot;</span>
+            </div>
+            <div className={styles.codeLine}>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span className={styles.cv}>requirements</span>:{" "}
+              <span className={styles.cs}>&quot;命令形の動詞で始め、50文字以内に収める&quot;</span>
+            </div>
+            <div className={styles.codeLine}>
+              &nbsp;&nbsp;&nbsp;&nbsp;<span className={styles.cv}>custom_checks</span>:
+            </div>
+            <div className={styles.codeLine}>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span className={styles.cv}>name</span>:{" "}
+              <span className={styles.cs}>&quot;破壊的変更の文書化&quot;</span>
+            </div>
+            <div className={styles.codeLine}>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              <span className={styles.cv}>mode</span>:{" "}
+              <span className={styles.cs}>&quot;warning&quot;</span>
+            </div>
+            <div className={styles.codeLine}>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              <span className={styles.cv}>instructions</span>:{" "}
+              <span className={styles.cs}>
+                &quot;公開API・CLIフラグ・環境変数・DBスキーマへの破壊的変更は、PR説明のBreaking
+                ChangeセクションとCHANGELOG.mdの両方に記載されていること。内部限定の変更は除く。&quot;
+              </span>
+            </div>
+          </div>
+
+          <p>
+            <strong>ベストプラクティス</strong>：新しいチェックはまず
+            <code>warning</code>モードで導入し、チームの認識が揃ってから
+            <code>error</code>に引き上げます。
+          </p>
+          <h3 id="custom-checksの制約と書き方">Custom Checksの制約と書き方</h3>
+          <p>
+            Custom
+            Checksは読み取り専用のサンドボックスで動作します。できること・できないことを理解しておかないと、無意味な指示になります。
+          </p>
+          <div className={styles.tableScroll}>
+            <table>
+              <thead>
+                <tr>
+                  <th>できること</th>
+                  <th>できないこと</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>変更ファイル・コードスニペット・関連するGit履歴の参照</td>
+                  <td>テストスイートの実行（依存関係が未インストール）</td>
+                </tr>
+                <tr>
+                  <td>PRタイトル・説明・紐づくIssue・レビュー内の議論の参照</td>
+                  <td>
+                    <code>node_modules</code>・<code>dist</code>
+                    ・ビルド成果物へのアクセス
+                  </td>
+                </tr>
+                <tr>
+                  <td>ast-grepやripgrepによるパターン検索</td>
+                  <td>任意のリポジトリコードの実行</td>
+                </tr>
+                <tr>
+                  <td>サンドボックス化されたシェルコマンドでの調査</td>
+                  <td>特定行へのインラインコメント投稿（結果はサマリー表のみ）</td>
+                </tr>
+                <tr>
+                  <td>公開ドキュメントへのWebアクセス、接続済みMCPツール</td>
+                  <td>PR承認状況やレビュアーの割り当て状況の確認</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div className={styles.tableScroll}>
+            <table>
+              <thead>
+                <tr>
+                  <th>アンチパターン</th>
+                  <th>例</th>
+                  <th>問題点</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>曖昧な指示</td>
+                  <td>「ベストプラクティスを確認して」</td>
+                  <td>具体的な合否基準がない</td>
+                </tr>
+                <tr>
+                  <td>取得不能な情報を要求</td>
+                  <td>「@security-teamの承認済みであることを確認して」</td>
+                  <td>エージェントは承認状況を確認できない</td>
+                </tr>
+                <tr>
+                  <td>主観的な推測</td>
+                  <td>「明らかなパフォーマンス改善余地があるか評価して」</td>
+                  <td>明確な判定基準がなく主観的</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>判定フローは次の通りです。</p>
+
+          <div className={styles.mermaidWrap}>
+            <MermaidDiagram
+              chart={DIAGRAM_7}
+              id="diagram-7"
+              theme="base"
+              themeVariables={MERMAID_THEME_VARS}
+            />
+          </div>
+
+          <p>
+            <code>
+              @coderabbitai evaluate custom pre-merge check --name &lt;名前&gt; --instructions
+              &lt;本文&gt;
+            </code>
+            とコメントすると、設定に保存する前にロジックをテストできます。本番投入前に必ず試すことを推奨します。
+          </p>
+          <hr />
+          <h2 id="10-finishing-touchesワンクリックのエージェント的アクション">
+            10. Finishing Touches：ワンクリックのエージェント的アクション
+          </h2>
+          <p>
+            Finishing
+            Touchesは、レビュー後にワンクリックで実行できるエージェント的アクション群です。PRコメントかWalkthrough内のチェックボックスから起動します。
+          </p>
+          <div className={styles.tableScroll}>
+            <table>
+              <thead>
+                <tr>
+                  <th>機能</th>
+                  <th>コマンド</th>
+                  <th>出力</th>
+                  <th>対応プラットフォーム</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Docstring生成</td>
+                  <td>
+                    <code>@coderabbitai generate docstrings</code>
+                  </td>
+                  <td>新規PR</td>
+                  <td>全プラットフォーム</td>
+                </tr>
+                <tr>
+                  <td>ユニットテスト生成</td>
+                  <td>
+                    <code>@coderabbitai generate unit tests</code>
+                  </td>
+                  <td>PRまたはコミット</td>
+                  <td>GitHub</td>
+                </tr>
+                <tr>
+                  <td>コードの簡潔化</td>
+                  <td>
+                    <code>@coderabbitai simplify</code>
+                  </td>
+                  <td>新規PRまたはコミット</td>
+                  <td>GitHub</td>
+                </tr>
+                <tr>
+                  <td>Autofix</td>
+                  <td>
+                    <code>@coderabbitai autofix</code> /{" "}
+                    <code>@coderabbitai autofix stacked pr</code>
+                  </td>
+                  <td>ブランチへのコミットまたはスタックPR</td>
+                  <td>GitHub, GitLab, Azure DevOps, Bitbucket</td>
+                </tr>
+                <tr>
+                  <td>カスタムレシピ</td>
+                  <td>
+                    <code>@coderabbitai run &lt;レシピ名&gt;</code>
+                  </td>
+                  <td>ブランチへのコミットまたはスタックPR</td>
+                  <td>GitHub</td>
+                </tr>
+                <tr>
+                  <td>マージコンフリクト解消</td>
+                  <td>
+                    <code>@coderabbitai resolve merge conflict</code>
+                  </td>
+                  <td>マージコミット</td>
+                  <td>GitHub, GitLab</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div className={styles.mermaidWrap}>
+            <MermaidDiagram
+              chart={DIAGRAM_8}
+              id="diagram-8"
+              theme="base"
+              themeVariables={MERMAID_THEME_VARS}
+            />
+          </div>
+
+          <p>
+            カスタムレシピはPro+・Enterpriseプランにおいてリポジトリごとに最大20件まで定義でき、「未使用importの整理」「型の厳格化」「CHANGELOGエントリの追加」のような繰り返し作業を名前付きのコマンドとして再利用できます。
+          </p>
+          <p>
+            <strong>注意</strong>：Autofixはマージコンフリクトがある状態では実行前に停止し、先に
+            <code>@coderabbitai resolve merge conflict</code>
+            を促す返信をします。マージコンフリクト解消機能自体は既定で有効ですが、無効化されている環境では先にこの設定を確認してください。
+          </p>
+          <hr />
+          <h2 id="11-walkthroughとcoderabbit-reviewchange-stackを使いこなす">
+            11. WalkthroughとCodeRabbit Review（Change Stack）を使いこなす
+          </h2>
+          <h3 id="walkthroughコメントの構成要素">Walkthroughコメントの構成要素</h3>
+          <p>
+            CodeRabbitがPRを分析するたびに投稿する構造化コメントが「Walkthrough」です。各セクションは個別にオン/オフできます。
+          </p>
+          <ul>
+            <li>変更ファイルの要約（関連ファイルはグループ化される）</li>
+            <li>Mermaidによるシーケンス図（コンポーネント間のやり取りが変わるPRのみ生成）</li>
+            <li>レビュー工数の見積もり（1＝些細、5＝非常に複雑）</li>
+            <li>紐づくIssue・関連PR・推奨レビュアー・推奨ラベル</li>
+            <li>変更内容にちなんだ詩（無効化も可能）</li>
+          </ul>
+          <h3 id="指摘の分類軸">指摘の分類軸</h3>
+          <p>各コメントには「内容カテゴリ」と「深刻度」の2軸のラベルが付きます。</p>
+          <div className={styles.tableScroll}>
+            <table>
+              <thead>
+                <tr>
+                  <th>カテゴリ</th>
+                  <th>意味</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>セキュリティ・プライバシー</td>
+                  <td>脆弱性、認証・認可の欠陥、シークレットの取り扱い</td>
+                </tr>
+                <tr>
+                  <td>安定性・可用性</td>
+                  <td>クラッシュ、未処理エラー、リソースリーク</td>
+                </tr>
+                <tr>
+                  <td>データ整合性・連携</td>
+                  <td>データの正確性、永続化、スキーマ、連携境界</td>
+                </tr>
+                <tr>
+                  <td>機能的正確性</td>
+                  <td>ロジックエラー、未処理のエッジケース</td>
+                </tr>
+                <tr>
+                  <td>パフォーマンス・スケーラビリティ</td>
+                  <td>非効率な処理、ボトルネック</td>
+                </tr>
+                <tr>
+                  <td>保守性・コード品質</td>
+                  <td>可読性、構造、命名</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div className={styles.tableScroll}>
+            <table>
+              <thead>
+                <tr>
+                  <th>深刻度</th>
+                  <th>意味</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Critical</td>
+                  <td>システム障害・セキュリティ侵害・データ損失につながりうる</td>
+                </tr>
+                <tr>
+                  <td>Major</td>
+                  <td>機能やパフォーマンスに大きく影響する</td>
+                </tr>
+                <tr>
+                  <td>Minor</td>
+                  <td>対応すべきだが致命的ではない</td>
+                </tr>
+                <tr>
+                  <td>Trivial</td>
+                  <td>コード品質面での軽微な提案</td>
+                </tr>
+                <tr>
+                  <td>Info</td>
+                  <td>対応不要な情報提供</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            この2軸を使うと、<code>assertive</code>
+            プロファイルで指摘件数が増えても、「CriticalとMajorだけまず見る」という運用でノイズを実質的に抑えられます。
+          </p>
+          <h3 id="coderabbit-reviewchange-stack">CodeRabbit Review（Change Stack）</h3>
+          <p>
+            AIエージェントが一度に大量のファイルを変更するPRが増える中、GitHubの既定の差分表示（アルファベット順のフラットなファイル一覧）は論理的な依存関係を表現できません。CodeRabbit
+            Reviewは、PRを「コホート（関連する変更のまとまり）」と「レイヤー（読む順序）」に再構成し、データ構造や契約の変更を、それに依存する呼び出し側やテストより先に読めるようにします。
+          </p>
+          <ul>
+            <li>左パネル：コホート／レイヤーのナビゲーションと全ファイル一覧</li>
+            <li>
+              中央パネル：現在のレイヤーに絞った差分（変数名クリックで定義・参照元にジャンプするCode
+              Peek機能付き）
+            </li>
+            <li>右パネル：範囲ごとのAI要約とコメントタブ</li>
+          </ul>
+          <p>
+            キーボード操作にも対応しており、<code>J</code>で次のレイヤー、
+            <code>K</code>で前のレイヤー、<code>Z</code>
+            でフォーカスモードの切り替えができます。この機能はWalkthroughコメントの「Review Change
+            Stack
+            →」ボタンから開き、レビュアーごとの任意選択（オプトイン）のため、従来のGitHubレビュー体験を好むメンバーには影響しません。
+          </p>
+          <hr />
+          <h2 id="12-knowledge-baseで文脈を拡張する">12. Knowledge Baseで文脈を拡張する</h2>
+          <p>Knowledge Baseは、コード自体を超えた文脈をレビューに供給する仕組みの総称です。</p>
+
+          <div className={styles.mermaidWrap}>
+            <MermaidDiagram
+              chart={DIAGRAM_9}
+              id="diagram-9"
+              theme="base"
+              themeVariables={MERMAID_THEME_VARS}
+            />
+          </div>
+
+          <h3 id="mcpサーバー連携">MCPサーバー連携</h3>
+          <p>
+            CodeRabbitはMCPの<strong>クライアント</strong>
+            として動作し、接続済みのMCPサーバー（社内Wiki、Figma、Issueトラッカーなど）からレビュー中に情報を取得します。使用状況はWalkthroughの「Additional
+            context
+            used」に明示されるため、何を参照したかが監査可能です。接続数の上限はプランによって異なり（Pro:5、Pro+:15、Enterprise:20）、
+            <code>knowledge_base.mcp.usage</code>で<code>auto</code> / <code>enabled</code> /{" "}
+            <code>disabled</code>を切り替えられます。
+          </p>
+          <h3 id="multi-repo-analysis">Multi-Repo Analysis</h3>
+          <p>
+            バックエンドAPIとフロントエンド、あるいはマイクロサービス群のように、複数リポジトリにまたがる契約変更を検出したい場合に使います。
+          </p>
+
+          <div className={styles.codeBlock}>
+            <div className={styles.codeLine}>
+              <span className={styles.cm}>knowledge_base</span>:
+            </div>
+            <div className={styles.codeLine}>
+              &nbsp;&nbsp;<span className={styles.cv}>linked_repositories</span>:
+            </div>
+            <div className={styles.codeLine}>
+              &nbsp;&nbsp;&nbsp;&nbsp;- <span className={styles.cv}>repository</span>:{" "}
+              <span className={styles.cs}>&quot;myorg/backend-api&quot;</span>
+            </div>
+            <div className={styles.codeLine}>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              <span className={styles.cv}>instructions</span>:{" "}
+              <span className={styles.cs}>
+                &quot;REST APIエンドポイントとデータベースモデルを含む&quot;
+              </span>
+            </div>
+          </div>
+
+          <p>
+            <strong>制約</strong>
+            ：連携先リポジトリは、レビュー対象PRと同じGitプラットフォーム上になければなりません（アクセストークンがプラットフォームごとにスコープされるため）。また、変更が自己完結していて他リポジトリへの影響がない場合、クロスリポジトリの指摘が出ないのは正常な挙動であり、設定ミスではありません。
+          </p>
+          <hr />
+          <h2 id="13-ide拡張機能とcliツールでシフトレフトする">
+            13. IDE拡張機能とCLIツールでシフトレフトする
+          </h2>
+          <p>PRを開く前にレビューを受けられる2つの経路があります。</p>
+          <h3 id="ide拡張機能vs-code--cursor--windsurf">
+            IDE拡張機能（VS Code / Cursor / Windsurf）
+          </h3>
+          <div className={styles.tableScroll}>
+            <table>
+              <thead>
+                <tr>
+                  <th>設定</th>
+                  <th>選択肢</th>
+                  <th>既定値</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Agent Type</td>
+                  <td>
+                    Native / Claude Code / Codex CLI / Cline / Roo / Kilo Code / Augment Code /
+                    OpenCode / Clipboard 等
+                  </td>
+                  <td>Native</td>
+                </tr>
+                <tr>
+                  <td>Auto Review Mode</td>
+                  <td>Disabled / Prompt / Auto</td>
+                  <td>Prompt</td>
+                </tr>
+                <tr>
+                  <td>Region</td>
+                  <td>us / eu</td>
+                  <td>us</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            「Fix with AI」機能を使う際、どのコーディングエージェントに修正案を渡すかをAgent
+            Typeで選べます。コミットのたびに毎回確認したくない場合はAuto Review Modeを
+            <code>Auto</code>に、逆に慎重に運用したい場合は
+            <code>Prompt</code>のままにしておくのが妥当です。
+          </p>
+          <h3 id="cliツール">CLIツール</h3>
+
+          <div className={styles.codeBlock}>
+            <div className={styles.codeLine}>
+              <span className={styles.cc}># インストール</span>
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>curl</span> -fsSL https://cli.coderabbit.ai/install.sh |{" "}
+              <span className={styles.ck}>sh</span>
+            </div>
+            <div className={styles.codeLine} />
+            <div className={styles.codeLine}>
+              <span className={styles.cc}># 認証</span>
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>cr</span> auth login
+            </div>
+            <div className={styles.codeLine} />
+            <div className={styles.codeLine}>
+              <span className={styles.cc}># レビュー実行（現在のGitリポジトリの差分を解析）</span>
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>cr</span>
+            </div>
+            <div className={styles.codeLine} />
+            <div className={styles.codeLine}>
+              <span className={styles.cc}># セットアップ診断</span>
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>cr</span> doctor
+            </div>
+          </div>
+
+          <p>CLIには3つの出力モードがあります。</p>
+          <div className={styles.tableScroll}>
+            <table>
+              <thead>
+                <tr>
+                  <th>モード</th>
+                  <th>用途</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <code>--plain</code>（既定）
+                  </td>
+                  <td>詳細な修正提案付きのテキスト出力。人間が読む用途</td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>--agent</code>
+                  </td>
+                  <td>エージェント連携向けの構造化JSON出力</td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>--interactive</code>
+                  </td>
+                  <td>ターミナルUIでの対話的レビュー</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <h3 id="コーディングエージェントとの連携ループ">
+            コーディングエージェントとの連携ループ
+          </h3>
+          <p>
+            Claude Codeにはネイティブプラグインがあり、
+            <code>/coderabbit:review</code>
+            でCLIレビューを起動できます。公式ドキュメントは、エージェントに渡すプロンプトの組み立て方として次のパターンを提示しています。
+          </p>
+          <ol>
+            <li>
+              <code>cr --agent</code>
+              をバックグラウンドで実行させる（レビューは7〜30分以上かかることがあるため、待機中に他の作業を進める）
+            </li>
+            <li>完了したら「重大な指摘のみ修正し、些末な指摘（nits）は無視する」よう指示する</li>
+            <li>
+              修正後にもう一度<code>cr --agent</code>
+              を実行し、新しい問題を作り込んでいないか確認する
+            </li>
+            <li>
+              「2回までのループに制限し、2回目でCritical指摘がなければ完了とする」といった終了条件を明示し、無限ループを防ぐ
+            </li>
+          </ol>
+
+          <div className={styles.mermaidWrap}>
+            <MermaidDiagram
+              chart={DIAGRAM_10}
+              id="diagram-10"
+              theme="base"
+              themeVariables={MERMAID_THEME_VARS}
+            />
+          </div>
+
+          <p>
+            この「バックグラウンド実行→評価→修正→再実行→終了条件」という一連の型は、CodeRabbitに限らずAIコーディングエージェント全般との協働で応用できる汎用パターンです。
+          </p>
+          <hr />
+          <h2 id="14-複数のaiレビューツールを組み合わせる考え方多層防御">
+            14. 複数のAIレビューツールを組み合わせる考え方（多層防御）
+          </h2>
+          <p>
+            AIコードレビューツールを1つだけ導入すれば十分、という前提は疑ってかかるべきです。Addy
+            Osmaniが2026年に公開した分析では、あるエンジニアがCodeRabbit・Sentry
+            Seer・Greptile・Cursor
+            BugBotの4つのAIレビューツールを、3週間半にわたり146件の実PRに並行適用した結果が紹介されています。
+          </p>
+          <ul>
+            <li>検出されたfindingsの総数は679件、重複を除いた指摘箇所は617箇所</li>
+            <li>
+              そのうち
+              <strong>93.4%は4ツール中ちょうど1つだけ</strong>が検出したもの
+            </li>
+            <li>2ツールが同じ箇所を指摘したのはわずか6%</li>
+            <li>3ツール以上が同じ箇所を指摘したケースはほぼ皆無</li>
+          </ul>
+          <p>
+            Osmaniはこの結果を「単一ツールを信頼していた時代は構造的に終わった。各ツールは異なる視点で異なる問題を見ている」と評しています。
+          </p>
+          <h3 id="ベンチマーク数値の解釈には注意が必要">ベンチマーク数値の解釈には注意が必要</h3>
+          <p>
+            CodeRabbitの精度に関する数値は、出典によって大きく異なります。これは対象PRの母集団や評価基準が異なるためで、「どれか一つが間違っている」という単純な話ではありません。
+          </p>
+          <div className={styles.tableScroll}>
+            <table>
+              <thead>
+                <tr>
+                  <th>出典</th>
+                  <th>数値</th>
+                  <th>備考</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>CodeRabbit自社ベンチマーク</td>
+                  <td>F1 51.5%（Copilotは44.5%）、再現率52.5%（Copilotは36.7%）</td>
+                  <td>自社の評価基準・ハーネスに基づく</td>
+                </tr>
+                <tr>
+                  <td>独立系Martianベンチマーク（2026年1〜2月）</td>
+                  <td>CodeRabbitがF1トップ、精度約49%</td>
+                  <td>Addy Osmaniが引用する独立評価</td>
+                </tr>
+                <tr>
+                  <td>独立した309PRのベンチマーク</td>
+                  <td>CodeRabbit 44%、GitHub Copilot 54%、Greptile 82%</td>
+                  <td>評価基準・PR母集団がCodeRabbit自社ベンチマークと異なる</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            <strong>実務的な結論</strong>
+            ：単一のベンチマーク数値だけを根拠に導入判断をせず、①自組織のPRで実際にパイロット運用してみる、②CodeRabbitのようなAIレビューを静的解析（Semgrep、CodeQLなど）・人間によるレビュー・テストと並ぶ「1つの層」として位置づける、という2点を徹底することが、公開されている複数の実務レポートに共通する助言です。
+          </p>
+          <hr />
+          <h2 id="15-実運用で直面する課題と対処法アンチパターン集">
+            15. 実運用で直面する課題と対処法（アンチパターン集）
+          </h2>
+          <h3 id="指摘のノイズ化">指摘のノイズ化</h3>
+          <p>
+            Hacker
+            Newsのスレッドでは「PRがノイズで読めなくなった」「シグナル対ノイズ比が低すぎて、何もせずにAIコメントをresolveするようになった」という報告が繰り返し見られます。GitHub上のOrchardCMSプロジェクトの実運用ディスカッションでも、「ドキュメント変更には有用だが、コード変更に対しては時々しか役立たず、大半はノイズ」「PR一覧上で&quot;要対応コメントあり&quot;に見えてしまい、人間のレビュー待ちと区別しづらくなる」という声が上がっています。
+          </p>
+          <p>対処の方向性：</p>
+          <ul>
+            <li>
+              <code>chill</code>
+              プロファイルを起点にし、<code>assertive</code>
+              は本当に必要な場合のみ検討する
+            </li>
+            <li>
+              曖昧な不満（「コメントが多い」）で終わらせず、具体的に繰り返される誤検知パターンをPath
+              InstructionsやCustom Checksに落とし込む
+            </li>
+            <li>
+              常時自動レビューが合わないチームは、
+              <code>auto_review.enabled: false</code>にして
+              <code>@coderabbitai review</code>
+              によるオンデマンド運用に切り替える
+            </li>
+          </ul>
+          <h3 id="料金モデルとスケール時のコスト">料金モデルとスケール時のコスト</h3>
+          <p>
+            2026年8月時点の公式プランは次の通りです（価格は変更される可能性があるため、最終確認は公式の料金ページで行ってください）。
+          </p>
+          <div className={styles.tableScroll}>
+            <table>
+              <thead>
+                <tr>
+                  <th>プラン</th>
+                  <th>料金（年間契約/月額）</th>
+                  <th>主な内容</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Free</td>
+                  <td>無料</td>
+                  <td>PR要約のみ。コードレビューはIDE拡張・CLI経由</td>
+                </tr>
+                <tr>
+                  <td>Pro</td>
+                  <td>$24 / $30（1開発者あたり月額）</td>
+                  <td>PRレビュー、高いレート制限、Knowledge Base、Autofix</td>
+                </tr>
+                <tr>
+                  <td>Pro+</td>
+                  <td>$48 / $60（1開発者あたり月額）</td>
+                  <td>Pro全機能＋Coding Plan、ユニットテスト生成、マージコンフリクト解消</td>
+                </tr>
+                <tr>
+                  <td>Enterprise</td>
+                  <td>個別見積もり</td>
+                  <td>セルフホスト、マルチ組織、SLA、監査ログ</td>
+                </tr>
+                <tr>
+                  <td>Open Source</td>
+                  <td>無料（Pro+相当の機能）</td>
+                  <td>公開リポジトリ限定</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            1開発者あたりの月額課金モデルは、開発者数が多いチームではコストが積み上がりやすく、複数の比較記事が「代替ツールを検討する主因」として言及しています。座席課金がボトルネックになる場合は、Usage-based
+            Add-on（従量課金）やCLIレビューのみの軽量運用への切り替えも選択肢に入れておくと交渉の幅が広がります。
+          </p>
+          <h3 id="静的解析ツールの重複">静的解析ツールの重複</h3>
+          <p>
+            CodeRabbit
+            Proには40以上のLinter・SASTツール連携が含まれますが、CIで既に同じLinterを実行しているチームも多いはずです。既存記事では、CIとの重複自体は「PR上に直接インラインコメントとして出るため、CIログをスクロールして探すより速い」というメリットがあるとされる一方、ESLintのように既にCIで厳格に運用しているツールは
+            <code>reviews.tools.eslint.enabled: false</code>
+            のように個別に無効化し、重複した指摘を減らす調整が有効です。
+          </p>
+          <h3 id="prサイズとレビュー精度">PRサイズとレビュー精度</h3>
+          <p>
+            PRが大きいほど、AIレビューの見落としと的外れな指摘の両方が増える傾向が指摘されています。小さいPRは人間にとってのレビュー容易性を高めるだけでなく、CodeRabbitの解析精度そのものにも直結します。「PRが小説のように長い場合は、まず分割する」という原則は、AIレビュー導入後も変わらない基本です。
+          </p>
+          <hr />
+          <h2 id="16-まとめベストプラクティス一覧表">16. まとめ：ベストプラクティス一覧表</h2>
+          <div className={styles.tableScroll}>
+            <table>
+              <thead>
+                <tr>
+                  <th>領域</th>
+                  <th>ベストプラクティス</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>導入</td>
+                  <td>1リポジトリで観察→最小設定→パイロット→段階拡大→月次棚卸し、の順で進める</td>
+                </tr>
+                <tr>
+                  <td>プロファイル</td>
+                  <td>
+                    まず<code>chill</code>起点。<code>assertive</code>
+                    は具体的な不満が解消しない場合のみ検討する
+                  </td>
+                </tr>
+                <tr>
+                  <td>設定の可視化</td>
+                  <td>
+                    変更のたびに<code>@coderabbitai configuration</code>
+                    で解決済み設定を確認する
+                  </td>
+                </tr>
+                <tr>
+                  <td>パス制御</td>
+                  <td>
+                    除外はPath Filters、観点追加はPath Instructions、既存規約はCode
+                    Guidelines、機械判定はCustom Checksと役割を分ける
+                  </td>
+                </tr>
+                <tr>
+                  <td>Learnings</td>
+                  <td>
+                    「何を」ではなく「なぜ」を伝え、特定行への返信で伝える。四半期ごとに棚卸しする
+                  </td>
+                </tr>
+                <tr>
+                  <td>Pre-Merge Checks</td>
+                  <td>
+                    新規チェックは<code>warning</code>
+                    から始め、チームの合意後に<code>error</code>へ引き上げる
+                  </td>
+                </tr>
+                <tr>
+                  <td>Finishing Touches</td>
+                  <td>
+                    Autofix・Docstring生成・ユニットテスト生成を個別コマンドでオンデマンド活用する
+                  </td>
+                </tr>
+                <tr>
+                  <td>IDE/CLI</td>
+                  <td>
+                    PRを開く前に<code>cr</code>
+                    やIDE拡張でシフトレフトし、エージェントループには明確な終了条件を設ける
+                  </td>
+                </tr>
+                <tr>
+                  <td>複数ツール運用</td>
+                  <td>
+                    単一ツールの数値を過信せず、静的解析・人間レビュー・テストと並ぶ1層として位置づける
+                  </td>
+                </tr>
+                <tr>
+                  <td>コスト管理</td>
+                  <td>座席課金の積み上がりを見越し、必要に応じて従量課金やCLI中心運用も検討する</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <hr />
+          <h2 id="17-参考文献">17. 参考文献</h2>
+          <div className={styles.refGrid}>
+            <div className={styles.refCard}>
+              <h4>公式ドキュメント（docs.coderabbit.ai）</h4>
+              <ul className={styles.refList}>
+                <li>
+                  <span className={styles.refIcon}>↗</span>
+                  <span className={styles.refText}>
+                    <span className={styles.refLabel}>CodeRabbitアーキテクチャ概要</span>
+                    <Ext href="https://docs.coderabbit.ai/overview/architecture">
+                      https://docs.coderabbit.ai/overview/architecture
+                    </Ext>
+                  </span>
+                </li>
+                <li>
+                  <span className={styles.refIcon}>↗</span>
+                  <span className={styles.refText}>
+                    <span className={styles.refLabel}>コードレビュー概要</span>
+                    <Ext href="https://docs.coderabbit.ai/guides/code-review-overview">
+                      https://docs.coderabbit.ai/guides/code-review-overview
+                    </Ext>
+                  </span>
+                </li>
+                <li>
+                  <span className={styles.refIcon}>↗</span>
+                  <span className={styles.refText}>
+                    <span className={styles.refLabel}>YAML設定ガイド</span>
+                    <Ext href="https://docs.coderabbit.ai/getting-started/yaml-configuration">
+                      https://docs.coderabbit.ai/getting-started/yaml-configuration
+                    </Ext>
+                  </span>
+                </li>
+                <li>
+                  <span className={styles.refIcon}>↗</span>
+                  <span className={styles.refText}>
+                    <span className={styles.refLabel}>設定の全体像と優先順位</span>
+                    <Ext href="https://docs.coderabbit.ai/guides/configuration-overview">
+                      https://docs.coderabbit.ai/guides/configuration-overview
+                    </Ext>
+                  </span>
+                </li>
+                <li>
+                  <span className={styles.refIcon}>↗</span>
+                  <span className={styles.refText}>
+                    <span className={styles.refLabel}>設定の継承</span>
+                    <Ext href="https://docs.coderabbit.ai/configuration/configuration-inheritance">
+                      https://docs.coderabbit.ai/configuration/configuration-inheritance
+                    </Ext>
+                  </span>
+                </li>
+                <li>
+                  <span className={styles.refIcon}>↗</span>
+                  <span className={styles.refText}>
+                    <span className={styles.refLabel}>パスベースのレビュー指示</span>
+                    <Ext href="https://docs.coderabbit.ai/configuration/path-instructions">
+                      https://docs.coderabbit.ai/configuration/path-instructions
+                    </Ext>
+                  </span>
+                </li>
+                <li>
+                  <span className={styles.refIcon}>↗</span>
+                  <span className={styles.refText}>
+                    <span className={styles.refLabel}>ast-grepによる構造的指示</span>
+                    <Ext href="https://docs.coderabbit.ai/configuration/ast-grep-instructions">
+                      https://docs.coderabbit.ai/configuration/ast-grep-instructions
+                    </Ext>
+                  </span>
+                </li>
+                <li>
+                  <span className={styles.refIcon}>↗</span>
+                  <span className={styles.refText}>
+                    <span className={styles.refLabel}>Code Guidelines</span>
+                    <Ext href="https://docs.coderabbit.ai/knowledge-base/code-guidelines">
+                      https://docs.coderabbit.ai/knowledge-base/code-guidelines
+                    </Ext>
+                  </span>
+                </li>
+                <li>
+                  <span className={styles.refIcon}>↗</span>
+                  <span className={styles.refText}>
+                    <span className={styles.refLabel}>Learnings</span>
+                    <Ext href="https://docs.coderabbit.ai/knowledge-base/learnings">
+                      https://docs.coderabbit.ai/knowledge-base/learnings
+                    </Ext>
+                  </span>
+                </li>
+                <li>
+                  <span className={styles.refIcon}>↗</span>
+                  <span className={styles.refText}>
+                    <span className={styles.refLabel}>MCPサーバー連携</span>
+                    <Ext href="https://docs.coderabbit.ai/knowledge-base/mcp-context">
+                      https://docs.coderabbit.ai/knowledge-base/mcp-context
+                    </Ext>
+                  </span>
+                </li>
+                <li>
+                  <span className={styles.refIcon}>↗</span>
+                  <span className={styles.refText}>
+                    <span className={styles.refLabel}>Multi-Repo Analysis</span>
+                    <Ext href="https://docs.coderabbit.ai/knowledge-base/multi-repo-analysis">
+                      https://docs.coderabbit.ai/knowledge-base/multi-repo-analysis
+                    </Ext>
+                  </span>
+                </li>
+                <li>
+                  <span className={styles.refIcon}>↗</span>
+                  <span className={styles.refText}>
+                    <span className={styles.refLabel}>自動レビュー制御</span>
+                    <Ext href="https://docs.coderabbit.ai/configuration/auto-review">
+                      https://docs.coderabbit.ai/configuration/auto-review
+                    </Ext>
+                  </span>
+                </li>
+                <li>
+                  <span className={styles.refIcon}>↗</span>
+                  <span className={styles.refText}>
+                    <span className={styles.refLabel}>Custom Checks</span>
+                    <Ext href="https://docs.coderabbit.ai/pr-reviews/custom-checks">
+                      https://docs.coderabbit.ai/pr-reviews/custom-checks
+                    </Ext>
+                  </span>
+                </li>
+                <li>
+                  <span className={styles.refIcon}>↗</span>
+                  <span className={styles.refText}>
+                    <span className={styles.refLabel}>Pre-Merge Checks</span>
+                    <Ext href="https://docs.coderabbit.ai/pr-reviews/pre-merge-checks">
+                      https://docs.coderabbit.ai/pr-reviews/pre-merge-checks
+                    </Ext>
+                  </span>
+                </li>
+                <li>
+                  <span className={styles.refIcon}>↗</span>
+                  <span className={styles.refText}>
+                    <span className={styles.refLabel}>PR Walkthroughs</span>
+                    <Ext href="https://docs.coderabbit.ai/pr-reviews/walkthroughs">
+                      https://docs.coderabbit.ai/pr-reviews/walkthroughs
+                    </Ext>
+                  </span>
+                </li>
+                <li>
+                  <span className={styles.refIcon}>↗</span>
+                  <span className={styles.refText}>
+                    <span className={styles.refLabel}>CodeRabbit Review（Change Stack）</span>
+                    <Ext href="https://docs.coderabbit.ai/pr-reviews/coderabbit-review">
+                      https://docs.coderabbit.ai/pr-reviews/coderabbit-review
+                    </Ext>
+                  </span>
+                </li>
+                <li>
+                  <span className={styles.refIcon}>↗</span>
+                  <span className={styles.refText}>
+                    <span className={styles.refLabel}>Slop Detection</span>
+                    <Ext href="https://docs.coderabbit.ai/pr-reviews/slop-detection">
+                      https://docs.coderabbit.ai/pr-reviews/slop-detection
+                    </Ext>
+                  </span>
+                </li>
+                <li>
+                  <span className={styles.refIcon}>↗</span>
+                  <span className={styles.refText}>
+                    <span className={styles.refLabel}>Finishing Touches概要</span>
+                    <Ext href="https://docs.coderabbit.ai/finishing-touches/index">
+                      https://docs.coderabbit.ai/finishing-touches/index
+                    </Ext>
+                  </span>
+                </li>
+                <li>
+                  <span className={styles.refIcon}>↗</span>
+                  <span className={styles.refText}>
+                    <span className={styles.refLabel}>レビューコマンド一覧</span>
+                    <Ext href="https://docs.coderabbit.ai/reference/review-commands">
+                      https://docs.coderabbit.ai/reference/review-commands
+                    </Ext>
+                  </span>
+                </li>
+                <li>
+                  <span className={styles.refIcon}>↗</span>
+                  <span className={styles.refText}>
+                    <span className={styles.refLabel}>設定リファレンス</span>
+                    <Ext href="https://docs.coderabbit.ai/reference/configuration">
+                      https://docs.coderabbit.ai/reference/configuration
+                    </Ext>
+                  </span>
+                </li>
+                <li>
+                  <span className={styles.refIcon}>↗</span>
+                  <span className={styles.refText}>
+                    <span className={styles.refLabel}>IDE/CLIレビュー概要</span>
+                    <Ext href="https://docs.coderabbit.ai/overview/ide-cli-review">
+                      https://docs.coderabbit.ai/overview/ide-cli-review
+                    </Ext>
+                  </span>
+                </li>
+                <li>
+                  <span className={styles.refIcon}>↗</span>
+                  <span className={styles.refText}>
+                    <span className={styles.refLabel}>CLIツール</span>
+                    <Ext href="https://docs.coderabbit.ai/cli/index">
+                      https://docs.coderabbit.ai/cli/index
+                    </Ext>
+                  </span>
+                </li>
+                <li>
+                  <span className={styles.refIcon}>↗</span>
+                  <span className={styles.refText}>
+                    <span className={styles.refLabel}>Claude Code連携</span>
+                    <Ext href="https://docs.coderabbit.ai/cli/claude-code-integration">
+                      https://docs.coderabbit.ai/cli/claude-code-integration
+                    </Ext>
+                  </span>
+                </li>
+                <li>
+                  <span className={styles.refIcon}>↗</span>
+                  <span className={styles.refText}>
+                    <span className={styles.refLabel}>VS Code拡張機能の設定</span>
+                    <Ext href="https://docs.coderabbit.ai/ide/vscode-config">
+                      https://docs.coderabbit.ai/ide/vscode-config
+                    </Ext>
+                  </span>
+                </li>
+                <li>
+                  <span className={styles.refIcon}>↗</span>
+                  <span className={styles.refText}>
+                    <span className={styles.refLabel}>CodeRabbit Plan概要</span>
+                    <Ext href="https://docs.coderabbit.ai/plan/index">
+                      https://docs.coderabbit.ai/plan/index
+                    </Ext>
+                  </span>
+                </li>
+                <li>
+                  <span className={styles.refIcon}>↗</span>
+                  <span className={styles.refText}>
+                    <span className={styles.refLabel}>プランと料金</span>
+                    <Ext href="https://docs.coderabbit.ai/management/plans">
+                      https://docs.coderabbit.ai/management/plans
+                    </Ext>
+                  </span>
+                </li>
+              </ul>
+            </div>
+            <div className={styles.refCard}>
+              <h4>開発者コミュニティ・第三者による分析</h4>
+              <ul className={styles.refList}>
+                <li>
+                  <span className={styles.refIcon}>↗</span>
+                  <span className={styles.refText}>
+                    <span className={styles.refLabel}>
+                      Addy Osmani, &quot;Agentic Code Review&quot;（O&apos;Reilly Radarへの転載）
+                    </span>
+                    <Ext href="https://www.oreilly.com/radar/agentic-code-review/">
+                      https://www.oreilly.com/radar/agentic-code-review/
+                    </Ext>
+                  </span>
+                </li>
+                <li>
+                  <span className={styles.refIcon}>↗</span>
+                  <span className={styles.refText}>
+                    <span className={styles.refLabel}>
+                      Addy Osmani, &quot;Agentic Code Review&quot;（著者本人のブログ）
+                    </span>
+                    <Ext href="https://addyosmani.com/blog/agentic-code-review/">
+                      https://addyosmani.com/blog/agentic-code-review/
+                    </Ext>
+                  </span>
+                </li>
+                <li>
+                  <span className={styles.refIcon}>↗</span>
+                  <span className={styles.refText}>
+                    <span className={styles.refLabel}>
+                      Daniel Moka, &quot;Code Review with AI: Best Practices&quot;
+                    </span>
+                    <Ext href="https://craftbettersoftware.com/p/code-review-with-ai-best-practices">
+                      https://craftbettersoftware.com/p/code-review-with-ai-best-practices
+                    </Ext>
+                  </span>
+                </li>
+                <li>
+                  <span className={styles.refIcon}>↗</span>
+                  <span className={styles.refText}>
+                    <span className={styles.refLabel}>
+                      OrchardCMSにおけるCodeRabbit運用の実コミュニティ議論
+                    </span>
+                    <Ext href="https://github.com/orgs/OrchardCMS/discussions/15935">
+                      https://github.com/orgs/OrchardCMS/discussions/15935
+                    </Ext>
+                  </span>
+                </li>
+                <li>
+                  <span className={styles.refIcon}>↗</span>
+                  <span className={styles.refText}>
+                    <span className={styles.refLabel}>
+                      DeepSource, &quot;7 Best AI Code Review Tools for 2026&quot;
+                    </span>
+                    <Ext href="https://deepsource.com/resources/ai-code-review-tools">
+                      https://deepsource.com/resources/ai-code-review-tools
+                    </Ext>
+                  </span>
+                </li>
+                <li>
+                  <span className={styles.refIcon}>↗</span>
+                  <span className={styles.refText}>
+                    <span className={styles.refLabel}>
+                      Monterail Blog, AIコードレビューツールの実機比較
+                    </span>
+                    <Ext href="https://www.monterail.com/blog/ai-code-review-tools-compared-how-to-choose-best">
+                      https://www.monterail.com/blog/ai-code-review-tools-compared-how-to-choose-best
+                    </Ext>
+                  </span>
+                </li>
+                <li>
+                  <span className={styles.refIcon}>↗</span>
+                  <span className={styles.refText}>
+                    <span className={styles.refLabel}>
+                      CodeRabbit公式ブログ, &quot;State of AI vs Human Code Generation Report&quot;:
+                    </span>
+                    <Ext href="https://www.coderabbit.ai/blog/state-of-ai-vs-human-code-generation-report">
+                      https://www.coderabbit.ai/blog/state-of-ai-vs-human-code-generation-report
+                    </Ext>
+                  </span>
+                </li>
+                <li>
+                  <span className={styles.refIcon}>↗</span>
+                  <span className={styles.refText}>
+                    <span className={styles.refLabel}>
+                      Surmado Blog, CodeRabbit代替ツールの比較（料金面の課題整理）
+                    </span>
+                    <Ext href="https://www.surmado.com/blog/best-coderabbit-alternatives-2026">
+                      https://www.surmado.com/blog/best-coderabbit-alternatives-2026
+                    </Ext>
+                  </span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <blockquote className={styles.noteCard}>
+            <p>
+              注：料金・プラン内容・ベンチマーク数値は変更が早い領域です。導入判断の最終確認は必ず公式サイト（coderabbit.ai）および上記の各情報源で行ってください。
+            </p>
+          </blockquote>
+        </article>
+
+        <footer className={styles.pageFooter}>
+          情報源: docs.coderabbit.ai(2026年8月8日時点) /
+          公式ドキュメント・著者ブログ・サードパーティ分析・コミュニティ議論（Addy Osmani, Daniel
+          Moka 等）。料金・仕様は変更される可能性があるため、最終確認は公式サイトで行ってください。
+        </footer>
       </main>
     </div>
   );

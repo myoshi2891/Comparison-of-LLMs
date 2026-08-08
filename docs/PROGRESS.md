@@ -2,7 +2,7 @@
 
 > 本ファイルは Next.js 移行完了後の保守・改善フェーズにおける開発の進捗（特にテスト関連）および品質チェックのルールを記録する。
 >
-> - 最終更新日: **Updated 2026-08-02**
+> - 最終更新日: **Updated 2026-08-08**
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
 
@@ -11,14 +11,33 @@
 - **フェーズ**: 保守・機能改善・品質強化フェーズ
 - **ブランチ**: `dev`（本番 `main` への Next.js 移行マージ完了 🚀）
 - **動作検証**:
-  - `bun run build` ⏭️（依頼により未実行。Antigravity環境では実行禁止、CI または他環境では必須）
+  - `bun run build` ⏭️（Antigravity環境ルール・ユーザー指定により省略。CI等で実施）
   - `bun run typecheck` ✅
-  - `npm run lint` ⚠️（432 files checked。作業範囲外の既存未コミットファイルに12 diagnostics）
+  - `bun run lint` ⚠️（442 files checked。作業範囲外の既存ファイルに17 diagnostics）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: Vitest **152 files / 1357 tests すべて合格**（収集失敗なし）
+  - **フロントエンド (`web-next/`)**: Vitest **157 files / 1414 tests すべて合格**（収集失敗なし）
   - **バックエンド (`scraper/`)**: pytest 実行で **43 件すべて合格** (全 Green ✅)
 
 ## 最近の追加内容
+
+- **CodeRabbit公開仕様・TOCアクセシビリティ・スクロール追従テストの修正**: CodeRabbitの設定階層をCloud / SaaS、Cloud連携Self-Hosted Git provider組織、完全Self-Hosted deploymentに分け、Global Overrideを通常階層の固定最上位ではなく解決後の最終マージ層として明記。カスタムレシピ上限をPro+・Enterpriseのリポジトリごと最大20件へ同期した。`/claude/skill`は交差中sectionをcallback間で保持して最上部を選択し、CodeRabbit・SonarQube・git-worktreeのTOCトグルは`aria-expanded`と状態依存ラベルを同期。SonarQubeの外部リンクテストは`rel`を空白区切りtokenとして厳密検証する。Vitest **157 files / 1414 tests**、typecheck、変更対象11ファイルのBiome、Markdown lintはGreen。全体lintは作業範囲外の既存17 diagnosticsで失敗。ユーザー指定によりビルドと目視確認は省略。
+
+- **`bun audit` 検出の脆弱性 10 件を解消（CI 復旧・2 回目）**: CI の `Dependency vulnerability audit` ステップ（`.github/workflows/test.yaml`）が再び exit 1 で失敗していた問題を修正（high 2 / moderate 7 / low 1）。`bun update` の全体実行は行わず overrides による外科的 pin のみで、ロックファイル差分は該当 4 パッケージに限定（Biome 等の devDependencies は再解決されていない）。検証は `bun audit` = `No vulnerabilities found`（exit 0）、Vitest **157 files / 1412 tests**（変化なし）、typecheck、build、pytest 43 件すべて Green。lint は作業範囲外の既存 19 diagnostics のみで変化なし。
+  - **mermaid 10.9.6 → 10.9.8**（直接依存）: GHSA-c4c3-pg64-4m4v（設定 API の prototype pollution）/ GHSA-6x64-9x62-f2gx（兄弟要素への CSS injection）/ GHSA-2v8p-3f2j-5mp7（XY Chart の無限ループ DoS）。10.x 保守ラインのパッチであり、破壊的変更を含む 11.x は採らない。
+  - **overrides `dompurify` `^3.4.12` → `^3.4.13`**: GHSA-55q2-fjhq-7xh7（IN_PLACE フック除去後の detached subtree が実行可能になり XSS）。勧告が `<=3.4.12` のため、前回引き上げた override の下限がそのまま脆弱版を指す状態になっていた。
+  - **overrides `undici` `^7.28.0` → `^7.29.0`**: GHSA-4cwx-7wf7-3272（private cache directive によるユーザー間情報漏洩）他 5 件。`cheerio`（`^7.19.0`）/ `jsdom`（`^7.24.5`）の要求を満たすため 8.x へは上げず 7 系のまま昇格。
+  - **overrides `nanoid` `^3.3.17` を新規追加**: GHSA-2v37-7h3g-55p8（size=0 でカスタム生成器が無限ループ）。`postcss` の宣言 `^3.3.16` では 3.3.16 に留まるため override が必須（`next` / `@tailwindcss/postcss` / `vitest → vite` の 3 経路すべてに適用）。
+  - **教訓: overrides は「勧告の境界バージョン」とともに陳腐化する** — 書いた時点で最新でも、新規勧告が出れば同じ pin が脆弱版の固定に転じる。監査失敗時はまず overrides の下限が現在の勧告レンジを外れていないかを確認する。また override は指定パッケージ自身にしか効かず子依存へ連鎖しないため（今回の `postcss` → `nanoid`）、依存ツリーの各層を個別に指定する必要がある。
+
+- **SonarQube PR カバレッジゲート対応（TocObserver 4件 + Checklist）**: PR #139 の Coverage on New Code が **60.8%** に低下していた原因は、`tests/setup.ts` のグローバル `IntersectionObserver` が no-op スタブで observer コールバック本体が一度も実行されないこと。既存の `tests/tocTestUtils.tsx` の `installIntersectionObserverStub()`（コールバックを捕捉し `emit()` で発火できる制御可能スタブ）を適用し、`/code-review/coderabbit-guide`・`/code-review/sonar-qube`・`/git-worktree` の `TocObserver.tsx` に新規テストを追加、`/claude/skill` の既存テストへスクロールスパイとバックトゥトップ可視性の分岐を追補、`/code-review/sonar-qube` の `Checklist.tsx` に状態遷移テストを追加。Sonar 算式（(covered lines + covered conditions)/(lines + conditions)）で 38.2% → 95.6%、44.0% → 96.0%、63.3% → 100%、86.9% → 93.8%、65.0% → 100%。実装コードは無変更。Vitest **157 files / 1412 tests**、typecheck、build は Green（lint は作業範囲外の既存19 diagnostics のみ）。
+
+- **git worktreeで実現する並列開発ベストプラクティスガイド（/git-worktree）の Pure JSX 完全置き換え移行とコードブロックハイライト最適化**: `Git-worktree-parallel-dev-guide.html` を `web-next/app/git-worktree/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。要約・省略なしで全15セクション（全15H2セクション, 全表, 全コードブロック, 5 Mermaid図, 11項目のチェックリスト, 参考文献カード群等）・TOCスクロール追従（`TocObserver.tsx`）・`page-registry.ts`（`lastReviewed` およびタイトル更新）を完了。さらに全コードブロックの `codeLine` 行構造化およびトークン構文ハイライト（`styles.ck`, `styles.cs`, `styles.cv`, `styles.cc`, `styles.cm`, `styles.fn`）を適用。既存の旧 `/git-worktree` コンテンツと完全入れ替え完了。原本 `Git-worktree-parallel-dev-guide.html` は `archive/Git-worktree-parallel-dev-guide.html` へ `git mv` 退避保存。契約テスト6件を更新し全クリア（Vitest **153 files / 1370 tests** 全 Green ✅）。
+
+- **SonarQubeコードレビュー実践ガイド（/code-review/sonar-qube）の Pure JSX 完全置き換え移行**: `Sonarqube-code-review-best-practices.html` を `web-next/app/code-review/sonar-qube/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。要約・省略なしで全16-H2セクション（全表, 全コードブロック, 9 Mermaid図, チェックリスト等）・TOCスクロール追従（`TocObserver.tsx`）・インタラクティブチェックリスト（`Checklist.tsx`）・`page-registry.ts`（`lastReviewed` 更新）を完了。既存の旧 `/code-review/sonar-qube` コンテンツと完全入れ替え完了。原本 `Sonarqube-code-review-best-practices.html` は `archive/Sonarqube-code-review-best-practices.html` へ `git mv` 退避保存。契約テスト7件を更新し全クリア（Vitest `app/code-review/sonar-qube/page.test.tsx` 全 Green ✅）。
+
+- **CodeRabbit 実践ガイド（/code-review/coderabbit-guide）の Pure JSX 完全置き換え移行**: `Coderabbit-best-practices.html` を `web-next/app/code-review/coderabbit-guide/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。要約・省略なしで全17-H2セクション（全17H2セクション, 全表, 全コードブロック, 10 Mermaid図, 32参考文献カード等）・TOCスクロール追従（`TocObserver.tsx`）・`page-registry.ts`（`lastReviewed` 更新）を完了。既存の旧 `/code-review/coderabbit-guide` コンテンツと完全入れ替え完了。原本 `Coderabbit-best-practices.html` および `.md` は `archive/html/code-review/` および `archive/md/code-review/` へ `git mv` 退避保存。契約テスト7件を更新し全クリア（Vitest **153 files / 1370 tests** 全 Green ✅）。
+
+- **Claude Code AI仕様駆動開発ガイド（/claude/skill）の Pure JSX 完全置き換え移行**: `Claude-code-spec-driven-development-guide.html` を `web-next/app/claude/skill/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。要約・省略なしで全15セクション（s0〜s14）・全表・全コードブロック・5 Mermaid図 (`diagram-workflow`, `diagram-login-sequence`, `diagram-implementation`, `diagram-context-loading`, `diagram-data-flow`)・TOCスクロール追従（`TocObserver.tsx`）・外部リンク安全属性・`page-registry.ts`（`lastReviewed` 更新）を完了。既存の旧 `/claude/skill` コンテンツと完全入れ替え完了。原本 `Claude-code-spec-driven-development-guide.html` および `.md` は `archive/html/Anthropic/` および `archive/md/Anthropic/` へ `git mv` 退避保存。契約テスト9件を更新・通過し全クリア（Vitest **152 files / 1366 tests** 全 Green ✅）。
 
 - **SonarQube 新規コードカバレッジ修正**: `MermaidDiagram` の例外型別正規化、初期化失敗、`foreignObject` 配色、一時描画要素の競合 cleanup を検証する9ケースを追加。対象ファイルは line coverage **100%**、branch coverage **94.53%**、function coverage **100%**、全体 line coverage **92.25%**。目視・ビルドは依頼により省略。Vitest **152 files / 1357 tests** と typecheck は Green。
 
@@ -289,7 +308,7 @@ Next.js 移行完了後のリポジトリ `LLM-Studies` にて、テストカバ
 Next.js 移行完了後のリポジトリ `LLM-Studies` の保守・改善作業を再開してください。
 
 - リポジトリ: LLM-Studies (Next.js 移行プロジェクトは dev/main へ完全マージ済み)
-  - 現在のステータス: docs/PROGRESS.md を参照。Vitest は 152 files / 1357 tests passed、pytest は 43/43 passed
+  - 現在のステータス: docs/PROGRESS.md を参照。Vitest は 157 files / 1414 tests passed、pytest は 43/43 passed
 - リポジトリ規約: CLAUDE.md (編集上の絶対ルール。※Antigravity環境ではビルドは実行禁止)
 
 作業方針：

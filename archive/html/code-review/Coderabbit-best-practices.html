@@ -1,0 +1,2644 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CodeRabbit実践ガイド：中級者から上級者のためのベストプラクティス</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/atom-one-dark.min.css"
+    />
+    <style>
+      :root {
+        --bg: #07111e;
+        --bg-panel: #0c1830;
+        --bg-elevated: #101f3d;
+        --border: #1e2c4d;
+        --text: #dbe4ff;
+        --text-dim: #8b9bc4;
+        --accent: #7c9eff;
+        --accent-2: #66e0c0;
+        --danger: #ff6b6b;
+        --warning: #ffb454;
+        --code-bg: #0a1428;
+        --sidebar-w: 288px;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        overflow-x: hidden;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family:
+          'Inter',
+          -apple-system,
+          BlinkMacSystemFont,
+          'Hiragino Kaku Gothic ProN',
+          'Noto Sans JP',
+          sans-serif;
+        line-height: 1.85;
+        font-size: 16px;
+      }
+      a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+      code,
+      pre {
+        font-family: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+      }
+      .layout {
+        display: block;
+      }
+
+      /* ---------- Sidebar ---------- */
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: var(--sidebar-w);
+        height: 100vh;
+        overflow-y: auto;
+        background: var(--bg-panel);
+        border-right: 1px solid var(--border);
+        padding: 1.5rem 1.25rem 3rem;
+        z-index: 50;
+        transition: transform 0.25s ease;
+      }
+      .sidebar-brand {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        margin-bottom: 1.5rem;
+        padding: 0 0.25rem;
+      }
+      .sidebar-brand .logo-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--accent);
+        box-shadow: 0 0 12px var(--accent);
+      }
+      .sidebar-brand span {
+        font-weight: 700;
+        font-size: 0.95rem;
+        letter-spacing: 0.02em;
+      }
+      .sidebar-label {
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--text-dim);
+        margin: 1.25rem 0.25rem 0.5rem;
+      }
+      .nav-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+      .nav-list li {
+        margin: 0;
+      }
+      .nav-link {
+        display: block;
+        padding: 0.5rem 0.6rem;
+        border-radius: 8px;
+        font-size: 0.86rem;
+        color: var(--text-dim);
+        border-left: 2px solid transparent;
+        line-height: 1.4;
+      }
+      .nav-link:hover {
+        color: var(--text);
+        background: rgba(124, 158, 255, 0.08);
+        text-decoration: none;
+      }
+      .nav-link.active {
+        color: var(--accent);
+        background: rgba(124, 158, 255, 0.12);
+        border-left-color: var(--accent);
+        font-weight: 600;
+      }
+      .sidebar-toggle {
+        display: none;
+        position: fixed;
+        top: 1rem;
+        left: 1rem;
+        z-index: 60;
+        background: var(--bg-elevated);
+        border: 1px solid var(--border);
+        color: var(--text);
+        width: 42px;
+        height: 42px;
+        border-radius: 10px;
+        font-size: 1.2rem;
+        cursor: pointer;
+      }
+
+      /* ---------- Main ---------- */
+      .main {
+        margin-left: var(--sidebar-w);
+        padding: 3.5rem 4rem 6rem;
+      }
+
+      .hero {
+        padding-bottom: 2.5rem;
+        margin-bottom: 2.5rem;
+        border-bottom: 1px solid var(--border);
+        position: relative;
+      }
+      .hero::before {
+        content: '';
+        position: absolute;
+        top: -8rem;
+        right: -6rem;
+        width: 32rem;
+        height: 32rem;
+        background: radial-gradient(circle, rgba(124, 158, 255, 0.16), transparent 70%);
+        pointer-events: none;
+        z-index: -1;
+      }
+      .hero-eyebrow {
+        color: var(--accent-2);
+        font-size: 0.82rem;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin-bottom: 1rem;
+      }
+      .hero h1 {
+        font-size: 2.6rem;
+        font-weight: 800;
+        line-height: 1.3;
+        margin: 0 0 1.1rem;
+        background: linear-gradient(120deg, #ffffff 20%, var(--accent) 75%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+      .hero-lede {
+        color: var(--text-dim);
+        font-size: 1.05rem;
+        max-width: 900px;
+        margin: 0 0 2rem;
+      }
+
+      .quick-nav {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1rem;
+        margin-top: 1.5rem;
+      }
+      .qn-card {
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+        padding: 1.1rem 1.2rem;
+        border-radius: 12px;
+        background: var(--bg-panel);
+        border: 1px solid var(--border);
+        color: var(--text);
+        min-width: 0;
+      }
+      .qn-card:hover {
+        border-color: var(--accent);
+        background: var(--bg-elevated);
+        text-decoration: none;
+        transform: translateY(-2px);
+      }
+      .qn-num {
+        color: var(--accent);
+        font-weight: 700;
+        font-size: 0.78rem;
+        letter-spacing: 0.05em;
+      }
+      .qn-title {
+        font-weight: 700;
+        font-size: 1rem;
+      }
+      .qn-desc {
+        color: var(--text-dim);
+        font-size: 0.82rem;
+        line-height: 1.5;
+      }
+
+      /* ---------- Prose ---------- */
+      .content {
+        width: 100%;
+      }
+      .content h2 {
+        font-size: 1.65rem;
+        font-weight: 800;
+        margin: 3.2rem 0 1.1rem;
+        padding-top: 0.5rem;
+        scroll-margin-top: 2rem;
+        color: #fff;
+      }
+      .content h3 {
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin: 2.2rem 0 0.9rem;
+        color: #eef2ff;
+        scroll-margin-top: 2rem;
+      }
+      .content h4 {
+        font-size: 1.02rem;
+        font-weight: 700;
+        margin: 1.4rem 0 0.6rem;
+        color: var(--accent-2);
+      }
+      .content p {
+        margin: 0 0 1.1rem;
+        color: var(--text);
+      }
+      .content ul,
+      .content ol {
+        margin: 0 0 1.1rem;
+        padding-left: 1.4rem;
+        color: var(--text);
+      }
+      .content li {
+        margin: 0.35rem 0;
+      }
+      .content hr {
+        border: none;
+        border-top: 1px solid var(--border);
+        margin: 3rem 0;
+      }
+      .content strong {
+        color: #fff;
+      }
+      .content blockquote {
+        margin: 1.5rem 0;
+        padding: 1rem 1.3rem;
+        border-left: 3px solid var(--accent);
+        background: var(--bg-panel);
+        border-radius: 0 10px 10px 0;
+        color: var(--text-dim);
+      }
+      .content blockquote p {
+        margin: 0;
+      }
+      .note-card {
+        border-left-color: var(--warning) !important;
+      }
+
+      code:not(pre code) {
+        background: var(--code-bg);
+        border: 1px solid var(--border);
+        color: var(--accent-2);
+        padding: 0.15em 0.42em;
+        border-radius: 5px;
+        font-size: 0.88em;
+        overflow-wrap: break-word;
+        word-break: break-word;
+      }
+      pre {
+        background: var(--code-bg);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 1.1rem 1.3rem;
+        overflow-x: auto;
+        margin: 1.4rem 0;
+        font-size: 0.87rem;
+        line-height: 1.65;
+      }
+      pre code {
+        background: none;
+        border: none;
+        padding: 0;
+        color: inherit;
+      }
+
+      /* ---------- Mermaid ---------- */
+      pre.mermaid {
+        width: 100%;
+        display: flex;
+        justify-content: safe center;
+        overflow-x: auto;
+        background: var(--bg-panel);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 1.5rem;
+        margin: 1.8rem 0;
+      }
+
+      /* ---------- Tables ---------- */
+      .table-scroll {
+        overflow-x: auto;
+        margin: 1.4rem 0;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        min-width: 620px;
+        font-size: 0.88rem;
+      }
+      thead th {
+        background: var(--bg-elevated);
+        color: var(--accent-2);
+        text-align: left;
+        padding: 0.7rem 0.9rem;
+        border-bottom: 1px solid var(--border);
+        white-space: nowrap;
+      }
+      td,
+      th {
+        padding: 0.65rem 0.9rem;
+        border-bottom: 1px solid var(--border);
+        overflow-wrap: break-word;
+        word-break: break-word;
+        vertical-align: top;
+      }
+      tbody tr:hover {
+        background: rgba(124, 158, 255, 0.05);
+      }
+      tbody tr:last-child td {
+        border-bottom: none;
+      }
+
+      /* ---------- Reference cards ---------- */
+      .ref-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+        gap: 1.2rem;
+        margin: 1.5rem 0 2.5rem;
+      }
+      @media (min-width: 820px) {
+        .ref-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+      .ref-card {
+        background: var(--bg-panel);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 1.3rem 1.4rem;
+        min-width: 0;
+      }
+      .ref-card h4 {
+        margin-top: 0;
+      }
+      .ref-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+      .ref-list li {
+        display: flex;
+        gap: 0.55rem;
+        align-items: flex-start;
+        padding: 0.55rem 0;
+        border-top: 1px solid var(--border);
+        min-width: 0;
+      }
+      .ref-list li:first-child {
+        border-top: none;
+      }
+      .ref-icon {
+        color: var(--accent);
+        flex: 0 0 auto;
+        font-size: 0.85rem;
+        margin-top: 0.15rem;
+      }
+      .ref-text {
+        display: flex;
+        flex-direction: column;
+        gap: 0.15rem;
+        min-width: 0;
+        flex: 1 1 0%;
+      }
+      .ref-label {
+        color: var(--text);
+        font-size: 0.88rem;
+        font-weight: 500;
+      }
+      .ref-list a {
+        font-size: 0.78rem;
+        color: var(--text-dim);
+        overflow-wrap: break-word;
+        word-break: break-word;
+      }
+      .ref-list a:hover {
+        color: var(--accent);
+      }
+
+      footer.page-footer {
+        margin-top: 4rem;
+        padding-top: 2rem;
+        border-top: 1px solid var(--border);
+        color: var(--text-dim);
+        font-size: 0.85rem;
+      }
+
+      /* ---------- Mobile ---------- */
+      @media (max-width: 900px) {
+        .sidebar {
+          transform: translateX(-100%);
+        }
+        .sidebar.open {
+          transform: translateX(0);
+        }
+        .sidebar-toggle {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .main {
+          margin-left: 0;
+          padding: 5rem 1.25rem 4rem;
+        }
+        .hero h1 {
+          font-size: 1.9rem;
+        }
+        .content h2 {
+          font-size: 1.35rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <button type="button" class="sidebar-toggle" id="sidebarToggle" aria-label="メニュー切り替え" aria-controls="sidebar" aria-expanded="false">☰</button>
+
+    <div class="layout">
+      <nav class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+          <span class="logo-dot"></span><span>CodeRabbit実践ガイド</span>
+        </div>
+        <div class="sidebar-label">目次</div>
+        <ul class="nav-list">
+          <li>
+            <a
+              href="#1-coderabbitとは何かアーキテクチャを理解する"
+              class="nav-link"
+              data-id="1-coderabbitとは何かアーキテクチャを理解する"
+              >1. CodeRabbitとは何か：アーキテクチャを理解する</a
+            >
+          </li>
+          <li>
+            <a
+              href="#2-導入のロールアウト戦略ステップバイステップ"
+              class="nav-link"
+              data-id="2-導入のロールアウト戦略ステップバイステップ"
+              >2. 導入のロールアウト戦略（ステップバイステップ）</a
+            >
+          </li>
+          <li>
+            <a
+              href="#3-設定の基本coderabbityamlとレビュープロファイル"
+              class="nav-link"
+              data-id="3-設定の基本coderabbityamlとレビュープロファイル"
+              >3. 設定の基本：.coderabbit.yamlとレビュープロファイル</a
+            >
+          </li>
+          <li>
+            <a
+              href="#4-設定の優先順位を制御するグローバルオーバーライド中央設定継承"
+              class="nav-link"
+              data-id="4-設定の優先順位を制御するグローバルオーバーライド中央設定継承"
+              >4. 設定の優先順位を制御する：グローバルオーバーライド・中央設定・継承</a
+            >
+          </li>
+          <li>
+            <a
+              href="#5-パスベースのレビュー制御を使い分ける"
+              class="nav-link"
+              data-id="5-パスベースのレビュー制御を使い分ける"
+              >5. パスベースのレビュー制御を使い分ける</a
+            >
+          </li>
+          <li>
+            <a
+              href="#6-ast-grepによる構造的レビュールール上級者向け"
+              class="nav-link"
+              data-id="6-ast-grepによる構造的レビュールール上級者向け"
+              >6. ast-grepによる構造的レビュールール（上級者向け）</a
+            >
+          </li>
+          <li>
+            <a
+              href="#7-自動レビューの挙動を制御するauto_review"
+              class="nav-link"
+              data-id="7-自動レビューの挙動を制御するauto_review"
+              >7. 自動レビューの挙動を制御する（auto_review）</a
+            >
+          </li>
+          <li>
+            <a
+              href="#8-learningsでチームの好みを学習させる"
+              class="nav-link"
+              data-id="8-learningsでチームの好みを学習させる"
+              >8. Learningsでチームの好みを学習させる</a
+            >
+          </li>
+          <li>
+            <a
+              href="#9-pre-merge-checksとcustom-checksで品質ゲートを敷く"
+              class="nav-link"
+              data-id="9-pre-merge-checksとcustom-checksで品質ゲートを敷く"
+              >9. Pre-Merge ChecksとCustom Checksで品質ゲートを敷く</a
+            >
+          </li>
+          <li>
+            <a
+              href="#10-finishing-touchesワンクリックのエージェント的アクション"
+              class="nav-link"
+              data-id="10-finishing-touchesワンクリックのエージェント的アクション"
+              >10. Finishing Touches：ワンクリックのエージェント的アクション</a
+            >
+          </li>
+          <li>
+            <a
+              href="#11-walkthroughとcoderabbit-reviewchange-stackを使いこなす"
+              class="nav-link"
+              data-id="11-walkthroughとcoderabbit-reviewchange-stackを使いこなす"
+              >11. WalkthroughとCodeRabbit Review（Change Stack）を使いこなす</a
+            >
+          </li>
+          <li>
+            <a
+              href="#12-knowledge-baseで文脈を拡張する"
+              class="nav-link"
+              data-id="12-knowledge-baseで文脈を拡張する"
+              >12. Knowledge Baseで文脈を拡張する</a
+            >
+          </li>
+          <li>
+            <a
+              href="#13-ide拡張機能とcliツールでシフトレフトする"
+              class="nav-link"
+              data-id="13-ide拡張機能とcliツールでシフトレフトする"
+              >13. IDE拡張機能とCLIツールでシフトレフトする</a
+            >
+          </li>
+          <li>
+            <a
+              href="#14-複数のaiレビューツールを組み合わせる考え方多層防御"
+              class="nav-link"
+              data-id="14-複数のaiレビューツールを組み合わせる考え方多層防御"
+              >14. 複数のAIレビューツールを組み合わせる考え方（多層防御）</a
+            >
+          </li>
+          <li>
+            <a
+              href="#15-実運用で直面する課題と対処法アンチパターン集"
+              class="nav-link"
+              data-id="15-実運用で直面する課題と対処法アンチパターン集"
+              >15. 実運用で直面する課題と対処法（アンチパターン集）</a
+            >
+          </li>
+          <li>
+            <a
+              href="#16-まとめベストプラクティス一覧表"
+              class="nav-link"
+              data-id="16-まとめベストプラクティス一覧表"
+              >16. まとめ：ベストプラクティス一覧表</a
+            >
+          </li>
+          <li><a href="#17-参考文献" class="nav-link" data-id="17-参考文献">17. 参考文献</a></li>
+        </ul>
+      </nav>
+
+      <main class="main">
+        <section class="hero">
+          <div class="hero-eyebrow">Intermediate &mdash; Advanced Guide</div>
+          <h1>CodeRabbit実践ガイド<br />中級者から上級者のためのベストプラクティス</h1>
+          <p class="hero-lede">
+            公式ドキュメント(docs.coderabbit.ai)と、Addy
+            Osmaniをはじめとする著名な開発者・コミュニティの実務レポートに基づく、設定・自動化・エージェント機能・複数ツール運用までを網羅したステップバイステップガイド。
+          </p>
+          <div class="quick-nav">
+            <a class="qn-card" href="#1-coderabbitとは何かアーキテクチャを理解する">
+              <span class="qn-num">01</span>
+              <span class="qn-title">基礎とロールアウト</span>
+              <span class="qn-desc">導入戦略とアーキテクチャの全体像</span>
+            </a>
+
+            <a
+              class="qn-card"
+              href="#4-設定の優先順位を制御するグローバルオーバーライド中央設定継承"
+            >
+              <span class="qn-num">02</span>
+              <span class="qn-title">設定と自動化</span>
+              <span class="qn-desc">YAML設定・優先順位・パス制御・自動レビュー</span>
+            </a>
+
+            <a class="qn-card" href="#10-finishing-touchesワンクリックのエージェント的アクション">
+              <span class="qn-num">03</span>
+              <span class="qn-title">エージェント機能</span>
+              <span class="qn-desc">Pre-Merge Checks・Finishing Touches・Walkthrough</span>
+            </a>
+
+            <a class="qn-card" href="#14-複数のaiレビューツールを組み合わせる考え方多層防御">
+              <span class="qn-num">04</span>
+              <span class="qn-title">実運用と統合</span>
+              <span class="qn-desc">IDE/CLI・多層防御・アンチパターン</span>
+            </a>
+
+            <a class="qn-card" href="#17-参考文献">
+              <span class="qn-num">05</span>
+              <span class="qn-title">参考文献</span>
+              <span class="qn-desc">公式ドキュメントと開発者コミュニティの一次情報</span>
+            </a>
+          </div>
+        </section>
+
+        <article class="content">
+          <p>
+            対象読者は、CodeRabbitを既に導入済み、またはこれから本格導入しようとしている中級〜上級のソフトウェアエンジニア・QAエンジニアです。単なる機能紹介にとどまらず、実運用でつまずきやすいポイントとその回避策、そして「なぜその設定が推奨されるのか」という背景まで踏み込んで解説します。
+          </p>
+          <p>
+            情報源は、CodeRabbit公式ドキュメント（docs.coderabbit.ai、2026年8月2日時点の内容）に加え、著名な開発者・組織による実務レポートを参照しています。特に、Google
+            Chrome/Web Vitalsチームでの活動やエンジニアリング関連の著作で知られるAddy
+            Osmaniが2026年に公開した「Agentic Code Review」（O'Reilly Radar /
+            addyosmani.com）は、CodeRabbitを含む複数のAIレビューツールを実PRで並行比較した第一級の一次情報として繰り返し引用します。ベンチマーク数値やコミュニティの声はソースによって前提が異なるため、複数の視点を併記し、断定は避けています。
+          </p>
+
+          <hr />
+          <h2 id="1-coderabbitとは何かアーキテクチャを理解する">
+            1. CodeRabbitとは何か：アーキテクチャを理解する
+          </h2>
+          <p>
+            CodeRabbitは「差分だけを見てLLMに投げる」単純なツールではありません。公式ドキュメントは、1件のレビューのたびに以下を組み合わせた本格的なAIインフラを動かしていると説明しています。
+          </p>
+          <ul>
+            <li>
+              <strong>サンドボックス化されたクラウド実行</strong
+              >：レビュー対象のリポジトリ全体を隔離環境にクローンして解析する
+            </li>
+            <li>
+              <strong>多次元コード解析</strong
+              >：40種類以上の静的解析ツール・Linter・SASTツールを横断的に実行する
+            </li>
+            <li><strong>エージェント的探索</strong>：コードベースを自律的に調べて文脈を集める</li>
+            <li>
+              <strong>専門エージェント群の並列稼働</strong>：Review・Verification・Chat・Pre-Merge
+              Checks・Finishing Touchesという役割ごとに専用のエージェントが動く
+            </li>
+            <li>
+              <strong>Living Memory（生きた記憶）</strong
+              >：フィードバック・過去のPR・Issue・コーディング規約から学習し続ける
+            </li>
+            <li>
+              <strong>エンタープライズ統合</strong
+              >：Jira、Linear、Slack、MCPサーバーなど既存の開発ワークフローと接続する
+            </li>
+          </ul>
+          <p>この全体像を図にすると次のようになります。</p>
+          <pre class="mermaid">
+flowchart TB
+    PR["Pull Requestが作成される"] --&gt; Clone["サンドボックスへリポジトリ全体をクローン"]
+    Clone --&gt; SAST["40以上の静的解析・Linter・SASTツール"]
+    Clone --&gt; Explore["エージェントによる自律的なコードベース探索"]
+    SAST --&gt; Agents["専門エージェント群 Review・Verification・Chat・Pre-Merge Checks・Finishing Touches"]
+    Explore --&gt; Agents
+    Agents --&gt; Memory["Living Memory Learnings・Code Guidelines・過去PR履歴"]
+    Memory --&gt; Output["レビューコメント・Walkthrough・提案の生成"]</pre
+          >
+          <p>
+            <strong>実務上の含意</strong
+            >：CodeRabbitは単発のLLM呼び出しではなく、複数のツールとエージェントの合議で結論を出しています。そのため「なぜこの指摘が出たのか」を理解するには、後述するKnowledge
+            Base（学習内容）や設定の優先順位を理解しておく必要があります。
+          </p>
+          <hr />
+          <h2 id="2-導入のロールアウト戦略ステップバイステップ">
+            2. 導入のロールアウト戦略（ステップバイステップ）
+          </h2>
+          <p>
+            いきなり全社的に「assertive」プロファイルで全リポジトリに展開するのは推奨されません。複数の実務ガイドが共通して勧めるのは、小さく始めて段階的に広げるアプローチです。
+          </p>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr class="header">
+                  <th>ステップ</th>
+                  <th>内容</th>
+                  <th>目的</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="odd">
+                  <td>1</td>
+                  <td>Quickstartで1つのリポジトリにGitHub/GitLab Appを接続する</td>
+                  <td>数分でPRレビューが動く状態を作る</td>
+                </tr>
+                <tr class="even">
+                  <td>2</td>
+                  <td>デフォルト設定のまま1〜2週間運用し、何が役に立ち、何がノイズかを観察する</td>
+                  <td>過剰なpath_instructionsを先回りで書かない</td>
+                </tr>
+                <tr class="odd">
+                  <td>3</td>
+                  <td>
+                    最小限の<code>.coderabbit.yaml</code>（プロファイルと明らかなノイズファイルの除外）を作成する
+                  </td>
+                  <td>「毎回同じ理由で無視しているコメント」を減らす</td>
+                </tr>
+                <tr class="even">
+                  <td>4</td>
+                  <td>
+                    パイロットチームからのフィードバックを収集し、誤検知（false
+                    positive）のパターンを特定する
+                  </td>
+                  <td>path_instructionsやCustom Checksの土台を作る</td>
+                </tr>
+                <tr class="odd">
+                  <td>5</td>
+                  <td>フロントエンド・バックエンドを含む3〜5リポジトリに拡大する</td>
+                  <td>技術スタックごとの挙動差を確認する</td>
+                </tr>
+                <tr class="even">
+                  <td>6</td>
+                  <td>GitHub Appを「All repositories」モードに切り替え、全社展開する</td>
+                  <td>一元管理に移行する</td>
+                </tr>
+                <tr class="odd">
+                  <td>7</td>
+                  <td>月次でダッシュボードとLearningsを棚卸しし、設定を見直す</td>
+                  <td>形骸化・陳腐化を防ぐ</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            この進め方はdev.to上の実践ガイド群でも共通して推奨されており、「2週間ほど誤検知を能動的に修正したチームは、静かに無視し続けたチームよりも最終的な精度が大きく上がる」という指摘があります。ステップ7のブランチ保護についても、CodeRabbitのチェックを「必須」にするのではなく、会話の解決（コメントへの返信）を必須にすることで、開発者が指摘を読む習慣を作りつつ、AIの判断だけでマージを止めない運用が現実的だとされています。
+          </p>
+          <hr />
+          <h2 id="3-設定の基本coderabbityamlとレビュープロファイル">
+            3. 設定の基本：<code>.coderabbit.yaml</code>とレビュープロファイル
+          </h2>
+          <p>
+            設定ファイルはリポジトリのルートに<code>.coderabbit.yaml</code>として置きます。レビュー対象のブランチにあるファイルが自動的に検出・適用されます。
+          </p>
+          <pre
+            class="yaml"
+          ><code class="language-yaml"># yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+language: "ja-JP"
+reviews:
+  profile: "chill"
+  request_changes_workflow: false
+  high_level_summary: true
+  poem: false
+  path_filters:
+    - "!dist/**"
+    - "!**/*.min.js"
+chat:
+  auto_reply: true</code></pre>
+          <p>
+            既存のWeb UI設定をYAMLに移行したい場合は、PR上で
+            <code>@coderabbitai configuration</code>
+            とコメントすると、現在有効になっている設定が「どの設定源から来たか」を示すコメント付きでYAML形式で返されます。これをそのまま<code>.coderabbit.yaml</code>にコピーするのが最も確実な出発点です。
+          </p>
+          <h3 id="レビュープロファイルchill-と-assertive">
+            レビュープロファイル：<code>chill</code> と <code>assertive</code>
+          </h3>
+          <ul>
+            <li>
+              <strong><code>chill</code>（デフォルト）</strong
+              >：軽めのフィードバック。指摘件数を絞りたいチーム向け
+            </li>
+            <li>
+              <strong><code>assertive</code></strong
+              >：より網羅的なフィードバック。ただし「ネチネチしている」と感じられるほど指摘が増える可能性がある
+            </li>
+          </ul>
+          <p>
+            実際にMonterailの検証記事では、初期状態のCodeRabbitは「かなり多くのコメントを生成した」ため、<code>.coderabbit.yaml</code>のチューニングに時間を投資する必要があったと報告されています。プロファイルを<code>assertive</code>に上げる前に、まず<code>chill</code>＋path_instructionsの組み合わせでノイズを減らす方向を試すのが安全です。
+          </p>
+          <h3 id="よく使う一般設定">よく使う一般設定</h3>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr class="header">
+                  <th>設定キー</th>
+                  <th>型</th>
+                  <th>デフォルト</th>
+                  <th>用途</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="odd">
+                  <td><code>language</code></td>
+                  <td>enum</td>
+                  <td><code>en-US</code></td>
+                  <td>レビュー・チャットで使う言語（ISOコード）</td>
+                </tr>
+                <tr class="even">
+                  <td><code>tone_instructions</code></td>
+                  <td>string</td>
+                  <td><code>""</code></td>
+                  <td>レビューやチャットの語り口（250文字まで）</td>
+                </tr>
+                <tr class="odd">
+                  <td><code>reviews.profile</code></td>
+                  <td>enum</td>
+                  <td><code>chill</code></td>
+                  <td><code>chill</code> / <code>assertive</code></td>
+                </tr>
+                <tr class="even">
+                  <td><code>reviews.request_changes_workflow</code></td>
+                  <td>boolean</td>
+                  <td><code>false</code></td>
+                  <td>フィードバックをRequest changesとして投稿・レビュー要求に対応し、全指摘事項の解消およびマージ前チェック通過後にのみApproveへ切り替える</td>
+                </tr>
+                <tr class="odd">
+                  <td><code>reviews.high_level_summary</code></td>
+                  <td>boolean</td>
+                  <td><code>true</code></td>
+                  <td>PR概要欄への要約生成</td>
+                </tr>
+                <tr class="even">
+                  <td><code>reviews.sequence_diagrams</code></td>
+                  <td>boolean</td>
+                  <td><code>true</code></td>
+                  <td>Walkthrough内のMermaidシーケンス図生成</td>
+                </tr>
+                <tr class="odd">
+                  <td><code>reviews.collapse_walkthrough</code></td>
+                  <td>boolean</td>
+                  <td><code>true</code></td>
+                  <td>Walkthroughを折りたたみ表示にする</td>
+                </tr>
+                <tr class="even">
+                  <td><code>reviews.poem</code></td>
+                  <td>boolean</td>
+                  <td><code>true</code></td>
+                  <td>変更内容にちなんだ詩の生成（オフにして実務的にする例も多い）</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <hr />
+          <h2 id="4-設定の優先順位を制御するグローバルオーバーライド中央設定継承">
+            4. 設定の優先順位を制御する：グローバルオーバーライド・中央設定・継承
+          </h2>
+          <p>
+            複数の設定手段（YAMLファイル、中央リポジトリ、Web
+            UIの組織/リポジトリ設定）を併用すると、「どれが実際に効いているのか」が分からなくなりがちです。CodeRabbitは既定では設定源をマージせず、最も優先度の高い1つだけを採用します。
+          </p>
+          <pre class="mermaid">
+flowchart TB
+    P0["優先度0 グローバルオーバーライド 組織Admin専用"] --&gt; P1["優先度1 リポジトリ内の .coderabbit.yaml"]
+    P1 --&gt; P2["優先度2 中央リポジトリの coderabbit/.coderabbit.yaml"]
+    P2 --&gt; P3["優先度3 リポジトリ設定 Web UI"]
+    P3 --&gt; P4["優先度4 組織設定 Web UI"]
+    P4 --&gt; P5["優先度5 スキーマのデフォルト値"]</pre
+          >
+          <p>
+            継承（inheritance）を使わない場合、たとえば組織設定と中央設定の両方でタイムアウト値を指定していても、リポジトリの<code>.coderabbit.yaml</code>がタイムアウトに一切触れていなければ、CodeRabbitは（組織設定でも中央設定でもなく）スキーマのデフォルト値を使います。「上位の設定を継承しつつ一部だけ上書きする」という直感的な挙動ではない点に注意してください。
+          </p>
+          <h3 id="グローバルオーバーライド">グローバルオーバーライド</h3>
+          <p>
+            組織Adminのみが編集できる最上位の設定層で、コンプライアンス上どうしても外せないポリシー（例：全リポジトリで<code>assertive</code>プロファイルを強制する、特定のpath_instructionsを必須にする）に使います。オブジェクトは再帰的にマージされ、配列は<code>path</code>などのキーで重複排除されながら結合され、スカラー値は単純に上書きされます。
+          </p>
+          <h3 id="継承configuration-inheritanceの有効化">
+            継承（Configuration Inheritance）の有効化
+          </h3>
+          <p>
+            デフォルトでは継承は無効です。<code>.coderabbit.yaml</code>のルートに<code
+              >inheritance: true</code
+            >を追加すると、親レベル（中央設定や組織UI設定）とマージされるようになります。チェーンは、<code
+              >inheritance: true</code
+            >が設定されている限り上位へと辿り、<code>inheritance: false</code
+            >（または未設定）のレベルで停止します。
+          </p>
+          <pre class="mermaid">
+flowchart LR
+    Repo["リポジトリYAML inheritance:true"] --&gt; Central["中央YAML inheritance:true"]
+    Central --&gt; OrgUI["組織UI設定 inheritance:false"]
+    OrgUI --&gt; Stop["ここでマージ停止"]</pre
+          >
+          <p>マージの挙動は型によって異なります。</p>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr class="header">
+                  <th>型</th>
+                  <th>マージ挙動</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="odd">
+                  <td>オブジェクト</td>
+                  <td>深いマージ。子の値が各階層で親の値を上書きする</td>
+                </tr>
+                <tr class="even">
+                  <td>配列</td>
+                  <td>
+                    子側の項目を先頭にし、<code>path</code> / <code>label</code> /
+                    <code>name</code> / <code>id</code> /
+                    <code>key</code>で重複排除しながら親側のユニークな項目を追加する
+                  </td>
+                </tr>
+                <tr class="odd">
+                  <td>スカラー</td>
+                  <td>子の値が定義されていれば、それが優先される</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            <strong>実務上のコツ</strong>：継承を有効にした後は、必ずPR上で<code
+              >@coderabbitai configuration</code
+            >を実行し、各設定値がどの階層から来たかを示す注釈付きの解決済みYAMLを確認してください。「意図せず組織設定が効いていない」といった事故は、この確認を怠ったチームで頻発します。
+          </p>
+          <hr />
+          <h2 id="5-パスベースのレビュー制御を使い分ける">
+            5. パスベースのレビュー制御を使い分ける
+          </h2>
+          <p>
+            CodeRabbitには、似ているようで役割が異なる4つの仕組みがあります。混同するとコメント過多や設定の重複を招くため、まず違いを整理します。
+          </p>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr class="header">
+                  <th>仕組み</th>
+                  <th>何をするか</th>
+                  <th>設定場所</th>
+                  <th>向いているケース</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="odd">
+                  <td><strong>Path Filters</strong></td>
+                  <td>特定のパスをレビュー対象から完全に除外する</td>
+                  <td><code>reviews.path_filters</code></td>
+                  <td>ロックファイル・生成コード・バイナリなど</td>
+                </tr>
+                <tr class="even">
+                  <td><strong>Path Instructions</strong></td>
+                  <td>特定のパスに追加の観点を与える（除外はしない）</td>
+                  <td><code>reviews.path_instructions</code></td>
+                  <td>「APIコントローラでは認可漏れを重点確認して」など</td>
+                </tr>
+                <tr class="odd">
+                  <td><strong>Code Guidelines</strong></td>
+                  <td>
+                    既存の<code>AGENTS.md</code>や<code>CLAUDE.md</code>などを自動検出して規約として適用する
+                  </td>
+                  <td>追加設定不要（自動検出）</td>
+                  <td>既にAIコーディングエージェント向けの規約がある場合</td>
+                </tr>
+                <tr class="even">
+                  <td><strong>Custom Checks</strong></td>
+                  <td>合否をはっきり判定できる基準をマージ前ゲートとして定義する</td>
+                  <td><code>reviews.pre_merge_checks.custom_checks</code></td>
+                  <td>
+                    「新規の<code>.java</code>ファイルを禁止する」など機械的に判定できるルール
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>この4つをどう使い分けるかを整理すると、次のような判断フローになります。</p>
+          <pre class="mermaid">
+flowchart TD
+    Start["レビューの挙動を変えたい"] --&gt; Q1{"そのファイル自体を対象外にしたいか"}
+    Q1 --&gt;|"はい"| PF["Path Filtersで除外"]
+    Q1 --&gt;|"いいえ"| Q2{"特定ディレクトリに追加の観点が必要か"}
+    Q2 --&gt;|"はい"| PI["Path Instructionsを追加"]
+    Q2 --&gt;|"いいえ"| Q3{"AGENTS.md CLAUDE.md 等の既存規約があるか"}
+    Q3 --&gt;|"はい"| CG["Code Guidelinesとして自動適用されているか確認"]
+    Q3 --&gt;|"いいえ"| Q4{"機械的にpass fail判定できるルールか"}
+    Q4 --&gt;|"はい"| CC["Custom Checksでpass fail条件を定義"]
+    Q4 --&gt;|"いいえ"| Learn["Learningsとして会話の中で教える"]</pre
+          >
+          <h3 id="path-instructionsの実例">Path Instructionsの実例</h3>
+          <pre class="yaml"><code class="language-yaml">reviews:
+  path_instructions:
+    - path: "src/controllers/**"
+      instructions: |
+        - 認証・認可・入力バリデーションを重点的に確認する
+        - ORMを迂回した直接のDBクエリがあれば指摘する
+    - path: "docs/**.md"
+      instructions: |
+        明瞭さ・正確さ・網羅性を確認し、非推奨APIへの言及があれば指摘する</code></pre>
+          <p>
+            <strong>よくある間違い</strong
+            >：<code>AGENTS.md</code>のようなガイドラインファイル名を<code>path_instructions</code>に登録してしまうケースです。これは「そのファイル自体をコードとしてレビューする」設定になってしまい、「そのファイルの内容を規約として使う」設定にはなりません。規約として使いたい場合はCode
+            Guidelinesの<code>filePatterns</code>を使います。
+          </p>
+          <h3 id="code-guidelinesの自動検出対象">Code Guidelinesの自動検出対象</h3>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr class="header">
+                  <th>ファイルパターン</th>
+                  <th>対応ツール</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="odd">
+                  <td><code>**/AGENTS.md</code>, <code>**/AGENT.md</code></td>
+                  <td>汎用AIエージェント指示</td>
+                </tr>
+                <tr class="even">
+                  <td><code>**/CLAUDE.md</code></td>
+                  <td>Claude Code</td>
+                </tr>
+                <tr class="odd">
+                  <td><code>**/GEMINI.md</code></td>
+                  <td>Gemini CLI</td>
+                </tr>
+                <tr class="even">
+                  <td><code>**/.cursorrules</code>, <code>**/.cursor/rules/*</code></td>
+                  <td>Cursor</td>
+                </tr>
+                <tr class="odd">
+                  <td><code>.github/copilot-instructions.md</code></td>
+                  <td>GitHub Copilot</td>
+                </tr>
+                <tr class="even">
+                  <td><code>**/.windsurfrules</code></td>
+                  <td>Windsurf</td>
+                </tr>
+                <tr class="odd">
+                  <td><code>**/.clinerules/*</code></td>
+                  <td>Cline</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            これらはディレクトリ単位でスコープされます。たとえば<code>src/frontend/CLAUDE.md</code>はそのディレクトリ配下にしか適用されません。モノレポで領域ごとに規約を分けたい場合に有効です。
+          </p>
+          <h3 id="蓄積したpath-instructionsをコマンドで反映する">
+            蓄積したPath Instructionsをコマンドで反映する
+          </h3>
+          <p>
+            <code>@coderabbitai emit path instructions</code>
+            とコメントすると、過去7日間にCodeRabbitが提案したpath
+            instructionを収集し、既存の<code>.coderabbit.yaml</code>を上書きせずにマージしたPRを自動で開いてくれます。手作業でYAMLを編集する前に、まずこのコマンドを試す価値があります。
+          </p>
+          <hr />
+          <h2 id="6-ast-grepによる構造的レビュールール上級者向け">
+            6. ast-grepによる構造的レビュールール（上級者向け）
+          </h2>
+          <p>
+            <code>ast-grep</code
+            >は、tree-sitterパーサーを使ってAST（抽象構文木）パターンでコードを検索するRust製ツールです（作者：Herrington
+            Darkholme）。YAMLの学習コストはありますが、「文字列一致では表現できない構造的な禁止パターン」を定義できます。
+          </p>
+          <pre class="yaml"><code class="language-yaml">reviews:
+  tools:
+    ast-grep:
+      essential_rules: true
+      rule_dirs:
+        - "custom-rules"
+      packages:
+        - "myorg/awesome-review-rules"</code></pre>
+          <p>ルールは3つのカテゴリの組み合わせで構成されます。</p>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr class="header">
+                  <th>カテゴリ</th>
+                  <th>内容</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="odd">
+                  <td>Atomic rule</td>
+                  <td>
+                    <code>pattern</code> / <code>kind</code> /
+                    <code>regex</code> によるASTノードの基本一致判定
+                  </td>
+                </tr>
+                <tr class="even">
+                  <td>Relational rule</td>
+                  <td>
+                    <code>inside</code> / <code>has</code> / <code>follows</code> /
+                    <code>precedes</code> によるノード間の関係判定
+                  </td>
+                </tr>
+                <tr class="odd">
+                  <td>Composite rule</td>
+                  <td><code>all</code> / <code>any</code> / <code>not</code> による論理結合</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            <strong>実例：catchブロック以外での<code>console.log</code>系呼び出しを禁止する</strong>
+          </p>
+          <pre class="yaml"><code class="language-yaml">id: no-console-except-error
+language: typescript
+message: "catchブロック以外でのconsole出力は禁止です"
+rule:
+  any:
+    - pattern: console.error($$$)
+      not:
+        inside:
+          kind: catch_clause
+          stopBy: end
+    - pattern: console.$METHOD($$$)
+constraints:
+  METHOD:
+    regex: "log|debug|warn"</code></pre>
+          <p>
+            CodeRabbitは<code>ast-grep-essentials</code>というセキュリティ寄りの既定ルールパックを提供しており、<code
+              >essential_rules: true</code
+            >だけで有効化できます。カスタムルールを作る前に、まずこの既定パックが自分たちのニーズをどこまでカバーするかを確認するのが効率的です。
+          </p>
+          <p>
+            <strong>注意</strong
+            >：ast-grepベースのコンテキストは自動レビュー時にのみ有効で、チャットでは使えません。設計を試すときは公式のast-grep
+            Playgroundでルールを検証してから組み込むと手戻りが減ります。
+          </p>
+          <hr />
+          <h2 id="7-自動レビューの挙動を制御するauto_review">
+            7. 自動レビューの挙動を制御する（<code>auto_review</code>）
+          </h2>
+          <p>
+            デフォルトでは、CodeRabbitはデフォルトブランチ向けの非ドラフトPRをすべて自動レビューします。<code>auto_review</code>の設定群で、この挙動を細かく制御できます。
+          </p>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr class="header">
+                  <th>目的</th>
+                  <th>推奨設定</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="odd">
+                  <td>
+                    小さなコミットが大量に積まれるアクティブブランチでレビュー回数を節約したい
+                  </td>
+                  <td>
+                    <code>auto_pause_after_reviewed_commits</code> を <code>1</code>〜<code>2</code>
+                    に設定
+                  </td>
+                </tr>
+                <tr class="even">
+                  <td>準備が整ったPRだけレビューしたい</td>
+                  <td>
+                    <code>enabled: false</code> にし、<code>labels</code>
+                    にレビュー準備完了ラベル（例：<code>review-ready</code>）を設定
+                  </td>
+                </tr>
+                <tr class="odd">
+                  <td>WIP・生成コード・自動化PRをスキップしたい</td>
+                  <td><code>ignore_title_keywords</code> に <code>WIP</code> などを追加</td>
+                </tr>
+                <tr class="even">
+                  <td>自動レビューを完全に止め、手動運用に切り替えたい</td>
+                  <td>
+                    <code>enabled: false</code> にし、<code>@coderabbitai review</code> を使う
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <pre class="yaml"><code class="language-yaml">reviews:
+  auto_review:
+    enabled: true
+    auto_incremental_review: true
+    auto_pause_after_reviewed_commits: 5
+    drafts: false
+    base_branches:
+      - "develop"
+      - "release/.*"
+    ignore_title_keywords:
+      - "WIP"
+      - "[skip review]"
+    labels:
+      - "!do-not-review"
+    ignore_usernames:
+      - "dependabot[bot]"
+      - "renovate[bot]"</code></pre>
+          <p>判定の流れを図にすると以下の通りです。</p>
+          <pre class="mermaid">
+flowchart TD
+    Open["PRがオープンされる"] --&gt; CheckUser{"ignore_usernamesに一致するか"}
+    CheckUser --&gt;|"はい"| Skip["レビューをスキップ"]
+    CheckUser --&gt;|"いいえ"| CheckTitle{"ignore_title_keywordsに一致するか"}
+    CheckTitle --&gt;|"はい"| Skip
+    CheckTitle --&gt;|"いいえ"| CheckDraft{"ドラフトかつ drafts:false か"}
+    CheckDraft --&gt;|"はい"| Skip
+    CheckDraft --&gt;|"いいえ"| CheckLabel{"labels条件を満たすか"}
+    CheckLabel --&gt;|"いいえ"| Skip
+    CheckLabel --&gt;|"はい"| Review["フルレビューを実行"]
+    Review --&gt; Push["新しいコミットがpushされる"]
+    Push --&gt; Incremental{"auto_incremental_review:true か"}
+    Incremental --&gt;|"いいえ"| Wait["手動コマンドを待機"]
+    Incremental --&gt;|"はい"| CountCheck{"pause閾値に到達したか"}
+    CountCheck --&gt;|"いいえ"| Review2["差分のみ増分レビュー"]
+    CountCheck --&gt;|"はい"| Paused["自動レビューを一時停止"]
+    Review2 --&gt; Push
+    Paused --&gt; Manual["@coderabbitai review で再開"]</pre
+          >
+          <p>
+            <strong>注意点</strong
+            >：<code>auto_pause_after_reviewed_commits</code>を<code>0</code>にして「常に全部レビューする」設定にすると、アクティブなブランチではレビュー回数の上限（プランごとの1時間あたりの割り当て）をすぐに消費してしまいます。プラン上限に頻繁に当たる場合は、まずこの値を絞ることを検討してください。
+          </p>
+          <hr />
+          <h2 id="8-learningsでチームの好みを学習させる">8. Learningsでチームの好みを学習させる</h2>
+          <p>
+            Learningsは、PRやIssueのコメントでのやり取りからCodeRabbitが学習する「チームの好み」の内部データベースです。フォーマルな設定変更をするほどではないが、今後も繰り返し適用してほしい方針に向いています。
+          </p>
+          <h3 id="効果的なlearningsの作り方">効果的なLearningsの作り方</h3>
+          <ol type="1">
+            <li>
+              <p>
+                <strong>パターンか一度きりかを見極める</strong
+                >：移行中の一時的な例外にはLearningsを作らず、コメントを解決するだけにとどめる。チーム全体に適用すべき方針だけをLearning化する。
+              </p>
+            </li>
+            <li>
+              <p>
+                <strong>「何を」ではなく「なぜ」を伝える</strong
+                >：理由を説明すると、似ているが完全に同一ではない状況にも正しく適用されやすくなる。
+              </p>
+              <blockquote>
+                <p>
+                  効果が薄い例：「catchブロックのネストは提案しないで」
+                  効果的な例：「認証ミドルウェアではネストしたtry-catchではなく、早期returnとエラーコードを使う方針にしている。理由は本番でのデバッグ容易性とモニタリングツールとの相性のため」
+                </p>
+              </blockquote>
+            </li>
+            <li>
+              <p>
+                <strong>特定の行コメントへの返信で伝える</strong
+                >：PR全体への一般的なコメントよりも、該当行への返信のほうが文脈が伝わり、精度の高いLearningになる。
+              </p>
+            </li>
+          </ol>
+          <h3 id="スコープの選び方">スコープの選び方</h3>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr class="header">
+                  <th>スコープ</th>
+                  <th>挙動</th>
+                  <th>向いているケース</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="odd">
+                  <td><code>auto</code>（既定）</td>
+                  <td>公開リポジトリでは当該リポジトリのみ、非公開では組織全体のLearningsを適用</td>
+                  <td>公開/非公開リポジトリが混在する組織</td>
+                </tr>
+                <tr class="even">
+                  <td><code>local</code></td>
+                  <td>常に当該リポジトリのLearningsのみ適用</td>
+                  <td>
+                    PythonバックエンドとReactフロントエンドなど、技術スタックが大きく異なるリポジトリが混在する組織（相互汚染の防止）
+                  </td>
+                </tr>
+                <tr class="odd">
+                  <td><code>global</code></td>
+                  <td>常に組織全体のLearningsを適用</td>
+                  <td>セキュリティ方針や命名規則など、組織横断で統一したい標準がある場合</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>学習フローを図示すると次のようになります。</p>
+          <pre class="mermaid">
+sequenceDiagram
+    participant Dev as 開発者
+    participant CR as CodeRabbit
+    participant DB as Learningsデータベース
+    Dev-&gt;&gt;CR: PRのコメントに返信し理由を説明する
+    CR-&gt;&gt;CR: 方針転換すべき内容かを判定する
+    CR-&gt;&gt;DB: 新しいLearningを作成する
+    CR--&gt;&gt;Dev: Learnings Addedとして返信に明記する
+    Note over DB: 承認遅延の設定がある場合はAdmin承認待ちになる
+    Dev-&gt;&gt;CR: 後日、別のPRを作成する
+    CR-&gt;&gt;DB: 該当スコープのLearningsを読み込む
+    DB--&gt;&gt;CR: 過去の指摘方針を返す
+    CR--&gt;&gt;Dev: 学習済みの方針を反映してレビューする</pre
+          >
+          <h3 id="運用と保守">運用と保守</h3>
+          <ul>
+            <li>
+              新しく作られたチャット由来のLearningsを即時反映せず、管理者の承認を挟みたい場合は<code>knowledge_base.learnings.approval_delay</code>を1〜30日の範囲で設定する（既定は<code>0</code>で即時反映）
+            </li>
+            <li>
+              Learningsは陳腐化する。四半期に一度、廃止したパターンやチーム決定を参照しているLearningsを棚卸しし、矛盾するものは追加せず更新・削除する
+            </li>
+            <li>
+              CodeRabbitがLearningsを無視しているように見える場合は、Path Instructionsとの競合（Path
+              Instructionsのほうが優先される）を疑い、必要であれば「回答前に必ずLearningsを確認すること」という補強ルールを追加する
+            </li>
+          </ul>
+          <hr />
+          <h2 id="9-pre-merge-checksとcustom-checksで品質ゲートを敷く">
+            9. Pre-Merge ChecksとCustom Checksで品質ゲートを敷く
+          </h2>
+          <p>
+            Pre-Merge
+            Checksは、マージ前の品質ゲートをAIエージェントで自動判定する機能です。組み込みチェックとカスタムチェックの2種類があります。
+          </p>
+          <h3 id="組み込みチェック">組み込みチェック</h3>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr class="header">
+                  <th>チェック</th>
+                  <th>内容</th>
+                  <th>既定閾値</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="odd">
+                  <td>Docstring Coverage</td>
+                  <td>PR内のdocstringカバレッジを検証</td>
+                  <td>80%</td>
+                </tr>
+                <tr class="even">
+                  <td>Pull Request Title</td>
+                  <td>タイトルが変更内容を正確に反映しているか検証</td>
+                  <td>チーム指定の要件</td>
+                </tr>
+                <tr class="odd">
+                  <td>Pull Request Description</td>
+                  <td>説明がテンプレートに沿っているか検証</td>
+                  <td>-</td>
+                </tr>
+                <tr class="even">
+                  <td>Issue Assessment</td>
+                  <td>紐づいたIssueに対応できているか検証</td>
+                  <td>-</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            各チェックは<code>off</code> / <code>warning</code> /
+            <code>error</code
+            >の3段階で設定できます。<code>error</code>は<code>request_changes_workflow</code>と組み合わせるとマージをブロックします。
+          </p>
+          <pre class="yaml"><code class="language-yaml">reviews:
+  pre_merge_checks:
+    docstrings:
+      mode: "error"
+      threshold: 85
+    title:
+      mode: "warning"
+      requirements: "命令形の動詞で始め、50文字以内に収める"
+    custom_checks:
+      - name: "破壊的変更の文書化"
+        mode: "warning"
+        instructions: "公開API・CLIフラグ・環境変数・DBスキーマへの破壊的変更は、PR説明のBreaking ChangeセクションとCHANGELOG.mdの両方に記載されていること。内部限定の変更は除く。"</code></pre>
+          <p>
+            <strong>ベストプラクティス</strong
+            >：新しいチェックはまず<code>warning</code>モードで導入し、チームの認識が揃ってから<code>error</code>に引き上げます。
+          </p>
+          <h3 id="custom-checksの制約と書き方">Custom Checksの制約と書き方</h3>
+          <p>
+            Custom
+            Checksは読み取り専用のサンドボックスで動作します。できること・できないことを理解しておかないと、無意味な指示になります。
+          </p>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr class="header">
+                  <th>できること</th>
+                  <th>できないこと</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="odd">
+                  <td>変更ファイル・コードスニペット・関連するGit履歴の参照</td>
+                  <td>テストスイートの実行（依存関係が未インストール）</td>
+                </tr>
+                <tr class="even">
+                  <td>PRタイトル・説明・紐づくIssue・レビュー内の議論の参照</td>
+                  <td><code>node_modules</code>・<code>dist</code>・ビルド成果物へのアクセス</td>
+                </tr>
+                <tr class="odd">
+                  <td>ast-grepやripgrepによるパターン検索</td>
+                  <td>任意のリポジトリコードの実行</td>
+                </tr>
+                <tr class="even">
+                  <td>サンドボックス化されたシェルコマンドでの調査</td>
+                  <td>特定行へのインラインコメント投稿（結果はサマリー表のみ）</td>
+                </tr>
+                <tr class="odd">
+                  <td>公開ドキュメントへのWebアクセス、接続済みMCPツール</td>
+                  <td>PR承認状況やレビュアーの割り当て状況の確認</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr class="header">
+                  <th>アンチパターン</th>
+                  <th>例</th>
+                  <th>問題点</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="odd">
+                  <td>曖昧な指示</td>
+                  <td>「ベストプラクティスを確認して」</td>
+                  <td>具体的な合否基準がない</td>
+                </tr>
+                <tr class="even">
+                  <td>取得不能な情報を要求</td>
+                  <td>「@security-teamの承認済みであることを確認して」</td>
+                  <td>エージェントは承認状況を確認できない</td>
+                </tr>
+                <tr class="odd">
+                  <td>主観的な推測</td>
+                  <td>「明らかなパフォーマンス改善余地があるか評価して」</td>
+                  <td>明確な判定基準がなく主観的</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>判定フローは次の通りです。</p>
+          <pre class="mermaid">
+flowchart TD
+    PR["Pull Request"] --&gt; Built["組み込みチェック docstrings title description issue_assessment"]
+    PR --&gt; Custom["カスタムチェック 自然言語のpass fail条件"]
+    Built --&gt; Result{"結果"}
+    Custom --&gt; Result
+    Result --&gt;|"Passed"| Merge["マージ可能"]
+    Result --&gt;|"Warning"| MergeWarn["警告付きでマージ可能"]
+    Result --&gt;|"Error かつ request_changes_workflow"| Block["マージがブロックされる"]
+    Result --&gt;|"Inconclusive"| Review["人間が確認"]
+    Block --&gt;|"Ignore failed checksを選択"| Merge</pre
+          >
+          <p>
+            <code
+              >@coderabbitai evaluate custom pre-merge check --name &lt;名前&gt; --instructions
+              &lt;本文&gt;</code
+            >
+            とコメントすると、設定に保存する前にロジックをテストできます。本番投入前に必ず試すことを推奨します。
+          </p>
+          <hr />
+          <h2 id="10-finishing-touchesワンクリックのエージェント的アクション">
+            10. Finishing Touches：ワンクリックのエージェント的アクション
+          </h2>
+          <p>
+            Finishing
+            Touchesは、レビュー後にワンクリックで実行できるエージェント的アクション群です。PRコメントかWalkthrough内のチェックボックスから起動します。
+          </p>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr class="header">
+                  <th>機能</th>
+                  <th>コマンド</th>
+                  <th>出力</th>
+                  <th>対応プラットフォーム</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="odd">
+                  <td>Docstring生成</td>
+                  <td><code>@coderabbitai generate docstrings</code></td>
+                  <td>新規PR</td>
+                  <td>全プラットフォーム</td>
+                </tr>
+                <tr class="even">
+                  <td>ユニットテスト生成</td>
+                  <td><code>@coderabbitai generate unit tests</code></td>
+                  <td>PRまたはコミット</td>
+                  <td>GitHub</td>
+                </tr>
+                <tr class="odd">
+                  <td>コードの簡潔化</td>
+                  <td><code>@coderabbitai simplify</code></td>
+                  <td>新規PRまたはコミット</td>
+                  <td>GitHub</td>
+                </tr>
+                <tr class="even">
+                  <td>Autofix</td>
+                  <td>
+                    <code>@coderabbitai autofix</code> /
+                    <code>@coderabbitai autofix stacked pr</code>
+                  </td>
+                  <td>ブランチへのコミットまたはスタックPR</td>
+                  <td>GitHub, GitLab, Azure DevOps, Bitbucket</td>
+                </tr>
+                <tr class="odd">
+                  <td>カスタムレシピ</td>
+                  <td><code>@coderabbitai run &lt;レシピ名&gt;</code></td>
+                  <td>ブランチへのコミットまたはスタックPR</td>
+                  <td>GitHub</td>
+                </tr>
+                <tr class="even">
+                  <td>マージコンフリクト解消</td>
+                  <td><code>@coderabbitai resolve merge conflict</code></td>
+                  <td>マージコミット</td>
+                  <td>GitHub, GitLab</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <pre class="mermaid">
+sequenceDiagram
+    participant Dev as 開発者
+    participant CR as CodeRabbit
+    participant Repo as リポジトリ
+    Dev-&gt;&gt;CR: "@coderabbitai generate docstrings"
+    CR-&gt;&gt;Repo: 変更された関数を解析する
+    CR-&gt;&gt;Repo: docstringを追加した新規PRを作成する
+    Dev-&gt;&gt;CR: "@coderabbitai autofix"
+    CR-&gt;&gt;Repo: レビュー指摘を修正しコミットする
+    Dev-&gt;&gt;CR: "@coderabbitai run cleanup-imports"
+    CR-&gt;&gt;Repo: カスタムレシピを実行しコミットする</pre
+          >
+          <p>
+            カスタムレシピは1組織あたり最大5件まで定義でき、「未使用importの整理」「型の厳格化」「CHANGELOGエントリの追加」のような繰り返し作業を名前付きのコマンドとして再利用できます。
+          </p>
+          <p>
+            <strong>注意</strong
+            >：Autofixはマージコンフリクトがある状態では実行前に停止し、先に<code
+              >@coderabbitai resolve merge conflict</code
+            >を促す返信をします。マージコンフリクト解消機能自体は既定で有効ですが、無効化されている環境では先にこの設定を確認してください。
+          </p>
+          <hr />
+          <h2 id="11-walkthroughとcoderabbit-reviewchange-stackを使いこなす">
+            11. WalkthroughとCodeRabbit Review（Change Stack）を使いこなす
+          </h2>
+          <h3 id="walkthroughコメントの構成要素">Walkthroughコメントの構成要素</h3>
+          <p>
+            CodeRabbitがPRを分析するたびに投稿する構造化コメントが「Walkthrough」です。各セクションは個別にオン/オフできます。
+          </p>
+          <ul>
+            <li>変更ファイルの要約（関連ファイルはグループ化される）</li>
+            <li>Mermaidによるシーケンス図（コンポーネント間のやり取りが変わるPRのみ生成）</li>
+            <li>レビュー工数の見積もり（1＝些細、5＝非常に複雑）</li>
+            <li>紐づくIssue・関連PR・推奨レビュアー・推奨ラベル</li>
+            <li>変更内容にちなんだ詩（無効化も可能）</li>
+          </ul>
+          <h3 id="指摘の分類軸">指摘の分類軸</h3>
+          <p>各コメントには「内容カテゴリ」と「深刻度」の2軸のラベルが付きます。</p>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr class="header">
+                  <th>カテゴリ</th>
+                  <th>意味</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="odd">
+                  <td>セキュリティ・プライバシー</td>
+                  <td>脆弱性、認証・認可の欠陥、シークレットの取り扱い</td>
+                </tr>
+                <tr class="even">
+                  <td>安定性・可用性</td>
+                  <td>クラッシュ、未処理エラー、リソースリーク</td>
+                </tr>
+                <tr class="odd">
+                  <td>データ整合性・連携</td>
+                  <td>データの正確性、永続化、スキーマ、連携境界</td>
+                </tr>
+                <tr class="even">
+                  <td>機能的正確性</td>
+                  <td>ロジックエラー、未処理のエッジケース</td>
+                </tr>
+                <tr class="odd">
+                  <td>パフォーマンス・スケーラビリティ</td>
+                  <td>非効率な処理、ボトルネック</td>
+                </tr>
+                <tr class="even">
+                  <td>保守性・コード品質</td>
+                  <td>可読性、構造、命名</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr class="header">
+                  <th>深刻度</th>
+                  <th>意味</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="odd">
+                  <td>Critical</td>
+                  <td>システム障害・セキュリティ侵害・データ損失につながりうる</td>
+                </tr>
+                <tr class="even">
+                  <td>Major</td>
+                  <td>機能やパフォーマンスに大きく影響する</td>
+                </tr>
+                <tr class="odd">
+                  <td>Minor</td>
+                  <td>対応すべきだが致命的ではない</td>
+                </tr>
+                <tr class="even">
+                  <td>Trivial</td>
+                  <td>コード品質面での軽微な提案</td>
+                </tr>
+                <tr class="odd">
+                  <td>Info</td>
+                  <td>対応不要な情報提供</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            この2軸を使うと、<code>assertive</code>プロファイルで指摘件数が増えても、「CriticalとMajorだけまず見る」という運用でノイズを実質的に抑えられます。
+          </p>
+          <h3 id="coderabbit-reviewchange-stack">CodeRabbit Review（Change Stack）</h3>
+          <p>
+            AIエージェントが一度に大量のファイルを変更するPRが増える中、GitHubの既定の差分表示（アルファベット順のフラットなファイル一覧）は論理的な依存関係を表現できません。CodeRabbit
+            Reviewは、PRを「コホート（関連する変更のまとまり）」と「レイヤー（読む順序）」に再構成し、データ構造や契約の変更を、それに依存する呼び出し側やテストより先に読めるようにします。
+          </p>
+          <ul>
+            <li>左パネル：コホート／レイヤーのナビゲーションと全ファイル一覧</li>
+            <li>
+              中央パネル：現在のレイヤーに絞った差分（変数名クリックで定義・参照元にジャンプするCode
+              Peek機能付き）
+            </li>
+            <li>右パネル：範囲ごとのAI要約とコメントタブ</li>
+          </ul>
+          <p>
+            キーボード操作にも対応しており、<code>J</code>で次のレイヤー、<code>K</code>で前のレイヤー、<code>Z</code>でフォーカスモードの切り替えができます。この機能はWalkthroughコメントの「Review
+            Change Stack
+            →」ボタンから開き、レビュアーごとの任意選択（オプトイン）のため、従来のGitHubレビュー体験を好むメンバーには影響しません。
+          </p>
+          <hr />
+          <h2 id="12-knowledge-baseで文脈を拡張する">12. Knowledge Baseで文脈を拡張する</h2>
+          <p>Knowledge Baseは、コード自体を超えた文脈をレビューに供給する仕組みの総称です。</p>
+          <pre class="mermaid">
+flowchart TB
+    CG["Code Guidelines AGENTS.md CLAUDE.md 等"] --&gt; Agent["レビューエージェント"]
+    Learn["Learnings 過去のフィードバック"] --&gt; Agent
+    MCP["MCP Servers 社内ドキュメント Figma Jira 等"] --&gt; Agent
+    Web["Web Search 公開情報"] --&gt; Agent
+    Multi["Multi-Repo Analysis 連携リポジトリ"] --&gt; Agent
+    Agent --&gt; Comment["文脈を反映したレビューコメント"]</pre
+          >
+          <h3 id="mcpサーバー連携">MCPサーバー連携</h3>
+          <p>
+            CodeRabbitはMCPの<strong>クライアント</strong>として動作し、接続済みのMCPサーバー（社内Wiki、Figma、Issueトラッカーなど）からレビュー中に情報を取得します。使用状況はWalkthroughの「Additional
+            context
+            used」に明示されるため、何を参照したかが監査可能です。接続数の上限はプランによって異なり（Pro:5、Pro+:15、Enterprise:20）、<code>knowledge_base.mcp.usage</code>で<code
+              >auto</code
+            >
+            / <code>enabled</code> / <code>disabled</code>を切り替えられます。
+          </p>
+          <h3 id="multi-repo-analysis">Multi-Repo Analysis</h3>
+          <p>
+            バックエンドAPIとフロントエンド、あるいはマイクロサービス群のように、複数リポジトリにまたがる契約変更を検出したい場合に使います。
+          </p>
+          <pre class="yaml"><code class="language-yaml">knowledge_base:
+  linked_repositories:
+    - repository: "myorg/backend-api"
+      instructions: "REST APIエンドポイントとデータベースモデルを含む"</code></pre>
+          <p>
+            <strong>制約</strong
+            >：連携先リポジトリは、レビュー対象PRと同じGitプラットフォーム上になければなりません（アクセストークンがプラットフォームごとにスコープされるため）。また、変更が自己完結していて他リポジトリへの影響がない場合、クロスリポジトリの指摘が出ないのは正常な挙動であり、設定ミスではありません。
+          </p>
+          <hr />
+          <h2 id="13-ide拡張機能とcliツールでシフトレフトする">
+            13. IDE拡張機能とCLIツールでシフトレフトする
+          </h2>
+          <p>PRを開く前にレビューを受けられる2つの経路があります。</p>
+          <h3 id="ide拡張機能vs-code--cursor--windsurf">
+            IDE拡張機能（VS Code / Cursor / Windsurf）
+          </h3>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr class="header">
+                  <th>設定</th>
+                  <th>選択肢</th>
+                  <th>既定値</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="odd">
+                  <td>Agent Type</td>
+                  <td>
+                    Native / Claude Code / Codex CLI / Cline / Roo / Kilo Code / Augment Code /
+                    OpenCode / Clipboard 等
+                  </td>
+                  <td>Native</td>
+                </tr>
+                <tr class="even">
+                  <td>Auto Review Mode</td>
+                  <td>Disabled / Prompt / Auto</td>
+                  <td>Prompt</td>
+                </tr>
+                <tr class="odd">
+                  <td>Region</td>
+                  <td>us / eu</td>
+                  <td>us</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            「Fix with AI」機能を使う際、どのコーディングエージェントに修正案を渡すかをAgent
+            Typeで選べます。コミットのたびに毎回確認したくない場合はAuto Review
+            Modeを<code>Auto</code>に、逆に慎重に運用したい場合は<code>Prompt</code>のままにしておくのが妥当です。
+          </p>
+          <h3 id="cliツール">CLIツール</h3>
+          <pre class="bash"><code class="language-bash"># インストール
+curl -fsSL https://cli.coderabbit.ai/install.sh | sh
+
+# 認証
+cr auth login
+
+# レビュー実行（現在のGitリポジトリの差分を解析）
+cr
+
+# セットアップ診断
+cr doctor</code></pre>
+          <p>CLIには3つの出力モードがあります。</p>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr class="header">
+                  <th>モード</th>
+                  <th>用途</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="odd">
+                  <td><code>--plain</code>（既定）</td>
+                  <td>詳細な修正提案付きのテキスト出力。人間が読む用途</td>
+                </tr>
+                <tr class="even">
+                  <td><code>--agent</code></td>
+                  <td>エージェント連携向けの構造化JSON出力</td>
+                </tr>
+                <tr class="odd">
+                  <td><code>--interactive</code></td>
+                  <td>ターミナルUIでの対話的レビュー</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <h3 id="コーディングエージェントとの連携ループ">
+            コーディングエージェントとの連携ループ
+          </h3>
+          <p>
+            Claude
+            Codeにはネイティブプラグインがあり、<code>/coderabbit:review</code>でCLIレビューを起動できます。公式ドキュメントは、エージェントに渡すプロンプトの組み立て方として次のパターンを提示しています。
+          </p>
+          <ol type="1">
+            <li>
+              <code>cr --agent</code
+              >をバックグラウンドで実行させる（レビューは7〜30分以上かかることがあるため、待機中に他の作業を進める）
+            </li>
+            <li>完了したら「重大な指摘のみ修正し、些末な指摘（nits）は無視する」よう指示する</li>
+            <li>
+              修正後にもう一度<code>cr --agent</code
+              >を実行し、新しい問題を作り込んでいないか確認する
+            </li>
+            <li>
+              「2回までのループに制限し、2回目でCritical指摘がなければ完了とする」といった終了条件を明示し、無限ループを防ぐ
+            </li>
+          </ol>
+          <pre class="mermaid">
+sequenceDiagram
+    participant Dev as 開発者
+    participant Agent as コーディングエージェント
+    participant CLI as CodeRabbit CLI
+    Dev-&gt;&gt;Agent: 機能を実装してCodeRabbitでレビューして
+    Agent-&gt;&gt;Agent: 機能を実装する
+    Agent-&gt;&gt;CLI: "cr --agent"をバックグラウンドで実行
+    CLI--&gt;&gt;Agent: 構造化JSONで指摘一覧を返す
+    Agent-&gt;&gt;Agent: 重大な指摘のみを選別する
+    Agent-&gt;&gt;Agent: 指摘に基づき修正を実装する
+    Agent-&gt;&gt;CLI: "cr --agent"を再実行（2回目）
+    CLI--&gt;&gt;Agent: 残存する重大指摘がないことを確認
+    Agent--&gt;&gt;Dev: 完了報告と対応内容の要約</pre
+          >
+          <p>
+            この「バックグラウンド実行→評価→修正→再実行→終了条件」という一連の型は、CodeRabbitに限らずAIコーディングエージェント全般との協働で応用できる汎用パターンです。
+          </p>
+          <hr />
+          <h2 id="14-複数のaiレビューツールを組み合わせる考え方多層防御">
+            14. 複数のAIレビューツールを組み合わせる考え方（多層防御）
+          </h2>
+          <p>
+            AIコードレビューツールを1つだけ導入すれば十分、という前提は疑ってかかるべきです。Addy
+            Osmaniが2026年に公開した分析では、あるエンジニアがCodeRabbit・Sentry
+            Seer・Greptile・Cursor
+            BugBotの4つのAIレビューツールを、3週間半にわたり146件の実PRに並行適用した結果が紹介されています。
+          </p>
+          <ul>
+            <li>検出されたfindingsの総数は679件、重複を除いた指摘箇所は617箇所</li>
+            <li>そのうち<strong>93.4%は4ツール中ちょうど1つだけ</strong>が検出したもの</li>
+            <li>2ツールが同じ箇所を指摘したのはわずか6%</li>
+            <li>3ツール以上が同じ箇所を指摘したケースはほぼ皆無</li>
+          </ul>
+          <p>
+            Osmaniはこの結果を「単一ツールを信頼していた時代は構造的に終わった。各ツールは異なる視点で異なる問題を見ている」と評しています。
+          </p>
+          <h3 id="ベンチマーク数値の解釈には注意が必要">ベンチマーク数値の解釈には注意が必要</h3>
+          <p>
+            CodeRabbitの精度に関する数値は、出典によって大きく異なります。これは対象PRの母集団や評価基準が異なるためで、「どれか一つが間違っている」という単純な話ではありません。
+          </p>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr class="header">
+                  <th>出典</th>
+                  <th>数値</th>
+                  <th>備考</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="odd">
+                  <td>CodeRabbit自社ベンチマーク</td>
+                  <td>F1 51.5%（Copilotは44.5%）、再現率52.5%（Copilotは36.7%）</td>
+                  <td>自社の評価基準・ハーネスに基づく</td>
+                </tr>
+                <tr class="even">
+                  <td>独立系Martianベンチマーク（2026年1〜2月）</td>
+                  <td>CodeRabbitがF1トップ、精度約49%</td>
+                  <td>Addy Osmaniが引用する独立評価</td>
+                </tr>
+                <tr class="odd">
+                  <td>独立した309PRのベンチマーク</td>
+                  <td>CodeRabbit 44%、GitHub Copilot 54%、Greptile 82%</td>
+                  <td>評価基準・PR母集団がCodeRabbit自社ベンチマークと異なる</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            <strong>実務的な結論</strong
+            >：単一のベンチマーク数値だけを根拠に導入判断をせず、①自組織のPRで実際にパイロット運用してみる、②CodeRabbitのようなAIレビューを静的解析（Semgrep、CodeQLなど）・人間によるレビュー・テストと並ぶ「1つの層」として位置づける、という2点を徹底することが、公開されている複数の実務レポートに共通する助言です。
+          </p>
+          <hr />
+          <h2 id="15-実運用で直面する課題と対処法アンチパターン集">
+            15. 実運用で直面する課題と対処法（アンチパターン集）
+          </h2>
+          <h3 id="指摘のノイズ化">指摘のノイズ化</h3>
+          <p>
+            Hacker
+            Newsのスレッドでは「PRがノイズで読めなくなった」「シグナル対ノイズ比が低すぎて、何もせずにAIコメントをresolveするようになった」という報告が繰り返し見られます。GitHub上のOrchardCMSプロジェクトの実運用ディスカッションでも、「ドキュメント変更には有用だが、コード変更に対しては時々しか役立たず、大半はノイズ」「PR一覧上で"要対応コメントあり"に見えてしまい、人間のレビュー待ちと区別しづらくなる」という声が上がっています。
+          </p>
+          <p>対処の方向性：</p>
+          <ul>
+            <li>
+              <code>chill</code
+              >プロファイルを起点にし、<code>assertive</code>は本当に必要な場合のみ検討する
+            </li>
+            <li>
+              曖昧な不満（「コメントが多い」）で終わらせず、具体的に繰り返される誤検知パターンをPath
+              InstructionsやCustom Checksに落とし込む
+            </li>
+            <li>
+              常時自動レビューが合わないチームは、<code>auto_review.enabled: false</code>にして<code
+                >@coderabbitai review</code
+              >によるオンデマンド運用に切り替える
+            </li>
+          </ul>
+          <h3 id="料金モデルとスケール時のコスト">料金モデルとスケール時のコスト</h3>
+          <p>
+            2026年8月時点の公式プランは次の通りです（価格は変更される可能性があるため、最終確認は公式の料金ページで行ってください）。
+          </p>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr class="header">
+                  <th>プラン</th>
+                  <th>料金（年間契約/月額）</th>
+                  <th>主な内容</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="odd">
+                  <td>Free</td>
+                  <td>無料</td>
+                  <td>PR要約のみ。コードレビューはIDE拡張・CLI経由</td>
+                </tr>
+                <tr class="even">
+                  <td>Pro</td>
+                  <td>$24 / $30（1開発者あたり月額）</td>
+                  <td>PRレビュー、高いレート制限、Knowledge Base、Autofix</td>
+                </tr>
+                <tr class="odd">
+                  <td>Pro+</td>
+                  <td>$48 / $60（1開発者あたり月額）</td>
+                  <td>Pro全機能＋Coding Plan、ユニットテスト生成、マージコンフリクト解消</td>
+                </tr>
+                <tr class="even">
+                  <td>Enterprise</td>
+                  <td>個別見積もり</td>
+                  <td>セルフホスト、マルチ組織、SLA、監査ログ</td>
+                </tr>
+                <tr class="odd">
+                  <td>Open Source</td>
+                  <td>無料（Pro+相当の機能）</td>
+                  <td>公開リポジトリ限定</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            1開発者あたりの月額課金モデルは、開発者数が多いチームではコストが積み上がりやすく、複数の比較記事が「代替ツールを検討する主因」として言及しています。座席課金がボトルネックになる場合は、Usage-based
+            Add-on（従量課金）やCLIレビューのみの軽量運用への切り替えも選択肢に入れておくと交渉の幅が広がります。
+          </p>
+          <h3 id="静的解析ツールの重複">静的解析ツールの重複</h3>
+          <p>
+            CodeRabbit
+            Proには40以上のLinter・SASTツール連携が含まれますが、CIで既に同じLinterを実行しているチームも多いはずです。既存記事では、CIとの重複自体は「PR上に直接インラインコメントとして出るため、CIログをスクロールして探すより速い」というメリットがあるとされる一方、ESLintのように既にCIで厳格に運用しているツールは<code
+              >reviews.tools.eslint.enabled: false</code
+            >のように個別に無効化し、重複した指摘を減らす調整が有効です。
+          </p>
+          <h3 id="prサイズとレビュー精度">PRサイズとレビュー精度</h3>
+          <p>
+            PRが大きいほど、AIレビューの見落としと的外れな指摘の両方が増える傾向が指摘されています。小さいPRは人間にとってのレビュー容易性を高めるだけでなく、CodeRabbitの解析精度そのものにも直結します。「PRが小説のように長い場合は、まず分割する」という原則は、AIレビュー導入後も変わらない基本です。
+          </p>
+          <hr />
+          <h2 id="16-まとめベストプラクティス一覧表">16. まとめ：ベストプラクティス一覧表</h2>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr class="header">
+                  <th>領域</th>
+                  <th>ベストプラクティス</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="odd">
+                  <td>導入</td>
+                  <td>1リポジトリで観察→最小設定→パイロット→段階拡大→月次棚卸し、の順で進める</td>
+                </tr>
+                <tr class="even">
+                  <td>プロファイル</td>
+                  <td>
+                    まず<code>chill</code>起点。<code>assertive</code>は具体的な不満が解消しない場合のみ検討する
+                  </td>
+                </tr>
+                <tr class="odd">
+                  <td>設定の可視化</td>
+                  <td>
+                    変更のたびに<code>@coderabbitai configuration</code>で解決済み設定を確認する
+                  </td>
+                </tr>
+                <tr class="even">
+                  <td>パス制御</td>
+                  <td>
+                    除外はPath Filters、観点追加はPath Instructions、既存規約はCode
+                    Guidelines、機械判定はCustom Checksと役割を分ける
+                  </td>
+                </tr>
+                <tr class="odd">
+                  <td>Learnings</td>
+                  <td>
+                    「何を」ではなく「なぜ」を伝え、特定行への返信で伝える。四半期ごとに棚卸しする
+                  </td>
+                </tr>
+                <tr class="even">
+                  <td>Pre-Merge Checks</td>
+                  <td>
+                    新規チェックは<code>warning</code>から始め、チームの合意後に<code>error</code>へ引き上げる
+                  </td>
+                </tr>
+                <tr class="odd">
+                  <td>Finishing Touches</td>
+                  <td>
+                    Autofix・Docstring生成・ユニットテスト生成を個別コマンドでオンデマンド活用する
+                  </td>
+                </tr>
+                <tr class="even">
+                  <td>IDE/CLI</td>
+                  <td>
+                    PRを開く前に<code>cr</code>やIDE拡張でシフトレフトし、エージェントループには明確な終了条件を設ける
+                  </td>
+                </tr>
+                <tr class="odd">
+                  <td>複数ツール運用</td>
+                  <td>
+                    単一ツールの数値を過信せず、静的解析・人間レビュー・テストと並ぶ1層として位置づける
+                  </td>
+                </tr>
+                <tr class="even">
+                  <td>コスト管理</td>
+                  <td>座席課金の積み上がりを見越し、必要に応じて従量課金やCLI中心運用も検討する</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <hr />
+          <h2 id="17-参考文献">17. 参考文献</h2>
+          <div class="ref-grid">
+            <div class="ref-card">
+              <h4>公式ドキュメント（docs.coderabbit.ai）</h4>
+              <ul class="ref-list">
+                <li>
+                  <span class="ref-icon">↗</span
+                  ><span class="ref-text"
+                    ><span class="ref-label">CodeRabbitアーキテクチャ概要</span
+                    ><a
+                      href="https://docs.coderabbit.ai/overview/architecture"
+                      rel="noopener"
+                      target="_blank"
+                      >https://docs.coderabbit.ai/overview/architecture</a
+                    ></span
+                  >
+                </li>
+                <li>
+                  <span class="ref-icon">↗</span
+                  ><span class="ref-text"
+                    ><span class="ref-label">コードレビュー概要</span
+                    ><a
+                      href="https://docs.coderabbit.ai/guides/code-review-overview"
+                      rel="noopener"
+                      target="_blank"
+                      >https://docs.coderabbit.ai/guides/code-review-overview</a
+                    ></span
+                  >
+                </li>
+                <li>
+                  <span class="ref-icon">↗</span
+                  ><span class="ref-text"
+                    ><span class="ref-label">YAML設定ガイド</span
+                    ><a
+                      href="https://docs.coderabbit.ai/getting-started/yaml-configuration"
+                      rel="noopener"
+                      target="_blank"
+                      >https://docs.coderabbit.ai/getting-started/yaml-configuration</a
+                    ></span
+                  >
+                </li>
+                <li>
+                  <span class="ref-icon">↗</span
+                  ><span class="ref-text"
+                    ><span class="ref-label">設定の全体像と優先順位</span
+                    ><a
+                      href="https://docs.coderabbit.ai/guides/configuration-overview"
+                      rel="noopener"
+                      target="_blank"
+                      >https://docs.coderabbit.ai/guides/configuration-overview</a
+                    ></span
+                  >
+                </li>
+                <li>
+                  <span class="ref-icon">↗</span
+                  ><span class="ref-text"
+                    ><span class="ref-label">設定の継承</span
+                    ><a
+                      href="https://docs.coderabbit.ai/configuration/configuration-inheritance"
+                      rel="noopener"
+                      target="_blank"
+                      >https://docs.coderabbit.ai/configuration/configuration-inheritance</a
+                    ></span
+                  >
+                </li>
+                <li>
+                  <span class="ref-icon">↗</span
+                  ><span class="ref-text"
+                    ><span class="ref-label">パスベースのレビュー指示</span
+                    ><a
+                      href="https://docs.coderabbit.ai/configuration/path-instructions"
+                      rel="noopener"
+                      target="_blank"
+                      >https://docs.coderabbit.ai/configuration/path-instructions</a
+                    ></span
+                  >
+                </li>
+                <li>
+                  <span class="ref-icon">↗</span
+                  ><span class="ref-text"
+                    ><span class="ref-label">ast-grepによる構造的指示</span
+                    ><a
+                      href="https://docs.coderabbit.ai/configuration/ast-grep-instructions"
+                      rel="noopener"
+                      target="_blank"
+                      >https://docs.coderabbit.ai/configuration/ast-grep-instructions</a
+                    ></span
+                  >
+                </li>
+                <li>
+                  <span class="ref-icon">↗</span
+                  ><span class="ref-text"
+                    ><span class="ref-label">Code Guidelines</span
+                    ><a
+                      href="https://docs.coderabbit.ai/knowledge-base/code-guidelines"
+                      rel="noopener"
+                      target="_blank"
+                      >https://docs.coderabbit.ai/knowledge-base/code-guidelines</a
+                    ></span
+                  >
+                </li>
+                <li>
+                  <span class="ref-icon">↗</span
+                  ><span class="ref-text"
+                    ><span class="ref-label">Learnings</span
+                    ><a
+                      href="https://docs.coderabbit.ai/knowledge-base/learnings"
+                      rel="noopener"
+                      target="_blank"
+                      >https://docs.coderabbit.ai/knowledge-base/learnings</a
+                    ></span
+                  >
+                </li>
+                <li>
+                  <span class="ref-icon">↗</span
+                  ><span class="ref-text"
+                    ><span class="ref-label">MCPサーバー連携</span
+                    ><a
+                      href="https://docs.coderabbit.ai/knowledge-base/mcp-context"
+                      rel="noopener"
+                      target="_blank"
+                      >https://docs.coderabbit.ai/knowledge-base/mcp-context</a
+                    ></span
+                  >
+                </li>
+                <li>
+                  <span class="ref-icon">↗</span
+                  ><span class="ref-text"
+                    ><span class="ref-label">Multi-Repo Analysis</span
+                    ><a
+                      href="https://docs.coderabbit.ai/knowledge-base/multi-repo-analysis"
+                      rel="noopener"
+                      target="_blank"
+                      >https://docs.coderabbit.ai/knowledge-base/multi-repo-analysis</a
+                    ></span
+                  >
+                </li>
+                <li>
+                  <span class="ref-icon">↗</span
+                  ><span class="ref-text"
+                    ><span class="ref-label">自動レビュー制御</span
+                    ><a
+                      href="https://docs.coderabbit.ai/configuration/auto-review"
+                      rel="noopener"
+                      target="_blank"
+                      >https://docs.coderabbit.ai/configuration/auto-review</a
+                    ></span
+                  >
+                </li>
+                <li>
+                  <span class="ref-icon">↗</span
+                  ><span class="ref-text"
+                    ><span class="ref-label">Custom Checks</span
+                    ><a
+                      href="https://docs.coderabbit.ai/pr-reviews/custom-checks"
+                      rel="noopener"
+                      target="_blank"
+                      >https://docs.coderabbit.ai/pr-reviews/custom-checks</a
+                    ></span
+                  >
+                </li>
+                <li>
+                  <span class="ref-icon">↗</span
+                  ><span class="ref-text"
+                    ><span class="ref-label">Pre-Merge Checks</span
+                    ><a
+                      href="https://docs.coderabbit.ai/pr-reviews/pre-merge-checks"
+                      rel="noopener"
+                      target="_blank"
+                      >https://docs.coderabbit.ai/pr-reviews/pre-merge-checks</a
+                    ></span
+                  >
+                </li>
+                <li>
+                  <span class="ref-icon">↗</span
+                  ><span class="ref-text"
+                    ><span class="ref-label">PR Walkthroughs</span
+                    ><a
+                      href="https://docs.coderabbit.ai/pr-reviews/walkthroughs"
+                      rel="noopener"
+                      target="_blank"
+                      >https://docs.coderabbit.ai/pr-reviews/walkthroughs</a
+                    ></span
+                  >
+                </li>
+                <li>
+                  <span class="ref-icon">↗</span
+                  ><span class="ref-text"
+                    ><span class="ref-label">CodeRabbit Review（Change Stack）</span
+                    ><a
+                      href="https://docs.coderabbit.ai/pr-reviews/coderabbit-review"
+                      rel="noopener"
+                      target="_blank"
+                      >https://docs.coderabbit.ai/pr-reviews/coderabbit-review</a
+                    ></span
+                  >
+                </li>
+                <li>
+                  <span class="ref-icon">↗</span
+                  ><span class="ref-text"
+                    ><span class="ref-label">Slop Detection</span
+                    ><a
+                      href="https://docs.coderabbit.ai/pr-reviews/slop-detection"
+                      rel="noopener"
+                      target="_blank"
+                      >https://docs.coderabbit.ai/pr-reviews/slop-detection</a
+                    ></span
+                  >
+                </li>
+                <li>
+                  <span class="ref-icon">↗</span
+                  ><span class="ref-text"
+                    ><span class="ref-label">Finishing Touches概要</span
+                    ><a
+                      href="https://docs.coderabbit.ai/finishing-touches/index"
+                      rel="noopener"
+                      target="_blank"
+                      >https://docs.coderabbit.ai/finishing-touches/index</a
+                    ></span
+                  >
+                </li>
+                <li>
+                  <span class="ref-icon">↗</span
+                  ><span class="ref-text"
+                    ><span class="ref-label">レビューコマンド一覧</span
+                    ><a
+                      href="https://docs.coderabbit.ai/reference/review-commands"
+                      rel="noopener"
+                      target="_blank"
+                      >https://docs.coderabbit.ai/reference/review-commands</a
+                    ></span
+                  >
+                </li>
+                <li>
+                  <span class="ref-icon">↗</span
+                  ><span class="ref-text"
+                    ><span class="ref-label">設定リファレンス</span
+                    ><a
+                      href="https://docs.coderabbit.ai/reference/configuration"
+                      rel="noopener"
+                      target="_blank"
+                      >https://docs.coderabbit.ai/reference/configuration</a
+                    ></span
+                  >
+                </li>
+                <li>
+                  <span class="ref-icon">↗</span
+                  ><span class="ref-text"
+                    ><span class="ref-label">IDE/CLIレビュー概要</span
+                    ><a
+                      href="https://docs.coderabbit.ai/overview/ide-cli-review"
+                      rel="noopener"
+                      target="_blank"
+                      >https://docs.coderabbit.ai/overview/ide-cli-review</a
+                    ></span
+                  >
+                </li>
+                <li>
+                  <span class="ref-icon">↗</span
+                  ><span class="ref-text"
+                    ><span class="ref-label">CLIツール</span
+                    ><a href="https://docs.coderabbit.ai/cli/index" rel="noopener" target="_blank"
+                      >https://docs.coderabbit.ai/cli/index</a
+                    ></span
+                  >
+                </li>
+                <li>
+                  <span class="ref-icon">↗</span
+                  ><span class="ref-text"
+                    ><span class="ref-label">Claude Code連携</span
+                    ><a
+                      href="https://docs.coderabbit.ai/cli/claude-code-integration"
+                      rel="noopener"
+                      target="_blank"
+                      >https://docs.coderabbit.ai/cli/claude-code-integration</a
+                    ></span
+                  >
+                </li>
+                <li>
+                  <span class="ref-icon">↗</span
+                  ><span class="ref-text"
+                    ><span class="ref-label">VS Code拡張機能の設定</span
+                    ><a
+                      href="https://docs.coderabbit.ai/ide/vscode-config"
+                      rel="noopener"
+                      target="_blank"
+                      >https://docs.coderabbit.ai/ide/vscode-config</a
+                    ></span
+                  >
+                </li>
+                <li>
+                  <span class="ref-icon">↗</span
+                  ><span class="ref-text"
+                    ><span class="ref-label">CodeRabbit Plan概要</span
+                    ><a href="https://docs.coderabbit.ai/plan/index" rel="noopener" target="_blank"
+                      >https://docs.coderabbit.ai/plan/index</a
+                    ></span
+                  >
+                </li>
+                <li>
+                  <span class="ref-icon">↗</span
+                  ><span class="ref-text"
+                    ><span class="ref-label">プランと料金</span
+                    ><a
+                      href="https://docs.coderabbit.ai/management/plans"
+                      rel="noopener"
+                      target="_blank"
+                      >https://docs.coderabbit.ai/management/plans</a
+                    ></span
+                  >
+                </li>
+              </ul>
+            </div>
+            <div class="ref-card">
+              <h4>開発者コミュニティ・第三者による分析</h4>
+              <ul class="ref-list">
+                <li>
+                  <span class="ref-icon">↗</span
+                  ><span class="ref-text"
+                    ><span class="ref-label"
+                      >Addy Osmani, "Agentic Code Review"（O'Reilly Radarへの転載）</span
+                    ><a
+                      href="https://www.oreilly.com/radar/agentic-code-review/"
+                      rel="noopener"
+                      target="_blank"
+                      >https://www.oreilly.com/radar/agentic-code-review/</a
+                    ></span
+                  >
+                </li>
+                <li>
+                  <span class="ref-icon">↗</span
+                  ><span class="ref-text"
+                    ><span class="ref-label"
+                      >Addy Osmani, "Agentic Code Review"（著者本人のブログ）</span
+                    ><a
+                      href="https://addyosmani.com/blog/agentic-code-review/"
+                      rel="noopener"
+                      target="_blank"
+                      >https://addyosmani.com/blog/agentic-code-review/</a
+                    ></span
+                  >
+                </li>
+                <li>
+                  <span class="ref-icon">↗</span
+                  ><span class="ref-text"
+                    ><span class="ref-label"
+                      >Daniel Moka, "Code Review with AI: Best Practices"</span
+                    ><a
+                      href="https://craftbettersoftware.com/p/code-review-with-ai-best-practices"
+                      rel="noopener"
+                      target="_blank"
+                      >https://craftbettersoftware.com/p/code-review-with-ai-best-practices</a
+                    ></span
+                  >
+                </li>
+                <li>
+                  <span class="ref-icon">↗</span
+                  ><span class="ref-text"
+                    ><span class="ref-label"
+                      >OrchardCMSにおけるCodeRabbit運用の実コミュニティ議論</span
+                    ><a
+                      href="https://github.com/orgs/OrchardCMS/discussions/15935"
+                      rel="noopener"
+                      target="_blank"
+                      >https://github.com/orgs/OrchardCMS/discussions/15935</a
+                    ></span
+                  >
+                </li>
+                <li>
+                  <span class="ref-icon">↗</span
+                  ><span class="ref-text"
+                    ><span class="ref-label"
+                      >DeepSource, "7 Best AI Code Review Tools for 2026"</span
+                    ><a
+                      href="https://deepsource.com/resources/ai-code-review-tools"
+                      rel="noopener"
+                      target="_blank"
+                      >https://deepsource.com/resources/ai-code-review-tools</a
+                    ></span
+                  >
+                </li>
+                <li>
+                  <span class="ref-icon">↗</span
+                  ><span class="ref-text"
+                    ><span class="ref-label">Monterail Blog, AIコードレビューツールの実機比較</span
+                    ><a
+                      href="https://www.monterail.com/blog/ai-code-review-tools-compared-how-to-choose-best"
+                      rel="noopener"
+                      target="_blank"
+                      >https://www.monterail.com/blog/ai-code-review-tools-compared-how-to-choose-best</a
+                    ></span
+                  >
+                </li>
+                <li>
+                  <span class="ref-icon">↗</span
+                  ><span class="ref-text"
+                    ><span class="ref-label"
+                      >CodeRabbit公式ブログ, "State of AI vs Human Code Generation Report":</span
+                    ><a
+                      href="https://www.coderabbit.ai/blog/state-of-ai-vs-human-code-generation-report"
+                      rel="noopener"
+                      target="_blank"
+                      >https://www.coderabbit.ai/blog/state-of-ai-vs-human-code-generation-report</a
+                    ></span
+                  >
+                </li>
+                <li>
+                  <span class="ref-icon">↗</span
+                  ><span class="ref-text"
+                    ><span class="ref-label"
+                      >Surmado Blog, CodeRabbit代替ツールの比較（料金面の課題整理）</span
+                    ><a
+                      href="https://www.surmado.com/blog/best-coderabbit-alternatives-2026"
+                      rel="noopener"
+                      target="_blank"
+                      >https://www.surmado.com/blog/best-coderabbit-alternatives-2026</a
+                    ></span
+                  >
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <blockquote class="note-card">
+            <p>
+              注：料金・プラン内容・ベンチマーク数値は変更が早い領域です。導入判断の最終確認は必ず公式サイト（coderabbit.ai）および上記の一次情報源で行ってください。
+            </p>
+          </blockquote>
+        </article>
+
+        <footer class="page-footer">
+          情報源: docs.coderabbit.ai(2026年8月2日時点) / Addy Osmani, Daniel Moka
+          ほか各種一次情報。料金・仕様は変更される可能性があるため、最終確認は公式サイトで行ってください。
+        </footer>
+      </main>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.12.0/mermaid.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/languages/yaml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/languages/bash.min.js"></script>
+    <script>
+      // ---------- Sidebar toggle (mobile) ----------
+      (function () {
+        var btn = document.getElementById('sidebarToggle');
+        var sidebar = document.getElementById('sidebar');
+        if (btn && sidebar) {
+          function syncSidebarState() {
+            var isMobile = window.innerWidth <= 900;
+            var isOpen = sidebar.classList.contains('open');
+            if (isMobile && !isOpen) {
+              sidebar.setAttribute('aria-hidden', 'true');
+              sidebar.setAttribute('inert', '');
+            } else {
+              sidebar.removeAttribute('aria-hidden');
+              sidebar.removeAttribute('inert');
+            }
+          }
+
+          function closeSidebar() {
+            sidebar.classList.remove('open');
+            btn.setAttribute('aria-expanded', 'false');
+            syncSidebarState();
+          }
+
+          function openSidebar() {
+            sidebar.classList.add('open');
+            btn.setAttribute('aria-expanded', 'true');
+            syncSidebarState();
+          }
+
+          btn.addEventListener('click', function () {
+            var isOpen = sidebar.classList.contains('open');
+            if (isOpen) {
+              closeSidebar();
+            } else {
+              openSidebar();
+            }
+          });
+
+          window.addEventListener('resize', syncSidebarState);
+          syncSidebarState();
+
+          sidebar.querySelectorAll('.nav-link').forEach(function (link) {
+            link.addEventListener('click', function () {
+              closeSidebar();
+              var targetId = link.getAttribute('href');
+              if (targetId && targetId.startsWith('#')) {
+                var target = document.querySelector(targetId);
+                if (target) {
+                  if (!target.hasAttribute('tabindex')) {
+                    target.setAttribute('tabindex', '-1');
+                  }
+                  target.focus();
+                } else {
+                  btn.focus();
+                }
+              } else {
+                btn.focus();
+              }
+            });
+          });
+        }
+      })();
+
+      // ---------- highlight.js ----------
+      (function () {
+        if (typeof hljs === 'undefined') return;
+        try {
+          document.querySelectorAll('pre code').forEach(function (block) {
+            hljs.highlightElement(block);
+          });
+        } catch (e) {
+          console.error('highlight.js error', e);
+        }
+      })();
+
+      // ---------- Mermaid (isolated, guarded) ----------
+      (function () {
+        if (typeof mermaid === 'undefined') {
+          console.error('mermaid failed to load');
+          return;
+        }
+        function initMermaid() {
+          try {
+            mermaid.initialize({
+              startOnLoad: false,
+              theme: 'base',
+              securityLevel: 'loose',
+              themeVariables: {
+                fontFamily:
+                  'Inter, -apple-system, "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif',
+                fontSize: '16px',
+                background: '#0c1830',
+                primaryColor: '#132449',
+                primaryTextColor: '#dbe4ff',
+                primaryBorderColor: '#7c9eff',
+                lineColor: '#7c9eff',
+                secondaryColor: '#101f3d',
+                tertiaryColor: '#0c1830',
+                noteBkgColor: '#132449',
+                noteTextColor: '#dbe4ff',
+                noteBorderColor: '#7c9eff',
+                actorBkg: '#132449',
+                actorTextColor: '#dbe4ff',
+                actorBorder: '#7c9eff',
+                signalColor: '#dbe4ff',
+                signalTextColor: '#dbe4ff',
+              },
+              flowchart: { useMaxWidth: false, htmlLabels: true },
+              sequence: { useMaxWidth: false },
+            });
+            mermaid.run({ querySelector: 'pre.mermaid' }).catch(function (e) {
+              console.error('mermaid render error', e);
+            });
+          } catch (e) {
+            console.error('mermaid init error', e);
+          }
+        }
+        if (document.fonts && document.fonts.ready) {
+          document.fonts.ready.then(initMermaid);
+        } else {
+          initMermaid();
+        }
+      })();
+
+      // ---------- Scroll-spy (two observers) ----------
+      (function () {
+        var navLinks = Array.from(document.querySelectorAll('.nav-link'));
+        if (navLinks.length === 0) return;
+        var map = new Map();
+        navLinks.forEach(function (link) {
+          var id = link.getAttribute('data-id');
+          var el = document.getElementById(id);
+          if (el) map.set(el, link);
+        });
+        var targets = Array.from(map.keys());
+        if (targets.length === 0) return;
+
+        var activeObserver = new IntersectionObserver(
+          function (entries) {
+            entries.forEach(function (entry) {
+              var link = map.get(entry.target);
+              if (!link) return;
+              if (entry.isIntersecting) {
+                navLinks.forEach(function (l) {
+                  l.classList.remove('active');
+                });
+                link.classList.add('active');
+              }
+            });
+          },
+          { root: null, rootMargin: '-15% 0px -75% 0px', threshold: 0 },
+        );
+
+        targets.forEach(function (t) {
+          activeObserver.observe(t);
+        });
+      })();
+    </script>
+  </body>
+</html>

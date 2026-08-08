@@ -241,15 +241,15 @@ const entries: PageEntry[] = [
   },
   {
     slug: "/claude/skill",
-    title: "Skill",
+    title: "Claude Codeで始めるAI仕様駆動開発 ― Markdownファイル完全ガイド",
     group: "Providers",
     category: "Claude",
     provider: "claude",
     topics: ["skill"],
     summary:
-      "CLAUDE.md / spec.md / requirements.md / design.md / tasks.md / MEMORY.md / SKILL.md など、Claude Code の仕様駆動開発 (SDD) を支えるマークダウンファイル群の役割・構造・ベストプラクティスを公式根拠付きで解説。",
+      "CLAUDE.mdからrequirements.md、design.md、tasks.mdまで。各Markdownファイルの役割・構造・ベストプラクティスを、初学者でも迷わないようステップバイステップで解説します。",
     addedAt: "2026-04-18",
-    lastReviewed: "2026-07-01",
+    lastReviewed: "2026-08-06",
   },
   {
     slug: "/claude/skill-guide",
@@ -293,7 +293,7 @@ const entries: PageEntry[] = [
     topics: ["code-review", "review", "guide"],
     summary: "AI コードレビューツール CodeRabbit の導入・設定・運用を解説する実践ガイド。",
     addedAt: "2026-06-01",
-    lastReviewed: "2026-06-30",
+    lastReviewed: "2026-08-07",
   },
   {
     slug: "/code-review/copilot-code-review",
@@ -307,13 +307,13 @@ const entries: PageEntry[] = [
   },
   {
     slug: "/code-review/sonar-qube",
-    title: "SonarQube Guide",
+    title: "SonarQube 実践ガイド",
     group: "開発プロセス",
     topics: ["code-review", "review"],
     summary:
-      "SonarQube による静的解析とコード品質ゲートの実践ガイド。CI 連携とカバレッジ計測を解説。",
+      "Quality Gate設計からIssueトリアージ、CI/CD統合、そしてAC/DC時代のAIコーディングエージェント連携まで。SonarQube公式ドキュメントと業界動向をもとに解説。",
     addedAt: "2026-06-01",
-    lastReviewed: "2026-06-30",
+    lastReviewed: "2026-08-07",
   },
   {
     slug: "/code-review/tool-pricing",
@@ -443,13 +443,13 @@ const entries: PageEntry[] = [
   },
   {
     slug: "/git-worktree",
-    title: "Git Worktree",
+    title: "git worktreeで実現する並列開発ベストプラクティスガイド",
     group: "開発プロセス",
-    topics: ["worktree"],
+    topics: ["worktree", "git"],
     summary:
-      "Claude / Gemini / Codex / GitHub Copilot — 4プラットフォームのドキュメントをAIツールとWebSearchで並列更新するための完全ガイド。git worktreeのセットアップから日常ワークフロー・GitHub Actions統合まで。",
+      "AIコーディングエージェント時代に再注目される git worktree。内部構造からClaude Code / OpenAI Codex / Cursorとの統合、依存関係の分離、トラブルシューティングまでをステップバイステップで解説します。",
     addedAt: "2026-05-08",
-    lastReviewed: "2026-07-01",
+    lastReviewed: "2026-08-07",
   },
   {
     slug: "/sdd/ai-spec-driven-development-guide",
