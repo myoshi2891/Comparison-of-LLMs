@@ -40,8 +40,9 @@ describe("/code-review/sonar-qube", () => {
       expect(link.getAttribute("target")).toBe("_blank");
       const rel = link.getAttribute("rel");
       expect(rel).toBeTruthy();
-      expect(rel?.includes("noopener")).toBe(true);
-      expect(rel?.includes("noreferrer")).toBe(true);
+      const relTokens = rel?.trim().split(/\s+/) ?? [];
+      expect(relTokens).toContain("noopener");
+      expect(relTokens).toContain("noreferrer");
     }
   });
 
