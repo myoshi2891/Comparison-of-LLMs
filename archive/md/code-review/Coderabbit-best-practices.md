@@ -2,7 +2,7 @@
 
 対象読者は、CodeRabbitを既に導入済み、またはこれから本格導入しようとしている中級〜上級のソフトウェアエンジニア・QAエンジニアです。単なる機能紹介にとどまらず、実運用でつまずきやすいポイントとその回避策、そして「なぜその設定が推奨されるのか」という背景まで踏み込んで解説します。
 
-情報源は、CodeRabbit公式ドキュメント（docs.coderabbit.ai、2026年8月2日時点の内容）に加え、著名な開発者・組織による実務レポートを参照しています。特に、Google Chrome/Web Vitalsチームでの活動やエンジニアリング関連の著作で知られるAddy Osmaniが2026年に公開した「Agentic Code Review」（O'Reilly Radar / addyosmani.com）は、CodeRabbitを含む複数のAIレビューツールを実PRで並行比較した第一級の一次情報として繰り返し引用します。ベンチマーク数値やコミュニティの声はソースによって前提が異なるため、複数の視点を併記し、断定は避けています。
+情報源は、CodeRabbit公式ドキュメント（docs.coderabbit.ai、2026年8月8日時点の内容）に加え、著名な開発者・組織による実務レポートを参照しています。特に、Google Chrome/Web Vitalsチームでの活動やエンジニアリング関連の著作で知られるAddy Osmaniが2026年に公開した「Agentic Code Review」（O'Reilly Radar / addyosmani.com）は、CodeRabbitを含む複数のAIレビューツールを実PRで並行比較した第一級の一次情報として繰り返し引用します。ベンチマーク数値やコミュニティの声はソースによって前提が異なるため、複数の視点を併記し、断定は避けています。
 
 ## 目次
 
@@ -119,37 +119,38 @@ chat:
 
 複数の設定手段（YAMLファイル、中央リポジトリ、Web UIの設定）を併用すると、「どれが実際に効いているのか」が分からなくなりがちです。CodeRabbitは既定では設定源をマージせず、最も優先度の高い1つだけを採用します。
 
-### Enterprise / SaaS構成での優先順位
+### Cloud / SaaS構成での優先順位
 
-SaaS・Enterprise構成では以下の順序で設定が評価されます。
+本ガイドの通常構成はCodeRabbit Cloud / SaaSを対象とします。Workspace設定とWorkspace Global OverrideはEnterprise Workspace契約でのみ利用できます。通常の設定解決順序は以下のとおりです。
 
 ```mermaid
 flowchart TB
-    P0["優先度0 Workspace Global Override"] --> P1["優先度1 Organization Global Override"]
-    P1 --> P2["優先度2 リポジトリ内の .coderabbit.yaml"]
-    P2 --> P3["優先度3 中央リポジトリの coderabbit/.coderabbit.yaml"]
-    P3 --> P4["優先度4 リポジトリ設定 Web UI"]
-    P4 --> P5["優先度5 組織設定 Web UI"]
-    P5 --> P6["優先度6 Workspace UI"]
-    P6 --> P7["優先度7 スキーマ既定値"]
+    P1["優先度1 リポジトリ内の .coderabbit.yaml"] --> P2["優先度2 中央リポジトリの coderabbit/.coderabbit.yaml"]
+    P2 --> P3["優先度3 リポジトリ設定 Web UI"]
+    P3 --> P4["優先度4 組織設定 Web UI"]
+    P4 --> P5["優先度5 Workspace UI Enterpriseのみ"]
+    P5 --> P6["優先度6 スキーマ既定値"]
 ```
 
-### 自己ホスト構成での優先順位
+### Self-Hosted構成での優先順位
 
-自己ホスト（Self-Hosted）構成では、Enterprise/SaaSのWorkspace層の代わりにOrganization Global Overrideを最上位とし、以下の順序で評価されます。
+CodeRabbit Cloudに連携したSelf-Hosted Git provider組織では、`YAML_CONFIG`がSelf-Hosted限定の設定源として中央YAMLとUI設定の間に加わります。優先順位は次のとおりです。
 
-1. **Organization Global Override**（組織Admin専用）
-2. **リポジトリ内の `.coderabbit.yaml`**
-3. **中央リポジトリの `.coderabbit.yaml`**
+1. **リポジトリ内の `.coderabbit.yaml`**
+2. **中央リポジトリの `.coderabbit.yaml`**
+3. **環境変数 `YAML_CONFIG`**（Self-Hosted限定）
 4. **リポジトリ設定 Web UI**
 5. **組織設定 Web UI**
-6. **スキーマ既定値**
+6. **Workspace UI**（Enterpriseのみ）
+7. **スキーマ既定値**
+
+完全なSelf-Hosted deployment（Enterprise）の公開hierarchy表は、リポジトリYAML、中央YAML、`YAML_CONFIG`、スキーマ既定値の4層だけを掲載しています。上記のUI層はCodeRabbit Cloudに連携したSelf-Hosted Git provider組織に対する記述であり、air-gapped環境には適用しません。`YAML_CONFIG`がSelf-Hosted限定である根拠は、公式のConfiguration InheritanceページがEnvironment YAMLをSelf-Hosted deployment固有の設定源として明記しているためです。
 
 継承（inheritance）を使わない場合、たとえば組織設定と中央設定の両方でタイムアウト値を指定していても、リポジトリの`.coderabbit.yaml`がタイムアウトに一切触れていなければ、CodeRabbitは（組織設定でも中央設定でもなく）スキーマのデフォルト値を使います。「上位の設定を継承しつつ一部だけ上書きする」という直感的な挙動ではない点に注意してください。
 
 ### グローバルオーバーライド
 
-Workspace Global OverrideおよびOrganization Global Overrideは、管理者のみが編集できる最上位の設定層で、コンプライアンス上どうしても外せないポリシー（例：全リポジトリで`assertive`プロファイルを強制する、特定のpath_instructionsを必須にする）に使います。オブジェクトは再帰的にマージされ、配列は`path`などのキーで重複排除されながら結合され、スカラー値は単純に上書きされます。
+Workspace Global OverrideおよびOrganization Global Overrideは、通常の設定階層における固定の最上位ソースではなく、継承チェーンの解決後に適用される最終マージ層です。Organization AdminがOrganization Global Overrideを、Enterprise Workspaceの管理者がWorkspace Global Overrideを編集でき、両方が同じキーを設定した場合はWorkspace側が優先されます。コンプライアンス上どうしても外せないポリシー（例：全リポジトリで`assertive`プロファイルを強制する、特定のpath_instructionsを必須にする）に使います。オブジェクトは再帰的にマージされ、配列は`path`などのキーで重複排除されながら結合され、スカラー値は単純に上書きされます。
 
 ### 継承（Configuration Inheritance）の有効化
 

@@ -32,11 +32,11 @@ const DIAGRAM_1 = `flowchart TB
     Memory --> Output["レビューコメント・Walkthrough・提案の生成"]`;
 
 const DIAGRAM_2 = `flowchart TB
-    P0["優先度0 グローバルオーバーライド 組織Admin専用"] --> P1["優先度1 リポジトリ内の .coderabbit.yaml"]
-    P1 --> P2["優先度2 中央リポジトリの coderabbit/.coderabbit.yaml"]
+    P1["優先度1 リポジトリ内の .coderabbit.yaml"] --> P2["優先度2 中央リポジトリの coderabbit/.coderabbit.yaml"]
     P2 --> P3["優先度3 リポジトリ設定 Web UI"]
     P3 --> P4["優先度4 組織設定 Web UI"]
-    P4 --> P5["優先度5 スキーマのデフォルト値"]`;
+    P4 --> P5["優先度5 Workspace UI Enterpriseのみ"]
+    P5 --> P6["優先度6 スキーマのデフォルト値"]`;
 
 const DIAGRAM_3 = `flowchart LR
     Repo["リポジトリYAML inheritance:true"] --> Central["中央YAML inheritance:true"]
@@ -375,7 +375,7 @@ export default function Page() {
             対象読者は、CodeRabbitを既に導入済み、またはこれから本格導入しようとしている中級〜上級のソフトウェアエンジニア・QAエンジニアです。単なる機能紹介にとどまらず、実運用でつまずきやすいポイントとその回避策、そして「なぜその設定が推奨されるのか」という背景まで踏み込んで解説します。
           </p>
           <p>
-            情報源は、CodeRabbit公式ドキュメント（docs.coderabbit.ai、2026年8月2日時点の内容）に加え、著名な開発者・組織による実務レポートを参照しています。特に、Google
+            情報源は、CodeRabbit公式ドキュメント（docs.coderabbit.ai、2026年8月8日時点の内容）に加え、著名な開発者・組織による実務レポートを参照しています。特に、Google
             Chrome/Web Vitalsチームでの活動やエンジニアリング関連の著作で知られるAddy
             Osmaniが2026年に公開した「Agentic Code Review」（O&apos;Reilly Radar /
             addyosmani.com）は、CodeRabbitを含む複数のAIレビューツールを実PRで並行比較した第一級の一次情報として繰り返し引用します。ベンチマーク数値やコミュニティの声はソースによって前提が異なるため、複数の視点を併記し、断定は避けています。
@@ -692,6 +692,11 @@ export default function Page() {
             複数の設定手段（YAMLファイル、中央リポジトリ、Web
             UIの組織/リポジトリ設定）を併用すると、「どれが実際に効いているのか」が分からなくなりがちです。CodeRabbitは既定では設定源をマージせず、最も優先度の高い1つだけを採用します。
           </p>
+          <h3 id="cloud-saas構成での優先順位">Cloud / SaaS構成での優先順位</h3>
+          <p>
+            本ガイドの通常構成はCodeRabbit Cloud / SaaSを対象とします。Workspace設定とWorkspace
+            Global OverrideはEnterprise Workspace契約でのみ利用できます。
+          </p>
 
           <div className={styles.mermaidWrap}>
             <MermaidDiagram
@@ -702,6 +707,39 @@ export default function Page() {
             />
           </div>
 
+          <h3 id="self-hosted構成での優先順位">Self-Hosted構成での優先順位</h3>
+          <p>
+            CodeRabbit Cloudに連携したSelf-Hosted Git provider組織では、
+            <code>YAML_CONFIG</code>
+            がSelf-Hosted限定の設定源として中央YAMLとUI設定の間に加わります。
+          </p>
+          <ol>
+            <li>
+              リポジトリ内の <code>.coderabbit.yaml</code>
+            </li>
+            <li>
+              中央リポジトリの <code>.coderabbit.yaml</code>
+            </li>
+            <li>
+              環境変数 <code>YAML_CONFIG</code>（Self-Hosted限定）
+            </li>
+            <li>リポジトリ設定 Web UI</li>
+            <li>組織設定 Web UI</li>
+            <li>Workspace UI（Enterpriseのみ）</li>
+            <li>スキーマ既定値</li>
+          </ol>
+          <p>
+            完全なSelf-Hosted
+            deployment（Enterprise）の公開hierarchy表は、リポジトリYAML、中央YAML、
+            <code>YAML_CONFIG</code>
+            、スキーマ既定値の4層だけを掲載しています。上記のUI層はCodeRabbit
+            Cloudに連携したSelf-Hosted Git
+            provider組織に対する記述であり、air-gapped環境には適用しません。
+            <code>YAML_CONFIG</code>
+            がSelf-Hosted限定である根拠は、公式のConfiguration InheritanceページがEnvironment
+            YAMLをSelf-Hosted deployment固有の設定源として明記しているためです。
+          </p>
+
           <p>
             継承（inheritance）を使わない場合、たとえば組織設定と中央設定の両方でタイムアウト値を指定していても、リポジトリの
             <code>.coderabbit.yaml</code>
@@ -709,7 +747,10 @@ export default function Page() {
           </p>
           <h3 id="グローバルオーバーライド">グローバルオーバーライド</h3>
           <p>
-            組織Adminのみが編集できる最上位の設定層で、コンプライアンス上どうしても外せないポリシー（例：全リポジトリで
+            Workspace Global OverrideおよびOrganization Global
+            Overrideは、通常の設定階層における固定の最上位ソースではなく、継承チェーンの解決後に適用される最終マージ層です。Organization
+            AdminがOrganization Global Overrideを、Enterprise Workspaceの管理者がWorkspace Global
+            Overrideを編集でき、両方が同じキーを設定した場合はWorkspace側が優先されます。コンプライアンス上どうしても外せないポリシー（例：全リポジトリで
             <code>assertive</code>
             プロファイルを強制する、特定のpath_instructionsを必須にする）に使います。オブジェクトは再帰的にマージされ、配列は
             <code>path</code>
@@ -1573,7 +1614,7 @@ export default function Page() {
           </div>
 
           <p>
-            カスタムレシピは1組織あたり最大5件まで定義でき、「未使用importの整理」「型の厳格化」「CHANGELOGエントリの追加」のような繰り返し作業を名前付きのコマンドとして再利用できます。
+            カスタムレシピはPro+・Enterpriseプランにおいてリポジトリごとに最大20件まで定義でき、「未使用importの整理」「型の厳格化」「CHANGELOGエントリの追加」のような繰り返し作業を名前付きのコマンドとして再利用できます。
           </p>
           <p>
             <strong>注意</strong>：Autofixはマージコンフリクトがある状態では実行前に停止し、先に
@@ -2446,7 +2487,7 @@ export default function Page() {
         </article>
 
         <footer className={styles.pageFooter}>
-          情報源: docs.coderabbit.ai(2026年8月2日時点) / Addy Osmani, Daniel Moka
+          情報源: docs.coderabbit.ai(2026年8月8日時点) / Addy Osmani, Daniel Moka
           ほか各種一次情報。料金・仕様は変更される可能性があるため、最終確認は公式サイトで行ってください。
         </footer>
       </main>
