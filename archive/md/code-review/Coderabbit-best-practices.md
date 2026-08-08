@@ -117,22 +117,39 @@ chat:
 
 ## 4. 設定の優先順位を制御する：グローバルオーバーライド・中央設定・継承
 
-複数の設定手段（YAMLファイル、中央リポジトリ、Web UIの組織/リポジトリ設定）を併用すると、「どれが実際に効いているのか」が分からなくなりがちです。CodeRabbitは既定では設定源をマージせず、最も優先度の高い1つだけを採用します。
+複数の設定手段（YAMLファイル、中央リポジトリ、Web UIの設定）を併用すると、「どれが実際に効いているのか」が分からなくなりがちです。CodeRabbitは既定では設定源をマージせず、最も優先度の高い1つだけを採用します。
+
+### Enterprise / SaaS構成での優先順位
+
+SaaS・Enterprise構成では以下の順序で設定が評価されます。
 
 ```mermaid
 flowchart TB
-    P0["優先度0 グローバルオーバーライド 組織Admin専用"] --> P1["優先度1 リポジトリ内の .coderabbit.yaml"]
-    P1 --> P2["優先度2 中央リポジトリの coderabbit/.coderabbit.yaml"]
-    P2 --> P3["優先度3 リポジトリ設定 Web UI"]
-    P3 --> P4["優先度4 組織設定 Web UI"]
-    P4 --> P5["優先度5 スキーマのデフォルト値"]
+    P0["優先度0 Workspace Global Override"] --> P1["優先度1 Organization Global Override"]
+    P1 --> P2["優先度2 リポジトリ内の .coderabbit.yaml"]
+    P2 --> P3["優先度3 中央リポジトリの coderabbit/.coderabbit.yaml"]
+    P3 --> P4["優先度4 リポジトリ設定 Web UI"]
+    P4 --> P5["優先度5 組織設定 Web UI"]
+    P5 --> P6["優先度6 Workspace UI"]
+    P6 --> P7["優先度7 スキーマ既定値"]
 ```
+
+### 自己ホスト構成での優先順位
+
+自己ホスト（Self-Hosted）構成では、Enterprise/SaaSのWorkspace層の代わりにOrganization Global Overrideを最上位とし、以下の順序で評価されます。
+
+1. **Organization Global Override**（組織Admin専用）
+2. **リポジトリ内の `.coderabbit.yaml`**
+3. **中央リポジトリの `.coderabbit.yaml`**
+4. **リポジトリ設定 Web UI**
+5. **組織設定 Web UI**
+6. **スキーマ既定値**
 
 継承（inheritance）を使わない場合、たとえば組織設定と中央設定の両方でタイムアウト値を指定していても、リポジトリの`.coderabbit.yaml`がタイムアウトに一切触れていなければ、CodeRabbitは（組織設定でも中央設定でもなく）スキーマのデフォルト値を使います。「上位の設定を継承しつつ一部だけ上書きする」という直感的な挙動ではない点に注意してください。
 
 ### グローバルオーバーライド
 
-組織Adminのみが編集できる最上位の設定層で、コンプライアンス上どうしても外せないポリシー（例：全リポジトリで`assertive`プロファイルを強制する、特定のpath_instructionsを必須にする）に使います。オブジェクトは再帰的にマージされ、配列は`path`などのキーで重複排除されながら結合され、スカラー値は単純に上書きされます。
+Workspace Global OverrideおよびOrganization Global Overrideは、管理者のみが編集できる最上位の設定層で、コンプライアンス上どうしても外せないポリシー（例：全リポジトリで`assertive`プロファイルを強制する、特定のpath_instructionsを必須にする）に使います。オブジェクトは再帰的にマージされ、配列は`path`などのキーで重複排除されながら結合され、スカラー値は単純に上書きされます。
 
 ### 継承（Configuration Inheritance）の有効化
 
@@ -208,6 +225,8 @@ reviews:
 | `**/GEMINI.md` | Gemini CLI |
 | `**/.cursorrules`, `**/.cursor/rules/*` | Cursor |
 | `.github/copilot-instructions.md` | GitHub Copilot |
+| `.github/instructions/*.instructions.md` | CodeRabbit |
+| `.rules/` | CodeRabbit / エージェント規約 |
 | `**/.windsurfrules` | Windsurf |
 | `**/.clinerules/*` | Cline |
 
@@ -469,7 +488,7 @@ sequenceDiagram
     CR->>Repo: カスタムレシピを実行しコミットする
 ```
 
-カスタムレシピは1組織あたり最大5件まで定義でき、「未使用importの整理」「型の厳格化」「CHANGELOGエントリの追加」のような繰り返し作業を名前付きのコマンドとして再利用できます。
+カスタムレシピはPro+・Enterpriseプランにおいてリポジトリごとに最大20件まで定義でき、「未使用importの整理」「型の厳格化」「CHANGELOGエントリの追加」のような繰り返し作業を名前付きのコマンドとして再利用できます。
 
 **注意**：Autofixはマージコンフリクトがある状態では実行前に停止し、先に`@coderabbitai resolve merge conflict`を促す返信をします。マージコンフリクト解消機能自体は既定で有効ですが、無効化されている環境では先にこの設定を確認してください。
 
