@@ -132,6 +132,29 @@ describe("Claude skill TocObserver - scroll spy", () => {
     expect(links[1].classList.contains("toc-active")).toBe(false);
   });
 
+  it("keeps earlier intersecting sections active across partial observer callbacks", () => {
+    const { container } = renderToc();
+    const links = container.querySelectorAll("nav a");
+
+    io.emit([
+      {
+        target: container.querySelector("#s1") as Element,
+        isIntersecting: true,
+        boundingClientRect: { top: 20 } as DOMRectReadOnly,
+      },
+    ]);
+    io.emit([
+      {
+        target: container.querySelector("#s2") as Element,
+        isIntersecting: true,
+        boundingClientRect: { top: 120 } as DOMRectReadOnly,
+      },
+    ]);
+
+    expect(links[0].classList.contains("toc-active")).toBe(true);
+    expect(links[1].classList.contains("toc-active")).toBe(false);
+  });
+
   it("ignores callbacks with no intersecting entry", () => {
     const { container } = renderToc();
     const links = container.querySelectorAll("nav a");
