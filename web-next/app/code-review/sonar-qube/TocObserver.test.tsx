@@ -67,12 +67,16 @@ describe("SonarQube guide TocObserver", () => {
 
   test("initializes aria-expanded to false when the sidebar is closed", () => {
     renderToc();
-    expect(document.getElementById("sidebarToggle")?.getAttribute("aria-expanded")).toBe("false");
+    const toggle = document.getElementById("sidebarToggle");
+    expect(toggle?.getAttribute("aria-expanded")).toBe("false");
+    expect(toggle?.getAttribute("aria-label")).toBe("目次を開く");
   });
 
   test("initializes aria-expanded to true when the sidebar starts open", () => {
     renderToc("true");
-    expect(document.getElementById("sidebarToggle")?.getAttribute("aria-expanded")).toBe("true");
+    const toggle = document.getElementById("sidebarToggle");
+    expect(toggle?.getAttribute("aria-expanded")).toBe("true");
+    expect(toggle?.getAttribute("aria-label")).toBe("目次を閉じる");
   });
 
   test("toggles data-open and aria-expanded on the sidebar toggle", () => {
@@ -83,10 +87,12 @@ describe("SonarQube guide TocObserver", () => {
     fireEvent.click(toggle);
     expect(sidebar.dataset.open).toBe("true");
     expect(toggle.getAttribute("aria-expanded")).toBe("true");
+    expect(toggle.getAttribute("aria-label")).toBe("目次を閉じる");
 
     fireEvent.click(toggle);
     expect(sidebar.dataset.open).toBe("false");
     expect(toggle.getAttribute("aria-expanded")).toBe("false");
+    expect(toggle.getAttribute("aria-label")).toBe("目次を開く");
   });
 
   test("closes the sidebar when a nav link is clicked on mobile widths", () => {
@@ -96,7 +102,9 @@ describe("SonarQube guide TocObserver", () => {
 
     fireEvent.click(link);
     expect((document.getElementById("sidebar") as HTMLElement).dataset.open).toBe("false");
-    expect(document.getElementById("sidebarToggle")?.getAttribute("aria-expanded")).toBe("false");
+    const toggle = document.getElementById("sidebarToggle");
+    expect(toggle?.getAttribute("aria-expanded")).toBe("false");
+    expect(toggle?.getAttribute("aria-label")).toBe("目次を開く");
   });
 
   test("keeps the sidebar open when a nav link is clicked on desktop widths", () => {

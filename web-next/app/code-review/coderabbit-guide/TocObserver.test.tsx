@@ -45,7 +45,13 @@ describe("CodeRabbit guide TocObserver", () => {
   function renderToc(sidebarOpen?: string) {
     return render(
       <div>
-        <button type="button" id="sidebarToggle" aria-label="目次を開く" />
+        <button
+          type="button"
+          id="sidebarToggle"
+          aria-controls="sidebar"
+          aria-expanded="false"
+          aria-label="目次を開く"
+        />
         <aside id="sidebar" data-open={sidebarOpen}>
           <a className="nav-link" href="#s1">
             S1
@@ -81,10 +87,13 @@ describe("CodeRabbit guide TocObserver", () => {
     fireEvent.click(toggle);
     expect(sidebar.dataset.open).toBe("true");
     expect(toggle.getAttribute("aria-expanded")).toBe("true");
+    expect(toggle.getAttribute("aria-label")).toBe("目次を閉じる");
+    expect(toggle.getAttribute("aria-controls")).toBe("sidebar");
 
     fireEvent.click(toggle);
     expect(sidebar.dataset.open).toBe("false");
     expect(toggle.getAttribute("aria-expanded")).toBe("false");
+    expect(toggle.getAttribute("aria-label")).toBe("目次を開く");
   });
 
   test("closes the sidebar when a nav link is clicked on mobile widths", () => {
@@ -96,6 +105,7 @@ describe("CodeRabbit guide TocObserver", () => {
     fireEvent.click(link);
     expect((document.getElementById("sidebar") as HTMLElement).dataset.open).toBe("false");
     expect(toggle.getAttribute("aria-expanded")).toBe("false");
+    expect(toggle.getAttribute("aria-label")).toBe("目次を開く");
   });
 
   test("keeps the sidebar open when a nav link is clicked on desktop widths", () => {

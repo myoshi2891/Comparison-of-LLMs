@@ -57,6 +57,7 @@ describe("git-worktree TocObserver", () => {
     const toggle = document.getElementById("menuToggle") as HTMLElement;
     expect(toggle.getAttribute("aria-expanded")).toBe("false");
     expect(toggle.getAttribute("aria-controls")).toBe("gitWorktreeSidebar");
+    expect(toggle.getAttribute("aria-label")).toBe("目次を開く");
   });
 
   test("toggles the sidebarOpen class and aria-expanded", () => {
@@ -67,10 +68,12 @@ describe("git-worktree TocObserver", () => {
     fireEvent.click(toggle);
     expect(sidebar.classList.contains(styles.sidebarOpen)).toBe(true);
     expect(toggle.getAttribute("aria-expanded")).toBe("true");
+    expect(toggle.getAttribute("aria-label")).toBe("目次を閉じる");
 
     fireEvent.click(toggle);
     expect(sidebar.classList.contains(styles.sidebarOpen)).toBe(false);
     expect(toggle.getAttribute("aria-expanded")).toBe("false");
+    expect(toggle.getAttribute("aria-label")).toBe("目次を開く");
   });
 
   test("toggling without a sidebar element does not throw", () => {
