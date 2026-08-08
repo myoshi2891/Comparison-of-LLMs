@@ -22,7 +22,7 @@ describe("/git-worktree page", () => {
   it("15 個の主要セクション（h2 または section）が存在する", () => {
     const { container } = render(<Page />);
     const h2List = container.querySelectorAll("h2");
-    expect(h2List.length).toBeGreaterThanOrEqual(15);
+    expect(h2List.length).toBe(15);
   });
 
   it("外部リンクに target=_blank と rel=noopener noreferrer が付与されている", () => {
@@ -55,6 +55,10 @@ describe("/git-worktree page", () => {
     for (const block of codeBlocks) {
       const codeLines = block.querySelectorAll(`.${styles.codeLine}`);
       expect(codeLines.length).toBeGreaterThan(0);
+      const highlightedTokens = block.querySelectorAll(
+        `.${styles.ck}, .${styles.cs}, .${styles.cv}, .${styles.cc}, .${styles.cm}, .${styles.fn}`
+      );
+      expect(highlightedTokens.length).toBeGreaterThan(0);
     }
   });
 });

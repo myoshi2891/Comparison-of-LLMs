@@ -511,10 +511,14 @@
     transition: transform 0.2s ease;
     width: 82vw;
     max-width: 320px;
+    visibility: hidden;
+    pointer-events: none;
   }
   .sidebarOpen {
     transform: translateX(0);
     box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
+    visibility: visible;
+    pointer-events: auto;
   }
   .menuToggle {
     display: flex;

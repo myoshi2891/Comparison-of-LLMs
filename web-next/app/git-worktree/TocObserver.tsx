@@ -7,6 +7,17 @@ export default function TocObserver() {
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
+    const sidebar = document.getElementById("gitWorktreeSidebar");
+    if (sidebar) {
+      if (isOpen) {
+        sidebar.classList.add(styles.sidebarOpen);
+      } else {
+        sidebar.classList.remove(styles.sidebarOpen);
+      }
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
     const navLinks = Array.from(
       document.querySelectorAll<HTMLAnchorElement>(`.${styles.sidebarNav} a`)
     );
