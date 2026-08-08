@@ -55,17 +55,26 @@ export default function TocObserver({
         }
       }
     };
+    const intersectingSections = new Map<Element, IntersectionObserverEntry>();
 
     const observer = new IntersectionObserver(
       (entries) => {
-        let bestEntry: IntersectionObserverEntry | null = null;
         for (const entry of entries) {
           if (entry.isIntersecting) {
-            if (!bestEntry || entry.boundingClientRect.top < bestEntry.boundingClientRect.top) {
-              bestEntry = entry;
-            }
+            intersectingSections.set(entry.target, entry);
+          } else {
+            intersectingSections.delete(entry.target);
           }
         }
+        const bestEntry = Array.from(intersectingSections.values()).reduce<
+          IntersectionObserverEntry | undefined
+        >(
+          (topmost, entry) =>
+            !topmost || entry.boundingClientRect.top < topmost.boundingClientRect.top
+              ? entry
+              : topmost,
+          undefined
+        );
         if (bestEntry) {
           setActive(bestEntry.target.id);
         }
