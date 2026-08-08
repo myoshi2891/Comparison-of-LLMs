@@ -8,6 +8,11 @@ export default function TocObserver() {
     const toggleBtn = document.getElementById("sidebarToggle");
     const navLinks = Array.from(document.querySelectorAll<HTMLAnchorElement>("#sidebar nav a"));
 
+    if (sidebar && toggleBtn) {
+      const initialOpen = sidebar.dataset.open === "true";
+      toggleBtn.setAttribute("aria-expanded", initialOpen ? "true" : "false");
+    }
+
     const handleToggleClick = () => {
       if (sidebar) {
         const isOpen = sidebar.dataset.open === "true";

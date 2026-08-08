@@ -41,6 +41,7 @@ describe("/code-review/sonar-qube", () => {
       const rel = link.getAttribute("rel");
       expect(rel).toBeTruthy();
       expect(rel?.includes("noopener")).toBe(true);
+      expect(rel?.includes("noreferrer")).toBe(true);
     }
   });
 

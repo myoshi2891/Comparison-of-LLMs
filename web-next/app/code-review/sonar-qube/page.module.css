@@ -236,7 +236,6 @@
   font-family: var(--font-mono);
   font-size: 0.88em;
   overflow-wrap: break-word;
-  word-break: break-word;
 }
 
 /* ---------- Callouts ---------- */
@@ -295,7 +294,6 @@
   text-align: left !important;
   border-bottom: 1px solid var(--border-soft);
   overflow-wrap: break-word;
-  word-break: break-word;
 }
 
 .tableScroll th {
@@ -618,7 +616,6 @@
 
 .refRow span {
   overflow-wrap: break-word;
-  word-break: break-word;
   min-width: 0;
 }
 
