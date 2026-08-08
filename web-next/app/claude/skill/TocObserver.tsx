@@ -58,10 +58,16 @@ export default function TocObserver({
 
     const observer = new IntersectionObserver(
       (entries) => {
+        let bestEntry: IntersectionObserverEntry | null = null;
         for (const entry of entries) {
           if (entry.isIntersecting) {
-            setActive(entry.target.id);
+            if (!bestEntry || entry.boundingClientRect.top < bestEntry.boundingClientRect.top) {
+              bestEntry = entry;
+            }
           }
+        }
+        if (bestEntry) {
+          setActive(bestEntry.target.id);
         }
       },
       { rootMargin: "-15% 0px -70% 0px", threshold: 0 }

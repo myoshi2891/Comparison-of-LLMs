@@ -22,6 +22,7 @@ import { render } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { describe, expect, it, vi } from "vitest";
 import ClaudeSkillPage, { metadata as rawMetadata } from "@/app/claude/skill/page";
+import { installIntersectionObserverStub } from "@/tests/tocTestUtils";
 
 vi.mock("@/components/docs/MermaidDiagram", () => ({
   default: function DummyMermaidDiagram({ chart, id }: { chart: string; id?: string }) {
@@ -150,5 +151,33 @@ describe("/claude/skill - static source safety", () => {
     const source = readFileSync(join(__dirname, "page.tsx"), "utf8");
     const needle = ["danger", "ously", "Set", "Inner", "HTML"].join("");
     expect(source.includes(needle)).toBe(false);
+  });
+});
+
+describe("/claude/skill - TocObserver intersection handling", () => {
+  it("selects the closest intersecting entry (smallest boundingClientRect.top) for TOC active state", () => {
+    const io = installIntersectionObserverStub();
+
+    const { container } = render(<Page />);
+    const tocLinks = container.querySelectorAll("nav a[href^='#']");
+    expect(tocLinks.length).toBeGreaterThan(0);
+
+    io.emit([
+      {
+        isIntersecting: true,
+        target: { id: "s1" } as unknown as HTMLElement,
+        boundingClientRect: { top: 300 } as DOMRectReadOnly,
+      },
+      {
+        isIntersecting: true,
+        target: { id: "s0" } as unknown as HTMLElement,
+        boundingClientRect: { top: 100 } as DOMRectReadOnly,
+      },
+    ]);
+
+    const s0Link = container.querySelector('nav a[href="#s0"]');
+    const s1Link = container.querySelector('nav a[href="#s1"]');
+    expect(s0Link?.classList.contains("toc-active")).toBe(true);
+    expect(s1Link?.classList.contains("toc-active")).toBe(false);
   });
 });
