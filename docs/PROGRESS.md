@@ -11,7 +11,7 @@
 - **フェーズ**: 保守・機能改善・品質強化フェーズ
 - **ブランチ**: `dev`（本番 `main` への Next.js 移行マージ完了 🚀）
 - **動作検証**:
-  - `bun run build` ✅
+  - `bun run build` ⏭️（Antigravity環境ルール・ユーザー指定により省略。CI等で実施）
   - `bun run typecheck` ✅
   - `bun run lint` ⚠️（442 files checked。作業範囲外の既存ファイルに17 diagnostics）
 - **テストの実行状況**:
