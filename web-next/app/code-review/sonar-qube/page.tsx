@@ -176,6 +176,7 @@ export default function SonarQubeGuidePage() {
         className={styles.sidebarToggle}
         id="sidebarToggle"
         aria-label="メニューを開閉"
+        aria-expanded="false"
       >
         ☰
       </button>
