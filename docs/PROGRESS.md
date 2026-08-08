@@ -2,7 +2,7 @@
 
 > 本ファイルは Next.js 移行完了後の保守・改善フェーズにおける開発の進捗（特にテスト関連）および品質チェックのルールを記録する。
 >
-> - 最終更新日: **Updated 2026-08-07**
+> - 最終更新日: **Updated 2026-08-08**
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
 
@@ -11,14 +11,16 @@
 - **フェーズ**: 保守・機能改善・品質強化フェーズ
 - **ブランチ**: `dev`（本番 `main` への Next.js 移行マージ完了 🚀）
 - **動作検証**:
-  - `bun run build` ⏭️（依頼により未実行。Antigravity環境では実行禁止、CI または他環境では必須）
+  - `bun run build` ✅
   - `bun run typecheck` ✅
-  - `npm run lint` ⚠️（432 files checked。作業範囲外の既存未コミットファイルに12 diagnostics）
+  - `bun run lint` ⚠️（442 files checked。作業範囲外の既存ファイルに19 diagnostics）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: Vitest **153 files / 1370 tests すべて合格**（収集失敗なし）
+  - **フロントエンド (`web-next/`)**: Vitest **157 files / 1412 tests すべて合格**（収集失敗なし）
   - **バックエンド (`scraper/`)**: pytest 実行で **43 件すべて合格** (全 Green ✅)
 
 ## 最近の追加内容
+
+- **SonarQube PR カバレッジゲート対応（TocObserver 4件 + Checklist）**: PR #139 の Coverage on New Code が **60.8%** に低下していた原因は、`tests/setup.ts` のグローバル `IntersectionObserver` が no-op スタブで observer コールバック本体が一度も実行されないこと。既存の `tests/tocTestUtils.tsx` の `installIntersectionObserverStub()`（コールバックを捕捉し `emit()` で発火できる制御可能スタブ）を適用し、`/code-review/coderabbit-guide`・`/code-review/sonar-qube`・`/git-worktree` の `TocObserver.tsx` に新規テストを追加、`/claude/skill` の既存テストへスクロールスパイとバックトゥトップ可視性の分岐を追補、`/code-review/sonar-qube` の `Checklist.tsx` に状態遷移テストを追加。Sonar 算式（(covered lines + covered conditions)/(lines + conditions)）で 38.2% → 95.6%、44.0% → 96.0%、63.3% → 100%、86.9% → 93.8%、65.0% → 100%。実装コードは無変更。Vitest **157 files / 1412 tests**、typecheck、build は Green（lint は作業範囲外の既存19 diagnostics のみ）。
 
 - **git worktreeで実現する並列開発ベストプラクティスガイド（/git-worktree）の Pure JSX 完全置き換え移行とコードブロックハイライト最適化**: `Git-worktree-parallel-dev-guide.html` を `web-next/app/git-worktree/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。要約・省略なしで全15セクション（全15H2セクション, 全表, 全コードブロック, 5 Mermaid図, 11項目のチェックリスト, 参考文献カード群等）・TOCスクロール追従（`TocObserver.tsx`）・`page-registry.ts`（`lastReviewed` およびタイトル更新）を完了。さらに全コードブロックの `codeLine` 行構造化およびトークン構文ハイライト（`styles.ck`, `styles.cs`, `styles.cv`, `styles.cc`, `styles.cm`, `styles.fn`）を適用。既存の旧 `/git-worktree` コンテンツと完全入れ替え完了。原本 `Git-worktree-parallel-dev-guide.html` は `archive/Git-worktree-parallel-dev-guide.html` へ `git mv` 退避保存。契約テスト6件を更新し全クリア（Vitest **153 files / 1370 tests** 全 Green ✅）。
 
@@ -298,7 +300,7 @@ Next.js 移行完了後のリポジトリ `LLM-Studies` にて、テストカバ
 Next.js 移行完了後のリポジトリ `LLM-Studies` の保守・改善作業を再開してください。
 
 - リポジトリ: LLM-Studies (Next.js 移行プロジェクトは dev/main へ完全マージ済み)
-  - 現在のステータス: docs/PROGRESS.md を参照。Vitest は 152 files / 1357 tests passed、pytest は 43/43 passed
+  - 現在のステータス: docs/PROGRESS.md を参照。Vitest は 157 files / 1412 tests passed、pytest は 43/43 passed
 - リポジトリ規約: CLAUDE.md (編集上の絶対ルール。※Antigravity環境ではビルドは実行禁止)
 
 作業方針：
