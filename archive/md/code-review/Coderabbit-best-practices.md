@@ -225,9 +225,8 @@ reviews:
 | `**/CLAUDE.md` | Claude Code |
 | `**/GEMINI.md` | Gemini CLI |
 | `**/.cursorrules`, `**/.cursor/rules/*` | Cursor |
-| `.github/copilot-instructions.md` | GitHub Copilot |
-| `.github/instructions/*.instructions.md` | CodeRabbit |
-| `.rules/` | CodeRabbit / エージェント規約 |
+| `.github/copilot-instructions.md`, `.github/instructions/*.instructions.md` | GitHub Copilot |
+| `**/.rules/*` | CodeRabbit / エージェント規約 |
 | `**/.windsurfrules` | Windsurf |
 | `**/.clinerules/*` | Cline |
 
