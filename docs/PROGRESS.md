@@ -15,7 +15,7 @@
   - `bun run typecheck` ✅
   - `npm run lint` ⚠️（432 files checked。作業範囲外の既存未コミットファイルに12 diagnostics）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: Vitest **153 files / 1369 tests すべて合格**（収集失敗なし）
+  - **フロントエンド (`web-next/`)**: Vitest **153 files / 1370 tests すべて合格**（収集失敗なし）
   - **バックエンド (`scraper/`)**: pytest 実行で **43 件すべて合格** (全 Green ✅)
 
 ## 最近の追加内容
@@ -24,7 +24,7 @@
 
 - **SonarQubeコードレビュー実践ガイド（/code-review/sonar-qube）の Pure JSX 完全置き換え移行**: `Sonarqube-code-review-best-practices.html` を `web-next/app/code-review/sonar-qube/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。要約・省略なしで全16-H2セクション（全表, 全コードブロック, 9 Mermaid図, チェックリスト等）・TOCスクロール追従（`TocObserver.tsx`）・インタラクティブチェックリスト（`Checklist.tsx`）・`page-registry.ts`（`lastReviewed` 更新）を完了。既存の旧 `/code-review/sonar-qube` コンテンツと完全入れ替え完了。原本 `Sonarqube-code-review-best-practices.html` は `archive/Sonarqube-code-review-best-practices.html` へ `git mv` 退避保存。契約テスト7件を更新し全クリア（Vitest `app/code-review/sonar-qube/page.test.tsx` 全 Green ✅）。
 
-- **CodeRabbit 実践ガイド（/code-review/coderabbit-guide）の Pure JSX 完全置き換え移行**: `Coderabbit-best-practices.html` を `web-next/app/code-review/coderabbit-guide/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。要約・省略なしで全17-H2セクション（全17H2セクション, 全表, 全コードブロック, 10 Mermaid図, 32参考文献カード等）・TOCスクロール追従（`TocObserver.tsx`）・`page-registry.ts`（`lastReviewed` 更新）を完了。既存の旧 `/code-review/coderabbit-guide` コンテンツと完全入れ替え完了。原本 `Coderabbit-best-practices.html` および `.md` は `archive/html/code-review/` および `archive/md/code-review/` へ `git mv` 退避保存。契約テスト7件を更新し全クリア（Vitest **153 files / 1369 tests** 全 Green ✅）。
+- **CodeRabbit 実践ガイド（/code-review/coderabbit-guide）の Pure JSX 完全置き換え移行**: `Coderabbit-best-practices.html` を `web-next/app/code-review/coderabbit-guide/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。要約・省略なしで全17-H2セクション（全17H2セクション, 全表, 全コードブロック, 10 Mermaid図, 32参考文献カード等）・TOCスクロール追従（`TocObserver.tsx`）・`page-registry.ts`（`lastReviewed` 更新）を完了。既存の旧 `/code-review/coderabbit-guide` コンテンツと完全入れ替え完了。原本 `Coderabbit-best-practices.html` および `.md` は `archive/html/code-review/` および `archive/md/code-review/` へ `git mv` 退避保存。契約テスト7件を更新し全クリア（Vitest **153 files / 1370 tests** 全 Green ✅）。
 
 - **Claude Code AI仕様駆動開発ガイド（/claude/skill）の Pure JSX 完全置き換え移行**: `Claude-code-spec-driven-development-guide.html` を `web-next/app/claude/skill/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。要約・省略なしで全15セクション（s0〜s14）・全表・全コードブロック・5 Mermaid図 (`diagram-workflow`, `diagram-login-sequence`, `diagram-implementation`, `diagram-context-loading`, `diagram-data-flow`)・TOCスクロール追従（`TocObserver.tsx`）・外部リンク安全属性・`page-registry.ts`（`lastReviewed` 更新）を完了。既存の旧 `/claude/skill` コンテンツと完全入れ替え完了。原本 `Claude-code-spec-driven-development-guide.html` および `.md` は `archive/html/Anthropic/` および `archive/md/Anthropic/` へ `git mv` 退避保存。契約テスト9件を更新・通過し全クリア（Vitest **152 files / 1366 tests** 全 Green ✅）。
 
