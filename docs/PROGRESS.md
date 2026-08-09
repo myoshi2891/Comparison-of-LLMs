@@ -20,6 +20,8 @@
 
 ## 最近の追加内容
 
+- **Google サンドボックス技術 完全ガイド（/google/sandbox-best-practices）の Pure JSX 完全置き換え移行**: `Google-sandbox-best-practices.html` を `web-next/app/google/sandbox-best-practices/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。要約・省略なしで全10セクション（1.はじめに〜10.参考文献）・全表・全コードブロック・9 Mermaid図・TOCスクロール追従（`TocObserver.tsx`）・`TocObserver.test.tsx` の単体テスト・`page-registry.ts`（タイトルおよび `lastReviewed` 更新）を完了。既存の旧 `/google/sandbox-best-practices` コンテンツと完全入れ替え完了。原本 `Google-sandbox-best-practices.html` は `archive/html/google/Google-sandbox-best-practices.html` へ `git mv` 退避保存。契約テストおよび `TocObserver.test.tsx` の全クリアを達成。
+
 - **CodeRabbit Cloud/SaaS 設定優先順位図とグローバルオーバーライド仕様の更新**: CodeRabbit Cloud/SaaS における設定解決階層図 (`DIAGRAM_2` および `.md` / `.html` 原稿) を修正。通常階層（リポジトリ内 YAML 〜 スキーマ既定値）でベース設定を評価後、継承処理後の最終マージ層として Organization Global Override および Workspace Global Override (Enterpriseのみ) が最優先適用される二段階フローチャート構造へ刷新。リポジトリ側の設定で組織・ワークスペースの必須ポリシー（強制プロファイル・必須 path_instructions 等）を無効化できないことを明確化・更新。Vitest **157 files / 1414 tests** 全 Green、typecheck ✅。
 
 - **CodeRabbit公開仕様・TOCアクセシビリティ・スクロール追従テストの修正**: CodeRabbitの設定階層をCloud / SaaS、Cloud連携Self-Hosted Git provider組織、完全Self-Hosted deploymentに分け、Global Overrideを通常階層の固定最上位ではなく解決後の最終マージ層として明記。カスタムレシピ上限をPro+・Enterpriseのリポジトリごと最大20件へ同期した。`/claude/skill`は交差中sectionをcallback間で保持して最上部を選択し、CodeRabbit・SonarQube・git-worktreeのTOCトグルは`aria-expanded`と状態依存ラベルを同期。SonarQubeの外部リンクテストは`rel`を空白区切りtokenとして厳密検証する。Vitest **157 files / 1414 tests**、typecheck、変更対象11ファイルのBiome、Markdown lintはGreen。全体lintは作業範囲外の既存17 diagnosticsで失敗。ユーザー指定によりビルドと目視確認は省略。
