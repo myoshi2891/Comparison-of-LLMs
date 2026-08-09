@@ -435,10 +435,14 @@
     transition: transform 0.2s ease;
     width: 82vw;
     max-width: 320px;
+    visibility: hidden;
+    pointer-events: none;
   }
 
   .sidebar.open {
     transform: translateX(0);
+    visibility: visible;
+    pointer-events: auto;
   }
 
   .main {

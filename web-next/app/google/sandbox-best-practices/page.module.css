@@ -24,7 +24,7 @@
   --sidebar-w: 300px;
   --radius: 14px;
   --font-jp: var(--font-sans), 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif;
-  --font-mono: var(--font-mono), 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-mono: var(--font-code), 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
 
   display: block;
   position: relative;
@@ -279,7 +279,7 @@
   font-size: 0.78rem;
   font-weight: 700;
   letter-spacing: 0.02em;
-  font-family: var(--font-mono);
+  font-family: var(--font-code);
   flex-shrink: 0;
 }
 
@@ -352,7 +352,7 @@
   border-radius: 50%;
   background: var(--accent-glow);
   color: var(--accent);
-  font-family: var(--font-mono);
+  font-family: var(--font-code);
   font-weight: 700;
   font-size: 0.8rem;
   display: flex;
@@ -366,7 +366,7 @@
 }
 
 .main code {
-  font-family: var(--font-mono);
+  font-family: var(--font-code);
   background: var(--code-bg);
   border: 1px solid var(--border-soft);
   padding: 0.15em 0.4em;
@@ -445,7 +445,7 @@
   background: color-mix(in srgb, var(--domain) 18%, var(--bg-card));
   color: var(--domain);
   border: 1px solid color-mix(in srgb, var(--domain) 45%, var(--border-soft));
-  font-family: var(--font-mono);
+  font-family: var(--font-code);
   font-weight: 700;
   font-size: 0.74rem;
   flex-shrink: 0;
@@ -604,7 +604,7 @@
   background: var(--bg-elevated);
   border-bottom: 1px solid var(--border-soft);
   padding: 0.5rem 1rem;
-  font-family: var(--font-mono);
+  font-family: var(--font-code);
   font-size: 0.78rem;
   color: var(--text-dim);
   display: flex;
@@ -614,7 +614,7 @@
 
 .codeBody {
   padding: 1rem 1.2rem;
-  font-family: var(--font-mono);
+  font-family: var(--font-code);
   font-size: 0.88rem;
   line-height: 1.65;
   overflow-x: auto;
@@ -636,10 +636,14 @@
     height: 100vh;
     transform: translateX(-100%);
     box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
+    visibility: hidden;
+    pointer-events: none;
   }
 
   .sidebar[data-open="true"] {
     transform: translateX(0);
+    visibility: visible;
+    pointer-events: auto;
   }
 
   .main {
