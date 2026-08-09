@@ -419,7 +419,7 @@ const entries: PageEntry[] = [
     summary:
       "GitHub Copilot Coding Agent / VS Code Agent Mode / Copilot CLI 対応の SKILL.md ガイド。フロントマター完全仕様・Progressive Disclosure 3段階ローディング・ステップバイステップ作成・実践テンプレート集・トラブルシューティングを 2026年6月最新版の公式ドキュメント根拠付きで徹底解説。Copilot code review は AGENTS.md 対応（2026-06-18）、Cloud agent は GA。",
     addedAt: "2026-04-18",
-    lastReviewed: "2026-07-01",
+    lastReviewed: "2026-08-09",
   },
   {
     slug: "/cursor/complete-guide",
