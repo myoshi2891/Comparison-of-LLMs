@@ -17,7 +17,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "mermaid": "10.9.6",
+    "mermaid": "10.9.8",
     "next": "16.2.11",
     "react": "19.2.4",
     "react-dom": "19.2.4",
@@ -26,9 +26,10 @@
   "overrides": {
     "postcss": "^8.5.18",
     "uuid": "^11.1.1",
-    "dompurify": "^3.4.12",
+    "dompurify": "^3.4.13",
+    "nanoid": "^3.3.17",
     "vite": "^8.0.16",
-    "undici": "^7.28.0",
+    "undici": "^7.29.0",
     "sharp": "^0.35.3"
   },
   "devDependencies": {

@@ -17,15 +17,15 @@ describe("/code-review/coderabbit-guide", () => {
   it("h1 の見出しテキストが一致する", () => {
     const { container } = render(<Page />);
     const h1 = container.querySelector("h1");
-    expect(h1?.textContent?.trim().replace(/\s+/g, " ")).toBe(
-      "Ship Better Code, AI がレビューする時代の実践マスターガイド"
+    expect(h1?.textContent?.trim().replace(/\s+/g, "")).toBe(
+      "CodeRabbit実践ガイド中級者から上級者のためのベストプラクティス"
     );
   });
 
-  it("主要セクション h2 が 9 個ある", () => {
+  it("主要セクション h2 が 17 個ある", () => {
     const { container } = render(<Page />);
     const h2s = container.querySelectorAll("h2");
-    expect(h2s).toHaveLength(9);
+    expect(h2s).toHaveLength(17);
   });
 
   it("外部リンクはすべて target と rel が正しい", () => {
@@ -52,6 +52,13 @@ describe("/code-review/coderabbit-guide", () => {
     const { container } = render(<Page />);
     const codeBlocks = container.querySelectorAll("pre, code");
     expect(codeBlocks.length).toBeGreaterThan(0);
+  });
+
+  it("カスタムレシピのプラン別上限を表示する", () => {
+    const { container } = render(<Page />);
+    expect(container.textContent).toContain(
+      "Pro+・Enterpriseプランにおいてリポジトリごとに最大20件"
+    );
   });
 });
 

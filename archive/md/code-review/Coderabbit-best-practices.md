@@ -2,7 +2,7 @@
 
 対象読者は、CodeRabbitを既に導入済み、またはこれから本格導入しようとしている中級〜上級のソフトウェアエンジニア・QAエンジニアです。単なる機能紹介にとどまらず、実運用でつまずきやすいポイントとその回避策、そして「なぜその設定が推奨されるのか」という背景まで踏み込んで解説します。
 
-情報源は、CodeRabbit公式ドキュメント（docs.coderabbit.ai、2026年8月2日時点の内容）に加え、著名な開発者・組織による実務レポートを参照しています。特に、Google Chrome/Web Vitalsチームでの活動やエンジニアリング関連の著作で知られるAddy Osmaniが2026年に公開した「Agentic Code Review」（O'Reilly Radar / addyosmani.com）は、CodeRabbitを含む複数のAIレビューツールを実PRで並行比較した第一級の一次情報として繰り返し引用します。ベンチマーク数値やコミュニティの声はソースによって前提が異なるため、複数の視点を併記し、断定は避けています。
+情報源は、CodeRabbit公式ドキュメント（docs.coderabbit.ai、2026年8月8日時点の内容）に加え、著名な開発者・組織による実務レポートを参照しています。特に、Google Chrome/Web Vitalsチームでの活動やエンジニアリング関連の著作で知られるAddy Osmaniが2026年に公開した「Agentic Code Review」（O'Reilly Radar / addyosmani.com）は、CodeRabbitを含む複数のAIレビューツールを実PRで並行比較した第一級の一次情報として繰り返し引用します。ベンチマーク数値やコミュニティの声はソースによって前提が異なるため、複数の視点を併記し、断定は避けています。
 
 ## 目次
 
@@ -117,22 +117,54 @@ chat:
 
 ## 4. 設定の優先順位を制御する：グローバルオーバーライド・中央設定・継承
 
-複数の設定手段（YAMLファイル、中央リポジトリ、Web UIの組織/リポジトリ設定）を併用すると、「どれが実際に効いているのか」が分からなくなりがちです。CodeRabbitは既定では設定源をマージせず、最も優先度の高い1つだけを採用します。
+複数の設定手段（YAMLファイル、中央リポジトリ、Web UIの設定）を併用すると、「どれが実際に効いているのか」が分からなくなりがちです。CodeRabbitは既定では設定源をマージせず、最も優先度の高い1つだけを採用します。
+
+### Cloud / SaaS構成での優先順位（Self-Managed Git Provider連携を含む）
+
+本ガイドの通常構成はCodeRabbit Cloud / SaaSを対象とします。連携先がSaaS型Git providerであってもSelf-Managed (Self-Hosted) Git providerであっても、CodeRabbit Cloud環境では環境変数 `YAML_CONFIG`（Environment YAML）は適用されません。また、Workspace設定およびWorkspace Global OverrideはEnterprise Workspace契約でのみ利用できます。
+
+設定解決プロセスでは、まず通常階層（リポジトリ内YAML、中央リポジトリYAML、各種Web UI設定、スキーマ既定値）でベース設定が評価・決定されます。その後、**最終マージ層**として Organization Global Override および Workspace Global Override が適用されます。継承処理やリポジトリ設定の有無にかかわらず、両Global Overrideの値が最終的に優先して適用されるため、リポジトリ側の設定で組織・ワークスペースの必須ポリシーを無効化・回避することはできません。
 
 ```mermaid
 flowchart TB
-    P0["優先度0 グローバルオーバーライド 組織Admin専用"] --> P1["優先度1 リポジトリ内の .coderabbit.yaml"]
-    P1 --> P2["優先度2 中央リポジトリの coderabbit/.coderabbit.yaml"]
-    P2 --> P3["優先度3 リポジトリ設定 Web UI"]
-    P3 --> P4["優先度4 組織設定 Web UI"]
-    P4 --> P5["優先度5 スキーマのデフォルト値"]
+    subgraph Base["通常解決階層（ベース設定の決定・フォールバック）"]
+        direction TB
+        P2["優先度2 リポジトリ内の .coderabbit.yaml"] --> P3["優先度3 中央リポジトリの coderabbit/.coderabbit.yaml"]
+        P3 --> P4["優先度4 リポジトリ設定 Web UI"]
+        P4 --> P5["優先度5 組織設定 Web UI"]
+        P5 --> P6["優先度6 Workspace UI（Enterpriseのみ）"]
+        P6 --> P7["優先度7 スキーマ既定値"]
+    end
+
+    subgraph Overrides["最終マージ層（最優先・強制ポリシースコープ）"]
+        direction TB
+        OrgGO["Organization Global Override"]
+        WsGO["Workspace Global Override（Enterpriseのみ・最優先）"]
+    end
+
+    Base -->|ベース設定解決| OrgGO
+    OrgGO --> WsGO
+    WsGO --> Final["最終評価設定（必須ポリシー上書き確定）"]
 ```
+
+### Self-Hosted Deployment（CodeRabbit自体のセルフホスト）での優先順位
+
+CodeRabbit自体を自社環境にデプロイするSelf-Hosted Deployment（Enterprise）においてのみ、環境変数 `YAML_CONFIG`（Environment YAML）がSelf-Hosted限定の設定源として評価されます。CodeRabbit CloudにSelf-Managed Git providerを接続した構成では `YAML_CONFIG` は利用できません。
+
+Self-Hosted deployment（Enterprise）における評価順序は以下のとおりです。
+
+1. **リポジトリ内の `.coderabbit.yaml`**
+2. **中央リポジトリの `.coderabbit.yaml`**
+3. **環境変数 `YAML_CONFIG`**（Self-Hosted Deployment限定）
+4. **スキーマ既定値**
+
+`YAML_CONFIG` がSelf-Hosted Deployment限定である根拠は、公式のConfiguration InheritanceドキュメントにおいてEnvironment YAMLがSelf-Hosted deployment固有の設定源として明記されているためです。
 
 継承（inheritance）を使わない場合、たとえば組織設定と中央設定の両方でタイムアウト値を指定していても、リポジトリの`.coderabbit.yaml`がタイムアウトに一切触れていなければ、CodeRabbitは（組織設定でも中央設定でもなく）スキーマのデフォルト値を使います。「上位の設定を継承しつつ一部だけ上書きする」という直感的な挙動ではない点に注意してください。
 
 ### グローバルオーバーライド
 
-組織Adminのみが編集できる最上位の設定層で、コンプライアンス上どうしても外せないポリシー（例：全リポジトリで`assertive`プロファイルを強制する、特定のpath_instructionsを必須にする）に使います。オブジェクトは再帰的にマージされ、配列は`path`などのキーで重複排除されながら結合され、スカラー値は単純に上書きされます。
+Workspace Global OverrideおよびOrganization Global Overrideは、通常の設定階層における固定の最上位ソースではなく、継承チェーンの解決後に適用される最終マージ層です。Organization AdminがOrganization Global Overrideを、Enterprise Workspaceの管理者がWorkspace Global Overrideを編集でき、両方が同じキーを設定した場合はWorkspace側が優先されます。コンプライアンス上どうしても外せないポリシー（例：全リポジトリで`assertive`プロファイルを強制する、特定のpath_instructionsを必須にする）に使います。オブジェクトは再帰的にマージされ、配列は`path`などのキーで重複排除されながら結合され、スカラー値は単純に上書きされます。継承解決後に最終適用されるため、個別のリポジトリ設定や`.coderabbit.yaml`でこれらの必須ポリシーを無効化・解除することはできません。
 
 ### 継承（Configuration Inheritance）の有効化
 
@@ -207,7 +239,8 @@ reviews:
 | `**/CLAUDE.md` | Claude Code |
 | `**/GEMINI.md` | Gemini CLI |
 | `**/.cursorrules`, `**/.cursor/rules/*` | Cursor |
-| `.github/copilot-instructions.md` | GitHub Copilot |
+| `.github/copilot-instructions.md`, `.github/instructions/*.instructions.md` | GitHub Copilot |
+| `**/.rules/*` | CodeRabbit / エージェント規約 |
 | `**/.windsurfrules` | Windsurf |
 | `**/.clinerules/*` | Cline |
 
@@ -469,7 +502,7 @@ sequenceDiagram
     CR->>Repo: カスタムレシピを実行しコミットする
 ```
 
-カスタムレシピは1組織あたり最大5件まで定義でき、「未使用importの整理」「型の厳格化」「CHANGELOGエントリの追加」のような繰り返し作業を名前付きのコマンドとして再利用できます。
+カスタムレシピはPro+・Enterpriseプランにおいてリポジトリごとに最大20件まで定義でき、「未使用importの整理」「型の厳格化」「CHANGELOGエントリの追加」のような繰り返し作業を名前付きのコマンドとして再利用できます。
 
 **注意**：Autofixはマージコンフリクトがある状態では実行前に停止し、先に`@coderabbitai resolve merge conflict`を促す返信をします。マージコンフリクト解消機能自体は既定で有効ですが、無効化されている環境では先にこの設定を確認してください。
 
