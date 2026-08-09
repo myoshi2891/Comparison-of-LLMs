@@ -23,8 +23,8 @@
   --code-bg: #0a1526;
   --sidebar-w: 300px;
   --radius: 14px;
-  --font-jp: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif;
-  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-jp: var(--font-sans), 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif;
+  --font-mono: var(--font-mono), 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
 
   display: block;
   position: relative;
@@ -201,6 +201,21 @@
   padding: 3.5rem 4vw 6rem;
   position: relative;
   min-width: 0;
+}
+
+.main a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.main a:hover {
+  text-decoration: underline;
+}
+
+.main hr {
+  border: none;
+  border-top: 1px solid var(--border-soft);
+  margin: 2.5rem 0;
 }
 
 .main h1 {
