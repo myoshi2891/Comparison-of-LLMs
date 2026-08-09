@@ -84,5 +84,32 @@ describe("/google/sandbox-best-practices - TocObserver", () => {
 
     expect(links[0].classList.contains("active")).toBe(true);
     expect(links[1].classList.contains("active")).toBe(false);
+
+    io.emit([
+      {
+        target: container.querySelector("#section-1") as Element,
+        isIntersecting: true,
+        boundingClientRect: { top: 40 } as DOMRectReadOnly,
+      },
+      {
+        target: container.querySelector("#section-2") as Element,
+        isIntersecting: true,
+        boundingClientRect: { top: 10 } as DOMRectReadOnly,
+      },
+    ]);
+
+    expect(links[0].classList.contains("active")).toBe(false);
+    expect(links[1].classList.contains("active")).toBe(true);
+
+    io.emit([
+      {
+        target: container.querySelector("#section-2") as Element,
+        isIntersecting: false,
+        boundingClientRect: { top: 10 } as DOMRectReadOnly,
+      },
+    ]);
+
+    expect(links[0].classList.contains("active")).toBe(true);
+    expect(links[1].classList.contains("active")).toBe(false);
   });
 });

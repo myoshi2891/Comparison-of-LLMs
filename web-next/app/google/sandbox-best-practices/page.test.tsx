@@ -37,7 +37,9 @@ describe("/google/sandbox-best-practices - metadata", () => {
       typeof metadata.title === "string"
         ? metadata.title
         : (metadata.title as { default?: string } | undefined)?.default;
-    expect(title).toBe("Google サンドボックス技術 完全ガイド ― AIエージェント・API・コンテナ・C/C++・ブラウザ");
+    expect(title).toBe(
+      "Google サンドボックス技術 完全ガイド ― AIエージェント・API・コンテナ・C/C++・ブラウザ"
+    );
   });
 
   it("exports a metadata object with description", () => {
@@ -57,7 +59,7 @@ describe("/google/sandbox-best-practices - page structure", () => {
   it("renders all expected section ids", () => {
     const { container } = render(<Page />);
     for (const id of EXPECTED_SECTION_IDS) {
-      const el = container.querySelector(`#${id}`);
+      const el = container.querySelector(`[id="${id}"]`);
       expect(el, `section id="${id}" must exist`).not.toBeNull();
     }
   });
@@ -66,6 +68,11 @@ describe("/google/sandbox-best-practices - page structure", () => {
     const { container } = render(<Page />);
     const h2 = container.querySelector("[id*='1-はじめになぜサンドボックスが必要なのか']");
     expect(h2).not.toBeNull();
+  });
+
+  it("renders 10 table-of-contents links", () => {
+    const { container } = render(<Page />);
+    expect(container.querySelectorAll('#sidebar a[href^="#"]')).toHaveLength(10);
   });
 });
 
@@ -83,6 +90,14 @@ describe("/google/sandbox-best-practices - external link safety", () => {
       expect(rel).toMatch(/noopener/);
       expect(rel).toMatch(/noreferrer/);
     }
+  });
+
+  it("renders 38 external reference links", () => {
+    const { container } = render(<Page />);
+    const referencesHeading = container.querySelector('[id="10-参考文献出典url"]');
+    const referencesGrid = referencesHeading?.nextElementSibling?.nextElementSibling;
+
+    expect(referencesGrid?.querySelectorAll('a[href^="http"]')).toHaveLength(38);
   });
 });
 

@@ -88,6 +88,15 @@ describe("/copilot/skill - external link safety", () => {
       expect(rel).toMatch(/noreferrer/);
     }
   });
+
+  it("renders at least 23 external links in the sources section", () => {
+    const { container } = render(<Page />);
+    const sourcesHeading = container.querySelector('[id="参考文献出典"]');
+    const sourcesGrid = sourcesHeading?.nextElementSibling?.nextElementSibling;
+    const sourceLinks = sourcesGrid?.querySelectorAll('a[href^="http"]');
+
+    expect(sourceLinks?.length).toBeGreaterThanOrEqual(23);
+  });
 });
 
 describe("/copilot/skill - static source safety", () => {
@@ -97,4 +106,3 @@ describe("/copilot/skill - static source safety", () => {
     expect(source.includes(needle)).toBe(false);
   });
 });
-
