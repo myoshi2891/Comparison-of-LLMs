@@ -119,9 +119,9 @@ chat:
 
 複数の設定手段（YAMLファイル、中央リポジトリ、Web UIの設定）を併用すると、「どれが実際に効いているのか」が分からなくなりがちです。CodeRabbitは既定では設定源をマージせず、最も優先度の高い1つだけを採用します。
 
-### Cloud / SaaS構成での優先順位
+### Cloud / SaaS構成での優先順位（Self-Managed Git Provider連携を含む）
 
-本ガイドの通常構成はCodeRabbit Cloud / SaaSを対象とします。Workspace設定とWorkspace Global OverrideはEnterprise Workspace契約でのみ利用できます。通常の設定解決順序は以下のとおりです。
+本ガイドの通常構成はCodeRabbit Cloud / SaaSを対象とします。連携先がSaaS型Git providerであってもSelf-Managed (Self-Hosted) Git providerであっても、CodeRabbit Cloud環境では環境変数 `YAML_CONFIG`（Environment YAML）は適用されません。Workspace設定とWorkspace Global OverrideはEnterprise Workspace契約でのみ利用できます。通常の設定解決順序は以下のとおりです。
 
 ```mermaid
 flowchart TB
@@ -132,19 +132,18 @@ flowchart TB
     P5 --> P6["優先度6 スキーマ既定値"]
 ```
 
-### Self-Hosted構成での優先順位
+### Self-Hosted Deployment（CodeRabbit自体のセルフホスト）での優先順位
 
-CodeRabbit Cloudに連携したSelf-Hosted Git provider組織では、`YAML_CONFIG`がSelf-Hosted限定の設定源として中央YAMLとUI設定の間に加わります。優先順位は次のとおりです。
+CodeRabbit自体を自社環境にデプロイするSelf-Hosted Deployment（Enterprise）においてのみ、環境変数 `YAML_CONFIG`（Environment YAML）がSelf-Hosted限定の設定源として評価されます。CodeRabbit CloudにSelf-Managed Git providerを接続した構成では `YAML_CONFIG` は利用できません。
+
+Self-Hosted deployment（Enterprise）における評価順序は以下のとおりです。
 
 1. **リポジトリ内の `.coderabbit.yaml`**
 2. **中央リポジトリの `.coderabbit.yaml`**
-3. **環境変数 `YAML_CONFIG`**（Self-Hosted限定）
-4. **リポジトリ設定 Web UI**
-5. **組織設定 Web UI**
-6. **Workspace UI**（Enterpriseのみ）
-7. **スキーマ既定値**
+3. **環境変数 `YAML_CONFIG`**（Self-Hosted Deployment限定）
+4. **スキーマ既定値**
 
-完全なSelf-Hosted deployment（Enterprise）の公開hierarchy表は、リポジトリYAML、中央YAML、`YAML_CONFIG`、スキーマ既定値の4層だけを掲載しています。上記のUI層はCodeRabbit Cloudに連携したSelf-Hosted Git provider組織に対する記述であり、air-gapped環境には適用しません。`YAML_CONFIG`がSelf-Hosted限定である根拠は、公式のConfiguration InheritanceページがEnvironment YAMLをSelf-Hosted deployment固有の設定源として明記しているためです。
+`YAML_CONFIG` がSelf-Hosted Deployment限定である根拠は、公式のConfiguration InheritanceドキュメントにおいてEnvironment YAMLがSelf-Hosted deployment固有の設定源として明記されているためです。
 
 継承（inheritance）を使わない場合、たとえば組織設定と中央設定の両方でタイムアウト値を指定していても、リポジトリの`.coderabbit.yaml`がタイムアウトに一切触れていなければ、CodeRabbitは（組織設定でも中央設定でもなく）スキーマのデフォルト値を使います。「上位の設定を継承しつつ一部だけ上書きする」という直感的な挙動ではない点に注意してください。
 
