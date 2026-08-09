@@ -121,15 +121,30 @@ chat:
 
 ### Cloud / SaaS構成での優先順位（Self-Managed Git Provider連携を含む）
 
-本ガイドの通常構成はCodeRabbit Cloud / SaaSを対象とします。連携先がSaaS型Git providerであってもSelf-Managed (Self-Hosted) Git providerであっても、CodeRabbit Cloud環境では環境変数 `YAML_CONFIG`（Environment YAML）は適用されません。Workspace設定とWorkspace Global OverrideはEnterprise Workspace契約でのみ利用できます。通常の設定解決順序は以下のとおりです。
+本ガイドの通常構成はCodeRabbit Cloud / SaaSを対象とします。連携先がSaaS型Git providerであってもSelf-Managed (Self-Hosted) Git providerであっても、CodeRabbit Cloud環境では環境変数 `YAML_CONFIG`（Environment YAML）は適用されません。また、Workspace設定およびWorkspace Global OverrideはEnterprise Workspace契約でのみ利用できます。
+
+設定解決プロセスでは、まず通常階層（リポジトリ内YAML、中央リポジトリYAML、各種Web UI設定、スキーマ既定値）でベース設定が評価・決定されます。その後、**最終マージ層**として Organization Global Override および Workspace Global Override が適用されます。継承処理やリポジトリ設定の有無にかかわらず、両Global Overrideの値が最終的に優先して適用されるため、リポジトリ側の設定で組織・ワークスペースの必須ポリシーを無効化・回避することはできません。
 
 ```mermaid
 flowchart TB
-    P1["優先度1 リポジトリ内の .coderabbit.yaml"] --> P2["優先度2 中央リポジトリの coderabbit/.coderabbit.yaml"]
-    P2 --> P3["優先度3 リポジトリ設定 Web UI"]
-    P3 --> P4["優先度4 組織設定 Web UI"]
-    P4 --> P5["優先度5 Workspace UI Enterpriseのみ"]
-    P5 --> P6["優先度6 スキーマ既定値"]
+    subgraph Base["通常解決階層（ベース設定の決定・フォールバック）"]
+        direction TB
+        P1["優先度1 リポジトリ内の .coderabbit.yaml"] --> P2["優先度2 中央リポジトリの coderabbit/.coderabbit.yaml"]
+        P2 --> P3["優先度3 リポジトリ設定 Web UI"]
+        P3 --> P4["優先度4 組織設定 Web UI"]
+        P4 --> P5["優先度5 Workspace UI（Enterpriseのみ）"]
+        P5 --> P6["優先度6 スキーマ既定値"]
+    end
+
+    subgraph Overrides["最終マージ層（最優先・強制ポリシースコープ）"]
+        direction TB
+        OrgGO["Organization Global Override"]
+        WsGO["Workspace Global Override（Enterpriseのみ・最優先）"]
+    end
+
+    Base -->|ベース設定解決| OrgGO
+    OrgGO --> WsGO
+    WsGO --> Final["最終評価設定（必須ポリシー上書き確定）"]
 ```
 
 ### Self-Hosted Deployment（CodeRabbit自体のセルフホスト）での優先順位
@@ -149,7 +164,7 @@ Self-Hosted deployment（Enterprise）における評価順序は以下のとお
 
 ### グローバルオーバーライド
 
-Workspace Global OverrideおよびOrganization Global Overrideは、通常の設定階層における固定の最上位ソースではなく、継承チェーンの解決後に適用される最終マージ層です。Organization AdminがOrganization Global Overrideを、Enterprise Workspaceの管理者がWorkspace Global Overrideを編集でき、両方が同じキーを設定した場合はWorkspace側が優先されます。コンプライアンス上どうしても外せないポリシー（例：全リポジトリで`assertive`プロファイルを強制する、特定のpath_instructionsを必須にする）に使います。オブジェクトは再帰的にマージされ、配列は`path`などのキーで重複排除されながら結合され、スカラー値は単純に上書きされます。
+Workspace Global OverrideおよびOrganization Global Overrideは、通常の設定階層における固定の最上位ソースではなく、継承チェーンの解決後に適用される最終マージ層です。Organization AdminがOrganization Global Overrideを、Enterprise Workspaceの管理者がWorkspace Global Overrideを編集でき、両方が同じキーを設定した場合はWorkspace側が優先されます。コンプライアンス上どうしても外せないポリシー（例：全リポジトリで`assertive`プロファイルを強制する、特定のpath_instructionsを必須にする）に使います。オブジェクトは再帰的にマージされ、配列は`path`などのキーで重複排除されながら結合され、スカラー値は単純に上書きされます。継承解決後に最終適用されるため、個別のリポジトリ設定や`.coderabbit.yaml`でこれらの必須ポリシーを無効化・解除することはできません。
 
 ### 継承（Configuration Inheritance）の有効化
 

@@ -32,10 +32,24 @@ const DIAGRAM_1 = `flowchart TB
     Memory --> Output["レビューコメント・Walkthrough・提案の生成"]`;
 
 const DIAGRAM_2 = `flowchart TB
-    P1["優先度1 Workspace global overrides Enterpriseのみ"] --> P2["優先度2 Organization global overrides"]
-    P2 --> P3["優先度3 Repository / Global / Central YAML"]
-    P3 --> P4["優先度4 UI 設定 リポジトリ・組織・Workspace UI"]
-    P4 --> P5["優先度5 スキーマのデフォルト値"]`;
+    subgraph Base["通常解決階層（ベース設定の決定・フォールバック）"]
+        direction TB
+        P1["優先度1 リポジトリ内の .coderabbit.yaml"] --> P2["優先度2 中央リポジトリの coderabbit/.coderabbit.yaml"]
+        P2 --> P3["優先度3 リポジトリ設定 Web UI"]
+        P3 --> P4["優先度4 組織設定 Web UI"]
+        P4 --> P5["優先度5 Workspace UI（Enterpriseのみ）"]
+        P5 --> P6["優先度6 スキーマ既定値"]
+    end
+
+    subgraph Overrides["最終マージ層（最優先・強制ポリシースコープ）"]
+        direction TB
+        OrgGO["Organization Global Override"]
+        WsGO["Workspace Global Override（Enterpriseのみ・最優先）"]
+    end
+
+    Base -->|ベース設定解決| OrgGO
+    OrgGO --> WsGO
+    WsGO --> Final["最終評価設定（必須ポリシー上書き確定）"]`;
 
 const DIAGRAM_3 = `flowchart LR
     Repo["リポジトリYAML inheritance:true"] --> Central["中央YAML inheritance:true"]
@@ -693,10 +707,14 @@ export default function Page() {
             複数の設定手段（YAMLファイル、中央リポジトリ、Web
             UIの組織/リポジトリ設定）を併用すると、「どれが実際に効いているのか」が分からなくなりがちです。CodeRabbitは既定では設定源をマージせず、最も優先度の高い1つだけを採用します。
           </p>
-          <h3 id="cloud-saas構成での優先順位">Cloud / SaaS構成での優先順位</h3>
+          <h3 id="cloud-saas構成での優先順位">
+            Cloud / SaaS構成での優先順位（Self-Managed Git Provider連携を含む）
+          </h3>
           <p>
-            本ガイドの通常構成はCodeRabbit Cloud / SaaSを対象とします。Workspace設定とWorkspace
-            Global OverrideはEnterprise Workspace契約でのみ利用できます。
+            本ガイドの通常構成はCodeRabbit Cloud / SaaSを対象とします。連携先がSaaS型Git providerであってもSelf-Managed (Self-Hosted) Git providerであっても、CodeRabbit Cloud環境では環境変数 <code>YAML_CONFIG</code>（Environment YAML）は適用されません。また、Workspace設定およびWorkspace Global OverrideはEnterprise Workspace契約でのみ利用できます。
+          </p>
+          <p>
+            設定解決プロセスでは、まず通常階層（リポジトリ内YAML、中央リポジトリYAML、各種Web UI設定、スキーマ既定値）でベース設定が評価・決定されます。その後、<strong>最終マージ層</strong>として Organization Global Override および Workspace Global Override が適用されます。継承処理やリポジトリ設定の有無にかかわらず、両Global Overrideの値が最終的に優先して適用されるため、リポジトリ側の設定で組織・ワークスペースの必須ポリシーを無効化・回避することはできません。
           </p>
 
           <div className={styles.mermaidWrap}>
@@ -746,7 +764,7 @@ export default function Page() {
             <code>assertive</code>
             プロファイルを強制する、特定のpath_instructionsを必須にする）に使います。オブジェクトは再帰的にマージされ、配列は
             <code>path</code>
-            などのキーで重複排除されながら結合され、スカラー値は単純に上書きされます。
+            などのキーで重複排除されながら結合され、スカラー値は単純に上書きされます。継承解決後に最終適用されるため、個別のリポジトリ設定や <code>.coderabbit.yaml</code> でこれらの必須ポリシーを無効化・解除することはできません。
           </p>
           <h3 id="継承configuration-inheritanceの有効化">
             継承（Configuration Inheritance）の有効化

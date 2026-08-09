@@ -892,13 +892,29 @@ chat:
             複数の設定手段（YAMLファイル、中央リポジトリ、Web
             UIの組織/リポジトリ設定）を併用すると、「どれが実際に効いているのか」が分からなくなりがちです。CodeRabbitは既定では設定源をマージせず、最も優先度の高い1つだけを採用します。
           </p>
+          <p>
+            設定解決プロセスでは、まず通常階層（リポジトリ内YAML、中央リポジトリYAML、各種Web UI設定、スキーマ既定値）でベース設定が評価・決定されます。その後、<strong>最終マージ層</strong>として Organization Global Override および Workspace Global Override が適用されます。継承処理やリポジトリ設定の有無にかかわらず、両Global Overrideの値が最終的に優先して適用されるため、リポジトリ側の設定で組織・ワークスペースの必須ポリシーを無効化・回避することはできません。
+          </p>
           <pre class="mermaid">
 flowchart TB
-    P0["優先度0 グローバルオーバーライド 組織Admin専用"] --&gt; P1["優先度1 リポジトリ内の .coderabbit.yaml"]
-    P1 --&gt; P2["優先度2 中央リポジトリの coderabbit/.coderabbit.yaml"]
-    P2 --&gt; P3["優先度3 リポジトリ設定 Web UI"]
-    P3 --&gt; P4["優先度4 組織設定 Web UI"]
-    P4 --&gt; P5["優先度5 スキーマのデフォルト値"]</pre
+    subgraph Base["通常解決階層（ベース設定の決定・フォールバック）"]
+        direction TB
+        P1["優先度1 リポジトリ内の .coderabbit.yaml"] --&gt; P2["優先度2 中央リポジトリの coderabbit/.coderabbit.yaml"]
+        P2 --&gt; P3["優先度3 リポジトリ設定 Web UI"]
+        P3 --&gt; P4["優先度4 組織設定 Web UI"]
+        P4 --&gt; P5["優先度5 Workspace UI（Enterpriseのみ）"]
+        P5 --&gt; P6["優先度6 スキーマ既定値"]
+    end
+
+    subgraph Overrides["最終マージ層（最優先・強制ポリシースコープ）"]
+        direction TB
+        OrgGO["Organization Global Override"]
+        WsGO["Workspace Global Override（Enterpriseのみ・最優先）"]
+    end
+
+    Base --&gt;|ベース設定解決| OrgGO
+    OrgGO --&gt; WsGO
+    WsGO --&gt; Final["最終評価設定（必須ポリシー上書き確定）"]</pre
           >
           <p>
             継承（inheritance）を使わない場合、たとえば組織設定と中央設定の両方でタイムアウト値を指定していても、リポジトリの<code>.coderabbit.yaml</code>がタイムアウトに一切触れていなければ、CodeRabbitは（組織設定でも中央設定でもなく）スキーマのデフォルト値を使います。「上位の設定を継承しつつ一部だけ上書きする」という直感的な挙動ではない点に注意してください。
