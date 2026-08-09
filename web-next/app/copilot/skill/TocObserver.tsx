@@ -28,20 +28,31 @@ export function TocObserver() {
     // 2. IntersectionObserver for TOC highlight
     const headings = Array.from(document.querySelectorAll("h2[id], h3[id]"));
     const navLinks = Array.from(document.querySelectorAll(`.${styles.navLink}`));
+    const intersectingHeadings = new Map<Element, IntersectionObserverEntry>();
 
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
           if (entry.isIntersecting) {
-            const id = entry.target.getAttribute("id");
-            for (const link of navLinks) {
-              const href = link.getAttribute("href") ?? "";
-              if (href === `#${id}`) {
-                link.classList.add(styles.active);
-              } else {
-                link.classList.remove(styles.active);
-              }
-            }
+            intersectingHeadings.set(entry.target, entry);
+          } else {
+            intersectingHeadings.delete(entry.target);
+          }
+        }
+        const topmostHeading = Array.from(intersectingHeadings.values()).reduce<
+          IntersectionObserverEntry | undefined
+        >(
+          (topmost, entry) =>
+            !topmost || entry.boundingClientRect.top < topmost.boundingClientRect.top
+              ? entry
+              : topmost,
+          undefined
+        );
+        if (topmostHeading) {
+          const id = topmostHeading.target.getAttribute("id");
+          for (const link of navLinks) {
+            const href = link.getAttribute("href") ?? "";
+            link.classList.toggle(styles.active, href === `#${id}`);
           }
         }
       },
