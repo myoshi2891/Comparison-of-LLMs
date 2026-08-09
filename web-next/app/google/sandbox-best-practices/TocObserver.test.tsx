@@ -1,54 +1,88 @@
-import { render } from "@testing-library/react";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { fireEvent, render } from "@testing-library/react";
+import { beforeEach, describe, expect, it } from "vitest";
+import { installIntersectionObserverStub } from "@/tests/tocTestUtils";
 import TocObserver from "./TocObserver";
 
-describe("TocObserver Component", () => {
-  let mockObserve: ReturnType<typeof vi.fn>;
-  let mockDisconnect: ReturnType<typeof vi.fn>;
-  let observerCallback: ((entries: Partial<IntersectionObserverEntry>[]) => void) | null = null;
+let io: ReturnType<typeof installIntersectionObserverStub>;
 
-  beforeEach(() => {
-    mockObserve = vi.fn();
-    mockDisconnect = vi.fn();
+beforeEach(() => {
+  io = installIntersectionObserverStub();
+});
 
-    window.IntersectionObserver = vi.fn().mockImplementation((callback) => {
-      observerCallback = callback;
-      return {
-        observe: mockObserve,
-        unobserve: vi.fn(),
-        disconnect: mockDisconnect,
-      };
-    }) as unknown as typeof IntersectionObserver;
+describe("/google/sandbox-best-practices - TocObserver", () => {
+  it("toggles data-open on sidebar and aria-expanded on toggle button, and closes on TOC link click", () => {
+    const { container } = render(
+      <div>
+        <button id="sidebarToggle" aria-label="目次を開く" type="button">
+          ≡
+        </button>
+        <nav id="sidebar">
+          <ul className="navList">
+            <li>
+              <a href="#section-1">1. はじめに</a>
+            </li>
+          </ul>
+        </nav>
+        <main>
+          <section id="section-1">Intro</section>
+        </main>
+        <TocObserver />
+      </div>
+    );
+
+    const sidebarToggle = container.querySelector("#sidebarToggle") as HTMLButtonElement;
+    const sidebar = container.querySelector("#sidebar") as HTMLElement;
+    const tocLink = container.querySelector('a[href="#section-1"]') as HTMLAnchorElement;
+
+    expect(sidebar.hasAttribute("data-open")).toBe(false);
+    expect(sidebarToggle.hasAttribute("aria-expanded")).toBe(false);
+
+    // Toggle open
+    fireEvent.click(sidebarToggle);
+    expect(sidebar.getAttribute("data-open")).toBe("true");
+    expect(sidebarToggle.getAttribute("aria-expanded")).toBe("true");
+
+    // Toggle close
+    fireEvent.click(sidebarToggle);
+    expect(sidebar.getAttribute("data-open")).toBe("false");
+    expect(sidebarToggle.getAttribute("aria-expanded")).toBe("false");
+
+    // Open again then click TOC link
+    fireEvent.click(sidebarToggle);
+    expect(sidebar.getAttribute("data-open")).toBe("true");
+
+    fireEvent.click(tocLink);
+    expect(sidebar.getAttribute("data-open")).toBe("false");
+    expect(sidebarToggle.getAttribute("aria-expanded")).toBe("false");
   });
 
-  afterEach(() => {
-    vi.restoreAllMocks();
-    observerCallback = null;
-  });
+  it("observes section elements with ids for scroll spy", () => {
+    const { container } = render(
+      <div>
+        <nav id="sidebar">
+          <a href="#section-1">1. はじめに</a>
+          <a href="#section-2">2. 全体マップ</a>
+        </nav>
+        <main>
+          <section id="section-1" />
+          <section id="section-2" />
+        </main>
+        <TocObserver />
+      </div>
+    );
 
-  it("renders null (returns empty DOM)", () => {
-    const { container } = render(<TocObserver />);
-    expect(container.firstChild).toBeNull();
-  });
+    expect(io.observedTargets.map((target) => target.id)).toEqual(["section-1", "section-2"]);
 
-  it("observes elements with class 'chapter' or section anchors on mount", () => {
-    document.body.innerHTML = `
-      <div id="section-1" class="chapter">Section 1</div>
-      <div id="section-2" class="chapter">Section 2</div>
-      <nav class="sidebar">
-        <a href="#section-1" class="tocLink">Link 1</a>
-        <a href="#section-2" class="tocLink">Link 2</a>
-      </nav>
-    `;
+    const links = container.querySelectorAll("nav a");
+    io.emit([
+      {
+        target: container.querySelector("#section-1") as Element,
+        isIntersecting: true,
+        boundingClientRect: { top: 20 } as DOMRectReadOnly,
+      },
+    ]);
 
-    render(<TocObserver />);
-    expect(window.IntersectionObserver).toHaveBeenCalled();
-    expect(mockObserve).toHaveBeenCalledTimes(2);
-  });
-
-  it("disconnects observer on unmount", () => {
-    const { unmount } = render(<TocObserver />);
-    unmount();
-    expect(mockDisconnect).toHaveBeenCalled();
+    expect(links[0].classList.contains("active")).toBe(true);
+    expect(links[1].classList.contains("active")).toBe(false);
   });
 });

@@ -569,15 +569,15 @@ const entries: PageEntry[] = [
   },
   {
     slug: "/google/sandbox-best-practices",
-    title: "Google Sandbox",
+    title: "Google サンドボックス技術 完全ガイド",
     group: "Providers",
     category: "Google",
     provider: "google",
     topics: ["sandbox"],
     summary:
-      "AIエージェント・API・コンテナ・C/C++・ブラウザ、それぞれの領域で Google が推奨する安全なサンドボックス技術（実行の箱）を、初学者でも理解できるよう図解とステップで解説します。",
+      "AIエージェント・API・コンテナ・C/C++・ブラウザ、5領域のサンドボックス技術のベストプラクティスをステップバイステップで解説する完全ガイド。",
     addedAt: "2026-06-12",
-    lastReviewed: "2026-07-01",
+    lastReviewed: "2026-08-09",
   },
   {
     slug: "/google/skill",

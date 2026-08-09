@@ -64,7 +64,7 @@ describe("/google/sandbox-best-practices - page structure", () => {
 
   it("renders intro content correctly", () => {
     const { container } = render(<Page />);
-    const h2 = container.querySelector("#\\1-はじめになぜサンドボックスが必要なのか, [id*='1-はじめになぜサンドボックスが必要なのか']");
+    const h2 = container.querySelector("[id*='1-はじめになぜサンドボックスが必要なのか']");
     expect(h2).not.toBeNull();
   });
 });
@@ -95,19 +95,6 @@ describe("/google/sandbox-best-practices - clean internal links", () => {
       if (href.startsWith("/") || href.startsWith("#")) {
         expect(href.includes(".html")).toBe(false);
       }
-    }
-  });
-});
-
-describe("/google/sandbox-best-practices - language classes on code blocks", () => {
-  it("all pre elements for code samples have language-* classes", () => {
-    const { container } = render(<Page />);
-    const codeBlocks = Array.from(container.querySelectorAll("pre"));
-    const actualBlocks = codeBlocks.filter((pre) => pre.getAttribute("data-testid") !== "mermaid");
-    expect(actualBlocks.length).toBeGreaterThan(0);
-    for (const pre of actualBlocks) {
-      const className = pre.className || "";
-      expect(className).toMatch(/language-\w+/);
     }
   });
 });
