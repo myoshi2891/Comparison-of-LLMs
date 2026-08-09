@@ -6,6 +6,8 @@ import { render } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { describe, expect, it } from "vitest";
 import CopilotSkillPage, { metadata as rawMetadata } from "@/app/copilot/skill/page";
+import { installIntersectionObserverStub } from "@/tests/tocTestUtils";
+import styles from "./page.module.css";
 
 const Page = CopilotSkillPage as unknown as () => ReactElement;
 type MetadataLike = { title?: unknown; description?: unknown };
@@ -64,12 +66,57 @@ describe("/copilot/skill - page structure", () => {
   });
 
   it("renders 16 TOC links pointing to section anchors", () => {
+    const io = installIntersectionObserverStub();
     const { container } = render(<Page />);
     const tocAnchors = container.querySelectorAll('nav a[href^="#"]');
     const tocHrefs = Array.from(tocAnchors).map((a) => a.getAttribute("href"));
     for (const id of EXPECTED_SECTION_IDS) {
       expect(tocHrefs, `TOC must link to #${id}`).toContain(`#${id}`);
     }
+
+    const firstHeading = container.querySelector(`[id="${EXPECTED_SECTION_IDS[0]}"]`) as Element;
+    const secondHeading = container.querySelector(`[id="${EXPECTED_SECTION_IDS[1]}"]`) as Element;
+    io.emit([
+      {
+        target: firstHeading,
+        isIntersecting: true,
+        boundingClientRect: { top: 20 } as DOMRectReadOnly,
+      },
+    ]);
+    io.emit([
+      {
+        target: secondHeading,
+        isIntersecting: true,
+        boundingClientRect: { top: 40 } as DOMRectReadOnly,
+      },
+    ]);
+    expect(tocAnchors[0].classList.contains(styles.active)).toBe(true);
+    expect(tocAnchors[1].classList.contains(styles.active)).toBe(false);
+
+    io.emit([
+      {
+        target: firstHeading,
+        isIntersecting: true,
+        boundingClientRect: { top: 50 } as DOMRectReadOnly,
+      },
+      {
+        target: secondHeading,
+        isIntersecting: true,
+        boundingClientRect: { top: 10 } as DOMRectReadOnly,
+      },
+    ]);
+    expect(tocAnchors[0].classList.contains(styles.active)).toBe(false);
+    expect(tocAnchors[1].classList.contains(styles.active)).toBe(true);
+
+    io.emit([
+      {
+        target: secondHeading,
+        isIntersecting: false,
+        boundingClientRect: { top: 10 } as DOMRectReadOnly,
+      },
+    ]);
+    expect(tocAnchors[0].classList.contains(styles.active)).toBe(true);
+    expect(tocAnchors[1].classList.contains(styles.active)).toBe(false);
   });
 });
 
@@ -87,10 +134,7 @@ describe("/copilot/skill - external link safety", () => {
       expect(rel).toMatch(/noopener/);
       expect(rel).toMatch(/noreferrer/);
     }
-  });
 
-  it("renders at least 23 external links in the sources section", () => {
-    const { container } = render(<Page />);
     const sourcesHeading = container.querySelector('[id="参考文献出典"]');
     const sourcesGrid = sourcesHeading?.nextElementSibling?.nextElementSibling;
     const sourceLinks = sourcesGrid?.querySelectorAll('a[href^="http"]');

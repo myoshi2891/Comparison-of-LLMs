@@ -62,17 +62,13 @@ describe("/google/sandbox-best-practices - page structure", () => {
       const el = container.querySelector(`[id="${id}"]`);
       expect(el, `section id="${id}" must exist`).not.toBeNull();
     }
+    expect(container.querySelectorAll('#sidebar a[href^="#"]')).toHaveLength(10);
   });
 
   it("renders intro content correctly", () => {
     const { container } = render(<Page />);
     const h2 = container.querySelector("[id*='1-はじめになぜサンドボックスが必要なのか']");
     expect(h2).not.toBeNull();
-  });
-
-  it("renders 10 table-of-contents links", () => {
-    const { container } = render(<Page />);
-    expect(container.querySelectorAll('#sidebar a[href^="#"]')).toHaveLength(10);
   });
 });
 
@@ -90,10 +86,7 @@ describe("/google/sandbox-best-practices - external link safety", () => {
       expect(rel).toMatch(/noopener/);
       expect(rel).toMatch(/noreferrer/);
     }
-  });
 
-  it("renders 38 external reference links", () => {
-    const { container } = render(<Page />);
     const referencesHeading = container.querySelector('[id="10-参考文献出典url"]');
     const referencesGrid = referencesHeading?.nextElementSibling?.nextElementSibling;
 
