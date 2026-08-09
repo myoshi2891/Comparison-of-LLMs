@@ -34,9 +34,8 @@ const DIAGRAM_1 = `flowchart TB
 const DIAGRAM_2 = `flowchart TB
     P1["優先度1 Workspace global overrides Enterpriseのみ"] --> P2["優先度2 Organization global overrides"]
     P2 --> P3["優先度3 Repository / Global / Central YAML"]
-    P3 --> P4["優先度4 Environment YAML Self-hosted YAML_CONFIG"]
-    P4 --> P5["優先度5 UI 設定 リポジトリ・組織・Workspace UI"]
-    P5 --> P6["優先度6 スキーマのデフォルト値"]`;
+    P3 --> P4["優先度4 UI 設定 リポジトリ・組織・Workspace UI"]
+    P4 --> P5["優先度5 スキーマのデフォルト値"]`;
 
 const DIAGRAM_3 = `flowchart LR
     Repo["リポジトリYAML inheritance:true"] --> Central["中央YAML inheritance:true"]
@@ -709,37 +708,28 @@ export default function Page() {
             />
           </div>
 
-          <h3 id="self-hosted構成での優先順位">Self-Hosted構成での優先順位</h3>
+          <h3 id="self-hosted構成での優先順位">
+            Self-Hosted Deployment（CodeRabbit自体のセルフホスト）での優先順位
+          </h3>
           <p>
-            CodeRabbit Cloudに連携したSelf-Hosted Git provider組織およびSelf-Hosted
-            deploymentでは、公式の優先順位に従って設定が評価されます。環境変数
-            <code>YAML_CONFIG</code>
-            （Environment YAML）はSelf-Hosted限定の設定源としてRepository/Central
-            YAMLの後かつUI設定より優先されます。
+            環境変数 <code>YAML_CONFIG</code>（Environment YAML）は、CodeRabbit自体を自社環境にデプロイする
+            <strong>Self-Hosted Deployment（Enterprise）限定</strong>の設定源です。CodeRabbit CloudにSelf-Managed (Self-Hosted) Git providerを連携させた構成であっても、CodeRabbit Cloud環境では <code>YAML_CONFIG</code> は適用されません。
+          </p>
+          <p>
+            Self-Hosted Deploymentでの階層構造は以下のとおり評価されます。
           </p>
           <ol>
-            <li>Workspace global overrides（Enterpriseのみ）</li>
-            <li>Organization global overrides</li>
             <li>
               Repository / Central YAML（リポジトリ内または中央リポジトリの{" "}
               <code>.coderabbit.yaml</code>）
             </li>
             <li>
-              Environment YAML（環境変数 <code>YAML_CONFIG</code>、Self-Hosted限定）
+              Environment YAML（環境変数 <code>YAML_CONFIG</code>、Self-Hosted Deployment限定）
             </li>
-            <li>UI 設定（リポジトリ設定 Web UI、組織設定 Web UI、Workspace UI）</li>
             <li>スキーマのデフォルト値（Defaults）</li>
           </ol>
           <p>
-            完全なSelf-Hosted
-            deployment（Enterprise）の公開hierarchy表は、リポジトリYAML、中央YAML、
-            <code>YAML_CONFIG</code>
-            、スキーマ既定値の4層だけを掲載しています。上記のUI層はCodeRabbit
-            Cloudに連携したSelf-Hosted Git
-            provider組織に対する記述であり、air-gapped環境には適用しません。
-            <code>YAML_CONFIG</code>
-            がSelf-Hosted限定である根拠は、公式のConfiguration InheritanceページがEnvironment
-            YAMLをSelf-Hosted deployment固有の設定源として明記しているためです。
+            公式のConfiguration Inheritanceドキュメントにおいて、Environment YAML（<code>YAML_CONFIG</code>）はSelf-Hosted Deployment固有の設定源として明記されています。
           </p>
 
           <p>
