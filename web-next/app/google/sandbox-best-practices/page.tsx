@@ -85,6 +85,10 @@ const MERMAID_CHART_8 = `flowchart TD
     Q4 -->|はい| A4["Site Isolation / V8 Sandbox<br/>/ 拡張機能sandboxディレクティブ"]
     Q4 -->|いいえ| A5["Apigee等でAPIレイヤーを保護"]`;
 
+/**
+ * Google Sandbox Best Practices Page Component
+ * Renders 100% faithful content from Google-sandbox-best-practices.html
+ */
 export default function GoogleSandboxBestPracticesPage() {
   return (
     <div className={styles.layout}>
