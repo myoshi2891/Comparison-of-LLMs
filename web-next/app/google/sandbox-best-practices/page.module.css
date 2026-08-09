@@ -201,6 +201,7 @@
   padding: 3.5rem 4vw 6rem;
   position: relative;
   min-width: 0;
+  color: var(--text);
 }
 
 .main a {
