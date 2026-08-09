@@ -34,11 +34,11 @@ const DIAGRAM_1 = `flowchart TB
 const DIAGRAM_2 = `flowchart TB
     subgraph Base["通常解決階層（ベース設定の決定・フォールバック）"]
         direction TB
-        P1["優先度1 リポジトリ内の .coderabbit.yaml"] --> P2["優先度2 中央リポジトリの coderabbit/.coderabbit.yaml"]
-        P2 --> P3["優先度3 リポジトリ設定 Web UI"]
-        P3 --> P4["優先度4 組織設定 Web UI"]
-        P4 --> P5["優先度5 Workspace UI（Enterpriseのみ）"]
-        P5 --> P6["優先度6 スキーマ既定値"]
+        P2["優先度2 リポジトリ内の .coderabbit.yaml"] --> P3["優先度3 中央リポジトリの coderabbit/.coderabbit.yaml"]
+        P3 --> P4["優先度4 リポジトリ設定 Web UI"]
+        P4 --> P5["優先度5 組織設定 Web UI"]
+        P5 --> P6["優先度6 Workspace UI（Enterpriseのみ）"]
+        P6 --> P7["優先度7 スキーマ既定値"]
     end
 
     subgraph Overrides["最終マージ層（最優先・強制ポリシースコープ）"]
