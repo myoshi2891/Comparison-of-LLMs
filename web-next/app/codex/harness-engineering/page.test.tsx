@@ -9,37 +9,40 @@ vi.mock("@/components/docs/MermaidDiagram", () => ({
   },
 }));
 
-describe("OpenAI Harness Engineering Guide", () => {
+describe("OpenAI Codex Harness Engineering Evals Guide", () => {
   it("renders the correct title (<h1>)", () => {
     const { container } = render(<Page />);
     const h1 = container.querySelector("h1");
     expect(h1).not.toBeNull();
-    expect(h1?.textContent).toContain("ハーネスエンジニアリング");
-    expect(h1?.textContent).toContain("完全ガイド");
+    expect(h1?.textContent).toContain("OpenAI Codexにおけるハーネスエンジニアリング実践ガイド");
   });
 
-  it("renders exactly 11 major sections (<h2>)", () => {
+  it("renders exactly 9 major sections (<h2>)", () => {
     const { container } = render(<Page />);
     const h2Elements = container.querySelectorAll("h2");
-    expect(h2Elements.length).toBe(11);
+    expect(h2Elements.length).toBe(9);
 
     const expectedTitles = [
-      "ハーネスエンジニアリングとは何か？",
-      "なぜ必要なのか？",
-      "OpenAI Evals フレームワーク全体像",
-      "5ステップでゼロから始める",
-      "Eval の3大パターン",
-      "ハーネス設計のベストプラクティス",
-      "AGENTS.md / TEST.md とハーネスの統合",
-      "CI/CD パイプラインへの組み込み",
-      "上級テクニック",
-      "よくある落とし穴と対策",
-      "参考ソース一覧",
+      "1. はじめに — なぜ評価基盤がハーネスエンジニアリングの核心なのか",
+      "2. ハーネスエンジニアリングとは何か",
+      "3. なぜ評価が継続的でなければならないのか",
+      "4. 評価基盤の7層モデル — 詳細解説",
+      "5. ステップバイステップ実装ガイド",
+      "6. ハーネス成熟度チェックリスト",
+      "7. アンチパターン",
+      "8. まとめ",
+      "9. 参考文献",
     ];
 
     expectedTitles.forEach((title, index) => {
       expect(h2Elements[index]?.textContent).toContain(title);
     });
+  });
+
+  it("renders 7 mermaid diagrams", () => {
+    const { container } = render(<Page />);
+    const mermaidDiagrams = container.querySelectorAll('[data-testid="mermaid"]');
+    expect(mermaidDiagrams.length).toBe(7);
   });
 
   it('ensures all external links have target="_blank" and rel="noopener noreferrer"', () => {
@@ -67,15 +70,6 @@ describe("OpenAI Harness Engineering Guide", () => {
       expect(a.getAttribute("href")).not.toMatch(/\.html$/);
     });
   });
-
-  it("renders code blocks with appropriate structure", () => {
-    const { container } = render(<Page />);
-    // CSS modules transform class names, so we check if any class contains 'codeWrap'
-    const codeBlocks = Array.from(container.querySelectorAll("div")).filter((el) =>
-      el.className?.includes("codeWrap")
-    );
-    expect(codeBlocks.length).toBeGreaterThan(0);
-  });
 });
 
 describe("/codex/harness-engineering metadata", () => {
@@ -91,3 +85,4 @@ describe("/codex/harness-engineering metadata", () => {
     expect((meta.description ?? "").length).toBeGreaterThan(20);
   });
 });
+
