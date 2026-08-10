@@ -147,7 +147,8 @@
 }
 
 /* Exact Active Class match with original HTML */
-.active {
+.active,
+:global(#sidebar) nav a:global(.active) {
   background: var(--accent-soft) !important;
   color: var(--accent) !important;
   border-left-color: var(--accent) !important;

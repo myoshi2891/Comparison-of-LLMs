@@ -42,46 +42,74 @@ export default function TocObserver() {
       overlay.addEventListener("click", closeSidebar);
     }
 
-    // Scroll spy for TOC - exact match with original HTML
+    // Scroll spy logic - 100% robust & smooth update on scroll
     const navLinks = Array.from(document.querySelectorAll<HTMLAnchorElement>("#sidebar nav a"));
-    const headingIdToLink = new Map<string, HTMLAnchorElement>();
 
-    navLinks.forEach((a) => {
-      const href = a.getAttribute("href");
-      if (href && href.startsWith("#")) {
-        headingIdToLink.set(href.slice(1), a);
+    const headings = Array.from(document.querySelectorAll<HTMLElement>("h2[id]"));
+
+    if (navLinks.length === 0 || headings.length === 0) return;
+
+    function updateActiveLink() {
+      const scrollPos = window.scrollY || window.pageYOffset;
+      const offset = 180; // Offset considering header + margin
+
+      let currentActiveId = "";
+
+      for (let i = 0; i < headings.length; i++) {
+        const h = headings[i];
+        const top = h.getBoundingClientRect().top + scrollPos;
+        if (scrollPos >= top - offset) {
+          currentActiveId = h.id;
+        } else {
+          break;
+        }
       }
+
+      if (!currentActiveId && headings.length > 0) {
+        currentActiveId = headings[0].id;
+      }
+
+      navLinks.forEach((link) => {
+        const href = link.getAttribute("href");
+        const targetId = href ? href.replace("#", "") : "";
+
+        if (targetId === currentActiveId) {
+          link.classList.add(styles.active);
+          link.classList.add("active");
+        } else {
+          link.classList.remove(styles.active);
+          link.classList.remove("active");
+        }
+      });
+    }
+
+    // Listen to scroll & resize
+    let ticking = false;
+    function onScroll() {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          updateActiveLink();
+          ticking = false;
+        });
+        ticking = true;
+      }
+    }
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll, { passive: true });
+
+    // Initial update
+    updateActiveLink();
+
+    // Close mobile sidebar on link click
+    navLinks.forEach((a) => {
       a.addEventListener("click", closeSidebar);
     });
 
-    const headings = Array.from(document.querySelectorAll<HTMLElement>("article h2"));
-
-    if (headings.length && "IntersectionObserver" in window) {
-      const spy = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              const link = headingIdToLink.get(entry.target.id);
-              if (link) {
-                navLinks.forEach((l) => {
-                  l.classList.remove(styles.active);
-                });
-                link.classList.add(styles.active);
-              }
-            }
-          });
-        },
-        { root: null, rootMargin: "-15% 0px -75% 0px", threshold: 0 }
-      );
-
-      headings.forEach((h) => {
-        spy.observe(h);
-      });
-
-      return () => {
-        spy.disconnect();
-      };
-    }
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
   }, []);
 
   return null;
