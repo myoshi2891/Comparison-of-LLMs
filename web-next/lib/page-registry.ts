@@ -340,15 +340,15 @@ const entries: PageEntry[] = [
   },
   {
     slug: "/codex/harness-engineering",
-    title: "Harness Engineering",
+    title: "OpenAI Codexにおけるハーネスエンジニアリング実践ガイド",
     group: "Providers",
     category: "Codex",
     provider: "codex",
     topics: ["harness"],
     summary:
-      "OpenAI Codex のハーネスエンジニアリング完全ガイド。エージェント実行環境の設計と運用。",
+      "OpenAI Codexにおける評価基盤の7層モデルと非対話型CI/CD品質ゲート(codex exec)の実装ガイド。",
     addedAt: "2026-05-29",
-    lastReviewed: "2026-07-01",
+    lastReviewed: "2026-08-10",
   },
   {
     slug: "/codex/openai-codex-guide",
