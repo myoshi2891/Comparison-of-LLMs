@@ -45,7 +45,9 @@
   border-right: 1px solid var(--border);
   background: var(--bg);
   z-index: 40;
-  transition: transform 0.25s ease;
+  transition:
+    transform 0.25s ease,
+    visibility 0.25s ease;
 }
 
 .sidebarBrand {
@@ -71,7 +73,6 @@
   list-style: none;
   margin: 26px 0 0;
   padding: 0;
-  counter-reset: toc;
 }
 
 .tocLi {
@@ -79,7 +80,6 @@
 }
 
 .tocLink {
-  counter-increment: toc;
   display: block;
   padding: 7px 10px 7px 8px;
   margin: 1px 0;
@@ -89,14 +89,6 @@
   text-decoration: none;
   border-left: 2px solid transparent;
   transition: background 0.15s, color 0.15s, border-color 0.15s;
-}
-
-.tocLink::before {
-  content: counter(toc, decimal-leading-zero) " ";
-  font-family: var(--font-mono, monospace);
-  color: var(--ink-faint);
-  font-size: 13px;
-  margin-right: 4px;
 }
 
 .tocLink:hover {
@@ -608,10 +600,14 @@
     transform: translateX(-100%);
     z-index: 100;
     box-shadow: 4px 0 24px rgba(0, 0, 0, 0.15);
+    visibility: hidden;
+    pointer-events: none;
   }
 
   .sidebar.sidebarOpen {
     transform: translateX(0);
+    visibility: visible;
+    pointer-events: auto;
   }
 
   .sidebarOverlay.overlayOpen {

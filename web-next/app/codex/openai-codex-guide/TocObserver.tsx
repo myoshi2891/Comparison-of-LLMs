@@ -28,44 +28,48 @@ export default function TocObserver() {
       }
     }
 
-    if (toggleBtn) {
-      const handleToggle = () => {
-        if (sidebar?.classList.contains(styles.sidebarOpen)) {
-          closeSidebar();
-        } else {
-          openSidebar();
-        }
-      };
-      toggleBtn.addEventListener("click", handleToggle);
+    function handleToggle() {
+      if (sidebar?.classList.contains(styles.sidebarOpen)) {
+        closeSidebar();
+      } else {
+        openSidebar();
+      }
     }
 
-    if (overlay) {
-      overlay.addEventListener("click", closeSidebar);
+    toggleBtn?.addEventListener("click", handleToggle);
+    overlay?.addEventListener("click", closeSidebar);
+
+    function removeDrawerListeners() {
+      toggleBtn?.removeEventListener("click", handleToggle);
+      overlay?.removeEventListener("click", closeSidebar);
     }
 
     // Scroll spy logic for section highlighting
-    const navLinks = Array.from(
-      document.querySelectorAll<HTMLAnchorElement>("#sidebar nav a")
-    );
+    const navLinks = Array.from(document.querySelectorAll<HTMLAnchorElement>("#sidebar nav a"));
 
-    const headings = Array.from(
-      document.querySelectorAll<HTMLElement>("h2[id]")
-    );
+    const sections = navLinks
+      .map((link) => {
+        const href = link.getAttribute("href");
+        return href ? document.querySelector<HTMLElement>(href) : null;
+      })
+      .filter((section): section is HTMLElement => section !== null);
 
-    if (navLinks.length === 0 || headings.length === 0) return;
+    if (navLinks.length === 0 || sections.length === 0) {
+      return removeDrawerListeners;
+    }
 
     function updateActiveLink() {
       const scrollPos = window.scrollY || window.pageYOffset;
       const offset = 180; // Header height + extra margin
 
-      let currentActiveId = headings[0]?.id || "";
+      let currentActiveId = sections[0]?.id || "";
 
       if (scrollPos > 0) {
-        for (let i = 0; i < headings.length; i++) {
-          const h = headings[i];
-          const top = h.getBoundingClientRect().top + scrollPos;
+        for (let i = 0; i < sections.length; i++) {
+          const section = sections[i];
+          const top = section.getBoundingClientRect().top + scrollPos;
           if (scrollPos >= top - offset) {
-            currentActiveId = h.id;
+            currentActiveId = section.id;
           } else {
             break;
           }
@@ -102,6 +106,10 @@ export default function TocObserver() {
     return () => {
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
+      removeDrawerListeners();
+      navLinks.forEach((a) => {
+        a.removeEventListener("click", closeSidebar);
+      });
     };
   }, []);
 
