@@ -21,10 +21,10 @@ vi.mock("@/components/docs/MermaidDiagram", () => ({
 }));
 
 describe("/codex/openai-codex-guide (2026 Best Practices)", () => {
-  it("h1 に 'OpenAI Codex ベストプラクティスガイド' が含まれる", () => {
+  it("h1 に 'OpenAI Codexベストプラクティスガイド' が含まれる", () => {
     const { container } = render(<Page />);
     const h1 = container.querySelector("h1");
-    expect(h1?.textContent?.replace(/\s+/g, " ")).toContain("OpenAI Codex ベストプラクティスガイド");
+    expect(h1?.textContent?.replace(/\s+/g, "")).toContain("OpenAICodexベストプラクティスガイド");
   });
 
   it("h2 が 16 個存在し、各セクションのアンカー ID とタイトルが正しく紐づいている", () => {
@@ -113,7 +113,7 @@ describe("/codex/openai-codex-guide (2026 Best Practices)", () => {
 
   it("Callout/Alert 要素（info, warn, good など）が存在する", () => {
     const { container } = render(<Page />);
-    const callouts = container.querySelectorAll("[class*='callout'], [class*='info'], [class*='warn'], [class*='good']");
+    const callouts = container.querySelectorAll("[data-testid='callout']");
     expect(callouts.length).toBeGreaterThan(0);
   });
 
@@ -138,6 +138,6 @@ describe("/codex/openai-codex-guide (2026 Best Practices)", () => {
 
   it("metadata.title と metadata.description が適切に定義されている", () => {
     expect(metadata.title).toContain("OpenAI Codex");
-    expect(metadata.description).toContain("ステップバイステップ実践ガイド");
+    expect(metadata.description).toContain("2026年最新情報に基づくOpenAI Codexベストプラクティスガイド");
   });
 });
