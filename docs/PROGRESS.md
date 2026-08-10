@@ -20,7 +20,12 @@
 
 ## 最近の追加内容
 
-- **OpenAI Codex ハーネスエンジニアリング実践ガイド（/codex/harness-engineering）の Pure JSX 100% Faithful 完全修復移植**: `Openai-codex-harness-engineering-evals.html` および `.md` を `web-next/app/codex/harness-engineering/page.tsx` に Pure JSX として原本 HTML と 100% 寸分たがわず完全一致する形で完全移植 🚀。要約・省略・文字改変一切なしで全9セクション（1.はじめに〜9.参考文献、全リード文、全コールアウト、全クイックナビカード、全参考文献カード）、全表、全コードブロック、7 Mermaid図 (`DIAGRAM_1`〜`DIAGRAM_7`)、TOCスクロール追従（`TocObserver.tsx`）、`page-registry.ts`（タイトル・`lastReviewed` 2026-08-10）を完了。既存の旧 `/codex/harness-engineering` コンテンツと完全入れ替え完了。原本 `Openai-codex-harness-engineering-evals.html` および `Openai-codex-harness-engineering-evals.md` は `archive/html/OpenAI/` および `archive/md/OpenAI/` へ `git mv` 退避保存。契約テスト7件を通し全クリア（Vitest **158 files / 1414 tests** 全 Green ✅）。
+- **OpenAI Codex ハーネスエンジニアリング実践ガイド（/codex/harness-engineering）の Pure JSX 100% Faithful 完全修復 ＆ 包括的回帰テスト・スキル強化**:
+  - 原本 `Openai-codex-harness-engineering-evals.html` から 100% 寸分違わぬテキスト・セクション・スタイリングへ修復完了。
+  - `page.test.tsx` に **8つの必須契約・包括的回帰防止テスト（全11テスト）** を新規整備し全 Green ✅。見出しID・タイトルの完全一致、H3レイヤークラス（L1〜L7）、クイックナビカード（L1〜L7）、TOC初期アクティブ状態、スクロール時のリアルタイムアクティブ切り替え、Mermaidラッパー構造、参考文献4カテゴリ・外部リンク安全属性をすべて契約テスト化。
+  - `TocObserver.tsx` を `getBoundingClientRect` リアルタイム・スクロールスパイ計算へ刷新。
+  - `.claude/skills/nextjs-page-migration/SKILL.md` に「8つの必須契約・回帰テスト定義」と「TocObserver スクロール自動追従の決定的な実装規則」をブラッシュアップ追加。（Vitest **158 files / 1418 tests** 全 Green ✅）。
+
 
 
 
