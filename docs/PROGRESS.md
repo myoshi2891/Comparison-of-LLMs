@@ -2,7 +2,7 @@
 
 > 本ファイルは Next.js 移行完了後の保守・改善フェーズにおける開発の進捗（特にテスト関連）および品質チェックのルールを記録する。
 >
-> - 最終更新日: **Updated 2026-08-10**
+> - 最終更新日: **Updated 2026-08-11**
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
 
@@ -11,14 +11,21 @@
 - **フェーズ**: 保守・機能改善・品質強化フェーズ
 - **ブランチ**: `dev`（本番 `main` への Next.js 移行マージ完了 🚀）
 - **動作検証**:
-  - `bun run build` ⏭️（Antigravity環境ルール・ユーザー指定により省略。CI等で実施）
+  - `bun run build` ⏭️（ユーザー指定により省略。CI等で実施）
   - `bun run typecheck` ✅
-  - `bun run lint` ⚠️（442 files checked。作業範囲外の既存ファイルに17 diagnostics）
+  - `bun run lint` ⚠️（449 files checked。既存 diagnostics は49 errors・2 warnings・3 infos）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: Vitest **158 files / 1414 tests すべて合格**（収集失敗なし）
+  - **フロントエンド (`web-next/`)**: Vitest **159 files / 1425 tests すべて合格**（収集失敗なし）
   - **バックエンド (`scraper/`)**: pytest 実行で **43 件すべて合格** (全 Green ✅)
 
 ## 最近の追加内容
+
+- **レビュー指摘の現行コード再検証とガイド契約の強化**:
+  - 移行スキルの契約数を「8 + 4」に統一し、CSS Modules と JSDOM の検証範囲、原本依存のレイアウト要件、TOC テストの責務を明確化。
+  - OpenAI Codex のアーカイブ Markdown 2 件で Mermaid 文のインデントを修正し、MCP の実設定先を `.codex/config.toml`、`agents/openai.yaml` の役割を MCP ツール依存宣言として整理。
+  - Hermes は自己参照フォント変数と Mermaid ラッパー、Harness はモバイルオーバーレイ・参考文献リスト・Mermaid ラッパーの契約を修復。
+  - OpenAI Codex ガイドは TOC の CSS 重複採番を除去し、リンク先 section に基づくスクロール追従、初期アクティブ状態、通常時・早期 return 時のイベント解除、モバイルドロワーの `visibility` / `pointer-events` 同期を追加。見出し・チェックリスト・CSS・TOC の回帰テストを強化。
+  - npm で Vitest **159 files / 1425 tests** と typecheck、pytest **43件**が Green。全体 lint は既存 diagnostics のみ（49 errors・2 warnings・3 infos）。ユーザー指定によりビルドと目視確認は省略。
 
 - **OpenAI Codex ベストプラクティスガイド 2026（/codex/openai-codex-guide）の Pure JSX 完全置き換え移行**:
   - 原本 `Openai-codex-best-practices-2026.html` および `Openai-codex-best-practices-2026.md` を `web-next/app/codex/openai-codex-guide/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。
