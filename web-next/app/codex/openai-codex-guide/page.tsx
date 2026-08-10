@@ -660,21 +660,21 @@ export default function OpenAICodexGuidePage() {
 
               <p className={styles.codeLabel}>~/.codex/config.toml — 個人のデフォルト例</p>
               <pre className={styles.codeBlock}>
-                <div className={styles.codeLine}>model = "gpt-5.5"</div>
-                <div className={styles.codeLine}>approval_policy = "on-request"</div>
-                <div className={styles.codeLine}>sandbox_mode = "workspace-write"</div>
-                <div className={styles.codeLine}>model_reasoning_effort = "medium"</div>
-                <div className={styles.codeLine}>plan_mode_reasoning_effort = "high"</div>
+                <div className={styles.codeLine}><span className={styles.cv}>model</span> = <span className={styles.cs}>"gpt-5.5"</span></div>
+                <div className={styles.codeLine}><span className={styles.cv}>approval_policy</span> = <span className={styles.cs}>"on-request"</span></div>
+                <div className={styles.codeLine}><span className={styles.cv}>sandbox_mode</span> = <span className={styles.cs}>"workspace-write"</span></div>
+                <div className={styles.codeLine}><span className={styles.cv}>model_reasoning_effort</span> = <span className={styles.cs}>"medium"</span></div>
+                <div className={styles.codeLine}><span className={styles.cv}>plan_mode_reasoning_effort</span> = <span className={styles.cs}>"high"</span></div>
                 <div className={styles.codeLine}></div>
-                <div className={styles.codeLine}>[features]</div>
-                <div className={styles.codeLine}>goals = true</div>
+                <div className={styles.codeLine}><span className={styles.cm}>[features]</span></div>
+                <div className={styles.codeLine}><span className={styles.cv}>goals</span> = <span className={styles.cw}>true</span></div>
               </pre>
 
               <p className={styles.codeLabel}>.codex/config.toml — プロジェクト固有の例</p>
               <pre className={styles.codeBlock}>
-                <div className={styles.codeLine}>[mcp_servers.jira]</div>
-                <div className={styles.codeLine}>command = "npx"</div>
-                <div className={styles.codeLine}>args = ["-y", "@example/jira-mcp"]</div>
+                <div className={styles.codeLine}><span className={styles.cm}>[mcp_servers.jira]</span></div>
+                <div className={styles.codeLine}><span className={styles.cv}>command</span> = <span className={styles.cs}>"npx"</span></div>
+                <div className={styles.codeLine}><span className={styles.cv}>args</span> = [<span className={styles.cs}>"-y"</span>, <span className={styles.cs}>"@example/jira-mcp"</span>]</div>
               </pre>
             </section>
 
@@ -748,11 +748,11 @@ export default function OpenAICodexGuidePage() {
               </p>
               <p className={styles.codeLabel}>典型的なディレクトリ構成(オープンなAgent Skills標準準拠)</p>
               <pre className={styles.codeBlock}>
-                <div className={styles.codeLine}>my-skill/</div>
-                <div className={styles.codeLine}>├── SKILL.md          # 必須: 指示内容</div>
-                <div className={styles.codeLine}>├── scripts/          # 任意: 実行可能スクリプト</div>
-                <div className={styles.codeLine}>├── references/       # 任意: 参考ドキュメント</div>
-                <div className={styles.codeLine}>└── assets/           # 任意: 画像やアイコン等</div>
+                <div className={styles.codeLine}><span className={styles.cm}>my-skill/</span></div>
+                <div className={styles.codeLine}>├── SKILL.md          <span className={styles.cc}># 必須: 指示内容</span></div>
+                <div className={styles.codeLine}>├── scripts/          <span className={styles.cc}># 任意: 実行可能スクリプト</span></div>
+                <div className={styles.codeLine}>├── references/       <span className={styles.cc}># 任意: 参考ドキュメント</span></div>
+                <div className={styles.codeLine}>└── assets/           <span className={styles.cc}># 任意: 画像やアイコン等</span></div>
               </pre>
               <p>
                 Skillは1つの仕事に絞ってスコープを設定し、2〜3個の具体的なユースケースから始めることが推奨されています。特に重要なのはSKILL.mdの<code>description</code>フィールドで、「何をするSkillか」「いつ使うべきか」を明確に書くことが、Codexが適切な場面でSkillを自動選択する精度に直結します。
@@ -832,14 +832,14 @@ export default function OpenAICodexGuidePage() {
               </p>
               <p className={styles.codeLabel}>bash — 基本的な使い方</p>
               <pre className={styles.codeBlock}>
-                <div className={styles.codeLine}>codex exec "失敗しているテストをすべて修正して"</div>
+                <div className={styles.codeLine}><span className={styles.ck}>codex</span> <span className={styles.cv}>exec</span> <span className={styles.cs}>"失敗しているテストをすべて修正して"</span></div>
                 <div className={styles.codeLine}></div>
-                <div className={styles.codeLine}># 前回のセッションを再開して2段階のパイプラインにする</div>
-                <div className={styles.codeLine}>codex exec "レースコンディションがないかレビューして"</div>
-                <div className={styles.codeLine}>codex exec resume --last "見つかった問題を修正して"</div>
+                <div className={styles.codeLine}><span className={styles.cc}># 前回のセッションを再開して2段階のパイプラインにする</span></div>
+                <div className={styles.codeLine}><span className={styles.ck}>codex</span> <span className={styles.cv}>exec</span> <span className={styles.cs}>"レースコンディションがないかレビューして"</span></div>
+                <div className={styles.codeLine}><span className={styles.ck}>codex</span> <span className={styles.cv}>exec</span> resume <span className={styles.cw}>--last</span> <span className={styles.cs}>"見つかった問題を修正して"</span></div>
                 <div className={styles.codeLine}></div>
-                <div className={styles.codeLine}># Gitリポジトリ外や使い捨て環境での実行</div>
-                <div className={styles.codeLine}>codex exec --skip-git-repo-check --sandbox read-only "このディレクトリの構成を説明して"</div>
+                <div className={styles.codeLine}><span className={styles.cc}># Gitリポジトリ外や使い捨て環境での実行</span></div>
+                <div className={styles.codeLine}><span className={styles.ck}>codex</span> <span className={styles.cv}>exec</span> <span className={styles.cw}>--skip-git-repo-check</span> <span className={styles.cw}>--sandbox</span> read-only <span className={styles.cs}>"このディレクトリの構成を説明して"</span></div>
               </pre>
 
               <p>
