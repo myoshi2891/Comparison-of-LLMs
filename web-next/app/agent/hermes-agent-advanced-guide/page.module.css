@@ -145,25 +145,32 @@
   padding: 4.4rem 0 3rem;
 }
 .eyebrow {
-  display: inline-block;
-  font-size: 0.76rem;
-  font-weight: 700;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.74rem;
+  letter-spacing: 0.1em;
   color: var(--accent);
-  margin-bottom: 0.8rem;
+  background: var(--accent-soft);
+  border: 1px solid rgba(124, 158, 255, 0.3);
+  padding: 0.32rem 0.85rem;
+  border-radius: 999px;
+  margin-bottom: 1.5rem;
+  font-weight: 500;
+  text-transform: uppercase;
 }
 .hero h1 {
-  font-size: 2.2rem;
+  font-size: 2.5rem;
   font-weight: 900;
-  line-height: 1.3;
-  margin: 0 0 1.2rem;
+  line-height: 1.35;
+  margin: 0 0 1.3rem;
   color: #fff;
+  letter-spacing: 0.01em;
 }
 .subtitle {
-  font-size: 1.02rem;
+  font-size: 0.98rem;
   color: var(--text-dim);
-  line-height: 1.8;
+  line-height: 1.9;
   margin: 0;
 }
 
@@ -172,40 +179,61 @@
 }
 
 .content h2 {
-  font-size: 1.5rem;
+  font-size: 1.55rem;
   font-weight: 700;
   color: #fff;
-  margin: 3.5rem 0 1.2rem;
-  padding-bottom: 0.6rem;
-  border-bottom: 1px solid var(--border-soft);
-  scroll-margin-top: calc(var(--header-height, 60px) + 20px);
+  margin: 3.6rem 0 1.3rem;
+  padding-top: 1.6rem;
+  border-top: 1px solid var(--border-soft);
+  scroll-margin-top: calc(var(--header-height, 60px) + 80px);
+}
+.content > h2:first-of-type {
+  border-top: none;
+  padding-top: 0;
+  margin-top: 0;
 }
 
 .content h3 {
-  font-size: 1.18rem;
+  font-size: 1.14rem;
   font-weight: 700;
-  color: var(--accent);
+  color: #eaf0fa;
   margin: 2.2rem 0 0.9rem;
-  scroll-margin-top: calc(var(--header-height, 60px) + 20px);
+  scroll-margin-top: calc(var(--header-height, 60px) + 80px);
 }
 
 .content p {
-  margin: 0 0 1.4rem;
+  color: var(--text);
+  margin: 0.9rem 0;
 }
 
 .content ul,
 .content ol {
-  margin: 0 0 1.5rem;
   padding-left: 1.4rem;
+  margin: 0.9rem 0;
+  color: var(--text);
 }
 .content li {
-  margin-bottom: 0.5rem;
+  margin: 0.4rem 0;
+}
+
+.content blockquote {
+  margin: 1.4rem 0;
+  padding: 1rem 1.3rem;
+  border-left: 3px solid var(--accent);
+  background: var(--accent-soft);
+  border-radius: 0 8px 8px 0;
+  color: var(--text-dim);
 }
 
 .content hr {
   border: none;
   border-top: 1px solid var(--border-soft);
-  margin: 3.5rem 0;
+  margin: 2.6rem 0;
+}
+
+.content strong {
+  color: #fff;
+  font-weight: 700;
 }
 
 .content code {
@@ -241,81 +269,127 @@
   border-radius: var(--radius);
   padding: 1.6rem;
   margin: 1.6rem 0;
+  display: flex;
+  justify-content: center;
+  overflow-x: auto;
 }
 
 .tableScroll {
   overflow-x: auto;
-  margin: 1.5rem 0;
+  margin: 1.4rem 0;
+  border-radius: var(--radius);
+  border: 1px solid var(--border-soft);
 }
 .tableScroll table {
-  width: 100%;
   border-collapse: collapse;
-  font-size: 0.92rem;
-}
-.tableScroll th,
-.tableScroll td {
-  padding: 0.8rem 1rem;
-  text-align: left !important;
-  border-bottom: 1px solid var(--border-soft);
+  width: 100%;
+  min-width: 560px;
+  font-size: 0.88rem;
 }
 .tableScroll th {
-  background: var(--bg-elevated);
+  background: var(--bg-card);
   color: #fff;
+  text-align: left;
+  padding: 0.75rem 1rem;
   font-weight: 700;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+.tableScroll td {
+  padding: 0.72rem 1rem;
+  border-bottom: 1px solid var(--border-soft);
+  color: var(--text-dim);
+  overflow-wrap: break-word;
+}
+.tableScroll tr:last-child td {
+  border-bottom: none;
 }
 .tableScroll tr:hover {
   background: rgba(255, 255, 255, 0.02);
 }
 
+/* Checklist grid */
 .checklistGrid {
   list-style: none;
   padding: 0;
-  margin: 1.5rem 0;
+  margin: 1.4rem 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 0.65rem;
+  align-items: stretch;
+}
+.checklistGrid li {
+  margin: 0;
 }
 .checklistItem {
   display: flex;
   align-items: flex-start;
-  gap: 0.75rem;
-  padding: 0.75rem 1rem;
-  background: var(--bg-elevated);
+  gap: 0.65rem;
+  background: var(--bg-card);
   border: 1px solid var(--border-soft);
-  border-radius: var(--radius);
-  margin-bottom: 0.6rem;
+  border-radius: 9px;
+  padding: 0.75rem 0.95rem;
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  line-height: 1.55;
   cursor: pointer;
+  height: 100%;
+  margin-bottom: 0;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
+}
+.checklistItem:hover {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: var(--border);
 }
 .checklistItem input[type="checkbox"] {
-  margin-top: 0.35rem;
+  margin-top: 0.2rem;
+  width: 15px;
+  height: 15px;
   accent-color: var(--accent);
+  flex: 0 0 15px;
 }
 .checklistText {
-  font-size: 0.92rem;
-  color: var(--text);
+  flex: 1 1 0%;
+  min-width: 0;
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  line-height: 1.55;
 }
 
+/* Reference grid */
 .refGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.2rem;
-  margin: 1.8rem 0;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1rem;
+  margin: 1.6rem 0;
 }
 .refCard {
-  background: var(--bg-elevated);
+  background: var(--bg-card);
   border: 1px solid var(--border-soft);
   border-radius: var(--radius);
-  padding: 1.4rem;
+  padding: 1.2rem 1.35rem;
 }
 .refCard h4 {
-  margin: 0 0 1rem;
-  font-size: 1rem;
-  color: #fff;
+  margin: 0 0 0.7rem;
+  font-size: 0.86rem;
+  color: var(--accent);
+  font-weight: 700;
 }
 .refCard ul {
-  padding-left: 1.2rem;
   margin: 0;
-  font-size: 0.88rem;
+  padding-left: 1.1rem;
+  list-style-type: disc;
 }
 .refCard li {
-  margin-bottom: 0.6rem;
+  margin: 0.5rem 0;
+  font-size: 0.83rem;
+  color: var(--text-dim);
+  line-height: 1.6;
+}
+.refCard li a {
+  word-break: break-all;
 }
 
 /* Code Highlight Token Classes */
@@ -369,6 +443,16 @@
     pointer-events: auto;
   }
   .main {
-    padding: 0 1.5rem 4rem;
+    padding: 0 1.3rem 4rem;
+  }
+  .hero {
+    padding: 5.2rem 0 2.4rem;
+  }
+  .hero h1 {
+    font-size: 1.7rem;
+  }
+  .refGrid,
+  .checklistGrid {
+    grid-template-columns: 1fr;
   }
 }

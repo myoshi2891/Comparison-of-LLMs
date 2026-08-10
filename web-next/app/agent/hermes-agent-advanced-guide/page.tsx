@@ -1919,102 +1919,132 @@ export default function HermesAgentAdvancedGuidePage() {
           <h2 id="16-ベストプラクティス総括チェックリスト">
             16. ベストプラクティス総括チェックリスト
           </h2>
-          <ul className={`${styles.checklistGrid} task-list`}>
-            <li className={styles.checklistItem}>
-              <input type="checkbox" id="chk-1" />
-              <label htmlFor="chk-1" className={styles.checklistText}>
-                プロファイルを用途別（開発／本番／検証）に分離している
+          <ul className={styles.checklistGrid}>
+            <li>
+              <label className={styles.checklistItem}>
+                <input type="checkbox" id="chk-1" />
+                <span className={styles.checklistText}>
+                  プロファイルを用途別（開発／本番／検証）に分離している
+                </span>
               </label>
             </li>
-            <li className={styles.checklistItem}>
-              <input type="checkbox" id="chk-2" />
-              <label htmlFor="chk-2" className={styles.checklistText}>
-                MEMORY.md/USER.mdの容量が80%を超えたら統合する運用にしている
+            <li>
+              <label className={styles.checklistItem}>
+                <input type="checkbox" id="chk-2" />
+                <span className={styles.checklistText}>
+                  MEMORY.md/USER.mdの容量が80%を超えたら統合する運用にしている
+                </span>
               </label>
             </li>
-            <li className={styles.checklistItem}>
-              <input type="checkbox" id="chk-3" />
-              <label htmlFor="chk-3" className={styles.checklistText}>
-                メモリ・スキルの<code>write_approval</code>を、信頼度に応じて有効化するか判断済み
+            <li>
+              <label className={styles.checklistItem}>
+                <input type="checkbox" id="chk-3" />
+                <span className={styles.checklistText}>
+                  メモリ・スキルの<code>write_approval</code>を、信頼度に応じて有効化するか判断済み
+                </span>
               </label>
             </li>
-            <li className={styles.checklistItem}>
-              <input type="checkbox" id="chk-4" />
-              <label htmlFor="chk-4" className={styles.checklistText}>
-                AGENTS.mdは<code>context_file_max_chars</code>
-                以内に収め、やってはいけないことを明記している
+            <li>
+              <label className={styles.checklistItem}>
+                <input type="checkbox" id="chk-4" />
+                <span className={styles.checklistText}>
+                  AGENTS.mdは<code>context_file_max_chars</code>
+                  以内に収め、やってはいけないことを明記している
+                </span>
               </label>
             </li>
-            <li className={styles.checklistItem}>
-              <input type="checkbox" id="chk-5" />
-              <label htmlFor="chk-5" className={styles.checklistText}>
-                サブエージェントへの委任では<code>goal</code>と<code>context</code>
-                に必要な情報を過不足なく詰めている
+            <li>
+              <label className={styles.checklistItem}>
+                <input type="checkbox" id="chk-5" />
+                <span className={styles.checklistText}>
+                  サブエージェントへの委任では<code>goal</code>と<code>context</code>
+                  に必要な情報を過不足なく詰めている
+                </span>
               </label>
             </li>
-            <li className={styles.checklistItem}>
-              <input type="checkbox" id="chk-6" />
-              <label htmlFor="chk-6" className={styles.checklistText}>
-                恒久実行が必要な処理は<code>delegate_task</code>ではなく<code>cronjob</code>/
-                <code>background terminal</code>を使っている
+            <li>
+              <label className={styles.checklistItem}>
+                <input type="checkbox" id="chk-6" />
+                <span className={styles.checklistText}>
+                  恒久実行が必要な処理は<code>delegate_task</code>ではなく<code>cronjob</code>/
+                  <code>background terminal</code>を使っている
+                </span>
               </label>
             </li>
-            <li className={styles.checklistItem}>
-              <input type="checkbox" id="chk-7" />
-              <label htmlFor="chk-7" className={styles.checklistText}>
-                Cronジョブのプロンプトは完全に自己完結している
+            <li>
+              <label className={styles.checklistItem}>
+                <input type="checkbox" id="chk-7" />
+                <span className={styles.checklistText}>
+                  Cronジョブのプロンプトは完全に自己完結している
+                </span>
               </label>
             </li>
-            <li className={styles.checklistItem}>
-              <input type="checkbox" id="chk-8" />
-              <label htmlFor="chk-8" className={styles.checklistText}>
-                高頻度ポーリングジョブには<code>wakeAgent</code>
-                ゲートを設けてLLM起動コストを削減している
+            <li>
+              <label className={styles.checklistItem}>
+                <input type="checkbox" id="chk-8" />
+                <span className={styles.checklistText}>
+                  高頻度ポーリングジョブには<code>wakeAgent</code>
+                  ゲートを設けてLLM起動コストを削減している
+                </span>
               </label>
             </li>
-            <li className={styles.checklistItem}>
-              <input type="checkbox" id="chk-9" />
-              <label htmlFor="chk-9" className={styles.checklistText}>
-                本番ゲートウェイは<code>GATEWAY_ALLOW_ALL_USERS=true</code>
-                を使わず、許可リストかDMペアリングを使っている
+            <li>
+              <label className={styles.checklistItem}>
+                <input type="checkbox" id="chk-9" />
+                <span className={styles.checklistText}>
+                  本番ゲートウェイは<code>GATEWAY_ALLOW_ALL_USERS=true</code>
+                  を使わず、許可リストかDMペアリングを使っている
+                </span>
               </label>
             </li>
-            <li className={styles.checklistItem}>
-              <input type="checkbox" id="chk-10" />
-              <label htmlFor="chk-10" className={styles.checklistText}>
-                本番ゲートウェイはコンテナバックエンド（Docker/Modal/Daytona）で動かしている
+            <li>
+              <label className={styles.checklistItem}>
+                <input type="checkbox" id="chk-10" />
+                <span className={styles.checklistText}>
+                  本番ゲートウェイはコンテナバックエンド（Docker/Modal/Daytona）で動かしている
+                </span>
               </label>
             </li>
-            <li className={styles.checklistItem}>
-              <input type="checkbox" id="chk-11" />
-              <label htmlFor="chk-11" className={styles.checklistText}>
-                MCPサーバーは<code>tools.include</code>/<code>exclude</code>
-                でツール単位に絞り込んでいる
+            <li>
+              <label className={styles.checklistItem}>
+                <input type="checkbox" id="chk-11" />
+                <span className={styles.checklistText}>
+                  MCPサーバーは<code>tools.include</code>/<code>exclude</code>
+                  でツール単位に絞り込んでいる
+                </span>
               </label>
             </li>
-            <li className={styles.checklistItem}>
-              <input type="checkbox" id="chk-12" />
-              <label htmlFor="chk-12" className={styles.checklistText}>
-                コミュニティ製スキル・MCPは<code>hermes skills inspect</code>
-                等でレビューしてから導入している
+            <li>
+              <label className={styles.checklistItem}>
+                <input type="checkbox" id="chk-12" />
+                <span className={styles.checklistText}>
+                  コミュニティ製スキル・MCPは<code>hermes skills inspect</code>
+                  等でレビューしてから導入している
+                </span>
               </label>
             </li>
-            <li className={styles.checklistItem}>
-              <input type="checkbox" id="chk-13" />
-              <label htmlFor="chk-13" className={styles.checklistText}>
-                モデル切り替え頻度を抑え、プロンプトキャッシュのヒット率を意識している
+            <li>
+              <label className={styles.checklistItem}>
+                <input type="checkbox" id="chk-13" />
+                <span className={styles.checklistText}>
+                  モデル切り替え頻度を抑え、プロンプトキャッシュのヒット率を意識している
+                </span>
               </label>
             </li>
-            <li className={styles.checklistItem}>
-              <input type="checkbox" id="chk-14" />
-              <label htmlFor="chk-14" className={styles.checklistText}>
-                Curatorのバックアップ（<code>curator.backup.enabled</code>）を有効なままにしている
+            <li>
+              <label className={styles.checklistItem}>
+                <input type="checkbox" id="chk-14" />
+                <span className={styles.checklistText}>
+                  Curatorのバックアップ（<code>curator.backup.enabled</code>）を有効なままにしている
+                </span>
               </label>
             </li>
-            <li className={styles.checklistItem}>
-              <input type="checkbox" id="chk-15" />
-              <label htmlFor="chk-15" className={styles.checklistText}>
-                <code>hermes update</code>を定期的に実行しセキュリティパッチを取り込んでいる
+            <li>
+              <label className={styles.checklistItem}>
+                <input type="checkbox" id="chk-15" />
+                <span className={styles.checklistText}>
+                  <code>hermes update</code>を定期的に実行しセキュリティパッチを取り込んでいる
+                </span>
               </label>
             </li>
           </ul>
