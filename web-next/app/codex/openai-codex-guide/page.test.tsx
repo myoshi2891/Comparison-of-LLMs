@@ -1,14 +1,3 @@
-import { JSDOM } from "jsdom";
-
-const dom = new JSDOM("<!DOCTYPE html><html><body></body></html>", {
-  url: "http://localhost:3000",
-});
-(global as any).window = dom.window;
-(global as any).document = dom.window.document;
-(global as any).navigator = dom.window.navigator;
-(global as any).HTMLElement = dom.window.HTMLElement;
-(global as any).SVGElement = dom.window.SVGElement;
-
 import { render } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import Page, { metadata } from "./page";
