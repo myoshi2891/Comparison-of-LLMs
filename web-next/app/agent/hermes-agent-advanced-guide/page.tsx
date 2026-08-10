@@ -611,7 +611,7 @@ export default function HermesAgentAdvancedGuidePage() {
               <span className={styles.ck}>memory:</span>
             </div>
             <div className={styles.codeLine}>
-              {" "}
+              {"  "}
               <span className={styles.cv}>write_approval:</span>{" "}
               <span className={styles.cs}>true</span>{" "}
               <span className={styles.cc}># true = 保存前に承認が必要</span>
@@ -620,7 +620,7 @@ export default function HermesAgentAdvancedGuidePage() {
               <span className={styles.ck}>skills:</span>
             </div>
             <div className={styles.codeLine}>
-              {" "}
+              {"  "}
               <span className={styles.cv}>write_approval:</span>{" "}
               <span className={styles.cs}>true</span>
             </div>
@@ -724,26 +724,26 @@ export default function HermesAgentAdvancedGuidePage() {
               <span className={styles.ck}>metadata:</span>
             </div>
             <div className={styles.codeLine}>
-              {" "}
+              {"  "}
               <span className={styles.cv}>hermes:</span>
             </div>
             <div className={styles.codeLine}>
-              {" "}
+              {"    "}
               <span className={styles.cv}>tags:</span> [<span className={styles.cs}>python</span>,{" "}
               <span className={styles.cs}>automation</span>]
             </div>
             <div className={styles.codeLine}>
-              {" "}
+              {"    "}
               <span className={styles.cv}>category:</span> <span className={styles.cs}>devops</span>
             </div>
             <div className={styles.codeLine}>
-              {" "}
+              {"    "}
               <span className={styles.cv}>fallback_for_toolsets:</span> [
               <span className={styles.cs}>web</span>]{" "}
               <span className={styles.cc}># 条件付き活性化：このtoolsetが無い時だけ表示</span>
             </div>
             <div className={styles.codeLine}>
-              {" "}
+              {"    "}
               <span className={styles.cv}>requires_toolsets:</span> [
               <span className={styles.cs}>terminal</span>]{" "}
               <span className={styles.cc}># 条件付き活性化：このtoolsetがある時だけ表示</span>
@@ -787,12 +787,11 @@ export default function HermesAgentAdvancedGuidePage() {
             <div className={styles.codeLine}>
               <span className={styles.ck}>hermes</span> bundles create backend-dev \
             </div>
-            <div className={styles.codeLine}> --skill github-code-review \</div>
-            <div className={styles.codeLine}> --skill test-driven-development \</div>
-            <div className={styles.codeLine}> --skill github-pr-workflow \</div>
+            <div className={styles.codeLine}>{"  "}--skill github-code-review \</div>
+            <div className={styles.codeLine}>{"  "}--skill test-driven-development \</div>
+            <div className={styles.codeLine}>{"  "}--skill github-pr-workflow \</div>
             <div className={styles.codeLine}>
-              {" "}
-              -d &quot;バックエンド機能開発：レビュー・テスト・PRワークフロー&quot;
+              {"  "}-d &quot;バックエンド機能開発：レビュー・テスト・PRワークフロー&quot;
             </div>
           </div>
           <p>
@@ -965,14 +964,12 @@ export default function HermesAgentAdvancedGuidePage() {
           </p>
           <div className={styles.codeBlock}>
             <div className={styles.codeLine}>my-project/</div>
-            <div className={styles.codeLine}> AGENTS.md ← セッション開始時にロード</div>
+            <div className={styles.codeLine}>{"  "}AGENTS.md ← セッション開始時にロード</div>
             <div className={styles.codeLine}>
-              {" "}
-              frontend/AGENTS.md ← frontend/ 配下を読んだ時に発見
+              {"  "}frontend/AGENTS.md ← frontend/ 配下を読んだ時に発見
             </div>
             <div className={styles.codeLine}>
-              {" "}
-              backend/AGENTS.md ← backend/ 配下を読んだ時に発見
+              {"  "}backend/AGENTS.md ← backend/ 配下を読んだ時に発見
             </div>
           </div>
           <p>
@@ -1037,27 +1034,25 @@ export default function HermesAgentAdvancedGuidePage() {
             </div>
             <div className={styles.codeLine}>delegate_task(</div>
             <div className={styles.codeLine}>
-              {" "}
-              goal=
+              {"    "}goal=
               <span className={styles.cs}>&quot;api/handlers.py の TypeError を修正&quot;</span>,
             </div>
             <div className={styles.codeLine}>
-              {" "}
-              context=
+              {"    "}context=
               <span className={styles.cs}>
                 &quot;&quot;&quot;47行目でTypeError: &apos;NoneType&apos; object has no attribute
                 &apos;get&apos;。
               </span>
             </div>
             <div className={styles.codeLine}>
+              {"    "}
               <span className={styles.cs}>
-                {" "}
                 process_request() が parse_body() からNoneを受け取っている。
               </span>
             </div>
             <div className={styles.codeLine}>
+              {"    "}
               <span className={styles.cs}>
-                {" "}
                 プロジェクトは /home/user/myproject、Python 3.11。&quot;&quot;&quot;
               </span>
             </div>
@@ -1080,21 +1075,21 @@ export default function HermesAgentAdvancedGuidePage() {
             </div>
             <div className={styles.codeLine}>delegate_task(tasks=[</div>
             <div className={styles.codeLine}>
-              {" "}
+              {"    "}
               &#123;<span className={styles.cs}>&quot;goal&quot;</span>:{" "}
               <span className={styles.cs}>&quot;話題Aを調査&quot;</span>,{" "}
               <span className={styles.cs}>&quot;context&quot;</span>:{" "}
               <span className={styles.cs}>&quot;...&quot;</span>&#125;,
             </div>
             <div className={styles.codeLine}>
-              {" "}
+              {"    "}
               &#123;<span className={styles.cs}>&quot;goal&quot;</span>:{" "}
               <span className={styles.cs}>&quot;話題Bを調査&quot;</span>,{" "}
               <span className={styles.cs}>&quot;context&quot;</span>:{" "}
               <span className={styles.cs}>&quot;...&quot;</span>&#125;,
             </div>
             <div className={styles.codeLine}>
-              {" "}
+              {"    "}
               &#123;<span className={styles.cs}>&quot;goal&quot;</span>:{" "}
               <span className={styles.cs}>&quot;ビルドを修正&quot;</span>,{" "}
               <span className={styles.cs}>&quot;context&quot;</span>:{" "}
@@ -1217,22 +1212,21 @@ export default function HermesAgentAdvancedGuidePage() {
               <span className={styles.cs}>&quot;web&quot;</span>]:
             </div>
             <div className={styles.codeLine}>
-              {" "}
-              page = web_extract([r[<span className={styles.cs}>&quot;url&quot;</span>]])
+              {"    "}page = web_extract([r[<span className={styles.cs}>&quot;url&quot;</span>]])
             </div>
             <div className={styles.codeLine}>
-              {" "}
+              {"    "}
               <span className={styles.ck}>for</span> p <span className={styles.ck}>in</span>{" "}
               page.get(<span className={styles.cs}>&quot;results&quot;</span>, []):
             </div>
             <div className={styles.codeLine}>
-              {" "}
+              {"        "}
               <span className={styles.ck}>if</span> p.get(
               <span className={styles.cs}>&quot;content&quot;</span>):
             </div>
             <div className={styles.codeLine}>
-              {" "}
-              summaries.append(&#123;<span className={styles.cs}>&quot;title&quot;</span>: r[
+              {"            "}summaries.append(&#123;
+              <span className={styles.cs}>&quot;title&quot;</span>: r[
               <span className={styles.cs}>&quot;title&quot;</span>],{" "}
               <span className={styles.cs}>&quot;excerpt&quot;</span>: p[
               <span className={styles.cs}>&quot;content&quot;</span>][:500]&#125;)
@@ -1378,8 +1372,12 @@ export default function HermesAgentAdvancedGuidePage() {
           <div className={styles.codeBlock}>
             <div className={styles.codeLine}>悪い例: 「サーバーの件を確認して」</div>
             <div className={styles.codeLine}>良い例: 「192.168.1.100にdeployユーザーでSSHし、</div>
-            <div className={styles.codeLine}> systemctl status nginx でnginxの稼働を確認し、</div>
-            <div className={styles.codeLine}> https://example.com がHTTP 200を返すか検証して」</div>
+            <div className={styles.codeLine}>
+              {"        "}systemctl status nginx でnginxの稼働を確認し、
+            </div>
+            <div className={styles.codeLine}>
+              {"        "}https://example.com がHTTP 200を返すか検証して」
+            </div>
           </div>
 
           <h3 id="113-ジョブの連鎖context_from">
@@ -1405,8 +1403,8 @@ export default function HermesAgentAdvancedGuidePage() {
               <span className={styles.cs}>&quot;30 7 * * *&quot;</span>,
             </div>
             <div className={styles.codeLine}>
-              {" "}
-              context_from=<span className={styles.cs}>&quot;&lt;job1_id&gt;&quot;</span>, name=
+              {"        "}context_from=
+              <span className={styles.cs}>&quot;&lt;job1_id&gt;&quot;</span>, name=
               <span className={styles.cs}>&quot;AI News Triage&quot;</span>)
             </div>
             <div className={styles.codeLine}>
@@ -1415,8 +1413,8 @@ export default function HermesAgentAdvancedGuidePage() {
               <span className={styles.cs}>&quot;0 8 * * *&quot;</span>,
             </div>
             <div className={styles.codeLine}>
-              {" "}
-              context_from=<span className={styles.cs}>&quot;&lt;job2_id&gt;&quot;</span>, name=
+              {"        "}context_from=
+              <span className={styles.cs}>&quot;&lt;job2_id&gt;&quot;</span>, name=
               <span className={styles.cs}>&quot;AI News Brief&quot;</span>)
             </div>
           </div>
@@ -1476,16 +1474,16 @@ export default function HermesAgentAdvancedGuidePage() {
               <span className={styles.ck}>mcp_servers:</span>
             </div>
             <div className={styles.codeLine}>
-              {" "}
+              {"  "}
               <span className={styles.cv}>filesystem:</span>
             </div>
             <div className={styles.codeLine}>
-              {" "}
+              {"    "}
               <span className={styles.cv}>command:</span>{" "}
               <span className={styles.cs}>&quot;npx&quot;</span>
             </div>
             <div className={styles.codeLine}>
-              {" "}
+              {"    "}
               <span className={styles.cv}>args:</span> [
               <span className={styles.cs}>&quot;-y&quot;</span>,{" "}
               <span className={styles.cs}>&quot;@modelcontextprotocol/server-filesystem&quot;</span>
@@ -1493,16 +1491,16 @@ export default function HermesAgentAdvancedGuidePage() {
             </div>
             <div className={styles.codeLine}></div>
             <div className={styles.codeLine}>
-              {" "}
+              {"  "}
               <span className={styles.cv}>linear:</span>
             </div>
             <div className={styles.codeLine}>
-              {" "}
+              {"    "}
               <span className={styles.cv}>url:</span>{" "}
               <span className={styles.cs}>&quot;https://mcp.linear.app/mcp&quot;</span>
             </div>
             <div className={styles.codeLine}>
-              {" "}
+              {"    "}
               <span className={styles.cv}>auth:</span> <span className={styles.cs}>oauth</span>
             </div>
           </div>
@@ -1522,20 +1520,20 @@ export default function HermesAgentAdvancedGuidePage() {
               <span className={styles.ck}>mcp_servers:</span>
             </div>
             <div className={styles.codeLine}>
-              {" "}
+              {"  "}
               <span className={styles.cv}>stripe:</span>
             </div>
             <div className={styles.codeLine}>
-              {" "}
+              {"    "}
               <span className={styles.cv}>url:</span>{" "}
               <span className={styles.cs}>&quot;https://mcp.stripe.com&quot;</span>
             </div>
             <div className={styles.codeLine}>
-              {" "}
+              {"    "}
               <span className={styles.cv}>tools:</span>
             </div>
             <div className={styles.codeLine}>
-              {" "}
+              {"      "}
               <span className={styles.cv}>exclude:</span> [
               <span className={styles.cs}>delete_customer</span>,{" "}
               <span className={styles.cs}>refund_payment</span>]
@@ -1623,16 +1621,14 @@ export default function HermesAgentAdvancedGuidePage() {
               <span className={styles.ck}>approvals:</span>
             </div>
             <div className={styles.codeLine}>
-              {" "}
+              {"  "}
               <span className={styles.cv}>deny:</span>
             </div>
             <div className={styles.codeLine}>
-              {" "}
-              - <span className={styles.cs}>&quot;git push --force*&quot;</span>
+              {"    "}- <span className={styles.cs}>&quot;git push --force*&quot;</span>
             </div>
             <div className={styles.codeLine}>
-              {" "}
-              - <span className={styles.cs}>&quot;*curl*|*sh*&quot;</span>
+              {"    "}- <span className={styles.cs}>&quot;*curl*|*sh*&quot;</span>
             </div>
           </div>
 
@@ -1813,30 +1809,30 @@ export default function HermesAgentAdvancedGuidePage() {
               <span className={styles.ck}>auxiliary:</span>
             </div>
             <div className={styles.codeLine}>
-              {" "}
+              {"  "}
               <span className={styles.cv}>background_review:</span>
             </div>
             <div className={styles.codeLine}>
-              {" "}
+              {"    "}
               <span className={styles.cv}>provider:</span>{" "}
               <span className={styles.cs}>openrouter</span>
             </div>
             <div className={styles.codeLine}>
-              {" "}
+              {"    "}
               <span className={styles.cv}>model:</span>{" "}
               <span className={styles.cs}>google/gemini-3-flash-preview</span>
             </div>
             <div className={styles.codeLine}>
-              {" "}
+              {"  "}
               <span className={styles.cv}>goal_judge:</span>
             </div>
             <div className={styles.codeLine}>
-              {" "}
+              {"    "}
               <span className={styles.cv}>provider:</span>{" "}
               <span className={styles.cs}>openrouter</span>
             </div>
             <div className={styles.codeLine}>
-              {" "}
+              {"    "}
               <span className={styles.cv}>model:</span>{" "}
               <span className={styles.cs}>google/gemini-3-flash-preview</span>
             </div>
