@@ -85,12 +85,13 @@ const entries: PageEntry[] = [
   },
   {
     slug: "/agent/hermes-agent-advanced-guide",
-    title: "Advanced Guide",
+    title: "Hermes Agent ベストプラクティスガイド ― 中級者から上級者向け",
     group: "Agent 開発",
     topics: ["agent", "guide"],
-    summary: "内部アーキテクチャ / 7層セキュリティ / 本番デプロイメントベストプラクティス",
+    summary:
+      "Nous Research製自己改善型AIエージェント「Hermes Agent」のアーキテクチャ・メモリ設計・スキル運用・サブエージェント委任・/goal・execute_code・Cron・MCP統合・8層セキュリティ・コスト最適化までを網羅した実践ガイド。",
     addedAt: "2026-06-04",
-    lastReviewed: "2026-07-01",
+    lastReviewed: "2026-08-10",
   },
   {
     slug: "/agent/loop-engineering",
