@@ -121,4 +121,20 @@ describe("/agent/hermes-agent-advanced-guide - static source safety", () => {
     const needle = ["danger", "ously", "Set", "Inner", "HTML"].join("");
     expect(source.includes(needle)).toBe(false);
   });
+
+  it("uses a non-circular local alias for the monospace font", () => {
+    const css = readFileSync(join(__dirname, "page.module.css"), "utf8");
+
+    expect(css).not.toMatch(/--font-mono:\s*var\(--font-mono\)/);
+    expect(css).toMatch(/--font-code:\s*var\(--font-mono\)/);
+    expect(css).toMatch(/\.content code\s*\{[^}]*font-family:\s*var\(--font-code\)/s);
+    expect(css).toMatch(/\.codeBlock\s*\{[^}]*font-family:\s*var\(--font-code\)/s);
+  });
+
+  it("delegates Mermaid sizing and centering to the shared component", () => {
+    const css = readFileSync(join(__dirname, "page.module.css"), "utf8");
+
+    expect(css).not.toMatch(/\.mermaidWrap\s*\{[^}]*(?:display|justify-content)\s*:/s);
+    expect(css).toMatch(/\.mermaidWrap\s*\{[^}]*overflow-x:\s*auto/s);
+  });
 });
