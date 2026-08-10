@@ -85,4 +85,3 @@ describe("/codex/harness-engineering metadata", () => {
     expect((meta.description ?? "").length).toBeGreaterThan(20);
   });
 });
-

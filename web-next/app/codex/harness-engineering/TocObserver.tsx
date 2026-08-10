@@ -45,7 +45,9 @@ export default function TocObserver() {
       }
     );
 
-    sections.forEach((section) => observer.observe(section));
+    sections.forEach((section) => {
+      observer.observe(section);
+    });
 
     return () => {
       if (toggleBtn) {
