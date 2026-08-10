@@ -16,7 +16,7 @@
   --c-ops: #ff8b9e;
   --radius: 12px;
   --font-body: var(--font-sans), "Noto Sans JP", sans-serif;
-  --font-mono: var(--font-mono), "JetBrains Mono", monospace;
+  --font-code: var(--font-mono), "JetBrains Mono", monospace;
 
   display: flex;
   min-height: 100vh;
@@ -237,7 +237,7 @@
 }
 
 .content code {
-  font-family: var(--font-mono);
+  font-family: var(--font-code);
   font-size: 0.88em;
   background: rgba(124, 158, 255, 0.1);
   padding: 0.14em 0.42em;
@@ -254,7 +254,7 @@
   padding: 1.15rem 1.3rem;
   overflow-x: auto;
   margin: 1.4rem 0;
-  font-family: var(--font-mono);
+  font-family: var(--font-code);
   font-size: 0.86rem;
   line-height: 1.7;
 }
@@ -269,8 +269,6 @@
   border-radius: var(--radius);
   padding: 1.6rem;
   margin: 1.6rem 0;
-  display: flex;
-  justify-content: center;
   overflow-x: auto;
 }
 
