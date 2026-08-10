@@ -56,7 +56,9 @@ describe("/agent/hermes-agent-advanced-guide - page structure", () => {
     const { container } = render(<Page />);
     const h1 = container.querySelector("h1");
     expect(h1).not.toBeNull();
-    expect(h1?.textContent?.trim()).toBe("Hermes Agent ベストプラクティスガイド ― 中級者から上級者向け");
+    expect(h1?.textContent?.trim()).toBe(
+      "Hermes Agent ベストプラクティスガイド ― 中級者から上級者向け"
+    );
   });
 
   it("renders all 17 expected section H2 ids", () => {
@@ -120,4 +122,3 @@ describe("/agent/hermes-agent-advanced-guide - static source safety", () => {
     expect(source.includes(needle)).toBe(false);
   });
 });
-

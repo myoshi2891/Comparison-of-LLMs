@@ -33,11 +33,7 @@
   position: fixed;
   inset: 0;
   background:
-    radial-gradient(
-      ellipse 900px 500px at 12% -10%,
-      rgba(124, 158, 255, 0.16),
-      transparent 60%
-    ),
+    radial-gradient(ellipse 900px 500px at 12% -10%, rgba(124, 158, 255, 0.16), transparent 60%),
     radial-gradient(ellipse 700px 500px at 100% 8%, rgba(94, 234, 212, 0.08), transparent 55%);
   pointer-events: none;
   z-index: 0;
@@ -118,7 +114,10 @@
   border-left: 2px solid transparent;
   border-radius: 0 6px 6px 0;
   margin-bottom: 0.05rem;
-  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  transition:
+    background 0.15s,
+    color 0.15s,
+    border-color 0.15s;
   text-decoration: none;
 }
 .navLink:hover {
@@ -194,7 +193,8 @@
   margin: 0 0 1.4rem;
 }
 
-.content ul, .content ol {
+.content ul,
+.content ol {
   margin: 0 0 1.5rem;
   padding-left: 1.4rem;
 }
@@ -252,7 +252,8 @@
   border-collapse: collapse;
   font-size: 0.92rem;
 }
-.tableScroll th, .tableScroll td {
+.tableScroll th,
+.tableScroll td {
   padding: 0.8rem 1rem;
   text-align: left !important;
   border-bottom: 1px solid var(--border-soft);
@@ -318,13 +319,32 @@
 }
 
 /* Code Highlight Token Classes */
-.ck { color: #ff7b72; font-weight: 600; } /* Keyword */
-.cs { color: #a5d6ff; } /* String/delimiter */
-.cv { color: #79c0ff; } /* Value/variable */
-.cc { color: #5d7495; font-style: italic; } /* Comment */
-.cm { color: #7ee787; font-weight: 600; } /* Marker/Section */
-.cw { color: #d29922; font-weight: 600; } /* Warning */
-.ch { color: #f0883e; font-weight: 700; } /* Header */
+.ck {
+  color: #ff7b72;
+  font-weight: 600;
+} /* Keyword */
+.cs {
+  color: #a5d6ff;
+} /* String/delimiter */
+.cv {
+  color: #79c0ff;
+} /* Value/variable */
+.cc {
+  color: #5d7495;
+  font-style: italic;
+} /* Comment */
+.cm {
+  color: #7ee787;
+  font-weight: 600;
+} /* Marker/Section */
+.cw {
+  color: #d29922;
+  font-weight: 600;
+} /* Warning */
+.ch {
+  color: #f0883e;
+  font-weight: 700;
+} /* Header */
 
 @media (max-width: 960px) {
   .sidebarToggle {
@@ -337,7 +357,9 @@
     bottom: 0;
     height: 100vh;
     transform: translateX(-100%);
-    transition: transform 0.25s ease-in-out, visibility 0.25s;
+    transition:
+      transform 0.25s ease-in-out,
+      visibility 0.25s;
     visibility: hidden;
     pointer-events: none;
   }
