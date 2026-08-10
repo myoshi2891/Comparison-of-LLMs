@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { fireEvent, render } from "@testing-library/react";
 import type { Metadata } from "next";
 import { describe, expect, it, vi } from "vitest";
@@ -173,6 +175,31 @@ describe("OpenAI Codex Harness Engineering Evals Guide - Comprehensive Regressio
       expect(href).toMatch(/^#/);
       expect(href).not.toMatch(/\.html$/);
     });
+  });
+
+  it("delegates Mermaid sizing and centering to the shared component", () => {
+    const css = readFileSync(join(__dirname, "page.module.css"), "utf8");
+
+    expect(css).not.toMatch(/\.mermaidWrap\s*\{[^}]*(?:display|justify-content)\s*:/s);
+    expect(css).toMatch(/\.mermaidWrap\s*\{[^}]*overflow-x:\s*auto/s);
+  });
+
+  it("preserves disc bullets in reference cards", () => {
+    const css = readFileSync(join(__dirname, "page.module.css"), "utf8");
+
+    expect(css).toMatch(/\.refCard ul\s*\{[^}]*list-style:\s*disc/s);
+    expect(css).toMatch(/\.refCard ul\s*\{[^}]*padding-left:\s*1\.1rem/s);
+    expect(css).toMatch(/\.refCard ul\s*\{[^}]*margin:\s*0/s);
+  });
+
+  it("makes the open mobile overlay cover the viewport", () => {
+    const css = readFileSync(join(__dirname, "page.module.css"), "utf8");
+
+    expect(css).toMatch(/\.overlayOpen\s*\{[^}]*display:\s*block\s*!important/s);
+    expect(css).toMatch(/\.overlayOpen\s*\{[^}]*position:\s*fixed/s);
+    expect(css).toMatch(/\.overlayOpen\s*\{[^}]*inset:\s*0/s);
+    expect(css).toMatch(/\.overlayOpen\s*\{[^}]*width:\s*100%/s);
+    expect(css).toMatch(/\.overlayOpen\s*\{[^}]*height:\s*100%/s);
   });
 });
 
