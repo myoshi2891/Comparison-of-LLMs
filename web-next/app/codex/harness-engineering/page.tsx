@@ -292,9 +292,8 @@ export default function Page() {
               </div>
               <div className={styles.quicknavGrid}>
                 <a
-                  className={styles.quicknavCard}
+                  className={`${styles.quicknavCard} ${styles.cardL1}`}
                   href="#41-layer-1-セッション内自己検証ループralph-wiggum-loop"
-                  style={{ "--layer-color": "#7c9eff" } as React.CSSProperties}
                 >
                   <span className={styles.quicknavBadge}>L1</span>
                   <span className={styles.quicknavTitle}>
@@ -305,9 +304,8 @@ export default function Page() {
                   </span>
                 </a>
                 <a
-                  className={styles.quicknavCard}
+                  className={`${styles.quicknavCard} ${styles.cardL2}`}
                   href="#42-layer-2-リポジトリレベルのメカニカル強制"
-                  style={{ "--layer-color": "#5ee6c4" } as React.CSSProperties}
                 >
                   <span className={styles.quicknavBadge}>L2</span>
                   <span className={styles.quicknavTitle}>リポジトリレベルのメカニカル強制</span>
@@ -316,9 +314,8 @@ export default function Page() {
                   </span>
                 </a>
                 <a
-                  className={styles.quicknavCard}
+                  className={`${styles.quicknavCard} ${styles.cardL3}`}
                   href="#43-layer-3-ランタイムオブザーバビリティによる実行時検証"
-                  style={{ "--layer-color": "#f2c94c" } as React.CSSProperties}
                 >
                   <span className={styles.quicknavBadge}>L3</span>
                   <span className={styles.quicknavTitle}>
@@ -329,9 +326,8 @@ export default function Page() {
                   </span>
                 </a>
                 <a
-                  className={styles.quicknavCard}
+                  className={`${styles.quicknavCard} ${styles.cardL4}`}
                   href="#44-layer-4-cicdにおける非対話型品質ゲートcodex-exec"
-                  style={{ "--layer-color": "#f2789a" } as React.CSSProperties}
                 >
                   <span className={styles.quicknavBadge}>L4</span>
                   <span className={styles.quicknavTitle}>
@@ -342,9 +338,8 @@ export default function Page() {
                   </span>
                 </a>
                 <a
-                  className={styles.quicknavCard}
+                  className={`${styles.quicknavCard} ${styles.cardL5}`}
                   href="#45-layer-5-プラットフォームevals--tracesgradersdatasetseval-runsのフライホイール"
-                  style={{ "--layer-color": "#b39ddb" } as React.CSSProperties}
                 >
                   <span className={styles.quicknavBadge}>L5</span>
                   <span className={styles.quicknavTitle}>
@@ -355,9 +350,8 @@ export default function Page() {
                   </span>
                 </a>
                 <a
-                  className={styles.quicknavCard}
+                  className={`${styles.quicknavCard} ${styles.cardL6}`}
                   href="#46-layer-6-外部標準ベンチマーク--swe-bench-verifiedとterminal-bench-20--harbor"
-                  style={{ "--layer-color": "#56ccf2" } as React.CSSProperties}
                 >
                   <span className={styles.quicknavBadge}>L6</span>
                   <span className={styles.quicknavTitle}>
@@ -368,9 +362,8 @@ export default function Page() {
                   </span>
                 </a>
                 <a
-                  className={styles.quicknavCard}
+                  className={`${styles.quicknavCard} ${styles.cardL7}`}
                   href="#47-layer-7-継続的セキュリティ評価codex-security-cli"
-                  style={{ "--layer-color": "#ff8a65" } as React.CSSProperties}
                 >
                   <span className={styles.quicknavBadge}>L7</span>
                   <span className={styles.quicknavTitle}>
@@ -391,9 +384,8 @@ export default function Page() {
 
             {/* 4.1 */}
             <h3
-              className={styles.layer1}
+              className={`${styles.layerH3} ${styles.layer1}`}
               id="41-layer-1-セッション内自己検証ループralph-wiggum-loop"
-              style={{ "--layer-color": "#7c9eff" } as React.CSSProperties}
             >
               4.1 Layer 1: セッション内自己検証ループ(Ralph Wiggum Loop)
             </h3>
@@ -414,9 +406,8 @@ export default function Page() {
 
             {/* 4.2 */}
             <h3
-              className={styles.layer2}
+              className={`${styles.layerH3} ${styles.layer2}`}
               id="42-layer-2-リポジトリレベルのメカニカル強制"
-              style={{ "--layer-color": "#5ee6c4" } as React.CSSProperties}
             >
               4.2 Layer 2: リポジトリレベルのメカニカル強制
             </h3>
@@ -449,9 +440,8 @@ export default function Page() {
 
             {/* 4.3 */}
             <h3
-              className={styles.layer3}
+              className={`${styles.layerH3} ${styles.layer3}`}
               id="43-layer-3-ランタイムオブザーバビリティによる実行時検証"
-              style={{ "--layer-color": "#f2c94c" } as React.CSSProperties}
             >
               4.3 Layer 3: ランタイム・オブザーバビリティによる実行時検証
             </h3>
@@ -473,9 +463,8 @@ export default function Page() {
 
             {/* 4.4 */}
             <h3
-              className={styles.layer4}
+              className={`${styles.layerH3} ${styles.layer4}`}
               id="44-layer-4-cicdにおける非対話型品質ゲートcodex-exec"
-              style={{ "--layer-color": "#f2789a" } as React.CSSProperties}
             >
               4.4 Layer 4: CI/CDにおける非対話型品質ゲート(codex exec)
             </h3>
@@ -576,9 +565,8 @@ export default function Page() {
 
             {/* 4.5 */}
             <h3
-              className={styles.layer5}
+              className={`${styles.layerH3} ${styles.layer5}`}
               id="45-layer-5-プラットフォームevals--tracesgradersdatasetseval-runsのフライホイール"
-              style={{ "--layer-color": "#b39ddb" } as React.CSSProperties}
             >
               4.5 Layer 5: プラットフォームEvals — Traces・Graders・Datasets・Eval
               Runsのフライホイール
@@ -693,9 +681,8 @@ export default function Page() {
 
             {/* 4.6 */}
             <h3
-              className={styles.layer6}
+              className={`${styles.layerH3} ${styles.layer6}`}
               id="46-layer-6-外部標準ベンチマーク--swe-bench-verifiedとterminal-bench-20--harbor"
-              style={{ "--layer-color": "#56ccf2" } as React.CSSProperties}
             >
               4.6 Layer 6: 外部標準ベンチマーク — SWE-bench VerifiedとTerminal-Bench 2.0 / Harbor
             </h3>
@@ -776,9 +763,8 @@ export default function Page() {
 
             {/* 4.7 */}
             <h3
-              className={styles.layer7}
+              className={`${styles.layerH3} ${styles.layer7}`}
               id="47-layer-7-継続的セキュリティ評価codex-security-cli"
-              style={{ "--layer-color": "#ff8a65" } as React.CSSProperties}
             >
               4.7 Layer 7: 継続的セキュリティ評価(Codex Security CLI)
             </h3>

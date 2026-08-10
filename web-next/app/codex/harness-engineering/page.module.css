@@ -10,8 +10,18 @@
   --accent-soft: rgba(124, 158, 255, 0.14);
   --accent-2: #5ee6c4;
   --sidebar-w: 300px;
-  --font-sans: 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'Noto Sans JP', 'Yu Gothic UI', system-ui, -apple-system, sans-serif;
-  --font-mono: ui-monospace, 'SFMono-Regular', 'Menlo', 'Consolas', 'Liberation Mono', monospace;
+  --font-sans:
+    "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Noto Sans JP", "Yu Gothic UI", system-ui,
+    -apple-system, sans-serif;
+  --font-mono: ui-monospace, "SFMono-Regular", "Menlo", "Consolas", "Liberation Mono", monospace;
+
+  --layer1: #7c9eff;
+  --layer2: #5ee6c4;
+  --layer3: #f2c94c;
+  --layer4: #f2789a;
+  --layer5: #b39ddb;
+  --layer6: #56ccf2;
+  --layer7: #ff8a65;
 
   position: relative;
   min-height: 100vh;
@@ -29,13 +39,13 @@
   height: 4px;
   background: linear-gradient(
     90deg,
-    #7c9eff,
-    #5ee6c4,
-    #f2c94c,
-    #f2789a,
-    #b39ddb,
-    #56ccf2,
-    #ff8a65
+    var(--layer1),
+    var(--layer2),
+    var(--layer3),
+    var(--layer4),
+    var(--layer5),
+    var(--layer6),
+    var(--layer7)
   );
   z-index: 80;
 }
@@ -50,7 +60,7 @@
 
 .bgGlow::before,
 .bgGlow::after {
-  content: '';
+  content: "";
   position: absolute;
   width: 640px;
   height: 640px;
@@ -60,86 +70,96 @@
 }
 
 .bgGlow::before {
-  top: -100px;
-  left: -100px;
-  background: radial-gradient(circle, var(--accent), transparent 70%);
+  top: -220px;
+  left: calc(var(--sidebar-w) + 60px);
+  background: var(--accent);
 }
 
 .bgGlow::after {
-  bottom: 10%;
-  right: -100px;
-  background: radial-gradient(circle, var(--accent-2), transparent 70%);
+  top: 900px;
+  right: -200px;
+  background: var(--accent-2);
+  opacity: 0.1;
 }
 
+/* Container & Sidebar (Avoid header overlap) */
 .pageContainer {
   position: relative;
   z-index: 1;
   max-width: 1440px;
   margin: 0 auto;
-  padding: 30px 24px 80px;
+  padding: 40px 32px 100px;
   display: flex;
-  gap: 32px;
+  gap: 40px;
 }
 
-/* Sidebar & Brand */
+/* Sidebar with sticky offset to avoid fixed header & disclaimer banner */
 .sidebar {
   width: var(--sidebar-w);
   flex-shrink: 0;
   position: sticky;
-  top: calc(var(--header-height, 60px) + 20px);
-  height: calc(100vh - var(--header-height, 60px) - 40px);
+  top: calc(var(--header-height, 60px) + 60px);
+  height: calc(100vh - var(--header-height, 60px) - 80px);
   overflow-y: auto;
-  padding-right: 8px;
   background: var(--bg-panel);
   border: 1px solid var(--border);
   border-radius: 14px;
-  padding: 24px;
+  padding: 28px 22px 32px;
 }
 
 .brand {
-  font-size: 0.82rem;
-  letter-spacing: 0.14em;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  color: var(--accent);
   text-transform: uppercase;
-  color: var(--accent-2);
-  font-weight: 800;
-  margin-bottom: 4px;
+  font-weight: 700;
+  margin-bottom: 6px;
 }
 
 .brandSub {
-  font-size: 0.95rem;
-  color: #fff;
-  font-weight: 700;
-  margin-bottom: 24px;
-  padding-bottom: 16px;
+  font-size: 0.82rem;
+  color: var(--text-faint);
+  margin-bottom: 26px;
+  line-height: 1.6;
+  padding-bottom: 14px;
   border-bottom: 1px solid var(--border);
-  line-height: 1.4;
 }
 
 .tocList {
   list-style: none;
-  padding: 0;
   margin: 0;
+  padding: 0;
 }
 
 .tocItem {
-  margin-bottom: 6px;
+  margin-bottom: 4px;
 }
 
 .tocLink {
   display: block;
-  font-size: 0.85rem;
-  color: var(--text-dim);
-  padding: 8px 12px;
+  padding: 9px 12px;
   border-radius: 8px;
-  transition: all 0.18s ease;
-  line-height: 1.45;
+  color: var(--text-dim);
+  font-size: 0.92rem;
+  line-height: 1.5;
+  border-left: 2px solid transparent;
+  text-decoration: none;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.tocLink:hover {
+  background: var(--accent-soft);
+  color: var(--text);
   text-decoration: none;
 }
 
-.tocLink:hover,
 .tocLinkActive {
   background: var(--accent-soft);
-  color: #ffffff;
+  color: var(--accent);
+  border-left-color: var(--accent);
   font-weight: 600;
 }
 
@@ -178,7 +198,7 @@
 }
 
 .eyebrow::before {
-  content: '';
+  content: "";
   display: inline-block;
   width: 8px;
   height: 8px;
@@ -211,7 +231,7 @@
   gap: 8px 18px;
 }
 
-/* Prose & Headers */
+/* Prose */
 .prose {
   width: 100%;
 }
@@ -261,16 +281,45 @@
   scroll-margin-top: calc(var(--header-height, 60px) + 80px);
 }
 
-.layer1,
-.layer2,
-.layer3,
-.layer4,
-.layer5,
-.layer6,
+/* Layer Specific H3 Styles (Crucial Fix) */
+.layerH3 {
+  padding-left: 12px !important;
+  margin: 36px 0 14px !important;
+}
+
+.layer1 {
+  color: var(--layer1) !important;
+  border-left: 3px solid var(--layer1) !important;
+}
+
+.layer2 {
+  color: var(--layer2) !important;
+  border-left: 3px solid var(--layer2) !important;
+}
+
+.layer3 {
+  color: var(--layer3) !important;
+  border-left: 3px solid var(--layer3) !important;
+}
+
+.layer4 {
+  color: var(--layer4) !important;
+  border-left: 3px solid var(--layer4) !important;
+}
+
+.layer5 {
+  color: var(--layer5) !important;
+  border-left: 3px solid var(--layer5) !important;
+}
+
+.layer6 {
+  color: var(--layer6) !important;
+  border-left: 3px solid var(--layer6) !important;
+}
+
 .layer7 {
-  color: var(--layer-color, var(--accent)) !important;
-  border-left: 3px solid var(--layer-color, var(--accent));
-  padding-left: 12px;
+  color: var(--layer7) !important;
+  border-left: 3px solid var(--layer7) !important;
 }
 
 .prose p {
@@ -296,6 +345,10 @@
   margin: 44px 0;
 }
 
+.prose strong {
+  color: #fff;
+}
+
 .callout {
   background: linear-gradient(135deg, var(--accent-soft), transparent);
   border: 1px solid var(--border);
@@ -305,6 +358,18 @@
   margin: 26px 0 26px;
   font-size: 1.02rem;
   color: var(--text);
+}
+
+.prose code:not(pre code) {
+  font-family: var(--font-mono);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  padding: 0.1em 0.4em;
+  border-radius: 5px;
+  font-size: 0.9em;
+  color: var(--accent-2);
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 /* Quick-nav */
@@ -325,7 +390,7 @@
 }
 
 .quicknavKicker::after {
-  content: '';
+  content: "";
   flex: 1;
   height: 1px;
   background: var(--border);
@@ -333,7 +398,7 @@
 
 .quicknavGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 14px;
 }
 
@@ -343,19 +408,24 @@
   gap: 8px;
   background: var(--bg-card);
   border: 1px solid var(--border);
-  border-top: 3px solid var(--layer-color, var(--accent));
+  border-top: 3px solid var(--card-border-top, var(--accent));
   border-radius: 12px;
   padding: 18px 18px 20px;
   min-width: 0;
   color: var(--text);
   text-decoration: none;
-  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    border-color 0.18s ease;
 }
 
 .quicknavCard:hover {
   text-decoration: none;
   transform: translateY(-4px);
-  box-shadow: 0 14px 28px -12px rgba(0, 0, 0, 0.55), 0 0 0 1px var(--layer-color, var(--accent)) inset;
+  box-shadow:
+    0 14px 28px -12px rgba(0, 0, 0, 0.55),
+    0 0 0 1px var(--card-border-top, var(--accent)) inset;
 }
 
 .quicknavBadge {
@@ -366,10 +436,32 @@
   height: 26px;
   border-radius: 7px;
   background: rgba(124, 158, 255, 0.18);
-  color: var(--layer-color, var(--accent));
+  color: var(--card-border-top, var(--accent));
   font-weight: 800;
   font-size: 0.8rem;
   letter-spacing: 0.02em;
+}
+
+.cardL1 {
+  --card-border-top: var(--layer1);
+}
+.cardL2 {
+  --card-border-top: var(--layer2);
+}
+.cardL3 {
+  --card-border-top: var(--layer3);
+}
+.cardL4 {
+  --card-border-top: var(--layer4);
+}
+.cardL5 {
+  --card-border-top: var(--layer5);
+}
+.cardL6 {
+  --card-border-top: var(--layer6);
+}
+.cardL7 {
+  --card-border-top: var(--layer7);
 }
 
 .quicknavTitle {
@@ -390,6 +482,7 @@
   width: 100%;
   display: flex;
   justify-content: center;
+  overflow-x: auto;
   margin: 30px 0 32px;
   background: var(--bg-panel);
   border: 1px solid var(--border);
@@ -447,7 +540,9 @@
   border-radius: 14px;
   padding: 20px 22px;
   min-width: 0;
-  transition: transform 0.18s ease, box-shadow 0.18s ease;
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease;
 }
 
 .refCard:hover {
@@ -512,7 +607,9 @@
     transform: translateX(-100%);
     visibility: hidden;
     pointer-events: none;
-    transition: transform 0.2s ease, visibility 0.2s ease;
+    transition:
+      transform 0.2s ease,
+      visibility 0.2s ease;
     box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
   }
 
