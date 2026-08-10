@@ -1,7 +1,10 @@
 // @vitest-environment jsdom
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { render } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import Page, { metadata } from "./page";
+import styles from "./page.module.css";
 
 // Mock MermaidDiagram component to avoid Vitest DOM rendering issues with canvas/SVG
 vi.mock("@/components/docs/MermaidDiagram", () => ({
@@ -42,9 +45,9 @@ describe("/codex/openai-codex-guide (2026 Best Practices)", () => {
     ];
 
     for (const expected of expectedSections) {
-      const sectionHeader = container.querySelector(`#${expected.id}`);
-      expect(sectionHeader, `Section with id #${expected.id} should exist`).not.toBeNull();
-      expect(sectionHeader?.textContent).toContain(expected.text);
+      const sectionHeader = container.querySelector(`#${expected.id} h2`);
+      expect(sectionHeader, `H2 inside #${expected.id} should exist`).not.toBeNull();
+      expect(sectionHeader?.textContent).toBe(expected.text);
     }
   });
 
@@ -81,6 +84,7 @@ describe("/codex/openai-codex-guide (2026 Best Practices)", () => {
     expect(navLinks.length).toBe(16);
     expect(navLinks[0].getAttribute("href")).toBe("#sec-1");
     expect(navLinks[15].getAttribute("href")).toBe("#sec-16");
+    expect(navLinks[0].classList.contains(styles.active)).toBe(true);
   });
 
   it("6つの Mermaid 図解が専用ラッパー内に配置されている", () => {
@@ -97,8 +101,20 @@ describe("/codex/openai-codex-guide (2026 Best Practices)", () => {
 
   it("運用チェックリストの 12 項目が存在する", () => {
     const { container } = render(<Page />);
-    const checklistItems = container.querySelectorAll("ul[class*='checklist'] li, input[type='checkbox']");
-    expect(checklistItems.length).toBeGreaterThanOrEqual(12);
+    const checklistItems = container.querySelectorAll("input[type='checkbox']");
+    expect(checklistItems).toHaveLength(12);
+  });
+
+  it("TOC番号をCSSで重複生成せず、モバイルサイドバーの操作状態を同期する", () => {
+    const css = readFileSync(join(__dirname, "page.module.css"), "utf8");
+
+    expect(css).not.toMatch(/counter-(?:reset|increment):\s*toc/);
+    expect(css).not.toMatch(/\.tocLink::before/);
+    expect(css).toMatch(/\.sidebar\s*\{[^}]*transition:[^}]*visibility/s);
+    expect(css).toMatch(/@media[\s\S]*\.sidebar\s*\{[^}]*visibility:\s*hidden/s);
+    expect(css).toMatch(/@media[\s\S]*\.sidebar\s*\{[^}]*pointer-events:\s*none/s);
+    expect(css).toMatch(/\.sidebar\.sidebarOpen\s*\{[^}]*visibility:\s*visible/s);
+    expect(css).toMatch(/\.sidebar\.sidebarOpen\s*\{[^}]*pointer-events:\s*auto/s);
   });
 
   it("Callout/Alert 要素（info, warn, good）がそれぞれ data-variant で区別されている", () => {
