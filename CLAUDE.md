@@ -245,7 +245,12 @@ Playwright ブラウザバイナリ（`/root/.cache/ms-playwright/`）はバイ�
 - 環境変数・Netlify 設定の変更
 - スタイル目的のリライト
 - **`legacy/` 配下の編集**（Phase A–F 遂行中は凍結。`.gitignore` により事故的な push は防止されているが、編集自体を避ける）
-- **元 HTML / Markdown ガイドページの要約・省略・縮約・部分抽出は一切禁止（絶対ルール）**: ガイドページの Next.js 移植および更新時、元ファイルの全セクション、全サブセクション、全段落、全リスト項目、全コードブロック、全 SVG、全 callout/alert、全 table、全参考文献/外部リンクを何一つ落とさずに **100% 漏れなく JSX へ完全移植**すること。代表例のみの抜粋や文章の要約は重大な規約違反とする。
+- **元 HTML / Markdown ガイドページの 100% Faithful 移植 & スタイリング防犯原則（絶対ルール）**:
+  1. **完全転写**: ガイドページの Next.js 移植および更新時、元ファイルの全セクション、全サブセクション、全段落、全リスト項目、全コードブロック、全 SVG、全 callout/alert、全 table、全参考文献/外部リンクを何一つ落とさずに **100% 漏れなく JSX へ完全移植** すること。代表例のみの抜粋や文章の要約は重大な規約違反とする。
+  2. **マークダウン表の全列左寄せ上書き**: `globals.css` の `thead th:not(:first-child)` (右寄せルール) が干渉するのを完全に防ぐため、`page.module.css` で `.tableScroll` を定義する際は `:global(th)`, `:global(td)`, `:global(thead th:not(:first-child))` 等に `text-align: left !important;` を必ず強制設定すること。
+  3. **コードブロックの明示的インデント保持**: Python のネスト構造や YAML 等の先頭インデントが Biome や JSX 空白圧縮で消失しないよう、明示的 JS 文字列式 `{"  "}` / `{"    "}` / `{"        "}` を先頭ノードとして埋め込み、`.codeLine { white-space: pre; }` で固定すること。
+  4. **レイアウトグリッド・リストの完全復元**: チェックリストは `grid-template-columns: repeat(auto-fit, minmax(320px, 1fr))` のカード多列グリッド構造、参考文献カードは `list-style-type: disc; padding-left: 1.1rem;` のブレットリスト表示を必ず再現すること。
+  5. **スクロールマージン（アンカーめり込み防止）**: 固定ヘッダー（`SiteHeader` + `DisclaimerBanner`）で `h2`/`h3` が隠れないよう `scroll-margin-top: calc(var(--header-height, 60px) + 80px);` を必ず指定すること。
 - **元のHTML/Markdownオリジナルファイルの完全削除は厳禁**: 移行元のファイルは絶対に削除してはならず、必ず `archive/` ディレクトリ配下に移動（`git mv` または `mv`）して退避保存すること
 
 ### 許可される変更

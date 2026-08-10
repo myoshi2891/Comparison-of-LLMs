@@ -175,6 +175,40 @@ Phase A–F で 18 枚のガイドページが `web-next/` App Router に**全�
 /* ❌ NG: @media 内にしか書かない → デスクトップでも表示されてしまう */
 ```
 
+**④ マークダウン表の全列左寄せアライメント原則**
+
+`globals.css` に定義された `thead th:not(:first-child) { text-align: right; }` （1列目以外の右寄せルール）が干渉し、表の2列目以降が右寄せ・中央寄せになるのを防ぐため、`page.module.css` で `.tableScroll` を定義する際は、必ず `:global` セレクタで全列を `text-align: left !important;` に上書き無効化すること。
+
+```css
+.tableScroll :global(th),
+.tableScroll :global(td),
+.tableScroll :global(thead th),
+.tableScroll :global(tbody td),
+.tableScroll :global(thead th:not(:first-child)),
+.tableScroll :global(tbody td:not(:first-child)) {
+  text-align: left !important;
+}
+```
+
+**⑤ コードブロックの先頭インデント完全保持原則**
+
+JSX / Biome の空白圧縮でコード行の先頭インデントが消失するのを防ぐため、インデントが必要な行には明示的な JS 文字列式 `{"  "}`（2スペース）、`{"    "}`（4スペース）、`{"        "}`（8スペース）を先頭ノードとして記述すること（`.codeLine { white-space: pre; }` と組み合わせて正確に保持される）。
+
+```tsx
+<div className={styles.codeLine}>
+  {"    "}page = web_extract([r["url"]])
+</div>
+```
+
+**⑥ チェックリスト・参考文献のグリッド＆リスト構造原則**
+
+- **チェックリスト**: `<ul className={styles.checklistGrid}><li><label className={styles.checklistItem}>...` のネスト構造とし、`grid-template-columns: repeat(auto-fit, minmax(320px, 1fr))` で多列カードグリッド化すること。
+- **参考文献**: カード内の `<ul>` に `list-style-type: disc; padding-left: 1.1rem;` を明示し、ブレット（bullet）を必ず表示させ、URL に `word-break: break-all;` を付与すること。
+
+**⑦ 固定ヘッダーめり込み防止原則（`scroll-margin-top`）**
+
+`h2`, `h3` の `scroll-margin-top` は、`SiteHeader`（60px）および `DisclaimerBanner`（約 40px〜50px）の存在を考慮し、必ず `scroll-margin-top: calc(var(--header-height, 60px) + 80px);` （100px〜120px 相当）を設定すること。単なる `2rem` にすると見出しが固定バナーの下に隠れる。
+
 **確認コマンド（var() 参照の棚卸し）**:
 
 > 完全な bash スクリプト（ローカル変数抽出 + globals.css 照合）は
