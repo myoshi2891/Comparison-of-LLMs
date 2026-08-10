@@ -28,6 +28,8 @@ allowed-tools:
 
 # Next.js ガイドページ追加・保守スキル
 
+(最終更新日: 2026-08-11)
+
 ## 概要
 
 Phase A–F で 18 枚のガイドページが `web-next/` App Router に**全移行完了**。
@@ -81,12 +83,13 @@ bun test app/some/page.test.tsx
 最低限以下の **8 + 4 契約（回帰防止テスト + デザイン契約テスト）** を書く:
 
 **コンテンツ契約テスト（8件）**:
+
 1. `render(<Page />)` でタイトル（`<h1>`）のテキスト完全一致
 2. 主要セクション数（`<h2>` の count）および各セクションタイトル・アンカー ID 存在検証
 3. サブセクション/レイヤー見出し（`<h3>`）の存在検証
 4. クイックナビゲーション（TOC リンク）の件数・アンカー指向（`href="#..."`）検証
 5. サイドバー TOC の初期アクティブ状態（`styles.active`）の存在検証
-6. スクロールイベント発火（`fireEvent.scroll`）時に `TocObserver` がアクティブクラスを正しく切り替えることの検証
+6. `TocObserver.test.tsx` で `fireEvent.scroll` を使い、スクロール時にアクティブクラスが正しく切り替わることを単体検証
 7. 外部リンクに `target="_blank"` と `rel="noopener noreferrer"` が両方付与されていること
 8. 全 Mermaid 図解が専用ラッパーに包まれて配置されていること
 
@@ -98,6 +101,7 @@ bun test app/some/page.test.tsx
 
 > 詳細実装: `references/design-contract-tests.md`
 > 参考実装: `web-next/app/codex/openai-codex-guide/page.test.tsx`
+> TocObserver 参考実装: `web-next/app/codex/openai-codex-guide/TocObserver.test.tsx`
 
 ### Step 2: [Green] page.tsx の実装
 
@@ -117,7 +121,7 @@ bun test app/some/page.test.tsx
 | **コードブロック構文ハイライト** | 鮮やかなマルチカラー (紫/青/緑/黄/赤/グレー) | 単色プレーンテキスト放置 | JSX 内で `.ck`, `.cv`, `.cs`, `.cw`, `.cc`, `.cm` の `<span>` トークン化 |
 | **コードブロック行改行** | `<div className={styles.codeLine}>` で1行毎ラッパー | 生テキスト直接配置 (`\n` 崩れ) | `.codeLine` (`white-space: pre`) で完全に囲む |
 | **Mermaid 図解テーマ** | 原本の `theme: 'base'` (白/青/金ライトテーマ) | デフォルトの `dark` (真っ黒) | `MermaidDiagram` に `theme="base"` と `themeVariables` を明示渡し |
-| **運用チェックリスト** | 縦1列リスト＋破線＋`hover`/`checked` 装飾 | 勝手に 2 列カードグリッド化 | 原本の `.checklist li` 構造と CSS をそのまま転写 |
+| **運用チェックリスト** | 原本 HTML のリスト／カード／表構造 | 原本と異なる構造への変換 | `openai-codex-guide` の縦1列リストを含め、原本の構造と CSS をそのまま転写 |
 | **callout.warn** | 赤系背景 (`var(--danger-soft)`) | 黄色/金系 (`gold-soft`) | `danger-soft` (#fbebe6) を正しく適用 |
 | **thead th** | 青系背景 (`var(--accent-soft)`) | ベージュ背景 (`var(--bg)`) | `thead th` に `var(--accent-soft)` を上書き定義 |
 
@@ -127,11 +131,14 @@ bun test app/some/page.test.tsx
 `globals.css` に存在しない変数は必ず `.layout` / `.root` スコープに転写する。
 
 **② 全列左寄せアライメント原則**
+
 ```css
-.tableScroll :global(th), .tableScroll :global(td) { text-align: left !important; }
+.tableScroll :global(th), .tableScroll :global(td),
+.tableWrap :global(th), .tableWrap :global(td) { text-align: left !important; }
 ```
 
 **③ scroll-margin-top の設定**
+
 ```css
 h2, h3 { scroll-margin-top: calc(var(--header-height, 60px) + 80px); }
 ```
@@ -152,12 +159,14 @@ h2, h3 { scroll-margin-top: calc(var(--header-height, 60px) + 80px); }
 ### Step 4: 図解の中央寄せ・カラー統一（Mermaid・手書き両方）
 
 #### (a) Mermaid 図解
+
 - `components/docs/MermaidDiagram.tsx` を使用
 - 原本がライト基調の場合は `theme="base"` + `themeVariables={THEME_VARS_CONST}` を渡す
 - 記述は **左端揃え必須**（インデント混入は構文エラー）
 - **レイアウトはコンポーネントが自己完結**。ページ側で `:global(.mermaid)` に `width`/`flex` を上書きしない
 
 #### (b) 手書き（非 Mermaid）の図解
+
 - 1行横並び: `width: fit-content; margin-inline: auto`
 - 折り返し: `justify-content: center`
 
@@ -177,7 +186,7 @@ bun run test        # vitest（必ず bun run test）
 - **コードブロック内の構文ハイライト・改行を怠らない** — 単色プレーンテキストで放置禁止。必ず `<span>` トークン化と `styles.codeLine` で囲む
 - **Mermaid のテーマを勝手に `dark` に固定しない** — 原本がライトテーマなら `theme="base"` と `themeVariables` を必ず渡す
 - **インライン `code` の背景・文字色を省略しない** — `.layout :global(code)` で `accent-soft` 背景を定義する
-- **チェックリストを勝手にカードグリッド化しない** — 原本の 1 列リスト・破線区切り・`hover`/`checked` 装飾を守る
+- **チェックリストを原本と異なる構造へ変換しない** — 1列リスト、カードグリッド、表など、原本の要素構造と装飾をそのまま守る
 - **`bun test` で vitest テストを実行しない** — 必ず `bun run test` を使う
 - **`<SiteHeader>` / `<DisclaimerBanner>` をページ側で再インクルードしない**
 - **Antigravity 環境で `bun run build` を実行しない** — CI / 他の許可環境でのみ実行可
