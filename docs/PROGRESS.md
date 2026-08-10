@@ -20,6 +20,9 @@
 
 ## 最近の追加内容
 
+- **OpenAI Codex ハーネスエンジニアリング実践ガイド（/codex/harness-engineering）の Pure JSX 完全置き換え移行**: `Openai-codex-harness-engineering-evals.html` および `.md` を `web-next/app/codex/harness-engineering/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。要約・省略なしで全9セクション（1.はじめに〜9.参考文献）、全表、全コードブロック（ハイライト・先頭インデント保持）、7 Mermaid図 (`DIAGRAM_1`〜`DIAGRAM_7`)、TOCスクロール追従（`TocObserver.tsx`）、成熟度チェックリスト、`page-registry.ts`（タイトル・`lastReviewed` 2026-08-10）を完了。既存の旧 `/codex/harness-engineering` コンテンツと完全入れ替え完了。原本 `Openai-codex-harness-engineering-evals.html` および `Openai-codex-harness-engineering-evals.md` は `archive/html/OpenAI/` および `archive/md/OpenAI/` へ `git mv` 退避保存。契約テスト7件を更新し全クリア（Vitest **158 files / 1414 tests** 全 Green ✅）。
+
+
 - **Hermes Agent ベストプラクティスガイド（/agent/hermes-agent-advanced-guide）の Pure JSX 完全置き換え移行**: `Harness-engineering-google-guide.html` を `web-next/app/agent/hermes-agent-advanced-guide/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。要約・省略一切なしで全17セクション（1.Hermes Agentとは何か〜17.参考文献・出典）、全表、全コードブロック、11 Mermaid図、TOCスクロール追従（`TocObserver.tsx`）、総括チェックリスト、`page-registry.ts`（タイトル・概要・`lastReviewed` 2026-08-10）を完了。既存の旧 `/agent/hermes-agent-advanced-guide` コンテンツと完全入れ替え完了。原本 `Harness-engineering-google-guide.html` は `archive/Harness-engineering-google-guide.html` へ `git mv` 退避保存。契約テスト 8 件を作成・全クリア（Vitest **158 files / 1414 tests** 全 Green ✅）。
 
 - **GitHub Copilot Agent Skills 実践ガイド（/copilot/skill）の Pure JSX 完全置き換え移行**: `Github-copilot-skillmd-guide.html` を `web-next/app/copilot/skill/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。要約・省略なしで全16セクション（このガイドについて〜14.まとめ、参考文献・出典）・全表・全コードブロック・7 Mermaid図・TOCスクロール追従（`TocObserver.tsx`）・インタラクティブチェックリスト（`ChecklistCard.tsx`）・`page-registry.ts`（`lastReviewed` 更新）を完了。既存の旧 `/copilot/skill` コンテンツと完全入れ替え完了。原本 `Github-copilot-skillmd-guide.html` は `archive/Github-copilot-skillmd-guide.html` へ `git mv` 退避保存。契約テスト 7 件を更新し全クリア。
