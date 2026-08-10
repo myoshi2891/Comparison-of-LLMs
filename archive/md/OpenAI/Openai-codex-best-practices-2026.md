@@ -65,19 +65,19 @@ Codexを支えるモデル自体も高速に更新されています。以下は
 
 ```mermaid
 flowchart TD
-    A[ユーザーがプロンプトを送信] --> B[Codexがモデルを呼び出す]
-    B --> C{モデル出力に基づき行動を決定}
-    C --> D[ファイルの読み取り・編集]
-    C --> E["コマンド実行 (shell / apply_patch)"]
-    C --> F[MCPツールの呼び出し]
-    D --> G[実行結果をコンテキストへ反映]
-    E --> G
-    F --> G
-    G --> H{タスクは完了したか?}
-    H -- 未完了・コンテキストが逼迫 --> I["Compaction: 古い情報を要約して圧縮"]
-    I --> B
-    H -- 未完了 --> B
-    H -- 完了 --> J[結果を提示しレビュー待ち]
+A[ユーザーがプロンプトを送信] --> B[Codexがモデルを呼び出す]
+B --> C{モデル出力に基づき行動を決定}
+C --> D[ファイルの読み取り・編集]
+C --> E["コマンド実行 (shell / apply_patch)"]
+C --> F[MCPツールの呼び出し]
+D --> G[実行結果をコンテキストへ反映]
+E --> G
+F --> G
+G --> H{タスクは完了したか?}
+H -- 未完了・コンテキストが逼迫 --> I["Compaction: 古い情報を要約して圧縮"]
+I --> B
+H -- 未完了 --> B
+H -- 完了 --> J[結果を提示しレビュー待ち]
 ```
 
 ポイントは、スレッド内の情報はすべてモデルのコンテキストウィンドウに収まる必要があるという点です。長時間タスクでは自動的に**Compaction(圧縮)**が働き、関連情報を要約しながら作業を継続できるようになっています。この仕組みを理解しておくと、「なぜ長時間タスクの後半で挙動が変わることがあるのか」を把握しやすくなります。
@@ -126,13 +126,13 @@ xhighはコスト・レイテンシが数倍に膨らむ可能性があるため
 
 ```mermaid
 flowchart TD
-    T[新しいタスクが来た] --> Q{タスクの性質は?}
-    Q -- 小さく明確・1ターンで完結 --> A[通常のプロンプトを直接送る]
-    Q -- 複雑・曖昧で設計が必要 --> B["/plan で計画を立てさせる<br/>(必要なら「まず質問して」と依頼)"]
-    Q -- ゴールは明確だが道筋が不確実で<br/>複数ターンかかる --> C["/goal で永続的な目標を設定<br/>(完了条件=検証可能な証拠)"]
-    B --> D[計画をレビューし承認]
-    D --> E[実装を開始]
-    C --> F["Codexが自律的にplan→act→testを繰り返す"]
+T[新しいタスクが来た] --> Q{タスクの性質は?}
+Q -- 小さく明確・1ターンで完結 --> A[通常のプロンプトを直接送る]
+Q -- 複雑・曖昧で設計が必要 --> B["/plan で計画を立てさせる<br/>(必要なら「まず質問して」と依頼)"]
+Q -- ゴールは明確だが道筋が不確実で<br/>複数ターンかかる --> C["/goal で永続的な目標を設定<br/>(完了条件=検証可能な証拠)"]
+B --> D[計画をレビューし承認]
+D --> E[実装を開始]
+C --> F["Codexが自律的にplan→act→testを繰り返す"]
 ```
 
 Goalの書き方には注意が必要です。「もっと良くして」のような曖昧な終着点はCodexにとって信頼できる完了条件になりません。「厳格モードでコンパイルが通り、`any`型が残っていないこと」のように、**測定可能な成功条件**を書くことが推奨されています。実践者の報告では、あるエンジニアが夜間にGoalモードでパフォーマンス最適化タスクを設定し、ノートPCを閉じて5時間半後に戻ったところ、テストとベンチマークの両方をクリアした状態で作業が完了していた、という事例も紹介されています。ただし、Goalはデータの欠落や不確実性を隠す手段にしてはならず、そうした前提はGoal自体に明記すべきだとされています。
@@ -162,13 +162,13 @@ AGENTS.mdは複数の階層に置くことができ、**より作業ディレク
 
 ```mermaid
 flowchart LR
-    subgraph 優先度["優先度: 低 → 高(具体的なものが勝つ)"]
-        direction LR
-        G["① ~/.codex/AGENTS.md<br/>個人のグローバル既定値"] --> R["② リポジトリ直下 AGENTS.md<br/>チーム共通ルール"]
-        R --> S["③ サブディレクトリ AGENTS.md<br/>例: apps/web/AGENTS.md"]
-        S --> O["④ AGENTS.override.md<br/>一時的なローカル上書き"]
-    end
-    O --> X[Codexセッション開始時に統合され読み込まれる]
+subgraph 優先度["優先度: 低 → 高(具体的なものが勝つ)"]
+direction LR
+G["① ~/.codex/AGENTS.md<br/>個人のグローバル既定値"] --> R["② リポジトリ直下 AGENTS.md<br/>チーム共通ルール"]
+R --> S["③ サブディレクトリ AGENTS.md<br/>例: apps/web/AGENTS.md"]
+S --> O["④ AGENTS.override.md<br/>一時的なローカル上書き"]
+end
+O --> X[Codexセッション開始時に統合され読み込まれる]
 ```
 
 例えば、モノレポのルートに「`pnpm test` を使う」と書かれていても、`apps/web/AGENTS.md` に「`pnpm --filter web test` を使う」と書かれていれば、Codexが `apps/web` 配下で作業する際は後者が優先されます。`AGENTS.override.md` は一時的なローカル上書き専用であり、これをチームのデフォルトにしてしまうと共同作業がしづらくなるため避けるべきだとされています。
@@ -197,11 +197,11 @@ AGENTS.mdが肥大化してきたら、本体は簡潔に保ち、計画・レ�
 
 ```mermaid
 flowchart TD
-    CLI["1. CLI flags / --config (実行時一時設定)"] --> PROJ["2. .codex/config.toml (信頼済みプロジェクト設定)"]
-    PROJ --> PROF["3. Profile settings (アクティブプロファイル)"]
-    PROF --> USER["4. ~/.codex/config.toml (ユーザー個人設定)"]
-    USER --> SYS["5. System settings (/etc/codex/config.toml 等)"]
-    SYS --> DEF["6. Built-in defaults (組み込み既定値)"]
+CLI["1. CLI flags / --config (実行時一時設定)"] --> PROJ["2. .codex/config.toml (信頼済みプロジェクト設定)"]
+PROJ --> PROF["3. Profile settings (アクティブプロファイル)"]
+PROF --> USER["4. ~/.codex/config.toml (ユーザー個人設定)"]
+USER --> SYS["5. System settings (/etc/codex/config.toml 等)"]
+SYS --> DEF["6. Built-in defaults (組み込み既定値)"]
 ```
 
 | レイヤー | 場所 | 備考 |
@@ -219,8 +219,8 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    MDM["1. MDM settings (組織・端末プロファイル)"] --> MNG["2. managed_config.toml (管理者提供デフォルト)"]
-    MNG --> BASE["3. User base config / CLI options (ユーザー・CLI設定)"]
+MDM["1. MDM settings (組織・端末プロファイル)"] --> MNG["2. managed_config.toml (管理者提供デフォルト)"]
+MNG --> BASE["3. User base config / CLI options (ユーザー・CLI設定)"]
 ```
 
 | レイヤー | 場所 | 備考 |
@@ -235,8 +235,8 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    REQ["requirements.toml (最高優先度の管理者制約)"] --> EVAL["設定値・実行制限の検証・強制適用"]
-    EVAL --> EXEC["Codex実行コンテキスト"]
+REQ["requirements.toml (最高優先度の管理者制約)"] --> EVAL["設定値・実行制限の検証・強制適用"]
+EVAL --> EXEC["Codex実行コンテキスト"]
 ```
 
 | 制約ファイル | 役割・適用規則 |
@@ -264,13 +264,13 @@ Codexには「どこまで書き込めるか(サンドボックス)」と「い�
 
 ```mermaid
 flowchart TD
-    Start[新しいCodexセッションを開始する] --> Q1{リポジトリ/環境の性質は?}
-    Q1 -- 初めて使う・信頼度が低い --> R1["sandbox_mode = read-only<br/>approval_policy = on-request"]
-    Q1 -- 普段使いのローカル開発 --> R2["sandbox_mode = workspace-write<br/>approval_policy = on-request<br/>(推奨される既定の落としどころ)"]
-    Q1 -- CI/使い捨ての隔離環境 --> R3["sandbox_mode = workspace-write または danger-full-access<br/>approval_policy = never<br/>(環境自体で隔離)"]
-    R1 --> Note1["ネットワークアクセスや<br/>ワークスペース外への操作は都度承認"]
-    R2 --> Note2["プロジェクト内の編集・テスト・整形は自動<br/>それ以外は承認を要求"]
-    R3 --> Note3["人間の承認なしで完結<br/>=環境の隔離が唯一の安全網"]
+Start[新しいCodexセッションを開始する] --> Q1{リポジトリ/環境の性質は?}
+Q1 -- 初めて使う・信頼度が低い --> R1["sandbox_mode = read-only<br/>approval_policy = on-request"]
+Q1 -- 普段使いのローカル開発 --> R2["sandbox_mode = workspace-write<br/>approval_policy = on-request<br/>(推奨される既定の落としどころ)"]
+Q1 -- CI/使い捨ての隔離環境 --> R3["sandbox_mode = workspace-write または danger-full-access<br/>approval_policy = never<br/>(環境自体で隔離)"]
+R1 --> Note1["ネットワークアクセスや<br/>ワークスペース外への操作は都度承認"]
+R2 --> Note2["プロジェクト内の編集・テスト・整形は自動<br/>それ以外は承認を要求"]
+R3 --> Note3["人間の承認なしで完結<br/>=環境の隔離が唯一の安全網"]
 ```
 
 公式ガイドは「コーディングエージェントに不慣れなうちは既定の権限のまま始め、信頼できるリポジトリや用途が明確になってから緩めるように」と明確に助言しています。`danger-full-access`(CLIでは `--dangerously-bypass-approvals-and-sandbox` という別名でも呼ばれます)は、名前の通り最終手段として扱うべきです。
@@ -327,7 +327,7 @@ Codex Appでは差分パネルで変更をその場でレビューでき、行�
 - プロンプトに情報を貼り付け続けるのではなく、Codexにツールを使わせたい
 - 複数ユーザー・複数プロジェクトで再利用できる連携にしたい
 
-MCPサーバーの直接設定はサブエージェント設定ファイル内の `[mcp_servers.<name>]` ブロックで行います。`agents/openai.yaml` はSkillやツールの依存関係宣言に限定して使用し、一般的なMCPサーバーの設定場所として使用しない点に注意してください。
+MCPサーバーの直接設定は、`~/.codex/config.toml` または信頼済みプロジェクトの `.codex/config.toml` にある `[mcp_servers.<server-name>]` ブロックで行います。`agents/openai.yaml` はSkillのUIメタデータ・呼び出しポリシー・`dependencies.tools` によるツール依存関係の宣言に使用し、一般的なMCPサーバーの接続設定場所としては使用しません。
 
 CodexはSTDIOサーバーとOAuth対応のStreamable HTTPサーバーの両方をサポートしています。Codex Appでは「Settings → MCP servers」から候補のサーバーを見つけて接続でき、CLIでは `codex mcp add` で名前・URLなどを指定して追加できます。
 
@@ -383,22 +383,22 @@ developer_instructions = """
 
 ```mermaid
 flowchart TD
-    Task{サブエージェントのタスク性質}
-    Task -- 曖昧・多段階・要検証 --> M1["gpt-5.6<br/>(深い推論・高度な検証)"]
-    Task -- バランス・速度重視 --> M2["gpt-5.6-terra<br/>(高速・標準作業)"]
+Task{サブエージェントのタスク性質}
+Task -- 曖昧・多段階・要検証 --> M1["gpt-5.6<br/>(深い推論・高度な検証)"]
+Task -- バランス・速度重視 --> M2["gpt-5.6-terra<br/>(高速・標準作業)"]
 ```
 
 また、セッションあたりの並行スレッド上限は現行キー `agents.max_concurrent_threads_per_session` を使用します（`agents.max_threads` はレガシー別名として維持。なお `agents.max_depth` はV1でのみ有効でV2では無視されます）。
 
 ```mermaid
 flowchart TD
-    P["親エージェント(メインスレッド)"] --> S1["サブエージェントA<br/>(セキュリティレビュー担当)"]
-    P --> S2["サブエージェントB<br/>(テスト作成担当)"]
-    P --> S3["サブエージェントC<br/>(コードベース探索担当)"]
-    S1 --> M[結果をメインスレッドに集約]
-    S2 --> M
-    S3 --> M
-    M --> P2[親エージェントが統合し次の行動を決定]
+P["親エージェント(メインスレッド)"] --> S1["サブエージェントA<br/>(セキュリティレビュー担当)"]
+P --> S2["サブエージェントB<br/>(テスト作成担当)"]
+P --> S3["サブエージェントC<br/>(コードベース探索担当)"]
+S1 --> M[結果をメインスレッドに集約]
+S2 --> M
+S3 --> M
+M --> P2[親エージェントが統合し次の行動を決定]
 ```
 
 サブエージェントは並列化による速度向上と引き換えに、単一エージェントで実行する場合より多くのトークンを消費すると報告されています。コスト管理の観点では、親エージェントは高めの推論レベル、定型作業を担う子エージェントは低め、という配分が現実的です。
@@ -437,20 +437,20 @@ GitHub Actions上での利用には、CLIを自前でインストール・認証
 
 ```mermaid
 sequenceDiagram
-    participant Dev as 開発者
-    participant GH as GitHub
-    participant Action as openai/codex-action
-    participant Codex as Codex CLI (codex exec)
-    participant PR as プルリクエスト
+participant Dev as 開発者
+participant GH as GitHub
+participant Action as openai/codex-action
+participant Codex as Codex CLI (codex exec)
+participant PR as プルリクエスト
 
-    Dev->>GH: プルリクエストを作成
-    GH->>Action: ワークフローをトリガー
-    Action->>Action: CLIをインストールし<br/>Responses APIプロキシを起動
-    Action->>Codex: codex exec --sandbox workspace-write<br/>--safety-strategy drop-sudo
-    Codex->>Codex: 差分を解析しレビュー観点を評価
-    Codex-->>Action: レビュー結果/パッチを返却
-    Action->>PR: レビューコメントを投稿
-    PR-->>Dev: 修正提案を確認しマージ判断
+Dev->>GH: プルリクエストを作成
+GH->>Action: ワークフローをトリガー
+Action->>Action: CLIをインストールし<br/>Responses APIプロキシを起動
+Action->>Codex: codex exec --sandbox workspace-write<br/>--safety-strategy drop-sudo
+Codex->>Codex: 差分を解析しレビュー観点を評価
+Codex-->>Action: レビュー結果/パッチを返却
+Action->>PR: レビューコメントを投稿
+PR-->>Dev: 修正提案を確認しマージ判断
 ```
 
 公式ドキュメントが特に強調している注意点は、**APIキーの取り扱い**です。リポジトリのコードを実行するジョブの中で `OPENAI_API_KEY` や `CODEX_API_KEY` をジョブレベルの環境変数として設定してはいけない、とされています。ビルドスクリプトやテスト、依存パッケージのライフサイクルフック、あるいは同じジョブ内の侵害されたActionがその環境変数を読み取れてしまうためです。GitHub Actions以外の自動化環境でも、`codex exec` の呼び出し単位でのみ認証情報を渡し、同じプロセス内で信頼できないコードを動かさないようにすることが推奨されています。
@@ -523,7 +523,7 @@ Codexは「毎回ゼロから指示する一回限りのアシスタント」で
 - [ ] `~/.codex/config.toml` と `.codex/config.toml` で個人設定とプロジェクト設定を役割分担しているか
 - [ ] スレッド並行上限設定で現行キー `agents.max_concurrent_threads_per_session`（レガシー別名 `agents.max_threads`）を使用し、`agents.max_depth`（V1限定・V2無視）を考慮しているか
 - [ ] サブエージェントのデフォルトモデル設定を各 `config.toml` の `agents.default_subagent_model` で確認・指定し、`gpt-5.6` または `gpt-5.6-terra` を設定しているか
-- [ ] MCPの依存関係を `agents/openai.yaml` に宣言しているか
+- [ ] Skillが利用するMCPツールを `agents/openai.yaml` の `dependencies.tools` に具体的な依存関係として宣言しているか
 - [ ] サンドボックス・承認ポリシーを用途(初回調査/通常開発/CI)に応じて使い分けているか
 - [ ] テスト・Lint・差分レビューをワークフローに組み込み、`/review` やAGENTS.md経由のレビュー観点を活用しているか
 - [ ] リポジトリ外のコンテキストが必要な場面でMCPを検討しているか(ただし繋ぎすぎに注意)

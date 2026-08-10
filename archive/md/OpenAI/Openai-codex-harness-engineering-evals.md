@@ -26,12 +26,12 @@ AIエージェントの品質を自動・継続的に測定する評価基盤の
 
 ```mermaid
 flowchart TB
-    A["Layer 1: セッション内自己検証<br/>(Ralph Wiggum Loop)"] --> B["Layer 2: リポジトリの<br/>メカニカル強制"]
-    B --> C["Layer 3: ランタイム<br/>オブザーバビリティ検証"]
-    C --> D["Layer 4: CI/CD 非対話型<br/>品質ゲート (codex exec)"]
-    D --> E["Layer 5: プラットフォーム Evals<br/>(Traces→Graders→Datasets)"]
-    E --> F["Layer 6: 外部標準ベンチマーク<br/>(SWE-bench / Terminal-Bench)"]
-    F --> G["Layer 7: 継続的セキュリティ評価<br/>(Codex Security CLI)"]
+A["Layer 1: セッション内自己検証<br/>(Ralph Wiggum Loop)"] --> B["Layer 2: リポジトリの<br/>メカニカル強制"]
+B --> C["Layer 3: ランタイム<br/>オブザーバビリティ検証"]
+C --> D["Layer 4: CI/CD 非対話型<br/>品質ゲート (codex exec)"]
+D --> E["Layer 5: プラットフォーム Evals<br/>(Traces→Graders→Datasets)"]
+E --> F["Layer 6: 外部標準ベンチマーク<br/>(SWE-bench / Terminal-Bench)"]
+F --> G["Layer 7: 継続的セキュリティ評価<br/>(Codex Security CLI)"]
 ```
 
 この7層モデルは、評価がかかる範囲の「近さ」で並べたものである。Layer 1はエージェント自身がその場で行う自己採点、Layer 7は業界全体で共有される外部標準に基づく評価であり、下に行くほど客観性は増すがフィードバックは遅くなる。優れたハーネスは、この全レイヤーを同時に運用し、速いフィードバック(Layer 1〜2)で日々の逸脱を潰しながら、遅いフィードバック(Layer 5〜7)で長期的な方向性を検証する。
@@ -68,21 +68,21 @@ Ryan Lopopolo氏の報告によれば、2025年8月末に空のGitリポジト�
 
 ```mermaid
 sequenceDiagram
-    participant Eng as エンジニア
-    participant Codex as Codexエージェント
-    participant Local as ローカル自己レビュー
-    participant Cloud as クラウドエージェントレビュー
-    participant PR as プルリクエスト
+participant Eng as エンジニア
+participant Codex as Codexエージェント
+participant Local as ローカル自己レビュー
+participant Cloud as クラウドエージェントレビュー
+participant PR as プルリクエスト
 
-    Eng->>Codex: タスクをプロンプトで指示
-    Codex->>Codex: 変更を実装
-    Codex->>Local: 自分の変更をローカルでレビュー依頼
-    Local-->>Codex: フィードバックを返却
-    Codex->>Cloud: 追加のエージェントレビューを要求
-    Cloud-->>Codex: 指摘事項を返却
-    Codex->>Codex: フィードバックへ対応し修正
-    Codex->>PR: 全レビュアーが満足するまでループ後PRを作成
-    PR-->>Eng: 人間レビューは任意(必須ではない)
+Eng->>Codex: タスクをプロンプトで指示
+Codex->>Codex: 変更を実装
+Codex->>Local: 自分の変更をローカルでレビュー依頼
+Local-->>Codex: フィードバックを返却
+Codex->>Cloud: 追加のエージェントレビューを要求
+Cloud-->>Codex: 指摘事項を返却
+Codex->>Codex: フィードバックへ対応し修正
+Codex->>PR: 全レビュアーが満足するまでループ後PRを作成
+PR-->>Eng: 人間レビューは任意(必須ではない)
 ```
 
 このレイヤーの評価基準は、人間が書いた固定チェックリストではなく、Codex自身が読み書きできる `gh` コマンド・ローカルスクリプト・リポジトリ埋め込みのSkillといった標準開発ツールを介して動的に決まる。人間がCLIへコピー&ペーストして文脈を渡す必要がない点が要である。
@@ -93,13 +93,13 @@ Layer 1は「本人任せ」の評価だが、Layer 2は「構造そのものが
 
 ```mermaid
 flowchart LR
-    Types["Types"] --> Config["Config"]
-    Config --> Repo["Repo"]
-    Repo --> Service["Service"]
-    Utils["Utils"] --> Providers["Providers"]
-    Providers --> Service
-    Service --> Runtime["Runtime"]
-    Runtime --> UI["UI"]
+Types["Types"] --> Config["Config"]
+Config --> Repo["Repo"]
+Repo --> Service["Service"]
+Utils["Utils"] --> Providers["Providers"]
+Providers --> Service
+Service --> Runtime["Runtime"]
+Runtime --> UI["UI"]
 ```
 
 この依存方向は人間のレビューではなく、Codex自身が生成したカスタムLinterと構造テストによって機械的に強制される。構造化ロギングやスキーマ・型の命名規則、ファイルサイズ上限、プラットフォーム固有の信頼性要件も同様にカスタムLintでチェックされる。Lintのエラーメッセージには、その場でエージェントへ是正手順を注入できるよう、修復手順そのものが埋め込まれている点が実務上のポイントである。
@@ -114,17 +114,17 @@ flowchart LR
 
 ```mermaid
 flowchart LR
-    App["アプリ (worktreeごとに起動)"] -->|"ログ/メトリクス/トレース"| Vector["Vector"]
-    Vector --> Logs["Victoria Logs (LogQL)"]
-    Vector --> Metrics["Victoria Metrics (PromQL)"]
-    Vector --> Traces["Victoria Traces (TraceQL)"]
-    Logs --> Codex["Codexが問い合わせ・相関分析"]
-    Metrics --> Codex
-    Traces --> Codex
-    Codex --> Fix["修正を実装"]
-    Fix --> Restart["アプリを再起動"]
-    Restart --> Rerun["ワークロード/UIシナリオを再実行"]
-    Rerun --> App
+App["アプリ (worktreeごとに起動)"] -->|"ログ/メトリクス/トレース"| Vector["Vector"]
+Vector --> Logs["Victoria Logs (LogQL)"]
+Vector --> Metrics["Victoria Metrics (PromQL)"]
+Vector --> Traces["Victoria Traces (TraceQL)"]
+Logs --> Codex["Codexが問い合わせ・相関分析"]
+Metrics --> Codex
+Traces --> Codex
+Codex --> Fix["修正を実装"]
+Fix --> Restart["アプリを再起動"]
+Restart --> Rerun["ワークロード/UIシナリオを再実行"]
+Rerun --> App
 ```
 
 このレイヤーによって、「サービス起動を800ミリ秒未満で完了させる」「4つの重要なユーザージャーニーのどのスパンも2秒を超えない」といった、これまで自然言語では扱いにくかった性能要件がCodexにとって実行可能なタスクになる。あわせて、Chrome DevTools Protocolをランタイムに組み込み、DOMスナップショット・スクリーンショット・ナビゲーションを扱うSkillを用意することで、Codexはブラウザ操作を伴うUIバグの再現・修正検証も自律的に行えるようになる。単一のCodex実行が(人間が眠っている間に)6時間以上にわたり1つのタスクへ取り組み続けるケースも珍しくないという。
@@ -137,12 +137,12 @@ flowchart LR
 
 ```mermaid
 flowchart TB
-    PR["プルリクエスト作成/更新"] --> Action["openai/codex-action (GitHub Action)"]
-    Action --> Exec["codex exec --sandbox read-only --output-schema"]
-    Exec --> Schema["JSON Schema準拠の構造化出力<br/>(severity / issues / summary)"]
-    Schema --> Gate{"重大度しきい値を超えるか?"}
-    Gate -->|"Yes"| Block["マージをブロックし修正を要求"]
-    Gate -->|"No"| Merge["自動マージ or 人間レビューへ"]
+PR["プルリクエスト作成/更新"] --> Action["openai/codex-action (GitHub Action)"]
+Action --> Exec["codex exec --sandbox read-only --output-schema"]
+Exec --> Schema["JSON Schema準拠の構造化出力<br/>(severity / issues / summary)"]
+Schema --> Gate{"重大度しきい値を超えるか?"}
+Gate -->|"Yes"| Block["マージをブロックし修正を要求"]
+Gate -->|"No"| Merge["自動マージ or 人間レビューへ"]
 ```
 
 GitHub Actions環境では、CLIを自前でインストールしAPIキーを渡すよりも `openai/codex-action` を使う方が安全とされている。このアクションはCodex CLIのインストールとResponses APIプロキシの起動を代行し、リポジトリを直接チェックアウトするジョブに `OPENAI_API_KEY` をジョブレベル環境変数として置かないよう案内している(ビルドスクリプトやテスト、依存パッケージのライフサイクルフック経由でキーが読み取られる懸念があるため)。CI専用には `CODEX_API_KEY` という別名の環境変数を使うのが定石である。
@@ -168,11 +168,11 @@ Codex自体のCI組み込みが「タスクが1件成功したか」を判定す
 
 ```mermaid
 flowchart LR
-    Traces["Traces<br/>(モデル呼び出し/ツール呼び出し/ハンドオフの記録)"] --> Graders["Graders<br/>(string_check/python/score_model等)"]
-    Graders --> Datasets["Datasets<br/>(代表的ケースを蓄積)"]
-    Datasets --> Runs["Eval Runs<br/>(プロンプト/モデル比較)"]
-    Runs --> Improve["プロンプト・ツール構成・ルーティングを改善"]
-    Improve --> Traces
+Traces["Traces<br/>(モデル呼び出し/ツール呼び出し/ハンドオフの記録)"] --> Graders["Graders<br/>(string_check/python/score_model等)"]
+Graders --> Datasets["Datasets<br/>(代表的ケースを蓄積)"]
+Datasets --> Runs["Eval Runs<br/>(プロンプト/モデル比較)"]
+Runs --> Improve["プロンプト・ツール構成・ルーティングを改善"]
+Improve --> Traces
 ```
 
 Graderには複数の型があり、判定したい品質の性質に応じて使い分ける。
@@ -200,11 +200,11 @@ Graderには複数の型があり、判定したい品質の性質に応じて�
 
 ```mermaid
 flowchart TB
-    Suite["Terminal-Bench 2.0<br/>(89タスク・コンテナ隔離)"] --> Harbor["Harbor評価ハーネス<br/>(クラウド並列ロールアウト)"]
-    Harbor --> Agents["Codex CLI / Claude Code / 他エージェント"]
-    Agents --> Verify["コンテナ内Verifierが合否判定"]
-    Verify --> Board["リーダーボード集計"]
-    Board --> Decision["自社ハーネスのモデル/設定選定に反映"]
+Suite["Terminal-Bench 2.0<br/>(89タスク・コンテナ隔離)"] --> Harbor["Harbor評価ハーネス<br/>(クラウド並列ロールアウト)"]
+Harbor --> Agents["Codex CLI / Claude Code / 他エージェント"]
+Agents --> Verify["コンテナ内Verifierが合否判定"]
+Verify --> Board["リーダーボード集計"]
+Board --> Decision["自社ハーネスのモデル/設定選定に反映"]
 ```
 
 | ベンチマーク | 測定対象 | 特徴 | 参考スコア(2025年11月時点、自己申告含む) |
