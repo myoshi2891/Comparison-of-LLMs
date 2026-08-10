@@ -43,9 +43,13 @@ export default function TocObserver() {
     }
 
     // Scroll spy logic - 100% robust & smooth update on scroll
-    const navLinks = Array.from(document.querySelectorAll<HTMLAnchorElement>("#sidebar nav a"));
+    const navLinks = Array.from(
+      document.querySelectorAll<HTMLAnchorElement>("#sidebar nav a")
+    );
 
-    const headings = Array.from(document.querySelectorAll<HTMLElement>("h2[id]"));
+    const headings = Array.from(
+      document.querySelectorAll<HTMLElement>("h2[id]")
+    );
 
     if (navLinks.length === 0 || headings.length === 0) return;
 
@@ -53,20 +57,18 @@ export default function TocObserver() {
       const scrollPos = window.scrollY || window.pageYOffset;
       const offset = 180; // Offset considering header + margin
 
-      let currentActiveId = "";
+      let currentActiveId = headings[0]?.id || "";
 
-      for (let i = 0; i < headings.length; i++) {
-        const h = headings[i];
-        const top = h.getBoundingClientRect().top + scrollPos;
-        if (scrollPos >= top - offset) {
-          currentActiveId = h.id;
-        } else {
-          break;
+      if (scrollPos > 0) {
+        for (let i = 0; i < headings.length; i++) {
+          const h = headings[i];
+          const top = h.getBoundingClientRect().top + scrollPos;
+          if (scrollPos >= top - offset) {
+            currentActiveId = h.id;
+          } else {
+            break;
+          }
         }
-      }
-
-      if (!currentActiveId && headings.length > 0) {
-        currentActiveId = headings[0].id;
       }
 
       navLinks.forEach((link) => {
@@ -84,15 +86,8 @@ export default function TocObserver() {
     }
 
     // Listen to scroll & resize
-    let ticking = false;
     function onScroll() {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          updateActiveLink();
-          ticking = false;
-        });
-        ticking = true;
-      }
+      updateActiveLink();
     }
 
     window.addEventListener("scroll", onScroll, { passive: true });

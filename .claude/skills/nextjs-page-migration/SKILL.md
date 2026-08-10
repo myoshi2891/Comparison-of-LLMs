@@ -55,15 +55,18 @@ Phase A–F で 18 枚のガイドページが `web-next/` App Router に**全�
 
 ### Step 1: [Red] 契約テストの作成
 
-`app/<provider>/<slug>/page.test.tsx` を作成。最低限以下の 5 契約を書く:
+`app/<provider>/<slug>/page.test.tsx` を作成。最低限以下の 8 契約（回帰防止テスト含む）を書く:
 
 1. `render(<Page />)` でタイトル（`<h1>`）のテキスト完全一致
-2. 主要セクション数（`<h2>` の count）
-3. 外部リンクに `target="_blank"` と `rel="noopener noreferrer"` が両方付与されている
-4. 内部リンクが clean URL（`.html` なし）である
-5. コードブロックに `language-*` クラスが付与されている（shiki 適用の前段確認）
+2. 主要セクション数（`<h2>` の count）および各セクションタイトル・アンカー ID 存在検証
+3. サブセクション/レイヤー見出し（`<h3>`）の専用カラークラス名（`layer1`〜`layer7` / `layerH3` 等）の付与検証
+4. クイックナビゲーションカード群（`.quicknavCard`）の件数・アンカー指向（`href="#..."`）・専用カードクラス（`cardL1`〜`cardL7` 等）の整合性検証
+5. サイドバー TOC の初期アクティブ状態（`styles.active`）の存在検証
+6. スクロールイベント発火（`fireEvent.scroll`）時に `TocObserver` が作動し、現在位置の見出しに応じて TOC リンクのアクティブクラス（`styles.active`）が正しく切り替わることの検証
+7. 外部リンクに `target="_blank"` と `rel="noopener noreferrer"` が両方付与されていること
+8. 全 Mermaid 図解が専用ラッパー（`.mermaidWrap`）に包まれて配置されていること
 
-参考実装: `web-next/components/Hero.test.tsx` の `render() + querySelector` パターン。
+参考実装: `web-next/app/codex/harness-engineering/page.test.tsx` の包括的契約・回帰テストパターン。
 
 ### Step 2: [Green] page.tsx の実装
 
@@ -362,18 +365,19 @@ function Ext({ href, children }: { href: string; children: React.ReactNode }) {
 > 完全実装コード（コードブロック JSX 全体・フッター CSS）は
 > `references/implementation-reference.md` §「コードブロック構造 完全実装例」「フッター CSS 完全実装例」を参照。
 
-### TOC nav とスクロール自動追従 (Intersection Observer)
+### TOC nav とスクロール自動追従 (TocObserver)
 
-スクロールに応じて TOC のアクティブ項目をハイライトする Intersection Observer を導入する場合、
+スクロールに応じて TOC のアクティブ項目をハイライト追従させる場合、
 `page.tsx` を `'use client'` 化してはいけない（`metadata` がエクスポートできなくなるため）。
 
-**推奨設計パターン**:
+**推奨設計パターン（堅牢なスクロール位置判定）**:
 1. 同一ディレクトリ内に `TocObserver.tsx` という軽量クライアントコンポーネントを新規作成する。
-2. `TocObserver` 内で `useEffect` + `IntersectionObserver` で各 `.chapter` の交差判定を行い、TOCリンクに `classList.add/remove(styles.tocLinkActive)` を操作する。
-3. Server Component の `page.tsx` から `TocObserver` をインポートして配置する（`metadata` 維持と追従機能の両立）。
+2. `TocObserver` 内で `useEffect` + `window.addEventListener('scroll', ...)` を設定し、`getBoundingClientRect().top + scrollPos` によるリアルタイム・スクロール位置計算で現在アクティブな `h2[id]` を判定する。
+3. 一致する TOC リンクに `styles.active` および `active` クラスを同時に `classList.add/remove` し、CSS 側でも `.active` と `:global(#sidebar) nav a:global(.active)` の両方でアクティブ装飾（背景 `rgba(124, 158, 255, 0.14)` ＋ 左ボーダー `#7c9eff` ＋ 文字色 `#7c9eff`）を適用する。
+4. 初期レンダリング時（`scrollPos === 0`）は必ず第1項目（`headings[0]`）がデフォルトでアクティブ化されるように保証する。
+5. Server Component の `page.tsx` から `<TocObserver />` をインポートして配置する（`metadata` 維持とリアルタイム追従機能の両立）。
 
-> 完全実装コード（`TocObserver.tsx` 全体 + page.tsx 呼び出し方）は
-> `references/implementation-reference.md` §「TocObserver 完全実装」を参照。
+> 実装コードは `app/codex/harness-engineering/TocObserver.tsx` を参照。
 
 ### CSS Module 複合クラス
 
