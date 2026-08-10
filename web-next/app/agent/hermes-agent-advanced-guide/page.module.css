@@ -286,25 +286,32 @@
   min-width: 560px;
   font-size: 0.88rem;
 }
-.tableScroll th {
+.tableScroll :global(th),
+.tableScroll :global(td),
+.tableScroll :global(thead th),
+.tableScroll :global(tbody td),
+.tableScroll :global(thead th:not(:first-child)),
+.tableScroll :global(tbody td:not(:first-child)) {
+  text-align: left !important;
+}
+.tableScroll :global(th) {
   background: var(--bg-card);
   color: #fff;
-  text-align: left;
   padding: 0.75rem 1rem;
   font-weight: 700;
   border-bottom: 1px solid var(--border);
   white-space: nowrap;
 }
-.tableScroll td {
+.tableScroll :global(td) {
   padding: 0.72rem 1rem;
   border-bottom: 1px solid var(--border-soft);
   color: var(--text-dim);
   overflow-wrap: break-word;
 }
-.tableScroll tr:last-child td {
+.tableScroll :global(tr:last-child td) {
   border-bottom: none;
 }
-.tableScroll tr:hover {
+.tableScroll :global(tr:hover) {
   background: rgba(255, 255, 255, 0.02);
 }
 
