@@ -10,8 +10,11 @@ description: >
   - guide-page layout/centering maintenance: "図解が左寄せ" / "図解を中央寄せ" /
     "コンテンツが左寄り" / "本文の幅がバランス悪い" / "diagram not centered" /
     "content column width" (both Mermaid and hand-coded flex/HTML diagrams)
+  - design mismatch: "デザイン違う" / "スタイルがおかしい" / "テーブルヘッダーの色が" /
+    "calloutの色が" / "stepTagが" / "voiceのスタイルが" / "コードブロックの色" /
+    "図解の色が違う" / "ハイライトが効いていない"
   Applies project-specific patterns: SiteHeader, DisclaimerBanner, nav-links.ts,
-  CSS Modules, shiki build-time highlighting, Mermaid lazy loading, diagram
+  CSS Modules, shiki/token build-time highlighting, Mermaid lazy loading, diagram
   centering (Mermaid + hand-coded), and the 1440px content-width policy.
 invocation: explicit
 allowed-tools:
@@ -41,6 +44,23 @@ Phase A–F で 18 枚のガイドページが `web-next/` App Router に**全�
 
 ---
 
+## ⚠️ テスト実行コマンド（最重要・必読）
+
+```bash
+# ✅ 正しい（vitest 経由 — jsdom 環境が適用される）
+cd web-next && bun run test
+
+# ❌ 禁止（Bun ネイティブランナー — jsdom なし → document is not defined で全滅）
+bun test app/some/page.test.tsx
+```
+
+**`bun test` と `bun run test` は全く別コマンド。**
+`bun test` は `vitest.config.ts` を無視するため、`environment: "jsdom"` が効かず
+`document is not defined` エラーが発生し metadata テスト以外が全失敗する。
+**必ず `bun run test` を使うこと。**
+
+---
+
 ## TDD 必須サイクルの適用（最重要）
 
 常に TDD サイクル（**Red → Green → Refactor → Docs**）を**最優先**で適用する。
@@ -55,18 +75,29 @@ Phase A–F で 18 枚のガイドページが `web-next/` App Router に**全�
 
 ### Step 1: [Red] 契約テストの作成
 
-`app/<provider>/<slug>/page.test.tsx` を作成。最低限以下の 8 契約（回帰防止テスト含む）を書く:
+`app/<provider>/<slug>/page.test.tsx` を作成。
+ファイル先頭に `// @vitest-environment jsdom` を記述し、環境を明示する。
 
+最低限以下の **8 + 4 契約（回帰防止テスト + デザイン契約テスト）** を書く:
+
+**コンテンツ契約テスト（8件）**:
 1. `render(<Page />)` でタイトル（`<h1>`）のテキスト完全一致
 2. 主要セクション数（`<h2>` の count）および各セクションタイトル・アンカー ID 存在検証
-3. サブセクション/レイヤー見出し（`<h3>`）の専用カラークラス名（`layer1`〜`layer7` / `layerH3` 等）の付与検証
-4. クイックナビゲーションカード群（`.quicknavCard`）の件数・アンカー指向（`href="#..."`）・専用カードクラス（`cardL1`〜`cardL7` 等）の整合性検証
+3. サブセクション/レイヤー見出し（`<h3>`）の存在検証
+4. クイックナビゲーション（TOC リンク）の件数・アンカー指向（`href="#..."`）検証
 5. サイドバー TOC の初期アクティブ状態（`styles.active`）の存在検証
-6. スクロールイベント発火（`fireEvent.scroll`）時に `TocObserver` が作動し、現在位置の見出しに応じて TOC リンクのアクティブクラス（`styles.active`）が正しく切り替わることの検証
+6. スクロールイベント発火（`fireEvent.scroll`）時に `TocObserver` がアクティブクラスを正しく切り替えることの検証
 7. 外部リンクに `target="_blank"` と `rel="noopener noreferrer"` が両方付与されていること
-8. 全 Mermaid 図解が専用ラッパー（`.mermaidWrap`）に包まれて配置されていること
+8. 全 Mermaid 図解が専用ラッパーに包まれて配置されていること
 
-参考実装: `web-next/app/codex/harness-engineering/page.test.tsx` の包括的契約・回帰テストパターン。
+**デザイン契約テスト（4件）— 必須追加**:
+9. `callout` が `data-variant="info"/"warn"/"good"` で区別され、各 variant が存在すること
+10. `callout.warn` が `data-variant="warn"` を持ち、`callout-label` 子要素があること
+11. `stepTag` が `data-testid="step-tag"` を持ち全セクション数と一致すること
+12. `voice/blockquote` が `data-testid="voice"` を持ち `voice-who` 子要素があること
+
+> 詳細実装: `references/design-contract-tests.md`
+> 参考実装: `web-next/app/codex/openai-codex-guide/page.test.tsx`
 
 ### Step 2: [Green] page.tsx の実装
 
@@ -74,383 +105,79 @@ Phase A–F で 18 枚のガイドページが `web-next/` App Router に**全�
 > **100% 完全移植ルール（絶対ルール）**:
 > ソース HTML / Markdown の **要約・省略・縮約・部分抽出・代表例のみの記述は重大な規約違反** である。
 > 元ファイルの全セクション、全サブセクション、全リード文・本文段落、全リスト項目、全コードブロック、全 SVG、全 callout/alert、全 table、全参考文献/外部リンクを、何一つ落とさずに **100% 漏れなく JSX へ完全転写** すること。
-> 
-> **【必須検証プロセス: ラインバイライン全件要素照合監査】**
-> 実装時およびコードレビュー時には、必ず以下の **全件要素照合** を自律的に実行すること:
-> 1. **監査対象**: 全セクション、全見出しレベル、全段落、全リスト項目、全コードブロック、全 SVG、全 callout/alert、全 table、全参考文献リンクを対象とする。
-> 2. **要素数と内容の照合**: 各監査対象の要素数をカウントして JSX 側と完全一致することを確認し、本文、表の全行・全列、箇条書き、スラッシュコマンド、設定キー、キーショートカットを原本と1件ずつ突き合わせる。
-> 3. **JSXパースチェック**: テキスト内の `<name>` や `<path>` などの山括弧が `&lt;` `&gt;` にエスケープされているか、生のバッククォートが放置されていないかを `grep_search` 等で静的スキャンする。
 
 - **Server Component デフォルト**。`"use client"` は `useState` が必要な場合のみ
-- スタイル優先順位: Tailwind ユーティリティ → CSS Modules（`page.module.css`） → global CSS（避ける）
-- **ファイルレイアウト**: `app/<provider>/<slug>/` 配下に `page.tsx` / `page.module.css` / `page.test.tsx` の 3 点セットをコロケーション配置
-- 新たに i18n キーを追加した場合、`lib/i18n.test.ts` の `expect(Object.keys(T).length).toBe(N)` を同じコミット内で更新する
+- **ファイルレイアウト**: `app/<provider>/<slug>/` 配下に `page.tsx` / `page.module.css` / `page.test.tsx` / `TocObserver.tsx` の 4 点セット
 
-#### JSX 変換 Pitfalls チェックリスト
+#### 🎨 スタイリング・コンポーネント防犯原則（過去の手戻りを全網羅）
 
-| 問題 | NG 例 | OK 例 |
-|------|-------|-------|
-| `class` 属性 | `class="foo"` | `className="foo"` |
-| `for` 属性 | `for="id"` | `htmlFor="id"` |
-| void 要素の閉じ | `<br>` `<img>` | `<br />` `<img />` |
-| HTML コメント | `<!-- comment -->` | `{/* comment */}` |
-| インラインスタイル | `style="font-family: var(--f)"` | `style={{ fontFamily: 'var(--f)' }}` |
-| `{"\n"}` 改行 | `<span>A</span>{"\n"}<span>B</span>` | `<div className={styles.codeLine}>…</div>` でラップ |
-| デシジョンテーブルのスペース揃え | スペースで列幅を合わせる | `<table>` 要素へ変換 |
-| `<main>` ラッパー追加 | `<main>…</main>` | 不要（`layout.tsx` が管理） |
-| 生 HTML 注入 | `dangerouslySetInnerHTML` | ネストした JSX `<span>` で表現（下記参照） |
-| SVG に title/aria なし | `<svg>…</svg>` | `<svg role="img" aria-label="…"><title>…</title>…</svg>` |
+| 対象 | 原本 HTML（正） | よくある誤り（絶対禁止） | 対策 |
+|---|---|---|---|
+| **インライン `code`** | 淡青背景＋濃青文字 (`var(--accent-soft)`) | 単色・文字のみ・ダーク背景 | `.layout :global(code)` に `background`/`color` 設定 |
+| **コードブロック構文ハイライト** | 鮮やかなマルチカラー (紫/青/緑/黄/赤/グレー) | 単色プレーンテキスト放置 | JSX 内で `.ck`, `.cv`, `.cs`, `.cw`, `.cc`, `.cm` の `<span>` トークン化 |
+| **コードブロック行改行** | `<div className={styles.codeLine}>` で1行毎ラッパー | 生テキスト直接配置 (`\n` 崩れ) | `.codeLine` (`white-space: pre`) で完全に囲む |
+| **Mermaid 図解テーマ** | 原本の `theme: 'base'` (白/青/金ライトテーマ) | デフォルトの `dark` (真っ黒) | `MermaidDiagram` に `theme="base"` と `themeVariables` を明示渡し |
+| **運用チェックリスト** | 縦1列リスト＋破線＋`hover`/`checked` 装飾 | 勝手に 2 列カードグリッド化 | 原本の `.checklist li` 構造と CSS をそのまま転写 |
+| **callout.warn** | 赤系背景 (`var(--danger-soft)`) | 黄色/金系 (`gold-soft`) | `danger-soft` (#fbebe6) を正しく適用 |
+| **thead th** | 青系背景 (`var(--accent-soft)`) | ベージュ背景 (`var(--bg)`) | `thead th` に `var(--accent-soft)` を上書き定義 |
 
-#### ⚠️ CSS Module 地雷チェックリスト（移行時の頻出バグ）
-
-> [!CAUTION]
-> 以下は `bun run build` が通っても **実行時に全配色・レイアウトが崩壊する** 無音バグ。
-> `page.module.css` を作成したら必ず全項目を確認すること。
+#### ⚠️ CSS Module 地雷チェックリスト
 
 **① CSS変数は必ず `page.module.css` の最上位セレクタ内に定義する**
+`globals.css` に存在しない変数は必ず `.layout` / `.root` スコープに転写する。
 
-`globals.css` には以下の変数が**存在しない**（使用すると `unset` / 透明になる）:
-`--bg-elevated`, `--bg-card`, `--accent`, `--accent-soft`, `--accent-2`, `--accent-2-soft`,
-`--text`, `--text-dim`, `--text-faint`, `--text-tertiary`
-
-元 HTML の `:root { ... }` 定義は必ず `.layout` または `.root` スコープに転写する:
-
+**② 全列左寄せアライメント原則**
 ```css
-/* ✅ 正しいパターン: .layout スコープに変数を閉じ込める */
-.layout {
-  --bg: #07111e;
-  --bg-elevated: #0d1b2e;
-  --bg-card: #0f2038;
-  --accent: #7c9eff;
-  --accent-soft: rgba(124, 158, 255, 0.14);
-  --text: #e6ecf5;
-  --text-dim: #9fb0c9;
-  --text-faint: #6d7f9c;
-  --border: rgba(255, 255, 255, 0.09);
-
-  display: flex;
-  background: var(--bg); /* 変数定義と同じセレクタ内ですぐ使える */
-  color: var(--text);
-}
-
-/* ❌ NG: globals.css に存在しない変数をそのまま参照 */
-/* .pageFooter { color: var(--text-tertiary); } → 未定義で透明になる */
+.tableScroll :global(th), .tableScroll :global(td) { text-align: left !important; }
 ```
 
-`globals.css` に実際に存在する変数（共有デザイントークン）:
-`--bg`, `--bg2`, `--srf`, `--srf2`, `--brd`, `--brd2`, `--txt`, `--txt2`, `--txt3`,
-`--acc`, `--acc2`, `--grn`, `--ylw`, `--red`, `--prp`, `--teal`, `--orng`
-
-**② デスクトップサイドバーの固定には `position: sticky` を使い、モバイルには `position: fixed` を許可する**
-
+**③ scroll-margin-top の設定**
 ```css
-/* ✅ デスクトップ用: sticky パターン（SiteHeader を考慮した top と height） */
-.sidebar {
-  flex-shrink: 0;
-  position: sticky;
-  top: var(--header-height, 60px); /* SiteHeader の高さを考慮したオフセット */
-  height: calc(100vh - var(--header-height, 60px)); /* ヘッダー分を引いた高さ */
-  overflow-y: auto;
-}
-
-/* ✅ モバイル用: オフキャンバス開閉動作には position: fixed の使用を明示的に許可 */
-@media (max-width: 960px) {
-  .sidebar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    height: 100vh;
-    /* ...モバイル開閉アニメーションなど... */
-  }
-}
+h2, h3 { scroll-margin-top: calc(var(--header-height, 60px) + 80px); }
 ```
 
-**③ サイドバートグルのデフォルト `display: none` を必ず書く**
-
-```css
-/* ✅ デスクトップのデフォルトを先に定義 */
-.sidebarToggle { display: none; }
-
-@media (max-width: 960px) {
-  .sidebarToggle { display: flex; /* ... */ }
-}
-
-/* ❌ NG: @media 内にしか書かない → デスクトップでも表示されてしまう */
-```
-
-**④ マークダウン表の全列左寄せアライメント原則**
-
-`globals.css` に定義された `thead th:not(:first-child) { text-align: right; }` （1列目以外の右寄せルール）が干渉し、表の2列目以降が右寄せ・中央寄せになるのを防ぐため、`page.module.css` で `.tableScroll` を定義する際は、必ず `:global` セレクタで全列を `text-align: left !important;` に上書き無効化すること。
-
-```css
-.tableScroll :global(th),
-.tableScroll :global(td),
-.tableScroll :global(thead th),
-.tableScroll :global(tbody td),
-.tableScroll :global(thead th:not(:first-child)),
-.tableScroll :global(tbody td:not(:first-child)) {
-  text-align: left !important;
-}
-```
-
-**⑤ コードブロックの先頭インデント完全保持原則**
-
-JSX / Biome の空白圧縮でコード行の先頭インデントが消失するのを防ぐため、インデントが必要な行には明示的な JS 文字列式 `{"  "}`（2スペース）、`{"    "}`（4スペース）、`{"        "}`（8スペース）を先頭ノードとして記述すること（`.codeLine { white-space: pre; }` と組み合わせて正確に保持される）。
-
-```tsx
-<div className={styles.codeLine}>
-  {"    "}page = web_extract([r["url"]])
-</div>
-```
-
-**⑥ チェックリスト・参考文献のグリッド＆リスト構造原則**
-
-- **チェックリスト**: `<ul className={styles.checklistGrid}><li><label className={styles.checklistItem}>...` のネスト構造とし、`grid-template-columns: repeat(auto-fit, minmax(320px, 1fr))` で多列カードグリッド化すること。
-- **参考文献**: カード内の `<ul>` に `list-style-type: disc; padding-left: 1.1rem;` を明示し、ブレット（bullet）を必ず表示させ、URL に `word-break: break-all;` を付与すること。
-
-**⑦ 固定ヘッダーめり込み防止原則（`scroll-margin-top`）**
-
-`h2`, `h3` の `scroll-margin-top` は、`SiteHeader`（60px）および `DisclaimerBanner`（約 40px〜50px）の存在を考慮し、必ず `scroll-margin-top: calc(var(--header-height, 60px) + 80px);` （100px〜120px 相当）を設定すること。単なる `2rem` にすると見出しが固定バナーの下に隠れる。
-
-**確認コマンド（var() 参照の棚卸し）**:
-
-> 完全な bash スクリプト（ローカル変数抽出 + globals.css 照合）は
-> `references/implementation-reference.md` §「CSS Module 地雷チェック — var() 参照確認コマンド」を参照。
-
-#### コードブロック内の行区切りパターン
-
-`.code-block` のデフォルト `white-space` は `normal` のため `{"\n"}` はスペースに正規化される。
-各行を `<div className={styles.codeLine}>` でラップすること（`.codeLine` には `white-space: pre` が定義済み）。
-
-```tsx
-{/* ❌ NG */}
-<div className={styles.codeBody}>
-  <span className={styles.ck}>const</span>{"\n"}
-  <span className={styles.cv}>value</span>
-</div>
-
-{/* ✅ OK */}
-<div className={styles.codeBody}>
-  <div className={styles.codeLine}><span className={styles.ck}>const</span><span className={styles.cv}> value</span></div>
-  <div className={styles.codeLine}><span className={styles.cv}>= 42</span></div>
-</div>
-```
-
-#### SVG 属性変換規則
-
-| HTML 属性 | JSX 属性 | HTML 属性 | JSX 属性 |
-|---|---|---|---|
-| `text-anchor` | `textAnchor` | `stroke-width` | `strokeWidth` |
-| `font-family` | `fontFamily` | `fill-opacity` | `fillOpacity` |
-| `font-size` | `fontSize` | `pointer-events` | `pointerEvents` |
-| `font-weight` | `fontWeight` | `stop-color` in `style=` | `style={{ stopColor: '...' }}` |
-| `letter-spacing` | `letterSpacing` | `style="display:block;"` | `style={{ display: 'block' }}` |
-
-SVG には必ず `role="img"` + `aria-label` + `<title>` を付与（Biome `noSvgWithoutTitle` 対応）。
-
-### Step 3: コードブロック（shiki）
-
-build-time ハイライトとして `shiki` を採用する。
-
-- RSC 内の `async` ページコンポーネントから `shiki` highlighter を取得し事前 HTML 化する
-- 安全な流し込み API の使い方は既存の `web-next/components/CodeBlock.tsx` を参照すること
-  （SKILL.md 内にリテラル記述しない — XSS 監査の false positive 防止）
-- 入力はビルド時に確定する値のみ（ユーザー入力はハイライト対象に含めない）
+### Step 3: コードブロックと構文ハイライト
 
 **コードハイライト用クラス早見表**（`styles.` を前置して使用）:
 
-| クラス | 色 | 用途 | クラス | 色 | 用途 |
-|---|---|---|---|---|---|
-| `ck` | 赤 `#ff7b72` | キーワード | `cm` | 緑太字 `#7ee787` | マーカー・セクション |
-| `cs` | 薄青 `#a5d6ff` | 文字列・区切り | `cw` | 黄 `#d29922` | 警告・重要語 |
-| `cv` | 青 `#79c0ff` | 値 | `ce` | 紫 `#bc8cff` | 列挙・特殊 |
-| `cc` | グレー斜体 `#3b4750` | コメント | `cg` | 明緑 `#3fb950` | 成功・肯定 |
-| `ch` | オレンジ太字 `#f0883e` | 見出し | | | |
+| クラス | 原本カラー | 用途 |
+|---|---|---|
+| `ck` | 紫 `#d89be0` | キーワード (codex, function, class) |
+| `cv` | 青 `#8fb2ff` | 変数 / 属性名 (model, command, exec) |
+| `cs` | 緑 `#b7d99a` | 文字列 (ダブルクォート / 単一引数) |
+| `cw` | 黄 `#e8b168` | 数値 / フラグ (`--last`, `true`, `42`) |
+| `cc` | グレー `#6b6f87` | コメント (斜体 `# comment`) |
+| `cm` | 金 `#f2c572` | セクション / ディレクトリ (`[features]`, `my-skill/`) |
 
-### Step 4: 図解の中央寄せ（Mermaid・手書き両方）
-
-> **鉄則**: サイト内の**あらゆる図解は中央寄せ**にする。「Mermaid だけ直す」は不十分 —
-> 過去に手書き（非 Mermaid）の flex/HTML 図解が左寄せのまま放置され、全面的な手戻りが発生した。
-> 図解を含むページを移行・保守したら、**Mermaid と手書き図解の両方**の中央寄せを必ず確認する。
+### Step 4: 図解の中央寄せ・カラー統一（Mermaid・手書き両方）
 
 #### (a) Mermaid 図解
+- `components/docs/MermaidDiagram.tsx` を使用
+- 原本がライト基調の場合は `theme="base"` + `themeVariables={THEME_VARS_CONST}` を渡す
+- 記述は **左端揃え必須**（インデント混入は構文エラー）
+- **レイアウトはコンポーネントが自己完結**。ページ側で `:global(.mermaid)` に `width`/`flex` を上書きしない
 
-- `components/docs/MermaidDiagram.tsx` を直接インポートして通常通り使用する（内部で動的インポート済み）
-- テーマは **`theme: "dark"`**。記述は **左端揃え必須**（インデントが混じると構文エラー）
-- **レイアウトはコンポーネントが自己完結で担当**（2層構造 + `useMaxWidth:false` + `mermaid.run` 後に svg へ `max-width:100%; height:auto` を付与＝**列幅への縮小フィット中央寄せ**）。ページ側ラッパーは**装飾（border/background/padding）のみ**。`:global(.mermaid)` / `:global(svg)` に `width`/`max-width`/`display:flex` を書いて中央寄せを**再実装しない**（引き伸ばし・縮小・左寄せの三分裂を招く）。不変条件は `.claude/rules/mermaid-diagram-layout.md`、実装詳細は `fix-mermaid/SKILL.md` Part 4。
+#### (b) 手書き（非 Mermaid）の図解
+- 1行横並び: `width: fit-content; margin-inline: auto`
+- 折り返し: `justify-content: center`
 
-#### (b) 手書き（非 Mermaid）の図解 — flex/HTML で組んだフロー図・決定木・ステップ図
-
-命名がバラバラ（`.flow` / `.flowRow` / `.hfFlow` / `.archRow` / `.decisionTree` …）なので
-**クラス名で探さない**。「色付きボックスが横に並ぶ図」を見つけたら中央寄せする。
-
-- **パターン1（1行横並び）**: `width: fit-content; margin-inline: auto` を追加。親に `overflow-x: auto` があることを確認する。
-- **パターン2（折り返し）**: `justify-content: center` を追加。
-- **左寄せが正しい**: 縦タイムライン・積層バー・ファイルツリー・箇条書きは触らない。
-- **決定木など**: 各行を個別中央寄せするとジグザグになるため、**ブロックごと**に `width: fit-content; max-width: 100%; margin: 0 auto`。
-
-> CSS コードの完全パターン（パターン1/2 の詳細）は
-> `references/implementation-reference.md` §「手書き図解（非 Mermaid）中央寄せ CSS パターン」を参照。
-
-#### (c) 本文カラム幅（バランス）
-
-- **単一カラム**ページ: トップレベルの本文コンテナに `max-width: 1440px; margin: 0 auto`（サイトの `.container` と同値。全幅すぎるとワイド画面で行が伸び読みにくい／狭すぎると窮屈）。
-- **サイドバー**ページ: 本文カラムは `min-width: 0` でトラックいっぱいに満たす（`.main { max-width: 900px }` のような狭い固定は左寄せ・空白の原因になるので付けない。mcp/local-llm に倣う）。
-- 読みやすさ用の狭いキャップ（`.lead` 等のリード文、ヒーローのサブタイトル）は保持してよい。
-
-### Step 5: [Refactor] 共通化判断
-
-- **3 ページ以上**で重複する UI パターン → `components/docs/` への抽出を検討
-- 2 ページ以下 → ページ固有で残す
-
-### Step 6: ローカル検証
+### Step 5: [Refactor] 共通化判断 / Step 6: ローカル検証
 
 ```bash
 cd web-next
 bun run lint        # Biome（変更ファイル単位でパス指定）
 bun run typecheck   # tsc --noEmit
-bun run test        # vitest
-bun run build       # Next.js production build
+bun run test        # vitest（必ず bun run test）
 ```
-
-**全通過** が必須。部分 pass でコミットしない。
-
-#### レイアウト・中央寄せの実測検証（視覚バグ用・任意だが強く推奨）
-
-中央寄せ・はみ出し・カラム幅は**ユニットテストで検出できない**。CSS 視覚バグを疑うときは
-**静的ビルドを別ポートで配信し、Playwright で描画座標を実測**する（`scraper/` に Playwright 導入済み）。
-**必ず `bun run build` 後の `out/` を静的配信**する（dev サーバーは負荷でクラッシュしやすいため）。
-
-> 配信コマンド詳細（`python3 -c` 簡易サーバ + scraper Playwright 実行方法）・判定の目安は
-> `references/implementation-reference.md` §「Playwright 実測配信コマンド」を参照。
-
-### Step 7: nav-links.ts / ドキュメント同期
-
-**nav-links.ts への登録**（必須）:
-
-```typescript
-// web-next/components/site/nav-links.ts
-{ href: '/<provider>/<slug>', label: 'ページ表示名', category: '<category>' },
-```
-
-**CLAUDE.md / GEMINI.md への追記**（必須）:
-
-```markdown
-- `app/<provider>/<slug>/page.tsx` — ページの説明
-```
-
----
-
-## 再利用パターン集
-
-### Ext ヘルパー（外部リンク）
-
-```tsx
-function Ext({ href, children }: { href: string; children: React.ReactNode }) {
-  return (
-    <a href={href} target="_blank" rel="noopener noreferrer">
-      {children}
-    </a>
-  );
-}
-```
-
-### コードブロック構造 / フッター構造
-
-> [!IMPORTANT]
-> `.codeBar`, `.codeBody`, `.codeLine` には必ず等幅フォント
-> （`font-family: var(--font-mono), "JetBrains Mono", monospace`）を適用。
-> `.codeBody` には `line-height: 1.65` 等を指定して視認性を確保する。
-
-> 完全実装コード（コードブロック JSX 全体・フッター CSS）は
-> `references/implementation-reference.md` §「コードブロック構造 完全実装例」「フッター CSS 完全実装例」を参照。
-
-### TOC nav とスクロール自動追従 (TocObserver)
-
-スクロールに応じて TOC のアクティブ項目をハイライト追従させる場合、
-`page.tsx` を `'use client'` 化してはいけない（`metadata` がエクスポートできなくなるため）。
-
-**推奨設計パターン（堅牢なスクロール位置判定）**:
-1. 同一ディレクトリ内に `TocObserver.tsx` という軽量クライアントコンポーネントを新規作成する。
-2. `TocObserver` 内で `useEffect` + `window.addEventListener('scroll', ...)` を設定し、`getBoundingClientRect().top + scrollPos` によるリアルタイム・スクロール位置計算で現在アクティブな `h2[id]` を判定する。
-3. 一致する TOC リンクに `styles.active` および `active` クラスを同時に `classList.add/remove` し、CSS 側でも `.active` と `:global(#sidebar) nav a:global(.active)` の両方でアクティブ装飾（背景 `rgba(124, 158, 255, 0.14)` ＋ 左ボーダー `#7c9eff` ＋ 文字色 `#7c9eff`）を適用する。
-4. 初期レンダリング時（`scrollPos === 0`）は必ず第1項目（`headings[0]`）がデフォルトでアクティブ化されるように保証する。
-5. Server Component の `page.tsx` から `<TocObserver />` をインポートして配置する（`metadata` 維持とリアルタイム追従機能の両立）。
-
-> 実装コードは `app/codex/harness-engineering/TocObserver.tsx` を参照。
-
-### CSS Module 複合クラス
-
-```tsx
-<span className={`${styles.navPill} ${styles.green}`}>Agent Mode</span>
-```
-
----
-
-## WAI-ARIA パターン（インタラクティブ UI）
-
-| UI パターン | 正しい ARIA | 誤りやすい代替 |
-|---|---|---|
-| チェックボタン (on/off) | `aria-pressed={bool}` | `aria-checked`, `aria-selected` |
-| タブ切り替え | `role="tab"` + `aria-selected` | `aria-pressed`, `aria-current` |
-| ステップ現在地 | `aria-current="step"` | `aria-selected`, `aria-pressed` |
-
-**ステップ現在地**: `aria-current={isActive ? "step" : undefined}` — `undefined` で属性自体を消す（`false` だと `aria-current="false"` が出力される）。
-
-> タブ UI 完全実装（`role="tablist"` / `role="tab"` / `tabIndex` Roving tabindex パターン）は
-> `references/implementation-reference.md` §「WAI-ARIA タブ UI 完全実装」を参照。
-
----
-
-## セッション終了前の仕様書同期（必須）
-
-<ai_agent_directive>
-**AI エージェントへの厳格な指示**: 以下のプロセスは**ゲート条件（Gate Condition）**です。タスクの報告を行う前に、ユーザーの許可を待たずに**自律的かつ自動的に、ステップバイステップでコミットまで完了させてください**。ルールに反してコミットを後回しにすることは禁止されています。
-</ai_agent_directive>
-
-1 ページの `git commit` 完了後、次の作業を始める前に必ず実施する:
-
-```bash
-cd web-next && bun run build && bun run lint && bun run test
-```
-
-全通過後、`docs/PROGRESS.md` のテスト数・次の作業・再開プロンプトを更新してコミットする。
-詳細は `.claude/rules/migration-progress-sync.md` を参照。
-
----
-
-## 判定基準
-
-| 結果 | アクション |
-| --- | --- |
-| 全ステップ成功 + テスト全通過 | コミット OK と報告し、次ページに進む |
-| 単体テスト失敗 | テストの意図を確認し、実装かテストかどちらが誤りか判断 |
-| ビルド失敗 | 停止。import / 型エラーを最小差分で修正 |
-| lint エラー | 変更ファイル単位でパス指定して修正（`bun run lint:fix` 引数なし禁止） |
-| 設定ファイルの意図しない変更 | 停止してユーザー確認 |
 
 ---
 
 ## Constraints（禁止事項）
 
-- **`<SiteHeader>` / `<DisclaimerBanner>` をページ側で再インクルードしない** — `layout.tsx` が提供
-- **`"use client"` を不必要に使わない** — Server Component デフォルト
-- **生 HTML 注入 prop を使わない** — JSX `<span>` でシンタックスハイライトを表現
-- **`{"\n"}` を `.code-block` 内の改行に使わない** — `<div className={styles.codeLine}>` でラップ
-- **スペース揃えで tabular data を表現しない** — `<table>` 要素へ変換。また、表の文字はすべてのヘッダー（`th`）およびセル（`td`）で必ず左寄せ（`text-align: left !important`）にして表示すること。
-- **Mermaidの図解レイアウトをページ CSS で再実装しない** — 中央寄せ・全幅・横スクロールは `MermaidDiagram` コンポーネントが担当する。ページ側の `:global(.mermaid)` / `:global(svg)` に `width` / `max-width` / `display:flex` を書かない（`svg{width:100%}`=引き伸ばし、`svg{max-width:100%}`=縮小の原因）。ラッパーは装飾のみ（`.claude/rules/mermaid-diagram-layout.md`）。
-- **手書き（非 Mermaid）の横並び図解を左寄せのまま放置しない** — flex/HTML で組んだフロー図・決定木は既定で左寄せになる。横並びのボックス群は必ず中央寄せする（Step 4(b)）。「Mermaid だけ直して手書き図解を見落とす」のが過去の典型的な手戻り。縦タイムライン・ファイルツリー・箇条書きは左寄せのままでよい。
-- **サイドバーページの本文カラムに狭い固定 `max-width` を付けない** — `.main { max-width: 900px }` 等はトラックに対して左寄せ・右空白の原因。サイドバーページは `min-width:0` でトラックを満たす。単一カラムページのみ `max-width:1440px; margin:0 auto` で中央寄せ（Step 4(c)）。
-- **`bun run lint:fix`（引数なし）を実行しない** — 変更ファイル単位でパス指定（R1 ルール）
-- **外部フォントを `<link>` タグで読み込まない** — `next/font/google` のみ（`layout.tsx`）
-- **`@layer components` を page-specific styles に使わない** — plain CSS で specificity を確保
-- **`@keyframes` にキャメルケースを使わない** — kebab-case 必須（`fadeUp` → `fade-up`）
-- **z-index を CSS と Tailwind クラスの両方で指定しない** — 単一ソース原則
-- **SVG に `role="img"` + `aria-label` + `<title>` を省略しない** — Biome `noSvgWithoutTitle` 違反
-- **Playwright MCP ツールを使わない** — トークン多消費のため。ただしレイアウト・中央寄せの回帰を追う場合に限り、**`scraper/` の Playwright で描画座標を実測**する方式は可（Step 6。スクショの大量取得ではなく bounding box の数値比較。ユーザー許可時のみ）。最終的な見た目確認はユーザーが手動で実施
-- **新規ガイドページを `legacy/` 配下に作成しない** — `web-next/app/` 側のみに作成する
-- **コードブロックやフッターの monospace フォント指定を省略しない** — `.codeBody`, `.codeLine`, `.codeBar`, `.pageFooter` には必ず等幅フォント（`font-family: var(--font-mono), ...`）を明示的に指定すること。
-- **RSC の `page.tsx` を直接クライアントコンポーネント化（'use client'）しない** — Intersection Observer 等が必要な場合は、軽量な `<TocObserver />` などに分割し、`page.tsx` 自体は Server Component のままで `metadata` 静的エクスポートができる状態を維持する。
-- **`globals.css` に存在しない CSS 変数を `var()` で参照しない** — 元 HTML の `:root` 定義は `page.module.css` の `.layout` / `.root` スコープ内に転写する（上記 CSS Module 地雷チェックリスト参照）。
-- **サイドバーの固定に `position: fixed` を無条件で使わない** — デスクトップでは `SiteHeader` の高さを考慮した `position: sticky; top: var(--header-height, 60px); height: calc(100vh - var(--header-height, 60px)); overflow-y: auto` を使用し、モバイルのオフキャンバス開閉動作に対してのみ `position: fixed` を明示的に許可する。
-- **`.sidebarToggle` のデフォルト `display: none` を省略しない** — メディアクエリ外でデフォルト非表示にし、`@media (max-width: 960px)` 内でのみ `display: flex` に上書きする。
+- **コードブロック内の構文ハイライト・改行を怠らない** — 単色プレーンテキストで放置禁止。必ず `<span>` トークン化と `styles.codeLine` で囲む
+- **Mermaid のテーマを勝手に `dark` に固定しない** — 原本がライトテーマなら `theme="base"` と `themeVariables` を必ず渡す
+- **インライン `code` の背景・文字色を省略しない** — `.layout :global(code)` で `accent-soft` 背景を定義する
+- **チェックリストを勝手にカードグリッド化しない** — 原本の 1 列リスト・破線区切り・`hover`/`checked` 装飾を守る
+- **`bun test` で vitest テストを実行しない** — 必ず `bun run test` を使う
+- **`<SiteHeader>` / `<DisclaimerBanner>` をページ側で再インクルードしない**
+- **Antigravity 環境で `bun run build` を実行しない** — CI / 他の許可環境でのみ実行可
