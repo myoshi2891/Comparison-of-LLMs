@@ -76,6 +76,24 @@ Codex-->>Action: レビュー結果を返却
 Action->>PR: レビューコメントを投稿
 PR-->>Dev: 修正提案を確認しマージ判断`;
 
+const ORIGINAL_THEME_VARS = {
+  primaryColor: "#E9EFFA",
+  primaryTextColor: "#1A1B22",
+  primaryBorderColor: "#2954A6",
+  lineColor: "#2954A6",
+  secondaryColor: "#F6ECD8",
+  secondaryBorderColor: "#A6791F",
+  tertiaryColor: "#FFFFFF",
+  fontFamily: "Zen Kaku Gothic New, Noto Sans JP, sans-serif",
+  fontSize: "1rem",
+  actorBkg: "#E9EFFA",
+  actorBorder: "#2954A6",
+  actorTextColor: "#1A1B22",
+  signalColor: "#2954A6",
+  signalTextColor: "#1A1B22",
+};
+
+
 function ExtLink({ href, children }: { href: string; children: React.ReactNode }) {
   return (
     <a href={href} target="_blank" rel="noopener noreferrer">
@@ -348,7 +366,7 @@ export default function OpenAICodexGuidePage() {
                 ベストプラクティスの前提として、Codexがどう動いているかを押さえておきましょう。プロンプトを送信すると、Codexは「モデルを呼び出す → 出力が指示するアクション(ファイル読み書き・コマンド実行・ツール呼び出し)を実行する」というループを、タスクが完了するかユーザーがキャンセルするまで繰り返します。
               </p>
               <div className={styles.mermaidWrap}>
-                <MermaidDiagram chart={DIAGRAM_LOOP} />
+                <MermaidDiagram chart={DIAGRAM_LOOP} theme="base" themeVariables={ORIGINAL_THEME_VARS} />
               </div>
               <p>
                 スレッド内の情報はすべてモデルのコンテキストウィンドウに収まる必要があります。長時間タスクでは自動的に<strong>Compaction(圧縮)</strong>が働き、関連情報を要約しながら作業を継続します。この仕組みを理解しておくと、長時間タスクの後半で挙動が変わる理由を把握しやすくなります。
@@ -467,7 +485,7 @@ export default function OpenAICodexGuidePage() {
               </ol>
 
               <div className={styles.mermaidWrap}>
-                <MermaidDiagram chart={DIAGRAM_PLAN} />
+                <MermaidDiagram chart={DIAGRAM_PLAN} theme="base" themeVariables={ORIGINAL_THEME_VARS} />
               </div>
 
               <p>
@@ -511,7 +529,7 @@ export default function OpenAICodexGuidePage() {
                 AGENTS.mdは複数の階層に置くことができ、<strong>より作業ディレクトリに近い、具体的なファイルが優先</strong>されます。
               </p>
               <div className={styles.mermaidWrap}>
-                <MermaidDiagram chart={DIAGRAM_AGENTS} />
+                <MermaidDiagram chart={DIAGRAM_AGENTS} theme="base" themeVariables={ORIGINAL_THEME_VARS} />
               </div>
               <p>
                 例えば、モノレポのルートに「<code>pnpm test</code>を使う」と書かれていても、<code>apps/web/AGENTS.md</code>に「<code>pnpm --filter web test</code>を使う」と書かれていれば、Codexが<code>apps/web</code>配下で作業する際は後者が優先されます。<code>AGENTS.override.md</code>は一時的なローカル上書き専用であり、これをチームのデフォルトにするのは避けるべきです。
@@ -634,7 +652,7 @@ export default function OpenAICodexGuidePage() {
               </div>
 
               <div className={styles.mermaidWrap}>
-                <MermaidDiagram chart={DIAGRAM_SANDBOX} />
+                <MermaidDiagram chart={DIAGRAM_SANDBOX} theme="base" themeVariables={ORIGINAL_THEME_VARS} />
               </div>
               <p>
                 公式ガイドは「コーディングエージェントに不慣れなうちは既定の権限のまま始め、信頼できるリポジトリや用途が明確になってから緩めるように」と明確に助言しています。<code>danger-full-access</code>(CLIでは<code>--dangerously-bypass-approvals-and-sandbox</code>という別名でも呼ばれます)は最終手段として扱うべきです。
@@ -761,7 +779,7 @@ export default function OpenAICodexGuidePage() {
                 大きなタスクは、スコープの明確な作業を子エージェントに委任することで並列化できます。<code>.codex/agents/</code>配下にTOMLファイルとしてサブエージェントを定義できます。
               </p>
               <div className={styles.mermaidWrap}>
-                <MermaidDiagram chart={DIAGRAM_SUBAGENTS} />
+                <MermaidDiagram chart={DIAGRAM_SUBAGENTS} theme="base" themeVariables={ORIGINAL_THEME_VARS} />
               </div>
               <p>
                 サブエージェントは並列化による速度向上と引き換えに、単一エージェントで実行する場合より多くのトークンを消費すると報告されています。コスト管理の観点では、親エージェントは高めの推論レベル、定型作業を担う子エージェントは低めという配分が現実的です。
@@ -829,7 +847,7 @@ export default function OpenAICodexGuidePage() {
               </p>
 
               <div className={styles.mermaidWrap}>
-                <MermaidDiagram chart={DIAGRAM_CICD} />
+                <MermaidDiagram chart={DIAGRAM_CICD} theme="base" themeVariables={ORIGINAL_THEME_VARS} />
               </div>
 
               <div className={`${styles.callout} ${styles.warn}`} data-testid="callout" data-variant="warn">
@@ -999,74 +1017,74 @@ export default function OpenAICodexGuidePage() {
               <p>
                 Codexは「毎回ゼロから指示する一回限りのアシスタント」ではなく、「時間をかけて設定・改善していくチームメイト」として扱うことが、公式ガイドが一貫して強調している姿勢です。
               </p>
-              <ul className={styles.checklistGrid}>
-                <li className={styles.checklistItem}>
+              <ul className={styles.checklist}>
+                <li>
                   <input type="checkbox" id="chk-1" />
                   <label htmlFor="chk-1">
                     プロンプトにGoal・Context・Constraints・Done whenの4要素を意識して書いているか
                   </label>
                 </li>
-                <li className={styles.checklistItem}>
+                <li>
                   <input type="checkbox" id="chk-2" />
                   <label htmlFor="chk-2">
                     タスクの複雑さに応じてReasoning Effortを使い分けているか(既定はmedium)
                   </label>
                 </li>
-                <li className={styles.checklistItem}>
+                <li>
                   <input type="checkbox" id="chk-3" />
                   <label htmlFor="chk-3">
                     複雑・曖昧なタスクでは<code>/plan</code>や<code>/goal</code>で完了条件を先に固めているか
                   </label>
                 </li>
-                <li className={styles.checklistItem}>
+                <li>
                   <input type="checkbox" id="chk-4" />
                   <label htmlFor="chk-4">
                     チームの規約・検証手順をAGENTS.mdに書き、プロンプトで繰り返していないか
                   </label>
                 </li>
-                <li className={styles.checklistItem}>
+                <li>
                   <input type="checkbox" id="chk-5" />
                   <label htmlFor="chk-5">
                     <code>~/.codex/config.toml</code>と<code>.codex/config.toml</code>で個人設定とプロジェクト設定を役割分担しているか
                   </label>
                 </li>
-                <li className={styles.checklistItem}>
+                <li>
                   <input type="checkbox" id="chk-6" />
                   <label htmlFor="chk-6">
                     サンドボックス・承認ポリシーを用途に応じて使い分けているか
                   </label>
                 </li>
-                <li className={styles.checklistItem}>
+                <li>
                   <input type="checkbox" id="chk-7" />
                   <label htmlFor="chk-7">
                     テスト・Lint・差分レビューをワークフローに組み込んでいるか
                   </label>
                 </li>
-                <li className={styles.checklistItem}>
+                <li>
                   <input type="checkbox" id="chk-8" />
                   <label htmlFor="chk-8">
                     リポジトリ外のコンテキストが必要な場面でMCPを検討しているか(繋ぎすぎに注意)
                   </label>
                 </li>
-                <li className={styles.checklistItem}>
+                <li>
                   <input type="checkbox" id="chk-9" />
                   <label htmlFor="chk-9">
                     繰り返し行っている作業をSkillに切り出しているか
                   </label>
                 </li>
-                <li className={styles.checklistItem}>
+                <li>
                   <input type="checkbox" id="chk-10" />
                   <label htmlFor="chk-10">
                     安定したワークフローだけをAutomationsに切り出しているか
                   </label>
                 </li>
-                <li className={styles.checklistItem}>
+                <li>
                   <input type="checkbox" id="chk-11" />
                   <label htmlFor="chk-11">
                     並列作業ではgit worktreeでスレッドを分離しているか
                   </label>
                 </li>
-                <li className={styles.checklistItem}>
+                <li>
                   <input type="checkbox" id="chk-12" />
                   <label htmlFor="chk-12">
                     CI/CDでは公式Actionや<code>codex exec</code>を使い、APIキーをジョブ全体に晒していないか
