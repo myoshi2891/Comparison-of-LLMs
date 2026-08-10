@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import { render } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import Page, { metadata } from "./page";
@@ -100,10 +101,57 @@ describe("/codex/openai-codex-guide (2026 Best Practices)", () => {
     expect(checklistItems.length).toBeGreaterThanOrEqual(12);
   });
 
-  it("Callout/Alert 要素（info, warn, good など）が存在する", () => {
+  it("Callout/Alert 要素（info, warn, good）がそれぞれ data-variant で区別されている", () => {
     const { container } = render(<Page />);
-    const callouts = container.querySelectorAll("[data-testid='callout']");
-    expect(callouts.length).toBeGreaterThan(0);
+    // info, warn, good の variant がすべて存在すること
+    const infoCallouts = container.querySelectorAll("[data-testid='callout'][data-variant='info']");
+    const warnCallouts = container.querySelectorAll("[data-testid='callout'][data-variant='warn']");
+    const goodCallouts = container.querySelectorAll("[data-testid='callout'][data-variant='good']");
+    expect(infoCallouts.length).toBeGreaterThan(0);
+    expect(warnCallouts.length).toBeGreaterThan(0);
+    expect(goodCallouts.length).toBeGreaterThan(0);
+  });
+
+  it("callout.warn が data-variant='warn' を持ち、danger(赤系)セマンティクスで区別される", () => {
+    const { container } = render(<Page />);
+    const warnCallouts = container.querySelectorAll("[data-testid='callout'][data-variant='warn']");
+    expect(warnCallouts.length).toBeGreaterThan(0);
+    // callout.warn の label テキストが存在すること
+    for (const callout of Array.from(warnCallouts)) {
+      const label = callout.querySelector("[data-testid='callout-label']");
+      expect(label).not.toBeNull();
+    }
+  });
+
+  it("callout の label が data-testid='callout-label' を持つ", () => {
+    const { container } = render(<Page />);
+    const calloutLabels = container.querySelectorAll("[data-testid='callout-label']");
+    expect(calloutLabels.length).toBeGreaterThan(0);
+  });
+
+  it("stepTag が各セクションに存在し data-testid='step-tag' を持つ", () => {
+    const { container } = render(<Page />);
+    const stepTags = container.querySelectorAll("[data-testid='step-tag']");
+    // sec-1 から sec-16 の 16 セクション分のタグが存在すること
+    expect(stepTags.length).toBe(16);
+    // Overview, Core Concept, Step 01 〜 Step 10, Reference, Perspective, Summary, Appendix の順
+    const texts = Array.from(stepTags).map((el) => el.textContent);
+    expect(texts).toContain("Overview");
+    expect(texts).toContain("Core Concept");
+    expect(texts).toContain("Step 01");
+    expect(texts).toContain("Step 10");
+    expect(texts).toContain("Appendix");
+  });
+
+  it("blockquote.voice が data-testid='voice' を持ち、金色 border の文脈で存在する", () => {
+    const { container } = render(<Page />);
+    const voiceBlocks = container.querySelectorAll("[data-testid='voice']");
+    expect(voiceBlocks.length).toBeGreaterThan(0);
+    for (const block of Array.from(voiceBlocks)) {
+      // .who 相当の span が存在すること
+      const who = block.querySelector("[data-testid='voice-who']");
+      expect(who).not.toBeNull();
+    }
   });
 
   it("外部リンクに target='_blank' と rel='noopener noreferrer' が両方付与されている", () => {

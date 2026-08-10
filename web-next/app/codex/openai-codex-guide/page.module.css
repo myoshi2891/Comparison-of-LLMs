@@ -260,21 +260,25 @@
 
 /* ---------- Section Styling & Headings ---------- */
 .section {
-  padding-top: 48px;
-  margin-bottom: 40px;
+  padding: 52px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.section:last-of-type {
+  border-bottom: none;
 }
 
 .stepTag {
-  display: inline-block;
-  font-size: 12px;
-  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono, monospace);
+  font-size: 16px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--gold);
-  background: var(--gold-soft);
-  padding: 3px 10px;
-  border-radius: 6px;
   margin-bottom: 10px;
+  /* no background badge — matches original HTML .step-tag */
 }
 
 .section h2 {
@@ -325,50 +329,54 @@
 .callout p { margin: 0; }
 .callout .label {
   display: block;
-  font-weight: 700;
-  margin-bottom: 2px;
+  font-family: var(--font-mono, monospace);
+  font-size: 16px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: 4px;
 }
 
 .callout.info {
   background: var(--accent-soft);
-  border: 1px solid rgba(41, 84, 166, 0.2);
-  color: var(--accent-ink);
+  border: 1px solid #cfdcf3;
+  color: var(--ink);
 }
 
 .callout.warn {
-  background: var(--gold-soft);
-  border: 1px solid rgba(166, 121, 31, 0.25);
-  color: #614305;
+  background: var(--danger-soft);
+  border: 1px solid #ebcac0;
+  color: var(--danger);
 }
 
 .callout.good {
   background: var(--good-soft);
-  border: 1px solid rgba(44, 122, 91, 0.25);
-  color: #174734;
+  border: 1px solid #c9e5d8;
+  color: var(--good);
 }
 
 /* Blockquote Voice */
 .voice {
-  margin: 28px 0;
-  padding: 20px 24px;
-  background: var(--surface);
-  border-left: 4px solid var(--accent);
+  margin: 0 0 24px;
+  padding: 18px 22px 18px 24px;
+  background: var(--gold-soft);
+  border-left: 3px solid var(--gold);
   border-radius: 0 12px 12px 0;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .voice .who {
   display: block;
   font-weight: 700;
-  font-size: 15px;
-  color: var(--accent-ink);
-  margin-bottom: 6px;
+  font-size: 16px;
+  color: var(--gold);
+  margin-bottom: 8px;
+  letter-spacing: 0.02em;
 }
 
 .voice p {
   margin: 0;
-  font-size: 15px;
-  color: var(--ink-soft);
+  font-size: 16px;
+  color: var(--ink);
 }
 
 /* ---------- Table Styling (Left Align Rule) ---------- */
@@ -397,21 +405,35 @@
 }
 
 .tableWrap th {
-  background: var(--bg);
-  padding: 12px 16px;
-  font-weight: 700;
+  background: var(--accent-soft);
   color: var(--accent-ink);
+  padding: 12px 16px;
+  font-weight: 600;
+  font-size: 16px;
+  letter-spacing: 0.02em;
   border-bottom: 1px solid var(--border);
+  white-space: nowrap;
 }
 
 .tableWrap td {
   padding: 12px 16px;
   border-bottom: 1px solid var(--border);
   line-height: 1.6;
+  color: var(--ink-soft);
+  vertical-align: top;
 }
 
 .tableWrap tr:last-child td {
   border-bottom: none;
+}
+
+.tableWrap tbody tr:nth-child(even) {
+  background: #fbfaf7;
+}
+
+.tableWrap td b,
+.tableWrap td strong {
+  color: var(--ink);
 }
 
 /* ---------- Mermaid Diagram Container ---------- */

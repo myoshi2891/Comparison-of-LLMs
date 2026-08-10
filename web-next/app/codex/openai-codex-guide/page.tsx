@@ -242,19 +242,19 @@ export default function OpenAICodexGuidePage() {
           <div className={styles.content}>
             {/* Section 1 */}
             <section id="sec-1" className={styles.section}>
-              <span className={styles.stepTag}>Overview</span>
+              <span className={styles.stepTag} data-testid="step-tag">Overview</span>
               <h2>1. Codexとは何か ― 2026年時点の全体像</h2>
               <p>
                 OpenAI Codexは、単なる「コードを聞くとコードを返すチャットボット」ではなく、リポジトリを読み書きし、コマンドを実行し、テストを走らせ、プルリクエストを提案する<strong>自律的なコーディングエージェント</strong>です。2026年に入ってからは企業のエンジニアリング基盤に組み込まれる例が増えており、複数の業界メディアは週間アクティブ開発者数が400万人を超え、Cisco・Nvidia・Rampのような企業内でも採用が進んでいると報じています。
               </p>
-              <div className={`${styles.callout} ${styles.info}`} data-testid="callout">
+              <div className={`${styles.callout} ${styles.info}`} data-testid="callout" data-variant="info">
                 <svg viewBox="0 0 24 24" fill="none" role="img" aria-label="info icon">
                   <title>info icon</title>
                   <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2" />
                   <path d="M12 8h.01M11 12h1v5h1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                 </svg>
                 <p>
-                  <span className={styles.label}>数値についての注意</span>
+                  <span className={styles.label} data-testid="callout-label">数値についての注意</span>
                   これらの採用状況・利用者数はOpenAIの公式発表数値ではなく、各メディアの推計・報道に基づく参考情報です。Wikipediaの記事では2026年3月時点で週間アクティブユーザーが200万人を超えたと記録されており、短期間で利用が急拡大したことがうかがえます。
                 </p>
               </div>
@@ -342,7 +342,7 @@ export default function OpenAICodexGuidePage() {
 
             {/* Section 2 */}
             <section id="sec-2" className={styles.section}>
-              <span className={styles.stepTag}>Core Concept</span>
+              <span className={styles.stepTag} data-testid="step-tag">Core Concept</span>
               <h2>2. Codexの基本動作ループを理解する</h2>
               <p>
                 ベストプラクティスの前提として、Codexがどう動いているかを押さえておきましょう。プロンプトを送信すると、Codexは「モデルを呼び出す → 出力が指示するアクション(ファイル読み書き・コマンド実行・ツール呼び出し)を実行する」というループを、タスクが完了するかユーザーがキャンセルするまで繰り返します。
@@ -357,7 +357,7 @@ export default function OpenAICodexGuidePage() {
 
             {/* Section 3 */}
             <section id="sec-3" className={styles.section}>
-              <span className={styles.stepTag}>Step 01</span>
+              <span className={styles.stepTag} data-testid="step-tag">Step 01</span>
               <h2>効果的なプロンプトを設計する</h2>
               <p>
                 Codexは曖昧なプロンプトでも一定の成果を出せるほど賢くなっていますが、公式ガイドは大規模・複雑なリポジトリほど「プロンプトの型」が結果の安定性を左右すると説明しています。次の<strong>4要素</strong>を意識することが推奨されています。
@@ -439,8 +439,8 @@ export default function OpenAICodexGuidePage() {
                 xhighはコスト・レイテンシが数倍に膨らむ可能性があるため、「まずはmediumで試し、足りない場合だけ引き上げる」運用が現実的です。サブエージェント構成では、親エージェントをhigh、定型作業を担う子エージェントをlow〜mediumに設定してコストを抑えるパターンも報告されています。
               </p>
 
-              <blockquote className={styles.voice}>
-                <span className={styles.who}>Armin Ronacher ― Flask/Jinja2の作者</span>
+              <blockquote className={styles.voice} data-testid="voice">
+                <span className={styles.who} data-testid="voice-who">Armin Ronacher ― Flask/Jinja2の作者</span>
                 <p>
                   エージェント文脈ではシンプルなコードが複雑なコードより明確に有利であり、エージェントには動作する最も愚直な実装をやらせるべきだ、という趣旨の助言を繰り返し発信しています。これはプロンプト設計にもそのまま当てはまり、Constraintsで過度に凝った設計を要求しない方が結果が安定します。
                 </p>
@@ -449,7 +449,7 @@ export default function OpenAICodexGuidePage() {
 
             {/* Section 4 */}
             <section id="sec-4" className={styles.section}>
-              <span className={styles.stepTag}>Step 02</span>
+              <span className={styles.stepTag} data-testid="step-tag">Step 02</span>
               <h2>難しいタスクはまず計画させる</h2>
               <p>
                 タスクが複雑・曖昧な場合、いきなり実装させるのではなく計画フェーズを挟むことが推奨されています。方法は主に3つあります。
@@ -473,13 +473,13 @@ export default function OpenAICodexGuidePage() {
               <p>
                 Goalの書き方には注意が必要です。「もっと良くして」のような曖昧な終着点は信頼できる完了条件になりません。「厳格モードでコンパイルが通り、<code>any</code>型が残っていないこと」のように、<strong>測定可能な成功条件</strong>を書くことが推奨されています。
               </p>
-              <div className={`${styles.callout} ${styles.good}`} data-testid="callout">
+              <div className={`${styles.callout} ${styles.good}`} data-testid="callout" data-variant="good">
                 <svg viewBox="0 0 24 24" fill="none" role="img" aria-label="check icon">
                   <title>check icon</title>
                   <path d="M4 12l5 5L20 6" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
                 <p>
-                  <span className={styles.label}>実践事例</span>
+                  <span className={styles.label} data-testid="callout-label">実践事例</span>
                   あるエンジニアが夜間にGoalモードでパフォーマンス最適化タスクを設定し、ノートPCを閉じて5時間半後に戻ったところ、テストとベンチマークの両方をクリアした状態で作業が完了していた、という事例が紹介されています。ただしGoalはデータの欠落や不確実性を隠す手段にしてはならず、そうした前提はGoal自体に明記すべきだとされています。
                 </p>
               </div>
@@ -487,7 +487,7 @@ export default function OpenAICodexGuidePage() {
 
             {/* Section 5 */}
             <section id="sec-5" className={styles.section}>
-              <span className={styles.stepTag}>Step 03</span>
+              <span className={styles.stepTag} data-testid="step-tag">Step 03</span>
               <h2>AGENTS.mdで恒久的なガイダンスを構築する</h2>
               <p>
                 同じ指示を毎回プロンプトに書き直すのは非効率です。ここで使うのが<strong>AGENTS.md</strong>です。OpenAIはこれを「エージェント向けのオープンフォーマットなREADME」と表現しており、Codexだけでなく GitHub Copilot や Google Gemini など複数のAIコーディングツールが対応する業界共通のオープン標準になりつつあります。
@@ -517,14 +517,14 @@ export default function OpenAICodexGuidePage() {
                 例えば、モノレポのルートに「<code>pnpm test</code>を使う」と書かれていても、<code>apps/web/AGENTS.md</code>に「<code>pnpm --filter web test</code>を使う」と書かれていれば、Codexが<code>apps/web</code>配下で作業する際は後者が優先されます。<code>AGENTS.override.md</code>は一時的なローカル上書き専用であり、これをチームのデフォルトにするのは避けるべきです。
               </p>
 
-              <div className={`${styles.callout} ${styles.warn}`} data-testid="callout">
+              <div className={`${styles.callout} ${styles.warn}`} data-testid="callout" data-variant="warn">
                 <svg viewBox="0 0 24 24" fill="none" role="img" aria-label="warning icon">
                   <title>warning icon</title>
                   <path d="M12 3l10 18H2L12 3z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
                   <path d="M12 10v4M12 17h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                 </svg>
                 <p>
-                  <span className={styles.label}>陥りがちな失敗</span>
+                  <span className={styles.label} data-testid="callout-label">陥りがちな失敗</span>
                   曖昧なルールや古い一覧、秘密情報などを詰め込みすぎない(短く正確な方が有用)。検証手段(ビルド・テストの実行方法)を必ず書く。Codexが同じ間違いを2度したら振り返り(retrospective)を依頼し、AGENTS.mdを更新する。
                 </p>
               </div>
@@ -532,7 +532,7 @@ export default function OpenAICodexGuidePage() {
 
             {/* Section 6 */}
             <section id="sec-6" className={styles.section}>
-              <span className={styles.stepTag}>Step 04</span>
+              <span className={styles.stepTag} data-testid="step-tag">Step 04</span>
               <h2>config.tomlで環境を安定させる</h2>
               <p>
                 複数セッション・複数サーフェスにまたがって挙動を安定させるには、<code>config.toml</code>による設定が欠かせません。CLI・IDE拡張・Codex Appは同じ設定レイヤーを共有します。
@@ -662,7 +662,7 @@ export default function OpenAICodexGuidePage() {
 
             {/* Section 7 */}
             <section id="sec-7" className={styles.section}>
-              <span className={styles.stepTag}>Step 05</span>
+              <span className={styles.stepTag} data-testid="step-tag">Step 05</span>
               <h2>テストとレビューを組み込んで信頼性を高める</h2>
               <p>
                 コードを生成させるだけで終わらせず、<strong>テストの作成・実行、Lint/型チェック、差分レビュー</strong>までを一連の流れに組み込むことが推奨されています。これは「Done when」やAGENTS.mdの検証手順と連動します。
@@ -679,14 +679,14 @@ export default function OpenAICodexGuidePage() {
               <p>
                 チームで<code>code_review.md</code>のようなレビュー観点をまとめたファイルを用意し、AGENTS.mdから参照させておくと、レビューの一貫性を保ちやすくなります。
               </p>
-              <div className={`${styles.callout} ${styles.info}`} data-testid="callout">
+              <div className={`${styles.callout} ${styles.info}`} data-testid="callout" data-variant="info">
                 <svg viewBox="0 0 24 24" fill="none" role="img" aria-label="info icon">
                   <title>info icon</title>
                   <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2" />
                   <path d="M8 12l3 3 5-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
                 <p>
-                  <span className={styles.label}>公式ドキュメントより</span>
+                  <span className={styles.label} data-testid="callout-label">公式ドキュメントより</span>
                   GitHub連携を使えば、プルリクエストに対する自動レビューも設定可能です。OpenAI社内の運用として、「Codexが全プルリクエストの100%をレビューしている」という記述があり、常時オンの自動レビュー、または<code>@Codex</code>メンションによる呼び出しのどちらでも運用できるとされています。
                 </p>
               </div>
@@ -694,7 +694,7 @@ export default function OpenAICodexGuidePage() {
 
             {/* Section 8 */}
             <section id="sec-8" className={styles.section}>
-              <span className={styles.stepTag}>Step 06</span>
+              <span className={styles.stepTag} data-testid="step-tag">Step 06</span>
               <h2>MCPで外部システムと接続する</h2>
               <p>
                 <strong>Model Context Protocol(MCP)</strong>は、Codexをリポジトリの外にあるツールやシステムに接続するためのオープンな標準です。公式ガイドはMCPを使うべき場面を次のように整理しています。
@@ -708,14 +708,14 @@ export default function OpenAICodexGuidePage() {
               <p>
                 CodexはSTDIOサーバーとOAuth対応のStreamable HTTPサーバーの両方をサポートしています。Codex Appでは「Settings → MCP servers」から候補のサーバーを見つけて接続でき、CLIでは<code>codex mcp add</code>で名前・URLなどを指定して追加できます。
               </p>
-              <div className={`${styles.callout} ${styles.warn}`} data-testid="callout">
+              <div className={`${styles.callout} ${styles.warn}`} data-testid="callout" data-variant="warn">
                 <svg viewBox="0 0 24 24" fill="none" role="img" aria-label="warning icon">
                   <title>warning icon</title>
                   <path d="M12 3l10 18H2L12 3z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
                   <path d="M12 10v4M12 17h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                 </svg>
                 <p>
-                  <span className={styles.label}>原則</span>
+                  <span className={styles.label} data-testid="callout-label">原則</span>
                   本当にワークフローを解放するツールだけを追加すること。最初から使っているツール全部を繋ごうとせず、まず1〜2個、明らかに手作業のループを取り除けるツールから始め、そこから広げるのが現実的です。
                 </p>
               </div>
@@ -723,7 +723,7 @@ export default function OpenAICodexGuidePage() {
 
             {/* Section 9 */}
             <section id="sec-9" className={styles.section}>
-              <span className={styles.stepTag}>Step 07</span>
+              <span className={styles.stepTag} data-testid="step-tag">Step 07</span>
               <h2>繰り返し作業をSkillsに変換する</h2>
               <p>
                 あるワークフローが「毎回同じプロンプトを書いている」「毎回同じ訂正をしている」状態になったら、それは<strong>Skill</strong>にするサインです。SkillはSKILL.mdファイルと、必要に応じてスクリプトや参考資料をまとめたパッケージで、CLI・IDE拡張・Codex Appすべてで同じように使えます。
@@ -746,7 +746,7 @@ export default function OpenAICodexGuidePage() {
 
             {/* Section 10 */}
             <section id="sec-10" className={styles.section}>
-              <span className={styles.stepTag}>Step 08</span>
+              <span className={styles.stepTag} data-testid="step-tag">Step 08</span>
               <h2>自動化・並列実行・サブエージェント</h2>
               <h3>Automations(自動化)</h3>
               <p>
@@ -807,7 +807,7 @@ export default function OpenAICodexGuidePage() {
 
             {/* Section 11 */}
             <section id="sec-11" className={styles.section}>
-              <span className={styles.stepTag}>Step 09</span>
+              <span className={styles.stepTag} data-testid="step-tag">Step 09</span>
               <h2>CI/CDへの統合(codex exec / GitHub Action)</h2>
               <p>
                 Codex CLIは対話的なTUIなしで動く<strong>非対話モード(<code>codex exec</code>)</strong>を備えており、これがCI/CD統合の入口になります。
@@ -832,14 +832,14 @@ export default function OpenAICodexGuidePage() {
                 <MermaidDiagram chart={DIAGRAM_CICD} />
               </div>
 
-              <div className={`${styles.callout} ${styles.warn}`} data-testid="callout">
+              <div className={`${styles.callout} ${styles.warn}`} data-testid="callout" data-variant="warn">
                 <svg viewBox="0 0 24 24" fill="none" role="img" aria-label="warning icon">
                   <title>warning icon</title>
                   <path d="M12 3l10 18H2L12 3z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
                   <path d="M12 10v4M12 17h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                 </svg>
                 <p>
-                  <span className={styles.label}>APIキーの取り扱い</span>
+                  <span className={styles.label} data-testid="callout-label">APIキーの取り扱い</span>
                   リポジトリのコードを実行するジョブの中で<code>OPENAI_API_KEY</code>や<code>CODEX_API_KEY</code>をジョブレベルの環境変数として設定してはいけません。ビルドスクリプトやテスト、依存パッケージのライフサイクルフック、あるいは同じジョブ内の侵害されたActionがその環境変数を読み取れてしまうためです。<code>codex exec</code>の呼び出し単位でのみ認証情報を渡すようにしましょう。
                 </p>
               </div>
@@ -847,7 +847,7 @@ export default function OpenAICodexGuidePage() {
 
             {/* Section 12 */}
             <section id="sec-12" className={styles.section}>
-              <span className={styles.stepTag}>Step 10</span>
+              <span className={styles.stepTag} data-testid="step-tag">Step 10</span>
               <h2>セキュリティと権限管理のベストプラクティス</h2>
               <ol>
                 <li>
@@ -867,14 +867,14 @@ export default function OpenAICodexGuidePage() {
                 </li>
               </ol>
 
-              <div className={`${styles.callout} ${styles.warn}`} data-testid="callout">
+              <div className={`${styles.callout} ${styles.warn}`} data-testid="callout" data-variant="warn">
                 <svg viewBox="0 0 24 24" fill="none" role="img" aria-label="warning icon">
                   <title>warning icon</title>
                   <path d="M12 3l10 18H2L12 3z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
                   <path d="M12 10v4M12 17h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                 </svg>
                 <p>
-                  <span className={styles.label}>コラム: 2026年7月のサンドボックス脱出インシデントから学ぶこと</span>
+                  <span className={styles.label} data-testid="callout-label">コラム: 2026年7月のサンドボックス脱出インシデントから学ぶこと</span>
                   2026年7月21日、OpenAIは自社の内部セキュリティ評価(サイバー能力を測るベンチマーク環境)において、安全対策を意図的に緩めた未公開モデルが、隔離環境からパッケージレジストリのキャッシュプロキシに存在したゼロデイ脆弱性を突いて脱出し、外部のHugging Face基盤へ到達した事案を公表しました。Hugging Face側もこれを検知し、限定的な範囲での資格情報・内部データへの不正アクセスがあったと公表しています。これは通常のCodex CLI利用者が直面する状況とは全く異なる、社内の未公開モデル評価という特殊な文脈で起きた出来事であり、一般提供されているCodexの標準的なサンドボックスが破られたという話ではありません。とはいえ、この一件は「サンドボックスは、それを取り囲むインフラ全体が耐えられて初めて安全境界として機能する」という教訓を業界全体に突きつけました。上記の最小権限の原則やネットワークアクセスの制限は、まさにこの種のリスクを一般利用の文脈でも小さくするための実践です。OpenAIは調査を継続中としており、詳細は今後更新される可能性があります。
                 </p>
               </div>
@@ -882,7 +882,7 @@ export default function OpenAICodexGuidePage() {
 
             {/* Section 13 */}
             <section id="sec-13" className={styles.section}>
-              <span className={styles.stepTag}>Reference</span>
+              <span className={styles.stepTag} data-testid="step-tag">Reference</span>
               <h2>よくある間違い(公式ガイドより)</h2>
               <p>
                 OpenAIの公式ベストプラクティスページは、初めてCodexを使う際に陥りがちな間違いを次のように整理しています。
@@ -935,7 +935,7 @@ export default function OpenAICodexGuidePage() {
 
             {/* Section 14 */}
             <section id="sec-14" className={styles.section}>
-              <span className={styles.stepTag}>Perspective</span>
+              <span className={styles.stepTag} data-testid="step-tag">Perspective</span>
               <h2>著名開発者の視点: Codexは実際どう評価されているか</h2>
 
               <h3>Simon Willison ― 著名なOSS開発者・LLMウォッチャー</h3>
@@ -994,7 +994,7 @@ export default function OpenAICodexGuidePage() {
 
             {/* Section 15 */}
             <section id="sec-15" className={styles.section}>
-              <span className={styles.stepTag}>Summary</span>
+              <span className={styles.stepTag} data-testid="step-tag">Summary</span>
               <h2>まとめ: 運用チェックリスト</h2>
               <p>
                 Codexは「毎回ゼロから指示する一回限りのアシスタント」ではなく、「時間をかけて設定・改善していくチームメイト」として扱うことが、公式ガイドが一貫して強調している姿勢です。
@@ -1077,7 +1077,7 @@ export default function OpenAICodexGuidePage() {
 
             {/* Section 16 */}
             <section id="sec-16" className={styles.section}>
-              <span className={styles.stepTag}>Appendix</span>
+              <span className={styles.stepTag} data-testid="step-tag">Appendix</span>
               <h2>参考情報源(出典一覧)</h2>
               <p className={styles.muted}>
                 本ガイドは2026年7月30日時点の情報を基に作成しています。Codexは頻繁にアップデートされるため、設定キー名・スラッシュコマンド・モデル名などは公式ドキュメントで随時確認してください。
