@@ -11,20 +11,21 @@
 - **フェーズ**: 保守・機能改善・品質強化フェーズ
 - **ブランチ**: `dev`（本番 `main` への Next.js 移行マージ完了 🚀）
 - **動作検証**:
-  - `bun run build` ⏭️（ユーザー指定により省略。CI等で実施）
+  - `npm run build` ⏭️（今回もユーザー指定により省略。CI等で実施）
   - `npm run typecheck` ✅（サンドボックスではユーザー指定により npm を使用。`package.json` の `typecheck` スクリプトは `tsc --noEmit` で、`bun run typecheck` と同じスクリプトを実行）
-  - `npm run lint` ❌（未完了。452 files checked、46 errors・2 warnings・3 infos。既存 diagnostics だが成功扱いせず、CI lint も解消まで失敗として扱う）
+  - `npm run lint` ✅（452 files checked、diagnostics 0）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: `npm test` で Vitest **162 files / 1443 tests すべて合格**（収集失敗なし）。サンドボックスではユーザー指定により npm を使用し、`package.json` の `test` スクリプト `vitest run` を実行するため `(cd web-next && bun run test)` と同等
+  - **フロントエンド (`web-next/`)**: `npm test` で Vitest **162 files / 1444 tests すべて合格**（収集失敗なし）。サンドボックスではユーザー指定により npm を使用し、`package.json` の `test` スクリプト `vitest run` を実行するため `(cd web-next && bun run test)` と同等
   - **バックエンド (`scraper/`)**: pytest 実行で **43 件すべて合格** (全 Green ✅)
 
 ## 最近の追加内容
 
 - **OpenAI Codex 設定移行とモバイルTOCフォーカス管理の同期**:
-  - 原本と`/codex/agent` でV1とMultiAgentV2の並列上限設定を分離。V1は `agents.max_concurrent_threads_per_session`（`agents.max_threads` は別名）、V2は `features.multi_agent_v2.max_concurrent_threads_per_session` を使用し、V2のサブエージェント実効上限が設定値−1であることと、V2有効時の `agents.max_threads` が設定エラーになることを同期。`/codex/agent` のTOML表示もV1とV2で別々のコードブロックに分離。
+  - 原本と`/codex/agent` でV1とMultiAgentV2の並列上限設定を分離。V1は `[agents]` の `max_concurrent_threads_per_session`（`max_threads` は別名）、V2は `[features.multi_agent_v2]` の `enabled = true` と `max_concurrent_threads_per_session` を使用し、V2のサブエージェント実効上限が設定値−1であることと、V2有効時の `agents.max_threads` が設定エラーになることを同期。TOMLセクションの子セクションまで検出するprefix-aware契約テストで、V1とV2のコードブロック分離も検証。
   - `agents.max_depth` はV1では実行時の深さ制限として使用し、MultiAgentV2では実行時制限に使用せずlineageとtask-pathの深さ計算にのみ使用することと、Codex PR `#20180` を原本と`/codex/agent` に明記。
+  - アーカイブMarkdownの全9 Mermaidブロックで明示的な4スペースインデントを復元。V1/MultiAgentV2のスレッド上限キーを管理者制約表から通常設定表へ移し、ユーザーまたは信頼済みプロジェクトの `config.toml` 内での配置先を明記。
   - モバイルTOCを閉じた後、開いていた場合に限ってトグルへフォーカスを戻し、オーバーレイとTOCリンク経由をテスト。
-  - サンドボックスではユーザー指定により npm を使用。`npm test` / `npm run typecheck` は `package.json` の `vitest run` / `tsc --noEmit` を実行するため、対応する `bun run test` / `bun run typecheck` と同等。Vitest **162 files / 1443 tests** とtypecheckがGreen。今回変更したpage/test 2ファイルのBiomeもGreen。全体lintは既存の46 errors・2 warnings・3 infosにより失敗し、未完了として記録。pytest **43件**はGreen。ユーザー指定によりビルドと目視確認は省略。
+  - サンドボックスではユーザー指定により npm を使用。Vitest **162 files / 1444 tests**、typecheck、lint（452 files / diagnostics 0）、pytest **43件**がGreen。ユーザー指定によりビルドと目視確認は省略。
 
 - **レビュー指摘の現行コード再検証とガイド契約の強化**:
   - 移行スキルの契約数を「8 + 4」に統一し、CSS Modules と JSDOM の検証範囲、原本依存のレイアウト要件、TOC テストの責務を明確化。
