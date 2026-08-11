@@ -56,6 +56,37 @@ describe("OpenAI Codex guide TocObserver", () => {
     expect(links[1].classList.contains(styles.active)).toBe(true);
   });
 
+  it("opens and closes the drawer from the toggle, overlay, and TOC links", () => {
+    const { container } = renderToc();
+    const toggle = container.querySelector("#menuToggle") as HTMLButtonElement;
+    const sidebar = container.querySelector("#sidebar") as HTMLElement;
+    const overlay = container.querySelector("#sidebarOverlay") as HTMLElement;
+    const firstLink = container.querySelector("#sidebar nav a") as HTMLAnchorElement;
+
+    fireEvent.click(toggle);
+    expect(sidebar).toHaveClass(styles.sidebarOpen);
+    expect(overlay).toHaveClass(styles.overlayOpen);
+    expect(toggle).toHaveAttribute("aria-expanded", "true");
+    expect(toggle).toHaveAttribute("aria-label", "目次を閉じる");
+
+    fireEvent.click(toggle);
+    expect(sidebar).not.toHaveClass(styles.sidebarOpen);
+    expect(toggle).toHaveAttribute("aria-expanded", "false");
+
+    fireEvent.click(toggle);
+    fireEvent.click(overlay);
+    expect(sidebar).not.toHaveClass(styles.sidebarOpen);
+
+    fireEvent.click(toggle);
+    fireEvent.click(firstLink);
+    expect(sidebar).not.toHaveClass(styles.sidebarOpen);
+    expect(toggle).toHaveAttribute("aria-label", "目次を開く");
+  });
+
+  it("renders safely when drawer elements and TOC links are absent", () => {
+    expect(() => render(<TocObserver />).unmount()).not.toThrow();
+  });
+
   it("removes toggle, overlay, nav-link, scroll, and resize listeners on unmount", () => {
     const { container, unmount } = renderToc();
     const toggle = container.querySelector("#menuToggle") as HTMLButtonElement;
