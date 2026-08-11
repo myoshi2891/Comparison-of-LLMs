@@ -400,7 +400,7 @@ Task -- 曖昧・多段階・要検証 --> M1["gpt-5.6<br/>(深い推論・高�
 Task -- バランス・速度重視 --> M2["gpt-5.6-terra<br/>(高速・標準作業)"]
 ```
 
-セッションあたりの並行スレッド上限は、V1とMultiAgentV2で設定を分けます。V1では `agents.max_concurrent_threads_per_session`（`agents.max_threads` は別名）で、親スレッドを除くサブエージェント同時実行上限を設定します。MultiAgentV2では `features.multi_agent_v2.max_concurrent_threads_per_session` で主スレッドを含む上限を設定するため、サブエージェント実効上限は設定値−1です。MultiAgentV2有効時に `agents.max_threads` を使用すると設定エラーになります。`agents.max_depth` はV1の実行時深さ制限としては適用されませんが、MultiAgentV2でもlineageとtask-pathの深さ計算に使用されます（[Codex PR #20180](https://github.com/openai/codex/pull/20180)）。
+セッションあたりの並行スレッド上限は、V1とMultiAgentV2で設定を分けます。V1では `agents.max_concurrent_threads_per_session`（`agents.max_threads` は別名）で、親スレッドを除くサブエージェント同時実行上限を設定します。MultiAgentV2では `features.multi_agent_v2.max_concurrent_threads_per_session` で主スレッドを含む上限を設定するため、サブエージェント実効上限は設定値−1です。MultiAgentV2有効時に `agents.max_threads` を使用すると設定エラーになります。`agents.max_depth` はV1では実行時の深さ制限として使用され、MultiAgentV2では実行時制限に使用せず、lineageとtask-pathの深さ計算にのみ使用されます（[Codex PR #20180](https://github.com/openai/codex/pull/20180)）。
 
 ```mermaid
 flowchart TD
