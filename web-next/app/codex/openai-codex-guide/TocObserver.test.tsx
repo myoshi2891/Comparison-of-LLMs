@@ -74,13 +74,17 @@ describe("OpenAI Codex guide TocObserver", () => {
     expect(toggle).toHaveAttribute("aria-expanded", "false");
 
     fireEvent.click(toggle);
+    firstLink.focus();
     fireEvent.click(overlay);
     expect(sidebar).not.toHaveClass(styles.sidebarOpen);
+    expect(toggle).toHaveFocus();
 
     fireEvent.click(toggle);
+    firstLink.focus();
     fireEvent.click(firstLink);
     expect(sidebar).not.toHaveClass(styles.sidebarOpen);
     expect(toggle).toHaveAttribute("aria-label", "目次を開く");
+    expect(toggle).toHaveFocus();
   });
 
   it("renders safely when drawer elements and TOC links are absent", () => {

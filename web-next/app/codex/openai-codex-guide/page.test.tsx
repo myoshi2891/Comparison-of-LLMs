@@ -99,10 +99,27 @@ describe("/codex/openai-codex-guide (2026 Best Practices)", () => {
     expect(tables.length).toBeGreaterThanOrEqual(9);
   });
 
-  it("運用チェックリストの 12 項目が存在する", () => {
+  it("原本と同期した運用チェックリストの 14 項目が存在する", () => {
     const { container } = render(<Page />);
-    const checklistItems = container.querySelectorAll("input[type='checkbox']");
-    expect(checklistItems).toHaveLength(12);
+    const checklist = container.querySelector("#sec-15");
+    const checklistItems = checklist?.querySelectorAll("input[type='checkbox']");
+    expect(checklistItems).toHaveLength(14);
+    expect(checklist?.textContent).toContain("agents.max_concurrent_threads_per_session");
+    expect(checklist?.textContent).toContain("agents.max_depth");
+    expect(checklist?.textContent).toContain("V1限定・V2無視");
+    expect(checklist?.textContent).toContain("agents/openai.yaml");
+    expect(checklist?.textContent).toContain("dependencies.tools");
+  });
+
+  it("MCP 設定場所と Skill のツール依存宣言を原本どおり区別する", () => {
+    const { container } = render(<Page />);
+    const mcpSection = container.querySelector("#sec-8");
+
+    expect(mcpSection?.textContent).toContain("~/.codex/config.toml");
+    expect(mcpSection?.textContent).toContain(".codex/config.toml");
+    expect(mcpSection?.textContent).toContain("[mcp_servers.<server-name>]");
+    expect(mcpSection?.textContent).toContain("agents/openai.yaml");
+    expect(mcpSection?.textContent).toContain("dependencies.tools");
   });
 
   it("TOC番号をCSSで重複生成せず、モバイルサイドバーの操作状態を同期する", () => {

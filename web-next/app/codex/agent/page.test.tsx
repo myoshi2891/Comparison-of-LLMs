@@ -91,6 +91,21 @@ describe("/codex/agent - page structure", () => {
     const expectedHrefs = EXPECTED_SECTION_IDS.map((id) => `#${id}`);
     expect(tocHrefs).toEqual(expectedHrefs);
   });
+
+  it("agents.max_depth を MultiAgentV2 の有効な再帰制限として案内しない", () => {
+    const { container } = render(<Page />);
+    const text = container.textContent ?? "";
+    const migrationLink = container.querySelector(
+      'a[href="https://github.com/openai/codex/pull/20180"]'
+    );
+
+    expect(text).toContain("agents.max_concurrent_threads_per_session");
+    expect(text).toContain("agents.max_depth");
+    expect(text).toContain("V1");
+    expect(text).toContain("MultiAgentV2");
+    expect(text).toContain("無視");
+    expect(migrationLink).not.toBeNull();
+  });
 });
 
 describe("/codex/agent - external link safety", () => {
