@@ -114,12 +114,20 @@ describe("/codex/openai-codex-guide (2026 Best Practices)", () => {
   it("MCP 設定場所と Skill のツール依存宣言を原本どおり区別する", () => {
     const { container } = render(<Page />);
     const mcpSection = container.querySelector("#sec-8");
+    const configGuidance = Array.from(mcpSection?.querySelectorAll("p") ?? []).find((paragraph) =>
+      paragraph.textContent?.includes("MCPサーバーの直接設定")
+    );
+    const configEntries = Array.from(configGuidance?.querySelectorAll("code") ?? []);
+    const findConfigEntry = (text: string) =>
+      configEntries.find((entry) => entry.textContent === text);
 
-    expect(mcpSection?.textContent).toContain("~/.codex/config.toml");
-    expect(mcpSection?.textContent).toContain(".codex/config.toml");
-    expect(mcpSection?.textContent).toContain("[mcp_servers.<server-name>]");
-    expect(mcpSection?.textContent).toContain("agents/openai.yaml");
-    expect(mcpSection?.textContent).toContain("dependencies.tools");
+    expect(findConfigEntry("~/.codex/config.toml")?.textContent).toBe("~/.codex/config.toml");
+    expect(findConfigEntry(".codex/config.toml")?.textContent).toBe(".codex/config.toml");
+    expect(findConfigEntry("[mcp_servers.<server-name>]")?.textContent).toBe(
+      "[mcp_servers.<server-name>]"
+    );
+    expect(findConfigEntry("agents/openai.yaml")?.textContent).toBe("agents/openai.yaml");
+    expect(findConfigEntry("dependencies.tools")?.textContent).toBe("dependencies.tools");
   });
 
   it("TOC番号をCSSで重複生成せず、モバイルサイドバーの操作状態を同期する", () => {

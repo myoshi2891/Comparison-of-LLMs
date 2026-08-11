@@ -94,16 +94,18 @@ describe("/codex/agent - page structure", () => {
 
   it("agents.max_depth を MultiAgentV2 の有効な再帰制限として案内しない", () => {
     const { container } = render(<Page />);
-    const text = container.textContent ?? "";
+    const maxDepthRow = Array.from(container.querySelectorAll("tr")).find((row) =>
+      Array.from(row.querySelectorAll("code")).some(
+        (code) => code.textContent === "agents.max_depth"
+      )
+    );
+    const guidance = maxDepthRow?.textContent?.replace(/\s+/g, "") ?? "";
     const migrationLink = container.querySelector(
       'a[href="https://github.com/openai/codex/pull/20180"]'
     );
 
-    expect(text).toContain("agents.max_concurrent_threads_per_session");
-    expect(text).toContain("agents.max_depth");
-    expect(text).toContain("V1");
-    expect(text).toContain("MultiAgentV2");
-    expect(text).toContain("無視");
+    expect(guidance).toContain("agents.max_depthはV1実装でのみ有効で、MultiAgentV2では無視される");
+    expect(guidance).not.toContain("MultiAgentV2の再帰制限");
     expect(migrationLink).not.toBeNull();
   });
 });
