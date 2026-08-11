@@ -526,7 +526,7 @@ export default function CodexAgentPage() {
                   カスタムエージェント定義への参照。
                   <code>agents.max_concurrent_threads_per_session</code>
                   は親スレッドを除くサブエージェント同時実行上限で、<code>agents.max_threads</code>
-                  は別名。<code>agents.max_depth</code>はV1の実行時深さ制限
+                  は別名。<code>agents.max_depth</code>はV1の実行時深さ制限として適用
                 </td>
               </tr>
               <tr>
@@ -539,7 +539,7 @@ export default function CodexAgentPage() {
                   上限は主スレッドを含むため、サブエージェント実効上限は設定値−1。
                   MultiAgentV2有効時の<code>agents.max_threads</code>は設定エラー。
                   <code>agents.max_depth</code>
-                  はV1の実行時深さ制限としては適用されないが、lineageとtask-pathの深さ計算に使用
+                  は実行時制限に使わず、lineageとtask-pathの深さ計算にのみ使用
                 </td>
               </tr>
               <tr>
@@ -638,6 +638,9 @@ export default function CodexAgentPage() {
               <span className={styles.ck}>max_concurrent_threads_per_session</span> ={" "}
               <span className={styles.cv}>4</span>
             </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>max_depth</span> = <span className={styles.cv}>2</span>
+            </div>
             <div className={styles.codeLine}> </div>
             <div className={styles.codeLine}>
               <span className={styles.ch}>[agents.security_reviewer]</span>
@@ -646,7 +649,14 @@ export default function CodexAgentPage() {
               <span className={styles.ck}>config_file</span> ={" "}
               <span className={styles.cs}>&quot;~/.codex/agents/security-reviewer.toml&quot;</span>
             </div>
-            <div className={styles.codeLine}> </div>
+          </div>
+        </div>
+        <div className={styles.codeBlock}>
+          <div className={styles.codeBar}>
+            <span>~/.codex/config.toml (MultiAgentV2)</span>
+            <span className={styles.codeLang}>toml</span>
+          </div>
+          <div className={styles.codeBody}>
             <div className={styles.codeLine}>
               <span className={styles.ch}>[features.multi_agent_v2]</span>
             </div>
@@ -886,7 +896,7 @@ export default function CodexAgentPage() {
           サブエージェント実効上限は設定値−1です。MultiAgentV2有効時の
           <code>agents.max_threads</code>
           は設定エラーになります。<code>agents.max_depth</code>
-          はV1の実行時深さ制限としては適用されませんが、MultiAgentV2でもlineageとtask-pathの深さ計算に使用されます(
+          はV1では実行時の深さ制限として使用され、MultiAgentV2では実行時制限に使用せず、lineageとtask-pathの深さ計算にのみ使用されます(
           <Ext href="https://github.com/openai/codex/pull/20180">Codex PR #20180</Ext>
           )。トリガーは特別なコマンドではなく自然言語で構いません。「レビュー観点ごとにエージェントを1つずつ立ち上げて、すべて完了したら結果をまとめて」と指示するだけで、Codexが複数スレッドを開いて集約します。
         </p>
@@ -1211,7 +1221,7 @@ export default function CodexAgentPage() {
               は主スレッド込みで実効上限が設定値−1になること、V2で
               <code>agents.max_threads</code>が設定エラーになることを確認したか。
               <code>agents.max_depth</code>
-              はV1の実行時深さ制限としては適用されないが、lineageとtask-pathの深さ計算に使用される
+              はV1では実行時の深さ制限、MultiAgentV2では実行時制限に使わず、lineageとtask-pathの深さ計算にのみ使用される
             </label>
           </li>
           <li>
