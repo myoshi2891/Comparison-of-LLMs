@@ -21,8 +21,8 @@
 ## 最近の追加内容
 
 - **OpenAI Codex 設定移行とモバイルTOCフォーカス管理の同期**:
-  - `/codex/openai-codex-guide` にMCPサーバーの設定場所、`agents/openai.yaml` の `dependencies.tools`、現行の `agents.max_concurrent_threads_per_session` を原本どおり反映し、15項目の運用チェックリストへ同期。
-  - `agents.max_depth` はCodex CLI V1限定でMultiAgentV2では無視されることと、Codex PR `#20180` を原本・移行ガイド・`/codex/agent` に明記。
+  - 原本・`/codex/openai-codex-guide`・`/codex/agent` でV1とMultiAgentV2の並列上限設定を分離。V1は `agents.max_concurrent_threads_per_session`（`agents.max_threads` は別名）、V2は `features.multi_agent_v2.max_concurrent_threads_per_session` を使用し、V2のサブエージェント実効上限が設定値−1であることと、V2有効時の `agents.max_threads` が設定エラーになることを全ガイド層へ同期。
+  - `agents.max_depth` はV1の実行時深さ制限としては適用されない一方、MultiAgentV2でもlineageとtask-pathの深さ計算に使用されることと、Codex PR `#20180` を原本・移行ガイド・`/codex/agent` に明記。
   - モバイルTOCを閉じた後、開いていた場合に限ってトグルへフォーカスを戻し、オーバーレイとTOCリンク経由をテスト。
   - サンドボックスではユーザー指定により npm を使用。`npm test` / `npm run typecheck` は `package.json` の `vitest run` / `tsc --noEmit` を実行するため、対応する `bun run test` / `bun run typecheck` と同等。Vitest **162 files / 1441 tests** とtypecheckがGreen。変更ロジック2ファイルのBiomeもGreen。全体lintは既存の49 errors・2 warnings・3 infosにより失敗し、未完了として記録。ユーザー指定によりビルドと目視確認は省略。
 
