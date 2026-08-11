@@ -12,27 +12,26 @@ export default function TocObserver({ activeClass = "active" }: TocObserverProps
     const sidebarToggle = document.getElementById("sidebarToggle");
     const sidebar = document.getElementById("sidebar");
 
-    const handleToggle = () => {
-      const isOpen = sidebar?.getAttribute("data-open") === "true";
-      const nextState = !isOpen;
+    const setSidebarState = (isOpen: boolean) => {
       if (sidebar) {
-        sidebar.setAttribute("data-open", String(nextState));
+        sidebar.setAttribute("data-open", String(isOpen));
       }
       if (sidebarToggle) {
-        sidebarToggle.setAttribute("aria-expanded", String(nextState));
+        sidebarToggle.setAttribute("aria-expanded", String(isOpen));
+        sidebarToggle.setAttribute("aria-label", isOpen ? "目次を閉じる" : "目次を開く");
       }
+    };
+
+    const handleToggle = () => {
+      const isOpen = sidebar?.getAttribute("data-open") === "true";
+      setSidebarState(!isOpen);
     };
 
     sidebarToggle?.addEventListener("click", handleToggle);
 
     const tocLinks = document.querySelectorAll("nav a[href^='#']");
     const handleTocClick = () => {
-      if (sidebar) {
-        sidebar.setAttribute("data-open", "false");
-      }
-      if (sidebarToggle) {
-        sidebarToggle.setAttribute("aria-expanded", "false");
-      }
+      setSidebarState(false);
     };
 
     for (const a of Array.from(tocLinks)) {

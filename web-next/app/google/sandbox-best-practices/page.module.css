@@ -239,6 +239,11 @@
   margin: 0 0 1.5rem;
 }
 
+.sectionAnchor {
+  display: block;
+  scroll-margin-top: calc(var(--header-height, 60px) + 80px);
+}
+
 .main h2 {
   font-size: 1.55rem;
   font-weight: 700;

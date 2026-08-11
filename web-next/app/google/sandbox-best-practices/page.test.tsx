@@ -81,9 +81,7 @@ describe("/google/sandbox-best-practices - page structure", () => {
     for (const anchor of anchors) {
       expect(anchor).toHaveClass(styles.sectionAnchor);
     }
-    expect(css).toContain(
-      "scroll-margin-top: calc(var(--header-height, 60px) + 80px)"
-    );
+    expect(css).toContain("scroll-margin-top: calc(var(--header-height, 60px) + 80px)");
   });
 });
 

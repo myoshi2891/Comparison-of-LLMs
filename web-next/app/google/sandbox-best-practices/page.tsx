@@ -279,7 +279,7 @@ export default function GoogleSandboxBestPracticesPage() {
 
         <hr />
 
-        <span id="section-1" aria-hidden="true" />
+        <span className={styles.sectionAnchor} id="section-1" aria-hidden="true" />
         <h2 id="1-はじめになぜサンドボックスが必要なのか">
           1. はじめに:なぜ「サンドボックス」が必要なのか
         </h2>
@@ -309,7 +309,7 @@ export default function GoogleSandboxBestPracticesPage() {
 
         <hr />
 
-        <span id="section-2" aria-hidden="true" />
+        <span className={styles.sectionAnchor} id="section-2" aria-hidden="true" />
         <h2 id="2-全体マップgoogleの5つのサンドボックス領域">
           2. 全体マップ:Googleの5つのサンドボックス領域
         </h2>
@@ -322,7 +322,7 @@ export default function GoogleSandboxBestPracticesPage() {
 
         <hr />
 
-        <span id="section-3" aria-hidden="true" />
+        <span className={styles.sectionAnchor} id="section-3" aria-hidden="true" />
         <h2
           className={styles.domainH2}
           id="3-領域①-aiエージェントのサンドボックス"
@@ -450,7 +450,7 @@ export default function GoogleSandboxBestPracticesPage() {
 
         <hr />
 
-        <span id="section-4" aria-hidden="true" />
+        <span className={styles.sectionAnchor} id="section-4" aria-hidden="true" />
         <h2
           className={styles.domainH2}
           id="4-領域②-apiのサンドボックス"
@@ -512,7 +512,7 @@ export default function GoogleSandboxBestPracticesPage() {
 
         <hr />
 
-        <span id="section-5" aria-hidden="true" />
+        <span className={styles.sectionAnchor} id="section-5" aria-hidden="true" />
         <h2
           className={styles.domainH2}
           id="5-領域③-コンテナのサンドボックス"
@@ -589,7 +589,7 @@ export default function GoogleSandboxBestPracticesPage() {
 
         <hr />
 
-        <span id="section-6" aria-hidden="true" />
+        <span className={styles.sectionAnchor} id="section-6" aria-hidden="true" />
         <h2
           className={styles.domainH2}
           id="6-領域④-ccのサンドボックス"
@@ -770,7 +770,7 @@ export default function GoogleSandboxBestPracticesPage() {
 
         <hr />
 
-        <span id="section-7" aria-hidden="true" />
+        <span className={styles.sectionAnchor} id="section-7" aria-hidden="true" />
         <h2
           className={styles.domainH2}
           id="7-領域⑤-ブラウザのサンドボックス"
@@ -879,7 +879,7 @@ export default function GoogleSandboxBestPracticesPage() {
 
         <hr />
 
-        <span id="section-8" aria-hidden="true" />
+        <span className={styles.sectionAnchor} id="section-8" aria-hidden="true" />
         <h2 id="8-意思決定フロー自分のケースにはどのサンドボックス技術を選ぶべきか">
           8. 意思決定フロー:自分のケースにはどのサンドボックス技術を選ぶべきか
         </h2>
@@ -892,7 +892,7 @@ export default function GoogleSandboxBestPracticesPage() {
 
         <hr />
 
-        <span id="section-9" aria-hidden="true" />
+        <span className={styles.sectionAnchor} id="section-9" aria-hidden="true" />
         <h2 id="9-横断ベストプラクティス早見表">9. 横断ベストプラクティス早見表</h2>
         <p>5つの領域を貫く共通原則を、実務でチェックリストとして使える形にまとめました。</p>
         <div className={styles.tableScroll}>
@@ -966,7 +966,7 @@ export default function GoogleSandboxBestPracticesPage() {
 
         <hr />
 
-        <span id="section-10" aria-hidden="true" />
+        <span className={styles.sectionAnchor} id="section-10" aria-hidden="true" />
         <h2 id="10-参考文献出典url">10. 参考文献・出典URL</h2>
         <p>
           本ガイドの作成にあたり、以下のGoogle公式ドキュメント・Google公式ブログ・著名なセキュリティエンジニア/開発者による技術記事を参照しました。
