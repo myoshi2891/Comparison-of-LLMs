@@ -144,6 +144,29 @@ describe("/copilot/skill - external link safety", () => {
 });
 
 describe("/copilot/skill - static source safety", () => {
+  it("documents the supported GitHub CLI validation and install metadata", () => {
+    const source = readFileSync(join(__dirname, "page.tsx"), "utf8");
+
+    expect(source).toContain("gh skill publish --dry-run");
+    expect(source).not.toContain("gh skill lint");
+    expect(source).toContain("--from-local");
+    expect(source).toContain("metadata.local-path");
+    expect(source).not.toContain("metadata.provenance");
+
+    const publishSection = source.slice(
+      source.indexOf('<h3 id="72-'),
+      source.indexOf('<h2 id="8-', source.indexOf('<h3 id="72-'))
+    );
+    expect(publishSection).not.toContain("ToxicSkills");
+  });
+
+  it("uses space-delimited strings for allowed-tools in publishable examples", () => {
+    const source = readFileSync(join(__dirname, "page.tsx"), "utf8");
+
+    expect(source).not.toMatch(/allowed-tools:\s*(?:\[|\n\s+-)/);
+    expect(source).toContain('allowed-tools: "Bash(git:*) Read"');
+  });
+
   it("does not use the React raw-HTML injection prop", () => {
     const source = readFileSync(join(__dirname, "page.tsx"), "utf8");
     const needle = ["danger", "ously", "Set", "Inner", "HTML"].join("");
