@@ -76,7 +76,7 @@ const DIAGRAM_5 = `sequenceDiagram
     Repo-->>CLI: 内容をターミナルに表示(未インストール)
     D->>CLI: gh skill install OWNER/REPO SKILL
     CLI->>Repo: 該当スキルを取得
-    CLI-->>D: 正しいディレクトリへ配置し、provenanceメタデータを付与`;
+    CLI-->>D: 正しいディレクトリへ配置し、ソース追跡メタデータを付与`;
 
 const DIAGRAM_6 = `flowchart TB
     Q1{ほぼ全タスクに<br/>常に関係する情報か?} -->|Yes| A[Custom Instructions]
@@ -519,12 +519,17 @@ export default function CopilotSkillPage() {
                   <code className={styles.inlineCode}>allowed-tools</code>
                 </td>
                 <td>任意(実験的)</td>
-                <td>string / list</td>
-                <td>スキル実行中にエージェントへ事前許可するツール一覧。</td>
+                <td>string (公開形式)</td>
+                <td>スキル実行中にエージェントへ事前許可するツールの空白区切り文字列。</td>
               </tr>
             </tbody>
           </table>
         </div>
+        <p>
+          Copilot CLI の実装は配列形式も読み込めるが、
+          <code className={styles.inlineCode}>gh skill publish --dry-run</code>{" "}
+          が検証する公開用形式は文字列である。公開するスキルでは、ツール名を空白で区切った文字列に統一する。
+        </p>
         <p>
           <code className={styles.inlineCode}>name</code> と{" "}
           <code className={styles.inlineCode}>description</code>{" "}
@@ -722,21 +727,21 @@ description: Fills out PDF forms and extracts form field data. Use this when ask
               <tr>
                 <td>ワイルドカード指定 (危険)</td>
                 <td>
-                  <code className={styles.inlineCode}>allowed-tools: ["*"]</code>
+                  <code className={styles.inlineCode}>allowed-tools: "*"</code>
                 </td>
                 <td>全ツールを無制限に許可。セキュリティリスクが非常に高く非推奨。</td>
               </tr>
               <tr>
                 <td>カテゴリ丸ごと指定 (注意)</td>
                 <td>
-                  <code className={styles.inlineCode}>allowed-tools: ["shell", "read"]</code>
+                  <code className={styles.inlineCode}>allowed-tools: "shell read"</code>
                 </td>
                 <td>シェル実行を全面的に許可。悪意あるスクリプトの実行リスクあり。</td>
               </tr>
               <tr>
                 <td>コマンド単位の限定指定 (推奨)</td>
                 <td>
-                  <code className={styles.inlineCode}>allowed-tools: ["Bash(git:*)", "Read"]</code>
+                  <code className={styles.inlineCode}>allowed-tools: "Bash(git:*) Read"</code>
                 </td>
                 <td>git コマンドとファイル読み込みのみを許可。最小権限原則に合致。</td>
               </tr>
@@ -752,10 +757,7 @@ description: Fills out PDF forms and extracts form field data. Use this when ask
             <code>{`---
 name: git-commit-helper
 description: Generates standardized git commit messages based on staged diffs.
-allowed-tools:
-  - "Bash(git status)"
-  - "Bash(git diff *)"
-  - "Read"
+allowed-tools: "Bash(git status) Bash(git diff *) Read"
 ---`}</code>
           </pre>
         </div>
@@ -1082,61 +1084,24 @@ gh skill preview vercel-labs/agent-skills react-best-practices
 gh skill install vercel-labs/agent-skills react-best-practices
 
 # 4. パーソナルスキル (~/.copilot/skills/) としてグローバルインストール
-gh skill install vercel-labs/agent-skills react-best-practices --global`}</code>
+gh skill install vercel-labs/agent-skills react-best-practices --global
+
+# 5. ローカルディレクトリからコピーしてインストール
+gh skill install ./my-skills-repo react-best-practices --from-local`}</code>
           </pre>
         </div>
         <p>
-          <code className={styles.inlineCode}>gh skill install</code> を実行すると、
-          <code className={styles.inlineCode}>SKILL.md</code> のフロントマターに{" "}
-          <code className={styles.inlineCode}>metadata.provenance</code>{" "}
-          が自動的に追記され、出所トレースが可能になる。
+          リモートリポジトリからのインストールでは、更新確認に使うソース追跡メタデータが追加される。一方、ローカルディレクトリを指定する
+          <code className={styles.inlineCode}>--from-local</code> では、コピー元を追跡する
+          <code className={styles.inlineCode}>metadata.local-path</code> が追加される。
         </p>
-        <div className={styles.tableScroll}>
-          <table>
-            <thead>
-              <tr>
-                <th>追記されるメタデータキー</th>
-                <th>内容例</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>
-                  <code className={styles.inlineCode}>metadata.provenance.repository</code>
-                </td>
-                <td>
-                  <code className={styles.inlineCode}>vercel-labs/agent-skills</code>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <code className={styles.inlineCode}>metadata.provenance.commit</code>
-                </td>
-                <td>
-                  <code className={styles.inlineCode}>a1b2c3d4e5f6...</code>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <code className={styles.inlineCode}>metadata.provenance.installed_at</code>
-                </td>
-                <td>
-                  <code className={styles.inlineCode}>2026-08-01T10:00:00Z</code>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
         <div className={styles.codeBlock}>
           <pre>
             <code>{`---
 name: react-best-practices
 description: Applies React 19 best practices...
 metadata:
-  provenance:
-    repository: vercel-labs/agent-skills
-    commit: a1b2c3d4e5f67890
-    installed_at: 2026-08-01T10:00:00Z
+  local-path: ./my-skills-repo/skills/react-best-practices
 ---`}</code>
           </pre>
         </div>
@@ -1147,23 +1112,22 @@ metadata:
             <code>{`# インストール済みスキルの更新確認と一括アップデート
 gh skill update --all
 
-# 自作スキルリポジトリの検証 (構造・フロントマター・セキュリティスキャン)
-gh skill lint .github/skills/my-custom-skill
+# 自作スキルリポジトリの公開前検証 (公開は行わない)
+gh skill publish --dry-run .github/skills/my-custom-skill
 
 # 自作スキルを GitHub 上へ公開・登録
 gh skill publish .github/skills/my-custom-skill`}</code>
           </pre>
         </div>
         <p>
-          <code className={styles.inlineCode}>gh skill lint</code> は、フロントマターの文法エラーや{" "}
-          <code className={styles.inlineCode}>name</code> とディレクトリ名の不一致、後述する
-          ToxicSkills パターンの検出を静的に行う。
+          <code className={styles.inlineCode}>gh skill publish --dry-run</code> は、公開を行わずに
+          Agent Skills 仕様への適合性を検証する。
         </p>
         <div className={styles.tableScroll}>
           <table>
             <thead>
               <tr>
-                <th>gh skill lint のチェック項目</th>
+                <th>gh skill publish --dry-run のチェック項目</th>
                 <th>判定基準</th>
               </tr>
             </thead>
@@ -1176,16 +1140,16 @@ gh skill publish .github/skills/my-custom-skill`}</code>
                 </td>
               </tr>
               <tr>
-                <td>Frontmatter Syntax</td>
-                <td>YAML文法が正しく、必須項目(name, description)が存在するか</td>
+                <td>Skill Name Rules</td>
+                <td>スキル名が Agent Skills 仕様の厳格な命名規則に適合するか</td>
               </tr>
               <tr>
-                <td>Description Length</td>
-                <td>description が 1,024 文字以内に収まっているか</td>
+                <td>Required Frontmatter</td>
+                <td>必須項目(name, description)が存在するか</td>
               </tr>
               <tr>
-                <td>Security Vulnerabilities</td>
-                <td>プロンプトインジェクションや危険な外部コマンド実行指示がないか</td>
+                <td>Allowed Tools Format</td>
+                <td>allowed-tools が配列ではなく文字列で記述されているか</td>
               </tr>
             </tbody>
           </table>
@@ -1224,9 +1188,7 @@ When asked to format an API response:
             <code>{`---
 name: svg-to-png-converter
 description: Converts SVG files to PNG format. Use this when asked to convert, render, or export SVG images to PNG.
-allowed-tools:
-  - "Bash(./scripts/convert.sh *)"
-  - "Read"
+allowed-tools: "Bash(./scripts/convert.sh *) Read"
 ---
 
 # SVG to PNG Conversion Guide
