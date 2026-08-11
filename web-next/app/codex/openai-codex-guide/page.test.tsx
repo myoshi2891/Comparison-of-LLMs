@@ -99,11 +99,11 @@ describe("/codex/openai-codex-guide (2026 Best Practices)", () => {
     expect(tables.length).toBeGreaterThanOrEqual(9);
   });
 
-  it("原本と同期した運用チェックリストの 14 項目が存在する", () => {
+  it("原本と同期した運用チェックリストの 15 項目が存在する", () => {
     const { container } = render(<Page />);
     const checklist = container.querySelector("#sec-15");
     const checklistItems = checklist?.querySelectorAll("input[type='checkbox']");
-    expect(checklistItems).toHaveLength(14);
+    expect(checklistItems).toHaveLength(15);
     expect(checklist?.textContent).toContain("agents.max_concurrent_threads_per_session");
     expect(checklist?.textContent).toContain("agents.max_depth");
     expect(checklist?.textContent).toContain("V1限定・V2無視");
