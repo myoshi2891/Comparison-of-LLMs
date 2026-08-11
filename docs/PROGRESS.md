@@ -13,18 +13,18 @@
 - **動作検証**:
   - `bun run build` ⏭️（ユーザー指定により省略。CI等で実施）
   - `npm run typecheck` ✅（サンドボックスではユーザー指定により npm を使用。`package.json` の `typecheck` スクリプトは `tsc --noEmit` で、`bun run typecheck` と同じスクリプトを実行）
-  - `bun run lint` ❌（未完了。452 files checked、49 errors・2 warnings・3 infos。既存 diagnostics だが成功扱いせず、CI lint も解消まで失敗として扱う）
+  - `npm run lint` ❌（未完了。452 files checked、46 errors・2 warnings・3 infos。既存 diagnostics だが成功扱いせず、CI lint も解消まで失敗として扱う）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: `npm test` で Vitest **162 files / 1441 tests すべて合格**（収集失敗なし）。サンドボックスではユーザー指定により npm を使用し、`package.json` の `test` スクリプト `vitest run` を実行するため `(cd web-next && bun run test)` と同等
+  - **フロントエンド (`web-next/`)**: `npm test` で Vitest **162 files / 1443 tests すべて合格**（収集失敗なし）。サンドボックスではユーザー指定により npm を使用し、`package.json` の `test` スクリプト `vitest run` を実行するため `(cd web-next && bun run test)` と同等
   - **バックエンド (`scraper/`)**: pytest 実行で **43 件すべて合格** (全 Green ✅)
 
 ## 最近の追加内容
 
 - **OpenAI Codex 設定移行とモバイルTOCフォーカス管理の同期**:
-  - 原本・`/codex/openai-codex-guide`・`/codex/agent` でV1とMultiAgentV2の並列上限設定を分離。V1は `agents.max_concurrent_threads_per_session`（`agents.max_threads` は別名）、V2は `features.multi_agent_v2.max_concurrent_threads_per_session` を使用し、V2のサブエージェント実効上限が設定値−1であることと、V2有効時の `agents.max_threads` が設定エラーになることを全ガイド層へ同期。
-  - `agents.max_depth` はV1の実行時深さ制限としては適用されない一方、MultiAgentV2でもlineageとtask-pathの深さ計算に使用されることと、Codex PR `#20180` を原本・移行ガイド・`/codex/agent` に明記。
+  - 原本と`/codex/agent` でV1とMultiAgentV2の並列上限設定を分離。V1は `agents.max_concurrent_threads_per_session`（`agents.max_threads` は別名）、V2は `features.multi_agent_v2.max_concurrent_threads_per_session` を使用し、V2のサブエージェント実効上限が設定値−1であることと、V2有効時の `agents.max_threads` が設定エラーになることを同期。`/codex/agent` のTOML表示もV1とV2で別々のコードブロックに分離。
+  - `agents.max_depth` はV1では実行時の深さ制限として使用し、MultiAgentV2では実行時制限に使用せずlineageとtask-pathの深さ計算にのみ使用することと、Codex PR `#20180` を原本と`/codex/agent` に明記。
   - モバイルTOCを閉じた後、開いていた場合に限ってトグルへフォーカスを戻し、オーバーレイとTOCリンク経由をテスト。
-  - サンドボックスではユーザー指定により npm を使用。`npm test` / `npm run typecheck` は `package.json` の `vitest run` / `tsc --noEmit` を実行するため、対応する `bun run test` / `bun run typecheck` と同等。Vitest **162 files / 1441 tests** とtypecheckがGreen。変更ロジック2ファイルのBiomeもGreen。全体lintは既存の49 errors・2 warnings・3 infosにより失敗し、未完了として記録。ユーザー指定によりビルドと目視確認は省略。
+  - サンドボックスではユーザー指定により npm を使用。`npm test` / `npm run typecheck` は `package.json` の `vitest run` / `tsc --noEmit` を実行するため、対応する `bun run test` / `bun run typecheck` と同等。Vitest **162 files / 1443 tests** とtypecheckがGreen。今回変更したpage/test 2ファイルのBiomeもGreen。全体lintは既存の46 errors・2 warnings・3 infosにより失敗し、未完了として記録。pytest **43件**はGreen。ユーザー指定によりビルドと目視確認は省略。
 
 - **レビュー指摘の現行コード再検証とガイド契約の強化**:
   - 移行スキルの契約数を「8 + 4」に統一し、CSS Modules と JSDOM の検証範囲、原本依存のレイアウト要件、TOC テストの責務を明確化。
