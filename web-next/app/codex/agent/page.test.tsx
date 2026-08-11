@@ -98,11 +98,13 @@ describe("/codex/agent - page structure", () => {
     const rows = Array.from(container.querySelectorAll("tr"));
     const v1Row = rows.find((row) => normalize(row.textContent).includes("サブエージェント(V1)"));
     const v2Row = rows.find((row) => normalize(row.textContent).includes("サブエージェント(V2)"));
-    const configExample = Array.from(container.querySelectorAll("pre")).find((pre) =>
-      normalize(pre.textContent).includes("max_concurrent_threads_per_session=4")
+    const configExample = Array.from(container.querySelectorAll("div")).find(
+      (element) =>
+        normalize(element.textContent).includes("[agents]") &&
+        normalize(element.textContent).includes("[features.multi_agent_v2]")
     );
     const guidance = Array.from(container.querySelectorAll("p")).find((paragraph) =>
-      normalize(paragraph.textContent).includes("V1では親スレッドを除く")
+      normalize(paragraph.textContent).includes("V1ではagents.max_concurrent_threads_per_session")
     );
     const checklist = container.querySelector('label[for="check-7"]');
     const troubleshooting = rows.find((row) =>
@@ -114,17 +116,19 @@ describe("/codex/agent - page structure", () => {
     );
     expect(normalize(v1Row?.textContent)).toContain("agents.max_threadsは別名");
     expect(normalize(v2Row?.textContent)).toContain(
-      "features.multi_agent_v2.max_concurrent_threads_per_sessionは主スレッドを含む"
+      "features.multi_agent_v2.max_concurrent_threads_per_session"
     );
+    expect(normalize(v2Row?.textContent)).toContain("上限は主スレッドを含む");
     expect(normalize(v2Row?.textContent)).toContain("サブエージェント実効上限は設定値−1");
     expect(normalize(v2Row?.textContent)).toContain("agents.max_threadsは設定エラー");
     expect(normalize(v2Row?.textContent)).toContain(
-      "agents.max_depthはlineageとtask-pathの深さ計算に使用"
+      "agents.max_depthはV1の実行時深さ制限としては適用されないが、lineageとtask-pathの深さ計算に使用"
     );
-    expect(normalize(configExample?.textContent)).toContain(
-      "[features.multi_agent_v2]max_concurrent_threads_per_session=4"
+    expect(normalize(configExample?.textContent)).toContain("[features.multi_agent_v2]");
+    expect(normalize(configExample?.textContent)).toContain("max_concurrent_threads_per_session=4");
+    expect(normalize(guidance?.textContent)).toContain(
+      "親スレッドを除くサブエージェント同時実行上限"
     );
-    expect(normalize(guidance?.textContent)).toContain("V1では親スレッドを除く");
     expect(normalize(checklist?.textContent)).toContain(
       "V1とMultiAgentV2で設定キーと上限の数え方を分離"
     );
