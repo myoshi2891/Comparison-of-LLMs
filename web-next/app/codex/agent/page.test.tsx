@@ -97,15 +97,40 @@ describe("/codex/agent - page structure", () => {
     const { container } = render(<Page />);
     const normalize = (value: string | null | undefined) => value?.replace(/\s+/g, "") ?? "";
     const codeBlocks = Array.from(container.querySelectorAll(`.${styles.codeBlock}`));
-    const v1Example = codeBlocks.find((block) => normalize(block.textContent).includes("[agents]"));
+    const hasSectionPrefix = (block: Element, section: string) =>
+      Array.from(block.querySelectorAll(`.${styles.codeLine}`)).some((line) => {
+        const text = normalize(line.textContent);
+        return text === `[${section}]` || text.startsWith(`[${section}.`);
+      });
+    const v1Example = codeBlocks.find((block) => hasSectionPrefix(block, "agents"));
     const v2Example = codeBlocks.find((block) =>
-      normalize(block.textContent).includes("[features.multi_agent_v2]")
+      hasSectionPrefix(block, "features.multi_agent_v2")
     );
 
     expect(v1Example).toBeDefined();
-    expect(normalize(v1Example?.textContent)).not.toContain("[features.multi_agent_v2]");
+    expect(hasSectionPrefix(v1Example as Element, "features.multi_agent_v2")).toBe(false);
     expect(v2Example).toBeDefined();
-    expect(normalize(v2Example?.textContent)).not.toContain("[agents]");
+    expect(hasSectionPrefix(v2Example as Element, "agents")).toBe(false);
+  });
+
+  it("MultiAgentV2 の TOML 例で機能を有効化する", () => {
+    const { container } = render(<Page />);
+    const normalize = (value: string | null | undefined) => value?.replace(/\s+/g, "") ?? "";
+    const codeBlocks = Array.from(container.querySelectorAll(`.${styles.codeBlock}`));
+    const v2Example = codeBlocks.find((block) =>
+      Array.from(block.querySelectorAll(`.${styles.codeLine}`)).some(
+        (line) => normalize(line.textContent) === "[features.multi_agent_v2]"
+      )
+    );
+    const lines = Array.from(v2Example?.querySelectorAll(`.${styles.codeLine}`) ?? []).map((line) =>
+      normalize(line.textContent)
+    );
+    const sectionStart = lines.indexOf("[features.multi_agent_v2]");
+    const nextSection = lines.findIndex(
+      (line, index) => index > sectionStart && /^\[.+\]$/.test(line)
+    );
+
+    expect(lines.slice(sectionStart + 1, nextSection)).toContain("enabled=true");
   });
 
   it("V1 では agents.max_depth を実行時の深さ制限に使用する", () => {
