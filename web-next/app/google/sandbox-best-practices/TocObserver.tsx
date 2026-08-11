@@ -40,7 +40,9 @@ export default function TocObserver({ activeClass = "active" }: TocObserverProps
     }
 
     // 2. IntersectionObserver for TOC highlight
-    const sections = document.querySelectorAll("main section[id], main h2[id], main [id^='section-']");
+    const sections = document.querySelectorAll(
+      "main section[id], main h2[id], main [id^='section-']"
+    );
     const setActive = (id: string) => {
       for (const a of Array.from(tocLinks)) {
         const href = a.getAttribute("href");
@@ -72,7 +74,7 @@ export default function TocObserver({ activeClass = "active" }: TocObserverProps
               : topmost,
           undefined
         );
-        if (bestEntry && bestEntry.target.id) {
+        if (bestEntry?.target.id) {
           setActive(bestEntry.target.id);
         }
       },

@@ -1,14 +1,14 @@
 /* biome-ignore-all lint/suspicious/noTemplateCurlyInString: code examples contain bash/yaml variables */
-import type { Metadata } from 'next';
-import MermaidDiagram from '@/components/docs/MermaidDiagram';
-import Checklist from './Checklist';
-import styles from './page.module.css';
-import TocObserver from './TocObserver';
+import type { Metadata } from "next";
+import MermaidDiagram from "@/components/docs/MermaidDiagram";
+import Checklist from "./Checklist";
+import styles from "./page.module.css";
+import TocObserver from "./TocObserver";
 
 export const metadata: Metadata = {
-  title: 'SonarQubeコードレビュー実践ガイド ― 中級者〜上級者のためのベストプラクティス',
+  title: "SonarQubeコードレビュー実践ガイド ― 中級者〜上級者のためのベストプラクティス",
   description:
-    'Quality Gate設計からIssueトリアージ、CI/CD統合、そしてAC/DC時代のAIコーディングエージェント連携まで。SonarQube公式ドキュメントと業界動向をもとに、ステップバイステップで整理しています。',
+    "Quality Gate設計からIssueトリアージ、CI/CD統合、そしてAC/DC時代のAIコーディングエージェント連携まで。SonarQube公式ドキュメントと業界動向をもとに、ステップバイステップで整理しています。",
 };
 
 // ── MERMAID DIAGRAMS ──
@@ -452,7 +452,7 @@ export default function SonarQubeGuidePage() {
 
         <p>
           Clean as You Codeの潜在的な弱点として、公式ドキュメントも「厳しすぎるQuality
-          Gateの副作用」に言及しています。新規コードの基準を過度に厳格にすると、小さな修正のたびに無関係な既存コードのリファクタリングを強いられ、開発速度を落とすリスクがあります。運用初期は組み込みの{' '}
+          Gateの副作用」に言及しています。新規コードの基準を過度に厳格にすると、小さな修正のたびに無関係な既存コードのリファクタリングを強いられ、開発速度を落とすリスクがあります。運用初期は組み込みの{" "}
           <code>Sonar way</code> Quality
           Gateから始め、チームの実態に合わせて段階的にカスタマイズすることが推奨されます。
         </p>
@@ -508,7 +508,7 @@ export default function SonarQubeGuidePage() {
         </div>
 
         <p>
-          これらの属性に問題があると、最終的に <strong>Software Qualities（3つの品質特性）</strong>{' '}
+          これらの属性に問題があると、最終的に <strong>Software Qualities（3つの品質特性）</strong>{" "}
           に影響します。
         </p>
 
@@ -538,8 +538,8 @@ export default function SonarQubeGuidePage() {
         </div>
 
         <p>
-          各Issueには、この4属性×3品質特性のマッピングに基づき、影響度が{' '}
-          <strong>Low / Medium / High</strong>{' '}
+          各Issueには、この4属性×3品質特性のマッピングに基づき、影響度が{" "}
+          <strong>Low / Medium / High</strong>{" "}
           の3段階（旧来のBlocker/Critical/Major/Minor/Infoという5段階の重要度モデルに代わるもの）で表示されます。プロジェクト全体・新規コードそれぞれについてのReliability
           Rating・Security Rating・Maintainability RatingはA〜Eの格付けとして引き続きQuality
           Gateの条件に利用されます。
@@ -559,7 +559,7 @@ export default function SonarQubeGuidePage() {
         <h2 id="5-quality-gate設計のベストプラクティス">5. Quality Gate設計のベストプラクティス</h2>
         <p>
           Quality
-          Gateは「このプロジェクトはリリース可能か」という一つの問いに答えるための、条件のセットです。組み込みの{' '}
+          Gateは「このプロジェクトはリリース可能か」という一つの問いに答えるための、条件のセットです。組み込みの{" "}
           <code>Sonar way</code> Quality
           Gateは、SonarSourceによって提供・維持される読み取り専用のゲートで、Clean as You
           Codeを体現するベストプラクティスとして機能します。
@@ -799,7 +799,7 @@ export default function SonarQubeGuidePage() {
             Whether」の質問リストに沿って、自分たちのコンテキストで本当にリスクがあるかを判定する
           </li>
           <li>
-            リスクがあると判断した場合、<strong>How can you fix it?</strong>{' '}
+            リスクがあると判断した場合、<strong>How can you fix it?</strong>{" "}
             タブの推奨されるセキュアコーディングプラクティスに沿って修正する
           </li>
           <li>最終的にFixed（修正済み）またはSafe（対応不要）のステータスを設定する</li>
@@ -865,38 +865,38 @@ export default function SonarQubeGuidePage() {
           <div className={styles.codeLine}> push:</div>
           <div className={styles.codeLine}> branches: [main]</div>
           <div className={styles.codeLine}> pull_request:</div>
-          <div className={styles.codeLine}>{'    types: [opened, synchronize, reopened]'}</div>
+          <div className={styles.codeLine}>{"    types: [opened, synchronize, reopened]"}</div>
           <div className={styles.codeLine} />
           <div className={styles.codeLine}>jobs:</div>
           <div className={styles.codeLine}> sonarqube:</div>
           <div className={styles.codeLine}> runs-on: ubuntu-latest</div>
           <div className={styles.codeLine}> steps:</div>
-          <div className={styles.codeLine}>{'      - uses: actions/checkout@v4'}</div>
+          <div className={styles.codeLine}>{"      - uses: actions/checkout@v4"}</div>
           <div className={styles.codeLine}> with:</div>
           <div className={styles.codeLine}>
-            {'          fetch-depth: 0   # blame情報を正確にするため全履歴を取得'}
+            {"          fetch-depth: 0   # blame情報を正確にするため全履歴を取得"}
           </div>
           <div className={styles.codeLine} />
-          <div className={styles.codeLine}>{'      - name: SonarQube Scan'}</div>
+          <div className={styles.codeLine}>{"      - name: SonarQube Scan"}</div>
           <div className={styles.codeLine}>
-            {'        uses: SonarSource/sonarqube-scan-action@v5'}
+            {"        uses: SonarSource/sonarqube-scan-action@v5"}
           </div>
           <div className={styles.codeLine}> env:</div>
           <div className={styles.codeLine}>
-            {'          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}'}
+            {"          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}"}
           </div>
           <div className={styles.codeLine}>
-            {'          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}'}
+            {"          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}"}
           </div>
           <div className={styles.codeLine} />
-          <div className={styles.codeLine}>{'      - name: SonarQube Quality Gate check'}</div>
+          <div className={styles.codeLine}>{"      - name: SonarQube Quality Gate check"}</div>
           <div className={styles.codeLine}>
-            {'        uses: SonarSource/sonarqube-quality-gate-action@master'}
+            {"        uses: SonarSource/sonarqube-quality-gate-action@master"}
           </div>
           <div className={styles.codeLine}> timeout-minutes: 5</div>
           <div className={styles.codeLine}> env:</div>
           <div className={styles.codeLine}>
-            {'          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}'}
+            {"          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}"}
           </div>
         </div>
 
@@ -1230,14 +1230,14 @@ export default function SonarQubeGuidePage() {
             <div className={styles.refRow}>
               <span className={styles.refIcon}>↗</span>
               <span>
-                Sonar Documentation トップページ{' '}
+                Sonar Documentation トップページ{" "}
                 <Ext href="https://docs.sonarsource.com/">https://docs.sonarsource.com/</Ext>
               </span>
             </div>
             <div className={styles.refRow}>
               <span className={styles.refIcon}>↗</span>
               <span>
-                Clean as You Code（SonarQube Server 10.5）{' '}
+                Clean as You Code（SonarQube Server 10.5）{" "}
                 <Ext href="https://docs.sonarsource.com/sonarqube-server/10.5/user-guide/clean-as-you-code">
                   https://docs.sonarsource.com/sonarqube-server/10.5/user-guide/clean-as-you-code
                 </Ext>
@@ -1246,7 +1246,7 @@ export default function SonarQubeGuidePage() {
             <div className={styles.refRow}>
               <span className={styles.refIcon}>↗</span>
               <span>
-                Clean Code definition（SonarQube Server 10.4）{' '}
+                Clean Code definition（SonarQube Server 10.4）{" "}
                 <Ext href="https://docs.sonarsource.com/sonarqube-server/10.4/user-guide/clean-code/definition">
                   https://docs.sonarsource.com/sonarqube-server/10.4/user-guide/clean-code/definition
                 </Ext>
@@ -1255,7 +1255,7 @@ export default function SonarQubeGuidePage() {
             <div className={styles.refRow}>
               <span className={styles.refIcon}>↗</span>
               <span>
-                Clean Code benefits: the software qualities（SonarQube Server 10.8）{' '}
+                Clean Code benefits: the software qualities（SonarQube Server 10.8）{" "}
                 <Ext href="https://docs.sonarsource.com/sonarqube-server/10.8/core-concepts/clean-code/software-qualities">
                   https://docs.sonarsource.com/sonarqube-server/10.8/core-concepts/clean-code/software-qualities
                 </Ext>
@@ -1264,7 +1264,7 @@ export default function SonarQubeGuidePage() {
             <div className={styles.refRow}>
               <span className={styles.refIcon}>↗</span>
               <span>
-                Quality gates（SonarQube Server 8.9）{' '}
+                Quality gates（SonarQube Server 8.9）{" "}
                 <Ext href="https://docs.sonarsource.com/sonarqube-server/8.9/user-guide/quality-gates/">
                   https://docs.sonarsource.com/sonarqube-server/8.9/user-guide/quality-gates/
                 </Ext>
@@ -1273,7 +1273,7 @@ export default function SonarQubeGuidePage() {
             <div className={styles.refRow}>
               <span className={styles.refIcon}>↗</span>
               <span>
-                Managing Security Hotspots（SonarQube Server）{' '}
+                Managing Security Hotspots（SonarQube Server）{" "}
                 <Ext href="https://docs.sonarsource.com/sonarqube-server/user-guide/security-hotspots">
                   https://docs.sonarsource.com/sonarqube-server/user-guide/security-hotspots
                 </Ext>
@@ -1282,7 +1282,7 @@ export default function SonarQubeGuidePage() {
             <div className={styles.refRow}>
               <span className={styles.refIcon}>↗</span>
               <span>
-                Reviewing security hotspots（SonarQube Cloud）{' '}
+                Reviewing security hotspots（SonarQube Cloud）{" "}
                 <Ext href="https://docs.sonarsource.com/sonarqube-cloud/managing-your-projects/issues/reviewing-security-hotspots">
                   https://docs.sonarsource.com/sonarqube-cloud/managing-your-projects/issues/reviewing-security-hotspots
                 </Ext>
@@ -1291,7 +1291,7 @@ export default function SonarQubeGuidePage() {
             <div className={styles.refRow}>
               <span className={styles.refIcon}>↗</span>
               <span>
-                Editing issues（SonarQube Server 10.8）{' '}
+                Editing issues（SonarQube Server 10.8）{" "}
                 <Ext href="https://docs.sonarsource.com/sonarqube-server/10.8/user-guide/issues/managing">
                   https://docs.sonarsource.com/sonarqube-server/10.8/user-guide/issues/managing
                 </Ext>
@@ -1300,7 +1300,7 @@ export default function SonarQubeGuidePage() {
             <div className={styles.refRow}>
               <span className={styles.refIcon}>↗</span>
               <span>
-                Issue management solution（SonarQube Cloud）{' '}
+                Issue management solution（SonarQube Cloud）{" "}
                 <Ext href="https://docs.sonarsource.com/sonarqube-cloud/managing-your-projects/issues/solution-overview">
                   https://docs.sonarsource.com/sonarqube-cloud/managing-your-projects/issues/solution-overview
                 </Ext>
@@ -1309,7 +1309,7 @@ export default function SonarQubeGuidePage() {
             <div className={styles.refRow}>
               <span className={styles.refIcon}>↗</span>
               <span>
-                AI Code Assurance（AC/DC）{' '}
+                AI Code Assurance（AC/DC）{" "}
                 <Ext href="https://docs.sonarsource.com/agent-centric-development-cycle/ai-code-standards/ai-code-assurance">
                   https://docs.sonarsource.com/agent-centric-development-cycle/ai-code-standards/ai-code-assurance
                 </Ext>
@@ -1318,7 +1318,7 @@ export default function SonarQubeGuidePage() {
             <div className={styles.refRow}>
               <span className={styles.refIcon}>↗</span>
               <span>
-                AI CodeFix（SonarQube Server）{' '}
+                AI CodeFix（SonarQube Server）{" "}
                 <Ext href="https://docs.sonarsource.com/sonarqube-server/ai-capabilities/ai-codefix">
                   https://docs.sonarsource.com/sonarqube-server/ai-capabilities/ai-codefix
                 </Ext>
@@ -1327,7 +1327,7 @@ export default function SonarQubeGuidePage() {
             <div className={styles.refRow}>
               <span className={styles.refIcon}>↗</span>
               <span>
-                Agentic Analysis（AC/DC）{' '}
+                Agentic Analysis（AC/DC）{" "}
                 <Ext href="https://docs.sonarsource.com/agent-centric-development-cycle/features/agentic-analysis">
                   https://docs.sonarsource.com/agent-centric-development-cycle/features/agentic-analysis
                 </Ext>
@@ -1336,7 +1336,7 @@ export default function SonarQubeGuidePage() {
             <div className={styles.refRow}>
               <span className={styles.refIcon}>↗</span>
               <span>
-                GitHub Actions連携（SonarQube Server）{' '}
+                GitHub Actions連携（SonarQube Server）{" "}
                 <Ext href="https://docs.sonarsource.com/sonarqube-server/analyzing-source-code/ci-integration/github-actions">
                   https://docs.sonarsource.com/sonarqube-server/analyzing-source-code/ci-integration/github-actions
                 </Ext>
@@ -1345,7 +1345,7 @@ export default function SonarQubeGuidePage() {
             <div className={styles.refRow}>
               <span className={styles.refIcon}>↗</span>
               <span>
-                GitHub Actions連携（SonarQube Cloud）{' '}
+                GitHub Actions連携（SonarQube Cloud）{" "}
                 <Ext href="https://docs.sonarsource.com/sonarqube-cloud/analyzing-source-code/ci-based-analysis/github-actions-for-sonarcloud">
                   https://docs.sonarsource.com/sonarqube-cloud/analyzing-source-code/ci-based-analysis/github-actions-for-sonarcloud
                 </Ext>
@@ -1358,7 +1358,7 @@ export default function SonarQubeGuidePage() {
             <div className={styles.refRow}>
               <span className={styles.refIcon}>↗</span>
               <span>
-                Sonar Streamlines Product Naming（ブランド統合の発表, 2024年10月）{' '}
+                Sonar Streamlines Product Naming（ブランド統合の発表, 2024年10月）{" "}
                 <Ext href="https://www.sonarsource.com/company/press-releases/sonar-streamlines-product-naming-to-reflect-core-mission-of-code-quality-and-security/">
                   https://www.sonarsource.com/company/press-releases/sonar-streamlines-product-naming-to-reflect-core-mission-of-code-quality-and-security/
                 </Ext>
@@ -1367,7 +1367,7 @@ export default function SonarQubeGuidePage() {
             <div className={styles.refRow}>
               <span className={styles.refIcon}>↗</span>
               <span>
-                Announcing SonarQube MCP Server{' '}
+                Announcing SonarQube MCP Server{" "}
                 <Ext href="https://www.sonarsource.com/blog/announcing-sonarqube-mcp-server/">
                   https://www.sonarsource.com/blog/announcing-sonarqube-mcp-server/
                 </Ext>
@@ -1376,7 +1376,7 @@ export default function SonarQubeGuidePage() {
             <div className={styles.refRow}>
               <span className={styles.refIcon}>↗</span>
               <span>
-                MCP Server製品ページ{' '}
+                MCP Server製品ページ{" "}
                 <Ext href="https://www.sonarsource.com/products/sonarqube/mcp-server/">
                   https://www.sonarsource.com/products/sonarqube/mcp-server/
                 </Ext>
@@ -1386,7 +1386,7 @@ export default function SonarQubeGuidePage() {
               <span className={styles.refIcon}>↗</span>
               <span>
                 Introducing Sonar Vortex and the SonarQube Remediation Agent（Addy
-                Osmani氏の言及を含む, 2026年6月）{' '}
+                Osmani氏の言及を含む, 2026年6月）{" "}
                 <Ext href="https://www.sonarsource.com/blog/introducing-sonar-vortex/">
                   https://www.sonarsource.com/blog/introducing-sonar-vortex/
                 </Ext>
@@ -1395,7 +1395,7 @@ export default function SonarQubeGuidePage() {
             <div className={styles.refRow}>
               <span className={styles.refIcon}>↗</span>
               <span>
-                What is Code Quality?（Clean Code Taxonomyの解説）{' '}
+                What is Code Quality?（Clean Code Taxonomyの解説）{" "}
                 <Ext href="https://www.sonarsource.com/blog/what-is-clean-code/">
                   https://www.sonarsource.com/blog/what-is-clean-code/
                 </Ext>
@@ -1408,7 +1408,7 @@ export default function SonarQubeGuidePage() {
             <div className={styles.refRow}>
               <span className={styles.refIcon}>↗</span>
               <span>
-                Addy Osmani「Code Review in the Age of AI」（2026年1月）{' '}
+                Addy Osmani「Code Review in the Age of AI」（2026年1月）{" "}
                 <Ext href="https://addyo.substack.com/p/code-review-in-the-age-of-ai">
                   https://addyo.substack.com/p/code-review-in-the-age-of-ai
                 </Ext>
@@ -1418,7 +1418,7 @@ export default function SonarQubeGuidePage() {
               <span className={styles.refIcon}>↗</span>
               <span>
                 SonarQube Agentic Analysis: Verify AI code as it is generated（Security Boulevard,
-                2026年3月）{' '}
+                2026年3月）{" "}
                 <Ext href="https://securityboulevard.com/2026/03/sonarqube-agentic-analysis-verify-ai-code-as-it-is-generated/">
                   https://securityboulevard.com/2026/03/sonarqube-agentic-analysis-verify-ai-code-as-it-is-generated/
                 </Ext>
@@ -1428,7 +1428,7 @@ export default function SonarQubeGuidePage() {
               <span className={styles.refIcon}>↗</span>
               <span>
                 AI Code Review 2026: SonarQube vs CodeRabbit vs Copilot Compared（Lushbinary,
-                実務比較記事）{' '}
+                実務比較記事）{" "}
                 <Ext href="https://lushbinary.com/blog/ai-code-review-tools-comparison-automated-pr-review/">
                   https://lushbinary.com/blog/ai-code-review-tools-comparison-automated-pr-review/
                 </Ext>
@@ -1437,7 +1437,7 @@ export default function SonarQubeGuidePage() {
             <div className={styles.refRow}>
               <span className={styles.refIcon}>↗</span>
               <span>
-                SonarQube Community vs Enterprise比較（DEV Community）{' '}
+                SonarQube Community vs Enterprise比較（DEV Community）{" "}
                 <Ext href="https://dev.to/rahulxsingh/sonarqube-community-vs-enterprise-comparison-2j0d">
                   https://dev.to/rahulxsingh/sonarqube-community-vs-enterprise-comparison-2j0d
                 </Ext>
@@ -1446,7 +1446,7 @@ export default function SonarQubeGuidePage() {
             <div className={styles.refRow}>
               <span className={styles.refIcon}>↗</span>
               <span>
-                SonarQube Review 2026（Pricing, Tiers &amp; Honest Pros/Cons）{' '}
+                SonarQube Review 2026（Pricing, Tiers &amp; Honest Pros/Cons）{" "}
                 <Ext href="https://appsecsanta.com/sonarqube">
                   https://appsecsanta.com/sonarqube
                 </Ext>
@@ -1455,7 +1455,7 @@ export default function SonarQubeGuidePage() {
             <div className={styles.refRow}>
               <span className={styles.refIcon}>↗</span>
               <span>
-                SonarQube（Wikipedia、エディション構成の概観）{' '}
+                SonarQube（Wikipedia、エディション構成の概観）{" "}
                 <Ext href="https://en.wikipedia.org/wiki/SonarQube">
                   https://en.wikipedia.org/wiki/SonarQube
                 </Ext>
@@ -1469,15 +1469,15 @@ export default function SonarQubeGuidePage() {
             <strong>注記</strong>:
             本ガイドはSonar社のドキュメント更新頻度が高いこと、また一部の機能（Agentic
             Analysis、Sonar
-            Vortexなど）がBetaないし提供開始直後であることを踏まえ、実際の導入前には必ず{' '}
-            <code>docs.sonarsource.com</code>{' '}
+            Vortexなど）がBetaないし提供開始直後であることを踏まえ、実際の導入前には必ず{" "}
+            <code>docs.sonarsource.com</code>{" "}
             の最新情報を確認してください。価格・LOC課金の具体的な数値は第三者レビューサイトの情報であり、正式な見積もりはSonarSourceへの直接確認を推奨します。
           </p>
         </blockquote>
 
         <div className={styles.pageFooter}>
           作成日:
-          2026年8月時点の情報にもとづく。Sonar社の高頻度リリースにより、機能名・バージョン・提供段階は変更される可能性があります。最新情報は{' '}
+          2026年8月時点の情報にもとづく。Sonar社の高頻度リリースにより、機能名・バージョン・提供段階は変更される可能性があります。最新情報は{" "}
           <Ext href="https://docs.sonarsource.com/">docs.sonarsource.com</Ext> を参照してください。
         </div>
       </main>

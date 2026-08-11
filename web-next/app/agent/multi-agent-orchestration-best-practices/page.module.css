@@ -127,7 +127,9 @@
   font-size: 13.5px;
   color: var(--text-dim);
   border-left: 2px solid transparent;
-  transition: background 0.15s ease, color 0.15s ease;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
   line-height: 1.4;
   text-decoration: none;
   white-space: normal;
@@ -372,16 +374,39 @@
 }
 
 /* Highlight Tokens */
-.ck { color: #ff7b72 !important; font-weight: 600; }
-.cs { color: #79c0ff !important; }
-.cv { color: #a5d6ff !important; }
-.cw { color: #d29922 !important; font-weight: 600; }
-.ce { color: #bc8cff !important; }
-.cc { color: #5f7288 !important; font-style: italic; }
-.cg { color: #5eead4 !important; font-weight: 600; }
-.ch { color: #f0883e !important; font-weight: 700; }
-.cm { color: #7ee787 !important; font-weight: 500; }
-
+.ck {
+  color: #ff7b72 !important;
+  font-weight: 600;
+}
+.cs {
+  color: #79c0ff !important;
+}
+.cv {
+  color: #a5d6ff !important;
+}
+.cw {
+  color: #d29922 !important;
+  font-weight: 600;
+}
+.ce {
+  color: #bc8cff !important;
+}
+.cc {
+  color: #5f7288 !important;
+  font-style: italic;
+}
+.cg {
+  color: #5eead4 !important;
+  font-weight: 600;
+}
+.ch {
+  color: #f0883e !important;
+  font-weight: 700;
+}
+.cm {
+  color: #7ee787 !important;
+  font-weight: 500;
+}
 
 /* ---------- Tables ---------- */
 .tableWrap {
@@ -509,4 +534,3 @@
     padding: 36px 22px 100px;
   }
 }
-

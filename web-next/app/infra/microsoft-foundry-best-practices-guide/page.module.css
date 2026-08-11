@@ -68,7 +68,9 @@
   color: var(--text-dim);
   font-size: 0.9rem;
   border-left: 2px solid transparent;
-  transition: background 0.15s, color 0.15s;
+  transition:
+    background 0.15s,
+    color 0.15s;
   margin-bottom: 2px;
   line-height: 1.4;
 }
@@ -375,4 +377,3 @@
     padding: 24px 16px 60px;
   }
 }
-

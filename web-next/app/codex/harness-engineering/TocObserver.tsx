@@ -43,13 +43,9 @@ export default function TocObserver() {
     }
 
     // Scroll spy logic - 100% robust & smooth update on scroll
-    const navLinks = Array.from(
-      document.querySelectorAll<HTMLAnchorElement>("#sidebar nav a")
-    );
+    const navLinks = Array.from(document.querySelectorAll<HTMLAnchorElement>("#sidebar nav a"));
 
-    const headings = Array.from(
-      document.querySelectorAll<HTMLElement>("h2[id]")
-    );
+    const headings = Array.from(document.querySelectorAll<HTMLElement>("h2[id]"));
 
     if (navLinks.length === 0 || headings.length === 0) return;
 

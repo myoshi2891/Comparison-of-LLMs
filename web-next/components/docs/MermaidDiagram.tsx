@@ -31,11 +31,11 @@ const MERMAID_RENDER_TIMEOUT_MS = 15000;
  * @param ms - The maximum wait duration in milliseconds
  * @returns The promise's resolved value, or `undefined` if the duration elapses first
  */
-function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T | void> {
+function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T | undefined> {
   return Promise.race([
     promise,
-    new Promise<void>((resolve) => {
-      setTimeout(resolve, ms);
+    new Promise<undefined>((resolve) => {
+      setTimeout(() => resolve(undefined), ms);
     }),
   ]);
 }

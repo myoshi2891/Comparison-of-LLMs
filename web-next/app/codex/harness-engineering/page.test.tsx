@@ -17,9 +17,7 @@ describe("OpenAI Codex Harness Engineering Evals Guide - Comprehensive Regressio
     const { container } = render(<Page />);
     const h1 = container.querySelector("h1");
     expect(h1).not.toBeNull();
-    expect(h1?.textContent).toContain(
-      "OpenAI Codexにおけるハーネスエンジニアリング実践ガイド"
-    );
+    expect(h1?.textContent).toContain("OpenAI Codexにおけるハーネスエンジニアリング実践ガイド");
   });
 
   it("renders exactly 9 major sections (<h2>) with exact titles and valid IDs", () => {
@@ -69,9 +67,7 @@ describe("OpenAI Codex Harness Engineering Evals Guide - Comprehensive Regressio
 
   it("renders 7 quick-navigation cards (L1 to L7) with correct card classes and anchor links", () => {
     const { container } = render(<Page />);
-    const quicknavCards = container.querySelectorAll(
-      'a[class*="quicknavCard"]'
-    );
+    const quicknavCards = container.querySelectorAll('a[class*="quicknavCard"]');
     expect(quicknavCards.length).toBe(7);
 
     for (let i = 1; i <= 7; i++) {
@@ -90,9 +86,7 @@ describe("OpenAI Codex Harness Engineering Evals Guide - Comprehensive Regressio
 
   it("updates sidebar active link on scroll event via TocObserver", () => {
     const { container } = render(<Page />);
-    const navLinks = Array.from(
-      container.querySelectorAll<HTMLAnchorElement>("#sidebar nav a")
-    );
+    const navLinks = Array.from(container.querySelectorAll<HTMLAnchorElement>("#sidebar nav a"));
     expect(navLinks.length).toBe(9);
 
     const headings = Array.from(container.querySelectorAll<HTMLElement>("h2[id]"));
@@ -106,7 +100,7 @@ describe("OpenAI Codex Harness Engineering Evals Guide - Comprehensive Regressio
         height: 400,
         x: 0,
         y: 0,
-        toJSON: () => {},
+        toJSON: () => undefined,
       });
     });
 
@@ -145,8 +139,8 @@ describe("OpenAI Codex Harness Engineering Evals Guide - Comprehensive Regressio
     ];
 
     refHeadings.forEach((headingText) => {
-      const found = Array.from(refCards).some(
-        (card) => card.querySelector("h3")?.textContent?.includes(headingText)
+      const found = Array.from(refCards).some((card) =>
+        card.querySelector("h3")?.textContent?.includes(headingText)
       );
       expect(found).toBe(true);
     });

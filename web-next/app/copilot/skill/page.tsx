@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import MermaidDiagram from "@/components/docs/MermaidDiagram";
 import { ChecklistCard } from "./ChecklistCard";
-import { TocObserver } from "./TocObserver";
 import styles from "./page.module.css";
+import { TocObserver } from "./TocObserver";
 
 export const metadata: Metadata = {
   title: "GitHub Copilot Agent Skills 実践ガイド ― SKILL.md 完全仕様",
@@ -236,8 +236,8 @@ export default function CopilotSkillPage() {
         </p>
         <blockquote>
           <p>
-            Agent skills are lightweight folders of instructions, scripts, and resources that
-            agents can dynamically discover and load to perform specific tasks effectively.
+            Agent skills are lightweight folders of instructions, scripts, and resources that agents
+            can dynamically discover and load to perform specific tasks effectively.
           </p>
         </blockquote>
         <p>
@@ -269,16 +269,22 @@ export default function CopilotSkillPage() {
           が登場する以前、開発者がエージェントの挙動をカスタマイズする主な手段は「Custom
           Instructions」(<code className={styles.inlineCode}>.github/copilot-instructions.md</code>{" "}
           や <code className={styles.inlineCode}>AGENTS.md</code>)であった。しかし Custom
-          Instructions は<strong>すべての会話で常時読み込まれる</strong>ため、次の2点の問題が深刻化した。
+          Instructions は<strong>すべての会話で常時読み込まれる</strong>
+          ため、次の2点の問題が深刻化した。
         </p>
         <p>
           第一に、コンテキストウィンドウの圧迫である。コードレビューの観点、特定ライブラリのハマりどころ、デプロイ手順などを1つの指示ファイルに詰め込むと、あっという間に数万トークンを消費し、肝心のコードを読み込む枠が削られてしまう。
         </p>
         <p>
-          第二に、指示の干渉(Instruction Confusion)である。あまりに多くのルールが常時並んでいると、エージェントが「どのルールを優先すべきか」を誤り、指示に従わなくなったり、無関係なタスクで過剰なチェックを行ったりする現象が起きる。
+          第二に、指示の干渉(Instruction
+          Confusion)である。あまりに多くのルールが常時並んでいると、エージェントが「どのルールを優先すべきか」を誤り、指示に従わなくなったり、無関係なタスクで過剰なチェックを行ったりする現象が起きる。
         </p>
         <p>
-          Agent Skills はこの問題を解決するために設計された。<strong>普段は「名前」と「1行の説明」だけを頭の片隅に置いておき、必要なタスクが来たときだけ中身を読み込む</strong>。この「段階的開示(Progressive Disclosure)」こそが、Agent Skills の本質である。
+          Agent Skills はこの問題を解決するために設計された。
+          <strong>
+            普段は「名前」と「1行の説明」だけを頭の片隅に置いておき、必要なタスクが来たときだけ中身を読み込む
+          </strong>
+          。この「段階的開示(Progressive Disclosure)」こそが、Agent Skills の本質である。
         </p>
 
         <h3 id="13-エコシステムにおける位置づけ">1.3 エコシステムにおける位置づけ</h3>
@@ -324,14 +330,12 @@ export default function CopilotSkillPage() {
           Disclosure)」にある。
         </p>
         <p>
-           Anthropic のエンジニアリングブログ「Equipping agents with Agent Skills」では、これを
+          Anthropic のエンジニアリングブログ「Equipping agents with Agent Skills」では、これを
           Discovery(発見)・Activation(起動)・Execution(実行) の 3 段階として定義している。
         </p>
 
         <h3 id="31-各社の呼称比較">3.1 各社の呼称比較</h3>
-        <p>
-          段階の表現にはベンダー間で若干の呼称差があるが、指している概念は完全に一致している。
-        </p>
+        <p>段階の表現にはベンダー間で若干の呼称差があるが、指している概念は完全に一致している。</p>
         <div className={styles.tableScroll}>
           <table>
             <thead>
@@ -365,7 +369,8 @@ export default function CopilotSkillPage() {
                 <td>Execution(実行)</td>
                 <td>Resource Fetch / Script Execution</td>
                 <td>
-                  <code className={styles.inlineCode}>references/</code> の個別ファイルやスクリプト実行結果
+                  <code className={styles.inlineCode}>references/</code>{" "}
+                  の個別ファイルやスクリプト実行結果
                 </td>
               </tr>
             </tbody>
@@ -384,7 +389,9 @@ export default function CopilotSkillPage() {
           <MermaidDiagram chart={DIAGRAM_3} />
         </div>
         <p>
-          重要なのは、<strong>スクリプト自体のソースコードはコンテキストウィンドウに入らない</strong>という点である。Copilot
+          重要なのは、
+          <strong>スクリプト自体のソースコードはコンテキストウィンドウに入らない</strong>
+          という点である。Copilot
           はスクリプトを外部ツールとして実行し、その標準出力(STDOUT)だけをコンテキストに受け取る。1,000行のPythonスクリプトであっても、出力が「3行のエラーログ」であれば消費トークンは数十トークンで済む。
         </p>
 
@@ -434,7 +441,8 @@ export default function CopilotSkillPage() {
         <h2 id="4-フロントマター完全仕様">4. フロントマター完全仕様</h2>
         <p>
           <code className={styles.inlineCode}>SKILL.md</code> の冒頭には、YAML
-          形式のフロントマターを記述する。フロントマターはハイフン3つ(<code className={styles.inlineCode}>---</code>
+          形式のフロントマターを記述する。フロントマターはハイフン3つ(
+          <code className={styles.inlineCode}>---</code>
           )で囲む必要がある。
         </p>
 
@@ -455,23 +463,31 @@ export default function CopilotSkillPage() {
             </thead>
             <tbody>
               <tr>
-                <td><code className={styles.inlineCode}>name</code></td>
+                <td>
+                  <code className={styles.inlineCode}>name</code>
+                </td>
                 <td>必須</td>
                 <td>string</td>
                 <td>
-                  スキルの識別名。小文字・ハイフン区切り。<strong>親ディレクトリ名と完全一致が必須</strong>。
+                  スキルの識別名。小文字・ハイフン区切り。
+                  <strong>親ディレクトリ名と完全一致が必須</strong>。
                 </td>
               </tr>
               <tr>
-                <td><code className={styles.inlineCode}>description</code></td>
+                <td>
+                  <code className={styles.inlineCode}>description</code>
+                </td>
                 <td>必須</td>
                 <td>string</td>
                 <td>
-                  スキルの機能と発火条件の説明。<strong>エージェントが発火を判断する唯一の情報源</strong>。
+                  スキルの機能と発火条件の説明。
+                  <strong>エージェントが発火を判断する唯一の情報源</strong>。
                 </td>
               </tr>
               <tr>
-                <td><code className={styles.inlineCode}>license</code></td>
+                <td>
+                  <code className={styles.inlineCode}>license</code>
+                </td>
                 <td>任意</td>
                 <td>string</td>
                 <td>
@@ -480,28 +496,31 @@ export default function CopilotSkillPage() {
                 </td>
               </tr>
               <tr>
-                <td><code className={styles.inlineCode}>compatibility</code></td>
+                <td>
+                  <code className={styles.inlineCode}>compatibility</code>
+                </td>
                 <td>任意</td>
                 <td>string</td>
                 <td>
-                  動作環境の要件(例: <code className={styles.inlineCode}>git, python &gt;= 3.10</code>)。
+                  動作環境の要件(例:{" "}
+                  <code className={styles.inlineCode}>git, python &gt;= 3.10</code>)。
                 </td>
               </tr>
               <tr>
-                <td><code className={styles.inlineCode}>metadata</code></td>
+                <td>
+                  <code className={styles.inlineCode}>metadata</code>
+                </td>
                 <td>任意</td>
                 <td>map</td>
-                <td>
-                  任意キーバリュー。著者情報・バージョン・内部IDなどを格納する。
-                </td>
+                <td>任意キーバリュー。著者情報・バージョン・内部IDなどを格納する。</td>
               </tr>
               <tr>
-                <td><code className={styles.inlineCode}>allowed-tools</code></td>
+                <td>
+                  <code className={styles.inlineCode}>allowed-tools</code>
+                </td>
                 <td>任意(実験的)</td>
                 <td>string / list</td>
-                <td>
-                  スキル実行中にエージェントへ事前許可するツール一覧。
-                </td>
+                <td>スキル実行中にエージェントへ事前許可するツール一覧。</td>
               </tr>
             </tbody>
           </table>
@@ -527,20 +546,27 @@ description: Fills out PDF forms. Use this when asked to fill out, complete, or 
 
         <h3 id="43-name-フィールドの命名規則">4.3 name フィールドの命名規則</h3>
         <p>
-          <code className={styles.inlineCode}>name</code>{" "}
-          フィールドには、厳格な命名規則がある。
+          <code className={styles.inlineCode}>name</code> フィールドには、厳格な命名規則がある。
         </p>
         <ul>
-          <li>小文字の英数字とハイフンのみを使用する(正規表現: <code className={styles.inlineCode}>^[a-z0-9-]+$</code>)</li>
+          <li>
+            小文字の英数字とハイフンのみを使用する(正規表現:{" "}
+            <code className={styles.inlineCode}>^[a-z0-9-]+$</code>)
+          </li>
           <li>先頭と末尾にハイフンを使ってはならない</li>
-          <li>連続したハイフン(<code className={styles.inlineCode}>--</code>)を使ってはならない</li>
+          <li>
+            連続したハイフン(<code className={styles.inlineCode}>--</code>)を使ってはならない
+          </li>
           <li>最大文字数は 64 文字</li>
-          <li><strong>配置されている親ディレクトリ名と完全に一致しなければならない</strong></li>
+          <li>
+            <strong>配置されている親ディレクトリ名と完全に一致しなければならない</strong>
+          </li>
         </ul>
         <p>
           特に最後の「親ディレクトリ名との一致」は、初心者が最もハマりやすいポイントである。ディレクトリ名が{" "}
-          <code className={styles.inlineCode}>.github/skills/my-skill/</code> であれば、フロントマターの{" "}
-          <code className={styles.inlineCode}>name</code> も必ず <code className={styles.inlineCode}>my-skill</code>{" "}
+          <code className={styles.inlineCode}>.github/skills/my-skill/</code>{" "}
+          であれば、フロントマターの <code className={styles.inlineCode}>name</code> も必ず{" "}
+          <code className={styles.inlineCode}>my-skill</code>{" "}
           にしなければならない。不一致の場合、Copilot はスキルをサイレントに無視する。
         </p>
         <div className={styles.codeBlock}>
@@ -564,13 +590,14 @@ description: ...
         </h3>
         <p>
           <code className={styles.inlineCode}>description</code> は、Agent Skills
-          において最も重要な要素である。第1段階(Discovery)において、Copilot
-          はユーザーのプロンプトと <code className={styles.inlineCode}>description</code>{" "}
+          において最も重要な要素である。第1段階(Discovery)において、Copilot はユーザーのプロンプトと{" "}
+          <code className={styles.inlineCode}>description</code>{" "}
           を突き合わせ、そのスキルを読み込むかどうかを決定する。
         </p>
         <p>
           Anthropic のガイドラインは、優れた <code className={styles.inlineCode}>description</code>{" "}
-          を書くためのフレームワークとして「<strong>Trigger Triad(トリガーの三原則)</strong>」を提示している。
+          を書くためのフレームワークとして「<strong>Trigger Triad(トリガーの三原則)</strong>
+          」を提示している。
         </p>
         <div className={styles.tableScroll}>
           <table>
@@ -590,12 +617,18 @@ description: ...
               <tr>
                 <td>2. いつ使うべきか (Context/Triggers)</td>
                 <td>ユーザーがどんな要求や用語を使ったときに発火すべきか明記する</td>
-                <td>Use this when asked to fill out, complete, or process PDF forms or interactive fields.</td>
+                <td>
+                  Use this when asked to fill out, complete, or process PDF forms or interactive
+                  fields.
+                </td>
               </tr>
               <tr>
                 <td>3. いつ使うべきでないか (Exclusions)</td>
                 <td>誤発火を防ぐための除外条件を明記する</td>
-                <td>Do not use for general PDF text extraction or creating new PDF documents from scratch.</td>
+                <td>
+                  Do not use for general PDF text extraction or creating new PDF documents from
+                  scratch.
+                </td>
               </tr>
             </tbody>
           </table>
@@ -614,13 +647,17 @@ description: Fills out PDF forms and extracts form field data. Use this when ask
         </p>
         <ul>
           <li>
-            <strong>三人称で記述する</strong>: 「I can fill out...」や「My purpose is...」などの一人称を避ける。「Fills out...」「Use this when...」のように客観的に書く。
+            <strong>三人称で記述する</strong>: 「I can fill out...」や「My purpose
+            is...」などの一人称を避ける。「Fills out...」「Use this when...」のように客観的に書く。
           </li>
           <li>
-            <strong>具体的なトリガー語彙を含める</strong>: ユーザーが実際に口にしそうな動詞や名詞(「fill out」「complete」「PDF form」など)を意識的に散りばめる。
+            <strong>具体的なトリガー語彙を含める</strong>:
+            ユーザーが実際に口にしそうな動詞や名詞(「fill out」「complete」「PDF
+            form」など)を意識的に散りばめる。
           </li>
           <li>
-            <strong>1,024文字以内に収める</strong>: 長すぎる説明はシステムプロンプトを圧迫し、判定精度を落とす。
+            <strong>1,024文字以内に収める</strong>:
+            長すぎる説明はシステムプロンプトを圧迫し、判定精度を落とす。
           </li>
         </ul>
 
@@ -652,22 +689,25 @@ description: Fills out PDF forms and extracts form field data. Use this when ask
               <tr>
                 <td>否定ケース (Negative)</td>
                 <td>「このPDFのテキストを抽出してMarkdownにして」</td>
-                <td>スキルが<strong>発火しない</strong>こと(誤発火の防止)</td>
+                <td>
+                  スキルが<strong>発火しない</strong>こと(誤発火の防止)
+                </td>
               </tr>
             </tbody>
           </table>
         </div>
         <p>
-          否定ケースでスキルが誤発火する場合は、<code className={styles.inlineCode}>description</code>{" "}
-          に「Do not use for...」という除外文を追加してチューニングを行う。
+          否定ケースでスキルが誤発火する場合は、
+          <code className={styles.inlineCode}>description</code> に「Do not use
+          for...」という除外文を追加してチューニングを行う。
         </p>
 
         <h3 id="46-allowed-tools-フィールドとセキュリティ">
           4.6 allowed-tools フィールドとセキュリティ
         </h3>
         <p>
-          <code className={styles.inlineCode}>allowed-tools</code> は、VS Code
-          および Copilot CLI において実験的に導入されているフィールドである。スキルが起動された際、ユーザーへ都度確認ダイアログを出さずに実行を許可するツールを指定できる。
+          <code className={styles.inlineCode}>allowed-tools</code> は、VS Code および Copilot CLI
+          において実験的に導入されているフィールドである。スキルが起動された際、ユーザーへ都度確認ダイアログを出さずに実行を許可するツールを指定できる。
         </p>
         <div className={styles.tableScroll}>
           <table>
@@ -681,24 +721,31 @@ description: Fills out PDF forms and extracts form field data. Use this when ask
             <tbody>
               <tr>
                 <td>ワイルドカード指定 (危険)</td>
-                <td><code className={styles.inlineCode}>allowed-tools: ["*"]</code></td>
+                <td>
+                  <code className={styles.inlineCode}>allowed-tools: ["*"]</code>
+                </td>
                 <td>全ツールを無制限に許可。セキュリティリスクが非常に高く非推奨。</td>
               </tr>
               <tr>
                 <td>カテゴリ丸ごと指定 (注意)</td>
-                <td><code className={styles.inlineCode}>allowed-tools: ["shell", "read"]</code></td>
+                <td>
+                  <code className={styles.inlineCode}>allowed-tools: ["shell", "read"]</code>
+                </td>
                 <td>シェル実行を全面的に許可。悪意あるスクリプトの実行リスクあり。</td>
               </tr>
               <tr>
                 <td>コマンド単位の限定指定 (推奨)</td>
-                <td><code className={styles.inlineCode}>allowed-tools: ["Bash(git:*)", "Read"]</code></td>
+                <td>
+                  <code className={styles.inlineCode}>allowed-tools: ["Bash(git:*)", "Read"]</code>
+                </td>
                 <td>git コマンドとファイル読み込みのみを許可。最小権限原則に合致。</td>
               </tr>
             </tbody>
           </table>
         </div>
         <p>
-          最小権限原則(Principle of Least Privilege)に従い、可能な限りコマンド単位で限定指定することが強く推奨される。
+          最小権限原則(Principle of Least
+          Privilege)に従い、可能な限りコマンド単位で限定指定することが強く推奨される。
         </p>
         <div className={styles.codeBlock}>
           <pre>
@@ -746,22 +793,30 @@ allowed-tools:
             </thead>
             <tbody>
               <tr>
-                <td><code className={styles.inlineCode}>SKILL.md</code> 本文</td>
+                <td>
+                  <code className={styles.inlineCode}>SKILL.md</code> 本文
+                </td>
                 <td>高レベルな手順、意思決定の原則、エッジケースの注意点</td>
                 <td>数千行の長大なコード、巨大なAPIリファレンスの丸ごと貼り付け</td>
               </tr>
               <tr>
-                <td><code className={styles.inlineCode}>scripts/</code></td>
+                <td>
+                  <code className={styles.inlineCode}>scripts/</code>
+                </td>
                 <td>決定論的で確実性が求められる処理(ビルド、データ整形、検証)</td>
                 <td>曖昧な自然言語で記述可能なロジック(指示本文に書くべき)</td>
               </tr>
               <tr>
-                <td><code className={styles.inlineCode}>references/</code></td>
+                <td>
+                  <code className={styles.inlineCode}>references/</code>
+                </td>
                 <td>特定のタスクでしか使わない長大なスキーマ定義やルール集</td>
                 <td>すべてのタスクで常に必要な共通ルール(SKILL.md本文に書くべき)</td>
               </tr>
               <tr>
-                <td><code className={styles.inlineCode}>assets/</code></td>
+                <td>
+                  <code className={styles.inlineCode}>assets/</code>
+                </td>
                 <td>コード生成のひな型、静的画像、サンプル設定ファイル</td>
                 <td>エージェントに直接読み込ませる指示テキスト</td>
               </tr>
@@ -772,9 +827,7 @@ allowed-tools:
         <h3 id="52-プロジェクトスキル-vs-パーソナルスキル">
           5.2 プロジェクトスキル vs パーソナルスキル
         </h3>
-        <p>
-          Copilot はスキルを配置する場所によって、適用されるスコープ(影響範囲)を分離している。
-        </p>
+        <p>Copilot はスキルを配置する場所によって、適用されるスコープ(影響範囲)を分離している。</p>
         <div className={styles.tableScroll}>
           <table>
             <thead>
@@ -788,13 +841,21 @@ allowed-tools:
             <tbody>
               <tr>
                 <td>プロジェクトスキル (Project Skill)</td>
-                <td><code className={styles.inlineCode}>{".github/skills/<skill-name>/SKILL.md"}</code></td>
+                <td>
+                  <code className={styles.inlineCode}>
+                    {".github/skills/<skill-name>/SKILL.md"}
+                  </code>
+                </td>
                 <td>該当リポジトリのみ</td>
                 <td>チーム共有のレビュー観点、プロジェクト固有のデプロイ・テスト手順</td>
               </tr>
               <tr>
                 <td>パーソナルスキル (Personal Skill)</td>
-                <td><code className={styles.inlineCode}>{"~/.copilot/skills/<skill-name>/SKILL.md"}</code></td>
+                <td>
+                  <code className={styles.inlineCode}>
+                    {"~/.copilot/skills/<skill-name>/SKILL.md"}
+                  </code>
+                </td>
                 <td>全プロジェクト共通</td>
                 <td>個人のお気に入りショートカット、個人のコーディングスタイル好み</td>
               </tr>
@@ -802,7 +863,8 @@ allowed-tools:
           </table>
         </div>
         <p>
-          なお、Anthropic Claude Code や Cursor との互換性を考慮する場合、以下の代替パスも自動検出される。
+          なお、Anthropic Claude Code や Cursor
+          との互換性を考慮する場合、以下の代替パスも自動検出される。
         </p>
         <div className={styles.codeBlock}>
           <pre>
@@ -818,12 +880,14 @@ allowed-tools:
           </pre>
         </div>
         <p>
-          プロジェクトスキルは Git リポジトリにコミットすることで、リポジトリをクローンしたチームメンバー全員へ即座に共有される。
+          プロジェクトスキルは Git
+          リポジトリにコミットすることで、リポジトリをクローンしたチームメンバー全員へ即座に共有される。
         </p>
 
         <h3 id="53-各エージェントホストでの対応状況">5.3 各エージェントホストでの対応状況</h3>
         <p>
-          GitHub Copilot の各製品・サーフェスにおける Agent Skills のサポート状況一覧は以下の通りである。
+          GitHub Copilot の各製品・サーフェスにおける Agent Skills
+          のサポート状況一覧は以下の通りである。
         </p>
         <div className={styles.tableScroll}>
           <table>
@@ -916,7 +980,8 @@ allowed-tools:
         </div>
         <p>
           サブディレクトリ名は小文字・ハイフン区切りにする。これは後述の{" "}
-          <code className={styles.inlineCode}>name</code> フィールドと一致させる必要があるためである。
+          <code className={styles.inlineCode}>name</code>{" "}
+          フィールドと一致させる必要があるためである。
         </p>
 
         <h3 id="step-3-フロントマターを書く">Step 3: フロントマターを書く</h3>
@@ -944,7 +1009,8 @@ description: Guide for debugging failing GitHub Actions workflows. Use this when
         <p>
           本文の分量は<strong>500行未満</strong>を目安にする。それを超える場合は{" "}
           <code className={styles.inlineCode}>references/</code> にファイルを分割し、SKILL.md
-          からリンクする形にする。Anthropic のガイドラインでは「SKILL.md本文は5,000トークン未満が理想」ともされており、行数だけでなくトークン量にも意識を向けるとよい。
+          からリンクする形にする。Anthropic
+          のガイドラインでは「SKILL.md本文は5,000トークン未満が理想」ともされており、行数だけでなくトークン量にも意識を向けるとよい。
         </p>
 
         <h3 id="step-5-スクリプトを追加する任意">Step 5: スクリプトを追加する(任意)</h3>
@@ -990,9 +1056,7 @@ path as the first argument.`}</code>
         </p>
         <hr />
 
-        <h2 id="7-github-cligh-skillによるスキル管理">
-          7. GitHub CLI(gh skill)によるスキル管理
-        </h2>
+        <h2 id="7-github-cligh-skillによるスキル管理">7. GitHub CLI(gh skill)によるスキル管理</h2>
         <p>
           GitHub CLI 2.90.0 以降では <code className={styles.inlineCode}>gh skill</code>{" "}
           サブコマンド(パブリックプレビュー)を使い、スキルの検索・プレビュー・インストール・更新・公開を行える。
@@ -1003,7 +1067,8 @@ path as the first argument.`}</code>
 
         <h3 id="71-検索プレビューインストール">7.1 検索・プレビュー・インストール</h3>
         <p>
-          GitHub CLI を使って公開スキルのエコシステムから目的のスキルを探し、安全に導入するコマンド例を示す。
+          GitHub CLI
+          を使って公開スキルのエコシステムから目的のスキルを探し、安全に導入するコマンド例を示す。
         </p>
         <div className={styles.codeBlock}>
           <pre>
@@ -1021,8 +1086,9 @@ gh skill install vercel-labs/agent-skills react-best-practices --global`}</code>
           </pre>
         </div>
         <p>
-          <code className={styles.inlineCode}>gh skill install</code> を実行すると、<code className={styles.inlineCode}>SKILL.md</code>{" "}
-          のフロントマターに <code className={styles.inlineCode}>metadata.provenance</code>{" "}
+          <code className={styles.inlineCode}>gh skill install</code> を実行すると、
+          <code className={styles.inlineCode}>SKILL.md</code> のフロントマターに{" "}
+          <code className={styles.inlineCode}>metadata.provenance</code>{" "}
           が自動的に追記され、出所トレースが可能になる。
         </p>
         <div className={styles.tableScroll}>
@@ -1035,16 +1101,28 @@ gh skill install vercel-labs/agent-skills react-best-practices --global`}</code>
             </thead>
             <tbody>
               <tr>
-                <td><code className={styles.inlineCode}>metadata.provenance.repository</code></td>
-                <td><code className={styles.inlineCode}>vercel-labs/agent-skills</code></td>
+                <td>
+                  <code className={styles.inlineCode}>metadata.provenance.repository</code>
+                </td>
+                <td>
+                  <code className={styles.inlineCode}>vercel-labs/agent-skills</code>
+                </td>
               </tr>
               <tr>
-                <td><code className={styles.inlineCode}>metadata.provenance.commit</code></td>
-                <td><code className={styles.inlineCode}>a1b2c3d4e5f6...</code></td>
+                <td>
+                  <code className={styles.inlineCode}>metadata.provenance.commit</code>
+                </td>
+                <td>
+                  <code className={styles.inlineCode}>a1b2c3d4e5f6...</code>
+                </td>
               </tr>
               <tr>
-                <td><code className={styles.inlineCode}>metadata.provenance.installed_at</code></td>
-                <td><code className={styles.inlineCode}>2026-08-01T10:00:00Z</code></td>
+                <td>
+                  <code className={styles.inlineCode}>metadata.provenance.installed_at</code>
+                </td>
+                <td>
+                  <code className={styles.inlineCode}>2026-08-01T10:00:00Z</code>
+                </td>
               </tr>
             </tbody>
           </table>
@@ -1078,8 +1156,8 @@ gh skill publish .github/skills/my-custom-skill`}</code>
         </div>
         <p>
           <code className={styles.inlineCode}>gh skill lint</code> は、フロントマターの文法エラーや{" "}
-          <code className={styles.inlineCode}>name</code> とディレクトリ名の不一致、後述する ToxicSkills
-          パターンの検出を静的に行う。
+          <code className={styles.inlineCode}>name</code> とディレクトリ名の不一致、後述する
+          ToxicSkills パターンの検出を静的に行う。
         </p>
         <div className={styles.tableScroll}>
           <table>
@@ -1092,7 +1170,10 @@ gh skill publish .github/skills/my-custom-skill`}</code>
             <tbody>
               <tr>
                 <td>Directory Name Parity</td>
-                <td><code className={styles.inlineCode}>name</code> フィールドが親ディレクトリ名と完全一致するか</td>
+                <td>
+                  <code className={styles.inlineCode}>name</code>{" "}
+                  フィールドが親ディレクトリ名と完全一致するか
+                </td>
               </tr>
               <tr>
                 <td>Frontmatter Syntax</td>
@@ -1250,11 +1331,11 @@ Execute the release process in exact sequential order:
         </div>
         <hr />
 
-        <h2 id="9-copilotの各サーフェスでの挙動差分">
-          9. Copilotの各サーフェスでの挙動差分
-        </h2>
+        <h2 id="9-copilotの各サーフェスでの挙動差分">9. Copilotの各サーフェスでの挙動差分</h2>
         <p>
-          GitHub Copilot は複数の開発環境(VS Code, Visual Studio, JetBrains, CLI, Cloud Agent)で提供されているが、Agent Skills のサポートレベルにはサーフェスごとの挙動差分が存在する。
+          GitHub Copilot は複数の開発環境(VS Code, Visual Studio, JetBrains, CLI, Cloud
+          Agent)で提供されているが、Agent Skills
+          のサポートレベルにはサーフェスごとの挙動差分が存在する。
         </p>
         <div className={styles.tableScroll}>
           <table>
@@ -1294,7 +1375,9 @@ Execute the release process in exact sequential order:
                 <td>対象外 (Cloud環境)</td>
               </tr>
               <tr>
-                <td><code className={styles.inlineCode}>scripts/</code> の実行</td>
+                <td>
+                  <code className={styles.inlineCode}>scripts/</code> の実行
+                </td>
                 <td>確認ダイアログ付き実行</td>
                 <td>CLIトグルが必要</td>
                 <td>ターミナル経由実行</td>
@@ -1302,7 +1385,9 @@ Execute the release process in exact sequential order:
                 <td>サンドボックス内で自動実行</td>
               </tr>
               <tr>
-                <td><code className={styles.inlineCode}>allowed-tools</code> の制御</td>
+                <td>
+                  <code className={styles.inlineCode}>allowed-tools</code> の制御
+                </td>
                 <td>対応 (実験的)</td>
                 <td>未対応</td>
                 <td>未対応</td>
@@ -1311,10 +1396,14 @@ Execute the release process in exact sequential order:
               </tr>
               <tr>
                 <td>手動再読み込みコマンド</td>
-                <td><code className={styles.inlineCode}>/skills reload</code></td>
+                <td>
+                  <code className={styles.inlineCode}>/skills reload</code>
+                </td>
                 <td>IDE再起動が必要</td>
                 <td>プラグイン再起動</td>
-                <td><code className={styles.inlineCode}>copilot skill reload</code></td>
+                <td>
+                  <code className={styles.inlineCode}>copilot skill reload</code>
+                </td>
                 <td>PRコミット毎に自動更新</td>
               </tr>
               <tr>
@@ -1329,7 +1418,8 @@ Execute the release process in exact sequential order:
           </table>
         </div>
         <p>
-          実務においてチーム全員で同一の体験を担保したい場合、<code className={styles.inlineCode}>.github/skills/</code>{" "}
+          実務においてチーム全員で同一の体験を担保したい場合、
+          <code className={styles.inlineCode}>.github/skills/</code>{" "}
           へのプロジェクトスキル配置を中心とし、過度な環境依存スクリプトを避ける設計が推奨される。
         </p>
         <hr />
@@ -1338,7 +1428,8 @@ Execute the release process in exact sequential order:
           10. Skills vs Custom Instructions vs MCP vs Subagents
         </h2>
         <p>
-          Copilot の拡張機能を設計する際、どの仕組みを採用すべきかの比較と使い分けのガイドラインを示す。
+          Copilot
+          の拡張機能を設計する際、どの仕組みを採用すべきかの比較と使い分けのガイドラインを示す。
         </p>
 
         <h3 id="101-比較表">10.1 比較表</h3>
@@ -1377,21 +1468,33 @@ Execute the release process in exact sequential order:
               </tr>
               <tr>
                 <td>標準化状況</td>
-                <td><code className={styles.inlineCode}>agentskills.io</code> (オープン標準)</td>
+                <td>
+                  <code className={styles.inlineCode}>agentskills.io</code> (オープン標準)
+                </td>
                 <td>各ツール個別の設定ファイル</td>
                 <td>Model Context Protocol (オープン標準)</td>
                 <td>ベンダー個別実装</td>
               </tr>
               <tr>
                 <td>配置場所</td>
-                <td><code className={styles.inlineCode}>{".github/skills/<name>/"}</code></td>
-                <td><code className={styles.inlineCode}>.github/copilot-instructions.md</code></td>
-                <td><code className={styles.inlineCode}>mcp.json</code> 設定ファイル</td>
-                <td><code className={styles.inlineCode}>{".github/agents/<name>.md"}</code></td>
+                <td>
+                  <code className={styles.inlineCode}>{".github/skills/<name>/"}</code>
+                </td>
+                <td>
+                  <code className={styles.inlineCode}>.github/copilot-instructions.md</code>
+                </td>
+                <td>
+                  <code className={styles.inlineCode}>mcp.json</code> 設定ファイル
+                </td>
+                <td>
+                  <code className={styles.inlineCode}>{".github/agents/<name>.md"}</code>
+                </td>
               </tr>
               <tr>
                 <td>実行コードの保持</td>
-                <td><code className={styles.inlineCode}>scripts/</code> 内にローカル保持</td>
+                <td>
+                  <code className={styles.inlineCode}>scripts/</code> 内にローカル保持
+                </td>
                 <td>保持できない</td>
                 <td>外部プロセスとして実行</td>
                 <td>サブエージェント内で保持</td>
@@ -1481,9 +1584,11 @@ Execute the release process in exact sequential order:
           </li>
         </ol>
         <p>
-          GitHub 公式ドキュメントも同様に、<code className={styles.inlineCode}>gh skill install</code>{" "}
-          の前に必ず <code className={styles.inlineCode}>gh skill preview</code> で{" "}
-          <code className={styles.inlineCode}>SKILL.md</code> とファイルツリーを確認することを警告として明記している。
+          GitHub 公式ドキュメントも同様に、
+          <code className={styles.inlineCode}>gh skill install</code> の前に必ず{" "}
+          <code className={styles.inlineCode}>gh skill preview</code> で{" "}
+          <code className={styles.inlineCode}>SKILL.md</code>{" "}
+          とファイルツリーを確認することを警告として明記している。
         </p>
 
         <h3 id="113-実務での防御策チェックリスト">11.3 実務での防御策チェックリスト</h3>
@@ -1492,8 +1597,7 @@ Execute the release process in exact sequential order:
             <code className={styles.inlineCode}>allowed-tools</code> に{" "}
             <code className={styles.inlineCode}>shell</code> /{" "}
             <code className={styles.inlineCode}>bash</code> を丸ごと許可しない。許可する場合は{" "}
-            <code className={styles.inlineCode}>Bash(git:*)</code>{" "}
-            のようにコマンド単位で絞り込む
+            <code className={styles.inlineCode}>Bash(git:*)</code> のようにコマンド単位で絞り込む
           </li>
           <li>
             未知のスキルは <code className={styles.inlineCode}>gh skill preview</code>{" "}
@@ -1548,11 +1652,16 @@ Execute the release process in exact sequential order:
               </tr>
               <tr>
                 <td>関係ないタスクでも誤発火する</td>
-                <td><code className={styles.inlineCode}>description</code> が広すぎる</td>
+                <td>
+                  <code className={styles.inlineCode}>description</code> が広すぎる
+                </td>
                 <td>「Do not use when...」という除外条件を追加する</td>
               </tr>
               <tr>
-                <td><code className={styles.inlineCode}>name</code> は正しいのにスキル自体が認識されない</td>
+                <td>
+                  <code className={styles.inlineCode}>name</code>{" "}
+                  は正しいのにスキル自体が認識されない
+                </td>
                 <td>
                   ディレクトリ名と <code className={styles.inlineCode}>name</code>{" "}
                   フィールドが一致していない
@@ -1567,15 +1676,15 @@ Execute the release process in exact sequential order:
                 <td>サーフェスごとの探索ロジックの差、キャッシュの不整合</td>
                 <td>
                   <code className={styles.inlineCode}>/skills reload</code>{" "}
-                  を試す。改善しない場合はCLIとVS Code拡張のバージョン差分を確認し、既知のIssueを検索する
+                  を試す。改善しない場合はCLIとVS
+                  Code拡張のバージョン差分を確認し、既知のIssueを検索する
                 </td>
               </tr>
               <tr>
                 <td>Insiders版で .agents/skills のスキルが急に見えなくなった</td>
                 <td>特定バージョンでの回帰(regression)</td>
                 <td>
-                  一時的な回避策として .github/skills に配置し直す。VS
-                  Codeを最新の安定版に更新する
+                  一時的な回避策として .github/skills に配置し直す。VS Codeを最新の安定版に更新する
                 </td>
               </tr>
               <tr>
@@ -1584,7 +1693,10 @@ Execute the release process in exact sequential order:
                 <td>スキルフォルダをマルチルートワークスペースに含める形で回避できた報告がある</td>
               </tr>
               <tr>
-                <td><code className={styles.inlineCode}>allowed-tools</code> を設定したのに毎回確認を求められる</td>
+                <td>
+                  <code className={styles.inlineCode}>allowed-tools</code>{" "}
+                  を設定したのに毎回確認を求められる
+                </td>
                 <td>フィールド名や記法の誤り、対応していないツール名を指定している</td>
                 <td>
                   実験的フィールドであるため、使用しているCopilotのバージョンでの対応状況を確認し、スペース区切りの記法(
@@ -1622,9 +1734,7 @@ Execute the release process in exact sequential order:
         </div>
         <hr />
 
-        <h2 id="13-ベストプラクティスチェックリスト">
-          13. ベストプラクティスチェックリスト
-        </h2>
+        <h2 id="13-ベストプラクティスチェックリスト">13. ベストプラクティスチェックリスト</h2>
         <p>スキルを作成・レビュー・配布する際の総合確認チェックリスト。</p>
         <ChecklistCard />
         <hr />
@@ -1635,8 +1745,8 @@ Execute the release process in exact sequential order:
           の便利機能にとどまらず、AI時代における「開発手順書とツールの標準フォーマット」へと進化を遂げた。
         </p>
         <p>
-          <code className={styles.inlineCode}>agentskills.io</code>{" "}
-          による標準化と、GitHub Copilot・Claude Code・Cursor・Gemini CLI
+          <code className={styles.inlineCode}>agentskills.io</code> による標準化と、GitHub
+          Copilot・Claude Code・Cursor・Gemini CLI
           を含む40前後のプラットフォームによるサポートにより、一度作成したスキル資産はチームやツールを超えて永続的に活用できる。
         </p>
         <ul>
@@ -1654,11 +1764,13 @@ Execute the release process in exact sequential order:
             によるチーム共有と、<code className={styles.inlineCode}>gh skill</code> による検証・公開
           </li>
           <li>
-            <strong>セキュリティ</strong>: 外部スキルの事前監査(<code className={styles.inlineCode}>gh skill preview</code>)と{" "}
+            <strong>セキュリティ</strong>: 外部スキルの事前監査(
+            <code className={styles.inlineCode}>gh skill preview</code>)と{" "}
             <code className={styles.inlineCode}>allowed-tools</code> の最小権限運用
           </li>
           <li>
-            <strong>品質向上</strong>: 直接・間接・否定の3パターンテストと、実運用からの反復改善ループ
+            <strong>品質向上</strong>:
+            直接・間接・否定の3パターンテストと、実運用からの反復改善ループ
           </li>
         </ul>
         <p>
@@ -1833,7 +1945,8 @@ Execute the release process in exact sequential order:
             <ul>
               <li>
                 <Ext href="https://snyk.io/blog/toxicskills-audit-agent-skills-vulnerabilities/">
-                  [21] ToxicSkills: Auditing Vulnerabilities in 3,984 Public Agent Skills (Snyk Research)
+                  [21] ToxicSkills: Auditing Vulnerabilities in 3,984 Public Agent Skills (Snyk
+                  Research)
                 </Ext>
               </li>
               <li>

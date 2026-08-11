@@ -8,9 +8,7 @@ import styles from "./page.module.css";
  */
 export default function TocObserver() {
   useEffect(() => {
-    const navLinks = document.querySelectorAll<HTMLAnchorElement>(
-      `.${styles.tocNav} a`,
-    );
+    const navLinks = document.querySelectorAll<HTMLAnchorElement>(`.${styles.tocNav} a`);
     const idToLink: Record<string, HTMLAnchorElement> = {};
     for (const a of Array.from(navLinks)) {
       const href = a.getAttribute("href");
@@ -34,7 +32,7 @@ export default function TocObserver() {
           }
         }
       },
-      { rootMargin: "-20% 0px -70% 0px" },
+      { rootMargin: "-20% 0px -70% 0px" }
     );
 
     for (const id of observedIds) {

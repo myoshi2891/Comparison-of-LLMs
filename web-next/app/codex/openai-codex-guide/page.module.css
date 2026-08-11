@@ -88,7 +88,10 @@
   color: var(--ink-soft);
   text-decoration: none;
   border-left: 2px solid transparent;
-  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  transition:
+    background 0.15s,
+    color 0.15s,
+    border-color 0.15s;
 }
 
 .tocLink:hover {
@@ -147,7 +150,8 @@
 .hero {
   padding: 64px 56px 46px;
   border-bottom: 1px solid var(--border);
-  background: radial-gradient(900px 420px at 85% -10%, var(--accent-soft) 0%, transparent 60%), var(--bg);
+  background:
+    radial-gradient(900px 420px at 85% -10%, var(--accent-soft) 0%, transparent 60%), var(--bg);
 }
 
 .heroInner {
@@ -225,9 +229,15 @@
   height: 10px;
   border-radius: 50%;
 }
-.termDot.r { background: #ff5f56; }
-.termDot.y { background: #ffbd2e; }
-.termDot.g { background: #27c93f; }
+.termDot.r {
+  background: #ff5f56;
+}
+.termDot.y {
+  background: #ffbd2e;
+}
+.termDot.g {
+  background: #27c93f;
+}
 
 .termTitle {
   margin-left: 8px;
@@ -246,9 +256,16 @@
   white-space: pre-wrap;
 }
 
-.termLine.muted { color: #6b7280; }
-.termLine.ok { color: #4ade80; }
-.prompt { color: var(--code-accent); font-weight: bold; }
+.termLine.muted {
+  color: #6b7280;
+}
+.termLine.ok {
+  color: #4ade80;
+}
+.prompt {
+  color: var(--code-accent);
+  font-weight: bold;
+}
 
 /* ---------- Section Styling & Headings ---------- */
 .section {
@@ -318,7 +335,9 @@
   margin-top: 2px;
 }
 
-.callout p { margin: 0; }
+.callout p {
+  margin: 0;
+}
 .callout .label {
   display: block;
   font-family: var(--font-mono, monospace);
@@ -481,16 +500,36 @@
 }
 
 /* Highlight Token Colors tuned to original HTML palette */
-.ck { color: #d89be0; }              /* keyword / built_in */
-.cv { color: var(--code-accent); }  /* attr / attribute / variable (#8fb2ff) */
-.cs { color: #b7d99a; }              /* string / symbol */
-.cw { color: #e8b168; }              /* number / literal */
-.cc { color: #6b6f87; font-style: italic; } /* comment */
-.ce { color: #d89be0; }              /* keyword / special */
-.cm { color: #f2c572; font-weight: 600; }  /* section / title */
-.cg { color: #b7d99a; }              /* success / green */
-.ch { color: #f2c572; font-weight: 600; }  /* header / gold */
-
+.ck {
+  color: #d89be0;
+} /* keyword / built_in */
+.cv {
+  color: var(--code-accent);
+} /* attr / attribute / variable (#8fb2ff) */
+.cs {
+  color: #b7d99a;
+} /* string / symbol */
+.cw {
+  color: #e8b168;
+} /* number / literal */
+.cc {
+  color: #6b6f87;
+  font-style: italic;
+} /* comment */
+.ce {
+  color: #d89be0;
+} /* keyword / special */
+.cm {
+  color: #f2c572;
+  font-weight: 600;
+} /* section / title */
+.cg {
+  color: #b7d99a;
+} /* success / green */
+.ch {
+  color: #f2c572;
+  font-weight: 600;
+} /* header / gold */
 
 /* ---------- Checklist Section ---------- */
 .checklist {
@@ -625,7 +664,8 @@
     gap: 32px;
   }
 
-  .hero, .content {
+  .hero,
+  .content {
     padding-left: 24px;
     padding-right: 24px;
   }

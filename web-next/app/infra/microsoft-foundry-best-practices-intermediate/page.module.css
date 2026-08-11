@@ -12,19 +12,15 @@
   --text-dim: #b9cbe9;
   --text-faint: #a3b9de;
   --danger: #ff9d7a;
-  --font-display: 'Space Grotesk', 'Hiragino Sans', 'Yu Gothic', sans-serif;
-  --font-body: 'Inter', 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'Yu Gothic', sans-serif;
-  --font-mono: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
+  --font-display: "Space Grotesk", "Hiragino Sans", "Yu Gothic", sans-serif;
+  --font-body: "Inter", "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Yu Gothic", sans-serif;
+  --font-mono: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
   --sidebar-w: 300px;
 
   display: block;
   background: var(--bg);
   background-image:
-    radial-gradient(
-      ellipse 900px 500px at 85% -5%,
-      rgba(126, 166, 255, 0.1),
-      transparent 60%
-    ),
+    radial-gradient(ellipse 900px 500px at 85% -5%, rgba(126, 166, 255, 0.1), transparent 60%),
     radial-gradient(ellipse 700px 500px at -5% 30%, rgba(34, 211, 201, 0.07), transparent 60%);
   color: var(--text);
   font-family: var(--font-body);
@@ -234,12 +230,7 @@
 }
 
 .gradientText {
-  background: linear-gradient(
-    100deg,
-    var(--accent) 10%,
-    var(--accent-3) 60%,
-    var(--accent-2) 100%
-  );
+  background: linear-gradient(100deg, var(--accent) 10%, var(--accent-3) 60%, var(--accent-2) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -463,15 +454,37 @@
 }
 
 /* Code tokens */
-.ck { color: #ff7b72; font-weight: 600; }
-.cm { color: #7ee787; font-weight: 700; }
-.cs { color: #a5d6ff; }
-.cv { color: #79c0ff; }
-.cw { color: #d29922; }
-.ce { color: #bc8cff; }
-.cc { color: #6e7f98; font-style: italic; }
-.cg { color: #3fb950; }
-.ch { color: #f0883e; font-weight: 700; }
+.ck {
+  color: #ff7b72;
+  font-weight: 600;
+}
+.cm {
+  color: #7ee787;
+  font-weight: 700;
+}
+.cs {
+  color: #a5d6ff;
+}
+.cv {
+  color: #79c0ff;
+}
+.cw {
+  color: #d29922;
+}
+.ce {
+  color: #bc8cff;
+}
+.cc {
+  color: #6e7f98;
+  font-style: italic;
+}
+.cg {
+  color: #3fb950;
+}
+.ch {
+  color: #f0883e;
+  font-weight: 700;
+}
 
 /* ---------- Mermaid Frame ---------- */
 .diagramFrame {
@@ -590,7 +603,9 @@
     transform: translateX(-100%);
     visibility: hidden;
     pointer-events: none;
-    transition: transform 0.3s ease, visibility 0.3s ease;
+    transition:
+      transform 0.3s ease,
+      visibility 0.3s ease;
     z-index: 40;
   }
   .sidebarOpen {

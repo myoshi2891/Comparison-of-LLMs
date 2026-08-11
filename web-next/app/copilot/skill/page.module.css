@@ -16,10 +16,10 @@
   min-height: 100vh;
   background:
     radial-gradient(circle at 15% 8%, rgba(124, 158, 255, 0.1), transparent 45%),
-    radial-gradient(circle at 85% 92%, rgba(124, 158, 255, 0.06), transparent 40%),
-    var(--bg);
+    radial-gradient(circle at 85% 92%, rgba(124, 158, 255, 0.06), transparent 40%), var(--bg);
   color: var(--text);
-  font-family: var(--font-sans), 'Hiragino Kaku Gothic ProN', 'Yu Gothic', 'Segoe UI', system-ui, sans-serif;
+  font-family:
+    var(--font-sans), "Hiragino Kaku Gothic ProN", "Yu Gothic", "Segoe UI", system-ui, sans-serif;
   line-height: 1.85;
   font-size: 16px;
   position: relative;
@@ -96,7 +96,10 @@
   color: var(--text-dim);
   border-left: 2px solid transparent;
   text-decoration: none;
-  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  transition:
+    background 0.15s,
+    color 0.15s,
+    border-color 0.15s;
 }
 
 .navLink:hover {
@@ -228,7 +231,7 @@
   padding: 2px 6px;
   border-radius: 4px;
   font-size: 0.88em;
-  font-family: var(--font-mono), 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  font-family: var(--font-mono), "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
   overflow-wrap: break-word;
   word-break: break-word;
 }
@@ -247,7 +250,7 @@
   padding: 0;
   color: inherit;
   font-size: 0.86rem;
-  font-family: var(--font-mono), 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  font-family: var(--font-mono), "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
   white-space: pre;
 }
 
@@ -309,7 +312,10 @@
   border: 1px solid var(--border);
   border-radius: 10px;
   padding: 16px 18px;
-  transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+  transition:
+    transform 0.15s,
+    box-shadow 0.15s,
+    border-color 0.15s;
   min-width: 0;
 }
 
@@ -383,7 +389,7 @@
   background: var(--accent-soft);
 }
 
-.taskList input[type='checkbox'] {
+.taskList input[type="checkbox"] {
   appearance: none;
   -webkit-appearance: none;
   flex: 0 0 auto;
@@ -395,20 +401,22 @@
   background: var(--code-bg);
   position: relative;
   cursor: pointer;
-  transition: background 0.15s, border-color 0.15s;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
 }
 
-.taskList input[type='checkbox']:hover {
+.taskList input[type="checkbox"]:hover {
   border-color: var(--accent);
 }
 
-.taskList input[type='checkbox']:checked {
+.taskList input[type="checkbox"]:checked {
   background: var(--accent);
   border-color: var(--accent);
 }
 
-.taskList input[type='checkbox']:checked::after {
-  content: '';
+.taskList input[type="checkbox"]:checked::after {
+  content: "";
   position: absolute;
   left: 6px;
   top: 2px;
