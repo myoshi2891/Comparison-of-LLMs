@@ -36,16 +36,19 @@ describe("/google/sandbox-best-practices - TocObserver", () => {
 
     expect(sidebar.hasAttribute("data-open")).toBe(false);
     expect(sidebarToggle.hasAttribute("aria-expanded")).toBe(false);
+    expect(sidebarToggle).toHaveAttribute("aria-label", "目次を開く");
 
     // Toggle open
     fireEvent.click(sidebarToggle);
     expect(sidebar.getAttribute("data-open")).toBe("true");
     expect(sidebarToggle.getAttribute("aria-expanded")).toBe("true");
+    expect(sidebarToggle).toHaveAttribute("aria-label", "目次を閉じる");
 
     // Toggle close
     fireEvent.click(sidebarToggle);
     expect(sidebar.getAttribute("data-open")).toBe("false");
     expect(sidebarToggle.getAttribute("aria-expanded")).toBe("false");
+    expect(sidebarToggle).toHaveAttribute("aria-label", "目次を開く");
 
     // Open again then click TOC link
     fireEvent.click(sidebarToggle);
@@ -54,6 +57,7 @@ describe("/google/sandbox-best-practices - TocObserver", () => {
     fireEvent.click(tocLink);
     expect(sidebar.getAttribute("data-open")).toBe("false");
     expect(sidebarToggle.getAttribute("aria-expanded")).toBe("false");
+    expect(sidebarToggle).toHaveAttribute("aria-label", "目次を開く");
   });
 
   it("observes section elements with ids for scroll spy", () => {

@@ -6,6 +6,7 @@ import { describe, expect, it, vi } from "vitest";
 import GoogleSandboxBestPracticesPage, {
   metadata as rawMetadata,
 } from "@/app/google/sandbox-best-practices/page";
+import styles from "./page.module.css";
 
 vi.mock("@/components/docs/MermaidDiagram", () => ({
   default: function DummyMermaidDiagram({ chart }: { chart: string }) {
@@ -69,6 +70,20 @@ describe("/google/sandbox-best-practices - page structure", () => {
     const { container } = render(<Page />);
     const h2 = container.querySelector("[id*='1-はじめになぜサンドボックスが必要なのか']");
     expect(h2).not.toBeNull();
+  });
+
+  it("offsets all TOC section anchors below the fixed header", () => {
+    const { container } = render(<Page />);
+    const anchors = container.querySelectorAll('main [id^="section-"]');
+    const css = readFileSync(join(__dirname, "page.module.css"), "utf8");
+
+    expect(anchors).toHaveLength(10);
+    for (const anchor of anchors) {
+      expect(anchor).toHaveClass(styles.sectionAnchor);
+    }
+    expect(css).toContain(
+      "scroll-margin-top: calc(var(--header-height, 60px) + 80px)"
+    );
   });
 });
 
