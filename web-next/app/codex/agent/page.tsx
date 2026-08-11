@@ -661,6 +661,9 @@ export default function CodexAgentPage() {
               <span className={styles.ch}>[features.multi_agent_v2]</span>
             </div>
             <div className={styles.codeLine}>
+              <span className={styles.ck}>enabled</span> = <span className={styles.cm}>true</span>
+            </div>
+            <div className={styles.codeLine}>
               <span className={styles.cc}>
                 # V2: 主スレッドを含むため、4ならサブエージェントは最大3
               </span>
