@@ -18,6 +18,7 @@ import { render } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { describe, expect, it } from "vitest";
 import CodexAgentPage, { metadata as rawMetadata } from "@/app/codex/agent/page";
+import styles from "@/app/codex/agent/page.module.css";
 
 const Page = CodexAgentPage as unknown as () => ReactElement;
 type MetadataLike = { title?: unknown; description?: unknown };
@@ -92,17 +93,40 @@ describe("/codex/agent - page structure", () => {
     expect(tocHrefs).toEqual(expectedHrefs);
   });
 
-  it("V1 と MultiAgentV2 の並列上限・深さ計算を全ガイド層で区別する", () => {
+  it("V1 と MultiAgentV2 の TOML 例を別々のコードブロックに分離する", () => {
+    const { container } = render(<Page />);
+    const normalize = (value: string | null | undefined) => value?.replace(/\s+/g, "") ?? "";
+    const codeBlocks = Array.from(container.querySelectorAll(`.${styles.codeBlock}`));
+    const v1Example = codeBlocks.find((block) => normalize(block.textContent).includes("[agents]"));
+    const v2Example = codeBlocks.find((block) =>
+      normalize(block.textContent).includes("[features.multi_agent_v2]")
+    );
+
+    expect(v1Example).toBeDefined();
+    expect(normalize(v1Example?.textContent)).not.toContain("[features.multi_agent_v2]");
+    expect(v2Example).toBeDefined();
+    expect(normalize(v2Example?.textContent)).not.toContain("[agents]");
+  });
+
+  it("V1 では agents.max_depth を実行時の深さ制限に使用する", () => {
+    const { container } = render(<Page />);
+    const normalize = (value: string | null | undefined) => value?.replace(/\s+/g, "") ?? "";
+    const rows = Array.from(container.querySelectorAll("tr"));
+    const v1Row = rows.find((row) => normalize(row.textContent).includes("サブエージェント(V1)"));
+    const guidance = Array.from(container.querySelectorAll("p")).find((paragraph) =>
+      normalize(paragraph.textContent).includes("V1ではagents.max_concurrent_threads_per_session")
+    );
+
+    expect(normalize(v1Row?.textContent)).toContain("agents.max_depthはV1の実行時深さ制限");
+    expect(normalize(guidance?.textContent)).toContain("V1では実行時の深さ制限として使用");
+  });
+
+  it("MultiAgentV2 では agents.max_depth を実行時制限に使わず深さ計算だけに使用する", () => {
     const { container } = render(<Page />);
     const normalize = (value: string | null | undefined) => value?.replace(/\s+/g, "") ?? "";
     const rows = Array.from(container.querySelectorAll("tr"));
     const v1Row = rows.find((row) => normalize(row.textContent).includes("サブエージェント(V1)"));
     const v2Row = rows.find((row) => normalize(row.textContent).includes("サブエージェント(V2)"));
-    const configExample = Array.from(container.querySelectorAll("div")).find(
-      (element) =>
-        normalize(element.textContent).includes("[agents]") &&
-        normalize(element.textContent).includes("[features.multi_agent_v2]")
-    );
     const guidance = Array.from(container.querySelectorAll("p")).find((paragraph) =>
       normalize(paragraph.textContent).includes("V1ではagents.max_concurrent_threads_per_session")
     );
@@ -122,15 +146,14 @@ describe("/codex/agent - page structure", () => {
     expect(normalize(v2Row?.textContent)).toContain("サブエージェント実効上限は設定値−1");
     expect(normalize(v2Row?.textContent)).toContain("agents.max_threadsは設定エラー");
     expect(normalize(v2Row?.textContent)).toContain(
-      "agents.max_depthはV1の実行時深さ制限としては適用されないが、lineageとtask-pathの深さ計算に使用"
+      "agents.max_depthは実行時制限に使わず、lineageとtask-pathの深さ計算にのみ使用"
     );
-    expect(normalize(configExample?.textContent)).toContain("[features.multi_agent_v2]");
-    expect(normalize(configExample?.textContent)).toContain("max_concurrent_threads_per_session=4");
-    expect(normalize(guidance?.textContent)).toContain(
-      "親スレッドを除くサブエージェント同時実行上限"
-    );
+    expect(normalize(guidance?.textContent)).toContain("MultiAgentV2では実行時制限に使用せず");
     expect(normalize(checklist?.textContent)).toContain(
       "V1とMultiAgentV2で設定キーと上限の数え方を分離"
+    );
+    expect(normalize(checklist?.textContent)).toContain(
+      "V1では実行時の深さ制限、MultiAgentV2では実行時制限に使わず"
     );
     expect(normalize(troubleshooting?.textContent)).toContain(
       "features.multi_agent_v2.max_concurrent_threads_per_session"
