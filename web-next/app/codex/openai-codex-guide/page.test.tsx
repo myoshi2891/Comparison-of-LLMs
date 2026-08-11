@@ -6,6 +6,26 @@ import { describe, expect, it, vi } from "vitest";
 import Page, { metadata } from "./page";
 import styles from "./page.module.css";
 
+const normalizeText = (value: string | null | undefined) => value?.replace(/\s+/g, "").trim() ?? "";
+
+const EXPECTED_CHECKLIST_LABELS = [
+  "プロンプトにGoal・Context・Constraints・Donewhenの4要素を意識して書いているか",
+  "タスクの複雑さに応じてReasoningEffortを使い分けているか(既定はmedium)",
+  "複雑・曖昧なタスクでは/planや/goalを使って計画・完了条件を先に固めているか",
+  "チームの規約・検証手順をAGENTS.mdに書き、プロンプトで毎回繰り返していないか",
+  "~/.codex/config.tomlと.codex/config.tomlで個人設定とプロジェクト設定を役割分担しているか",
+  "V1ではagents.max_concurrent_threads_per_session(agents.max_threadsは別名)で親スレッドを除くサブエージェント同時実行上限を設定し、MultiAgentV2ではfeatures.multi_agent_v2.max_concurrent_threads_per_sessionで主スレッドを含む上限を設定して、サブエージェント実効上限が設定値−1になることとagents.max_threadsが設定エラーになることを確認したか。agents.max_depthはV1の実行時深さ制限としては適用されないが、lineageとtask-pathの深さ計算に使用される",
+  "サブエージェントのデフォルトモデル設定を各config.tomlのagents.default_subagent_modelで確認・指定し、gpt-5.6またはgpt-5.6-terraを設定しているか",
+  "Skillが利用するMCPツールをagents/openai.yamlのdependencies.toolsに具体的な依存関係として宣言しているか",
+  "サンドボックス・承認ポリシーを用途(初回調査/通常開発/CI)に応じて使い分けているか",
+  "テスト・Lint・差分レビューをワークフローに組み込み、/reviewやAGENTS.md経由のレビュー観点を活用しているか",
+  "リポジトリ外のコンテキストが必要な場面でMCPを検討しているか(ただし繋ぎすぎに注意)",
+  "繰り返し行っている作業をSkillに切り出しているか",
+  "安定したワークフローだけをAutomationsに切り出しているか",
+  "並列作業ではgitworktreeでスレッドを分離しているか",
+  "CI/CDでは公式のopenai/codex-actionやcodexexecを使い、APIキーをジョブ全体に晒していないか",
+] as const;
+
 // Mock MermaidDiagram component to avoid Vitest DOM rendering issues with canvas/SVG
 vi.mock("@/components/docs/MermaidDiagram", () => ({
   default: function DummyMermaidDiagram({ chart }: { chart: string }) {
@@ -54,7 +74,7 @@ describe("/codex/openai-codex-guide (2026 Best Practices)", () => {
   it("h3 セクションが全主要サブセクションに存在する", () => {
     const { container } = render(<Page />);
     const h3List = Array.from(container.querySelectorAll("h3")).map((el) => el.textContent);
-    
+
     const expectedSubsections = [
       "モデルの系譜(コミュニティ報告ベースの概観)",
       "Reasoning Effort(推論の深さ)を使い分ける",
@@ -74,7 +94,10 @@ describe("/codex/openai-codex-guide (2026 Best Practices)", () => {
     ];
 
     for (const title of expectedSubsections) {
-      expect(h3List.some((t) => t?.includes(title)), `H3 containing '${title}' should exist`).toBe(true);
+      expect(
+        h3List.some((t) => t?.includes(title)),
+        `H3 containing '${title}' should exist`
+      ).toBe(true);
     }
   });
 
@@ -102,13 +125,18 @@ describe("/codex/openai-codex-guide (2026 Best Practices)", () => {
   it("原本と同期した運用チェックリストの 15 項目が存在する", () => {
     const { container } = render(<Page />);
     const checklist = container.querySelector("#sec-15");
-    const checklistItems = checklist?.querySelectorAll("input[type='checkbox']");
-    expect(checklistItems).toHaveLength(15);
-    expect(checklist?.textContent).toContain("agents.max_concurrent_threads_per_session");
-    expect(checklist?.textContent).toContain("agents.max_depth");
-    expect(checklist?.textContent).toContain("V1限定・V2無視");
-    expect(checklist?.textContent).toContain("agents/openai.yaml");
-    expect(checklist?.textContent).toContain("dependencies.tools");
+    const checklistItems = Array.from(checklist?.querySelectorAll(":scope > ul > li") ?? []);
+    const actualLabels = checklistItems.map((item) => {
+      const checkbox = item.querySelector("input[type='checkbox']");
+      const label = item.querySelector("label");
+
+      expect(checkbox).not.toBeNull();
+      expect(label).not.toBeNull();
+      expect(label?.htmlFor).toBe(checkbox?.id);
+      return normalizeText(label?.textContent);
+    });
+
+    expect(actualLabels).toEqual(EXPECTED_CHECKLIST_LABELS);
   });
 
   it("MCP 設定場所と Skill のツール依存宣言を原本どおり区別する", () => {
@@ -216,6 +244,8 @@ describe("/codex/openai-codex-guide (2026 Best Practices)", () => {
 
   it("metadata.title と metadata.description が適切に定義されている", () => {
     expect(metadata.title).toContain("OpenAI Codex");
-    expect(metadata.description).toContain("2026年最新情報に基づくOpenAI Codexベストプラクティスガイド");
+    expect(metadata.description).toContain(
+      "2026年最新情報に基づくOpenAI Codexベストプラクティスガイド"
+    );
   });
 });

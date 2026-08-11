@@ -92,21 +92,45 @@ describe("/codex/agent - page structure", () => {
     expect(tocHrefs).toEqual(expectedHrefs);
   });
 
-  it("agents.max_depth を MultiAgentV2 の有効な再帰制限として案内しない", () => {
+  it("V1 と MultiAgentV2 の並列上限・深さ計算を全ガイド層で区別する", () => {
     const { container } = render(<Page />);
-    const maxDepthRow = Array.from(container.querySelectorAll("tr")).find((row) =>
-      Array.from(row.querySelectorAll("code")).some(
-        (code) => code.textContent === "agents.max_depth"
-      )
+    const normalize = (value: string | null | undefined) => value?.replace(/\s+/g, "") ?? "";
+    const rows = Array.from(container.querySelectorAll("tr"));
+    const v1Row = rows.find((row) => normalize(row.textContent).includes("サブエージェント(V1)"));
+    const v2Row = rows.find((row) => normalize(row.textContent).includes("サブエージェント(V2)"));
+    const configExample = Array.from(container.querySelectorAll("pre")).find((pre) =>
+      normalize(pre.textContent).includes("max_concurrent_threads_per_session=4")
     );
-    const guidance = maxDepthRow?.textContent?.replace(/\s+/g, "") ?? "";
-    const migrationLink = container.querySelector(
-      'a[href="https://github.com/openai/codex/pull/20180"]'
+    const guidance = Array.from(container.querySelectorAll("p")).find((paragraph) =>
+      normalize(paragraph.textContent).includes("V1では親スレッドを除く")
+    );
+    const checklist = container.querySelector('label[for="check-7"]');
+    const troubleshooting = rows.find((row) =>
+      normalize(row.textContent).includes("サブエージェントがコストを消費しすぎる")
     );
 
-    expect(guidance).toContain("agents.max_depthはV1実装でのみ有効で、MultiAgentV2では無視される");
-    expect(guidance).not.toContain("MultiAgentV2の再帰制限");
-    expect(migrationLink).not.toBeNull();
+    expect(normalize(v1Row?.textContent)).toContain(
+      "agents.max_concurrent_threads_per_sessionは親スレッドを除くサブエージェント同時実行上限"
+    );
+    expect(normalize(v1Row?.textContent)).toContain("agents.max_threadsは別名");
+    expect(normalize(v2Row?.textContent)).toContain(
+      "features.multi_agent_v2.max_concurrent_threads_per_sessionは主スレッドを含む"
+    );
+    expect(normalize(v2Row?.textContent)).toContain("サブエージェント実効上限は設定値−1");
+    expect(normalize(v2Row?.textContent)).toContain("agents.max_threadsは設定エラー");
+    expect(normalize(v2Row?.textContent)).toContain(
+      "agents.max_depthはlineageとtask-pathの深さ計算に使用"
+    );
+    expect(normalize(configExample?.textContent)).toContain(
+      "[features.multi_agent_v2]max_concurrent_threads_per_session=4"
+    );
+    expect(normalize(guidance?.textContent)).toContain("V1では親スレッドを除く");
+    expect(normalize(checklist?.textContent)).toContain(
+      "V1とMultiAgentV2で設定キーと上限の数え方を分離"
+    );
+    expect(normalize(troubleshooting?.textContent)).toContain(
+      "features.multi_agent_v2.max_concurrent_threads_per_session"
+    );
   });
 });
 
