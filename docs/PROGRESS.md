@@ -12,10 +12,10 @@
 - **ブランチ**: `dev`（本番 `main` への Next.js 移行マージ完了 🚀）
 - **動作検証**:
   - `bun run build` ⏭️（ユーザー指定により省略。CI等で実施）
-  - `bun run typecheck` ✅
+  - `npm run typecheck` ✅（サンドボックスではユーザー指定により npm を使用。`package.json` の `typecheck` スクリプトは `tsc --noEmit` で、`bun run typecheck` と同じスクリプトを実行）
   - `bun run lint` ❌（未完了。452 files checked、49 errors・2 warnings・3 infos。既存 diagnostics だが成功扱いせず、CI lint も解消まで失敗として扱う）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: Vitest **162 files / 1441 tests すべて合格**（収集失敗なし）
+  - **フロントエンド (`web-next/`)**: `npm test` で Vitest **162 files / 1441 tests すべて合格**（収集失敗なし）。サンドボックスではユーザー指定により npm を使用し、`package.json` の `test` スクリプト `vitest run` を実行するため `(cd web-next && bun run test)` と同等
   - **バックエンド (`scraper/`)**: pytest 実行で **43 件すべて合格** (全 Green ✅)
 
 ## 最近の追加内容
@@ -24,7 +24,7 @@
   - `/codex/openai-codex-guide` にMCPサーバーの設定場所、`agents/openai.yaml` の `dependencies.tools`、現行の `agents.max_concurrent_threads_per_session` を原本どおり反映し、15項目の運用チェックリストへ同期。
   - `agents.max_depth` はCodex CLI V1限定でMultiAgentV2では無視されることと、Codex PR `#20180` を原本・移行ガイド・`/codex/agent` に明記。
   - モバイルTOCを閉じた後、開いていた場合に限ってトグルへフォーカスを戻し、オーバーレイとTOCリンク経由をテスト。
-  - npmでVitest **162 files / 1441 tests** とtypecheckがGreen。変更ロジック2ファイルのBiomeもGreen。全体lintは既存の49 errors・2 warnings・3 infosにより失敗し、未完了として記録。ユーザー指定によりビルドと目視確認は省略。
+  - サンドボックスではユーザー指定により npm を使用。`npm test` / `npm run typecheck` は `package.json` の `vitest run` / `tsc --noEmit` を実行するため、対応する `bun run test` / `bun run typecheck` と同等。Vitest **162 files / 1441 tests** とtypecheckがGreen。変更ロジック2ファイルのBiomeもGreen。全体lintは既存の49 errors・2 warnings・3 infosにより失敗し、未完了として記録。ユーザー指定によりビルドと目視確認は省略。
 
 - **レビュー指摘の現行コード再検証とガイド契約の強化**:
   - 移行スキルの契約数を「8 + 4」に統一し、CSS Modules と JSDOM の検証範囲、原本依存のレイアウト要件、TOC テストの責務を明確化。
