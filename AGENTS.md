@@ -31,10 +31,10 @@ AGENTS.md は Codex / Cursor / Cline など AGENTS.md 規約を読む AI ツー�
 ## 検証コマンド
 
 ```bash
-(cd web-next && bun run test)        # 159 files / 1425 tests pass（全 Green ✅）
+(cd web-next && bun run test)        # 162 files / 1441 tests pass（全 Green ✅）
 (cd web-next && bun run typecheck)   # OK
 (cd web-next && bun run build)       # Antigravity環境では実行禁止。CI / 他の許可された環境でのみ実行可
-(cd web-next && bun run lint)        # 449 files / 49 errors・2 warnings・3 infos（既存 diagnostics）
+(cd web-next && bun run lint)        # FAIL（未完了）: 452 files / 49 errors・2 warnings・3 infos。既存 diagnostics だが成功扱いせず、CI lint も解消まで失敗として扱う
 (cd scraper && uv run pytest)        # 43/43 pass（全 Green ✅）
 ```
 

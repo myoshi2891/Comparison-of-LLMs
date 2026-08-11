@@ -388,7 +388,7 @@ Task -- 曖昧・多段階・要検証 --> M1["gpt-5.6<br/>(深い推論・高�
 Task -- バランス・速度重視 --> M2["gpt-5.6-terra<br/>(高速・標準作業)"]
 ```
 
-また、セッションあたりの並行スレッド上限は現行キー `agents.max_concurrent_threads_per_session` を使用します（`agents.max_threads` はレガシー別名として維持。なお `agents.max_depth` はV1でのみ有効でV2では無視されます）。
+また、セッションあたりの並行スレッド上限は現行キー `agents.max_concurrent_threads_per_session` を使用します（`agents.max_threads` はレガシー別名として維持）。`agents.max_depth` はCodex CLIのV1実装でのみ有効で、現行のMultiAgentV2では無視されます（[Codex PR #20180](https://github.com/openai/codex/pull/20180)）。
 
 ```mermaid
 flowchart TD

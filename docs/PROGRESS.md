@@ -13,12 +13,18 @@
 - **動作検証**:
   - `bun run build` ⏭️（ユーザー指定により省略。CI等で実施）
   - `bun run typecheck` ✅
-  - `bun run lint` ⚠️（449 files checked。既存 diagnostics は49 errors・2 warnings・3 infos）
+  - `bun run lint` ❌（未完了。452 files checked、49 errors・2 warnings・3 infos。既存 diagnostics だが成功扱いせず、CI lint も解消まで失敗として扱う）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: Vitest **159 files / 1425 tests すべて合格**（収集失敗なし）
+  - **フロントエンド (`web-next/`)**: Vitest **162 files / 1441 tests すべて合格**（収集失敗なし）
   - **バックエンド (`scraper/`)**: pytest 実行で **43 件すべて合格** (全 Green ✅)
 
 ## 最近の追加内容
+
+- **OpenAI Codex 設定移行とモバイルTOCフォーカス管理の同期**:
+  - `/codex/openai-codex-guide` にMCPサーバーの設定場所、`agents/openai.yaml` の `dependencies.tools`、現行の `agents.max_concurrent_threads_per_session` を原本どおり反映し、15項目の運用チェックリストへ同期。
+  - `agents.max_depth` はCodex CLI V1限定でMultiAgentV2では無視されることと、Codex PR `#20180` を原本・移行ガイド・`/codex/agent` に明記。
+  - モバイルTOCを閉じた後、開いていた場合に限ってトグルへフォーカスを戻し、オーバーレイとTOCリンク経由をテスト。
+  - npmでVitest **162 files / 1441 tests** とtypecheckがGreen。変更ロジック2ファイルのBiomeもGreen。全体lintは既存の49 errors・2 warnings・3 infosにより失敗し、未完了として記録。ユーザー指定によりビルドと目視確認は省略。
 
 - **レビュー指摘の現行コード再検証とガイド契約の強化**:
   - 移行スキルの契約数を「8 + 4」に統一し、CSS Modules と JSDOM の検証範囲、原本依存のレイアウト要件、TOC テストの責務を明確化。
@@ -29,7 +35,7 @@
 
 - **OpenAI Codex ベストプラクティスガイド 2026（/codex/openai-codex-guide）の Pure JSX 完全置き換え移行**:
   - 原本 `Openai-codex-best-practices-2026.html` および `Openai-codex-best-practices-2026.md` を `web-next/app/codex/openai-codex-guide/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。
-  - 要約・省略一切なしで全16セクション（1.Codexとは何か〜16.参考情報源）、全表、全コードブロック、6 Mermaid図解（`diag-loop`, `diag-plan`, `diag-agents`, `diag-sandbox`, `diag-subagents`, `diag-cicd`）、TOCスクロール追従（`TocObserver.tsx`）、12項目運用チェックリスト、全出典リンクを完了。
+  - 要約・省略一切なしで全16セクション（1.Codexとは何か〜16.参考情報源）、全表、全コードブロック、6 Mermaid図解（`diag-loop`, `diag-plan`, `diag-agents`, `diag-sandbox`, `diag-subagents`, `diag-cicd`）、TOCスクロール追従（`TocObserver.tsx`）、15項目運用チェックリスト、全出典リンクを完了。
   - 既存の旧 `/codex/openai-codex-guide` コンテンツと完全入れ替え完了。
   - 原本 `Openai-codex-best-practices-2026.html` および `.md` は `archive/html/OpenAI/` および `archive/md/OpenAI/` へ `git mv` 退避保存。
   - 契約テスト11件（H1, 16 H2s, H3s, TOCリンク, Mermaidラッパー, 表構造, チェックリスト, Callout, 外部リンク, metadata）を作成し全クリア（bun test 全 Green ✅）。
