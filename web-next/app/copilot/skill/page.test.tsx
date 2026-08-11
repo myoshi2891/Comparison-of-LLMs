@@ -163,8 +163,16 @@ describe("/copilot/skill - static source safety", () => {
   it("uses space-delimited strings for allowed-tools in publishable examples", () => {
     const source = readFileSync(join(__dirname, "page.tsx"), "utf8");
 
-    expect(source).not.toMatch(/allowed-tools:\s*(?:\[|\n\s+-)/);
-    expect(source).toContain('allowed-tools: "Bash(git:*) Read"');
+    expect(source).not.toMatch(/allowed-tools:\s*(?:\[|\n\s+-|[^"\r\n]*,|"[^"]*,)/);
+
+    const matches = Array.from(source.matchAll(/allowed-tools:\s*"([^"]+)"/g));
+    expect(matches.length).toBeGreaterThan(0);
+    for (const match of matches) {
+      const toolString = match[1];
+      expect(toolString).not.toContain(",");
+      expect(toolString).not.toContain("[");
+      expect(toolString).not.toContain("]");
+    }
   });
 
   it("does not use the React raw-HTML injection prop", () => {
