@@ -11,11 +11,13 @@ export default function TocObserver() {
     const overlay = document.getElementById("sidebarOverlay");
 
     function closeSidebar() {
+      const wasOpen = sidebar?.classList.contains(styles.sidebarOpen) ?? false;
       if (sidebar) sidebar.classList.remove(styles.sidebarOpen);
       if (overlay) overlay.classList.remove(styles.overlayOpen);
       if (toggleBtn) {
         toggleBtn.setAttribute("aria-expanded", "false");
         toggleBtn.setAttribute("aria-label", "目次を開く");
+        if (wasOpen) toggleBtn.focus();
       }
     }
 

@@ -724,6 +724,14 @@ export default function OpenAICodexGuidePage() {
                 <li>複数ユーザー・複数プロジェクトで再利用できる連携にしたい</li>
               </ul>
               <p>
+                MCPサーバーの直接設定は、<code>~/.codex/config.toml</code>
+                または信頼済みプロジェクトの<code>.codex/config.toml</code>にある
+                <code>[mcp_servers.&lt;server-name&gt;]</code>ブロックで行います。
+                <code>agents/openai.yaml</code>
+                はSkillのUIメタデータ・呼び出しポリシー・<code>dependencies.tools</code>
+                によるツール依存関係の宣言に使用し、一般的なMCPサーバーの接続設定場所としては使用しません。
+              </p>
+              <p>
                 CodexはSTDIOサーバーとOAuth対応のStreamable HTTPサーバーの両方をサポートしています。Codex Appでは「Settings → MCP servers」から候補のサーバーを見つけて接続でき、CLIでは<code>codex mcp add</code>で名前・URLなどを指定して追加できます。
               </p>
               <div className={`${styles.callout} ${styles.warn}`} data-testid="callout" data-variant="warn">
@@ -777,6 +785,14 @@ export default function OpenAICodexGuidePage() {
               <h3>サブエージェントによる並列実行</h3>
               <p>
                 大きなタスクは、スコープの明確な作業を子エージェントに委任することで並列化できます。<code>.codex/agents/</code>配下にTOMLファイルとしてサブエージェントを定義できます。
+              </p>
+              <p>
+                セッションあたりの並行スレッド上限には現行キー
+                <code>agents.max_concurrent_threads_per_session</code>を使用します(
+                <code>agents.max_threads</code>はレガシー別名)。<code>agents.max_depth</code>
+                はCodex CLIのV1実装でのみ有効で、現行のMultiAgentV2では無視されます。移行の詳細は
+                <ExtLink href="https://github.com/openai/codex/pull/20180">Codex PR #20180</ExtLink>
+                を参照してください。
               </p>
               <div className={styles.mermaidWrap}>
                 <MermaidDiagram chart={DIAGRAM_SUBAGENTS} theme="base" themeVariables={ORIGINAL_THEME_VARS} />
@@ -1051,42 +1067,66 @@ export default function OpenAICodexGuidePage() {
                 <li>
                   <input type="checkbox" id="chk-6" />
                   <label htmlFor="chk-6">
-                    サンドボックス・承認ポリシーを用途に応じて使い分けているか
+                    スレッド並行上限設定で現行キー
+                    <code>agents.max_concurrent_threads_per_session</code>(レガシー別名
+                    <code>agents.max_threads</code>)を使用し、<code>agents.max_depth</code>
+                    (V1限定・V2無視)を考慮しているか
                   </label>
                 </li>
                 <li>
                   <input type="checkbox" id="chk-7" />
                   <label htmlFor="chk-7">
-                    テスト・Lint・差分レビューをワークフローに組み込んでいるか
+                    サブエージェントのデフォルトモデル設定を各<code>config.toml</code>の
+                    <code>agents.default_subagent_model</code>で確認・指定し、
+                    <code>gpt-5.6</code>または<code>gpt-5.6-terra</code>を設定しているか
                   </label>
                 </li>
                 <li>
                   <input type="checkbox" id="chk-8" />
                   <label htmlFor="chk-8">
-                    リポジトリ外のコンテキストが必要な場面でMCPを検討しているか(繋ぎすぎに注意)
+                    Skillが利用するMCPツールを<code>agents/openai.yaml</code>の
+                    <code>dependencies.tools</code>に具体的な依存関係として宣言しているか
                   </label>
                 </li>
                 <li>
                   <input type="checkbox" id="chk-9" />
                   <label htmlFor="chk-9">
-                    繰り返し行っている作業をSkillに切り出しているか
+                    サンドボックス・承認ポリシーを用途(初回調査/通常開発/CI)に応じて使い分けているか
                   </label>
                 </li>
                 <li>
                   <input type="checkbox" id="chk-10" />
                   <label htmlFor="chk-10">
-                    安定したワークフローだけをAutomationsに切り出しているか
+                    テスト・Lint・差分レビューをワークフローに組み込み、<code>/review</code>やAGENTS.md経由のレビュー観点を活用しているか
                   </label>
                 </li>
                 <li>
                   <input type="checkbox" id="chk-11" />
                   <label htmlFor="chk-11">
-                    並列作業ではgit worktreeでスレッドを分離しているか
+                    リポジトリ外のコンテキストが必要な場面でMCPを検討しているか(ただし繋ぎすぎに注意)
                   </label>
                 </li>
                 <li>
                   <input type="checkbox" id="chk-12" />
                   <label htmlFor="chk-12">
+                    繰り返し行っている作業をSkillに切り出しているか
+                  </label>
+                </li>
+                <li>
+                  <input type="checkbox" id="chk-13" />
+                  <label htmlFor="chk-13">
+                    安定したワークフローだけをAutomationsに切り出しているか
+                  </label>
+                </li>
+                <li>
+                  <input type="checkbox" id="chk-14" />
+                  <label htmlFor="chk-14">
+                    並列作業ではgit worktreeでスレッドを分離しているか
+                  </label>
+                </li>
+                <li>
+                  <input type="checkbox" id="chk-15" />
+                  <label htmlFor="chk-15">
                     CI/CDでは公式Actionや<code>codex exec</code>を使い、APIキーをジョブ全体に晒していないか
                   </label>
                 </li>

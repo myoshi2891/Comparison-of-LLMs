@@ -518,11 +518,14 @@ export default function CodexAgentPage() {
               <tr>
                 <td>サブエージェント</td>
                 <td>
-                  <code>agents.&lt;name&gt;.config_file</code>, <code>agents.max_depth</code>,{" "}
-                  <code>agents.max_threads</code>, <code>features.multi_agent</code>
+                  <code>agents.&lt;name&gt;.config_file</code>,{" "}
+                  <code>agents.max_concurrent_threads_per_session</code>,{" "}
+                  <code>agents.max_threads</code>, <code>agents.max_depth</code>
                 </td>
                 <td>
-                  カスタムエージェント定義への参照、再帰の深さ・並列数の上限、マルチエージェント機能全体のオン/オフ
+                  カスタムエージェント定義への参照と並列数の上限。<code>agents.max_threads</code>
+                  はレガシー別名。<code>agents.max_depth</code>
+                  はV1実装でのみ有効で、MultiAgentV2では無視される
                 </td>
               </tr>
               <tr>
@@ -615,10 +618,8 @@ export default function CodexAgentPage() {
               <span className={styles.ch}>[agents]</span>
             </div>
             <div className={styles.codeLine}>
-              <span className={styles.ck}>max_depth</span> = <span className={styles.cv}>2</span>
-            </div>
-            <div className={styles.codeLine}>
-              <span className={styles.ck}>max_threads</span> = <span className={styles.cv}>4</span>
+              <span className={styles.ck}>max_concurrent_threads_per_session</span> ={" "}
+              <span className={styles.cv}>4</span>
             </div>
             <div className={styles.codeLine}> </div>
             <div className={styles.codeLine}>
@@ -847,10 +848,12 @@ export default function CodexAgentPage() {
           </table>
         </div>
         <p>
-          <code>config.toml</code> 側では <code>agents.max_depth</code>
-          (何段まで入れ子でサブエージェントを起動できるか)と <code>agents.max_threads</code>
-          (同時並列数)で暴走を防ぎます。トリガーは特別なコマンドではなく自然言語で構いません。「レビュー観点ごとにエージェントを1つずつ立ち上げて、すべて完了したら結果をまとめて」と指示するだけで、Codex
-          が複数スレッドを開いて集約します。
+          <code>config.toml</code> 側では現行キーの{" "}
+          <code>agents.max_concurrent_threads_per_session</code>(レガシー別名{" "}
+          <code>agents.max_threads</code>)で同時並列数を制限します。<code>agents.max_depth</code>
+          はCodex CLIのV1実装でのみ有効で、現行のMultiAgentV2では無視されます(
+          <Ext href="https://github.com/openai/codex/pull/20180">Codex PR #20180</Ext>
+          )。トリガーは特別なコマンドではなく自然言語で構いません。「レビュー観点ごとにエージェントを1つずつ立ち上げて、すべて完了したら結果をまとめて」と指示するだけで、Codexが複数スレッドを開いて集約します。
         </p>
         <p>
           <code>~/.codex/agents/security-reviewer.toml</code> の例:
@@ -1167,8 +1170,9 @@ export default function CodexAgentPage() {
           <li>
             <input type="checkbox" readOnly id="check-7" />
             <label htmlFor="check-7">
-              サブエージェントの並列度(<code>agents.max_threads</code>)と再帰深さ(
-              <code>agents.max_depth</code>)に上限を設定しているか
+              サブエージェントの並列度に現行キー
+              <code>agents.max_concurrent_threads_per_session</code>を使用し、
+              <code>agents.max_depth</code>がV1限定・MultiAgentV2では無視されることを確認したか
             </label>
           </li>
           <li>
@@ -1236,11 +1240,9 @@ export default function CodexAgentPage() {
               </tr>
               <tr>
                 <td>サブエージェントがコストを消費しすぎる</td>
+                <td>並列度の上限が未設定、またはモデル選定が一律で高コストなものになっている</td>
                 <td>
-                  並列度・再帰深さの上限が未設定、またはモデル選定が一律で高コストなものになっている
-                </td>
-                <td>
-                  <code>agents.max_threads</code>/<code>agents.max_depth</code>{" "}
+                  <code>agents.max_concurrent_threads_per_session</code>
                   を設定し、探索系タスクには軽量なモデルを割り当てる
                 </td>
               </tr>
