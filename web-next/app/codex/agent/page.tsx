@@ -516,16 +516,30 @@ export default function CodexAgentPage() {
                 <td>ドメイン単位の allow/deny を伴うネットワークプロキシ機能</td>
               </tr>
               <tr>
-                <td>サブエージェント</td>
+                <td>サブエージェント(V1)</td>
                 <td>
                   <code>agents.&lt;name&gt;.config_file</code>,{" "}
                   <code>agents.max_concurrent_threads_per_session</code>,{" "}
                   <code>agents.max_threads</code>, <code>agents.max_depth</code>
                 </td>
                 <td>
-                  カスタムエージェント定義への参照と並列数の上限。<code>agents.max_threads</code>
-                  はレガシー別名。<code>agents.max_depth</code>
-                  はV1実装でのみ有効で、MultiAgentV2では無視される
+                  カスタムエージェント定義への参照。
+                  <code>agents.max_concurrent_threads_per_session</code>
+                  は親スレッドを除くサブエージェント同時実行上限で、<code>agents.max_threads</code>
+                  は別名。<code>agents.max_depth</code>はV1の実行時深さ制限
+                </td>
+              </tr>
+              <tr>
+                <td>サブエージェント(V2)</td>
+                <td>
+                  <code>features.multi_agent_v2.max_concurrent_threads_per_session</code>,{" "}
+                  <code>agents.max_depth</code>
+                </td>
+                <td>
+                  上限は主スレッドを含むため、サブエージェント実効上限は設定値−1。
+                  MultiAgentV2有効時の<code>agents.max_threads</code>は設定エラー。
+                  <code>agents.max_depth</code>
+                  はV1の実行時深さ制限としては適用されないが、lineageとtask-pathの深さ計算に使用
                 </td>
               </tr>
               <tr>
@@ -618,6 +632,9 @@ export default function CodexAgentPage() {
               <span className={styles.ch}>[agents]</span>
             </div>
             <div className={styles.codeLine}>
+              <span className={styles.cc}># V1: 親スレッドを除くサブエージェント上限</span>
+            </div>
+            <div className={styles.codeLine}>
               <span className={styles.ck}>max_concurrent_threads_per_session</span> ={" "}
               <span className={styles.cv}>4</span>
             </div>
@@ -628,6 +645,19 @@ export default function CodexAgentPage() {
             <div className={styles.codeLine}>
               <span className={styles.ck}>config_file</span> ={" "}
               <span className={styles.cs}>&quot;~/.codex/agents/security-reviewer.toml&quot;</span>
+            </div>
+            <div className={styles.codeLine}> </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ch}>[features.multi_agent_v2]</span>
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.cc}>
+                # V2: 主スレッドを含むため、4ならサブエージェントは最大3
+              </span>
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>max_concurrent_threads_per_session</span> ={" "}
+              <span className={styles.cv}>4</span>
             </div>
             <div className={styles.codeLine}> </div>
             <div className={styles.codeLine}>
@@ -848,10 +878,15 @@ export default function CodexAgentPage() {
           </table>
         </div>
         <p>
-          <code>config.toml</code> 側では現行キーの{" "}
-          <code>agents.max_concurrent_threads_per_session</code>(レガシー別名{" "}
-          <code>agents.max_threads</code>)で同時並列数を制限します。<code>agents.max_depth</code>
-          はCodex CLIのV1実装でのみ有効で、現行のMultiAgentV2では無視されます(
+          V1では<code>agents.max_concurrent_threads_per_session</code>(
+          <code>agents.max_threads</code>
+          は別名)で、親スレッドを除くサブエージェント同時実行上限を設定します。MultiAgentV2では
+          <code>features.multi_agent_v2.max_concurrent_threads_per_session</code>
+          で主スレッドを含む上限を設定するため、
+          サブエージェント実効上限は設定値−1です。MultiAgentV2有効時の
+          <code>agents.max_threads</code>
+          は設定エラーになります。<code>agents.max_depth</code>
+          はV1の実行時深さ制限としては適用されませんが、MultiAgentV2でもlineageとtask-pathの深さ計算に使用されます(
           <Ext href="https://github.com/openai/codex/pull/20180">Codex PR #20180</Ext>
           )。トリガーは特別なコマンドではなく自然言語で構いません。「レビュー観点ごとにエージェントを1つずつ立ち上げて、すべて完了したら結果をまとめて」と指示するだけで、Codexが複数スレッドを開いて集約します。
         </p>
@@ -1170,9 +1205,13 @@ export default function CodexAgentPage() {
           <li>
             <input type="checkbox" readOnly id="check-7" />
             <label htmlFor="check-7">
-              サブエージェントの並列度に現行キー
-              <code>agents.max_concurrent_threads_per_session</code>を使用し、
-              <code>agents.max_depth</code>がV1限定・MultiAgentV2では無視されることを確認したか
+              V1とMultiAgentV2で設定キーと上限の数え方を分離し、V1の
+              <code>agents.max_concurrent_threads_per_session</code>は親スレッドを除外、V2の
+              <code>features.multi_agent_v2.max_concurrent_threads_per_session</code>
+              は主スレッド込みで実効上限が設定値−1になること、V2で
+              <code>agents.max_threads</code>が設定エラーになることを確認したか。
+              <code>agents.max_depth</code>
+              はV1の実行時深さ制限としては適用されないが、lineageとtask-pathの深さ計算に使用される
             </label>
           </li>
           <li>
@@ -1240,10 +1279,14 @@ export default function CodexAgentPage() {
               </tr>
               <tr>
                 <td>サブエージェントがコストを消費しすぎる</td>
-                <td>並列度の上限が未設定、またはモデル選定が一律で高コストなものになっている</td>
                 <td>
-                  <code>agents.max_concurrent_threads_per_session</code>
-                  を設定し、探索系タスクには軽量なモデルを割り当てる
+                  V1またはV2の並列度上限が未設定、V2で<code>agents.max_threads</code>
+                  を使用して設定エラーになっている、またはモデル選定が一律で高コストなものになっている
+                </td>
+                <td>
+                  V1は<code>agents.max_concurrent_threads_per_session</code>
+                  、V2は<code>features.multi_agent_v2.max_concurrent_threads_per_session</code>
+                  を設定する。V2は主スレッド込みのためサブエージェント実効上限を設定値−1として見積もり、探索系タスクには軽量なモデルを割り当てる
                 </td>
               </tr>
             </tbody>
