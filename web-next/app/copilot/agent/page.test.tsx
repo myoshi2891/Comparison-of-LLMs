@@ -78,7 +78,9 @@ describe("/copilot/agent - page structure", () => {
 
   it("renders 6 Mermaid diagrams within wrappers", () => {
     const { container } = render(<Page />);
-    const diagrams = container.querySelectorAll("[data-testid='mermaid-diagram'], .mermaid-wrapper, [data-mermaid]");
+    const diagrams = container.querySelectorAll(
+      "[data-testid='mermaid-diagram'], .mermaid-wrapper, [data-mermaid]"
+    );
     expect(diagrams.length).toBe(6);
   });
 

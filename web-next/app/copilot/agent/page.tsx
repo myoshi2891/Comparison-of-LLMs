@@ -1,3548 +1,2606 @@
 import type { Metadata } from "next";
-import type { ReactNode } from "react";
+import MermaidDiagram from "@/components/docs/MermaidDiagram";
 import styles from "./page.module.css";
+import { TocObserver } from "./TocObserver";
 
 export const metadata: Metadata = {
-  title: "GitHub Copilot コーディングエージェント開発ガイド | LLM コスト計算機",
+  title:
+    "GitHub Copilot .agent.md 実践ガイド ― Custom Agents / Handoffs / Subagents / MCP / マルチエージェント設計",
   description:
-    "GitHub Copilot .agent.md の完全ベストプラクティスガイド。フロントマター全仕様・ステップバイステップ作成・Handoffs（エージェント連鎖）・Subagents（サブエージェント）・MCP統合・マルチエージェント設計パターン・トラブルシューティングを 2026年6月最新版の公式ドキュメント準拠で解説。Cloud agent GA・組織/エンタープライズエージェント（JetBrains）・Copilot code review の AGENTS.md 対応に対応。",
+    "GitHub Copilot .agent.md の完全ベストプラクティスガイド。フロントマター全仕様、ステップバイステップ作成、Handoffs、Subagents、MCP統合、マルチエージェント設計パターン、トラブルシューティングを解説。",
 };
 
-type Source = {
-  icon: string;
-  title: string;
-  href: string;
-  url: string;
-  desc: string;
-};
-
-const TOC_ITEMS = [
-  { id: "s01", label: "1. 全体アーキテクチャと各ファイルの位置づけ" },
-  { id: "s02", label: "2. .github/copilot-instructions.md" },
-  { id: "s03", label: "3. .github/instructions/*.instructions.md" },
-  { id: "s04", label: "4. .github/agents/*.agent.md" },
-  { id: "s05", label: "4-1. 配置場所（スコープ別）" },
-  { id: "s06", label: "4-2. フロントマター完全仕様" },
-  { id: "s07", label: "4-3. ステップバイステップ作成ガイド" },
-  { id: "s08", label: "4-4. Handoffs" },
-  { id: "s09", label: "4-5. Subagents" },
-  { id: "s10", label: "4-6. MCP統合" },
-  { id: "s11", label: "4-7. 実践テンプレート集" },
-  { id: "s12", label: "4-8. .agent.md ベストプラクティス 12則" },
-  { id: "s13", label: "4-9. トラブルシューティング / 4-10. Good & Anti Patterns" },
-  { id: "s14", label: "5. .github/skills/*/SKILL.md" },
-  { id: "s15", label: "6. *.prompt.md / *.chatmode.md" },
-  { id: "s16", label: "7. AGENTS.md" },
-  { id: "s17", label: "8. ファイル選択の意思決定ツリー" },
-  { id: "s18", label: "9. 絶対に避けるべき Anti-Patterns" },
-  { id: "s19", label: "10. まとめ" },
-  { id: "sources", label: "📚 参考ソース" },
-] as const;
-
-function Ext({ href, children }: { href: string; children: ReactNode }) {
-  return (
-    <a href={href} target="_blank" rel="noopener noreferrer">
-      {children}
-    </a>
-  );
-}
-
-const SOURCES: Source[] = [
-  {
-    icon: "🐙",
-    title: "GitHub Docs: About custom agents（概念・スコープ）",
-    href: "https://docs.github.com/en/copilot/concepts/agents/cloud-agent/about-custom-agents",
-    url: "docs.github.com/en/copilot/concepts/agents/cloud-agent/about-custom-agents",
-    desc: "カスタムエージェントの概念・リポジトリ/ユーザー/組織レベル配置・対応IDE（VS Code・JetBrains・Eclipse・Xcode）",
-  },
-  {
-    icon: "🛠️",
-    title: "GitHub Docs: Creating custom agents（作成手順・IDE別）",
-    href: "https://docs.github.com/en/copilot/how-tos/use-copilot-agents/cloud-agent/create-custom-agents",
-    url: "docs.github.com/en/copilot/how-tos/use-copilot-agents/cloud-agent/create-custom-agents",
-    desc: "VS Code・JetBrains・Eclipse・Xcodeでの作成手順。Customize Agentボタン・handoffs設定・プロンプト最大30,000文字",
-  },
-  {
-    icon: "📋",
-    title: "GitHub Docs: Custom agents configuration（フロントマター完全仕様）",
-    href: "https://docs.github.com/en/copilot/reference/custom-agents-configuration",
-    url: "docs.github.com/en/copilot/reference/custom-agents-configuration",
-    desc: `全YAMLフィールド仕様。mcp-serversのtype（local/http/sse）。シークレット構文（\${{secrets.*}} / \${VAR:-default}）。`,
-  },
-  {
-    icon: "💻",
-    title: "VS Code Docs: Custom agents in VS Code（handoffs・subagents）",
-    href: "https://code.visualstudio.com/docs/copilot/customization/custom-agents",
-    url: "code.visualstudio.com/docs/copilot/customization/custom-agents",
-    desc: "handoffsの全プロパティ（label/agent/prompt/send）。model配列フォールバック。agents[]ホワイトリスト。chat.agentFilesLocations設定。2026年3月6日更新",
-  },
-  {
-    icon: "🔀",
-    title: "VS Code Docs: Subagents in VS Code（並列実行・コンテキスト分離）",
-    href: "https://code.visualstudio.com/docs/copilot/agents/subagents",
-    url: "code.visualstudio.com/docs/copilot/agents/subagents",
-    desc: "Subagentsの概念（独立コンテキスト・並列実行）。tools:['agent']の必須設定。agents[]によるホワイトリスト制限。並列コードレビューパターン例",
-  },
-  {
-    icon: "🔌",
-    title: "GitHub Docs: Extend coding agent with MCP（mcp-servers設定）",
-    href: "https://docs.github.com/en/copilot/how-tos/use-copilot-agents/cloud-agent/extend-coding-agent-with-mcp",
-    url: "docs.github.com/en/copilot/how-tos/use-copilot-agents/cloud-agent/extend-coding-agent-with-mcp",
-    desc: "MCPサーバー設定JSON/YAML仕様。ビルトインサーバー（github/azure/cloudflare）。シークレット管理（copilot環境）。OAuth認証未対応の明記",
-  },
-  {
-    icon: "📝",
-    title: "GitHub Blog: How to write great agents.md（2,500リポジトリ分析）",
-    href: "https://github.blog/ai-and-ml/github-copilot/how-to-write-a-great-agents-md-lessons-from-over-2500-repositories/",
-    url: "github.blog/…/how-to-write-a-great-agents-md-lessons-from-over-2500-repositories/",
-    desc: "2,500リポジトリ分析。descriptionの明確さと誤呼び出し率の相関。ベストプラクティステンプレート集",
-  },
-  {
-    icon: "⭐",
-    title: "awesome-copilot: agents.instructions.md（handoffs仕様・テンプレート集）",
-    href: "https://github.com/github/awesome-copilot/blob/main/instructions/agents.instructions.md",
-    url: "github.com/github/awesome-copilot/blob/main/instructions/agents.instructions.md",
-    desc: "handoffs全フィールド（label/agent/prompt/send）詳細。コンテキスト引き継ぎ。手動vs自動送信の使い分け。Planning→Implementation→Review連鎖例",
-  },
-  {
-    icon: "📖",
-    title: "VS Code Docs: Using agents overview（Local/CLI/Cloud/Third-party）",
-    href: "https://code.visualstudio.com/docs/copilot/agents/overview",
-    url: "code.visualstudio.com/docs/copilot/agents/overview",
-    desc: "エージェントの4カテゴリ（Local/CLI/Cloud/Third-party）。エージェント間ハンドオフ（セッション引き継ぎ）。/delegateコマンド。hooks統合",
-  },
-  {
-    icon: "🎓",
-    title: "Microsoft Learn: Configure Copilot & Create Custom Agents（ハンズオン）",
-    href: "https://learn.microsoft.com/en-us/training/modules/configure-customize-github-copilot-visual-studio-code/",
-    url: "learn.microsoft.com/en-us/training/modules/configure-customize-github-copilot-visual-studio-code/",
-    desc: "Copilot設定・カスタムエージェント作成・handoffsでのマルチエージェントワークフロー実装のハンズオントレーニング",
-  },
-  {
-    icon: "🏗️",
-    title: "Utkarsh Shigihalli: Mastering Copilot Customisation（実践ガイド）",
-    href: "https://onlyutkarsh.com/posts/2026/github-copilot-customization/",
-    url: "onlyutkarsh.com/posts/2026/github-copilot-customization/",
-    desc: "model配列フォールバック。Planning→Development連鎖の実装例。Instructions・Prompts・Agents・Skillsの使い分け実践解説（2026年1月）",
-  },
-  {
-    icon: "🔍",
-    title: "DeepWiki: awesome-copilot Agent Architecture（検証パイプライン）",
-    href: "https://deepwiki.com/github/awesome-copilot/2.1-agent-architecture-and-definition",
-    url: "deepwiki.com/github/awesome-copilot/2.1-agent-architecture-and-definition",
-    desc: "agent.mdのパース・バリデーション仕様。必須フィールド（description 1-500文字）。MCP設定パターン（http/local/sse）。ネーミング規約",
-  },
-  {
-    icon: "🎯",
-    title: "DEV Community: Copilot Instructions vs Agents vs Skills（比較ガイド）",
-    href: "https://dev.to/pwd9000/github-copilot-instructions-vs-prompts-vs-custom-agents-vs-skills-vs-x-vs-why-339l",
-    url: "dev.to/pwd9000/github-copilot-instructions-vs-prompts-vs-custom-agents-vs-skills-vs-x-vs-why-339l",
-    desc: "Instructions/Prompts/Agents/Skills/MCP/Hooksの選択フローチャート。Handoffsとサブエージェントの実践使い分け。組織レベル共有の解説（2026年3月）",
-  },
-  {
-    icon: "🔔",
-    title: "GitHub Changelog: Copilot CLI GA（Feb 2026）",
-    href: "https://github.blog/changelog/2026-02-25-github-copilot-cli-is-now-generally-available/",
-    url: "github.blog/changelog/2026-02-25-github-copilot-cli-is-now-generally-available/",
-    desc: "Copilot CLI GA・Skills / Custom Agents / Hooks / /diffコマンドの正式リリース。カスタムエージェントのCLI対応が確定",
-  },
-  {
-    icon: "🏢",
-    title: "Microsoft Learn: Visual Studio Custom Agents（Visual Studio 2026）",
-    href: "https://learn.microsoft.com/en-us/visualstudio/ide/copilot-specialized-agents?view=visualstudio",
-    url: "learn.microsoft.com/en-us/visualstudio/ide/copilot-specialized-agents",
-    desc: "Visual Studio 2026 v18.4+でのカスタムエージェント設定。@debugger/@profiler/@testなどビルトインエージェント。MCP連携でext knowledge source接続",
-  },
-  {
-    icon: "📢",
-    title:
-      "GitHub Changelog: Gemini latest model (2026) is generally available for GitHub Copilot (May 2026)",
-    href: "https://github.blog/changelog/2026-05-19-gemini-3.5-flash-is-generally-available-for-github-copilot/",
-    url: "github.blog/changelog/2026-05-19-gemini-3.5-flash-is-generally-available-for-github-copilot/",
-    desc: "Geminiの最新モデル（2026）がGitHub Copilotで一般提供開始。より高速かつ高精度なレスポンスが利用可能に",
-  },
-  {
-    icon: "🤖",
-    title:
-      "GitHub Changelog: Auto model (latest 2026) selection routes based on task in VS Code (May 2026)",
-    href: "https://github.blog/changelog/2026-05-20-auto-model-selection-now-routes-based-on-your-task-in-vs-code/",
-    url: "github.blog/changelog/2026-05-20-auto-model-selection-now-routes-based-on-your-task-in-vs-code/",
-    desc: "タスクの難易度やツール使用の有無に基づき、最適な最新モデル（2026）を自動的に選択・ルーティングする機能がVS Code向けにGA",
-  },
-];
-
-/**
- * Renders the single-page UI for the GitHub Copilot .agent.md best-practices guide.
- *
- * @returns The React element that renders the complete Copilot Agent guidance page
- */
 export default function CopilotAgentPage() {
   return (
-    <div className={styles.root}>
-      <div className={styles.wrap}>
-        {/* Hero */}
-        <div className={styles.hero}>
-          <div className={styles.heroBadge}>🐙 GitHub Copilot 完全ガイド 2026年6月版</div>
-          <h1>
-            GitHub Copilot <em>.agent.md</em> 完全
-            <br />
-            ベストプラクティスガイド
-          </h1>
-          <p>
-            フロントマター全仕様 / ステップバイステップ作成 / Handoffs（エージェント連鎖） /
-            Subagents（サブエージェント） / MCP統合 / マルチエージェント設計パターン /
-            トラブルシューティング ——
-            2026年6月版の公式ドキュメント準拠で初学者から上級者まで対応した決定版ガイド。
-          </p>
-          <div className={styles.heroChips}>
-            <span className={styles.heroChip}>フロントマター完全仕様</span>
-            <span className={styles.heroChip}>Handoffs（ハンドオフ）</span>
-            <span className={styles.heroChip}>Subagents（サブエージェント）</span>
-            <span className={styles.heroChip}>MCP mcp-servers設定</span>
-            <span className={styles.heroChip}>マルチエージェントパターン</span>
-            <span className={styles.heroChip}>7ステップ作成ガイド</span>
-            <span className={styles.heroChip}>ベストプラクティス12則</span>
-            <span className={styles.heroChip}>トラブルシューティング</span>
-          </div>
-        </div>
+    <div className={styles.layout}>
+      <button
+        type="button"
+        id="sidebarToggle"
+        className={styles.sidebarToggle}
+        aria-expanded="false"
+        aria-label="目次を開く"
+      >
+        <svg
+          aria-hidden="true"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <line x1="3" y1="12" x2="21" y2="12" />
+          <line x1="3" y1="6" x2="21" y2="6" />
+          <line x1="3" y1="18" x2="21" y2="18" />
+        </svg>
+      </button>
 
-        {/* TOC（合成 — legacy HTML に存在しないため移行時に追加）*/}
-        <nav className={styles.toc}>
-          <div className={styles.tocTitle}>目次</div>
-          {TOC_ITEMS.map((item) => (
-            <a key={item.id} href={`#${item.id}`}>
-              {item.label}
-            </a>
-          ))}
+      <aside className={styles.sidebar} id="sidebar">
+        <span className={styles.brand}>.agent.md 実践ガイド</span>
+        <span className={styles.brandSub}>GitHub Copilot Custom Agents</span>
+        <nav>
+          <ul>
+            <li>
+              <a className={styles.navLink} href="#overview">
+                1. .agent.md とは何か
+              </a>
+            </li>
+            <li>
+              <a className={styles.navLink} href="#frontmatter">
+                2. フロントマター全仕様
+              </a>
+            </li>
+            <li>
+              <a className={styles.navLink} href="#stepbystep">
+                3. ステップバイステップ作成
+              </a>
+            </li>
+            <li>
+              <a className={styles.navLink} href="#handoffs">
+                4. Handoffs(エージェント連鎖)
+              </a>
+            </li>
+            <li>
+              <a className={styles.navLink} href="#subagents">
+                5. Subagents(サブエージェント)
+              </a>
+            </li>
+            <li>
+              <a className={styles.navLink} href="#mcp">
+                6. MCP統合
+              </a>
+            </li>
+            <li>
+              <a className={styles.navLink} href="#patterns">
+                7. マルチエージェント設計
+              </a>
+            </li>
+            <li>
+              <a className={styles.navLink} href="#troubleshooting">
+                8. トラブルシューティング
+              </a>
+            </li>
+            <li>
+              <a className={styles.navLink} href="#bestpractices">
+                9. ベストプラクティス総まとめ
+              </a>
+            </li>
+            <li>
+              <a className={styles.navLink} href="#references">
+                10. 参考文献
+              </a>
+            </li>
+          </ul>
         </nav>
+        <div className={styles.updated}>最終更新: 2026年7月31日時点の公開情報に基づく</div>
+      </aside>
 
-        {/* Sections — faithful content filled in per-section commits */}
-        <section id="s01" className={styles.sec}>
-          <div className={styles.secHead}>
-            <span className={styles.secNum}>1</span>
-            <h2>全体アーキテクチャと各ファイルの位置づけ</h2>
-          </div>
-          <div className={styles.card}>
+      <main className={styles.content}>
+        <header className={styles.hero}>
+          <span className={styles.eyebrow}>
+            GitHub Copilot / VS Code / Copilot CLI / Cloud Agent
+          </span>
+          <h1>
+            .agent.md 実践ガイド
+            <br />
+            Custom Agents・Handoffs・Subagents・MCP・マルチエージェント設計
+          </h1>
+          <p className={styles.subtitle}>
+            中級者から上級者向けに、フロントマター全仕様からトラブルシューティングまでをステップバイステップで解説します。図解はすべてMermaid、表はすべてMarkdown/HTMLテーブルで構成し、ASCIIアートは使用していません。
+          </p>
+          <p className={styles.meta}>
+            対象読者: VS Code / Copilot CLI / GitHub.com Cloud Agent で <code>.agent.md</code>{" "}
+            によるカスタムエージェントをすでに触ったことがあり、Handoffs・Subagents・MCP統合・マルチエージェント設計まで踏み込みたい方。
+          </p>
+        </header>
+
+        {/* 1. Overview */}
+        <section className={styles.section} id="overview">
+          <div className={styles.sectionNumber}>SECTION 1</div>
+          <h2>1. .agent.md とは何か</h2>
+          <div className={styles.prose}>
             <p>
-              GitHub Copilot は他のツールと比較して
-              <strong>最も多様なMarkdownファイル体系</strong>
-              を持ちます。「常時ロード型」「パスマッチ型」「オンデマンド型」「エージェント定義型」の4カテゴリが存在し、それぞれ役割が明確に分かれています。さらに{" "}
-              <strong>AGENTS.md</strong> によって Claude Code・Gemini CLI・Codex
-              とのクロスツール互換性も確保されています。
-            </p>
-          </div>
-          <div className={styles.matrix}>
-            <div className={styles.matrixTitle}>
-              カスタム指示の読み込み優先度 — 組織 → リポジトリ → パス → スキル（後が優先）
-            </div>
-            <div className={styles.matrixRow}>
-              <div className={`${styles.mxBox} ${styles.mxOrg}`}>
-                🏢 Organization
-                <br />
-                <small>org-level instructions</small>
-              </div>
-              <span className={styles.mxArrow}>→</span>
-              <div className={`${styles.mxBox} ${styles.mxRepo}`}>
-                📁 Repository
-                <br />
-                <small>
-                  copilot-instructions.md
-                  <br />
-                  AGENTS.md
-                </small>
-              </div>
-              <span className={styles.mxArrow}>→</span>
-              <div className={`${styles.mxBox} ${styles.mxPath}`}>
-                📂 Path-specific
-                <br />
-                <small>
-                  *.instructions.md
-                  <br />
-                  (applyTo)
-                </small>
-              </div>
-              <span className={styles.mxArrow}>→</span>
-              <div className={`${styles.mxBox} ${styles.mxSkill}`}>
-                ⚡ On-demand
-                <br />
-                <small>
-                  SKILL.md
-                  <br />
-                  （遅延ロード）
-                </small>
-              </div>
-            </div>
-            <div className={styles.matrixNote}>
-              Coding Agent の優先度: <strong>リポジトリ指示 → 組織指示</strong>
-              （リポジトリが最優先）
-              <br />
-              <code>excludeAgent</code>{" "}
-              プロパティで指示ファイルを特定エージェントから除外可能（2025年11月〜）
-            </div>
-          </div>
-          <div className={styles.filetreeOuter}>
-            <div className={styles.filetreeBar}>
-              <span className={styles.fbDot} style={{ background: "#ff6057" }} />
-              <span className={styles.fbDot} style={{ background: "#ffbd2e" }} />
-              <span className={styles.fbDot} style={{ background: "#27c93f" }} />
-              <span
-                style={{
-                  marginLeft: "10px",
-                  color: "#8b949e",
-                  fontSize: "12px",
-                  fontFamily: "'Cascadia Code','Consolas',monospace",
-                }}
-              >
-                project-root/ — GitHub Copilot エコシステム ファイル構造
-              </span>
-            </div>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 1000 880"
-              width="100%"
-              style={{ display: "block" }}
-              fontFamily="'Cascadia Code','Consolas',monospace"
-              role="img"
-              aria-label="GitHub Copilot エコシステム ファイル構造ツリー図"
-            >
-              <title>GitHub Copilot エコシステム ファイル構造ツリー図</title>
-              <defs>
-                <linearGradient id="gh1" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" style={{ stopColor: "#1f883d" }} />
-                  <stop offset="100%" style={{ stopColor: "#3fb950" }} />
-                </linearGradient>
-                <linearGradient id="gh2" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" style={{ stopColor: "#0969da" }} />
-                  <stop offset="100%" style={{ stopColor: "#58a6ff" }} />
-                </linearGradient>
-                <linearGradient id="gh3" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" style={{ stopColor: "#8250df" }} />
-                  <stop offset="100%" style={{ stopColor: "#bc8cff" }} />
-                </linearGradient>
-                <linearGradient id="gh4" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" style={{ stopColor: "#bf8700" }} />
-                  <stop offset="100%" style={{ stopColor: "#d29922" }} />
-                </linearGradient>
-                <linearGradient id="gh5" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" style={{ stopColor: "#cf222e" }} />
-                  <stop offset="100%" style={{ stopColor: "#f85149" }} />
-                </linearGradient>
-                <linearGradient id="gh6" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" style={{ stopColor: "#0a7a5c" }} />
-                  <stop offset="100%" style={{ stopColor: "#2da672" }} />
-                </linearGradient>
-                <linearGradient id="gh7" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" style={{ stopColor: "#0078d4" }} />
-                  <stop offset="100%" style={{ stopColor: "#58a6ff" }} />
-                </linearGradient>
-              </defs>
-              <rect width="1000" height="880" fill="#0d1117" />
-              <rect
-                x="668"
-                y="16"
-                width="316"
-                height="304"
-                rx="10"
-                fill="#161b22"
-                stroke="#21262d"
-                strokeWidth="1"
-              />
-              <text
-                x="826"
-                y="38"
-                textAnchor="middle"
-                fill="#484f58"
-                fontSize="11"
-                letterSpacing="1.5"
-              >
-                LEGEND
-              </text>
-              <rect x="684" y="50" width="22" height="22" rx="5" fill="url(#gh1)" />
-              <text x="695" y="65" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
-                ①
-              </text>
-              <text x="714" y="65" fontSize="12" fill="#c9d1d9">
-                copilot-instructions.md（常時ロード）
-              </text>
-              <rect x="684" y="82" width="22" height="22" rx="5" fill="url(#gh2)" />
-              <text x="695" y="97" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
-                ②
-              </text>
-              <text x="714" y="97" fontSize="12" fill="#c9d1d9">
-                *.instructions.md（パスマッチ型）
-              </text>
-              <rect x="684" y="114" width="22" height="22" rx="5" fill="url(#gh3)" />
-              <text x="695" y="129" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
-                ③
-              </text>
-              <text x="714" y="129" fontSize="12" fill="#c9d1d9">
-                *.agent.md（エージェント定義）
-              </text>
-              <rect x="684" y="146" width="22" height="22" rx="5" fill="url(#gh4)" />
-              <text x="695" y="161" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
-                ④
-              </text>
-              <text x="714" y="161" fontSize="12" fill="#c9d1d9">
-                SKILL.md（遅延ロード型スキル）
-              </text>
-              <rect x="684" y="178" width="22" height="22" rx="5" fill="url(#gh5)" />
-              <text x="695" y="193" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
-                ⑤
-              </text>
-              <text x="714" y="193" fontSize="12" fill="#c9d1d9">
-                *.prompt.md（再利用可能プロンプト）
-              </text>
-              <rect x="684" y="210" width="22" height="22" rx="5" fill="url(#gh6)" />
-              <text x="695" y="225" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
-                ⑥
-              </text>
-              <text x="714" y="225" fontSize="12" fill="#c9d1d9">
-                *.chatmode.md（カスタムチャットモード）
-              </text>
-              <rect x="684" y="242" width="22" height="22" rx="5" fill="url(#gh7)" />
-              <text x="695" y="257" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
-                ⑦
-              </text>
-              <text x="714" y="257" fontSize="12" fill="#c9d1d9">
-                AGENTS.md（クロスツール共通）
-              </text>
-              <rect x="684" y="274" width="52" height="22" rx="5" fill="#1c2128" />
-              <text
-                x="710"
-                y="289"
-                textAnchor="middle"
-                fill="#6e7681"
-                fontSize="11"
-                fontWeight="700"
-              >
-                📁 DIR
-              </text>
-              <text x="744" y="289" fontSize="12" fill="#484f58">
-                ディレクトリ
-              </text>
-              <line x1="44" y1="50" x2="44" y2="846" stroke="#21262d" strokeWidth="1.5" />
-              <line x1="44" y1="52" x2="70" y2="52" stroke="#21262d" strokeWidth="1.5" />
-              <line x1="44" y1="100" x2="70" y2="100" stroke="#21262d" strokeWidth="1.5" />
-              <line x1="86" y1="100" x2="86" y2="670" stroke="#21262d" strokeWidth="1.5" />
-              <line x1="86" y1="132" x2="112" y2="132" stroke="#21262d" strokeWidth="1.5" />
-              <line x1="86" y1="170" x2="112" y2="170" stroke="#21262d" strokeWidth="1.5" />
-              <line x1="128" y1="170" x2="128" y2="238" stroke="#21262d" strokeWidth="1.5" />
-              <line x1="128" y1="202" x2="154" y2="202" stroke="#21262d" strokeWidth="1.5" />
-              <line x1="128" y1="236" x2="154" y2="236" stroke="#21262d" strokeWidth="1.5" />
-              <line x1="86" y1="278" x2="112" y2="278" stroke="#21262d" strokeWidth="1.5" />
-              <line x1="128" y1="278" x2="128" y2="384" stroke="#21262d" strokeWidth="1.5" />
-              <line x1="128" y1="310" x2="154" y2="310" stroke="#21262d" strokeWidth="1.5" />
-              <line x1="128" y1="348" x2="154" y2="348" stroke="#21262d" strokeWidth="1.5" />
-              <line x1="128" y1="386" x2="154" y2="386" stroke="#21262d" strokeWidth="1.5" />
-              <line x1="86" y1="428" x2="112" y2="428" stroke="#21262d" strokeWidth="1.5" />
-              <line x1="128" y1="428" x2="128" y2="502" stroke="#21262d" strokeWidth="1.5" />
-              <line x1="128" y1="460" x2="154" y2="460" stroke="#21262d" strokeWidth="1.5" />
-              <line x1="170" y1="460" x2="170" y2="500" stroke="#21262d" strokeWidth="1.5" />
-              <line x1="170" y1="498" x2="196" y2="498" stroke="#21262d" strokeWidth="1.5" />
-              <line x1="86" y1="548" x2="112" y2="548" stroke="#21262d" strokeWidth="1.5" />
-              <line x1="128" y1="548" x2="128" y2="584" stroke="#21262d" strokeWidth="1.5" />
-              <line x1="128" y1="582" x2="154" y2="582" stroke="#21262d" strokeWidth="1.5" />
-              <line x1="86" y1="626" x2="112" y2="626" stroke="#21262d" strokeWidth="1.5" />
-              <line x1="128" y1="626" x2="128" y2="660" stroke="#21262d" strokeWidth="1.5" />
-              <line x1="128" y1="658" x2="154" y2="658" stroke="#21262d" strokeWidth="1.5" />
-              <line x1="44" y1="718" x2="70" y2="718" stroke="#21262d" strokeWidth="1.5" />
-              <line x1="44" y1="846" x2="70" y2="846" stroke="#21262d" strokeWidth="1.5" />
-              <text x="20" y="30" fontSize="16" fill="#3fb950">
-                📁
-              </text>
-              <text x="42" y="30" fontSize="14" fontWeight="700" fill="#3fb950">
-                {"  project-root/"}
-              </text>
-              <text x="78" y="58" fontSize="14" fill="#7ee787">
-                📄
-              </text>
-              <text x="98" y="58" fontSize="13.5" fontWeight="700" fill="#7ee787">
-                AGENTS.md
-              </text>
-              <rect x="198" y="43" width="22" height="22" rx="5" fill="url(#gh7)" />
-              <text x="209" y="58" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
-                ⑦
-              </text>
-              <text x="228" y="58" fontSize="12" fill="#6e7681">
-                クロスツール共通指示（Claude / Gemini / Codex と共有）
-              </text>
-              <text x="228" y="74" fontSize="11" fill="#2d3a4a">
-                {"  ※ Coding Agent が CLAUDE.md / GEMINI.md も自動認識"}
-              </text>
-              <text x="78" y="106" fontSize="14" fill="#58a6ff">
-                📁
-              </text>
-              <text x="98" y="106" fontSize="14" fontWeight="700" fill="#58a6ff">
-                .github/
-              </text>
-              <text x="120" y="138" fontSize="14" fill="#7ee787">
-                📄
-              </text>
-              <text x="140" y="138" fontSize="13.5" fontWeight="700" fill="#7ee787">
-                copilot-instructions.md
-              </text>
-              <rect x="334" y="123" width="22" height="22" rx="5" fill="url(#gh1)" />
-              <text x="345" y="138" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
-                ①
-              </text>
-              <text x="364" y="138" fontSize="12" fill="#6e7681">
-                常時ロード：プロジェクト全体の共通指示
-              </text>
-              <text x="120" y="176" fontSize="14" fill="#58a6ff">
-                📂
-              </text>
-              <text x="140" y="176" fontSize="13.5" fontWeight="700" fill="#58a6ff">
-                instructions/
-              </text>
-              <text x="162" y="208" fontSize="13" fill="#79c0ff">
-                📄
-              </text>
-              <text x="182" y="208" fontSize="13" fill="#79c0ff">
-                frontend.instructions.md
-              </text>
-              <rect x="370" y="193" width="22" height="22" rx="5" fill="url(#gh2)" />
-              <text x="381" y="208" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
-                ②
-              </text>
-              <text x="400" y="208" fontSize="12" fill="#6e7681">
-                {'applyTo: "src/components/**" でパスマッチ'}
-              </text>
-              <text x="162" y="242" fontSize="13" fill="#79c0ff">
-                📄
-              </text>
-              <text x="182" y="242" fontSize="13" fill="#79c0ff">
-                testing.instructions.md
-              </text>
-              <rect x="356" y="227" width="22" height="22" rx="5" fill="url(#gh2)" opacity="0.8" />
-              <text x="367" y="242" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
-                ②
-              </text>
-              <text x="386" y="242" fontSize="12" fill="#6e7681">
-                {'applyTo: "**/*.test.*" / excludeAgent: "code-review"'}
-              </text>
-              <text x="120" y="284" fontSize="14" fill="#58a6ff">
-                📂
-              </text>
-              <text x="140" y="284" fontSize="13.5" fontWeight="700" fill="#58a6ff">
-                agents/
-              </text>
-              <text x="162" y="316" fontSize="13" fill="#bc8cff">
-                📝
-              </text>
-              <text x="182" y="316" fontSize="13" fill="#bc8cff">
-                test-agent.agent.md
-              </text>
-              <rect x="348" y="301" width="22" height="22" rx="5" fill="url(#gh3)" />
-              <text x="359" y="316" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
-                ③
-              </text>
-              <text x="378" y="316" fontSize="12" fill="#6e7681">
-                @test-agent として呼び出せるQAエージェント
-              </text>
-              <text x="162" y="354" fontSize="13" fill="#bc8cff">
-                📝
-              </text>
-              <text x="182" y="354" fontSize="13" fill="#bc8cff">
-                docs-agent.agent.md
-              </text>
-              <rect x="348" y="339" width="22" height="22" rx="5" fill="url(#gh3)" opacity="0.8" />
-              <text x="359" y="354" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
-                ③
-              </text>
-              <text x="378" y="354" fontSize="12" fill="#6e7681">
-                @docs-agent：ドキュメント生成専門
-              </text>
-              <text x="162" y="392" fontSize="13" fill="#bc8cff">
-                📝
-              </text>
-              <text x="182" y="392" fontSize="13" fill="#bc8cff">
-                security-agent.agent.md
-              </text>
-              <rect x="360" y="377" width="22" height="22" rx="5" fill="url(#gh3)" opacity="0.7" />
-              <text x="371" y="392" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
-                ③
-              </text>
-              <text x="390" y="392" fontSize="12" fill="#6e7681">
-                @security-agent：セキュリティ監査専門
-              </text>
-              <text x="120" y="434" fontSize="14" fill="#58a6ff">
-                📂
-              </text>
-              <text x="140" y="434" fontSize="13.5" fontWeight="700" fill="#58a6ff">
-                skills/
-              </text>
-              <text x="220" y="434" fontSize="12" fill="#2d3a4a">
-                {"  ← anthropics/skills と共通フォーマット"}
-              </text>
-              <text x="162" y="466" fontSize="13" fill="#58a6ff">
-                📂
-              </text>
-              <text x="182" y="466" fontSize="13" fontWeight="700" fill="#58a6ff">
-                webapp-testing/
-              </text>
-              <text x="204" y="504" fontSize="13" fill="#d29922">
-                📝
-              </text>
-              <text x="224" y="504" fontSize="13" fill="#d29922">
-                SKILL.md
-              </text>
-              <rect x="304" y="489" width="22" height="22" rx="5" fill="url(#gh4)" />
-              <text x="315" y="504" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
-                ④
-              </text>
-              <text x="334" y="504" fontSize="12" fill="#6e7681">
-                遅延ロード：Playwright テストスキル（マッチ時のみ）
-              </text>
-              <text x="120" y="554" fontSize="14" fill="#58a6ff">
-                📂
-              </text>
-              <text x="140" y="554" fontSize="13.5" fontWeight="700" fill="#58a6ff">
-                prompts/
-              </text>
-              <text x="162" y="588" fontSize="13" fill="#f85149">
-                📄
-              </text>
-              <text x="182" y="588" fontSize="13" fill="#f85149">
-                my-pull-requests.prompt.md
-              </text>
-              <rect x="390" y="573" width="22" height="22" rx="5" fill="url(#gh5)" />
-              <text x="401" y="588" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
-                ⑤
-              </text>
-              <text x="420" y="588" fontSize="12" fill="#6e7681">
-                再利用プロンプト（/my-pull-requests で実行）
-              </text>
-              <text x="120" y="632" fontSize="14" fill="#58a6ff">
-                📂
-              </text>
-              <text x="140" y="632" fontSize="13.5" fontWeight="700" fill="#58a6ff">
-                chatmodes/
-              </text>
-              <text x="162" y="664" fontSize="13" fill="#2da672">
-                📄
-              </text>
-              <text x="182" y="664" fontSize="13" fill="#2da672">
-                databaseadmin.chatmode.md
-              </text>
-              <rect x="386" y="649" width="22" height="22" rx="5" fill="url(#gh6)" />
-              <text x="397" y="664" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
-                ⑥
-              </text>
-              <text x="416" y="664" fontSize="12" fill="#6e7681">
-                DBA ペルソナ（ツール + 指示セット）
-              </text>
-              <text x="78" y="724" fontSize="14" fill="#7ee787">
-                📄
-              </text>
-              <text x="98" y="724" fontSize="13.5" fontWeight="700" fill="#58a6ff">
-                .github/copilot-instructions.md
-              </text>
-              <rect x="302" y="709" width="22" height="22" rx="5" fill="url(#gh1)" opacity="0.75" />
-              <text x="313" y="724" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
-                ①
-              </text>
-              <text x="332" y="724" fontSize="12" fill="#6e7681">
-                （ルートの .github/ 内に配置）
-              </text>
-              <line x1="44" y1="760" x2="70" y2="760" stroke="#21262d" strokeWidth="1.5" />
-              <text x="78" y="766" fontSize="14" fill="#58a6ff">
-                📁
-              </text>
-              <text x="98" y="766" fontSize="14" fontWeight="700" fill="#58a6ff">
-                src/
-              </text>
-              <line x1="86" y1="766" x2="86" y2="802" stroke="#21262d" strokeWidth="1.5" />
-              <line x1="86" y1="800" x2="112" y2="800" stroke="#21262d" strokeWidth="1.5" />
-              <text x="120" y="806" fontSize="13" fill="#58a6ff">
-                📂
-              </text>
-              <text x="140" y="806" fontSize="13" fontWeight="700" fill="#58a6ff">
-                components/
-              </text>
-              <text x="240" y="806" fontSize="12" fill="#2d3a4a">
-                {"  ← frontend.instructions.md の applyTo 対象"}
-              </text>
-              <text x="78" y="852" fontSize="14" fill="#58a6ff">
-                📘
-              </text>
-              <text x="98" y="852" fontSize="14" fontWeight="700" fill="#2da672">
-                README.md
-              </text>
-              <rect x="204" y="837" width="22" height="22" rx="5" fill="url(#gh6)" />
-              <text x="215" y="852" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
-                ⑥
-              </text>
-              <text x="234" y="852" fontSize="12" fill="#6e7681">
-                人間向け：エージェント構成・セットアップ手順
-              </text>
-            </svg>
-          </div>
-        </section>
-        <section id="s02" className={styles.sec}>
-          <div className={styles.secHead}>
-            <span className={styles.secNum}>2</span>
-            <h2>
-              <span className={styles.mono}>.github/copilot-instructions.md</span>
-              {" — 常時ロード型グローバル指示"}
-            </h2>
-          </div>
-          <div className={`${styles.alert} ${styles.ai}`}>
-            <span className={styles.alertIcon}>ℹ️</span>
-            <div className={styles.alertBody}>
-              <strong>
-                必ず <code>.github/</code> 直下に配置する
-              </strong>
-              <code>copilot-instructions.md</code> はワークスペースルートの <code>.github/</code>{" "}
-              フォルダ内に置く必要があります。他の場所に置いても読み込まれません。この1ファイルが
-              Chat・Agent Mode・Code Review・Copilot Coding Agent のすべてで常時ロードされます。
-            </div>
-          </div>
-          <div className={styles.card}>
-            <div className={styles.cardTitle}>
-              📋 copilot-instructions.md に書くべきこと / 書かないべきこと
-            </div>
-            <div className={styles.patGrid}>
-              <div className={`${styles.pat} ${styles.patOk}`}>
-                <div className={styles.patLabel}>✅ 書くべき内容</div>
-                <ul>
-                  <li>プロジェクト概要・目的（2〜3文）</li>
-                  <li>技術スタック・主要バージョン</li>
-                  <li>ビルド・テスト・Lint コマンド</li>
-                  <li>コーディング規約（コンパクトに）</li>
-                  <li>PR メッセージのフォーマット</li>
-                  <li>サブエージェント委譲ルール</li>
-                  <li>禁止操作・危険コマンドの明示</li>
-                  <li>ペルソナの定義（「新人開発者向けに」等）</li>
-                </ul>
-              </div>
-              <div className={`${styles.pat} ${styles.patNg}`}>
-                <div className={styles.patLabel}>✗ 書かないべき内容</div>
-                <ul>
-                  <li>特定パスにしか使わない詳細ルール（*.instructions.md に分離）</li>
-                  <li>専門的な手順（SKILL.md に分離）</li>
-                  <li>長大なコードスニペット（コンテキスト浪費）</li>
-                  <li>機密情報・API キー</li>
-                  <li>修正履歴・変更ログ</li>
-                  <li>ツール設定（MCP は別ファイルへ）</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-          <div className={styles.codeWrap}>
-            <div className={styles.codeBar}>
-              <span>.github/copilot-instructions.md</span>
-              <span className={styles.codeLang}>Markdown</span>
-            </div>
-            <div className={styles.codeBody}>
-              <span className={styles.ch}># PROJECT: my-saas-app</span>
-              {"\n\n"}
-              <span className={styles.cm}>## Overview</span>
-              {"\n"}
-              {"Next.js 15 App Router + Supabase + Stripe のマルチテナント SaaS。\n"}
-              {"本番: Vercel Edge Runtime / DB: Supabase (PostgreSQL) / AI: GitHub Models。\n\n"}
-              <span className={styles.cm}>## Tech Stack</span>
-              {"\n"}
-              {"- Frontend: Next.js 15 (App Router), TypeScript 5.x, Tailwind CSS\n"}
-              {"- Backend:  Supabase Edge Functions (Deno 2.x)\n"}
-              {"- Auth:     Supabase Auth + RLS (Row Level Security)\n"}
-              {"- Payment:  Stripe Checkout / Webhooks\n"}
-              {"- Testing:  Vitest (unit) + Playwright (E2E)\n\n"}
-              <span className={styles.cm}>## Persona</span>
-              {"\n"}
-              {"シニアフルスタックエンジニアとして振る舞うこと。\n"}
-              {"コードを変更する前に必ず計画を要約すること。\n\n"}
-              <span className={styles.cm}>## Build & Test (CRITICAL: run after every change)</span>
-              {"\n"}
-              {"- Build:    "}
-              <span className={styles.cs}>{"`pnpm build`"}</span>
-              {"\n- Test:     "}
-              <span className={styles.cs}>{"`pnpm test`"}</span>
-              {"  — "}
-              <span className={styles.cw}>変更後は必ず実行すること</span>
-              {"\n- E2E:      "}
-              <span className={styles.cs}>{"`pnpm test:e2e`"}</span>
-              {" (Playwright)\n- Lint:     "}
-              <span className={styles.cs}>{"`pnpm lint`"}</span>
-              {"    — "}
-              <span className={styles.cw}>PR前に必ず実行すること</span>
-              {"\n\n"}
-              <span className={styles.cm}>## Coding Standards</span>
-              {"\n"}
-              {"- TypeScript strict モード必須\n"}
-              {"- エラーは Result<T,E> 型でラップ（throw 禁止）\n"}
-              {"- Supabase クエリは必要カラムのみ .select('col1, col2')\n"}
-              {"- React Server Components を優先し 'use client' を最小化\n\n"}
-              <span className={styles.cm}>## Sub-Agent Dispatch (for Copilot Coding Agent)</span>
-              {"\n"}
-              <span className={styles.cw}>@test-agent</span>
-              {"  → テスト作成・実行・失敗分析\n"}
-              <span className={styles.cw}>@docs-agent</span>
-              {"  → ドキュメント生成・更新 (docs/ のみ)\n"}
-              <span className={styles.cw}>@security-agent</span>
-              {" → セキュリティ監査（コード変更なし）\n\n"}
-              <span className={styles.cm}>## PR Message Format</span>
-              {"\n"}
-              <span className={styles.cs}>
-                {
-                  "```\n## Summary\n[2〜3文の概要]\n\n## Changes\n- [変更点]\n\n## Tests\n- [テスト内容]\n```"
-                }
-              </span>
-              {"\n\n"}
-              <span className={styles.cm}>## Forbidden Operations</span>
-              {"\n"}
-              {"- "}
-              <span className={styles.cw}>{"`supabase db reset`"}</span>
-              {" は絶対に実行しない\n"}
-              {"- "}
-              <span className={styles.cw}>{"`.env.production`"}</span>
-              {" の読み書き禁止"}
-            </div>
-          </div>
-        </section>
-        <section id="s03" className={styles.sec}>
-          <div className={styles.secHead}>
-            <span className={styles.secNum}>3</span>
-            <h2>
-              <span className={styles.mono}>.github/instructions/*.instructions.md</span>
-              {" — パスマッチ型指示"}
-            </h2>
-            <span className={styles.note}>2025年7月〜 GA</span>
-          </div>
-          <div className={styles.card}>
-            <p>
-              <code>*.instructions.md</code> は YAML フロントマターの <code>applyTo</code>{" "}
-              でパスグロブを指定することで、
-              <strong>特定のファイル・ディレクトリを操作しているときのみ自動適用</strong>
-              されます。さらに <code>excludeAgent</code>{" "}
-              プロパティで特定のエージェント（coding-agent・code-review）から除外できます。
-            </p>
-          </div>
-          <div className={styles.codeWrap}>
-            <div className={styles.codeBar}>
-              <span>.github/instructions/frontend.instructions.md</span>
-              <span className={styles.codeLang}>Markdown + YAML</span>
-            </div>
-            <div className={styles.codeBody}>
-              <span className={styles.cs}>---</span>
-              {"\n"}
-              <span className={styles.cm}>applyTo</span>
-              {": "}
-              <span className={styles.cv}>{'"src/components/**,src/app/**"'}</span>
-              {"\n"}
-              <span className={styles.cc}>
-                {"# この指示は src/components/ と src/app/ への変更時のみ適用される"}
-              </span>
-              {"\n"}
-              <span className={styles.cc}>
-                {'# excludeAgent: "code-review"  # コードレビューから除外する場合'}
-              </span>
-              {"\n"}
-              <span className={styles.cs}>---</span>
-              {"\n\n"}
-              <span className={styles.ch}>{"## Frontend Development Rules"}</span>
-              {"\n\n"}
-              <span className={styles.cm}>{"### Component Structure"}</span>
-              {"\n"}
-              {"- React Server Components (RSC) を優先し、'use client' は最小限に\n"}
-              {"- コンポーネントは 150行以下に収める\n"}
-              {"- Props は明示的な TypeScript インターフェースを定義する\n"}
-              {"- CSS は Tailwind ユーティリティクラスのみ（インラインスタイル禁止）\n\n"}
-              <span className={styles.cm}>{"### Naming Conventions"}</span>
-              {"\n"}
-              {"- コンポーネントファイル: PascalCase.tsx (例: UserCard.tsx)\n"}
-              {"- ページファイル: page.tsx (Next.js App Router 規約)\n"}
-              {"- フック: use プレフィックス (例: useUserProfile)\n\n"}
-              <span className={styles.cm}>{"### DO THIS / NOT THIS"}</span>
-              {"\n"}
-              {"✅ 良い例:\n"}
-              <span className={styles.cs}>
-                {
-                  "```tsx\n// Server Component（デフォルト）\nexport default async function UserList() {\n  const users = await getUsers()\n  return <ul>{users.map(u => <UserItem key={u.id} user={u} />)}</ul>\n}\n```"
-                }
-              </span>
-              {"\n\n"}
-              {"❌ 悪い例:\n"}
-              <span className={styles.cs}>
-                {
-                  "```tsx\n// 不要な 'use client' の使用\n'use client'\nexport default function UserList() { ... } // fetchをuseEffectで行っている\n```"
-                }
-              </span>
-            </div>
-          </div>
-          <div className={styles.codeWrap}>
-            <div className={styles.codeBar}>
-              <span>.github/instructions/testing.instructions.md</span>
-              <span className={styles.codeLang}>Markdown + YAML</span>
-            </div>
-            <div className={styles.codeBody}>
-              <span className={styles.cs}>---</span>
-              {"\n"}
-              <span className={styles.cm}>applyTo</span>
-              {": "}
-              <span className={styles.cv}>
-                {'"**/*.test.ts,**/*.test.tsx,**/*.spec.ts,tests/**"'}
-              </span>
-              {"\n"}
-              <span className={styles.cm}>excludeAgent</span>
-              {": "}
-              <span className={styles.cv}>{'"code-review"'}</span>
-              {"\n"}
-              <span className={styles.cc}>
-                {"# Copilot code review はこの指示を読まない（テスト専用ルールを汚染しない）"}
-              </span>
-              {"\n"}
-              <span className={styles.cs}>---</span>
-              {"\n\n"}
-              <span className={styles.ch}>{"## Testing Standards"}</span>
-              {"\n\n"}
-              <span className={styles.cm}>{"### Unit Tests (Vitest)"}</span>
-              {"\n"}
-              {"- テストは AAA (Arrange / Act / Assert) 形式で記述\n"}
-              {"- モックは vi.mock() を使用、過剰なモックは避ける\n"}
-              {"- テスト名は「[条件] [状態] [期待結果]」形式\n\n"}
-              <span className={styles.cm}>{"### E2E Tests (Playwright)"}</span>
-              {"\n"}
-              {"- ページオブジェクトパターンを使用 (tests/pages/ に配置)\n"}
-              {"- data-testid 属性でセレクタを指定（クラス名ベースは禁止）\n"}
-              {"- 各テストは独立して実行できること（beforeEach で状態をリセット）"}
-            </div>
-          </div>
-          <div className={`${styles.alert} ${styles.ag}`}>
-            <span className={styles.alertIcon}>💡</span>
-            <div className={styles.alertBody}>
-              <strong>excludeAgent で指示の適用先をコントロールする（2025年11月〜）</strong>
-              <code>{'excludeAgent: "code-review"'}</code>
-              {" を設定するとコードレビューに、"}
-              <code>{'excludeAgent: "coding-agent"'}</code>
-              {
-                " を設定すると Copilot Coding Agent に指示が適用されなくなります。レビュー専用・実装専用の指示を分離するのに有効です。"
-              }
-            </div>
-          </div>
-        </section>
-        <section id="s04" className={styles.sec}>
-          <div className={styles.secHead}>
-            <span className={styles.secNum}>4</span>
-            <h2>
-              <span className={styles.mono}>.github/agents/*.agent.md</span>
-              {" — カスタムエージェント完全ガイド"}
-            </h2>
-          </div>
-          <div className={styles.card}>
-            <div className={styles.cardTitle}>
-              🤖 .agent.md とは — 「専門チームメイト」を定義するファイル
-            </div>
-            <p>
-              <code>*.agent.md</code>
-              {"は"}
-              <strong>特定のペルソナ・ツールセット・指示・ハンドオフを持つ専門エージェント</strong>
-              {"を定義するMarkdownファイルです。定義したエージェントは "}
-              <code>@エージェント名</code>
-              {
-                " で呼び出せ、GitHub.com（Coding Agent）・VS Code・JetBrains・Eclipse・Xcodeのすべてで動作します。"
-              }
+              <code>.agent.md</code> は、GitHub Copilot
+              に「特定の役割(ペルソナ)」「使えるツール」「振る舞いのルール」をまとめて持たせるための、YAMLフロントマター付きMarkdownファイルです。以前は「custom
+              chat modes」と呼ばれていましたが、名称が「custom agents」に統一されました。既存の{" "}
+              <code>.chatmode.md</code> ファイルがあれば、拡張子を <code>.agent.md</code>{" "}
+              に変更するだけで移行できます。
             </p>
             <p>
-              {"エージェントは「常に同じ指示とコンテキストを繰り返し与える」必要をなくし、"}
-              <strong>セキュリティレビュー専門・テスト専門・ドキュメント専門</strong>
-              {"など、役割ごとに特化した振る舞いを一度定義するだけで再利用できます。"}
+              <code>.agent.md</code>{" "}
+              が解決する課題はシンプルです。汎用の「なんでも屋」エージェントに毎回同じ前提知識やツール制限を説明し直すのは非効率です。プランナー、実装者、セキュリティレビュアーといった役割ごとにファイルを分けておけば、ドロップダウンやスラッシュコマンドで切り替えるだけで、その役割に最適化されたツールセットと指示が適用されます。
             </p>
-          </div>
-        </section>
-        <section id="s05" className={styles.sec}>
-          <div
-            className={styles.secHead}
-            style={{ marginTop: "36px", paddingTop: "24px", borderTop: "1px solid var(--border2)" }}
-          >
-            <h2 style={{ fontSize: "1.1rem" }}>
-              {"4-1. 配置場所（スコープ別） "}
-              <span className={styles.newB}>2026 更新</span>
-            </h2>
-          </div>
-          <div className={styles.scopeGrid}>
-            <div className={styles.scopeCard}>
-              <div className={styles.scopeCardIcon}>📁</div>
-              <div className={styles.scopeCardTtl}>リポジトリレベル（推奨）</div>
-              <div className={styles.scopeCardBody}>
-                <code>.github/agents/AGENT-NAME.agent.md</code>
-                <br />
-                {"そのリポジトリのすべてのコラボレーターが利用可能。git管理でチーム共有。"}
-              </div>
-              <div style={{ marginTop: "8px" }}>
-                <span className={`${styles.tag} ${styles.tagG}`}>全プラン</span>
-              </div>
-            </div>
-            <div className={styles.scopeCard}>
-              <div className={styles.scopeCardIcon}>👤</div>
-              <div className={styles.scopeCardTtl}>ユーザーレベル（個人）</div>
-              <div className={styles.scopeCardBody}>
-                {"VS Code設定の「ユーザー」選択で作成。全ワークスペースで利用可能。"}
-                <code>chat.agentFilesLocations</code>
-                {"でカスタムパスも指定可。"}
-              </div>
-              <div style={{ marginTop: "8px" }}>
-                <span className={`${styles.tag} ${styles.tagB}`}>VS Code</span>
-              </div>
-            </div>
-            <div className={styles.scopeCard}>
-              <div className={styles.scopeCardIcon}>🏢</div>
-              <div className={styles.scopeCardTtl}>組織・Enterpriseレベル</div>
-              <div className={styles.scopeCardBody}>
-                <code>.github-private</code>
-                {"リポジトリの "}
-                <code>agents/</code>
-                {" に配置。組織全体・Enterprise全体に展開可能。"}
-              </div>
-              <div style={{ marginTop: "8px" }}>
-                <span className={`${styles.tag} ${styles.tagP}`}>Business/Enterprise</span>
-              </div>
-            </div>
-          </div>
-          <div className={`${styles.alert} ${styles.aw}`}>
-            <span className={styles.alertIcon}>⚠️</span>
-            <div className={styles.alertBody}>
-              <strong>ファイル名の制約：</strong>
-              {"ファイル名に使用できる文字は "}
-              <code>. - _ a-z A-Z 0-9</code>
-              {" のみ。スペース・日本語・記号（"}
-              <code>@</code>
-              {"等）は使用不可。エージェントの呼び出し名はファイル名（"}
-              <code>.agent.md</code>
-              {"除く）になります。例："}
-              <code>test-agent.agent.md</code>
-              {" → "}
-              <code>@test-agent</code>
-            </div>
-          </div>
-        </section>
-        <section id="s06" className={styles.sec}>
-          <div
-            className={styles.secHead}
-            style={{ marginTop: "36px", paddingTop: "24px", borderTop: "1px solid var(--border2)" }}
-          >
-            <h2 style={{ fontSize: "1.1rem" }}>
-              {"4-2. フロントマター完全仕様（全フィールド） "}
-              <span className={styles.newB}>NEW</span>
-            </h2>
-          </div>
-          <div className={styles.codeWrap}>
-            <div className={styles.codeBar}>
-              <span>.github/agents/my-agent.agent.md — 全フィールド仕様</span>
-              <span className={styles.codeLang}>YAML + Markdown</span>
-            </div>
-            <div className={styles.codeBody}>
-              <span className={styles.cs}>---</span>
-              {"\n"}
-              <span className={styles.cm}>name</span>
-              {": "}
-              <span className={styles.cv}>{"'My Agent'"}</span>
-              {"            "}
-              <span className={styles.cc}>{"# 任意: 表示名（省略時はファイル名ベース）"}</span>
-              {"\n"}
-              {"                              "}
-              <span className={styles.cc}>{"# 単一引用符推奨（awesome-copilot規約）"}</span>
-              {"\n\n"}
-              <span className={styles.cm}>description</span>
-              {": "}
-              <span className={styles.cv}>{"'エージェントの役割と能力の説明（必須）'"}</span>
-              {"\n"}
-              {"  "}
-              <span className={styles.cc}>{"# ★★★ 最重要フィールド ★★★"}</span>
-              {"\n"}
-              {"  "}
-              <span className={styles.cc}>
-                {"# エージェントが自動・手動選択される唯一の判断材料"}
-              </span>
-              {"\n"}
-              {"  "}
-              <span className={styles.cc}>
-                {"# 「いつ使う / いつ使わない」を50〜150文字で明確に"}
-              </span>
-              {"\n"}
-              {"  "}
-              <span className={styles.cc}>
-                {"# GitHub.com（Coding Agent）でのIssue割り当て時に参照される"}
-              </span>
-              {"\n\n"}
-              <span className={styles.cm}>argument-hint</span>
-              {": "}
-              <span className={styles.cv}>{"'ヒントテキスト'"}</span>
-              {"        "}
-              <span className={styles.cc}>{"# 任意: 入力欄プレースホルダーヒント"}</span>
-              {"\n\n"}
-              <span className={styles.cm}>target</span>
-              {": "}
-              <span className={styles.cv}>{"'github-copilot'"}</span>
-              {"  "}
-              <span className={styles.cc}>{"# 必須: github-copilot | vscode"}</span>
-              {"\n"}
-              {"                              "}
-              <span className={styles.cc}>{"# mcp-servers は github-copilot 専用"}</span>
-              {"\n\n"}
-              <span className={styles.cm}>model</span>
-              {": "}
-              <span className={styles.cv}>{"'claude-sonnet-4-6'"}</span>
-              {"   "}
-              <span className={styles.cc}>{"# 任意: 使用AIモデルを指定"}</span>
-              {"\n"}
-              {"                              "}
-              <span className={styles.cc}>{"# 配列で優先順位付きフォールバック指定も可:"}</span>
-              {"\n"}
-              {"  "}
-              <span className={styles.cc}>
-                {"# model: ['Claude Opus 4.5', 'GPT-5.2 (copilot)']"}
-              </span>
-              {"\n"}
-              {"  "}
-              <span className={styles.cc}>
-                {"# IDEカスタムエージェント専用（GitHub.comでは無視）"}
-              </span>
-              {"\n\n"}
-              <span className={styles.cm}>tools</span>
-              {":                       "}
-              <span className={styles.cc}>{"# 任意: 利用可能ツールのホワイトリスト"}</span>
-              {"\n"}
-              {"  - "}
-              <span className={styles.cv}>read_file</span>
-              {"               "}
-              <span className={styles.cc}>{"# 省略すると全ツール（組み込み＋MCP）が使用可"}</span>
-              {"\n"}
-              {"  - "}
-              <span className={styles.cv}>edit_file</span>
-              {"               "}
-              <span className={styles.cc}>{"# ★ 最小権限の原則: 必要なツールのみ許可"}</span>
-              {"\n"}
-              {"  - "}
-              <span className={styles.cv}>run_terminal_command</span>
-              {"    "}
-              <span className={styles.cc}>{'# MCP ツールは "サーバー名/ツール名" 形式'}</span>
-              {"\n"}
-              {"  - "}
-              <span className={styles.cv}>grep_search</span>
-              {"             "}
-              <span className={styles.cc}>{'# 例: "sentry/get_issue_details"'}</span>
-              {"\n"}
-              {"  - "}
-              <span className={styles.cv}>agent</span>
-              {"                   "}
-              <span className={styles.cc}>{"# ★ サブエージェントを使う場合は必須"}</span>
-              {"\n\n"}
-              <span className={styles.cm}>agents</span>
-              {":                     "}
-              <span className={styles.cc}>{"# 任意: 使用できるサブエージェントを制限"}</span>
-              {"\n"}
-              {"  - "}
-              <span className={styles.cv}>implementer</span>
-              {"             "}
-              <span className={styles.cc}>
-                {"# 省略時: disable-model-invocation:false の全エージェントが対象"}
-              </span>
-              {"\n"}
-              {"  - "}
-              <span className={styles.cv}>code-reviewer</span>
-              {"          "}
-              <span className={styles.cc}>{"# 明示することで予期しない呼び出しを防ぐ"}</span>
-              {"\n\n"}
-              <span className={styles.cm}>handoffs</span>
-              {":                   "}
-              <span className={styles.cc}>
-                {"# 任意: 次のエージェントへの誘導ボタン（IDE専用）"}
-              </span>
-              {"\n"}
-              {"  - "}
-              <span className={styles.cv}>label</span>
-              {": "}
-              <span className={styles.cv}>{"'Start Implementation'"}</span>
-              {"   "}
-              <span className={styles.cc}>{"# ボタンラベル"}</span>
-              {"\n"}
-              {"    "}
-              <span className={styles.cv}>agent</span>
-              {": "}
-              <span className={styles.cv}>implementer</span>
-              {"              "}
-              <span className={styles.cc}>{"# 遷移先エージェント名（ファイル名ベース）"}</span>
-              {"\n"}
-              {"    "}
-              <span className={styles.cv}>prompt</span>
-              {": "}
-              <span className={styles.cv}>{"'Now implement the plan.'"}</span>{" "}
-              <span className={styles.cc}>{"# 遷移後の入力欄に事前入力されるテキスト"}</span>
-              {"\n"}
-              {"    "}
-              <span className={styles.cv}>send</span>
-              {": "}
-              <span className={styles.cv}>false</span>
-              {"                      "}
-              <span className={styles.cc}>{"# false=手動送信, true=自動送信"}</span>
-              {"\n"}
-              {"  - "}
-              <span className={styles.cv}>label</span>
-              {": "}
-              <span className={styles.cv}>{"'Code Review'"}</span>
-              {"\n"}
-              {"    "}
-              <span className={styles.cv}>agent</span>
-              {": "}
-              <span className={styles.cv}>code-reviewer</span>
-              {"\n"}
-              {"    "}
-              <span className={styles.cv}>prompt</span>
-              {": "}
-              <span className={styles.cv}>{"'Review this implementation.'"}</span>
-              {"\n"}
-              {"    "}
-              <span className={styles.cv}>send</span>
-              {": "}
-              <span className={styles.cv}>false</span>
-              {"\n\n"}
-              <span className={styles.cm}>user-invocable</span>
-              {": "}
-              <span className={styles.cv}>true</span>
-              {"        "}
-              <span className={styles.cc}>{"# 任意（default: true）"}</span>
-              {"\n"}
-              {"                              "}
-              <span className={styles.cc}>
-                {"# false: @メニューに表示されないが、サブエージェントとしては使用可"}
-              </span>
-              {"\n"}
-              {"                              "}
-              <span className={styles.cc}>{"# 内部ワーカーエージェントに設定"}</span>
-              {"\n\n"}
-              <span className={styles.cm}>disable-model-invocation</span>
-              {": "}
-              <span className={styles.cv}>false</span>
-              {"  "}
-              <span className={styles.cc}>{"# 任意（default: false）"}</span>
-              {"\n"}
-              {"                              "}
-              <span className={styles.cc}>{"# true: モデルによる自動選択を完全無効化"}</span>
-              {"\n"}
-              {"                              "}
-              <span className={styles.cc}>{"# ※ agents[] に明示すれば上書き可能"}</span>
-              {"\n\n"}
-              <span className={styles.cm}>mcp-servers</span>
-              {":               "}
-              <span className={styles.cc}>{"# 任意: このエージェント専用MCPサーバー設定"}</span>
-              {"\n"}
-              {"  "}
-              <span className={styles.cv}>sentry</span>
-              {":\n    "}
-              <span className={styles.cv}>type</span>
-              {": "}
-              <span className={styles.cv}>{"'local'"}</span>
-              {"            "}
-              <span className={styles.cc}>{"# local（stdio互換）/ http / sse"}</span>
-              {"\n"}
-              {"    "}
-              <span className={styles.cv}>command</span>
-              {": "}
-              <span className={styles.cv}>{"'npx'"}</span>
-              {"\n    "}
-              <span className={styles.cv}>args</span>
-              {": ["}
-              <span className={styles.cv}>{"'@sentry/mcp-server@latest'"}</span>
-              {"]\n    "}
-              <span className={styles.cv}>tools</span>
-              {": ["}
-              <span className={styles.cv}>{"'get_issue_details'"}</span>
-              {", "}
-              <span className={styles.cv}>{"'get_issue_summary'"}</span>
-              {"]  "}
-              <span className={styles.cc}>{"# ホワイトリスト"}</span>
-              {"\n"}
-              {"    "}
-              <span className={styles.cv}>env</span>
-              {":\n      "}
-              <span className={styles.cv}>SENTRY_ACCESS_TOKEN</span>
-              {": "}
-              {/* biome-ignore lint/suspicious/noTemplateCurlyInString: GitHub Actions secret syntax */}
-              <span className={styles.cv}>{"'${{ secrets.COPILOT_MCP_SENTRY_TOKEN }}'"}</span>
-              {"\n"}
-              {"      "}
-              <span className={styles.cc}>
-                {'# シークレットはリポジトリの "copilot" 環境から取得'}
-              </span>
-              {"\n"}
-              <span className={styles.cm}>hooks</span>
-              {":\n  - "}
-              <span className={styles.cv}>type</span>
-              {": "}
-              <span className={styles.cv}>{"'post-tool'"}</span>
-              {"\n    "}
-              <span className={styles.cv}>command</span>
-              {": "}
-              <span className={styles.cv}>{"'npm run test'"}</span>
-              {"  "}
-              <span className={styles.cc}>{"# フックコマンド"}</span>
-              {"\n"}
-              <span className={styles.cs}>---</span>
-              {"\n\n"}
-              <span className={styles.cc}>{"# ↓ ここからMarkdown本文（最大30,000文字）"}</span>
-              {"\n"}
-              <span className={styles.ch}>{"## Role（役割）"}</span>
-              {"\n"}
-              {"エージェントの役割・専門性・振る舞いを自然言語で記述...\n\n"}
-              <span className={styles.cm}>{"## Instructions（手順）"}</span>
-              {"\n"}
-              {"具体的な作業手順・判断基準...\n\n"}
-              <span className={styles.cm}>{"## Constraints（制約）"}</span>
-              {"\n"}
-              {"絶対に行わないこと・アクセス制限...\n\n"}
-              <span className={styles.cm}>{"## Output Format（出力形式）"}</span>
-              {"\n"}
-              {"レポートや成果物のフォーマット..."}
-            </div>
-          </div>
-          <div className={styles.tblWrap}>
-            <table className={styles.fmTable}>
-              <thead>
-                <tr>
-                  <th>フィールド</th>
-                  <th>必須</th>
-                  <th>対応環境</th>
-                  <th>説明・ポイント</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>description</td>
-                  <td>
-                    <span className={`${styles.badge} ${styles.bRed}`}>必須</span>
-                  </td>
-                  <td>
-                    <span className={`${styles.tag} ${styles.tagG}`}>全環境</span>
-                  </td>
-                  <td>50〜150文字。「いつ使う/使わない」を明記。自動選択の唯一の判断材料</td>
-                </tr>
-                <tr>
-                  <td>target</td>
-                  <td>
-                    <span className={`${styles.badge} ${styles.bRed}`}>必須</span>
-                  </td>
-                  <td>
-                    <span className={`${styles.tag} ${styles.tagG}`}>全環境</span>
-                  </td>
-                  <td>
-                    {"実行環境指定: "}
-                    <code>github-copilot</code>
-                    {" または "}
-                    <code>vscode</code>
-                    {"。mcp-serversは github-copilot 専用"}
-                  </td>
-                </tr>
-                <tr>
-                  <td>name</td>
-                  <td>
-                    <span className={`${styles.badge} ${styles.bBlue}`}>任意</span>
-                  </td>
-                  <td>
-                    <span className={`${styles.tag} ${styles.tagG}`}>全環境</span>
-                  </td>
-                  <td>{"表示名。省略時はファイル名（test-agent.agent.md → test-agent）"}</td>
-                </tr>
-                <tr>
-                  <td>argument-hint</td>
-                  <td>
-                    <span className={`${styles.badge} ${styles.bBlue}`}>任意</span>
-                  </td>
-                  <td>
-                    <span className={`${styles.tag} ${styles.tagB}`}>IDE専用</span>
-                  </td>
-                  <td>
-                    {
-                      "チャット入力欄に表示されるプレースホルダー型のヒントテキスト。エージェントとの対話方法をガイドする"
-                    }
-                  </td>
-                </tr>
-                <tr>
-                  <td>model</td>
-                  <td>
-                    <span className={`${styles.badge} ${styles.bBlue}`}>任意</span>
-                  </td>
-                  <td>
-                    <span className={`${styles.tag} ${styles.tagB}`}>IDE専用</span>
-                  </td>
-                  <td>AIモデル指定。配列でフォールバック順を設定可。GitHub.comでは無視</td>
-                </tr>
-                <tr>
-                  <td>tools</td>
-                  <td>
-                    <span className={`${styles.badge} ${styles.bBlue}`}>任意</span>
-                  </td>
-                  <td>
-                    <span className={`${styles.tag} ${styles.tagG}`}>全環境</span>
-                  </td>
-                  <td>
-                    {"省略=全ツール許可。最小権限の原則を適用。サブエージェント使用は "}
-                    <code>agent</code>
-                    {" ツールが必須"}
-                  </td>
-                </tr>
-                <tr>
-                  <td>agents</td>
-                  <td>
-                    <span className={`${styles.badge} ${styles.bBlue}`}>任意</span>
-                  </td>
-                  <td>
-                    <span className={`${styles.tag} ${styles.tagB}`}>IDE専用</span>
-                  </td>
-                  <td>使用できるサブエージェントのホワイトリスト。省略=全エージェント対象</td>
-                </tr>
-                <tr>
-                  <td>handoffs</td>
-                  <td>
-                    <span className={`${styles.badge} ${styles.bBlue}`}>任意</span>
-                  </td>
-                  <td>
-                    <span className={`${styles.tag} ${styles.tagB}`}>IDE専用</span>
-                  </td>
-                  <td>
-                    {"label・agent・prompt・send・model の5プロパティ。GitHub.comでは無視される"}
-                  </td>
-                </tr>
-                <tr>
-                  <td>user-invocable</td>
-                  <td>
-                    <span className={`${styles.badge} ${styles.bBlue}`}>任意</span>
-                  </td>
-                  <td>
-                    <span className={`${styles.tag} ${styles.tagG}`}>全環境</span>
-                  </td>
-                  <td>{"false で @メニューから非表示（サブエージェントとしては動作）"}</td>
-                </tr>
-                <tr>
-                  <td>disable-model-invocation</td>
-                  <td>
-                    <span className={`${styles.badge} ${styles.bBlue}`}>任意</span>
-                  </td>
-                  <td>
-                    <span className={`${styles.tag} ${styles.tagG}`}>全環境</span>
-                  </td>
-                  <td>
-                    {
-                      "true で自動選択を完全無効化。`infer: false` と同等（両方設定された場合はこちらが優先）。agents[]で明示すれば上書き可"
-                    }
-                  </td>
-                </tr>
-                <tr>
-                  <td>metadata</td>
-                  <td>
-                    <span className={`${styles.badge} ${styles.bBlue}`}>任意</span>
-                  </td>
-                  <td>
-                    <span className={`${styles.tag} ${styles.tagG}`}>GitHub.com専用</span>
-                  </td>
-                  <td>
-                    {
-                      "エージェントのメタデータ注釈（キー・値の文字列ペア）。VS Codeや他IDEでは無視されます"
-                    }
-                  </td>
-                </tr>
-                <tr>
-                  <td>infer</td>
-                  <td>
-                    <span className={`${styles.badge} ${styles.bRed}`}>非推奨</span>
-                  </td>
-                  <td>
-                    <span className={`${styles.tag} ${styles.tagG}`}>全環境</span>
-                  </td>
-                  <td>
-                    {
-                      "廃止（Retired）。代わりに `disable-model-invocation` と `user-invocable` を使用します"
-                    }
-                  </td>
-                </tr>
-                <tr>
-                  <td>mcp-servers</td>
-                  <td>
-                    <span className={`${styles.badge} ${styles.bBlue}`}>任意</span>
-                  </td>
-                  <td>
-                    <span className={`${styles.tag} ${styles.tagB}`}>Copilot専用</span>
-                  </td>
-                  <td>
-                    {
-                      "エージェント固有のMCPサーバー設定（YAML形式）。target: github-copilot 時のみ有効。シークレットは copilot 環境から取得"
-                    }
-                  </td>
-                </tr>
-                <tr>
-                  <td>hooks</td>
-                  <td>
-                    <span className={`${styles.badge} ${styles.bBlue}`}>任意</span>
-                  </td>
-                  <td>
-                    <span className={`${styles.tag} ${styles.tagB}`}>IDE専用(Preview)</span>
-                  </td>
-                  <td>
-                    {
-                      "エージェントがアクティブな時のみ実行されるフックコマンド設定。ライフサイクルイベントに合わせた処理を定義"
-                    }
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-        <section id="s07" className={styles.sec}>
-          <div
-            className={styles.secHead}
-            style={{ marginTop: "36px", paddingTop: "24px", borderTop: "1px solid var(--border2)" }}
-          >
-            <h2 style={{ fontSize: "1.1rem" }}>
-              {"4-3. ステップバイステップ作成ガイド（7ステップ） "}
-              <span className={styles.newB}>NEW</span>
-            </h2>
-          </div>
-          <div className={styles.stepList}>
-            <div className={styles.stepRow}>
-              <div className={`${styles.stepCircle} ${styles.scG}`}>01</div>
-              <div className={styles.stepContent}>
-                <div className={styles.stepTtl}>エージェントの「単一責任」を決める</div>
-                <div className={styles.stepBody}>
-                  {"まず「このエージェントが"}
-                  <strong>{"何をするか / 何をしないか"}</strong>
-                  {
-                    "」を1文で言えるか確認します。「テスト生成 + コードレビュー + ドキュメント作成」を1エージェントにまとめるのはアンチパターン。"
-                  }
-                  <strong>{"1エージェント = 1専門領域"}</strong>
-                  {"に分割してください。"}
-                  <br />
-                  <br />
-                  {"✅ 良い例:「テストカバレッジを向上させる。本番コードは変更しない」"}
-                  <br />
-                  {"❌ 悪い例:「開発全般をサポートする」"}
-                </div>
-              </div>
-            </div>
-            <div className={styles.stepRow}>
-              <div className={`${styles.stepCircle} ${styles.scB}`}>02</div>
-              <div className={styles.stepContent}>
-                <div className={styles.stepTtl}>ファイルを作成する</div>
-                <div className={styles.stepBody}>
-                  {
-                    "VS Codeでは Copilot Chat の「エージェント選択ドロップダウン → Configure Custom Agents... → Create new custom agent」から作成。または手動でファイルを作成してください。"
-                  }
-                  <div className={styles.codeWrap} style={{ marginTop: "10px" }}>
-                    <div className={styles.codeBar}>
-                      <span>TERMINAL</span>
-                    </div>
-                    <div className={styles.codeBody}>
-                      <span className={styles.cc}>
-                        {"# プロジェクト（リポジトリ）レベルのエージェント"}
-                      </span>
-                      {
-                        "\nmkdir -p .github/agents\ntouch .github/agents/security-reviewer.agent.md\n\n"
-                      }
-                      <span className={styles.cc}>{"# 個人レベル（VS Code設定から作成推奨）"}</span>
-                      {"\n"}
-                      <span className={styles.cc}>
-                        {'# Create new custom agent → "User" を選択'}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className={styles.stepRow}>
-              <div className={`${styles.stepCircle} ${styles.scP}`}>03</div>
-              <div className={styles.stepContent}>
-                <div className={styles.stepTtl}>{"description を丁寧に書く（最重要）"}</div>
-                <div className={styles.stepBody}>
-                  <code>description</code>
-                  {" はエージェントが自動選択・手動選択される唯一の判断材料です。"}
-                  <strong>{"「Focuses on X without doing Y」パターン"}</strong>
-                  {
-                    "が最も効果的です。2,500以上のリポジトリ分析から、descriptionが曖昧なエージェントほど誤呼び出しが多いことが判明しています。"
-                  }
-                  <div className={styles.codeWrap} style={{ marginTop: "10px" }}>
-                    <div className={styles.codeBar}>
-                      <span>{"description のベストプラクティス"}</span>
-                      <span className={styles.codeLang}>YAML</span>
-                    </div>
-                    <div className={styles.codeBody}>
-                      <span className={styles.cc}>{"✅ 明確な description（推奨）"}</span>
-                      {"\n"}
-                      <span className={styles.cm}>description</span>
-                      {": "}
-                      <span className={styles.cv}>
-                        {"'Security reviewer focused on OWASP Top 10 vulnerabilities."}
-                      </span>
-                      {"\n  "}
-                      <span className={styles.cv}>
-                        {"Reads code and generates audit reports. Does NOT modify any files.'"}
-                      </span>
-                      {"\n\n"}
-                      <span className={styles.cc}>{"❌ 曖昧な description（アンチパターン）"}</span>
-                      {"\n"}
-                      <span className={styles.cm}>description</span>
-                      {": "}
-                      <span className={styles.cv}>{"'コードを分析するエージェント'"}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className={styles.stepRow}>
-              <div className={`${styles.stepCircle} ${styles.scA}`}>04</div>
-              <div className={styles.stepContent}>
-                <div className={styles.stepTtl}>ツールを最小権限で設定する</div>
-                <div className={styles.stepBody}>
-                  <code>tools</code>
-                  {" フィールドを省略すると全ツールが使用可能になります（便利だが危険）。"}
-                  <strong>{"必要最小限のツールのみ許可"}</strong>
-                  {"してください。特に本番DBや本番環境へのアクセスツールは慎重に扱います。"}
-                  <div className={styles.codeWrap} style={{ marginTop: "10px" }}>
-                    <div className={styles.codeBar}>
-                      <span>{"ツール設定パターン"}</span>
-                      <span className={styles.codeLang}>YAML</span>
-                    </div>
-                    <div className={styles.codeBody}>
-                      <span className={styles.cc}>
-                        {"# Read-Only エージェント（セキュリティ審査・レビュー用）"}
-                      </span>
-                      {"\n"}
-                      <span className={styles.cm}>tools</span>
-                      {": ["}
-                      <span className={styles.cv}>read_file</span>
-                      {", "}
-                      <span className={styles.cv}>grep_search</span>
-                      {", "}
-                      <span className={styles.cv}>list_directory</span>
-                      {"]\n\n"}
-                      <span className={styles.cc}>
-                        {"# Write限定エージェント（docs/のみ書き込み可）"}
-                      </span>
-                      {"\n"}
-                      <span className={styles.cm}>tools</span>
-                      {": ["}
-                      <span className={styles.cv}>read_file</span>
-                      {", "}
-                      <span className={styles.cv}>create_file</span>
-                      {", "}
-                      <span className={styles.cv}>edit_file</span>
-                      {"]\n"}
-                      <span className={styles.cc}>
-                        {
-                          "# → 本文で \"Write: /docs/ のみ\" と明示的に制約を追加\n\n# サブエージェントを呼び出す場合は 'agent' ツールが必須"
-                        }
-                      </span>
-                      {"\n"}
-                      <span className={styles.cm}>tools</span>
-                      {": ["}
-                      <span className={styles.cv}>read_file</span>
-                      {", "}
-                      <span className={styles.cv}>search</span>
-                      {", "}
-                      <span className={styles.cv}>agent</span>
-                      {"]\n\n"}
-                      <span className={styles.cc}>
-                        {"# MCPサーバーのツールを個別許可（完全なツール名はサーバー名/ツール名）"}
-                      </span>
-                      {"\n"}
-                      <span className={styles.cm}>tools</span>
-                      {": ["}
-                      <span className={styles.cv}>read_file</span>
-                      {", "}
-                      <span className={styles.cv}>{"sentry/get_issue_details"}</span>
-                      {", "}
-                      <span className={styles.cv}>{"sentry/get_issue_summary"}</span>
-                      {"]"}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className={styles.stepRow}>
-              <div className={`${styles.stepCircle} ${styles.scT}`}>05</div>
-              <div className={styles.stepContent}>
-                <div className={styles.stepTtl}>{"本文（プロンプト）を構造化して書く"}</div>
-                <div className={styles.stepBody}>
-                  {"本文は最大"}
-                  <strong>{"30,000文字"}</strong>
-                  {"のMarkdownです。"}
-                  <strong>{"Role → Instructions → Constraints → Output Format"}</strong>
-                  {" の4セクション構成が推奨されます。"}
-                  <div className={styles.codeWrap} style={{ marginTop: "10px" }}>
-                    <div className={styles.codeBar}>
-                      <span>{"本文の推奨構成"}</span>
-                      <span className={styles.codeLang}>Markdown</span>
-                    </div>
-                    <div className={styles.codeBody}>
-                      <span className={styles.ch}>{"## Role"}</span>
-                      {
-                        "\nあなたは経験豊富なセキュリティエンジニアです。\nOWASP Top 10を基準にコードを監査します。\n\n"
-                      }
-                      <span className={styles.ch}>{"## Instructions"}</span>
-                      {
-                        "\n1. コードベースを読み取って脆弱性を特定する\n2. 各問題をCritical/High/Medium/Lowで分類する\n3. CWE番号を付与する\n4. 修正コード例を提示する\n\n"
-                      }
-                      <span className={styles.ch}>{"## Constraints（絶対に守ること）"}</span>
-                      {"\n- "}
-                      <span className={styles.cw}>{"コードを一切変更しない（Read-Only）"}</span>
-                      {"\n- "}
-                      <span className={styles.cw}>{"レポート出力のみ行う"}</span>
-                      {"\n- 確認していない脆弱性を断定しない\n\n"}
-                      <span className={styles.ch}>{"## Output Format"}</span>
-                      {"\n報告書は以下の形式:\n"}
-                      <span className={styles.cs}>
-                        {
-                          "## Security Audit Report\n| 重大度 | 問題 | CWE | 該当箇所 | 修正案 |\n|-------|-----|-----|---------|-------|"
-                        }
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className={styles.stepRow}>
-              <div className={`${styles.stepCircle} ${styles.scG}`}>06</div>
-              <div className={styles.stepContent}>
-                <div className={styles.stepTtl}>{"動作確認 — エージェントを認識させる"}</div>
-                <div className={styles.stepBody}>
-                  {"ファイルをコミット・プッシュ後、以下で確認します。"}
-                  <div className={styles.codeWrap} style={{ marginTop: "10px" }}>
-                    <div className={styles.codeBar}>
-                      <span>{"確認方法（VS Code）"}</span>
-                    </div>
-                    <div className={styles.codeBody}>
-                      <span className={styles.cc}>{"# Copilot Chat を開く"}</span>
-                      {"\n"}
-                      <span className={styles.cc}>
-                        {"# エージェント選択ドロップダウンを開く → エージェントが表示されるか確認"}
-                      </span>
-                      {"\n"}
-                      <span className={styles.cc}>
-                        {"# または @security-reviewer と入力して候補が出るか確認"}
-                      </span>
-                      {"\n\n"}
-                      <span className={styles.cc}>{"# GitHub.com（Copilot Coding Agent）"}</span>
-                      {"\n"}
-                      <span className={styles.cc}>
-                        {'# Issue を作成 → Assignees の "Assign to Copilot" をクリック'}
-                      </span>
-                      {"\n"}
-                      <span className={styles.cc}>
-                        {"# → Agents パネルにエージェントが表示されるか確認"}
-                      </span>
-                      {"\n\n"}
-                      <span className={styles.cc}>{"# ★ 認識されない場合の確認事項:"}</span>
-                      {"\n"}
-                      <span className={styles.cc}>
-                        {"# 1. .github/agents/ 以下に配置されているか"}
-                      </span>
-                      {"\n"}
-                      <span className={styles.cc}>{"# 2. ファイル名が *.agent.md 形式か"}</span>
-                      {"\n"}
-                      <span className={styles.cc}>{"# 3. description フィールドが存在するか"}</span>
-                      {"\n"}
-                      <span className={styles.cc}>
-                        {"# 4. デフォルトブランチにコミットされているか（GitHub.com）"}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className={styles.stepRow}>
-              <div className={`${styles.stepCircle} ${styles.scB}`}>07</div>
-              <div className={styles.stepContent}>
-                <div className={styles.stepTtl}>
-                  {"Handoffs（ハンドオフ）を設定する（IDEのみ）"}
-                </div>
-                <div className={styles.stepBody}>
-                  {"複数エージェントを連鎖させる場合は "}
-                  <code>handoffs</code>
-                  {
-                    " プロパティで「次のエージェントへの誘導ボタン」を設定します。チャットレスポンスの下部にボタンが表示され、ユーザーが選択すると次のエージェントにコンテキストごと移行します。"
-                  }
-                  <div className={styles.codeWrap} style={{ marginTop: "10px" }}>
-                    <div className={styles.codeBar}>
-                      <span>{"handoffs 設定例"}</span>
-                      <span className={styles.codeLang}>YAML</span>
-                    </div>
-                    <div className={styles.codeBody}>
-                      <span className={styles.cm}>handoffs</span>
-                      {":\n  - "}
-                      <span className={styles.cm}>label</span>
-                      {": "}
-                      <span className={styles.cv}>{"'実装を開始'"}</span>
-                      {"         "}
-                      <span className={styles.cc}>{"# ボタンに表示されるテキスト"}</span>
-                      {"\n    "}
-                      <span className={styles.cm}>agent</span>
-                      {": "}
-                      <span className={styles.cv}>implementer</span>
-                      {"        "}
-                      <span className={styles.cc}>
-                        {"# 遷移先: .github/agents/implementer.agent.md"}
-                      </span>
-                      {"\n    "}
-                      <span className={styles.cm}>prompt</span>
-                      {": "}
-                      <span className={styles.cv}>{"'上記の計画に従って実装してください。'"}</span>
-                      {"\n    "}
-                      <span className={styles.cm}>send</span>
-                      {": "}
-                      <span className={styles.cv}>{"false"}</span>
-                      {"              "}
-                      <span className={styles.cc}>
-                        {"# false: ユーザーが確認後に手動送信（推奨）"}
-                      </span>
-                      {"\n                               "}
-                      <span className={styles.cc}>
-                        {"# true:  自動送信（完全自動化ワークフロー）"}
-                      </span>
-                      {"\n  - "}
-                      <span className={styles.cm}>label</span>
-                      {": "}
-                      <span className={styles.cv}>{"'コードレビューへ'"}</span>
-                      {"\n    "}
-                      <span className={styles.cm}>agent</span>
-                      {": "}
-                      <span className={styles.cv}>{"code-reviewer"}</span>
-                      {"\n    "}
-                      <span className={styles.cm}>prompt</span>
-                      {": "}
-                      <span className={styles.cv}>
-                        {"'実装内容のセキュリティとコード品質をレビューしてください。'"}
-                      </span>
-                      {"\n    "}
-                      <span className={styles.cm}>send</span>
-                      {": "}
-                      <span className={styles.cv}>{"false"}</span>
-                      {"\n    "}
-                      <span className={styles.cm}>model</span>
-                      {": "}
-                      <span className={styles.cv}>{"'GPT-5 (copilot)'"}</span>
-                      {"         "}
-                      <span className={styles.cc}>{"# 遷移後のモデル（任意）"}</span>
-                    </div>
-                  </div>
-                  <div className={`${styles.alert} ${styles.aw}`} style={{ marginTop: "10px" }}>
-                    <span className={styles.alertIcon}>⚠️</span>
-                    <div className={styles.alertBody}>
-                      <strong>
-                        {"handoffs および argument-hint は GitHub.com では無視されます。"}
-                      </strong>
-                      {
-                        " VS Code・JetBrains・Eclipse・Xcodeのみ有効で、GitHub.com（Copilot cloud agent）では compatibility を保つため無視されます。"
-                      }
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-        <section id="s08" className={styles.sec}>
-          <div
-            className={styles.secHead}
-            style={{ marginTop: "36px", paddingTop: "24px", borderTop: "1px solid var(--border2)" }}
-          >
-            <h2 style={{ fontSize: "1.1rem" }}>
-              {"4-4. Handoffs — マルチエージェントワークフロー設計 "}
-              <span className={styles.newB}>NEW</span>
-            </h2>
-          </div>
-          <div className={styles.card}>
             <p>
-              {"Handoffsは"}
-              <strong>{"エージェント間を決定論的に遷移させるUIメカニズム"}</strong>
-              {"です。LLMの非決定性（「次に何をすべきか」の判断）に依存せず、"}
-              <strong>{"ユーザーが各ステップで承認・確認できる"}</strong>
-              {"制御された連鎖が実現します。"}
+              <code>.agent.md</code>{" "}
+              が置かれる代表的な場所は次の3プラットフォームです。挙動やフロントマターの一部フィールドがプラットフォームごとに微妙に異なるため、第2章の全仕様表で必ず確認してください。
             </p>
           </div>
-          <div style={{ margin: "16px 0" }}>
-            <div
-              style={{
-                fontSize: "11px",
-                textAlign: "center",
-                color: "var(--text3)",
-                textTransform: "uppercase",
-                letterSpacing: ".12em",
-                marginBottom: "16px",
-                fontWeight: 600,
-              }}
-            >
-              {"典型パターン 1 — 計画 → 実装 → レビュー（手動承認型）"}
-            </div>
-            <div className={styles.hfFlow}>
-              <div className={`${styles.hfAgent} ${styles.hfA}`}>
-                {"📐 planner"}
-                <br />
-                <small>{".agent.md"}</small>
-                <div className={styles.hfBtn}>{"実装を開始 →"}</div>
-              </div>
-              <div className={styles.hfArrow}>→</div>
-              <div className={`${styles.hfAgent} ${styles.hfB}`}>
-                {"⚙️ implementer"}
-                <br />
-                <small>{".agent.md"}</small>
-                <div className={styles.hfBtn}>{"レビューへ →"}</div>
-              </div>
-              <div className={styles.hfArrow}>→</div>
-              <div className={`${styles.hfAgent} ${styles.hfC}`}>
-                {"🔒 code-reviewer"}
-                <br />
-                <small>{".agent.md"}</small>
-                <div className={styles.hfBtn}>完了</div>
-              </div>
-            </div>
-            <div
-              style={{
-                fontSize: "11px",
-                textAlign: "center",
-                color: "var(--text3)",
-                marginTop: "8px",
-              }}
-            >
-              {"各ボタンは send:false（手動送信）— ユーザーが内容を確認してから次のステップへ"}
-            </div>
-          </div>
-          <div style={{ margin: "16px 0" }}>
-            <div
-              style={{
-                fontSize: "11px",
-                textAlign: "center",
-                color: "var(--text3)",
-                textTransform: "uppercase",
-                letterSpacing: ".12em",
-                marginBottom: "16px",
-                fontWeight: 600,
-              }}
-            >
-              {"典型パターン 2 — TDD（テスト先行）自動連鎖"}
-            </div>
-            <div className={styles.hfFlow}>
-              <div className={`${styles.hfAgent} ${styles.hfA}`}>
-                {"🔴 red-agent"}
-                <br />
-                <small>{"失敗テスト生成"}</small>
-                <div className={`${styles.hfBtn} ${styles.auto}`}>{"自動→"}</div>
-              </div>
-              <div className={styles.hfArrow}>→</div>
-              <div className={`${styles.hfAgent} ${styles.hfB}`}>
-                {"🟢 green-agent"}
-                <br />
-                <small>{"テストをパスする実装"}</small>
-                <div className={styles.hfBtn}>{"リファクタへ →"}</div>
-              </div>
-              <div className={styles.hfArrow}>→</div>
-              <div className={`${styles.hfAgent} ${styles.hfD}`}>
-                {"🔵 refactor-agent"}
-                <br />
-                <small>{"コード品質改善"}</small>
-                <div className={styles.hfBtn}>完了</div>
-              </div>
-            </div>
-            <div
-              style={{
-                fontSize: "11px",
-                textAlign: "center",
-                color: "var(--text3)",
-                marginTop: "8px",
-              }}
-            >
-              {
-                "Red→Green は send:true（自動）/ Green→Refactor は send:false（手動確認）の混合パターン"
-              }
-            </div>
-          </div>
-          <div className={styles.codeWrap}>
-            <div className={styles.codeBar}>
-              <span>{".github/agents/planner.agent.md — Handoffsを使った計画エージェント"}</span>
-              <span className={styles.codeLang}>{"Markdown + YAML"}</span>
-            </div>
-            <div className={styles.codeBody}>
-              <span className={styles.cs}>---</span>
-              {"\n"}
-              <span className={styles.cm}>name</span>
-              {": "}
-              <span className={styles.cv}>{"'Planner'"}</span>
-              {"\n"}
-              <span className={styles.cm}>description</span>
-              {": "}
-              <span className={styles.cv}>
-                {
-                  "'Generates implementation plans for new features or refactoring.\n  Does NOT write code. Use for: planning, architecture, design, spec.'"
-                }
-              </span>
-              {"\n"}
-              <span className={styles.cm}>target</span>
-              {": "}
-              <span className={styles.cv}>{"'github-copilot'"}</span>
-              {"  "}
-              <span className={styles.cc}>{"# 必須: github-copilot | vscode"}</span>
-              {"\n"}
-              <span className={styles.cm}>model</span>
-              {": ["}
-              <span className={styles.cv}>{"'Claude Opus 4.5'"}</span>
-              {", "}
-              <span className={styles.cv}>{"'GPT-5.2 (copilot)'"}</span>
-              {"]   "}
-              <span className={styles.cc}>{"# フォールバック順"}</span>
-              {"\n"}
-              <span className={styles.cm}>tools</span>
-              {": ["}
-              <span className={styles.cv}>{"'search/codebase'"}</span>
-              {", "}
-              <span className={styles.cv}>{"'web/fetch'"}</span>
-              {", "}
-              <span className={styles.cv}>{"'read_file'"}</span>
-              {"]  "}
-              <span className={styles.cc}>{"# 読み取り専用"}</span>
-              {"\n"}
-              <span className={styles.cm}>handoffs</span>
-              {":\n  - "}
-              <span className={styles.cm}>label</span>
-              {": "}
-              <span className={styles.cv}>{"'Implement Plan'"}</span>
-              {"\n    "}
-              <span className={styles.cm}>agent</span>
-              {": "}
-              <span className={styles.cv}>implementer</span>
-              {"\n    "}
-              <span className={styles.cm}>prompt</span>
-              {": "}
-              <span className={styles.cv}>
-                {"'Implement the plan outlined above. Follow the steps in order.'"}
-              </span>
-              {"\n    "}
-              <span className={styles.cm}>send</span>
-              {": "}
-              <span className={styles.cv}>{"false"}</span>
-              {"\n    "}
-              <span className={styles.cm}>model</span>
-              {": "}
-              <span className={styles.cv}>{"'Claude Sonnet 4.5 (copilot)'"}</span>
-              {"\n"}
-              <span className={styles.cs}>---</span>
-              {"\n\n"}
-              <span className={styles.ch}>{"## Role"}</span>
-              {
-                "\nあなたはシニアソフトウェアアーキテクトです。\nコードを書かず、実装計画の作成に専念します。\n\n"
-              }
-              <span className={styles.ch}>{"## Instructions"}</span>
-              {"\n1. コードベース全体（"}
-              <span className={styles.cw}>@workspace</span>
-              {
-                "）を分析して現状を把握する\n2. 要件と既存アーキテクチャの適合性を評価する\n3. 実装計画を以下の形式で作成する:\n\n"
-              }
-              <span className={styles.cs}>
-                {
-                  "```markdown\n## Implementation Plan: [機能名]\n\n### Overview\n[2〜3文の概要]\n\n### Requirements\n- [要件1]\n- [要件2]\n\n### Implementation Steps\n1. [Step 1: ファイル名と変更内容]\n2. [Step 2: ...]\n\n### Testing Strategy\n- [テスト方針]\n\n### Risk Assessment\n- [リスク要因と対策]\n```"
-                }
-              </span>
-              {"\n\n"}
-              <span className={styles.ch}>{"## Constraints"}</span>
-              {"\n- "}
-              <span className={styles.cw}>{"コードを書かない（計画のみ）"}</span>
-              {
-                "\n- 既存のアーキテクチャパターンに従う\n- 新規依存パッケージの追加は事前に確認を求める"
-              }
-            </div>
-          </div>
-        </section>
-        <section id="s09" className={styles.sec}>
-          <div
-            className={styles.secHead}
-            style={{ marginTop: "36px", paddingTop: "24px", borderTop: "1px solid var(--border2)" }}
-          >
-            <h2 style={{ fontSize: "1.1rem" }}>
-              {"4-5. Subagents（サブエージェント）— 並列・分離実行 "}
-              <span className={styles.newB}>NEW</span>
-            </h2>
-          </div>
-          <div className={styles.card}>
-            <p>
-              {"Subagentsはメインエージェントから"}
-              <strong>{"独立したコンテキストで実行される子エージェント"}</strong>
-              {"です。Handoffsが「ユーザーが操作する順次遷移」であるのに対し、Subagentsは"}
-              <strong>{"「エージェントが自律的に委任する並列実行」"}</strong>
-              {"です。"}
-            </p>
-          </div>
-          <div className={styles.g2}>
-            <div className={styles.card}>
-              <div className={styles.cardTitle}>{"🔄 Handoffs vs Subagents — 使い分け"}</div>
-              <div className={styles.tblWrap}>
-                <table>
-                  <thead>
-                    <tr>
-                      <th>観点</th>
-                      <th>Handoffs</th>
-                      <th>Subagents</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>制御</td>
-                      <td>{"ユーザーが各ステップを承認"}</td>
-                      <td>{"エージェントが自律委任"}</td>
-                    </tr>
-                    <tr>
-                      <td>実行</td>
-                      <td>{"順次（ユーザー操作後）"}</td>
-                      <td>{"並列実行可能"}</td>
-                    </tr>
-                    <tr>
-                      <td>コンテキスト</td>
-                      <td>{"前のセッションを引き継ぐ"}</td>
-                      <td>{"完全に独立・隔離"}</td>
-                    </tr>
-                    <tr>
-                      <td>{"適した場面"}</td>
-                      <td>{"人間の承認が必要な作業"}</td>
-                      <td>{"調査・分析の並列実行"}</td>
-                    </tr>
-                    <tr>
-                      <td>{"必要ツール"}</td>
-                      <td>{"不要（UIメカニズム）"}</td>
-                      <td>
-                        <code>{"tools: [agent]"}</code>
-                        {"が必須"}
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-            <div>
-              <div className={`${styles.alert} ${styles.ai}`}>
-                <span className={styles.alertIcon}>ℹ️</span>
-                <div className={styles.alertBody}>
-                  <strong>{"Subagentsの主なユースケース"}</strong>
-                  <ul style={{ marginTop: "8px", paddingLeft: "16px", fontSize: "13px" }}>
-                    <li>
-                      {"コードレビューを"}
-                      <strong>
-                        {"複数の視点（セキュリティ・パフォーマンス・可読性）で並列実行"}
-                      </strong>
-                    </li>
-                    <li>
-                      {"実装前の"}
-                      <strong>{"技術調査"}</strong>
-                      {"（複数ライブラリの比較など）"}
-                    </li>
-                    <li>
-                      {"大規模コードベースの"}
-                      <strong>{"並列分析"}</strong>
-                      {"（デッドコード・重複コード等）"}
-                    </li>
-                    <li>
-                      <strong>{"コンテキスト節約"}</strong>
-                      {
-                        "：サブエージェントは結果のみを返すため、メインエージェントのコンテキストが汚染されない"
-                      }
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className={styles.codeWrap}>
-            <div className={styles.codeBar}>
-              <span>
-                {".github/agents/thorough-reviewer.agent.md — 並列Subagentでコードレビュー"}
-              </span>
-              <span className={styles.codeLang}>{"Markdown + YAML"}</span>
-            </div>
-            <div className={styles.codeBody}>
-              <span className={styles.cs}>---</span>
-              {"\n"}
-              <span className={styles.cm}>name</span>
-              {": "}
-              <span className={styles.cv}>{"'Thorough Reviewer'"}</span>
-              {"\n"}
-              <span className={styles.cm}>description</span>
-              {": "}
-              <span className={styles.cv}>
-                {
-                  "'Comprehensive code review using multiple parallel perspectives.\n  Use for: code review, PR review, quality check.'"
-                }
-              </span>
-              {"\n"}
-              <span className={styles.cm}>target</span>
-              {": "}
-              <span className={styles.cv}>{"'github-copilot'"}</span>
-              {"  "}
-              <span className={styles.cc}>{"# 必須: github-copilot | vscode"}</span>
-              {"\n"}
-              <span className={styles.cm}>tools</span>
-              {": ["}
-              <span className={styles.cv}>{"'read_file'"}</span>
-              {", "}
-              <span className={styles.cv}>{"'search'"}</span>
-              {", "}
-              <span className={styles.cv}>{"'agent'"}</span>
-              {"]   "}
-              <span className={styles.cc}>{"# 'agent' が必須"}</span>
-              {"\n"}
-              <span className={styles.cm}>agents</span>
-              {":                "}
-              <span className={styles.cc}>{"# 使用できるサブエージェントを制限"}</span>
-              {"\n  - "}
-              <span className={styles.cv}>correctness-reviewer</span>
-              {"\n  - "}
-              <span className={styles.cv}>security-reviewer</span>
-              {"\n  - "}
-              <span className={styles.cv}>performance-reviewer</span>
-              {"\n"}
-              <span className={styles.cs}>---</span>
-              {"\n\n"}
-              <span className={styles.ch}>{"## Role"}</span>
-              {"\nあなたは包括的なコードレビュアーです。\n複数の視点を"}
-              <strong>{"並列サブエージェント"}</strong>
-              {"として実行し、結果を統合します。\n\n"}
-              <span className={styles.ch}>{"## Instructions"}</span>
-              {"\nコードレビューを依頼されたら、以下の3つを"}
-              <strong>{"同時並列"}</strong>
-              {
-                "で実行する:\n\n1. correctness-reviewer サブエージェント:\n   「ロジックエラー・エッジケース・型の問題を分析してください」\n   \n2. security-reviewer サブエージェント:\n   「OWASP Top 10 に基づいてセキュリティ問題を特定してください」\n   \n3. performance-reviewer サブエージェント:\n   「パフォーマンスボトルネック・不要な再レンダリングを特定してください」\n\n各サブエージェントの結果を受け取ったら、統合レポートを作成する。\n\n"
-              }
-              <span className={styles.ch}>{"## Output Format"}</span>
-              {"\n"}
-              <span className={styles.cs}>
-                {
-                  "```markdown\n## Code Review Summary\n\n### Critical Issues\n[セキュリティ・バグ]\n\n### Improvements\n[パフォーマンス・品質]\n\n### Positive Observations\n[良かった点]\n```"
-                }
-              </span>
-            </div>
-          </div>
-        </section>
-        <section id="s10" className={styles.sec}>
-          <div
-            className={styles.secHead}
-            style={{ marginTop: "36px", paddingTop: "24px", borderTop: "1px solid var(--border2)" }}
-          >
-            <h2 style={{ fontSize: "1.1rem" }}>
-              {"4-6. MCP統合 — エージェント専用MCPサーバー設定 "}
-              <span className={styles.newB}>NEW</span>
-            </h2>
-          </div>
-          <div className={styles.card}>
-            <p>
-              <code>mcp-servers</code>
-              {" フィールドで"}
-              <strong>{"このエージェント専用のMCPサーバー"}</strong>
-              {
-                "を設定できます。GitHub Copilot Coding Agent（GitHub.com）はMCPサーバーのtoolsのみサポート（resources・promptsは非対応）。リモートMCPのOAuth認証は現在未対応です。"
-              }
-            </p>
-          </div>
-          <div className={styles.codeWrap}>
-            <div className={styles.codeBar}>
-              <span>{".github/agents/sentry-debugger.agent.md — Sentry MCP連携エージェント"}</span>
-              <span className={styles.codeLang}>{"Markdown + YAML"}</span>
-            </div>
-            <div className={styles.codeBody}>
-              <span className={styles.cs}>---</span>
-              {"\n"}
-              <span className={styles.cm}>name</span>
-              {": "}
-              <span className={styles.cv}>{"'Sentry Debugger'"}</span>
-              {"\n"}
-              <span className={styles.cm}>description</span>
-              {": "}
-              <span className={styles.cv}>
-                {
-                  "'Analyzes Sentry errors and links them to code issues.\n  Use for: Sentry, error tracking, production bugs, exception analysis.'"
-                }
-              </span>
-              {"\n"}
-              <span className={styles.cm}>target</span>
-              {": "}
-              <span className={styles.cv}>{"'github-copilot'"}</span>
-              {"  "}
-              <span className={styles.cc}>{"# 必須: github-copilot | vscode"}</span>
-              {"\n"}
-              <span className={styles.cm}>tools</span>
-              {": ["}
-              <span className={styles.cv}>{"'read_file'"}</span>
-              {", "}
-              <span className={styles.cv}>{"'search'"}</span>
-              {", "}
-              <span className={styles.cv}>{"'sentry/get_issue_details'"}</span>
-              {", "}
-              <span className={styles.cv}>{"'sentry/get_issue_summary'"}</span>
-              {"]\n"}
-              <span className={styles.cm}>{"mcp-servers"}</span>
-              {":\n  "}
-              <span className={styles.cv}>sentry</span>
-              {":\n    "}
-              <span className={styles.cv}>type</span>
-              {": "}
-              <span className={styles.cv}>{"'local'"}</span>
-              {"           "}
-              <span className={styles.cc}>{"# 'local'=stdio互換, 'http', 'sse'"}</span>
-              {"\n    "}
-              <span className={styles.cv}>command</span>
-              {": "}
-              <span className={styles.cv}>{"'npx'"}</span>
-              {"\n    "}
-              <span className={styles.cv}>args</span>
-              {": ["}
-              <span className={styles.cv}>{"'@sentry/mcp-server@latest'"}</span>
-              {", "}
-              <span className={styles.cv}>{"'--host=$SENTRY_HOST'"}</span>
-              {"]\n    "}
-              <span className={styles.cv}>tools</span>
-              {": ["}
-              <span className={styles.cv}>{"'get_issue_details'"}</span>
-              {", "}
-              <span className={styles.cv}>{"'get_issue_summary'"}</span>
-              {"]   "}
-              <span className={styles.cc}>{"# ホワイトリスト推奨"}</span>
-              {"\n    "}
-              <span className={styles.cv}>env</span>
-              {":\n      "}
-              <span className={styles.cv}>SENTRY_HOST</span>
-              {": "}
-              <span className={styles.cv}>{"'https://yourcompany.sentry.io'"}</span>
-              {"\n      "}
-              <span className={styles.cv}>SENTRY_ACCESS_TOKEN</span>
-              {": "}
-              {/* biome-ignore lint/suspicious/noTemplateCurlyInString: GitHub Actions secret syntax */}
-              <span className={styles.cv}>{"'${{ secrets.COPILOT_MCP_SENTRY_TOKEN }}'"}</span>
-              {"\n      "}
-              <span className={styles.cc}>
-                {'# ↑ リポジトリSettings → Copilot → Coding Agent → "copilot" 環境に設定'}
-              </span>
-              {"\n      "}
-              <span className={styles.cc}>
-                {/* biome-ignore lint/suspicious/noTemplateCurlyInString: GitHub Actions template syntax */}
-                {"# GitHub Actions構文: ${{ secrets.* }} / ${{ vars.* }}"}
-              </span>
-              {"\n      "}
-              <span className={styles.cc}>
-                {/* biome-ignore lint/suspicious/noTemplateCurlyInString: shell variable syntax */}
-                {"# Claude Code構文: ${VAR} / ${VAR:-default} も使用可"}
-              </span>
-              {"\n"}
-              <span className={styles.cs}>---</span>
-              {"\n\n"}
-              <span className={styles.ch}>{"## Role"}</span>
-              {
-                "\nあなたは本番エラー調査の専門家です。Sentryのエラーを分析し、\nコードベースと照合して根本原因を特定します。\n\n"
-              }
-              <span className={styles.ch}>{"## Instructions"}</span>
-              {"\n1. "}
-              <span className={styles.cw}>get_issue_summary</span>
-              {
-                " でSentryイシューの概要を取得（ログ全量は取得しない）\n2. 問題のスタックトレースから関連ファイルを特定\n3. コードベースで該当箇所を読み取る\n4. 根本原因と修正案を提示する\n\n"
-              }
-              <span className={styles.ch}>{"## Constraints"}</span>
-              {"\n- "}
-              <span className={styles.cw}>{"コードを変更しない（調査・レポートのみ）"}</span>
-              {"\n- 完全なログが必要な場合のみ "}
-              <span className={styles.cw}>get_issue_details</span>
-              {" を使用\n- センシティブなデータ（PII等）をレポートに含めない"}
-            </div>
-          </div>
-          <div className={`${styles.alert} ${styles.ai}`}>
-            <span className={styles.alertIcon}>💡</span>
-            <div className={styles.alertBody}>
-              <strong>{"ビルトインMCPサーバー（追加設定不要）"}</strong>
-              {" Copilot Coding Agentには以下のMCPサーバーがビルトインで利用可能です（"}
-              <code>mcp-servers</code>
-              {"設定不要）："}
-              <code>github</code>
-              {"（Issue・PR・コード操作）・"}
-              <code>azure</code>
-              {"（Azure DevOps連携）・"}
-              <code>cloudflare</code>
-              {"。これらは "}
-              <code>tools</code>
-              {" フィールドに直接 "}
-              <code>{'"github/create_issue"'}</code>
-              {" のように指定するだけで使用できます。"}
-            </div>
-          </div>
-        </section>
-        <section id="s11" className={styles.sec}>
-          <div
-            className={styles.secHead}
-            style={{ marginTop: "36px", paddingTop: "24px", borderTop: "1px solid var(--border2)" }}
-          >
-            <h2 style={{ fontSize: "1.1rem" }}>
-              {"4-7. 実践テンプレート集（5種） "}
-              <span className={styles.newB}>NEW</span>
-            </h2>
-          </div>
-          <div className={styles.codeWrap}>
-            <div className={styles.codeBar}>
-              <span>{"① security-reviewer.agent.md — セキュリティ監査専門（Read-Only）"}</span>
-              <span className={styles.codeLang}>{"YAML + MD"}</span>
-            </div>
-            <div className={styles.codeBody}>
-              <span className={styles.cs}>---</span>
-              {"\n"}
-              <span className={styles.cm}>name</span>
-              {": "}
-              <span className={styles.cv}>{"'Security Reviewer'"}</span>
-              {"\n"}
-              <span className={styles.cm}>description</span>
-              {": "}
-              <span className={styles.cv}>
-                {
-                  "'OWASP Top 10 security audit. Reads code, generates reports only.\n  Use for: security review, vulnerability, OWASP, audit, sec check.\n  Does NOT modify any files.'"
-                }
-              </span>
-              {"\n"}
-              <span className={styles.cm}>target</span>
-              {": "}
-              <span className={styles.cv}>{"'github-copilot'"}</span>
-              {"  "}
-              <span className={styles.cc}>{"# 必須: github-copilot | vscode"}</span>
-              {"\n"}
-              <span className={styles.cm}>tools</span>
-              {": ["}
-              <span className={styles.cv}>{"'read_file'"}</span>
-              {", "}
-              <span className={styles.cv}>{"'grep_search'"}</span>
-              {", "}
-              <span className={styles.cv}>{"'list_directory'"}</span>
-              {"]  "}
-              <span className={styles.cc}>{"# Read-Only"}</span>
-              {"\n"}
-              <span className={styles.cs}>---</span>
-              {"\n\n"}
-              <span className={styles.ch}>{"## Role"}</span>
-              {
-                "\nOWASP Top 10 を基準にコードを監査するセキュリティエンジニア。\nコードを変更せずレポートのみ出力する。\n\n"
-              }
-              <span className={styles.ch}>{"## Checklist"}</span>
-              {
-                "\n- A01: アクセス制御の欠陥（IDOR・権限バイパス）\n- A02: 暗号化の失敗（平文保存・弱暗号）\n- A03: インジェクション（SQLi・XSS・コマンドインジェクション）\n- A04: 安全でない設計（ビジネスロジックの欠陥）\n- A07: 認証の失敗（弱パスワード・ブルートフォース対策なし）\n\n"
-              }
-              <span className={styles.ch}>{"## Constraints"}</span>
-              {"\n- "}
-              <span className={styles.cw}>{"コードを一切変更しない"}</span>
-              {"\n- 確認していない脆弱性を断定しない\n- CWE番号を付与して報告する"}
-            </div>
-          </div>
-          <div className={styles.codeWrap}>
-            <div className={styles.codeBar}>
-              <span>{"② docs-agent.agent.md — ドキュメント生成専門（docs/のみ書き込み）"}</span>
-              <span className={styles.codeLang}>{"YAML + MD"}</span>
-            </div>
-            <div className={styles.codeBody}>
-              <span className={styles.cs}>---</span>
-              {"\n"}
-              <span className={styles.cm}>name</span>
-              {": "}
-              <span className={styles.cv}>{"'Docs Agent'"}</span>
-              {"\n"}
-              <span className={styles.cm}>description</span>
-              {": "}
-              <span className={styles.cv}>
-                {
-                  "'Creates and updates technical documentation in docs/ folder.\n  Use for: docs, README, changelog, API docs, documentation update.\n  Does NOT modify source code.'"
-                }
-              </span>
-              {"\n"}
-              <span className={styles.cm}>target</span>
-              {": "}
-              <span className={styles.cv}>{"'github-copilot'"}</span>
-              {"  "}
-              <span className={styles.cc}>{"# 必須: github-copilot | vscode"}</span>
-              {"\n"}
-              <span className={styles.cm}>tools</span>
-              {": ["}
-              <span className={styles.cv}>{"'read_file'"}</span>
-              {", "}
-              <span className={styles.cv}>{"'create_file'"}</span>
-              {", "}
-              <span className={styles.cv}>{"'edit_file'"}</span>
-              {"]\n"}
-              <span className={styles.cs}>---</span>
-              {"\n\n"}
-              <span className={styles.ch}>{"## Role"}</span>
-              {"\n技術文書作成の専門家。"}
-              <span className={styles.cw}>{"docs/ ディレクトリのみ"}</span>
-              {"書き込み可能。\n\n"}
-              <span className={styles.ch}>{"## File Boundaries"}</span>
-              {"\n- 書き込み: "}
-              <span className={styles.cw}>{"/docs/ のみ"}</span>
-              {
-                "（README.md・CHANGELOG.md を含む）\n- 読み取り: プロジェクト全体（src/ 等も読める）\n- "
-              }
-              <span className={styles.cw}>{"ソースコードの変更は絶対にしない"}</span>
-            </div>
-          </div>
-          <div className={styles.codeWrap}>
-            <div className={styles.codeBar}>
-              <span>
-                {
-                  "③ implementer.agent.md — 実装専任（user-invocable: false でサブエージェント専用）"
-                }
-              </span>
-              <span className={styles.codeLang}>{"YAML + MD"}</span>
-            </div>
-            <div className={styles.codeBody}>
-              <span className={styles.cs}>---</span>
-              {"\n"}
-              <span className={styles.cm}>name</span>
-              {": "}
-              <span className={styles.cv}>{"'Implementer'"}</span>
-              {"\n"}
-              <span className={styles.cm}>description</span>
-              {": "}
-              <span className={styles.cv}>
-                {
-                  "'Implements features based on provided plan. Worker agent, not for direct invocation.'"
-                }
-              </span>
-              {"\n"}
-              <span className={styles.cm}>target</span>
-              {": "}
-              <span className={styles.cv}>{"'github-copilot'"}</span>
-              {"  "}
-              <span className={styles.cc}>{"# 必須: github-copilot | vscode"}</span>
-              {"\n"}
-              <span className={styles.cm}>model</span>
-              {": ["}
-              <span className={styles.cv}>{"'Claude Haiku 4.5 (copilot)'"}</span>
-              {", "}
-              <span className={styles.cv}>{"'Gemini 3 Flash (Preview) (copilot)'"}</span>
-              {"]\n"}
-              <span className={styles.cm}>tools</span>
-              {": ["}
-              <span className={styles.cv}>{"'read_file'"}</span>
-              {", "}
-              <span className={styles.cv}>{"'edit_file'"}</span>
-              {", "}
-              <span className={styles.cv}>{"'create_file'"}</span>
-              {", "}
-              <span className={styles.cv}>{"'run_terminal_command'"}</span>
-              {"]\n"}
-              <span className={styles.cm}>{"user-invocable"}</span>
-              {": "}
-              <span className={styles.cv}>{"false"}</span>
-              {"   "}
-              <span className={styles.cc}>{"# @メニューに表示しない"}</span>
-              {"\n"}
-              <span className={styles.cm}>handoffs</span>
-              {":\n  - "}
-              <span className={styles.cm}>label</span>
-              {": "}
-              <span className={styles.cv}>{"'Review Changes'"}</span>
-              {"\n    "}
-              <span className={styles.cm}>agent</span>
-              {": "}
-              <span className={styles.cv}>{"security-reviewer"}</span>
-              {"\n    "}
-              <span className={styles.cm}>prompt</span>
-              {": "}
-              <span className={styles.cv}>
-                {"'Implemented changes for security vulnerabilities.'"}
-              </span>
-              {"\n    "}
-              <span className={styles.cm}>send</span>
-              {": "}
-              <span className={styles.cv}>{"false"}</span>
-              {"\n"}
-              <span className={styles.cs}>---</span>
-              {"\n\n"}
-              <span className={styles.ch}>{"## Role"}</span>
-              {
-                "\nplannerエージェントから渡された計画を実装するワーカー。\n計画に従って実装し、逸脱しない。\n\n"
-              }
-              <span className={styles.ch}>{"## Constraints"}</span>
-              {
-                "\n- 計画にない変更を加えない\n- テストが失敗したら実装を止めて報告する\n- 新規依存パッケージは人間確認なしに追加しない"
-              }
-            </div>
-          </div>
-          <div className={styles.codeWrap}>
-            <div className={styles.codeBar}>
-              <span>{"④ triage-agent.agent.md — Issueトリアージ（GitHub MCPビルトイン活用）"}</span>
-              <span className={styles.codeLang}>{"YAML + MD"}</span>
-            </div>
-            <div className={styles.codeBody}>
-              <span className={styles.cs}>---</span>
-              {"\n"}
-              <span className={styles.cm}>name</span>
-              {": "}
-              <span className={styles.cv}>{"'Issue Triage Agent'"}</span>
-              {"\n"}
-              <span className={styles.cm}>description</span>
-              {": "}
-              <span className={styles.cv}>
-                {
-                  "'Triages GitHub Issues: adds labels, assigns priority, links to related PRs.\n  Use for: issue triage, label, priority, backlog management.'"
-                }
-              </span>
-              {"\n"}
-              <span className={styles.cm}>target</span>
-              {": "}
-              <span className={styles.cv}>{"'github-copilot'"}</span>
-              {"  "}
-              <span className={styles.cc}>{"# 必須: github-copilot | vscode"}</span>
-              {"\n"}
-              <span className={styles.cm}>tools</span>
-              {": ["}
-              <span className={styles.cv}>{"'github/list_issues'"}</span>
-              {", "}
-              <span className={styles.cv}>{"'github/update_issue'"}</span>
-              {", "}
-              <span className={styles.cv}>{"'github/add_labels'"}</span>
-              {", "}
-              <span className={styles.cv}>{"'read_file'"}</span>
-              {"]\n"}
-              <span className={styles.cc}>
-                {"# 'github/*' はビルトインMCPサーバー（追加設定不要）"}
-              </span>
-              {"\n"}
-              <span className={styles.cs}>---</span>
-              {"\n\n"}
-              <span className={styles.ch}>{"## Role"}</span>
-              {"\nGitHubのIssueを体系的にトリアージする。\n\n"}
-              <span className={styles.ch}>{"## Triage Process"}</span>
-              {"\n1. 未ラベルのIssueを取得する\n2. 内容を分析して以下のラベルを付与:\n   - "}
-              <span className={styles.cs}>bug</span>
-              {" / "}
-              <span className={styles.cs}>enhancement</span>
-              {" / "}
-              <span className={styles.cs}>documentation</span>
-              {" / "}
-              <span className={styles.cs}>question</span>
-              {"\n   - 優先度: "}
-              <span className={styles.cs}>P0-critical</span>
-              {" / "}
-              <span className={styles.cs}>P1-high</span>
-              {" / "}
-              <span className={styles.cs}>P2-medium</span>
-              {" / "}
-              <span className={styles.cs}>P3-low</span>
-              {"\n3. 関連するPRや既存Issueがあればリンクを追加\n\n"}
-              <span className={styles.ch}>{"## Constraints"}</span>
-              {"\n- "}
-              <span className={styles.cw}>{"コードを変更しない"}</span>
-              {"\n- Issueのクローズは行わない（人間が最終判断）"}
-            </div>
-          </div>
-          <div className={styles.codeWrap}>
-            <div className={styles.codeBar}>
-              <span>{"⑤ readme-creator.agent.md — README作成（GitHub Docs公式テンプレート）"}</span>
-              <span className={styles.codeLang}>{"YAML + MD"}</span>
-            </div>
-            <div className={styles.codeBody}>
-              <span className={styles.cs}>---</span>
-              {"\n"}
-              <span className={styles.cm}>name</span>
-              {": "}
-              <span className={styles.cv}>{"'README Creator'"}</span>
-              {"\n"}
-              <span className={styles.cm}>description</span>
-              {": "}
-              <span className={styles.cv}>
-                {
-                  "'Creates and improves README files. Scope limited to README and docs only.\n  Use for: README, documentation, getting started, badges.'"
-                }
-              </span>
-              {"\n"}
-              <span className={styles.cm}>target</span>
-              {": "}
-              <span className={styles.cv}>{"'github-copilot'"}</span>
-              {"  "}
-              <span className={styles.cc}>{"# 必須: github-copilot | vscode"}</span>
-              {"\n"}
-              <span className={styles.cs}>---</span>
-              {"\n"}
-              <span className={styles.cc}>
-                {"# ↑ tools 省略 = 全ツール使用可（最もシンプルな構成）"}
-              </span>
-              {"\n"}
-              <span className={styles.cc}>
-                {"# GitHub Docs の公式テンプレートをベースにカスタマイズ"}
-              </span>
-              {"\n\n"}
-              <span className={styles.ch}>{"## Role"}</span>
-              {
-                "\nREADMEとドキュメントファイルの作成・改善に特化する。\nコードファイル・設定ファイルは変更しない。\n\n"
-              }
-              <span className={styles.ch}>{"## README Structure"}</span>
-              {
-                "\n- Overview（概要・目的）\n- Installation（インストール手順）\n- Usage（使い方・サンプル）\n- Contributing（コントリビューション方法）\n- License\n\n"
-              }
-              <span className={styles.ch}>{"## Rules"}</span>
-              {
-                "\n- 相対リンクを使用する（絶対URLは避ける）\n- バッジは必要最小限\n- コードサンプルにはシンタックスハイライトを使用"
-              }
-            </div>
-          </div>
-        </section>
-        <section id="s12" className={styles.sec}>
-          <div
-            className={styles.secHead}
-            style={{ marginTop: "36px", paddingTop: "24px", borderTop: "1px solid var(--border2)" }}
-          >
-            <h2 style={{ fontSize: "1.1rem" }}>
-              {"4-8. .agent.md ベストプラクティス 12則 "}
-              <span className={styles.newB}>NEW</span>
-            </h2>
-          </div>
-          <div className={styles.bpGrid}>
-            <div className={`${styles.bpCard} ${styles.bpG}`}>
-              <div className={styles.bpNum}>01</div>
-              <h4>{"descriptionは「Focuses on X, does NOT do Y」形式で"}</h4>
-              <p>
-                {
-                  "2,500リポジトリの分析から、明確なdescriptionを持つエージェントほど誤呼び出しが少ない。50〜150文字で「使う場面」と「使わない場面」を両方書く。"
-                }
-              </p>
-            </div>
-            <div className={`${styles.bpCard} ${styles.bpB}`}>
-              <div className={styles.bpNum}>02</div>
-              <h4>{"ツールは最小権限の原則を徹底する"}</h4>
-              <p>
-                {
-                  "tools省略=全ツール許可は危険。セキュリティ審査エージェントは read_file+grep のみ。本番DB操作ツールは原則許可しない。必要に応じて人間確認ステップを本文に組み込む。"
-                }
-              </p>
-            </div>
-            <div className={`${styles.bpCard} ${styles.bpP}`}>
-              <div className={styles.bpNum}>03</div>
-              <h4>{"本文Constraintsセクションで「絶対に行わないこと」を明記"}</h4>
-              <p>
-                {
-                  "「ソースコードを変更しない」「本番DBには書き込まない」「テストを削除しない」などをConstraintsセクションに明示。LLMの非決定性に対する安全網として機能する。"
-                }
-              </p>
-            </div>
-            <div className={`${styles.bpCard} ${styles.bpA}`}>
-              <div className={styles.bpNum}>04</div>
-              <h4>{"handoffsはsend:false（手動承認）を原則にする"}</h4>
-              <p>
-                {
-                  "send:trueの自動送信は完全自動化できるが、予期しない変更につながるリスクがある。重要な処理の前は send:false でユーザー確認を挟む設計が安全。CI/CD用途のみsend:true。"
-                }
-              </p>
-            </div>
-            <div className={`${styles.bpCard} ${styles.bpT}`}>
-              <div className={styles.bpNum}>05</div>
-              <h4>{"サブエージェント専用は user-invocable: false にする"}</h4>
-              <p>
-                {
-                  "plannerから呼び出されるimplementerなど、直接呼び出し不要なエージェントは @メニューに表示しない。coordinatorがagents[]で明示すれば上書き可能。エコシステムをクリーンに保てる。"
-                }
-              </p>
-            </div>
-            <div className={`${styles.bpCard} ${styles.bpG}`}>
-              <div className={styles.bpNum}>06</div>
-              <h4>{"File Boundariesを本文に必ず書く"}</h4>
-              <p>
-                {
-                  "「書き込みは /tests/ のみ」「/docs/ 以外は読み取り専用」のように書き込み範囲を明示する。toolsでの制限に加え、本文でも自然言語で制約を再確認するダブルチェック体制が重要。"
-                }
-              </p>
-            </div>
-            <div className={`${styles.bpCard} ${styles.bpB}`}>
-              <div className={styles.bpNum}>07</div>
-              <h4>{"MCPシークレットはcopilot環境から取得する"}</h4>
-              <p>
-                {
-                  "mcp-servers の env に直接トークンを書かない。リポジトリ Settings → Copilot → Coding Agent の「copilot」環境に登録し、$"
-                }
-                {"{{ secrets.COPILOT_MCP_* }}"}
-                {" で参照する。gitにシークレットを含めない。"}
-              </p>
-            </div>
-            <div className={`${styles.bpCard} ${styles.bpR}`}>
-              <div className={styles.bpNum}>08</div>
-              <h4>{"handoffsはGitHub.com Coding Agentでは動作しない"}</h4>
-              <p>
-                {
-                  "handoffsとargument-hintはIDE専用機能（VS Code・JetBrains・Eclipse・Xcode）。GitHub.com上でIssueに割り当てる「Copilot Coding Agent」では無視される。プラットフォーム別の設計が必要。"
-                }
-              </p>
-            </div>
-            <div className={`${styles.bpCard} ${styles.bpP}`}>
-              <div className={styles.bpNum}>09</div>
-              <h4>{"modelはIDEで使用、GitHub.comでは無視"}</h4>
-              <p>
-                {
-                  "model指定はVS Code等のIDEカスタムエージェント専用。GitHub.comのCopilot Coding AgentはOrg/Repoの設定に従う。配列指定でフォールバックも設定可能: ['Claude Opus', 'GPT-5']"
-                }
-              </p>
-            </div>
-            <div className={`${styles.bpCard} ${styles.bpA}`}>
-              <div className={styles.bpNum}>10</div>
-              <h4>{"agentsでサブエージェントホワイトリストを制限する"}</h4>
-              <p>
-                {
-                  "agents[]を省略するとdisable-model-invocation:falseの全エージェントがサブエージェント対象になる。予期しない呼び出しを防ぐため、coordinatorエージェントは使用するサブエージェントを明示的に列挙する。"
-                }
-              </p>
-            </div>
-            <div className={`${styles.bpCard} ${styles.bpT}`}>
-              <div className={styles.bpNum}>11</div>
-              <h4>{"エージェントはgit管理してデフォルトブランチに置く"}</h4>
-              <p>
-                {
-                  "GitHub.com Copilot Coding AgentはデフォルトブランチのエージェントのみIssueトリアージUIに表示する。PR中のエージェントはIDE経由では使えるが、GitHub.comのAgentsパネルには表示されない。"
-                }
-              </p>
-            </div>
-            <div className={`${styles.bpCard} ${styles.bpG}`}>
-              <div className={styles.bpNum}>12</div>
-              <h4>{"Output Formatセクションで出力を標準化する"}</h4>
-              <p>
-                {
-                  "「テスト完了後は作成ファイル一覧・Pass/Fail数・カバレッジ変化を報告する」のように出力形式を明示する。チームメンバーがエージェントの成果物を予測・評価できるようになる。"
-                }
-              </p>
-            </div>
-          </div>
-        </section>
-        <section id="s13" className={styles.sec}>
-          <div
-            className={styles.secHead}
-            style={{ marginTop: "36px", paddingTop: "24px", borderTop: "1px solid var(--border2)" }}
-          >
-            <h2 style={{ fontSize: "1.1rem" }}>
-              {"4-9. トラブルシューティング — よくある問題と解決策 "}
-              <span className={styles.newB}>NEW</span>
-            </h2>
-          </div>
-          <div className={styles.tblWrap}>
+
+          <div className={styles.tableWrap}>
             <table>
               <thead>
                 <tr>
-                  <th>症状</th>
-                  <th>原因</th>
-                  <th>解決策</th>
+                  <th>プラットフォーム</th>
+                  <th>主な用途</th>
+                  <th>参照ディレクトリ(既定)</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
+                  <td>VS Code(Copilot Chat)</td>
+                  <td>エディタ内での対話・編集・計画</td>
                   <td>
-                    <code>@エージェント名</code>
-                    {"がメニューに表示されない"}
-                  </td>
-                  <td>
-                    {
-                      "descriptionフィールドがない / ファイル名に不正文字 / デフォルトブランチ未コミット"
-                    }
-                  </td>
-                  <td>
-                    {
-                      "descriptionを追加、ファイル名を英数字・ハイフン・アンダースコアのみに変更、デフォルトブランチにpush"
-                    }
+                    <code>.github/agents/</code>(ワークスペース)/ <code>~/.copilot/agents</code>
+                    (ユーザー)
                   </td>
                 </tr>
                 <tr>
-                  <td>{"エージェントが意図しないファイルを変更する"}</td>
-                  <td>{"toolsが無制限 / 本文にConstraintsがない"}</td>
-                  <td>
-                    {
-                      "toolsに必要なツールのみ明示。本文Constraintsセクションに「○○以外を変更しない」と明記"
-                    }
-                  </td>
-                </tr>
-                <tr>
-                  <td>{"handoffsボタンが表示されない"}</td>
-                  <td>{"GitHub.com（Coding Agent）で使用している / IDE未対応"}</td>
-                  <td>
-                    {
-                      "handoffsはIDE専用（VS Code・JetBrains等）。GitHub.comでは使用不可。IDE上で使用するか、AGENTS.md記述に変更"
-                    }
-                  </td>
-                </tr>
-                <tr>
-                  <td>{"MCPサーバーへの接続が失敗する"}</td>
-                  <td>{"シークレットが設定されていない / typeが間違っている"}</td>
-                  <td>
-                    {
-                      "リポジトリSettings → Copilot → Coding Agent → copilot環境にシークレットを登録。GitHub.comはlocalタイプ（stdioと互換）を使用"
-                    }
-                  </td>
-                </tr>
-                <tr>
-                  <td>{"サブエージェントが予期しないエージェントを呼び出す"}</td>
-                  <td>{"agents[]が未設定で全エージェントが対象になっている"}</td>
-                  <td>
-                    {"coordinatorエージェントのfrontmatterに "}
-                    <code>{"agents: [worker1, worker2]"}</code>
-                    {" を追加して使用エージェントを制限"}
-                  </td>
-                </tr>
-                <tr>
-                  <td>{"モデル指定が効かない"}</td>
-                  <td>{"GitHub.com Copilot Coding Agentで使用している"}</td>
-                  <td>
-                    {
-                      "model指定はIDEカスタムエージェント専用。GitHub.comではOrg/Repo設定のモデルが使用される"
-                    }
-                  </td>
-                </tr>
-                <tr>
-                  <td>{"エージェントが同じ指示を毎回繰り返す"}</td>
-                  <td>{"copilot-instructions.mdと内容が重複している"}</td>
-                  <td>
-                    {
-                      "エージェント固有の専門指示のみをagent.mdに書き、汎用ルールはcopilot-instructions.mdに集約して重複を避ける"
-                    }
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <div className={styles.card} style={{ marginTop: "20px" }}>
-            <div className={styles.cardTitle}>{"📊 Good vs Anti Pattern — .agent.md 設計比較"}</div>
-            <div className={styles.patGrid}>
-              <div className={`${styles.pat} ${styles.patOk}`}>
-                <div className={styles.patLabel}>{"✅ ベストプラクティス"}</div>
-                <ul>
-                  <li>{"1エージェント = 1専門領域（単一責任）"}</li>
-                  <li>{"descriptionに「Use for: ... / Does NOT:...」両方記載"}</li>
-                  <li>{"toolsを最小権限で明示"}</li>
-                  <li>{"本文にConstraints・File Boundaries・Output Format"}</li>
-                  <li>{"handoffs は send:false（手動承認）を原則"}</li>
-                  <li>{"サブエージェント専用は user-invocable: false"}</li>
-                  <li>{"MCPシークレットはcopilot環境変数で管理"}</li>
-                  <li>{"エージェントをgit管理・デフォルトブランチに配置"}</li>
-                </ul>
-              </div>
-              <div className={`${styles.pat} ${styles.patNg}`}>
-                <div className={styles.patLabel}>{"✗ アンチパターン"}</div>
-                <ul>
-                  <li>{"description が曖昧・短すぎる（1行）"}</li>
-                  <li>{"tools 省略（全ツール許可のまま）"}</li>
-                  <li>{"本番DBアクセスツールを制限なく許可"}</li>
-                  <li>{"「何でもやる汎用エージェント」を1つ作る"}</li>
-                  <li>{"handoffs を send:true にして確認なく自動実行"}</li>
-                  <li>{"MCPシークレットをYAMLに直書きしてgitにコミット"}</li>
-                  <li>{"copilot-instructions.mdと全く同じ内容を重複記述"}</li>
-                  <li>{"ファイル名に日本語・スペースを使用"}</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-          <div className={`${styles.alert} ${styles.ag}`}>
-            <span className={styles.alertIcon}>💡</span>
-            <div className={styles.alertBody}>
-              <strong>{"copilot-instructions.mdとの位置関係："}</strong>
-              {" エージェントのプロンプトはシステムプロンプト内で "}
-              <code>copilot-instructions.md</code>
-              {" の"}
-              <strong>{"下"}</strong>
-              {
-                "に配置されます。つまり全体のルールは常に尊重されつつ、エージェントがその振る舞いを拡張・上書きできます。エージェント固有のルールを "
-              }
-              <code>copilot-instructions.md</code>
-              {" に書く必要はありません（重複・コンテキスト汚染の原因になります）。"}
-            </div>
-          </div>
-        </section>
-        <hr />
-        <section id="s14" className={styles.sec}>
-          <div className={styles.secHead}>
-            <span className={styles.secNum}>5</span>
-            <h2>
-              <span className={styles.mono}>.github/skills/*/SKILL.md</span>
-              {" — 遅延ロード型スキル（Open Standard）"}
-            </h2>
-            <span className={styles.note}>
-              2025年12月〜 · VS Code + Copilot CLI + Coding Agent 対応
-            </span>
-          </div>
-          <div className={styles.card}>
-            <p>
-              {"Agent Skills は "}
-              <strong>プロンプトに関連する場合のみ自動ロードされる「専門知識パッケージ」</strong>
-              {"です。"}
-              <code>copilot-instructions.md</code>
-              {
-                " が常時ロードされるのに対して、SKILL.md はタスクマッチ時のみロードされます（プログレッシブ・ディスクロージャー）。"
-              }
-              <strong>Anthropic の Claude Code と同じフォーマット</strong>
-              {"のオープンスタンダードであり、"}
-              <code>anthropics/skills</code>
-              {" リポジトリのスキルをそのまま使えます。"}
-            </p>
-          </div>
-          <div className={`${styles.alert} ${styles.ag}`}>
-            <span className={styles.alertIcon}>✅</span>
-            <div className={styles.alertBody}>
-              <strong>Claude Code の .claude/skills/ と互換性あり</strong>
-              <code>.claude/skills/</code>
-              {
-                " に配置したスキルは GitHub Copilot が自動的に認識します。スキルはクロスツールで動作するオープンスタンダードです。"
-              }
-              <code>github/awesome-copilot</code>
-              {" や "}
-              <code>anthropics/skills</code>
-              {" リポジトリのコミュニティスキルも利用できます。"}
-            </div>
-          </div>
-          <div className={styles.codeWrap}>
-            <div className={styles.codeBar}>
-              <span>.github/skills/playwright-testing/SKILL.md</span>
-              <span className={styles.codeLang}>Markdown + YAML frontmatter</span>
-            </div>
-            <div className={styles.codeBody}>
-              <span className={styles.cs}>---</span>
-              {"\n"}
-              <span className={styles.cm}>name</span>
-              {": "}
-              <span className={styles.cv}>playwright-testing</span>
-              {"\n"}
-              <span className={styles.cm}>description</span>
-              {": "}
-              <span className={styles.cv}>
-                {
-                  "|\n  Playwright を使った E2E テストを作成・実行するスキル。\n  以下の場合にトリガーする:\n  - ブラウザベースのテストを作成してほしい\n  - E2E テストを実行・デバッグしてほしい\n  - Playwright の設定・セットアップが必要\n  \n  以下の場合はトリガーしない:\n  - ユニットテスト（Vitest）の作成\n  - API テスト（supabase functions test）"
-                }
-              </span>
-              {"\n"}
-              <span className={styles.cs}>---</span>
-              {"\n\n"}
-              <span className={styles.ch}># Playwright E2E Testing</span>
-              {"\n\n"}
-              <span className={styles.cm}>## Setup</span>
-              {"\nインストール: "}
-              <span className={styles.cs}>{"`pnpm add -D @playwright/test`"}</span>
-              {"\n設定: playwright.config.ts（プロジェクトルート）\nブラウザインストール: "}
-              <span className={styles.cs}>{"`pnpm playwright install chromium`"}</span>
-              {"\n\n"}
-              <span className={styles.cm}>## Page Object Pattern</span>
-              {"\nすべての E2E テストはページオブジェクトパターンを使用する:\n\n"}
-              <span className={styles.cs}>
-                {
-                  "```typescript\n// tests/pages/LoginPage.ts\nexport class LoginPage {\n  constructor(private page: Page) {}\n  \n  async login(email: string, password: string) {\n    await this.page.getByTestId('email').fill(email)\n    await this.page.getByTestId('password').fill(password)\n    await this.page.getByTestId('submit').click()\n  }\n}\n```"
-                }
-              </span>
-              {"\n\n"}
-              <span className={styles.cm}>## Commands</span>
-              {"\n- 全 E2E 実行: "}
-              <span className={styles.cs}>{"`pnpm playwright test`"}</span>
-              {"\n- UI モード:   "}
-              <span className={styles.cs}>{"`pnpm playwright test --ui`"}</span>
-              {"\n- トレース記録: "}
-              <span className={styles.cs}>{"`pnpm playwright test --trace on`"}</span>
-              {"\n\n"}
-              <span className={styles.cm}>## Test Structure Rules</span>
-              {"\n- "}
-              <span className={styles.cs}>data-testid</span>
-              {" 属性でセレクタを指定（クラス名は変わりやすいため禁止）\n- "}
-              <span className={styles.cs}>beforeEach</span>
-              {
-                " でテスト状態をリセット\n- 各テストは独立して実行可能なこと（テスト間の依存禁止）\n\n"
-              }
-              <span className={styles.cc}>
-                {"# スキルディレクトリには追加リソースも含められる"}
-              </span>
-              {"\n"}
-              <span className={styles.cc}>
-                {"# ./test-template.ts  — テストテンプレート（参照可能）"}
-              </span>
-              {"\n"}
-              <span className={styles.cc}>{"# ./setup-guide.md    — 詳細セットアップガイド"}</span>
-            </div>
-          </div>
-        </section>
-        <section id="s15" className={styles.sec}>
-          <div className={styles.secHead}>
-            <span className={styles.secNum}>6</span>
-            <h2>
-              <span className={styles.mono}>*.prompt.md</span>
-              {" / "}
-              <span className={styles.mono}>*.chatmode.md</span>
-              {" — 再利用プロンプトとチャットモード"}
-            </h2>
-          </div>
-          <div className={styles.codeWrap}>
-            <div className={styles.codeBar}>
-              <span>.github/prompts/my-pull-requests.prompt.md</span>
-              <span className={styles.codeLang}>Markdown + YAML（再利用プロンプト）</span>
-            </div>
-            <div className={styles.codeBody}>
-              <span className={styles.cs}>---</span>
-              {"\n"}
-              <span className={styles.cm}>mode</span>
-              {": "}
-              <span className={styles.cv}>agent</span>
-              {"\n"}
-              <span className={styles.cm}>tools</span>
-              {": ["}
-              <span className={styles.cs}>{"'githubRepo'"}</span>
-              {", "}
-              <span className={styles.cs}>{"'list_pull_requests'"}</span>
-              {", "}
-              <span className={styles.cs}>{"'get_pull_request'"}</span>
-              {", "}
-              <span className={styles.cs}>{"'request_copilot_review'"}</span>
-              {"]"}
-              {"\n"}
-              <span className={styles.cm}>description</span>
-              {": "}
-              <span className={styles.cv}>
-                {'"現在のリポジトリの自分のPR一覧を取得して状態を確認する"'}
-              </span>
-              {"\n"}
-              <span className={styles.cs}>---</span>
-              {"\n\n"}
-              {"現在のリポジトリ（"}
-              <span className={styles.cw}>#githubRepo</span>
-              {" でリポジトリ情報を取得）で、\n自分にアサインされた PR を "}
-              <span className={styles.cw}>#list_pull_requests</span>
-              {
-                " で取得してください。\n\n各 PR について以下を報告:\n- PR の目的・変更内容の概要\n- レビュー待ちの場合はそれを強調\n- CI チェックが失敗している場合は原因と修正案\n- Copilot レビューが未実施の場合は "
-              }
-              <span className={styles.cw}>#request_copilot_review</span>
-              {" を提案\n\n"}
-              <span className={styles.cc}>{"# 使い方: /my-pull-requests コマンドで実行"}</span>
-            </div>
-          </div>
-          <div className={styles.codeWrap}>
-            <div className={styles.codeBar}>
-              <span>.github/chatmodes/databaseadmin.chatmode.md</span>
-              <span className={styles.codeLang}>Markdown + YAML（カスタムチャットモード）</span>
-            </div>
-            <div className={styles.codeBody}>
-              <span className={styles.cs}>---</span>
-              {"\n"}
-              <span className={styles.cm}>name</span>
-              {": "}
-              <span className={styles.cv}>Database Admin</span>
-              {"\n"}
-              <span className={styles.cm}>description</span>
-              {": "}
-              <span className={styles.cv}>
-                PostgreSQL DBA の専門家としてデータベース管理を支援する
-              </span>
-              {"\n"}
-              <span className={styles.cm}>tools</span>
-              {": ["}
-              <span className={styles.cs}>{"'pgsql_connect'"}</span>
-              {", "}
-              <span className={styles.cs}>{"'pgsql_query'"}</span>
-              {", "}
-              <span className={styles.cs}>{"'read_file'"}</span>
-              {"]"}
-              {"\n"}
-              <span className={styles.cm}>icon</span>
-              {": "}
-              <span className={styles.cv}>database</span>
-              {"\n"}
-              <span className={styles.cs}>---</span>
-              {"\n\n"}
-              {"あなたは経験豊富な PostgreSQL DBA です。\n\n"}
-              <span className={styles.ch}>## Your Expertise</span>
-              {
-                "\n- クエリの最適化（EXPLAIN ANALYZE の読み方・インデックス設計）\n- スキーマ設計（正規化・非正規化の判断）\n- Supabase Row Level Security (RLS) ポリシー\n- マイグレーション計画（ゼロダウンタイム移行）\n\n"
-              }
-              <span className={styles.ch}>## Tools Available</span>
-              {"\n- "}
-              <span className={styles.cw}>pgsql_connect</span>
-              {": データベースへの接続\n- "}
-              <span className={styles.cw}>pgsql_query</span>
-              {":   SQL クエリの実行・確認\n\n"}
-              <span className={styles.ch}>## Safety Rules</span>
-              {"\n- "}
-              <span className={styles.cw}>DROP / TRUNCATE は必ず確認してから実行</span>
-              {"\n- 本番 DB への書き込みは提案するが自動実行しない\n- "}
-              <span className={styles.cw}>
-                すべてのマイグレーションは --dry-run で確認してから適用
-              </span>
-            </div>
-          </div>
-          <div className={styles.tblWrap}>
-            <table>
-              <thead>
-                <tr>
-                  <th>ファイル種別</th>
-                  <th>配置場所</th>
-                  <th>呼び出し方</th>
-                  <th>用途</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>
-                    <code>*.prompt.md</code>
-                  </td>
-                  <td>
-                    <code>.github/prompts/</code>
-                  </td>
-                  <td>
-                    <code>/コマンド名</code>
-                  </td>
-                  <td>繰り返し使うタスクを再利用プロンプトとして定義</td>
-                </tr>
-                <tr>
-                  <td>
-                    <code>*.chatmode.md</code>
-                  </td>
-                  <td>
-                    <code>.github/chatmodes/</code>
-                  </td>
-                  <td>モード切替 UI</td>
-                  <td>特定の DBA・セキュリティ等のペルソナモード定義</td>
-                </tr>
-                <tr>
-                  <td>
-                    <code>*.agent.md</code>
-                  </td>
+                  <td>GitHub Copilot CLI</td>
+                  <td>ターミナル駆動のワークフロー自動化</td>
                   <td>
                     <code>.github/agents/</code>
                   </td>
-                  <td>
-                    <code>@エージェント名</code>
-                  </td>
-                  <td>ツール・MCP・指示を持つ専門エージェント定義</td>
+                </tr>
+                <tr>
+                  <td>GitHub Copilot Cloud Agent(GitHub.com)</td>
+                  <td>Issue割り当てによる自律実行</td>
+                  <td>リポジトリ内のエージェントプロファイル</td>
                 </tr>
               </tbody>
             </table>
           </div>
-        </section>
-        <section id="s16" className={styles.sec}>
-          <div className={styles.secHead}>
-            <span className={styles.secNum}>7</span>
-            <h2>
-              <span className={styles.mono}>AGENTS.md</span>
-              {" — クロスツール互換戦略"}
-            </h2>
-          </div>
-          <div className={styles.card}>
+
+          <div className={styles.prose}>
             <p>
-              {"Copilot Coding Agent は 2025年8月から "}
-              <code>AGENTS.md</code>
-              {" をサポートし、さらに "}
-              <strong>CLAUDE.md・GEMINI.md</strong>
-              {" も自動認識します。チームで複数のAIツールを使う場合、"}
-              <code>AGENTS.md</code>
-              {
-                " を共通エントリポイントにして、ツール固有の設定は別ファイルに分離する戦略が推奨されています。"
-              }
+              なお VS Code は <code>.claude/agents</code> フォルダ内の <code>.md</code>{" "}
+              ファイル(Claude Code のサブエージェント形式)も自動検出し、ツール名をVS
+              Code側の名称にマッピングします。両フォーマットを使い分ければ、同じエージェント定義をVS
+              CodeとClaude Codeの間で使い回すことも可能です。
             </p>
           </div>
-          <div className={styles.compatGrid}>
-            <div className={styles.compatCard}>
-              <div className={styles.compatIcon}>🐙</div>
-              <div className={styles.compatName}>Copilot Coding Agent</div>
-              <div className={styles.compatFile}>copilot-instructions.md</div>
-              <div className={styles.compatFile}>AGENTS.md</div>
-              <div className={styles.compatFile}>CLAUDE.md</div>
-              <div className={styles.compatFile}>GEMINI.md</div>
-            </div>
-            <div className={styles.compatCard}>
-              <div className={styles.compatIcon}>🤖</div>
-              <div className={styles.compatName}>Claude Code</div>
-              <div className={styles.compatFile}>CLAUDE.md</div>
-              <div className={styles.compatFile}>AGENTS.md</div>
-            </div>
-            <div className={styles.compatCard}>
-              <div className={styles.compatIcon}>♊</div>
-              <div className={styles.compatName}>Gemini CLI</div>
-              <div className={styles.compatFile}>GEMINI.md</div>
-              <div className={styles.compatFile}>AGENTS.md</div>
-            </div>
-            <div className={styles.compatCard}>
-              <div className={styles.compatIcon}>⚙️</div>
-              <div className={styles.compatName}>Codex CLI</div>
-              <div className={styles.compatFile}>AGENTS.md</div>
-            </div>
-            <div className={styles.compatCard}>
-              <div className={styles.compatIcon}>⚡</div>
-              <div className={styles.compatName}>
-                {"Copilot CLI "}
-                <small style={{ fontSize: "10px", opacity: 0.7 }}>(GA Feb 2026)</small>
-              </div>
-              <div className={styles.compatFile}>copilot-instructions.md</div>
-              <div className={styles.compatFile}>AGENTS.md</div>
-              <div className={styles.compatFile}>CLAUDE.md</div>
-              <div className={styles.compatFile}>GEMINI.md</div>
-            </div>
+        </section>
+
+        {/* 2. Frontmatter */}
+        <section className={styles.section} id="frontmatter">
+          <div className={styles.sectionNumber}>SECTION 2</div>
+          <h2>2. フロントマター全仕様</h2>
+          <div className={styles.prose}>
+            <p>
+              <code>.agent.md</code>{" "}
+              のフロントマターはYAMLで記述し、本体(Markdown)がシステムプロンプトとしてユーザーの入力の前に挿入されます。フィールドの意味はプラットフォームによって一部異なるため、まずVS
+              Code版の全フィールドを網羅し、その後にGitHub Copilot Cloud
+              Agent版との差分を整理します。
+            </p>
           </div>
-          <div className={`${styles.alert} ${styles.ai}`}>
-            <span className={styles.alertIcon}>💡</span>
-            <div className={styles.alertBody}>
-              <strong>Agentic Workflows（GitHub Actions 統合）</strong>
-              {
-                "AGENTS.md を使った GitHub Actions のマルチエージェントワークフロー（コードトリアージ・ドキュメント自動更新・品質チェック）が段階的に展開中です（2026年 Technical Preview）。Issues のラベル付けを "
-              }
-              <code>@triage-agent</code>
-              {" に、PR のドキュメント更新を "}
-              <code>@docs-agent</code>
-              {" に自動委譲する構成が可能になります。"}
+
+          <h3>2.1 VS Code版フロントマター全フィールド</h3>
+          <div className={styles.tableWrap}>
+            <table>
+              <thead>
+                <tr>
+                  <th>フィールド</th>
+                  <th>型</th>
+                  <th>必須</th>
+                  <th>説明</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <code>description</code>
+                  </td>
+                  <td>string</td>
+                  <td>推奨</td>
+                  <td>
+                    エージェントの概要。チャット入力欄のプレースホルダーやエージェント選択ピッカーに表示される。
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>name</code>
+                  </td>
+                  <td>string</td>
+                  <td>任意</td>
+                  <td>表示名。省略時はファイル名が使われる。</td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>argument-hint</code>
+                  </td>
+                  <td>string</td>
+                  <td>任意</td>
+                  <td>チャット入力欄に薄字で表示される入力ヒント。</td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>tools</code>
+                  </td>
+                  <td>string[]</td>
+                  <td>推奨</td>
+                  <td>
+                    利用可能な組み込みツール・ツールセット・MCPツール・拡張機能提供ツールの一覧。
+                    <code>&lt;サーバー名&gt;/*</code> でMCPサーバーの全ツールを一括指定できる。
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>agents</code>
+                  </td>
+                  <td>string[]</td>
+                  <td>任意</td>
+                  <td>
+                    このエージェントがサブエージェントとして呼び出せるエージェント名の許可リスト。
+                    <code>*</code> は全許可、空配列 <code>[]</code>{" "}
+                    はサブエージェント利用を禁止。指定する場合は <code>tools</code> に{" "}
+                    <code>agent</code> ツールを含める必要がある。
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>model</code>
+                  </td>
+                  <td>string | string[]</td>
+                  <td>任意</td>
+                  <td>
+                    使用するモデル。配列で指定すると先頭から順に利用可能なモデルを試す(フォールバック)。省略時はモデルピッカーで選択中のモデルを使用。
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>reasoningEffort</code>
+                  </td>
+                  <td>low | medium | high</td>
+                  <td>任意</td>
+                  <td>
+                    推論の強度をエージェント単位で固定する(例: 整形専用エージェントは
+                    low、セキュリティレビューは high)。
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>user-invocable</code>
+                  </td>
+                  <td>boolean</td>
+                  <td>任意(既定 true)</td>
+                  <td>
+                    <code>false</code>{" "}
+                    にするとエージェント選択ドロップダウンから隠れ、サブエージェントとしてのみ呼び出し可能になる。
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>disable-model-invocation</code>
+                  </td>
+                  <td>boolean</td>
+                  <td>任意(既定 false)</td>
+                  <td>
+                    <code>true</code>{" "}
+                    にすると他のエージェントからサブエージェントとして呼ばれなくなる(ユーザーが明示的に選んだ時のみ動作)。
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>infer</code>
+                  </td>
+                  <td>boolean</td>
+                  <td>非推奨</td>
+                  <td>
+                    旧仕様。<code>user-invocable</code> と <code>disable-model-invocation</code>{" "}
+                    に置き換え済み。
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>target</code>
+                  </td>
+                  <td>vscode | github-copilot</td>
+                  <td>任意</td>
+                  <td>エージェントの対象環境。</td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>mcp-servers</code>
+                  </td>
+                  <td>object[]</td>
+                  <td>任意</td>
+                  <td>
+                    <code>target: github-copilot</code>{" "}
+                    のカスタムエージェントで使うMCPサーバー設定(JSON)。
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>handoffs</code>
+                  </td>
+                  <td>object[]</td>
+                  <td>任意</td>
+                  <td>
+                    チャット応答後に表示する「次のエージェントへの引き継ぎ」ボタンの定義。詳細は第4章。
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>handoffs[].label</code>
+                  </td>
+                  <td>string</td>
+                  <td>Handoffs使用時必須</td>
+                  <td>ボタンに表示するテキスト。</td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>handoffs[].agent</code>
+                  </td>
+                  <td>string</td>
+                  <td>Handoffs使用時必須</td>
+                  <td>切り替え先のエージェント識別子。</td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>handoffs[].prompt</code>
+                  </td>
+                  <td>string</td>
+                  <td>任意</td>
+                  <td>切り替え先に送信するプロンプト文。</td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>handoffs[].send</code>
+                  </td>
+                  <td>boolean</td>
+                  <td>任意(既定 false)</td>
+                  <td>
+                    <code>true</code> なら自動送信、<code>false</code>{" "}
+                    ならプロンプトを入力欄にプリフィルするだけ。
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>handoffs[].model</code>
+                  </td>
+                  <td>string</td>
+                  <td>任意</td>
+                  <td>
+                    Handoff実行時に使うモデル。<code>GPT-5 (copilot)</code> のように「モデル名
+                    (ベンダー)」形式で指定。
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>hooks</code>(プレビュー)
+                  </td>
+                  <td>object</td>
+                  <td>任意</td>
+                  <td>
+                    このエージェントが有効な間だけ動作するフック(例:
+                    編集後に自動フォーマッタを実行)。<code>chat.useCustomAgentHooks</code>{" "}
+                    の有効化が必要。
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div className={styles.callout} data-variant="info">
+            <strong>補足:</strong> <code>tools</code>{" "}
+            に指定したツールがその時点で利用不可な場合、そのツールは黙って無視されます(エラーにはなりません)。
+          </div>
+
+          <h3>2.2 Claude形式(.claude/agents)との違い</h3>
+          <div className={styles.prose}>
+            <p>
+              VS Codeは <code>.claude/agents</code> フォルダ内のプレーンな <code>.md</code>{" "}
+              ファイル(Claude Code
+              のサブエージェント形式)も検出します。フィールド名と型が異なる点に注意してください。
+            </p>
+          </div>
+          <div className={styles.tableWrap}>
+            <table>
+              <thead>
+                <tr>
+                  <th>フィールド</th>
+                  <th>型</th>
+                  <th>説明</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <code>name</code>
+                  </td>
+                  <td>string(必須)</td>
+                  <td>エージェント名</td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>description</code>
+                  </td>
+                  <td>string</td>
+                  <td>エージェントの役割</td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>tools</code>
+                  </td>
+                  <td>カンマ区切り文字列</td>
+                  <td>
+                    例: <code>&quot;Read, Grep, Glob, Bash&quot;</code>。VS
+                    Code側のツール名に自動マッピングされる。
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>disallowedTools</code>
+                  </td>
+                  <td>カンマ区切り文字列</td>
+                  <td>ブロックするツール</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div className={styles.prose}>
+            <p>
+              VS CodeネイティブのYAML配列形式(
+              <code>tools: [&apos;edit&apos;, &apos;search&apos;]</code>
+              )と、Claude形式のカンマ区切り文字列形式の両方がサポートされているため、混同しないよう注意してください。
+            </p>
+          </div>
+
+          <h3>2.3 GitHub Copilot Cloud Agent(GitHub.com)版との差分</h3>
+          <div className={styles.prose}>
+            <p>
+              GitHub.com上のCopilot Cloud
+              Agent(Issueへのアサインで動く自律エージェント)向けの設定リファレンスでは、フィールド自体はVS
+              Code版とほぼ共通ですが、
+              <strong>「handoffs」と「argument-hint」は現時点でCloud Agentでは無視される</strong>
+              という重要な違いがあります。つまり、これらのフィールドを含むエージェントファイルをそのままCloud
+              Agentで使っても、VS
+              Codeのような引き継ぎボタンは表示されません。複数プラットフォームでエージェントファイルを共有する場合は、この非対応差分をチーム内ドキュメントに明記しておくべきです。
+            </p>
+          </div>
+
+          <h3>2.4 GitHub Copilot CLI版のポイント</h3>
+          <div className={styles.prose}>
+            <p>
+              CLIでは <code>.github/agents/&lt;name&gt;.agent.md</code>{" "}
+              という命名規則でエージェントプロファイルを配置します。フロントマターの基本構造はVS
+              Code版と共通ですが、CLI特有の運用として以下が挙げられます。
+            </p>
+            <ul>
+              <li>
+                エージェントは <code>/agent</code> スラッシュコマンドで選択する。
+              </li>
+              <li>
+                Agent Coordination
+                Protocol(ACP)対応クライアント(Zedやエディタプラグイン、CI連携ツールなど)は、
+                <code>agent</code>{" "}
+                セッション設定オプションでプログラム的にエージェントを切り替えられる。
+              </li>
+              <li>
+                ACPクライアントは、エージェントが多段階タスクを進める様子を示す「ライブプラン」も受け取れるため、ターン完了を待たずに進捗表示ができる。
+              </li>
+            </ul>
+          </div>
+
+          <h3>2.5 基本サンプル</h3>
+          <span className={styles.codeLabel}>accessibility.agent.md</span>
+          <pre className={styles.codeBlock}>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>---</span>
             </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>description</span>:{" "}
+              <span className={styles.cs}>
+                &apos;Web accessibility(WCAG 2.1/2.2)とインクルーシブUXの専門アシスタント&apos;
+              </span>
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>name</span>:{" "}
+              <span className={styles.cs}>&apos;Accessibility Expert&apos;</span>
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>model</span>: <span className={styles.cw}>GPT-5.2</span>
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>tools</span>: [
+              <span className={styles.cs}>&apos;codebase&apos;</span>,{" "}
+              <span className={styles.cs}>&apos;edit/editFiles&apos;</span>,{" "}
+              <span className={styles.cs}>&apos;web/fetch&apos;</span>,{" "}
+              <span className={styles.cs}>&apos;runTests&apos;</span>,{" "}
+              <span className={styles.cs}>&apos;problems&apos;</span>]
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>---</span>
+            </div>
+            <div className={styles.codeLine}></div>
+            <div className={styles.codeLine}>
+              <span className={styles.cm}># Accessibility Expert</span>
+            </div>
+            <div className={styles.codeLine}></div>
+            <div className={styles.codeLine}>
+              あなたはWCAG
+              2.1/2.2に精通したアクセシビリティの専門家です。デザイナー、開発者、QA向けに
+            </div>
+            <div className={styles.codeLine}>実務的なガイダンスを提供してください。</div>
+          </pre>
+        </section>
+
+        {/* 3. Step by step */}
+        <section className={styles.section} id="stepbystep">
+          <div className={styles.sectionNumber}>SECTION 3</div>
+          <h2>3. ステップバイステップ作成ガイド</h2>
+          <div className={styles.prose}>
+            <p>
+              GitHubが2,500件超の公開 <code>agents.md</code>{" "}
+              ファイルを分析した結果によれば、うまく機能しているファイルには共通のパターンがあります。「あなたは親切なコーディングアシスタントです」のような曖昧な指示は機能せず、「あなたはReactコンポーネントのテストを書くテストエンジニアであり、このサンプルに従い、ソースコードは絶対に変更しません」のように具体的である必要があります。以下のステップは、この分析結果と公式ドキュメントの作成フローを統合したものです。
+            </p>
+
+            <h3>ステップ0: 1つのタスクに絞る</h3>
+            <p>
+              「汎用ヘルパー」を作らないことが最初の分岐点です。ドキュメント執筆、テスト作成、Lint修正、API実装、開発環境デプロイなど、
+              <strong>具体的なジョブを1つだけ</strong>
+              選びます。欲張って複数の役割を1つのエージェントに詰め込むと、後述する「巨大エージェント」アンチパターンに陥ります。
+            </p>
+
+            <h3>ステップ1: 配置場所を決める</h3>
+          </div>
+          <div className={styles.tableWrap}>
+            <table>
+              <thead>
+                <tr>
+                  <th>スコープ</th>
+                  <th>既定の配置場所</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>ワークスペース(チーム共有)</td>
+                  <td>
+                    <code>.github/agents/</code> フォルダ
+                  </td>
+                </tr>
+                <tr>
+                  <td>ワークスペース(Claude形式)</td>
+                  <td>
+                    <code>.claude/agents/</code> フォルダ
+                  </td>
+                </tr>
+                <tr>
+                  <td>ユーザープロファイル(個人・全ワークスペース共通)</td>
+                  <td>
+                    <code>~/.copilot/agents</code> またはVS Codeユーザーデータ
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div className={styles.prose}>
+            <p>
+              チームで共有する場合はワークスペーススコープ(<code>.github/agents/</code>
+              )を選び、Gitでバージョン管理してレビュー対象にするのが基本です。モノレポでは{" "}
+              <code>chat.useCustomizationsInParentRepositories</code>{" "}
+              を有効にすると、親リポジトリルートのエージェントも検出できます。
+            </p>
+
+            <h3>ステップ2: フロントマターを書く</h3>
+            <p>
+              最低限、<code>name</code> と <code>description</code> があれば動作します。慣れてきたら{" "}
+              <code>tools</code> で権限を絞り込み、<code>model</code> で適切なモデルを固定します。VS
+              Codeでは <code>/agents</code> とチャット欄に打つと「Configure Custom
+              Agents」メニューが開き、GUIからも作成できます。AIに生成させる場合は Agent モードで{" "}
+              <code>/create-agent</code>{" "}
+              と打ち、「セキュリティレビューエージェント」のように役割を説明すると、AIが確認質問をしながら適切なフロントマターと指示を含む{" "}
+              <code>.agent.md</code>{" "}
+              を生成してくれます。既存の会話から「このタスク用のエージェントを作って」と頼んで抽出することもできます。
+            </p>
+
+            <h3>ステップ3: 本文を「6つの核」で構成する</h3>
+            <p>
+              2,500件の分析から導かれた、成果を出しているエージェントファイルに共通する6領域です。
+            </p>
+          </div>
+          <div className={styles.tableWrap}>
+            <table>
+              <thead>
+                <tr>
+                  <th>領域</th>
+                  <th>書くべき内容</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>コマンド</td>
+                  <td>
+                    <code>npm test</code>、<code>pytest -v</code>{" "}
+                    のように、フラグ込みの実行可能コマンドを早い段階に書く
+                  </td>
+                </tr>
+                <tr>
+                  <td>テスト</td>
+                  <td>テストフレームワークと実行方法、成功基準</td>
+                </tr>
+                <tr>
+                  <td>プロジェクト構造</td>
+                  <td>ディレクトリごとの役割(読む場所・書く場所を明示)</td>
+                </tr>
+                <tr>
+                  <td>コードスタイル</td>
+                  <td>実際のコード例を1つ見せる(説明文3段落より効果的)</td>
+                </tr>
+                <tr>
+                  <td>Gitワークフロー</td>
+                  <td>コミット前に何を実行すべきか、ブランチ運用</td>
+                </tr>
+                <tr>
+                  <td>境界(バウンダリ)</td>
+                  <td>
+                    触ってはいけないもの(シークレット、<code>vendor/</code>、本番設定など)
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div className={styles.prose}>
+            <p>
+              コマンドは早めに書くこと、説明より実例を優先すること、そして「絶対にシークレットをコミットしない」のような境界線を明示することが、分析上もっとも効果があった項目として挙げられています。
+            </p>
+
+            <h3>ステップ4: バウンダリを3段階で明文化する</h3>
+            <p>
+              「常にやってよいこと」「先に確認すること」「絶対にやらないこと」の3層構造にすると、破壊的なミスを防ぎやすくなります。
+            </p>
+            <ul>
+              <li>
+                ✅ 常に実行してよい: <code>docs/</code> への新規ファイル作成、スタイルガイドの遵守、
+                <code>markdownlint</code> の実行
+              </li>
+              <li>⚠️ 先に確認する: 既存ドキュメントの大幅な書き換え</li>
+              <li>
+                🚫 絶対にしない: <code>src/</code>{" "}
+                配下のコード変更、設定ファイルの編集、シークレットのコミット
+              </li>
+            </ul>
+
+            <h3>ステップ5: テストして、失敗から育てる</h3>
+            <p>
+              最良のエージェントファイルは、事前の完璧な設計ではなく反復から生まれます。まずは最小構成(名前・説明・ペルソナ)で動かし、エージェントが間違えたポイントに合わせてルールを足していくアプローチが推奨されています。
+            </p>
+
+            <h3>ステップ6: プロトタイプ→計画→実装→レビューのハーネスに乗せる</h3>
+            <p>
+              GitHub社内でAI活用を推進するBurke
+              Hollandは、ツールや裏技を積み上げるより「ハーネス(Copilotという実行基盤そのもの)を深く理解する」ことが生産性向上の本質だと述べています。実務では、
+              <code>.agent.md</code>{" "}
+              単体よりも次のようなワークフロー全体の中に位置づけるほうが効果的です。
+            </p>
+            <ol>
+              <li>
+                <strong>プロトタイプ</strong>:
+                実装前にHTMLモックやMermaid図で複数案を並べ、要件の曖昧さを可視化する。
+              </li>
+              <li>
+                <strong>計画(Plan mode)</strong>: <code>/plan</code>{" "}
+                で実装計画を立てさせ、想定していなかったエッジケースを洗い出す。
+              </li>
+              <li>
+                <strong>実装(Autopilot)</strong>:
+                計画の各項目を完了させるまで反復させる。この段階でCopilotは内部的に、読み取り中心の作業には軽量サブエージェント、複雑な作業にはより大きなモデルのサブエージェントを自動選択する。
+              </li>
+              <li>
+                <strong>人間によるレビューと反復</strong>:
+                出力を「まあ良い」で妥協せず、具体的な修正を会話的に伝える。
+              </li>
+              <li>
+                <strong>ラバーダックレビュー</strong>:
+                別系統のモデルに実装をレビューさせ、モデルごとの死角を補い合う。
+              </li>
+            </ol>
+            <p>
+              この一連の流れの中で <code>.agent.md</code>{" "}
+              は「毎回繰り返す前提説明を自動化する部品」として機能します。
+            </p>
+
+            <h3>3.1 作成ワークフロー図</h3>
+          </div>
+
+          <div className={styles.mermaidWrapper} data-testid="mermaid-diagram">
+            <p className={styles.mermaidCaption}>図1: .agent.md 作成ワークフロー</p>
+            <MermaidDiagram
+              chart={`flowchart TB
+    A[タスクを1つ選ぶ] --> B["配置場所を決める(workspace / user)"]
+    B --> C[フロントマターを書く]
+    C --> D["本文を6領域で構成する<br/>コマンド・テスト・構造・スタイル・Git・境界"]
+    D --> E["3段階の境界を明文化<br/>常に許可 / 要確認 / 禁止"]
+    E --> F[小さく動かして試す]
+    F --> G{意図通りに<br/>動作したか}
+    G -- いいえ --> H[失敗パターンをルールに追記]
+    H --> F
+    G -- はい --> I[チームと共有<br/>.github/agents にコミット]
+    I --> J[利用状況を見ながら継続改善]`}
+              theme="base"
+            />
           </div>
         </section>
-        <section id="s17" className={styles.sec}>
-          <div className={styles.secHead}>
-            <span className={styles.secNum}>8</span>
-            <h2>ファイル選択の意思決定ツリー</h2>
+
+        {/* 4. Handoffs */}
+        <section className={styles.section} id="handoffs">
+          <div className={styles.sectionNumber}>SECTION 4</div>
+          <h2>4. Handoffs(エージェント連鎖)</h2>
+          <div className={styles.prose}>
+            <h3>4.1 概念</h3>
+            <p>
+              Handoffsは、チャット応答が完了したあとに「次のエージェントへ進む」ボタンを表示し、文脈と(必要なら)事前入力済みプロンプトを引き継ぎながらエージェントを切り替える機能です。開発者が各ステップをレビュー・承認してから次に進める、段階的なワークフローの統制に向いています。
+            </p>
+            <p>代表的な連鎖パターンは次の3つです。</p>
+            <ul>
+              <li>
+                <strong>計画 → 実装</strong>:
+                計画エージェントで計画を生成し、実装エージェントへ引き継いでコーディングを開始する。
+              </li>
+              <li>
+                <strong>実装 → レビュー</strong>:
+                実装が終わったらコードレビューエージェントに切り替え、品質・セキュリティを確認する。
+              </li>
+              <li>
+                <strong>失敗するテストを書く → 成功させる</strong>:
+                先に失敗するテストを生成し(実装より差分が小さくレビューしやすい)、そのテストを通す実装へ引き継ぐ。
+              </li>
+            </ul>
+
+            <h3>4.2 フロントマター構文</h3>
           </div>
-          <div className={styles.dflow}>
-            <div className={styles.dflowTitle}>どのMarkdownファイルを使うべきか — 決定フロー</div>
-            <div className={styles.dflowRow}>
-              <div className={styles.dnQ}>
-                すべてのファイル・コンテキストに
-                <br />
-                常時適用したい指示？
-              </div>
-              <div className={styles.dnArr}>→ YES →</div>
-              <div className={styles.dnY}>
-                copilot-instructions.md
-                <br />
-                <small>.github/ 直下に配置</small>
-              </div>
+          <span className={styles.codeLabel}>frontmatter</span>
+          <pre className={styles.codeBlock}>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>---</span>
             </div>
-            <div className={styles.dnIn} style={{ marginTop: "12px" }}>
-              <div className={styles.dflowRow}>
-                <span style={{ color: "var(--text3)", fontSize: "13px" }}>↓ NO</span>
-              </div>
-              <div className={styles.dflowRow}>
-                <div className={styles.dnQ}>
-                  特定のパス・ファイル種別にのみ
-                  <br />
-                  適用したい？（例: src/components/）
-                </div>
-                <div className={styles.dnArr}>→ YES →</div>
-                <div className={styles.dnY}>
-                  *.instructions.md
-                  <br />
-                  <small>applyTo + excludeAgent</small>
-                </div>
-              </div>
-              <div className={styles.dnIn} style={{ marginTop: "12px" }}>
-                <div className={styles.dflowRow}>
-                  <span style={{ color: "var(--text3)", fontSize: "13px" }}>↓ NO</span>
-                </div>
-                <div className={styles.dflowRow}>
-                  <div className={styles.dnQ}>
-                    専門的なペルソナ・ツールセット
-                    <br />
-                    を持つエージェントを定義したい？
-                  </div>
-                  <div className={styles.dnArr}>→ YES →</div>
-                  <div className={styles.dnY}>
-                    *.agent.md
-                    <br />
-                    <small>@エージェント名で呼び出し</small>
-                  </div>
-                </div>
-                <div className={styles.dnIn} style={{ marginTop: "12px" }}>
-                  <div className={styles.dflowRow}>
-                    <span style={{ color: "var(--text3)", fontSize: "13px" }}>↓ NO</span>
-                  </div>
-                  <div className={styles.dflowRow}>
-                    <div className={styles.dnQ}>
-                      マッチ時のみロードされる
-                      <br />
-                      専門知識（手順・コマンド等）？
-                    </div>
-                    <div className={styles.dnArr}>→ YES →</div>
-                    <div className={styles.dnY}>
-                      SKILL.md
-                      <br />
-                      <small>.github/skills/*/SKILL.md</small>
-                    </div>
-                  </div>
-                  <div className={styles.dnIn} style={{ marginTop: "12px" }}>
-                    <div className={styles.dflowRow}>
-                      <span style={{ color: "var(--text3)", fontSize: "13px" }}>↓ NO</span>
-                    </div>
-                    <div className={styles.dflowRow}>
-                      <div className={styles.dnQ}>
-                        繰り返し実行するタスク
-                        <br />を /コマンドで呼びたい？
-                      </div>
-                      <div className={styles.dnArr}>→ YES →</div>
-                      <div className={styles.dnY}>
-                        *.prompt.md
-                        <br />
-                        <small>.github/prompts/</small>
-                      </div>
-                    </div>
-                    <div className={styles.dnIn} style={{ marginTop: "12px" }}>
-                      <div className={styles.dflowRow}>
-                        <span style={{ color: "var(--text3)", fontSize: "13px" }}>↓ NO</span>
-                      </div>
-                      <div className={styles.dflowRow}>
-                        <div className={styles.dnY}>
-                          *.chatmode.md
-                          <br />
-                          <small>カスタムペルソナモード</small>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>description</span>:{" "}
+              <span className={styles.cs}>新機能の実装計画を生成する</span>
             </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>tools</span>: [
+              <span className={styles.cs}>&apos;search&apos;</span>,{" "}
+              <span className={styles.cs}>&apos;web&apos;</span>]
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>handoffs</span>:
+            </div>
+            <div className={styles.codeLine}>
+              {" "}
+              - <span className={styles.ck}>label</span>:{" "}
+              <span className={styles.cs}>実装を開始する</span>
+            </div>
+            <div className={styles.codeLine}>
+              {" "}
+              <span className={styles.ck}>agent</span>:{" "}
+              <span className={styles.cs}>implementation</span>
+            </div>
+            <div className={styles.codeLine}>
+              {" "}
+              <span className={styles.ck}>prompt</span>:{" "}
+              <span className={styles.cs}>上記の計画に沿って実装してください。</span>
+            </div>
+            <div className={styles.codeLine}>
+              {" "}
+              <span className={styles.ck}>send</span>: <span className={styles.cw}>false</span>
+            </div>
+            <div className={styles.codeLine}>
+              {" "}
+              <span className={styles.ck}>model</span>:{" "}
+              <span className={styles.cs}>GPT-5.2 (copilot)</span>
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>---</span>
+            </div>
+          </pre>
+          <div className={styles.prose}>
+            <p>
+              ユーザーがHandoffボタンを押すと、対象エージェントに切り替わり、プロンプトが入力欄にプリフィルされます。
+              <code>send: true</code>{" "}
+              にすると、そのプロンプトは自動送信され、次の工程がすぐに始まります。
+            </p>
+            <h3>4.3 実例: Planner → Implementer</h3>
+          </div>
+          <span className={styles.codeLabel}>planner.agent.md</span>
+          <pre className={styles.codeBlock}>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>---</span>
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>description</span>:{" "}
+              <span className={styles.cs}>
+                新機能や既存コードのリファクタリングの実装計画を生成する。
+              </span>
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>name</span>: <span className={styles.cs}>Planner</span>
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>tools</span>: [
+              <span className={styles.cs}>&apos;web/fetch&apos;</span>,{" "}
+              <span className={styles.cs}>&apos;search/codebase&apos;</span>,{" "}
+              <span className={styles.cs}>&apos;search/usages&apos;</span>]
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>model</span>: [
+              <span className={styles.cs}>&apos;Claude Opus 4.5&apos;</span>,{" "}
+              <span className={styles.cs}>&apos;GPT-5.2&apos;</span>]
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>handoffs</span>:
+            </div>
+            <div className={styles.codeLine}>
+              {" "}
+              - <span className={styles.ck}>label</span>:{" "}
+              <span className={styles.cs}>計画を実装する</span>
+            </div>
+            <div className={styles.codeLine}>
+              {" "}
+              <span className={styles.ck}>agent</span>: <span className={styles.cs}>agent</span>
+            </div>
+            <div className={styles.codeLine}>
+              {" "}
+              <span className={styles.ck}>prompt</span>:{" "}
+              <span className={styles.cs}>上記の計画を実装してください。</span>
+            </div>
+            <div className={styles.codeLine}>
+              {" "}
+              <span className={styles.ck}>send</span>: <span className={styles.cw}>false</span>
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>---</span>
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.cm}># Planning instructions</span>
+            </div>
+            <div className={styles.codeLine}>
+              あなたはプランニングモードで動作します。コードは変更せず、実装計画のみを生成してください。
+            </div>
+            <div className={styles.codeLine}></div>
+            <div className={styles.codeLine}>
+              計画は以下のセクションを含むMarkdown文書とします。
+            </div>
+            <div className={styles.codeLine}>* Overview: 機能やリファクタリングの概要</div>
+            <div className={styles.codeLine}>* Requirements: 要件一覧</div>
+            <div className={styles.codeLine}>* Implementation Steps: 実装手順の詳細</div>
+            <div className={styles.codeLine}>* Testing: 検証すべきテストの一覧</div>
+          </pre>
+
+          <div className={styles.prose}>
+            <h3>4.4 プラットフォーム間の注意点</h3>
+            <p>
+              <code>handoffs</code> はVS Codeのカスタムエージェント機能として設計されており、
+              <strong>
+                GitHub Copilot Cloud Agent(GitHub.com)では現時点でこのフィールドが無視されます
+              </strong>
+              。同じエージェントファイル群を複数プラットフォームで共有する場合、「VS
+              Codeでは引き継ぎボタンが出るが、Cloud
+              Agentでは出ない」という差異をREADME等に明記しておくことをおすすめします。Copilot
+              CLIでは、Handoffsに相当する連鎖体験は <code>/fleet</code> や <code>/research</code>{" "}
+              のようなオーケストレーション系スラッシュコマンドで代替されます(詳細は第5章)。
+            </p>
+            <h3>4.5 Handoffsの流れ</h3>
+          </div>
+
+          <div className={styles.mermaidWrapper} data-testid="mermaid-diagram">
+            <p className={styles.mermaidCaption}>図2: Handoffsによる段階的ワークフロー</p>
+            <MermaidDiagram
+              chart={`flowchart LR
+    subgraph Plan["Planner エージェント"]
+        P1[要件を分析]
+        P2[実装計画を生成]
+    end
+    subgraph Impl["Implementer エージェント"]
+        I1[計画を1手順ずつ実装]
+        I2[テストを実行]
+    end
+    subgraph Review["Reviewer エージェント"]
+        R1[品質とセキュリティを確認]
+    end
+    P1 --> P2
+    P2 -- "Handoffボタン: 実装を開始する" --> I1
+    I1 --> I2
+    I2 -- "Handoffボタン: レビューに回す" --> R1`}
+              theme="base"
+            />
           </div>
         </section>
-        <section id="s18" className={styles.sec}>
-          <div className={styles.secHead}>
-            <span className={styles.secNum}>9</span>
-            <h2>絶対に避けるべき Anti-Patterns</h2>
+
+        {/* 5. Subagents */}
+        <section className={styles.section} id="subagents">
+          <div className={styles.sectionNumber}>SECTION 5</div>
+          <h2>5. Subagents(サブエージェント)</h2>
+          <div className={styles.prose}>
+            <h3>5.1 エージェントとサブエージェントの違い</h3>
+            <p>
+              エージェント(主エージェント)はユーザーが選ぶ、あるいはワークフロー用に構成される「セッションの顔」であり、会話全体の文脈と目標を保持し続けます。一方サブエージェントは、主エージェントが起動する一時的なワーカーであり、独立した(分離された)文脈の中で狭いタスクだけを実行し、結果を主エージェントに要約して返します。
+            </p>
           </div>
-          <div className={styles.patGrid}>
-            <div className={`${styles.pat} ${styles.patNg}`}>
-              <div className={styles.patLabel}>✗ copilot-instructions.md</div>
-              <ul>
-                <li>ファイルを .github/ 以外の場所に置く（読み込まれない）</li>
-                <li>特定パス専用ルールを記述（*.instructions.md へ）</li>
-                <li>専門手順・コマンドを詰め込む（SKILL.md へ）</li>
-                <li>長大なコードスニペット（コンテキスト圧迫）</li>
-                <li>機密情報・API キーの記述</li>
-                <li>指示が互いに矛盾する記述</li>
-              </ul>
+          <div className={styles.tableWrap}>
+            <table>
+              <thead>
+                <tr>
+                  <th>観点</th>
+                  <th>エージェント</th>
+                  <th>サブエージェント</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>起動方法</td>
+                  <td>ユーザーが選択、またはワークフロー用に設定</td>
+                  <td>別のエージェント(オーケストレーター)が起動</td>
+                </tr>
+                <tr>
+                  <td>生存期間</td>
+                  <td>会話・セッションを通じて持続</td>
+                  <td>委任されたタスクの間だけ存在</td>
+                </tr>
+                <tr>
+                  <td>文脈</td>
+                  <td>会話全体の目標を保持</td>
+                  <td>タスクに限定した独立した文脈</td>
+                </tr>
+                <tr>
+                  <td>役割</td>
+                  <td>タスク全体を統括</td>
+                  <td>1つの絞り込まれた作業を実行</td>
+                </tr>
+                <tr>
+                  <td>出力</td>
+                  <td>ユーザーと直接対話</td>
+                  <td>主エージェントに結果を返し、主エージェントが統合する</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div className={styles.prose}>
+            <h3>5.2 サブエージェントが有効な場面</h3>
+            <ul>
+              <li>
+                実装前の技術調査(ライブラリ比較・既存パターンの分析)を、主エージェントの文脈を汚さずに行いたいとき
+              </li>
+              <li>
+                リファクタリングやレビューで、複数の観点(重複コード検出・デッドコード・エラーハンドリング・セキュリティ)を並列に洗い出したいとき
+              </li>
+              <li>
+                複数のアプローチ(例: Redisキャッシュ vs インメモリLRU vs
+                ハイブリッド)を比較検討したいとき
+              </li>
+              <li>
+                異なるモデルに同じ問題を検証させ、意見が一致する点・しない点を洗い出したいとき(マルチモデル・コンセンサス)
+              </li>
+            </ul>
+
+            <h3>5.3 呼び出し方(VS Code)</h3>
+            <p>
+              サブエージェントは基本的に<strong>エージェント主導(agent-initiated)</strong>
+              であり、ユーザーが逐一「サブエージェントを実行して」と書く必要はありません。主エージェントが「この部分は文脈分離が有効だ」と判断した時点で自律的に起動します。これを機能させるには{" "}
+              <code>tools</code> に <code>agent</code>(内部的には <code>runSubagent</code>
+              )ツールを含めておく必要があります。
+            </p>
+          </div>
+          <span className={styles.codeLabel}>document-feature.agent.md</span>
+          <pre className={styles.codeBlock}>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>---</span>
             </div>
-            <div className={`${styles.pat} ${styles.patNg}`}>
-              <div className={styles.patLabel}>✗ *.agent.md / SKILL.md</div>
-              <ul>
-                <li>description が曖昧（「何でもやります」エージェント）</li>
-                <li>ファイル境界を設定しないエージェント（無制限書き込み）</li>
-                <li>SKILL.md で applyTo なしに常時ロード状態にする</li>
-                <li>*.agent.md を .github/agents/ 以外に置く</li>
-                <li>excludeAgent を設定せず指示が混在する</li>
-                <li>agent.md ファイル名に許可外文字（スペース等）を使う</li>
-              </ul>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>name</span>:{" "}
+              <span className={styles.cs}>document-feature</span>
             </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>tools</span>: [
+              <span className={styles.cs}>&apos;agent&apos;</span>,{" "}
+              <span className={styles.cs}>&apos;read&apos;</span>,{" "}
+              <span className={styles.cs}>&apos;search&apos;</span>,{" "}
+              <span className={styles.cs}>&apos;edit&apos;</span>]
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>---</span>
+            </div>
+            <div className={styles.codeLine}>
+              新機能の実装詳細を調査するサブエージェントを実行し、ユーザー向けドキュメントに関係する
+            </div>
+            <div className={styles.codeLine}>
+              情報だけを返してください。そのうえで docs/ フォルダを更新してください。
+            </div>
+          </pre>
+          <div className={styles.prose}>
+            <p>
+              プロンプト側で「独立した調査として」「並列で分析して」のように書くことで、サブエージェントへの委任を促すこともできます。
+            </p>
+
+            <h3>5.4 サブエージェントとしてのカスタムエージェント</h3>
+            <p>
+              既定では、サブエージェントは主セッションのモデル・ツールをそのまま引き継ぎます。カスタムエージェントをサブエージェントとして走らせると、そのエージェント自身の{" "}
+              <code>model</code>・<code>tools</code>
+              ・指示が優先されます。呼び出し制御は次の2つのフィールドで行います。
+            </p>
+            <ul>
+              <li>
+                <code>user-invocable: false</code> …
+                エージェント選択ドロップダウンには表示されず、サブエージェントとしてのみ利用可能
+              </li>
+              <li>
+                <code>disable-model-invocation: true</code> …
+                他のエージェントからサブエージェントとして呼ばれなくなる(ユーザーが明示的に選んだ場合のみ動作)
+              </li>
+            </ul>
+          </div>
+          <span className={styles.codeLabel}>internal-helper.agent.md</span>
+          <pre className={styles.codeBlock}>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>---</span>
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>name</span>:{" "}
+              <span className={styles.cs}>internal-helper</span>
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>user-invocable</span>:{" "}
+              <span className={styles.cw}>false</span>
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>---</span>
+            </div>
+            <div className={styles.codeLine}>
+              このエージェントはサブエージェントとしてのみ呼び出せます。
+            </div>
+          </pre>
+
+          <div className={styles.prose}>
+            <h3>5.5 呼び出せるサブエージェントを制限する(実験的機能)</h3>
+            <p>
+              既定では <code>disable-model-invocation: true</code>{" "}
+              を持たないすべてのカスタムエージェントがサブエージェント候補になります。名前や説明が似ているエージェントが複数あると、意図しないエージェントが選ばれることがあるため、
+              <code>agents</code> プロパティで許可リストを明示できます。
+            </p>
+            <ul>
+              <li>
+                特定のエージェント名の配列(例:{" "}
+                <code>[&apos;Red&apos;, &apos;Green&apos;, &apos;Refactor&apos;]</code>)を指定 →
+                それだけを許可
+              </li>
+              <li>
+                <code>*</code> → すべて許可(既定動作)
+              </li>
+              <li>
+                <code>[]</code> → サブエージェントの利用自体を禁止
+              </li>
+            </ul>
+          </div>
+          <span className={styles.codeLabel}>tdd.agent.md</span>
+          <pre className={styles.codeBlock}>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>---</span>
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>name</span>: <span className={styles.cs}>TDD</span>
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>tools</span>: [
+              <span className={styles.cs}>&apos;agent&apos;</span>]
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>agents</span>: [
+              <span className={styles.cs}>&apos;Red&apos;</span>,{" "}
+              <span className={styles.cs}>&apos;Green&apos;</span>,{" "}
+              <span className={styles.cs}>&apos;Refactor&apos;</span>]
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>---</span>
+            </div>
+            <div className={styles.codeLine}>
+              テスト駆動開発でこの機能を実装してください。以下の手順でサブエージェントを使います。
+            </div>
+            <div className={styles.codeLine}>1. Red エージェントで失敗するテストを書く</div>
+            <div className={styles.codeLine}>
+              2. Green エージェントでテストを通すコードを実装する
+            </div>
+            <div className={styles.codeLine}>3. Refactor エージェントでコード品質を改善する</div>
+          </pre>
+          <div className={styles.prose}>
+            <p>
+              <code>agents</code> 配列に明示的に列挙されたエージェントは、
+              <code>disable-model-invocation: true</code>{" "}
+              の設定より優先されます。つまり「一般的にはサブエージェントとして使われたくないが、特定のコーディネーターからは呼ばれてよい」というエージェントを作れます。
+            </p>
+
+            <h3>5.6 ネストしたサブエージェント(再帰)</h3>
+            <p>
+              既定ではサブエージェントはさらにサブエージェントを生成できません。これは、エージェントが誤って自分自身をループ呼び出しする無限再帰を防ぐためです。分割統治(divide-and-conquer)のような再帰的な委任が必要な場合は、
+              <code>chat.subagents.allowInvocationsFromSubagents</code> 設定(既定
+              false)を有効にします。有効化すると、最大ネスト深度5までサブエージェントが自身のサブエージェントを生成できます。
+            </p>
+          </div>
+          <span className={styles.codeLabel}>recursive-processor.agent.md</span>
+          <pre className={styles.codeBlock}>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>---</span>
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>name</span>:{" "}
+              <span className={styles.cs}>RecursiveProcessor</span>
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>tools</span>: [
+              <span className={styles.cs}>&apos;agent&apos;</span>,{" "}
+              <span className={styles.cs}>&apos;read&apos;</span>,{" "}
+              <span className={styles.cs}>&apos;search&apos;</span>]
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>agents</span>: [
+              <span className={styles.cs}>RecursiveProcessor</span>]
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>argument-hint</span>:{" "}
+              <span className={styles.cs}>処理対象の項目リスト</span>
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>---</span>
+            </div>
+            <div className={styles.codeLine}>リストを分割統治で処理します。</div>
+            <div className={styles.codeLine}>
+              -
+              項目が5個より多い場合、半分に分割してそれぞれをRecursiveProcessorサブエージェントに委任する
+            </div>
+            <div className={styles.codeLine}>- 4個以下ならその場で直接処理する</div>
+            <div className={styles.codeLine}>
+              - 各サブエージェントの結果を統合して最終結果とする
+            </div>
+          </pre>
+
+          <div className={styles.prose}>
+            <h3>5.7 サブエージェントのモデル選択優先順位</h3>
+            <p>サブエージェント実行時のモデルは、次の優先順位で決まります。</p>
+            <ol>
+              <li>
+                主エージェントが <code>runSubagent</code> ツール呼び出し時に明示的に指定したモデル
+              </li>
+              <li>
+                サブエージェント自身の <code>.agent.md</code> フロントマターの <code>model</code>
+              </li>
+              <li>親の会話を実行しているメインモデル</li>
+            </ol>
+            <p>
+              なお、要求されたモデルは主モデルのコスト階層を超えられません。より高価なモデルを要求した場合は主モデルにフォールバックします。
+            </p>
+
+            <h3>5.8 GitHub Copilot CLIでのオーケストレーション</h3>
+            <p>
+              VS Codeの <code>agent</code> ツールに相当する体験として、Copilot CLIには{" "}
+              <code>/fleet</code>{" "}
+              というエンドユーザー向けのオーケストレーションコマンドがあります。大きな目標を分解し、複数のバックグラウンドサブエージェントを起動し、依存関係を尊重しながら結果を統合します。
+            </p>
+          </div>
+          <span className={styles.codeLabel}>terminal</span>
+          <pre className={styles.codeBlock}>
+            <div className={styles.codeLine}>
+              <span className={styles.cc}># 対話実行の場合</span>
+            </div>
+            <div className={styles.codeLine}>
+              /fleet
+              認証まわりのドキュメントを更新し、認証サービスをリファクタリングし、関連テストを追加して。
+            </div>
+            <div className={styles.codeLine}></div>
+            <div className={styles.codeLine}>
+              <span className={styles.cc}># 非対話実行の場合</span>
+            </div>
+            <div className={styles.codeLine}>
+              copilot -p{" "}
+              <span className={styles.cs}>
+                &quot;/fleet
+                認証まわりのドキュメントを更新し、認証サービスをリファクタリングし、関連テストを追加して。&quot;
+              </span>{" "}
+              --no-ask-user
+            </div>
+          </pre>
+          <div className={styles.prose}>
+            <p>
+              また <code>/research</code>{" "}
+              は、1つのトピックを複数の調査スレッドに分解し、並列サブエージェントとして実行してから構造化レポートに統合する、組み込みのオーケストレーションコマンドです。自分でマルチエージェントパターンを組まなくても、単発の質問より深く信頼性の高い調査結果が得られます。
+            </p>
+
+            <h3>5.9 サブエージェントの並列度・深度制御</h3>
+            <p>
+              利用量ベース課金のユーザーは、<code>/settings</code> からサブエージェントの
+              <strong>同時実行数</strong>と<strong>深度の上限</strong>
+              を設定できます。同時実行数は並列に走るサブエージェントの数、深度上限は委任が何階層まで連鎖できるかを制御し、複雑なオーケストレーションタスクにおけるリソース消費を予測可能にします。
+            </p>
+
+            <h3>5.10 サブエージェントの実行フロー</h3>
+          </div>
+
+          <div className={styles.mermaidWrapper} data-testid="mermaid-diagram">
+            <p className={styles.mermaidCaption}>図3: サブエージェントの実行フロー</p>
+            <MermaidDiagram
+              chart={`flowchart TB
+    U[ユーザーが複雑なタスクを依頼] --> M[主エージェントがタスクを分析]
+    M --> D{文脈分離が<br/>有効な部分がある}
+    D -- なし --> S[主エージェントが直接処理]
+    D -- あり --> R["agent ツールで<br/>サブエージェントを起動"]
+    R --> W1[サブエージェント1: 調査]
+    R --> W2[サブエージェント2: 実装案A]
+    R --> W3[サブエージェント3: 実装案B]
+    W1 --> C[主エージェントが結果を統合]
+    W2 --> C
+    W3 --> C
+    C --> O[ユーザーへ最終結果を提示]`}
+              theme="base"
+            />
           </div>
         </section>
-        <section id="s19" className={styles.sec}>
-          <div className={styles.secHead}>
-            <span className={styles.secNum}>10</span>
-            <h2>まとめ：各ファイルの役割と設計原則</h2>
+
+        {/* 6. MCP */}
+        <section className={styles.section} id="mcp">
+          <div className={styles.sectionNumber}>SECTION 6</div>
+          <h2>6. MCP統合</h2>
+          <div className={styles.prose}>
+            <h3>6.1 MCPとは</h3>
+            <p>
+              Model Context
+              Protocol(MCP)は、AIモデルを外部ツールやサービスに接続するためのオープンな標準規格です。GitHub
+              CopilotにおいてMCPサーバーは、ファイル操作・データベース・外部APIなどのための「ツール」を提供します。MCPサーバーは、ツールに加えて「リソース(読み取り専用の文脈データ)」「プロンプト(定型プロンプトのテンプレート)」「MCP
+              Apps(チャット内に直接描画されるフォームやビジュアライゼーションなどの対話型UI)」も提供できます。
+            </p>
+
+            <h3>6.2 エージェントからMCPツールを使う</h3>
+            <p>
+              <code>.agent.md</code> の <code>tools</code>{" "}
+              配列にMCPサーバー名(またはツール名)を追加するだけで、そのエージェントはMCPツールを利用できます。サーバーの全ツールを含めたい場合は{" "}
+              <code>&lt;サーバー名&gt;/*</code> という記法を使います。
+            </p>
           </div>
-          <div className={styles.tblWrap}>
+          <span className={styles.codeLabel}>database-administrator.agent.md</span>
+          <pre className={styles.codeBlock}>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>---</span>
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>name</span>:{" "}
+              <span className={styles.cs}>&apos;Database Administrator&apos;</span>
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>description</span>:{" "}
+              <span className={styles.cs}>
+                &apos;PostgreSQLのパフォーマンスチューニング・クエリ最適化・スキーマ設計の専門DBA&apos;
+              </span>
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>tools</span>: [
+              <span className={styles.cs}>&apos;codebase&apos;</span>,{" "}
+              <span className={styles.cs}>&apos;terminal&apos;</span>,{" "}
+              <span className={styles.cs}>&apos;postgres/*&apos;</span>]
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>---</span>
+            </div>
+          </pre>
+          <div className={styles.prose}>
+            <p>
+              この設定があると、エージェントは実際のデータベースに対して{" "}
+              <code>EXPLAIN ANALYZE</code>{" "}
+              を実行してボトルネックを特定したり、実データの分布に基づいてインデックスを提案したりできます。MCPサーバーがなければ、エージェントはデータベース構造やパフォーマンス特性を推測するしかありません。
+            </p>
+
+            <h3>6.3 mcp.json によるサーバー設定(VS Code)</h3>
+            <p>
+              MCPサーバーはワークスペース単位(<code>.vscode/mcp.json</code>
+              )、またはユーザープロファイル単位で設定します。
+            </p>
+          </div>
+          <span className={styles.codeLabel}>.vscode/mcp.json</span>
+          <pre className={styles.codeBlock}>
+            <div className={styles.codeLine}>&#123;</div>
+            <div className={styles.codeLine}>
+              {" "}
+              <span className={styles.ck}>&quot;servers&quot;</span>: &#123;
+            </div>
+            <div className={styles.codeLine}>
+              {" "}
+              <span className={styles.ck}>&quot;github&quot;</span>: &#123;
+            </div>
+            <div className={styles.codeLine}>
+              {" "}
+              <span className={styles.cv}>&quot;type&quot;</span>:{" "}
+              <span className={styles.cs}>&quot;http&quot;</span>,
+            </div>
+            <div className={styles.codeLine}>
+              {" "}
+              <span className={styles.cv}>&quot;url&quot;</span>:{" "}
+              <span className={styles.cs}>&quot;https://api.githubcopilot.com/mcp&quot;</span>
+            </div>
+            <div className={styles.codeLine}> &#125;,</div>
+            <div className={styles.codeLine}>
+              {" "}
+              <span className={styles.ck}>&quot;playwright&quot;</span>: &#123;
+            </div>
+            <div className={styles.codeLine}>
+              {" "}
+              <span className={styles.cv}>&quot;command&quot;</span>:{" "}
+              <span className={styles.cs}>&quot;npx&quot;</span>,
+            </div>
+            <div className={styles.codeLine}>
+              {" "}
+              <span className={styles.cv}>&quot;args&quot;</span>: [
+              <span className={styles.cs}>&quot;-y&quot;</span>,{" "}
+              <span className={styles.cs}>&quot;@microsoft/mcp-server-playwright&quot;</span>]
+            </div>
+            <div className={styles.codeLine}> &#125;</div>
+            <div className={styles.codeLine}> &#125;</div>
+            <div className={styles.codeLine}>&#125;</div>
+          </pre>
+          <div className={styles.prose}>
+            <p>
+              APIキーなどの機密情報はJSONに直書きせず、<code>${`\${input:variableName}`}</code>{" "}
+              のような入力変数を使うことが強く推奨されています。VS
+              Codeが実行時にプロンプトを出し、コミットされるファイルにシークレットが残らないようにできます。
+            </p>
+
+            <h3>6.4 Copilot CLIでのMCP設定ファイル優先順位</h3>
+            <p>Copilot CLIは、次の順序でMCPサーバー定義を探索します。</p>
+          </div>
+          <div className={styles.tableWrap}>
             <table>
               <thead>
                 <tr>
                   <th>ファイル</th>
-                  <th>配置場所</th>
-                  <th>ロード方式</th>
-                  <th>設計原則</th>
-                  <th>アンチパターン</th>
+                  <th>スコープ</th>
+                  <th>備考</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
                   <td>
-                    <code>copilot-instructions.md</code>
+                    <code>.mcp.json</code>
                   </td>
-                  <td>
-                    <code>.github/</code>
-                    {" 直下（必須）"}
-                  </td>
-                  <td>
-                    <span className={`${styles.badge} ${styles.bGreen}`}>常時</span>
-                  </td>
-                  <td>普遍的なルールのみ。プロジェクト概要・スタック・禁止操作</td>
-                  <td>パス固有ルール・専門手順の混在</td>
+                  <td>リポジトリルート</td>
+                  <td>チーム共有設定として推奨</td>
                 </tr>
                 <tr>
                   <td>
-                    <code>*.instructions.md</code>
+                    <code>.github/mcp.json</code>
                   </td>
                   <td>
-                    <code>.github/instructions/</code>
+                    <code>.github/</code> フォルダ
                   </td>
-                  <td>
-                    <span className={`${styles.badge} ${styles.bBlue}`}>applyTo</span>
-                  </td>
-                  <td>applyTo でパスを絞る。excludeAgent でエージェント除外</td>
-                  <td>applyTo なしの全体適用</td>
+                  <td>自動読み込みされるワークスペース設定</td>
                 </tr>
                 <tr>
                   <td>
-                    <code>*.agent.md</code>
+                    <code>.vscode/mcp.json</code>
                   </td>
-                  <td>
-                    <code>.github/agents/</code>
-                  </td>
-                  <td>
-                    <span className={`${styles.badge} ${styles.bPurple}`}>@呼び出し</span>
-                  </td>
-                  <td>description 明確化・ツール最小化・境界（書き込み先）を明示</td>
-                  <td>曖昧なdescription・書き込み先無制限</td>
+                  <td>VS Codeワークスペース</td>
+                  <td>VS Code互換設定</td>
                 </tr>
                 <tr>
                   <td>
-                    <code>SKILL.md</code>
+                    <code>devcontainer.json</code>
                   </td>
-                  <td>
-                    <code>.github/skills/*/</code>
-                  </td>
-                  <td>
-                    <span className={`${styles.badge} ${styles.bAmber}`}>遅延ロード</span>
-                  </td>
-                  <td>description で「いつ使う/使わない」を明確に記述</td>
-                  <td>description が曖昧・常時ロード設定</td>
-                </tr>
-                <tr>
-                  <td>
-                    <code>*.prompt.md</code>
-                  </td>
-                  <td>
-                    <code>.github/prompts/</code>
-                  </td>
-                  <td>
-                    <span className={`${styles.badge} ${styles.bRed}`}>/コマンド</span>
-                  </td>
-                  <td>繰り返しタスクの再利用化。mode と tools を明示</td>
-                  <td>1回しか使わないタスクを定義</td>
-                </tr>
-                <tr>
-                  <td>
-                    <code>*.chatmode.md</code>
-                  </td>
-                  <td>
-                    <code>.github/chatmodes/</code>
-                  </td>
-                  <td>
-                    <span className={`${styles.badge} ${styles.bTeal}`}>モード切替</span>
-                  </td>
-                  <td>特定ペルソナ（DBA・セキュリティ等）のツールセット定義</td>
-                  <td>過剰なツール許可</td>
-                </tr>
-                <tr>
-                  <td>
-                    <code>AGENTS.md</code>
-                  </td>
-                  <td>プロジェクトルート</td>
-                  <td>
-                    <span className={`${styles.badge} ${styles.bMs}`}>クロスツール</span>
-                  </td>
-                  <td>Claude/Gemini/Codex と共通の普遍ルール。ツール固有は別ファイル</td>
-                  <td>ツール固有構文の混在</td>
+                  <td>Dev Container</td>
+                  <td>コンテナ内実行時に利用可能</td>
                 </tr>
               </tbody>
             </table>
           </div>
-        </section>
-        <hr />
+          <div className={styles.callout} data-variant="warn">
+            <strong>重要な安全対策:</strong> ワークスペースのMCPサーバーは「フォルダ信頼(folder
+            trust)」が確認された後にのみ起動します。明示的に信頼していないフォルダの設定ファイルに書かれたMCPサーバーは起動しないため、信頼していないリポジトリの悪意あるMCPサーバー設定から保護されます。
+          </div>
 
-        {/* Sources */}
-        <section id="sources" className={styles.sec}>
-          <div className={styles.secHead}>
-            <span className={styles.secNum}>📚</span>
-            <h2>参考ソース（公式・一次情報優先）— 2026年6月最新版</h2>
+          <div className={styles.prose}>
+            <h3>6.5 認証とサンドボックス</h3>
+            <p>MCPサーバーの認証方式は多岐にわたります。</p>
+            <ul>
+              <li>
+                <strong>OAuth</strong>: ブラウザリダイレクトとトークン保存をCLI/エディタが自動処理
+              </li>
+              <li>
+                <strong>client_credentials グラント</strong>:
+                ブラウザのないヘッドレス環境(CI/CDなど)向けのマシン間認証
+              </li>
+              <li>
+                <strong>デバイスコードフロー(RFC 8628)</strong>:
+                ヘッドレス/CI環境でブラウザリダイレクトが使えない場合の自動フォールバック
+              </li>
+              <li>
+                <strong>環境変数によるAPIキー</strong>: <code>env</code>{" "}
+                フィールド経由で渡し、設定ファイルには直書きしない
+              </li>
+            </ul>
+            <p>
+              macOSとLinuxでは、ローカルで動くstdio型MCPサーバーに対してサンドボックス化を有効にできます。
+              <code>sandboxEnabled: true</code>{" "}
+              を設定すると、そのサーバーがアクセスできるファイルパスとネットワークドメインを明示的に許可したものだけに制限できます。サンドボックス化されたサーバーのツール呼び出しは、制御された環境内で実行されるため自動承認されます(Windowsでは現時点で非対応)。
+            </p>
           </div>
-          <div className={styles.srcGrid}>
-            {SOURCES.map((src) => (
-              <div key={src.href} className={styles.srcCard}>
-                <div className={styles.srcIcon}>{src.icon}</div>
-                <div className={styles.srcTitle}>{src.title}</div>
-                <div className={styles.srcUrl}>
-                  <Ext href={src.href}>{src.url}</Ext>
-                </div>
-                <div className={styles.srcDesc}>{src.desc}</div>
-              </div>
-            ))}
+          <span className={styles.codeLabel}>.vscode/mcp.json(サンドボックス設定)</span>
+          <pre className={styles.codeBlock}>
+            <div className={styles.codeLine}>&#123;</div>
+            <div className={styles.codeLine}>
+              {" "}
+              <span className={styles.ck}>&quot;servers&quot;</span>: &#123;
+            </div>
+            <div className={styles.codeLine}>
+              {" "}
+              <span className={styles.ck}>&quot;myServer&quot;</span>: &#123;
+            </div>
+            <div className={styles.codeLine}>
+              {" "}
+              <span className={styles.cv}>&quot;type&quot;</span>:{" "}
+              <span className={styles.cs}>&quot;stdio&quot;</span>,
+            </div>
+            <div className={styles.codeLine}>
+              {" "}
+              <span className={styles.cv}>&quot;command&quot;</span>:{" "}
+              <span className={styles.cs}>&quot;npx&quot;</span>,
+            </div>
+            <div className={styles.codeLine}>
+              {" "}
+              <span className={styles.cv}>&quot;args&quot;</span>: [
+              <span className={styles.cs}>&quot;-y&quot;</span>,{" "}
+              <span className={styles.cs}>&quot;@example/mcp-server&quot;</span>],
+            </div>
+            <div className={styles.codeLine}>
+              {" "}
+              <span className={styles.cv}>&quot;sandboxEnabled&quot;</span>:{" "}
+              <span className={styles.cw}>true</span>
+            </div>
+            <div className={styles.codeLine}> &#125;</div>
+            <div className={styles.codeLine}> &#125;,</div>
+            <div className={styles.codeLine}>
+              {" "}
+              <span className={styles.ck}>&quot;sandbox&quot;</span>: &#123;
+            </div>
+            <div className={styles.codeLine}>
+              {" "}
+              <span className={styles.ck}>&quot;filesystem&quot;</span>: &#123;{" "}
+              <span className={styles.cv}>&quot;allowWrite&quot;</span>: [
+              <span className={styles.cs}>&quot;\${`\${workspaceFolder}`}&quot;</span>] &#125;,
+            </div>
+            <div className={styles.codeLine}>
+              {" "}
+              <span className={styles.ck}>&quot;network&quot;</span>: &#123;{" "}
+              <span className={styles.cv}>&quot;allowedDomains&quot;</span>: [
+              <span className={styles.cs}>&quot;api.example.com&quot;</span>] &#125;
+            </div>
+            <div className={styles.codeLine}> &#125;</div>
+            <div className={styles.codeLine}>&#125;</div>
+          </pre>
+
+          <div className={styles.prose}>
+            <h3>6.6 GitHub Copilot Cloud Agent向けの mcp-servers フィールド</h3>
+            <p>
+              <code>target: github-copilot</code> のカスタムエージェントでは、
+              <code>mcp-servers</code>{" "}
+              フロントマターフィールドにMCPサーバー設定(JSON)を直接記述できます。VS Code版が外部の{" "}
+              <code>mcp.json</code> を参照するのに対し、Cloud
+              Agent版はエージェントファイル自体にMCP設定を持たせられる点が異なります。
+            </p>
+            <h3>6.7 アーキテクチャ概観</h3>
+          </div>
+
+          <div className={styles.mermaidWrapper} data-testid="mermaid-diagram">
+            <p className={styles.mermaidCaption}>
+              図4: .agent.md ・MCPサーバー・外部システムの関係
+            </p>
+            <MermaidDiagram
+              chart={`flowchart TB
+    subgraph Editor["エディタ / CLI / Cloud Agent"]
+        Agent[".agent.md<br/>tools に MCPサーバー名を指定"]
+    end
+    subgraph MCPLayer["MCP レイヤー"]
+        S1["MCPサーバー: Postgres<br/>ツール提供"]
+        S2["MCPサーバー: GitHub<br/>リソース提供"]
+        S3["MCPサーバー: Figma<br/>プロンプト/MCP Apps"]
+    end
+    subgraph External["外部システム"]
+        DB[(データベース)]
+        API[外部API]
+        Design[デザインツール]
+    end
+    Agent -->|ツール呼び出し| S1
+    Agent -->|ツール呼び出し| S2
+    Agent -->|ツール呼び出し| S3
+    S1 --> DB
+    S2 --> API
+    S3 --> Design`}
+              theme="base"
+            />
+          </div>
+
+          <div className={styles.prose}>
+            <h3>6.8 トラブルシューティングの要点(概要)</h3>
+            <p>
+              MCP固有のトラブルシューティングは第8章にまとめていますが、まず押さえるべき基本動線は次の3つです。
+            </p>
+            <ol>
+              <li>
+                サーバーが起動しない/接続が切れる場合、チャットビューにエラーインジケーターが表示されるので選択して出力ログを確認する
+              </li>
+              <li>
+                コマンドパレットの <strong>MCP: List Servers</strong>{" "}
+                からサーバーごとの状態確認・再起動ができる
+              </li>
+              <li>
+                CLIでは <code>/mcp show</code>(全サーバー一覧)や <code>/mcp show &lt;name&gt;</code>
+                (個別サーバー詳細)でstderr出力込みの失敗理由を素早く特定できる
+              </li>
+            </ol>
           </div>
         </section>
-      </div>
+
+        {/* 7. Patterns */}
+        <section className={styles.section} id="patterns">
+          <div className={styles.sectionNumber}>SECTION 7</div>
+          <h2>7. マルチエージェント設計パターン</h2>
+          <div className={styles.prose}>
+            <p>
+              <code>.agent.md</code>{" "}
+              の真価は、単体のペルソナ切り替えよりも、複数のエージェントを役割分担させる「オーケストレーション」で発揮されます。ここでは実務でよく使われる設計パターンを、実装例つきで紹介します。
+            </p>
+            <h3>7.1 パターン比較表</h3>
+          </div>
+          <div className={styles.tableWrap}>
+            <table>
+              <thead>
+                <tr>
+                  <th>パターン</th>
+                  <th>目的</th>
+                  <th>主な構成要素</th>
+                  <th>向いている場面</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Coordinator &amp; Worker</td>
+                  <td>全体の流れを統括しつつ、専門特化したワーカーに委任する</td>
+                  <td>
+                    コーディネーター1体 + ワーカー複数体(<code>agents</code> で許可リスト化)
+                  </td>
+                  <td>機能開発全体(計画→実装→レビュー)のように、明確な工程がある場合</td>
+                </tr>
+                <tr>
+                  <td>Multi-perspective Review</td>
+                  <td>同じ成果物を複数の視点から独立してレビューする</td>
+                  <td>並列サブエージェント(正確性・品質・セキュリティ・アーキテクチャ)</td>
+                  <td>コードレビュー、設計レビューなど「見落とし」を減らしたい場合</td>
+                </tr>
+                <tr>
+                  <td>Research → Act</td>
+                  <td>調査と実行を分離し、主文脈を汚さない</td>
+                  <td>調査用サブエージェント → 実装エージェント</td>
+                  <td>未知のライブラリ選定、既存パターンの調査が必要な実装</td>
+                </tr>
+                <tr>
+                  <td>Recursive Divide &amp; Conquer</td>
+                  <td>大きなタスクを再帰的に分割する</td>
+                  <td>
+                    自己参照する <code>agents</code> プロパティ、ネスト許可設定
+                  </td>
+                  <td>大量データ処理、大規模リストの一括処理</td>
+                </tr>
+                <tr>
+                  <td>Red/Green/Refactor(TDD)</td>
+                  <td>テスト駆動開発の3工程をエージェントごとに分離する</td>
+                  <td>許可リストで固定された専用サブエージェント3体</td>
+                  <td>テスト駆動開発を厳密に運用したいチーム</td>
+                </tr>
+                <tr>
+                  <td>Handoffsチェーン</td>
+                  <td>人間のレビューを挟みながら段階的に進める</td>
+                  <td>
+                    <code>handoffs</code> フロントマター
+                  </td>
+                  <td>各工程で承認を得たい、監査性を重視する場合</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div className={styles.prose}>
+            <h3>7.2 Coordinator &amp; Worker(コーディネーター &amp; ワーカー)</h3>
+            <p>
+              コーディネーターは全体のワークフローを管理し、専門特化したサブエージェントにサブタスクを委任します。各ワーカーは読み取り専用ツールだけを持つプランナーや、編集権限を持つ実装者など、必要な権限だけを個別に持てます。
+            </p>
+          </div>
+          <span className={styles.codeLabel}>feature-builder.agent.md</span>
+          <pre className={styles.codeBlock}>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>---</span>
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>name</span>:{" "}
+              <span className={styles.cs}>Feature Builder</span>
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>tools</span>: [
+              <span className={styles.cs}>&apos;agent&apos;</span>,{" "}
+              <span className={styles.cs}>&apos;edit&apos;</span>,{" "}
+              <span className={styles.cs}>&apos;search&apos;</span>,{" "}
+              <span className={styles.cs}>&apos;read&apos;</span>]
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>agents</span>: [
+              <span className={styles.cs}>&apos;Planner&apos;</span>,{" "}
+              <span className={styles.cs}>&apos;Plan Architect&apos;</span>,{" "}
+              <span className={styles.cs}>&apos;Implementer&apos;</span>,{" "}
+              <span className={styles.cs}>&apos;Reviewer&apos;</span>]
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>---</span>
+            </div>
+            <div className={styles.codeLine}>
+              あなたは機能開発のコーディネーターです。各機能要求について次の手順を踏みます。
+            </div>
+            <div className={styles.codeLine}></div>
+            <div className={styles.codeLine}>1. Planner エージェントで機能をタスクに分解する</div>
+            <div className={styles.codeLine}>
+              2. Plan Architect エージェントで計画をコードベースの既存パターンと照合する
+            </div>
+            <div className={styles.codeLine}>
+              3.
+              アーキテクトが再利用可能なパターンやライブラリを指摘したら、Plannerへフィードバックし計画を更新する
+            </div>
+            <div className={styles.codeLine}>
+              4. Implementer エージェントで各タスクのコードを書く
+            </div>
+            <div className={styles.codeLine}>5. Reviewer エージェントで実装を確認する</div>
+            <div className={styles.codeLine}>
+              6. レビューアが問題を指摘したら、再度Implementerエージェントで修正する
+            </div>
+            <div className={styles.codeLine}></div>
+            <div className={styles.codeLine}>
+              各フェーズが収束するまで、計画とアーキテクチャの往復、レビューと実装の往復を繰り返してください。
+            </div>
+          </pre>
+          <span className={styles.codeLabel}>implementer.agent.md(軽量モデルを優先)</span>
+          <pre className={styles.codeBlock}>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>---</span>
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>name</span>:{" "}
+              <span className={styles.cs}>Implementer</span>
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>user-invocable</span>:{" "}
+              <span className={styles.cw}>false</span>
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>model</span>: [
+              <span className={styles.cs}>&apos;Claude Haiku 4.5 (copilot)&apos;</span>,{" "}
+              <span className={styles.cs}>&apos;Gemini 3 Flash (Preview) (copilot)&apos;</span>]
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>---</span>
+            </div>
+            <div className={styles.codeLine}>
+              割り当てられたタスクを実装するコードを書いてください。
+            </div>
+          </pre>
+
+          <div className={styles.prose}>
+            <h3>7.3 Multi-perspective Review(多視点レビュー)</h3>
+            <p>
+              コードレビューは1回のパスだけでは見落としが生じがちです。異なる視点を並列サブエージェントとして走らせ、あとから統合するとレビュー品質が上がります。
+            </p>
+          </div>
+          <span className={styles.codeLabel}>thorough-reviewer.agent.md</span>
+          <pre className={styles.codeBlock}>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>---</span>
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>name</span>:{" "}
+              <span className={styles.cs}>Thorough Reviewer</span>
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>tools</span>: [
+              <span className={styles.cs}>&apos;agent&apos;</span>,{" "}
+              <span className={styles.cs}>&apos;read&apos;</span>,{" "}
+              <span className={styles.cs}>&apos;search&apos;</span>]
+            </div>
+            <div className={styles.codeLine}>
+              <span className={styles.ck}>---</span>
+            </div>
+            <div className={styles.codeLine}>
+              あなたは複数の視点を同時にレビューします。各視点を独立した並列サブエージェントとして実行し、
+            </div>
+            <div className={styles.codeLine}>互いの結果に引きずられないようにしてください。</div>
+            <div className={styles.codeLine}></div>
+            <div className={styles.codeLine}>
+              レビュー依頼を受けたら、以下を並列サブエージェントとして実行します。
+            </div>
+            <div className={styles.codeLine}>
+              - 正確性レビュアー: ロジックの誤り、エッジケース、型の問題
+            </div>
+            <div className={styles.codeLine}>- コード品質レビュアー: 可読性、命名、重複</div>
+            <div className={styles.codeLine}>
+              - セキュリティレビュアー: 入力検証、インジェクションリスク、データ漏えい
+            </div>
+            <div className={styles.codeLine}>
+              - アーキテクチャレビュアー: 既存パターンとの整合性、設計の一貫性
+            </div>
+            <div className={styles.codeLine}></div>
+            <div className={styles.codeLine}>
+              全サブエージェントの完了後、優先度付きサマリーに統合してください。致命的な問題とnice-to-have
+            </div>
+            <div className={styles.codeLine}>を区別し、良かった点にも触れてください。</div>
+          </pre>
+          <div className={styles.prose}>
+            <p>
+              より細かく制御したい場合、各視点を専用のカスタムエージェントとして切り出し、セキュリティレビュアーにはセキュリティ特化MCPサーバー、コード品質レビュアーには社内Lint
+              CLIツールを個別に持たせる、といった拡張も可能です。
+            </p>
+
+            <h3>7.4 Research → Act(調査してから実行)</h3>
+            <p>
+              未知の技術選定が絡む実装では、先に調査専用のサブエージェントで選択肢を洗い出し、主エージェントの文脈をきれいに保ったまま実装フェーズへ進むパターンが有効です。
+            </p>
+          </div>
+          <span className={styles.codeLabel}>プロンプト例</span>
+          <pre className={styles.codeBlock}>
+            <div className={styles.codeLine}>
+              このAPIにキャッシュ機能を実装したいので、次の3案について独立調査を行ってください。
+            </div>
+            <div className={styles.codeLine}>1. Redisベースのキャッシュ設計</div>
+            <div className={styles.codeLine}>2. LRU削除つきインメモリキャッシュ設計</div>
+            <div className={styles.codeLine}>3. 階層型(ハイブリッド)キャッシュ設計</div>
+            <div className={styles.codeLine}></div>
+            <div className={styles.codeLine}>
+              結果を比較し、この用途に最適な案を推奨してください。
+            </div>
+          </pre>
+          <div className={styles.prose}>
+            <p>
+              主エージェントは最終的な推奨結果だけを受け取るため、実装作業に入る際の文脈がノイズで汚れません。
+            </p>
+
+            <h3>7.5 Recursive Divide &amp; Conquer(再帰的な分割統治)</h3>
+            <p>
+              大量の項目を処理する場合、自分自身をサブエージェントとして再帰的に呼び出すパターンが使えます(第5.6節参照)。既定では無効な「ネストしたサブエージェント」設定を有効化する必要がある点に注意してください。
+            </p>
+
+            <h3>7.6 Red/Green/Refactor(TDDパターン)</h3>
+            <p>
+              汎用的なコーディングエージェントに丸投げすると、テスト駆動開発の各工程が曖昧になりがちです。専用の3エージェントに許可リストで固定すると、意図しない汎用エージェントが選ばれる事故を防げます(第5.5節のサンプル参照)。
+            </p>
+
+            <h3>7.7 マルチエージェント設計のフロー</h3>
+          </div>
+
+          <div className={styles.mermaidWrapper} data-testid="mermaid-diagram">
+            <p className={styles.mermaidCaption}>
+              図5: Coordinator &amp; Worker パターンの全体フロー
+            </p>
+            <MermaidDiagram
+              chart={`flowchart TB
+    Req[機能要求] --> Coord["Coordinator エージェント<br/>agents で許可リストを制御"]
+    Coord --> Plan[Planner]
+    Plan --> Arch["Plan Architect<br/>既存パターンと照合"]
+    Arch -- 差し戻し --> Plan
+    Arch -- 承認 --> Impl[Implementer]
+    Impl --> Rev[Reviewer]
+    Rev -- 修正依頼 --> Impl
+    Rev -- 承認 --> Done[マージ可能な成果物]`}
+              theme="base"
+            />
+          </div>
+
+          <div className={styles.prose}>
+            <h3>7.8 設計上の指針</h3>
+            <ul>
+              <li>
+                <strong>1エージェント1ペルソナ</strong>
+                を守る。セキュリティ・テスト・ドキュメント・デプロイを1体に詰め込まず、専用エージェントに分割し、共通処理はスキルとして切り出す。
+              </li>
+              <li>
+                コーディネーターには <code>agents</code>{" "}
+                の許可リストを必ず設定する。似た名前・説明を持つエージェントが複数あると、意図しないエージェントが選ばれるリスクが高まる。
+              </li>
+              <li>
+                ワーカーエージェントは既定で <code>user-invocable: false</code>{" "}
+                にして、ピッカーを汚さずサブエージェント専用にしておく。
+              </li>
+              <li>
+                コストの異なるモデルをワーカーごとに使い分ける。要求モデルは主モデルのコスト階層を超えられない点に注意。
+              </li>
+              <li>
+                「ハーネスの単純さ」を忘れない。すべてのタスクにオーケストレーションが必要なわけではなく、単一ファイルで完結する作業にサブエージェントは不要というのが実務者の共通見解です。
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        {/* 8. Troubleshooting */}
+        <section className={styles.section} id="troubleshooting">
+          <div className={styles.sectionNumber}>SECTION 8</div>
+          <h2>8. トラブルシューティング</h2>
+          <div className={styles.prose}>
+            <h3>8.1 まず使うべき診断ツール</h3>
+          </div>
+          <div className={styles.tableWrap}>
+            <table>
+              <thead>
+                <tr>
+                  <th>ツール</th>
+                  <th>できること</th>
+                  <th>開き方</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Agent Debug Log パネル(プレビュー)</td>
+                  <td>
+                    ツール呼び出し順序、LLMリクエスト、トークン使用量、カスタマイズファイルの検出過程、エラーを時系列で確認
+                  </td>
+                  <td>チャットビューの「…」メニュー→「Show Agent Debug Logs」</td>
+                </tr>
+                <tr>
+                  <td>Chat Debug View</td>
+                  <td>各LLMリクエスト/レスポンスの生データ(システムプロンプト全文含む)を確認</td>
+                  <td>チャットビューの「…」メニュー→「Show Chat Debug View」</td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>/troubleshoot</code> スラッシュコマンド
+                  </td>
+                  <td>
+                    直近セッションのデバッグログをAIに解析させる。<code>#session</code>{" "}
+                    で過去セッションも指定可能
+                  </td>
+                  <td>
+                    チャット入力欄に直接入力(<code>github.copilot.chat.agentDebugLog.enabled</code>{" "}
+                    の有効化が必要)
+                  </td>
+                </tr>
+                <tr>
+                  <td>Diagnostics(チャットカスタマイズ診断)</td>
+                  <td>
+                    読み込まれているエージェント・プロンプトファイル・指示ファイル・スキルとそのエラーを一覧表示
+                  </td>
+                  <td>チャットビューを右クリック→「Diagnostics」</td>
+                </tr>
+                <tr>
+                  <td>ログレベル Trace</td>
+                  <td>GitHub Copilot / GitHub Copilot Chat 拡張機能の詳細ログ</td>
+                  <td>コマンドパレット「Developer: Set Log Level」→ Trace</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div className={styles.prose}>
+            <h3>8.2 よくある問題と対処</h3>
+          </div>
+          <div className={styles.tableWrap}>
+            <table>
+              <thead>
+                <tr>
+                  <th>症状</th>
+                  <th>主な原因</th>
+                  <th>対処</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>エージェントがドロップダウン・ピッカーに出てこない</td>
+                  <td>
+                    <code>user-invocable: false</code>{" "}
+                    になっている、ファイルが検出対象パス外にある、拡張機能/プラグイン側の既知バグ
+                  </td>
+                  <td>
+                    フロントマターを確認し、<code>.github/agents/</code>{" "}
+                    配下にあるか確認。IDEによっては再読み込みが必要な既知バグが報告されているため拡張機能を最新化する
+                  </td>
+                </tr>
+                <tr>
+                  <td>ファイルを開いている間だけエージェントが表示される</td>
+                  <td>
+                    一部IDE統合(例:
+                    Xcode向けCopilot)でファイルシステム監視が未実装という既知の不具合が報告されている
+                  </td>
+                  <td>
+                    該当拡張機能のIssueトラッカーで状況を確認し、当面は該当ファイルを開いた状態で作業する
+                  </td>
+                </tr>
+                <tr>
+                  <td>サブエージェントとして一覧に出ない/呼ばれない</td>
+                  <td>
+                    <code>tools</code> に <code>agent</code> が含まれていない、
+                    <code>disable-model-invocation: true</code> になっている、コーディネーター側の{" "}
+                    <code>agents</code> 許可リストに含まれていない
+                  </td>
+                  <td>
+                    <code>tools: [&apos;agent&apos;, ...]</code> を確認し、コーディネーター側の{" "}
+                    <code>agents</code> 配列に対象エージェント名を追加する
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    ユーザーレベルのエージェント(<code>~/.copilot/agents</code>)が読み込まれない
+                  </td>
+                  <td>
+                    CLI/SDKのバージョンやクライアント実装によって、ユーザーレベルのエージェント読み込みが未対応・不具合を抱えている場合がある
+                  </td>
+                  <td>
+                    CLI/拡張機能を最新版に更新し、改善しない場合はリポジトリレベル(
+                    <code>.github/agents/</code>)に一時的にコピーして回避する
+                  </td>
+                </tr>
+                <tr>
+                  <td>Handoffsボタンが出ない</td>
+                  <td>
+                    Cloud Agent環境で使っている(現時点で <code>handoffs</code> は無視される)、
+                    <code>send</code>/<code>label</code>/<code>agent</code> のいずれかが未設定
+                  </td>
+                  <td>
+                    VS Codeで動作確認する。Cloud
+                    Agentでは引き継ぎUIが出ない仕様であることをチームに共有する
+                  </td>
+                </tr>
+                <tr>
+                  <td>モデル指定でエラーになる/意図したモデルが使われない</td>
+                  <td>
+                    <code>model</code>{" "}
+                    に配列を渡した際のクライアント側実装差異、指定したモデル名の表記揺れ
+                  </td>
+                  <td>
+                    まずは単一の文字列で動作確認し、正しいモデル名(ベンダー表記込み)を公式ドキュメントで確認してから配列化する
+                  </td>
+                </tr>
+                <tr>
+                  <td>MCPサーバーが起動しない</td>
+                  <td>
+                    実行コマンド(<code>npx</code>/<code>python</code>
+                    等)がPATH上にない、必須の環境変数(接続文字列やAPIキー)が未設定
+                  </td>
+                  <td>
+                    CLIでは失敗時にstderr出力がそのまま警告に表示されるため、そこに書かれた原因(例:
+                    環境変数未設定)を確認する
+                  </td>
+                </tr>
+                <tr>
+                  <td>MCPサーバーで認証エラー(401など)</td>
+                  <td>トークン期限切れ、認証情報の設定漏れ</td>
+                  <td>
+                    <code>/mcp auth</code> で再認証する。設定ファイルの <code>env</code>{" "}
+                    フィールドを見直す
+                  </td>
+                </tr>
+                <tr>
+                  <td>MCPサーバーが組織ポリシーでブロックされる</td>
+                  <td>組織レベルでMCPサーバーの許可リストが設定されている</td>
+                  <td>管理者に許可リストを確認し、承認済みの代替サーバーに切り替える</td>
+                </tr>
+                <tr>
+                  <td>MCPサーバーがワークスペースで一切起動しない</td>
+                  <td>フォルダ信頼(folder trust)が未確認のまま</td>
+                  <td>
+                    フォルダを信頼するダイアログで承認する。信頼していないリポジトリでは意図的に起動しない仕様であることを理解する
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div className={styles.prose}>
+            <h3>8.3 MCP診断コマンド早見表</h3>
+          </div>
+          <span className={styles.codeLabel}>Copilot CLI</span>
+          <pre className={styles.codeBlock}>
+            <div className={styles.codeLine}>
+              <span className={styles.cc}># サーバー一覧と状態を確認(Copilot CLI)</span>
+            </div>
+            <div className={styles.codeLine}>/mcp show</div>
+            <div className={styles.codeLine}></div>
+            <div className={styles.codeLine}>
+              <span className={styles.cc}># 特定サーバーの詳細を確認</span>
+            </div>
+            <div className={styles.codeLine}>/mcp show postgres</div>
+            <div className={styles.codeLine}></div>
+            <div className={styles.codeLine}>
+              <span className={styles.cc}># レジストリからサーバーを検索・追加</span>
+            </div>
+            <div className={styles.codeLine}>/mcp registry</div>
+            <div className={styles.codeLine}>
+              /mcp install @modelcontextprotocol/server-postgres
+            </div>
+            <div className={styles.codeLine}></div>
+            <div className={styles.codeLine}>
+              <span className={styles.cc}># 再認証</span>
+            </div>
+            <div className={styles.codeLine}>/mcp auth</div>
+          </pre>
+          <div className={styles.prose}>
+            <p>
+              VS Codeでは、コマンドパレットから <strong>MCP: List Servers</strong> →
+              対象サーバーを選択 → <strong>Show Output</strong>(ログ表示)/{" "}
+              <strong>Restart Server</strong>(再起動)という流れが基本の診断フローです。
+            </p>
+            <h3>8.4 トラブルシューティングの判断フロー</h3>
+          </div>
+
+          <div className={styles.mermaidWrapper} data-testid="mermaid-diagram">
+            <p className={styles.mermaidCaption}>図6: トラブルシューティングの判断フロー</p>
+            <MermaidDiagram
+              chart={`flowchart TB
+    Start[エージェントが期待通り動かない] --> Q1{エージェント自体が<br/>ピッカーに出るか}
+    Q1 -- 出ない --> F1["frontmatterの user-invocable / 配置パスを確認<br/>IDE再読み込み・拡張機能更新"]
+    Q1 -- 出る --> Q2{サブエージェントとして<br/>呼ばれるべきなのに呼ばれない}
+    Q2 -- はい --> F2["tools に agent があるか確認<br/>コーディネーターの agents 許可リストを確認"]
+    Q2 -- いいえ --> Q3{MCPツールが<br/>使えない}
+    Q3 -- はい --> F3["/mcp show でサーバー状態を確認<br/>stderr出力・env設定・folder trustを確認"]
+    Q3 -- いいえ --> Q4{Handoffsボタンが<br/>出ない}
+    Q4 -- はい --> F4["Cloud Agentでは handoffs が無視される仕様と一致していないか確認"]
+    Q4 -- いいえ --> F5["Agent Debug Log / Chat Debug View で<br/>実際に送信されたプロンプトとツール呼び出しを確認"]`}
+              theme="base"
+            />
+          </div>
+
+          <div className={styles.prose}>
+            <h3>8.5 セキュリティ関連の注意</h3>
+            <p>
+              <code>.agent.md</code>{" "}
+              はツールアクセスを制限できる仕組みそのものが安全機構でもあります。セキュリティ上重要なワークフローでは、読み取り専用ツールだけを持つエージェントを作り、意図しない変更を防ぎます。リポジトリで共有するエージェントは、最小権限の原則に沿ってツール一覧と指示内容をレビューしてください。自律実行を強めるモード(いわゆる「YOLOモード」/
+              Allow All)を使う場合、ローカルマシンで直接実行せず、GitHub CodespacesやDev
+              Containerのようなサンドボックス環境で動かすことが推奨されています。
+            </p>
+          </div>
+        </section>
+
+        {/* 9. Best practices */}
+        <section className={styles.section} id="bestpractices">
+          <div className={styles.sectionNumber}>SECTION 9</div>
+          <h2>9. ベストプラクティス総まとめ</h2>
+          <div className={styles.prose}>
+            <p>
+              ここまでの各章から、実務で優先度の高い10項目を並べました。番号は本ガイド内での重要度順の目安であり、上から順にチェックしていくと抜け漏れが少なくなります。
+            </p>
+          </div>
+          <div className={styles.grid2}>
+            <div className={styles.card}>
+              <h4>1. 1エージェント1ジョブ</h4>
+              <p>
+                「なんでも屋」を作らず、テスト・ドキュメント・Lint・API実装のように具体的な役割ごとに分割する。
+              </p>
+            </div>
+            <div className={styles.card}>
+              <h4>2. 本文は説明よりコード例</h4>
+              <p>実際のコードスタイル例1つは、説明文3段落分の価値がある。</p>
+            </div>
+            <div className={styles.card}>
+              <h4>3. 境界を3層で明文化する</h4>
+              <p>
+                常に許可 / 要確認 /
+                禁止の3層構造にする。特に「シークレットを絶対にコミットしない」は最も効果的な制約として繰り返し報告されている。
+              </p>
+            </div>
+            <div className={styles.card}>
+              <h4>4. ツールは最小権限</h4>
+              <p>
+                プランナーやレビュアーには読み取り専用ツールだけを与え、実装者にのみ編集権限を与える。
+              </p>
+            </div>
+            <div className={styles.card}>
+              <h4>5. サブエージェントは許可リストで制御する</h4>
+              <p>
+                似た名前のエージェントが複数あるコーディネーターほど、<code>agents</code>{" "}
+                の明示指定が重要になる。
+              </p>
+            </div>
+            <div className={styles.card}>
+              <h4>6. Handoffsとサブエージェントを使い分ける</h4>
+              <p>
+                人間の承認を挟みたい段階的フローにはHandoffs、文脈分離や並列化が主目的ならサブエージェント。
+              </p>
+            </div>
+            <div className={styles.card}>
+              <h4>7. プラットフォーム差異を文書化する</h4>
+              <p>
+                <code>handoffs</code> / <code>argument-hint</code> がCloud Agentで無視されるなど、VS
+                Code・CLI・Cloud Agent間の非互換フィールドをチームで共有する。
+              </p>
+            </div>
+            <div className={styles.card}>
+              <h4>8. 反復して育てる</h4>
+              <p>
+                最小構成から始め、エージェントが間違えた箇所にルールを足していく。最初から完璧な設計を狙わない。
+              </p>
+            </div>
+            <div className={styles.card}>
+              <h4>9. 診断ツールを先に使う</h4>
+              <p>
+                「動かない」と感じたら、まずAgent Debug LogやChat Debug View、<code>/mcp show</code>{" "}
+                のような一次情報を確認してから設定を推測で変更する。
+              </p>
+            </div>
+            <div className={styles.card}>
+              <h4>10. ハーネス全体を理解する</h4>
+              <p>
+                <code>.agent.md</code>{" "}
+                は魔法の呪文ではなく、プロトタイプ→計画→実装→レビューという既存ワークフローを支える部品の1つとして位置づける。
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* 10. References */}
+        <footer className={styles.section} id="references">
+          <h2>10. 参考文献</h2>
+          <div className={styles.prose}>
+            <p>
+              本ガイドは2026年7月31日時点で確認できた以下の一次情報・実務者による公開情報に基づいています。カテゴリごとに分類し、根拠となるURLをあわせて記載しています。
+            </p>
+          </div>
+
+          <div className={styles.prose}>
+            <h3>公式ドキュメント (6件)</h3>
+          </div>
+          <div className={styles.refGrid}>
+            <a
+              className={styles.refCard}
+              href="https://docs.github.com/en/copilot/reference/custom-agents-configuration"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <div className={styles.refCardTitle}>
+                Configuration reference for GitHub Copilot agents
+              </div>
+              <span className={styles.refCardUrl}>
+                <svg
+                  aria-hidden="true"
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M7 17L17 7" />
+                  <path d="M7 7h10v10" />
+                </svg>
+                docs.github.com/en/copilot/reference/custom-agents-configuration
+              </span>
+            </a>
+            <a
+              className={styles.refCard}
+              href="https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/customize-cloud-agent/create-custom-agents"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <div className={styles.refCardTitle}>
+                Creating custom agents for Copilot cloud agent
+              </div>
+              <span className={styles.refCardUrl}>
+                <svg
+                  aria-hidden="true"
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M7 17L17 7" />
+                  <path d="M7 7h10v10" />
+                </svg>
+                docs.github.com/.../customize-cloud-agent/create-custom-agents
+              </span>
+            </a>
+            <a
+              className={styles.refCard}
+              href="https://code.visualstudio.com/docs/agent-customization/custom-agents"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <div className={styles.refCardTitle}>Custom agents in VS Code</div>
+              <span className={styles.refCardUrl}>
+                <svg
+                  aria-hidden="true"
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M7 17L17 7" />
+                  <path d="M7 7h10v10" />
+                </svg>
+                code.visualstudio.com/docs/agent-customization/custom-agents
+              </span>
+            </a>
+            <a
+              className={styles.refCard}
+              href="https://code.visualstudio.com/docs/agents/subagents"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <div className={styles.refCardTitle}>Subagents in Visual Studio Code</div>
+              <span className={styles.refCardUrl}>
+                <svg
+                  aria-hidden="true"
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M7 17L17 7" />
+                  <path d="M7 7h10v10" />
+                </svg>
+                code.visualstudio.com/docs/agents/subagents
+              </span>
+            </a>
+            <a
+              className={styles.refCard}
+              href="https://code.visualstudio.com/docs/agent-customization/mcp-servers"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <div className={styles.refCardTitle}>Add and manage MCP servers in VS Code</div>
+              <span className={styles.refCardUrl}>
+                <svg
+                  aria-hidden="true"
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M7 17L17 7" />
+                  <path d="M7 7h10v10" />
+                </svg>
+                code.visualstudio.com/docs/agent-customization/mcp-servers
+              </span>
+            </a>
+            <a
+              className={styles.refCard}
+              href="https://code.visualstudio.com/docs/agents/agent-troubleshooting/troubleshooting"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <div className={styles.refCardTitle}>Troubleshoot AI in Visual Studio Code</div>
+              <span className={styles.refCardUrl}>
+                <svg
+                  aria-hidden="true"
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M7 17L17 7" />
+                  <path d="M7 7h10v10" />
+                </svg>
+                code.visualstudio.com/docs/agents/agent-troubleshooting/troubleshooting
+              </span>
+            </a>
+          </div>
+
+          <div className={styles.prose}>
+            <h3>実務者による解説記事・コミュニティリソース (7件)</h3>
+          </div>
+          <div className={styles.refGrid}>
+            <a
+              className={styles.refCard}
+              href="https://github.blog/ai-and-ml/github-copilot/the-harness-is-all-you-need-mostly/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <div className={styles.refCardTitle}>The harness is all you need (mostly)</div>
+              <span className={styles.refCardUrl}>
+                <svg
+                  aria-hidden="true"
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M7 17L17 7" />
+                  <path d="M7 7h10v10" />
+                </svg>
+                github.blog/ai-and-ml/github-copilot/the-harness-is-all-you-need-mostly
+              </span>
+            </a>
+            <a
+              className={styles.refCard}
+              href="https://github.blog/ai-and-ml/github-copilot/how-to-write-a-great-agents-md-lessons-from-over-2500-repositories/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <div className={styles.refCardTitle}>
+                How to write a great agents.md: Lessons from over 2,500 repositories
+              </div>
+              <span className={styles.refCardUrl}>
+                <svg
+                  aria-hidden="true"
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M7 17L17 7" />
+                  <path d="M7 7h10v10" />
+                </svg>
+                github.blog/.../how-to-write-a-great-agents-md-lessons-from-over-2500-repositories
+              </span>
+            </a>
+            <a
+              className={styles.refCard}
+              href="https://github.blog/ai-and-ml/github-copilot/from-one-off-prompts-to-workflows-how-to-use-custom-agents-in-github-copilot-cli/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <div className={styles.refCardTitle}>
+                From one-off prompts to workflows: How to use custom agents in GitHub Copilot CLI
+              </div>
+              <span className={styles.refCardUrl}>
+                <svg
+                  aria-hidden="true"
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M7 17L17 7" />
+                  <path d="M7 7h10v10" />
+                </svg>
+                github.blog/.../from-one-off-prompts-to-workflows-how-to-use-custom-agents-in-github-copilot-cli
+              </span>
+            </a>
+            <a
+              className={styles.refCard}
+              href="https://awesome-copilot.github.com/learning-hub/agents-and-subagents/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <div className={styles.refCardTitle}>Agents and Subagents</div>
+              <span className={styles.refCardUrl}>
+                <svg
+                  aria-hidden="true"
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M7 17L17 7" />
+                  <path d="M7 7h10v10" />
+                </svg>
+                awesome-copilot.github.com/learning-hub/agents-and-subagents
+              </span>
+            </a>
+            <a
+              className={styles.refCard}
+              href="https://awesome-copilot.github.com/learning-hub/building-custom-agents/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <div className={styles.refCardTitle}>Building Custom Agents</div>
+              <span className={styles.refCardUrl}>
+                <svg
+                  aria-hidden="true"
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M7 17L17 7" />
+                  <path d="M7 7h10v10" />
+                </svg>
+                awesome-copilot.github.com/learning-hub/building-custom-agents
+              </span>
+            </a>
+            <a
+              className={styles.refCard}
+              href="https://awesome-copilot.github.com/learning-hub/understanding-mcp-servers/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <div className={styles.refCardTitle}>Understanding MCP Servers</div>
+              <span className={styles.refCardUrl}>
+                <svg
+                  aria-hidden="true"
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M7 17L17 7" />
+                  <path d="M7 7h10v10" />
+                </svg>
+                awesome-copilot.github.com/learning-hub/understanding-mcp-servers
+              </span>
+            </a>
+            <a
+              className={styles.refCard}
+              href="https://github.com/github/awesome-copilot/blob/main/docs/README.agents.md"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <div className={styles.refCardTitle}>
+                awesome-copilot リポジトリ サンプルエージェント集(context7.agent.md ほか)
+              </div>
+              <span className={styles.refCardUrl}>
+                <svg
+                  aria-hidden="true"
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M7 17L17 7" />
+                  <path d="M7 7h10v10" />
+                </svg>
+                github.com/github/awesome-copilot/blob/main/docs/README.agents.md
+              </span>
+            </a>
+          </div>
+
+          <div className={styles.prose}>
+            <h3>既知の不具合・コミュニティ報告 (3件)</h3>
+          </div>
+          <div className={styles.refGrid}>
+            <a
+              className={styles.refCard}
+              href="https://youtrack.jetbrains.com/projects/LLM/issues/LLM-24292/Custom-Agent-does-not-show-in-the-dropdown-of-GitHub-Copilot"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <div className={styles.refCardTitle}>
+                Custom Agent does not show in the dropdown of GitHub Copilot
+              </div>
+              <span className={styles.refCardUrl}>
+                <svg
+                  aria-hidden="true"
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M7 17L17 7" />
+                  <path d="M7 7h10v10" />
+                </svg>
+                youtrack.jetbrains.com/projects/LLM/issues/LLM-24292
+              </span>
+            </a>
+            <a
+              className={styles.refCard}
+              href="https://github.com/github/CopilotForXcode/issues/728"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <div className={styles.refCardTitle}>
+                Custom agents not appearing in dropdown unless agent files are open in editor
+              </div>
+              <span className={styles.refCardUrl}>
+                <svg
+                  aria-hidden="true"
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M7 17L17 7" />
+                  <path d="M7 7h10v10" />
+                </svg>
+                github.com/github/CopilotForXcode/issues/728
+              </span>
+            </a>
+            <a
+              className={styles.refCard}
+              href="https://github.com/github/copilot-cli/issues/452"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <div className={styles.refCardTitle}>
+                User-level custom agents not loading from ~/.copilot/agents
+              </div>
+              <span className={styles.refCardUrl}>
+                <svg
+                  aria-hidden="true"
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M7 17L17 7" />
+                  <path d="M7 7h10v10" />
+                </svg>
+                github.com/github/copilot-cli/issues/452
+              </span>
+            </a>
+          </div>
+
+          <div className={styles.callout} data-variant="warn">
+            <strong>注記:</strong> GitHub
+            Copilotのエージェント関連機能(Handoffs・Subagents・MCP連携・スラッシュコマンド等)は2026年に入ってからも継続的に更新されています。本ガイド内のバージョン番号や挙動は執筆時点のものであり、実装前に必ず上記の公式ドキュメントで最新仕様を確認してください。
+          </div>
+        </footer>
+      </main>
+
+      <TocObserver />
     </div>
   );
 }
