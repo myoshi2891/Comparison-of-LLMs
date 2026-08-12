@@ -32,9 +32,9 @@ GitHub Copilot Code Review(以下Copilot Code Review)は、Pull Request(PR)の�
 
 ### 何をしてくれるのか
 
-Copilot Code ReviewはPRの差分・タイトル・本文・リポジトリのカスタム指示などをまとめてコンテキストとして与えられたLLMが解析し、行単位のインラインコメントとしてPRに投稿する機能です。既定のレビュー分析は差分とリポジトリコンテキストを対象とする静的な解析であり、それ自体がコードやテストを実行するわけではありません。一方、設定されたGitHub Actions実行環境では、後述するagentic capabilitiesによるコンテキスト収集やツール実行が行われます。バグや論理エラー、セキュリティ上の懸念、パフォーマンスの問題、言語・フレームワークのベストプラクティス違反などを検出範囲としています<sup>1, 7</sup>。
+Copilot Code ReviewはPRの差分・タイトル・本文・リポジトリのカスタム指示などをまとめてコンテキストとして与えられたLLMが解析し、行単位のインラインコメントとしてPRに投稿する機能です。Agentic capabilitiesは既定で標準のGitHub-hosted runner上で実行され、通常はランナーの追加設定なしでプロジェクトコンテキストの収集やツール利用が行われます。組織でGitHub-hosted runnerを無効化している場合、agentic capabilitiesを利用するにはARCで管理された対応self-hosted runnerを設定する必要があり、未設定時は限定的なレビューへフォールバックします。バグや論理エラー、セキュリティ上の懸念、パフォーマンスの問題、言語・フレームワークのベストプラクティス違反などを検出範囲としています<sup>1, 7, 26</sup>。
 
-レビューを担当するモデルは固定ではなく、GPT系・Claude Opus系・Gemini系など複数のモデルを組み合わせて使う設計になっており、レビューごとに使用されるモデルが変わり得る点も押さえておく必要があります<sup>17</sup>。
+レビューには、モデル・プロンプト・システム動作を慎重に調整した構成が使用されます。品質と一貫性を保つため、利用者によるモデル切替はサポートされていません<sup>27</sup>。
 
 Copilotのレビューは常に「Comment」種別で投稿され、「Approve」や「Request changes」にはなりません。したがって、必須レビュー(Required reviewers)としてはカウントされず、マージ判定をブロックすることもありません。最終的な承認権限は常に人間のレビュアーに残ります<sup>2</sup>。
 
@@ -42,7 +42,7 @@ Copilotのレビューは常に「Comment」種別で投稿され、「Approve�
 
 ```mermaid
 flowchart TB
-    A["入力処理<br/>PR差分 + タイトル/本文 + カスタム指示を統合"] --> B["言語モデル解析<br/>GPT系 / Claude Opus系 / Gemini系 等を使い分け"]
+    A["入力処理<br/>PR差分 + タイトル/本文 + カスタム指示を統合"] --> B["言語モデル解析<br/>調整済みのモデル・プロンプト・システム動作を使用"]
     B --> C["応答生成<br/>指摘 + severity + 修正提案(自然言語/コード)"]
     C --> D["出力整形<br/>PRのインライン差分コメントとして投稿"]
 ```
@@ -183,14 +183,14 @@ GitHub自身の「Responsible use」ドキュメントは、Copilot Code Review�
 
 | 限界 | 内容 |
 |---|---|
-| 誤検知(false positive) | 実務者の報告では、Copilotのレビューコメントのうちおおよそ15〜25%が誤りか、的外れか、曖昧すぎて役に立たないケースだとされています<sup>17</sup>。 |
+| 誤検知(false positive) | 第三者の解説記事には、利用者が誤り・的外れ・曖昧と感じるコメントが一定数あるとの記述があります。ただし、調査母集団、観測期間、評価基準、サンプルサイズが開示されていないため、定量的な誤検知率やGitHub公式指標としては扱えません<sup>7, 17</sup>。 |
 | 見逃し(false negative) | 権限昇格や設計レベルのセキュリティ上の欠陥など、ファイルをまたぐ文脈が必要な問題を見逃す傾向が指摘されています<sup>18</sup>。 |
 | 対応言語 | 公式にサポートされる出力言語は英語のみです<sup>7</sup>。日本語での応答は`copilot-instructions.md`などで明示的に指示できますが、公式サポート対象外である点に注意してください。 |
 | 学習しない | 特定のレビューコメントを繰り返し却下しても、Copilotがその傾向を学習して次回から抑制することはありません。同種の指摘を出し続ける前提でチーム運用を設計する必要があります<sup>17</sup>。 |
-| 既定分析の限界 | 既定の静的レビューだけでは、実行時にしか顕在化しない問題を検出できません。GitHub Actions上のagentic capabilitiesを構成した場合は別途ツール実行が可能ですが、その結果も人間が検証する必要があります<sup>1</sup>。 |
+| 既定分析の限界 | テスト実行などのagentic capabilitiesを利用しても、実行時にしか顕在化しない問題をすべて検出できるわけではありません。ツールの結果も人間が検証する必要があります<sup>1, 7, 26</sup>。 |
 | マージをブロックしない | 「Comment」レビューのみのため、必須承認としてカウントされず、マージの可否は人間の判断に委ねられます<sup>2</sup>。 |
 
-ある分析記事によれば、Copilot Code Reviewが実際にフィードバックを返すのはPRレビューの約71%で、フィードバックがある場合の平均コメント数はおよそ5.1件、残り約29%では「特に指摘なし」として静かに終わるとされています。指摘があれば何でも出す方針ではなく、価値がないと判断すればコメントしない設計は、開発者がコメントを読み続けてくれるための工夫だと分析されています<sup>23</sup>。
+第三者の分析記事は、Copilot Code Reviewがコメントを返すレビューと、指摘なしで終わるレビューの両方があると説明しています。ただし、その記事はGitHubの報告に基づくとする集計の調査母集団、観測期間、評価基準、サンプルサイズ、一次資料へのリンクを示していません。このため、コメント有無の割合や平均コメント数はGitHub公式指標として掲載せず、「問題が見つからない場合はコメントを返さないことがある」という定性的な挙動だけを参考にします<sup>23</sup>。
 
 ### チーム運用上の推奨事項
 
@@ -324,5 +324,7 @@ GitHub Copilot Code Reviewは、GitHubのPRワークフローに深く統合さ�
 23. 同上(GitHubのレビュー実施率・平均コメント数に関する分析部分)
 24. [CodeRabbit vs GitHub Copilot Code Review (2026): Benchmarks, Pricing, Features](https://www.morphllm.com/comparisons/coderabbit-vs-copilot)(2026年3月14日)
 25. Simon Willison, [Posts tagged "github-copilot"](https://simonwillison.net/tags/github-copilot/) — GitHub Copilotのエージェント化やモデル変更を継続的に追跡している著名な開発者のブログ。Copilot CLIやプラン変更などの一次情報源へのリンク集としても有用です。
+26. [Configuring runners for GitHub Copilot code review](https://docs.github.com/en/copilot/how-tos/copilot-on-github/set-up-copilot/configure-runners)(GitHub Docs)
+27. [About GitHub Copilot code review — Model usage](https://docs.github.com/en/copilot/concepts/agents/code-review#model-usage)(GitHub Docs)
 
-> 注: 上記のうち14・17〜24は第三者(比較サイト・個人ブログ)による分析記事であり、数値や評価は執筆時点のものです。導入判断の際は必ず一次情報である公式ドキュメント(1〜13、16、31、58)と最新のGitHub Changelogを優先して確認してください。
+> 注: 上記のうち14・17〜24は第三者(比較サイト・個人ブログ)による分析記事であり、数値や評価は執筆時点のものです。導入判断の際は必ず一次情報である公式ドキュメント(1〜13、16、26、27、31、58)と最新のGitHub Changelogを優先して確認してください。
