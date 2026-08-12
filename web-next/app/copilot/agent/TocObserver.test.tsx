@@ -1,5 +1,5 @@
 import { cleanup, fireEvent, render } from "@testing-library/react";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { installIntersectionObserverStub } from "@/tests/tocTestUtils";
 import styles from "./page.module.css";
 import { TocObserver } from "./TocObserver";
@@ -58,10 +58,13 @@ describe("Copilot agent TocObserver", () => {
     expect(toggle).toHaveAttribute("aria-label", "目次を開く");
   });
 
-  it("observes headings/sections and activates the topmost intersecting element", () => {
+  it("observes headings/sections and activates the currently topmost intersecting element", () => {
     const { container } = renderToc();
     const sections = container.querySelectorAll("main section");
     const links = container.querySelectorAll(`.${styles.navLink}`);
+
+    vi.spyOn(sections[0], "getBoundingClientRect").mockReturnValue({ top: 5 } as DOMRect);
+    vi.spyOn(sections[1], "getBoundingClientRect").mockReturnValue({ top: 30 } as DOMRect);
 
     expect(io.observedTargets).toEqual(Array.from(sections));
 
@@ -78,8 +81,8 @@ describe("Copilot agent TocObserver", () => {
       },
     ]);
 
-    expect(links[0]).not.toHaveClass(styles.active);
-    expect(links[1]).toHaveClass(styles.active);
+    expect(links[0]).toHaveClass(styles.active);
+    expect(links[1]).not.toHaveClass(styles.active);
 
     io.emit([
       {
@@ -101,8 +104,14 @@ describe("Copilot agent TocObserver", () => {
   });
 
   it("disconnects the observer and tolerates missing drawer elements", () => {
-    const { unmount } = render(<TocObserver />);
-    expect(() => fireEvent.click(document.body)).not.toThrow();
+    const { container, unmount } = render(
+      <div>
+        <button type="button" id="sidebarToggle" />
+        <TocObserver />
+      </div>
+    );
+    const toggle = container.querySelector("#sidebarToggle") as HTMLButtonElement;
+    expect(() => fireEvent.click(toggle)).not.toThrow();
     unmount();
     expect(io.disconnectCount).toBe(1);
   });
