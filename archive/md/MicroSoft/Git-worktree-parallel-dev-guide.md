@@ -284,7 +284,7 @@ worktreeが共有するのはGitが追跡するファイルだけです。`node_
 | `node_modules`をsymlinkで共有 | 1つのworktreeの`node_modules`を他からシンボリックリンク | 一瞬でセットアップ完了 | 依存関係が分岐(`package.json`が変わる)すると壊れる。同一依存関係の場合のみ安全 |
 | pnpmの共有ストア(推奨) | コンテンツアドレス方式のグローバルストアを全worktreeで共有 | ダウンロード・ディスク使用量がほぼ増えない。依存関係が分岐しても安全 | pnpm固有の`node_modules`構造への移行が必要 |
 
-pnpm公式ドキュメントは、`enableGlobalVirtualStore: true`を設定したグローバル仮想ストアを使うことで、各worktreeの`node_modules`が実体を持たずシンボリックリンクのみで構成される運用を、マルチエージェント開発向けのパターンとして公開しています。この機能は実験的で、`NODE_PATH`に依存するためESMモジュールとは互換性がありません。この設定では、新しいworktreeを追加してもパッケージは既にグローバルストアに存在するため、インストールがほぼ瞬時に終わります。ただし、この共有ストアは「同じ信頼境界内にいる」エージェント・利用者同士でのみ使うべきで、互いに信頼できないエージェント間で書き込み可能な共有ストアを使うことは避けるべきだと明記されています。
+pnpm公式ドキュメントは、`enableGlobalVirtualStore: true`を設定したグローバル仮想ストアを使うことで、各worktreeの`node_modules`が実体を持たずシンボリックリンクのみで構成される運用を、マルチエージェント開発向けのパターンとして公開しています。この実験的機能はpnpm 10.12.1で追加され、pnpm 10.12.2では有効時のホイスト処理が修正されました。CommonJSではpnpmが設定する`NODE_PATH`を利用できますが、Node.jsのESMは`NODE_PATH`を参照しないため、ESMを使うプロジェクトでは`@pnpm/plugin-esm-node-path`などのESMローダーを追加する必要があります。本ガイドの検証基準は、問題報告で再現に使われたNode.js 22.16.0と、ホイスト修正を含むpnpm 10.12.2以降です。この設定では、新しいworktreeを追加してもパッケージは既にグローバルストアに存在するため、インストールがほぼ瞬時に終わります。ただし、この共有ストアは「同じ信頼境界内にいる」エージェント・利用者同士でのみ使うべきで、互いに信頼できないエージェント間で書き込み可能な共有ストアを使うことは避けるべきだと明記されています。
 
 ```yaml
 # pnpm-workspace.yaml
@@ -344,23 +344,52 @@ flowchart TB
 - Docker Composeを使う場合は、worktreeごとに`COMPOSE_PROJECT_NAME`を変えてコンテナ名・ネットワーク・ポートマッピングを分離する
 - データベースも同様に、worktreeごとにスキーマやDBブランチ(マネージドDBのbranching機能)を分ける
 
+以下の例では、全worktreeで共有されるGit common directory配下に`mkdir`で原子的なロックを作り、予約済みポートの確認、LISTEN状態の確認、`.env`への予約反映を同じ排他区間で行います。これにより、並行実行されたプロセスが同じ候補を同時に選ぶ競合を防ぎます。
+
 ```bash
 # ポート自動割り当ての例(ハッシュを起点に衝突を検出する)
-WORKTREE_NAME=$(basename "$PWD")
+ROOT_DIR=$(git rev-parse --show-toplevel) || exit 1
+GIT_COMMON_DIR=$(git rev-parse --path-format=absolute --git-common-dir) || exit 1
+LOCK_DIR="$GIT_COMMON_DIR/gwt-port.lock"
+ENV_FILE="$ROOT_DIR/.env"
+WORKTREE_NAME=$(basename "$ROOT_DIR")
 PORT_OFFSET=$(($(printf '%s' "$WORKTREE_NAME" | cksum | cut -d' ' -f1) % 50))
 PORT=""
 
+command -v lsof >/dev/null 2>&1 || { echo "lsofが必要です" >&2; exit 1; }
+while ! mkdir "$LOCK_DIR" 2>/dev/null; do sleep 0.1; done
+trap 'rmdir "$LOCK_DIR" 2>/dev/null' EXIT
+trap 'exit 130' HUP INT TERM
+
 for attempt in $(seq 0 49); do
   candidate=$((3000 + (PORT_OFFSET + attempt) % 50))
-  if ! grep -Rqs "^PORT=$candidate$" ../*/.env 2>/dev/null && \
-     ! lsof -nP -iTCP:"$candidate" -sTCP:LISTEN >/dev/null 2>&1; then
-    PORT=$candidate
-    break
+  grep -Rqs "^PORT=$candidate$" "$ROOT_DIR"/../*/.env 2>/dev/null && continue
+  lsof -nP -iTCP:"$candidate" -sTCP:LISTEN >/dev/null 2>&1
+  lsof_status=$?
+  [ "$lsof_status" -eq 0 ] && continue
+  if [ "$lsof_status" -ne 1 ]; then
+    echo "ポート$candidateの確認に失敗しました" >&2
+    rmdir "$LOCK_DIR"
+    trap - EXIT HUP INT TERM
+    exit 1
   fi
+  PORT=$candidate
+  break
 done
 
-[ -n "$PORT" ] || { echo "利用可能なポートが3000〜3049にありません" >&2; exit 1; }
-printf 'PORT=%s\n' "$PORT" >> .env
+if [ -z "$PORT" ]; then
+  echo "利用可能なポートが3000〜3049にありません" >&2
+  rmdir "$LOCK_DIR"
+  trap - EXIT HUP INT TERM
+  exit 1
+fi
+if grep -q '^PORT=' "$ENV_FILE" 2>/dev/null; then
+  sed -i.bak "s/^PORT=.*/PORT=$PORT/" "$ENV_FILE" && rm -f "$ENV_FILE.bak"
+else
+  printf 'PORT=%s\n' "$PORT" >> "$ENV_FILE"
+fi
+rmdir "$LOCK_DIR"
+trap - EXIT HUP INT TERM
 ```
 
 ---
@@ -373,9 +402,15 @@ worktree作成のたびに「作成 → 依存関係インストール → 非�
 # ~/.zshrc または ~/.bashrc に追加する例
 gwt() {
   local branch="$1"
-  local root_dir="$PWD"
-  local dir="../$(basename "$root_dir")-$(echo "$branch" | tr '/' '-')"
-  local port_offset port candidate attempt env_file reserved
+  local root_dir git_common_dir lock_dir parent_dir dir
+  local port_offset port candidate attempt env_file reserved lsof_status
+
+  root_dir=$(git rev-parse --show-toplevel) || return 1
+  git_common_dir=$(git rev-parse --path-format=absolute --git-common-dir) || return 1
+  parent_dir=$(dirname "$root_dir")
+  dir="$parent_dir/$(basename "$root_dir")-$(echo "$branch" | tr '/' '-')"
+  lock_dir="$git_common_dir/gwt-port.lock"
+  command -v lsof >/dev/null 2>&1 || { echo "lsofが必要です" >&2; return 1; }
 
   git worktree add -b "$branch" "$dir" origin/main
   cd "$dir" || return
@@ -393,6 +428,9 @@ gwt() {
   # worktreeごとに未予約・未使用のPORTを割り当てる
   port_offset=$(($(printf '%s' "$(basename "$PWD")" | cksum | cut -d' ' -f1) % 50))
   port=""
+  while ! mkdir "$lock_dir" 2>/dev/null; do sleep 0.1; done
+  trap 'rmdir "$lock_dir" 2>/dev/null' EXIT
+  trap 'rmdir "$lock_dir" 2>/dev/null; trap - HUP INT TERM; return 130' HUP INT TERM
   for attempt in $(seq 0 49); do
     candidate=$((3000 + (port_offset + attempt) % 50))
     reserved=false
@@ -401,17 +439,32 @@ gwt() {
       [ "$env_file" = "$PWD/.env" ] && continue
       grep -qx "PORT=$candidate" "$env_file" && reserved=true && break
     done
-    if [ "$reserved" = false ] && ! lsof -nP -iTCP:"$candidate" -sTCP:LISTEN >/dev/null 2>&1; then
-      port=$candidate
-      break
+    [ "$reserved" = true ] && continue
+    lsof -nP -iTCP:"$candidate" -sTCP:LISTEN >/dev/null 2>&1
+    lsof_status=$?
+    [ "$lsof_status" -eq 0 ] && continue
+    if [ "$lsof_status" -ne 1 ]; then
+      echo "ポート$candidateの確認に失敗しました" >&2
+      rmdir "$lock_dir"
+      trap - EXIT HUP INT TERM
+      return 1
     fi
+    port=$candidate
+    break
   done
-  [ -n "$port" ] || { echo "利用可能なポートが3000〜3049にありません" >&2; return 1; }
+  if [ -z "$port" ]; then
+    echo "利用可能なポートが3000〜3049にありません" >&2
+    rmdir "$lock_dir"
+    trap - EXIT HUP INT TERM
+    return 1
+  fi
   if grep -q '^PORT=' .env 2>/dev/null; then
     sed -i.bak "s/^PORT=.*/PORT=$port/" .env && rm -f .env.bak
   else
     printf 'PORT=%s\n' "$port" >> .env
   fi
+  rmdir "$lock_dir"
+  trap - EXIT HUP INT TERM
 
   echo "worktree '$dir' の準備が完了しました"
 }
@@ -552,6 +605,9 @@ flowchart TB
 ### パッケージマネージャ公式
 
 - pnpm + Git Worktrees for Multi-Agent Development: <https://pnpm.io/git-worktrees>
+- pnpm 10.12.1 release notes(`enableGlobalVirtualStore`追加): <https://github.com/pnpm/pnpm/releases/tag/v10.12.1>
+- pnpm 10.12.2 release notes(ホイスト修正): <https://github.com/pnpm/pnpm/releases/tag/v10.12.2>
+- @pnpm/plugin-esm-node-path: <https://github.com/pnpm/plugin-esm-node-path>
 
 ### 著名な開発者による発信
 
