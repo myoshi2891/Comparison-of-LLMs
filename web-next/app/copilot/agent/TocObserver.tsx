@@ -33,28 +33,26 @@ export function TocObserver() {
     // 2. IntersectionObserver for TOC highlight
     const headings = Array.from(document.querySelectorAll("h2[id], h3[id], section[id]"));
     const navLinks = Array.from(document.querySelectorAll(`.${styles.navLink}`));
-    const intersectingHeadings = new Map<Element, IntersectionObserverEntry>();
+    const intersectingHeadings = new Set<Element>();
 
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
           if (entry.isIntersecting) {
-            intersectingHeadings.set(entry.target, entry);
+            intersectingHeadings.add(entry.target);
           } else {
             intersectingHeadings.delete(entry.target);
           }
         }
-        const topmostHeading = Array.from(intersectingHeadings.values()).reduce<
-          IntersectionObserverEntry | undefined
-        >(
-          (topmost, entry) =>
-            !topmost || entry.boundingClientRect.top < topmost.boundingClientRect.top
-              ? entry
+        const topmostHeading = Array.from(intersectingHeadings).reduce<Element | undefined>(
+          (topmost, heading) =>
+            !topmost || heading.getBoundingClientRect().top < topmost.getBoundingClientRect().top
+              ? heading
               : topmost,
           undefined
         );
         if (topmostHeading) {
-          const id = topmostHeading.target.getAttribute("id");
+          const id = topmostHeading.getAttribute("id");
           for (const link of navLinks) {
             const href = link.getAttribute("href") ?? "";
             link.classList.toggle(styles.active, href === `#${id}`);
