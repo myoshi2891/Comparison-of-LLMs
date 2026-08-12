@@ -163,7 +163,7 @@ describe("/copilot/skill - static source safety", () => {
   it("uses space-delimited strings for allowed-tools in publishable examples", () => {
     const source = readFileSync(join(__dirname, "page.tsx"), "utf8");
 
-    expect(source).not.toMatch(/allowed-tools:\s*(?:\[|\n\s+-|[^"\r\n]*,|"[^"]*,)/);
+    expect(source).not.toMatch(/allowed-tools:\s*(?:\[|\n\s+-|[^\n]*,)/);
 
     const matches = Array.from(source.matchAll(/allowed-tools:\s*"([^"]+)"/g));
     expect(matches.length).toBeGreaterThan(0);
