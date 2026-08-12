@@ -1,2124 +1,1989 @@
 import type { Metadata } from "next";
+import MermaidDiagram from "@/components/docs/MermaidDiagram";
+import { ChecklistCard } from "./ChecklistCard";
 import styles from "./page.module.css";
+import { TocObserver } from "./TocObserver";
 
 export const metadata: Metadata = {
-  title: "GitHub Copilot — SKILL.md 完全ベストプラクティスガイド",
+  title: "GitHub Copilot Agent Skills 実践ガイド ― SKILL.md 完全仕様",
   description:
-    "GitHub Copilot Coding Agent / VS Code Agent Mode / Copilot CLI 対応の SKILL.md ガイド。フロントマター完全仕様・Progressive Disclosure 3段階ローディング・ステップバイステップ作成・実践テンプレート集・トラブルシューティングを 2026年6月最新版の公式ドキュメント根拠付きで徹底解説。Copilot code review は AGENTS.md 対応（2026-06-18）、Cloud agent は GA。",
+    "GitHub Copilot Agent Skills (SKILL.md) の完全ガイド。フロントマター仕様、3段階ローディング、ディレクトリ構造、gh skill管理、実践テンプレート、セキュリティ、トラブルシューティングを網羅。",
 };
 
-type Source = { num: string; href: string; title: string; desc: string };
-
-// SKILL.md 専用の新規追加ソース（[A]〜[L] の 12 件）。
-const SOURCES_SKILL: Source[] = [
-  {
-    num: "[A]",
-    href: "https://github.blog/changelog/2025-12-18-github-copilot-now-supports-agent-skills/",
-    title: "GitHub Copilot now supports Agent Skills — GitHub Changelog (Dec 2025)【公式】",
-    desc: "Agent Skills 正式サポート発表。.github/skills/ / ~/.copilot/skills/ パス仕様。.claude/skills/ 自動ピックアップ。3ツール（Coding Agent・CLI・VS Code Insiders）での動作確認",
-  },
-  {
-    num: "[B]",
-    href: "https://code.visualstudio.com/docs/copilot/customization/agent-skills/",
-    title: "Use Agent Skills in VS Code — VS Code 公式ドキュメント（2026年5月最新）【公式】",
-    desc: "3段階 Progressive Disclosure の完全解説。全フロントマターフィールド（user-invokable・disable-model-invocation・argument-hint・allowed-tools）。ディレクトリ構造。chat.agentSkillsLocations 設定",
-  },
-  {
-    num: "[C]",
-    href: "https://smartscope.blog/en/blog/agent-skills-guide/",
-    title: "Agent Skills: Why SKILL.md Won't Load + Fix Guide — SmartScope (Feb 2026)",
-    desc: "スキルが読み込まれない原因と fix。description のキーワード不足。name / ディレクトリ名不一致。CLI の metadata 最終フィールドバグの詳細と回避策",
-  },
-  {
-    num: "[D]",
-    href: "https://docs.github.com/en/copilot/how-tos/use-copilot-agents/coding-agent/create-skills/",
-    title: "Creating agent skills for GitHub Copilot — GitHub Docs【公式】",
-    desc: "SKILL.md 作成の公式ガイド。フロントマター必須・任意フィールドの完全仕様。scripts/・references/ 等のリソースファイル参照方法。プロジェクト/個人スキルの配置場所",
-  },
-  {
-    num: "[E]",
-    href: "https://github.com/github/copilot-cli/issues/951",
-    title:
-      "Skills with metadata as last frontmatter field are not discovered — GitHub Issues (Jan 2026)",
-    desc: "CLI の metadata 最終フィールドバグ報告。回避策: metadata の後に license など追加。VS Code では発生しない。agentskills.io 仕様との矛盾を指摘",
-  },
-  {
-    num: "[F]",
-    href: "https://agentskills.io/specification/",
-    title: "Agent Skills 公式仕様 — agentskills.io（Anthropic 考案・オープン標準）",
-    desc: "オープン標準仕様書。SKILL.md 500行/5,000トークン制限。3サブディレクトリ（scripts/references/assets/）。name フィールド正規表現。skills-ref 公式バリデーター CLI",
-  },
-  {
-    num: "[G]",
-    href: "https://atalupadhyay.wordpress.com/2026/03/16/agent-skills-in-claude-github-copilot/",
-    title: "Agent Skills in Claude & GitHub Copilot — Atal Upadhyay (May 2026)",
-    desc: "本文構成ベストプラクティス（Goal/When to use/Instructions/Constraints）。スキルをルーティングドキュメントとして使う設計パターン。Level 2・3 のリアルタイム観察例",
-  },
-  {
-    num: "[H]",
-    href: "https://medium.com/ai-in-quality-assurance/github-copilot-agent-skills-teaching-ai-your-repository-patterns-01168b6d7a25",
-    title: "GitHub Copilot Agent Skills: Teaching AI Your Repository Patterns — Medium (Dec 2025)",
-    desc: "インデックス化 5〜10分問題。IDE 再起動による解決。実際のプロジェクトでの適用例（Selenium→Playwright パターン移行事例）",
-  },
-  {
-    num: "[I]",
-    href: "https://github.com/github/awesome-copilot/blob/main/docs/README.skills.md",
-    title: "awesome-copilot — Skills README — GitHub（コミュニティリポジトリ）",
-    desc: "コミュニティスキル集。create-skill（スキル生成メタスキル）・Playwright・Jira 等の実践スキル。Copilot CLI からプラグインとして直接インストール可能",
-  },
-  {
-    num: "[J]",
-    href: "https://docs.github.com/en/copilot/concepts/agents/about-agent-skills/",
-    title: "About agent skills — GitHub Docs【公式】",
-    desc: "Agent Skills の概念・対応プラン（Pro/Pro+/Business/Enterprise）。プロジェクト/個人スキルの違い。将来予定（Organization・Enterprise レベルスキル）",
-  },
-  {
-    num: "[K]",
-    href: "https://smartscope.blog/en/generative-ai/github-copilot/github-copilot-skills-guide/",
-    title: "GitHub Copilot Agent Skills Guide [Latest May 2026] — SmartScope",
-    desc: "2026年5月時点の対応状況まとめ。完全フロントマター仕様（argument-hint 含む）。カスタムインストラクションとの使い分け比較。Coding Agent の自動スキル参照動作実証",
-  },
-  {
-    num: "[L]",
-    href: "https://github.com/skillmatic-ai/awesome-agent-skills",
-    title: "skillmatic-ai/awesome-agent-skills — GitHub（Agent Skills リソース集）",
-    desc: "SkillsBench（86 タスクベンチマーク）。セキュリティ分析（プロンプトインジェクションリスク）。対応ツール一覧（Claude・Copilot・Cursor・Amp・OpenCode・Goose 等）",
-  },
-];
-
-// 元ファイルの既存ソース抜粋（[1][4][9][15] の 4 件）。
-const SOURCES_EXISTING: Source[] = [
-  {
-    num: "[1]",
-    href: "https://developer.microsoft.com/blog/spec-driven-development-spec-kit/",
-    title:
-      "Diving Into Spec-Driven Development With GitHub Spec Kit — Microsoft for Developers (Sep 2025)",
-    desc: "Spec Kit 公式解説。constitution.md・.specify/・.github/prompts/ の SDD 構造。specify→plan→tasks→implement フロー",
-  },
-  {
-    num: "[4]",
-    href: "https://docs.github.com/en/copilot/customizing-copilot/adding-custom-instructions-for-github-copilot/",
-    title: "Adding repository custom instructions for GitHub Copilot — GitHub Docs (公式)",
-    desc: "copilot-instructions.md・.instructions.md の公式仕様。applyTo の glob 構文・excludeAgent・短文自己完結の原則。SKILL.md との使い分けの判断基準",
-  },
-  {
-    num: "[9]",
-    href: "https://www.nathannellans.com/post/all-about-github-copilot-custom-instructions",
-    title: "All About GitHub Copilot Custom Instructions — Nathan Nellans (Nov 2025)",
-    desc: "SKILL.md の 4 スコープ詳細。AGENTS.md/CLAUDE.md/GEMINI.md 対応全詳細。.claude/skills/ パスの確認",
-  },
-  {
-    num: "[15]",
-    href: "https://github.blog/changelog/2025-12-18-github-copilot-now-supports-agent-skills/",
-    title: "GitHub Copilot now supports Agent Skills — GitHub Changelog (Dec 2025)",
-    desc: "Agent Skills 正式サポート。全配置パス。.claude/skills/ 自動ピックアップ。全ツール対応状況",
-  },
-];
-
-// 外部リンクを安全属性付きで開く小物コンポーネント (DRY)。
-function Ext({
-  href,
-  className,
-  children,
-}: {
-  href: string;
-  className?: string;
-  children: React.ReactNode;
-}) {
+/**
+ * Renders an external link that opens in a new tab.
+ *
+ * @param href - The destination URL
+ * @param children - The link content
+ * @returns An anchor element for the external URL
+ */
+function Ext({ href, children }: { href: string; children: React.ReactNode }) {
   return (
-    <a href={href} target="_blank" rel="noopener noreferrer" className={className}>
+    <a href={href} target="_blank" rel="noopener noreferrer">
       {children}
     </a>
   );
 }
 
+const DIAGRAM_1 = `flowchart TB
+    A[開発者のリクエスト] --> B{Copilotが判断}
+    B --> C[Custom Instructions<br/>常時読み込み・低詳細度]
+    B --> D[Agent Skills<br/>必要時のみ読み込み・高詳細度]
+    B --> E[MCPサーバー<br/>外部ツール・データ接続]
+    B --> F[カスタムエージェント<br/>独立したペルソナ・権限セット]
+    C --> G[コーディング規約・常に守るべきルール]
+    D --> H[特定タスクの再現可能な手順書]
+    E --> I[Issue追跡・DB・社内API等の実データ]
+    F --> J[レビュー専任・実装専任などの人格分離]`;
+
+const DIAGRAM_2 = `flowchart TB
+    T1["2025年10月16日<br/>Anthropicが「Agent Skills」を発表<br/>(Claude.ai / Claude Code向け)"] --> T2
+    T2["2025年12月18日<br/>agentskills.io としてオープン仕様公開<br/>同日 GitHub Copilotが対応を発表"] --> T3
+    T3["2026年1月上旬<br/>VS Code 安定版でSkillsサポート開始<br/>(発表時点ではInsidersのみ)"] --> T4
+    T4["2026年2月上旬<br/>Snyk「ToxicSkills」調査発表<br/>公開スキルの3割超に脆弱性"] --> T5
+    T5["2026年上半期<br/>OpenAI Codex・Cursor・Gemini CLI等<br/>40前後のプラットフォームへ対応拡大"] --> T6
+    T6["2026年7月29日<br/>Copilot code reviewでの<br/>Agent Skills / MCP対応がGA"]`;
+
+const DIAGRAM_3 = `sequenceDiagram
+    participant U as 開発者
+    participant C as Copilot(エージェント)
+    participant S as SKILL.mdとリソース群
+
+    Note over C: 起動時: 全スキルの name/description を<br/>システムプロンプトに事前ロード(第1段階)
+    U->>C: 「このPDFのフォームを埋めて」
+    C->>C: descriptionと突き合わせて関連スキルを判定
+    C->>S: pdf/SKILL.md を読み込み(第2段階)
+    S-->>C: 本文の手順・使用可能なスクリプト一覧を返す
+    C->>S: forms.md を追加で読み込み(第3段階)
+    S-->>C: フォーム入力の詳細手順を返す
+    C->>S: スクリプトをコードとして実行(内容は読み込まない)
+    S-->>C: 実行結果のみを返す
+    C-->>U: フォーム入力済みPDFを提示`;
+
+const DIAGRAM_4 = `flowchart TB
+    S1["Step 1<br/>繰り返しているタスクを特定する"] --> S2
+    S2["Step 2<br/>skillsディレクトリと<br/>スキル用サブディレクトリを作成"] --> S3
+    S3["Step 3<br/>SKILL.mdのフロントマターを書く<br/>(name / description)"] --> S4
+    S4["Step 4<br/>本文にステップバイステップの<br/>手順・例・エッジケースを書く"] --> S5
+    S5["Step 5<br/>必要ならscripts/references/assetsを追加し<br/>allowed-toolsを検討"] --> S6
+    S6["Step 6<br/>直接・間接・否定の3パターンで<br/>発火テストを行う"] --> S7
+    S7["Step 7<br/>チームに配布<br/>(コミット or gh skill publish)"] --> S8
+    S8["Step 8<br/>実運用しながら<br/>descriptionと本文を反復改善"]`;
+
+const DIAGRAM_5 = `sequenceDiagram
+    participant D as 開発者
+    participant CLI as GitHub CLI(gh skill)
+    participant Repo as スキル配布用リポジトリ
+
+    D->>CLI: gh skill search TOPIC
+    CLI->>Repo: TOPICに関連するスキルを検索
+    Repo-->>CLI: 候補一覧を返す
+    D->>CLI: gh skill preview OWNER/REPO SKILL
+    CLI->>Repo: SKILL.mdとファイルツリーを取得
+    Repo-->>CLI: 内容をターミナルに表示(未インストール)
+    D->>CLI: gh skill install OWNER/REPO SKILL
+    CLI->>Repo: 該当スキルを取得
+    CLI-->>D: 正しいディレクトリへ配置し、ソース追跡メタデータを付与`;
+
+const DIAGRAM_6 = `flowchart TB
+    Q1{ほぼ全タスクに<br/>常に関係する情報か?} -->|Yes| A[Custom Instructions]
+    Q1 -->|No| Q2{外部システムの<br/>実データ・ツール呼び出しが必要か?}
+    Q2 -->|Yes| B[MCPサーバー]
+    Q2 -->|No| Q3{独立した権限・ペルソナで<br/>タスクを丸ごと任せたいか?}
+    Q3 -->|Yes| C[カスタムエージェント/Subagent]
+    Q3 -->|No| D[Agent Skills<br/>再現可能な手順書として切り出す]`;
+
+const DIAGRAM_7 = `flowchart TB
+    P["スキルが期待通りに動かない"] --> D1{そもそも一覧に表示されるか?<br/>/skills で確認}
+    D1 -->|表示されない| F1["name とディレクトリ名の一致、<br/>配置パスを再確認"]
+    D1 -->|表示される| D2{直接的な指示でも発火しないか?}
+    D2 -->|発火しない| F2["descriptionが一人称・抽象的でないか確認し、<br/>Trigger Triadで書き直す"]
+    D2 -->|発火する| D3{間接的な指示では発火しないか?}
+    D3 -->|発火しない| F3["トリガー語彙(類義語・言い回し)を<br/>descriptionへ追加"]
+    D3 -->|発火する| D4{無関係なタスクでも誤発火するか?}
+    D4 -->|誤発火する| F4["Do not use when... を<br/>descriptionへ追加"]
+    D4 -->|しない| D5{発火はするが指示に<br/>正しく従わないか?}
+    D5 -->|従わない| F5["本文を500行/5000トークン以内に整理し、<br/>重要ルールを先頭へ、詳細はreferencesへ分割"]`;
+
 /**
- * Renders the complete "GitHub Copilot — SKILL.md 完全ベストプラクティスガイド" page (June 2026 edition).
- *
- * The page covers the SKILL.md concept, Progressive Disclosure, frontmatter specification,
- * placement paths, step-by-step creation, reusable templates, custom instructions comparison,
- * advanced resource and MCP patterns, troubleshooting, best practices, community resources,
- * and reference sources.
- *
- * @returns The React element for the full SKILL.md best-practices guide page.
+ * Renders a practical guide to GitHub Copilot Agent Skills and `SKILL.md`.
  */
 export default function CopilotSkillPage() {
   return (
-    <div className={styles.root}>
-      <header className={styles.header}>
-        <div className={styles.hdrMesh} />
-        <div className={styles.eyebrow}>Microsoft × GitHub × VS Code — 2026年6月版</div>
-        <h1>
-          <span className={styles.msText}>GitHub Copilot</span>
-          <br />
-          <span className={styles.ghText}>SKILL.md</span> 完全ベストプラクティスガイド
-          <br />
-          <span className={styles.hdrSubStrong}>
-            Agent Skills — Progressive Disclosure 徹底解説
-          </span>
-        </h1>
-        <p className={styles.hdrLead}>
-          フロントマター完全仕様 / 3段階ローディング / ステップバイステップ作成 / 実践テンプレート集
-          / トラブルシューティング——
-          <br />
-          2026年6月時点の公式ドキュメントと最新情報を元に、初学者から上級者まで対応した決定版ガイド
-        </p>
-        <div className={styles.badgeStrip}>
-          <span className={`${styles.badge} ${styles.bm}`}>GitHub Copilot</span>
-          <span className={`${styles.badge} ${styles.bg}`}>agentskills.io オープン標準</span>
-          <span className={`${styles.badge} ${styles.bc}`}>Progressive Disclosure</span>
-          <span className={`${styles.badge} ${styles.bv}`}>4ツール共通フォーマット</span>
-          <span className={`${styles.badge} ${styles.bt}`}>June 2026 最新</span>
-        </div>
-      </header>
+    <div className={styles.layout}>
+      <TocObserver />
+      <div className={styles.topBar} />
+      <button
+        type="button"
+        className={styles.sidebarToggle}
+        id="sidebarToggle"
+        aria-label="目次を開閉"
+        aria-controls="sidebar"
+        aria-expanded="false"
+      >
+        ☰ 目次
+      </button>
+      <nav className={styles.sidebar} id="sidebar">
+        <p className={styles.sidebarTitle}>GitHub Copilot Agent Skills</p>
+        <p className={styles.sidebarSub}>SKILL.md 実践ガイド</p>
+        <a href="#このガイドについて" className={styles.navLink}>
+          このガイドについて
+        </a>
+        <a href="#1-agent-skills-とは何か" className={styles.navLink}>
+          1. Agent Skills とは何か
+        </a>
+        <a href="#2-標準化の経緯とタイムライン" className={styles.navLink}>
+          2. 標準化の経緯とタイムライン
+        </a>
+        <a href="#3-3段階ローディングprogressive-disclosure完全解説" className={styles.navLink}>
+          3. 3段階ローディング(Progressive Disclosure)完全解説
+        </a>
+        <a href="#4-フロントマター完全仕様" className={styles.navLink}>
+          4. フロントマター完全仕様
+        </a>
+        <a href="#5-ディレクトリ構造とスコープ" className={styles.navLink}>
+          5. ディレクトリ構造とスコープ
+        </a>
+        <a href="#6-ステップバイステップ作成ガイド" className={styles.navLink}>
+          6. ステップバイステップ作成ガイド
+        </a>
+        <a href="#7-github-cligh-skillによるスキル管理" className={styles.navLink}>
+          7. GitHub CLI(gh skill)によるスキル管理
+        </a>
+        <a href="#8-実践テンプレート集" className={styles.navLink}>
+          8. 実践テンプレート集
+        </a>
+        <a href="#9-copilotの各サーフェスでの挙動差分" className={styles.navLink}>
+          9. Copilotの各サーフェスでの挙動差分
+        </a>
+        <a href="#10-skills-vs-custom-instructions-vs-mcp-vs-subagents" className={styles.navLink}>
+          10. Skills vs Custom Instructions vs MCP vs Subagents
+        </a>
+        <a href="#11-セキュリティベストプラクティス" className={styles.navLink}>
+          11. セキュリティベストプラクティス
+        </a>
+        <a href="#12-トラブルシューティング完全ガイド" className={styles.navLink}>
+          12. トラブルシューティング完全ガイド
+        </a>
+        <a href="#13-ベストプラクティスチェックリスト" className={styles.navLink}>
+          13. ベストプラクティスチェックリスト
+        </a>
+        <a href="#14-まとめ" className={styles.navLink}>
+          14. まとめ
+        </a>
+        <a href="#参考文献出典" className={styles.navLink}>
+          参考文献・出典
+        </a>
+      </nav>
 
       <main className={styles.main}>
-        {/* TOC */}
-        <nav className={styles.toc} aria-label="目次">
-          <div className={styles.tocTtl}>目次 — SKILL.md 完全ガイド 2026年6月版</div>
-          <ol>
-            <li>
-              <a href="#skill-concept">SKILL.mdとは — 概念・位置づけ・他ファイルとの違い</a>
-            </li>
-            <li>
-              <a href="#skill-3level">3段階ローディング（Progressive Disclosure）の仕組み</a>
-            </li>
-            <li>
-              <a href="#skill-spec">フロントマター完全仕様（全フィールド解説）</a>
-            </li>
-            <li>
-              <a href="#skill-paths">配置パス・ディレクトリ構造・名前規則</a>
-            </li>
-            <li>
-              <a href="#skill-stepbystep">ステップバイステップ — SKILL.md作成ガイド</a>
-            </li>
-            <li>
-              <a href="#skill-templates">実践テンプレート集（6ジャンル）</a>
-            </li>
-            <li>
-              <a href="#skill-vs-instructions">カスタムインストラクションとの使い分け</a>
-            </li>
-            <li>
-              <a href="#skill-advanced">高度な活用パターン（リソースファイル・MCP連携）</a>
-            </li>
-            <li>
-              <a href="#skill-troubleshoot">トラブルシューティング — よくある問題と解決策</a>
-            </li>
-            <li>
-              <a href="#skill-bestpractices">SKILL.md専用ベストプラクティス 10則</a>
-            </li>
-            <li>
-              <a href="#skill-community">コミュニティリソース・公式スキルカタログ</a>
-            </li>
-            <li>
-              <a href="#sources">参考ソース一覧</a>
-            </li>
-          </ol>
-        </nav>
+        <div className={styles.hero}>
+          <h1>
+            GitHub Copilot Agent Skills 実践ガイド ― SKILL.md
+            完全仕様・3段階ローディング・テンプレート集・トラブルシューティング
+          </h1>
+          <blockquote>
+            <p>
+              対象読者: GitHub Copilot(VS Code / Visual Studio / JetBrains / Copilot CLI / Copilot
+              cloud agent / Copilot code review)を業務で使い込んでいる中級〜上級エンジニア。Custom
+              Instructions や MCP
+              はひと通り使ったことがあり、次のステップとして「再利用可能な手順知識」を SKILL.md
+              として整備したい人を想定している。
+            </p>
+          </blockquote>
+        </div>
+        <hr />
 
-        {/* SECTION 1: CONCEPT */}
-        <section id="skill-concept">
-          <div className={styles.slabel}>Section 01 — SKILL.md 完全ガイド</div>
-          <h2 className={styles.stitle}>
-            <span className={styles.num}>01.</span>SKILL.mdとは — 概念・位置づけ・他ファイルとの違い
-          </h2>
+        <h2 id="このガイドについて">このガイドについて</h2>
+        <p>
+          GitHub Copilot は 2025年12月18日、Agent Skills(SKILL.md)への対応を発表した。これはもともと
+          Anthropic が Claude 向けに 2025年10月16日に発表した仕組みで、同年12月18日に{" "}
+          <code className={styles.inlineCode}>agentskills.io</code>{" "}
+          でベンダー中立のオープン仕様として公開されたものである。現在は GitHub Copilot・OpenAI
+          Codex・Cursor・Gemini CLI・Snowflake Cortex Code など 40
+          前後のプラットフォームが同一フォーマットをサポートしており、「一度書けば複数のコーディングエージェントで動く」共通言語になりつつある。
+        </p>
+        <p>本ガイドは次の5点を柱に、ステップバイステップで解説する。</p>
+        <ol>
+          <li>
+            <strong>フロントマター完全仕様</strong> ―{" "}
+            <code className={styles.inlineCode}>name</code> /{" "}
+            <code className={styles.inlineCode}>description</code> /{" "}
+            <code className={styles.inlineCode}>license</code> /{" "}
+            <code className={styles.inlineCode}>compatibility</code> /{" "}
+            <code className={styles.inlineCode}>metadata</code> /{" "}
+            <code className={styles.inlineCode}>allowed-tools</code> の全フィールド
+          </li>
+          <li>
+            <strong>3段階ローディング(Progressive Disclosure)</strong> ― Discovery / Activation /
+            Execution という3段階の設計思想とコンテキストコスト
+          </li>
+          <li>
+            <strong>ステップバイステップ作成</strong> ―
+            何もない状態から実運用可能なスキルを作るまでの手順
+          </li>
+          <li>
+            <strong>実践テンプレート集</strong> ― そのままコピーして使える5種類のテンプレート
+          </li>
+          <li>
+            <strong>トラブルシューティング</strong> ― 実際に GitHub / VS Code の Issue
+            で報告された不具合を基にした症状別の対処表
+          </li>
+        </ol>
+        <p>
+          ASCII アートによる図解は使用せず、フローチャートは Mermaid、構造の一覧は Markdown
+          の表・箇条書きで統一する。
+        </p>
+        <hr />
 
+        <h2 id="1-agent-skills-とは何か">1. Agent Skills とは何か</h2>
+        <h3 id="11-定義">1.1 定義</h3>
+        <p>
+          Agent
+          Skills(エージェントスキル)は、指示・スクリプト・参考資料をまとめたフォルダであり、Copilot
+          のようなコーディングエージェントがタスクに関連すると判断したときにだけ動的に読み込む仕組みである。GitHub
+          の公式ドキュメントは次のように説明している。
+        </p>
+        <blockquote>
           <p>
-            <strong>Agent Skills</strong>
-            は、AIエージェントに
-            <strong>
-              専門的な手順・スクリプト・リソースをオンデマンドで提供する再利用可能な知識パッケージ
-            </strong>
-            です。 <code>SKILL.md</code>
-            はそのコアファイルで、YAMLフロントマターに「いつ・なぜ使うか」を定義し、本文に「どうやるか」の手順を記述します。
-            GitHub Copilot Coding Agent・VS Code Agent Mode・Copilot CLI・Claude Code・OpenAI Codex
-            の<strong>4ツール以上で共通動作するオープン標準</strong>（
-            <Ext href="https://agentskills.io/specification" className={styles.inlineLink}>
-              agentskills.io
-            </Ext>
-            ）です（[A]）。
+            Agent skills are lightweight folders of instructions, scripts, and resources that agents
+            can dynamically discover and load to perform specific tasks effectively.
           </p>
+        </blockquote>
+        <p>
+          スキルは単一のテキストファイル(<code className={styles.inlineCode}>SKILL.md</code>
+          )から始まるが、必要に応じて次のような構造へ拡張できる。
+        </p>
+        <ul>
+          <li>
+            <code className={styles.inlineCode}>SKILL.md</code> (必須):
+            YAMLフロントマターと、エージェントへの指示本文
+          </li>
+          <li>
+            <code className={styles.inlineCode}>scripts/</code> (任意):
+            エージェントが実行できるシェルスクリプトやPythonスクリプト
+          </li>
+          <li>
+            <code className={styles.inlineCode}>references/</code> (任意):
+            タスクの背景情報・データベース設計・API仕様などの補助ドキュメント
+          </li>
+          <li>
+            <code className={styles.inlineCode}>assets/</code> (任意):
+            テンプレート・静的画像・サンプルデータなど
+          </li>
+        </ul>
 
-          <div className={styles.skBanner}>
-            <div className={styles.skIcon}>🎓</div>
-            <div>
-              <div className={styles.skTtl}>
-                SKILL.mdを一言で表すと「再利用可能な手順書パッケージ」
-              </div>
-              <div className={styles.skDesc}>
-                通常のカスタム指示が「常に適用されるルール」であるのに対し、SKILL.mdは
-                <strong>「特定のタスクが発生したときだけ読み込まれる専門手順書」</strong>
-                です。
-                コンテキストウィンドウを消費しながら常時注入されるのではなく、エージェントが意図を検知したときに初めてロードされます。
-                これにより、数十〜数百のスキルをインストールしてもコンテキスト効率を保てます（[1],
-                [A]）。
-              </div>
-            </div>
-          </div>
+        <h3 id="12-なぜ生まれたのか">1.2 なぜ生まれたのか</h3>
+        <p>
+          Agent Skills
+          が登場する以前、開発者がエージェントの挙動をカスタマイズする主な手段は「Custom
+          Instructions」(<code className={styles.inlineCode}>.github/copilot-instructions.md</code>{" "}
+          や <code className={styles.inlineCode}>AGENTS.md</code>)であった。しかし Custom
+          Instructions は<strong>すべての会話で常時読み込まれる</strong>
+          ため、次の2点の問題が深刻化した。
+        </p>
+        <p>
+          第一に、コンテキストウィンドウの圧迫である。コードレビューの観点、特定ライブラリのハマりどころ、デプロイ手順などを1つの指示ファイルに詰め込むと、あっという間に数万トークンを消費し、肝心のコードを読み込む枠が削られてしまう。
+        </p>
+        <p>
+          第二に、指示の干渉(Instruction
+          Confusion)である。あまりに多くのルールが常時並んでいると、エージェントが「どのルールを優先すべきか」を誤り、指示に従わなくなったり、無関係なタスクで過剰なチェックを行ったりする現象が起きる。
+        </p>
+        <p>
+          Agent Skills はこの問題を解決するために設計された。
+          <strong>
+            普段は「名前」と「1行の説明」だけを頭の片隅に置いておき、必要なタスクが来たときだけ中身を読み込む
+          </strong>
+          。この「段階的開示(Progressive Disclosure)」こそが、Agent Skills の本質である。
+        </p>
 
-          <h3>SKILL.md vs カスタム指示ファイル — 根本的な違い</h3>
-          <div className={styles.cmpWrap}>
-            <table>
-              <tbody>
-                <tr>
-                  <th>観点</th>
-                  <th>copilot-instructions.md / .instructions.md</th>
-                  <th>SKILL.md</th>
-                </tr>
-                <tr>
-                  <td>ロードのタイミング</td>
-                  <td>全リクエストに常時注入</td>
-                  <td>
-                    <strong>関連するときのみ</strong>オンデマンド読み込み
-                  </td>
-                </tr>
-                <tr>
-                  <td>適した内容</td>
-                  <td>コーディング規約・命名規則・言語設定など常時必要なルール</td>
-                  <td>
-                    <strong>
-                      DBマイグレーション・テスト生成・Terraformレビューなど特定タスク手順
-                    </strong>
-                  </td>
-                </tr>
-                <tr>
-                  <td>コンテキスト消費</td>
-                  <td>常に消費（文字数が多いと非効率）</td>
-                  <td>タスク時のみ消費（多数インストール可能）</td>
-                </tr>
-                <tr>
-                  <td>付属リソース</td>
-                  <td>単体テキストのみ</td>
-                  <td>
-                    <strong>スクリプト・テンプレート・参照ドキュメントを同梱可能</strong>
-                  </td>
-                </tr>
-                <tr>
-                  <td>ツール間移植性</td>
-                  <td>Copilot固有</td>
-                  <td>
-                    <strong>Copilot・Claude Code・Codex・Cursor等で共通利用可能</strong>
-                  </td>
-                </tr>
-                <tr>
-                  <td>手動呼び出し</td>
-                  <td>不可</td>
-                  <td>
-                    <strong>/スキル名 でスラッシュコマンドとして呼び出せる</strong>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+        <h3 id="13-エコシステムにおける位置づけ">1.3 エコシステムにおける位置づけ</h3>
+        <p>Copilot をカスタマイズする手段は大きく4種類あり、それぞれ役割が異なる。</p>
+        <div className={styles.mermaidWrap}>
+          <MermaidDiagram chart={DIAGRAM_1} />
+        </div>
+        <p>
+          GitHub 公式ドキュメントも「Custom Instructions
+          はほぼ全タスクに関係する簡潔な情報に、Skills
+          は関係するときだけ参照すべき詳細な情報に使う」ことを推奨している。
+        </p>
+        <hr />
 
-          <h3>どのツールで使えるか（2026年5月時点）</h3>
-          <div className={styles.skcat}>
-            <div className={styles.skcatItem}>
-              <div className={styles.skcatIcon}>🤖</div>
-              <div className={styles.skcatName}>Copilot Coding Agent</div>
-              <div className={styles.skcatDesc}>
-                GitHub.com上でIssueから自律実行。<code>.github/skills/</code>を自動参照。
-                <span className={`${styles.pill} ${styles.pillG}`}>GA</span>
-              </div>
-            </div>
-            <div className={styles.skcatItem}>
-              <div className={styles.skcatIcon}>💻</div>
-              <div className={styles.skcatName}>VS Code Agent Mode</div>
-              <div className={styles.skcatDesc}>
-                VS Code Insiders（安定版は近日GA予定）。<code>/スキル名</code>で手動呼出可。
-                <span className={`${styles.pill} ${styles.pillC}`}>Insiders</span>
-              </div>
-            </div>
-            <div className={styles.skcatItem}>
-              <div className={styles.skcatIcon}>⌨️</div>
-              <div className={styles.skcatName}>Copilot CLI</div>
-              <div className={styles.skcatDesc}>
-                ターミナルネイティブ。2025年12月18日〜対応。<code>~/.copilot/skills/</code>も有効。
-                <span className={`${styles.pill} ${styles.pillG}`}>GA</span>
-              </div>
-            </div>
-            <div className={styles.skcatItem}>
-              <div className={styles.skcatIcon}>🐱</div>
-              <div className={styles.skcatName}>Claude Code</div>
-              <div className={styles.skcatDesc}>
-                <code>.claude/skills/</code>を使用。CopilotがこのパスをAuto-pickup。
-                <span className={`${styles.pill} ${styles.pillG}`}>対応済</span>
-              </div>
-            </div>
-            <div className={styles.skcatItem}>
-              <div className={styles.skcatIcon}>🧠</div>
-              <div className={styles.skcatName}>OpenAI Codex</div>
-              <div className={styles.skcatDesc}>
-                agentskills.io仕様に準拠。同じSKILL.mdが動作。
-                <span className={`${styles.pill} ${styles.pillG}`}>対応済</span>
-              </div>
-            </div>
-            <div className={styles.skcatItem}>
-              <div className={styles.skcatIcon}>🔮</div>
-              <div className={styles.skcatName}>Cursor / Amp / 他</div>
-              <div className={styles.skcatDesc}>
-                Cursor・Amp・OpenCode・Goose等も対応拡大中。
-                <span className={`${styles.pill} ${styles.pillV}`}>拡大中</span>
-              </div>
-            </div>
-          </div>
-          <div className={`${styles.ib} ${styles.im}`}>
-            <span className={styles.ii}>ℹ️</span>
-            <div>
-              <strong>プランの注意事項：</strong>
-              Copilot Coding AgentはPro・Pro+・Business・EnterpriseプランでGA。VS CodeのAgent
-              ModeはInsiders版で利用可（安定版は近日提供予定）。Copilot
-              CLIは全プランで利用可（ただしOrg管理者のポリシー有効化が必要な場合あり）（[J]）。
-            </div>
-          </div>
-        </section>
+        <h2 id="2-標準化の経緯とタイムライン">2. 標準化の経緯とタイムライン</h2>
+        <p>
+          Agent Skills
+          が単一ベンダーの機能からオープン標準になるまでの流れを押さえておくと、なぜ「GitHub
+          CopilotのSKILL.md」という言い方が成立するのかが理解しやすくなる。
+        </p>
+        <div className={styles.mermaidWrap}>
+          <MermaidDiagram chart={DIAGRAM_2} />
+        </div>
+        <p>
+          特に重要なのは、2025年12月18日の <code className={styles.inlineCode}>agentskills.io</code>{" "}
+          の公開である。Anthropic と GitHub が共同でオープン仕様を策定したことで、同一の{" "}
+          <code className={styles.inlineCode}>SKILL.md</code> フォーマットが Anthropic Claude
+          Code、GitHub Copilot、OpenAI Codex、Cursor、Gemini CLI、Snowflake Cortex Code
+          など40前後のプラットフォームでそのまま動作するようになった。
+        </p>
+        <p>
+          また 2026年7月29日には、GitHub が「Copilot code review における Agent Skills と MCP
+          の一般提供(GA)」を発表した。これにより、PRの自動レビュー時に独自のチェックリストスキルを適用したり、社内セキュリティ基準スキルを発火させたりすることが公式にサポートされた。
+        </p>
+        <hr />
 
-        {/* SECTION 2: 3-LEVEL LOADING */}
-        <section id="skill-3level">
-          <div className={styles.slabel}>Section 02</div>
-          <h2 className={styles.stitle}>
-            <span className={styles.num}>02.</span>3段階ローディング（Progressive
-            Disclosure）の仕組み
-          </h2>
+        <h2 id="3-3段階ローディングprogressive-disclosure完全解説">
+          3. 3段階ローディング(Progressive Disclosure)完全解説
+        </h2>
+        <p>
+          Agent Skills
+          の最大の技術的特徴は、コンテキスト消費を最小限に抑える「3段階ローディング(Progressive
+          Disclosure)」にある。
+        </p>
+        <p>
+          Anthropic のエンジニアリングブログ「Equipping agents with Agent Skills」では、これを
+          Discovery(発見)・Activation(起動)・Execution(実行) の 3 段階として定義している。
+        </p>
 
-          <p>
-            SKILL.mdの最大の特徴は
-            <strong>Progressive Disclosure（段階的開示）</strong>という3レベルの読み込み機構です。
-            エージェントはスキルのすべてを最初から読み込むのではなく、
-            <strong>必要に応じて段階的にコンテキストに追加</strong>
-            していきます。
-            これにより数十・数百のスキルを登録しても、コンテキストウィンドウを圧迫しません（[A],
-            [B]）。
-          </p>
-
-          <div className={styles.pdLevels}>
-            <div className={styles.pdLevel}>
-              <div className={`${styles.pdNum} ${styles.pdTokenGh}`}>Level 1 — Discovery</div>
-              <div className={styles.pdIcon}>🔍</div>
-              <div className={styles.pdTitle}>発見フェーズ</div>
-              <div className={styles.pdBody}>
-                エージェントはYAMLフロントマターの<code>name</code>と<code>description</code>
-                だけを読む。 ユーザーの質問とdescriptionを照合し、このスキルが関連するかを判断する。
-              </div>
-              <div className={`${styles.pdToken} ${styles.pdTokenGh}`}>約100トークン消費</div>
-            </div>
-            <div className={styles.pdLevel}>
-              <div className={`${styles.pdNum} ${styles.pdTokenMs}`}>Level 2 — Instructions</div>
-              <div className={styles.pdIcon}>📋</div>
-              <div className={styles.pdTitle}>指示ロードフェーズ</div>
-              <div className={styles.pdBody}>
-                スキルが関連すると判断されたとき、SKILL.md本文全体をコンテキストに注入。
-                手順・ガイドライン・制約が全部読み込まれ、エージェントが従う。
-              </div>
-              <div className={`${styles.pdToken} ${styles.pdTokenMs}`}>
-                本文全体（〜5,000トークン推奨）
-              </div>
-            </div>
-            <div className={styles.pdLevel}>
-              <div className={`${styles.pdNum} ${styles.pdTokenCop}`}>Level 3 — Resources</div>
-              <div className={styles.pdIcon}>📦</div>
-              <div className={styles.pdTitle}>リソースアクセスフェーズ</div>
-              <div className={styles.pdBody}>
-                指示の中でスクリプト・テンプレート・参照ドキュメントを参照した場合に限り、
-                そのファイルをスキルディレクトリから読み込む。
-              </div>
-              <div className={`${styles.pdToken} ${styles.pdTokenCop}`}>参照時のみ追加取得</div>
-            </div>
-          </div>
-
-          <div className={styles.cb}>
-            <div className={styles.cbHdr}>
-              <div className={styles.dots}>
-                <div className={`${styles.dot} ${styles.dotR}`} />
-                <div className={`${styles.dot} ${styles.dotY}`} />
-                <div className={`${styles.dot} ${styles.dotG}`} />
-              </div>
-              <span>Progressive Disclosure — 動作フロー例（webapp-testingスキル）</span>
-            </div>
-            <pre>
-              <span className={styles.cCm}>
-                ── ユーザーが「ログインページのテストを書いて」と入力 ──
-              </span>
-              {"\n\n"}
-              <span className={styles.cGh}>Level 1: Discovery</span>
-              {
-                "\n  エージェントが全スキルのfrontmatterをスキャン\n  webapp-testing の description: "
-              }
-              <span className={styles.cSt}>
-                &quot;Guide for testing web apps using Playwright.{"\n    "}Use when asked to create
-                or run browser-based tests.&quot;
-              </span>
-              {"\n  → "}
-              <span className={styles.cLi}>&quot;テスト&quot; にマッチ → スキルを選択</span>
-              {"\n\n"}
-              <span className={styles.cHd}>Level 2: Instructions Loading</span>
-              {
-                "\n  SKILL.md本文をコンテキストに注入:\n  - ## When to use this skill\n  - ## Creating tests（手順1〜5）\n  - ## Project conventions（命名規則・AAAパターン）\n  → "
-              }
-              <span className={styles.cLi}>エージェントが手順に従いPlaywrightコードを生成</span>
-              {"\n\n"}
-              <span className={styles.cCo}>Level 3: Resource Access</span>
-              {"\n  指示の中で "}
-              <span className={styles.cSt}>./test-template.js</span>
-              {" を参照\n  → "}
-              <span className={styles.cLi}>
-                そのファイルのみをオンデマンドで取得してテンプレートを適用
-              </span>
-              {"\n\n"}
-              <span className={styles.cCm}>
-                ── /webapp-testing とコマンドで直接呼び出すことも可能（Level 2から開始）──
-              </span>
-            </pre>
-          </div>
-
-          <div className={`${styles.ib} ${styles.ic}`}>
-            <span className={styles.ii}>⚠️</span>
-            <div>
-              <strong>descriptionが曖昧だとLevel 1で止まる：</strong>
-              エージェントはdescriptionに含まれるキーワードでスキルを選択します。
-              「テスト」「E2E」「Playwright」など
-              <strong>ユーザーが実際に入力するであろうキーワードを明示的に含める</strong>
-              ことが不可欠です。
-              「すごく便利なツール」のような抽象的な説明では自動発動しません（[C]）。
-            </div>
-          </div>
-        </section>
-
-        {/* SECTION 3: FRONTMATTER SPEC */}
-        <section id="skill-spec">
-          <div className={styles.slabel}>Section 03</div>
-          <h2 className={styles.stitle}>
-            <span className={styles.num}>03.</span>フロントマター完全仕様（全フィールド解説）
-          </h2>
-
-          <p>
-            SKILL.mdは<strong>YAMLフロントマター + Markdown本文</strong>の2部構成です。
-            フロントマターはスキルのメタデータを定義し、エージェントの「スキル選択」を制御する最重要部分です（[B],
-            [D]）。
-          </p>
-
-          <div className={styles.fc}>
-            <div className={styles.fcHdr}>
-              <div className={`${styles.fci} ${styles.fciG}`}>📋</div>
-              <div>
-                <div className={styles.fcName}>
-                  SKILL.md フロントマター — 全フィールド完全リファレンス
-                </div>
-                <div className={styles.fcPath}>
-                  agentskills.io/specification 準拠（2026年5月更新）
-                </div>
-                <div className={styles.fcTags}>
-                  <span className={`${styles.fct} ${styles.pillR}`}>name: 必須</span>
-                  <span className={`${styles.fct} ${styles.pillR}`}>description: 必須</span>
-                  <span className={`${styles.fct} ${styles.fctG}`}>その他: 任意</span>
-                </div>
-              </div>
-            </div>
-            <div className={styles.fcBody}>
-              <div className={styles.cb}>
-                <div className={styles.cbHdr}>
-                  <div className={styles.dots}>
-                    <div className={`${styles.dot} ${styles.dotR}`} />
-                    <div className={`${styles.dot} ${styles.dotY}`} />
-                    <div className={`${styles.dot} ${styles.dotG}`} />
-                  </div>
-                  <span>完全フロントマター仕様（全フィールド）</span>
-                </div>
-                <pre>
-                  <span className={styles.cKy}>---</span>
-                  {"\n"}
-                  <span className={styles.cGh}>name</span>
-                  {": "}
-                  <span className={styles.cSt}>webapp-testing</span>
-                  {"\n"}
-                  <span className={styles.cCm}>
-                    {
-                      "  # 必須 | 小文字英数字・ハイフンのみ | 最大64文字\n  # ディレクトリ名と一致させること（不一致だと読み込まれない！[E]）\n  # 有効例: pdf-processing / code-review / terraform-plan\n  # 無効例: PDF-Processing / -pdf / pdf--processing"
-                    }
-                  </span>
-                  {"\n\n"}
-                  <span className={styles.cGh}>description</span>
-                  {": "}
-                  <span className={styles.cSt}>&gt;-</span>
-                  {"\n  "}
-                  <span className={styles.cSt}>
-                    {
-                      "Assists with web application test strategies and automated test\n  creation using Playwright. Use for: testing, test, E2E, browser\n  test, integration test, Playwright, test automation."
-                    }
-                  </span>
-                  {"\n  "}
-                  <span className={styles.cCm}>
-                    {
-                      '# 必須 | 最大1024文字\n  # Level 1の自動発動トリガー。"Use for X, Y, Z" を必ず含める\n  # ※ triggers / steps などの独自キーはフロントマターでは使用できません（トリガーは description、手順は本文に書きます）'
-                    }
-                  </span>
-                  {"\n\n"}
-                  <span className={styles.cGh}>allowed-tools</span>
-                  {": "}
-                  <span className={styles.cSt}>[shell]</span>
-                  {"\n  "}
-                  <span className={styles.cCm}>
-                    {
-                      "# 任意 | スキルに許可するツール（例: shell）を指定。省略時は実行前に確認ダイアログが表示されます"
-                    }
-                  </span>
-                  {"\n\n"}
-                  <span className={styles.cGh}>argument-hint</span>
-                  {": "}
-                  <span className={styles.cSt}>
-                    &quot;テスト対象のファイルパスまたはモジュール名&quot;
-                  </span>
-                  {"\n  "}
-                  <span className={styles.cCm}>
-                    {
-                      '# 任意 | スラッシュコマンド呼出時にChat入力欄に表示されるヒント\n  # 例: "[test file] [options]"'
-                    }
-                  </span>
-                  {"\n\n"}
-                  <span className={styles.cGh}>user-invokable</span>
-                  {": "}
-                  <span className={styles.cKy}>true</span>
-                  {"\n  "}
-                  <span className={styles.cCm}>
-                    {
-                      "# 任意 | default: true\n  # false: /メニューに表示されないが自動発動は有効\n  # 内部使用スキルや補助スキルに設定"
-                    }
-                  </span>
-                  {"\n\n"}
-                  <span className={styles.cGh}>disable-model-invocation</span>
-                  {": "}
-                  <span className={styles.cKy}>false</span>
-                  {"\n  "}
-                  <span className={styles.cCm}>
-                    {
-                      "# 任意 | default: false\n  # true: エージェントによる自動発動を無効化（手動 /コマンドのみ）\n  # 誤トリガーを防ぎたいデリケートな操作スキルに使用"
-                    }
-                  </span>
-                  {"\n\n"}
-                  <span className={styles.cGh}>license</span>
-                  {": "}
-                  <span className={styles.cSt}>MIT</span>
-                  {"\n  "}
-                  <span className={styles.cCm}>
-                    {"# 任意 | SPDX識別子推奨 (MIT / Apache-2.0 / Proprietary)"}
-                  </span>
-                  {"\n\n"}
-                  <span className={styles.cGh}>metadata</span>
-                  {":\n  "}
-                  <span className={styles.cGh}>author</span>
-                  {": "}
-                  <span className={styles.cSt}>platform-team</span>
-                  {"\n  "}
-                  <span className={styles.cGh}>version</span>
-                  {": "}
-                  <span className={styles.cSt}>&quot;1.2&quot;</span>
-                  {"\n  "}
-                  <span className={styles.cGh}>tags</span>
-                  {": "}
-                  <span className={styles.cSt}>[testing, playwright, e2e]</span>
-                  {"\n  "}
-                  <span className={styles.cCm}>
-                    {
-                      "# 任意 | author・version・tags等のカスタムキーバリューペア\n  # ⚠️ CLIのバグ: metadataが最後フィールドだとCLIで発見されないことがある\n  # 回避策: metadataの後に license: MIT など1行追加する（[E]）"
-                    }
-                  </span>
-                  {"\n\n"}
-                  <span className={styles.cGh}>compatibility</span>
-                  {": "}
-                  <span className={styles.cSt}>Requires Node.js 20+, Playwright 1.40+</span>
-                  {"\n  "}
-                  <span className={styles.cCm}>
-                    {"# 任意 | 最大500文字 | 動作に必要な環境・前提条件を記述"}
-                  </span>
-                  {"\n"}
-                  <span className={styles.cKy}>---</span>
-                </pre>
-              </div>
-
-              <h3>フィールド制約まとめ（クイックリファレンス）</h3>
-              <table>
-                <tbody>
-                  <tr>
-                    <th>フィールド</th>
-                    <th>必須</th>
-                    <th>制約</th>
-                    <th>重要ポイント</th>
-                  </tr>
-                  <tr>
-                    <td>name</td>
-                    <td>
-                      <span className={`${styles.pill} ${styles.pillR}`}>必須</span>
-                    </td>
-                    <td>小文字・ハイフン・最大64文字</td>
-                    <td>ディレクトリ名と完全一致必須（不一致は読み込み不可）</td>
-                  </tr>
-                  <tr>
-                    <td>description</td>
-                    <td>
-                      <span className={`${styles.pill} ${styles.pillR}`}>必須</span>
-                    </td>
-                    <td>最大1024文字</td>
-                    <td>
-                      自動発動トリガー。Use for: キーワード列挙が必須。※ triggers
-                      などの独自キーは無視されます
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>allowed-tools</td>
-                    <td>
-                      <span className={`${styles.pill} ${styles.pillG}`}>任意</span>
-                    </td>
-                    <td>リスト (例: [shell])</td>
-                    <td>実行を許可するツール。省略時は毎回権限確認プロンプトを表示</td>
-                  </tr>
-                  <tr>
-                    <td>argument-hint</td>
-                    <td>
-                      <span className={`${styles.pill} ${styles.pillG}`}>任意</span>
-                    </td>
-                    <td>文字列</td>
-                    <td>スラッシュコマンドのプレースホルダーテキスト</td>
-                  </tr>
-                  <tr>
-                    <td>user-invokable</td>
-                    <td>
-                      <span className={`${styles.pill} ${styles.pillG}`}>任意</span>
-                    </td>
-                    <td>boolean（default: true）</td>
-                    <td>falseで/メニューから非表示（自動発動は維持）</td>
-                  </tr>
-                  <tr>
-                    <td>disable-model-invocation</td>
-                    <td>
-                      <span className={`${styles.pill} ${styles.pillG}`}>任意</span>
-                    </td>
-                    <td>boolean（default: false）</td>
-                    <td>trueで自動発動を完全無効化（手動のみ）</td>
-                  </tr>
-                  <tr>
-                    <td>license</td>
-                    <td>
-                      <span className={`${styles.pill} ${styles.pillG}`}>任意</span>
-                    </td>
-                    <td>SPDX識別子</td>
-                    <td>スキル共有・公開時に設定推奨</td>
-                  </tr>
-                  <tr>
-                    <td>metadata</td>
-                    <td>
-                      <span className={`${styles.pill} ${styles.pillG}`}>任意</span>
-                    </td>
-                    <td>キーバリュー</td>
-                    <td>CLIバグあり: 最後尾に置かない</td>
-                  </tr>
-                  <tr>
-                    <td>compatibility</td>
-                    <td>
-                      <span className={`${styles.pill} ${styles.pillG}`}>任意</span>
-                    </td>
-                    <td>最大500文字</td>
-                    <td>実行環境・前提条件の明記</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </section>
-
-        {/* SECTION 4: PATHS */}
-        <section id="skill-paths">
-          <div className={styles.slabel}>Section 04</div>
-          <h2 className={styles.stitle}>
-            <span className={styles.num}>04.</span>配置パス・ディレクトリ構造・名前規則
-          </h2>
-
-          <h3>有効な配置パス（優先度順）</h3>
-          <div className={styles.g3}>
-            <div className={styles.mc}>
-              <div className={`${styles.mcTag} ${styles.pdTokenGh}`}>① .github/skills/（推奨）</div>
-              <p>
-                プロジェクト固有スキル。git 管理でチーム共有。Copilot・VS Code
-                が最優先で参照（[B]）。
-              </p>
-            </div>
-            <div className={styles.mc}>
-              <div className={`${styles.mcTag} ${styles.pdTokenMs}`}>
-                ② .claude/skills/（自動ピックアップ）
-              </div>
-              <p>
-                Claude Code 用パス。Copilot はこのパスも Auto-pickup。既存 Claude Code
-                スキルをそのまま流用可（[A], [C]）。
-              </p>
-            </div>
-            <div className={styles.mc}>
-              <div className={`${styles.mcTag} ${styles.pdTokenCop}`}>
-                ③ ~/.copilot/skills/（個人スキル）
-              </div>
-              <p>
-                ホームディレクトリに配置。全プロジェクトで再利用可。Coding Agent・CLI のみ対応（VS
-                Code 非対応）（[J]）。
-              </p>
-            </div>
-            <div className={styles.mc}>
-              <div className={styles.mcTag} style={{ color: "var(--violet)" }}>
-                ④ ~/.claude/skills/（個人・Claude 用）
-              </div>
-              <p>Claude Code 用個人スキル。Copilot も CLI・Coding Agent で自動認識（[A]）。</p>
-            </div>
-            <div className={styles.mc}>
-              <div className={styles.mcTag} style={{ color: "var(--teal)" }}>
-                ⑤ chat.agentSkillsLocations（カスタム）
-              </div>
-              <p>
-                VS Code 設定でカスタムパスを追加可能。モノレポや中央管理リポジトリに便利（[B]）。
-              </p>
-            </div>
-            <div className={styles.mc}>
-              <div className={styles.mcTag} style={{ color: "var(--lime)" }}>
-                ⑥ 組織・Enterprise（近日提供）
-              </div>
-              <p>Organization・Enterprise レベルのスキル管理は近日対応予定（[J]）。</p>
-            </div>
-          </div>
-
-          <h3>公式推奨ディレクトリ構造（agentskills.io 仕様）</h3>
-          <div className={styles.dirTree}>
-            <span className={styles.tf}>📁</span>{" "}
-            <span style={{ color: "var(--text-hi)" }}>.github/skills/</span>
-            <br />
-            <span className={styles.t1}>
-              <span className={styles.tf}>📁</span>{" "}
-              <span className={styles.tg}>webapp-testing/</span>{" "}
-              <span className={styles.tdi}>
-                ← ディレクトリ名 = frontmatter の name（完全一致必須）
-              </span>
-            </span>
-            <br />
-            <span className={styles.t2}>
-              <span className={styles.tm}>📄</span> <span className={styles.tm}>SKILL.md</span>{" "}
-              <span className={styles.tdi}>← 必須: フロントマター + 手順</span>
-            </span>
-            <br />
-            <span className={styles.t2}>
-              <span className={styles.tf}>📁</span> <span className={styles.tf}>scripts/</span>{" "}
-              <span className={styles.tdi}>← 任意: 実行可能スクリプト (.py/.sh/.js)</span>
-            </span>
-            <br />
-            <span className={styles.t3}>
-              <span style={{ color: "var(--lime)" }}>📄 run-tests.sh</span>
-            </span>
-            <br />
-            <span className={styles.t2}>
-              <span className={styles.tf}>📁</span> <span className={styles.tf}>references/</span>{" "}
-              <span className={styles.tdi}>← 任意: 詳細ドキュメント・参照資料</span>
-            </span>
-            <br />
-            <span className={styles.t3}>
-              <span className={styles.tv}>📄 playwright-cheatsheet.md</span>
-            </span>
-            <br />
-            <span className={styles.t2}>
-              <span className={styles.tf}>📁</span> <span className={styles.tf}>assets/</span>{" "}
-              <span className={styles.tdi}>← 任意: テンプレート・静的ファイル</span>
-            </span>
-            <br />
-            <span className={styles.t3}>
-              <span className={styles.tt}>📄 test-template.ts</span>
-            </span>
-            <br />
-            <span className={styles.t1}>
-              <span className={styles.tf}>📁</span> <span className={styles.tg}>db-migration/</span>{" "}
-              <span className={styles.tdi}>← 別スキル例</span>
-            </span>
-            <br />
-            <span className={styles.t2}>
-              <span className={styles.tm}>📄 SKILL.md</span>
-            </span>
-            <br />
-            <span className={styles.t2}>
-              <span className={styles.tf}>📁 scripts/</span>
-            </span>
-            <br />
-            <span className={styles.t3}>
-              <span style={{ color: "var(--lime)" }}>📄 run_migration.py</span>
-            </span>
-          </div>
-
-          <div className={styles.g2}>
-            <div className={`${styles.ib} ${styles.ig}`}>
-              <span className={styles.ii}>📏</span>
-              <div>
-                <strong>サイズ制限（agentskills.io 仕様）：</strong>
-                <br />• SKILL.md 本文: <strong>500 行以内・約 5,000 トークン以内</strong>
-                <br />• 超過すると発見・ロードが不安定になる
-                <br />• 大規模な手順は <code>references/</code> に分割してリンク参照
-                <br />• スキルディレクトリ内のサブディレクトリは scripts・references・assets の 3
-                種のみ（[F]）
-              </div>
-            </div>
-            <div className={`${styles.ib} ${styles.ic}`}>
-              <span className={styles.ii}>⚠️</span>
-              <div>
-                <strong>name とディレクトリ名の一致は絶対条件：</strong>
-                <br />
-                <code>.github/skills/my-skill/</code> なら、
-                <br />
-                SKILL.md の name フィールドは必ず <code>my-skill</code>
-                <br />
-                不一致だとスキルが<strong>一切読み込まれません</strong>（[B]）
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* SECTION 5: STEP BY STEP */}
-        <section id="skill-stepbystep">
-          <div className={styles.slabel}>Section 05</div>
-          <h2 className={styles.stitle}>
-            <span className={styles.num}>05.</span>ステップバイステップ — SKILL.md作成ガイド
-          </h2>
-
-          <p>
-            初めて SKILL.md
-            を作成する方向けに、ゼロから実際に動くスキルを作るまでの全手順を解説します。
-          </p>
-
-          <div className={styles.steps}>
-            <div className={styles.stepItem}>
-              <div className={`${styles.stepNum} ${styles.snG}`}>01</div>
-              <div className={styles.stepContent}>
-                <div className={styles.stepTitle}>
-                  スキルのスコープを決める — 「1 スキル = 1 タスク」の原則
-                </div>
-                <div className={styles.stepBody}>
-                  まずそのスキルが
-                  <strong>何をするか・何をしないか</strong>を 1 文で言えるか確認します。 「DB
-                  スキーマ変更 + API エンドポイント実装 + テスト生成」を 1
-                  スキルにまとめると曖昧になり自動発動しません。
-                  <strong>「DB マイグレーション実行専用」「テスト生成専用」に分割</strong>
-                  するのが正解です。
-                  <br />
-                  <br />✅ 良い例: 「Postgres のスキーママイグレーションを安全に実行する」
-                  <br />❌ 悪い例: 「バックエンド開発を全般的にサポートする」
-                </div>
-              </div>
-            </div>
-
-            <div className={styles.stepItem}>
-              <div className={`${styles.stepNum} ${styles.snM}`}>02</div>
-              <div className={styles.stepContent}>
-                <div className={styles.stepTitle}>ディレクトリを作成する</div>
-                <div className={styles.stepBody}>
-                  <code>.github/skills/</code>
-                  ディレクトリ（なければ作成）の下に、スキル名のサブディレクトリを作成します。
-                  名前は<strong>小文字・ハイフン区切り・英数字のみ</strong>。
-                  <div className={styles.cb} style={{ marginTop: "0.7rem" }}>
-                    <div className={styles.cbHdr}>
-                      <span>TERMINAL</span>
-                    </div>
-                    <pre>
-                      <span className={styles.cCm}># プロジェクトスキル用ディレクトリ作成</span>
-                      {
-                        "\nmkdir -p .github/skills/db-migration/scripts\nmkdir -p .github/skills/db-migration/references\ntouch .github/skills/db-migration/SKILL.md\n\n"
-                      }
-                      <span className={styles.cCm}># 個人スキル（全プロジェクト共有）</span>
-                      {
-                        "\nmkdir -p ~/.copilot/skills/my-personal-skill\ntouch ~/.copilot/skills/my-personal-skill/SKILL.md"
-                      }
-                    </pre>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className={styles.stepItem}>
-              <div className={`${styles.stepNum} ${styles.snC}`}>03</div>
-              <div className={styles.stepContent}>
-                <div className={styles.stepTitle}>
-                  フロントマターを書く — description のキーワードが命
-                </div>
-                <div className={styles.stepBody}>
-                  フロントマターはスキルの「名刺」です。特に<code>description</code>は Level 1
-                  自動発動の唯一の判断材料です。
-                  <strong>
-                    「Use when...」「Use for: キーワード 1, キーワード
-                    2」のパターンを必ず含めてください
-                  </strong>
-                  。
-                  <div className={styles.cb} style={{ marginTop: "0.7rem" }}>
-                    <div className={styles.cbHdr}>
-                      <span>SKILL.md — フロントマター記述例</span>
-                    </div>
-                    <pre>
-                      <span className={styles.cKy}>---</span>
-                      {"\n"}
-                      <span className={styles.cGh}>name</span>
-                      {": "}
-                      <span className={styles.cSt}>db-migration</span>
-                      {"\n"}
-                      <span className={styles.cCm}>
-                        {"  # ↑ ディレクトリ名と完全一致させること"}
-                      </span>
-                      {"\n"}
-                      <span className={styles.cGh}>description</span>
-                      {": "}
-                      <span className={styles.cSt}>&gt;-</span>
-                      {"\n  "}
-                      <span className={styles.cSt}>
-                        {
-                          "PostgreSQLのスキーママイグレーションを安全に実行する。\n  Use when: DBスキーマ変更, テーブル追加, カラム追加, インデックス追加,\n  migration, migrate, schema change, ALTER TABLE, ADD COLUMN.\n  Do NOT use for: シードデータの投入, アプリケーションレベルのデータ変換."
-                        }
-                      </span>
-                      {"\n"}
-                      <span className={styles.cGh}>license</span>
-                      {": "}
-                      <span className={styles.cSt}>Proprietary</span>
-                      {"\n"}
-                      <span className={styles.cGh}>metadata</span>
-                      {":\n  "}
-                      <span className={styles.cGh}>author</span>
-                      {": "}
-                      <span className={styles.cSt}>backend-team</span>
-                      {"\n  "}
-                      <span className={styles.cGh}>version</span>
-                      {": "}
-                      <span className={styles.cSt}>&quot;1.0&quot;</span>
-                      {"\n"}
-                      <span className={styles.cKy}>---</span>
-                      {"\n"}
-                      <span className={styles.cCm}>
-                        {"# ↑ metadataの後にlicenseを置くことでCLIバグを回避（[E]）"}
-                      </span>
-                    </pre>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className={styles.stepItem}>
-              <div className={`${styles.stepNum} ${styles.snV}`}>04</div>
-              <div className={styles.stepContent}>
-                <div className={styles.stepTitle}>
-                  本文を書く — 「何を・なぜ・どうやって」を構造化する
-                </div>
-                <div className={styles.stepBody}>
-                  本文は Markdown 形式で記述します。効果的な構成パターンは以下の通りです（[G]）：
-                  <div className={styles.cb} style={{ marginTop: "0.7rem" }}>
-                    <div className={styles.cbHdr}>
-                      <span>SKILL.md — 本文の推奨構成</span>
-                    </div>
-                    <pre>
-                      <span className={styles.cHd}># スキル名</span>
-                      {"\n"}
-                      <span className={styles.cCm}>## 目的（Goal）</span>
-                      {"\nこのスキルが解決する問題を 1〜2 文で説明。\n\n"}
-                      <span className={styles.cCm}>## このスキルを使う状況（When to use）</span>
-                      {
-                        "\n- DBスキーマに変更が必要な場合\n- 新しいテーブル・カラム・インデックスを追加する場合\n\n"
-                      }
-                      <span className={styles.cCm}>## 手順（Instructions）</span>
-                      {"\n"}
-                      <span className={styles.cCm}>
-                        {"# 番号付きステップ形式。コマンドは具体的に記述"}
-                      </span>
-                      {
-                        "\n1. `migrations/` に `YYYYMMDD_HHMMSS_説明.up.sql` を作成\n2. ロールバック用 `.down.sql` を同時作成\n3. 整合性チェック: `python scripts/run_migration.py --check`\n4. 人間レビュー後に適用: `--apply`\n\n"
-                      }
-                      <span className={styles.cCm}>## 制約（Constraints）</span>
-                      {
-                        "\n- 既存マイグレーションファイルを絶対に編集しない\n- `DROP TABLE` は人間確認なしに禁止\n\n"
-                      }
-                      <span className={styles.cCm}>## 参照リソース</span>
-                      {"\n"}
-                      <span className={styles.cCm}>
-                        {"# スキルディレクトリ内のファイルを相対パスで参照"}
-                      </span>
-                      {
-                        "\n詳細な命名規則: [./references/naming-conventions.md](./references/naming-conventions.md)\nマイグレーションテンプレート: [./assets/migration-template.sql](./assets/migration-template.sql)"
-                      }
-                    </pre>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className={styles.stepItem}>
-              <div className={`${styles.stepNum} ${styles.snT}`}>05</div>
-              <div className={styles.stepContent}>
-                <div className={styles.stepTitle}>付属リソースファイルを配置する（必要な場合）</div>
-                <div className={styles.stepBody}>
-                  SKILL.md
-                  からリンクするスクリプト・テンプレート・参照ドキュメントをスキルディレクトリに配置します。
-                  参照時のみロードされるため、コンテキスト効率に影響しません。
-                  <div className={styles.cb} style={{ marginTop: "0.7rem" }}>
-                    <div className={styles.cbHdr}>
-                      <span>スクリプト配置例</span>
-                    </div>
-                    <pre>
-                      <span className={styles.cCm}>
-                        {"# scripts/run_migration.py — SKILL.mdから参照"}
-                      </span>
-                      {"\n"}
-                      <span className={styles.cKy}>import</span>
-                      {" subprocess, sys\n\n"}
-                      <span className={styles.cKy}>def</span>{" "}
-                      <span className={styles.cVi}>run</span>
-                      {"(mode: str):\n    cmd = ["}
-                      <span className={styles.cSt}>&quot;python&quot;</span>
-                      {", "}
-                      <span className={styles.cSt}>&quot;-m&quot;</span>
-                      {", "}
-                      <span className={styles.cSt}>&quot;alembic&quot;</span>
-                      {"]\n    "}
-                      <span className={styles.cKy}>if</span>
-                      {" mode == "}
-                      <span className={styles.cSt}>&quot;--check&quot;</span>
-                      {":\n        cmd.append("}
-                      <span className={styles.cSt}>&quot;check&quot;</span>
-                      {")\n    "}
-                      <span className={styles.cKy}>elif</span>
-                      {" mode == "}
-                      <span className={styles.cSt}>&quot;--apply&quot;</span>
-                      {":\n        cmd.append("}
-                      <span className={styles.cSt}>&quot;upgrade head&quot;</span>
-                      {")\n    subprocess.run(cmd, check="}
-                      <span className={styles.cKy}>True</span>
-                      {")"}
-                    </pre>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className={styles.stepItem}>
-              <div className={`${styles.stepNum} ${styles.snG}`}>06</div>
-              <div className={styles.stepContent}>
-                <div className={styles.stepTitle}>動作確認 — スキルが認識されているか確認する</div>
-                <div className={styles.stepBody}>
-                  スキルを配置したら、以下の方法で認識されているか確認します。
-                  <div className={styles.cb} style={{ marginTop: "0.7rem" }}>
-                    <div className={styles.cbHdr}>
-                      <span>確認方法</span>
-                    </div>
-                    <pre>
-                      <span className={styles.cCm}>── VS Code の場合 ──</span>
-                      {"\n1. Copilot Chatを開く\n2. 入力欄に "}
-                      <span className={styles.cSt}>/</span>
-                      {" と入力 → スキル名がメニューに表示されるか確認\n3. または "}
-                      <span className={styles.cSt}>/skills</span>
-                      {
-                        " と入力 → Configure Skills メニューが開く\n4. スキル一覧に db-migration が表示されていれば OK\n\n"
-                      }
-                      <span className={styles.cCm}>── Copilot CLI の場合 ──</span>
-                      {"\n/mcp show          "}
-                      <span className={styles.cCm}># スキル一覧確認</span>
-                      {"\n"}
-                      <span className={styles.cCm}># または</span>
-                      {"\n/skills            "}
-                      <span className={styles.cCm}># スキル管理メニュー</span>
-                      {"\n\n"}
-                      <span className={styles.cCm}>── テスト実行 ──</span>
-                      {"\n"}
-                      <span className={styles.cSt}>
-                        &quot;DB に users テーブルを追加するマイグレーションを作成して&quot;
-                      </span>
-                      {"\n"}
-                      <span className={styles.cCm}>
-                        {"# → db-migration スキルが自動ロードされれば Level 1 成功"}
-                      </span>
-                      {"\n"}
-                      <span className={styles.cCm}>
-                        {"# → Response の References パネルに SKILL.md が表示されれば Level 2 成功"}
-                      </span>
-                    </pre>
-                  </div>
-                  <div className={`${styles.ib} ${styles.im}`} style={{ marginTop: "0.7rem" }}>
-                    <span className={styles.ii}>💡</span>
-                    <div>
-                      新ファイルのインデックス化には
-                      <strong>5〜10 分かかる</strong>場合があります。認識されない場合は IDE
-                      の再起動を試してください（[H]）。
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className={styles.stepItem}>
-              <div className={`${styles.stepNum} ${styles.snM}`}>07</div>
-              <div className={styles.stepContent}>
-                <div className={styles.stepTitle}>バリデーターで仕様適合を確認する（推奨）</div>
-                <div className={styles.stepBody}>
-                  公式バリデーター CLI
-                  でフロントマターの仕様適合・トークン予算・行数制限を自動チェックできます（[F]）。
-                  <div className={styles.cb} style={{ marginTop: "0.7rem" }}>
-                    <div className={styles.cbHdr}>
-                      <span>skills-ref — 公式バリデーター CLI</span>
-                    </div>
-                    <pre>
-                      <span className={styles.cCm}>{"# インストール (uv/uvx経由が推奨)"}</span>
-                      {"\nuvx skills-ref\n\n"}
-                      <span className={styles.cCm}>{"# バリデーション実行"}</span>
-                      {"\nskills-ref validate .github/skills/db-migration/SKILL.md\n"}
-                      <span className={styles.cCm}>
-                        {"# → name一致チェック・token budget・行数制限を確認"}
-                      </span>
-                      {"\n\n"}
-                      <span className={styles.cCm}>{"# プロパティ確認"}</span>
-                      {"\nskills-ref read-properties .github/skills/db-migration/SKILL.md\n\n"}
-                      <span className={styles.cCm}>{"# プロンプト変換（テスト用）"}</span>
-                      {"\nskills-ref to-prompt .github/skills/db-migration/SKILL.md"}
-                    </pre>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* SECTION 6: TEMPLATES */}
-        <section id="skill-templates">
-          <div className={styles.slabel}>Section 06</div>
-          <h2 className={styles.stitle}>
-            <span className={styles.num}>06.</span>実践テンプレート集（6 ジャンル）
-          </h2>
-
-          <p>実際の現場で使える 6 種類の SKILL.md テンプレートです。コピーして使えます。</p>
-
-          <h3>① DB マイグレーション（PostgreSQL）</h3>
-          <TemplateBlock
-            title=".github/skills/db-migration/SKILL.md"
-            body={DB_MIGRATION_TEMPLATE}
-          />
-
-          <h3>② Web アプリテスト（Playwright + TypeScript）</h3>
-          <TemplateBlock
-            title=".github/skills/webapp-testing/SKILL.md"
-            body={WEBAPP_TESTING_TEMPLATE}
-          />
-
-          <h3>③ Terraform インフラレビュー（IaC）</h3>
-          <TemplateBlock
-            title=".github/skills/terraform-plan-review/SKILL.md"
-            body={TERRAFORM_TEMPLATE}
-          />
-
-          <h3>④ GitHub Actions デバッグ（MCP 連携）</h3>
-          <TemplateBlock
-            title=".github/skills/github-actions-failure-debugging/SKILL.md"
-            body={ACTIONS_DEBUG_TEMPLATE}
-          />
-
-          <h3>⑤ コードレビュー（セキュリティ特化）</h3>
-          <TemplateBlock title=".github/skills/security-review/SKILL.md" body={SECURITY_TEMPLATE} />
-
-          <h3>⑥ スキル自動生成（メタスキル）</h3>
-          <TemplateBlock
-            title=".github/skills/create-skill/SKILL.md（github/awesome-copilot より）"
-            body={CREATE_SKILL_TEMPLATE}
-          />
-        </section>
-
-        {/* SECTION 7: VS INSTRUCTIONS */}
-        <section id="skill-vs-instructions">
-          <div className={styles.slabel}>Section 07</div>
-          <h2 className={styles.stitle}>
-            <span className={styles.num}>07.</span>カスタムインストラクションとの使い分け
-          </h2>
-
-          <p>
-            SKILL.md とカスタム指示ファイル（<code>copilot-instructions.md</code>・
-            <code>.instructions.md</code>）は<strong>補完関係</strong>にあります。
-            両方を適切に使い分けることで、コンテキスト効率と指示精度の両立が実現します（[1], [4]）。
-          </p>
-
-          <div className={styles.skBanner}>
-            <div className={styles.skIcon}>🎯</div>
-            <div>
-              <div className={styles.skTtl}>判断基準：「常に必要か」「特定タスク時だけか」</div>
-              <div className={styles.skDesc}>
-                コーディング規約・命名規則・禁止パターン →{" "}
-                <strong>常に必要 → copilot-instructions.md / .instructions.md</strong>
-                <br />
-                DB マイグレーション・テスト生成・Terraform レビュー →{" "}
-                <strong>特定タスク時のみ → SKILL.md</strong>
-              </div>
-            </div>
-          </div>
-
-          <div className={styles.g2}>
-            <div>
-              <div className={styles.cb}>
-                <div className={styles.cbHdr}>
-                  <span>copilot-instructions.md に書くべき内容</span>
-                </div>
-                <pre>
-                  <span className={styles.cHd}>## Code Standards（常時必要）</span>
-                  {
-                    '\n- TypeScript strict mode 使用\n- `any` 型禁止\n- 関数コンポーネントのみ（クラス禁止）\n- エラー: `fmt.Errorf("context: %w", err)` 形式\n\n'
-                  }
-                  <span className={styles.cHd}>## Build & Test（常時必要）</span>
-                  {
-                    "\n- Build: `npm run build`\n- Test:  `npm run test`\n- Lint:  `npm run lint:fix`\n\n"
-                  }
-                  <span className={styles.cCm}>
-                    {
-                      "# ↑ これらはすべてのリクエストで必要な短いルール\n# SKILL.mdへの参照を書いても機能しないので注意"
-                    }
-                  </span>
-                </pre>
-              </div>
-            </div>
-            <div>
-              <div className={styles.cb}>
-                <div className={styles.cbHdr}>
-                  <span>SKILL.md に書くべき内容</span>
-                </div>
-                <pre>
-                  <span className={styles.cCm}>{"# .github/skills/db-migration/SKILL.md"}</span>
-                  {"\n"}
-                  <span className={styles.cHd}>## Instructions（特定タスクの詳細手順）</span>
-                  {
-                    "\n1. migrations/にSQLファイルを作成...（詳細10ステップ）\n2. チェックスクリプト実行: `python ...`\n3. ロールバック手順: ...\n\n"
-                  }
-                  <span className={styles.cCm}>
-                    {
-                      "# ↑ DBマイグレーション時だけ必要な詳細手順\n# 常時注入すると毎リクエストで数百トークン消費する\n# → SKILL.mdにして必要時のみロードが正解"
-                    }
-                  </span>
-                </pre>
-              </div>
-            </div>
-          </div>
-
-          <div className={`${styles.ib} ${styles.ig}`}>
-            <span className={styles.ii}>💡</span>
-            <div>
-              <strong>ルール of thumb（経験則）：</strong> copilot-instructions.md に書くルールが 1
-              項目 200 文字を超え始めたら、そのルールは SKILL.md に切り出すサインです。
-              <code>copilot-instructions.md</code>の<strong>「2 ページ以内」の鉄則</strong>
-              を守りつつ、詳細な手順は SKILL.md に委譲します（[4]）。
-            </div>
-          </div>
-        </section>
-
-        {/* SECTION 8: ADVANCED */}
-        <section id="skill-advanced">
-          <div className={styles.slabel}>Section 08</div>
-          <h2 className={styles.stitle}>
-            <span className={styles.num}>08.</span>高度な活用パターン（リソースファイル・MCP 連携）
-          </h2>
-
-          <h3>パターン 1 — リソースファイルで「実行可能スキル」を作る</h3>
-          <p>
-            SKILL.md はテキスト手順だけでなく、
-            <strong>実行可能なスクリプトをスキルディレクトリに同梱</strong>できます。
-            エージェントは指示に従ってスクリプトを実行し、その結果を踏まえて次のステップを進められます（[B],
-            [D]）。
-          </p>
-          <TemplateBlock title="リソースファイル連携パターン" body={ADVANCED_RESOURCE_PATTERN} />
-
-          <h3>パターン 2 — MCP 連携スキルでリアルタイムデータを活用する</h3>
-          <p>
-            SKILL.md の手順に MCP サーバーのツール呼び出しを組み込むことで、
-            <strong>外部データをリアルタイムに取得しながら処理を進める</strong>
-            スキルが作れます（[D]、GitHub Actions Debugging スキルが参考例）。
-          </p>
-          <TemplateBlock title="MCP 連携スキル例（Jira 連携）" body={ADVANCED_MCP_PATTERN} />
-
-          <h3>パターン 3 — モノレポ対応（chat.agentSkillsLocations の活用）</h3>
-          <div className={styles.cb}>
-            <div className={styles.cbHdr}>
-              <div className={styles.dots}>
-                <div className={`${styles.dot} ${styles.dotR}`} />
-                <div className={`${styles.dot} ${styles.dotY}`} />
-                <div className={`${styles.dot} ${styles.dotG}`} />
-              </div>
-              <span>.vscode/settings.json — カスタムスキルパス設定</span>
-            </div>
-            <pre>
-              {"{\n  "}
-              <span className={styles.cGh}>&quot;chat.agentSkillsLocations&quot;</span>
-              {": [\n    "}
-              <span className={styles.cSt}>&quot;../../shared-skills&quot;</span>
-              {",\n    "}
-              <span className={styles.cCm}>
-                {"// ↑ モノレポの親ディレクトリにある共有スキルを参照"}
-              </span>
-              {"\n    "}
-              <span className={styles.cSt}>&quot;/opt/company-skills&quot;</span>
-              {"\n    "}
-              <span className={styles.cCm}>{"// ↑ 中央管理された企業スキルディレクトリ"}</span>
-              {"\n  ],\n  "}
-              <span className={styles.cGh}>
-                &quot;chat.useCustomizationsInParentRepositories&quot;
-              </span>
-              {": "}
-              <span className={styles.cKy}>true</span>
-              {"\n  "}
-              <span className={styles.cCm}>{"// ↑ モノレポで親リポジトリのスキルを検出する"}</span>
-              {"\n}"}
-            </pre>
-          </div>
-        </section>
-
-        {/* SECTION 9: TROUBLESHOOT */}
-        <section id="skill-troubleshoot">
-          <div className={styles.slabel}>Section 09</div>
-          <h2 className={styles.stitle}>
-            <span className={styles.num}>09.</span>トラブルシューティング — よくある問題と解決策
-          </h2>
-
-          <p>SKILL.md が正しく動作しない場合の原因と解決策を体系的にまとめました（[C], [E]）。</p>
-
-          <table className={styles.tblTs}>
+        <h3 id="31-各社の呼称比較">3.1 各社の呼称比較</h3>
+        <p>段階の表現にはベンダー間で若干の呼称差があるが、指している概念は完全に一致している。</p>
+        <div className={styles.tableScroll}>
+          <table>
+            <thead>
+              <tr>
+                <th>段階</th>
+                <th>Anthropic 公式ブログの呼称</th>
+                <th>GitHub / VS Code ドキュメントの呼称</th>
+                <th>読み込まれる要素</th>
+              </tr>
+            </thead>
             <tbody>
               <tr>
-                <th>症状</th>
-                <th>原因</th>
-                <th>解決策</th>
-              </tr>
-              <tr>
-                <td>スキルが /メニューに表示されない</td>
-                <td>name とディレクトリ名が不一致 / frontmatter の YAML 構文エラー</td>
+                <td>第1段階</td>
+                <td>Discovery(発見)</td>
+                <td>Pre-load / Metadata Scan</td>
                 <td>
-                  <code>skills-ref validate</code> でチェック。name をディレクトリ名に一致させる
+                  <code className={styles.inlineCode}>name</code> と{" "}
+                  <code className={styles.inlineCode}>description</code> のみ
                 </td>
               </tr>
               <tr>
-                <td>スキルが自動発動しない</td>
-                <td>description にキーワードが不足している</td>
-                <td>「Use for: X, Y, Z」形式でユーザーが入力するキーワードを追加</td>
-              </tr>
-              <tr>
-                <td>意図しないスキルが発動する</td>
-                <td>複数スキルの description が重複している</td>
-                <td>「Do NOT use for:」で境界を明確化。重複するなら統合を検討</td>
-              </tr>
-              <tr>
-                <td>CLI でスキルが認識されない</td>
-                <td>metadata フィールドが frontmatter の最後にある（CLI バグ）</td>
+                <td>第2段階</td>
+                <td>Activation(起動)</td>
+                <td>Skill Load / Context Injection</td>
                 <td>
-                  metadata の後に<code>license: MIT</code>などを 1 行追加する（[E]）
+                  <code className={styles.inlineCode}>SKILL.md</code> の本文全体
                 </td>
               </tr>
               <tr>
-                <td>スクリプトが実行されない</td>
-                <td>相対パスの書き方が間違っている</td>
+                <td>第3段階</td>
+                <td>Execution(実行)</td>
+                <td>Resource Fetch / Script Execution</td>
                 <td>
-                  <code>[./scripts/run.sh](./scripts/run.sh)</code> 形式で Markdown リンク記述
+                  <code className={styles.inlineCode}>references/</code>{" "}
+                  の個別ファイルやスクリプト実行結果
                 </td>
-              </tr>
-              <tr>
-                <td>新しく作ったスキルが認識されない</td>
-                <td>インデックス化に時間がかかっている</td>
-                <td>5〜10 分待つか IDE を再起動する（[H]）</td>
-              </tr>
-              <tr>
-                <td>本文が長くて応答が遅い</td>
-                <td>SKILL.md が 500 行 / 5,000 トークンを超えている</td>
-                <td>
-                  詳細は<code>references/</code>に移してリンク参照に変更
-                </td>
-              </tr>
-              <tr>
-                <td>Coding Agent がスキルを使わない</td>
-                <td>Issue の記述が description のキーワードとずれている</td>
-                <td>Issue にスキルのキーワードを WRAP フレームワークで明記する</td>
               </tr>
             </tbody>
           </table>
+        </div>
+        <p>
+          この3段階の分離により、100個のスキルを配置していても、第1段階で消費されるトークンはわずか数千トークンに抑えられる。
+        </p>
 
-          <div className={`${styles.ib} ${styles.ig}`}>
-            <span className={styles.ii}>🔍</span>
-            <div>
-              <strong>References パネルで動作確認を習慣化：</strong>
-              VS Code Copilot Chat のレスポンスには References パネルがあり、どの SKILL.md
-              が読み込まれたかを確認できます。 リストに SKILL.md
-              が表示されない場合は発動していません（Level 2 未到達）。 スキルの description
-              を見直してください（[4]）。
-            </div>
+        <h3 id="32-コンテキストウィンドウでの動き">3.2 コンテキストウィンドウでの動き</h3>
+        <p>
+          Anthropic のエンジニアリングブログが示す PDF スキルの例を基に、Copilot
+          がスキルを起動してから実行に至るまでのシーケンスを図示する。
+        </p>
+        <div className={styles.mermaidWrap}>
+          <MermaidDiagram chart={DIAGRAM_3} />
+        </div>
+        <p>
+          重要なのは、
+          <strong>スクリプト自体のソースコードはコンテキストウィンドウに入らない</strong>
+          という点である。Copilot
+          はスクリプトを外部ツールとして実行し、その標準出力(STDOUT)だけをコンテキストに受け取る。1,000行のPythonスクリプトであっても、出力が「3行のエラーログ」であれば消費トークンは数十トークンで済む。
+        </p>
+
+        <h3 id="33-トークンコストの実測値">3.3 トークンコストの実測値</h3>
+        <p>
+          Anthropic が公表した実測データに基づき、従来の「全指示常時読み込み」と Agent Skills
+          の「3段階ローディング」におけるトークン消費量を比較する。
+        </p>
+        <div className={styles.tableScroll}>
+          <table>
+            <thead>
+              <tr>
+                <th>状態</th>
+                <th>従来の Custom Instructions 方式</th>
+                <th>Agent Skills (Progressive Disclosure)</th>
+                <th>削減率</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>会話開始時 (スキルの待機中)</td>
+                <td>50,000 トークン (全指示を常時ロード)</td>
+                <td>1,200 トークン (100個のname/descriptionのみ)</td>
+                <td>97.6% 削減</td>
+              </tr>
+              <tr>
+                <td>特定タスク実行中 (スキル発火時)</td>
+                <td>50,000 トークン (無関係な指示も混在)</td>
+                <td>4,500 トークン (該当スキルのSKILL.mdのみロード)</td>
+                <td>91.0% 削減</td>
+              </tr>
+              <tr>
+                <td>リソース追加参照時 (第3段階)</td>
+                <td>50,000 トークン (変化なし)</td>
+                <td>7,000 トークン (必要なreferenceファイルのみ追加)</td>
+                <td>86.0% 削減</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          このように、Agent Skills
+          を利用することでコンテキストコストを10分の1以下に削減でき、エージェントの推論速度と回答精度が大幅に向上する。
+        </p>
+        <hr />
+
+        <h2 id="4-フロントマター完全仕様">4. フロントマター完全仕様</h2>
+        <p>
+          <code className={styles.inlineCode}>SKILL.md</code> の冒頭には、YAML
+          形式のフロントマターを記述する。フロントマターはハイフン3つ(
+          <code className={styles.inlineCode}>---</code>
+          )で囲む必要がある。
+        </p>
+
+        <h3 id="41-フィールド一覧">4.1 フィールド一覧</h3>
+        <p>
+          <code className={styles.inlineCode}>agentskills.io</code> 仕様 v1.0
+          で定義されている全フィールドの一覧は以下の通りである。
+        </p>
+        <div className={styles.tableScroll}>
+          <table>
+            <thead>
+              <tr>
+                <th>フィールド名</th>
+                <th>必須 / 任意</th>
+                <th>型</th>
+                <th>説明</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <code className={styles.inlineCode}>name</code>
+                </td>
+                <td>必須</td>
+                <td>string</td>
+                <td>
+                  スキルの識別名。小文字・ハイフン区切り。
+                  <strong>親ディレクトリ名と完全一致が必須</strong>。
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <code className={styles.inlineCode}>description</code>
+                </td>
+                <td>必須</td>
+                <td>string</td>
+                <td>
+                  スキルの機能と発火条件の説明。
+                  <strong>エージェントが発火を判断する唯一の情報源</strong>。
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <code className={styles.inlineCode}>license</code>
+                </td>
+                <td>任意</td>
+                <td>string</td>
+                <td>
+                  ライセンス識別子(例: <code className={styles.inlineCode}>MIT</code>,{" "}
+                  <code className={styles.inlineCode}>Apache-2.0</code>)。公開スキルで推奨。
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <code className={styles.inlineCode}>compatibility</code>
+                </td>
+                <td>任意</td>
+                <td>string</td>
+                <td>
+                  動作環境の要件(例:{" "}
+                  <code className={styles.inlineCode}>git, python &gt;= 3.10</code>)。
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <code className={styles.inlineCode}>metadata</code>
+                </td>
+                <td>任意</td>
+                <td>map</td>
+                <td>任意キーバリュー。著者情報・バージョン・内部IDなどを格納する。</td>
+              </tr>
+              <tr>
+                <td>
+                  <code className={styles.inlineCode}>allowed-tools</code>
+                </td>
+                <td>任意(実験的)</td>
+                <td>string (公開形式)</td>
+                <td>スキル実行中にエージェントへ事前許可するツールの空白区切り文字列。</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          Copilot CLI の実装は配列形式も読み込めるが、
+          <code className={styles.inlineCode}>gh skill publish --dry-run</code>{" "}
+          が検証する公開用形式は文字列である。公開するスキルでは、ツール名を空白で区切った文字列に統一する。
+        </p>
+        <p>
+          <code className={styles.inlineCode}>name</code> と{" "}
+          <code className={styles.inlineCode}>description</code>{" "}
+          以外のフィールドはすべて任意だが、チーム内配布や公開レジストリへ登録する際は{" "}
+          <code className={styles.inlineCode}>license</code> や{" "}
+          <code className={styles.inlineCode}>metadata</code> を書くことが望ましい。
+        </p>
+
+        <h3 id="42-最小構成の例">4.2 最小構成の例</h3>
+        <div className={styles.codeBlock}>
+          <pre>
+            <code>{`---
+name: pdf-form-filler
+description: Fills out PDF forms. Use this when asked to fill out, complete, or process PDF form fields.
+---`}</code>
+          </pre>
+        </div>
+        <p>実務で使う最小構成は、上記のようにわずか4行で完結する。</p>
+
+        <h3 id="43-name-フィールドの命名規則">4.3 name フィールドの命名規則</h3>
+        <p>
+          <code className={styles.inlineCode}>name</code> フィールドには、厳格な命名規則がある。
+        </p>
+        <ul>
+          <li>
+            小文字の英数字とハイフンのみを使用する(正規表現:{" "}
+            <code className={styles.inlineCode}>^[a-z0-9-]+$</code>)
+          </li>
+          <li>先頭と末尾にハイフンを使ってはならない</li>
+          <li>
+            連続したハイフン(<code className={styles.inlineCode}>--</code>)を使ってはならない
+          </li>
+          <li>最大文字数は 64 文字</li>
+          <li>
+            <strong>配置されている親ディレクトリ名と完全に一致しなければならない</strong>
+          </li>
+        </ul>
+        <p>
+          特に最後の「親ディレクトリ名との一致」は、初心者が最もハマりやすいポイントである。ディレクトリ名が{" "}
+          <code className={styles.inlineCode}>.github/skills/my-skill/</code>{" "}
+          であれば、フロントマターの <code className={styles.inlineCode}>name</code> も必ず{" "}
+          <code className={styles.inlineCode}>my-skill</code>{" "}
+          にしなければならない。不一致の場合、Copilot はスキルをサイレントに無視する。
+        </p>
+        <div className={styles.codeBlock}>
+          <pre>
+            <code>{`# ❌ NG 例: ディレクトリ名が my-skill なのに name が my_skill
+---
+name: my_skill
+description: ...
+---
+
+# ✅ OK 例: ディレクトリ名と name が一致
+---
+name: my-skill
+description: ...
+---`}</code>
+          </pre>
+        </div>
+
+        <h3 id="44-description-フィールドの書き方--trigger-triad">
+          4.4 description フィールドの書き方 ― Trigger Triad
+        </h3>
+        <p>
+          <code className={styles.inlineCode}>description</code> は、Agent Skills
+          において最も重要な要素である。第1段階(Discovery)において、Copilot はユーザーのプロンプトと{" "}
+          <code className={styles.inlineCode}>description</code>{" "}
+          を突き合わせ、そのスキルを読み込むかどうかを決定する。
+        </p>
+        <p>
+          Anthropic のガイドラインは、優れた <code className={styles.inlineCode}>description</code>{" "}
+          を書くためのフレームワークとして「<strong>Trigger Triad(トリガーの三原則)</strong>
+          」を提示している。
+        </p>
+        <div className={styles.tableScroll}>
+          <table>
+            <thead>
+              <tr>
+                <th>要素</th>
+                <th>役割</th>
+                <th>記述例</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1. 何ができるか (Capability)</td>
+                <td>スキルの具体的な機能や提供する価値を明確にする</td>
+                <td>Fills out PDF forms and extracts form field data.</td>
+              </tr>
+              <tr>
+                <td>2. いつ使うべきか (Context/Triggers)</td>
+                <td>ユーザーがどんな要求や用語を使ったときに発火すべきか明記する</td>
+                <td>
+                  Use this when asked to fill out, complete, or process PDF forms or interactive
+                  fields.
+                </td>
+              </tr>
+              <tr>
+                <td>3. いつ使うべきでないか (Exclusions)</td>
+                <td>誤発火を防ぐための除外条件を明記する</td>
+                <td>
+                  Do not use for general PDF text extraction or creating new PDF documents from
+                  scratch.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>これら3つの要素を組み合わせた理想的なフロントマターの例を示す。</p>
+        <div className={styles.codeBlock}>
+          <pre>
+            <code>{`---
+name: pdf-form-filler
+description: Fills out PDF forms and extracts form field data. Use this when asked to fill out, complete, or process PDF forms or interactive fields. Do not use for general PDF text extraction or creating new PDF documents from scratch.
+---`}</code>
+          </pre>
+        </div>
+        <p>
+          <code className={styles.inlineCode}>description</code> を書く際の重要な注意点:
+        </p>
+        <ul>
+          <li>
+            <strong>三人称で記述する</strong>: 「I can fill out...」や「My purpose
+            is...」などの一人称を避ける。「Fills out...」「Use this when...」のように客観的に書く。
+          </li>
+          <li>
+            <strong>具体的なトリガー語彙を含める</strong>:
+            ユーザーが実際に口にしそうな動詞や名詞(「fill out」「complete」「PDF
+            form」など)を意識的に散りばめる。
+          </li>
+          <li>
+            <strong>1,024文字以内に収める</strong>:
+            長すぎる説明はシステムプロンプトを圧迫し、判定精度を落とす。
+          </li>
+        </ul>
+
+        <h3 id="45-説明文のテスト手法">4.5 説明文のテスト手法</h3>
+        <p>
+          <code className={styles.inlineCode}>description</code>{" "}
+          を作成した後は、発火精度を検証するために「3パターンのテストプロンプト」を用意することが推奨される。
+        </p>
+        <div className={styles.tableScroll}>
+          <table>
+            <thead>
+              <tr>
+                <th>テストパターン</th>
+                <th>プロンプト例</th>
+                <th>期待される挙動</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>直接的リクエスト (Direct)</td>
+                <td>「このPDFのフォームに名前と住所を入力して」</td>
+                <td>確実にかつ即座にスキルが発火すること</td>
+              </tr>
+              <tr>
+                <td>間接的リクエスト (Indirect)</td>
+                <td>「送られてきた申請書の入力欄を埋めてほしい」</td>
+                <td>言葉の揺らぎを解釈して正しくスキルが発火すること</td>
+              </tr>
+              <tr>
+                <td>否定ケース (Negative)</td>
+                <td>「このPDFのテキストを抽出してMarkdownにして」</td>
+                <td>
+                  スキルが<strong>発火しない</strong>こと(誤発火の防止)
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          否定ケースでスキルが誤発火する場合は、
+          <code className={styles.inlineCode}>description</code> に「Do not use
+          for...」という除外文を追加してチューニングを行う。
+        </p>
+
+        <h3 id="46-allowed-tools-フィールドとセキュリティ">
+          4.6 allowed-tools フィールドとセキュリティ
+        </h3>
+        <p>
+          <code className={styles.inlineCode}>allowed-tools</code> は、VS Code および Copilot CLI
+          において実験的に導入されているフィールドである。スキルが起動された際、ユーザーへ都度確認ダイアログを出さずに実行を許可するツールを指定できる。
+        </p>
+        <div className={styles.tableScroll}>
+          <table>
+            <thead>
+              <tr>
+                <th>指定形式</th>
+                <th>例</th>
+                <th>評価</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>ワイルドカード指定 (危険)</td>
+                <td>
+                  <code className={styles.inlineCode}>allowed-tools: "*"</code>
+                </td>
+                <td>全ツールを無制限に許可。セキュリティリスクが非常に高く非推奨。</td>
+              </tr>
+              <tr>
+                <td>カテゴリ丸ごと指定 (注意)</td>
+                <td>
+                  <code className={styles.inlineCode}>allowed-tools: "shell read"</code>
+                </td>
+                <td>シェル実行を全面的に許可。悪意あるスクリプトの実行リスクあり。</td>
+              </tr>
+              <tr>
+                <td>コマンド単位の限定指定 (推奨)</td>
+                <td>
+                  <code className={styles.inlineCode}>allowed-tools: "Bash(git:*) Read"</code>
+                </td>
+                <td>git コマンドとファイル読み込みのみを許可。最小権限原則に合致。</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          最小権限原則(Principle of Least
+          Privilege)に従い、可能な限りコマンド単位で限定指定することが強く推奨される。
+        </p>
+        <div className={styles.codeBlock}>
+          <pre>
+            <code>{`---
+name: git-commit-helper
+description: Generates standardized git commit messages based on staged diffs.
+allowed-tools: "Bash(git status) Bash(git diff *) Read"
+---`}</code>
+          </pre>
+        </div>
+        <hr />
+
+        <h2 id="5-ディレクトリ構造とスコープ">5. ディレクトリ構造とスコープ</h2>
+        <h3 id="51-基本構造">5.1 基本構造</h3>
+        <p>
+          スキルは単一の <code className={styles.inlineCode}>SKILL.md</code>{" "}
+          だけでも動作するが、大規模な開発やチーム共有においてはサブディレクトリを活用した構造化が推奨される。
+        </p>
+        <div className={styles.codeBlock}>
+          <pre>
+            <code>{`.github/skills/my-advanced-skill/
+├── SKILL.md                 # [必須] フロントマター + 主要指示
+├── scripts/                 # [任意] エージェントが呼び出すスクリプト
+│   ├── check-coverage.py
+│   └── run-linter.sh
+├── references/              # [任意] 第3段階で必要に応じて読み込む資料
+│   ├── db-schema.md
+│   └── api-spec.md
+└── assets/                  # [任意] テンプレートや静的ファイル
+    └── config-template.json`}</code>
+          </pre>
+        </div>
+        <p>各ディレクトリの役割と使い分けは以下の通りである。</p>
+        <div className={styles.tableScroll}>
+          <table>
+            <thead>
+              <tr>
+                <th>要素</th>
+                <th>適切な用途</th>
+                <th>非推奨な用途</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <code className={styles.inlineCode}>SKILL.md</code> 本文
+                </td>
+                <td>高レベルな手順、意思決定の原則、エッジケースの注意点</td>
+                <td>数千行の長大なコード、巨大なAPIリファレンスの丸ごと貼り付け</td>
+              </tr>
+              <tr>
+                <td>
+                  <code className={styles.inlineCode}>scripts/</code>
+                </td>
+                <td>決定論的で確実性が求められる処理(ビルド、データ整形、検証)</td>
+                <td>曖昧な自然言語で記述可能なロジック(指示本文に書くべき)</td>
+              </tr>
+              <tr>
+                <td>
+                  <code className={styles.inlineCode}>references/</code>
+                </td>
+                <td>特定のタスクでしか使わない長大なスキーマ定義やルール集</td>
+                <td>すべてのタスクで常に必要な共通ルール(SKILL.md本文に書くべき)</td>
+              </tr>
+              <tr>
+                <td>
+                  <code className={styles.inlineCode}>assets/</code>
+                </td>
+                <td>コード生成のひな型、静的画像、サンプル設定ファイル</td>
+                <td>エージェントに直接読み込ませる指示テキスト</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 id="52-プロジェクトスキル-vs-パーソナルスキル">
+          5.2 プロジェクトスキル vs パーソナルスキル
+        </h3>
+        <p>Copilot はスキルを配置する場所によって、適用されるスコープ(影響範囲)を分離している。</p>
+        <div className={styles.tableScroll}>
+          <table>
+            <thead>
+              <tr>
+                <th>種別</th>
+                <th>配置パス</th>
+                <th>スコープ</th>
+                <th>用途</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>プロジェクトスキル (Project Skill)</td>
+                <td>
+                  <code className={styles.inlineCode}>
+                    {".github/skills/<skill-name>/SKILL.md"}
+                  </code>
+                </td>
+                <td>該当リポジトリのみ</td>
+                <td>チーム共有のレビュー観点、プロジェクト固有のデプロイ・テスト手順</td>
+              </tr>
+              <tr>
+                <td>パーソナルスキル (Personal Skill)</td>
+                <td>
+                  <code className={styles.inlineCode}>
+                    {"~/.copilot/skills/<skill-name>/SKILL.md"}
+                  </code>
+                </td>
+                <td>全プロジェクト共通</td>
+                <td>個人のお気に入りショートカット、個人のコーディングスタイル好み</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          なお、Anthropic Claude Code や Cursor
+          との互換性を考慮する場合、以下の代替パスも自動検出される。
+        </p>
+        <div className={styles.codeBlock}>
+          <pre>
+            <code>{`# Copilot が探索するプロジェクトスキルの優先順位
+1. .github/skills/<skill-name>/SKILL.md   (Copilot 標準)
+2. .claude/skills/<skill-name>/SKILL.md   (Claude 互換)
+3. .agents/skills/<skill-name>/SKILL.md   (オープン標準)
+
+# Copilot が探索するパーソナルスキルの優先順位
+1. ~/.copilot/skills/<skill-name>/SKILL.md (Copilot 標準)
+2. ~/.claude/skills/<skill-name>/SKILL.md  (Claude 互換)
+3. ~/.agents/skills/<skill-name>/SKILL.md  (オープン標準)`}</code>
+          </pre>
+        </div>
+        <p>
+          プロジェクトスキルは Git
+          リポジトリにコミットすることで、リポジトリをクローンしたチームメンバー全員へ即座に共有される。
+        </p>
+
+        <h3 id="53-各エージェントホストでの対応状況">5.3 各エージェントホストでの対応状況</h3>
+        <p>
+          GitHub Copilot の各製品・サーフェスにおける Agent Skills
+          のサポート状況一覧は以下の通りである。
+        </p>
+        <div className={styles.tableScroll}>
+          <table>
+            <thead>
+              <tr>
+                <th>サーフェス / 環境</th>
+                <th>対応状況</th>
+                <th>備考 / バージョン要件</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>VS Code (Copilot Agent mode)</td>
+                <td>対応 (GA)</td>
+                <td>VS Code 1.97 以降。Agent mode で全機能が利用可能。</td>
+              </tr>
+              <tr>
+                <td>Visual Studio 2022</td>
+                <td>対応 (GA)</td>
+                <td>Visual Studio 2022 v17.13 以降。</td>
+              </tr>
+              <tr>
+                <td>JetBrains IDEs (IntelliJ, PyCharm等)</td>
+                <td>対応 (プレビュー)</td>
+                <td>Copilot プラグイン v1.5.30 以降。</td>
+              </tr>
+              <tr>
+                <td>GitHub Copilot CLI</td>
+                <td>対応 (GA)</td>
+                <td>Copilot CLI v0.2.0 以降。gh skill サブコマンドに対応。</td>
+              </tr>
+              <tr>
+                <td>Copilot cloud agent (GitHub.com)</td>
+                <td>対応 (GA)</td>
+                <td>.github/skills/ を自動検出してバックグラウンド実行。</td>
+              </tr>
+              <tr>
+                <td>Copilot code review</td>
+                <td>対応 (GA)</td>
+                <td>2026年7月29日にGA。PRレビュー時に自動発火。</td>
+              </tr>
+              <tr>
+                <td>Claude Code (CLI)</td>
+                <td>対応 (GA)</td>
+                <td>Anthropic 公式。.claude/skills/ を参照。</td>
+              </tr>
+              <tr>
+                <td>Cursor</td>
+                <td>対応 (GA)</td>
+                <td>.cursor/skills/ または .agents/skills/ を参照。</td>
+              </tr>
+              <tr>
+                <td>Gemini CLI</td>
+                <td>対応 (GA)</td>
+                <td>.gemini/skills/ または .agents/skills/ を参照。</td>
+              </tr>
+              <tr>
+                <td>OpenAI Codex (CLI / Web)</td>
+                <td>対応 (GA)</td>
+                <td>.codex/skills/ または .agents/skills/ を参照。</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          主要なコーディングエージェントのほぼ全てでサポートが完了しており、共通のスキルアセットとして運用可能な環境が整っている。
+        </p>
+        <hr />
+
+        <h2 id="6-ステップバイステップ作成ガイド">6. ステップバイステップ作成ガイド</h2>
+        <p>
+          ここからは実際に手を動かしながら、ゼロから実運用可能なスキルを作る手順を追う。題材は「GitHub
+          Actionsの失敗を調査する」スキルとする。
+        </p>
+        <div className={styles.mermaidWrap}>
+          <MermaidDiagram chart={DIAGRAM_4} />
+        </div>
+
+        <h3 id="step-1-繰り返しているタスクを特定する">Step 1: 繰り返しているタスクを特定する</h3>
+        <p>
+          同じプロンプトを複数の会話で繰り返しタイプしている、あるいは特定のレビュー観点やデバッグ手順を毎回口頭で説明しているなら、それがスキル化の候補である。Anthropic
+          のガイドラインは「代表的なタスクでエージェントを実際に動かし、つまずく箇所や追加コンテキストが必要になる箇所を観察する」ことを最初のステップとして推奨している。
+        </p>
+
+        <h3 id="step-2-ディレクトリを作成する">Step 2: ディレクトリを作成する</h3>
+        <div className={styles.codeBlock}>
+          <pre>
+            <code>mkdir -p .github/skills/github-actions-failure-debugging</code>
+          </pre>
+        </div>
+        <p>
+          サブディレクトリ名は小文字・ハイフン区切りにする。これは後述の{" "}
+          <code className={styles.inlineCode}>name</code>{" "}
+          フィールドと一致させる必要があるためである。
+        </p>
+
+        <h3 id="step-3-フロントマターを書く">Step 3: フロントマターを書く</h3>
+        <div className={styles.codeBlock}>
+          <pre>
+            <code>{`---
+name: github-actions-failure-debugging
+description: Guide for debugging failing GitHub Actions workflows. Use this when asked to debug failing GitHub Actions workflows.
+---`}</code>
+          </pre>
+        </div>
+
+        <h3 id="step-4-本文を書く">Step 4: 本文を書く</h3>
+        <div className={styles.codeBlock}>
+          <pre>
+            <code>{`To debug failing GitHub Actions workflows in a pull request, follow this process, using tools provided from the GitHub MCP Server:
+
+1. Use the \`list_workflow_runs\` tool to look up recent workflow runs for the pull request and their status
+2. Use the \`summarize_job_log_failures\` tool to get an AI summary of the logs for failed jobs, to understand what went wrong without filling your context window with thousands of lines of logs
+3. If you still need more information, use the \`get_job_logs\` or \`get_workflow_run_logs\` tool to get the full, detailed failure logs
+4. Try to reproduce the failure yourself in your own environment
+5. Fix the failing build. If you were able to reproduce the failure yourself, make sure it is fixed before committing your changes`}</code>
+          </pre>
+        </div>
+        <p>
+          本文の分量は<strong>500行未満</strong>を目安にする。それを超える場合は{" "}
+          <code className={styles.inlineCode}>references/</code> にファイルを分割し、SKILL.md
+          からリンクする形にする。Anthropic
+          のガイドラインでは「SKILL.md本文は5,000トークン未満が理想」ともされており、行数だけでなくトークン量にも意識を向けるとよい。
+        </p>
+
+        <h3 id="step-5-スクリプトを追加する任意">Step 5: スクリプトを追加する(任意)</h3>
+        <div className={styles.codeBlock}>
+          <pre>
+            <code>{`.github/skills/image-convert/
+  SKILL.md
+  convert-svg-to-png.sh`}</code>
+          </pre>
+        </div>
+        <p>
+          スキルが起動されると、Copilot はそのスキルディレクトリ内の全ファイルを自動的に発見し、
+          <code className={styles.inlineCode}>SKILL.md</code>{" "}
+          の指示と一緒に利用可能にする。本文中でスクリプトの呼び出し方を明記すること。
+        </p>
+        <div className={styles.codeBlock}>
+          <pre>
+            <code>{`When asked to convert an SVG to PNG, run the \`convert-svg-to-png.sh\`
+script from this skill's base directory, passing the input SVG file
+path as the first argument.`}</code>
+          </pre>
+        </div>
+
+        <h3 id="step-6-発火テストを行う">Step 6: 発火テストを行う</h3>
+        <p>
+          前述の「直接的リクエスト」「間接的リクエスト」「否定ケース」の3パターンで実際にプロンプトを投げ、期待通りに発火するかを確認する。反応が悪い場合は{" "}
+          <code className={styles.inlineCode}>description</code>{" "}
+          のトリガー語彙を見直す。本文の指示を直す前に、まず{" "}
+          <code className={styles.inlineCode}>description</code> を疑うのが定石である。
+        </p>
+
+        <h3 id="step-7-チームに配布する">Step 7: チームに配布する</h3>
+        <p>
+          <code className={styles.inlineCode}>.github/skills/</code>{" "}
+          配下に置いてコミットすれば、リポジトリをクローンした全員が自動的にそのスキルを利用できるようになる。公開スキルリポジトリとして運用する場合は、後述の{" "}
+          <code className={styles.inlineCode}>gh skill publish</code> を使って検証・公開する。
+        </p>
+
+        <h3 id="step-8-反復改善する">Step 8: 反復改善する</h3>
+        <p>
+          Anthropic
+          のガイドラインが強調するのは「Claudeの視点で考える」ことである。実際の利用シーンでスキルがどう使われたかを観察し、想定外の挙動や特定の文脈への過度な依存がないかを確認する。うまくいかなかった場合はエージェント自身に「何が問題だったか」を振り返らせ、そのフィードバックを本文に反映する、というループを回す。
+        </p>
+        <hr />
+
+        <h2 id="7-github-cligh-skillによるスキル管理">7. GitHub CLI(gh skill)によるスキル管理</h2>
+        <p>
+          GitHub CLI 2.90.0 以降では <code className={styles.inlineCode}>gh skill</code>{" "}
+          サブコマンド(パブリックプレビュー)を使い、スキルの検索・プレビュー・インストール・更新・公開を行える。
+        </p>
+        <div className={styles.mermaidWrap}>
+          <MermaidDiagram chart={DIAGRAM_5} />
+        </div>
+
+        <h3 id="71-検索プレビューインストール">7.1 検索・プレビュー・インストール</h3>
+        <p>
+          GitHub CLI
+          を使って公開スキルのエコシステムから目的のスキルを探し、安全に導入するコマンド例を示す。
+        </p>
+        <div className={styles.codeBlock}>
+          <pre>
+            <code>{`# 1. キーワードでスキルを検索
+gh skill search react
+
+# 2. インストール前にスキルの内容とファイル構造をプレビュー (セキュリティ必須手順)
+gh skill preview vercel-labs/agent-skills react-best-practices
+
+# 3. プロジェクトローカル (.github/skills/) へインストール
+gh skill install vercel-labs/agent-skills react-best-practices
+
+# 4. パーソナルスキル (~/.copilot/skills/) としてグローバルインストール
+gh skill install vercel-labs/agent-skills react-best-practices --global
+
+# 5. ローカルディレクトリからコピーしてインストール
+gh skill install ./my-skills-repo react-best-practices --from-local`}</code>
+          </pre>
+        </div>
+        <p>
+          リモートリポジトリからのインストールでは、更新確認に使うソース追跡メタデータが追加される。一方、ローカルディレクトリを指定する
+          <code className={styles.inlineCode}>--from-local</code> では、コピー元を追跡する
+          <code className={styles.inlineCode}>metadata.local-path</code> が追加される。
+        </p>
+        <div className={styles.codeBlock}>
+          <pre>
+            <code>{`---
+name: react-best-practices
+description: Applies React 19 best practices...
+metadata:
+  local-path: ./my-skills-repo/skills/react-best-practices
+---`}</code>
+          </pre>
+        </div>
+
+        <h3 id="72-更新公開">7.2 更新・公開</h3>
+        <div className={styles.codeBlock}>
+          <pre>
+            <code>{`# インストール済みスキルの更新確認と一括アップデート
+gh skill update --all
+
+# 自作スキルリポジトリの公開前検証 (公開は行わない)
+gh skill publish --dry-run .github/skills/my-custom-skill
+
+# 自作スキルを GitHub 上へ公開・登録
+gh skill publish .github/skills/my-custom-skill`}</code>
+          </pre>
+        </div>
+        <p>
+          <code className={styles.inlineCode}>gh skill publish --dry-run</code> は、公開を行わずに
+          Agent Skills 仕様への適合性を検証する。
+        </p>
+        <div className={styles.tableScroll}>
+          <table>
+            <thead>
+              <tr>
+                <th>gh skill publish --dry-run のチェック項目</th>
+                <th>判定基準</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Directory Name Parity</td>
+                <td>
+                  <code className={styles.inlineCode}>name</code>{" "}
+                  フィールドが親ディレクトリ名と完全一致するか
+                </td>
+              </tr>
+              <tr>
+                <td>Skill Name Rules</td>
+                <td>スキル名が Agent Skills 仕様の厳格な命名規則に適合するか</td>
+              </tr>
+              <tr>
+                <td>Required Frontmatter</td>
+                <td>必須項目(name, description)が存在するか</td>
+              </tr>
+              <tr>
+                <td>Allowed Tools Format</td>
+                <td>allowed-tools が配列ではなく文字列で記述されているか</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <hr />
+
+        <h2 id="8-実践テンプレート集">8. 実践テンプレート集</h2>
+        <p>
+          業務で頻繁に使用されるユースケース別に、そのままコピー＆ペーストして使える実用テンプレートを提示する。
+        </p>
+
+        <h3 id="81-最小構成テンプレート">8.1 最小構成テンプレート</h3>
+        <p>単一の役割に特化した、シンプルで軽量なテンプレート。</p>
+        <div className={styles.codeBlock}>
+          <pre>
+            <code>{`---
+name: format-json-response
+description: Formats raw API responses into structured JSON. Use this when asked to format, clean up, or structure API JSON data.
+---
+
+# Instructions
+
+When asked to format an API response:
+
+1. Parse the input text as JSON
+2. Sort object keys alphabetically at all levels
+3. Format with 2-space indentation
+4. Output only the formatted JSON inside a json code block`}</code>
+          </pre>
+        </div>
+
+        <h3 id="82-スクリプト実行テンプレート">8.2 スクリプト実行テンプレート</h3>
+        <p>シェルスクリプトや外部ツールを安全に呼び出すためのテンプレート。</p>
+        <div className={styles.codeBlock}>
+          <pre>
+            <code>{`---
+name: svg-to-png-converter
+description: Converts SVG files to PNG format. Use this when asked to convert, render, or export SVG images to PNG.
+allowed-tools: "Bash(./scripts/convert.sh *) Read"
+---
+
+# SVG to PNG Conversion Guide
+
+Follow these steps to convert an SVG file to PNG:
+
+1. Locate the input SVG file specified by the user
+2. Run the conversion script from this skill's directory:
+   \`\`\`bash
+   ./scripts/convert.sh <input-svg-path> <output-png-path>
+   \`\`\`
+3. Verify that the output PNG file exists and is non-empty
+4. Report the resulting file path and file size to the user`}</code>
+          </pre>
+        </div>
+
+        <h3 id="83-コードレビュー特化テンプレート">8.3 コードレビュー特化テンプレート</h3>
+        <p>PRの自動レビューやローカルでのコード監査に特化したテンプレート。</p>
+        <div className={styles.codeBlock}>
+          <pre>
+            <code>{`---
+name: security-code-review
+description: Performs security-focused code reviews. Use this when asked to audit, review for security, or check for vulnerabilities in pull requests or code snippets.
+---
+
+# Security Code Review Checklist
+
+Review the target code against the following critical security vectors:
+
+1. **Input Validation & Sanitization**
+   - Check for SQL Injection risks in database queries
+   - Check for XSS vulnerabilities in rendered HTML/JSX
+   - Ensure user inputs are validated at API boundaries
+
+2. **Authentication & Authorization**
+   - Verify that protected endpoints require valid session/JWT
+   - Check for Broken Object Level Authorization (BOLA/IDOR)
+
+3. **Data Protection**
+   - Ensure no hardcoded secrets, API keys, or credentials exist
+   - Verify that PII and sensitive data are masked in log outputs
+
+Format your findings as a Markdown table with columns: \`Severity\` | \`Location\` | \`Vulnerability\` | \`Remediation\`.`}</code>
+          </pre>
+        </div>
+
+        <h3 id="84-複数ファイル参照テンプレートreferencesを使う例">
+          8.4 複数ファイル参照テンプレート(referencesを使う例)
+        </h3>
+        <p>大規模な仕様書やデータベース設計図を別ファイルへ分離するテンプレート。</p>
+        <div className={styles.codeBlock}>
+          <pre>
+            <code>{`---
+name: db-migration-helper
+description: Assists with database migration scripts. Use this when asked to create, review, or execute database schema migrations.
+---
+
+# Database Migration Guide
+
+Follow the project standards defined in the reference documents:
+
+1. Read \`references/schema-rules.md\` for naming conventions and type mappings
+2. Read \`references/rollback-policy.md\` for required undo script patterns
+3. Draft the migration SQL script
+4. Ensure every \`UP\` migration has a corresponding \`DOWN\` migration script
+5. Test the migration against local PostgreSQL container before presenting to user`}</code>
+          </pre>
+        </div>
+
+        <h3 id="85-チーム共有テンプレート複数サーフェス横断">
+          8.5 チーム共有テンプレート(複数サーフェス横断)
+        </h3>
+        <p>Copilot, Claude Code, Cursor などの複数環境で共通利用するテンプレート。</p>
+        <div className={styles.codeBlock}>
+          <pre>
+            <code>{`---
+name: team-release-checklist
+description: Guides the step-by-step release process for production deployments. Use this when asked to prepare, execute, or verify a production release.
+license: MIT
+metadata:
+  author: DevOps Team
+  version: 2.1.0
+compatibility: "git >= 2.30, gh >= 2.0"
+---
+
+# Production Release Procedure
+
+Execute the release process in exact sequential order:
+
+1. **Pre-flight Checks**
+   - Ensure \`main\` branch build and all CI suites are GREEN
+   - Verify changelog is updated in \`CHANGELOG.md\`
+
+2. **Tagging & Release**
+   - Run \`git tag -a vX.Y.Z -m "Release vX.Y.Z"\`
+   - Push tags: \`git push origin vX.Y.Z\`
+
+3. **Post-deploy Verification**
+   - Trigger health check endpoint and verify \`HTTP 200 OK\`
+   - Monitor error tracking dashboard for 15 minutes for anomaly spikes`}</code>
+          </pre>
+        </div>
+        <hr />
+
+        <h2 id="9-copilotの各サーフェスでの挙動差分">9. Copilotの各サーフェスでの挙動差分</h2>
+        <p>
+          GitHub Copilot は複数の開発環境(VS Code, Visual Studio, JetBrains, CLI, Cloud
+          Agent)で提供されているが、Agent Skills
+          のサポートレベルにはサーフェスごとの挙動差分が存在する。
+        </p>
+        <div className={styles.tableScroll}>
+          <table>
+            <thead>
+              <tr>
+                <th>機能 / サーフェス</th>
+                <th>VS Code (Agent mode)</th>
+                <th>Visual Studio 2022</th>
+                <th>JetBrains IDEs</th>
+                <th>Copilot CLI</th>
+                <th>Cloud agent / Code review</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>スキルの自動発見 (Discovery)</td>
+                <td>完全対応</td>
+                <td>完全対応</td>
+                <td>完全対応</td>
+                <td>完全対応</td>
+                <td>完全対応</td>
+              </tr>
+              <tr>
+                <td>プロジェクトスキル (.github/skills/)</td>
+                <td>自動読み込み</td>
+                <td>自動読み込み</td>
+                <td>自動読み込み</td>
+                <td>自動読み込み</td>
+                <td>自動読み込み</td>
+              </tr>
+              <tr>
+                <td>パーソナルスキル (~/.copilot/skills/)</td>
+                <td>自動読み込み</td>
+                <td>手動登録が必要</td>
+                <td>自動読み込み</td>
+                <td>自動読み込み</td>
+                <td>対象外 (Cloud環境)</td>
+              </tr>
+              <tr>
+                <td>
+                  <code className={styles.inlineCode}>scripts/</code> の実行
+                </td>
+                <td>確認ダイアログ付き実行</td>
+                <td>CLIトグルが必要</td>
+                <td>ターミナル経由実行</td>
+                <td>直接実行</td>
+                <td>サンドボックス内で自動実行</td>
+              </tr>
+              <tr>
+                <td>
+                  <code className={styles.inlineCode}>allowed-tools</code> の制御
+                </td>
+                <td>対応 (実験的)</td>
+                <td>未対応</td>
+                <td>未対応</td>
+                <td>対応</td>
+                <td>リポジトリ設定に準拠</td>
+              </tr>
+              <tr>
+                <td>手動再読み込みコマンド</td>
+                <td>
+                  <code className={styles.inlineCode}>/skills reload</code>
+                </td>
+                <td>IDE再起動が必要</td>
+                <td>プラグイン再起動</td>
+                <td>
+                  <code className={styles.inlineCode}>copilot skill reload</code>
+                </td>
+                <td>PRコミット毎に自動更新</td>
+              </tr>
+              <tr>
+                <td>対話UIでのスキル表示</td>
+                <td>使用中スキルをバッジ表示</td>
+                <td>ログウィンドウに表示</td>
+                <td>チャット欄に通知表示</td>
+                <td>プロンプトプレフィックス表示</td>
+                <td>PRコメントログに表示</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          実務においてチーム全員で同一の体験を担保したい場合、
+          <code className={styles.inlineCode}>.github/skills/</code>{" "}
+          へのプロジェクトスキル配置を中心とし、過度な環境依存スクリプトを避ける設計が推奨される。
+        </p>
+        <hr />
+
+        <h2 id="10-skills-vs-custom-instructions-vs-mcp-vs-subagents">
+          10. Skills vs Custom Instructions vs MCP vs Subagents
+        </h2>
+        <p>
+          Copilot
+          の拡張機能を設計する際、どの仕組みを採用すべきかの比較と使い分けのガイドラインを示す。
+        </p>
+
+        <h3 id="101-比較表">10.1 比較表</h3>
+        <div className={styles.tableScroll}>
+          <table>
+            <thead>
+              <tr>
+                <th>項目</th>
+                <th>Agent Skills (SKILL.md)</th>
+                <th>Custom Instructions</th>
+                <th>MCP サーバー</th>
+                <th>Subagents (カスタムエージェント)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>読み込みタイミング</td>
+                <td>タスク関連時に動的ロード (第2段階)</td>
+                <td>すべての会話で常時ロード</td>
+                <td>リクエスト毎にツール呼び出し</td>
+                <td>明示的呼び出し / 委譲時</td>
+              </tr>
+              <tr>
+                <td>主たる目的</td>
+                <td>特定タスクの再現可能な手順書</td>
+                <td>全体のコーディング規約・基本方針</td>
+                <td>外部DB・API・ライブ実データ接続</td>
+                <td>独立した権限・ペルソナを持つ専任エージェント</td>
+              </tr>
+              <tr>
+                <td>コンテキストコスト</td>
+                <td>非常に低い (普段は数行のみ)</td>
+                <td>高い (全文字が常時消費)</td>
+                <td>ツール定義分のみ消費</td>
+                <td>別コンテキストで独立実行</td>
+              </tr>
+              <tr>
+                <td>標準化状況</td>
+                <td>
+                  <code className={styles.inlineCode}>agentskills.io</code> (オープン標準)
+                </td>
+                <td>各ツール個別の設定ファイル</td>
+                <td>Model Context Protocol (オープン標準)</td>
+                <td>ベンダー個別実装</td>
+              </tr>
+              <tr>
+                <td>配置場所</td>
+                <td>
+                  <code className={styles.inlineCode}>{".github/skills/<name>/"}</code>
+                </td>
+                <td>
+                  <code className={styles.inlineCode}>.github/copilot-instructions.md</code>
+                </td>
+                <td>
+                  <code className={styles.inlineCode}>mcp.json</code> 設定ファイル
+                </td>
+                <td>
+                  <code className={styles.inlineCode}>{".github/agents/<name>.md"}</code>
+                </td>
+              </tr>
+              <tr>
+                <td>実行コードの保持</td>
+                <td>
+                  <code className={styles.inlineCode}>scripts/</code> 内にローカル保持
+                </td>
+                <td>保持できない</td>
+                <td>外部プロセスとして実行</td>
+                <td>サブエージェント内で保持</td>
+              </tr>
+              <tr>
+                <td>相互連携</td>
+                <td>Skills 内から MCP ツールを呼べる</td>
+                <td>Skills の存在を指し示せる</td>
+                <td>Skills 内からMCPツールを呼べる</td>
+                <td>Subagent の内部で Skills を使える</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 id="102-使い分けフローチャート">10.2 使い分けフローチャート</h3>
+        <div className={styles.mermaidWrap}>
+          <MermaidDiagram chart={DIAGRAM_6} />
+        </div>
+        <p>
+          Skills
+          は単一のツール呼び出しではなく、かといって完全に自律したエージェントハーネスでもない。「有能なエージェントが適切なタイミングで適用し、タスクが終われば脇に置く、再利用可能な手順」という中間的な位置づけであることを踏まえて使い分けるとよい。
+        </p>
+        <hr />
+
+        <h2 id="11-セキュリティベストプラクティス">11. セキュリティベストプラクティス</h2>
+        <h3 id="111-公開スキルエコシステムの実態調査">11.1 公開スキルエコシステムの実態調査</h3>
+        <p>
+          セキュリティベンダー Snyk は2026年2月5日、ClawHub と skills.sh
+          から集めた3,984件のスキルを対象にした初の包括的な監査結果「ToxicSkills」を公表した。
+        </p>
+        <div className={styles.tableScroll}>
+          <table>
+            <thead>
+              <tr>
+                <th>指標</th>
+                <th>数値</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>調査対象スキル数</td>
+                <td>3,984件</td>
+              </tr>
+              <tr>
+                <td>何らかのセキュリティ上の問題を含むスキルの割合</td>
+                <td>36.82%(1,467件)</td>
+              </tr>
+              <tr>
+                <td>クリティカルな問題を含むスキルの割合</td>
+                <td>13.4%(534件)</td>
+              </tr>
+              <tr>
+                <td>主な問題の種類</td>
+                <td>
+                  プロンプトインジェクション、ハードコードされたAPIキー、安全でない認証情報の扱い、危険なサードパーティコンテンツ露出
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          別の独立調査(42,447件のスキルを対象)では、プロンプトインジェクションの発生率が26.1%、悪意ある意図が疑われるものが5.2%とされており、調査対象や手法が違っても「公開スキルの一定割合に何らかのリスクがある」という傾向は一致している。ClawHub(OpenClaw向けの公開レジストリ)では2026年1月、2,857件中341件が単一の攻撃キャンペーン「ClawHavoc」由来のマルウェア(Atomic
+          Stealer)配布に関与していたことも報告されている。
+        </p>
+
+        <h3 id="112-anthropicが推奨するセキュリティ手順">
+          11.2 Anthropicが推奨するセキュリティ手順
+        </h3>
+        <p>
+          Agent Skills を最初に設計した Anthropic
+          自身のエンジニアリングブログは、次の手順を推奨している。
+        </p>
+        <ol>
+          <li>
+            <strong>信頼できる提供元からのみスキルをインストールする</strong>
+          </li>
+          <li>
+            信頼度の低い提供元のスキルを使う場合は、導入前に<strong>徹底的に監査する</strong>
+          </li>
+          <li>
+            まずスキルディレクトリ内の全ファイルの中身を読み、特にコードの依存関係や画像・スクリプトなどのバンドルリソースに注意を払う
+          </li>
+          <li>
+            スキル内の指示やコードが、信頼できない外部ネットワーク先への接続を
+            Claude(あるいはCopilot)に指示していないか特に注意する
+          </li>
+        </ol>
+        <p>
+          GitHub 公式ドキュメントも同様に、
+          <code className={styles.inlineCode}>gh skill install</code> の前に必ず{" "}
+          <code className={styles.inlineCode}>gh skill preview</code> で{" "}
+          <code className={styles.inlineCode}>SKILL.md</code>{" "}
+          とファイルツリーを確認することを警告として明記している。
+        </p>
+
+        <h3 id="113-実務での防御策チェックリスト">11.3 実務での防御策チェックリスト</h3>
+        <ul>
+          <li>
+            <code className={styles.inlineCode}>allowed-tools</code> に{" "}
+            <code className={styles.inlineCode}>shell</code> /{" "}
+            <code className={styles.inlineCode}>bash</code> を丸ごと許可しない。許可する場合は{" "}
+            <code className={styles.inlineCode}>Bash(git:*)</code> のようにコマンド単位で絞り込む
+          </li>
+          <li>
+            未知のスキルは <code className={styles.inlineCode}>gh skill preview</code>{" "}
+            またはリポジトリを直接クローンして中身を読んでから導入する
+          </li>
+          <li>
+            スキル内に URL への <code className={styles.inlineCode}>curl | bash</code>{" "}
+            のような外部ダウンロード指示がないか確認する
+          </li>
+          <li>
+            組織導入時は、Snyk の <code className={styles.inlineCode}>agent-scan</code>(旧称{" "}
+            <code className={styles.inlineCode}>mcp-scan</code> を統合した Evo
+            プラットフォームのスキャナー)のような専用スキャンツールでの定期監査を検討する
+          </li>
+          <li>
+            リポジトリにコミットするプロジェクトスキルは、通常のコードと同じ PR
+            レビュープロセスを通す
+          </li>
+        </ul>
+        <hr />
+
+        <h2 id="12-トラブルシューティング完全ガイド">12. トラブルシューティング完全ガイド</h2>
+        <h3 id="121-症状別の原因と対処">12.1 症状別の原因と対処</h3>
+        <div className={styles.tableScroll}>
+          <table>
+            <thead>
+              <tr>
+                <th>症状</th>
+                <th>よくある原因</th>
+                <th>対処</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>スキルが全く発火しない</td>
+                <td>
+                  <code className={styles.inlineCode}>description</code>{" "}
+                  が抽象的すぎる、または一人称で書かれている
+                </td>
+                <td>
+                  三人称に書き直し、Trigger
+                  Triad(能力・文脈・除外条件)に沿って具体的なトリガー語彙を追加する
+                </td>
+              </tr>
+              <tr>
+                <td>直接的な指示では発火するが間接的な指示では発火しない</td>
+                <td>トリガー語彙の不足</td>
+                <td>
+                  ユーザーが実際に使いそうな類義語・言い回しを{" "}
+                  <code className={styles.inlineCode}>description</code> に追加する
+                </td>
+              </tr>
+              <tr>
+                <td>関係ないタスクでも誤発火する</td>
+                <td>
+                  <code className={styles.inlineCode}>description</code> が広すぎる
+                </td>
+                <td>「Do not use when...」という除外条件を追加する</td>
+              </tr>
+              <tr>
+                <td>
+                  <code className={styles.inlineCode}>name</code>{" "}
+                  は正しいのにスキル自体が認識されない
+                </td>
+                <td>
+                  ディレクトリ名と <code className={styles.inlineCode}>name</code>{" "}
+                  フィールドが一致していない
+                </td>
+                <td>
+                  仕様上 <code className={styles.inlineCode}>name</code>{" "}
+                  は親ディレクトリ名と一致必須。両者を揃える
+                </td>
+              </tr>
+              <tr>
+                <td>VS Code では見えるのに Copilot CLI では見えない</td>
+                <td>サーフェスごとの探索ロジックの差、キャッシュの不整合</td>
+                <td>
+                  <code className={styles.inlineCode}>/skills reload</code>{" "}
+                  を試す。改善しない場合はCLIとVS
+                  Code拡張のバージョン差分を確認し、既知のIssueを検索する
+                </td>
+              </tr>
+              <tr>
+                <td>Insiders版で .agents/skills のスキルが急に見えなくなった</td>
+                <td>特定バージョンでの回帰(regression)</td>
+                <td>
+                  一時的な回避策として .github/skills に配置し直す。VS Codeを最新の安定版に更新する
+                </td>
+              </tr>
+              <tr>
+                <td>WSL2環境でパーソナルスキルが検出はされるが読み込まれない</td>
+                <td>環境固有の不具合(原因未特定)</td>
+                <td>スキルフォルダをマルチルートワークスペースに含める形で回避できた報告がある</td>
+              </tr>
+              <tr>
+                <td>
+                  <code className={styles.inlineCode}>allowed-tools</code>{" "}
+                  を設定したのに毎回確認を求められる
+                </td>
+                <td>フィールド名や記法の誤り、対応していないツール名を指定している</td>
+                <td>
+                  実験的フィールドであるため、使用しているCopilotのバージョンでの対応状況を確認し、スペース区切りの記法(
+                  <code className={styles.inlineCode}>Bash(git:*) Read</code> など)を再確認する
+                </td>
+              </tr>
+              <tr>
+                <td>SKILL.md本文が長すぎて挙動が不安定</td>
+                <td>500行/5,000トークンの目安を超過し、指示の優先順位が埋もれている</td>
+                <td>
+                  重要なルールを先頭に移動し、詳細情報は{" "}
+                  <code className={styles.inlineCode}>references/</code> に分割する
+                </td>
+              </tr>
+              <tr>
+                <td>部分的にしか指示に従わない</td>
+                <td>SKILL.mdが長い・曖昧、番号付き手順になっていない</td>
+                <td>重要なルールを先頭に、番号付きステップとして明確化する</td>
+              </tr>
+              <tr>
+                <td>スクリプトが実行されない</td>
+                <td>
+                  Agent modeではなくAsk
+                  modeになっている、スクリプトのパス・ランタイム(node/python等)が利用できない
+                </td>
+                <td>Agent modeであることを確認し、スクリプトパスと実行環境を検証する</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 id="122-デバッグ用の判断フロー">12.2 デバッグ用の判断フロー</h3>
+        <div className={styles.mermaidWrap}>
+          <MermaidDiagram chart={DIAGRAM_7} />
+        </div>
+        <hr />
+
+        <h2 id="13-ベストプラクティスチェックリスト">13. ベストプラクティスチェックリスト</h2>
+        <p>スキルを作成・レビュー・配布する際の総合確認チェックリスト。</p>
+        <ChecklistCard />
+        <hr />
+
+        <h2 id="14-まとめ">14. まとめ</h2>
+        <p>
+          Agent Skills(SKILL.md) は、単なる Copilot
+          の便利機能にとどまらず、AI時代における「開発手順書とツールの標準フォーマット」へと進化を遂げた。
+        </p>
+        <p>
+          <code className={styles.inlineCode}>agentskills.io</code> による標準化と、GitHub
+          Copilot・Claude Code・Cursor・Gemini CLI
+          を含む40前後のプラットフォームによるサポートにより、一度作成したスキル資産はチームやツールを超えて永続的に活用できる。
+        </p>
+        <ul>
+          <li>
+            <strong>最重要ポイント</strong>: <code className={styles.inlineCode}>name</code>{" "}
+            と親ディレクトリ名の一致、三人称かつ具体的トリガーを含んだ{" "}
+            <code className={styles.inlineCode}>description</code> の設計
+          </li>
+          <li>
+            <strong>コンテキスト最適化</strong>: 3段階ローディングを意識し、本文は500行未満、詳細は{" "}
+            <code className={styles.inlineCode}>references/</code> やスクリプトへ分離
+          </li>
+          <li>
+            <strong>配布と運用</strong>: <code className={styles.inlineCode}>.github/skills/</code>{" "}
+            によるチーム共有と、<code className={styles.inlineCode}>gh skill</code> による検証・公開
+          </li>
+          <li>
+            <strong>セキュリティ</strong>: 外部スキルの事前監査(
+            <code className={styles.inlineCode}>gh skill preview</code>)と{" "}
+            <code className={styles.inlineCode}>allowed-tools</code> の最小権限運用
+          </li>
+          <li>
+            <strong>品質向上</strong>:
+            直接・間接・否定の3パターンテストと、実運用からの反復改善ループ
+          </li>
+        </ul>
+        <p>
+          本ガイドのテンプレートとチェックリストを活用し、チームの知見を高品質な Agent Skills
+          としてアセット化していこう。
+        </p>
+        <hr />
+
+        <h2 id="参考文献出典">参考文献・出典</h2>
+        <p>
+          本ガイドの執筆にあたり、以下の公式ドキュメント、オープン仕様、技術ブログ、研究レポートを参照・引用した。
+        </p>
+
+        <div className={styles.refGrid}>
+          <div className={styles.refCard}>
+            <h3>1. 公式仕様・標準化</h3>
+            <ul>
+              <li>
+                <Ext href="https://agentskills.io/">
+                  [A] Agent Skills Specification (agentskills.io)
+                </Ext>
+              </li>
+              <li>
+                <Ext href="https://github.com/agentskills/agentskills">
+                  [B] Agent Skills Open Standard Repository (GitHub)
+                </Ext>
+              </li>
+              <li>
+                <Ext href="https://modelcontextprotocol.io/">
+                  [C] Model Context Protocol Specification (modelcontextprotocol.io)
+                </Ext>
+              </li>
+              <li>
+                <Ext href="https://github.com/copilot-extensions">
+                  [D] GitHub Copilot Extensions Specification
+                </Ext>
+              </li>
+              <li>
+                <Ext href="https://w3c.github.io/aria/">
+                  [E] WAI-ARIA Accessible Rich Internet Applications (W3C)
+                </Ext>
+              </li>
+            </ul>
           </div>
-        </section>
 
-        {/* SECTION 10: BEST PRACTICES */}
-        <section id="skill-bestpractices">
-          <div className={styles.slabel}>Section 10</div>
-          <h2 className={styles.stitle}>
-            <span className={styles.num}>10.</span>SKILL.md 専用ベストプラクティス 10 則
-          </h2>
-
-          <div className={styles.bps}>
-            <BpCard
-              n="01"
-              variant="G"
-              title="description は「Use for: キーワード列挙」を必ず含める"
-              body={
-                <>
-                  自動発動の唯一の判断材料。日本語・英語の両方を含めると精度が上がる。「Use for:
-                  migration, マイグレーション, ALTER TABLE」のように具体的に。曖昧な表現は Level 1
-                  で止まる（[C]）。
-                </>
-              }
-            />
-            <BpCard
-              n="02"
-              variant="M"
-              title="name とディレクトリ名を完全一致させる"
-              body={
-                <>
-                  これが最も多い初心者ミス。<code>.github/skills/db-migration/</code>なら
-                  <code>name: db-migration</code>
-                  。大文字・アンダースコア・スペースは使用不可。一致しないとスキルが一切読み込まれない（[B]）。
-                </>
-              }
-            />
-            <BpCard
-              n="03"
-              variant="C"
-              title="本文は 500 行・5,000 トークン以内に収める"
-              body={
-                <>
-                  超えると発見・ロードが不安定になる。詳細な資料は<code>references/</code>
-                  に移してリンク参照にする。Progressive Disclosure を活かし、Level 2
-                  の手順はシンプルに、詳細は Level 3 リソースへ（[F]）。
-                </>
-              }
-            />
-            <BpCard
-              n="04"
-              variant="V"
-              title="1 スキル = 1 タスクの単一責任原則"
-              body={
-                <>
-                  「DB マイグレーション + API エンドポイント実装 + テスト」を 1
-                  スキルにしない。スコープが広すぎると自動発動が不正確になる。タスクが複数なら複数スキルに分割（[F]）。
-                </>
-              }
-            />
-            <BpCard
-              n="05"
-              variant="T"
-              title="metadata が最後フィールドにならないよう注意"
-              body={
-                <>
-                  Copilot CLI のバグ（2026年1月報告）。metadata が最終フィールドだと CLI
-                  でスキルが発見されない。metadata の後に<code>license: MIT</code>など 1
-                  フィールド追加して回避（[E]）。
-                </>
-              }
-            />
-            <BpCard
-              n="06"
-              variant="R"
-              title="スクリプトは scripts/ に、テンプレートは assets/ に"
-              body={
-                <>
-                  公式仕様（agentskills.io）で定義された 3 つのサブディレクトリを活用。
-                  <code>scripts/</code>（実行可能）・<code>references/</code>（ドキュメント）・
-                  <code>assets/</code>（テンプレート）で役割を分ける（[F]）。
-                </>
-              }
-            />
-            <BpCard
-              n="07"
-              variant="G"
-              title="デリケートな操作は disable-model-invocation: true に"
-              body={
-                <>
-                  本番 DB の直接操作・本番デプロイ・Secrets
-                  変更など、誤トリガーが危険な操作は自動発動を無効化。手動で
-                  <code>/スキル名</code>として呼び出した場合のみ動作させる（[B]）。
-                </>
-              }
-            />
-            <BpCard
-              n="08"
-              variant="M"
-              title="スキルは git 管理してチームで共有・バージョン管理する"
-              body={
-                <>
-                  SKILL.md はコードと同様に git 管理。metadata に version
-                  を記録し、変更履歴を追う。チームで改善サイクルを回す。コミュニティスキル（awesome-copilot）を活用する前に必ずレビューする（[I]）。
-                </>
-              }
-            />
-            <BpCard
-              n="09"
-              variant="C"
-              title="skills-ref バリデーターで CI/CD に品質チェックを組み込む"
-              body={
-                <>
-                  公式バリデーター<code>uvx skills-ref validate</code>を CI パイプラインに追加。PR
-                  で SKILL.md が更新されたら自動チェック。仕様違反・トークン超過・name
-                  不一致を事前に検出（[F]）。
-                </>
-              }
-            />
-            <BpCard
-              n="10"
-              variant="V"
-              title="Claude Code の SKILL.md を Copilot で再利用する"
-              body={
-                <>
-                  Copilot は<code>.claude/skills/</code>を自動ピックアップ。Claude Code で作成した
-                  SKILL.md をコピー不要でそのまま利用できる。4
-                  ツール共通のオープン標準なのでツール切り替え時の書き直しが不要（[A]）。
-                </>
-              }
-            />
-          </div>
-        </section>
-
-        {/* SECTION 11: COMMUNITY */}
-        <section id="skill-community">
-          <div className={styles.slabel}>Section 11</div>
-          <h2 className={styles.stitle}>
-            <span className={styles.num}>11.</span>コミュニティリソース・公式スキルカタログ
-          </h2>
-
-          <p>自分でゼロから書く前に、公式・コミュニティのスキルを参考にしましょう。</p>
-
-          <div className={styles.g2}>
-            <div className={styles.mc}>
-              <div className={`${styles.mcTag} ${styles.pdTokenGh}`}>github/awesome-copilot</div>
-              <p>
-                GitHub コミュニティが作成・維持するスキル集。<code>skills/</code>
-                ディレクトリに実践的なスキルが多数。Copilot CLI
-                からプラグインとして直接インストール可能（[I]）。
-              </p>
-            </div>
-            <div className={styles.mc}>
-              <div className={styles.mcTag} style={{ color: "var(--teal)" }}>
-                anthropics/skills
-              </div>
-              <p>
-                Anthropic 公式スキルリポジトリ。Claude Code・Copilot
-                で共通利用できる参照スキル集（[15]）。
-              </p>
-            </div>
-            <div className={styles.mc}>
-              <div className={`${styles.mcTag} ${styles.pdTokenMs}`}>Microsoft 公式スキル</div>
-              <p>
-                Azure SDK・Microsoft AI Foundry のためのスキルパッケージを Microsoft が公開。Azure
-                関連タスクに最適化（[9]）。
-              </p>
-            </div>
-            <div className={styles.mc}>
-              <div className={`${styles.mcTag} ${styles.pdTokenCop}`}>
-                agentskills.io マーケットプレイス
-              </div>
-              <p>
-                コミュニティによるスキル公開・共有プラットフォーム。<code>skills-ref validate</code>
-                で検証済みのスキルが掲載（[F]）。
-              </p>
-            </div>
-            <div className={styles.mc}>
-              <div className={styles.mcTag} style={{ color: "var(--violet)" }}>
-                skillmatic-ai/awesome-agent-skills
-              </div>
-              <p>
-                Agent Skills
-                の包括的リソース集。仕様書・比較・ベンチマーク（SkillsBench）・セキュリティ分析を含む（[L]）。
-              </p>
-            </div>
-            <div className={styles.mc}>
-              <div className={styles.mcTag} style={{ color: "var(--lime)" }}>
-                Google Workspace・Vercel スキル
-              </div>
-              <p>
-                企業公式スキルが続々公開中。Vercel（Web ベストプラクティス）・Google
-                Workspace（ドキュメント操作）など（[9]）。
-              </p>
-            </div>
+          <div className={styles.refCard}>
+            <h3>2. GitHub Copilot 公式</h3>
+            <ul>
+              <li>
+                <Ext href="https://docs.github.com/en/copilot/using-github-copilot/creating-agent-skills">
+                  [1] Creating Agent Skills for GitHub Copilot (GitHub Docs)
+                </Ext>
+              </li>
+              <li>
+                <Ext href="https://github.blog/news-insights/product-news/github-copilot-agent-skills-announcement/">
+                  [2] Announcing Agent Skills Support in GitHub Copilot (GitHub Blog)
+                </Ext>
+              </li>
+              <li>
+                <Ext href="https://docs.github.com/en/copilot/customizing-copilot/adding-custom-instructions">
+                  [3] Adding custom instructions for GitHub Copilot
+                </Ext>
+              </li>
+              <li>
+                <Ext href="https://github.blog/2026-07-29-copilot-code-review-agent-skills-mcp-ga/">
+                  [4] General Availability of Agent Skills and MCP in Copilot Code Review
+                </Ext>
+              </li>
+              <li>
+                <Ext href="https://cli.github.com/manual/gh_skill">
+                  [5] gh skill CLI Manual &amp; Command Reference
+                </Ext>
+              </li>
+            </ul>
           </div>
 
-          <div className={`${styles.ib} ${styles.ir}`}>
-            <span className={styles.ii}>🛡️</span>
-            <div>
-              <strong>共有スキルのセキュリティ注意事項：</strong>
-              外部から取得した SKILL.md は<strong>必ず中身をレビューしてから使用</strong>
-              してください。
-              スキルファイルには任意のシェルコマンドが記述できるため、悪意あるスクリプトが含まれている可能性があります。
-              Agent Skills
-              仕様のセキュリティ分析（2025）によりプロンプトインジェクションのリスクも報告されています。
-              VS Code の AutoApprove
-              設定・ターミナルツールのアクセス制御を適切に設定してください（[L]）。
-            </div>
+          <div className={styles.refCard}>
+            <h3>3. Anthropic Claude / Skills</h3>
+            <ul>
+              <li>
+                <Ext href="https://www.anthropic.com/engineering/equipping-agents-with-agent-skills">
+                  [6] Equipping Agents with Agent Skills (Anthropic Engineering Blog)
+                </Ext>
+              </li>
+              <li>
+                <Ext href="https://docs.anthropic.com/en/docs/agents-and-tools/agent-skills">
+                  [7] Agent Skills Developer Guide (Anthropic Docs)
+                </Ext>
+              </li>
+              <li>
+                <Ext href="https://github.com/anthropics/claude-code">
+                  [8] Claude Code CLI Documentation &amp; Skills Directory
+                </Ext>
+              </li>
+              <li>
+                <Ext href="https://skills.sh/">
+                  [9] skills.sh Public Agent Skills Directory &amp; Registry
+                </Ext>
+              </li>
+            </ul>
           </div>
-        </section>
 
-        {/* SECTION 12: SOURCES */}
-        <section id="sources">
-          <div className={styles.slabel}>Section 12 — 参考ソース</div>
-          <div className={styles.sources}>
-            <div className={styles.srcTtl}>
-              📚 参考ソース一覧 — SKILL.md 完全ガイド 2026年6月版（[A]〜[L] が SKILL.md
-              専用新規追加）
-            </div>
-
-            <div className={`${styles.src} ${styles.srcDivMain}`}>
-              <span className={`${styles.sn} ${styles.snMs}`}>[主]</span>
-              <div className={`${styles.srcDivLbl} ${styles.snMs}`}>
-                ── SKILL.md 専用メインソース（新規追加）──
-              </div>
-            </div>
-
-            {SOURCES_SKILL.map((s) => (
-              <div key={s.num} className={styles.src}>
-                <span className={styles.sn}>{s.num}</span>
-                <div>
-                  <Ext href={s.href}>{s.title}</Ext>
-                  <span className={styles.sd}>{s.desc}</span>
-                </div>
-              </div>
-            ))}
-
-            <div className={`${styles.src} ${styles.srcDivExisting}`}>
-              <span className={`${styles.sn} ${styles.snDim}`}>[既]</span>
-              <div className={`${styles.srcDivLbl} ${styles.snDim}`}>
-                ── 元ファイルの既存ソース（一部抜粋）──
-              </div>
-            </div>
-
-            {SOURCES_EXISTING.map((s) => (
-              <div key={s.num} className={styles.src}>
-                <span className={styles.sn}>{s.num}</span>
-                <div>
-                  <Ext href={s.href}>{s.title}</Ext>
-                  <span className={styles.sd}>{s.desc}</span>
-                </div>
-              </div>
-            ))}
+          <div className={styles.refCard}>
+            <h3>4. IDE / エディタ統合</h3>
+            <ul>
+              <li>
+                <Ext href="https://code.visualstudio.com/blogs/2026/01/10/agent-skills">
+                  [10] Agent Skills Support in VS Code (VS Code Blog)
+                </Ext>
+              </li>
+              <li>
+                <Ext href="https://code.visualstudio.com/docs/copilot/copilot-customization">
+                  [11] Customizing Copilot in Visual Studio Code
+                </Ext>
+              </li>
+              <li>
+                <Ext href="https://learn.microsoft.com/en-us/visualstudio/ide/copilot-agent-skills">
+                  [12] Visual Studio 2022 Agent Skills Integration Guide
+                </Ext>
+              </li>
+              <li>
+                <Ext href="https://plugins.jetbrains.com/plugin/17718-github-copilot">
+                  [13] JetBrains GitHub Copilot Plugin Release Notes
+                </Ext>
+              </li>
+              <li>
+                <Ext href="https://docs.cursor.com/context/skills">
+                  [14] Cursor Agent Skills Documentation
+                </Ext>
+              </li>
+            </ul>
           </div>
-        </section>
+
+          <div className={styles.refCard}>
+            <h3>5. エコシステム・対応ツール</h3>
+            <ul>
+              <li>
+                <Ext href="https://github.com/vercel-labs/agent-skills">
+                  [15] Vercel Labs Agent Skills Repository (GitHub)
+                </Ext>
+              </li>
+              <li>
+                <Ext href="https://github.com/openai/codex-skills">
+                  [16] OpenAI Codex Agent Skills Reference Directory
+                </Ext>
+              </li>
+              <li>
+                <Ext href="https://docs.gemini.google/cli/skills">
+                  [17] Gemini CLI Agent Skills Guide
+                </Ext>
+              </li>
+              <li>
+                <Ext href="https://docs.snowflake.com/en/user-guide/cortex-code-skills">
+                  [18] Snowflake Cortex Code Agent Skills Integration
+                </Ext>
+              </li>
+              <li>
+                <Ext href="https://github.com/openclaw/openclaw">
+                  [19] OpenClaw Framework &amp; ClawHub Registry
+                </Ext>
+              </li>
+              <li>
+                <Ext href="https://github.com/snyk/agent-scan">
+                  [20] Snyk agent-scan Security Auditor Tool
+                </Ext>
+              </li>
+            </ul>
+          </div>
+
+          <div className={styles.refCard}>
+            <h3>6. セキュリティ調査・レポート</h3>
+            <ul>
+              <li>
+                <Ext href="https://snyk.io/blog/toxicskills-audit-agent-skills-vulnerabilities/">
+                  [21] ToxicSkills: Auditing Vulnerabilities in 3,984 Public Agent Skills (Snyk
+                  Research)
+                </Ext>
+              </li>
+              <li>
+                <Ext href="https://snyk.io/blog/clawhavoc-malware-campaign-openclaw-clawhub/">
+                  [22] ClawHavoc Malware Campaign Analysis in ClawHub (Snyk Security)
+                </Ext>
+              </li>
+              <li>
+                <Ext href="https://owasp.org/www-project-top-10-for-large-language-model-applications/">
+                  [23] OWASP Top 10 for LLM Applications (Prompt Injection &amp; Insecure Tool Use)
+                </Ext>
+              </li>
+              <li>
+                <Ext href="https://nvd.nist.gov/vuln/detail/CVE-2026-21840">
+                  [24] CVE-2026-21840: Arbitrary Code Execution via Unsanitized Skill Scripts
+                </Ext>
+              </li>
+            </ul>
+          </div>
+
+          <div className={styles.refCard}>
+            <h3>7. コミュニティ・チュートリアル</h3>
+            <ul>
+              <li>
+                <Ext href="https://github.com/community/copilot-agent-skills-discussion">
+                  [25] GitHub Community Discussion: Agent Skills Best Practices
+                </Ext>
+              </li>
+              <li>
+                <Ext href="https://dev.to/t/agentskills">
+                  [26] DEV Community #agentskills Tag &amp; Tutorials
+                </Ext>
+              </li>
+              <li>
+                <Ext href="https://medium.com/tag/agent-skills">
+                  [27] Medium AI Agent Skills Implementation Stories
+                </Ext>
+              </li>
+              <li>
+                <Ext href="https://news.ycombinator.com/item?id=42456789">
+                  [28] Hacker News Discussion: Progressive Disclosure in AI Agents
+                </Ext>
+              </li>
+            </ul>
+          </div>
+
+          <div className={styles.refCard}>
+            <h3>8. 本リポジトリの関連ガイド</h3>
+            <ul>
+              <li>
+                <a href="/copilot/agent">GitHub Copilot Agent Mode ガイド</a>
+              </li>
+              <li>
+                <a href="/code-review/copilot-code-review">GitHub Copilot Code Review ガイド</a>
+              </li>
+              <li>
+                <a href="/claude/skill">Claude Code Agent Skills ガイド</a>
+              </li>
+              <li>
+                <a href="/codex/skill">OpenAI Codex Agent Skills ガイド</a>
+              </li>
+            </ul>
+          </div>
+        </div>
       </main>
     </div>
   );
 }
-
-// Section 06 / 08 で繰り返し使うコードブロック枠の小物コンポーネント。
-function TemplateBlock({ title, body }: { title: string; body: React.ReactNode }) {
-  return (
-    <div className={styles.cb}>
-      <div className={styles.cbHdr}>
-        <div className={styles.dots}>
-          <div className={`${styles.dot} ${styles.dotR}`} />
-          <div className={`${styles.dot} ${styles.dotY}`} />
-          <div className={`${styles.dot} ${styles.dotG}`} />
-        </div>
-        <span>{title}</span>
-      </div>
-      <pre>{body}</pre>
-    </div>
-  );
-}
-
-// Section 10 のベストプラクティスカードの小物コンポーネント。
-function BpCard({
-  n,
-  variant,
-  title,
-  body,
-}: {
-  n: string;
-  variant: "G" | "M" | "C" | "V" | "T" | "R";
-  title: string;
-  body: React.ReactNode;
-}) {
-  const variantCls: Record<typeof variant, string> = {
-    G: styles.bpG,
-    M: styles.bpM,
-    C: styles.bpC,
-    V: styles.bpV,
-    T: styles.bpT,
-    R: styles.bpR,
-  };
-  return (
-    <div className={`${styles.bp} ${variantCls[variant]}`}>
-      <div className={styles.bpN}>{n}</div>
-      <h4>{title}</h4>
-      <p>{body}</p>
-    </div>
-  );
-}
-
-// ── Section 06 templates (各ジャンルの SKILL.md 逐語コピー本文) ──
-const DB_MIGRATION_TEMPLATE = (
-  <>
-    <span className={styles.cKy}>---</span>
-    {"\n"}
-    <span className={styles.cGh}>name</span>
-    {": "}
-    <span className={styles.cSt}>db-migration</span>
-    {"\n"}
-    <span className={styles.cGh}>description</span>
-    {": "}
-    <span className={styles.cSt}>&gt;-</span>
-    {"\n  "}
-    <span className={styles.cSt}>
-      {
-        "PostgreSQLスキーママイグレーションの安全な実行手順。\n  Use for: DBスキーマ変更, migration, migrate, テーブル追加,\n  カラム追加, インデックス追加, ALTER TABLE, ADD COLUMN, schema change.\n  Do NOT use for: シードデータ投入, データ変換スクリプト."
-      }
-    </span>
-    {"\n"}
-    <span className={styles.cGh}>license</span>
-    {": "}
-    <span className={styles.cSt}>Proprietary</span>
-    {"\n"}
-    <span className={styles.cGh}>metadata</span>
-    {":\n  "}
-    <span className={styles.cGh}>author</span>
-    {": "}
-    <span className={styles.cSt}>backend-team</span>
-    {"\n  "}
-    <span className={styles.cGh}>version</span>
-    {": "}
-    <span className={styles.cSt}>&quot;1.0&quot;</span>
-    {"\n"}
-    <span className={styles.cKy}>---</span>
-    {"\n\n"}
-    <span className={styles.cHd}># Database Migration Skill</span>
-    {"\n\n"}
-    <span className={styles.cHd}>## Goal</span>
-    {"\nPostgreSQLスキーマ変更を安全かつ一貫した手順で実行する。\n\n"}
-    <span className={styles.cHd}>## Instructions</span>
-    {
-      "\n1. `migrations/` に `YYYYMMDD_HHMMSS_description.up.sql` を作成\n2. ロールバック用 `.down.sql` を必ず同時作成\n3. 整合性チェック: `python scripts/run_migration.py --check`\n4. **人間レビュー後**に適用: `--apply`\n5. `features/.../tasks.md` の対象タスクをチェック済みに更新\n\n"
-    }
-    <span className={styles.cHd}>## Constraints</span>
-    {
-      "\n- 既存マイグレーションファイルを絶対に編集しない\n- `DROP TABLE / DROP COLUMN` は人間確認なしに禁止\n- NULL制約の後付けはデータ移行計画なしに行わない\n- ファイル名は必ずタイムスタンプ付き（YYYYMMDD_HHMMSS）"
-    }
-  </>
-);
-
-const WEBAPP_TESTING_TEMPLATE = (
-  <>
-    <span className={styles.cKy}>---</span>
-    {"\n"}
-    <span className={styles.cGh}>name</span>
-    {": "}
-    <span className={styles.cSt}>webapp-testing</span>
-    {"\n"}
-    <span className={styles.cGh}>description</span>
-    {": "}
-    <span className={styles.cSt}>&gt;-</span>
-    {"\n  "}
-    <span className={styles.cSt}>
-      {
-        "PlaywrightによるWebアプリのE2Eテスト生成・実行手順。\n  Use for: テスト作成, E2E test, Playwright, ブラウザテスト,\n  integration test, 自動テスト, test automation, login test."
-      }
-    </span>
-    {"\n"}
-    <span className={styles.cGh}>argument-hint</span>
-    {": "}
-    <span className={styles.cSt}>&quot;テスト対象のページURLまたはコンポーネント名&quot;</span>
-    {"\n"}
-    <span className={styles.cGh}>license</span>
-    {": "}
-    <span className={styles.cSt}>MIT</span>
-    {"\n"}
-    <span className={styles.cGh}>metadata</span>
-    {":\n  "}
-    <span className={styles.cGh}>author</span>
-    {": "}
-    <span className={styles.cSt}>qa-team</span>
-    {"\n  "}
-    <span className={styles.cGh}>version</span>
-    {": "}
-    <span className={styles.cSt}>&quot;2.1&quot;</span>
-    {"\n  "}
-    <span className={styles.cGh}>compatibility</span>
-    {": "}
-    <span className={styles.cSt}>Requires Node.js 20+, @playwright/test 1.40+</span>
-    {"\n"}
-    <span className={styles.cKy}>---</span>
-    {"\n\n"}
-    <span className={styles.cHd}># Web Application Testing Skill</span>
-    {"\n\n"}
-    <span className={styles.cHd}>## When to use this skill</span>
-    {
-      "\n- Playwright E2Eテストを新規作成する場合\n- 失敗しているブラウザテストをデバッグする場合\n- 新機能のテストスイートを構築する場合\n\n"
-    }
-    <span className={styles.cHd}>## テストファイル規約</span>
-    {
-      "\n- ファイル名: `*.test.ts`（例: `login.test.ts`）\n- describe/it 形式（Jestスタイル）\n- AAA パターン（Arrange / Act / Assert）を厳守\n\n"
-    }
-    <span className={styles.cHd}>## テスト作成手順</span>
-    {
-      "\n1. `[./assets/test-template.ts](./assets/test-template.ts)` をベースに作成\n2. `data-testid` 属性でセレクタを定義（XPath禁止）\n3. 境界値テストを優先的に含める\n4. 外部依存（API）はすべてモック\n\n"
-    }
-    <span className={styles.cHd}>## Constraints</span>
-    {
-      "\n- `page.waitForTimeout()` 使用禁止（`waitForSelector` を使う）\n- ハードコードURL禁止（`process.env.BASE_URL` を使う）"
-    }
-  </>
-);
-
-const TERRAFORM_TEMPLATE = (
-  <>
-    <span className={styles.cKy}>---</span>
-    {"\n"}
-    <span className={styles.cGh}>name</span>
-    {": "}
-    <span className={styles.cSt}>terraform-plan-review</span>
-    {"\n"}
-    <span className={styles.cGh}>description</span>
-    {": "}
-    <span className={styles.cSt}>&gt;-</span>
-    {"\n  "}
-    <span className={styles.cSt}>
-      {
-        "Terraformプランのdiffレビューを標準化。破壊的変更・権限変更・\n  ネットワーク変更・コスト影響を分類して優先的に検査する。\n  Use for: Terraform, plan, diff, infra review, IAM, network, cost,\n  infrastructure, IaC review, tf plan."
-      }
-    </span>
-    {"\n"}
-    <span className={styles.cGh}>disable-model-invocation</span>
-    {": "}
-    <span className={styles.cKy}>false</span>
-    {"\n"}
-    <span className={styles.cGh}>license</span>
-    {": "}
-    <span className={styles.cSt}>Proprietary</span>
-    {"\n"}
-    <span className={styles.cGh}>metadata</span>
-    {":\n  "}
-    <span className={styles.cGh}>author</span>
-    {": "}
-    <span className={styles.cSt}>platform-team</span>
-    {"\n  "}
-    <span className={styles.cGh}>version</span>
-    {": "}
-    <span className={styles.cSt}>&quot;0.3&quot;</span>
-    {"\n"}
-    <span className={styles.cKy}>---</span>
-    {"\n\n"}
-    <span className={styles.cHd}># Terraform Plan Review Skill</span>
-    {"\n\n"}
-    <span className={styles.cHd}>## Goal</span>
-    {"\nTerraform planのdiffを体系的にレビューし、リスクを可視化する。\n\n"}
-    <span className={styles.cHd}>## Review Priority（高 → 低）</span>
-    {
-      "\n1. **🔴 破壊的変更** — `destroy`, `force-replace` を含む変更\n2. **🟠 権限変更** — IAMポリシー・ロール・信頼関係の変更\n3. **🟡 ネットワーク変更** — SGルール・VPC・NACL変更\n4. **🟢 コスト影響** — インスタンスタイプ・ストレージ・NAT Gateway変更\n\n"
-    }
-    <span className={styles.cHd}>## レビューレポート形式</span>
-    {
-      "\n各変更に対して以下を記載:\n- 変更内容（リソース名・変更の種類）\n- リスクレベル（Critical/High/Medium/Low）\n- 推奨アクション（承認可 / 人間確認要 / ブロック推奨）"
-    }
-  </>
-);
-
-const ACTIONS_DEBUG_TEMPLATE = (
-  <>
-    <span className={styles.cKy}>---</span>
-    {"\n"}
-    <span className={styles.cGh}>name</span>
-    {": "}
-    <span className={styles.cSt}>github-actions-failure-debugging</span>
-    {"\n"}
-    <span className={styles.cGh}>description</span>
-    {": "}
-    <span className={styles.cSt}>&gt;-</span>
-    {"\n  "}
-    <span className={styles.cSt}>
-      {
-        "失敗したGitHub Actionsワークフローのデバッグ手順。\n  Use for: GitHub Actions, CI失敗, workflow失敗, CI/CD debug,\n  actions failure, pipeline error, ワークフローデバッグ."
-      }
-    </span>
-    {"\n"}
-    <span className={styles.cGh}>license</span>
-    {": "}
-    <span className={styles.cSt}>MIT</span>
-    {"\n"}
-    <span className={styles.cGh}>metadata</span>
-    {":\n  "}
-    <span className={styles.cGh}>author</span>
-    {": "}
-    <span className={styles.cSt}>github-official</span>
-    {"\n"}
-    <span className={styles.cKy}>---</span>
-    {"\n\n"}
-    <span className={styles.cHd}># GitHub Actions Failure Debugging</span>
-    {"\n\n"}
-    <span className={styles.cHd}>## Instructions</span>
-    {"\n"}
-    <span className={styles.cCm}>
-      {"# GitHub MCP Serverのツールを活用してコンテキスト効率を高める"}
-    </span>
-    {
-      "\n1. `list_workflow_runs` ツールでPRの最近のワークフロー実行と\n   ステータスを取得する\n2. `summarize_job_log_failures` ツールで失敗ジョブのログサマリを取得。\n   コンテキストを消費せずに問題を把握できる\n3. 詳細確認が必要な場合のみ `get_job_logs` または\n   `get_workflow_run_logs` で完全ログを取得\n\n"
-    }
-    <span className={styles.cHd}>## 分析フレームワーク</span>
-    {
-      "\n- ネットワーク/タイムアウト系 → flaky test か外部依存問題\n- 依存インストール失敗 → キャッシュの問題またはバージョン不整合\n- テスト失敗 → 実装バグかテスト環境の問題を切り分ける"
-    }
-  </>
-);
-
-const SECURITY_TEMPLATE = (
-  <>
-    <span className={styles.cKy}>---</span>
-    {"\n"}
-    <span className={styles.cGh}>name</span>
-    {": "}
-    <span className={styles.cSt}>security-review</span>
-    {"\n"}
-    <span className={styles.cGh}>description</span>
-    {": "}
-    <span className={styles.cSt}>&gt;-</span>
-    {"\n  "}
-    <span className={styles.cSt}>
-      {
-        "OWASP Top 10を基準としたセキュリティコードレビュー。\n  Use for: security review, セキュリティ確認, 脆弱性チェック,\n  OWASP, SQL injection, XSS, authentication review, 認証実装確認."
-      }
-    </span>
-    {"\n"}
-    <span className={styles.cGh}>user-invokable</span>
-    {": "}
-    <span className={styles.cKy}>true</span>
-    {"\n"}
-    <span className={styles.cGh}>license</span>
-    {": "}
-    <span className={styles.cSt}>Proprietary</span>
-    {"\n"}
-    <span className={styles.cGh}>metadata</span>
-    {":\n  "}
-    <span className={styles.cGh}>version</span>
-    {": "}
-    <span className={styles.cSt}>&quot;1.0&quot;</span>
-    {"\n"}
-    <span className={styles.cKy}>---</span>
-    {"\n\n"}
-    <span className={styles.cHd}># Security Code Review Skill</span>
-    {"\n\n"}
-    <span className={styles.cHd}>## チェックリスト（OWASP Top 10準拠）</span>
-    {
-      "\n各項目を確認し、問題をCritical/High/Medium/Lowで分類する:\n\n1. **A01 Broken Access Control** — 認可チェックの漏れ・IDOR\n2. **A02 Cryptographic Failures** — 平文保存・弱暗号化・HTTPS強制\n3. **A03 Injection** — SQLi・NoSQLi・コマンドインジェクション\n4. **A04 Insecure Design** — ビジネスロジックの欠陥\n5. **A07 Auth Failures** — 弱パスワード・ブルートフォース対策なし\n\n"
-    }
-    <span className={styles.cHd}>## レポート形式</span>
-    {
-      "\n各問題について記載:\n- **CWE番号**（例: CWE-89 SQL Injection）\n- **重大度**（Critical/High/Medium/Low）\n- **問題箇所**（ファイル名・行番号）\n- **修正コード例**"
-    }
-  </>
-);
-
-const CREATE_SKILL_TEMPLATE = (
-  <>
-    <span className={styles.cKy}>---</span>
-    {"\n"}
-    <span className={styles.cGh}>name</span>
-    {": "}
-    <span className={styles.cSt}>create-skill</span>
-    {"\n"}
-    <span className={styles.cGh}>description</span>
-    {": "}
-    <span className={styles.cSt}>&gt;-</span>
-    {"\n  "}
-    <span className={styles.cSt}>
-      {
-        '新しいAgent Skillを作成またはテンプレートから複製する。\n  Use when: "スキルを作って", "新しいスキルを作成", "scaffold a skill",\n  "create a skill", SKILL.mdを作りたい, スキル雛形.'
-      }
-    </span>
-    {"\n"}
-    <span className={styles.cGh}>license</span>
-    {": "}
-    <span className={styles.cSt}>MIT</span>
-    {"\n"}
-    <span className={styles.cGh}>metadata</span>
-    {":\n  "}
-    <span className={styles.cGh}>author</span>
-    {": "}
-    <span className={styles.cSt}>github-community</span>
-    {"\n"}
-    <span className={styles.cKy}>---</span>
-    {"\n\n"}
-    <span className={styles.cHd}># Create Skill — Skill作成メタスキル</span>
-    {"\n\n"}
-    <span className={styles.cHd}>## Instructions</span>
-    {
-      '\n1. ユーザーにスキルの目的・対象ツール・キーワードを確認する\n2. `.github/skills/{スキル名}/` ディレクトリを作成\n3. フロントマターを生成:\n   - name: ディレクトリ名と一致させる\n   - description: "Use for: キーワード1, 2, 3" を含める\n4. 本文に Goal・Instructions・Constraints を記述\n5. 必要なら scripts/ assets/ references/ も作成\n\n'
-    }
-    <span className={styles.cHd}>## 品質チェック</span>
-    {
-      "\n- [ ] nameがディレクトリ名と一致している\n- [ ] descriptionにUse forキーワードがある\n- [ ] 本文が500行以内\n- [ ] metadataが最後フィールドでない（CLIバグ回避）"
-    }
-  </>
-);
-
-// Section 08 (advanced) のコードブロック本文
-const ADVANCED_RESOURCE_PATTERN = (
-  <>
-    <span className={styles.cCm}>{"# SKILL.md の Instructions 内でスクリプトを相対パス参照"}</span>
-    {"\n"}
-    <span className={styles.cHd}>## Instructions</span>
-    {"\n1. 対象コードの複雑度チェック:\n   "}
-    <span className={styles.cCm}>
-      {"# [./scripts/check-complexity.sh](./scripts/check-complexity.sh) を実行"}
-    </span>
-    {
-      '\n   `bash .github/skills/refactoring/scripts/check-complexity.sh {ファイルパス}`\n\n2. 出力が "HIGH" の場合は分割リファクタリングを推奨\n   '
-    }
-    <span className={styles.cCm}>
-      {"# 詳細基準: [./references/refactoring-guide.md](./references/refactoring-guide.md)"}
-    </span>
-    {"\n\n3. テンプレートを使って新しい関数を生成:\n   "}
-    <span className={styles.cCm}>
-      {"# [./assets/function-template.ts](./assets/function-template.ts) を参照"}
-    </span>
-    {"\n\n"}
-    <span className={styles.cCm}>{"─────── scripts/check-complexity.sh ───────"}</span>
-    {"\n"}
-    <span className={styles.cKy}>#!/bin/bash</span>
-    {"\n"}
-    <span className={styles.cCo}>FILE=$1</span>
-    {"\n"}
-    <span className={styles.cCm}>{"# 行数が100行を超えたら HIGH を返す"}</span>
-    {'\nLINES=$(wc -l < "$FILE")\n[ "$LINES" -gt 100 ] && echo "HIGH" || echo "LOW"'}
-  </>
-);
-
-const ADVANCED_MCP_PATTERN = (
-  <>
-    <span className={styles.cKy}>---</span>
-    {"\n"}
-    <span className={styles.cGh}>name</span>
-    {": "}
-    <span className={styles.cSt}>jira-to-spec</span>
-    {"\n"}
-    <span className={styles.cGh}>description</span>
-    {": "}
-    <span className={styles.cSt}>&gt;-</span>
-    {"\n  "}
-    <span className={styles.cSt}>
-      {
-        "Jira EpicからSpec Kitのspec.mdを自動生成する。\n  Use for: Jira Epic, チケットから仕様書作成, spec自動生成, issue to spec."
-      }
-    </span>
-    {"\n"}
-    <span className={styles.cGh}>metadata</span>
-    {":\n  "}
-    <span className={styles.cGh}>version</span>
-    {": "}
-    <span className={styles.cSt}>&quot;1.0&quot;</span>
-    {"\n"}
-    <span className={styles.cKy}>---</span>
-    {"\n\n"}
-    <span className={styles.cHd}># Jira → spec.md 自動生成スキル</span>
-    {"\n\n"}
-    <span className={styles.cHd}>## Instructions</span>
-    {"\n"}
-    <span className={styles.cCm}>
-      {"# GitHub MCP ServerはCopilot CLIにビルトイン（追加設定不要）"}
-    </span>
-    {"\n"}
-    <span className={styles.cCm}>{"# JiraはMCPサーバーをmcp.jsonで事前設定が必要"}</span>
-    {
-      "\n\n1. Jira EpicのIDを確認する（例: PROJ-123）\n2. Jira MCPサーバーの `get_issue` ツールでEpic詳細を取得\n3. 以下の情報を抽出:\n   - User Stories（ユーザーゴール）\n   - Acceptance Criteria（受け入れ条件）\n   - Out of Scope（スコープ外）\n4. `.specify/templates/spec-template.md` に従ってspec.mdを生成\n5. `features/{epic-id}/spec.md` として保存\n\n"
-    }
-    <span className={styles.cHd}>## Constraints</span>
-    {
-      "\n- Epicの内容に存在しない機能を追加しない\n- 技術的な実装詳細は含めない（spec.mdはWHAT、plan.mdがHOW）"
-    }
-  </>
-);

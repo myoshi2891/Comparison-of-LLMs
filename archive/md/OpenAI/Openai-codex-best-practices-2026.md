@@ -210,6 +210,8 @@ flowchart TD
 | プロジェクト設定 | `.codex/config.toml` | **信頼済みプロジェクト**でのみ自動的に読み込まれるリポジトリ設定 |
 | プロファイル設定 | アクティブプロファイル指定 | 設定プロファイルによる一括構成 |
 | ユーザー設定 | `~/.codex/config.toml` | 個人の既定値(モデル・推論レベル・スレッド制限等) |
+| スレッド上限キー(V1) | `~/.codex/config.toml` または信頼済みプロジェクトの `.codex/config.toml` 内の `[agents]` | `max_concurrent_threads_per_session` で、親スレッドを除くサブエージェント同時実行上限を設定。`max_threads` は別名。`max_depth` はV1の実行時深さ制限 |
+| スレッド上限キー(MultiAgentV2) | `~/.codex/config.toml` または信頼済みプロジェクトの `.codex/config.toml` 内の `[features.multi_agent_v2]` | `enabled = true` と `max_concurrent_threads_per_session` を設定。上限は主スレッドを含むため、サブエージェント実効上限は設定値−1。MultiAgentV2有効時の `agents.max_threads` は設定エラー |
 | システム設定 | `/etc/codex/config.toml` 等 | OS/システムレベルの標準設定 |
 | 組み込み既定値 | Codex内蔵デフォルト | 設定未指定時の既定動作 |
 
@@ -242,7 +244,6 @@ flowchart TD
 | 制約ファイル | 役割・適用規則 |
 |---|---|
 | `requirements.toml` | **最高優先度の不可逆な管理者制約**。ユーザー設定やCLI引数の如何に関わらず、セキュリティ方針や制限を強制適用します。 |
-| スレッド上限キー | `agents.max_concurrent_threads_per_session` が現行キー。`agents.max_threads` はレガシー別名。※`agents.max_depth` はV1でのみ有効 |
 
 公式のおすすめパターンは、**通常の設定解決においては `~/.codex/config.toml` を個人の既定値とし、信頼済みリポジトリ固有の挙動は `.codex/config.toml` で定義しつつ、一時的な変更のみ CLI 引数で行う**という役割分担です。組織レベルで統一・強制する設定については `managed_config.toml` や `requirements.toml` で管理します。
 
@@ -286,12 +287,23 @@ model_reasoning_effort = "medium"
 plan_mode_reasoning_effort = "high"
 
 [agents]
-# 並行スレッド数の現行キー(agents.max_threads はレガシー別名。agents.max_depth はV1のみ有効でV2では無視)
+# V1: 親スレッドを除くサブエージェント同時実行上限(agents.max_threads は別名)
 max_concurrent_threads_per_session = 4
 default_subagent_model = "gpt-5.6-terra"
 
 [features]
 goals = true
+```
+
+MultiAgentV2を有効にする場合は、V1の上限キーと混在させず、V2専用キーを使用します。
+
+```toml
+[features]
+goals = true
+
+[features.multi_agent_v2]
+# V2: 主スレッドを含むため、4ならサブエージェントは最大3
+max_concurrent_threads_per_session = 4
 ```
 
 ```toml
@@ -327,7 +339,7 @@ Codex Appでは差分パネルで変更をその場でレビューでき、行�
 - プロンプトに情報を貼り付け続けるのではなく、Codexにツールを使わせたい
 - 複数ユーザー・複数プロジェクトで再利用できる連携にしたい
 
-MCPサーバーの直接設定はサブエージェント設定ファイル内の `[mcp_servers.<name>]` ブロックで行います。`agents/openai.yaml` はSkillやツールの依存関係宣言に限定して使用し、一般的なMCPサーバーの設定場所として使用しない点に注意してください。
+MCPサーバーの直接設定は、`~/.codex/config.toml` または信頼済みプロジェクトの `.codex/config.toml` にある `[mcp_servers.<server-name>]` ブロックで行います。`agents/openai.yaml` はSkillのUIメタデータ・呼び出しポリシー・`dependencies.tools` によるツール依存関係の宣言に使用し、一般的なMCPサーバーの接続設定場所としては使用しません。
 
 CodexはSTDIOサーバーとOAuth対応のStreamable HTTPサーバーの両方をサポートしています。Codex Appでは「Settings → MCP servers」から候補のサーバーを見つけて接続でき、CLIでは `codex mcp add` で名前・URLなどを指定して追加できます。
 
@@ -388,7 +400,7 @@ flowchart TD
     Task -- バランス・速度重視 --> M2["gpt-5.6-terra<br/>(高速・標準作業)"]
 ```
 
-また、セッションあたりの並行スレッド上限は現行キー `agents.max_concurrent_threads_per_session` を使用します（`agents.max_threads` はレガシー別名として維持。なお `agents.max_depth` はV1でのみ有効でV2では無視されます）。
+セッションあたりの並行スレッド上限は、V1とMultiAgentV2で設定を分けます。V1では `agents.max_concurrent_threads_per_session`（`agents.max_threads` は別名）で、親スレッドを除くサブエージェント同時実行上限を設定します。MultiAgentV2では `features.multi_agent_v2.max_concurrent_threads_per_session` で主スレッドを含む上限を設定するため、サブエージェント実効上限は設定値−1です。MultiAgentV2有効時に `agents.max_threads` を使用すると設定エラーになります。`agents.max_depth` はV1では実行時の深さ制限として使用され、MultiAgentV2では実行時制限に使用せず、lineageとtask-pathの深さ計算にのみ使用されます（[Codex PR #20180](https://github.com/openai/codex/pull/20180)）。
 
 ```mermaid
 flowchart TD
@@ -521,9 +533,9 @@ Codexは「毎回ゼロから指示する一回限りのアシスタント」で
 - [ ] 複雑・曖昧なタスクでは `/plan` や `/goal` を使って計画・完了条件を先に固めているか
 - [ ] チームの規約・検証手順をAGENTS.mdに書き、プロンプトで毎回繰り返していないか
 - [ ] `~/.codex/config.toml` と `.codex/config.toml` で個人設定とプロジェクト設定を役割分担しているか
-- [ ] スレッド並行上限設定で現行キー `agents.max_concurrent_threads_per_session`（レガシー別名 `agents.max_threads`）を使用し、`agents.max_depth`（V1限定・V2無視）を考慮しているか
+- [ ] V1とMultiAgentV2で設定キーと上限の数え方を分離し、V1では `agents.max_concurrent_threads_per_session`（`agents.max_threads` は別名）で親スレッドを除外し、MultiAgentV2では `features.multi_agent_v2.max_concurrent_threads_per_session` で主スレッドを含めてサブエージェント実効上限を設定値−1としているか。また、MultiAgentV2有効時の `agents.max_threads` が設定エラーになることを確認したか
 - [ ] サブエージェントのデフォルトモデル設定を各 `config.toml` の `agents.default_subagent_model` で確認・指定し、`gpt-5.6` または `gpt-5.6-terra` を設定しているか
-- [ ] MCPの依存関係を `agents/openai.yaml` に宣言しているか
+- [ ] Skillが利用するMCPツールを `agents/openai.yaml` の `dependencies.tools` に具体的な依存関係として宣言しているか
 - [ ] サンドボックス・承認ポリシーを用途(初回調査/通常開発/CI)に応じて使い分けているか
 - [ ] テスト・Lint・差分レビューをワークフローに組み込み、`/review` やAGENTS.md経由のレビュー観点を活用しているか
 - [ ] リポジトリ外のコンテキストが必要な場面でMCPを検討しているか(ただし繋ぎすぎに注意)

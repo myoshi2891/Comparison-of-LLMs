@@ -85,12 +85,13 @@ const entries: PageEntry[] = [
   },
   {
     slug: "/agent/hermes-agent-advanced-guide",
-    title: "Advanced Guide",
+    title: "Hermes Agent ベストプラクティスガイド ― 中級者から上級者向け",
     group: "Agent 開発",
     topics: ["agent", "guide"],
-    summary: "内部アーキテクチャ / 7層セキュリティ / 本番デプロイメントベストプラクティス",
+    summary:
+      "Nous Research製自己改善型AIエージェント「Hermes Agent」のアーキテクチャ・メモリ設計・スキル運用・サブエージェント委任・/goal・execute_code・Cron・MCP統合・8層セキュリティ・コスト最適化までを網羅した実践ガイド。",
     addedAt: "2026-06-04",
-    lastReviewed: "2026-07-01",
+    lastReviewed: "2026-08-10",
   },
   {
     slug: "/agent/loop-engineering",
@@ -339,15 +340,15 @@ const entries: PageEntry[] = [
   },
   {
     slug: "/codex/harness-engineering",
-    title: "Harness Engineering",
+    title: "OpenAI Codexにおけるハーネスエンジニアリング実践ガイド",
     group: "Providers",
     category: "Codex",
     provider: "codex",
     topics: ["harness"],
     summary:
-      "OpenAI Codex のハーネスエンジニアリング完全ガイド。エージェント実行環境の設計と運用。",
+      "OpenAI Codexにおける評価基盤の7層モデルと非対話型CI/CD品質ゲート(codex exec)の実装ガイド。",
     addedAt: "2026-05-29",
-    lastReviewed: "2026-07-01",
+    lastReviewed: "2026-08-10",
   },
   {
     slug: "/codex/openai-codex-guide",
@@ -419,7 +420,7 @@ const entries: PageEntry[] = [
     summary:
       "GitHub Copilot Coding Agent / VS Code Agent Mode / Copilot CLI 対応の SKILL.md ガイド。フロントマター完全仕様・Progressive Disclosure 3段階ローディング・ステップバイステップ作成・実践テンプレート集・トラブルシューティングを 2026年6月最新版の公式ドキュメント根拠付きで徹底解説。Copilot code review は AGENTS.md 対応（2026-06-18）、Cloud agent は GA。",
     addedAt: "2026-04-18",
-    lastReviewed: "2026-07-01",
+    lastReviewed: "2026-08-09",
   },
   {
     slug: "/cursor/complete-guide",
@@ -569,15 +570,15 @@ const entries: PageEntry[] = [
   },
   {
     slug: "/google/sandbox-best-practices",
-    title: "Google Sandbox",
+    title: "Google サンドボックス技術 完全ガイド",
     group: "Providers",
     category: "Google",
     provider: "google",
     topics: ["sandbox"],
     summary:
-      "AIエージェント・API・コンテナ・C/C++・ブラウザ、それぞれの領域で Google が推奨する安全なサンドボックス技術（実行の箱）を、初学者でも理解できるよう図解とステップで解説します。",
+      "AIエージェント・API・コンテナ・C/C++・ブラウザ、5領域のサンドボックス技術のベストプラクティスをステップバイステップで解説する完全ガイド。",
     addedAt: "2026-06-12",
-    lastReviewed: "2026-07-01",
+    lastReviewed: "2026-08-09",
   },
   {
     slug: "/google/skill",

@@ -2,7 +2,17 @@
   # Next.js App Router (web-next/) を静的エクスポートとして配信する。
   # base を web-next に設定し、publish は base 相対で out ディレクトリを指す。
   base    = "web-next"
-  command = "bun install && bun run build"
+  # ビルドは Next.js 16 既定の Turbopack を使用する（bun run build = next build）。
+  # --webpack へ切り替えないこと: webpack の css-loader は .module.css を pure モードで
+  #   処理するため、:root / :global(...) をトップレベルに持つ page.module.css
+  #   （codex/harness-engineering, google/agent-harness-engineering,
+  #    google/antigravity-slash-commands-guide）が "selector is not pure" で全滅する。
+  # --frozen-lockfile: Netlify はビルド間で node_modules をキャッシュするため、
+  #   素の bun install だと @next/swc-linux-x64-gnu 等のネイティブバイナリを欠いた
+  #   キャッシュを引き継ぎ、Turbopack が next/font/google の仮想モジュール
+  #   "@vercel/turbopack-next/internal/font/google/font" を解決できなくなる。
+  #   lockfile 通りに固定して再現性を確保する。
+  command = "bun install --frozen-lockfile && bun run build"
   publish = "out"
   # base 配下に差分がない場合に Netlify がビルドを自動スキップする既定挙動を無効化する。
   # 理由: base 外にある netlify.toml（リダイレクト定義）や pricing.json の変更が

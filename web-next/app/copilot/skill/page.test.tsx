@@ -1,23 +1,4 @@
-// Phase B-4 [Red] contract test. Expected to FAIL until Green phase
-// implements app/copilot/skill/page.tsx.
-
-/**
- * Phase B-4 契約テスト (/copilot/skill)。
- *
- * 固定する契約:
- * - `metadata` が export され、title に「SKILL.md」と「Copilot」を含む
- * - `<h1>` が 1 つ存在し、`SKILL.md` を含む
- * - 12 個の TOC 対象 section id が存在する (skill-concept, skill-3level,
- *   skill-spec, skill-paths, skill-stepbystep, skill-templates,
- *   skill-vs-instructions, skill-advanced, skill-troubleshoot,
- *   skill-bestpractices, skill-community, sources)
- * - 12 個の TOC リンクが `#section-id` 形式で存在する
- * - 外部リンク (http/https) には全て `target="_blank"` かつ
- *   `rel="noopener noreferrer"` が付与されている
- * - `sources` セクション内に 16 件以上の外部リンクが存在する
- *   (legacy HTML は [A]〜[L] 12 件 + 既存 [1][4][9][15] 4 件 = 計 16 件)
- * - 静的検査: 生 HTML 流し込み API (React の XSS 危険 prop) を使用していない
- */
+// Red contract test for /copilot/skill updated for Github-copilot-skillmd-guide.html migration.
 
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
@@ -25,25 +6,30 @@ import { render } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { describe, expect, it } from "vitest";
 import CopilotSkillPage, { metadata as rawMetadata } from "@/app/copilot/skill/page";
+import { installIntersectionObserverStub } from "@/tests/tocTestUtils";
+import styles from "./page.module.css";
 
 const Page = CopilotSkillPage as unknown as () => ReactElement;
-// Next.js の Metadata 型を避けるための最小ローカル型 (実体は Metadata オブジェクト)。
 type MetadataLike = { title?: unknown; description?: unknown };
 const metadata = rawMetadata as unknown as MetadataLike;
 
 const EXPECTED_SECTION_IDS = [
-  "skill-concept",
-  "skill-3level",
-  "skill-spec",
-  "skill-paths",
-  "skill-stepbystep",
-  "skill-templates",
-  "skill-vs-instructions",
-  "skill-advanced",
-  "skill-troubleshoot",
-  "skill-bestpractices",
-  "skill-community",
-  "sources",
+  "このガイドについて",
+  "1-agent-skills-とは何か",
+  "2-標準化の経緯とタイムライン",
+  "3-3段階ローディングprogressive-disclosure完全解説",
+  "4-フロントマター完全仕様",
+  "5-ディレクトリ構造とスコープ",
+  "6-ステップバイステップ作成ガイド",
+  "7-github-cligh-skillによるスキル管理",
+  "8-実践テンプレート集",
+  "9-copilotの各サーフェスでの挙動差分",
+  "10-skills-vs-custom-instructions-vs-mcp-vs-subagents",
+  "11-セキュリティベストプラクティス",
+  "12-トラブルシューティング完全ガイド",
+  "13-ベストプラクティスチェックリスト",
+  "14-まとめ",
+  "参考文献出典",
 ] as const;
 
 describe("/copilot/skill - metadata", () => {
@@ -64,28 +50,73 @@ describe("/copilot/skill - metadata", () => {
 });
 
 describe("/copilot/skill - page structure", () => {
-  it("renders an <h1> containing 'SKILL.md'", () => {
+  it("renders an <h1> containing 'GitHub Copilot Agent Skills 実践ガイド'", () => {
     const { container } = render(<Page />);
     const h1 = container.querySelector("h1");
     expect(h1).not.toBeNull();
-    expect(h1?.textContent).toMatch(/SKILL\.md/);
+    expect(h1?.textContent).toMatch(/GitHub Copilot Agent Skills 実践ガイド/);
   });
 
-  it("renders all 12 expected section ids", () => {
+  it("renders all 16 expected section ids", () => {
     const { container } = render(<Page />);
     for (const id of EXPECTED_SECTION_IDS) {
-      const el = container.querySelector(`#${id}`);
+      const el = container.querySelector(`[id="${id}"]`);
       expect(el, `section id="${id}" must exist`).not.toBeNull();
     }
   });
 
-  it("renders 12 TOC links pointing to section anchors", () => {
+  it("renders 16 TOC links pointing to section anchors", () => {
+    const io = installIntersectionObserverStub();
     const { container } = render(<Page />);
     const tocAnchors = container.querySelectorAll('nav a[href^="#"]');
     const tocHrefs = Array.from(tocAnchors).map((a) => a.getAttribute("href"));
     for (const id of EXPECTED_SECTION_IDS) {
       expect(tocHrefs, `TOC must link to #${id}`).toContain(`#${id}`);
     }
+
+    const firstHeading = container.querySelector(`[id="${EXPECTED_SECTION_IDS[0]}"]`) as Element;
+    const secondHeading = container.querySelector(`[id="${EXPECTED_SECTION_IDS[1]}"]`) as Element;
+    io.emit([
+      {
+        target: firstHeading,
+        isIntersecting: true,
+        boundingClientRect: { top: 20 } as DOMRectReadOnly,
+      },
+    ]);
+    io.emit([
+      {
+        target: secondHeading,
+        isIntersecting: true,
+        boundingClientRect: { top: 40 } as DOMRectReadOnly,
+      },
+    ]);
+    expect(tocAnchors[0].classList.contains(styles.active)).toBe(true);
+    expect(tocAnchors[1].classList.contains(styles.active)).toBe(false);
+
+    io.emit([
+      {
+        target: firstHeading,
+        isIntersecting: true,
+        boundingClientRect: { top: 50 } as DOMRectReadOnly,
+      },
+      {
+        target: secondHeading,
+        isIntersecting: true,
+        boundingClientRect: { top: 10 } as DOMRectReadOnly,
+      },
+    ]);
+    expect(tocAnchors[0].classList.contains(styles.active)).toBe(false);
+    expect(tocAnchors[1].classList.contains(styles.active)).toBe(true);
+
+    io.emit([
+      {
+        target: secondHeading,
+        isIntersecting: false,
+        boundingClientRect: { top: 10 } as DOMRectReadOnly,
+      },
+    ]);
+    expect(tocAnchors[0].classList.contains(styles.active)).toBe(true);
+    expect(tocAnchors[1].classList.contains(styles.active)).toBe(false);
   });
 });
 
@@ -103,23 +134,49 @@ describe("/copilot/skill - external link safety", () => {
       expect(rel).toMatch(/noopener/);
       expect(rel).toMatch(/noreferrer/);
     }
-  });
 
-  it("sources section contains at least 16 external links", () => {
-    const { container } = render(<Page />);
-    const sources = container.querySelector("#sources");
-    expect(sources).not.toBeNull();
-    const externals =
-      sources?.querySelectorAll('a[href^="http"]') ??
-      ([] as unknown as NodeListOf<HTMLAnchorElement>);
-    expect(externals.length).toBeGreaterThanOrEqual(16);
+    const sourcesHeading = container.querySelector('[id="参考文献出典"]');
+    const sourcesGrid = sourcesHeading?.nextElementSibling?.nextElementSibling;
+    const sourceLinks = sourcesGrid?.querySelectorAll('a[href^="http"]');
+
+    expect(sourceLinks?.length).toBeGreaterThanOrEqual(23);
   });
 });
 
 describe("/copilot/skill - static source safety", () => {
+  it("documents the supported GitHub CLI validation and install metadata", () => {
+    const source = readFileSync(join(__dirname, "page.tsx"), "utf8");
+
+    expect(source).toContain("gh skill publish --dry-run");
+    expect(source).not.toContain("gh skill lint");
+    expect(source).toContain("--from-local");
+    expect(source).toContain("metadata.local-path");
+    expect(source).not.toContain("metadata.provenance");
+
+    const publishSection = source.slice(
+      source.indexOf('<h3 id="72-'),
+      source.indexOf('<h2 id="8-', source.indexOf('<h3 id="72-'))
+    );
+    expect(publishSection).not.toContain("ToxicSkills");
+  });
+
+  it("uses space-delimited strings for allowed-tools in publishable examples", () => {
+    const source = readFileSync(join(__dirname, "page.tsx"), "utf8");
+
+    expect(source).not.toMatch(/allowed-tools:\s*(?:\[|\n\s+-|[^\n]*,)/);
+
+    const matches = Array.from(source.matchAll(/allowed-tools:\s*"([^"]+)"/g));
+    expect(matches.length).toBeGreaterThan(0);
+    for (const match of matches) {
+      const toolString = match[1];
+      expect(toolString).not.toContain(",");
+      expect(toolString).not.toContain("[");
+      expect(toolString).not.toContain("]");
+    }
+  });
+
   it("does not use the React raw-HTML injection prop", () => {
     const source = readFileSync(join(__dirname, "page.tsx"), "utf8");
-    // オブフスケート (false positive / prompt hook 誤検知回避)。
     const needle = ["danger", "ously", "Set", "Inner", "HTML"].join("");
     expect(source.includes(needle)).toBe(false);
   });

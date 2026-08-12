@@ -1,6 +1,6 @@
 # GEMINI.md
 
-Updated 2026-07-31
+Updated 2026-08-09
 
 GEMINI.md は Gemini CLI / Gemini Code Assist 向けの入り口。
 本リポジトリでは **CLAUDE.md が正本** とし、GEMINI.md はその委譲 pointer として機能する。
@@ -17,7 +17,7 @@ GEMINI.md は Gemini CLI / Gemini Code Assist 向けの入り口。
 ## 絶対に守るべきルール（CLAUDE.md と docs/PROGRESS.md のサマリ）
 
 - **R1（Biome scope）**: `bun run lint:fix` / `bunx biome check --write`（パス引数なし）は **禁止**。必ずファイル単位でパス指定
-- **R2（100% 完全移植・faithful 必須）**: HTML/Markdown からの移植・更新では **要約・省略・縮約・代表抽出を一切禁止（絶対ルール）**。元ファイルの全セクション、全サブセクション、全段落、全リスト項目、全コードブロック、全 SVG、全 callout/alert、全 table、全参考文献リンクを何一つ落とさずに 100% 漏れなく JSX に転写すること。
+- **R2（100% 完全移植 & スタイリング防犯原則）**: HTML/Markdown からの移植・更新では **要約・省略・縮約・代表抽出を一切禁止（絶対ルール）**。全要素の JSX 転写に加え、①表の全列左寄せ（`:global(th/td)` で `text-align: left !important`）、②コードブロックの明示的先頭インデント（`{"    "}` 形式）、③カードグリッド・ブレットリストの完全再現、④アンカー移動の見出しめり込み防止（`scroll-margin-top: calc(var(--header-height, 60px) + 80px)`）を徹底すること。
 - **legacy/ 配下の編集禁止**（移行完了・凍結済み）
 - **元のHTML/Markdownオリジナルファイルの完全削除は厳禁**：移行元のファイルは絶対に削除してはならず、必ず `archive/` ディレクトリ配下に移動（`git mv` または `mv`）して退避保存すること
 - **ファイル全体の書き直し禁止**（明示指示がない限り）
@@ -28,10 +28,10 @@ GEMINI.md は Gemini CLI / Gemini Code Assist 向けの入り口。
 ## 検証コマンド
 
 ```bash
-(cd web-next && bun run test)        # 1281/1281 pass（収集失敗なし）
+(cd web-next && bun run test)        # 162 files / 1441 tests pass（収集失敗なし）
 (cd web-next && bun run typecheck)   # OK
 (cd web-next && bun run build)       # Antigravity環境では実行禁止。CI / 他環境では必須
-(cd web-next && bun run lint)        # 385 files / 0 diagnostics
+(cd web-next && bun run lint)        # FAIL（未完了）: 452 files / 49 errors・2 warnings・3 infos
 (cd scraper && uv run pytest)        # 43/43 pass（全 Green ✅）
 ```
 

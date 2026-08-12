@@ -18,6 +18,7 @@ import { render } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { describe, expect, it } from "vitest";
 import CodexAgentPage, { metadata as rawMetadata } from "@/app/codex/agent/page";
+import styles from "@/app/codex/agent/page.module.css";
 
 const Page = CodexAgentPage as unknown as () => ReactElement;
 type MetadataLike = { title?: unknown; description?: unknown };
@@ -90,6 +91,98 @@ describe("/codex/agent - page structure", () => {
     const tocHrefs = Array.from(tocAnchors).map((a) => a.getAttribute("href"));
     const expectedHrefs = EXPECTED_SECTION_IDS.map((id) => `#${id}`);
     expect(tocHrefs).toEqual(expectedHrefs);
+  });
+
+  it("V1 と MultiAgentV2 の TOML 例を別々のコードブロックに分離する", () => {
+    const { container } = render(<Page />);
+    const normalize = (value: string | null | undefined) => value?.replace(/\s+/g, "") ?? "";
+    const codeBlocks = Array.from(container.querySelectorAll(`.${styles.codeBlock}`));
+    const hasSectionPrefix = (block: Element, section: string) =>
+      Array.from(block.querySelectorAll(`.${styles.codeLine}`)).some((line) => {
+        const text = normalize(line.textContent);
+        return text === `[${section}]` || text.startsWith(`[${section}.`);
+      });
+    const v1Example = codeBlocks.find((block) => hasSectionPrefix(block, "agents"));
+    const v2Example = codeBlocks.find((block) =>
+      hasSectionPrefix(block, "features.multi_agent_v2")
+    );
+
+    expect(v1Example).toBeDefined();
+    expect(hasSectionPrefix(v1Example as Element, "features.multi_agent_v2")).toBe(false);
+    expect(v2Example).toBeDefined();
+    expect(hasSectionPrefix(v2Example as Element, "agents")).toBe(false);
+  });
+
+  it("MultiAgentV2 の TOML 例で機能を有効化する", () => {
+    const { container } = render(<Page />);
+    const normalize = (value: string | null | undefined) => value?.replace(/\s+/g, "") ?? "";
+    const codeBlocks = Array.from(container.querySelectorAll(`.${styles.codeBlock}`));
+    const v2Example = codeBlocks.find((block) =>
+      Array.from(block.querySelectorAll(`.${styles.codeLine}`)).some(
+        (line) => normalize(line.textContent) === "[features.multi_agent_v2]"
+      )
+    );
+    const lines = Array.from(v2Example?.querySelectorAll(`.${styles.codeLine}`) ?? []).map((line) =>
+      normalize(line.textContent)
+    );
+    const sectionStart = lines.indexOf("[features.multi_agent_v2]");
+    const nextSection = lines.findIndex(
+      (line, index) => index > sectionStart && /^\[.+\]$/.test(line)
+    );
+
+    expect(lines.slice(sectionStart + 1, nextSection)).toContain("enabled=true");
+  });
+
+  it("V1 では agents.max_depth を実行時の深さ制限に使用する", () => {
+    const { container } = render(<Page />);
+    const normalize = (value: string | null | undefined) => value?.replace(/\s+/g, "") ?? "";
+    const rows = Array.from(container.querySelectorAll("tr"));
+    const v1Row = rows.find((row) => normalize(row.textContent).includes("サブエージェント(V1)"));
+    const guidance = Array.from(container.querySelectorAll("p")).find((paragraph) =>
+      normalize(paragraph.textContent).includes("V1ではagents.max_concurrent_threads_per_session")
+    );
+
+    expect(normalize(v1Row?.textContent)).toContain("agents.max_depthはV1の実行時深さ制限");
+    expect(normalize(guidance?.textContent)).toContain("V1では実行時の深さ制限として使用");
+  });
+
+  it("MultiAgentV2 では agents.max_depth を実行時制限に使わず深さ計算だけに使用する", () => {
+    const { container } = render(<Page />);
+    const normalize = (value: string | null | undefined) => value?.replace(/\s+/g, "") ?? "";
+    const rows = Array.from(container.querySelectorAll("tr"));
+    const v1Row = rows.find((row) => normalize(row.textContent).includes("サブエージェント(V1)"));
+    const v2Row = rows.find((row) => normalize(row.textContent).includes("サブエージェント(V2)"));
+    const guidance = Array.from(container.querySelectorAll("p")).find((paragraph) =>
+      normalize(paragraph.textContent).includes("V1ではagents.max_concurrent_threads_per_session")
+    );
+    const checklist = container.querySelector('label[for="check-7"]');
+    const troubleshooting = rows.find((row) =>
+      normalize(row.textContent).includes("サブエージェントがコストを消費しすぎる")
+    );
+
+    expect(normalize(v1Row?.textContent)).toContain(
+      "agents.max_concurrent_threads_per_sessionは親スレッドを除くサブエージェント同時実行上限"
+    );
+    expect(normalize(v1Row?.textContent)).toContain("agents.max_threadsは別名");
+    expect(normalize(v2Row?.textContent)).toContain(
+      "features.multi_agent_v2.max_concurrent_threads_per_session"
+    );
+    expect(normalize(v2Row?.textContent)).toContain("上限は主スレッドを含む");
+    expect(normalize(v2Row?.textContent)).toContain("サブエージェント実効上限は設定値−1");
+    expect(normalize(v2Row?.textContent)).toContain("agents.max_threadsは設定エラー");
+    expect(normalize(v2Row?.textContent)).toContain(
+      "agents.max_depthは実行時制限に使わず、lineageとtask-pathの深さ計算にのみ使用"
+    );
+    expect(normalize(guidance?.textContent)).toContain("MultiAgentV2では実行時制限に使用せず");
+    expect(normalize(checklist?.textContent)).toContain(
+      "V1とMultiAgentV2で設定キーと上限の数え方を分離"
+    );
+    expect(normalize(checklist?.textContent)).toContain(
+      "V1では実行時の深さ制限、MultiAgentV2では実行時制限に使わず"
+    );
+    expect(normalize(troubleshooting?.textContent)).toContain(
+      "features.multi_agent_v2.max_concurrent_threads_per_session"
+    );
   });
 });
 

@@ -4,13 +4,11 @@ import { useEffect } from "react";
 import styles from "./page.module.css";
 
 /**
- * Highlights the table-of-contents link for the heading currently within the visible area.
+ * Highlights the table-of-contents link for headings that enter the configured viewport region.
  */
 export default function TocObserver() {
   useEffect(() => {
-    const navLinks = document.querySelectorAll<HTMLAnchorElement>(
-      `.${styles.tocNav} a`,
-    );
+    const navLinks = document.querySelectorAll<HTMLAnchorElement>(`.${styles.tocNav} a`);
     const idToLink: Record<string, HTMLAnchorElement> = {};
     for (const a of Array.from(navLinks)) {
       const href = a.getAttribute("href");
@@ -34,7 +32,7 @@ export default function TocObserver() {
           }
         }
       },
-      { rootMargin: "-20% 0px -70% 0px" },
+      { rootMargin: "-20% 0px -70% 0px" }
     );
 
     for (const id of observedIds) {

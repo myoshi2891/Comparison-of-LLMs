@@ -849,19 +849,23 @@ export default function MultiAgentOrchestrationPage() {
           </div>
 
           <p>
-            また、生成→検証ループや共有ステートパターンでは「収束しない」ことそのものが失敗モードになるため、<strong>最大反復回数・時間予算・収束閾値(N回連続で新しい発見がない場合は終了)</strong>を設計段階で必ず定義しておく必要があります。
+            また、生成→検証ループや共有ステートパターンでは「収束しない」ことそのものが失敗モードになるため、
+            <strong>最大反復回数・時間予算・収束閾値(N回連続で新しい発見がない場合は終了)</strong>
+            を設計段階で必ず定義しておく必要があります。
           </p>
 
           <div className={styles.callout}>
             <div className={styles.calloutTitle}>参照URL</div>
             <p>
               <Ext href="https://www.centific.com/blog/anthropic-s-multi-agent-research-system-raises-the-bar-for-open-ended-ai-reasoning">
-                Anthropic's multi-agent research system raises the bar for open-ended AI reasoning — Centific
+                Anthropic's multi-agent research system raises the bar for open-ended AI reasoning —
+                Centific
               </Ext>
             </p>
             <p>
               <Ext href="https://claude.com/blog/multi-agent-coordination-patterns">
-                Multi-agent coordination patterns: Five approaches and when to use them — Claude by Anthropic
+                Multi-agent coordination patterns: Five approaches and when to use them — Claude by
+                Anthropic
               </Ext>
             </p>
           </div>
@@ -883,7 +887,11 @@ export default function MultiAgentOrchestrationPage() {
           </div>
 
           <p>
-            その他の主なリスクとしては、エージェント同士が互いを無条件に信頼することによる<strong>権限昇格</strong>、規制対象データが共有ステートやメッセージバスを通じてドメイン境界を越えて漏れる<strong>越境的な情報漏洩</strong>、フレームワークが依存するパッケージが侵害される<strong>サプライチェーンの脆弱性</strong>などがあります。
+            その他の主なリスクとしては、エージェント同士が互いを無条件に信頼することによる
+            <strong>権限昇格</strong>
+            、規制対象データが共有ステートやメッセージバスを通じてドメイン境界を越えて漏れる
+            <strong>越境的な情報漏洩</strong>、フレームワークが依存するパッケージが侵害される
+            <strong>サプライチェーンの脆弱性</strong>などがあります。
           </p>
 
           <p>対策の基本方針は「Least Agency(最小権限の原則をエージェントに適用したもの)」です。</p>
@@ -931,7 +939,8 @@ export default function MultiAgentOrchestrationPage() {
             </p>
             <p>
               <Ext href="https://www.helpnetsecurity.com/2026/06/11/owasp-prompt-injection-ai-security-failures/">
-                Prompt injection still drives most agentic AI security failures in production — Help Net Security
+                Prompt injection still drives most agentic AI security failures in production — Help
+                Net Security
               </Ext>
             </p>
             <p>
@@ -1063,7 +1072,8 @@ export default function MultiAgentOrchestrationPage() {
                   <td>リード+並列サブエージェント構成の性能改善</td>
                   <td>単体エージェント比で約90.2%向上</td>
                   <td>
-                    Claude Opus 4をリード、Claude Sonnet 4をサブエージェントとした構成でのAnthropic社内リサーチ評価
+                    Claude Opus 4をリード、Claude Sonnet
+                    4をサブエージェントとした構成でのAnthropic社内リサーチ評価
                   </td>
                 </tr>
                 <tr>
@@ -1174,7 +1184,8 @@ export default function MultiAgentOrchestrationPage() {
             <div className={styles.calloutTitle}>参照URL</div>
             <p>
               <Ext href="https://claude.com/blog/multi-agent-coordination-patterns">
-                Multi-agent coordination patterns: Five approaches and when to use them — Claude by Anthropic
+                Multi-agent coordination patterns: Five approaches and when to use them — Claude by
+                Anthropic
               </Ext>
             </p>
           </div>
@@ -1263,7 +1274,8 @@ export default function MultiAgentOrchestrationPage() {
             </li>
             <li>
               <Ext href="https://claude.com/blog/multi-agent-coordination-patterns">
-                Multi-agent coordination patterns: Five approaches and when to use them — Claude by Anthropic
+                Multi-agent coordination patterns: Five approaches and when to use them — Claude by
+                Anthropic
               </Ext>
             </li>
             <li>
@@ -1273,7 +1285,8 @@ export default function MultiAgentOrchestrationPage() {
             </li>
             <li>
               <Ext href="https://www.centific.com/blog/anthropic-s-multi-agent-research-system-raises-the-bar-for-open-ended-ai-reasoning">
-                Anthropic's multi-agent research system raises the bar for open-ended AI reasoning — Centific
+                Anthropic's multi-agent research system raises the bar for open-ended AI reasoning —
+                Centific
               </Ext>
             </li>
             <li>
@@ -1363,7 +1376,8 @@ export default function MultiAgentOrchestrationPage() {
             </li>
             <li>
               <Ext href="https://www.helpnetsecurity.com/2026/06/11/owasp-prompt-injection-ai-security-failures/">
-                Prompt injection still drives most agentic AI security failures in production — Help Net Security
+                Prompt injection still drives most agentic AI security failures in production — Help
+                Net Security
               </Ext>
             </li>
             <li>

@@ -4,9 +4,7 @@ import MultiAgentOrchestrationPage, { metadata } from "./page";
 
 describe("MultiAgentOrchestrationPage", () => {
   it("exports proper metadata", () => {
-    expect(metadata.title).toBe(
-      "マルチエージェント・オーケストレーション実践ガイド"
-    );
+    expect(metadata.title).toBe("マルチエージェント・オーケストレーション実践ガイド");
     expect(metadata.description).toContain(
       "Anthropicのリサーチシステム、5つの基本パターン、MAST失敗モード分類"
     );
@@ -34,9 +32,7 @@ describe("MultiAgentOrchestrationPage", () => {
     expect(sec13).not.toBeNull();
 
     // Verify all target="_blank" links contain rel="noopener noreferrer"
-    const blankLinks = container.querySelectorAll<HTMLAnchorElement>(
-      'a[target="_blank"]'
-    );
+    const blankLinks = container.querySelectorAll<HTMLAnchorElement>('a[target="_blank"]');
     expect(blankLinks.length).toBeGreaterThan(0);
     for (const link of blankLinks) {
       expect(link.getAttribute("rel")).toBe("noopener noreferrer");

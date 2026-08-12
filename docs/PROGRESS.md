@@ -2,7 +2,7 @@
 
 > 本ファイルは Next.js 移行完了後の保守・改善フェーズにおける開発の進捗（特にテスト関連）および品質チェックのルールを記録する。
 >
-> - 最終更新日: **Updated 2026-08-09**
+> - 最終更新日: **Updated 2026-08-11**
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
 
@@ -11,14 +11,52 @@
 - **フェーズ**: 保守・機能改善・品質強化フェーズ
 - **ブランチ**: `dev`（本番 `main` への Next.js 移行マージ完了 🚀）
 - **動作検証**:
-  - `bun run build` ⏭️（Antigravity環境ルール・ユーザー指定により省略。CI等で実施）
-  - `bun run typecheck` ✅
-  - `bun run lint` ⚠️（442 files checked。作業範囲外の既存ファイルに17 diagnostics）
+  - `npm run build` ⏭️（今回もユーザー指定により省略。CI等で実施）
+  - `npm run typecheck` ✅（サンドボックスではユーザー指定により npm を使用。`package.json` の `typecheck` スクリプトは `tsc --noEmit` で、`bun run typecheck` と同じスクリプトを実行）
+  - `npm run lint` ✅（452 files checked、diagnostics 0）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: Vitest **157 files / 1414 tests すべて合格**（収集失敗なし）
+  - **フロントエンド (`web-next/`)**: `npm test` で Vitest **162 files / 1447 tests すべて合格**（収集失敗なし）。サンドボックスではユーザー指定により npm を使用し、`package.json` の `test` スクリプト `vitest run` を実行するため `(cd web-next && bun run test)` と同等
   - **バックエンド (`scraper/`)**: pytest 実行で **43 件すべて合格** (全 Green ✅)
 
 ## 最近の追加内容
+
+- **GitHub Copilot Agent Skills 公開仕様と Google Sandbox TOC アクセシビリティの修正**:
+  - `/copilot/skill` の検証コマンドを `gh skill publish --dry-run` に統一し、公式に確認できない ToxicSkills 検出の説明を削除。ローカル導入の `--from-local` と `metadata.local-path` を明記し、公開用 `allowed-tools` の全例を空白区切り文字列へ統一。
+  - `/google/sandbox-best-practices` の空アンカー10個に固定ヘッダー分の `scroll-margin-top` を設定し、モバイル目次の `aria-expanded` と「目次を開く／閉じる」の `aria-label` を同期。
+  - サンドボックスではユーザー指定により npm を使用。Vitest **162 files / 1447 tests**、typecheck、lint（452 files / diagnostics 0）、pytest **43件**がGreen。ユーザー指定によりビルドと目視確認は省略。
+
+- **OpenAI Codex 設定移行とモバイルTOCフォーカス管理の同期**:
+  - 原本と`/codex/agent` でV1とMultiAgentV2の並列上限設定を分離。V1は `[agents]` の `max_concurrent_threads_per_session`（`max_threads` は別名）、V2は `[features.multi_agent_v2]` の `enabled = true` と `max_concurrent_threads_per_session` を使用し、V2のサブエージェント実効上限が設定値−1であることと、V2有効時の `agents.max_threads` が設定エラーになることを同期。TOMLセクションの子セクションまで検出するprefix-aware契約テストで、V1とV2のコードブロック分離も検証。
+  - `agents.max_depth` はV1では実行時の深さ制限として使用し、MultiAgentV2では実行時制限に使用せずlineageとtask-pathの深さ計算にのみ使用することと、Codex PR `#20180` を原本と`/codex/agent` に明記。
+  - アーカイブMarkdownの全9 Mermaidブロックで明示的な4スペースインデントを復元。V1/MultiAgentV2のスレッド上限キーを管理者制約表から通常設定表へ移し、ユーザーまたは信頼済みプロジェクトの `config.toml` 内での配置先を明記。
+  - モバイルTOCを閉じた後、開いていた場合に限ってトグルへフォーカスを戻し、オーバーレイとTOCリンク経由をテスト。
+  - サンドボックスではユーザー指定により npm を使用。Vitest **162 files / 1444 tests**、typecheck、lint（452 files / diagnostics 0）、pytest **43件**がGreen。ユーザー指定によりビルドと目視確認は省略。
+
+- **レビュー指摘の現行コード再検証とガイド契約の強化**:
+  - 移行スキルの契約数を「8 + 4」に統一し、CSS Modules と JSDOM の検証範囲、原本依存のレイアウト要件、TOC テストの責務を明確化。
+  - OpenAI Codex のアーカイブ Markdown 2 件で Mermaid 文のインデントを修正し、MCP の実設定先を `.codex/config.toml`、`agents/openai.yaml` の役割を MCP ツール依存宣言として整理。
+  - Hermes は自己参照フォント変数と Mermaid ラッパー、Harness はモバイルオーバーレイ・参考文献リスト・Mermaid ラッパーの契約を修復。
+  - OpenAI Codex ガイドは TOC の CSS 重複採番を除去し、リンク先 section に基づくスクロール追従、初期アクティブ状態、通常時・早期 return 時のイベント解除、モバイルドロワーの `visibility` / `pointer-events` 同期を追加。見出し・チェックリスト・CSS・TOC の回帰テストを強化。
+  - npm で Vitest **159 files / 1425 tests** と typecheck、pytest **43件**が Green。全体 lint は既存 diagnostics のみ（49 errors・2 warnings・3 infos）。ユーザー指定によりビルドと目視確認は省略。
+
+- **OpenAI Codex ベストプラクティスガイド 2026（/codex/openai-codex-guide）の Pure JSX 完全置き換え移行**:
+  - 原本 `Openai-codex-best-practices-2026.html` および `Openai-codex-best-practices-2026.md` を `web-next/app/codex/openai-codex-guide/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。
+  - 要約・省略一切なしで全16セクション（1.Codexとは何か〜16.参考情報源）、全表、全コードブロック、6 Mermaid図解（`diag-loop`, `diag-plan`, `diag-agents`, `diag-sandbox`, `diag-subagents`, `diag-cicd`）、TOCスクロール追従（`TocObserver.tsx`）、15項目運用チェックリスト、全出典リンクを完了。
+  - 既存の旧 `/codex/openai-codex-guide` コンテンツと完全入れ替え完了。
+  - 原本 `Openai-codex-best-practices-2026.html` および `.md` は `archive/html/OpenAI/` および `archive/md/OpenAI/` へ `git mv` 退避保存。
+  - 契約テスト11件（H1, 16 H2s, H3s, TOCリンク, Mermaidラッパー, 表構造, チェックリスト, Callout, 外部リンク, metadata）を作成し全クリア（bun test 全 Green ✅）。
+
+- **OpenAI Codex ハーネスエンジニアリング実践ガイド（/codex/harness-engineering）の Pure JSX 100% Faithful 完全修復 ＆ 包括的回帰テスト・スキル強化**:
+  - 原本 `Openai-codex-harness-engineering-evals.html` から 100% 寸分違わぬテキスト・セクション・スタイリングへ修復完了。
+  - `page.test.tsx` に **8つの必須契約・包括的回帰防止テスト（全11テスト）** を新規整備し全 Green ✅。見出しID・タイトルの完全一致、H3レイヤークラス（L1〜L7）、クイックナビカード（L1〜L7）、TOC初期アクティブ状態、スクロール時のリアルタイムアクティブ切り替え、Mermaidラッパー構造、参考文献4カテゴリ・外部リンク安全属性をすべて契約テスト化。
+  - `TocObserver.tsx` を `getBoundingClientRect` リアルタイム・スクロールスパイ計算へ刷新。
+  - `.claude/skills/nextjs-page-migration/SKILL.md` に「8つの必須契約・回帰テスト定義」と「TocObserver スクロール自動追従の決定的な実装規則」をブラッシュアップ追加。（Vitest **158 files / 1418 tests** 全 Green ✅）。
+
+- **Hermes Agent ベストプラクティスガイド（/agent/hermes-agent-advanced-guide）の Pure JSX 完全置き換え移行**: `Harness-engineering-google-guide.html` を `web-next/app/agent/hermes-agent-advanced-guide/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。要約・省略一切なしで全17セクション（1.Hermes Agentとは何か〜17.参考文献・出典）、全表、全コードブロック、11 Mermaid図、TOCスクロール追従（`TocObserver.tsx`）、総括チェックリスト、`page-registry.ts`（タイトル・概要・`lastReviewed` 2026-08-10）を完了。既存の旧 `/agent/hermes-agent-advanced-guide` コンテンツと完全入れ替え完了。原本 `Harness-engineering-google-guide.html` は `archive/Harness-engineering-google-guide.html` へ `git mv` 退避保存。契約テスト 8 件を作成・全クリア（Vitest **158 files / 1414 tests** 全 Green ✅）。
+
+- **GitHub Copilot Agent Skills 実践ガイド（/copilot/skill）の Pure JSX 完全置き換え移行**: `Github-copilot-skillmd-guide.html` を `web-next/app/copilot/skill/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。要約・省略なしで全16セクション（このガイドについて〜14.まとめ、参考文献・出典）・全表・全コードブロック・7 Mermaid図・TOCスクロール追従（`TocObserver.tsx`）・インタラクティブチェックリスト（`ChecklistCard.tsx`）・`page-registry.ts`（`lastReviewed` 更新）を完了。既存の旧 `/copilot/skill` コンテンツと完全入れ替え完了。原本 `Github-copilot-skillmd-guide.html` は `archive/Github-copilot-skillmd-guide.html` へ `git mv` 退避保存。契約テスト 7 件を更新し全クリア。
+
+- **Google サンドボックス技術 完全ガイド（/google/sandbox-best-practices）の Pure JSX 完全置き換え移行**: `Google-sandbox-best-practices.html` を `web-next/app/google/sandbox-best-practices/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。要約・省略なしで全10セクション（1.はじめに〜10.参考文献）・全表・全コードブロック・9 Mermaid図・TOCスクロール追従（`TocObserver.tsx`）・`TocObserver.test.tsx` の単体テスト・`page-registry.ts`（タイトルおよび `lastReviewed` 更新）を完了。既存の旧 `/google/sandbox-best-practices` コンテンツと完全入れ替え完了。原本 `Google-sandbox-best-practices.html` は `archive/html/google/Google-sandbox-best-practices.html` へ `git mv` 退避保存。契約テストおよび `TocObserver.test.tsx` の全クリアを達成。
 
 - **CodeRabbit Cloud/SaaS 設定優先順位図とグローバルオーバーライド仕様の更新**: CodeRabbit Cloud/SaaS における設定解決階層図 (`DIAGRAM_2` および `.md` / `.html` 原稿) を修正。通常階層（リポジトリ内 YAML 〜 スキーマ既定値）でベース設定を評価後、継承処理後の最終マージ層として Organization Global Override および Workspace Global Override (Enterpriseのみ) が最優先適用される二段階フローチャート構造へ刷新。リポジトリ側の設定で組織・ワークスペースの必須ポリシー（強制プロファイル・必須 path_instructions 等）を無効化できないことを明確化・更新。Vitest **157 files / 1414 tests** 全 Green、typecheck ✅。
 
@@ -42,283 +80,3 @@
 - **Claude Code AI仕様駆動開発ガイド（/claude/skill）の Pure JSX 完全置き換え移行**: `Claude-code-spec-driven-development-guide.html` を `web-next/app/claude/skill/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。要約・省略なしで全15セクション（s0〜s14）・全表・全コードブロック・5 Mermaid図 (`diagram-workflow`, `diagram-login-sequence`, `diagram-implementation`, `diagram-context-loading`, `diagram-data-flow`)・TOCスクロール追従（`TocObserver.tsx`）・外部リンク安全属性・`page-registry.ts`（`lastReviewed` 更新）を完了。既存の旧 `/claude/skill` コンテンツと完全入れ替え完了。原本 `Claude-code-spec-driven-development-guide.html` および `.md` は `archive/html/Anthropic/` および `archive/md/Anthropic/` へ `git mv` 退避保存。契約テスト9件を更新・通過し全クリア（Vitest **152 files / 1366 tests** 全 Green ✅）。
 
 - **SonarQube 新規コードカバレッジ修正**: `MermaidDiagram` の例外型別正規化、初期化失敗、`foreignObject` 配色、一時描画要素の競合 cleanup を検証する9ケースを追加。対象ファイルは line coverage **100%**、branch coverage **94.53%**、function coverage **100%**、全体 line coverage **92.25%**。目視・ビルドは依頼により省略。Vitest **152 files / 1357 tests** と typecheck は Green。
-
-- **GitHub Copilot ガイド原稿3件の追加と公開ページ対応**: `Github-copilot-agent-md-guide.md` / `.html`（`.agent.md` のフロントマター、Handoffs、Subagents、MCP、マルチエージェント設計）を `/copilot/agent`、`Github-copilot-skillmd-guide.md` / `.html`（SKILL.md、Progressive Disclosure、実践テンプレート、トラブルシューティング）を `/copilot/skill`、`Copilot-spec-driven-development-best-practices.html`（Copilot の instructions / prompt / agent / skill / MCP / Plan Mode を使う仕様駆動開発）を `/copilot/markdown-file-guide` の公開内容として追加。レビュー再照合では、各原稿のモバイル目次、ARIA 状態、Mermaid エラー処理、Markdown 表示、CDN SRI を修正し、共有 `MermaidDiagram` の一時描画要素をビューポート外へ配置した。目視・ビルドは依頼により省略。Vitest **152 files / 1348 tests** と typecheck、対象2ファイルの Biome は Green。全体 lint は作業範囲外の既存12 diagnosticsで失敗（432 files checked）。
-
-- **コンテキストエンジニアリング入門（/agent/context-engineering-best-practices）のデザイン改善**: 1440px のサイドバー付きドキュメントシェル、ヒーローと章見出し、表・図解枠・出典・callout・コード・チェックリストの視覚階層をページ固有 CSS で再設計。Mermaid のレイアウト責務は共有コンポーネントに維持し、モバイル目次の `aria-controls`・状態ラベル・非表示制御、キーボードフォーカス、モーション抑制も追加。目視・ビルドは依頼により省略。Vitest **152 files / 1348 tests** と typecheck、対象3ファイルの Biome は Green。全体 lint は作業範囲外の既存未コミットファイルにある12件のフォーマット診断で失敗したため、対象外ファイルは変更せず記録のみとした。
-
-- **マルチエージェント関連ページ・CSS・Mermaidテーマ・レジストリのリファクタリングと修正**:
-  - `MermaidDiagram.tsx`: テーマに応じた Mermaid pie chart の動的テキスト色適用および `foreignObject` スコープ修正。
-  - `/agent/multi-agent-orchestration-best-practices`: CSS モジュール名修正 (`styles.calloutWarn`, `styles.calloutDanger`, `styles.pageFooter`, `.contentInner`)、`rel="noopener noreferrer"` の追加、および `@testing-library/react` による DOM レンダリング検証テストへの変更。
-  - `/agent/multi-agent-orchestration`: `--font-mono` の自己参照解消、`p` のスコープ付き適用、`.tiTiCircleCheck` アイコンの定義、および Step 7〜11 / 31件の参考文献 / footer-note の 100% 忠実補完。
-  - `/vercel/eve-beginner-guide`: モバイル用 960px メディアクエリの `flex-direction: column` を `.pageContainer` に適用。
-  - `page-registry.ts`: `/agent/multi-agent-orchestration-best-practices` と `/agent/multi-agent-orchestration` のタイトル・説明を `metadata.title` に合わせ区別化し、`/vercel/eve-beginner-guide` の `summary` 重複を改善。
-  - `PROGRESS.md`: Microsoft Foundry ガイドのアーカイブ記録パスを `archive/html/Microsoft/` に統一。 (Vitest **147 files / 1303 tests** 全 Green ✅)
-
-- **Vercel eve 完全ガイド（/vercel/eve-beginner-guide）の Pure JSX 移行と Agent 開発 ナビ同期**: `Vercel-eve-beginner-guide.html` を `web-next/app/vercel/eve-beginner-guide/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。要約・省略なしで全11-H2セクション（Hero H1除く11のH2見出し：本文10H2セクション + 11.参考文献一覧）・全表・全コードブロック・8 Mermaid図 (`diagram-arch`, `diagram-mapping`, `diagram-session`, `diagram-approval`, `diagram-sandbox`, `diagram-channel`, `diagram-cicd`, `diagram-fleet`)・TOCスクロール追従（`TocObserver.tsx`）・外部リンク安全属性・`page-registry.ts`（`Agent 開発` グループ）登録を完了。原本 `Vercel-eve-beginner-guide.html` は `archive/html/Vercel/Vercel-eve-beginner-guide.html` へ `git mv` 退避保存。契約テスト5件（タイトル、11-H2セクション、8 Mermaid図、外部リンク・内部リンク検証）を追加し全クリア（Vitest **144 files / 1295 tests** 全 Green ✅）。
-
-- **マルチエージェントオーケストレーション ベストプラクティスガイド 2026（/agent/multi-agent-orchestration）の Pure JSX 移行と ナビ同期**: `Multi-agent-orchestration.html` を `web-next/app/agent/multi-agent-orchestration/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。要約・省略なしで全17-H2セクション（Hero H1除く17のH2見出し：Intro, Step1〜11, アンチパターン, 全体ワークフロー, まとめ, 参考文献）・全表・全コードブロック・14 Mermaid図・TOCスクロール追従（`TocObserver.tsx`）・外部リンク安全属性・`page-registry.ts`（`Agent 開発` グループ）登録を完了。原本 `Multi-agent-orchestration.html` は指定の `archive/html/agent/Multi-agent-orchestration.html` へ `git mv` 退避保存。契約テスト5件（タイトル、17-H2セクション、外部リンク、クリーン内部リンク、14Mermaid図）を追加し全クリア。
-
-- **マルチエージェント・オーケストレーション実践ガイド（/agent/multi-agent-orchestration-best-practices）の Pure JSX 移行と ナビ同期**: `Multi-agent-orchestration-best-practices.html` を `web-next/app/agent/multi-agent-orchestration-best-practices/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。要約・省略なしで全15-H2セクション（Hero H1除く15のH2見出し：本文14H2セクション + 15.参考文献一覧）・全表・全コードブロック（`subagent_contract` および `orchestrator_scaling_rules` の全2件）・21 Mermaid図・TOCスクロール追従（`TocObserver.tsx`）・外部リンク安全属性・`page-registry.ts`（`Agent 開発` グループ）登録を完了。原本 `Multi-agent-orchestration-best-practices.html` は `archive/html/Multi-agent-orchestration-best-practices.html` へ `git mv` 退避保存。表属性の JSX 互換 (`rowspan` → `rowSpan`) 修正、Mermaid円グラフの JS/CSS による全スライス色・テキストの確実な鮮やかカラー強力上書き (`#57c7ff` シアン / `#a996ff` パープル / `#ff9d66` コーラル / `#ffffff` 白太字文字)、固定ヘッダー・免責バナー被り防止の `scroll-margin-top: 140px` 導入、全コードブロックの復元・完全シンタックスハイライト（トークンカラー指定・背景透過・シアンアクセント枠）、原本HTMLに基づくフォント色 (`--accent-2` H3紫, `--text-dim` 本文, `--accent` キーワード)・グループ別サイドバーTOC・チェックリストアイコンの 100% 忠実移植を完了し、契約テスト（タイトル、15-H2セクション/要素、外部リンク安全属性、アンカー）を追加し全クリア。
-
-- **Microsoft Foundry 実践ベストプラクティスガイド（/infra/microsoft-foundry-best-practices-intermediate）の Pure JSX 移行と Providers ナビ同期**: `Microsoft-foundry-best-practices-intermediate.html` を `web-next/app/infra/microsoft-foundry-best-practices-intermediate/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。要約・省略なしで全17-H2セクション（Hero H1除く17のH2見出し：本文16H2セクション + 17.参考文献一覧）・全表・全コードブロック・9 Mermaid図・TOCスクロール追従（`TocObserver.tsx`）・外部リンク安全属性・`page-registry.ts` 登録を完了。原本 `Microsoft-foundry-best-practices-intermediate.html` は `archive/html/Microsoft/Microsoft-foundry-best-practices-intermediate.html` へ `git mv` 退避保存。契約テスト4件（タイトル、17-H2セクション、外部リンク検証）を追加し全クリア（Vitest **143 files / 1290 tests** 全 Green ✅）。
-
-- **Providers ナビの Copilot から Microsoft への変更および Microsoft Foundry ガイドのコードハイライト追記**: `nav-taxonomy.ts` および `page-registry.ts` において、`Providers` グループ配下の `Copilot` カテゴリ名を `Microsoft` に更新 🚀。旧 `/copilot/*` ページ群（Agent, GitHub Copilot, Markdown Guide, Skill）に加え、新規追加した `/infra/microsoft-foundry-best-practices-guide` も `Providers -> Microsoft` 配下に登録。併せて Foundry ガイド内の bash / python コードブロックに対し構文ハイライト（`styles.ck`, `styles.cm`, `styles.cs`, `styles.cv`, `styles.cc`, `styles.fn`）を追加。関連する全ナビ導出テスト・SiteHeader テストを同期・更新し全クリア（Vitest **142 files / 1286 tests** 全 Green ✅）。
-
-- **Microsoft Foundry 活用ガイド（/infra/microsoft-foundry-best-practices-guide）の Pure JSX 移行と ナビ同期**: `Microsoft-foundry-best-practices-guide.html` を `web-next/app/infra/microsoft-foundry-best-practices-guide/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。要約・省略なしで全15-H2セクション（Hero H1除く15のH2見出し：本文14H2セクション + 15.参考文献一覧）・全表・全コードブロック・5 Mermaid図・TOCスクロール追従（`TocObserver.tsx`）・外部リンク安全属性・`page-registry.ts` 登録を完了。原本 `Microsoft-foundry-best-practices-guide.html` は `archive/html/Microsoft/Microsoft-foundry-best-practices-guide.html` へ `git mv` 退避保存。契約テスト5件（タイトル、15-H2セクション、5 Mermaid図、外部リンク検証）を追加し全クリア（Vitest **142 files / 1286 tests** 全 Green ✅）。
-
-- **Z.ai (GLM) LLM ベストプラクティスガイド（/zhipu/zai-glm-best-practices）の Pure JSX 移行と Providers ナビ同期**: `Zai-glm-best-practices-guide.html` を `web-next/app/zhipu/zai-glm-best-practices/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。要約・省略なしで全17-H2セクション（Hero H1除く17のH2見出し：本文16H2セクション + 17.参考文献一覧）・全表・全コードブロック・8 Mermaid図・TOCスクロール追従（`TocObserver.tsx`）・外部リンク安全属性・Providers グループ配下（Zhipu(GLM)）ナビゲーション追加（`nav-taxonomy.ts` / `page-registry.ts`）を完了。原本 `Zai-glm-best-practices-guide.html` は `archive/html/zhipu/Zai-glm-best-practices-guide.html` へ `git mv` 退避保存。契約テスト5件（タイトル、17-H2セクション、8 Mermaid図、外部リンク・内部リンク検証）を追加し全クリア（Vitest **140 files / 1274 tests** 全 Green ✅）。
-
-- **xAI Grok API 実践ベストプラクティスガイド（/xai/grok-best-practices-intermediate）の Pure JSX 移行と Providers ナビ同期**: `Xai-grok-best-practices-intermediate.html` を `web-next/app/xai/grok-best-practices-intermediate/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。要約・省略なしで全15-H2セクション（Hero H1除く15のH2見出し：本文14H2セクション + 15.参考文献一覧）・全表・全コードブロック・11 Mermaid図・TOCスクロール追従（`TocObserver.tsx`）・外部リンク安全属性・Providers グループ配下（xAI）ナビゲーション追加（`page-registry.ts`）を完了。原本 `Xai-grok-best-practices-intermediate.html` は `archive/Xai-grok-best-practices-intermediate.html` へ `git mv` 退避保存。契約テスト2件（メタデータ・JSXツリー構造検証）を追加。
-
-- **xAI Grok 完全ガイド（/xai/grok-best-practices）の Pure JSX 移行と Providers ナビ同期**: `Xai-grok-best-practices.html` を `web-next/app/xai/grok-best-practices/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。要約・省略なしで全18-H2セクション（Hero H1除く18のH2見出し：本文17H2セクション + 18.参考文献一覧）・全表・全コードブロック・5 Mermaid図・TOCスクロール追従（`TocObserver.tsx`）・外部リンク安全属性・Providers グループ配下（xAI）ナビゲーション追加（`nav-taxonomy.ts` / `page-registry.ts`）を完了。原本 `Xai-grok-best-practices.html` は `archive/html/xAI/Xai-grok-best-practices.html` へ `git mv` 退避保存。契約テスト5件（タイトル、18-H2セクション、5 Mermaid図、外部リンク・内部リンク検証）を追加し全クリア（Vitest **139 files / 1269 tests** 全 Green ✅）。
-
-- **DeepSeek LLM ベストプラクティスガイド（/deepseek/llm-best-practices）の Pure JSX 移行と Providers ナビ同期**: `Deepseek-llm.html` を `web-next/app/deepseek/llm-best-practices/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。要約・省略なしで全17-H2セクション（Hero H1除く17のH2見出し：本文16H2セクション + 17.参考文献一覧）・全表・全コードブロック・8 Mermaid図・TOCスクロール追従（`TocObserver.tsx`）・外部リンク安全属性・Providers グループ配下ナビゲーション追加（`nav-taxonomy.ts` / `page-registry.ts`）を完了。原本 `Deepseek-llm.html` は `archive/html/DeepSeek/Deepseek-llm.html` へ `git mv` 退避保存。契約テスト5件（タイトル、17-H2セクション、8 Mermaid図、外部リンク・内部リンク検証）を追加し全クリア（Vitest **138 files / 1264 tests** 全 Green ✅）。
-
-- **OpenAI Codex サブエージェント開発ベストプラクティス完全ガイド（/codex/agent）の Pure JSX 完全置き換え移行**: `Openai-codex-agents-multiagent-best-practices.html` を `web-next/app/codex/agent/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。要約・省略一切なしで全20セクション（前提, Step 1〜18, 参考文献）、全表、全コードブロック、7 Mermaid図 (`DIAGRAM_1`〜`DIAGRAM_14`)、全チェックリスト、全参考文献リンク、TOCスクロール追従（`TocObserver.tsx`）、外部リンク安全属性、`page-registry.ts`（`OpenAI Codex サブエージェント開発ガイド`）登録を完了。既存の旧 `/codex/agent` コンテンツと完全入れ替え完了。原本 `Openai-codex-agents-multiagent-best-practices.html` および `.md` はユーザー指定の `archive/html/OpenAI/` および `archive/md/OpenAI/` へ `git mv` 退避保存。契約テスト8件を更新し全クリア（Vitest **137 files / 1259 tests** 全 Green ✅）。
-
-- **SonarQube CI のaxeタイムアウト・新規コードカバレッジ修正**: coverage計測時にAntigravity a11y監査が既定5秒でタイムアウトし、未完了axeと後続監査が競合する問題を、同規模ページと同じ15秒上限で解消。Sonarが新規コードとして検出したClaude TocObserver 3ファイルへ分岐テスト12件を追加し、対象3ファイルの行・条件カバレッジを各100%にした。目視・ビルドは依頼により省略。`bun run test:coverage` は **137 files / 1259 tests**、全体 line coverage **92.79%**、typecheck、lint **385 files / 0 diagnostics** がGreen。
-
-- **レビュー指摘の再照合とセマンティクス・安全性修正**: 現行コードで全指摘を再検証し、シェル手順の exact-line CSS 変数照合・静的サーバー PID cleanup・チェックサム失敗時停止を修正。Cowork チェックボックスのラベル関連付け、Fable 5 の凡例/タイムライン list semantics、Skill frontmatter 必須説明と命名制約、Antigravity の用語・Review Policy・SHA-256検証パス、TechCrunch出典の第三者報道ラベル、TOC の DOM 順選択、CSS font fallback、共有 `Ext`、目次データ駆動化を反映した。テストは DOM 出力ベースへ堅牢化し、共有 Mermaid は未指定時 `16px`、明示 `fontSize` は保持する契約へ更新。目視・ビルドは依頼により省略。Vitest **134 files / 1247 tests**、typecheck、lint **382 files / 0 diagnostics**、pytest **43 tests** はすべて Green。
-
-- **レビュー指摘の現行コード照合と品質修正**: Antigravity CLI ガイドを v1.1.5+ の `/effort` / `--effort`、固定コミット URL・SHA-256・厳密な MCP パッケージバージョン、現行 MCP 設定キーへ同期。削除済み Google コンポーネントへのテスト参照を除去し、共有 `MermaidDiagram` の数値 `maxHeight` を CSS px へ正規化。移行ページ群の Biome 診断もファイル単位で解消した。目視・ビルドは依頼により省略。Vitest **133 files / 1240 tests**、typecheck、lint、pytest **43 tests** はすべて Green。
-
-- **Google Antigravity 完全ガイド — エコシステムとベストプラクティス（/google/antigravity-best-practices）の Pure JSX 完全置き換え移行**: `Google-antigravity-best-practices.html` を `web-next/app/google/antigravity-best-practices/page.tsx` に Pure JSX として完全忠実移植 🚀。要約・省略なしで全15セクション（全15H2セクション、全表、全コードブロック、3 Mermaid図、全参考文献等）・TOCスクロール追従（`TocObserver.tsx`）・横幅画面いっぱい（100%）・`page-registry.ts` 登録・更新を完了。旧 `/google/skill-guide-intermediate` を新URLへ完全置き換え完了。原本 `Google-antigravity-best-practices.html` / `Google-antigravity-best-practices.md` は `archive/html/google/` および `archive/md/google/` へ `git mv` 退避保存。契約テストを更新。
-
-- **SKILL.md 実践ベストプラクティスガイド（/google/skill-guide）の Pure JSX 完全置き換え移行**: `Skill-md-antigravity-best-practices.html` を `web-next/app/google/skill-guide/page.tsx` に Pure JSX として完全忠実移植 🚀。要約・省略なしで全12セクション（全12H2セクション、全表、全コードブロック、2 Mermaid図、全参考文献等）・TOCスクロール追従（`TocObserver.tsx`）・外部リンク安全属性・`page-registry.ts` 登録確認を完了。既存の旧 `/google/skill-guide` コンテンツと完全入れ替え完了。原本 `Skill-md-antigravity-best-practices.html` / `Skill-md-antigravity-best-practices.md` は `archive/html/google/` および `archive/md/google/` へ `git mv` 退避保存。契約テスト（全12セクション検証）を更新。
-
-- **Google Antigravity AI仕様駆動開発ガイド（/google/agent）の Pure JSX 完全置き換え移行**: `Antigravity-spec-driven-dev-guide.html` を `web-next/app/google/agent/page.tsx` に Pure JSX として完全忠実移植 🚀。要約・省略なしで全10セクション（イントロ〜参考文献）・全表・全コードブロック・6 Mermaid図 (`diagram-0`〜`diagram-5`)・TOCスクロール追従（`TocObserver.tsx`）・外部リンク安全属性・`page-registry.ts`（`Antigravity AI仕様駆動開発`）登録を完了。既存の旧 `/google/agent`（Gemini マルチエージェント）コンテンツと完全入れ替え完了。原本 `Antigravity-spec-driven-dev-guide.html` および `Antigravity-spec-driven-dev-guide.md` は `archive/` へ `git mv` 退避保存。契約テスト（`section-1`〜`section-10` 検証）を更新。
-
-- **Antigravity CLI 完全ガイド（/google/antigravity-guide）の Pure JSX 完全置き換え移行**: `Antigravity-cli-guide.html` を `web-next/app/google/antigravity-guide/page.tsx` に Pure JSX として完全忠実移植 🚀。要約・省略なしで全16セクション（00〜15）・全表・全コードブロック・8 Mermaid図 (`diag-1`〜`diag-8`)・TOCスクロール追従（`TocObserver.tsx`）・外部リンク安全属性・`page-registry.ts` 登録を完了。既存の旧 `/google/antigravity-guide` コンテンツと完全入れ替え完了。原本 `Antigravity-cli-guide.html` は `archive/` へ `git mv` 退避保存。契約テストを更新し全クリア。
-
-- **ハーネスエンジニアリング入門ガイド（/claude/harness-engineering）の Pure JSX 完全置き換え移行**: `Harness-engineering-guide.html` を `web-next/app/claude/harness-engineering/page.tsx` に Pure JSX として完全忠実移植 🚀。要約・省略なしで全9セクション（intro, chapter1〜7, references）・全表・全コードブロック（hook.sh含む）・9 Mermaid図・TOCスクロール追従（`TocObserver.tsx`）・外部リンク安全属性・`page-registry.ts` 登録確認を完了。既存の旧 `harness-engineering` コンテンツと完全入れ替え完了。原本 `Harness-engineering-guide.html` / `Harness-engineering-guide.md` は `archive/html/Anthropic/` および `archive/md/Anthropic/` へ `git mv` 退避保存。契約テスト（9セクション検証）を更新。
-
-- **Claude Cowork 実践ガイド（/claude/cowork-guide）の Pure JSX 完全置き換え移行**: `Claude-cowork-best-practices.html` を `web-next/app/claude/cowork-guide/page.tsx` に Pure JSX として完全忠実移植 🚀。要約・省略なしで全12ステップ（STEP 0〜11）・納品前チェックリスト・参考文献・8 Mermaid図・TOCスクロール追従（`TocObserver.tsx`）・外部リンク安全属性・`page-registry.ts`（`Claude` カテゴリ）登録を完了。既存の旧 `cowork-guide` コンテンツと完全入れ替え完了。原本 `Claude-cowork-best-practices.html` / `Claude-cowork-best-practices.md` は `archive/html/Anthropic/` および `archive/md/Anthropic/` へ `git mv` 退避保存。契約テストを更新。
-- **SKILL.md 実践ガイド — Claude Code Agent Skills のベストプラクティス（/claude/skill-guide-intermediate）の Pure JSX 完全置き換え移行**: `Skill-md-best-practices.html` を `web-next/app/claude/skill-guide-intermediate/page.tsx` に Pure JSX として完全忠実移植 🚀。要約・省略なしで全17セクション・全表・全コードブロック・5 Mermaid図・TOCスクロール追従（`TocObserver.tsx`）・外部リンク安全属性・`page-registry.ts`（`Claude` カテゴリ）登録を完了。既存の旧 `skill-guide-intermediate` コンテンツと完全入れ替え完了。原本 `Skill-md-best-practices.html` / `Skill-md-best-practices.md` は `archive/html/Anthropic/` および `archive/md/Anthropic/` へ `git mv` 退避保存。契約テストを更新。
-- **レビュー追加指摘のアクセシビリティ・Mermaid・文書整合性修正**: Claude Agent / Fable 5 / AI SDD のモバイル目次で状態依存の `aria-label` と `aria-expanded` を同期し、閉状態を `visibility: hidden` + `pointer-events: none`、開状態を visible + interactive に統一。
-  Gemini 静的 HTML の目次にも一意な ID / `aria-controls` / `aria-expanded` と開閉ラベル同期を追加。Harness Mermaid ソースをカラム0へ修正し、2つの Skill HTML では描画 Promise の rejection 時に既存 SVG を保持しつつ fallback 文言を表示。
-  Claude Platform の `name` / `description` を任意とする frontmatter 説明と Fable 5 のヒーロー改訂日を基準日に同期。Vitest **1232 件** / typecheck 全 Green、lint は既存ベースラインの **27 errors / 2 warnings**（ビルド・目視確認は依頼により省略）。
-- **レビュー指摘の現行コード照合とガイド品質修正**: 静的 HTML/Markdown の Mermaid 初期化・脚注・パス・リンク・アクセシビリティを現行コードと原本に照合して修正。Next.js 側は Claude 2ページと AI SDD ガイドのモバイル TOC を Server Component 維持のまま操作部分だけ Client Component 化し、チェックボックスのラベル、装飾 SVG、流動幅レイアウト、SDD の単一 `h1`、monospace CSS 変数の自己参照を修正。共有 `MermaidDiagram` は `default` / `forest` / `neutral` のネイティブ配色を保持し、sequenceDiagram の色補正を関数抽出。`IntersectionObserver` テストモックを setupFiles へ集約し、Vitest **1232 件** / typecheck 全 Green（ビルド・目視確認は依頼により省略）。
-- **仕様駆動開発（SDD）実践ガイド ― 中級・上級エンジニア向けベストプラクティス（/sdd/spec-driven-development-guide）の Next.js 移行**: `Spec-driven-development-guide.html` を `web-next/app/sdd/spec-driven-development-guide/page.tsx` に Pure JSX として完全忠実移植 🚀。要約・省略一切なしで全16セクション・全1.1〜14.1サブセクション・全8表・全コードブロック・10 Mermaid図・全コールアウト・全58件参考文献・TOCスクロール追従（`TocObserver.tsx`）・外部リンク安全属性・`page-registry.ts`（`開発プロセス` グループ）登録を完了。メインコンテンツ幅を 100% 化し画面全幅に拡張。第11章（タイムライン型カード）、第15章（SVGアイコン付きチェックリストグリッド）、第16章（ナンバーバッジ付きカードグリッド）のデザインブラッシュアップを完了。原本 `Spec-driven-development-guide.html` は `archive/html/SDD/Spec-driven-development-guide.html` へ `git mv` 退避保存。契約テスト5件を追加。
-- **AI仕様駆動開発（Spec-Driven Development）実践ガイド（/sdd/ai-spec-driven-development-guide）の Next.js 移行とグローバルナビ同期**: `Ai-spec-driven-development-guide.html` を `web-next/app/sdd/ai-spec-driven-development-guide/page.tsx` に Pure JSX として完全忠実移植 🚀。要約・省略なしで全13章（全12セクション+参考文献）・全表・全コードブロック・6 Mermaid図・TOCスクロール追従（`TocObserver.tsx`）・外部リンク安全属性・`page-registry.ts`（`開発プロセス` グループ）登録を完了。原本 `Ai-spec-driven-development-guide.html` / `Ai-spec-driven-development-guide.md` は `archive/html/SDD/` および `archive/md/SDD/` へ `git mv` 退避。契約テスト5件を追加し全クリア。
-- **Claude Fable 5 実践活用ガイド（/claude/fable-5-best-practices）のフィールドガイド版への全面刷新**: 『地図は、現地ではない。』から始まる最新のフィールドガイド版 `Fable5-guide.html` を `web-next/app/claude/fable-5-best-practices/page.tsx` に Pure JSX として完全忠実移植 🚀。要約・省略なしで全15セクション・全表・全コードブロック・12 Mermaid図・TOCスクロール追従（`TocObserver.tsx`）・外部リンク安全属性を適用し、旧コンテンツと置き換え完了。原本 `Fable5-guide.html` は `archive/html/` へ `git mv` 退避。契約テスト6件を更新し全クリア（Vitest PASS）。
-- **Claude サブエージェント & Agent Teams ベストプラクティスガイド（/claude/agent）の刷新**: `Claude-code-subagents-agentteams-markdown-bestpractices.html` を `web-next/app/claude/agent/page.tsx` に Pure JSX として完全忠実移植 🚀。要約・省略なしで全9セクション・全表・全コードブロック・4 Mermaid図・TOCスクロール追従（`TocObserver.tsx`）・外部リンク安全属性・`page-registry.ts` 登録を完了。原本 `Claude-code-subagents-agentteams-markdown-bestpractices.html` は `archive/html/` へ `git mv` 退避。契約テスト5件を更新し全クリア（Vitest **1183 件** / pytest **43 件** 全 Green ✅）。
-- **Claude Fable 5 追加 + 参考リンク集の更新（新2社カード・リンク切れ修正）**: コスト計算機の Anthropic 料金一覧に最上位モデル **Claude Fable 5**（$10 / $50 per 1M・1M ctx）を追加（`anthropic.py` の `_FALLBACKS`/`_TAG`/`_CLS`/`_SUB_*` 先頭、TDD）。参考リンク集（`RefLinks.tsx`）へ **Moonshot(Kimi) / Zhipu(GLM)** の公式料金ページカードを追加（16→18枚）し、リンク切れ3件を修正（Claude Code pricing `docs.anthropic.com/.../pricing`→`docs.claude.com/.../costs`、Windsurf `credits-and-billing`→`docs.windsurf.com/`、Junie `junie/faq/`→`help/junie/faq.html`）。Zhipu 料金は `z.ai/pricing` が 404 のため `docs.z.ai/guides/overview/pricing` を採用。全 URL を curl 実測で検証（403 のボット保護3件・FRED の HTTP/2 quirk は切れではないと確認）。`pricing.json` 3ファイルへ Fable を反映。Vitest **1203 件** / pytest **43 件** 全 Green。
-- **Google AI スクレイパーの `price_in` 誤スクレイプバグ修正（ライブ抽出を無効化）**: `providers/google.py` の `price_in` 抽出が、料金ページ上のモデル名手前の無関係な `$` 額を拾う正規表現バグ（逆順パターン `\$X ... model_key`）で全 Google AI モデルの入力価格を汚染していた。原因調査の結果、当該ページは TOC 重複・ラベル無し価格・1モデル複数価格併記のため正規表現抽出が構造的に不安定（実測で正しく取れるモデルが 0 件）と判明。TDD で ① 逆順パターン除去 → ② `input` キーワードアンカー追加を試行するも 2 モデルが残存したため、最終的にユーザー方針で **ライブ抽出を廃止し `_FALLBACKS`(SSoT/WebSearch確定値) を決定論的に採用**（Vertex と同扱い）。`scrape()` を `_FALLBACKS` 生成のみに簡素化（`get_page_text` 不使用）、`TestGoogle` をフォールバック固定・ネット非依存へ更新、smoke で Google を分離。設計判断を CLAUDE.md に固定（スクレイプ復活の禁止）。pytest **42 件合格（据え置き）**。
-- **2026-07 月次更新: 新規2社(Moonshot(Kimi)/Zhipu(GLM))追加 + 既存6社の 2026-07 モデル刷新**: Moonshot(Kimi)（Kimi K3 / K2.6）と Zhipu(GLM)（GLM-5.2 / GLM-4.6）を新規プロバイダースクレイパーとして追加（`providers/moonshot.py` / `zhipu.py`、`cls="tag-oss"`）。既存6社（Anthropic/OpenAI/Google/AWS/DeepSeek/xAI）の `_FALLBACKS` を GPT-5.6 系・Claude Sonnet 5・Gemini 3.6 Flash / 3.5 Flash-Lite・Grok 4.5・Amazon Nova Premier / Lite 追加で刷新。フロント側は唯一のハードコード `ApiTable.tsx` の `PROVIDER_COLORS` に新2社（Moonshot(Kimi)=`#818cf8` / Zhipu(GLM)=`#f472b6`）を追加（Red→Green、色検証テスト2件）。`pricing.json` を再生成（USD/JPY 163.47）し、Google AI 全モデルの `price_in` ライブ誤スクレイプ（ページ上の無関係な `$` 額を拾う既存の正規表現バグ）と Amazon Nova Premier の `price_out` を SSoT(`_FALLBACKS`) 値へ直接補正。provider ブロックの連続性・型パリティ・build/lint/typecheck を全 Green で確認（合計 **1202 テスト合格**、pytest **42 件合格**）。
-<!-- markdownlint-disable-next-line MD013 -->
-- **Mermaid 図解レイアウトの全サイト統一（中央寄せ・全幅・横スクロール）**: 共有コンポーネント `web-next/components/docs/MermaidDiagram.tsx` を2層構造（外側=`width:100%` / 内側=`display:flex; justify-content:center`、`useMaxWidth:false` + `mermaid.run` 後に svg へ `max-width:100%; height:auto` を付与）に変更し、**図解レイアウトの唯一の真実の源**とした。従来は約50ページの `page.module.css` が個別に `:global(.mermaid)` / `:global(svg)` の幅を強制しており、`svg{width:100%}`（引き伸ばし）／`svg{max-width:100%}`（縮小）／override 無し（左寄せ）の三分裂が起きていた。34 ページの per-page レイアウト強制ルールを削除（配色テーマルールは保持）し、`enterprise-agent-platform-intermediate` はフレーム装飾を `.diagramWrap` へ移設。併せてユーザー要望により 32 ページの本文カラムの固定 `max-width`（1000〜1200px のバラつき）を**統一の 1440px**（サイトの `.container` と同値。旧値より広くしつつワイド画面でのバランスを確保）に揃え、手書き（非 Mermaid）横並び図解の中央寄せも修正（`claude/skill`・`claude/agent`・`google/agent`・`codex/skill`・`copilot/skill`・`copilot/markdown-file-guide`・`copilot/agent`・`google/skill`・`google/antigravity-guide`）、`claude/skill-guide` は 900px 固定を外してサイドバートラックいっぱいに。Mermaid は列幅への縮小フィット＋中央寄せに変更。静的ビルドを別ポートで配信し **Playwright でレンダリング座標を実測**して全図の中央寄せ・全ページのコンテンツ幅を検証（残る左寄せ検出はヒーローのメタ/バッジ行のみで意図的）。`MermaidDiagram.test.tsx` を新設（Red→Green）、`gpt-5-6` 契約テストを新不変条件へ更新。不変条件を `.claude/rules/mermaid-diagram-layout.md` に固定し、`fix-mermaid` / `nextjs-page-migration` スキルをブラッシュアップ（合計 **1199 テスト合格**）。
-- **PR #126 SonarCloud Quality Gate の新規コードカバレッジを復旧**: Gemma、Kimi、Amazon Bedrock 2ページの `TocObserver.tsx` はページ契約テストで初期化だけが実行され、`IntersectionObserver` コールバックの32条件中26条件が未カバーだったため、新規コードカバレッジが47.7%（基準80%）まで低下していた。クラス選択型と `href` 解決型の共通テストスイートを追加し、4ファイルすべて行・条件カバレッジ100%を実測。テスト12件を追加して合計 **1195 テスト合格**とし、併せて既存ファイルのBiome指摘26 errors / 1 warningもファイル単位で全件解消した。
-- **Amazon Bedrock 活用ベストプラクティスガイドの Next.js 移行とグローバルナビ同期**: `Amazon-bedrock-best-practices-guide.html` を `web-next/app/infra/amazon-bedrock-best-practices-guide/page.tsx` に Pure JSX として完全忠実移植 🚀。要約・省略なしで全18セクション・全表・全コードブロック・6 Mermaid図・TOCスクロール追従・外部リンク安全属性・グローバルナビ（`運用・品質` グループ / `page-registry.ts`）登録を完了。原本 `Amazon-bedrock-best-practices-guide.html` は `archive/` へ `git mv` 退避。契約テスト5件を追加し全クリア（合計 **1183 テスト合格**）。
-- **Amazon Bedrock ベストプラクティス完全ガイドの Next.js 移行とグローバルナビ同期**: `Amazon-bedrock-best-practices-2026-intermediate.html` を `web-next/app/infra/amazon-bedrock-best-practices-2026-intermediate/page.tsx` に Pure JSX として完全忠実移植 🚀。要約・省略なしで全15セクション・全表・全コードブロック・6 Mermaid図・TOCスクロール追従・外部リンク安全属性・グローバルナビ（`運用・品質` グループ）登録を完了。原本 `Amazon-bedrock-best-practices-2026-intermediate.html` は `archive/` へ `git mv` 退避。契約テスト5件を追加し全クリア（合計 **1178 テスト合格**）。
-- **Kimi(Moonshot AI) LLM 徹底ガイドの Pure JSX 移行とグローバルナビ同期**: `Kimi-llm-best-practices.html` を `web-next/app/moonshot/kimi-llm-best-practices/page.tsx` に Pure JSX として完全忠実移植 🚀。要約・省略なしで全19セクション・全表・全コードブロック・9 Mermaid図・TOCスクロール追従・外部リンク安全属性・グローバルナビ登録を完了。原本 `Kimi-llm-best-practices.html` / `.md` は `archive/html/moonshot/` および `archive/md/moonshot/` へ `git mv` 退避。契約テスト5件を追加し全クリア（合計 **1173 テスト合格**）。
-- **OpenAI GPT-5.6 完全ガイドの Pure JSX 移行とグローバルナビ同期**: `Gpt-5.6-best-practices-guide.html` を `web-next/app/model-data/gpt-5-6-best-practices/page.tsx` に Pure JSX として完全忠実移植 🚀。要約・省略なしで全18セクション・全7表・8 Mermaid図・コードブロック・TOCスクロール追従・外部リンク安全属性・グローバルナビ登録を完了。仮の `GuideContent.tsx` 動的読み込みを廃止し、原本 `Gpt-5.6-best-practices-guide.html` / `.md` を `archive/` へ `git mv` 退避。契約テストを増強し全クリア（合計 **1168 テスト合格**）。
-- **Google Gemma 実践ガイド 2026 の Next.js 移行**: `Gemma-best-practices-guide.html` を `web-next/app/google/gemma-best-practices-guide/page.tsx` に移行 🚀。原文の全14セクション・全表・全コードブロック・7 Mermaid図を React 要素として faithful に保持し、TOCのスクロール追従、外部リンクの安全属性、ページレジストリ登録、CSS Modules化によるCSS変数定義のスコープ化、フッター等幅フォント設定を追加。原本は `archive/html/google/` および `archive/md/google/` 配下に退避。契約テスト6件を追加（合計 **1167 テスト合格**）。
-- **Biome 指摘 224 件を全て解消（lint がクリーンに）**: `bun run lint` の 36 errors / 186 warnings / 2 infos をゼロにした。テストは **1161 件合格（変化なし）**、build / typecheck / pytest 38 件も全て Green。
-  - **CSS 警告 179 件**（`noImportantStyles` 169 + `noDescendingSpecificity` 10）: `biome.json` の `overrides` で `app/**/page.module.css` に限定して無効化。これらは `globals.css` の素の要素セレクタを打ち消すための意図的な `!important` であり、除去するとガイドページ 24 枚の表示が壊れる。**理由は `biome.json` 内に書けない** — 厳密 JSON のためコメントを入れると設定がパース不能になり、Biome がデフォルト設定へフォールバックして `node_modules` まで走査する（実際に一度踏んで 154,586 件の診断が出た）。よって理由は CLAUDE.md に記載。これに伴い不要化した `biome-ignore` コメント 48 件を 11 ファイルから削除。
-  - **format 22 + organizeImports 2**: 該当ファイルのみ個別に `biome check --write`（リポジトリ全体走査は禁止ルール）。CSS 20 ファイルは「コメント・引用符・空白を正規化すると変更前後が完全一致」することを機械的に検証済み＝**意味的変更ゼロ・視覚回帰リスクなし**（実変更は `'` → `"` の統一と複数値プロパティの改行のみ）。
-  - **`noArrayIndexKey` 9 件**（`app/model-data/gpt-5-6-best-practices/GuideContent.tsx`）: ビルド時に確定する静的 Markdown 由来の表セル・リスト項目。内容ベースのキーにすると「○」「必須」等の重複で**キー衝突という実在のバグを新たに作り込む**ため、index キーのままが正しい。理由付きの局所抑制で対応（抑制コメントは `if` 文ではなく対象の JSX 直前に置かないと効かない）。
-  - **その他**: `noEmptyBlockStatements` 3 件は他 10 数ファイルと同じ `{ /* mock */ }` 形式へ統一。`noNonNullAssertion` 2 件はアクセサ関数経由の読み取りで `!` を除去（`capturedCallback` の代入が `render()` 内のコンストラクタ経由で TS の制御フロー解析から見えず、直接参照すると `never` へ絞り込まれる。型注釈では回避できない）。`useTemplate` 2 件 / `useOptionalChain` 1 件 / 不要な suppression 3 件も解消。
-- **`bun audit` 検出の脆弱性 2 件を解消（CI 復旧）**: CI の `Dependency vulnerability audit` ステップ（`.github/workflows/test.yaml`）が exit 1 で失敗していた問題を修正。① **high**: `next` の optionalDependency である `sharp` が 0.34.5（libvips 1.2.4）で GHSA-f88m-g3jw-g9cj（CVE-2026-33327 / 33328 / 35590 / 35591）に該当 → `overrides` に `"sharp": "^0.35.3"` を追加し libvips 1.3.2 へ更新。`next@16.2.6` の宣言レンジ `^0.34.5` は外れるが、本プロジェクトは `images: { unoptimized: true }` + `output: 'export'` の pure SSG で sharp のコードパスを一切実行しないため実害なし（`engines.node >= 20.9.0` は Netlify `NODE_VERSION=20` / CI Node 22 の双方を満たす）。② **low**: `mermaid` → `dompurify` が 3.4.11 で GHSA-c2j3-45gr-mqc4 に該当 → 既存 override を `^3.4.11` → `^3.4.12` へ引き上げ（脆弱版が範囲に残らないよう下限を更新）。mermaid 10.9.6 の宣言 `^3.2.4` を満たすため **mermaid 本体のアップグレードは不要**。`bun update` の全体実行は行わず overrides による外科的 pin のみ。ロックファイル差分は sharp サブツリー + dompurify + semver に限定。`bun audit` は `No vulnerabilities found`（exit 0）、テストは **1161 件合格（変化なし）**。
-- **共有フック `useTocObserver` のカバレッジ拡充とサブリンク親章連動バグの修正**: PR #124 の SonarCloud Quality Gate が `new_coverage 64.3% < 80%` で失敗していた原因（`web-next/lib/useTocObserver.ts` の 18 行・17 分岐が未カバー）を解消。`web-next/lib/useTocObserver.test.tsx` を新設し、サブリンク経路・モバイルサイドバー開閉・複数 entry の最上位選択・クリーンアップを直接検証（行 65/65・分岐 36/37）。テスト作成の過程で、サブリンク交差時に親章の TOC リンクを点灯させる処理が `subLink.closest("section")` を使っており、TOC リンクはサイドバー内にあって `<section>` の子孫にならないため本番で一度も実行されない死んだコードだったことが判明 → 交差した対象要素側から `closest("section")` する形に修正。併せて、リスナ登録ブロック内でしか呼ばれないハンドラの到達不能な null ガードを `const` クロージャ化して除去。TDD の Red / Green / Refactor を分割コミット。契約テスト 14 件を追加（合計 **1161 テスト合格**）。
-- **AWS Bedrock ガイドの表記および Mermaid 修正**: `Amazon-bedrock-best-practices-guide.md` 内の Mermaid フローチャートのインデントをカラム 0 に揃え、Contextual Grounding（コンテキスト根拠確認）の実行条件と、その後の Automated Reasoning 事実検証およびアプリ側による再生成・拒否・代替応答判断の評価フローを明示（Mermaid 図と表の両方に反映）。また、Converse API 説明での複数 Guardrail 同時適用（重ね合わせ）の記述を `guardrailConfig` で指定できる単一の Guardrail の適用に修正。（合計 **1147 テスト合格**）。
-- **Gemini Enterprise Agent Platform (中級) ガイドの Next.js 新設移行**: `Gemini-enterprise-agent-platform-best-practices.html` (実践ベストプラクティスガイド、中級向け) を `web-next/app/google/enterprise-agent-platform-intermediate/page.tsx` に新設移行。既存の完全ガイドはそのまま残し、原文の全14セクション・7 Mermaid図・コードブロックを React 要素として faithful に保持。SEO Heading 構造の適合（単一 h1 化）、TOC のスクロール追従、外部リンクの安全属性、ページレジストリ登録、CSS modules 化による CSS 変数定義 of スコープ化、フッター等幅フォント設定を追加。原本は `archive/html/google/` 配下に退避。契約テスト6件を追加（合計 **1144 テスト合格**）。
-- **Gemini Enterprise Agent Platform ガイドの Next.js 移行**: `Gemini-enterprise-agent-platform-guide.html` を `web-next/app/google/enterprise-agent-platform/page.tsx` に移行。原文の全20セクション・チェックリスト・アンチパターン・外部リンク・15 Mermaid図を React 要素として faithful に保持し、TOC のスクロール追従、外部リンクの安全属性、ページレジストリ登録、テーブル左寄せ強制、CSS modules 化による CSS 変数定義のスコープ化、フッター等幅フォント設定を追加。原本は `archive/html/google` および `archive/md/google` 配下に退避。契約テスト7件を追加（合計 **1138 テスト合格**）。
-- **Claude Tag ガイド CSS 移行修正**: `web-next/app/claude/tag-best-practices/page.module.css` の3件の CSS 不具合を修正。① `--bg-elevated` / `--bg-card` / `--accent` 等の CSS 変数が `globals.css` に存在しないため全配色が崩壊していた問題を、`.layout` スコープ内に元 HTML の `:root` 定義を移植して解決。② `.sidebar` に `position: sticky; top: 0; height: 100vh; overflow-y: auto` を追加してスクロール時のサイドバー固定を実現。③ `.sidebarToggle { display: none }` をメディアクエリ外に追加してデスクトップでのハンバーガーボタン非表示を修正。また `.pageFooter` で未定義だった `--text-tertiary` を `--text-faint` に修正（合計 **1130 テスト合格、変化なし**）。
-- **Claude Tag 活用ガイドの Next.js 移行**: `Claude-tag-best-practices.html` を `web-next/app/claude/tag-best-practices/page.tsx` に移行。原文の全15セクション・10チェックリスト・全表・6 Mermaid図を React 要素として faithful に保持し、TOC のスクロール追従、モバイル開閉トグル、外部リンクの安全属性、ページレジストリ登録を追加。原本は `archive/html/Anthropic` および `archive/md/Anthropic` 配下に退避。契約テスト1件を追加（合計 **1130 テスト合格**）。
-- **GPT-5.6 ガイドのナビ・表示改善**: `/model-data/gpt-5-6-best-practices` を Providers の Codex 配下へ移動。メインコンテンツを全幅化し、Mermaid SVGを中央寄せ、Python/Bashコードブロックに依存追加なしのトークンハイライトを追加（合計 **1129 テスト合格**）。
-- **OpenAI GPT-5.6 完全ガイドの Next.js 移行**: `Gpt-5.6-best-practices-guide.html` の対応Markdown原本をビルド時に安全なReact要素へ変換し、`/model-data/gpt-5-6-best-practices` に追加。18セクション、7表、8 Mermaid図、コードブロック、目次スクロール追従、外部リンクの安全属性、ページレジストリ登録を実装。TDDのRed / Greenを分割し、契約テスト7件を追加（合計 **1126 テスト合格**）。
-- **AIガバナンス実践ガイドの Next.js 移行**: `Ai-governance-guide.html` を `/governance/ai-governance` へ移行。原文の全22セクション・表4件・Mermaid図5件・外部リンク84件をReact要素としてfaithfulに保持し、TOCスクロール追従、外部リンクの安全属性、ページレジストリ登録を追加。HTMLと対応Markdown原本は `archive/` に退避。TDDのRed / Green / Refactorを分割し、契約テスト6件を追加（合計 **1119 テスト合格**）。
-- **LLMファインチューニング ベストプラクティスガイドのデザイン刷新**: `/local-llm/finetuning-best-practices` をアンバー×ブルーのダーク技術ドキュメントとして再設計。本文・リンク・12表・5コードブロック・9 Mermaid図・99外部リンクは維持したまま、旧インラインスタイルをページ専用CSSへ集約し、表の左寄せとコード5件の依存追加なしのシンタックスハイライトを追加。契約テストを1件追加（合計 **1113 テスト合格**）。
-- **LLMファインチューニング ベストプラクティスガイドの Next.js 移行**: `Finetuning-best-practices-guide.html` を `/local-llm/finetuning-best-practices` へ移行。原文の全17セクション・12表・5コードブロック・9 Mermaid図・99外部リンクを React 要素として faithful に保持し、TOC のスクロール追従、外部リンクの安全属性、ページレジストリ登録を追加。原本は `archive/` に退避。TDD の Red / Green / Refactor を分割し、契約テスト6件を追加（合計 **1112 テスト合格**）。
-- **横断導線（RSS / 関連ページリンク / 横断検索）— plans/006 Phase 3（F-3' / F-7 / F-5、[plans/009](../plans/009-phase3-cross-navigation.md)）**: 58 ルートに達し「読者が目的のガイドへナビのドロップダウン経由でしか到達できない」状態を解消 🚀。3 導線すべてを `page-registry.ts` からの導出で追加した（手書きのフィード・関連リンク表・検索インデックスを一切持たない）。ナビは `nav-taxonomy.ts` の `NAV_GROUPS` に「検索」をフラットリンクとして What's New の直前へ挿入し、トップレベル 7 → 8 グループへ。TDD サイクル（Red/Green/Refactor/Docs Sync）でコミット分割。Vitest 契約テスト 42 件追加（合計 **1106 テスト合格**）。
-  - **F-3' RSS**: `app/rss.xml/route.ts` を Route Handler + `dynamic = "force-static"` で実装し、`output: 'export'` 下でも `out/rss.xml` として静的生成（addedAt 降順 20 件）。XML 予約 5 文字のエスケープは純粋関数 `escapeXml` に切り出してユニットテスト。`lib/metadata.ts` の `alternates.types` に自動発見リンクを追加。
-  - **F-7 関連ページリンク**: `lib/related-pages.ts` が topics の共有数からスコアし、「共有 topics 数 降順 → 同一 group 優先 → addedAt 降順 → slug 昇順」の 4 段タイブレークで順序を一意に決める（決定論的でないと無関係なページ追加で全ページの関連リンクが揺れ SSG 出力が不安定になる）。共有 0 件は除外し、無関係なリンクを出さない。`RelatedPages.tsx` は PageFreshness と同じく `app/layout.tsx` に 1 箇所マウントし、55 個の page.tsx を未編集のまま全ページへ関連 3 件を表示。
-  - **F-5 横断検索**: `/search` を新設。**外部ライブラリを追加せず自前実装**（57 ページの title/summary/topics は数十 KB で全件走査の部分一致で十分）。NFKC + 小文字化で正規化し、空白区切りの全トークンが title/summary/topics/group/category のいずれかに一致（AND）。**タグは `/tags/[tag]` の静的ページ群を作らず `/search` に集約**し（1〜2 ページしか持たないタグで薄いページが量産されるため）、`?q=` / `?tag=` の URL クエリで検索状態を共有可能にした。page.tsx は metadata のため Server Component に保ち、`useSearchParams` を使う `SearchClient` を `<Suspense>` 境界に置く（`output: 'export'` の要件）。
-- **ナビ再グルーピング（18 → 7 項目）— plans/006 Phase 2（F-4' / STATE-06 対応、[plans/008](../plans/008-nav-regrouping-f4.md)）**: サイトヘッダーのトップレベルが 18 項目に膨張し（うち 4 つは子リンク 1 件のみのドロップダウン）、かつ `nav-links.ts` が 170 行の手書きデータで `page-registry.ts` と二重管理になっていた問題を解消 🚀。**ナビを registry からの導出に変更**し、手書きリンクデータを全廃。トップレベルは 7 グループ（Home / Providers / Agent 開発 / 開発プロセス / 運用・品質 / モデル・データ / What's New）へ集約。新規 `lib/nav-taxonomy.ts` がグループの並び順とネスト対象の SSoT（registry のエントリは slug 昇順のため表示順を表現できない）。`page-registry.ts` に `category`（ナビ 2 段目ラベル）を追加し `group` を Zod enum 化（**`group` の値自体は 1 件も変更なし** — Phase 1 の投入時点で正しかった）。**2 段ネストは Providers（30 リンク）のみ**に適用（全グループを 2 段にすると CI/CD・Git Worktree・RAG のような 1 ページのカテゴリで 3 段ホバーが生まれ、STATE-06 の問題が階層を変えて再発するため）。`SiteHeaderClient` はサブトグル専用ハンドラを追加（既存の `closeAllDropdowns()` を呼ぶと親ドロップダウンごと閉じてしまうため、閉じるのは同一サブメニュー内の兄弟のみ）。**registry ⇔ ナビの全単射を契約テストで固定**し、以後ページ追加時のナビ登録漏れを機械検知。URL は不変（`app/**/page.tsx` と `netlify.toml` は未編集）。TDD サイクル（Red/Green/Refactor/Docs Sync）でコミット分割。Vitest 契約テスト 18 件追加（合計 **1064 テスト合格**）。
-- **metadata 欠落 3 ページの SEO 修正**: F-1 のレジストリ初期値採取中に、`/code-review/coderabbit-guide`・`/code-review/sonar-qube`・`/codex/harness-engineering` の 3 ページだけ `export const metadata` を持たず、SEO タイトル・説明が出力されていないことが判明。根因は書き忘れではなく **Client Component 境界の設計差**で、前 2 ページはページ全体が `"use client"` のため Next.js の規約上 page.tsx から metadata を export できない状態だった（他 53 ページは Server Component）。TDD（Red→Green）で対応し、`"use client"` の 2 ページはルート単位の `layout.tsx`（Server Component）から metadata を供給（本体の大規模リファクタは行わない最小差分）、`codex/harness-engineering` は page.tsx へ直接追加。description は `lib/page-registry.ts` の summary と同一文言に統一。Vitest 契約テスト 6 件追加（合計 **1046 テスト合格**）。
-- **鮮度基盤（ページレジストリ + What's New）の導入 — plans/006 Phase 1（F-1 / F-2）**: `web-next/lib/page-registry.ts` を新設し、全 57 ルート（Home + 55 ガイド + What's New）のメタデータ（title / group / provider / topics / summary / addedAt / lastReviewed）を Zod 検証付きの SSoT として集約 🚀。初期値は全フィールドを機械採取（title/group は nav-links、summary は各 page.tsx の metadata.description、日付は git log）。TDD サイクル（Red/Green/Refactor）でコミット分割。派生実装として ① `components/site/PageFreshness.tsx` を `app/layout.tsx` に 1 箇所マウントし、55 個の page.tsx を編集せずに全ページへ「最終確認日 / 公開日」バッジを表示（SiteHeader と同じ `usePathname()` パターン。SSG プリレンダで静的 HTML に焼き込まれることをビルド出力で確認済み）、② `app/whats-new/page.tsx` を registry から静的生成（新着 = addedAt 降順 / 最近更新 = lastReviewed 降順、各上位 12 件）、③ `app/sitemap.ts` のハードコード ROUTES（24 件で実ルート 55 と乖離＝stale）を registry 駆動へ置換し欠落 31 ルートを解消、`lastmod` にビルド日時ではなく `lastReviewed` を出力。ナビはトップレベル 17 → 18 項目（末尾に What's New）。Vitest 契約テスト 44 件追加（合計 **1040 テスト合格**）。
-- **LLM評価・ベンチマーク & オブザーバビリティ ガイドの Next.js 移行**: ルートの `Llm-evaluation-observability-best-practices.html` を `web-next/app/llm-ops/evaluation-observability/page.tsx` に完全移行 🚀。TDD サイクル（Red/Green/Refactor）に沿ってステップバイステップでコミット。CSS Modules によるレイアウトスコープ化、外部リンクのセキュリティ対策（target/rel）、10個の Mermaid 図の中央寄せ、TOCスクロールハイライト追従（Intersection Observer）、およびモバイル開閉トグルを実装。ナビゲーションに新規カテゴリ「LLMOps -> Evaluation & Observability」を追加し、関連統合テストを 15 ドロップダウン対応に更新。元のHTML・MDファイルはアーカイブディレクトリに退避。Vitest 契約テスト 9 件追加（合計 931 テスト合格）。
-- **Google Stitch 実践ガイドの Next.js 移行**: ルートの `Google-stitch-guide.html` を `web-next/app/google/stitch-guide/page.tsx` に完全移行 🚀。TDD サイクル（Red/Green/Refactor）に沿ってステップバイステップでコミット。CSS Modules によるレイアウトスコープ化、外部リンクのセキュリティ対策（target/rel）、等幅フォント適用、7つの Mermaid 図の中央寄せ、TOCスクロールハイライト追従（Intersection Observer）、およびモバイル開閉トグルを実装。ナビゲーションの「Google -> Stitch Guide」に新規登録。元のHTML・MDファイルはアーカイブディレクトリに退避。Vitest 契約テスト 9 件追加（合計 922 テスト合格）。
-- **マルチモーダルAI実践ガイド：画像・音声生成のベストプラクティス 2026の Next.js 移行**: ルートの `Multimodal-image-audio-best-practices-2026.html` を `web-next/app/multimodal/image-audio-best-practices-2026/page.tsx` に完全移行 🚀。TDD サイクル（Red/Green/Refactor）に沿ってステップバイステップでコミット。CSS Modules によるレイアウトスコープ化、外部リンクのセキュリティ対策（target/rel）、18個の Mermaid 図の中央寄せ、TOCスクロールハイライト追従（Intersection Observer）、およびモバイル開閉トグルを実装。ナビゲーションの「Multimodal -> Image & Audio (2026)」に新規登録。元のHTML・MDファイルはアーカイブディレクトリに退避。Vitest 契約テスト 6 件追加（合計 911 テスト合格）。
-- **マルチモーダルAI(画像・音声生成)ベストプラクティスガイド 2026の Next.js 移行**: ルートの `Multimodal-ai-image-audio-generation-best-practices.html` を `web-next/app/multimodal/generation-best-practices/page.tsx` に完全移行 🚀。TDD サイクル（Red/Green/Refactor）に沿ってステップバイステップでコミット。CSS Modules によるレイアウトスコープ化、外部リンクのセキュリティ対策（target/rel）、8つの Mermaid 図の中央寄せ、TOCスクロールハイライト追従（Intersection Observer）、およびモバイル開閉トグルを実装。ナビゲーションに新規カテゴリ「Multimodal -> Generation Best Practices」を追加。元のHTML・MDファイルはアーカイブディレクトリに退避。Vitest 契約テスト 6 件追加（合計 905 テスト合格）。
-- **RAG & Embeddings 完全ベストプラクティスガイドの Next.js 移行**: ルートの `Rag-embeddings-best-practices-guide.html` を `web-next/app/rag/embeddings-best-practices/page.tsx` に完全移行 🚀。TDD サイクル（Red/Green/Refactor）に沿ってステップバイステップでコミット。CSS Modules によるレイアウトスコープ化、等幅フォント適用、外部リンクのセキュリティ対策（target/rel）、4つの Mermaid 図の中央寄せ、TOCスクロールハイライト追従（Intersection Observer）、およびモバイル開閉トグルを実装。ナビゲーションに新規カテゴリ「RAG -> RAG & Embeddings Best Practices」を追加。元のHTML・MDファイルはアーカイブディレクトリに退避。Vitest 契約テスト 5 件追加（合計 899 テスト合格）。
-- **MCP実践ベストプラクティスガイド（中級〜上級者向け）の Next.js 新設移行**: 既存の `/mcp/mcp-best-practices` はそのまま残し、ルートの `Mcp-best-practices.html` を `web-next/app/mcp/mcp-best-practices-intermediate/page.tsx` に新設移行。TDD サイクル（Red/Green/Refactor）に沿ってステップバイステップでコミット。CSS Modules によるレイアウトスコープ化、等幅フォント適用、外部リンクのセキュリティ対策（target/rel）、12点の Mermaid 図の中央寄せ、TOCスクロールハイライト追従（Intersection Observer）、およびモバイル開閉トグルを実装。ナビゲーションの「MCP -> MCP Best Practices (中級)」に新規登録。元の HTML ファイルはアーカイブディレクトリに退避。Vitest 契約テスト 9 件追加（合計 892 テスト合格）。
-- **MCP実践ガイドの Next.js 移行**: `Mcp-best-practices-guide.html` から `web-next/app/mcp/mcp-best-practices/page.tsx` への完全移行を完了 🚀。TDD サイクルに沿ってステップバイステップでコミット。CSS Modules によるレイアウトスコープ化、等幅フォント適用、外部リンクのセキュリティ対策（target/rel）、Mermaid遅延ロードと中央寄せ、TOCスクロールハイライト追従（Intersection Observer）、およびモバイル開閉トグルを実装。ナビゲーションの「MCP -> MCP Best Practices」に新規登録。 Vitest 契約テスト 9 件追加（合計 883 テスト合格）。
-- **コンテキストエンジニアリング入門の Next.js 移行**: ルートの `Context-engineering-guide.html` から `web-next/app/agent/context-engineering-best-practices/page.tsx` への完全移行を完了 🚀。TDD サイクルに沿ってステップバイステップでコミット。CSS Modules によるレイアウトスコープ化、等幅フォントの適用、外部リンクのセキュリティ対策（target/rel）、Mermaid遅延ロードと中央寄せ、TOCスクロールハイライト追従（Intersection Observer）、およびモバイル開閉トグルを実装。ナビゲーションの「Agent -> Context Engineering」に新規登録。元の HTML ファイルは `legacy/` 配下に移動。Vitest 契約テスト 8 件がすべて合格。
-- **AI CI/CD 自動化 完全ガイドの Next.js 移行**: `Ai-cicd-automation-best-practices.html` から `web-next/app/ci-cd/ai-cicd-automation-best-practices/page.tsx` への完全移行を完了 🚀。TDD サイクルに沿ってステップバイステップでコミット。CSS Modules によるレイアウトスコープ化、等幅フォント適用、外部リンクのセキュリティ対策、Mermaid遅延ロードと中央寄せ、TOCスクロールハイライト追従（Intersection Observer）、およびモバイル開閉トグルを実装。ナビゲーションに新規カテゴリ「CI/CD -> AI CI/CD Automation」を追加し、関連統合テストを 11 ドロップダウン対応に更新。Vitest 契約テスト 8 件追加（合計 864 テスト合格）。
-- **AIセキュリティ ベストプラクティス完全ガイド（中級〜上級者向け）の Next.js 移行**: `Ai-security-best-practices-intermediate.html` から `web-next/app/security/ai-security-best-practices-intermediate/page.tsx` への完全移行を完了 🚀。TDD サイクルに沿ってステップバイステップでコミット。CSS Modules によるレイアウトスコープ化、等幅フォント適用、外部リンクのセキュリティ対策（target/rel）、Mermaid遅延ロードと中央寄せ、TOCスクロールハイライト追従（Intersection Observer）、およびモバイル開閉トグルを実装。ナビゲーションの「Security -> AI Security Best Practices (中級)」に新規登録。 Vitest 契約テスト 8 件追加（合計 856 テスト合格）。
-- **Google Agent Development Kit 実践ガイドの Next.js 移行**: `Adk-best-practices-guide.html` から `web-next/app/google/adk-best-practices/page.tsx` への完全移行を完了 🚀。TDD サイクルに沿ってステップバイステップでコミット。CSS Modules によるレイアウトスコープ化、等幅フォント適用、外部リンクのセキュリティ対策（target/rel）、Mermaid遅延ロードと中央寄せ、TOCスクロールハイライト追従（Intersection Observer）、およびモバイル開閉トグルを実装。ナビゲーションの「Google -> ADK Best Practices」に新規登録。 Vitest 契約テスト 9 件追加（合計 848 テスト合格）。
-- **ローカルLLM／セルフホスティング ベストプラクティスガイドの Next.js 移行**: `Local-llm-self-hosting-best-practices.html` から `web-next/app/local-llm/best-practices/page.tsx` への完全移行を完了 🚀。TDD サイクルに沿ってステップバイステップでコミット。CSS Modules によるレイアウトスコープ化、外部リンクのセキュリティ対策（target/rel）、Mermaid遅延ロード、TOCスクロールハイライト追従（Intersection Observer）を実装。ナビゲーションの「Local LLM -> Self-hosting Best Practices」に新規登録。 Vitest 契約テスト 9 件追加（合計 839 テスト合格）。
-- **ローカルLLM/セルフホスティング 完全ガイドの Next.js 移行**: `Local-llm-self-hosting-guide.html` から `web-next/app/local-llm/self-hosting/page.tsx` への完全移行を完了 🚀。TDD サイクルに沿ってステップバイステップでコミット。CSS Modules によるレイアウトスコープ化、外部リンクのセキュリティ対策、Mermaid遅延ロード、TOCスクロールハイライト追従（Intersection Observer）を実装。ナビゲーションの「Local LLM -> Self-hosting Guide」に新規登録。 Vitest 契約テスト 8 件追加（合計 830 テスト合格）。
-- **Google NotebookLM 完全ベストプラクティスガイドの Next.js 移行**: `Google-NotebookLM.html` から `web-next/app/google/notebook-lm/page.tsx` への完全移行を完了 🚀。TDD サイクルに沿ってステップバイステップでコミット。CSS Modules によるレイアウトスコープ化、外部リンクのセキュリティ対策、Mermaid遅延ロード、TOCスクロールハイライト追従（Intersection Observer）を実装。ナビゲーションの「Google -> NotebookLM Guide」に新規登録。 Vitest 契約テスト 9 件追加（合計 820 テスト合格）。
-- **AIセキュリティ ベストプラクティスガイドの Next.js 移行**: `Ai-security-best-practices.html` から `web-next/app/security/ai-security-best-practices/page.tsx` への完全移行を完了 🚀。TDD サイクルに沿ってステップバイステップでコミット。CSS Modules によるレイアウトスコープ化、外部リンクのセキュリティ対策、Mermaid遅延ロード、TOCスクロールハイライト追従（Intersection Observer）を実装。ナビゲーションの「Security -> AI Security Best Practices」に新規登録。 Vitest 契約テスト 8 件追加（合計 811 テスト合格）。
-- **Agent Skills 完全ガイドのNext.js 移行**: `Agent-skills-guide.html` から `web-next/app/agent/skills/page.tsx` への完全移行を完了 🚀。TDD サイクルに沿ってステップバイステップでコミット。CSS Modules によるレイアウトスコープ化とメインコンテンツの画面幅100%化、外部リンクのセキュリティ対策、Mermaid遅延ロード、TOCスクロールハイライト追従（Intersection Observer）を実装。ナビゲーションの「Agent -> Agent Skills Guide」に新規登録。 Vitest 契約テスト 7 件追加（合計 801 テスト合格）。
-- **skills.sh 完全ガイドの Next.js 移行**: `Skills-sh-guide.html` から `web-next/app/claude/skills-sh/page.tsx` への完全移行を完了 🚀。TDD サイクルに沿ってステップバイステップでコミット。CSS Modules によるレイアウトスコープ化とメインコンテンツの画面幅100%化、外部リンクのセキュリティ対策、Mermaid遅延ロード、TOCスクロールハイライト追従（Intersection Observer）、進捗バーおよびモバイル開閉ロジックの TocObserver 移行を実装。ナビゲーションの「Agent -> skills.sh Guide」に新規登録。 Vitest 契約テスト 7 件追加（合計 794 テスト合格）。
-- **Claude Fable 5 実践活用ガイドの Next.js 移行**: `Claude-fable-5-best-practices.html` から `web-next/app/claude/fable-5-best-practices/page.tsx` への完全移行を完了 🚀。カテゴリ毎に TDD サイクルに沿ってステップバイステップでコミット。CSS Modules によるレイアウトスコープ化、外部リンクのセキュリティ対策、Mermaid遅延ロード、TOCスクロールハイライト追従（Intersection Observer）を実装。ナビゲーションの「Claude -> Fable 5 Best Practices」に新規登録。 Vitest 契約テスト 9 件追加（合計 787 テスト合格）。
-- **Cursor 実践ガイド（中〜上級者向け）の Next.js 移行**: `Cursor-complete-guide-intermediate.html` から `web-next/app/cursor/complete-guide-intermediate/page.tsx` への完全移行を完了 🚀。カテゴリ毎に TDD サイクルに沿ってステップバイステップでコミット。CSS Modules によるレイアウトスコープ化、外部リンクのセキュリティ対策、Mermaid遅延ロード、TOCスクロールハイライト追従（Intersection Observer）を実装。ナビゲーションの「IDE -> Cursor Guide (中級)」に新規登録。 Vitest 契約テスト 2 件追加（合計 778 テスト合格）。
-- **Loop Engineering 完全ガイドの Next.js 移行**: `Loop-engineering-guide.html` から `web-next/app/agent/loop-engineering/page.tsx` への完全移行を完了 🚀。カテゴリ毎に TDD サイクルに沿ってステップバイステップでコミット。CSS Modules によるレイアウトスコープ化、外部リンクのセキュリティ対策、モノスペースコードブロック、警告バナー、Mermaid遅延ロード、TOCスクロールハイライト追従（Intersection Observer）を実装。ナビゲーションの「Agent -> Loop Engineering Guide」に新規登録。 Vitest 契約テスト 19 件追加（合計 778 テスト合格）。
-- **Cursor 完全ガイド コードブロック・フッターCSS修正**: コードブロック (`.codeBody`・`.codeLine`・`.codeBar`) に `font-family: var(--font-mono)` を追加し、レガシーHTMLと同様の JetBrains Mono 等のモノスペースフォントで表示されるよう修正。フッター (`.pageFooter`) も `font-family: var(--font-mono)` と `font-size: 12.5px` に統一。Intersection Observer によるTOCスクロール追従、モバイル幅でのサイドバー強制非表示、コードハイライト Atom One Dark 配色の修正も含む。全744件テスト合格。
-- **Cursor 完全ガイドの Next.js 移行**: `Cursor-complete-guide.html` から `web-next/app/cursor/complete-guide/page.tsx` への完全移行を完了 🚀。CSS Modules によるレイアウトスコープ化、外部リンクのセキュリティ対策、コピー機能付きコードブロック、Mermaid遅延ロードを実装。ナビゲーションに新規カテゴリ「IDE -> Cursor Guide」を追加。さらに、共通ヘッダーによるサイドバー重なり（top/heightオフセット）を修正し、目次テキストを元のHTMLに完全一致するよう補正。フッターをメインコンテンツ内に戻して元の背景色・上境界線を復元。全コードブロックのインデント（スペース数）を忠実に復元修正。全744件のテストがパス。
-- **Vercel Sandbox 完全入門ガイドの Next.js 移行**: `Vercel-sandbox-guide.html` から `web-next/app/vercel/sandbox/page.tsx` への完全移行を完了 🚀。CSS Modules によるレイアウト調整、Mermaid遅延ロード、安全な外部リンク対応、コードコピーボタンを実装。ナビゲーションに「Vercel` -> `Vercel Sandbox`」を新規登録し、テスト期待値の修正や新規の契約テストを含めた 743 件のフロントエンドテストが全合格。
-- **ビルド実行禁止ルールの明文化**: Antigravity環境におけるメモリ制限（OOM）クラッシュやネットワーク遮断エラーを防止するため、`CLAUDE.md` および `GEMINI.md` に Antigravity サンドボックス環境下でのみビルドコマンド実行を禁止するルールを追加整備。
-- **InteractiveChecklist 状態同期バグの修正**: `items` プロップの動的変更時に `checkedStates` が追従せず表示と不整合を起こす問題を `useEffect` による再初期化で解決。テストケースを新規追加。
-- **Vercel Sandbox 実践・上級者ガイド**: Vercel Sandbox のアーキテクチャ、SDK API リファレンス、認証、ネットワークポリシー、セキュリティ等を詳細に解説した上級者向けガイド (`Vercel-sandbox-advanced-guide.md`) を追加。
-- **InteractiveChecklist コンポーネントの導入**: `claude/self-hosted-sandboxes` ページに、クライアントサイドで状態を保持し、Enter/Spaceキーやクリックで切り替え可能な `InteractiveChecklist` を導入。アクセシビリティ（aria-checked/role="checkbox"）にも配慮。
-- **Vercel Sandbox 完全入門ガイド**: Vercel Sandbox (MicroVM) のアーキテクチャ、セットアップ、SDK利用法、ベストプラクティスを網羅した詳細ガイド (`Vercel-sandbox-guide.md`) を追加。HTML版 (`Vercel-sandbox-guide.html`) も作成。
-- **Claude Self-hosted Sandboxes ガイドの強化**: インタラクティブチェックリストの導入と、誤字の修正を実施。合計 742 テスト合格（2件追加）。
-- **Google 関連コンポーネントテストの堅牢性向上**: `StepsApp` のテストにおいて、`fakeTimers` のクリーンアップを確実にするため `try-finally` ブロックを導入。インポート順の整理。合計 738 テスト合格（維持）。
-- **CIエラー修正およびGoogle関連コンポーネントテスト追加**: Biomeフォーマットエラーを修正し、テストカバレッジが不足していた8つの新規Googleコンポーネントに対する Vitest テストを追加。合計738テスト合格。
-- **Claude Self-hosted Sandboxes 完全ガイド**: Next.js App Router への移行完了 🚀（7件の契約テストを追加し、合計710テスト合格）。Claude Managed Agents のセルフホスト型サンドボックス環境におけるアーキテクチャ、Docker 連携、セキュリティ制御、MCP 統合などのベストプラクティスを解説する詳細ガイド。
-- **Hermes Agent 中級・上級者向け完全ガイド**: Next.js App Router への移行完了 🚀（8件の契約テストを追加し、合計693テスト合格）。アーキテクチャの深掘り、7層の多層防御セキュリティモデル、DMペアリング、Docker サンドボックス、サブエージェント委譲、Cron ジョブチェーニング等、本番運用を見据えた高度な活用法を解説する詳細ガイド。
-- **Hermes Agent 完全ガイド**: Nous Research が開発した自己改善型 AI エージェント「Hermes Agent」のアーキテクチャ、セットアップ、メモリ、スキル、自動化（Cron）等を解説する総合ガイドをルートに配置。
-- **Code Review Tool Pricing（1/3/12ヶ月プラン別料金表）**: 既存の `/code-review/tool-pricing` ページに**プラン別・USD+円の料金表**を追加 🚀。`ToolEntry.price: string` を `plans: readonly PricingPlan[]` に置き換え、`planAmounts`（1/3/12ヶ月計算・純粋関数）と `representativePrice`（マトリクス用最安値ラベル）を `constants.ts` に追加。pricing.json の `jpy_rate` / `generated_at` を `parsePricingData` で取得し、`fmtUSD` / `fmtJPY` で USD+円を二段表示。年額割引あるプランには「年額割引」バッジを表示。Hero と免責セクションに更新時レートと基準日を明記。テスト 7 件追加（plan-header / plan-row / ¥記号 各ページテスト + planAmounts 純粋関数テスト4件、計684テスト合格）。Gemini Code Assist / Google Jules AI Ultra は公式ページで WebSearch 確認済み（Standard $19〜22.80、Enterprise $45〜54、Jules Ultra $200/月）。確定不能プラン（AWS CodeGuru・SonarQube Developer）は `priceNote` で「従量課金」「LOC依存（年額）」と非推測値で明記。
-- **Code Review Tool Pricing（料金比較ページ）**: `/code-review/tool-pricing` を新規追加 🚀。Code Review 系 AI ツール 9 種（GitHub Copilot / Codex / Claude / CodeRabbit / Gemini Code Assist / Jules / AWS CodeGuru / SonarQube ×2）の料金目安・主用途・メリット/デメリットを比較マトリクス＋カテゴリ別カードで横断表示。各価格に**公式 pricing ページの出典リンク**と確認年月を併記し、可変データは `app/code-review/tool-pricing/constants.ts` に SSoT として集約（**月次価格レビュー対象**）。Code Review ナビ先頭に「Tool Pricing」を追加。契約テスト 7 件追加（合計 677 テスト合格）。本ページの lint はクリーン（既存 `sonar-qube` / `antigravity-slash-commands-guide` の既知 lint 指摘は本作業の対象外）。
-- **Antigravity スラッシュコマンド完全ガイド (CSS修正)**: Next.js CSS Modules の `:global()` ラッパーを用いて、約400行のスタイルを安全にスコープ化し適用完了。
-- **Antigravity スラッシュコマンド完全ガイド**: Next.js App Router への移行完了 🚀（5件の契約テストを追加し、合計670テスト合格）。
-- **Antigravity スラッシュコマンド完全ガイド (HTML版)**: Gemini CLI から Antigravity CLI への移行に伴う、スラッシュコマンド、カスタムコマンド（TOML）、Plan Mode 等の解説ガイドをルートに配置。
-- **SonarQube Cloud 解析の導入（品質 CI/CD）**: public 無料プランをモノレポ単一プロジェクトで導入。両言語にカバレッジ計測を追加（web-next: `@vitest/coverage-v8`→`lcov.info` / scraper: `pytest-cov`→`coverage.xml`、いずれも dev 依存）。`sonar-project.properties` / `.github/workflows/sonarqube.yml`（`push:main,dev`+PR）/ `make sonar`（Docker scanner CLI）を追加。**モノレポのレポートパス補正**（lcov `SF:`→`web-next/`、coverage.xml `<source>`→`scraper/src/scraper`）でカバレッジ 0% を回避。既定 `uv run pytest` の出力は不変。**初回手動作業**: Cloud import→Automatic Analysis OFF、org/projectKey 反映、GitHub Secrets に `SONAR_TOKEN` 登録。
-- **SonarQube Code Review 実践ガイド**: Next.js App Router への移行完了 🚀（5件の契約テストを追加し、合計665テスト合格）。
-- **GitHub Copilot Code Review 完全活用ガイド**: Next.js App Router への移行完了 🚀（5件の契約テストを追加し、合計660テスト合格）。
-- **CodeRabbit 完全活用ガイド**: Next.js App Router への移行完了 🚀（5件の契約テストを追加し、合計655テスト合格）。
-- **Claude Code スラッシュコマンド完全ガイド**: Next.js App Router への移行完了 🚀（5件の契約テストを追加し、合計650テスト合格）。
-- **CodeCopyButton コンポーネント**: `web-next/components/docs/` に追加。`managed-agents` ページ等で利用開始。
-
-## テストカバレッジの進捗状況
-
-総合的なテストカバレッジの詳細は [`docs/TEST_COVERAGE_PROGRESS.md`](TEST_COVERAGE_PROGRESS.md) および [`docs/coverage-dashboard.html`](coverage-dashboard.html) を参照のこと。
-
-### テスト分野別のカバレッジ概要 (2026-06-01 時点)
-
-- **Unit**:
-  - `app/` (全 23 ガイドページルート): ✅ 100% 契約テスト（タイトル、セクション数、rel、metadata）
-  - `components/` (電卓 UI 9/9 コンポーネント): ✅ 100%
-  - `site/` (共通ヘッダー/バナー): ✅ 100%
-  - `lib/` (ユーティリティ): ほぼ網羅 (metadata, fonts を除く)
-  - `types/`, `providers/`, `tools/`, `core/`: ⚠️ 一部モックテストのみ (ランタイム検証や詳細ロジック未整備)
-- **Integration**:
-  - `components/` (データフロー連携): ✅ 実装済み (`HomePage.integration.test.tsx`)
-  - その他 (`app/`, `site/`, `scraper/` 関連): ❌ 未実装 (missing)
-- **E2E / Visual**: ❌ 未実装
-- **Accessibility (a11y)**: ⚠️ 部分的 (`LanguageToggle` や `ApiTable` 等の aria 属性確認のみ。axe-core 自動テスト未導入)
-- **Performance**: ❌ 未実装 (Lighthouse CI 未整備)
-- **API / Contract**:
-  - `lib/` (Zod スキーマ): ✅ 実装済み
-  - `types/` (TypeScript-Pydantic パリティ): ✅ コンパイル時アサートで同期検証
-  - スクレイパー関連: ❌ 未実装
-- **Security**:
-  - `lib/` / `components/`: ⚠️ `tRich` の HTML 文字列 XSS 耐性テストあり。その他監査ゲート未整備
-
----
-
-## 開発・品質チェックルール (AI/人間共通)
-
-`CLAUDE.md` の開発ルールを補完する、現在の保守フェーズで厳守すべきルールです。
-
-### R1. Biome フォーマット・lint の適用スコープ
-
-- **禁止**: リポジトリ全体を対象とする自動修正 (`bun run lint:fix` / `biome check . --write` など引数なしの実行)
-- **理由**: 作業範囲外のファイルを意図せずフォーマットまたは修正し、差分を汚してしまうのを防ぐため。
-- **手順**: 変更したファイルのみを明示的にパス指定して実行すること (例: `bunx biome check --write web-next/app/some-page/page.tsx`)
-
-### R2. 型定義の同期 (SSoT)
-
-- **原則**: スクレイパーの `scraper/src/scraper/models.py` (Pydantic) が Single Source of Truth (SSoT)。
-- **手順**: スキーマを変更する際は、必ず `web-next/types/pricing.ts` (TypeScript) を手動で更新し、`web-next/lib/pricing.ts` 内の `_AssertParity` が通ることを確認する。
-
----
-
-## 保守・開発用 検証コマンド早見表
-
-```bash
-# フロントエンドテスト (Vitest)
-cd web-next && bun run test
-
-# TypeScript 型チェック
-cd web-next && bun run typecheck
-
-# 静的ビルド検証
-cd web-next && bun run build
-
-# Biome リント確認
-cd web-next && bun run lint
-
-# スクレイパーテスト (pytest)
-cd scraper && uv run pytest
-```
-
----
-
-## 移行完了後の継続的課題とネクストアクション
-
-移行（Phase 1–14, Phase A–F）が完了したため、今後は以下の継続的課題と改善に注力する。
-
-### 1. 月次データアップデート（定常運用）
-
-毎月、各プロバイダー（Anthropic, Google, OpenAI など）の最新価格を反映させる。
-為替レート更新および `pricing.json` の型定義と `lib/pricing.ts` の `_AssertParity` の一致を確認する。
-加えて、**`/code-review/tool-pricing` の料金**（`app/code-review/tool-pricing/constants.ts`）も毎月見直す。
-各エントリの `sourceUrl`（公式 pricing ページ）を辿って `price` / `priceCheckedAt` を更新し、ページ全体の `PRICE_CHECKED_AT` を当月へ更新する。
-
-### 2. テストカバレッジの拡充
-
-[`docs/TEST_COVERAGE_PROGRESS.md`](TEST_COVERAGE_PROGRESS.md) で `missing` または `partial` となっている領域のテストを順次追加する。
-特に **E2Eテストの導入**、**アクセシビリティ自動検証テストの追加**、**セキュリティ監査ゲートの整備** に注力する。
-
-### 3. 表示パフォーマンスおよび Core Web Vitals の監視
-
-Netlify 上での SSG (Static Site Generation) 出力物の Lighthouse 計測を行い、LCP (Largest Contentful Paint) や INP (Interaction to Next Paint) が高スコアを維持しているか監視する。
-
----
-
-## 次回セッションでの再開・実行依頼プロンプト
-
-以下は、任意の Coding Agent（Jules, Claude Code, Gemini CLI, Cline など）に特定の作業を依頼する際の指示プロンプトテンプレートです。
-
-### 1. 月次データアップデート実行依頼
-
-```text
-Next.js 移行完了後のリポジトリ `LLM-Studies` にて、最新のAIモデル価格と為替レートへのアップデート作業（月次データアップデート）を実行してください。
-
-- ドキュメント: docs/MONTHLY_UPDATE_PROMPTS.md に定義された手順に従ってください。
-- 現在のステータス: docs/PROGRESS.md を参照。
-
-作業ステップ：
-1. 為替レートとモデル価格データのスクレイピングおよび更新処理の実行。
-2. scraper/src/scraper/models.py (SSoT) の変更がある場合、web-next/types/pricing.ts に型を同期。
-3. web-next/lib/pricing.ts の _AssertParity によるコンパイル時整合性チェックが通ることを確認。
-4. フロントエンドおよびスクレイパーの全テスト（Vitest / pytest）を実行し、問題ないことを検証。
-```
-
-### 2. テスト拡充（E2E / a11y / セキュリティ）実行依頼
-
-```text
-Next.js 移行完了後のリポジトリ `LLM-Studies` にて、テストカバレッジ拡充計画に基づき、テストの追加・強化を行ってください。
-
-- ドキュメント: docs/TEST_COVERAGE_PROGRESS.md および docs/TESTING.md を参照。
-- 現在のステータス: docs/PROGRESS.md を参照。
-
-作業ステップ：
-1. テストが不足しているセル（例: アクセシビリティの axe-core 自動テストの導入、Playwright による E2E テストの骨格作成、または security の audit 関連など）を特定。
-2. 計画的にテストコードを追加し、既存テストにデグレード（不合格）が発生していないことを確認。
-3. docs/TEST_COVERAGE_PROGRESS.md のカバレッジ進捗を更新し、/update-coverage-dashboard スキル等を用いて docs/coverage-dashboard.html と同期する。
-```
-
-### 3. 一般的な保守・改善作業の再開
-
-```text
-Next.js 移行完了後のリポジトリ `LLM-Studies` の保守・改善作業を再開してください。
-
-- リポジトリ: LLM-Studies (Next.js 移行プロジェクトは dev/main へ完全マージ済み)
-  - 現在のステータス: docs/PROGRESS.md を参照。Vitest は 157 files / 1414 tests passed、pytest は 43/43 passed
-- リポジトリ規約: CLAUDE.md (編集上の絶対ルール。※Antigravity環境ではビルドは実行禁止)
-
-作業方針：
-1. ドキュメントや設定ファイルの更新、パフォーマンスとアクセシビリティの継続的な改善・監視。
-2. 検証コマンド（※Antigravity環境ではビルドは実行禁止）:
-  (cd web-next && bun run test)
-  (cd web-next && bun run typecheck)
-  (cd web-next && bun run build)
-  (cd web-next && bun run lint)
-  (cd scraper && uv run pytest)
-```

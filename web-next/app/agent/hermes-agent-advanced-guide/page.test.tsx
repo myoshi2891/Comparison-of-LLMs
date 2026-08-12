@@ -1,71 +1,87 @@
-// Red contract test. Expected to FAIL until page.tsx is implemented.
+// Contract test for /agent/hermes-agent-advanced-guide
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { render } from "@testing-library/react";
 import type { ReactElement } from "react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import PageComponent, {
   metadata as rawMetadata,
 } from "@/app/agent/hermes-agent-advanced-guide/page";
+
+vi.mock("@/components/docs/MermaidDiagram", () => ({
+  default: function DummyMermaidDiagram({ chart }: { chart: string }) {
+    return <pre data-testid="mermaid">{chart}</pre>;
+  },
+}));
 
 const Page = PageComponent as unknown as () => ReactElement;
 type MetadataLike = { title?: unknown; description?: unknown };
 const metadata = rawMetadata as unknown as MetadataLike;
 
-const EXPECTED_SECTION_IDS = [
-  "ch1",
-  "ch2",
-  "ch3",
-  "ch4",
-  "ch5",
-  "ch6",
-  "ch7",
-  "ch8",
-  "ch9",
-  "ch10",
-  "ch11",
-  "ch12",
+const EXPECTED_H2_IDS = [
+  "1-hermes-agentとは何か",
+  "2-アーキテクチャ概観",
+  "3-セットアップとプロファイル運用のベストプラクティス",
+  "4-メモリシステム設計のベストプラクティス",
+  "5-スキルシステムとprogressive-disclosure",
+  "6-curatorによるスキルの自動メンテナンス",
+  "7-コンテキストファイル戦略agentsmd--soulmd",
+  "8-サブエージェント委任delegation",
+  "9-execute_codeによるトークン最適化",
+  "10-persistent-goalsgoal-ralph-loopの実践",
+  "11-cron自動化のベストプラクティス",
+  "12-mcp統合のベストプラクティス",
+  "13-本番運用のセキュリティチェックリスト",
+  "14-コスト最適化とプロンプトキャッシュ",
+  "15-トラブルシューティング",
+  "16-ベストプラクティス総括チェックリスト",
+  "17-参考文献出典",
 ] as const;
 
 describe("/agent/hermes-agent-advanced-guide - metadata", () => {
-  it("exports a metadata object with title containing 'Hermes Agent'", () => {
+  it("exports a metadata object with correct title and description", () => {
     expect(metadata).toBeDefined();
     const title =
       typeof metadata.title === "string"
         ? metadata.title
         : (metadata.title as { default?: string } | undefined)?.default;
-    expect(title).toMatch(/Hermes Agent/);
-  });
-
-  it("exports a metadata object with non-empty description", () => {
+    expect(title).toBe("Hermes Agent ベストプラクティスガイド ― 中級者から上級者向け");
     expect(typeof metadata.description).toBe("string");
     expect((metadata.description as string).length).toBeGreaterThan(0);
   });
 });
 
 describe("/agent/hermes-agent-advanced-guide - page structure", () => {
-  it("renders an <h1> containing 'Hermes Agent'", () => {
+  it("renders an <h1> with exact title text", () => {
     const { container } = render(<Page />);
     const h1 = container.querySelector("h1");
     expect(h1).not.toBeNull();
-    expect(h1?.textContent).toMatch(/Hermes Agent/);
+    expect(h1?.textContent?.trim()).toBe(
+      "Hermes Agent ベストプラクティスガイド ― 中級者から上級者向け"
+    );
   });
 
-  it("renders all 12 expected chapter section ids", () => {
+  it("renders all 17 expected section H2 ids", () => {
     const { container } = render(<Page />);
-    const sections = container.querySelectorAll('section[id^="ch"]');
-    expect(sections.length).toBe(EXPECTED_SECTION_IDS.length);
-    for (const id of EXPECTED_SECTION_IDS) {
-      const el = container.querySelector(`#${id}`);
-      expect(el, `chapter section id="${id}" must exist`).not.toBeNull();
+    const h2Elements = container.querySelectorAll("h2[id]");
+    expect(h2Elements.length).toBe(EXPECTED_H2_IDS.length);
+    for (const id of EXPECTED_H2_IDS) {
+      const el = container.querySelector(`h2#${CSS.escape(id)}`);
+      expect(el, `h2 id="${id}" must exist`).not.toBeNull();
     }
   });
 
-  it("renders TOC links pointing to all section anchors", () => {
+  it("renders exactly 11 Mermaid diagrams", () => {
+    const { container } = render(<Page />);
+    const mermaids = container.querySelectorAll('[data-testid="mermaid"]');
+    expect(mermaids.length).toBe(11);
+  });
+
+  it("renders TOC links pointing to section anchors", () => {
     const { container } = render(<Page />);
     const tocAnchors = container.querySelectorAll('nav a[href^="#"]');
     const tocHrefs = Array.from(tocAnchors).map((a) => a.getAttribute("href"));
-    for (const id of EXPECTED_SECTION_IDS) {
+    for (const id of EXPECTED_H2_IDS) {
       expect(tocHrefs, `TOC must link to #${id}`).toContain(`#${id}`);
     }
   });
@@ -82,7 +98,6 @@ describe("/agent/hermes-agent-advanced-guide - external link safety", () => {
     for (const a of externals) {
       expect(a.getAttribute("target")).toBe("_blank");
       const rel = a.getAttribute("rel") ?? "";
-      expect(rel).toMatch(/\bexternal\b/);
       expect(rel).toMatch(/\bnoopener\b/);
       expect(rel).toMatch(/\bnoreferrer\b/);
     }
@@ -105,5 +120,21 @@ describe("/agent/hermes-agent-advanced-guide - static source safety", () => {
     const source = readFileSync(join(__dirname, "page.tsx"), "utf8");
     const needle = ["danger", "ously", "Set", "Inner", "HTML"].join("");
     expect(source.includes(needle)).toBe(false);
+  });
+
+  it("uses a non-circular local alias for the monospace font", () => {
+    const css = readFileSync(join(__dirname, "page.module.css"), "utf8");
+
+    expect(css).not.toMatch(/--font-mono:\s*var\(--font-mono\)/);
+    expect(css).toMatch(/--font-code:\s*var\(--font-mono\)/);
+    expect(css).toMatch(/\.content code\s*\{[^}]*font-family:\s*var\(--font-code\)/s);
+    expect(css).toMatch(/\.codeBlock\s*\{[^}]*font-family:\s*var\(--font-code\)/s);
+  });
+
+  it("delegates Mermaid sizing and centering to the shared component", () => {
+    const css = readFileSync(join(__dirname, "page.module.css"), "utf8");
+
+    expect(css).not.toMatch(/\.mermaidWrap\s*\{[^}]*(?:display|justify-content)\s*:/s);
+    expect(css).toMatch(/\.mermaidWrap\s*\{[^}]*overflow-x:\s*auto/s);
   });
 });

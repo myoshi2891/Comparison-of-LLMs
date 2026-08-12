@@ -1,1952 +1,1415 @@
 import type { Metadata } from "next";
 import MermaidDiagram from "@/components/docs/MermaidDiagram";
 import styles from "./page.module.css";
+import TocObserver from "./TocObserver";
 
 export const metadata: Metadata = {
-  title: "Google Sandbox 完全ガイド 2026 — 初学者向け",
+  title: "Google サンドボックス技術 完全ガイド ― AIエージェント・API・コンテナ・C/C++・ブラウザ",
   description:
-    "AIエージェント・API・コンテナ・C/C++・ブラウザ、それぞれの領域で Google が推奨する安全なサンドボックス技術（実行の箱）を、初学者でも理解できるよう図解とステップで解説します。",
+    "AIエージェント・API・コンテナ・C/C++・ブラウザ、5領域のサンドボックス技術のベストプラクティスをステップバイステップで解説するガイドライン。",
 };
 
-// ── MERMAID DIAGRAMS ──
-const DIAG_1 = `graph TD
-    A["⚠️ 危険なコード<br/>(AI生成 / ユーザー入力)"] --> B{"サンドボックス<br/>あり？"}
-    B -->|"なし"| C["💀 ホストOS侵害<br/>データ漏洩 / 横断攻撃"]
-    B -->|"あり"| D["🔒 隔離環境内で実行<br/>問題は箱の中に封じ込め"]
-    D --> E["✅ ホストOS・他データは安全"]
+const MERMAID_CHART_2 = `flowchart TB
+    A["Google のサンドボックス戦略<br/>(隔離レイヤーごとの使い分け)"]
+    A --> B["① AIエージェント"]
+    A --> C["② API"]
+    A --> D["③ コンテナ"]
+    A --> E["④ C / C++"]
+    A --> F["⑤ ブラウザ"]
 
-    subgraph 多層防御["Googleの三層防御"]
-        L1["🌐 L1 ネットワーク分離<br/>（デフォルト拒否 Network Policy）"]
-        L2["🖥️ L2 カーネル分離<br/>（gVisor / Seccomp-bpf）"]
-        L3["🔑 L3 ID・権限分離<br/>（Workload Identity / IAM）"]
-        L1 --> L2 --> L3
-    end`;
+    B --> B1["GKE Agent Sandbox (gVisor)"]
+    B --> B2["Gemini Code Execution"]
 
-const DIAG_2 = `flowchart TD
-    START(["🔍 何を実行したいか？"]) --> Q1
+    C --> C1["Apigee サンドボックス環境"]
+    C --> C2["Cloud Armor / WAAP"]
 
-    Q1{"AIエージェントが<br/>生成したコード？"} -->|"Yes"| Q2
-    Q1 -->|"No"| Q3
+    D --> D1["GKE Sandbox (gVisor)"]
+    D --> D2["Cloud Run / App Engine / Functions"]
 
-    Q2{"インフラを<br/>自分で管理したい？"} -->|"Kubernetes で管理"| R1
-    Q2 -->|"API を呼ぶだけでOK"| R2
+    E --> E1["Sandbox2"]
+    E --> E2["Sandboxed API (SAPI)"]
 
-    Q3{"C/C++ライブラリを<br/>安全に使いたい？"} -->|"Yes"| R4
-    Q3 -->|"No"| Q4
+    F --> F1["マルチプロセス + Site Isolation"]
+    F --> F2["V8 Sandbox"]`;
 
-    Q4{"多数ユーザーの<br/>コンテナを隔離？"} -->|"Yes"| R3
-    Q4 -->|"No"| Q5
+const MERMAID_CHART_3_2 = `flowchart LR
+    App["エージェントが生成した<br/>コード / プロセス"] --> Sentry["gVisor Sentry<br/>(ユーザー空間の疑似カーネル)"]
+    Sentry --> Gofer["gVisor Gofer<br/>(ファイルI/Oプロキシ)"]
+    Gofer --> Kernel["ホストのLinuxカーネル"]
+    Sentry -.-|直接到達は不可| Kernel`;
 
-    Q5{"ブラウザ内の<br/>JavaScript実行？"} -->|"Yes"| R5
-    Q5 -->|"No"| R6
+const MERMAID_CHART_4_1 = `flowchart LR
+    Client["クライアント"] --> GFE["Google Front End<br/>(TLS終端)"]
+    GFE --> Proxy["Apigee APIプロキシ<br/>(環境=サンドボックス)"]
+    Proxy --> Policy1["トラフィック管理<br/>ポリシー"]
+    Proxy --> Policy2["メッセージレベル<br/>保護ポリシー"]
+    Proxy --> Policy3["セキュリティポリシー<br/>(RBAC / OAuth等)"]
+    Proxy --> Backend["バックエンドサービス"]`;
 
-    R1["✅ GKE Agent Sandbox<br/>300 sandboxes/秒 + Pod Snapshot"]
-    R2["✅ Gemini Code Execution<br/>API 1 行で Python 実行"]
-    R3["✅ gVisor / GKE Sandbox<br/>RuntimeClass: gvisor"]
-    R4["✅ Sandbox2 / SAPI<br/>seccomp-bpf + Namespaces"]
-    R5["✅ V8 Sandbox<br/>Chrome が自動適用"]
-    R6["💬 ユースケースを確認<br/>→ セキュリティチームに相談"]
+const MERMAID_CHART_5_1 = `flowchart LR
+    Container["コンテナ内アプリケーション"] --> Sentry2["gVisor Sentry<br/>(ユーザー空間カーネル)"]
+    Sentry2 --> Seccomp["seccomp-bpf<br/>システムコールフィルタ"]
+    Seccomp --> HostKernel["ホストのLinuxカーネル"]`;
 
-    style R1 fill:#152036,stroke:#4285F4
-    style R2 fill:#152036,stroke:#34A853
-    style R3 fill:#152036,stroke:#FF6D00
-    style R4 fill:#152036,stroke:#FBBC04
-    style R5 fill:#152036,stroke:#9C27B0`;
+const MERMAID_CHART_6_1 = `flowchart LR
+    Policy["Sandbox Policy<br/>(許可するsyscallを定義)"] --> Executor["Executor<br/>(信頼済みの管理プロセス)"]
+    Executor -->|ポリシーを適用して起動| Sandboxee["Sandboxee<br/>(隔離対象プロセス)"]
+    Sandboxee -->|許可済みsyscallのみ通過| Kernel3["Linuxカーネル"]`;
 
-const DIAG_3 = `flowchart TB
-    subgraph FW["AIフレームワーク（ADK / LangChain）"]
-        CLAIM["SandboxClaim<br/>（実行環境リクエスト）"]
-    end
+const MERMAID_CHART_6_2 = `flowchart LR
+    HostCode["ホストコード<br/>(信頼済みプログラム本体)"] --> SapiObject["SAPI Object"]
+    SapiObject -->|RPC呼び出し| RpcStub["RPC Stub"]
+    RpcStub --> SandboxedLib["サンドボックス化された<br/>C/C++ライブラリ(Sandbox2内)"]`;
 
-    subgraph CTRL["GKE Agent Sandbox Controller"]
-        TMPL["SandboxTemplate<br/>セキュリティ設計図"]
-        POOL["SandboxWarmPool<br/>事前起動プール（常時N個待機）"]
-        SB["Sandbox Pod<br/>（gVisor RuntimeClass）"]
-    end
+const MERMAID_CHART_7_1 = `flowchart TB
+    Browser["ブラウザプロセス<br/>(無サンドボックス・特権)"]
+    Browser --> RendererA["レンダラープロセスA<br/>(サイトA専用・サンドボックス化)"]
+    Browser --> RendererB["レンダラープロセスB<br/>(サイトB専用・サンドボックス化)"]
+    Browser --> GPU["GPUプロセス<br/>(サンドボックス化)"]
+    Browser --> Network["ネットワークプロセス"]
+    RendererA -.-|IPC経由のみ| Browser
+    RendererB -.-|IPC経由のみ| Browser`;
 
-    subgraph STORAGE["Pod Snapshot（GCS）"]
-        SNAP["スナップショット<br/>実行状態を保存・復元"]
-    end
+const MERMAID_CHART_7_3 = `flowchart LR
+    JS["JavaScript / WebAssembly<br/>コード"] --> V8Heap["V8ヒープ<br/>(サンドボックス化されたメモリ領域)"]
+    V8Heap -->|メモリ破壊が発生しても脱出不可| Boundary["サンドボックス境界"]
+    Boundary -.-|通常はアクセス不可| ProcessMemory["レンダラープロセスの<br/>その他のメモリ"]`;
 
-    CLAIM -->|"1. テンプレート参照"| TMPL
-    TMPL -->|"2. 事前起動"| POOL
-    CLAIM -->|"3. Poolから即割り当て（<1秒）"| SB
-    SB -->|"4. コード実行（gVisor分離）"| SB
-    SB -.->|"5. 状態を保存"| SNAP
-    SNAP -.->|"6. コールドスタート時に復元"| POOL`;
-
-const DIAG_4 = `sequenceDiagram
-    actor User as あなた
-    participant API as Gemini API
-    participant Model as Geminiモデル
-    participant Sandbox as マネージドサンドボックス
-
-    User->>API: 「最初の50個の素数の合計は？」<br/>tools: [codeExecution]
-    API->>Model: ツール有効化状態でリクエスト転送
-    Model->>Model: 問題を分析し Python コードを生成
-    Model->>Sandbox: コード送信（executableCode）
-    Sandbox->>Sandbox: 安全な環境で Python 実行（最大30秒）
-    Sandbox-->>Model: 実行結果（codeExecutionResult）
-    Model->>Model: 結果を検証・必要なら再試行
-    Model-->>API: 最終回答（テキスト + 実行済みコード）
-    API-->>User: 回答を返却
-    Note over User,Sandbox: 💡注: 実行結果の検証は自動で行われます`;
-
-const DIAG_5 = `flowchart LR
-    A["📊 分析タスク"] --> B{"ファイルが<br/>必要か？"}
-    B -->|"不要"| C["Code Execution<br/>単体で解決"]
-    B -->|"必要"| D["Function Calling で<br/>ファイル取得を実装"]
-    D --> C
-    C --> E{"30秒以内に<br/>収まるか？"}
-    E -->|"Yes"| F["✅ そのまま実行"]
-    E -->|"No"| G["複数ターンに<br/>処理を分割"]
-    G --> F`;
-
-const DIAG_6 = `graph TB
-    subgraph normal["通常のコンテナ（高速だが隔離が弱い）"]
-        APP1["アプリ"] -->|"syscall直接発行"| HOST_KERNEL["ホストOS カーネル"]
-        HOST_KERNEL --> RISK["⚠️ カーネル脆弱性で<br/>ホスト侵害リスク"]
-    end
-
-    subgraph gvisor["gVisor コンテナ（やや遅いが強力に隔離）"]
-        APP2["アプリ"] -->|"1. syscall 発行"| SENTRY["Sentry（疑似カーネル）<br/>Linux API をユーザー空間で再実装"]
-        SENTRY -->|"2. ファイルI/Oのみ委譲"| GOFER["Gofer（I/O プロキシ）"]
-        SENTRY -->|"3. 最小限の syscall のみ"| HOST_KERNEL2["ホストOS カーネル"]
-        GOFER -->|"4. 検証済みI/Oのみ"| HOST_KERNEL2
-        HOST_KERNEL2 --> SAFE["✅ ホストOS は保護"]
-    end
-
-    RISK ~~~ APP2`;
-
-const DIAG_7 = `flowchart LR
-    subgraph TRUSTED["信頼済みプロセス（Executor）"]
-        HC["メインアプリ<br/>（C++ コード）"]
-        PB["PolicyBuilder<br/>syscall 許可リスト設計"]
-        IPC["IPC Layer<br/>TLV / FD 受け渡し"]
-    end
-
-    subgraph SANDBOX["サンドボックス環境（Sandboxee）"]
-        SBEE["信頼されないライブラリ<br/>（例: 古い zlib / libpng）"]
-        subgraph POLICY["適用済みポリシー"]
-            SC["seccomp-bpf<br/>syscall フィルタ"]
-            NS["Linux Namespaces<br/>PID / Net / Mount"]
-        end
-    end
-
-    HC -->|"1. 起動・ポリシー適用"| PB
-    PB -->|"2. seccomp インストール"| SBEE
-    HC <-->|"3. データ交換（RPC）"| IPC
-    IPC <-->|"4. TLV / FD"| SBEE
-    SBEE -->|"5. syscall 発行"| SC
-    SC -->|"許可外 → SIGKILL"| HC`;
-
-const DIAG_8 = `graph TB
-    subgraph PROC["Chrome レンダラープロセス（64bit）"]
-        subgraph SANDBOX["V8 Sandbox 保護領域（最大 1TB 仮想アドレス）"]
-            HEAP["JavaScript Heap<br/>全JSオブジェクト"]
-            PTR["ポインタ圧縮（32bit）<br/>= sandbox_base + 32bit_offset<br/>→ sandbox 外は参照不可"]
-            GUARD_L["Guard Region（左境界）"]
-            GUARD_R["Guard Region（右境界）"]
-        end
-        subgraph TABLES["サンドボックス外テーブル（改ざん保護）"]
-            EPT["ExternalPointerTable (EPT)<br/>外部ポインタの間接テーブル"]
-            TPT["TrustedPointerTable (TPT)<br/>JITコードメタデータ"]
-        end
-        OTHER["ブラウザプロセスの<br/>他のメモリ（DOM 等）"]
-    end
-
-    HEAP -->|"外部参照"| EPT
-    EPT -->|"検証済みアドレスのみ解決"| OTHER
-    GUARD_L & GUARD_R -->|"境界外アクセスをブロック"| OTHER
-
-    style SANDBOX fill:#1a0d2e,stroke:#9C27B0
-    style GUARD_L fill:#2e0d0d,stroke:#EA4335
-    style GUARD_R fill:#2e0d0d,stroke:#EA4335`;
-
-interface ExtProps {
-  href: string;
-  children: React.ReactNode;
-}
+const MERMAID_CHART_8 = `flowchart TD
+    Start["何を隔離したいか?"] --> Q1{"AIエージェントが<br/>生成したコードを実行する"}
+    Q1 -->|はい| A1["GKE Agent Sandbox<br/>または Gemini Code Execution"]
+    Q1 -->|いいえ| Q2{"C/C++のライブラリや<br/>バイナリを隔離したい"}
+    Q2 -->|はい| A2["Sandbox2 / Sandboxed API (SAPI)"]
+    Q2 -->|いいえ| Q3{"コンテナ全体を<br/>カーネルから隔離したい"}
+    Q3 -->|はい| A3["gVisor / GKE Sandbox"]
+    Q3 -->|いいえ| Q4{"ブラウザや拡張機能の<br/>コンテンツを隔離したい"}
+    Q4 -->|はい| A4["Site Isolation / V8 Sandbox<br/>/ 拡張機能sandboxディレクティブ"]
+    Q4 -->|いいえ| A5["Apigee等でAPIレイヤーを保護"]`;
 
 /**
- * Renders an external anchor link with standard target and security attributes.
- */
-function Ext({ href, children }: ExtProps) {
-  return (
-    <a href={href} target="_blank" rel="noopener noreferrer">
-      {children}
-    </a>
-  );
-}
-
-const TOC_ITEMS = [
-  { id: "intro", label: "はじめに" },
-  { id: "selector", label: "選択ガイド" },
-  { id: "s1", label: "GKE Agent Sandbox" },
-  { id: "s2", label: "Gemini Code Execution" },
-  { id: "s3", label: "gVisor / GKE Sandbox" },
-  { id: "s4", label: "Sandbox2 / SAPI" },
-  { id: "s5", label: "V8 Sandbox" },
-  { id: "s6", label: "Privacy Sandbox ⚠️" },
-  { id: "compare", label: "技術比較表" },
-  { id: "glossary", label: "用語集" },
-  { id: "resources", label: "公式リンク集" },
-] as const;
-
-/**
- * Renders the Google Sandbox best practices guide page.
- *
- * @returns The Google Sandbox best practices documentation page.
+ * Renders a guide to Google sandbox technologies and best practices across AI agents, APIs, containers, C/C++, and browsers.
  */
 export default function GoogleSandboxBestPracticesPage() {
   return (
-    <>
-      <div className={styles.prog} />
+    <div className={styles.layout}>
+      <TocObserver />
+      <div className={styles.bgGlow} />
+      <div className={styles.topAccentBar} />
 
-      <div className={styles.wrap}>
-        {/* HERO */}
-        <header className={styles.hero}>
-          <div className={styles.heroEyebrow}>Google Sandbox Best Practices 2026</div>
-          <h1 className={styles.heroTitle}>
-            Google の<span> サンドボックス</span>技術
-            <br />
-            完全ガイド
-          </h1>
-          <p className={styles.heroSub}>
-            AIエージェント・API・コンテナ・C/C++・ブラウザ、それぞれの領域で Google
-            が推奨する安全な「実行の箱」を、初学者でも理解できるよう図解とステップで解説します。
-          </p>
-          <div className={styles.heroChips}>
-            <span
-              className={styles.chip}
-              style={{
-                color: "var(--c1)",
-                borderColor: "rgba(66, 133, 244, 0.35)",
-                background: "rgba(66, 133, 244, 0.08)",
-              }}
-            >
-              <span className={styles.chipDot} style={{ background: "var(--c1)" }} />
-              AIエージェント
-            </span>
-            <span
-              className={styles.chip}
-              style={{
-                color: "var(--c2)",
-                borderColor: "rgba(52, 168, 83, 0.35)",
-                background: "rgba(52, 168, 83, 0.08)",
-              }}
-            >
-              <span className={styles.chipDot} style={{ background: "var(--c2)" }} />
-              LLM / API
-            </span>
-            <span
-              className={styles.chip}
-              style={{
-                color: "var(--c3)",
-                borderColor: "rgba(255, 109, 0, 0.35)",
-                background: "rgba(255, 109, 0, 0.08)",
-              }}
-            >
-              <span className={styles.chipDot} style={{ background: "var(--c3)" }} />
-              コンテナ
-            </span>
-            <span
-              className={styles.chip}
-              style={{
-                color: "var(--c4)",
-                borderColor: "rgba(251, 188, 4, 0.35)",
-                background: "rgba(251, 188, 4, 0.08)",
-              }}
-            >
-              <span className={styles.chipDot} style={{ background: "var(--c4)" }} />
-              C/C++
-            </span>
-            <span
-              className={styles.chip}
-              style={{
-                color: "var(--c5)",
-                borderColor: "rgba(156, 39, 176, 0.35)",
-                background: "rgba(156, 39, 176, 0.08)",
-              }}
-            >
-              <span className={styles.chipDot} style={{ background: "var(--c5)" }} />
-              ブラウザ
-            </span>
+      <button
+        className={styles.sidebarToggle}
+        id="sidebarToggle"
+        type="button"
+        aria-controls="sidebar"
+        aria-label="目次を開く"
+        aria-expanded="false"
+      >
+        ☰
+      </button>
+
+      <nav className={styles.sidebar} id="sidebar">
+        <div className={styles.brand}>
+          <div className={styles.brandBadge}>GS</div>
+          <div className={styles.brandText}>
+            <strong>Google Sandbox</strong>完全ガイド
           </div>
-        </header>
+        </div>
+        <div className={styles.navGroupLabel}>目次</div>
+        <ul className={styles.navList}>
+          <li>
+            <a href="#section-1">
+              <span className={styles.navDot} />
+              1. はじめに
+            </a>
+          </li>
+          <li>
+            <a href="#section-2">
+              <span className={styles.navDot} />
+              2. 全体マップ
+            </a>
+          </li>
+          <li>
+            <a href="#section-3">
+              <span
+                className={styles.navDot}
+                style={{ "--dot": "var(--c-agent)" } as React.CSSProperties}
+              />
+              3. ① AIエージェント
+            </a>
+          </li>
+          <li>
+            <a href="#section-4">
+              <span
+                className={styles.navDot}
+                style={{ "--dot": "var(--c-api)" } as React.CSSProperties}
+              />
+              4. ② API
+            </a>
+          </li>
+          <li>
+            <a href="#section-5">
+              <span
+                className={styles.navDot}
+                style={{ "--dot": "var(--c-container)" } as React.CSSProperties}
+              />
+              5. ③ コンテナ
+            </a>
+          </li>
+          <li>
+            <a href="#section-6">
+              <span
+                className={styles.navDot}
+                style={{ "--dot": "var(--c-cpp)" } as React.CSSProperties}
+              />
+              6. ④ C/C++
+            </a>
+          </li>
+          <li>
+            <a href="#section-7">
+              <span
+                className={styles.navDot}
+                style={{ "--dot": "var(--c-browser)" } as React.CSSProperties}
+              />
+              7. ⑤ ブラウザ
+            </a>
+          </li>
+          <li>
+            <a href="#section-8">
+              <span className={styles.navDot} />
+              8. 意思決定フロー
+            </a>
+          </li>
+          <li>
+            <a href="#section-9">
+              <span className={styles.navDot} />
+              9. 横断ベストプラクティス
+            </a>
+          </li>
+          <li>
+            <a href="#section-10">
+              <span className={styles.navDot} />
+              10. 参考文献・出典URL
+            </a>
+          </li>
+        </ul>
+      </nav>
 
-        {/* TOC */}
-        <nav className={styles.toc} aria-label="目次">
-          <div className={styles.tocTitle}>目次</div>
-          <ol>
-            {TOC_ITEMS.map((item) => (
-              <li key={item.id}>
-                <a href={`#${item.id}`}>{item.label}</a>
+      <main className={styles.main}>
+        <h1>Google サンドボックス技術 完全ガイド</h1>
+        <p className={styles.lede}>
+          AIエージェント・API・コンテナ・C/C++・ブラウザ、5領域のベストプラクティスをステップバイステップで理解する
+        </p>
+        <blockquote>
+          <p>
+            対象読者:サンドボックス技術の初学者〜中級エンジニア
+            <br />
+            情報基準日:2026年7月27日時点(以降の変更は各社公式ドキュメントで要確認)
+          </p>
+        </blockquote>
+
+        <div className={styles.quicknavLabel}>5つの領域をひと目で</div>
+        <div className={styles.quicknavGrid}>
+          <a
+            className={styles.quicknavCard}
+            href="#section-3"
+            style={{ "--domain": "var(--c-agent)" } as React.CSSProperties}
+          >
+            <div className={styles.quicknavHead}>
+              <span className={styles.quicknavBadge}>AI</span>
+              <span className={styles.quicknavTitle}>AIエージェント</span>
+            </div>
+            <p className={styles.quicknavDesc}>
+              GKE Agent Sandbox(gVisor)とGemini Code Executionで、生成されたコードを隔離実行
+            </p>
+          </a>
+          <a
+            className={styles.quicknavCard}
+            href="#section-4"
+            style={{ "--domain": "var(--c-api)" } as React.CSSProperties}
+          >
+            <div className={styles.quicknavHead}>
+              <span className={styles.quicknavBadge}>API</span>
+              <span className={styles.quicknavTitle}>API</span>
+            </div>
+            <p className={styles.quicknavDesc}>
+              Apigeeの環境分離とセキュリティポリシーでAPIレイヤーを保護
+            </p>
+          </a>
+          <a
+            className={styles.quicknavCard}
+            href="#section-5"
+            style={{ "--domain": "var(--c-container)" } as React.CSSProperties}
+          >
+            <div className={styles.quicknavHead}>
+              <span className={styles.quicknavBadge}>CT</span>
+              <span className={styles.quicknavTitle}>コンテナ</span>
+            </div>
+            <p className={styles.quicknavDesc}>
+              gVisorのカーネルレベル分離でGKE・Cloud Run・App Engineを保護
+            </p>
+          </a>
+          <a
+            className={styles.quicknavCard}
+            href="#section-6"
+            style={{ "--domain": "var(--c-cpp)" } as React.CSSProperties}
+          >
+            <div className={styles.quicknavHead}>
+              <span className={styles.quicknavBadge}>C+</span>
+              <span className={styles.quicknavTitle}>C/C++</span>
+            </div>
+            <p className={styles.quicknavDesc}>
+              Sandbox2とSandboxed API(SAPI)でネイティブライブラリを隔離
+            </p>
+          </a>
+          <a
+            className={`${styles.quicknavCard} ${styles.spanFull}`}
+            href="#section-7"
+            style={{ "--domain": "var(--c-browser)" } as React.CSSProperties}
+          >
+            <div className={styles.quicknavHead}>
+              <span className={styles.quicknavBadge}>WEB</span>
+              <span className={styles.quicknavTitle}>ブラウザ</span>
+            </div>
+            <p className={styles.quicknavDesc}>
+              マルチプロセス構造・Site Isolation・V8 Sandboxによる多層防御
+            </p>
+          </a>
+        </div>
+
+        <hr />
+
+        <span className={styles.sectionAnchor} id="section-1" aria-hidden="true" />
+        <h2 id="1-はじめになぜサンドボックスが必要なのか">
+          1. はじめに:なぜ「サンドボックス」が必要なのか
+        </h2>
+        <p>
+          「サンドボックス(sandbox)」とは、信頼できないコードやデータを、ホストシステム(OS本体・他のプロセス・他の顧客のデータなど)から隔離された領域の中だけで実行させるための仕組みです。子どもが砂場の外に砂をこぼさないのと同じように、「万が一そのコードが悪意を持っていたり、バグを含んでいたりしても、被害が砂場の外に漏れない」ことを保証するのが目的です。
+        </p>
+        <p>Googleがサンドボックスを重視する背景には、次の3つの共通した脅威があります。</p>
+        <ul>
+          <li>
+            <strong>信頼できない入力の実行</strong>
+            :AIエージェントが生成したコード、ユーザーがアップロードしたファイル、サードパーティのライブラリなど、開発者自身がレビューしきれないコードを動かす機会が増え続けている
+          </li>
+          <li>
+            <strong>マルチテナンシー</strong>
+            :クラウド上では複数の顧客・複数のワークロードが同じ物理ハードウェアを共有するため、1つのワークロードの侵害が他のワークロードに波及してはならない
+          </li>
+          <li>
+            <strong>メモリ安全性が保証できない領域の存在</strong>
+            :C/C++やJavaScriptエンジンのように、言語仕様上メモリ安全性を完全には保証できない領域が、今なお本番システムの中核に存在する
+          </li>
+        </ul>
+        <p>
+          Googleはこの課題に対して、単一の万能な解決策ではなく、
+          <strong>隔離したい対象のレイヤーごとに専用のサンドボックス技術を使い分ける</strong>
+          という設計思想を取っています。本ガイドでは、その中でも特に問い合わせの多い次の5領域を、ステップバイステップのベストプラクティスとして整理します。
+        </p>
+
+        <hr />
+
+        <span className={styles.sectionAnchor} id="section-2" aria-hidden="true" />
+        <h2 id="2-全体マップgoogleの5つのサンドボックス領域">
+          2. 全体マップ:Googleの5つのサンドボックス領域
+        </h2>
+        <div className={styles.mermaidWrap}>
+          <MermaidDiagram chart={MERMAID_CHART_2} />
+        </div>
+        <p>
+          この図からもわかるとおり、5つの領域の多くが「gVisor」という同一のオープンソース技術を土台にしていることが特徴です。gVisorはGoogle社内で長年本番ワークロードの隔離に使われてきた実績をもとにオープンソース化された、ユーザー空間でLinuxカーネルAPIを再実装する「アプリケーションカーネル」です。まずこの共通基盤を理解しておくと、以降の各領域の理解が格段に速くなります。
+        </p>
+
+        <hr />
+
+        <span className={styles.sectionAnchor} id="section-3" aria-hidden="true" />
+        <h2
+          className={styles.domainH2}
+          id="3-領域①-aiエージェントのサンドボックス"
+          style={{ "--domain": "var(--c-agent)" } as React.CSSProperties}
+        >
+          <span className={styles.domainBadge}>AI</span>3. 領域① AIエージェントのサンドボックス
+        </h2>
+        <h3
+          className={styles.domainH3}
+          id="3-1-なぜaiエージェント専用の隔離が必要か"
+          style={{ "--domain": "var(--c-agent)" } as React.CSSProperties}
+        >
+          3-1. なぜAIエージェント専用の隔離が必要か
+        </h3>
+        <p>
+          AIエージェントは、LLMが生成した非決定的なコードをその場で実行したり、外部ツールを自律的に呼び出したりします。これは「常に信頼できない入力を、常に本番同然の権限で実行し続ける」ことに等しく、通常のアプリケーションよりもはるかに広い攻撃対象領域を生み出します。GoogleはこれをGKE(Google
+          Kubernetes Engine)向けの<strong>Agent Sandbox</strong>と、Gemini APIやAgent Platform向けの
+          <strong>Code Execution</strong>という2つの製品ラインで解決しています。
+        </p>
+        <h3
+          className={styles.domainH3}
+          id="3-2-gke-agent-sandboxアーキテクチャ"
+          style={{ "--domain": "var(--c-agent)" } as React.CSSProperties}
+        >
+          3-2. GKE Agent Sandbox:アーキテクチャ
+        </h3>
+        <p>
+          GKE Agent Sandboxは、Kubernetes SIG
+          Apps配下でオープンソース開発されているKubernetesネイティブな拡張機能です。gVisorによるカーネルレベルの隔離を、
+          <code>Sandbox</code>・<code>SandboxTemplate</code>・<code>SandboxClaim</code>
+          という3つの新しいKubernetesカスタムリソースを通じて提供します。
+        </p>
+        <p>gVisorの内部は「Sentry」と「Gofer」という2つのコンポーネントで構成されます。</p>
+        <div className={styles.mermaidWrap}>
+          <MermaidDiagram chart={MERMAID_CHART_3_2} />
+        </div>
+        <p>
+          Sentryはエージェントが発行するすべてのシステムコール(<code>exec</code>や
+          <code>socket</code>
+          など)を横取りし、ホストカーネルに直接触れさせない「偽のカーネル」として振る舞います。ファイルシステム操作だけは別プロセスのGoferが仲介するため、たとえSentryに未知の脆弱性があっても、ファイルシステムへの被害範囲を最小化できます。
+        </p>
+        <h3
+          className={styles.domainH3}
+          id="3-3-ステップバイステップ導入のベストプラクティス"
+          style={{ "--domain": "var(--c-agent)" } as React.CSSProperties}
+        >
+          3-3. ステップバイステップ:導入のベストプラクティス
+        </h3>
+        <ol type="1">
+          <li>
+            <strong>隔離(ISOLATE)</strong>
+            :非決定的なエージェントのコード・ツール実行・ユーザー入力処理はすべてGKE Agent
+            Sandbox(gVisor)上で実行し、RCE(リモートコード実行)攻撃をサンドボックス内に封じ込める
+          </li>
+          <li>
+            <strong>高速化(ACCELERATE)</strong>
+            :サンドボックスの起動レイテンシを隠すため、事前にプロビジョニングされた「ウォームプール」を用意する。さらにコスト削減のため、アイドル状態のエージェントは「コールドプール(サスペンド状態のVM)」に退避させ、Pod
+            Snapshotsで低コストに復元する
+          </li>
+          <li>
+            <strong>権限の制限(RESTRICT・ID)</strong>:Workload Identity
+            Federationを使い、エージェントごとに使い捨ての最小権限IAMアイデンティティを付与する
+          </li>
+          <li>
+            <strong>通信の制限(RESTRICT・Network)</strong>:デフォルト拒否(default-deny)のKubernetes
+            NetworkPolicyを設定し、エージェントが必要とするDNS・メタデータ・APIエンドポイントだけを明示的に許可リスト化する
+          </li>
+          <li>
+            <strong>多層防御を過信しない</strong>:gVisor・Workload Identity・VPC Service
+            Controlsをすべて設定しても、それらは「許可されたチャネルの中で行われる正規の操作」しか防げない。プロンプトインジェクションによって、許可済みのAPI呼び出し経由でデータが持ち出されるリスクは別途モニタリングで検知する必要がある、と複数のセキュリティ研究者が指摘している
+          </li>
+        </ol>
+        <h3
+          className={styles.domainH3}
+          id="3-4-gemini-api--agent-platform-の-code-execution"
+          style={{ "--domain": "var(--c-agent)" } as React.CSSProperties}
+        >
+          3-4. Gemini API / Agent Platform の Code Execution
+        </h3>
+        <p>
+          GKE以外にも、Gemini APIおよびGemini Enterprise Agent Platformが提供する
+          <strong>Code Execution</strong>
+          ツールを使えば、GKEにデプロイしなくてもマネージドなサンドボックスでPythonコードを実行できます。特徴は次のとおりです。
+        </p>
+        <div className={styles.tableScroll}>
+          <table>
+            <thead>
+              <tr>
+                <th>特徴</th>
+                <th>内容</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>起動速度</td>
+                <td>1秒未満でサンドボックスを作成・実行可能</td>
+              </tr>
+              <tr>
+                <td>ファイル入出力</td>
+                <td>リクエスト/レスポンス全体で最大100MBまで対応</td>
+              </tr>
+              <tr>
+                <td>状態保持</td>
+                <td>実行状態(メモリ)を最大14日間保持(TTLで調整可能)</td>
+              </tr>
+              <tr>
+                <td>デフォルトのネットワーク</td>
+                <td>無効(明示的な許可リストを設定しない限りアウトバウンド通信不可)</td>
+              </tr>
+              <tr>
+                <td>対応フレームワーク</td>
+                <td>
+                  特定のフレームワークに依存せず、任意のエージェント実装・任意のモデルから利用可能
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          Agent Development
+          Kit(ADK)の公式安全設計ドキュメントでも、「コード実行は特にセキュリティ上の影響が大きい特殊なツールであり、モデルが生成したコードがローカル環境を侵害しないよう、必ずサンドボックス化しなければならない」と明記されています。あわせてModel
+          ArmorプラグインやPII
+          redactionプラグインといった、入出力を検査する追加のガードレールも推奨されています。
+        </p>
+
+        <hr />
+
+        <span className={styles.sectionAnchor} id="section-4" aria-hidden="true" />
+        <h2
+          className={styles.domainH2}
+          id="4-領域②-apiのサンドボックス"
+          style={{ "--domain": "var(--c-api)" } as React.CSSProperties}
+        >
+          <span className={styles.domainBadge}>API</span>4. 領域② APIのサンドボックス
+        </h2>
+        <h3
+          className={styles.domainH3}
+          id="4-1-apigeeにおけるサンドボックス環境の考え方"
+          style={{ "--domain": "var(--c-api)" } as React.CSSProperties}
+        >
+          4-1. Apigeeにおける「サンドボックス環境」の考え方
+        </h3>
+        <p>
+          API領域での「サンドボックス」は、これまでの実行時隔離とは意味合いが少し異なります。Apigee(Googleのネイティブなフルライフサイクル
+          API管理製品)における「環境(environment)」は、
+          <strong>APIプロキシを実行するための隔離されたコンテキスト</strong>
+          を指し、公式ドキュメントでも「サンドボックス」と表現されています。1つの組織の中に複数の環境(開発用・テスト用・本番用など)を作成し、プロキシのデプロイ先を環境ごとに分離するのが基本設計です。
+        </p>
+        <div className={styles.mermaidWrap}>
+          <MermaidDiagram chart={MERMAID_CHART_4_1} />
+        </div>
+        <h3
+          className={styles.domainH3}
+          id="4-2-ステップバイステップapiサンドボックスのベストプラクティス"
+          style={{ "--domain": "var(--c-api)" } as React.CSSProperties}
+        >
+          4-2. ステップバイステップ:APIサンドボックスのベストプラクティス
+        </h3>
+        <ol type="1">
+          <li>
+            <strong>環境を目的別に分離する</strong>
+            :hybrid構成では、1つの環境に大量のプロキシを詰め込まず、複数の環境を作り、環境ごとにデプロイするプロキシ数を絞ることが推奨されている
+          </li>
+          <li>
+            <strong>デフォルトポリシーを有効化する</strong>
+            :Apigeeが提供する3種類の既定ポリシー(トラフィック管理・メッセージレベル保護・セキュリティ)をプロキシ層にアタッチする
+          </li>
+          <li>
+            <strong>IPアドレス/地理情報によるアクセス制御にはCloud Armorを使う</strong>
+            :Apigee自体のポリシーだけでなく、Cloud Armorと組み合わせたWAAP(Web App and API
+            Protection)構成が推奨されている
+          </li>
+          <li>
+            <strong>クライアントIP解決を環境ごとにカスタマイズする</strong>
+            :プロキシ経由のリクエストでは<code>X-Forwarded-For</code>
+            ヘッダーの保持設定が必要になるケースがあり、デフォルトのIP解決アルゴリズムが合わない場合は環境単位でカスタマイズできる
+          </li>
+          <li>
+            <strong>開発者向けサンドボックスは60日間の無償トライアルで検証する</strong>
+            :本番導入前に、Apigeeの試用サンドボックス環境でAPI設計を検証してから、本番の環境構成に反映するワークフローが一般的
+          </li>
+          <li>
+            <strong>モックとの併用(一般的なAPIサンドボックス設計のベストプラクティス)</strong>
+            :OpenAPI仕様からモックエンドポイントを自動生成できるAPI管理プラットフォームの機能を活用し、モックとAPI仕様を常に同期させ、成功シナリオだけでなくエラーシナリオも用意し、CI/CDパイプラインに組み込むことが、業界全体のAPIサンドボックス運用における共通ベストプラクティスとして紹介されている
+          </li>
+        </ol>
+
+        <hr />
+
+        <span className={styles.sectionAnchor} id="section-5" aria-hidden="true" />
+        <h2
+          className={styles.domainH2}
+          id="5-領域③-コンテナのサンドボックス"
+          style={{ "--domain": "var(--c-container)" } as React.CSSProperties}
+        >
+          <span className={styles.domainBadge}>CT</span>5. 領域③ コンテナのサンドボックス
+        </h2>
+        <h3
+          className={styles.domainH3}
+          id="5-1-gvisorの基本アーキテクチャ再掲詳細版"
+          style={{ "--domain": "var(--c-container)" } as React.CSSProperties}
+        >
+          5-1. gVisorの基本アーキテクチャ(再掲・詳細版)
+        </h3>
+        <p>
+          コンテナ領域におけるGoogleの主力技術は、AIエージェント領域でも登場した
+          <strong>gVisor</strong>
+          そのものです。通常のコンテナはホストカーネルを直接共有するため、1つのコンテナ内のカーネル脆弱性が、ノード全体・他の全コンテナに波及するリスクを抱えます。gVisorは、コンテナが発行するシステムコールをユーザー空間の「Sentry」で受け止め、seccomp-bpfによるシステムコールフィルタリングでさらに一段階の防御を重ねます。
+        </p>
+        <div className={styles.mermaidWrap}>
+          <MermaidDiagram chart={MERMAID_CHART_5_1} />
+        </div>
+        <p>
+          Googleのサーバーレス製品群(App Engine、Cloud Run、Cloud
+          Functions)はいずれも、アプリケーションワークロードの隔離にgVisorを採用しています。Cloud
+          Runの場合、各インスタンスは仮想マシンモニター(VMM)によって他のインスタンスから隔離され、さらにコンテナ境界の強制とseccompによるシステムコールフィルタリングが重ねられる多層防御構成になっています。
+        </p>
+        <h3
+          className={styles.domainH3}
+          id="5-2-ステップバイステップgke-sandboxの有効化手順"
+          style={{ "--domain": "var(--c-container)" } as React.CSSProperties}
+        >
+          5-2. ステップバイステップ:GKE Sandboxの有効化手順
+        </h3>
+        <ol type="1">
+          <li>
+            <strong>専用ノードプールを作成する</strong>:GKE
+            SandboxはデフォルトのノードプールにはEnableできない。Standardクラスタでは、すべてのワークロードをサンドボックス化する場合でも、GKE
+            Sandboxを有効化していないノードプールを最低1つ残す必要がある
+          </li>
+          <li>
+            <strong>イメージタイプを揃える</strong>
+            :ノードプールのイメージタイプは「Container-Optimized OS with Containerd(
+            <code>cos_containerd</code>)」のみがサポート対象
+          </li>
+          <li>
+            <strong>RuntimeClassを確認する</strong>
+            :ノードプール作成後、GKEが自動的に<code>gvisor</code>
+            という名前のRuntimeClassを作成する。<code>kubectl get runtimeclass gvisor</code>
+            で存在を確認する
+          </li>
+          <li>
+            <strong>Podスペックでサンドボックスを指定する</strong>
+            :隔離したいPodのマニフェストに<code>runtimeClassName: gvisor</code>を追加する
+          </li>
+          <li>
+            <strong>リソース上限を必ず設定する</strong>:GKE
+            Sandboxを使う場合でも、すべてのコンテナにリソース制限(CPU/メモリ)を指定し、不良コードや悪意あるアプリケーションがノードのリソースを枯渇させないようにする
+          </li>
+          <li>
+            <strong>GPU/TPUワークロードでの注意点</strong>:GKE
+            SandboxはNVIDIAドライバの脆弱性すべてを緩和するわけではないが、Linuxカーネルの脆弱性に対する保護は維持される。またGPUタイムシェアリングはGPUが完全に隔離されないため、GKE
+            Sandboxとの併用は非推奨とされている
+          </li>
+          <li>
+            <strong>ログとモニタリングを有効化する</strong>
+            :必須ではないが、gVisorのメッセージがログに残るよう、クラスタの機能設定でLogging/Monitoringを有効化することが推奨されている
+          </li>
+          <li>
+            <strong>チェックポイント/リストア機能を活用する</strong>
+            :gVisorはコンテナのチェックポイント・リストアに対応しており、ウォームアップ済みサービスのキャッシュ、他マシンでのワークロード再開、実行状態のスナップショット取得、フォレンジック用の状態保存などに活用できる
+          </li>
+        </ol>
+
+        <hr />
+
+        <span className={styles.sectionAnchor} id="section-6" aria-hidden="true" />
+        <h2
+          className={styles.domainH2}
+          id="6-領域④-ccのサンドボックス"
+          style={{ "--domain": "var(--c-cpp)" } as React.CSSProperties}
+        >
+          <span className={styles.domainBadge}>C+</span>6. 領域④ C/C++のサンドボックス
+        </h2>
+        <h3
+          className={styles.domainH3}
+          id="6-1-sandbox2プログラム全体一部を隔離する"
+          style={{ "--domain": "var(--c-cpp)" } as React.CSSProperties}
+        >
+          6-1. Sandbox2:プログラム全体・一部を隔離する
+        </h3>
+        <p>
+          <strong>Sandbox2</strong>
+          は、Linux向けのオープンソースC++セキュリティサンドボックスで、Google内のセキュリティチームが開発・保守しています。Linuxのnamespace、リソース制限、そしてseccomp-bpfによるシステムコールフィルタを組み合わせて、プログラム全体、あるいはプログラムの一部分だけを隔離できます。
+        </p>
+        <p>
+          seccomp-bpfは、Secure Computing
+          Mode(seccomp)を拡張したLinuxカーネルの機能です。素のseccompは<code>exit</code>・
+          <code>sigreturn</code>・<code>read</code>・<code>write</code>
+          の4つしか許可しませんが、seccomp-bpfはBPF(Berkeley Packet
+          Filter)プログラムでシステムコールごとに柔軟な判定ロジックを書けるようにし、許可・ダミー値を返す・プロセス終了・シグナル送出・トレーサーへの通知、といった細かい制御を可能にします。
+        </p>
+        <div className={styles.mermaidWrap}>
+          <MermaidDiagram chart={MERMAID_CHART_6_1} />
+        </div>
+        <h3
+          className={styles.domainH3}
+          id="6-2-sandboxed-apisapiライブラリ単位でサンドボックス化する"
+          style={{ "--domain": "var(--c-cpp)" } as React.CSSProperties}
+        >
+          6-2. Sandboxed API(SAPI):ライブラリ単位でサンドボックス化する
+        </h3>
+        <p>
+          Sandbox2をそのまま使う場合、プロジェクトごとにポリシーやプロセス間のデータ交換の仕組みをゼロから設計し直す必要がありました。
+          <strong>Sandboxed API(SAPI)</strong>
+          はこの負担を解消するために作られたオープンソースプロジェクトで、Sandbox2を基盤にしながら「
+          <strong>C/C++のライブラリ単位</strong>
+          」でサンドボックス化できるようにします。開発チームのモットーは &quot;Sandbox once, use
+          anywhere&quot;(一度サンドボックス化すれば、どこでも使い回せる)です。
+        </p>
+        <div className={styles.mermaidWrap}>
+          <MermaidDiagram chart={MERMAID_CHART_6_2} />
+        </div>
+        <p>
+          SAPIライブラリはそれぞれ、必要最小限のシステムコール/リソースだけを許可するタイトなセキュリティポリシーを個別に持てる点が、プロジェクト全体で1つの巨大なポリシーを共有する従来型のサンドボックス設計との大きな違いです。
+        </p>
+        <h3
+          className={styles.domainH3}
+          id="6-3-ステップバイステップzlibをsapiでサンドボックス化する例"
+          style={{ "--domain": "var(--c-cpp)" } as React.CSSProperties}
+        >
+          6-3. ステップバイステップ:zlibをSAPIでサンドボックス化する例
+        </h3>
+        <p>公式のGetting Startedガイドで紹介されている典型的な流れは次のとおりです。</p>
+        <ol type="1">
+          <li>
+            <strong>サンドボックス化したいライブラリの関数を洗い出す</strong>
+            :今回の例ではzlibの<code>deflate()</code>など、実際に使う関数だけを対象にする
+          </li>
+          <li>
+            <strong>アンサンドボックス版のホストコードをまず動かす</strong>
+            :最初はライブラリを直接呼び出す通常のプログラムとして実装し、動作を確認する
+          </li>
+          <li>
+            <strong>
+              <code>sapi_library</code>ビルドルールを定義する
+            </strong>
+            :Bazel/CMakeのビルドルールでSAPIライブラリを生成する
+          </li>
+          <li>
+            <strong>SAPI ObjectとRPC Stubの自動生成を確認する</strong>
+            :ビルドプロセス中にSAPIが自動生成するため、開発者がRPCの配線を手書きする必要はない
+          </li>
+          <li>
+            <strong>ホストコードをSAPI呼び出しに置き換える</strong>:<code>sapi::Sandbox</code>
+            でサンドボックスオブジェクトを作成し、生成されたAPIクラス経由で関数を呼び出すようにホストコードを書き換える
+          </li>
+          <li>
+            <strong>必要に応じて専用のsandbox policyを書く</strong>
+            :デフォルトポリシーで足りない場合は、<code>sandbox.h</code>
+            ヘッダーファイルに許可するシステムコール・ファイルアクセス範囲を定義し、
+            <code>sapi_library</code>ルールに渡す
+          </li>
+          <li>
+            <strong>Transactionsモジュールで監視・自動再起動を設定する</strong>
+            :セキュリティ違反・クラッシュ・リソース枯渇でライブラリが落ちた場合に自動的に再起動する高レベルAPIも用意されている
+          </li>
+        </ol>
+        <h3
+          className={styles.domainH3}
+          id="6-4-cc領域における他の選択肢比較"
+          style={{ "--domain": "var(--c-cpp)" } as React.CSSProperties}
+        >
+          6-4. C/C++領域における他の選択肢比較
+        </h3>
+        <p>
+          Google Developersの公式ページでは、用途別に複数のサンドボックス技術が一覧化されています。
+        </p>
+        <div className={styles.tableScroll}>
+          <table>
+            <thead>
+              <tr>
+                <th>製品</th>
+                <th>概要</th>
+                <th>主な用途</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Sandbox2</td>
+                <td>
+                  namespace・リソース制限・seccomp-bpfを用いたLinuxサンドボックス。SAPIの基盤技術
+                </td>
+                <td>汎用サンドボックス</td>
+              </tr>
+              <tr>
+                <td>gVisor</td>
+                <td>
+                  システムコールをアプリケーションカーネルとして実装。ptraceまたはハードウェア仮想化でインターセプト
+                </td>
+                <td>汎用サンドボックス</td>
+              </tr>
+              <tr>
+                <td>Bubblewrap</td>
+                <td>user namespaceのサブセットで実装。Flatpakの実行エンジンとしても利用</td>
+                <td>CLIツール</td>
+              </tr>
+              <tr>
+                <td>Minijail</td>
+                <td>ChromeOS/Androidで使われるサンドボックス・封じ込めツール</td>
+                <td>CLIツール</td>
+              </tr>
+              <tr>
+                <td>NSJail</td>
+                <td>
+                  namespace・リソース制限・seccomp-bpfによるプロセス隔離。独自DSLのKafelにも対応
+                </td>
+                <td>CLIツール</td>
+              </tr>
+              <tr>
+                <td>Sandboxed API (SAPI)</td>
+                <td>Sandbox2を使ったC/C++ライブラリの再利用可能なサンドボックス</td>
+                <td>C/C++コード</td>
+              </tr>
+              <tr>
+                <td>Native Client(NaCl)</td>
+                <td>
+                  <strong>非推奨</strong>
+                  。x86/LLVMバイトコードの制限されたサブセットにコンパイルして隔離。後継のWebAssembly設計に影響を与えた
+                </td>
+                <td>C/C++コード(廃止)</td>
+              </tr>
+              <tr>
+                <td>WebAssembly (WASM)</td>
+                <td>移植可能なバイナリフォーマット。隔離された実行環境でモジュールを実行</td>
+                <td>C/C++コード</td>
+              </tr>
+              <tr>
+                <td>RLBox</td>
+                <td>
+                  C++17で書かれたサンドボックスAPI。NaCl・WASM・リモートプロセスなど複数の実行バックエンドを選択可能
+                </td>
+                <td>C/C++コード</td>
+              </tr>
+              <tr>
+                <td>Flatpak</td>
+                <td>
+                  Bubblewrapを土台にしたLinuxデスクトップアプリ向けサンドボックス。パッケージング・配布に重点
+                </td>
+                <td>デスクトップアプリ</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <hr />
+
+        <span className={styles.sectionAnchor} id="section-7" aria-hidden="true" />
+        <h2
+          className={styles.domainH2}
+          id="7-領域⑤-ブラウザのサンドボックス"
+          style={{ "--domain": "var(--c-browser)" } as React.CSSProperties}
+        >
+          <span className={styles.domainBadge}>WEB</span>7. 領域⑤ ブラウザのサンドボックス
+        </h2>
+        <h3
+          className={styles.domainH3}
+          id="7-1-chromeのマルチプロセスアーキテクチャ"
+          style={{ "--domain": "var(--c-browser)" } as React.CSSProperties}
+        >
+          7-1. Chromeのマルチプロセスアーキテクチャ
+        </h3>
+        <p>
+          Chromeのセキュリティ設計の中核は「サンドボックス化されたマルチプロセスアーキテクチャ」です。DOMのレンダリング・スクリプト実行・メディアデコードなど、Web由来の攻撃対象領域の大部分は、権限を持たない「レンダラープロセス」に閉じ込められます。唯一「ブラウザプロセス」だけが、ファイルシステムやネットワークに直接アクセスできる無サンドボックスの特権プロセスとして動作します。
+        </p>
+        <div className={styles.mermaidWrap}>
+          <MermaidDiagram chart={MERMAID_CHART_7_1} />
+        </div>
+        <h3
+          className={styles.domainH3}
+          id="7-2-site-isolationサイトをまたいだデータ漏洩を防ぐ"
+          style={{ "--domain": "var(--c-browser)" } as React.CSSProperties}
+        >
+          7-2. Site Isolation:サイトをまたいだデータ漏洩を防ぐ
+        </h3>
+        <p>
+          Chrome 67(デスクトップ、全サイト対象)およびChrome
+          77(Android、ログイン済みサイト対象)からデフォルトで有効化されているのが
+          <strong>Site Isolation</strong>
+          です。目的は「1つのレンダラープロセスには、最大でも1つのWebサイト由来のページしか含めない」ことを保証し、レンダラープロセスに脆弱性があっても、他サイトのCookieやデータへのアクセスを遮断することにあります。ブラウザプロセスは、どのサイトが専用プロセスを必要とするかに基づいて、各レンダラープロセスのCookieや他リソースへのアクセスを制限します。
+        </p>
+        <h3
+          className={styles.domainH3}
+          id="7-3-v8-sandboxjavascriptエンジン自体を隔離する"
+          style={{ "--domain": "var(--c-browser)" } as React.CSSProperties}
+        >
+          7-3. V8 Sandbox:JavaScriptエンジン自体を隔離する
+        </h3>
+        <p>
+          Site Isolationがプロセス間の隔離だとすれば、<strong>V8 Sandbox</strong>
+          はプロセス<strong>内</strong>の隔離です。V8のセキュリティ技術リードであるSamuel
+          Groß氏によれば、今日発見・悪用されるV8の脆弱性のほぼすべてに共通するのは、「コンパイラとランタイムがほぼ例外なくV8のHeapObjectインスタンスだけを操作するため、最終的なメモリ破壊が必ずV8ヒープの内部で発生する」という点です。
+        </p>
+        <p>
+          V8
+          Sandboxは、V8が実行するコードを、プロセスの仮想アドレス空間の一部(=サンドボックス、64bit環境で最大1TB分を予約)に限定し、それ以外のメモリ領域からは切り離します。サンドボックス外のメモリにアクセスできるすべてのデータ型を「サンドボックス互換」の代替型に置き換えることで、たとえV8内でメモリ破壊が起きても、サンドボックスの外側には影響が及ばない設計です。Chrome
+          123から、Android・ChromeOS・Linux・macOS・Windowsの全プラットフォームでデフォルト有効化されており、SpeedometerやJetStreamのベンチマークでは、性能オーバーヘッドは約1%に抑えられています。
+        </p>
+        <div className={styles.mermaidWrap}>
+          <MermaidDiagram chart={MERMAID_CHART_7_3} />
+        </div>
+        <h3
+          className={styles.domainH3}
+          id="7-4-chrome拡張機能開発者向けsandboxディレクティブのベストプラクティス"
+          style={{ "--domain": "var(--c-browser)" } as React.CSSProperties}
+        >
+          7-4. Chrome拡張機能開発者向け:sandboxディレクティブのベストプラクティス
+        </h3>
+        <p>
+          ブラウザ本体だけでなく、拡張機能を開発する側にもGoogleが公式に推奨するサンドボックス機構があります。Manifest
+          V3の<code>sandbox</code>
+          プロパティを使うと、拡張機能内の特定のページを「一意のオリジンを持つサンドボックス」として動作させられます。
+        </p>
+        <ol type="1">
+          <li>
+            <strong>
+              <code>eval</code>やインラインスクリプトが必要なページだけをsandbox指定する
+            </strong>
+            :サンドボックス化されたページは拡張機能全体のCSP(コンテンツセキュリティポリシー)の対象外になり、独自のCSPを持てるため、
+            <code>eval()</code>やインラインスクリプトの実行が可能になる
+          </li>
+          <li>
+            <strong>拡張機能APIへの直接アクセスはできない前提で設計する</strong>
+            :サンドボックス化ページは拡張機能API・非サンドボックスページへの直接アクセスができず、
+            <code>postMessage()</code>経由でのみ通信できる
+          </li>
+          <li>
+            <strong>
+              CSPを絞り込む場合は<code>sandbox</code>ディレクティブを外さない
+            </strong>
+            :デフォルトのCSP値は
+            <code>
+              sandbox allow-scripts allow-forms allow-popups allow-modals; script-src
+              &apos;self&apos; &apos;unsafe-inline&apos; &apos;unsafe-eval&apos;; child-src
+              &apos;self&apos;;
+            </code>
+            。これをより厳しく絞り込むことは可能だが、<code>sandbox</code>
+            ディレクティブ自体は必須で、<code>allow-same-origin</code>トークンは指定できない
+          </li>
+          <li>
+            <strong>外部Webコンテンツの読み込みは避ける</strong>:Chrome
+            57以降、サンドボックス化ページの中に外部Webコンテンツ(埋め込みフレーム・スクリプトを含む)を読み込むことはできない。外部コンテンツが必要な場合は
+            <code>webview</code>を使う
+          </li>
+          <li>
+            <strong>通常の拡張機能ページのCSPも最小権限に保つ</strong>
+            :通常のページ(<code>extension_pages</code>)側では、Chromeが強制する最小CSP(
+            <code>
+              script-src &apos;self&apos; &apos;wasm-unsafe-eval&apos;; object-src &apos;self&apos;;
+            </code>
+            )より緩和することはできない仕様になっている
+          </li>
+        </ol>
+
+        <hr />
+
+        <span className={styles.sectionAnchor} id="section-8" aria-hidden="true" />
+        <h2 id="8-意思決定フロー自分のケースにはどのサンドボックス技術を選ぶべきか">
+          8. 意思決定フロー:自分のケースにはどのサンドボックス技術を選ぶべきか
+        </h2>
+        <p>
+          ここまでの5領域を踏まえて、「自分は何を隔離したいのか」から逆引きできる意思決定フローにまとめました。
+        </p>
+        <div className={styles.mermaidWrap}>
+          <MermaidDiagram chart={MERMAID_CHART_8} />
+        </div>
+
+        <hr />
+
+        <span className={styles.sectionAnchor} id="section-9" aria-hidden="true" />
+        <h2 id="9-横断ベストプラクティス早見表">9. 横断ベストプラクティス早見表</h2>
+        <p>5つの領域を貫く共通原則を、実務でチェックリストとして使える形にまとめました。</p>
+        <div className={styles.tableScroll}>
+          <table>
+            <thead>
+              <tr>
+                <th>原則</th>
+                <th>AIエージェント</th>
+                <th>API</th>
+                <th>コンテナ</th>
+                <th>C/C++</th>
+                <th>ブラウザ</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <strong>最小権限</strong>
+                </td>
+                <td>Workload Identity Federationで使い捨てIAM</td>
+                <td>RBAC・OAuthスコープの絞り込み</td>
+                <td>サンドボックス化ノードプールの分離</td>
+                <td>ポリシーで許可syscallを最小化</td>
+                <td>拡張機能CSPを最小権限に</td>
+              </tr>
+              <tr>
+                <td>
+                  <strong>デフォルト拒否</strong>
+                </td>
+                <td>ネットワークポリシーで通信先を許可リスト化</td>
+                <td>Cloud Armorでの地理/IP制御</td>
+                <td>GPUタイムシェアリングを避ける等の制約順守</td>
+                <td>seccomp-bpfでsyscallをデフォルト拒否</td>
+                <td>
+                  サンドボックス化ページに<code>allow-same-origin</code>を付けない
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <strong>多層防御</strong>
+                </td>
+                <td>gVisor+ID+ネットワークを重ねても過信しない</td>
+                <td>トラフィック管理+メッセージ保護+セキュリティポリシー</td>
+                <td>VMM境界+コンテナ境界+seccomp</td>
+                <td>namespace+リソース制限+seccomp-bpf</td>
+                <td>マルチプロセス+Site Isolation+V8 Sandbox</td>
+              </tr>
+              <tr>
+                <td>
+                  <strong>状態管理/リソース制御</strong>
+                </td>
+                <td>Pod Snapshotsでウォーム/コールドプール</td>
+                <td>環境ごとにデプロイ数を制限</td>
+                <td>全コンテナにリソース上限を設定</td>
+                <td>Transactionsで異常時に自動再起動</td>
+                <td>プロセスクラッシュ時も他タブは継続動作</td>
+              </tr>
+              <tr>
+                <td>
+                  <strong>監視・可観測性</strong>
+                </td>
+                <td>トレーシングでツール呼び出しを可視化</td>
+                <td>Advanced API Securityでクライアント挙動を分析</td>
+                <td>gVisorログのLogging/Monitoring連携</td>
+                <td>セキュリティ違反のログ記録</td>
+                <td>サンドボックス違反の検知</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <hr />
+
+        <span className={styles.sectionAnchor} id="section-10" aria-hidden="true" />
+        <h2 id="10-参考文献出典url">10. 参考文献・出典URL</h2>
+        <p>
+          本ガイドの作成にあたり、以下のGoogle公式ドキュメント・Google公式ブログ・著名なセキュリティエンジニア/開発者による技術記事を参照しました。
+        </p>
+        <div className={styles.refGrid}>
+          <div className={styles.refCard}>
+            <h3 id="google公式サンドボックス技術全般">Google公式:サンドボックス技術全般</h3>
+            <ul>
+              <li>
+                Code Sandboxing(Google for Developers、Sandbox2/SAPI/gVisor等の比較表):
+                <span className={styles.refIcon}>↗</span>
+                <a
+                  href="https://developers.google.com/code-sandboxing"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  https://developers.google.com/code-sandboxing
+                </a>
               </li>
-            ))}
-          </ol>
-        </nav>
-
-        {/* INTRO */}
-        <section className={styles.sec} id="intro">
-          <div className={styles.secEyebrow} style={{ color: "var(--c1)" }}>
-            CHAPTER 01 — OVERVIEW
+              <li>
+                Sandbox2 Explained: <span className={styles.refIcon}>↗</span>
+                <a
+                  href="https://developers.google.com/code-sandboxing/sandbox2/explained"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  https://developers.google.com/code-sandboxing/sandbox2/explained
+                </a>
+              </li>
+              <li>
+                Sandboxed API (SAPI) 概要: <span className={styles.refIcon}>↗</span>
+                <a
+                  href="https://developers.google.com/code-sandboxing/sandboxed-api"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  https://developers.google.com/code-sandboxing/sandboxed-api
+                </a>
+              </li>
+              <li>
+                SAPI Explained: <span className={styles.refIcon}>↗</span>
+                <a
+                  href="https://developers.google.com/code-sandboxing/sandboxed-api/explained"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  https://developers.google.com/code-sandboxing/sandboxed-api/explained
+                </a>
+              </li>
+              <li>
+                SAPI Getting Started: <span className={styles.refIcon}>↗</span>
+                <a
+                  href="https://developers.google.com/code-sandboxing/sandboxed-api/getting-started"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  https://developers.google.com/code-sandboxing/sandboxed-api/getting-started
+                </a>
+              </li>
+              <li>
+                google/sandboxed-api (GitHub): <span className={styles.refIcon}>↗</span>
+                <a
+                  href="https://github.com/google/sandboxed-api"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  https://github.com/google/sandboxed-api
+                </a>
+              </li>
+            </ul>
           </div>
-          <h2 className={styles.secTitle}>サンドボックスとは何か？</h2>
-          <p className={styles.secLead}>
-            「砂場（サンドボックス）」のように隔離された環境で怪しいコードを実行し、万が一問題が起きてもシステム全体に影響が及ばないようにする仕組みです。
+          <div className={styles.refCard}>
+            <h3 id="①-aiエージェント">① AIエージェント</h3>
+            <ul>
+              <li>
+                GKE Sandbox(GKEセキュリティ公式ドキュメント):{" "}
+                <span className={styles.refIcon}>↗</span>
+                <a
+                  href="https://docs.cloud.google.com/kubernetes-engine/docs/concepts/sandbox-pods"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  https://docs.cloud.google.com/kubernetes-engine/docs/concepts/sandbox-pods
+                </a>
+              </li>
+              <li>
+                Isolate AI code execution with Agent Sandbox:{" "}
+                <span className={styles.refIcon}>↗</span>
+                <a
+                  href="https://docs.cloud.google.com/kubernetes-engine/docs/how-to/agent-sandbox"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  https://docs.cloud.google.com/kubernetes-engine/docs/how-to/agent-sandbox
+                </a>
+              </li>
+              <li>
+                Bringing you Agent Sandbox on GKE and Agent Substrate(Google Cloud Blog):
+                <span className={styles.refIcon}>↗</span>
+                <a
+                  href="https://cloud.google.com/blog/products/containers-kubernetes/bringing-you-agent-sandbox-on-gke-and-agent-substrate"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  https://cloud.google.com/blog/products/containers-kubernetes/bringing-you-agent-sandbox-on-gke-and-agent-substrate
+                </a>
+              </li>
+              <li>
+                Safety and Security for AI Agents(Agent Development Kit公式):
+                <span className={styles.refIcon}>↗</span>
+                <a
+                  href="https://google.github.io/adk-docs/safety/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  https://google.github.io/adk-docs/safety/
+                </a>
+              </li>
+              <li>
+                Code Execution(Gemini Enterprise Agent Platform公式):{" "}
+                <span className={styles.refIcon}>↗</span>
+                <a
+                  href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/scale/sandbox/code-execution-overview"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  https://docs.cloud.google.com/gemini-enterprise-agent-platform/scale/sandbox/code-execution-overview
+                </a>
+              </li>
+              <li>
+                Sandboxes overview(Gemini Enterprise Agent Platform公式):
+                <span className={styles.refIcon}>↗</span>
+                <a
+                  href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/scale/sandbox"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  https://docs.cloud.google.com/gemini-enterprise-agent-platform/scale/sandbox
+                </a>
+              </li>
+              <li>
+                Agents Overview(Gemini API公式): <span className={styles.refIcon}>↗</span>
+                <a
+                  href="https://ai.google.dev/gemini-api/docs/agents"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  https://ai.google.dev/gemini-api/docs/agents
+                </a>
+              </li>
+              <li>
+                A Deep Dive into GKE Sandbox for Agents(The New Stack、Darryl K. Taft氏):
+                <span className={styles.refIcon}>↗</span>
+                <a
+                  href="https://thenewstack.io/google-cloud-a-deep-dive-into-gke-sandbox-for-agents/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  https://thenewstack.io/google-cloud-a-deep-dive-into-gke-sandbox-for-agents/
+                </a>
+              </li>
+              <li>
+                Google Announces GKE Agent Sandbox and Hypercluster at Next &apos;26(InfoQ、Google
+                Cloud AmbassadorのAlex Gkiouros氏の見解を含む):{" "}
+                <span className={styles.refIcon}>↗</span>
+                <a
+                  href="https://www.infoq.com/news/2026/05/gke-agent-sandbox-hypercluster/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  https://www.infoq.com/news/2026/05/gke-agent-sandbox-hypercluster/
+                </a>
+              </li>
+              <li>
+                Securing AI Agents on GKE(ARMO、Shauli Rozen氏):{" "}
+                <span className={styles.refIcon}>↗</span>
+                <a
+                  href="https://www.armosec.io/blog/sandboxing-ai-agents-gke-workload-identity/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  https://www.armosec.io/blog/sandboxing-ai-agents-gke-workload-identity/
+                </a>
+              </li>
+              <li>
+                GKE Agent SandboxとGKE Pod Snapshots(Rahul Ranganathan氏、Google Cloud
+                Community/Medium ― ISOLATE/ACCELERATE/RESTRICTのフレームワークの出典):
+                <span className={styles.refIcon}>↗</span>
+                <a
+                  href="https://medium.com/google-cloud/gke-agent-sandbox-and-gke-pod-snapshots-zero-trust-security-for-ai-agents-at-scale-559261ee20b5"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  https://medium.com/google-cloud/gke-agent-sandbox-and-gke-pod-snapshots-zero-trust-security-for-ai-agents-at-scale-559261ee20b5
+                </a>
+              </li>
+              <li>
+                Deploying Secure AI Agents on GKE(Google Codelabs):{" "}
+                <span className={styles.refIcon}>↗</span>
+                <a
+                  href="https://codelabs.developers.google.com/codelabs/gke/ai-agents-on-gke"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  https://codelabs.developers.google.com/codelabs/gke/ai-agents-on-gke
+                </a>
+              </li>
+            </ul>
+          </div>
+          <div className={styles.refCard}>
+            <h3 id="②-api">② API</h3>
+            <ul>
+              <li>
+                Apigee API Management(製品ページ): <span className={styles.refIcon}>↗</span>
+                <a href="https://cloud.google.com/apigee" target="_blank" rel="noopener noreferrer">
+                  https://cloud.google.com/apigee
+                </a>
+              </li>
+              <li>
+                Best practices for securing your applications and APIs using Apigee:
+                <span className={styles.refIcon}>↗</span>
+                <a
+                  href="https://docs.cloud.google.com/architecture/best-practices-securing-applications-and-apis-using-apigee"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  https://docs.cloud.google.com/architecture/best-practices-securing-applications-and-apis-using-apigee
+                </a>
+              </li>
+              <li>
+                Advanced API Security best practices(Apigee公式):{" "}
+                <span className={styles.refIcon}>↗</span>
+                <a
+                  href="https://docs.cloud.google.com/apigee/docs/api-security/best-practices"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  https://docs.cloud.google.com/apigee/docs/api-security/best-practices
+                </a>
+              </li>
+              <li>
+                About environments(Apigee hybrid公式、環境=サンドボックスの定義):
+                <span className={styles.refIcon}>↗</span>
+                <a
+                  href="https://cloud.google.com/apigee/docs/hybrid/v1.9/environments-about"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  https://cloud.google.com/apigee/docs/hybrid/v1.9/environments-about
+                </a>
+              </li>
+              <li>
+                Top Sandbox Development Environment Best Practices Guide(DigitalAPI):
+                <span className={styles.refIcon}>↗</span>
+                <a
+                  href="https://www.digitalapi.ai/blogs/what-are-the-best-practices-for-managing-a-sandbox-development-environment"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  https://www.digitalapi.ai/blogs/what-are-the-best-practices-for-managing-a-sandbox-development-environment
+                </a>
+              </li>
+            </ul>
+          </div>
+          <div className={styles.refCard}>
+            <h3 id="③-コンテナ">③ コンテナ</h3>
+            <ul>
+              <li>
+                GKE Sandbox(概念ドキュメント): <span className={styles.refIcon}>↗</span>
+                <a
+                  href="https://docs.cloud.google.com/kubernetes-engine/docs/concepts/sandbox-pods"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  https://docs.cloud.google.com/kubernetes-engine/docs/concepts/sandbox-pods
+                </a>
+              </li>
+              <li>
+                Harden workload isolation with GKE Sandbox(手順ドキュメント):
+                <span className={styles.refIcon}>↗</span>
+                <a
+                  href="https://docs.cloud.google.com/kubernetes-engine/docs/how-to/sandbox-pods"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  https://docs.cloud.google.com/kubernetes-engine/docs/how-to/sandbox-pods
+                </a>
+              </li>
+              <li>
+                gVisor公式サイト: <span className={styles.refIcon}>↗</span>
+                <a href="https://gvisor.dev/" target="_blank" rel="noopener noreferrer">
+                  https://gvisor.dev/
+                </a>
+              </li>
+              <li>
+                Security design overview(Cloud Run公式): <span className={styles.refIcon}>↗</span>
+                <a
+                  href="https://docs.cloud.google.com/run/docs/securing/security"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  https://docs.cloud.google.com/run/docs/securing/security
+                </a>
+              </li>
+              <li>
+                Improved gVisor file system performance for GKE, Cloud Run, App Engine and Cloud
+                Functions(Google Cloud Blog): <span className={styles.refIcon}>↗</span>
+                <a
+                  href="https://cloud.google.com/blog/products/containers-kubernetes/gvisor-file-system-improvements-for-gke-and-serverless"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  https://cloud.google.com/blog/products/containers-kubernetes/gvisor-file-system-improvements-for-gke-and-serverless
+                </a>
+              </li>
+            </ul>
+          </div>
+          <div className={styles.refCard}>
+            <h3 id="④-cc">④ C/C++</h3>
+            <ul>
+              <li>
+                Sandbox2 Explained: <span className={styles.refIcon}>↗</span>
+                <a
+                  href="https://developers.google.com/code-sandboxing/sandbox2/explained"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  https://developers.google.com/code-sandboxing/sandbox2/explained
+                </a>
+              </li>
+              <li>
+                Sandboxed API README(GitHub): <span className={styles.refIcon}>↗</span>
+                <a
+                  href="https://github.com/google/sandboxed-api/blob/main/README.md"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  https://github.com/google/sandboxed-api/blob/main/README.md
+                </a>
+              </li>
+            </ul>
+          </div>
+          <div className={styles.refCard}>
+            <h3 id="⑤-ブラウザ">⑤ ブラウザ</h3>
+            <ul>
+              <li>
+                Site Isolation Design Document(Chromium公式):{" "}
+                <span className={styles.refIcon}>↗</span>
+                <a
+                  href="https://www.chromium.org/developers/design-documents/site-isolation/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  https://www.chromium.org/developers/design-documents/site-isolation/
+                </a>
+              </li>
+              <li>
+                Secure Architecture(Chromium Security公式):{" "}
+                <span className={styles.refIcon}>↗</span>
+                <a
+                  href="https://www.chromium.org/Home/chromium-security/guts/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  https://www.chromium.org/Home/chromium-security/guts/
+                </a>
+              </li>
+              <li>
+                The V8 Sandbox(V8公式ブログ、Samuel Groß氏):{" "}
+                <span className={styles.refIcon}>↗</span>
+                <a href="https://v8.dev/blog/sandbox" target="_blank" rel="noopener noreferrer">
+                  https://v8.dev/blog/sandbox
+                </a>
+              </li>
+              <li>
+                The V8 Heap Sandbox, OffensiveCon 2024講演資料(Samuel Groß氏):
+                <span className={styles.refIcon}>↗</span>
+                <a
+                  href="https://saelo.github.io/presentations/offensivecon_24_the_v8_heap_sandbox.pdf"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  https://saelo.github.io/presentations/offensivecon_24_the_v8_heap_sandbox.pdf
+                </a>
+              </li>
+              <li>
+                Google Chrome Adds V8 Sandbox(The Hacker News):{" "}
+                <span className={styles.refIcon}>↗</span>
+                <a
+                  href="https://thehackernews.com/2024/04/google-chrome-adds-v8-sandbox-new.html"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  https://thehackernews.com/2024/04/google-chrome-adds-v8-sandbox-new.html
+                </a>
+              </li>
+              <li>
+                Manifest - Sandbox(Chrome Extensions公式、Manifest V3):
+                <span className={styles.refIcon}>↗</span>
+                <a
+                  href="https://developer.chrome.com/docs/extensions/reference/manifest/sandbox"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  https://developer.chrome.com/docs/extensions/reference/manifest/sandbox
+                </a>
+              </li>
+              <li>
+                Manifest - Content Security Policy(Chrome Extensions公式):
+                <span className={styles.refIcon}>↗</span>
+                <a
+                  href="https://developer.chrome.com/docs/extensions/reference/manifest/content-security-policy"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  https://developer.chrome.com/docs/extensions/reference/manifest/content-security-policy
+                </a>
+              </li>
+              <li>
+                Cleanly Escaping the Chrome Sandbox(Theori Blog):{" "}
+                <span className={styles.refIcon}>↗</span>
+                <a
+                  href="https://theori.io/blog/cleanly-escaping-the-chrome-sandbox"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  https://theori.io/blog/cleanly-escaping-the-chrome-sandbox
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <hr />
+        <blockquote>
+          <p>
+            <strong>免責事項</strong>
+            :本ガイドは2026年7月27日時点で確認できた公開情報に基づいています。GKE Agent
+            SandboxやGemini Enterprise Agent
+            Platform関連の一部機能はPre-GA(プレビュー)段階の製品を含むため、実際の導入前には必ずGoogle
+            Cloud公式ドキュメントの最新版を確認してください。
           </p>
-
-          <div className={`${styles.callout} ${styles.calloutInfo}`}>
-            <div className={styles.calloutIcon}>💡</div>
-            <div className={styles.calloutBody}>
-              <strong>子どもの砂場のイメージ</strong>
-              <br />
-              子どもが砂場で遊んでも、砂が外に出ないように囲いがあります。サンドボックスも同じで、プログラムが「囲いの中」だけで動き、外（ホストOS・他のデータ）には触れられません。
-            </div>
-          </div>
-
-          <div
-            className={styles.subH2}
-            style={{ "--accent-c": "var(--c1)" } as React.CSSProperties}
-          >
-            Google の 6 つのサンドボックス技術 — クイックリファレンス
-          </div>
-          <table className={styles.mdTable}>
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>名称</th>
-                <th>領域</th>
-                <th>主要技術</th>
-                <th>2026年ステータス</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>1</td>
-                <td>
-                  <strong style={{ color: "var(--c1)" }}>GKE Agent Sandbox</strong>
-                </td>
-                <td>AIエージェント</td>
-                <td>gVisor + Pod Snapshot</td>
-                <td>
-                  <span style={{ color: "#34a853", fontWeight: 700 }}>✅ GA（2026年5月〜）</span>
-                </td>
-              </tr>
-              <tr>
-                <td>2</td>
-                <td>
-                  <strong style={{ color: "var(--c2)" }}>Gemini Code Execution</strong>
-                </td>
-                <td>AI / LLM API</td>
-                <td>マネージドLinux環境</td>
-                <td>
-                  <span style={{ color: "#34a853", fontWeight: 700 }}>✅ GA</span>
-                </td>
-              </tr>
-              <tr>
-                <td>3</td>
-                <td>
-                  <strong style={{ color: "var(--c3)" }}>gVisor / GKE Sandbox</strong>
-                </td>
-                <td>コンテナ</td>
-                <td>ユーザー空間カーネル</td>
-                <td>
-                  <span style={{ color: "#34a853", fontWeight: 700 }}>✅ GA</span>
-                </td>
-              </tr>
-              <tr>
-                <td>4</td>
-                <td>
-                  <strong style={{ color: "var(--c4)" }}>Sandbox2 / SAPI</strong>
-                </td>
-                <td>C/C++ アプリ</td>
-                <td>Seccomp-bpf / Namespaces</td>
-                <td>
-                  <span style={{ color: "#34a853", fontWeight: 700 }}>✅ GA（OSS）</span>
-                </td>
-              </tr>
-              <tr>
-                <td>5</td>
-                <td>
-                  <strong style={{ color: "var(--c5)" }}>V8 Sandbox</strong>
-                </td>
-                <td>ブラウザ JS</td>
-                <td>メモリ空間分離</td>
-                <td>
-                  <span style={{ color: "#fbbc04", fontWeight: 700 }}>🔄 開発継続中</span>
-                </td>
-              </tr>
-              <tr>
-                <td>6</td>
-                <td>
-                  <strong style={{ color: "var(--c6)" }}>Privacy Sandbox</strong>
-                </td>
-                <td>Web 広告</td>
-                <td>デバイス内暗号化API</td>
-                <td>
-                  <span style={{ color: "#ea4335", fontWeight: 700 }}>⛔ 2025年10月廃止</span>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-
-          <div
-            className={styles.subH2}
-            style={{ "--accent-c": "var(--c1)" } as React.CSSProperties}
-          >
-            サンドボックスが必要な理由（3 層防御モデル）
-          </div>
-          <div
-            className={styles.diagramWrap}
-            style={{ "--diag-w": "650px" } as React.CSSProperties}
-          >
-            <div className={styles.preMermaid}>
-              <MermaidDiagram chart={DIAG_1} />
-            </div>
-            <p className={styles.diagramLabel}>
-              図1: サンドボックスが防ぐ攻撃と Google の三層防御モデル
-            </p>
-          </div>
-        </section>
-
-        {/* SELECTOR */}
-        <section className={styles.sec} id="selector">
-          <div className={styles.secEyebrow} style={{ color: "var(--c2)" }}>
-            CHAPTER 02 — DECISION GUIDE
-          </div>
-          <h2 className={styles.secTitle}>どのサンドボックスを選ぶべきか？</h2>
-          <p className={styles.secLead}>
-            実行したいものの種類で最適技術が決まります。以下のフローチャートで自分のユースケースを確認してください。
-          </p>
-          <div
-            className={`${styles.diagramWrap} ${styles.diagramScrollable}`}
-            style={{ "--diag-min-w": "900px" } as React.CSSProperties}
-          >
-            <div className={styles.preMermaid}>
-              <MermaidDiagram chart={DIAG_2} />
-            </div>
-            <p className={styles.diagramLabel}>
-              図2: ユースケース別サンドボックス選択フローチャート
-            </p>
-          </div>
-        </section>
-
-        {/* S1: GKE AGENT SANDBOX */}
-        <section className={styles.sec} id="s1">
-          <div className={styles.secEyebrow} style={{ color: "var(--c1)" }}>
-            CHAPTER 03 — AI AGENTS
-          </div>
-          <h2 className={styles.secTitle}>GKE Agent Sandbox</h2>
-
-          <div className={styles.sbHeader} style={{ borderLeftColor: "var(--c1)" }}>
-            <div
-              className={styles.sbIcon}
-              style={{ background: "rgba(66, 133, 244, 0.15)", color: "var(--c1)" }}
-            >
-              🤖
-            </div>
-            <div className={styles.sbHeaderMeta}>
-              <div className={styles.sbName}>GKE Agent Sandbox</div>
-              <div className={styles.sbDomain}>
-                領域: AIエージェント &nbsp;|&nbsp; 主要技術: gVisor + Pod Snapshot
-              </div>
-              <div className={styles.sbDesc}>
-                AIエージェントが生成した「信頼できないコード」をKubernetes上で安全・高速に実行するための専用インフラ。
-                <br />
-                1秒未満のレイテンシで <strong>300サンドボックス/秒</strong> のスループットを実現。
-              </div>
-            </div>
-            <div>
-              <span
-                className={styles.statusBadge}
-                style={{
-                  background: "rgba(52, 168, 83, 0.12)",
-                  color: "#34a853",
-                  border: "1px solid rgba(52, 168, 83, 0.3)",
-                }}
-              >
-                <span className={styles.statusPulse} style={{ background: "#34a853" }} />
-                GA
-              </span>
-            </div>
-          </div>
-
-          <div
-            className={styles.subH2}
-            style={{ "--accent-c": "var(--c1)" } as React.CSSProperties}
-          >
-            仕組みの全体像
-          </div>
-          <div
-            className={`${styles.diagramWrap} ${styles.diagramScrollable}`}
-            style={{ "--diag-min-w": "800px" } as React.CSSProperties}
-          >
-            <div className={styles.preMermaid}>
-              <MermaidDiagram chart={DIAG_3} />
-            </div>
-            <p className={styles.diagramLabel}>図3: GKE Agent Sandbox の CRD 連携フロー</p>
-          </div>
-
-          <div
-            className={styles.subH2}
-            style={{ "--accent-c": "var(--c1)" } as React.CSSProperties}
-          >
-            4 つの主要 CRD の役割
-          </div>
-          <table className={styles.mdTable}>
-            <thead>
-              <tr>
-                <th>CRD名</th>
-                <th>例え</th>
-                <th>主な役割</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>
-                  <strong style={{ color: "var(--c1)" }}>SandboxTemplate</strong>
-                </td>
-                <td>「箱の設計図」</td>
-                <td>
-                  Podのリソース・セキュリティポリシー・ネットワークルールを定義する再利用可能な青写真
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <strong style={{ color: "var(--c1)" }}>SandboxWarmPool</strong>
-                </td>
-                <td>「予備の箱を常備」</td>
-                <td>事前起動済みPodを常時N個確保し、コールドスタートを&lt;1秒に短縮</td>
-              </tr>
-              <tr>
-                <td>
-                  <strong style={{ color: "var(--c1)" }}>SandboxClaim</strong>
-                </td>
-                <td>「箱の引き取り票」</td>
-                <td>AIフレームワークがPoolに「箱を1つ貸してください」とリクエストするリソース</td>
-              </tr>
-              <tr>
-                <td>
-                  <strong style={{ color: "var(--c1)" }}>Pod Snapshot</strong>
-                </td>
-                <td>「中断・再開ボタン」</td>
-                <td>実行中のPod状態をGCSに保存し、次回起動時に即座に復元してアイドルコスト削減</td>
-              </tr>
-            </tbody>
-          </table>
-
-          <div
-            className={styles.subH2}
-            style={{ "--accent-c": "var(--c1)" } as React.CSSProperties}
-          >
-            SandboxTemplate の最小設定例
-          </div>
-          <div className={styles.codeBlock}>
-            <div className={styles.codeLabel}>YAML — SandboxTemplate</div>
-            <pre className="language-yaml">
-              {`apiVersion: extensions.agents.x-k8s.io/v1alpha1
-kind: SandboxTemplate
-metadata:
-  name: python-agent-template
-spec:
-  networkPolicy:
-    egress:
-      - ports:
-          - port: 443       # HTTPS のみ許可（デフォルト拒否）
-            protocol: TCP
-  podTemplate:
-    spec:
-      runtimeClassName: gvisor    # gVisor で実行（必須）
-      serviceAccountName: agent-sa
-      containers:
-      - name: executor
-        image: python:3.12-slim
-        resources:
-          limits:
-            cpu: "2"
-            memory: "4Gi"
-        securityContext:
-          runAsNonRoot: true          # root での実行を禁止
-          allowPrivilegeEscalation: false
-          readOnlyRootFilesystem: true`}
-            </pre>
-          </div>
-
-          <div
-            className={styles.subH2}
-            style={{ "--accent-c": "var(--c1)" } as React.CSSProperties}
-          >
-            セットアップ手順
-          </div>
-          <div className={styles.steps}>
-            <div className={styles.step}>
-              <div
-                className={styles.stepNum}
-                style={{ background: "rgba(66, 133, 244, 0.2)", color: "var(--c1)" }}
-              >
-                1
-              </div>
-              <div className={styles.stepBody}>
-                <div className={styles.stepTitle}>GKE クラスタを Workload Identity 付きで作成</div>
-                <div className={styles.stepDesc}>
-                  <code
-                    style={{ fontFamily: "var(--font-mono)", fontSize: "12px", color: "#a8c4e0" }}
-                  >
-                    --workload-pool=${"{PROJECT_ID}"}.svc.id.goog
-                  </code>{" "}
-                  オプションを付けて作成します。
-                </div>
-              </div>
-            </div>
-            <div className={styles.step}>
-              <div
-                className={styles.stepNum}
-                style={{ background: "rgba(66, 133, 244, 0.2)", color: "var(--c1)" }}
-              >
-                2
-              </div>
-              <div className={styles.stepBody}>
-                <div className={styles.stepTitle}>gVisor ノードプールを追加</div>
-                <div className={styles.stepDesc}>
-                  <code
-                    style={{ fontFamily: "var(--font-mono)", fontSize: "1rem", color: "#a8c4e0" }}
-                  >
-                    --sandbox type=gvisor --image-type cos_containerd
-                  </code>{" "}
-                  でサンドボックス専用ノードを作成します。
-                </div>
-              </div>
-            </div>
-            <div className={styles.step}>
-              <div
-                className={styles.stepNum}
-                style={{ background: "rgba(66, 133, 244, 0.2)", color: "var(--c1)" }}
-              >
-                3
-              </div>
-              <div className={styles.stepBody}>
-                <div className={styles.stepTitle}>Agent Sandbox アドオンをインストール</div>
-                <div className={styles.stepDesc}>
-                  GKE マネージドアドオンとして Agent Sandbox Controller を有効化します（Google
-                  がライフサイクル管理）。
-                </div>
-              </div>
-            </div>
-            <div className={styles.step}>
-              <div
-                className={styles.stepNum}
-                style={{ background: "rgba(66, 133, 244, 0.2)", color: "var(--c1)" }}
-              >
-                4
-              </div>
-              <div className={styles.stepBody}>
-                <div className={styles.stepTitle}>SandboxTemplate と SandboxWarmPool を作成</div>
-                <div className={styles.stepDesc}>
-                  上記 YAML を kubectl apply し、セキュリティポリシーと事前起動数を設定します。
-                </div>
-              </div>
-            </div>
-            <div className={styles.step}>
-              <div
-                className={styles.stepNum}
-                style={{ background: "rgba(66, 133, 244, 0.2)", color: "var(--c1)" }}
-              >
-                5
-              </div>
-              <div className={styles.stepBody}>
-                <div className={styles.stepTitle}>
-                  AIフレームワーク（ADK/LangChain）から SandboxClaim を発行
-                </div>
-                <div className={styles.stepDesc}>
-                  フレームワークが SandboxClaim を発行すると、Warm Pool
-                  から即座に隔離環境が割り当てられます。
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div
-            className={styles.subH2}
-            style={{ "--accent-c": "var(--c1)" } as React.CSSProperties}
-          >
-            ベストプラクティス
-          </div>
-          <table className={styles.mdTable}>
-            <thead>
-              <tr>
-                <th>カテゴリ</th>
-                <th>推奨事項</th>
-                <th>理由</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>🔒 分離</td>
-                <td>信頼できないコードは必ず gVisor Pod で実行</td>
-                <td>ホストOS侵害（RCE）を防止</td>
-              </tr>
-              <tr>
-                <td>⚡ パフォーマンス</td>
-                <td>SandboxWarmPool でPodを常時待機</td>
-                <td>コールドスタートをサブ秒に短縮</td>
-              </tr>
-              <tr>
-                <td>💰 コスト</td>
-                <td>Pod Snapshot でアイドルPodをsuspend</td>
-                <td>GPU/CPUの無駄なアイドルコストを削減</td>
-              </tr>
-              <tr>
-                <td>🔑 ID管理</td>
-                <td>Workload Identity で Pod 単位の最小権限 IAM</td>
-                <td>1つのPod侵害が他に波及しない</td>
-              </tr>
-              <tr>
-                <td>🌐 ネットワーク</td>
-                <td>NetworkPolicy をデフォルト拒否に設定</td>
-                <td>外部コールバックや横断移動を防止</td>
-              </tr>
-              <tr>
-                <td>📦 リソース</td>
-                <td>全コンテナに resource.limits を設定</td>
-                <td>ノードリソース枯渇DoSを防止</td>
-              </tr>
-            </tbody>
-          </table>
-
-          <ul className={styles.linkList}>
-            <li>
-              <span className={styles.linkLabel}>公式ドキュメント</span>
-              <Ext href="https://cloud.google.com/kubernetes-engine/docs/concepts/machine-learning/agent-sandbox">
-                GKE Agent Sandbox コンセプトドキュメント
-              </Ext>
-            </li>
-            <li>
-              <span className={styles.linkLabel}>セットアップ</span>
-              <Ext href="https://cloud.google.com/kubernetes-engine/docs/how-to/how-install-agent-sandbox">
-                Agent Sandbox インストールガイド
-              </Ext>
-            </li>
-            <li>
-              <span className={styles.linkLabel}>CRD リファレンス</span>
-              <Ext href="https://cloud.google.com/kubernetes-engine/docs/reference/crds/agentsandbox">
-                SandboxTemplate / SandboxClaim スペック
-              </Ext>
-            </li>
-            <li>
-              <span className={styles.linkLabel}>GA 発表ブログ</span>
-              <Ext href="https://cloud.google.com/blog/products/containers-kubernetes/bringing-you-agent-sandbox-on-gke-and-agent-substrate">
-                Cloud Next '26: GKE Agent Sandbox &amp; Agent Substrate
-              </Ext>
-            </li>
-          </ul>
-        </section>
-
-        {/* S2: GEMINI CODE EXECUTION */}
-        <section className={styles.sec} id="s2">
-          <div className={styles.secEyebrow} style={{ color: "var(--c2)" }}>
-            CHAPTER 04 — AI / LLM API
-          </div>
-          <h2 className={styles.secTitle}>Gemini Code Execution</h2>
-
-          <div className={styles.sbHeader} style={{ borderLeftColor: "var(--c2)" }}>
-            <div
-              className={styles.sbIcon}
-              style={{ background: "rgba(52, 168, 83, 0.15)", color: "var(--c2)" }}
-            >
-              ✨
-            </div>
-            <div className={styles.sbHeaderMeta}>
-              <div className={styles.sbName}>Gemini Code Execution</div>
-              <div className={styles.sbDomain}>
-                領域: AI / LLM API &nbsp;|&nbsp; 主要技術: マネージド Linux 環境
-              </div>
-              <div className={styles.sbDesc}>
-                Gemini API の「ツール」として提供されるマネージドなコード実行環境。
-                <strong>インフラ構築ゼロ</strong>で、API 1 行有効化するだけで Gemini が Python
-                コードを生成・実行して結果を確認します。
-              </div>
-            </div>
-            <div>
-              <span
-                className={styles.statusBadge}
-                style={{
-                  background: "rgba(52, 168, 83, 0.12)",
-                  color: "#34a853",
-                  border: "1px solid rgba(52, 168, 83, 0.3)",
-                }}
-              >
-                <span className={styles.statusPulse} style={{ background: "#34a853" }} />
-                GA
-              </span>
-            </div>
-          </div>
-
-          <div
-            className={styles.subH2}
-            style={{ "--accent-c": "var(--c2)" } as React.CSSProperties}
-          >
-            コード実行の流れ（シーケンス図）
-          </div>
-          <div
-            className={`${styles.diagramWrap} ${styles.diagramScrollable}`}
-            style={{ "--diag-min-w": "850px" } as React.CSSProperties}
-          >
-            <div className={styles.preMermaid}>
-              <MermaidDiagram chart={DIAG_4} />
-            </div>
-            <p className={styles.diagramLabel}>図4: Gemini Code Execution の ReAct ループ</p>
-          </div>
-
-          <div
-            className={styles.subH2}
-            style={{ "--accent-c": "var(--c2)" } as React.CSSProperties}
-          >
-            制約事項と対処法
-          </div>
-          <table className={styles.mdTable}>
-            <thead>
-              <tr>
-                <th>制約</th>
-                <th>詳細</th>
-                <th>対処法</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>⏱️ タイムアウト</td>
-                <td>
-                  最大 <strong>30 秒</strong> で強制終了
-                </td>
-                <td>処理を複数ターンに分割して実行</td>
-              </tr>
-              <tr>
-                <td>📂 ファイルI/O不可</td>
-                <td>ファイルの読み書きができない</td>
-                <td>データをプロンプト内にテキストで埋め込む</td>
-              </tr>
-              <tr>
-                <td>🌐 ネットワーク不可</td>
-                <td>外部 API 呼び出し不可</td>
-                <td>Function Calling と組み合わせる</td>
-              </tr>
-              <tr>
-                <td>🐍 Python のみ</td>
-                <td>他の言語は非対応</td>
-                <td>Python で記述 or GKE Agent Sandbox を採用</td>
-              </tr>
-              <tr>
-                <td>♻️ ステートレス</td>
-                <td>セッション間で状態が失われる</td>
-                <td>マルチターン会話で継続性を確保</td>
-              </tr>
-            </tbody>
-          </table>
-
-          <div
-            className={styles.subH2}
-            style={{ "--accent-c": "var(--c2)" } as React.CSSProperties}
-          >
-            Python SDK で有効化する方法
-          </div>
-          <div className={styles.codeBlock}>
-            <div className={styles.codeLabel}>Python — Gemini Code Execution 有効化</div>
-            <pre className="language-python">
-              {`from google import genai
-from google.genai.types import Tool, ToolCodeExecution, GenerateContentConfig
-
-client = genai.Client()
-
-response = client.models.generate_content(
-    model="gemini-2.5-flash",           # 2026年6月時点推奨モデル
-    contents="最初の50個の素数の合計を計算してください",
-    config=GenerateContentConfig(
-        tools=[Tool(code_execution=ToolCodeExecution())],
-        temperature=0,                   # 再現性確保
-    )
-)
-
-# レスポンスには text / executableCode / codeExecutionResult の3種が混在
-for part in response.candidates[0].content.parts:
-    if part.text:
-        print("[説明]", part.text)
-    if part.executable_code:
-        print("[コード]\\n", part.executable_code.code)
-    if part.code_execution_result:
-        print("[実行結果]", part.code_execution_result.output)`}
-            </pre>
-          </div>
-
-          <div
-            className={styles.subH2}
-            style={{ "--accent-c": "var(--c2)" } as React.CSSProperties}
-          >
-            ベストプラクティス
-          </div>
-          <div
-            className={`${styles.diagramWrap} ${styles.diagramScrollable}`}
-            style={{ "--diag-min-w": "800px" } as React.CSSProperties}
-          >
-            <div className={styles.preMermaid}>
-              <MermaidDiagram chart={DIAG_5} />
-            </div>
-            <p className={styles.diagramLabel}>図5: Code Execution タスク設計フロー</p>
-          </div>
-
-          <ul className={styles.linkList}>
-            <li>
-              <span className={styles.linkLabel}>API ドキュメント</span>
-              <Ext href="https://ai.google.dev/gemini-api/docs/code-execution">
-                Gemini Code Execution — ai.google.dev
-              </Ext>
-            </li>
-            <li>
-              <span className={styles.linkLabel}>Vertex AI 版</span>
-              <Ext href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/tools/code-execution">
-                Gemini Enterprise Agent Platform — Code Execution
-              </Ext>
-            </li>
-            <li>
-              <span className={styles.linkLabel}>Function Calling</span>
-              <Ext href="https://ai.google.dev/gemini-api/docs/interactions/function-calling">
-                Function Calling リファレンス
-              </Ext>
-            </li>
-          </ul>
-        </section>
-
-        {/* S3: gVISOR */}
-        <section className={styles.sec} id="s3">
-          <div className={styles.secEyebrow} style={{ color: "var(--c3)" }}>
-            CHAPTER 05 — CONTAINER
-          </div>
-          <h2 className={styles.secTitle}>gVisor / GKE Sandbox</h2>
-
-          <div className={styles.sbHeader} style={{ borderLeftColor: "var(--c3)" }}>
-            <div
-              className={styles.sbIcon}
-              style={{ background: "rgba(255, 109, 0, 0.15)", color: "var(--c3)" }}
-            >
-              🛡️
-            </div>
-            <div className={styles.sbHeaderMeta}>
-              <div className={styles.sbName}>gVisor / GKE Sandbox</div>
-              <div className={styles.sbDomain}>
-                領域: コンテナ &nbsp;|&nbsp; 主要技術: ユーザー空間カーネル（Sentry + Gofer）
-              </div>
-              <div className={styles.sbDesc}>
-                Google が開発した OSS のアプリケーションカーネル。コンテナがホスト OS
-                のカーネルに直接触れることなく実行される。
-                <strong>GKE Agent Sandbox の基盤技術</strong>
-                であり、Gemini の実行にも使用されている。
-              </div>
-            </div>
-            <div>
-              <span
-                className={styles.statusBadge}
-                style={{
-                  background: "rgba(52, 168, 83, 0.12)",
-                  color: "#34a853",
-                  border: "1px solid rgba(52, 168, 83, 0.3)",
-                }}
-              >
-                <span className={styles.statusPulse} style={{ background: "#34a853" }} />
-                GA
-              </span>
-            </div>
-          </div>
-
-          <div
-            className={styles.subH2}
-            style={{ "--accent-c": "var(--c3)" } as React.CSSProperties}
-          >
-            通常コンテナ vs gVisor コンテナ
-          </div>
-          <div
-            className={styles.diagramWrap}
-            style={{ "--diag-w": "600px" } as React.CSSProperties}
-          >
-            <div className={styles.preMermaid}>
-              <MermaidDiagram chart={DIAG_6} />
-            </div>
-            <p className={styles.diagramLabel}>
-              図6: 通常コンテナと gVisor コンテナのアーキテクチャ比較
-            </p>
-          </div>
-
-          <div
-            className={styles.subH2}
-            style={{ "--accent-c": "var(--c3)" } as React.CSSProperties}
-          >
-            通常コンテナとの比較表
-          </div>
-          <table className={styles.mdTable}>
-            <thead>
-              <tr>
-                <th>比較項目</th>
-                <th>通常コンテナ</th>
-                <th>gVisor コンテナ</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>カーネル</td>
-                <td>ホストOSカーネルを直接使用</td>
-                <td>Sentry（疑似カーネル）が仲介</td>
-              </tr>
-              <tr>
-                <td>隔離強度</td>
-                <td>中（名前空間・cgroup）</td>
-                <td>
-                  <span style={{ color: "#34a853", fontWeight: 700 }}>高</span>
-                  （ユーザー空間カーネル）
-                </td>
-              </tr>
-              <tr>
-                <td>パフォーマンス</td>
-                <td>ネイティブに近い</td>
-                <td>
-                  syscall heavy: 10〜30%オーバーヘッド
-                  <br />
-                  CPU bound: 3%以下
-                </td>
-              </tr>
-              <tr>
-                <td>Breakoutリスク</td>
-                <td>カーネル脆弱性で逃脱可能</td>
-                <td>ホストカーネルに直接アクセス不可</td>
-              </tr>
-              <tr>
-                <td>KubernetesでのPod設定</td>
-                <td>（デフォルト）</td>
-                <td>
-                  <code style={{ fontFamily: "var(--font-mono)", fontSize: "1rem" }}>
-                    runtimeClassName: gvisor
-                  </code>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-
-          <div
-            className={styles.subH2}
-            style={{ "--accent-c": "var(--c3)" } as React.CSSProperties}
-          >
-            GKE Sandbox 有効化手順
-          </div>
-          <div className={styles.steps}>
-            <div className={styles.step}>
-              <div
-                className={styles.stepNum}
-                style={{ background: "rgba(255, 109, 0, 0.2)", color: "var(--c3)" }}
-              >
-                1
-              </div>
-              <div className={styles.stepBody}>
-                <div className={styles.stepTitle}>
-                  cos_containerd イメージタイプのノードプールを作成
-                </div>
-                <div className={styles.stepDesc}>
-                  gVisor が動作するためには Container-Optimized OS with containerd が必要です。
-                </div>
-              </div>
-            </div>
-            <div className={styles.step}>
-              <div
-                className={styles.stepNum}
-                style={{ background: "rgba(255, 109, 0, 0.2)", color: "var(--c3)" }}
-              >
-                2
-              </div>
-              <div className={styles.stepBody}>
-                <div className={styles.stepTitle}>
-                  gVisor ノードプールを作成（--sandbox type=gvisor）
-                </div>
-                <div className={styles.stepDesc}>
-                  専用ノードプールを作成し、gVisor ランタイムを有効化します。
-                </div>
-              </div>
-            </div>
-            <div className={styles.step}>
-              <div
-                className={styles.stepNum}
-                style={{ background: "rgba(255, 109, 0, 0.2)", color: "var(--c3)" }}
-              >
-                3
-              </div>
-              <div className={styles.stepBody}>
-                <div className={styles.stepTitle}>
-                  Deployment に runtimeClassName: gvisor を追加
-                </div>
-                <div className={styles.stepDesc}>
-                  信頼できないワークロードの Pod spec に RuntimeClass を指定します。
-                </div>
-              </div>
-            </div>
-            <div className={styles.step}>
-              <div
-                className={styles.stepNum}
-                style={{ background: "rgba(255, 109, 0, 0.2)", color: "var(--c3)" }}
-              >
-                4
-              </div>
-              <div className={styles.stepBody}>
-                <div className={styles.stepTitle}>securityContext で最小権限を設定</div>
-                <div className={styles.stepDesc}>
-                  <code style={{ fontSize: "1rem", color: "#a8c4e0" }}>
-                    runAsNonRoot: true / allowPrivilegeEscalation: false
-                  </code>{" "}
-                  を必ず設定します。
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <ul className={styles.linkList}>
-            <li>
-              <span className={styles.linkLabel}>GKE ドキュメント</span>
-              <Ext href="https://cloud.google.com/kubernetes-engine/docs/concepts/sandbox-pods">
-                GKE Sandbox Pods — Google Cloud
-              </Ext>
-            </li>
-            <li>
-              <span className={styles.linkLabel}>gVisor 公式</span>
-              <Ext href="https://gvisor.dev/">gvisor.dev — 公式サイト</Ext>
-            </li>
-            <li>
-              <span className={styles.linkLabel}>Performance Guide</span>
-              <Ext href="https://gvisor.dev/docs/architecture_guide/performance/">
-                gVisor パフォーマンスガイド
-              </Ext>
-            </li>
-          </ul>
-        </section>
-
-        {/* S4: SANDBOX2 / SAPI */}
-        <section className={styles.sec} id="s4">
-          <div className={styles.secEyebrow} style={{ color: "var(--c4)" }}>
-            CHAPTER 06 — C/C++ APPS
-          </div>
-          <h2 className={styles.secTitle}>Sandbox2 / SAPI</h2>
-
-          <div className={styles.sbHeader} style={{ borderLeftColor: "var(--c4)" }}>
-            <div
-              className={styles.sbIcon}
-              style={{ background: "rgba(251, 188, 4, 0.15)", color: "var(--c4)" }}
-            >
-              🔩
-            </div>
-            <div className={styles.sbHeaderMeta}>
-              <div className={styles.sbName}>Sandbox2 / Sandboxed API（SAPI）</div>
-              <div className={styles.sbDomain}>
-                領域: C/C++ アプリ &nbsp;|&nbsp; 主要技術: Seccomp-bpf + Linux Namespaces
-              </div>
-              <div className={styles.sbDesc}>
-                C/C++ で書かれたライブラリやプログラムを安全に実行するための Google OSS
-                フレームワーク。古い脆弱なライブラリを「
-                <strong>一度サンドボックス化したらどこでも再利用</strong>
-                」できる設計。
-              </div>
-            </div>
-            <div>
-              <span
-                className={styles.statusBadge}
-                style={{
-                  background: "rgba(52, 168, 83, 0.12)",
-                  color: "#34a853",
-                  border: "1px solid rgba(52, 168, 83, 0.3)",
-                }}
-              >
-                <span className={styles.statusPulse} style={{ background: "#34a853" }} />
-                GA（OSS）
-              </span>
-            </div>
-          </div>
-
-          <div
-            className={styles.subH2}
-            style={{ "--accent-c": "var(--c4)" } as React.CSSProperties}
-          >
-            Sandbox2 の 2 プロセスモデル
-          </div>
-          <div
-            className={`${styles.diagramWrap} ${styles.diagramScrollable}`}
-            style={{ "--diag-min-w": "800px" } as React.CSSProperties}
-          >
-            <div className={styles.preMermaid}>
-              <MermaidDiagram chart={DIAG_7} />
-            </div>
-            <p className={styles.diagramLabel}>図7: Sandbox2 の Executor-Sandboxee 分離モデル</p>
-          </div>
-
-          <div
-            className={styles.subH2}
-            style={{ "--accent-c": "var(--c4)" } as React.CSSProperties}
-          >
-            Sandbox2 vs SAPI — 使い分けガイド
-          </div>
-          <table className={styles.mdTable}>
-            <thead>
-              <tr>
-                <th>観点</th>
-                <th>Sandbox2</th>
-                <th>SAPI（Sandboxed API）</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>対象</td>
-                <td>プログラム全体・複雑なケース</td>
-                <td>特定の C/C++ ライブラリ</td>
-              </tr>
-              <tr>
-                <td>実装コスト</td>
-                <td>高（ポリシー・RPC を手動設計）</td>
-                <td>
-                  <span style={{ color: "#34a853", fontWeight: 700 }}>低</span>（スタブ自動生成）
-                </td>
-              </tr>
-              <tr>
-                <td>再利用性</td>
-                <td>低（プロジェクトごとに再実装）</td>
-                <td>
-                  <span style={{ color: "#34a853", fontWeight: 700 }}>高</span>
-                  （一度書いたらどこでも）
-                </td>
-              </tr>
-              <tr>
-                <td>クラッシュ対応</td>
-                <td>手動でリスタートを実装</td>
-                <td>Transactions API が自動リスタート</td>
-              </tr>
-              <tr>
-                <td>推奨場面</td>
-                <td>プログラム全体の細かい制御</td>
-                <td>
-                  <strong>古い C ライブラリを安全に再利用</strong>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-
-          <div
-            className={styles.subH2}
-            style={{ "--accent-c": "var(--c4)" } as React.CSSProperties}
-          >
-            seccomp-bpf の仕組み（初学者向け）
-          </div>
-          <div className={`${styles.callout} ${styles.calloutInfo}`}>
-            <div className={styles.calloutIcon}>📚</div>
-            <div className={styles.calloutBody}>
-              <strong>syscall（システムコール）</strong>
-              とは、プログラムがOSカーネルに機能を頼む命令のこと（ファイルを開く・ネットワークに接続する等）。
-              <br />
-              <strong>seccomp-bpf</strong> は「このプログラムが使える syscall
-              リスト（許可リスト）」をカーネルに登録する仕組みです。リスト外の syscall
-              が呼ばれると即座にプロセスを終了させます。
-            </div>
-          </div>
-
-          <ul className={styles.linkList}>
-            <li>
-              <span className={styles.linkLabel}>公式ドキュメント</span>
-              <Ext href="https://developers.google.com/code-sandboxing">
-                Google Code Sandboxing Overview
-              </Ext>
-            </li>
-            <li>
-              <span className={styles.linkLabel}>Sandbox2 解説</span>
-              <Ext href="https://developers.google.com/code-sandboxing/sandbox2/explained">
-                Sandbox2 Explained
-              </Ext>
-            </li>
-            <li>
-              <span className={styles.linkLabel}>SAPI Getting Started</span>
-              <Ext href="https://developers.google.com/code-sandboxing/sandboxed-api/getting-started">
-                SAPI Getting Started Guide
-              </Ext>
-            </li>
-            <li>
-              <span className={styles.linkLabel}>GitHub</span>
-              <Ext href="https://github.com/google/sandboxed-api">google/sandboxed-api</Ext>
-            </li>
-          </ul>
-        </section>
-
-        {/* S5: V8 SANDBOX */}
-        <section className={styles.sec} id="s5">
-          <div className={styles.secEyebrow} style={{ color: "var(--c5)" }}>
-            CHAPTER 07 — BROWSER
-          </div>
-          <h2 className={styles.secTitle}>V8 Sandbox</h2>
-
-          <div className={styles.sbHeader} style={{ borderLeftColor: "var(--c5)" }}>
-            <div
-              className={styles.sbIcon}
-              style={{ background: "rgba(156, 39, 176, 0.15)", color: "var(--c5)" }}
-            >
-              🌐
-            </div>
-            <div className={styles.sbHeaderMeta}>
-              <div className={styles.sbName}>V8 Sandbox</div>
-              <div className={styles.sbDomain}>
-                領域: ブラウザ JavaScript 実行 &nbsp;|&nbsp; 主要技術:
-                メモリ空間分離（ポインタ圧縮）
-              </div>
-              <div className={styles.sbDesc}>
-                Chrome ブラウザ内部で JavaScript を実行する V8 エンジン専用のメモリ隔離機構。JS
-                の脆弱性がブラウザプロセス全体に波及しないよう設計されている。
-                <br />
-                2021〜2023年のChromeゼロデイの <strong>約60%がV8に起因</strong>。
-              </div>
-            </div>
-            <div>
-              <span
-                className={styles.statusBadge}
-                style={{
-                  background: "rgba(251, 188, 4, 0.12)",
-                  color: "var(--c4)",
-                  border: "1px solid rgba(251, 188, 4, 0.3)",
-                }}
-              >
-                🔄 開発継続中
-              </span>
-            </div>
-          </div>
-
-          <div
-            className={styles.subH2}
-            style={{ "--accent-c": "var(--c5)" } as React.CSSProperties}
-          >
-            V8 Sandbox のメモリ隔離モデル
-          </div>
-          <div
-            className={`${styles.diagramWrap} ${styles.diagramScrollable}`}
-            style={{ "--diag-min-w": "800px" } as React.CSSProperties}
-          >
-            <div className={styles.preMermaid}>
-              <MermaidDiagram chart={DIAG_8} />
-            </div>
-            <p className={styles.diagramLabel}>図8: V8 Sandbox のメモリ分離とポインタ圧縮</p>
-          </div>
-
-          <div
-            className={styles.subH2}
-            style={{ "--accent-c": "var(--c5)" } as React.CSSProperties}
-          >
-            ポインタ圧縮とは？（初学者向け）
-          </div>
-          <div className={`${styles.callout} ${styles.calloutInfo}`}>
-            <div className={styles.calloutIcon}>🔢</div>
-            <div className={styles.calloutBody}>
-              通常のポインタは「メモリのどこでも指せる 64bit アドレス」ですが、V8 Sandbox では
-              <strong>32bit のオフセット</strong>に圧縮します。
-              <br />
-              実際のアドレス ={" "}
-              <code style={{ fontFamily: "var(--font-mono)" }}>
-                サンドボックス基底アドレス + 32bit オフセット
-              </code>
-              <br />
-              攻撃者がポインタを改ざんしても、常に「サンドボックス内のアドレス」しか指せないため、外部メモリへのアクセスが不可能になります。
-            </div>
-          </div>
-
-          <div
-            className={styles.subH2}
-            style={{ "--accent-c": "var(--c5)" } as React.CSSProperties}
-          >
-            役割別アクションアイテム
-          </div>
-          <table className={styles.mdTable}>
-            <thead>
-              <tr>
-                <th>あなたの役割</th>
-                <th>推奨アクション</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>🌐 Web アプリ開発者</td>
-                <td>Chrome を最新バージョンに保つ（V8 ゼロデイパッチの迅速適用）</td>
-              </tr>
-              <tr>
-                <td>🏢 企業セキュリティ担当</td>
-                <td>Chrome Enterprise ポリシーで組織全体に自動更新を強制適用</td>
-              </tr>
-              <tr>
-                <td>⚙️ Node.js 開発者</td>
-                <td>
-                  <code style={{ fontFamily: "var(--font-mono)", fontSize: "1rem" }}>
-                    isolated-vm
-                  </code>{" "}
-                  パッケージ（V8 Isolate ベース）で各テナントに独立した実行環境を付与
-                </td>
-              </tr>
-              <tr>
-                <td>🔍 セキュリティ研究者</td>
-                <td>
-                  V8 Sandbox バイパスは Chrome
-                  VRP（脆弱性報奨金）の対象セキュリティ境界として認定済み
-                </td>
-              </tr>
-            </tbody>
-          </table>
-
-          <ul className={styles.linkList}>
-            <li>
-              <span className={styles.linkLabel}>V8 ブログ</span>
-              <Ext href="https://v8.dev/blog/sandbox">V8 Sandbox — 設計解説ブログ</Ext>
-            </li>
-            <li>
-              <span className={styles.linkLabel}>ソースREADME</span>
-              <Ext href="https://chromium.googlesource.com/v8/v8.git/+/refs/heads/main/src/sandbox/README.md">
-                V8 Sandbox README（設計詳細）
-              </Ext>
-            </li>
-            <li>
-              <span className={styles.linkLabel}>学術論文</span>
-              <Ext href="https://2025.programming-conference.org/details/MoreVMs-2025-papers/3/The-V8-Sandbox">
-                The V8 Sandbox — MoreVMs 2025
-              </Ext>
-            </li>
-          </ul>
-        </section>
-
-        {/* S6: PRIVACY SANDBOX */}
-        <section className={styles.sec} id="s6">
-          <div className={styles.secEyebrow} style={{ color: "var(--c6)" }}>
-            CHAPTER 08 — DEPRECATED
-          </div>
-          <h2 className={styles.secTitle}>Privacy Sandbox</h2>
-
-          <div className={styles.deprecatedBanner}>
-            <div className={styles.depIcon}>⛔</div>
-            <div>
-              <div className={styles.depTitle}>2025年10月17日に正式廃止されました</div>
-              <div className={styles.depBody}>
-                Topics API、Protected Audience、Attribution Reporting を含む全 API
-                が廃止されています。新規プロジェクトでの採用は絶対に避けてください。サードパーティ
-                Cookie は Chrome に残存しています。
-              </div>
-            </div>
-          </div>
-
-          <div
-            className={styles.subH2}
-            style={{ "--accent-c": "var(--c6)" } as React.CSSProperties}
-          >
-            Privacy Sandbox とは何だったか
-          </div>
-          <p
-            style={{
-              color: "var(--ts)",
-              fontSize: "1rem",
-              marginBottom: "24px",
-              lineHeight: "1.75",
-            }}
-          >
-            2019年にGoogleが発表したプライバシー配慮型Web広告APIの総称。サードパーティCookieを廃止しながらも広告のターゲティング・計測を維持するという目標で開発されていましたが、採用率の低迷・規制当局（英国CMA等）からの懸念・業界からの冷ややかな反応により、6年間の開発の末に廃止されました。
-          </p>
-
-          <div
-            className={styles.subH2}
-            style={{ "--accent-c": "var(--c6)" } as React.CSSProperties}
-          >
-            廃止までのタイムライン
-          </div>
-          <div className={styles.timeline}>
-            <div className={styles.tlItem}>
-              <div className={styles.tlLeft}>
-                <div className={styles.tlDot} />
-                <div className={styles.tlLine} />
-              </div>
-              <div className={styles.tlBody}>
-                <div className={styles.tlYear}>2019</div>
-                <div className={styles.tlEvent}>
-                  Google が Privacy Sandbox 構想を発表。サードパーティCookie の段階的廃止を宣言。
-                </div>
-              </div>
-            </div>
-            <div className={styles.tlItem}>
-              <div className={styles.tlLeft}>
-                <div className={styles.tlDot} />
-                <div className={styles.tlLine} />
-              </div>
-              <div className={styles.tlBody}>
-                <div className={styles.tlYear}>2022〜2024</div>
-                <div className={styles.tlEvent}>
-                  廃止期限を繰り返し延期。規制当局の懸念を受け、スケジュールが揺れ続ける。
-                </div>
-              </div>
-            </div>
-            <div className={styles.tlItem}>
-              <div className={styles.tlLeft}>
-                <div className={styles.tlDot} />
-                <div className={styles.tlLine} />
-              </div>
-              <div className={styles.tlBody}>
-                <div className={styles.tlYear}>2024年7月</div>
-                <div className={styles.tlEvent}>
-                  完全廃止からユーザー選択型モデルへ方針転換を発表。
-                </div>
-              </div>
-            </div>
-            <div className={styles.tlItem}>
-              <div className={styles.tlLeft}>
-                <div className={styles.tlDot} />
-                <div className={styles.tlLine} />
-              </div>
-              <div className={styles.tlBody}>
-                <div className={styles.tlYear}>2025年4月</div>
-                <div className={styles.tlEvent}>
-                  新規プロンプト展開を中止。既存のCookie設定を維持すると発表。
-                </div>
-              </div>
-            </div>
-            <div className={styles.tlItem}>
-              <div className={styles.tlLeft}>
-                <div className={styles.tlDot} style={{ background: "#ea4335" }} />
-                <div className={styles.tlLine} />
-              </div>
-              <div className={styles.tlBody}>
-                <div className={styles.tlYear} style={{ color: "#ea4335" }}>
-                  2025年10月17日
-                </div>
-                <div className={styles.tlEvent}>
-                  <strong>
-                    Topics API / Protected Audience / Attribution Reporting を含む全 API
-                    を正式廃止。
-                  </strong>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div
-            className={styles.subH2}
-            style={{ "--accent-c": "var(--c6)" } as React.CSSProperties}
-          >
-            現在の代替アプローチ
-          </div>
-          <table className={styles.mdTable}>
-            <thead>
-              <tr>
-                <th>廃止されたAPI</th>
-                <th>目的</th>
-                <th>2026年時点の代替</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Topics API</td>
-                <td>関心カテゴリ ターゲティング</td>
-                <td>ファーストパーティデータ + Customer Match</td>
-              </tr>
-              <tr>
-                <td>Protected Audience</td>
-                <td>クロスサイト リマーケティング</td>
-                <td>サーバーサイド オーディエンス + Consent Mode</td>
-              </tr>
-              <tr>
-                <td>Attribution Reporting</td>
-                <td>コンバージョン計測</td>
-                <td>GTM Server-Side + サーバーサイド計測</td>
-              </tr>
-            </tbody>
-          </table>
-
-          <div className={`${styles.callout} ${styles.calloutWarn}`}>
-            <div className={styles.calloutIcon}>⚠️</div>
-            <div className={styles.calloutBody}>
-              <strong>注意:</strong> サードパーティ Cookie は Chrome
-              に引き続き存在しています。ただし Safari・Firefox
-              は既にブロックしており、GDPR/同意管理（CMP）の維持は引き続き法的義務です。
-            </div>
-          </div>
-        </section>
-
-        {/* COMPARE */}
-        <section className={styles.sec} id="compare">
-          <div className={styles.secEyebrow} style={{ color: "var(--c1)" }}>
-            CHAPTER 09 — COMPARISON
-          </div>
-          <h2 className={styles.secTitle}>技術比較マトリクス</h2>
-          <p className={styles.secLead}>6つのサンドボックス技術を主要軸で比較します。</p>
-          <table className={styles.mdTable}>
-            <thead>
-              <tr>
-                <th>比較軸</th>
-                <th style={{ color: "var(--c1)" }}>GKE Agent</th>
-                <th style={{ color: "var(--c2)" }}>Gemini CE</th>
-                <th style={{ color: "var(--c3)" }}>gVisor</th>
-                <th style={{ color: "var(--c4)" }}>Sandbox2</th>
-                <th style={{ color: "var(--c5)" }}>V8</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>セットアップ難度</td>
-                <td>中</td>
-                <td>
-                  <span style={{ color: "#34a853", fontWeight: 700 }}>最低</span>
-                </td>
-                <td>中</td>
-                <td>
-                  <span style={{ color: "#ea4335", fontWeight: 700 }}>高</span>
-                </td>
-                <td>自動</td>
-              </tr>
-              <tr>
-                <td>隔離強度</td>
-                <td>
-                  <span style={{ color: "#34a853", fontWeight: 700 }}>◎</span>
-                </td>
-                <td>
-                  <span style={{ color: "#34a853", fontWeight: 700 }}>◎</span>
-                </td>
-                <td>
-                  <span style={{ color: "#34a853", fontWeight: 700 }}>◎</span>
-                </td>
-                <td>
-                  <span style={{ color: "#fbbc04", fontWeight: 700 }}>○</span>
-                </td>
-                <td>
-                  <span style={{ color: "#fbbc04", fontWeight: 700 }}>△</span>
-                </td>
-              </tr>
-              <tr>
-                <td>対応言語</td>
-                <td>全言語</td>
-                <td>
-                  <span style={{ color: "#fbbc04", fontWeight: 700 }}>Python のみ</span>
-                </td>
-                <td>全言語</td>
-                <td>
-                  <span style={{ color: "#fbbc04", fontWeight: 700 }}>C/C++ のみ</span>
-                </td>
-                <td>JS/WASM</td>
-              </tr>
-              <tr>
-                <td>ステートフル</td>
-                <td>
-                  <span style={{ color: "#34a853", fontWeight: 700 }}>◎ (Snapshot)</span>
-                </td>
-                <td>
-                  <span style={{ color: "#ea4335", fontWeight: 700 }}>✗</span>
-                </td>
-                <td>
-                  <span style={{ color: "#fbbc04", fontWeight: 700 }}>○ (PVC)</span>
-                </td>
-                <td>
-                  <span style={{ color: "#ea4335", fontWeight: 700 }}>✗</span>
-                </td>
-                <td>N/A</td>
-              </tr>
-              <tr>
-                <td>コールドスタート</td>
-                <td>
-                  <span style={{ color: "#34a853", fontWeight: 700 }}>&lt; 1秒</span>
-                </td>
-                <td>〜数秒</td>
-                <td>〜数秒</td>
-                <td>μs</td>
-                <td>N/A</td>
-              </tr>
-              <tr>
-                <td>Kubernetes 対応</td>
-                <td>
-                  <span style={{ color: "#34a853", fontWeight: 700 }}>◎ (CRD)</span>
-                </td>
-                <td>不要</td>
-                <td>
-                  <span style={{ color: "#34a853", fontWeight: 700 }}>◎ (RuntimeClass)</span>
-                </td>
-                <td>不要</td>
-                <td>不要</td>
-              </tr>
-              <tr>
-                <td>インフラ管理コスト</td>
-                <td>GKE 料金</td>
-                <td>
-                  <span style={{ color: "#34a853", fontWeight: 700 }}>最小 (API)</span>
-                </td>
-                <td>GKE 料金</td>
-                <td>自己管理</td>
-                <td>ゼロ</td>
-              </tr>
-              <tr>
-                <td>スループット</td>
-                <td>
-                  <span style={{ color: "#34a853", fontWeight: 700 }}>300/秒</span>
-                </td>
-                <td>API quota 依存</td>
-                <td>ノード依存</td>
-                <td>syscall 依存</td>
-                <td>N/A</td>
-              </tr>
-            </tbody>
-          </table>
-
-          <div className={`${styles.callout} ${styles.calloutInfo}`}>
-            <div className={styles.calloutIcon}>💡</div>
-            <div className={styles.calloutBody}>
-              <strong>迷ったら：</strong> まず
-              <strong style={{ color: "var(--c2)" }}>Gemini Code Execution</strong>{" "}
-              から試してください。Python に限定されますが、インフラ不要でGemini
-              が自律的にコードを実行します。より複雑な要件（多言語・ステートフル・高スループット）が出てきたら
-              <strong style={{ color: "var(--c1)" }}>GKE Agent Sandbox</strong> に移行するのが
-              Google 推奨のパスです。
-            </div>
-          </div>
-        </section>
-
-        {/* GLOSSARY */}
-        <section className={styles.sec} id="glossary">
-          <div className={styles.secEyebrow} style={{ color: "var(--ts)" }}>
-            APPENDIX A — GLOSSARY
-          </div>
-          <h2 className={styles.secTitle}>用語集</h2>
-          <div className={styles.glossaryGrid}>
-            <div className={styles.glossaryItem}>
-              <div className={styles.glossaryTerm}>syscall（システムコール）</div>
-              <div className={styles.glossaryDef}>
-                アプリがOSカーネルに機能を頼む命令。ファイル読み書き・ネットワーク接続・プロセス生成などが該当する。
-              </div>
-            </div>
-            <div className={styles.glossaryItem}>
-              <div className={styles.glossaryTerm}>gVisor</div>
-              <div className={styles.glossaryDef}>
-                Google が開発した OSS のアプリケーションカーネル。Linux syscall
-                をユーザー空間で再実装し、ホストOSカーネルへの直接接触を防ぐ。
-              </div>
-            </div>
-            <div className={styles.glossaryItem}>
-              <div className={styles.glossaryTerm}>seccomp-bpf</div>
-              <div className={styles.glossaryDef}>
-                Linuxカーネルのセキュリティ機能。BPF プログラムで「どの syscall
-                を許可するか」を細かく制御できる。
-              </div>
-            </div>
-            <div className={styles.glossaryItem}>
-              <div className={styles.glossaryTerm}>Linux Namespaces</div>
-              <div className={styles.glossaryDef}>
-                PID・ネットワーク・ファイルシステム等をプロセスごとに独立した「見え方」で分離する
-                Linux の機能。
-              </div>
-            </div>
-            <div className={styles.glossaryItem}>
-              <div className={styles.glossaryTerm}>Pod Snapshot</div>
-              <div className={styles.glossaryDef}>
-                GKEでPodの実行状態をまるごとGCSに保存・復元できる機能。コールドスタートを1秒未満にする鍵となる技術。
-              </div>
-            </div>
-            <div className={styles.glossaryItem}>
-              <div className={styles.glossaryTerm}>SandboxClaim</div>
-              <div className={styles.glossaryDef}>
-                AIフレームワークが GKE Agent Sandbox
-                に「実行環境を1つ貸してください」とリクエストするKubernetesリソース。PVCと同様のClaimモデル。
-              </div>
-            </div>
-            <div className={styles.glossaryItem}>
-              <div className={styles.glossaryTerm}>Workload Identity</div>
-              <div className={styles.glossaryDef}>
-                GKEのPodに個別のGCPサービスアカウントを紐付ける仕組み。Podごとに最小権限IAMを実現し、横断攻撃を防ぐ。
-              </div>
-            </div>
-            <div className={styles.glossaryItem}>
-              <div className={styles.glossaryTerm}>RCE（リモートコード実行）</div>
-              <div className={styles.glossaryDef}>
-                攻撃者がリモートから任意のコードを実行できる脆弱性。サンドボックスが防ぐべき最大の脅威の一つ。
-              </div>
-            </div>
-            <div className={styles.glossaryItem}>
-              <div className={styles.glossaryTerm}>ポインタ圧縮（V8）</div>
-              <div className={styles.glossaryDef}>
-                64bitのメモリアドレスを32bitのオフセットに変換する技術。V8
-                Sandboxがサンドボックス外のメモリを参照できなくするための核心技術。
-              </div>
-            </div>
-            <div className={styles.glossaryItem}>
-              <div className={styles.glossaryTerm}>RuntimeClass（Kubernetes）</div>
-              <div className={styles.glossaryDef}>
-                KubernetesでPodの実行エンジン（runc / gVisor 等）を指定するためのリソース。
-                <code style={{ fontSize: "1rem" }}>runtimeClassName: gvisor</code>{" "}
-                でgVisorを指定する。
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* RESOURCES */}
-        <section className={styles.sec} id="resources">
-          <div className={styles.secEyebrow} style={{ color: "var(--ts)" }}>
-            APPENDIX B — REFERENCES
-          </div>
-          <h2 className={styles.secTitle}>公式リンク集</h2>
-
-          <div
-            className={styles.subH2}
-            style={{ "--accent-c": "var(--c1)" } as React.CSSProperties}
-          >
-            GKE Agent Sandbox
-          </div>
-          <ul className={styles.linkList}>
-            <li>
-              <span className={styles.linkLabel}>コンセプト</span>
-              <Ext href="https://cloud.google.com/kubernetes-engine/docs/concepts/machine-learning/agent-sandbox">
-                GKE Agent Sandbox コンセプトドキュメント
-              </Ext>
-            </li>
-            <li>
-              <span className={styles.linkLabel}>セットアップ</span>
-              <Ext href="https://cloud.google.com/kubernetes-engine/docs/how-to/how-install-agent-sandbox">
-                Agent Sandbox インストールガイド（2026-05-08 更新）
-              </Ext>
-            </li>
-            <li>
-              <span className={styles.linkLabel}>Pod Snapshot</span>
-              <Ext href="https://cloud.google.com/kubernetes-engine/docs/how-to/agent-sandbox-pod-snapshots">
-                Pod Snapshots ハウツー
-              </Ext>
-            </li>
-            <li>
-              <span className={styles.linkLabel}>CRD Ref</span>
-              <Ext href="https://cloud.google.com/kubernetes-engine/docs/reference/crds/agentsandbox">
-                Agent Sandbox CRD リファレンス
-              </Ext>
-            </li>
-            <li>
-              <span className={styles.linkLabel}>GA ブログ</span>
-              <Ext href="https://cloud.google.com/blog/products/containers-kubernetes/bringing-you-agent-sandbox-on-gke-and-agent-substrate">
-                Cloud Next '26: GKE Agent Sandbox GA 発表（2026/05/20）
-              </Ext>
-            </li>
-            <li>
-              <span className={styles.linkLabel}>Codelab</span>
-              <Ext href="https://codelabs.developers.google.com/codelabs/gke/ai-agents-on-gke">
-                Google Codelabs: AI Agents on GKE
-              </Ext>
-            </li>
-          </ul>
-
-          <div
-            className={styles.subH2}
-            style={{ "--accent-c": "var(--c2)" } as React.CSSProperties}
-          >
-            Gemini Code Execution
-          </div>
-          <ul className={styles.linkList}>
-            <li>
-              <span className={styles.linkLabel}>API Ref</span>
-              <Ext href="https://ai.google.dev/gemini-api/docs/code-execution">
-                Code Execution — ai.google.dev
-              </Ext>
-            </li>
-            <li>
-              <span className={styles.linkLabel}>Vertex AI</span>
-              <Ext href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/tools/code-execution">
-                Gemini Enterprise Agent Platform — Code Execution
-              </Ext>
-            </li>
-          </ul>
-
-          <div
-            className={styles.subH2}
-            style={{ "--accent-c": "var(--c3)" } as React.CSSProperties}
-          >
-            gVisor / GKE Sandbox
-          </div>
-          <ul className={styles.linkList}>
-            <li>
-              <span className={styles.linkLabel}>GKE Docs</span>
-              <Ext href="https://cloud.google.com/kubernetes-engine/docs/concepts/sandbox-pods">
-                GKE Sandbox Pods（Google Cloud）
-              </Ext>
-            </li>
-            <li>
-              <span className={styles.linkLabel}>gVisor</span>
-              <Ext href="https://gvisor.dev/">gvisor.dev — 公式サイト</Ext>
-            </li>
-            <li>
-              <span className={styles.linkLabel}>Performance</span>
-              <Ext href="https://gvisor.dev/docs/architecture_guide/performance/">
-                gVisor パフォーマンスガイド
-              </Ext>
-            </li>
-            <li>
-              <span className={styles.linkLabel}>Platforms</span>
-              <Ext href="https://gvisor.dev/docs/architecture_guide/platforms/">
-                gVisor Platform ガイド（systrap/KVM/ptrace）
-              </Ext>
-            </li>
-            <li>
-              <span className={styles.linkLabel}>Production</span>
-              <Ext href="https://gvisor.dev/docs/user_guide/production/">gVisor 本番環境ガイド</Ext>
-            </li>
-          </ul>
-
-          <div
-            className={styles.subH2}
-            style={{ "--accent-c": "var(--c4)" } as React.CSSProperties}
-          >
-            Sandbox2 / SAPI
-          </div>
-          <ul className={styles.linkList}>
-            <li>
-              <span className={styles.linkLabel}>Overview</span>
-              <Ext href="https://developers.google.com/code-sandboxing">Google Code Sandboxing</Ext>
-            </li>
-            <li>
-              <span className={styles.linkLabel}>Sandbox2</span>
-              <Ext href="https://developers.google.com/code-sandboxing/sandbox2/explained">
-                Sandbox2 Explained
-              </Ext>
-            </li>
-            <li>
-              <span className={styles.linkLabel}>SAPI</span>
-              <Ext href="https://developers.google.com/code-sandboxing/sandboxed-api/getting-started">
-                SAPI Getting Started
-              </Ext>
-            </li>
-            <li>
-              <span className={styles.linkLabel}>GitHub</span>
-              <Ext href="https://github.com/google/sandboxed-api">google/sandboxed-api</Ext>
-            </li>
-          </ul>
-
-          <div
-            className={styles.subH2}
-            style={{ "--accent-c": "var(--c5)" } as React.CSSProperties}
-          >
-            V8 Sandbox
-          </div>
-          <ul className={styles.linkList}>
-            <li>
-              <span className={styles.linkLabel}>Blog</span>
-              <Ext href="https://v8.dev/blog/sandbox">V8 Sandbox — 設計解説ブログ</Ext>
-            </li>
-            <li>
-              <span className={styles.linkLabel}>README</span>
-              <Ext href="https://chromium.googlesource.com/v8/v8.git/+/refs/heads/main/src/sandbox/README.md">
-                V8 Sandbox ソース README（設計詳細）
-              </Ext>
-            </li>
-            <li>
-              <span className={styles.linkLabel}>Paper</span>
-              <Ext href="https://2025.programming-conference.org/details/MoreVMs-2025-papers/3/The-V8-Sandbox">
-                The V8 Sandbox — MoreVMs 2025 論文
-              </Ext>
-            </li>
-          </ul>
-
-          <div className={styles.footerNote}>
-            本ドキュメントは 2026年6月30日時点の Google 公式情報・発表に基づいています。
-            <br />
-            各技術は急速に進化しています。最新情報は公式ドキュメントをご確認ください。
-          </div>
-        </section>
-      </div>
-    </>
+        </blockquote>
+      </main>
+    </div>
   );
 }

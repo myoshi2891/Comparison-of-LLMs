@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Updated 2026-08-08
+Updated 2026-08-11
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
@@ -245,7 +245,12 @@ Playwright ブラウザバイナリ（`/root/.cache/ms-playwright/`）はバイ�
 - 環境変数・Netlify 設定の変更
 - スタイル目的のリライト
 - **`legacy/` 配下の編集**（Phase A–F 遂行中は凍結。`.gitignore` により事故的な push は防止されているが、編集自体を避ける）
-- **元 HTML / Markdown ガイドページの要約・省略・縮約・部分抽出は一切禁止（絶対ルール）**: ガイドページの Next.js 移植および更新時、元ファイルの全セクション、全サブセクション、全段落、全リスト項目、全コードブロック、全 SVG、全 callout/alert、全 table、全参考文献/外部リンクを何一つ落とさずに **100% 漏れなく JSX へ完全移植**すること。代表例のみの抜粋や文章の要約は重大な規約違反とする。
+- **元 HTML / Markdown ガイドページの 100% Faithful 移植 & スタイリング防犯原則（絶対ルール）**:
+  1. **完全転写**: ガイドページの Next.js 移植および更新時、元ファイルの全セクション、全サブセクション、全段落、全リスト項目、全コードブロック、全 SVG、全 callout/alert、全 table、全参考文献/外部リンクを何一つ落とさずに **100% 漏れなく JSX へ完全移植** すること。代表例のみの抜粋や文章の要約は重大な規約違反とする。
+  2. **マークダウン表の全列左寄せ上書き**: `globals.css` の `thead th:not(:first-child)` (右寄せルール) が干渉するのを完全に防ぐため、`page.module.css` の表ラッパー（`.tableScroll` / `.tableWrap` 等）では `:global(th)`, `:global(td)`, `:global(thead th:not(:first-child))` 等に `text-align: left !important;` を必ず強制設定すること。
+  3. **コードブロックの明示的インデント保持**: Python のネスト構造や YAML 等の先頭インデントが Biome や JSX 空白圧縮で消失しないよう、明示的 JS 文字列式 `{"  "}` / `{"    "}` / `{"        "}` を先頭ノードとして埋め込み、`.codeLine { white-space: pre; }` で固定すること。
+  4. **レイアウトグリッド・リストの完全復元**: チェックリストは原本 HTML の構造に従い、カードグリッド、縦1列リスト、表などを別の構造へ変換しないこと。参考文献カード内が原本でブレットリストの場合は `list-style-type: disc; padding-left: 1.1rem;` 等の表示を再現すること。
+  5. **スクロールマージン（アンカーめり込み防止）**: 固定ヘッダー（`SiteHeader` + `DisclaimerBanner`）で `h2`/`h3` が隠れないよう `scroll-margin-top: calc(var(--header-height, 60px) + 80px);` を必ず指定すること。
 - **元のHTML/Markdownオリジナルファイルの完全削除は厳禁**: 移行元のファイルは絶対に削除してはならず、必ず `archive/` ディレクトリ配下に移動（`git mv` または `mv`）して退避保存すること
 
 ### 許可される変更
@@ -280,7 +285,7 @@ Build:     cd web-next && bun run build
 以下を全て確認してからコミットすること：
 
 1. `cd web-next && bun run build` が成功（※Antigravityサンドボックス環境では実行禁止。他環境やCIでは必須）
-2. `cd web-next && bun run test` が完全に成功（1414 tests pass。収集失敗もブロッキング失敗として原因を調査する）
+2. `cd web-next && bun run test` が完全に成功（1447 tests pass。収集失敗もブロッキング失敗として原因を調査する）
 3. `cd web-next && bun run typecheck` が成功
 4. `cd web-next && bun run lint` が成功
 5. `cd scraper && uv run pytest` が成功

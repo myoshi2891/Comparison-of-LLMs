@@ -145,6 +145,12 @@ const DIAGRAM_10 = `sequenceDiagram
     CLI-->>Agent: 残存する重大指摘がないことを確認
     Agent-->>Dev: 完了報告と対応内容の要約`;
 
+/**
+ * Renders an external link that opens in a new browser tab.
+ *
+ * @param href - The destination URL
+ * @param children - The link content
+ */
 function Ext({ href, children }: { href: string; children: React.ReactNode }) {
   return (
     <a href={href} target="_blank" rel="noopener noreferrer">
@@ -153,6 +159,9 @@ function Ext({ href, children }: { href: string; children: React.ReactNode }) {
   );
 }
 
+/**
+ * Renders the CodeRabbit practical guide page with navigation, instructional content, diagrams, and references.
+ */
 export default function Page() {
   return (
     <div className={styles.layout}>
@@ -711,10 +720,18 @@ export default function Page() {
             Cloud / SaaS構成での優先順位（Self-Managed Git Provider連携を含む）
           </h3>
           <p>
-            本ガイドの通常構成はCodeRabbit Cloud / SaaSを対象とします。連携先がSaaS型Git providerであってもSelf-Managed (Self-Hosted) Git providerであっても、CodeRabbit Cloud環境では環境変数 <code>YAML_CONFIG</code>（Environment YAML）は適用されません。また、Workspace設定およびWorkspace Global OverrideはEnterprise Workspace契約でのみ利用できます。
+            本ガイドの通常構成はCodeRabbit Cloud / SaaSを対象とします。連携先がSaaS型Git
+            providerであってもSelf-Managed (Self-Hosted) Git providerであっても、CodeRabbit
+            Cloud環境では環境変数 <code>YAML_CONFIG</code>（Environment
+            YAML）は適用されません。また、Workspace設定およびWorkspace Global OverrideはEnterprise
+            Workspace契約でのみ利用できます。
           </p>
           <p>
-            設定解決プロセスでは、まず通常階層（リポジトリ内YAML、中央リポジトリYAML、各種Web UI設定、スキーマ既定値）でベース設定が評価・決定されます。その後、<strong>最終マージ層</strong>として Organization Global Override および Workspace Global Override が適用されます。継承処理やリポジトリ設定の有無にかかわらず、両Global Overrideの値が最終的に優先して適用されるため、リポジトリ側の設定で組織・ワークスペースの必須ポリシーを無効化・回避することはできません。
+            設定解決プロセスでは、まず通常階層（リポジトリ内YAML、中央リポジトリYAML、各種Web
+            UI設定、スキーマ既定値）でベース設定が評価・決定されます。その後、
+            <strong>最終マージ層</strong>として Organization Global Override および Workspace Global
+            Override が適用されます。継承処理やリポジトリ設定の有無にかかわらず、両Global
+            Overrideの値が最終的に優先して適用されるため、リポジトリ側の設定で組織・ワークスペースの必須ポリシーを無効化・回避することはできません。
           </p>
 
           <div className={styles.mermaidWrap}>
@@ -730,12 +747,13 @@ export default function Page() {
             Self-Hosted Deployment（CodeRabbit自体のセルフホスト）での優先順位
           </h3>
           <p>
-            環境変数 <code>YAML_CONFIG</code>（Environment YAML）は、CodeRabbit自体を自社環境にデプロイする
-            <strong>Self-Hosted Deployment（Enterprise）限定</strong>の設定源です。CodeRabbit CloudにSelf-Managed (Self-Hosted) Git providerを連携させた構成であっても、CodeRabbit Cloud環境では <code>YAML_CONFIG</code> は適用されません。
+            環境変数 <code>YAML_CONFIG</code>（Environment
+            YAML）は、CodeRabbit自体を自社環境にデプロイする
+            <strong>Self-Hosted Deployment（Enterprise）限定</strong>の設定源です。CodeRabbit
+            CloudにSelf-Managed (Self-Hosted) Git providerを連携させた構成であっても、CodeRabbit
+            Cloud環境では <code>YAML_CONFIG</code> は適用されません。
           </p>
-          <p>
-            Self-Hosted Deploymentでの階層構造は以下のとおり評価されます。
-          </p>
+          <p>Self-Hosted Deploymentでの階層構造は以下のとおり評価されます。</p>
           <ol>
             <li>
               Repository / Central YAML（リポジトリ内または中央リポジトリの{" "}
@@ -747,7 +765,8 @@ export default function Page() {
             <li>スキーマのデフォルト値（Defaults）</li>
           </ol>
           <p>
-            公式のConfiguration Inheritanceドキュメントにおいて、Environment YAML（<code>YAML_CONFIG</code>）はSelf-Hosted Deployment固有の設定源として明記されています。
+            公式のConfiguration Inheritanceドキュメントにおいて、Environment YAML（
+            <code>YAML_CONFIG</code>）はSelf-Hosted Deployment固有の設定源として明記されています。
           </p>
 
           <p>
@@ -764,7 +783,8 @@ export default function Page() {
             <code>assertive</code>
             プロファイルを強制する、特定のpath_instructionsを必須にする）に使います。オブジェクトは再帰的にマージされ、配列は
             <code>path</code>
-            などのキーで重複排除されながら結合され、スカラー値は単純に上書きされます。継承解決後に最終適用されるため、個別のリポジトリ設定や <code>.coderabbit.yaml</code> でこれらの必須ポリシーを無効化・解除することはできません。
+            などのキーで重複排除されながら結合され、スカラー値は単純に上書きされます。継承解決後に最終適用されるため、個別のリポジトリ設定や{" "}
+            <code>.coderabbit.yaml</code> でこれらの必須ポリシーを無効化・解除することはできません。
           </p>
           <h3 id="継承configuration-inheritanceの有効化">
             継承（Configuration Inheritance）の有効化

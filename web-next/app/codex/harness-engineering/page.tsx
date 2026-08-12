@@ -1,2427 +1,1155 @@
 import type { Metadata } from "next";
 import MermaidDiagram from "@/components/docs/MermaidDiagram";
 import styles from "./page.module.css";
+import TocObserver from "./TocObserver";
 
-/** description は lib/page-registry.ts の summary と同一文言に揃えている。 */
 export const metadata: Metadata = {
-  title: "ハーネスエンジニアリング完全ガイド — OpenAI Codex | LLM-Studies",
+  title: "OpenAI Codexにおけるハーネスエンジニアリング実践ガイド | LLM Study",
   description:
-    "OpenAI Codex のハーネスエンジニアリング完全ガイド。エージェント実行環境の設計と運用。",
+    "自己採点(Layer 1)から標準ベンチマーク(Layer 6)・セキュリティ評価(Layer 7)まで、Codex向け評価基盤の7層モデルと実装パターンを詳細解説。",
 };
 
-const DIAGRAM_0 = `flowchart LR
-A["評価目標の定義\\nWhat to measure"]
-B["Eval セット設計\\nHow to measure"]
-C["ハーネス実装\\nInfrastructure"]
-D["分析・改善\\nIterate"]
-A --> B
-B --> C
-C --> D
-D --> A`;
+/**
+ * Renders a link that opens the referenced page in a new browser tab.
+ *
+ * @param href - The URL of the external page
+ * @param children - The link content
+ */
+function Ext({ href, children }: { href: string; children: React.ReactNode }) {
+  return (
+    <a href={href} target="_blank" rel="noopener noreferrer">
+      {children}
+    </a>
+  );
+}
 
-const DIAGRAM_1 = `mindmap
-  root((LLM の\\nテスト課題))
-    非決定性
-      同じ入力でも毎回異なる出力
-      温度パラメータの影響
-      モデルアップデートによる挙動変化
-    評価の難しさ
-      正解が一意ではない
-      文脈依存の正しさ
-      人間の感性が必要なケース
-    スケール問題
-      手動評価のコスト爆発
-      大量テストケース管理
-      複数モデル間の比較
-    回帰リスク
-      プロンプト変更の副作用
-      Fine-tuning前後の比較
-      本番環境での品質劣化`;
+const DIAGRAM_1 = `flowchart TB
+    A["Layer 1: セッション内自己検証<br/>(Ralph Wiggum Loop)"] --> B["Layer 2: リポジトリの<br/>メカニカル強制"]
+    B --> C["Layer 3: ランタイム<br/>オブザーバビリティ検証"]
+    C --> D["Layer 4: CI/CD 非対話型<br/>品質ゲート (codex exec)"]
+    D --> E["Layer 5: プラットフォーム Evals<br/>(Traces→Graders→Datasets)"]
+    E --> F["Layer 6: 外部標準ベンチマーク<br/>(SWE-bench / Terminal-Bench)"]
+    F --> G["Layer 7: 継続的セキュリティ評価<br/>(Codex Security CLI)"]`;
 
-const DIAGRAM_2 = `flowchart LR
-subgraph IN["入力層"]
-  DS["Dataset\\nJSONL 形式"]
-  PT["Prompt\\nTemplate"]
-end
-subgraph HN["ハーネス層"]
-  direction TB
-  RN["Runner\\n実行エンジン"]
-  SA["Sampler\\nモデル呼び出し"]
-  EV["Evaluator\\n採点器"]
-end
-subgraph OUT["出力層"]
-  RP["results.jsonl\\n生の結果"]
-  DB["Platform\\nDashboard"]
-  AL["Alert\\nSlack / GitHub"]
-end
-DS --> RN
-PT --> RN
-RN --> SA
-SA --> EV
-EV --> RP
-RP --> DB
-RP --> AL`;
+const DIAGRAM_2 = `sequenceDiagram
+    participant Eng as エンジニア
+    participant Codex as Codexエージェント
+    participant Local as ローカル自己レビュー
+    participant Cloud as クラウドエージェントレビュー
+    participant PR as プルリクエスト
 
-const DIAGRAM_3 = `flowchart TD
-S0["Step 0\\n環境構築"]
-S1["Step 1\\nデータセット作成\\nsamples.jsonl"]
-S2["Step 2\\nYAML 定義\\neval_name.yaml"]
-S3["Step 3\\nEval 実行\\noaieval model eval"]
-S4{"合格ライン\\n超えたか？"}
-S5["ダッシュボード\\nアップロード"]
-S6["改善\\nプロンプト調整\\nデータ追加"]
-S0 --> S1
-S1 --> S2
-S2 --> S3
-S3 --> S4
-S4 -->|"Yes"| S5
-S4 -->|"No"| S6
-S6 --> S3`;
+    Eng->>Codex: タスクをプロンプトで指示
+    Codex->>Codex: 変更を実装
+    Codex->>Local: 自分の変更をローカルでレビュー依頼
+    Local-->>Codex: フィードバックを返却
+    Codex->>Cloud: 追加のエージェントレビューを要求
+    Cloud-->>Codex: 指摘事項を返却
+    Codex->>Codex: フィードバックへ対応し修正
+    Codex->>PR: 全レビュアーが満足するまでループ後PRを作成
+    PR-->>Eng: 人間レビューは任意(必須ではない)`;
 
-const DIAGRAM_4 = `flowchart TD
-Q1{"出力は\\n一意に決まるか？"}
-A1["String Match\\nMatch / Includes /\\nFuzzyMatch\\n最速・最安"]
-Q2{"判断基準を\\n明文化できるか？"}
-A2["Model Graded\\nClosedQA\\n/ Criteria\\nGPT-4o が採点"]
-Q3{"コスト・時間を\\nかけられるか？"}
-A3["Human\\nEval\\nゴールデンセット構築"]
-A4["LLM-as-Judge\\nGPT-4o で代替"]
-A5["Custom\\nPython\\n任意ロジック実装"]
-Q4{"複雑なロジックが\\n必要か？"}
-Q1 -->|"Yes\\n数値・コード・固定値"| A1
-Q1 -->|"No\\n自由記述・翻訳"| Q2
-Q2 -->|"Yes"| Q4
-Q2 -->|"No"| Q3
-Q3 -->|"Yes"| A3
-Q3 -->|"No"| A4
-Q4 -->|"Yes\\nコード実行・API検証"| A5
-Q4 -->|"No"| A2`;
+const DIAGRAM_3 = `flowchart LR
+    Types["Types"] --> Config["Config"]
+    Config --> Repo["Repo"]
+    Repo --> Service["Service"]
+    Utils["Utils"] --> Providers["Providers"]
+    Providers --> Service
+    Service --> Runtime["Runtime"]
+    Runtime --> UI["UI"]`;
 
-const DIAGRAM_5 = `sequenceDiagram
-participant H as ハーネス
-participant UT as 被評価モデル(gpt-4o-mini)
-participant JD as 採点モデル(gpt-4o)
-H->>UT: テスト入力を送信
-UT-->>H: 回答を返す
-H->>JD: この回答は正しいか？+ 採点基準
-JD-->>H: スコア (Y / N / Unclear)
-H->>H: results.jsonl に記録`;
+const DIAGRAM_4 = `flowchart LR
+    App["アプリ (worktreeごとに起動)"] -->|"ログ/メトリクス/トレース"| Vector["Vector"]
+    Vector --> Logs["Victoria Logs (LogQL)"]
+    Vector --> Metrics["Victoria Metrics (PromQL)"]
+    Vector --> Traces["Victoria Traces (TraceQL)"]
+    Logs --> Codex["Codexが問い合わせ・相関分析"]
+    Metrics --> Codex
+    Traces --> Codex
+    Codex --> Fix["修正を実装"]
+    Fix --> Restart["アプリを再起動"]
+    Restart --> Rerun["ワークロード/UIシナリオを再実行"]
+    Rerun --> App`;
 
-const DIAGRAM_6 = `sequenceDiagram
-participant Dev as 開発者
-participant Codex as Codex Agent
-participant Harness as Eval ハーネス
-participant CI as GitHub Actions
-participant Review as レビュアー
-Dev->>Codex: タスクを指示
-Codex->>Codex: AGENTS.md を読み込み
-Codex->>Codex: コード・プロンプトを変更
-Codex->>Harness: ミニセット Eval 自動実行
-Harness-->>Codex: Score: 0.87 合格
-Codex->>Dev: PR を提案
-Dev->>CI: PR をマージ要求
-CI->>Harness: フルセット Eval 実行
-Harness-->>CI: accuracy: 0.88 合格
-CI-->>Review: テスト結果レポート
-Review->>Dev: LGTM / マージ`;
+const DIAGRAM_5 = `flowchart TB
+    PR["プルリクエスト作成/更新"] --> Action["openai/codex-action (GitHub Action)"]
+    Action --> Exec["codex exec --sandbox read-only --output-schema"]
+    Exec --> Schema["JSON Schema準拠の構造化出力<br/>(severity / issues / summary)"]
+    Schema --> Gate{"重大度しきい値を超えるか?"}
+    Gate -->|"Yes"| Block["マージをブロックし修正を要求"]
+    Gate -->|"No"| Merge["自動マージ or 人間レビューへ"]`;
 
-const DIAGRAM_7 = `flowchart LR
-PR["PR 作成時\\nミニセット 30件\\ngpt-4o-mini\\n~$0.01"]
-MG["main\\nマージ前\\nフルセット 500件\\ngpt-4o\\n~$0.50"]
-NT["毎夜 cron\\nゴールデン\\n100件\\ngpt-4o\\n~$0.10"]
-RL["リリース前\\n包括セット 全件\\ngpt-4o + human\\n~$5-50"]
-PR --> MG
-MG --> NT
-NT --> RL`;
+const DIAGRAM_6 = `flowchart LR
+    Traces["Traces<br/>(モデル呼び出し/ツール呼び出し/ハンドオフの記録)"] --> Graders["Graders<br/>(string_check/python/score_model等)"]
+    Graders --> Datasets["Datasets<br/>(代表的ケースを蓄積)"]
+    Datasets --> Runs["Eval Runs<br/>(プロンプト/モデル比較)"]
+    Runs --> Improve["プロンプト・ツール構成・ルーティングを改善"]
+    Improve --> Traces`;
 
-const DIAGRAM_8 = `flowchart TD
-IN["エージェントへのタスク入力"]
-E1["Step 1\\nEval\\n意図理解の正確さ\\naccuracy >= 0.90"]
-E2["Step 2 Eval\\n計画の妥当性\\nmodel_graded\\n>= 0.85"]
-E3["Step 3 Eval\\n最終出力の品質\\nhuman_graded >= 0.80"]
-G1{"Step 1 合格？"}
-G2{"Step 2 合格？"}
-FAIL["早期失敗\\nコスト節約"]
-PASS["全ステップ合格"]
-IN --> E1
-E1 --> G1
-G1 -->|"Yes"| E2
-E2 --> G2
-G1 -->|"No"| FAIL
-G2 -->|"Yes"| E3
-G2 -->|"No"| FAIL
-E3 --> PASS`;
-
-const DIAGRAM_9 = `flowchart TD
-START["Eval スコアが期待より低い"]
-Q1{"データセット品質\\nの問題？"}
-Q2{"プロンプトの問題？"}
-Q3{"採点基準の問題？"}
-Q4{"モデルの問題？"}
-Q1 -->|"Yes"| A1
-Q1 -->|"No"| Q2
-Q2 -->|"Yes"| A2
-Q2 -->|"No"| Q3
-Q3 -->|"Yes"| A3
-Q3 -->|"No"| Q4
-Q4 --> A4
-A1["サンプルを手動確認\\n曖昧な正解を修正\\nエッジケースを追加"]
-A2["Few-shot\\nを追加\\nシステムプロンプトを修正\\nタスクを分解する"]
-A3["採点プロンプトを見直し\\n別の\\nEvaluator を試す\\n人手評価でサンプル確認"]
-A4["上位モデルを試す\\nFine-tuning\\nを検討\\nRAG を活用する"]`;
+const DIAGRAM_7 = `flowchart TB
+    Suite["Terminal-Bench 2.0<br/>(89タスク・コンテナ隔離)"] --> Harbor["Harbor評価ハーネス<br/>(クラウド並列ロールアウト)"]
+    Harbor --> Agents["Codex CLI / Claude Code / 他エージェント"]
+    Agents --> Verify["コンテナ内Verifierが合否判定"]
+    Verify --> Board["リーダーボード集計"]
+    Board --> Decision["自社ハーネスのモデル/設定選定に反映"]`;
 
 /**
- * Renders the Harness Engineering guide page.
- *
- * @returns The guide page content for OpenAI harness engineering.
+ * Renders the Codex harness engineering evaluation infrastructure guide.
  */
-export default function HarnessEngineeringGuide() {
+export default function Page() {
   return (
-    <div className={styles.wrapper}>
-      {/*  ═══ HERO ═══  */}
-      <header className={styles.header}>
-        <div className={styles.eyebrow}>OpenAI Harness Engineering · 2026 Edition</div>
-        <h1 className={styles.h1}>
-          <span className={`${styles.span} ${styles.t1}`}>ハーネスエンジニアリング</span>
-          <span className={`${styles.span} ${styles.t2}`}>完全ガイド</span>
-        </h1>
-        <p className={`${styles.p} ${styles.heroSub}`}>
-          AIエージェントの品質を自動・継続的に測定するための評価基盤を、
-          <br />
-          ゼロからステップバイステップで構築する実践的解説。
-        </p>
-        <div className={styles.heroStats}>
-          <div className={styles.stat}>
-            <div className={styles.statV}>11</div>
-            <div className={styles.statL}>チャプター</div>
-          </div>
-          <div className={styles.stat}>
-            <div className={styles.statV}>3</div>
-            <div className={styles.statL}>Eval パターン</div>
-          </div>
-          <div className={styles.stat}>
-            <div className={styles.statV}>10</div>
-            <div className={styles.statL}>BP 原則</div>
-          </div>
-          <div className={styles.stat}>
-            <div className={styles.statV}>13</div>
-            <div className={styles.statL}>参考ソース</div>
-          </div>
-        </div>
-        <div className={styles.scrollCue}>
-          <span className={styles.span}>scroll</span>
-          <div className={styles.scrollLine}></div>
-        </div>
-      </header>
+    <div className={styles.layout}>
+      <div className={styles.topBar} />
+      <div className={styles.bgGlow} />
 
-      {/*  ═══ NAV ═══  */}
-      <nav className={styles.nav}>
-        <div className={styles.navInner}>
-          <div className={styles.navLogo}>HARNESS GUIDE</div>
-          <a className={styles.a} href="#what">
-            概要
-          </a>
-          <a className={styles.a} href="#why">
-            背景
-          </a>
-          <a className={styles.a} href="#overview">
-            全体像
-          </a>
-          <a className={styles.a} href="#setup">
-            セットアップ
-          </a>
-          <a className={styles.a} href="#patterns">
-            Eval パターン
-          </a>
-          <a className={styles.a} href="#bp">
-            ベストプラクティス
-          </a>
-          <a className={styles.a} href="#agents">
-            AGENTS.md 統合
-          </a>
-          <a className={styles.a} href="#cicd">
-            CI/CD
-          </a>
-          <a className={styles.a} href="#advanced">
-            上級テクニック
-          </a>
-          <a className={styles.a} href="#pitfalls">
-            落とし穴
-          </a>
-          <a className={styles.a} href="#sources">
-            参考文献
-          </a>
-        </div>
-      </nav>
+      <TocObserver />
 
-      {/*  ═══ MAIN ═══  */}
+      <button
+        type="button"
+        className={styles.sidebarToggle}
+        id="menuToggle"
+        aria-label="メニューを開く"
+        aria-expanded="false"
+        aria-controls="sidebar"
+      >
+        ☰
+      </button>
+      <div className={styles.sidebarOverlay} id="sidebarOverlay" />
+
+      <aside className={styles.sidebar} id="sidebar">
+        <div className={styles.brand}>OpenAI Codex Guide</div>
+        <div className={styles.brandSub}>ハーネスエンジニアリング実践ガイド — 評価基盤編</div>
+        <nav>
+          <ul className={styles.tocList}>
+            <li className={styles.tocItem}>
+              <a
+                href="#1-はじめに--なぜ評価基盤がハーネスエンジニアリングの核心なのか"
+                className={`${styles.tocLink} ${styles.active}`}
+              >
+                1. はじめに — なぜ「評価基盤」がハーネスエンジニアリングの核心なのか
+              </a>
+            </li>
+            <li className={styles.tocItem}>
+              <a href="#2-ハーネスエンジニアリングとは何か" className={styles.tocLink}>
+                2. ハーネスエンジニアリングとは何か
+              </a>
+            </li>
+            <li className={styles.tocItem}>
+              <a href="#3-なぜ評価が継続的でなければならないのか" className={styles.tocLink}>
+                3. なぜ評価が「継続的」でなければならないのか
+              </a>
+            </li>
+            <li className={styles.tocItem}>
+              <a href="#4-評価基盤の7層モデル--詳細解説" className={styles.tocLink}>
+                4. 評価基盤の7層モデル — 詳細解説
+              </a>
+            </li>
+            <li className={styles.tocItem}>
+              <a href="#5-ステップバイステップ実装ガイド" className={styles.tocLink}>
+                5. ステップバイステップ実装ガイド
+              </a>
+            </li>
+            <li className={styles.tocItem}>
+              <a href="#6-ハーネス成熟度チェックリスト" className={styles.tocLink}>
+                6. ハーネス成熟度チェックリスト
+              </a>
+            </li>
+            <li className={styles.tocItem}>
+              <a href="#7-アンチパターン" className={styles.tocLink}>
+                7. アンチパターン
+              </a>
+            </li>
+            <li className={styles.tocItem}>
+              <a href="#8-まとめ" className={styles.tocLink}>
+                8. まとめ
+              </a>
+            </li>
+            <li className={styles.tocItem}>
+              <a href="#9-参考文献" className={styles.tocLink}>
+                9. 参考文献
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </aside>
+
+      {/* Main Content */}
       <main className={styles.main}>
-        {/*  ────────────────────────────────  */}
-        {/*  SECTION 1 — WHAT IS  */}
-        {/*  ────────────────────────────────  */}
-        <section className={styles.section} id="what">
-          <div className={styles.secLabel}>Chapter 01</div>
-          <div className={styles.secHeader}>
-            <div className={styles.secNum}>1</div>
-            <div>
-              <h2 className={styles.secTitle}>ハーネスエンジニアリングとは何か？</h2>
-              <div className={styles.secSub}>AI 評価基盤の概念・定義・位置づけ</div>
-            </div>
+        <div className={styles.hero}>
+          <div className={styles.eyebrow}>
+            Harness Engineering &middot; Evaluation Infrastructure
           </div>
-
-          <p className={`${styles.p} ${styles.body}`}>
-            <strong className={styles.strong}>
-              ハーネスエンジニアリング（Harness Engineering）
-            </strong>
-            とは、AIモデル・エージェントの品質を
-            <strong className={styles.strong}>体系的・自動的に評価するためのテスト基盤</strong>
-            を設計・構築する工学的手法です。 "ハーネス"
-            とは「被試験体を取り囲み、制御・計測する仕組み全体」を指します。LLMの時代において、これは
-            <strong className={styles.strong}>Eval（Evaluation）フレームワーク</strong>
-            と呼ばれる評価パイプラインとして具体化されます。
+          <h1 className={styles.heroTitle}>
+            OpenAI Codexにおけるハーネスエンジニアリング実践ガイド
+          </h1>
+          <p className={styles.subtitle}>
+            AIエージェントの品質を自動・継続的に測定する評価基盤の設計
           </p>
-
-          <h3 className={`${styles.h3} ${styles.subH}`}>従来のテストとの根本的な違い</h3>
-
-          <div className={styles.tableWrap}>
-            <table className={styles.table}>
-              <thead className={styles.thead}>
-                <tr className={styles.tr}>
-                  <th className={styles.th}>比較軸</th>
-                  <th className={styles.th}>従来のソフトウェアテスト</th>
-                  <th className={styles.th}>AI ハーネスエンジニアリング</th>
-                </tr>
-              </thead>
-              <tbody className={styles.tbody}>
-                <tr className={styles.tr}>
-                  <td className={styles.td}>出力の性質</td>
-                  <td className={styles.td}>入力が同じなら出力は常に同じ</td>
-                  <td className={styles.td}>確率的・非決定的（モデルごとに異なる）</td>
-                </tr>
-                <tr className={styles.tr}>
-                  <td className={styles.td}>判定方式</td>
-                  <td className={styles.td}>Pass / Fail の二値</td>
-                  <td className={styles.td}>スコア・グレードによる多段階評価</td>
-                </tr>
-                <tr className={styles.tr}>
-                  <td className={styles.td}>テスト手法</td>
-                  <td className={styles.td}>ユニットテスト・統合テスト</td>
-                  <td className={styles.td}>Eval セット・ベンチマーク・LLM-as-Judge</td>
-                </tr>
-                <tr className={styles.tr}>
-                  <td className={styles.td}>正解の定義</td>
-                  <td className={styles.td}>明確・一意</td>
-                  <td className={styles.td}>複数の正解あり・文脈依存</td>
-                </tr>
-                <tr className={styles.tr}>
-                  <td className={styles.td}>回帰テスト</td>
-                  <td className={styles.td}>コード変更時に実行</td>
-                  <td className={styles.td}>プロンプト変更・モデル更新時にも必要</td>
-                </tr>
-                <tr className={styles.tr}>
-                  <td className={styles.td}>実行環境</td>
-                  <td className={styles.td}>ローカル・高速</td>
-                  <td className={styles.td}>クラウド・API コスト・並列実行</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <h3 className={`${styles.h3} ${styles.subH}`}>
-            OpenAI が定義するハーネスエンジニアリングの3層構造
-          </h3>
-
-          <div className={styles.mermaidWrap}>
-            <div className={styles.mermaidLabel}>▸ ハーネスエンジニアリング サイクル</div>
-            <div id="diag-0" className={styles.mermaid}>
-              <MermaidDiagram chart={DIAGRAM_0} />
-            </div>
-          </div>
-
-          <div className={styles.cardGrid3}>
-            <div className={`${styles.mc} ${styles.mcOai}`}>
-              <div className={`${styles.mcTag} ${styles.oai}`}>🎯 Layer 1 — 評価目標</div>
-              <p className={styles.p}>
-                「何を評価するか」を定義する。精度・安全性・レイテンシ・コストなど、ビジネス目標と直結した指標を選ぶ。
-              </p>
-            </div>
-            <div className={`${styles.mc} ${styles.mcBlue}`}>
-              <div className={`${styles.mcTag} ${styles.blue}`}>🔬 Layer 2 — Eval セット</div>
-              <p className={styles.p}>
-                「どうやって評価するか」を設計する。テストケース・正解データ・採点基準の3点セットを用意する。
-              </p>
-            </div>
-            <div className={`${styles.mc} ${styles.mcPurp}`}>
-              <div className={`${styles.mcTag} ${styles.purple}`}>⚙️ Layer 3 — インフラ</div>
-              <p className={styles.p}>
-                「評価の仕組み」を実装する。自動実行・結果の記録・CI/CD
-                統合・ダッシュボードで継続的に品質を見える化する。
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/*  ────────────────────────────────  */}
-        {/*  SECTION 2 — WHY  */}
-        {/*  ────────────────────────────────  */}
-        <section className={styles.section} id="why">
-          <div className={styles.secLabel}>Chapter 02</div>
-          <div className={styles.secHeader}>
-            <div className={styles.secNum}>2</div>
-            <div>
-              <h2 className={styles.secTitle}>なぜ必要なのか？</h2>
-              <div className={styles.secSub}>LLM 特有の課題とハーネスなし開発のリスク</div>
-            </div>
-          </div>
-
-          <h3 className={`${styles.h3} ${styles.subH}`}>LLM アプリケーション固有の問題</h3>
-
-          <div className={styles.mermaidWrap}>
-            <div className={styles.mermaidLabel}>▸ LLM テスト課題マップ</div>
-            <div id="diag-1" className={styles.mermaid}>
-              <MermaidDiagram chart={DIAGRAM_1} />
-            </div>
-          </div>
-
-          <h3 className={`${styles.h3} ${styles.subH}`}>ハーネスなし開発のリスク一覧</h3>
-
-          <div className={styles.tableWrap}>
-            <table className={styles.table}>
-              <thead className={styles.thead}>
-                <tr className={styles.tr}>
-                  <th className={styles.th}>リスク</th>
-                  <th className={styles.th}>発生確率</th>
-                  <th className={styles.th}>影響度</th>
-                  <th className={styles.th}>対策</th>
-                </tr>
-              </thead>
-              <tbody className={styles.tbody}>
-                <tr className={styles.tr}>
-                  <td className={styles.td}>サイレント品質劣化（モデル更新時）</td>
-                  <td className={styles.td}>
-                    <span className={`${styles.span} ${styles.tag} ${styles.tRose}`}>高</span>
-                  </td>
-                  <td className={styles.td}>
-                    <span className={`${styles.span} ${styles.tag} ${styles.tRose}`}>高</span>
-                  </td>
-                  <td className={styles.td}>自動 Eval CI/CD の構築</td>
-                </tr>
-                <tr className={styles.tr}>
-                  <td className={styles.td}>プロンプト変更による意図しない副作用</td>
-                  <td className={styles.td}>
-                    <span className={`${styles.span} ${styles.tag} ${styles.tRose}`}>高</span>
-                  </td>
-                  <td className={styles.td}>
-                    <span className={`${styles.span} ${styles.tag} ${styles.tAmb}`}>中</span>
-                  </td>
-                  <td className={styles.td}>回帰テストスイート</td>
-                </tr>
-                <tr className={styles.tr}>
-                  <td className={styles.td}>エッジケースの見落とし</td>
-                  <td className={styles.td}>
-                    <span className={`${styles.span} ${styles.tag} ${styles.tAmb}`}>中</span>
-                  </td>
-                  <td className={styles.td}>
-                    <span className={`${styles.span} ${styles.tag} ${styles.tRose}`}>高</span>
-                  </td>
-                  <td className={styles.td}>Eval セット多様化</td>
-                </tr>
-                <tr className={styles.tr}>
-                  <td className={styles.td}>本番環境でのユーザー体験劣化</td>
-                  <td className={styles.td}>
-                    <span className={`${styles.span} ${styles.tag} ${styles.tAmb}`}>中</span>
-                  </td>
-                  <td className={styles.td}>
-                    <span className={`${styles.span} ${styles.tag} ${styles.tRose}`}>高</span>
-                  </td>
-                  <td className={styles.td}>本番ログからの Eval 生成</td>
-                </tr>
-                <tr className={styles.tr}>
-                  <td className={styles.td}>コスト爆発（無効 API 呼び出し）</td>
-                  <td className={styles.td}>
-                    <span className={`${styles.span} ${styles.tag} ${styles.tAmb}`}>中</span>
-                  </td>
-                  <td className={styles.td}>
-                    <span className={`${styles.span} ${styles.tag} ${styles.tAmb}`}>中</span>
-                  </td>
-                  <td className={styles.td}>キャッシュ + ミニセット戦略</td>
-                </tr>
-                <tr className={styles.tr}>
-                  <td className={styles.td}>Fine-tuning 効果の検証不能</td>
-                  <td className={styles.td}>
-                    <span className={`${styles.span} ${styles.tag} ${styles.tBlue}`}>低</span>
-                  </td>
-                  <td className={styles.td}>
-                    <span className={`${styles.span} ${styles.tag} ${styles.tRose}`}>高</span>
-                  </td>
-                  <td className={styles.td}>ゴールデンセットの固定管理</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        {/*  ────────────────────────────────  */}
-        {/*  SECTION 3 — OVERVIEW  */}
-        {/*  ────────────────────────────────  */}
-        <section className={styles.section} id="overview">
-          <div className={styles.secLabel}>Chapter 03</div>
-          <div className={styles.secHeader}>
-            <div className={styles.secNum}>3</div>
-            <div>
-              <h2 className={styles.secTitle}>OpenAI Evals フレームワーク全体像</h2>
-              <div className={styles.secSub}>
-                コンポーネント構成と openai/evals ライブラリの役割
-              </div>
-            </div>
-          </div>
-
-          <p className={`${styles.p} ${styles.body}`}>
-            <strong className={styles.strong}>OpenAI Evals</strong> は、LLM
-            の品質を評価するためのオープンソースフレームワークです（
-            <code className={styles.code}>github.com/openai/evals</code>）。 JSONL
-            形式のデータセット・YAML 定義ファイル・Python Evaluator
-            クラスの3要素で構成されています。
+          <p className={styles.meta}>
+            <span>
+              対象読者: Codex CLI / Codex cloud
+              を用いたエージェント駆動開発に取り組む中級〜上級エンジニア
+            </span>
+            <span>2026年7月29日時点の情報に基づく</span>
           </p>
-
-          <div className={styles.mermaidWrap}>
-            <div className={styles.mermaidLabel}>▸ OpenAI Evals コンポーネント構成</div>
-            <div id="diag-2" className={styles.mermaid}>
-              <MermaidDiagram chart={DIAGRAM_2} />
-            </div>
-          </div>
-
-          <h3 className={`${styles.h3} ${styles.subH}`}>Evaluator クラス一覧（組み込み）</h3>
-
-          <div className={styles.tableWrap}>
-            <table className={styles.table}>
-              <thead className={styles.thead}>
-                <tr className={styles.tr}>
-                  <th className={styles.th}>クラス</th>
-                  <th className={styles.th}>判定方式</th>
-                  <th className={styles.th}>適用場面</th>
-                  <th className={styles.th}>コスト</th>
-                </tr>
-              </thead>
-              <tbody className={styles.tbody}>
-                <tr className={styles.tr}>
-                  <td className={styles.td}>Match</td>
-                  <td className={styles.td}>完全一致</td>
-                  <td className={styles.td}>数値・固定値・コード出力</td>
-                  <td className={styles.td}>
-                    <span className={`${styles.span} ${styles.tag} ${styles.tOai}`}>最低</span>
-                  </td>
-                </tr>
-                <tr className={styles.tr}>
-                  <td className={styles.td}>Includes</td>
-                  <td className={styles.td}>部分一致</td>
-                  <td className={styles.td}>特定キーワードの有無</td>
-                  <td className={styles.td}>
-                    <span className={`${styles.span} ${styles.tag} ${styles.tOai}`}>最低</span>
-                  </td>
-                </tr>
-                <tr className={styles.tr}>
-                  <td className={styles.td}>FuzzyMatch</td>
-                  <td className={styles.td}>近似一致</td>
-                  <td className={styles.td}>大文字小文字・スペース無視</td>
-                  <td className={styles.td}>
-                    <span className={`${styles.span} ${styles.tag} ${styles.tOai}`}>最低</span>
-                  </td>
-                </tr>
-                <tr className={styles.tr}>
-                  <td className={styles.td}>ClosedQA</td>
-                  <td className={styles.td}>LLM 採点</td>
-                  <td className={styles.td}>自由記述・Yes/No 判定</td>
-                  <td className={styles.td}>
-                    <span className={`${styles.span} ${styles.tag} ${styles.tAmb}`}>中</span>
-                  </td>
-                </tr>
-                <tr className={styles.tr}>
-                  <td className={styles.td}>Criteria</td>
-                  <td className={styles.td}>LLM ルーブリック</td>
-                  <td className={styles.td}>品質・スタイル・完全性</td>
-                  <td className={styles.td}>
-                    <span className={`${styles.span} ${styles.tag} ${styles.tAmb}`}>中</span>
-                  </td>
-                </tr>
-                <tr className={styles.tr}>
-                  <td className={styles.td}>Custom Python</td>
-                  <td className={styles.td}>任意ロジック</td>
-                  <td className={styles.td}>コード実行・API 検証・複合評価</td>
-                  <td className={styles.td}>
-                    <span className={`${styles.span} ${styles.tag} ${styles.tBlue}`}>設計次第</span>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <div className={`${styles.ib} ${styles.iOai}`}>
-            <span className={`${styles.span} ${styles.ibIcon}`}>💡</span>
-            <div>
-              <strong className={styles.strong}>OpenAI Evals はオープンソースです。</strong>
-              <code className={styles.code}>github.com/openai/evals</code> でコードを確認でき、自作
-              Evaluator クラスをプルリクエストで貢献することも可能です。 公式ドキュメント:
-              <code className={styles.code}>
-                github.com/openai/evals/blob/main/docs/build-eval.md
-              </code>
-            </div>
-          </div>
-        </section>
-
-        {/*  ────────────────────────────────  */}
-        {/*  SECTION 4 — SETUP  */}
-        {/*  ────────────────────────────────  */}
-        <section className={styles.section} id="setup">
-          <div className={styles.secLabel}>Chapter 04</div>
-          <div className={styles.secHeader}>
-            <div className={styles.secNum}>4</div>
-            <div>
-              <h2 className={styles.secTitle}>5ステップでゼロから始める</h2>
-              <div className={styles.secSub}>インストールから初回 Eval 実行まで</div>
-            </div>
-          </div>
-
-          <div className={styles.mermaidWrap}>
-            <div className={styles.mermaidLabel}>▸ セットアップ → 実行 → 改善サイクル</div>
-            <div id="diag-3" className={styles.mermaid}>
-              <MermaidDiagram chart={DIAGRAM_3} />
-            </div>
-          </div>
-
-          <div className={styles.divider}></div>
-
-          <div className={styles.stepFlow}>
-            {/*  Step 0  */}
-            <div className={styles.stepItem}>
-              <div className={styles.stepLine}>
-                <div className={styles.stepDot}>0</div>
-                <div className={styles.stepConnector}></div>
-              </div>
-              <div className={styles.stepContent}>
-                <div className={styles.stepTitle}>環境構築 — openai/evals をインストールする</div>
-                <div className={styles.stepDesc}>
-                  GitHub からリポジトリをクローンし、仮想環境に依存パッケージをインストールします。
-                </div>
-                <div className={styles.codeWrap}>
-                  <div className={styles.codeHdr}>
-                    <div className={styles.codeDots}>
-                      <div className={`${styles.codeDot} ${styles.cdR}`}></div>
-                      <div className={`${styles.codeDot} ${styles.cdY}`}></div>
-                      <div className={`${styles.codeDot} ${styles.cdG}`}></div>
-                    </div>
-                    <div className={styles.codeLang}>bash</div>
-                  </div>
-                  <pre className={styles.pre}>
-                    <span className={`${styles.span} ${styles.cm}`}># 1. リポジトリをクローン</span>
-                    {"\n"}
-                    <span className={`${styles.span} ${styles.fn}`}>git</span> clone{" "}
-                    https://github.com/openai/evals.git
-                    {"\n"}
-                    <span className={`${styles.span} ${styles.fn}`}>cd</span> evals
-                    {"\n"}
-                    <span className={`${styles.span} ${styles.cm}`}>
-                      # 2. 仮想環境を作成（推奨）
-                    </span>
-                    {"\n"}
-                    <span className={`${styles.span} ${styles.fn}`}>python</span> -m venv .venv
-                    {"\n"}
-                    <span className={`${styles.span} ${styles.fn}`}>source</span> .venv/bin/activate{" "}
-                    <span className={`${styles.span} ${styles.cm}`}>
-                      # Windows: .venv\Scripts\activate
-                    </span>
-                    {"\n"}
-                    <span className={`${styles.span} ${styles.cm}`}>
-                      # 3. 依存パッケージをインストール
-                    </span>
-                    {"\n"}
-                    <span className={`${styles.span} ${styles.fn}`}>pip</span> install -e{" "}
-                    <span className={`${styles.span} ${styles.str}`}>".[dev]"</span>
-                    {"\n"}
-                    <span className={`${styles.span} ${styles.cm}`}># 4. API キーを設定</span>
-                    {"\n"}
-                    <span className={`${styles.span} ${styles.kw}`}>export</span>{" "}
-                    <span className={`${styles.span} ${styles.op}`}>OPENAI_API_KEY</span>=
-                    <span className={`${styles.span} ${styles.str}`}>"sk-..."</span>
-                    {"\n"}
-                    <span className={`${styles.span} ${styles.cm}`}>
-                      # 5. 動作確認（サンプル Eval を実行）
-                    </span>
-                    {"\n"}
-                    <span className={`${styles.span} ${styles.fn}`}>oaieval</span> gpt-4o test-match{" "}
-                    --max_samples <span className={`${styles.span} ${styles.num}`}>10</span>
-                  </pre>
-                </div>
-                <div className={`${styles.ib} ${styles.iBlue}`}>
-                  <span className={`${styles.span} ${styles.ibIcon}`}>ℹ️</span>
-                  <div>
-                    <code className={styles.code}>pip install -e ".[dev]"</code> の
-                    <code className={styles.code}>-e</code>
-                    は「編集可能インストール」。ソースコードを変更しても再インストール不要になるため、カスタム
-                    Evaluator 開発時に必須です。
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/*  Step 1  */}
-            <div className={styles.stepItem}>
-              <div className={styles.stepLine}>
-                <div className={styles.stepDot}>1</div>
-                <div className={styles.stepConnector}></div>
-              </div>
-              <div className={styles.stepContent}>
-                <div className={styles.stepTitle}>
-                  データセット作成 — JSONL 形式で 1行 = 1テストケース
-                </div>
-                <div className={styles.stepDesc}>
-                  各行に <code className={styles.code}>input</code>（会話履歴）と
-                  <code className={styles.code}>ideal</code>（期待する回答）を記述します。
-                </div>
-                <div className={styles.codeWrap}>
-                  <div className={styles.codeHdr}>
-                    <div className={styles.codeDots}>
-                      <div className={`${styles.codeDot} ${styles.cdR}`}></div>
-                      <div className={`${styles.codeDot} ${styles.cdY}`}></div>
-                      <div className={`${styles.codeDot} ${styles.cdG}`}></div>
-                    </div>
-                    <div className={styles.codeLang}>
-                      jsonl — evals/registry/data/my_qa/samples.jsonl
-                    </div>
-                  </div>
-                  <pre className={`${styles.pre} ${styles.wrapLines}`}>
-                    <span className={`${styles.span} ${styles.str}`}>
-                      &#123;"input": [&#123;"role": "user", "content":
-                      "日本の首都はどこですか？"&#125;], "ideal": "東京"&#125;
-                    </span>
-                    {"\n"}
-                    <span className={`${styles.span} ${styles.str}`}>
-                      &#123;"input": [&#123;"role": "user", "content":
-                      "富士山の標高を教えてください"&#125;], "ideal": ["3776メートル", "3,776m",
-                      "3776m"]&#125;
-                    </span>
-                    {"\n"}
-                    <span className={`${styles.span} ${styles.str}`}>
-                      &#123;"input": [&#123;"role": "system", "content":
-                      "あなたはSQLの専門家です"&#125;, &#123;"role": "user", "content":
-                      "ユーザー一覧を取得するSQLを書いてください"&#125;], "ideal": "SELECT * FROM
-                      users"&#125;
-                    </span>
-                  </pre>
-                </div>
-                <div className={styles.tableWrap}>
-                  <table className={styles.table}>
-                    <thead className={styles.thead}>
-                      <tr className={styles.tr}>
-                        <th className={styles.th}>フィールド</th>
-                        <th className={styles.th}>型</th>
-                        <th className={styles.th}>説明</th>
-                        <th className={styles.th}>注意点</th>
-                      </tr>
-                    </thead>
-                    <tbody className={styles.tbody}>
-                      <tr className={styles.tr}>
-                        <td className={styles.td}>input</td>
-                        <td className={styles.td}>Array</td>
-                        <td className={styles.td}>role/content 形式の会話履歴</td>
-                        <td className={styles.td}>system プロンプトも含められる</td>
-                      </tr>
-                      <tr className={styles.tr}>
-                        <td className={styles.td}>ideal</td>
-                        <td className={styles.td}>String / Array</td>
-                        <td className={styles.td}>期待する回答（正解）</td>
-                        <td className={styles.td}>配列で複数の正解を指定可能</td>
-                      </tr>
-                      <tr className={styles.tr}>
-                        <td className={styles.td}>metadata</td>
-                        <td className={styles.td}>Object（任意）</td>
-                        <td className={styles.td}>カテゴリ・難易度などのタグ</td>
-                        <td className={styles.td}>分析時のフィルタリングに活用</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-
-            {/*  Step 2  */}
-            <div className={styles.stepItem}>
-              <div className={styles.stepLine}>
-                <div className={styles.stepDot}>2</div>
-                <div className={styles.stepConnector}></div>
-              </div>
-              <div className={styles.stepContent}>
-                <div className={styles.stepTitle}>
-                  YAML 定義 — Evaluator クラスとデータセットを紐付ける
-                </div>
-                <div className={styles.stepDesc}>
-                  <code className={styles.code}>evals/registry/evals/</code> 配下に YAML
-                  ファイルを作成します。
-                </div>
-                <div className={styles.codeWrap}>
-                  <div className={styles.codeHdr}>
-                    <div className={styles.codeDots}>
-                      <div className={`${styles.codeDot} ${styles.cdR}`}></div>
-                      <div className={`${styles.codeDot} ${styles.cdY}`}></div>
-                      <div className={`${styles.codeDot} ${styles.cdG}`}></div>
-                    </div>
-                    <div className={styles.codeLang}>yaml — evals/registry/evals/my_qa.yaml</div>
-                  </div>
-                  <pre className={styles.pre}>
-                    <span className={`${styles.span} ${styles.cm}`}>
-                      # Eval グループ定義（最上位）
-                    </span>
-                    {"\n"}
-                    <span className={`${styles.span} ${styles.op}`}>my_qa</span>
-                    <span className={`${styles.span} ${styles.kw}`}>:</span>
-                    {"\n"}
-                    {"  "}
-                    <span className={`${styles.span} ${styles.fn}`}>id</span>
-                    <span className={`${styles.span} ${styles.kw}`}>:</span> my_qa.v1
-                    {"\n"}
-                    {"  "}
-                    <span className={`${styles.span} ${styles.fn}`}>metrics</span>
-                    <span className={`${styles.span} ${styles.kw}`}>:</span> [accuracy]
-                    {"\n\n"}
-                    <span className={`${styles.span} ${styles.cm}`}># Eval バージョン定義</span>
-                    {"\n"}
-                    <span className={`${styles.span} ${styles.op}`}>my_qa.v1</span>
-                    <span className={`${styles.span} ${styles.kw}`}>:</span>
-                    {"\n"}
-                    {"  "}
-                    <span className={`${styles.span} ${styles.fn}`}>class</span>
-                    <span className={`${styles.span} ${styles.kw}`}>:</span>{" "}
-                    <span className={`${styles.span} ${styles.str}`}>
-                      evals.elsuite.basic.match:Match
-                    </span>
-                    {"\n"}
-                    {"  "}
-                    <span className={`${styles.span} ${styles.fn}`}>args</span>
-                    <span className={`${styles.span} ${styles.kw}`}>:</span>
-                    {"\n"}
-                    {"    "}
-                    <span className={`${styles.span} ${styles.fn}`}>samples_jsonl</span>
-                    <span className={`${styles.span} ${styles.kw}`}>:</span> my_qa/samples.jsonl
-                  </pre>
-                </div>
-              </div>
-            </div>
-
-            {/*  Step 3  */}
-            <div className={styles.stepItem}>
-              <div className={styles.stepLine}>
-                <div className={styles.stepDot}>3</div>
-                <div className={styles.stepConnector}></div>
-              </div>
-              <div className={styles.stepContent}>
-                <div className={styles.stepTitle}>Eval 実行 — oaieval CLI で評価を走らせる</div>
-                <div className={styles.stepDesc}>
-                  モデル名と Eval 名を指定するだけで評価が実行されます。
-                </div>
-                <div className={styles.codeWrap}>
-                  <div className={styles.codeHdr}>
-                    <div className={styles.codeDots}>
-                      <div className={`${styles.codeDot} ${styles.cdR}`}></div>
-                      <div className={`${styles.codeDot} ${styles.cdY}`}></div>
-                      <div className={`${styles.codeDot} ${styles.cdG}`}></div>
-                    </div>
-                    <div className={styles.codeLang}>bash</div>
-                  </div>
-                  <pre className={styles.pre}>
-                    <span className={`${styles.span} ${styles.cm}`}># 基本実行</span>
-                    {"\n"}
-                    <span className={`${styles.span} ${styles.fn}`}>oaieval</span> gpt-4o my_qa
-                    {"\n\n"}
-                    <span className={`${styles.span} ${styles.cm}`}>
-                      # コスト節約: サンプル数を制限してテスト
-                    </span>
-                    {"\n"}
-                    <span className={`${styles.span} ${styles.fn}`}>oaieval</span> gpt-4o my_qa{" "}
-                    --max_samples <span className={`${styles.span} ${styles.num}`}>20</span>
-                    {"\n\n"}
-                    <span className={`${styles.span} ${styles.cm}`}>
-                      # モデル比較: 結果ファイルを分けて保存
-                    </span>
-                    {"\n"}
-                    <span className={`${styles.span} ${styles.fn}`}>oaieval</span> gpt-4o-mini my_qa{" "}
-                    --record_path results/mini.jsonl
-                    {"\n"}
-                    <span className={`${styles.span} ${styles.fn}`}>oaieval</span> gpt-4o my_qa{" "}
-                    --record_path results/4o.jsonl
-                    {"\n\n"}
-                    <span className={`${styles.span} ${styles.cm}`}>
-                      # 並列実行でスピードアップ（コスト注意）
-                    </span>
-                    {"\n"}
-                    <span className={`${styles.span} ${styles.fn}`}>oaieval</span> gpt-4o my_qa{" "}
-                    --num_threads <span className={`${styles.span} ${styles.num}`}>10</span>
-                    {"\n\n"}
-                    <span className={`${styles.span} ${styles.cm}`}>
-                      # 結果を OpenAI Platform にアップロード
-                    </span>
-                    {"\n"}
-                    <span className={`${styles.span} ${styles.fn}`}>oaieval</span> gpt-4o my_qa{" "}
-                    --upload
-                  </pre>
-                </div>
-              </div>
-            </div>
-
-            {/*  Step 4  */}
-            <div className={styles.stepItem}>
-              <div className={styles.stepLine}>
-                <div className={styles.stepDot}>4</div>
-              </div>
-              <div className={styles.stepContent}>
-                <div className={styles.stepTitle}>結果の確認 — results.jsonl を分析する</div>
-                <div className={styles.stepDesc}>
-                  各サンプルの採点結果が JSONL
-                  形式で保存されます。集計スクリプトで合否を判定します。
-                </div>
-                <div className={styles.codeWrap}>
-                  <div className={styles.codeHdr}>
-                    <div className={styles.codeDots}>
-                      <div className={`${styles.codeDot} ${styles.cdR}`}></div>
-                      <div className={`${styles.codeDot} ${styles.cdY}`}></div>
-                      <div className={`${styles.codeDot} ${styles.cdG}`}></div>
-                    </div>
-                    <div className={styles.codeLang}>jsonl — results.jsonl（出力サンプル）</div>
-                  </div>
-                  <pre className={`${styles.pre} ${styles.wrapLines}`}>
-                    <span className={`${styles.span} ${styles.str}`}>
-                      &#123;"run_id": "abc123", "event_id": 0, "type": "match", "data":
-                      &#123;"correct": true, "expected": "東京", "sampled": "東京"&#125;&#125;
-                    </span>
-                    {"\n"}
-                    <span className={`${styles.span} ${styles.str}`}>
-                      &#123;"run_id": "abc123", "event_id": 1, "type": "match", "data":
-                      &#123;"correct": false, "expected": "3776メートル", "sampled":
-                      "約3776m"&#125;&#125;
-                    </span>
-                  </pre>
-                </div>
-                <div className={styles.codeWrap}>
-                  <div className={styles.codeHdr}>
-                    <div className={styles.codeDots}>
-                      <div className={`${styles.codeDot} ${styles.cdR}`}></div>
-                      <div className={`${styles.codeDot} ${styles.cdY}`}></div>
-                      <div className={`${styles.codeDot} ${styles.cdG}`}></div>
-                    </div>
-                    <div className={styles.codeLang}>python — 合否判定スクリプト</div>
-                  </div>
-                  <pre className={styles.pre}>
-                    <span className={`${styles.span} ${styles.kw}`}>import</span> json, sys
-                    {"\n"}
-                    <span className={`${styles.span} ${styles.kw}`}>def</span>{" "}
-                    <span className={`${styles.span} ${styles.fn}`}>check_threshold</span>
-                    (results_path: <span className={`${styles.span} ${styles.fn}`}>str</span>,
-                    threshold: <span className={`${styles.span} ${styles.fn}`}>float</span> ={" "}
-                    <span className={`${styles.span} ${styles.num}`}>0.85</span>):
-                    {"\n"}
-                    {"    "}correct = total ={" "}
-                    <span className={`${styles.span} ${styles.num}`}>0</span>
-                    {"\n"}
-                    {"    "}
-                    <span className={`${styles.span} ${styles.kw}`}>with</span>{" "}
-                    <span className={`${styles.span} ${styles.fn}`}>open</span>
-                    (results_path) <span className={`${styles.span} ${styles.kw}`}>as</span> f:
-                    {"\n"}
-                    {"        "}
-                    <span className={`${styles.span} ${styles.kw}`}>for</span> line{" "}
-                    <span className={`${styles.span} ${styles.kw}`}>in</span> f:
-                    {"\n"}
-                    {"            "}ev = json.
-                    <span className={`${styles.span} ${styles.fn}`}>loads</span>(line)
-                    {"\n"}
-                    {"            "}
-                    <span className={`${styles.span} ${styles.kw}`}>if</span> ev.get(
-                    <span className={`${styles.span} ${styles.str}`}>"type"</span>) =={" "}
-                    <span className={`${styles.span} ${styles.str}`}>"match"</span>:{"\n"}
-                    {"                "}total +={" "}
-                    <span className={`${styles.span} ${styles.num}`}>1</span>
-                    {"\n"}
-                    {"                "}
-                    <span className={`${styles.span} ${styles.kw}`}>if</span> ev[
-                    <span className={`${styles.span} ${styles.str}`}>"data"</span>][
-                    <span className={`${styles.span} ${styles.str}`}>"correct"</span>]:
-                    {"\n"}
-                    {"                    "}correct +={" "}
-                    <span className={`${styles.span} ${styles.num}`}>1</span>
-                    {"\n"}
-                    {"    "}accuracy = correct / total{" "}
-                    <span className={`${styles.span} ${styles.kw}`}>if</span> total{" "}
-                    <span className={`${styles.span} ${styles.kw}`}>else</span>{" "}
-                    <span className={`${styles.span} ${styles.num}`}>0</span>
-                    {"\n"}
-                    {"    "}
-                    <span className={`${styles.span} ${styles.fn}`}>print</span>(
-                    <span className={`${styles.span} ${styles.str}`}>
-                      f"Accuracy: &#123;accuracy:.2%&#125; (&#123;correct&#125;/&#123;total&#125;)"
-                    </span>
-                    ){"\n"}
-                    {"    "}sys.<span className={`${styles.span} ${styles.fn}`}>exit</span>(
-                    <span className={`${styles.span} ${styles.num}`}>0</span>{" "}
-                    <span className={`${styles.span} ${styles.kw}`}>if</span> accuracy &gt;=
-                    threshold <span className={`${styles.span} ${styles.kw}`}>else</span>{" "}
-                    <span className={`${styles.span} ${styles.num}`}>1</span>){"\n\n"}
-                    <span className={`${styles.span} ${styles.fn}`}>check_threshold</span>(
-                    <span className={`${styles.span} ${styles.str}`}>"results/4o.jsonl"</span>,
-                    threshold=
-                    <span className={`${styles.span} ${styles.num}`}>0.85</span>)
-                  </pre>
-                </div>
-              </div>
-            </div>
-          </div>
-          {/*  /step-flow  */}
-        </section>
-
-        {/*  ────────────────────────────────  */}
-        {/*  SECTION 5 — PATTERNS  */}
-        {/*  ────────────────────────────────  */}
-        <section className={styles.section} id="patterns">
-          <div className={styles.secLabel}>Chapter 05</div>
-          <div className={styles.secHeader}>
-            <div className={styles.secNum}>5</div>
-            <div>
-              <h2 className={styles.secTitle}>Eval の3大パターン</h2>
-              <div className={styles.secSub}>
-                String Match · Model Graded · Custom Python — 使い分けの判断木
-              </div>
-            </div>
-          </div>
-
-          <h3 className={`${styles.h3} ${styles.subH}`}>パターン選択フロー</h3>
-
-          <div className={styles.mermaidWrap}>
-            <div className={styles.mermaidLabel}>▸ Eval パターン選択の判断木</div>
-            <div id="diag-4" className={styles.mermaid}>
-              <MermaidDiagram chart={DIAGRAM_4} />
-            </div>
-          </div>
-
-          <h3 className={`${styles.h3} ${styles.subH}`}>パターン比較表</h3>
-
-          <div className={styles.tableWrap}>
-            <table className={styles.table}>
-              <thead className={styles.thead}>
-                <tr className={styles.tr}>
-                  <th className={styles.th}>パターン</th>
-                  <th className={styles.th}>精度</th>
-                  <th className={styles.th}>コスト</th>
-                  <th className={styles.th}>速度</th>
-                  <th className={styles.th}>適用場面</th>
-                </tr>
-              </thead>
-              <tbody className={styles.tbody}>
-                <tr className={styles.tr}>
-                  <td className={styles.td}>String Match</td>
-                  <td className={styles.td}>
-                    <span className={`${styles.span} ${styles.tag} ${styles.tAmb}`}>
-                      △ 固定正解のみ
-                    </span>
-                  </td>
-                  <td className={styles.td}>
-                    <span className={`${styles.span} ${styles.tag} ${styles.tOai}`}>◎ 最低</span>
-                  </td>
-                  <td className={styles.td}>
-                    <span className={`${styles.span} ${styles.tag} ${styles.tOai}`}>◎ 最速</span>
-                  </td>
-                  <td className={styles.td}>固定値・数値・コード出力・True/False</td>
-                </tr>
-                <tr className={styles.tr}>
-                  <td className={styles.td}>Model Graded</td>
-                  <td className={styles.td}>
-                    <span className={`${styles.span} ${styles.tag} ${styles.tOai}`}>◎ 高精度</span>
-                  </td>
-                  <td className={styles.td}>
-                    <span className={`${styles.span} ${styles.tag} ${styles.tAmb}`}>△ 高め</span>
-                  </td>
-                  <td className={styles.td}>
-                    <span className={`${styles.span} ${styles.tag} ${styles.tAmb}`}>△ 低め</span>
-                  </td>
-                  <td className={styles.td}>自由記述・要約・翻訳・説明品質</td>
-                </tr>
-                <tr className={styles.tr}>
-                  <td className={styles.td}>Human Eval</td>
-                  <td className={styles.td}>
-                    <span className={`${styles.span} ${styles.tag} ${styles.tOai}`}>◎◎ 最高</span>
-                  </td>
-                  <td className={styles.td}>
-                    <span className={`${styles.span} ${styles.tag} ${styles.tRose}`}>✗ 最高</span>
-                  </td>
-                  <td className={styles.td}>
-                    <span className={`${styles.span} ${styles.tag} ${styles.tRose}`}>✗ 最遅</span>
-                  </td>
-                  <td className={styles.td}>ゴールデンデータセット構築・最終検証</td>
-                </tr>
-                <tr className={styles.tr}>
-                  <td className={styles.td}>Custom Python</td>
-                  <td className={styles.td}>
-                    <span className={`${styles.span} ${styles.tag} ${styles.tBlue}`}>設計次第</span>
-                  </td>
-                  <td className={styles.td}>
-                    <span className={`${styles.span} ${styles.tag} ${styles.tBlue}`}>設計次第</span>
-                  </td>
-                  <td className={styles.td}>
-                    <span className={`${styles.span} ${styles.tag} ${styles.tBlue}`}>設計次第</span>
-                  </td>
-                  <td className={styles.td}>コード実行・API 検証・複合評価</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <div className={styles.patternGrid}>
-            <div className={`${styles.patCard} ${styles.pcOai}`}>
-              <div className={styles.patNum}>01</div>
-              <div className={styles.patIcon}>🎯</div>
-              <div className={styles.patName}>String Match</div>
-              <p className={`${styles.p} ${styles.patDesc}`}>
-                最もシンプル。出力が固定値に一致するかを検証。
-                <strong className={styles.strong}>Match</strong>（完全）・
-                <strong className={styles.strong}>Includes</strong>（部分）・
-                <strong className={styles.strong}>FuzzyMatch</strong>
-                （近似）の3種類がある。
-              </p>
-              <span className={`${styles.span} ${styles.patBadge} ${styles.tOai}`}>最安・最速</span>
-            </div>
-            <div className={`${styles.patCard} ${styles.pcBlue}`}>
-              <div className={styles.patNum}>02</div>
-              <div className={styles.patIcon}>🤖</div>
-              <div className={styles.patName}>Model Graded</div>
-              <p className={`${styles.p} ${styles.patDesc}`}>
-                別の LLM（通常
-                GPT-4o）が採点者として評価。自由記述など正解が一意でない場合に有効。採点プロンプトの設計が品質を左右する。
-              </p>
-              <span className={`${styles.span} ${styles.patBadge} ${styles.tBlue}`}>
-                LLM-as-Judge
-              </span>
-            </div>
-            <div className={`${styles.patCard} ${styles.pcPurp}`}>
-              <div className={styles.patNum}>03</div>
-              <div className={styles.patIcon}>🔧</div>
-              <div className={styles.patName}>Custom Python</div>
-              <p className={`${styles.p} ${styles.patDesc}`}>
-                完全にカスタマイズした評価ロジックを Python で実装。コードの実行確認・外部 API
-                の検証・複数条件の組み合わせなど複雑なケースに対応。
-              </p>
-              <span className={`${styles.span} ${styles.patBadge} ${styles.tPurp}`}>最も柔軟</span>
-            </div>
-          </div>
-
-          <h3 className={`${styles.h3} ${styles.subH}`}>
-            パターン 2 — Model Graded の仕組み（シーケンス図）
-          </h3>
-
-          <div className={styles.mermaidWrap}>
-            <div className={styles.mermaidLabel}>▸ LLM-as-Judge シーケンス</div>
-            <div id="diag-5" className={styles.mermaid}>
-              <MermaidDiagram chart={DIAGRAM_5} />
-            </div>
-          </div>
-
-          <h3 className={`${styles.h3} ${styles.subH}`}>
-            パターン 2 — LLM-as-Judge 採点プロンプトテンプレート
-          </h3>
-
-          <div className={styles.codeWrap}>
-            <div className={styles.codeHdr}>
-              <div className={styles.codeDots}>
-                <div className={`${styles.codeDot} ${styles.cdR}`}></div>
-                <div className={`${styles.codeDot} ${styles.cdY}`}></div>
-                <div className={`${styles.codeDot} ${styles.cdG}`}></div>
-              </div>
-              <div className={styles.codeLang}>
-                python — 採点プロンプト（OpenAI 推奨フォーマット）
-              </div>
-            </div>
-            <pre className={styles.pre}>
-              <span className={`${styles.span} ${styles.op}`}>GRADER_PROMPT</span> ={" "}
-              <span className={`${styles.span} ${styles.str}`}>
-                """
-                {"\n"}
-                あなたは厳格かつ公平な評価者です。以下の基準で回答を評価してください。
-                {"\n\n"}
-                ## 評価対象
-                {"\n"}
-                **質問**: &#123;question&#125;
-                {"\n"}
-                **回答**: &#123;answer&#125;
-                {"\n\n"}
-                ## 評価基準
-                {"\n"}
-                &#123;criteria&#125;
-                {"\n\n"}
-                ## 採点ルール
-                {"\n"}- `Y` : 基準を完全に満たしている
-                {"\n"}- `N` : 基準を満たしていない
-                {"\n"}- `Unclear` : 判断が難しい場合（乱用禁止）
-                {"\n\n"}
-                ## 重要な指示
-                {"\n"}
-                1. 自分の知識ではなく「提示された情報のみ」で評価すること
-                {"\n"}
-                2. 部分的に正しくても基準を完全に満たさなければ N{"\n"}
-                3. 採点理由を 1 文で説明すること
-                {"\n\n"}
-                ## 出力（JSON のみ）
-                {"\n"}
-                &#123;&#123;"grade": "Y/N/Unclear", "reason": "採点理由"&#125;&#125;
-                {"\n"}
-                """
-              </span>
-            </pre>
-          </div>
-
-          <div className={`${styles.ib} ${styles.iRose}`}>
-            <span className={`${styles.span} ${styles.ibIcon}`}>🔑</span>
-            <div>
-              <strong className={styles.strong}>採点モデルは被評価モデルと分けること。</strong>
-              GPT-4o-mini を評価する場合は
-              GPT-4o（上位モデル）を採点者にする。採点者が自分と同じ出力を高く評価する「採点者バイアス」を防ぐためです。
-            </div>
-          </div>
-        </section>
-
-        {/*  ────────────────────────────────  */}
-        {/*  SECTION 6 — BEST PRACTICES  */}
-        {/*  ────────────────────────────────  */}
-        <section className={styles.section} id="bp">
-          <div className={styles.secLabel}>Chapter 06</div>
-          <div className={styles.secHeader}>
-            <div className={styles.secNum}>6</div>
-            <div>
-              <h2 className={styles.secTitle}>ハーネス設計のベストプラクティス</h2>
-              <div className={styles.secSub}>データセット品質 10 原則 + 推奨ディレクトリ構成</div>
-            </div>
-          </div>
-
-          <h3 className={`${styles.h3} ${styles.subH}`}>データセット品質の 10 原則</h3>
-
-          <div className={styles.tableWrap}>
-            <table className={styles.table}>
-              <thead className={styles.thead}>
-                <tr className={styles.tr}>
-                  <th className={styles.th}>#</th>
-                  <th className={styles.th}>原則</th>
-                  <th className={styles.th}>悪い例 ❌</th>
-                  <th className={styles.th}>良い例 ✅</th>
-                </tr>
-              </thead>
-              <tbody className={styles.tbody}>
-                <tr className={styles.tr}>
-                  <td className={styles.td}>1</td>
-                  <td className={styles.td}>多様性</td>
-                  <td className={styles.td}>同パターンの問題のみ</td>
-                  <td className={styles.td}>エッジケース・境界値を含む</td>
-                </tr>
-                <tr className={styles.tr}>
-                  <td className={styles.td}>2</td>
-                  <td className={styles.td}>代表性</td>
-                  <td className={styles.td}>開発者が作った問題のみ</td>
-                  <td className={styles.td}>実際のユーザーログから抽出</td>
-                </tr>
-                <tr className={styles.tr}>
-                  <td className={styles.td}>3</td>
-                  <td className={styles.td}>難易度分散</td>
-                  <td className={styles.td}>簡単な問題だけ</td>
-                  <td className={styles.td}>Easy / Medium / Hard を均等に</td>
-                </tr>
-                <tr className={styles.tr}>
-                  <td className={styles.td}>4</td>
-                  <td className={styles.td}>正解の明確化</td>
-                  <td className={styles.td}>「良い回答」</td>
-                  <td className={styles.td}>「100文字以内で箇条書き3点」</td>
-                </tr>
-                <tr className={styles.tr}>
-                  <td className={styles.td}>5</td>
-                  <td className={styles.td}>カテゴリバランス</td>
-                  <td className={styles.td}>特定カテゴリに偏る</td>
-                  <td className={styles.td}>カテゴリ比率を意図的に設計</td>
-                </tr>
-                <tr className={styles.tr}>
-                  <td className={styles.td}>6</td>
-                  <td className={styles.td}>汚染防止</td>
-                  <td className={styles.td}>訓練データと重複</td>
-                  <td className={styles.td}>独立したホールドアウトセット</td>
-                </tr>
-                <tr className={styles.tr}>
-                  <td className={styles.td}>7</td>
-                  <td className={styles.td}>バージョン管理</td>
-                  <td className={styles.td}>上書き保存</td>
-                  <td className={styles.td}>v1, v2 ... と分けて git 管理</td>
-                </tr>
-                <tr className={styles.tr}>
-                  <td className={styles.td}>8</td>
-                  <td className={styles.td}>サイズ適正化</td>
-                  <td className={styles.td}>1000件を毎回全実行</td>
-                  <td className={styles.td}>ミニ 20件 + フル 500件 で使い分け</td>
-                </tr>
-                <tr className={styles.tr}>
-                  <td className={styles.td}>9</td>
-                  <td className={styles.td}>ゴールデンセット</td>
-                  <td className={styles.td}>随時更新</td>
-                  <td className={styles.td}>固定した参照セットを保持</td>
-                </tr>
-                <tr className={styles.tr}>
-                  <td className={styles.td}>10</td>
-                  <td className={styles.td}>メタデータ付与</td>
-                  <td className={styles.td}>JSONL のみ</td>
-                  <td className={styles.td}>カテゴリ・難易度タグを追加</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <h3 className={`${styles.h3} ${styles.subH}`}>推奨ディレクトリ構成</h3>
-
-          <div className={styles.codeWrap}>
-            <div className={styles.codeHdr}>
-              <div className={styles.codeDots}>
-                <div className={`${styles.codeDot} ${styles.cdR}`}></div>
-                <div className={`${styles.codeDot} ${styles.cdY}`}></div>
-                <div className={`${styles.codeDot} ${styles.cdG}`}></div>
-              </div>
-              <div className={styles.codeLang}>tree — プロジェクト構成（推奨）</div>
-            </div>
-            <pre className={styles.pre}>
-              <span className={`${styles.span} ${styles.hl}`}>my-ai-project/</span>
-              {"\n"}
-              ├── <span className={`${styles.span} ${styles.op}`}>evals/</span> {"  "}
-              <span className={`${styles.span} ${styles.cm}`}>← Eval ルートディレクトリ</span>
-              {"\n"}│ ├── registry/
-              {"\n"}│ │ ├── data/
-              {"\n"}│ │ │ ├── <span className={`${styles.span} ${styles.fn}`}>qa_basic/</span>{" "}
-              {"  "}
-              <span className={`${styles.span} ${styles.cm}`}>← カテゴリ別に分割</span>
-              {"\n"}│ │ │ │ ├── train.jsonl {"  "}
-              <span className={`${styles.span} ${styles.cm}`}>← 開発用（少量・変更可）</span>
-              {"\n"}│ │ │ │ └── test.jsonl {"  "}
-              <span className={`${styles.span} ${styles.cm}`}>← 本番評価用（固定・変更禁止）</span>
-              {"\n"}│ │ │ ├── <span className={`${styles.span} ${styles.fn}`}>code_gen/</span>
-              {"\n"}│ │ │ │ └── samples.jsonl
-              {"\n"}│ │ │ └── <span className={`${styles.span} ${styles.rose}`}>safety/</span>{" "}
-              {"  "}
-              <span className={`${styles.span} ${styles.cm}`}>← セーフティ Eval は必ず独立</span>
-              {"\n"}│ │ │ └── samples.jsonl
-              {"\n"}│ │ └── evals/
-              {"\n"}│ │ ├── qa_basic.yaml
-              {"\n"}│ │ ├── code_gen.yaml
-              {"\n"}│ │ └── safety.yaml
-              {"\n"}│ └── elsuite/custom/
-              {"\n"}│ └── my_custom_eval.py {"  "}
-              <span className={`${styles.span} ${styles.cm}`}>← カスタム Evaluator</span>
-              {"\n"}
-              ├── scripts/
-              {"\n"}│ ├── run_evals.sh {"  "}
-              <span className={`${styles.span} ${styles.cm}`}>← 実行スクリプト</span>
-              {"\n"}│ └── compare_models.py {"  "}
-              <span className={`${styles.span} ${styles.cm}`}>← モデル比較スクリプト</span>
-              {"\n"}
-              ├── results/{" "}
-              <span className={`${styles.span} ${styles.rose}`}>← .gitignore 推奨</span>
-              {"\n"}
-              ├── <span className={`${styles.span} ${styles.op}`}>AGENTS.md</span>{" "}
-              <span className={`${styles.span} ${styles.cm}`}>← Codex 向け永続設定</span>
-              {"\n"}
-              └── <span className={`${styles.span} ${styles.op}`}>TEST.md</span>{" "}
-              <span className={`${styles.span} ${styles.cm}`}>← 受け入れ基準チェックリスト</span>
-            </pre>
-          </div>
-
-          <h3 className={`${styles.h3} ${styles.subH}`}>ベストプラクティス10則</h3>
-
-          <div className={styles.bpGrid}>
-            <div className={`${styles.bpCard} ${styles.bpOai}`}>
-              <div className={styles.bpN}>01</div>
-              <h4>テストコマンドを AGENTS.md に明示する</h4>
-              <p className={styles.p}>
-                AGENTS.md はテストを自動実行しない。「ファイル変更後は必ず oaieval
-                を実行すること」と明記することで Codex が自動的に Eval を走らせる。
-              </p>
-            </div>
-            <div className={`${styles.bpCard} ${styles.bpBlue}`}>
-              <div className={styles.bpN}>02</div>
-              <h4>ゴールデンセットを絶対に更新しない</h4>
-              <p className={styles.p}>
-                ゴールデンセットは参照基準。更新する場合は新バージョン (v2)
-                として作成し、旧バージョンは残す。
-              </p>
-            </div>
-            <div className={`${styles.bpCard} ${styles.bpPurp}`}>
-              <div className={styles.bpN}>03</div>
-              <h4>temperature=0 + seed を固定する</h4>
-              <p className={styles.p}>
-                Eval 実行時は決定的出力のため temperature=0 と seed
-                を固定。再現性のある結果が得られる。
-              </p>
-            </div>
-            <div className={`${styles.bpCard} ${styles.bpAmb}`}>
-              <div className={styles.bpN}>04</div>
-              <h4>採点モデルは上位モデルを使う</h4>
-              <p className={styles.p}>
-                被評価モデルより高性能なモデルを採点者に。採点者バイアスを最小化できる。
-              </p>
-            </div>
-            <div className={`${styles.bpCard} ${styles.bpRose}`}>
-              <div className={styles.bpN}>05</div>
-              <h4>セーフティ Eval は violation_rate=0</h4>
-              <p className={styles.p}>
-                安全性に関する Eval だけは合格基準をゼロトレランス（違反率 0%）に設定する。
-              </p>
-            </div>
-            <div className={`${styles.bpCard} ${styles.bpCyan}`}>
-              <div className={styles.bpN}>06</div>
-              <h4>ミニセット戦略でコスト管理</h4>
-              <p className={styles.p}>
-                PR 時は 20〜30件のミニセットで高速チェック。フルセットは main ブランチの PR
-                前のみ実行。
-              </p>
-            </div>
-            <div className={`${styles.bpCard} ${styles.bpOai}`}>
-              <div className={styles.bpN}>07</div>
-              <h4>本番ログからサンプルを自動生成</h4>
-              <p className={styles.p}>
-                高評価ユーザー回答を Eval データセットに取り込む自動パイプラインを構築する。
-              </p>
-            </div>
-            <div className={`${styles.bpCard} ${styles.bpBlue}`}>
-              <div className={styles.bpN}>08</div>
-              <h4>難易度別に合格基準を分ける</h4>
-              <p className={styles.p}>
-                Easy ≥ 0.95、Medium ≥ 0.85、Hard ≥ 0.70 のように難易度別に閾値を設定する。
-              </p>
-            </div>
-            <div className={`${styles.bpCard} ${styles.bpPurp}`}>
-              <div className={styles.bpN}>09</div>
-              <h4>Eval セットを公開しない</h4>
-              <p className={styles.p}>
-                テストデータを公開するとプロンプトが最適化され、本当の性能が見えなくなる過学習を招く。
-              </p>
-            </div>
-            <div className={`${styles.bpCard} ${styles.bpAmb}`}>
-              <div className={styles.bpN}>10</div>
-              <h4>複数の指標を組み合わせる</h4>
-              <p className={styles.p}>
-                accuracy 一つだけ高くても意味がない。ROUGE、レイテンシ、コスト、人手評価を併用する。
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/*  ────────────────────────────────  */}
-        {/*  SECTION 7 — AGENTS / TEST.md  */}
-        {/*  ────────────────────────────────  */}
-        <section className={styles.section} id="agents">
-          <div className={styles.secLabel}>Chapter 07</div>
-          <div className={styles.secHeader}>
-            <div className={styles.secNum}>7</div>
-            <div>
-              <h2 className={styles.secTitle}>AGENTS.md / TEST.md とハーネスの統合</h2>
-              <div className={styles.secSub}>
-                Codex エージェントが自律的に Eval を実行する仕組み
-              </div>
-            </div>
-          </div>
-
-          <h3 className={`${styles.h3} ${styles.subH}`}>AGENTS.md — Eval コマンドを永続記録する</h3>
-
-          <div className={styles.codeWrap}>
-            <div className={styles.codeHdr}>
-              <div className={styles.codeDots}>
-                <div className={`${styles.codeDot} ${styles.cdR}`}></div>
-                <div className={`${styles.codeDot} ${styles.cdY}`}></div>
-                <div className={`${styles.codeDot} ${styles.cdG}`}></div>
-              </div>
-              <div className={styles.codeLang}>markdown — AGENTS.md（Eval セクションの記載例）</div>
-            </div>
-            <pre className={styles.pre}>
-              <span className={`${styles.span} ${styles.hl}`}>## Build & Test Commands</span>
-              {"\n"}
-              <span className={`${styles.span} ${styles.op}`}>### AI Eval（ハーネス）</span>
-              {"\n"}
-              <span className={`${styles.span} ${styles.cm}`}>
-                # ★ ファイルを変更したら必ず以下を実行すること
-              </span>
-              {"\n"}- ミニセット（開発中）: `oaieval gpt-4o-mini qa_basic --max_samples 20`
-              {"\n"}- フルセット（PR前必須）: `oaieval gpt-4o qa_basic`
-              {"\n"}- モデル比較: `python scripts/compare_models.py --models gpt-4o,gpt-4o-mini`
-              {"\n"}- 合格基準: accuracy &gt;= 0.85
-              {"\n\n"}
-              <span className={`${styles.span} ${styles.op}`}>### 注意事項</span>
-              {"\n"}- Eval 実行には OPENAI_API_KEY 環境変数が必要
-              {"\n"}- フルセットはコストが発生するため main ブランチ PR 時のみ実行
-              {"\n"}- results/ ディレクトリは .gitignore 済み
-            </pre>
-          </div>
-
-          <h3 className={`${styles.h3} ${styles.subH}`}>TEST.md — 受け入れ基準を定義する</h3>
-
-          <div className={styles.codeWrap}>
-            <div className={styles.codeHdr}>
-              <div className={styles.codeDots}>
-                <div className={`${styles.codeDot} ${styles.cdR}`}></div>
-                <div className={`${styles.codeDot} ${styles.cdY}`}></div>
-                <div className={`${styles.codeDot} ${styles.cdG}`}></div>
-              </div>
-              <div className={styles.codeLang}>markdown — TEST.md（Eval 品質基準）</div>
-            </div>
-            <pre className={styles.pre}>
-              <span className={`${styles.span} ${styles.hl}`}>
-                # TEST.md — AI 品質基準チェックリスト
-              </span>
-              {"\n\n"}
-              <span className={`${styles.span} ${styles.op}`}>## Eval 基準</span>
-              {"\n"}- [ ] [Eval] `qa_basic` eval の accuracy &gt;= 0.85
-              {"\n"}- [ ] [Eval] `code_gen` eval の pass_rate &gt;= 0.80
-              {"\n"}- [ ] [Eval] `safety` eval の violation_rate == 0.0（ゼロトレランス）
-              {"\n"}- [ ] [Eval] 新機能追加時は対応する eval サンプルを最低 10件追加
-              {"\n\n"}
-              <span className={`${styles.span} ${styles.op}`}>## 回帰テスト</span>
-              {"\n"}- [ ] [CI] 前バージョン比で accuracy が 2% 以上低下していない
-              {"\n"}- [ ] [CI] レスポンスタイム p99 &lt; 3000ms
-            </pre>
-          </div>
-
-          <h3 className={`${styles.h3} ${styles.subH}`}>
-            Eval と開発フローの統合（全体シーケンス）
-          </h3>
-
-          <div className={styles.mermaidWrap}>
-            <div className={styles.mermaidLabel}>
-              ▸ Codex エージェント × Eval ハーネス 統合フロー
-            </div>
-            <div id="diag-6" className={styles.mermaid}>
-              <MermaidDiagram chart={DIAGRAM_6} />
-            </div>
-          </div>
-        </section>
-
-        {/*  ────────────────────────────────  */}
-        {/*  SECTION 8 — CI/CD  */}
-        {/*  ────────────────────────────────  */}
-        <section className={styles.section} id="cicd">
-          <div className={styles.secLabel}>Chapter 08</div>
-          <div className={styles.secHeader}>
-            <div className={styles.secNum}>8</div>
-            <div>
-              <h2 className={styles.secTitle}>CI/CD パイプラインへの組み込み</h2>
-              <div className={styles.secSub}>GitHub Actions × Eval の自動化とコスト管理戦略</div>
-            </div>
-          </div>
-
-          <h3 className={`${styles.h3} ${styles.subH}`}>コスト管理：段階的 Eval 実行戦略</h3>
-
-          <div className={styles.mermaidWrap}>
-            <div className={styles.mermaidLabel}>▸ 実行タイミング別コスト管理戦略</div>
-            <div id="diag-7" className={styles.mermaid}>
-              <MermaidDiagram chart={DIAGRAM_7} />
-            </div>
-          </div>
-
-          <div className={styles.tableWrap}>
-            <table className={styles.table}>
-              <thead className={styles.thead}>
-                <tr className={styles.tr}>
-                  <th className={styles.th}>タイミング</th>
-                  <th className={styles.th}>サンプル数</th>
-                  <th className={styles.th}>モデル</th>
-                  <th className={styles.th}>目安コスト</th>
-                  <th className={styles.th}>合格基準</th>
-                </tr>
-              </thead>
-              <tbody className={styles.tbody}>
-                <tr className={styles.tr}>
-                  <td className={styles.td}>PR 作成時</td>
-                  <td className={styles.td}>20〜30件</td>
-                  <td className={styles.td}>gpt-4o-mini</td>
-                  <td className={styles.td}>~$0.01</td>
-                  <td className={styles.td}>≥ 0.80</td>
-                </tr>
-                <tr className={styles.tr}>
-                  <td className={styles.td}>main ブランチ PR</td>
-                  <td className={styles.td}>200〜500件</td>
-                  <td className={styles.td}>gpt-4o</td>
-                  <td className={styles.td}>~$0.30〜$0.80</td>
-                  <td className={styles.td}>≥ 0.85</td>
-                </tr>
-                <tr className={styles.tr}>
-                  <td className={styles.td}>毎日 cron</td>
-                  <td className={styles.td}>100件固定</td>
-                  <td className={styles.td}>gpt-4o</td>
-                  <td className={styles.td}>~$0.10</td>
-                  <td className={styles.td}>前日比 -2%以内</td>
-                </tr>
-                <tr className={styles.tr}>
-                  <td className={styles.td}>リリース前</td>
-                  <td className={styles.td}>全件</td>
-                  <td className={styles.td}>gpt-4o + human</td>
-                  <td className={styles.td}>$5〜$50</td>
-                  <td className={styles.td}>≥ 0.90</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <h3 className={`${styles.h3} ${styles.subH}`}>GitHub Actions ワークフロー実装例</h3>
-
-          <div className={styles.codeWrap}>
-            <div className={styles.codeHdr}>
-              <div className={styles.codeDots}>
-                <div className={`${styles.codeDot} ${styles.cdR}`}></div>
-                <div className={`${styles.codeDot} ${styles.cdY}`}></div>
-                <div className={`${styles.codeDot} ${styles.cdG}`}></div>
-              </div>
-              <div className={styles.codeLang}>yaml — .github/workflows/eval.yml</div>
-            </div>
-            <pre className={styles.pre}>
-              <span className={`${styles.span} ${styles.op}`}>name:</span>{" "}
-              <span className={`${styles.span} ${styles.str}`}>AI Eval Pipeline</span>
-              {"\n\n"}
-              <span className={`${styles.span} ${styles.op}`}>on:</span>
-              {"\n"}
-              {"  "}
-              <span className={`${styles.span} ${styles.fn}`}>pull_request:</span>
-              {"\n"}
-              {"    "}
-              <span className={`${styles.span} ${styles.fn}`}>branches:</span> [main]
-              {"\n"}
-              {"    "}
-              <span className={`${styles.span} ${styles.fn}`}>paths:</span>
-              {"\n"}
-              {"      "}- <span className={`${styles.span} ${styles.str}`}>'prompts/**'</span>{" "}
-              <span className={`${styles.span} ${styles.cm}`}># プロンプト変更時</span>
-              {"\n"}
-              {"      "}- <span className={`${styles.span} ${styles.str}`}>'evals/**'</span>{" "}
-              <span className={`${styles.span} ${styles.cm}`}># Eval 定義変更時</span>
-              {"\n"}
-              {"      "}- <span className={`${styles.span} ${styles.str}`}>'src/ai/**'</span>{" "}
-              <span className={`${styles.span} ${styles.cm}`}># AI ロジック変更時</span>
-              {"\n\n"}
-              <span className={`${styles.span} ${styles.op}`}>jobs:</span>
-              {"\n"}
-              {"  "}
-              <span className={`${styles.span} ${styles.fn}`}>mini_eval:</span>
-              {"\n"}
-              {"    "}
-              <span className={`${styles.span} ${styles.fn}`}>name:</span>{" "}
-              <span className={`${styles.span} ${styles.str}`}>
-                ミニセット Eval（高速チェック）
-              </span>
-              {"\n"}
-              {"    "}
-              <span className={`${styles.span} ${styles.fn}`}>runs-on:</span> ubuntu-latest
-              {"\n"}
-              {"    "}
-              <span className={`${styles.span} ${styles.fn}`}>steps:</span>
-              {"\n"}
-              {"      "}- <span className={`${styles.span} ${styles.kw}`}>uses:</span>{" "}
-              actions/checkout@v4
-              {"\n"}
-              {"      "}- <span className={`${styles.span} ${styles.kw}`}>name:</span>{" "}
-              <span className={`${styles.span} ${styles.str}`}>Python セットアップ</span>
-              {"\n"}
-              {"        "}
-              <span className={`${styles.span} ${styles.kw}`}>uses:</span> actions/setup-python@v5
-              {"\n"}
-              {"        "}
-              <span className={`${styles.span} ${styles.kw}`}>with:</span>
-              {"\n"}
-              {"          "}
-              <span className={`${styles.span} ${styles.fn}`}>python-version:</span>{" "}
-              <span className={`${styles.span} ${styles.str}`}>'3.11'</span>
-              {"\n"}
-              {"      "}- <span className={`${styles.span} ${styles.kw}`}>name:</span>{" "}
-              <span className={`${styles.span} ${styles.str}`}>依存関係インストール</span>
-              {"\n"}
-              {"        "}
-              <span className={`${styles.span} ${styles.kw}`}>run:</span>{" "}
-              <span className={`${styles.span} ${styles.str}`}>pip install -e "evals/[dev]"</span>
-              {"\n"}
-              {"      "}- <span className={`${styles.span} ${styles.kw}`}>name:</span>{" "}
-              <span className={`${styles.span} ${styles.str}`}>ミニセット Eval 実行</span>
-              {"\n"}
-              {"        "}
-              <span className={`${styles.span} ${styles.fn}`}>env:</span>
-              {"\n"}
-              {"          "}
-              <span className={`${styles.span} ${styles.fn}`}>OPENAI_API_KEY:</span>{" "}
-              <span className={`${styles.span} ${styles.str}`}>
-                $&#123;&#123; secrets.OPENAI_API_KEY &#125;&#125;
-              </span>
-              {"\n"}
-              {"        "}
-              <span className={`${styles.span} ${styles.fn}`}>run:</span> |{"\n"}
-              {"          "}oaieval gpt-4o-mini qa_basic \{"\n"}
-              {"            "}--max_samples{" "}
-              <span className={`${styles.span} ${styles.num}`}>30</span> \{"\n"}
-              {"            "}--record_path results/mini_eval.jsonl
-              {"\n"}
-              {"      "}- <span className={`${styles.span} ${styles.kw}`}>name:</span>{" "}
-              <span className={`${styles.span} ${styles.str}`}>合格判定（0.80 以上）</span>
-              {"\n"}
-              {"        "}
-              <span className={`${styles.span} ${styles.fn}`}>run:</span>{" "}
-              <span className={`${styles.span} ${styles.str}`}>
-                python scripts/check_threshold.py --results results/mini_eval.jsonl --threshold 0.80
-              </span>
-              {"\n\n"}
-              {"  "}
-              <span className={`${styles.span} ${styles.fn}`}>full_eval:</span>
-              {"\n"}
-              {"    "}
-              <span className={`${styles.span} ${styles.fn}`}>name:</span>{" "}
-              <span className={`${styles.span} ${styles.str}`}>フルセット Eval（マージ前）</span>
-              {"\n"}
-              {"    "}
-              <span className={`${styles.span} ${styles.fn}`}>runs-on:</span> ubuntu-latest
-              {"\n"}
-              {"    "}
-              <span className={`${styles.span} ${styles.hl}`}>needs:</span> mini_eval{" "}
-              <span className={`${styles.span} ${styles.cm}`}># ミニセット合格後のみ実行</span>
-              {"\n"}
-              {"    "}
-              <span className={`${styles.span} ${styles.fn}`}>steps:</span>
-              {"\n"}
-              {"      "}- <span className={`${styles.span} ${styles.kw}`}>uses:</span>{" "}
-              actions/checkout@v4
-              {"\n"}
-              {"      "}- <span className={`${styles.span} ${styles.kw}`}>name:</span>{" "}
-              <span className={`${styles.span} ${styles.str}`}>フルセット Eval 実行</span>
-              {"\n"}
-              {"        "}
-              <span className={`${styles.span} ${styles.fn}`}>env:</span>
-              {"\n"}
-              {"          "}
-              <span className={`${styles.span} ${styles.fn}`}>OPENAI_API_KEY:</span>{" "}
-              <span className={`${styles.span} ${styles.str}`}>
-                $&#123;&#123; secrets.OPENAI_API_KEY &#125;&#125;
-              </span>
-              {"\n"}
-              {"        "}
-              <span className={`${styles.span} ${styles.fn}`}>run:</span> |{"\n"}
-              {"          "}oaieval gpt-4o qa_basic \{"\n"}
-              {"            "}--record_path results/full_eval.jsonl \{"\n"}
-              {"            "}--num_threads{" "}
-              <span className={`${styles.span} ${styles.num}`}>10</span>
-              {"\n"}
-              {"      "}- <span className={`${styles.span} ${styles.kw}`}>name:</span>{" "}
-              <span className={`${styles.span} ${styles.str}`}>結果をアーティファクト保存</span>
-              {"\n"}
-              {"        "}
-              <span className={`${styles.span} ${styles.kw}`}>uses:</span>{" "}
-              actions/upload-artifact@v4
-              {"\n"}
-              {"        "}
-              <span className={`${styles.span} ${styles.kw}`}>with:</span>
-              {"\n"}
-              {"          "}
-              <span className={`${styles.span} ${styles.fn}`}>name:</span>{" "}
-              <span className={`${styles.span} ${styles.str}`}>eval-results</span>
-              {"\n"}
-              {"          "}
-              <span className={`${styles.span} ${styles.fn}`}>path:</span> results/
-            </pre>
-          </div>
-
-          <div className={`${styles.ib} ${styles.iWarn}`}>
-            <span className={`${styles.span} ${styles.ibIcon}`}>⚠️</span>
-            <div>
-              <strong className={styles.strong}>コスト暴走を防ぐ2つの安全策：</strong>
-              (1) <code className={styles.code}>paths:</code> フィルタで AI 関連ファイル変更時のみ
-              Eval を実行。(2)
-              <code className={styles.code}>needs:</code>
-              でミニセット合格後にのみフルセットを実行し、早期失敗でコストを節約します。
-            </div>
-          </div>
-        </section>
-
-        {/*  ────────────────────────────────  */}
-        {/*  SECTION 9 — ADVANCED  */}
-        {/*  ────────────────────────────────  */}
-        <section className={styles.section} id="advanced">
-          <div className={styles.secLabel}>Chapter 09</div>
-          <div className={styles.secHeader}>
-            <div className={styles.secNum}>9</div>
-            <div>
-              <h2 className={styles.secTitle}>上級テクニック</h2>
-              <div className={styles.secSub}>
-                Eval Chain · 本番ログからの自動生成 · カスタム Evaluator
-              </div>
-            </div>
-          </div>
-
-          <h3 className={`${styles.h3} ${styles.subH}`}>
-            Eval Chain — 段階的評価でコストを早期カット
-          </h3>
-
-          <div className={styles.mermaidWrap}>
-            <div className={styles.mermaidLabel}>▸ Eval チェーン フロー（ゲート条件付き）</div>
-            <div id="diag-8" className={styles.mermaid}>
-              <MermaidDiagram chart={DIAGRAM_8} />
-            </div>
-          </div>
-
-          <h3 className={`${styles.h3} ${styles.subH}`}>本番ログからの Eval サンプル自動生成</h3>
-
-          <div className={styles.codeWrap}>
-            <div className={styles.codeHdr}>
-              <div className={styles.codeDots}>
-                <div className={`${styles.codeDot} ${styles.cdR}`}></div>
-                <div className={`${styles.codeDot} ${styles.cdY}`}></div>
-                <div className={`${styles.codeDot} ${styles.cdG}`}></div>
-              </div>
-              <div className={styles.codeLang}>python — scripts/generate_eval_from_logs.py</div>
-            </div>
-            <pre className={styles.pre}>
-              <span className={`${styles.span} ${styles.kw}`}>import</span> json, random
-              {"\n\n"}
-              <span className={`${styles.span} ${styles.kw}`}>def</span>{" "}
-              <span className={`${styles.span} ${styles.fn}`}>extract_eval_samples</span>({"\n"}
-              {"    "}log_file: <span className={`${styles.span} ${styles.fn}`}>str</span>,{"\n"}
-              {"    "}output_jsonl: <span className={`${styles.span} ${styles.fn}`}>str</span>,
-              {"\n"}
-              {"    "}sample_rate: <span className={`${styles.span} ${styles.fn}`}>float</span> ={" "}
-              <span className={`${styles.span} ${styles.num}`}>0.01</span>,{"      "}
-              <span className={`${styles.span} ${styles.cm}`}># 本番ログ of 1% をサンプリング</span>
-              {"\n"}
-              {"    "}min_quality: <span className={`${styles.span} ${styles.fn}`}>float</span> ={" "}
-              <span className={`${styles.span} ${styles.num}`}>4.5</span>,{"        "}
-              <span className={`${styles.span} ${styles.cm}`}># ユーザー評価 4.5 以上のみ</span>
-              {"\n"}
-              ):
-              {"\n"}
-              {"    "}
-              <span className={`${styles.span} ${styles.str}`}>
-                """
-                {"\n"}
-                {"    "}高評価ユーザー回答を本番ログから抽出し、
-                {"\n"}
-                {"    "}Eval データセットを自動生成する。
-                {"\n"}
-                {"    "}"""
-              </span>
-              {"\n"}
-              {"    "}samples = []
-              {"\n"}
-              {"    "}
-              <span className={`${styles.span} ${styles.kw}`}>with</span>{" "}
-              <span className={`${styles.span} ${styles.fn}`}>open</span>
-              (log_file) <span className={`${styles.span} ${styles.kw}`}>as</span> f:
-              {"\n"}
-              {"        "}
-              <span className={`${styles.span} ${styles.kw}`}>for</span> line{" "}
-              <span className={`${styles.span} ${styles.kw}`}>in</span> f:
-              {"\n"}
-              {"            "}log = json.
-              <span className={`${styles.span} ${styles.fn}`}>loads</span>(line)
-              {"\n\n"}
-              {"            "}
-              <span className={`${styles.span} ${styles.cm}`}># 品質フィルタリング</span>
-              {"\n"}
-              {"            "}
-              <span className={`${styles.span} ${styles.kw}`}>if</span> log.
-              <span className={`${styles.span} ${styles.fn}`}>get</span>(
-              <span className={`${styles.span} ${styles.str}`}>"user_rating"</span>,{" "}
-              <span className={`${styles.span} ${styles.num}`}>0</span>) &lt; min_quality:
-              {"\n"}
-              {"                "}
-              <span className={`${styles.span} ${styles.kw}`}>continue</span>
-              {"\n"}
-              {"            "}
-              <span className={`${styles.span} ${styles.kw}`}>if</span> random.
-              <span className={`${styles.span} ${styles.fn}`}>random</span>
-              () &gt; sample_rate:
-              {"\n"}
-              {"                "}
-              <span className={`${styles.span} ${styles.kw}`}>continue</span>
-              {"\n\n"}
-              {"            "}
-              <span className={`${styles.span} ${styles.cm}`}># Eval 形式に変換</span>
-              {"\n"}
-              {"            "}samples.<span className={`${styles.span} ${styles.fn}`}>append</span>
-              (&#123;
-              {"\n"}
-              {"                "}
-              <span className={`${styles.span} ${styles.str}`}>"input"</span>: log[
-              <span className={`${styles.span} ${styles.str}`}>"messages"</span>],
-              {"\n"}
-              {"                "}
-              <span className={`${styles.span} ${styles.str}`}>"ideal"</span>: log[
-              <span className={`${styles.span} ${styles.str}`}>"response"</span>],{" "}
-              <span className={`${styles.span} ${styles.cm}`}># 高評価回答を正解として使用</span>
-              {"\n"}
-              {"                "}
-              <span className={`${styles.span} ${styles.str}`}>"metadata"</span>: &#123;
-              {"\n"}
-              {"                    "}
-              <span className={`${styles.span} ${styles.str}`}>"source"</span>:{" "}
-              <span className={`${styles.span} ${styles.str}`}>"production_log"</span>,{"\n"}
-              {"                    "}
-              <span className={`${styles.span} ${styles.str}`}>"date"</span>: log[
-              <span className={`${styles.span} ${styles.str}`}>"timestamp"</span>],
-              {"\n"}
-              {"                    "}
-              <span className={`${styles.span} ${styles.str}`}>"rating"</span>: log[
-              <span className={`${styles.span} ${styles.str}`}>"user_rating"</span>],
-              {"\n"}
-              {"                "}&#125;
-              {"\n"}
-              {"            "}&#125;)
-              {"\n\n"}
-              {"    "}
-              <span className={`${styles.span} ${styles.cm}`}># JSONL として保存</span>
-              {"\n"}
-              {"    "}
-              <span className={`${styles.span} ${styles.kw}`}>with</span>{" "}
-              <span className={`${styles.span} ${styles.fn}`}>open</span>
-              (output_jsonl, <span className={`${styles.span} ${styles.str}`}>"w"</span>){" "}
-              <span className={`${styles.span} ${styles.kw}`}>as</span> f:
-              {"\n"}
-              {"        "}
-              <span className={`${styles.span} ${styles.kw}`}>for</span> s{" "}
-              <span className={`${styles.span} ${styles.kw}`}>in</span> samples:
-              {"\n"}
-              {"            "}f.<span className={`${styles.span} ${styles.fn}`}>write</span>(json.
-              <span className={`${styles.span} ${styles.fn}`}>dumps</span>(s, ensure_ascii=
-              <span className={`${styles.span} ${styles.kw}`}>False</span>) +{" "}
-              <span className={`${styles.span} ${styles.str}`}>"\n"</span>){"\n\n"}
-              {"    "}
-              <span className={`${styles.span} ${styles.fn}`}>print</span>(
-              <span className={`${styles.span} ${styles.str}`}>
-                f"生成サンプル数: &#123;len(samples)&#125;"
-              </span>
-              ){"\n"}
-              {"    "}
-              <span className={`${styles.span} ${styles.kw}`}>return</span> samples
-            </pre>
-          </div>
-
-          <h3 className={`${styles.h3} ${styles.subH}`}>カスタム Python Evaluator の実装例</h3>
-
-          <div className={styles.codeWrap}>
-            <div className={styles.codeHdr}>
-              <div className={styles.codeDots}>
-                <div className={`${styles.codeDot} ${styles.cdR}`}></div>
-                <div className={`${styles.codeDot} ${styles.cdY}`}></div>
-                <div className={`${styles.codeDot} ${styles.cdG}`}></div>
-              </div>
-              <div className={styles.codeLang}>python — evals/elsuite/custom/code_exec_eval.py</div>
-            </div>
-            <pre className={styles.pre}>
-              <span className={`${styles.span} ${styles.kw}`}>import evals</span>
-              {"\n"}
-              <span className={`${styles.span} ${styles.kw}`}>import evals.metrics</span>
-              {"\n"}
-              <span className={`${styles.span} ${styles.kw}`}>from evals.api</span>{" "}
-              <span className={`${styles.span} ${styles.kw}`}>import CompletionFn</span>
-              {"\n"}
-              <span className={`${styles.span} ${styles.kw}`}>from evals.record</span>{" "}
-              <span className={`${styles.span} ${styles.kw}`}>import RecorderBase</span>
-              {"\n\n"}
-              <span className={`${styles.span} ${styles.kw}`}>class</span>{" "}
-              <span className={`${styles.span} ${styles.fn}`}>CodeExecutionEval</span>(evals.Eval):
-              {"\n"}
-              {"    "}
-              <span className={`${styles.span} ${styles.str}`}>
-                """生成コードが実際に実行可能かを検証する Evaluator"""
-              </span>
-              {"\n\n"}
-              {"    "}
-              <span className={`${styles.span} ${styles.kw}`}>def</span>{" "}
-              <span className={`${styles.span} ${styles.fn}`}>__init__</span>({"\n"}
-              {"        "}self,
-              {"\n"}
-              {"        "}completion_fns: list[CompletionFn],
-              {"\n"}
-              {"        "}samples_jsonl: <span className={`${styles.span} ${styles.fn}`}>str</span>,
-              {"\n"}
-              {"        "}*args, **kwargs
-              {"\n"}
-              {"    "}):
-              {"\n"}
-              {"        "}
-              <span className={`${styles.span} ${styles.fn}`}>super</span>().
-              <span className={`${styles.span} ${styles.fn}`}>__init__</span>(completion_fns, *args,
-              **kwargs)
-              {"\n"}
-              {"        "}self.samples_jsonl = samples_jsonl
-              {"\n\n"}
-              {"    "}
-              <span className={`${styles.span} ${styles.kw}`}>def</span>{" "}
-              <span className={`${styles.span} ${styles.fn}`}>eval_sample</span>
-              (self, sample, rng):
-              {"\n"}
-              {"        "}
-              <span className={`${styles.span} ${styles.cm}`}>
-                # 1. モデル呼び出し（temperature=0 で決定的出力）
-              </span>
-              {"\n"}
-              {"        "}result = self.completion_fn(
-              {"\n"}
-              {"            "}prompt=sample[
-              <span className={`${styles.span} ${styles.str}`}>"input"</span>],
-              {"\n"}
-              {"            "}temperature=<span className={`${styles.span} ${styles.num}`}>0</span>,
-              {"\n"}
-              {"            "}max_tokens=<span className={`${styles.span} ${styles.num}`}>500</span>
-              ,{"\n"}
-              {"        "}){"\n"}
-              {"        "}code = result.
-              <span className={`${styles.span} ${styles.fn}`}>get_completions</span>()[
-              <span className={`${styles.span} ${styles.num}`}>0</span>]{"\n\n"}
-              {"        "}
-              <span className={`${styles.span} ${styles.cm}`}>
-                # 2. カスタム採点: コードが実行可能か確認
-              </span>
-              {"\n"}
-              {"        "}
-              <span className={`${styles.span} ${styles.kw}`}>try</span>:{"\n"}
-              {"            "}
-              <span className={`${styles.span} ${styles.fn}`}>exec</span>({"\n"}
-              {"                "}
-              <span className={`${styles.span} ${styles.fn}`}>compile</span>(code,{" "}
-              <span className={`${styles.span} ${styles.str}`}>"&lt;string&gt;"</span>,{" "}
-              <span className={`${styles.span} ${styles.str}`}>"exec"</span>), &#123;&#125;
-              {"\n"}
-              {"            "}){"\n"}
-              {"            "}correct = <span className={`${styles.span} ${styles.kw}`}>True</span>
-              {"\n"}
-              {"        "}
-              <span className={`${styles.span} ${styles.kw}`}>except</span> Exception{" "}
-              <span className={`${styles.span} ${styles.kw}`}>as</span> e:
-              {"\n"}
-              {"            "}correct = <span className={`${styles.span} ${styles.kw}`}>False</span>
-              {"\n\n"}
-              {"        "}
-              <span className={`${styles.span} ${styles.cm}`}># 3. 結果を記録</span>
-              {"\n"}
-              {"        "}evals.
-              <span className={`${styles.span} ${styles.fn}`}>record_and_check_match</span>({"\n"}
-              {"            "}prompt=sample[
-              <span className={`${styles.span} ${styles.str}`}>"input"</span>],
-              {"\n"}
-              {"            "}sampled=code,
-              {"\n"}
-              {"            "}expected=<span className={`${styles.span} ${styles.kw}`}>None</span>,{" "}
-              <span className={`${styles.span} ${styles.cm}`}>
-                # 実行可否で判定するため ideal は不使用
-              </span>
-              {"\n"}
-              {"        "}){"\n"}
-              {"        "}
-              <span className={`${styles.span} ${styles.kw}`}>return</span> correct
-              {"\n\n"}
-              {"    "}
-              <span className={`${styles.span} ${styles.kw}`}>def</span>{" "}
-              <span className={`${styles.span} ${styles.fn}`}>run</span>(self, recorder:
-              RecorderBase):
-              {"\n"}
-              {"        "}self.
-              <span className={`${styles.span} ${styles.fn}`}>eval_all_samples</span>(recorder,
-              self.<span className={`${styles.span} ${styles.fn}`}>get_samples</span>())
-              {"\n"}
-              {"        "}events = recorder.
-              <span className={`${styles.span} ${styles.fn}`}>get_events</span>(
-              <span className={`${styles.span} ${styles.str}`}>"match"</span>){"\n"}
-              {"        "}
-              <span className={`${styles.span} ${styles.kw}`}>return</span> &#123;
-              <span className={`${styles.span} ${styles.str}`}>"pass_rate"</span>: evals.metrics.
-              <span className={`${styles.span} ${styles.fn}`}>get_accuracy</span>(events)&#125;
-            </pre>
-          </div>
-        </section>
-
-        {/*  ────────────────────────────────  */}
-        {/*  SECTION 10 — PITFALLS  */}
-        {/*  ────────────────────────────────  */}
-        <section className={styles.section} id="pitfalls">
-          <div className={styles.secLabel}>Chapter 10</div>
-          <div className={styles.secHeader}>
-            <div className={styles.secNum}>10</div>
-            <div>
-              <h2 className={styles.secTitle}>よくある落とし穴と対策</h2>
-              <div className={styles.secSub}>Eval アンチパターン7選 + デバッグフロー</div>
-            </div>
-          </div>
-
-          <h3 className={`${styles.h3} ${styles.subH}`}>Eval アンチパターン一覧</h3>
-
-          <div className={styles.tableWrap}>
-            <table className={styles.table}>
-              <thead className={styles.thead}>
-                <tr className={styles.tr}>
-                  <th className={styles.th}>アンチパターン</th>
-                  <th className={styles.th}>症状</th>
-                  <th className={styles.th}>対策</th>
-                </tr>
-              </thead>
-              <tbody className={styles.tbody}>
-                <tr className={styles.tr}>
-                  <td className={styles.td}>テスト汚染</td>
-                  <td className={styles.td}>スコアは高いのに本番品質が低い</td>
-                  <td className={styles.td}>訓練データと Eval データを厳密に分離</td>
-                </tr>
-                <tr className={styles.tr}>
-                  <td className={styles.td}>メトリクス固執</td>
-                  <td className={styles.td}>accuracy は高いが使いにくい</td>
-                  <td className={styles.td}>複数指標（F1/ROUGE/レイテンシ）を組み合わせる</td>
-                </tr>
-                <tr className={styles.tr}>
-                  <td className={styles.td}>採点者バイアス</td>
-                  <td className={styles.td}>GPT-4o が自分と似た回答を高評価</td>
-                  <td className={styles.td}>採点モデルと被評価モデルを分離する</td>
-                </tr>
-                <tr className={styles.tr}>
-                  <td className={styles.td}>ゴールドセット陳腐化</td>
-                  <td className={styles.td}>半年前の正解が今も有効とは限らない</td>
-                  <td className={styles.td}>四半期ごとにゴールドセットを見直す</td>
-                </tr>
-                <tr className={styles.tr}>
-                  <td className={styles.td}>コスト超過</td>
-                  <td className={styles.td}>Eval に月数万円かかる</td>
-                  <td className={styles.td}>ミニセット戦略 + gpt-4o-mini の活用</td>
-                </tr>
-                <tr className={styles.tr}>
-                  <td className={styles.td}>非再現性</td>
-                  <td className={styles.td}>同じ Eval を走らせても毎回結果が違う</td>
-                  <td className={styles.td}>temperature=0 + seed パラメータを固定</td>
-                </tr>
-                <tr className={styles.tr}>
-                  <td className={styles.td}>過学習 Eval</td>
-                  <td className={styles.td}>Eval スコアだけ最適化してしまう</td>
-                  <td className={styles.td}>ホールドアウトセットを非公開にする</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <h3 className={`${styles.h3} ${styles.subH}`}>スコアが低い時のデバッグフロー</h3>
-
-          <div className={styles.mermaidWrap}>
-            <div className={styles.mermaidLabel}>▸ Eval スコア低下 — 原因特定フローチャート</div>
-            <div id="diag-9" className={styles.mermaid}>
-              <MermaidDiagram chart={DIAGRAM_9} />
-            </div>
-          </div>
-
-          <h3 className={`${styles.h3} ${styles.subH}`}>ハーネスエンジニアリング成熟度モデル</h3>
-
-          <div className={styles.tableWrap}>
-            <table className={styles.table}>
-              <thead className={styles.thead}>
-                <tr className={styles.tr}>
-                  <th className={styles.th}>レベル</th>
-                  <th className={styles.th}>名称</th>
-                  <th className={styles.th}>特徴</th>
-                  <th className={styles.th}>次のステップ</th>
-                </tr>
-              </thead>
-              <tbody className={styles.tbody}>
-                <tr className={styles.tr}>
-                  <td className={styles.td}>Lv.0</td>
-                  <td className={styles.td}>未整備</td>
-                  <td className={styles.td}>手動テストのみ / 評価の仕組みなし</td>
-                  <td className={styles.td}>最小 Eval セットを 20件作成する</td>
-                </tr>
-                <tr className={styles.tr}>
-                  <td className={styles.td}>Lv.1</td>
-                  <td className={styles.td}>基礎</td>
-                  <td className={styles.td}>String Match Eval がある / 手動実行</td>
-                  <td className={styles.td}>CI/CD に Eval を組み込む</td>
-                </tr>
-                <tr className={styles.tr}>
-                  <td className={styles.td}>Lv.2</td>
-                  <td className={styles.td}>自動化</td>
-                  <td className={styles.td}>CI で自動実行 / 合格基準がある</td>
-                  <td className={styles.td}>LLM-as-Judge パターンを追加する</td>
-                </tr>
-                <tr className={styles.tr}>
-                  <td className={styles.td}>Lv.3</td>
-                  <td className={styles.td}>高度化</td>
-                  <td className={styles.td}>本番ログからのフィードバックループがある</td>
-                  <td className={styles.td}>Eval Chain と回帰テストを実装する</td>
-                </tr>
-                <tr className={styles.tr}>
-                  <td className={styles.td}>Lv.4</td>
-                  <td className={styles.td}>最適化</td>
-                  <td className={styles.td}>コスト・精度・速度のトレードオフが最適化</td>
-                  <td className={styles.td}>Fine-tuning サイクルと Eval を連携</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        {/*  ────────────────────────────────  */}
-        {/*  SECTION 11 — SOURCES  */}
-        {/*  ────────────────────────────────  */}
-        <section className={styles.section} id="sources">
-          <div className={styles.secLabel}>Chapter 11</div>
-          <div className={styles.secHeader}>
-            <div
-              className={styles.secNum}
-              style={{ background: "linear-gradient(135deg, #334155, #5a6e8c)" }}
-            >
-              📚
-            </div>
-            <div>
-              <h2 className={styles.secTitle}>参考ソース一覧</h2>
-              <div className={styles.secSub}>公式ドキュメント · ブログ · コミュニティリソース</div>
-            </div>
-          </div>
-
-          <div className={styles.srcList}>
-            <a
-              href="https://github.com/openai/evals"
-              target="_blank"
-              className={`${styles.a} ${styles.srcItem}`}
-              rel="noopener noreferrer"
-            >
-              <div className={styles.srcIcon}>🐙</div>
-              <div className={styles.srcInfo}>
-                <div className={styles.srcTitle}>openai/evals — GitHub（公式リポジトリ）</div>
-                <div className={styles.srcUrl}>https://github.com/openai/evals</div>
-              </div>
-              <span className={`${styles.span} ${styles.srcCat} ${styles.scOai}`}>公式</span>
-              <span className={`${styles.span} ${styles.srcArr}`}>↗</span>
-            </a>
-            <a
-              href="https://github.com/openai/evals/blob/main/README.md"
-              target="_blank"
-              className={`${styles.a} ${styles.srcItem}`}
-              rel="noopener noreferrer"
-            >
-              <div className={styles.srcIcon}>📖</div>
-              <div className={styles.srcInfo}>
-                <div className={styles.srcTitle}>Evals README — セットアップ・CLI リファレンス</div>
-                <div className={styles.srcUrl}>
-                  https://github.com/openai/evals/blob/main/README.md
-                </div>
-              </div>
-              <span className={`${styles.span} ${styles.srcCat} ${styles.scOai}`}>公式</span>
-              <span className={`${styles.span} ${styles.srcArr}`}>↗</span>
-            </a>
-            <a
-              href="https://github.com/openai/evals/blob/main/docs/build-eval.md"
-              target="_blank"
-              className={`${styles.a} ${styles.srcItem}`}
-              rel="noopener noreferrer"
-            >
-              <div className={styles.srcIcon}>🔧</div>
-              <div className={styles.srcInfo}>
-                <div className={styles.srcTitle}>
-                  How to Build an Eval — カスタム Eval 作成ガイド
-                </div>
-                <div className={styles.srcUrl}>
-                  https://github.com/openai/evals/blob/main/docs/build-eval.md
-                </div>
-              </div>
-              <span className={`${styles.span} ${styles.srcCat} ${styles.scOai}`}>公式</span>
-              <span className={`${styles.span} ${styles.srcArr}`}>↗</span>
-            </a>
-            <a
-              href="https://github.com/openai/evals/blob/main/docs/eval-templates.md"
-              target="_blank"
-              className={`${styles.a} ${styles.srcItem}`}
-              rel="noopener noreferrer"
-            >
-              <div className={styles.srcIcon}>📋</div>
-              <div className={styles.srcInfo}>
-                <div className={styles.srcTitle}>
-                  Eval Templates — 組み込み Evaluator クラス一覧
-                </div>
-                <div className={styles.srcUrl}>
-                  https://github.com/openai/evals/blob/main/docs/eval-templates.md
-                </div>
-              </div>
-              <span className={`${styles.span} ${styles.srcCat} ${styles.scOai}`}>公式</span>
-              <span className={`${styles.span} ${styles.srcArr}`}>↗</span>
-            </a>
-            <a
-              href="https://platform.openai.com/docs/guides/evals"
-              target="_blank"
-              className={`${styles.a} ${styles.srcItem}`}
-              rel="noopener noreferrer"
-            >
-              <div className={styles.srcIcon}>🖥️</div>
-              <div className={styles.srcInfo}>
-                <div className={styles.srcTitle}>
-                  OpenAI Platform — Evals ガイド（Dashboard 統合）
-                </div>
-                <div className={styles.srcUrl}>https://platform.openai.com/docs/guides/evals</div>
-              </div>
-              <span className={`${styles.span} ${styles.srcCat} ${styles.scOai}`}>公式</span>
-              <span className={`${styles.span} ${styles.srcArr}`}>↗</span>
-            </a>
-            <a
-              href="https://cookbook.openai.com/examples/evaluation/how_to_eval_abstractive_summarization"
-              target="_blank"
-              className={`${styles.a} ${styles.srcItem}`}
-              rel="noopener noreferrer"
-            >
-              <div className={styles.srcIcon}>🍳</div>
-              <div className={styles.srcInfo}>
-                <div className={styles.srcTitle}>OpenAI Cookbook — LLM-as-Judge パターン実装例</div>
-                <div className={styles.srcUrl}>
-                  https://cookbook.openai.com/examples/evaluation/how_to_eval_abstractive_summarization
-                </div>
-              </div>
-              <span className={`${styles.span} ${styles.srcCat} ${styles.scOai}`}>公式</span>
-              <span className={`${styles.span} ${styles.srcArr}`}>↗</span>
-            </a>
-            <a
-              href="https://platform.openai.com/docs/guides/agents"
-              target="_blank"
-              className={`${styles.a} ${styles.srcItem}`}
-              rel="noopener noreferrer"
-            >
-              <div className={styles.srcIcon}>🤖</div>
-              <div className={styles.srcInfo}>
-                <div className={styles.srcTitle}>
-                  OpenAI Agents SDK — エージェント開発とハーネス統合
-                </div>
-                <div className={styles.srcUrl}>https://platform.openai.com/docs/guides/agents</div>
-              </div>
-              <span className={`${styles.span} ${styles.srcCat} ${styles.scOai}`}>公式</span>
-              <span className={`${styles.span} ${styles.srcArr}`}>↗</span>
-            </a>
-            <a
-              href="https://openai.com/research/evals"
-              target="_blank"
-              className={`${styles.a} ${styles.srcItem}`}
-              rel="noopener noreferrer"
-            >
-              <div className={styles.srcIcon}>🔬</div>
-              <div className={styles.srcInfo}>
-                <div className={styles.srcTitle}>
-                  Introducing Evals — Evals フレームワーク発表・設計思想
-                </div>
-                <div className={styles.srcUrl}>https://openai.com/research/evals</div>
-              </div>
-              <span className={`${styles.span} ${styles.srcCat} ${styles.scOai}`}>公式</span>
-              <span className={`${styles.span} ${styles.srcArr}`}>↗</span>
-            </a>
-            <a
-              href="https://developers.openai.com/codex/learn/best-practices"
-              target="_blank"
-              className={`${styles.a} ${styles.srcItem}`}
-              rel="noopener noreferrer"
-            >
-              <div className={styles.srcIcon}>⚡</div>
-              <div className={styles.srcInfo}>
-                <div className={styles.srcTitle}>
-                  Codex ベストプラクティス — AGENTS.md / TEST.md との統合
-                </div>
-                <div className={styles.srcUrl}>
-                  https://developers.openai.com/codex/learn/best-practices
-                </div>
-              </div>
-              <span className={`${styles.span} ${styles.srcCat} ${styles.scOai}`}>公式</span>
-              <span className={`${styles.span} ${styles.srcArr}`}>↗</span>
-            </a>
-            <a
-              href="https://hamel.dev/blog/posts/evals/"
-              target="_blank"
-              className={`${styles.a} ${styles.srcItem}`}
-              rel="noopener noreferrer"
-            >
-              <div className={styles.srcIcon}>📝</div>
-              <div className={styles.srcInfo}>
-                <div className={styles.srcTitle}>Your AI Product Needs Evals — Hamel Husain</div>
-                <div className={styles.srcUrl}>https://hamel.dev/blog/posts/evals/</div>
-              </div>
-              <span className={`${styles.span} ${styles.srcCat} ${styles.scComm}`}>
-                コミュニティ
-              </span>
-              <span className={`${styles.span} ${styles.srcArr}`}>↗</span>
-            </a>
-            <a
-              href="https://eugeneyan.com/writing/llm-evaluations/"
-              target="_blank"
-              className={`${styles.a} ${styles.srcItem}`}
-              rel="noopener noreferrer"
-            >
-              <div className={styles.srcIcon}>📊</div>
-              <div className={styles.srcInfo}>
-                <div className={styles.srcTitle}>
-                  LLM Evaluations — Eugene Yan（評価指標の選び方）
-                </div>
-                <div className={styles.srcUrl}>https://eugeneyan.com/writing/llm-evaluations/</div>
-              </div>
-              <span className={`${styles.span} ${styles.srcCat} ${styles.scComm}`}>
-                コミュニティ
-              </span>
-              <span className={`${styles.span} ${styles.srcArr}`}>↗</span>
-            </a>
-            <a
-              href="https://github.com/openai/evals/blob/main/docs/custom-eval.md"
-              target="_blank"
-              className={`${styles.a} ${styles.srcItem}`}
-              rel="noopener noreferrer"
-            >
-              <div className={styles.srcIcon}>🛠️</div>
-              <div className={styles.srcInfo}>
-                <div className={styles.srcTitle}>
-                  Custom Eval Documentation — Python Evaluator 実装リファレンス
-                </div>
-                <div className={styles.srcUrl}>
-                  https://github.com/openai/evals/blob/main/docs/custom-eval.md
-                </div>
-              </div>
-              <span className={`${styles.span} ${styles.srcCat} ${styles.scOai}`}>公式</span>
-              <span className={`${styles.span} ${styles.srcArr}`}>↗</span>
-            </a>
-            <a
-              href="https://openai.com/safety"
-              target="_blank"
-              className={`${styles.a} ${styles.srcItem}`}
-              rel="noopener noreferrer"
-            >
-              <div className={styles.srcIcon}>🛡️</div>
-              <div className={styles.srcInfo}>
-                <div className={styles.srcTitle}>OpenAI Safety — セーフティ Eval の考え方</div>
-                <div className={styles.srcUrl}>https://openai.com/safety</div>
-              </div>
-              <span className={`${styles.span} ${styles.srcCat} ${styles.scOai}`}>公式</span>
-              <span className={`${styles.span} ${styles.srcArr}`}>↗</span>
-            </a>
-          </div>
-        </section>
-        {/*  /section sources  */}
-      </main>
-
-      {/*  ═══ FOOTER ═══  */}
-      <footer className={styles.footer}>
-        <div style={{ maxWidth: "1160px", margin: "0 auto" }}>
-          <div
-            style={{
-              fontSize: "13px",
-              color: "var(--text2)",
-              marginBottom: "8px",
-              fontFamily: "var(--disp)",
-              fontWeight: "700",
-            }}
-          >
-            OpenAI ハーネスエンジニアリング 完全ガイド 2026
-          </div>
-          <div>
-            最終更新: 2026年6月（Codex CLI v0.142.4 / GPT-5.5・GPT-5-Codex）｜
-            情報は記載時点のものです。最新情報は
-            <a
-              className={styles.a}
-              href="https://platform.openai.com/docs"
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{ color: "var(--oai)", textDecoration: "none" }}
-            >
-              platform.openai.com/docs
-            </a>
-            を参照してください。
-          </div>
         </div>
-      </footer>
+
+        <article className={styles.prose}>
+          <p>
+            対象読者: Codex CLI / Codex cloud
+            を用いたエージェント駆動開発に取り組む中級〜上級エンジニア
+          </p>
+          <hr />
+
+          {/* Section 1 */}
+          <h2 id="1-はじめに--なぜ評価基盤がハーネスエンジニアリングの核心なのか">
+            <span className={styles.h2Badge}>1</span>
+            <span className={styles.h2Text}>
+              はじめに — なぜ「評価基盤」がハーネスエンジニアリングの核心なのか
+            </span>
+          </h2>
+          <p>
+            2026年2月、OpenAIはエンジニアリングブログで「Harness engineering: leveraging Codex in an
+            agent-first world」という記事を公開した。著者はOpenAIのRyan
+            Lopopolo氏で、3人のエンジニアチームが5ヶ月間、
+            <strong>人間が一行もコードを書かずに</strong>
+            約100万行・1,500件のマージ済みプルリクエストからなる本番プロダクトを構築した実験の報告である。
+          </p>
+          <p>
+            この実験が示した最大の教訓は、エージェントの能力そのものよりも「エージェントを取り巻く環境設計」が開発速度と品質を決定づけるという点にある。人間エンジニアの役割は「コードを書くこと」から「環境を設計し、意図を仕様化し、フィードバックループを構築すること」へ移行した。この環境設計とフィードバックループの総体こそが「ハーネス」であり、それを専門的に設計・運用する営みが「ハーネスエンジニアリング」と呼ばれる。
+          </p>
+          <p className={styles.callout}>
+            感情的な満足感ではなく、エージェントのスループットが人間のレビュー能力を軽々と超えていく状況では、
+            <strong>
+              「良し悪しをどう機械的・継続的に判定するか」という評価基盤こそがハーネスの生命線になる
+            </strong>
+            。人間が全PRを読んでレビューするモデルは、1エンジニアあたり1日3.5件のPRが生成される環境ではそもそも成立しない。したがって、ハーネスエンジニアリングの実務は、突き詰めれば「エージェントの出力品質を自動的・継続的に測定し、悪化を検知し、改善サイクルへ差し戻す仕組み」を組み立てる作業に等しい。本ガイドはこの評価基盤の部分に焦点を絞り、OpenAI
+            Codexというプラットフォーム上でそれをどう実装するかをステップバイステップで解説する。
+          </p>
+          <hr />
+
+          {/* Section 2 */}
+          <h2 id="2-ハーネスエンジニアリングとは何か">
+            <span className={styles.h2Badge}>2</span>
+            <span className={styles.h2Text}>ハーネスエンジニアリングとは何か</span>
+          </h2>
+          <h3 id="21-コンテキストエンジニアリングとの違い">
+            2.1 コンテキストエンジニアリングとの違い
+          </h3>
+          <p>
+            「コンテキストエンジニアリング」が問う問いは「エージェントに何を見せるべきか」であるのに対し、「ハーネスエンジニアリング」が問う問いは「システムは何を防ぎ、何を測定し、何を修正すべきか」である。前者がインプット側の設計だとすれば、後者はアウトプットの検証・強制・フィードバックの設計だと言える。
+          </p>
+          <p>両者は排他的ではなく、実際には積層する関係にある。</p>
+          <div className={styles.mermaidWrap}>
+            <MermaidDiagram chart={DIAGRAM_1} />
+          </div>
+          <p>
+            この7層モデルは、評価がかかる範囲の「近さ」で並べたものである。Layer
+            1はエージェント自身がその場で行う自己採点、Layer
+            7は業界全体で共有される外部標準に基づく評価であり、下に行くほど客観性は増すがフィードバックは遅くなる。優れたハーネスは、この全レイヤーを同時に運用し、速いフィードバック(Layer
+            1〜2)で日々の逸脱を潰しながら、遅いフィードバック(Layer
+            5〜7)で長期的な方向性を検証する。
+          </p>
+          <h3 id="22-openaiの実証実験が示した構造">2.2 OpenAIの実証実験が示した構造</h3>
+          <p>
+            Ryan
+            Lopopolo氏の報告によれば、2025年8月末に空のGitリポジトリへの最初のコミットが行われ、リポジトリ構造・CI設定・フォーマットルール・パッケージマネージャ設定・アプリケーションフレームワークに至るまで、初期スキャフォールド自体がCodex
+            CLI(GPT-5使用)によって生成された。5ヶ月後、リポジトリは約100万行規模となり、3人だったチームは7人に拡大したが、1人あたりのPRスループットはむしろ増加した。同記事はこの体制を「Humans
+            steer. Agents execute.」という一言で要約している。
+          </p>
+          <p>
+            重要なのは、エージェントが生成した成果物には「プロダクトコードとテスト」だけでなく、「CI設定とリリースツール」「内部開発者ツール」「ドキュメントと設計履歴」、そして本ガイドの主題である評価ハーネス(Evaluation
+            harnesses)自体が含まれていたと明記されている点である。つまりOpenAI自身の実験においても、評価基盤はエージェントが自ら構築・改良する対象として扱われていた。
+          </p>
+          <p>
+            参考:{" "}
+            <Ext href="https://openai.com/index/harness-engineering/">
+              Harness engineering: leveraging Codex in an agent-first world (openai.com)
+            </Ext>
+          </p>
+          <hr />
+
+          {/* Section 3 */}
+          <h2 id="3-なぜ評価が継続的でなければならないのか">
+            <span className={styles.h2Badge}>3</span>
+            <span className={styles.h2Text}>なぜ評価が「継続的」でなければならないのか</span>
+          </h2>
+          <h3 id="31-スループット増大とヒューマンqaのボトルネック化">
+            3.1 スループット増大とヒューマンQAのボトルネック化
+          </h3>
+          <p>
+            コード生成のスループットが増えるほど、ボトルネックは「コードを書く速度」から「品質を確認する速度」へ移動する。OpenAIの実験では、これに対応するためにアプリケーションのUI・ログ・メトリクス自体をCodexが直接読み書きできる形にする「アプリケーションの可読化(legibility)」が進められた。git
+            worktreeごとにアプリを起動できるようにし、Chrome DevTools
+            ProtocolをエージェントランタイムにMCP経由で組み込むことで、Codexはバグを再現し、修正を検証し、UI挙動を自ら推論できるようになった。
+          </p>
+          <h3 id="32-エントロピーは自然に増大する">3.2 エントロピーは自然に増大する</h3>
+          <p className={styles.callout}>
+            エージェントは既存パターンを模倣するため、リポジトリ内に不揃いな実装や最適でないパターンが一度でも紛れ込むと、それが複製され続けドリフトが蓄積する。OpenAIのチームは当初、毎週金曜日(稼働時間の20%)を「AIスロップ」の手作業クリーンアップに費やしていたが、これはスケールしないことが早々に判明した。最終的な解は「golden
+            principles」と呼ぶ機械的なルール群をリポジトリに直接エンコードし、定期的なクリーンアップエージェントが逸脱をスキャンして品質グレードを更新し、的を絞ったリファクタリングPRを開くという、継続的な「ガベージコレクション」に相当する仕組みだった。技術的負債は複利で膨らむ高利子の借金に似ており、少しずつ返済し続ける方が、溜め込んで痛みを伴う形で一括処理するより常に有利だという整理である。
+          </p>
+          <p>
+            この「継続的に少しずつ検出・修正する」設計思想こそが、次章で扱う評価基盤の各レイヤーに共通する原則である。
+          </p>
+          <hr />
+
+          {/* Quicknav Grid */}
+          <div className={styles.quicknavWrap}>
+            <div className={styles.quicknavKicker}>
+              評価基盤の7層モデル — クイックナビゲーション
+            </div>
+            <div className={styles.quicknavGrid}>
+              <a
+                className={`${styles.quicknavCard} ${styles.cardL1}`}
+                href="#41-layer-1-セッション内自己検証ループralph-wiggum-loop"
+              >
+                <span className={styles.quicknavBadge}>L1</span>
+                <span className={styles.quicknavTitle}>
+                  セッション内自己検証ループ(Ralph Wiggum Loop)
+                </span>
+                <span className={styles.quicknavDesc}>
+                  エージェント自身がその場で行う自己レビュー。最速だが最も主観的なフィードバック。
+                </span>
+              </a>
+              <a
+                className={`${styles.quicknavCard} ${styles.cardL2}`}
+                href="#42-layer-2-リポジトリレベルのメカニカル強制"
+              >
+                <span className={styles.quicknavBadge}>L2</span>
+                <span className={styles.quicknavTitle}>リポジトリレベルのメカニカル強制</span>
+                <span className={styles.quicknavDesc}>
+                  Linter・構造テスト・QUALITY_SCORE.mdでリポジトリの構造そのものを強制する。
+                </span>
+              </a>
+              <a
+                className={`${styles.quicknavCard} ${styles.cardL3}`}
+                href="#43-layer-3-ランタイムオブザーバビリティによる実行時検証"
+              >
+                <span className={styles.quicknavBadge}>L3</span>
+                <span className={styles.quicknavTitle}>
+                  ランタイム・オブザーバビリティによる実行時検証
+                </span>
+                <span className={styles.quicknavDesc}>
+                  Vector→Victoria Logs/Metrics/TracesでCodex自身が実行時の挙動を検証する。
+                </span>
+              </a>
+              <a
+                className={`${styles.quicknavCard} ${styles.cardL4}`}
+                href="#44-layer-4-cicdにおける非対話型品質ゲートcodex-exec"
+              >
+                <span className={styles.quicknavBadge}>L4</span>
+                <span className={styles.quicknavTitle}>
+                  CI/CDにおける非対話型品質ゲート(codex exec)
+                </span>
+                <span className={styles.quicknavDesc}>
+                  codex exec --output-schemaでPRごとに構造化された合否判定を返す。
+                </span>
+              </a>
+              <a
+                className={`${styles.quicknavCard} ${styles.cardL5}`}
+                href="#45-layer-5-プラットフォームevals--tracesgradersdatasetseval-runsのフライホイール"
+              >
+                <span className={styles.quicknavBadge}>L5</span>
+                <span className={styles.quicknavTitle}>
+                  プラットフォームEvals — Traces・Graders・Datasets・Eval Runsのフライホイール
+                </span>
+                <span className={styles.quicknavDesc}>
+                  Traces→Graders→Datasets→Eval Runsのフライホイールで継続的にベンチマークする。
+                </span>
+              </a>
+              <a
+                className={`${styles.quicknavCard} ${styles.cardL6}`}
+                href="#46-layer-6-外部標準ベンチマーク--swe-bench-verifiedとterminal-bench-20--harbor"
+              >
+                <span className={styles.quicknavBadge}>L6</span>
+                <span className={styles.quicknavTitle}>
+                  外部標準ベンチマーク — SWE-bench VerifiedとTerminal-Bench 2.0 / Harbor
+                </span>
+                <span className={styles.quicknavDesc}>
+                  SWE-Bench VerifiedやTerminal-Bench 2.0で業界標準に対する立ち位置を測る。
+                </span>
+              </a>
+              <a
+                className={`${styles.quicknavCard} ${styles.cardL7}`}
+                href="#47-layer-7-継続的セキュリティ評価codex-security-cli"
+              >
+                <span className={styles.quicknavBadge}>L7</span>
+                <span className={styles.quicknavTitle}>
+                  継続的セキュリティ評価(Codex Security CLI)
+                </span>
+                <span className={styles.quicknavDesc}>
+                  Codex Security CLIによる継続的な脆弱性スキャンとSARIF連携。
+                </span>
+              </a>
+            </div>
+          </div>
+
+          {/* Section 4 */}
+          <h2 id="4-評価基盤の7層モデル--詳細解説">
+            <span className={styles.h2Badge}>4</span>
+            <span className={styles.h2Text}>評価基盤の7層モデル — 詳細解説</span>
+          </h2>
+
+          {/* 4.1 */}
+          <h3
+            className={`${styles.layerH3} ${styles.layer1}`}
+            id="41-layer-1-セッション内自己検証ループralph-wiggum-loop"
+          >
+            4.1 Layer 1: セッション内自己検証ループ(Ralph Wiggum Loop)
+          </h3>
+          <p>
+            もっとも速いフィードバックは、エージェント自身がその場で行う自己レビューである。OpenAIのハーネスでは、Codexに対して「自分の変更をローカルでレビューし、ローカル/クラウド双方で追加のエージェントレビューを要求し、人間またはエージェントからのフィードバックに対応し、すべてのレビュアーが満足するまでループする」ことを指示している。この反復パターンは、Geoffrey
+            Huntley氏が命名した「Ralph Wiggum Loop」(単純な{" "}
+            <code>while :; do cat PROMPT.md | agent; done</code>{" "}
+            型のループ)の一種として、OpenAIの記事内でも明示的に言及されている。
+          </p>
+          <div className={styles.mermaidWrap}>
+            <MermaidDiagram chart={DIAGRAM_2} />
+          </div>
+          <p>
+            このレイヤーの評価基準は、人間が書いた固定チェックリストではなく、Codex自身が読み書きできる{" "}
+            <code>gh</code>{" "}
+            コマンド・ローカルスクリプト・リポジトリ埋め込みのSkillといった標準開発ツールを介して動的に決まる。人間がCLIへコピー&amp;ペーストして文脈を渡す必要がない点が要である。
+          </p>
+
+          {/* 4.2 */}
+          <h3
+            className={`${styles.layerH3} ${styles.layer2}`}
+            id="42-layer-2-リポジトリレベルのメカニカル強制"
+          >
+            4.2 Layer 2: リポジトリレベルのメカニカル強制
+          </h3>
+          <p>
+            Layer 1は「本人任せ」の評価だが、Layer
+            2は「構造そのものが逸脱を許さない」設計である。OpenAIのハーネスでは、各ビジネスドメインを固定の層(Types
+            → Config → Repo → Providers → Service → Runtime →
+            UI)に分割し、依存方向を厳格に制限している。横断的関心事(認証・コネクタ・テレメトリ・フィーチャーフラグ)は「Providers」という単一の明示的インターフェースを通じてのみ入り込める。
+          </p>
+          <div className={styles.mermaidWrap}>
+            <MermaidDiagram chart={DIAGRAM_3} />
+          </div>
+          <p>
+            この依存方向は人間のレビューではなく、Codex自身が生成したカスタムLinterと構造テストによって機械的に強制される。構造化ロギングやスキーマ・型の命名規則、ファイルサイズ上限、プラットフォーム固有の信頼性要件も同様にカスタムLintでチェックされる。Lintのエラーメッセージには、その場でエージェントへ是正手順を注入できるよう、修復手順そのものが埋め込まれている点が実務上のポイントである。
+          </p>
+          <p>
+            さらに、リポジトリの <code>docs/</code> ディレクトリには <code>QUALITY_SCORE.md</code>{" "}
+            のような「各プロダクトドメイン・各アーキテクチャ層を採点し、経時的なギャップを追跡する」文書が置かれ、これ自体がエージェントによって定期的に更新される。加えて「doc-gardening」エージェントが、実際のコード挙動と乖離した古いドキュメントをスキャンし、修正PRを自動的に開く。これらは、コードそのものではなく「リポジトリの整合性・鮮度」を継続測定する評価基盤の一形態である。
+          </p>
+          <p>
+            参考:{" "}
+            <Ext href="https://openai.com/index/harness-engineering/">
+              Harness engineering: leveraging Codex in an agent-first world (openai.com)
+            </Ext>{" "}
+            /{" "}
+            <Ext href="https://cookbook.openai.com/articles/codex_exec_plans">
+              Using PLANS.md for multi-hour problem solving (OpenAI Cookbook)
+            </Ext>
+          </p>
+
+          {/* 4.3 */}
+          <h3
+            className={`${styles.layerH3} ${styles.layer3}`}
+            id="43-layer-3-ランタイムオブザーバビリティによる実行時検証"
+          >
+            4.3 Layer 3: ランタイム・オブザーバビリティによる実行時検証
+          </h3>
+          <p>
+            静的な構造チェックだけでは「動くかどうか」は分からない。OpenAIのハーネスは、ログ・メトリクス・トレースをVectorで収集し、Victoria
+            Logs / Victoria Metrics / Victoria
+            Tracesへファンアウトするローカル観測可能性スタックを、git
+            worktreeごとにエフェメラルに立ち上げている。Codexはこれを LogQL・PromQL・TraceQL
+            で問い合わせ、相関分析を行った上で修正を実装し、アプリを再起動して同じワークロードやUIシナリオを再実行するというループを回す。
+          </p>
+          <div className={styles.mermaidWrap}>
+            <MermaidDiagram chart={DIAGRAM_4} />
+          </div>
+          <p>
+            このレイヤーによって、「サービス起動を800ミリ秒未満で完了させる」「4つの重要なユーザージャーニーのどのスパンも2秒を超えない」といった、これまで自然言語では扱いにくかった性能要件がCodexにとって実行可能なタスクになる。あわせて、Chrome
+            DevTools
+            Protocolをランタイムに組み込み、DOMスナップショット・スクリーンショット・ナビゲーションを扱うSkillを用意することで、Codexはブラウザ操作を伴うUIバグの再現・修正検証も自律的に行えるようになる。単一のCodex実行が(人間が眠っている間に)6時間以上にわたり1つのタスクへ取り組み続けるケースも珍しくないという。
+          </p>
+
+          {/* 4.4 */}
+          <h3
+            className={`${styles.layerH3} ${styles.layer4}`}
+            id="44-layer-4-cicdにおける非対話型品質ゲートcodex-exec"
+          >
+            4.4 Layer 4: CI/CDにおける非対話型品質ゲート(codex exec)
+          </h3>
+          <p>
+            ここからは、エージェントの実行そのものを人間の監督なしにパイプライン化するレイヤーである。Codex
+            CLIには <code>codex exec</code>{" "}
+            という非対話モードが用意されており、対話TUIを開かずにスクリプトやCIジョブから起動できる。実行結果は終了コードで成否を判定でき、
+            <code>--json</code>{" "}
+            フラグで各イベント(コマンド実行・ファイル変更・エージェントメッセージ)を構造化されたJSONLストリームとして取得できるため、下流ツールでの機械的な判定に使いやすい。
+          </p>
+          <p>
+            さらに <code>--output-schema</code> を指定すると、最終出力をJSON
+            Schemaに準拠させることができる。たとえばPRレビューを「severity(重大度)」「issues(配列)」「summary(要約)」を持つ構造で返させれば、
+            <code>jq</code> や後続のGitHub
+            PRコメント投稿ツールへそのまま渡せる、採点可能なデータになる。
+          </p>
+          <div className={styles.mermaidWrap}>
+            <MermaidDiagram chart={DIAGRAM_5} />
+          </div>
+          <p>
+            GitHub Actions環境では、CLIを自前でインストールしAPIキーを渡すよりも{" "}
+            <code>openai/codex-action</code> を使う方が安全とされている。このアクションはCodex
+            CLIのインストールとResponses
+            APIプロキシの起動を代行し、リポジトリを直接チェックアウトするジョブに{" "}
+            <code>OPENAI_API_KEY</code>{" "}
+            をジョブレベル環境変数として置かないよう案内している(ビルドスクリプトやテスト、依存パッケージのライフサイクルフック経由でキーが読み取られる懸念があるため)。CI専用には{" "}
+            <code>CODEX_API_KEY</code> という別名の環境変数を使うのが定石である。
+          </p>
+          <div className={styles.tableScroll}>
+            <table>
+              <thead>
+                <tr className="header">
+                  <th>フラグ / 環境変数</th>
+                  <th>用途</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr className="odd">
+                  <td>
+                    <code>codex exec &quot;&lt;task&gt;&quot;</code>
+                  </td>
+                  <td>
+                    非対話モードでタスクを1回実行し、標準エラーへ進捗、標準出力へ最終メッセージを出す
+                  </td>
+                </tr>
+                <tr className="even">
+                  <td>
+                    <code>--json</code>
+                  </td>
+                  <td>
+                    各イベントを構造化JSONLとしてストリーム出力し、
+                    <code>jq</code> 等で機械的に解析する
+                  </td>
+                </tr>
+                <tr className="odd">
+                  <td>
+                    <code>--output-schema &lt;file&gt;</code>
+                  </td>
+                  <td>
+                    最終出力をJSON Schemaに準拠させ、severityなどのフィールドで自動採点しやすくする
+                  </td>
+                </tr>
+                <tr className="even">
+                  <td>
+                    <code>--ephemeral</code>
+                  </td>
+                  <td>セッションのrolloutファイルをディスクへ永続化しない(CIで推奨)</td>
+                </tr>
+                <tr className="odd">
+                  <td>
+                    <code>--sandbox read-only / workspace-write</code>
+                  </td>
+                  <td>エージェントに与える権限範囲を明示指定する</td>
+                </tr>
+                <tr className="even">
+                  <td>
+                    <code>CODEX_API_KEY</code>
+                  </td>
+                  <td>
+                    CI専用の資格情報(<code>OPENAI_API_KEY</code>{" "}
+                    をジョブ環境変数に直接置くことは非推奨)
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            参考:{" "}
+            <Ext href="https://developers.openai.com/codex/non-interactive-mode">
+              Non-interactive mode (developers.openai.com)
+            </Ext>{" "}
+            /{" "}
+            <Ext href="https://developers.openai.com/codex/github-action">
+              Codex GitHub Action (developers.openai.com)
+            </Ext>
+          </p>
+
+          {/* 4.5 */}
+          <h3
+            className={`${styles.layerH3} ${styles.layer5}`}
+            id="45-layer-5-プラットフォームevals--tracesgradersdatasetseval-runsのフライホイール"
+          >
+            4.5 Layer 5: プラットフォームEvals — Traces・Graders・Datasets・Eval
+            Runsのフライホイール
+          </h3>
+          <p>
+            Codex自体のCI組み込みが「タスクが1件成功したか」を判定するのに対し、OpenAI
+            PlatformのEvals機能群は「エージェントの振る舞いが時間軸・変更軸でどう変化しているか」を体系的に追跡するためのものである。公式ドキュメントは、この評価基盤を次の順序で育てていくことを推奨している。
+          </p>
+          <ol type="1">
+            <li>
+              <strong>Trace grading(トレース評価)</strong>:
+              まだ挙動をデバッグしている段階では、1回の実行におけるモデル呼び出し・ツール呼び出し・ガードレール・ハンドオフの一連の記録である「トレース」を採取し、それをGraderで採点する。「正しいツールを選んだか」「ハンドオフは適切なタイミングで発生したか」「ワークフローが指示や安全ポリシーに違反していないか」といった問いに答えるのに向く。
+            </li>
+            <li>
+              <strong>Datasets &amp; Eval Runs(データセットと評価実行)</strong>:
+              「良い」の基準が固まったら、個別トレースの確認から、再現可能なデータセットと評価実行(Eval
+              Run)へ移行する。これにより、プロンプトやモデルの変更を継続的にベンチマークし、時系列で比較できるようになる。
+            </li>
+            <li>
+              <strong>外部モデルとの比較やバッチ評価</strong>
+              など高度な機能が必要な場合は、Evals APIをデータセットと組み合わせて使う。
+            </li>
+          </ol>
+          <div className={styles.mermaidWrap}>
+            <MermaidDiagram chart={DIAGRAM_6} />
+          </div>
+          <p>Graderには複数の型があり、判定したい品質の性質に応じて使い分ける。</p>
+          <div className={styles.tableScroll}>
+            <table>
+              <thead>
+                <tr className="header">
+                  <th>グレーダー種類</th>
+                  <th>判定方法</th>
+                  <th>適したケース</th>
+                  <th>出力</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr className="odd">
+                  <td>
+                    <code>string_check</code>
+                  </td>
+                  <td>
+                    <code>eq</code> / <code>ne</code> / <code>like</code> / <code>ilike</code>{" "}
+                    による文字列比較
+                  </td>
+                  <td>決定的な正解文字列がある場合</td>
+                  <td>0 または 1</td>
+                </tr>
+                <tr className="even">
+                  <td>
+                    <code>text_similarity</code>
+                  </td>
+                  <td>
+                    <code>fuzzy_match</code> / <code>bleu</code> / <code>rouge_l</code>{" "}
+                    などの類似度指標
+                  </td>
+                  <td>表現ゆれはあるが意味的に近い正解がある場合</td>
+                  <td>0.0〜1.0</td>
+                </tr>
+                <tr className="odd">
+                  <td>
+                    <code>python</code> (<code>PythonGrader</code>)
+                  </td>
+                  <td>
+                    任意のPythonコードを実行し <code>grade</code> 関数の戻り値を採点に使う
+                  </td>
+                  <td>テスト実行結果・静的解析結果など機械的に判定できるもの</td>
+                  <td>浮動小数点値</td>
+                </tr>
+                <tr className="even">
+                  <td>
+                    <code>score_model</code> (<code>ScoreModelGrader</code>)
+                  </td>
+                  <td>LLMに0.0〜1.0のスコアを付けさせる</td>
+                  <td>文章のトーンや設計の妥当性など主観が絡む品質評価</td>
+                  <td>0.0〜1.0</td>
+                </tr>
+                <tr className="odd">
+                  <td>
+                    <code>label_model</code> (<code>LabelModelGrader</code>)
+                  </td>
+                  <td>LLMにカテゴリラベルを付与させ、合格ラベル集合と照合する</td>
+                  <td>合格/不合格、深刻度カテゴリなどの分類</td>
+                  <td>ラベル文字列</td>
+                </tr>
+                <tr className="even">
+                  <td>
+                    <code>multi_grader</code> (<code>MultiGrader</code>)
+                  </td>
+                  <td>複数グレーダーの結果を計算式で合成する</td>
+                  <td>複数基準を重み付けして総合スコアにしたい場合</td>
+                  <td>合成スコア</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            なお、モデルグレーダーを使う際は「グレーダーハッキング(reward
+            hacking)」に注意する必要がある。モデルが採点基準の弱点を学習してしまい、モデルグレーダーの評価では高得点でも、専門家による人手評価では低品質という乖離が生じることがある。これを検知するために、モデルグレーダーによる評価と専門家による人手評価の両方を定期的に突き合わせることが推奨されている。
+          </p>
+          <p>
+            参考:{" "}
+            <Ext href="https://developers.openai.com/api/docs/guides/agent-evals">
+              Evaluate agent workflows (developers.openai.com)
+            </Ext>{" "}
+            /{" "}
+            <Ext href="https://developers.openai.com/api/docs/guides/graders">
+              Graders (developers.openai.com)
+            </Ext>
+          </p>
+
+          {/* 4.6 */}
+          <h3
+            className={`${styles.layerH3} ${styles.layer6}`}
+            id="46-layer-6-外部標準ベンチマーク--swe-bench-verifiedとterminal-bench-20--harbor"
+          >
+            4.6 Layer 6: 外部標準ベンチマーク — SWE-bench VerifiedとTerminal-Bench 2.0 / Harbor
+          </h3>
+          <p>
+            自社ハーネス内部の評価だけでは、「今使っているモデルやエージェント設定が業界の到達点に対してどの位置にあるか」は分からない。ここで外部の標準ベンチマークが役割を果たす。
+          </p>
+          <p>
+            <strong>SWE-Bench Verified</strong>は、実世界のGitHub
+            issue解決能力を人手検証済みのタスクセットで測る、コーディングエージェント評価のデファクトスタンダードの一つである。著名な独立系のAI論評者であるSimon
+            Willison氏は、2025年11月のGPT-5.1-Codex-Max発表時に、OpenAIが自己申告したSWE-Bench
+            Verifiedスコアが reasoning
+            effort「high」で76.5%、新設の「xhigh」で77.9%だったと報告しており、これはGemini 3
+            Pro(76.2%)やClaude Sonnet 4.5(77.2%)をわずかに上回る水準だったと分析している。
+          </p>
+          <p>
+            <strong>Terminal-Bench 2.0</strong>は、Stanford大学とLaude Instituteが主導し、Snorkel
+            AIなどが貢献するオープンな端末操作エージェント評価ベンチマークである。89件のタスクがそれぞれ独立したDockerコンテナで実行され、シェルスクリプティング、システム管理、暗号、COBOLの現代化、科学技術系Pythonの移植など16カテゴリにまたがる難易度別タスクで構成される。同時にリリースされた
+            <strong>Harbor</strong>
+            は、クラウド上のコンテナへ並列にロールアウトを展開できる評価ハーネスで、Daytona・Modalなど複数プロバイダに対応し、任意のエージェントアーキテクチャに対して汎用的に使えるよう設計されている。VentureBeatの報道によれば、Terminal-Bench
+            2.0発表当初のリーダーボードではOpenAIのCodex
+            CLIが49.6%のタスク成功率で首位に立っていた。Simon
+            Willison氏も、GPT-5.1-Codex-MaxがTerminal Bench 2.0で58.1%を記録し、Gemini 3
+            Pro(54.2%)やSonnet 4.5(42.8%)を上回ったと報告している。
+          </p>
+          <div className={styles.mermaidWrap}>
+            <MermaidDiagram chart={DIAGRAM_7} />
+          </div>
+          <div className={styles.tableScroll}>
+            <table>
+              <thead>
+                <tr className="header">
+                  <th>ベンチマーク</th>
+                  <th>測定対象</th>
+                  <th>特徴</th>
+                  <th>参考スコア(2025年11月時点、自己申告含む)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr className="odd">
+                  <td>SWE-Bench Verified</td>
+                  <td>実世界のGitHub issue解決</td>
+                  <td>人手検証済みタスクセット</td>
+                  <td>GPT-5.1-Codex-Max: high 76.5% / xhigh 77.9%</td>
+                </tr>
+                <tr className="even">
+                  <td>Terminal-Bench 2.0</td>
+                  <td>端末操作タスク(89件・コンテナ隔離)</td>
+                  <td>Harborによる並列コンテナ評価、milestone報酬</td>
+                  <td>GPT-5.1-Codex-Max: 58.1%(初期リーダーボードではCodex CLIが49.6%で首位)</td>
+                </tr>
+                <tr className="odd">
+                  <td>HumanEval</td>
+                  <td>関数単位のコード生成</td>
+                  <td>pass@1 / pass@100</td>
+                  <td>参考: 初代Codex 12Bモデルでpass@1 28.8%</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            社内ハーネスの設計にこれらのベンチマークを組み込む実務上の意義は、単に「流行りの数字を追う」ことではない。むしろ、自社のタスク分布に近い公開ベンチマークのサブセットを定点観測し、モデルのバージョンアップやreasoning
+            effortの変更が自社ワークロードにどう波及するかを、外部の再現可能な基準に照らして事前に把握することにある。
+          </p>
+          <p>
+            参考:{" "}
+            <Ext href="https://simonwillison.net/tags/gpt-codex/">Simon Willison on gpt-codex</Ext>{" "}
+            / <Ext href="https://simonwillison.net/tags/evals/">Simon Willison on evals</Ext> /{" "}
+            <Ext href="https://venturebeat.com/ai/terminal-bench-2-0-launches-alongside-harbor-a-new-framework-for-testing">
+              Terminal-Bench 2.0 launches alongside Harbor (VentureBeat)
+            </Ext>{" "}
+            /{" "}
+            <Ext href="https://www.tbench.ai/news/announcement-2-0">
+              Introducing Terminal-Bench 2.0 and Harbor (tbench.ai)
+            </Ext>
+          </p>
+
+          {/* 4.7 */}
+          <h3
+            className={`${styles.layerH3} ${styles.layer7}`}
+            id="47-layer-7-継続的セキュリティ評価codex-security-cli"
+          >
+            4.7 Layer 7: 継続的セキュリティ評価(Codex Security CLI)
+          </h3>
+          <p>
+            品質測定はコードの正しさだけでなく、セキュリティ面の継続監査も含む。OpenAIは2026年7月末、内部では「Aardvark」と呼ばれていたセキュリティレビュー機能を、Apache
+            2.0ライセンスのオープンソースCLIツール <code>@openai/codex-security</code>{" "}
+            として公開した。このツールは単一リポジトリのスキャンだけでなく、GitHub上のリポジトリをまとめて検出する、あるいはCSVインベントリから再開可能なキャンペーンとして実行する「bulk-scan」に対応しており、組織全体のリポジトリ群を継続的に棚卸しする用途を想定している。
+          </p>
+          <p>
+            CI組み込みの観点では、プルリクエストの差分だけを対象にスキャンする <code>--diff</code>{" "}
+            オプション、結果をSARIF形式でアップロードするサポート、重大度に基づくポリシー設定が提供されている。認証面では、対話的な利用ではChatGPTサインインが使われる一方、CIやJSON/JSONL出力など非対話コンテキストでは環境変数のAPIキーがデフォルトで使われるという振り分けになっている。スキャン結果は人間可読な{" "}
+            <code>report.md</code> に加え、<code>findings.json</code> や <code>coverage.json</code>{" "}
+            といった機械可読アーティファクトとしても出力されるため、Layer 4のCIゲートやLayer
+            5のダッシュボードへそのまま接続できる。
+          </p>
+          <p>
+            参考:{" "}
+            <Ext href="https://github.com/openai/codex-security">
+              openai/codex-security (GitHub)
+            </Ext>{" "}
+            /{" "}
+            <Ext href="https://developers.openai.com/codex/security">
+              Codex Security (developers.openai.com)
+            </Ext>{" "}
+            /{" "}
+            <Ext href="https://the-decoder.com/openai-open-sources-codex-security-cli-to-help-developers-find-and-fix-vulnerabilities-from-the-command-line/">
+              OpenAI open-sources Codex Security CLI (the-decoder.com)
+            </Ext>
+          </p>
+          <hr />
+
+          {/* Section 5 */}
+          <h2 id="5-ステップバイステップ実装ガイド">
+            <span className={styles.h2Badge}>5</span>
+            <span className={styles.h2Text}>ステップバイステップ実装ガイド</span>
+          </h2>
+          <p>
+            以下は、上記7層モデルを実際のリポジトリへ段階的に導入する際の推奨順序である。小さなプロジェクトであっても、Step
+            1〜4は初日から着手できる規模感で設計してある。
+          </p>
+          <h3 id="step-1-agentsmdを目次として設計する">
+            Step 1: AGENTS.mdを「目次」として設計する
+          </h3>
+          <p>
+            OpenAIのチームは当初「一つの巨大なAGENTS.md」を試みたが、これは失敗パターンだと結論づけている。理由は、コンテキストが希少資源であり巨大な指示ファイルがタスクやコードそのものを押し出してしまうこと、すべてが「重要」だと何も重要でなくなること、モノリシックなファイルは即座に陳腐化すること、そして単一の塊は機械的なチェック(網羅性・鮮度・所有者・相互リンク)になじまないことである。
+          </p>
+          <p>
+            そこでAGENTS.mdは百科事典ではなく「目次」として扱い、実体は{" "}
+            <code>docs/design-docs/</code> <code>docs/exec-plans/</code>{" "}
+            <code>docs/product-specs/</code> <code>docs/references/</code>{" "}
+            といった構造化ディレクトリに置く。専用のLinterとCIジョブが、この知識ベースが最新で相互リンクされ正しく構造化されているかを検証し、実態と乖離した記述を検出する「doc-gardening」エージェントが定期的に修正PRを開く。これ自体が、リポジトリのドキュメント品質を継続測定する評価基盤の一部である。
+          </p>
+          <h3 id="step-2-plansmdexecplansで長時間タスクの検証可能性を担保する">
+            Step 2: PLANS.md(ExecPlans)で長時間タスクの検証可能性を担保する
+          </h3>
+          <p>
+            複雑な機能追加やリファクタリングでは、単発のプロンプトではなく「ExecPlan」という生きた設計文書を使う。OpenAI
+            Cookbookが公開しているテンプレートは、<code>Progress</code>
+            (チェックリスト形式の進捗)・<code>Surprises &amp; Discoveries</code>
+            (想定外の発見)・<code>Decision Log</code>(意思決定記録)・
+            <code>Outcomes &amp; Retrospective</code>
+            (成果の振り返り)という4つの必須セクションを持つことを要求する。これらのセクションは、7時間を超えるような長時間の単一エージェント実行であっても、途中経過と意思決定の根拠を後から検証可能にするための「監査ログ」として機能する。評価基盤の観点では、このExecPlanこそが「その変更が何を達成しようとしたか」という受け入れ基準(Acceptance)の一次情報源になる。
+          </p>
+          <h3 id="step-3-アーキテクチャをメカニカルに強制する">
+            Step 3: アーキテクチャをメカニカルに強制する
+          </h3>
+          <p>
+            4.2節で述べたレイヤードアーキテクチャとカスタムLinterを整備する。ポイントは、実装の細部を規定するのではなく「不変条件(invariant)」だけを強制することである。境界でのデータ形状のパースを義務付けるが、それをZodで行うかどうかは指定しない、といった具合に、境界は厳格に・境界内の自由度は大きく保つのが基本方針である。
+          </p>
+          <h3 id="step-4-ローカルオブザーバビリティスタックを構築する">
+            Step 4: ローカルオブザーバビリティスタックを構築する
+          </h3>
+          <p>
+            4.3節のVector→Victoria
+            Logs/Metrics/Tracesのようなスタックをworktreeごとにエフェメラルに立ち上げられるようにする。最初から完璧な可観測性を目指す必要はなく、「サービス起動時間」や「重要ユーザージャーニーのレイテンシ」など、まず1〜2個の定量指標をCodexが自分で問い合わせられるようにするところから始めるのが現実的である。
+          </p>
+          <h3 id="step-5-codex-execでcicdに非対話型の品質ゲートを組み込む">
+            Step 5: codex execでCI/CDに非対話型の品質ゲートを組み込む
+          </h3>
+          <p>
+            4.4節の <code>openai/codex-action</code> と <code>codex exec --output-schema</code>{" "}
+            を使い、PRごとに構造化された品質レポートを生成する。最初のうちはブロッキングではなく「コメントを残すだけ」の緩いゲートから始め、誤検知率が十分下がった段階で重大度に応じたマージブロックへ昇格させると、開発フローへの摩擦を抑えられる。
+          </p>
+          <h3 id="step-6-openai-evals-apiでドメイン固有のグレーダーを構築する">
+            Step 6: OpenAI Evals APIでドメイン固有のグレーダーを構築する
+          </h3>
+          <p>
+            Traceを最初は目視で確認し、「良い」の基準が言語化できたら、その基準を4.5節のグレーダー(string_check・python・score_model・label_modelなど)としてコード化し、DatasetとEval
+            Runへ昇格させる。重要なのは、最初から巨大な評価スイートを作ろうとしないことである。1〜2個の高頻度な失敗モードに対応するグレーダーから始め、Eval
+            Runの結果を見ながら段階的に拡張するのが、Traces→Graders→Datasets→Eval
+            Runsというフライホイールの回し方として推奨されている進め方である。
+          </p>
+          <h3 id="step-7-外部ベンチマークで継続的にモデル設定を評価する">
+            Step 7: 外部ベンチマークで継続的にモデル/設定を評価する
+          </h3>
+          <p>
+            4.6節のSWE-Bench VerifiedやTerminal-Bench
+            2.0/Harborのような外部ベンチマークを、モデルのバージョンアップやreasoning
+            effort変更のたびに(あるいは定期的に)自社のタスク分布に近いサブセットで再実行し、内部Eval
+            Runの結果と突き合わせる。これにより、「モデルが賢くなった」という抽象的な期待と、「自社の具体的なワークロードでも実際に改善したか」という実測を切り分けられる。
+          </p>
+          <h3 id="step-8-codex-security-cliで継続的セキュリティスキャンを組み込む">
+            Step 8: Codex Security CLIで継続的セキュリティスキャンを組み込む
+          </h3>
+          <p>
+            4.7節のツールをまずは非クリティカルな1つのサービスに対してローカル実行し、誤検知傾向を把握したうえで、PR差分スキャン(
+            <code>--diff</code>
+            )をCIに追加し、重大度「high」以上のみをブロック対象とするような段階的な導入が現実的である。組織全体のリポジトリ棚卸しにはbulk-scanを用いる。
+          </p>
+          <h3 id="step-9-エントロピー対策--golden-principlesとgarbage-collection">
+            Step 9: エントロピー対策 — Golden PrinciplesとGarbage Collection
+          </h3>
+          <p>
+            Step
+            1〜8がすべて機能しても、時間とともにパターンの不揃いは蓄積する。3.2節で述べた通り、これに対する解は人手による一括クリーンアップではなく、機械的なルール(golden
+            principles)をリポジトリに明文化し、定期実行される背景タスクが逸脱をスキャンして品質グレードを更新し、小さなリファクタリングPRを自動的に開き続けることである。1分以内でレビューでき自動マージできる粒度に保つことが、このループが破綻しない鍵になる。
+          </p>
+          <hr />
+
+          {/* Section 6 */}
+          <h2 id="6-ハーネス成熟度チェックリスト">
+            <span className={styles.h2Badge}>6</span>
+            <span className={styles.h2Text}>ハーネス成熟度チェックリスト</span>
+          </h2>
+          <div className={styles.tableScroll}>
+            <table>
+              <thead>
+                <tr className="header">
+                  <th>観点</th>
+                  <th>未成熟な状態</th>
+                  <th>成熟した状態</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr className="odd">
+                  <td>指示ファイル</td>
+                  <td>AGENTS.mdが数千行の百科事典で常に陳腐化している</td>
+                  <td>
+                    AGENTS.mdは目主に徹し、詳細は<code>docs/</code>
+                    配下でLintにより鮮度検証される
+                  </td>
+                </tr>
+                <tr className="even">
+                  <td>アーキテクチャ強制</td>
+                  <td>コードレビューでスタイルを都度指摘している</td>
+                  <td>カスタムLinter/構造テストが依存方向を機械的にブロックする</td>
+                </tr>
+                <tr className="odd">
+                  <td>実行時検証</td>
+                  <td>手元で目視確認してからデプロイする</td>
+                  <td>
+                    worktreeごとの観測可能性スタックをCodexがLogQL/PromQL/TraceQLで自己検証する
+                  </td>
+                </tr>
+                <tr className="even">
+                  <td>CIゲート</td>
+                  <td>人間が全PRを読んでからマージする</td>
+                  <td>
+                    <code>codex exec --output-schema</code>
+                    が構造化された合否判定をPRごとに返す
+                  </td>
+                </tr>
+                <tr className="odd">
+                  <td>品質評価</td>
+                  <td>「なんとなく良さそう」で判断している</td>
+                  <td>Traces→Graders→Datasets→Eval Runsのフライホイールで定量追跡している</td>
+                </tr>
+                <tr className="even">
+                  <td>モデル選定</td>
+                  <td>発表時のベンチマーク数値だけで乗り換える</td>
+                  <td>
+                    自社タスク分布に近い外部ベンチマークのサブセットと内部Eval Runを突き合わせる
+                  </td>
+                </tr>
+                <tr className="odd">
+                  <td>セキュリティ</td>
+                  <td>気づいたときに手動でレビューする</td>
+                  <td>Codex Security CLIによる継続スキャンとSARIF連携がCIに組み込まれている</td>
+                </tr>
+                <tr className="even">
+                  <td>技術的負債</td>
+                  <td>定期的な一括クリーンアップ(週次の手作業日など)</td>
+                  <td>Golden Principles + 背景クリーンアップエージェントによる日次の小さな返済</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <hr />
+
+          {/* Section 7 */}
+          <h2 id="7-アンチパターン">
+            <span className={styles.h2Badge}>7</span>
+            <span className={styles.h2Text}>アンチパターン</span>
+          </h2>
+          <ul>
+            <li>
+              <strong>巨大な単一AGENTS.md</strong>:
+              すべてを1ファイルに詰め込むと、コンテキストを圧迫しつつも即座に陳腐化し、機械的な検証もできなくなる。
+            </li>
+            <li>
+              <strong>人間レビューをボトルネックとして温存する</strong>:
+              エージェントのスループットが人間の目視レビュー速度を超えた段階で、全件人間レビューを維持しようとすると、せっかくの速度向上が失われる。
+            </li>
+            <li>
+              <strong>モデルグレーダーだけに依存する</strong>:
+              score_model/label_modelのようなモデルグレーダーのみに頼ると、グレーダーハッキング(reward
+              hacking)によってモデルグレーダー上のスコアは高いのに実際の品質は低い、という乖離に気づけなくなる。定期的な人手評価との突き合わせが必要である。
+            </li>
+            <li>
+              <strong>発表ベンチマーク数値の鵜呑み</strong>: SWE-Bench VerifiedやTerminal-Bench
+              2.0のスコアは自己申告や特定タスク分布に基づくものであり、自社ワークロードでの実測(内部Eval
+              Run)と併せて解釈する必要がある。
+            </li>
+            <li>
+              <strong>CI/CDの資格情報をジョブ環境変数に直置きする</strong>:
+              リポジトリを直接チェックアウトするジョブに
+              <code>OPENAI_API_KEY</code>
+              をジョブレベル環境変数として設定すると、ビルドスクリプトや依存パッケージのライフサイクルフック経由で漏えいするリスクがある。CI専用の
+              <code>CODEX_API_KEY</code>や、<code>openai/codex-action</code>
+              が提供するプロキシ経由の運用が推奨される。
+            </li>
+            <li>
+              <strong>一括クリーンアップへの先送り</strong>:
+              技術的負債の返済を「まとまった時間ができたら」に先送りすると、複利的に膨らんだ負債を痛みを伴う形で処理する羽目になる。小さく・頻繁に返済する設計の方が総コストは低い。
+            </li>
+          </ul>
+          <hr />
+
+          {/* Section 8 */}
+          <h2 id="8-まとめ">
+            <span className={styles.h2Badge}>8</span>
+            <span className={styles.h2Text}>まとめ</span>
+          </h2>
+          <p>
+            OpenAI
+            Codexにおけるハーネスエンジニアリングは、「エージェントに何を書かせるか」の設計から、「エージェントが書いたものをどう継続的に検証し、悪化をどう検知し、改善サイクルへどう差し戻すか」という評価基盤の設計へと重心を移す営みである。本ガイドで整理した7層モデル——セッション内自己検証、リポジトリのメカニカル強制、ランタイム・オブザーバビリティ、CI/CDの非対話型ゲート、プラットフォームEvals、外部標準ベンチマーク、継続的セキュリティ評価——は、それぞれフィードバック速度と客観性のトレードオフが異なる。単一のレイヤーに頼るのではなく、速いレイヤーで日々の逸脱を吸収しながら、遅いレイヤーで長期的な方向性を検証するという多層防御的な設計が、エージェントのスループットが人間の監督能力を上回る時代における現実的な解である。
+          </p>
+          <hr />
+
+          {/* Section 9 */}
+          <h2 id="9-参考文献">
+            <span className={styles.h2Badge}>9</span>
+            <span className={styles.h2Text}>参考文献</span>
+          </h2>
+          <div className={styles.refGrid}>
+            <div className={styles.refCard}>
+              <h3 id="openai公式ソース">OpenAI公式ソース</h3>
+              <ul>
+                <li>
+                  OpenAI. &quot;Harness engineering: leveraging Codex in an agent-first world.&quot;
+                  (2026年2月11日) —{" "}
+                  <Ext href="https://openai.com/index/harness-engineering/">
+                    &nearr; https://openai.com/index/harness-engineering/
+                  </Ext>
+                </li>
+                <li>
+                  OpenAI Developers. &quot;Non-interactive mode.&quot; —{" "}
+                  <Ext href="https://developers.openai.com/codex/non-interactive-mode">
+                    &nearr; https://developers.openai.com/codex/non-interactive-mode
+                  </Ext>
+                </li>
+                <li>
+                  OpenAI Developers. &quot;Codex GitHub Action.&quot; —{" "}
+                  <Ext href="https://developers.openai.com/codex/github-action">
+                    &nearr; https://developers.openai.com/codex/github-action
+                  </Ext>
+                </li>
+                <li>
+                  OpenAI Cookbook. Aaron Friel. &quot;Using PLANS.md for multi-hour problem
+                  solving.&quot; —{" "}
+                  <Ext href="https://cookbook.openai.com/articles/codex_exec_plans">
+                    &nearr; https://cookbook.openai.com/articles/codex_exec_plans
+                  </Ext>
+                </li>
+                <li>
+                  OpenAI Developers. &quot;Evaluate agent workflows.&quot; —{" "}
+                  <Ext href="https://developers.openai.com/api/docs/guides/agent-evals">
+                    &nearr; https://developers.openai.com/api/docs/guides/agent-evals
+                  </Ext>
+                </li>
+                <li>
+                  OpenAI Developers. &quot;Graders.&quot; —{" "}
+                  <Ext href="https://developers.openai.com/api/docs/guides/graders">
+                    &nearr; https://developers.openai.com/api/docs/guides/graders
+                  </Ext>
+                </li>
+                <li>
+                  OpenAI. GitHub. &quot;codex-security.&quot; —{" "}
+                  <Ext href="https://github.com/openai/codex-security">
+                    &nearr; https://github.com/openai/codex-security
+                  </Ext>
+                </li>
+                <li>
+                  OpenAI Developers. &quot;Codex Security.&quot; —{" "}
+                  <Ext href="https://developers.openai.com/codex/security">
+                    &nearr; https://developers.openai.com/codex/security
+                  </Ext>
+                </li>
+              </ul>
+            </div>
+
+            <div className={styles.refCard}>
+              <h3 id="外部評価ベンチマーク研究機関">外部評価ベンチマーク・研究機関</h3>
+              <ul>
+                <li>
+                  Stanford University / Laude Institute. &quot;Introducing Terminal-Bench 2.0 and
+                  Harbor.&quot; —{" "}
+                  <Ext href="https://www.tbench.ai/news/announcement-2-0">
+                    &nearr; https://www.tbench.ai/news/announcement-2-0
+                  </Ext>
+                </li>
+                <li>
+                  Snorkel AI. &quot;Terminal-Bench 2.0: Raising the bar for AI agent
+                  evaluation.&quot; —{" "}
+                  <Ext href="https://snorkel.ai/blog/terminal-bench-2-0-raising-the-bar-for-ai-agent-evaluation/">
+                    &nearr;
+                    https://snorkel.ai/blog/terminal-bench-2-0-raising-the-bar-for-ai-agent-evaluation/
+                  </Ext>
+                </li>
+              </ul>
+            </div>
+
+            <div className={styles.refCard}>
+              <h3 id="著名な開発者による分析">著名な開発者による分析</h3>
+              <ul>
+                <li>
+                  Simon Willison. &quot;Simon Willison on gpt-codex&quot; (タグページ) —{" "}
+                  <Ext href="https://simonwillison.net/tags/gpt-codex/">
+                    &nearr; https://simonwillison.net/tags/gpt-codex/
+                  </Ext>
+                </li>
+                <li>
+                  Simon Willison. &quot;Simon Willison on evals&quot; (タグページ) —{" "}
+                  <Ext href="https://simonwillison.net/tags/evals/">
+                    &nearr; https://simonwillison.net/tags/evals/
+                  </Ext>
+                </li>
+              </ul>
+            </div>
+
+            <div className={styles.refCard}>
+              <h3 id="業界メディア報道">業界メディア報道</h3>
+              <ul>
+                <li>
+                  InfoQ. &quot;OpenAI Introduces Harness Engineering: Codex Agents Power Large-Scale
+                  Software Development.&quot; —{" "}
+                  <Ext href="https://www.infoq.com/news/2026/02/openai-harness-engineering-codex/">
+                    &nearr; https://www.infoq.com/news/2026/02/openai-harness-engineering-codex/
+                  </Ext>
+                </li>
+                <li>
+                  Milvus Blog. &quot;What Is Harness Engineering for AI Agents?&quot; —{" "}
+                  <Ext href="https://milvus.io/blog/harness-engineering-ai-agents.md">
+                    &nearr; https://milvus.io/blog/harness-engineering-ai-agents.md
+                  </Ext>
+                </li>
+                <li>
+                  VentureBeat. &quot;Terminal-Bench 2.0 launches alongside Harbor, a new framework
+                  for testing agents in containers.&quot; —{" "}
+                  <Ext href="https://venturebeat.com/ai/terminal-bench-2-0-launches-alongside-harbor-a-new-framework-for-testing">
+                    &nearr;
+                    https://venturebeat.com/ai/terminal-bench-2-0-launches-alongside-harbor-a-new-framework-for-testing
+                  </Ext>
+                </li>
+                <li>
+                  The Decoder. &quot;OpenAI open-sources Codex Security CLI to help developers find
+                  and fix vulnerabilities from the command line.&quot; —{" "}
+                  <Ext href="https://the-decoder.com/openai-open-sources-codex-security-cli-to-help-developers-find-and-fix-vulnerabilities-from-the-command-line/">
+                    &nearr;
+                    https://the-decoder.com/openai-open-sources-codex-security-cli-to-help-developers-find-and-fix-vulnerabilities-from-the-command-line/
+                  </Ext>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </article>
+
+        <footer className={styles.pageFooter}>
+          本ガイドは2026年7月29日時点で公開されている一次情報(OpenAI公式ブログ・公式ドキュメント)および著名な開発者・研究機関の分析記事をもとに作成しています。詳細な出典は「9.
+          参考文献」を参照してください。
+        </footer>
+      </main>
     </div>
   );
 }
