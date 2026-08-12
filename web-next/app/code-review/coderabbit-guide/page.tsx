@@ -145,6 +145,12 @@ const DIAGRAM_10 = `sequenceDiagram
     CLI-->>Agent: 残存する重大指摘がないことを確認
     Agent-->>Dev: 完了報告と対応内容の要約`;
 
+/**
+ * Renders an external link that opens in a new browser tab.
+ *
+ * @param href - The destination URL
+ * @param children - The link content
+ */
 function Ext({ href, children }: { href: string; children: React.ReactNode }) {
   return (
     <a href={href} target="_blank" rel="noopener noreferrer">

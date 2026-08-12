@@ -24,6 +24,9 @@ export default function TocObserver() {
       }
     }
 
+    /**
+     * Opens the table-of-contents sidebar and updates its accessibility state.
+     */
     function openSidebar() {
       if (sidebar) sidebar.classList.add(styles.sidebarOpen);
       if (overlay) overlay.classList.add(styles.overlayOpen);
@@ -63,6 +66,9 @@ export default function TocObserver() {
       return removeDrawerListeners;
     }
 
+    /**
+     * Updates the table-of-contents link that corresponds to the section nearest the current scroll position.
+     */
     function updateActiveLink() {
       const scrollPos = window.scrollY || window.pageYOffset;
       const offset = 180; // Header height + extra margin

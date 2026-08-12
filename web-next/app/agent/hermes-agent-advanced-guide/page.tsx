@@ -10,10 +10,10 @@ export const metadata: Metadata = {
 };
 
 /**
- * Renders content as a secure external link that opens in a new tab.
+ * Renders link content that opens the destination in a new tab.
  *
  * @param href - The destination URL
- * @param children - The link content
+ * @param children - The content displayed within the link
  */
 function Ext({ href, children }: { href: string; children: React.ReactNode }) {
   return (
