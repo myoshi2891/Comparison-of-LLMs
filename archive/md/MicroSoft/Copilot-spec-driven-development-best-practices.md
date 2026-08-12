@@ -81,7 +81,7 @@ flowchart TD
 |---|---|---|---|---|
 | Repository instructions | `.github/copilot-instructions.md` | リポジトリ全体 | 自動（常時） | 技術スタック、ビルド/テスト手順、コーディング規約 |
 | Path-specific instructions | `.github/instructions/*.instructions.md` | `applyTo` で指定したパス/言語のみ | 自動（条件付き） | 言語別・ディレクトリ別の詳細ルール |
-| AGENTS.md | リポジトリルートの `AGENTS.md` | リポジトリ全体（複数のAIツール共通） | 対応機能で自動。Copilot code reviewはhead branchのリポジトリルート、coding agentは作業対象に適用されるファイル、Copilot CLI／VS Code agent modeは開いたリポジトリ・ワークスペースの対応スコープから検出 | Copilot以外のエージェント（Claude Code、Codexなど）とも共有する規約 |
+| AGENTS.md | 製品ごとに異なる場所の `AGENTS.md` | Copilot code review: PRのhead branchにあるリポジトリルートのファイル。Copilot coding agent: リポジトリルートとネストされたファイルを検出し、ネスト版は特定領域に適用するが、複数ファイル間の優先順位は公式仕様で未定義。VS Code agent mode: `chat.useAgentsMdFile`が有効なworkspaceルートが対象で、ネスト版は実験的な`chat.useNestedAgentsMdFiles`有効時に検出され、編集対象に応じた選択はagentが判断するため優先順位は未定義。Copilot CLI: Gitルート、現在の作業ディレクトリ、その中間ディレクトリ、作業対象ファイル配下の標準探索場所から検出する | Copilot code reviewはhead branchから自動参照。coding agentとVS Codeは各検出条件に従う。Copilot CLIは適用可能な指示を結合し、一般的な優先順位を定義しない | 製品をまたいで共有できる規約。競合する指示を置かず、各製品の検出場所と設定を個別に確認する |
 | Prompt files | `.github/prompts/*.prompt.md` | 単発タスク | 手動（`/command`） | 定型作業をスラッシュコマンド化 |
 | Custom agents（旧Custom chat modes） | `.github/agents/*.agent.md` | セッション/タスク単位 | 手動（エージェント選択） | 役割・ツールセット・モデルの切り替え |
 | Agent Skills | `.github/skills/<name>/SKILL.md` | タスク単位 | 自動（description一致で動的ロード） | 手続き的知識、スクリプト、テンプレートの束 |
