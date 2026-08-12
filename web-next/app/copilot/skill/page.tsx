@@ -10,6 +10,13 @@ export const metadata: Metadata = {
     "GitHub Copilot Agent Skills (SKILL.md) の完全ガイド。フロントマター仕様、3段階ローディング、ディレクトリ構造、gh skill管理、実践テンプレート、セキュリティ、トラブルシューティングを網羅。",
 };
 
+/**
+ * Renders an external link that opens in a new tab.
+ *
+ * @param href - The destination URL
+ * @param children - The link content
+ * @returns An anchor element for the external URL
+ */
 function Ext({ href, children }: { href: string; children: React.ReactNode }) {
   return (
     <a href={href} target="_blank" rel="noopener noreferrer">
@@ -98,6 +105,9 @@ const DIAGRAM_7 = `flowchart TB
     D4 -->|しない| D5{発火はするが指示に<br/>正しく従わないか?}
     D5 -->|従わない| F5["本文を500行/5000トークン以内に整理し、<br/>重要ルールを先頭へ、詳細はreferencesへ分割"]`;
 
+/**
+ * Renders a practical guide to GitHub Copilot Agent Skills and `SKILL.md`.
+ */
 export default function CopilotSkillPage() {
   return (
     <div className={styles.layout}>

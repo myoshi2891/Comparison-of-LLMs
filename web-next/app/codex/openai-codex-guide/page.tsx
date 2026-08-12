@@ -93,6 +93,12 @@ const ORIGINAL_THEME_VARS = {
   signalTextColor: "#1A1B22",
 };
 
+/**
+ * Renders an external link that opens in a new tab with referrer protection.
+ *
+ * @param href - The destination URL
+ * @param children - The link content
+ */
 function ExtLink({ href, children }: { href: string; children: React.ReactNode }) {
   return (
     <a href={href} target="_blank" rel="noopener noreferrer">
@@ -101,6 +107,9 @@ function ExtLink({ href, children }: { href: string; children: React.ReactNode }
   );
 }
 
+/**
+ * Renders a Japanese best-practices guide for OpenAI Codex, including navigation, instructional content, diagrams, and security guidance.
+ */
 export default function OpenAICodexGuidePage() {
   return (
     <div className={styles.layout}>

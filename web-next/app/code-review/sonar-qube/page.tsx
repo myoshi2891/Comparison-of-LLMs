@@ -159,6 +159,12 @@ const DIAG_13 = `flowchart TD
     Q3 -->|"Yes"| A3["Acceptedにして理由をコメント<br/>棚卸し対象として記録"]
     Q3 -->|"No"| A4["優先度を上げてバックログ化<br/>放置しない"]`;
 
+/**
+ * Renders an external link that opens in a new browser tab.
+ *
+ * @param href - The destination URL
+ * @param children - The content displayed inside the link
+ */
 function Ext({ href, children }: { href: string; children: React.ReactNode }) {
   return (
     <a href={href} target="_blank" rel="noopener noreferrer">

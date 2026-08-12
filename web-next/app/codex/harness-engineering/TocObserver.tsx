@@ -13,6 +13,9 @@ export default function TocObserver() {
     const sidebar = document.getElementById("sidebar");
     const overlay = document.getElementById("sidebarOverlay");
 
+    /**
+     * Closes the mobile sidebar and updates the menu button's accessibility state.
+     */
     function closeSidebar() {
       if (sidebar) sidebar.classList.remove(styles.sidebarOpen);
       if (overlay) overlay.classList.remove(styles.overlayOpen);
@@ -22,6 +25,9 @@ export default function TocObserver() {
       }
     }
 
+    /**
+     * Opens the mobile sidebar and updates the menu toggle state.
+     */
     function openSidebar() {
       if (sidebar) sidebar.classList.add(styles.sidebarOpen);
       if (overlay) overlay.classList.add(styles.overlayOpen);
@@ -84,7 +90,9 @@ export default function TocObserver() {
       });
     }
 
-    // Listen to scroll & resize
+    /**
+     * Updates the active table-of-contents link to reflect the current scroll position.
+     */
     function onScroll() {
       updateActiveLink();
     }
