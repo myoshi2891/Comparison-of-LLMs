@@ -2,7 +2,10 @@
   # Next.js App Router (web-next/) を静的エクスポートとして配信する。
   # base を web-next に設定し、publish は base 相対で out ディレクトリを指す。
   base    = "web-next"
-  command = "bun install && bun run build"
+  # --webpack: Turbopack が next/font/google + output:export 環境で
+  #   "@vercel/turbopack-next/internal/font/google/font" を解決できないため
+  #   Webpack ビルドを明示的に使用する。
+  command = "bun install && bunx next build --webpack"
   publish = "out"
   # base 配下に差分がない場合に Netlify がビルドを自動スキップする既定挙動を無効化する。
   # 理由: base 外にある netlify.toml（リダイレクト定義）や pricing.json の変更が
