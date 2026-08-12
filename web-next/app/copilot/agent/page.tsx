@@ -10,6 +10,20 @@ export const metadata: Metadata = {
     "GitHub Copilot .agent.md の完全ベストプラクティスガイド。フロントマター全仕様、ステップバイステップ作成、Handoffs、Subagents、MCP統合、マルチエージェント設計パターン、トラブルシューティングを解説。",
 };
 
+const COPILOT_AGENT_THEME_VARS = {
+  background: "#07111e",
+  primaryColor: "#132a4a",
+  primaryBorderColor: "#7c9eff",
+  primaryTextColor: "#e7ecf7",
+  lineColor: "#7c9eff",
+  secondaryColor: "#0d1b2e",
+  tertiaryColor: "#0d1b2e",
+  clusterBkg: "#0d1f36",
+  clusterBorder: "#3a5a8a",
+  edgeLabelBackground: "#0d1b2e",
+  fontSize: "16px",
+};
+
 export default function CopilotAgentPage() {
   return (
     <div className={styles.layout}>
@@ -739,6 +753,7 @@ export default function CopilotAgentPage() {
     G -- はい --> I[チームと共有<br/>.github/agents にコミット]
     I --> J[利用状況を見ながら継続改善]`}
               theme="base"
+              themeVariables={COPILOT_AGENT_THEME_VARS}
             />
           </div>
         </section>
@@ -788,26 +803,25 @@ export default function CopilotAgentPage() {
               <span className={styles.ck}>handoffs</span>:
             </div>
             <div className={styles.codeLine}>
-              {" "}
-              - <span className={styles.ck}>label</span>:{" "}
+              {"  "}- <span className={styles.ck}>label</span>:{" "}
               <span className={styles.cs}>実装を開始する</span>
             </div>
             <div className={styles.codeLine}>
-              {" "}
+              {"    "}
               <span className={styles.ck}>agent</span>:{" "}
               <span className={styles.cs}>implementation</span>
             </div>
             <div className={styles.codeLine}>
-              {" "}
+              {"    "}
               <span className={styles.ck}>prompt</span>:{" "}
               <span className={styles.cs}>上記の計画に沿って実装してください。</span>
             </div>
             <div className={styles.codeLine}>
-              {" "}
+              {"    "}
               <span className={styles.ck}>send</span>: <span className={styles.cw}>false</span>
             </div>
             <div className={styles.codeLine}>
-              {" "}
+              {"    "}
               <span className={styles.ck}>model</span>:{" "}
               <span className={styles.cs}>GPT-5.2 (copilot)</span>
             </div>
@@ -924,6 +938,7 @@ export default function CopilotAgentPage() {
     I1 --> I2
     I2 -- "Handoffボタン: レビューに回す" --> R1`}
               theme="base"
+              themeVariables={COPILOT_AGENT_THEME_VARS}
             />
           </div>
         </section>
@@ -1251,6 +1266,7 @@ export default function CopilotAgentPage() {
     W3 --> C
     C --> O[ユーザーへ最終結果を提示]`}
               theme="base"
+              themeVariables={COPILOT_AGENT_THEME_VARS}
             />
           </div>
         </section>
@@ -1317,41 +1333,50 @@ export default function CopilotAgentPage() {
           <pre className={styles.codeBlock}>
             <div className={styles.codeLine}>&#123;</div>
             <div className={styles.codeLine}>
-              {" "}
+              {"  "}
               <span className={styles.ck}>&quot;servers&quot;</span>: &#123;
             </div>
             <div className={styles.codeLine}>
-              {" "}
+              {"    "}
               <span className={styles.ck}>&quot;github&quot;</span>: &#123;
             </div>
             <div className={styles.codeLine}>
-              {" "}
+              {"      "}
               <span className={styles.cv}>&quot;type&quot;</span>:{" "}
               <span className={styles.cs}>&quot;http&quot;</span>,
             </div>
             <div className={styles.codeLine}>
-              {" "}
+              {"      "}
               <span className={styles.cv}>&quot;url&quot;</span>:{" "}
               <span className={styles.cs}>&quot;https://api.githubcopilot.com/mcp&quot;</span>
             </div>
-            <div className={styles.codeLine}> &#125;,</div>
             <div className={styles.codeLine}>
-              {" "}
+              {"    "}
+              &#125;,
+            </div>
+            <div className={styles.codeLine}>
+              {"    "}
               <span className={styles.ck}>&quot;playwright&quot;</span>: &#123;
             </div>
             <div className={styles.codeLine}>
-              {" "}
+              {"      "}
               <span className={styles.cv}>&quot;command&quot;</span>:{" "}
               <span className={styles.cs}>&quot;npx&quot;</span>,
             </div>
             <div className={styles.codeLine}>
-              {" "}
+              {"      "}
               <span className={styles.cv}>&quot;args&quot;</span>: [
               <span className={styles.cs}>&quot;-y&quot;</span>,{" "}
               <span className={styles.cs}>&quot;@microsoft/mcp-server-playwright&quot;</span>]
             </div>
-            <div className={styles.codeLine}> &#125;</div>
-            <div className={styles.codeLine}> &#125;</div>
+            <div className={styles.codeLine}>
+              {"    "}
+              &#125;
+            </div>
+            <div className={styles.codeLine}>
+              {"  "}
+              &#125;
+            </div>
             <div className={styles.codeLine}>&#125;</div>
           </pre>
           <div className={styles.prose}>
@@ -1530,6 +1555,7 @@ export default function CopilotAgentPage() {
     S2 --> API
     S3 --> Design`}
               theme="base"
+              themeVariables={COPILOT_AGENT_THEME_VARS}
             />
           </div>
 
@@ -1809,6 +1835,7 @@ export default function CopilotAgentPage() {
     Rev -- 修正依頼 --> Impl
     Rev -- 承認 --> Done[マージ可能な成果物]`}
               theme="base"
+              themeVariables={COPILOT_AGENT_THEME_VARS}
             />
           </div>
 
@@ -2060,6 +2087,7 @@ export default function CopilotAgentPage() {
     Q4 -- はい --> F4["Cloud Agentでは handoffs が無視される仕様と一致していないか確認"]
     Q4 -- いいえ --> F5["Agent Debug Log / Chat Debug View で<br/>実際に送信されたプロンプトとツール呼び出しを確認"]`}
               theme="base"
+              themeVariables={COPILOT_AGENT_THEME_VARS}
             />
           </div>
 
@@ -2083,65 +2111,75 @@ export default function CopilotAgentPage() {
               ここまでの各章から、実務で優先度の高い10項目を並べました。番号は本ガイド内での重要度順の目安であり、上から順にチェックしていくと抜け漏れが少なくなります。
             </p>
           </div>
-          <div className={styles.grid2}>
-            <div className={styles.card}>
-              <h4>1. 1エージェント1ジョブ</h4>
+          <div className={styles.practiceGrid}>
+            <div className={styles.practiceCard}>
+              <span className={styles.num}>01</span>
+              <h4>1エージェント1ジョブ</h4>
               <p>
                 「なんでも屋」を作らず、テスト・ドキュメント・Lint・API実装のように具体的な役割ごとに分割する。
               </p>
             </div>
-            <div className={styles.card}>
-              <h4>2. 本文は説明よりコード例</h4>
+            <div className={styles.practiceCard}>
+              <span className={styles.num}>02</span>
+              <h4>本文は説明よりコード例</h4>
               <p>実際のコードスタイル例1つは、説明文3段落分の価値がある。</p>
             </div>
-            <div className={styles.card}>
-              <h4>3. 境界を3層で明文化する</h4>
+            <div className={styles.practiceCard}>
+              <span className={styles.num}>03</span>
+              <h4>境界を3層で明文化する</h4>
               <p>
                 常に許可 / 要確認 /
                 禁止の3層構造にする。特に「シークレットを絶対にコミットしない」は最も効果的な制約として繰り返し報告されている。
               </p>
             </div>
-            <div className={styles.card}>
-              <h4>4. ツールは最小権限</h4>
+            <div className={styles.practiceCard}>
+              <span className={styles.num}>04</span>
+              <h4>ツールは最小権限</h4>
               <p>
                 プランナーやレビュアーには読み取り専用ツールだけを与え、実装者にのみ編集権限を与える。
               </p>
             </div>
-            <div className={styles.card}>
-              <h4>5. サブエージェントは許可リストで制御する</h4>
+            <div className={styles.practiceCard}>
+              <span className={styles.num}>05</span>
+              <h4>サブエージェントは許可リストで制御する</h4>
               <p>
                 似た名前のエージェントが複数あるコーディネーターほど、<code>agents</code>{" "}
                 の明示指定が重要になる。
               </p>
             </div>
-            <div className={styles.card}>
-              <h4>6. Handoffsとサブエージェントを使い分ける</h4>
+            <div className={styles.practiceCard}>
+              <span className={styles.num}>06</span>
+              <h4>Handoffsとサブエージェントを使い分ける</h4>
               <p>
                 人間の承認を挟みたい段階的フローにはHandoffs、文脈分離や並列化が主目的ならサブエージェント。
               </p>
             </div>
-            <div className={styles.card}>
-              <h4>7. プラットフォーム差異を文書化する</h4>
+            <div className={styles.practiceCard}>
+              <span className={styles.num}>07</span>
+              <h4>プラットフォーム差異を文書化する</h4>
               <p>
                 <code>handoffs</code> / <code>argument-hint</code> がCloud Agentで無視されるなど、VS
                 Code・CLI・Cloud Agent間の非互換フィールドをチームで共有する。
               </p>
             </div>
-            <div className={styles.card}>
-              <h4>8. 反復して育てる</h4>
+            <div className={styles.practiceCard}>
+              <span className={styles.num}>08</span>
+              <h4>反復して育てる</h4>
               <p>
                 最小構成から始め、エージェントが間違えた箇所にルールを足していく。最初から完璧な設計を狙わない。
               </p>
             </div>
-            <div className={styles.card}>
-              <h4>9. 診断ツールを先に使う</h4>
+            <div className={styles.practiceCard}>
+              <span className={styles.num}>09</span>
+              <h4>診断ツールを先に使う</h4>
               <p>
                 「動かない」と感じたら、まずAgent Debug LogやChat Debug View、<code>/mcp show</code>{" "}
                 のような一次情報を確認してから設定を推測で変更する。
               </p>
             </div>
-            <div className={styles.card}>
-              <h4>10. ハーネス全体を理解する</h4>
+            <div className={styles.practiceCard}>
+              <span className={styles.num}>10</span>
+              <h4>ハーネス全体を理解する</h4>
               <p>
                 <code>.agent.md</code>{" "}
                 は魔法の呪文ではなく、プロトタイプ→計画→実装→レビューという既存ワークフローを支える部品の1つとして位置づける。
@@ -2169,6 +2207,9 @@ export default function CopilotAgentPage() {
               target="_blank"
               rel="noopener noreferrer"
             >
+              <div className={styles.refCardTop}>
+                <span className={styles.refTag}>GitHub Docs</span>
+              </div>
               <div className={styles.refCardTitle}>
                 Configuration reference for GitHub Copilot agents
               </div>
@@ -2196,6 +2237,9 @@ export default function CopilotAgentPage() {
               target="_blank"
               rel="noopener noreferrer"
             >
+              <div className={styles.refCardTop}>
+                <span className={styles.refTag}>GitHub Docs</span>
+              </div>
               <div className={styles.refCardTitle}>
                 Creating custom agents for Copilot cloud agent
               </div>
@@ -2223,6 +2267,9 @@ export default function CopilotAgentPage() {
               target="_blank"
               rel="noopener noreferrer"
             >
+              <div className={styles.refCardTop}>
+                <span className={styles.refTag}>VS Code Docs</span>
+              </div>
               <div className={styles.refCardTitle}>Custom agents in VS Code</div>
               <span className={styles.refCardUrl}>
                 <svg
@@ -2248,6 +2295,9 @@ export default function CopilotAgentPage() {
               target="_blank"
               rel="noopener noreferrer"
             >
+              <div className={styles.refCardTop}>
+                <span className={styles.refTag}>VS Code Docs</span>
+              </div>
               <div className={styles.refCardTitle}>Subagents in Visual Studio Code</div>
               <span className={styles.refCardUrl}>
                 <svg
@@ -2273,6 +2323,9 @@ export default function CopilotAgentPage() {
               target="_blank"
               rel="noopener noreferrer"
             >
+              <div className={styles.refCardTop}>
+                <span className={styles.refTag}>VS Code Docs</span>
+              </div>
               <div className={styles.refCardTitle}>Add and manage MCP servers in VS Code</div>
               <span className={styles.refCardUrl}>
                 <svg
@@ -2298,6 +2351,9 @@ export default function CopilotAgentPage() {
               target="_blank"
               rel="noopener noreferrer"
             >
+              <div className={styles.refCardTop}>
+                <span className={styles.refTag}>VS Code Docs</span>
+              </div>
               <div className={styles.refCardTitle}>Troubleshoot AI in Visual Studio Code</div>
               <span className={styles.refCardUrl}>
                 <svg
@@ -2329,6 +2385,10 @@ export default function CopilotAgentPage() {
               target="_blank"
               rel="noopener noreferrer"
             >
+              <div className={styles.refCardTop}>
+                <span className={`${styles.refTag} ${styles.refTagCommunity}`}>GitHub Blog</span>
+                <span className={styles.refDate}>Burke Holland ・ 2026年7月27日</span>
+              </div>
               <div className={styles.refCardTitle}>The harness is all you need (mostly)</div>
               <span className={styles.refCardUrl}>
                 <svg
@@ -2354,6 +2414,10 @@ export default function CopilotAgentPage() {
               target="_blank"
               rel="noopener noreferrer"
             >
+              <div className={styles.refCardTop}>
+                <span className={`${styles.refTag} ${styles.refTagCommunity}`}>GitHub Blog</span>
+                <span className={styles.refDate}>Phani Marupaka ・ 2026年6月14日</span>
+              </div>
               <div className={styles.refCardTitle}>
                 How to write a great agents.md: Lessons from over 2,500 repositories
               </div>
@@ -2381,6 +2445,10 @@ export default function CopilotAgentPage() {
               target="_blank"
               rel="noopener noreferrer"
             >
+              <div className={styles.refCardTop}>
+                <span className={`${styles.refTag} ${styles.refTagCommunity}`}>GitHub Blog</span>
+                <span className={styles.refDate}>Phani Marupaka ・ 2026年6月14日</span>
+              </div>
               <div className={styles.refCardTitle}>
                 From one-off prompts to workflows: How to use custom agents in GitHub Copilot CLI
               </div>
@@ -2408,6 +2476,12 @@ export default function CopilotAgentPage() {
               target="_blank"
               rel="noopener noreferrer"
             >
+              <div className={styles.refCardTop}>
+                <span className={`${styles.refTag} ${styles.refTagCommunity}`}>
+                  Awesome GitHub Copilot
+                </span>
+                <span className={styles.refDate}>コミュニティキュレーション</span>
+              </div>
               <div className={styles.refCardTitle}>Agents and Subagents</div>
               <span className={styles.refCardUrl}>
                 <svg
@@ -2433,6 +2507,12 @@ export default function CopilotAgentPage() {
               target="_blank"
               rel="noopener noreferrer"
             >
+              <div className={styles.refCardTop}>
+                <span className={`${styles.refTag} ${styles.refTagCommunity}`}>
+                  Awesome GitHub Copilot
+                </span>
+                <span className={styles.refDate}>コミュニティキュレーション</span>
+              </div>
               <div className={styles.refCardTitle}>Building Custom Agents</div>
               <span className={styles.refCardUrl}>
                 <svg
@@ -2458,6 +2538,12 @@ export default function CopilotAgentPage() {
               target="_blank"
               rel="noopener noreferrer"
             >
+              <div className={styles.refCardTop}>
+                <span className={`${styles.refTag} ${styles.refTagCommunity}`}>
+                  Awesome GitHub Copilot
+                </span>
+                <span className={styles.refDate}>コミュニティキュレーション</span>
+              </div>
               <div className={styles.refCardTitle}>Understanding MCP Servers</div>
               <span className={styles.refCardUrl}>
                 <svg
@@ -2483,6 +2569,12 @@ export default function CopilotAgentPage() {
               target="_blank"
               rel="noopener noreferrer"
             >
+              <div className={styles.refCardTop}>
+                <span className={`${styles.refTag} ${styles.refTagIssue}`}>
+                  GitHub Community Discussion #168864
+                </span>
+                <span className={styles.refDate}>ディスカッション</span>
+              </div>
               <div className={styles.refCardTitle}>
                 awesome-copilot リポジトリ サンプルエージェント集(context7.agent.md ほか)
               </div>
@@ -2516,6 +2608,12 @@ export default function CopilotAgentPage() {
               target="_blank"
               rel="noopener noreferrer"
             >
+              <div className={styles.refCardTop}>
+                <span className={`${styles.refTag} ${styles.refTagIssue}`}>
+                  YouTrack / JetBrains
+                </span>
+                <span className={styles.refDate}>LLM-24292</span>
+              </div>
               <div className={styles.refCardTitle}>
                 Custom Agent does not show in the dropdown of GitHub Copilot
               </div>
@@ -2543,6 +2641,12 @@ export default function CopilotAgentPage() {
               target="_blank"
               rel="noopener noreferrer"
             >
+              <div className={styles.refCardTop}>
+                <span className={`${styles.refTag} ${styles.refTagIssue}`}>
+                  GitHub CopilotForXcode
+                </span>
+                <span className={styles.refDate}>Issue #728</span>
+              </div>
               <div className={styles.refCardTitle}>
                 Custom agents not appearing in dropdown unless agent files are open in editor
               </div>
@@ -2570,6 +2674,10 @@ export default function CopilotAgentPage() {
               target="_blank"
               rel="noopener noreferrer"
             >
+              <div className={styles.refCardTop}>
+                <span className={`${styles.refTag} ${styles.refTagIssue}`}>GitHub Copilot CLI</span>
+                <span className={styles.refDate}>Issue #452</span>
+              </div>
               <div className={styles.refCardTitle}>
                 User-level custom agents not loading from ~/.copilot/agents
               </div>
