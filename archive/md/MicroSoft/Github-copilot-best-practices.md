@@ -282,8 +282,8 @@ sequenceDiagram
 
 **ベストプラクティス**
 
-- インストラクションが競合する場合は、個人インストラクション、リポジトリインストラクション、組織インストラクションの順に優先される。利用面によって差があるため、適用対象の公式ドキュメントも確認する。
-- リポジトリインストラクションは、チーム固有の規約をリポジトリ利用者と対象Copilot機能で共有するために使う。個人設定より強い強制境界ではないため、必須ルールはCIなどでも検証する。
+- Copilot CLIは、適用可能なユーザーレベル、リポジトリ、エージェントの指示ファイルを結合し、それらの一般的な優先順位を定義していない。競合を避けるため、複数ファイルの指示は一貫させる。
+- リポジトリインストラクションは、チーム固有の規約をリポジトリ利用者と対象Copilot機能で共有するために使う。必須ルールの強制は、既存のLinter、テスト、ポリシーチェックなどのCI検証に委ねる。
 - `GITHUB_TOKEN` や `COPILOT_GITHUB_TOKEN` は既定でログから redact されるが、それ以外のシークレットをプロンプトや環境変数に含めないことが重要。
 - 実行前に「そのフォルダ以下は信頼できるか」を必ず確認する。CLIはそのフォルダ以下のファイルを読み書き・実行できるため。
 - Plan mode → Autopilotの順に進めることで、いきなり巨大で曖昧な依頼を投げるアンチパターンを避けられる。
@@ -466,6 +466,8 @@ flowchart TD
 
 2026年6月1日より、GitHub Copilotは使用量ベース(AI Credits)の課金体系に移行しました。基本のインライン補完・Next Edit Suggestionsは引き続き無制限・無料枠の対象ですが、Chat・Agentモード・CLI・Coding Agent・Code Reviewなどの高度な機能はAI Creditsを消費します。
 
+> **情報基準日: 2026年7月31日**。次表のBusinessとEnterpriseは期間終了後も適用される標準値です。
+
 | プラン | 月額 | AI Credits/月 |
 |---|---|---|
 | Free | 無料 | 限定的な範囲(試用向け) |
@@ -474,6 +476,8 @@ flowchart TD
 | Max | $100/月 | 20,000 |
 | Business | $19/ユーザー/月 | 1,900/ユーザー |
 | Enterprise | $39/ユーザー/月 | 3,900/ユーザー |
+
+既存のCopilot Business顧客とCopilot Enterprise顧客には、使用量ベース課金の移行期間である2026年6月1日から9月1日まで、標準値に代えてBusinessは3,000 AI Credits/ユーザー/月、Enterpriseは7,000 AI Credits/ユーザー/月が期間限定で適用されます。プロモーション終了後は、表の標準値へ戻ります。
 
 **コストを抑えるための実践**
 
@@ -537,6 +541,7 @@ Google Engineering LeadのAddy Osmani氏も、AIが生成したコードは「�
 - GitHub Docs, *"Best practices for using GitHub Copilot to work on tasks"* — https://docs.github.com/copilot/how-tos/agents/copilot-coding-agent/best-practices-for-using-copilot-to-work-on-tasks
 - GitHub Docs, *"Best practices for GitHub Copilot CLI"* — https://docs.github.com/en/copilot/how-tos/copilot-cli/cli-best-practices
 - GitHub Docs, *"Adding custom instructions for GitHub Copilot CLI"* — https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/add-custom-instructions
+- GitHub Docs, *"Usage-based billing for organizations and enterprises"* — https://docs.github.com/en/copilot/concepts/billing/usage-based-billing-for-organizations-and-enterprises
 - GitHub Docs, *"Asking GitHub Copilot questions in your IDE"* — https://docs.github.com/copilot/using-github-copilot/asking-github-copilot-questions-in-your-ide
 - GitHub Docs, *"Using GitHub Copilot code review"* — https://docs.github.com/copilot/using-github-copilot/code-review/using-copilot-code-review
 - GitHub Docs, *"Model Context Protocol (MCP) and GitHub Copilot cloud agent"* — https://docs.github.com/en/copilot/concepts/agents/cloud-agent/mcp-and-cloud-agent
