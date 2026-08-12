@@ -115,7 +115,7 @@ GKE以外にも、Gemini APIおよびGemini Enterprise Agent Platformが提供�
 | 状態保持 | 実行状態(メモリ)を最大14日間保持(TTLで調整可能) |
 | デフォルトのネットワーク | 無効(明示的な許可リストを設定しない限りアウトバウンド通信不可) |
 | 対応フレームワーク | 特定のフレームワークに依存せず、任意のエージェント実装・任意のモデルから利用可能 |
-| 提供リージョン(Gemini Enterprise Agent Platform) | `us-central1` |
+| 提供リージョン(Gemini Enterprise Agent Platform、Preview) | `us-central1`(`v1beta1`のみ) |
 
 Agent Development Kit(ADK)の公式安全設計ドキュメントでも、「コード実行は特にセキュリティ上の影響が大きい特殊なツールであり、モデルが生成したコードがローカル環境を侵害しないよう、必ずサンドボックス化しなければならない」と明記されています。あわせてModel ArmorプラグインやPII redactionプラグインといった、入出力を検査する追加のガードレールも推奨されています。
 
@@ -349,6 +349,7 @@ flowchart TD
 - Bringing you Agent Sandbox on GKE and Agent Substrate(Google Cloud Blog): https://cloud.google.com/blog/products/containers-kubernetes/bringing-you-agent-sandbox-on-gke-and-agent-substrate
 - Safety and Security for AI Agents(Agent Development Kit公式): https://google.github.io/adk-docs/safety/
 - Code Execution(Gemini Enterprise Agent Platform公式): https://docs.cloud.google.com/gemini-enterprise-agent-platform/scale/sandbox/code-execution-overview
+- Supported locations for agents in Agent Platform(Gemini Enterprise Agent Platform公式): https://docs.cloud.google.com/gemini-enterprise-agent-platform/resources/agent-locations
 - Sandboxes overview(Gemini Enterprise Agent Platform公式): https://docs.cloud.google.com/gemini-enterprise-agent-platform/scale/sandbox
 - Agents Overview(Gemini API公式): https://ai.google.dev/gemini-api/docs/agents
 - A Deep Dive into GKE Sandbox for Agents(The New Stack、Darryl K. Taft氏): https://thenewstack.io/google-cloud-a-deep-dive-into-gke-sandbox-for-agents/
