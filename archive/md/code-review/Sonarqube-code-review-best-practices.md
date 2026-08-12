@@ -69,7 +69,7 @@ flowchart TB
     GateCheck -->|Pass / Fail| PR["プルリクエストへの<br/>デコレーション"]
 ```
 
-ポイントは、SonarQube for IDEとMCP Serverがどちらも「同じルールセット・同じ解析エンジン」をローカルとCIの両方で共有していることです。IDEで指摘されなかった問題がCIで初めて出る、という状況を減らすことが、中級以上のチームがまず押さえるべき設計原則になります。
+SonarQube for IDEはIDE内でローカル解析を行い、Connected ModeでSonarQube Server／CloudのQuality Profileや設定を同期します。これにより、IDEとCIのルール差による見落としを減らせます。一方、SonarQube MCP Serverはローカル解析エンジンではなく、AIエージェントとSonarQubeを接続して解析結果や品質情報を利用させる統合レイヤーです。両者の役割を分けて設計することが、中級以上のチームがまず押さえるべき原則になります。
 
 ---
 
@@ -150,7 +150,7 @@ SonarQubeは2023年以降、旧来の「Bug / Vulnerability / Code Smell」と�
 | Reliability | 定められた条件下で性能を維持し続ける能力 |
 | Maintainability | 修復・改善・理解のしやすさ |
 
-各Issueには、この4属性×3品質特性のマッピングに基づき、影響度が **Low / Medium / High** の3段階（旧来のBlocker/Critical/Major/Minor/Infoという5段階の重要度モデルに代わるもの）で表示されます。プロジェクト全体・新規コードそれぞれについてのReliability Rating・Security Rating・Maintainability RatingはA〜Eの格付けとして引き続きQuality Gateの条件に利用されます。
+SonarQube Server 2026.1では、MQR（Multi-Quality Rule）modeのIssue severityは **Blocker / High / Medium / Low / Info**、Standard Experienceでは **Blocker / Critical / Major / Minor / Info** の5段階で表示されます。MQR modeはStandard Experienceを置き換えるものではなく、運用モードに応じてseverity体系を使い分けます。プロジェクト全体・新規コードそれぞれについてのReliability Rating・Security Rating・Maintainability RatingはA〜Eの格付けとして、severityとは別に引き続きQuality Gateの条件に利用できます。
 
 ```mermaid
 flowchart LR
@@ -183,16 +183,16 @@ flowchart LR
 
 Quality Gateは「このプロジェクトはリリース可能か」という一つの問いに答えるための、条件のセットです。組み込みの `Sonar way` Quality Gateは、SonarSourceによって提供・維持される読み取り専用のゲートで、Clean as You Codeを体現するベストプラクティスとして機能します。
 
-**Sonar wayが新規コードに設定する代表的な条件例:**
+**Sonar wayが新規コードに設定する現在の既定条件:**
 
-| 指標 | 推奨しきい値の例 |
+| 指標 | 既定条件 |
 |---|---|
+| 新規Issue | 未解決Issueがないこと |
+| 新規Security Hotspot | 100%レビュー済み |
 | 新規コードのカバレッジ | 80%以上 |
-| 新規コードの重複行率 | 3%未満 |
-| 新規コードのMaintainability Rating | A |
-| 新規コードのReliability Rating | A |
-| 新規コードのSecurity Rating | A |
-| 新規コードのSecurity Hotspotレビュー率 | 100% |
+| 新規コードの重複行率 | 3%以下 |
+
+Maintainability、Reliability、Security Ratingなどを条件に使う場合は、プロジェクト要件に応じたカスタムQuality Gateとして追加します。
 
 カスタムQuality Gateを設計する際のベストプラクティスは次の通りです。
 
@@ -360,6 +360,7 @@ jobs:
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
       - name: SonarQube Quality Gate check
+        if: github.event_name == 'push'
         uses: SonarSource/sonarqube-quality-gate-action@master
         timeout-minutes: 5
         env:
@@ -371,7 +372,7 @@ jobs:
 - **`fetch-depth: 0`を必ず設定する**：浅いクローンのままだとSCM blame情報（誰がどの行を書いたか）が不正確になり、Issueの自動アサインが機能しません
 - **アクションのバージョン指定とコミットSHAピン留め（サプライチェーン対策）**：公式サンプル構成（`sonarqube-scan-action@v5` や `sonarqube-quality-gate-action@master`）をベースにしつつ、セキュリティ厳格化やビルド再現性の確保が必要な場合は `uses: SonarSource/sonarqube-scan-action@<full-commit-sha>` のように完全なコミットSHAへの固定を推進してください
 - **`sonar.qualitygate.wait=true`は乱用しない**：このパラメータをつけるとスキャナーがQuality Gate判定を待ってから終了するためワークフロー時間が伸びます。デプロイをブロックする用途以外では、プルリクエストデコレーション（自動で表示される）に任せるのが推奨です
-- **Quality Gate Check Actionを別ステップに分離する**：スキャン自体の成否とQuality Gateの合否を分けることで、失敗原因の切り分けが容易になります
+- **Quality Gate Check ActionをPRでは実行しない**：Pull RequestではPR decorationだけを使い、Quality Gate Actionはデプロイ判定や専用ブランチの`push`など、明示的にゲートで停止させるジョブに限定します
 - **モノレポの場合はパスフィルタで対象を絞る**：変更のあったサービスのみをスキャンすることで、CI時間とライセンス消費（LOCベース課金）の両方を抑制できます
 - **ブランチ保護ルールと連動させる**：Quality Gateのステータスチェックを必須チェックに指定し、Redのままではマージできないようにする
 
@@ -399,8 +400,8 @@ flowchart LR
 | AI CodeFix | 検出されたIssueに対し、LLMによる修正案を自動生成 | GA（一般提供）。Enterprise/Data Center、SonarQube CloudのTeam/Enterprise向け |
 | AI Code Assurance | AI生成コードを含むプロジェクトにラベル付けし、より厳格なQuality Gateを自動適用 | 提供中 |
 | SonarQube MCP Server | AIコーディングエージェント（Cursor、Claude Code等）がSonarQubeに自然言語で問い合わせできるようにする無料の統合レイヤー | GA |
-| Agentic Analysis | エージェントがコード生成の最中に、CIと同等精度の解析を数秒で受けられる仕組み | Beta（SonarQube CloudのTeam/Enterprise向け） |
-| Sonar Vortex | エージェントのコーディングループの内側で、コード生成前にコンテキストと制約を与え、生成過程をリアルタイム検証する新製品 | 提供開始 |
+| Agentic Analysis | Sonar Vortexに統合され、エージェントがコード生成の最中に解析を受けられる仕組み | GA（一般提供） |
+| Sonar Vortex | エージェントのコーディングループの内側で、コード生成前にコンテキストと制約を与え、生成過程をリアルタイム検証する製品 | GA（一般提供） |
 | SonarQube Remediation Agent | バックグラウンドで自律的に技術的負債を検出・修正するエージェント | GA |
 
 このアーキテクチャの核心は、著名なエンジニアリングブロガーであるAddy Osmani氏（Google Chrome関連のエンジニアリングリーダーとして知られる）が指摘する **「maker-checker split（作る側と検証する側を分離する）」** という原則です。同氏は2026年6月、「無人で回り続けるループは、無人でミスを重ねるループでもある」という趣旨の指摘をしており、Sonarはこれを引用する形で、コードを生成するモデルと、それを検証する仕組みを意図的に分離する設計思想（同社はこれを「ゼロトラスト」なコード検証と呼んでいます）を採用しています。
@@ -522,13 +523,13 @@ SonarQubeを使ったコードレビューのベストプラクティスは、�
 **公式ドキュメント（docs.sonarsource.com）**
 
 - Sonar Documentation トップページ: https://docs.sonarsource.com/
-- Clean as You Code（SonarQube Server 10.5）: https://docs.sonarsource.com/sonarqube-server/10.5/user-guide/clean-as-you-code
-- Clean Code definition（SonarQube Server 10.4）: https://docs.sonarsource.com/sonarqube-server/10.4/user-guide/clean-code/definition
-- Clean Code benefits: the software qualities（SonarQube Server 10.8）: https://docs.sonarsource.com/sonarqube-server/10.8/core-concepts/clean-code/software-qualities
-- Quality gates（SonarQube Server 8.9）: https://docs.sonarsource.com/sonarqube-server/8.9/user-guide/quality-gates/
+- Clean as You Code（SonarQube Server 2026.1 LTA）: https://docs.sonarsource.com/sonarqube-server/2026.1/user-guide/about-new-code
+- Clean Code definition（旧SonarQube Server 10.7資料。2026.1 LTAに同名ページなし）: https://docs.sonarsource.com/sonarqube-server/10.7/core-concepts/clean-code/definition
+- Software qualities（旧SonarQube Server 2025.1 LTA資料。2026.1 LTAに同名ページなし）: https://docs.sonarsource.com/sonarqube-server/2025.1/user-guide/rules/software-qualities
+- Quality gates（SonarQube Server 2026.1 LTA）: https://docs.sonarsource.com/sonarqube-server/2026.1/quality-standards-administration/managing-quality-gates/introduction
 - Managing Security Hotspots（SonarQube Server）: https://docs.sonarsource.com/sonarqube-server/user-guide/security-hotspots
 - Reviewing security hotspots（SonarQube Cloud）: https://docs.sonarsource.com/sonarqube-cloud/managing-your-projects/issues/reviewing-security-hotspots
-- Editing issues（SonarQube Server 10.8）: https://docs.sonarsource.com/sonarqube-server/10.8/user-guide/issues/managing
+- Editing issues（SonarQube Server 2026.1 LTA）: https://docs.sonarsource.com/sonarqube-server/2026.1/user-guide/issues/managing
 - Issue management solution（SonarQube Cloud）: https://docs.sonarsource.com/sonarqube-cloud/managing-your-projects/issues/solution-overview
 - AI Code Assurance（AC/DC）: https://docs.sonarsource.com/agent-centric-development-cycle/ai-code-standards/ai-code-assurance
 - AI CodeFix（SonarQube Server）: https://docs.sonarsource.com/sonarqube-server/ai-capabilities/ai-codefix
@@ -553,4 +554,4 @@ SonarQubeを使ったコードレビューのベストプラクティスは、�
 - SonarQube Review 2026（Pricing, Tiers & Honest Pros/Cons）: https://appsecsanta.com/sonarqube
 - SonarQube（Wikipedia、エディション構成の概観）: https://en.wikipedia.org/wiki/SonarQube
 
-> **注記**: 本ガイドはSonar社のドキュメント更新頻度が高いこと、また一部の機能（Agentic Analysis、Sonar Vortexなど）がBetaないし提供開始直後であることを踏まえ、実際の導入前には必ず `docs.sonarsource.com` の最新情報を確認してください。価格・LOC課金の具体的な数値は第三者レビューサイトの情報であり、正式な見積もりはSonarSourceへの直接確認を推奨します。
+> **注記**: 本ガイドはSonar社のドキュメント更新頻度が高いこと、またAgentic Analysisを統合したSonar VortexがGA後も継続的に更新されていることを踏まえ、実際の導入前には必ず `docs.sonarsource.com` の最新情報を確認してください。価格・LOC課金の具体的な数値は第三者レビューサイトの情報であり、正式な見積もりはSonarSourceへの直接確認を推奨します。
