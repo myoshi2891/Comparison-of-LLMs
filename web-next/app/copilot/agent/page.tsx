@@ -866,21 +866,20 @@ export default function CopilotAgentPage() {
               <span className={styles.ck}>handoffs</span>:
             </div>
             <div className={styles.codeLine}>
-              {" "}
-              - <span className={styles.ck}>label</span>:{" "}
+              {"  "}- <span className={styles.ck}>label</span>:{" "}
               <span className={styles.cs}>計画を実装する</span>
             </div>
             <div className={styles.codeLine}>
-              {" "}
+              {"    "}
               <span className={styles.ck}>agent</span>: <span className={styles.cs}>agent</span>
             </div>
             <div className={styles.codeLine}>
-              {" "}
+              {"    "}
               <span className={styles.ck}>prompt</span>:{" "}
               <span className={styles.cs}>上記の計画を実装してください。</span>
             </div>
             <div className={styles.codeLine}>
-              {" "}
+              {"    "}
               <span className={styles.ck}>send</span>: <span className={styles.cw}>false</span>
             </div>
             <div className={styles.codeLine}>
@@ -1467,53 +1466,62 @@ export default function CopilotAgentPage() {
           <pre className={styles.codeBlock}>
             <div className={styles.codeLine}>&#123;</div>
             <div className={styles.codeLine}>
-              {" "}
+              {"  "}
               <span className={styles.ck}>&quot;servers&quot;</span>: &#123;
             </div>
             <div className={styles.codeLine}>
-              {" "}
+              {"    "}
               <span className={styles.ck}>&quot;myServer&quot;</span>: &#123;
             </div>
             <div className={styles.codeLine}>
-              {" "}
+              {"      "}
               <span className={styles.cv}>&quot;type&quot;</span>:{" "}
               <span className={styles.cs}>&quot;stdio&quot;</span>,
             </div>
             <div className={styles.codeLine}>
-              {" "}
+              {"      "}
               <span className={styles.cv}>&quot;command&quot;</span>:{" "}
               <span className={styles.cs}>&quot;npx&quot;</span>,
             </div>
             <div className={styles.codeLine}>
-              {" "}
+              {"      "}
               <span className={styles.cv}>&quot;args&quot;</span>: [
               <span className={styles.cs}>&quot;-y&quot;</span>,{" "}
               <span className={styles.cs}>&quot;@example/mcp-server&quot;</span>],
             </div>
             <div className={styles.codeLine}>
-              {" "}
+              {"      "}
               <span className={styles.cv}>&quot;sandboxEnabled&quot;</span>:{" "}
               <span className={styles.cw}>true</span>
             </div>
-            <div className={styles.codeLine}> &#125;</div>
-            <div className={styles.codeLine}> &#125;,</div>
             <div className={styles.codeLine}>
-              {" "}
+              {"    "}
+              &#125;
+            </div>
+            <div className={styles.codeLine}>
+              {"  "}
+              &#125;,
+            </div>
+            <div className={styles.codeLine}>
+              {"  "}
               <span className={styles.ck}>&quot;sandbox&quot;</span>: &#123;
             </div>
             <div className={styles.codeLine}>
-              {" "}
+              {"    "}
               <span className={styles.ck}>&quot;filesystem&quot;</span>: &#123;{" "}
               <span className={styles.cv}>&quot;allowWrite&quot;</span>: [
               <span className={styles.cs}>&quot;\${`\${workspaceFolder}`}&quot;</span>] &#125;,
             </div>
             <div className={styles.codeLine}>
-              {" "}
+              {"    "}
               <span className={styles.ck}>&quot;network&quot;</span>: &#123;{" "}
               <span className={styles.cv}>&quot;allowedDomains&quot;</span>: [
               <span className={styles.cs}>&quot;api.example.com&quot;</span>] &#125;
             </div>
-            <div className={styles.codeLine}> &#125;</div>
+            <div className={styles.codeLine}>
+              {"  "}
+              &#125;
+            </div>
             <div className={styles.codeLine}>&#125;</div>
           </pre>
 
