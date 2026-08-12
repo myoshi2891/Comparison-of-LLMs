@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import styles from "./page.module.css";
 
 /**
- * Highlights the table-of-contents link for the heading currently within the visible area.
+ * Highlights the table-of-contents link for headings that enter the configured viewport region.
  */
 export default function TocObserver() {
   useEffect(() => {

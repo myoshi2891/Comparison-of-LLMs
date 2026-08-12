@@ -3,6 +3,9 @@
 import { useEffect } from "react";
 import styles from "./page.module.css";
 
+/**
+ * Initializes mobile table-of-contents controls and highlights the section corresponding to the current scroll position.
+ */
 export default function TocObserver() {
   useEffect(() => {
     // Mobile sidebar toggle logic

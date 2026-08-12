@@ -9,6 +9,12 @@ export const metadata: Metadata = {
     "Nous Research製オープンソース自己改善型AIエージェント「Hermes Agent」を実運用レベルで使いこなすためのステップバイステップ解説。アーキテクチャ・メモリ設計・スキル運用・サブエージェント委任・/goal・execute_code・Cron・MCP統合・セキュリティ・コスト最適化まで全網羅。",
 };
 
+/**
+ * Renders content as a secure external link that opens in a new tab.
+ *
+ * @param href - The destination URL
+ * @param children - The link content
+ */
 function Ext({ href, children }: { href: string; children: React.ReactNode }) {
   return (
     <a href={href} target="_blank" rel="noopener noreferrer">
@@ -135,6 +141,9 @@ const DIAGRAM_15_1 = `flowchart TB
     Q3 -->|No| Q4{"Cronジョブが<br/>実行されない?"}
     Q4 -->|Yes| Fix5["hermes cron status /<br/>runsで履歴確認"]`;
 
+/**
+ * Renders the intermediate-to-advanced Hermes Agent best practices guide.
+ */
 export default function HermesAgentAdvancedGuidePage() {
   return (
     <div className={styles.layout}>

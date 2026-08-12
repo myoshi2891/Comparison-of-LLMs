@@ -6,6 +6,12 @@ interface TocObserverProps {
   activeClass?: string;
 }
 
+/**
+ * Manages sidebar navigation and highlights the table-of-contents link for the uppermost visible section.
+ *
+ * @param activeClass - The CSS class applied to the link for the active section.
+ * @returns `null`
+ */
 export default function TocObserver({ activeClass = "active" }: TocObserverProps) {
   useEffect(() => {
     // 1. Mobile menu toggle

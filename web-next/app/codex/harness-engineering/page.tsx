@@ -9,6 +9,12 @@ export const metadata: Metadata = {
     "自己採点(Layer 1)から標準ベンチマーク(Layer 6)・セキュリティ評価(Layer 7)まで、Codex向け評価基盤の7層モデルと実装パターンを詳細解説。",
 };
 
+/**
+ * Renders a link that opens the referenced page in a new browser tab.
+ *
+ * @param href - The URL of the external page
+ * @param children - The link content
+ */
 function Ext({ href, children }: { href: string; children: React.ReactNode }) {
   return (
     <a href={href} target="_blank" rel="noopener noreferrer">
@@ -86,6 +92,9 @@ const DIAGRAM_7 = `flowchart TB
     Verify --> Board["リーダーボード集計"]
     Board --> Decision["自社ハーネスのモデル/設定選定に反映"]`;
 
+/**
+ * Renders the Codex harness engineering evaluation infrastructure guide.
+ */
 export default function Page() {
   return (
     <div className={styles.layout}>

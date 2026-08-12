@@ -87,8 +87,7 @@ const MERMAID_CHART_8 = `flowchart TD
     Q4 -->|いいえ| A5["Apigee等でAPIレイヤーを保護"]`;
 
 /**
- * Google Sandbox Best Practices Page Component
- * Renders 100% faithful content from Google-sandbox-best-practices.html
+ * Renders a guide to Google sandbox technologies and best practices across AI agents, APIs, containers, C/C++, and browsers.
  */
 export default function GoogleSandboxBestPracticesPage() {
   return (

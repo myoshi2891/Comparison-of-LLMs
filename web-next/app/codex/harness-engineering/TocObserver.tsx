@@ -3,6 +3,9 @@
 import { useEffect } from "react";
 import styles from "./page.module.css";
 
+/**
+ * Synchronizes the mobile sidebar and table of contents with user interactions and scroll position.
+ */
 export default function TocObserver() {
   useEffect(() => {
     // Mobile sidebar toggle

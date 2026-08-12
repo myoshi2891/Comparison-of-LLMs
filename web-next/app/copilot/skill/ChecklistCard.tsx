@@ -32,6 +32,11 @@ const CHECKLIST_ITEMS: ChecklistItem[] = [
   { id: "c15", text: "プロジェクトスキルとしてコミットする際、PR レビューを通しているか" },
 ];
 
+/**
+ * Renders an interactive checklist for configuring and reviewing a skill.
+ *
+ * @returns The checklist card interface.
+ */
 export function ChecklistCard() {
   const [checkedState, setCheckedState] = useState<Record<string, boolean>>({});
 

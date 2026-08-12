@@ -153,6 +153,9 @@ function Ext({ href, children }: { href: string; children: React.ReactNode }) {
   );
 }
 
+/**
+ * Renders the CodeRabbit practical guide page with navigation, instructional content, diagrams, and references.
+ */
 export default function Page() {
   return (
     <div className={styles.layout}>

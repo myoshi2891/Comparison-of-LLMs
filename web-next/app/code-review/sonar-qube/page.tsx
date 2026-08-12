@@ -167,6 +167,9 @@ function Ext({ href, children }: { href: string; children: React.ReactNode }) {
   );
 }
 
+/**
+ * Renders a guide to SonarQube code review practices, including quality gates, issue triage, CI/CD integration, and AI-assisted review workflows.
+ */
 export default function SonarQubeGuidePage() {
   return (
     <div className={styles.layout}>
