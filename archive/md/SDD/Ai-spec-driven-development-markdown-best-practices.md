@@ -391,3 +391,37 @@ AI仕様駆動開発におけるMarkdown運用の本質は、**「AIエージェ
 33. Kanai Dutta（Medium）, "Experience With Kiro's Spec Driven Development Methodology" — https://medium.com/@kanaiduttaiem/experience-with-kiros-spec-driven-development-methodology-1e57af895fd7
 
 > 免責事項: 上記は2026年7月28日時点のWeb検索結果に基づく要約であり、各ツールの仕様・対応状況は今後変更される可能性があります。導入前には各公式ドキュメントの最新版を必ず確認してください。
+
+[1]: https://github.com/github/spec-kit
+[2]: https://github.github.com/spec-kit/
+[3]: https://den.dev/blog/github-spec-kit/
+[4]: https://developer.microsoft.com/blog/spec-driven-development-spec-kit/
+[5]: https://kiro.dev/docs/specs/
+[6]: https://kiro.dev/docs/specs/feature-specs/
+[7]: https://agents.md/
+[8]: https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents
+[9]: https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents
+[10]: https://addyosmani.com/blog/good-spec/
+[11]: https://simonw.substack.com/p/agentic-engineering-patterns
+[12]: https://simonwillison.net/tags/ai-assisted-programming/
+[13]: https://martinfowler.com/articles/exploring-gen-ai.html
+[14]: https://en.wikipedia.org/wiki/Spec-driven_development
+[15]: https://www.javacodegeeks.com/2026/05/spec-driven-development-with-ai-write-the-spec-first-then-prompt-the-implementation.html
+[16]: https://thebcms.com/blog/spec-driven-development
+[17]: https://blog.scottlogic.com/2025/11/26/putting-spec-kit-through-its-paces-radical-idea-or-reinvented-waterfall.html
+[18]: https://blog.agentailor.com/posts/top-ai-agent-standards-2026
+[19]: https://ssojet.com/blog/prd-spec-templates-ai-agents
+[20]: https://joshmcdonald.medium.com/ears-fifteen-years-on-the-requirements-format-built-for-the-agent-era-0f78f8ff35a0
+[21]: https://dev.to/krlz/spec-driven-development-in-2026-what-it-is-the-tooling-and-how-teams-actually-use-it-2fk2
+[22]: https://www.augmentcode.com/tools/best-spec-driven-development-tools
+[23]: https://www.softwareseni.com/spec-driven-development-is-replacing-vibe-coding-as-the-professional-standard-for-ai-teams/
+[24]: https://codemyspec.com/blog/spec-driven-development
+[25]: https://codersera.com/blog/agents-md-complete-guide-2026/
+[26]: https://blog.buildbetter.ai/agents-md-complete-guide-for-engineering-teams-in-2026/
+[27]: https://www.morphllm.com/agents-md-guide
+[28]: https://deepwiki.com/openai/agents.md/5-agents.md-format-documentation
+[29]: https://www.agensi.io/learn/agent-skills-open-standard
+[30]: https://bitbytebit.substack.com/p/spec-driven-development-from-vibe
+[31]: https://www.the-main-thread.com/p/spec-driven-development-exit-strategy
+[32]: https://builder.aws.com/content/36nn9PbSZuKJiWWoO2UWmFaaCHs/getting-started-with-spec-driven-development-using-kiro
+[33]: https://medium.com/@kanaiduttaiem/experience-with-kiros-spec-driven-development-methodology-1e57af895fd7
