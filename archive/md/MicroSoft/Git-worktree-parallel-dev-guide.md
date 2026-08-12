@@ -284,12 +284,14 @@ worktreeが共有するのはGitが追跡するファイルだけです。`node_
 | `node_modules`をsymlinkで共有 | 1つのworktreeの`node_modules`を他からシンボリックリンク | 一瞬でセットアップ完了 | 依存関係が分岐(`package.json`が変わる)すると壊れる。同一依存関係の場合のみ安全 |
 | pnpmの共有ストア(推奨) | コンテンツアドレス方式のグローバルストアを全worktreeで共有 | ダウンロード・ディスク使用量がほぼ増えない。依存関係が分岐しても安全 | pnpm固有の`node_modules`構造への移行が必要 |
 
-pnpm公式ドキュメントは、`enableGlobalVirtualStore: true`を設定したグローバル仮想ストアを使うことで、各worktreeの`node_modules`が実体を持たずシンボリックリンクのみで構成される運用を、マルチエージェント開発向けの推奨パターンとして公開しています。この設定では、新しいworktreeを追加してもパッケージは既にグローバルストアに存在するため、インストールがほぼ瞬時に終わります。ただし、この共有ストアは「同じ信頼境界内にいる」エージェント・利用者同士でのみ使うべきで、互いに信頼できないエージェント間で書き込み可能な共有ストアを使うことは避けるべきだと明記されています。
+pnpm公式ドキュメントは、`enableGlobalVirtualStore: true`を設定したグローバル仮想ストアを使うことで、各worktreeの`node_modules`が実体を持たずシンボリックリンクのみで構成される運用を、マルチエージェント開発向けのパターンとして公開しています。この機能は実験的で、`NODE_PATH`に依存するためESMモジュールとは互換性がありません。この設定では、新しいworktreeを追加してもパッケージは既にグローバルストアに存在するため、インストールがほぼ瞬時に終わります。ただし、この共有ストアは「同じ信頼境界内にいる」エージェント・利用者同士でのみ使うべきで、互いに信頼できないエージェント間で書き込み可能な共有ストアを使うことは避けるべきだと明記されています。
+
+```yaml
+# pnpm-workspace.yaml
+enableGlobalVirtualStore: true
+```
 
 ```bash
-# pnpmのグローバル仮想ストアを有効化する例(.npmrc または pnpm-workspace.yaml)
-echo "enable-global-virtual-store=true" >> .npmrc
-
 # bareリポジトリ構成での運用例
 git clone --bare https://github.com/your-org/your-monorepo.git your-monorepo
 cd your-monorepo
@@ -343,23 +345,37 @@ flowchart TB
 - データベースも同様に、worktreeごとにスキーマやDBブランチ(マネージドDBのbranching機能)を分ける
 
 ```bash
-# シンプルなポート自動割り当ての例(worktree名のハッシュ下位2桁を使う)
+# ポート自動割り当ての例(ハッシュを起点に衝突を検出する)
 WORKTREE_NAME=$(basename "$PWD")
-PORT_OFFSET=$(( 0x$(echo -n "$WORKTREE_NAME" | md5sum | cut -c1-2) % 50 ))
-echo "PORT=$((3000 + PORT_OFFSET))" >> .env
+PORT_OFFSET=$(($(printf '%s' "$WORKTREE_NAME" | cksum | cut -d' ' -f1) % 50))
+PORT=""
+
+for attempt in $(seq 0 49); do
+  candidate=$((3000 + (PORT_OFFSET + attempt) % 50))
+  if ! grep -Rqs "^PORT=$candidate$" ../*/.env 2>/dev/null && \
+     ! lsof -nP -iTCP:"$candidate" -sTCP:LISTEN >/dev/null 2>&1; then
+    PORT=$candidate
+    break
+  fi
+done
+
+[ -n "$PORT" ] || { echo "利用可能なポートが3000〜3049にありません" >&2; exit 1; }
+printf 'PORT=%s\n' "$PORT" >> .env
 ```
 
 ---
 
 ## 8. 自動化スクリプトとGit Hooks
 
-worktree作成のたびに「作成 → 依存関係インストール → `.env`コピー → ポート設定」を手動で行うのは非効率です。シェル関数として1コマンド化しておくと運用が大幅に楽になります。
+worktree作成のたびに「作成 → 依存関係インストール → 非秘密設定の用意 → ポート設定」を手動で行うのは非効率です。シェル関数として1コマンド化しておくと運用が大幅に楽になります。
 
 ```bash
 # ~/.zshrc または ~/.bashrc に追加する例
 gwt() {
   local branch="$1"
-  local dir="../$(basename "$(pwd)")-$(echo "$branch" | tr '/' '-')"
+  local root_dir="$PWD"
+  local dir="../$(basename "$root_dir")-$(echo "$branch" | tr '/' '-')"
+  local port_offset port candidate attempt env_file reserved
 
   git worktree add -b "$branch" "$dir" origin/main
   cd "$dir" || return
@@ -371,8 +387,31 @@ gwt() {
     npm ci
   fi
 
-  # .envの用意
-  [ -f ../"$(basename "$(dirname "$dir")")"/.env ] && cp ../"$(basename "$(dirname "$dir")")"/.env .env
+  # 秘密を含まないテンプレートだけをコピーする
+  [ -f "$root_dir/.env.example" ] && cp "$root_dir/.env.example" .env
+
+  # worktreeごとに未予約・未使用のPORTを割り当てる
+  port_offset=$(($(printf '%s' "$(basename "$PWD")" | cksum | cut -d' ' -f1) % 50))
+  port=""
+  for attempt in $(seq 0 49); do
+    candidate=$((3000 + (port_offset + attempt) % 50))
+    reserved=false
+    for env_file in "$root_dir"/../*/.env; do
+      [ -f "$env_file" ] || continue
+      [ "$env_file" = "$PWD/.env" ] && continue
+      grep -qx "PORT=$candidate" "$env_file" && reserved=true && break
+    done
+    if [ "$reserved" = false ] && ! lsof -nP -iTCP:"$candidate" -sTCP:LISTEN >/dev/null 2>&1; then
+      port=$candidate
+      break
+    fi
+  done
+  [ -n "$port" ] || { echo "利用可能なポートが3000〜3049にありません" >&2; return 1; }
+  if grep -q '^PORT=' .env 2>/dev/null; then
+    sed -i.bak "s/^PORT=.*/PORT=$port/" .env && rm -f .env.bak
+  else
+    printf 'PORT=%s\n' "$port" >> .env
+  fi
 
   echo "worktree '$dir' の準備が完了しました"
 }
@@ -439,7 +478,7 @@ Gitの公式ドキュメントは、複数worktreeでのsubmoduleサポートは
 
 ### 12.3 `mv`による移動でリンクが壊れる
 
-前述の通り、worktreeディレクトリをOSの`mv`コマンドで直接移動すると、メインリポジトリとの双方向シンボリックリンクが壊れます。移動する際は必ず`git worktree move <old> <new>`を使用してください。既に壊れてしまった場合は`git worktree repair`で修復を試みます。
+前述の通り、worktreeディレクトリをOSの`mv`コマンドで直接移動すると、Gitの管理データを指すポインタが古いパスのままになります。linked worktree側の`.git`ファイルと、管理領域側の`gitdir`ファイルは互いの場所をパスで参照しています。移動する際は必ず`git worktree move <old> <new>`を使用してください。既にパスが古くなった場合は`git worktree repair`で修復を試みます。
 
 ### 12.4 ロックされたworktreeの扱い
 

@@ -421,11 +421,11 @@ Model Context Protocol(MCP)は、AIモデルを外部ツールやサービスに
 ---
 name: 'Database Administrator'
 description: 'PostgreSQLのパフォーマンスチューニング・クエリ最適化・スキーマ設計の専門DBA'
-tools: ['codebase', 'terminal', 'postgres/*']
+tools: ['codebase', 'postgres/schema_read', 'postgres/query_readonly', 'postgres/explain_readonly']
 ---
 ```
 
-この設定があると、エージェントは実際のデータベースに対して `EXPLAIN ANALYZE` を実行してボトルネックを特定したり、実データの分布に基づいてインデックスを提案したりできます。MCPサーバーがなければ、エージェントはデータベース構造やパフォーマンス特性を推測するしかありません。
+この例では、スキーマ参照、読み取り専用クエリ、読み取り専用の実行計画確認だけを個別に許可します。実際のツール名は使用するMCPサーバーに合わせ、サーバー側でも読み取り専用ロールを強制してください。これにより、エージェントはデータベースへの書き込みや管理操作を許可されることなく、スキーマ、データ分布、実行計画を調査してインデックスを提案できます。MCPサーバーがなければ、エージェントはデータベース構造やパフォーマンス特性を推測するしかありません。
 
 ### 6.3 `mcp.json` によるサーバー設定(VS Code)
 

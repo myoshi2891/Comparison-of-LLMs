@@ -64,14 +64,15 @@ VS Codeの公式ドキュメントによれば、複数の指示が衝突した�
 
 ```mermaid
 flowchart TD
-    Q1{"このルールは常に<br/>適用したいか?"}
+    Q0{"外部システムの<br/>データや操作が必要か?"}
+    Q0 -->|"はい"| R6["MCP サーバー"]
+    Q0 -->|"いいえ"| Q1{"このルールは常に<br/>適用したいか?"}
     Q1 -->|"はい・リポジトリ全体"| R1["copilot-instructions.md<br/>または AGENTS.md"]
     Q1 -->|"はい・特定言語/ディレクトリのみ"| R2[".instructions.md<br/>applyTo で限定"]
     Q1 -->|"いいえ・手動で呼び出したい"| Q2{"再利用したいのは何か?"}
     Q2 -->|"定型プロンプト・単発タスク"| R3[".prompt.md<br/>/command"]
     Q2 -->|"AIの役割・使えるツール・モデル"| R4[".agent.md<br/>カスタムエージェント"]
     Q2 -->|"スクリプト付きの専門手順"| R5["SKILL.md<br/>description一致で自動ロード"]
-    Q1 -->|"外部システムのデータ/操作が必要"| R6["MCP サーバー"]
 ```
 
 まずは全体像を俯瞰する一覧表です。
@@ -80,7 +81,7 @@ flowchart TD
 |---|---|---|---|---|
 | Repository instructions | `.github/copilot-instructions.md` | リポジトリ全体 | 自動（常時） | 技術スタック、ビルド/テスト手順、コーディング規約 |
 | Path-specific instructions | `.github/instructions/*.instructions.md` | `applyTo` で指定したパス/言語のみ | 自動（条件付き） | 言語別・ディレクトリ別の詳細ルール |
-| AGENTS.md | リポジトリルートの `AGENTS.md` | リポジトリ全体（複数のAIツール共通） | 自動（常時） | Copilot以外のエージェント（Claude Code、Codexなど）とも共有する規約 |
+| AGENTS.md | リポジトリルートの `AGENTS.md` | リポジトリ全体（複数のAIツール共通） | 対応機能で自動。Copilot code reviewはhead branchのリポジトリルート、coding agentは作業対象に適用されるファイル、Copilot CLI／VS Code agent modeは開いたリポジトリ・ワークスペースの対応スコープから検出 | Copilot以外のエージェント（Claude Code、Codexなど）とも共有する規約 |
 | Prompt files | `.github/prompts/*.prompt.md` | 単発タスク | 手動（`/command`） | 定型作業をスラッシュコマンド化 |
 | Custom agents（旧Custom chat modes） | `.github/agents/*.agent.md` | セッション/タスク単位 | 手動（エージェント選択） | 役割・ツールセット・モデルの切り替え |
 | Agent Skills | `.github/skills/<name>/SKILL.md` | タスク単位 | 自動（description一致で動的ロード） | 手続き的知識、スクリプト、テンプレートの束 |
