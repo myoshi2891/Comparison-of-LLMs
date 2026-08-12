@@ -2,7 +2,7 @@
 
 > 本ファイルは Next.js 移行完了後の保守・改善フェーズにおける開発の進捗（特にテスト関連）および品質チェックのルールを記録する。
 >
-> - 最終更新日: **Updated 2026-08-11**
+> - 最終更新日: **Updated 2026-08-12**
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
 
@@ -12,13 +12,20 @@
 - **ブランチ**: `dev`（本番 `main` への Next.js 移行マージ完了 🚀）
 - **動作検証**:
   - `npm run build` ⏭️（今回もユーザー指定により省略。CI等で実施）
-  - `npm run typecheck` ✅（サンドボックスではユーザー指定により npm を使用。`package.json` の `typecheck` スクリプトは `tsc --noEmit` で、`bun run typecheck` と同じスクリプトを実行）
-  - `npm run lint` ✅（452 files checked、diagnostics 0）
+  - `npm run typecheck` ✅（`tsc --noEmit`）
+  - `npm run lint` ✅（Biome check）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: `npm test` で Vitest **162 files / 1447 tests すべて合格**（収集失敗なし）。サンドボックスではユーザー指定により npm を使用し、`package.json` の `test` スクリプト `vitest run` を実行するため `(cd web-next && bun run test)` と同等
+  - **フロントエンド (`web-next/`)**: `bun run test` で Vitest **163 files / 1454 tests すべて合格**（全 Green ✅）
   - **バックエンド (`scraper/`)**: pytest 実行で **43 件すべて合格** (全 Green ✅)
 
 ## 最近の追加内容
+
+- **GitHub Copilot .agent.md 実践ガイド（/copilot/agent）の Pure JSX 完全置き換え移行**:
+  - `Github-copilot-agent-md-guide.html` を `web-next/app/copilot/agent/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。
+  - 要約・省略なしで全10セクション（1. .agent.md とは何か〜10. 参考文献）、全52サブセクション（h3）、全表、全コードブロック（1行毎 `codeLine` ラッパー & 構文トークン化）、6 Mermaid図（`MermaidDiagram`）、TOCスクロール追従（`TocObserver.tsx`）、`TocObserver.test.tsx` の単体テスト・スクロールスパイ計算、`page-registry.ts` の内容更新・`lastReviewed` (2026-08-12) を完了。
+  - 既存の旧 `/copilot/agent` コンテンツと完全入れ替え完了。
+  - 原本 `Github-copilot-agent-md-guide.html` は `archive/Github-copilot-agent-md-guide.html` へ `git mv` 退避保存。
+  - 契約テスト11件および TocObserver テスト4件（計15件）を作成し全クリア（Vitest **163 files / 1454 tests** 全 Green ✅）。
 
 - **GitHub Copilot Agent Skills 公開仕様と Google Sandbox TOC アクセシビリティの修正**:
   - `/copilot/skill` の検証コマンドを `gh skill publish --dry-run` に統一し、公式に確認できない ToxicSkills 検出の説明を削除。ローカル導入の `--from-local` と `metadata.local-path` を明記し、公開用 `allowed-tools` の全例を空白区切り文字列へ統一。
