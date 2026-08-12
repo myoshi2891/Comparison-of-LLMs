@@ -91,17 +91,17 @@ flowchart LR
     App["エージェントが生成した<br/>コード / プロセス"] --> Sentry["gVisor Sentry<br/>(ユーザー空間の疑似カーネル)"]
     Sentry --> Gofer["gVisor Gofer<br/>(ファイルI/Oプロキシ)"]
     Gofer --> Kernel["ホストのLinuxカーネル"]
-    Sentry -.->|直接到達は不可| Kernel
+    Sentry -.->|"同期・タイマー・シグナル等に必要な限定syscall"| Kernel
 ```
 
-Sentryはエージェントが発行するすべてのシステムコール(`exec`や`socket`など)を横取りし、ホストカーネルに直接触れさせない「偽のカーネル」として振る舞います。ファイルシステム操作だけは別プロセスのGoferが仲介するため、たとえSentryに未知の脆弱性があっても、ファイルシステムへの被害範囲を最小化できます。
+Sentryはエージェントが発行するシステムコール(`exec`や`socket`など)をユーザー空間で再実装し、アプリケーションからホストカーネルへ直接パススルーさせない「偽のカーネル」として振る舞います。一方、Sentry自身は同期・タイマー・シグナル処理などに必要な限定されたホストシステムコールを、seccompフィルタの下で利用します。ファイルシステム操作は別プロセスのGoferが仲介するため、たとえSentryに未知の脆弱性があっても、ファイルシステムへの被害範囲を最小化できます。
 
 ### 3-3. ステップバイステップ:導入のベストプラクティス
 
 1. **隔離(ISOLATE)**:非決定的なエージェントのコード・ツール実行・ユーザー入力処理はすべてGKE Agent Sandbox(gVisor)上で実行し、RCE(リモートコード実行)攻撃をサンドボックス内に封じ込める
 2. **高速化(ACCELERATE)**:サンドボックスの起動レイテンシを隠すため、事前にプロビジョニングされた「ウォームプール」を用意する。さらにコスト削減のため、アイドル状態のエージェントは「コールドプール(サスペンド状態のVM)」に退避させ、Pod Snapshotsで低コストに復元する
 3. **権限の制限(RESTRICT・ID)**:Workload Identity Federationを使い、エージェントごとに使い捨ての最小権限IAMアイデンティティを付与する
-4. **通信の制限(RESTRICT・Network)**:デフォルト拒否(default-deny)のKubernetes NetworkPolicyを設定し、エージェントが必要とするDNS・メタデータ・APIエンドポイントだけを明示的に許可リスト化する
+4. **通信の制限(RESTRICT・Network)**:Agent Sandboxのマネージド既定設定では、公開インターネットへのegressは許可される一方、RFC 1918のプライベートアドレス、メタデータサーバー、内部DNSなど内部宛先への通信は制限される。データ持ち出しも抑止する場合は、カスタムのdefault-deny Kubernetes NetworkPolicyを追加し、DNSと必要なAPIエンドポイントだけを明示的に許可する
 5. **多層防御を過信しない**:gVisor・Workload Identity・VPC Service Controlsをすべて設定しても、それらは「許可されたチャネルの中で行われる正規の操作」しか防げない。プロンプトインジェクションによって、許可済みのAPI呼び出し経由でデータが持ち出されるリスクは別途モニタリングで検知する必要がある、と複数のセキュリティ研究者が指摘している
 
 ### 3-4. Gemini API / Agent Platform の Code Execution
@@ -115,6 +115,7 @@ GKE以外にも、Gemini APIおよびGemini Enterprise Agent Platformが提供�
 | 状態保持 | 実行状態(メモリ)を最大14日間保持(TTLで調整可能) |
 | デフォルトのネットワーク | 無効(明示的な許可リストを設定しない限りアウトバウンド通信不可) |
 | 対応フレームワーク | 特定のフレームワークに依存せず、任意のエージェント実装・任意のモデルから利用可能 |
+| 提供リージョン(Gemini Enterprise Agent Platform) | `us-central1` |
 
 Agent Development Kit(ADK)の公式安全設計ドキュメントでも、「コード実行は特にセキュリティ上の影響が大きい特殊なツールであり、モデルが生成したコードがローカル環境を侵害しないよう、必ずサンドボックス化しなければならない」と明記されています。あわせてModel ArmorプラグインやPII redactionプラグインといった、入出力を検査する追加のガードレールも推奨されています。
 
@@ -164,7 +165,7 @@ flowchart LR
     Seccomp --> HostKernel["ホストのLinuxカーネル"]
 ```
 
-Googleのサーバーレス製品群(App Engine、Cloud Run、Cloud Functions)はいずれも、アプリケーションワークロードの隔離にgVisorを採用しています。Cloud Runの場合、各インスタンスは仮想マシンモニター(VMM)によって他のインスタンスから隔離され、さらにコンテナ境界の強制とseccompによるシステムコールフィルタリングが重ねられる多層防御構成になっています。
+Googleのサーバーレス製品群は、製品名だけでなく実行環境ごとに隔離方式を確認する必要があります。Cloud Runの第1世代はgVisor、第2世代はLinux microVMを使い、第2世代ではseccompとSandbox2のLinux namespaceによる追加防御も重ねられます。App EngineはStandard環境でgVisorを使う一方、Flexible環境はCompute Engine VM上のDockerコンテナとして動作します。Cloud Functionsは第1世代でgVisorを使い、第2世代はCloud Runを基盤とするため、その実行環境の隔離方式に従います。したがって、全製品・全世代が一律にgVisorを採用しているとは扱えません。
 
 ### 5-2. ステップバイステップ:GKE Sandboxの有効化手順
 
@@ -246,15 +247,16 @@ Google Developersの公式ページでは、用途別に複数のサンドボッ
 
 ### 7-1. Chromeのマルチプロセスアーキテクチャ
 
-Chromeのセキュリティ設計の中核は「サンドボックス化されたマルチプロセスアーキテクチャ」です。DOMのレンダリング・スクリプト実行・メディアデコードなど、Web由来の攻撃対象領域の大部分は、権限を持たない「レンダラープロセス」に閉じ込められます。唯一「ブラウザプロセス」だけが、ファイルシステムやネットワークに直接アクセスできる無サンドボックスの特権プロセスとして動作します。
+Chromeのセキュリティ設計の中核は「サンドボックス化されたマルチプロセスアーキテクチャ」です。DOMのレンダリング・スクリプト実行・メディアデコードなど、Web由来の攻撃対象領域の大部分は、権限を持たない「レンダラープロセス」に閉じ込められ、ファイルシステムやネットワークへの直接アクセスも制限されます。ブラウザプロセスは通常サンドボックス外で高い権限を持ちますが、Network Service、GPU、Utilityも別プロセスで動作し、それぞれのサンドボックス化と権限制限はプロセス、プラットフォーム、構成によって異なります。
 
 ```mermaid
 flowchart TB
     Browser["ブラウザプロセス<br/>(無サンドボックス・特権)"]
     Browser --> RendererA["レンダラープロセスA<br/>(サイトA専用・サンドボックス化)"]
     Browser --> RendererB["レンダラープロセスB<br/>(サイトB専用・サンドボックス化)"]
-    Browser --> GPU["GPUプロセス<br/>(サンドボックス化)"]
-    Browser --> Network["ネットワークプロセス"]
+    Browser --> GPU["GPUプロセス<br/>(制限は環境依存)"]
+    Browser --> Network["Network Service<br/>(制限は環境依存)"]
+    Browser --> Utility["Utilityプロセス<br/>(制限は用途・環境依存)"]
     RendererA -.->|IPC経由のみ| Browser
     RendererB -.->|IPC経由のみ| Browser
 ```
@@ -267,7 +269,7 @@ Chrome 67(デスクトップ、全サイト対象)およびChrome 77(Android、�
 
 Site Isolationがプロセス間の隔離だとすれば、**V8 Sandbox**はプロセス**内**の隔離です。V8のセキュリティ技術リードであるSamuel Groß氏によれば、今日発見・悪用されるV8の脆弱性のほぼすべてに共通するのは、「コンパイラとランタイムがほぼ例外なくV8のHeapObjectインスタンスだけを操作するため、最終的なメモリ破壊が必ずV8ヒープの内部で発生する」という点です。
 
-V8 Sandboxは、V8が実行するコードを、プロセスの仮想アドレス空間の一部(=サンドボックス、64bit環境で最大1TB分を予約)に限定し、それ以外のメモリ領域からは切り離します。サンドボックス外のメモリにアクセスできるすべてのデータ型を「サンドボックス互換」の代替型に置き換えることで、たとえV8内でメモリ破壊が起きても、サンドボックスの外側には影響が及ばない設計です。Chrome 123から、Android・ChromeOS・Linux・macOS・Windowsの全プラットフォームでデフォルト有効化されており、SpeedometerやJetStreamのベンチマークでは、性能オーバーヘッドは約1%に抑えられています。
+V8 Sandboxは、V8が実行するコードを、プロセスの仮想アドレス空間の一部(=サンドボックス、64bit環境で最大1TB分を予約)に限定し、それ以外のメモリ領域からは切り離します。サンドボックス外のメモリにアクセスできるすべてのデータ型を「サンドボックス互換」の代替型に置き換えることで、たとえV8内でメモリ破壊が起きても、サンドボックスの外側には影響が及ばない設計です。Chrome 123から、Android・ChromeOS・Linux・macOS・Windowsの64-bit版(x64またはarm64構成)でデフォルト有効化されており、32-bit版は対象外です。SpeedometerやJetStreamのベンチマークでは、性能オーバーヘッドは約1%に抑えられています。
 
 ```mermaid
 flowchart LR
@@ -360,7 +362,7 @@ flowchart TD
 - Apigee API Management(製品ページ): https://cloud.google.com/apigee
 - Best practices for securing your applications and APIs using Apigee: https://docs.cloud.google.com/architecture/best-practices-securing-applications-and-apis-using-apigee
 - Advanced API Security best practices(Apigee公式): https://docs.cloud.google.com/apigee/docs/api-security/best-practices
-- About environments(Apigee hybrid公式、環境=サンドボックスの定義): https://cloud.google.com/apigee/docs/hybrid/v1.9/environments-about
+- About environments(Apigee hybrid公式、環境=サンドボックスの定義): https://cloud.google.com/apigee/docs/hybrid/v1.16/environments-about
 - Top Sandbox Development Environment Best Practices Guide(DigitalAPI): https://www.digitalapi.ai/blogs/what-are-the-best-practices-for-managing-a-sandbox-development-environment
 
 ### ③ コンテナ
