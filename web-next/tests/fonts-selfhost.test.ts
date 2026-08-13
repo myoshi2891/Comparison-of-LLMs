@@ -18,6 +18,7 @@
 import { existsSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { beforeAll, describe, expect, it } from "vitest";
+import { notoSansJpPreloadHrefs } from "@/lib/noto-sans-jp-preload";
 
 const repoRoot = join(__dirname, "..");
 const fontCssPath = join(repoRoot, "public/fonts/noto-sans-jp.css");
@@ -39,6 +40,7 @@ let faces: FontFace[] = [];
 let fontsTs = "";
 let globalsCss = "";
 let layoutTsx = "";
+let vendorScript = "";
 
 beforeAll(() => {
   fontCss = existsSync(fontCssPath) ? readFileSync(fontCssPath, "utf8") : "";
@@ -51,6 +53,7 @@ beforeAll(() => {
   fontsTs = readFileSync(join(repoRoot, "lib/fonts.ts"), "utf8");
   globalsCss = readFileSync(join(repoRoot, "app/globals.css"), "utf8");
   layoutTsx = readFileSync(join(repoRoot, "app/layout.tsx"), "utf8");
+  vendorScript = readFileSync(join(repoRoot, "scripts/vendor-noto-sans-jp.ts"), "utf8");
 });
 
 describe("self-hosted Noto Sans JP - vendored stylesheet", () => {
@@ -130,6 +133,26 @@ describe("self-hosted Noto Sans JP - wiring", () => {
   });
 
   it("preloads the latin slice to keep parity with next/font subsets", () => {
+    const latinUrls = [
+      ...new Set(
+        Array.from(
+          fontCss.matchAll(
+            /\/\*\s*latin\s*\*\/\s*@font-face\s*\{[\s\S]*?src:\s*url\(([^)]+)\)/g
+          ),
+          (match) => match[1]
+        )
+      ),
+    ];
+
+    expect([...notoSansJpPreloadHrefs]).toEqual(latinUrls);
     expect(layoutTsx).toMatch(/rel="preload"[^>]*as="font"/);
+  });
+
+  it("stages every generated artifact before replacing the current generation", () => {
+    expect(vendorScript).toMatch(/mkdtempSync\(/);
+    expect(vendorScript).toMatch(/downloadAll\(filesByName,\s*stagedOutDir\)/);
+    expect(vendorScript).toMatch(/writeFileSync\(stagedCssOut,/);
+    expect(vendorScript).toMatch(/writeFileSync\(stagedPreloadOut,/);
+    expect(vendorScript).toMatch(/promoteStagedGeneration\(/);
   });
 });

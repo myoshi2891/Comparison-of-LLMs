@@ -173,8 +173,11 @@ describe("Phase 6 - fonts configuration (lib/fonts.ts)", () => {
   it("does not configure Noto Sans JP via next/font/google", () => {
     // Noto Sans JP は 496 @font-face をビルド時に外部取得するため自前ホストへ移行した。
     // 詳細な契約は tests/fonts-selfhost.test.ts を参照。
+    const rootBlock = /:root\s*\{([\s\S]*?)\n\}/.exec(globalsCss)?.[1] ?? "";
+    const fontSansValue = /(?:^|\n)\s*--font-sans:\s*([^;]+);/.exec(rootBlock)?.[1].trim();
+
     expect(fontsTs).not.toContain("Noto_Sans_JP");
-    expect(globalsCss).toMatch(/--font-sans:\s*"Noto Sans JP"/);
+    expect(fontSansValue).toBe('"Noto Sans JP"');
   });
 
   it("configures JetBrains Mono and exposes --font-mono variable", () => {
