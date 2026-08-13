@@ -675,7 +675,7 @@ try {
   process.exit(2);
 }
 
-const sourceInventory = sourcePath.endsWith(".md")
+const sourceInventory = /\.(?:md|markdown)$/i.test(sourcePath)
   ? inventoryMarkdown(sourceText)
   : inventoryHtml(sourceText);
 const pageInventory = inventoryTsx(pageText);
