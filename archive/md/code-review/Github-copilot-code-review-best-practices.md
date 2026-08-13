@@ -134,7 +134,7 @@ GitHub自身が公開しているガイドによれば、Copilot Code Reviewの�
 
 ## ステップ3: Agent SkillsとMCPで文脈を拡張する
 
-2026年7月29日、Copilot Code ReviewにおけるAgent SkillsとMCPサーバー連携が、Copilot Pro・Pro+・Business・Enterpriseの全有償プランで一般提供(GA)になりました<sup>15</sup>。これはMCPの2026-07-28版仕様が正式リリースされた翌日というタイミングでもあり、MCP対応が「アーリーアダプター向けの機能」から「プラン選定時のチェック項目」へと位置づけを変えた出来事として注目されています<sup>20</sup>。
+2026年7月29日、Copilot Code ReviewにおけるAgent SkillsとMCPサーバー連携が、Copilot Pro・Pro+・Business・Enterpriseの全有償プランで一般提供(GA)になりました<sup>15</sup>。これはMCPの2026-07-28版仕様が正式リリースされた翌日というタイミングでもあり、MCP対応が「アーリーアダプター向けの機能」から「プラン選定時のチェック項目」へと位置づけを変えた出来事として注目されています<sup>34</sup>。
 
 - **Agent Skills**: `.github/skills/`配下にスキル専用のディレクトリを作り、その中に`SKILL.md`を置くことで、社内ツールやコーディング標準に関する文脈をレビュー時に注入できます。レビュー用途であることが伝わるよう、ディレクトリ名は`code-review`のようにレビュー指向の名前にすることが推奨されています<sup>14</sup>。
 - **MCPサーバー**: リポジトリのCopilot設定からMCPサーバーを追加すると、課題管理システムやドキュメント、サービスカタログなど外部プラットフォームの情報をレビューに取り込めます。GitHub MCPサーバーとPlaywright MCPサーバーはデフォルトで有効です<sup>14</sup>。GitHub MCPサーバーの既定トークンは読み取り専用ですが、リポジトリ設定ではより広い権限を持つトークンも指定できます。利用するツールを読み取り用途に限定し、トークン権限も必要最小限に明示して管理してください。Copilot cloud agent用に設定済みのMCP設定は自動的にCode Reviewにも引き継がれます<sup>15</sup>。
@@ -235,9 +235,9 @@ Copilot Code Reviewは「GitHubエコシステムに完全統合されたゼロ�
 
 | 観点 | GitHub Copilot Code Review | 専業レビューツール(CodeRabbit等) |
 |---|---|---|
-| 導入のしやすさ | 有償Copilotプランで利用できるが、レビューはAI Creditsを消費し、agentic capabilitiesはGitHub Actions minutesも消費する。プラン内クレジットや予算上限を超えた追加利用は課金対象になり得る<sup>25</sup> | 別途契約・別料金が必要 |
-| 対応プラットフォーム | GitHub.com・GitHub CLI・GitHub Mobile・主要IDEを中心に対応し、Azure DevOpsはpublic preview<sup>25</sup> | GitHub・GitLab・Bitbucket・Azure DevOps等、複数プラットフォームに対応する製品もある<sup>25</sup> |
-| 精度傾向 | [Martianのオンラインベンチマーク](https://codereview.withmartian.com/)の現行スナップショットでは、Copilotが参加した279 PRでprecision 62.7%、recall 32.6%。LLMがレビュー時の差分・botコメント・レビュー後コミットを解析し、実際の修正との対応からprecision/recallを算出する方式であり、時点や条件で値は変動する | 製品群を一括して「高精度・高再現」とは評価できない。同じ母集団・条件での各製品の値は[Martianの一次結果と方法論](https://github.com/withmartian/code-review-benchmark)を個別に確認する |
+| 導入のしやすさ | 有償Copilotプランで利用できるが、レビューはAI Creditsを消費し、agentic capabilitiesはGitHub Actions minutesも消費する。プラン内クレジットや予算上限を超えた追加利用は課金対象になり得る<sup>25, 33</sup> | 別途契約・別料金が必要 |
+| 対応プラットフォーム | GitHub.com・GitHub CLI・GitHub Mobile・主要IDEを中心に対応し、Azure DevOpsはpublic preview<sup>25, 33</sup> | GitHub・GitLab・Bitbucket・Azure DevOps等、複数プラットフォームに対応する製品もある<sup>25</sup> |
+| 精度傾向 | [Martianのオンラインベンチマーク](https://codereview.withmartian.com/)は、botの提案とレビュー後の開発者による修正の対応をLLMで判定する継続更新型の比較である。取得期間・対象フィルター・結果版を固定したスナップショットを保存できないため数値は引用しない。precision/recallは実際の修正行動を正解の代理とする指標であり、recallの分母も独立に列挙した全潜在問題ではなくLLMが抽出したレビュー後修正なので、固定された外部の分母はない<sup>35</sup> | 製品群を一括して「高精度・高再現」とは評価できない。同じ母集団・条件での各製品の値は[Martianの一次結果と方法論](https://github.com/withmartian/code-review-benchmark)を個別に確認する<sup>35</sup> |
 | カスタマイズ性 | `copilot-instructions.md`等による指示のカスタマイズが可能 | 学習型のフィルタリングなど、より高度なノイズ抑制機構を持つ製品もある<sup>28</sup> |
 
 2026年2月には、DeepMind・Anthropic・Metaの研究者が設立した研究機関Martianが、レビューツールを販売する立場にない独立機関として初めてAIコードレビューエージェントのベンチマークを公開し、ベンダー自身が「自社が勝つベンチマーク」を発表し合う状況に一石を投じたと報じられています<sup>25</sup>。
@@ -301,10 +301,12 @@ GitHub Copilot Code Reviewは、GitHubのPRワークフローに深く統合さ�
 8. [Excluding content from GitHub Copilot](https://docs.github.com/en/copilot/how-tos/configure-content-exclusion/exclude-content-from-copilot)
 9. [Configuring runners for GitHub Copilot code review](https://docs.github.com/en/copilot/how-tos/copilot-on-github/set-up-copilot/configure-runners)
 10. [About GitHub Copilot code review — Model usage](https://docs.github.com/en/copilot/concepts/agents/code-review#model-usage)
-11. [Copilot code review: Analysis depth and efficiency updates](https://github.blog/changelog/2026-06-25-copilot-code-review-analysis-depth-and-efficiency-updates/)(2026年6月25日)
 12. [Adding custom instructions for GitHub Copilot CLI(excludeAgent)](https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/add-custom-instructions)
 13. [Testing changes to content exclusions in your IDE](https://docs.github.com/zh/enterprise-cloud@latest/copilot/managing-copilot/managing-github-copilot-in-your-organization/managing-github-copilot-features-in-your-organization/testing-changes-to-content-exclusions-in-your-ide)
 14. [Using GitHub Copilot code review(MCP/Agent Skills設定詳細)](https://docs.github.com/copilot/using-github-copilot/code-review/using-copilot-code-review)
+31. [Model Context Protocol(MCP) and GitHub Copilot cloud agent](https://docs.github.com/en/copilot/concepts/agents/cloud-agent/mcp-and-cloud-agent)
+32. [Creating custom agents for Copilot cloud agent](https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/customize-cloud-agent/create-custom-agents)
+33. [About GitHub Copilot code review](https://docs.github.com/en/enterprise-cloud@latest/copilot/concepts/agents/code-review)
 
 ### 公式ブログ・Changelog(GitHub Blog)
 
@@ -313,13 +315,16 @@ GitHub Copilot Code Reviewは、GitHubのPRワークフローに深く統合さ�
 17. [Copilot code review: New configurations and controls](https://github.blog/changelog/2026-06-12-copilot-code-review-new-configurations-and-controls/)(2026年6月12日)
 18. [Copilot code review: Path-scoped custom instruction file support](https://github.blog/changelog/2025-09-03-copilot-code-review-path-scoped-custom-instruction-file-support/)(2025年9月3日)
 19. [Unlocking the full power of Copilot code review: Master your instructions files](https://github.blog/ai-and-ml/github-copilot/unlocking-the-full-power-of-copilot-code-review-master-your-instructions-files/)(GitHub公式ブログ、2026年4月17日)
+20. [Copilot code review: Independent repository rule for automatic reviews](https://github.blog/changelog/2025-09-10-copilot-code-review-independent-repository-rule-for-automatic-reviews/)(2025年9月10日)
+11. [Copilot code review: Analysis depth and efficiency updates](https://github.blog/changelog/2026-06-25-copilot-code-review-analysis-depth-and-efficiency-updates/)(2026年6月25日)
 30. [Copilot code review effort levels are generally available](https://github.blog/changelog/2026-08-07-copilot-code-review-effort-levels-are-generally-available/)(2026年8月7日)
-31. [Model Context Protocol(MCP) and GitHub Copilot cloud agent](https://docs.github.com/en/copilot/concepts/agents/cloud-agent/mcp-and-cloud-agent)
-32. [Creating custom agents for Copilot cloud agent](https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/customize-cloud-agent/create-custom-agents)
+
+### MCP公式資料
+
+34. [The 2026-07-28 Specification](https://blog.modelcontextprotocol.io/posts/2026-07-28/)(MCP公式ブログ、2026年7月28日)
 
 ### コミュニティ・実務者による記事
 
-20. [MCP Adoption Week: Copilot Code Review Goes GA](https://www.digitalapplied.com/blog/mcp-adoption-week-copilot-code-review-ga)(2026年7月、GA日の経緯を分析した記事)
 21. Rahul Singh, [GitHub Copilot Code Review: Complete Guide (2026)](https://dev.to/rahulxsingh/github-copilot-code-review-complete-guide-2026-255h), DEV Community(2026年4月2日)
 22. pwd9000, [Mastering Code Reviews with GitHub Copilot: The Definitive Guide](https://dev.to/pwd9000/mastering-code-reviews-with-github-copilot-the-definitive-guide-3nfp), DEV Community(2026年5月27日)
 23. Mrinal Maheshwari, [GitHub Copilot Code Review: Guidelines, Best Practices, and How to Integrate It into Your PR Workflow](https://blog.mrinalmaheshwari.com/github-copilot-code-review-guidelines-best-practices-and-how-to-integrate-it-into-your-pr-b4518073b4c9)(2026年1月12日)
@@ -330,4 +335,8 @@ GitHub Copilot Code Reviewは、GitHubのPRワークフローに深く統合さ�
 28. [CodeRabbit vs GitHub Copilot Code Review (2026): Benchmarks, Pricing, Features](https://www.morphllm.com/comparisons/coderabbit-vs-copilot)(2026年3月14日)
 29. Simon Willison, [Posts tagged "github-copilot"](https://simonwillison.net/tags/github-copilot/) — GitHub Copilotのエージェント化やモデル変更を継続的に追跡している著名な開発者のブログ。Copilot CLIやプラン変更などの一次情報源へのリンク集としても有用です。
 
-> 注: 上記のうち20〜29は第三者(比較サイト・個人ブログ)による分析記事であり、数値や評価は執筆時点のものです。導入判断の際は必ず一次情報である公式ドキュメントと公式ブログ・Changelog(1〜19、30〜32)を優先して確認してください。
+### ベンチマーク一次資料
+
+35. [Code Review Bench](https://github.com/withmartian/code-review-benchmark), Martian(オンライン/オフライン評価のデータ・判定手順・指標定義)
+
+> 注: 上記のうち21〜29は第三者(比較サイト・個人ブログ)による分析記事であり、数値や評価は執筆時点のものです。導入判断の際は必ず一次情報である公式ドキュメント、公式ブログ・Changelog、MCP公式資料、ベンチマーク一次資料(1〜20、30〜35)を優先して確認してください。
