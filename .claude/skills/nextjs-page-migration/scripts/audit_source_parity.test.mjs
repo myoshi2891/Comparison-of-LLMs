@@ -4,6 +4,10 @@ import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
+import {
+	MERMAID_DIAGRAM_DECLARATION,
+	MERMAID_DIAGRAM_TYPES,
+} from "../../fix-mermaid/scripts/mermaid-diagram-types.mjs";
 
 const auditScript = new URL("./audit_source_parity.mjs", import.meta.url);
 
@@ -104,7 +108,7 @@ flowchart TD
   A[Start] --> B[Done]
 \`\`\``;
 	const page = `const CHART = \`flowchart TD
-A[Start] --> B[Done]\`;
+  A[Start] --> B[Done]\`;
 export default function Page() {
   return <><p>Intro paragraph.</p><MermaidDiagram chart={CHART} /></>;
 }`;
@@ -132,7 +136,7 @@ test("recognizes every allowed Mermaid diagram declaration including pie", () =>
 	];
 	const source = charts.map((chart) => `<div class="mermaid">${chart}</div>`).join("\n");
 	const declarations = charts
-		.map((chart, index) => `const CHART_${index} = ${JSON.stringify(chart)};`)
+		.map((chart, index) => `const CHART_${index} = \`${chart}\`;`)
 		.join("\n");
 	const diagrams = charts
 		.map((_, index) => `<MermaidDiagram chart={CHART_${index}} />`)
@@ -146,6 +150,9 @@ test("recognizes every allowed Mermaid diagram declaration including pie", () =>
 	assert.equal(result.status, 0);
 	assert.equal(result.json.mermaidSourcesMatch, true);
 	assert.equal(result.json.counts.mermaidSources.source, charts.length);
+	assert.equal(MERMAID_DIAGRAM_TYPES.length, charts.length);
+	for (const chart of charts) assert.match(chart, MERMAID_DIAGRAM_DECLARATION);
+	assert.doesNotMatch("block-beta\ncolumns 1", MERMAID_DIAGRAM_DECLARATION);
 });
 
 test("treats normalized HTML and Markdown paragraphs as blocking parity elements", () => {

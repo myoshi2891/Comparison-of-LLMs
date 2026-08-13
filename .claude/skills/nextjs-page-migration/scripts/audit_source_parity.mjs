@@ -23,6 +23,7 @@
  */
 
 import { readFileSync } from "node:fs";
+import { MERMAID_DIAGRAM_DECLARATION } from "../../fix-mermaid/scripts/mermaid-diagram-types.mjs";
 
 /** リスト項目の照合に使う先頭文字数。長大な項目の全文一致を求めないための上限。 */
 const LIST_ITEM_PROBE = 40;
@@ -263,11 +264,7 @@ function collectHtmlMermaidSources(src) {
   return sources
     .sort((a, b) => a.index - b.index)
     .map(({ source }) => source)
-    .filter((source) =>
-      /^(?:graph|flowchart|sequenceDiagram|mindmap|stateDiagram-v2|gitGraph|erDiagram|classDiagram|journey|timeline)\b/.test(
-        source
-      )
-    );
+    .filter((source) => MERMAID_DIAGRAM_DECLARATION.test(source));
 }
 
 /**
@@ -329,19 +326,29 @@ function inventoryMarkdown(src) {
   const codeBlockTexts = [];
   const tableRowTexts = [];
   const mermaidSources = [];
+  const paragraphTexts = [];
+  let paragraphLines = [];
+
+  const flushParagraph = () => {
+    if (paragraphLines.length === 0) return;
+    paragraphTexts.push(normalize(stripMarkdownInline(paragraphLines.join(" "))));
+    paragraphLines = [];
+  };
 
   for (const line of lines) {
     const fence = /^\s*(```|~~~)\s*([^\s]*)/.exec(line);
     if (fence) {
+      flushParagraph();
       if (!inFence) {
         codeBlocks += 1;
         fenceLanguage = fence[2].toLowerCase();
         fenceLines = [];
       } else {
         const rawBlock = fenceLines.join("\n");
-        codeBlockTexts.push(normalize(rawBlock));
         if (fenceLanguage === "mermaid") {
           mermaidSources.push(normalizeMermaidSource(rawBlock));
+        } else {
+          codeBlockTexts.push(normalize(rawBlock));
         }
       }
       inFence = !inFence;
@@ -354,6 +361,7 @@ function inventoryMarkdown(src) {
 
     const heading = /^(#{2,3})\s+(.*?)\s*#*\s*$/.exec(line);
     if (heading) {
+      flushParagraph();
       headings.push({
         level: heading[1].length,
         text: normalize(stripMarkdownInline(heading[2])),
@@ -362,15 +370,29 @@ function inventoryMarkdown(src) {
     }
     const listItem = /^\s*(?:[-*+]|\d+\.)\s+(\S.*)$/.exec(line);
     if (listItem) {
+      flushParagraph();
       listItems += 1;
       listTexts.push(normalize(stripMarkdownInline(listItem[1])));
       continue;
     }
     if (/^\s*\|.*\|\s*$/.test(line) && !/^\s*\|?\s*:?-{3,}/.test(line)) {
+      flushParagraph();
       tableRows += 1;
       tableRowTexts.push(normalize(stripMarkdownInline(line.replace(/^\s*\||\|\s*$/g, ""))));
+      continue;
     }
+    if (
+      line.trim() === "" ||
+      /^\s*(?:---+|___+|\*\*\*+)\s*$/.test(line) ||
+      /^\s*(?:>|<[^>]+>)/.test(line) ||
+      /^\s*\|?\s*:?-{3,}/.test(line)
+    ) {
+      flushParagraph();
+      continue;
+    }
+    paragraphLines.push(line.trim());
   }
+  flushParagraph();
 
   return {
     headings,
@@ -380,6 +402,7 @@ function inventoryMarkdown(src) {
     tableRows,
     codeBlockTexts,
     tableRowTexts,
+    paragraphTexts,
     mermaidSources,
     externalLinks: collectUrls(src),
   };
@@ -415,6 +438,9 @@ function inventoryHtml(src) {
   const tableRowTexts = extractTagContents(body, "tr").map(({ content }) =>
     normalizeElementContent(content)
   );
+  const paragraphTexts = extractTagContents(body, "p").map(({ content }) =>
+    normalizeElementContent(content)
+  );
 
   return {
     headings,
@@ -424,6 +450,7 @@ function inventoryHtml(src) {
     tableRows: tableRowTexts.length,
     codeBlockTexts,
     tableRowTexts,
+    paragraphTexts,
     mermaidSources: collectHtmlMermaidSources(src),
     externalLinks: collectUrls(body),
   };
@@ -464,6 +491,9 @@ function inventoryTsx(src) {
   const tableRowTexts = extractTagContents(src, "tr").map(({ content }) =>
     normalizeElementContent(content)
   );
+  const paragraphTexts = extractTagContents(src, "p").map(({ content }) =>
+    normalizeElementContent(resolveStringConstants(content, constants))
+  );
 
   return {
     headings,
@@ -475,6 +505,7 @@ function inventoryTsx(src) {
     tableRows: tableRowTexts.length,
     codeBlockTexts,
     tableRowTexts,
+    paragraphTexts,
     mermaidSources: collectTsxMermaidSources(src),
     externalLinks: collectUrls(src),
   };
@@ -577,6 +608,7 @@ function compare(source, page) {
   });
   const missingCodeBlocks = missingOccurrences(source.codeBlockTexts, page.codeBlockTexts, matchKey);
   const missingTableRows = missingOccurrences(source.tableRowTexts, page.tableRowTexts, matchKey);
+  const missingParagraphs = missingOccurrences(source.paragraphTexts, page.paragraphTexts, matchKey);
   const mermaidSourcesMatch =
     source.mermaidSources.length === page.mermaidSources.length &&
     source.mermaidSources.every((value, index) => value === page.mermaidSources[index]);
@@ -585,6 +617,7 @@ function compare(source, page) {
     listItems: { source: source.listItems, page: page.listItems },
     codeBlocks: { source: source.codeBlocks, page: page.codeBlocks },
     tableRows: { source: source.tableRows, page: page.tableRows },
+    paragraphs: { source: source.paragraphTexts.length, page: page.paragraphTexts.length },
     headings: { source: source.headings.length, page: page.headings.length },
     externalLinks: { source: source.externalLinks.size, page: page.externalLinks.size },
     mermaidSources: { source: source.mermaidSources.length, page: page.mermaidSources.length },
@@ -596,6 +629,7 @@ function compare(source, page) {
     missingListItems.length > 0 ||
     missingCodeBlocks.length > 0 ||
     missingTableRows.length > 0 ||
+    missingParagraphs.length > 0 ||
     !mermaidSourcesMatch;
 
   return {
@@ -605,6 +639,7 @@ function compare(source, page) {
     missingListItems,
     missingCodeBlocks,
     missingTableRows,
+    missingParagraphs,
     mermaidSourcesMatch,
     sourceMermaidSources: source.mermaidSources,
     pageMermaidSources: page.mermaidSources,
@@ -704,6 +739,10 @@ if (result.missingCodeBlocks.length > 0) {
 if (result.missingTableRows.length > 0) {
   console.log(`\n❌ page.tsx に存在しない原本の表行 (${result.missingTableRows.length} 件):`);
   for (const text of result.missingTableRows) console.log(`  ${JSON.stringify(text)}`);
+}
+if (result.missingParagraphs.length > 0) {
+  console.log(`\n❌ page.tsx に存在しない原本の段落 (${result.missingParagraphs.length} 件):`);
+  for (const text of result.missingParagraphs) console.log(`  ${JSON.stringify(text)}`);
 }
 if (!result.mermaidSourcesMatch) {
   console.log("\n❌ Mermaid ソースが原本と順序・出現回数込みで一致しません:");
