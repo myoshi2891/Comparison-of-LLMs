@@ -1,6 +1,6 @@
 # Codex 作業規約
 
-Updated 2026-07-16
+Updated 2026-08-13
 
 このファイルは Codex が `.claude/` 配下の既存ルールとスキルを見落とさずに適用するための
 ルーティング層である。実装上の正本は `CLAUDE.md`、作業状況の正本は
@@ -35,7 +35,7 @@ Updated 2026-07-16
 | 作業・トリガー | 必ず読むスキル / ルール | 実行上の要点 |
 | --- | --- | --- |
 | `web-next/` の機能追加・バグ修正・改善 | `.claude/rules/tdd-mandatory-cycle.md` | 実装前に Red テストを作成・失敗確認・コミットし、Green / Refactor / Docs を分ける。純粋なリファクタリングは既存テストの成功確認から始める。 |
-| 新規ガイドページ、HTML からの移行、既存ガイドの保守 | `.claude/skills/nextjs-page-migration/SKILL.md`、`.claude/rules/tdd-mandatory-cycle.md`、`.claude/rules/migration-progress-sync.md` | faithful 移植、3 点セット、ページレジストリ登録、TDD、進捗同期を守る。`nav-links.ts` は手書き変更しない。 |
+| 新規ガイドページ、HTML からの移行、既存ガイドの保守 | `.claude/skills/nextjs-page-migration/SKILL.md`、`.claude/skills/nextjs-page-migration/references/source-parity-audit.md`、`.claude/rules/tdd-mandatory-cycle.md`、`.claude/rules/migration-progress-sync.md` | faithful 移植、3 点セット、ページレジストリ登録、TDD、進捗同期を守る。**Green コミット前に `bun .claude/skills/nextjs-page-migration/scripts/audit_source_parity.mjs <原本> <page.tsx>` を実行し終了コード 0 を確認する**（移行漏れの機械検知）。契約テストは順序込み完全一致で書く。`nav-links.ts` は手書き変更しない。 |
 | テスト・ページ・ナビ・レジストリ・共有仕様の変更、セッション終了 | `.claude/skills/docs-sync/SKILL.md` | 変更種別に対応する仕様書と日付を同期し、実測値で確認する。 |
 | Markdown の新規作成・編集 | `.claude/skills/markdown-formatter/SKILL.md` | `bun scripts/format-markdown.mjs <file>` と `bun x markdownlint-cli <file>` を実行し、差分を確認する。 |
 | `globals.css` またはページ CSS の変更 | `.claude/rules/css-cache-reset.md` | `.next` キャッシュを削除し、必要なら開発サーバーを再起動する。 |
