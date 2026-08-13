@@ -20,6 +20,12 @@
 
 ## 最近の追加内容
 
+- **移行監査・Mermaid契約・ガイド原稿のレビュー指摘対応**:
+  - 原本照合監査でHTML/Markdown/TSXの通常段落を出現回数込みのblocking対象へ追加し、MarkdownのMermaidフェンスを通常コードブロックから分離。`.markdown`入力にも対応。
+  - Mermaid許可図種別を共有定義へ集約して`pie`を追加し、`block-beta`は引き続き禁止。C-6aの比較は外側空行と最小共通インデントだけを除去して相対インデントを保持。
+  - OpenClaw bootstrapMode図、git worktree失敗時cleanup、Copilot coding agentの`AGENTS.md`優先順位、Copilot Code Reviewの一次資料・動的ベンチマーク記述を修正。
+  - Node回帰テスト **7件**、npmでVitest **163 files / 1455 tests**、typecheck、変更対象のMarkdown lintがGreen。ユーザー指定によりビルドと目視確認は省略。
+
 - **レビュー指摘の再検証とガイド・契約テストの修正**:
   - OpenClawのbootstrapMode条件を厳密化し、通常セッションとサブエージェントのブートストラップファイル経路を分離。
   - Copilot Code Reviewのレビュー深度・コスト削減・Martianベンチマーク・`.agent.md`とPlaywright MCPの説明を一次情報に合わせて修正。
@@ -31,7 +37,7 @@
   - 要約・省略なしで全10セクション（1. .agent.md とは何か〜10. 参考文献）、全52サブセクション（h3）、全表、全コードブロック（1行毎 `codeLine` ラッパー & 構文トークン化）、6 Mermaid図（`MermaidDiagram`）、TOCスクロール追従（`TocObserver.tsx`）、`TocObserver.test.tsx` の単体テスト・スクロールスパイ計算、`page-registry.ts` の内容更新・`lastReviewed` (2026-08-12) を完了。
   - 既存の旧 `/copilot/agent` コンテンツと完全入れ替え完了。
   - 原本 `Github-copilot-agent-md-guide.html` は `archive/Github-copilot-agent-md-guide.html` へ `git mv` 退避保存。
-  - 契約テスト11件および TocObserver テスト4件（計15件）を作成し全クリア（Vitest **163 files / 1454 tests** 全 Green ✅）。
+  - 契約テスト11件および TocObserver テスト4件（計15件）を作成し全クリア（**2026-08-12、commit `4031d76`時点**: Vitest **163 files / 1454 tests** 全 Green ✅）。
 
 - **GitHub Copilot Agent Skills 公開仕様と Google Sandbox TOC アクセシビリティの修正**:
   - `/copilot/skill` の検証コマンドを `gh skill publish --dry-run` に統一し、公式に確認できない ToxicSkills 検出の説明を削除。ローカル導入の `--from-local` と `metadata.local-path` を明記し、公開用 `allowed-tools` の全例を空白区切り文字列へ統一。
