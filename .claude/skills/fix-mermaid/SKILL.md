@@ -504,6 +504,8 @@ vi.mock("@/components/docs/MermaidDiagram", () => ({
 // 原本 HTML の <div class="mermaid"> / DIAGRAMS オブジェクトから機械抽出し、
 // 改行コード・外側の空行・共通インデントだけを正規化して固定する。
 // 重複する図も省略せず、原本の出現順のまま列挙する。
+import { MERMAID_DIAGRAM_DECLARATION } from "../../../../.claude/skills/fix-mermaid/scripts/mermaid-diagram-types.mjs";
+
 const EXPECTED_MERMAID_SOURCES = [
   `flowchart TD
 A[Start] --> B[Validate]`,
@@ -511,10 +513,21 @@ A[Start] --> B[Validate]`,
 User->>Agent: Request`,
 ] as const;
 
+function normalizeMermaidSource(raw: string): string {
+  const lines = raw.replace(/\r\n?/g, "\n").split("\n");
+  while (lines.length > 0 && lines[0].trim() === "") lines.shift();
+  while (lines.length > 0 && lines.at(-1)?.trim() === "") lines.pop();
+  const indents = lines
+    .filter((line) => line.trim().length > 0)
+    .map((line) => line.match(/^\s*/)?.[0].length ?? 0);
+  const commonIndent = indents.length > 0 ? Math.min(...indents) : 0;
+  return lines.map((line) => line.slice(commonIndent).trimEnd()).join("\n");
+}
+
 it("C-6a: Mermaid ソースが原本と順序・内容・出現回数込みで完全一致する", () => {
   const { container } = render(<Page />);
   const actual = Array.from(container.querySelectorAll('[data-testid="mermaid"]')).map(
-    (el) => (el.textContent ?? "").replace(/\r\n?/g, "\n").trim()
+    (el) => normalizeMermaidSource(el.textContent ?? "")
   );
   expect(actual).toEqual([...EXPECTED_MERMAID_SOURCES]);
 });
@@ -535,7 +548,7 @@ it("C-6c: 各図解が空でなく、図種別の宣言から始まる", () => {
   );
   for (const chart of charts) {
     expect(chart.length).toBeGreaterThan(0);
-    expect(chart).toMatch(/^(graph|flowchart|sequenceDiagram|mindmap|stateDiagram-v2|gitGraph|erDiagram|classDiagram|journey|timeline)\b/);
+    expect(chart).toMatch(MERMAID_DIAGRAM_DECLARATION);
   }
 });
 
@@ -560,6 +573,12 @@ it("C-6e: 図解のソースが左端揃え（先頭行にインデントが無�
   }
 });
 ```
+
+C-6c の `MERMAID_DIAGRAM_DECLARATION` は、監査スクリプトと同じ
+`.claude/skills/fix-mermaid/scripts/mermaid-diagram-types.mjs` から import する。
+許可種別は `graph` / `flowchart` / `sequenceDiagram` / `mindmap` / `stateDiagram-v2` /
+`gitGraph` / `erDiagram` / `classDiagram` / `journey` / `timeline` / `pie` であり、
+`block-beta` は共有定義に含めない。
 
 > **なぜ C-6e が要るのか**: Mermaid v10 は先頭インデントで構文エラーになる。
 > ビルドもテストも通るのに**ブラウザでだけ図が全滅する**という、最も発見が遅れる壊れ方をする。

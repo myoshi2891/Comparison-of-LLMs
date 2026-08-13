@@ -48,6 +48,7 @@ bun .claude/skills/nextjs-page-migration/scripts/audit_source_parity.mjs \
 listItems             0         0
 codeBlocks           11        11
 tableRows            41        41
+paragraphs           27        27
 headings             17        17
 externalLinks        16        16
 mermaidSources       11        11
@@ -84,8 +85,9 @@ mermaidSources       11        11
 | リスト項目テキストの欠落 | **ブロッキング** | 本文平坦化テキストへの包含判定なのでマークアップ非依存 |
 | コードブロック内容の欠落 | **ブロッキング** | タグを除去した正規化内容を出現回数込みで比較する |
 | 表行内容の欠落 | **ブロッキング** | セルのマークアップを除去した正規化内容を出現回数込みで比較する |
+| 通常段落内容の欠落 | **ブロッキング** | HTML / Markdown / JSX の段落を正規化し、出現回数込みで比較する |
 | Mermaid ソースの差分 | **ブロッキング** | 正規化済みソースを順序・内容・出現回数込みで完全一致比較する |
-| `listItems` / `codeBlocks` / `tableRows` の件数 | **参考値のみ** | ブロッキング判定は件数そのものではなく、上記の正規化内容で行う |
+| `listItems` / `codeBlocks` / `tableRows` / `paragraphs` の件数 | **参考値のみ** | ブロッキング判定は件数そのものではなく、上記の正規化内容で行う |
 
 > 生のタグ件数を判定に使わないのは意図的な設計である。`<li>` 件数でゲートすると
 > 「原本 18 / ページ 0」のような正当なカード移植で常時 Red になる。コードブロックと表行は

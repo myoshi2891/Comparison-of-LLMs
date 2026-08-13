@@ -26,7 +26,7 @@ AGENTS.md は Codex / Cursor / Cline など AGENTS.md 規約を読む AI ツー�
 
   ```bash
   bun .claude/skills/nextjs-page-migration/scripts/audit_source_parity.mjs \
-    archive/html/<ベンダー>/<原本>.html web-next/app/<provider>/<slug>/page.tsx
+    archive/{html|md}/<ベンダー>/<原本>.{html|md|markdown} web-next/app/<provider>/<slug>/page.tsx
   echo "exit=$?"   # 0 以外は移行漏れ → コミット禁止
   ```
 

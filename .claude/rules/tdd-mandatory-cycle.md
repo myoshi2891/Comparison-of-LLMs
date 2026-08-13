@@ -89,7 +89,7 @@ Mermaid 契約 C-6 とデザイン契約 D-1〜D-4 は原本依存の追加契�
 
   ```bash
   bun .claude/skills/nextjs-page-migration/scripts/audit_source_parity.mjs \
-    archive/html/<ベンダー>/<原本>.html \
+    archive/{html|md}/<ベンダー>/<原本>.{html|md|markdown} \
     web-next/app/<provider>/<slug>/page.tsx
   echo "exit=$?"   # 0 以外なら移行漏れあり → Green コミット禁止
   ```
