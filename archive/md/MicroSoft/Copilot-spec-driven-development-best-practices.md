@@ -66,6 +66,7 @@ VS Codeの公式ドキュメントによれば、複数の指示が衝突した�
 flowchart TD
     Q0{"外部システムの<br/>データや操作が必要か?"}
     Q0 -->|"はい"| R6["MCP サーバー"]
+    R6 --> Q1
     Q0 -->|"いいえ"| Q1{"このルールは常に<br/>適用したいか?"}
     Q1 -->|"はい・リポジトリ全体"| R1["copilot-instructions.md<br/>または AGENTS.md"]
     Q1 -->|"はい・特定言語/ディレクトリのみ"| R2[".instructions.md<br/>applyTo で限定"]
