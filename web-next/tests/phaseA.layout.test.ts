@@ -77,11 +77,12 @@ describe("Phase A - body composition", () => {
 });
 
 describe("Phase A - regression guards", () => {
-  it("still imports the three next/font variables from @/lib/fonts", () => {
+  it("still imports the next/font variables from @/lib/fonts", () => {
+    // Noto Sans JP は自前ホストへ移行済み (tests/fonts-selfhost.test.ts)。
+    // next/font 経由で残るのは latin のみの JetBrains Mono / Syne。
     expect(layoutSrc).toMatch(
-      /import\s*\{[^}]*\bnotoSansJp\b[^}]*\}\s*from\s*["']@\/lib\/fonts["']/
+      /import\s*\{[^}]*\bjetbrainsMono\b[^}]*\}\s*from\s*["']@\/lib\/fonts["']/
     );
-    expect(layoutSrc).toMatch(/\bjetbrainsMono\b/);
     expect(layoutSrc).toMatch(/\bsyne\b/);
   });
 });
