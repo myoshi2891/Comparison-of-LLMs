@@ -183,3 +183,17 @@ two source lines.`,
 		"Second Markdown paragraph spans two source lines.",
 	]);
 });
+
+test("accepts .markdown as a Markdown source extension", () => {
+	const result = audit(
+		"## Markdown heading\n\nOrdinary paragraph.",
+		"<><h2>Markdown heading</h2><p>Ordinary paragraph.</p></>",
+		"markdown",
+	);
+
+	assert.equal(result.status, 0);
+	assert.equal(result.json.counts.headings.source, 1);
+	assert.equal(result.json.counts.paragraphs.source, 1);
+	assert.deepEqual(result.json.missingHeadings, []);
+	assert.deepEqual(result.json.missingParagraphs, []);
+});
