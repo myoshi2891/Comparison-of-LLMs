@@ -32,9 +32,9 @@ GitHub Copilot Code Review(以下Copilot Code Review)は、Pull Request(PR)の�
 
 ### 何をしてくれるのか
 
-Copilot Code ReviewはPRの差分・タイトル・本文・リポジトリのカスタム指示などをまとめてコンテキストとして与えられたLLMが解析し、行単位のインラインコメントとしてPRに投稿する機能です。Agentic capabilitiesは既定で標準のGitHub-hosted runner上で実行され、通常はランナーの追加設定なしでプロジェクトコンテキストの収集やツール利用が行われます。組織でGitHub-hosted runnerを無効化している場合、agentic capabilitiesを利用するにはARCで管理された対応self-hosted runnerを設定する必要があり、未設定時は限定的なレビューへフォールバックします。バグや論理エラー、セキュリティ上の懸念、パフォーマンスの問題、言語・フレームワークのベストプラクティス違反などを検出範囲としています<sup>1, 7, 26</sup>。
+Copilot Code ReviewはPRの差分・タイトル・本文・リポジトリのカスタム指示などをまとめてコンテキストとして与えられたLLMが解析し、行単位のインラインコメントとしてPRに投稿する機能です。Agentic capabilitiesは既定で標準のGitHub-hosted runner上で実行され、通常はランナーの追加設定なしでプロジェクトコンテキストの収集やツール利用が行われます。組織でGitHub-hosted runnerを無効化している場合、agentic capabilitiesを利用するにはARCで管理された対応self-hosted runnerを設定する必要があり、未設定時は限定的なレビューへフォールバックします。バグや論理エラー、セキュリティ上の懸念、パフォーマンスの問題、言語・フレームワークのベストプラクティス違反などを検出範囲としています<sup>1, 7, 9</sup>。
 
-レビューには、モデル・プロンプト・システム動作を慎重に調整した構成が使用されます。品質と一貫性を保つため、利用者によるモデル切替はサポートされていません<sup>27</sup>。
+レビューには、モデル・プロンプト・システム動作を慎重に調整した構成が使用されます。品質と一貫性を保つため、利用者によるモデル切替はサポートされていません<sup>10</sup>。
 
 Copilotのレビューは常に「Comment」種別で投稿され、「Approve」や「Request changes」にはなりません。したがって、必須レビュー(Required reviewers)としてはカウントされず、マージ判定をブロックすることもありません。最終的な承認権限は常に人間のレビュアーに残ります<sup>2</sup>。
 
@@ -47,7 +47,7 @@ flowchart TB
     C --> D["出力整形<br/>PRのインライン差分コメントとして投稿"]
 ```
 
-2026年6月には、Copilot CLI/SDKに組み込まれているファイル探索ツールをレビュー処理そのものにも使うよう内部実装が刷新され、レビュー品質を維持したままコストが約20%削減されたと報告されています。この変更に合わせて「Medium analysis depth」という解析の深さを選べるパブリックプレビューも展開されています<sup>11</sup>。
+2026年6月には、Copilot CLI/SDKに組み込まれているファイル探索ツールをレビュー処理そのものにも使うよう内部実装が刷新され、レビュー品質を維持したままコストが約20%削減されたと報告されています。現在のレビュー深度は、既定の`Lite`と、より深い解析を行う`Balanced`から選択できます<sup>11</sup>。
 
 ### 利用できる環境
 
@@ -72,16 +72,16 @@ flowchart TB
 ```
 
 - **個人設定**: プロフィールの「Your Copilot」から「Automatic code review」を有効化すると、自分が開いたすべてのPRが自動レビュー対象になります。この設定はCopilot Pro / Pro+ / Maxプランでのみ利用できます<sup>5</sup>。
-- **リポジトリRuleset**: リポジトリのSettings > Rules > Rulesetsで「Automatically request Copilot code review」を有効化します。「Review new pushes」を有効にすると新しいコミットのたびに再レビューされ、「Review draft pull requests」を有効にするとドラフトPRの段階からフィードバックを得られます<sup>5</sup>。2025年9月からは、この自動レビュー設定が「Require a pull request before merging」の付随設定ではなく、独立したルールとして設定できるようになったため、マージ保護(ブランチ保護)を強制せずに自動レビューだけを導入することも可能です<sup>14</sup>。
+- **リポジトリRuleset**: リポジトリのSettings > Rules > Rulesetsで「Automatically request Copilot code review」を有効化します。「Review new pushes」を有効にすると新しいコミットのたびに再レビューされ、「Review draft pull requests」を有効にするとドラフトPRの段階からフィードバックを得られます<sup>5</sup>。2025年9月からは、この自動レビュー設定が「Require a pull request before merging」の付随設定ではなく、独立したルールとして設定できるようになったため、マージ保護(ブランチ保護)を強制せずに自動レビューだけを導入することも可能です<sup>20</sup>。
 - **組織/Enterpriseレベル**: Enterprise管理者は「AI controls」からCopilot Code Reviewを「Enabled everywhere」または「Let organizations decide」として一括制御でき、組織Rulesetsを使えば多数のリポジトリに同じ自動レビュー方針を適用できます<sup>6</sup>。ただし、Push毎・ドラフト時のレビューを有効にするほど開発者への通知は増えるため、ノイズとのバランスを意識する必要があります<sup>6</sup>。
 
-> **実務Tips**: いきなり組織全体に自動レビューを強制するのではなく、まず1〜2個のリポジトリでPR作成時のみの自動レビューから始め、チームの反応(コメントの採用率・却下率)を見てからPush毎レビューやドラフトレビューを追加する、という段階導入が推奨されます<sup>3, 19</sup>。
+> **実務Tips**: いきなり組織全体に自動レビューを強制するのではなく、まず1〜2個のリポジトリでPR作成時のみの自動レビューから始め、チームの反応(コメントの採用率・却下率)を見てからPush毎レビューやドラフトレビューを追加する、という段階導入が推奨されます<sup>3, 23</sup>。
 
 ---
 
 ## ステップ2: カスタムインストラクションを設計する
 
-Copilot Code Reviewは、そのままでも一般的なコーディング標準に基づいてレビューしますが、真価を発揮するのはリポジトリ固有の文脈(意図的な設計判断、重点的に見てほしい箇所、テストや実装に関するチームの基準など)を教えたときです<sup>25</sup>。
+Copilot Code Reviewは、そのままでも一般的なコーディング標準に基づいてレビューしますが、真価を発揮するのはリポジトリ固有の文脈(意図的な設計判断、重点的に見てほしい箇所、テストや実装に関するチームの基準など)を教えたときです<sup>29</sup>。
 
 ### 3種類の指示ファイル
 
@@ -91,7 +91,7 @@ Copilot Code Reviewは、そのままでも一般的なコーディング標準�
 | `.github/instructions/*.instructions.md`(`applyTo`フロントマター付き) | 指定したパス/言語のみ | 特定言語・特定ディレクトリだけに適用したいルール(例: フロントエンドのアクセシビリティ、Pythonの型ヒント等) |
 | `AGENTS.md`(リポジトリルート) | リポジトリ全体 | プロジェクトの構造や「意図的にこうなっている」文脈など、レビュー品質を上げるための背景情報 |
 
-さらに、2026年に入ってからは`REVIEW.md`・`GEMINI.md`・`CLAUDE.md`といった他のAIツール向けの指示ファイルも自動的に読み込まれるようになり、チームがどこにガイドラインを書いていても一貫して反映されるようになりました<sup>10</sup>。以前はCopilot Enterprise向けに「Coding guidelines」というUIベースの別機能がプライベートプレビューで提供されていましたが、この`*.instructions.md`ベースの仕組みに統合される形で段階的に廃止されています<sup>15</sup>。
+さらに、2026年に入ってからは`REVIEW.md`・`GEMINI.md`・`CLAUDE.md`といった他のAIツール向けの指示ファイルも自動的に読み込まれるようになり、チームがどこにガイドラインを書いていても一貫して反映されるようになりました<sup>16</sup>。Copilot Enterprise向けにプライベートプレビューで提供されていたUIベースの「Coding guidelines」は、2025年9月3日に完全廃止された過去の機能です。現在は`.github/copilot-instructions.md`と`.github/instructions/*.instructions.md`を使用します<sup>18</sup>。
 
 `*.instructions.md`ファイルの例:
 
@@ -106,7 +106,7 @@ applyTo:
 `legacy/`配下の非推奨コンポーネントの利用を検出したら指摘してください。
 ```
 
-特定のファイルをCopilot code reviewだけ、あるいはCopilot cloud agentだけに読ませたくない場合は、フロントマターに`excludeAgent: code-review`または`excludeAgent: cloud-agent`を指定することで、そのファイルを対象エージェントから除外できます<sup>31</sup>。
+特定のファイルをCopilot code reviewだけ、あるいはCopilot cloud agentだけに読ませたくない場合は、フロントマターに`excludeAgent: code-review`または`excludeAgent: cloud-agent`を指定することで、そのファイルを対象エージェントから除外できます<sup>12</sup>。
 
 ### 指示ファイルをどこに書くか判断する
 
@@ -120,28 +120,28 @@ applyTo:
 
 ### 効果的な書き方
 
-GitHub自身が公開しているガイドによれば、Copilot Code Reviewの指示ファイルは非決定的(non-deterministic)であり、すべての指示に毎回100%従うわけではありません。そのため、以下のような書き方が推奨されています<sup>3, 16</sup>。
+GitHub自身が公開しているガイドによれば、Copilot Code Reviewの指示ファイルは非決定的(non-deterministic)であり、すべての指示に毎回100%従うわけではありません。そのため、以下のような書き方が推奨されています<sup>3, 19</sup>。
 
 - 最小限の指示から始め、実際のレビュー結果を見ながら段階的に追加する。
 - 見出しと箇条書きで構造化し、長い説明文ではなく短い命令形の指示にする。
 - 1つの指示ファイルはおよそ1,000行を超えないようにする。それ以上長くなると、指示の遵守精度が落ちる傾向がある<sup>3</sup>。
 - 抽象的な指示より、具体例を添えた指示のほうが伝わりやすい(例:「良いコードを書いて」ではなく「この関数のように早期returnでネストを浅くして」)。
-- どうしても100%守らせたいルール(セキュリティの必須要件など)は、Copilotへの指示だけに頼らず、Linterや静的解析ツールなど決定的な仕組みでも担保する<sup>19</sup>。
+- どうしても100%守らせたいルール(セキュリティの必須要件など)は、Copilotへの指示だけに頼らず、Linterや静的解析ツールなど決定的な仕組みでも担保する<sup>23</sup>。
 
-2026年6月には、`copilot-instructions.md`・`*.instructions.md`の合計文字数に課されていた4,000文字の上限が撤廃され、より柔軟にカスタマイズできるようになりました<sup>13</sup>。また、組織レベルの指示もCopilot Code Reviewが考慮するようになっています<sup>15</sup>。
+2026年6月には、`copilot-instructions.md`・`*.instructions.md`の合計文字数に課されていた4,000文字の上限が撤廃され、より柔軟にカスタマイズできるようになりました<sup>17</sup>。また、組織レベルの指示もCopilot Code Reviewが考慮するようになっています<sup>18</sup>。
 
 ---
 
 ## ステップ3: Agent SkillsとMCPで文脈を拡張する
 
-2026年7月29日、Copilot Code ReviewにおけるAgent SkillsとMCPサーバー連携が、Copilot Pro・Pro+・Business・Enterpriseの全有償プランで一般提供(GA)になりました<sup>9</sup>。これはMCPの2026-07-28版仕様が正式リリースされた翌日というタイミングでもあり、MCP対応が「アーリーアダプター向けの機能」から「プラン選定時のチェック項目」へと位置づけを変えた出来事として注目されています<sup>14</sup>。
+2026年7月29日、Copilot Code ReviewにおけるAgent SkillsとMCPサーバー連携が、Copilot Pro・Pro+・Business・Enterpriseの全有償プランで一般提供(GA)になりました<sup>15</sup>。これはMCPの2026-07-28版仕様が正式リリースされた翌日というタイミングでもあり、MCP対応が「アーリーアダプター向けの機能」から「プラン選定時のチェック項目」へと位置づけを変えた出来事として注目されています<sup>20</sup>。
 
-- **Agent Skills**: `.github/skills/`配下にスキル専用のディレクトリを作り、その中に`SKILL.md`を置くことで、社内ツールやコーディング標準に関する文脈をレビュー時に注入できます。レビュー用途であることが伝わるよう、ディレクトリ名は`code-review`のようにレビュー指向の名前にすることが推奨されています<sup>12</sup>。
-- **MCPサーバー**: リポジトリのCopilot設定からMCPサーバーを追加すると、課題管理システムやドキュメント、サービスカタログなど外部プラットフォームの情報をレビューに取り込めます。GitHub MCPサーバーとPlaywright MCPサーバーはデフォルトで有効です<sup>12</sup>。GitHub MCPサーバーの既定トークンは読み取り専用ですが、リポジトリ設定ではより広い権限を持つトークンも指定できます。利用するツールを読み取り用途に限定し、トークン権限も必要最小限に明示して管理してください。Copilot cloud agent用に設定済みのMCP設定は自動的にCode Reviewにも引き継がれます<sup>9</sup>。
-- **利用状況の可視化**: Agent SkillsやMCPの文脈を使って生成されたコメントには、その旨を示すアトリビューションが付与されるため、どのスキル・MCPサーバーが実際に使われたかをレビューコメント下部やセッションログから確認できます<sup>9, 12</sup>。
-- PR本文に課題番号やインシデントIDなどMCP経由で参照できる識別子を明記すると、Copilotがその文脈をより積極的に利用する傾向があります<sup>12</sup>。
+- **Agent Skills**: `.github/skills/`配下にスキル専用のディレクトリを作り、その中に`SKILL.md`を置くことで、社内ツールやコーディング標準に関する文脈をレビュー時に注入できます。レビュー用途であることが伝わるよう、ディレクトリ名は`code-review`のようにレビュー指向の名前にすることが推奨されています<sup>14</sup>。
+- **MCPサーバー**: リポジトリのCopilot設定からMCPサーバーを追加すると、課題管理システムやドキュメント、サービスカタログなど外部プラットフォームの情報をレビューに取り込めます。GitHub MCPサーバーとPlaywright MCPサーバーはデフォルトで有効です<sup>14</sup>。GitHub MCPサーバーの既定トークンは読み取り専用ですが、リポジトリ設定ではより広い権限を持つトークンも指定できます。利用するツールを読み取り用途に限定し、トークン権限も必要最小限に明示して管理してください。Copilot cloud agent用に設定済みのMCP設定は自動的にCode Reviewにも引き継がれます<sup>15</sup>。
+- **利用状況の可視化**: Agent SkillsやMCPの文脈を使って生成されたコメントには、その旨を示すアトリビューションが付与されるため、どのスキル・MCPサーバーが実際に使われたかをレビューコメント下部やセッションログから確認できます<sup>15, 14</sup>。
+- PR本文に課題番号やインシデントIDなどMCP経由で参照できる識別子を明記すると、Copilotがその文脈をより積極的に利用する傾向があります<sup>14</sup>。
 
-対応言語の壁を越えたい場合、Web検索ツールを備えたMCPサーバーやPlaywright経由で最新のセキュリティ勧告・イディオムを調べさせる`.agent.md`レビュアーを自作し、根拠となる情報源を引用させるという応用例も紹介されています<sup>18</sup>。
+対応言語の壁を越えたい場合、Web検索ツールを備えたMCPサーバーやPlaywright経由で最新のセキュリティ勧告・イディオムを調べさせる`.agent.md`レビュアーを自作し、根拠となる情報源を引用させるという応用例も紹介されています<sup>22</sup>。
 
 ---
 
@@ -183,21 +183,21 @@ GitHub自身の「Responsible use」ドキュメントは、Copilot Code Review�
 
 | 限界 | 内容 |
 |---|---|
-| 誤検知(false positive) | 第三者の解説記事には、利用者が誤り・的外れ・曖昧と感じるコメントが一定数あるとの記述があります。ただし、調査母集団、観測期間、評価基準、サンプルサイズが開示されていないため、定量的な誤検知率やGitHub公式指標としては扱えません<sup>7, 17</sup>。 |
-| 見逃し(false negative) | 権限昇格や設計レベルのセキュリティ上の欠陥など、ファイルをまたぐ文脈が必要な問題を見逃す傾向が指摘されています<sup>18</sup>。 |
+| 誤検知(false positive) | 第三者の解説記事には、利用者が誤り・的外れ・曖昧と感じるコメントが一定数あるとの記述があります。ただし、調査母集団、観測期間、評価基準、サンプルサイズが開示されていないため、定量的な誤検知率やGitHub公式指標としては扱えません<sup>7, 21</sup>。 |
+| 見逃し(false negative) | 権限昇格や設計レベルのセキュリティ上の欠陥など、ファイルをまたぐ文脈が必要な問題を見逃す傾向が指摘されています<sup>22</sup>。 |
 | 対応言語 | 公式にサポートされる出力言語は英語のみです<sup>7</sup>。日本語での応答は`copilot-instructions.md`などで明示的に指示できますが、公式サポート対象外である点に注意してください。 |
-| 学習しない | 特定のレビューコメントを繰り返し却下しても、Copilotがその傾向を学習して次回から抑制することはありません。同種の指摘を出し続ける前提でチーム運用を設計する必要があります<sup>17</sup>。 |
-| 既定分析の限界 | テスト実行などのagentic capabilitiesを利用しても、実行時にしか顕在化しない問題をすべて検出できるわけではありません。ツールの結果も人間が検証する必要があります<sup>1, 7, 26</sup>。 |
+| 学習しない | 特定のレビューコメントを繰り返し却下しても、Copilotがその傾向を学習して次回から抑制することはありません。同種の指摘を出し続ける前提でチーム運用を設計する必要があります<sup>21</sup>。 |
+| 既定分析の限界 | テスト実行などのagentic capabilitiesを利用しても、実行時にしか顕在化しない問題をすべて検出できるわけではありません。ツールの結果も人間が検証する必要があります<sup>1, 7, 9</sup>。 |
 | マージをブロックしない | 「Comment」レビューのみのため、必須承認としてカウントされず、マージの可否は人間の判断に委ねられます<sup>2</sup>。 |
 
-第三者の分析記事は、Copilot Code Reviewがコメントを返すレビューと、指摘なしで終わるレビューの両方があると説明しています。ただし、その記事はGitHubの報告に基づくとする集計の調査母集団、観測期間、評価基準、サンプルサイズ、一次資料へのリンクを示していません。このため、コメント有無の割合や平均コメント数はGitHub公式指標として掲載せず、「問題が見つからない場合はコメントを返さないことがある」という定性的な挙動だけを参考にします<sup>23</sup>。
+第三者の分析記事は、Copilot Code Reviewがコメントを返すレビューと、指摘なしで終わるレビューの両方があると説明しています。ただし、その記事はGitHubの報告に基づくとする集計の調査母集団、観測期間、評価基準、サンプルサイズ、一次資料へのリンクを示していません。このため、コメント有無の割合や平均コメント数はGitHub公式指標として掲載せず、「問題が見つからない場合はコメントを返さないことがある」という定性的な挙動だけを参考にします<sup>27</sup>。
 
 ### チーム運用上の推奨事項
 
-- **却下してよい文化をつくる**: 誤検知が一定割合発生する前提に立ち、「Copilotのコメントを却下するのは普通のこと」という規範をチームで共有します<sup>17</sup>。
-- **PRは小さく保つ**: 2,000行規模のPRをレビューで救ってくれることは期待せず、人間にとってもAIにとっても妥当な粒度までPRを分割することが、そもそもの前提として推奨されています<sup>22</sup>。
-- **必須要件はLinter/静的解析で担保する**: セキュリティ上絶対に守らせたいルールは、Copilotへの指示だけでなく決定的なツール(SAST、Linter、Secret Scanning等)でも二重に担保します<sup>17, 19</sup>。
-- **人間レビューを省略しない**: Copilotのレビューは「一次スクリーニング」であり、最終承認・アーキテクチャ判断・ドメイン知識が必要な判断は引き続き人間が担います<sup>3, 19</sup>。
+- **却下してよい文化をつくる**: 誤検知が一定割合発生する前提に立ち、「Copilotのコメントを却下するのは普通のこと」という規範をチームで共有します<sup>21</sup>。
+- **PRは小さく保つ**: 2,000行規模のPRをレビューで救ってくれることは期待せず、人間にとってもAIにとっても妥当な粒度までPRを分割することが、そもそもの前提として推奨されています<sup>26</sup>。
+- **必須要件はLinter/静的解析で担保する**: セキュリティ上絶対に守らせたいルールは、Copilotへの指示だけでなく決定的なツール(SAST、Linter、Secret Scanning等)でも二重に担保します<sup>21, 23</sup>。
+- **人間レビューを省略しない**: Copilotのレビューは「一次スクリーニング」であり、最終承認・アーキテクチャ判断・ドメイン知識が必要な判断は引き続き人間が担います<sup>3, 23</sup>。
 
 ---
 
@@ -205,9 +205,9 @@ GitHub自身の「Responsible use」ドキュメントは、Copilot Code Review�
 
 ### Content Exclusion(コンテンツ除外)の適用範囲を正しく理解する
 
-リポジトリ管理者はContent Exclusion機能を使って、機密ファイル(認証情報、課金データ、独自アルゴリズム等)をCopilotの補完・Chat・Code Reviewの対象から除外できます。除外されたファイルはCopilot Code Reviewでもレビュー対象になりません<sup>8, 58</sup>。
+リポジトリ管理者はContent Exclusion機能を使って、機密ファイル(認証情報、課金データ、独自アルゴリズム等)をCopilotの補完・Chat・Code Reviewの対象から除外できます。除外されたファイルはCopilot Code Reviewでもレビュー対象になりません<sup>8, 13</sup>。
 
-ここで重要な注意点があります。GitHub公式ドキュメントおよびGitHub社員による解説記事の双方が指摘しているとおり、**Content ExclusionはCopilot CLI、Copilot cloud agent、およびIDEのAgentモードには適用されません**<sup>8, 20</sup>。これらのエージェント的な機能はツール呼び出しでファイルを直接読み書きできるため、リポジトリレベルの除外設定をすり抜けて除外対象ファイルの内容にアクセスできてしまう可能性があります。Code Reviewだけを使っている分には保護されますが、同じリポジトリでCLIやcloud agentも使っているチームは、この境界を正しく認識しておく必要があります<sup>20</sup>。
+ここで重要な注意点があります。GitHub公式ドキュメントおよびGitHub社員による解説記事の双方が指摘しているとおり、**Content ExclusionはCopilot CLI、Copilot cloud agent、およびIDEのAgentモードには適用されません**<sup>8, 24</sup>。これらのエージェント的な機能はツール呼び出しでファイルを直接読み書きできるため、リポジトリレベルの除外設定をすり抜けて除外対象ファイルの内容にアクセスできてしまう可能性があります。Code Reviewだけを使っている分には保護されますが、同じリポジトリでCLIやcloud agentも使っているチームは、この境界を正しく認識しておく必要があります<sup>24</sup>。
 
 ### Copilot Code Review自体のセキュリティ制御
 
@@ -218,10 +218,10 @@ flowchart TB
     L3 --> L4["レイヤー4: CODEOWNERS<br/>設定ファイル自体の変更を承認制に"]
 ```
 
-- **Firewall**: 2026年7月17日のアップデートで、Copilot Code Review用のネットワークアクセス制御(Firewall)がCopilot cloud agentとは独立して設定できるようになりました。デフォルトで全リポジトリに対して有効です。セルフホストランナーでは現時点でFirewallがサポートされていない点に注意してください<sup>10</sup>。
-- **MCP最小権限**: GitHub MCPサーバーの既定トークンは読み取り専用ですが、より広い権限を設定できるため、Code Reviewに公開するツールとトークン権限を明示的に限定します<sup>9</sup>。
-- **CODEOWNERS**: `copilot-instructions.md`・`*.instructions.md`・`.github/skills/`・MCP設定など、レビューの挙動を左右する設定ファイル自体を誰が変更できるかも重要なガバナンス項目です。これらのパスにCODEOWNERSを設定し、変更に承認を必須にすることを推奨します(Sizikov氏のブログで紹介されているエージェント一般向けの多層防御の考え方を、Code Review用の設定ファイル保護にも応用したものです)<sup>20</sup>。
-- **カスタム実行環境**: `.github/workflows/copilot-code-review.yml`を使うと、依存関係のインストールやツールのセットアップなど、Copilot Code Reviewの実行環境自体をリポジトリ単位で設定できます。ランナーの種類も組織のCopilot設定から独立して構成可能です<sup>10, 9</sup>。
+- **Firewall**: 2026年7月17日のアップデートで、Copilot Code Review用のネットワークアクセス制御(Firewall)がCopilot cloud agentとは独立して設定できるようになりました。デフォルトで全リポジトリに対して有効です。セルフホストランナーでは現時点でFirewallがサポートされていない点に注意してください<sup>16</sup>。
+- **MCP最小権限**: GitHub MCPサーバーの既定トークンは読み取り専用ですが、より広い権限を設定できるため、Code Reviewに公開するツールとトークン権限を明示的に限定します<sup>15</sup>。
+- **CODEOWNERS**: `copilot-instructions.md`・`*.instructions.md`・`.github/skills/`・MCP設定など、レビューの挙動を左右する設定ファイル自体を誰が変更できるかも重要なガバナンス項目です。これらのパスにCODEOWNERSを設定し、変更に承認を必須にすることを推奨します(Sizikov氏のブログで紹介されているエージェント一般向けの多層防御の考え方を、Code Review用の設定ファイル保護にも応用したものです)<sup>24</sup>。
+- **カスタム実行環境**: `.github/workflows/copilot-code-review.yml`を使うと、依存関係のインストールやツールのセットアップなど、Copilot Code Reviewの実行環境自体をリポジトリ単位で設定できます。ランナーの種類も組織のCopilot設定から独立して構成可能です<sup>16, 15</sup>。
 
 ### エンタープライズでの一括ガバナンス
 
@@ -235,14 +235,14 @@ Copilot Code Reviewは「GitHubエコシステムに完全統合されたゼロ�
 
 | 観点 | GitHub Copilot Code Review | 専業レビューツール(CodeRabbit等) |
 |---|---|---|
-| 導入のしやすさ | 有償Copilotプランで利用できるが、レビューはAI Creditsを消費し、agentic capabilitiesはGitHub Actions minutesも消費する。プラン内クレジットや予算上限を超えた追加利用は課金対象になり得る<sup>21</sup> | 別途契約・別料金が必要 |
-| 対応プラットフォーム | GitHub.com・GitHub CLI・GitHub Mobile・主要IDEを中心に対応し、Azure DevOpsはpublic preview<sup>21</sup> | GitHub・GitLab・Bitbucket・Azure DevOps等、複数プラットフォームに対応する製品もある<sup>21</sup> |
-| 精度傾向 | ある独立ベンチマークでは適合率(precision)がやや高く、再現率(recall)は低めと報告されている(検出は少ないが誤りも少ない)<sup>21</sup> | 同ベンチマークでは再現率が高めで、より多くの問題を検出する一方、誤検知もやや増える傾向<sup>21</sup> |
-| カスタマイズ性 | `copilot-instructions.md`等による指示のカスタマイズが可能 | 学習型のフィルタリングなど、より高度なノイズ抑制機構を持つ製品もある<sup>24</sup> |
+| 導入のしやすさ | 有償Copilotプランで利用できるが、レビューはAI Creditsを消費し、agentic capabilitiesはGitHub Actions minutesも消費する。プラン内クレジットや予算上限を超えた追加利用は課金対象になり得る<sup>25</sup> | 別途契約・別料金が必要 |
+| 対応プラットフォーム | GitHub.com・GitHub CLI・GitHub Mobile・主要IDEを中心に対応し、Azure DevOpsはpublic preview<sup>25</sup> | GitHub・GitLab・Bitbucket・Azure DevOps等、複数プラットフォームに対応する製品もある<sup>25</sup> |
+| 精度傾向 | ある独立ベンチマークでは適合率(precision)がやや高く、再現率(recall)は低めと報告されている(検出は少ないが誤りも少ない)<sup>25</sup> | 同ベンチマークでは再現率が高めで、より多くの問題を検出する一方、誤検知もやや増える傾向<sup>25</sup> |
+| カスタマイズ性 | `copilot-instructions.md`等による指示のカスタマイズが可能 | 学習型のフィルタリングなど、より高度なノイズ抑制機構を持つ製品もある<sup>28</sup> |
 
-2026年2月には、DeepMind・Anthropic・Metaの研究者が設立した研究機関Martianが、レビューツールを販売する立場にない独立機関として初めてAIコードレビューエージェントのベンチマークを公開し、ベンダー自身が「自社が勝つベンチマーク」を発表し合う状況に一石を投じたと報じられています<sup>21</sup>。
+2026年2月には、DeepMind・Anthropic・Metaの研究者が設立した研究機関Martianが、レビューツールを販売する立場にない独立機関として初めてAIコードレビューエージェントのベンチマークを公開し、ベンダー自身が「自社が勝つベンチマーク」を発表し合う状況に一石を投じたと報じられています<sup>25</sup>。
 
-**実務上の指針**としては、すでにGitHubとCopilotのエコシステムにいるチームは、まずCopilot Code Reviewを標準の一次レビューとして導入し、自分たちのコードベースで十分な検出力があるかを評価したうえで、ギャップが許容できない場合に専業ツールを追加するという段階的なアプローチが多くの比較記事で共通して推奨されています<sup>1, 21</sup>。
+**実務上の指針**としては、すでにGitHubとCopilotのエコシステムにいるチームは、まずCopilot Code Reviewを標準の一次レビューとして導入し、自分たちのコードベースで十分な検出力があるかを評価したうえで、ギャップが許容できない場合に専業ツールを追加するという段階的なアプローチが多くの比較記事で共通して推奨されています<sup>1, 25</sup>。
 
 ---
 
@@ -260,7 +260,7 @@ flowchart TB
 1. **個人トライアル**: 数名の開発者が手動でレビューをリクエストし、指摘の質・自分たちのコードベースとの相性を確認します。
 2. **リポジトリ導入**: `copilot-instructions.md`を最小構成で用意し、PR作成時のみの自動レビューを有効化します。過剰な指示を書かず、実際のレビュー結果を見ながら反復的に育てます<sup>3</sup>。
 3. **組織展開**: 複数リポジトリに展開する段階で、Agent SkillsやMCPサーバー、Firewall・Content Exclusion・CODEOWNERSといったガバナンス設定を標準化します。
-4. **計測と改善**: コメントの採用率・却下率、レビューにかかる時間、誤検知の傾向などを定期的にモニタリングし、指示ファイルを継続的にチューニングします<sup>3, 19</sup>。
+4. **計測と改善**: コメントの採用率・却下率、レビューにかかる時間、誤検知の傾向などを定期的にモニタリングし、指示ファイルを継続的にチューニングします<sup>3, 23</sup>。
 
 ---
 
@@ -299,32 +299,32 @@ GitHub Copilot Code Reviewは、GitHubのPRワークフローに深く統合さ�
 6. [Enabling GitHub Copilot code review in your enterprise](https://docs.github.com/en/copilot/how-tos/administer-copilot/manage-for-enterprise/manage-agents/enable-copilot-code-review)
 7. [Responsible use of GitHub Copilot code review](https://docs.github.com/copilot/responsible-use-of-github-copilot-features/responsible-use-of-github-copilot-code-review)
 8. [Excluding content from GitHub Copilot](https://docs.github.com/en/copilot/how-tos/configure-content-exclusion/exclude-content-from-copilot)
-31. [Adding custom instructions for GitHub Copilot CLI(excludeAgent)](https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/add-custom-instructions)
-58. [Testing changes to content exclusions in your IDE](https://docs.github.com/zh/enterprise-cloud@latest/copilot/managing-copilot/managing-github-copilot-in-your-organization/managing-github-copilot-features-in-your-organization/testing-changes-to-content-exclusions-in-your-ide)
+9. [Configuring runners for GitHub Copilot code review](https://docs.github.com/en/copilot/how-tos/copilot-on-github/set-up-copilot/configure-runners)
+10. [About GitHub Copilot code review — Model usage](https://docs.github.com/en/copilot/concepts/agents/code-review#model-usage)
+11. [About GitHub Copilot code review — Review effort level](https://docs.github.com/en/copilot/concepts/agents/code-review#review-effort-level)
+12. [Adding custom instructions for GitHub Copilot CLI(excludeAgent)](https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/add-custom-instructions)
+13. [Testing changes to content exclusions in your IDE](https://docs.github.com/zh/enterprise-cloud@latest/copilot/managing-copilot/managing-github-copilot-in-your-organization/managing-github-copilot-features-in-your-organization/testing-changes-to-content-exclusions-in-your-ide)
+14. [Using GitHub Copilot code review(MCP/Agent Skills設定詳細)](https://docs.github.com/copilot/using-github-copilot/code-review/using-copilot-code-review)
 
 ### 公式ブログ・Changelog(GitHub Blog)
 
-9. [Copilot code review: Agent skills and MCP now generally available](https://github.blog/changelog/2026-07-29-copilot-code-review-agent-skills-and-mcp-now-generally-available/)(2026年7月29日)
-10. [Copilot code review: Customization and configurability improvements](https://github.blog/changelog/2026-07-17-copilot-code-review-customization-and-configurability-improvements/)(2026年7月17日)
-11. [Copilot code review: Analysis depth and efficiency updates](https://github.blog/changelog/2026-06-25-copilot-code-review-analysis-depth-and-efficiency-updates/)(2026年6月25日)
-12. [Using GitHub Copilot code review(GitHub Docs, MCP/Agent Skills設定詳細)](https://docs.github.com/copilot/using-github-copilot/code-review/using-copilot-code-review)
-13. [Copilot code review: New configurations and controls](https://github.blog/changelog/2026-06-12-copilot-code-review-new-configurations-and-controls/)(2026年6月12日)
-14. [MCP Adoption Week: Copilot Code Review Goes GA](https://www.digitalapplied.com/blog/mcp-adoption-week-copilot-code-review-ga)(2026年7月、GA日の経緯を分析した記事)
-15. [Copilot code review: Path-scoped custom instruction file support](https://github.blog/changelog/2025-09-03-copilot-code-review-path-scoped-custom-instruction-file-support/)(2025年9月3日)
-16. [Unlocking the full power of Copilot code review: Master your instructions files](https://github.blog/ai-and-ml/github-copilot/unlocking-the-full-power-of-copilot-code-review-master-your-instructions-files/)(GitHub公式ブログ、2026年4月17日)
+15. [Copilot code review: Agent skills and MCP now generally available](https://github.blog/changelog/2026-07-29-copilot-code-review-agent-skills-and-mcp-now-generally-available/)(2026年7月29日)
+16. [Copilot code review: Customization and configurability improvements](https://github.blog/changelog/2026-07-17-copilot-code-review-customization-and-configurability-improvements/)(2026年7月17日)
+17. [Copilot code review: New configurations and controls](https://github.blog/changelog/2026-06-12-copilot-code-review-new-configurations-and-controls/)(2026年6月12日)
+18. [Copilot code review: Path-scoped custom instruction file support](https://github.blog/changelog/2025-09-03-copilot-code-review-path-scoped-custom-instruction-file-support/)(2025年9月3日)
+19. [Unlocking the full power of Copilot code review: Master your instructions files](https://github.blog/ai-and-ml/github-copilot/unlocking-the-full-power-of-copilot-code-review-master-your-instructions-files/)(GitHub公式ブログ、2026年4月17日)
 
 ### コミュニティ・実務者による記事
 
-17. Rahul Singh, [GitHub Copilot Code Review: Complete Guide (2026)](https://dev.to/rahulxsingh/github-copilot-code-review-complete-guide-2026-255h), DEV Community(2026年4月2日)
-18. pwd9000, [Mastering Code Reviews with GitHub Copilot: The Definitive Guide](https://dev.to/pwd9000/mastering-code-reviews-with-github-copilot-the-definitive-guide-3nfp), DEV Community(2026年5月27日)
-19. Mrinal Maheshwari, [GitHub Copilot Code Review: Guidelines, Best Practices, and How to Integrate It into Your PR Workflow](https://blog.mrinalmaheshwari.com/github-copilot-code-review-guidelines-best-practices-and-how-to-integrate-it-into-your-pr-b4518073b4c9)(2026年1月12日)
-20. Anton Sizikov(GitHub社員), [Copilot Content Exclusions: Four Layers of Defense](https://blog.cloud-eng.nl/2026/03/13/copilot-content-exclusions-four-layers/)(2026年3月13日)
-21. [10 Best AI Code Review Tools in 2026 (Ranked by Independent Benchmark)](https://codeant.ai/blogs/best-ai-code-review-tools), CodeAnt AI(Martianによる独立ベンチマークの紹介を含む)
-22. [GitHub Copilot Code Review in 2026: What It Does and Misses](https://refacto.ai/blog/github-copilot-code-review-in-2026-what-it-does-well-and-where-it-falls-short/)(2026年4月10日)
-23. 同上(GitHubのレビュー実施率・平均コメント数に関する分析部分)
-24. [CodeRabbit vs GitHub Copilot Code Review (2026): Benchmarks, Pricing, Features](https://www.morphllm.com/comparisons/coderabbit-vs-copilot)(2026年3月14日)
-25. Simon Willison, [Posts tagged "github-copilot"](https://simonwillison.net/tags/github-copilot/) — GitHub Copilotのエージェント化やモデル変更を継続的に追跡している著名な開発者のブログ。Copilot CLIやプラン変更などの一次情報源へのリンク集としても有用です。
-26. [Configuring runners for GitHub Copilot code review](https://docs.github.com/en/copilot/how-tos/copilot-on-github/set-up-copilot/configure-runners)(GitHub Docs)
-27. [About GitHub Copilot code review — Model usage](https://docs.github.com/en/copilot/concepts/agents/code-review#model-usage)(GitHub Docs)
+20. [MCP Adoption Week: Copilot Code Review Goes GA](https://www.digitalapplied.com/blog/mcp-adoption-week-copilot-code-review-ga)(2026年7月、GA日の経緯を分析した記事)
+21. Rahul Singh, [GitHub Copilot Code Review: Complete Guide (2026)](https://dev.to/rahulxsingh/github-copilot-code-review-complete-guide-2026-255h), DEV Community(2026年4月2日)
+22. pwd9000, [Mastering Code Reviews with GitHub Copilot: The Definitive Guide](https://dev.to/pwd9000/mastering-code-reviews-with-github-copilot-the-definitive-guide-3nfp), DEV Community(2026年5月27日)
+23. Mrinal Maheshwari, [GitHub Copilot Code Review: Guidelines, Best Practices, and How to Integrate It into Your PR Workflow](https://blog.mrinalmaheshwari.com/github-copilot-code-review-guidelines-best-practices-and-how-to-integrate-it-into-your-pr-b4518073b4c9)(2026年1月12日)
+24. Anton Sizikov(GitHub社員), [Copilot Content Exclusions: Four Layers of Defense](https://blog.cloud-eng.nl/2026/03/13/copilot-content-exclusions-four-layers/)(2026年3月13日)
+25. [10 Best AI Code Review Tools in 2026 (Ranked by Independent Benchmark)](https://codeant.ai/blogs/best-ai-code-review-tools), CodeAnt AI(Martianによる独立ベンチマークの紹介を含む)
+26. [GitHub Copilot Code Review in 2026: What It Does and Misses](https://refacto.ai/blog/github-copilot-code-review-in-2026-what-it-does-well-and-where-it-falls-short/)(2026年4月10日)
+27. 同上(GitHubのレビュー実施率・平均コメント数に関する分析部分)
+28. [CodeRabbit vs GitHub Copilot Code Review (2026): Benchmarks, Pricing, Features](https://www.morphllm.com/comparisons/coderabbit-vs-copilot)(2026年3月14日)
+29. Simon Willison, [Posts tagged "github-copilot"](https://simonwillison.net/tags/github-copilot/) — GitHub Copilotのエージェント化やモデル変更を継続的に追跡している著名な開発者のブログ。Copilot CLIやプラン変更などの一次情報源へのリンク集としても有用です。
 
-> 注: 上記のうち14・17〜24は第三者(比較サイト・個人ブログ)による分析記事であり、数値や評価は執筆時点のものです。導入判断の際は必ず一次情報である公式ドキュメント(1〜13、16、26、27、31、58)と最新のGitHub Changelogを優先して確認してください。
+> 注: 上記のうち20〜28は第三者(比較サイト・個人ブログ)による分析記事であり、数値や評価は執筆時点のものです。導入判断の際は必ず一次情報である公式ドキュメントと公式ブログ・Changelog(1〜19)を優先して確認してください。

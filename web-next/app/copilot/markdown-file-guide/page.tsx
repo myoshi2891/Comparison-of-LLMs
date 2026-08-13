@@ -686,7 +686,7 @@ export default function Page() {
                   {": "}
                   <span className={styles.cSt}>{'"code-review"'}</span>
                   {"       "}
-                  <span className={styles.cCm}>{'# 任意: "code-review" or "coding-agent"'}</span>
+                  <span className={styles.cCm}>{'# 任意: "code-review" or "cloud-agent"'}</span>
                   {"\n                                     "}
                   <span className={styles.cCm}>{"# 指定したエージェントには非適用"}</span>
                   {"\n"}
@@ -805,7 +805,7 @@ export default function Page() {
                       {"\n"}
                       <span className={styles.cGh}>{"excludeAgent"}</span>
                       {": "}
-                      <span className={styles.cSt}>{'"coding-agent"'}</span>
+                      <span className={styles.cSt}>{'"cloud-agent"'}</span>
                       {"\n"}
                       <span className={styles.cKy}>{"---"}</span>
                       {"\n\n"}
@@ -823,10 +823,10 @@ export default function Page() {
                 <div>
                   <strong>excludeAgent の活用法</strong>
                   <br />
-                  <code>excludeAgent: "coding-agent"</code>を設定すると、Copilot Coding
-                  AgentにはそのルールファイルがPRとして届かず、Copilot
-                  Chatでの手作業支援にのみ適用できます。逆に<code>excludeAgent: "code-review"</code>
-                  で自動コードレビューには除外することもできます（[5]）。
+                  <code>excludeAgent: "cloud-agent"</code>を設定すると、Copilot cloud
+                  agentにはそのルールファイルを適用しません。逆に
+                  <code>excludeAgent: "code-review"</code>
+                  でCopilot code reviewから除外できます（[5]）。
                 </div>
               </div>
             </div>
