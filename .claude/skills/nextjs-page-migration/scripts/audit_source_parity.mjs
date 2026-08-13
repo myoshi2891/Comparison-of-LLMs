@@ -18,7 +18,7 @@
  *
  * 終了コード:
  *   0 = 漏れなし（Green 判定に進んでよい）
- *   1 = 漏れあり（見出し・外部リンク・リスト項目・表のいずれかが不足）
+ *   1 = 漏れあり（見出し・SVG・callout/alert・本文要素のいずれかが不足または改変）
  *   2 = 引数エラー / ファイル未検出
  */
 
@@ -132,6 +132,93 @@ function normalizeElementContent(raw) {
   return normalize(stripMarkup(raw));
 }
 
+/** SVG をタグ・属性順序に依存しない比較シグネチャへ変換する。 */
+function normalizeSvgElement(raw) {
+  const tags = [];
+  const tagRe = /<([A-Za-z][\w:.-]*)\b([^>]*)\/?\s*>/g;
+  let tag = tagRe.exec(raw);
+  while (tag !== null) {
+    const attributes = [];
+    const attributeRe =
+      /([:@A-Za-z_][\w:.-]*)\s*=\s*(?:"([^"]*)"|'([^']*)'|\{\s*(?:"([^"]*)"|'([^']*)'|([^{}]+))\s*\})/g;
+    let attribute = attributeRe.exec(tag[2]);
+    while (attribute !== null) {
+      const name = attribute[1].replace(/-/g, "").toLowerCase();
+      if (name !== "class" && name !== "classname") {
+        attributes.push([
+          name,
+          normalize(decodeEntities(attribute[2] ?? attribute[3] ?? attribute[4] ?? attribute[5] ?? attribute[6] ?? "")),
+        ]);
+      }
+      attribute = attributeRe.exec(tag[2]);
+    }
+    attributes.sort(([left], [right]) => left.localeCompare(right));
+    tags.push([tag[1].toLowerCase(), attributes]);
+    tag = tagRe.exec(raw);
+  }
+  return JSON.stringify({ tags, text: normalize(stripMarkup(raw)) });
+}
+
+/** callout / alert の種別と本文をマークアップ非依存の比較値へ変換する。 */
+function normalizeCalloutElement(openingTag, content) {
+  const markers = new Set();
+  const markerSource = `${openingTag} ${openingTag.match(/styles\.([\w-]+)/g)?.join(" ") ?? ""}`;
+  for (const marker of markerSource.matchAll(/(?:callout|alert|warning|warn|note|info|tip|success|good)/gi)) {
+    const value = marker[0].toLowerCase();
+    markers.add(value === "warning" ? "warn" : value === "note" ? "info" : value);
+  }
+  return `${[...markers].sort().join("|")}::${matchKey(stripMarkup(content))}`;
+}
+
+function collectSvgElements(src) {
+  return (src.match(/<svg\b[\s\S]*?<\/svg>/gi) ?? []).map(normalizeSvgElement);
+}
+
+function collectMarkupCalloutElements(src) {
+  return extractElementContents(src, (openingTag) =>
+    /<(?:Callout|Alert)\b|(?:class|className)\s*=\s*(?:["'][^"']*(?:callout|alert)|\{[^}]*styles\.(?:callout|alert))|data-(?:testid|variant)\s*=\s*["'](?:callout|alert|warn|warning|info|note|good|success|tip)/i.test(
+      openingTag
+    )
+  ).map(({ openingTag, content }) => normalizeCalloutElement(openingTag, content));
+}
+
+function collectMarkdownCalloutElements(src) {
+  const callouts = [];
+  const lines = src.split(/\r?\n/);
+  for (let index = 0; index < lines.length; index += 1) {
+    const marker = /^\s*>\s*\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]\s*$/i.exec(lines[index]);
+    if (!marker) continue;
+    const body = [];
+    while (index + 1 < lines.length) {
+      const quoted = /^\s*>\s?(.*)$/.exec(lines[index + 1]);
+      if (!quoted) break;
+      body.push(quoted[1]);
+      index += 1;
+    }
+    const variant = /WARNING|CAUTION/i.test(marker[1])
+      ? "warn"
+      : /NOTE|IMPORTANT/i.test(marker[1])
+        ? "info"
+        : "tip";
+    callouts.push(`${variant}::${matchKey(stripMarkdownInline(body.join(" ")))}`);
+  }
+  return callouts;
+}
+
+function stripMarkdownFences(src) {
+  let inFence = false;
+  return src
+    .split(/\r?\n/)
+    .map((line) => {
+      if (/^\s*(```|~~~)/.test(line)) {
+        inFence = !inFence;
+        return "";
+      }
+      return inFence ? "" : line;
+    })
+    .join("\n");
+}
+
 /**
  * Mermaid ソースを改行コード・外側の空行・共通インデントだけ正規化する。
  * mindmap 等の相対インデントは構文の一部なので保持する。
@@ -195,6 +282,7 @@ function extractElementContents(src, predicate) {
         if (depth === 0) {
           results.push({
             index: opening.index,
+            openingTag,
             content: src.slice(openingRe.lastIndex, nested.index),
           });
           openingRe.lastIndex = nestedRe.lastIndex;
@@ -315,6 +403,7 @@ function normalizeUrl(url) {
  */
 function inventoryMarkdown(src) {
   const lines = src.split(/\r?\n/);
+  const proseSource = stripMarkdownFences(src);
   const headings = [];
   const listTexts = [];
   let listItems = 0;
@@ -359,7 +448,7 @@ function inventoryMarkdown(src) {
       continue;
     }
 
-    const heading = /^(#{2,3})\s+(.*?)\s*#*\s*$/.exec(line);
+    const heading = /^(#{1,6})\s+(.*?)\s*#*\s*$/.exec(line);
     if (heading) {
       flushParagraph();
       headings.push({
@@ -404,6 +493,8 @@ function inventoryMarkdown(src) {
     tableRowTexts,
     paragraphTexts,
     mermaidSources,
+    svgElements: collectSvgElements(proseSource),
+    calloutElements: collectMarkdownCalloutElements(proseSource),
     externalLinks: collectUrls(src),
   };
 }
@@ -417,7 +508,7 @@ function inventoryMarkdown(src) {
 function inventoryHtml(src) {
   const body = src.replace(/<(script|style)[\s\S]*?<\/\1>/gi, "");
   const headings = [];
-  const headingRe = /<h([23])\b[^>]*>([\s\S]*?)<\/h\1>/gi;
+  const headingRe = /<h([1-6])\b[^>]*>([\s\S]*?)<\/h\1>/gi;
   let match = headingRe.exec(body);
   while (match !== null) {
     headings.push({ level: Number(match[1]), text: normalize(stripMarkup(match[2])) });
@@ -452,6 +543,8 @@ function inventoryHtml(src) {
     tableRowTexts,
     paragraphTexts,
     mermaidSources: collectHtmlMermaidSources(src),
+    svgElements: collectSvgElements(body),
+    calloutElements: collectMarkupCalloutElements(body),
     externalLinks: collectUrls(body),
   };
 }
@@ -469,7 +562,7 @@ function inventoryTsx(src) {
   const headings = [];
   // h1 も採取する。原本の h2 タイトルがページの h1 になるのは正当な移植であり、
   // h2/h3 だけを見ると偽陽性になるため。
-  const headingRe = /<h([123])\b[^>]*>([\s\S]*?)<\/h\1>/g;
+  const headingRe = /<h([1-6])\b[^>]*>([\s\S]*?)<\/h\1>/g;
   let match = headingRe.exec(src);
   while (match !== null) {
     headings.push({ level: Number(match[1]), text: normalize(stripMarkup(match[2])) });
@@ -507,6 +600,8 @@ function inventoryTsx(src) {
     tableRowTexts,
     paragraphTexts,
     mermaidSources: collectTsxMermaidSources(src),
+    svgElements: collectSvgElements(src),
+    calloutElements: collectMarkupCalloutElements(src),
     externalLinks: collectUrls(src),
   };
 }
@@ -609,6 +704,8 @@ function compare(source, page) {
   const missingCodeBlocks = missingOccurrences(source.codeBlockTexts, page.codeBlockTexts, matchKey);
   const missingTableRows = missingOccurrences(source.tableRowTexts, page.tableRowTexts, matchKey);
   const missingParagraphs = missingOccurrences(source.paragraphTexts, page.paragraphTexts, matchKey);
+  const missingSvgElements = missingOccurrences(source.svgElements, page.svgElements);
+  const missingCalloutElements = missingOccurrences(source.calloutElements, page.calloutElements);
   const mermaidSourcesMatch =
     source.mermaidSources.length === page.mermaidSources.length &&
     source.mermaidSources.every((value, index) => value === page.mermaidSources[index]);
@@ -621,6 +718,8 @@ function compare(source, page) {
     headings: { source: source.headings.length, page: page.headings.length },
     externalLinks: { source: source.externalLinks.size, page: page.externalLinks.size },
     mermaidSources: { source: source.mermaidSources.length, page: page.mermaidSources.length },
+    svgElements: { source: source.svgElements.length, page: page.svgElements.length },
+    calloutElements: { source: source.calloutElements.length, page: page.calloutElements.length },
   };
 
   const blocking =
@@ -630,6 +729,8 @@ function compare(source, page) {
     missingCodeBlocks.length > 0 ||
     missingTableRows.length > 0 ||
     missingParagraphs.length > 0 ||
+    missingSvgElements.length > 0 ||
+    missingCalloutElements.length > 0 ||
     !mermaidSourcesMatch;
 
   return {
@@ -640,6 +741,8 @@ function compare(source, page) {
     missingCodeBlocks,
     missingTableRows,
     missingParagraphs,
+    missingSvgElements,
+    missingCalloutElements,
     mermaidSourcesMatch,
     sourceMermaidSources: source.mermaidSources,
     pageMermaidSources: page.mermaidSources,
@@ -683,14 +786,12 @@ const result = compare(sourceInventory, pageInventory);
 
 if (flags.has("--emit-headings")) {
   // 契約テスト S-1 に貼り付ける期待値配列を出力する
-  const h2 = sourceInventory.headings.filter((h) => h.level === 2).map((h) => h.text);
-  const h3 = sourceInventory.headings.filter((h) => h.level === 3).map((h) => h.text);
-  console.log("const EXPECTED_H2 = [");
-  for (const t of h2) console.log(`  ${JSON.stringify(t)},`);
-  console.log("] as const;\n");
-  console.log("const EXPECTED_H3 = [");
-  for (const t of h3) console.log(`  ${JSON.stringify(t)},`);
-  console.log("] as const;");
+  for (let level = 1; level <= 6; level += 1) {
+    const headings = sourceInventory.headings.filter((h) => h.level === level).map((h) => h.text);
+    console.log(`const EXPECTED_H${level} = [`);
+    for (const text of headings) console.log(`  ${JSON.stringify(text)},`);
+    console.log(`] as const;${level < 6 ? "\n" : ""}`);
+  }
   process.exit(0);
 }
 
@@ -743,6 +844,14 @@ if (result.missingTableRows.length > 0) {
 if (result.missingParagraphs.length > 0) {
   console.log(`\n❌ page.tsx に存在しない原本の段落 (${result.missingParagraphs.length} 件):`);
   for (const text of result.missingParagraphs) console.log(`  ${JSON.stringify(text)}`);
+}
+if (result.missingSvgElements.length > 0) {
+  console.log(`\n❌ page.tsx に存在しないか改変された原本の SVG (${result.missingSvgElements.length} 件)`);
+}
+if (result.missingCalloutElements.length > 0) {
+  console.log(
+    `\n❌ page.tsx に存在しないか改変された原本の callout/alert (${result.missingCalloutElements.length} 件)`
+  );
 }
 if (!result.mermaidSourcesMatch) {
   console.log("\n❌ Mermaid ソースが原本と順序・出現回数込みで一致しません:");
