@@ -86,8 +86,7 @@ describe("Phase A - regression guards", () => {
       .split(",")
       .map((name) => name.trim())
       .filter(Boolean);
-    const htmlClassExpression =
-      /<html\b[^>]*className=\{`([^`]*)`\}/.exec(layoutSrc)?.[1] ?? "";
+    const htmlClassExpression = /<html\b[^>]*className=\{`([^`]*)`\}/.exec(layoutSrc)?.[1] ?? "";
     const htmlFontClasses = Array.from(
       htmlClassExpression.matchAll(/\$\{(\w+)\.variable\}/g),
       (match) => match[1]

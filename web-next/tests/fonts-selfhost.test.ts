@@ -136,9 +136,7 @@ describe("self-hosted Noto Sans JP - wiring", () => {
     const latinUrls = [
       ...new Set(
         Array.from(
-          fontCss.matchAll(
-            /\/\*\s*latin\s*\*\/\s*@font-face\s*\{[\s\S]*?src:\s*url\(([^)]+)\)/g
-          ),
+          fontCss.matchAll(/\/\*\s*latin\s*\*\/\s*@font-face\s*\{[\s\S]*?src:\s*url\(([^)]+)\)/g),
           (match) => match[1]
         )
       ),
