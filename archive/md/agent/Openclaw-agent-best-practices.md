@@ -116,7 +116,10 @@ flowchart TB
     NONE --> NOBOOT["ブートストラップファイルを注入しない"]
     APPLY -->|"通常セッション"| MAIN["通常のブートストラップ対象"]
     MAIN -.->|"存在する場合のみ"| MEM["MEMORY.md（任意）"]
-    MAINFILES["AGENTS.md / SOUL.md / TOOLS.md / IDENTITY.md / USER.md<br/>BOOTSTRAP.md（初期設定中）/ MEMORY.md（任意）"]
+    MAINFILES["AGENTS.md / SOUL.md / TOOLS.md / IDENTITY.md / USER.md<br/>BOOTSTRAP.md（初期設定中）/ MEMORY.md（任意）<br/>HEARTBEAT.md（条件付き）"]
+    MAIN -.->|"heartbeat有効 +<br/>agents.defaults.heartbeat.includeSystemPromptSection"| HEARTBEAT["HEARTBEAT.md"]
+    HEARTBEAT -->|"embedded harness: 通常runで内容を注入"| MAINFILES
+    HEARTBEAT -.->|"native Codex harness"| HEARTBEATTURN["heartbeat turnから参照<br/>内容は直接注入しない"]
     SUBFILES["AGENTS.md / TOOLS.md のみ"]
     APPLY -->|"sub-agent"| SUB["サブエージェントのブートストラップ対象"]
     MAIN --> MAINFILES
@@ -126,7 +129,7 @@ flowchart TB
     SUBFILES --> SYS
 ```
 
-OpenClaw v2026.7.xでは、通常セッションに`AGENTS.md`・`SOUL.md`・`TOOLS.md`・`IDENTITY.md`・`USER.md`などのブートストラップファイルを注入し、`MEMORY.md`は存在する場合のみ、`BOOTSTRAP.md`は新規ワークスペースの初期セットアップ時のみ対象にする。サブエージェントではコンテキストを小さく保つため、`AGENTS.md`と`TOOLS.md`だけを注入する。利用できるツール自体は、ツールプロファイル、allow/denyポリシー、サンドボックスなどの実行時ポリシーで決まり、`AGENTS.md`と`TOOLS.md`はツールを許可する設定ではなく、利用方法や環境固有の注意事項をモデルへ伝える指針である。
+OpenClaw v2026.7.xでは、通常セッションに`AGENTS.md`・`SOUL.md`・`TOOLS.md`・`IDENTITY.md`・`USER.md`などのブートストラップファイルを注入し、`MEMORY.md`は存在する場合のみ、`BOOTSTRAP.md`は新規ワークスペースの初期セットアップ時のみ対象にする。`HEARTBEAT.md`は条件付きで、heartbeatが有効かつ`agents.defaults.heartbeat.includeSystemPromptSection`が有効な通常runではembedded harnessが内容を注入する一方、native Codex harnessは内容を直接注入せずheartbeat turnから参照する。サブエージェントではコンテキストを小さく保つため、`AGENTS.md`と`TOOLS.md`だけを注入する。利用できるツール自体は、ツールプロファイル、allow/denyポリシー、サンドボックスなどの実行時ポリシーで決まり、`AGENTS.md`と`TOOLS.md`はツールを許可する設定ではなく、利用方法や環境固有の注意事項をモデルへ伝える指針である。
 
 ### 3.1 各ファイルの役割
 

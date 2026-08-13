@@ -14,8 +14,9 @@
   #   失敗していた原因は SWC バイナリ欠損ではなく、next/font が @font-face を
   #   全件ビルド時にダウンロードする挙動だった（Noto Sans JP = 124 slice ×
   #   4 weight = 496 本を fonts.gstatic.com から取得しようとして失敗）。
-  #   現在は Noto Sans JP を web-next/public/fonts/ へ vendor 済みで、
+  #   現在は Noto Sans JP を web-next/public/fonts/ へ vendor 済みで、このフォントは
   #   ビルド中に Google Fonts へアクセスしない（web-next/scripts/vendor-noto-sans-jp.ts）。
+  #   JetBrains Mono / Syne は引き続き next/font/google から読み込む。
   command = "bun install --frozen-lockfile && bun run build"
   publish = "out"
   # base 配下に差分がない場合に Netlify がビルドを自動スキップする既定挙動を無効化する。

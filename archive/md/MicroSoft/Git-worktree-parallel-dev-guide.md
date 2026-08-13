@@ -567,7 +567,7 @@ gwt() {
     return 1
   fi
   trap 'gwt_cleanup_lock; gwt_cleanup_worktree' EXIT
-  trap 'gwt_cleanup_lock; gwt_cleanup_worktree; trap - HUP INT TERM; return 130' HUP INT TERM
+  trap 'gwt_cleanup_lock; gwt_cleanup_worktree; trap - EXIT HUP INT TERM; return 130' HUP INT TERM
   for attempt in $(seq 0 49); do
     candidate=$((3000 + (port_offset + attempt) % 50))
     reserved=false
