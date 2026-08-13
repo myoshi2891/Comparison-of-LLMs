@@ -7,9 +7,9 @@ import test from "node:test";
 
 const auditScript = new URL("./audit_source_parity.mjs", import.meta.url);
 
-function audit(source, page) {
+function audit(source, page, sourceExtension = "html") {
 	const fixtureDir = mkdtempSync(join(tmpdir(), "source-parity-"));
-	const sourcePath = join(fixtureDir, "source.html");
+	const sourcePath = join(fixtureDir, `source.${sourceExtension}`);
 	const pagePath = join(fixtureDir, "page.tsx");
 	writeFileSync(sourcePath, source);
 	writeFileSync(pagePath, page);
@@ -93,5 +93,86 @@ export default function Page() {
 	assert.deepEqual(reversed.json.pageMermaidSources, [
 		"sequenceDiagram\nA->>B: ping",
 		"graph TD\nA --> B",
+	]);
+});
+
+test("does not treat a Markdown Mermaid fence as a normal code block", () => {
+	const source = `Intro paragraph.
+
+\`\`\`mermaid
+flowchart TD
+  A[Start] --> B[Done]
+\`\`\``;
+	const page = `const CHART = \`flowchart TD
+A[Start] --> B[Done]\`;
+export default function Page() {
+  return <><p>Intro paragraph.</p><MermaidDiagram chart={CHART} /></>;
+}`;
+
+	const result = audit(source, page, "md");
+
+	assert.equal(result.status, 0);
+	assert.deepEqual(result.json.missingCodeBlocks, []);
+	assert.equal(result.json.mermaidSourcesMatch, true);
+});
+
+test("recognizes every allowed Mermaid diagram declaration including pie", () => {
+	const charts = [
+		"graph TD\nA --> B",
+		"flowchart TD\nA --> B",
+		"sequenceDiagram\nA->>B: ping",
+		"mindmap\n  root((Root))",
+		"stateDiagram-v2\nA --> B",
+		"gitGraph\ncommit",
+		"erDiagram\nA ||--o{ B : has",
+		"classDiagram\nA <|-- B",
+		"journey\ntitle Trip",
+		"timeline\ntitle History",
+		"pie title Share\n\"A\" : 1",
+	];
+	const source = charts.map((chart) => `<div class="mermaid">${chart}</div>`).join("\n");
+	const declarations = charts
+		.map((chart, index) => `const CHART_${index} = ${JSON.stringify(chart)};`)
+		.join("\n");
+	const diagrams = charts
+		.map((_, index) => `<MermaidDiagram chart={CHART_${index}} />`)
+		.join("");
+
+	const result = audit(
+		source,
+		`${declarations}\nexport default function Page() { return <>${diagrams}</>; }`,
+	);
+
+	assert.equal(result.status, 0);
+	assert.equal(result.json.mermaidSourcesMatch, true);
+	assert.equal(result.json.counts.mermaidSources.source, charts.length);
+});
+
+test("treats normalized HTML and Markdown paragraphs as blocking parity elements", () => {
+	const matchingHtml = audit(
+		"<p>First ordinary paragraph.</p><p>Second ordinary paragraph.</p>",
+		"<p>First ordinary paragraph.</p><p>Second ordinary paragraph.</p>",
+	);
+	assert.equal(matchingHtml.status, 0);
+	assert.deepEqual(matchingHtml.json.missingParagraphs, []);
+
+	const missingHtml = audit(
+		"<p>First ordinary paragraph.</p><p>Second ordinary paragraph.</p>",
+		"<p>First ordinary paragraph.</p>",
+	);
+	assert.equal(missingHtml.status, 1);
+	assert.deepEqual(missingHtml.json.missingParagraphs, ["Second ordinary paragraph."]);
+
+	const missingMarkdown = audit(
+		`First Markdown paragraph.
+
+Second Markdown paragraph spans
+two source lines.`,
+		"<p>First Markdown paragraph.</p>",
+		"md",
+	);
+	assert.equal(missingMarkdown.status, 1);
+	assert.deepEqual(missingMarkdown.json.missingParagraphs, [
+		"Second Markdown paragraph spans two source lines.",
 	]);
 });
