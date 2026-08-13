@@ -284,7 +284,7 @@ worktreeが共有するのはGitが追跡するファイルだけです。`node_
 | `node_modules`をsymlinkで共有 | 1つのworktreeの`node_modules`を他からシンボリックリンク | 一瞬でセットアップ完了 | 依存関係が分岐(`package.json`が変わる)すると壊れる。同一依存関係の場合のみ安全 |
 | pnpmの共有ストア(推奨) | コンテンツアドレス方式のグローバルストアを全worktreeで共有 | ダウンロード・ディスク使用量がほぼ増えない。依存関係が分岐しても安全 | pnpm固有の`node_modules`構造への移行が必要 |
 
-pnpm公式ドキュメントは、`enableGlobalVirtualStore: true`を設定したグローバル仮想ストアを使うことで、各worktreeの`node_modules`が実体を持たずシンボリックリンクのみで構成される運用を、マルチエージェント開発向けのパターンとして公開しています。この実験的機能はpnpm 10.12.1で追加され、pnpm 10.12.2では有効時のホイスト処理が修正されました。CommonJSではpnpmが設定する`NODE_PATH`を利用できますが、Node.jsのESMは`NODE_PATH`を参照しないため、ESMを使うプロジェクトでは`@pnpm/plugin-esm-node-path`などのESMローダーを追加する必要があります。本ガイドの検証基準は、問題報告で再現に使われたNode.js 22.16.0と、ホイスト修正を含むpnpm 10.12.2以降です。この設定では、新しいworktreeを追加してもパッケージは既にグローバルストアに存在するため、インストールがほぼ瞬時に終わります。ただし、この共有ストアは「同じ信頼境界内にいる」エージェント・利用者同士でのみ使うべきで、互いに信頼できないエージェント間で書き込み可能な共有ストアを使うことは避けるべきだと明記されています。
+pnpm公式ドキュメントは、`enableGlobalVirtualStore: true`を設定したグローバル仮想ストアを使うことで、各worktreeの`node_modules`が実体を持たずシンボリックリンクのみで構成される運用を、マルチエージェント開発向けのパターンとして公開しています。この実験的機能はpnpm 10.12.1で追加され、pnpm 10.12.2では有効時のホイスト処理が修正されました。`@pnpm/plugin-esm-node-path`などのESMローダーが必要なのは、`enableGlobalVirtualStore: true`で`NODE_PATH`経由のホイスト依存をESMから解決する必要がある構成に限られます。依存パッケージの不足を`packageExtensions`で宣言できる場合、直接依存として追加できる場合、または`NODE_PATH`に頼らない解決構成ではローダーは不要であり、すべてのESMプロジェクトに追加するものではありません。本ガイドの検証基準は、問題報告で再現に使われたNode.js 22.16.0と、ホイスト修正を含むpnpm 10.12.2以降です。この設定では、新しいworktreeを追加してもパッケージは既にグローバルストアに存在するため、インストールがほぼ瞬時に終わります。ただし、この共有ストアは「同じ信頼境界内にいる」エージェント・利用者同士でのみ使うべきで、互いに信頼できないエージェント間で書き込み可能な共有ストアを使うことは避けるべきだと明記されています。
 
 ```yaml
 # pnpm-workspace.yaml
@@ -351,25 +351,80 @@ flowchart TB
 ROOT_DIR=$(git rev-parse --show-toplevel) || exit 1
 GIT_COMMON_DIR=$(git rev-parse --path-format=absolute --git-common-dir) || exit 1
 LOCK_DIR="$GIT_COMMON_DIR/gwt-port.lock"
+LOCK_OWNER="$LOCK_DIR/owner"
 ENV_FILE="$ROOT_DIR/.env"
 WORKTREE_NAME=$(basename "$ROOT_DIR")
 PORT_OFFSET=$(($(printf '%s' "$WORKTREE_NAME" | cksum | cut -d' ' -f1) % 50))
 PORT=""
 
 command -v lsof >/dev/null 2>&1 || { echo "lsofが必要です" >&2; exit 1; }
-while ! mkdir "$LOCK_DIR" 2>/dev/null; do sleep 0.1; done
-trap 'rmdir "$LOCK_DIR" 2>/dev/null' EXIT
+cleanup_lock() {
+  [ -r "$LOCK_OWNER" ] && [ "$(cat "$LOCK_OWNER")" = "$$" ] || return 0
+  rm -f "$LOCK_OWNER"
+  rmdir "$LOCK_DIR" 2>/dev/null || true
+}
+lock_attempt=0
+while ! mkdir "$LOCK_DIR" 2>/dev/null; do
+  lock_attempt=$((lock_attempt + 1))
+  if [ "$lock_attempt" -ge 100 ]; then
+    echo "ポート予約ロックを10秒以内に取得できませんでした: $LOCK_DIR" >&2
+    exit 1
+  fi
+  sleep 0.1
+done
+if ! printf '%s\n' "$$" > "$LOCK_OWNER"; then
+  rmdir "$LOCK_DIR" 2>/dev/null || true
+  echo "ロック所有者の記録に失敗しました" >&2
+  exit 1
+fi
+trap 'cleanup_lock' EXIT
 trap 'exit 130' HUP INT TERM
 
 for attempt in $(seq 0 49); do
   candidate=$((3000 + (PORT_OFFSET + attempt) % 50))
-  grep -Rqs "^PORT=$candidate$" "$ROOT_DIR"/../*/.env 2>/dev/null && continue
+  reserved=false
+  worktree_list=$(git worktree list --porcelain) || {
+    echo "worktree一覧の取得に失敗しました" >&2
+    cleanup_lock
+    trap - EXIT HUP INT TERM
+    exit 1
+  }
+  worktree_paths=$(printf '%s\n' "$worktree_list" | sed -n 's/^worktree //p') || {
+    echo "worktree一覧の解析に失敗しました" >&2
+    cleanup_lock
+    trap - EXIT HUP INT TERM
+    exit 1
+  }
+  while IFS= read -r worktree_path; do
+    [ -n "$worktree_path" ] || continue
+    env_file="$worktree_path/.env"
+    [ "$env_file" = "$ENV_FILE" ] && continue
+    [ -e "$env_file" ] || continue
+    if [ ! -r "$env_file" ]; then
+      echo "$env_fileを読み取れません" >&2
+      cleanup_lock
+      trap - EXIT HUP INT TERM
+      exit 1
+    fi
+    grep -qx "PORT=$candidate" "$env_file"
+    grep_status=$?
+    [ "$grep_status" -eq 0 ] && reserved=true && break
+    if [ "$grep_status" -ne 1 ]; then
+      echo "$env_fileのPORT確認に失敗しました" >&2
+      cleanup_lock
+      trap - EXIT HUP INT TERM
+      exit 1
+    fi
+  done <<EOF
+$worktree_paths
+EOF
+  [ "$reserved" = true ] && continue
   lsof -nP -iTCP:"$candidate" -sTCP:LISTEN >/dev/null 2>&1
   lsof_status=$?
   [ "$lsof_status" -eq 0 ] && continue
   if [ "$lsof_status" -ne 1 ]; then
     echo "ポート$candidateの確認に失敗しました" >&2
-    rmdir "$LOCK_DIR"
+    cleanup_lock
     trap - EXIT HUP INT TERM
     exit 1
   fi
@@ -379,16 +434,43 @@ done
 
 if [ -z "$PORT" ]; then
   echo "利用可能なポートが3000〜3049にありません" >&2
-  rmdir "$LOCK_DIR"
+  cleanup_lock
   trap - EXIT HUP INT TERM
   exit 1
 fi
-if grep -q '^PORT=' "$ENV_FILE" 2>/dev/null; then
-  sed -i.bak "s/^PORT=.*/PORT=$PORT/" "$ENV_FILE" && rm -f "$ENV_FILE.bak"
-else
-  printf 'PORT=%s\n' "$PORT" >> "$ENV_FILE"
+env_grep_status=1
+if [ -e "$ENV_FILE" ]; then
+  if [ ! -r "$ENV_FILE" ]; then
+    echo "$ENV_FILEを読み取れません" >&2
+    cleanup_lock
+    trap - EXIT HUP INT TERM
+    exit 1
+  fi
+  grep -q '^PORT=' "$ENV_FILE"
+  env_grep_status=$?
+  if [ "$env_grep_status" -ne 0 ] && [ "$env_grep_status" -ne 1 ]; then
+    echo "$ENV_FILEのPORT確認に失敗しました" >&2
+    cleanup_lock
+    trap - EXIT HUP INT TERM
+    exit 1
+  fi
 fi
-rmdir "$LOCK_DIR"
+if [ "$env_grep_status" -eq 0 ]; then
+  if ! sed -i.bak "s/^PORT=.*/PORT=$PORT/" "$ENV_FILE" || ! rm -f "$ENV_FILE.bak"; then
+    echo "$ENV_FILEのPORT更新に失敗しました" >&2
+    cleanup_lock
+    trap - EXIT HUP INT TERM
+    exit 1
+  fi
+else
+  if ! printf 'PORT=%s\n' "$PORT" >> "$ENV_FILE"; then
+    echo "$ENV_FILEへのPORT追記に失敗しました" >&2
+    cleanup_lock
+    trap - EXIT HUP INT TERM
+    exit 1
+  fi
+fi
+cleanup_lock
 trap - EXIT HUP INT TERM
 ```
 
@@ -402,14 +484,26 @@ worktree作成のたびに「作成 → 依存関係インストール → 非�
 # ~/.zshrc または ~/.bashrc に追加する例
 gwt() {
   local branch="$1"
-  local root_dir git_common_dir lock_dir parent_dir dir
-  local port_offset port candidate attempt env_file reserved lsof_status
+  local root_dir git_common_dir lock_dir lock_owner parent_dir dir branch_slug branch_id
+  local port_offset port candidate attempt env_file reserved lsof_status lock_attempt
+  local worktree_list worktree_paths worktree_path grep_status env_grep_status
 
   root_dir=$(git rev-parse --show-toplevel) || return 1
   git_common_dir=$(git rev-parse --path-format=absolute --git-common-dir) || return 1
   parent_dir=$(dirname "$root_dir")
-  dir="$parent_dir/$(basename "$root_dir")-$(echo "$branch" | tr '/' '-')"
+  git check-ref-format --branch "$branch" >/dev/null || {
+    echo "無効なbranch名です: $branch" >&2
+    return 1
+  }
+  branch_slug=$(printf '%s' "$branch" | tr '/' '-') || return 1
+  branch_id=$(printf '%s' "$branch" | git hash-object --stdin) || return 1
+  dir="$parent_dir/$(basename "$root_dir")-$branch_slug-$branch_id"
+  if [ -e "$dir" ] || [ -L "$dir" ]; then
+    echo "worktreeパスが既に存在します（上書きしません）: $dir" >&2
+    return 1
+  fi
   lock_dir="$git_common_dir/gwt-port.lock"
+  lock_owner="$lock_dir/owner"
   command -v lsof >/dev/null 2>&1 || { echo "lsofが必要です" >&2; return 1; }
 
   git worktree add -b "$branch" "$dir" origin/main
@@ -428,24 +522,72 @@ gwt() {
   # worktreeごとに未予約・未使用のPORTを割り当てる
   port_offset=$(($(printf '%s' "$(basename "$PWD")" | cksum | cut -d' ' -f1) % 50))
   port=""
-  while ! mkdir "$lock_dir" 2>/dev/null; do sleep 0.1; done
-  trap 'rmdir "$lock_dir" 2>/dev/null' EXIT
-  trap 'rmdir "$lock_dir" 2>/dev/null; trap - HUP INT TERM; return 130' HUP INT TERM
+  gwt_cleanup_lock() {
+    [ -r "$lock_owner" ] && [ "$(cat "$lock_owner")" = "$$" ] || return 0
+    rm -f "$lock_owner"
+    rmdir "$lock_dir" 2>/dev/null || true
+  }
+  lock_attempt=0
+  while ! mkdir "$lock_dir" 2>/dev/null; do
+    lock_attempt=$((lock_attempt + 1))
+    if [ "$lock_attempt" -ge 100 ]; then
+      echo "ポート予約ロックを10秒以内に取得できませんでした: $lock_dir" >&2
+      return 1
+    fi
+    sleep 0.1
+  done
+  if ! printf '%s\n' "$$" > "$lock_owner"; then
+    rmdir "$lock_dir" 2>/dev/null || true
+    echo "ロック所有者の記録に失敗しました" >&2
+    return 1
+  fi
+  trap 'gwt_cleanup_lock' EXIT
+  trap 'gwt_cleanup_lock; trap - HUP INT TERM; return 130' HUP INT TERM
   for attempt in $(seq 0 49); do
     candidate=$((3000 + (port_offset + attempt) % 50))
     reserved=false
-    for env_file in "$root_dir"/../*/.env; do
-      [ -f "$env_file" ] || continue
+    worktree_list=$(git worktree list --porcelain) || {
+      echo "worktree一覧の取得に失敗しました" >&2
+      gwt_cleanup_lock
+      trap - EXIT HUP INT TERM
+      return 1
+    }
+    worktree_paths=$(printf '%s\n' "$worktree_list" | sed -n 's/^worktree //p') || {
+      echo "worktree一覧の解析に失敗しました" >&2
+      gwt_cleanup_lock
+      trap - EXIT HUP INT TERM
+      return 1
+    }
+    while IFS= read -r worktree_path; do
+      [ -n "$worktree_path" ] || continue
+      env_file="$worktree_path/.env"
       [ "$env_file" = "$PWD/.env" ] && continue
-      grep -qx "PORT=$candidate" "$env_file" && reserved=true && break
-    done
+      [ -e "$env_file" ] || continue
+      if [ ! -r "$env_file" ]; then
+        echo "$env_fileを読み取れません" >&2
+        gwt_cleanup_lock
+        trap - EXIT HUP INT TERM
+        return 1
+      fi
+      grep -qx "PORT=$candidate" "$env_file"
+      grep_status=$?
+      [ "$grep_status" -eq 0 ] && reserved=true && break
+      if [ "$grep_status" -ne 1 ]; then
+        echo "$env_fileのPORT確認に失敗しました" >&2
+        gwt_cleanup_lock
+        trap - EXIT HUP INT TERM
+        return 1
+      fi
+    done <<EOF
+$worktree_paths
+EOF
     [ "$reserved" = true ] && continue
     lsof -nP -iTCP:"$candidate" -sTCP:LISTEN >/dev/null 2>&1
     lsof_status=$?
     [ "$lsof_status" -eq 0 ] && continue
     if [ "$lsof_status" -ne 1 ]; then
       echo "ポート$candidateの確認に失敗しました" >&2
-      rmdir "$lock_dir"
+      gwt_cleanup_lock
       trap - EXIT HUP INT TERM
       return 1
     fi
@@ -454,16 +596,43 @@ gwt() {
   done
   if [ -z "$port" ]; then
     echo "利用可能なポートが3000〜3049にありません" >&2
-    rmdir "$lock_dir"
+    gwt_cleanup_lock
     trap - EXIT HUP INT TERM
     return 1
   fi
-  if grep -q '^PORT=' .env 2>/dev/null; then
-    sed -i.bak "s/^PORT=.*/PORT=$port/" .env && rm -f .env.bak
-  else
-    printf 'PORT=%s\n' "$port" >> .env
+  env_grep_status=1
+  if [ -e .env ]; then
+    if [ ! -r .env ]; then
+      echo ".envを読み取れません" >&2
+      gwt_cleanup_lock
+      trap - EXIT HUP INT TERM
+      return 1
+    fi
+    grep -q '^PORT=' .env
+    env_grep_status=$?
+    if [ "$env_grep_status" -ne 0 ] && [ "$env_grep_status" -ne 1 ]; then
+      echo ".envのPORT確認に失敗しました" >&2
+      gwt_cleanup_lock
+      trap - EXIT HUP INT TERM
+      return 1
+    fi
   fi
-  rmdir "$lock_dir"
+  if [ "$env_grep_status" -eq 0 ]; then
+    if ! sed -i.bak "s/^PORT=.*/PORT=$port/" .env || ! rm -f .env.bak; then
+      echo ".envのPORT更新に失敗しました" >&2
+      gwt_cleanup_lock
+      trap - EXIT HUP INT TERM
+      return 1
+    fi
+  else
+    if ! printf 'PORT=%s\n' "$port" >> .env; then
+      echo ".envへのPORT追記に失敗しました" >&2
+      gwt_cleanup_lock
+      trap - EXIT HUP INT TERM
+      return 1
+    fi
+  fi
+  gwt_cleanup_lock
   trap - EXIT HUP INT TERM
 
   echo "worktree '$dir' の準備が完了しました"
