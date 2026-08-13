@@ -108,21 +108,23 @@ OpenClawのエージェントは、Markdownファイル群（ワークスペー�
 flowchart TB
     MODE{"セッション種別・runKind・<br/>ワークスペース状態"}
     MODE --> RESOLVE{"内部bootstrapModeを解決"}
-    RESOLVE -->|"初期設定中・primary対話・通常アクセス"| FULL["full"]
-    RESOLVE -->|"初期設定中・アクセス制約あり"| LIMITED["limited"]
-    RESOLVE -->|"初期設定済み / background / 非primary"| NONE["none"]
-    FILES["AGENTS.md / SOUL.md / IDENTITY.md / USER.md<br/>BOOTSTRAP.md（初期設定中）/ MEMORY.md（任意）"]
+    RESOLVE -->|"bootstrapPending + primary + interactive<br/>+ hasBootstrapFileAccess + canonical workspace"| FULL["full"]
+    RESOLVE -->|"非canonical workspace<br/>またはbootstrapファイルへアクセス不可"| LIMITED["limited"]
+    RESOLVE -->|"heartbeat / commitment-only / cron<br/>非interactive / 非primary / bootstrap保留なし"| NONE["none"]
     FULL --> APPLY["状態に応じたbootstrapガイダンスと<br/>対象ファイルをProject Contextへ適用"]
     LIMITED --> APPLY
     NONE --> APPLY
-    FILES --> APPLY
     APPLY --> SYS[("システムプロンプトへ注入")]
     MODE -->|"通常セッション"| MAIN["通常のブートストラップ対象"]
     MAIN -.->|"存在する場合のみ"| MEM["MEMORY.md（任意）"]
-    MODE -->|"sub-agent"| SUB["AGENTS.md / TOOLS.md のみ"]
-    MAIN --> FILES
-    MEM --> FILES
-    SUB --> FILES
+    MAINFILES["AGENTS.md / SOUL.md / TOOLS.md / IDENTITY.md / USER.md<br/>BOOTSTRAP.md（初期設定中）/ MEMORY.md（任意）"]
+    SUBFILES["AGENTS.md / TOOLS.md のみ"]
+    MODE -->|"sub-agent"| SUB["サブエージェントのブートストラップ対象"]
+    MAIN --> MAINFILES
+    MEM --> MAINFILES
+    SUB --> SUBFILES
+    MAINFILES --> APPLY
+    SUBFILES --> APPLY
 ```
 
 OpenClaw v2026.7.xでは、通常セッションに`AGENTS.md`・`SOUL.md`・`TOOLS.md`・`IDENTITY.md`・`USER.md`などのブートストラップファイルを注入し、`MEMORY.md`は存在する場合のみ、`BOOTSTRAP.md`は新規ワークスペースの初期セットアップ時のみ対象にする。サブエージェントではコンテキストを小さく保つため、`AGENTS.md`と`TOOLS.md`だけを注入する。利用できるツール自体は、ツールプロファイル、allow/denyポリシー、サンドボックスなどの実行時ポリシーで決まり、`AGENTS.md`と`TOOLS.md`はツールを許可する設定ではなく、利用方法や環境固有の注意事項をモデルへ伝える指針である。
