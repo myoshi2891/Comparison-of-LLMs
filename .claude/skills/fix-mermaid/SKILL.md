@@ -498,21 +498,37 @@ vi.mock("@/components/docs/MermaidDiagram", () => ({
 }));
 ```
 
-### 6-2: 契約 C-6 — 図の数と中身が原本と一致する
+### 6-2: 契約 C-6 — 図のソースが原本と順序込みで完全一致する
 
 ```tsx
-// 原本 HTML の <div class="mermaid"> / DIAGRAMS オブジェクトから機械的に数える:
-//   grep -c 'class="mermaid"' archive/html/<ベンダー>/<原本>.html
-const EXPECTED_DIAGRAM_COUNT = 7;
+// 原本 HTML の <div class="mermaid"> / DIAGRAMS オブジェクトから機械抽出し、
+// 改行コード・外側の空行・共通インデントだけを正規化して固定する。
+// 重複する図も省略せず、原本の出現順のまま列挙する。
+const EXPECTED_MERMAID_SOURCES = [
+  `flowchart TD
+A[Start] --> B[Validate]`,
+  `sequenceDiagram
+User->>Agent: Request`,
+] as const;
 
-it("C-6a: Mermaid 図解の数が原本と一致する", () => {
+it("C-6a: Mermaid ソースが原本と順序・内容・出現回数込みで完全一致する", () => {
   const { container } = render(<Page />);
-  expect(container.querySelectorAll('[data-testid="mermaid"]')).toHaveLength(
-    EXPECTED_DIAGRAM_COUNT
+  const actual = Array.from(container.querySelectorAll('[data-testid="mermaid"]')).map(
+    (el) => (el.textContent ?? "").replace(/\r\n?/g, "\n").trim()
   );
+  expect(actual).toEqual([...EXPECTED_MERMAID_SOURCES]);
 });
 
-it("C-6b: 各図解が空でなく、図種別の宣言から始まる", () => {
+it("C-6b: 全 Mermaid 図解がページ専用ラッパーに包まれている", () => {
+  const { container } = render(<Page />);
+  const diagrams = Array.from(container.querySelectorAll('[data-testid="mermaid"]'));
+  const wrapped = Array.from(
+    container.querySelectorAll(`.${styles.mermaidWrap} [data-testid="mermaid"]`)
+  );
+  expect(wrapped).toEqual(diagrams);
+});
+
+it("C-6c: 各図解が空でなく、図種別の宣言から始まる", () => {
   const { container } = render(<Page />);
   const charts = Array.from(container.querySelectorAll('[data-testid="mermaid"]')).map(
     (el) => (el.textContent ?? "").trim()
@@ -523,7 +539,7 @@ it("C-6b: 各図解が空でなく、図種別の宣言から始まる", () => {
   }
 });
 
-it("C-6c: 禁止構文 block-beta を使っていない", () => {
+it("C-6d: 禁止構文 block-beta を使っていない", () => {
   const { container } = render(<Page />);
   const charts = Array.from(container.querySelectorAll('[data-testid="mermaid"]')).map(
     (el) => el.textContent ?? ""
@@ -533,7 +549,7 @@ it("C-6c: 禁止構文 block-beta を使っていない", () => {
   }
 });
 
-it("C-6d: 図解のソースが左端揃え（先頭行にインデントが無い）", () => {
+it("C-6e: 図解のソースが左端揃え（先頭行にインデントが無い）", () => {
   const { container } = render(<Page />);
   const charts = Array.from(container.querySelectorAll('[data-testid="mermaid"]')).map(
     (el) => el.textContent ?? ""
@@ -545,7 +561,7 @@ it("C-6d: 図解のソースが左端揃え（先頭行にインデントが無�
 });
 ```
 
-> **なぜ C-6d が要るのか**: Mermaid v10 は先頭インデントで構文エラーになる。
+> **なぜ C-6e が要るのか**: Mermaid v10 は先頭インデントで構文エラーになる。
 > ビルドもテストも通るのに**ブラウザでだけ図が全滅する**という、最も発見が遅れる壊れ方をする。
 > 静的に弾けるので必ずテストに入れる。
 

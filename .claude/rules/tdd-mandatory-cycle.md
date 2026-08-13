@@ -73,8 +73,10 @@ expect(Array.from(container.querySelectorAll("h2")).map(headingText))
   .toEqual([...EXPECTED_H2]);
 ```
 
-`web-next/app/**/page.tsx` の新規作成・移行では、**最低 17 契約**
-（原本照合 S-1〜S-4 / コンテンツ C-1〜C-6 / デザイン D-1〜D-4 / 品質 Q-1〜Q-3）を Red で用意する。
+`web-next/app/**/page.tsx` の新規作成・移行では、原本の要素種別に依存しない **最低 12 契約**
+（原本照合 S-1〜S-4 / コンテンツ C-1〜C-5 / 品質 Q-1〜Q-3）を Red で用意する。
+Mermaid 契約 C-6 とデザイン契約 D-1〜D-4 は原本依存の追加契約であり、対応する要素が
+原本に存在する場合のみ必須とする。原本に存在しない要素の件数や構造を移植先へ要求してはならない。
 各契約の定義と実装例は `.claude/skills/nextjs-page-migration/SKILL.md` §5 Step 1 および
 `.claude/skills/nextjs-page-migration/references/source-parity-audit.md` を参照。
 

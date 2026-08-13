@@ -150,7 +150,9 @@ bun .claude/skills/nextjs-page-migration/scripts/audit_source_parity.mjs \
 `web-next/app/<provider>/<slug>/page.test.tsx` を作成する。
 ファイル先頭に `// @vitest-environment jsdom` を書いて環境を明示する。
 
-**最低 17 契約**を書く。内訳は次のとおり。**件数だけを見る弱いテストは契約として認めない。**
+原本の要素種別に依存しない **最低 12 契約**（S-1〜S-4 / C-1〜C-5 / Q-1〜Q-3）を書く。
+C-6 と D-1〜D-4 は下記の適用条件に該当する場合のみ追加する。
+**件数だけを見る弱いテストは契約として認めない。**
 
 #### S. 原本照合契約（4 件・必須）
 
@@ -163,7 +165,7 @@ bun .claude/skills/nextjs-page-migration/scripts/audit_source_parity.mjs \
 
 > 実装例とゲートの考え方: `references/source-parity-audit.md`
 
-#### C. コンテンツ契約（6 件・必須）
+#### C. コンテンツ契約（5 件必須 + 1 件条件付き）
 
 | ID | 内容 |
 |---|---|
@@ -172,16 +174,19 @@ bun .claude/skills/nextjs-page-migration/scripts/audit_source_parity.mjs \
 | C-3 | サイドバー TOC の初期アクティブ状態（`styles.active`）が存在する |
 | C-4 | 外部リンク全件に `target="_blank"` **かつ** `rel="noopener noreferrer"` |
 | C-5 | 内部リンクに `.html` 拡張子が含まれない |
-| C-6 | 全 Mermaid 図解が専用ラッパーに包まれ、**図の数が原本と一致する** |
+| C-6 | **原本に Mermaid 図解がある場合のみ必須**。全図解が専用ラッパーに包まれ、原本から抽出した正規化済み Mermaid ソースと `MermaidDiagram` の全 `chart` 値が**順序・内容・出現回数込みで完全一致**する |
 
-#### D. デザイン契約（4 件・必須）
+#### D. デザイン契約（原本に対応要素がある場合のみ必須）
 
-| ID | 内容 |
-|---|---|
-| D-1 | `callout` が `data-variant="info"/"warn"/"good"` で区別され、原本にある variant がすべて存在する |
-| D-2 | `callout[data-variant="warn"]` が `callout-label` 子要素を持つ |
-| D-3 | `stepTag` が `data-testid="step-tag"` を持ち、**件数がセクション数と一致**する |
-| D-4 | `voice`/`blockquote` が `data-testid="voice"` と `voice-who` 子要素を持つ |
+| ID | 適用条件 | 内容 |
+|---|---|---|
+| D-1 | 原本に callout / alert がある | `callout` が `data-variant="info"/"warn"/"good"` で区別され、原本にある variant がすべて存在する |
+| D-2 | 原本に warn callout がある | `callout[data-variant="warn"]` が `callout-label` 子要素を持つ |
+| D-3 | 原本に step / stepTag がある | `stepTag` が `data-testid="step-tag"` を持ち、件数が**原本の step 数**と一致する |
+| D-4 | 原本に voice / blockquote がある | `voice`/`blockquote` が `data-testid="voice"` と `voice-who` 子要素を持つ |
+
+原本に warn callout・step・voice / blockquote 等が存在しない場合、対応する D 契約は要求しない。
+不在要素を作成して契約数を満たすことは faithful 移植ではない。
 
 > 実装例: `references/design-contract-tests.md`
 
