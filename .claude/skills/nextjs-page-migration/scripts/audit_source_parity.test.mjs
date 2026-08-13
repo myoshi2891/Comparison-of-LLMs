@@ -132,9 +132,11 @@ test("recognizes every allowed Mermaid diagram declaration including pie", () =>
 		"classDiagram\nA <|-- B",
 		"journey\ntitle Trip",
 		"timeline\ntitle History",
-		"pie title Share\n\"A\" : 1",
+		'pie title Share\n"A" : 1',
 	];
-	const source = charts.map((chart) => `<div class="mermaid">${chart}</div>`).join("\n");
+	const source = charts
+		.map((chart) => `<div class="mermaid">${chart}</div>`)
+		.join("\n");
 	const declarations = charts
 		.map((chart, index) => `const CHART_${index} = \`${chart}\`;`)
 		.join("\n");
@@ -168,7 +170,9 @@ test("treats normalized HTML and Markdown paragraphs as blocking parity elements
 		"<p>First ordinary paragraph.</p>",
 	);
 	assert.equal(missingHtml.status, 1);
-	assert.deepEqual(missingHtml.json.missingParagraphs, ["Second ordinary paragraph."]);
+	assert.deepEqual(missingHtml.json.missingParagraphs, [
+		"Second ordinary paragraph.",
+	]);
 
 	const missingMarkdown = audit(
 		`First Markdown paragraph.
