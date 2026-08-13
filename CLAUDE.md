@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Updated 2026-08-11
+Updated 2026-08-13
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
@@ -43,12 +43,15 @@ update.sh  ← オーケストレーター (scrape → copy)
 │   │   ├── cost.ts              純粋関数 (calcApiCost / calcSubCost / colorIndex / fmtUSD / fmtJPY)
 │   │   ├── pricing.ts           Zod スキーマ + コンパイル時パリティアサート
 │   │   ├── i18n.tsx             T オブジェクト + t() + tRich() (React 要素ファクトリ)
-│   │   ├── fonts.ts             next/font/google (Noto Sans JP / JetBrains Mono / Syne)
+│   │   ├── fonts.ts             next/font/google (JetBrains Mono / Syne。Noto Sans JP は自前ホスト)
+│   │   ├── noto-sans-jp-preload.ts  自動生成 (latin slice の preload 対象)
 │   │   ├── metadata.ts          静的 Metadata / Viewport
 │   │   └── site-url.ts          サイト URL 解決ユーティリティ (resolveSiteUrl / NEXT_PUBLIC_SITE_URL)
 │   ├── types/pricing.ts         Pydantic 同期型定義
 │   ├── data/pricing.json        ビルド時 static import 用 (update.sh がコピー)
 │   ├── public/pricing.json      /pricing.json URL 配信用 (update.sh がコピー)
+│   ├── public/fonts/            Noto Sans JP の自前ホスト資産 (woff2 124 本 + @font-face CSS。自動生成)
+│   ├── scripts/vendor-noto-sans-jp.ts   上記の生成スクリプト (bun で手動実行)
 │   ├── tests/                   vitest (最新のテスト結果や既知の Issue については CI または進捗ドキュメントを参照)
 │   ├── next.config.ts           output: 'export' + images.unoptimized
 │   ├── biome.json               Biome lint/format
@@ -199,6 +202,7 @@ Playwright ブラウザバイナリ（`/root/.cache/ms-playwright/`）はバイ�
 - **モバイル目次のアクセシビリティ状態を同期する**: オフキャンバス型サイドバーのトグルは `aria-expanded` と状態依存の `aria-label`（「目次を開く」/「目次を閉じる」）を同期し、`aria-controls` で一意なサイドバー ID を参照する。閉状態のサイドバーはオフスクリーン変形だけに頼らず `visibility: hidden` と `pointer-events: none` を併用し、開状態で両方を復元する
 - **Mermaid 図解レイアウトは共有コンポーネントが真実の源**（2026-07-29）: 中央寄せ・全幅フレーム・列幅への縮小フィットは `web-next/components/docs/MermaidDiagram.tsx` の2層構造（外側 `width:100%` / 内側 `.mermaid` `display:flex; justify-content:center`、`useMaxWidth:false` + `mermaid.run` 後に svg へ `max-width:100%; height:auto` を付与）が一元的に担当する。列幅に収まる図は自然サイズで中央寄せ、広い図は列幅まで縮小して中央寄せ（切れ・左寄りなし）。`themeVariables.fontSize` は未指定時のみ `16px` を既定値とし、呼び出し側が指定した固定 px 値を保持する。
   少数ノードの stateDiagram など高さ制限が必要な図は共有 `maxHeight` prop を使う。**各ページの `page.module.css` で `:global(.mermaid)` / `:global(svg)` の `width` / `max-width` / `max-height` / `display:flex` を書いて中央寄せ・サイズ制限を再実装しない**。ページ側ラッパーは装飾（border/background/padding）および必要に応じた `overflow-x: auto` のみを担当。本文カラムの幅方針はレイアウト別に分ける: **サイドバー付きページ**（大半）は本文カラム（`.main`）を `min-width: 0` + `width: 100%` の流動幅（固定 `max-width` なし）でサイドバートラックを埋める。**単一カラム（サイドバーなし）ページ**は中央寄せコンテナに `max-width: 1440px` + `margin: 0 auto`（サイトの `.container` と同値）を用いてワイド画面でのバランスを取る。不変条件は `.claude/rules/mermaid-diagram-layout.md`、実装ガイドは `.claude/skills/fix-mermaid/SKILL.md`（Part 4）を参照
+- **Noto Sans JP は自前ホスト。`next/font/google` へ戻さないこと**（2026-08-13）: `next/font/google` は Google Fonts が返す `@font-face` を**全件**ビルド時にダウンロードする（`subsets` は preload 判定にしか使われず、ダウンロード数を減らさない）。Noto Sans JP は CJK を `unicode-range` で 124 分割し weight 4 種を掛けた **496 `@font-face`** を返すため、Netlify のビルドで `fonts.gstatic.com` からの取得が失敗し、Turbopack が `Can't resolve '@vercel/turbopack-next/internal/font/google/font'` を 496 件出して停止した（`--webpack` 切り替えや SWC バイナリではなく、**ビルド時の外部ネットワーク依存**が原因）。対策として woff2 124 本と `@font-face` CSS を `web-next/public/fonts/` へ vendor し、`--font-sans` は `globals.css` の `:root` で定義、`app/layout.tsx` が React 19 の `precedence` 付き `<link rel="stylesheet">` と latin slice の preload を出す。フォント更新は `cd web-next && bun scripts/vendor-noto-sans-jp.ts` を実行して生成物をコミットする（出力は決定論的）。生成物のため `public/fonts` は `biome.json` の対象外
 - **3層フォールバック**: スクレイパーは「スクレイプ成功 → 既存 JSON の値 → ハードコードフォールバック」の順で価格を決定。`scrape_status` フィールド (`success` | `fallback` | `manual`) で出自を追跡
 - **Google AI/Vertex はライブ抽出を行わずフォールバック固定**（2026-07-24）: `providers/google.py` の `scrape()` は `get_page_text` を呼ばず、常に `_FALLBACKS`（WebSearch 確定値）を返す。Google AI 料金ページ (`ai.google.dev/pricing`) は ① モデル名が目次(TOC)に複数回先行出現、② 価格が `/1M` 等のアンカーを伴わない `Input price ... $1.50` ラベル、③ 1モデルに標準/キャッシュ等の複数価格が併記される、という構造のため正規表現抽出が構造的に不安定（実測で正しく取れるモデルが 0 件で、近傍の無関係な額を誤取得し `price_in` を汚染していた）。**この挙動を「スクレイプ復活」で戻さないこと**。価格改定は月次で `_FALLBACKS` を更新して反映する
 - **型の同期**: `scraper/src/scraper/models.py` (Pydantic) が SSoT、`web-next/types/pricing.ts` (TypeScript) が手動ミラー、`web-next/lib/pricing.ts` の `_AssertParity` でコンパイル時検証。**片方を変更したら必ずもう片方も更新すること**

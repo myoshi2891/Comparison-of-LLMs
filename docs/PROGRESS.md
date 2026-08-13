@@ -11,14 +11,19 @@
 - **フェーズ**: 保守・機能改善・品質強化フェーズ
 - **ブランチ**: `dev`（本番 `main` への Next.js 移行マージ完了 🚀）
 - **動作検証**:
-  - `npm run build` ⏭️（今回もユーザー指定により省略。CI等で実施）
-  - `npm run typecheck` ✅（`tsc --noEmit`）
-  - `npm run lint` ✅（Biome check）
+  - `bun run build` ✅（Turbopack / `output: 'export'`。2026-08-13 実測）
+  - `bun run typecheck` ✅（`tsc --noEmit`）
+  - `bun run lint` ✅（Biome check / 457 files）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: `npm test -- --run` で Vitest **163 files / 1455 tests すべて合格**（全 Green ✅）
+  - **フロントエンド (`web-next/`)**: `bun run test` で Vitest **164 files / 1466 tests すべて合格**（全 Green ✅）
   - **バックエンド (`scraper/`)**: pytest 実行で **43 件すべて合格** (全 Green ✅)
 
 ## 最近の追加内容
+
+- **Netlify ビルド失敗（Turbopack 496 errors）の恒久対処 — Noto Sans JP の自前ホスト化**:
+  - 原因は `next/font/google` が Google Fonts の `@font-face` を**全件**ビルド時に取得する挙動。Noto Sans JP は CJK を `unicode-range` で 124 分割 × weight 4 種 = **496 `@font-face`** を返し、その一括取得が Netlify のビルドコンテナで失敗して `Can't resolve '@vercel/turbopack-next/internal/font/google/font'` が 496 件出ていた（`subsets: ["latin"]` は preload 判定のみでダウンロード数を減らさない）。SWC バイナリ欠損や `--webpack` 切り替えは的外れで、`netlify.toml` の該当コメントも訂正済み。
+  - 対策: `web-next/scripts/vendor-noto-sans-jp.ts` で woff2 124 本 + `@font-face` CSS 496 件 + latin preload リストを生成し `web-next/public/fonts/` へ vendor。`lib/fonts.ts` は latin のみで完結する JetBrains Mono / Syne だけを `next/font` で読み、`--font-sans` は `globals.css` の `:root` で定義。`app/layout.tsx` は React 19 の `precedence` 付き `<link rel="stylesheet">` と latin preload を出力する。
+  - 検証: `out/index.html` の `<head>` に stylesheet / preload が巻き上がることを確認。`out/_next/static/media` は 7.5MB → 184KB（mono/syne のみ）、フォント CSS は 449KB / brotli 18.9KB。契約テスト `web-next/tests/fonts-selfhost.test.ts` を 11 件追加（Vitest **164 files / 1466 tests** 全 Green ✅、typecheck / lint / build も Green）。
 
 - **移行監査・Mermaid契約・ガイド原稿のレビュー指摘対応**:
   - 原本照合監査でHTML/Markdown/TSXの通常段落を出現回数込みのblocking対象へ追加し、MarkdownのMermaidフェンスを通常コードブロックから分離。`.markdown`入力にも対応。

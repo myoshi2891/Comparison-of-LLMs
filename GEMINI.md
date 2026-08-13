@@ -35,6 +35,10 @@ GEMINI.md は Gemini CLI / Gemini Code Assist 向けの入り口。
 - **R5（テスト強度の下限）**: 契約テストは件数のみ・存在のみ・部分一致のみの検証を禁止し、
   見出しは `toEqual([...EXPECTED_H2])` の順序込み完全一致で検証する
   （詳細は [`.gemini/rules/tdd-mandatory-cycle.md`](.gemini/rules/tdd-mandatory-cycle.md)）
+- **R6（Noto Sans JP の自前ホスト）**: 本文フォントを `next/font/google` へ戻さない。`next/font` は
+  `@font-face` を全件ビルド時に取得するため、Noto Sans JP の 496 件が Netlify ビルドを落とす。
+  woff2 と `@font-face` CSS は `web-next/public/fonts/` に vendor 済み（生成は
+  `cd web-next && bun scripts/vendor-noto-sans-jp.ts`。詳細は CLAUDE.md の設計判断を参照）
 - **legacy/ 配下の編集禁止**（移行完了・凍結済み）
 - **元のHTML/Markdownオリジナルファイルの完全削除は厳禁**：移行元のファイルは絶対に削除してはならず、必ず `archive/` ディレクトリ配下に移動（`git mv` または `mv`）して退避保存すること
 - **ファイル全体の書き直し禁止**（明示指示がない限り）
@@ -45,10 +49,10 @@ GEMINI.md は Gemini CLI / Gemini Code Assist 向けの入り口。
 ## 検証コマンド
 
 ```bash
-(cd web-next && bun run test)        # 163 files / 1455 tests pass（2026-08-13 実測。収集失敗なし）
+(cd web-next && bun run test)        # 164 files / 1466 tests pass（2026-08-13 実測。収集失敗なし）
 (cd web-next && bun run typecheck)   # OK
 (cd web-next && bun run build)       # Antigravity環境では実行禁止。CI / 他環境では必須
-(cd web-next && bun run lint)        # FAIL（未完了）: 452 files / 49 errors・2 warnings・3 infos
+(cd web-next && bun run lint)        # OK（457 files / 0 errors。2026-08-13 実測）
 (cd scraper && uv run pytest)        # 43/43 pass（全 Green ✅）
 ```
 
