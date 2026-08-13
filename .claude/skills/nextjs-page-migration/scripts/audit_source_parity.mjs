@@ -122,6 +122,175 @@ function stripMarkdownInline(raw) {
 }
 
 /**
+ * コードブロック・表行の内容をマークアップ非依存の比較値へ変換する。
+ *
+ * @param raw - HTML / JSX を含む要素本文
+ * @returns タグと JSX 空白表現を除去した正規化テキスト
+ */
+function normalizeElementContent(raw) {
+  return normalize(stripMarkup(raw));
+}
+
+/**
+ * Mermaid ソースを改行コード・外側の空行・共通インデントだけ正規化する。
+ * mindmap 等の相対インデントは構文の一部なので保持する。
+ *
+ * @param raw - Mermaid ソース
+ * @returns 順序比較に使う正規化済みソース
+ */
+function normalizeMermaidSource(raw) {
+  const lines = decodeEntities(raw).replace(/\r\n?/g, "\n").split("\n");
+  while (lines.length > 0 && lines[0].trim() === "") lines.shift();
+  while (lines.length > 0 && lines.at(-1)?.trim() === "") lines.pop();
+  const indents = lines
+    .filter((line) => line.trim().length > 0)
+    .map((line) => line.match(/^\s*/)?.[0].length ?? 0);
+  const commonIndent = indents.length > 0 ? Math.min(...indents) : 0;
+  return lines.map((line) => line.slice(commonIndent).trimEnd()).join("\n");
+}
+
+/**
+ * 指定タグの本文と出現位置を採取する。pre / tr は同名タグをネストしないため、
+ * この単純な抽出で HTML と JSX の双方をマークアップ非依存に比較できる。
+ *
+ * @param src - 走査対象
+ * @param tag - タグ名
+ * @returns 本文と出現位置
+ */
+function extractTagContents(src, tag) {
+  const results = [];
+  const re = new RegExp(`<${tag}\\b[^>]*>([\\s\\S]*?)<\\/${tag}>`, "gi");
+  let match = re.exec(src);
+  while (match !== null) {
+    results.push({ index: match.index, content: match[1] });
+    match = re.exec(src);
+  }
+  return results;
+}
+
+/**
+ * 開始タグ条件に一致する JSX 要素を、同名タグのネストを考慮して採取する。
+ * CSS Modules の codeBlock ラッパーが div を入れ子にするケースで使用する。
+ *
+ * @param src - 走査対象
+ * @param predicate - 開始タグの採取条件
+ * @returns 本文と出現位置
+ */
+function extractElementContents(src, predicate) {
+  const results = [];
+  const openingRe = /<([A-Za-z][\w.-]*)\b[^>]*>/g;
+  let opening = openingRe.exec(src);
+  while (opening !== null) {
+    const openingTag = opening[0];
+    if (!openingTag.endsWith("/>") && predicate(openingTag)) {
+      const tag = opening[1];
+      const nestedRe = new RegExp(`<\\/?${tag}\\b[^>]*>`, "g");
+      nestedRe.lastIndex = openingRe.lastIndex;
+      let depth = 1;
+      let nested = nestedRe.exec(src);
+      while (nested !== null) {
+        if (nested[0].startsWith(`</${tag}`)) depth -= 1;
+        else if (!nested[0].endsWith("/>")) depth += 1;
+        if (depth === 0) {
+          results.push({
+            index: opening.index,
+            content: src.slice(openingRe.lastIndex, nested.index),
+          });
+          openingRe.lastIndex = nestedRe.lastIndex;
+          break;
+        }
+        nested = nestedRe.exec(src);
+      }
+    }
+    opening = openingRe.exec(src);
+  }
+  return results;
+}
+
+/**
+ * page.tsx 内の文字列定数を採取する。
+ *
+ * @param src - page.tsx 全文
+ * @returns 定数名から文字列値への対応
+ */
+function collectStringConstants(src) {
+  const constants = new Map();
+  const constantRe =
+    /\bconst\s+([A-Za-z_$][\w$]*)\s*=\s*(?:String\.raw\s*)?(`([\s\S]*?)`|"([^"\\]*(?:\\.[^"\\]*)*)"|'([^'\\]*(?:\\.[^'\\]*)*)')\s*;/g;
+  let constant = constantRe.exec(src);
+  while (constant !== null) {
+    constants.set(constant[1], constant[3] ?? constant[4] ?? constant[5] ?? "");
+    constant = constantRe.exec(src);
+  }
+  return constants;
+}
+
+/**
+ * JSX 本文中の単純な文字列定数参照を実値へ置換する。
+ *
+ * @param content - JSX 要素本文
+ * @param constants - 文字列定数
+ * @returns 定数参照を展開した本文
+ */
+function resolveStringConstants(content, constants) {
+  return content.replace(/\{\s*([A-Za-z_$][\w$]*)\s*\}/g, (expression, name) =>
+    constants.has(name) ? constants.get(name) : expression
+  );
+}
+
+/**
+ * HTML の Mermaid 本文（直接ブロックと DIAGRAMS オブジェクト）を出現順に採取する。
+ *
+ * @param src - HTML 全文
+ * @returns 正規化済み Mermaid ソース
+ */
+function collectHtmlMermaidSources(src) {
+  const sources = [];
+  const divRe = /<div\b([^>]*\bclass=["'][^"']*\bmermaid\b[^"']*["'][^>]*)>([\s\S]*?)<\/div>/gi;
+  let div = divRe.exec(src);
+  while (div !== null) {
+    sources.push({ index: div.index, source: normalizeMermaidSource(div[2]) });
+    div = divRe.exec(src);
+  }
+
+  const diagramEntryRe = /["'][^"']+["']\s*:\s*`([\s\S]*?)`/g;
+  let entry = diagramEntryRe.exec(src);
+  while (entry !== null) {
+    sources.push({ index: entry.index, source: normalizeMermaidSource(entry[1]) });
+    entry = diagramEntryRe.exec(src);
+  }
+
+  return sources
+    .sort((a, b) => a.index - b.index)
+    .map(({ source }) => source)
+    .filter((source) =>
+      /^(?:graph|flowchart|sequenceDiagram|mindmap|stateDiagram-v2|gitGraph|erDiagram|classDiagram|journey|timeline)\b/.test(
+        source
+      )
+    );
+}
+
+/**
+ * page.tsx の MermaidDiagram chart 値を定数参照を解決して出現順に採取する。
+ *
+ * @param src - page.tsx 全文
+ * @returns 正規化済み Mermaid ソース
+ */
+function collectTsxMermaidSources(src) {
+  const constants = collectStringConstants(src);
+
+  const sources = [];
+  const componentRe = /<MermaidDiagram\b[^>]*\bchart\s*=\s*(?:\{\s*([A-Za-z_$][\w$]*)\s*\}|\{\s*`([\s\S]*?)`\s*\}|["']([^"']*)["'])[^>]*\/?>/g;
+  let component = componentRe.exec(src);
+  while (component !== null) {
+    const raw = component[2] ?? component[3] ?? constants.get(component[1]);
+    sources.push(raw === undefined ? `__UNRESOLVED__:${component[1]}` : normalizeMermaidSource(raw));
+    component = componentRe.exec(src);
+  }
+  return sources;
+}
+
+/**
  * URL を比較用に正規化する（末尾スラッシュ・アンカー・クエリを除去）。
  *
  * @param url - 生の URL 文字列
@@ -155,14 +324,33 @@ function inventoryMarkdown(src) {
   let codeBlocks = 0;
   let tableRows = 0;
   let inFence = false;
+  let fenceLanguage = "";
+  let fenceLines = [];
+  const codeBlockTexts = [];
+  const tableRowTexts = [];
+  const mermaidSources = [];
 
   for (const line of lines) {
-    if (/^\s*(```|~~~)/.test(line)) {
-      if (!inFence) codeBlocks += 1;
+    const fence = /^\s*(```|~~~)\s*([^\s]*)/.exec(line);
+    if (fence) {
+      if (!inFence) {
+        codeBlocks += 1;
+        fenceLanguage = fence[2].toLowerCase();
+        fenceLines = [];
+      } else {
+        const rawBlock = fenceLines.join("\n");
+        codeBlockTexts.push(normalize(rawBlock));
+        if (fenceLanguage === "mermaid") {
+          mermaidSources.push(normalizeMermaidSource(rawBlock));
+        }
+      }
       inFence = !inFence;
       continue;
     }
-    if (inFence) continue;
+    if (inFence) {
+      fenceLines.push(line);
+      continue;
+    }
 
     const heading = /^(#{2,3})\s+(.*?)\s*#*\s*$/.exec(line);
     if (heading) {
@@ -178,7 +366,10 @@ function inventoryMarkdown(src) {
       listTexts.push(normalize(stripMarkdownInline(listItem[1])));
       continue;
     }
-    if (/^\s*\|.*\|\s*$/.test(line)) tableRows += 1;
+    if (/^\s*\|.*\|\s*$/.test(line) && !/^\s*\|?\s*:?-{3,}/.test(line)) {
+      tableRows += 1;
+      tableRowTexts.push(normalize(stripMarkdownInline(line.replace(/^\s*\||\|\s*$/g, ""))));
+    }
   }
 
   return {
@@ -187,6 +378,9 @@ function inventoryMarkdown(src) {
     listItems,
     codeBlocks,
     tableRows,
+    codeBlockTexts,
+    tableRowTexts,
+    mermaidSources,
     externalLinks: collectUrls(src),
   };
 }
@@ -215,12 +409,22 @@ function inventoryHtml(src) {
     li = liRe.exec(body);
   }
 
+  const codeBlockTexts = extractTagContents(body, "pre").map(({ content }) =>
+    normalizeElementContent(content)
+  );
+  const tableRowTexts = extractTagContents(body, "tr").map(({ content }) =>
+    normalizeElementContent(content)
+  );
+
   return {
     headings,
     listTexts,
     listItems: countMatches(body, /<li\b/gi),
-    codeBlocks: countMatches(body, /<pre\b/gi),
-    tableRows: countMatches(body, /<tr\b/gi),
+    codeBlocks: codeBlockTexts.length,
+    tableRows: tableRowTexts.length,
+    codeBlockTexts,
+    tableRowTexts,
+    mermaidSources: collectHtmlMermaidSources(src),
     externalLinks: collectUrls(body),
   };
 }
@@ -245,8 +449,21 @@ function inventoryTsx(src) {
     match = headingRe.exec(src);
   }
 
-  const preCount = countMatches(src, /<pre\b/g);
-  const moduleCodeCount = countMatches(src, /styles\.code(?:Block|Wrap|Card)\b/g);
+  const constants = collectStringConstants(src);
+  const preBlocks = extractTagContents(src, "pre");
+  const styledBlocks = extractElementContents(src, (openingTag) =>
+    /className=\{\s*styles\.code(?:Block|Wrap|Card)\s*\}/.test(openingTag)
+  ).filter(
+    ({ content }) =>
+      !/<pre\b/.test(content) &&
+      !/className=\{\s*styles\.code(?:Block|Wrap|Card)\s*\}/.test(content)
+  );
+  const codeBlockTexts = [...preBlocks, ...styledBlocks]
+    .sort((a, b) => a.index - b.index)
+    .map(({ content }) => normalizeElementContent(resolveStringConstants(content, constants)));
+  const tableRowTexts = extractTagContents(src, "tr").map(({ content }) =>
+    normalizeElementContent(content)
+  );
 
   return {
     headings,
@@ -254,8 +471,11 @@ function inventoryTsx(src) {
     // 本文全体の平坦化テキストを照合対象にする（マークアップ非依存の漏れ検知）。
     flatText: matchKey(stripMarkup(src)),
     listItems: countMatches(src, /<li\b/g),
-    codeBlocks: Math.max(preCount, moduleCodeCount),
-    tableRows: countMatches(src, /<tr\b/g),
+    codeBlocks: codeBlockTexts.length,
+    tableRows: tableRowTexts.length,
+    codeBlockTexts,
+    tableRowTexts,
+    mermaidSources: collectTsxMermaidSources(src),
     externalLinks: collectUrls(src),
   };
 }
@@ -288,6 +508,28 @@ function collectUrls(src) {
   return urls;
 }
 
+/**
+ * 出現回数を保持したまま、移植先に不足する原本要素を返す。
+ *
+ * @param sourceValues - 原本の値（出現順）
+ * @param pageValues - 移植先の値
+ * @returns 移植先で不足している値（重複を保持）
+ */
+function missingOccurrences(sourceValues, pageValues, key = (value) => value) {
+  const remaining = new Map();
+  for (const value of pageValues) {
+    const valueKey = key(value);
+    remaining.set(valueKey, (remaining.get(valueKey) ?? 0) + 1);
+  }
+  return sourceValues.filter((value) => {
+    const valueKey = key(value);
+    const count = remaining.get(valueKey) ?? 0;
+    if (count === 0) return true;
+    remaining.set(valueKey, count - 1);
+    return false;
+  });
+}
+
 // --------------------------------------------------------------------------
 // 照合
 // --------------------------------------------------------------------------
@@ -300,11 +542,27 @@ function collectUrls(src) {
  * @returns 不足見出し・不足リンク・カウント差分を含む照合結果
  */
 function compare(source, page) {
-  const pageHeadingKeys = new Set(page.headings.map((h) => matchKey(h.text)));
-  const missingHeadings = source.headings.filter((h) => !pageHeadingKeys.has(matchKey(h.text)));
-
-  const sourceHeadingKeys = new Set(source.headings.map((h) => matchKey(h.text)));
-  const extraHeadings = page.headings.filter((h) => !sourceHeadingKeys.has(matchKey(h.text)));
+  const consumedPageHeadings = new Set();
+  const missingHeadings = source.headings.filter((sourceHeading) => {
+    const key = matchKey(sourceHeading.text);
+    let pageIndex = page.headings.findIndex(
+      (pageHeading, index) =>
+        !consumedPageHeadings.has(index) &&
+        pageHeading.level === sourceHeading.level &&
+        matchKey(pageHeading.text) === key
+    );
+    // 原本の h2 ページタイトルを移植先の h1 に昇格するケースだけを許可する。
+    if (pageIndex === -1 && sourceHeading.level === 2) {
+      pageIndex = page.headings.findIndex(
+        (pageHeading, index) =>
+          !consumedPageHeadings.has(index) && pageHeading.level === 1 && matchKey(pageHeading.text) === key
+      );
+    }
+    if (pageIndex === -1) return true;
+    consumedPageHeadings.add(pageIndex);
+    return false;
+  });
+  const extraHeadings = page.headings.filter((_, index) => !consumedPageHeadings.has(index));
 
   const missingLinks = [...source.externalLinks].filter((u) => !page.externalLinks.has(u));
 
@@ -317,6 +575,11 @@ function compare(source, page) {
     if (key.length < 8) return false;
     return !page.flatText.includes(key.slice(0, LIST_ITEM_PROBE));
   });
+  const missingCodeBlocks = missingOccurrences(source.codeBlockTexts, page.codeBlockTexts, matchKey);
+  const missingTableRows = missingOccurrences(source.tableRowTexts, page.tableRowTexts, matchKey);
+  const mermaidSourcesMatch =
+    source.mermaidSources.length === page.mermaidSources.length &&
+    source.mermaidSources.every((value, index) => value === page.mermaidSources[index]);
 
   const counts = {
     listItems: { source: source.listItems, page: page.listItems },
@@ -324,12 +587,30 @@ function compare(source, page) {
     tableRows: { source: source.tableRows, page: page.tableRows },
     headings: { source: source.headings.length, page: page.headings.length },
     externalLinks: { source: source.externalLinks.size, page: page.externalLinks.size },
+    mermaidSources: { source: source.mermaidSources.length, page: page.mermaidSources.length },
   };
 
   const blocking =
-    missingHeadings.length > 0 || missingLinks.length > 0 || missingListItems.length > 0;
+    missingHeadings.length > 0 ||
+    missingLinks.length > 0 ||
+    missingListItems.length > 0 ||
+    missingCodeBlocks.length > 0 ||
+    missingTableRows.length > 0 ||
+    !mermaidSourcesMatch;
 
-  return { missingHeadings, extraHeadings, missingLinks, missingListItems, counts, blocking };
+  return {
+    missingHeadings,
+    extraHeadings,
+    missingLinks,
+    missingListItems,
+    missingCodeBlocks,
+    missingTableRows,
+    mermaidSourcesMatch,
+    sourceMermaidSources: source.mermaidSources,
+    pageMermaidSources: page.mermaidSources,
+    counts,
+    blocking,
+  };
 }
 
 // --------------------------------------------------------------------------
@@ -415,6 +696,19 @@ if (result.missingLinks.length > 0) {
 if (result.missingListItems.length > 0) {
   console.log(`\n❌ page.tsx 本文に見当たらない原本のリスト項目 (${result.missingListItems.length} 件):`);
   for (const t of result.missingListItems) console.log(`  - ${t}`);
+}
+if (result.missingCodeBlocks.length > 0) {
+  console.log(`\n❌ page.tsx に存在しない原本のコードブロック (${result.missingCodeBlocks.length} 件):`);
+  for (const text of result.missingCodeBlocks) console.log(`  ${JSON.stringify(text)}`);
+}
+if (result.missingTableRows.length > 0) {
+  console.log(`\n❌ page.tsx に存在しない原本の表行 (${result.missingTableRows.length} 件):`);
+  for (const text of result.missingTableRows) console.log(`  ${JSON.stringify(text)}`);
+}
+if (!result.mermaidSourcesMatch) {
+  console.log("\n❌ Mermaid ソースが原本と順序・出現回数込みで一致しません:");
+  console.log(`  原本: ${JSON.stringify(result.sourceMermaidSources)}`);
+  console.log(`  page: ${JSON.stringify(result.pageMermaidSources)}`);
 }
 if (result.extraHeadings.length > 0) {
   console.log(`\n⚠️ 原本に存在しない page.tsx の見出し (${result.extraHeadings.length} 件、要確認):`);
