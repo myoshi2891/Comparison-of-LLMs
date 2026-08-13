@@ -8,10 +8,14 @@
   #   （codex/harness-engineering, google/agent-harness-engineering,
   #    google/antigravity-slash-commands-guide）が "selector is not pure" で全滅する。
   # --frozen-lockfile: Netlify はビルド間で node_modules をキャッシュするため、
-  #   素の bun install だと @next/swc-linux-x64-gnu 等のネイティブバイナリを欠いた
-  #   キャッシュを引き継ぎ、Turbopack が next/font/google の仮想モジュール
-  #   "@vercel/turbopack-next/internal/font/google/font" を解決できなくなる。
   #   lockfile 通りに固定して再現性を確保する。
+  # 参考（過去の失敗の記録）: Turbopack が next/font/google の仮想モジュール
+  #   "@vercel/turbopack-next/internal/font/google/font" を 496 件解決できずに
+  #   失敗していた原因は SWC バイナリ欠損ではなく、next/font が @font-face を
+  #   全件ビルド時にダウンロードする挙動だった（Noto Sans JP = 124 slice ×
+  #   4 weight = 496 本を fonts.gstatic.com から取得しようとして失敗）。
+  #   現在は Noto Sans JP を web-next/public/fonts/ へ vendor 済みで、
+  #   ビルド中に Google Fonts へアクセスしない（web-next/scripts/vendor-noto-sans-jp.ts）。
   command = "bun install --frozen-lockfile && bun run build"
   publish = "out"
   # base 配下に差分がない場合に Netlify がビルドを自動スキップする既定挙動を無効化する。
