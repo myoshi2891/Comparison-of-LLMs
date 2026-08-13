@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Updated 2026-08-13
+Updated 2026-08-14
 
 AGENTS.md は Codex / Cursor / Cline など AGENTS.md 規約を読む AI ツール向けの入り口。
 本リポジトリでは **CLAUDE.md が正本** とし、AGENTS.md はその委譲 pointer として機能する。
@@ -43,10 +43,10 @@ AGENTS.md は Codex / Cursor / Cline など AGENTS.md 規約を読む AI ツー�
 ## 検証コマンド
 
 ```bash
-(cd web-next && bun run test)        # 163 files / 1455 tests pass（2026-08-13 実測。全 Green ✅）
-(cd web-next && bun run typecheck)   # OK
-(cd web-next && bun run build)       # Antigravity環境では実行禁止。CI / 他の許可された環境でのみ実行可
-(cd web-next && bun run lint)        # FAIL（未完了）: 452 files / 49 errors・2 warnings・3 infos。既存 diagnostics だが成功扱いせず、CI lint も解消まで失敗として扱う
+(cd web-next && npm test)            # 164 files / 1467 tests pass（2026-08-14 実測。全 Green ✅）
+(cd web-next && npm run typecheck)   # OK（2026-08-14 実測）
+(cd web-next && bun run build)       # 今回はユーザー指定により未実行。許可環境または CI で確認する
+(cd web-next && npm run lint)        # OK（457 files / 0 diagnostics。2026-08-14 実測）
 (cd scraper && uv run pytest)        # 43/43 pass（全 Green ✅）
 ```
 

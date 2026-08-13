@@ -28,7 +28,7 @@ allowed-tools:
 
 # Next.js ガイドページ追加・保守スキル
 
-(最終更新日: 2026-08-13)
+(最終更新日: 2026-08-14)
 
 ## 0. このスキルが解決する問題
 
@@ -105,7 +105,7 @@ bun test app/claude/managed-agents/page.test.tsx
 `bun test` は `vitest.config.ts` を無視するため `environment: "jsdom"` が効かず、
 `document is not defined` で metadata テスト以外が全滅する。**必ず `bun run test` を使う。**
 
-現状のベースライン（2026-08-13 実測）: **163 files / 1454 tests pass**。
+現状のベースライン（2026-08-14 に `npm test` で実測）: **164 files / 1467 tests pass**。
 テスト数が減っていたら何かを壊している。**収集失敗（collect error）もブロッキング失敗として扱う。**
 
 ---
@@ -354,7 +354,7 @@ echo "exit=$?"   # 0 でなければ移行漏れがある
 ```bash
 (cd web-next && bun run lint app/<provider>/<slug>)   # Biome。パス指定必須
 (cd web-next && bun run typecheck)                    # tsc --noEmit
-(cd web-next && bun run test)                         # 全件。163 files / 1454 tests 以上
+(cd web-next && bun run test)                         # 全件。164 files / 1467 tests 以上
 (cd web-next && bun run build)                        # Antigravity 環境では実行禁止
 ```
 
