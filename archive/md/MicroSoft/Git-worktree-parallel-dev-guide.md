@@ -485,11 +485,12 @@ worktree作成のたびに「作成 → 依存関係インストール → 非�
 # ~/.zshrc または ~/.bashrc に追加する例
 gwt() {
   local branch="$1"
-  local root_dir git_common_dir lock_dir lock_owner parent_dir dir branch_slug branch_id
+  local root_dir main_root git_common_dir lock_dir lock_owner parent_dir dir branch_slug branch_id
   local port_offset port candidate attempt env_file reserved lsof_status lock_attempt
-  local worktree_list worktree_paths worktree_path grep_status env_grep_status
+  local worktree_list worktree_paths worktree_path grep_status env_grep_status setup_complete
 
   root_dir=$(git rev-parse --show-toplevel) || return 1
+  main_root="$root_dir"
   git_common_dir=$(git rev-parse --path-format=absolute --git-common-dir) || return 1
   parent_dir=$(dirname "$root_dir")
   git check-ref-format --branch "$branch" >/dev/null || {
@@ -507,19 +508,37 @@ gwt() {
   lock_owner="$lock_dir/owner"
   command -v lsof >/dev/null 2>&1 || { echo "lsofが必要です" >&2; return 1; }
 
-  git worktree add -b "$branch" "$dir" origin/main
-  cd "$dir" || return
-  root_dir=$(git rev-parse --show-toplevel) || return 1
+  git worktree add -b "$branch" "$dir" origin/main || return 1
+  setup_complete=false
+  gwt_cleanup_worktree() {
+    [ "$setup_complete" = true ] && return 0
+    cd "$main_root" 2>/dev/null || return 0
+    git -C "$main_root" worktree remove --force "$dir" >/dev/null 2>&1 || true
+    git -C "$main_root" branch -D "$branch" >/dev/null 2>&1 || true
+  }
+  trap 'gwt_cleanup_worktree' EXIT HUP INT TERM
+  cd "$dir" || { gwt_cleanup_worktree; trap - EXIT HUP INT TERM; return 1; }
+  root_dir=$(git rev-parse --show-toplevel) || {
+    gwt_cleanup_worktree
+    trap - EXIT HUP INT TERM
+    return 1
+  }
 
   # 依存関係のセットアップ(プロジェクトに応じて調整)
   if [ -f pnpm-lock.yaml ]; then
-    pnpm install
+    pnpm install || { gwt_cleanup_worktree; trap - EXIT HUP INT TERM; return 1; }
   elif [ -f package-lock.json ]; then
-    npm ci
+    npm ci || { gwt_cleanup_worktree; trap - EXIT HUP INT TERM; return 1; }
   fi
 
   # 秘密を含まないテンプレートだけをコピーする
-  [ -f "$root_dir/.env.example" ] && cp "$root_dir/.env.example" "$root_dir/.env"
+  if [ -f "$root_dir/.env.example" ]; then
+    cp "$root_dir/.env.example" "$root_dir/.env" || {
+      gwt_cleanup_worktree
+      trap - EXIT HUP INT TERM
+      return 1
+    }
+  fi
 
   # worktreeごとに未予約・未使用のPORTを割り当てる
   port_offset=$(($(printf '%s' "$(basename "$root_dir")" | cksum | cut -d' ' -f1) % 50))
@@ -534,6 +553,8 @@ gwt() {
     lock_attempt=$((lock_attempt + 1))
     if [ "$lock_attempt" -ge 100 ]; then
       echo "ポート予約ロックを10秒以内に取得できませんでした: $lock_dir" >&2
+      gwt_cleanup_worktree
+      trap - EXIT HUP INT TERM
       return 1
     fi
     sleep 0.1
@@ -541,22 +562,26 @@ gwt() {
   if ! printf '%s\n' "$$" > "$lock_owner"; then
     rmdir "$lock_dir" 2>/dev/null || true
     echo "ロック所有者の記録に失敗しました" >&2
+    gwt_cleanup_worktree
+    trap - EXIT HUP INT TERM
     return 1
   fi
-  trap 'gwt_cleanup_lock' EXIT
-  trap 'gwt_cleanup_lock; trap - HUP INT TERM; return 130' HUP INT TERM
+  trap 'gwt_cleanup_lock; gwt_cleanup_worktree' EXIT
+  trap 'gwt_cleanup_lock; gwt_cleanup_worktree; trap - HUP INT TERM; return 130' HUP INT TERM
   for attempt in $(seq 0 49); do
     candidate=$((3000 + (port_offset + attempt) % 50))
     reserved=false
     worktree_list=$(git worktree list --porcelain) || {
       echo "worktree一覧の取得に失敗しました" >&2
       gwt_cleanup_lock
+      gwt_cleanup_worktree
       trap - EXIT HUP INT TERM
       return 1
     }
     worktree_paths=$(printf '%s\n' "$worktree_list" | sed -n 's/^worktree //p') || {
       echo "worktree一覧の解析に失敗しました" >&2
       gwt_cleanup_lock
+      gwt_cleanup_worktree
       trap - EXIT HUP INT TERM
       return 1
     }
@@ -568,6 +593,7 @@ gwt() {
       if [ ! -r "$env_file" ]; then
         echo "$env_fileを読み取れません" >&2
         gwt_cleanup_lock
+        gwt_cleanup_worktree
         trap - EXIT HUP INT TERM
         return 1
       fi
@@ -577,6 +603,7 @@ gwt() {
       if [ "$grep_status" -ne 1 ]; then
         echo "$env_fileのPORT確認に失敗しました" >&2
         gwt_cleanup_lock
+        gwt_cleanup_worktree
         trap - EXIT HUP INT TERM
         return 1
       fi
@@ -591,6 +618,7 @@ EOF
     if [ "$lsof_status" -ne 1 ]; then
       echo "ポート$candidateの確認に失敗しました" >&2
       gwt_cleanup_lock
+      gwt_cleanup_worktree
       trap - EXIT HUP INT TERM
       return 1
     fi
@@ -600,6 +628,7 @@ EOF
   if [ -z "$port" ]; then
     echo "利用可能なポートが3000〜3049にありません" >&2
     gwt_cleanup_lock
+    gwt_cleanup_worktree
     trap - EXIT HUP INT TERM
     return 1
   fi
@@ -608,6 +637,7 @@ EOF
     if [ ! -r "$root_dir/.env" ]; then
       echo "$root_dir/.envを読み取れません" >&2
       gwt_cleanup_lock
+      gwt_cleanup_worktree
       trap - EXIT HUP INT TERM
       return 1
     fi
@@ -616,6 +646,7 @@ EOF
     if [ "$env_grep_status" -ne 0 ] && [ "$env_grep_status" -ne 1 ]; then
       echo "$root_dir/.envのPORT確認に失敗しました" >&2
       gwt_cleanup_lock
+      gwt_cleanup_worktree
       trap - EXIT HUP INT TERM
       return 1
     fi
@@ -624,6 +655,7 @@ EOF
     if ! sed -i.bak "s/^PORT=.*/PORT=$port/" "$root_dir/.env" || ! rm -f "$root_dir/.env.bak"; then
       echo "$root_dir/.envのPORT更新に失敗しました" >&2
       gwt_cleanup_lock
+      gwt_cleanup_worktree
       trap - EXIT HUP INT TERM
       return 1
     fi
@@ -631,10 +663,12 @@ EOF
     if ! printf 'PORT=%s\n' "$port" >> "$root_dir/.env"; then
       echo "$root_dir/.envへのPORT追記に失敗しました" >&2
       gwt_cleanup_lock
+      gwt_cleanup_worktree
       trap - EXIT HUP INT TERM
       return 1
     fi
   fi
+  setup_complete=true
   gwt_cleanup_lock
   trap - EXIT HUP INT TERM
 
