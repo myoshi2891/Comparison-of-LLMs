@@ -40,12 +40,14 @@ describe("/copilot/markdown-file-guide", () => {
 
   it("excludeAgent は公式の code-review / cloud-agent 値だけを案内する", () => {
     const { container } = render(<Page />);
-    const text = container.textContent ?? "";
+    const excludeAgentValues = Array.from(container.querySelectorAll("pre")).flatMap((block) =>
+      Array.from(
+        block.textContent?.matchAll(/excludeAgent:\s*"([^"]+)"/g) ?? [],
+        (match) => match[1]
+      )
+    );
 
-    expect(text).toContain('excludeAgent: "code-review"');
-    expect(text).toContain('excludeAgent: "cloud-agent"');
-    expect(text).not.toContain('excludeAgent: "coding-agent"');
-    expect(text).not.toContain('"code-review" or "coding-agent"');
+    expect(excludeAgentValues).toEqual(["code-review", "cloud-agent"]);
   });
 
   it("metadata.title と metadata.description が定義されている", () => {
