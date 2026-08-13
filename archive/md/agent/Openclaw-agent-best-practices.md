@@ -113,18 +113,17 @@ flowchart TB
     RESOLVE -->|"heartbeat / commitment-only / cron<br/>非interactive / 非primary / bootstrap保留なし"| NONE["none"]
     FULL --> APPLY["状態に応じたbootstrapガイダンスと<br/>対象ファイルをProject Contextへ適用"]
     LIMITED --> APPLY
-    NONE --> APPLY
-    APPLY --> SYS[("システムプロンプトへ注入")]
-    MODE -->|"通常セッション"| MAIN["通常のブートストラップ対象"]
+    NONE --> NOBOOT["ブートストラップファイルを注入しない"]
+    APPLY -->|"通常セッション"| MAIN["通常のブートストラップ対象"]
     MAIN -.->|"存在する場合のみ"| MEM["MEMORY.md（任意）"]
     MAINFILES["AGENTS.md / SOUL.md / TOOLS.md / IDENTITY.md / USER.md<br/>BOOTSTRAP.md（初期設定中）/ MEMORY.md（任意）"]
     SUBFILES["AGENTS.md / TOOLS.md のみ"]
-    MODE -->|"sub-agent"| SUB["サブエージェントのブートストラップ対象"]
+    APPLY -->|"sub-agent"| SUB["サブエージェントのブートストラップ対象"]
     MAIN --> MAINFILES
     MEM --> MAINFILES
     SUB --> SUBFILES
-    MAINFILES --> APPLY
-    SUBFILES --> APPLY
+    MAINFILES --> SYS[("システムプロンプトへ注入")]
+    SUBFILES --> SYS
 ```
 
 OpenClaw v2026.7.xでは、通常セッションに`AGENTS.md`・`SOUL.md`・`TOOLS.md`・`IDENTITY.md`・`USER.md`などのブートストラップファイルを注入し、`MEMORY.md`は存在する場合のみ、`BOOTSTRAP.md`は新規ワークスペースの初期セットアップ時のみ対象にする。サブエージェントではコンテキストを小さく保つため、`AGENTS.md`と`TOOLS.md`だけを注入する。利用できるツール自体は、ツールプロファイル、allow/denyポリシー、サンドボックスなどの実行時ポリシーで決まり、`AGENTS.md`と`TOOLS.md`はツールを許可する設定ではなく、利用方法や環境固有の注意事項をモデルへ伝える指針である。
@@ -433,6 +432,7 @@ ClawHub経由の悪性スキル（第5章）に加え、**エージェント同�
 以下は本ガイド作成にあたって参照した主要な情報源である（2026年8月1日時点でアクセス可能な内容に基づく）。
 
 **概要・アーキテクチャ**
+
 - Lenny's Newsletter「OpenClaw: The complete guide to building, training, and living with your personal AI agent」https://www.lennysnewsletter.com/p/openclaw-the-complete-guide-to-building
 - Bibek Poudel (Medium)「How OpenClaw Works: Understanding AI Agents Through a Real Architecture」https://bibek-poudel.medium.com/how-openclaw-works-understanding-ai-agents-through-a-real-architecture-5d59cc7a4764
 - freeCodeCamp「How to Build and Secure a Personal AI Agent with OpenClaw」https://www.freecodecamp.org/news/how-to-build-and-secure-a-personal-ai-agent-with-openclaw/
@@ -445,6 +445,7 @@ ClawHub経由の悪性スキル（第5章）に加え、**エージェント同�
 - KDnuggets「10 GitHub Repositories to Master OpenClaw」https://www.kdnuggets.com/10-github-repositories-to-master-openclaw
 
 **ワークスペース・メモリ・スキル**
+
 - Stanza「OpenClaw SOUL.md — Agent Persona Guide」https://www.stanza.dev/concepts/openclaw-soul-persona
 - OpenClaw Blog「Crafting Your Agent's Soul: A Complete Guide to SOUL.md」https://openclaws.io/blog/openclaw-soul-md-guide
 - Roberto Capodieci (Medium)「AI Agents 003 — OpenClaw Workspace Files Explained」https://capodieci.medium.com/ai-agents-003-openclaw-workspace-files-explained-soul-md-agents-md-heartbeat-md-and-more-5bdfbee4827a
@@ -452,6 +453,7 @@ ClawHub経由の悪性スキル（第5章）に加え、**エージェント同�
 - Codebridge「How to Build Domain-Specific AI Agents with OpenClaw」https://www.codebridge.tech/articles/how-to-build-domain-specific-ai-agents-with-openclaw-skills-soul-md-and-memory
 
 **マルチエージェント・スケジューリング・コスト最適化**
+
 - MindStudio「OpenClaw Best Practices: 14 Tips for Power Users After 200+ Hours」https://www.mindstudio.ai/blog/openclaw-best-practices-power-users-200-hours
 - VelvetShark「Stop overpaying for OpenClaw: Multi-model routing guide」https://velvetshark.com/openclaw-multi-model-routing
 - SFAI Labs「Openclaw Heartbeat Scheduling」https://sfailabs.com/guides/openclaw-heartbeat-scheduling
@@ -462,6 +464,7 @@ ClawHub経由の悪性スキル（第5章）に加え、**エージェント同�
 - GitHub「mergisi/awesome-openclaw-agents」https://github.com/mergisi/awesome-openclaw-agents
 
 **セキュリティ・サプライチェーン**
+
 - Fernando Irarrázaval「What happened after 2,000 people tried to hack my AI assistant」https://www.fernandoi.cl/posts/hackmyclaw/
 - Simon Willison's Weblog「What happened after 2,000 people tried to hack my AI assistant」https://simonwillison.net/2026/jun/26/hack-my-ai-assistant/
 - Simon Willison's Weblog「prompt-injection タグ一覧」https://simonwillison.net/tags/prompt-injection/
@@ -482,6 +485,7 @@ ClawHub経由の悪性スキル（第5章）に加え、**エージェント同�
 - PointGuard AI「OpenClaw ClawHub Malicious Skills Supply Chain Attack」https://www.pointguardai.com/ai-security-incidents/openclaw-clawhub-malicious-skills-supply-chain-attack
 
 **創設者・プロジェクトの現状**
+
 - Peter Steinberger個人ブログ「OpenClaw, OpenAI and the future」https://steipete.me/posts/2026/openclaw
 - Lex Fridman Podcast「#491 – OpenClaw: The Viral AI Agent that Broke the Internet」https://lexfridman.com/peter-steinberger/
 - Wikipedia「Peter Steinberger (programmer)」https://en.wikipedia.org/wiki/Peter_Steinberger_(programmer)
