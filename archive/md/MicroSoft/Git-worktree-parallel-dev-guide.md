@@ -344,7 +344,7 @@ flowchart TB
 - Docker Composeを使う場合は、worktreeごとに`COMPOSE_PROJECT_NAME`を変えてコンテナ名・ネットワーク・ポートマッピングを分離する
 - データベースも同様に、worktreeごとにスキーマやDBブランチ(マネージドDBのbranching機能)を分ける
 
-以下の例では、全worktreeで共有されるGit common directory配下に`mkdir`で原子的なロックを作り、予約済みポートの確認、LISTEN状態の確認、`.env`への予約反映を同じ排他区間で行います。これにより、並行実行されたプロセスが同じ候補を同時に選ぶ競合を防ぎます。
+以下の例では、全worktreeで共有されるGit common directory配下に`mkdir`で原子的なロックを作り、`.env`に記録済みのポート確認、LISTEN状態の助言的チェック、`.env`への予約反映を同じ排他区間で行います。これにより、スクリプト同士が同じ候補を同時に選ぶ競合を防ぎます。ただし、`lsof`の確認からサーバーがbindするまでには別プロセスがポートを取得できるため、LISTEN確認そのものは予約ではありません。実際の起動処理では終了ステータスとエラーを確認し、`EADDRINUSE`ならロックを取り直して別候補を選ぶか、明示的なエラーとして非0終了してください。
 
 ```bash
 # ポート自動割り当ての例(ハッシュを起点に衝突を検出する)
@@ -419,6 +419,7 @@ for attempt in $(seq 0 49); do
 $worktree_paths
 EOF
   [ "$reserved" = true ] && continue
+  # 助言的チェックのみ。ここを通過してもbind成功は保証されない。
   lsof -nP -iTCP:"$candidate" -sTCP:LISTEN >/dev/null 2>&1
   lsof_status=$?
   [ "$lsof_status" -eq 0 ] && continue
@@ -508,6 +509,7 @@ gwt() {
 
   git worktree add -b "$branch" "$dir" origin/main
   cd "$dir" || return
+  root_dir=$(git rev-parse --show-toplevel) || return 1
 
   # 依存関係のセットアップ(プロジェクトに応じて調整)
   if [ -f pnpm-lock.yaml ]; then
@@ -517,10 +519,10 @@ gwt() {
   fi
 
   # 秘密を含まないテンプレートだけをコピーする
-  [ -f "$root_dir/.env.example" ] && cp "$root_dir/.env.example" .env
+  [ -f "$root_dir/.env.example" ] && cp "$root_dir/.env.example" "$root_dir/.env"
 
   # worktreeごとに未予約・未使用のPORTを割り当てる
-  port_offset=$(($(printf '%s' "$(basename "$PWD")" | cksum | cut -d' ' -f1) % 50))
+  port_offset=$(($(printf '%s' "$(basename "$root_dir")" | cksum | cut -d' ' -f1) % 50))
   port=""
   gwt_cleanup_lock() {
     [ -r "$lock_owner" ] && [ "$(cat "$lock_owner")" = "$$" ] || return 0
@@ -561,7 +563,7 @@ gwt() {
     while IFS= read -r worktree_path; do
       [ -n "$worktree_path" ] || continue
       env_file="$worktree_path/.env"
-      [ "$env_file" = "$PWD/.env" ] && continue
+      [ "$env_file" = "$root_dir/.env" ] && continue
       [ -e "$env_file" ] || continue
       if [ ! -r "$env_file" ]; then
         echo "$env_fileを読み取れません" >&2
@@ -582,6 +584,7 @@ gwt() {
 $worktree_paths
 EOF
     [ "$reserved" = true ] && continue
+    # 助言的チェックのみ。ここを通過してもbind成功は保証されない。
     lsof -nP -iTCP:"$candidate" -sTCP:LISTEN >/dev/null 2>&1
     lsof_status=$?
     [ "$lsof_status" -eq 0 ] && continue
@@ -601,32 +604,32 @@ EOF
     return 1
   fi
   env_grep_status=1
-  if [ -e .env ]; then
-    if [ ! -r .env ]; then
-      echo ".envを読み取れません" >&2
+  if [ -e "$root_dir/.env" ]; then
+    if [ ! -r "$root_dir/.env" ]; then
+      echo "$root_dir/.envを読み取れません" >&2
       gwt_cleanup_lock
       trap - EXIT HUP INT TERM
       return 1
     fi
-    grep -q '^PORT=' .env
+    grep -q '^PORT=' "$root_dir/.env"
     env_grep_status=$?
     if [ "$env_grep_status" -ne 0 ] && [ "$env_grep_status" -ne 1 ]; then
-      echo ".envのPORT確認に失敗しました" >&2
+      echo "$root_dir/.envのPORT確認に失敗しました" >&2
       gwt_cleanup_lock
       trap - EXIT HUP INT TERM
       return 1
     fi
   fi
   if [ "$env_grep_status" -eq 0 ]; then
-    if ! sed -i.bak "s/^PORT=.*/PORT=$port/" .env || ! rm -f .env.bak; then
-      echo ".envのPORT更新に失敗しました" >&2
+    if ! sed -i.bak "s/^PORT=.*/PORT=$port/" "$root_dir/.env" || ! rm -f "$root_dir/.env.bak"; then
+      echo "$root_dir/.envのPORT更新に失敗しました" >&2
       gwt_cleanup_lock
       trap - EXIT HUP INT TERM
       return 1
     fi
   else
-    if ! printf 'PORT=%s\n' "$port" >> .env; then
-      echo ".envへのPORT追記に失敗しました" >&2
+    if ! printf 'PORT=%s\n' "$port" >> "$root_dir/.env"; then
+      echo "$root_dir/.envへのPORT追記に失敗しました" >&2
       gwt_cleanup_lock
       trap - EXIT HUP INT TERM
       return 1
@@ -638,6 +641,8 @@ EOF
   echo "worktree '$dir' の準備が完了しました"
 }
 ```
+
+この`gwt`関数はworktreeと`.env`を準備するところまでで、開発サーバーは起動しません。後続の起動コマンドは失敗を無視せず、`EADDRINUSE`を検出した場合は上の選定処理を再実行して別候補を割り当てるか、そのまま非0で終了して利用者に再選定を促してください。
 
 Gitフックを使う場合は、`core.hooksPath`をリポジトリ共通の場所に向けておくと、全worktreeで同じフック(例: `post-checkout`でのlintキャッシュクリア)を共有できます。ただしフック自体はworktree固有の状態(どのブランチで実行されたか等)を意識して書く必要があります。
 
