@@ -19,7 +19,7 @@
  * ファイル名をそのまま踏襲する) なので、再実行しても差分は出ない。
  */
 
-import { existsSync, mkdirSync, readdirSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -94,7 +94,7 @@ async function fetchText(url: string): Promise<string> {
   return await res.text();
 }
 
-async function downloadAll(urls: Map<string, string>): Promise<void> {
+async function downloadAll(urls: Map<string, string>, destinationDir: string): Promise<void> {
   const entries = [...urls.entries()];
   let cursor = 0;
   let done = 0;
@@ -109,12 +109,57 @@ async function downloadAll(urls: Map<string, string>): Promise<void> {
       if (!res.ok) throw new Error(`GET ${remoteUrl} -> ${res.status}`);
       const bytes = new Uint8Array(await res.arrayBuffer());
       if (bytes.byteLength === 0) throw new Error(`empty font file: ${remoteUrl}`);
-      writeFileSync(join(outDir, fileName), bytes);
+      writeFileSync(join(destinationDir, fileName), bytes);
       done += 1;
       console.log(`  [${done}/${entries.length}] ${fileName} (${bytes.byteLength} bytes)`);
     }
   });
   await Promise.all(workers);
+}
+
+type StagedGeneration = {
+  stagingRoot: string;
+  stagedOutDir: string;
+  stagedCssOut: string;
+  stagedPreloadOut: string;
+};
+
+/** 全生成物が揃った後だけ現行世代と入れ替え、途中失敗時は旧世代へ戻す。 */
+function promoteStagedGeneration(generation: StagedGeneration): void {
+  const backupRoot = join(generation.stagingRoot, "previous");
+  mkdirSync(backupRoot);
+  const artifacts = [
+    { staged: generation.stagedOutDir, target: outDir, backup: join(backupRoot, "woff2") },
+    { staged: generation.stagedCssOut, target: cssOut, backup: join(backupRoot, "font.css") },
+    {
+      staged: generation.stagedPreloadOut,
+      target: preloadOut,
+      backup: join(backupRoot, "preload.ts"),
+    },
+  ];
+  const backedUp: typeof artifacts = [];
+  const promoted: typeof artifacts = [];
+
+  try {
+    for (const artifact of artifacts) {
+      if (!existsSync(artifact.target)) continue;
+      renameSync(artifact.target, artifact.backup);
+      backedUp.push(artifact);
+    }
+    for (const artifact of artifacts) {
+      renameSync(artifact.staged, artifact.target);
+      promoted.push(artifact);
+    }
+    rmSync(backupRoot, { recursive: true, force: true });
+  } catch (error) {
+    for (const artifact of promoted.reverse()) {
+      rmSync(artifact.target, { recursive: true, force: true });
+    }
+    for (const artifact of backedUp.reverse()) {
+      renameSync(artifact.backup, artifact.target);
+    }
+    throw error;
+  }
 }
 
 function renderCss(faces: ParsedFace[]): string {
@@ -183,18 +228,6 @@ async function main(): Promise<void> {
   }
   console.log(`parsed ${faces.length} @font-face / ${filesByName.size} unique woff2`);
 
-  // 旧バージョンのファイルが残らないよう作り直す。
-  if (existsSync(outDir)) {
-    for (const stale of readdirSync(outDir)) {
-      if (!filesByName.has(stale)) rmSync(join(outDir, stale));
-    }
-  } else {
-    mkdirSync(outDir, { recursive: true });
-  }
-
-  await downloadAll(filesByName);
-
-  writeFileSync(cssOut, renderCss(faces), "utf8");
   const latinHrefs = [
     ...new Set(
       faces
@@ -204,7 +237,20 @@ async function main(): Promise<void> {
   ];
   if (latinHrefs.length === 0)
     throw new Error("latin subset not found; preload list would be empty");
-  writeFileSync(preloadOut, renderPreloadModule(latinHrefs), "utf8");
+
+  const stagingRoot = mkdtempSync(join(repoRoot, ".vendor-noto-sans-jp-"));
+  const stagedOutDir = join(stagingRoot, "woff2");
+  const stagedCssOut = join(stagingRoot, "noto-sans-jp.css");
+  const stagedPreloadOut = join(stagingRoot, "noto-sans-jp-preload.ts");
+  try {
+    mkdirSync(stagedOutDir);
+    await downloadAll(filesByName, stagedOutDir);
+    writeFileSync(stagedCssOut, renderCss(faces), "utf8");
+    writeFileSync(stagedPreloadOut, renderPreloadModule(latinHrefs), "utf8");
+    promoteStagedGeneration({ stagingRoot, stagedOutDir, stagedCssOut, stagedPreloadOut });
+  } finally {
+    rmSync(stagingRoot, { recursive: true, force: true });
+  }
 
   console.log(`wrote ${cssOut}`);
   console.log(`wrote ${preloadOut} (${latinHrefs.length} preload target)`);
