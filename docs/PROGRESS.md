@@ -2,7 +2,7 @@
 
 > 本ファイルは Next.js 移行完了後の保守・改善フェーズにおける開発の進捗（特にテスト関連）および品質チェックのルールを記録する。
 >
-> - 最終更新日: **Updated 2026-08-12**
+> - 最終更新日: **Updated 2026-08-13**
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
 
@@ -15,10 +15,16 @@
   - `npm run typecheck` ✅（`tsc --noEmit`）
   - `npm run lint` ✅（Biome check）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: `bun run test` で Vitest **163 files / 1454 tests すべて合格**（全 Green ✅）
+  - **フロントエンド (`web-next/`)**: `npm test -- --run` で Vitest **163 files / 1455 tests すべて合格**（全 Green ✅）
   - **バックエンド (`scraper/`)**: pytest 実行で **43 件すべて合格** (全 Green ✅)
 
 ## 最近の追加内容
+
+- **レビュー指摘の再検証とガイド・契約テストの修正**:
+  - OpenClawのbootstrapMode条件を厳密化し、通常セッションとサブエージェントのブートストラップファイル経路を分離。
+  - Copilot Code Reviewのレビュー深度・コスト削減・Martianベンチマーク・`.agent.md`とPlaywright MCPの説明を一次情報に合わせて修正。
+  - Git worktreeのポート確認を助言的チェックとして明記し、gwtの`.env`操作をGitルート基準へ統一。
+  - `/copilot/markdown-file-guide`の`excludeAgent`契約をコードブロックから抽出した値の完全一致に強化。npmでVitest **163 files / 1455 tests**、対象Biome、typecheckがGreen。ユーザー指定によりビルドと目視確認は省略。
 
 - **GitHub Copilot .agent.md 実践ガイド（/copilot/agent）の Pure JSX 完全置き換え移行**:
   - `Github-copilot-agent-md-guide.html` を `web-next/app/copilot/agent/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。

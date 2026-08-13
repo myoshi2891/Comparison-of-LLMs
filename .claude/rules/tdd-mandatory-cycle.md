@@ -109,7 +109,7 @@ expect(Array.from(container.querySelectorAll("h2")).map(headingText))
 - **実行**: `cd web-next && bun run build` および `cd web-next && bun run lint <変更したパス>` を実行し、問題がないことを確認。
   Biome はパス引数なしでの `lint:fix` を禁止しているため、必ず変更対象パスを指定する。
 - **テスト数の後退を許さない**: `bun run test` の合計テスト数がベースライン（2026-08-13 実測で
-  **163 files / 1454 tests**）を下回った場合、何かを壊しているか削除している。原因を特定するまで先へ進まない。
+  **163 files / 1455 tests**）を下回った場合、何かを壊しているか削除している。原因を特定するまで先へ進まない。
   **収集失敗（collect error）もブロッキング失敗として扱う。**
 - **コミット**: `refactor(<scope>): <clean up or optimization>`
 
