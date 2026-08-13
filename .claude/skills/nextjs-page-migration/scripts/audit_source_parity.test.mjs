@@ -47,6 +47,78 @@ test("compares heading level and occurrence count while allowing source h2 to be
 	assert.deepEqual(result.json.extraHeadings, [{ level: 2, text: "Details" }]);
 });
 
+test("compares every HTML and Markdown heading level from h1 through h6", () => {
+	const html = audit(
+		"<h1>Title</h1><h2>Section</h2><h3>Detail</h3><h4>Level four</h4><h5>Level five</h5><h6>Level six</h6>",
+		"<h1>Title</h1><h2>Section</h2><h3>Detail</h3><h4>Level four</h4><h5>Changed five</h5>",
+	);
+	assert.equal(html.status, 1);
+	assert.deepEqual(html.json.missingHeadings, [
+		{ level: 5, text: "Level five" },
+		{ level: 6, text: "Level six" },
+	]);
+
+	const markdown = audit(
+		"# Title\n\n#### Level four\n\n##### Level five\n\n###### Level six",
+		"<h1>Title</h1><h4>Level four</h4><h5>Level five</h5>",
+		"md",
+	);
+	assert.equal(markdown.status, 1);
+	assert.deepEqual(markdown.json.missingHeadings, [{ level: 6, text: "Level six" }]);
+});
+
+test("treats missing or altered SVG elements as blocking parity failures", () => {
+	const source = `<svg viewBox="0 0 20 20"><path d="M0 0 L20 20" stroke-width="2" /></svg>
+<svg viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" /></svg>`;
+	const matching = audit(
+		source,
+		`<><svg viewBox="0 0 20 20"><path d="M0 0 L20 20" strokeWidth="2" /></svg>
+<svg viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" /></svg></>`,
+	);
+	assert.equal(matching.status, 0);
+	assert.deepEqual(matching.json.missingSvgElements, []);
+	assert.deepEqual(matching.json.counts.svgElements, { source: 2, page: 2 });
+
+	const altered = audit(
+		source,
+		'<svg viewBox="0 0 20 20"><path d="M0 0 L10 10" strokeWidth="2" /></svg>',
+	);
+	assert.equal(altered.status, 1);
+	assert.equal(altered.json.missingSvgElements.length, 2);
+});
+
+test("treats missing or altered callout and alert elements as blocking parity failures", () => {
+	const source = `<div class="callout warn"><strong>Warning</strong><p>Keep this exact text.</p></div>
+<aside class="alert info"><p>Informational text.</p></aside>`;
+	const matching = audit(
+		source,
+		`<><div className={\`\${styles.callout} \${styles.warn}\`}><strong>Warning</strong><p>Keep this exact text.</p></div>
+<aside className={\`\${styles.alert} \${styles.info}\`}><p>Informational text.</p></aside></>`,
+	);
+	assert.equal(matching.status, 0);
+	assert.deepEqual(matching.json.missingCalloutElements, []);
+	assert.deepEqual(matching.json.counts.calloutElements, { source: 2, page: 2 });
+
+	const altered = audit(
+		source,
+		'<div className={styles.callout}><strong>Warning</strong><p>Changed text.</p></div>',
+	);
+	assert.equal(altered.status, 1);
+	assert.equal(altered.json.missingCalloutElements.length, 2);
+});
+
+test("extracts Markdown admonitions as callout elements", () => {
+	const result = audit(
+		"> [!WARNING]\n> Keep this exact text.",
+		'<aside data-variant="warn"><p>Changed text.</p></aside>',
+		"md",
+	);
+
+	assert.equal(result.status, 1);
+	assert.deepEqual(result.json.counts.calloutElements, { source: 1, page: 1 });
+	assert.equal(result.json.missingCalloutElements.length, 1);
+});
+
 test("treats normalized code blocks and table rows as blocking parity elements", () => {
 	const matching = audit(
 		`<pre><code><span>npm</span> test</code></pre>
