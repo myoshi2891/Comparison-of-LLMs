@@ -71,10 +71,15 @@ describe("self-hosted Noto Sans JP - vendored stylesheet", () => {
   });
 
   it("never points at a remote origin", () => {
-    expect(fontCss).not.toContain("fonts.gstatic.com");
-    expect(fontCss).not.toContain("fonts.googleapis.com");
-    expect(fontCss).not.toContain("https://");
-    expect(fontCss).not.toContain("http://");
+    // 由来 URL は先頭のコメントに残す (再生成の手掛かり) ため、
+    // 検査対象は @font-face ブロックと url() 参照に限定する。
+    for (const face of faces) {
+      expect(face.block).not.toContain("fonts.gstatic.com");
+      expect(face.block).not.toContain("fonts.googleapis.com");
+      expect(face.block).not.toContain("//");
+    }
+    expect(fontCss).not.toMatch(/url\(\s*["']?https?:/);
+    expect(fontCss).not.toMatch(/@import/);
   });
 
   it("resolves every src to a woff2 file that exists in public/", () => {
@@ -117,10 +122,11 @@ describe("self-hosted Noto Sans JP - wiring", () => {
   });
 
   it("loads the vendored stylesheet from the root layout", () => {
-    expect(layoutTsx).toMatch(
-      /<link[^>]*rel="stylesheet"[^>]*href="\/fonts\/noto-sans-jp\.css"/
-    );
-    expect(layoutTsx).not.toContain("notoSansJp");
+    expect(layoutTsx).toMatch(/<link[^>]*rel="stylesheet"[^>]*href="\/fonts\/noto-sans-jp\.css"/);
+    // next/font 由来の変数注入 (notoSansJp.variable) が復活していないこと。
+    // preload リスト (notoSansJpPreloadHrefs) の参照は自前ホスト側の実装なので許容する。
+    expect(layoutTsx).not.toMatch(/\bnotoSansJp\.variable\b/);
+    expect(layoutTsx).not.toMatch(/\bnotoSansJp\b(?!PreloadHrefs)/);
   });
 
   it("preloads the latin slice to keep parity with next/font subsets", () => {
