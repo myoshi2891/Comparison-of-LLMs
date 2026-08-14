@@ -33,12 +33,9 @@ const LIST_ITEM_PROBE = 40;
 // --------------------------------------------------------------------------
 
 /**
- * 比較用にテキストを正規化する（NFKC + 空白畳み込み + 装飾記号除去）。
- *
- * 原本と JSX で全角/半角・改行位置・記号装飾がずれても同一視できるようにする。
- *
- * @param raw - 正規化前の文字列
- * @returns 比較キーとして使える正規化済み文字列
+ * Normalize text for comparison across source and JSX content.
+ * @param {string} raw - The text to normalize.
+ * @returns {string} The normalized comparison key.
  */
 function normalize(raw) {
   return raw
@@ -49,15 +46,9 @@ function normalize(raw) {
 }
 
 /**
- * 照合専用のキーを作る（表示上の差異を吸収する）。
- *
- * 原本と JSX では ①見出しの採番（`1. ` / `第2章 `）、②日本語と英数字の間の空白、
- * ③記号の装飾が食い違うのが常態であり、これらは移行漏れではない。
- * よって「空白を全除去し、先頭の採番を落とした文字列」を同一性判定キーとする。
- * 文字そのものが欠けていれば依然として不一致になるため、漏れ検知力は落ちない。
- *
- * @param raw - 比較したい表示テキスト
- * @returns 表記ゆれを吸収した照合キー
+ * Creates a comparison key that ignores whitespace, leading numbering, punctuation, and letter case.
+ * @param {string} raw - The display text to normalize for comparison.
+ * @returns {string} The normalized comparison key.
  */
 function matchKey(raw) {
   return (
@@ -75,10 +66,9 @@ function matchKey(raw) {
 }
 
 /**
- * HTML の実体参照のうち頻出するものだけを復号する。
- *
- * @param raw - 実体参照を含む文字列
- * @returns 復号済み文字列
+ * Decodes common HTML character references in a string.
+ * @param {string} raw - The string containing HTML character references.
+ * @returns {string} The decoded string.
  */
 function decodeEntities(raw) {
   return raw
@@ -91,12 +81,9 @@ function decodeEntities(raw) {
 }
 
 /**
- * HTML / JSX 断片から表示テキストだけを取り出す。
- *
- * JSX の `{" "}` は空白へ、`{/* ... *\/}` と残りの式は除去する。
- *
- * @param fragment - タグを含むマークアップ断片
- * @returns タグ・式を除去した表示テキスト
+ * Extracts display text from an HTML or JSX fragment.
+ * @param {string} fragment - The markup fragment containing tags or JSX expressions.
+ * @returns {string} The decoded display text with tags and expressions removed.
  */
 function stripMarkup(fragment) {
   return decodeEntities(
@@ -110,10 +97,9 @@ function stripMarkup(fragment) {
 }
 
 /**
- * Markdown のインライン装飾を落として表示テキストにする。
- *
- * @param raw - Markdown のインライン断片
- * @returns リンク・強調を除去した表示テキスト
+ * Removes Markdown links, images, and HTML tags from an inline fragment.
+ * @param {string} raw - The raw Markdown inline fragment.
+ * @returns {string} The fragment with links, images, and HTML tags removed.
  */
 function stripMarkdownInline(raw) {
   return raw
@@ -123,16 +109,19 @@ function stripMarkdownInline(raw) {
 }
 
 /**
- * コードブロック・表行の内容をマークアップ非依存の比較値へ変換する。
- *
- * @param raw - HTML / JSX を含む要素本文
- * @returns タグと JSX 空白表現を除去した正規化テキスト
+ * Normalize code block or table row content for markup-independent comparison.
+ * @param {string} raw - Element content that may contain HTML or JSX markup.
+ * @returns {string} Text with markup and JSX whitespace expressions removed.
  */
 function normalizeElementContent(raw) {
   return normalize(stripMarkup(raw));
 }
 
-/** SVG をタグ・属性順序に依存しない比較シグネチャへ変換する。 */
+/**
+ * Creates a normalized comparison signature for an SVG fragment.
+ * @param {string} raw - The raw SVG markup to normalize.
+ * @returns {string} A JSON-encoded signature containing normalized tags, attributes, and text.
+ */
 function normalizeSvgElement(raw) {
   const tags = [];
   const tagRe = /<([A-Za-z][\w:.-]*)\b([^>]*)\/?\s*>/g;
@@ -159,7 +148,12 @@ function normalizeSvgElement(raw) {
   return JSON.stringify({ tags, text: normalize(stripMarkup(raw)) });
 }
 
-/** callout / alert の種別と本文をマークアップ非依存の比較値へ変換する。 */
+/**
+ * Creates a markup-independent comparison key for a callout or alert element.
+ * @param {string} openingTag - The element's opening tag, including its type markers.
+ * @param {string} content - The element's body content.
+ * @returns {string} A normalized key containing the callout types and content.
+ */
 function normalizeCalloutElement(openingTag, content) {
   const markers = new Set();
   const markerSource = `${openingTag} ${openingTag.match(/styles\.([\w-]+)/g)?.join(" ") ?? ""}`;
@@ -170,10 +164,20 @@ function normalizeCalloutElement(openingTag, content) {
   return `${[...markers].sort().join("|")}::${matchKey(stripMarkup(content))}`;
 }
 
+/**
+ * Extracts and normalizes SVG elements from source text.
+ * @param {string} src - The source text to inspect.
+ * @return {string[]} The normalized SVG elements found in the source text.
+ */
 function collectSvgElements(src) {
   return (src.match(/<svg\b[\s\S]*?<\/svg>/gi) ?? []).map(normalizeSvgElement);
 }
 
+/**
+ * Collects callout and alert elements from markup source.
+ * @param {string} src - The markup source to inspect.
+ * @returns {Array} The normalized callout and alert elements found in the source.
+ */
 function collectMarkupCalloutElements(src) {
   return extractElementContents(src, (openingTag) =>
     /<(?:Callout|Alert)\b|(?:class|className)\s*=\s*(?:["'][^"']*(?:callout|alert)|\{[^}]*styles\.(?:callout|alert))|data-(?:testid|variant)\s*=\s*["'](?:callout|alert|warn|warning|info|note|good|success|tip)/i.test(
@@ -182,6 +186,11 @@ function collectMarkupCalloutElements(src) {
   ).map(({ openingTag, content }) => normalizeCalloutElement(openingTag, content));
 }
 
+/**
+ * Extract supported Markdown callouts and classify them by variant.
+ * @param {string} src - Markdown source containing callout blocks.
+ * @returns {string[]} Normalized callout keys prefixed with `warn`, `info`, or `tip`.
+ */
 function collectMarkdownCalloutElements(src) {
   const callouts = [];
   const lines = src.split(/\r?\n/);
@@ -205,6 +214,11 @@ function collectMarkdownCalloutElements(src) {
   return callouts;
 }
 
+/**
+ * Removes fenced code block markers and their contents from Markdown text.
+ * @param {string} src - The Markdown text to process.
+ * @return {string} The text with fenced code blocks removed.
+ */
 function stripMarkdownFences(src) {
   let inFence = false;
   return src
@@ -220,11 +234,9 @@ function stripMarkdownFences(src) {
 }
 
 /**
- * Mermaid ソースを改行コード・外側の空行・共通インデントだけ正規化する。
- * mindmap 等の相対インデントは構文の一部なので保持する。
- *
- * @param raw - Mermaid ソース
- * @returns 順序比較に使う正規化済みソース
+ * Normalizes Mermaid source while preserving indentation that carries syntactic meaning.
+ * @param {string} raw - The Mermaid source to normalize.
+ * @returns {string} The normalized source for content and order comparisons.
  */
 function normalizeMermaidSource(raw) {
   const lines = decodeEntities(raw).replace(/\r\n?/g, "\n").split("\n");
@@ -238,12 +250,10 @@ function normalizeMermaidSource(raw) {
 }
 
 /**
- * 指定タグの本文と出現位置を採取する。pre / tr は同名タグをネストしないため、
- * この単純な抽出で HTML と JSX の双方をマークアップ非依存に比較できる。
- *
- * @param src - 走査対象
- * @param tag - タグ名
- * @returns 本文と出現位置
+ * Extracts the contents and source positions of matching non-nested HTML or JSX tags.
+ * @param {string} src - The source markup to scan.
+ * @param {string} tag - The tag name to match.
+ * @return {{index: number, content: string}[]} The matched contents and their starting positions.
  */
 function extractTagContents(src, tag) {
   const results = [];
@@ -257,12 +267,10 @@ function extractTagContents(src, tag) {
 }
 
 /**
- * 開始タグ条件に一致する JSX 要素を、同名タグのネストを考慮して採取する。
- * CSS Modules の codeBlock ラッパーが div を入れ子にするケースで使用する。
- *
- * @param src - 走査対象
- * @param predicate - 開始タグの採取条件
- * @returns 本文と出現位置
+ * Extracts JSX elements whose opening tags satisfy a predicate, including their nested content.
+ * @param {string} src - The source text to scan.
+ * @param {function(string): boolean} predicate - Determines whether an opening tag should be extracted.
+ * @returns {Array<{index: number, openingTag: string, content: string}>} The extracted elements and their source positions.
  */
 function extractElementContents(src, predicate) {
   const results = [];
@@ -297,10 +305,9 @@ function extractElementContents(src, predicate) {
 }
 
 /**
- * page.tsx 内の文字列定数を採取する。
- *
- * @param src - page.tsx 全文
- * @returns 定数名から文字列値への対応
+ * Extracts string constant declarations from TSX source.
+ * @param {string} src - The complete TSX source text.
+ * @return {Map<string, string>} A map from constant names to string values.
  */
 function collectStringConstants(src) {
   const constants = new Map();
@@ -315,11 +322,10 @@ function collectStringConstants(src) {
 }
 
 /**
- * JSX 本文中の単純な文字列定数参照を実値へ置換する。
- *
- * @param content - JSX 要素本文
- * @param constants - 文字列定数
- * @returns 定数参照を展開した本文
+ * Resolves simple string constant references embedded in JSX content.
+ * @param {string} content - The JSX element content.
+ * @param {Map<string, string>} constants - The string constants available for resolution.
+ * @returns {string} The content with recognized constant references replaced by their values.
  */
 function resolveStringConstants(content, constants) {
   return content.replace(/\{\s*([A-Za-z_$][\w$]*)\s*\}/g, (expression, name) =>
@@ -328,10 +334,9 @@ function resolveStringConstants(content, constants) {
 }
 
 /**
- * HTML の Mermaid 本文（直接ブロックと DIAGRAMS オブジェクト）を出現順に採取する。
- *
- * @param src - HTML 全文
- * @returns 正規化済み Mermaid ソース
+ * Collects Mermaid diagram sources from HTML in document order.
+ * @param {string} src - The complete HTML source.
+ * @returns {string[]} The normalized Mermaid sources found in Mermaid blocks and diagram definitions.
  */
 function collectHtmlMermaidSources(src) {
   const sources = [];
@@ -356,10 +361,9 @@ function collectHtmlMermaidSources(src) {
 }
 
 /**
- * page.tsx の MermaidDiagram chart 値を定数参照を解決して出現順に採取する。
- *
- * @param src - page.tsx 全文
- * @returns 正規化済み Mermaid ソース
+ * Collect Mermaid chart sources from `MermaidDiagram` components in their occurrence order.
+ * @param {string} src - The complete contents of `page.tsx`.
+ * @returns {string[]} The normalized Mermaid sources, including markers for unresolved constant references.
  */
 function collectTsxMermaidSources(src) {
   const constants = collectStringConstants(src);
@@ -376,10 +380,9 @@ function collectTsxMermaidSources(src) {
 }
 
 /**
- * URL を比較用に正規化する（末尾スラッシュ・アンカー・クエリを除去）。
- *
- * @param url - 生の URL 文字列
- * @returns 比較キーとして使える URL
+ * Normalizes a URL for comparison.
+ * @param {string} url - The raw URL string.
+ * @return {string} The URL without its query, fragment, or trailing slashes, converted to lowercase.
  */
 function normalizeUrl(url) {
   return url
@@ -394,12 +397,12 @@ function normalizeUrl(url) {
 // --------------------------------------------------------------------------
 
 /**
- * Markdown 本文から見出し・リスト・コードブロック・表・外部リンクを採取する。
+ * Builds an inventory of headings, lists, code blocks, tables, paragraphs, diagrams, callouts, and external links in Markdown source.
  *
- * フェンス内はコード扱いとし、見出し・リストとして数えない。
+ * Fenced content is treated as code and excluded from heading and list extraction.
  *
- * @param src - Markdown ソース全文
- * @returns インベントリ（見出し配列と各種カウント）
+ * @param {string} src - The complete Markdown source.
+ * @return {Object} The extracted element inventory and occurrence counts.
  */
 function inventoryMarkdown(src) {
   const lines = src.split(/\r?\n/);
@@ -500,10 +503,9 @@ function inventoryMarkdown(src) {
 }
 
 /**
- * HTML 本文から見出し・リスト・コードブロック・表・外部リンクを採取する。
- *
- * @param src - HTML ソース全文
- * @returns インベントリ（見出し配列と各種カウント）
+ * Builds an inventory of headings and content elements found in an HTML document.
+ * @param {string} src - The complete HTML source.
+ * @return {Object} The extracted headings, element counts, normalized content, Mermaid sources, SVG elements, callouts, and external links.
  */
 function inventoryHtml(src) {
   const body = src.replace(/<(script|style)[\s\S]*?<\/\1>/gi, "");
@@ -550,13 +552,9 @@ function inventoryHtml(src) {
 }
 
 /**
- * page.tsx（JSX）から見出し・リスト・コードブロック・表・外部リンクを採取する。
- *
- * コードブロックは `<pre>` と CSS Modules の `styles.codeBlock` 系ラッパーの
- * 多い方を採用する（本リポジトリは両方の実装パターンが存在するため）。
- *
- * @param src - page.tsx の全文
- * @returns インベントリ（見出し配列と各種カウント）
+ * Builds a normalized content inventory from TSX source for migration comparison.
+ * @param {string} src - The complete contents of the `page.tsx` file.
+ * @returns {Object} The inventory of headings, lists, code blocks, table rows, paragraphs, Mermaid sources, SVGs, callouts, and external links.
  */
 function inventoryTsx(src) {
   const headings = [];
@@ -607,21 +605,20 @@ function inventoryTsx(src) {
 }
 
 /**
- * 正規表現に一致した件数を数える。
- *
- * @param src - 走査対象の文字列
- * @param re - グローバルフラグ付きの正規表現
- * @returns 一致件数
+ * Counts the matches found by a regular expression in a string.
+ * @param {string} src - The string to search.
+ * @param {RegExp} re - The regular expression used for matching.
+ * @returns {number} The number of matches.
  */
 function countMatches(src, re) {
   return (src.match(re) ?? []).length;
 }
 
 /**
- * 本文中の外部 URL を重複排除して採取する。
+ * Collects unique external URLs from text.
  *
- * @param src - 走査対象の文字列
- * @returns 正規化済み URL の集合
+ * @param {string} src - The text to scan.
+ * @returns {Set<string>} The normalized URLs found in the text.
  */
 function collectUrls(src) {
   const urls = new Set();
@@ -635,11 +632,12 @@ function collectUrls(src) {
 }
 
 /**
- * 出現回数を保持したまま、移植先に不足する原本要素を返す。
+ * Identifies source values that occur more often than their corresponding page values.
  *
- * @param sourceValues - 原本の値（出現順）
- * @param pageValues - 移植先の値
- * @returns 移植先で不足している値（重複を保持）
+ * @param {Array} sourceValues - Source values in occurrence order.
+ * @param {Array} pageValues - Values found in the destination page.
+ * @param {Function} [key=(value) => value] - Function that derives the comparison key for each value.
+ * @return {Array} Source values missing from the destination, preserving duplicate occurrences and source order.
  */
 function missingOccurrences(sourceValues, pageValues, key = (value) => value) {
   const remaining = new Map();
@@ -661,11 +659,11 @@ function missingOccurrences(sourceValues, pageValues, key = (value) => value) {
 // --------------------------------------------------------------------------
 
 /**
- * 原本と移植先のインベントリを突き合わせ、不足分を算出する。
+ * Compares source and migrated-page inventories and reports migration discrepancies.
  *
- * @param source - 原本のインベントリ
- * @param page - page.tsx のインベントリ
- * @returns 不足見出し・不足リンク・カウント差分を含む照合結果
+ * @param {object} source - Inventory extracted from the source document.
+ * @param {object} page - Inventory extracted from the migrated page.
+ * @returns {object} Comparison results, including missing elements, extra headings, count differences, Mermaid matches, and the blocking status.
  */
 function compare(source, page) {
   const consumedPageHeadings = new Set();
