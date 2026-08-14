@@ -5,11 +5,12 @@ Updated 2026-08-14
 GEMINI.md は Gemini CLI / Gemini Code Assist 向けの入り口。
 本リポジトリでは **CLAUDE.md が正本** とし、GEMINI.md はその委譲 pointer として機能する。
 
-## 必読（順序固定、作業開始前に 3 点すべてを読むこと）
+## 必読（順序固定、作業開始前に 4 点すべてを読むこと）
 
-1. [`CLAUDE.md`](CLAUDE.md) — リポジトリ全体の AI 編集ルール・アーキテクチャ・禁止事項
-2. [`docs/PROGRESS.md`](docs/PROGRESS.md) — 最新の進捗状況・テスト実行・ネクストアクションと再開プロンプト（移行時の詳細は [`docs/archive/MIGRATION_PROGRESS.md`](docs/archive/MIGRATION_PROGRESS.md)）
-3. [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](docs/archive/NEXTJS_PHASE_A_F_PLAN.md) — Phase A–F の全体計画書（全完了済み）
+1. [`CODEX.md`](CODEX.md) — 作業種別に対応する `.claude` スキル・ルールの必読表
+2. [`CLAUDE.md`](CLAUDE.md) — リポジトリ全体の AI 編集ルール・アーキテクチャ・禁止事項
+3. [`docs/PROGRESS.md`](docs/PROGRESS.md) — 最新の進捗状況・テスト実行・ネクストアクションと再開プロンプト（移行時の詳細は [`docs/archive/MIGRATION_PROGRESS.md`](docs/archive/MIGRATION_PROGRESS.md)）
+4. [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](docs/archive/NEXTJS_PHASE_A_F_PLAN.md) — Phase A–F の全体計画書（全完了済み）
 
 @./CLAUDE.md
 @docs/PROGRESS.md
@@ -49,10 +50,10 @@ GEMINI.md は Gemini CLI / Gemini Code Assist 向けの入り口。
 ## 検証コマンド
 
 ```bash
-(cd web-next && npm test)            # 164 files / 1467 tests pass（2026-08-14 実測。収集失敗なし）
-(cd web-next && npm run typecheck)   # OK（2026-08-14 実測）
+(cd web-next && bun run test)        # 164 files / 1467 tests pass（2026-08-14 実測。収集失敗なし）
+(cd web-next && bun run typecheck)   # OK（2026-08-14 実測）
 (cd web-next && bun run build)       # 今回はユーザー指定により未実行。許可環境または CI で確認する
-(cd web-next && npm run lint)        # OK（457 files / 0 diagnostics。2026-08-14 実測）
+(cd web-next && bun run lint)        # OK（457 files / 0 diagnostics。2026-08-14 実測）
 (cd scraper && uv run pytest)        # 43/43 pass（全 Green ✅）
 ```
 
