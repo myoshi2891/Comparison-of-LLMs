@@ -17,7 +17,7 @@ description: >
 
 # Mermaid v10 修正・スタイリングスキル
 
-Updated: 2026-07-29
+Updated: 2026-08-13
 
 ## 対象
 
@@ -25,6 +25,24 @@ Updated: 2026-07-29
 - ダークモードでの配色崩れ（マインドマップ・シーケンス図）
 - SVGサイズ・クリッピング・**中央寄せ**問題
 - Next.js 共有コンポーネント `web-next/components/docs/MermaidDiagram.tsx` のレイアウト（Part 4）
+- 図解の移行漏れ検知（Part 6）
+
+## 現行スタック（2026-08-13 実測。バージョンは `web-next/package.json` が正）
+
+| 項目 | 値 | 影響 |
+|---|---|---|
+| mermaid | **10.9.8** | v10 系。`block-beta` は使用禁止（クラッシュ） |
+| Next.js | **16.2.11**（App Router / `output: "export"`） | Turbopack が既定。CSS チャンク分割の影響を受ける |
+| React | **19.2.4** | `MermaidDiagram` は `"use client"`。Server Component から直接 import してよい |
+| テスト | Vitest 4.1.4 + jsdom 29 | jsdom は SVG を描画しないため、図解テストは**モックして本文照合で検証する**（Part 6） |
+
+> **`next/dynamic` の `ssr: false` を Server Component で使ってはならない**（Next 15 以降エラー）。
+> `MermaidDiagram` は自身が `"use client"` なので、`page.tsx` から素の import で使う。
+
+```tsx
+// ✅ page.tsx（Server Component）から直接 import する
+import MermaidDiagram from "@/components/docs/MermaidDiagram";
+```
 
 > **レイアウトの不変条件は `.claude/rules/mermaid-diagram-layout.md` が SSoT**（中央寄せ・列幅への縮小フィット・
 > `useMaxWidth:false`・ページ側で幅を強制しない）。本スキルはその実装ガイド。サイト（web-next）で図解が左寄せ・
@@ -340,6 +358,31 @@ return (
 
 **振る舞い**: 列幅に収まる図は自然サイズで中央寄せ、列幅より広い図は**列幅まで縮小して中央寄せ**（横スクロールも切れも起こさない）。svg への `max-width:100%` は mermaid が付ける inline style を上書きするため、**コンポーネント内で JS 後処理として付与**する（CSS では inline に負ける）。
 
+### `MermaidDiagram` の props（実装が正。推測で書かない）
+
+| prop | 型 | 既定 | 用途 |
+|---|---|---|---|
+| `chart` | `string` | 必須 | Mermaid ソース。**左端揃え必須**（インデント混入は構文エラー） |
+| `id` | `string` | 自動 | DOM id を固定したい場合のみ |
+| `theme` | `"dark" \| "base" \| "default" \| "forest" \| "neutral"` | `"dark"` | 原本がライト基調のページは `"base"` |
+| `themeVariables` | `Record<string, string>` | — | `theme="base"` のときのみ意味を持つ。**モジュールレベル定数か `useMemo` で安定参照にする**（毎レンダー新しいオブジェクトを渡すと再初期化でチラつく） |
+| `maxHeight` | `CSSProperties["maxHeight"]` | — | 巨大化する図（少ノードの `stateDiagram-v2` 等）**だけ**に個別指定する |
+| `flowchartHtmlLabels` | `boolean` | — | ラベルがノードからはみ出す flowchart で `false` にする |
+| `className` / `style` | — | — | 外側フレームへの追加装飾 |
+
+実装上の性質として、レンダーは**直列キューで実行**され、1 図あたり **15 秒のタイムアウト**が掛かる。
+図が多いページで描画が遅いのは仕様であり、`page.module.css` で回避しようとしないこと。
+
+```tsx
+// ✅ themeVariables はモジュールレベル定数（安定参照）
+const LIGHT_THEME_VARS = { fontSize: "16px", primaryColor: "#e8f0ff" } as const;
+
+<MermaidDiagram chart={DIAGRAM_0} theme="base" themeVariables={LIGHT_THEME_VARS} />
+
+// ❌ 毎レンダー新しいオブジェクト → 再初期化とチラつきの原因
+<MermaidDiagram chart={DIAGRAM_0} theme="base" themeVariables={{ fontSize: "16px" }} />
+```
+
 ```tsx
 {/* ページ側の使い方: フレームは装飾のみ。中央寄せ/サイズ調整を再実装しない */}
 <div className={styles.mermaidWrap}>
@@ -424,16 +467,6 @@ SVG の `font-size` は継承可能である。ただし Mermaid が生成した
 >
 > **手順**: 全図解をブラウザで目視確認し、巨大化している図を特定 → その図だけに `maxHeight` を指定 → 高さが適切になるまで数値を微調整する。ページ CSS で SVG を直接上書きしない。
 
-### テスト環境（Vitest）でのモック化
-
-```typescript
-vi.mock("@/components/docs/MermaidDiagram", () => ({
-  default: function DummyMermaidDiagram({ chart }: { chart: string }) {
-    return <pre data-testid="mermaid">{chart}</pre>;
-  },
-}));
-```
-
 ---
 
 ## Part 5: Mermaidを諦めてHTML/CSSに置き換えるべきケース
@@ -444,6 +477,139 @@ vi.mock("@/components/docs/MermaidDiagram", () => ({
 - 接続されていない複数のサブグラフ（ノード数が非対称なためアスペクト比が崩れる）
 
 判断基準：「ノード増減に関わらず、他の図と同じ高さに収まる保証がない場合」
+
+---
+
+## Part 6: 図解のテスト契約（Vitest / jsdom）
+
+**jsdom は SVG をレイアウトしないため、「図が正しく見えるか」はユニットテストで検証できない。**
+検証できるのは「**図が原本と同じ数だけ、同じ内容で、正しいラッパーの中に置かれているか**」である。
+これが図解の**移行漏れ**を捉える唯一の自動手段なので必ず書く。
+
+### 6-1: モック（全ページ共通）
+
+`page.test.tsx` の先頭でモックする。実物は `mermaid` を動的 import するためテストでは重く不安定。
+
+```tsx
+vi.mock("@/components/docs/MermaidDiagram", () => ({
+  default: function DummyMermaidDiagram({ chart }: { chart: string }) {
+    return <pre data-testid="mermaid">{chart}</pre>;
+  },
+}));
+```
+
+### 6-2: 契約 C-6 — 図のソースが原本と順序込みで完全一致する
+
+```tsx
+// 原本 HTML の <div class="mermaid"> / DIAGRAMS オブジェクトから機械抽出し、
+// 改行コード・外側の空行・共通インデントだけを正規化して固定する。
+// 重複する図も省略せず、原本の出現順のまま列挙する。
+import { MERMAID_DIAGRAM_DECLARATION } from "../../../../.claude/skills/fix-mermaid/scripts/mermaid-diagram-types.mjs";
+
+const EXPECTED_MERMAID_SOURCES = [
+  `flowchart TD
+A[Start] --> B[Validate]`,
+  `sequenceDiagram
+User->>Agent: Request`,
+] as const;
+
+function normalizeMermaidSource(raw: string): string {
+  const lines = raw.replace(/\r\n?/g, "\n").split("\n");
+  while (lines.length > 0 && lines[0].trim() === "") lines.shift();
+  while (lines.length > 0 && lines.at(-1)?.trim() === "") lines.pop();
+  const indents = lines
+    .filter((line) => line.trim().length > 0)
+    .map((line) => line.match(/^\s*/)?.[0].length ?? 0);
+  const commonIndent = indents.length > 0 ? Math.min(...indents) : 0;
+  return lines.map((line) => line.slice(commonIndent).trimEnd()).join("\n");
+}
+
+it("C-6a: Mermaid ソースが原本と順序・内容・出現回数込みで完全一致する", () => {
+  const { container } = render(<Page />);
+  const actual = Array.from(container.querySelectorAll('[data-testid="mermaid"]')).map(
+    (el) => normalizeMermaidSource(el.textContent ?? "")
+  );
+  expect(actual).toEqual([...EXPECTED_MERMAID_SOURCES]);
+});
+
+it("C-6b: 全 Mermaid 図解がページ専用ラッパーに包まれている", () => {
+  const { container } = render(<Page />);
+  const diagrams = Array.from(container.querySelectorAll('[data-testid="mermaid"]'));
+  const wrapped = Array.from(
+    container.querySelectorAll(`.${styles.mermaidWrap} [data-testid="mermaid"]`)
+  );
+  expect(wrapped).toEqual(diagrams);
+});
+
+it("C-6c: 各図解が空でなく、図種別の宣言から始まる", () => {
+  const { container } = render(<Page />);
+  const charts = Array.from(container.querySelectorAll('[data-testid="mermaid"]')).map(
+    (el) => (el.textContent ?? "").trim()
+  );
+  for (const chart of charts) {
+    expect(chart.length).toBeGreaterThan(0);
+    expect(chart).toMatch(MERMAID_DIAGRAM_DECLARATION);
+  }
+});
+
+it("C-6d: 禁止構文 block-beta を使っていない", () => {
+  const { container } = render(<Page />);
+  const charts = Array.from(container.querySelectorAll('[data-testid="mermaid"]')).map(
+    (el) => el.textContent ?? ""
+  );
+  for (const chart of charts) {
+    expect(chart).not.toContain("block-beta");
+  }
+});
+
+it("C-6e: 図解のソースが左端揃え（先頭行にインデントが無い）", () => {
+  const { container } = render(<Page />);
+  const charts = Array.from(container.querySelectorAll('[data-testid="mermaid"]')).map(
+    (el) => el.textContent ?? ""
+  );
+  for (const chart of charts) {
+    const firstLine = chart.split("\n").find((l) => l.trim().length > 0) ?? "";
+    expect(firstLine).toBe(firstLine.trimStart());
+  }
+});
+```
+
+C-6c の `MERMAID_DIAGRAM_DECLARATION` は、監査スクリプトと同じ
+`.claude/skills/fix-mermaid/scripts/mermaid-diagram-types.mjs` から import する。
+許可種別は `graph` / `flowchart` / `sequenceDiagram` / `mindmap` / `stateDiagram-v2` /
+`gitGraph` / `erDiagram` / `classDiagram` / `journey` / `timeline` / `pie` であり、
+`block-beta` は共有定義に含めない。
+
+> **なぜ C-6e が要るのか**: Mermaid v10 は先頭インデントで構文エラーになる。
+> ビルドもテストも通るのに**ブラウザでだけ図が全滅する**という、最も発見が遅れる壊れ方をする。
+> 静的に弾けるので必ずテストに入れる。
+
+### 6-3: 図解の総数を原本から数えるコマンド
+
+```bash
+# HTML 原本（<div class="mermaid"> 方式 / DIAGRAMS オブジェクト方式の両方）
+grep -c 'class="mermaid"' archive/html/<ベンダー>/<原本>.html
+grep -cE "^\s*'diag-[^']*':" archive/html/<ベンダー>/<原本>.html
+
+# Markdown 原本
+grep -c '^```mermaid' archive/md/<ベンダー>/<原本>.md
+
+# 移植先
+grep -c '<MermaidDiagram' web-next/app/<provider>/<slug>/page.tsx
+```
+
+数が合わない場合は**図解の移行漏れ**である。原本照合監査（`.claude/skills/nextjs-page-migration/
+references/source-parity-audit.md`）と併せて解消してから Green コミットする。
+
+### 6-4: ユニットテストで検証できないこと（目視確認が必要）
+
+以下はブラウザでの目視確認が必須。`(cd web-next && bun run dev)` で確認する
+（Playwright MCP はこのプロジェクトでは使用しない）。
+
+- 図の中央寄せ・列幅への収まり
+- ダークモードの配色
+- ノードラベルのはみ出し
+- `stateDiagram-v2` の文字サイズ
 
 ---
 

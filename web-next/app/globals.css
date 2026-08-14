@@ -55,6 +55,12 @@
   --g-red: #ea4335;
   --g-cyan: #00bcd4;
   --g-purp: #8b5cf6;
+
+  /* ── 本文フォント ──
+   * Noto Sans JP は自前ホスト (public/fonts/noto-sans-jp.css) のため
+   * next/font の変数注入を受けない。ここで :root に定義する
+   * (--font-mono / --font-display は next/font が <html> へ注入)。 */
+  --font-sans: "Noto Sans JP";
 }
 
 /*
@@ -62,8 +68,9 @@
  * これで bg-acc / text-txt2 / border-brd 等の utility クラスが
  * 自動生成され、Phase 8 以降の Atomic UI を Tailwind で書ける。
  *
- * フォント系の --font-sans/--font-mono/--font-display は next/font が
- * <html> 要素に直接注入しており、CSS 側は var(--font-sans) で参照する。
+ * フォント系のうち --font-mono/--font-display は next/font が <html> 要素へ
+ * 直接注入し、--font-sans は上の :root で定義する (Noto Sans JP は自前ホスト)。
+ * いずれも CSS 側は var(--font-sans) 等で参照する。
  * Tailwind の font-sans utility を使う場合は同名の循環参照になるため、
  * ここでは theme にマッピングせず、必要なら font-[var(--font-sans)] 形式
  * か専用の `--font-*` エイリアスを別途追加する方針とする。

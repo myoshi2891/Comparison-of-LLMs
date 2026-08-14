@@ -38,6 +38,18 @@ describe("/copilot/markdown-file-guide", () => {
     expect(codeBlocks.length).toBeGreaterThan(0);
   });
 
+  it("excludeAgent は公式の code-review / cloud-agent 値だけを案内する", () => {
+    const { container } = render(<Page />);
+    const excludeAgentValues = Array.from(container.querySelectorAll("pre")).flatMap((block) =>
+      Array.from(
+        block.textContent?.matchAll(/excludeAgent:\s*"([^"]+)"/g) ?? [],
+        (match) => match[1]
+      )
+    );
+
+    expect(excludeAgentValues).toEqual(["code-review", "cloud-agent"]);
+  });
+
   it("metadata.title と metadata.description が定義されている", () => {
     expect(metadata.title).toBeTruthy();
     expect(typeof metadata.title).toBe("string");

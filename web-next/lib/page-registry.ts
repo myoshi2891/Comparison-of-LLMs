@@ -384,7 +384,7 @@ const entries: PageEntry[] = [
     summary:
       "GitHub Copilot .agent.md の完全ベストプラクティスガイド。フロントマター全仕様・ステップバイステップ作成・Handoffs（エージェント連鎖）・Subagents（サブエージェント）・MCP統合・マルチエージェント設計パターン・トラブルシューティングを 2026年6月最新版の公式ドキュメント準拠で解説。Cloud agent GA・組織/エンタープライズエージェント（JetBrains）・Copilot code review の AGENTS.md 対応に対応。",
     addedAt: "2026-04-27",
-    lastReviewed: "2026-07-01",
+    lastReviewed: "2026-08-12",
   },
   {
     slug: "/copilot/github-copilot",

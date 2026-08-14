@@ -2,7 +2,7 @@
 
 > 本ファイルは Next.js 移行完了後の保守・改善フェーズにおける開発の進捗（特にテスト関連）および品質チェックのルールを記録する。
 >
-> - 最終更新日: **Updated 2026-08-11**
+> - 最終更新日: **Updated 2026-08-14**
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
 
@@ -11,14 +11,49 @@
 - **フェーズ**: 保守・機能改善・品質強化フェーズ
 - **ブランチ**: `dev`（本番 `main` への Next.js 移行マージ完了 🚀）
 - **動作検証**:
-  - `npm run build` ⏭️（今回もユーザー指定により省略。CI等で実施）
-  - `npm run typecheck` ✅（サンドボックスではユーザー指定により npm を使用。`package.json` の `typecheck` スクリプトは `tsc --noEmit` で、`bun run typecheck` と同じスクリプトを実行）
-  - `npm run lint` ✅（452 files checked、diagnostics 0）
+  - `bun run build`: 今回はユーザー指定により未実行（直近の成功記録は 2026-08-13。許可環境または CI で再確認する）
+  - `npm run typecheck` ✅（`tsc --noEmit`。2026-08-14 実測）
+  - `npm run lint` ✅（Biome check / 457 files / 0 diagnostics。2026-08-14 実測）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: `npm test` で Vitest **162 files / 1447 tests すべて合格**（収集失敗なし）。サンドボックスではユーザー指定により npm を使用し、`package.json` の `test` スクリプト `vitest run` を実行するため `(cd web-next && bun run test)` と同等
+  - **フロントエンド (`web-next/`)**: `npm test` で Vitest **164 files / 1467 tests すべて合格**（2026-08-14 実測。全 Green ✅）
   - **バックエンド (`scraper/`)**: pytest 実行で **43 件すべて合格** (全 Green ✅)
 
 ## 最近の追加内容
+
+- **レビュー指摘の再検証 — エージェント案内・フォント公開順序・OpenClaw境界の明確化**:
+  - `AGENTS.md`と`GEMINI.md`の検証コマンドをbunへ統一し、`GEMINI.md`の必読順を`CODEX.md`、`CLAUDE.md`、移行文書の順へ同期。
+  - Noto Sans JP生成スクリプトの契約を、全downloadとstaged CSS/preload書き込みが現行世代の昇格より前に並ぶことを順序込み完全一致で検証する形へ強化。
+  - OpenClawの`bootstrapMode=none`と通常のcontext injectionを分離し、embedded harnessとnative Codexのファイル別経路を図示。Fiuの不正返信0件は返信禁止指示下の限定結果であり、自由な外部送信の安全性を証明しないと明記。
+  - サンドボックスではユーザー指定によりnpmを使用。Vitest **164 files / 1467 tests**、typecheck、lint（457 files / 0 diagnostics）、pytest **43件**がGreen。ユーザー指定によりbuildと目視確認は省略。
+
+- **レビュー指摘の再検証 — フォント生成の原子化・契約強化・移行監査拡張**:
+  - Noto Sans JP の woff2・CSS・preload module を一時世代へ全件生成し、成功後だけ現行世代と置換するよう変更。昇格途中の失敗時も旧世代へ復元する。preload URL、`:root` の `--font-sans`、layout の named import / font variable classes は完全一致契約へ強化。
+  - 原本照合監査は HTML / Markdown / TSX の h1〜h6、SVG、callout / alert をインベントリ化し、欠落・改変を blocking failure（exit 1）として扱う。Node 回帰テストは **11件**すべて合格。
+  - OpenClaw の条件付き `HEARTBEAT.md`、git worktree の signal trap、Netlify の Noto Sans JP 限定コメントを修正。`npm test` **164 files / 1467 tests**、typecheck、lint（457 files / 0 diagnostics）が Green。ユーザー指定により build と目視確認は省略。
+
+- **Netlify ビルド失敗（Turbopack 496 errors）の恒久対処 — Noto Sans JP の自前ホスト化**:
+  - 原因は `next/font/google` が Google Fonts の `@font-face` を**全件**ビルド時に取得する挙動。Noto Sans JP は CJK を `unicode-range` で 124 分割 × weight 4 種 = **496 `@font-face`** を返し、その一括取得が Netlify のビルドコンテナで失敗して `Can't resolve '@vercel/turbopack-next/internal/font/google/font'` が 496 件出ていた（`subsets: ["latin"]` は preload 判定のみでダウンロード数を減らさない）。SWC バイナリ欠損や `--webpack` 切り替えは的外れで、`netlify.toml` の該当コメントも訂正済み。
+  - 対策: `web-next/scripts/vendor-noto-sans-jp.ts` で woff2 124 本 + `@font-face` CSS 496 件 + latin preload リストを生成し `web-next/public/fonts/` へ vendor。`lib/fonts.ts` は latin のみで完結する JetBrains Mono / Syne だけを `next/font` で読み、`--font-sans` は `globals.css` の `:root` で定義。`app/layout.tsx` は React 19 の `precedence` 付き `<link rel="stylesheet">` と latin preload を出力する。
+  - 検証: `out/index.html` の `<head>` に stylesheet / preload が巻き上がることを確認。`out/_next/static/media` は 7.5MB → 184KB（mono/syne のみ）、フォント CSS は 449KB / brotli 18.9KB。契約テスト `web-next/tests/fonts-selfhost.test.ts` を 11 件追加（Vitest **164 files / 1466 tests** 全 Green ✅、typecheck / lint / build も Green）。
+
+- **移行監査・Mermaid契約・ガイド原稿のレビュー指摘対応**:
+  - 原本照合監査でHTML/Markdown/TSXの通常段落を出現回数込みのblocking対象へ追加し、MarkdownのMermaidフェンスを通常コードブロックから分離。`.markdown`入力にも対応。
+  - Mermaid許可図種別を共有定義へ集約して`pie`を追加し、`block-beta`は引き続き禁止。C-6aの比較は外側空行と最小共通インデントだけを除去して相対インデントを保持。
+  - OpenClaw bootstrapMode図、git worktree失敗時cleanup、Copilot coding agentの`AGENTS.md`優先順位、Copilot Code Reviewの一次資料・動的ベンチマーク記述を修正。
+  - Node回帰テスト **7件**、npmでVitest **163 files / 1455 tests**、typecheck、変更対象のMarkdown lintがGreen。ユーザー指定によりビルドと目視確認は省略。
+
+- **レビュー指摘の再検証とガイド・契約テストの修正**:
+  - OpenClawのbootstrapMode条件を厳密化し、通常セッションとサブエージェントのブートストラップファイル経路を分離。
+  - Copilot Code Reviewのレビュー深度・コスト削減・Martianベンチマーク・`.agent.md`とPlaywright MCPの説明を一次情報に合わせて修正。
+  - Git worktreeのポート確認を助言的チェックとして明記し、gwtの`.env`操作をGitルート基準へ統一。
+  - `/copilot/markdown-file-guide`の`excludeAgent`契約をコードブロックから抽出した値の完全一致に強化。npmでVitest **163 files / 1455 tests**、対象Biome、typecheckがGreen。ユーザー指定によりビルドと目視確認は省略。
+
+- **GitHub Copilot .agent.md 実践ガイド（/copilot/agent）の Pure JSX 完全置き換え移行**:
+  - `Github-copilot-agent-md-guide.html` を `web-next/app/copilot/agent/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。
+  - 要約・省略なしで全10セクション（1. .agent.md とは何か〜10. 参考文献）、全52サブセクション（h3）、全表、全コードブロック（1行毎 `codeLine` ラッパー & 構文トークン化）、6 Mermaid図（`MermaidDiagram`）、TOCスクロール追従（`TocObserver.tsx`）、`TocObserver.test.tsx` の単体テスト・スクロールスパイ計算、`page-registry.ts` の内容更新・`lastReviewed` (2026-08-12) を完了。
+  - 既存の旧 `/copilot/agent` コンテンツと完全入れ替え完了。
+  - 原本 `Github-copilot-agent-md-guide.html` は `archive/Github-copilot-agent-md-guide.html` へ `git mv` 退避保存。
+  - 契約テスト11件および TocObserver テスト4件（計15件）を作成し全クリア（**2026-08-12、commit `4031d76`時点**: Vitest **163 files / 1454 tests** 全 Green ✅）。
 
 - **GitHub Copilot Agent Skills 公開仕様と Google Sandbox TOC アクセシビリティの修正**:
   - `/copilot/skill` の検証コマンドを `gh skill publish --dry-run` に統一し、公式に確認できない ToxicSkills 検出の説明を削除。ローカル導入の `--from-local` と `metadata.local-path` を明記し、公開用 `allowed-tools` の全例を空白区切り文字列へ統一。

@@ -7,7 +7,14 @@
   },
   "files": {
     "ignoreUnknown": false,
-    "includes": ["**", "!.next", "!node_modules", "!next-env.d.ts", "!app/globals.css"]
+    "includes": [
+      "**",
+      "!.next",
+      "!node_modules",
+      "!next-env.d.ts",
+      "!app/globals.css",
+      "!public/fonts"
+    ]
   },
   "formatter": {
     "enabled": true,

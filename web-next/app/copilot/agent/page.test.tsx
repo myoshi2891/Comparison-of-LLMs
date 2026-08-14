@@ -1,21 +1,4 @@
-// Phase C-4 [Red] contract test.
-// All 8 tests fail until page.tsx is implemented.
-
-/**
- * Phase C-4 契約テスト (/copilot/agent)。
- *
- * 固定する契約:
- * - `metadata` が export され、title に「Copilot」を含む
- * - `<h1>` が 1 つ存在し、`Copilot` を含む
- * - 20 個の section id が存在する (s01〜s19 + sources)
- *   (legacy は <div class="sec"> × 11、id 属性なし → synthetic id 付与。
- *    s04 は 9 サブセクション h2 を持つため s04〜s13 に分割)
- * - 20 個の TOC リンクが `#section-id` 形式で存在する
- * - 外部リンク (http/https) には全て `target="_blank"` かつ
- *   `rel="noopener noreferrer"` が付与されている
- * - `sources` セクション内に 15 件以上の外部リンクが存在する
- * - 静的検査: 生 HTML 流し込み API (React の XSS 危険 prop) を使用していない
- */
+// @vitest-environment jsdom
 
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
@@ -25,41 +8,32 @@ import { describe, expect, it } from "vitest";
 import CopilotAgentPage, { metadata as rawMetadata } from "@/app/copilot/agent/page";
 
 const Page = CopilotAgentPage as unknown as () => ReactElement;
-// Next.js の Metadata 型を避けるための最小ローカル型 (実体は Metadata オブジェクト)。
+
 type MetadataLike = { title?: unknown; description?: unknown };
 const metadata = rawMetadata as unknown as MetadataLike;
 
 const EXPECTED_SECTION_IDS = [
-  "s01",
-  "s02",
-  "s03",
-  "s04",
-  "s05",
-  "s06",
-  "s07",
-  "s08",
-  "s09",
-  "s10",
-  "s11",
-  "s12",
-  "s13",
-  "s14",
-  "s15",
-  "s16",
-  "s17",
-  "s18",
-  "s19",
-  "sources",
+  "overview",
+  "frontmatter",
+  "stepbystep",
+  "handoffs",
+  "subagents",
+  "mcp",
+  "patterns",
+  "troubleshooting",
+  "bestpractices",
+  "references",
 ] as const;
 
 describe("/copilot/agent - metadata", () => {
-  it("exports a metadata object with title containing Copilot", () => {
+  it("exports a metadata object with title containing Copilot and .agent.md", () => {
     expect(metadata).toBeDefined();
     const title =
       typeof metadata.title === "string"
         ? metadata.title
         : (metadata.title as { default?: string } | undefined)?.default;
-    expect(title).toMatch(/Copilot/);
+    expect(title).toMatch(/\.agent\.md/);
+    expect(title).toMatch(/GitHub Copilot/);
   });
 
   it("exports a metadata object with non-empty description", () => {
@@ -69,14 +43,14 @@ describe("/copilot/agent - metadata", () => {
 });
 
 describe("/copilot/agent - page structure", () => {
-  it("renders an <h1> containing 'Copilot'", () => {
+  it("renders an <h1> containing '.agent.md 実践ガイド'", () => {
     const { container } = render(<Page />);
     const h1 = container.querySelector("h1");
     expect(h1).not.toBeNull();
-    expect(h1?.textContent).toMatch(/Copilot/);
+    expect(h1?.textContent).toMatch(/\.agent\.md 実践ガイド/);
   });
 
-  it("renders all 20 expected section ids", () => {
+  it("renders all 10 expected section ids", () => {
     const { container } = render(<Page />);
     for (const id of EXPECTED_SECTION_IDS) {
       const el = container.querySelector(`#${id}`);
@@ -84,7 +58,7 @@ describe("/copilot/agent - page structure", () => {
     }
   });
 
-  it("renders 20 TOC links pointing to all section anchors", () => {
+  it("renders 10 TOC links pointing to all section anchors", () => {
     const { container } = render(<Page />);
     const tocAnchors = container.querySelectorAll('nav a[href^="#"]');
     const tocHrefs = Array.from(tocAnchors).map((a) => a.getAttribute("href"));
@@ -94,6 +68,24 @@ describe("/copilot/agent - page structure", () => {
     for (const id of EXPECTED_SECTION_IDS) {
       expect(tocHrefs, `TOC must link to #${id}`).toContain(`#${id}`);
     }
+  });
+
+  it("renders exactly 52 h3 subsections", () => {
+    const { container } = render(<Page />);
+    const h3s = container.querySelectorAll("h3");
+    expect(h3s.length).toBe(52);
+  });
+
+  it("renders 6 Mermaid diagrams within wrappers", () => {
+    const { container } = render(<Page />);
+    const diagrams = container.querySelectorAll("[data-testid='mermaid-diagram'], [data-mermaid]");
+    expect(diagrams.length).toBe(6);
+  });
+
+  it("renders callout boxes with proper data-variant", () => {
+    const { container } = render(<Page />);
+    const callouts = container.querySelectorAll("[data-variant]");
+    expect(callouts.length).toBeGreaterThanOrEqual(3);
   });
 });
 
@@ -113,20 +105,19 @@ describe("/copilot/agent - external link safety", () => {
     }
   });
 
-  it("sources section contains at least 15 external links", () => {
+  it("references section contains at least 5 external reference cards/links", () => {
     const { container } = render(<Page />);
-    const sources = container.querySelector("#sources");
-    expect(sources).not.toBeNull();
-    if (!sources) throw new Error("sources is null");
-    const externals = sources.querySelectorAll('a[href^="http://"], a[href^="https://"]');
-    expect(externals.length).toBeGreaterThanOrEqual(15);
+    const references = container.querySelector("#references");
+    expect(references).not.toBeNull();
+    if (!references) throw new Error("references section is null");
+    const externals = references.querySelectorAll('a[href^="http://"], a[href^="https://"]');
+    expect(externals.length).toBeGreaterThanOrEqual(5);
   });
 });
 
 describe("/copilot/agent - static source safety", () => {
-  it("does not use the React raw-HTML injection prop", () => {
+  it("does not use React raw-HTML injection prop", () => {
     const source = readFileSync(join(__dirname, "page.tsx"), "utf8");
-    // オブフスケート (false positive / prompt hook 誤検知回避)。
     const needle = ["danger", "ously", "Set", "Inner", "HTML"].join("");
     expect(source.includes(needle)).toBe(false);
   });

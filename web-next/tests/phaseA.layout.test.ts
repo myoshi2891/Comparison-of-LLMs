@@ -77,11 +77,22 @@ describe("Phase A - body composition", () => {
 });
 
 describe("Phase A - regression guards", () => {
-  it("still imports the three next/font variables from @/lib/fonts", () => {
-    expect(layoutSrc).toMatch(
-      /import\s*\{[^}]*\bnotoSansJp\b[^}]*\}\s*from\s*["']@\/lib\/fonts["']/
+  it("still imports the next/font variables from @/lib/fonts", () => {
+    // Noto Sans JP は自前ホストへ移行済み (tests/fonts-selfhost.test.ts)。
+    // next/font 経由で残るのは latin のみの JetBrains Mono / Syne。
+    const namedImport =
+      /import\s*\{([^}]*)\}\s*from\s*["']@\/lib\/fonts["']/.exec(layoutSrc)?.[1] ?? "";
+    const importedFonts = namedImport
+      .split(",")
+      .map((name) => name.trim())
+      .filter(Boolean);
+    const htmlClassExpression = /<html\b[^>]*className=\{`([^`]*)`\}/.exec(layoutSrc)?.[1] ?? "";
+    const htmlFontClasses = Array.from(
+      htmlClassExpression.matchAll(/\$\{(\w+)\.variable\}/g),
+      (match) => match[1]
     );
-    expect(layoutSrc).toMatch(/\bjetbrainsMono\b/);
-    expect(layoutSrc).toMatch(/\bsyne\b/);
+
+    expect(importedFonts).toEqual(["jetbrainsMono", "syne"]);
+    expect(htmlFontClasses).toEqual(["jetbrainsMono", "syne"]);
   });
 });
