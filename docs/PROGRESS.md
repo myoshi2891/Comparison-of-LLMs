@@ -20,6 +20,12 @@
 
 ## 最近の追加内容
 
+- **レビュー指摘の再検証 — エージェント案内・フォント公開順序・OpenClaw境界の明確化**:
+  - `AGENTS.md`と`GEMINI.md`の検証コマンドをbunへ統一し、`GEMINI.md`の必読順を`CODEX.md`、`CLAUDE.md`、移行文書の順へ同期。
+  - Noto Sans JP生成スクリプトの契約を、全downloadとstaged CSS/preload書き込みが現行世代の昇格より前に並ぶことを順序込み完全一致で検証する形へ強化。
+  - OpenClawの`bootstrapMode=none`と通常のcontext injectionを分離し、embedded harnessとnative Codexのファイル別経路を図示。Fiuの不正返信0件は返信禁止指示下の限定結果であり、自由な外部送信の安全性を証明しないと明記。
+  - サンドボックスではユーザー指定によりnpmを使用。Vitest **164 files / 1467 tests**、typecheck、lint（457 files / 0 diagnostics）、pytest **43件**がGreen。ユーザー指定によりbuildと目視確認は省略。
+
 - **レビュー指摘の再検証 — フォント生成の原子化・契約強化・移行監査拡張**:
   - Noto Sans JP の woff2・CSS・preload module を一時世代へ全件生成し、成功後だけ現行世代と置換するよう変更。昇格途中の失敗時も旧世代へ復元する。preload URL、`:root` の `--font-sans`、layout の named import / font variable classes は完全一致契約へ強化。
   - 原本照合監査は HTML / Markdown / TSX の h1〜h6、SVG、callout / alert をインベントリ化し、欠落・改変を blocking failure（exit 1）として扱う。Node 回帰テストは **11件**すべて合格。
