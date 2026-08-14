@@ -75,10 +75,10 @@ function requireDeclaration(block: string, pattern: RegExp, label: string): stri
 }
 
 /**
- * Parses Google Fonts CSS into ordered font-face definitions and associates each subset label with the following definition.
+ * Parses Google Fonts CSS into ordered font-face definitions.
  *
  * @param css - The Google Fonts CSS to parse
- * @returns The parsed font-face definitions
+ * @returns The parsed font-face definitions, including subset, style, weight, Unicode range, remote URL, and local file name
  */
 function parseFaces(css: string): ParsedFace[] {
   const faces: ParsedFace[] = [];
