@@ -189,7 +189,7 @@ function collectMarkupCalloutElements(src) {
 /**
  * Extract supported Markdown callouts and classify them by variant.
  * @param {string} src - Markdown source containing callout blocks.
- * @returns {string[]} Normalized callout keys prefixed with `warn`, `info`, or `tip`.
+ * @return {string[]} Callout keys in the form `warn::key`, `info::key`, or `tip::key`, based on the callout type and normalized body.
  */
 function collectMarkdownCalloutElements(src) {
   const callouts = [];
@@ -361,9 +361,9 @@ function collectHtmlMermaidSources(src) {
 }
 
 /**
- * Collect Mermaid chart sources from `MermaidDiagram` components in their occurrence order.
+ * Collect normalized Mermaid chart sources from `MermaidDiagram` components in occurrence order.
  * @param {string} src - The complete contents of `page.tsx`.
- * @returns {string[]} The normalized Mermaid sources, including markers for unresolved constant references.
+ * @returns {string[]} The normalized Mermaid sources, or unresolved-reference markers for constants that cannot be resolved.
  */
 function collectTsxMermaidSources(src) {
   const constants = collectStringConstants(src);
@@ -397,12 +397,10 @@ function normalizeUrl(url) {
 // --------------------------------------------------------------------------
 
 /**
- * Builds an inventory of headings, lists, code blocks, tables, paragraphs, diagrams, callouts, and external links in Markdown source.
+ * Extracts structural elements and external links from Markdown source.
  *
- * Fenced content is treated as code and excluded from heading and list extraction.
- *
- * @param {string} src - The complete Markdown source.
- * @return {Object} The extracted element inventory and occurrence counts.
+ * @param {string} src - The complete Markdown source to inspect.
+ * @return {Object} An inventory containing headings, list items, code blocks, table rows, paragraphs, Mermaid sources, SVG elements, callouts, and external links with occurrence counts where applicable.
  */
 function inventoryMarkdown(src) {
   const lines = src.split(/\r?\n/);
