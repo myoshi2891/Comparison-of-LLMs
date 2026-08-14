@@ -24,6 +24,9 @@ const COPILOT_AGENT_THEME_VARS = {
   fontSize: "16px",
 };
 
+/**
+ * Renders a practical guide to GitHub Copilot custom agents defined with `.agent.md`.
+ */
 export default function CopilotAgentPage() {
   return (
     <div className={styles.layout}>

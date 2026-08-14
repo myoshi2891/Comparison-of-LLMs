@@ -47,19 +47,39 @@ type ParsedFace = {
   fileName: string;
 };
 
-/** gstatic のファイル名はコンテンツハッシュ。先頭 `-` だけ CLI 互換のため退避する。 */
+/**
+ * Derives a local file name from a remote font URL.
+ *
+ * @param remoteUrl - The remote URL containing the file name
+ * @returns The URL's final path segment, prefixed with `f` when it starts with `-`
+ * @throws Error if the URL does not contain a file name
+ */
 function toFileName(remoteUrl: string): string {
   const base = remoteUrl.split("/").pop();
   if (!base) throw new Error(`cannot derive file name from ${remoteUrl}`);
   return base.startsWith("-") ? `f${base}` : base;
 }
 
+/**
+ * Extracts a required declaration value from a CSS block.
+ *
+ * @param block - The CSS block containing the declaration
+ * @param pattern - The pattern used to capture the declaration value
+ * @param label - The declaration name used in the error message
+ * @returns The trimmed declaration value
+ */
 function requireDeclaration(block: string, pattern: RegExp, label: string): string {
   const value = pattern.exec(block)?.[1];
   if (!value) throw new Error(`@font-face without ${label}:\n${block}`);
   return value.trim();
 }
 
+/**
+ * Parses Google Fonts CSS into ordered font-face definitions.
+ *
+ * @param css - The Google Fonts CSS to parse
+ * @returns The parsed font-face definitions, including subset, style, weight, Unicode range, remote URL, and local file name
+ */
 function parseFaces(css: string): ParsedFace[] {
   const faces: ParsedFace[] = [];
   let subset = "";
@@ -88,12 +108,24 @@ function parseFaces(css: string): ParsedFace[] {
   return faces;
 }
 
+/**
+ * Retrieves text content from a URL.
+ *
+ * @param url - The URL to request
+ * @returns The response body as text
+ */
 async function fetchText(url: string): Promise<string> {
   const res = await fetch(url, { headers: { "User-Agent": WOFF2_USER_AGENT } });
   if (!res.ok) throw new Error(`GET ${url} -> ${res.status}`);
   return await res.text();
 }
 
+/**
+ * Downloads font files and saves them to the destination directory.
+ *
+ * @param urls - A map of local file names to remote font URLs
+ * @param destinationDir - The directory where downloaded files are saved
+ */
 async function downloadAll(urls: Map<string, string>, destinationDir: string): Promise<void> {
   const entries = [...urls.entries()];
   let cursor = 0;
@@ -124,7 +156,13 @@ type StagedGeneration = {
   stagedPreloadOut: string;
 };
 
-/** 全生成物が揃った後だけ現行世代と入れ替え、途中失敗時は旧世代へ戻す。 */
+/**
+ * Promotes a fully prepared generation to the current output locations.
+ *
+ * If promotion fails, restores the previously backed-up generation.
+ *
+ * @param generation - The staged font files and generated modules to publish
+ */
 function promoteStagedGeneration(generation: StagedGeneration): void {
   const backupRoot = join(generation.stagingRoot, "previous");
   mkdirSync(backupRoot);
@@ -162,6 +200,12 @@ function promoteStagedGeneration(generation: StagedGeneration): void {
   }
 }
 
+/**
+ * Generates CSS `@font-face` declarations that reference the vendored font files.
+ *
+ * @param faces - Parsed font-face definitions to include in the generated stylesheet
+ * @returns The generated CSS stylesheet
+ */
 function renderCss(faces: ParsedFace[]): string {
   const lines = [
     "/*",
@@ -194,6 +238,12 @@ function renderCss(faces: ParsedFace[]): string {
   return lines.join("\n");
 }
 
+/**
+ * Generates a TypeScript module containing preload URLs for the Latin font slices.
+ *
+ * @param hrefs - The local font URLs to include in the preload list
+ * @returns The generated TypeScript module source
+ */
 function renderPreloadModule(hrefs: string[]): string {
   return [
     "/**",
@@ -212,6 +262,11 @@ function renderPreloadModule(hrefs: string[]): string {
   ].join("\n");
 }
 
+/**
+ * Vendors Noto Sans JP assets and generated metadata from Google Fonts.
+ *
+ * @returns Nothing.
+ */
 async function main(): Promise<void> {
   console.log(`fetching ${CSS_URL}`);
   const remoteCss = await fetchText(CSS_URL);
