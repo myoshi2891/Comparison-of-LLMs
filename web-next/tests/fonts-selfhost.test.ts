@@ -147,10 +147,24 @@ describe("self-hosted Noto Sans JP - wiring", () => {
   });
 
   it("stages every generated artifact before replacing the current generation", () => {
-    expect(vendorScript).toMatch(/mkdtempSync\(/);
-    expect(vendorScript).toMatch(/downloadAll\(filesByName,\s*stagedOutDir\)/);
-    expect(vendorScript).toMatch(/writeFileSync\(stagedCssOut,/);
-    expect(vendorScript).toMatch(/writeFileSync\(stagedPreloadOut,/);
-    expect(vendorScript).toMatch(/promoteStagedGeneration\(/);
+    const mainBody = vendorScript.slice(vendorScript.indexOf("async function main()"));
+    const publicationOrder = Array.from(
+      mainBody.matchAll(
+        /mkdtempSync\(|downloadAll\(filesByName,\s*stagedOutDir\)|writeFileSync\(stagedCssOut,|writeFileSync\(stagedPreloadOut,|promoteStagedGeneration\(/g
+      ),
+      (match) => {
+        if (match[0].includes("stagedCssOut")) return "write staged CSS";
+        if (match[0].includes("stagedPreloadOut")) return "write staged preload";
+        return match[0].replace(/\(.*/, "");
+      }
+    );
+
+    expect(publicationOrder).toEqual([
+      "mkdtempSync",
+      "downloadAll",
+      "write staged CSS",
+      "write staged preload",
+      "promoteStagedGeneration",
+    ]);
   });
 });
