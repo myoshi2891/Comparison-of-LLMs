@@ -20,7 +20,6 @@
   --color-border-tertiary: #1c2e46;
 
   --accent: #7c9eff;
-  --accent-soft: rgba(124, 158, 255, 0.14);
 
   --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
 
@@ -35,6 +34,9 @@
   box-sizing: border-box;
   background: var(--color-background-primary);
   color: var(--color-text-primary);
+  font-size: 16px;
+  line-height: 1.7;
+  font-weight: 400;
   position: relative;
 }
 
@@ -63,52 +65,7 @@
   font-size: 13px;
 }
 
-.codeBlock {
-  background: var(--color-background-secondary);
-  border: 1px solid var(--color-border-tertiary);
-  border-radius: var(--border-radius-md);
-  padding: 16px 18px;
-  overflow-x: auto;
-  margin: 16px 0;
-  font-family: var(--font-mono);
-  font-size: 13px;
-  line-height: 1.6;
-  color: var(--color-text-primary);
-}
-
-.codeLine {
-  white-space: pre;
-  min-height: 1.4em;
-}
-
-.ck {
-  color: #d89be0;
-  font-weight: 600;
-}
-
-.cv {
-  color: #8fb2ff;
-}
-
-.cs {
-  color: #b7d99a;
-}
-
-.cw {
-  color: #e8b168;
-}
-
-.cc {
-  color: #6b6f87;
-  font-style: italic;
-}
-
-.cm {
-  color: #f2c572;
-  font-weight: 600;
-}
-
-/* Sidebar */
+/* Sidebar Toggle (Mobile) */
 .sidebarToggle {
   display: none;
   position: fixed;
@@ -117,9 +74,9 @@
   z-index: 60;
   width: 44px;
   height: 44px;
+  border: 1px solid var(--color-border-secondary);
   border-radius: var(--border-radius-md);
   background: var(--color-background-secondary);
-  border: 1px solid var(--color-border-secondary);
   color: var(--color-text-primary);
   font-size: 20px;
   cursor: pointer;
@@ -132,10 +89,11 @@
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(1, 4, 9, 0.72);
   z-index: 40;
+  background: rgba(1, 4, 9, 0.72);
 }
 
+/* Sidebar - Original Faithful Styling */
 .sidebar {
   position: sticky;
   top: var(--header-height, 60px);
@@ -189,7 +147,7 @@
   gap: 10px;
   padding: 8px 10px;
   border-radius: var(--border-radius-md);
-  color: var(--color-text-secondary);
+  color: var(--color-text-secondary) !important;
   font-size: 13px;
   font-weight: 400;
   line-height: 1.4;
@@ -209,12 +167,12 @@
 .navLink:hover {
   background: var(--color-background-tertiary);
   text-decoration: none;
-  color: var(--color-text-primary);
+  color: var(--color-text-primary) !important;
 }
 
 .navLink.active {
   background: var(--color-background-tertiary);
-  color: var(--color-text-primary);
+  color: var(--color-text-primary) !important;
   font-weight: 500;
   border: 1px solid var(--color-border-secondary);
 }
@@ -223,15 +181,17 @@
   color: var(--accent);
 }
 
-/* Main Content */
+/* Main Content (Full Width) */
 .content {
   flex: 1;
   min-width: 0;
+  width: 100%;
+  max-width: none;
   padding: 48px 56px 90px 56px;
-  max-width: 1200px;
   box-sizing: border-box;
 }
 
+/* Hero */
 .hero {
   border-bottom: 1px solid var(--color-border-tertiary);
   padding-bottom: 28px;
@@ -318,7 +278,7 @@
   color: var(--color-text-warning);
 }
 
-/* Sections & Typography */
+/* Sections */
 .layout section {
   margin-bottom: 52px;
   scroll-margin-top: calc(var(--header-height, 60px) + 28px);
@@ -387,9 +347,9 @@
 
 .layout ul,
 .layout ol {
-  margin: 0 0 16px 0;
-  padding-left: 22px;
   color: var(--color-text-secondary);
+  padding-left: 22px;
+  margin: 0 0 16px 0;
 }
 
 .layout li {
@@ -443,6 +403,69 @@
 
 .tableWrap :global(tbody td code) {
   white-space: nowrap;
+}
+
+/* Atom One Dark Syntax Highlight Colors */
+.codeBlock {
+  background: var(--color-background-secondary); /* #0d1b2e */
+  border: 1px solid var(--color-border-tertiary); /* #1c2e46 */
+  border-radius: var(--border-radius-md);
+  padding: 16px 18px;
+  overflow-x: auto;
+  margin: 16px 0;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.6;
+  color: #abb2bf;
+}
+
+.codeLine {
+  white-space: pre;
+  min-height: 1.4em;
+  color: #abb2bf;
+}
+
+.cm {
+  /* Markdown Headings */
+  color: #e06c75;
+  font-weight: 600;
+}
+
+.ck {
+  /* Keywords, YAML Keys */
+  color: #c678dd;
+  font-weight: 600;
+}
+
+.cv {
+  /* Variables, Properties */
+  color: #e06c75;
+}
+
+.cs {
+  /* Strings, Globs, Paths */
+  color: #98c379;
+}
+
+.cn {
+  /* Numbers, Constants */
+  color: #d19a66;
+}
+
+.cw {
+  /* Warning, Highlights */
+  color: #e5c07b;
+}
+
+.cc {
+  /* Comments */
+  color: #5c6370;
+  font-style: italic;
+}
+
+.fn {
+  /* Function Names, Methods */
+  color: #61afef;
 }
 
 /* Checklist */

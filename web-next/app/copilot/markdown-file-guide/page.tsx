@@ -402,7 +402,7 @@ export default function MarkdownFileGuidePage() {
           </p>
 
           <h3>ベストプラクティス</h3>
-          <ul>
+          <ol>
             <li>
               <strong>簡潔・具体的に書く</strong>: GitHub公式ブログの「5
               tips」でも、完璧を目指しすぎず「不完全な instructions
@@ -435,7 +435,7 @@ export default function MarkdownFileGuidePage() {
               copilot-instructions.md
               にあるコーディング規約を要約して」のように尋ね、正確な要約が返ってくるかで読み込まれているか検証できます。
             </li>
-          </ul>
+          </ol>
 
           <h3>サンプル</h3>
           <pre className={styles.codeBlock}>
