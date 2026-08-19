@@ -1,0 +1,14 @@
+"use client";
+
+import { useTocObserver } from "@/lib/useTocObserver";
+import styles from "./page.module.css";
+
+export default function TocObserver() {
+  useTocObserver({
+    chapterSelector: "section[id]",
+    tocLinkSelector: `.${styles.tocLink}`,
+    activeClassName: styles.active,
+  });
+
+  return null;
+}

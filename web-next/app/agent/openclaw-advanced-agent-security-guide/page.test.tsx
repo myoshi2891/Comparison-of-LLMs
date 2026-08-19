@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { render, screen } from "@testing-library/react";
+import { render } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import Page, { metadata } from "./page";
 import styles from "./page.module.css";
@@ -11,12 +11,12 @@ vi.mock("@/components/docs/MermaidDiagram", () => ({
 }));
 
 vi.mock("@/components/docs/CodeCopyButton", () => ({
-  default: function DummyCodeCopyButton({ code }: { code: string }) {
-    return <button type="button" data-testid="code-copy-button" data-code={code}>Copy</button>;
+  default: function DummyCodeCopyButton({ text }: { text: string }) {
+    return <button type="button" data-testid="code-copy-button" data-code={text}>Copy</button>;
   },
 }));
 
-const EXPECTED_H1 = ["OpenClaw Agent 実践ベストプラクティスガイド"] as const;
+const EXPECTED_H1 = ["OpenClaw Agent実践ベストプラクティスガイド"] as const;
 
 const EXPECTED_H2 = [
   "OpenClawとは何か",
@@ -114,106 +114,106 @@ const EXPECTED_EXTERNAL_LINKS = [
 
 const EXPECTED_MERMAID_SOURCES = [
   `flowchart TB
-subgraph CH["チャネル層 (Channel)"]
-    A1["WhatsApp"]
-    A2["Telegram"]
-    A3["Slack / Discord"]
-    A4["iMessage / Matrix など"]
-end
-A1 ~~~ A2 ~~~ A3 ~~~ A4
-CH --> GW["Gateway
-唯一の信頼境界・セッション管理"]
-GW --> BR["エージェントランタイム (Brain)
-推論・モデルルーティング"]
-BR --> BO["ツール実行層 (Body)
-シェル / ブラウザ / 外部API"]
-BR <--> WS[("ワークスペース
-SOUL.md / MEMORY.md 等")]
-BO --> EXT[("外部システム / ローカルファイル")]`,
+    subgraph CH["チャネル層 (Channel)"]
+        A1["WhatsApp"]
+        A2["Telegram"]
+        A3["Slack / Discord"]
+        A4["iMessage / Matrix など"]
+    end
+    A1 ~~~ A2 ~~~ A3 ~~~ A4
+    CH --> GW["Gateway
+    唯一の信頼境界・セッション管理"]
+    GW --> BR["エージェントランタイム (Brain)
+    推論・モデルルーティング"]
+    BR --> BO["ツール実行層 (Body)
+    シェル / ブラウザ / 外部API"]
+    BR <--> WS[("ワークスペース
+    SOUL.md / MEMORY.md 等")]
+    BO --> EXT[("外部システム / ローカルファイル")]`,
 
   `flowchart TB
-S1["1. Normalize
-チャネル入力の正規化"] --> S2["2. Route
-セッション・エージェントの選定"]
-S2 --> S3["3. Assemble Context
-ブートストラップファイル+履歴+スキル一覧の読込"]
-S3 --> S4["4. Infer
-LLM推論"]
-S4 --> S5["5. ReAct
-ツール呼出しと観測の反復"]
-S5 --> S6["6. Load Skills
-必要なSKILL.mdをオンデマンド読込"]
-S6 --> S4
-S5 --> S7["7. Persist Memory
-MEMORY.md / 日次ログへ反映"]`,
+    S1["1. Normalize
+    チャネル入力の正規化"] --> S2["2. Route
+    セッション・エージェントの選定"]
+    S2 --> S3["3. Assemble Context
+    ブートストラップファイル+履歴+スキル一覧の読込"]
+    S3 --> S4["4. Infer
+    LLM推論"]
+    S4 --> S5["5. ReAct
+    ツール呼出しと観測の反復"]
+    S5 --> S6["6. Load Skills
+    必要なSKILL.mdをオンデマンド読込"]
+    S6 --> S4
+    S5 --> S7["7. Persist Memory
+    MEMORY.md / 日次ログへ反映"]`,
 
   `flowchart TB
-SOUL["SOUL.md
-人格・価値観・境界線"] --> IDENT["IDENTITY.md
-エージェント自己情報"]
-IDENT --> USERMD["USER.md
-ユーザーコンテキスト"]
-USERMD --> AGENTSMD["AGENTS.md
-手続き的ルール・ツール利用方針"]
-AGENTSMD --> TOOLSMD["TOOLS.md
-環境固有ツールメモ"]
-TOOLSMD --> MEM["MEMORY.md
-永続知識"]
-MEM --> SYS[("システムプロンプトとして合成")]`,
+    SOUL["SOUL.md
+    人格・価値観・境界線"] --> IDENT["IDENTITY.md
+    エージェント自己情報"]
+    IDENT --> USERMD["USER.md
+    ユーザーコンテキスト"]
+    USERMD --> AGENTSMD["AGENTS.md
+    手続き的ルール・ツール利用方針"]
+    AGENTSMD --> TOOLSMD["TOOLS.md
+    環境固有ツールメモ"]
+    TOOLSMD --> MEM["MEMORY.md
+    永続知識"]
+    MEM --> SYS[("システムプロンプトとして合成")]`,
 
   `flowchart TB
-F["ClawHubでスキルを発見"] --> C1{"公式 / 検証済み
-パブリッシャーか"}
-C1 -->|"No"| STOP1["導入を見送る、
-またはソースを精査する"]
-C1 -->|"Yes"| C2{"SKILL.md本文と
-コメント欄を目視確認したか"}
-C2 -->|"No"| REVIEW["README・コメント欄の
-不審なコマンド/リンクを確認"]
-REVIEW --> C2
-C2 -->|"Yes"| C3{"要求される権限
-(ファイル/認証情報/実行)は最小限か"}
-C3 -->|"No"| STOP2["権限スコープを縮小、
-または導入を却下"]
-C3 -->|"Yes"| INSTALL["隔離環境でテスト導入"]
-INSTALL --> MONITOR["openclaw security audit
-で継続的に監視"]`,
+    F["ClawHubでスキルを発見"] --> C1{"公式 / 検証済み
+    パブリッシャーか"}
+    C1 -->|"No"| STOP1["導入を見送る、
+    またはソースを精査する"]
+    C1 -->|"Yes"| C2{"SKILL.md本文と
+    コメント欄を目視確認したか"}
+    C2 -->|"No"| REVIEW["README・コメント欄の
+    不審なコマンド/リンクを確認"]
+    REVIEW --> C2
+    C2 -->|"Yes"| C3{"要求される権限
+    (ファイル/認証情報/実行)は最小限か"}
+    C3 -->|"No"| STOP2["権限スコープを縮小、
+    または導入を却下"]
+    C3 -->|"Yes"| INSTALL["隔離環境でテスト導入"]
+    INSTALL --> MONITOR["openclaw security audit
+    で継続的に監視"]`,
 
   `flowchart TB
-Q{"定期タスクの性質は?"}
-Q -->|"状態を見て判断・監視したい"| HB["Heartbeat"]
-Q -->|"決まった時刻に確実に実行したい"| CR["Cron"]
-HB --> HB1["isolatedSession: true
-軽量モデルを割り当てる"]
-HB1 --> HB2["HEARTBEAT.mdに
-静穏時間・エスカレーション条件を明記"]
-CR --> CR1["detachedセッションで実行"]
-CR1 --> CR2["ジョブごとにモデル階層を指定"]`,
+    Q{"定期タスクの性質は?"}
+    Q -->|"状態を見て判断・監視したい"| HB["Heartbeat"]
+    Q -->|"決まった時刻に確実に実行したい"| CR["Cron"]
+    HB --> HB1["isolatedSession: true
+    軽量モデルを割り当てる"]
+    HB1 --> HB2["HEARTBEAT.mdに
+    静穏時間・エスカレーション条件を明記"]
+    CR --> CR1["detachedセッションで実行"]
+    CR1 --> CR2["ジョブごとにモデル階層を指定"]`,
 
   `flowchart TB
-T["タスク受信"] --> D1{"Heartbeatや
-単純な定型チェックか"}
-D1 -->|"Yes"| M1["Tier1: 最安モデル
-(Haiku / Flash / DeepSeek等)"]
-D1 -->|"No"| D2{"サブエージェントの
-並列作業か"}
-D2 -->|"Yes"| M2["Tier2: 中コストモデル"]
-D2 -->|"No"| D3{"高度な推論・
-本会話・重要判断か"}
-D3 -->|"Yes"| M3["Tier3: 最上位モデル
-(Opus / Sonnet 等)"]
-D3 -->|"No"| M2`,
+    T["タスク受信"] --> D1{"Heartbeatや
+    単純な定型チェックか"}
+    D1 -->|"Yes"| M1["Tier1: 最安モデル
+    (Haiku / Flash / DeepSeek等)"]
+    D1 -->|"No"| D2{"サブエージェントの
+    並列作業か"}
+    D2 -->|"Yes"| M2["Tier2: 中コストモデル"]
+    D2 -->|"No"| D3{"高度な推論・
+    本会話・重要判断か"}
+    D3 -->|"Yes"| M3["Tier3: 最上位モデル
+    (Opus / Sonnet 等)"]
+    D3 -->|"No"| M2`,
 
   `flowchart TB
-P1["① 秘匿データへのアクセス"] --> RISK{"3条件が揃うと
-プロンプトインジェクションによる
-実被害リスクが急増する"}
-P2["② 未信頼コンテンツへの露出
-(メール・Webページ・共有連絡先など)"] --> RISK
-P3["③ 外部への通信能力
-(送信・投稿・API呼出)"] --> RISK
-RISK --> OUT["機密データの持出し・
-意図しない外部操作"]`,
+    P1["① 秘匿データへのアクセス"] --> RISK{"3条件が揃うと
+    プロンプトインジェクションによる
+    実被害リスクが急増する"}
+    P2["② 未信頼コンテンツへの露出
+    (メール・Webページ・共有連絡先など)"] --> RISK
+    P3["③ 外部への通信能力
+    (送信・投稿・API呼出)"] --> RISK
+    RISK --> OUT["機密データの持出し・
+    意図しない外部操作"]`,
 ] as const;
 
 function cleanText(text: string | null | undefined): string {
