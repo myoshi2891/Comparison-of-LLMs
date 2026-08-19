@@ -298,13 +298,13 @@ const entries: PageEntry[] = [
   },
   {
     slug: "/code-review/copilot-code-review",
-    title: "Copilot Code Review",
+    title: "GitHub Copilot Code Review 実践ガイド",
     group: "開発プロセス",
     topics: ["code-review", "review"],
     summary:
       "AI駆動のコードレビューをチーム開発に深く組み込む——概念・設定・運用まで中〜上級者向けにステップバイステップで解説",
     addedAt: "2026-06-01",
-    lastReviewed: "2026-07-01",
+    lastReviewed: "2026-08-19",
   },
   {
     slug: "/code-review/sonar-qube",

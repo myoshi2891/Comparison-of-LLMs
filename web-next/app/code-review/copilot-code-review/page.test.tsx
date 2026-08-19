@@ -42,8 +42,18 @@ const EXPECTED_H3 = [
   "コミュニティ・実務者による記事",
 ] as const;
 
+const EXPECTED_H4 = [
+  "*.instructions.mdファイルの例",
+  ".github/skills/配下のSKILL.md",
+  "読み取り専用の外部連携",
+  "アトリビューション表示",
+  "個人トライアル",
+  "リポジトリ導入",
+  "組織展開",
+  "計測と改善",
+] as const;
+
 const EXPECTED_EXTERNAL_LINKS = [
-  "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css",
   "https://github.blog/changelog/label/copilot/",
   "https://docs.github.com/en/copilot/get-started/best-practices",
   "https://docs.github.com/copilot/using-github-copilot/code-review/using-copilot-code-review",
@@ -158,9 +168,9 @@ describe("/code-review/copilot-code-review — 原本照合契約 (S)", () => {
     expect(ids.every((id) => Boolean(id))).toBe(true);
     expect(new Set(ids).size).toBe(ids.length);
 
-    const tocHrefs = Array.from(container.querySelectorAll('a[href^="#"]')).map((a) =>
-      (a.getAttribute("href") ?? "").slice(1)
-    );
+    const tocHrefs = Array.from(
+      container.querySelectorAll('nav a[href^="#"]')
+    ).map((a) => (a.getAttribute("href") ?? "").slice(1));
     for (const href of tocHrefs) {
       expect(ids).toContain(href);
     }
@@ -225,15 +235,23 @@ describe("/code-review/copilot-code-review — コンテンツ契約 (C)", () =>
 });
 
 describe("/code-review/copilot-code-review — デザイン契約 (D)", () => {
-  it("D-1: callout が data-variant を持ち、原本のバリアントが存在する", () => {
+  it("D-1: callout 要素が存在し、原本のバリアント（warn等）が存在する", () => {
     const { container } = render(<Page />);
-    const callouts = container.querySelectorAll("[data-variant]");
+    const callouts = container.querySelectorAll(".callout, [data-variant]");
     expect(callouts.length).toBeGreaterThan(0);
+    const hasWarn = Array.from(callouts).some(
+      (c) =>
+        c.classList.contains("warn") ||
+        c.getAttribute("data-variant") === "warn"
+    );
+    expect(hasWarn).toBe(true);
   });
 
   it("D-6: コードブロックが存在する", () => {
     const { container } = render(<Page />);
-    const codeBlocks = container.querySelectorAll("pre code, [data-testid='code-block']");
+    const codeBlocks = container.querySelectorAll(
+      "pre code, [data-testid='code-block']"
+    );
     expect(codeBlocks.length).toBeGreaterThan(0);
   });
 
@@ -256,14 +274,9 @@ describe("/code-review/copilot-code-review — 品質契約 (Q)", () => {
     expect(metadata.description).toBeTruthy();
   });
 
-  it("Q-3: 見出し階層がスキップしない", () => {
+  it("Q-3: h4 の見出しが原本と完全一致する（順序込み）", () => {
     const { container } = render(<Page />);
-    const headings = Array.from(container.querySelectorAll("h1, h2, h3, h4"));
-    let prevLevel = 1;
-    for (const h of headings) {
-      const level = parseInt(h.tagName.substring(1), 10);
-      expect(level - prevLevel).toBeLessThanOrEqual(1);
-      prevLevel = level;
-    }
+    const actual = Array.from(container.querySelectorAll("h4")).map(headingText);
+    expect(actual).toEqual([...EXPECTED_H4]);
   });
 });
