@@ -249,6 +249,88 @@
   color: var(--text);
 }
 
+.codeBlockWrap {
+  margin: 18px 0;
+  border-radius: 10px;
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.codeBlockHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 16px;
+  background: rgba(13, 27, 48, 0.7);
+  border-bottom: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--text-faint);
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+}
+
+.codeBlockHeader span {
+  font-weight: 500;
+  color: var(--text-dim);
+}
+
+.codeBlockWrap pre {
+  margin: 0;
+  padding: 16px 20px;
+  background: transparent;
+  border: none;
+  overflow-x: auto;
+  font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 13.5px;
+  line-height: 1.65;
+  color: #abb2bf;
+}
+
+.codeBlockWrap pre code {
+  background: none !important;
+  border: none !important;
+  padding: 0 !important;
+  color: inherit !important;
+  font-family: inherit;
+  font-size: inherit;
+}
+
+.codeLine {
+  white-space: pre;
+  min-height: 1.65em;
+}
+
+/* Syntax Token Colors (Atom One Dark) */
+.ck {
+  color: #c678dd;
+  font-weight: 500;
+} /* Keyword */
+.cs {
+  color: #98c379;
+} /* String */
+.cc {
+  color: #5c6370;
+  font-style: italic;
+} /* Comment */
+.cv {
+  color: #e06c75;
+} /* Variable / Key / Attr */
+.cf {
+  color: #61afef;
+} /* Function / Method */
+.cn {
+  color: #d19a66;
+} /* Number / Constant / Boolean */
+.ct {
+  color: #e5c07b;
+} /* Type / Class / Section */
+.cp {
+  color: #abb2bf;
+} /* Punctuation / Plain */
+.cm {
+  color: #56b6c2;
+} /* Meta / Builtin */
+
 /* Prose */
 .content :global(h2) {
   font-size: 26px;

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import CodeCopyButton from "@/components/docs/CodeCopyButton";
 import MermaidDiagram from "@/components/docs/MermaidDiagram";
 import styles from "./page.module.css";
 import TocObserver from "./TocObserver";
@@ -9,6 +10,321 @@ export const metadata: Metadata = {
   description:
     "GEMINI.md・AGENTS.md・agent.py・.geminiignore・settings.json・A2A・Agent Engine まで、Gemini エコシステムでのマルチエージェント開発を網羅した完全実践ガイド。",
 };
+
+const CODE_TEXT_1 = `# Project: My TypeScript Library
+
+## General Instructions
+- 新しいTypeScriptコードを生成する際は、既存のコーディングスタイルに従うこと。
+- 新しい関数・クラスには必ずJSDocコメントを付けること。
+- 可能な限り関数型プログラミングのパラダイムを優先すること。
+
+## Coding Style
+- インデントはスペース2つ。
+- インターフェース名には \`I\` プレフィックスを付ける（例: \`IUserService\`）。
+- 常に厳密等価演算子（\`===\` と \`!==\`）を使うこと。`;
+
+const CODE_TEXT_2 = `# Main GEMINI.md file
+これはメインの内容です。
+
+@./components/instructions.md
+
+さらに内容が続きます。
+
+@../shared/style-guide.md`;
+
+const CODE_TEXT_3 = `{
+  "context": {
+    "fileName": ["AGENTS.md", "CONTEXT.md", "GEMINI.md"]
+  }
+}`;
+
+const CODE_TEXT_4 = `# 認証情報・環境変数
+.env*
+credentials.json
+service-account-key.json
+
+# ビルド成果物・キャッシュ
+dist/
+build/
+.cache/
+__pycache__/
+
+# 巨大なデータファイル
+*.csv
+*.parquet
+dataset/
+
+# 独自プロンプト・プライベートなメモ
+prompts/private-*
+internal-notes.md`;
+
+const CODE_TEXT_5 = `{
+  "agents": {
+    "subagents": {
+      "code-reviewer": {
+        "description": "コードのセキュリティと品質をレビューする専門エージェント"
+      },
+      "tester": {
+        "description": "単体テストを自動生成するエージェント"
+      }
+    }
+  }
+}`;
+
+const CODE_TEXT_6 = `{
+  "mcpServers": {
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "\${GITHUB_TOKEN}"
+      }
+    }
+  }
+}`;
+
+const CODE_TEXT_7 = `{
+  "agents": {
+    "subagents": {
+      "disabled": true
+    }
+  }
+}`;
+
+const CODE_TEXT_8 = `---
+name: security-auditor
+description: コード内のセキュリティ脆弱性を発見することに特化。
+kind: local
+tools:
+  - read_file
+  - grep_search
+model: gemini-3-flash-preview
+temperature: 0.2
+max_turns: 10
+---
+あなたは容赦のないセキュリティ監査官です。コードを分析し、潜在的な脆弱性を洗い出してください。
+
+重点項目:
+1. SQLインジェクション
+2. XSS（クロスサイトスクリプティング）
+3. ハードコードされた認証情報
+4. 安全でないファイル操作
+
+脆弱性を発見したら明確に説明し、修正案を提示すること。ただし自分で修正はしないこと。`;
+
+const CODE_TEXT_9 = `[[rules]]
+name = "Allow pr-creator to push code"
+subagent = "pr-creator"
+description = "pr-creatorによる自動ブランチプッシュを許可する。"
+action = "allow"
+toolName = "run_shell_command"
+commandPrefix = "git push"`;
+
+const CODE_TEXT_10 = `{
+  "protocolVersion": "0.3.0",
+  "name": "Example Agent Name",
+  "description": "ドキュメント目的のサンプルエージェントの説明。",
+  "version": "1.0.0",
+  "url": "https://example.com/a2a",
+  "preferredTransport": "HTTP+JSON",
+  "capabilities": {
+    "streaming": true,
+    "extendedAgentCard": false
+  },
+  "defaultInputModes": ["text/plain"],
+  "defaultOutputModes": ["application/json"],
+  "skills": [
+    {
+      "id": "ExampleSkill",
+      "name": "Example Skill Assistant",
+      "description": "このスキルが行うことの説明。",
+      "tags": ["example-tag"],
+      "examples": ["ここに例を示してください。"]
+    }
+  ]
+}`;
+
+const CODE_TEXT_11 = `---
+kind: remote
+name: my-remote-agent
+agent_card_url: https://example.com/agent-card
+---`;
+
+const CODE_TEXT_12 = `---
+- kind: remote
+  name: remote-1
+  agent_card_url: https://example.com/1
+- kind: remote
+  name: remote-2
+  agent_card_url: https://example.com/2
+---`;
+
+const CODE_TEXT_13 = `from google.adk.agents import Agent
+from my_tools import fetch_purchase_history, get_policy, send_email, issue_refund, close_ticket
+
+root_agent = Agent(
+    name="Refund_Processor",
+    tools=[fetch_purchase_history, get_policy, send_email, issue_refund, close_ticket],
+    instruction="""
+    あなたは返金処理を担当するカスタマーサービスエージェントです。
+    以下の5ステップを厳密に守ってください。
+    1. fetch_purchase_historyツールで購入履歴を確認する。
+    2. get_policyツールで返金ポリシーを確認する。
+    3. 対象であればissue_refundツールで返金処理を行う。
+    4. send_emailツールで顧客にメールを送る。
+    5. close_ticketツールで返金対応を完了とする。
+    """
+)`;
+
+const CODE_TEXT_14 = `# python-extraction-agent/app/agent.py
+from google.adk.agents import Agent, SequentialAgent
+from google.adk.agents.remote_a2a_agent import RemoteA2aAgent
+from google.adk.models import Gemini
+
+# サブエージェント1: LLM推論でデータを抽出
+extractor_agent = Agent(
+    name="extractor_agent",
+    model=Gemini(model="gemini-3.5-flash"),
+    instruction="あなたは法務データ抽出エージェントです。契約書から金額・契約者・日付・保険条項を抽出してください。",
+    tools=[read_contract_text, save_extracted_fields, classify_risk_level]
+)
+
+# サブエージェント2: Go製のA2Aコンプライアンスサービスをローカルエージェントとしてラップ
+compliance_agent = RemoteA2aAgent(
+    name="compliance_agent",
+    agent_card=GO_AGENT_CARD_URL,
+    description="抽出された契約フィールドを企業のコンプライアンスポリシーに照らして検証する。"
+)
+
+# サブエージェント3: 最終監査レポートを生成
+report_agent = Agent(
+    name="report_agent",
+    model=Gemini(model="gemini-3.5-flash"),
+    instruction="最終的なコンプライアンスレポートとMarkdown要約を生成すること。",
+    tools=[generate_summary_report]
+)
+
+# コーディネーター: 上記3つを順番に連結する
+root_agent = SequentialAgent(
+    name="contract_compliance_coordinator",
+    description="契約解析・A2Aコンプライアンス検証・最終レポート作成を順に実行する。",
+    sub_agents=[extractor_agent, compliance_agent, report_agent],
+)`;
+
+const CODE_TEXT_15 = `from enum import Enum
+
+class ComplianceStep(str, Enum):
+    INGESTED = "INGESTED"                      # 契約書アップロード、抽出待ち
+    EXTRACTED = "EXTRACTED"                     # Geminiによるフィールド抽出完了
+    COMPLIANCE_PENDING = "COMPLIANCE_PENDING"   # Goエージェントへ送信、結果待ち
+    COMPLIANCE_COMPLETE = "COMPLIANCE_COMPLETE" # Goエージェントの判定を受領
+    MANUAL_REVIEW = "MANUAL_REVIEW"             # タイムアウト/エラー、人間のレビューへ
+    REVIEW_READY = "REVIEW_READY"               # 違反ありのレポート生成済み
+    APPROVED = "APPROVED"                       # 全チェック合格`;
+
+const CODE_TEXT_16 = `from google.adk.agents.remote_a2a_agent import RemoteA2aAgent
+
+# 方法1: Agent CardのURLを直接指定
+remote_agent = RemoteA2aAgent(
+    name="image_scoring",
+    description="画像について興味深い事実を教えてくれるエージェント。",
+    agent_card="http://localhost:8001/a2a/image_scoring/.well-known/agent.json",
+    timeout=300.0,       # HTTPタイムアウト（秒）
+    httpx_client=None,   # カスタムHTTPクライアント（省略可）
+)
+
+# 方法2: ローカルファイルパスとしてAgent Cardを指定
+remote_agent_from_file = RemoteA2aAgent(
+    name="illustration_agent",
+    description="イラストを生成するエージェント。",
+    agent_card="illustration-agent-card.json",
+)
+
+# 方法3: AgentCardオブジェクトを直接構築して渡す（プログラムから動的に生成する場合）`;
+
+const CODE_TEXT_17 = `from google.adk.agents.remote_a2a_agent import RemoteA2aAgent
+from google.adk import Agent
+
+data_analyst = RemoteA2aAgent(
+    name="DataAnalyst",
+    description="データセットを分析する。",
+    agent_card="https://agent-b.run.app/.well-known/agent.json"
+)
+
+orchestrator = Agent(
+    name="Orchestrator",
+    model="gemini-2.0-flash",
+    instruction="データ分析タスクはDataAnalystに委譲すること。",
+    sub_agents=[data_analyst]
+)`;
+
+const CODE_TEXT_18 = `# あなたの既存のエージェント定義
+root_agent = Agent(
+    model='gemini-flash-latest',
+    name='hello_world_agent',
+    # ...ツールや指示...
+)`;
+
+const CODE_TEXT_19 = `from google.adk.a2a.utils.agent_to_a2a import to_a2a
+
+# エージェントをA2A対応にする
+a2a_app = to_a2a(root_agent, port=8001)`;
+
+const CODE_TEXT_20 = `# uvicornでA2Aサーバーとして起動
+uvicorn agent:a2a_app --host localhost --port 8001`;
+
+const CODE_TEXT_21 = `# following command runs the ADK agent as a2a agent
+adk api_server --a2a --port 8001 remote_a2a`;
+
+const CODE_TEXT_22 = `# 1. リモート（公開）側を起動
+uvicorn contributing.samples.a2a_root.remote_a2a.hello_world.agent:a2a_app --host localhost --port 8001
+
+# 2. 別ターミナルで、呼び出す側（コンシューマー）のadk webを起動
+adk web contributing/samples/`;
+
+const CODE_TEXT_23 = `pip install --upgrade --quiet "google-cloud-aiplatform[agent_engines,adk]>=1.112"`;
+
+const CODE_TEXT_24 = `gcloud auth application-default login`;
+
+const CODE_TEXT_25 = `PROJECT_ID=my-project-id
+LOCATION_ID=us-central1
+
+adk deploy agent_engine \\
+  --project=$PROJECT_ID \\
+  --region=$LOCATION_ID \\
+  --display_name="My First Agent" \\
+  multi_tool_agent`;
+
+const CODE_TEXT_26 = `https://{LOCATION_ID}-aiplatform.googleapis.com/v1/projects/{PROJECT_ID}/locations/{LOCATION_ID}/reasoningEngines/{RESOURCE_ID}:query`;
+
+const CODE_TEXT_27 = `import vertexai
+from vertexai.preview import reasoning_engines
+
+vertexai.init(
+    project="your-gcp-project-id",
+    location="us-central1",
+    staging_bucket="gs://my-agent-staging-bucket",  # ステージング用バケットが必須
+)
+
+# ローカルのadk_appオブジェクトをそのままデプロイ
+remote_app = vertexai.agent_engines.create(
+    reasoning_engines.AdkApp(agent=root_agent, enable_tracing=True),
+)`;
+
+const CODE_TEXT_28 = `import os
+from google.adk.agents.remote_a2a_agent import RemoteA2aAgent
+
+PROJECT_ID = os.getenv("GOOGLE_CLOUD_PROJECT")
+LOCATION = os.getenv("GOOGLE_CLOUD_LOCATION")
+REASONING_ENGINE_ID = os.getenv("REASONING_ENGINE_ID")
+AGENT_ENGINE_RESOURCE = f"projects/{PROJECT_ID}/locations/{LOCATION}/reasoningEngines/{REASONING_ENGINE_ID}"
+a2a_url = f"https://{LOCATION}-aiplatform.googleapis.com/v1beta1/{AGENT_ENGINE_RESOURCE}/a2a"
+
+time_agent = RemoteA2aAgent(
+    name="time_agent",
+    description="Agent Engine上で動くA2Aエージェント。",
+    agent_card=f"{a2a_url}/v1/card",
+)`;
 
 const MERMAID_THEME_VARS = {
   fontSize: "16px",
@@ -466,19 +782,41 @@ export default function GeminiMultiAgentBestPracticesPage() {
           </li>
         </ol>
         <div className={styles.codeBlockWrap} data-testid="code-block">
+          <div className={styles.codeBlockHeader}>
+            <span>markdown</span>
+            <CodeCopyButton text={CODE_TEXT_1} />
+          </div>
           <pre className="markdown">
             <code className="markdown">
-              {`# Project: My TypeScript Library
-
-## General Instructions
-- 新しいTypeScriptコードを生成する際は、既存のコーディングスタイルに従うこと。
-- 新しい関数・クラスには必ずJSDocコメントを付けること。
-- 可能な限り関数型プログラミングのパラダイムを優先すること。
-
-## Coding Style
-- インデントはスペース2つ。
-- インターフェース名には \`I\` プレフィックスを付ける（例: \`IUserService\`）。
-- 常に厳密等価演算子（\`===\` と \`!==\`）を使うこと。`}
+              <div className={styles.codeLine}>
+                <span className={styles.ct}># Project: My TypeScript Library</span>
+              </div>
+              <div className={styles.codeLine}>&nbsp;</div>
+              <div className={styles.codeLine}>
+                <span className={styles.ct}>## General Instructions</span>
+              </div>
+              <div className={styles.codeLine}>
+                - 新しいTypeScriptコードを生成する際は、既存のコーディングスタイルに従うこと。
+              </div>
+              <div className={styles.codeLine}>
+                - 新しい関数・クラスには必ずJSDocコメントを付けること。
+              </div>
+              <div className={styles.codeLine}>
+                - 可能な限り関数型プログラミングのパラダイムを優先すること。
+              </div>
+              <div className={styles.codeLine}>&nbsp;</div>
+              <div className={styles.codeLine}>
+                <span className={styles.ct}>## Coding Style</span>
+              </div>
+              <div className={styles.codeLine}>- インデントはスペース2つ。</div>
+              <div className={styles.codeLine}>
+                - インターフェース名には <span className={styles.cs}>`I`</span>{" "}
+                プレフィックスを付ける（例: <span className={styles.cs}>`IUserService`</span>）。
+              </div>
+              <div className={styles.codeLine}>
+                - 常に厳密等価演算子（<span className={styles.cs}>`===`</span> と{" "}
+                <span className={styles.cs}>`!==`</span>）を使うこと。
+              </div>
             </code>
           </pre>
         </div>
@@ -490,16 +828,26 @@ export default function GeminiMultiAgentBestPracticesPage() {
           </li>
         </ol>
         <div className={styles.codeBlockWrap} data-testid="code-block">
+          <div className={styles.codeBlockHeader}>
+            <span>markdown</span>
+            <CodeCopyButton text={CODE_TEXT_2} />
+          </div>
           <pre className="markdown">
             <code className="markdown">
-              {`# Main GEMINI.md file
-これはメインの内容です。
-
-@./components/instructions.md
-
-さらに内容が続きます。
-
-@../shared/style-guide.md`}
+              <div className={styles.codeLine}>
+                <span className={styles.ct}># Main GEMINI.md file</span>
+              </div>
+              <div className={styles.codeLine}>これはメインの内容です。</div>
+              <div className={styles.codeLine}>&nbsp;</div>
+              <div className={styles.codeLine}>
+                <span className={styles.ck}>@./components/instructions.md</span>
+              </div>
+              <div className={styles.codeLine}>&nbsp;</div>
+              <div className={styles.codeLine}>さらに内容が続きます。</div>
+              <div className={styles.codeLine}>&nbsp;</div>
+              <div className={styles.codeLine}>
+                <span className={styles.ck}>@../shared/style-guide.md</span>
+              </div>
             </code>
           </pre>
         </div>
@@ -629,13 +977,29 @@ export default function GeminiMultiAgentBestPracticesPage() {
           を正としつつ Gemini CLI にも読ませる、という一石二鳥の運用が可能です。
         </p>
         <div className={styles.codeBlockWrap} data-testid="code-block">
+          <div className={styles.codeBlockHeader}>
+            <span>json</span>
+            <CodeCopyButton text={CODE_TEXT_3} />
+          </div>
           <pre className="json">
             <code className="json">
-              {`{
-  "context": {
-    "fileName": ["AGENTS.md", "CONTEXT.md", "GEMINI.md"]
-  }
-}`}
+              <div className={styles.codeLine}>{"{"}</div>
+              <div className={styles.codeLine}>
+                {"  "}
+                <span className={styles.cv}>&quot;context&quot;</span>: {"{"}
+              </div>
+              <div className={styles.codeLine}>
+                {"    "}
+                <span className={styles.cv}>&quot;fileName&quot;</span>: [
+                <span className={styles.cs}>&quot;AGENTS.md&quot;</span>,{" "}
+                <span className={styles.cs}>&quot;CONTEXT.md&quot;</span>,{" "}
+                <span className={styles.cs}>&quot;GEMINI.md&quot;</span>]
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}
+                {"}"}
+              </div>
+              <div className={styles.codeLine}>{"}"}</div>
             </code>
           </pre>
         </div>
@@ -788,20 +1152,38 @@ export default function GeminiMultiAgentBestPracticesPage() {
 
         <h3 id="53-実践例">5.3 実践例</h3>
         <div className={styles.codeBlockWrap} data-testid="code-block">
+          <div className={styles.codeBlockHeader}>
+            <span>gitignore</span>
+            <CodeCopyButton text={CODE_TEXT_4} />
+          </div>
           <pre className="gitignore">
             <code className="gitignore">
-              {`# /packages/ ディレクトリとそのサブディレクトリすべてを除外
-/packages/
-
-# apikeys.txt ファイルを除外
-apikeys.txt
-
-# すべての .md ファイルを除外（ワイルドカード）
-*.md
-
-# ただし README.md だけは除外対象から除外して見せる
-*.md
-!README.md`}
+              <div className={styles.codeLine}>
+                <span className={styles.cc}>
+                  # /packages/ ディレクトリとそのサブディレクトリすべてを除外
+                </span>
+              </div>
+              <div className={styles.codeLine}>/packages/</div>
+              <div className={styles.codeLine}>&nbsp;</div>
+              <div className={styles.codeLine}>
+                <span className={styles.cc}># apikeys.txt ファイルを除外</span>
+              </div>
+              <div className={styles.codeLine}>apikeys.txt</div>
+              <div className={styles.codeLine}>&nbsp;</div>
+              <div className={styles.codeLine}>
+                <span className={styles.cc}># すべての .md ファイルを除外（ワイルドカード）</span>
+              </div>
+              <div className={styles.codeLine}>*.md</div>
+              <div className={styles.codeLine}>&nbsp;</div>
+              <div className={styles.codeLine}>
+                <span className={styles.cc}>
+                  # ただし README.md だけは除外対象から除外して見せる
+                </span>
+              </div>
+              <div className={styles.codeLine}>*.md</div>
+              <div className={styles.codeLine}>
+                <span className={styles.ck}>!README.md</span>
+              </div>
             </code>
           </pre>
         </div>
@@ -945,18 +1327,50 @@ apikeys.txt
           ）に、モデルや最大ターン数を個別指定する例です。
         </p>
         <div className={styles.codeBlockWrap} data-testid="code-block">
+          <div className={styles.codeBlockHeader}>
+            <span>json</span>
+            <CodeCopyButton text={CODE_TEXT_5} />
+          </div>
           <pre className="json">
             <code className="json">
-              {`{
-  "agents": {
-    "overrides": {
-      "codebase_investigator": {
-        "modelConfig": { "model": "gemini-3-flash-preview" },
-        "runConfig": { "maxTurns": 50 }
-      }
-    }
-  }
-}`}
+              <div className={styles.codeLine}>{"{"}</div>
+              <div className={styles.codeLine}>
+                {"  "}
+                <span className={styles.cv}>&quot;agents&quot;</span>: {"{"}
+              </div>
+              <div className={styles.codeLine}>
+                {"    "}
+                <span className={styles.cv}>&quot;overrides&quot;</span>: {"{"}
+              </div>
+              <div className={styles.codeLine}>
+                {"      "}
+                <span className={styles.cv}>&quot;codebase_investigator&quot;</span>: {"{"}
+              </div>
+              <div className={styles.codeLine}>
+                {"        "}
+                <span className={styles.cv}>&quot;modelConfig&quot;</span>: {"{"}{" "}
+                <span className={styles.cv}>&quot;model&quot;</span>:{" "}
+                <span className={styles.cs}>&quot;gemini-3-flash-preview&quot;</span> {"}"},
+              </div>
+              <div className={styles.codeLine}>
+                {"        "}
+                <span className={styles.cv}>&quot;runConfig&quot;</span>: {"{"}{" "}
+                <span className={styles.cv}>&quot;maxTurns&quot;</span>:{" "}
+                <span className={styles.cn}>50</span> {"}"}
+              </div>
+              <div className={styles.codeLine}>
+                {"      "}
+                {"}"}
+              </div>
+              <div className={styles.codeLine}>
+                {"    "}
+                {"}"}
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}
+                {"}"}
+              </div>
+              <div className={styles.codeLine}>{"}"}</div>
             </code>
           </pre>
         </div>
@@ -966,34 +1380,85 @@ apikeys.txt
           マルチエージェント開発では、外部ツール（GitHub等）をMCP経由で各エージェントに与えることがよくあります。
         </p>
         <div className={styles.codeBlockWrap} data-testid="code-block">
+          <div className={styles.codeBlockHeader}>
+            <span>json</span>
+            <CodeCopyButton text={CODE_TEXT_6} />
+          </div>
           <pre className="json">
             <code className="json">
-              {`{
-  "mcpServers": {
-    "github": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-github"],
-      "env": {
-        "GITHUB_PERSONAL_ACCESS_TOKEN": "\${GITHUB_TOKEN}"
-      }
-    }
-  }
-}`}
+              <div className={styles.codeLine}>{"{"}</div>
+              <div className={styles.codeLine}>
+                {"  "}
+                <span className={styles.cv}>&quot;mcpServers&quot;</span>: {"{"}
+              </div>
+              <div className={styles.codeLine}>
+                {"    "}
+                <span className={styles.cv}>&quot;github&quot;</span>: {"{"}
+              </div>
+              <div className={styles.codeLine}>
+                {"      "}
+                <span className={styles.cv}>&quot;command&quot;</span>:{" "}
+                <span className={styles.cs}>&quot;npx&quot;</span>,
+              </div>
+              <div className={styles.codeLine}>
+                {"      "}
+                <span className={styles.cv}>&quot;args&quot;</span>: [
+                <span className={styles.cs}>&quot;-y&quot;</span>,{" "}
+                <span className={styles.cs}>&quot;@modelcontextprotocol/server-github&quot;</span>
+                ],
+              </div>
+              <div className={styles.codeLine}>
+                {"      "}
+                <span className={styles.cv}>&quot;env&quot;</span>: {"{"}
+              </div>
+              <div className={styles.codeLine}>
+                {"        "}
+                <span className={styles.cv}>&quot;GITHUB_PERSONAL_ACCESS_TOKEN&quot;</span>:{" "}
+                <span className={styles.cs}>
+                  &quot;{"$"}
+                  {"{GITHUB_TOKEN}"}&quot;
+                </span>
+              </div>
+              <div className={styles.codeLine}>
+                {"      "}
+                {"}"}
+              </div>
+              <div className={styles.codeLine}>
+                {"    "}
+                {"}"}
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}
+                {"}"}
+              </div>
+              <div className={styles.codeLine}>{"}"}</div>
             </code>
           </pre>
         </div>
         <p>
-          <code>&#36;&#123;GITHUB_TOKEN&#125;</code>{" "}
+          <code>
+            {"$"}
+            {"{GITHUB_TOKEN}"}
+          </code>{" "}
           のような記法で、実際の値をシェル環境変数から実行時に解決させ、設定ファイル自体にシークレットを平文で書かないのがベストプラクティスです。
         </p>
 
         <h3 id="65-サブエージェントを無効化したい場合">6.5 サブエージェントを無効化したい場合</h3>
         <div className={styles.codeBlockWrap} data-testid="code-block">
+          <div className={styles.codeBlockHeader}>
+            <span>json</span>
+            <CodeCopyButton text={CODE_TEXT_7} />
+          </div>
           <pre className="json">
             <code className="json">
-              {`{
-  "experimental": { "enableAgents": false }
-}`}
+              <div className={styles.codeLine}>{"{"}</div>
+              <div className={styles.codeLine}>
+                {"  "}
+                <span className={styles.cv}>&quot;experimental&quot;</span>: {"{"}{" "}
+                <span className={styles.cv}>&quot;enableAgents&quot;</span>:{" "}
+                <span className={styles.cn}>false</span> {"}"}
+              </div>
+              <div className={styles.codeLine}>{"}"}</div>
             </code>
           </pre>
         </div>
@@ -1074,28 +1539,66 @@ apikeys.txt
           </li>
         </ol>
         <div className={styles.codeBlockWrap} data-testid="code-block">
+          <div className={styles.codeBlockHeader}>
+            <span>markdown</span>
+            <CodeCopyButton text={CODE_TEXT_8} />
+          </div>
           <pre className="markdown">
             <code className="markdown">
-              {`---
-name: security-auditor
-description: コード内のセキュリティ脆弱性を発見することに特化。
-kind: local
-tools:
-  - read_file
-  - grep_search
-model: gemini-3-flash-preview
-temperature: 0.2
-max_turns: 10
----
-あなたは容赦のないセキュリティ監査官です。コードを分析し、潜在的な脆弱性を洗い出してください。
-
-重点項目:
-1. SQLインジェクション
-2. XSS（クロスサイトスクリプティング）
-3. ハードコードされた認証情報
-4. 安全でないファイル操作
-
-脆弱性を発見したら明確に説明し、修正案を提示すること。ただし自分で修正はしないこと。`}
+              <div className={styles.codeLine}>
+                <span className={styles.cc}>---</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.cv}>name</span>:{" "}
+                <span className={styles.cs}>security-auditor</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.cv}>description</span>:{" "}
+                <span className={styles.cs}>
+                  コード内のセキュリティ脆弱性を発見することに特化。
+                </span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.cv}>kind</span>: <span className={styles.cs}>local</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.cv}>tools</span>:
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}- <span className={styles.cs}>read_file</span>
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}- <span className={styles.cs}>grep_search</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.cv}>model</span>:{" "}
+                <span className={styles.cs}>gemini-3-flash-preview</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.cv}>temperature</span>:{" "}
+                <span className={styles.cn}>0.2</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.cv}>max_turns</span>: <span className={styles.cn}>10</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.cc}>---</span>
+              </div>
+              <div className={styles.codeLine}>
+                あなたは容赦のないセキュリティ監査官です。コードを分析し、潜在的な脆弱性を洗い出してください。
+              </div>
+              <div className={styles.codeLine}>&nbsp;</div>
+              <div className={styles.codeLine}>
+                <span className={styles.ct}>重点項目:</span>
+              </div>
+              <div className={styles.codeLine}>1. SQLインジェクション</div>
+              <div className={styles.codeLine}>2. XSS（クロスサイトスクリプティング）</div>
+              <div className={styles.codeLine}>3. ハードコードされた認証情報</div>
+              <div className={styles.codeLine}>4. 安全でないファイル操作</div>
+              <div className={styles.codeLine}>&nbsp;</div>
+              <div className={styles.codeLine}>
+                脆弱性を発見したら明確に説明し、修正案を提示すること。ただし自分で修正はしないこと。
+              </div>
             </code>
           </pre>
         </div>
@@ -1211,15 +1714,41 @@ max_turns: 10
         <h3 id="76-サブエージェント単位のポリシー制御">7.6 サブエージェント単位のポリシー制御</h3>
         <p>ポリシーエンジンのTOML設定で、特定サブエージェントにだけ適用されるルールを書けます。</p>
         <div className={styles.codeBlockWrap} data-testid="code-block">
+          <div className={styles.codeBlockHeader}>
+            <span>toml</span>
+            <CodeCopyButton text={CODE_TEXT_9} />
+          </div>
           <pre className="toml">
             <code className="toml">
-              {`[[rules]]
-name = "Allow pr-creator to push code"
-subagent = "pr-creator"
-description = "pr-creatorによる自動ブランチプッシュを許可する。"
-action = "allow"
-toolName = "run_shell_command"
-commandPrefix = "git push"`}
+              <div className={styles.codeLine}>
+                <span className={styles.ct}>[[rules]]</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.cv}>name</span> ={" "}
+                <span className={styles.cs}>&quot;Allow pr-creator to push code&quot;</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.cv}>subagent</span> ={" "}
+                <span className={styles.cs}>&quot;pr-creator&quot;</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.cv}>description</span> ={" "}
+                <span className={styles.cs}>
+                  &quot;pr-creatorによる自動ブランチプッシュを許可する。&quot;
+                </span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.cv}>action</span> ={" "}
+                <span className={styles.cs}>&quot;allow&quot;</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.cv}>toolName</span> ={" "}
+                <span className={styles.cs}>&quot;run_shell_command&quot;</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.cv}>commandPrefix</span> ={" "}
+                <span className={styles.cs}>&quot;git push&quot;</span>
+              </div>
             </code>
           </pre>
         </div>
@@ -1283,31 +1812,114 @@ commandPrefix = "git push"`}
           8.2 Agent Card（<code>agent.json</code>）の主要フィールド
         </h3>
         <div className={styles.codeBlockWrap} data-testid="code-block">
+          <div className={styles.codeBlockHeader}>
+            <span>json</span>
+            <CodeCopyButton text={CODE_TEXT_10} />
+          </div>
           <pre className="json">
             <code className="json">
-              {`{
-  "protocolVersion": "0.3.0",
-  "name": "Example Agent Name",
-  "description": "ドキュメント目的のサンプルエージェントの説明。",
-  "version": "1.0.0",
-  "url": "https://example.com/a2a",
-  "preferredTransport": "HTTP+JSON",
-  "capabilities": {
-    "streaming": true,
-    "extendedAgentCard": false
-  },
-  "defaultInputModes": ["text/plain"],
-  "defaultOutputModes": ["application/json"],
-  "skills": [
-    {
-      "id": "ExampleSkill",
-      "name": "Example Skill Assistant",
-      "description": "このスキルが行うことの説明。",
-      "tags": ["example-tag"],
-      "examples": ["ここに例を示してください。"]
-    }
-  ]
-}`}
+              <div className={styles.codeLine}>{"{"}</div>
+              <div className={styles.codeLine}>
+                {"  "}
+                <span className={styles.cv}>&quot;protocolVersion&quot;</span>:{" "}
+                <span className={styles.cs}>&quot;0.3.0&quot;</span>,
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}
+                <span className={styles.cv}>&quot;name&quot;</span>:{" "}
+                <span className={styles.cs}>&quot;Example Agent Name&quot;</span>,
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}
+                <span className={styles.cv}>&quot;description&quot;</span>:{" "}
+                <span className={styles.cs}>
+                  &quot;ドキュメント目的のサンプルエージェントの説明。&quot;
+                </span>
+                ,
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}
+                <span className={styles.cv}>&quot;version&quot;</span>:{" "}
+                <span className={styles.cs}>&quot;1.0.0&quot;</span>,
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}
+                <span className={styles.cv}>&quot;url&quot;</span>:{" "}
+                <span className={styles.cs}>&quot;https://example.com/a2a&quot;</span>,
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}
+                <span className={styles.cv}>&quot;preferredTransport&quot;</span>:{" "}
+                <span className={styles.cs}>&quot;HTTP+JSON&quot;</span>,
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}
+                <span className={styles.cv}>&quot;capabilities&quot;</span>: {"{"}
+              </div>
+              <div className={styles.codeLine}>
+                {"    "}
+                <span className={styles.cv}>&quot;streaming&quot;</span>:{" "}
+                <span className={styles.cn}>true</span>,
+              </div>
+              <div className={styles.codeLine}>
+                {"    "}
+                <span className={styles.cv}>&quot;extendedAgentCard&quot;</span>:{" "}
+                <span className={styles.cn}>false</span>
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}
+                {"}"},
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}
+                <span className={styles.cv}>&quot;defaultInputModes&quot;</span>: [
+                <span className={styles.cs}>&quot;text/plain&quot;</span>],
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}
+                <span className={styles.cv}>&quot;defaultOutputModes&quot;</span>: [
+                <span className={styles.cs}>&quot;application/json&quot;</span>
+                ],
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}
+                <span className={styles.cv}>&quot;skills&quot;</span>: [
+              </div>
+              <div className={styles.codeLine}>
+                {"    "}
+                {"{"}
+              </div>
+              <div className={styles.codeLine}>
+                {"      "}
+                <span className={styles.cv}>&quot;id&quot;</span>:{" "}
+                <span className={styles.cs}>&quot;ExampleSkill&quot;</span>,
+              </div>
+              <div className={styles.codeLine}>
+                {"      "}
+                <span className={styles.cv}>&quot;name&quot;</span>:{" "}
+                <span className={styles.cs}>&quot;Example Skill Assistant&quot;</span>,
+              </div>
+              <div className={styles.codeLine}>
+                {"      "}
+                <span className={styles.cv}>&quot;description&quot;</span>:{" "}
+                <span className={styles.cs}>&quot;このスキルが行うことの説明。&quot;</span>,
+              </div>
+              <div className={styles.codeLine}>
+                {"      "}
+                <span className={styles.cv}>&quot;tags&quot;</span>: [
+                <span className={styles.cs}>&quot;example-tag&quot;</span>],
+              </div>
+              <div className={styles.codeLine}>
+                {"      "}
+                <span className={styles.cv}>&quot;examples&quot;</span>: [
+                <span className={styles.cs}>&quot;ここに例を示してください。&quot;</span>]
+              </div>
+              <div className={styles.codeLine}>
+                {"    "}
+                {"}"}
+              </div>
+              <div className={styles.codeLine}>{"  "}]</div>
+              <div className={styles.codeLine}>{"}"}</div>
             </code>
           </pre>
         </div>
@@ -1368,13 +1980,29 @@ commandPrefix = "git push"`}
           を指定することで、A2A準拠の外部エージェントをサブエージェントとして直接呼び出せます。
         </p>
         <div className={styles.codeBlockWrap} data-testid="code-block">
+          <div className={styles.codeBlockHeader}>
+            <span>markdown</span>
+            <CodeCopyButton text={CODE_TEXT_11} />
+          </div>
           <pre className="markdown">
             <code className="markdown">
-              {`---
-kind: remote
-name: my-remote-agent
-agent_card_url: https://example.com/agent-card
----`}
+              <div className={styles.codeLine}>
+                <span className={styles.cc}>---</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.cv}>kind</span>: <span className={styles.cs}>remote</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.cv}>name</span>:{" "}
+                <span className={styles.cs}>my-remote-agent</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.cv}>agent_card_url</span>:{" "}
+                <span className={styles.cs}>https://example.com/agent-card</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.cc}>---</span>
+              </div>
             </code>
           </pre>
         </div>
@@ -1382,16 +2010,42 @@ agent_card_url: https://example.com/agent-card
           1つのMarkdownファイルに複数のリモートサブエージェントをリスト形式で定義することも可能です（ローカルとリモートの混在や複数ローカルの混在は不可、リモートの複数指定のみサポート）。
         </p>
         <div className={styles.codeBlockWrap} data-testid="code-block">
+          <div className={styles.codeBlockHeader}>
+            <span>markdown</span>
+            <CodeCopyButton text={CODE_TEXT_12} />
+          </div>
           <pre className="markdown">
             <code className="markdown">
-              {`---
-- kind: remote
-  name: remote-1
-  agent_card_url: https://example.com/1
-- kind: remote
-  name: remote-2
-  agent_card_url: https://example.com/2
----`}
+              <div className={styles.codeLine}>
+                <span className={styles.cc}>---</span>
+              </div>
+              <div className={styles.codeLine}>
+                - <span className={styles.cv}>kind</span>: <span className={styles.cs}>remote</span>
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}
+                <span className={styles.cv}>name</span>: <span className={styles.cs}>remote-1</span>
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}
+                <span className={styles.cv}>agent_card_url</span>:{" "}
+                <span className={styles.cs}>https://example.com/1</span>
+              </div>
+              <div className={styles.codeLine}>
+                - <span className={styles.cv}>kind</span>: <span className={styles.cs}>remote</span>
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}
+                <span className={styles.cv}>name</span>: <span className={styles.cs}>remote-2</span>
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}
+                <span className={styles.cv}>agent_card_url</span>:{" "}
+                <span className={styles.cs}>https://example.com/2</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.cc}>---</span>
+              </div>
             </code>
           </pre>
         </div>
@@ -1471,24 +2125,78 @@ agent_card_url: https://example.com/agent-card
           オブジェクトを1つ定義するだけです。
         </p>
         <div className={styles.codeBlockWrap} data-testid="code-block">
+          <div className={styles.codeBlockHeader}>
+            <span>python</span>
+            <CodeCopyButton text={CODE_TEXT_13} />
+          </div>
           <pre className="python">
             <code className="python">
-              {`from google.adk.agents import Agent
-from my_tools import fetch_purchase_history, get_policy, send_email, issue_refund, close_ticket
-
-root_agent = Agent(
-    name="Refund_Processor",
-    tools=[fetch_purchase_history, get_policy, send_email, issue_refund, close_ticket],
-    instruction="""
-    あなたは返金処理を担当するカスタマーサービスエージェントです。
-    以下の5ステップを厳密に守ってください。
-    1. fetch_purchase_historyツールで購入履歴を確認する。
-    2. get_policyツールで返金ポリシーを確認する。
-    3. 対象であればissue_refundツールで返金処理を行う。
-    4. send_emailツールで顧客にメールを送る。
-    5. close_ticketツールで返金対応を完了とする。
-    """
-)`}
+              <div className={styles.codeLine}>
+                <span className={styles.ck}>from</span> google.adk.agents{" "}
+                <span className={styles.ck}>import</span> Agent
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.ck}>from</span> my_tools{" "}
+                <span className={styles.ck}>import</span> fetch_purchase_history, get_policy,
+                send_email, issue_refund, close_ticket
+              </div>
+              <div className={styles.codeLine}>&nbsp;</div>
+              <div className={styles.codeLine}>
+                <span className={styles.cv}>root_agent</span> = Agent(
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}
+                <span className={styles.cv}>name</span>=
+                <span className={styles.cs}>&quot;Refund_Processor&quot;</span>,
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}
+                <span className={styles.cv}>tools</span>=[ fetch_purchase_history, get_policy,
+                send_email, issue_refund, close_ticket],
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}
+                <span className={styles.cv}>instruction</span>=
+                <span className={styles.cs}>&quot;&quot;&quot;</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.cs}>
+                  {"  "}
+                  あなたは返金処理を担当するカスタマーサービスエージェントです。
+                </span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.cs}>{"  "}以下の5ステップを厳密に守ってください。</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.cs}>
+                  {"  "}
+                  1. fetch_purchase_historyツールで購入履歴を確認する。
+                </span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.cs}>
+                  {"  "}2. get_policyツールで返金ポリシーを確認する。
+                </span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.cs}>
+                  {"  "}
+                  3. 対象であればissue_refundツールで返金処理を行う。
+                </span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.cs}>{"  "}4. send_emailツールで顧客にメールを送る。</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.cs}>
+                  {"  "}5. close_ticketツールで返金対応を完了とする。
+                </span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.cs}>{"  "}&quot;&quot;&quot;</span>
+              </div>
+              <div className={styles.codeLine}>)</div>
             </code>
           </pre>
         </div>
@@ -1509,42 +2217,145 @@ root_agent = Agent(
           レポート生成エージェント、という3段構成の実例です。
         </p>
         <div className={styles.codeBlockWrap} data-testid="code-block">
+          <div className={styles.codeBlockHeader}>
+            <span>python</span>
+            <CodeCopyButton text={CODE_TEXT_14} />
+          </div>
           <pre className="python">
             <code className="python">
-              {`# python-extraction-agent/app/agent.py
-from google.adk.agents import Agent, SequentialAgent
-from google.adk.agents.remote_a2a_agent import RemoteA2aAgent
-from google.adk.models import Gemini
-
-# サブエージェント1: LLM推論でデータを抽出
-extractor_agent = Agent(
-    name="extractor_agent",
-    model=Gemini(model="gemini-3.5-flash"),
-    instruction="あなたは法務データ抽出エージェントです。契約書から金額・契約者・日付・保険条項を抽出してください。",
-    tools=[read_contract_text, save_extracted_fields, classify_risk_level]
-)
-
-# サブエージェント2: Go製のA2Aコンプライアンスサービスをローカルエージェントとしてラップ
-compliance_agent = RemoteA2aAgent(
-    name="compliance_agent",
-    agent_card=GO_AGENT_CARD_URL,
-    description="抽出された契約フィールドを企業のコンプライアンスポリシーに照らして検証する。"
-)
-
-# サブエージェント3: 最終監査レポートを生成
-report_agent = Agent(
-    name="report_agent",
-    model=Gemini(model="gemini-3.5-flash"),
-    instruction="最終的なコンプライアンスレポートとMarkdown要約を生成すること。",
-    tools=[generate_summary_report]
-)
-
-# コーディネーター: 上記3つを順番に連結する
-root_agent = SequentialAgent(
-    name="contract_compliance_coordinator",
-    description="契約解析・A2Aコンプライアンス検証・最終レポート作成を順に実行する。",
-    sub_agents=[extractor_agent, compliance_agent, report_agent],
-)`}
+              <div className={styles.codeLine}>
+                <span className={styles.cc}># python-extraction-agent/app/agent.py</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.ck}>from</span> google.adk.agents{" "}
+                <span className={styles.ck}>import</span> Agent, SequentialAgent
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.ck}>from</span> google.adk.agents.remote_a2a_agent{" "}
+                <span className={styles.ck}>import</span> RemoteA2aAgent
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.ck}>from</span> google.adk.models{" "}
+                <span className={styles.ck}>import</span> Gemini
+              </div>
+              <div className={styles.codeLine}>&nbsp;</div>
+              <div className={styles.codeLine}>
+                <span className={styles.cc}># サブエージェント1: LLM推論でデータを抽出</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.cv}>extractor_agent</span> = Agent(
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}
+                <span className={styles.cv}>name</span>=
+                <span className={styles.cs}>&quot;extractor_agent&quot;</span>,
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}
+                <span className={styles.cv}>model</span>=Gemini(
+                <span className={styles.cv}>model</span>=
+                <span className={styles.cs}>&quot;gemini-3.5-flash&quot;</span>
+                ),
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}
+                <span className={styles.cv}>instruction</span>=
+                <span className={styles.cs}>
+                  &quot;あなたは法務データ抽出エージェントです。契約書から金額・契約者・日付・保険条項を抽出してください。&quot;
+                </span>
+                ,
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}
+                <span className={styles.cv}>tools</span>=[read_contract_text, save_extracted_fields,
+                classify_risk_level]
+              </div>
+              <div className={styles.codeLine}>)</div>
+              <div className={styles.codeLine}>&nbsp;</div>
+              <div className={styles.codeLine}>
+                <span className={styles.cc}>
+                  # サブエージェント2:
+                  Go製のA2Aコンプライアンスサービスをローカルエージェントとしてラップ
+                </span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.cv}>compliance_agent</span> = RemoteA2aAgent(
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}
+                <span className={styles.cv}>name</span>=
+                <span className={styles.cs}>&quot;compliance_agent&quot;</span>,
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}
+                <span className={styles.cv}>agent_card</span>=GO_AGENT_CARD_URL,
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}
+                <span className={styles.cv}>description</span>=
+                <span className={styles.cs}>
+                  &quot;抽出された契約フィールドを企業のコンプライアンスポリシーに照らして検証する。&quot;
+                </span>
+              </div>
+              <div className={styles.codeLine}>)</div>
+              <div className={styles.codeLine}>&nbsp;</div>
+              <div className={styles.codeLine}>
+                <span className={styles.cc}># サブエージェント3: 最終監査レポートを生成</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.cv}>report_agent</span> = Agent(
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}
+                <span className={styles.cv}>name</span>=
+                <span className={styles.cs}>&quot;report_agent&quot;</span>,
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}
+                <span className={styles.cv}>model</span>=Gemini(
+                <span className={styles.cv}>model</span>=
+                <span className={styles.cs}>&quot;gemini-3.5-flash&quot;</span>
+                ),
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}
+                <span className={styles.cv}>instruction</span>=
+                <span className={styles.cs}>
+                  &quot;最終的なコンプライアンスレポートとMarkdown要約を生成すること。&quot;
+                </span>
+                ,
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}
+                <span className={styles.cv}>tools</span>= [generate_summary_report]
+              </div>
+              <div className={styles.codeLine}>)</div>
+              <div className={styles.codeLine}>&nbsp;</div>
+              <div className={styles.codeLine}>
+                <span className={styles.cc}># コーディネーター: 上記3つを順番に連結する</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.cv}>root_agent</span> = SequentialAgent(
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}
+                <span className={styles.cv}>name</span>=
+                <span className={styles.cs}>&quot;contract_compliance_coordinator&quot;</span>,
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}
+                <span className={styles.cv}>description</span>=
+                <span className={styles.cs}>
+                  &quot;契約解析・A2Aコンプライアンス検証・最終レポート作成を順に実行する。&quot;
+                </span>
+                ,
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}
+                <span className={styles.cv}>sub_agents</span>=[extractor_agent, compliance_agent,
+                report_agent],
+              </div>
+              <div className={styles.codeLine}>)</div>
             </code>
           </pre>
         </div>
@@ -1566,18 +2377,69 @@ root_agent = SequentialAgent(
           が提供する共有辞書（セッションステート）を介してやり取りするのが定石です。パイプラインの各ステップを列挙型（Enum）でチェックポイント化しておくと、状態遷移が追跡しやすくなります。
         </p>
         <div className={styles.codeBlockWrap} data-testid="code-block">
+          <div className={styles.codeBlockHeader}>
+            <span>python</span>
+            <CodeCopyButton text={CODE_TEXT_15} />
+          </div>
           <pre className="python">
             <code className="python">
-              {`from enum import Enum
-
-class ComplianceStep(str, Enum):
-    INGESTED = "INGESTED"                      # 契約書アップロード、抽出待ち
-    EXTRACTED = "EXTRACTED"                     # Geminiによるフィールド抽出完了
-    COMPLIANCE_PENDING = "COMPLIANCE_PENDING"   # Goエージェントへ送信、結果待ち
-    COMPLIANCE_COMPLETE = "COMPLIANCE_COMPLETE" # Goエージェントの判定を受領
-    MANUAL_REVIEW = "MANUAL_REVIEW"             # タイムアウト/エラー、人間のレビューへ
-    REVIEW_READY = "REVIEW_READY"               # 違反ありのレポート生成済み
-    APPROVED = "APPROVED"                       # 全チェック合格`}
+              <div className={styles.codeLine}>
+                <span className={styles.ck}>from</span> enum{" "}
+                <span className={styles.ck}>import</span> Enum
+              </div>
+              <div className={styles.codeLine}>&nbsp;</div>
+              <div className={styles.codeLine}>
+                <span className={styles.ck}>class</span>{" "}
+                <span className={styles.ct}>ComplianceStep</span>(str, Enum):
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}
+                <span className={styles.cv}>INGESTED</span> ={" "}
+                <span className={styles.cs}>&quot;INGESTED&quot;</span>
+                {"                      "}
+                <span className={styles.cc}># 契約書アップロード、抽出待ち</span>
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}
+                <span className={styles.cv}>EXTRACTED</span> ={" "}
+                <span className={styles.cs}>&quot;EXTRACTED&quot;</span>
+                {"                     "}
+                <span className={styles.cc}># Geminiによるフィールド抽出完了</span>
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}
+                <span className={styles.cv}>COMPLIANCE_PENDING</span> ={" "}
+                <span className={styles.cs}>&quot;COMPLIANCE_PENDING&quot;</span>
+                {"   "}
+                <span className={styles.cc}># Goエージェントへ送信、結果待ち</span>
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}
+                <span className={styles.cv}>COMPLIANCE_COMPLETE</span> ={" "}
+                <span className={styles.cs}>&quot;COMPLIANCE_COMPLETE&quot;</span>{" "}
+                <span className={styles.cc}># Goエージェントの判定を受領</span>
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}
+                <span className={styles.cv}>MANUAL_REVIEW</span> ={" "}
+                <span className={styles.cs}>&quot;MANUAL_REVIEW&quot;</span>
+                {"             "}
+                <span className={styles.cc}># タイムアウト/エラー、人間のレビューへ</span>
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}
+                <span className={styles.cv}>REVIEW_READY</span> ={" "}
+                <span className={styles.cs}>&quot;REVIEW_READY&quot;</span>
+                {"               "}
+                <span className={styles.cc}># 違反ありのレポート生成済み</span>
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}
+                <span className={styles.cv}>APPROVED</span> ={" "}
+                <span className={styles.cs}>&quot;APPROVED&quot;</span>
+                {"                       "}
+                <span className={styles.cc}># 全チェック合格</span>
+              </div>
             </code>
           </pre>
         </div>
@@ -1606,27 +2468,89 @@ class ComplianceStep(str, Enum):
           はリモートのA2A準拠エージェントを指し示す方法を3通りサポートします。
         </p>
         <div className={styles.codeBlockWrap} data-testid="code-block">
+          <div className={styles.codeBlockHeader}>
+            <span>python</span>
+            <CodeCopyButton text={CODE_TEXT_16} />
+          </div>
           <pre className="python">
             <code className="python">
-              {`from google.adk.agents.remote_a2a_agent import RemoteA2aAgent
-
-# 方法1: Agent CardのURLを直接指定
-remote_agent = RemoteA2aAgent(
-    name="image_scoring",
-    description="画像について興味深い事実を教えてくれるエージェント。",
-    agent_card="http://localhost:8001/a2a/image_scoring/.well-known/agent.json",
-    timeout=300.0,       # HTTPタイムアウト（秒）
-    httpx_client=None,   # カスタムHTTPクライアント（省略可）
-)
-
-# 方法2: ローカルファイルパスとしてAgent Cardを指定
-remote_agent_from_file = RemoteA2aAgent(
-    name="illustration_agent",
-    description="イラストを生成するエージェント。",
-    agent_card="illustration-agent-card.json",
-)
-
-# 方法3: AgentCardオブジェクトを直接構築して渡す（プログラムから動的に生成する場合）`}
+              <div className={styles.codeLine}>
+                <span className={styles.ck}>from</span> google.adk.agents.remote_a2a_agent{" "}
+                <span className={styles.ck}>import</span> RemoteA2aAgent
+              </div>
+              <div className={styles.codeLine}>&nbsp;</div>
+              <div className={styles.codeLine}>
+                <span className={styles.cc}># 方法1: Agent CardのURLを直接指定</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.cv}>remote_agent</span> = RemoteA2aAgent(
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}
+                <span className={styles.cv}>name</span>=
+                <span className={styles.cs}>&quot;image_scoring&quot;</span>,
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}
+                <span className={styles.cv}>description</span>=
+                <span className={styles.cs}>
+                  &quot;画像について興味深い事実を教えてくれるエージェント。&quot;
+                </span>
+                ,
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}
+                <span className={styles.cv}>agent_card</span>=
+                <span className={styles.cs}>
+                  &quot;http://localhost:8001/a2a/image_scoring/.well-known/agent.json&quot;
+                </span>
+                ,
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}
+                <span className={styles.cv}>timeout</span>=<span className={styles.cn}>300.0</span>,
+                {"       "}
+                <span className={styles.cc}># HTTPタイムアウト（秒）</span>
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}
+                <span className={styles.cv}>httpx_client</span>=
+                <span className={styles.cn}>None</span>,{"   "}
+                <span className={styles.cc}># カスタムHTTPクライアント（省略可）</span>
+              </div>
+              <div className={styles.codeLine}>)</div>
+              <div className={styles.codeLine}>&nbsp;</div>
+              <div className={styles.codeLine}>
+                <span className={styles.cc}>
+                  # 方法2: ローカルファイルパスとしてAgent Cardを指定
+                </span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.cv}>remote_agent_from_file</span> = RemoteA2aAgent(
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}
+                <span className={styles.cv}>name</span>=
+                <span className={styles.cs}>&quot;illustration_agent&quot;</span>,
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}
+                <span className={styles.cv}>description</span>=
+                <span className={styles.cs}>&quot;イラストを生成するエージェント。&quot;</span>,
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}
+                <span className={styles.cv}>agent_card</span>=
+                <span className={styles.cs}>&quot;illustration-agent-card.json&quot;</span>,
+              </div>
+              <div className={styles.codeLine}>)</div>
+              <div className={styles.codeLine}>&nbsp;</div>
+              <div className={styles.codeLine}>
+                <span className={styles.cc}>
+                  # 方法3:
+                  AgentCardオブジェクトを直接構築して渡す（プログラムから動的に生成する場合）
+                </span>
+              </div>
             </code>
           </pre>
         </div>
@@ -1638,23 +2562,69 @@ remote_agent_from_file = RemoteA2aAgent(
           リストにそのまま加えるだけでメインのオーケストレーターから利用できます。
         </p>
         <div className={styles.codeBlockWrap} data-testid="code-block">
+          <div className={styles.codeBlockHeader}>
+            <span>python</span>
+            <CodeCopyButton text={CODE_TEXT_17} />
+          </div>
           <pre className="python">
             <code className="python">
-              {`from google.adk.agents.remote_a2a_agent import RemoteA2aAgent
-from google.adk import Agent
-
-data_analyst = RemoteA2aAgent(
-    name="DataAnalyst",
-    description="データセットを分析する。",
-    agent_card="https://agent-b.run.app/.well-known/agent.json"
-)
-
-orchestrator = Agent(
-    name="Orchestrator",
-    model="gemini-2.0-flash",
-    instruction="データ分析タスクはDataAnalystに委譲すること。",
-    sub_agents=[data_analyst]
-)`}
+              <div className={styles.codeLine}>
+                <span className={styles.ck}>from</span> google.adk.agents.remote_a2a_agent{" "}
+                <span className={styles.ck}>import</span> RemoteA2aAgent
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.ck}>from</span> google.adk{" "}
+                <span className={styles.ck}>import</span> Agent
+              </div>
+              <div className={styles.codeLine}>&nbsp;</div>
+              <div className={styles.codeLine}>
+                <span className={styles.cv}>data_analyst</span> = RemoteA2aAgent(
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}
+                <span className={styles.cv}>name</span>=
+                <span className={styles.cs}>&quot;DataAnalyst&quot;</span>,
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}
+                <span className={styles.cv}>description</span>=
+                <span className={styles.cs}>&quot;データセットを分析する。&quot;</span>,
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}
+                <span className={styles.cv}>agent_card</span>=
+                <span className={styles.cs}>
+                  &quot;https://agent-b.run.app/.well-known/agent.json&quot;
+                </span>
+              </div>
+              <div className={styles.codeLine}>)</div>
+              <div className={styles.codeLine}>&nbsp;</div>
+              <div className={styles.codeLine}>
+                <span className={styles.cv}>orchestrator</span> = Agent(
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}
+                <span className={styles.cv}>name</span>=
+                <span className={styles.cs}>&quot;Orchestrator&quot;</span>,
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}
+                <span className={styles.cv}>model</span>=
+                <span className={styles.cs}>&quot;gemini-2.0-flash&quot;</span>,
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}
+                <span className={styles.cv}>instruction</span>=
+                <span className={styles.cs}>
+                  &quot;データ分析タスクはDataAnalystに委譲すること。&quot;
+                </span>
+                ,
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}
+                <span className={styles.cv}>sub_agents</span>=[data_analyst]
+              </div>
+              <div className={styles.codeLine}>)</div>
             </code>
           </pre>
         </div>
@@ -1672,32 +2642,72 @@ orchestrator = Agent(
           <code>to_a2a()</code> ユーティリティを使うのが最も簡単な方法です。
         </p>
         <div className={styles.codeBlockWrap} data-testid="code-block">
+          <div className={styles.codeBlockHeader}>
+            <span>python</span>
+            <CodeCopyButton text={CODE_TEXT_18} />
+          </div>
           <pre className="python">
             <code className="python">
-              {`# あなたの既存のエージェント定義
-root_agent = Agent(
-    model='gemini-flash-latest',
-    name='hello_world_agent',
-    # ...ツールや指示...
-)`}
+              <div className={styles.codeLine}>
+                <span className={styles.cc}># あなたの既存のエージェント定義</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.cv}>root_agent</span> = Agent(
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}
+                <span className={styles.cv}>model</span>=
+                <span className={styles.cs}>&apos;gemini-flash-latest&apos;</span>,
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}
+                <span className={styles.cv}>name</span>=
+                <span className={styles.cs}>&apos;hello_world_agent&apos;</span>,
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}
+                <span className={styles.cc}># ...ツールや指示...</span>
+              </div>
+              <div className={styles.codeLine}>)</div>
             </code>
           </pre>
         </div>
         <div className={styles.codeBlockWrap} data-testid="code-block">
+          <div className={styles.codeBlockHeader}>
+            <span>python</span>
+            <CodeCopyButton text={CODE_TEXT_19} />
+          </div>
           <pre className="python">
             <code className="python">
-              {`from google.adk.a2a.utils.agent_to_a2a import to_a2a
-
-# エージェントをA2A対応にする
-a2a_app = to_a2a(root_agent, port=8001)`}
+              <div className={styles.codeLine}>
+                <span className={styles.ck}>from</span> google.adk.a2a.utils.agent_to_a2a{" "}
+                <span className={styles.ck}>import</span> to_a2a
+              </div>
+              <div className={styles.codeLine}>&nbsp;</div>
+              <div className={styles.codeLine}>
+                <span className={styles.cc}># エージェントをA2A対応にする</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.cv}>a2a_app</span> = to_a2a(root_agent,{" "}
+                <span className={styles.cv}>port</span>=<span className={styles.cn}>8001</span>)
+              </div>
             </code>
           </pre>
         </div>
         <div className={styles.codeBlockWrap} data-testid="code-block">
+          <div className={styles.codeBlockHeader}>
+            <span>bash</span>
+            <CodeCopyButton text={CODE_TEXT_20} />
+          </div>
           <pre className="bash">
             <code className="bash">
-              {`# uvicornでA2Aサーバーとして起動
-uvicorn agent:a2a_app --host localhost --port 8001`}
+              <div className={styles.codeLine}>
+                <span className={styles.cc}># uvicornでA2Aサーバーとして起動</span>
+              </div>
+              <div className={styles.codeLine}>
+                uvicorn agent:a2a_app --host localhost --port{" "}
+                <span className={styles.cn}>8001</span>
+              </div>
             </code>
           </pre>
         </div>
@@ -1749,10 +2759,20 @@ uvicorn agent:a2a_app --host localhost --port 8001`}
           と組み合わせてデバッグしやすいこと、また1つのサーバーで複数の独立したエージェントを親フォルダ配下にまとめて配信できることです。
         </p>
         <div className={styles.codeBlockWrap} data-testid="code-block">
+          <div className={styles.codeBlockHeader}>
+            <span>bash</span>
+            <CodeCopyButton text={CODE_TEXT_21} />
+          </div>
           <pre className="bash">
             <code className="bash">
-              {`# following command runs the ADK agent as a2a agent
-adk api_server --a2a --port 8001 remote_a2a`}
+              <div className={styles.codeLine}>
+                <span className={styles.cc}>
+                  # following command runs the ADK agent as a2a agent
+                </span>
+              </div>
+              <div className={styles.codeLine}>
+                adk api_server --a2a --port <span className={styles.cn}>8001</span> remote_a2a
+              </div>
             </code>
           </pre>
         </div>
@@ -1790,13 +2810,26 @@ adk api_server --a2a --port 8001 remote_a2a`}
           </li>
         </ul>
         <div className={styles.codeBlockWrap} data-testid="code-block">
+          <div className={styles.codeBlockHeader}>
+            <span>bash</span>
+            <CodeCopyButton text={CODE_TEXT_22} />
+          </div>
           <pre className="bash">
             <code className="bash">
-              {`# 1. リモート（公開）側を起動
-uvicorn contributing.samples.a2a_root.remote_a2a.hello_world.agent:a2a_app --host localhost --port 8001
-
-# 2. 別ターミナルで、呼び出す側（コンシューマー）のadk webを起動
-adk web contributing/samples/`}
+              <div className={styles.codeLine}>
+                <span className={styles.cc}># 1. リモート（公開）側を起動</span>
+              </div>
+              <div className={styles.codeLine}>
+                uvicorn contributing.samples.a2a_root.remote_a2a.hello_world.agent:a2a_app --host
+                localhost --port <span className={styles.cn}>8001</span>
+              </div>
+              <div className={styles.codeLine}>&nbsp;</div>
+              <div className={styles.codeLine}>
+                <span className={styles.cc}>
+                  # 2. 別ターミナルで、呼び出す側（コンシューマー）のadk webを起動
+                </span>
+              </div>
+              <div className={styles.codeLine}>adk web contributing/samples/</div>
             </code>
           </pre>
         </div>
@@ -1831,9 +2864,18 @@ adk web contributing/samples/`}
           </li>
         </ol>
         <div className={styles.codeBlockWrap} data-testid="code-block">
+          <div className={styles.codeBlockHeader}>
+            <span>bash</span>
+            <CodeCopyButton text={CODE_TEXT_23} />
+          </div>
           <pre className="bash">
             <code className="bash">
-              {`pip install --upgrade --quiet "google-cloud-aiplatform[agent_engines,adk]>=1.112"`}
+              <div className={styles.codeLine}>
+                pip install --upgrade --quiet{" "}
+                <span className={styles.cs}>
+                  &quot;google-cloud-aiplatform[agent_engines,adk]&gt;=1.112&quot;
+                </span>
+              </div>
             </code>
           </pre>
         </div>
@@ -1843,8 +2885,14 @@ adk web contributing/samples/`}
           </li>
         </ol>
         <div className={styles.codeBlockWrap} data-testid="code-block">
+          <div className={styles.codeBlockHeader}>
+            <span>bash</span>
+            <CodeCopyButton text={CODE_TEXT_24} />
+          </div>
           <pre className="bash">
-            <code className="bash">{`gcloud auth application-default login`}</code>
+            <code className="bash">
+              <div className={styles.codeLine}>gcloud auth application-default login</div>
+            </code>
           </pre>
         </div>
         <ol start={4} type="1">
@@ -1857,16 +2905,33 @@ adk web contributing/samples/`}
           </li>
         </ol>
         <div className={styles.codeBlockWrap} data-testid="code-block">
+          <div className={styles.codeBlockHeader}>
+            <span>bash</span>
+            <CodeCopyButton text={CODE_TEXT_25} />
+          </div>
           <pre className="bash">
             <code className="bash">
-              {`PROJECT_ID=my-project-id
-LOCATION_ID=us-central1
-
-adk deploy agent_engine \\
-  --project=$PROJECT_ID \\
-  --region=$LOCATION_ID \\
-  --display_name="My First Agent" \\
-  multi_tool_agent`}
+              <div className={styles.codeLine}>
+                <span className={styles.cv}>PROJECT_ID</span>=my-project-id
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.cv}>LOCATION_ID</span>=us-central1
+              </div>
+              <div className={styles.codeLine}>&nbsp;</div>
+              <div className={styles.codeLine}>adk deploy agent_engine \</div>
+              <div className={styles.codeLine}>
+                {"  "}--project=
+                <span className={styles.cv}>$PROJECT_ID</span> \
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}--region=
+                <span className={styles.cv}>$LOCATION_ID</span> \
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}--display_name=
+                <span className={styles.cs}>&quot;My First Agent&quot;</span> \
+              </div>
+              <div className={styles.codeLine}>{"  "}multi_tool_agent</div>
             </code>
           </pre>
         </div>
@@ -1880,9 +2945,17 @@ adk deploy agent_engine \\
           </li>
         </ol>
         <div className={styles.codeBlockWrap} data-testid="code-block">
+          <div className={styles.codeBlockHeader}>
+            <span>text</span>
+            <CodeCopyButton text={CODE_TEXT_26} />
+          </div>
           <pre className="text">
             <code className="text">
-              {`https://{LOCATION_ID}-aiplatform.googleapis.com/v1/projects/{PROJECT_ID}/locations/{LOCATION_ID}/reasoningEngines/{RESOURCE_ID}:query`}
+              <div className={styles.codeLine}>
+                {
+                  "https://{LOCATION_ID}-aiplatform.googleapis.com/v1/projects/{PROJECT_ID}/locations/{LOCATION_ID}/reasoningEngines/{RESOURCE_ID}:query"
+                }
+              </div>
             </code>
           </pre>
         </div>
@@ -1897,21 +2970,53 @@ adk deploy agent_engine \\
           にアップロードしてからクラウド上で復元する流れです。
         </p>
         <div className={styles.codeBlockWrap} data-testid="code-block">
+          <div className={styles.codeBlockHeader}>
+            <span>python</span>
+            <CodeCopyButton text={CODE_TEXT_27} />
+          </div>
           <pre className="python">
             <code className="python">
-              {`import vertexai
-from vertexai.preview import reasoning_engines
-
-vertexai.init(
-    project="your-gcp-project-id",
-    location="us-central1",
-    staging_bucket="gs://my-agent-staging-bucket",  # ステージング用バケットが必須
-)
-
-# ローカルのadk_appオブジェクトをそのままデプロイ
-remote_app = vertexai.agent_engines.create(
-    reasoning_engines.AdkApp(agent=root_agent, enable_tracing=True),
-)`}
+              <div className={styles.codeLine}>
+                <span className={styles.ck}>import</span> vertexai
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.ck}>from</span> vertexai.preview{" "}
+                <span className={styles.ck}>import</span> reasoning_engines
+              </div>
+              <div className={styles.codeLine}>&nbsp;</div>
+              <div className={styles.codeLine}>vertexai.init(</div>
+              <div className={styles.codeLine}>
+                {"  "}
+                <span className={styles.cv}>project</span>=
+                <span className={styles.cs}>&quot;your-gcp-project-id&quot;</span>,
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}
+                <span className={styles.cv}>location</span>=
+                <span className={styles.cs}>&quot;us-central1&quot;</span>,
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}
+                <span className={styles.cv}>staging_bucket</span>=
+                <span className={styles.cs}>&quot;gs://my-agent-staging-bucket&quot;</span>,{"  "}
+                <span className={styles.cc}># ステージング用バケットが必須</span>
+              </div>
+              <div className={styles.codeLine}>)</div>
+              <div className={styles.codeLine}>&nbsp;</div>
+              <div className={styles.codeLine}>
+                <span className={styles.cc}># ローカルのadk_appオブジェクトをそのままデプロイ</span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.cv}>remote_app</span> = vertexai.agent_engines.create(
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}
+                reasoning_engines.AdkApp(
+                <span className={styles.cv}>agent</span>=root_agent,{" "}
+                <span className={styles.cv}>enable_tracing</span>=
+                <span className={styles.cn}>True</span>),
+              </div>
+              <div className={styles.codeLine}>)</div>
             </code>
           </pre>
         </div>
@@ -1931,22 +3036,69 @@ remote_app = vertexai.agent_engines.create(
           <code>google-credentials</code>（Application Default Credentials）を使うのが定石です。
         </p>
         <div className={styles.codeBlockWrap} data-testid="code-block">
+          <div className={styles.codeBlockHeader}>
+            <span>python</span>
+            <CodeCopyButton text={CODE_TEXT_28} />
+          </div>
           <pre className="python">
             <code className="python">
-              {`import os
-from google.adk.agents.remote_a2a_agent import RemoteA2aAgent
-
-PROJECT_ID = os.getenv("GOOGLE_CLOUD_PROJECT")
-LOCATION = os.getenv("GOOGLE_CLOUD_LOCATION")
-REASONING_ENGINE_ID = os.getenv("REASONING_ENGINE_ID")
-AGENT_ENGINE_RESOURCE = f"projects/{PROJECT_ID}/locations/{LOCATION}/reasoningEngines/{REASONING_ENGINE_ID}"
-a2a_url = f"https://{LOCATION}-aiplatform.googleapis.com/v1beta1/{AGENT_ENGINE_RESOURCE}/a2a"
-
-time_agent = RemoteA2aAgent(
-    name="time_agent",
-    description="Agent Engine上で動くA2Aエージェント。",
-    agent_card=f"{a2a_url}/v1/card",
-)`}
+              <div className={styles.codeLine}>
+                <span className={styles.ck}>import</span> os
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.ck}>from</span> google.adk.agents.remote_a2a_agent{" "}
+                <span className={styles.ck}>import</span> RemoteA2aAgent
+              </div>
+              <div className={styles.codeLine}>&nbsp;</div>
+              <div className={styles.codeLine}>
+                <span className={styles.cv}>PROJECT_ID</span> = os.getenv(
+                <span className={styles.cs}>&quot;GOOGLE_CLOUD_PROJECT&quot;</span>)
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.cv}>LOCATION</span> = os.getenv(
+                <span className={styles.cs}>&quot;GOOGLE_CLOUD_LOCATION&quot;</span>)
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.cv}>REASONING_ENGINE_ID</span> = os.getenv(
+                <span className={styles.cs}>&quot;REASONING_ENGINE_ID&quot;</span>)
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.cv}>AGENT_ENGINE_RESOURCE</span> ={" "}
+                <span className={styles.cs}>
+                  {
+                    'f"projects/{PROJECT_ID}/locations/{LOCATION}/reasoningEngines/{REASONING_ENGINE_ID}"'
+                  }
+                </span>
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.cv}>a2a_url</span> ={" "}
+                <span className={styles.cs}>
+                  {
+                    'f"https://{LOCATION}-aiplatform.googleapis.com/v1beta1/{AGENT_ENGINE_RESOURCE}/a2a"'
+                  }
+                </span>
+              </div>
+              <div className={styles.codeLine}>&nbsp;</div>
+              <div className={styles.codeLine}>
+                <span className={styles.cv}>time_agent</span> = RemoteA2aAgent(
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}
+                <span className={styles.cv}>name</span>=
+                <span className={styles.cs}>&quot;time_agent&quot;</span>,
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}
+                <span className={styles.cv}>description</span>=
+                <span className={styles.cs}>&quot;Agent Engine上で動くA2Aエージェント。&quot;</span>
+                ,
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}
+                <span className={styles.cv}>agent_card</span>=
+                <span className={styles.cs}>{'f"{a2a_url}/v1/card"'}</span>,
+              </div>
+              <div className={styles.codeLine}>)</div>
             </code>
           </pre>
         </div>
