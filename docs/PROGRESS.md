@@ -13,12 +13,20 @@
 - **動作検証**:
   - `bun run build`: 今回はユーザー指定により未実行（直近の成功記録は 2026-08-13。許可環境または CI で再確認する）
   - `bun run typecheck` ✅（`tsc --noEmit`。2026-08-19 実測）
-  - `bun run lint` ✅（Biome check / 465 files / 0 diagnostics。2026-08-19 実測）
+  - `bun run lint` ✅（Biome check / 468 files / 0 diagnostics。2026-08-19 実測）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: `bun run test` で Vitest **169 files / 1497 tests すべて合格**（2026-08-19 実測。全 Green ✅）
+  - **フロントエンド (`web-next/`)**: `bun run test` で Vitest **169 files / 1510 tests すべて合格**（2026-08-19 実測。全 Green ✅）
   - **バックエンド (`scraper/`)**: pytest 実行で **43 件すべて合格** (全 Green ✅)
 
 ## 最近の追加内容
+
+- **AI仕様駆動開発におけるMarkdownファイル実践ガイド（/codex/skill）の Pure JSX 完全置き換え移行**:
+  - `Ai-spec-driven-development-markdown-best-practices.html` を `web-next/app/codex/skill/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。
+  - 要約・省略一切なしで全15章（SDDとは何か〜参考文献）、全12サブセクション（h3）、全表（3個）、全コードブロック（4個：CopyButton & Atom One Dark シンタックスハイライト対応）、4個のMermaid図解（`MermaidDiagram`）、TOCスクロール追従・モバイルドロワー（`TocObserver.tsx`）、全12項目のチェックリスト、全33件の参考文献・外部リンク安全属性（`target="_blank" rel="noopener noreferrer"`）、callout（3個）を完全再現。
+  - デザイン・スタイリングの完全再現: SiteHeader との重なりを解消する `position: sticky; top: var(--header-height, 60px); height: calc(100vh - var(--header-height, 60px));` のサイドバーレイアウト、Atom One Dark 配色の構文トークン（見出し `#e06c75`、属性 `#e06c75`、文字列 `#98c379`、ブレット `#61aeee`、コード `#56b6c2`、番号 `#d19a66`、メタ `#5c6370`）、参考文献リストの美しいタイポグラフィと URL ホバースタイルを完全適用。
+  - 原本 `Ai-spec-driven-development-markdown-best-practices.html` は `archive/html/SDD/Ai-spec-driven-development-markdown-best-practices.html` へ退避保存。
+  - 契約テスト21件（S-1〜S-4, C-1〜C-6, D-1〜D-8, Q-2〜Q-3）を作成し、Vitest **169 files / 1510 tests** 全 Green ✅、typecheck ✅、Biome lint ✅ を確認。
+
 
 - **GitHub Copilot Code Review 実践ガイド（/code-review/copilot-code-review）の Pure JSX 完全置き換え移行**:
   - `Github-copilot-code-review-best-practices.html` を `web-next/app/code-review/copilot-code-review/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。
