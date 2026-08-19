@@ -16,7 +16,7 @@ vi.mock("@/components/docs/CodeCopyButton", () => ({
   },
 }));
 
-const EXPECTED_H1 = ["Gemini マルチエージェント開発 ベストプラクティス完全ガイド"] as const;
+const EXPECTED_H1 = ["Gemini マルチエージェント開発ベストプラクティス完全ガイド"] as const;
 
 const EXPECTED_H2 = [
   "0. はじめに — このガイドを読む前に知っておくべきこと",
@@ -75,8 +75,8 @@ const EXPECTED_H3 = [
   "9.4 マルチエージェントパイプラインの全体像",
   "10.1 3つの指定方法",
   "10.2 サブエージェントとして組み込む",
-  "10.3 逆方向: 自分のエージェントをA2A対応で公開する（toa2a()）",
-  "10.4 もう一つの公開方法: adk apiserver --a2a",
+  "10.3 逆方向: 自分のエージェントをA2A対応で公開する（to_a2a()）",
+  "10.4 もう一つの公開方法: adk api_server --a2a",
   "10.5 開発時のディレクトリ構成例",
   "11.1 Agent Engine とは",
   "11.2 デプロイ手順（ステップバイステップ）",
