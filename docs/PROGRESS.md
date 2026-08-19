@@ -15,7 +15,7 @@
   - `bun run typecheck` ✅（`tsc --noEmit`。2026-08-19 実測）
   - `bun run lint` ✅（Biome check / 459 files / 0 diagnostics。2026-08-19 実測）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: `bun run test` で Vitest **165 files / 1468 tests すべて合格**（2026-08-19 実測。全 Green ✅）
+  - **フロントエンド (`web-next/`)**: `bun run test` で Vitest **166 files / 1470 tests すべて合格**（2026-08-19 実測。全 Green ✅）
   - **バックエンド (`scraper/`)**: pytest 実行で **43 件すべて合格** (全 Green ✅)
 
 ## 最近の追加内容
