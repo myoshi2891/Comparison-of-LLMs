@@ -79,6 +79,13 @@ function decodeEntities(raw) {
     .replace(/&#39;/g, "'")
     .replace(/&apos;/g, "'")
     .replace(/&nbsp;/g, " ")
+    .replace(/&mdash;/g, "—")
+    .replace(/&ndash;/g, "–")
+    .replace(/&hellip;/g, "…")
+    .replace(/&rsquo;/g, "’")
+    .replace(/&lsquo;/g, "‘")
+    .replace(/&rdquo;/g, "”")
+    .replace(/&ldquo;/g, "“")
     .replace(/&amp;/g, "&");
 }
 
@@ -91,6 +98,7 @@ function stripMarkup(fragment) {
   return decodeEntities(
     fragment
       .replace(/\{\/\*[\s\S]*?\*\/\}/g, "")
+      .replace(/\{\s*"\\n"\s*\}|\{\s*'\\n'\s*\}|\{\s*`\\n`\s*\}/g, "\n")
       .replace(/\{\s*"([^"]*)"\s*\}/g, "$1")
       .replace(/\{\s*'([^']*)'\s*\}/g, "$1")
       .replace(/\{\s*`([^`]*)`\s*\}/g, "$1")
@@ -351,7 +359,7 @@ function collectHtmlMermaidSources(src) {
   }
 
   const scriptRe =
-    /<script\b[^>]*\bclass=["'][^"']*\bmermaid-source\b[^"']*["'][^>]*>([\s\S]*?)<\/script\s*>/gi;
+    /<script\b[^>]*\b(?:class=["'][^"']*\bmermaid-source\b[^"']*["']|id=["']src-diagram-\d+["'])[^>]*>([\s\S]*?)<\/script\s*>/gi;
   let script = scriptRe.exec(src);
   while (script !== null) {
     sources.push({ index: script.index, source: normalizeMermaidSource(script[1]) });
@@ -517,7 +525,11 @@ function inventoryMarkdown(src) {
  * @return {Object} The extracted headings, element counts, normalized content, Mermaid sources, SVG elements, callouts, and external links.
  */
 function inventoryHtml(src) {
-  const body = src
+  const preserved = src.replace(
+    /<script\b[^>]*\bdata-code\b[^>]*>([\s\S]*?)<\/script\s*>/gi,
+    "<code>$1</code>"
+  );
+  const body = preserved
     .replace(/<head[\s\S]*?<\/head>/gi, "")
     .replace(/<(script|style)[\s\S]*?<\/\1>/gi, "")
     .replace(/<link\b[^>]*\/?>/gi, "");

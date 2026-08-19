@@ -28,7 +28,7 @@ allowed-tools:
 
 # Next.js ガイドページ追加・保守スキル
 
-(最終更新日: 2026-08-14)
+(最終更新日: 2026-08-19)
 
 ## 0. このスキルが解決する問題
 
@@ -184,11 +184,15 @@ C-6 と D-1〜D-4 は下記の適用条件に該当する場合のみ追加す�
 | D-2 | 原本に warn callout がある | `callout[data-variant="warn"]` が `callout-label` 子要素を持つ |
 | D-3 | 原本に step / stepTag がある | `stepTag` が `data-testid="step-tag"` を持ち、件数が**原本の step 数**と一致する |
 | D-4 | 原本に voice / blockquote がある | `voice`/`blockquote` が `data-testid="voice"` と `voice-who` 子要素を持つ |
+| D-5 | 原本にサイドバーがある | `data-testid="sidebar-nav"` があり、各リンクに `data-testid="sidebar-nav-link"` がある |
+| D-6 | 原本にコードブロックがある | `pre` 内の `code` が背景/枠線リセット済み（`background: none`）。`data-testid="code-block"` で識別 |
+| D-7 | 原本に外部 CDN がある | Tabler Icons 等の `<link rel="stylesheet">` が JSX 内に挿入されている |
+| D-8 | 全ページ | `.layout` に `data-testid="layout-root"` があり、`width: 100%` で全幅展開 |
 
-原本に warn callout・step・voice / blockquote 等が存在しない場合、対応する D 契約は要求しない。
+原本に warn callout・step・voice / blockquote・サイドバー・CDN 等が存在しない場合、対応する D 契約は要求しない。
 不在要素を作成して契約数を満たすことは faithful 移植ではない。
 
-> 実装例: `references/design-contract-tests.md`
+> 実装例: `references/design-contract-tests.md`（D-5〜D-8 の具体的なテストコードも収録）
 
 #### Q. 品質契約（3 件・必須）
 
@@ -243,10 +247,18 @@ expect(Array.from(container.querySelectorAll("h2")).map(headingText))
 | **コードブロック構文ハイライト** | 鮮やかなマルチカラー | 単色プレーンテキスト放置 | JSX 内で `.ck`, `.cv`, `.cs`, `.cw`, `.cc`, `.cm` の `<span>` トークン化 |
 | **コードブロック行改行** | `<div className={styles.codeLine}>` で 1 行毎ラッパー | 生テキスト直接配置（`\n` 崩れ） | `.codeLine`（`white-space: pre`）で完全に囲む |
 | **コードブロックのインデント** | Python / YAML の先頭空白 | Biome / JSX の空白圧縮で消失 | 先頭ノードに `{"  "}` / `{"    "}` を明示的に埋め込む |
+| **`pre code` リセット** | `background: none; border: none; color: inherit;` | リセット忘れでブロック内にインラインスタイルが漏れる | `.layout :global(pre code)` で明示リセット |
 | **Mermaid 図解テーマ** | 原本の `theme: 'base'`（白/青/金ライト） | デフォルトの `dark`（真っ黒） | `MermaidDiagram` に `theme="base"` と `themeVariables` を明示渡し |
 | **チェックリスト構造** | 原本のリスト／カード／表構造 | 別構造への変換 | 原本の要素構造と CSS をそのまま転写 |
 | **callout.warn** | 赤系背景 (`var(--danger-soft)`) | 黄色/金系 (`gold-soft`) | `danger-soft` (#fbebe6) を正しく適用 |
 | **thead th** | 青系背景 (`var(--accent-soft)`) | ベージュ背景 (`var(--bg)`) | `thead th` に `var(--accent-soft)` を上書き定義 |
+| **サイドバーナビ色** | `color: var(--color-text-secondary)` / アイコン `var(--color-text-tertiary)` | globals.css デフォルト色のまま | `.sidebarNav a` / `.sidebarNav a i` に明示 |
+| **`p` / `li` 文字色** | `color: var(--color-text-secondary)` | globals.css デフォルト（白/グレー） | `.layout :global(p)` / `.layout :global(li)` に設定 |
+| **リスト要素の型** | 原本が `<ol>` なら `<ol>`、`<ul>` なら `<ul>` | `<ol>` を `<ul>` に変えてしまう | 原本のリスト型をそのまま使う |
+| **全幅レイアウト** | `width: 100%` / `max-width: 100%` | `max-width: 1440px` 等で制約 | サイドバー付きは固定 max-width を付けない |
+| **CDN リンク** | `<link>` で Tabler Icons 等を読み込み | リンクタグ挿入忘れ | JSX 内に `<link>` を直接配置 |
+
+> **→ CSS 転写の詳細手順は `references/css-full-transfer-checklist.md` を参照**
 
 #### ⚠️ CSS Module 地雷チェックリスト
 
@@ -282,6 +294,14 @@ h2, h3 { scroll-margin-top: calc(var(--header-height, 60px) + 80px); }
 
 - **サイドバー付きページ**（大半）: `.main` は `min-width: 0` + `width: 100%` の流動幅。固定 `max-width` を付けない
 - **単一カラムページ**: 中央寄せコンテナに `max-width: 1440px` + `margin: 0 auto`（サイトの `.container` と同値）
+
+**⑤ 外部 CDN リンクの挿入**
+原本の `<head>` に外部 CSS/フォントの `<link>` がある場合、JSX 内に `<link>` を直接配置する。
+→ 詳細は `references/implementation-reference.md` §「外部 CDN リンク挿入パターン」
+
+**⑥ `pre code` リセット**
+`<pre>` 内の `<code>` はインラインコードスタイルを打ち消す必要がある。
+→ 詳細は `references/implementation-reference.md` §「`pre code` リセットパターン」
 
 ### Step 3: [Green の前提] 原本照合監査を通す
 
@@ -338,9 +358,11 @@ echo "exit=$?"   # 0 でなければ移行漏れがある
 
 ### Step 6: コードハイライト用クラス早見表
 
-`styles.` を前置して使用する。
+`styles.` を前置して使用する。**以下は一例（Atom One Dark 系）であり、実際の色は原本の
+`<style>` ブロックから抽出すること。** → 詳細は `references/implementation-reference.md`
+§「原本配色テーマの特定と転写手順」
 
-| クラス | 原本カラー | 用途 |
+| クラス | デフォルト例 | 用途 |
 |---|---|---|
 | `ck` | 紫 `#d89be0` | キーワード (`codex`, `function`, `class`) |
 | `cv` | 青 `#8fb2ff` | 変数 / 属性名 (`model`, `command`, `exec`) |
@@ -348,6 +370,9 @@ echo "exit=$?"   # 0 でなければ移行漏れがある
 | `cw` | 黄 `#e8b168` | 数値 / フラグ (`--last`, `true`, `42`) |
 | `cc` | グレー `#6b6f87` | コメント（斜体 `# comment`） |
 | `cm` | 金 `#f2c572` | セクション / ディレクトリ (`[features]`, `my-skill/`) |
+
+> **⚠ 配色は原本ごとに異なる。** 原本 HTML の `<style>` に定義された色を 1:1 で転記すること。
+> 原本に配色クラスが無い場合（プレーンテキスト）はハイライト不要。
 
 ### Step 7: [Refactor] ローカル検証
 
@@ -422,8 +447,9 @@ git diff --cached | grep -E '^\+[^+]' | grep -E '(/Users/|/home/|C:\\Users\\)' |
 |---|---|
 | `scripts/audit_source_parity.mjs` | 原本照合監査スクリプト（移行漏れの機械検知） |
 | `references/source-parity-audit.md` | 監査の運用手順・S-1〜S-4 契約テストの実装例 |
-| `references/design-contract-tests.md` | D-1〜D-4 デザイン契約テストの実装例と `data-testid` 一覧 |
-| `references/implementation-reference.md` | page.tsx / CSS の実装リファレンス |
+| `references/design-contract-tests.md` | D-1〜D-8 デザイン契約テストの実装例と `data-testid` 一覧 |
+| `references/implementation-reference.md` | page.tsx / CSS の実装リファレンス（`pre code` リセット・CDN 挿入・配色テーマ特定を含む） |
+| `references/css-full-transfer-checklist.md` | **CSS 完全転写チェックリスト** — 原本 `<style>` → page.module.css の転写手順を網羅 |
 | `.claude/rules/tdd-mandatory-cycle.md` | TDD サイクルとコミット分割の強制ルール |
 | `.claude/rules/mermaid-diagram-layout.md` | Mermaid レイアウトの不変条件（SSoT） |
 | `.claude/rules/css-cache-reset.md` | CSS 変更後のキャッシュリセット手順 |
