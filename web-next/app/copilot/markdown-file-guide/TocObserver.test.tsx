@@ -1,33 +1,19 @@
 // @vitest-environment jsdom
-import { fireEvent, render } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { cleanup, fireEvent, render } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { installIntersectionObserverStub } from "@/tests/tocTestUtils";
 import { TocObserver } from "./TocObserver";
 import styles from "./page.module.css";
 
 describe("TocObserver Component", () => {
-  let observeMock: ReturnType<typeof vi.fn>;
-  let disconnectMock: ReturnType<typeof vi.fn>;
-  let observerCallback: IntersectionObserverCallback;
+  let io: ReturnType<typeof installIntersectionObserverStub>;
 
   beforeEach(() => {
-    observeMock = vi.fn();
-    disconnectMock = vi.fn();
+    io = installIntersectionObserverStub();
+  });
 
-    vi.stubGlobal(
-      "IntersectionObserver",
-      vi.fn((callback: IntersectionObserverCallback) => {
-        observerCallback = callback;
-        return {
-          observe: observeMock,
-          disconnect: disconnectMock,
-          unobserve: vi.fn(),
-          takeRecords: vi.fn(() => []),
-          root: null,
-          rootMargin: "",
-          thresholds: [],
-        };
-      })
-    );
+  afterEach(() => {
+    cleanup();
   });
 
   it("registers observer on section[id] elements and cleans up on unmount", () => {
@@ -36,14 +22,14 @@ describe("TocObserver Component", () => {
       <div id="sidebar"></div>
       <div id="sidebarOverlay"></div>
       <section id="overview"></section>
-      <section id="step-repo-instructions"></section>
+      <section id="step-instructions"></section>
     `;
 
     const { unmount } = render(<TocObserver />);
-    expect(observeMock).toHaveBeenCalledTimes(2);
+    expect(io.observedTargets.length).toBe(2);
 
     unmount();
-    expect(disconnectMock).toHaveBeenCalledTimes(1);
+    expect(io.disconnectCount).toBe(1);
   });
 
   it("handles sidebar toggle clicks and overlay clicks", () => {
@@ -81,9 +67,9 @@ describe("TocObserver Component", () => {
   it("updates active TOC link on intersection change", () => {
     document.body.innerHTML = `
       <a class="${styles.navLink}" href="#overview">Overview</a>
-      <a class="${styles.navLink}" href="#step-repo-instructions">Repo Instructions</a>
+      <a class="${styles.navLink}" href="#step-instructions">Repo Instructions</a>
       <section id="overview"></section>
-      <section id="step-repo-instructions"></section>
+      <section id="step-instructions"></section>
     `;
 
     render(<TocObserver />);
@@ -92,25 +78,19 @@ describe("TocObserver Component", () => {
     overviewSec.getBoundingClientRect = () =>
       ({ top: 10, bottom: 200, left: 0, right: 100, width: 100, height: 190 }) as DOMRect;
 
-    const repoSec = document.getElementById("step-repo-instructions")!;
+    const repoSec = document.getElementById("step-instructions")!;
     repoSec.getBoundingClientRect = () =>
       ({ top: 300, bottom: 500, left: 0, right: 100, width: 100, height: 200 }) as DOMRect;
 
     // Simulate overview section intersecting
-    observerCallback(
-      [
-        {
-          target: overviewSec,
-          isIntersecting: true,
-          boundingClientRect: overviewSec.getBoundingClientRect(),
-          intersectionRatio: 1,
-          intersectionRect: overviewSec.getBoundingClientRect(),
-          rootBounds: null,
-          time: Date.now(),
-        } as IntersectionObserverEntry,
-      ],
-      {} as IntersectionObserver
-    );
+    io.emit([
+      {
+        target: overviewSec,
+        isIntersecting: true,
+        boundingClientRect: overviewSec.getBoundingClientRect(),
+        intersectionRatio: 1,
+      },
+    ]);
 
     const links = document.querySelectorAll(`.${styles.navLink}`);
     expect(links[0].classList.contains(styles.active)).toBe(true);

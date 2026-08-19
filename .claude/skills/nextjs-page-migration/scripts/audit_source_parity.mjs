@@ -93,7 +93,8 @@ function stripMarkup(fragment) {
       .replace(/\{\/\*[\s\S]*?\*\/\}/g, "")
       .replace(/\{\s*"([^"]*)"\s*\}/g, "$1")
       .replace(/\{\s*'([^']*)'\s*\}/g, "$1")
-      .replace(/\{[^{}]*\}/g, "")
+      .replace(/\{\s*`([^`]*)`\s*\}/g, "$1")
+      .replace(/\{\s*(?:styles\.[A-Za-z0-9_-]+|[A-Za-z_$][\w$]*)\s*\}/g, "")
       .replace(/<[^>]*>/g, "")
   );
 }
@@ -349,6 +350,14 @@ function collectHtmlMermaidSources(src) {
     div = divRe.exec(src);
   }
 
+  const scriptRe =
+    /<script\b[^>]*\bclass=["'][^"']*\bmermaid-source\b[^"']*["'][^>]*>([\s\S]*?)<\/script\s*>/gi;
+  let script = scriptRe.exec(src);
+  while (script !== null) {
+    sources.push({ index: script.index, source: normalizeMermaidSource(script[1]) });
+    script = scriptRe.exec(src);
+  }
+
   const diagramEntryRe = /["'][^"']+["']\s*:\s*`([\s\S]*?)`/g;
   let entry = diagramEntryRe.exec(src);
   while (entry !== null) {
@@ -510,7 +519,8 @@ function inventoryMarkdown(src) {
 function inventoryHtml(src) {
   const body = src
     .replace(/<head[\s\S]*?<\/head>/gi, "")
-    .replace(/<(script|style)[\s\S]*?<\/\1>/gi, "");
+    .replace(/<(script|style)[\s\S]*?<\/\1>/gi, "")
+    .replace(/<link\b[^>]*\/?>/gi, "");
   const headings = [];
   const headingRe = /<h([1-6])\b[^>]*>([\s\S]*?)<\/h\1>/gi;
   let match = headingRe.exec(body);
@@ -623,12 +633,13 @@ function countMatches(src, re) {
  * @returns {Set<string>} The normalized URLs found in the text.
  */
 function collectUrls(src) {
+  const decoded = decodeEntities(src);
   const urls = new Set();
   const re = /https?:\/\/[^\s"'`)<>\]}\\]+/g;
-  let match = re.exec(src);
+  let match = re.exec(decoded);
   while (match !== null) {
     urls.add(normalizeUrl(match[0]));
-    match = re.exec(src);
+    match = re.exec(decoded);
   }
   return urls;
 }

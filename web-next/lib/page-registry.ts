@@ -406,9 +406,9 @@ const entries: PageEntry[] = [
     provider: "microsoft",
     topics: ["guide"],
     summary:
-      "copilot-instructions.md / .instructions.md / .prompt.md / .chatmode.md / .agent.md / AGENTS.md / SKILL.md / MCP / Plan Mode — Copilotの全カスタマイズファイル・新機能を根拠ソース付きで徹底解説。Copilot code review の AGENTS.md 対応（2026-06-18）・Cloud agent GA を反映。",
+      "copilot-instructions.md / .instructions.md / .prompt.md / .chatmode.md / .agent.md / SKILL.md / MCP / Plan Mode — GitHub Copilot AI仕様駆動開発（SDD）ベストプラクティスガイド。全体像・ファイル使い分けフロー・Spec Kit・セキュリティ・成熟度モデルを徹底解説。",
     addedAt: "2026-05-08",
-    lastReviewed: "2026-07-01",
+    lastReviewed: "2026-08-19",
   },
   {
     slug: "/copilot/skill",

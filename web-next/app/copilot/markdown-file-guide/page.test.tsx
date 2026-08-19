@@ -77,10 +77,6 @@ const EXPECTED_EXTERNAL_URLS = [
   "https://learn.microsoft.com/en-us/visualstudio/ide/copilot-agent-skills?view=visualstudio",
   "https://github.blog/changelog/2025-12-18-github-copilot-now-supports-agent-skills/",
   "https://github.blog/changelog/2026-07-29-copilot-code-review-agent-skills-and-mcp-now-generally-available/",
-  "https://docs.github.com/en/copilot/how-tos/provide-context/use-mcp-in-your-ide/extend-copilot-chat-with-mcp",
-  "https://docs.github.com/en/copilot/concepts/context/mcp",
-  "https://code.visualstudio.com/docs/agents/reference/mcp-configuration",
-  "https://github.blog/security/vulnerability-research/safeguarding-vs-code-against-prompt-injections/",
   "https://developer.microsoft.com/blog/spec-driven-development-spec-kit/",
   "https://github.blog/ai-and-ml/generative-ai/spec-driven-development-with-ai-get-started-with-a-new-open-source-toolkit/",
   "https://github.github.com/spec-kit/",
@@ -95,104 +91,104 @@ const EXPECTED_EXTERNAL_URLS = [
 
 const EXPECTED_MERMAID_SOURCES = [
   `flowchart TB
-subgraph AO["常時適用 (Always-on)"]
-A["Personal Instructions<br/>個人のユーザー設定"]
-B["Organization Instructions<br/>組織/Enterprise設定"]
-C["Repository Instructions<br/>copilot-instructions.md / AGENTS.md"]
-D[".instructions.md<br/>applyTo で条件付き適用"]
-end
-subgraph OD["呼び出し時のみ (On-demand)"]
-E[".prompt.md<br/>/コマンドで手動起動"]
-F[".agent.md（旧 .chatmode.md）<br/>役割・ツールセットを切替"]
-G["SKILL.md<br/>description との一致で自動ロード"]
-end
-subgraph EXT["外部連携 (External)"]
-H["MCP Servers<br/>ツール・データソースの接続"]
-end
-A --> M["1回のリクエストごとに<br/>Copilotがコンテキストを統合"]
-B --> M
-C --> M
-D --> M
-M --> E
-M --> F
-M --> G
-M --> H
+    subgraph AO["常時適用 (Always-on)"]
+        A["Personal Instructions<br/>個人のユーザー設定"]
+        B["Organization Instructions<br/>組織/Enterprise設定"]
+        C["Repository Instructions<br/>copilot-instructions.md / AGENTS.md"]
+        D[".instructions.md<br/>applyTo で条件付き適用"]
+    end
+    subgraph OD["呼び出し時のみ (On-demand)"]
+        E[".prompt.md<br/>/コマンドで手動起動"]
+        F[".agent.md（旧 .chatmode.md）<br/>役割・ツールセットを切替"]
+        G["SKILL.md<br/>description との一致で自動ロード"]
+    end
+    subgraph EXT["外部連携 (External)"]
+        H["MCP Servers<br/>ツール・データソースの接続"]
+    end
+    A --> M["1回のリクエストごとに<br/>Copilotがコンテキストを統合"]
+    B --> M
+    C --> M
+    D --> M
+    M --> E
+    M --> F
+    M --> G
+    M --> H
 
-classDef purple fill:#2f2a52,stroke:#b6a6f0,color:#efe9fd;
-classDef teal fill:#113f3b,stroke:#7fd9c9,color:#e3faf5;
-classDef coral fill:#4a2620,stroke:#f0a688,color:#fbe4da;
-class A,B,C,D purple;
-class E,F,G teal;
-class H,M coral;`,
+    classDef purple fill:#2f2a52,stroke:#b6a6f0,color:#efe9fd;
+    classDef teal fill:#113f3b,stroke:#7fd9c9,color:#e3faf5;
+    classDef coral fill:#4a2620,stroke:#f0a688,color:#fbe4da;
+    class A,B,C,D purple;
+    class E,F,G teal;
+    class H,M coral;`,
   `flowchart TD
-Q1{"このルールは常に<br/>適用したいか?"}
-Q1 -->|"はい・リポジトリ全体"| R1["copilot-instructions.md<br/>または AGENTS.md"]
-Q1 -->|"はい・特定言語/ディレクトリのみ"| R2[".instructions.md<br/>applyTo で限定"]
-Q1 -->|"いいえ・手動で呼び出したい"| Q2{"再利用したいのは何か?"}
-Q2 -->|"定型プロンプト・単発タスク"| R3[".prompt.md<br/>/command"]
-Q2 -->|"AIの役割・使えるツール・モデル"| R4[".agent.md<br/>カスタムエージェント"]
-Q2 -->|"手順書・スクリプト付き専門知識"| R5["SKILL.md<br/>description一致で自動ロード"]
-Q1 -->|"外部システムのデータ/操作が必要"| R6["MCP サーバー"]
+    Q1{"このルールは常に<br/>適用したいか?"}
+    Q1 -->|"はい・リポジトリ全体"| R1["copilot-instructions.md<br/>または AGENTS.md"]
+    Q1 -->|"はい・特定言語/ディレクトリのみ"| R2[".instructions.md<br/>applyTo で限定"]
+    Q1 -->|"いいえ・手動で呼び出したい"| Q2{"再利用したいのは何か?"}
+    Q2 -->|"定型プロンプト・単発タスク"| R3[".prompt.md<br/>/command"]
+    Q2 -->|"AIの役割・使えるツール・モデル"| R4[".agent.md<br/>カスタムエージェント"]
+    Q2 -->|"手順書・スクリプト付き専門知識"| R5["SKILL.md<br/>description一致で自動ロード"]
+    Q1 -->|"外部システムのデータ/操作が必要"| R6["MCP サーバー"]
 
-classDef decision fill:#16233a,stroke:#47607f,color:#d7e0ec;
-classDef result fill:#113f3b,stroke:#7fd9c9,color:#e3faf5;
-class Q1,Q2 decision;
-class R1,R2,R3,R4,R5,R6 result;`,
+    classDef decision fill:#16233a,stroke:#47607f,color:#d7e0ec;
+    classDef result fill:#113f3b,stroke:#7fd9c9,color:#e3faf5;
+    class Q1,Q2 decision;
+    class R1,R2,R3,R4,R5,R6 result;`,
   `flowchart LR
-U["ユーザーが<br/>/explain-code と入力"] --> F["explain-code.prompt.md<br/>を読み込み"]
-F --> Ag["Agent modeで実行<br/>(frontmatterのagent/tools/modelに従う)"]
-Ag --> Out["結果を返す"]
+    U["ユーザーが<br/>/explain-code と入力"] --> F["explain-code.prompt.md<br/>を読み込み"]
+    F --> Ag["Agent modeで実行<br/>(frontmatterのagent/tools/modelに従う)"]
+    Ag --> Out["結果を返す"]
 
-classDef purple fill:#2f2a52,stroke:#b6a6f0,color:#efe9fd;
-class U,F,Ag,Out purple;`,
+    classDef purple fill:#2f2a52,stroke:#b6a6f0,color:#efe9fd;
+    class U,F,Ag,Out purple;`,
   `flowchart LR
-Old[".chatmode.md<br/>(旧: Custom Chat Modes)"] -->|"リネーム"| New[".agent.md<br/>(新: Custom Agents)"]
-New --> Loc[".github/agents/<br/>または ユーザープロファイル"]
+    Old[".chatmode.md<br/>(旧: Custom Chat Modes)"] -->|"リネーム"| New[".agent.md<br/>(新: Custom Agents)"]
+    New --> Loc[".github/agents/<br/>または ユーザープロファイル"]
 
-classDef coral fill:#4a2620,stroke:#f0a688,color:#fbe4da;
-classDef teal fill:#113f3b,stroke:#7fd9c9,color:#e3faf5;
-class Old coral;
-class New,Loc teal;`,
+    classDef coral fill:#4a2620,stroke:#f0a688,color:#fbe4da;
+    classDef teal fill:#113f3b,stroke:#7fd9c9,color:#e3faf5;
+    class Old coral;
+    class New,Loc teal;`,
   `flowchart TB
-L1["Level 1: Discovery<br/>全SKILL.mdの description だけを常時スキャン"] --> L2["Level 2: Instructions<br/>関連しそうなSKILL.md本文を読み込む"]
-L2 --> L3["Level 3: Resources<br/>スクリプト・参照資料・テンプレートを必要時にのみ読み込む"]
+    L1["Level 1: Discovery<br/>全SKILL.mdの description だけを常時スキャン"] --> L2["Level 2: Instructions<br/>関連しそうなSKILL.md本文を読み込む"]
+    L2 --> L3["Level 3: Resources<br/>スクリプト・参照資料・テンプレートを必要時にのみ読み込む"]
 
-classDef teal fill:#113f3b,stroke:#7fd9c9,color:#e3faf5;
-class L1,L2,L3 teal;`,
+    classDef teal fill:#113f3b,stroke:#7fd9c9,color:#e3faf5;
+    class L1,L2,L3 teal;`,
   `flowchart TB
-S1["Explore and clarify<br/>読み取り専用ツールでコードベースを調査し、<br/>曖昧な点は質問する"] --> S2["Draft and refine<br/>詳細な実装計画を作成し、一緒にレビューする"]
-S2 --> S3["Edit the plan directly<br/>計画は .copilot/plans/plan-{title}.md<br/>として保存され、直接編集できる"]
-S3 --> S4["Implement<br/>『Implement plan』を押すまで<br/>コードは一切変更されない"]
+    S1["Explore and clarify<br/>読み取り専用ツールでコードベースを調査し、<br/>曖昧な点は質問する"] --> S2["Draft and refine<br/>詳細な実装計画を作成し、一緒にレビューする"]
+    S2 --> S3["Edit the plan directly<br/>計画は .copilot/plans/plan-{title}.md<br/>として保存され、直接編集できる"]
+    S3 --> S4["Implement<br/>『Implement plan』を押すまで<br/>コードは一切変更されない"]
 
-classDef purple fill:#2f2a52,stroke:#b6a6f0,color:#efe9fd;
-class S1,S2,S3,S4 purple;`,
+    classDef purple fill:#2f2a52,stroke:#b6a6f0,color:#efe9fd;
+    class S1,S2,S3,S4 purple;`,
   `flowchart TB
-P1["1. プロトタイピング<br/>複数案をモックで比較する"] --> P2["2. Plan Mode<br/>/plan で要件を詰める・質問に答える"]
-P2 --> P3["3. Autopilot<br/>計画に沿って自律的に実装するループ"]
-P3 --> P4["4. 人間によるレビューと反復"]
-P4 --> P5["5. Rubber Duck Review<br/>別系統のモデルにセカンドオピニオンを求める"]
-P5 -->|"要修正"| P3
-P5 -->|"承認"| P6["6. コミット・PR作成"]
+    P1["1. プロトタイピング<br/>複数案をモックで比較する"] --> P2["2. Plan Mode<br/>/plan で要件を詰める・質問に答える"]
+    P2 --> P3["3. Autopilot<br/>計画に沿って自律的に実装するループ"]
+    P3 --> P4["4. 人間によるレビューと反復"]
+    P4 --> P5["5. Rubber Duck Review<br/>別系統のモデルにセカンドオピニオンを求める"]
+    P5 -->|"要修正"| P3
+    P5 -->|"承認"| P6["6. コミット・PR作成"]
 
-classDef coral fill:#4a2620,stroke:#f0a688,color:#fbe4da;
-classDef teal fill:#113f3b,stroke:#7fd9c9,color:#e3faf5;
-class P1,P2,P3,P4,P5 coral;
-class P6 teal;`,
+    classDef coral fill:#4a2620,stroke:#f0a688,color:#fbe4da;
+    classDef teal fill:#113f3b,stroke:#7fd9c9,color:#e3faf5;
+    class P1,P2,P3,P4,P5 coral;
+    class P6 teal;`,
   `flowchart LR
-C["constitution.md<br/>プロジェクトの<br/>非交渉的な原則"] --> S["/specify<br/>spec.md を生成"]
-S --> P["/plan<br/>plan.md（技術方針）を生成"]
-P --> T["/tasks<br/>tasks.md（実行可能な単位に分解）"]
-T --> I["/implement<br/>タスクごとに<br/>段階的にコード生成"]
-I --> Rev{"人間による<br/>チェックポイント"}
-Rev -->|"要修正"| P
-Rev -->|"承認"| Done["PR作成・マージ"]
+    C["constitution.md<br/>プロジェクトの<br/>非交渉的な原則"] --> S["/specify<br/>spec.md を生成"]
+    S --> P["/plan<br/>plan.md（技術方針）を生成"]
+    P --> T["/tasks<br/>tasks.md（実行可能な単位に分解）"]
+    T --> I["/implement<br/>タスクごとに<br/>段階的にコード生成"]
+    I --> Rev{"人間による<br/>チェックポイント"}
+    Rev -->|"要修正"| P
+    Rev -->|"承認"| Done["PR作成・マージ"]
 
-classDef purple fill:#2f2a52,stroke:#b6a6f0,color:#efe9fd;
-classDef gray fill:#16233a,stroke:#47607f,color:#d7e0ec;
-classDef teal fill:#113f3b,stroke:#7fd9c9,color:#e3faf5;
-class C,S,P,T,I purple;
-class Rev gray;
-class Done teal;`,
+    classDef purple fill:#2f2a52,stroke:#b6a6f0,color:#efe9fd;
+    classDef gray fill:#16233a,stroke:#47607f,color:#d7e0ec;
+    classDef teal fill:#113f3b,stroke:#7fd9c9,color:#e3faf5;
+    class C,S,P,T,I purple;
+    class Rev gray;
+    class Done teal;`,
 ] as const;
 
 function headingText(el: Element): string {
