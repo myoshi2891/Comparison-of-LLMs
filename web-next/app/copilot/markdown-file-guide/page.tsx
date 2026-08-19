@@ -127,6 +127,11 @@ const DIAGRAM_7 = `flowchart LR
 export default function MarkdownFileGuidePage() {
   return (
     <div className={styles.layout}>
+      <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.31.0/dist/tabler-icons.min.css"
+        precedence="default"
+      />
       <button
         type="button"
         id="sidebarToggle"
