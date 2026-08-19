@@ -13,12 +13,21 @@
 - **動作検証**:
   - `bun run build`: 今回はユーザー指定により未実行（直近の成功記録は 2026-08-13。許可環境または CI で再確認する）
   - `bun run typecheck` ✅（`tsc --noEmit`。2026-08-19 実測）
-  - `bun run lint` ✅（Biome check / 468 files / 0 diagnostics。2026-08-19 実測）
+  - `bun run lint` ✅（Biome check / 473 files / 0 diagnostics。2026-08-19 実測）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: `bun run test` で Vitest **169 files / 1510 tests すべて合格**（2026-08-19 実測。全 Green ✅）
+  - **フロントエンド (`web-next/`)**: `bun run test` で Vitest **170 files / 1539 tests すべて合格**（2026-08-19 実測。全 Green ✅）
   - **バックエンド (`scraper/`)**: pytest 実行で **43 件すべて合格** (全 Green ✅)
 
 ## 最近の追加内容
+
+- **Gemini マルチエージェント開発 ベストプラクティス完全ガイド（/google/multi-agent-best-practices）の Next.js アプリ移行**:
+  - `Gemini-multi-agent-best-practices.html` を `web-next/app/google/multi-agent-best-practices/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。
+  - 要約・省略一切なしで全16章（0. はじめに〜15. 参考文献・出典）、全56サブセクション（h3）、全表（12個）、全コードブロック（28個）、8個のMermaid図解（`MermaidDiagram`）、TOCスクロール追従・モバイルドロワー（`TocObserver.tsx`）、全7項目の実践チェックリスト、全7項目のセキュリティチェックリスト、全22件の参考文献・外部リンク安全属性（`target="_blank" rel="noopener noreferrer"`）、全幅レイアウトを完全再現。
+  - 原本 `Gemini-multi-agent-best-practices.html` は `archive/html/google/Gemini-multi-agent-best-practices.html` へ退避保存。
+  - 原本照合監査スクリプト `audit_source_parity.mjs` で exit code 0（漏れなし ✅）を確認。
+  - `web-next/lib/page-registry.ts` に新規エントリ（`slug: "/google/multi-agent-best-practices"`）を登録。
+  - 契約テスト20件（S-1〜S-4, C-1〜C-6, D-5〜D-8, Q-2〜Q-3）を作成し、Vitest **170 files / 1539 tests** 全 Green ✅、typecheck ✅、Biome lint ✅ を確認。
+
 
 - **AI仕様駆動開発におけるMarkdownファイル実践ガイド（/codex/skill）の Pure JSX 完全置き換え移行**:
   - `Ai-spec-driven-development-markdown-best-practices.html` を `web-next/app/codex/skill/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。
