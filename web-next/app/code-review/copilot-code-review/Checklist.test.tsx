@@ -1,12 +1,14 @@
 // @vitest-environment jsdom
 import { fireEvent, render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import Checklist from "./Checklist";
+import Page from "./page";
 
 describe("/code-review/copilot-code-review — Checklist", () => {
   it("チェックボックスをクリックすると checked になり、done クラスが付与されカウンターが更新される", () => {
-    const { container } = render(<Checklist />);
-    const checkboxes = container.querySelectorAll<HTMLInputElement>('input[type="checkbox"]');
+    const { container } = render(<Page />);
+    const checkboxes = container.querySelectorAll<HTMLInputElement>(
+      '#checklistList input[type="checkbox"]'
+    );
     expect(checkboxes.length).toBe(12);
 
     const progress = container.querySelector("#checklistProgress");
@@ -17,8 +19,8 @@ describe("/code-review/copilot-code-review — Checklist", () => {
     expect(checkboxes[0].checked).toBe(true);
     expect(progress?.textContent?.trim()).toBe("1 / 12 完了");
 
-    const firstItem = checkboxes[0].closest(".check-item, [class*='checkItem']");
-    expect(firstItem?.className).toMatch(/done/);
+    const firstItem = checkboxes[0].closest(".check-item");
+    expect(firstItem?.classList.contains("done")).toBe(true);
 
     // リセットボタンをクリック
     const resetBtn = container.querySelector("#checklistReset");
@@ -26,6 +28,7 @@ describe("/code-review/copilot-code-review — Checklist", () => {
       fireEvent.click(resetBtn);
       expect(checkboxes[0].checked).toBe(false);
       expect(progress?.textContent?.trim()).toBe("0 / 12 完了");
+      expect(firstItem?.classList.contains("done")).toBe(false);
     }
   });
 });

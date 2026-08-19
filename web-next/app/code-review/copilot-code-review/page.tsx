@@ -9,6 +9,21 @@ export const metadata: Metadata = {
     "AI駆動のコードレビューをチーム開発に深く組み込む——概念・設定・運用まで中〜上級者向けにステップバイステップで解説",
 };
 
+const THEME_VARIABLES: Record<string, string> = {
+  darkMode: "true",
+  background: "#0d1c30",
+  primaryColor: "#132540",
+  primaryTextColor: "#dbe4f3",
+  primaryBorderColor: "#7c9eff",
+  lineColor: "#7c9eff",
+  secondaryColor: "#101f36",
+  tertiaryColor: "#0d1c30",
+  fontFamily:
+    '-apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans", "Noto Sans JP", sans-serif',
+  fontSize: "16px",
+  edgeLabelBackground: "#0d1c30",
+};
+
 const MERMAID_1 = `flowchart TB
     A["入力処理<br/>PR差分 + タイトル/本文 + カスタム指示を統合"] --> B["言語モデル解析<br/>GPT系 / Claude Opus系 / Gemini系 等を使い分け"]
     B --> C["応答生成<br/>指摘 + severity + 修正提案(自然言語/コード)"]
@@ -237,7 +252,7 @@ export default function Page() {
             <h3 id="sec-h3-2">処理の流れ(アーキテクチャ)</h3>
             <div className="diagram">
               <div className="mermaid-wrapper">
-                <MermaidDiagram chart={MERMAID_1} theme="base" />
+                <MermaidDiagram chart={MERMAID_1} theme="base" themeVariables={THEME_VARIABLES} />
               </div>
               <p className="diagram-caption">図1. Copilot Code Reviewの内部処理フロー</p>
             </div>
@@ -277,7 +292,7 @@ export default function Page() {
 
             <div className="diagram">
               <div className="mermaid-wrapper">
-                <MermaidDiagram chart={MERMAID_2} theme="base" />
+                <MermaidDiagram chart={MERMAID_2} theme="base" themeVariables={THEME_VARIABLES} />
               </div>
               <p className="diagram-caption">図2. 自動レビューを有効化するまでの意思決定フロー</p>
             </div>
@@ -413,11 +428,30 @@ export default function Page() {
                 <span>yaml + markdown</span>
               </div>
               <pre>
-                <code
-                  data-testid="code-block"
-                  className="language-yaml"
-                  id="code-instructions"
-                ></code>
+                <code data-testid="code-block" className="language-yaml" id="code-instructions">
+                  <div className={styles.codeLine}>
+                    <span className="cc">---</span>
+                  </div>
+                  <div className={styles.codeLine}>
+                    <span className="ck">applyTo</span>:
+                  </div>
+                  <div className={styles.codeLine}>
+                    {"  "}- <span className="cs">&quot;webapp/src/**&quot;</span>
+                  </div>
+                  <div className={styles.codeLine}>
+                    {"  "}- <span className="cs">&quot;ui/components/**&quot;</span>
+                  </div>
+                  <div className={styles.codeLine}>
+                    <span className="cc">---</span>
+                  </div>
+                  <div className={styles.codeLine}>
+                    アクセシビリティ(ARIA属性、フォーカス管理)を重視してください。
+                  </div>
+                  <div className={styles.codeLine}>デザイントークンの利用を優先してください。</div>
+                  <div className={styles.codeLine}>
+                    legacy/配下の非推奨コンポーネントの利用を検出したら指摘してください。
+                  </div>
+                </code>
               </pre>
             </div>
 
@@ -657,7 +691,7 @@ export default function Page() {
             <h3 id="sec-h3-8">コメントへの対応フロー</h3>
             <div className="diagram">
               <div className="mermaid-wrapper">
-                <MermaidDiagram chart={MERMAID_3} theme="base" />
+                <MermaidDiagram chart={MERMAID_3} theme="base" themeVariables={THEME_VARIABLES} />
               </div>
               <p className="diagram-caption">図3. レビューコメントへの標準的な対応フロー</p>
             </div>
@@ -859,7 +893,7 @@ export default function Page() {
             <h3 id="sec-h3-11">Copilot Code Review自体のセキュリティ制御</h3>
             <div className="diagram">
               <div className="mermaid-wrapper">
-                <MermaidDiagram chart={MERMAID_4} theme="base" />
+                <MermaidDiagram chart={MERMAID_4} theme="base" themeVariables={THEME_VARIABLES} />
               </div>
               <p className="diagram-caption">図4. Copilot Code Reviewにおける多層防御</p>
             </div>
@@ -1019,7 +1053,7 @@ export default function Page() {
 
             <div className="diagram">
               <div className="mermaid-wrapper">
-                <MermaidDiagram chart={MERMAID_5} theme="base" />
+                <MermaidDiagram chart={MERMAID_5} theme="base" themeVariables={THEME_VARIABLES} />
               </div>
               <p className="diagram-caption">図5. 段階的な導入ロードマップ</p>
             </div>

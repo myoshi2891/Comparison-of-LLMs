@@ -248,7 +248,9 @@ describe("/code-review/copilot-code-review — デザイン契約 (D)", () => {
     const { container } = render(<Page />);
     const codeBlocks = container.querySelectorAll("pre code, [data-testid='code-block']");
     expect(codeBlocks.length).toBeGreaterThan(0);
-    const codeText = Array.from(codeBlocks).map((cb) => cb.textContent).join("\n");
+    const codeText = Array.from(codeBlocks)
+      .map((cb) => cb.textContent)
+      .join("\n");
     expect(codeText).toContain("applyTo:");
     expect(codeText).toContain("webapp/src/**");
     expect(codeText).toContain("アクセシビリティ");
