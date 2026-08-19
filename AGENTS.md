@@ -43,10 +43,10 @@ AGENTS.md は Codex / Cursor / Cline など AGENTS.md 規約を読む AI ツー�
 ## 検証コマンド
 
 ```bash
-(cd web-next && bun run test)        # 166 files / 1470 tests pass（2026-08-19 実測。全 Green ✅）
+(cd web-next && bun run test)        # 168 files / 1496 tests pass（2026-08-19 実測。全 Green ✅）
 (cd web-next && bun run typecheck)   # OK（2026-08-19 実測）
 (cd web-next && bun run build)       # 今回はユーザー指定により未実行。許可環境または CI で確認する
-(cd web-next && bun run lint)        # OK（459 files / 0 diagnostics。2026-08-19 実測）
+(cd web-next && bun run lint)        # OK（465 files / 0 diagnostics。2026-08-19 実測）
 (cd scraper && uv run pytest)        # 43/43 pass（全 Green ✅）
 ```
 

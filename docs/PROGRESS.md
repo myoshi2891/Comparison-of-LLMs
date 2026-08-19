@@ -13,12 +13,31 @@
 - **動作検証**:
   - `bun run build`: 今回はユーザー指定により未実行（直近の成功記録は 2026-08-13。許可環境または CI で再確認する）
   - `bun run typecheck` ✅（`tsc --noEmit`。2026-08-19 実測）
-  - `bun run lint` ✅（Biome check / 459 files / 0 diagnostics。2026-08-19 実測）
+  - `bun run lint` ✅（Biome check / 465 files / 0 diagnostics。2026-08-19 実測）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: `bun run test` で Vitest **167 files / 1484 tests すべて合格**（2026-08-19 実測。全 Green ✅）
+  - **フロントエンド (`web-next/`)**: `bun run test` で Vitest **168 files / 1496 tests すべて合格**（2026-08-19 実測。全 Green ✅）
   - **バックエンド (`scraper/`)**: pytest 実行で **43 件すべて合格** (全 Green ✅)
 
 ## 最近の追加内容
+
+- **GitHub Copilot Code Review 実践ガイド（/code-review/copilot-code-review）の Pure JSX 完全置き換え移行**:
+  - `Github-copilot-code-review-best-practices.html` を `web-next/app/code-review/copilot-code-review/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。
+  - 要約・省略一切なしで全13セクション（はじめに〜参考文献・出典）、全15サブセクション（h3）、全8サブセクション（h4）、全表、全コードブロック、5個のMermaid図解（`MermaidDiagram`）、TOCスクロール追従（`TocObserver.tsx`）、全25件の参考文献・外部リンク安全属性（`target="_blank" rel="noopener noreferrer"`）、callout、チェックリストを完全再現。
+  - 原本 `Github-copilot-code-review-best-practices.html` は `archive/html/Microsoft/Github-copilot-code-review-best-practices.html` へ退避保存。
+  - 原本照合監査スクリプト `audit_source_parity.mjs` で exit code 0（漏れなし ✅）を確認。
+  - 契約テスト16件および TocObserver テスト1件（計17件）を作成・更新し、Vitest **168 files / 1496 tests** 全 Green ✅、typecheck ✅、Biome lint ✅ を確認。
+
+
+- **Next.js ガイドページ移行スキル（nextjs-page-migration）のブラッシュアップ & デザイン移行チェックリスト整備**:
+  - 原本 HTML からの移行時に頻発していた「デザイン・CSS 移行漏れ」（サイドバー配色、コードブロック配色、全幅レイアウト、CDN リンク、リスト要素型、`pre code` リセット、テキスト・段落色）を根絶するため、スキル体系を大幅強化。
+  - **新規リファレンス追加**:
+    - `references/css-full-transfer-checklist.md`（343行）: 原本 `<style>` から `page.module.css` への 100% 完全転写手順、9 つのカテゴリ別チェックリスト（CSS 変数、レイアウト構造、タイポグラフィ、コードブロック 3 層構造、サイドバー、テーブル、callout、外部 CDN リソース、レスポンシブ）を策定。
+  - **既存リファレンス・スキルの更新**:
+    - `SKILL.md`: デザイン契約テスト D-5〜D-8（サイドバーナビ、`pre code` リセット、CDN リンク、レイアウトルート）を新設、スタイリング防犯原則テーブルの拡充、原本配色テーマ依存のコードハイライト手順を明文化。
+    - `references/design-contract-tests.md`: D-5〜D-8 の DOM テスト実装パターンと `data-testid` 仕様を追加。
+    - `references/implementation-reference.md`: `pre code` リセット、外部 CDN リンク直接配置、原本配色テーマ特定コマンド、原本 CSS → page.module.css 変換ルールを収録。
+  - `.skills/`、`.claude/skills/`、`.agent/skills/`、`.gemini/skills/` の全シンボリックリンク・ハードリンクの参照整合性を確認。
+  - テスト検証: Vitest **167 files / 1484 tests** 全 Green ✅。
 
 - **GitHub Copilot AI仕様駆動開発 ベストプラクティスガイド（/copilot/markdown-file-guide）の Pure JSX 完全置き換え移行**:
   - `Copilot-spec-driven-development-best-practices.html` を `web-next/app/copilot/markdown-file-guide/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。
