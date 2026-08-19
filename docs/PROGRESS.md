@@ -23,6 +23,7 @@
 - **GitHub Copilot AI仕様駆動開発 ベストプラクティスガイド（/copilot/markdown-file-guide）の Pure JSX 完全置き換え移行**:
   - `Copilot-spec-driven-development-best-practices.html` を `web-next/app/copilot/markdown-file-guide/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。
   - 要約・省略一切なしで全12セクション（全体像、Step 1〜Step 7、Spec Kitと仕様駆動開発、セキュリティ、成熟度モデル、参考文献）、全表、全コードブロック（1行毎 `codeLine` ラッパー & 構文トークン化）、8個のMermaid図解（`MermaidDiagram`）、TOCスクロール追従（`TocObserver.tsx`）、インタラクティブチェックリスト、全31件の参考文献・外部リンク安全属性（`target="_blank" rel="noopener noreferrer"`）を完全再現。
+  - デザイン・スタイリングの完全再現: Tabler Icons Webfont（`@tabler/icons-webfont`）をロードして全アイコン（サイドバー、kicker、H2見出し、callout、参考文献見出し）を正確に表示。SiteHeader との重なりを解消する `position: sticky; top: var(--header-height, 60px); height: calc(100vh - var(--header-height, 60px));` のサイドバーレイアウトを適用。
   - 既存の旧 `/copilot/markdown-file-guide` 画面と完全入れ替え完了。原本 `Copilot-spec-driven-development-best-practices.html` は `archive/html/Microsoft/Copilot-spec-driven-development-best-practices.html` へ退避保存。
   - 原本照合監査スクリプト `audit_source_parity.mjs` を更新し、`<script class="mermaid-source">` の Mermaid ソース認識、JSON 波括弧の保護、URL エンティティデコードに対応。原本照合監査で exit code 0（漏れなし ✅）を確認。
   - 契約テスト18件（S-1〜S-4, C-1〜C-6, D-1〜D-2, Q-1〜Q-2）および TocObserver テスト3件（計21件）を作成・更新し、Vitest **167 files / 1484 tests** 全 Green ✅、typecheck ✅、Biome lint ✅ を確認。
