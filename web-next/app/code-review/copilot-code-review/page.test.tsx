@@ -244,10 +244,14 @@ describe("/code-review/copilot-code-review — デザイン契約 (D)", () => {
     expect(hasWarn).toBe(true);
   });
 
-  it("D-6: コードブロックが存在する", () => {
+  it("D-6: コードブロックが存在し、指示ファイルのテキスト内容が完全にレンダリングされている", () => {
     const { container } = render(<Page />);
     const codeBlocks = container.querySelectorAll("pre code, [data-testid='code-block']");
     expect(codeBlocks.length).toBeGreaterThan(0);
+    const codeText = Array.from(codeBlocks).map((cb) => cb.textContent).join("\n");
+    expect(codeText).toContain("applyTo:");
+    expect(codeText).toContain("webapp/src/**");
+    expect(codeText).toContain("アクセシビリティ");
   });
 
   it("D-7: highlight.js atom-one-dark CDN リンクが存在する", () => {
