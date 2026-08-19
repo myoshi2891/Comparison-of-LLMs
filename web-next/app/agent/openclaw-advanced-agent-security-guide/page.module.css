@@ -15,9 +15,9 @@
   --text-secondary: #9fb0cc;
   --text-muted: #66789a;
   --code-bg: #0a1220;
-  --font-display: 'Space Grotesk', 'Noto Sans JP', sans-serif;
-  --font-body: 'Inter', 'Noto Sans JP', sans-serif;
-  --font-mono: 'JetBrains Mono', 'Noto Sans JP', monospace;
+  --font-display: "Space Grotesk", "Noto Sans JP", sans-serif;
+  --font-body: "Inter", "Noto Sans JP", sans-serif;
+  --font-mono: "JetBrains Mono", "Noto Sans JP", monospace;
 
   display: block;
   width: 100%;
@@ -127,7 +127,9 @@
   color: var(--text-secondary);
   font-size: 0.885rem;
   line-height: 1.4;
-  transition: background 0.15s ease, color 0.15s ease;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
   text-decoration: none;
 }
 
@@ -203,7 +205,7 @@
 }
 
 .eyebrow::before {
-  content: '';
+  content: "";
   width: 6px;
   height: 6px;
   border-radius: 50%;
@@ -508,12 +510,25 @@
 }
 
 /* Span token code highlight classes */
-.ck { color: #c678dd; } /* keyword */
-.cv { color: #61afef; } /* variable */
-.cs { color: #98c379; } /* string */
-.cw { color: #d19a66; } /* number/flag */
-.cc { color: #5c6370; font-style: italic; } /* comment */
-.cm { color: #e5c07b; } /* section/dir/heading */
+.ck {
+  color: #c678dd;
+} /* keyword */
+.cv {
+  color: #61afef;
+} /* variable */
+.cs {
+  color: #98c379;
+} /* string */
+.cw {
+  color: #d19a66;
+} /* number/flag */
+.cc {
+  color: #5c6370;
+  font-style: italic;
+} /* comment */
+.cm {
+  color: #e5c07b;
+} /* section/dir/heading */
 
 /* Diagrams */
 .diagramWrap {

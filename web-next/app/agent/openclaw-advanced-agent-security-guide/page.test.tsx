@@ -12,7 +12,11 @@ vi.mock("@/components/docs/MermaidDiagram", () => ({
 
 vi.mock("@/components/docs/CodeCopyButton", () => ({
   default: function DummyCodeCopyButton({ text }: { text: string }) {
-    return <button type="button" data-testid="code-copy-button" data-code={text}>Copy</button>;
+    return (
+      <button type="button" data-testid="code-copy-button" data-code={text}>
+        Copy
+      </button>
+    );
   },
 }));
 
@@ -235,13 +239,17 @@ describe("OpenClaw Agent 実践ベストプラクティスガイド 契約テス
   // S. 原本照合契約
   it("S-1: h2 の見出しが原本と完全一致（順序込み）", () => {
     const { container } = render(<Page />);
-    const actualH2 = Array.from(container.querySelectorAll("h2")).map((el) => cleanText(el.textContent));
+    const actualH2 = Array.from(container.querySelectorAll("h2")).map((el) =>
+      cleanText(el.textContent)
+    );
     expect(actualH2).toEqual([...EXPECTED_H2]);
   });
 
   it("S-2: h3 の見出しが原本と完全一致（順序込み）", () => {
     const { container } = render(<Page />);
-    const actualH3 = Array.from(container.querySelectorAll("h3")).map((el) => cleanText(el.textContent));
+    const actualH3 = Array.from(container.querySelectorAll("h3")).map((el) =>
+      cleanText(el.textContent)
+    );
     expect(actualH3).toEqual([...EXPECTED_H3]);
   });
 
@@ -250,7 +258,7 @@ describe("OpenClaw Agent 実践ベストプラクティスガイド 契約テス
     const hrefs = new Set(
       Array.from(container.querySelectorAll("a[href]"))
         .map((a) => a.getAttribute("href"))
-        .filter((h): h is string => Boolean(h && h.startsWith("http")))
+        .filter((h): h is string => Boolean(h?.startsWith("http")))
     );
     for (const url of EXPECTED_EXTERNAL_LINKS) {
       expect(hrefs.has(url)).toBe(true);
@@ -265,7 +273,7 @@ describe("OpenClaw Agent 実践ベストプラクティスガイド 契約テス
     for (const link of tocLinks) {
       const href = link.getAttribute("href");
       expect(href).toMatch(/^#[a-zA-Z0-9_-]+$/);
-      const targetId = href!.slice(1);
+      const targetId = href?.slice(1);
       const targetEl = container.querySelector(`#${targetId}`);
       expect(targetEl).not.toBeNull();
     }
@@ -293,9 +301,9 @@ describe("OpenClaw Agent 実践ベストプラクティスガイド 契約テス
     expect(activeLink).not.toBeNull();
   });
 
-  it("C-4: 外部リンク全件に target=\"_blank\" かつ rel=\"noopener noreferrer\"", () => {
+  it('C-4: 外部リンク全件に target="_blank" かつ rel="noopener noreferrer"', () => {
     const { container } = render(<Page />);
-    const externalLinks = Array.from(container.querySelectorAll("a[href^=\"http\"]"));
+    const externalLinks = Array.from(container.querySelectorAll('a[href^="http"]'));
     expect(externalLinks.length).toBeGreaterThanOrEqual(EXPECTED_EXTERNAL_LINKS.length);
     for (const link of externalLinks) {
       expect(link.getAttribute("target")).toBe("_blank");
@@ -306,8 +314,8 @@ describe("OpenClaw Agent 実践ベストプラクティスガイド 契約テス
   it("C-5: 内部リンクに .html 拡張子が含まれない", () => {
     const { container } = render(<Page />);
     const internalLinks = Array.from(container.querySelectorAll("a[href]"))
-      .map((a) => a.getAttribute("href")!)
-      .filter((href) => !href.startsWith("http") && !href.startsWith("#"));
+      .map((a) => a.getAttribute("href") ?? "")
+      .filter((href) => href && !href.startsWith("http") && !href.startsWith("#"));
     for (const href of internalLinks) {
       expect(href).not.toContain(".html");
     }
@@ -315,8 +323,8 @@ describe("OpenClaw Agent 実践ベストプラクティスガイド 契約テス
 
   it("C-6a: Mermaid ソースが原本と順序・内容・出現回数込みで完全一致する", () => {
     const { container } = render(<Page />);
-    const actual = Array.from(container.querySelectorAll('[data-testid="mermaid"]')).map(
-      (el) => normalizeMermaidSource(el.textContent ?? "")
+    const actual = Array.from(container.querySelectorAll('[data-testid="mermaid"]')).map((el) =>
+      normalizeMermaidSource(el.textContent ?? "")
     );
     expect(actual).toEqual([...EXPECTED_MERMAID_SOURCES]);
   });
@@ -335,7 +343,9 @@ describe("OpenClaw Agent 実践ベストプラクティスガイド 契約テス
     const { container } = render(<Page />);
     const warnCallouts = container.querySelectorAll(`.${styles.calloutWarn}`);
     const dangerCallouts = container.querySelectorAll(`.${styles.calloutDanger}`);
-    const defaultCallouts = container.querySelectorAll(`.${styles.callout}:not(.${styles.calloutWarn}):not(.${styles.calloutDanger})`);
+    const defaultCallouts = container.querySelectorAll(
+      `.${styles.callout}:not(.${styles.calloutWarn}):not(.${styles.calloutDanger})`
+    );
     expect(warnCallouts.length).toBeGreaterThan(0);
     expect(dangerCallouts.length).toBeGreaterThan(0);
     expect(defaultCallouts.length).toBeGreaterThan(0);
