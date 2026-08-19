@@ -47,7 +47,7 @@ export default function TocObserver() {
 
       for (const a of navLinks) {
         const href = a.getAttribute("href");
-        if (href && href.startsWith("#")) {
+        if (href?.startsWith("#")) {
           const id = decodeURIComponent(href.slice(1));
           idToLink[id] = a;
           const el = document.getElementById(id);

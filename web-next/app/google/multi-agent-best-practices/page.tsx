@@ -1,12 +1,11 @@
-import MermaidDiagram from "@/components/docs/MermaidDiagram";
 import type { Metadata } from "next";
 import Link from "next/link";
+import MermaidDiagram from "@/components/docs/MermaidDiagram";
 import styles from "./page.module.css";
 import TocObserver from "./TocObserver";
 
 export const metadata: Metadata = {
-  title:
-    "Gemini マルチエージェント開発 ベストプラクティス完全ガイド | LLM コスト計算機",
+  title: "Gemini マルチエージェント開発 ベストプラクティス完全ガイド | LLM コスト計算機",
   description:
     "GEMINI.md・AGENTS.md・agent.py・.geminiignore・settings.json・A2A・Agent Engine まで、Gemini エコシステムでのマルチエージェント開発を網羅した完全実践ガイド。",
 };
@@ -143,11 +142,7 @@ export default function GeminiMultiAgentBestPracticesPage() {
         href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/atom-one-dark.min.css"
       />
 
-      <div
-        className={styles.sidebar}
-        id="gemini-multi-agent-sidebar"
-        data-testid="sidebar-nav"
-      >
+      <div className={styles.sidebar} id="gemini-multi-agent-sidebar" data-testid="sidebar-nav">
         <div className={styles.brand}>
           <div className={styles.brandBadge}>G</div>
           <div className={styles.brandText}>
@@ -156,10 +151,7 @@ export default function GeminiMultiAgentBestPracticesPage() {
         </div>
         <ul className={styles.sideNav}>
           <li>
-            <a
-              href="#0-はじめに--このガイドを読む前に知っておくべきこと"
-              className={styles.active}
-            >
+            <a href="#0-はじめに--このガイドを読む前に知っておくべきこと" className={styles.active}>
               0. はじめに
             </a>
           </li>
@@ -169,14 +161,10 @@ export default function GeminiMultiAgentBestPracticesPage() {
             </a>
           </li>
           <li>
-            <a href="#2-geminimd--プロジェクトの文脈を教える指示書">
-              2. GEMINI.md
-            </a>
+            <a href="#2-geminimd--プロジェクトの文脈を教える指示書">2. GEMINI.md</a>
           </li>
           <li>
-            <a href="#3-geminimd-と-agentsmd--どちらを使うべきか">
-              3. GEMINI.md と AGENTS.md
-            </a>
+            <a href="#3-geminimd-と-agentsmd--どちらを使うべきか">3. GEMINI.md と AGENTS.md</a>
           </li>
           <li>
             <a href="#4-マルチエージェント向け-geminimd--agentsmd-設計">
@@ -184,17 +172,13 @@ export default function GeminiMultiAgentBestPracticesPage() {
             </a>
           </li>
           <li>
-            <a href="#5-geminiignore--見せたくないファイルを隠す">
-              5. .geminiignore
-            </a>
+            <a href="#5-geminiignore--見せたくないファイルを隠す">5. .geminiignore</a>
           </li>
           <li>
             <a href="#6-settingsjson--cli-挙動の中枢設定">6. settings.json</a>
           </li>
           <li>
-            <a href="#7-サブエージェントsubagentsの設計">
-              7. サブエージェント（Subagents）の設計
-            </a>
+            <a href="#7-サブエージェントsubagentsの設計">7. サブエージェント（Subagents）の設計</a>
           </li>
           <li>
             <a href="#8-リモートサブエージェントと-a2a-プロトコル入門">
@@ -202,9 +186,7 @@ export default function GeminiMultiAgentBestPracticesPage() {
             </a>
           </li>
           <li>
-            <a href="#9-agentpy--adk-でのエージェント実装パターン">
-              9. agent.py
-            </a>
+            <a href="#9-agentpy--adk-でのエージェント実装パターン">9. agent.py</a>
           </li>
           <li>
             <a href="#10-remotea2aagent-実装パターンの詳細">
@@ -252,17 +234,14 @@ export default function GeminiMultiAgentBestPracticesPage() {
 
       <main className={styles.content}>
         <div className={styles.hero}>
-          <span className={styles.heroEyebrow}>
-            GEMINI CLI × ADK × A2A × AGENT ENGINE
-          </span>
+          <span className={styles.heroEyebrow}>GEMINI CLI × ADK × A2A × AGENT ENGINE</span>
           <h1>
             Gemini マルチエージェント開発
             <br />
             ベストプラクティス完全ガイド
           </h1>
           <p className={styles.subtitle}>
-            GEMINI.md・AGENTS.md・agent.py・.geminiignore・settings.json・A2A・Agent
-            Engine まで
+            GEMINI.md・AGENTS.md・agent.py・.geminiignore・settings.json・A2A・Agent Engine まで
           </p>
           <div className={styles.heroMeta}>
             <div className={styles.metaCard}>
@@ -315,9 +294,7 @@ export default function GeminiMultiAgentBestPracticesPage() {
                 <td>
                   <code>AGENTS.md</code>
                 </td>
-                <td>
-                  複数のAIツール共通の「エージェント向けREADME」オープン標準
-                </td>
+                <td>複数のAIツール共通の「エージェント向けREADME」オープン標準</td>
               </tr>
               <tr className="odd">
                 <td>3</td>
@@ -408,20 +385,14 @@ export default function GeminiMultiAgentBestPracticesPage() {
 
         <hr />
 
-        <h2 id="1-エコシステム全体像を1枚の図でつかむ">
-          1. エコシステム全体像を1枚の図でつかむ
-        </h2>
+        <h2 id="1-エコシステム全体像を1枚の図でつかむ">1. エコシステム全体像を1枚の図でつかむ</h2>
         <p>個別のファイルに入る前に、これらがどう連携しているかを俯瞰します。</p>
         <div className={styles.mermaidWrap}>
-          <MermaidDiagram
-            chart={DIAGRAM_1}
-            theme="base"
-            themeVariables={MERMAID_THEME_VARS}
-          />
+          <MermaidDiagram chart={DIAGRAM_1} theme="base" themeVariables={MERMAID_THEME_VARS} />
         </div>
         <p>
-          読み方: <code>GEMINI.md</code> / <code>.geminiignore</code> /{" "}
-          <code>settings.json</code> はいずれも
+          読み方: <code>GEMINI.md</code> / <code>.geminiignore</code> / <code>settings.json</code>{" "}
+          はいずれも
           <strong>Gemini CLI 自体を賢く・安全にするための設定</strong>です。一方{" "}
           <code>agent.py</code> と <code>agent.json</code>（Agent Card）は
           <strong>ADK で作る個々のエージェント（コード側の実体）</strong>
@@ -444,14 +415,11 @@ export default function GeminiMultiAgentBestPracticesPage() {
         <h3 id="22-3段階の階層システム超重要">2.2 3段階の階層システム（超重要）</h3>
         <p>
           <code>GEMINI.md</code>
-          は1ファイルだけではなく、以下の3段階で読み込まれ、<strong>すべて連結されて</strong>モデルに渡されます。
+          は1ファイルだけではなく、以下の3段階で読み込まれ、<strong>すべて連結されて</strong>
+          モデルに渡されます。
         </p>
         <div className={styles.mermaidWrap}>
-          <MermaidDiagram
-            chart={DIAGRAM_2}
-            theme="base"
-            themeVariables={MERMAID_THEME_VARS}
-          />
+          <MermaidDiagram chart={DIAGRAM_2} theme="base" themeVariables={MERMAID_THEME_VARS} />
         </div>
         <ul>
           <li>
@@ -460,8 +428,8 @@ export default function GeminiMultiAgentBestPracticesPage() {
           </li>
           <li>
             <strong>②ワークスペース</strong>:
-            作業ディレクトリとその親ディレクトリを探索して見つかった{" "}
-            <code>GEMINI.md</code>。現在のプロジェクト向けのルールです。
+            作業ディレクトリとその親ディレクトリを探索して見つかった <code>GEMINI.md</code>
+            。現在のプロジェクト向けのルールです。
           </li>
           <li>
             <strong>③JIT（Just-In-Time）</strong>:
@@ -476,9 +444,12 @@ export default function GeminiMultiAgentBestPracticesPage() {
         </h3>
         <ol type="1">
           <li>
-            <strong><code>/init</code> コマンドで雛形を作る。</strong> プロジェクトルートで Gemini
-            CLI を起動し <code>/init</code> を実行すると、リポジトリを解析して{" "}
-            <code>GEMINI.md</code> の初期版を自動生成してくれます。
+            <strong>
+              <code>/init</code> コマンドで雛形を作る。
+            </strong>{" "}
+            プロジェクトルートで Gemini CLI を起動し <code>/init</code>{" "}
+            を実行すると、リポジトリを解析して <code>GEMINI.md</code>{" "}
+            の初期版を自動生成してくれます。
           </li>
           <li>
             <strong>簡潔に、目的ベースで書く。</strong>
@@ -490,14 +461,14 @@ export default function GeminiMultiAgentBestPracticesPage() {
             のように、見出しでセクションを区切ります。
           </li>
           <li>
-            <strong>500行を超えたら分割する。</strong> 巨大化してきたら{" "}
-            <code>@ファイルパス</code> のインポート構文でモジュール化します。
+            <strong>500行を超えたら分割する。</strong> 巨大化してきたら <code>@ファイルパス</code>{" "}
+            のインポート構文でモジュール化します。
           </li>
         </ol>
         <div className={styles.codeBlockWrap} data-testid="code-block">
           <pre className="markdown">
             <code className="markdown">
-{`# Project: My TypeScript Library
+              {`# Project: My TypeScript Library
 
 ## General Instructions
 - 新しいTypeScriptコードを生成する際は、既存のコーディングスタイルに従うこと。
@@ -513,13 +484,15 @@ export default function GeminiMultiAgentBestPracticesPage() {
         </div>
         <ol start={5} type="1">
           <li>
-            <strong><code>@file.md</code> 構文でインポートして分割する。</strong>
+            <strong>
+              <code>@file.md</code> 構文でインポートして分割する。
+            </strong>
           </li>
         </ol>
         <div className={styles.codeBlockWrap} data-testid="code-block">
           <pre className="markdown">
             <code className="markdown">
-{`# Main GEMINI.md file
+              {`# Main GEMINI.md file
 これはメインの内容です。
 
 @./components/instructions.md
@@ -532,15 +505,17 @@ export default function GeminiMultiAgentBestPracticesPage() {
         </div>
         <ol start={6} type="1">
           <li>
-            <strong><code>/memory</code> コマンドで検証する。</strong>
+            <strong>
+              <code>/memory</code> コマンドで検証する。
+            </strong>
             <ul>
               <li>
                 <code>/memory show</code> —
                 現在読み込まれている連結後の文脈全文を表示（実際にモデルに渡っている内容を確認できる）
               </li>
               <li>
-                <code>/memory reload</code> — すべての{" "}
-                <code>GEMINI.md</code> を再スキャンして再読み込み
+                <code>/memory reload</code> — すべての <code>GEMINI.md</code>{" "}
+                を再スキャンして再読み込み
               </li>
             </ul>
           </li>
@@ -599,7 +574,8 @@ export default function GeminiMultiAgentBestPracticesPage() {
         </h3>
         <p>
           <code>GEMINI.md</code> は Gemini CLI
-          専用の名称・階層読み込みロジック（グローバル/ワークスペース/JIT、<code>@import</code>構文）を持つ
+          専用の名称・階層読み込みロジック（グローバル/ワークスペース/JIT、<code>@import</code>
+          構文）を持つ
           <strong>Gemini CLI 固有の仕組み</strong>です。一方 <code>AGENTS.md</code> は
           <strong>どのツールでも読める共通ファイル</strong>という位置づけです。
         </p>
@@ -648,15 +624,14 @@ export default function GeminiMultiAgentBestPracticesPage() {
           3.3 実は共存できる — settings.json での統合設定
         </h3>
         <p>
-          Gemini CLI は <code>settings.json</code> の{" "}
-          <code>context.fileName</code>{" "}
+          Gemini CLI は <code>settings.json</code> の <code>context.fileName</code>{" "}
           プロパティで、読み込むファイル名を変更・追加できます。これを使うと、<code>AGENTS.md</code>{" "}
           を正としつつ Gemini CLI にも読ませる、という一石二鳥の運用が可能です。
         </p>
         <div className={styles.codeBlockWrap} data-testid="code-block">
           <pre className="json">
             <code className="json">
-{`{
+              {`{
   "context": {
     "fileName": ["AGENTS.md", "CONTEXT.md", "GEMINI.md"]
   }
@@ -681,8 +656,8 @@ export default function GeminiMultiAgentBestPracticesPage() {
             を作成し、ビルドコマンド・テストコマンド・コーディング規約・触れてはいけないファイルなどを記述する。
           </li>
           <li>
-            <code>.gemini/settings.json</code>（ワークスペース設定）に{" "}
-            <code>context.fileName</code> を追加し、<code>AGENTS.md</code> を最優先で読み込ませる。
+            <code>.gemini/settings.json</code>（ワークスペース設定）に <code>context.fileName</code>{" "}
+            を追加し、<code>AGENTS.md</code> を最優先で読み込ませる。
           </li>
           <li>
             モノレポの場合、各パッケージのルートにもその場限りの <code>AGENTS.md</code>{" "}
@@ -703,17 +678,13 @@ export default function GeminiMultiAgentBestPracticesPage() {
         </p>
         <h3 id="41-モノレポ型階層設計">4.1 モノレポ型階層設計</h3>
         <div className={styles.mermaidWrap}>
-          <MermaidDiagram
-            chart={DIAGRAM_3}
-            theme="base"
-            themeVariables={MERMAID_THEME_VARS}
-          />
+          <MermaidDiagram chart={DIAGRAM_3} theme="base" themeVariables={MERMAID_THEME_VARS} />
         </div>
         <p>
           第2章で解説した JIT（Just-In-Time）読み込みの仕組みにより、モデルが{" "}
-          <code>agents/go-compliance/</code>{" "}
-          配下のファイルを開いた瞬間だけ、その場所の <code>AGENTS.md</code>{" "}
-          が自動的に追加読み込みされます。これにより、ルートの <code>AGENTS.md</code>{" "}
+          <code>agents/go-compliance/</code> 配下のファイルを開いた瞬間だけ、その場所の{" "}
+          <code>AGENTS.md</code> が自動的に追加読み込みされます。これにより、ルートの{" "}
+          <code>AGENTS.md</code>{" "}
           を薄く保ちながら、各サブエージェントの専門知識を必要な時にだけ注入できます。
         </p>
 
@@ -819,7 +790,7 @@ export default function GeminiMultiAgentBestPracticesPage() {
         <div className={styles.codeBlockWrap} data-testid="code-block">
           <pre className="gitignore">
             <code className="gitignore">
-{`# /packages/ ディレクトリとそのサブディレクトリすべてを除外
+              {`# /packages/ ディレクトリとそのサブディレクトリすべてを除外
 /packages/
 
 # apikeys.txt ファイルを除外
@@ -836,16 +807,15 @@ apikeys.txt
         </div>
         <p>
           <strong>変更を反映するには Gemini CLI セッションの再起動が必要</strong>
-          です。マルチエージェント開発では、各サブエージェント/リモートエージェントのシークレット（<code>.env</code>、認証キー、
+          です。マルチエージェント開発では、各サブエージェント/リモートエージェントのシークレット（
+          <code>.env</code>、認証キー、
           <code>agent_card_json</code>{" "}
           に埋め込みがちな認証情報）を確実に除外リストへ入れることが、次章のセキュリティ設定と合わせて重要になります。
         </p>
 
         <hr />
 
-        <h2 id="6-settingsjson--cli-挙動の中枢設定">
-          6. settings.json — CLI 挙動の中枢設定
-        </h2>
+        <h2 id="6-settingsjson--cli-挙動の中枢設定">6. settings.json — CLI 挙動の中枢設定</h2>
         <h3 id="61-設定ファイルの場所と優先順位">6.1 設定ファイルの場所と優先順位</h3>
         <div className={styles.tableWrap}>
           <table>
@@ -926,7 +896,8 @@ apikeys.txt
                   <code>general.defaultApprovalMode</code>
                 </td>
                 <td>
-                  ツール実行の承認モード（<code>default</code>/<code>auto_edit</code>/<code>plan</code>）
+                  ツール実行の承認モード（<code>default</code>/<code>auto_edit</code>/
+                  <code>plan</code>）
                 </td>
               </tr>
               <tr className="odd">
@@ -976,7 +947,7 @@ apikeys.txt
         <div className={styles.codeBlockWrap} data-testid="code-block">
           <pre className="json">
             <code className="json">
-{`{
+              {`{
   "agents": {
     "overrides": {
       "codebase_investigator": {
@@ -997,7 +968,7 @@ apikeys.txt
         <div className={styles.codeBlockWrap} data-testid="code-block">
           <pre className="json">
             <code className="json">
-{`{
+              {`{
   "mcpServers": {
     "github": {
       "command": "npx",
@@ -1012,7 +983,7 @@ apikeys.txt
           </pre>
         </div>
         <p>
-          <code>{"${GITHUB_TOKEN}"}</code>{" "}
+          <code>&#36;&#123;GITHUB_TOKEN&#125;</code>{" "}
           のような記法で、実際の値をシェル環境変数から実行時に解決させ、設定ファイル自体にシークレットを平文で書かないのがベストプラクティスです。
         </p>
 
@@ -1020,7 +991,7 @@ apikeys.txt
         <div className={styles.codeBlockWrap} data-testid="code-block">
           <pre className="json">
             <code className="json">
-{`{
+              {`{
   "experimental": { "enableAgents": false }
 }`}
             </code>
@@ -1029,20 +1000,16 @@ apikeys.txt
 
         <hr />
 
-        <h2 id="7-サブエージェントsubagentsの設計">
-          7. サブエージェント（Subagents）の設計
-        </h2>
+        <h2 id="7-サブエージェントsubagentsの設計">7. サブエージェント（Subagents）の設計</h2>
         <h3 id="71-サブエージェントとは">7.1 サブエージェントとは</h3>
         <p>
           サブエージェントは、メインの Gemini CLI
-          セッションの中で動く「専門家」です。深いコードベース解析やドメイン固有の推論など、特定タスクをメインエージェントの文脈を汚さずに処理します。メインエージェントからは、サブエージェントは同名の<strong>1つのツール</strong>として見えます。呼び出されると処理を委譲し、完了すると結果だけを報告して戻ります。
+          セッションの中で動く「専門家」です。深いコードベース解析やドメイン固有の推論など、特定タスクをメインエージェントの文脈を汚さずに処理します。メインエージェントからは、サブエージェントは同名の
+          <strong>1つのツール</strong>
+          として見えます。呼び出されると処理を委譲し、完了すると結果だけを報告して戻ります。
         </p>
         <div className={styles.mermaidWrap}>
-          <MermaidDiagram
-            chart={DIAGRAM_4}
-            theme="base"
-            themeVariables={MERMAID_THEME_VARS}
-          />
+          <MermaidDiagram chart={DIAGRAM_4} theme="base" themeVariables={MERMAID_THEME_VARS} />
         </div>
 
         <h3 id="72-組み込みサブエージェント">7.2 組み込みサブエージェント</h3>
@@ -1095,20 +1062,21 @@ apikeys.txt
         </h3>
         <ol type="1">
           <li>
-            <code>.gemini/agents/</code> （プロジェクト共有）または{" "}
-            <code>~/.gemini/agents/</code>（個人用）にMarkdownファイルを作成する。
+            <code>.gemini/agents/</code> （プロジェクト共有）または <code>~/.gemini/agents/</code>
+            （個人用）にMarkdownファイルを作成する。
           </li>
           <li>
             ファイル先頭にYAMLフロントマターを書く（このフォーマットは<strong>必須</strong>）。
           </li>
           <li>
-            フロントマター以降の本文が、そのままサブエージェントの<strong>システムプロンプト</strong>になる。
+            フロントマター以降の本文が、そのままサブエージェントの
+            <strong>システムプロンプト</strong>になる。
           </li>
         </ol>
         <div className={styles.codeBlockWrap} data-testid="code-block">
           <pre className="markdown">
             <code className="markdown">
-{`---
+              {`---
 name: security-auditor
 description: コード内のセキュリティ脆弱性を発見することに特化。
 kind: local
@@ -1232,8 +1200,11 @@ max_turns: 10
 
         <h3 id="75-ツール分離と再帰防止">7.5 ツール分離と再帰防止</h3>
         <p>
-          各サブエージェントは独立したコンテキストループで動作し、明示的に許可したツールにしかアクセスできません。<strong>重要な安全設計として、サブエージェントは他のサブエージェントを呼び出せません</strong>（
-          <code>*</code>{" "}
+          各サブエージェントは独立したコンテキストループで動作し、明示的に許可したツールにしかアクセスできません。
+          <strong>
+            重要な安全設計として、サブエージェントは他のサブエージェントを呼び出せません
+          </strong>
+          （<code>*</code>{" "}
           ワイルドカードを与えても他エージェントは見えない）。これにより無限再帰やトークンの爆発的消費を防いでいます。
         </p>
 
@@ -1242,7 +1213,7 @@ max_turns: 10
         <div className={styles.codeBlockWrap} data-testid="code-block">
           <pre className="toml">
             <code className="toml">
-{`[[rules]]
+              {`[[rules]]
 name = "Allow pr-creator to push code"
 subagent = "pr-creator"
 description = "pr-creatorによる自動ブランチプッシュを許可する。"
@@ -1257,8 +1228,7 @@ commandPrefix = "git push"`}
           7.7 説明文（description）の最適化がすべてを左右する
         </h3>
         <p>
-          メインエージェントはサブエージェントの{" "}
-          <code>description</code>{" "}
+          メインエージェントはサブエージェントの <code>description</code>{" "}
           を見て「これは自分の専門家か」を判断します。呼び出し精度を上げる鉄則は、①専門分野、②いつ使うべきか、③具体的な利用シーン例、の3点を書くことです。
         </p>
         <blockquote>
@@ -1283,36 +1253,30 @@ commandPrefix = "git push"`}
         <p>
           A2A
           は、実装言語やフレームワークを問わずエージェント同士が相互運用できるようにするオープン標準です。「エージェント界のHTTP」と表現され、REST
-          APIにおけるOpenAPI仕様のような役割を果たす{" "}
-          <strong>Agent Card</strong> を軸に、次の3つの課題を解決します。
+          APIにおけるOpenAPI仕様のような役割を果たす <strong>Agent Card</strong>{" "}
+          を軸に、次の3つの課題を解決します。
         </p>
         <ol type="1">
           <li>
-            <strong>発見（Discovery）</strong>: エージェントは{" "}
-            <code>/.well-known/agent.json</code> というJSONメタデータ（Agent
+            <strong>発見（Discovery）</strong>: エージェントは <code>/.well-known/agent.json</code>{" "}
+            というJSONメタデータ（Agent
             Card）を通じて自身の能力を宣言する。呼び出す側は先にこのカードを取得して「相手が何をできるか」を理解する。
           </li>
           <li>
             <strong>通信（Communication）</strong>: すべてのデータ交換は単一エンドポイント経由の
-            JSON-RPC 2.0 で行われる。中心となるメソッドは{" "}
-            <code>message/send</code>（同期的な送受信）で、他に <code>tasks/send</code>・
-            <code>tasks/get</code>{" "}
-            などがある。データは <code>TextPart</code>（自然言語）や{" "}
-            <code>DataPart</code>（構造化JSON）といった型付きの「Message Part」で運ばれる。
+            JSON-RPC 2.0 で行われる。中心となるメソッドは <code>message/send</code>
+            （同期的な送受信）で、他に <code>tasks/send</code>・<code>tasks/get</code>{" "}
+            などがある。データは <code>TextPart</code>（自然言語）や <code>DataPart</code>
+            （構造化JSON）といった型付きの「Message Part」で運ばれる。
           </li>
           <li>
-            <strong>タスクのライフサイクル</strong>: すべてのやり取りは{" "}
-            <code>Task</code>{" "}
-            に包まれ、<code>submitted → working → completed / failed</code>{" "}
+            <strong>タスクのライフサイクル</strong>: すべてのやり取りは <code>Task</code> に包まれ、
+            <code>submitted → working → completed / failed</code>{" "}
             という明確な状態遷移をたどる。この仕組みにより、同期的なワークフロー（今すぐこの契約書を確認）と非同期のワークフロー（48時間かけて文書を検証）を同じプロトコルで扱える。
           </li>
         </ol>
         <div className={styles.mermaidWrap}>
-          <MermaidDiagram
-            chart={DIAGRAM_5}
-            theme="base"
-            themeVariables={MERMAID_THEME_VARS}
-          />
+          <MermaidDiagram chart={DIAGRAM_5} theme="base" themeVariables={MERMAID_THEME_VARS} />
         </div>
 
         <h3 id="82-agent-cardagentjsonの主要フィールド">
@@ -1321,7 +1285,7 @@ commandPrefix = "git push"`}
         <div className={styles.codeBlockWrap} data-testid="code-block">
           <pre className="json">
             <code className="json">
-{`{
+              {`{
   "protocolVersion": "0.3.0",
   "name": "Example Agent Name",
   "description": "ドキュメント目的のサンプルエージェントの説明。",
@@ -1400,14 +1364,13 @@ commandPrefix = "git push"`}
           8.3 Gemini CLI からリモートサブエージェントを定義する
         </h3>
         <p>
-          Gemini CLI 自体も、<code>.gemini/agents/*.md</code> で{" "}
-          <code>kind: remote</code>{" "}
+          Gemini CLI 自体も、<code>.gemini/agents/*.md</code> で <code>kind: remote</code>{" "}
           を指定することで、A2A準拠の外部エージェントをサブエージェントとして直接呼び出せます。
         </p>
         <div className={styles.codeBlockWrap} data-testid="code-block">
           <pre className="markdown">
             <code className="markdown">
-{`---
+              {`---
 kind: remote
 name: my-remote-agent
 agent_card_url: https://example.com/agent-card
@@ -1421,7 +1384,7 @@ agent_card_url: https://example.com/agent-card
         <div className={styles.codeBlockWrap} data-testid="code-block">
           <pre className="markdown">
             <code className="markdown">
-{`---
+              {`---
 - kind: remote
   name: remote-1
   agent_card_url: https://example.com/1
@@ -1434,8 +1397,7 @@ agent_card_url: https://example.com/agent-card
         </div>
         <p>
           Agent Card を配信するエンドポイントを持たない場合は、<code>agent_card_json</code>{" "}
-          にJSON文字列を直接埋め込むこともできます（YAMLのブロックスカラー{" "}
-          <code>|</code>{" "}
+          にJSON文字列を直接埋め込むこともできます（YAMLのブロックスカラー <code>|</code>{" "}
           を使うと引用符のエスケープが不要になり可読性が上がります）。
         </p>
 
@@ -1473,8 +1435,8 @@ agent_card_url: https://example.com/agent-card
                   Credentials（ADC）を利用。ホスト名から自動でアクセストークン/IDトークンを選択
                 </td>
                 <td>
-                  <code>*.googleapis.com</code>（Agent Engine, Vertex
-                  AI等）、<code>*.run.app</code>（Cloud Run）
+                  <code>*.googleapis.com</code>（Agent Engine, Vertex AI等）、<code>*.run.app</code>
+                  （Cloud Run）
                 </td>
               </tr>
               <tr className="even">
@@ -1489,8 +1451,8 @@ agent_card_url: https://example.com/agent-card
         </div>
         <p>
           <strong>セキュリティ上のポイント</strong>:
-          シークレットはエージェント定義ファイルに直書きせず、<code>$MY_API_KEY</code>（環境変数参照）や{" "}
-          <code>!gcloud auth print-token</code>
+          シークレットはエージェント定義ファイルに直書きせず、<code>$MY_API_KEY</code>
+          （環境変数参照）や <code>!gcloud auth print-token</code>
           （シェルコマンド実行結果）のような動的値解決を使うことが推奨されます。特にプロジェクト共有の{" "}
           <code>.gemini/agents/*.md</code>{" "}
           はバージョン管理にコミットされる可能性が高いため注意してください。
@@ -1505,13 +1467,13 @@ agent_card_url: https://example.com/agent-card
         <p>
           ADK（Agent Development Kit）は、Python・Java・Go・TypeScript・Kotlin
           に対応するオープンソースのマルチエージェント構築フレームワークです。もっとも基本的な{" "}
-          <code>agent.py</code> は、ツールと指示文を持つ{" "}
-          <code>Agent</code> オブジェクトを1つ定義するだけです。
+          <code>agent.py</code> は、ツールと指示文を持つ <code>Agent</code>{" "}
+          オブジェクトを1つ定義するだけです。
         </p>
         <div className={styles.codeBlockWrap} data-testid="code-block">
           <pre className="python">
             <code className="python">
-{`from google.adk.agents import Agent
+              {`from google.adk.agents import Agent
 from my_tools import fetch_purchase_history, get_policy, send_email, issue_refund, close_ticket
 
 root_agent = Agent(
@@ -1542,15 +1504,14 @@ root_agent = Agent(
         </h3>
         <p>
           1つの巨大なプロンプトに全責務を詰め込む代わりに、責務ごとにエージェントを分割し、
-          <code>SequentialAgent</code>{" "}
-          で順に実行させます。以下は、Python製の抽出エージェント →
+          <code>SequentialAgent</code> で順に実行させます。以下は、Python製の抽出エージェント →
           Go製のリモート検証エージェント（A2A経由） →
           レポート生成エージェント、という3段構成の実例です。
         </p>
         <div className={styles.codeBlockWrap} data-testid="code-block">
           <pre className="python">
             <code className="python">
-{`# python-extraction-agent/app/agent.py
+              {`# python-extraction-agent/app/agent.py
 from google.adk.agents import Agent, SequentialAgent
 from google.adk.agents.remote_a2a_agent import RemoteA2aAgent
 from google.adk.models import Gemini
@@ -1588,8 +1549,11 @@ root_agent = SequentialAgent(
           </pre>
         </div>
         <p>
-          このパターンの利点は、<strong>Pythonのオーケストレーターから見ると、Go製の別言語・別プロセスのサービスが、あたかもローカルのPythonクラスであるかのように呼び出せる</strong>ことです。ADKのSDKが
-          Agent Card
+          このパターンの利点は、
+          <strong>
+            Pythonのオーケストレーターから見ると、Go製の別言語・別プロセスのサービスが、あたかもローカルのPythonクラスであるかのように呼び出せる
+          </strong>
+          ことです。ADKのSDKが Agent Card
           の取得、パラメータのシリアライズ、JSON-RPCの通信をすべて裏側で処理してくれます。
         </p>
 
@@ -1604,7 +1568,7 @@ root_agent = SequentialAgent(
         <div className={styles.codeBlockWrap} data-testid="code-block">
           <pre className="python">
             <code className="python">
-{`from enum import Enum
+              {`from enum import Enum
 
 class ComplianceStep(str, Enum):
     INGESTED = "INGESTED"                      # 契約書アップロード、抽出待ち
@@ -1620,25 +1584,22 @@ class ComplianceStep(str, Enum):
         <p>
           <code>MANUAL_REVIEW</code>{" "}
           の設計が特に重要です。リモートのコンプライアンスエージェントがクラッシュ・ネットワークタイムアウト・未起動などの理由で応答不能になっても、パイプラインは単純に失敗するのではなく、人間のレビュー担当者にケースを引き渡す状態へフェイルセーフに遷移します。
-          <strong>リモート依存先が断続的に利用不能になり得る本番システムでは、このフェイルセーフ設計が必須</strong>です。
+          <strong>
+            リモート依存先が断続的に利用不能になり得る本番システムでは、このフェイルセーフ設計が必須
+          </strong>
+          です。
         </p>
 
         <h3 id="94-マルチエージェントパイプラインの全体像">
           9.4 マルチエージェントパイプラインの全体像
         </h3>
         <div className={styles.mermaidWrap}>
-          <MermaidDiagram
-            chart={DIAGRAM_6}
-            theme="base"
-            themeVariables={MERMAID_THEME_VARS}
-          />
+          <MermaidDiagram chart={DIAGRAM_6} theme="base" themeVariables={MERMAID_THEME_VARS} />
         </div>
 
         <hr />
 
-        <h2 id="10-remotea2aagent-実装パターンの詳細">
-          10. RemoteA2aAgent 実装パターンの詳細
-        </h2>
+        <h2 id="10-remotea2aagent-実装パターンの詳細">10. RemoteA2aAgent 実装パターンの詳細</h2>
         <h3 id="101-3つの指定方法">10.1 3つの指定方法</h3>
         <p>
           <code>RemoteA2aAgent</code>
@@ -1647,7 +1608,7 @@ class ComplianceStep(str, Enum):
         <div className={styles.codeBlockWrap} data-testid="code-block">
           <pre className="python">
             <code className="python">
-{`from google.adk.agents.remote_a2a_agent import RemoteA2aAgent
+              {`from google.adk.agents.remote_a2a_agent import RemoteA2aAgent
 
 # 方法1: Agent CardのURLを直接指定
 remote_agent = RemoteA2aAgent(
@@ -1673,12 +1634,13 @@ remote_agent_from_file = RemoteA2aAgent(
         <h3 id="102-サブエージェントとして組み込む">10.2 サブエージェントとして組み込む</h3>
         <p>
           <code>RemoteA2aAgent</code> は他の <code>Agent</code> と同じインターフェースを持つため、
-          <code>sub_agents</code> リストにそのまま加えるだけでメインのオーケストレーターから利用できます。
+          <code>sub_agents</code>{" "}
+          リストにそのまま加えるだけでメインのオーケストレーターから利用できます。
         </p>
         <div className={styles.codeBlockWrap} data-testid="code-block">
           <pre className="python">
             <code className="python">
-{`from google.adk.agents.remote_a2a_agent import RemoteA2aAgent
+              {`from google.adk.agents.remote_a2a_agent import RemoteA2aAgent
 from google.adk import Agent
 
 data_analyst = RemoteA2aAgent(
@@ -1712,7 +1674,7 @@ orchestrator = Agent(
         <div className={styles.codeBlockWrap} data-testid="code-block">
           <pre className="python">
             <code className="python">
-{`# あなたの既存のエージェント定義
+              {`# あなたの既存のエージェント定義
 root_agent = Agent(
     model='gemini-flash-latest',
     name='hello_world_agent',
@@ -1724,7 +1686,7 @@ root_agent = Agent(
         <div className={styles.codeBlockWrap} data-testid="code-block">
           <pre className="python">
             <code className="python">
-{`from google.adk.a2a.utils.agent_to_a2a import to_a2a
+              {`from google.adk.a2a.utils.agent_to_a2a import to_a2a
 
 # エージェントをA2A対応にする
 a2a_app = to_a2a(root_agent, port=8001)`}
@@ -1734,7 +1696,7 @@ a2a_app = to_a2a(root_agent, port=8001)`}
         <div className={styles.codeBlockWrap} data-testid="code-block">
           <pre className="bash">
             <code className="bash">
-{`# uvicornでA2Aサーバーとして起動
+              {`# uvicornでA2Aサーバーとして起動
 uvicorn agent:a2a_app --host localhost --port 8001`}
             </code>
           </pre>
@@ -1751,17 +1713,26 @@ uvicorn agent:a2a_app --host localhost --port 8001`}
         </p>
         <ul>
           <li>
-            <strong><code>A2aAgentExecutor</code></strong>: A2Aプロトコルとあなたの ADK
-            エージェントを橋渡しする実行エンジン
+            <strong>
+              <code>A2aAgentExecutor</code>
+            </strong>
+            : A2Aプロトコルとあなたの ADK エージェントを橋渡しする実行エンジン
           </li>
           <li>
-            <strong><code>InMemoryTaskStore</code></strong> /{" "}
-            <strong><code>InMemoryPushNotificationConfigStore</code></strong>:
-            タスク状態とプッシュ通知の管理
+            <strong>
+              <code>InMemoryTaskStore</code>
+            </strong>{" "}
+            /{" "}
+            <strong>
+              <code>InMemoryPushNotificationConfigStore</code>
+            </strong>
+            : タスク状態とプッシュ通知の管理
           </li>
           <li>
-            <strong><code>DefaultRequestHandler</code></strong>: 受信したA2A
-            HTTPリクエストを適切にルーティング
+            <strong>
+              <code>DefaultRequestHandler</code>
+            </strong>
+            : 受信したA2A HTTPリクエストを適切にルーティング
           </li>
           <li>
             <strong>Starletteアプリ</strong>: 起動時にAgent Cardを自動構築し、必要なA2A
@@ -1780,7 +1751,7 @@ uvicorn agent:a2a_app --host localhost --port 8001`}
         <div className={styles.codeBlockWrap} data-testid="code-block">
           <pre className="bash">
             <code className="bash">
-{`# following command runs the ADK agent as a2a agent
+              {`# following command runs the ADK agent as a2a agent
 adk api_server --a2a --port 8001 remote_a2a`}
             </code>
           </pre>
@@ -1821,7 +1792,7 @@ adk api_server --a2a --port 8001 remote_a2a`}
         <div className={styles.codeBlockWrap} data-testid="code-block">
           <pre className="bash">
             <code className="bash">
-{`# 1. リモート（公開）側を起動
+              {`# 1. リモート（公開）側を起動
 uvicorn contributing.samples.a2a_root.remote_a2a.hello_world.agent:a2a_app --host localhost --port 8001
 
 # 2. 別ターミナルで、呼び出す側（コンシューマー）のadk webを起動
@@ -1836,9 +1807,7 @@ adk web contributing/samples/`}
 
         <hr />
 
-        <h2 id="11-vertex-ai-agent-engine-へのデプロイ">
-          11. Vertex AI Agent Engine へのデプロイ
-        </h2>
+        <h2 id="11-vertex-ai-agent-engine-へのデプロイ">11. Vertex AI Agent Engine へのデプロイ</h2>
         <h3 id="111-agent-engine-とは">11.1 Agent Engine とは</h3>
         <p>
           Vertex AI Agent Engine は、ADK・LangChain
@@ -1848,11 +1817,7 @@ adk web contributing/samples/`}
           とされています（Go/Java版ADKはCloud Run等の別ターゲットを利用）。
         </p>
         <div className={styles.mermaidWrap}>
-          <MermaidDiagram
-            chart={DIAGRAM_7}
-            theme="base"
-            themeVariables={MERMAID_THEME_VARS}
-          />
+          <MermaidDiagram chart={DIAGRAM_7} theme="base" themeVariables={MERMAID_THEME_VARS} />
         </div>
 
         <h3 id="112-デプロイ手順ステップバイステップ">11.2 デプロイ手順（ステップバイステップ）</h3>
@@ -1868,7 +1833,7 @@ adk web contributing/samples/`}
         <div className={styles.codeBlockWrap} data-testid="code-block">
           <pre className="bash">
             <code className="bash">
-{`pip install --upgrade --quiet "google-cloud-aiplatform[agent_engines,adk]>=1.112"`}
+              {`pip install --upgrade --quiet "google-cloud-aiplatform[agent_engines,adk]>=1.112"`}
             </code>
           </pre>
         </div>
@@ -1879,14 +1844,14 @@ adk web contributing/samples/`}
         </ol>
         <div className={styles.codeBlockWrap} data-testid="code-block">
           <pre className="bash">
-            <code className="bash">
-{`gcloud auth application-default login`}
-            </code>
+            <code className="bash">{`gcloud auth application-default login`}</code>
           </pre>
         </div>
         <ol start={4} type="1">
           <li>
-            <strong><code>adk deploy agent_engine</code> コマンドでデプロイする。</strong>
+            <strong>
+              <code>adk deploy agent_engine</code> コマンドでデプロイする。
+            </strong>
             このコマンドはコードのパッケージング、コンテナビルド、Agent
             Engineへのデプロイまでを一括で行います（数分かかります）。
           </li>
@@ -1894,7 +1859,7 @@ adk web contributing/samples/`}
         <div className={styles.codeBlockWrap} data-testid="code-block">
           <pre className="bash">
             <code className="bash">
-{`PROJECT_ID=my-project-id
+              {`PROJECT_ID=my-project-id
 LOCATION_ID=us-central1
 
 adk deploy agent_engine \\
@@ -1917,7 +1882,7 @@ adk deploy agent_engine \\
         <div className={styles.codeBlockWrap} data-testid="code-block">
           <pre className="text">
             <code className="text">
-{`https://{LOCATION_ID}-aiplatform.googleapis.com/v1/projects/{PROJECT_ID}/locations/{LOCATION_ID}/reasoningEngines/{RESOURCE_ID}:query`}
+              {`https://{LOCATION_ID}-aiplatform.googleapis.com/v1/projects/{PROJECT_ID}/locations/{LOCATION_ID}/reasoningEngines/{RESOURCE_ID}:query`}
             </code>
           </pre>
         </div>
@@ -1934,7 +1899,7 @@ adk deploy agent_engine \\
         <div className={styles.codeBlockWrap} data-testid="code-block">
           <pre className="python">
             <code className="python">
-{`import vertexai
+              {`import vertexai
 from vertexai.preview import reasoning_engines
 
 vertexai.init(
@@ -1951,8 +1916,7 @@ remote_app = vertexai.agent_engines.create(
           </pre>
         </div>
         <p>
-          Agent Engine にデプロイすると、ADKの{" "}
-          <code>InMemorySessionService</code>
+          Agent Engine にデプロイすると、ADKの <code>InMemorySessionService</code>
           （ローカル開発用、本番運用には不向き）に代わって、Agent Engine
           側のマネージドセッション管理が使われるようになります。
         </p>
@@ -1961,14 +1925,15 @@ remote_app = vertexai.agent_engines.create(
           11.4 デプロイしたエージェントをA2A経由で呼び出す
         </h3>
         <p>
-          Agent Engine にデプロイしたエージェントは、A2Aエンドポイントとしても公開されるため、第10章の{" "}
+          Agent Engine
+          にデプロイしたエージェントは、A2Aエンドポイントとしても公開されるため、第10章の{" "}
           <code>RemoteA2aAgent</code> からそのまま呼び出せます。認証には{" "}
           <code>google-credentials</code>（Application Default Credentials）を使うのが定石です。
         </p>
         <div className={styles.codeBlockWrap} data-testid="code-block">
           <pre className="python">
             <code className="python">
-{`import os
+              {`import os
 from google.adk.agents.remote_a2a_agent import RemoteA2aAgent
 
 PROJECT_ID = os.getenv("GOOGLE_CLOUD_PROJECT")
@@ -1988,8 +1953,7 @@ time_agent = RemoteA2aAgent(
         <blockquote>
           <p>
             <strong>実務上の注意点</strong>: Google Cloud
-            の認証トークンは有効期限があるため、長時間動作するプロセスでは{" "}
-            <code>httpx.Auth</code>{" "}
+            の認証トークンは有効期限があるため、長時間動作するプロセスでは <code>httpx.Auth</code>{" "}
             を実装してトークンを自動リフレッシュする仕組みを組み込む必要があります。単純に{" "}
             <code>credentials.refresh()</code>{" "}
             を一度呼ぶだけでは、長時間セッションの途中でトークン期限切れによるエラーが発生します。
@@ -2118,11 +2082,7 @@ time_agent = RemoteA2aAgent(
 
         <h3 id="124-workflow-の考え方概念図">12.4 Workflow の考え方（概念図）</h3>
         <div className={styles.mermaidWrap}>
-          <MermaidDiagram
-            chart={DIAGRAM_8}
-            theme="base"
-            themeVariables={MERMAID_THEME_VARS}
-          />
+          <MermaidDiagram chart={DIAGRAM_8} theme="base" themeVariables={MERMAID_THEME_VARS} />
         </div>
         <p>
           決定論的なノード（A・C・E）はコードとして高速に遷移し、曖昧な判断が必要なノード（B・D）だけをLLMエージェントに任せます。これにより、①コンテキストの肥大化（大量のAPIレスポンスをそのまま会話履歴に積み上げない）、②プロンプトインジェクションへの耐性（ワークフローのグラフ自体が「実行できる経路」を制限する境界になるため、LLMノードが操作されても未承認のアクションへの経路が存在しない）という2つの効果が得られます。
@@ -2142,8 +2102,8 @@ time_agent = RemoteA2aAgent(
             <label>
               <input type="checkbox" readOnly />
               シークレット（APIキー・トークン）は <code>settings.json</code> や{" "}
-              <code>.gemini/agents/*.md</code>{" "}
-              に直書きせず、環境変数参照（<code>$ENV_VAR</code>）またはシェルコマンド参照（
+              <code>.gemini/agents/*.md</code> に直書きせず、環境変数参照（<code>$ENV_VAR</code>
+              ）またはシェルコマンド参照（
               <code>!command</code>）を使っているか
             </label>
           </li>
@@ -2164,8 +2124,9 @@ time_agent = RemoteA2aAgent(
           <li>
             <label>
               <input type="checkbox" readOnly />
-              サブエージェントごとにポリシーエンジン（<code>policy.toml</code>）で権限を絞っているか（特に{" "}
-              <code>run_shell_command</code> や <code>write_file</code> を持つサブエージェント）
+              サブエージェントごとにポリシーエンジン（<code>policy.toml</code>
+              ）で権限を絞っているか（特に <code>run_shell_command</code> や <code>write_file</code>{" "}
+              を持つサブエージェント）
             </label>
           </li>
           <li>
@@ -2198,7 +2159,8 @@ time_agent = RemoteA2aAgent(
           という複数の認証方式をサポートしています。プロジェクト共有される設定ファイル（
           <code>.gemini/agents/*.md</code> や <code>settings.json</code>{" "}
           のワークスペーススコープ）はバージョン管理にコミットされがちなので、
-          <strong>シークレットの値そのものではなく、参照方法だけを記述する</strong>ことを徹底してください。
+          <strong>シークレットの値そのものではなく、参照方法だけを記述する</strong>
+          ことを徹底してください。
         </p>
 
         <hr />
@@ -2400,11 +2362,7 @@ time_agent = RemoteA2aAgent(
             <h3 id="agentsmd-オープン標準">AGENTS.md オープン標準</h3>
             <ul>
               <li>
-                <Link
-                  href="https://agents.md/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
+                <Link href="https://agents.md/" target="_blank" rel="noopener noreferrer">
                   AGENTS.md 公式サイト
                 </Link>
               </li>

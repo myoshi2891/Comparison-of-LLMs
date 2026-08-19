@@ -22,15 +22,10 @@
   min-height: 100vh;
   background:
     radial-gradient(1200px 600px at 85% -10%, #12234a55, transparent 60%),
-    radial-gradient(900px 500px at -10% 10%, #0d1e3f55, transparent 55%),
-    var(--bg);
+    radial-gradient(900px 500px at -10% 10%, #0d1e3f55, transparent 55%), var(--bg);
   color: var(--text);
   font-family:
-    'Noto Sans JP',
-    'Hiragino Kaku Gothic ProN',
-    'Yu Gothic',
-    -apple-system,
-    BlinkMacSystemFont,
+    "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Yu Gothic", -apple-system, BlinkMacSystemFont,
     sans-serif;
   line-height: 1.85;
   font-size: 16px;
@@ -46,7 +41,7 @@
 .layout :global(code),
 .layout :global(pre),
 .layout :global(kbd) {
-  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
 
 .layout :global(a) {
@@ -268,7 +263,7 @@
 }
 
 .content :global(h2)::before {
-  content: '';
+  content: "";
   width: 6px;
   height: 6px;
   border-radius: 2px;
