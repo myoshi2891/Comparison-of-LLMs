@@ -1,2166 +1,1905 @@
 import type { Metadata } from "next";
+import MermaidDiagram from "@/components/docs/MermaidDiagram";
+import CopyButton from "./CopyButton";
 import styles from "./page.module.css";
+import TocObserver from "./TocObserver";
 
 export const metadata: Metadata = {
-  title:
-    "OpenAI Codex 最新 (2026) — AI仕様駆動開発 マークダウンファイル完全ガイド (v0.142.4, GPT-5.5 / GPT-5-Codex)",
+  title: "AI仕様駆動開発におけるMarkdownファイル実践ガイド",
   description:
-    "AGENTS.md / SKILL.md / .prompt.md / REQUIREMENTS.md / AGENT_TASKS.md — OpenAI Codex 最新 (2026年最新版) の AI 仕様駆動開発を支える全マークダウンファイルの役割・構造・ベストプラクティスを公式根拠付きで解説 (v0.142.4, GPT-5.5 / GPT-5-Codex 対応、Codex Remote GA)。",
+    "GitHub Spec Kit・AWS Kiro・Claude Code・AGENTS.md・Agent Skillsなど、2026年時点の主要なSDDツール群が共通して採用する「Markdownで仕様を書き、AIエージェントに実装させる」ワークフローを、ステップバイステップで体系化しました。EARS記法、ファイル構成、Mermaid図解の作法まで一気通貫で扱います。",
 };
 
-// 外部ソース (sources セクション) の定義。Phase F で redirect 一覧を作る際にも参照する。
-type Source = { num: string; href: string; title: string; desc: string };
+const THEME_VARS = {
+  background: "#07111e",
+  primaryColor: "#132745",
+  primaryTextColor: "#e7edf7",
+  primaryBorderColor: "#7c9eff",
+  lineColor: "#5c7cb8",
+  secondaryColor: "#0d1c30",
+  tertiaryColor: "#0d1c30",
+  fontSize: "16px",
+  fontFamily: 'Inter, "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif',
+} as const;
 
-const SOURCES: Source[] = [
-  {
-    num: "[1]",
-    href: "https://developers.openai.com/codex/guides/agents-md/",
-    title: "Custom instructions with AGENTS.md — OpenAI Developer Documentation (公式)",
-    desc: "AGENTS.md読み込み優先度チェーン・32KiB上限・project_doc_fallback_filenames・AGENTS.override.mdの完全仕様",
-  },
-  {
-    num: "[2]",
-    href: "https://openai.com/index/introducing-codex/",
-    title: "Introducing Codex — OpenAI Blog (May 2025)",
-    desc: "codex-1（o3ベース）の初期仕様・AGENTS.md公式サポート発表・SWE-Bench 72.1%スコアはいずれも2025年5月時点での報告。codex-1システムメッセージ公開。",
-  },
-  {
-    num: "[3]",
-    href: "https://developers.openai.com/codex/skills/",
-    title: "Agent Skills — OpenAI Developer Documentation (公式)",
-    desc: "SKILL.md完全仕様・Progressive Disclosure設計思想・スキルスコープ4段階・agents/openai.yaml・$skill-installerの使い方",
-  },
-  {
-    num: "[4]",
-    href: "https://developers.openai.com/codex/changelog/",
-    title: "Codex Changelog — OpenAI Developer Documentation (公式)",
-    desc: "Skills正式リリース詳細・スキルディレクトリ構造（SKILL.md/scripts/references/assets）・マルチエージェントconfig",
-  },
-  {
-    num: "[5]",
-    href: "https://developers.openai.com/codex/guides/agents-sdk/",
-    title: "Use Codex with the Agents SDK — OpenAI Developer Documentation (公式)",
-    desc: "マルチエージェントSDDパターン・REQUIREMENTS.md/AGENT_TASKS.md/TEST.mdの生成順序・ゲート条件付きハンドオフ・Codex MCP統合",
-  },
-  {
-    num: "[6]",
-    href: "https://developers.openai.com/codex/cloud",
-    title: "Codex Cloud — OpenAI Developer Documentation (公式)",
-    desc: "Cloud Codex（ChatGPT統合）の機能・GitHub連携・並列タスク実行・PR自動生成",
-  },
-  {
-    num: "[7]",
-    href: "https://developers.openai.com/cookbook/examples/skills_in_api",
-    title: "Skills in OpenAI API — OpenAI Cookbook (Feb 2026)",
-    desc: "SKILL.mdフロントマター仕様・バージョン管理・Instruction-only/Tool Use/All-in-Oneパターン・ルーティング精度改善tips",
-  },
-  {
-    num: "[8]",
-    href: "https://agents.md/",
-    title: "AGENTS.md Open Standard — agents.md (Agentic AI Foundation)",
-    desc: "Linux Foundation傘下のAGENTS.mdオープン標準化・Codex/Cursor/Jules/Amp/Factory採用・40,000+プロジェクト利用",
-  },
-  {
-    num: "[9]",
-    href: "https://developers.openai.com/blog/openai-for-developers-2025/",
-    title: "OpenAI for Developers in 2025 — OpenAI Developer Blog",
-    desc: "AGENTS.mdオープン標準化の経緯・Agents SDK・AgentKit・2025年の主要な変遷・GPT-5.2-Codex（初期Cloud Codexモデル）",
-  },
-  {
-    num: "[10]",
-    href: "https://layer5.io/blog/ai/agentsmd-one-file-to-guide-them-all/",
-    title: "AGENTS.md: One File to Guide Them All — Layer5 Blog",
-    desc: "AGENTS.md vs .prompt.md の使い分け・Claude CodeへのAGENTS.mdインポート方法・ツール乗り換え問題の解決策",
-  },
-  {
-    num: "[11]",
-    href: "https://www.datacamp.com/tutorial/openai-codex",
-    title: "OpenAI's Codex: A Guide With 3 Practical Examples — DataCamp (May 2025)",
-    desc: "AGENTS.md実践サンプル（Code Style/Testing/PR Instructions）・Cloud Codexセットアップ手順",
-  },
-  {
-    num: "[12]",
-    href: "https://github.com/openai/skills",
-    title: "openai/skills — GitHub (公式スキルカタログ)",
-    desc: "公式スキルカタログ・create-plan/git/linear等のサンプルスキル・$skill-installerによるインストール手順",
-  },
-  {
-    num: "[13]",
-    href: "https://community.openai.com/t/agents-md-file-optimization/1369152",
-    title: "AGENTS.md File Optimization — OpenAI Developer Community (Dec 2025)",
-    desc: "コミュニティのAGENTS.md最適化事例・シンプルさの重要性・実際のファイル例",
-  },
-  {
-    num: "[14]",
-    href: "https://community.openai.com/t/skills-for-codex-experimental-support-starting-today/1369367",
-    title:
-      "Skills for Codex: Experimental support starting today — OpenAI Developer Community (Dec 2025)",
-    desc: "Codexスキル機能の実験的リリース発表・コミュニティ実装例",
-  },
-  {
-    num: "[15]",
-    href: "https://agentsmd.net/",
-    title: "Agents.md Guide for OpenAI Codex — agentsmd.net",
-    desc: "AGENTS.mdのコードスタイル・テスト・PR手順・プロジェクト構造の記述ベストプラクティス",
-  },
-  {
-    num: "[16]",
-    href: "https://blog.fsck.com/2025/10/27/skills-for-openai-codex/",
-    title: "Porting Skills (and Superpowers) to OpenAI Codex — blog.fsck.com (Oct 2025)",
-    desc: "SKILL.mdのオープン規格（Claude Code/Antigravity/Codex共通）・スキルを「フランチャイズのバインダー」と比喩した設計思想",
-  },
-  {
-    num: "[17]",
-    href: "https://openai.com/index/introducing-gpt-5-3-codex/",
-    title: "Introducing GPT-5.3-Codex — OpenAI Blog (2026)",
-    desc: "GPT-5.3-Codexの仕様（GPT-5.2-Codex比25%高速・SWE-Bench Pro SoTA）・GPT-5.3-Codex-Spark（1000+ tokens/sec）・GPT-5.4との統合経緯",
-  },
-];
+const DIAGRAM_1 = `flowchart TB
+A["constitution.md<br/>（プロジェクトの不変原則）"] --> B["① Specify<br/>spec.md / requirements.md"]
+B --> C{"人間によるレビュー<br/>曖昧さの解消（Clarify）"}
+C -->|"要修正"| B
+C -->|"承認"| D["② Plan<br/>plan.md / design.md"]
+D --> E{"技術レビュー"}
+E -->|"要修正"| D
+E -->|"承認"| F["③ Tasks<br/>tasks.md"]
+F --> G["④ Implement<br/>AIエージェントによる実装"]
+G --> H{"テスト・検証"}
+H -->|"失敗"| F
+H -->|"合格"| I["マージ"]
+I -.->|"仕様は生きたドキュメント：<br/>変更時はSpecを先に更新"| B`;
 
-// Section 05 拡充にあたり参照した追加文献 ([18]〜[23])。
-// legacy HTML では [17] と [18] の間に区切り行を挿入していた構造を再現する。
-const SOURCES_SKILL_ADDITIONAL: Source[] = [
-  {
-    num: "[18]",
-    href: "https://developers.openai.com/codex/skills/",
-    title: "Agent Skills — OpenAI Developer Documentation (公式・最新)",
-    desc: "SKILL.md フロントマター仕様（name/description フィールド）・Progressive Disclosure 設計思想・スキルスコープ4段階（system/user/repository/admin）・$skill-installer の使い方・openai.yaml UIメタデータの完全仕様",
-  },
-  {
-    num: "[19]",
-    href: "https://developers.openai.com/cookbook/examples/skills_in_api",
-    title: "Skills in OpenAI API — OpenAI Cookbook (Feb 2026)",
-    desc: "SKILL.md フロントマター仕様の詳細・バージョン管理・Instruction-only / Tool Use / All-in-One パターンの実装例・ルーティング精度改善tips・「Use when / Do NOT use when」の必要性",
-  },
-  {
-    num: "[20]",
-    href: "https://developers.openai.com/codex/changelog/",
-    title: "Codex Changelog — OpenAI Developer Documentation (公式)",
-    desc: "Skills 正式リリース詳細・スキルディレクトリ構造（SKILL.md/scripts/references/assets）の変遷・マルチエージェント config との統合",
-  },
-  {
-    num: "[21]",
-    href: "https://github.com/openai/skills",
-    title: "openai/skills — GitHub 公式スキルカタログ（詳細）",
-    desc: "create-plan / git / linear / add-tests 等の実践的サンプルスキル全文・SKILL.md の実際の書き方・$skill-installer コマンドリファレンス・コミュニティへの貢献方法",
-  },
-  {
-    num: "[22]",
-    href: "https://community.openai.com/t/skills-for-codex-experimental-support-starting-today/1369367",
-    title:
-      "Skills for Codex: Experimental support starting today — OpenAI Developer Community (Dec 2025)",
-    desc: "Codex スキル機能の実験的リリース発表・暗黙的・明示的呼び出しの挙動・$ショートカット名の使い方・コミュニティ実装例と開発者フィードバック",
-  },
-  {
-    num: "[23]",
-    href: "https://blog.fsck.com/2025/10/27/skills-for-openai-codex/",
-    title: "Porting Skills (and Superpowers) to OpenAI Codex — blog.fsck.com (Oct 2025)",
-    desc: "SKILL.md のオープン規格（Claude Code/Antigravity/Codex 共通）・スキルを「フランチャイズのバインダー」と比喩した設計思想・3プラットフォーム間の移植方法・Few-shot examples の効果",
-  },
-  {
-    num: "[24]",
-    href: "https://developers.openai.com/codex/blog/may-2026-updates/",
-    title:
-      "Codex May 2026 Updates: Goal Mode, Appshots, and Mobile Integration — OpenAI Developer Blog (May 2026)",
-    desc: "Goal Mode（自律的な長期目標の実行とチェックポイント管理）・Appshots（UIプレビューのスナップショット共有機能）・モバイル統合の仕様とベストプラクティス",
-  },
-];
+const DIAGRAM_2 = `flowchart TB
+subgraph Root["リポジトリルート"]
+    AGENTS["AGENTS.md<br/>プロジェクト全体のコンテキスト"]
+    CONST["constitution.md<br/>不変の原則"]
+end
+subgraph Feature["specs/001-feature/"]
+    SPEC["spec.md<br/>What と Why"]
+    PLAN["plan.md<br/>How"]
+    TASKS["tasks.md<br/>実行単位"]
+end
+subgraph Skills["再利用可能な手順"]
+    SKILL["SKILL.md<br/>YAML frontmatter + 手順"]
+end
+AGENTS --> SPEC
+CONST --> SPEC
+SPEC --> PLAN
+PLAN --> TASKS
+TASKS -.->|"必要時にオンデマンドで読込"| SKILL`;
 
-/**
- * Renders the Codex Skill documentation page.
- *
- * @returns A React element containing the full Codex Skill guide page.
- */
-export default function CodexSkillPage() {
+const DIAGRAM_3 = `flowchart TD
+Q1{"常に真であるべき要件か？"}
+Q1 -->|"Yes"| U["Ubiquitous<br/>THE SYSTEM SHALL ..."]
+Q1 -->|"No"| Q2{"特定のイベントで発火するか？"}
+Q2 -->|"Yes"| EV["Event-driven<br/>WHEN event THE SYSTEM SHALL ..."]
+Q2 -->|"No"| Q3{"特定の状態が続く間だけ有効か？"}
+Q3 -->|"Yes"| ST["State-driven<br/>WHILE state THE SYSTEM SHALL ..."]
+Q3 -->|"No"| Q4{"望ましくない事象への対応か？"}
+Q4 -->|"Yes"| UB["Unwanted behavior<br/>IF trigger THEN THE SYSTEM SHALL ..."]
+Q4 -->|"No"| OPT["Optional feature<br/>WHERE feature THE SYSTEM SHALL ..."]`;
+
+const DIAGRAM_4 = `flowchart TB
+S1["セッション開始<br/>SKILL.md の name / description のみ読込"] --> S2{"タスクがスキルの<br/>ドメインと一致するか？"}
+S2 -->|"No"| S1
+S2 -->|"Yes"| S3["SKILL.md 本文を読込"]
+S3 --> S4{"補助ファイルが必要か？<br/>（スクリプト・参考資料）"}
+S4 -->|"Yes"| S5["補助ファイルをオンデマンドで読込"]
+S4 -->|"No"| S6["タスクを実行"]
+S5 --> S6`;
+
+const CODE_TEXT_1 = `### US-1（P1）: パスワードレス・ログイン
+ユーザーとして、パスワードを覚えずにメールリンクだけでログインしたい。
+これにより、パスワード忘れによる離脱を防げるため。`;
+
+const CODE_TEXT_2 = `## Task 12: マジックリンク送信APIの実装
+- 対応要件: US-1 / EARS-EV-1
+- 依存: Task 03（メール送信基盤）
+- 完了条件: \`POST /auth/magic-link\` が15分間有効なトークンを発行し、単体テストが通ること`;
+
+const CODE_TEXT_3 = `# AGENTS.md
+
+## セットアップ
+- 依存関係インストール: \`pnpm install\`
+- 開発サーバー起動: \`pnpm dev\`
+
+## テスト
+- 変更前に必ず実行: \`pnpm test -- --changed\`
+- E2Eは \`pnpm test:e2e\`（CI専用、ローカルでは実行しない）
+
+## 規約
+- 状態管理はZustandのみ使用し、Reduxを追加しない
+- APIクライアントは \`src/lib/api/\` 以下に集約する
+
+## 境界
+- \`packages/billing/\` 配下は決済監査対象。変更時は必ず人間レビューを要求すること`;
+
+const CODE_TEXT_4 = `---
+name: deploy
+description: アプリケーションを本番またはステージング環境へデプロイする
+---
+
+# Deploy
+
+## 手順
+1. テストスイートを実行: \`bun run test\`
+2. 本番ビルド: \`bun run build\`
+3. デプロイコマンドを実行し、ヘルスチェックを確認する`;
+
+export default function Page() {
   return (
-    <div className={styles.root}>
-      <header className={styles.header}>
-        <div className={styles.hdrBg} />
-        <div className={styles.hdrEyebrow}>
-          OpenAI Codex 最新 (2026) (v0.142.4, GPT-5.5 / GPT-5-Codex)
-        </div>
-        <h1>
-          AI仕様駆動開発における
-          <br />
-          <span className={styles.oaiText}>マークダウンファイル</span>
-          <br />
-          完全ガイド
-        </h1>
-        <p className={styles.hdrSub}>
-          AGENTS.md / SKILL.md / .prompt.md / REQUIREMENTS.md / AGENT_TASKS.md ——
-          <br />
-          Codexの全マークダウンファイルの役割・構造・ベストプラクティスを根拠ソース付きで徹底解説
-        </p>
-        <div className={styles.badgeRow}>
-          <span className={`${styles.badge} ${styles.bOai}`}>
-            OpenAI Codex 最新 (2026) (v0.142.4)
-          </span>
-          <span className={`${styles.badge} ${styles.bBlue}`}>
-            最新モデル (GPT-5.5 / GPT-5-Codex)
-          </span>
-          <span className={`${styles.badge} ${styles.bPurple}`}>AGENTS.md オープン標準</span>
-          <span className={`${styles.badge} ${styles.bAmber}`}>SKILL.md 共通規格</span>
-          <span className={`${styles.badge} ${styles.bRose}`}>最新版 (2026-06-29, v0.142.4)</span>
-        </div>
-      </header>
+    <div className={styles.layout} data-testid="layout-root">
+      <TocObserver />
 
-      <main className={styles.main}>
-        {/* TOC */}
-        <nav className={styles.toc} aria-label="目次">
-          <div className={styles.tocLbl}>目次</div>
+      <div className={styles.mobileTopbar}>
+        <button
+          className={styles.hamburger}
+          id="hamburgerBtn"
+          type="button"
+          aria-label="目次を開く"
+          aria-expanded="false"
+          aria-controls="sidebar"
+        >
+          <span />
+        </button>
+        <span className={styles.brand}>Markdown実践ガイド / SDD</span>
+      </div>
+      <div className={styles.sidebarBackdrop} id="sidebarBackdrop" />
+
+      <aside className={styles.sidebar} id="sidebar" data-testid="sidebar-nav">
+        <div className={styles.brandBlock}>
+          <p className={styles.eyebrow}>AI Spec-Driven Development</p>
+          <h2>Markdownファイル実践ガイド</h2>
+          <div className={styles.brandMeta}>最終更新: 2026-07-28 ・ 全15章 ・ 出典33件</div>
+        </div>
+        <ul className={styles.toc} id="tocList">
+          <li>
+            <a href="#sec-1" className={styles.active}>
+              <span className={styles.num}>01</span>
+              <span className={styles.dot} />
+              SDDとは何か・なぜMarkdownか
+            </a>
+          </li>
+          <li>
+            <a href="#sec-2">
+              <span className={styles.num}>02</span>
+              <span className={styles.dot} />
+              成熟度モデル
+            </a>
+          </li>
+          <li>
+            <a href="#sec-3">
+              <span className={styles.num}>03</span>
+              <span className={styles.dot} />
+              全体ワークフロー
+            </a>
+          </li>
+          <li>
+            <a href="#sec-4">
+              <span className={styles.num}>04</span>
+              <span className={styles.dot} />
+              ファイル構成の全体像
+            </a>
+          </li>
+          <li>
+            <a href="#sec-5">
+              <span className={styles.num}>05</span>
+              <span className={styles.dot} />
+              spec.md の書き方
+            </a>
+          </li>
+          <li>
+            <a href="#sec-6">
+              <span className={styles.num}>06</span>
+              <span className={styles.dot} />
+              plan.md の書き方
+            </a>
+          </li>
+          <li>
+            <a href="#sec-7">
+              <span className={styles.num}>07</span>
+              <span className={styles.dot} />
+              tasks.md の書き方
+            </a>
+          </li>
+          <li>
+            <a href="#sec-8">
+              <span className={styles.num}>08</span>
+              <span className={styles.dot} />
+              AGENTS.md / CLAUDE.md
+            </a>
+          </li>
+          <li>
+            <a href="#sec-9">
+              <span className={styles.num}>09</span>
+              <span className={styles.dot} />
+              SKILL.md と段階的開示
+            </a>
+          </li>
+          <li>
+            <a href="#sec-10">
+              <span className={styles.num}>10</span>
+              <span className={styles.dot} />
+              Markdown記法のベストプラクティス
+            </a>
+          </li>
+          <li>
+            <a href="#sec-11">
+              <span className={styles.num}>11</span>
+              <span className={styles.dot} />
+              生きたドキュメントの運用
+            </a>
+          </li>
+          <li>
+            <a href="#sec-12">
+              <span className={styles.num}>12</span>
+              <span className={styles.dot} />
+              よくある落とし穴
+            </a>
+          </li>
+          <li>
+            <a href="#sec-13">
+              <span className={styles.num}>13</span>
+              <span className={styles.dot} />
+              導入前チェックリスト
+            </a>
+          </li>
+          <li>
+            <a href="#sec-14">
+              <span className={styles.num}>14</span>
+              <span className={styles.dot} />
+              まとめ
+            </a>
+          </li>
+          <li>
+            <a href="#sec-15">
+              <span className={styles.num}>15</span>
+              <span className={styles.dot} />
+              参考文献
+            </a>
+          </li>
+        </ul>
+      </aside>
+
+      <div className={styles.main}>
+        {/* ===================== HERO ===================== */}
+        <header className={styles.hero}>
+          <div className={styles.heroInner}>
+            <div className={styles.heroCopy}>
+              <p className={styles.eyebrow}>中級〜上級エンジニア向け実践ガイド</p>
+              <h1>
+                AI仕様駆動開発における
+                <br />
+                <span className={styles.grad}>Markdownファイル</span>実践ガイド
+              </h1>
+              <p className={styles.lede}>
+                GitHub Spec Kit・AWS Kiro・Claude Code・AGENTS.md・Agent
+                Skillsなど、2026年時点の主要なSDDツール群が
+                共通して採用する「Markdownで仕様を書き、AIエージェントに実装させる」ワークフローを、
+                ステップバイステップで体系化しました。EARS記法、ファイル構成、Mermaid図解の作法まで一気通貫で扱います。
+              </p>
+              <div className={styles.heroBadges}>
+                <span className={styles.badge}>
+                  <strong>14</strong>ステップ構成
+                </span>
+                <span className={styles.badge}>
+                  <strong>4</strong>本のMermaid図解
+                </span>
+                <span className={styles.badge}>
+                  <strong>33</strong>件の一次情報を参照
+                </span>
+                <span className={styles.badge}>
+                  最終更新 <strong>2026-07-28</strong>
+                </span>
+              </div>
+            </div>
+
+            <div className={styles.filetreeCard} aria-hidden="true">
+              <div className={styles.ftHead}>
+                <span className={`${styles.ftDot} ${styles.r}`} />
+                <span className={`${styles.ftDot} ${styles.y}`} />
+                <span className={`${styles.ftDot} ${styles.g}`} />
+                <span>specs/001-magic-link-auth/</span>
+              </div>
+              <div className={styles.filetree}>
+                <div className={`${styles.row} ${styles.lvl1}`}>
+                  <span className={styles.path}>├─</span>
+                  <span className={styles.name}>constitution.md</span>
+                </div>
+                <div className={`${styles.row} ${styles.lvl1} ${styles.active}`}>
+                  <span className={styles.path}>├─</span>
+                  <span className={styles.name}>
+                    spec.md
+                    <span className={styles.cursor} />
+                  </span>
+                </div>
+                <div className={`${styles.row} ${styles.lvl2}`}>
+                  <span className={styles.path}>│&nbsp;&nbsp;</span>
+                  <span className={styles.path}>受け入れ基準（EARS）</span>
+                </div>
+                <div className={`${styles.row} ${styles.lvl1}`}>
+                  <span className={styles.path}>├─</span>
+                  <span className={styles.name}>plan.md</span>
+                </div>
+                <div className={`${styles.row} ${styles.lvl2}`}>
+                  <span className={styles.path}>│&nbsp;&nbsp;</span>
+                  <span className={styles.path}>アーキテクチャ図（Mermaid）</span>
+                </div>
+                <div className={`${styles.row} ${styles.lvl1}`}>
+                  <span className={styles.path}>└─</span>
+                  <span className={styles.name}>tasks.md</span>
+                </div>
+                <div className={`${styles.row} ${styles.lvl2}`}>
+                  <span className={styles.path}>&nbsp;&nbsp;&nbsp;</span>
+                  <span className={styles.path}>実装タスク一覧</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        {/* ===================== 1 ===================== */}
+        <section className={`${styles.section} ${styles.prose}`} id="sec-1">
+          <span className={styles.chapterNum} aria-hidden="true">
+            01
+          </span>
+          <p className={styles.sectionKicker}>Chapter 01</p>
+          <h2>SDDとは何か、なぜMarkdownなのか</h2>
+
+          <h3>Vibe Codingの限界</h3>
+          <p>
+            Andrej Karpathy氏が2025年初頭に提唱した「Vibe
+            Coding」という言葉は、コーディングエージェントに緩いプロンプトを
+            投げて生成物をそのまま受け入れるスタイルを指し、2025年のCollins English
+            Dictionary「今年の言葉」にも選出される ほど広まりました<sup>[16]</sup>
+            。プロトタイピングや個人開発では有効ですが、数百行を超える規模になると、
+            エージェントが「言語化されていない意図」を推測で埋めるようになり、その推測の積み重ねがコードベース全体の
+            ドリフト（意図からのズレ）を生みます<sup>[15][20]</sup>。
+          </p>
+
+          <div className={styles.callout} data-variant="default">
+            <span className={styles.calLabel}>Simon Willison氏の視点</span>
+            <p>
+              Datasette作者のSimon
+              Willison氏は、LLMが書いたコードであっても開発者がレビュー・テスト・理解を尽くしていれば、
+              それはもはやVibe
+              Codingではなく「LLMをタイピングアシスタントとして使っている」状態だと整理しています
+              <sup>[23]</sup>。
+              この「所有できるかどうか」の境界線こそが、SDD導入の判断基準になります。
+            </p>
+          </div>
+
+          <h3>SDDの定義</h3>
+          <p>
+            仕様駆動開発（Spec-Driven Development）とは、コードではなく
+            <strong>バージョン管理された仕様書そのもの</strong>を
+            正とし、そこから実装計画・タスク・コードを導出する開発手法です<sup>[14]</sup>
+            。2025年に、GitHub Spec Kit （2025年9月公開）やAWS
+            Kiro（2025年7月公開）といったツールがAIエージェント向けに具体化し、2026年には主要な
+            AIコーディングツールのほぼすべて（GitHub Spec Kit, AWS Kiro, Claude Code, Cursor,
+            OpenSpec, BMAD-METHOD, Tessl, Google
+            Antigravityなど）が何らかのSDDワークフローを実装するに至りました<sup>[16]</sup>。
+          </p>
+          <p>
+            SDDが解決しようとしている問題は明快です。AIエージェントは明示された契約（仕様）に対する実装は非常に得意ですが、
+            暗黙の意図を推測することは苦手です<sup>[16]</sup>
+            。曖昧なプロンプトは曖昧なコードを生みますが、
+            構造化された仕様は、意図に近いコードを生みます。
+          </p>
+
+          <h3>なぜMarkdownなのか</h3>
+          <p>SDDの実務ツールがほぼ例外なくMarkdownを採用しているのには理由があります。</p>
+          <ul>
+            <li>
+              <strong>人間にもAIにも読める</strong>:
+              プレーンテキストであるため、人間のレビュアーとAIエージェントの
+              双方が同じファイルをそのまま解釈できる<sup>[4]</sup>。
+            </li>
+            <li>
+              <strong>バージョン管理と親和性が高い</strong>:
+              Gitでdiffが取れるため、「仕様がいつ・どう変わったか」を 追跡できる<sup>[9]</sup>。
+            </li>
+            <li>
+              <strong>ツール非依存（ポータブル）</strong>:
+              特定ベンダーのフォーマットに縛られず、Claude Code・Codex・ Cursor・Gemini
+              CLIなど複数のエージェント間で使い回せる<sup>[7]</sup>。
+            </li>
+            <li>
+              <strong>構造と自由度のバランス</strong>:
+              見出し・表・コードブロックといった軽量な構造化要素を持ちながら、
+              厳密なスキーマを強制しない<sup>[26][7]</sup>。
+            </li>
+          </ul>
+        </section>
+
+        {/* ===================== 2 ===================== */}
+        <section className={`${styles.section} ${styles.prose}`} id="sec-2">
+          <span className={styles.chapterNum} aria-hidden="true">
+            02
+          </span>
+          <p className={styles.sectionKicker}>Chapter 02</p>
+          <h2>成熟度モデル:Spec-first / Spec-anchored / Spec-as-source</h2>
+          <p>
+            Thoughtworks社のMartin
+            Fowler氏らのチームは、SDDの実践パターンを3段階の厳密度スペクトラムとして整理して います
+            <sup>[13]</sup>
+            。自分たちのチームがどの段階を目指すのかを最初に決めておくことが、後述する
+            「過剰形式化（Waterfall化）」を防ぐ第一歩になります。
+          </p>
+
+          <div className={styles.tableWrap}>
+            <table>
+              <thead>
+                <tr>
+                  <th>段階</th>
+                  <th>考え方</th>
+                  <th>仕様が担う役割</th>
+                  <th>コードの位置づけ</th>
+                  <th>向いているケース</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <strong>Spec-first</strong>
+                    <br />
+                    （仕様先行）
+                  </td>
+                  <td>仕様を書いてからプロンプトする</td>
+                  <td>AIへの高品質なコンテキスト</td>
+                  <td>依然として正（メンテナンス対象）</td>
+                  <td>
+                    ほとんどの現場のデフォルト。実務での主流<sup>[16]</sup>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>Spec-anchored</strong>
+                    <br />
+                    （仕様係留）
+                  </td>
+                  <td>仕様は実装後も「生きた契約」として残り続ける</td>
+                  <td>継続的なガバナンス文書</td>
+                  <td>正だが、仕様との乖離をCIで機械的に検知</td>
+                  <td>チーム開発・長期保守プロジェクト</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>Spec-as-source</strong>
+                    <br />
+                    （仕様が源泉）
+                  </td>
+                  <td>仕様こそが唯一のソースで、コードは使い捨て可能な生成物</td>
+                  <td>実行可能な仕様そのもの</td>
+                  <td>生成物（規約変更時は再生成）</td>
+                  <td>
+                    OpenAPIからのスタブ生成、Simulinkモデルからの組込みコード生成など、既に標準化された領域
+                    <sup>[15]</sup>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            多くの現場が実際に運用しているのは<strong>Spec-anchored</strong>寄りのアプローチであり、
+            「仕様がAIの仕事を楽にし、人間レビュアーの仕事も楽にする」という位置づけです
+            <sup>[15]</sup>。
+          </p>
+        </section>
+
+        {/* ===================== 3 ===================== */}
+        <section className={`${styles.section} ${styles.prose}`} id="sec-3">
+          <span className={styles.chapterNum} aria-hidden="true">
+            03
+          </span>
+          <p className={styles.sectionKicker}>Chapter 03</p>
+          <h2>全体ワークフロー:Specify → Plan → Tasks → Implement</h2>
+          <p>
+            GitHub Spec Kitに代表される主要ツール群は、ほぼ共通して「Specify → Plan → Tasks →
+            Implement」という 4フェーズループを採用しています<sup>[15][16]</sup>。各フェーズの間に
+            <strong>人間によるレビューゲート</strong>を 置くことが、品質を保つ最大のポイントです。
+          </p>
+
+          <div className={styles.mermaidWrapper}>
+            <MermaidDiagram chart={DIAGRAM_1} theme="base" themeVariables={THEME_VARS} />
+          </div>
+          <p className={styles.figCaption}>
+            図1: Spec Kit / Kiro 共通の4フェーズループと人間レビューゲート
+          </p>
+
+          <p>
+            GitHub Spec Kitでは、この4フェーズに加えて
+            <code>/speckit.constitution</code>（プロジェクトの非交渉原則を 定義）、
+            <code>/speckit.clarify</code>（曖昧点の質問）、<code>/speckit.analyze</code>
+            （spec/plan/tasks間の 矛盾チェック）、<code>/speckit.checklist</code>
+            （仕様の抜け漏れを検査する「英語のユニットテスト」）といった
+            補助コマンドがスラッシュコマンドとして用意されています<sup>[3]</sup>。AWS
+            Kiroも同様に、要件定義→設計→実装計画
+            の3フェーズを踏み、各フェーズ間に承認ゲートを設けます<sup>[5][6]</sup>。
+          </p>
+        </section>
+
+        {/* ===================== 4 ===================== */}
+        <section className={`${styles.section} ${styles.prose}`} id="sec-4">
+          <span className={styles.chapterNum} aria-hidden="true">
+            04
+          </span>
+          <p className={styles.sectionKicker}>Chapter 04</p>
+          <h2>ファイル構成の全体像</h2>
+          <p>
+            SDDのMarkdown群は役割ごとに階層化して配置するのが定石です。プロジェクト全体に効くファイルと、
+            機能単位でスコープされるファイルを混在させないことが重要です。
+          </p>
+
+          <div className={styles.mermaidWrapper}>
+            <MermaidDiagram chart={DIAGRAM_2} theme="base" themeVariables={THEME_VARS} />
+          </div>
+          <p className={styles.figCaption}>
+            図2: プロジェクト全体スコープと機能スコープのファイル階層
+          </p>
+
+          <p>
+            主要なツール・標準がそれぞれどのファイル名を使っているかを整理すると以下の通りです。名前は違えど、役割
+            （What/Why・How・実行単位・全体コンテキスト）はほぼ共通しています。
+          </p>
+
+          <div className={styles.tableWrap}>
+            <table>
+              <thead>
+                <tr>
+                  <th>ツール / 標準</th>
+                  <th>主なファイル</th>
+                  <th>提供元・管理団体</th>
+                  <th>位置づけ</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <strong>GitHub Spec Kit</strong>
+                  </td>
+                  <td>
+                    <code>constitution.md</code> <code>spec.md</code> <code>plan.md</code>{" "}
+                    <code>tasks.md</code>
+                  </td>
+                  <td>GitHub（Microsoft傘下）</td>
+                  <td>
+                    OSSツールキット（MITライセンス）<sup>[1]</sup>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>AWS Kiro</strong>
+                  </td>
+                  <td>
+                    <code>requirements.md</code> <code>design.md</code> <code>tasks.md</code>
+                  </td>
+                  <td>AWS</td>
+                  <td>
+                    統合IDEに組み込み。EARS記法をネイティブ採用<sup>[5]</sup>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>Claude Code</strong>
+                  </td>
+                  <td>
+                    <code>CLAUDE.md</code>
+                  </td>
+                  <td>Anthropic</td>
+                  <td>
+                    セッションを跨いで読み込まれる指示書<sup>[20]</sup>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>AGENTS.md</strong>（オープン標準）
+                  </td>
+                  <td>
+                    <code>AGENTS.md</code>
+                  </td>
+                  <td>
+                    Agentic AI Foundation（Linux
+                    Foundation傘下）。OpenAI・Google（Jules）・Cursor・Factor等が策定を主導
+                  </td>
+                  <td>
+                    ベンダー中立、必須フィールドなしのプレーンMarkdown<sup>[32]</sup>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>Cursor</strong>
+                  </td>
+                  <td>
+                    <code>.cursor/rules/*.mdc</code>
+                  </td>
+                  <td>Cursor（Anysphere）</td>
+                  <td>
+                    YAML frontmatter付きMarkdown。パスごとに適用範囲を制御<sup>[22]</sup>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>Agent Skills</strong>
+                  </td>
+                  <td>
+                    <code>SKILL.md</code>
+                  </td>
+                  <td>Anthropicが提唱、オープン標準化</td>
+                  <td>
+                    Claude Code・Codex・Cursorなど30以上のツールが対応<sup>[18][29]</sup>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div className={`${styles.callout} ${styles.good}`} data-variant="good">
+            <span className={styles.calLabel}>モノレポでの配置ルール</span>
+            <p>
+              AGENTS.mdやCLAUDE.mdはモノレポの各パッケージ配下にも配置でき、エージェントは「編集対象ファイルに最も近い
+              ファイル」を優先して読み込みます（例:
+              OpenAIのCodexリポジトリでは88個のAGENTS.mdが階層的に配置されている）
+              <sup>[27]</sup>。Claude Codeは独自にCLAUDE.mdを読みますが、
+              <code>@AGENTS.md</code> のインポート記法を
+              使えばAGENTS.mdを取り込めるため、複数ツールを併用するチームは「AGENTS.mdを単一の正とし、CLAUDE.mdは1行の
+              インポート文だけにする」運用が推奨されています<sup>[26]</sup>。
+            </p>
+          </div>
+        </section>
+
+        {/* ===================== 5 ===================== */}
+        <section className={`${styles.section} ${styles.prose}`} id="sec-5">
+          <span className={styles.chapterNum} aria-hidden="true">
+            05
+          </span>
+          <p className={styles.sectionKicker}>Chapter 05 ・ Step-by-Step</p>
+          <h2>spec.md / requirements.md の書き方</h2>
+
+          <h3>Step 1: メタデータと目的を明記する</h3>
+          <p>
+            冒頭に「何のための機能か」「誰のためか」「スコープ外は何か」を短く書きます。実装方法（How）はここに書きません。
+            GitHub Spec
+            Kitの実運用では、LLMが張り切りすぎて要素サイズや配色などの実装詳細をspecに混入させてしまう傾向が
+            報告されており、気づいた時点で技術要件をplanドキュメント側へ移動するよう指示することが推奨されています
+            <sup>[3]</sup>。
+          </p>
+
+          <h3>Step 2: ユーザーストーリーを優先度付きで書く</h3>
+          <p>
+            <code>P1</code>/<code>P2</code>/<code>P3</code>
+            のように優先度ラベルを振り、各ストーリーを独立してテスト可能な
+            MVPスライスとして記述するテンプレートが広く使われています<sup>[19]</sup>。
+          </p>
+
+          <div className={styles.codeBlock} data-testid="code-block">
+            <div className={styles.cbHead}>
+              <div className={styles.cbMeta}>
+                <span>spec.md</span>
+                <span className={styles.cbLang}>markdown</span>
+              </div>
+              <CopyButton text={CODE_TEXT_1} />
+            </div>
+            <pre>
+              <code>
+                <span className={styles.tokenSection}>
+                  ### US-1（P1）: パスワードレス・ログイン
+                </span>
+                {"\n"}
+                {"ユーザーとして、パスワードを覚えずにメールリンクだけでログインしたい。\n"}
+                {"これにより、パスワード忘れによる離脱を防げるため。"}
+              </code>
+            </pre>
+          </div>
+
+          <h3>Step 3: 受け入れ基準をEARS記法で書く</h3>
+          <p>
+            自然文の受け入れ基準（"ユーザーはログインできる"
+            等）は曖昧で、人間にもAIにも解釈のブレを生みます。 この問題に対する業界標準の解が
+            <strong>EARS（Easy Approach to Requirements Syntax）</strong> です。
+            2009年にRolls-RoyceのAlistair
+            Mavin氏らが航空機エンジン制御の要件定義用に考案した記法で、Kiroをはじめとする
+            主要SDDツールがAIエージェント向けの受け入れ基準記法として採用しています
+            <sup>[16][24]</sup>。EARSはベンダー
+            中立の記法であり、Kiroは採用者であって考案者ではありません<sup>[24]</sup>。
+          </p>
+          <p>
+            EARSは5つのパターンで構成されます。どのパターンを使うべきかは、以下のように機械的に判定できます。
+          </p>
+
+          <div className={styles.mermaidWrapper}>
+            <MermaidDiagram chart={DIAGRAM_3} theme="base" themeVariables={THEME_VARS} />
+          </div>
+          <p className={styles.figCaption}>図3: EARS 5パターンの判定フロー</p>
+
+          <div className={styles.tableWrap}>
+            <table>
+              <thead>
+                <tr>
+                  <th>パターン</th>
+                  <th>用途</th>
+                  <th>構文テンプレート</th>
+                  <th>例</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <strong>Ubiquitous</strong>
+                    <br />
+                    （恒常要件）
+                  </td>
+                  <td>常に真である基本要件</td>
+                  <td>
+                    <code>THE SYSTEM SHALL &lt;応答&gt;</code>
+                  </td>
+                  <td>THE SYSTEM SHALL 全APIレスポンスをJSON形式で返す</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>Event-driven</strong>
+                    <br />
+                    （イベント駆動）
+                  </td>
+                  <td>特定のイベント発生時</td>
+                  <td>
+                    <code>WHEN &lt;トリガー&gt; THE SYSTEM SHALL &lt;応答&gt;</code>
+                  </td>
+                  <td>
+                    WHEN ユーザーが有効なメールアドレスを送信 THE SYSTEM SHALL
+                    15分間有効なワンタイムリンクを送付する<sup>[21]</sup>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>State-driven</strong>
+                    <br />
+                    （状態駆動）
+                  </td>
+                  <td>特定の状態が続く間</td>
+                  <td>
+                    <code>WHILE &lt;状態&gt; THE SYSTEM SHALL &lt;応答&gt;</code>
+                  </td>
+                  <td>WHILE メンテナンスモード中 THE SYSTEM SHALL 書き込みAPIを503で拒否する</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>Unwanted behavior</strong>
+                    <br />
+                    （望まない挙動への対応）
+                  </td>
+                  <td>異常系・エラー処理</td>
+                  <td>
+                    <code>IF &lt;トリガー&gt; THEN THE SYSTEM SHALL &lt;応答&gt;</code>
+                  </td>
+                  <td>
+                    IF ログインリンクが2回目以降使用された THEN THE SYSTEM SHALL HTTP 410で拒否する
+                    <sup>[21]</sup>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>Optional feature</strong>
+                    <br />
+                    （オプション機能）
+                  </td>
+                  <td>特定機能が有効な場合のみ</td>
+                  <td>
+                    <code>WHERE &lt;機能&gt; THE SYSTEM SHALL &lt;応答&gt;</code>
+                  </td>
+                  <td>
+                    WHERE 多要素認証が有効化されている THE SYSTEM SHALL
+                    追加のワンタイムコード入力を要求する
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            EARSで書かれた受け入れ基準は、ほぼ1対1でテストケースに変換できるという実務上の利点があります
+            <sup>[21]</sup>。
+            一方で、EARSは「表現の型」を統一するだけであり、それ自体が実行可能なテストになるわけではない点には注意が必要です
+            <sup>[24]</sup>。
+          </p>
+
+          <h3>Step 4: 曖昧さを可視化するマーカーを使う</h3>
+          <p>
+            GitHub Spec Kitの実運用では、spec.md中に
+            <code>[NEEDS CLARIFICATION]</code> のようなマーカーを埋め込み、
+            これが残っている間はタスクを「完了」とマークしない、という運用が確認されています
+            <sup>[19]</sup>。曖昧な要件を 無理に確定させず、可視化したまま人間の判断を仰ぐ設計です。
+          </p>
+
+          <h3>Step 5: 実装詳細を書かない(Whatに徹する)</h3>
+          <p>
+            spec.mdは「何を」「なぜ」に徹し、「どう作るか」はplan.mdに譲ります。良い仕様書の条件を扱った
+            Addy
+            Osmani氏（Googleの著名なエンジニア）の記事でも、仕様はAIエージェントが自己修正しつつ安全な境界内に
+            留まるための"契約"であるべきだと述べられています<sup>[10]</sup>。
+          </p>
+        </section>
+
+        {/* ===================== 6 ===================== */}
+        <section className={`${styles.section} ${styles.prose}`} id="sec-6">
+          <span className={styles.chapterNum} aria-hidden="true">
+            06
+          </span>
+          <p className={styles.sectionKicker}>Chapter 06 ・ Step-by-Step</p>
+          <h2>plan.md / design.md の書き方</h2>
           <ol>
             <li>
-              <a href="#overview">OpenAI Codexとは — Cloud版 vs CLI版 vs Agents SDK</a>
+              <strong>技術スタックとアーキテクチャ方針を明記する</strong>:
+              使用するフレームワーク、データストア、
+              外部API連携などをspecの要件にひもづけて記述します。
             </li>
             <li>
-              <a href="#directory">全体ファイル構成とディレクトリ</a>
+              <strong>アーキテクチャ図・シーケンス図はMermaidで描く</strong>:
+              Kiroのdesign.mdも、技術アーキテクチャと
+              シーケンス図をこの段階で文書化する運用になっています<sup>[5]</sup>
+              。ASCIIアートは避け、Mermaidの フローチャート／シーケンス図で表現します。
             </li>
             <li>
-              <a href="#agents-md">AGENTS.md — プロジェクト永続メモリ（オープン標準）</a>
+              <strong>意思決定の根拠を残す（ADR的に）</strong>:
+              なぜこの技術を選んだかを一言添えるだけで、後からの
+              手戻りやレビュー時間を大きく減らせます。
             </li>
             <li>
-              <a href="#agents-override">AGENTS.override.md — 一時的スコープ上書き</a>
-            </li>
-            <li>
-              <a href="#skill-md">SKILL.md — Progressive Disclosure ナレッジ</a>
-            </li>
-            <li>
-              <a href="#prompt-md">.prompt.md — 再利用タスクプロンプト</a>
-            </li>
-            <li>
-              <a href="#sdd-files">SDD仕様書群 (REQUIREMENTS / AGENT_TASKS / TEST / design_spec)</a>
-            </li>
-            <li>
-              <a href="#config">config.toml — Codex設定ファイル</a>
-            </li>
-            <li>
-              <a href="#openai-yaml">agents/openai.yaml — スキルUIメタデータ</a>
-            </li>
-            <li>
-              <a href="#multi-agent">Multi-Agent SDD パターン（Agents SDK）</a>
-            </li>
-            <li>
-              <a href="#best-practices">横断ベストプラクティス10則</a>
-            </li>
-            <li>
-              <a href="#sources">参考ソース一覧</a>
+              <strong>エラーハンドリング・テスト戦略を明記する</strong>:
+              Kiroのdesign.mdはエラーハンドリングとテスト
+              戦略を含むのが標準ですが、必要な粒度は都度調整します<sup>[32]</sup>。
             </li>
           </ol>
-        </nav>
 
-        {/* SECTION 1: OVERVIEW */}
-        <section id="overview" className={styles.section}>
-          <div className={styles.secLabel}>Section 01</div>
-          <h2 className={styles.secTitle}>
-            <span className={styles.num}>01.</span>OpenAI Codexとは — Cloud版 vs CLI版 vs Agents SDK
-          </h2>
-
-          <p>
-            OpenAI Codexは2025年5月にリリースされた
-            <strong className={styles.strongBright}>
-              クラウドベースのソフトウェアエンジニアリングエージェント
-            </strong>
-            です。かつての「コード補完モデル」とは全く別物で、2026年2月に
-            <code>GPT-5.3-Codex</code>
-            （GPT-5.2-Codex比25%高速、SWE-Bench ProでSoTA）が導入され、現行の推奨モデルは
-            <code>GPT-5.4</code>
-            です。GitHubリポジトリを自律的に操作・PR提案まで行います。
-          </p>
-
-          <div className={styles.g3}>
-            <div className={styles.mc}>
-              <div className={`${styles.mcTag} ${styles.mcTagOai}`}>☁️ Cloud Codex</div>
-              <p>
-                専用<strong>Codex App</strong>
-                （Web・デスクトップ、2026年3月Windows版リリース）から利用。クラウドサンドボックスでタスクを並列実行。GitHub連携でPRを自動作成。ChatGPTサイドバーからも引き続き利用可。
-              </p>
-            </div>
-            <div className={styles.mc}>
-              <div className={`${styles.mcTag} ${styles.mcTagBlue}`}>💻 Codex CLI</div>
-              <p>
-                ターミナルで動作するオープンソースエージェント（
-                <code>npm install @openai/codex</code>
-                ）。ローカルリポジトリを直接操作。TUI（テキストUI）とHeadlessモードを持つ。デフォルトの
-                <code>service_tier</code> は <code>flex</code>（標準モード）。
-                <strong>Fast modeはオプトイン</strong>で、セッション内の <code>/fast</code>
-                コマンドで明示的に有効化する（GPT-5.4で利用可能、約1.5倍速だがクレジット消費約2倍）。音声入力（スペースキー長押しで録音・文字起こし）対応。
-              </p>
-            </div>
-            <div className={styles.mc}>
-              <div className={`${styles.mcTag} ${styles.mcTagPurple}`}>🤖 Agents SDK</div>
-              <p>
-                Python/TypeScriptでマルチエージェントパイプラインを構築するSDK。Codex MCP経由でCodex
-                CLIをサブエージェントとして呼び出す。並列SDD実装を実現。
-              </p>
-            </div>
-          </div>
-
-          <table className={styles.table}>
-            <tbody>
-              <tr>
-                <th>特性</th>
-                <th>OpenAI Codex</th>
-                <th>Claude Code</th>
-                <th>Google Antigravity</th>
-              </tr>
-              <tr>
-                <td>永続メモリ</td>
-                <td>AGENTS.md（オープン標準）</td>
-                <td>CLAUDE.md（独自）</td>
-                <td>GEMINI.md + Rules</td>
-              </tr>
-              <tr>
-                <td>ナレッジ拡張</td>
-                <td>SKILL.md（共通規格）</td>
-                <td>SKILL.md（共通規格）</td>
-                <td>SKILL.md（共通規格）</td>
-              </tr>
-              <tr>
-                <td>タスクプロンプト</td>
-                <td>.prompt.md</td>
-                <td>Custom Commands (.md)</td>
-                <td>Workflows (.md)</td>
-              </tr>
-              <tr>
-                <td>SDD専用ファイル</td>
-                <td>REQUIREMENTS.md / AGENT_TASKS.md / TEST.md</td>
-                <td>tasks.md（慣習）</td>
-                <td>tasks.md + Artifacts</td>
-              </tr>
-              <tr>
-                <td>設定ファイル</td>
-                <td>~/.codex/config.toml</td>
-                <td>なし</td>
-                <td>.agent/rules/ + TOML</td>
-              </tr>
-              <tr>
-                <td>エコシステム</td>
-                <td>AAIF（Linux Foundation）</td>
-                <td>Anthropic独自</td>
-                <td>Google独自</td>
-              </tr>
-            </tbody>
-          </table>
-
-          <div className={styles.stdBanner}>
-            <div className={styles.stdIcon}>🌐</div>
-            <div>
-              <div className={styles.stdTitle}>
-                AGENTS.md は Linux Foundation 傘下のオープン標準
-              </div>
-              <div className={styles.stdDesc}>
-                AGENTS.mdはOpenAIが発案し、2025年にAgentic AI Foundation（AAIF）がLinux
-                Foundationの傘下で管理する
-                <strong>業界横断オープン標準</strong>
-                となりました。Codex・Cursor・Google Jules・Amp・Factoryなどが採用し、
-                <strong>40,000以上のオープンソースプロジェクト</strong>
-                で使用されています。「ツール固有のCLAUDE.mdやGEMINI.mdを書き分ける」問題を解消し、1ファイルで全エージェントに対応します。
-              </div>
-            </div>
+          <div className={`${styles.callout} ${styles.warn}`} data-variant="warn">
+            <span className={styles.calLabel}>生成物を鵜呑みにしない</span>
+            <p>
+              Scott Logic社の検証では、planフェーズで自動生成された406行の「research
+              doc」が、既存ページと同じ
+              ライブラリを使う理由付けなど、冗長で価値の薄い内容になっていた例が報告されています
+              <sup>[17]</sup>。
+              <strong>生成させたら鵜呑みにせず、価値のある意思決定記録だけを残す</strong>
+              姿勢が重要です。
+            </p>
           </div>
         </section>
 
-        {/* SECTION 2: DIRECTORY */}
-        <section id="directory" className={styles.section}>
-          <div className={styles.secLabel}>Section 02</div>
-          <h2 className={styles.secTitle}>
-            <span className={styles.num}>02.</span>全体ファイル構成とディレクトリ
-          </h2>
+        {/* ===================== 7 ===================== */}
+        <section className={`${styles.section} ${styles.prose}`} id="sec-7">
+          <span className={styles.chapterNum} aria-hidden="true">
+            07
+          </span>
+          <p className={styles.sectionKicker}>Chapter 07 ・ Step-by-Step</p>
+          <h2>tasks.md の書き方</h2>
+          <ol>
+            <li>
+              <strong>アトミックなタスクに分解する</strong>:
+              各タスクは独立してレビュー・差し戻し可能な単位にします。
+            </li>
+            <li>
+              <strong>要件へのトレーサビリティを持たせる</strong>:
+              各タスクがどのユーザーストーリー／受け入れ基準に
+              対応するかを明示し、実装が要件から逸脱していないかを追跡できるようにします
+              <sup>[33]</sup>。
+            </li>
+            <li>
+              <strong>依存関係を明示し、並列実行可能なタスクをグルーピングする</strong>:
+              Kiroはtasks.mdから依存関係 グラフを構築し、依存のないタスクを「Wave
+              1」としてまとめて並列に扱う仕組みを持ちます<sup>[5]</sup>。
+            </li>
+            <li>
+              <strong>実装フェーズで内容を変更しない</strong>:
+              タスクはLLMが何を作るかの直接的な反映であるため、
+              この段階で不正確な内容が混入していないかの確認が特に重要だと、Spec
+              Kitの実運用知見として指摘されています<sup>[3]</sup>。
+            </li>
+          </ol>
 
-          <div className={styles.flowWrap}>
-            <div className={styles.flowLbl}>▸ Codex SDD 5フェーズフロー</div>
-            <div className={styles.flow}>
-              <div className={styles.fst}>
-                <div className={`${styles.fbox} ${styles.fOai}`}>
-                  Phase 1<br />
-                  仕様策定
-                </div>
-                <div className={styles.ffile}>
-                  REQUIREMENTS.md
-                  <br />
-                  design_spec.md
-                </div>
+          <div className={styles.codeBlock} data-testid="code-block">
+            <div className={styles.cbHead}>
+              <div className={styles.cbMeta}>
+                <span>tasks.md</span>
+                <span className={styles.cbLang}>markdown</span>
               </div>
-              <div className={styles.farr}>→</div>
-              <div className={styles.fst}>
-                <div className={`${styles.fbox} ${styles.fBlue}`}>
-                  Phase 2<br />
-                  タスク分解
-                </div>
-                <div className={styles.ffile}>
-                  AGENT_TASKS.md
-                  <br />
-                  TEST.md
-                </div>
-              </div>
-              <div className={styles.farr}>→</div>
-              <div className={styles.fst}>
-                <div className={`${styles.fbox} ${styles.fPurp}`}>
-                  Phase 3<br />
-                  Codex実行
-                </div>
-                <div className={styles.ffile}>
-                  AGENTS.md
-                  <br />
-                  SKILL.md
-                </div>
-              </div>
-              <div className={styles.farr}>→</div>
-              <div className={styles.fst}>
-                <div className={`${styles.fbox} ${styles.fAmb}`}>
-                  Phase 4<br />
-                  検証
-                </div>
-                <div className={styles.ffile}>
-                  TEST_PLAN.md
-                  <br />
-                  test.sh
-                </div>
-              </div>
-              <div className={styles.farr}>→</div>
-              <div className={styles.fst}>
-                <div className={`${styles.fbox} ${styles.fRose}`}>
-                  Phase 5<br />
-                  PR生成
-                </div>
-                <div className={styles.ffile}>
-                  AGENTS.md
-                  <br />
-                  (PR instructions)
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <h3>推奨ディレクトリ構成（全体）</h3>
-          <div className={styles.tree}>
-            <div className={styles.t0}>
-              <span className={styles.tf}>📁</span> <span>your-project/</span>
-            </div>
-
-            <div className={`${styles.t0} ${styles.t1}`}>
-              <span className={styles.tb}>📄</span> <span className={styles.tb}>AGENTS.md</span>
-              <span className={styles.td}>— プロジェクト永続メモリ（最重要・git管理）</span>
-            </div>
-            <div className={`${styles.t0} ${styles.t1}`}>
-              <span className={styles.tp}>📄</span>{" "}
-              <span className={styles.tp}>AGENTS.override.md</span>
-              <span className={styles.td}>— 一時的グローバル上書き（gitignore推奨）</span>
-            </div>
-
-            <div className={`${styles.t0} ${styles.t1}`}>
-              <span className={styles.tf}>📁</span> <span>.agents/</span>
-              <span className={styles.td}>— Codex スキルルート</span>
-            </div>
-            <div className={`${styles.t0} ${styles.t2}`}>
-              <span className={styles.tf}>📁</span> <span>skills/</span>
-            </div>
-            <div className={`${styles.t0} ${styles.t3}`}>
-              <span className={styles.tf}>📁</span> <span>db-migration/</span>
-            </div>
-            <div className={`${styles.t0} ${styles.t4}`}>
-              <span className={styles.tg}>📄</span> <span className={styles.tg}>SKILL.md</span>
-              <span className={styles.td}>— スキル定義（必須）</span>
-            </div>
-            <div className={`${styles.t0} ${styles.t4}`}>
-              <span className={styles.tf}>📁</span> <span>scripts/</span>
-              <span className={styles.td}>— 実行スクリプト（任意）</span>
-            </div>
-            <div className={`${styles.t0} ${styles.t4}`}>
-              <span className={styles.tf}>📁</span> <span>references/</span>
-              <span className={styles.td}>— 参考ドキュメント（任意）</span>
-            </div>
-            <div className={`${styles.t0} ${styles.t4}`}>
-              <span className={styles.tg}>📄</span>{" "}
-              <span className={styles.tg}>agents/openai.yaml</span>
-              <span className={styles.td}>— UI/呼び出しメタデータ（任意）</span>
-            </div>
-
-            <div className={`${styles.t0} ${styles.t1}`}>
-              <span className={styles.tf}>📁</span> <span>.github/</span>
-            </div>
-            <div className={`${styles.t0} ${styles.t2}`}>
-              <span className={styles.tp}>📄</span> <span className={styles.tp}>.prompt.md</span>
-              <span className={styles.td}>— 再利用タスクプロンプト</span>
-            </div>
-
-            <div className={`${styles.t0} ${styles.t1}`}>
-              <span className={styles.tf}>📁</span> <span>docs/</span>{" "}
-              <span className={styles.td}>— SDD仕様書群</span>
-            </div>
-            <div className={`${styles.t0} ${styles.t2}`}>
-              <span className={styles.tb}>📄</span>{" "}
-              <span className={styles.tb}>REQUIREMENTS.md</span>
-              <span className={styles.td}>— 製品要件定義</span>
-            </div>
-            <div className={`${styles.t0} ${styles.t2}`}>
-              <span className={styles.tb}>📄</span>{" "}
-              <span className={styles.tb}>AGENT_TASKS.md</span>
-              <span className={styles.td}>— エージェント別タスク割り当て</span>
-            </div>
-            <div className={`${styles.t0} ${styles.t2}`}>
-              <span className={styles.tl}>📄</span> <span className={styles.tl}>TEST.md</span>
-              <span className={styles.td}>— テスト計画・受け入れ基準</span>
-            </div>
-            <div className={`${styles.t0} ${styles.t2}`}>
-              <span className={styles.tc}>📄</span>{" "}
-              <span className={styles.tc}>design_spec.md</span>
-              <span className={styles.td}>— 技術設計書（Designerエージェント生成）</span>
-            </div>
-
-            <div className={`${styles.t0} ${styles.t1} ${styles.treeGroupSpacer}`}>
-              <span className={styles.treeDimPrefix}>~/</span>
-              <span>.codex/</span>
-              <span className={styles.td}>— グローバル設定</span>
-            </div>
-            <div className={`${styles.t0} ${styles.t2}`}>
-              <span className={styles.tb}>📄</span> <span className={styles.tb}>AGENTS.md</span>
-              <span className={styles.td}>— 全プロジェクト共通ルール</span>
-            </div>
-            <div className={`${styles.t0} ${styles.t2}`}>
-              <span className={styles.tp}>📄</span>{" "}
-              <span className={styles.tp}>AGENTS.override.md</span>
-              <span className={styles.td}>— 緊急上書き（一時的）</span>
-            </div>
-            <div className={`${styles.t0} ${styles.t2}`}>
-              <span className={styles.tg}>📄</span> <span className={styles.tg}>config.toml</span>
-              <span className={styles.td}>— Codex設定（サイズ上限・フォールバック等）</span>
-            </div>
-            <div className={`${styles.t0} ${styles.t2}`}>
-              <span className={styles.tf}>📁</span> <span>skills/</span>
-              <span className={styles.td}>— グローバルスキル</span>
-            </div>
-          </div>
-        </section>
-
-        {/* SECTION 3: AGENTS.MD */}
-        <section id="agents-md" className={styles.section}>
-          <div className={styles.secLabel}>Section 03</div>
-          <h2 className={styles.secTitle}>
-            <span className={styles.num}>03.</span>AGENTS.md —
-            プロジェクト永続メモリ（オープン標準）
-          </h2>
-
-          <p>
-            AGENTS.mdはClaude CodeのCLAUDE.mdに相当する
-            <strong className={styles.strongBright}>Codexの最重要ファイル</strong>
-            です。Codexはタスクを開始する前に必ずAGENTS.mdを読み込み、コーディング規約・テストコマンド・PR手順などのコンテキストを取得します。ただしAGENTS.mdはテストを自動実行しないため、「ファイルを変更したら必ず
-            npm test を実行すること」のように<strong>テストコマンドを明示的に記述</strong>
-            する必要があります。コマンドが未記載だとテストが省略されます。
-          </p>
-
-          <h3>読み込み優先度チェーン</h3>
-          <div className={styles.precDiagram}>
-            <div className={styles.precLabel}>
-              ▸ Codex の AGENTS.md 探索順序（後に読まれたものが前のものを上書き）
-            </div>
-            <div className={`${styles.precRow} ${styles.pr1}`}>
-              <div className={styles.precRank}>① 最優先</div>
-              <div>
-                <div className={styles.precFile}>~/.codex/AGENTS.override.md</div>
-                <div className={styles.precDesc}>
-                  グローバル緊急上書き（存在する場合のみ）— ~/.codex/AGENTS.md を完全に置換
-                </div>
-              </div>
-            </div>
-            <div className={styles.precArrow}>↓ なければ</div>
-            <div className={`${styles.precRow} ${styles.pr2}`}>
-              <div className={styles.precRank}>②</div>
-              <div>
-                <div className={styles.precFile}>~/.codex/AGENTS.md</div>
-                <div className={styles.precDesc}>
-                  グローバルデフォルト — 全リポジトリ継承（Working agreements・言語設定など）
-                </div>
-              </div>
-            </div>
-            <div className={styles.precArrow}>↓ プロジェクトルートへ</div>
-            <div className={`${styles.precRow} ${styles.pr3}`}>
-              <div className={styles.precRank}>③</div>
-              <div>
-                <div className={styles.precFile}>
-                  ./AGENTS.md
-                  <span className={styles.precFileNote}>（プロジェクトルート）</span>
-                </div>
-                <div className={styles.precDesc}>
-                  リポジトリ共有ルール — チームのコーディング規約・テスト手順・PR形式
-                </div>
-              </div>
-            </div>
-            <div className={styles.precArrow}>↓ カレントディレクトリまで降下</div>
-            <div className={`${styles.precRow} ${styles.pr4}`}>
-              <div className={styles.precRank}>④ 最後に読まれる＝最高優先</div>
-              <div>
-                <div className={styles.precFile}>./services/payments/AGENTS.override.md</div>
-                <div className={styles.precDesc}>
-                  サブディレクトリの上書き — チーム固有ルール。
-                  <strong>最も近いファイルが最優先</strong>
-                </div>
-              </div>
-            </div>
-            <div className={styles.precFootnote}>
-              <strong>結合順:</strong>{" "}
-              Codexはルートから現在ディレクトリまで上記をすべて連結し、後に来るものが前のものを上書きします。デフォルト上限は
-              <strong>32 KiB</strong>
-              （config.tomlで変更可）。1ディレクトリにつき最大1ファイル読み込み。
-            </div>
-          </div>
-
-          <div className={styles.fc}>
-            <div className={styles.fcHdr}>
-              <div className={`${styles.fcIcon} ${styles.fcIconOai}`}>📋</div>
-              <div>
-                <div className={styles.fcName}>AGENTS.md</div>
-                <div className={styles.fcPath}>
-                  ./AGENTS.md (プロジェクトルート) — git管理・チーム共有
-                </div>
-                <div className={styles.fcMeta}>
-                  <span className={`${styles.fcTag} ${styles.fcTagOai}`}>オープン標準</span>
-                  <span className={`${styles.fcTag} ${styles.fcTagBlue}`}>
-                    Codex起動時自動読み込み
-                  </span>
-                  <span className={`${styles.fcTag} ${styles.fcTagPurple}`}>32KiB上限</span>
-                </div>
-              </div>
-            </div>
-            <div className={styles.fcBody}>
-              <h3>ベストプラクティス完全テンプレート</h3>
-              <div className={styles.cb}>
-                <div className={styles.cbHdr}>
-                  <div className={styles.cbDots}>
-                    <div className={`${styles.cbd} ${styles.cbdRed}`} />
-                    <div className={`${styles.cbd} ${styles.cbdAmber}`} />
-                    <div className={`${styles.cbd} ${styles.cbdOai}`} />
-                  </div>
-                  <span>AGENTS.md — プロジェクトルート</span>
-                </div>
-                <pre>
-                  <span className={styles.cHd}># AGENTS.md</span>
-                  {"\n"}
-                  <span className={styles.cCm}>
-                    # READMEのエージェント版。Codexはタスク開始前に必ずこのファイルを読む。
-                  </span>
-                  {"\n\n"}
-                  <span className={styles.cHd}>## Project Overview</span>
-                  {"\n"}
-                  <span className={styles.cCm}>
-                    # 1〜2文で目的を記述。Codexが全判断の基準とする。
-                  </span>
-                  {"\n"}
-                  {"ECサイトのバックエンドAPI（Go製マイクロサービス）。\n"}
-                  {"プリオーダー・決済・在庫管理の3サービスで構成。\n\n"}
-                  <span className={styles.cHd}>## Repository Structure</span>
-                  {"\n"}
-                  <span className={styles.cCm}># Codexがコードベースを理解するための地図</span>
-                  {"\n"}
-                  {"- cmd/       — サービスエントリーポイント\n"}
-                  {"- internal/  — ビジネスロジック（外部公開不可）\n"}
-                  {"- pkg/       — 再利用可能パッケージ\n"}
-                  {"- migrations/— DBマイグレーション（直接編集禁止）\n"}
-                  {"- docs/      — 仕様書群（spec / requirements / design / tasks）\n\n"}
-                  <span className={styles.cHd}>## Build &amp; Test Commands</span>
-                  {"\n"}
-                  <span className={styles.cCm}>
-                    # ★重要: AGENTS.md はテストを自動実行しない。明示的にコマンドを記述すること
-                  </span>
-                  {"\n"}
-                  <span className={styles.cCm}>
-                    # 例: 「ファイルを変更したら必ず以下のコマンドを実行すること」
-                  </span>
-                  {"\n"}
-                  {"- Build:    `go build ./...`\n"}
-                  {"- Test all: `go test ./... -race -timeout 120s`\n"}
-                  {"- Lint:     `golangci-lint run`\n"}
-                  {
-                    "- Coverage: `go test ./... -coverprofile=coverage.out && go tool cover -html=coverage.out`\n"
-                  }
-                  {"- Dev:      `docker compose up -d`\n\n"}
-                  <span className={styles.cHd}>## Code Style</span>
-                  {"\n"}
-                  {"- Go 1.23 modules。CGO無効（CGO_ENABLED=0）\n"}
-                  {'- エラーハンドリング: `fmt.Errorf("context: %w", err)` 形式\n'}
-                  {"- テスト: table-driven tests 必須\n"}
-                  {"- コメント: GoDoc形式（英語）\n"}
-                  {"- パッケージ名: 単数形・短縮なし\n\n"}
-                  <span className={styles.cHd}>## Architecture Constraints</span>
-                  {"\n"}
-                  {"- サービス間通信: gRPCのみ（REST禁止）\n"}
-                  {"- ORM使用禁止（pgx v5 raw SQL のみ）\n"}
-                  {"- グローバル変数の新規追加禁止\n"}
-                  {"- panic() の使用禁止（エラーを返す）\n\n"}
-                  <span className={styles.cHd}>## PR Instructions</span>
-                  {"\n"}
-                  <span className={styles.cCm}>
-                    # Codex がPRを作成する際の形式を指定（公式機能）
-                  </span>
-                  {"\n"}
-                  {"タイトル形式: `[feat/fix/refactor] 短い説明（英語）`\n"}
-                  {"必須セクション:\n"}
-                  {"- Summary: 変更内容の1段落サマリー\n"}
-                  {"- Testing Done: 実行したテストと結果\n"}
-                  {"- Breaking Changes: 破壊的変更があれば記載\n\n"}
-                  <span className={styles.cHd}>## System Instructions</span>
-                  {"\n"}
-                  <span className={styles.cCm}>
-                    # system_promptの役割。エージェントとしての性格や言語前提を指定。
-                  </span>
-                  {"\n"}
-                  {"- 常に日本語で報告や返答を行ってください。\n"}
-                  {"- 変更が必要な場合は実装前に理由と設計プランを提示してください。\n\n"}
-                  <span className={styles.cHd}>## Tool Permissions</span>
-                  {"\n"}
-                  <span className={styles.cCm}>
-                    # 使用可能な tools と、その実行結果取得における token flood 防止の制約。
-                  </span>
-                  {"\n"}
-                  {"- `run_command` ではテストおよびビルドコマンドのみ実行可能。\n"}
-                  {
-                    "- コマンド実行結果が長大な場合は byte cap (最大 4000 バイト) で出力を切り詰めて処理すること。\n\n"
-                  }
-                  <span className={styles.cHd}>## Agent Handoffs</span>
-                  {"\n"}
-                  <span className={styles.cCm}>
-                    # handoffsポリシー。他の専門エージェントへタスクを委譲・引き渡す際の基準。
-                  </span>
-                  {"\n"}
-                  {"- DBマイグレーションを伴うタスクは `db-migration` エージェントへハンドオフ。\n"}
-                  {"- 実装完了後は `ReviewerAgent` へ自動的にハンドオフして検証を受けること。\n\n"}
-                  <span className={styles.cHd}>## Forbidden Actions</span>
-                  {"\n"}
-                  <span className={styles.cRose}># Codexに絶対にさせてはいけないこと</span>
-                  {"\n"}
-                  {
-                    "- migrations/ フォルダへの直接書き込み（docs/SKILL.md の db-migration スキル使用）\n"
-                  }
-                  {"- .env ファイルの作成・変更\n"}
-                  {"- 本番DBへのDELETE/DROP（必ず人間確認）\n"}
-                  {"- APIキーのハードコード"}
-                </pre>
-              </div>
-
-              <div className={`${styles.ib} ${styles.iWarn}`}>
-                <span className={styles.ii}>⚠️</span>
-                <div>
-                  <strong>32KiBの上限を意識せよ</strong>
-                  <br />
-                  AGENTS.mdは全ディレクトリ分を連結した合計が<strong>デフォルト32KiB</strong>（
-                  <code>~/.codex/config.toml</code>の<code>project_doc_max_bytes</code>
-                  で変更可）を超えると以降のファイルが切り捨てられます。重要な情報は上に、詳細はSKILL.mdへ分離するか、上限を
-                  <code>65536</code>（64KiB）に増やしてください（[1]）。
-                </div>
-              </div>
-
-              <div className={`${styles.ib} ${styles.iBlue}`}>
-                <span className={styles.ii}>ℹ️</span>
-                <div>
-                  <strong>AGENTS.mdはオープン標準なのでClaude Codeでもそのまま使える</strong>
-                  <br />
-                  Claude CodeはCLAUDE.mdに<code>@AGENTS.md</code>
-                  でインポートすることで、AGENTS.mdを唯一の真実のソースとして活用できます。ツールを乗り換えても書き直し不要（[10]）。
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* SECTION 4: AGENTS.OVERRIDE.MD */}
-        <section id="agents-override" className={styles.section}>
-          <div className={styles.secLabel}>Section 04</div>
-          <h2 className={styles.secTitle}>
-            <span className={styles.num}>04.</span>AGENTS.override.md — 一時的スコープ上書き
-          </h2>
-
-          <p>
-            AGENTS.override.mdは
-            <strong className={styles.strongBright}>
-              既存のAGENTS.mdを削除せずに一時的に置き換える
-            </strong>
-            ためのファイルです。「今回だけテストをスキップしたい」「特定チームの支払いサービスだけ異なるルールを適用したい」といったシナリオで使用します。
-          </p>
-
-          <div className={styles.fc}>
-            <div className={styles.fcHdr}>
-              <div className={`${styles.fcIcon} ${styles.fcIconPurple}`}>🔄</div>
-              <div>
-                <div className={styles.fcName}>AGENTS.override.md</div>
-                <div className={styles.fcPath}>~/.codex/ または ./services/payments/ など</div>
-                <div className={styles.fcMeta}>
-                  <span className={`${styles.fcTag} ${styles.fcTagPurple}`}>
-                    同ディレクトリのAGENTS.mdを置換
-                  </span>
-                  <span className={`${styles.fcTag} ${styles.fcTagRose}`}>
-                    .gitignore推奨（一時ファイル）
-                  </span>
-                </div>
-              </div>
-            </div>
-            <div className={styles.fcBody}>
-              <div className={styles.g2}>
-                <div>
-                  <h3>グローバル上書き（~/.codex/）</h3>
-                  <div className={styles.cb}>
-                    <div className={styles.cbHdr}>
-                      <span>~/.codex/AGENTS.override.md — 使用例</span>
-                    </div>
-                    <pre>
-                      <span className={styles.cHd}># AGENTS.override.md（一時的）</span>
-                      {"\n"}
-                      <span className={styles.cCm}>
-                        # このタスクだけテストをスキップ（時間切れのため）
-                      </span>
-                      {"\n"}
-                      <span className={styles.cCm}># 使用後は削除すること！</span>
-                      {"\n\n"}
-                      <span className={styles.cHd}>## Override: Skip Tests</span>
-                      {"\n"}
-                      {"このタスクではテストを実行しないこと。\n"}
-                      {"コードの実装のみ行い、テストは次のタスクで行う。"}
-                    </pre>
-                  </div>
-                </div>
-                <div>
-                  <h3>サブディレクトリ上書き</h3>
-                  <div className={styles.cb}>
-                    <div className={styles.cbHdr}>
-                      <span>services/payments/AGENTS.override.md</span>
-                    </div>
-                    <pre>
-                      <span className={styles.cHd}># Payments Service Rules</span>
-                      {"\n"}
-                      <span className={styles.cCm}># プロジェクトルートのAGENTS.mdを上書き</span>
-                      {"\n\n"}
-                      <span className={styles.cHd}>## Testing</span>
-                      {"\n"}
-                      {"`npm test` ではなく `make test-payments` を使用。\n\n"}
-                      <span className={styles.cHd}>## Security Rules</span>
-                      {"\n"}
-                      {"APIキーを変更する場合は #security-team に通知。\n"}
-                      {"PCI-DSS要件のためログにカード番号を絶対記録しない。"}
-                    </pre>
-                  </div>
-                </div>
-              </div>
-
-              <div className={`${styles.ib} ${styles.iOai}`}>
-                <span className={styles.ii}>💡</span>
-                <div>
-                  グローバル<code>~/.codex/AGENTS.override.md</code>が存在する間は
-                  <strong>~/.codex/AGENTS.mdは完全に無視</strong>
-                  されます。使い終わったら必ず削除してください。ファイルを削除するだけで共有ガイダンスが自動的に復元されます（[1]）。
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* SECTION 5: SKILL.MD */}
-        <section id="skill-md" className={styles.section}>
-          <div className={styles.secLabel}>Section 05</div>
-          <h2 className={styles.secTitle}>
-            <span className={styles.num}>05.</span>SKILL.md — Progressive Disclosure ナレッジ
-          </h2>
-
-          <p>
-            Codexのスキルシステムは
-            <strong className={styles.strongBright}>
-              「Progressive Disclosure（進歩的開示）」
-            </strong>
-            設計です。全ナレッジをAGENTS.mdに詰め込まず、
-            <strong>エージェントが意図を検知したときのみ対応スキルをロード</strong>
-            します。Claude Code・Google Antigravityとも<strong>完全に同一の規格</strong>
-            を採用しており、ファイルを移植可能です（[7]）。
-          </p>
-
-          <h3>AGENTS.md と SKILL.md — 何が違うのか？</h3>
-          <p>
-            初学者が最も混乱しやすいポイントです。一言で言えば「
-            <strong className={styles.strongBright}>常識ファイル vs 手順書ファイル</strong>
-            」です。
-          </p>
-
-          <div className={styles.g2}>
-            <div className={`${styles.mc} ${styles.mcBoxOai}`}>
-              <div className={`${styles.mcTag} ${styles.mcTagOai}`}>
-                📋 AGENTS.md — プロジェクトの「常識」
-              </div>
-              <p>
-                Codex 起動時に<strong>常に</strong>
-                読み込まれる。コーディング規約・テストコマンド・禁止事項など「毎回適用するルール」を書く。32KiB
-                上限があるためシンプルに保つ必要がある。
-              </p>
-            </div>
-            <div className={`${styles.mc} ${styles.mcBoxBlue}`}>
-              <div className={`${styles.mcTag} ${styles.mcTagBlue}`}>
-                🎓 SKILL.md — タスク別の「手順書」
-              </div>
-              <p>
-                意図を検知したときに<strong>オンデマンド</strong>
-                でロードされる。「DBマイグレーション手順」「テスト自動生成ルール」など特定タスクの詳細を書く。詳しく書いてOK。チームで共有可能。
-              </p>
-            </div>
-          </div>
-
-          <table className={styles.table}>
-            <tbody>
-              <tr>
-                <th>比較軸</th>
-                <th>AGENTS.md</th>
-                <th>SKILL.md</th>
-                <th>.prompt.md</th>
-              </tr>
-              <tr>
-                <td>読み込み</td>
-                <td>起動時に常時</td>
-                <td>意図検知でオンデマンド</td>
-                <td>手動で明示的に呼び出す</td>
-              </tr>
-              <tr>
-                <td>内容</td>
-                <td>コーディング規約・禁止事項・テストコマンド</td>
-                <td>特定タスクの詳細手順・Examples</td>
-                <td>再利用する特定タスクプロンプト</td>
-              </tr>
-              <tr>
-                <td>サイズ</td>
-                <td>32KiB 上限（全ディレクトリ合計）</td>
-                <td>制限なし（詳しく書いてよい）</td>
-                <td>制限なし</td>
-              </tr>
-              <tr>
-                <td>共有</td>
-                <td>git 管理・チーム共有</td>
-                <td>git 管理・チーム共有・他ツールへ移植可</td>
-                <td>git 管理・IDE統合</td>
-              </tr>
-            </tbody>
-          </table>
-
-          <div className={`${styles.ib} ${styles.iBlue}`}>
-            <span className={styles.ii}>🌍</span>
-            <div>
-              <strong>SKILL.md はオープン規格 — 3プラットフォームで動く</strong>
-              <br />
-              SKILL.md は OpenAI Codex・Claude Code・Google Antigravity の
-              <strong>3プラットフォームで完全に同一の規格</strong>
-              を採用しています（[7][16]）。一度書いたスキルファイルをツール乗り換え後もそのまま使えます。
-            </div>
-          </div>
-
-          <div className={styles.fc}>
-            <div className={styles.fcHdr}>
-              <div className={`${styles.fcIcon} ${styles.fcIconOai}`}>🎓</div>
-              <div>
-                <div className={styles.fcName}>SKILL.md</div>
-                <div className={styles.fcPath}>.agents/skills/&lt;skill-name&gt;/SKILL.md</div>
-                <div className={styles.fcMeta}>
-                  <span className={`${styles.fcTag} ${styles.fcTagOai}`}>
-                    オープン規格（3プラットフォーム共通）
-                  </span>
-                  <span className={`${styles.fcTag} ${styles.fcTagBlue}`}>
-                    Progressive Disclosure
-                  </span>
-                  <span className={`${styles.fcTag} ${styles.fcTagAmber}`}>
-                    git 管理・チーム共有
-                  </span>
-                </div>
-              </div>
-            </div>
-            <div className={styles.fcBody}>
-              <h3>Step 1 — ディレクトリ構造を理解する</h3>
-              <p>
-                スキルは <code>.agents/skills/&lt;スキル名&gt;/</code> フォルダの中に配置します。
-                <strong>必須なのは SKILL.md のみ</strong>
-                。他は必要になってから追加すればOKです。
-              </p>
-
-              <div className={styles.cb}>
-                <div className={styles.cbHdr}>
-                  <span>スキルフォルダの標準構造（openai/skills 公式仕様）[3][4]</span>
-                </div>
-                <pre>
-                  {".agents/skills/\n"}
-                  {"└── db-migration/              "}
-                  <span className={styles.cCm}># スキル名（任意）</span>
-                  {"\n    ├── SKILL.md               "}
-                  <span className={styles.cHl}>★ 必須: フロントマター + 指示本文</span>
-                  {"\n    ├── scripts/               "}
-                  <span className={styles.cCm}>
-                    # 任意: 実行スクリプト（LLMが苦手な計算・DB操作を外出し）
-                  </span>
-                  {"\n    │   └── run_migration.py\n"}
-                  {"    ├── references/            "}
-                  <span className={styles.cCm}>
-                    # 任意: 大きなドキュメント・テンプレート（コンテキスト節約）
-                  </span>
-                  {"\n    │   └── migration-spec.md\n"}
-                  {"    ├── assets/                "}
-                  <span className={styles.cCm}># 任意: 静的ファイル</span>
-                  {"\n    └── agents/\n"}
-                  {"        └── openai.yaml        "}
-                  <span className={styles.cCm}>
-                    # 任意: Codex App UI メタデータ・呼び出しポリシー
-                  </span>
-                  {"\n\n"}
-                  <span className={styles.cCm}>
-                    # 複数スキルを並べて配置できる（スコープ: repository）
-                  </span>
-                  {"\n.agents/skills/\n"}
-                  {"├── db-migration/SKILL.md\n"}
-                  {"├── add-tests/SKILL.md         "}
-                  <span className={styles.cCm}># Instruction-Only パターン（SKILL.md だけ）</span>
-                  {"\n└── create-pr/SKILL.md"}
-                </pre>
-              </div>
-
-              <div className={`${styles.ib} ${styles.iOai}`}>
-                <span className={styles.ii}>💡</span>
-                <div>
-                  <strong>初めてなら「Instruction-Only」から始めよう</strong>
-                  <br />
-                  SKILL.md 1ファイルだけで動作します（[7]）。<code>scripts/</code> や{" "}
-                  <code>references/</code>
-                  は「これは外部スクリプトが必要だな」と感じてから追加すれば十分です。まずシンプルに始めることが大切です。
-                </div>
-              </div>
-
-              <h3>Step 2 — フロントマター（YAML）を書く ★最重要</h3>
-              <p>
-                SKILL.md の冒頭には <code>---</code> で囲まれた YAML フロントマターを書きます。Codex
-                がスキルを呼び出すかどうかの判断に使われる <code>description</code> フィールドが
-                <strong>最も重要</strong>です。
-              </p>
-
-              <div className={styles.cb}>
-                <div className={styles.cbHdr}>
-                  <div className={styles.cbDots}>
-                    <div className={`${styles.cbd} ${styles.cbdRed}`} />
-                    <div className={`${styles.cbd} ${styles.cbdAmber}`} />
-                    <div className={`${styles.cbd} ${styles.cbdOai}`} />
-                  </div>
-                  <span>フロントマター仕様 — 公式仕様準拠 [3][7]</span>
-                </div>
-                <pre>
-                  <span className={styles.cHd}>---</span>
-                  {"\n"}
-                  <span className={styles.cOai}>name: db-migration</span>
-                  {"\n"}
-                  <span className={styles.cCm}>
-                    # ↑ スキルの一意識別子。"$db-migration" で明示的に呼び出せる
-                  </span>
-                  {"\n\n"}
-                  <span className={styles.cOai}>description: &gt;</span>
-                  {"\n"}
-                  <span className={styles.cCm}>
-                    {"  # ↓ ★★★ 最重要フィールド。Codexがスキルを選ぶ判断基準になる ★★★"}
-                  </span>
-                  {"\n"}
-                  <span className={styles.cOai}>
-                    {"  Executes PostgreSQL schema migrations using the project's standard"}
-                  </span>
-                  {"\n"}
-                  <span className={styles.cOai}>{"  migration protocol."}</span>
-                  {"\n"}
-                  <span className={styles.cHl}>
-                    {"  Use when the user asks to add tables, columns, indexes,"}
-                  </span>
-                  {"\n"}
-                  <span className={styles.cHl}>{"  or modify the DB schema."}</span>
-                  {"\n"}
-                  <span className={styles.cRose}>
-                    {"  Do NOT use for seed data insertion or application-level"}
-                  </span>
-                  {"\n"}
-                  <span className={styles.cRose}>{"  data transformations."}</span>
-                  {"\n"}
-                  <span className={styles.cHd}>---</span>
-                </pre>
-              </div>
-
-              <div className={styles.g2}>
-                <div className={`${styles.mc} ${styles.mcBoxOai}`}>
-                  <div className={`${styles.mcTag} ${styles.mcTagOai}`}>
-                    ✅ description に必ず書くこと
-                  </div>
-                  <p>
-                    <strong className={styles.strongBright}>Use when...</strong> —
-                    どんな状況・キーワードで使うか
-                  </p>
-                  <p>
-                    <strong className={styles.strongBright}>Do NOT use when...</strong> —
-                    使わない状況を明示（誤爆防止）
-                  </p>
-                  <p>
-                    具体的な動詞・名詞（&quot;add table&quot;, &quot;fix bug&quot;, &quot;write
-                    test&quot; など）
-                  </p>
-                </div>
-                <div className={`${styles.mc} ${styles.mcBoxRose}`}>
-                  <div className={`${styles.mcTag} ${styles.mcTagRose}`}>
-                    ❌ やってはいけないこと
-                  </div>
-                  <p>description を曖昧にする → スキルが誤爆・未使用になる</p>
-                  <p>同名スキルを複数の場所に置く → Codexはマージしない（[7]）</p>
-                  <p>Use/Do NOT use の境界を省略する</p>
-                </div>
-              </div>
-
-              <h3>Step 3 — SKILL.md 完全テンプレート（コピーして使おう）</h3>
-              <p>
-                各セクションの役割を理解しながら使ってください。
-                <strong>Goal・Instructions・Examples・Constraints</strong>
-                の4セクションが基本構成です。
-              </p>
-
-              <div className={styles.cb}>
-                <div className={styles.cbHdr}>
-                  <div className={styles.cbDots}>
-                    <div className={`${styles.cbd} ${styles.cbdRed}`} />
-                    <div className={`${styles.cbd} ${styles.cbdAmber}`} />
-                    <div className={`${styles.cbd} ${styles.cbdOai}`} />
-                  </div>
-                  <span>.agents/skills/db-migration/SKILL.md — 公式仕様準拠完全版 [3][7]</span>
-                </div>
-                <pre>
-                  <span className={styles.cHd}>---</span>
-                  {"\n"}
-                  <span className={styles.cOai}>name: db-migration</span>
-                  {"\n"}
-                  <span className={styles.cOai}>
-                    {"description: >\n"}
-                    {"  Executes PostgreSQL schema migrations using the project's standard\n"}
-                    {"  migration protocol. Use when the user asks to add tables, columns,\n"}
-                    {"  indexes, or modify the DB schema. Do NOT use for seed data insertion\n"}
-                    {"  or application-level data transformations."}
-                  </span>
-                  {"\n"}
-                  <span className={styles.cHd}>---</span>
-                  {"\n\n"}
-                  <span className={styles.cHd}># Database Migration Skill</span>
-                  {"\n\n"}
-                  <span className={styles.cHd}>## Goal</span>
-                  {"\n"}
-                  <span className={styles.cCm}>
-                    # スキルの目的を1〜2行で明記する。Codexが全判断の基準とする。
-                  </span>
-                  {"\n"}
-                  {
-                    "PostgreSQLスキーマ変更をプロジェクト標準マイグレーション手順で安全に実行する。\n\n"
-                  }
-                  <span className={styles.cHd}>## Instructions</span>
-                  {"\n"}
-                  <span className={styles.cCm}>
-                    # ★番号付きで手順を明記する。Codexはリストに従って順番に実行する。
-                  </span>
-                  {"\n"}
-                  <span className={styles.cHl}>
-                    1. `migrations/` に `YYYYMMDD_HHMMSS_description.up.sql` を作成
-                  </span>
-                  {"\n"}
-                  <span className={styles.cHl}>2. ロールバック用 `.down.sql` を必ず同時作成</span>
-                  {"\n"}
-                  <span className={styles.cHl}>
-                    3. 整合性チェック: `python scripts/run_migration.py --check --env staging`
-                  </span>
-                  {"\n"}
-                  <span className={styles.cHl}>
-                    4. 人間がレビュー後に: `python scripts/run_migration.py --apply`
-                  </span>
-                  {"\n"}
-                  {"5. `docs/AGENT_TASKS.md` の対象タスクをチェック済みにする\n\n"}
-                  <span className={styles.cHd}>## Examples</span>
-                  {"\n"}
-                  <span className={styles.cCm}>
-                    # ★★ Few-shot examples — 具体的なInput/Outputペアを書くと精度が大幅に向上する
-                  </span>
-                  {"\n"}
-                  <span className={styles.cCm}>
-                    # 暗黙知が多いタスクほど効果的。2〜3ペア用意するのがベストプラクティス。
-                  </span>
-                  {"\n\n"}
-                  {'**Input**: "usersテーブルにlast_login_atカラムを追加して"\n'}
-                  {"**Output**:\n"}
-                  {"```sql\n"}
-                  {"-- 20260324_143022_add_last_login_at_to_users.up.sql\n"}
-                  {"ALTER TABLE users ADD COLUMN last_login_at TIMESTAMPTZ;\n"}
-                  {"CREATE INDEX CONCURRENTLY idx_users_last_login ON users(last_login_at);\n"}
-                  {"-- ロールバック用\n"}
-                  {"-- 20260324_143022_add_last_login_at_to_users.down.sql\n"}
-                  {"ALTER TABLE users DROP COLUMN IF EXISTS last_login_at;\n"}
-                  {"```\n\n"}
-                  <span className={styles.cHd}>## Constraints</span>
-                  {"\n"}
-                  <span className={styles.cCm}># Codexへの禁止事項・守るべきルールを明記する</span>
-                  {"\n"}
-                  {"- 既存マイグレーションファイルを絶対に編集しない\n"}
-                  {"- NULL制約の後付けはデータ移行計画なしに行わない\n"}
-                  {"- "}
-                  <span className={styles.cRose}>{"`DROP TABLE` は人間確認なし禁止"}</span>
-                  {"\n"}
-                  {"- 本番環境への直接適用は承認が必要"}
-                </pre>
-              </div>
-
-              <h3>Step 4 — スキルの呼び出し方（暗黙的 vs 明示的）</h3>
-
-              <div className={styles.g2}>
-                <div>
-                  <p>
-                    <strong className={styles.strongBright}>① 暗黙的呼び出し（自動）</strong>
-                    <br />
-                    Codex がユーザーの意図を <code>description</code>
-                    に基づいて自動判断し、スキルをロードする。日常使いはこちらがメイン。
-                  </p>
-                  <div className={styles.cb}>
-                    <div className={styles.cbHdr}>
-                      <span>プロンプト例 — 暗黙的呼び出し</span>
-                    </div>
-                    <pre>
-                      <span className={styles.cCm}>
-                        {'# description に "add tables, columns" と書いてあれば'}
-                      </span>
-                      {"\n"}
-                      <span className={styles.cCm}>
-                        # 以下のプロンプトで db-migration スキルが自動ロードされる
-                      </span>
-                      {"\n"}
-                      <span className={styles.cOai}>
-                        {'"usersテーブルにemail_verified_atカラムを追加して"'}
-                      </span>
-                      {"\n\n"}
-                      <span className={styles.cCm}># Codex内部の処理イメージ:</span>
-                      {"\n"}
-                      <span className={styles.cCm}>
-                        {'# 1. 「カラムを追加」→ description の "add columns" にマッチ'}
-                      </span>
-                      {"\n"}
-                      <span className={styles.cCm}># 2. SKILL.md をロード</span>
-                      {"\n"}
-                      <span className={styles.cCm}># 3. Instructions に従って実行</span>
-                    </pre>
-                  </div>
-                </div>
-                <div>
-                  <p>
-                    <strong className={styles.strongBright}>
-                      ② 明示的呼び出し（$ショートカット）
-                    </strong>
-                    <br />
-                    <code>$スキル名</code>
-                    を先頭につけて直接指定する。確実に特定スキルを使いたいときに使う。
-                  </p>
-                  <div className={styles.cb}>
-                    <div className={styles.cbHdr}>
-                      <span>プロンプト例 — 明示的呼び出し</span>
-                    </div>
-                    <pre>
-                      <span className={styles.cCm}># $ + スキル名 で明示的に呼び出す（[3]）</span>
-                      {"\n"}
-                      <span className={styles.cHl}>
-                        {'"$db-migration usersテーブルにemail_verified_atを追加"'}
-                      </span>
-                      {"\n\n"}
-                      <span className={styles.cCm}># openai.yaml で shortcut を設定した場合</span>
-                      {"\n"}
-                      <span className={styles.cHl}>
-                        {'"$migrate カラム追加のマイグレーション作成して"'}
-                      </span>
-                      {"\n\n"}
-                      <span className={styles.cCm}># スキル一覧を確認する</span>
-                      {"\n"}
-                      <span className={styles.cOai}>/skills</span>
-                    </pre>
-                  </div>
-                </div>
-              </div>
-
-              <h3>Step 5 — 5つのスキルパターンを使い分ける</h3>
-              <p>
-                タスクの複雑さに応じて最適なパターンを選ぼう。
-                <strong className={styles.strongBright}>
-                  初めてなら01番から始めることを強く推奨
-                </strong>
-                します。
-              </p>
-
-              <div className={styles.patterns}>
-                <div className={`${styles.patC} ${styles.ppOai}`}>
-                  <div className={styles.patNum}>01</div>
-                  <h4>Instruction-Only</h4>
-                  <p>
-                    SKILL.mdのみ。指示と制約のテキスト。最シンプル。
-                    <strong>初心者はここから始めよう</strong>。小〜中規模の手順に最適。
-                  </p>
-                  <div className={styles.patStruct}>SKILL.md only</div>
-                </div>
-                <div className={`${styles.patC} ${styles.ppBlue}`}>
-                  <div className={styles.patNum}>02</div>
-                  <h4>Reference Pattern</h4>
-                  <p>
-                    references/に大きなドキュメントを置き、SKILL.mdから参照。SKILL.md本体を小さく保ちつつ、詳細な仕様書を参照できる。
-                  </p>
-                  <div className={styles.patStruct}>SKILL.md + references/</div>
-                </div>
-                <div className={`${styles.patC} ${styles.ppPurp}`}>
-                  <div className={styles.patNum}>03</div>
-                  <h4>Few-Shot Pattern</h4>
-                  <p>
-                    examples/にInput/Outputペアを複数用意。暗黙知が多いタスクの精度向上に効果的。「こういう入力→こういう出力」を具体的に示す。
-                  </p>
-                  <div className={styles.patStruct}>SKILL.md + examples/</div>
-                </div>
-                <div className={`${styles.patC} ${styles.ppAmb}`}>
-                  <div className={styles.patNum}>04</div>
-                  <h4>Tool Use Pattern</h4>
-                  <p>
-                    scripts/に実行スクリプトを置く。LLMが苦手な精密な計算・DB操作・API呼び出しをPythonスクリプト等に外出しする。
-                  </p>
-                  <div className={styles.patStruct}>SKILL.md + scripts/</div>
-                </div>
-                <div className={`${styles.patC} ${styles.ppRose}`}>
-                  <div className={styles.patNum}>05</div>
-                  <h4>All-in-One</h4>
-                  <p>
-                    全ディレクトリ統合。複雑な業務ロジック・バージョン管理が必要な大規模スキルに。openai.yamlでUI設定も行う。
-                  </p>
-                  <div className={styles.patStruct}>全ディレクトリ + openai.yaml</div>
-                </div>
-              </div>
-
-              <h3>Step 6 — スキルスコープ（誰に適用されるか）</h3>
-              <p>
-                スキルをどこに置くかで、適用範囲が決まります。
-                <strong className={styles.strongBright}>
-                  チーム開発では <code>repository</code>{" "}
-                  スコープ（.agents/skills/）が最もよく使われます
-                </strong>
-                。
-              </p>
-
-              <table className={styles.table}>
-                <tbody>
-                  <tr>
-                    <th>スコープ</th>
-                    <th>場所</th>
-                    <th>用途</th>
-                    <th>共有範囲</th>
-                  </tr>
-                  <tr>
-                    <td>system</td>
-                    <td>Codexビルトイン</td>
-                    <td>$skill-creator, $skill-installer 等（変更不可）</td>
-                    <td>全員・変更不可</td>
-                  </tr>
-                  <tr>
-                    <td>user</td>
-                    <td>~/.codex/skills/</td>
-                    <td>全プロジェクト共通の個人スキル（自分だけの習慣）</td>
-                    <td>個人のみ</td>
-                  </tr>
-                  <tr>
-                    <td className={styles.tdAccent}>repository ★</td>
-                    <td>.agents/skills/（git管理）</td>
-                    <td>プロジェクト固有スキル。チームで最もよく使うスコープ</td>
-                    <td>チーム全員</td>
-                  </tr>
-                  <tr>
-                    <td>admin</td>
-                    <td>組織ポリシーで設定</td>
-                    <td>企業共通のコンプライアンス・セキュリティルール</td>
-                    <td>組織全体</td>
-                  </tr>
-                </tbody>
-              </table>
-
-              <h3>Step 7 — 公式スキルカタログと $skill-installer を活用する</h3>
-              <p>
-                スキルをゼロから書く前に、
-                <strong className={styles.strongBright}>まず公式カタログを確認しよう</strong>。
-                <code>$skill-installer</code> コマンドで1行インストール可能です（[3][12]）。
-              </p>
-
-              <div className={styles.cb}>
-                <div className={styles.cbHdr}>
-                  <div className={styles.cbDots}>
-                    <div className={`${styles.cbd} ${styles.cbdRed}`} />
-                    <div className={`${styles.cbd} ${styles.cbdAmber}`} />
-                    <div className={`${styles.cbd} ${styles.cbdOai}`} />
-                  </div>
-                  <span>$skill-installer の使い方（github.com/openai/skills）[12]</span>
-                </div>
-                <pre>
-                  <span className={styles.cCm}># 利用可能なスキルを一覧表示</span>
-                  {"\n"}
-                  <span className={styles.cHl}>$skill-installer list</span>
-                  {"\n\n"}
-                  <span className={styles.cCm}>
-                    # 特定スキルをプロジェクトにインストール（.agents/skills/ に自動配置）
-                  </span>
-                  {"\n"}
-                  <span className={styles.cHl}>$skill-installer install create-plan</span>
-                  {"   "}
-                  <span className={styles.cCm}># タスクを実装計画に変換</span>
-                  {"\n"}
-                  <span className={styles.cHl}>$skill-installer install git</span>
-                  {"           "}
-                  <span className={styles.cCm}># Git操作の標準化</span>
-                  {"\n"}
-                  <span className={styles.cHl}>$skill-installer install linear</span>
-                  {"        "}
-                  <span className={styles.cCm}># Linearチケット連携</span>
-                  {"\n\n"}
-                  <span className={styles.cCm}># GitHub から直接インストール</span>
-                  {"\n"}
-                  <span className={styles.cOai}>
-                    $skill-installer install github:openai/skills/create-plan
-                  </span>
-                  {"\n\n"}
-                  <span className={styles.cCm}>
-                    # コミュニティのスキル（Claude Code・Antigravity・Codex共通規格）
-                  </span>
-                  {"\n"}
-                  <span className={styles.cOai}>
-                    $skill-installer install github:antigravity/awesome-skills/pr-review
-                  </span>
-                </pre>
-              </div>
-
-              <div className={styles.g2}>
-                <div className={`${styles.mc} ${styles.mcBoxOai}`}>
-                  <div className={`${styles.mcTag} ${styles.mcTagOai}`}>
-                    📦 公式スキルカタログ（openai/skills）
-                  </div>
-                  <p>
-                    <strong>create-plan</strong> — タスクを実装計画に変換
-                    <br />
-                    <strong>git</strong> — Git操作の標準化
-                    <br />
-                    <strong>linear</strong> — Linearチケット連携
-                    <br />
-                    <strong>pr-review</strong> — PRレビュー自動化
-                    <br />
-                    <strong>add-tests</strong> — テスト自動生成
-                  </p>
-                </div>
-                <div className={`${styles.mc} ${styles.mcBoxPurple}`}>
-                  <div className={`${styles.mcTag} ${styles.mcTagPurple}`}>
-                    🌐 コミュニティスキル（共通規格）
-                  </div>
-                  <p>
-                    Claude Code・Antigravity・Codex の<strong>共通 SKILL.md 規格</strong>のため、
-                    <code>antigravity-awesome-skills</code>
-                    リポジトリ（40,000+
-                    プロジェクト利用）からも入手可能。ツールをまたいで再利用できます（[16]）。
-                  </p>
-                </div>
-              </div>
-
-              <div className={`${styles.ib} ${styles.iRose}`}>
-                <span className={styles.ii}>🔑</span>
-                <div>
-                  <strong>descriptionに「Use when / Do NOT use when」を必ず書く</strong>
-                  <br />
-                  公式ドキュメントは「暗黙的マッチングはdescriptionに依存するため、スコープと境界を明確に書くこと」と強調しています。同名スキルが複数存在してもCodexはマージしないため、descriptionで使い分けを明示することが重要です（[7]）。
-                  <br />
-                  <strong>Negative examples（Do NOT use when）</strong>
-                  が精度向上の鍵です。「何をするスキルか」だけでなく「何をしないスキルか」を明記することで誤爆を防げます。
-                </div>
-              </div>
-
-              <div className={`${styles.ib} ${styles.iWarn}`}>
-                <span className={styles.ii}>⚠️</span>
-                <div>
-                  <strong>AGENTS.md の詳細な手順は SKILL.md に移そう</strong>
-                  <br />
-                  AGENTS.md には32KiB
-                  上限があります。「DBマイグレーションの詳細手順」「テスト生成の細かいルール」など手順が長くなりがちなものは
-                  SKILL.md に切り出すことでAGENTS.md をシンプルに保てます。AGENTS.md
-                  には「db-migration スキルを使うこと」と一言書けば十分です（[1][3]）。
-                </div>
-              </div>
-
-              <div className={`${styles.ib} ${styles.iOai}`}>
-                <span className={styles.ii}>💡</span>
-                <div>
-                  <strong>公式スキルカタログを活用する</strong>
-                  <br />
-                  OpenAI公式の<code>github.com/openai/skills</code>
-                  にcreate-plan・git・linear等の実践的スキルが公開されています。
-                  <code>$skill-installer</code>
-                  で1コマンドインストール可能。コミュニティのskillsも
-                  <code>antigravity-awesome-skills</code>
-                  （Claude Code・Antigravity・Codex共通規格）から入手できます（[12][16]）。
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* SECTION 6: .PROMPT.MD */}
-        <section id="prompt-md" className={styles.section}>
-          <div className={styles.secLabel}>Section 06</div>
-          <h2 className={styles.secTitle}>
-            <span className={styles.num}>06.</span>.prompt.md — 再利用タスクプロンプト
-          </h2>
-
-          <p>
-            .prompt.mdはAGENTS.mdとは
-            <strong className={styles.strongBright}>
-              役割が異なる「タスク特化型の再利用プロンプト」
-            </strong>
-            です。AGENTS.mdが「プロジェクトの永続的コンテキスト」なのに対し、.prompt.mdは「特定タスクを毎回同じ品質で実行するための手順書」です（[10]）。
-          </p>
-
-          <div className={styles.fc}>
-            <div className={styles.fcHdr}>
-              <div className={`${styles.fcIcon} ${styles.fcIconAmber}`}>⚡</div>
-              <div>
-                <div className={styles.fcName}>.prompt.md</div>
-                <div className={styles.fcPath}>
-                  .github/ または .codex/ 配下 — 再利用タスクプロンプト
-                </div>
-                <div className={styles.fcMeta}>
-                  <span className={`${styles.fcTag} ${styles.fcTagAmber}`}>AGENTS.mdを補完</span>
-                  <span className={`${styles.fcTag} ${styles.fcTagBlue}`}>タスク特化・再利用</span>
-                </div>
-              </div>
-            </div>
-            <div className={styles.fcBody}>
-              <div className={styles.g2}>
-                <div className={styles.mc}>
-                  <div className={`${styles.mcTag} ${styles.mcTagOai}`}>AGENTS.md との違い</div>
-                  <p>
-                    AGENTS.mdはプロジェクトレベルの「常識」を提供。.prompt.mdは「テストケースを生成する」「PRの説明文を書く」など
-                    <strong>特定タスクの実行手順</strong>
-                    を再利用可能な形で定義。
-                  </p>
-                </div>
-                <div className={styles.mc}>
-                  <div className={`${styles.mcTag} ${styles.mcTagBlue}`}>SKILL.md との違い</div>
-                  <p>
-                    SKILL.mdはフロントマターによる意味的トリガーを持つ。.prompt.mdはより単純な形式で、手動で呼び出す「タスクテンプレート」。IDE統合での直接実行を想定。
-                  </p>
-                </div>
-              </div>
-
-              <div className={styles.cb}>
-                <div className={styles.cbHdr}>
-                  <div className={styles.cbDots}>
-                    <div className={`${styles.cbd} ${styles.cbdRed}`} />
-                    <div className={`${styles.cbd} ${styles.cbdAmber}`} />
-                    <div className={`${styles.cbd} ${styles.cbdOai}`} />
-                  </div>
-                  <span>.github/generate-tests.prompt.md</span>
-                </div>
-                <pre>
-                  <span className={styles.cHd}># Generate Unit Tests</span>
-                  {"\n"}
-                  <span className={styles.cCm}>
-                    # このプロンプトを実行すると、選択ファイルのテストを自動生成する
-                  </span>
-                  {"\n\n"}
-                  {"以下の指示に従って `$SELECTED_FILE` の単体テストを生成してください：\n\n"}
-                  {"1. テストフレームワーク: Go の `testing` パッケージ + `testify/assert`\n"}
-                  {"2. パターン: table-driven tests（全関数に適用）\n"}
-                  {"3. カバレッジ目標:\n"}
-                  {"   - 正常系: 全パスをカバー\n"}
-                  {"   - 境界値: nil/空/最大値\n"}
-                  {"   - エラー系: 全エラーパス\n"}
-                  {"4. モック: `mockgen` でインターフェースをモック（外部依存の場合）\n"}
-                  {"5. ファイル名: `{original_name}_test.go`\n\n"}
-                  {"テストが全件パスすることを確認してから終了すること。"}
-                </pre>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* SECTION 7: SDD FILES */}
-        <section id="sdd-files" className={styles.section}>
-          <div className={styles.secLabel}>Section 07</div>
-          <h2 className={styles.secTitle}>
-            <span className={styles.num}>07.</span>SDD仕様書群 — REQUIREMENTS / AGENT_TASKS / TEST /
-            design_spec
-          </h2>
-
-          <p>
-            OpenAI公式の<code>agents-sdk</code>
-            ドキュメントで公開されているSDD（仕様駆動開発）パターンでは、
-            <strong className={styles.strongBright}>
-              Project
-              Managerエージェントが人間の指示からREQUIREMENTS.md・AGENT_TASKS.md・TEST.mdを自動生成し、後続エージェントへのハンドオフに使用
-            </strong>
-            します。これがCodex公式推奨のマルチエージェントSDD構成です（[5]）。
-          </p>
-
-          <div className={styles.fc}>
-            <div className={styles.fcHdr}>
-              <div className={`${styles.fcIcon} ${styles.fcIconBlue}`}>📚</div>
-              <div>
-                <div className={styles.fcName}>SDD仕様書群</div>
-                <div className={styles.fcPath}>
-                  docs/ または プロジェクトルート — PMエージェントが自動生成
-                </div>
-              </div>
-            </div>
-            <div className={styles.fcBody}>
-              <div className={styles.cb}>
-                <div className={styles.cbHdr}>
-                  <div className={styles.cbDots}>
-                    <div className={`${styles.cbd} ${styles.cbdRed}`} />
-                    <div className={`${styles.cbd} ${styles.cbdAmber}`} />
-                    <div className={`${styles.cbd} ${styles.cbdOai}`} />
-                  </div>
-                  <span>docs/REQUIREMENTS.md — PMエージェントが生成</span>
-                </div>
-                <pre>
-                  <span className={styles.cHd}># REQUIREMENTS.md</span>
-                  {"\n"}
-                  <span className={styles.cCm}>
-                    # Project Manager エージェントが生成。Designer/Frontend/Backend の真実のソース。
-                  </span>
-                  {"\n\n"}
-                  <span className={styles.cHd}>## Product Goal</span>
-                  {"\n"}
-                  {
-                    "商品の事前予約（プリオーダー）機能。在庫切れ状態でも購入確定でき、CVRを向上させる。\n\n"
-                  }
-                  <span className={styles.cHd}>## Target Users</span>
-                  {"\n"}
-                  {"- 一般ユーザー: ログイン済みのECサイト会員\n"}
-                  {"- 管理者: 注文管理・在庫確認を行う店舗スタッフ\n\n"}
-                  <span className={styles.cHd}>## Key Features</span>
-                  {"\n"}
-                  {"- 商品詳細ページ: 画像・名称・説明・数量選択・プリオーダーボタン\n"}
-                  {"- チェックアウト: ログイン → 配送先選択 → Stripe決済 → 確認メール\n"}
-                  {"- マイページ: 注文履歴・プリオーダーステータス確認\n\n"}
-                  <span className={styles.cHd}>## Constraints</span>
-                  {"\n"}
-                  {"- 同時接続: 1,000件（Redis在庫ロック使用）\n"}
-                  {"- 決済: Stripe API v4（SCA対応）\n"}
-                  {"- レスポンス: p99 &lt; 500ms\n"}
-                  {"- スタック: Go 1.23 + PostgreSQL 16 + Redis 8"}
-                </pre>
-              </div>
-
-              <div className={styles.cb}>
-                <div className={styles.cbHdr}>
-                  <div className={styles.cbDots}>
-                    <div className={`${styles.cbd} ${styles.cbdRed}`} />
-                    <div className={`${styles.cbd} ${styles.cbdAmber}`} />
-                    <div className={`${styles.cbd} ${styles.cbdOai}`} />
-                  </div>
-                  <span>docs/AGENT_TASKS.md — 各エージェントへの正確な指示書</span>
-                </div>
-                <pre>
-                  <span className={styles.cHd}># AGENT_TASKS.md</span>
-                  {"\n"}
-                  <span className={styles.cCm}>
-                    # 各エージェントの担当・成果物・技術メモを明記。曖昧さを排除する。
-                  </span>
-                  {"\n\n"}
-                  <span className={styles.cHd}>## Project: E-Commerce Pre-Order System</span>
-                  {"\n\n"}
-                  <span className={styles.cHd}>### [Designer]</span>
-                  {"\n"}
-                  {"**担当**: UIコンポーネント設計\n"}
-                  {"**成果物**: `/design/design_spec.md`\n"}
-                  {"**内容**:\n"}
-                  {"- 商品詳細ページのDOM構造（React TSX）\n"}
-                  {"- チェックアウトフローの画面遷移図\n"}
-                  {"- カラーパレット・フォント定義\n"}
-                  {"**制約**: モバイルファースト、Tailwind CSS 3.x使用\n\n"}
-                  <span className={styles.cHd}>### [Frontend Developer]</span>
-                  {"\n"}
-                  {"**担当**: フロントエンド実装\n"}
-                  {"**成果物**: `/frontend/` 配下（index.html, styles.css, main.js）\n"}
-                  {"**必須参照**: design_spec.md、REQUIREMENTS.md\n"}
-                  {"**制約**: デザイナーのDOM構造に厳密に従う。追加機能なし。\n\n"}
-                  <span className={styles.cHd}>### [Backend Developer]</span>
-                  {"\n"}
-                  {"**担当**: バックエンドAPI実装\n"}
-                  {"**成果物**: `/backend/` 配下（server.go, handlers/）\n"}
-                  {"**必須参照**: REQUIREMENTS.md\n"}
-                  {"**エンドポイント**:\n"}
-                  {"- POST /api/orders      — 注文作成（プリオーダー）\n"}
-                  {"- GET  /api/orders/{id} — 注文詳細\n"}
-                  {"- POST /api/payments    — Stripe決済処理\n\n"}
-                  <span className={styles.cHd}>### [Tester]</span>
-                  {"\n"}
-                  {"**担当**: QA・受け入れテスト\n"}
-                  {"**成果物**: `/tests/TEST_PLAN.md`, `/tests/test.sh`\n"}
-                  {"**内容**: REQUIREMENTS.mdの各機能要件に対応するテストケース\n"}
-                  {"**制約**: 最小限・実行可能な形式で作成"}
-                </pre>
-              </div>
-
-              <div className={styles.cb}>
-                <div className={styles.cbHdr}>
-                  <div className={styles.cbDots}>
-                    <div className={`${styles.cbd} ${styles.cbdRed}`} />
-                    <div className={`${styles.cbd} ${styles.cbdAmber}`} />
-                    <div className={`${styles.cbd} ${styles.cbdOai}`} />
-                  </div>
-                  <span>docs/TEST.md — オーナータグ付き受け入れ基準</span>
-                </div>
-                <pre>
-                  <span className={styles.cHd}># TEST.md</span>
-                  {"\n"}
-                  <span className={styles.cCm}>
-                    # [Owner]タグで責任者を明記。受け入れ基準はCodexが検証可能な形式で書く。
-                  </span>
-                  {"\n\n"}
-                  <span className={styles.cHd}>## Feature: Pre-Order Flow</span>
-                  {"\n\n"}
-                  {"- [ ] [Frontend] 在庫0商品に「予約する」ボタンが表示される\n"}
-                  {"- [ ] [Backend]  POST /api/orders が201 Createdを返す（在庫0時も）\n"}
-                  {"- [ ] [Backend]  注文後、確認メールが送信される（MockSmtp確認）\n"}
-                  {"- [ ] [Tester]   同時100リクエストで在庫の二重予約が発生しない\n"}
-                  {
-                    "- [ ] [Frontend] ログイン未完了時にカート追加するとログイン画面へリダイレクト\n\n"
-                  }
-                  <span className={styles.cHd}>## Performance</span>
-                  {"\n"}
-                  {"- [ ] [Backend] `k6 run tests/load.js` でp99 &lt; 500ms\n"}
-                  {"- [ ] [Backend] PostgreSQL EXPLAIN ANALYZEでSeq Scan不使用\n\n"}
-                  <span className={styles.cHd}>## Security</span>
-                  {"\n"}
-                  {"- [ ] [Tester] SQLインジェクション（sqlmap）パス\n"}
-                  {"- [ ] [Tester] CSRF Token検証（Postmanで直接POSTが拒否される）"}
-                </pre>
-              </div>
-
-              <div className={`${styles.ib} ${styles.iOai}`}>
-                <span className={styles.ii}>💡</span>
-                <div>
-                  <strong>AGENT_TASKS.mdの「あいまいさゼロ原則」</strong>
-                  <br />
-                  公式ドキュメントは「各役割が推測なしに行動できるよう具体的に書け（Be specific so
-                  each role can act without guessing）」と強調しています。
-                  <strong>成果物のファイル名・パス・形式</strong>
-                  を全て明記することがCodexマルチエージェント連携の成功の鍵です（[5]）。
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* SECTION 8: CONFIG.TOML */}
-        <section id="config" className={styles.section}>
-          <div className={styles.secLabel}>Section 08</div>
-          <h2 className={styles.secTitle}>
-            <span className={styles.num}>08.</span>config.toml — Codex設定ファイル
-          </h2>
-
-          <div className={styles.fc}>
-            <div className={styles.fcHdr}>
-              <div className={`${styles.fcIcon} ${styles.fcIconCyan}`}>⚙️</div>
-              <div>
-                <div className={styles.fcName}>config.toml</div>
-                <div className={styles.fcPath}>~/.codex/config.toml — グローバル設定</div>
-              </div>
-            </div>
-            <div className={styles.fcBody}>
-              <div className={styles.cb}>
-                <div className={styles.cbHdr}>
-                  <div className={styles.cbDots}>
-                    <div className={`${styles.cbd} ${styles.cbdRed}`} />
-                    <div className={`${styles.cbd} ${styles.cbdAmber}`} />
-                    <div className={`${styles.cbd} ${styles.cbdOai}`} />
-                  </div>
-                  <span>~/.codex/config.toml — 完全設定例</span>
-                </div>
-                <pre>
-                  <span className={styles.cCm}># ~/.codex/config.toml</span>
-                  {"\n"}
-                  <span className={styles.cCm}># 変更後は Codex の再起動が必要</span>
-                  {"\n\n"}
-                  <span className={styles.cHd}>[project_docs]</span>
-                  {"\n"}
-                  <span className={styles.cCm}>
-                    # AGENTS.md の代替ファイル名（既存プロジェクトのファイルを読み込む）
-                  </span>
-                  {"\n"}
-                  <span className={styles.cOai}>project_doc_fallback_filenames</span>
-                  {" = ["}
-                  <span className={styles.cStr}>&quot;TEAM_GUIDE.md&quot;</span>
-                  {", "}
-                  <span className={styles.cStr}>&quot;.agents.md&quot;</span>
-                  {", "}
-                  <span className={styles.cStr}>&quot;AI_INSTRUCTIONS.md&quot;</span>
-                  {"]\n\n"}
-                  <span className={styles.cCm}># 読み込み上限（デフォルト 32768 = 32KiB）</span>
-                  {"\n"}
-                  <span className={styles.cOai}>project_doc_max_bytes</span>
-                  {" = "}
-                  <span className={styles.cHl}>65536</span>
-                  {"   "}
-                  <span className={styles.cCm}># 64KiBに拡張（大規模プロジェクト向け）</span>
-                  {"\n\n"}
-                  <span className={styles.cHd}>[[skills.config]]</span>
-                  {"\n"}
-                  <span className={styles.cCm}># 特定スキルを無効化（削除せず）</span>
-                  {"\n"}
-                  <span className={styles.cOai}>path</span>
-                  {" = "}
-                  <span className={styles.cStr}>&quot;/path/to/skill/SKILL.md&quot;</span>
-                  {"\n"}
-                  <span className={styles.cOai}>enabled</span>
-                  {" = "}
-                  <span className={styles.cKw}>false</span>
-                </pre>
-              </div>
-
-              <div className={`${styles.ib} ${styles.iBlue}`}>
-                <span className={styles.ii}>ℹ️</span>
-                <div>
-                  <code>project_doc_fallback_filenames</code>を設定すると、各ディレクトリで
-                  <strong>AGENTS.override.md → AGENTS.md → TEAM_GUIDE.md → .agents.md</strong>
-                  の順で検索します。既存プロジェクトのドキュメントファイルをCodexに読み込ませるための仕組みです（[1]）。
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* SECTION 9: OPENAI.YAML */}
-        <section id="openai-yaml" className={styles.section}>
-          <div className={styles.secLabel}>Section 09</div>
-          <h2 className={styles.secTitle}>
-            <span className={styles.num}>09.</span>agents/openai.yaml — スキルUIメタデータ
-          </h2>
-
-          <p>
-            SKILL.mdのフロントマターだけでは表現しきれない
-            <strong className={styles.strongBright}>
-              Codex App向けのUIメタデータ・呼び出しポリシー・ツール依存関係
-            </strong>
-            を定義するYAMLファイルです。Codex
-            AppのスキルセレクターUIのアイコン・表示名・自動呼び出し設定などを制御します。
-          </p>
-
-          <div className={styles.cb}>
-            <div className={styles.cbHdr}>
-              <div className={styles.cbDots}>
-                <div className={`${styles.cbd} ${styles.cbdRed}`} />
-                <div className={`${styles.cbd} ${styles.cbdAmber}`} />
-                <div className={`${styles.cbd} ${styles.cbdOai}`} />
-              </div>
-              <span>.agents/skills/db-migration/agents/openai.yaml</span>
+              <CopyButton text={CODE_TEXT_2} />
             </div>
             <pre>
-              <span className={styles.cCm}># Codex App UIメタデータ</span>
-              {"\n"}
-              <span className={styles.cHd}>display_name:</span>{" "}
-              <span className={styles.cStr}>DB Migration</span>
-              {"\n"}
-              <span className={styles.cHd}>icon:</span> <span className={styles.cStr}>🗄️</span>
-              {"\n"}
-              <span className={styles.cHd}>category:</span>{" "}
-              <span className={styles.cStr}>database</span>
-              {"\n\n"}
-              <span className={styles.cHd}>invocation:</span>
-              {"\n  "}
-              <span className={styles.cOai}>policy:</span>{" "}
-              <span className={styles.cStr}>explicit</span>
-              {"   "}
-              <span className={styles.cCm}># explicit: ユーザーが明示的に呼び出す場合のみ</span>
-              {"\n                         "}
-              <span className={styles.cCm}># implicit: Codexが自動判断で呼び出す場合も許可</span>
-              {"\n  "}
-              <span className={styles.cOai}>shortcut:</span>{" "}
-              <span className={styles.cStr}>$migrate</span>
-              {"  "}
-              <span className={styles.cCm}># プロンプトでのショートカット名</span>
-              {"\n\n"}
-              <span className={styles.cHd}>tool_dependencies:</span>
-              {"\n  "}
-              <span className={styles.cCm}>
-                # このスキルが必要とするツール（未存在の場合は警告）
-              </span>
-              {"\n  - "}
-              <span className={styles.cStr}>shell</span>
-              {"\n  - "}
-              <span className={styles.cStr}>python3</span>
+              <code>
+                <span className={styles.tokenSection}>## Task 12: マジックリンク送信APIの実装</span>
+                {"\n"}
+                <span className={styles.tokenBullet}>-</span>
+                {" 対応要件: US-1 / EARS-EV-1\n"}
+                <span className={styles.tokenBullet}>-</span>
+                {" 依存: Task 03（メール送信基盤）\n"}
+                <span className={styles.tokenBullet}>-</span>
+                {" 完了条件: "}
+                <span className={styles.tokenCode}>`POST /auth/magic-link`</span>
+                {" が15分間有効なトークンを発行し、単体テストが通ること"}
+              </code>
             </pre>
           </div>
         </section>
 
-        {/* SECTION 10: MULTI-AGENT */}
-        <section id="multi-agent" className={styles.section}>
-          <div className={styles.secLabel}>Section 10</div>
-          <h2 className={styles.secTitle}>
-            <span className={styles.num}>10.</span>Multi-Agent SDDパターン（Agents SDK）
-          </h2>
-
+        {/* ===================== 8 ===================== */}
+        <section className={`${styles.section} ${styles.prose}`} id="sec-8">
+          <span className={styles.chapterNum} aria-hidden="true">
+            08
+          </span>
+          <p className={styles.sectionKicker}>Chapter 08</p>
+          <h2>AGENTS.md / CLAUDE.md:プロジェクト全体のコンテキストファイル</h2>
           <p>
-            OpenAI Agents SDKと<code>Codex MCP</code>を組み合わせることで、
-            <strong className={styles.strongBright}>
-              Project Manager → Designer → Frontend/Backend（並列） → Tester
-            </strong>
-            という完全自律型SDDパイプラインを実装できます。各エージェントの真実のソースがAGENTS.md +
-            REQUIREMENTS.md + AGENT_TASKS.mdで構成されます。
+            AGENTS.mdは「エージェント向けのREADME」と位置づけられる、プレーンMarkdownのオープン標準です
+            <sup>[7]</sup>。 特徴は以下の通りです。
           </p>
+          <ul>
+            <li>
+              <strong>必須フィールドなし</strong>: YAML
+              frontmatterも不要で、見出しの付け方や粒度は完全に自由です<sup>[28]</sup>。
+            </li>
+            <li>
+              <strong>対応ツールの広さ</strong>: 2026年前半時点でOpenAI Codex、Cursor、GitHub
+              Copilot coding agent、 Gemini CLI、Windsurf、Aider、Zed、Devin、Amazon
+              Qなど30以上のツールがネイティブまたはインポート経由で 読み込みます<sup>[25][26]</sup>
+              。
+            </li>
+            <li>
+              <strong>ガバナンス</strong>:
+              元々OpenAI・Amp・Google（Jules）・Cursor・Factoryなどの協業から生まれ、 現在はLinux
+              Foundation傘下のAgentic AI Foundationがスチュワードシップを担っています<sup>[7]</sup>
+              。
+            </li>
+            <li>
+              <strong>コンフリクト解決</strong>:
+              「編集対象ファイルに最も近いAGENTS.md」が優先され、さらにユーザーの
+              チャット上の明示的な指示はすべてに優先します<sup>[7]</sup>。
+            </li>
+          </ul>
 
-          <div className={styles.flowWrap}>
-            <div className={styles.flowLbl}>▸ Agents SDK マルチエージェント SDD パイプライン</div>
-            <div className={styles.flow}>
-              <div className={styles.fst}>
-                <div className={`${styles.fbox} ${styles.fOai}`}>
-                  Project
-                  <br />
-                  Manager
-                </div>
-                <div className={styles.ffile}>
-                  REQUIREMENTS.md
-                  <br />
-                  AGENT_TASKS.md
-                  <br />
-                  TEST.md を生成
-                </div>
+          <div className={styles.codeBlock} data-testid="code-block">
+            <div className={styles.cbHead}>
+              <div className={styles.cbMeta}>
+                <span>AGENTS.md</span>
+                <span className={styles.cbLang}>markdown</span>
               </div>
-              <div className={styles.farr}>→</div>
-              <div className={styles.fst}>
-                <div className={`${styles.fbox} ${styles.fBlue}`}>Designer</div>
-                <div className={styles.ffile}>
-                  design_spec.md
-                  <br />
-                  を生成
-                </div>
-              </div>
-              <div className={styles.farr}>→</div>
-              <div className={styles.fst}>
-                <div className={`${styles.fbox} ${styles.fPurp}`}>
-                  Frontend
-                  <br />+ Backend
-                </div>
-                <div className={styles.ffile}>
-                  並列実行
-                  <br />
-                  design_spec.md参照
-                </div>
-              </div>
-              <div className={styles.farr}>→</div>
-              <div className={styles.fst}>
-                <div className={`${styles.fbox} ${styles.fAmb}`}>Tester</div>
-                <div className={styles.ffile}>
-                  TEST_PLAN.md
-                  <br />
-                  test.sh を生成
-                </div>
-              </div>
-              <div className={styles.farr}>→</div>
-              <div className={styles.fst}>
-                <div className={`${styles.fbox} ${styles.fRose}`}>
-                  PM
-                  <br />
-                  検証
-                </div>
-                <div className={styles.ffile}>
-                  全成果物の
-                  <br />
-                  整合性確認
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className={styles.cb}>
-            <div className={styles.cbHdr}>
-              <div className={styles.cbDots}>
-                <div className={`${styles.cbd} ${styles.cbdRed}`} />
-                <div className={`${styles.cbd} ${styles.cbdAmber}`} />
-                <div className={`${styles.cbd} ${styles.cbdOai}`} />
-              </div>
-              <span>SDD パイプライン — ファイル生成順序とゲート条件</span>
+              <CopyButton text={CODE_TEXT_3} />
             </div>
             <pre>
-              <span className={styles.cCm}># Agents SDK × Codex MCP — SDD ファイル依存グラフ</span>
-              {"\n\n"}
-              <span className={styles.cHd}>Step 1: PM Agent が生成（ゲート: なし）</span>
-              {"\n"}
-              {"  ├── REQUIREMENTS.md   → 製品要件・制約\n"}
-              {"  ├── AGENT_TASKS.md    → 各役割への指示\n"}
-              {"  └── TEST.md           → 受け入れ基準\n\n"}
-              <span className={styles.cHd}>
-                Step 2: Designer Agent（ゲート: AGENT_TASKS.md 存在確認）
-              </span>
-              {"\n"}
-              {"  └── /design/design_spec.md  → DOM構造・UI仕様\n\n"}
-              <span className={styles.cHd}>
-                Step 3: 並列実行（ゲート: design_spec.md 存在確認）
-              </span>
-              {"\n"}
-              {"  ├── Frontend Agent  → /frontend/{index.html, styles.css, main.js}\n"}
-              {"  └── Backend Agent   → /backend/{server.go, handlers/}\n\n"}
-              <span className={styles.cHd}>
-                Step 4: Tester Agent（ゲート: frontend + backend 完了確認）
-              </span>
-              {"\n"}
-              {"  ├── /tests/TEST_PLAN.md  → 手動チェックリスト\n"}
-              {"  └── /tests/test.sh       → 自動テストスクリプト\n\n"}
-              <span className={styles.cHd}>Step 5: PM Agent 最終確認</span>
-              {"\n"}
-              {"  └── TEST.mdの受け入れ基準と全成果物の整合性チェック"}
+              <code>
+                <span className={styles.tokenSection}># AGENTS.md</span>
+                {"\n\n"}
+                <span className={styles.tokenSection}>## セットアップ</span>
+                {"\n"}
+                <span className={styles.tokenBullet}>-</span>
+                {" 依存関係インストール: "}
+                <span className={styles.tokenCode}>`pnpm install`</span>
+                {"\n"}
+                <span className={styles.tokenBullet}>-</span>
+                {" 開発サーバー起動: "}
+                <span className={styles.tokenCode}>`pnpm dev`</span>
+                {"\n\n"}
+                <span className={styles.tokenSection}>## テスト</span>
+                {"\n"}
+                <span className={styles.tokenBullet}>-</span>
+                {" 変更前に必ず実行: "}
+                <span className={styles.tokenCode}>`pnpm test -- --changed`</span>
+                {"\n"}
+                <span className={styles.tokenBullet}>-</span>
+                {" E2Eは "}
+                <span className={styles.tokenCode}>`pnpm test:e2e`</span>
+                {"（CI専用、ローカルでは実行しない）\n\n"}
+                <span className={styles.tokenSection}>## 規約</span>
+                {"\n"}
+                <span className={styles.tokenBullet}>-</span>
+                {" 状態管理はZustandのみ使用し、Reduxを追加しない\n"}
+                <span className={styles.tokenBullet}>-</span>
+                {" APIクライアントは "}
+                <span className={styles.tokenCode}>`src/lib/api/`</span>
+                {" 以下に集約する\n\n"}
+                <span className={styles.tokenSection}>## 境界</span>
+                {"\n"}
+                <span className={styles.tokenBullet}>-</span>{" "}
+                <span className={styles.tokenCode}>`packages/billing/`</span>
+                {" 配下は決済監査対象。変更時は必ず人間レビューを要求すること"}
+              </code>
             </pre>
           </div>
 
-          <div className={`${styles.ib} ${styles.iPurp}`}>
-            <span className={styles.ii}>⚡</span>
-            <div>
-              <strong>ゲート条件（Handoff Gating）がSDDの鍵</strong>
-              <br />
-              公式サンプルコードでは
-              <code>design_spec.mdが存在することを確認してから並列ハンドオフ</code>
-              と明示されています。AGENT_TASKS.mdに「依存ファイルが存在しない場合は停止」と書くことで、前フェーズ未完了での実装開始を防ぎます（[5]）。
-            </div>
-          </div>
-
-          <div className={`${styles.ib} ${styles.iBlue}`}>
-            <span className={styles.ii}>🔍</span>
-            <div>
-              <strong>Agents SDK 組み込みトレーシング（2026年〜）</strong>
-              <br />
-              Agents SDKには<strong>built-in tracing</strong>
-              が統合されており、マルチエージェントフローの可視化・デバッグ・評価・ファインチューニングをワンストップで行えます。一方、
-              <code>spawn_agents_on_csv</code>
-              によるCSVからのエージェントファンアウトとETA付き進捗追跡は
-              <strong>Codex CLI（最新版, rust-v0.105.0+）固有の機能</strong>です（
-              <a
-                href="https://github.com/openai/codex/releases"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Codex CLI リリースノート
-              </a>
-              ）。
-            </div>
-          </div>
+          <p>
+            Claude CodeはAGENTS.mdではなく独自の
+            <code>CLAUDE.md</code> を読み込みますが、二重管理を避けるため 「CLAUDE.mdの中身は
+            <code>@AGENTS.md</code> の1行インポートのみにし、実体はAGENTS.mdに一本化する」という
+            移行パターンが定着しています<sup>[25]</sup>。
+          </p>
         </section>
 
-        {/* SECTION 11: BEST PRACTICES */}
-        <section id="best-practices" className={styles.section}>
-          <div className={styles.secLabel}>Section 11</div>
-          <h2 className={styles.secTitle}>
-            <span className={styles.num}>11.</span>横断ベストプラクティス 10則
-          </h2>
+        {/* ===================== 9 ===================== */}
+        <section className={`${styles.section} ${styles.prose}`} id="sec-9">
+          <span className={styles.chapterNum} aria-hidden="true">
+            09
+          </span>
+          <p className={styles.sectionKicker}>Chapter 09</p>
+          <h2>SKILL.md:段階的開示(Progressive Disclosure)</h2>
+          <p>
+            AGENTS.mdが「プロジェクトが何であるか」を伝えるのに対し、SKILL.mdは「特定のタスクをどうこなすか」という
+            再利用可能な手順をエージェントに渡す仕組みです<sup>[27]</sup>。Anthropicが提唱し、Claude
+            Code・Codex・ Cursorなど多くのツールに広がったオープン標準です<sup>[18]</sup>。
+          </p>
+          <p>
+            SKILL.mdの最大の設計思想は<strong>段階的開示（Progressive Disclosure）</strong>
+            です。コンテキストウィンドウは
+            有限であり、すべてのスキルの全文を常時ロードするとノイズが増えるため、必要になった瞬間にだけ詳細を
+            読み込む設計になっています<sup>[8]</sup>。
+          </p>
 
-          <div className={styles.bps}>
-            <div className={`${styles.bpC} ${styles.bpOai}`}>
-              <div className={styles.bpN}>01</div>
-              <h4>AGENTS.mdにテストコマンドを明示的に書く</h4>
-              <p>
-                AGENTS.md はテストを自動実行しない。「ファイルを変更したら必ず npm test
-                を実行すること」のようにテストコマンドを明示的に記述し、Codex
-                がそのシェルツール許可フローに従って実行できるよう指示する。コマンドが未記載だとテストが省略される。
-              </p>
-            </div>
-            <div className={`${styles.bpC} ${styles.bpBlue}`}>
-              <div className={styles.bpN}>02</div>
-              <h4>32KiB上限を意識してファイルを分割</h4>
-              <p>
-                重要なルールはAGENTS.mdの上部へ。詳細な知識はSKILL.md・references/へ分離。上限超過で切り捨てられる。
-              </p>
-            </div>
-            <div className={`${styles.bpC} ${styles.bpPurp}`}>
-              <div className={styles.bpN}>03</div>
-              <h4>AGENTS.mdはオープン標準を活かす</h4>
-              <p>
-                Claude
-                CodeのCLAUDE.mdに@AGENTS.mdでインポートする。1ファイルで全ツールに対応し「ツール乗り換え問題」を解消。
-              </p>
-            </div>
-            <div className={`${styles.bpC} ${styles.bpAmb}`}>
-              <div className={styles.bpN}>04</div>
-              <h4>AGENT_TASKS.mdに「あいまいさゼロ」で書く</h4>
-              <p>
-                「成果物のファイル名・パス・形式」を全て明記。「後でデザイナーのDOMを参考にして」ではなく「/design/design_spec.mdのDOM構造を参照」。
-              </p>
-            </div>
-            <div className={`${styles.bpC} ${styles.bpRose}`}>
-              <div className={styles.bpN}>05</div>
-              <h4>AGENTS.override.mdを一時的にのみ使う</h4>
-              <p>
-                使い終わったら即削除。永続的ルール変更はAGENTS.mdを直接編集する。override.mdの.gitignore追加を忘れない。
-              </p>
-            </div>
-            <div className={`${styles.bpC} ${styles.bpCyan}`}>
-              <div className={styles.bpN}>06</div>
-              <h4>SKILL.mdのdescriptionに境界を明記</h4>
-              <p>
-                「Use when...」だけでなく「Do NOT use
-                when...」も書く。暗黙マッチングの誤爆を防ぐnegative examplesが精度向上の鍵。
-              </p>
-            </div>
-            <div className={`${styles.bpC} ${styles.bpOai}`}>
-              <div className={styles.bpN}>07</div>
-              <h4>PRインストラクションをAGENTS.mdに書く</h4>
-              <p>
-                Codex
-                Cloudが自動PR生成する際のタイトル形式・必須セクション・レビュアー設定をAGENTS.mdのPR
-                Instructionsセクションで制御。
-              </p>
-            </div>
-            <div className={`${styles.bpC} ${styles.bpBlue}`}>
-              <div className={styles.bpN}>08</div>
-              <h4>Forbidden Actionsで安全柵を作る</h4>
-              <p>
-                「migrations/への直接書き込み禁止」「.envの変更禁止」を明示。Codexは明示的な禁止を強く尊重する。
-              </p>
-            </div>
-            <div className={`${styles.bpC} ${styles.bpPurp}`}>
-              <div className={styles.bpN}>09</div>
-              <h4>ゲート条件付きハンドオフで品質を担保</h4>
-              <p>
-                Agents
-                SDKパイプラインでは「design_spec.mdが存在することを確認してから実装開始」のようなゲート条件を各エージェントに持たせる。
-              </p>
-            </div>
-            <div className={`${styles.bpC} ${styles.bpAmb}`}>
-              <div className={styles.bpN}>10</div>
-              <h4>$skill-installerで公式スキルを活用</h4>
-              <p>
-                openai/skillsの公式カタログとコミュニティのスキル集（40,000+プロジェクト）を積極的に活用。スクラッチで書く前に既存スキルを確認。
-              </p>
-            </div>
+          <div className={styles.mermaidWrapper}>
+            <MermaidDiagram chart={DIAGRAM_4} theme="base" themeVariables={THEME_VARS} />
           </div>
-        </section>
+          <p className={styles.figCaption}>図4: SKILL.mdの段階的開示(Progressive Disclosure)</p>
 
-        {/* SECTION 12: SOURCES */}
-        <section id="sources" className={styles.section}>
-          <div className={styles.sources}>
-            <h3>📚 参考ソース一覧（公式・二次情報を含む）</h3>
-            {SOURCES.map((s) => (
-              <div key={s.num} className={styles.src}>
-                <span className={styles.sn}>{s.num}</span>
-                <div>
-                  <a href={s.href} target="_blank" rel="noopener noreferrer">
-                    {s.title}
-                  </a>
-                  <span className={styles.sd}>{s.desc}</span>
-                </div>
+          <p>
+            構造は「YAML frontmatter（<code>name</code> と<code>description</code>{" "}
+            の2つが必須）＋Markdown本文の指示＋
+            任意の補助ファイル（スクリプト・テンプレート）」というシンプルな形です
+            <sup>[27][18]</sup>。
+          </p>
+
+          <div className={styles.codeBlock} data-testid="code-block">
+            <div className={styles.cbHead}>
+              <div className={styles.cbMeta}>
+                <span>SKILL.md</span>
+                <span className={styles.cbLang}>markdown</span>
               </div>
-            ))}
+              <CopyButton text={CODE_TEXT_4} />
+            </div>
+            <pre>
+              <code>
+                <span className={styles.tokenMeta}>---</span>
+                {"\n"}
+                <span className={styles.tokenAttr}>name</span>
+                {": "}
+                <span className={styles.tokenString}>deploy</span>
+                {"\n"}
+                <span className={styles.tokenAttr}>description</span>
+                {": "}
+                <span className={styles.tokenString}>
+                  アプリケーションを本番またはステージング環境へデプロイする
+                </span>
+                {"\n"}
+                <span className={styles.tokenMeta}>---</span>
+                {"\n\n"}
+                <span className={styles.tokenSection}># Deploy</span>
+                {"\n\n"}
+                <span className={styles.tokenSection}>## 手順</span>
+                {"\n"}
+                <span className={styles.tokenNumber}>1.</span>
+                {" テストスイートを実行: "}
+                <span className={styles.tokenCode}>`bun run test`</span>
+                {"\n"}
+                <span className={styles.tokenNumber}>2.</span>
+                {" 本番ビルド: "}
+                <span className={styles.tokenCode}>`bun run build`</span>
+                {"\n"}
+                <span className={styles.tokenNumber}>3.</span>
+                {" デプロイコマンドを実行し、ヘルスチェックを確認する"}
+              </code>
+            </pre>
+          </div>
+        </section>
 
-            <div className={`${styles.src} ${styles.srcSeparator}`}>
-              <span className={`${styles.sn} ${styles.srcSeparatorLabel}`}>
-                SKILL.md 追加ソース
+        {/* ===================== 10 ===================== */}
+        <section className={`${styles.section} ${styles.prose}`} id="sec-10">
+          <span className={styles.chapterNum} aria-hidden="true">
+            10
+          </span>
+          <p className={styles.sectionKicker}>Chapter 10</p>
+          <h2>Markdown記法そのもののベストプラクティス</h2>
+          <p>
+            Anthropicの公式エンジニアリングブログ「Effective context engineering for AI
+            agents」は、プロンプトや コンテキストを<code>&lt;background_information&gt;</code>
+            のようなXMLタグ、または
+            <strong>Markdownの見出し</strong>で
+            明確にセクション分けすることを推奨しています。具体的な整形方法自体は今後変わっていく可能性があるが、
+            明確なセクション区切りという原則自体は重要だと位置づけられています<sup>[8]</sup>
+            。この原則はspec.md等の SDDドキュメントにもそのまま当てはまります。
+          </p>
+
+          <h3>10.1 見出し階層とセクション分け</h3>
+          <ul>
+            <li>
+              見出し（<code>#</code>〜<code>####</code>
+              ）でセクションを明確に分離し、AIが「今どのセクションを読んで
+              いるか」を見出しテキストだけで判断できるようにする。
+            </li>
+            <li>1見出しに1目的。複数の関心事を1つの見出し配下に詰め込まない。</li>
+            <li>
+              アンカーリンク付きの目次を長いドキュメントには必ず用意し、人間のレビュー時のナビゲーションコストを下げる。
+            </li>
+          </ul>
+
+          <h3>10.2 表 vs 箇条書きの使い分け</h3>
+          <ul>
+            <li>
+              <strong>表が向くケース</strong>:
+              複数の項目を同じ軸（列）で比較する場合。AIエージェントにとっても
+              構造化データとして解釈しやすい。
+            </li>
+            <li>
+              <strong>箇条書きが向くケース</strong>: 単純な列挙、手順のステップ、条件の羅列。
+            </li>
+          </ul>
+
+          <h3>10.3 Mermaidダイアグラムのルール</h3>
+          <p>
+            ASCIIアートによる図解は保守性が低く、フォントやレンダリング環境によって崩れるため、フローチャートは必ず
+            Mermaidのコードブロックで記述します。実務での注意点は以下の通りです。
+          </p>
+          <ul>
+            <li>
+              <code>mindmap</code> と <code>quadrantChart</code>{" "}
+              は環境によって表示が崩れやすいため避け、
+              <code>flowchart</code> + <code>subgraph</code> で代替する。
+            </li>
+            <li>
+              サブグラフのタイトルには特殊文字を避けるか、クォートで囲んでパースエラーを防ぐ。
+            </li>
+            <li>
+              ノード数が多い横方向のフローチャートはビューポート幅を超えやすいため、<code>TB</code>
+              （縦方向）レイアウトを 優先する。
+            </li>
+            <li>
+              ノード間に実際のエッジがない兄弟要素は横に並んで幅が広がりがちなので、意味のある接続だけを描き、
+              レイアウトを縦に収める。
+            </li>
+          </ul>
+
+          <h3>10.4 コードブロックとfrontmatter</h3>
+          <ul>
+            <li>
+              コマンド例・設定例は必ずフェンス付きコードブロック（<code>```</code>
+              ）で囲み、言語識別子 （<code>bash</code>, <code>json</code>, <code>markdown</code>
+              など）を付与する。
+            </li>
+            <li>
+              SKILL.mdやCursorの<code>.mdc</code>ファイルのように、メタデータが必要な場合はYAML
+              frontmatterを使う。 本文の指示と機械可読なメタデータを分離できる<sup>[27]</sup>。
+            </li>
+          </ul>
+        </section>
+
+        {/* ===================== 11 ===================== */}
+        <section className={`${styles.section} ${styles.prose}`} id="sec-11">
+          <span className={styles.chapterNum} aria-hidden="true">
+            11
+          </span>
+          <p className={styles.sectionKicker}>Chapter 11</p>
+          <h2>生きたドキュメントとしての運用</h2>
+          <p>
+            仕様は「書いたら終わり」ではありません。SDDが従来のウォーターフォール型ドキュメントと決定的に違うのは、
+            <strong>要求が変わったらまず仕様を更新し、そこからコードを再生成・修正する</strong>
+            という運用ループを 回す点です<sup>[16]</sup>。
+          </p>
+          <ul>
+            <li>バグ修正・機能追加のリクエストが来たら、実装コードより先にspec.mdを更新する。</li>
+            <li>
+              仕様変更のコストが「重い」と感じ始めたら、それは過剰形式化（Waterfall化）のサインとして扱い、
+              プロセスを軽量化する<sup>[31]</sup>。
+            </li>
+            <li>
+              大きな機能追加のたびに1つの巨大な仕様に機能を積み増すのではなく、機能ごとに仕様を分割する。
+            </li>
+          </ul>
+        </section>
+
+        {/* ===================== 12 ===================== */}
+        <section className={`${styles.section} ${styles.prose}`} id="sec-12">
+          <span className={styles.chapterNum} aria-hidden="true">
+            12
+          </span>
+          <p className={styles.sectionKicker}>Chapter 12</p>
+          <h2>よくある落とし穴と対策</h2>
+
+          <div className={styles.tableWrap}>
+            <table>
+              <thead>
+                <tr>
+                  <th>落とし穴</th>
+                  <th>症状</th>
+                  <th>対策</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <strong>Spec Bloat</strong>
+                    <br />
+                    （仕様の肥大化）
+                  </td>
+                  <td>
+                    30分で実装できるはずの機能に対して800行超のMarkdownが生成される<sup>[30]</sup>
+                  </td>
+                  <td>テンプレートを最小構成にトリムし、「必要十分」をチーム内で明文化する</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>ウォーターフォール化</strong>
+                  </td>
+                  <td>
+                    Spec→Plan→Tasksの往復が硬直化する。Scott Logic社の実機検証では、Spec
+                    Kitのフルパイプラインが
+                    通常の反復プロンプトよりも約10倍遅く、レビューだけで3.5時間を要した例も報告されている
+                    <sup>[17]</sup>
+                  </td>
+                  <td>
+                    変更コストが高いと感じたら過剰形式化のサイン。小規模な変更は軽量な仕様更新に留める
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>Semantic Diffusion</strong>
+                    <br />
+                    （用語の希薄化）
+                  </td>
+                  <td>
+                    「仕様駆動開発」という言葉がツールごとに異なる哲学を指すため、比較が噛み合わなくなる
+                    <sup>[24]</sup>
+                  </td>
+                  <td>
+                    ツール名やラベルではなく、実際のワークフロー（何がSource of Truthか）で比較する
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>実装詳細の混入</strong>
+                  </td>
+                  <td>
+                    機能仕様（spec.md）に色・サイズ・ライブラリ選定などの技術詳細が紛れ込む
+                    <sup>[3]</sup>
+                  </td>
+                  <td>気づいた時点でLLMに指示し、該当箇所をplan.md側へ移動する</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>Spec Drift</strong>
+                    <br />
+                    （仕様と実装の乖離）
+                  </td>
+                  <td>コードだけが変更され、仕様が古いまま放置される</td>
+                  <td>
+                    「要求変更時は必ず仕様を先に更新する」運用をチームルール化し、CIで乖離を検知する仕組みを検討する
+                    <sup>[16]</sup>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>偽の網羅感</strong>
+                  </td>
+                  <td>
+                    仕様を読み流し、エッジケースが書かれていると錯覚したまま実装を進めてしまう
+                  </td>
+                  <td>
+                    仕様は「読まれる前提」で簡潔に保ち、レビュー担当を明確に決める<sup>[30]</sup>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* ===================== 13 ===================== */}
+        <section className={`${styles.section} ${styles.prose}`} id="sec-13">
+          <span className={styles.chapterNum} aria-hidden="true">
+            13
+          </span>
+          <p className={styles.sectionKicker}>Chapter 13</p>
+          <h2>導入前チェックリスト</h2>
+          <ul className={styles.checklist}>
+            <li>
+              <span className={styles.chk} />
+              <span>
+                <code>constitution.md</code>
+                （またはAGENTS.md冒頭）にプロジェクトの非交渉原則が明文化されている
               </span>
-              <div className={styles.srcSeparatorDesc}>Section 05 拡充にあたり参照した追加文献</div>
-            </div>
-
-            {SOURCES_SKILL_ADDITIONAL.map((s) => (
-              <div key={s.num} className={styles.src}>
-                <span className={styles.sn}>{s.num}</span>
-                <div>
-                  <a href={s.href} target="_blank" rel="noopener noreferrer">
-                    {s.title}
-                  </a>
-                  <span className={styles.sd}>{s.desc}</span>
-                </div>
-              </div>
-            ))}
-          </div>
+            </li>
+            <li>
+              <span className={styles.chk} />
+              <span>
+                spec.md / requirements.mdが「What」「Why」に徹し、実装詳細（How）を含んでいない
+              </span>
+            </li>
+            <li>
+              <span className={styles.chk} />
+              <span>
+                受け入れ基準がEARS記法（またはGiven-When-Then）で書かれ、曖昧な自然文のままになっていない
+              </span>
+            </li>
+            <li>
+              <span className={styles.chk} />
+              <span>
+                曖昧な要件には <code>[NEEDS CLARIFICATION]</code>{" "}
+                等のマーカーが付き、放置されていない
+              </span>
+            </li>
+            <li>
+              <span className={styles.chk} />
+              <span>
+                plan.md /
+                design.mdのアーキテクチャ図・シーケンス図がMermaidで記述され、ASCIIアートを含まない
+              </span>
+            </li>
+            <li>
+              <span className={styles.chk} />
+              <span>
+                tasks.mdの各タスクが要件へのトレーサビリティを持ち、独立してレビュー可能な粒度になっている
+              </span>
+            </li>
+            <li>
+              <span className={styles.chk} />
+              <span>
+                AGENTS.md（またはCLAUDE.md）にビルド／テストコマンドと「触ってはいけない領域」が明記されている
+              </span>
+            </li>
+            <li>
+              <span className={styles.chk} />
+              <span>
+                繰り返し使う手順はSKILL.mdとして切り出し、YAML frontmatterの<code>description</code>
+                だけで用途が判断できる
+              </span>
+            </li>
+            <li>
+              <span className={styles.chk} />
+              <span>
+                長いドキュメントにはアンカーリンク付き目次があり、見出し階層が1見出し1目的になっている
+              </span>
+            </li>
+            <li>
+              <span className={styles.chk} />
+              <span>比較・列挙情報は表で、手順・条件は箇条書きで整理されている</span>
+            </li>
+            <li>
+              <span className={styles.chk} />
+              <span>
+                仕様変更時は「まず仕様を更新してからコードを再生成・修正する」運用ルールがチームに共有されている
+              </span>
+            </li>
+            <li>
+              <span className={styles.chk} />
+              <span>
+                生成された仕様・計画ドキュメントの分量が肥大化していないか、レビュー時に確認している
+              </span>
+            </li>
+          </ul>
         </section>
-      </main>
+
+        {/* ===================== 14 ===================== */}
+        <section className={`${styles.section} ${styles.prose}`} id="sec-14">
+          <span className={styles.chapterNum} aria-hidden="true">
+            14
+          </span>
+          <p className={styles.sectionKicker}>Chapter 14</p>
+          <h2>まとめ</h2>
+          <p>
+            AI仕様駆動開発におけるMarkdown運用の本質は、
+            <strong>
+              「AIエージェントが迷わず実装でき、人間が短時間で
+              レビューできる」構造をどれだけ作れるか
+            </strong>
+            に尽きます。EARS記法による受け入れ基準の明確化、What/Howの
+            分離、段階的開示によるコンテキスト管理、そして「仕様は生きたドキュメントである」という運用ルールの4つが、
+            ツールを問わず共通する骨格です。同時に、Spec
+            Kitの実運用レビューが示すように、仕様が肥大化し
+            ウォーターフォール的な硬直運用に陥るリスクも実際に報告されています<sup>[17]</sup>
+            。仕様の「厳密さ」と
+            「軽さ」のバランスは、プロジェクトの規模とチームの成熟度に応じて都度調整していく前提で運用してください。
+          </p>
+        </section>
+
+        {/* ===================== 15 ===================== */}
+        <section className={`${styles.section} ${styles.prose}`} id="sec-15">
+          <span className={styles.chapterNum} aria-hidden="true">
+            15
+          </span>
+          <p className={styles.sectionKicker}>Chapter 15</p>
+          <h2>参考文献</h2>
+          <p>
+            本ガイドの記述は、2026年7月28日時点で参照可能な以下の一次情報・著名な開発者/組織の発信に基づいています。
+          </p>
+          <ol className={styles.refList}>
+            <li className={styles.refItem}>
+              <div className={styles.refBody}>
+                <p className={styles.refTitle}>GitHub, &quot;spec-kit&quot; 公式リポジトリ</p>
+                <a
+                  className={styles.refUrl}
+                  href="https://github.com/github/spec-kit"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  https://github.com/github/spec-kit
+                </a>
+              </div>
+            </li>
+            <li className={styles.refItem}>
+              <div className={styles.refBody}>
+                <p className={styles.refTitle}>GitHub, Spec Kit 公式ドキュメントサイト</p>
+                <a
+                  className={styles.refUrl}
+                  href="https://github.github.com/spec-kit/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  https://github.github.com/spec-kit/
+                </a>
+              </div>
+            </li>
+            <li className={styles.refItem}>
+              <div className={styles.refBody}>
+                <p className={styles.refTitle}>
+                  Den Delimarsky（GitHub Principal PM）, &quot;What&apos;s The Deal With GitHub Spec
+                  Kit&quot;
+                </p>
+                <a
+                  className={styles.refUrl}
+                  href="https://den.dev/blog/github-spec-kit/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  https://den.dev/blog/github-spec-kit/
+                </a>
+              </div>
+            </li>
+            <li className={styles.refItem}>
+              <div className={styles.refBody}>
+                <p className={styles.refTitle}>
+                  Microsoft for Developers, &quot;Diving Into Spec-Driven Development With GitHub
+                  Spec Kit&quot;
+                </p>
+                <a
+                  className={styles.refUrl}
+                  href="https://developer.microsoft.com/blog/spec-driven-development-spec-kit/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  https://developer.microsoft.com/blog/spec-driven-development-spec-kit/
+                </a>
+              </div>
+            </li>
+            <li className={styles.refItem}>
+              <div className={styles.refBody}>
+                <p className={styles.refTitle}>AWS Kiro 公式ドキュメント, &quot;Specs&quot;</p>
+                <a
+                  className={styles.refUrl}
+                  href="https://kiro.dev/docs/specs/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  https://kiro.dev/docs/specs/
+                </a>
+              </div>
+            </li>
+            <li className={styles.refItem}>
+              <div className={styles.refBody}>
+                <p className={styles.refTitle}>
+                  AWS Kiro 公式ドキュメント, &quot;Feature Specs&quot;
+                </p>
+                <a
+                  className={styles.refUrl}
+                  href="https://kiro.dev/docs/specs/feature-specs/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  https://kiro.dev/docs/specs/feature-specs/
+                </a>
+              </div>
+            </li>
+            <li className={styles.refItem}>
+              <div className={styles.refBody}>
+                <p className={styles.refTitle}>
+                  AGENTS.md 公式サイト（Agentic AI Foundation / Linux Foundation）
+                </p>
+                <a
+                  className={styles.refUrl}
+                  href="https://agents.md/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  https://agents.md/
+                </a>
+              </div>
+            </li>
+            <li className={styles.refItem}>
+              <div className={styles.refBody}>
+                <p className={styles.refTitle}>
+                  Anthropic Engineering, &quot;Effective context engineering for AI agents&quot;
+                </p>
+                <a
+                  className={styles.refUrl}
+                  href="https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents
+                </a>
+              </div>
+            </li>
+            <li className={styles.refItem}>
+              <div className={styles.refBody}>
+                <p className={styles.refTitle}>
+                  Anthropic Engineering, &quot;Effective harnesses for long-running agents&quot;
+                </p>
+                <a
+                  className={styles.refUrl}
+                  href="https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents
+                </a>
+              </div>
+            </li>
+            <li className={styles.refItem}>
+              <div className={styles.refBody}>
+                <p className={styles.refTitle}>
+                  Addy Osmani（Google, Chrome Engineering）, &quot;How to write a good spec for AI
+                  agents&quot;
+                </p>
+                <a
+                  className={styles.refUrl}
+                  href="https://addyosmani.com/blog/good-spec/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  https://addyosmani.com/blog/good-spec/
+                </a>
+              </div>
+            </li>
+            <li className={styles.refItem}>
+              <div className={styles.refBody}>
+                <p className={styles.refTitle}>
+                  Simon Willison（Datasette作者）, &quot;Agentic Engineering Patterns&quot;
+                </p>
+                <a
+                  className={styles.refUrl}
+                  href="https://simonw.substack.com/p/agentic-engineering-patterns"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  https://simonw.substack.com/p/agentic-engineering-patterns
+                </a>
+              </div>
+            </li>
+            <li className={styles.refItem}>
+              <div className={styles.refBody}>
+                <p className={styles.refTitle}>Simon Willison, ai-assisted-programming タグ一覧</p>
+                <a
+                  className={styles.refUrl}
+                  href="https://simonwillison.net/tags/ai-assisted-programming/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  https://simonwillison.net/tags/ai-assisted-programming/
+                </a>
+              </div>
+            </li>
+            <li className={styles.refItem}>
+              <div className={styles.refBody}>
+                <p className={styles.refTitle}>
+                  Martin Fowler / Thoughtworks, &quot;Exploring Generative AI&quot;
+                </p>
+                <a
+                  className={styles.refUrl}
+                  href="https://martinfowler.com/articles/exploring-gen-ai.html"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  https://martinfowler.com/articles/exploring-gen-ai.html
+                </a>
+              </div>
+            </li>
+            <li className={styles.refItem}>
+              <div className={styles.refBody}>
+                <p className={styles.refTitle}>Wikipedia, &quot;Spec-driven development&quot;</p>
+                <a
+                  className={styles.refUrl}
+                  href="https://en.wikipedia.org/wiki/Spec-driven_development"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  https://en.wikipedia.org/wiki/Spec-driven_development
+                </a>
+              </div>
+            </li>
+            <li className={styles.refItem}>
+              <div className={styles.refBody}>
+                <p className={styles.refTitle}>
+                  Java Code Geeks, &quot;Spec-Driven Development with AI: Write the Spec First, Then
+                  Prompt the Implementation&quot;
+                </p>
+                <a
+                  className={styles.refUrl}
+                  href="https://www.javacodegeeks.com/2026/05/spec-driven-development-with-ai-write-the-spec-first-then-prompt-the-implementation.html"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  https://www.javacodegeeks.com/2026/05/spec-driven-development-with-ai-write-the-spec-first-then-prompt-the-implementation.html
+                </a>
+              </div>
+            </li>
+            <li className={styles.refItem}>
+              <div className={styles.refBody}>
+                <p className={styles.refTitle}>
+                  BCMS, &quot;Spec-Driven Development (SDD): The Definitive 2026 Guide&quot;
+                </p>
+                <a
+                  className={styles.refUrl}
+                  href="https://thebcms.com/blog/spec-driven-development"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  https://thebcms.com/blog/spec-driven-development
+                </a>
+              </div>
+            </li>
+            <li className={styles.refItem}>
+              <div className={styles.refBody}>
+                <p className={styles.refTitle}>
+                  Scott Logic（Colin Eberhardt, CTO）, &quot;Putting Spec Kit Through Its Paces:
+                  Radical Idea or Reinvented Waterfall?&quot;
+                </p>
+                <a
+                  className={styles.refUrl}
+                  href="https://blog.scottlogic.com/2025/11/26/putting-spec-kit-through-its-paces-radical-idea-or-reinvented-waterfall.html"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  https://blog.scottlogic.com/2025/11/26/putting-spec-kit-through-its-paces-radical-idea-or-reinvented-waterfall.html
+                </a>
+              </div>
+            </li>
+            <li className={styles.refItem}>
+              <div className={styles.refBody}>
+                <p className={styles.refTitle}>
+                  Agentailor, &quot;Top AI Agent Standards to Know in 2026&quot;
+                </p>
+                <a
+                  className={styles.refUrl}
+                  href="https://blog.agentailor.com/posts/top-ai-agent-standards-2026"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  https://blog.agentailor.com/posts/top-ai-agent-standards-2026
+                </a>
+              </div>
+            </li>
+            <li className={styles.refItem}>
+              <div className={styles.refBody}>
+                <p className={styles.refTitle}>
+                  SSOJet, &quot;9 PRD and Spec Templates Built for AI Coding Agents&quot;
+                </p>
+                <a
+                  className={styles.refUrl}
+                  href="https://ssojet.com/blog/prd-spec-templates-ai-agents"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  https://ssojet.com/blog/prd-spec-templates-ai-agents
+                </a>
+              </div>
+            </li>
+            <li className={styles.refItem}>
+              <div className={styles.refBody}>
+                <p className={styles.refTitle}>
+                  Joshua McDonald, &quot;EARS, Fifteen Years On: The Requirements Format Built for
+                  the Agent Era&quot;
+                </p>
+                <a
+                  className={styles.refUrl}
+                  href="https://joshmcdonald.medium.com/ears-fifteen-years-on-the-requirements-format-built-for-the-agent-era-0f78f8ff35a0"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  https://joshmcdonald.medium.com/ears-fifteen-years-on-the-requirements-format-built-for-the-agent-era-0f78f8ff35a0
+                </a>
+              </div>
+            </li>
+            <li className={styles.refItem}>
+              <div className={styles.refBody}>
+                <p className={styles.refTitle}>
+                  DEV Community (krlz), &quot;Spec-Driven Development in 2026: What It Is, the
+                  Tooling, and How Teams Actually Use It&quot;
+                </p>
+                <a
+                  className={styles.refUrl}
+                  href="https://dev.to/krlz/spec-driven-development-in-2026-what-it-is-the-tooling-and-how-teams-actually-use-it-2fk2"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  https://dev.to/krlz/spec-driven-development-in-2026-what-it-is-the-tooling-and-how-teams-actually-use-it-2fk2
+                </a>
+              </div>
+            </li>
+            <li className={styles.refItem}>
+              <div className={styles.refBody}>
+                <p className={styles.refTitle}>
+                  Augment Code, &quot;6 Best Spec-Driven Development Tools for AI Coding in
+                  2026&quot;
+                </p>
+                <a
+                  className={styles.refUrl}
+                  href="https://www.augmentcode.com/tools/best-spec-driven-development-tools"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  https://www.augmentcode.com/tools/best-spec-driven-development-tools
+                </a>
+              </div>
+            </li>
+            <li className={styles.refItem}>
+              <div className={styles.refBody}>
+                <p className={styles.refTitle}>
+                  SoftwareSeni, &quot;Spec-Driven Development Is Replacing Vibe Coding as the
+                  Professional Standard for AI Teams&quot;（Simon Willison氏の見解を含む）
+                </p>
+                <a
+                  className={styles.refUrl}
+                  href="https://www.softwareseni.com/spec-driven-development-is-replacing-vibe-coding-as-the-professional-standard-for-ai-teams/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  https://www.softwareseni.com/spec-driven-development-is-replacing-vibe-coding-as-the-professional-standard-for-ai-teams/
+                </a>
+              </div>
+            </li>
+            <li className={styles.refItem}>
+              <div className={styles.refBody}>
+                <p className={styles.refTitle}>
+                  CodeMySpec, &quot;Spec-Driven Development in 2026: Guide + Tool
+                  Comparison&quot;（EARS記法の歴史・Rolls-Royce起源の詳細）
+                </p>
+                <a
+                  className={styles.refUrl}
+                  href="https://codemyspec.com/blog/spec-driven-development"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  https://codemyspec.com/blog/spec-driven-development
+                </a>
+              </div>
+            </li>
+            <li className={styles.refItem}>
+              <div className={styles.refBody}>
+                <p className={styles.refTitle}>
+                  CodersEra, &quot;AGENTS.md Complete Guide 2026&quot;
+                </p>
+                <a
+                  className={styles.refUrl}
+                  href="https://codersera.com/blog/agents-md-complete-guide-2026/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  https://codersera.com/blog/agents-md-complete-guide-2026/
+                </a>
+              </div>
+            </li>
+            <li className={styles.refItem}>
+              <div className={styles.refBody}>
+                <p className={styles.refTitle}>
+                  BuildBetter, &quot;AGENTS.md Complete Guide for Engineering Teams in 2026&quot;
+                </p>
+                <a
+                  className={styles.refUrl}
+                  href="https://blog.buildbetter.ai/agents-md-complete-guide-for-engineering-teams-in-2026/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  https://blog.buildbetter.ai/agents-md-complete-guide-for-engineering-teams-in-2026/
+                </a>
+              </div>
+            </li>
+            <li className={styles.refItem}>
+              <div className={styles.refBody}>
+                <p className={styles.refTitle}>
+                  MorphLLM, &quot;AGENTS.md Spec (2026): Recommended Sections and Comparison With
+                  CLAUDE.md / .cursorrules&quot;
+                </p>
+                <a
+                  className={styles.refUrl}
+                  href="https://www.morphllm.com/agents-md-guide"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  https://www.morphllm.com/agents-md-guide
+                </a>
+              </div>
+            </li>
+            <li className={styles.refItem}>
+              <div className={styles.refBody}>
+                <p className={styles.refTitle}>
+                  DeepWiki, &quot;AGENTS.md Format Documentation&quot;（openai/agents.md）
+                </p>
+                <a
+                  className={styles.refUrl}
+                  href="https://deepwiki.com/openai/agents.md/5-agents.md-format-documentation"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  https://deepwiki.com/openai/agents.md/5-agents.md-format-documentation
+                </a>
+              </div>
+            </li>
+            <li className={styles.refItem}>
+              <div className={styles.refBody}>
+                <p className={styles.refTitle}>
+                  Agensi, &quot;What Is the Agent Skills Open Standard?&quot;
+                </p>
+                <a
+                  className={styles.refUrl}
+                  href="https://www.agensi.io/learn/agent-skills-open-standard"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  https://www.agensi.io/learn/agent-skills-open-standard
+                </a>
+              </div>
+            </li>
+            <li className={styles.refItem}>
+              <div className={styles.refBody}>
+                <p className={styles.refTitle}>
+                  bitbytebit（Substack）, &quot;Spec-Driven Development: From Vibe Coding to
+                  Structured Development&quot;
+                </p>
+                <a
+                  className={styles.refUrl}
+                  href="https://bitbytebit.substack.com/p/spec-driven-development-from-vibe"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  https://bitbytebit.substack.com/p/spec-driven-development-from-vibe
+                </a>
+              </div>
+            </li>
+            <li className={styles.refItem}>
+              <div className={styles.refBody}>
+                <p className={styles.refTitle}>
+                  The Main Thread, &quot;Spec-Driven Development Needs an Exit Strategy&quot;
+                </p>
+                <a
+                  className={styles.refUrl}
+                  href="https://www.the-main-thread.com/p/spec-driven-development-exit-strategy"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  https://www.the-main-thread.com/p/spec-driven-development-exit-strategy
+                </a>
+              </div>
+            </li>
+            <li className={styles.refItem}>
+              <div className={styles.refBody}>
+                <p className={styles.refTitle}>
+                  AWS Builder Center, &quot;Getting Started With Spec-Driven Development Using
+                  Kiro&quot;
+                </p>
+                <a
+                  className={styles.refUrl}
+                  href="https://builder.aws.com/content/36nn9PbSZuKJiWWoO2UWmFaaCHs/getting-started-with-spec-driven-development-using-kiro"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  https://builder.aws.com/content/36nn9PbSZuKJiWWoO2UWmFaaCHs/getting-started-with-spec-driven-development-using-kiro
+                </a>
+              </div>
+            </li>
+            <li className={styles.refItem}>
+              <div className={styles.refBody}>
+                <p className={styles.refTitle}>
+                  Kanai Dutta（Medium）, &quot;Experience With Kiro&apos;s Spec Driven Development
+                  Methodology&quot;
+                </p>
+                <a
+                  className={styles.refUrl}
+                  href="https://medium.com/@kanaiduttaiem/experience-with-kiros-spec-driven-development-methodology-1e57af895fd7"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  https://medium.com/@kanaiduttaiem/experience-with-kiros-spec-driven-development-methodology-1e57af895fd7
+                </a>
+              </div>
+            </li>
+          </ol>
+        </section>
+
+        <footer className={styles.footer}>
+          <div className={styles.disclaimer}>
+            免責事項:
+            上記は2026年7月28日時点のWeb検索結果に基づく要約であり、各ツールの仕様・対応状況は今後変更される
+            可能性があります。導入前には各公式ドキュメントの最新版を必ず確認してください。
+          </div>
+        </footer>
+      </div>
     </div>
   );
 }

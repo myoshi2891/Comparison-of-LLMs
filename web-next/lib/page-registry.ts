@@ -364,15 +364,15 @@ const entries: PageEntry[] = [
   },
   {
     slug: "/codex/skill",
-    title: "Skill",
+    title: "AI仕様駆動開発におけるMarkdown実践ガイド",
     group: "Providers",
     category: "Codex",
     provider: "codex",
-    topics: ["skill"],
+    topics: ["skill", "sdd", "markdown"],
     summary:
-      "AGENTS.md / SKILL.md / .prompt.md / REQUIREMENTS.md / AGENT_TASKS.md — OpenAI Codex 最新 (2026年最新版) の AI 仕様駆動開発を支える全マークダウンファイルの役割・構造・ベストプラクティスを公式根拠付きで解説 (v0.142.4, GPT-5.5 / GPT-5-Codex 対応、Codex Remote GA)。",
+      "GitHub Spec Kit・AWS Kiro・Claude Code・AGENTS.md・Agent Skillsなど、2026年時点の主要なSDDツール群が共通して採用する「Markdownで仕様を書き、AIエージェントに実装させる」ワークフローを体系化した実践ガイド。EARS記法、ファイル構成、Mermaid図解の作法まで一気通貫で解説。",
     addedAt: "2026-04-18",
-    lastReviewed: "2026-07-01",
+    lastReviewed: "2026-07-28",
   },
   {
     slug: "/copilot/agent",

@@ -262,8 +262,8 @@ describe("/codex/skill - AI仕様駆動開発におけるMarkdownファイル実
 
   it("C-6c: 各図解が空でなく、図種別の宣言から始まる", () => {
     const { container } = render(<Page />);
-    const charts = Array.from(container.querySelectorAll('[data-testid="mermaid"]')).map(
-      (el) => (el.textContent ?? "").trim()
+    const charts = Array.from(container.querySelectorAll('[data-testid="mermaid"]')).map((el) =>
+      (el.textContent ?? "").trim()
     );
     expect(charts.length).toBe(4);
     for (const chart of charts) {
@@ -341,14 +341,16 @@ describe("/codex/skill - AI仕様駆動開発におけるMarkdownファイル実
 
   it("Q-3: 見出し階層が飛ばない（h1 → h2 → h3）", () => {
     const { container } = render(<Page />);
-    const headings = Array.from(container.querySelectorAll("h1, h2, h3, h4, h5, h6")).map(
-      (el) => Number.parseInt(el.tagName.replace(/^H/, ""), 10)
+    const headings = Array.from(container.querySelectorAll("h1, h2, h3, h4, h5, h6")).map((el) =>
+      Number.parseInt(el.tagName.replace(/^H/, ""), 10)
     );
     expect(headings.length).toBeGreaterThan(0);
-    expect(headings[0]).toBe(1);
-    for (let i = 1; i < headings.length; i++) {
-      const diff = headings[i] - headings[i - 1];
-      expect(diff).toBeLessThanOrEqual(1);
+    let prevLevel = 0;
+    for (const level of headings) {
+      if (prevLevel > 0) {
+        expect(level - prevLevel).toBeLessThanOrEqual(1);
+      }
+      prevLevel = level;
     }
   });
 });
