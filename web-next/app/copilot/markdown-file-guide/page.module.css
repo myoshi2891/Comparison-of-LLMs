@@ -187,7 +187,9 @@
   font-weight: 400;
   line-height: 1.4;
   text-decoration: none;
-  transition: background 0.15s, color 0.15s;
+  transition:
+    background 0.15s,
+    color 0.15s;
 }
 
 .navLink :global(i) {
@@ -437,7 +439,9 @@
   cursor: pointer;
   font-size: 14px;
   line-height: 1.5;
-  transition: background 0.15s, border-color 0.15s;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
 }
 
 .checkItem:hover {

@@ -299,8 +299,8 @@ describe("/copilot/markdown-file-guide (Copilot Spec-Driven Development Guide) C
   // C-6a: Mermaid ソースが原本と順序・内容・出現回数込みで完全一致する
   it("C-6a: Mermaid ソースが原本と順序・内容・出現回数込みで完全一致する", () => {
     const { container } = render(<MarkdownFileGuidePage />);
-    const actual = Array.from(container.querySelectorAll('[data-testid="mermaid"]')).map(
-      (el) => normalizeMermaidSource(el.textContent ?? "")
+    const actual = Array.from(container.querySelectorAll('[data-testid="mermaid"]')).map((el) =>
+      normalizeMermaidSource(el.textContent ?? "")
     );
     expect(actual).toEqual([...EXPECTED_MERMAID_SOURCES]);
   });
@@ -318,8 +318,8 @@ describe("/copilot/markdown-file-guide (Copilot Spec-Driven Development Guide) C
   // C-6c: 各図解が空でなく、図種別の宣言から始まる
   it("C-6c: 各図解が空でなく、図種別の宣言から始まる", () => {
     const { container } = render(<MarkdownFileGuidePage />);
-    const charts = Array.from(container.querySelectorAll('[data-testid="mermaid"]')).map(
-      (el) => (el.textContent ?? "").trim()
+    const charts = Array.from(container.querySelectorAll('[data-testid="mermaid"]')).map((el) =>
+      (el.textContent ?? "").trim()
     );
     for (const chart of charts) {
       expect(chart.length).toBeGreaterThan(0);

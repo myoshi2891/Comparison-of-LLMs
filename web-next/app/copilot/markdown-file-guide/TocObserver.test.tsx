@@ -2,8 +2,8 @@
 import { cleanup, fireEvent, render } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { installIntersectionObserverStub } from "@/tests/tocTestUtils";
-import { TocObserver } from "./TocObserver";
 import styles from "./page.module.css";
+import { TocObserver } from "./TocObserver";
 
 describe("TocObserver Component", () => {
   let io: ReturnType<typeof installIntersectionObserverStub>;
@@ -41,9 +41,13 @@ describe("TocObserver Component", () => {
 
     render(<TocObserver />);
 
-    const toggleBtn = document.getElementById("sidebarToggle")!;
-    const sidebar = document.getElementById("sidebar")!;
-    const overlay = document.getElementById("sidebarOverlay")!;
+    const toggleBtn = document.getElementById("sidebarToggle");
+    const sidebar = document.getElementById("sidebar");
+    const overlay = document.getElementById("sidebarOverlay");
+    expect(toggleBtn).toBeInstanceOf(HTMLElement);
+    expect(sidebar).toBeInstanceOf(HTMLElement);
+    expect(overlay).toBeInstanceOf(HTMLElement);
+    if (!toggleBtn || !sidebar || !overlay) return;
 
     // Open
     fireEvent.click(toggleBtn);
@@ -74,11 +78,15 @@ describe("TocObserver Component", () => {
 
     render(<TocObserver />);
 
-    const overviewSec = document.getElementById("overview")!;
+    const overviewSec = document.getElementById("overview");
+    const repoSec = document.getElementById("step-instructions");
+    expect(overviewSec).toBeInstanceOf(HTMLElement);
+    expect(repoSec).toBeInstanceOf(HTMLElement);
+    if (!overviewSec || !repoSec) return;
+
     overviewSec.getBoundingClientRect = () =>
       ({ top: 10, bottom: 200, left: 0, right: 100, width: 100, height: 190 }) as DOMRect;
 
-    const repoSec = document.getElementById("step-instructions")!;
     repoSec.getBoundingClientRect = () =>
       ({ top: 300, bottom: 500, left: 0, right: 100, width: 100, height: 200 }) as DOMRect;
 
