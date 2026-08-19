@@ -355,9 +355,6 @@
 .main :global(.mermaid-scroll) {
   width: 100%;
   max-width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   overflow-x: auto;
   background: var(--bg-card);
   border: 1px solid var(--border-soft);
@@ -368,8 +365,20 @@
   font-size: 1rem;
 }
 
-.main :global(.mermaid) {
-  font-size: 1rem;
+.main :global(.mermaid-scroll .mermaid) {
+  display: flex;
+  justify-content: center;
+  min-width: 100%;
+  width: max-content;
+  margin: 0 auto;
+}
+
+.main :global(.mermaid-scroll svg) {
+  max-width: none !important;
+  width: auto !important;
+  height: auto !important;
+  display: block;
+  margin: 0 auto;
 }
 
 .main :global(.mermaid foreignObject),

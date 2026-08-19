@@ -361,7 +361,7 @@ export default function GithubCopilotPage() {
         <p>
           GitHub Copilotはもはや単一機能ではなく、用途の異なる複数の面(surface)からなる製品群です。
         </p>
-        <MermaidDiagram chart={CHART_1} theme="base" themeVariables={COPILOT_THEME_VARS} />
+        <MermaidDiagram chart={CHART_1} theme="dark" themeVariables={COPILOT_THEME_VARS} />
         <div className={styles.tableScroll}>
           <table>
             <thead>
@@ -440,7 +440,7 @@ export default function GithubCopilotPage() {
           GitHub Copilot
           Chatには3つの基本モードがあり、タスクの性質に応じて選ぶことでコストと精度のバランスが取れます。
         </p>
-        <MermaidDiagram chart={CHART_2} theme="base" themeVariables={COPILOT_THEME_VARS} />
+        <MermaidDiagram chart={CHART_2} theme="dark" themeVariables={COPILOT_THEME_VARS} />
         <div className={styles.tableScroll}>
           <table>
             <thead>
@@ -510,7 +510,7 @@ export default function GithubCopilotPage() {
         <p>
           Copilotは複数のインストラクションソースを同時に読み込み、優先順位に従って解決します。この階層を理解しないまま設定すると、「なぜか指示が無視される」という事態に陥ります。
         </p>
-        <MermaidDiagram chart={CHART_3} theme="base" themeVariables={COPILOT_THEME_VARS} />
+        <MermaidDiagram chart={CHART_3} theme="dark" themeVariables={COPILOT_THEME_VARS} />
         <div className={styles.tableScroll}>
           <table>
             <thead>
@@ -738,7 +738,7 @@ export default function GithubCopilotPage() {
           <strong>Copilot Spaces</strong>
           に一本化されました。Spacesは、コード・Markdown・Issue・PR・アップロードファイル・自由記述テキストなどを1つのコンテキストにまとめ、チームで共有できる仕組みです。
         </p>
-        <MermaidDiagram chart={CHART_4} theme="base" themeVariables={COPILOT_THEME_VARS} />
+        <MermaidDiagram chart={CHART_4} theme="dark" themeVariables={COPILOT_THEME_VARS} />
         <p>
           <strong>活用パターン</strong>
         </p>
@@ -785,7 +785,7 @@ export default function GithubCopilotPage() {
           <em>"The harness is all you need (mostly)"</em>
           では、特別なMCPやスキルに頼らず、既存機能だけで生産性を大きく高める実践的な8ステップワークフローが紹介されています。以下はその要点です。
         </p>
-        <MermaidDiagram chart={CHART_5} theme="base" themeVariables={COPILOT_THEME_VARS} />
+        <MermaidDiagram chart={CHART_5} theme="dark" themeVariables={COPILOT_THEME_VARS} />
         <div className={styles.tableScroll}>
           <table>
             <thead>
@@ -865,7 +865,7 @@ export default function GithubCopilotPage() {
           Copilot
           CLIは、ターミナルに常駐するエージェント型アシスタントです。チャットボットとしても使えますが、真価は自律的にコマンドを実行しながらタスクをこなす点にあります。
         </p>
-        <MermaidDiagram chart={CHART_6} theme="base" themeVariables={COPILOT_THEME_VARS} />
+        <MermaidDiagram chart={CHART_6} theme="dark" themeVariables={COPILOT_THEME_VARS} />
         <p>
           <strong>主要なスラッシュコマンド</strong>
         </p>
@@ -961,7 +961,7 @@ export default function GithubCopilotPage() {
           にアサインすることで、バックグラウンド(クラウド上)でタスクを処理させ、完了したらPull
           Requestを作成させる仕組みです。
         </p>
-        <MermaidDiagram chart={CHART_7} theme="base" themeVariables={COPILOT_THEME_VARS} />
+        <MermaidDiagram chart={CHART_7} theme="dark" themeVariables={COPILOT_THEME_VARS} />
         <p>
           <strong>タスクを任せる際のベストプラクティス</strong>
         </p>
@@ -1001,7 +1001,7 @@ export default function GithubCopilotPage() {
           <strong>Public PreviewからGA(一般提供)</strong>
           へ移行しました。これはPro・Pro+・Business・Enterpriseの全有償プランで利用可能です。
         </p>
-        <MermaidDiagram chart={CHART_8} theme="base" themeVariables={COPILOT_THEME_VARS} />
+        <MermaidDiagram chart={CHART_8} theme="dark" themeVariables={COPILOT_THEME_VARS} />
         <p>
           <strong>重要なポイント</strong>
         </p>
@@ -1204,7 +1204,7 @@ export default function GithubCopilotPage() {
         <p>
           <strong>選定の考え方</strong>
         </p>
-        <MermaidDiagram chart={CHART_9} theme="base" themeVariables={COPILOT_THEME_VARS} />
+        <MermaidDiagram chart={CHART_9} theme="dark" themeVariables={COPILOT_THEME_VARS} />
         <p>
           <strong>実践的なヒント</strong>
         </p>
@@ -1237,7 +1237,7 @@ export default function GithubCopilotPage() {
           を攻撃経路として悪用される可能性があります。これはCopilotに限らず、Claude Code・Gemini
           CLIなど同種のエージェント全般に共通するリスクです。
         </p>
-        <MermaidDiagram chart={CHART_10} theme="base" themeVariables={COPILOT_THEME_VARS} />
+        <MermaidDiagram chart={CHART_10} theme="dark" themeVariables={COPILOT_THEME_VARS} />
         <p>
           <strong>知っておくべき既知の事例</strong>
         </p>
@@ -1374,7 +1374,7 @@ export default function GithubCopilotPage() {
         </blockquote>
         <hr />
         <h2 id="15-よくあるアンチパターン">15. よくあるアンチパターン</h2>
-        <MermaidDiagram chart={CHART_11} theme="base" themeVariables={COPILOT_THEME_VARS} />
+        <MermaidDiagram chart={CHART_11} theme="dark" themeVariables={COPILOT_THEME_VARS} />
         <p>
           Google Engineering LeadのAddy
           Osmani氏も、AIが生成したコードは「ロジック・セキュリティ・エッジケースで人間より誤りが多くなりがちである」と指摘した上で、CI(自動テスト・Lint・型チェック)を整備し、失敗ログをAIにそのままフィードバックして反復修正させるワークフローの重要性を述べています。「自分の目でコードが正しく動くのを確認するまでは、動いているとは言えない」という原則は、AIの活用が進むほど重要性を増すとしています。
