@@ -22,7 +22,8 @@
  *   2 = 引数エラー / ファイル未検出
  */
 
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
+import { dirname, resolve } from "node:path";
 import { MERMAID_DIAGRAM_DECLARATION } from "../../fix-mermaid/scripts/mermaid-diagram-types.mjs";
 
 /** リスト項目の照合に使う先頭文字数。長大な項目の全文一致を求めないための上限。 */
@@ -76,6 +77,7 @@ function decodeEntities(raw) {
     .replace(/&gt;/g, ">")
     .replace(/&quot;/g, '"')
     .replace(/&#39;/g, "'")
+    .replace(/&apos;/g, "'")
     .replace(/&nbsp;/g, " ")
     .replace(/&amp;/g, "&");
 }
@@ -771,6 +773,25 @@ let pageText;
 try {
   sourceText = readFileSync(sourcePath, "utf8");
   pageText = readFileSync(pagePath, "utf8");
+  const dir = dirname(pagePath);
+  const localImportRe = /import\s+(?:\{[^}]*\}|[\w$]+)\s+from\s+["'](\.[^"']+)["']/g;
+  let imp = localImportRe.exec(pageText);
+  while (imp !== null) {
+    const relPath = imp[1];
+    const candidatePaths = [
+      resolve(dir, `${relPath}.tsx`),
+      resolve(dir, `${relPath}.ts`),
+      resolve(dir, `${relPath}/index.tsx`),
+      resolve(dir, `${relPath}/index.ts`),
+    ];
+    for (const cp of candidatePaths) {
+      if (existsSync(cp)) {
+        pageText += `\n${readFileSync(cp, "utf8")}`;
+        break;
+      }
+    }
+    imp = localImportRe.exec(pageText);
+  }
 } catch (error) {
   console.error(`読み込み失敗: ${error instanceof Error ? error.message : String(error)}`);
   process.exit(2);

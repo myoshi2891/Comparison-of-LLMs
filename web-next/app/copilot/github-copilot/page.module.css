@@ -310,6 +310,7 @@
 }
 
 /* fenced code blocks */
+.codeBlock,
 .main pre {
   margin: 0 0 22px;
   border-radius: 12px;
@@ -319,15 +320,18 @@
   box-sizing: border-box;
   width: 100%;
   max-width: 100%;
-}
-
-.main pre code {
-  background: transparent;
   padding: 18px 20px;
   font-family: var(--font-mono, monospace);
   font-size: 0.86rem;
   line-height: 1.7;
+  color: #abb2bf;
+}
+
+.codeLine {
   display: block;
+  min-height: 1.7em;
+  white-space: pre-wrap;
+  word-break: break-all;
 }
 
 /* syntax highlighting tokens */
@@ -484,15 +488,17 @@
   gap: 12px;
   cursor: pointer;
   color: var(--text);
+  user-select: none;
 }
 
-.checkbox {
+.checkbox,
+.checklistCard input[type="checkbox"] {
   appearance: none;
   -webkit-appearance: none;
   width: 20px;
   height: 20px;
   flex: none;
-  margin-top: 2px;
+  margin-top: 3px;
   border: 1.5px solid var(--border);
   border-radius: 6px;
   background: var(--bg);
@@ -503,12 +509,14 @@
     border-color 0.15s;
 }
 
-.checkbox:checked {
+.checkbox:checked,
+.checklistCard input[type="checkbox"]:checked {
   background: var(--accent);
   border-color: var(--accent);
 }
 
-.checkbox:checked::after {
+.checkbox:checked::after,
+.checklistCard input[type="checkbox"]:checked::after {
   content: "";
   position: absolute;
   left: 6px;
@@ -520,8 +528,13 @@
   transform: rotate(40deg);
 }
 
+.checkedItem label,
 .checklistCard li:has(input:checked) label {
   color: var(--text-dimmer);
+}
+
+.checkedItem .checkboxLabelText,
+.checklistCard li:has(input:checked) span {
   text-decoration: line-through;
 }
 

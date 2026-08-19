@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import MermaidDiagram from "@/components/docs/MermaidDiagram";
+import { ChecklistCard } from "./ChecklistCard";
 import styles from "./page.module.css";
 import { TocObserver } from "./TocObserver";
 
@@ -601,14 +602,35 @@ export default function GithubCopilotPage() {
           繰り返し使うプロンプトは
           <code>.prompt.md</code> ファイルとして保存し、スラッシュコマンドのように呼び出せます。
         </p>
-        <pre>
-          <code className="language-markdown">
-            --- mode: 'agent' tools: ['githubRepo', 'codebase'] description:
-            'Reactフォームコンポーネントを新規生成する' --- あなたの目標は #githubRepo
-            contoso/react-templates のテンプレートを参考に、
+        <pre className={styles.codeBlock}>
+          <div className={styles.codeLine}>
+            <span className={styles.ck}>---</span>
+          </div>
+          <div className={styles.codeLine}>
+            <span className={styles.ck}>mode</span>:{" "}
+            <span className={styles.cs}>&apos;agent&apos;</span>
+          </div>
+          <div className={styles.codeLine}>
+            <span className={styles.ck}>tools</span>: [
+            <span className={styles.cs}>&apos;githubRepo&apos;</span>,{" "}
+            <span className={styles.cs}>&apos;codebase&apos;</span>]
+          </div>
+          <div className={styles.codeLine}>
+            <span className={styles.ck}>description</span>:{" "}
+            <span className={styles.cs}>&apos;Reactフォームコンポーネントを新規生成する&apos;</span>
+          </div>
+          <div className={styles.codeLine}>
+            <span className={styles.ck}>---</span>
+          </div>
+          <div className={styles.codeLine}>
+            あなたの目標は #githubRepo contoso/react-templates のテンプレートを参考に、
+          </div>
+          <div className={styles.codeLine}>
             新しいReactフォームコンポーネントを生成することです。
+          </div>
+          <div className={styles.codeLine}>
             フォーム名とフィールドが未指定の場合は質問してください。
-          </code>
+          </div>
         </pre>
         <div className={styles.tableScroll}>
           <table>
@@ -674,14 +696,40 @@ export default function GithubCopilotPage() {
           <code>.agent.md</code>
           ファイルを使うと、特化型のペルソナ(コードレビュー専任、テスト専任、セキュリティ監査専任など)を定義できます。
         </p>
-        <pre>
-          <code className="language-markdown">
-            --- description: 'テストカバレッジと品質、テストのベストプラクティスに特化' name: 'Test
-            Specialist' tools: ['read', 'edit', 'search'] model: 'Claude Sonnet 4.5' target:
-            'vscode' --- あなたはテスト専門のスペシャリストです。
-            実装の前に必ずテストケースの網羅性を確認し、
-            エッジケースを洗い出してから実装を進めてください。
-          </code>
+        <pre className={styles.codeBlock}>
+          <div className={styles.codeLine}>
+            <span className={styles.ck}>---</span>
+          </div>
+          <div className={styles.codeLine}>
+            <span className={styles.ck}>description</span>:{" "}
+            <span className={styles.cs}>
+              &apos;テストカバレッジと品質、テストのベストプラクティスに特化&apos;
+            </span>
+          </div>
+          <div className={styles.codeLine}>
+            <span className={styles.ck}>name</span>:{" "}
+            <span className={styles.cs}>&apos;Test Specialist&apos;</span>
+          </div>
+          <div className={styles.codeLine}>
+            <span className={styles.ck}>tools</span>: [
+            <span className={styles.cs}>&apos;read&apos;</span>,{" "}
+            <span className={styles.cs}>&apos;edit&apos;</span>,{" "}
+            <span className={styles.cs}>&apos;search&apos;</span>]
+          </div>
+          <div className={styles.codeLine}>
+            <span className={styles.ck}>model</span>:{" "}
+            <span className={styles.cs}>&apos;Claude Sonnet 4.5&apos;</span>
+          </div>
+          <div className={styles.codeLine}>
+            <span className={styles.ck}>target</span>:{" "}
+            <span className={styles.cs}>&apos;vscode&apos;</span>
+          </div>
+          <div className={styles.codeLine}>
+            <span className={styles.ck}>---</span>
+          </div>
+          <div className={styles.codeLine}>あなたはテスト専門のスペシャリストです。</div>
+          <div className={styles.codeLine}>実装の前に必ずテストケースの網羅性を確認し、</div>
+          <div className={styles.codeLine}>エッジケースを洗い出してから実装を進めてください。</div>
         </pre>
         <div className={styles.tableScroll}>
           <table>
@@ -1387,92 +1435,7 @@ export default function GithubCopilotPage() {
         </blockquote>
         <hr />
         <h2 id="16-ベストプラクティスチェックリスト">16. ベストプラクティスチェックリスト</h2>
-        <div className={styles.checklistCard}>
-          <ul className={styles.taskList}>
-            <li>
-              <label>
-                <input type="checkbox" readOnly />
-                タスクの性質に応じてAsk / Edit / Agentモードを使い分けている
-              </label>
-            </li>
-            <li>
-              <label>
-                <input type="checkbox" readOnly />
-                <code>.github/copilot-instructions.md</code>
-                を用意し、ビルド・テスト・コーディング規約を簡潔に明記している
-              </label>
-            </li>
-            <li>
-              <label>
-                <input type="checkbox" readOnly />
-                エージェント的タスク向けに
-                <code>AGENTS.md</code> を用意している(必要な場合)
-              </label>
-            </li>
-            <li>
-              <label>
-                <input type="checkbox" readOnly />
-                繰り返すプロンプトは
-                <code>.prompt.md</code> 化している
-              </label>
-            </li>
-            <li>
-              <label>
-                <input type="checkbox" readOnly />
-                チームのナレッジベースをCopilot Spacesとして整理している
-              </label>
-            </li>
-            <li>
-              <label>
-                <input type="checkbox" readOnly />
-                複雑な機能追加では「プロトタイプ→計画→Autopilot実装→人間レビュー→Rubber
-                Duckレビュー」の流れを踏んでいる
-              </label>
-            </li>
-            <li>
-              <label>
-                <input type="checkbox" readOnly />
-                YOLOモード(Allow All)は必ずサンドボックス環境内でのみ使用している
-              </label>
-            </li>
-            <li>
-              <label>
-                <input type="checkbox" readOnly />
-                Coding AgentへのIssueアサインでは、スコープと受け入れ条件を明確に記述している
-              </label>
-            </li>
-            <li>
-              <label>
-                <input type="checkbox" readOnly />
-                Copilot Code ReviewのMCP/Agent Skills設定を、チームの内部標準に合わせて整えている
-              </label>
-            </li>
-            <li>
-              <label>
-                <input type="checkbox" readOnly />
-                MCPで取得した外部情報を「信頼できない入力」として扱っている
-              </label>
-            </li>
-            <li>
-              <label>
-                <input type="checkbox" readOnly />
-                タスクの難易度に応じてモデルを選び、作業単位内ではモデル・推論レベルを変えていない
-              </label>
-            </li>
-            <li>
-              <label>
-                <input type="checkbox" readOnly />
-                AIが生成したコードは必ず自分でテスト・レビューしてからマージしている
-              </label>
-            </li>
-            <li>
-              <label>
-                <input type="checkbox" readOnly />
-                チームのAI Credits使用状況を定期的に可視化・レビューしている
-              </label>
-            </li>
-          </ul>
-        </div>
+        <ChecklistCard />
         <hr />
         <h2 id="17-参考文献">17. 参考文献</h2>
         <div className={styles.refGrid}>
