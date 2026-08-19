@@ -20,12 +20,13 @@
 
 ## 最近の追加内容
 
-- **Gemini マルチエージェント開発 ベストプラクティス完全ガイド（/google/multi-agent-best-practices）の Next.js アプリ移行**:
+- **Gemini マルチエージェント開発 ベストプラクティス完全ガイド（/google/multi-agent-best-practices）の Next.js アプリ移行 & コードブロック構文ハイライト化**:
   - `Gemini-multi-agent-best-practices.html` を `web-next/app/google/multi-agent-best-practices/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。
   - 要約・省略一切なしで全16章（0. はじめに〜15. 参考文献・出典）、全56サブセクション（h3）、全表（12個）、全コードブロック（28個）、8個のMermaid図解（`MermaidDiagram`）、TOCスクロール追従・モバイルドロワー（`TocObserver.tsx`）、全7項目の実践チェックリスト、全7項目のセキュリティチェックリスト、全22件の参考文献・外部リンク安全属性（`target="_blank" rel="noopener noreferrer"`）、全幅レイアウトを完全再現。
+  - **コードブロックの構文ハイライト & CopyButton 全件適用**: 全28個のコードブロック（markdown, json, gitignore, toml, python, bash, text）に対して `<CodeCopyButton text={...} />`、`<div className={styles.codeLine}>`、および Atom One Dark 準拠の構文トークンクラス（`.ck`, `.cs`, `.cc`, `.cv`, `.cf`, `.cn`, `.ct`, `.cp`, `.cm`）を適用。波括弧の JSX エスケープ（`{"{"}`, `{"}"}`）とインデント保護（`{"  "}`）を徹底。
   - 原本 `Gemini-multi-agent-best-practices.html` は `archive/html/google/Gemini-multi-agent-best-practices.html` へ退避保存。
   - 原本照合監査スクリプト `audit_source_parity.mjs` で exit code 0（漏れなし ✅）を確認。
-  - `web-next/lib/page-registry.ts` に新規エントリ（`slug: "/google/multi-agent-best-practices"`）を登録。
+  - `web-next/lib/page-registry.ts` に新規エントリ（`slug: "/google/multi-agent-best-practices"`）を登録し、グローバルナビゲーション（`components/site/nav-links.ts`）に自動導出。
   - 契約テスト20件（S-1〜S-4, C-1〜C-6, D-5〜D-8, Q-2〜Q-3）を作成し、Vitest **170 files / 1539 tests** 全 Green ✅、typecheck ✅、Biome lint ✅ を確認。
 
 
