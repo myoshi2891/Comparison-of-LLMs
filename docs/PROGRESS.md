@@ -2,7 +2,7 @@
 
 > 本ファイルは Next.js 移行完了後の保守・改善フェーズにおける開発の進捗（特にテスト関連）および品質チェックのルールを記録する。
 >
-> - 最終更新日: **Updated 2026-08-14**
+> - 最終更新日: **Updated 2026-08-19**
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
 
@@ -12,13 +12,20 @@
 - **ブランチ**: `dev`（本番 `main` への Next.js 移行マージ完了 🚀）
 - **動作検証**:
   - `bun run build`: 今回はユーザー指定により未実行（直近の成功記録は 2026-08-13。許可環境または CI で再確認する）
-  - `npm run typecheck` ✅（`tsc --noEmit`。2026-08-14 実測）
-  - `npm run lint` ✅（Biome check / 457 files / 0 diagnostics。2026-08-14 実測）
+  - `bun run typecheck` ✅（`tsc --noEmit`。2026-08-19 実測）
+  - `bun run lint` ✅（Biome check / 459 files / 0 diagnostics。2026-08-19 実測）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: `npm test` で Vitest **164 files / 1467 tests すべて合格**（2026-08-14 実測。全 Green ✅）
+  - **フロントエンド (`web-next/`)**: `bun run test` で Vitest **165 files / 1468 tests すべて合格**（2026-08-19 実測。全 Green ✅）
   - **バックエンド (`scraper/`)**: pytest 実行で **43 件すべて合格** (全 Green ✅)
 
 ## 最近の追加内容
+
+- **GitHub Copilot 実践ベストプラクティスガイド（/copilot/github-copilot）の Pure JSX 完全置き換え移行**:
+  - `Github-copilot-best-practices.html` を `web-next/app/copilot/github-copilot/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。
+  - 要約・省略一切なしで全17セクション（1.全体像〜17.参考文献）、全表、全コードブロック、11 Mermaid図解（`MermaidDiagram`）、TOCスクロール追従（`TocObserver.tsx`）、チェックリスト、全43件の参考文献・外部リンク安全属性（`target="_blank" rel="noopener noreferrer"`）を完全再現。
+  - 既存の旧 `/copilot/github-copilot` 画面と完全入れ替え完了。原本 `Github-copilot-best-practices.html` は `archive/html/Microsoft/Github-copilot-best-practices.html` へ退避保存。
+  - 原本照合監査スクリプト `audit_source_parity.mjs` を更新し、`<pre class="mermaid">` の Mermaid ソース認識および `<head>` 内リソース除外に対応。原本照合監査で exit code 0（漏れなし ✅）を確認。
+  - 契約テスト12件および TocObserver テスト5件（計17件）を作成・更新し、Vitest **165 files / 1468 tests** 全 Green ✅、typecheck ✅、Biome lint ✅ を確認。
 
 - **レビュー指摘の再検証 — エージェント案内・フォント公開順序・OpenClaw境界の明確化**:
   - `AGENTS.md`と`GEMINI.md`の検証コマンドをbunへ統一し、`GEMINI.md`の必読順を`CODEX.md`、`CLAUDE.md`、移行文書の順へ同期。
