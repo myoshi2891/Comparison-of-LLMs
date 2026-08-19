@@ -61,7 +61,7 @@ export function TocObserver() {
             !topmost || heading.getBoundingClientRect().top < topmost.getBoundingClientRect().top
               ? heading
               : topmost,
-          undefined,
+          undefined
         );
         if (topmostHeading) {
           const id = topmostHeading.getAttribute("id");
@@ -71,7 +71,7 @@ export function TocObserver() {
           }
         }
       },
-      { rootMargin: "-80px 0px -70% 0px", threshold: 0 },
+      { rootMargin: "-80px 0px -70% 0px", threshold: 0 }
     );
 
     for (const h of headings) {

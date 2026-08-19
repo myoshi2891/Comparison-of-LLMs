@@ -158,7 +158,6 @@ const CHART_11 = `flowchart TD
     AP --> AP6["関係のない話題を1つのChatセッションに詰め込む"]
     AP6 --> Fix6["→ 話題ごとに新しいセッションを開始する"]`;
 
-
 /**
  * Renders the GitHub Copilot Best Practices Guide page.
  */
@@ -177,139 +176,160 @@ export default function GithubCopilotPage() {
       <div className={styles.sidebarOverlay} id="sidebarOverlay" />
 
       <nav className={styles.sidebar} id="sidebar">
-        
-      <div className={styles.sidebarBrand}><span className={styles.mark}>⚙</span>Copilot Guide</div>
-      <p className={styles.sidebarTagline}>Best Practices 2026</p>
-      <ul className={styles.navList}>
-        <li>
-          <a
-            href="#1-github-copilotの全体像2026年時点のプロダクトファミリー"
-            className={styles.navLink}
-            data-id="1-github-copilotの全体像2026年時点のプロダクトファミリー"
-            >1. GitHub Copilotの全体像(2026年時点のプロダクトファミリー)</a
-          >
-        </li>
-        <li>
-          <a
-            href="#2-3つのchatモードを使い分けるask--edit--agent"
-            className={styles.navLink}
-            data-id="2-3つのchatモードを使い分けるask--edit--agent"
-            >2. 3つのChatモードを使い分ける(Ask / Edit / Agent)</a
-          >
-        </li>
-        <li>
-          <a
-            href="#3-カスタムインストラクションの3層構造"
-            className={styles.navLink}
-            data-id="3-カスタムインストラクションの3層構造"
-            >3. カスタムインストラクションの3層構造</a
-          >
-        </li>
-        <li>
-          <a
-            href="#4-プロンプトファイルとカスタムチャットモード"
-            className={styles.navLink}
-            data-id="4-プロンプトファイルとカスタムチャットモード"
-            >4. プロンプトファイルとカスタムチャットモード</a
-          >
-        </li>
-        <li>
-          <a
-            href="#5-カスタムエージェントとサブエージェント"
-            className={styles.navLink}
-            data-id="5-カスタムエージェントとサブエージェント"
-            >5. カスタムエージェントとサブエージェント</a
-          >
-        </li>
-        <li>
-          <a
-            href="#6-copilot-spacesでチームのナレッジベースを構築する"
-            className={styles.navLink}
-            data-id="6-copilot-spacesでチームのナレッジベースを構築する"
-            >6. Copilot Spacesでチームのナレッジベースを構築する</a
-          >
-        </li>
-        <li>
-          <a
-            href="#7-エージェントモード実践ワークフロー8ステップ"
-            className={styles.navLink}
-            data-id="7-エージェントモード実践ワークフロー8ステップ"
-            >7. エージェントモード実践ワークフロー(8ステップ)</a
-          >
-        </li>
-        <li>
-          <a
-            href="#8-github-copilot-cliを使いこなす"
-            className={styles.navLink}
-            data-id="8-github-copilot-cliを使いこなす"
-            >8. GitHub Copilot CLIを使いこなす</a
-          >
-        </li>
-        <li>
-          <a
-            href="#9-coding-agentクラウドエージェントにissueを任せる"
-            className={styles.navLink}
-            data-id="9-coding-agentクラウドエージェントにissueを任せる"
-            >9. Coding Agent(クラウドエージェント)にIssueを任せる</a
-          >
-        </li>
-        <li>
-          <a
-            href="#10-copilot-code-review--agent-skillsとmcpの活用"
-            className={styles.navLink}
-            data-id="10-copilot-code-review--agent-skillsとmcpの活用"
-            >10. Copilot Code Review — Agent SkillsとMCPの活用</a
-          >
-        </li>
-        <li>
-          <a
-            href="#11-mcpサーバー統合のベストプラクティス"
-            className={styles.navLink}
-            data-id="11-mcpサーバー統合のベストプラクティス"
-            >11. MCPサーバー統合のベストプラクティス</a
-          >
-        </li>
-        <li>
-          <a href="#12-モデル選定戦略" className={styles.navLink} data-id="12-モデル選定戦略"
-            >12. モデル選定戦略</a
-          >
-        </li>
-        <li>
-          <a
-            href="#13-セキュリティと責任あるai活用"
-            className={styles.navLink}
-            data-id="13-セキュリティと責任あるai活用"
-            >13. セキュリティと責任あるAI活用</a
-          >
-        </li>
-        <li>
-          <a
-            href="#14-コストとai-creditsの管理"
-            className={styles.navLink}
-            data-id="14-コストとai-creditsの管理"
-            >14. コストとAI Creditsの管理</a
-          >
-        </li>
-        <li>
-          <a href="#15-よくあるアンチパターン" className={styles.navLink} data-id="15-よくあるアンチパターン"
-            >15. よくあるアンチパターン</a
-          >
-        </li>
-        <li>
-          <a
-            href="#16-ベストプラクティスチェックリスト"
-            className={styles.navLink}
-            data-id="16-ベストプラクティスチェックリスト"
-            >16. ベストプラクティスチェックリスト</a
-          >
-        </li>
-        <li><a href="#17-参考文献" className={styles.navLink} data-id="17-参考文献">17. 参考文献</a></li>
-      </ul>
-    
+        <div className={styles.sidebarBrand}>
+          <span className={styles.mark}>⚙</span>Copilot Guide
+        </div>
+        <p className={styles.sidebarTagline}>Best Practices 2026</p>
+        <ul className={styles.navList}>
+          <li>
+            <a
+              href="#1-github-copilotの全体像2026年時点のプロダクトファミリー"
+              className={styles.navLink}
+              data-id="1-github-copilotの全体像2026年時点のプロダクトファミリー"
+            >
+              1. GitHub Copilotの全体像(2026年時点のプロダクトファミリー)
+            </a>
+          </li>
+          <li>
+            <a
+              href="#2-3つのchatモードを使い分けるask--edit--agent"
+              className={styles.navLink}
+              data-id="2-3つのchatモードを使い分けるask--edit--agent"
+            >
+              2. 3つのChatモードを使い分ける(Ask / Edit / Agent)
+            </a>
+          </li>
+          <li>
+            <a
+              href="#3-カスタムインストラクションの3層構造"
+              className={styles.navLink}
+              data-id="3-カスタムインストラクションの3層構造"
+            >
+              3. カスタムインストラクションの3層構造
+            </a>
+          </li>
+          <li>
+            <a
+              href="#4-プロンプトファイルとカスタムチャットモード"
+              className={styles.navLink}
+              data-id="4-プロンプトファイルとカスタムチャットモード"
+            >
+              4. プロンプトファイルとカスタムチャットモード
+            </a>
+          </li>
+          <li>
+            <a
+              href="#5-カスタムエージェントとサブエージェント"
+              className={styles.navLink}
+              data-id="5-カスタムエージェントとサブエージェント"
+            >
+              5. カスタムエージェントとサブエージェント
+            </a>
+          </li>
+          <li>
+            <a
+              href="#6-copilot-spacesでチームのナレッジベースを構築する"
+              className={styles.navLink}
+              data-id="6-copilot-spacesでチームのナレッジベースを構築する"
+            >
+              6. Copilot Spacesでチームのナレッジベースを構築する
+            </a>
+          </li>
+          <li>
+            <a
+              href="#7-エージェントモード実践ワークフロー8ステップ"
+              className={styles.navLink}
+              data-id="7-エージェントモード実践ワークフロー8ステップ"
+            >
+              7. エージェントモード実践ワークフロー(8ステップ)
+            </a>
+          </li>
+          <li>
+            <a
+              href="#8-github-copilot-cliを使いこなす"
+              className={styles.navLink}
+              data-id="8-github-copilot-cliを使いこなす"
+            >
+              8. GitHub Copilot CLIを使いこなす
+            </a>
+          </li>
+          <li>
+            <a
+              href="#9-coding-agentクラウドエージェントにissueを任せる"
+              className={styles.navLink}
+              data-id="9-coding-agentクラウドエージェントにissueを任せる"
+            >
+              9. Coding Agent(クラウドエージェント)にIssueを任せる
+            </a>
+          </li>
+          <li>
+            <a
+              href="#10-copilot-code-review--agent-skillsとmcpの活用"
+              className={styles.navLink}
+              data-id="10-copilot-code-review--agent-skillsとmcpの活用"
+            >
+              10. Copilot Code Review — Agent SkillsとMCPの活用
+            </a>
+          </li>
+          <li>
+            <a
+              href="#11-mcpサーバー統合のベストプラクティス"
+              className={styles.navLink}
+              data-id="11-mcpサーバー統合のベストプラクティス"
+            >
+              11. MCPサーバー統合のベストプラクティス
+            </a>
+          </li>
+          <li>
+            <a href="#12-モデル選定戦略" className={styles.navLink} data-id="12-モデル選定戦略">
+              12. モデル選定戦略
+            </a>
+          </li>
+          <li>
+            <a
+              href="#13-セキュリティと責任あるai活用"
+              className={styles.navLink}
+              data-id="13-セキュリティと責任あるai活用"
+            >
+              13. セキュリティと責任あるAI活用
+            </a>
+          </li>
+          <li>
+            <a
+              href="#14-コストとai-creditsの管理"
+              className={styles.navLink}
+              data-id="14-コストとai-creditsの管理"
+            >
+              14. コストとAI Creditsの管理
+            </a>
+          </li>
+          <li>
+            <a
+              href="#15-よくあるアンチパターン"
+              className={styles.navLink}
+              data-id="15-よくあるアンチパターン"
+            >
+              15. よくあるアンチパターン
+            </a>
+          </li>
+          <li>
+            <a
+              href="#16-ベストプラクティスチェックリスト"
+              className={styles.navLink}
+              data-id="16-ベストプラクティスチェックリスト"
+            >
+              16. ベストプラクティスチェックリスト
+            </a>
+          </li>
+          <li>
+            <a href="#17-参考文献" className={styles.navLink} data-id="17-参考文献">
+              17. 参考文献
+            </a>
+          </li>
+        </ul>
       </nav>
 
       <main className={styles.main} id="main">
-        
         <div className={styles.hero}>
           <p className={styles.eyebrow}>GitHub Copilot 実践ガイド</p>
           <h1>GitHub Copilot 実践ベストプラクティスガイド</h1>
@@ -355,7 +375,9 @@ export default function GithubCopilotPage() {
               <tr className="odd">
                 <td>インライン補完 / Next Edit Suggestions</td>
                 <td>1行〜数行単位の即時補完。無制限・無料枠あり</td>
-                <td><code>docs.github.com/copilot</code></td>
+                <td>
+                  <code>docs.github.com/copilot</code>
+                </td>
               </tr>
               <tr className="even">
                 <td>Copilot Chat(Ask/Edit/Agent)</td>
@@ -365,22 +387,30 @@ export default function GithubCopilotPage() {
               <tr className="odd">
                 <td>Copilot CLI</td>
                 <td>ターミナルでのエージェント作業、Plan/Autopilot</td>
-                <td><code>docs.github.com/copilot/how-tos/copilot-cli</code></td>
+                <td>
+                  <code>docs.github.com/copilot/how-tos/copilot-cli</code>
+                </td>
               </tr>
               <tr className="even">
                 <td>Copilot Coding Agent(クラウド)</td>
                 <td>Issueをバックグラウンドで自律的に処理しPRを作成</td>
-                <td><code>docs.github.com/copilot/how-tos/agents</code></td>
+                <td>
+                  <code>docs.github.com/copilot/how-tos/agents</code>
+                </td>
               </tr>
               <tr className="odd">
                 <td>Copilot Code Review</td>
                 <td>PRの自動レビュー。Agent Skills / MCPに対応(2026年7月29日GA)</td>
-                <td><code>docs.github.com/copilot/using-github-copilot/code-review</code></td>
+                <td>
+                  <code>docs.github.com/copilot/using-github-copilot/code-review</code>
+                </td>
               </tr>
               <tr className="even">
                 <td>Copilot Spaces</td>
                 <td>コード・ドキュメント・Issueを束ねたチームのナレッジベース</td>
-                <td><code>docs.github.com</code> / Microsoft Learn</td>
+                <td>
+                  <code>docs.github.com</code> / Microsoft Learn
+                </td>
               </tr>
               <tr className="odd">
                 <td>Copilot App</td>
@@ -391,7 +421,9 @@ export default function GithubCopilotPage() {
           </table>
         </div>
         <p>
-          各サーフェスの詳細な挙動は異なりますが、<strong>同じハーネス(harness)を共有している</strong>ため、一度使い方を覚えればどこでも応用できます。GitHubのBurke
+          各サーフェスの詳細な挙動は異なりますが、
+          <strong>同じハーネス(harness)を共有している</strong>
+          ため、一度使い方を覚えればどこでも応用できます。GitHubのBurke
           Holland氏はこれを次のように表現しています——学ぶべきは個々の小技ではなく、ハーネスそのものの使い方だという考え方です。
         </p>
         <blockquote>
@@ -421,19 +453,25 @@ export default function GithubCopilotPage() {
             </thead>
             <tbody>
               <tr className="odd">
-                <td><strong>Ask</strong></td>
+                <td>
+                  <strong>Ask</strong>
+                </td>
                 <td>ファイルを変更せず回答のみ</td>
                 <td>コードの説明、設計相談、概念の理解</td>
                 <td>最も安価</td>
               </tr>
               <tr className="even">
-                <td><strong>Edit</strong></td>
+                <td>
+                  <strong>Edit</strong>
+                </td>
                 <td>選択中のファイル内でピンポイントに編集</td>
                 <td>対象ファイルが分かっている単純なリファクタ</td>
                 <td>中程度</td>
               </tr>
               <tr className="odd">
-                <td><strong>Agent</strong></td>
+                <td>
+                  <strong>Agent</strong>
+                </td>
                 <td>
                   複数ファイルを横断し、必要なツール・ターミナルコマンドを自律的に呼び出し、エラーを自己修正しながら反復
                 </td>
@@ -443,7 +481,9 @@ export default function GithubCopilotPage() {
             </tbody>
           </table>
         </div>
-        <p><strong>実践のコツ</strong></p>
+        <p>
+          <strong>実践のコツ</strong>
+        </p>
         <ul>
           <li>
             まず <strong>Ask モード</strong>で問題のスコープを固め、要件が固まってから
@@ -482,17 +522,25 @@ export default function GithubCopilotPage() {
             </thead>
             <tbody>
               <tr className="odd">
-                <td><code>.github/copilot-instructions.md</code></td>
+                <td>
+                  <code>.github/copilot-instructions.md</code>
+                </td>
                 <td>リポジトリ全体、全リクエストに常時適用</td>
                 <td>コーディング規約・ビルド/テストコマンド・命名規則</td>
               </tr>
               <tr className="even">
-                <td><code>.github/instructions/*.instructions.md</code></td>
-                <td><code>applyTo</code> で指定したパスのみ(例: <code>**/*.tsx</code>)</td>
+                <td>
+                  <code>.github/instructions/*.instructions.md</code>
+                </td>
+                <td>
+                  <code>applyTo</code> で指定したパスのみ(例: <code>**/*.tsx</code>)
+                </td>
                 <td>フレームワーク別・ファイル種別ごとのルール</td>
               </tr>
               <tr className="odd">
-                <td><code>AGENTS.md</code>(ルートおよびネスト可能)</td>
+                <td>
+                  <code>AGENTS.md</code>(ルートおよびネスト可能)
+                </td>
                 <td>Copilot CLI、Coding Agent、Copilot Chatのエージェント的タスク</td>
                 <td>ビルド・テスト・検証手順など「エージェントが自律的に動く際に必要な情報」</td>
               </tr>
@@ -504,23 +552,24 @@ export default function GithubCopilotPage() {
             </tbody>
           </table>
         </div>
-        <p><strong>ベストプラクティス</strong></p>
+        <p>
+          <strong>ベストプラクティス</strong>
+        </p>
         <ul>
           <li>
             <strong>1指示1文</strong>を徹底する。複数の情報を詰め込みたい場合は箇条書きで分割する。
           </li>
           <li>
-            <strong>理由を書く</strong
-            >。「なぜそのルールが存在するか」を書き添えると、エッジケースでの判断精度が上がる。
+            <strong>理由を書く</strong>
+            。「なぜそのルールが存在するか」を書き添えると、エッジケースでの判断精度が上がる。
           </li>
           <li>
-            <strong>600語を超えない</strong
-            >。インライン提案生成時、Copilotは長大な指示ファイルを全文読み込まない場合があり、実効コンテキストウィンドウを超えた部分は無視される。
+            <strong>600語を超えない</strong>
+            。インライン提案生成時、Copilotは長大な指示ファイルを全文読み込まない場合があり、実効コンテキストウィンドウを超えた部分は無視される。
           </li>
           <li>
-            VS Codeでは <code>/init</code> で既存の規約を検出しつつ雛形を生成、<code
-              >/create-instructions</code
-            >
+            VS Codeでは <code>/init</code> で既存の規約を検出しつつ雛形を生成、
+            <code>/create-instructions</code>
             で特定用途向けの指示を追加生成できる。
           </li>
           <li>
@@ -529,10 +578,12 @@ export default function GithubCopilotPage() {
             の記法で別ファイルを読み込ませることができ、参照先ファイル内のさらなる参照も解決される。
           </li>
           <li>
-            <code>.github/copilot-instructions.md</code> と
-            <code>.cursorrules</code> は似て非なるものであり、<strong
-              >Copilotは <code>.cursorrules</code> を読まない</strong
-            >。
+            <code>.github/copilot-instructions.md</code> と<code>.cursorrules</code>{" "}
+            は似て非なるものであり、
+            <strong>
+              Copilotは <code>.cursorrules</code> を読まない
+            </strong>
+            。
           </li>
         </ul>
         <blockquote>
@@ -550,14 +601,15 @@ export default function GithubCopilotPage() {
           繰り返し使うプロンプトは
           <code>.prompt.md</code> ファイルとして保存し、スラッシュコマンドのように呼び出せます。
         </p>
-        <pre><code className="language-markdown">---
-mode: 'agent'
-tools: ['githubRepo', 'codebase']
-description: 'Reactフォームコンポーネントを新規生成する'
----
-あなたの目標は #githubRepo contoso/react-templates のテンプレートを参考に、
-新しいReactフォームコンポーネントを生成することです。
-フォーム名とフィールドが未指定の場合は質問してください。</code></pre>
+        <pre>
+          <code className="language-markdown">
+            --- mode: 'agent' tools: ['githubRepo', 'codebase'] description:
+            'Reactフォームコンポーネントを新規生成する' --- あなたの目標は #githubRepo
+            contoso/react-templates のテンプレートを参考に、
+            新しいReactフォームコンポーネントを生成することです。
+            フォーム名とフィールドが未指定の場合は質問してください。
+          </code>
+        </pre>
         <div className={styles.tableScroll}>
           <table>
             <thead>
@@ -568,22 +620,30 @@ description: 'Reactフォームコンポーネントを新規生成する'
             </thead>
             <tbody>
               <tr className="odd">
-                <td><code>mode</code></td>
                 <td>
-                  実行時のChatモード(<code>ask</code> / <code>edit</code> /
-                  <code>agent</code>、既定は <code>agent</code>)
+                  <code>mode</code>
+                </td>
+                <td>
+                  実行時のChatモード(<code>ask</code> / <code>edit</code> /<code>agent</code>
+                  、既定は <code>agent</code>)
                 </td>
               </tr>
               <tr className="even">
-                <td><code>tools</code></td>
+                <td>
+                  <code>tools</code>
+                </td>
                 <td>Agentモード時に使用を許可するツール一覧</td>
               </tr>
               <tr className="odd">
-                <td><code>model</code></td>
+                <td>
+                  <code>model</code>
+                </td>
                 <td>使用する特定モデルを固定したい場合に指定</td>
               </tr>
               <tr className="even">
-                <td><code>description</code></td>
+                <td>
+                  <code>description</code>
+                </td>
                 <td>プロンプトの説明(スラッシュコマンド一覧に表示)</td>
               </tr>
             </tbody>
@@ -591,18 +651,19 @@ description: 'Reactフォームコンポーネントを新規生成する'
         </div>
         <p>
           さらに、<code>.chatmode.md</code>
-          を使うと<strong>カスタムチャットモード</strong>を定義でき、特定領域(コードレビュー専任、テスト専任など)にフォーカスしたモードを何個でも作成できます。ただし、カスタムチャットモードもAI
+          を使うと<strong>カスタムチャットモード</strong>
+          を定義でき、特定領域(コードレビュー専任、テスト専任など)にフォーカスしたモードを何個でも作成できます。ただし、カスタムチャットモードもAI
           Creditsを消費するため、無秩序に増やすとコストが見えにくくなる点に注意してください。
         </p>
         <blockquote>
           <p>
             出典: <em>"GitHub Copilot Chat を使う時のTips(Instruction files, Prompt files)"</em>,
             Zenn /
-            <em
-              >"Master GitHub Copilot Customization in VS Code with Instructions and Prompt
-              Files"</em
-            >, Copilot That Jawn / <em>"Blog Post - Modes of Chatting with GitHub Copilot"</em>,
-            CODE Magazine
+            <em>
+              "Master GitHub Copilot Customization in VS Code with Instructions and Prompt Files"
+            </em>
+            , Copilot That Jawn / <em>"Blog Post - Modes of Chatting with GitHub Copilot"</em>, CODE
+            Magazine
           </p>
         </blockquote>
         <hr />
@@ -613,16 +674,15 @@ description: 'Reactフォームコンポーネントを新規生成する'
           <code>.agent.md</code>
           ファイルを使うと、特化型のペルソナ(コードレビュー専任、テスト専任、セキュリティ監査専任など)を定義できます。
         </p>
-        <pre><code className="language-markdown">---
-description: 'テストカバレッジと品質、テストのベストプラクティスに特化'
-name: 'Test Specialist'
-tools: ['read', 'edit', 'search']
-model: 'Claude Sonnet 4.5'
-target: 'vscode'
----
-あなたはテスト専門のスペシャリストです。
-実装の前に必ずテストケースの網羅性を確認し、
-エッジケースを洗い出してから実装を進めてください。</code></pre>
+        <pre>
+          <code className="language-markdown">
+            --- description: 'テストカバレッジと品質、テストのベストプラクティスに特化' name: 'Test
+            Specialist' tools: ['read', 'edit', 'search'] model: 'Claude Sonnet 4.5' target:
+            'vscode' --- あなたはテスト専門のスペシャリストです。
+            実装の前に必ずテストケースの網羅性を確認し、
+            エッジケースを洗い出してから実装を進めてください。
+          </code>
+        </pre>
         <div className={styles.tableScroll}>
           <table>
             <thead>
@@ -635,17 +695,23 @@ target: 'vscode'
             <tbody>
               <tr className="odd">
                 <td>リポジトリレベルのカスタムエージェント</td>
-                <td><code>.github/agents/</code></td>
+                <td>
+                  <code>.github/agents/</code>
+                </td>
                 <td>リポジトリ単位</td>
               </tr>
               <tr className="even">
                 <td>個人のカスタムエージェント</td>
-                <td><code>~/.copilot/agents/</code></td>
+                <td>
+                  <code>~/.copilot/agents/</code>
+                </td>
                 <td>全プロジェクト共通</td>
               </tr>
               <tr className="odd">
                 <td>組織/Enterprise共有エージェント</td>
-                <td><code>agents/</code>(組織レベル)</td>
+                <td>
+                  <code>agents/</code>(組織レベル)
+                </td>
                 <td>組織全体</td>
               </tr>
             </tbody>
@@ -673,38 +739,41 @@ target: 'vscode'
           に一本化されました。Spacesは、コード・Markdown・Issue・PR・アップロードファイル・自由記述テキストなどを1つのコンテキストにまとめ、チームで共有できる仕組みです。
         </p>
         <MermaidDiagram chart={CHART_4} theme="base" themeVariables={COPILOT_THEME_VARS} />
-        <p><strong>活用パターン</strong></p>
+        <p>
+          <strong>活用パターン</strong>
+        </p>
         <ol type="1">
           <li>
-            <strong>プロジェクト専任アシスタント</strong
-            >:主要プロジェクトごとにSpaceを作成し、内部規約に沿ったコード生成・複雑なモジュールの説明・安全なリファクタリングを行わせる。
+            <strong>プロジェクト専任アシスタント</strong>
+            :主要プロジェクトごとにSpaceを作成し、内部規約に沿ったコード生成・複雑なモジュールの説明・安全なリファクタリングを行わせる。
           </li>
           <li>
-            <strong>チームのナレッジベース</strong
-            >:コーディング規約・アーキテクチャ決定・ベストプラクティスを集約し、新人のオンボーディングを加速する。
+            <strong>チームのナレッジベース</strong>
+            :コーディング規約・アーキテクチャ決定・ベストプラクティスを集約し、新人のオンボーディングを加速する。
           </li>
           <li>
-            <strong>API/ドキュメント支援</strong
-            >:APIドキュメントのドラフト作成、README生成、用語の一貫性維持。
+            <strong>API/ドキュメント支援</strong>
+            :APIドキュメントのドラフト作成、README生成、用語の一貫性維持。
           </li>
           <li>
-            <strong>セキュリティ/コンプライアンス</strong
-            >:セキュリティポリシーやコンプライアンスチェックリストを添付し、方針に沿った安全なコードを提案させる。
+            <strong>セキュリティ/コンプライアンス</strong>
+            :セキュリティポリシーやコンプライアンスチェックリストを添付し、方針に沿った安全なコードを提案させる。
           </li>
         </ol>
         <p>
-          <strong>運用のコツ</strong
-          >:1つのSpaceは単一の目的に絞ること。「何でも入れたSpace」は回答精度を落とします。Spaceは組織・チーム・個人ユーザー単位で共有・非公開を選択でき、GitHub上のコンテンツが更新されれば内容も追随して最新化されます。
+          <strong>運用のコツ</strong>
+          :1つのSpaceは単一の目的に絞ること。「何でも入れたSpace」は回答精度を落とします。Spaceは組織・チーム・個人ユーザー単位で共有・非公開を選択でき、GitHub上のコンテンツが更新されれば内容も追随して最新化されます。
         </p>
         <blockquote>
           <p>
             出典:
-            <em
-              >"Turning GitHub Copilot into a 'Best Practices Coach' with Copilot Spaces + a
-              Markdown Knowledge Base"</em
-            >, Microsoft Community Hub, 2026-05-06 /
-            <em>"Sunset notice: Copilot knowledge bases"</em>, GitHub Changelog /
-            <em>"How to use GitHub Copilot Spaces to debug issues faster"</em>, The GitHub Blog
+            <em>
+              "Turning GitHub Copilot into a 'Best Practices Coach' with Copilot Spaces + a Markdown
+              Knowledge Base"
+            </em>
+            , Microsoft Community Hub, 2026-05-06 /<em>"Sunset notice: Copilot knowledge bases"</em>
+            , GitHub Changelog /<em>"How to use GitHub Copilot Spaces to debug issues faster"</em>,
+            The GitHub Blog
           </p>
         </blockquote>
         <hr />
@@ -735,8 +804,9 @@ target: 'vscode'
               <tr className="even">
                 <td>② YOLOモード</td>
                 <td>
-                  エージェントに自律性を与えないと生産性向上は得られない。ただし<strong>ローカルマシンでは実行しない</strong>。GitHub
-                  CodespacesやDev Containerなどサンドボックス環境を使う
+                  エージェントに自律性を与えないと生産性向上は得られない。ただし
+                  <strong>ローカルマシンでは実行しない</strong>。GitHub CodespacesやDev
+                  Containerなどサンドボックス環境を使う
                 </td>
               </tr>
               <tr className="odd">
@@ -796,7 +866,9 @@ target: 'vscode'
           CLIは、ターミナルに常駐するエージェント型アシスタントです。チャットボットとしても使えますが、真価は自律的にコマンドを実行しながらタスクをこなす点にあります。
         </p>
         <MermaidDiagram chart={CHART_6} theme="base" themeVariables={COPILOT_THEME_VARS} />
-        <p><strong>主要なスラッシュコマンド</strong></p>
+        <p>
+          <strong>主要なスラッシュコマンド</strong>
+        </p>
         <div className={styles.tableScroll}>
           <table>
             <thead>
@@ -807,37 +879,53 @@ target: 'vscode'
             </thead>
             <tbody>
               <tr className="odd">
-                <td><code>/help</code></td>
+                <td>
+                  <code>/help</code>
+                </td>
                 <td>最新の利用可能なコマンド一覧を表示(CLIは頻繁に更新されるため都度確認推奨)</td>
               </tr>
               <tr className="even">
-                <td><code>/models</code></td>
+                <td>
+                  <code>/models</code>
+                </td>
                 <td>使用するモデルを切り替え</td>
               </tr>
               <tr className="odd">
-                <td><code>/plan</code>(または <code>Shift+Tab</code>)</td>
+                <td>
+                  <code>/plan</code>(または <code>Shift+Tab</code>)
+                </td>
                 <td>実装前に協働的な計画フェーズへ入る</td>
               </tr>
               <tr className="even">
-                <td><code>/allow-all</code></td>
+                <td>
+                  <code>/allow-all</code>
+                </td>
                 <td>YOLOモード(Allow All)を有効化</td>
               </tr>
               <tr className="odd">
-                <td><code>/sandbox enable</code></td>
+                <td>
+                  <code>/sandbox enable</code>
+                </td>
                 <td>ローカルサンドボックスを有効化(2026年7月時点でPublic Preview)</td>
               </tr>
               <tr className="even">
-                <td><code>--cloud</code></td>
+                <td>
+                  <code>--cloud</code>
+                </td>
                 <td>クラウド側サンドボックスでの実行(同上)</td>
               </tr>
               <tr className="odd">
-                <td><code>--secret-env-vars</code></td>
+                <td>
+                  <code>--secret-env-vars</code>
+                </td>
                 <td>スクリプト実行時に指定したシークレットをログから redact</td>
               </tr>
             </tbody>
           </table>
         </div>
-        <p><strong>ベストプラクティス</strong></p>
+        <p>
+          <strong>ベストプラクティス</strong>
+        </p>
         <ul>
           <li>
             リポジトリインストラクションは常にユーザーレベルのインストラクションより優先されるため、チーム規約の強制に使える。
@@ -874,10 +962,13 @@ target: 'vscode'
           Requestを作成させる仕組みです。
         </p>
         <MermaidDiagram chart={CHART_7} theme="base" themeVariables={COPILOT_THEME_VARS} />
-        <p><strong>タスクを任せる際のベストプラクティス</strong></p>
+        <p>
+          <strong>タスクを任せる際のベストプラクティス</strong>
+        </p>
         <ul>
           <li>
-            Issueには<strong>明確なスコープと受け入れ条件</strong>を書く。曖昧なIssueほどPRの手戻りが増える。
+            Issueには<strong>明確なスコープと受け入れ条件</strong>
+            を書く。曖昧なIssueほどPRの手戻りが増える。
           </li>
           <li>
             リポジトリに一度だけ丁寧な
@@ -885,7 +976,8 @@ target: 'vscode'
             を用意しておくと、以降すべてのタスクの品質が上がる。ビルド/テスト/lintコマンドを明記し、CIで失敗しやすいポイントを減らすことが目的。
           </li>
           <li>
-            PRのマージまでのプロセスは、人間が作成したPRと<strong>全く同じ</strong>。特別扱いせず通常のレビューフローに乗せる。
+            PRのマージまでのプロセスは、人間が作成したPRと<strong>全く同じ</strong>
+            。特別扱いせず通常のレビューフローに乗せる。
           </li>
           <li>
             独立したタスクは複数の並列セッション(ローカル・バックグラウンド・クラウド)で同時に走らせ、セッション一覧から監視できる。
@@ -910,7 +1002,9 @@ target: 'vscode'
           へ移行しました。これはPro・Pro+・Business・Enterpriseの全有償プランで利用可能です。
         </p>
         <MermaidDiagram chart={CHART_8} theme="base" themeVariables={COPILOT_THEME_VARS} />
-        <p><strong>重要なポイント</strong></p>
+        <p>
+          <strong>重要なポイント</strong>
+        </p>
         <div className={styles.tableScroll}>
           <table>
             <thead>
@@ -937,8 +1031,8 @@ target: 'vscode'
               <tr className="odd">
                 <td>読み取り専用の原則</td>
                 <td>
-                  Code
-                  Review中のMCPツール呼び出しは<strong>すべて読み取り専用</strong>に制限されている(書き込み不可)
+                  Code Review中のMCPツール呼び出しは<strong>すべて読み取り専用</strong>
+                  に制限されている(書き込み不可)
                 </td>
               </tr>
               <tr className="even">
@@ -982,7 +1076,9 @@ target: 'vscode'
           Model Context
           Protocol(MCP)により、Copilotは社内ツール・イシュートラッカー・ドキュメントシステムなど外部システムと連携できます。
         </p>
-        <p><strong>Coding AgentおよびCode Reviewの制約(2026年7月時点)</strong></p>
+        <p>
+          <strong>Coding AgentおよびCode Reviewの制約(2026年7月時点)</strong>
+        </p>
         <ul>
           <li>
             <strong>ツールのみサポート</strong>:MCPサーバーが提供する resources や prompts
@@ -997,7 +1093,9 @@ target: 'vscode'
             Agent向けに自動設定され、Issueやプルリクエストなどのデータへのアクセスが可能。
           </li>
         </ul>
-        <p><strong>IDE(VS Code / CLI)でのMCP活用</strong></p>
+        <p>
+          <strong>IDE(VS Code / CLI)でのMCP活用</strong>
+        </p>
         <ul>
           <li>
             VS Codeの <code>#tool名</code> 記法、または「Add Context &gt;
@@ -1008,7 +1106,9 @@ target: 'vscode'
             CLIでも同様にMCPサーバーを設定し、GitHubのMCPサーバーや任意のMCPサーバーと統合可能。
           </li>
         </ul>
-        <p><strong>運用の指針</strong></p>
+        <p>
+          <strong>運用の指針</strong>
+        </p>
         <ol type="1">
           <li>
             まず読み取り専用のMCPサーバー(ドキュメント検索、Issue参照など)から導入し、書き込み権限を伴うMCPは慎重に評価する。
@@ -1022,14 +1122,20 @@ target: 'vscode'
           <p>
             出典: GitHub Docs
             <em>"Model Context Protocol (MCP) and GitHub Copilot cloud agent"</em> /
-            <em>"GitHub Copilot Instructions vs Prompts vs Custom Agents vs Skills vs X vs WHY?"</em
-            >, DEV Community
+            <em>
+              "GitHub Copilot Instructions vs Prompts vs Custom Agents vs Skills vs X vs WHY?"
+            </em>
+            , DEV Community
           </p>
         </blockquote>
         <hr />
         <h2 id="12-モデル選定戦略">12. モデル選定戦略</h2>
         <p>
-          Copilotのモデルピッカーには、Anthropic・OpenAI・Google・xAIなど複数プロバイダーのモデルが並びます。2026年7月時点で確認できる代表的なラインナップは以下の通りです(<strong>プランや管理者設定により利用可否が変わるため、必ず実際のモデルピッカーで確認してください</strong>)。
+          Copilotのモデルピッカーには、Anthropic・OpenAI・Google・xAIなど複数プロバイダーのモデルが並びます。2026年7月時点で確認できる代表的なラインナップは以下の通りです(
+          <strong>
+            プランや管理者設定により利用可否が変わるため、必ず実際のモデルピッカーで確認してください
+          </strong>
+          )。
         </p>
         <div className={styles.tableScroll}>
           <table>
@@ -1095,17 +1201,21 @@ target: 'vscode'
             </tbody>
           </table>
         </div>
-        <p><strong>選定の考え方</strong></p>
+        <p>
+          <strong>選定の考え方</strong>
+        </p>
         <MermaidDiagram chart={CHART_9} theme="base" themeVariables={COPILOT_THEME_VARS} />
-        <p><strong>実践的なヒント</strong></p>
+        <p>
+          <strong>実践的なヒント</strong>
+        </p>
         <ul>
           <li>
-            <strong>1つの機能・バグ修正の作業中はモデルと推論レベルを変えない</strong
-            >。プロンプトキャッシュが効き続け、以降のリクエストが割引価格になる。
+            <strong>1つの機能・バグ修正の作業中はモデルと推論レベルを変えない</strong>
+            。プロンプトキャッシュが効き続け、以降のリクエストが割引価格になる。
           </li>
           <li>
-            重要な実装の最終確認には、<strong>別系統のモデルによる「Rubber Duckレビュー」</strong
-            >(第7章参照)を組み合わせると、単一モデルの盲点を補完できる。
+            重要な実装の最終確認には、<strong>別系統のモデルによる「Rubber Duckレビュー」</strong>
+            (第7章参照)を組み合わせると、単一モデルの盲点を補完できる。
           </li>
           <li>
             モデルによってデータ保持ポリシー・ホスティング先(AWS/Anthropic/GCP/xAI等)が異なるため、機密性の高いプロジェクトではモデルごとのデータ取り扱いポリシーを確認する。
@@ -1122,15 +1232,19 @@ target: 'vscode'
         <hr />
         <h2 id="13-セキュリティと責任あるai活用">13. セキュリティと責任あるAI活用</h2>
         <p>
-          AIコーディングエージェントは、リポジトリ内のコード・コメント・Issue・PRコメント・ツール出力など、<strong>エージェントが理解するために読み込む情報そのもの</strong>を攻撃経路として悪用される可能性があります。これはCopilotに限らず、Claude
-          Code・Gemini CLIなど同種のエージェント全般に共通するリスクです。
+          AIコーディングエージェントは、リポジトリ内のコード・コメント・Issue・PRコメント・ツール出力など、
+          <strong>エージェントが理解するために読み込む情報そのもの</strong>
+          を攻撃経路として悪用される可能性があります。これはCopilotに限らず、Claude Code・Gemini
+          CLIなど同種のエージェント全般に共通するリスクです。
         </p>
         <MermaidDiagram chart={CHART_10} theme="base" themeVariables={COPILOT_THEME_VARS} />
-        <p><strong>知っておくべき既知の事例</strong></p>
+        <p>
+          <strong>知っておくべき既知の事例</strong>
+        </p>
         <ul>
           <li>
-            <strong>CVE-2025-53773</strong
-            >:リポジトリ内のソースコードに埋め込まれたインジェクションペイロードが、エージェントに任意のターミナルコマンドを実行させた脆弱性(CVSS
+            <strong>CVE-2025-53773</strong>
+            :リポジトリ内のソースコードに埋め込まれたインジェクションペイロードが、エージェントに任意のターミナルコマンドを実行させた脆弱性(CVSS
             9.6)。特別な権限昇格を必要とせず、エージェントの通常の「コードを読む」挙動だけで発火した点が特徴。
           </li>
           <li>
@@ -1139,37 +1253,41 @@ target: 'vscode'
             Agentのコミットは常に監査可能かつ人間との共著扱いにする、といった防御策を講じています。
           </li>
         </ul>
-        <p><strong>実務での対応</strong></p>
+        <p>
+          <strong>実務での対応</strong>
+        </p>
         <ol type="1">
           <li>
-            <strong>リポジトリ内のテキストはすべて「信頼できない入力」として扱う</strong
-            >。ソースファイル・コメント・Issue説明・PRディスカッション・ドキュメント・コミットメッセージ・テスト出力・ターミナルログのいずれも例外ではない。
+            <strong>リポジトリ内のテキストはすべて「信頼できない入力」として扱う</strong>
+            。ソースファイル・コメント・Issue説明・PRディスカッション・ドキュメント・コミットメッセージ・テスト出力・ターミナルログのいずれも例外ではない。
           </li>
           <li>
-            <strong>YOLOモード(Allow All)は必ずサンドボックスの中で使う</strong
-            >。ローカルマシン上、特に業務用途では実行しない。GitHub CodespacesやDev
+            <strong>YOLOモード(Allow All)は必ずサンドボックスの中で使う</strong>
+            。ローカルマシン上、特に業務用途では実行しない。GitHub CodespacesやDev
             Containerなど使い捨て可能な環境を使う。
           </li>
           <li>
-            <strong>エージェントの成果物は常に「ドラフト」として扱う</strong
-            >。読み、テストし、リファクタリングし、Pull
+            <strong>エージェントの成果物は常に「ドラフト」として扱う</strong>
+            。読み、テストし、リファクタリングし、Pull
             Requestに載せる前に自分のものとして理解・検証する。
           </li>
           <li>
-            <strong>権限境界を明確にする</strong
-            >。エージェントが読み書き・実行できる範囲を最小化し、シークレットや不要な環境変数をプロンプトに含めない。
+            <strong>権限境界を明確にする</strong>
+            。エージェントが読み書き・実行できる範囲を最小化し、シークレットや不要な環境変数をプロンプトに含めない。
           </li>
           <li>
-            <strong>セキュリティ機能を併用する</strong
-            >。Copilot自体が提供するハードコードされた認証情報やSQLインジェクションのフィルタ、Copilot
+            <strong>セキュリティ機能を併用する</strong>
+            。Copilot自体が提供するハードコードされた認証情報やSQLインジェクションのフィルタ、Copilot
             Autofixに加え、静的/動的解析ツールとの併用が推奨される。
           </li>
         </ol>
         <blockquote>
           <p>
             出典:
-            <em>"AI Agent Security Practices 2026: Prompt Injection, MCP Risks &amp; Data Leaks"</em
-            >, TechStoriess.com /
+            <em>
+              "AI Agent Security Practices 2026: Prompt Injection, MCP Risks &amp; Data Leaks"
+            </em>
+            , TechStoriess.com /
             <em>"GitHub Copilot Security: Risks, Controls, and Best Practices"</em>, CybeDefend /
             <em>"GitHub Copilot Security: Risks, Built-In Controls, and Best Practices"</em>,
             Checkmarx /
@@ -1223,23 +1341,25 @@ target: 'vscode'
             </tbody>
           </table>
         </div>
-        <p><strong>コストを抑えるための実践</strong></p>
+        <p>
+          <strong>コストを抑えるための実践</strong>
+        </p>
         <ul>
           <li>
-            <strong>モードを使い分ける</strong
-            >:調査・学習にはAsk、範囲が明確な修正にはEdit、複雑なタスクにのみAgentを使う(第2章参照)。
+            <strong>モードを使い分ける</strong>
+            :調査・学習にはAsk、範囲が明確な修正にはEdit、複雑なタスクにのみAgentを使う(第2章参照)。
           </li>
           <li>
-            <strong>モデルと推論レベルを不用意に切り替えない</strong
-            >:プロンプトキャッシュの割引を維持するため、1つの作業単位の中では固定する。
+            <strong>モデルと推論レベルを不用意に切り替えない</strong>
+            :プロンプトキャッシュの割引を維持するため、1つの作業単位の中では固定する。
           </li>
           <li>
-            <strong>軽量タスクには軽量モデルを使う</strong
-            >:全てのタスクに最上位モデルを使う必要はない。
+            <strong>軽量タスクには軽量モデルを使う</strong>
+            :全てのタスクに最上位モデルを使う必要はない。
           </li>
           <li>
-            <strong>チーム全体の利用状況を可視化する</strong
-            >:Chat・CLI・Spaces・クラウドエージェント・サードパーティエージェント・Code
+            <strong>チーム全体の利用状況を可視化する</strong>
+            :Chat・CLI・Spaces・クラウドエージェント・サードパーティエージェント・Code
             Reviewの利用状況をモニタリングし、コストとROIをセットで追跡する。
           </li>
           <li>Copilot Code Reviewは実行にGitHub Actionsの分数も消費する点に留意する。</li>
@@ -1270,79 +1390,86 @@ target: 'vscode'
         <div className={styles.checklistCard}>
           <ul className={styles.taskList}>
             <li>
-              <label
-                ><input type="checkbox" readOnly />タスクの性質に応じてAsk / Edit /
-                Agentモードを使い分けている</label
-              >
+              <label>
+                <input type="checkbox" readOnly />
+                タスクの性質に応じてAsk / Edit / Agentモードを使い分けている
+              </label>
             </li>
             <li>
-              <label
-                ><input type="checkbox" readOnly /><code>.github/copilot-instructions.md</code>
-                を用意し、ビルド・テスト・コーディング規約を簡潔に明記している</label
-              >
+              <label>
+                <input type="checkbox" readOnly />
+                <code>.github/copilot-instructions.md</code>
+                を用意し、ビルド・テスト・コーディング規約を簡潔に明記している
+              </label>
             </li>
             <li>
-              <label
-                ><input type="checkbox" readOnly />エージェント的タスク向けに
-                <code>AGENTS.md</code> を用意している(必要な場合)</label
-              >
+              <label>
+                <input type="checkbox" readOnly />
+                エージェント的タスク向けに
+                <code>AGENTS.md</code> を用意している(必要な場合)
+              </label>
             </li>
             <li>
-              <label
-                ><input type="checkbox" readOnly />繰り返すプロンプトは
-                <code>.prompt.md</code> 化している</label
-              >
+              <label>
+                <input type="checkbox" readOnly />
+                繰り返すプロンプトは
+                <code>.prompt.md</code> 化している
+              </label>
             </li>
             <li>
-              <label
-                ><input type="checkbox" readOnly />チームのナレッジベースをCopilot
-                Spacesとして整理している</label
-              >
+              <label>
+                <input type="checkbox" readOnly />
+                チームのナレッジベースをCopilot Spacesとして整理している
+              </label>
             </li>
             <li>
-              <label
-                ><input type="checkbox" readOnly />複雑な機能追加では「プロトタイプ→計画→Autopilot実装→人間レビュー→Rubber
-                Duckレビュー」の流れを踏んでいる</label
-              >
+              <label>
+                <input type="checkbox" readOnly />
+                複雑な機能追加では「プロトタイプ→計画→Autopilot実装→人間レビュー→Rubber
+                Duckレビュー」の流れを踏んでいる
+              </label>
             </li>
             <li>
-              <label
-                ><input type="checkbox" readOnly />YOLOモード(Allow
-                All)は必ずサンドボックス環境内でのみ使用している</label
-              >
+              <label>
+                <input type="checkbox" readOnly />
+                YOLOモード(Allow All)は必ずサンドボックス環境内でのみ使用している
+              </label>
             </li>
             <li>
-              <label
-                ><input type="checkbox" readOnly />Coding
-                AgentへのIssueアサインでは、スコープと受け入れ条件を明確に記述している</label
-              >
+              <label>
+                <input type="checkbox" readOnly />
+                Coding AgentへのIssueアサインでは、スコープと受け入れ条件を明確に記述している
+              </label>
             </li>
             <li>
-              <label
-                ><input type="checkbox" readOnly />Copilot Code ReviewのMCP/Agent
-                Skills設定を、チームの内部標準に合わせて整えている</label
-              >
+              <label>
+                <input type="checkbox" readOnly />
+                Copilot Code ReviewのMCP/Agent Skills設定を、チームの内部標準に合わせて整えている
+              </label>
             </li>
             <li>
-              <label
-                ><input type="checkbox" readOnly />MCPで取得した外部情報を「信頼できない入力」として扱っている</label
-              >
+              <label>
+                <input type="checkbox" readOnly />
+                MCPで取得した外部情報を「信頼できない入力」として扱っている
+              </label>
             </li>
             <li>
-              <label
-                ><input type="checkbox" readOnly />タスクの難易度に応じてモデルを選び、作業単位内ではモデル・推論レベルを変えていない</label
-              >
+              <label>
+                <input type="checkbox" readOnly />
+                タスクの難易度に応じてモデルを選び、作業単位内ではモデル・推論レベルを変えていない
+              </label>
             </li>
             <li>
-              <label
-                ><input type="checkbox" readOnly />AIが生成したコードは必ず自分でテスト・レビューしてからマージしている</label
-              >
+              <label>
+                <input type="checkbox" readOnly />
+                AIが生成したコードは必ず自分でテスト・レビューしてからマージしている
+              </label>
             </li>
             <li>
-              <label
-                ><input type="checkbox" readOnly />チームのAI
-                Credits使用状況を定期的に可視化・レビューしている</label
-              >
+              <label>
+                <input type="checkbox" readOnly />
+                チームのAI Credits使用状況を定期的に可視化・レビューしている
+              </label>
             </li>
           </ul>
         </div>
@@ -1354,122 +1481,227 @@ target: 'vscode'
             <ul>
               <li>
                 GitHub Docs, <em>"Adding custom instructions for GitHub Copilot"</em> —
-                <a href="https://docs.github.com/copilot/customizing-copilot/adding-custom-instructions-for-github-copilot" target="_blank" rel="noopener noreferrer">https://docs.github.com/copilot/customizing-copilot/adding-custom-instructions-for-github-copilot</a
+                <a
+                  href="https://docs.github.com/copilot/customizing-copilot/adding-custom-instructions-for-github-copilot"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
+                  https://docs.github.com/copilot/customizing-copilot/adding-custom-instructions-for-github-copilot
+                </a>
               </li>
               <li>
                 GitHub Docs, <em>"Best practices for using GitHub Copilot to work on tasks"</em> —
-                <a href="https://docs.github.com/copilot/how-tos/agents/copilot-coding-agent/best-practices-for-using-copilot-to-work-on-tasks" target="_blank" rel="noopener noreferrer">https://docs.github.com/copilot/how-tos/agents/copilot-coding-agent/best-practices-for-using-copilot-to-work-on-tasks</a
+                <a
+                  href="https://docs.github.com/copilot/how-tos/agents/copilot-coding-agent/best-practices-for-using-copilot-to-work-on-tasks"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
+                  https://docs.github.com/copilot/how-tos/agents/copilot-coding-agent/best-practices-for-using-copilot-to-work-on-tasks
+                </a>
               </li>
               <li>
                 GitHub Docs, <em>"Best practices for GitHub Copilot CLI"</em> —
-                <a href="https://docs.github.com/en/copilot/how-tos/copilot-cli/cli-best-practices" target="_blank" rel="noopener noreferrer">https://docs.github.com/en/copilot/how-tos/copilot-cli/cli-best-practices</a
+                <a
+                  href="https://docs.github.com/en/copilot/how-tos/copilot-cli/cli-best-practices"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
+                  https://docs.github.com/en/copilot/how-tos/copilot-cli/cli-best-practices
+                </a>
               </li>
               <li>
                 GitHub Docs, <em>"Adding custom instructions for GitHub Copilot CLI"</em> —
-                <a href="https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/add-custom-instructions" target="_blank" rel="noopener noreferrer">https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/add-custom-instructions</a
+                <a
+                  href="https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/add-custom-instructions"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
+                  https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/add-custom-instructions
+                </a>
               </li>
               <li>
                 GitHub Docs, <em>"Asking GitHub Copilot questions in your IDE"</em> —
-                <a href="https://docs.github.com/copilot/using-github-copilot/asking-github-copilot-questions-in-your-ide" target="_blank" rel="noopener noreferrer">https://docs.github.com/copilot/using-github-copilot/asking-github-copilot-questions-in-your-ide</a
+                <a
+                  href="https://docs.github.com/copilot/using-github-copilot/asking-github-copilot-questions-in-your-ide"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
+                  https://docs.github.com/copilot/using-github-copilot/asking-github-copilot-questions-in-your-ide
+                </a>
               </li>
               <li>
                 GitHub Docs, <em>"Using GitHub Copilot code review"</em> —
-                <a href="https://docs.github.com/copilot/using-github-copilot/code-review/using-copilot-code-review" target="_blank" rel="noopener noreferrer">https://docs.github.com/copilot/using-github-copilot/code-review/using-copilot-code-review</a
+                <a
+                  href="https://docs.github.com/copilot/using-github-copilot/code-review/using-copilot-code-review"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
+                  https://docs.github.com/copilot/using-github-copilot/code-review/using-copilot-code-review
+                </a>
               </li>
               <li>
                 GitHub Docs,
                 <em>"Model Context Protocol (MCP) and GitHub Copilot cloud agent"</em> —
-                <a href="https://docs.github.com/en/copilot/concepts/agents/cloud-agent/mcp-and-cloud-agent" target="_blank" rel="noopener noreferrer">https://docs.github.com/en/copilot/concepts/agents/cloud-agent/mcp-and-cloud-agent</a
+                <a
+                  href="https://docs.github.com/en/copilot/concepts/agents/cloud-agent/mcp-and-cloud-agent"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
+                  https://docs.github.com/en/copilot/concepts/agents/cloud-agent/mcp-and-cloud-agent
+                </a>
               </li>
               <li>
                 GitHub Docs, <em>"Supported AI models in GitHub Copilot"</em> —
-                <a href="https://docs.github.com/en/enterprise-cloud@latest/copilot/reference/ai-models/supported-models" target="_blank" rel="noopener noreferrer">https://docs.github.com/en/enterprise-cloud@latest/copilot/reference/ai-models/supported-models</a
+                <a
+                  href="https://docs.github.com/en/enterprise-cloud@latest/copilot/reference/ai-models/supported-models"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
+                  https://docs.github.com/en/enterprise-cloud@latest/copilot/reference/ai-models/supported-models
+                </a>
               </li>
               <li>
                 GitHub Docs, <em>"Hosting of models for GitHub Copilot"</em> —
-                <a href="https://docs.github.com/en/copilot/reference/ai-models/model-hosting" target="_blank" rel="noopener noreferrer">https://docs.github.com/en/copilot/reference/ai-models/model-hosting</a
+                <a
+                  href="https://docs.github.com/en/copilot/reference/ai-models/model-hosting"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
+                  https://docs.github.com/en/copilot/reference/ai-models/model-hosting
+                </a>
               </li>
               <li>
                 GitHub Docs, <em>"Using Claude in GitHub Copilot"</em> —
-                <a href="https://docs.github.com/copilot/using-github-copilot/ai-models/using-claude-in-github-copilot" target="_blank" rel="noopener noreferrer">https://docs.github.com/copilot/using-github-copilot/ai-models/using-claude-in-github-copilot</a
+                <a
+                  href="https://docs.github.com/copilot/using-github-copilot/ai-models/using-claude-in-github-copilot"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
+                  https://docs.github.com/copilot/using-github-copilot/ai-models/using-claude-in-github-copilot
+                </a>
               </li>
               <li>
                 GitHub Changelog,
-                <em>"Copilot coding agent now supports AGENTS.md custom instructions"</em
-                >(2025-08-28) —
-                <a href="https://github.blog/changelog/2025-08-28-copilot-coding-agent-now-supports-agents-md-custom-instructions/" target="_blank" rel="noopener noreferrer">https://github.blog/changelog/2025-08-28-copilot-coding-agent-now-supports-agents-md-custom-instructions/</a
+                <em>"Copilot coding agent now supports AGENTS.md custom instructions"</em>
+                (2025-08-28) —
+                <a
+                  href="https://github.blog/changelog/2025-08-28-copilot-coding-agent-now-supports-agents-md-custom-instructions/"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
+                  https://github.blog/changelog/2025-08-28-copilot-coding-agent-now-supports-agents-md-custom-instructions/
+                </a>
               </li>
               <li>
                 GitHub Changelog,
-                <em
-                  >"GitHub Copilot coding agent now supports .instructions.md custom
-                  instructions"</em
-                >(2025-07-23) —
-                <a href="https://github.blog/changelog/2025-07-23-github-copilot-coding-agent-now-supports-instructions-md-custom-instructions/" target="_blank" rel="noopener noreferrer">https://github.blog/changelog/2025-07-23-github-copilot-coding-agent-now-supports-instructions-md-custom-instructions/</a
+                <em>
+                  "GitHub Copilot coding agent now supports .instructions.md custom instructions"
+                </em>
+                (2025-07-23) —
+                <a
+                  href="https://github.blog/changelog/2025-07-23-github-copilot-coding-agent-now-supports-instructions-md-custom-instructions/"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
+                  https://github.blog/changelog/2025-07-23-github-copilot-coding-agent-now-supports-instructions-md-custom-instructions/
+                </a>
               </li>
               <li>
                 GitHub Changelog, <em>"Shape Copilot code review around your team"</em>(2026-06-02)
                 —
-                <a href="https://github.blog/changelog/2026-06-02-shape-copilot-code-review-around-your-team/" target="_blank" rel="noopener noreferrer">https://github.blog/changelog/2026-06-02-shape-copilot-code-review-around-your-team/</a
+                <a
+                  href="https://github.blog/changelog/2026-06-02-shape-copilot-code-review-around-your-team/"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
+                  https://github.blog/changelog/2026-06-02-shape-copilot-code-review-around-your-team/
+                </a>
               </li>
               <li>
                 GitHub Changelog,
-                <em>"Copilot code review: Agent skills and MCP now generally available"</em
-                >(2026-07-29) —
-                <a href="https://github.blog/changelog/2026-07-29-copilot-code-review-agent-skills-and-mcp-now-generally-available/" target="_blank" rel="noopener noreferrer">https://github.blog/changelog/2026-07-29-copilot-code-review-agent-skills-and-mcp-now-generally-available/</a
+                <em>"Copilot code review: Agent skills and MCP now generally available"</em>
+                (2026-07-29) —
+                <a
+                  href="https://github.blog/changelog/2026-07-29-copilot-code-review-agent-skills-and-mcp-now-generally-available/"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
+                  https://github.blog/changelog/2026-07-29-copilot-code-review-agent-skills-and-mcp-now-generally-available/
+                </a>
               </li>
               <li>
                 GitHub Changelog,
                 <em>"GitHub Copilot CLI: Plan before you build, steer as you go"</em>(2026-01-21) —
-                <a href="https://github.blog/changelog/2026-01-21-github-copilot-cli-plan-before-you-build-steer-as-you-go/" target="_blank" rel="noopener noreferrer">https://github.blog/changelog/2026-01-21-github-copilot-cli-plan-before-you-build-steer-as-you-go/</a
+                <a
+                  href="https://github.blog/changelog/2026-01-21-github-copilot-cli-plan-before-you-build-steer-as-you-go/"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
+                  https://github.blog/changelog/2026-01-21-github-copilot-cli-plan-before-you-build-steer-as-you-go/
+                </a>
               </li>
               <li>
                 GitHub Changelog,
-                <em>"Copilot knowledge bases can now be converted to Copilot Spaces"</em
-                >(2025-10-17) —
-                <a href="https://github.blog/changelog/2025-10-17-copilot-knowledge-bases-can-now-be-converted-to-copilot-spaces/" target="_blank" rel="noopener noreferrer">https://github.blog/changelog/2025-10-17-copilot-knowledge-bases-can-now-be-converted-to-copilot-spaces/</a
+                <em>"Copilot knowledge bases can now be converted to Copilot Spaces"</em>
+                (2025-10-17) —
+                <a
+                  href="https://github.blog/changelog/2025-10-17-copilot-knowledge-bases-can-now-be-converted-to-copilot-spaces/"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
+                  https://github.blog/changelog/2025-10-17-copilot-knowledge-bases-can-now-be-converted-to-copilot-spaces/
+                </a>
               </li>
               <li>
                 GitHub Changelog, <em>"Sunset notice: Copilot knowledge bases"</em> —
-                <a href="https://github.blog/changelog/2025-08-20-sunset-notice-copilot-knowledge-bases/" target="_blank" rel="noopener noreferrer">https://github.blog/changelog/2025-08-20-sunset-notice-copilot-knowledge-bases/</a
+                <a
+                  href="https://github.blog/changelog/2025-08-20-sunset-notice-copilot-knowledge-bases/"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
+                  https://github.blog/changelog/2025-08-20-sunset-notice-copilot-knowledge-bases/
+                </a>
               </li>
               <li>
                 GitHub Changelog,
                 <em>"Updates to available models in Copilot on web"</em>(2026-05-20) —
-                <a href="https://github.blog/changelog/2026-05-20-updates-to-available-models-in-copilot-on-web/" target="_blank" rel="noopener noreferrer">https://github.blog/changelog/2026-05-20-updates-to-available-models-in-copilot-on-web/</a
+                <a
+                  href="https://github.blog/changelog/2026-05-20-updates-to-available-models-in-copilot-on-web/"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
+                  https://github.blog/changelog/2026-05-20-updates-to-available-models-in-copilot-on-web/
+                </a>
               </li>
               <li>
                 VS Code Docs, <em>"Best practices for using AI in VS Code"</em> —
-                <a href="https://code.visualstudio.com/docs/agents/best-practices" target="_blank" rel="noopener noreferrer">https://code.visualstudio.com/docs/agents/best-practices</a
+                <a
+                  href="https://code.visualstudio.com/docs/agents/best-practices"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
+                  https://code.visualstudio.com/docs/agents/best-practices
+                </a>
               </li>
               <li>
                 VS Code Docs, <em>"Use custom instructions in VS Code"</em> —
-                <a href="https://code.visualstudio.com/docs/agent-customization/custom-instructions" target="_blank" rel="noopener noreferrer">https://code.visualstudio.com/docs/agent-customization/custom-instructions</a
+                <a
+                  href="https://code.visualstudio.com/docs/agent-customization/custom-instructions"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
+                  https://code.visualstudio.com/docs/agent-customization/custom-instructions
+                </a>
               </li>
               <li>
                 VS Code Blog, <em>"Introducing GitHub Copilot agent mode (preview)"</em> —
-                <a href="https://code.visualstudio.com/blogs/2025/02/24/introducing-copilot-agent-mode" target="_blank" rel="noopener noreferrer">https://code.visualstudio.com/blogs/2025/02/24/introducing-copilot-agent-mode</a
+                <a
+                  href="https://code.visualstudio.com/blogs/2025/02/24/introducing-copilot-agent-mode"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
+                  https://code.visualstudio.com/blogs/2025/02/24/introducing-copilot-agent-mode
+                </a>
               </li>
             </ul>
           </div>
@@ -1481,45 +1713,80 @@ target: 'vscode'
               <li>
                 Burke Holland(GitHub, Technologist),
                 <em>"The harness is all you need (mostly)"</em>, The GitHub Blog(2026-07-27) —
-                <a href="https://github.blog/ai-and-ml/github-copilot/the-harness-is-all-you-need-mostly/" target="_blank" rel="noopener noreferrer">https://github.blog/ai-and-ml/github-copilot/the-harness-is-all-you-need-mostly/</a
+                <a
+                  href="https://github.blog/ai-and-ml/github-copilot/the-harness-is-all-you-need-mostly/"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
+                  https://github.blog/ai-and-ml/github-copilot/the-harness-is-all-you-need-mostly/
+                </a>
               </li>
               <li>
                 Burke Holland,
                 <em>"Copilot ask, edit, and agent modes: What they do and when to use them"</em>,
                 The GitHub Blog —
-                <a href="https://github.blog/ai-and-ml/github-copilot/copilot-ask-edit-and-agent-modes-what-they-do-and-when-to-use-them/" target="_blank" rel="noopener noreferrer">https://github.blog/ai-and-ml/github-copilot/copilot-ask-edit-and-agent-modes-what-they-do-and-when-to-use-them/</a
+                <a
+                  href="https://github.blog/ai-and-ml/github-copilot/copilot-ask-edit-and-agent-modes-what-they-do-and-when-to-use-them/"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
+                  https://github.blog/ai-and-ml/github-copilot/copilot-ask-edit-and-agent-modes-what-they-do-and-when-to-use-them/
+                </a>
               </li>
               <li>
                 Burke Holland, <em>"Opus 4.5 is going to change everything"</em>(個人ブログ,
                 2026-01-05) —
-                <a href="https://burkeholland.github.io/posts/opus-4-5-change-everything/" target="_blank" rel="noopener noreferrer">https://burkeholland.github.io/posts/opus-4-5-change-everything/</a
+                <a
+                  href="https://burkeholland.github.io/posts/opus-4-5-change-everything/"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
+                  https://burkeholland.github.io/posts/opus-4-5-change-everything/
+                </a>
               </li>
               <li>
                 Simon Willison, <em>タグ「github-copilot」記事一覧</em> —
-                <a href="https://simonwillison.net/tags/github-copilot/" target="_blank" rel="noopener noreferrer">https://simonwillison.net/tags/github-copilot/</a
+                <a
+                  href="https://simonwillison.net/tags/github-copilot/"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
+                  https://simonwillison.net/tags/github-copilot/
+                </a>
               </li>
               <li>
                 Simon Willison,
                 <em>"The Five Levels: from Spicy Autocomplete to the Dark Factory"</em>(2026-01-28)
                 —
-                <a href="https://simonwillison.net/2026/Jan/28/the-five-levels/" target="_blank" rel="noopener noreferrer">https://simonwillison.net/2026/Jan/28/the-five-levels/</a
+                <a
+                  href="https://simonwillison.net/2026/Jan/28/the-five-levels/"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
+                  https://simonwillison.net/2026/Jan/28/the-five-levels/
+                </a>
               </li>
               <li>
                 Addy Osmani(Google, Engineering Lead),
                 <em>"My LLM coding workflow going into 2026"</em> —
-                <a href="https://addyosmani.com/blog/ai-coding-workflow/" target="_blank" rel="noopener noreferrer">https://addyosmani.com/blog/ai-coding-workflow/</a
+                <a
+                  href="https://addyosmani.com/blog/ai-coding-workflow/"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
+                  https://addyosmani.com/blog/ai-coding-workflow/
+                </a>
               </li>
               <li>
                 Addy Osmani, <em>"Code Review in the Age of AI"</em>, Elevate(Substack, 2026-01-06)
                 —
-                <a href="https://addyo.substack.com/p/code-review-in-the-age-of-ai" target="_blank" rel="noopener noreferrer">https://addyo.substack.com/p/code-review-in-the-age-of-ai</a
+                <a
+                  href="https://addyo.substack.com/p/code-review-in-the-age-of-ai"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
+                  https://addyo.substack.com/p/code-review-in-the-age-of-ai
+                </a>
               </li>
             </ul>
           </div>
@@ -1530,39 +1797,64 @@ target: 'vscode'
             <ul>
               <li>
                 Microsoft Community Hub,
-                <em
-                  >"Turning GitHub Copilot into a 'Best Practices Coach' with Copilot Spaces + a
-                  Markdown Knowledge Base"</em
-                >(2026-05-06) —
-                <a href="https://techcommunity.microsoft.com/blog/azuredevcommunityblog/turning-github-copilot-into-a-%E2%80%9Cbest-practices-coach%E2%80%9D-with-copilot-spaces--a-mark/4511567" target="_blank" rel="noopener noreferrer">https://techcommunity.microsoft.com/blog/azuredevcommunityblog/turning-github-copilot-into-a-%E2%80%9Cbest-practices-coach%E2%80%9D-with-copilot-spaces--a-mark/4511567</a
+                <em>
+                  "Turning GitHub Copilot into a 'Best Practices Coach' with Copilot Spaces + a
+                  Markdown Knowledge Base"
+                </em>
+                (2026-05-06) —
+                <a
+                  href="https://techcommunity.microsoft.com/blog/azuredevcommunityblog/turning-github-copilot-into-a-%E2%80%9Cbest-practices-coach%E2%80%9D-with-copilot-spaces--a-mark/4511567"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
+                  https://techcommunity.microsoft.com/blog/azuredevcommunityblog/turning-github-copilot-into-a-%E2%80%9Cbest-practices-coach%E2%80%9D-with-copilot-spaces--a-mark/4511567
+                </a>
               </li>
               <li>
                 Microsoft Learn, <em>"Introduction to Copilot Spaces"</em> —
-                <a href="https://learn.microsoft.com/en-us/training/modules/introduction-copilot-spaces/" target="_blank" rel="noopener noreferrer">https://learn.microsoft.com/en-us/training/modules/introduction-copilot-spaces/</a
+                <a
+                  href="https://learn.microsoft.com/en-us/training/modules/introduction-copilot-spaces/"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
+                  https://learn.microsoft.com/en-us/training/modules/introduction-copilot-spaces/
+                </a>
               </li>
               <li>
                 The GitHub Blog,
                 <em>"How to use GitHub Copilot Spaces to debug issues faster"</em> —
-                <a href="https://github.blog/ai-and-ml/github-copilot/how-to-use-github-copilot-spaces-to-debug-issues-faster/" target="_blank" rel="noopener noreferrer">https://github.blog/ai-and-ml/github-copilot/how-to-use-github-copilot-spaces-to-debug-issues-faster/</a
+                <a
+                  href="https://github.blog/ai-and-ml/github-copilot/how-to-use-github-copilot-spaces-to-debug-issues-faster/"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
+                  https://github.blog/ai-and-ml/github-copilot/how-to-use-github-copilot-spaces-to-debug-issues-faster/
+                </a>
               </li>
               <li>
                 Zenn,
                 <em>"GitHub Copilot Chat を使う時のTips(Instruction files, Prompt files)"</em> —
-                <a href="https://zenn.dev/chot/articles/b8b830571ba088" target="_blank" rel="noopener noreferrer">https://zenn.dev/chot/articles/b8b830571ba088</a
+                <a
+                  href="https://zenn.dev/chot/articles/b8b830571ba088"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
+                  https://zenn.dev/chot/articles/b8b830571ba088
+                </a>
               </li>
               <li>
                 DEV Community,
-                <em
-                  >"GitHub Copilot Instructions vs Prompts vs Custom Agents vs Skills vs X vs
-                  WHY?"</em
-                >
+                <em>
+                  "GitHub Copilot Instructions vs Prompts vs Custom Agents vs Skills vs X vs WHY?"
+                </em>
                 —
-                <a href="https://dev.to/pwd9000/github-copilot-instructions-vs-prompts-vs-custom-agents-vs-skills-vs-x-vs-why-339l" target="_blank" rel="noopener noreferrer">https://dev.to/pwd9000/github-copilot-instructions-vs-prompts-vs-custom-agents-vs-skills-vs-x-vs-why-339l</a
+                <a
+                  href="https://dev.to/pwd9000/github-copilot-instructions-vs-prompts-vs-custom-agents-vs-skills-vs-x-vs-why-339l"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
+                  https://dev.to/pwd9000/github-copilot-instructions-vs-prompts-vs-custom-agents-vs-skills-vs-x-vs-why-339l
+                </a>
               </li>
             </ul>
           </div>
@@ -1571,43 +1863,78 @@ target: 'vscode'
             <ul>
               <li>
                 DEV Community, <em>"GitHub Copilot CLI: The Complete Developer Guide (2026)"</em> —
-                <a href="https://dev.to/proflead/github-copilot-cli-the-complete-developer-guide-2026-3cjj" target="_blank" rel="noopener noreferrer">https://dev.to/proflead/github-copilot-cli-the-complete-developer-guide-2026-3cjj</a
+                <a
+                  href="https://dev.to/proflead/github-copilot-cli-the-complete-developer-guide-2026-3cjj"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
+                  https://dev.to/proflead/github-copilot-cli-the-complete-developer-guide-2026-3cjj
+                </a>
               </li>
               <li>
                 devleader.ca,
-                <em>"The GitHub Copilot CLI Permission Model: What It Can and Can't Touch"</em
-                >(2026-07-21) —
-                <a href="https://www.devleader.ca/2026/07/21/the-github-copilot-cli-permission-model-what-it-can-and-cant-touch" target="_blank" rel="noopener noreferrer">https://www.devleader.ca/2026/07/21/the-github-copilot-cli-permission-model-what-it-can-and-cant-touch</a
+                <em>"The GitHub Copilot CLI Permission Model: What It Can and Can't Touch"</em>
+                (2026-07-21) —
+                <a
+                  href="https://www.devleader.ca/2026/07/21/the-github-copilot-cli-permission-model-what-it-can-and-cant-touch"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
+                  https://www.devleader.ca/2026/07/21/the-github-copilot-cli-permission-model-what-it-can-and-cant-touch
+                </a>
               </li>
               <li>
                 fundesk.io, <em>"GitHub Copilot Agent Mode: The Complete Guide for 2026"</em> —
-                <a href="https://www.fundesk.io/github-copilot-agent-mode-guide-2026" target="_blank" rel="noopener noreferrer">https://www.fundesk.io/github-copilot-agent-mode-guide-2026</a
+                <a
+                  href="https://www.fundesk.io/github-copilot-agent-mode-guide-2026"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
+                  https://www.fundesk.io/github-copilot-agent-mode-guide-2026
+                </a>
               </li>
               <li>
                 movarnell.github.io,
                 <em>"GitHub Copilot Model Guide — Cost, Tasks, and Workflows"</em> —
-                <a href="https://movarnell.github.io/Copilot-Links/models.html" target="_blank" rel="noopener noreferrer">https://movarnell.github.io/Copilot-Links/models.html</a
+                <a
+                  href="https://movarnell.github.io/Copilot-Links/models.html"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
+                  https://movarnell.github.io/Copilot-Links/models.html
+                </a>
               </li>
               <li>
                 Tales on Tech,
                 <em>"GitHub Copilot Best Practices: Your Complete Beginner-Friendly Guide"</em> —
-                <a href="https://www.talesontech.com/blog/github-copilot-best-practices-guide-2026/" target="_blank" rel="noopener noreferrer">https://www.talesontech.com/blog/github-copilot-best-practices-guide-2026/</a
+                <a
+                  href="https://www.talesontech.com/blog/github-copilot-best-practices-guide-2026/"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
+                  https://www.talesontech.com/blog/github-copilot-best-practices-guide-2026/
+                </a>
               </li>
               <li>
                 metacto.com, <em>"GitHub Copilot Best Practices for Engineering Teams (2026)"</em> —
-                <a href="https://www.metacto.com/blogs/github-copilot-best-practices-from-high-performing-teams" target="_blank" rel="noopener noreferrer">https://www.metacto.com/blogs/github-copilot-best-practices-from-high-performing-teams</a
+                <a
+                  href="https://www.metacto.com/blogs/github-copilot-best-practices-from-high-performing-teams"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
+                  https://www.metacto.com/blogs/github-copilot-best-practices-from-high-performing-teams
+                </a>
               </li>
               <li>
                 The GitHub Blog,
                 <em>"Copilot vs. raw API access: What are you actually paying for?"</em> —
-                <a href="https://github.blog/ai-and-ml/github-copilot/copilot-vs-raw-api-access-what-are-you-actually-paying-for/" target="_blank" rel="noopener noreferrer">https://github.blog/ai-and-ml/github-copilot/copilot-vs-raw-api-access-what-are-you-actually-paying-for/</a
+                <a
+                  href="https://github.blog/ai-and-ml/github-copilot/copilot-vs-raw-api-access-what-are-you-actually-paying-for/"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
+                  https://github.blog/ai-and-ml/github-copilot/copilot-vs-raw-api-access-what-are-you-actually-paying-for/
+                </a>
               </li>
             </ul>
           </div>
@@ -1616,26 +1943,41 @@ target: 'vscode'
             <ul>
               <li>
                 Checkmarx,
-                <em>"GitHub Copilot Security: Risks, Built-In Controls, and Best Practices"</em
-                >(2026-05-11) —
-                <a href="https://checkmarx.com/learn/ai-security/top-5-github-copilot-security-risks-9-ways-to-mitigate-them/" target="_blank" rel="noopener noreferrer">https://checkmarx.com/learn/ai-security/top-5-github-copilot-security-risks-9-ways-to-mitigate-them/</a
+                <em>"GitHub Copilot Security: Risks, Built-In Controls, and Best Practices"</em>
+                (2026-05-11) —
+                <a
+                  href="https://checkmarx.com/learn/ai-security/top-5-github-copilot-security-risks-9-ways-to-mitigate-them/"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
+                  https://checkmarx.com/learn/ai-security/top-5-github-copilot-security-risks-9-ways-to-mitigate-them/
+                </a>
               </li>
               <li>
                 CybeDefend,
                 <em>"GitHub Copilot Security: Risks, Controls, and Best Practices"</em>(2026-06-10)
                 —
-                <a href="https://www.cybedefend.com/en/blog/github-copilot-security-risks-best-practices" target="_blank" rel="noopener noreferrer">https://www.cybedefend.com/en/blog/github-copilot-security-risks-best-practices</a
+                <a
+                  href="https://www.cybedefend.com/en/blog/github-copilot-security-risks-best-practices"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
+                  https://www.cybedefend.com/en/blog/github-copilot-security-risks-best-practices
+                </a>
               </li>
               <li>
                 TechStoriess.com,
-                <em
-                  >"AI Agent Security Practices 2026: Prompt Injection, MCP Risks &amp; Data
-                  Leaks"</em
-                >(2026-06-30) —
-                <a href="https://www.techstoriess.com/ai-agent-security-practices-2026-prompt-injection-mcp-risks-data-leaks/" target="_blank" rel="noopener noreferrer">https://www.techstoriess.com/ai-agent-security-practices-2026-prompt-injection-mcp-risks-data-leaks/</a
+                <em>
+                  "AI Agent Security Practices 2026: Prompt Injection, MCP Risks &amp; Data Leaks"
+                </em>
+                (2026-06-30) —
+                <a
+                  href="https://www.techstoriess.com/ai-agent-security-practices-2026-prompt-injection-mcp-risks-data-leaks/"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
+                  https://www.techstoriess.com/ai-agent-security-practices-2026-prompt-injection-mcp-risks-data-leaks/
+                </a>
               </li>
             </ul>
           </div>
@@ -1643,11 +1985,11 @@ target: 'vscode'
 
         <hr />
         <p>
-          <em
-            >本ガイドは2026年7月31日時点で確認できた情報をもとに作成しています。GitHub
+          <em>
+            本ガイドは2026年7月31日時点で確認できた情報をもとに作成しています。GitHub
             Copilotは頻繁に機能更新が行われるため、実際の設定・挙動は必ず上記の公式ドキュメントやご利用中のバージョンのin-product
-            helpで最終確認してください。</em
-          >
+            helpで最終確認してください。
+          </em>
         </p>
 
         <footer className={styles.colophon}>
@@ -1655,7 +1997,6 @@ target: 'vscode'
             本ガイドはMarkdown版と同一内容のHTML版です。Mermaidダイアグラムはこのページ内で描画され、参考文献は各URLへのリンクとして提供されています。
           </p>
         </footer>
-      
       </main>
 
       <TocObserver />

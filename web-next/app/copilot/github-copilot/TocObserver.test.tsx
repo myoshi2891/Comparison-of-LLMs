@@ -27,10 +27,7 @@ function renderToc() {
           >
             1. GitHub Copilotの全体像
           </a>
-          <a
-            className={styles.navLink}
-            href="#2-3つのchatモードを使い分けるask--edit--agent"
-          >
+          <a className={styles.navLink} href="#2-3つのchatモードを使い分けるask--edit--agent">
             2. 3つのChatモードを使い分ける
           </a>
         </nav>
@@ -39,12 +36,10 @@ function renderToc() {
         <h2 id="1-github-copilotの全体像2026年時点のプロダクトファミリー">
           1. GitHub Copilotの全体像
         </h2>
-        <h2 id="2-3つのchatモードを使い分けるask--edit--agent">
-          2. 3つのChatモードを使い分ける
-        </h2>
+        <h2 id="2-3つのchatモードを使い分けるask--edit--agent">2. 3つのChatモードを使い分ける</h2>
       </main>
       <TocObserver />
-    </div>,
+    </div>
   );
 }
 
@@ -123,7 +118,7 @@ describe("Github Copilot TocObserver", () => {
     io.emit([
       {
         target: container.querySelector(
-          "[id='1-github-copilotの全体像2026年時点のプロダクトファミリー']",
+          "[id='1-github-copilotの全体像2026年時点のプロダクトファミリー']"
         ) as Element,
         isIntersecting: false,
       },
@@ -136,7 +131,7 @@ describe("Github Copilot TocObserver", () => {
       <div>
         <button type="button" id="sidebarToggle" />
         <TocObserver />
-      </div>,
+      </div>
     );
     const toggle = container.querySelector("#sidebarToggle") as HTMLButtonElement;
     expect(() => fireEvent.click(toggle)).not.toThrow();

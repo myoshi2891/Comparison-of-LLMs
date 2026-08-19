@@ -3,9 +3,7 @@ import { render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import GithubCopilotPage, { metadata } from "./page";
 
-const EXPECTED_H1 = [
-  "GitHub Copilot 実践ベストプラクティスガイド",
-] as const;
+const EXPECTED_H1 = ["GitHub Copilot 実践ベストプラクティスガイド"] as const;
 
 const EXPECTED_H2 = [
   "1. GitHub Copilotの全体像(2026年時点のプロダクトファミリー)",
@@ -104,7 +102,7 @@ describe("/copilot/github-copilot Contract Tests", () => {
   it("S-3: 原本の外部リンク URL が全件存在", () => {
     const { container } = render(<GithubCopilotPage />);
     const links = Array.from(container.querySelectorAll('a[href^="http"]')).map((a) =>
-      a.getAttribute("href"),
+      a.getAttribute("href")
     );
     for (const expectedUrl of EXPECTED_EXTERNAL_URLS) {
       expect(links).toContain(expectedUrl);
@@ -123,7 +121,9 @@ describe("/copilot/github-copilot Contract Tests", () => {
     for (const link of tocLinks) {
       const targetId = link.getAttribute("href")?.slice(1);
       expect(targetId).toBeTruthy();
-      expect(container.querySelector(`#${CSS.escape(targetId!)}`)).toBeTruthy();
+      if (targetId) {
+        expect(container.querySelector(`#${CSS.escape(targetId)}`)).toBeTruthy();
+      }
     }
   });
 
@@ -194,8 +194,8 @@ describe("/copilot/github-copilot Contract Tests", () => {
   // Q-3: 見出し階層が飛ばない（h1 -> h2 -> h3）
   it("Q-3: 見出し階層が飛ばない", () => {
     const { container } = render(<GithubCopilotPage />);
-    const allHeadings = Array.from(container.querySelectorAll("h1, h2, h3, h4, h5, h6")).map(
-      (h) => Number.parseInt(h.tagName.substring(1), 10),
+    const allHeadings = Array.from(container.querySelectorAll("h1, h2, h3, h4, h5, h6")).map((h) =>
+      Number.parseInt(h.tagName.substring(1), 10)
     );
     let prevLevel = 0;
     for (const level of allHeadings) {
