@@ -116,7 +116,8 @@
   max-width: none;
 }
 
-.layout :/* ---------- Sidebar ---------- */ global(.sidebar) {
+/* ---------- Sidebar ---------- */
+.layout :global(.sidebar) {
   position: fixed;
   top: 0;
   left: 0;
@@ -253,7 +254,8 @@
   z-index: 39;
 }
 
-.layout :/* ---------- Main ---------- */ global(.main) {
+/* ---------- Main ---------- */
+.layout :global(.main) {
   margin-left: var(--sidebar-w);
   max-width: none;
   padding: 0 0 6rem;
@@ -443,7 +445,8 @@
   text-decoration: underline;
 }
 
-.layout :/* ---------- Tables ---------- */ global(.table-wrap) {
+/* ---------- Tables ---------- */
+.layout :global(.table-wrap) {
   overflow-x: auto;
   margin: 1.4rem 0 1.7rem;
   border: 1px solid var(--border);
@@ -519,7 +522,8 @@
   border: 1px solid rgba(74, 222, 128, 0.35);
 }
 
-.layout :/* ---------- Mermaid diagrams ---------- */ global(.diagram) {
+/* ---------- Mermaid diagrams ---------- */
+.layout :global(.diagram) {
   margin: 1.6rem 0 1.9rem;
 }
 
@@ -559,7 +563,8 @@
   padding: 1rem;
 }
 
-.layout :/* ---------- Code blocks ---------- */ global(.code-block) {
+/* ---------- Code blocks ---------- */
+.layout :global(.code-block) {
   margin: 1.2rem 0 1.6rem;
   border: 1px solid var(--border);
   border-radius: 12px;
@@ -592,7 +597,8 @@
   background: transparent !important;
 }
 
-.layout :/* ---------- Checklist ---------- */ global(.checklist-header) {
+/* ---------- Checklist ---------- */
+.layout :global(.checklist-header) {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -747,10 +753,8 @@
   opacity: 0.75;
 }
 
-.layout
-  :/* ---------- Card grid (roadmap phases),
-.layout :global(tips) ---------- */
-  global(.grid) {
+/* ---------- Card grid (roadmap phases, tips) ---------- */
+.layout :global(.grid) {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
   gap: 1rem;
@@ -787,7 +791,8 @@
   margin-bottom: 0.6rem;
 }
 
-.layout :/* ---------- References ---------- */ global(.ref-group) {
+/* ---------- References ---------- */
+.layout :global(.ref-group) {
   margin-bottom: 2.4rem;
 }
 
