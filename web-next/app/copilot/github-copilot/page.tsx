@@ -1,1698 +1,1664 @@
 import type { Metadata } from "next";
+import MermaidDiagram from "@/components/docs/MermaidDiagram";
 import styles from "./page.module.css";
+import { TocObserver } from "./TocObserver";
 
 export const metadata: Metadata = {
-  title: "GitHub Copilot 完全ガイド 2026 | ベストプラクティス",
+  title: "GitHub Copilot 実践ベストプラクティスガイド",
   description:
-    "2026年6月最新版 — 初学者からエキスパートまで対応したステップバイステップのAIコーディングアシスタント活用法。Cloud agent GA・従量課金（AI Credits）・Copilot code review の AGENTS.md 対応を反映。",
+    "GitHub Copilot 実践ベストプラクティスガイド — 中級者〜上級者のためのステップバイステップ活用法(2026年7月31日時点)",
 };
 
-type Source = {
-  icon: string;
-  title: string;
-  href: string;
-  url: string;
-  badge: string;
+const COPILOT_THEME_VARS = {
+  fontSize: "16px",
+  background: "#101f34",
+  primaryColor: "#16273f",
+  primaryTextColor: "#dce6f5",
+  primaryBorderColor: "#2c4570",
+  lineColor: "#5878b0",
+  secondaryColor: "#0d1b2e",
+  tertiaryColor: "#0d1b2e",
+  noteBkgColor: "#16273f",
+  noteTextColor: "#dce6f5",
+  noteBorderColor: "#2c4570",
+  actorBkg: "#16273f",
+  actorBorder: "#2c4570",
+  actorTextColor: "#dce6f5",
+  signalColor: "#8ea3c2",
+  signalTextColor: "#dce6f5",
 };
 
-type SourceGroup = {
-  heading: string;
-  items: Source[];
-};
+const CHART_1 = `flowchart TB
+    A["GitHub Copilot<br/>共通ハーネス"] --> B["インライン補完 / NES<br/>(Next Edit Suggestions)"]
+    A --> C["Copilot Chat<br/>Ask / Edit / Agent"]
+    A --> D["Copilot CLI<br/>ターミナル常駐エージェント"]
+    A --> E["Copilot Coding Agent<br/>(クラウド/バックグラウンド)"]
+    A --> F["Copilot Code Review<br/>PRレビュー自動化"]
+    A --> G["Copilot Spaces<br/>チームのナレッジベース"]
+    A --> H["Copilot App<br/>キャンバス型の新インターフェース"]
 
-const TOC_ITEMS = [
-  { id: "s01", label: "01 GitHub Copilotとは？" },
-  { id: "s02", label: "02 プラン比較・選び方" },
-  { id: "s03", label: "03 インストール手順" },
-  { id: "s04", label: "04 効果的なプロンプト" },
-  { id: "s05", label: "05 2026年の主要機能" },
-  { id: "s06", label: "06 10のベストプラクティス" },
-  { id: "s07", label: "07 セキュリティ注意点" },
-  { id: "s08", label: "08 AIモデル選択ガイド" },
-  { id: "s09", label: "09 導入チェックリスト" },
-  { id: "sources", label: "10 参考ソース一覧" },
-] as const;
+    C --> C1["VS Code / Visual Studio / JetBrains<br/>/ Eclipse / Xcode"]
+    D --> D1["/plan・Autopilot・Allow All"]
+    E --> E1["@copilot へIssueを割り当て"]
+    F --> F1["Agent Skills + MCP(GA)"]`;
 
-const SOURCE_GROUPS: SourceGroup[] = [
-  {
-    heading: "// 公式ドキュメント",
-    items: [
-      {
-        icon: "📖",
-        title: "GitHub Copilot ベストプラクティス（公式）",
-        href: "https://docs.github.com/en/copilot/get-started/best-practices",
-        url: "docs.github.com/en/copilot/get-started/best-practices",
-        badge: "GitHub Docs",
-      },
-      {
-        icon: "💳",
-        title: "GitHub Copilot プラン一覧（公式）",
-        href: "https://docs.github.com/en/copilot/get-started/plans-for-github-copilot",
-        url: "docs.github.com/en/copilot/get-started/plans-for-github-copilot",
-        badge: "GitHub Docs",
-      },
-      {
-        icon: "💻",
-        title: "GitHub Copilot CLI ベストプラクティス（公式）",
-        href: "https://docs.github.com/en/copilot/how-tos/copilot-cli/cli-best-practices",
-        url: "docs.github.com/en/copilot/how-tos/copilot-cli/cli-best-practices",
-        badge: "GitHub Docs",
-      },
-      {
-        icon: "🚀",
-        title: "GitHub Copilot 公式フィーチャーページ",
-        href: "https://github.com/features/copilot",
-        url: "github.com/features/copilot",
-        badge: "GitHub.com",
-      },
-      {
-        icon: "💰",
-        title: "GitHub Copilot 料金プランページ",
-        href: "https://github.com/features/copilot/plans",
-        url: "github.com/features/copilot/plans",
-        badge: "GitHub.com",
-      },
-      {
-        icon: "🆕",
-        title: "GitHub Copilot 新機能ページ",
-        href: "https://github.com/features/copilot/whats-new",
-        url: "github.com/features/copilot/whats-new",
-        badge: "GitHub.com",
-      },
-    ],
-  },
-  {
-    heading: "// GitHub Blog & Changelog",
-    items: [
-      {
-        icon: "📝",
-        title: "GitHub Blog — AI & Copilot 技術ガイド",
-        href: "https://github.blog/ai-and-ml/github-copilot/",
-        url: "github.blog/ai-and-ml/github-copilot/",
-        badge: "Blog",
-      },
-      {
-        icon: "📢",
-        title: "GitHub Copilot 従量課金制（AI Credits）への移行発表（2026年4月）",
-        href: "https://github.blog/news-insights/company-news/github-copilot-is-moving-to-usage-based-billing/",
-        url: "github.blog/.../github-copilot-is-moving-to-usage-based-billing/",
-        badge: "Blog",
-      },
-      {
-        icon: "⚡",
-        title: "GitHub Copilot App 技術プレビューリリース（2026年5月）",
-        href: "https://github.blog/2026-05-14-introducing-the-github-copilot-app-in-technical-preview/",
-        url: "github.blog/.../introducing-the-github-copilot-app-in-technical-preview/",
-        badge: "Blog",
-      },
-      {
-        icon: "🤖",
-        title: "Gemini 3.5 Flash 一般提供開始（2026年5月）",
-        href: "https://github.blog/changelog/2026-05-19-gemini-3.5-flash-is-generally-available-for-github-copilot/",
-        url: "github.blog/changelog/2026-05-19-...",
-        badge: "Changelog",
-      },
-      {
-        icon: "🎯",
-        title: "VS Codeでのタスクに基づくAIモデル自動ルーティング（2026年5月）",
-        href: "https://github.blog/changelog/2026-05-20-auto-model-selection-now-routes-based-on-your-task-in-vs-code/",
-        url: "github.blog/changelog/2026-05-20-...",
-        badge: "Changelog",
-      },
-      {
-        icon: "📋",
-        title: "Copilot CLI 強化: エージェント・コンテキスト管理（2026年1月）",
-        href: "https://github.blog/changelog/2026-01-14-github-copilot-cli-enhanced-agents-context-management-and-new-ways-to-install/",
-        url: "github.blog/changelog/2026-01-14-...",
-        badge: "Changelog",
-      },
-      {
-        icon: "⭐",
-        title: "Awesome Copilot — コミュニティ作成の設定集",
-        href: "https://github.com/github/awesome-copilot",
-        url: "github.com/github/awesome-copilot",
-        badge: "GitHub",
-      },
-    ],
-  },
-  {
-    heading: "// 料金・比較情報",
-    items: [
-      {
-        icon: "📊",
-        title: "Copilot 課金と支払いの詳細（公式）",
-        href: "https://docs.github.com/en/copilot/managing-copilot/managing-copilot-billing/about-billing-for-github-copilot",
-        url: "docs.github.com/en/copilot/managing-copilot/managing-copilot-billing/about-billing-for-github-copilot",
-        badge: "GitHub Docs",
-      },
-    ],
-  },
-];
+const CHART_2 = `flowchart TD
+    Start["タスクを分類する"] --> Q1{"コードを変更する必要があるか?"}
+    Q1 -- "いいえ(説明・学習・調査のみ)" --> Ask["Ask モード<br/>質問応答のみ、ファイル変更なし"]
+    Q1 -- "はい" --> Q2{"変更範囲は単一ファイルか?"}
+    Q2 -- "はい(対象が明確)" --> Edit["Edit モード<br/>選択ファイル内で編集"]
+    Q2 -- "いいえ(複数ファイル・調査・<br/>ツール実行が必要)" --> Agent["Agent モード<br/>自律的に計画・編集・実行・修正"]
+    Agent --> Q3{"MCPサーバーや外部ツール<br/>連携が必要か?"}
+    Q3 -- "はい" --> AgentMCP["Agent モード + MCP接続"]
+    Q3 -- "いいえ" --> AgentPlain["Agent モードのみで実行"]`;
+
+const CHART_3 = `flowchart TD
+    P["個人インストラクション<br/>(ユーザー単位・全プロジェクト共通)"] --> Merge["Copilotが全てのソースを<br/>統合してコンテキストに含める"]
+    R["リポジトリインストラクション<br/>.github/copilot-instructions.md"] --> Merge
+    Path["パス限定インストラクション<br/>.github/instructions/**.instructions.md<br/>(applyTo で対象パスを指定)"] --> Merge
+    Agents["AGENTS.md<br/>(エージェント/CLI/コーディングエージェント向け)"] --> Merge
+    Merge --> Priority["優先順位: 個人 > リポジトリ > 組織<br/>(ただし全て同時にコンテキストへ供給される)"]
+    Priority --> Output["矛盾する指示は避けること<br/>(競合時は個人インストラクションが優先)"]`;
+
+const CHART_4 = `flowchart LR
+    Repo["ナレッジベースリポジトリ<br/>(コーディング規約・ADR・セキュリティルール<br/>・テスト規約・テンプレート)"] --> Space["Copilot Space<br/>「エンジニアリング標準コーチ」"]
+    App["アプリケーションリポジトリ"] --> Space
+    Instr["指示(Rules of Engagement)"] --> Space
+    Space --> Dev["開発者からの質問"]
+    Dev --> Answer["標準に沿った回答<br/>+ 準拠している規約の明示<br/>+ レビュー用チェックリスト"]`;
+
+const CHART_5 = `flowchart TD
+    S1["① ツールを1つ選ぶ<br/>(CLI / VS Code / Visual Studio / JetBrains)"] --> S2["② YOLOモード(Allow All)を有効化<br/>※必ずサンドボックス内で"]
+    S2 --> S3["③ プロトタイプから始める<br/>複数バリエーションを一括生成"]
+    S3 --> S4["④ Planモードで方法論的に計画<br/>/plan でエッジケースを洗い出す"]
+    S4 --> S5["⑤ Autopilotで実装<br/>計画の各項目を自律的に完了"]
+    S5 --> S6["⑥ 人間によるレビューと反復<br/>妥協せず品質を追求する"]
+    S6 --> S7["⑦ Rubber Duckレビュー<br/>別系統のモデルに二重チェックさせる"]
+    S7 --> S8["⑧ コミット<br/>新しいトピックは新セッションで"]`;
+
+const CHART_6 = `sequenceDiagram
+    participant Dev as 開発者
+    participant CLI as Copilot CLI
+    participant Repo as リポジトリ/ファイルシステム
+
+    Dev->>CLI: プロンプトを入力
+    CLI->>Repo: AGENTS.md / copilot-instructions.md<br/>を自動検出・読み込み
+    Dev->>CLI: Shift+Tab で Plan モードへ切替
+    CLI->>Dev: 質問を重ねながら実装計画を提示
+    Dev->>CLI: 計画を承認
+    CLI->>Repo: Autopilotでファイル読み書き・<br/>コマンド実行(許可された範囲で)
+    CLI-->>Dev: 進捗と結果を報告
+    Dev->>CLI: /allow-all でYOLOモードに切替(任意)
+    Note over CLI,Repo: サンドボックス環境(/sandbox enable, --cloud)を<br/>推奨(いずれもPublic Preview, 2026年7月時点)`;
+
+const CHART_7 = `sequenceDiagram
+    participant Dev as 開発者
+    participant Issue as GitHub Issue
+    participant Agent as Copilot Coding Agent
+    participant PR as Pull Request
+
+    Dev->>Issue: Issueを作成し、要件・受け入れ条件を明記
+    Dev->>Agent: Issueを @copilot にアサイン
+    Agent->>Agent: AGENTS.md / copilot-instructions.md /<br/>.instructions.md を読み込み
+    Agent->>Agent: MCPサーバー(GitHub MCP等)を用いて<br/>リポジトリ情報・Issue履歴を収集
+    Agent->>PR: ドラフトPRを作成しコミットをpush
+    Agent->>Dev: レビュアーとして開発者を追加、通知
+    Dev->>PR: 人間と同じレビュープロセスでマージ判断`;
+
+const CHART_8 = `flowchart TD
+    PR["Pull Requestが作成される"] --> Review["Copilot Code Reviewが起動<br/>(GitHub Actionsで実行)"]
+    Review --> Skill{".github/skills 配下に<br/>SKILL.md はあるか?"}
+    Skill -- "あり" --> SkillUse["リポジトリ/組織固有の規約・<br/>内部ツールをレビューに反映"]
+    Skill -- "なし" --> Default["Copilotの標準分析のみ"]
+    Review --> MCP{"MCPサーバー設定は<br/>あるか?"}
+    MCP -- "あり(読み取り専用)" --> MCPUse["Issueトラッカー・ドキュメント・<br/>サービスカタログ等から文脈を取得"]
+    MCP -- "なし" --> DefaultMCP["GitHub MCP / Playwright MCPが<br/>既定で有効"]
+    SkillUse --> Comment["レビューコメントを生成"]
+    MCPUse --> Comment
+    Default --> Comment
+    DefaultMCP --> Comment
+    Comment --> Attribution["コメントにSkill/MCPの<br/>出典を明示(Attribution)"]`;
+
+const CHART_9 = `flowchart TD
+    Task["タスクの性質を評価"] --> Simple{"構文・定型文・<br/>ボイラープレート程度か?"}
+    Simple -- "はい" --> Fast["高速・低コストモデル<br/>(Haiku系 / Grok Code Fast 等)"]
+    Simple -- "いいえ" --> Mid{"標準的な機能実装・<br/>アルゴリズムか?"}
+    Mid -- "はい" --> Balanced["バランス型モデル<br/>(Sonnet系 / GPT-5.4系等)を<br/>中程度の推論レベルで"]
+    Mid -- "いいえ" --> Hard{"アーキテクチャ設計・<br/>ミッションクリティカルな判断か?"}
+    Hard -- "はい" --> Premium["フラッグシップモデル<br/>(Opus系 / GPT-5.5系等)"]
+    Hard -- "いいえ" --> Context{"非常に大きな<br/>コンテキストが必要か?"}
+    Context -- "はい" --> LargeCtx["大規模コンテキスト対応モデル<br/>(Gemini Pro系等)"]
+    Context -- "いいえ" --> Balanced`;
+
+const CHART_10 = `flowchart TD
+    Threat["脅威: プロンプトインジェクション<br/>(コード/コメント/Issue/PRコメント/<br/>ツール出力に隠された指示)"] --> L1["対策① 最小権限の原則<br/>エージェントに与えるデータ・権限を必要最小限に"]
+    Threat --> L2["対策② サンドボックス実行<br/>Codespaces / Dev Container / /sandbox enable"]
+    Threat --> L3["対策③ 人間によるレビュー<br/>PRマージ前の必須チェック"]
+    Threat --> L4["対策④ MCP読み取り専用化<br/>書き込み権限は慎重に評価"]
+    Threat --> L5["対策⑤ シークレット衛生<br/>プロンプト・環境変数にシークレットを含めない"]
+    Threat --> L6["対策⑥ 監査可能性<br/>コミットの共著者表示・アクション属性の明確化"]
+    L1 --> Result["攻撃が成功しても<br/>被害範囲(blast radius)を限定"]
+    L2 --> Result
+    L3 --> Result
+    L4 --> Result
+    L5 --> Result
+    L6 --> Result`;
+
+const CHART_11 = `flowchart TD
+    AP["よくあるアンチパターン"] --> AP1["何でもAgentモードで済ませる<br/>(高コストな割に精度が下がる)"]
+    AP1 --> Fix1["→ タスクの性質に応じてAsk/Edit/Agentを使い分ける"]
+    AP --> AP2["巨大で曖昧な1発プロンプト"]
+    AP2 --> Fix2["→ プロトタイプ→計画(/plan)→実装の順に分解する"]
+    AP --> AP3["生成コードを無検証でマージ"]
+    AP3 --> Fix3["→ 必ず読み、テストし、レビューしてから採用する"]
+    AP --> AP4["インストラクションファイルを肥大化させる"]
+    AP4 --> Fix4["→ 1指示1文・600語以内を目安に簡潔化する"]
+    AP --> AP5["ローカルマシンでYOLOモードを実行"]
+    AP5 --> Fix5["→ Codespaces / Dev Containerなどサンドボックスで実行"]
+    AP --> AP6["関係のない話題を1つのChatセッションに詰め込む"]
+    AP6 --> Fix6["→ 話題ごとに新しいセッションを開始する"]`;
+
 
 /**
- * Render an anchor that opens the given URL in a new browser tab with safe `rel` attributes.
- *
- * @param href - Destination URL for the link
- * @param children - Content rendered inside the anchor
- * @returns The anchor element configured with `target="_blank"` and `rel="noopener noreferrer"`
- */
-function Ext({ href, children }: { href: string; children: React.ReactNode }) {
-  return (
-    <a href={href} target="_blank" rel="noopener noreferrer">
-      {children}
-    </a>
-  );
-}
-
-/**
- * Renders the GitHub Copilot complete best practices guide page.
- *
- * This page assembles a static Japanese article with a hero header, navigation and table of contents,
- * nine content sections covering setup, prompting, features, security, model selection, and a checklist,
- * plus grouped reference sources and a footer.
- *
- * @returns The complete guide page as a React element.
+ * Renders the GitHub Copilot Best Practices Guide page.
  */
 export default function GithubCopilotPage() {
   return (
-    <div className={styles.wrapper}>
-      {/* ─── Hero ─── */}
-      <header className={styles.hero}>
-        <div className={styles.heroBadge}>
-          <span className={styles.badgeDot} />
-          Updated: June 2026
-        </div>
-        <h1 className={styles.heroTitle}>
-          <span className={styles.dim}>{"// "}</span>
-          <span className={styles.accent}>GitHub Copilot</span>
-          <br />
-          完全ベストプラクティスガイド
-        </h1>
-        <p className={styles.heroSub}>
-          2026年6月最新版 — 初学者からエキスパートまで対応した
-          <br />
-          ステップバイステップのAIコーディングアシスタント活用法
-        </p>
-        <div className={styles.heroStats}>
-          <div className={styles.statItem}>
-            <span className={styles.statNum}>55%</span>
-            <span className={styles.statLabel}>コーディング生産性向上</span>
-          </div>
-          <div className={styles.statItem}>
-            <span className={styles.statNum}>5</span>
-            <span className={styles.statLabel}>プランバリエーション</span>
-          </div>
-          <div className={styles.statItem}>
-            <span className={styles.statNum}>10+</span>
-            <span className={styles.statLabel}>対応IDE数</span>
-          </div>
-          <div className={styles.statItem}>
-            <span className={styles.statNum}>75%</span>
-            <span className={styles.statLabel}>開発者満足度向上</span>
-          </div>
-        </div>
-      </header>
+    <div className={styles.layout}>
+      <button
+        type="button"
+        className={styles.sidebarToggle}
+        id="sidebarToggle"
+        aria-label="目次を開く"
+        aria-expanded="false"
+      >
+        ☰
+      </button>
+      <div className={styles.sidebarOverlay} id="sidebarOverlay" />
 
-      {/* ─── Nav ─── */}
-      <nav className={styles.topNav} aria-label="セクションナビゲーション">
-        {TOC_ITEMS.map((item) => (
-          <a key={item.id} href={`#${item.id}`} className={styles.navItem}>
-            {item.label}
-          </a>
-        ))}
+      <nav className={styles.sidebar} id="sidebar">
+        
+      <div className={styles.sidebarBrand}><span className={styles.mark}>⚙</span>Copilot Guide</div>
+      <p className={styles.sidebarTagline}>Best Practices 2026</p>
+      <ul className={styles.navList}>
+        <li>
+          <a
+            href="#1-github-copilotの全体像2026年時点のプロダクトファミリー"
+            className={styles.navLink}
+            data-id="1-github-copilotの全体像2026年時点のプロダクトファミリー"
+            >1. GitHub Copilotの全体像(2026年時点のプロダクトファミリー)</a
+          >
+        </li>
+        <li>
+          <a
+            href="#2-3つのchatモードを使い分けるask--edit--agent"
+            className={styles.navLink}
+            data-id="2-3つのchatモードを使い分けるask--edit--agent"
+            >2. 3つのChatモードを使い分ける(Ask / Edit / Agent)</a
+          >
+        </li>
+        <li>
+          <a
+            href="#3-カスタムインストラクションの3層構造"
+            className={styles.navLink}
+            data-id="3-カスタムインストラクションの3層構造"
+            >3. カスタムインストラクションの3層構造</a
+          >
+        </li>
+        <li>
+          <a
+            href="#4-プロンプトファイルとカスタムチャットモード"
+            className={styles.navLink}
+            data-id="4-プロンプトファイルとカスタムチャットモード"
+            >4. プロンプトファイルとカスタムチャットモード</a
+          >
+        </li>
+        <li>
+          <a
+            href="#5-カスタムエージェントとサブエージェント"
+            className={styles.navLink}
+            data-id="5-カスタムエージェントとサブエージェント"
+            >5. カスタムエージェントとサブエージェント</a
+          >
+        </li>
+        <li>
+          <a
+            href="#6-copilot-spacesでチームのナレッジベースを構築する"
+            className={styles.navLink}
+            data-id="6-copilot-spacesでチームのナレッジベースを構築する"
+            >6. Copilot Spacesでチームのナレッジベースを構築する</a
+          >
+        </li>
+        <li>
+          <a
+            href="#7-エージェントモード実践ワークフロー8ステップ"
+            className={styles.navLink}
+            data-id="7-エージェントモード実践ワークフロー8ステップ"
+            >7. エージェントモード実践ワークフロー(8ステップ)</a
+          >
+        </li>
+        <li>
+          <a
+            href="#8-github-copilot-cliを使いこなす"
+            className={styles.navLink}
+            data-id="8-github-copilot-cliを使いこなす"
+            >8. GitHub Copilot CLIを使いこなす</a
+          >
+        </li>
+        <li>
+          <a
+            href="#9-coding-agentクラウドエージェントにissueを任せる"
+            className={styles.navLink}
+            data-id="9-coding-agentクラウドエージェントにissueを任せる"
+            >9. Coding Agent(クラウドエージェント)にIssueを任せる</a
+          >
+        </li>
+        <li>
+          <a
+            href="#10-copilot-code-review--agent-skillsとmcpの活用"
+            className={styles.navLink}
+            data-id="10-copilot-code-review--agent-skillsとmcpの活用"
+            >10. Copilot Code Review — Agent SkillsとMCPの活用</a
+          >
+        </li>
+        <li>
+          <a
+            href="#11-mcpサーバー統合のベストプラクティス"
+            className={styles.navLink}
+            data-id="11-mcpサーバー統合のベストプラクティス"
+            >11. MCPサーバー統合のベストプラクティス</a
+          >
+        </li>
+        <li>
+          <a href="#12-モデル選定戦略" className={styles.navLink} data-id="12-モデル選定戦略"
+            >12. モデル選定戦略</a
+          >
+        </li>
+        <li>
+          <a
+            href="#13-セキュリティと責任あるai活用"
+            className={styles.navLink}
+            data-id="13-セキュリティと責任あるai活用"
+            >13. セキュリティと責任あるAI活用</a
+          >
+        </li>
+        <li>
+          <a
+            href="#14-コストとai-creditsの管理"
+            className={styles.navLink}
+            data-id="14-コストとai-creditsの管理"
+            >14. コストとAI Creditsの管理</a
+          >
+        </li>
+        <li>
+          <a href="#15-よくあるアンチパターン" className={styles.navLink} data-id="15-よくあるアンチパターン"
+            >15. よくあるアンチパターン</a
+          >
+        </li>
+        <li>
+          <a
+            href="#16-ベストプラクティスチェックリスト"
+            className={styles.navLink}
+            data-id="16-ベストプラクティスチェックリスト"
+            >16. ベストプラクティスチェックリスト</a
+          >
+        </li>
+        <li><a href="#17-参考文献" className={styles.navLink} data-id="17-参考文献">17. 参考文献</a></li>
+      </ul>
+    
       </nav>
 
-      <main>
-        {/* ─── TOC ─── */}
-        <nav className={styles.toc} aria-label="目次">
-          <div className={styles.tocTitle}>{"// 目次 — Table of Contents"}</div>
-          <div className={styles.tocGrid}>
-            {TOC_ITEMS.map((item) => (
-              <a key={item.id} href={`#${item.id}`} className={styles.tocLink}>
-                <span className={styles.tocNum}>{item.label.slice(0, 2)}</span>
-                {item.label.slice(3)}
-              </a>
-            ))}
+      <main className={styles.main} id="main">
+        
+        <div className={styles.hero}>
+          <p className={styles.eyebrow}>GitHub Copilot 実践ガイド</p>
+          <h1>GitHub Copilot 実践ベストプラクティスガイド</h1>
+          <p className={styles.heroSub}>
+            中級者〜上級者のためのステップバイステップ活用法(2026年7月31日時点)
+          </p>
+          <div className={styles.heroLede}>
+            <p>
+              GitHub Copilotは、単なる「コード補完ツール」から「エージェント・ハーネス(agent
+              harness)」へと姿を変えました。Chat・CLI・Coding Agent・Code
+              Review・Spaces——複数の製品面が同じ推論基盤を共有し、Ask/Edit/Agentという3つのモード、カスタムインストラクション、MCP(Model
+              Context Protocol)、サブエージェントといった仕組みで構成されています。
+            </p>
+            <p>
+              本ガイドは、GitHub公式ドキュメント・GitHub Changelog・VS
+              Code公式ドキュメント、そしてSimon Willison氏、GitHubのBurke Holland氏、Google
+              Engineering LeadのAddy
+              Osmani氏といった著名な開発者の発信内容を調査した上でまとめたものです。GitHub
+              Copilotは更新が非常に速いため、実際の挙動は必ず公式ドキュメントで確認してください。
+            </p>
           </div>
-        </nav>
+        </div>
 
-        {/* ─── s01: overview ─── */}
-        <section id="s01" className={styles.sec}>
-          <div className={styles.secHeader}>
-            <span className={styles.secNum}>01</span>
-            <div>
-              <h2 className={styles.secTitle}>GitHub Copilotとは？</h2>
-              <p className={styles.secDesc}>
-                AIを活用したコーディングアシスタントの全体像を理解しましょう
-              </p>
-            </div>
-          </div>
-          <div className={styles.cardGrid} style={{ marginBottom: "32px" }}>
-            <div className={styles.card}>
-              <span className={styles.cardIcon}>🤖</span>
-              <div className={styles.cardTitle}>AIペアプログラマー</div>
-              <div className={styles.cardDesc}>
-                GitHub
-                Copilotは、コードを書く際にリアルタイムで提案を行うAIアシスタントです。行全体や関数全体の補完、コードの説明、バグ修正まで幅広くサポートします。
-              </div>
-            </div>
-            <div className={styles.card}>
-              <span className={styles.cardIcon}>⚡</span>
-              <div className={styles.cardTitle}>55%の生産性向上</div>
-              <div className={styles.cardDesc}>
-                GitHub社の調査では、Copilot利用者はコード作成速度が最大55%向上し、開発者満足度が75%向上したと報告されています。
-              </div>
-            </div>
-            <div className={styles.card}>
-              <span className={styles.cardIcon}>🌐</span>
-              <div className={styles.cardTitle}>あらゆる環境で利用可能</div>
-              <div className={styles.cardDesc}>
-                VS Code、JetBrains、Xcode、Neovim、Visual Studio、Eclipse、Azure Data
-                Studio、さらにターミナル（CLI）まで対応しています。
-              </div>
-            </div>
-            <div className={styles.card}>
-              <span className={styles.cardIcon}>🔗</span>
-              <div className={styles.cardTitle}>GitHub完全統合（2026年）</div>
-              <div className={styles.cardDesc}>
-                2026年時点では、コードレビューエージェント、MCPサポート、Copilot
-                Spaces、エージェントモードなど強力な機能が追加されています。
-              </div>
-            </div>
-          </div>
+        <hr />
 
-          <div className={styles.secSubHead} style={{ marginBottom: "20px", marginTop: "40px" }}>
-            <h3 className={styles.secSubTitle}>{"// 進化の歴史"}</h3>
-          </div>
-
-          <div className={styles.timeline}>
-            <div className={styles.timelineItem}>
-              <div className={styles.timelineYear}>2022年6月</div>
-              <div className={styles.timelineDesc}>
-                GitHub Copilot正式リリース。インラインコード補完に特化した革命的なツールとして登場
-              </div>
-            </div>
-            <div className={styles.timelineItem}>
-              <div className={styles.timelineYear}>2023年</div>
-              <div className={styles.timelineDesc}>
-                Copilot Chat追加。コードの質問・説明がチャット形式でできるようになった
-              </div>
-            </div>
-            <div className={styles.timelineItem}>
-              <div className={styles.timelineYear}>2024年</div>
-              <div className={styles.timelineDesc}>
-                Copilot Workspace（Issue→PR自動化）、Enterpriseティア登場
-              </div>
-            </div>
-            <div className={styles.timelineItem}>
-              <div className={styles.timelineYear}>2025年</div>
-              <div className={styles.timelineDesc}>
-                マルチモデルサポート（GPT、Claude、Gemini選択可）、エージェントモード追加
-              </div>
-            </div>
-            <div className={`${styles.timelineItem} ${styles.timelineItemLast}`}>
-              <div className={styles.timelineYear}>2026年 — 現在</div>
-              <div className={styles.timelineDesc}>
-                コードレビューエージェント、MCPサポート、Extensionsエコシステム、Copilot
-                CLI強化版（GPT-5.3-Codex対応）
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ─── s02: plans ─── */}
-        <section id="s02" className={styles.sec}>
-          <div className={styles.secHeader}>
-            <span className={styles.secNum}>02</span>
-            <div>
-              <h2 className={styles.secTitle}>プラン比較＆選び方</h2>
-              <p className={styles.secDesc}>あなたに最適なプランを選ぶための比較ガイド</p>
-            </div>
-          </div>
-          <div className={styles.plansGrid}>
-            <div className={styles.planCard}>
-              <div className={styles.planName}>Free</div>
-              <div className={styles.planPrice}>
-                <span className={styles.planCurrency}>$</span>0
-                <span className={styles.planPeriod}>/月</span>
-              </div>
-              <div className={styles.planTarget}>まず試してみたい方・学習目的</div>
-              <ul className={styles.planFeatures}>
-                <li>月2,000回のインライン補完</li>
-                <li>月50回分のAIクレジット</li>
-                <li>基本的なChats機能</li>
-              </ul>
-              <span
-                className={`${styles.tag} ${styles.tagFree}`}
-                style={{ marginTop: "12px", display: "inline-block" }}
-              >
-                FREE
-              </span>
-            </div>
-            <div className={`${styles.planCard} ${styles.planCardFeatured}`}>
-              <div className={styles.planName}>Pro</div>
-              <div className={styles.planPrice}>
-                <span className={styles.planCurrency}>$</span>10
-                <span className={styles.planPeriod}>/月</span>
-              </div>
-              <div className={styles.planTarget}>個人開発者・フリーランス向け</div>
-              <ul className={styles.planFeatures}>
-                <li>無制限のインライン補完</li>
-                <li>月300回分相当のAIクレジット</li>
-                <li>Coding Agent（コーディングエージェント）</li>
-                <li>Code Review（コードレビュー）</li>
-                <li>30日間無料トライアルあり</li>
-              </ul>
-              <span
-                className={`${styles.tag} ${styles.tagPro}`}
-                style={{ marginTop: "12px", display: "inline-block" }}
-              >
-                RECOMMENDED
-              </span>
-            </div>
-            <div className={styles.planCard}>
-              <div className={styles.planName}>Pro+</div>
-              <div className={styles.planPrice}>
-                <span className={styles.planCurrency}>$</span>39
-                <span className={styles.planPeriod}>/月</span>
-              </div>
-              <div className={styles.planTarget}>ヘビーユーザー・上級者向け</div>
-              <ul className={styles.planFeatures}>
-                <li>月1,500回分相当のAIクレジット</li>
-                <li>全モデルへのアクセス</li>
-                <li>Claude Opus 4.6・o3・GPT-5.4対応</li>
-                <li>Copilot CLI（GA版）</li>
-                <li>最大限の柔軟性</li>
-              </ul>
-              <span
-                className={`${styles.tag} ${styles.tagBeta}`}
-                style={{ marginTop: "12px", display: "inline-block" }}
-              >
-                POWER
-              </span>
-            </div>
-            <div className={styles.planCard}>
-              <div className={styles.planName}>Business</div>
-              <div className={styles.planPrice}>
-                <span className={styles.planCurrency}>$</span>19
-                <span className={styles.planPeriod}>/ユーザー/月</span>
-              </div>
-              <div className={styles.planTarget}>チーム・中小組織向け</div>
-              <ul className={styles.planFeatures}>
-                <li>組織全体の一元管理</li>
-                <li>ポリシー制御・監査ログ</li>
-                <li>IP補償（著作権保護）</li>
-                <li>SAML SSO対応</li>
-              </ul>
-              <span
-                className={`${styles.tag} ${styles.tagPro}`}
-                style={{ marginTop: "12px", display: "inline-block" }}
-              >
-                TEAM
-              </span>
-            </div>
-            <div className={styles.planCard}>
-              <div className={styles.planName}>Enterprise</div>
-              <div className={styles.planPrice}>
-                <span className={styles.planCurrency}>$</span>39
-                <span className={styles.planPeriod}>/ユーザー/月</span>
-              </div>
-              <div className={styles.planTarget}>大企業・コンプライアンス重視</div>
-              <ul className={styles.planFeatures}>
-                <li>ナレッジベース機能</li>
-                <li>カスタムモデル訓練</li>
-                <li>GitHub.com Chat統合</li>
-                <li>Copilot CLI（GA版）</li>
-                <li>GitHub Spark統合</li>
-                <li>月1,000回分相当のAIクレジット</li>
-              </ul>
-              <span
-                className={`${styles.tag} ${styles.tagNew}`}
-                style={{ marginTop: "12px", display: "inline-block" }}
-              >
-                ENTERPRISE
-              </span>
-            </div>
-          </div>
-
-          <div className={styles.alertInfo} style={{ marginTop: "16px", fontSize: "0.875rem" }}>
-            <span className={styles.alertIcon}>📅</span>
-            <div className={styles.alertContent}>
-              <strong>最終更新:</strong> 2026年6月
-              <br />
-              <strong>参考:</strong>{" "}
-              <Ext href="https://github.com/features/copilot/plans">
-                GitHub Copilot Plans &amp; Pricing
-              </Ext>
-              ,{" "}
-              <Ext href="https://docs.github.com/en/copilot/get-started/plans-for-github-copilot">
-                Plans for GitHub Copilot - GitHub Docs
-              </Ext>
-              ,{" "}
-              <Ext href="https://github.blog/news-insights/company-news/github-copilot-is-moving-to-usage-based-billing/">
-                GitHub Copilot usage-based billing transition
-              </Ext>
-            </div>
-          </div>
-
-          <div className={styles.alertWarn} style={{ marginTop: "24px" }}>
-            <span className={styles.alertIcon}>⚠️</span>
-            <div className={styles.alertContent}>
-              <strong>重要：</strong>{" "}
-              2026年6月1日より、従来の定額「プレミアムリクエスト」カウント制限から、実際のトークン消費量に基づく『GitHub
-              AI
-              Credits』従量課金制へと完全に移行します（各プラン基本料金に変更はなく、プラン料と同額のクレジットが含まれます）。なお、基本的なインラインコード補完は引き続き無制限でクレジットを消費しません。
-              <br />
-              EnterpriseプランはGitHub Enterprise
-              Cloud（$21/ユーザー/月）が前提条件です。合計コストは
-              <strong>$60/ユーザー/月</strong>になります。
-              <br />
-              学生・教師・オープンソースメンテナはProプランが<strong>無料</strong>
-              で利用できます。GitHub Student Developer Packを確認してください。
-            </div>
-          </div>
-        </section>
-
-        {/* ─── s03: setup ─── */}
-        <section id="s03" className={styles.sec}>
-          <div className={styles.secHeader}>
-            <span className={styles.secNum}>03</span>
-            <div>
-              <h2 className={styles.secTitle}>ステップバイステップセットアップ</h2>
-              <p className={styles.secDesc}>インストールから最初のコード補完まで</p>
-            </div>
-          </div>
-          <div className={styles.stepsList}>
-            <div className={styles.step}>
-              <div className={styles.stepNum}>01</div>
-              <div className={styles.stepContent}>
-                <div className={styles.stepTitle}>GitHubアカウントの準備</div>
-                <div className={styles.stepBody}>
-                  <Ext href="https://github.com">github.com</Ext>
-                  にアクセスしてアカウントを作成（既存アカウントでも可）。
-                  プランを選択します。初めての方は<strong>Copilot Free</strong>
-                  からスタートがおすすめです。
-                </div>
-                <ul className={styles.stepSub}>
-                  <li>github.com → Settings → Copilot → 有効化</li>
-                  <li>学生の方はGitHub Student Developer Pack（無料Pro）を申請</li>
-                  <li>Proプランの30日間無料トライアルも活用可能</li>
-                </ul>
-              </div>
-            </div>
-
-            <div className={styles.step}>
-              <div className={styles.stepNum}>02</div>
-              <div className={styles.stepContent}>
-                <div className={styles.stepTitle}>VS Code拡張機能のインストール</div>
-                <div className={styles.stepBody}>
-                  VS Codeを開き、拡張機能マーケットプレイスから「GitHub
-                  Copilot」を検索してインストールします。
-                </div>
-                <div className={styles.codeWrap}>
-                  <div className={styles.codeBar}>
-                    <span className={styles.codeLang}>TERMINAL</span>
-                    <div className={styles.codeDots}>
-                      <span />
-                      <span />
-                      <span />
-                    </div>
-                  </div>
-                  <div className={styles.codeBody}>
-                    <span className={styles.cc}>
-                      # VS Code コマンドパレットから実行（Ctrl/Cmd + Shift + P）
-                    </span>
-                    {"\n"}
-                    {"ext install GitHub.copilot\next install GitHub.copilot-chat\n\n"}
-                    <span className={styles.cc}># または コマンドラインから</span>
-                    {"\n"}
-                    {
-                      "code --install-extension GitHub.copilot\ncode --install-extension GitHub.copilot-chat"
-                    }
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className={styles.step}>
-              <div className={styles.stepNum}>03</div>
-              <div className={styles.stepContent}>
-                <div className={styles.stepTitle}>GitHubアカウントでサインイン</div>
-                <div className={styles.stepBody}>
-                  VS Code左下のアカウントアイコン、またはコマンドパレットから「GitHub Copilot: Sign
-                  in to GitHub」を実行。ブラウザでOAuth認証を完了します。
-                </div>
-                <ul className={styles.stepSub}>
-                  <li>Ctrl/Cmd + Shift + P → "GitHub Copilot: Sign in"</li>
-                  <li>ブラウザが開くのでGitHubアカウントで承認</li>
-                  <li>認証後、エディタに戻ると右下にCopilotアイコンが表示</li>
-                </ul>
-              </div>
-            </div>
-
-            <div className={styles.step}>
-              <div className={styles.stepNum}>04</div>
-              <div className={styles.stepContent}>
-                <div className={styles.stepTitle}>動作確認 — はじめてのコード補完</div>
-                <div className={styles.stepBody}>
-                  Pythonファイルを作成し、コメントを書いてTabキーを押すと補完が表示されます。
-                </div>
-                <div className={styles.codeWrap}>
-                  <div className={styles.codeBar}>
-                    <span className={styles.codeLang}>PYTHON — hello_copilot.py</span>
-                    <div className={styles.codeDots}>
-                      <span />
-                      <span />
-                      <span />
-                    </div>
-                  </div>
-                  <div className={styles.codeBody}>
-                    <span className={styles.cc}># フィボナッチ数列を返す関数を作成する</span>
-                    {"\n"}
-                    <span className={styles.ce}>def</span>{" "}
-                    <span className={styles.cv}>fibonacci</span>
-                    {"(n: "}
-                    <span className={styles.cv}>int</span>
-                    {") -> "}
-                    <span className={styles.cv}>list</span>
-                    {"["}
-                    <span className={styles.cv}>int</span>
-                    {"]:\n    "}
-                    <span className={styles.cc}>
-                      # ↑ ここでTabを押すとCopilotが補完してくれます！
-                    </span>
-                    {"\n    result = ["}
-                    <span className={styles.cn}>0</span>
-                    {", "}
-                    <span className={styles.cn}>1</span>
-                    {"]\n    "}
-                    <span className={styles.ce}>while</span> <span className={styles.cv}>len</span>
-                    {"(result) < n:\n        result.append(result["}
-                    <span className={styles.cs}>-</span>
-                    <span className={styles.cn}>1</span>
-                    {"] + result["}
-                    <span className={styles.cs}>-</span>
-                    <span className={styles.cn}>2</span>
-                    {"])\n    "}
-                    <span className={styles.ce}>return</span>
-                    {" result[:n]"}
-                  </div>
-                </div>
-                <div className={styles.alertSuccess} style={{ marginTop: "12px" }}>
-                  <span className={styles.alertIcon}>✅</span>
-                  <div className={styles.alertContent}>
-                    補完を<strong>受け入れる</strong>：Tab キー
-                    <strong>却下する</strong>：Esc キー
-                    <strong>次の候補</strong>：Alt+] / Option+]
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className={styles.step}>
-              <div className={styles.stepNum}>05</div>
-              <div className={styles.stepContent}>
-                <div className={styles.stepTitle}>Copilot Chatを使ってみる</div>
-                <div className={styles.stepBody}>
-                  サイドバーのCopilotアイコンをクリック、またはCtrl/Cmd+Shift+Iでチャット画面を開きます。
-                </div>
-                <ul className={styles.stepSub}>
-                  <li>
-                    <code>/explain</code> — 選択したコードを日本語で説明してもらう
-                  </li>
-                  <li>
-                    <code>/fix</code> — バグを自動修正してもらう
-                  </li>
-                  <li>
-                    <code>/tests</code> — 単体テストを自動生成
-                  </li>
-                  <li>
-                    <code>/doc</code> — ドキュメントコメントを自動生成
-                  </li>
-                  <li>
-                    <code>@workspace</code> — プロジェクト全体を参照して質問
-                  </li>
-                </ul>
-              </div>
-            </div>
-
-            <div className={styles.step}>
-              <div className={styles.stepNum}>06</div>
-              <div className={styles.stepContent}>
-                <div className={styles.stepTitle}>カスタム指示ファイルの設定（推奨）</div>
-                <div className={styles.stepBody}>
-                  プロジェクトルートに
-                  <code>.github/copilot-instructions.md</code>
-                  を作成すると、Copilotにプロジェクト固有の指示を与えられます。
-                </div>
-                <div className={styles.codeWrap}>
-                  <div className={styles.codeBar}>
-                    <span className={styles.codeLang}>.github/copilot-instructions.md</span>
-                    <div className={styles.codeDots}>
-                      <span />
-                      <span />
-                      <span />
-                    </div>
-                  </div>
-                  <div className={styles.codeBody}>
-                    <span className={styles.cm}>## ビルドコマンド</span>
-                    {"\n"}
-                    <span className={styles.cs}>-</span>
-                    {" `npm run build` - プロジェクトをビルド\n"}
-                    <span className={styles.cs}>-</span>
-                    {" `npm run test` - テストを実行\n"}
-                    <span className={styles.cs}>-</span>
-                    {" `npm run lint:fix` - Lint自動修正\n\n"}
-                    <span className={styles.cm}>## コードスタイル</span>
-                    {"\n"}
-                    <span className={styles.cs}>-</span>
-                    {" TypeScript strict modeを使用\n"}
-                    <span className={styles.cs}>-</span>
-                    {" 関数コンポーネントをクラスより優先\n"}
-                    <span className={styles.cs}>-</span>
-                    {" 公開APIには必ずJSDocコメントを付与\n\n"}
-                    <span className={styles.cm}>## ワークフロー</span>
-                    {"\n"}
-                    <span className={styles.cs}>-</span>
-                    {" コミットはConventional Commits形式\n"}
-                    <span className={styles.cs}>-</span>
-                    {" ブランチはmainから作成"}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ─── s04: prompting ─── */}
-        <section id="s04" className={styles.sec}>
-          <div className={styles.secHeader}>
-            <span className={styles.secNum}>04</span>
-            <div>
-              <h2 className={styles.secTitle}>効果的なプロンプト技術</h2>
-              <p className={styles.secDesc}>Copilotから最高の提案を引き出すテクニック</p>
-            </div>
-          </div>
-          <div className={styles.alertInfo} style={{ marginBottom: "28px" }}>
-            <span className={styles.alertIcon}>💡</span>
-            <div className={styles.alertContent}>
-              <strong>プロンプトエンジニアリングの3原則：</strong>
-              ①タスクを細分化する　②要件を具体的に書く　③入出力の例を示す
-            </div>
-          </div>
-
-          <h3
-            className={styles.secSubTitle}
-            style={{ marginBottom: "16px", letterSpacing: "0.05em", fontSize: "0.9rem" }}
-          >
-            {"// BAD vs GOOD — プロンプト比較"}
-          </h3>
-
-          <div className={styles.promptGrid}>
-            <div className={`${styles.promptBox} ${styles.promptBoxBad}`}>
-              <div className={`${styles.promptBoxLabel} ${styles.promptBoxBadLabel}`}>
-                ❌ BAD — 漠然とした指示
-              </div>
-              <div className={styles.promptText}>ユーザー認証を作って</div>
-            </div>
-            <div className={`${styles.promptBox} ${styles.promptBoxGood}`}>
-              <div className={`${styles.promptBoxLabel} ${styles.promptBoxGoodLabel}`}>
-                ✅ GOOD — 具体的な指示
-              </div>
-              <div className={styles.promptText}>
-                Next.js 14 + TypeScriptで、メールとパスワードによるJWT認証を実装して。 -
-                bcryptでパスワードハッシュ化 - accessToken (15分) / refreshToken (7日)
-                の2トークン方式 - エラーはカスタムエラークラスで返す - Zodでバリデーション
-                型定義とユニットテストも含めて
-              </div>
-            </div>
-          </div>
-
-          <div className={styles.promptGrid} style={{ marginTop: "16px" }}>
-            <div className={`${styles.promptBox} ${styles.promptBoxBad}`}>
-              <div className={`${styles.promptBoxLabel} ${styles.promptBoxBadLabel}`}>
-                ❌ BAD — コンテキスト不足
-              </div>
-              <div className={styles.promptText}>このコードのバグを直して</div>
-            </div>
-            <div className={`${styles.promptBox} ${styles.promptBoxGood}`}>
-              <div className={`${styles.promptBoxLabel} ${styles.promptBoxGoodLabel}`}>
-                ✅ GOOD — コンテキスト付き
-              </div>
-              <div className={styles.promptText}>
-                @workspace の src/api/users.ts、135行目でTypeErrorが発生しています。 「Cannot read
-                properties of undefined (reading {"'id'"}）」というエラーです。
-                ユーザーが存在しない場合の null チェックが漏れていると思います。
-                修正案と、同様のパターンが他にないか確認してください
-              </div>
-            </div>
-          </div>
-
-          <div className={styles.divider} style={{ margin: "32px 0" }} />
-
-          <h3
-            className={styles.secSubTitle}
-            style={{ marginBottom: "16px", letterSpacing: "0.05em", fontSize: "0.9rem" }}
-          >
-            {"// スラッシュコマンド チートシート"}
-          </h3>
-
-          <div className={styles.cardGrid}>
-            <div className={styles.card}>
-              <div className={styles.cardTitle}>
-                <code>/explain</code>
-              </div>
-              <div className={styles.cardDesc}>
-                選択したコードの動作を詳細に説明します。チームへの共有や自分の理解確認に最適。
-              </div>
-            </div>
-            <div className={styles.card}>
-              <div className={styles.cardTitle}>
-                <code>/fix</code>
-              </div>
-              <div className={styles.cardDesc}>
-                バグや問題を検出して修正案を提示。エラーメッセージと一緒に使うと精度が上がります。
-              </div>
-            </div>
-            <div className={styles.card}>
-              <div className={styles.cardTitle}>
-                <code>/tests</code>
-              </div>
-              <div className={styles.cardDesc}>
-                Jest・Vitest等でユニットテストを自動生成。エッジケースも考慮したテストコードが得られます。
-              </div>
-            </div>
-            <div className={styles.card}>
-              <div className={styles.cardTitle}>
-                <code>/doc</code>
-              </div>
-              <div className={styles.cardDesc}>
-                JSDoc・Docstring等のドキュメントコメントを生成。API仕様書の自動化に役立ちます。
-              </div>
-            </div>
-            <div className={styles.card}>
-              <div className={styles.cardTitle}>
-                <code>@workspace</code>
-              </div>
-              <div className={styles.cardDesc}>
-                プロジェクト全体のファイルを参照して回答。「このプロジェクトで〇〇を実装するには？」という質問に対応。
-              </div>
-            </div>
-            <div className={styles.card}>
-              <div className={styles.cardTitle}>
-                <code>@terminal</code>
-              </div>
-              <div className={styles.cardDesc}>
-                ターミナルの出力内容やエラーを参照して助言。シェルコマンドの問題解決に便利です。
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ─── s05: features ─── */}
-        <section id="s05" className={styles.sec}>
-          <div className={styles.secHeader}>
-            <span className={styles.secNum}>05</span>
-            <div>
-              <h2 className={styles.secTitle}>2026年の主要機能</h2>
-              <p className={styles.secDesc}>最新アップデートで追加された強力な機能群</p>
-            </div>
-          </div>
-          <div className={styles.stepsList}>
-            <div className={styles.step}>
-              <div className={styles.stepNum}>🤖</div>
-              <div className={styles.stepContent}>
-                <div className={styles.stepTitle}>
-                  エージェントモード <span className={`${styles.tag} ${styles.tagNew}`}>NEW</span>
-                </div>
-                <div className={styles.stepBody}>
-                  自律的に複数ファイルを横断して編集・テスト実行・バグ修正まで行う高度な自動化機能。
-                  「ユーザー認証モジュールを実装して」と指示するだけで、ファイル作成からテストまで一括実行します。
-                </div>
-                <ul className={styles.stepSub}>
-                  <li>複数ファイルの同時編集が可能</li>
-                  <li>テスト実行結果を見てコードを自動修正</li>
-                  <li>プレミアムリクエストを複数消費する点に注意</li>
-                </ul>
-              </div>
-            </div>
-
-            <div className={styles.step}>
-              <div className={styles.stepNum}>📋</div>
-              <div className={styles.stepContent}>
-                <div className={styles.stepTitle}>
-                  プランモード（Plan Mode）{" "}
-                  <span className={`${styles.tag} ${styles.tagNew}`}>2026</span>
-                </div>
-                <div className={styles.stepBody}>
-                  コードを書く前に実装計画を作成し、承認後に実装を進める機能。Chat UI で Plan
-                  エージェントを選択するか、/plan コマンドで起動。
-                  複雑な機能実装前に計画をレビューできるため、手戻りを大幅に削減できます。
-                </div>
-                <div className={styles.codeWrap}>
-                  <div className={styles.codeBar}>
-                    <span className={styles.codeLang}>COPILOT CHAT — Plan Mode</span>
-                    <div className={styles.codeDots}>
-                      <span />
-                      <span />
-                      <span />
-                    </div>
-                  </div>
-                  <div className={styles.codeBody}>
-                    <span className={styles.cc}>
-                      # Chat UI で Plan エージェントを選択、または /plan と入力
-                    </span>
-                    {"\n"}
-                    <span className={styles.cs}>
-                      OAuth2認証（Google・GitHubプロバイダー）を実装して
-                    </span>
-                    {"\n\n"}
-                    <span className={styles.cc}>
-                      # Copilotが以下のような計画を作成してくれます：
-                    </span>
-                    {"\n"}
-                    <span className={styles.ce}>## 実装計画: OAuth2認証</span>
-                    {"\n"}
-                    <span className={styles.cs}>-</span>
-                    {" [ ] NextAuth.jsのインストールと設定\n"}
-                    <span className={styles.cs}>-</span>
-                    {" [ ] Google OAuth設定ファイル作成\n"}
-                    <span className={styles.cs}>-</span>
-                    {" [ ] GitHubプロバイダー設定\n"}
-                    <span className={styles.cs}>-</span>
-                    {" [ ] コールバックルート実装\n"}
-                    <span className={styles.cs}>-</span>
-                    {" [ ] セッション管理の設定\n"}
-                    <span className={styles.cc}>
-                      # → 承認後に実装開始（Chat UI でプランを編集・承認可能）
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className={styles.step}>
-              <div className={styles.stepNum}>🔍</div>
-              <div className={styles.stepContent}>
-                <div className={styles.stepTitle}>
-                  コードレビューエージェント{" "}
-                  <span className={`${styles.tag} ${styles.tagNew}`}>2026</span>
-                </div>
-                <div className={styles.stepBody}>
-                  Pull
-                  Requestに対して自動でコードレビューを行うエージェント。セキュリティ問題・バグ・コードスタイルの問題を自動検出して指摘します。
-                </div>
-                <ul className={styles.stepSub}>
-                  <li>GitHub PR上で直接レビューコメントを生成</li>
-                  <li>GitHub Advanced Securityとの連携でセキュリティスキャン</li>
-                  <li>コーディング規約違反の自動検出</li>
-                </ul>
-              </div>
-            </div>
-
-            <div className={styles.step}>
-              <div className={styles.stepNum}>🔌</div>
-              <div className={styles.stepContent}>
-                <div className={styles.stepTitle}>
-                  MCPサポート（Model Context Protocol）{" "}
-                  <span className={`${styles.tag} ${styles.tagNew}`}>2026</span>
-                </div>
-                <div className={styles.stepBody}>
-                  外部ツール（Asana、Jira、Figma等）とCopilotを直接連携できる新しいプロトコル。
-                  Copilot CLIのGitHub MCP serverでは、Copilot Spacesのツールも含まれています。
-                </div>
-                <div className={styles.codeWrap}>
-                  <div className={styles.codeBar}>
-                    <span className={styles.codeLang}>.vscode/mcp.json — MCP設定例</span>
-                    <div className={styles.codeDots}>
-                      <span />
-                      <span />
-                      <span />
-                    </div>
-                  </div>
-                  <div className={styles.codeBody}>
-                    {"{\n  "}
-                    <span className={styles.cs}>"servers"</span>
-                    {": {\n    "}
-                    <span className={styles.cs}>"github"</span>
-                    {": {\n      "}
-                    <span className={styles.cs}>"type"</span>
-                    {": "}
-                    <span className={styles.cs}>"http"</span>
-                    {",\n      "}
-                    <span className={styles.cs}>"url"</span>
-                    {": "}
-                    <span className={styles.cs}>"https://api.githubcopilot.com/mcp/"</span>
-                    {",\n      "}
-                    <span className={styles.cs}>"headers"</span>
-                    {": {\n        "}
-                    <span className={styles.cs}>"X-MCP-Toolsets"</span>
-                    {": "}
-                    <span className={styles.cs}>"default,copilot_spaces"</span>
-                    {"\n      }\n    }\n  }\n}"}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className={styles.step}>
-              <div className={styles.stepNum}>💾</div>
-              <div className={styles.stepContent}>
-                <div className={styles.stepTitle}>
-                  Copilot Spaces（コンテキスト管理）{" "}
-                  <span className={`${styles.tag} ${styles.tagNew}`}>2026</span>
-                </div>
-                <div className={styles.stepBody}>
-                  プロジェクト固有のコンテキストを記憶・参照する機能。コードベースの知識を蓄積し、より的確な提案を生成します。
-                </div>
-                <ul className={styles.stepSub}>
-                  <li>リポジトリを横断した知識ベースの構築</li>
-                  <li>クロスエージェントメモリ：CLI・IDE・コードレビュー間で学習を共有</li>
-                  <li>Enterpriseプランではカスタムファインチューニングモデルも利用可能</li>
-                </ul>
-              </div>
-            </div>
-
-            <div className={styles.step}>
-              <div className={styles.stepNum}>📱</div>
-              <div className={styles.stepContent}>
-                <div className={styles.stepTitle}>
-                  GitHub Copilot App{" "}
-                  <span className={`${styles.tag} ${styles.tagNew}`}>2026/05</span>
-                </div>
-                <div className={styles.stepBody}>
-                  エージェント開発に特化したGitHubネイティブのデスクトップアプリ（技術プレビュー）。
-                  独立したセッションでブランチやファイルの編集、タスク進行状況を管理でき、PRレビューやCIエラーの自動修正まで統合環境で行えます。
-                </div>
-                <ul className={styles.stepSub}>
-                  <li>GitHub Issues / PR から直接セッションを開始可能</li>
-                  <li>自動テストやブラウザプレビューによるコード検証</li>
-                  <li>Interactive / Plan / Autopilotの各モードを搭載</li>
-                </ul>
-              </div>
-            </div>
-
-            <div className={styles.step}>
-              <div className={styles.stepNum}>🎯</div>
-              <div className={styles.stepContent}>
-                <div className={styles.stepTitle}>
-                  タスクに基づく自動モデル選択（Auto Model Selection）{" "}
-                  <span className={`${styles.tag} ${styles.tagNew}`}>2026/05</span>
-                </div>
-                <div className={styles.stepBody}>
-                  VS
-                  Codeにおいて、実行するタスクの難易度やツール使用の有無に基づき、最適なAIモデルへ自動的にルーティングする機能。
-                </div>
-                <ul className={styles.stepSub}>
-                  <li>手動でモデルを切り替える手間を削減</li>
-                  <li>タスクの複雑さに応じて最適な処理モデルを選択</li>
-                  <li>無駄なプレミアムリクエスト（クレジット）消費を抑制</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ─── s06: tips ─── */}
-        <section id="s06" className={styles.sec}>
-          <div className={styles.secHeader}>
-            <span className={styles.secNum}>06</span>
-            <div>
-              <h2 className={styles.secTitle}>10のベストプラクティス</h2>
-              <p className={styles.secDesc}>Copilotを最大限に活用するための実践的なヒント</p>
-            </div>
-          </div>
-          <details className={styles.accordionItem} open>
-            <summary className={styles.accordionSummary}>
-              <span className={styles.accordionIcon}>📂</span>
-              <span>
-                <strong>01.</strong> 関連ファイルを開き、不要なファイルを閉じる
-              </span>
-              <span className={styles.accordionArrow}>▼</span>
-            </summary>
-            <div className={styles.accordionBody}>
-              Copilotは現在エディタで開いているファイルをコンテキストとして利用します。
-              <strong>実装対象のファイルと関連する型定義・テストファイルだけを開く</strong>
-              ことで、より正確な補完が得られます。
-              逆に無関係なファイルが大量に開いているとコンテキストが汚染されます。
-              <div className={styles.alertInfo} style={{ marginTop: "12px" }}>
-                <span className={styles.alertIcon}>💡</span>
-                <div className={styles.alertContent}>
-                  VS Codeの「エクスプローラー → タブ管理」で不要なファイルを整理しましょう
-                </div>
-              </div>
-            </div>
-          </details>
-
-          <details className={styles.accordionItem}>
-            <summary className={styles.accordionSummary}>
-              <span className={styles.accordionIcon}>📝</span>
-              <span>
-                <strong>02.</strong> 具体的なコメントでコンテキストを提供する
-              </span>
-              <span className={styles.accordionArrow}>▼</span>
-            </summary>
-            <div className={styles.accordionBody}>
-              コードを書く前に、意図を説明するコメントを先に書くと、Copilotの補完精度が劇的に向上します。
-              「何をするか」だけでなく「なぜそうするか」「どんな制約があるか」も書くとさらに効果的です。
-              <div className={styles.codeWrap}>
-                <div className={styles.codeBar}>
-                  <span className={styles.codeLang}>EXAMPLE</span>
-                  <div className={styles.codeDots}>
-                    <span />
-                    <span />
-                    <span />
-                  </div>
-                </div>
-                <div className={styles.codeBody}>
-                  <span className={styles.cc}>
-                    {
-                      "/**\n * レート制限付きAPIクライアント\n * - 1分間に最大100リクエスト\n * - 指数バックオフで自動リトライ（最大3回）\n * - タイムアウトは10秒\n * - エラー時はカスタムAPIErrorをthrow\n */"
-                    }
-                  </span>
-                  {"\n"}
-                  <span className={styles.ce}>class</span>{" "}
-                  <span className={styles.cv}>RateLimitedApiClient</span>
-                  {" {"}
-                </div>
-              </div>
-            </div>
-          </details>
-
-          <details className={styles.accordionItem}>
-            <summary className={styles.accordionSummary}>
-              <span className={styles.accordionIcon}>🧩</span>
-              <span>
-                <strong>03.</strong> タスクを小さな単位に分解する
-              </span>
-              <span className={styles.accordionArrow}>▼</span>
-            </summary>
-            <div className={styles.accordionBody}>
-              「ECサイト全体を作って」ではなく「商品一覧APIを作って」→「カート機能を追加して」→「決済フローを実装して」と
-              <strong>小さなステップに分解</strong>
-              することでCopilotの精度が大幅に向上します。
-              複雑なタスクほどプランモードを活用して計画を立てましょう。
-            </div>
-          </details>
-
-          <details className={styles.accordionItem}>
-            <summary className={styles.accordionSummary}>
-              <span className={styles.accordionIcon}>✅</span>
-              <span>
-                <strong>04.</strong> 提案コードを必ず理解してから採用する
-              </span>
-              <span className={styles.accordionArrow}>▼</span>
-            </summary>
-            <div className={styles.accordionBody}>
-              Copilotは強力なツールですが<strong>間違いを犯すことがあります</strong>。
-              提案されたコードを「なぜこのロジックになっているか」を自分で理解してから採用することが必須です。
-              特に、セキュリティに関わる部分（認証・暗号化・SQL）は細心の注意を払いましょう。
-              <div className={styles.alertWarn} style={{ marginTop: "12px" }}>
-                <span className={styles.alertIcon}>⚠️</span>
-                <div className={styles.alertContent}>
-                  Copilotは「コパイロット（副操縦士）」です。「オートパイロット（自動操縦）」ではありません。最終判断は常にあなたが行います。
-                </div>
-              </div>
-            </div>
-          </details>
-
-          <details className={styles.accordionItem}>
-            <summary className={styles.accordionSummary}>
-              <span className={styles.accordionIcon}>🎯</span>
-              <span>
-                <strong>05.</strong> ペルソナを設定してChat品質を上げる
-              </span>
-              <span className={styles.accordionArrow}>▼</span>
-            </summary>
-            <div className={styles.accordionBody}>
-              Chatに「あなたはコード品質と可読性を重視するシニアTypeScriptエンジニアです」などのペルソナを設定すると、
-              より専門的な視点からのレビューや提案が得られます。
-              <div className={styles.codeWrap}>
-                <div className={styles.codeBar}>
-                  <span className={styles.codeLang}>CHAT PROMPT</span>
-                  <div className={styles.codeDots}>
-                    <span />
-                    <span />
-                    <span />
-                  </div>
-                </div>
-                <div className={styles.codeBody}>
-                  <span className={styles.cs}>
-                    {
-                      "あなたはGolangのパフォーマンス最適化を専門とする\nシニアバックエンドエンジニアです。\n以下のコードのボトルネックを分析して改善案を提示してください..."
-                    }
-                  </span>
-                </div>
-              </div>
-            </div>
-          </details>
-
-          <details className={styles.accordionItem}>
-            <summary className={styles.accordionSummary}>
-              <span className={styles.accordionIcon}>🔄</span>
-              <span>
-                <strong>06.</strong> TDD（テスト駆動開発）と組み合わせる
-              </span>
-              <span className={styles.accordionArrow}>▼</span>
-            </summary>
-            <div className={styles.accordionBody}>
-              テストを先に書き、Copilotにテストを通す実装を生成させるTDDワークフローは非常に効果的です。
-              テストがあることでCopilotが生成したコードの品質を自動検証できます。
-              <code>/tests</code>コマンドでテストを先生成し、その後実装を書くアプローチも有効です。
-            </div>
-          </details>
-
-          <details className={styles.accordionItem}>
-            <summary className={styles.accordionSummary}>
-              <span className={styles.accordionIcon}>📚</span>
-              <span>
-                <strong>07.</strong> copilot-instructions.mdを活用する
-              </span>
-              <span className={styles.accordionArrow}>▼</span>
-            </summary>
-            <div className={styles.accordionBody}>
-              プロジェクト固有のルール（コーディング規約・ライブラリ選定・命名規則）を
-              <code>.github/copilot-instructions.md</code>に記述することで、
-              チーム全員が一貫した品質のコードをCopilotから得られます。 指示は
-              <strong>簡潔・具体的</strong>に書くことが重要です。長すぎると効果が薄れます。
-            </div>
-          </details>
-
-          <details className={styles.accordionItem}>
-            <summary className={styles.accordionSummary}>
-              <span className={styles.accordionIcon}>🌐</span>
-              <span>
-                <strong>08.</strong> コンテキストウィンドウを意識する
-              </span>
-              <span className={styles.accordionArrow}>▼</span>
-            </summary>
-            <div className={styles.accordionBody}>
-              Copilot CLIではトークン上限の95%に近づくと自動圧縮（Auto-compaction）が発動します。
-              長いセッションでは重要な文脈が失われることがあります。 複雑なタスクでは
-              <strong>定期的に新しいチャットセッションを始める</strong>か、 重要なコンテキストを
-              <code>copilot-instructions.md</code>に記録しておきましょう。
-            </div>
-          </details>
-
-          <details className={styles.accordionItem}>
-            <summary className={styles.accordionSummary}>
-              <span className={styles.accordionIcon}>🚀</span>
-              <span>
-                <strong>09.</strong> WRAPフレームワークで効果的なIssueを書く
-              </span>
-              <span className={styles.accordionArrow}>▼</span>
-            </summary>
-            <div className={styles.accordionBody}>
-              GitHub Copilotエージェントが最も効果を発揮するのは、明確に記述されたIssueです。
-              GitHub公式が推奨する<strong>WRAPフレームワーク</strong>を活用しましょう：
-              <div
-                className={styles.cardGrid}
-                style={{ marginTop: "14px", gridTemplateColumns: "repeat(2, 1fr)" }}
-              >
-                <div className={styles.card} style={{ padding: "16px" }}>
-                  <div className={styles.cardTitle} style={{ color: "var(--accent)" }}>
-                    W — What (何を)
-                  </div>
-                  <div className={styles.cardDesc}>達成したいことを具体的に書く</div>
-                </div>
-                <div className={styles.card} style={{ padding: "16px" }}>
-                  <div className={styles.cardTitle} style={{ color: "var(--accent)" }}>
-                    R — Reason (なぜ)
-                  </div>
-                  <div className={styles.cardDesc}>背景・理由・ユーザーへの影響を書く</div>
-                </div>
-                <div className={styles.card} style={{ padding: "16px" }}>
-                  <div className={styles.cardTitle} style={{ color: "var(--accent)" }}>
-                    A — Acceptance (完了条件)
-                  </div>
-                  <div className={styles.cardDesc}>どうなれば完了か明確にする</div>
-                </div>
-                <div className={styles.card} style={{ padding: "16px" }}>
-                  <div className={styles.cardTitle} style={{ color: "var(--accent)" }}>
-                    P — Prior Context (前提)
-                  </div>
-                  <div className={styles.cardDesc}>関連コード・制約・参考情報を添付</div>
-                </div>
-              </div>
-            </div>
-          </details>
-
-          <details className={styles.accordionItem}>
-            <summary className={styles.accordionSummary}>
-              <span className={styles.accordionIcon}>📊</span>
-              <span>
-                <strong>10.</strong> プレミアムリクエストの使用量を監視する
-              </span>
-              <span className={styles.accordionArrow}>▼</span>
-            </summary>
-            <div className={styles.accordionBody}>
-              Chat・エージェントモード・コードレビューはプレミアムリクエストを消費します。
-              上限を超えると<strong>$0.04/リクエスト</strong>の追加費用が発生します。
-              月ごとのリセットタイミング（1日UTC深夜）を把握し、 Settings → Copilot → Usage
-              で使用量を定期確認しましょう。
-              <div className={styles.alertInfo} style={{ marginTop: "12px" }}>
-                <span className={styles.alertIcon}>💡</span>
-                <div className={styles.alertContent}>
-                  通常のコード補完（インライン補完）はプレミアムリクエストを消費しません（Freeプランを除く）
-                </div>
-              </div>
-            </div>
-          </details>
-        </section>
-
-        {/* ─── s07: security ─── */}
-        <section id="s07" className={styles.sec}>
-          <div className={styles.secHeader}>
-            <span className={styles.secNum}>07</span>
-            <div>
-              <h2 className={styles.secTitle}>セキュリティと注意事項</h2>
-              <p className={styles.secDesc}>安全にCopilotを使用するための重要な注意点</p>
-            </div>
-          </div>
-          <div className={styles.cardGrid}>
-            <div className={styles.card}>
-              <span className={styles.cardIcon}>🔐</span>
-              <div className={styles.cardTitle}>脆弱なコードパターンを認識する</div>
-              <div className={styles.cardDesc}>
-                Copilotはハードコードされた認証情報、SQLインジェクション、パストラバーサルなど一般的な脆弱性をフィルタリングしますが、
-                <strong>すべての脆弱性を防げるわけではありません</strong>。
-                セキュリティ関連のコードは必ず手動レビューしてください。
-              </div>
-            </div>
-            <div className={styles.card}>
-              <span className={styles.cardIcon}>📜</span>
-              <div className={styles.cardTitle}>著作権・ライセンス確認</div>
-              <div className={styles.cardDesc}>
-                Copilotはパブリックリポジトリのコードで学習しています。生成されたコードが既存のOSSコードに類似する可能性があります。
-                Business/EnterpriseプランのIP補償を活用しつつ、重要なコードは確認しましょう。
-              </div>
-            </div>
-            <div className={styles.card}>
-              <span className={styles.cardIcon}>🏢</span>
-              <div className={styles.cardTitle}>機密情報をChatに貼らない</div>
-              <div className={styles.cardDesc}>
-                APIキー・パスワード・個人情報などの機密データをCopilot
-                Chatに直接貼り付けることは避けてください。
-                Enterpriseプランではデータ保護協定（DPA）により適切に管理されますが、基本的な慎重さが重要です。
-              </div>
-            </div>
-            <div className={styles.card}>
-              <span className={styles.cardIcon}>🧪</span>
-              <div className={styles.cardTitle}>必ずテストを実行する</div>
-              <div className={styles.cardDesc}>
-                Copilotが生成したコードは、既存のテスト・コードスキャン・セキュリティテストなど
-                <strong>通常の品質管理プロセスをすべて通過させてください</strong>。
-                AI生成だからといって例外にしないこと。
-              </div>
-            </div>
-            <div className={styles.card}>
-              <span className={styles.cardIcon}>⚙️</span>
-              <div className={styles.cardTitle}>除外ファイルを設定する</div>
-              <div className={styles.cardDesc}>
-                機密性の高いファイル（<code>.env</code>
-                ・設定ファイル・秘密鍵）はCopilotが参照しないよう
-                <code>.copilotignore</code>
-                またはOrganization設定で除外できます（Business/Enterpriseプラン）。
-              </div>
-            </div>
-            <div className={styles.card}>
-              <span className={styles.cardIcon}>🔄</span>
-              <div className={styles.cardTitle}>古いAPIパターンに注意</div>
-              <div className={styles.cardDesc}>
-                Copilotの学習データには古いAPIやライブラリバージョンが含まれています。
-                生成されたコードが使用している外部ライブラリの最新バージョンと互換性があるか必ず確認しましょう。
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ─── s08: models ─── */}
-        <section id="s08" className={styles.sec}>
-          <div className={styles.secHeader}>
-            <span className={styles.secNum}>08</span>
-            <div>
-              <h2 className={styles.secTitle}>AIモデル選択ガイド</h2>
-              <p className={styles.secDesc}>タスクに最適なAIモデルの選び方</p>
-            </div>
-          </div>
-          <div className={styles.alertInfo} style={{ marginBottom: "24px" }}>
-            <span className={styles.alertIcon}>ℹ️</span>
-            <div className={styles.alertContent}>
-              <strong>プレミアムリクエストと通常リクエストの違い：</strong>
-              <br />
-              高度なモデル（GPTの最新モデル（2026）やClaudeの最新モデル（2026）等）を使用するChat/エージェントモードは「プレミアムリクエスト」を消費します。
-              インラインコード補完は通常消費しません。モデルによって1リクエストあたりの消費量が異なります。
-            </div>
-          </div>
-
-          <table className={styles.modelTable}>
-            <caption className={styles.srOnly}>モデル比較</caption>
+        <h2 id="1-github-copilotの全体像2026年時点のプロダクトファミリー">
+          1. GitHub Copilotの全体像(2026年時点のプロダクトファミリー)
+        </h2>
+        <p>
+          GitHub Copilotはもはや単一機能ではなく、用途の異なる複数の面(surface)からなる製品群です。
+        </p>
+        <MermaidDiagram chart={CHART_1} theme="base" themeVariables={COPILOT_THEME_VARS} />
+        <div className={styles.tableScroll}>
+          <table>
             <thead>
-              <tr>
-                <th>モデル</th>
-                <th>特性</th>
-                <th>最適な用途</th>
-                <th>利用可能プラン</th>
-                <th>速度</th>
+              <tr className="header">
+                <th>面(サーフェス)</th>
+                <th>主な用途</th>
+                <th>主なドキュメント</th>
               </tr>
             </thead>
             <tbody>
-              <tr>
+              <tr className="odd">
+                <td>インライン補完 / Next Edit Suggestions</td>
+                <td>1行〜数行単位の即時補完。無制限・無料枠あり</td>
+                <td><code>docs.github.com/copilot</code></td>
+              </tr>
+              <tr className="even">
+                <td>Copilot Chat(Ask/Edit/Agent)</td>
+                <td>IDE内での対話・複数ファイル編集</td>
+                <td>VS Code / Visual Studio / JetBrains</td>
+              </tr>
+              <tr className="odd">
+                <td>Copilot CLI</td>
+                <td>ターミナルでのエージェント作業、Plan/Autopilot</td>
+                <td><code>docs.github.com/copilot/how-tos/copilot-cli</code></td>
+              </tr>
+              <tr className="even">
+                <td>Copilot Coding Agent(クラウド)</td>
+                <td>Issueをバックグラウンドで自律的に処理しPRを作成</td>
+                <td><code>docs.github.com/copilot/how-tos/agents</code></td>
+              </tr>
+              <tr className="odd">
+                <td>Copilot Code Review</td>
+                <td>PRの自動レビュー。Agent Skills / MCPに対応(2026年7月29日GA)</td>
+                <td><code>docs.github.com/copilot/using-github-copilot/code-review</code></td>
+              </tr>
+              <tr className="even">
+                <td>Copilot Spaces</td>
+                <td>コード・ドキュメント・Issueを束ねたチームのナレッジベース</td>
+                <td><code>docs.github.com</code> / Microsoft Learn</td>
+              </tr>
+              <tr className="odd">
+                <td>Copilot App</td>
+                <td>プロトタイピングやキャンバス型のインタラクティブ作業向け新インターフェース</td>
+                <td>GitHub Blog</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          各サーフェスの詳細な挙動は異なりますが、<strong>同じハーネス(harness)を共有している</strong>ため、一度使い方を覚えればどこでも応用できます。GitHubのBurke
+          Holland氏はこれを次のように表現しています——学ぶべきは個々の小技ではなく、ハーネスそのものの使い方だという考え方です。
+        </p>
+        <blockquote>
+          <p>
+            出典: Burke Holland, <em>"The harness is all you need (mostly)"</em>, The GitHub Blog,
+            2026-07-27
+          </p>
+        </blockquote>
+        <hr />
+        <h2 id="2-3つのchatモードを使い分けるask--edit--agent">
+          2. 3つのChatモードを使い分ける(Ask / Edit / Agent)
+        </h2>
+        <p>
+          GitHub Copilot
+          Chatには3つの基本モードがあり、タスクの性質に応じて選ぶことでコストと精度のバランスが取れます。
+        </p>
+        <MermaidDiagram chart={CHART_2} theme="base" themeVariables={COPILOT_THEME_VARS} />
+        <div className={styles.tableScroll}>
+          <table>
+            <thead>
+              <tr className="header">
+                <th>モード</th>
+                <th>挙動</th>
+                <th>適した場面</th>
+                <th>コスト特性</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr className="odd">
+                <td><strong>Ask</strong></td>
+                <td>ファイルを変更せず回答のみ</td>
+                <td>コードの説明、設計相談、概念の理解</td>
+                <td>最も安価</td>
+              </tr>
+              <tr className="even">
+                <td><strong>Edit</strong></td>
+                <td>選択中のファイル内でピンポイントに編集</td>
+                <td>対象ファイルが分かっている単純なリファクタ</td>
+                <td>中程度</td>
+              </tr>
+              <tr className="odd">
+                <td><strong>Agent</strong></td>
                 <td>
-                  <span className={styles.modelName}>GPT — newest 2026</span>
-                  <br />
-                  <span className={`${styles.tag} ${styles.tagNew}`}>LTS標準</span>
+                  複数ファイルを横断し、必要なツール・ターミナルコマンドを自律的に呼び出し、エラーを自己修正しながら反復
                 </td>
-                <td>長期サポート（〜2027/2）。コーディング全般に優秀</td>
-                <td>日常的なコーディング補助・説明</td>
+                <td>機能追加、複雑なリファクタ、テスト作成、レガシー移行</td>
+                <td>高め(反復のたびにAI Creditsを消費)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p><strong>実践のコツ</strong></p>
+        <ul>
+          <li>
+            まず <strong>Ask モード</strong>で問題のスコープを固め、要件が固まってから
+            <strong>Agent モード</strong>に切り替えると、AI Creditsの浪費を防げます。
+          </li>
+          <li>
+            Agent
+            モードは1回の複雑なタスクで10〜20回分のプレミアムリクエストを消費することもあるため、着手前に要件を明確化しておくことが重要です。
+          </li>
+          <li>
+            VS Codeでは、Copilot Editsビューのモードドロップダウンから切り替え可能です。Copilot
+            CLIでは <code>Shift+Tab</code> でPlanモードとの行き来ができます。
+          </li>
+        </ul>
+        <blockquote>
+          <p>
+            出典: <em>"Copilot ask, edit, and agent modes: What they do and when to use them"</em>,
+            The GitHub Blog / <em>"GitHub Copilot Agent Mode: The Complete Guide for 2026"</em>,
+            fundesk.io
+          </p>
+        </blockquote>
+        <hr />
+        <h2 id="3-カスタムインストラクションの3層構造">3. カスタムインストラクションの3層構造</h2>
+        <p>
+          Copilotは複数のインストラクションソースを同時に読み込み、優先順位に従って解決します。この階層を理解しないまま設定すると、「なぜか指示が無視される」という事態に陥ります。
+        </p>
+        <MermaidDiagram chart={CHART_3} theme="base" themeVariables={COPILOT_THEME_VARS} />
+        <div className={styles.tableScroll}>
+          <table>
+            <thead>
+              <tr className="header">
+                <th>ファイル</th>
+                <th>適用範囲</th>
+                <th>主な用途</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr className="odd">
+                <td><code>.github/copilot-instructions.md</code></td>
+                <td>リポジトリ全体、全リクエストに常時適用</td>
+                <td>コーディング規約・ビルド/テストコマンド・命名規則</td>
+              </tr>
+              <tr className="even">
+                <td><code>.github/instructions/*.instructions.md</code></td>
+                <td><code>applyTo</code> で指定したパスのみ(例: <code>**/*.tsx</code>)</td>
+                <td>フレームワーク別・ファイル種別ごとのルール</td>
+              </tr>
+              <tr className="odd">
+                <td><code>AGENTS.md</code>(ルートおよびネスト可能)</td>
+                <td>Copilot CLI、Coding Agent、Copilot Chatのエージェント的タスク</td>
+                <td>ビルド・テスト・検証手順など「エージェントが自律的に動く際に必要な情報」</td>
+              </tr>
+              <tr className="even">
+                <td>個人インストラクション</td>
+                <td>そのユーザーの全プロジェクト</td>
+                <td>好みのコーディングスタイルなど個人設定</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p><strong>ベストプラクティス</strong></p>
+        <ul>
+          <li>
+            <strong>1指示1文</strong>を徹底する。複数の情報を詰め込みたい場合は箇条書きで分割する。
+          </li>
+          <li>
+            <strong>理由を書く</strong
+            >。「なぜそのルールが存在するか」を書き添えると、エッジケースでの判断精度が上がる。
+          </li>
+          <li>
+            <strong>600語を超えない</strong
+            >。インライン提案生成時、Copilotは長大な指示ファイルを全文読み込まない場合があり、実効コンテキストウィンドウを超えた部分は無視される。
+          </li>
+          <li>
+            VS Codeでは <code>/init</code> で既存の規約を検出しつつ雛形を生成、<code
+              >/create-instructions</code
+            >
+            で特定用途向けの指示を追加生成できる。
+          </li>
+          <li>
+            Copilot CLIでは
+            <code>@相対パス</code>
+            の記法で別ファイルを読み込ませることができ、参照先ファイル内のさらなる参照も解決される。
+          </li>
+          <li>
+            <code>.github/copilot-instructions.md</code> と
+            <code>.cursorrules</code> は似て非なるものであり、<strong
+              >Copilotは <code>.cursorrules</code> を読まない</strong
+            >。
+          </li>
+        </ul>
+        <blockquote>
+          <p>
+            出典: GitHub Docs <em>"Adding custom instructions for GitHub Copilot"</em> / VS Code
+            Docs <em>"Use custom instructions"</em> / GitHub Changelog (AGENTS.md対応, 2025-08-28) /
+            <em>"AI Coding Best Practices for GitHub Copilot (2026)"</em>, cursor-alternatives.com
+          </p>
+        </blockquote>
+        <hr />
+        <h2 id="4-プロンプトファイルとカスタムチャットモード">
+          4. プロンプトファイルとカスタムチャットモード
+        </h2>
+        <p>
+          繰り返し使うプロンプトは
+          <code>.prompt.md</code> ファイルとして保存し、スラッシュコマンドのように呼び出せます。
+        </p>
+        <pre><code className="language-markdown">---
+mode: 'agent'
+tools: ['githubRepo', 'codebase']
+description: 'Reactフォームコンポーネントを新規生成する'
+---
+あなたの目標は #githubRepo contoso/react-templates のテンプレートを参考に、
+新しいReactフォームコンポーネントを生成することです。
+フォーム名とフィールドが未指定の場合は質問してください。</code></pre>
+        <div className={styles.tableScroll}>
+          <table>
+            <thead>
+              <tr className="header">
+                <th>フィールド</th>
+                <th>意味</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr className="odd">
+                <td><code>mode</code></td>
                 <td>
-                  <span className={`${styles.tag} ${styles.tagFree}`}>Free〜</span>
-                </td>
-                <td>
-                  <div className={styles.progressBarWrap}>
-                    <div className={styles.progressBarInner} style={{ width: "85%" }} />
-                  </div>
-                  速い
+                  実行時のChatモード(<code>ask</code> / <code>edit</code> /
+                  <code>agent</code>、既定は <code>agent</code>)
                 </td>
               </tr>
-              <tr>
+              <tr className="even">
+                <td><code>tools</code></td>
+                <td>Agentモード時に使用を許可するツール一覧</td>
+              </tr>
+              <tr className="odd">
+                <td><code>model</code></td>
+                <td>使用する特定モデルを固定したい場合に指定</td>
+              </tr>
+              <tr className="even">
+                <td><code>description</code></td>
+                <td>プロンプトの説明(スラッシュコマンド一覧に表示)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          さらに、<code>.chatmode.md</code>
+          を使うと<strong>カスタムチャットモード</strong>を定義でき、特定領域(コードレビュー専任、テスト専任など)にフォーカスしたモードを何個でも作成できます。ただし、カスタムチャットモードもAI
+          Creditsを消費するため、無秩序に増やすとコストが見えにくくなる点に注意してください。
+        </p>
+        <blockquote>
+          <p>
+            出典: <em>"GitHub Copilot Chat を使う時のTips(Instruction files, Prompt files)"</em>,
+            Zenn /
+            <em
+              >"Master GitHub Copilot Customization in VS Code with Instructions and Prompt
+              Files"</em
+            >, Copilot That Jawn / <em>"Blog Post - Modes of Chatting with GitHub Copilot"</em>,
+            CODE Magazine
+          </p>
+        </blockquote>
+        <hr />
+        <h2 id="5-カスタムエージェントとサブエージェント">
+          5. カスタムエージェントとサブエージェント
+        </h2>
+        <p>
+          <code>.agent.md</code>
+          ファイルを使うと、特化型のペルソナ(コードレビュー専任、テスト専任、セキュリティ監査専任など)を定義できます。
+        </p>
+        <pre><code className="language-markdown">---
+description: 'テストカバレッジと品質、テストのベストプラクティスに特化'
+name: 'Test Specialist'
+tools: ['read', 'edit', 'search']
+model: 'Claude Sonnet 4.5'
+target: 'vscode'
+---
+あなたはテスト専門のスペシャリストです。
+実装の前に必ずテストケースの網羅性を確認し、
+エッジケースを洗い出してから実装を進めてください。</code></pre>
+        <div className={styles.tableScroll}>
+          <table>
+            <thead>
+              <tr className="header">
+                <th>項目</th>
+                <th>配置場所</th>
+                <th>スコープ</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr className="odd">
+                <td>リポジトリレベルのカスタムエージェント</td>
+                <td><code>.github/agents/</code></td>
+                <td>リポジトリ単位</td>
+              </tr>
+              <tr className="even">
+                <td>個人のカスタムエージェント</td>
+                <td><code>~/.copilot/agents/</code></td>
+                <td>全プロジェクト共通</td>
+              </tr>
+              <tr className="odd">
+                <td>組織/Enterprise共有エージェント</td>
+                <td><code>agents/</code>(組織レベル)</td>
+                <td>組織全体</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          <strong>サブエージェント(subagents)</strong>
+          は、メインのChatセッション内で独立したコンテキストウィンドウを持つ子エージェントに作業を委譲する仕組みです。リサーチや大量ドキュメントの処理など、メインの会話コンテキストを汚したくない場合に有効で、Agentモードは複雑なタスクの際に自動的に「Explore」(小型モデル)や「General
+          Purpose」(大型モデル)といった組み込みサブエージェントへオーケストレーションを行います。特別な設定をしなくても、この恩恵は標準で得られます。
+        </p>
+        <blockquote>
+          <p>
+            出典: GitHub Docs <em>"Asking GitHub Copilot questions in your IDE"</em> /
+            <em>awesome-copilot</em> リポジトリ(<code>agents.instructions.md</code>) / Burke
+            Holland, <em>"The harness is all you need (mostly)"</em>
+          </p>
+        </blockquote>
+        <hr />
+        <h2 id="6-copilot-spacesでチームのナレッジベースを構築する">
+          6. Copilot Spacesでチームのナレッジベースを構築する
+        </h2>
+        <p>
+          2025年11月1日に「Copilot Knowledge Bases」が廃止され、後継として
+          <strong>Copilot Spaces</strong>
+          に一本化されました。Spacesは、コード・Markdown・Issue・PR・アップロードファイル・自由記述テキストなどを1つのコンテキストにまとめ、チームで共有できる仕組みです。
+        </p>
+        <MermaidDiagram chart={CHART_4} theme="base" themeVariables={COPILOT_THEME_VARS} />
+        <p><strong>活用パターン</strong></p>
+        <ol type="1">
+          <li>
+            <strong>プロジェクト専任アシスタント</strong
+            >:主要プロジェクトごとにSpaceを作成し、内部規約に沿ったコード生成・複雑なモジュールの説明・安全なリファクタリングを行わせる。
+          </li>
+          <li>
+            <strong>チームのナレッジベース</strong
+            >:コーディング規約・アーキテクチャ決定・ベストプラクティスを集約し、新人のオンボーディングを加速する。
+          </li>
+          <li>
+            <strong>API/ドキュメント支援</strong
+            >:APIドキュメントのドラフト作成、README生成、用語の一貫性維持。
+          </li>
+          <li>
+            <strong>セキュリティ/コンプライアンス</strong
+            >:セキュリティポリシーやコンプライアンスチェックリストを添付し、方針に沿った安全なコードを提案させる。
+          </li>
+        </ol>
+        <p>
+          <strong>運用のコツ</strong
+          >:1つのSpaceは単一の目的に絞ること。「何でも入れたSpace」は回答精度を落とします。Spaceは組織・チーム・個人ユーザー単位で共有・非公開を選択でき、GitHub上のコンテンツが更新されれば内容も追随して最新化されます。
+        </p>
+        <blockquote>
+          <p>
+            出典:
+            <em
+              >"Turning GitHub Copilot into a 'Best Practices Coach' with Copilot Spaces + a
+              Markdown Knowledge Base"</em
+            >, Microsoft Community Hub, 2026-05-06 /
+            <em>"Sunset notice: Copilot knowledge bases"</em>, GitHub Changelog /
+            <em>"How to use GitHub Copilot Spaces to debug issues faster"</em>, The GitHub Blog
+          </p>
+        </blockquote>
+        <hr />
+        <h2 id="7-エージェントモード実践ワークフロー8ステップ">
+          7. エージェントモード実践ワークフロー(8ステップ)
+        </h2>
+        <p>
+          GitHubのBurke Holland氏が2026年7月27日に公開した記事
+          <em>"The harness is all you need (mostly)"</em>
+          では、特別なMCPやスキルに頼らず、既存機能だけで生産性を大きく高める実践的な8ステップワークフローが紹介されています。以下はその要点です。
+        </p>
+        <MermaidDiagram chart={CHART_5} theme="base" themeVariables={COPILOT_THEME_VARS} />
+        <div className={styles.tableScroll}>
+          <table>
+            <thead>
+              <tr className="header">
+                <th>ステップ</th>
+                <th>ポイント</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr className="odd">
+                <td>① ツール選択</td>
                 <td>
-                  <span className={styles.modelName}>GPT — newest 2026</span>
-                  <br />
-                  <span className={`${styles.tag} ${styles.tagFree}`}>軽量</span>
-                </td>
-                <td>軽量・高速。プレミアムリクエスト消費が少ない</td>
-                <td>シンプルな質問・繰り返し作業</td>
-                <td>
-                  <span className={`${styles.tag} ${styles.tagFree}`}>Free〜</span>
-                </td>
-                <td>
-                  <div className={styles.progressBarWrap}>
-                    <div className={styles.progressBarInner} style={{ width: "100%" }} />
-                  </div>
-                  最速
+                  ハーネスは共通なので、どれか1つを深く学べば他にも応用できる。初学者はUIが少ないCLIから始めるのがおすすめ
                 </td>
               </tr>
-              <tr>
+              <tr className="even">
+                <td>② YOLOモード</td>
                 <td>
-                  <span className={styles.modelName}>Claude — newest 2026</span>
-                  <br />
-                  <span className={`${styles.tag} ${styles.tagFree}`}>軽量</span>
-                </td>
-                <td>軽量・高速。Anthropic製の効率的モデル</td>
-                <td>シンプルな質問・繰り返し作業</td>
-                <td>
-                  <span className={`${styles.tag} ${styles.tagFree}`}>Free〜</span>
-                </td>
-                <td>
-                  <div className={styles.progressBarWrap}>
-                    <div className={styles.progressBarInner} style={{ width: "95%" }} />
-                  </div>
-                  最速
+                  エージェントに自律性を与えないと生産性向上は得られない。ただし<strong>ローカルマシンでは実行しない</strong>。GitHub
+                  CodespacesやDev Containerなどサンドボックス環境を使う
                 </td>
               </tr>
-              <tr>
+              <tr className="odd">
+                <td>③ プロトタイプ</td>
                 <td>
-                  <span className={styles.modelName}>Claude — newest 2026</span>
-                  <br />
-                  <span className={`${styles.tag} ${styles.tagPro}`}>中〜上級</span>
-                </td>
-                <td>コード品質・説明能力が高い。Anthropic製</td>
-                <td>コードレビュー・アーキテクチャ設計</td>
-                <td>
-                  <span className={`${styles.tag} ${styles.tagPro}`}>Pro〜</span>
-                </td>
-                <td>
-                  <div className={styles.progressBarWrap}>
-                    <div className={styles.progressBarInner} style={{ width: "75%" }} />
-                  </div>
-                  普通
+                  「20パターンのモック」のように複数バリエーションを一括生成させ、人間が比較検討する。視覚情報は密なテキストより速く処理できる
                 </td>
               </tr>
-              <tr>
+              <tr className="even">
+                <td>④ 計画(Plan)</td>
                 <td>
-                  <span className={styles.modelName}>Claude — newest 2026</span>
-                  <br />
-                  <span className={`${styles.tag} ${styles.tagBeta}`}>最上級</span>
-                </td>
-                <td>最高品質の推論・複雑なロジック分析</td>
-                <td>難解なバグ解析・複雑な設計判断</td>
-                <td>
-                  <span className={`${styles.tag} ${styles.tagBeta}`}>Pro+のみ</span>
-                </td>
-                <td>
-                  <div className={styles.progressBarWrap}>
-                    <div className={styles.progressBarInner} style={{ width: "40%" }} />
-                  </div>
-                  遅め
+                  <code>/plan</code>
+                  で要件のヌケモレ・エッジケースを洗い出す。曖昧な一文のプロンプトでも、計画フェーズが質問を重ねて具体化してくれる
                 </td>
               </tr>
-              <tr>
+              <tr className="odd">
+                <td>⑤ 実装(Autopilot)</td>
                 <td>
-                  <span className={styles.modelName}>Gemini — newest 2026</span>
-                  <br />
-                  <span className={`${styles.tag} ${styles.tagNew}`}>GA</span>
-                </td>
-                <td>2026年5月GA。超高速かつ高精度なレスポンス。Google製</td>
-                <td>迅速なコード補完・チャット回答</td>
-                <td>
-                  <span className={`${styles.tag} ${styles.tagFree}`}>Free〜</span>
-                </td>
-                <td>
-                  <div className={styles.progressBarWrap}>
-                    <div className={styles.progressBarInner} style={{ width: "95%" }} />
-                  </div>
-                  最速クラス
+                  計画の各項目を完了させるまで自律的にループする。複雑さに応じて内部的に小型/大型モデルのサブエージェントへ自動振り分けされる
                 </td>
               </tr>
-              <tr>
+              <tr className="even">
+                <td>⑥ 人間レビュー</td>
+                <td>「だいたいで良い」を許容しない。品質の見極めは依然として人間の責任</td>
+              </tr>
+              <tr className="odd">
+                <td>⑦ Rubber Duckレビュー</td>
                 <td>
-                  <span className={styles.modelName}>Gemini — newest 2026</span>
-                  <br />
-                  <span className={`${styles.tag} ${styles.tagBeta}`}>GA</span>
-                </td>
-                <td>強力な推論・マルチモーダル対応。Google製</td>
-                <td>複雑なリファクタリング・論理推論</td>
-                <td>
-                  <span className={`${styles.tag} ${styles.tagPro}`}>Pro〜</span>
-                </td>
-                <td>
-                  <div className={styles.progressBarWrap}>
-                    <div className={styles.progressBarInner} style={{ width: "70%" }} />
-                  </div>
-                  普通
+                  異なるモデルファミリーに二重チェックさせる(例:
+                  GPT系で実装→Claude系でレビュー)ことで、単一モデルの死角を補える
                 </td>
               </tr>
-              <tr>
+              <tr className="even">
+                <td>⑧ 完了</td>
                 <td>
-                  <span className={styles.modelName}>Grok — newest 2026</span>
-                  <br />
-                  <span className={`${styles.tag} ${styles.tagNew}`}>高速</span>
-                </td>
-                <td>xAI製。高速コーディング特化。データ保持なし</td>
-                <td>迅速なコード生成・反復開発</td>
-                <td>
-                  <span className={`${styles.tag} ${styles.tagFree}`}>Free〜</span>
-                </td>
-                <td>
-                  <div className={styles.progressBarWrap}>
-                    <div className={styles.progressBarInner} style={{ width: "90%" }} />
-                  </div>
-                  高速
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <span className={styles.modelName}>Raptor — newest 2026</span>
-                  <br />
-                  <span className={`${styles.tag} ${styles.tagBeta}`}>Preview</span>
-                </td>
-                <td>超軽量プレビューモデル。制限なし使用可</td>
-                <td>実験的用途・頻繁な問い合わせ</td>
-                <td>
-                  <span className={`${styles.tag} ${styles.tagFree}`}>Free〜</span>
-                </td>
-                <td>
-                  <div className={styles.progressBarWrap}>
-                    <div className={styles.progressBarInner} style={{ width: "100%" }} />
-                  </div>
-                  最速
+                  話題が変わったら新しいセッションを開始する。コンテキストウィンドウは有限であることを忘れない
                 </td>
               </tr>
             </tbody>
           </table>
-
-          <div className={styles.alertInfo} style={{ marginTop: "16px", fontSize: "0.875rem" }}>
-            <span className={styles.alertIcon}>📅</span>
-            <div className={styles.alertContent}>
-              <strong>最終更新:</strong> 2026年6月
-              <br />
-              <strong>参考:</strong>{" "}
-              <Ext href="https://docs.github.com/en/copilot/using-github-copilot/finding-information-about-github-copilot/supported-models">
-                Supported AI models - GitHub Docs
-              </Ext>
-              ,{" "}
-              <Ext href="https://github.blog/changelog/2026-03-18-gpt-5-3-codex-long-term-support-in-github-copilot/">
-                GPT latest model (2026) LTS - GitHub Changelog
-              </Ext>
-              ,{" "}
-              <Ext href="https://github.blog/changelog/2026-05-19-gemini-3.5-flash-is-generally-available-for-github-copilot/">
-                Gemini latest model (2026) in GitHub Copilot
-              </Ext>
-            </div>
-          </div>
-
-          <div className={styles.alertSuccess} style={{ marginTop: "20px" }}>
-            <span className={styles.alertIcon}>💡</span>
-            <div className={styles.alertContent}>
-              <strong>モデル選択の基本戦略：</strong>
-              日常のコーディングはGPTの最新モデル（2026）やGeminiの最新モデル（2026）、複雑なアーキテクチャ設計はClaudeの最新モデル（2026）、
-              難解なバグや高度な推論が必要な場合のみClaudeの最上位モデル（2026、Pro+のみ）を使用することで、AIクレジットを効率的に使えます。また、VS
-              Codeの自動モデル選択（Auto Model
-              Selection）機能を利用すると、自動的にタスクに応じた最適ルーティングが行われます。
-            </div>
-          </div>
-        </section>
-
-        {/* ─── s09: checklist ─── */}
-        <section id="s09" className={styles.sec}>
-          <div className={styles.secHeader}>
-            <span className={styles.secNum}>09</span>
-            <div>
-              <h2 className={styles.secTitle}>導入チェックリスト</h2>
-              <p className={styles.secDesc}>
-                Copilotを最大限活用するための確認項目。クリックでチェックできます
-              </p>
-            </div>
-          </div>
-
-          <h3 className={styles.checklistHeading}>{"// 初期セットアップ"}</h3>
-          <div className={styles.checklistGroup} id="checklist-setup">
-            <label className={styles.checkItem}>
-              <input type="checkbox" />
-              <span>GitHubアカウントを作成し、Copilotプランを有効化した</span>
-            </label>
-            <label className={styles.checkItem}>
-              <input type="checkbox" />
-              <span>VS Code（またはJetBrains等）にGitHub Copilot拡張機能をインストールした</span>
-            </label>
-            <label className={styles.checkItem}>
-              <input type="checkbox" />
-              <span>Copilot Chat拡張機能もインストールし、動作確認した</span>
-            </label>
-            <label className={styles.checkItem}>
-              <input type="checkbox" />
-              <span>プロジェクトに .github/copilot-instructions.md を作成した</span>
-            </label>
-            <label className={styles.checkItem}>
-              <input type="checkbox" />
-              <span>学生・教師の場合、GitHub Educationの無料プランを申請した</span>
-            </label>
-          </div>
-
-          <h3 className={styles.checklistHeading} style={{ margin: "24px 0 12px" }}>
-            {"// 日常的な活用習慣"}
-          </h3>
-          <div className={styles.checklistGroup}>
-            <label className={styles.checkItem}>
-              <input type="checkbox" />
-              <span>コードを書く前に意図を説明するコメントを先に書く習慣を身につけた</span>
-            </label>
-            <label className={styles.checkItem}>
-              <input type="checkbox" />
-              <span>Copilotの提案を採用する前に必ず理解・レビューしている</span>
-            </label>
-            <label className={styles.checkItem}>
-              <input type="checkbox" />
-              <span>/explain, /fix, /tests などのスラッシュコマンドを使いこなしている</span>
-            </label>
-            <label className={styles.checkItem}>
-              <input type="checkbox" />
-              <span>
-                複雑な実装ではプランモード（/plan または Plan
-                エージェント選択）を使って計画を立てている
-              </span>
-            </label>
-            <label className={styles.checkItem}>
-              <input type="checkbox" />
-              <span>月のプレミアムリクエスト使用量を定期的に確認している</span>
-            </label>
-          </div>
-
-          <h3 className={styles.checklistHeading} style={{ margin: "24px 0 12px" }}>
-            {"// セキュリティ・品質"}
-          </h3>
-          <div className={styles.checklistGroup}>
-            <label className={styles.checkItem}>
-              <input type="checkbox" />
-              <span>APIキー・パスワード等の機密情報をChatに貼り付けていない</span>
-            </label>
-            <label className={styles.checkItem}>
-              <input type="checkbox" />
-              <span>生成されたコードに対して既存のテスト・Lintを必ず実行している</span>
-            </label>
-            <label className={styles.checkItem}>
-              <input type="checkbox" />
-              <span>セキュリティ関連コード（認証・暗号化・DB操作）は手動レビューしている</span>
-            </label>
-            <label className={styles.checkItem}>
-              <input type="checkbox" />
-              <span>必要に応じて .copilotignore で機密ファイルを除外設定した</span>
-            </label>
-          </div>
-        </section>
-
-        {/* ─── sources ─── */}
-        <section id="sources" className={styles.sec}>
-          <div className={styles.secHeader}>
-            <span className={styles.secNum}>10</span>
-            <div>
-              <h2 className={styles.secTitle}>参考ソース一覧</h2>
-              <p className={styles.secDesc}>
-                本ガイドの根拠となる公式ドキュメントおよび最新情報ソース（2026年6月時点）
-              </p>
-            </div>
-          </div>
-          {SOURCE_GROUPS.map((group, gi) => (
-            <div key={group.heading}>
-              <h3
-                className={styles.checklistHeading}
-                style={gi > 0 ? { margin: "24px 0 14px" } : { marginBottom: "14px" }}
+        </div>
+        <p>
+          <strong>モデル選択のヒント(同記事より)</strong>:多くの作業には中規模モデル(例: GPT-5.6
+          Terra やClaude
+          Sonnet系)を中程度の推論レベルで使い、その機能・バグ修正の間はモデルや推論レベルを変えないことが推奨されています。これは、モデルや推論レベルを変えない限りプロンプトキャッシュが効き、以降のリクエストのコストが下がるためです。
+        </p>
+        <blockquote>
+          <p>
+            出典: Burke Holland, <em>"The harness is all you need (mostly)"</em>, The GitHub Blog,
+            2026-07-27(更新: 2026-07-28)
+          </p>
+        </blockquote>
+        <hr />
+        <h2 id="8-github-copilot-cliを使いこなす">8. GitHub Copilot CLIを使いこなす</h2>
+        <p>
+          Copilot
+          CLIは、ターミナルに常駐するエージェント型アシスタントです。チャットボットとしても使えますが、真価は自律的にコマンドを実行しながらタスクをこなす点にあります。
+        </p>
+        <MermaidDiagram chart={CHART_6} theme="base" themeVariables={COPILOT_THEME_VARS} />
+        <p><strong>主要なスラッシュコマンド</strong></p>
+        <div className={styles.tableScroll}>
+          <table>
+            <thead>
+              <tr className="header">
+                <th>コマンド</th>
+                <th>役割</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr className="odd">
+                <td><code>/help</code></td>
+                <td>最新の利用可能なコマンド一覧を表示(CLIは頻繁に更新されるため都度確認推奨)</td>
+              </tr>
+              <tr className="even">
+                <td><code>/models</code></td>
+                <td>使用するモデルを切り替え</td>
+              </tr>
+              <tr className="odd">
+                <td><code>/plan</code>(または <code>Shift+Tab</code>)</td>
+                <td>実装前に協働的な計画フェーズへ入る</td>
+              </tr>
+              <tr className="even">
+                <td><code>/allow-all</code></td>
+                <td>YOLOモード(Allow All)を有効化</td>
+              </tr>
+              <tr className="odd">
+                <td><code>/sandbox enable</code></td>
+                <td>ローカルサンドボックスを有効化(2026年7月時点でPublic Preview)</td>
+              </tr>
+              <tr className="even">
+                <td><code>--cloud</code></td>
+                <td>クラウド側サンドボックスでの実行(同上)</td>
+              </tr>
+              <tr className="odd">
+                <td><code>--secret-env-vars</code></td>
+                <td>スクリプト実行時に指定したシークレットをログから redact</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p><strong>ベストプラクティス</strong></p>
+        <ul>
+          <li>
+            リポジトリインストラクションは常にユーザーレベルのインストラクションより優先されるため、チーム規約の強制に使える。
+          </li>
+          <li>
+            <code>GITHUB_TOKEN</code> や <code>COPILOT_GITHUB_TOKEN</code> は既定でログから redact
+            されるが、それ以外のシークレットをプロンプトや環境変数に含めないことが重要。
+          </li>
+          <li>
+            実行前に「そのフォルダ以下は信頼できるか」を必ず確認する。CLIはそのフォルダ以下のファイルを読み書き・実行できるため。
+          </li>
+          <li>
+            Plan mode →
+            Autopilotの順に進めることで、いきなり巨大で曖昧な依頼を投げるアンチパターンを避けられる。
+          </li>
+        </ul>
+        <blockquote>
+          <p>
+            出典: GitHub Docs <em>"Best practices for GitHub Copilot CLI"</em> / GitHub Changelog
+            <em>"GitHub Copilot CLI: Plan before you build, steer as you go"</em>, 2026-01-21 /
+            <em>"The GitHub Copilot CLI Permission Model: What It Can and Can't Touch"</em>,
+            devleader.ca, 2026-07-21 /
+            <em>"GitHub Copilot CLI: The Complete Developer Guide (2026)"</em>, DEV Community
+          </p>
+        </blockquote>
+        <hr />
+        <h2 id="9-coding-agentクラウドエージェントにissueを任せる">
+          9. Coding Agent(クラウドエージェント)にIssueを任せる
+        </h2>
+        <p>
+          Copilot Coding Agentは、GitHub Issueを直接
+          <code>@copilot</code>
+          にアサインすることで、バックグラウンド(クラウド上)でタスクを処理させ、完了したらPull
+          Requestを作成させる仕組みです。
+        </p>
+        <MermaidDiagram chart={CHART_7} theme="base" themeVariables={COPILOT_THEME_VARS} />
+        <p><strong>タスクを任せる際のベストプラクティス</strong></p>
+        <ul>
+          <li>
+            Issueには<strong>明確なスコープと受け入れ条件</strong>を書く。曖昧なIssueほどPRの手戻りが増える。
+          </li>
+          <li>
+            リポジトリに一度だけ丁寧な
+            <code>.github/copilot-instructions.md</code>
+            を用意しておくと、以降すべてのタスクの品質が上がる。ビルド/テスト/lintコマンドを明記し、CIで失敗しやすいポイントを減らすことが目的。
+          </li>
+          <li>
+            PRのマージまでのプロセスは、人間が作成したPRと<strong>全く同じ</strong>。特別扱いせず通常のレビューフローに乗せる。
+          </li>
+          <li>
+            独立したタスクは複数の並列セッション(ローカル・バックグラウンド・クラウド)で同時に走らせ、セッション一覧から監視できる。
+          </li>
+          <li>
+            チーム協働が絡む、あるいはレビューを介したい作業はクラウドエージェントに向いている一方、対話しながら細かく操作したい作業はローカルのAgentモードが向いている。
+          </li>
+        </ul>
+        <blockquote>
+          <p>
+            出典: GitHub Docs <em>"Best practices for using GitHub Copilot to work on tasks"</em> /
+            VS Code Docs <em>"Best practices for using AI in VS Code"</em>, 2026-07-29更新
+          </p>
+        </blockquote>
+        <hr />
+        <h2 id="10-copilot-code-review--agent-skillsとmcpの活用">
+          10. Copilot Code Review — Agent SkillsとMCPの活用
+        </h2>
+        <p>
+          2026年7月29日、Copilot Code ReviewにおけるAgent SkillsとMCPサーバー対応が
+          <strong>Public PreviewからGA(一般提供)</strong>
+          へ移行しました。これはPro・Pro+・Business・Enterpriseの全有償プランで利用可能です。
+        </p>
+        <MermaidDiagram chart={CHART_8} theme="base" themeVariables={COPILOT_THEME_VARS} />
+        <p><strong>重要なポイント</strong></p>
+        <div className={styles.tableScroll}>
+          <table>
+            <thead>
+              <tr className="header">
+                <th>項目</th>
+                <th>内容</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr className="odd">
+                <td>Agent Skills</td>
+                <td>
+                  <code>.github/skills/&lt;skill-name&gt;/SKILL.md</code>
+                  を配置すると、レビューがその内部規約・ツールを踏まえた指摘を行う
+                </td>
+              </tr>
+              <tr className="even">
+                <td>MCP設定</td>
+                <td>
+                  リポジトリ設定 → Copilot → MCP servers からJSON設定を追加。認証トークンは Secrets
+                  and variables → Agents に保管
+                </td>
+              </tr>
+              <tr className="odd">
+                <td>読み取り専用の原則</td>
+                <td>
+                  Code
+                  Review中のMCPツール呼び出しは<strong>すべて読み取り専用</strong>に制限されている(書き込み不可)
+                </td>
+              </tr>
+              <tr className="even">
+                <td>既定で有効なMCP</td>
+                <td>GitHub MCP、Playwright MCPは特別な設定なしで既定有効</td>
+              </tr>
+              <tr className="odd">
+                <td>Coding Agentとの設定共有</td>
+                <td>
+                  Copilot Coding Agent向けに既に設定済みのMCP構成は、Code
+                  Reviewにも自動的に引き継がれる
+                </td>
+              </tr>
+              <tr className="even">
+                <td>Attribution(出典表示)</td>
+                <td>
+                  どのコメントがSkill/MCPの文脈を使って生成されたかが明示される。監査可能性を重視した設計
+                </td>
+              </tr>
+              <tr className="odd">
+                <td>分析の深さ</td>
+                <td>
+                  変更の複雑さに応じて分析ティアが自動的に上がり、複雑なPRはより高い推論力のモデルに回される(Medium
+                  analysis tier)
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <blockquote>
+          <p>
+            出典: GitHub Changelog
+            <em>"Copilot code review: Agent skills and MCP now generally available"</em>, 2026-07-29
+            / <em>"Shape Copilot code review around your team"</em>, GitHub Changelog, 2026-06-02 /
+            <em>"MCP Adoption Week: Copilot Code Review Goes GA"</em>, digitalapplied.com
+          </p>
+        </blockquote>
+        <hr />
+        <h2 id="11-mcpサーバー統合のベストプラクティス">11. MCPサーバー統合のベストプラクティス</h2>
+        <p>
+          Model Context
+          Protocol(MCP)により、Copilotは社内ツール・イシュートラッカー・ドキュメントシステムなど外部システムと連携できます。
+        </p>
+        <p><strong>Coding AgentおよびCode Reviewの制約(2026年7月時点)</strong></p>
+        <ul>
+          <li>
+            <strong>ツールのみサポート</strong>:MCPサーバーが提供する resources や prompts
+            には対応しておらず、tools のみが利用可能。
+          </li>
+          <li>
+            <strong>OAuth認証のリモートMCPサーバーは未対応</strong>:Coding AgentおよびCode
+            Reviewでは、OAuthを用いるリモートMCPサーバーはサポート対象外。
+          </li>
+          <li>
+            GitHub MCPサーバーはCoding
+            Agent向けに自動設定され、Issueやプルリクエストなどのデータへのアクセスが可能。
+          </li>
+        </ul>
+        <p><strong>IDE(VS Code / CLI)でのMCP活用</strong></p>
+        <ul>
+          <li>
+            VS Codeの <code>#tool名</code> 記法、または「Add Context &gt;
+            Tools」からMCPツールを明示的に指定できる。
+          </li>
+          <li>
+            Copilot
+            CLIでも同様にMCPサーバーを設定し、GitHubのMCPサーバーや任意のMCPサーバーと統合可能。
+          </li>
+        </ul>
+        <p><strong>運用の指針</strong></p>
+        <ol type="1">
+          <li>
+            まず読み取り専用のMCPサーバー(ドキュメント検索、Issue参照など)から導入し、書き込み権限を伴うMCPは慎重に評価する。
+          </li>
+          <li>
+            MCP経由で取得する情報は「信頼できない外部入力」として扱い、後述のプロンプトインジェクション対策を適用する。
+          </li>
+          <li>組織で使うMCPサーバーは一元管理し、リポジトリごとに乱立させない。</li>
+        </ol>
+        <blockquote>
+          <p>
+            出典: GitHub Docs
+            <em>"Model Context Protocol (MCP) and GitHub Copilot cloud agent"</em> /
+            <em>"GitHub Copilot Instructions vs Prompts vs Custom Agents vs Skills vs X vs WHY?"</em
+            >, DEV Community
+          </p>
+        </blockquote>
+        <hr />
+        <h2 id="12-モデル選定戦略">12. モデル選定戦略</h2>
+        <p>
+          Copilotのモデルピッカーには、Anthropic・OpenAI・Google・xAIなど複数プロバイダーのモデルが並びます。2026年7月時点で確認できる代表的なラインナップは以下の通りです(<strong>プランや管理者設定により利用可否が変わるため、必ず実際のモデルピッカーで確認してください</strong>)。
+        </p>
+        <div className={styles.tableScroll}>
+          <table>
+            <thead>
+              <tr className="header">
+                <th>モデル系統</th>
+                <th>提供元</th>
+                <th>得意な用途の目安</th>
+                <th>備考</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr className="odd">
+                <td>Claude Sonnet 4.5 / 4.6</td>
+                <td>Anthropic</td>
+                <td>日常のコーディング全般、Agentモードの既定選択肢になりやすい</td>
+                <td>バランスの取れた品質とコスト</td>
+              </tr>
+              <tr className="even">
+                <td>Claude Opus 4.7 / 4.8</td>
+                <td>Anthropic</td>
+                <td>複雑な設計判断、難易度の高いマルチファイル作業</td>
+                <td>コスト高めで、上位プラン限定になりやすい</td>
+              </tr>
+              <tr className="odd">
+                <td>Claude Haiku 4.5</td>
+                <td>Anthropic</td>
+                <td>高速・軽量なタスク</td>
+                <td>低コスト</td>
+              </tr>
+              <tr className="even">
+                <td>GPT-5.4 / GPT-5.5</td>
+                <td>OpenAI</td>
+                <td>実装・レビュー・深い分析</td>
+                <td>GPT-5.5はOpenAI側の「価値の効くフラッグシップ」的な位置づけ</td>
+              </tr>
+              <tr className="odd">
+                <td>GPT-5.6(Luna / Sol / Terra)</td>
+                <td>OpenAI</td>
+                <td>拡張コンテキスト・拡張推論が必要なタスク</td>
+                <td>2026年7月10日GA。VS Code 1.128以上が必要</td>
+              </tr>
+              <tr className="even">
+                <td>Gemini 3 / 3.1 Pro、Gemini 3 Flash</td>
+                <td>Google</td>
+                <td>非常に大きなコンテキストが必要なタスク</td>
+                <td>Copilot on Web では提供範囲が縮小(2026年5月時点)</td>
+              </tr>
+              <tr className="odd">
+                <td>Grok 4.5 / Grok Code Fast 1</td>
+                <td>xAI</td>
+                <td>高速・日常的な軽量タスク</td>
+                <td>ゼロデータ保持ポリシーでホスティング</td>
+              </tr>
+              <tr className="even">
+                <td>Claude Fable 5</td>
+                <td>Anthropic(Mythos系)</td>
+                <td>追加の安全対策を備えたモデル</td>
+                <td>
+                  Anthropicが安全性分類のため入出力を保持する点が他のClaudeモデルと異なる。Enterprise/Businessでは組織側で有効化が必要
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p><strong>選定の考え方</strong></p>
+        <MermaidDiagram chart={CHART_9} theme="base" themeVariables={COPILOT_THEME_VARS} />
+        <p><strong>実践的なヒント</strong></p>
+        <ul>
+          <li>
+            <strong>1つの機能・バグ修正の作業中はモデルと推論レベルを変えない</strong
+            >。プロンプトキャッシュが効き続け、以降のリクエストが割引価格になる。
+          </li>
+          <li>
+            重要な実装の最終確認には、<strong>別系統のモデルによる「Rubber Duckレビュー」</strong
+            >(第7章参照)を組み合わせると、単一モデルの盲点を補完できる。
+          </li>
+          <li>
+            モデルによってデータ保持ポリシー・ホスティング先(AWS/Anthropic/GCP/xAI等)が異なるため、機密性の高いプロジェクトではモデルごとのデータ取り扱いポリシーを確認する。
+          </li>
+        </ul>
+        <blockquote>
+          <p>
+            出典: GitHub Docs <em>"Supported AI models in GitHub Copilot"</em> /
+            <em>"Hosting of models for GitHub Copilot"</em> /
+            <em>"GitHub Copilot Model Guide — Cost, Tasks, and Workflows"</em> /
+            <em>"Updates to available models in Copilot on web"</em>, GitHub Changelog, 2026-05-20
+          </p>
+        </blockquote>
+        <hr />
+        <h2 id="13-セキュリティと責任あるai活用">13. セキュリティと責任あるAI活用</h2>
+        <p>
+          AIコーディングエージェントは、リポジトリ内のコード・コメント・Issue・PRコメント・ツール出力など、<strong>エージェントが理解するために読み込む情報そのもの</strong>を攻撃経路として悪用される可能性があります。これはCopilotに限らず、Claude
+          Code・Gemini CLIなど同種のエージェント全般に共通するリスクです。
+        </p>
+        <MermaidDiagram chart={CHART_10} theme="base" themeVariables={COPILOT_THEME_VARS} />
+        <p><strong>知っておくべき既知の事例</strong></p>
+        <ul>
+          <li>
+            <strong>CVE-2025-53773</strong
+            >:リポジトリ内のソースコードに埋め込まれたインジェクションペイロードが、エージェントに任意のターミナルコマンドを実行させた脆弱性(CVSS
+            9.6)。特別な権限昇格を必要とせず、エージェントの通常の「コードを読む」挙動だけで発火した点が特徴。
+          </li>
+          <li>
+            GitHub自身も、Coding
+            Agentのリスクと緩和策について公式ドキュメントで言及しており、ユーザー入力を渡す前に隠し文字やHTMLコメント内容を除去する、エージェントのインターネットアクセスを制限してデータ持ち出しを防ぐ、Coding
+            Agentのコミットは常に監査可能かつ人間との共著扱いにする、といった防御策を講じています。
+          </li>
+        </ul>
+        <p><strong>実務での対応</strong></p>
+        <ol type="1">
+          <li>
+            <strong>リポジトリ内のテキストはすべて「信頼できない入力」として扱う</strong
+            >。ソースファイル・コメント・Issue説明・PRディスカッション・ドキュメント・コミットメッセージ・テスト出力・ターミナルログのいずれも例外ではない。
+          </li>
+          <li>
+            <strong>YOLOモード(Allow All)は必ずサンドボックスの中で使う</strong
+            >。ローカルマシン上、特に業務用途では実行しない。GitHub CodespacesやDev
+            Containerなど使い捨て可能な環境を使う。
+          </li>
+          <li>
+            <strong>エージェントの成果物は常に「ドラフト」として扱う</strong
+            >。読み、テストし、リファクタリングし、Pull
+            Requestに載せる前に自分のものとして理解・検証する。
+          </li>
+          <li>
+            <strong>権限境界を明確にする</strong
+            >。エージェントが読み書き・実行できる範囲を最小化し、シークレットや不要な環境変数をプロンプトに含めない。
+          </li>
+          <li>
+            <strong>セキュリティ機能を併用する</strong
+            >。Copilot自体が提供するハードコードされた認証情報やSQLインジェクションのフィルタ、Copilot
+            Autofixに加え、静的/動的解析ツールとの併用が推奨される。
+          </li>
+        </ol>
+        <blockquote>
+          <p>
+            出典:
+            <em>"AI Agent Security Practices 2026: Prompt Injection, MCP Risks &amp; Data Leaks"</em
+            >, TechStoriess.com /
+            <em>"GitHub Copilot Security: Risks, Controls, and Best Practices"</em>, CybeDefend /
+            <em>"GitHub Copilot Security: Risks, Built-In Controls, and Best Practices"</em>,
+            Checkmarx /
+            <em>"The GitHub Copilot CLI Permission Model: What It Can and Can't Touch"</em>,
+            devleader.ca
+          </p>
+        </blockquote>
+        <hr />
+        <h2 id="14-コストとai-creditsの管理">14. コストとAI Creditsの管理</h2>
+        <p>
+          2026年6月1日より、GitHub Copilotは使用量ベース(AI
+          Credits)の課金体系に移行しました。基本のインライン補完・Next Edit
+          Suggestionsは引き続き無制限・無料枠の対象ですが、Chat・Agentモード・CLI・Coding
+          Agent・Code Reviewなどの高度な機能はAI Creditsを消費します。
+        </p>
+        <div className={styles.tableScroll}>
+          <table>
+            <thead>
+              <tr className="header">
+                <th>プラン</th>
+                <th>月額</th>
+                <th>含まれるAI Credits(目安)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr className="odd">
+                <td>Free</td>
+                <td>無料</td>
+                <td>限定的な範囲(試用向け)</td>
+              </tr>
+              <tr className="even">
+                <td>Pro</td>
+                <td>$10/月</td>
+                <td>月$10相当</td>
+              </tr>
+              <tr className="odd">
+                <td>Pro+</td>
+                <td>$39/月</td>
+                <td>月$39相当(より多くのモデル・エージェント機能)</td>
+              </tr>
+              <tr className="even">
+                <td>Business</td>
+                <td>$19/ユーザー/月</td>
+                <td>月$19相当/ユーザー</td>
+              </tr>
+              <tr className="odd">
+                <td>Enterprise</td>
+                <td>$39/ユーザー/月</td>
+                <td>月$39相当/ユーザー(追加のセキュリティ・カスタマイズ)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p><strong>コストを抑えるための実践</strong></p>
+        <ul>
+          <li>
+            <strong>モードを使い分ける</strong
+            >:調査・学習にはAsk、範囲が明確な修正にはEdit、複雑なタスクにのみAgentを使う(第2章参照)。
+          </li>
+          <li>
+            <strong>モデルと推論レベルを不用意に切り替えない</strong
+            >:プロンプトキャッシュの割引を維持するため、1つの作業単位の中では固定する。
+          </li>
+          <li>
+            <strong>軽量タスクには軽量モデルを使う</strong
+            >:全てのタスクに最上位モデルを使う必要はない。
+          </li>
+          <li>
+            <strong>チーム全体の利用状況を可視化する</strong
+            >:Chat・CLI・Spaces・クラウドエージェント・サードパーティエージェント・Code
+            Reviewの利用状況をモニタリングし、コストとROIをセットで追跡する。
+          </li>
+          <li>Copilot Code Reviewは実行にGitHub Actionsの分数も消費する点に留意する。</li>
+        </ul>
+        <blockquote>
+          <p>
+            出典: <em>"GitHub Copilot Best Practices: Your Complete Beginner-Friendly Guide"</em>,
+            Tales on Tech / <em>"GitHub Copilot Best Practices for Engineering Teams (2026)"</em>,
+            metacto.com / <em>"Copilot vs. raw API access: What are you actually paying for?"</em>,
+            The GitHub Blog
+          </p>
+        </blockquote>
+        <hr />
+        <h2 id="15-よくあるアンチパターン">15. よくあるアンチパターン</h2>
+        <MermaidDiagram chart={CHART_11} theme="base" themeVariables={COPILOT_THEME_VARS} />
+        <p>
+          Google Engineering LeadのAddy
+          Osmani氏も、AIが生成したコードは「ロジック・セキュリティ・エッジケースで人間より誤りが多くなりがちである」と指摘した上で、CI(自動テスト・Lint・型チェック)を整備し、失敗ログをAIにそのままフィードバックして反復修正させるワークフローの重要性を述べています。「自分の目でコードが正しく動くのを確認するまでは、動いているとは言えない」という原則は、AIの活用が進むほど重要性を増すとしています。
+        </p>
+        <blockquote>
+          <p>
+            出典: Addy Osmani, <em>"My LLM coding workflow going into 2026"</em>, addyosmani.com /
+            Addy Osmani, <em>"Code Review in the Age of AI"</em>, Elevate(Substack)
+          </p>
+        </blockquote>
+        <hr />
+        <h2 id="16-ベストプラクティスチェックリスト">16. ベストプラクティスチェックリスト</h2>
+        <div className={styles.checklistCard}>
+          <ul className={styles.taskList}>
+            <li>
+              <label
+                ><input type="checkbox" readOnly />タスクの性質に応じてAsk / Edit /
+                Agentモードを使い分けている</label
               >
-                {group.heading}
-              </h3>
-              <div className={styles.sourceList}>
-                {group.items.map((s) => (
-                  <Ext key={s.href} href={s.href}>
-                    <span className={styles.sourceIcon}>{s.icon}</span>
-                    <div className={styles.sourceInfo}>
-                      <span className={styles.sourceTitle}>{s.title}</span>
-                      <span className={styles.sourceUrl}>{s.url}</span>
-                    </div>
-                    <span className={styles.sourceBadge}>{s.badge}</span>
-                  </Ext>
-                ))}
-              </div>
-            </div>
-          ))}
-        </section>
+            </li>
+            <li>
+              <label
+                ><input type="checkbox" readOnly /><code>.github/copilot-instructions.md</code>
+                を用意し、ビルド・テスト・コーディング規約を簡潔に明記している</label
+              >
+            </li>
+            <li>
+              <label
+                ><input type="checkbox" readOnly />エージェント的タスク向けに
+                <code>AGENTS.md</code> を用意している(必要な場合)</label
+              >
+            </li>
+            <li>
+              <label
+                ><input type="checkbox" readOnly />繰り返すプロンプトは
+                <code>.prompt.md</code> 化している</label
+              >
+            </li>
+            <li>
+              <label
+                ><input type="checkbox" readOnly />チームのナレッジベースをCopilot
+                Spacesとして整理している</label
+              >
+            </li>
+            <li>
+              <label
+                ><input type="checkbox" readOnly />複雑な機能追加では「プロトタイプ→計画→Autopilot実装→人間レビュー→Rubber
+                Duckレビュー」の流れを踏んでいる</label
+              >
+            </li>
+            <li>
+              <label
+                ><input type="checkbox" readOnly />YOLOモード(Allow
+                All)は必ずサンドボックス環境内でのみ使用している</label
+              >
+            </li>
+            <li>
+              <label
+                ><input type="checkbox" readOnly />Coding
+                AgentへのIssueアサインでは、スコープと受け入れ条件を明確に記述している</label
+              >
+            </li>
+            <li>
+              <label
+                ><input type="checkbox" readOnly />Copilot Code ReviewのMCP/Agent
+                Skills設定を、チームの内部標準に合わせて整えている</label
+              >
+            </li>
+            <li>
+              <label
+                ><input type="checkbox" readOnly />MCPで取得した外部情報を「信頼できない入力」として扱っている</label
+              >
+            </li>
+            <li>
+              <label
+                ><input type="checkbox" readOnly />タスクの難易度に応じてモデルを選び、作業単位内ではモデル・推論レベルを変えていない</label
+              >
+            </li>
+            <li>
+              <label
+                ><input type="checkbox" readOnly />AIが生成したコードは必ず自分でテスト・レビューしてからマージしている</label
+              >
+            </li>
+            <li>
+              <label
+                ><input type="checkbox" readOnly />チームのAI
+                Credits使用状況を定期的に可視化・レビューしている</label
+              >
+            </li>
+          </ul>
+        </div>
+        <hr />
+        <h2 id="17-参考文献">17. 参考文献</h2>
+        <div className={styles.refGrid}>
+          <div className={styles.refCard}>
+            <h3 id="公式ドキュメントgithub-changelog">公式ドキュメント・GitHub Changelog</h3>
+            <ul>
+              <li>
+                GitHub Docs, <em>"Adding custom instructions for GitHub Copilot"</em> —
+                <a href="https://docs.github.com/copilot/customizing-copilot/adding-custom-instructions-for-github-copilot" target="_blank" rel="noopener noreferrer">https://docs.github.com/copilot/customizing-copilot/adding-custom-instructions-for-github-copilot</a
+                >
+              </li>
+              <li>
+                GitHub Docs, <em>"Best practices for using GitHub Copilot to work on tasks"</em> —
+                <a href="https://docs.github.com/copilot/how-tos/agents/copilot-coding-agent/best-practices-for-using-copilot-to-work-on-tasks" target="_blank" rel="noopener noreferrer">https://docs.github.com/copilot/how-tos/agents/copilot-coding-agent/best-practices-for-using-copilot-to-work-on-tasks</a
+                >
+              </li>
+              <li>
+                GitHub Docs, <em>"Best practices for GitHub Copilot CLI"</em> —
+                <a href="https://docs.github.com/en/copilot/how-tos/copilot-cli/cli-best-practices" target="_blank" rel="noopener noreferrer">https://docs.github.com/en/copilot/how-tos/copilot-cli/cli-best-practices</a
+                >
+              </li>
+              <li>
+                GitHub Docs, <em>"Adding custom instructions for GitHub Copilot CLI"</em> —
+                <a href="https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/add-custom-instructions" target="_blank" rel="noopener noreferrer">https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/add-custom-instructions</a
+                >
+              </li>
+              <li>
+                GitHub Docs, <em>"Asking GitHub Copilot questions in your IDE"</em> —
+                <a href="https://docs.github.com/copilot/using-github-copilot/asking-github-copilot-questions-in-your-ide" target="_blank" rel="noopener noreferrer">https://docs.github.com/copilot/using-github-copilot/asking-github-copilot-questions-in-your-ide</a
+                >
+              </li>
+              <li>
+                GitHub Docs, <em>"Using GitHub Copilot code review"</em> —
+                <a href="https://docs.github.com/copilot/using-github-copilot/code-review/using-copilot-code-review" target="_blank" rel="noopener noreferrer">https://docs.github.com/copilot/using-github-copilot/code-review/using-copilot-code-review</a
+                >
+              </li>
+              <li>
+                GitHub Docs,
+                <em>"Model Context Protocol (MCP) and GitHub Copilot cloud agent"</em> —
+                <a href="https://docs.github.com/en/copilot/concepts/agents/cloud-agent/mcp-and-cloud-agent" target="_blank" rel="noopener noreferrer">https://docs.github.com/en/copilot/concepts/agents/cloud-agent/mcp-and-cloud-agent</a
+                >
+              </li>
+              <li>
+                GitHub Docs, <em>"Supported AI models in GitHub Copilot"</em> —
+                <a href="https://docs.github.com/en/enterprise-cloud@latest/copilot/reference/ai-models/supported-models" target="_blank" rel="noopener noreferrer">https://docs.github.com/en/enterprise-cloud@latest/copilot/reference/ai-models/supported-models</a
+                >
+              </li>
+              <li>
+                GitHub Docs, <em>"Hosting of models for GitHub Copilot"</em> —
+                <a href="https://docs.github.com/en/copilot/reference/ai-models/model-hosting" target="_blank" rel="noopener noreferrer">https://docs.github.com/en/copilot/reference/ai-models/model-hosting</a
+                >
+              </li>
+              <li>
+                GitHub Docs, <em>"Using Claude in GitHub Copilot"</em> —
+                <a href="https://docs.github.com/copilot/using-github-copilot/ai-models/using-claude-in-github-copilot" target="_blank" rel="noopener noreferrer">https://docs.github.com/copilot/using-github-copilot/ai-models/using-claude-in-github-copilot</a
+                >
+              </li>
+              <li>
+                GitHub Changelog,
+                <em>"Copilot coding agent now supports AGENTS.md custom instructions"</em
+                >(2025-08-28) —
+                <a href="https://github.blog/changelog/2025-08-28-copilot-coding-agent-now-supports-agents-md-custom-instructions/" target="_blank" rel="noopener noreferrer">https://github.blog/changelog/2025-08-28-copilot-coding-agent-now-supports-agents-md-custom-instructions/</a
+                >
+              </li>
+              <li>
+                GitHub Changelog,
+                <em
+                  >"GitHub Copilot coding agent now supports .instructions.md custom
+                  instructions"</em
+                >(2025-07-23) —
+                <a href="https://github.blog/changelog/2025-07-23-github-copilot-coding-agent-now-supports-instructions-md-custom-instructions/" target="_blank" rel="noopener noreferrer">https://github.blog/changelog/2025-07-23-github-copilot-coding-agent-now-supports-instructions-md-custom-instructions/</a
+                >
+              </li>
+              <li>
+                GitHub Changelog, <em>"Shape Copilot code review around your team"</em>(2026-06-02)
+                —
+                <a href="https://github.blog/changelog/2026-06-02-shape-copilot-code-review-around-your-team/" target="_blank" rel="noopener noreferrer">https://github.blog/changelog/2026-06-02-shape-copilot-code-review-around-your-team/</a
+                >
+              </li>
+              <li>
+                GitHub Changelog,
+                <em>"Copilot code review: Agent skills and MCP now generally available"</em
+                >(2026-07-29) —
+                <a href="https://github.blog/changelog/2026-07-29-copilot-code-review-agent-skills-and-mcp-now-generally-available/" target="_blank" rel="noopener noreferrer">https://github.blog/changelog/2026-07-29-copilot-code-review-agent-skills-and-mcp-now-generally-available/</a
+                >
+              </li>
+              <li>
+                GitHub Changelog,
+                <em>"GitHub Copilot CLI: Plan before you build, steer as you go"</em>(2026-01-21) —
+                <a href="https://github.blog/changelog/2026-01-21-github-copilot-cli-plan-before-you-build-steer-as-you-go/" target="_blank" rel="noopener noreferrer">https://github.blog/changelog/2026-01-21-github-copilot-cli-plan-before-you-build-steer-as-you-go/</a
+                >
+              </li>
+              <li>
+                GitHub Changelog,
+                <em>"Copilot knowledge bases can now be converted to Copilot Spaces"</em
+                >(2025-10-17) —
+                <a href="https://github.blog/changelog/2025-10-17-copilot-knowledge-bases-can-now-be-converted-to-copilot-spaces/" target="_blank" rel="noopener noreferrer">https://github.blog/changelog/2025-10-17-copilot-knowledge-bases-can-now-be-converted-to-copilot-spaces/</a
+                >
+              </li>
+              <li>
+                GitHub Changelog, <em>"Sunset notice: Copilot knowledge bases"</em> —
+                <a href="https://github.blog/changelog/2025-08-20-sunset-notice-copilot-knowledge-bases/" target="_blank" rel="noopener noreferrer">https://github.blog/changelog/2025-08-20-sunset-notice-copilot-knowledge-bases/</a
+                >
+              </li>
+              <li>
+                GitHub Changelog,
+                <em>"Updates to available models in Copilot on web"</em>(2026-05-20) —
+                <a href="https://github.blog/changelog/2026-05-20-updates-to-available-models-in-copilot-on-web/" target="_blank" rel="noopener noreferrer">https://github.blog/changelog/2026-05-20-updates-to-available-models-in-copilot-on-web/</a
+                >
+              </li>
+              <li>
+                VS Code Docs, <em>"Best practices for using AI in VS Code"</em> —
+                <a href="https://code.visualstudio.com/docs/agents/best-practices" target="_blank" rel="noopener noreferrer">https://code.visualstudio.com/docs/agents/best-practices</a
+                >
+              </li>
+              <li>
+                VS Code Docs, <em>"Use custom instructions in VS Code"</em> —
+                <a href="https://code.visualstudio.com/docs/agent-customization/custom-instructions" target="_blank" rel="noopener noreferrer">https://code.visualstudio.com/docs/agent-customization/custom-instructions</a
+                >
+              </li>
+              <li>
+                VS Code Blog, <em>"Introducing GitHub Copilot agent mode (preview)"</em> —
+                <a href="https://code.visualstudio.com/blogs/2025/02/24/introducing-copilot-agent-mode" target="_blank" rel="noopener noreferrer">https://code.visualstudio.com/blogs/2025/02/24/introducing-copilot-agent-mode</a
+                >
+              </li>
+            </ul>
+          </div>
+          <div className={styles.refCard}>
+            <h3 id="著名な開発者企業テクノロジストによる発信">
+              著名な開発者・企業テクノロジストによる発信
+            </h3>
+            <ul>
+              <li>
+                Burke Holland(GitHub, Technologist),
+                <em>"The harness is all you need (mostly)"</em>, The GitHub Blog(2026-07-27) —
+                <a href="https://github.blog/ai-and-ml/github-copilot/the-harness-is-all-you-need-mostly/" target="_blank" rel="noopener noreferrer">https://github.blog/ai-and-ml/github-copilot/the-harness-is-all-you-need-mostly/</a
+                >
+              </li>
+              <li>
+                Burke Holland,
+                <em>"Copilot ask, edit, and agent modes: What they do and when to use them"</em>,
+                The GitHub Blog —
+                <a href="https://github.blog/ai-and-ml/github-copilot/copilot-ask-edit-and-agent-modes-what-they-do-and-when-to-use-them/" target="_blank" rel="noopener noreferrer">https://github.blog/ai-and-ml/github-copilot/copilot-ask-edit-and-agent-modes-what-they-do-and-when-to-use-them/</a
+                >
+              </li>
+              <li>
+                Burke Holland, <em>"Opus 4.5 is going to change everything"</em>(個人ブログ,
+                2026-01-05) —
+                <a href="https://burkeholland.github.io/posts/opus-4-5-change-everything/" target="_blank" rel="noopener noreferrer">https://burkeholland.github.io/posts/opus-4-5-change-everything/</a
+                >
+              </li>
+              <li>
+                Simon Willison, <em>タグ「github-copilot」記事一覧</em> —
+                <a href="https://simonwillison.net/tags/github-copilot/" target="_blank" rel="noopener noreferrer">https://simonwillison.net/tags/github-copilot/</a
+                >
+              </li>
+              <li>
+                Simon Willison,
+                <em>"The Five Levels: from Spicy Autocomplete to the Dark Factory"</em>(2026-01-28)
+                —
+                <a href="https://simonwillison.net/2026/Jan/28/the-five-levels/" target="_blank" rel="noopener noreferrer">https://simonwillison.net/2026/Jan/28/the-five-levels/</a
+                >
+              </li>
+              <li>
+                Addy Osmani(Google, Engineering Lead),
+                <em>"My LLM coding workflow going into 2026"</em> —
+                <a href="https://addyosmani.com/blog/ai-coding-workflow/" target="_blank" rel="noopener noreferrer">https://addyosmani.com/blog/ai-coding-workflow/</a
+                >
+              </li>
+              <li>
+                Addy Osmani, <em>"Code Review in the Age of AI"</em>, Elevate(Substack, 2026-01-06)
+                —
+                <a href="https://addyo.substack.com/p/code-review-in-the-age-of-ai" target="_blank" rel="noopener noreferrer">https://addyo.substack.com/p/code-review-in-the-age-of-ai</a
+                >
+              </li>
+            </ul>
+          </div>
+          <div className={styles.refCard}>
+            <h3 id="copilot-spacesとカスタムインストラクション関連">
+              Copilot Spacesとカスタムインストラクション関連
+            </h3>
+            <ul>
+              <li>
+                Microsoft Community Hub,
+                <em
+                  >"Turning GitHub Copilot into a 'Best Practices Coach' with Copilot Spaces + a
+                  Markdown Knowledge Base"</em
+                >(2026-05-06) —
+                <a href="https://techcommunity.microsoft.com/blog/azuredevcommunityblog/turning-github-copilot-into-a-%E2%80%9Cbest-practices-coach%E2%80%9D-with-copilot-spaces--a-mark/4511567" target="_blank" rel="noopener noreferrer">https://techcommunity.microsoft.com/blog/azuredevcommunityblog/turning-github-copilot-into-a-%E2%80%9Cbest-practices-coach%E2%80%9D-with-copilot-spaces--a-mark/4511567</a
+                >
+              </li>
+              <li>
+                Microsoft Learn, <em>"Introduction to Copilot Spaces"</em> —
+                <a href="https://learn.microsoft.com/en-us/training/modules/introduction-copilot-spaces/" target="_blank" rel="noopener noreferrer">https://learn.microsoft.com/en-us/training/modules/introduction-copilot-spaces/</a
+                >
+              </li>
+              <li>
+                The GitHub Blog,
+                <em>"How to use GitHub Copilot Spaces to debug issues faster"</em> —
+                <a href="https://github.blog/ai-and-ml/github-copilot/how-to-use-github-copilot-spaces-to-debug-issues-faster/" target="_blank" rel="noopener noreferrer">https://github.blog/ai-and-ml/github-copilot/how-to-use-github-copilot-spaces-to-debug-issues-faster/</a
+                >
+              </li>
+              <li>
+                Zenn,
+                <em>"GitHub Copilot Chat を使う時のTips(Instruction files, Prompt files)"</em> —
+                <a href="https://zenn.dev/chot/articles/b8b830571ba088" target="_blank" rel="noopener noreferrer">https://zenn.dev/chot/articles/b8b830571ba088</a
+                >
+              </li>
+              <li>
+                DEV Community,
+                <em
+                  >"GitHub Copilot Instructions vs Prompts vs Custom Agents vs Skills vs X vs
+                  WHY?"</em
+                >
+                —
+                <a href="https://dev.to/pwd9000/github-copilot-instructions-vs-prompts-vs-custom-agents-vs-skills-vs-x-vs-why-339l" target="_blank" rel="noopener noreferrer">https://dev.to/pwd9000/github-copilot-instructions-vs-prompts-vs-custom-agents-vs-skills-vs-x-vs-why-339l</a
+                >
+              </li>
+            </ul>
+          </div>
+          <div className={styles.refCard}>
+            <h3 id="cliモデル選定コスト関連の解説記事">CLI・モデル選定・コスト関連の解説記事</h3>
+            <ul>
+              <li>
+                DEV Community, <em>"GitHub Copilot CLI: The Complete Developer Guide (2026)"</em> —
+                <a href="https://dev.to/proflead/github-copilot-cli-the-complete-developer-guide-2026-3cjj" target="_blank" rel="noopener noreferrer">https://dev.to/proflead/github-copilot-cli-the-complete-developer-guide-2026-3cjj</a
+                >
+              </li>
+              <li>
+                devleader.ca,
+                <em>"The GitHub Copilot CLI Permission Model: What It Can and Can't Touch"</em
+                >(2026-07-21) —
+                <a href="https://www.devleader.ca/2026/07/21/the-github-copilot-cli-permission-model-what-it-can-and-cant-touch" target="_blank" rel="noopener noreferrer">https://www.devleader.ca/2026/07/21/the-github-copilot-cli-permission-model-what-it-can-and-cant-touch</a
+                >
+              </li>
+              <li>
+                fundesk.io, <em>"GitHub Copilot Agent Mode: The Complete Guide for 2026"</em> —
+                <a href="https://www.fundesk.io/github-copilot-agent-mode-guide-2026" target="_blank" rel="noopener noreferrer">https://www.fundesk.io/github-copilot-agent-mode-guide-2026</a
+                >
+              </li>
+              <li>
+                movarnell.github.io,
+                <em>"GitHub Copilot Model Guide — Cost, Tasks, and Workflows"</em> —
+                <a href="https://movarnell.github.io/Copilot-Links/models.html" target="_blank" rel="noopener noreferrer">https://movarnell.github.io/Copilot-Links/models.html</a
+                >
+              </li>
+              <li>
+                Tales on Tech,
+                <em>"GitHub Copilot Best Practices: Your Complete Beginner-Friendly Guide"</em> —
+                <a href="https://www.talesontech.com/blog/github-copilot-best-practices-guide-2026/" target="_blank" rel="noopener noreferrer">https://www.talesontech.com/blog/github-copilot-best-practices-guide-2026/</a
+                >
+              </li>
+              <li>
+                metacto.com, <em>"GitHub Copilot Best Practices for Engineering Teams (2026)"</em> —
+                <a href="https://www.metacto.com/blogs/github-copilot-best-practices-from-high-performing-teams" target="_blank" rel="noopener noreferrer">https://www.metacto.com/blogs/github-copilot-best-practices-from-high-performing-teams</a
+                >
+              </li>
+              <li>
+                The GitHub Blog,
+                <em>"Copilot vs. raw API access: What are you actually paying for?"</em> —
+                <a href="https://github.blog/ai-and-ml/github-copilot/copilot-vs-raw-api-access-what-are-you-actually-paying-for/" target="_blank" rel="noopener noreferrer">https://github.blog/ai-and-ml/github-copilot/copilot-vs-raw-api-access-what-are-you-actually-paying-for/</a
+                >
+              </li>
+            </ul>
+          </div>
+          <div className={styles.refCard}>
+            <h3 id="セキュリティ関連">セキュリティ関連</h3>
+            <ul>
+              <li>
+                Checkmarx,
+                <em>"GitHub Copilot Security: Risks, Built-In Controls, and Best Practices"</em
+                >(2026-05-11) —
+                <a href="https://checkmarx.com/learn/ai-security/top-5-github-copilot-security-risks-9-ways-to-mitigate-them/" target="_blank" rel="noopener noreferrer">https://checkmarx.com/learn/ai-security/top-5-github-copilot-security-risks-9-ways-to-mitigate-them/</a
+                >
+              </li>
+              <li>
+                CybeDefend,
+                <em>"GitHub Copilot Security: Risks, Controls, and Best Practices"</em>(2026-06-10)
+                —
+                <a href="https://www.cybedefend.com/en/blog/github-copilot-security-risks-best-practices" target="_blank" rel="noopener noreferrer">https://www.cybedefend.com/en/blog/github-copilot-security-risks-best-practices</a
+                >
+              </li>
+              <li>
+                TechStoriess.com,
+                <em
+                  >"AI Agent Security Practices 2026: Prompt Injection, MCP Risks &amp; Data
+                  Leaks"</em
+                >(2026-06-30) —
+                <a href="https://www.techstoriess.com/ai-agent-security-practices-2026-prompt-injection-mcp-risks-data-leaks/" target="_blank" rel="noopener noreferrer">https://www.techstoriess.com/ai-agent-security-practices-2026-prompt-injection-mcp-risks-data-leaks/</a
+                >
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <hr />
+        <p>
+          <em
+            >本ガイドは2026年7月31日時点で確認できた情報をもとに作成しています。GitHub
+            Copilotは頻繁に機能更新が行われるため、実際の設定・挙動は必ず上記の公式ドキュメントやご利用中のバージョンのin-product
+            helpで最終確認してください。</em
+          >
+        </p>
+
+        <footer className={styles.colophon}>
+          <p>
+            本ガイドはMarkdown版と同一内容のHTML版です。Mermaidダイアグラムはこのページ内で描画され、参考文献は各URLへのリンクとして提供されています。
+          </p>
+        </footer>
+      
       </main>
 
-      <footer className={styles.footer}>
-        <p>{"// GitHub Copilot 完全ベストプラクティスガイド"}</p>
-        <p style={{ marginTop: "8px", color: "var(--text-muted)" }}>
-          {"Last updated: "}
-          <span style={{ color: "var(--accent-cyan)" }}>June 2026</span>
-          {"  |  "}
-          {"Sources: "}
-          <Ext href="https://docs.github.com/en/copilot">GitHub Docs</Ext>
-          {" & "}
-          <Ext href="https://github.blog/ai-and-ml/github-copilot/">GitHub Blog</Ext>
-        </p>
-        <p style={{ marginTop: "12px", fontSize: "0.7rem", color: "var(--text-muted)" }}>
-          ※ 本ガイドの情報は2026年6月時点のものです。最新情報は公式ドキュメントをご確認ください。
-        </p>
-      </footer>
+      <TocObserver />
     </div>
   );
 }

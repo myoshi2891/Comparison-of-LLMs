@@ -394,9 +394,9 @@ const entries: PageEntry[] = [
     provider: "microsoft",
     topics: ["copilot"],
     summary:
-      "2026年6月最新版 — 初学者からエキスパートまで対応したステップバイステップのAIコーディングアシスタント活用法。Cloud agent GA・従量課金（AI Credits）・Copilot code review の AGENTS.md 対応を反映。",
+      "GitHub Copilot 実践ベストプラクティスガイド — 3つのChatモード、カスタムインストラクションの3層構造、Copilot Spaces、8ステップワークフロー、CLI、Coding Agent、Copilot Code Review (Agent Skills/MCP GA)、モデル選定、セキュリティ、AI Credits管理を網羅。",
     addedAt: "2026-05-08",
-    lastReviewed: "2026-07-01",
+    lastReviewed: "2026-08-19",
   },
   {
     slug: "/copilot/markdown-file-guide",

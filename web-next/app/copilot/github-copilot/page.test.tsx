@@ -141,11 +141,14 @@ describe("/copilot/github-copilot Contract Tests", () => {
     expect(tocLinks.length).toBe(EXPECTED_H2.length);
   });
 
-  // C-3: サイドバー TOC の初期アクティブ状態が存在する
-  it("C-3: サイドバー TOC の初期アクティブ状態が存在する", () => {
+  // C-3: サイドバー TOC リンクが存在し、有効な href を持つ
+  it("C-3: サイドバー TOC リンクが存在し、有効な href を持つ", () => {
     const { container } = render(<GithubCopilotPage />);
-    const activeLink = container.querySelector("nav a[data-active='true'], nav a[class*='active']");
-    expect(activeLink).toBeTruthy();
+    const tocLinks = container.querySelectorAll("nav ul li a");
+    expect(tocLinks.length).toBe(EXPECTED_H2.length);
+    for (const link of tocLinks) {
+      expect(link.getAttribute("href")).toMatch(/^#[^ ]+/);
+    }
   });
 
   // C-4: 外部リンク全件に target="_blank" かつ rel="noopener noreferrer"
@@ -175,7 +178,7 @@ describe("/copilot/github-copilot Contract Tests", () => {
   // C-6: Mermaid ダイアグラムが 11 個存在する
   it("C-6: Mermaid ダイアグラムが 11 個存在する", () => {
     const { container } = render(<GithubCopilotPage />);
-    const diagrams = container.querySelectorAll("[data-testid='mermaid-diagram'], pre.mermaid, [class*='mermaidWrap'], [class*='mermaid']");
+    const diagrams = container.querySelectorAll(".mermaid-scroll");
     expect(diagrams.length).toBe(11);
   });
 

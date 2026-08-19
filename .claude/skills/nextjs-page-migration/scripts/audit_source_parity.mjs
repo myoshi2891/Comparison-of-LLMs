@@ -340,7 +340,7 @@ function resolveStringConstants(content, constants) {
  */
 function collectHtmlMermaidSources(src) {
   const sources = [];
-  const divRe = /<div\b([^>]*\bclass=["'][^"']*\bmermaid\b[^"']*["'][^>]*)>([\s\S]*?)<\/div>/gi;
+  const divRe = /<(?:div|pre)\b([^>]*\bclass=["'][^"']*\bmermaid\b[^"']*["'][^>]*)>([\s\S]*?)<\/(?:div|pre)\s*>/gi;
   let div = divRe.exec(src);
   while (div !== null) {
     sources.push({ index: div.index, source: normalizeMermaidSource(div[2]) });
@@ -506,7 +506,9 @@ function inventoryMarkdown(src) {
  * @return {Object} The extracted headings, element counts, normalized content, Mermaid sources, SVG elements, callouts, and external links.
  */
 function inventoryHtml(src) {
-  const body = src.replace(/<(script|style)[\s\S]*?<\/\1>/gi, "");
+  const body = src
+    .replace(/<head[\s\S]*?<\/head>/gi, "")
+    .replace(/<(script|style)[\s\S]*?<\/\1>/gi, "");
   const headings = [];
   const headingRe = /<h([1-6])\b[^>]*>([\s\S]*?)<\/h\1>/gi;
   let match = headingRe.exec(body);
@@ -523,9 +525,9 @@ function inventoryHtml(src) {
     li = liRe.exec(body);
   }
 
-  const codeBlockTexts = extractTagContents(body, "pre").map(({ content }) =>
-    normalizeElementContent(content)
-  );
+  const codeBlockTexts = extractElementContents(body, (openingTag) =>
+    /^<pre\b/i.test(openingTag) && !/\bclass=["'][^"']*\bmermaid\b/i.test(openingTag)
+  ).map(({ content }) => normalizeElementContent(content));
   const tableRowTexts = extractTagContents(body, "tr").map(({ content }) =>
     normalizeElementContent(content)
   );
