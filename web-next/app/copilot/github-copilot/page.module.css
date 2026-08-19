@@ -365,6 +365,21 @@
   padding: 26px 20px;
   margin: 0 0 26px;
   box-sizing: border-box;
+  font-size: 1rem;
+}
+
+.main :global(.mermaid) {
+  font-size: 1rem;
+}
+
+.main :global(.mermaid foreignObject),
+.main :global(.mermaid foreignObject *),
+.main :global(.mermaid text),
+.main :global(.mermaid .nodeLabel),
+.main :global(.mermaid .edgeLabel),
+.main :global(.mermaid .label) {
+  font-size: 1rem !important;
+  font-family: inherit;
 }
 
 .mermaidErrorNote {
