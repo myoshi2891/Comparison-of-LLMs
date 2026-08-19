@@ -168,9 +168,9 @@ describe("/code-review/copilot-code-review — 原本照合契約 (S)", () => {
     expect(ids.every((id) => Boolean(id))).toBe(true);
     expect(new Set(ids).size).toBe(ids.length);
 
-    const tocHrefs = Array.from(
-      container.querySelectorAll('nav a[href^="#"]')
-    ).map((a) => (a.getAttribute("href") ?? "").slice(1));
+    const tocHrefs = Array.from(container.querySelectorAll('nav a[href^="#"]')).map((a) =>
+      (a.getAttribute("href") ?? "").slice(1)
+    );
     for (const href of tocHrefs) {
       expect(ids).toContain(href);
     }
@@ -181,7 +181,10 @@ describe("/code-review/copilot-code-review — コンテンツ契約 (C)", () =>
   it("C-1: h1 のテキストが完全一致する", () => {
     const { container } = render(<Page />);
     const h1 = container.querySelector("h1");
-    expect(headingText(h1!)).toBe(EXPECTED_H1[0]);
+    expect(h1).not.toBeNull();
+    if (h1) {
+      expect(headingText(h1)).toBe(EXPECTED_H1[0]);
+    }
   });
 
   it("C-2: クイックナビ（TOC リンク）の件数と href 形式", () => {
@@ -198,9 +201,7 @@ describe("/code-review/copilot-code-review — コンテンツ契約 (C)", () =>
 
   it("C-4: 外部リンク全件に target='_blank' かつ rel='noopener noreferrer'", () => {
     const { container } = render(<Page />);
-    const externalLinks = Array.from(
-      container.querySelectorAll('a[href^="http"]')
-    );
+    const externalLinks = Array.from(container.querySelectorAll('a[href^="http"]'));
     expect(externalLinks.length).toBeGreaterThan(0);
     for (const link of externalLinks) {
       expect(link.getAttribute("target")).toBe("_blank");
@@ -210,9 +211,7 @@ describe("/code-review/copilot-code-review — コンテンツ契約 (C)", () =>
 
   it("C-5: 内部リンクに .html 拡張子が含まれない", () => {
     const { container } = render(<Page />);
-    const internalLinks = Array.from(
-      container.querySelectorAll('a[href^="#"], a[href^="/"]')
-    );
+    const internalLinks = Array.from(container.querySelectorAll('a[href^="#"], a[href^="/"]'));
     for (const link of internalLinks) {
       const href = link.getAttribute("href");
       if (href) {
@@ -240,18 +239,14 @@ describe("/code-review/copilot-code-review — デザイン契約 (D)", () => {
     const callouts = container.querySelectorAll(".callout, [data-variant]");
     expect(callouts.length).toBeGreaterThan(0);
     const hasWarn = Array.from(callouts).some(
-      (c) =>
-        c.classList.contains("warn") ||
-        c.getAttribute("data-variant") === "warn"
+      (c) => c.classList.contains("warn") || c.getAttribute("data-variant") === "warn"
     );
     expect(hasWarn).toBe(true);
   });
 
   it("D-6: コードブロックが存在する", () => {
     const { container } = render(<Page />);
-    const codeBlocks = container.querySelectorAll(
-      "pre code, [data-testid='code-block']"
-    );
+    const codeBlocks = container.querySelectorAll("pre code, [data-testid='code-block']");
     expect(codeBlocks.length).toBeGreaterThan(0);
   });
 

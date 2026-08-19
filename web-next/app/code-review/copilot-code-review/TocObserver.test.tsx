@@ -23,9 +23,7 @@ describe("/code-review/copilot-code-review — TocObserver", () => {
       </div>
     );
 
-    expect(container.querySelector("nav a.active")?.getAttribute("href")).toBe(
-      "#intro"
-    );
+    expect(container.querySelector("nav a.active")?.getAttribute("href")).toBe("#intro");
 
     fireEvent.scroll(window, { target: { scrollY: 600 } });
   });
