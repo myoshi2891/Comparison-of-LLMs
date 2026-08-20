@@ -30,18 +30,21 @@ fi
 # globals.css には現れないため、lib/fonts.ts の variable 宣言も定義済みとして扱う。
 font_vars=""
 if [ -f "$fonts_ts" ]; then
-  font_vars=$(grep -oE 'variable:[[:space:]]*"--[a-zA-Z0-9_-]+"' "$fonts_ts" \
+  # grep はマッチ 0 件で exit 1 を返す。pipefail 下では代入自体が失敗し
+  # set -e でスクリプトが無言終了するため、|| true で握らずに空文字へ落とす。
+  font_vars=$( { grep -oE 'variable:[[:space:]]*"--[a-zA-Z0-9_-]+"' "$fonts_ts" || true; } \
     | sed -E 's/.*"(--[a-zA-Z0-9_-]+)"/\1/' | sort -u)
 fi
 
 # page.module.css 内で定義されているローカル変数を抽出
-local_vars=$(grep -oE '^[[:space:]]*--[a-zA-Z0-9_-]+[[:space:]]*:' "$css_file" \
+# ローカル変数が 1 件も無い page.module.css でも grep の exit 1 で止まらないようにする。
+local_vars=$( { grep -oE '^[[:space:]]*--[a-zA-Z0-9_-]+[[:space:]]*:' "$css_file" || true; } \
   | sed -E 's/^[[:space:]]*(--[a-zA-Z0-9_-]+)[[:space:]]*:/\1/' | sort -u)
 
 # `var(--x, fallback)` は未定義でも fallback に解決されるため安全。
 # フォールバックを持たない参照だけを検査対象にする。
 undefined=0
-for var in $(grep -oE 'var\([[:space:]]*--[a-zA-Z0-9_-]+[[:space:]]*\)' "$css_file" \
+for var in $( { grep -oE 'var\([[:space:]]*--[a-zA-Z0-9_-]+[[:space:]]*\)' "$css_file" || true; } \
   | sed -E 's/var\([[:space:]]*(--[a-zA-Z0-9_-]+)[[:space:]]*\)/\1/' | sort -u); do
   if printf '%s\n' "$local_vars" | grep -qxF -- "$var"; then continue; fi
   if printf '%s\n' "$font_vars" | grep -qxF -- "$var"; then continue; fi

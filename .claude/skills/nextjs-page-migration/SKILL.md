@@ -189,8 +189,9 @@ C-6 と D-1〜D-7 は下記の適用条件に該当する場合のみ追加す�
 | D-7 | 原本に外部 CDN がある | 原本 `<head>` の `<link rel="stylesheet">` の href 一覧が JSX 内に**全件・完全一致**で挿入されている |
 | D-8 | **全ページ（無条件）** | `.layout` 最外殻に `data-testid="layout-root"` があり、`page.module.css` の `.layout` が `width: 100%` を持つ |
 
-**D-1〜D-7 は条件付き**（原本に warn callout・step・voice / blockquote・サイドバー・
-コードブロック・CDN が存在しない場合は要求しない）。不在要素を作成して契約数を満たすことは
+**D-1〜D-7 は条件付き**（原本に callout / alert・warn callout・step・voice / blockquote・
+サイドバー・コードブロック・CDN が存在しない場合は要求しない。
+D-1 は callout / alert が 1 つでもあれば適用し、warn 限定の条件は D-2 のみに掛かる）。不在要素を作成して契約数を満たすことは
 faithful 移植ではない。
 **D-8 だけは原本の内容に依存せず全ページ必須**である（`.layout` は移植先が必ず持つ最外殻であり、
 全幅レイアウト崩れは原本の要素構成と無関係に起こるため）。

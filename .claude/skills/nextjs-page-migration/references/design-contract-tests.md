@@ -175,8 +175,10 @@ it("サイドバーナビのリンクが原本の TOC と順序込みで完全�
   const sidebarNav = container.querySelector("[data-testid='sidebar-nav']");
   expect(sidebarNav).not.toBeNull();
 
+  // リンクはサイドバー配下だけを走査する。container 全体だと本文中の
+  // アンカーまで拾い、順序比較が原本の TOC と無関係に壊れる。
   const navLinks = Array.from(
-    container.querySelectorAll("[data-testid='sidebar-nav-link']")
+    sidebarNav.querySelectorAll("[data-testid='sidebar-nav-link']")
   );
   // ❌ length > 0 では 1 本でも通る。href 配列を丸ごと比較する
   expect(navLinks.map((link) => link.getAttribute("href"))).toEqual([
