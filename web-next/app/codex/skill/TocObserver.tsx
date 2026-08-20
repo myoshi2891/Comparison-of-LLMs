@@ -3,30 +3,20 @@
 import { useEffect } from "react";
 import styles from "./page.module.css";
 
-const TOC_IDS = [
-  "sec-1",
-  "sec-2",
-  "sec-3",
-  "sec-4",
-  "sec-5",
-  "sec-6",
-  "sec-7",
-  "sec-8",
-  "sec-9",
-  "sec-10",
-  "sec-11",
-  "sec-12",
-  "sec-13",
-  "sec-14",
-  "sec-15",
-] as const;
-
 export default function TocObserver() {
   useEffect(() => {
-    const sections = TOC_IDS.map((id) => document.getElementById(id)).filter(
-      Boolean
-    ) as HTMLElement[];
-    const tocLinks = Array.from(document.querySelectorAll(`.${styles.toc} a`));
+    const tocLinks = Array.from(
+      document.querySelectorAll<HTMLAnchorElement>(`.${styles.toc} a[href^="#"]`)
+    );
+
+    // 監視対象は TOC リンクの href から導出する。ID をハードコードすると
+    // セクションの増減で監視漏れ・幽霊 ID が生じるため。
+    const sections = tocLinks
+      .map((link) => {
+        const href = link.getAttribute("href");
+        return href ? document.getElementById(decodeURIComponent(href.slice(1))) : null;
+      })
+      .filter((el): el is HTMLElement => el !== null);
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -56,7 +46,10 @@ export default function TocObserver() {
     const backdrop = document.getElementById("sidebarBackdrop");
 
     const toggleSidebar = () => {
-      const isOpen = sidebar?.classList.toggle(styles.sidebarOpen);
+      // sidebar が無いと classList.toggle が undefined を返し、
+      // aria-expanded="undefined" という不正な値が出力されるため先に抜ける。
+      if (!sidebar) return;
+      const isOpen = sidebar.classList.toggle(styles.sidebarOpen);
       backdrop?.classList.toggle(styles.sidebarOpen, isOpen);
       hamburgerBtn?.setAttribute("aria-expanded", String(isOpen));
       hamburgerBtn?.setAttribute("aria-label", isOpen ? "目次を閉じる" : "目次を開く");
@@ -69,21 +62,25 @@ export default function TocObserver() {
       hamburgerBtn?.setAttribute("aria-label", "目次を開く");
     };
 
+    const handleTocLinkClick = () => {
+      if (window.innerWidth <= 900) {
+        closeSidebar();
+      }
+    };
+
     hamburgerBtn?.addEventListener("click", toggleSidebar);
     backdrop?.addEventListener("click", closeSidebar);
-
     for (const link of tocLinks) {
-      link.addEventListener("click", () => {
-        if (window.innerWidth <= 900) {
-          closeSidebar();
-        }
-      });
+      link.addEventListener("click", handleTocLinkClick);
     }
 
     return () => {
       observer.disconnect();
       hamburgerBtn?.removeEventListener("click", toggleSidebar);
       backdrop?.removeEventListener("click", closeSidebar);
+      for (const link of tocLinks) {
+        link.removeEventListener("click", handleTocLinkClick);
+      }
     };
   }, []);
 

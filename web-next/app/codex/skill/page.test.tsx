@@ -1,7 +1,8 @@
 // @vitest-environment jsdom
 import { render } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import { MERMAID_DIAGRAM_DECLARATION } from "../../../../.claude/skills/fix-mermaid/scripts/mermaid-diagram-types.mjs";
+import { MERMAID_DIAGRAM_DECLARATION } from "@/lib/mermaid-diagram-types";
+import { normalizeMermaidSource } from "@/tests/helpers/mermaid";
 import Page, { metadata } from "./page";
 import styles from "./page.module.css";
 
@@ -13,17 +14,6 @@ vi.mock("@/components/docs/MermaidDiagram", () => ({
 
 function normalizeText(text: string | null | undefined): string {
   return (text ?? "").replace(/\s+/g, " ").trim();
-}
-
-function normalizeMermaidSource(raw: string): string {
-  const lines = raw.replace(/\r\n?/g, "\n").split("\n");
-  while (lines.length > 0 && lines[0].trim() === "") lines.shift();
-  while (lines.length > 0 && lines.at(-1)?.trim() === "") lines.pop();
-  const indents = lines
-    .filter((line) => line.trim().length > 0)
-    .map((line) => line.match(/^\s*/)?.[0].length ?? 0);
-  const commonIndent = indents.length > 0 ? Math.min(...indents) : 0;
-  return lines.map((line) => line.slice(commonIndent).trimEnd()).join("\n");
 }
 
 const EXPECTED_H1 = "AI仕様駆動開発におけるMarkdownファイル実践ガイド";
@@ -229,7 +219,9 @@ describe("/codex/skill - AI仕様駆動開発におけるMarkdownファイル実
     expect(extLinks.length).toBeGreaterThanOrEqual(33);
     for (const link of extLinks) {
       expect(link.getAttribute("target")).toBe("_blank");
-      expect(link.getAttribute("rel")).toContain("noopener");
+      const rel = (link.getAttribute("rel") ?? "").split(/\s+/);
+      expect(rel).toContain("noopener");
+      expect(rel).toContain("noreferrer");
     }
   });
 
@@ -248,7 +240,7 @@ describe("/codex/skill - AI仕様駆動開発におけるMarkdownファイル実
     const actual = Array.from(container.querySelectorAll('[data-testid="mermaid"]')).map((el) =>
       normalizeMermaidSource(el.textContent ?? "")
     );
-    expect(actual).toEqual([...EXPECTED_MERMAID_SOURCES]);
+    expect(actual).toEqual(EXPECTED_MERMAID_SOURCES.map(normalizeMermaidSource));
   });
 
   it("C-6b: 全 Mermaid 図解がページ専用ラッパーに包まれている", () => {
