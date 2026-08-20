@@ -17,7 +17,7 @@
   --danger: #ff8a8a;
   --code-bg: #0a1729;
   --font-display: "Space Grotesk", "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
-  --font-body: "Inter", "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
+  --font-body: var(--font-sans), "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
   --font-mono: "JetBrains Mono", "SF Mono", monospace;
   --sidebar-w: 308px;
 
@@ -1007,7 +1007,9 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .cursor {
+  /* .filetree .cursor (詳細度 0,2,0) と同じ詳細度で打ち消す。
+     .cursor 単体では詳細度が足りず animation が止まらない。 */
+  .filetree .cursor {
     animation: none;
   }
   .sidebar {

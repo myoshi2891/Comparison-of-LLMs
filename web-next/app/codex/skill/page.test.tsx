@@ -183,7 +183,7 @@ describe("/codex/skill - AI仕様駆動開発におけるMarkdownファイル実
     for (const link of tocLinks) {
       const targetId = link.getAttribute("href")?.replace(/^#/, "");
       expect(targetId).toBeTruthy();
-      expect(container.querySelector(`#${targetId}`)).not.toBeNull();
+      expect(container.querySelector(`#${CSS.escape(targetId as string)}`)).not.toBeNull();
     }
   });
 
@@ -210,7 +210,7 @@ describe("/codex/skill - AI仕様駆動開発におけるMarkdownファイル実
     const { container } = render(<Page />);
     const firstTocLink = container.querySelector("aside ul li:first-child a");
     expect(firstTocLink).not.toBeNull();
-    expect(firstTocLink?.className).toContain("active");
+    expect(firstTocLink?.classList.contains(styles.active)).toBe(true);
   });
 
   it("C-4: 外部リンク全件に target='_blank' かつ rel='noopener noreferrer'", () => {
@@ -309,6 +309,7 @@ describe("/codex/skill - AI仕様駆動開発におけるMarkdownファイル実
     const { container } = render(<Page />);
     const sidebar = container.querySelector("aside");
     expect(sidebar).not.toBeNull();
+    expect(sidebar?.getAttribute("data-testid")).toBe("sidebar-nav");
   });
 
   it("D-6: コードブロックが data-testid='code-block' で識別される", () => {
