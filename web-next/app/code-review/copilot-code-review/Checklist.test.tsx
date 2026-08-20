@@ -1,9 +1,17 @@
 // @vitest-environment jsdom
 import { fireEvent, render } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 import Page from "./page";
 
+// TocObserver がチェック状態を localStorage へ永続化するため、
+// 前のテストが残した状態で初期カウンタが 0 / 12 からずれないようにする。
+const CHECKLIST_STORAGE_KEY = "copilotCodeReviewGuide.checklist.v1";
+
 describe("/code-review/copilot-code-review — Checklist", () => {
+  beforeEach(() => {
+    localStorage.removeItem(CHECKLIST_STORAGE_KEY);
+  });
+
   it("チェックボックスをクリックすると checked になり、done クラスが付与されカウンターが更新される", () => {
     const { container } = render(<Page />);
     const checkboxes = container.querySelectorAll<HTMLInputElement>(

@@ -243,14 +243,18 @@ describe("/code-review/copilot-code-review — コンテンツ契約 (C)", () =>
 });
 
 describe("/code-review/copilot-code-review — デザイン契約 (D)", () => {
-  it("D-1: callout 要素が存在し、原本のバリアント（warn等）が存在する", () => {
+  // 原本 archive/html/Microsoft/Github-copilot-code-review-best-practices.html の
+  // callout 出現順（"default" = バリアント指定なしの素の callout）。
+  const EXPECTED_CALLOUT_VARIANTS = ["default", "default", "warn", "default", "default"] as const;
+
+  it("D-1: callout が原本と同数・同じバリアント順で存在する", () => {
     const { container } = render(<Page />);
-    const callouts = container.querySelectorAll(".callout, [data-variant]");
-    expect(callouts.length).toBeGreaterThan(0);
-    const hasWarn = Array.from(callouts).some(
-      (c) => c.classList.contains("warn") || c.getAttribute("data-variant") === "warn"
+    const callouts = Array.from(container.querySelectorAll(".callout"));
+    // 件数だけ / some() だけでは callout を落としても通るため、順序込みで比較する。
+    const variants = callouts.map(
+      (c) => c.getAttribute("data-variant") ?? (c.classList.contains("warn") ? "warn" : "default")
     );
-    expect(hasWarn).toBe(true);
+    expect(variants).toEqual([...EXPECTED_CALLOUT_VARIANTS]);
   });
 
   it("D-6: コードブロックが存在し、指示ファイルのテキスト内容が完全にレンダリングされている", () => {
