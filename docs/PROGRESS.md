@@ -11,11 +11,13 @@
 - **フェーズ**: 保守・機能改善・品質強化フェーズ
 - **ブランチ**: `dev`（本番 `main` への Next.js 移行マージ完了 🚀）
 - **動作検証**:
-  - `bun run build`: 今回はユーザー指定により未実行（直近の成功記録は 2026-08-13。許可環境または CI で再確認する）
-  - `bun run typecheck` ✅（`tsc --noEmit`。2026-08-19 実測）
-  - `bun run lint` ✅（Biome check / 473 files / 0 diagnostics。2026-08-19 実測）
+  - `bun run build` ✅（Compiled successfully / 86 静的ページを生成。2026-08-20 実測）
+  - `bun run typecheck` ✅（`tsc --noEmit`。2026-08-20 実測）
+  - `bun run lint` ✅（Biome check / 477 files / 0 diagnostics。2026-08-20 実測）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: `bun run test` で Vitest **170 files / 1539 tests すべて合格**（2026-08-19 実測。全 Green ✅）
+  - **フロントエンド (`web-next/`)**: `bun run test` で Vitest **170 files / 1540 tests すべて合格**（2026-08-20 実測。全 Green ✅）
+    - `load(sourceHtml)` をモジュール初期化時に呼ぶ `governance/ai-governance/GuideContent.tsx` と
+      `local-llm/finetuning-best-practices/GuideContent.tsx` は、import スモークでも読み込み可能であることを確認済み
   - **バックエンド (`scraper/`)**: pytest 実行で **43 件すべて合格** (全 Green ✅)
 
 ## 最近の追加内容
