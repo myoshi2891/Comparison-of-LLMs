@@ -21,6 +21,16 @@ export default function TocObserver() {
     }
   }, [isOpen]);
 
+  // Escape キーでサイドバーを閉じる（オフキャンバス UI の慣習）
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setIsOpen(false);
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen]);
+
   // TOC ScrollSpy
   useEffect(() => {
     const navLinks = Array.from(
@@ -43,21 +53,33 @@ export default function TocObserver() {
     const targets = Array.from(map.keys());
     if (!targets.length) return;
 
+    // 交差中の要素を保持し、そのうち最も上にあるものをアクティブにする。
+    // entries を順に処理して「最後の交差」を採用すると、複数セクションが同時に
+    // 交差したときに下のセクションが勝ってしまう。
+    const intersecting = new Set<HTMLElement>();
+
     const spy = new IntersectionObserver(
       (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            navLinks.forEach((a) => {
-              a.classList.remove(styles.active);
-              a.classList.remove("active");
-            });
-            const link = map.get(entry.target as HTMLElement);
-            if (link) {
-              link.classList.add(styles.active);
-              link.classList.add("active");
-            }
-          }
-        });
+        for (const entry of entries) {
+          const target = entry.target as HTMLElement;
+          if (entry.isIntersecting) intersecting.add(target);
+          else intersecting.delete(target);
+        }
+
+        const [topmost] = [...intersecting].sort(
+          (a, b) => a.getBoundingClientRect().top - b.getBoundingClientRect().top
+        );
+        if (!topmost) return;
+
+        const link = map.get(topmost);
+        if (!link) return;
+
+        for (const a of navLinks) {
+          a.classList.remove(styles.active);
+          a.classList.remove("active");
+        }
+        link.classList.add(styles.active);
+        link.classList.add("active");
       },
       { root: null, rootMargin: "-15% 0px -75% 0px", threshold: 0 }
     );

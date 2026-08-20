@@ -2,6 +2,7 @@
 import { render } from "@testing-library/react";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import Page, { metadata } from "./page";
+import styles from "./page.module.css";
 
 // 原本照合用 見出し配列（順序込み完全一致）
 const EXPECTED_H1 = [
@@ -191,12 +192,20 @@ describe("/code-review/copilot-code-review — コンテンツ契約 (C)", () =>
     const { container } = render(<Page />);
     const tocLinks = Array.from(container.querySelectorAll("nav a[href^='#']"));
     expect(tocLinks.length).toBe(EXPECTED_H2.length);
+    // 件数だけでは href の綴り間違い・空アンカーを見逃すため、形式と解決先も検証する
+    for (const link of tocLinks) {
+      const href = link.getAttribute("href") ?? "";
+      expect(href).toMatch(/^#[\w-]+$/);
+      expect(container.querySelector(`#${CSS.escape(href.slice(1))}`)).not.toBeNull();
+    }
   });
 
   it("C-3: サイドバー TOC の初期アクティブ状態が存在する", () => {
     const { container } = render(<Page />);
-    const activeLink = container.querySelector("nav a[class*='active']");
-    expect(activeLink).not.toBeNull();
+    // [class*='active'] は "inactive" 等にも当たるため、CSS Modules の生成クラスで厳密に選ぶ
+    const activeLinks = Array.from(container.querySelectorAll(`nav a.${styles.active}`));
+    expect(activeLinks).toHaveLength(1);
+    expect(activeLinks[0].getAttribute("href")).toBe("#intro");
   });
 
   it("C-4: 外部リンク全件に target='_blank' かつ rel='noopener noreferrer'", () => {

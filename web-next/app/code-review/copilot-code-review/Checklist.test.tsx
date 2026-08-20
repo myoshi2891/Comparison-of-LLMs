@@ -22,13 +22,12 @@ describe("/code-review/copilot-code-review — Checklist", () => {
     const firstItem = checkboxes[0].closest(".check-item");
     expect(firstItem?.classList.contains("done")).toBe(true);
 
-    // リセットボタンをクリック
+    // リセットボタンをクリック。ボタンが無い場合は if で握りつぶさず落とす
     const resetBtn = container.querySelector("#checklistReset");
-    if (resetBtn) {
-      fireEvent.click(resetBtn);
-      expect(checkboxes[0].checked).toBe(false);
-      expect(progress?.textContent?.trim()).toBe("0 / 12 完了");
-      expect(firstItem?.classList.contains("done")).toBe(false);
-    }
+    expect(resetBtn).not.toBeNull();
+    fireEvent.click(resetBtn as Element);
+    expect(checkboxes[0].checked).toBe(false);
+    expect(progress?.textContent?.trim()).toBe("0 / 12 完了");
+    expect(firstItem?.classList.contains("done")).toBe(false);
   });
 });

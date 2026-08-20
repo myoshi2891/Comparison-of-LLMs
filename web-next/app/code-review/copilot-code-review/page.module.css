@@ -114,19 +114,22 @@
   }
 }
 
-/* Active navigation link */
-.active,
-.layout :global(nav.toc a.active),
+/* Hover state */
 .layout :global(nav.toc a:hover) {
   background: var(--accent-soft) !important;
   color: var(--text) !important;
   border-left-color: var(--accent) !important;
-  font-weight: 500 !important;
 }
 
-.sidebarOpen,
-.layout :global(.sidebar.open) {
-  transform: translateX(0) !important;
+/* Active navigation link
+   番号バッジ (nav.toc a.active .n) がアクセント色なので、リンク本体も揃える。
+   以前は !important 付きの --text / 500 が後方の --accent / 600 を打ち消していた。 */
+.active,
+.layout :global(nav.toc a.active) {
+  background: var(--accent-soft) !important;
+  color: var(--accent) !important;
+  border-left-color: var(--accent) !important;
+  font-weight: 600 !important;
 }
 
 /* Checklist done style - line-through */
@@ -244,14 +247,7 @@
 }
 
 /* ---------- Sidebar ---------- */
-.layout :global(.sidebar::-webkit-scrollbar) {
-  width: 8px;
-}
-
-.layout :global(.sidebar::-webkit-scrollbar-thumb) {
-  background: var(--border-strong);
-  border-radius: 8px;
-}
+/* スクロールバーの見た目は上部の .layout :global(.sidebar::-webkit-scrollbar) 群で定義済み。 */
 
 .layout :global(.brand) {
   display: flex;
@@ -328,13 +324,6 @@
   background: var(--accent-soft);
   color: var(--text);
   text-decoration: none;
-}
-
-.layout :global(nav.toc a.active) {
-  background: var(--accent-soft);
-  color: var(--accent);
-  border-left-color: var(--accent);
-  font-weight: 600;
 }
 
 .layout :global(nav.toc a.active .n) {
@@ -1011,11 +1000,9 @@
   color: var(--text-dim);
 }
 
-@media (max-width: 980px) {
-  .layout :global(.sidebar.open) {
-    transform: translateX(0);
-  }
-
+/* オフキャンバスサイドバー / .menuToggle と同じ 960px で切り替える。
+   980px にすると 961–980px でサイドバーは固定のまま本文だけ詰まる。 */
+@media (max-width: 960px) {
   .layout :global(.hero),
   .layout :global(section.section),
   .layout :global(footer.page-footer) {
