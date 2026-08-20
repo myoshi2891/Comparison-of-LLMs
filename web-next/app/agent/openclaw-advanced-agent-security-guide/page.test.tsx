@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import { render } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
+import { normalizeMermaidSource } from "@/tests/helpers/mermaid";
 import Page, { metadata } from "./page";
 import styles from "./page.module.css";
 
@@ -224,17 +225,6 @@ function cleanText(text: string | null | undefined): string {
   return (text ?? "").replace(/\s+/g, " ").trim();
 }
 
-function normalizeMermaidSource(raw: string): string {
-  const lines = raw.replace(/\r\n?/g, "\n").split("\n");
-  while (lines.length > 0 && lines[0].trim() === "") lines.shift();
-  while (lines.length > 0 && lines.at(-1)?.trim() === "") lines.pop();
-  const indents = lines
-    .filter((line) => line.trim().length > 0)
-    .map((line) => line.match(/^\s*/)?.[0].length ?? 0);
-  const commonIndent = indents.length > 0 ? Math.min(...indents) : 0;
-  return lines.map((line) => line.slice(commonIndent).trimEnd()).join("\n");
-}
-
 describe("OpenClaw Agent 実践ベストプラクティスガイド 契約テスト", () => {
   // S. 原本照合契約
   it("S-1: h2 の見出しが原本と完全一致（順序込み）", () => {
@@ -268,7 +258,7 @@ describe("OpenClaw Agent 実践ベストプラクティスガイド 契約テス
   it("S-4: 全 h2/h3 が一意な id または section id を持ち、TOC アンカーが実在する見出し/セクションを指す", () => {
     const { container } = render(<Page />);
     const tocLinks = Array.from(container.querySelectorAll(`nav[aria-label="目次"] a`));
-    expect(tocLinks.length).toBe(12);
+    expect(tocLinks.length).toBe(EXPECTED_H2.length);
 
     for (const link of tocLinks) {
       const href = link.getAttribute("href");
@@ -289,7 +279,7 @@ describe("OpenClaw Agent 実践ベストプラクティスガイド 契約テス
   it("C-2: クイックナビ（TOC リンク）の件数と href 形式", () => {
     const { container } = render(<Page />);
     const tocLinks = Array.from(container.querySelectorAll(`nav[aria-label="目次"] a`));
-    expect(tocLinks.length).toBe(12);
+    expect(tocLinks.length).toBe(EXPECTED_H2.length);
     for (const link of tocLinks) {
       expect(link.getAttribute("href")).toMatch(/^#[a-z0-9-]+$/);
     }
@@ -326,7 +316,7 @@ describe("OpenClaw Agent 実践ベストプラクティスガイド 契約テス
     const actual = Array.from(container.querySelectorAll('[data-testid="mermaid"]')).map((el) =>
       normalizeMermaidSource(el.textContent ?? "")
     );
-    expect(actual).toEqual([...EXPECTED_MERMAID_SOURCES]);
+    expect(actual).toEqual(EXPECTED_MERMAID_SOURCES.map(normalizeMermaidSource));
   });
 
   it("C-6b: 全 Mermaid 図解がページ専用ラッパーに包まれている", () => {

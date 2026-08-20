@@ -15,9 +15,12 @@
   --text-secondary: #9fb0cc;
   --text-muted: #66789a;
   --code-bg: #0a1220;
-  --font-display: "Space Grotesk", "Noto Sans JP", sans-serif;
-  --font-body: "Inter", "Noto Sans JP", sans-serif;
-  --font-mono: "JetBrains Mono", "Noto Sans JP", monospace;
+  /* フォントはサイトが実際に読み込んでいるものだけを参照する。
+     --font-display (Syne) / --font-mono (JetBrains Mono) は next/font が <html> へ注入し、
+     --font-sans (Noto Sans JP) は globals.css の :root が定義する。
+     ここで --font-display / --font-mono を上書きすると読み込み済みフォントが外れるため、
+     ローカルでは本文用の --font-body だけを定義する。 */
+  --font-body: var(--font-sans), "Noto Sans JP", sans-serif;
 
   display: block;
   width: 100%;
