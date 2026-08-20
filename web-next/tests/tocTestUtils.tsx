@@ -19,6 +19,8 @@ export interface IntersectionObserverController {
   readonly disconnectCount: number;
   /** 直近に生成された observer のコールバックへ entries を流し込む */
   emit(entries: Array<Partial<IntersectionObserverEntry>>): void;
+  /** global.IntersectionObserver を差し替え前の値へ戻す */
+  restore(): void;
 }
 
 /**
@@ -50,6 +52,7 @@ export function installIntersectionObserverStub(): IntersectionObserverControlle
     }
   }
 
+  const previous = global.IntersectionObserver;
   global.IntersectionObserver = IntersectionObserverStub as unknown as typeof IntersectionObserver;
 
   return {
@@ -60,7 +63,19 @@ export function installIntersectionObserverStub(): IntersectionObserverControlle
       return state.disconnectCount;
     },
     emit(entries) {
-      state.callback?.(entries);
+      // TocObserver には entry.boundingClientRect を見る実装と
+      // entry.target の矩形を見る実装の両方がある。呼び出し側が省略した場合は
+      // target の矩形で補い、どちらの経路でも同じ entries で検証できるようにする。
+      state.callback?.(
+        entries.map((entry) =>
+          entry.boundingClientRect === undefined && entry.target !== undefined
+            ? { ...entry, boundingClientRect: entry.target.getBoundingClientRect() }
+            : entry
+        )
+      );
+    },
+    restore() {
+      global.IntersectionObserver = previous;
     },
   };
 }
