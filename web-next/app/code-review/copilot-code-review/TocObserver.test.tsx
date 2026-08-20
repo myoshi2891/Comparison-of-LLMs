@@ -119,4 +119,35 @@ describe("/code-review/copilot-code-review — TocObserver", () => {
     expect(sidebar.classList.contains("open")).toBe(false);
     expect(document.activeElement).toBe(toggle);
   });
+  it("Q-1c: 交差が解除されたセクションはアクティブ候補から外れる", () => {
+    const io = installStub();
+
+    const { container } = render(
+      <div>
+        <nav className="toc">
+          <a href="#intro">はじめに</a>
+          <a href="#what-is-it">GitHub Copilot Code Reviewとは何か</a>
+        </nav>
+        <div id="intro">Intro</div>
+        <div id="what-is-it">What is it</div>
+        <TocObserver />
+      </div>
+    );
+
+    const intro = container.querySelector("#intro") as HTMLElement;
+    const second = container.querySelector("#what-is-it") as HTMLElement;
+    intro.getBoundingClientRect = () => ({ top: 20 }) as DOMRect;
+    second.getBoundingClientRect = () => ({ top: 400 }) as DOMRect;
+
+    io.emit([
+      { target: intro, isIntersecting: true },
+      { target: second, isIntersecting: true },
+    ]);
+    // 上端のセクションが画面外へ出たら、次のセクションへアクティブが移る。
+    io.emit([{ target: intro, isIntersecting: false }]);
+
+    expect(container.querySelector(`nav.toc a.${styles.active}`)?.getAttribute("href")).toBe(
+      "#what-is-it"
+    );
+  });
 });
