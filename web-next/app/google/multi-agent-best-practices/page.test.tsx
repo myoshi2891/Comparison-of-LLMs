@@ -297,7 +297,11 @@ describe("Gemini Multi-Agent Best Practices Page Contract Tests", () => {
       expect(tocLinks.length).toBe(EXPECTED_H2.length);
       for (const link of tocLinks) {
         const href = link.getAttribute("href");
-        expect(href).toMatch(/^#[a-zA-Z0-9_\-\u3000-\u30FE\u4E00-\u9FFF]+/);
+        // 末尾を固定しないと「#id + 余計な文字」を素通しする
+        expect(href).toMatch(/^#[a-zA-Z0-9_\-\u3000-\u30FE\u4E00-\u9FFF]+$/);
+        // S-4 と同様、アンカーが実在する要素を指すことまで確認する
+        const targetId = href?.slice(1) ?? "";
+        expect(container.querySelector(`#${CSS.escape(targetId)}`)).not.toBeNull();
       }
     });
 
@@ -392,10 +396,14 @@ describe("Gemini Multi-Agent Best Practices Page Contract Tests", () => {
       expect(sidebar).not.toBeNull();
     });
 
+    // 原本 HTML のコードブロック数。裸のマジックナンバーだと、
+    // 期待値が原本由来なのか実装に合わせた値なのか後から判別できない。
+    const EXPECTED_CODE_BLOCK_COUNT = 28;
+
     it("D-6: コードブロックが data-testid='code-block' で識別される", () => {
       const { container } = render(<Page />);
       const codeBlocks = container.querySelectorAll('[data-testid="code-block"]');
-      expect(codeBlocks.length).toBe(28);
+      expect(codeBlocks.length).toBe(EXPECTED_CODE_BLOCK_COUNT);
     });
 
     it("D-7: 外部 CSS リンク（atom-one-dark）が存在する", () => {
