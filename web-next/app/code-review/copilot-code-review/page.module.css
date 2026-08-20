@@ -104,21 +104,28 @@
     transform: translateX(-100%) !important;
     z-index: 9999 !important;
     box-shadow: 0 0 40px rgba(0, 0, 0, 0.4) !important;
+    /* オフスクリーン変形だけでは閉状態のリンクがキーボードフォーカスを受け取れてしまうため、
+       visibility / pointer-events でも不活性化する。 */
+    visibility: hidden !important;
+    pointer-events: none !important;
   }
   .layout :global(.sidebar.open),
   .sidebarOpen {
     transform: translateX(0) !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
   }
   .layout :global(.main) {
     padding: 0 0 4rem !important;
   }
 }
 
-/* Hover state */
+/* Hover state — 後方の a.active 規則に打ち消されるよう、意図的にこの位置へ置く */
 .layout :global(nav.toc a:hover) {
   background: var(--accent-soft) !important;
   color: var(--text) !important;
   border-left-color: var(--accent) !important;
+  text-decoration: none !important;
 }
 
 /* Active navigation link
@@ -132,12 +139,7 @@
   font-weight: 600 !important;
 }
 
-/* Checklist done style - line-through */
-.layout :global(.check-item.done .check-text) {
-  text-decoration: line-through !important;
-  color: var(--text-faint) !important;
-}
-
+/* Checklist done style - line-through は .check-text 定義の直後へ集約した */
 .layout :global(.check-item.done .check-box) {
   background: var(--accent) !important;
   border-color: var(--accent) !important;
@@ -318,12 +320,6 @@
   font-size: 0.72rem;
   color: var(--text-faint);
   min-width: 1.3em;
-}
-
-.layout :global(nav.toc a:hover) {
-  background: var(--accent-soft);
-  color: var(--text);
-  text-decoration: none;
 }
 
 .layout :global(nav.toc a.active .n) {
@@ -817,8 +813,8 @@
 }
 
 .layout :global(.check-item.done .check-text) {
-  color: var(--text-faint);
-  text-decoration: line-through;
+  color: var(--text-faint) !important;
+  text-decoration: line-through !important;
   text-decoration-color: var(--text-faint);
   opacity: 0.75;
 }

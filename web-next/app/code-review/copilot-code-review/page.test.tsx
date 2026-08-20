@@ -82,6 +82,35 @@ const EXPECTED_EXTERNAL_LINKS = [
   "https://simonwillison.net/tags/github-copilot/",
 ] as const;
 
+/** 原本 <title> の文言。ページの h1 とは別に metadata の契約として固定する。 */
+const EXPECTED_METADATA_TITLE =
+  "GitHub Copilot Code Review 実践ガイド ― 中級〜上級エンジニアのためのベストプラクティス";
+
+/** 原本には meta description が無いため、本ページ用に定めた SEO 文言を契約として固定する。 */
+const EXPECTED_METADATA_DESCRIPTION =
+  "AI駆動のコードレビューをチーム開発に深く組み込む——概念・設定・運用まで中〜上級者向けにステップバイステップで解説";
+
+/** 原本 <pre><code> の全文（1 ブロックのみ）。 */
+const EXPECTED_CODE_BLOCKS = [
+  `---
+applyTo:
+  - "webapp/src/**"
+  - "ui/components/**"
+---
+アクセシビリティ(ARIA属性、フォーカス管理)を重視してください。
+デザイントークンの利用を優先してください。
+legacy/配下の非推奨コンポーネントの利用を検出したら指摘してください。`,
+] as const;
+
+/**
+ * コードブロックの比較用正規化。
+ * ページ側は 1 行を 1 つの div (codeLine) で組むため textContent に改行が現れない。
+ * 改行だけを除去して比較し、インデントと文字列そのものは厳密に突き合わせる。
+ */
+function normalizeCode(raw: string | null): string {
+  return (raw ?? "").replace(/\r?\n/g, "").trim();
+}
+
 const EXPECTED_MERMAID_SOURCES = [
   `flowchart TB
     A["入力処理<br/>PR差分 + タイトル/本文 + カスタム指示を統合"] --> B["言語モデル解析<br/>GPT系 / Claude Opus系 / Gemini系 等を使い分け"]
@@ -257,16 +286,15 @@ describe("/code-review/copilot-code-review — デザイン契約 (D)", () => {
     expect(variants).toEqual([...EXPECTED_CALLOUT_VARIANTS]);
   });
 
-  it("D-6: コードブロックが存在し、指示ファイルのテキスト内容が完全にレンダリングされている", () => {
+  it("D-6: コードブロックが原本と同数・同内容で存在する", () => {
     const { container } = render(<Page />);
-    const codeBlocks = container.querySelectorAll("pre code, [data-testid='code-block']");
-    expect(codeBlocks.length).toBeGreaterThan(0);
-    const codeText = Array.from(codeBlocks)
-      .map((cb) => cb.textContent)
-      .join("\n");
-    expect(codeText).toContain("applyTo:");
-    expect(codeText).toContain("webapp/src/**");
-    expect(codeText).toContain("アクセシビリティ");
+    const codeBlocks = Array.from(
+      container.querySelectorAll("pre code, [data-testid='code-block']")
+    );
+    // 件数下限 + 部分一致では行を落としても通る。原本の全文と順序込みで比較する。
+    expect(codeBlocks.map((cb) => normalizeCode(cb.textContent))).toEqual([
+      ...EXPECTED_CODE_BLOCKS.map(normalizeCode),
+    ]);
   });
 
   it("D-7: highlight.js atom-one-dark CDN リンクが存在する", () => {
@@ -283,9 +311,10 @@ describe("/code-review/copilot-code-review — デザイン契約 (D)", () => {
 });
 
 describe("/code-review/copilot-code-review — 品質契約 (Q)", () => {
-  it("Q-2: export const metadata の title / description が有効", () => {
-    expect(metadata.title).toBeTruthy();
-    expect(metadata.description).toBeTruthy();
+  it("Q-2: export const metadata の title / description が原本の値と完全一致する", () => {
+    // truthy 判定では文言が入れ替わっても通る。定数と厳密比較する。
+    expect(metadata.title).toBe(EXPECTED_METADATA_TITLE);
+    expect(metadata.description).toBe(EXPECTED_METADATA_DESCRIPTION);
   });
 
   it("Q-3: h4 の見出しが原本と完全一致する（順序込み）", () => {

@@ -1,12 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import styles from "./page.module.css";
 
-const CHECKLIST_STORAGE_KEY = "copilotCodeReviewGuide.checklist.v1";
+/** チェック状態の永続化キー。テストからも参照するため export する。 */
+export const CHECKLIST_STORAGE_KEY = "copilotCodeReviewGuide.checklist.v1";
 
 export default function TocObserver() {
   const [isOpen, setIsOpen] = useState(false);
+  const toggleRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     const sidebar = document.getElementById("copilotCodeReviewSidebar");
@@ -21,11 +23,15 @@ export default function TocObserver() {
     }
   }, [isOpen]);
 
-  // Escape キーでサイドバーを閉じる（オフキャンバス UI の慣習）
+  // Escape キーでサイドバーを閉じる（オフキャンバス UI の慣習）。
+  // 閉じた後はフォーカスをトグルボタンへ戻す。閉状態のサイドバーは
+  // visibility: hidden で不活性化されるため、戻さないとフォーカスが宙に浮く。
   useEffect(() => {
     if (!isOpen) return;
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setIsOpen(false);
+      if (event.key !== "Escape") return;
+      setIsOpen(false);
+      toggleRef.current?.focus();
     };
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
@@ -188,6 +194,7 @@ export default function TocObserver() {
 
   return (
     <button
+      ref={toggleRef}
       type="button"
       className={styles.menuToggle}
       id="menuToggle"

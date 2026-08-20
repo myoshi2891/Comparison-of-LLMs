@@ -2,10 +2,10 @@
 import { fireEvent, render } from "@testing-library/react";
 import { beforeEach, describe, expect, it } from "vitest";
 import Page from "./page";
-
 // TocObserver がチェック状態を localStorage へ永続化するため、
 // 前のテストが残した状態で初期カウンタが 0 / 12 からずれないようにする。
-const CHECKLIST_STORAGE_KEY = "copilotCodeReviewGuide.checklist.v1";
+// キーは実装側の定数をそのまま使う（二重管理すると片方の変更で掃除が効かなくなる）。
+import { CHECKLIST_STORAGE_KEY } from "./TocObserver";
 
 describe("/code-review/copilot-code-review — Checklist", () => {
   beforeEach(() => {
