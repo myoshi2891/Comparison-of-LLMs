@@ -112,10 +112,15 @@ describe("/copilot/github-copilot Contract Tests", () => {
   // S-4: 全 h2/h3 が一意な id を持ち、TOC のアンカーが全て実在する見出しを指す
   it("S-4: 全 h2/h3 が一意な id を持ち、TOC のアンカーが全て実在する見出しを指す", () => {
     const { container } = render(<GithubCopilotPage />);
-    const headings = container.querySelectorAll("main h2[id], main h3[id]");
-    const ids = Array.from(headings).map((h) => h.getAttribute("id"));
-    const uniqueIds = new Set(ids);
-    expect(ids.length).toBe(uniqueIds.size);
+    // [id] で絞り込むと id 欠落の見出しが集合から消えてしまい、テストが素通りする。
+    // 全 h2/h3 を集めてから「全件が空でない一意な id を持つ」ことを検証する。
+    const headings = Array.from(container.querySelectorAll("main h2, main h3"));
+    expect(headings.length).toBeGreaterThan(0);
+    const ids = headings
+      .map((h) => h.getAttribute("id"))
+      .filter((id): id is string => id !== null && id.trim() !== "");
+    expect(ids.length).toBe(headings.length);
+    expect(new Set(ids).size).toBe(ids.length);
 
     const tocLinks = container.querySelectorAll('nav a[href^="#"]');
     for (const link of tocLinks) {

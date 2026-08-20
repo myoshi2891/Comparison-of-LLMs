@@ -43,8 +43,20 @@ export function TocObserver() {
     overlay?.addEventListener("click", handleOverlayClick);
 
     // 2. IntersectionObserver for TOC highlight
-    const headings = Array.from(document.querySelectorAll("h2[id], h3[id], section[id]"));
     const navLinks = Array.from(document.querySelectorAll(`.${styles.navLink}`));
+    // TOC が指す id だけを監視対象にする。document 全体を走査すると
+    // SiteHeader / DisclaimerBanner など本文外の見出しまで拾ってしまい、
+    // それが最上位になった瞬間に全リンクのハイライトが消える。
+    const tocTargetIds = new Set(
+      navLinks
+        .map((link) => link.getAttribute("href") ?? "")
+        .filter((href) => href.startsWith("#"))
+        .map((href) => decodeURIComponent(href.slice(1)))
+    );
+    const contentRoot = document.getElementById("main") ?? document;
+    const headings = Array.from(contentRoot.querySelectorAll("h2[id], h3[id], section[id]")).filter(
+      (heading) => tocTargetIds.has(heading.id)
+    );
     const intersectingHeadings = new Set<Element>();
 
     const observer = new IntersectionObserver(
@@ -64,10 +76,14 @@ export function TocObserver() {
           undefined
         );
         if (topmostHeading) {
-          const id = topmostHeading.getAttribute("id");
-          for (const link of navLinks) {
-            const href = link.getAttribute("href") ?? "";
-            link.classList.toggle(styles.active, href === `#${id}`);
+          const id = topmostHeading.getAttribute("id") ?? "";
+          // 対応する TOC リンクが無いときは現在のハイライトを維持する
+          // （全リンクを消すと「どこにも居ない」表示になるため）。
+          const activeHref = `#${id}`;
+          if (navLinks.some((link) => link.getAttribute("href") === activeHref)) {
+            for (const link of navLinks) {
+              link.classList.toggle(styles.active, link.getAttribute("href") === activeHref);
+            }
           }
         }
       },
