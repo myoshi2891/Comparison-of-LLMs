@@ -255,6 +255,9 @@ describe("OpenClaw Agent 実践ベストプラクティスガイド 契約テス
     }
   });
 
+  // TOC アンカーの形式契約。S-4 と C-2 で二重定義すると片方だけ緩む。
+  const TOC_HREF_PATTERN = /^#[a-z0-9-]+$/;
+
   it("S-4: 全 h2/h3 が一意な id または section id を持ち、TOC アンカーが実在する見出し/セクションを指す", () => {
     const { container } = render(<Page />);
     const tocLinks = Array.from(container.querySelectorAll(`nav[aria-label="目次"] a`));
@@ -262,9 +265,10 @@ describe("OpenClaw Agent 実践ベストプラクティスガイド 契約テス
 
     for (const link of tocLinks) {
       const href = link.getAttribute("href");
-      expect(href).toMatch(/^#[a-zA-Z0-9_-]+$/);
-      const targetId = href?.slice(1);
-      const targetEl = container.querySelector(`#${targetId}`);
+      expect(href).toMatch(TOC_HREF_PATTERN);
+      const targetId = href?.slice(1) ?? "";
+      // id は CSS セレクタとして解釈されるため、必ずエスケープしてから渡す。
+      const targetEl = container.querySelector(`#${CSS.escape(targetId)}`);
       expect(targetEl).not.toBeNull();
     }
   });
@@ -281,7 +285,7 @@ describe("OpenClaw Agent 実践ベストプラクティスガイド 契約テス
     const tocLinks = Array.from(container.querySelectorAll(`nav[aria-label="目次"] a`));
     expect(tocLinks.length).toBe(EXPECTED_H2.length);
     for (const link of tocLinks) {
-      expect(link.getAttribute("href")).toMatch(/^#[a-z0-9-]+$/);
+      expect(link.getAttribute("href")).toMatch(TOC_HREF_PATTERN);
     }
   });
 
