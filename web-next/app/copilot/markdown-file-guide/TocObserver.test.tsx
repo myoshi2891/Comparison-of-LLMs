@@ -68,6 +68,42 @@ describe("TocObserver Component", () => {
     expect(sidebar.classList.contains(styles.open)).toBe(false);
   });
 
+  it("closes the open sidebar on Escape and returns focus to the toggle", () => {
+    document.body.innerHTML = `
+      <button id="sidebarToggle" aria-expanded="false"></button>
+      <div id="sidebar"></div>
+      <div id="sidebarOverlay"></div>
+    `;
+
+    render(<TocObserver />);
+
+    const toggleBtn = document.getElementById("sidebarToggle");
+    const sidebar = document.getElementById("sidebar");
+    const overlay = document.getElementById("sidebarOverlay");
+    expect(toggleBtn).toBeInstanceOf(HTMLElement);
+    expect(sidebar).toBeInstanceOf(HTMLElement);
+    expect(overlay).toBeInstanceOf(HTMLElement);
+    if (!toggleBtn || !sidebar || !overlay) return;
+
+    fireEvent.click(toggleBtn);
+    expect(sidebar.classList.contains(styles.open)).toBe(true);
+
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(sidebar.classList.contains(styles.open)).toBe(false);
+    expect(overlay.classList.contains(styles.open)).toBe(false);
+    expect(toggleBtn.getAttribute("aria-expanded")).toBe("false");
+    expect(toggleBtn.getAttribute("aria-label")).toBe("目次を開く");
+    expect(document.activeElement).toBe(toggleBtn);
+
+    // 閉じている状態の Escape は何も変えない（他のキーも同様）
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(sidebar.classList.contains(styles.open)).toBe(false);
+
+    fireEvent.click(toggleBtn);
+    fireEvent.keyDown(document, { key: "Enter" });
+    expect(sidebar.classList.contains(styles.open)).toBe(true);
+  });
+
   it("updates active TOC link on intersection change", () => {
     document.body.innerHTML = `
       <a class="${styles.navLink}" href="#overview">Overview</a>

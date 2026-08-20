@@ -341,10 +341,14 @@ describe("/copilot/markdown-file-guide (Copilot Spec-Driven Development Guide) C
   });
 
   // D-1: 原本の callout-warning が正しく存在する
-  it("D-1: callout-warning が正しく存在する", () => {
+  // 件数は原本 archive/html/Microsoft/Copilot-spec-driven-development-best-practices.html
+  // の `callout callout-warning` 出現数（1 件）に固定する。
+  const EXPECTED_CALLOUT_WARNING_COUNT = 1;
+
+  it("D-1: callout-warning が原本と同数存在する", () => {
     const { container } = render(<MarkdownFileGuidePage />);
     const warnings = container.querySelectorAll(`.${styles.calloutWarning}`);
-    expect(warnings.length).toBeGreaterThanOrEqual(1);
+    expect(warnings).toHaveLength(EXPECTED_CALLOUT_WARNING_COUNT);
   });
 
   // D-2: 原本の step-badge が 7 件存在する

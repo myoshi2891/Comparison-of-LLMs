@@ -84,29 +84,17 @@ describe("Github Copilot TocObserver", () => {
 
     expect(io.observedTargets).toEqual(Array.from(headings));
 
+    // 実装は entry.boundingClientRect ではなく target.getBoundingClientRect() を見るため、
+    // entry 側に矛盾する座標を載せない（上の spy が唯一の位置情報源）。
     io.emit([
-      {
-        target: headings[0],
-        isIntersecting: true,
-        boundingClientRect: { top: 40 } as DOMRectReadOnly,
-      },
-      {
-        target: headings[1],
-        isIntersecting: true,
-        boundingClientRect: { top: 10 } as DOMRectReadOnly,
-      },
+      { target: headings[0], isIntersecting: true },
+      { target: headings[1], isIntersecting: true },
     ]);
 
     expect(links[0]).toHaveClass(styles.active);
     expect(links[1]).not.toHaveClass(styles.active);
 
-    io.emit([
-      {
-        target: headings[1],
-        isIntersecting: false,
-        boundingClientRect: { top: 10 } as DOMRectReadOnly,
-      },
-    ]);
+    io.emit([{ target: headings[1], isIntersecting: false }]);
     expect(links[0]).toHaveClass(styles.active);
     expect(links[1]).not.toHaveClass(styles.active);
   });

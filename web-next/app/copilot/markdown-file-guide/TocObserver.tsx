@@ -15,23 +15,8 @@ export function TocObserver() {
     const sidebar = document.getElementById("sidebar");
     const overlay = document.getElementById("sidebarOverlay");
 
-    const handleToggle = () => {
-      if (!sidebar || !toggleBtn) return;
-      const isOpen = sidebar.classList.contains(styles.open);
-      if (isOpen) {
-        sidebar.classList.remove(styles.open);
-        overlay?.classList.remove(styles.open);
-        toggleBtn.setAttribute("aria-expanded", "false");
-        toggleBtn.setAttribute("aria-label", "目次を開く");
-      } else {
-        sidebar.classList.add(styles.open);
-        overlay?.classList.add(styles.open);
-        toggleBtn.setAttribute("aria-expanded", "true");
-        toggleBtn.setAttribute("aria-label", "目次を閉じる");
-      }
-    };
-
-    const handleOverlayClick = () => {
+    // 閉じる操作はトグル・オーバーレイ・Escape の 3 経路から呼ばれるため共通化する。
+    const closeSidebar = () => {
       if (!sidebar || !toggleBtn) return;
       sidebar.classList.remove(styles.open);
       overlay?.classList.remove(styles.open);
@@ -39,8 +24,34 @@ export function TocObserver() {
       toggleBtn.setAttribute("aria-label", "目次を開く");
     };
 
+    const handleToggle = () => {
+      if (!sidebar || !toggleBtn) return;
+      if (sidebar.classList.contains(styles.open)) {
+        closeSidebar();
+        return;
+      }
+      sidebar.classList.add(styles.open);
+      overlay?.classList.add(styles.open);
+      toggleBtn.setAttribute("aria-expanded", "true");
+      toggleBtn.setAttribute("aria-label", "目次を閉じる");
+    };
+
+    const handleOverlayClick = () => {
+      closeSidebar();
+    };
+
+    // オフキャンバス目次はキーボード利用者が Escape で閉じられる必要がある。
+    // 閉じた後はフォーカスをトグルボタンへ戻し、フォーカスが迷子にならないようにする。
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      if (!sidebar?.classList.contains(styles.open)) return;
+      closeSidebar();
+      toggleBtn?.focus();
+    };
+
     toggleBtn?.addEventListener("click", handleToggle);
     overlay?.addEventListener("click", handleOverlayClick);
+    document.addEventListener("keydown", handleKeyDown);
 
     // 2. IntersectionObserver for TOC highlight
     const headings = Array.from(document.querySelectorAll("section[id], h2[id]"));
@@ -81,6 +92,7 @@ export function TocObserver() {
     return () => {
       toggleBtn?.removeEventListener("click", handleToggle);
       overlay?.removeEventListener("click", handleOverlayClick);
+      document.removeEventListener("keydown", handleKeyDown);
       observer.disconnect();
     };
   }, []);

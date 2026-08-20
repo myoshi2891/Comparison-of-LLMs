@@ -139,11 +139,18 @@ describe("/copilot/github-copilot Contract Tests", () => {
     expect(actualH1).toEqual([...EXPECTED_H1]);
   });
 
-  // C-2: クイックナビ（TOC リンク）の件数と href="#..." 形式
-  it("C-2: クイックナビ（TOC リンク）の件数と href 形式", () => {
+  // C-2: クイックナビ（TOC リンク）の href が h2 の id と順序込みで一致する
+  it("C-2: クイックナビ（TOC リンク）の href が h2 の id と順序込みで一致する", () => {
     const { container } = render(<GithubCopilotPage />);
-    const tocLinks = container.querySelectorAll('nav a[href^="#"]');
-    expect(tocLinks.length).toBe(EXPECTED_H2.length);
+    // 件数だけでは「同じリンクを重複させて 1 本落とす」移行漏れを検知できないため、
+    // 文書順の h2 id と href を配列ごと比較する。
+    const headingHrefs = Array.from(container.querySelectorAll("h2[id]")).map((h2) => `#${h2.id}`);
+    expect(headingHrefs).toHaveLength(EXPECTED_H2.length);
+
+    const tocHrefs = Array.from(container.querySelectorAll('nav a[href^="#"]')).map((a) =>
+      a.getAttribute("href")
+    );
+    expect(tocHrefs).toEqual(headingHrefs);
   });
 
   // C-3: サイドバー TOC リンクが存在し、有効な href を持つ
