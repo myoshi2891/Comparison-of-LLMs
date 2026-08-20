@@ -2,7 +2,7 @@
 
 > 本ファイルは Next.js 移行完了後の保守・改善フェーズにおける開発の進捗（特にテスト関連）および品質チェックのルールを記録する。
 >
-> - 最終更新日: **Updated 2026-08-19**
+> - 最終更新日: **Updated 2026-08-20**
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
 
@@ -15,7 +15,7 @@
   - `bun run typecheck` ✅（`tsc --noEmit`。2026-08-20 実測）
   - `bun run lint` ✅（Biome check / 477 files / 0 diagnostics。2026-08-20 実測）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: `bun run test` で Vitest **170 files / 1540 tests すべて合格**（2026-08-20 実測。全 Green ✅）
+  - **フロントエンド (`web-next/`)**: `bun run test` で Vitest **170 files / 1541 tests すべて合格**（2026-08-20 実測。全 Green ✅）
     - `load(sourceHtml)` をモジュール初期化時に呼ぶ `governance/ai-governance/GuideContent.tsx` と
       `local-llm/finetuning-best-practices/GuideContent.tsx` は、import スモークでも読み込み可能であることを確認済み
   - **バックエンド (`scraper/`)**: pytest 実行で **43 件すべて合格** (全 Green ✅)
