@@ -354,6 +354,35 @@ test("入れ子の相対 import を各モジュールのディレクトリ基準
 	assert.deepEqual(result.json.missingParagraphs, []);
 });
 
+test("default / namespace / type / 複合の相対 import も辿る", () => {
+	const forms = {
+		"default import": 'import Body from "./Body";\nexport default function Section() { return <Body />; }',
+		"namespace import":
+			'import * as Body from "./Body";\nexport default function Section() { return <Body.default />; }',
+		"default + named import":
+			'import Body, { helper } from "./Body";\nexport default function Section() { return <Body value={helper} />; }',
+		"default + namespace import":
+			'import Body, * as rest from "./Body";\nexport default function Section() { return <Body value={rest} />; }',
+		"type import":
+			'import type { BodyProps } from "./Body";\nexport default function Section(props: BodyProps) { return <p>{props.text}</p>; }',
+	};
+
+	for (const [label, sectionSource] of Object.entries(forms)) {
+		const result = auditWithModules(
+			"<h2>Overview</h2><p>Nested paragraph.</p>",
+			'import Section from "./sections/Section";\n<><h2>Overview</h2><Section /></>',
+			{
+				"sections/Section.tsx": sectionSource,
+				"sections/Body.tsx":
+					"export default function Body() { return <p>Nested paragraph.</p>; }",
+			},
+		);
+
+		assert.deepEqual(result.json.missingParagraphs, [], label);
+		assert.equal(result.status, 0, label);
+	}
+});
+
 test("循環する相対 import があっても監査が完了する", () => {
 	const result = auditWithModules(
 		"<h2>Overview</h2><p>Cyclic paragraph.</p>",

@@ -814,7 +814,12 @@ try {
   const visited = new Set([pageModulePath]);
   const queue = [pageModulePath];
   const collected = [];
-  const localImportRe = /import\s+(?:\{[^}]*\}|[\w$]+)\s+from\s+["'](\.[^"']+)["']/g;
+  // 名前付き import だけでなく、default / namespace / type import と
+  // それらの組み合わせ（`import A, { b }` / `import A, * as B`）も辿る。
+  // 取りこぼすとそのモジュール配下の本文が監査対象から丸ごと外れ、
+  // 移行漏れを「漏れなし」と誤判定する。
+  const localImportRe =
+    /import\s+(?:type\s+)?(?:[\w$]+\s*,\s*)?(?:\{[^}]*\}|\*\s+as\s+[\w$]+|[\w$]+)\s+from\s+["'](\.[^"']+)["']/g;
   while (queue.length > 0) {
     const modulePath = queue.shift();
     const moduleText = readFileSync(modulePath, "utf8");

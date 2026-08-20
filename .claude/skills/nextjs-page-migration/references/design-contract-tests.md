@@ -173,7 +173,9 @@ const EXPECTED_STYLESHEET_HREFS = [
 it("サイドバーナビのリンクが原本の TOC と順序込みで完全一致する", () => {
   const { container } = render(<Page />);
   const sidebarNav = container.querySelector("[data-testid='sidebar-nav']");
-  expect(sidebarNav).not.toBeNull();
+  // expect(...).not.toBeNull() は型を絞り込まないため、明示的に null を弾いてから使う。
+  // 絞り込まずに querySelectorAll すると型エラーになり、`!` で握り潰すのは規約違反。
+  if (sidebarNav === null) throw new Error("sidebar-nav が存在しない");
 
   // リンクはサイドバー配下だけを走査する。container 全体だと本文中の
   // アンカーまで拾い、順序比較が原本の TOC と無関係に壊れる。
