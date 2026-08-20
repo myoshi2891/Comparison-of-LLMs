@@ -13,9 +13,9 @@
 - **動作検証**:
   - `bun run build` ✅（Compiled successfully / 86 静的ページを生成。2026-08-20 実測）
   - `bun run typecheck` ✅（`tsc --noEmit`。2026-08-20 実測）
-  - `bun run lint` ✅（Biome check / 477 files / 0 diagnostics。2026-08-20 実測）
+  - `bun run lint` ✅（Biome check / 478 files / 0 diagnostics。2026-08-20 実測）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: `bun run test` で Vitest **170 files / 1541 tests すべて合格**（2026-08-20 実測。全 Green ✅）
+  - **フロントエンド (`web-next/`)**: `bun run test` で Vitest **171 files / 1545 tests すべて合格**（2026-08-20 実測。全 Green ✅）
     - `load(sourceHtml)` をモジュール初期化時に呼ぶ `governance/ai-governance/GuideContent.tsx` と
       `local-llm/finetuning-best-practices/GuideContent.tsx` は、import スモークでも読み込み可能であることを確認済み
   - **バックエンド (`scraper/`)**: pytest 実行で **43 件すべて合格** (全 Green ✅)
