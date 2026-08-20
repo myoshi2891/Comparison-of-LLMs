@@ -28,18 +28,22 @@ export default function TocObserver() {
       syncToggleState();
     };
 
+    // 2. Scroll Spy Intersection Observer
+    // navLinks はトグルのリスナ登録とスパイの双方で使うため先に確定させる。
+    // 「登録時と解除時で querySelectorAll を撮り直す」と対象がずれうるので、
+    // 同じ配列を cleanup でも使う。
+    const navLinks = Array.from(
+      document.querySelectorAll(`.${styles.sideNav} a`)
+    ) as HTMLAnchorElement[];
+
     if (toggle && sidebar) {
       toggle.addEventListener("click", handleToggle);
-      const links = document.querySelectorAll(`.${styles.sideNav} a`);
-      for (const a of Array.from(links)) {
+      for (const a of navLinks) {
         a.addEventListener("click", handleLinkClick);
       }
     }
 
-    // 2. Scroll Spy Intersection Observer
-    const navLinks = Array.from(
-      document.querySelectorAll(`.${styles.sideNav} a`)
-    ) as HTMLAnchorElement[];
+    let observer: IntersectionObserver | undefined;
 
     if (navLinks.length > 0) {
       const idToLink: Record<string, HTMLAnchorElement> = {};
@@ -55,18 +59,30 @@ export default function TocObserver() {
         }
       }
 
-      const observer = new IntersectionObserver(
+      // 交差中の要素を保持し、そのうち最も上にあるものをアクティブにする。
+      // entries を順に処理して最後の交差を採用すると、同時に複数が交差したとき
+      // 下のセクションが勝ってしまう。
+      const intersecting = new Set<Element>();
+
+      observer = new IntersectionObserver(
         (entries) => {
           for (const entry of entries) {
-            const link = idToLink[entry.target.id];
-            if (!link) continue;
-            if (entry.isIntersecting) {
-              for (const a of navLinks) {
-                a.classList.remove(styles.active);
-              }
-              link.classList.add(styles.active);
-            }
+            if (entry.isIntersecting) intersecting.add(entry.target);
+            else intersecting.delete(entry.target);
           }
+
+          const [topmost] = [...intersecting].sort(
+            (a, b) => a.getBoundingClientRect().top - b.getBoundingClientRect().top
+          );
+          if (!topmost) return;
+
+          const link = idToLink[topmost.id];
+          if (!link) return;
+
+          for (const a of navLinks) {
+            a.classList.remove(styles.active);
+          }
+          link.classList.add(styles.active);
         },
         { root: null, rootMargin: "-15% 0px -75% 0px", threshold: 0 }
       );
@@ -74,16 +90,18 @@ export default function TocObserver() {
       for (const s of sections) {
         observer.observe(s);
       }
-
-      return () => {
-        if (toggle) toggle.removeEventListener("click", handleToggle);
-        const links = document.querySelectorAll(`.${styles.sideNav} a`);
-        for (const a of Array.from(links)) {
-          a.removeEventListener("click", handleLinkClick);
-        }
-        observer.disconnect();
-      };
     }
+
+    // cleanup は navLinks の有無に関わらず必ず返す。
+    // 以前は navLinks.length > 0 の分岐内にのみ return があったため、
+    // TOC が空のページではトグルのリスナが解除されずに残っていた。
+    return () => {
+      if (toggle) toggle.removeEventListener("click", handleToggle);
+      for (const a of navLinks) {
+        a.removeEventListener("click", handleLinkClick);
+      }
+      observer?.disconnect();
+    };
   }, []);
 
   return null;

@@ -250,7 +250,8 @@
 }
 
 .codeBlockWrap {
-  margin: 18px 0;
+  position: relative;
+  margin: 18px 0 24px;
   border-radius: 10px;
   background: var(--code-bg);
   border: 1px solid var(--border);
@@ -427,11 +428,6 @@
 }
 
 /* code blocks */
-.codeBlockWrap {
-  position: relative;
-  margin: 18px 0 24px;
-}
-
 .content :global(pre) {
   background: var(--code-bg) !important;
   border: 1px solid var(--border);

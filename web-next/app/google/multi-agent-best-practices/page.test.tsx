@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import { render } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
+import { normalizeMermaidSource } from "@/tests/helpers/mermaid";
 import Page, { metadata } from "./page";
 import styles from "./page.module.css";
 
@@ -20,7 +21,9 @@ vi.mock("@/components/docs/CodeCopyButton", () => ({
   },
 }));
 
-const EXPECTED_H1 = ["Gemini マルチエージェント開発ベストプラクティス完全ガイド"] as const;
+// metadata.title / page-registry の表記と一致させる。
+// h1 は <br> で 2 行に割られているため、<br> を空白として正規化して比較する。
+const EXPECTED_H1 = ["Gemini マルチエージェント開発 ベストプラクティス完全ガイド"] as const;
 
 const EXPECTED_H2 = [
   "0. はじめに — このガイドを読む前に知っておくべきこと",
@@ -217,19 +220,18 @@ const EXPECTED_MERMAID_SOURCES = [
     D --> E`,
 ] as const;
 
-function normalizeMermaidSource(raw: string): string {
-  const lines = raw.replace(/\r\n?/g, "\n").split("\n");
-  while (lines.length > 0 && lines[0].trim() === "") lines.shift();
-  while (lines.length > 0 && lines.at(-1)?.trim() === "") lines.pop();
-  const indents = lines
-    .filter((line) => line.trim().length > 0)
-    .map((line) => line.match(/^\s*/)?.[0].length ?? 0);
-  const commonIndent = indents.length > 0 ? Math.min(...indents) : 0;
-  return lines.map((line) => line.slice(commonIndent).trimEnd()).join("\n");
-}
-
 function cleanHeadingText(text: string | null): string {
   return (text ?? "").replace(/\s+/g, " ").trim();
+}
+
+/** <br> を単語区切りの空白として扱ったうえで見出しテキストを正規化する。 */
+function headingTextWithLineBreaks(el: Element | null): string {
+  if (!el) return "";
+  const clone = el.cloneNode(true) as Element;
+  for (const br of Array.from(clone.querySelectorAll("br"))) {
+    br.replaceWith(" ");
+  }
+  return cleanHeadingText(clone.textContent);
 }
 
 describe("Gemini Multi-Agent Best Practices Page Contract Tests", () => {
@@ -286,7 +288,7 @@ describe("Gemini Multi-Agent Best Practices Page Contract Tests", () => {
     it("C-1: h1 のテキストが完全一致する", () => {
       const { container } = render(<Page />);
       const h1 = container.querySelector("h1");
-      expect(cleanHeadingText(h1?.textContent ?? null)).toBe(EXPECTED_H1[0]);
+      expect(headingTextWithLineBreaks(h1)).toBe(EXPECTED_H1[0]);
     });
 
     it("C-2: クイックナビ（TOC リンク）の件数と href 形式", () => {
@@ -335,7 +337,7 @@ describe("Gemini Multi-Agent Best Practices Page Contract Tests", () => {
       const actual = Array.from(container.querySelectorAll('[data-testid="mermaid"]')).map((el) =>
         normalizeMermaidSource(el.textContent ?? "")
       );
-      expect(actual).toEqual([...EXPECTED_MERMAID_SOURCES]);
+      expect(actual).toEqual(EXPECTED_MERMAID_SOURCES.map(normalizeMermaidSource));
     });
 
     it("C-6b: 全 Mermaid 図解がページ専用ラッパーに包まれている", () => {
