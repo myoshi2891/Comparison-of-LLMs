@@ -504,7 +504,7 @@ vi.mock("@/components/docs/MermaidDiagram", () => ({
 // 原本 HTML の <div class="mermaid"> / DIAGRAMS オブジェクトから機械抽出し、
 // 改行コード・外側の空行・共通インデントだけを正規化して固定する。
 // 重複する図も省略せず、原本の出現順のまま列挙する。
-import { MERMAID_DIAGRAM_DECLARATION } from "../../../../.claude/skills/fix-mermaid/scripts/mermaid-diagram-types.mjs";
+import { MERMAID_DIAGRAM_DECLARATION } from "@/lib/mermaid-diagram-types";
 
 const EXPECTED_MERMAID_SOURCES = [
   `flowchart TD
@@ -574,8 +574,11 @@ it("C-6e: 図解のソースが左端揃え（先頭行にインデントが無�
 });
 ```
 
-C-6c の `MERMAID_DIAGRAM_DECLARATION` は、監査スクリプトと同じ
-`.claude/skills/fix-mermaid/scripts/mermaid-diagram-types.mjs` から import する。
+C-6c の `MERMAID_DIAGRAM_DECLARATION` は、web-next 側の共有モジュール
+`web-next/lib/mermaid-diagram-types.ts` から import する（`web-next/` → `web-next/` のみという
+CLAUDE.md の「インポート安全性」を守るため、`.claude/` 配下を直接 import しない）。
+監査スクリプト側は `.claude/skills/fix-mermaid/scripts/mermaid-diagram-types.mjs` を使い、
+両者の差分は `audit_source_parity.test.mjs` が機械検知する。
 許可種別は `graph` / `flowchart` / `sequenceDiagram` / `mindmap` / `stateDiagram-v2` /
 `gitGraph` / `erDiagram` / `classDiagram` / `journey` / `timeline` / `pie` であり、
 `block-beta` は共有定義に含めない。

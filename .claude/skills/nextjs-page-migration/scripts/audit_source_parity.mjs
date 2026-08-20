@@ -525,14 +525,25 @@ function inventoryMarkdown(src) {
  * @return {Object} The extracted headings, element counts, normalized content, Mermaid sources, SVG elements, callouts, and external links.
  */
 function inventoryHtml(src) {
-  const preserved = src.replace(
+  // data-code スクリプトの中身は「表示されるコードブロック」なので保存する。
+  // ただし中身自体が <style> 等を含みうるため、いったん不透明なプレースホルダへ退避し、
+  // script/style/link の除去が終わってから <code> として復元する。
+  const preservedCode = [];
+  const stashed = src.replace(
     /<script\b[^>]*\bdata-code\b[^>]*>([\s\S]*?)<\/script\s*>/gi,
-    "<code>$1</code>"
+    (_match, content) => {
+      preservedCode.push(content);
+      return `\u0000DATACODE${preservedCode.length - 1}\u0000`;
+    }
   );
-  const body = preserved
+  const body = stashed
     .replace(/<head[\s\S]*?<\/head>/gi, "")
     .replace(/<(script|style)[\s\S]*?<\/\1>/gi, "")
-    .replace(/<link\b[^>]*\/?>/gi, "");
+    .replace(/<link\b[^>]*\/?>/gi, "")
+    .replace(
+      /\u0000DATACODE(\d+)\u0000/g,
+      (_match, index) => `<code>${preservedCode[Number(index)]}</code>`
+    );
   const headings = [];
   const headingRe = /<h([1-6])\b[^>]*>([\s\S]*?)<\/h\1>/gi;
   let match = headingRe.exec(body);
@@ -795,26 +806,43 @@ let sourceText;
 let pageText;
 try {
   sourceText = readFileSync(sourcePath, "utf8");
-  pageText = readFileSync(pagePath, "utf8");
-  const dir = dirname(pagePath);
+  const pageModulePath = resolve(pagePath);
+  // 相対 import はモジュールごとのディレクトリを基準に解決する。
+  // page.tsx の dir を使い回すとネストした相対 import を取り違え、
+  // 同一文字列を再走査すると循環 import で無限ループになるため、
+  // 解決済みパスの visited Set を持つワークキューで辿る。
+  const visited = new Set([pageModulePath]);
+  const queue = [pageModulePath];
+  const collected = [];
   const localImportRe = /import\s+(?:\{[^}]*\}|[\w$]+)\s+from\s+["'](\.[^"']+)["']/g;
-  let imp = localImportRe.exec(pageText);
-  while (imp !== null) {
-    const relPath = imp[1];
-    const candidatePaths = [
-      resolve(dir, `${relPath}.tsx`),
-      resolve(dir, `${relPath}.ts`),
-      resolve(dir, `${relPath}/index.tsx`),
-      resolve(dir, `${relPath}/index.ts`),
-    ];
-    for (const cp of candidatePaths) {
-      if (existsSync(cp)) {
-        pageText += `\n${readFileSync(cp, "utf8")}`;
+  while (queue.length > 0) {
+    const modulePath = queue.shift();
+    const moduleText = readFileSync(modulePath, "utf8");
+    collected.push(moduleText);
+
+    const moduleDir = dirname(modulePath);
+    localImportRe.lastIndex = 0;
+    let imp = localImportRe.exec(moduleText);
+    while (imp !== null) {
+      const relPath = imp[1];
+      const candidatePaths = [
+        resolve(moduleDir, `${relPath}.tsx`),
+        resolve(moduleDir, `${relPath}.ts`),
+        resolve(moduleDir, `${relPath}/index.tsx`),
+        resolve(moduleDir, `${relPath}/index.ts`),
+      ];
+      for (const cp of candidatePaths) {
+        if (!existsSync(cp)) continue;
+        if (!visited.has(cp)) {
+          visited.add(cp);
+          queue.push(cp);
+        }
         break;
       }
+      imp = localImportRe.exec(moduleText);
     }
-    imp = localImportRe.exec(pageText);
   }
+  pageText = collected.join("\n");
 } catch (error) {
   console.error(`読み込み失敗: ${error instanceof Error ? error.message : String(error)}`);
   process.exit(2);

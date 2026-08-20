@@ -150,8 +150,8 @@ bun .claude/skills/nextjs-page-migration/scripts/audit_source_parity.mjs \
 `web-next/app/<provider>/<slug>/page.test.tsx` を作成する。
 ファイル先頭に `// @vitest-environment jsdom` を書いて環境を明示する。
 
-原本の要素種別に依存しない **最低 12 契約**（S-1〜S-4 / C-1〜C-5 / Q-1〜Q-3）を書く。
-C-6 と D-1〜D-4 は下記の適用条件に該当する場合のみ追加する。
+原本の要素種別に依存しない **最低 13 契約**（S-1〜S-4 / C-1〜C-5 / D-8 / Q-1〜Q-3）を書く。
+C-6 と D-1〜D-7 は下記の適用条件に該当する場合のみ追加する。
 **件数だけを見る弱いテストは契約として認めない。**
 
 #### S. 原本照合契約（4 件・必須）
@@ -184,13 +184,16 @@ C-6 と D-1〜D-4 は下記の適用条件に該当する場合のみ追加す�
 | D-2 | 原本に warn callout がある | `callout[data-variant="warn"]` が `callout-label` 子要素を持つ |
 | D-3 | 原本に step / stepTag がある | `stepTag` が `data-testid="step-tag"` を持ち、件数が**原本の step 数**と一致する |
 | D-4 | 原本に voice / blockquote がある | `voice`/`blockquote` が `data-testid="voice"` と `voice-who` 子要素を持つ |
-| D-5 | 原本にサイドバーがある | `data-testid="sidebar-nav"` があり、各リンクに `data-testid="sidebar-nav-link"` がある |
-| D-6 | 原本にコードブロックがある | `pre` 内の `code` が背景/枠線リセット済み（`background: none`）。`data-testid="code-block"` で識別 |
-| D-7 | 原本に外部 CDN がある | Tabler Icons 等の `<link rel="stylesheet">` が JSX 内に挿入されている |
-| D-8 | 全ページ | `.layout` に `data-testid="layout-root"` があり、`width: 100%` で全幅展開 |
+| D-5 | 原本にサイドバーがある | `data-testid="sidebar-nav"` があり、各リンクに `data-testid="sidebar-nav-link"` がある。リンクの `href` 一覧が**原本の TOC と順序込みで完全一致**する |
+| D-6 | 原本にコードブロックがある | `data-testid="code-block"` が**原本のコードブロック数と一致**し、各ブロックが `code` 子要素を持つ。`page.module.css` に `pre code` のリセット（`background: none`）が存在する |
+| D-7 | 原本に外部 CDN がある | 原本 `<head>` の `<link rel="stylesheet">` の href 一覧が JSX 内に**全件・完全一致**で挿入されている |
+| D-8 | **全ページ（無条件）** | `.layout` 最外殻に `data-testid="layout-root"` があり、`page.module.css` の `.layout` が `width: 100%` を持つ |
 
-原本に warn callout・step・voice / blockquote・サイドバー・CDN 等が存在しない場合、対応する D 契約は要求しない。
-不在要素を作成して契約数を満たすことは faithful 移植ではない。
+**D-1〜D-7 は条件付き**（原本に warn callout・step・voice / blockquote・サイドバー・
+コードブロック・CDN が存在しない場合は要求しない）。不在要素を作成して契約数を満たすことは
+faithful 移植ではない。
+**D-8 だけは原本の内容に依存せず全ページ必須**である（`.layout` は移植先が必ず持つ最外殻であり、
+全幅レイアウト崩れは原本の要素構成と無関係に起こるため）。
 
 > 実装例: `references/design-contract-tests.md`（D-5〜D-8 の具体的なテストコードも収録）
 

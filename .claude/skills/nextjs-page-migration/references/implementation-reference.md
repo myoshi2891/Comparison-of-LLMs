@@ -355,9 +355,20 @@ SKILL.md §6 の早見表は Atom One Dark 系のデフォルト例であり、
 
 2. **インラインスタイルから色を抽出する**
 
+   `style="color: …"` だけを狙う素朴な grep は、① `color` の前に別の宣言がある
+   (`style="font-weight:700;color:#98c379"`)、② コロン前後の空白、③ 単引用符属性、
+   ④ 大文字表記、を取りこぼす。まず `style` 属性値を丸ごと取り出し、
+   そのうえで `color` 宣言だけを拾う（`border-color` 等は境界文字で除外される）。
+
    ```bash
-   grep -oE 'style="color:\s*#[0-9a-fA-F]+' archive/html/<ベンダー>/<原本>.html | sort -u
+   grep -oE "style=(\"[^\"]*\"|'[^']*')" archive/html/<ベンダー>/<原本>.html \
+     | grep -oiE '(^|[;"'"'"'[:space:]])color[[:space:]]*:[[:space:]]*(#[0-9a-fA-F]{3,8}|rgba?\([^)]*\)|[a-z]+)' \
+     | sed -E 's/.*[Cc][Oo][Ll][Oo][Rr][[:space:]]*:[[:space:]]*//' | sort -u
    ```
+
+   属性が複数行にまたがるなど正規表現で取り切れない原本では、正規表現ではなく
+   HTML パーサ（例: `bun -e` + `DOMParser`、`python3 -c` + `html.parser`）で
+   `style` 属性を列挙してから同じ抽出を行う。
 
 3. **配色テーマを page.module.css に定義する**
 

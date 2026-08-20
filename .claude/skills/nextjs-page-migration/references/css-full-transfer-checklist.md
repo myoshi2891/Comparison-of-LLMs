@@ -78,12 +78,36 @@ bash .claude/skills/nextjs-page-migration/references/check-css-vars.sh \
 |---|---|---|
 | `.layout` の `display` | `display: block` or `display: flex` | 原本通り転記 |
 | `.layout` の `width` | 暗黙の `width: auto`（全幅） | `width: 100%; max-width: 100%;` を明示 |
-| `.sidebar` の配置 | `position: fixed; width: 272px;` | `position: sticky; top: calc(var(--header-height, 60px) + 16px);` ※Next.js ではヘッダー分ずらす |
+| `.sidebar` の配置 | `position: fixed; width: 272px;` | **原本の positioning を保持するのが既定**。`SiteHeader` と競合する場合のみページ単位でオフセット／`sticky` 化を検討する（下記「サイドバー positioning の判断手順」） |
 | `.content` の余白 | `margin-left: 272px; padding: 48px 56px;` | 原本通り。サイドバー幅と揃える |
 | ボックスモデル | `box-sizing: border-box` | `.layout` に適用 |
 
 **最頻出バグ**: `.layout` に `max-width: 1440px` 等を付けてしまい、原本の全幅レイアウトを壊す。
 サイドバー付きページの `.layout` には **固定 `max-width` を付けない**。
+
+#### サイドバー positioning の判断手順
+
+`position: fixed` → `sticky` への変換は**一律の規則ではない**。
+`fixed` のままで正しく動くページも多く、機械的に `sticky` へ変えると
+`transform` を持つ祖先による包含ブロックの変化やスクロール境界のずれで
+サイドバーが本文と一緒に流れてしまう。**まず原本を確認し、必要な場合だけ変える。**
+
+1. **原本の positioning を読む** — `.sidebar` の `position` / `top` / `height` / `overflow` を控える
+2. **`SiteHeader` + `DisclaimerBanner` と重なるかを確認する** —
+   固定ヘッダーの高さは `var(--header-height, 60px)`。重ならないなら原本のまま転写する
+3. **重なる場合のみ**、そのページに必要なオフセットを決める:
+   - `position: fixed` を維持するなら `top: calc(var(--header-height, 60px) + 16px)` と
+     `height: calc(100vh - var(--header-height, 60px) - 16px)` を対で指定する
+     （`height: 100vh` のままだと下端がビューポート外へはみ出す）
+   - `position: sticky` へ変えるなら、祖先に `transform` / `filter` / `overflow: hidden` が
+     無いことを確認する（あると包含ブロックかスクロール境界が変わり `sticky` が効かない）
+4. **`overflow-y` を転写する** — 原本が `overflow-y: auto` ならスクロール可能高さも合わせて指定する
+5. **モバイル挙動を合わせて調整する** — オフキャンバス化するブレークポイントでは
+   `position` に依存した `transform: translateX(-100%)` / `visibility: hidden` /
+   `pointer-events: none` の三点セットが必要（`CLAUDE.md`「モバイル目次のアクセシビリティ状態を同期する」）
+
+いずれの選択でも**原本の CSS を落とさないこと**が前提であり、
+変更した場合は「なぜ原本の positioning を変えたか」を `docs/PROGRESS.md` かコミットメッセージに残す。
 
 ---
 
@@ -309,9 +333,10 @@ export default async function Page() {
 }
 ```
 
-**注意**: Next.js ではサイドバーの `position: fixed` を `position: sticky` に変更する
-（SiteHeader との共存のため）。このため、モバイルブレークポイントでの表示切替ロジックも
-調整が必要。
+**注意**: モバイルブレークポイントの表示切替は、サイドバーの `position` の選択に依存する
+（§2「サイドバー positioning の判断手順」を先に済ませること）。
+`position` を原本から変更した場合は、オフキャンバス化の `transform` /
+`visibility` / `pointer-events` の指定もそのページ固有に検証し直す。
 
 ---
 

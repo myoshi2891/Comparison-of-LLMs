@@ -157,51 +157,96 @@ D-5〜D-8 は **CSS/スタイリングの移行漏れを防止する**契約テ�
 ### テスト実装パターン
 
 ```tsx
-// D-5: サイドバーナビの data-testid が正しく設定されている
-it("サイドバーナビに data-testid='sidebar-nav' があり、各リンクに data-testid='sidebar-nav-link' がある", () => {
+// 原本から機械抽出した期待値。適用有無もここで宣言する
+// （--emit-headings と同様、原本を読んで一度だけ書き出す）。
+const EXPECTED_SIDEBAR_HREFS = [
+  "#overview",
+  "#step-01",
+  "#appendix",
+] as const;
+const EXPECTED_CODE_BLOCK_COUNT = 7;
+const EXPECTED_STYLESHEET_HREFS = [
+  "https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.31.0/dist/tabler-icons.min.css",
+] as const;
+
+// D-5: サイドバーナビが原本の TOC と順序込みで一致する（原本にサイドバーがある場合のみ）
+it("サイドバーナビのリンクが原本の TOC と順序込みで完全一致する", () => {
   const { container } = render(<Page />);
   const sidebarNav = container.querySelector("[data-testid='sidebar-nav']");
   expect(sidebarNav).not.toBeNull();
-  const navLinks = container.querySelectorAll("[data-testid='sidebar-nav-link']");
-  expect(navLinks.length).toBeGreaterThan(0);
-  // リンクがすべて href="#..." 形式であること
-  for (const link of Array.from(navLinks)) {
-    expect(link.getAttribute("href")).toMatch(/^#/);
+
+  const navLinks = Array.from(
+    container.querySelectorAll("[data-testid='sidebar-nav-link']")
+  );
+  // ❌ length > 0 では 1 本でも通る。href 配列を丸ごと比較する
+  expect(navLinks.map((link) => link.getAttribute("href"))).toEqual([
+    ...EXPECTED_SIDEBAR_HREFS,
+  ]);
+  // アンカーが実在する見出しを指すこと
+  for (const href of EXPECTED_SIDEBAR_HREFS) {
+    expect(container.querySelector(`[id='${href.slice(1)}']`)).not.toBeNull();
   }
 });
 
-// D-6: pre 内の code 要素が存在する（pre code リセットの前提）
-it("コードブロック内の <code> が pre の子として存在する", () => {
+// D-6: コードブロックが原本と同数あり、すべて code 子要素を持つ（原本にコードブロックがある場合のみ）
+it("コードブロックが原本と同数存在し、各ブロックが <code> を持つ", () => {
   const { container } = render(<Page />);
-  const codeBlocks = container.querySelectorAll("[data-testid='code-block']");
-  if (codeBlocks.length > 0) {
-    // 少なくとも 1 つの code-block に <code> 子要素がある
-    const hasCodeChild = Array.from(codeBlocks).some(
-      (block) => block.querySelector("code") !== null
-    );
-    expect(hasCodeChild).toBe(true);
+  const codeBlocks = Array.from(
+    container.querySelectorAll("[data-testid='code-block']")
+  );
+  // ❌ if (codeBlocks.length > 0) で囲むと 0 件でも通ってしまう。無条件に件数を要求する
+  expect(codeBlocks).toHaveLength(EXPECTED_CODE_BLOCK_COUNT);
+  for (const block of codeBlocks) {
+    expect(block.querySelector("code")).not.toBeNull();
   }
 });
 
-// D-7: 外部 CDN リンクが挿入されている（原本に CDN がある場合のみ）
-it("Tabler Icons 等の外部 CDN リンクが挿入されている", () => {
-  const { container } = render(<Page />);
-  const links = container.querySelectorAll("link[rel='stylesheet']");
-  const hrefs = Array.from(links).map((l) => l.getAttribute("href"));
-  // 原本に Tabler Icons がある場合:
-  expect(hrefs.some((h) => h?.includes("tabler-icons"))).toBe(true);
+// D-6b: pre code のリセットが page.module.css に存在する（JSDOM では実 CSS が効かないため原文を検査）
+it("page.module.css が pre code のスタイルリセットを持つ", () => {
+  const css = readFileSync(new URL("./page.module.css", import.meta.url), "utf8");
+  const preCodeRule = /:global\(pre code\)\s*\{([^}]*)\}/.exec(css);
+  expect(preCodeRule).not.toBeNull();
+  expect(preCodeRule?.[1]).toMatch(/background:\s*none/);
+  expect(preCodeRule?.[1]).toMatch(/border:\s*none/);
+  expect(preCodeRule?.[1]).toMatch(/color:\s*inherit/);
 });
 
-// D-8: layout-root の data-testid が存在する
-it("レイアウトルートに data-testid='layout-root' がある", () => {
+// D-7: 原本 <head> の外部 CDN リンクが全件挿入されている（原本に CDN がある場合のみ）
+it("原本の外部 CDN スタイルシートが全件・完全一致で挿入されている", () => {
+  const { container } = render(<Page />);
+  const hrefs = Array.from(
+    container.querySelectorAll("link[rel='stylesheet']")
+  ).map((link) => link.getAttribute("href"));
+  // ❌ some(h => h?.includes("tabler")) はバージョン差異や重複を見逃す
+  expect(hrefs).toEqual([...EXPECTED_STYLESHEET_HREFS]);
+});
+
+// D-8: layout-root が .layout 最外殻であり全幅で展開する（全ページ無条件）
+it("layout-root が .layout 最外殻であり width: 100% を持つ", () => {
   const { container } = render(<Page />);
   const layoutRoot = container.querySelector("[data-testid='layout-root']");
   expect(layoutRoot).not.toBeNull();
+  // 最外殻であること — container の直下に居る
+  expect(layoutRoot?.parentElement).toBe(container);
+  // .layout クラスそのものであること（別要素へ付け替えられていないこと）
+  expect(layoutRoot?.classList.contains(styles.layout)).toBe(true);
+
+  // JSDOM は CSS Modules の実値を解決しないため、CSS 原文で全幅を検証する
+  const css = readFileSync(new URL("./page.module.css", import.meta.url), "utf8");
+  const layoutRule = /^\.layout\s*\{([^}]*)\}/m.exec(css);
+  expect(layoutRule).not.toBeNull();
+  expect(layoutRule?.[1]).toMatch(/width:\s*100%/);
 });
 ```
 
-> **注意**: D-5〜D-8 は原本にサイドバー/コードブロック/CDN リンクがある場合のみ適用する。
+> **適用条件**: **D-8 は原本の内容に依存せず全ページで必須**である
+> （`.layout` は移植先が必ず持つ最外殻であり、全幅レイアウト崩れは原本の要素構成と無関係に起こる）。
+> **D-5〜D-7 は条件付き**で、原本にサイドバー / コードブロック / CDN リンクがある場合のみ適用する。
 > 原本にない要素の契約テストを書くのは faithful 移植に反する。
+>
+> **弱い契約にしないための原則**: 期待値は**ページごとの配列・件数**として宣言し、
+> `toEqual` で順序込みに比較する。`length > 0` / `some(...)` / `if (…) { expect(…) }` は
+> 「要素を全部落としても通る」ため契約として認めない。
 
 ---
 

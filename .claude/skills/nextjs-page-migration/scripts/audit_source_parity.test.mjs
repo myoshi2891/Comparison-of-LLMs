@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import test from "node:test";
 import {
 	MERMAID_DIAGRAM_DECLARATION,
@@ -271,5 +271,100 @@ test("accepts .markdown as a Markdown source extension", () => {
 	assert.equal(result.json.counts.headings.source, 1);
 	assert.equal(result.json.counts.paragraphs.source, 1);
 	assert.deepEqual(result.json.missingHeadings, []);
+	assert.deepEqual(result.json.missingParagraphs, []);
+});
+
+test("web-next 側の Mermaid 図解型一覧がスキル側と一致する", () => {
+	// web-next/ から .claude/ を import すると CLAUDE.md の「インポート安全性」に反するため、
+	// web-next 側は lib/mermaid-diagram-types.ts に同じ一覧を持つ。差分をここで機械検知する。
+	const mirrorPath = new URL(
+		"../../../../web-next/lib/mermaid-diagram-types.ts",
+		import.meta.url,
+	);
+	const mirrorSource = readFileSync(mirrorPath, "utf8");
+	const listBlock = /MERMAID_DIAGRAM_TYPES\s*=\s*\[([\s\S]*?)\]/.exec(mirrorSource);
+	assert.ok(listBlock, "web-next 側に MERMAID_DIAGRAM_TYPES の定義が見つからない");
+	const mirrorTypes = [...listBlock[1].matchAll(/"([^"]+)"/g)].map((m) => m[1]);
+
+	assert.deepEqual(mirrorTypes, MERMAID_DIAGRAM_TYPES);
+});
+
+/**
+ * page.tsx に加えて任意の同階層モジュールを書き出したうえで監査を実行する。
+ * @param {string} source - 原本 HTML。
+ * @param {string} page - page.tsx の内容。
+ * @param {Record<string, string>} modules - fixture ディレクトリ相対のパス → 内容。
+ * @returns {{status: number, json: object}} 監査結果。
+ */
+function auditWithModules(source, page, modules) {
+	const fixtureDir = mkdtempSync(join(tmpdir(), "source-parity-modules-"));
+	const sourcePath = join(fixtureDir, "source.html");
+	const pagePath = join(fixtureDir, "page.tsx");
+	writeFileSync(sourcePath, source);
+	writeFileSync(pagePath, page);
+	for (const [relPath, content] of Object.entries(modules)) {
+		const target = join(fixtureDir, relPath);
+		mkdirSync(dirname(target), { recursive: true });
+		writeFileSync(target, content);
+	}
+
+	const result = spawnSync(
+		process.execPath,
+		[auditScript.pathname, sourcePath, pagePath, "--json"],
+		{ encoding: "utf8", timeout: 20_000 },
+	);
+	rmSync(fixtureDir, { recursive: true, force: true });
+
+	return { status: result.status, json: JSON.parse(result.stdout) };
+}
+
+test("data-code ブロック内の style 要素が除去されずコード全文が残る", () => {
+	// <script type="text/plain"> の中身は生の <style> を含みうる。プレースホルダへ退避せずに
+	// script/style 除去を掛けると、コード本文ごと消えて原本側が空になる。
+	const result = audit(
+		[
+			"<style>.page{color:red}</style>",
+			"<pre>",
+			'<script type="text/plain" data-code-src="1">',
+			"<style>.hero{color:red}</style>",
+			"</script>",
+			"</pre>",
+		].join("\n"),
+		'<><pre><code>{"<style>.hero{color:red}</style>"}</code></pre></>',
+	);
+
+	assert.equal(result.json.counts.codeBlocks.source, 1);
+	assert.deepEqual(result.json.missingCodeBlocks, []);
+	assert.equal(result.status, 0);
+});
+
+test("入れ子の相対 import を各モジュールのディレクトリ基準で解決する", () => {
+	const result = auditWithModules(
+		"<h2>Overview</h2><p>Nested paragraph.</p>",
+		'import Section from "./sections/Section";\n<><h2>Overview</h2><Section /></>',
+		{
+			"sections/Section.tsx":
+				'import Body from "./Body";\nexport default function Section() { return <Body />; }',
+			"sections/Body.tsx":
+				"export default function Body() { return <p>Nested paragraph.</p>; }",
+		},
+	);
+
+	assert.equal(result.status, 0);
+	assert.deepEqual(result.json.missingParagraphs, []);
+});
+
+test("循環する相対 import があっても監査が完了する", () => {
+	const result = auditWithModules(
+		"<h2>Overview</h2><p>Cyclic paragraph.</p>",
+		'import A from "./A";\n<><h2>Overview</h2><A /></>',
+		{
+			"A.tsx": 'import B from "./B";\nexport default function A() { return <B />; }',
+			"B.tsx":
+				'import A from "./A";\nexport default function B() { return <p>Cyclic paragraph.</p>; }',
+		},
+	);
+
+	assert.equal(result.status, 0);
 	assert.deepEqual(result.json.missingParagraphs, []);
 });
