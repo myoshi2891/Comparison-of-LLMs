@@ -88,6 +88,9 @@ const EXPECTED_EXTERNAL_URLS = [
   "https://medium.com/@kanaiduttaiem/experience-with-kiros-spec-driven-development-methodology-1e57af895fd7",
 ] as const;
 
+/** 原本のコードブロック数。 */
+const EXPECTED_CODE_BLOCK_COUNT = 4;
+
 const EXPECTED_MERMAID_SOURCES = [
   `flowchart TB
 A["constitution.md<br/>（プロジェクトの不変原則）"] --> B["① Specify<br/>spec.md / requirements.md"]
@@ -216,7 +219,8 @@ describe("/codex/skill - AI仕様駆動開発におけるMarkdownファイル実
   it("C-4: 外部リンク全件に target='_blank' かつ rel='noopener noreferrer'", () => {
     const { container } = render(<Page />);
     const extLinks = Array.from(container.querySelectorAll("a[href^='http']"));
-    expect(extLinks.length).toBeGreaterThanOrEqual(33);
+    // 下限比較だと原本のリンクを落としても通る。fixture の件数と厳密に一致させる。
+    expect(extLinks.length).toBe(EXPECTED_EXTERNAL_URLS.length);
     for (const link of extLinks) {
       expect(link.getAttribute("target")).toBe("_blank");
       const rel = (link.getAttribute("rel") ?? "").split(/\s+/);
@@ -315,7 +319,8 @@ describe("/codex/skill - AI仕様駆動開発におけるMarkdownファイル実
   it("D-6: コードブロックが data-testid='code-block' で識別される", () => {
     const { container } = render(<Page />);
     const codeBlocks = container.querySelectorAll('[data-testid="code-block"]');
-    expect(codeBlocks.length).toBeGreaterThanOrEqual(4);
+    // 原本のコードブロック数。下限比較にすると転写漏れを検出できない。
+    expect(codeBlocks.length).toBe(EXPECTED_CODE_BLOCK_COUNT);
   });
 
   it("D-8: layout-root が存在し全幅展開される", () => {

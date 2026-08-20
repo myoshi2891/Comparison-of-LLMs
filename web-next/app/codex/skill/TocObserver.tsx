@@ -18,18 +18,28 @@ export default function TocObserver() {
       })
       .filter((el): el is HTMLElement => el !== null);
 
+    // 交差中のセクションを保持し、そのうち最も上にあるものをアクティブにする。
+    // entries を順に処理して「最後の交差」を採用すると、複数セクションが同時に
+    // 交差したときに下のセクションが勝ってしまう。
+    const intersecting = new Set<Element>();
+
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
-          if (entry.isIntersecting) {
-            const id = entry.target.id;
-            for (const link of tocLinks) {
-              if (link.getAttribute("href") === `#${id}`) {
-                link.classList.add(styles.active);
-              } else {
-                link.classList.remove(styles.active);
-              }
-            }
+          if (entry.isIntersecting) intersecting.add(entry.target);
+          else intersecting.delete(entry.target);
+        }
+
+        const [topmost] = [...intersecting].sort(
+          (a, b) => a.getBoundingClientRect().top - b.getBoundingClientRect().top
+        );
+        if (!topmost) return;
+
+        for (const link of tocLinks) {
+          if (link.getAttribute("href") === `#${topmost.id}`) {
+            link.classList.add(styles.active);
+          } else {
+            link.classList.remove(styles.active);
           }
         }
       },
