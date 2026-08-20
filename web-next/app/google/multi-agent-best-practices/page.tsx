@@ -452,10 +452,13 @@ const DIAGRAM_8 = `flowchart TD
 export default function GeminiMultiAgentBestPracticesPage() {
   return (
     <div className={styles.layout} data-testid="layout-root">
-      {/* 外部 CSS リンク */}
+      {/* 外部 CSS リンク。CDN 改ざん対策として SRI (cdnjs 公開ハッシュ) と
+          crossOrigin を付与する。integrity は crossOrigin が無いと検証されない。 */}
       <link
         rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/atom-one-dark.min.css"
+        integrity="sha512-Jk4AqjWsdSzSWCSuQTfYRIF84Rq/eV0G2+tu07byYwHcbTGfdmLrHjUSwvzp5HvbiqK4ibmNwdcG49Y5RGYPTg=="
+        crossOrigin="anonymous"
       />
 
       <div className={styles.sidebar} id="gemini-multi-agent-sidebar" data-testid="sidebar-nav">

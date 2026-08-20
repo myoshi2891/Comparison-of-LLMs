@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import { render } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
+import { MERMAID_DIAGRAM_DECLARATION } from "@/lib/mermaid-diagram-types";
 import { normalizeMermaidSource } from "@/tests/helpers/mermaid";
 import Page, { metadata } from "./page";
 import styles from "./page.module.css";
@@ -360,9 +361,8 @@ describe("Gemini Multi-Agent Best Practices Page Contract Tests", () => {
       );
       for (const chart of charts) {
         expect(chart.length).toBeGreaterThan(0);
-        expect(chart).toMatch(
-          /^(flowchart|sequenceDiagram|graph|mindmap|classDiagram|stateDiagram|erDiagram|gantt|pie|gitGraph|journey|timeline)\b/
-        );
+        // 図種別の一覧は共有定数を使う（ここで正規表現を二重管理しない）。
+        expect(chart).toMatch(MERMAID_DIAGRAM_DECLARATION);
       }
     });
 
@@ -406,12 +406,17 @@ describe("Gemini Multi-Agent Best Practices Page Contract Tests", () => {
       expect(codeBlocks.length).toBe(EXPECTED_CODE_BLOCK_COUNT);
     });
 
-    it("D-7: 外部 CSS リンク（atom-one-dark）が存在する", () => {
+    it("D-7: 外部 CSS リンク（atom-one-dark）が SRI 付きで存在する", () => {
       const { container } = render(<Page />);
       const link = container.querySelector(
         'link[href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/atom-one-dark.min.css"]'
       );
       expect(link).not.toBeNull();
+      // CDN 改ざん対策。crossorigin が無いと integrity は検証されないため両方を要求する。
+      expect(link?.getAttribute("integrity")).toBe(
+        "sha512-Jk4AqjWsdSzSWCSuQTfYRIF84Rq/eV0G2+tu07byYwHcbTGfdmLrHjUSwvzp5HvbiqK4ibmNwdcG49Y5RGYPTg=="
+      );
+      expect(link?.getAttribute("crossorigin")).toBe("anonymous");
     });
 
     it("D-8: .layout に data-testid='layout-root' がある", () => {

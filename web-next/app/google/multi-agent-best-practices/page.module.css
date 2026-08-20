@@ -56,7 +56,9 @@
 /* Sidebar */
 .sidebar {
   position: fixed;
-  top: 0;
+  /* 共通ヘッダー (SiteHeader) は fixed で最前面に居るため、top: 0 だと
+     サイドバー上端がヘッダーの下へ潜り込んで読めなくなる。 */
+  top: var(--header-height, 60px);
   left: 0;
   bottom: 0;
   width: var(--sidebar-w);
@@ -142,8 +144,9 @@
   text-decoration: none;
 }
 
-.sideNav a.active,
-.active {
+/* TocObserver が付ける styles.active は .sideNav 配下のリンクにのみ乗る。
+   単独の .active はスコープが広すぎるため置かない。 */
+.sideNav a.active {
   color: var(--accent-strong) !important;
   border-left: 2px solid var(--accent) !important;
   background: var(--accent-soft) !important;
@@ -162,7 +165,8 @@
 .sidebarToggle {
   display: none;
   position: fixed;
-  top: 14px;
+  /* ヘッダー領域にトグルが重ならないよう、ヘッダー高さ分だけ下げる。 */
+  top: calc(var(--header-height, 60px) + 14px);
   right: 14px;
   z-index: 100;
   width: 44px;
