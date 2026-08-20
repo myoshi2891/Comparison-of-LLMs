@@ -97,21 +97,30 @@ describe("Github Copilot TocObserver", () => {
     io.emit([{ target: headings[1], isIntersecting: false }]);
     expect(links[0]).toHaveClass(styles.active);
     expect(links[1]).not.toHaveClass(styles.active);
+
+    // 先頭が画面外へ出て 2 番目だけが交差したら、アクティブは 2 番目へ移る。
+    io.emit([
+      { target: headings[0], isIntersecting: false },
+      { target: headings[1], isIntersecting: true },
+    ]);
+    expect(links[0]).not.toHaveClass(styles.active);
+    expect(links[1]).toHaveClass(styles.active);
   });
 
-  it("does not change link state when no heading intersects", () => {
+  it("keeps the previous highlight when no heading intersects", () => {
     const { container } = renderToc();
+    const headings = container.querySelectorAll("main h2");
     const links = container.querySelectorAll(`.${styles.navLink}`);
 
-    io.emit([
-      {
-        target: container.querySelector(
-          "[id='1-github-copilotの全体像2026年時点のプロダクトファミリー']"
-        ) as Element,
-        isIntersecting: false,
-      },
-    ]);
-    expect(Array.from(links).every((link) => !link.classList.contains(styles.active))).toBe(true);
+    // 事前にアクティブを確定させる。初期状態のまま false を流すだけでは
+    // 「何も起きない」ことしか確かめられず、契約として無意味になる。
+    io.emit([{ target: headings[0], isIntersecting: true }]);
+    expect(links[0]).toHaveClass(styles.active);
+
+    // 交差が 0 件になってもハイライトは直前のまま維持される。
+    io.emit([{ target: headings[0], isIntersecting: false }]);
+    expect(links[0]).toHaveClass(styles.active);
+    expect(links[1]).not.toHaveClass(styles.active);
   });
 
   it("disconnects the observer and tolerates missing drawer elements", () => {

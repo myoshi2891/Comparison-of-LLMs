@@ -231,6 +231,16 @@ describe("/copilot/markdown-file-guide (Copilot Spec-Driven Development Guide) C
     const uniqueIds = new Set(ids);
     expect(uniqueIds.size).toBe(ids.length);
 
+    // id を持つ要素だけを集めると「id の無い見出し」が黙って検査対象から外れる。
+    // 本ページは原本どおり section 側に id を置くため、見出し自身か祖先 section の
+    // いずれかで必ずアンカー先になっていることを全 h2/h3 について要求する。
+    const headings = Array.from(container.querySelectorAll("h2, h3"));
+    expect(headings.length).toBeGreaterThan(0);
+    for (const heading of headings) {
+      const anchorId = heading.id || (heading.closest("section[id]")?.id ?? "");
+      expect(anchorId).not.toBe("");
+    }
+
     const tocLinks = Array.from(container.querySelectorAll(`.${styles.navLink}`)).map((a) =>
       a.getAttribute("href")
     );
@@ -258,11 +268,14 @@ describe("/copilot/markdown-file-guide (Copilot Spec-Driven Development Guide) C
     }
   });
 
-  // C-3: サイドバー TOC の初期アクティブ状態（styles.active）が存在する
-  it("C-3: サイドバー TOC の初期アクティブ状態が存在する", () => {
+  // C-3: サイドバー TOC の初期アクティブ状態（styles.active）が 1 件だけ存在する
+  it("C-3: サイドバー TOC の初期アクティブ状態が先頭セクションに 1 件だけ付く", () => {
     const { container } = render(<MarkdownFileGuidePage />);
-    const activeLinks = container.querySelectorAll(`.${styles.navLink}.${styles.active}`);
-    expect(activeLinks.length).toBeGreaterThanOrEqual(1);
+    const activeLinks = Array.from(
+      container.querySelectorAll(`.${styles.navLink}.${styles.active}`)
+    );
+    // 下限比較だと複数リンクが同時にアクティブでも通る。初期状態は先頭の 1 件のみ。
+    expect(activeLinks.map((link) => link.getAttribute("href"))).toEqual(["#overview"]);
   });
 
   // C-4: 外部リンク全件に target="_blank" かつ rel="noopener noreferrer"

@@ -1,7 +1,16 @@
 // @vitest-environment jsdom
 import { render } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+import { normalizeMermaidSource } from "@/tests/helpers/mermaid";
 import GithubCopilotPage, { metadata } from "./page";
+
+// 実 Mermaid は jsdom で描画できないため、chart をそのまま吐くダミーへ差し替え、
+// ページが渡す図解ソースを原本と突き合わせられるようにする。
+vi.mock("@/components/docs/MermaidDiagram", () => ({
+  default: function DummyMermaidDiagram({ chart }: { chart: string }) {
+    return <pre data-testid="mermaid">{chart}</pre>;
+  },
+}));
 
 const EXPECTED_H1 = ["GitHub Copilot 実践ベストプラクティスガイド"] as const;
 
@@ -23,6 +32,129 @@ const EXPECTED_H2 = [
   "15. よくあるアンチパターン",
   "16. ベストプラクティスチェックリスト",
   "17. 参考文献",
+] as const;
+
+/** 原本 <pre class="mermaid"> のソース（出現順）。 */
+const EXPECTED_MERMAID_SOURCES = [
+  `flowchart TB
+    A["GitHub Copilot<br/>共通ハーネス"] --> B["インライン補完 / NES<br/>(Next Edit Suggestions)"]
+    A --> C["Copilot Chat<br/>Ask / Edit / Agent"]
+    A --> D["Copilot CLI<br/>ターミナル常駐エージェント"]
+    A --> E["Copilot Coding Agent<br/>(クラウド/バックグラウンド)"]
+    A --> F["Copilot Code Review<br/>PRレビュー自動化"]
+    A --> G["Copilot Spaces<br/>チームのナレッジベース"]
+    A --> H["Copilot App<br/>キャンバス型の新インターフェース"]
+
+    C --> C1["VS Code / Visual Studio / JetBrains<br/>/ Eclipse / Xcode"]
+    D --> D1["/plan・Autopilot・Allow All"]
+    E --> E1["@copilot へIssueを割り当て"]
+    F --> F1["Agent Skills + MCP(GA)"]`,
+  `flowchart TD
+    Start["タスクを分類する"] --> Q1{"コードを変更する必要があるか?"}
+    Q1 -- "いいえ(説明・学習・調査のみ)" --> Ask["Ask モード<br/>質問応答のみ、ファイル変更なし"]
+    Q1 -- "はい" --> Q2{"変更範囲は単一ファイルか?"}
+    Q2 -- "はい(対象が明確)" --> Edit["Edit モード<br/>選択ファイル内で編集"]
+    Q2 -- "いいえ(複数ファイル・調査・<br/>ツール実行が必要)" --> Agent["Agent モード<br/>自律的に計画・編集・実行・修正"]
+    Agent --> Q3{"MCPサーバーや外部ツール<br/>連携が必要か?"}
+    Q3 -- "はい" --> AgentMCP["Agent モード + MCP接続"]
+    Q3 -- "いいえ" --> AgentPlain["Agent モードのみで実行"]`,
+  `flowchart TD
+    P["個人インストラクション<br/>(ユーザー単位・全プロジェクト共通)"] --> Merge["Copilotが全てのソースを<br/>統合してコンテキストに含める"]
+    R["リポジトリインストラクション<br/>.github/copilot-instructions.md"] --> Merge
+    Path["パス限定インストラクション<br/>.github/instructions/**.instructions.md<br/>(applyTo で対象パスを指定)"] --> Merge
+    Agents["AGENTS.md<br/>(エージェント/CLI/コーディングエージェント向け)"] --> Merge
+    Merge --> Priority["優先順位: 個人 > リポジトリ > 組織<br/>(ただし全て同時にコンテキストへ供給される)"]
+    Priority --> Output["矛盾する指示は避けること<br/>(競合時は個人インストラクションが優先)"]`,
+  `flowchart LR
+    Repo["ナレッジベースリポジトリ<br/>(コーディング規約・ADR・セキュリティルール<br/>・テスト規約・テンプレート)"] --> Space["Copilot Space<br/>「エンジニアリング標準コーチ」"]
+    App["アプリケーションリポジトリ"] --> Space
+    Instr["指示(Rules of Engagement)"] --> Space
+    Space --> Dev["開発者からの質問"]
+    Dev --> Answer["標準に沿った回答<br/>+ 準拠している規約の明示<br/>+ レビュー用チェックリスト"]`,
+  `flowchart TD
+    S1["① ツールを1つ選ぶ<br/>(CLI / VS Code / Visual Studio / JetBrains)"] --> S2["② YOLOモード(Allow All)を有効化<br/>※必ずサンドボックス内で"]
+    S2 --> S3["③ プロトタイプから始める<br/>複数バリエーションを一括生成"]
+    S3 --> S4["④ Planモードで方法論的に計画<br/>/plan でエッジケースを洗い出す"]
+    S4 --> S5["⑤ Autopilotで実装<br/>計画の各項目を自律的に完了"]
+    S5 --> S6["⑥ 人間によるレビューと反復<br/>妥協せず品質を追求する"]
+    S6 --> S7["⑦ Rubber Duckレビュー<br/>別系統のモデルに二重チェックさせる"]
+    S7 --> S8["⑧ コミット<br/>新しいトピックは新セッションで"]`,
+  `sequenceDiagram
+    participant Dev as 開発者
+    participant CLI as Copilot CLI
+    participant Repo as リポジトリ/ファイルシステム
+
+    Dev->>CLI: プロンプトを入力
+    CLI->>Repo: AGENTS.md / copilot-instructions.md<br/>を自動検出・読み込み
+    Dev->>CLI: Shift+Tab で Plan モードへ切替
+    CLI->>Dev: 質問を重ねながら実装計画を提示
+    Dev->>CLI: 計画を承認
+    CLI->>Repo: Autopilotでファイル読み書き・<br/>コマンド実行(許可された範囲で)
+    CLI-->>Dev: 進捗と結果を報告
+    Dev->>CLI: /allow-all でYOLOモードに切替(任意)
+    Note over CLI,Repo: サンドボックス環境(/sandbox enable, --cloud)を<br/>推奨(いずれもPublic Preview, 2026年7月時点)`,
+  `sequenceDiagram
+    participant Dev as 開発者
+    participant Issue as GitHub Issue
+    participant Agent as Copilot Coding Agent
+    participant PR as Pull Request
+
+    Dev->>Issue: Issueを作成し、要件・受け入れ条件を明記
+    Dev->>Agent: Issueを @copilot にアサイン
+    Agent->>Agent: AGENTS.md / copilot-instructions.md /<br/>.instructions.md を読み込み
+    Agent->>Agent: MCPサーバー(GitHub MCP等)を用いて<br/>リポジトリ情報・Issue履歴を収集
+    Agent->>PR: ドラフトPRを作成しコミットをpush
+    Agent->>Dev: レビュアーとして開発者を追加、通知
+    Dev->>PR: 人間と同じレビュープロセスでマージ判断`,
+  `flowchart TD
+    PR["Pull Requestが作成される"] --> Review["Copilot Code Reviewが起動<br/>(GitHub Actionsで実行)"]
+    Review --> Skill{".github/skills 配下に<br/>SKILL.md はあるか?"}
+    Skill -- "あり" --> SkillUse["リポジトリ/組織固有の規約・<br/>内部ツールをレビューに反映"]
+    Skill -- "なし" --> Default["Copilotの標準分析のみ"]
+    Review --> MCP{"MCPサーバー設定は<br/>あるか?"}
+    MCP -- "あり(読み取り専用)" --> MCPUse["Issueトラッカー・ドキュメント・<br/>サービスカタログ等から文脈を取得"]
+    MCP -- "なし" --> DefaultMCP["GitHub MCP / Playwright MCPが<br/>既定で有効"]
+    SkillUse --> Comment["レビューコメントを生成"]
+    MCPUse --> Comment
+    Default --> Comment
+    DefaultMCP --> Comment
+    Comment --> Attribution["コメントにSkill/MCPの<br/>出典を明示(Attribution)"]`,
+  `flowchart TD
+    Task["タスクの性質を評価"] --> Simple{"構文・定型文・<br/>ボイラープレート程度か?"}
+    Simple -- "はい" --> Fast["高速・低コストモデル<br/>(Haiku系 / Grok Code Fast 等)"]
+    Simple -- "いいえ" --> Mid{"標準的な機能実装・<br/>アルゴリズムか?"}
+    Mid -- "はい" --> Balanced["バランス型モデル<br/>(Sonnet系 / GPT-5.4系等)を<br/>中程度の推論レベルで"]
+    Mid -- "いいえ" --> Hard{"アーキテクチャ設計・<br/>ミッションクリティカルな判断か?"}
+    Hard -- "はい" --> Premium["フラッグシップモデル<br/>(Opus系 / GPT-5.5系等)"]
+    Hard -- "いいえ" --> Context{"非常に大きな<br/>コンテキストが必要か?"}
+    Context -- "はい" --> LargeCtx["大規模コンテキスト対応モデル<br/>(Gemini Pro系等)"]
+    Context -- "いいえ" --> Balanced`,
+  `flowchart TD
+    Threat["脅威: プロンプトインジェクション<br/>(コード/コメント/Issue/PRコメント/<br/>ツール出力に隠された指示)"] --> L1["対策① 最小権限の原則<br/>エージェントに与えるデータ・権限を必要最小限に"]
+    Threat --> L2["対策② サンドボックス実行<br/>Codespaces / Dev Container / /sandbox enable"]
+    Threat --> L3["対策③ 人間によるレビュー<br/>PRマージ前の必須チェック"]
+    Threat --> L4["対策④ MCP読み取り専用化<br/>書き込み権限は慎重に評価"]
+    Threat --> L5["対策⑤ シークレット衛生<br/>プロンプト・環境変数にシークレットを含めない"]
+    Threat --> L6["対策⑥ 監査可能性<br/>コミットの共著者表示・アクション属性の明確化"]
+    L1 --> Result["攻撃が成功しても<br/>被害範囲(blast radius)を限定"]
+    L2 --> Result
+    L3 --> Result
+    L4 --> Result
+    L5 --> Result
+    L6 --> Result`,
+  `flowchart TD
+    AP["よくあるアンチパターン"] --> AP1["何でもAgentモードで済ませる<br/>(高コストな割に精度が下がる)"]
+    AP1 --> Fix1["→ タスクの性質に応じてAsk/Edit/Agentを使い分ける"]
+    AP --> AP2["巨大で曖昧な1発プロンプト"]
+    AP2 --> Fix2["→ プロトタイプ→計画(/plan)→実装の順に分解する"]
+    AP --> AP3["生成コードを無検証でマージ"]
+    AP3 --> Fix3["→ 必ず読み、テストし、レビューしてから採用する"]
+    AP --> AP4["インストラクションファイルを肥大化させる"]
+    AP4 --> Fix4["→ 1指示1文・600語以内を目安に簡潔化する"]
+    AP --> AP5["ローカルマシンでYOLOモードを実行"]
+    AP5 --> Fix5["→ Codespaces / Dev Containerなどサンドボックスで実行"]
+    AP --> AP6["関係のない話題を1つのChatセッションに詰め込む"]
+    AP6 --> Fix6["→ 話題ごとに新しいセッションを開始する"]`,
 ] as const;
 
 const EXPECTED_H3 = [
@@ -187,11 +319,14 @@ describe("/copilot/github-copilot Contract Tests", () => {
     }
   });
 
-  // C-6: Mermaid ダイアグラムが 11 個存在する
-  it("C-6: Mermaid ダイアグラムが 11 個存在する", () => {
+  // C-6: Mermaid ダイアグラムが原本と順序込みで完全一致する
+  it("C-6: Mermaid ダイアグラムが原本と同数・同ソース・同順序で存在する", () => {
     const { container } = render(<GithubCopilotPage />);
-    const diagrams = container.querySelectorAll(".mermaid-scroll");
-    expect(diagrams.length).toBe(11);
+    const actual = Array.from(container.querySelectorAll('[data-testid="mermaid"]')).map((el) =>
+      normalizeMermaidSource(el.textContent ?? "")
+    );
+    // 件数だけでは図解を差し替えても通る。原本のソースと順序込みで比較する。
+    expect(actual).toEqual(EXPECTED_MERMAID_SOURCES.map(normalizeMermaidSource));
   });
 
   // Q-2: metadata の title と description が空でなく title が h1 と整合する
