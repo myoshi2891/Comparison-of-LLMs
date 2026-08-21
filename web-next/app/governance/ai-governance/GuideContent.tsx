@@ -1,9 +1,8 @@
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
 import { load } from "cheerio";
 import { createElement, type ReactNode } from "react";
 import MermaidDiagram from "@/components/docs/MermaidDiagram";
 import { DIAGRAMS, MERMAID_THEME } from "./diagrams";
+import { sourceHtml } from "./sourceHtml";
 
 type HtmlNode = {
   attribs?: Record<string, string>;
@@ -13,15 +12,6 @@ type HtmlNode = {
   type?: string;
 };
 
-const SOURCE_PATH = join(
-  process.cwd(),
-  "..",
-  "archive",
-  "html",
-  "security",
-  "Ai-governance-guide.html"
-);
-const sourceHtml = readFileSync(SOURCE_PATH, "utf8");
 const $ = load(sourceHtml);
 const layout = $(".layout").first().get(0) as unknown as HtmlNode;
 

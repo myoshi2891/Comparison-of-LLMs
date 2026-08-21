@@ -2,7 +2,7 @@
 
 > 本ファイルは Next.js 移行完了後の保守・改善フェーズにおける開発の進捗（特にテスト関連）および品質チェックのルールを記録する。
 >
-> - 最終更新日: **Updated 2026-08-14**
+> - 最終更新日: **Updated 2026-08-20**
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
 
@@ -11,18 +11,72 @@
 - **フェーズ**: 保守・機能改善・品質強化フェーズ
 - **ブランチ**: `dev`（本番 `main` への Next.js 移行マージ完了 🚀）
 - **動作検証**:
-  - `bun run build`: 今回はユーザー指定により未実行（直近の成功記録は 2026-08-13。許可環境または CI で再確認する）
-  - `npm run typecheck` ✅（`tsc --noEmit`。2026-08-14 実測）
-  - `npm run lint` ✅（Biome check / 457 files / 0 diagnostics。2026-08-14 実測）
+  - `bun run build` ✅（Compiled successfully / 86 静的ページを生成。2026-08-20 実測）
+  - `bun run typecheck` ✅（`tsc --noEmit`。2026-08-20 実測）
+  - `bun run lint` ✅（Biome check / 478 files / 0 diagnostics。2026-08-20 実測）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: `npm test` で Vitest **164 files / 1467 tests すべて合格**（2026-08-14 実測。全 Green ✅）
+  - **フロントエンド (`web-next/`)**: `bun run test` で Vitest **171 files / 1545 tests すべて合格**（2026-08-20 実測。全 Green ✅）
+    - `load(sourceHtml)` をモジュール初期化時に呼ぶ `governance/ai-governance/GuideContent.tsx` と
+      `local-llm/finetuning-best-practices/GuideContent.tsx` は、import スモークでも読み込み可能であることを確認済み
   - **バックエンド (`scraper/`)**: pytest 実行で **43 件すべて合格** (全 Green ✅)
 
 ## 最近の追加内容
 
+- **Gemini マルチエージェント開発 ベストプラクティス完全ガイド（/google/multi-agent-best-practices）の Next.js アプリ移行 & コードブロック構文ハイライト化**:
+  - `Gemini-multi-agent-best-practices.html` を `web-next/app/google/multi-agent-best-practices/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。
+  - 要約・省略一切なしで全16章（0. はじめに〜15. 参考文献・出典）、全56サブセクション（h3）、全表（12個）、全コードブロック（28個）、8個のMermaid図解（`MermaidDiagram`）、TOCスクロール追従・モバイルドロワー（`TocObserver.tsx`）、全7項目の実践チェックリスト、全7項目のセキュリティチェックリスト、全22件の参考文献・外部リンク安全属性（`target="_blank" rel="noopener noreferrer"`）、全幅レイアウトを完全再現。
+  - **コードブロックの構文ハイライト & CopyButton 全件適用**: 全28個のコードブロック（markdown, json, gitignore, toml, python, bash, text）に対して `<CodeCopyButton text={...} />`、`<div className={styles.codeLine}>`、および Atom One Dark 準拠の構文トークンクラス（`.ck`, `.cs`, `.cc`, `.cv`, `.cf`, `.cn`, `.ct`, `.cp`, `.cm`）を適用。波括弧の JSX エスケープ（`{"{"}`, `{"}"}`）とインデント保護（`{"  "}`）を徹底。
+  - 原本 `Gemini-multi-agent-best-practices.html` は `archive/html/google/Gemini-multi-agent-best-practices.html` へ退避保存。
+  - 原本照合監査スクリプト `audit_source_parity.mjs` で exit code 0（漏れなし ✅）を確認。
+  - `web-next/lib/page-registry.ts` に新規エントリ（`slug: "/google/multi-agent-best-practices"`）を登録し、グローバルナビゲーション（`components/site/nav-links.ts`）に自動導出。
+  - 契約テスト20件（S-1〜S-4, C-1〜C-6, D-5〜D-8, Q-2〜Q-3）を作成し、Vitest **170 files / 1539 tests** 全 Green ✅、typecheck ✅、Biome lint ✅ を確認。
+
+
+- **AI仕様駆動開発におけるMarkdownファイル実践ガイド（/codex/skill）の Pure JSX 完全置き換え移行**:
+  - `Ai-spec-driven-development-markdown-best-practices.html` を `web-next/app/codex/skill/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。
+  - 要約・省略一切なしで全15章（SDDとは何か〜参考文献）、全12サブセクション（h3）、全表（3個）、全コードブロック（4個：CopyButton & Atom One Dark シンタックスハイライト対応）、4個のMermaid図解（`MermaidDiagram`）、TOCスクロール追従・モバイルドロワー（`TocObserver.tsx`）、全12項目のチェックリスト、全33件の参考文献・外部リンク安全属性（`target="_blank" rel="noopener noreferrer"`）、callout（3個）を完全再現。
+  - デザイン・スタイリングの完全再現: SiteHeader との重なりを解消する `position: sticky; top: var(--header-height, 60px); height: calc(100vh - var(--header-height, 60px));` のサイドバーレイアウト、Atom One Dark 配色の構文トークン（見出し `#e06c75`、属性 `#e06c75`、文字列 `#98c379`、ブレット `#61aeee`、コード `#56b6c2`、番号 `#d19a66`、メタ `#5c6370`）、参考文献リストの美しいタイポグラフィと URL ホバースタイルを完全適用。
+  - 原本 `Ai-spec-driven-development-markdown-best-practices.html` は `archive/html/SDD/Ai-spec-driven-development-markdown-best-practices.html` へ退避保存。
+  - 契約テスト21件（S-1〜S-4, C-1〜C-6, D-1〜D-8, Q-2〜Q-3）を作成し、Vitest **169 files / 1510 tests** 全 Green ✅、typecheck ✅、Biome lint ✅ を確認。
+
+
+- **GitHub Copilot Code Review 実践ガイド（/code-review/copilot-code-review）の Pure JSX 完全置き換え移行**:
+  - `Github-copilot-code-review-best-practices.html` を `web-next/app/code-review/copilot-code-review/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。
+  - 要約・省略一切なしで全13セクション（はじめに〜参考文献・出典）、全15サブセクション（h3）、全8サブセクション（h4）、全表、全コードブロック、5個のMermaid図解（`MermaidDiagram`）、TOCスクロール追従（`TocObserver.tsx`）、全25件の参考文献・外部リンク安全属性（`target="_blank" rel="noopener noreferrer"`）、callout、チェックリストを完全再現。
+  - 原本 `Github-copilot-code-review-best-practices.html` は `archive/html/Microsoft/Github-copilot-code-review-best-practices.html` へ退避保存。
+  - 原本照合監査スクリプト `audit_source_parity.mjs` で exit code 0（漏れなし ✅）を確認。
+  - 契約テスト16件および TocObserver テスト1件（計17件）を作成・更新し、Vitest **168 files / 1496 tests** 全 Green ✅、typecheck ✅、Biome lint ✅ を確認。
+
+
+- **Next.js ガイドページ移行スキル（nextjs-page-migration）のブラッシュアップ & デザイン移行チェックリスト整備**:
+  - 原本 HTML からの移行時に頻発していた「デザイン・CSS 移行漏れ」（サイドバー配色、コードブロック配色、全幅レイアウト、CDN リンク、リスト要素型、`pre code` リセット、テキスト・段落色）を根絶するため、スキル体系を大幅強化。
+  - **新規リファレンス追加**:
+    - `references/css-full-transfer-checklist.md`（343行）: 原本 `<style>` から `page.module.css` への 100% 完全転写手順、9 つのカテゴリ別チェックリスト（CSS 変数、レイアウト構造、タイポグラフィ、コードブロック 3 層構造、サイドバー、テーブル、callout、外部 CDN リソース、レスポンシブ）を策定。
+  - **既存リファレンス・スキルの更新**:
+    - `SKILL.md`: デザイン契約テスト D-5〜D-8（サイドバーナビ、`pre code` リセット、CDN リンク、レイアウトルート）を新設、スタイリング防犯原則テーブルの拡充、原本配色テーマ依存のコードハイライト手順を明文化。
+    - `references/design-contract-tests.md`: D-5〜D-8 の DOM テスト実装パターンと `data-testid` 仕様を追加。
+    - `references/implementation-reference.md`: `pre code` リセット、外部 CDN リンク直接配置、原本配色テーマ特定コマンド、原本 CSS → page.module.css 変換ルールを収録。
+  - `.skills/`、`.claude/skills/`、`.agent/skills/`、`.gemini/skills/` の全シンボリックリンク・ハードリンクの参照整合性を確認。
+  - テスト検証: Vitest **167 files / 1484 tests** 全 Green ✅。
+
+- **GitHub Copilot AI仕様駆動開発 ベストプラクティスガイド（/copilot/markdown-file-guide）の Pure JSX 完全置き換え移行**:
+  - `Copilot-spec-driven-development-best-practices.html` を `web-next/app/copilot/markdown-file-guide/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。
+  - 要約・省略一切なしで全12セクション（全体像、Step 1〜Step 7、Spec Kitと仕様駆動開発、セキュリティ、成熟度モデル、参考文献）、全表、全コードブロック（1行毎 `codeLine` ラッパー & 構文トークン化）、8個のMermaid図解（`MermaidDiagram`）、TOCスクロール追従（`TocObserver.tsx`）、インタラクティブチェックリスト、全31件の参考文献・外部リンク安全属性（`target="_blank" rel="noopener noreferrer"`）を完全再現。
+  - デザイン・スタイリングの完全再現: 原本通りの全幅展開（`max-width: none; width: 100%`）で右側余白を排除、サイドバー文字色（`--color-text-secondary: #a9b8cc` / ホバー・アクティブ `--color-text-primary: #e9edf5`）、Atom One Dark シンタックスカラー（見出し `#e06c75`、キーワード `#c678dd`、文字列 `#98c379`、コメント `#5c6370`、通常文字 `#abb2bf`）を完全一致。Tabler Icons Webfont（`@tabler/icons-webfont`）をロードして全アイコン（サイドバー、kicker、H2見出し、callout、参考文献見出し）を正確に表示。SiteHeader との重なりを解消する `position: sticky; top: var(--header-height, 60px); height: calc(100vh - var(--header-height, 60px));` のサイドバーレイアウトを適用。
+  - 既存の旧 `/copilot/markdown-file-guide` 画面と完全入れ替え完了。原本 `Copilot-spec-driven-development-best-practices.html` は `archive/html/Microsoft/Copilot-spec-driven-development-best-practices.html` へ退避保存。
+  - 原本照合監査スクリプト `audit_source_parity.mjs` を更新し、`<script class="mermaid-source">` の Mermaid ソース認識、JSON 波括弧の保護、URL エンティティデコードに対応。原本照合監査で exit code 0（漏れなし ✅）を確認。
+  - 契約テスト18件（S-1〜S-4, C-1〜C-6, D-1〜D-2, Q-1〜Q-2）および TocObserver テスト3件（計21件）を作成・更新し、Vitest **167 files / 1484 tests** 全 Green ✅、typecheck ✅、Biome lint ✅ を確認。
+
+- **GitHub Copilot 実践ベストプラクティスガイド（/copilot/github-copilot）の Pure JSX 完全置き換え移行**:
+  - `Github-copilot-best-practices.html` を `web-next/app/copilot/github-copilot/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。
+  - 要約・省略一切なしで全17セクション（1.全体像〜17.参考文献）、全表、全コードブロック、11 Mermaid図解（`MermaidDiagram`）、TOCスクロール追従（`TocObserver.tsx`）、チェックリスト、全43件の参考文献・外部リンク安全属性（`target="_blank" rel="noopener noreferrer"`）を完全再現。
+  - 既存の旧 `/copilot/github-copilot` 画面と完全入れ替え完了。原本 `Github-copilot-best-practices.html` は `archive/html/Microsoft/Github-copilot-best-practices.html` へ退避保存。
+  - 原本照合監査スクリプト `audit_source_parity.mjs` を更新し、`<pre class="mermaid">` の Mermaid ソース認識および `<head>` 内リソース除外に対応。原本照合監査で exit code 0（漏れなし ✅）を確認。
+  - 契約テスト12件および TocObserver テスト5件（計17件）を作成・更新し、Vitest **165 files / 1468 tests** 全 Green ✅、typecheck ✅、Biome lint ✅ を確認。
+
 - **レビュー指摘の再検証 — エージェント案内・フォント公開順序・OpenClaw境界の明確化**:
   - `AGENTS.md`と`GEMINI.md`の検証コマンドをbunへ統一し、`GEMINI.md`の必読順を`CODEX.md`、`CLAUDE.md`、移行文書の順へ同期。
-  - Noto Sans JP生成スクリプトの契約を、全downloadとstaged CSS/preload書き込みが現行世代の昇格より前に並ぶことを順序込み完全一致で検証する形へ強化。
+  - Noto Sans JP生成スクリプトの契約を、一時世代ディレクトリ作成、`await`付き全download、staged CSS/preload書き込みが現行世代の昇格より前に並ぶことを順序込み完全一致で検証する形へ強化。
   - OpenClawの`bootstrapMode=none`と通常のcontext injectionを分離し、embedded harnessとnative Codexのファイル別経路を図示。Fiuの不正返信0件は返信禁止指示下の限定結果であり、自由な外部送信の安全性を証明しないと明記。
   - サンドボックスではユーザー指定によりnpmを使用。Vitest **164 files / 1467 tests**、typecheck、lint（457 files / 0 diagnostics）、pytest **43件**がGreen。ユーザー指定によりbuildと目視確認は省略。
 

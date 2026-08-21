@@ -1,1899 +1,1820 @@
 import type { Metadata } from "next";
-import CodeCopyButton from "@/components/docs/CodeCopyButton";
 import MermaidDiagram from "@/components/docs/MermaidDiagram";
 import styles from "./page.module.css";
+import TocObserver from "./TocObserver";
 
 export const metadata: Metadata = {
-  title: "GitHub Copilot Code Review — 完全活用ガイド",
+  title: "GitHub Copilot Code Review 実践ガイド ― 中級〜上級エンジニアのためのベストプラクティス",
   description:
     "AI駆動のコードレビューをチーム開発に深く組み込む——概念・設定・運用まで中〜上級者向けにステップバイステップで解説",
 };
 
-// 外部リンク用ヘルパー
-function Ext({ href, children }: { href: string; children: React.ReactNode }) {
-  return (
-    <a href={href} target="_blank" rel="noopener noreferrer">
-      {children}
-    </a>
-  );
-}
+const THEME_VARIABLES: Record<string, string> = {
+  darkMode: "true",
+  background: "#0d1c30",
+  primaryColor: "#132540",
+  primaryTextColor: "#dbe4f3",
+  primaryBorderColor: "#7c9eff",
+  lineColor: "#7c9eff",
+  secondaryColor: "#101f36",
+  tertiaryColor: "#0d1c30",
+  fontFamily:
+    '-apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans", "Noto Sans JP", sans-serif',
+  fontSize: "16px",
+  edgeLabelBackground: "#0d1c30",
+};
 
-// Mermaid ダイアグラムの定義
-const DIAG_ARCH = `flowchart LR
-PR[Pull Request / Local Changes]
-subgraph Copilot["GitHub Copilot Code Review Engine"]
-direction TB
-CTX["Full Project Context Gathering"]
-MODEL["Purpose-Built Model Mix"]
-CI["Custom Instructions Parser"]
-CTX --> MODEL
-CI --> MODEL
-end
-PR --> Copilot
-Copilot --> COM["Review Comments + Suggested Fixes"]
-COM --> DEV[Developer]
-COM --> AGT["Copilot Cloud Agent - Public Preview"]
-AGT --> FIXPR["Fix PR Auto-generated"]
-DEV -->|Thumbs up/down| FB[Feedback Loop]`;
-
-const DIAG_SETUP = `flowchart TD
-A["Org Admin として GitHub.com にログイン"] --> B["Organization Settings へ移動"]
-B --> C["Copilot - Policies タブ"]
-C --> D{"コードレビューを有効化"}
-D -->|有効化| E["Copilot code review トグル ON"]
-E --> F{"ライセンスなしメンバーにも提供?"}
-F -->|Yes| G["Premium request paid usage を先に有効化"]
-G --> H["Allow members without a Copilot license ポリシー有効化"]
-H --> I["対象リポジトリを明示指定"]
-F -->|No| J["設定完了"]
-I --> J`;
-
-const DIAG_CONTEXT = `flowchart LR
-subgraph GA["Full Project Context Gathering - GA"]
-DIFF["PR diff"] --> ANALYZER["Repository Analyzer via GitHub Actions"]
-REPO["Entire Repository Codebase"] --> ANALYZER
-ANALYZER --> CONTEXT["Rich Context Object"]
-end
-subgraph PREVIEW["Cloud Agent Integration - Preview"]
-REVIEW_COM["Review Comment + Suggestion"] --> IMPL["Implement Suggestion ボタン"]
-IMPL --> DRAFT["Draft Comment on PR"]
-DRAFT --> AGENT["Copilot Cloud Agent"]
-AGENT --> FIXPR["New Fix PR against your branch"]
-end
-CONTEXT --> REVIEW_COM`;
-
-const DIAG_AUTO = `flowchart TD
-A["自動レビュー設定を開始"] --> B{"対象スコープ"}
-B -->|個人 Pro/Pro+| C["GitHub Settings - Copilot - Code review - Enable for your PRs"]
-B -->|リポジトリ| D["Repo Settings - Copilot - Automatic code review"]
-B -->|組織| E["Org Settings - Copilot Policies - Automatic code review"]
-C --> F["トリガー条件選択: Basic / New pushes / Draft PRs"]
-D --> F
-E --> G["対象リポジトリを選択: 全て / 特定リポジトリ"]
-G --> F
-F --> H["保存 - 有効化完了"]`;
-
-const DIAG_QUOTA = `flowchart LR
-A["月次クォータ超過"] --> B{"対応選択"}
-B -->|短期| C["クォータリセットを待つ"]
-B -->|継続利用| D["プランのアップグレード"]
-B -->|追加購入| E["Additional Premium Requests を有効化"]
-D --> F["レビュー継続"]
-E --> F
-C --> G["リセット後に再開"]`;
-
-const DIAG_ROLE = `flowchart TD
-PR["Pull Request 作成"] --> COPILOT["Copilot Code Review (自動 or 手動トリガー)"]
-COPILOT --> FIX1["明確な修正提案 - Apply"]
-COPILOT --> SKIP["判断困難 - スキップ"]
-FIX1 --> HUMAN["Human Review"]
-SKIP --> HUMAN
-HUMAN --> ARCH["アーキテクチャ判断 / ビジネスロジック検証 / パフォーマンス要件確認"]
-ARCH --> APPROVE["Approve / Request Changes"]
-APPROVE --> MERGE["Merge"]`;
+const MERMAID_1 = `flowchart TB
+    A["入力処理<br/>PR差分 + タイトル/本文 + カスタム指示を統合"] --> B["言語モデル解析<br/>GPT系 / Claude Opus系 / Gemini系 等を使い分け"]
+    B --> C["応答生成<br/>指摘 + severity + 修正提案(自然言語/コード)"]
+    C --> D["出力整形<br/>PRのインライン差分コメントとして投稿"]`;
+const MERMAID_2 = `flowchart TB
+    Start["自動化のレベルを決める"] --> Triage{"どの範囲で有効化する?"}
+    Triage -->|"自分のPRだけ"| P["個人設定<br/>Your Copilot > Automatic code review"]
+    Triage -->|"1つのリポジトリ"| R["リポジトリRuleset<br/>Automatically request Copilot code review"]
+    Triage -->|"組織全体"| O["組織Ruleset<br/>Repository Rulesetsを一括適用"]
+    P --> Merge["PR作成/更新時にCopilotが自動レビュー"]
+    R --> Merge
+    O --> Merge
+    Merge --> End["レビューコメントがPRに投稿される"]`;
+const MERMAID_3 = `flowchart TB
+    A["PR作成 (Draftも可)"] --> B["Copilot code reviewを起動<br/>(自動設定 または 手動Request)"]
+    B --> C["レビューコメント生成<br/>severity: High / Medium / Low"]
+    C --> D{"開発者が内容を確認"}
+    D -->|"妥当な指摘"| E["提案を適用 または 手動修正"]
+    D -->|"誤検知/対象外"| F["コメントをResolve"]
+    E --> G["人間レビュアーが最終レビュー"]
+    F --> G
+    G --> H{"Approve?"}
+    H -->|"Yes"| I["マージ"]
+    H -->|"No / 追加修正"| B`;
+const MERMAID_4 = `flowchart TB
+    L1["レイヤー1: Content Exclusion<br/>機密ファイルをレビュー対象から除外"] --> L2["レイヤー2: Firewall<br/>Copilotのネットワークアクセスを制御"]
+    L2 --> L3["レイヤー3: MCP read-only制約<br/>ツール呼び出しを読み取り専用に限定"]
+    L3 --> L4["レイヤー4: CODEOWNERS<br/>設定ファイル自体の変更を承認制に"]`;
+const MERMAID_5 = `flowchart TB
+    P1["フェーズ1: 個人トライアル<br/>数名が手動リクエストで試用"] --> P2["フェーズ2: リポジトリ導入<br/>copilot-instructions.md整備 + 自動レビュー有効化"]
+    P2 --> P3["フェーズ3: 組織展開<br/>組織Ruleset・Agent Skills・MCPの標準化"]
+    P3 --> P4["フェーズ4: 計測と改善<br/>採用率とfalse positive率をモニタリングし指示を継続改善"]`;
 
 /**
- * Renders the GitHub Copilot Code Review guide page.
- *
- * @returns The full guide page content.
+ * Displays a Japanese practical guide to GitHub Copilot Code Review, including setup, customization, security, governance, team adoption, and operational guidance.
  */
 export default function Page() {
   return (
-    <div className={styles.pageContainer}>
-      {/* NAVBAR */}
-      <nav className={styles.nav}>
-        <div className={styles.navInner}>
-          <span className={styles.navBrand}>Copilot CR Guide</span>
-          <a href="#ch1">01 概要</a>
-          <a href="#ch2">02 可用性</a>
-          <a href="#ch3">03 セットアップ</a>
-          <a href="#ch4">04 基本操作</a>
-          <a href="#ch5">05 Custom Instructions</a>
-          <a href="#ch6">06 Agentic機能</a>
-          <a href="#ch7">07 自動レビュー</a>
-          <a href="#ch8">08 クォータ/課金</a>
-          <a href="#ch9">09 Enterprise</a>
-          <a href="#ch10">10 ベストプラクティス</a>
-          <a href="#refs">参考文献</a>
-        </div>
-      </nav>
+    <>
+      <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css"
+      />
+      <TocObserver />
 
-      {/* HERO */}
-      <div className={styles.hero}>
-        <div className={styles.heroGlow} />
-        <div className={styles.heroBadge}>K-Level: Intermediate → Advanced</div>
-        <h1 className={styles.heroTitle}>
-          GitHub Copilot
-          <br />
-          Code Review 完全活用ガイド
-        </h1>
-        <p className={styles.heroSub}>
-          AI駆動のコードレビューをチーム開発に深く組み込む——概念・設定・運用まで中〜上級者向けにステップバイステップで解説
-        </p>
-        <div className={styles.heroMeta}>
-          <span className={styles.metaChip}>
-            更新: <span>2026年6月</span>
-          </span>
-          <span className={styles.metaChip}>
-            一次情報源: <span>docs.github.com</span>
-          </span>
-          <span className={styles.metaChip}>
-            対象: <span>Pro / Business / Enterprise</span>
-          </span>
-          <span className={styles.metaChip}>
-            K-Level: <span>300–400</span>
-          </span>
-        </div>
+      <button type="button" className="sidebar-toggle" id="sidebarToggle" aria-label="目次を開閉">
+        ☰
+      </button>
+      <div className="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+      <div className={styles.layout} data-testid="layout-root">
+        <aside className="sidebar" id="copilotCodeReviewSidebar">
+          <div className="brand">
+            <div className="brand-mark">🧭</div>
+            <div className="brand-text">
+              <strong>Copilot Code Review</strong>実践ガイド
+            </div>
+          </div>
+          <nav className="toc" aria-label="目次">
+            <div className="nav-group-label">はじめに</div>
+            <ul>
+              <li>
+                <a href="#intro" className={styles.active}>
+                  <span className="n">00</span>本ガイドについて
+                </a>
+              </li>
+              <li>
+                <a href="#overview">
+                  <span className="n">01</span>Code Reviewとは何か
+                </a>
+              </li>
+            </ul>
+            <div className="nav-group-label">ステップバイステップ</div>
+            <ul>
+              <li>
+                <a href="#step1">
+                  <span className="n">02</span>レビューを起動する
+                </a>
+              </li>
+              <li>
+                <a href="#step2">
+                  <span className="n">03</span>カスタムインストラクション
+                </a>
+              </li>
+              <li>
+                <a href="#step3">
+                  <span className="n">04</span>Agent SkillsとMCP
+                </a>
+              </li>
+              <li>
+                <a href="#step4">
+                  <span className="n">05</span>コメントを運用する
+                </a>
+              </li>
+              <li>
+                <a href="#step5">
+                  <span className="n">06</span>限界と人間レビュー
+                </a>
+              </li>
+              <li>
+                <a href="#step6">
+                  <span className="n">07</span>セキュリティとガバナンス
+                </a>
+              </li>
+            </ul>
+            <div className="nav-group-label">導入・比較</div>
+            <ul>
+              <li>
+                <a href="#comparison">
+                  <span className="n">08</span>他ツールとの位置づけ
+                </a>
+              </li>
+              <li>
+                <a href="#roadmap">
+                  <span className="n">09</span>チーム導入ロードマップ
+                </a>
+              </li>
+              <li>
+                <a href="#checklist">
+                  <span className="n">10</span>チェックリスト
+                </a>
+              </li>
+              <li>
+                <a href="#summary">
+                  <span className="n">11</span>まとめ
+                </a>
+              </li>
+            </ul>
+            <div className="nav-group-label">出典</div>
+            <ul>
+              <li>
+                <a href="#references">
+                  <span className="n">12</span>参考文献・出典
+                </a>
+              </li>
+            </ul>
+          </nav>
+        </aside>
+
+        <main className="main">
+          <div className="hero">
+            <span className="eyebrow">GitHub Copilot &middot; Code Review</span>
+            <h1>
+              GitHub Copilot Code Review 実践ガイド
+              <br />
+              中級〜上級エンジニアのためのベストプラクティス
+            </h1>
+            <p className="lede prose">
+              Pull
+              Requestの一次レビューをAIに任せるための、設定・カスタムインストラクション・セキュリティ・チーム運用までをステップバイステップで解説します。
+            </p>
+            <div className="hero-meta">
+              <span>
+                <strong>情報基準日:</strong>&nbsp;2026年8月1日
+              </span>
+              <span>
+                <strong>対象読者:</strong>&nbsp;GitHub
+                Copilotの基本操作を経験した中級〜上級エンジニア
+              </span>
+              <span>
+                <strong>出典数:</strong>&nbsp;26件(公式ドキュメント・Changelog・実務者記事)
+              </span>
+            </div>
+            <div className="callout">
+              本ガイドは2026年8月1日時点の公開情報をもとに作成しています。GitHub Copilot Code
+              Reviewは更新頻度が高い機能のため、実際に導入する際は必ず
+              <a
+                href="https://github.blog/changelog/label/copilot/"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                GitHub Changelog
+              </a>
+              で最新の挙動を確認してください。
+            </div>
+          </div>
+
+          {/* ============ はじめに ============ */}
+          <section className="section prose" id="intro">
+            <h2 id="intro">はじめに</h2>
+            <p>
+              GitHub Copilot Code Review(以下Copilot Code Review)は、Pull
+              Request(PR)の差分に対してAIが自動でインラインコメントを付ける機能です。2025年前半に一般提供が始まって以降、2026年に入ってからはエージェント的なアーキテクチャへの刷新、Agent
+              SkillsやMCP(Model Context
+              Protocol)サーバーとの連携、severity(重大度)表示、ネットワークアクセス制御(Firewall)など、短期間で多くの機能が追加されています。
+            </p>
+            <p>
+              本ガイドは、すでにGitHub
+              Copilotの基本機能(補完・Chat)を使ったことがある中級〜上級者を対象に、Copilot Code
+              Reviewを<strong>チームの開発フローに安全かつ効果的に組み込む</strong>
+              ための考え方と手順をステップバイステップで解説します。個々のボタン操作の解説よりも、「何を」「なぜ」設定するのかという設計判断に重点を置いています。
+            </p>
+          </section>
+
+          {/* ============ Overview ============ */}
+          <section className="section prose" id="overview">
+            <h2 id="overview">GitHub Copilot Code Reviewとは何か</h2>
+
+            <h3 id="sec-h3-1">何をしてくれるのか</h3>
+            <p>
+              Copilot Code
+              ReviewはPRの差分・タイトル・本文・リポジトリのカスタム指示などをまとめてコンテキストとして与えられたLLMが解析し、行単位のインラインコメントとしてPRに投稿する機能です。解析は静的なものであり、実際にコードを実行したりテストを走らせたりはしません。バグや論理エラー、セキュリティ上の懸念、パフォーマンスの問題、言語・フレームワークのベストプラクティス違反などを検出範囲としています
+              <sup className="cite">
+                <a href="#ref-1">[1]</a>
+              </sup>
+              <sup className="cite">
+                <a href="#ref-7">[7]</a>
+              </sup>
+              。
+            </p>
+            <p>
+              レビューを担当するモデルは固定ではなく、GPT系・Claude
+              Opus系・Gemini系など複数のモデルを組み合わせて使う設計になっており、レビューごとに使用されるモデルが変わり得る点も押さえておく必要があります
+              <sup className="cite">
+                <a href="#ref-17">[17]</a>
+              </sup>
+              。
+            </p>
+            <p>
+              Copilotのレビューは常に「Comment」種別で投稿され、「Approve」や「Request
+              changes」にはなりません。したがって、必須レビュー(Required
+              reviewers)としてはカウントされず、マージ判定をブロックすることもありません。最終的な承認権限は常に人間のレビュアーに残ります
+              <sup className="cite">
+                <a href="#ref-2">[2]</a>
+              </sup>
+              。
+            </p>
+
+            <h3 id="sec-h3-2">処理の流れ(アーキテクチャ)</h3>
+            <div className="diagram">
+              <div className="mermaid-wrapper">
+                <MermaidDiagram chart={MERMAID_1} theme="base" themeVariables={THEME_VARIABLES} />
+              </div>
+              <p className="diagram-caption">図1. Copilot Code Reviewの内部処理フロー</p>
+            </div>
+
+            <p>
+              2026年6月には、Copilot
+              CLI/SDKに組み込まれているファイル探索ツールをレビュー処理そのものにも使うよう内部実装が刷新され、レビュー品質を維持したままコストが約20%削減されたと報告されています。この変更に合わせて「Medium
+              analysis depth」という解析の深さを選べるパブリックプレビューも展開されています
+              <sup className="cite">
+                <a href="#ref-11">[11]</a>
+              </sup>
+              。
+            </p>
+
+            <h3 id="sec-h3-3">利用できる環境</h3>
+            <p>
+              Copilot Code ReviewはGitHub.com上のPR画面のほか、Visual Studio(17.14以降)やVS
+              Code、CLIなど複数の環境から呼び出せます。GitHub.com上では、PRの「Reviewers」からCopilotを選んで「Request」をクリックするだけで、通常30秒以内にレビューが投稿されます
+              <sup className="cite">
+                <a href="#ref-2">[2]</a>
+              </sup>
+              。組織のCopilotライセンスを持たないメンバーでも、管理者が許可していればレビューを受け取れる場合があります
+              <sup className="cite">
+                <a href="#ref-2">[2]</a>
+              </sup>
+              。
+            </p>
+          </section>
+
+          {/* ============ Step 1 ============ */}
+          <section className="section prose" id="step1">
+            <span className="step-badge">STEP 1</span>
+            <h2 id="step1">レビューを起動する</h2>
+            <p>
+              Copilotにレビューを依頼する方法は「都度手動でリクエストする」か「自動化する」かの二択です。チームで運用するなら、早い段階で自動化の範囲を決めておくことをおすすめします。
+            </p>
+
+            <div className="diagram">
+              <div className="mermaid-wrapper">
+                <MermaidDiagram chart={MERMAID_2} theme="base" themeVariables={THEME_VARIABLES} />
+              </div>
+              <p className="diagram-caption">図2. 自動レビューを有効化するまでの意思決定フロー</p>
+            </div>
+
+            <ul>
+              <li>
+                <strong>個人設定</strong>: プロフィールの「Your Copilot」から「Automatic code
+                review」を有効化すると、自分が開いたすべてのPRが自動レビュー対象になります。この設定はCopilot
+                Pro / Pro+ / Maxプランでのみ利用できます
+                <sup className="cite">
+                  <a href="#ref-5">[5]</a>
+                </sup>
+                。
+              </li>
+              <li>
+                <strong>リポジトリRuleset</strong>: リポジトリのSettings &gt; Rules &gt;
+                Rulesetsで「Automatically request Copilot code review」を有効化します。「Review new
+                pushes」を有効にすると新しいコミットのたびに再レビューされ、「Review draft pull
+                requests」を有効にするとドラフトPRの段階からフィードバックを得られます
+                <sup className="cite">
+                  <a href="#ref-5">[5]</a>
+                </sup>
+                。2025年9月からは、この自動レビュー設定が「Require a pull request before
+                merging」の付随設定ではなく、独立したルールとして設定できるようになったため、マージ保護(ブランチ保護)を強制せずに自動レビューだけを導入することも可能です
+                <sup className="cite">
+                  <a href="#ref-14">[14]</a>
+                </sup>
+                。
+              </li>
+              <li>
+                <strong>組織/Enterpriseレベル</strong>: Enterprise管理者は「AI controls」からCopilot
+                Code Reviewを「Enabled everywhere」または「Let organizations
+                decide」として一括制御でき、組織Rulesetsを使えば多数のリポジトリに同じ自動レビュー方針を適用できます
+                <sup className="cite">
+                  <a href="#ref-6">[6]</a>
+                </sup>
+                。ただし、Push毎・ドラフト時のレビューを有効にするほど開発者への通知は増えるため、ノイズとのバランスを意識する必要があります
+                <sup className="cite">
+                  <a href="#ref-6">[6]</a>
+                </sup>
+                。
+              </li>
+            </ul>
+
+            <div className="callout">
+              <strong>実務Tips:</strong>
+              いきなり組織全体に自動レビューを強制するのではなく、まず1〜2個のリポジトリでPR作成時のみの自動レビューから始め、チームの反応(コメントの採用率・却下率)を見てからPush毎レビューやドラフトレビューを追加する、という段階導入が推奨されます
+              <sup className="cite">
+                <a href="#ref-3">[3]</a>
+              </sup>
+              <sup className="cite">
+                <a href="#ref-19">[19]</a>
+              </sup>
+              。
+            </div>
+          </section>
+
+          {/* ============ Step 2 ============ */}
+          <section className="section prose" id="step2">
+            <span className="step-badge">STEP 2</span>
+            <h2 id="step2">カスタムインストラクションを設計する</h2>
+            <p>
+              Copilot Code
+              Reviewは、そのままでも一般的なコーディング標準に基づいてレビューしますが、真価を発揮するのはリポジトリ固有の文脈(意図的な設計判断、重点的に見てほしい箇所、テストや実装に関するチームの基準など)を教えたときです
+              <sup className="cite">
+                <a href="#ref-25">[25]</a>
+              </sup>
+              。
+            </p>
+
+            <h3 id="sec-h3-4">3種類の指示ファイル</h3>
+            <div className="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>ファイル</th>
+                    <th>適用範囲</th>
+                    <th>主な用途</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td className="mono">.github/copilot-instructions.md</td>
+                    <td>リポジトリ全体</td>
+                    <td>
+                      コーディング規約・レビュー観点・組織横断の期待値など、常に考慮してほしい内容
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="mono">
+                      .github/instructions/*.instructions.md
+                      <br />(<code>applyTo</code>フロントマター付き)
+                    </td>
+                    <td>指定したパス/言語のみ</td>
+                    <td>
+                      特定言語・特定ディレクトリだけに適用したいルール(例:
+                      フロントエンドのアクセシビリティ、Pythonの型ヒント等)
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="mono">AGENTS.md</td>
+                    <td>リポジトリ全体</td>
+                    <td>
+                      プロジェクトの構造や「意図的にこうなっている」文脈など、レビュー品質を上げるための背景情報
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <p>
+              さらに、2026年に入ってからは<code>REVIEW.md</code>・<code>GEMINI.md</code>・
+              <code>CLAUDE.md</code>
+              といった他のAIツール向けの指示ファイルも自動的に読み込まれるようになり、チームがどこにガイドラインを書いていても一貫して反映されるようになりました
+              <sup className="cite">
+                <a href="#ref-10">[10]</a>
+              </sup>
+              。以前はCopilot Enterprise向けに「Coding
+              guidelines」というUIベースの別機能がプライベートプレビューで提供されていましたが、この
+              <code>*.instructions.md</code>ベースの仕組みに統合される形で段階的に廃止されています
+              <sup className="cite">
+                <a href="#ref-15">[15]</a>
+              </sup>
+              。
+            </p>
+
+            <h4 id="sec-h4-1">
+              <code>*.instructions.md</code>ファイルの例
+            </h4>
+            <div className="code-block">
+              <div className="code-label">
+                <span>.github/instructions/frontend.instructions.md</span>
+                <span>yaml + markdown</span>
+              </div>
+              <pre>
+                <code data-testid="code-block" className="language-yaml" id="code-instructions">
+                  <div className={styles.codeLine}>
+                    <span className="cc">---</span>
+                  </div>
+                  <div className={styles.codeLine}>
+                    <span className="ck">applyTo</span>:
+                  </div>
+                  <div className={styles.codeLine}>
+                    {"  "}- <span className="cs">&quot;webapp/src/**&quot;</span>
+                  </div>
+                  <div className={styles.codeLine}>
+                    {"  "}- <span className="cs">&quot;ui/components/**&quot;</span>
+                  </div>
+                  <div className={styles.codeLine}>
+                    <span className="cc">---</span>
+                  </div>
+                  <div className={styles.codeLine}>
+                    アクセシビリティ(ARIA属性、フォーカス管理)を重視してください。
+                  </div>
+                  <div className={styles.codeLine}>デザイントークンの利用を優先してください。</div>
+                  <div className={styles.codeLine}>
+                    legacy/配下の非推奨コンポーネントの利用を検出したら指摘してください。
+                  </div>
+                </code>
+              </pre>
+            </div>
+
+            <p>
+              特定のファイルをCopilot code reviewだけ、あるいはCopilot cloud
+              agentだけに読ませたくない場合は、フロントマターに
+              <code>excludeAgent: code-review</code>または<code>excludeAgent: cloud-agent</code>
+              を指定することで、そのファイルを対象エージェントから除外できます
+              <sup className="cite">
+                <a href="#ref-31">[31]</a>
+              </sup>
+              。
+            </p>
+
+            <h3 id="sec-h3-5">指示ファイルをどこに書くか判断する</h3>
+            <div className="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>目的</th>
+                    <th>使うファイル</th>
+                    <th>備考</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>リポジトリ全体で常に守ってほしい規約を書きたい</td>
+                    <td className="mono">copilot-instructions.md</td>
+                    <td>最初に書くべき基本ファイル</td>
+                  </tr>
+                  <tr>
+                    <td>特定言語・特定ディレクトリだけにルールを絞りたい</td>
+                    <td className="mono">*.instructions.md + applyTo</td>
+                    <td>言語ごとのルールを copilot-instructions.md から移すと精度が上がる</td>
+                  </tr>
+                  <tr>
+                    <td>Copilot code reviewとcloud agentで挙動を変えたい</td>
+                    <td className="mono">excludeAgent フロントマター</td>
+                    <td>片方のエージェントにだけ読ませたい指示に使う</td>
+                  </tr>
+                  <tr>
+                    <td>チーム独自のツールや社内標準を反映したい</td>
+                    <td className="mono">.github/skills/配下のSKILL.md</td>
+                    <td>
+                      レビュー専用にするなら code-review のようなレビュー用途とわかる名前にする
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>外部システム(課題管理・ドキュメント等)の情報を参照したい</td>
+                    <td>リポジトリのMCPサーバー設定</td>
+                    <td>ツール呼び出しは読み取り専用に限定される</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <h3 id="sec-h3-6">効果的な書き方</h3>
+            <p>
+              GitHub自身が公開しているガイドによれば、Copilot Code
+              Reviewの指示ファイルは非決定的(non-deterministic)であり、すべての指示に毎回100%従うわけではありません。そのため、以下のような書き方が推奨されています
+              <sup className="cite">
+                <a href="#ref-3">[3]</a>
+              </sup>
+              <sup className="cite">
+                <a href="#ref-16">[16]</a>
+              </sup>
+              。
+            </p>
+            <ul>
+              <li>最小限の指示から始め、実際のレビュー結果を見ながら段階的に追加する。</li>
+              <li>見出しと箇条書きで構造化し、長い説明文ではなく短い命令形の指示にする。</li>
+              <li>
+                1つの指示ファイルはおよそ1,000行を超えないようにする。それ以上長くなると、指示の遵守精度が落ちる傾向がある
+                <sup className="cite">
+                  <a href="#ref-3">[3]</a>
+                </sup>
+                。
+              </li>
+              <li>
+                抽象的な指示より、具体例を添えた指示のほうが伝わりやすい(例:「良いコードを書いて」ではなく「この関数のように早期returnでネストを浅くして」)。
+              </li>
+              <li>
+                どうしても100%守らせたいルール(セキュリティの必須要件など)は、Copilotへの指示だけに頼らず、Linterや静的解析ツールなど決定的な仕組みでも担保する
+                <sup className="cite">
+                  <a href="#ref-19">[19]</a>
+                </sup>
+                。
+              </li>
+            </ul>
+            <p>
+              2026年6月には、<code>copilot-instructions.md</code>・<code>*.instructions.md</code>
+              の合計文字数に課されていた4,000文字の上限が撤廃され、より柔軟にカスタマイズできるようになりました
+              <sup className="cite">
+                <a href="#ref-13">[13]</a>
+              </sup>
+              。また、組織レベルの指示もCopilot Code Reviewが考慮するようになっています
+              <sup className="cite">
+                <a href="#ref-15">[15]</a>
+              </sup>
+              。
+            </p>
+          </section>
+
+          {/* ============ Step 3 ============ */}
+          <section className="section prose" id="step3">
+            <span className="step-badge">STEP 3</span>
+            <h2 id="step3">Agent SkillsとMCPで文脈を拡張する</h2>
+            <p>
+              2026年7月29日、Copilot Code ReviewにおけるAgent SkillsとMCPサーバー連携が、Copilot
+              Pro・Pro+・Business・Enterpriseの全有償プランで一般提供(GA)になりました
+              <sup className="cite">
+                <a href="#ref-9">[9]</a>
+              </sup>
+              。これはMCPの2026-07-28版仕様が正式リリースされた翌日というタイミングでもあり、MCP対応が「アーリーアダプター向けの機能」から「プラン選定時のチェック項目」へと位置づけを変えた出来事として注目されています
+              <sup className="cite">
+                <a href="#ref-14">[14]</a>
+              </sup>
+              。
+            </p>
+
+            <div className="grid">
+              <div className="card">
+                <span className="tag">Agent Skills</span>
+                <h4 id="sec-h4-2">.github/skills/配下のSKILL.md</h4>
+                <p>
+                  社内ツールやコーディング標準に関する文脈をレビュー時に注入。レビュー用途であることが伝わるよう、ディレクトリ名は
+                  <code>code-review</code> のようにレビュー指向の名前にすることが推奨されています
+                  <sup className="cite">
+                    <a href="#ref-12">[12]</a>
+                  </sup>
+                  。
+                </p>
+              </div>
+              <div className="card">
+                <span className="tag">MCPサーバー</span>
+                <h4 id="sec-h4-3">読み取り専用の外部連携</h4>
+                <p>
+                  課題管理・ドキュメント・サービスカタログ等の情報をレビューに取り込む。GitHub
+                  MCPサーバーとPlaywright
+                  MCPサーバーはデフォルトで有効。全ツール呼び出しは読み取り専用に制限
+                  <sup className="cite">
+                    <a href="#ref-9">[9]</a>
+                  </sup>
+                  <sup className="cite">
+                    <a href="#ref-12">[12]</a>
+                  </sup>
+                  。
+                </p>
+              </div>
+              <div className="card">
+                <span className="tag">可視化</span>
+                <h4 id="sec-h4-4">アトリビューション表示</h4>
+                <p>
+                  Agent
+                  SkillsやMCPの文脈を使って生成されたコメントには利用元が明示され、セッションログからどのツールが呼ばれたか確認できます
+                  <sup className="cite">
+                    <a href="#ref-9">[9]</a>
+                  </sup>
+                  <sup className="cite">
+                    <a href="#ref-12">[12]</a>
+                  </sup>
+                  。
+                </p>
+              </div>
+            </div>
+
+            <p>
+              PR本文に課題番号やインシデントIDなどMCP経由で参照できる識別子を明記すると、Copilotがその文脈をより積極的に利用する傾向があります
+              <sup className="cite">
+                <a href="#ref-12">[12]</a>
+              </sup>
+              。対応言語の壁を越えたい場合、Web検索ツールを備えたMCPサーバーやPlaywright経由で最新のセキュリティ勧告・イディオムを調べさせる
+              <code>.agent.md</code>
+              レビュアーを自作し、根拠となる情報源を引用させるという応用例も紹介されています
+              <sup className="cite">
+                <a href="#ref-18">[18]</a>
+              </sup>
+              。
+            </p>
+          </section>
+
+          {/* ============ Step 4 ============ */}
+          <section className="section prose" id="step4">
+            <span className="step-badge">STEP 4</span>
+            <h2 id="step4">レビューコメントを運用する</h2>
+
+            <h3 id="sec-h3-7">コメントの構造</h3>
+            <p>
+              Copilotのレビューコメントは通常、問題点の説明・重大度・(可能な場合は)ワンクリックで適用できる修正提案という構成になっています
+              <sup className="cite">
+                <a href="#ref-6">[6]</a>
+              </sup>
+              。2026年5月には、似た指摘をまとめてグループ化する機能と、severity(重大度)ラベルがコメントの右上に表示される機能が追加され、大規模PRでもどこから対応すべきか判断しやすくなりました
+              <sup className="cite">
+                <a href="#ref-7">[7]</a>
+              </sup>
+              。
+            </p>
+
+            <div className="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Severity</th>
+                    <th>目安</th>
+                    <th>推奨対応</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <span className="badge high">High</span>
+                    </td>
+                    <td>
+                      バグ・セキュリティ上の懸念など、放置するとインシデントにつながりうる指摘
+                    </td>
+                    <td>マージ前に必ず精査し、対応または明示的な却下理由を残す</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <span className="badge medium">Medium</span>
+                    </td>
+                    <td>保守性・パフォーマンスなど、後々の負債になりうる指摘</td>
+                    <td>可能な範囲で対応し、対応しない場合はコメントで理由を残す</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <span className="badge low">Low</span>
+                    </td>
+                    <td>スタイルや軽微な改善提案</td>
+                    <td>チームの余力に応じて対応。無理に全件消化しようとしない</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <h3 id="sec-h3-8">コメントへの対応フロー</h3>
+            <div className="diagram">
+              <div className="mermaid-wrapper">
+                <MermaidDiagram chart={MERMAID_3} theme="base" themeVariables={THEME_VARIABLES} />
+              </div>
+              <p className="diagram-caption">図3. レビューコメントへの標準的な対応フロー</p>
+            </div>
+
+            <p>
+              Copilotの提案は1件ずつ、あるいは複数まとめて1つのコミットとして適用できます。自分で修正するのではなく、提案の実装ごとCopilot
+              cloud agentに任せることも可能です
+              <sup className="cite">
+                <a href="#ref-6">[6]</a>
+              </sup>
+              。Copilotのレビューコメントは人間のレビューコメントと同様に、リアクションを付けたり返信したり、Resolve/Hideしたりできますが、Copilotへの返信コメントはCopilot自身には見えず、Copilotから返信が来ることもない点は覚えておく必要があります
+              <sup className="cite">
+                <a href="#ref-2">[2]</a>
+              </sup>
+              。
+            </p>
+          </section>
+
+          {/* ============ Step 5 ============ */}
+          <section className="section prose" id="step5">
+            <span className="step-badge">STEP 5</span>
+            <h2 id="step5">限界を理解し、人間レビューと組み合わせる</h2>
+            <p>
+              GitHub自身の「Responsible use」ドキュメントは、Copilot Code
+              Reviewの既知の弱点として、見逃し(false negative)・誤検知(false
+              positive)・不正確な修正提案・学習データに起因するバイアスを明記しており、セキュリティ上のすべての問題を検出できるわけではなく、脆弱性を含むコードを提案する可能性もあるため過信すべきではないとしています
+              <sup className="cite">
+                <a href="#ref-7">[7]</a>
+              </sup>
+              。
+            </p>
+
+            <div className="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>限界</th>
+                    <th>内容</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>誤検知(false positive)</td>
+                    <td>
+                      実務者の報告では、Copilotのレビューコメントのうちおおよそ15〜25%が誤りか、的外れか、曖昧すぎて役に立たないケースだとされています
+                      <sup className="cite">
+                        <a href="#ref-17">[17]</a>
+                      </sup>
+                      。
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>見逃し(false negative)</td>
+                    <td>
+                      権限昇格や設計レベルのセキュリティ上の欠陥など、ファイルをまたぐ文脈が必要な問題を見逃す傾向が指摘されています
+                      <sup className="cite">
+                        <a href="#ref-18">[18]</a>
+                      </sup>
+                      。
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>対応言語</td>
+                    <td>
+                      公式にサポートされる出力言語は英語のみです
+                      <sup className="cite">
+                        <a href="#ref-7">[7]</a>
+                      </sup>
+                      。日本語での応答は copilot-instructions.md
+                      等で明示的に指示できますが、公式サポート対象外である点に注意してください。
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>学習しない</td>
+                    <td>
+                      特定のレビューコメントを繰り返し却下しても、Copilotがその傾向を学習して次回から抑制することはありません。同種の指摘を出し続ける前提でチーム運用を設計する必要があります
+                      <sup className="cite">
+                        <a href="#ref-17">[17]</a>
+                      </sup>
+                      。
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>静的解析のみ</td>
+                    <td>
+                      コードを実際に実行したりテストを走らせたりはしないため、実行時にしか顕在化しない問題は検出対象外です
+                      <sup className="cite">
+                        <a href="#ref-1">[1]</a>
+                      </sup>
+                      。
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>マージをブロックしない</td>
+                    <td>
+                      「Comment」レビューのみのため、必須承認としてカウントされず、マージの可否は人間の判断に委ねられます
+                      <sup className="cite">
+                        <a href="#ref-2">[2]</a>
+                      </sup>
+                      。
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <p>
+              ある分析記事によれば、Copilot Code
+              Reviewが実際にフィードバックを返すのはPRレビューの約71%で、フィードバックがある場合の平均コメント数はおよそ5.1件、残り約29%では「特に指摘なし」として静かに終わるとされています。指摘があれば何でも出す方針ではなく、価値がないと判断すればコメントしない設計は、開発者がコメントを読み続けてくれるための工夫だと分析されています
+              <sup className="cite">
+                <a href="#ref-23">[23]</a>
+              </sup>
+              。
+            </p>
+
+            <h3 id="sec-h3-9">チーム運用上の推奨事項</h3>
+            <ul>
+              <li>
+                <strong>却下してよい文化をつくる:</strong>
+                誤検知が一定割合発生する前提に立ち、「Copilotのコメントを却下するのは普通のこと」という規範をチームで共有します
+                <sup className="cite">
+                  <a href="#ref-17">[17]</a>
+                </sup>
+                。
+              </li>
+              <li>
+                <strong>PRは小さく保つ:</strong>
+                2,000行規模のPRをレビューで救ってくれることは期待せず、人間にとってもAIにとっても妥当な粒度までPRを分割することが、そもそもの前提として推奨されています
+                <sup className="cite">
+                  <a href="#ref-22">[22]</a>
+                </sup>
+                。
+              </li>
+              <li>
+                <strong>必須要件はLinter/静的解析で担保する:</strong>
+                セキュリティ上絶対に守らせたいルールは、Copilotへの指示だけでなく決定的なツール(SAST、Linter、Secret
+                Scanning等)でも二重に担保します
+                <sup className="cite">
+                  <a href="#ref-17">[17]</a>
+                </sup>
+                <sup className="cite">
+                  <a href="#ref-19">[19]</a>
+                </sup>
+                。
+              </li>
+              <li>
+                <strong>人間レビューを省略しない:</strong>
+                Copilotのレビューは「一次スクリーニング」であり、最終承認・アーキテクチャ判断・ドメイン知識が必要な判断は引き続き人間が担います
+                <sup className="cite">
+                  <a href="#ref-3">[3]</a>
+                </sup>
+                <sup className="cite">
+                  <a href="#ref-19">[19]</a>
+                </sup>
+                。
+              </li>
+            </ul>
+          </section>
+
+          {/* ============ Step 6 ============ */}
+          <section className="section prose" id="step6">
+            <span className="step-badge">STEP 6</span>
+            <h2 id="step6">セキュリティとガバナンスを固める</h2>
+
+            <h3 id="sec-h3-10">Content Exclusion(コンテンツ除外)の適用範囲を正しく理解する</h3>
+            <p>
+              リポジトリ管理者はContent
+              Exclusion機能を使って、機密ファイル(認証情報、課金データ、独自アルゴリズム等)をCopilotの補完・Chat・Code
+              Reviewの対象から除外できます。除外されたファイルはCopilot Code
+              Reviewでもレビュー対象になりません
+              <sup className="cite">
+                <a href="#ref-8">[8]</a>
+              </sup>
+              <sup className="cite">
+                <a href="#ref-58">[58]</a>
+              </sup>
+              。
+            </p>
+
+            <div className="callout warn">
+              <strong>重要な注意点:</strong>
+              GitHub公式ドキュメントおよびGitHub社員による解説記事の双方が指摘しているとおり、Content
+              ExclusionはCopilot CLI、Copilot cloud agent、およびIDEのAgentモードには適用されません
+              <sup className="cite">
+                <a href="#ref-8">[8]</a>
+              </sup>
+              <sup className="cite">
+                <a href="#ref-20">[20]</a>
+              </sup>
+              。これらのエージェント的な機能はツール呼び出しでファイルを直接読み書きできるため、リポジトリレベルの除外設定をすり抜けて除外対象ファイルの内容にアクセスできてしまう可能性があります。Code
+              Reviewだけを使っている分には保護されますが、同じリポジトリでCLIやcloud
+              agentも使っているチームは、この境界を正しく認識しておく必要があります
+              <sup className="cite">
+                <a href="#ref-20">[20]</a>
+              </sup>
+              。
+            </div>
+
+            <h3 id="sec-h3-11">Copilot Code Review自体のセキュリティ制御</h3>
+            <div className="diagram">
+              <div className="mermaid-wrapper">
+                <MermaidDiagram chart={MERMAID_4} theme="base" themeVariables={THEME_VARIABLES} />
+              </div>
+              <p className="diagram-caption">図4. Copilot Code Reviewにおける多層防御</p>
+            </div>
+
+            <ul>
+              <li>
+                <strong>Firewall:</strong> 2026年7月17日のアップデートで、Copilot Code
+                Review用のネットワークアクセス制御(Firewall)がCopilot cloud
+                agentとは独立して設定できるようになりました。デフォルトで全リポジトリに対して有効です。セルフホストランナーでは現時点でFirewallがサポートされていない点に注意してください
+                <sup className="cite">
+                  <a href="#ref-10">[10]</a>
+                </sup>
+                。
+              </li>
+              <li>
+                <strong>MCP read-only制約:</strong> 前述のとおり、Code
+                ReviewからのMCPツール呼び出しは読み取り専用に限定されています
+                <sup className="cite">
+                  <a href="#ref-9">[9]</a>
+                </sup>
+                。
+              </li>
+              <li>
+                <strong>CODEOWNERS:</strong>
+                <code>copilot-instructions.md</code>・<code>*.instructions.md</code>・
+                <code>.github/skills/</code>
+                ・MCP設定など、レビューの挙動を左右する設定ファイル自体を誰が変更できるかも重要なガバナンス項目です。これらのパスにCODEOWNERSを設定し、変更に承認を必須にすることを推奨します(GitHub社員のブログで紹介されているエージェント一般向けの多層防御の考え方を、Code
+                Review用の設定ファイル保護にも応用したものです)
+                <sup className="cite">
+                  <a href="#ref-20">[20]</a>
+                </sup>
+                。
+              </li>
+              <li>
+                <strong>カスタム実行環境:</strong>
+                <code>.github/workflows/copilot-code-review.yml</code>
+                を使うと、依存関係のインストールやツールのセットアップなど、Copilot Code
+                Reviewの実行環境自体をリポジトリ単位で設定できます。ランナーの種類も組織のCopilot設定から独立して構成可能です
+                <sup className="cite">
+                  <a href="#ref-10">[10]</a>
+                </sup>
+                <sup className="cite">
+                  <a href="#ref-9">[9]</a>
+                </sup>
+                。
+              </li>
+            </ul>
+
+            <h3 id="sec-h3-12">エンタープライズでの一括ガバナンス</h3>
+            <p>
+              Enterprise管理者は「AI controls」からCopilot Code
+              Reviewを機能単位で有効/無効化でき、自動レビューを組織横断で強制することも、各組織の裁量に委ねることもできます。標準を一貫させたい場合は自動レビューポリシーを有効にしますが、Push毎・ドラフト時のレビューを増やすほど開発者に届く通知も増える点はトレードオフとして意識してください
+              <sup className="cite">
+                <a href="#ref-6">[6]</a>
+              </sup>
+              。
+            </p>
+          </section>
+
+          {/* ============ Comparison ============ */}
+          <section className="section prose" id="comparison">
+            <h2 id="comparison">他のAIコードレビューツールとの位置づけ</h2>
+            <p>
+              Copilot Code
+              Reviewは「GitHubエコシステムに完全統合されたゼロフリクションな選択肢」として評価される一方、専業のAIコードレビューツールと比較すると精度や機能面で見劣りするという評価も複数の比較記事で共通しています。
+            </p>
+
+            <div className="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>観点</th>
+                    <th>GitHub Copilot Code Review</th>
+                    <th>専業レビューツール(CodeRabbit等)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>導入のしやすさ</td>
+                    <td>
+                      Copilotを契約していればレビュー機能も含まれており追加費用なしで開始可能
+                      <sup className="cite">
+                        <a href="#ref-21">[21]</a>
+                      </sup>
+                    </td>
+                    <td>別途契約・別料金が必要</td>
+                  </tr>
+                  <tr>
+                    <td>対応プラットフォーム</td>
+                    <td>
+                      GitHubのみ
+                      <sup className="cite">
+                        <a href="#ref-21">[21]</a>
+                      </sup>
+                    </td>
+                    <td>
+                      GitLab・Bitbucket・Azure DevOps等、複数プラットフォームに対応する製品もある
+                      <sup className="cite">
+                        <a href="#ref-21">[21]</a>
+                      </sup>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>精度傾向</td>
+                    <td>
+                      ある独立ベンチマークでは適合率(precision)がやや高く、再現率(recall)は低めと報告(検出は少ないが誤りも少ない)
+                      <sup className="cite">
+                        <a href="#ref-21">[21]</a>
+                      </sup>
+                    </td>
+                    <td>
+                      同ベンチマークでは再現率が高めで、より多くの問題を検出する一方、誤検知もやや増える傾向
+                      <sup className="cite">
+                        <a href="#ref-21">[21]</a>
+                      </sup>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>カスタマイズ性</td>
+                    <td>copilot-instructions.md 等による指示のカスタマイズが可能</td>
+                    <td>
+                      学習型のフィルタリングなど、より高度なノイズ抑制機構を持つ製品もある
+                      <sup className="cite">
+                        <a href="#ref-24">[24]</a>
+                      </sup>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <p>
+              2026年2月には、DeepMind・Anthropic・Metaの研究者が設立した研究機関Martianが、レビューツールを販売する立場にない独立機関として初めてAIコードレビューエージェントのベンチマークを公開し、ベンダー自身が「自社が勝つベンチマーク」を発表し合う状況に一石を投じたと報じられています
+              <sup className="cite">
+                <a href="#ref-21">[21]</a>
+              </sup>
+              。
+            </p>
+
+            <div className="callout">
+              <strong>実務上の指針:</strong>
+              すでにGitHubとCopilotのエコシステムにいるチームは、まずCopilot Code
+              Reviewを標準の一次レビューとして導入し、自分たちのコードベースで十分な検出力があるかを評価したうえで、ギャップが許容できない場合に専業ツールを追加するという段階的なアプローチが多くの比較記事で共通して推奨されています
+              <sup className="cite">
+                <a href="#ref-1">[1]</a>
+              </sup>
+              <sup className="cite">
+                <a href="#ref-21">[21]</a>
+              </sup>
+              。
+            </div>
+          </section>
+
+          {/* ============ Roadmap ============ */}
+          <section className="section prose" id="roadmap">
+            <h2 id="roadmap">チーム導入ロードマップ</h2>
+
+            <div className="diagram">
+              <div className="mermaid-wrapper">
+                <MermaidDiagram chart={MERMAID_5} theme="base" themeVariables={THEME_VARIABLES} />
+              </div>
+              <p className="diagram-caption">図5. 段階的な導入ロードマップ</p>
+            </div>
+
+            <div className="grid">
+              <div className="card">
+                <span className="tag">Phase 1</span>
+                <h4 id="sec-h4-5">個人トライアル</h4>
+                <p>
+                  数名の開発者が手動でレビューをリクエストし、指摘の質・自分たちのコードベースとの相性を確認します。
+                </p>
+              </div>
+              <div className="card">
+                <span className="tag">Phase 2</span>
+                <h4 id="sec-h4-6">リポジトリ導入</h4>
+                <p>
+                  <code>copilot-instructions.md</code>
+                  を最小構成で用意し、PR作成時のみの自動レビューを有効化します。過剰な指示を書かず、実際のレビュー結果を見ながら反復的に育てます
+                  <sup className="cite">
+                    <a href="#ref-3">[3]</a>
+                  </sup>
+                  。
+                </p>
+              </div>
+              <div className="card">
+                <span className="tag">Phase 3</span>
+                <h4 id="sec-h4-7">組織展開</h4>
+                <p>
+                  複数リポジトリに展開する段階で、Agent SkillsやMCPサーバー、Firewall・Content
+                  Exclusion・CODEOWNERSといったガバナンス設定を標準化します。
+                </p>
+              </div>
+              <div className="card">
+                <span className="tag">Phase 4</span>
+                <h4 id="sec-h4-8">計測と改善</h4>
+                <p>
+                  コメントの採用率・却下率、レビューにかかる時間、誤検知の傾向などを定期的にモニタリングし、指示ファイルを継続的にチューニングします
+                  <sup className="cite">
+                    <a href="#ref-3">[3]</a>
+                  </sup>
+                  <sup className="cite">
+                    <a href="#ref-19">[19]</a>
+                  </sup>
+                  。
+                </p>
+              </div>
+            </div>
+          </section>
+
+          {/* ============ Checklist ============ */}
+          <section className="section prose" id="checklist">
+            <div className="checklist-header">
+              <h2 id="checklist">納品前・運用開始前チェックリスト</h2>
+              <div className="checklist-controls">
+                <span className="checklist-progress" id="checklistProgress">
+                  0 / 12 完了
+                </span>
+                <button type="button" className="checklist-reset" id="checklistReset">
+                  リセット
+                </button>
+              </div>
+            </div>
+            <p className="checklist-hint">
+              チェック状態はこのブラウザに自動保存されます(他の人には共有されません)。
+            </p>
+            <ul className="checklist" id="checklistList">
+              <li className="check-item">
+                <label>
+                  <span className="check-box-wrap">
+                    <input type="checkbox" className="check-input" data-key="chk-01" />
+                    <span className="check-box" aria-hidden="true"></span>
+                  </span>
+                  <span className="check-text">
+                    <code>copilot-instructions.md</code>
+                    はリポジトリ全体の規約に絞り、言語・パス固有のルールは
+                    <code>*.instructions.md</code>へ分離した
+                  </span>
+                </label>
+              </li>
+              <li className="check-item">
+                <label>
+                  <span className="check-box-wrap">
+                    <input type="checkbox" className="check-input" data-key="chk-02" />
+                    <span className="check-box" aria-hidden="true"></span>
+                  </span>
+                  <span className="check-text">
+                    各指示ファイルはおよそ1,000行以内に収まっている
+                  </span>
+                </label>
+              </li>
+              <li className="check-item">
+                <label>
+                  <span className="check-box-wrap">
+                    <input type="checkbox" className="check-input" data-key="chk-03" />
+                    <span className="check-box" aria-hidden="true"></span>
+                  </span>
+                  <span className="check-text">
+                    レビュー専用のAgent Skillには<code>code-review</code>
+                    のようなレビュー用途とわかる名前を付けた
+                  </span>
+                </label>
+              </li>
+              <li className="check-item">
+                <label>
+                  <span className="check-box-wrap">
+                    <input type="checkbox" className="check-input" data-key="chk-04" />
+                    <span className="check-box" aria-hidden="true"></span>
+                  </span>
+                  <span className="check-text">
+                    MCPサーバー連携が必要な場合、「Allow Copilot to use MCP tools when reviewing
+                    pull requests」の設定を確認した
+                  </span>
+                </label>
+              </li>
+              <li className="check-item">
+                <label>
+                  <span className="check-box-wrap">
+                    <input type="checkbox" className="check-input" data-key="chk-05" />
+                    <span className="check-box" aria-hidden="true"></span>
+                  </span>
+                  <span className="check-text">
+                    自動レビューの範囲(個人/リポジトリ/組織)と、Push毎・ドラフト時レビューの要否を決定した
+                  </span>
+                </label>
+              </li>
+              <li className="check-item">
+                <label>
+                  <span className="check-box-wrap">
+                    <input type="checkbox" className="check-input" data-key="chk-06" />
+                    <span className="check-box" aria-hidden="true"></span>
+                  </span>
+                  <span className="check-text">
+                    機密ファイルにContent Exclusionを設定し、かつそれがCLI/cloud
+                    agent/Agentモードには適用されないことをチームに周知した
+                  </span>
+                </label>
+              </li>
+              <li className="check-item">
+                <label>
+                  <span className="check-box-wrap">
+                    <input type="checkbox" className="check-input" data-key="chk-07" />
+                    <span className="check-box" aria-hidden="true"></span>
+                  </span>
+                  <span className="check-text">
+                    Firewall(ネットワークアクセス制御)が意図した設定になっていることを確認した
+                  </span>
+                </label>
+              </li>
+              <li className="check-item">
+                <label>
+                  <span className="check-box-wrap">
+                    <input type="checkbox" className="check-input" data-key="chk-08" />
+                    <span className="check-box" aria-hidden="true"></span>
+                  </span>
+                  <span className="check-text">
+                    <code>copilot-instructions.md</code>・<code>.github/skills/</code>
+                    ・MCP設定にCODEOWNERSを設定し、無断変更を防いだ
+                  </span>
+                </label>
+              </li>
+              <li className="check-item">
+                <label>
+                  <span className="check-box-wrap">
+                    <input type="checkbox" className="check-input" data-key="chk-09" />
+                    <span className="check-box" aria-hidden="true"></span>
+                  </span>
+                  <span className="check-text">
+                    「Copilotのコメントを却下してよい」というチーム規範を共有した
+                  </span>
+                </label>
+              </li>
+              <li className="check-item">
+                <label>
+                  <span className="check-box-wrap">
+                    <input type="checkbox" className="check-input" data-key="chk-10" />
+                    <span className="check-box" aria-hidden="true"></span>
+                  </span>
+                  <span className="check-text">
+                    セキュリティ上の必須要件はLinter/SAST等の決定的なツールでも別途担保した
+                  </span>
+                </label>
+              </li>
+              <li className="check-item">
+                <label>
+                  <span className="check-box-wrap">
+                    <input type="checkbox" className="check-input" data-key="chk-11" />
+                    <span className="check-box" aria-hidden="true"></span>
+                  </span>
+                  <span className="check-text">
+                    Copilotのレビューは「Comment」のみでマージをブロックしないことをチームに周知した
+                  </span>
+                </label>
+              </li>
+              <li className="check-item">
+                <label>
+                  <span className="check-box-wrap">
+                    <input type="checkbox" className="check-input" data-key="chk-12" />
+                    <span className="check-box" aria-hidden="true"></span>
+                  </span>
+                  <span className="check-text">
+                    導入後の効果測定(採用率・却下率・レビュー時間)の方法を決めた
+                  </span>
+                </label>
+              </li>
+            </ul>
+          </section>
+
+          {/* ============ Summary ============ */}
+          <section className="section prose" id="summary">
+            <h2 id="summary">まとめ</h2>
+            <p>
+              GitHub Copilot Code
+              Reviewは、GitHubのPRワークフローに深く統合された「一次レビュアー」として、明白なミスの早期発見や人間レビュアーの負荷軽減に貢献するツールです。ただし、誤検知や見逃しが一定割合存在すること、学習しないこと、静的解析にとどまることなど、既知の限界を理解したうえで、カスタムインストラクション・Agent
+              Skills・MCP・セキュリティ設定を丁寧に設計し、人間レビューと役割分担することが、実務で成果を出すための鍵になります。
+            </p>
+          </section>
+
+          {/* ============ References ============ */}
+          <section className="section prose" id="references">
+            <h2 id="references">参考文献・出典</h2>
+
+            <div className="ref-group">
+              <div className="ref-group-head">
+                <h3 id="sec-h3-13">公式ドキュメント(GitHub Docs)</h3>
+                <span className="ref-group-count">9件</span>
+              </div>
+              <div className="ref-grid">
+                <a
+                  href="https://docs.github.com/en/copilot/get-started/best-practices"
+                  className="ref-card"
+                  id="ref-1"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <span className="ref-card-index">01</span>
+                  <span className="ref-card-body">
+                    <span className="ref-card-title">Best practices for using GitHub Copilot</span>
+                    <span className="ref-card-url">
+                      docs.github.com/en/copilot/get-started/best-practices
+                      <span className="go">↗</span>
+                    </span>
+                  </span>
+                </a>
+                <a
+                  href="https://docs.github.com/copilot/using-github-copilot/code-review/using-copilot-code-review"
+                  className="ref-card"
+                  id="ref-2"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <span className="ref-card-index">02</span>
+                  <span className="ref-card-body">
+                    <span className="ref-card-title">Using GitHub Copilot code review</span>
+                    <span className="ref-card-url">
+                      docs.github.com/copilot/using-github-copilot/code-review/using-copilot-code-review
+                      <span className="go">↗</span>
+                    </span>
+                  </span>
+                </a>
+                <a
+                  href="https://docs.github.com/en/copilot/tutorials/customize-code-review"
+                  className="ref-card"
+                  id="ref-3"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <span className="ref-card-index">03</span>
+                  <span className="ref-card-body">
+                    <span className="ref-card-title">
+                      Using custom instructions to unlock the power of Copilot code review
+                    </span>
+                    <span className="ref-card-url">
+                      docs.github.com/en/copilot/tutorials/customize-code-review
+                      <span className="go">↗</span>
+                    </span>
+                  </span>
+                </a>
+                <a
+                  href="https://docs.github.com/en/copilot/how-tos/copilot-on-github/set-up-copilot/configure-automatic-review"
+                  className="ref-card"
+                  id="ref-5"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <span className="ref-card-index">05</span>
+                  <span className="ref-card-body">
+                    <span className="ref-card-title">
+                      Configuring automatic code review by GitHub Copilot
+                    </span>
+                    <span className="ref-card-url">
+                      docs.github.com/en/copilot/how-tos/copilot-on-github/set-up-copilot/configure-automatic-review
+                      <span className="go">↗</span>
+                    </span>
+                  </span>
+                </a>
+                <a
+                  href="https://docs.github.com/en/copilot/how-tos/administer-copilot/manage-for-enterprise/manage-agents/enable-copilot-code-review"
+                  className="ref-card"
+                  id="ref-6"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <span className="ref-card-index">06</span>
+                  <span className="ref-card-body">
+                    <span className="ref-card-title">
+                      Enabling GitHub Copilot code review in your enterprise
+                    </span>
+                    <span className="ref-card-url">
+                      docs.github.com/en/copilot/how-tos/administer-copilot/manage-for-enterprise/manage-agents/enable-copilot-code-review
+                      <span className="go">↗</span>
+                    </span>
+                  </span>
+                </a>
+                <a
+                  href="https://docs.github.com/copilot/responsible-use-of-github-copilot-features/responsible-use-of-github-copilot-code-review"
+                  className="ref-card"
+                  id="ref-7"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <span className="ref-card-index">07</span>
+                  <span className="ref-card-body">
+                    <span className="ref-card-title">
+                      Responsible use of GitHub Copilot code review
+                    </span>
+                    <span className="ref-card-url">
+                      docs.github.com/copilot/responsible-use-of-github-copilot-features/responsible-use-of-github-copilot-code-review
+                      <span className="go">↗</span>
+                    </span>
+                  </span>
+                </a>
+                <a
+                  href="https://docs.github.com/en/copilot/how-tos/configure-content-exclusion/exclude-content-from-copilot"
+                  className="ref-card"
+                  id="ref-8"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <span className="ref-card-index">08</span>
+                  <span className="ref-card-body">
+                    <span className="ref-card-title">Excluding content from GitHub Copilot</span>
+                    <span className="ref-card-url">
+                      docs.github.com/en/copilot/how-tos/configure-content-exclusion/exclude-content-from-copilot
+                      <span className="go">↗</span>
+                    </span>
+                  </span>
+                </a>
+                <a
+                  href="https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/add-custom-instructions"
+                  className="ref-card"
+                  id="ref-31"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <span className="ref-card-index">31</span>
+                  <span className="ref-card-body">
+                    <span className="ref-card-title">
+                      Adding custom instructions for GitHub Copilot CLI(excludeAgent)
+                    </span>
+                    <span className="ref-card-url">
+                      docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/add-custom-instructions
+                      <span className="go">↗</span>
+                    </span>
+                  </span>
+                </a>
+                <a
+                  href="https://docs.github.com/zh/enterprise-cloud@latest/copilot/managing-copilot/managing-github-copilot-in-your-organization/managing-github-copilot-features-in-your-organization/testing-changes-to-content-exclusions-in-your-ide"
+                  className="ref-card"
+                  id="ref-58"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <span className="ref-card-index">58</span>
+                  <span className="ref-card-body">
+                    <span className="ref-card-title">
+                      About content exclusion for Copilot(コードレビューへの適用範囲)
+                    </span>
+                    <span className="ref-card-url">
+                      docs.github.com/.../testing-changes-to-content-exclusions-in-your-ide
+                      <span className="go">↗</span>
+                    </span>
+                  </span>
+                </a>
+              </div>
+            </div>
+
+            <div className="ref-group">
+              <div className="ref-group-head">
+                <h3 id="sec-h3-14">公式ブログ・Changelog(GitHub Blog)</h3>
+                <span className="ref-group-count">8件</span>
+              </div>
+              <div className="ref-grid">
+                <a
+                  href="https://github.blog/changelog/2026-07-29-copilot-code-review-agent-skills-and-mcp-now-generally-available/"
+                  className="ref-card"
+                  id="ref-9"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <span className="ref-card-index">09</span>
+                  <span className="ref-card-body">
+                    <span className="ref-card-title">
+                      Copilot code review: Agent skills and MCP now generally available
+                    </span>
+                    <span className="ref-card-date">2026年7月29日</span>
+                    <span className="ref-card-url">
+                      github.blog/changelog/.../agent-skills-and-mcp-now-generally-available
+                      <span className="go">↗</span>
+                    </span>
+                  </span>
+                </a>
+                <a
+                  href="https://github.blog/changelog/2026-07-17-copilot-code-review-customization-and-configurability-improvements/"
+                  className="ref-card"
+                  id="ref-10"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <span className="ref-card-index">10</span>
+                  <span className="ref-card-body">
+                    <span className="ref-card-title">
+                      Copilot code review: Customization and configurability improvements
+                    </span>
+                    <span className="ref-card-date">2026年7月17日</span>
+                    <span className="ref-card-url">
+                      github.blog/changelog/.../customization-and-configurability-improvements
+                      <span className="go">↗</span>
+                    </span>
+                  </span>
+                </a>
+                <a
+                  href="https://github.blog/changelog/2026-06-25-copilot-code-review-analysis-depth-and-efficiency-updates/"
+                  className="ref-card"
+                  id="ref-11"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <span className="ref-card-index">11</span>
+                  <span className="ref-card-body">
+                    <span className="ref-card-title">
+                      Copilot code review: Analysis depth and efficiency updates
+                    </span>
+                    <span className="ref-card-date">2026年6月25日</span>
+                    <span className="ref-card-url">
+                      github.blog/changelog/.../analysis-depth-and-efficiency-updates
+                      <span className="go">↗</span>
+                    </span>
+                  </span>
+                </a>
+                <a
+                  href="https://docs.github.com/copilot/using-github-copilot/code-review/using-copilot-code-review"
+                  className="ref-card"
+                  id="ref-12"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <span className="ref-card-index">12</span>
+                  <span className="ref-card-body">
+                    <span className="ref-card-title">
+                      Using GitHub Copilot code review(Agent Skills / MCP設定詳細)
+                    </span>
+                    <span className="ref-card-url">
+                      docs.github.com/copilot/using-github-copilot/code-review/using-copilot-code-review
+                      <span className="go">↗</span>
+                    </span>
+                  </span>
+                </a>
+                <a
+                  href="https://github.blog/changelog/2026-06-12-copilot-code-review-new-configurations-and-controls/"
+                  className="ref-card"
+                  id="ref-13"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <span className="ref-card-index">13</span>
+                  <span className="ref-card-body">
+                    <span className="ref-card-title">
+                      Copilot code review: New configurations and controls
+                    </span>
+                    <span className="ref-card-date">2026年6月12日</span>
+                    <span className="ref-card-url">
+                      github.blog/changelog/.../new-configurations-and-controls
+                      <span className="go">↗</span>
+                    </span>
+                  </span>
+                </a>
+                <a
+                  href="https://www.digitalapplied.com/blog/mcp-adoption-week-copilot-code-review-ga"
+                  className="ref-card"
+                  id="ref-14"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <span className="ref-card-index">14</span>
+                  <span className="ref-card-body">
+                    <span className="ref-card-title">
+                      MCP Adoption Week: Copilot Code Review Goes GA
+                    </span>
+                    <span className="ref-card-date">2026年7月</span>
+                    <span className="ref-card-url">
+                      digitalapplied.com/blog/mcp-adoption-week-copilot-code-review-ga
+                      <span className="go">↗</span>
+                    </span>
+                  </span>
+                </a>
+                <a
+                  href="https://github.blog/changelog/2025-09-03-copilot-code-review-path-scoped-custom-instruction-file-support/"
+                  className="ref-card"
+                  id="ref-15"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <span className="ref-card-index">15</span>
+                  <span className="ref-card-body">
+                    <span className="ref-card-title">
+                      Copilot code review: Path-scoped custom instruction file support
+                    </span>
+                    <span className="ref-card-date">2025年9月3日</span>
+                    <span className="ref-card-url">
+                      github.blog/changelog/.../path-scoped-custom-instruction-file-support
+                      <span className="go">↗</span>
+                    </span>
+                  </span>
+                </a>
+                <a
+                  href="https://github.blog/ai-and-ml/github-copilot/unlocking-the-full-power-of-copilot-code-review-master-your-instructions-files/"
+                  className="ref-card"
+                  id="ref-16"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <span className="ref-card-index">16</span>
+                  <span className="ref-card-body">
+                    <span className="ref-card-title">
+                      Unlocking the full power of Copilot code review: Master your instructions
+                      files
+                    </span>
+                    <span className="ref-card-date">2026年4月17日</span>
+                    <span className="ref-card-url">
+                      github.blog/ai-and-ml/.../master-your-instructions-files
+                      <span className="go">↗</span>
+                    </span>
+                  </span>
+                </a>
+              </div>
+            </div>
+
+            <div className="ref-group">
+              <div className="ref-group-head">
+                <h3 id="sec-h3-15">コミュニティ・実務者による記事</h3>
+                <span className="ref-group-count">9件</span>
+              </div>
+              <p
+                className="prose"
+                style={{
+                  margin: "-0.2rem 0 0.2rem",
+                  color: "var(--text-faint)",
+                  fontSize: "0.85rem",
+                }}
+              >
+                著名/国際的な開発者・実務者による分析記事
+              </p>
+              <div className="ref-grid">
+                <a
+                  href="https://dev.to/rahulxsingh/github-copilot-code-review-complete-guide-2026-255h"
+                  className="ref-card"
+                  id="ref-17"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <span className="ref-card-index">17</span>
+                  <span className="ref-card-body">
+                    <span className="ref-card-title">
+                      Rahul Singh, "GitHub Copilot Code Review: Complete Guide (2026)", DEV
+                      Community
+                    </span>
+                    <span className="ref-card-date">2026年4月2日</span>
+                    <span className="ref-card-url">
+                      dev.to/rahulxsingh/github-copilot-code-review-complete-guide-2026-255h
+                      <span className="go">↗</span>
+                    </span>
+                  </span>
+                </a>
+                <a
+                  href="https://dev.to/pwd9000/mastering-code-reviews-with-github-copilot-the-definitive-guide-3nfp"
+                  className="ref-card"
+                  id="ref-18"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <span className="ref-card-index">18</span>
+                  <span className="ref-card-body">
+                    <span className="ref-card-title">
+                      pwd9000, "Mastering Code Reviews with GitHub Copilot: The Definitive Guide",
+                      DEV Community
+                    </span>
+                    <span className="ref-card-date">2026年5月27日</span>
+                    <span className="ref-card-url">
+                      dev.to/pwd9000/mastering-code-reviews-with-github-copilot-the-definitive-guide-3nfp
+                      <span className="go">↗</span>
+                    </span>
+                  </span>
+                </a>
+                <a
+                  href="https://blog.mrinalmaheshwari.com/github-copilot-code-review-guidelines-best-practices-and-how-to-integrate-it-into-your-pr-b4518073b4c9"
+                  className="ref-card"
+                  id="ref-19"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <span className="ref-card-index">19</span>
+                  <span className="ref-card-body">
+                    <span className="ref-card-title">
+                      Mrinal Maheshwari, "GitHub Copilot Code Review: Guidelines, Best Practices,
+                      and How to Integrate It into Your PR Workflow"
+                    </span>
+                    <span className="ref-card-date">2026年1月12日</span>
+                    <span className="ref-card-url">
+                      blog.mrinalmaheshwari.com/.../how-to-integrate-it-into-your-pr
+                      <span className="go">↗</span>
+                    </span>
+                  </span>
+                </a>
+                <a
+                  href="https://blog.cloud-eng.nl/2026/03/13/copilot-content-exclusions-four-layers/"
+                  className="ref-card"
+                  id="ref-20"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <span className="ref-card-index">20</span>
+                  <span className="ref-card-body">
+                    <span className="ref-card-title">
+                      Anton Sizikov(GitHub社員), "Copilot Content Exclusions: Four Layers of
+                      Defense"
+                    </span>
+                    <span className="ref-card-date">2026年3月13日</span>
+                    <span className="ref-card-url">
+                      blog.cloud-eng.nl/2026/03/13/copilot-content-exclusions-four-layers
+                      <span className="go">↗</span>
+                    </span>
+                  </span>
+                </a>
+                <a
+                  href="https://codeant.ai/blogs/best-ai-code-review-tools"
+                  className="ref-card"
+                  id="ref-21"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <span className="ref-card-index">21</span>
+                  <span className="ref-card-body">
+                    <span className="ref-card-title">
+                      "10 Best AI Code Review Tools in 2026 (Ranked by Independent Benchmark)",
+                      CodeAnt AI
+                    </span>
+                    <span className="ref-card-url">
+                      codeant.ai/blogs/best-ai-code-review-tools<span className="go">↗</span>
+                    </span>
+                  </span>
+                </a>
+                <a
+                  href="https://refacto.ai/blog/github-copilot-code-review-in-2026-what-it-does-well-and-where-it-falls-short/"
+                  className="ref-card"
+                  id="ref-22"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <span className="ref-card-index">22</span>
+                  <span className="ref-card-body">
+                    <span className="ref-card-title">
+                      "GitHub Copilot Code Review in 2026: What It Does and Misses"
+                    </span>
+                    <span className="ref-card-date">2026年4月10日</span>
+                    <span className="ref-card-url">
+                      refacto.ai/blog/.../what-it-does-well-and-where-it-falls-short
+                      <span className="go">↗</span>
+                    </span>
+                  </span>
+                </a>
+                <a
+                  href="https://refacto.ai/blog/github-copilot-code-review-in-2026-what-it-does-well-and-where-it-falls-short/"
+                  className="ref-card"
+                  id="ref-23"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <span className="ref-card-index">23</span>
+                  <span className="ref-card-body">
+                    <span className="ref-card-title">
+                      同上(GitHubのレビュー実施率・平均コメント数に関する分析部分)
+                    </span>
+                    <span className="ref-card-url">
+                      refacto.ai/blog/.../what-it-does-well-and-where-it-falls-short
+                      <span className="go">↗</span>
+                    </span>
+                  </span>
+                </a>
+                <a
+                  href="https://www.morphllm.com/comparisons/coderabbit-vs-copilot"
+                  className="ref-card"
+                  id="ref-24"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <span className="ref-card-index">24</span>
+                  <span className="ref-card-body">
+                    <span className="ref-card-title">
+                      "CodeRabbit vs GitHub Copilot Code Review (2026): Benchmarks, Pricing,
+                      Features"
+                    </span>
+                    <span className="ref-card-date">2026年3月14日</span>
+                    <span className="ref-card-url">
+                      morphllm.com/comparisons/coderabbit-vs-copilot<span className="go">↗</span>
+                    </span>
+                  </span>
+                </a>
+                <a
+                  href="https://simonwillison.net/tags/github-copilot/"
+                  className="ref-card"
+                  id="ref-25"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <span className="ref-card-index">25</span>
+                  <span className="ref-card-body">
+                    <span className="ref-card-title">
+                      Simon Willison, Posts tagged "github-copilot"
+                    </span>
+                    <span className="ref-card-url">
+                      simonwillison.net/tags/github-copilot<span className="go">↗</span>
+                    </span>
+                  </span>
+                </a>
+              </div>
+            </div>
+
+            <div className="callout">
+              <strong>注:</strong>
+              上記のうち14・17・18・19・20・21・22・23・24は第三者(比較サイト・個人ブログ)による分析記事であり、数値や評価は執筆時点のものです。導入判断の際は必ず一次情報である公式ドキュメント(1〜13、16、31、58)と最新の
+              <a
+                href="https://github.blog/changelog/label/copilot/"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                GitHub Changelog
+              </a>
+              を優先して確認してください。
+            </div>
+          </section>
+
+          <footer className="page-footer">
+            <p>
+              本ページはMermaid.js(バージョン固定CDN配信)とhighlight.jsを用いて描画しています。オフライン環境や社内ネットワークでCDNへのアクセスが制限されている場合、図表・シンタックスハイライトが正しく表示されないことがあります。
+            </p>
+          </footer>
+        </main>
       </div>
-
-      <div className={styles.container}>
-        {/* TOC */}
-        <section className={styles.chapter} id="toc">
-          <h3
-            style={{
-              color: "var(--text-secondary)",
-              fontSize: "0.85rem",
-              fontFamily: "var(--font-mono)",
-              marginBottom: "0.9rem",
-            }}
-          >
-            — 目次 —
-          </h3>
-          <div className={styles.tocGrid}>
-            <a href="#ch1" className={styles.tocCard}>
-              <span className={styles.tocIcon}>🔍</span>01 概要・アーキテクチャ
-            </a>
-            <a href="#ch2" className={styles.tocCard}>
-              <span className={styles.tocIcon}>🗺</span>02 可用性・プラン比較
-            </a>
-            <a href="#ch3" className={styles.tocCard}>
-              <span className={styles.tocIcon}>⚙️</span>03 初期セットアップ
-            </a>
-            <a href="#ch4" className={styles.tocCard}>
-              <span className={styles.tocIcon}>▶️</span>04 基本操作（全環境）
-            </a>
-            <a href="#ch5" className={styles.tocCard}>
-              <span className={styles.tocIcon}>📝</span>05 Custom Instructions
-            </a>
-            <a href="#ch6" className={styles.tocCard}>
-              <span className={styles.tocIcon}>🤖</span>06 Agentic 機能
-            </a>
-            <a href="#ch7" className={styles.tocCard}>
-              <span className={styles.tocIcon}>⚡</span>07 自動レビュー設定
-            </a>
-            <a href="#ch8" className={styles.tocCard}>
-              <span className={styles.tocIcon}>💰</span>08 クォータ・課金管理
-            </a>
-            <a href="#ch9" className={styles.tocCard}>
-              <span className={styles.tocIcon}>🏢</span>09 Enterprise 管理
-            </a>
-            <a href="#ch10" className={styles.tocCard}>
-              <span className={styles.tocIcon}>🏆</span>10 ベストプラクティス
-            </a>
-          </div>
-        </section>
-
-        <hr className={styles.divider} />
-
-        {/* CH1 */}
-        <section className={styles.chapter} id="ch1">
-          <div className={styles.chapterHeader}>
-            <span className={styles.chapterNum}>CH-01</span>
-            <h2>概要・アーキテクチャ</h2>
-          </div>
-
-          <h3 className={styles.sectionTitle}>1.1 定義</h3>
-          <p className={styles.paragraph}>
-            <strong>GitHub Copilot Code Review</strong> は、Pull
-            Request（PR）内のコード変更を自動的に解析し、マルチアングルで問題を検出して修正案を提示する
-            AI エージェントです。すべての主要プログラミング言語に対応し、「Comment」レビューとして
-            PR に投稿します。
-          </p>
-
-          <h3 className={styles.sectionTitle}>1.2 なぜ重要か</h3>
-          <p className={styles.paragraph}>
-            コードレビューはソフトウェア品質の要ですが、人間のレビュアーはボトルネックになりがちです。Copilot
-            Code Review
-            は最初の品質フィルタとして機能し、レビュアーが本質的な設計判断に集中できる環境を作ります。
-          </p>
-
-          <div className={styles.metricGrid}>
-            <div className={styles.metricCard}>
-              <span className={styles.metricVal}>&lt;30s</span>
-              <div className={styles.metricLabel}>標準レビュー完了時間</div>
-            </div>
-            <div className={`${styles.metricCard}`}>
-              <span className={`${styles.metricVal} ${styles.cyan}`}>All</span>
-              <div className={styles.metricLabel}>対応言語（言語問わず）</div>
-            </div>
-            <div className={styles.metricCard}>
-              <span className={`${styles.metricVal} ${styles.purple}`}>7+</span>
-              <div className={styles.metricLabel}>対応開発環境</div>
-            </div>
-            <div className={styles.metricCard}>
-              <span className={`${styles.metricVal} ${styles.amber}`}>4KB</span>
-              <div className={styles.metricLabel}>Custom Instructions 最大読み取り</div>
-            </div>
-          </div>
-
-          <h3 className={styles.sectionTitle}>1.3 アーキテクチャ概観</h3>
-
-          <div className={styles.mermaidWrap}>
-            <div style={{ maxWidth: "800px", margin: "0 auto" }}>
-              <MermaidDiagram chart={DIAG_ARCH} />
-            </div>
-          </div>
-
-          <div className={styles.archLayers}>
-            <div className={styles.archLayer}>
-              <span className={styles.archLabel}>Input Layer</span>
-              <span className={styles.archDesc}>
-                PR diff、ファイル差分、コメント、ベースブランチの Custom Instructions
-              </span>
-            </div>
-            <div className={`${styles.archLayer} ${styles.cyan}`}>
-              <span className={styles.archLabel}>Context Layer</span>
-              <span className={styles.archDesc}>
-                Full Project Context Gathering — リポジトリ全体を解析してコード変更の意図を把握
-              </span>
-            </div>
-            <div className={`${styles.archLayer} ${styles.purple}`}>
-              <span className={styles.archLabel}>Reasoning Layer</span>
-              <span className={styles.archDesc}>
-                専用チューニングされたモデル群 — モデル切替不可（品質・一貫性保証のため）
-              </span>
-            </div>
-            <div className={`${styles.archLayer} ${styles.amber}`}>
-              <span className={styles.archLabel}>Output Layer</span>
-              <span className={styles.archDesc}>
-                「Comment」レビュー（Approve/Request Changes ではない）、Suggested Changes
-              </span>
-            </div>
-            <div className={`${styles.archLayer} ${styles.blue}`}>
-              <span className={styles.archLabel}>Agentic Layer</span>
-              <span className={styles.archDesc}>
-                ★ Preview: Cloud Agent 連携による Fix PR 自動生成、Actions runners 使用
-              </span>
-            </div>
-          </div>
-
-          <div className={`${styles.callout} ${styles.info}`}>
-            <strong>📌 重要な設計上の制約</strong>
-            Copilot Code Review は<em>必ず</em>
-            「Comment」レビューを投稿します。「Approve」や「Request
-            Changes」は行いません。そのため、必須承認者数のカウントには含まれず、マージをブロックしません。
-          </div>
-        </section>
-
-        <hr className={styles.divider} />
-
-        {/* CH2 */}
-        <section className={styles.chapter} id="ch2">
-          <div className={styles.chapterHeader}>
-            <span className={`${styles.chapterNum} ${styles.cyan}`}>CH-02</span>
-            <h2>可用性・プラン比較</h2>
-          </div>
-
-          <h3 className={styles.sectionTitle}>2.1 対応プラットフォーム</h3>
-
-          <div className={styles.tableWrap}>
-            <table className={styles.table}>
-              <thead>
-                <tr>
-                  <th className={styles.th}>環境</th>
-                  <th className={styles.th}>対応状況</th>
-                  <th className={styles.th}>備考</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td className={styles.td}>GitHub.com (Web)</td>
-                  <td className={styles.td}>
-                    <span className={`${styles.badge} ${styles.badgeGreen}`}>✓ GA</span>
-                  </td>
-                  <td className={styles.td}>PR の Reviewers メニューから選択</td>
-                </tr>
-                <tr>
-                  <td className={styles.td}>GitHub Mobile</td>
-                  <td className={styles.td}>
-                    <span className={`${styles.badge} ${styles.badgeGreen}`}>✓ GA</span>
-                  </td>
-                  <td className={styles.td}>Reviews セクション → Request Reviews</td>
-                </tr>
-                <tr>
-                  <td className={styles.td}>VS Code</td>
-                  <td className={styles.td}>
-                    <span className={`${styles.badge} ${styles.badgeGreen}`}>✓ GA</span>
-                  </td>
-                  <td className={styles.td}>未コミット変更のローカルレビューも可能</td>
-                </tr>
-                <tr>
-                  <td className={styles.td}>Visual Studio</td>
-                  <td className={styles.td}>
-                    <span className={`${styles.badge} ${styles.badgeGreen}`}>✓ GA</span>
-                  </td>
-                  <td className={styles.td}>v17.14 以降必須。Git Changes ウィンドウから起動</td>
-                </tr>
-                <tr>
-                  <td className={styles.td}>JetBrains IDEs</td>
-                  <td className={styles.td}>
-                    <span className={`${styles.badge} ${styles.badgeGreen}`}>✓ GA</span>
-                  </td>
-                  <td className={styles.td}>Commit ウィンドウ上部の Copilot ボタン</td>
-                </tr>
-                <tr>
-                  <td className={styles.td}>Xcode</td>
-                  <td className={styles.td}>
-                    <span className={`${styles.badge} ${styles.badgeGreen}`}>✓ GA</span>
-                  </td>
-                  <td className={styles.td}>CopilotForXcode v0.41.0+、Staged/Unstaged 選択可</td>
-                </tr>
-                <tr>
-                  <td className={styles.td}>GitHub CLI</td>
-                  <td className={styles.td}>
-                    <span className={`${styles.badge} ${styles.badgeGreen}`}>✓ GA</span>
-                  </td>
-                  <td className={styles.td}>
-                    <code>gh pr create --reviewer @copilot</code>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <h3 className={styles.sectionTitle}>2.2 プラン別機能比較</h3>
-
-          <div className={styles.tableWrap}>
-            <table className={styles.table}>
-              <thead>
-                <tr>
-                  <th className={styles.th}>機能</th>
-                  <th className={styles.th}>Copilot Free</th>
-                  <th className={styles.th}>Copilot Pro</th>
-                  <th className={styles.th}>Copilot Pro+</th>
-                  <th className={styles.th}>Copilot Business</th>
-                  <th className={styles.th}>Copilot Enterprise</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td className={styles.td}>Code Review（基本）</td>
-                  <td className={styles.td}>
-                    <span className={`${styles.badge} ${styles.badgeRed}`}>✗</span>
-                  </td>
-                  <td className={styles.td}>
-                    <span className={`${styles.badge} ${styles.badgeGreen}`}>✓</span>
-                  </td>
-                  <td className={styles.td}>
-                    <span className={`${styles.badge} ${styles.badgeGreen}`}>✓</span>
-                  </td>
-                  <td className={styles.td}>
-                    <span className={`${styles.badge} ${styles.badgeGreen}`}>✓</span>
-                  </td>
-                  <td className={styles.td}>
-                    <span className={`${styles.badge} ${styles.badgeGreen}`}>✓</span>
-                  </td>
-                </tr>
-                <tr>
-                  <td className={styles.td}>Full Project Context</td>
-                  <td className={styles.td}>
-                    <span className={`${styles.badge} ${styles.badgeRed}`}>✗</span>
-                  </td>
-                  <td className={styles.td}>
-                    <span className={`${styles.badge} ${styles.badgeGreen}`}>✓</span>
-                  </td>
-                  <td className={styles.td}>
-                    <span className={`${styles.badge} ${styles.badgeGreen}`}>✓</span>
-                  </td>
-                  <td className={styles.td}>
-                    <span className={`${styles.badge} ${styles.badgeGreen}`}>✓</span>
-                  </td>
-                  <td className={styles.td}>
-                    <span className={`${styles.badge} ${styles.badgeGreen}`}>✓</span>
-                  </td>
-                </tr>
-                <tr>
-                  <td className={styles.td}>Cloud Agent 連携（Fix PR）</td>
-                  <td className={styles.td}>
-                    <span className={`${styles.badge} ${styles.badgeRed}`}>✗</span>
-                  </td>
-                  <td className={styles.td}>
-                    <span className={`${styles.badge} ${styles.badgeAmber}`}>Preview</span>
-                  </td>
-                  <td className={styles.td}>
-                    <span className={`${styles.badge} ${styles.badgeAmber}`}>Preview</span>
-                  </td>
-                  <td className={styles.td}>
-                    <span className={`${styles.badge} ${styles.badgeAmber}`}>Preview</span>
-                  </td>
-                  <td className={styles.td}>
-                    <span className={`${styles.badge} ${styles.badgeAmber}`}>Preview</span>
-                  </td>
-                </tr>
-                <tr>
-                  <td className={styles.td}>自動レビュー（個人設定）</td>
-                  <td className={styles.td}>
-                    <span className={`${styles.badge} ${styles.badgeRed}`}>✗</span>
-                  </td>
-                  <td className={styles.td}>
-                    <span className={`${styles.badge} ${styles.badgeGreen}`}>✓</span>
-                  </td>
-                  <td className={styles.td}>
-                    <span className={`${styles.badge} ${styles.badgeGreen}`}>✓</span>
-                  </td>
-                  <td className={styles.td}>
-                    <span className={`${styles.badge} ${styles.badgeRed}`}>✗</span>
-                  </td>
-                  <td className={styles.td}>
-                    <span className={`${styles.badge} ${styles.badgeRed}`}>✗</span>
-                  </td>
-                </tr>
-                <tr>
-                  <td className={styles.td}>Org/Repo 自動レビュー設定</td>
-                  <td className={styles.td}>
-                    <span className={`${styles.badge} ${styles.badgeRed}`}>✗</span>
-                  </td>
-                  <td className={styles.td}>
-                    <span className={`${styles.badge} ${styles.badgeRed}`}>✗</span>
-                  </td>
-                  <td className={styles.td}>
-                    <span className={`${styles.badge} ${styles.badgeRed}`}>✗</span>
-                  </td>
-                  <td className={styles.td}>
-                    <span className={`${styles.badge} ${styles.badgeGreen}`}>✓</span>
-                  </td>
-                  <td className={styles.td}>
-                    <span className={`${styles.badge} ${styles.badgeGreen}`}>✓</span>
-                  </td>
-                </tr>
-                <tr>
-                  <td className={styles.td}>ライセンスなしユーザー向け提供</td>
-                  <td className={styles.td}>
-                    <span className={`${styles.badge} ${styles.badgeRed}`}>✗</span>
-                  </td>
-                  <td className={styles.td}>
-                    <span className={`${styles.badge} ${styles.badgeRed}`}>✗</span>
-                  </td>
-                  <td className={styles.td}>
-                    <span className={`${styles.badge} ${styles.badgeRed}`}>✗</span>
-                  </td>
-                  <td className={styles.td}>
-                    <span className={`${styles.badge} ${styles.badgeGreen}`}>要有効化</span>
-                  </td>
-                  <td className={styles.td}>
-                    <span className={`${styles.badge} ${styles.badgeGreen}`}>要有効化</span>
-                  </td>
-                </tr>
-                <tr>
-                  <td className={styles.td}>Copilot Memory</td>
-                  <td className={styles.td}>
-                    <span className={`${styles.badge} ${styles.badgeRed}`}>✗</span>
-                  </td>
-                  <td className={styles.td}>
-                    <span className={`${styles.badge} ${styles.badgeAmber}`}>Preview</span>
-                  </td>
-                  <td className={styles.td}>
-                    <span className={`${styles.badge} ${styles.badgeAmber}`}>Preview</span>
-                  </td>
-                  <td className={styles.td}>
-                    <span className={`${styles.badge} ${styles.badgeRed}`}>✗</span>
-                  </td>
-                  <td className={styles.td}>
-                    <span className={`${styles.badge} ${styles.badgeRed}`}>✗</span>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <h3 className={styles.sectionTitle}>2.3 レビュー対象外ファイル</h3>
-          <div className={styles.archLayers}>
-            <div className={`${styles.archLayer} ${styles.red}`}>
-              <span className={styles.archLabel}>除外: 依存管理</span>
-              <span className={styles.archDesc}>
-                package.json、Gemfile.lock、yarn.lock、package-lock.json など
-              </span>
-            </div>
-            <div className={`${styles.archLayer} ${styles.red}`}>
-              <span className={styles.archLabel}>除外: ログファイル</span>
-              <span className={styles.archDesc}>*.log、*.log.* 形式のファイル</span>
-            </div>
-            <div className={`${styles.archLayer} ${styles.red}`}>
-              <span className={styles.archLabel}>除外: SVG ファイル</span>
-              <span className={styles.archDesc}>*.svg — バイナリ的なベクターデータはスキップ</span>
-            </div>
-          </div>
-        </section>
-
-        <hr className={styles.divider} />
-
-        {/* CH3 */}
-        <section className={styles.chapter} id="ch3">
-          <div className={styles.chapterHeader}>
-            <span className={`${styles.chapterNum} ${styles.purple}`}>CH-03</span>
-            <h2>初期セットアップ</h2>
-          </div>
-
-          <h3 className={styles.sectionTitle}>3.1 Organization レベルの有効化フロー</h3>
-
-          <div className={styles.mermaidWrap}>
-            <div style={{ maxWidth: "450px", margin: "0 auto" }}>
-              <MermaidDiagram chart={DIAG_SETUP} />
-            </div>
-          </div>
-
-          <h3 className={styles.sectionTitle}>3.2 ステップバイステップ手順</h3>
-          <ul className={styles.stepList}>
-            <li>
-              <span className={styles.stepNum}>1</span>
-              <div className={styles.stepContent}>
-                <strong>プラン確認</strong>
-                <br />
-                Copilot Pro / Pro+ / Business / Enterprise のいずれかを保有していることを確認。Free
-                プランでは Code Review は利用不可。
-              </div>
-            </li>
-            <li>
-              <span className={styles.stepNum}>2</span>
-              <div className={styles.stepContent}>
-                <strong>Org ポリシー有効化</strong>
-                <br />
-                Organization → Settings → Copilot → Policies → <em>Copilot code review</em> を
-                Enabled に設定。
-              </div>
-            </li>
-            <li>
-              <span className={`${styles.stepNum} ${styles.cyan}`}>3</span>
-              <div className={styles.stepContent}>
-                <strong>Runners の設定（Agentic 機能用）</strong>
-                <br />
-                Full Project Context Gathering は GitHub Actions runners を使用。デフォルトは
-                GitHub-hosted runners。大規模リポジトリでは Larger runners への移行を検討。
-              </div>
-            </li>
-            <li>
-              <span className={`${styles.stepNum} ${styles.cyan}`}>4</span>
-              <div className={styles.stepContent}>
-                <strong>コンテンツ除外の設定</strong>
-                <br />
-                <code>.github/copilot-instructions.md</code>
-                にスキャン対象外パスを記述、または Org 設定の Content exclusion を使用。
-              </div>
-            </li>
-            <li>
-              <span className={`${styles.stepNum} ${styles.purple}`}>5</span>
-              <div className={styles.stepContent}>
-                <strong>Custom Instructions の準備</strong>
-                <br />
-                <code>.github/copilot-instructions.md</code>（リポジトリ全体）または{" "}
-                <code>.github/instructions/{"**/*.instructions.md"}</code>（パス別）を作成。
-              </div>
-            </li>
-          </ul>
-
-          <div className={`${styles.callout} ${styles.warning}`}>
-            <strong>⚠️ 注意: 自動レビューのトリガー条件</strong>
-            自動レビューが有効な場合、GitHub Actions が無効化されている環境や Actions
-            ワークフローが失敗した場合でも <em>基本レビュー</em> は生成されますが、Full Project
-            Context Gathering などの Agentic 機能は動作しません。
-          </div>
-        </section>
-
-        <hr className={styles.divider} />
-
-        {/* CH4 */}
-        <section className={styles.chapter} id="ch4">
-          <div className={styles.chapterHeader}>
-            <span className={`${styles.chapterNum} ${styles.amber}`}>CH-04</span>
-            <h2>基本操作（全環境別）</h2>
-          </div>
-
-          <h3 className={styles.sectionTitle}>4.1 GitHub.com（Web）— 最も標準的な使い方</h3>
-          <ul className={styles.stepList}>
-            <li>
-              <span className={styles.stepNum}>1</span>
-              <div className={styles.stepContent}>PR を作成または既存 PR に移動する</div>
-            </li>
-            <li>
-              <span className={styles.stepNum}>2</span>
-              <div className={styles.stepContent}>
-                右側の <strong>Reviewers</strong> メニューを開き <strong>Copilot</strong> を選択
-              </div>
-            </li>
-            <li>
-              <span className={styles.stepNum}>3</span>
-              <div className={styles.stepContent}>通常 30 秒以内にコメントが投稿される</div>
-            </li>
-            <li>
-              <span className={styles.stepNum}>4</span>
-              <div className={styles.stepContent}>
-                コメントを確認し、必要に応じて Suggested Changes を <em>Apply suggestion</em>{" "}
-                ボタンで適用
-              </div>
-            </li>
-            <li>
-              <span className={`${styles.stepNum} ${styles.cyan}`}>5</span>
-              <div className={styles.stepContent}>
-                フィードバック（👍/👎）で提案品質を評価 — 製品改善に活用される
-              </div>
-            </li>
-          </ul>
-
-          <h3 className={styles.sectionTitle}>4.2 VS Code — ローカルレビューの活用</h3>
-          <p className={styles.paragraph}>
-            VS Code では PR のほかに、<em>未コミット変更のローカルレビュー</em>
-            が可能です。早期フィードバックを得ることでコミット前の品質向上が図れます。
-          </p>
-
-          <div className={styles.compareGrid}>
-            <div className={`${styles.compareCard} ${styles.good}`}>
-              <div className={styles.compareTitle}>
-                ✅ 良い例：コミット前にローカルレビューを使う
-              </div>
-              <p
-                className={styles.paragraph}
-                style={{ fontSize: "0.85rem", color: "var(--text-secondary)" }}
-              >
-                Source Control ビュー → CHANGES 上の 🔍 ボタン →
-                問題をローカルで修正してからコミット
-              </p>
-            </div>
-            <div className={`${styles.compareCard} ${styles.bad}`}>
-              <div className={styles.compareTitle}>
-                ❌ 悪い例：全変更を一括コミットしてからレビュー依頼
-              </div>
-              <p
-                className={styles.paragraph}
-                style={{ fontSize: "0.85rem", color: "var(--text-secondary)" }}
-              >
-                差分が大きいと Copilot のコンテキストが分散し、指摘が表面的になりやすい
-              </p>
-            </div>
-          </div>
-
-          <h3 className={styles.sectionTitle}>4.3 GitHub CLI — CI パイプラインへの組み込み</h3>
-
-          <div className={styles.codeWrap}>
-            <div className={styles.codeBar}>
-              <span>terminal</span>
-              <span className={styles.codeLang}>shell</span>
-              <CodeCopyButton
-                className={styles.codeCopy}
-                text={`# PR 作成と同時に Copilot をレビュアーに追加\ngh pr create --reviewer @copilot\n\n# 既存 PR にレビュー依頼\ngh pr edit PR-NUMBER --add-reviewer @copilot\n\n# 対話的選択（スペースキーで選択）\ngh pr create\n# → Reviewers プロンプトで "Copilot (AI)" を選択`}
-              />
-            </div>
-            <div className={styles.codeBody}>
-              <div className={styles.codeLine}>
-                <span className={styles.cc}># PR 作成と同時に Copilot をレビュアーに追加</span>
-              </div>
-              <div className={styles.codeLine}>
-                <span className={styles.cg}>gh</span> pr create --reviewer @copilot
-              </div>
-              <div className={styles.codeLine} />
-              <div className={styles.codeLine}>
-                <span className={styles.cc}># 既存 PR にレビュー依頼</span>
-              </div>
-              <div className={styles.codeLine}>
-                <span className={styles.cg}>gh</span> pr edit{" "}
-                <span className={styles.cv}>PR-NUMBER</span> --add-reviewer @copilot
-              </div>
-              <div className={styles.codeLine} />
-              <div className={styles.codeLine}>
-                <span className={styles.cc}># 対話的選択（スペースキーで選択）</span>
-              </div>
-              <div className={styles.codeLine}>
-                <span className={styles.cg}>gh</span> pr create
-              </div>
-              <div className={styles.codeLine}>
-                <span className={styles.cc}># → Reviewers プロンプトで "Copilot (AI)" を選択</span>
-              </div>
-            </div>
-          </div>
-
-          <h3 className={styles.sectionTitle}>4.4 JetBrains IDEs</h3>
-          <ul className={styles.stepList}>
-            <li>
-              <span className={styles.stepNum}>1</span>
-              <div className={styles.stepContent}>
-                左側パネルの <strong>Commit</strong> ツールウィンドウを開く
-              </div>
-            </li>
-            <li>
-              <span className={styles.stepNum}>2</span>
-              <div className={styles.stepContent}>
-                コミットメッセージ入力欄の上にある <strong>Copilot: Review Code Changes</strong>
-                （虫眼鏡+スパークルアイコン）をクリック
-              </div>
-            </li>
-            <li>
-              <span className={styles.stepNum}>3</span>
-              <div className={styles.stepContent}>コメントを確認、上下矢印で複数コメントを移動</div>
-            </li>
-            <li>
-              <span className={`${styles.stepNum} ${styles.cyan}`}>4</span>
-              <div className={styles.stepContent}>
-                <strong>Discard</strong> ボタンで不要な提案を却下
-              </div>
-            </li>
-          </ul>
-
-          <h3 className={styles.sectionTitle}>4.5 Xcode</h3>
-          <ul className={styles.stepList}>
-            <li>
-              <span className={styles.stepNum}>1</span>
-              <div className={styles.stepContent}>CopilotForXcode v0.41.0+ をインストール</div>
-            </li>
-            <li>
-              <span className={styles.stepNum}>2</span>
-              <div className={styles.stepContent}>
-                Editor → GitHub Copilot → Open Chat でチャットウィンドウを開く
-              </div>
-            </li>
-            <li>
-              <span className={styles.stepNum}>3</span>
-              <div className={styles.stepContent}>
-                右下の Code Review ボタン（吹き出しアイコン）をクリック
-              </div>
-            </li>
-            <li>
-              <span className={`${styles.stepNum} ${styles.cyan}`}>4</span>
-              <div className={styles.stepContent}>
-                <strong>Review Staged Changes</strong> または{" "}
-                <strong>Review Unstaged Changes</strong> を選択
-              </div>
-            </li>
-            <li>
-              <span className={`${styles.stepNum} ${styles.cyan}`}>5</span>
-              <div className={styles.stepContent}>
-                レビュー対象ファイルをチェックボックスで選択 → Continue
-              </div>
-            </li>
-            <li>
-              <span className={`${styles.stepNum} ${styles.purple}`}>6</span>
-              <div className={styles.stepContent}>Accept / Dismiss でインライン提案を処理</div>
-            </li>
-          </ul>
-
-          <h3 className={styles.sectionTitle}>4.6 再レビューの依頼</h3>
-          <div className={`${styles.callout} ${styles.info}`}>
-            <strong>📌 重要: Copilot は自動で再レビューしない</strong>
-            PR に変更をプッシュしても（「Review new pushes」を有効化していない限り）Copilot
-            は自動で再レビューしません。Reviewers メニューの Copilot
-            横の更新ボタンをクリックして手動で再依頼します。なお、再レビュー時には以前に Resolve
-            済みや 👎 をつけたコメントが再び投稿されることがあります。
-          </div>
-        </section>
-
-        <hr className={styles.divider} />
-
-        {/* CH5 */}
-        <section className={styles.chapter} id="ch5">
-          <div className={styles.chapterHeader}>
-            <span className={`${styles.chapterNum} ${styles.red}`}>CH-05</span>
-            <h2>Custom Instructions による高度カスタマイズ</h2>
-          </div>
-
-          <h3 className={styles.sectionTitle}>5.1 定義と仕組み</h3>
-          <p className={styles.paragraph}>
-            <strong>Custom Instructions</strong>{" "}
-            は、自然言語で記述したレビュー指示をリポジトリに格納することで、Copilot
-            のレビュー観点・スタイル・優先事項を制御する機能です。Copilot は PR
-            のベースブランチにある設定ファイルを参照します。
-          </p>
-
-          <div className={`${styles.callout} ${styles.warning}`}>
-            <strong>⚠️ 制限: 最初の 4,000 文字のみ読み取り</strong>
-            Custom Instructions ファイルの最初の 4,000 文字を超えた部分は Code Review
-            に反映されません（Copilot Chat / Cloud Agent
-            にはこの制限なし）。重要な指示を冒頭に配置してください。
-          </div>
-
-          <h3 className={styles.sectionTitle}>5.2 ファイル構成</h3>
-
-          <div className={styles.archLayers}>
-            <div className={styles.archLayer}>
-              <span className={styles.archLabel}>リポジトリ全体</span>
-              <span className={styles.archDesc}>
-                <code>.github/copilot-instructions.md</code> — 全ファイルに適用
-              </span>
-            </div>
-            <div className={`${styles.archLayer} ${styles.cyan}`}>
-              <span className={styles.archLabel}>パス別指示</span>
-              <span className={styles.archDesc}>
-                <code>.github/instructions/{"**/*.instructions.md"}</code> —
-                特定パスのファイルにのみ適用
-              </span>
-            </div>
-            <div className={`${styles.archLayer} ${styles.purple}`}>
-              <span className={styles.archLabel}>Organization 指示</span>
-              <span className={styles.archDesc}>
-                Org Settings → Copilot で設定（Enterprise / Business のみ）
-              </span>
-            </div>
-          </div>
-
-          <h3 className={styles.sectionTitle}>5.3 実践例：プロダクションレベルの Instructions</h3>
-
-          <div className={styles.compareGrid}>
-            <div className={`${styles.compareCard} ${styles.good}`}>
-              <div className={styles.compareTitle}>✅ 良い例: 具体的・測定可能な指示</div>
-              <div className={styles.codeWrap} style={{ marginTop: "0.6rem" }}>
-                <div className={styles.codeBar}>
-                  <span>.github/copilot-instructions.md</span>
-                  <CodeCopyButton
-                    className={styles.codeCopy}
-                    text={`## Code Review Guidelines\n\n# 言語・スタイル\nReview in Japanese. Focus on security and performance. Flag O(n²) loops in data-processing code.\n\n# セキュリティ\nApply checks in /docs/security.md. Flag any SQL string concatenation.\n\n# 禁止パターン\nReject nested ternary operators. Reject console.log in production.`}
-                  />
-                </div>
-                <div className={styles.codeBody}>
-                  <div className={styles.codeLine}>
-                    <span className={styles.ch}>## Code Review Guidelines</span>
-                  </div>
-                  <div className={styles.codeLine} />
-                  <div className={styles.codeLine}>
-                    <span className={styles.cc}># 言語・スタイル</span>
-                  </div>
-                  <div className={styles.codeLine}>
-                    <span className={styles.cs}>
-                      Review in Japanese. Focus on security and performance. Flag O(n²) loops in
-                      data-processing code.
-                    </span>
-                  </div>
-                  <div className={styles.codeLine} />
-                  <div className={styles.codeLine}>
-                    <span className={styles.cc}># セキュリティ</span>
-                  </div>
-                  <div className={styles.codeLine}>
-                    <span className={styles.cs}>
-                      Apply checks in /docs/security.md. Flag any SQL string concatenation.
-                    </span>
-                  </div>
-                  <div className={styles.codeLine} />
-                  <div className={styles.codeLine}>
-                    <span className={styles.cc}># 禁止パターン</span>
-                  </div>
-                  <div className={styles.codeLine}>
-                    <span className={styles.cs}>
-                      Reject nested ternary operators. Reject console.log in production.
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className={`${styles.compareCard} ${styles.bad}`}>
-              <div className={styles.compareTitle}>❌ 悪い例: 曖昧・過剰な指示</div>
-              <div className={styles.codeWrap} style={{ marginTop: "0.6rem" }}>
-                <div className={styles.codeBar}>
-                  <span>copilot-instructions-bad.md</span>
-                </div>
-                <div className={styles.codeBody}>
-                  <div className={styles.codeLine}>
-                    <span className={styles.cc}># 悪い例</span>
-                  </div>
-                  <div className={styles.codeLine}>
-                    <span className={styles.cs}>
-                      コードをちゃんとレビューしてください。
-                      <br />
-                      いい感じに書かれているか確認して。
-                      <br />
-                      バグがあれば教えてください。
-                      <br />
-                      パフォーマンスも見てください。
-                      <br />
-                      読みやすさも大事です。
-                      <br />
-                      セキュリティも注意してください。
-                    </span>
-                  </div>
-                  <div className={styles.codeLine}>
-                    <span className={styles.cc}># → 4000 文字以内に具体的指示を入れていない</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <h3 className={styles.sectionTitle}>5.4 パス別 Instructions の応用</h3>
-          <div className={styles.codeWrap}>
-            <div className={styles.codeBar}>
-              <span>.github/instructions/api/api.instructions.md</span>
-              <span className={styles.codeLang}>markdown</span>
-              <CodeCopyButton
-                className={styles.codeCopy}
-                text={`---\napplyTo: "src/api/**"\n---\nWhen reviewing API endpoints:\n- Check for missing authentication middleware\n- Validate all inputs use zod schemas\n- Ensure error responses follow RFC 7807\n- Flag any endpoint exposing stack traces`}
-              />
-            </div>
-            <div className={styles.codeBody}>
-              <div className={styles.codeLine}>
-                <span className={styles.cs}>---</span>
-              </div>
-              <div className={styles.codeLine}>
-                <span className={styles.ck}>applyTo</span>:{" "}
-                <span className={styles.cs}>&quot;src/api/**&quot;</span>
-              </div>
-              <div className={styles.codeLine}>
-                <span className={styles.cs}>---</span>
-              </div>
-              <div className={styles.codeLine}>When reviewing API endpoints:</div>
-              <div className={styles.codeLine}>- Check for missing authentication middleware</div>
-              <div className={styles.codeLine}>- Validate all inputs use zod schemas</div>
-              <div className={styles.codeLine}>- Ensure error responses follow RFC 7807</div>
-              <div className={styles.codeLine}>- Flag any endpoint exposing stack traces</div>
-            </div>
-          </div>
-
-          <div className={styles.codeWrap}>
-            <div className={styles.codeBar}>
-              <span>.github/instructions/migrations/db.instructions.md</span>
-              <span className={styles.codeLang}>markdown</span>
-              <CodeCopyButton
-                className={styles.codeCopy}
-                text={`---\napplyTo: "db/migrations/**"\n---\nFor database migrations:\n- Verify DOWN migration exists and is reversible\n- Check for missing index on foreign keys\n- Flag column renames without data migration`}
-              />
-            </div>
-            <div className={styles.codeBody}>
-              <div className={styles.codeLine}>
-                <span className={styles.cs}>---</span>
-              </div>
-              <div className={styles.codeLine}>
-                <span className={styles.ck}>applyTo</span>:{" "}
-                <span className={styles.cs}>&quot;db/migrations/**&quot;</span>
-              </div>
-              <div className={styles.codeLine}>
-                <span className={styles.cs}>---</span>
-              </div>
-              <div className={styles.codeLine}>For database migrations:</div>
-              <div className={styles.codeLine}>
-                - Verify DOWN migration exists and is reversible
-              </div>
-              <div className={styles.codeLine}>- Check for missing index on foreign keys</div>
-              <div className={styles.codeLine}>- Flag column renames without data migration</div>
-            </div>
-          </div>
-
-          <h3 className={styles.sectionTitle}>5.5 Copilot Memory（Public Preview）</h3>
-          <p className={styles.paragraph}>
-            Copilot Pro / Pro+ ユーザーは <strong>Copilot Memory</strong>{" "}
-            を有効化することで、Copilot
-            がリポジトリについて学習した知識を蓄積し、レビュー精度を継続的に向上させることができます。
-          </p>
-
-          <div className={styles.trendGrid}>
-            <div className={styles.trendCard}>
-              <div className={styles.trendLabel}>Copilot Memory</div>
-              <div className={styles.trendTitle}>学習型コンテキスト蓄積</div>
-              <div className={styles.trendDesc}>
-                リポジトリ固有のコーディングパターン、頻出バグ傾向、チームの命名規則を学習・記憶
-              </div>
-            </div>
-            <div className={styles.trendCard}>
-              <div className={styles.trendLabel}>Integration</div>
-              <div className={styles.trendTitle}>PR レビューへの自動適用</div>
-              <div className={styles.trendDesc}>
-                蓄積した知識は PR レビュー時に自動的に参照され、より文脈に即した指摘が可能になる
-              </div>
-            </div>
-            <div className={styles.trendCard}>
-              <div className={styles.trendLabel}>Availability</div>
-              <div className={styles.trendTitle}>Pro / Pro+ 限定</div>
-              <div className={styles.trendDesc}>
-                2026年6月時点で Public Preview。Business / Enterprise プランでは提供されていない
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <hr className={styles.divider} />
-
-        {/* CH6 */}
-        <section className={styles.chapter} id="ch6">
-          <div className={styles.chapterHeader}>
-            <span className={`${styles.chapterNum} ${styles.blue}`}>CH-06</span>
-            <h2>Agentic 機能の活用</h2>
-          </div>
-
-          <h3 className={styles.sectionTitle}>6.1 Full Project Context Gathering（GA）</h3>
-          <p className={styles.paragraph}>
-            従来のコードレビューが PR の diff のみを見るのに対し、Full Project Context Gathering
-            はリポジトリ全体を解析して変更の意図・影響範囲・既存コードとの整合性を把握します。これにより「このメソッドは別モジュールで既に実装されている」「この変更が下流のクラスに影響する」といったコンテキスト依存の指摘が可能です。
-          </p>
-
-          <div className={styles.mermaidWrap}>
-            <div style={{ maxWidth: "800px", margin: "0 auto" }}>
-              <MermaidDiagram chart={DIAG_CONTEXT} />
-            </div>
-          </div>
-
-          <h3 className={styles.sectionTitle}>
-            6.2 Cloud Agent 連携（Fix PR 自動生成）— Public Preview
-          </h3>
-
-          <ul className={styles.stepList}>
-            <li>
-              <span className={styles.stepNum}>1</span>
-              <div className={styles.stepContent}>
-                Code Review のコメントに <strong>Implement suggestion</strong>{" "}
-                ボタンが表示されていることを確認（Cloud Agent が有効な場合のみ）
-              </div>
-            </li>
-            <li>
-              <span className={styles.stepNum}>2</span>
-              <div className={styles.stepContent}>
-                <strong>Implement suggestion</strong> をクリックすると PR
-                上にドラフトコメントが作成される
-              </div>
-            </li>
-            <li>
-              <span className={`${styles.stepNum} ${styles.cyan}`}>3</span>
-              <div className={styles.stepContent}>
-                ドラフトコメントで Copilot に追加の指示を書いてサブミット
-              </div>
-            </li>
-            <li>
-              <span className={`${styles.stepNum} ${styles.cyan}`}>4</span>
-              <div className={styles.stepContent}>
-                Copilot Cloud Agent が提案された修正を適用した<em>新しい PR</em>を自動生成
-              </div>
-            </li>
-            <li>
-              <span className={`${styles.stepNum} ${styles.purple}`}>5</span>
-              <div className={styles.stepContent}>
-                生成された Fix PR を人間がレビューしてマージ判断
-              </div>
-            </li>
-          </ul>
-
-          <div className={`${styles.callout} ${styles.warning}`}>
-            <strong>⚠️ Preview 機能の注意事項</strong>
-            Cloud Agent 連携は Public Preview であり、仕様が変更される可能性があります。GitHub
-            Pre-release License Terms
-            が適用されます。エンタープライズ環境での本番運用前に十分なテストを推奨します。
-          </div>
-
-          <h3 className={styles.sectionTitle}>6.3 GitHub Actions runners の設定</h3>
-
-          <div className={styles.tableWrap}>
-            <table className={styles.table}>
-              <thead>
-                <tr>
-                  <th className={styles.th}>Runner 種別</th>
-                  <th className={styles.th}>コスト</th>
-                  <th className={styles.th}>推奨ユースケース</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td className={styles.td}>GitHub-hosted (Standard)</td>
-                  <td className={styles.td}>
-                    <span className={`${styles.badge} ${styles.badgeGreen}`}>無料枠内</span>
-                  </td>
-                  <td className={styles.td}>通常規模のリポジトリ、Agentic 機能のデフォルト</td>
-                </tr>
-                <tr>
-                  <td className={styles.td}>GitHub-hosted (Larger)</td>
-                  <td className={styles.td}>
-                    <span className={`${styles.badge} ${styles.badgeAmber}`}>分単位課金</span>
-                  </td>
-                  <td className={styles.td}>
-                    大規模リポジトリ、高速なコンテキスト収集が必要な場合
-                  </td>
-                </tr>
-                <tr>
-                  <td className={styles.td}>Self-hosted runners</td>
-                  <td className={styles.td}>
-                    <span className={`${styles.badge} ${styles.badgeCyan}`}>要設定</span>
-                  </td>
-                  <td className={styles.td}>GitHub-hosted runners が組織で無効化されている場合</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <div className={`${styles.alert} ${styles.alertAmber}`}>
-            組織で GitHub-hosted runners が <strong>無効化</strong> されている場合、Agentic
-            機能（Full Project Context Gathering 含む）は利用できません。Self-hosted runners
-            を設定することで回避可能です。
-          </div>
-        </section>
-
-        <hr className={styles.divider} />
-
-        {/* CH7 */}
-        <section className={styles.chapter} id="ch7">
-          <div className={styles.chapterHeader}>
-            <span className={styles.chapterNum}>CH-07</span>
-            <h2>自動レビュー（Automatic Reviews）の設定</h2>
-          </div>
-
-          <h3 className={styles.sectionTitle}>7.1 自動レビューの階層構造</h3>
-          <div className={styles.pyramid}>
-            <div className={`${styles.pyrTier} ${styles.pyrT4}`}>
-              Enterprise Org: 全リポジトリ適用
-            </div>
-            <div className={`${styles.pyrTier} ${styles.pyrT3}`}>Org Owner: 指定リポジトリ適用</div>
-            <div className={`${styles.pyrTier} ${styles.pyrT2}`}>
-              Repository Owner: リポジトリ内 PR に適用
-            </div>
-            <div className={`${styles.pyrTier} ${styles.pyrT1}`}>
-              個人 (Pro/Pro+): 自分の PR に適用
-            </div>
-          </div>
-
-          <h3 className={styles.sectionTitle}>7.2 トリガー設定と挙動</h3>
-
-          <div className={styles.tableWrap}>
-            <table className={styles.table}>
-              <thead>
-                <tr>
-                  <th className={styles.th}>設定オプション</th>
-                  <th className={styles.th}>トリガータイミング</th>
-                  <th className={styles.th}>推奨シナリオ</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td className={styles.td}>Basic（デフォルト）</td>
-                  <td className={styles.td}>
-                    PR を "Open" で作成時 / Draft → Open 切替時（初回のみ）
-                  </td>
-                  <td className={styles.td}>標準的な開発フロー</td>
-                </tr>
-                <tr>
-                  <td className={styles.td}>Review new pushes</td>
-                  <td className={styles.td}>PR へのコミットプッシュ毎</td>
-                  <td className={styles.td}>継続的に品質チェックしたい場合（クォータ消費注意）</td>
-                </tr>
-                <tr>
-                  <td className={styles.td}>Review draft PRs</td>
-                  <td className={styles.td}>Draft PR の作成時から</td>
-                  <td className={styles.td}>WIP 段階から早期フィードバックを得たい場合</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <h3 className={styles.sectionTitle}>7.3 自動レビューの設定フロー</h3>
-          <div className={styles.mermaidWrap}>
-            <div style={{ maxWidth: "550px", margin: "0 auto" }}>
-              <MermaidDiagram chart={DIAG_AUTO} />
-            </div>
-          </div>
-
-          <h3 className={styles.sectionTitle}>
-            7.4 Bot・GitHub Actions が PR を作成する場合の課金帰属
-          </h3>
-
-          <div className={styles.archLayers}>
-            <div className={styles.archLayer}>
-              <span className={styles.archLabel}>ワークフロー起動者が特定可能</span>
-              <span className={styles.archDesc}>そのユーザーのクォータに加算される</span>
-            </div>
-            <div className={`${styles.archLayer} ${styles.amber}`}>
-              <span className={styles.archLabel}>特定不可能</span>
-              <span className={styles.archDesc}>
-                指定された Billing Owner のクォータに加算される
-              </span>
-            </div>
-          </div>
-
-          <div className={styles.compareGrid}>
-            <div className={`${styles.compareCard} ${styles.good}`}>
-              <div className={styles.compareTitle}>✅ 良い例: 自動レビューの適切な設定</div>
-              <p
-                className={styles.paragraph}
-                style={{ fontSize: "0.85rem", color: "var(--text-secondary)" }}
-              >
-                大きい PR には必ず Human Review も必須にする（Org の branch protection rules
-                で設定）。Copilot
-                のコメントは参考として扱い、最終判断は人間が行う運用フローを確立する。
-              </p>
-            </div>
-            <div className={`${styles.compareCard} ${styles.bad}`}>
-              <div className={styles.compareTitle}>❌ 悪い例: Copilot のみでレビュー完結</div>
-              <p
-                className={styles.paragraph}
-                style={{ fontSize: "0.85rem", color: "var(--text-secondary)" }}
-              >
-                Copilot の「Comment」レビューは Required Reviewers
-                に含まれないが、レビュープロセス全体を Copilot に委任するのは危険。Copilot
-                は全問題を検出できる保証なし。
-              </p>
-            </div>
-          </div>
-        </section>
-
-        <hr className={styles.divider} />
-
-        {/* CH8 */}
-        <section className={styles.chapter} id="ch8">
-          <div className={styles.chapterHeader}>
-            <span className={`${styles.chapterNum} ${styles.cyan}`}>CH-08</span>
-            <h2>クォータ・課金管理</h2>
-          </div>
-
-          <h3 className={styles.sectionTitle}>8.1 クォータ消費の仕組み</h3>
-          <p className={styles.paragraph}>
-            Copilot Code Review は <strong>Premium Request</strong> を消費します。PR レビュー 1 回 =
-            Premium Request 1 消費。IDE でのローカルレビューも同様です。
-          </p>
-          <p className={styles.paragraph}>
-            <strong>2026-06-01 の課金変更：</strong> GitHub は 2026 年 6 月 1 日より Copilot
-            を使用量ベース（AI Credits）課金へ移行しました。 これに伴い Copilot Code Review も AI
-            Credits を消費するようになり、さらに <strong>プライベートリポジトリ</strong>
-            で実行されるレビューは既存プランの <strong>GitHub Actions 分</strong>も消費します。Pro /
-            Pro+ プランで自動レビュー（個人設定）（Automatically request Copilot code
-            review）を有効化できます。
-          </p>
-
-          <div className={styles.metricGrid}>
-            <div className={styles.metricCard}>
-              <span className={styles.metricVal}>1</span>
-              <div className={styles.metricLabel}>PR レビュー1回あたりの消費</div>
-            </div>
-            <div className={styles.metricCard}>
-              <span className={`${styles.metricVal} ${styles.cyan}`}>1</span>
-              <div className={styles.metricLabel}>IDE ローカルレビュー1回あたり</div>
-            </div>
-            <div className={styles.metricCard}>
-              <span className={`${styles.metricVal} ${styles.purple}`}>0</span>
-              <div className={styles.metricLabel}>Copilot Free プランの月次クォータ</div>
-            </div>
-            <div className={styles.metricCard}>
-              <span className={`${styles.metricVal} ${styles.amber}`}>Paid</span>
-              <div className={styles.metricLabel}>クォータ超過時（有償オーバーエイジ）</div>
-            </div>
-          </div>
-
-          <h3 className={styles.sectionTitle}>8.2 クォータ帰属ルール</h3>
-          <div className={styles.archLayers}>
-            <div className={styles.archLayer}>
-              <span className={styles.archLabel}>自動レビュー（設定済み）</span>
-              <span className={styles.archDesc}>PR 作成者のクォータに帰属</span>
-            </div>
-            <div className={`${styles.archLayer} ${styles.cyan}`}>
-              <span className={styles.archLabel}>手動レビュー依頼</span>
-              <span className={styles.archDesc}>依頼を実行したユーザーのクォータに帰属</span>
-            </div>
-            <div className={`${styles.archLayer} ${styles.amber}`}>
-              <span className={styles.archLabel}>ライセンスなしユーザー</span>
-              <span className={styles.archDesc}>
-                個人クォータなし。生成コストは Org/Enterprise の Paid Overage Usage に計上
-              </span>
-            </div>
-          </div>
-
-          <h3 className={styles.sectionTitle}>8.3 クォータ超過時の対応フロー</h3>
-          <div className={styles.mermaidWrap}>
-            <div style={{ maxWidth: "650px", margin: "0 auto" }}>
-              <MermaidDiagram chart={DIAG_QUOTA} />
-            </div>
-          </div>
-
-          <h3 className={styles.sectionTitle}>8.4 クォータ節約のベストプラクティス</h3>
-          <div className={styles.progressItem}>
-            <div className={styles.progressHeader}>
-              <span>PR を小さく分割（200行以下を目標）</span>
-              <span>効果 高</span>
-            </div>
-            <div className={styles.progressBar}>
-              <div className={styles.progressFill} style={{ width: "90%" }} />
-            </div>
-          </div>
-          <div className={styles.progressItem}>
-            <div className={styles.progressHeader}>
-              <span>「Review new pushes」は必要な場合のみ有効化</span>
-              <span>効果 高</span>
-            </div>
-            <div className={styles.progressBar}>
-              <div className={styles.progressFill} style={{ width: "85%" }} />
-            </div>
-          </div>
-          <div className={styles.progressItem}>
-            <div className={styles.progressHeader}>
-              <span>Lint / 型チェックを CI で先行実行してから PR 作成</span>
-              <span>効果 中</span>
-            </div>
-            <div className={styles.progressBar}>
-              <div className={styles.progressFill} style={{ width: "65%" }} />
-            </div>
-          </div>
-          <div className={styles.progressItem}>
-            <div className={styles.progressHeader}>
-              <span>Bot 生成 PR の Billing Owner を適切に設定</span>
-              <span>効果 中</span>
-            </div>
-            <div className={styles.progressBar}>
-              <div className={styles.progressFill} style={{ width: "55%" }} />
-            </div>
-          </div>
-        </section>
-
-        <hr className={styles.divider} />
-
-        {/* CH9 */}
-        <section className={styles.chapter} id="ch9">
-          <div className={styles.chapterHeader}>
-            <span className={`${styles.chapterNum} ${styles.purple}`}>CH-09</span>
-            <h2>Enterprise 管理・ガバナンス</h2>
-          </div>
-
-          <h3 className={styles.sectionTitle}>9.1 Enterprise 管理者向けポリシー設定</h3>
-
-          <div className={styles.tableWrap}>
-            <table className={styles.table}>
-              <thead>
-                <tr>
-                  <th className={styles.th}>ポリシー</th>
-                  <th className={styles.th}>設定箇所</th>
-                  <th className={styles.th}>デフォルト</th>
-                  <th className={styles.th}>説明</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td className={styles.td}>Copilot code review</td>
-                  <td className={styles.td}>Org / Enterprise Policy</td>
-                  <td className={styles.td}>
-                    <span className={`${styles.badge} ${styles.badgeRed}`}>無効</span>
-                  </td>
-                  <td className={styles.td}>Code Review 機能の有効化</td>
-                </tr>
-                <tr>
-                  <td className={styles.td}>Premium request paid usage</td>
-                  <td className={styles.td}>Enterprise Admin</td>
-                  <td className={styles.td}>
-                    <span className={`${styles.badge} ${styles.badgeRed}`}>無効</span>
-                  </td>
-                  <td className={styles.td}>ライセンスなしユーザー向け提供の前提条件</td>
-                </tr>
-                <tr>
-                  <td className={styles.td}>Allow members without license</td>
-                  <td className={styles.td}>Enterprise → Org</td>
-                  <td className={styles.td}>
-                    <span className={`${styles.badge} ${styles.badgeRed}`}>無効</span>
-                  </td>
-                  <td className={styles.td}>
-                    ライセンスなしユーザーへの提供。Ent 設定後は Org で変更不可
-                  </td>
-                </tr>
-                <tr>
-                  <td className={styles.td}>Automatic code review</td>
-                  <td className={styles.td}>Org / Repo Settings</td>
-                  <td className={styles.td}>
-                    <span className={`${styles.badge} ${styles.badgeRed}`}>無効</span>
-                  </td>
-                  <td className={styles.td}>自動レビューの対象リポジトリ設定</td>
-                </tr>
-                <tr>
-                  <td className={styles.td}>Content exclusion</td>
-                  <td className={styles.td}>Org Settings / .github</td>
-                  <td className={styles.td}>—</td>
-                  <td className={styles.td}>スキャン対象外ファイル・ディレクトリの指定</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <h3 className={styles.sectionTitle}>9.2 ライセンスなしユーザー向け提供の注意点</h3>
-          <div className={`${styles.callout} ${styles.danger}`}>
-            <strong>🔴 Enterprise Admin 必読</strong>
-            「Allow members without a Copilot license」を Enterprise
-            レベルで設定した場合、そのポリシーは Organization レベルで
-            <em>表示はされますが変更できません（Most Restrictive）</em>
-            。また、当該ユーザーが生成するレビューコストはすべて組織への Paid Overage
-            として計上されます。予算管理に注意してください。
-          </div>
-
-          <h3 className={styles.sectionTitle}>9.3 Audit Log・モニタリング</h3>
-          <ul className={styles.stepList}>
-            <li>
-              <span className={styles.stepNum}>1</span>
-              <div className={styles.stepContent}>
-                Enterprise Settings → Audit Log で Copilot Code Review 関連イベントを確認
-              </div>
-            </li>
-            <li>
-              <span className={`${styles.stepNum} ${styles.cyan}`}>2</span>
-              <div className={styles.stepContent}>
-                Premium Request の使用状況は Settings → Billing → Copilot usage で確認
-              </div>
-            </li>
-            <li>
-              <span className={`${styles.stepNum} ${styles.cyan}`}>3</span>
-              <div className={styles.stepContent}>
-                Agentic 機能の使用状況は Agentic Audit Log Events を参照
-              </div>
-            </li>
-            <li>
-              <span className={`${styles.stepNum} ${styles.purple}`}>4</span>
-              <div className={styles.stepContent}>
-                Org レベルの Activity Report をダウンロードして定期的に分析
-              </div>
-            </li>
-          </ul>
-
-          <h3 className={styles.sectionTitle}>9.4 GitHub Code Quality との連携</h3>
-          <div className={styles.trendGrid}>
-            <div className={styles.trendCard}>
-              <div className={styles.trendLabel}>Copilot Code Review</div>
-              <div className={styles.trendTitle}>PR 単位のフィードバック</div>
-              <div className={styles.trendDesc}>
-                PR の変更差分を対象。即時フィードバックで開発サイクルを加速
-              </div>
-            </div>
-            <div className={styles.trendCard}>
-              <div className={styles.trendLabel}>GitHub Code Quality</div>
-              <div className={styles.trendTitle}>リポジトリ全体の品質分析</div>
-              <div className={styles.trendDesc}>
-                信頼性・保守性の継続的評価。戦略的な技術的負債管理に活用
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <hr className={styles.divider} />
-
-        {/* CH10 */}
-        <section className={styles.chapter} id="ch10">
-          <div className={styles.chapterHeader}>
-            <span className={`${styles.chapterNum} ${styles.amber}`}>CH-10</span>
-            <h2>ベストプラクティス・運用設計</h2>
-          </div>
-
-          <h3 className={styles.sectionTitle}>10.1 Human Review との役割分担</h3>
-          <div className={styles.mermaidWrap}>
-            <div style={{ maxWidth: "650px", margin: "0 auto" }}>
-              <MermaidDiagram chart={DIAG_ROLE} />
-            </div>
-          </div>
-
-          <h3 className={styles.sectionTitle}>10.2 PR サイズとレビュー品質</h3>
-          <p className={styles.paragraph}>
-            Copilot のコンテキストウィンドウには制限があります。PR
-            が大きすぎると指摘が表面的になります。
-          </p>
-
-          <div className={styles.tableWrap}>
-            <table className={styles.table}>
-              <thead>
-                <tr>
-                  <th className={styles.th}>PR サイズ（変更行数）</th>
-                  <th className={styles.th}>Copilot レビュー品質</th>
-                  <th className={styles.th}>推奨アクション</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td className={styles.td}>〜 200 行</td>
-                  <td className={styles.td}>
-                    <span className={`${styles.badge} ${styles.badgeGreen}`}>★★★ 最高</span>
-                  </td>
-                  <td className={styles.td}>そのままレビュー依頼</td>
-                </tr>
-                <tr>
-                  <td className={styles.td}>200〜500 行</td>
-                  <td className={styles.td}>
-                    <span className={`${styles.badge} ${styles.badgeCyan}`}>★★☆ 良好</span>
-                  </td>
-                  <td className={styles.td}>可能なら分割を検討</td>
-                </tr>
-                <tr>
-                  <td className={styles.td}>500〜1000 行</td>
-                  <td className={styles.td}>
-                    <span className={`${styles.badge} ${styles.badgeAmber}`}>★☆☆ 低下</span>
-                  </td>
-                  <td className={styles.td}>機能単位で PR を分割</td>
-                </tr>
-                <tr>
-                  <td className={styles.td}>1000 行以上</td>
-                  <td className={styles.td}>
-                    <span className={`${styles.badge} ${styles.badgeRed}`}>☆☆☆ 要注意</span>
-                  </td>
-                  <td className={styles.td}>必ず分割。Human Review を主体に</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <h3 className={styles.sectionTitle}>10.3 Custom Instructions 設計のベストプラクティス</h3>
-
-          <div className={styles.compareGrid}>
-            <div className={`${styles.compareCard} ${styles.good}`}>
-              <div className={styles.compareTitle}>✅ 効果的な Instructions の構造</div>
-              <p
-                className={styles.paragraph}
-                style={{ fontSize: "0.85rem", color: "var(--text-secondary)", marginTop: "0.4rem" }}
-              >
-                <strong style={{ color: "var(--neon-green)" }}>
-                  1. 優先度高い指示を冒頭 4000 文字以内に
-                </strong>
-                <br />
-                セキュリティ、重大バグ検出ルールを先頭に配置。
-                <br />
-                <br />
-                <strong style={{ color: "var(--neon-green)" }}>2. 具体的なパターンを指定</strong>
-                <br />
-                「可読性を高めて」ではなく「ネストが 3 層以上は関数分割を提案」。
-                <br />
-                <br />
-                <strong style={{ color: "var(--neon-green)" }}>
-                  3. パス別 Instructions で責務を分離
-                </strong>
-                <br />
-                API / DB / Frontend ごとに異なる観点を設定。
-              </p>
-            </div>
-            <div className={`${styles.compareCard} ${styles.bad}`}>
-              <div className={styles.compareTitle}>❌ 避けるべき Anti-patterns</div>
-              <p
-                className={styles.paragraph}
-                style={{ fontSize: "0.85rem", color: "var(--text-secondary)", marginTop: "0.4rem" }}
-              >
-                <strong style={{ color: "var(--neon-red)" }}>
-                  ×「全てのベストプラクティスを適用して」
-                </strong>
-                <br />
-                包括的すぎる指示は Copilot の焦点が分散する。
-                <br />
-                <br />
-                <strong style={{ color: "var(--neon-red)" }}>
-                  × 4000 文字を超える設定ファイル
-                </strong>
-                <br />
-                後半の指示は完全に無視される。
-                <br />
-                <br />
-                <strong style={{ color: "var(--neon-red)" }}>
-                  × feature ブランチで Instructions を編集
-                </strong>
-                <br />
-                Copilot はベースブランチの Instructions を参照するため、feature
-                ブランチの変更は反映されない。
-              </p>
-            </div>
-          </div>
-
-          <h3 className={styles.sectionTitle}>10.4 CI/CD パイプラインへの統合</h3>
-          <div className={styles.codeWrap}>
-            <div className={styles.codeBar}>
-              <span>.github/workflows/auto-review.yml</span>
-              <span className={styles.codeLang}>yaml</span>
-              <CodeCopyButton
-                className={styles.codeCopy}
-                text={`name: Auto Copilot Review\non:\n  pull_request:\n    types: [opened, ready_for_review]\n    branches: [main, develop]\n\njobs:\n  pre-checks:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - run: npm ci && npm run lint && npm test\n\n  request-copilot-review:\n    needs: pre-checks\n    if: github.event.pull_request.draft == false\n    runs-on: ubuntu-latest\n    steps:\n      - run: |\n          gh pr edit \${{ github.event.pull_request.number }} \\\n            --add-reviewer @copilot\n        env:\n          GH_TOKEN: \${{ secrets.GITHUB_TOKEN }}`}
-              />
-            </div>
-            <div className={styles.codeBody}>
-              <div className={styles.codeLine}>
-                <span className={styles.ck}>name</span>:{" "}
-                <span className={styles.cs}>Auto Copilot Review</span>
-              </div>
-              <div className={styles.codeLine}>
-                <span className={styles.ck}>on</span>:
-              </div>
-              <div className={styles.codeLine}>
-                {"  "}
-                <span className={styles.ck}>pull_request</span>:
-              </div>
-              <div className={styles.codeLine}>
-                {"    "}
-                <span className={styles.ck}>types</span>: [<span className={styles.cs}>opened</span>
-                , <span className={styles.cs}>ready_for_review</span>]
-              </div>
-              <div className={styles.codeLine}>
-                {"    "}
-                <span className={styles.ck}>branches</span>: [
-                <span className={styles.cs}>main</span>, <span className={styles.cs}>develop</span>]
-              </div>
-              <div className={styles.codeLine} />
-              <div className={styles.codeLine}>
-                <span className={styles.ck}>jobs</span>:
-              </div>
-              <div className={styles.codeLine}>
-                {"  "}
-                <span className={styles.ck}>pre-checks</span>:
-              </div>
-              <div className={styles.codeLine}>
-                {"    "}
-                <span className={styles.ck}>runs-on</span>:{" "}
-                <span className={styles.cs}>ubuntu-latest</span>
-              </div>
-              <div className={styles.codeLine}>
-                {"    "}
-                <span className={styles.ck}>steps</span>:
-              </div>
-              <div className={styles.codeLine}>
-                {"      "}- <span className={styles.ck}>uses</span>:{" "}
-                <span className={styles.cs}>actions/checkout@v4</span>
-              </div>
-              <div className={styles.codeLine}>
-                {"      "}- <span className={styles.ck}>run</span>:{" "}
-                <span className={styles.cs}>npm ci && npm run lint && npm test</span>
-              </div>
-              <div className={styles.codeLine} />
-              <div className={styles.codeLine}>
-                {"  "}
-                <span className={styles.ck}>request-copilot-review</span>:
-              </div>
-              <div className={styles.codeLine}>
-                {"    "}
-                <span className={styles.ck}>needs</span>:{" "}
-                <span className={styles.cs}>pre-checks</span>
-              </div>
-              <div className={styles.codeLine}>
-                {"    "}
-                <span className={styles.ck}>if</span>:{" "}
-                <span className={styles.cs}>github.event.pull_request.draft == false</span>
-              </div>
-              <div className={styles.codeLine}>
-                {"    "}
-                <span className={styles.ck}>runs-on</span>:{" "}
-                <span className={styles.cs}>ubuntu-latest</span>
-              </div>
-              <div className={styles.codeLine}>
-                {"    "}
-                <span className={styles.ck}>steps</span>:
-              </div>
-              <div className={styles.codeLine}>
-                {"      "}- <span className={styles.ck}>run</span>:{" "}
-                <span className={styles.cs}>|</span>
-              </div>
-              <div className={styles.codeLine}>
-                {/* biome-ignore lint/suspicious/noTemplateCurlyInString: GH expression */}
-                {"          gh pr edit ${{ github.event.pull_request.number }} \\"}
-              </div>
-              <div className={styles.codeLine}>{"            --add-reviewer @copilot"}</div>
-              <div className={styles.codeLine}>
-                {"        "}(<span className={styles.ck}>env</span>):
-              </div>
-              <div className={styles.codeLine}>
-                {"          "}(<span className={styles.ck}>GH_TOKEN</span>):{" "}
-                {/* biome-ignore lint/suspicious/noTemplateCurlyInString: GH token */}
-                <span className={styles.cs}>{"${{ secrets.GITHUB_TOKEN }}"}</span>
-              </div>
-            </div>
-          </div>
-
-          <h3 className={styles.sectionTitle}>10.5 レビュー結果の評価とフィードバック</h3>
-          <div className={`${styles.alert} ${styles.alertGreen}`}>
-            <strong>👍 有効なフィードバック活用法</strong>
-            Copilot のコメントに👍/👎を積極的に付けることで、チームの Copilot
-            レビュー品質が向上します。特に👎の場合は理由を選択することで、GitHub
-            のモデル改善に貢献できます。
-          </div>
-          <div className={`${styles.alert} ${styles.alertRed}`}>
-            <strong>⚠️ Copilot レビューの限界を理解する</strong>
-            Copilot
-            はすべての問題を検出できる保証はありません。特に「ビジネスロジックの正確性」「非機能要件への適合」「セキュリティ脅威モデルに基づいた判断」は
-            Human Review で補完必須です。
-          </div>
-
-          <h3 className={styles.sectionTitle}>10.6 組織展開のロードマップ</h3>
-
-          <ul className={styles.stepList}>
-            <li>
-              <span className={styles.stepNum}>1</span>
-              <div className={styles.stepContent}>
-                <strong>Phase 1: パイロット（Week 1-2）</strong>
-                <br />
-                少数チームで手動レビュー依頼から開始。Custom Instructions
-                を最小限で作成。フィードバックを収集。
-              </div>
-            </li>
-            <li>
-              <span className={`${styles.stepNum} ${styles.cyan}`}>2</span>
-              <div className={styles.stepContent}>
-                <strong>Phase 2: カスタマイズ（Week 3-4）</strong>
-                <br />
-                チームの技術スタック・コーディング規約を反映した Custom Instructions
-                を整備。パス別設定を追加。
-              </div>
-            </li>
-            <li>
-              <span className={`${styles.stepNum} ${styles.cyan}`}>3</span>
-              <div className={styles.stepContent}>
-                <strong>Phase 3: 自動化（Month 2）</strong>
-                <br />
-                主要リポジトリで自動レビューを有効化。ライセンスなしユーザー向け提供ポリシーの検討。
-              </div>
-            </li>
-            <li>
-              <span className={`${styles.stepNum} ${styles.purple}`}>4</span>
-              <div className={styles.stepContent}>
-                <strong>Phase 4: 全社展開（Month 3+）</strong>
-                <br />
-                Enterprise レベルでのポリシー管理。Audit Log によるコスト分析。Cloud Agent
-                連携（Preview）の評価。
-              </div>
-            </li>
-          </ul>
-        </section>
-
-        <hr className={styles.divider} />
-
-        {/* REFERENCES */}
-        <section className={styles.chapter} id="refs">
-          <div className={styles.chapterHeader}>
-            <span
-              className={styles.chapterNum}
-              style={{ background: "var(--text-muted)", color: "#000" }}
-            >
-              REF
-            </span>
-            <h2>参考文献・公式ドキュメント</h2>
-          </div>
-
-          <div className={styles.refGrid}>
-            <Ext href="https://docs.github.com/en/copilot/concepts/agents/code-review">
-              <span className={styles.refCard}>
-                <span className={styles.refCat}>一次情報源 / Concepts</span>
-                <span className={styles.refTitle}>About GitHub Copilot code review</span>
-                <span className={styles.refUrl}>
-                  docs.github.com/en/copilot/concepts/agents/code-review
-                </span>
-              </span>
-            </Ext>
-            <Ext href="https://docs.github.com/en/copilot/how-tos/use-copilot-agents/request-a-code-review/use-code-review">
-              <span className={styles.refCard}>
-                <span className={styles.refCat}>How-to / 操作手順</span>
-                <span className={styles.refTitle}>Using GitHub Copilot code review</span>
-                <span className={styles.refUrl}>docs.github.com/.../use-code-review</span>
-              </span>
-            </Ext>
-            <Ext href="https://docs.github.com/en/copilot/how-tos/copilot-on-github/set-up-copilot/configure-automatic-review">
-              <span className={styles.refCard}>
-                <span className={styles.refCat}>How-to / 自動レビュー設定</span>
-                <span className={styles.refTitle}>Configure automatic code review</span>
-                <span className={styles.refUrl}>
-                  docs.github.com/.../configure-automatic-review
-                </span>
-              </span>
-            </Ext>
-            <Ext href="https://docs.github.com/en/copilot/how-tos/copilot-on-github/set-up-copilot/configure-runners">
-              <span className={styles.refCard}>
-                <span className={styles.refCat}>How-to / インフラ設定</span>
-                <span className={styles.refTitle}>Configuring runners for Copilot code review</span>
-                <span className={styles.refUrl}>docs.github.com/.../configure-runners</span>
-              </span>
-            </Ext>
-            <Ext href="https://docs.github.com/en/copilot/reference/review-excluded-files">
-              <span className={styles.refCard}>
-                <span className={styles.refCat}>Reference / 除外ファイル</span>
-                <span className={styles.refTitle}>Files excluded from Copilot code review</span>
-                <span className={styles.refUrl}>
-                  docs.github.com/en/copilot/reference/review-excluded-files
-                </span>
-              </span>
-            </Ext>
-            <Ext href="https://docs.github.com/en/copilot/responsible-use/code-review">
-              <span className={styles.refCard}>
-                <span className={styles.refCat}>Responsible Use / ガイドライン</span>
-                <span className={styles.refTitle}>
-                  Responsible use of GitHub Copilot code review
-                </span>
-                <span className={styles.refUrl}>
-                  docs.github.com/en/copilot/responsible-use/code-review
-                </span>
-              </span>
-            </Ext>
-            <Ext href="https://docs.github.com/en/copilot/concepts/prompting/response-customization">
-              <span className={styles.refCard}>
-                <span className={styles.refCat}>Concepts / カスタマイズ</span>
-                <span className={styles.refTitle}>About customizing GitHub Copilot responses</span>
-                <span className={styles.refUrl}>docs.github.com/.../response-customization</span>
-              </span>
-            </Ext>
-            <Ext href="https://docs.github.com/en/copilot/concepts/agents/copilot-memory">
-              <span className={styles.refCard}>
-                <span className={styles.refCat}>Concepts / Agentic</span>
-                <span className={styles.refTitle}>About agentic memory for GitHub Copilot</span>
-                <span className={styles.refUrl}>docs.github.com/.../copilot-memory</span>
-              </span>
-            </Ext>
-            <Ext href="https://docs.github.com/en/copilot/how-tos/administer-copilot/manage-for-organization/manage-policies">
-              <span className={styles.refCard}>
-                <span className={styles.refCat}>Admin / Organization</span>
-                <span className={styles.refTitle}>
-                  Managing policies for Copilot in your organization
-                </span>
-                <span className={styles.refUrl}>docs.github.com/.../manage-policies</span>
-              </span>
-            </Ext>
-            <Ext href="https://docs.github.com/en/copilot/how-tos/administer-copilot/manage-for-enterprise/manage-agents/enable-copilot-code-review">
-              <span className={styles.refCard}>
-                <span className={styles.refCat}>Admin / Enterprise</span>
-                <span className={styles.refTitle}>Enable Copilot code review (Enterprise)</span>
-                <span className={styles.refUrl}>
-                  docs.github.com/.../enable-copilot-code-review
-                </span>
-              </span>
-            </Ext>
-            <Ext href="https://docs.github.com/en/copilot/tutorials/customize-code-review">
-              <span className={styles.refCard}>
-                <span className={styles.refCat}>Tutorial / カスタマイズ</span>
-                <span className={styles.refTitle}>Customize code review</span>
-                <span className={styles.refUrl}>
-                  docs.github.com/en/copilot/tutorials/customize-code-review
-                </span>
-              </span>
-            </Ext>
-            <Ext href="https://docs.github.com/en/copilot/tutorials/optimize-code-reviews">
-              <span className={styles.refCard}>
-                <span className={styles.refCat}>Tutorial / 最適化</span>
-                <span className={styles.refTitle}>Optimize code reviews</span>
-                <span className={styles.refUrl}>
-                  docs.github.com/en/copilot/tutorials/optimize-code-reviews
-                </span>
-              </span>
-            </Ext>
-            <Ext href="https://docs.github.com/en/copilot/concepts/billing/premium-request-management">
-              <span className={styles.refCard}>
-                <span className={styles.refCat}>Billing / クォータ管理</span>
-                <span className={styles.refTitle}>Premium request management</span>
-                <span className={styles.refUrl}>
-                  docs.github.com/.../premium-request-management
-                </span>
-              </span>
-            </Ext>
-            <Ext href="https://docs.github.com/en/code-security/code-quality/concepts/about-code-quality">
-              <span className={styles.refCard}>
-                <span className={styles.refCat}>関連機能 / Code Quality</span>
-                <span className={styles.refTitle}>About GitHub Code Quality</span>
-                <span className={styles.refUrl}>docs.github.com/.../about-code-quality</span>
-              </span>
-            </Ext>
-            <Ext href="https://docs.github.com/en/site-policy/github-terms/github-pre-release-license-terms">
-              <span className={styles.refCard}>
-                <span className={styles.refCat}>Legal / Preview Terms</span>
-                <span className={styles.refTitle}>GitHub Pre-release License Terms</span>
-                <span className={styles.refUrl}>
-                  docs.github.com/.../github-pre-release-license-terms
-                </span>
-              </span>
-            </Ext>
-            <Ext href="https://github.com/features/copilot/plans">
-              <span className={styles.refCard}>
-                <span className={styles.refCat}>プラン比較</span>
-                <span className={styles.refTitle}>GitHub Copilot Plans &amp; Pricing</span>
-                <span className={styles.refUrl}>github.com/features/copilot/plans</span>
-              </span>
-            </Ext>
-          </div>
-
-          <div
-            style={{
-              textAlign: "center",
-              marginTop: "3rem",
-              fontFamily: "var(--font-mono)",
-              fontSize: "0.75rem",
-              color: "var(--text-muted)",
-            }}
-          >
-            最終更新: June 2026 &nbsp;|&nbsp; 一次情報源: GitHub Docs (docs.github.com)
-            &nbsp;|&nbsp; 本ガイドは公式ドキュメントに基づいて作成
-          </div>
-        </section>
-      </div>
-    </div>
+    </>
   );
 }

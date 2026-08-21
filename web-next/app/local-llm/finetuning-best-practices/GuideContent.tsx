@@ -1,8 +1,7 @@
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
 import { load } from "cheerio";
 import { createElement, type ReactNode } from "react";
 import MermaidDiagram from "@/components/docs/MermaidDiagram";
+import { sourceHtml } from "./sourceHtml";
 
 type HtmlNode = {
   attribs?: Record<string, string>;
@@ -254,32 +253,14 @@ function scopeCss(css: string, prefix: string): string {
   return result.join(" ");
 }
 
+const $ = load(sourceHtml);
+const layout = $(".layout").first().get(0) as unknown as HtmlNode;
+const sourceCss = $("style").first().html() || "";
+
 /**
  * Renders the finetuning best practices guide with scoped styles.
- *
- * Displays a fallback message when the guide content cannot be loaded.
  */
 export default function GuideContent() {
-  let layout: HtmlNode | null = null;
-  let sourceCss = "";
-
-  try {
-    const SOURCE_PATH = join(
-      process.cwd(),
-      "..",
-      "archive",
-      "html",
-      "LLM-OPs",
-      "Finetuning-best-practices-guide.html"
-    );
-    const sourceHtml = readFileSync(SOURCE_PATH, "utf8");
-    const $ = load(sourceHtml);
-    layout = $(".layout").first().get(0) as unknown as HtmlNode;
-    sourceCss = $("style").first().html() || "";
-  } catch (error) {
-    console.error("Failed to load guide content:", error);
-  }
-
   if (!layout) {
     return <div className="fineTuningGuide">Guide content not found.</div>;
   }

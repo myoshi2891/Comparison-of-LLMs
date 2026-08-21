@@ -150,7 +150,7 @@ describe("self-hosted Noto Sans JP - wiring", () => {
     const mainBody = vendorScript.slice(vendorScript.indexOf("async function main()"));
     const publicationOrder = Array.from(
       mainBody.matchAll(
-        /mkdtempSync\(|downloadAll\(filesByName,\s*stagedOutDir\)|writeFileSync\(stagedCssOut,|writeFileSync\(stagedPreloadOut,|promoteStagedGeneration\(/g
+        /mkdtempSync\(|mkdirSync\(stagedOutDir\)|await downloadAll\(filesByName,\s*stagedOutDir\)|writeFileSync\(stagedCssOut,|writeFileSync\(stagedPreloadOut,|promoteStagedGeneration\(/g
       ),
       (match) => {
         if (match[0].includes("stagedCssOut")) return "write staged CSS";
@@ -161,7 +161,8 @@ describe("self-hosted Noto Sans JP - wiring", () => {
 
     expect(publicationOrder).toEqual([
       "mkdtempSync",
-      "downloadAll",
+      "mkdirSync",
+      "await downloadAll",
       "write staged CSS",
       "write staged preload",
       "promoteStagedGeneration",

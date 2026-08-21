@@ -1,5 +1,7 @@
 # Next.js ページ移行 — 詳細実装リファレンス
 
+(最終更新日: 2026-08-19)
+
 **用途:** SKILL.md から移動した詳細実装コード・コマンドの完全バージョン。
 SKILL.md 内の「→ references/implementation-reference.md 参照」が示す実装はここに収録。
 
@@ -279,9 +281,145 @@ WAI-ARIA 使い分け早見表:
 
 ---
 
+## `pre code` リセットパターン（2026-08-19 追加）
+
+`<pre>` 内の `<code>` はインラインコード用スタイルを継承してしまうため、
+明示的にリセットしないとコードブロック内に背景色・枠線が表示されて崩壊する。
+
+**これは最も頻出する CSS 移行バグの 1 つ。**
+
+```css
+/* ✅ 必須: pre 内の code をリセット */
+.layout :global(pre code) {
+  background: none;
+  border: none;
+  padding: 0;
+  color: inherit;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+/* ❌ NG: pre code のリセットを忘れると... */
+/* → コードブロック内に青い背景 + 枠線のインラインコードスタイルが出現 */
+```
+
+---
+
+## 外部 CDN リンク挿入パターン（2026-08-19 追加）
+
+原本の `<head>` に外部 CSS/フォントの `<link>` タグがある場合、
+Next.js App Router のページに挿入する必要がある。
+
+### 方法: JSX 内に `<link>` を直接配置
+
+App Router では `next/head` が使えないため、`<link>` タグを JSX に直接配置する。
+
+```tsx
+export default async function Page() {
+  return (
+    <div className={styles.layout} data-testid="layout-root">
+      {/* Tabler Icons webfont CDN */}
+      <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.31.0/dist/tabler-icons.min.css"
+      />
+      {/* ... 残りのコンテンツ ... */}
+    </div>
+  );
+}
+```
+
+### よくある CDN リンクの例
+
+| ライブラリ | URL パターン |
+|---|---|
+| Tabler Icons | `https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@X.Y.Z/dist/tabler-icons.min.css` |
+| Prism.js テーマ | `https://cdn.jsdelivr.net/npm/prismjs@X.Y.Z/themes/prism-*.min.css` |
+
+---
+
+## 原本配色テーマの特定と転写手順（2026-08-19 追加）
+
+原本の構文ハイライトカラーは**原本ごとに異なる**。
+SKILL.md §6 の早見表は Atom One Dark 系のデフォルト例であり、
+必ず原本の実際の配色を確認して転写すること。
+
+### 手順
+
+1. **原本 HTML の `<style>` 内で配色クラスを検索する**
+
+   ```bash
+   # よくあるクラス名パターン
+   grep -E '\.(hl-|token-|syntax-|ck|cv|cs|cw|cc|cm)' archive/html/<ベンダー>/<原本>.html
+   ```
+
+2. **インラインスタイルから色を抽出する**
+
+   `style="color: …"` だけを狙う素朴な grep は、① `color` の前に別の宣言がある
+   (`style="font-weight:700;color:#98c379"`)、② コロン前後の空白、③ 単引用符属性、
+   ④ 大文字表記、を取りこぼす。まず `style` 属性値を丸ごと取り出し、
+   そのうえで `color` 宣言だけを拾う（`border-color` 等は境界文字で除外される）。
+
+   ```bash
+   grep -oE "style=(\"[^\"]*\"|'[^']*')" archive/html/<ベンダー>/<原本>.html \
+     | grep -oiE '(^|[;"'"'"'[:space:]])color[[:space:]]*:[[:space:]]*(#[0-9a-fA-F]{3,8}|rgba?\([^)]*\)|[a-z]+)' \
+     | sed -E 's/.*[Cc][Oo][Ll][Oo][Rr][[:space:]]*:[[:space:]]*//' | sort -u
+   ```
+
+   属性が複数行にまたがるなど正規表現で取り切れない原本では、正規表現ではなく
+   HTML パーサ（例: `bun -e` + `DOMParser`、`python3 -c` + `html.parser`）で
+   `style` 属性を列挙してから同じ抽出を行う。
+
+3. **配色テーマを page.module.css に定義する**
+
+   ```css
+   /* 原本の配色テーマ — 原本 HTML の <style> から 1:1 で転記 */
+   .ck { color: #c678dd; }    /* キーワード */
+   .cv { color: #61afef; }    /* 変数 / 属性名 */
+   .cs { color: #98c379; }    /* 文字列 */
+   .cw { color: #d19a66; }    /* 数値 / フラグ */
+   .cc { color: #5c6370; font-style: italic; }  /* コメント */
+   .cm { color: #e5c07b; }    /* セクション / ディレクトリ */
+   ```
+
+4. **原本に配色クラスがない場合**
+   - プレーンテキスト（単色）なのでハイライトは不要
+   - `pre` / `pre code` の `color` だけを転写すれば十分
+
+---
+
+## 原本 CSS `<style>` → page.module.css 転写手順（2026-08-19 追加）
+
+原本の `:root` / `body` の CSS 変数と要素スタイルを page.module.css に変換する
+標準手順。
+
+### 変換ルール
+
+| 原本のセレクタ | page.module.css での書き方 |
+|---|---|
+| `:root { --xxx: ...; }` | `.layout { --xxx: ...; }` |
+| `body { color: ...; }` | `.layout { color: ...; }` |
+| `p { color: ...; }` | `.layout :global(p) { color: ...; }` |
+| `a { color: ...; }` | `.layout a { color: ...; }` |
+| `.sidebar { ... }` | `.sidebar { ... }` (CSS Module クラス) |
+| `.sidebar-nav a { ... }` | `.sidebarNav a { ... }` (camelCase) |
+| `.sidebar-nav a.active { ... }` | `.tocLinkActive { ... }` (プロジェクト命名規約) |
+| `h2 { ... }` | `.layout :global(h2) { ... }` or `.sectionTitle { ... }` |
+| `thead th { ... }` | `.layout :global(thead th) { ... }` |
+
+### チェック: 未定義変数がないか
+
+```bash
+# implementation-reference.md の var() 参照確認コマンドを使う
+# (§ CSS Module 地雷チェック — var() 参照確認コマンド 参照)
+```
+
+---
+
 ## 関連ドキュメント
 
 - `.claude/rules/tdd-mandatory-cycle.md` — TDD 必須サイクル & コミット分割ルール
 - `.claude/rules/mermaid-diagram-layout.md` — Mermaid レイアウト不変条件
 - `.claude/rules/migration-progress-sync.md` — PROGRESS.md 同期ルール
 - `.claude/skills/fix-mermaid/SKILL.md` — Mermaid 修正・スタイリング詳細
+- `css-full-transfer-checklist.md` — CSS 完全転写チェックリスト（2026-08-19 追加）

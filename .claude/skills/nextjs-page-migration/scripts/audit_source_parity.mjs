@@ -22,7 +22,8 @@
  *   2 = 引数エラー / ファイル未検出
  */
 
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
+import { dirname, resolve } from "node:path";
 import { MERMAID_DIAGRAM_DECLARATION } from "../../fix-mermaid/scripts/mermaid-diagram-types.mjs";
 
 /** リスト項目の照合に使う先頭文字数。長大な項目の全文一致を求めないための上限。 */
@@ -76,24 +77,56 @@ function decodeEntities(raw) {
     .replace(/&gt;/g, ">")
     .replace(/&quot;/g, '"')
     .replace(/&#39;/g, "'")
+    .replace(/&apos;/g, "'")
     .replace(/&nbsp;/g, " ")
+    .replace(/&mdash;/g, "—")
+    .replace(/&ndash;/g, "–")
+    .replace(/&hellip;/g, "…")
+    .replace(/&rsquo;/g, "’")
+    .replace(/&lsquo;/g, "‘")
+    .replace(/&rdquo;/g, "”")
+    .replace(/&ldquo;/g, "“")
     .replace(/&amp;/g, "&");
 }
 
 /**
  * Extracts display text from an HTML or JSX fragment.
  * @param {string} fragment - The markup fragment containing tags or JSX expressions.
- * @returns {string} The decoded display text with tags and expressions removed.
+ * @returns {string} The decoded display text: tags and identifier expressions are removed, while
+ *   the literal text of string expressions is kept.
  */
 function stripMarkup(fragment) {
-  return decodeEntities(
-    fragment
-      .replace(/\{\/\*[\s\S]*?\*\/\}/g, "")
-      .replace(/\{\s*"([^"]*)"\s*\}/g, "$1")
-      .replace(/\{\s*'([^']*)'\s*\}/g, "$1")
-      .replace(/\{[^{}]*\}/g, "")
-      .replace(/<[^>]*>/g, "")
-  );
+  // JSX 文字列式の中身は「そのまま表示されるテキスト」であり、HTML に見える断片も本文の一部。
+  // タグ除去より前にプレースホルダへ退避しないと、原本側の &lt;style&gt; は（エンティティ復号が
+  // 最後なので）生き残るのに page 側の {"<style>"} だけが消え、一致している内容が漏れとして
+  // 誤検出される。復元はタグ除去の後・エンティティ復号の前に行い、両側の見え方を揃える。
+  //
+  // 例外は <br>。図解ラベルの改行指示として頻出し、原本側でも除去されるため、
+  // 文字どおりのテキストではなく空白として扱う（比較キーは空白を落とすので原本と一致する）。
+  const preserved = [];
+  const stash = (text) =>
+    `\u0000JSXSTR${preserved.push(text.replace(/<br\s*\/?>/gi, " ")) - 1}\u0000`;
+  const placeholderRe = /\u0000JSXSTR(\d+)\u0000/g;
+
+  let text = fragment
+    .replace(/\{\/\*[\s\S]*?\*\/\}/g, "")
+    .replace(/\{\s*"\\n"\s*\}|\{\s*'\\n'\s*\}|\{\s*`\\n`\s*\}/g, "\n")
+    .replace(/\{\s*"([^"]*)"\s*\}/g, (_match, value) => stash(value))
+    .replace(/\{\s*'([^']*)'\s*\}/g, (_match, value) => stash(value))
+    .replace(/\{\s*`([^`]*)`\s*\}/g, (_match, value) => stash(value))
+    .replace(/\{\s*(?:styles\.[A-Za-z0-9_-]+|[A-Za-z_$][\w$]*)\s*\}/g, "")
+    .replace(/<[^>]*>/g, "");
+
+  // 退避は入れ子になりうる（テンプレートリテラル式の中に "..." 式がある等）。
+  // String.replace は差し込んだ文字列を再走査しないため、1 回では内側のプレースホルダが
+  // 生テキストとして残り、その区間の本文が丸ごと欠落する。解けなくなるまで繰り返す。
+  // 内側は必ず先に採番されるので添字は単調減少し、ループは必ず停止する。
+  while (placeholderRe.test(text)) {
+    placeholderRe.lastIndex = 0;
+    text = text.replace(placeholderRe, (_match, index) => preserved[Number(index)]);
+  }
+
+  return decodeEntities(text);
 }
 
 /**
@@ -334,17 +367,25 @@ function resolveStringConstants(content, constants) {
 }
 
 /**
- * Collects Mermaid diagram sources from HTML in document order.
+ * Extracts Mermaid diagram declarations from HTML in document order.
  * @param {string} src - The complete HTML source.
- * @returns {string[]} The normalized Mermaid sources found in Mermaid blocks and diagram definitions.
+ * @returns {string[]} Normalized Mermaid diagram sources found in supported HTML containers, scripts, and definitions.
  */
 function collectHtmlMermaidSources(src) {
   const sources = [];
-  const divRe = /<div\b([^>]*\bclass=["'][^"']*\bmermaid\b[^"']*["'][^>]*)>([\s\S]*?)<\/div>/gi;
+  const divRe = /<(?:div|pre)\b([^>]*\bclass=["'][^"']*\bmermaid\b[^"']*["'][^>]*)>([\s\S]*?)<\/(?:div|pre)\s*>/gi;
   let div = divRe.exec(src);
   while (div !== null) {
     sources.push({ index: div.index, source: normalizeMermaidSource(div[2]) });
     div = divRe.exec(src);
+  }
+
+  const scriptRe =
+    /<script\b[^>]*\b(?:class=["'][^"']*\bmermaid-source\b[^"']*["']|id=["']src-diagram-\d+["'])[^>]*>([\s\S]*?)<\/script\s*>/gi;
+  let script = scriptRe.exec(src);
+  while (script !== null) {
+    sources.push({ index: script.index, source: normalizeMermaidSource(script[1]) });
+    script = scriptRe.exec(src);
   }
 
   const diagramEntryRe = /["'][^"']+["']\s*:\s*`([\s\S]*?)`/g;
@@ -390,6 +431,208 @@ function normalizeUrl(url) {
     .replace(/[#?].*$/, "")
     .replace(/\/+$/, "")
     .toLowerCase();
+}
+
+/**
+ * Masks comments and template-literal contents while preserving quoted string contents.
+ * @param {string} src - The module source text.
+ * @return {string} The source with comments and template-literal contents replaced by spaces.
+ */
+function blankNonCodeText(src) {
+  const blank = (text) => text.replace(/[^\n]/g, " ");
+  let out = "";
+  let index = 0;
+  while (index < src.length) {
+    const char = src[index];
+    const next = src[index + 1];
+    if (char === "/" && next === "/") {
+      const lineEnd = src.indexOf("\n", index);
+      const stop = lineEnd === -1 ? src.length : lineEnd;
+      out += blank(src.slice(index, stop));
+      index = stop;
+      continue;
+    }
+    if (char === "/" && next === "*") {
+      const commentEnd = src.indexOf("*/", index + 2);
+      const stop = commentEnd === -1 ? src.length : commentEnd + 2;
+      out += blank(src.slice(index, stop));
+      index = stop;
+      continue;
+    }
+    if (char === "`" || char === '"' || char === "'") {
+      let cursor = index + 1;
+      while (cursor < src.length) {
+        if (src[cursor] === "\\") {
+          cursor += 2;
+          continue;
+        }
+        if (src[cursor] === char) break;
+        if (char !== "`" && src[cursor] === "\n") break;
+        cursor += 1;
+      }
+      const body = src.slice(index + 1, Math.min(cursor, src.length));
+      out += char + (char === "`" ? blank(body) : body) + (src[cursor] === char ? char : "");
+      index = Math.min(cursor + 1, src.length);
+      continue;
+    }
+    out += char;
+    index += 1;
+  }
+  return out;
+}
+
+/** 読み飛ばしてよいトップレベル宣言の開始キーワード。これ以外に出会ったら走査を止める。 */
+const DECLARATION_HEAD_RE = /(?:export|const|let|var|type|interface|declare|enum)\b/y;
+
+/** 実行される本体を持たない宣言（型エイリアス・interface・ambient 宣言）の先頭。 */
+const TYPE_ONLY_HEAD_RE = /^\s*(?:export\s+(?:default\s+)?)?(?:declare\b|(?:declare\s+)?(?:type|interface)\b)/;
+
+/**
+ * Skips the quoted string that starts at the given position.
+ * @param {string} code - The module source with comments and template literal bodies blanked.
+ * @param {number} start - The index of the opening quote.
+ * @returns {number} The index of the closing quote, or the end of the source when unterminated.
+ */
+function skipQuoted(code, start) {
+  const quote = code[start];
+  let index = start + 1;
+  while (index < code.length) {
+    if (code[index] === "\\") {
+      index += 2;
+      continue;
+    }
+    if (code[index] === quote) return index;
+    if (quote !== "`" && code[index] === "\n") return index - 1;
+    index += 1;
+  }
+  return code.length;
+}
+
+/**
+ * Masks balanced type-parameter and type-argument lists while preserving source offsets.
+ *
+ * Arrow operators inside these lists are ignored so function-type syntax does not close the list.
+ * @param {string} head - The declaration head to mask.
+ * @return {string} The head with each balanced angle-bracket list replaced by spaces.
+ */
+function maskTypeArguments(head) {
+  const chars = [...head];
+  const opens = [];
+  for (let index = 0; index < chars.length; index += 1) {
+    if (chars[index] === "=" && chars[index + 1] === ">") {
+      index += 1;
+      continue;
+    }
+    if (chars[index] === "<") opens.push(index);
+    else if (chars[index] === ">" && opens.length > 0) {
+      for (let cursor = opens.pop(); cursor <= index; cursor += 1) chars[cursor] = " ";
+    }
+  }
+  return chars.join("");
+}
+
+/**
+ * Finds the `=` that opens a declaration's initializer.
+ *
+ * Everything before it is a type annotation, where an arrow is just part of a function type.
+ * Arrows and comparison operators contain an `=` of their own, so they are stepped over rather
+ * than mistaken for the boundary.
+ * @param {string} head - The declaration head with its type-argument lists already masked.
+ * @returns {number} The index of the initializer `=`, or -1 when the declaration has no initializer.
+ */
+function initializerBoundary(head) {
+  for (let index = 0; index < head.length; index += 1) {
+    if (head[index] !== "=") continue;
+    // `=>` / `==` / `===` / `!=` / `<=` / `>=` はいずれも初期化子の開始ではない。
+    if (head[index + 1] === ">" || head[index + 1] === "=") continue;
+    if (index > 0 && "=!<>".includes(head[index - 1])) continue;
+    return index;
+  }
+  return -1;
+}
+
+/**
+ * Advances past a top-level declaration when it can be safely skipped during import scanning.
+ * @param {string} code - Module source with comments and template literal bodies blanked.
+ * @param {number} start - Position at the beginning of the declaration.
+ * @returns {number} The position after the declaration, or `-1` if scanning must stop.
+ */
+function skipTopLevelDeclaration(code, start) {
+  DECLARATION_HEAD_RE.lastIndex = start;
+  if (!DECLARATION_HEAD_RE.test(code)) return -1;
+  const headEnd = code.slice(start).search(/[{;\n]/);
+  const head = headEnd === -1 ? code.slice(start) : code.slice(start, start + headEnd);
+  // 型引数リストを伏せてから境界を探す。伏せないと `<T = string>` の `=` を初期化子の開始と
+  // 誤認し、`new Map<string, () => void>()` の型引数内のアローを実行本体の開始と誤認する。
+  // どちらも走査を止め、後続の実 import 配下の本文が監査対象から丸ごと外れる。
+  const maskedHead = maskTypeArguments(head);
+  const boundary = initializerBoundary(maskedHead);
+  const initializer = boundary === -1 ? "" : maskedHead.slice(boundary + 1);
+  if (!TYPE_ONLY_HEAD_RE.test(head) && (/\b(?:function|class)\b/.test(head) || /=>/.test(initializer)))
+    return -1;
+
+  let depth = 0;
+  let index = start;
+  while (index < code.length) {
+    const char = code[index];
+    if (char === '"' || char === "'" || char === "`") {
+      index = skipQuoted(code, index) + 1;
+      continue;
+    }
+    if (char === "(" || char === "[" || char === "{") depth += 1;
+    else if (char === ")" || char === "]" || char === "}") {
+      depth -= 1;
+      if (depth < 0) return -1;
+      // ブロックで閉じる宣言（`interface X { … }` 等）はセミコロンを伴わないことがある。
+      if (depth === 0 && char === "}" && !/^\s*;/.test(code.slice(index + 1))) return index + 1;
+    } else if (char === ";" && depth === 0) return index + 1;
+    index += 1;
+  }
+  return -1;
+}
+
+/**
+ * Collects relative module specifiers from import declarations in a module's prelude.
+ *
+ * @param {string} src - The module source text.
+ * @returns {string[]} The relative specifiers of the module's import declarations.
+ */
+function collectLocalImportSpecifiers(src) {
+  const code = blankNonCodeText(src);
+  // 空白（＝空白化済みコメントを含む）と "use client" 等のディレクティブは読み飛ばす。
+  const skipRe = /(?:\s+|["'][^"'\n]*["']\s*;?)/y;
+  // 名前付き / default / namespace / type とその組み合わせ。取りこぼすとそのモジュール配下の
+  // 本文が監査対象から丸ごと外れる。
+  const importRe =
+    /import\s+(?:type\s+)?(?:[\w$]+\s*,\s*)?(?:\{[^}]*\}|\*\s+as\s+[\w$]+|[\w$]+)\s+from\s*(["'])([^"']+)\1(?:\s*(?:with|assert)\s*\{[^}]*\})?\s*;?/y;
+  // 副作用 import（`import "./styles.css";`）。辿る対象ではないが、prelude の途中で
+  // 走査が止まって後続の実 import を見落とさないよう、ここで消費する。
+  const sideEffectRe = /import\s*(["'])([^"']+)\1(?:\s*(?:with|assert)\s*\{[^}]*\})?\s*;?/y;
+
+  const specifiers = [];
+  let cursor = 0;
+  while (cursor < code.length) {
+    skipRe.lastIndex = cursor;
+    const skipped = skipRe.exec(code);
+    if (skipped !== null) {
+      cursor = skipRe.lastIndex;
+      continue;
+    }
+    importRe.lastIndex = cursor;
+    sideEffectRe.lastIndex = cursor;
+    const declaration = importRe.exec(code) ?? sideEffectRe.exec(code);
+    if (declaration === null) {
+      // import 群の途中に挟まったトップレベル宣言（`export const revalidate = false;` 等）で
+      // 走査を止めると、後続の実 import 配下の本文が丸ごと監査対象から外れる。
+      const resumed = skipTopLevelDeclaration(code, cursor);
+      if (resumed === -1) break;
+      cursor = resumed;
+      continue;
+    }
+    if (declaration[2].startsWith(".")) specifiers.push(declaration[2]);
+    cursor += declaration[0].length;
+  }
+  return specifiers;
 }
 
 // --------------------------------------------------------------------------
@@ -502,11 +745,33 @@ function inventoryMarkdown(src) {
 
 /**
  * Builds an inventory of headings and content elements found in an HTML document.
- * @param {string} src - The complete HTML source.
- * @return {Object} The extracted headings, element counts, normalized content, Mermaid sources, SVG elements, callouts, and external links.
+ * @param {string} src - The HTML source to inspect.
+ * @return {Object} The inventory of headings, lists, code blocks, table rows, paragraphs, Mermaid sources, SVG elements, callouts, and external links.
  */
 function inventoryHtml(src) {
-  const body = src.replace(/<(script|style)[\s\S]*?<\/\1>/gi, "");
+  // data-code スクリプトの中身は「表示されるコードブロック」なので保存する。
+  // ただし中身自体が <style> 等を含みうるため、いったん不透明なプレースホルダへ退避し、
+  // script/style/link の除去が終わってから <code> として復元する。
+  const preservedCode = [];
+  const stashed = src.replace(
+    /<script\b[^>]*\bdata-code\b[^>]*>([\s\S]*?)<\/script\s*>/gi,
+    (_match, content) => {
+      preservedCode.push(content);
+      return `\u0000DATACODE${preservedCode.length - 1}\u0000`;
+    }
+  );
+  const body = stashed
+    .replace(/<head[\s\S]*?<\/head>/gi, "")
+    .replace(/<(script|style)[\s\S]*?<\/\1>/gi, "")
+    .replace(/<link\b[^>]*\/?>/gi, "")
+    .replace(
+      /\u0000DATACODE(\d+)\u0000/g,
+      // 中身のタグは「表示されるコード」なので < > をエンティティ化して除去から守る。
+      // page 側の {"<style>…"} が復元されるのに合わせ、復号後に同じ文字列へ落ちる。
+      // & は触らない（原本が既に持つ &lt; を二重符号化しないため）。
+      (_match, index) =>
+        `<code>${preservedCode[Number(index)].replace(/</g, "&lt;").replace(/>/g, "&gt;")}</code>`
+    );
   const headings = [];
   const headingRe = /<h([1-6])\b[^>]*>([\s\S]*?)<\/h\1>/gi;
   let match = headingRe.exec(body);
@@ -523,9 +788,9 @@ function inventoryHtml(src) {
     li = liRe.exec(body);
   }
 
-  const codeBlockTexts = extractTagContents(body, "pre").map(({ content }) =>
-    normalizeElementContent(content)
-  );
+  const codeBlockTexts = extractElementContents(body, (openingTag) =>
+    /^<pre\b/i.test(openingTag) && !/\bclass=["'][^"']*\bmermaid\b/i.test(openingTag)
+  ).map(({ content }) => normalizeElementContent(content));
   const tableRowTexts = extractTagContents(body, "tr").map(({ content }) =>
     normalizeElementContent(content)
   );
@@ -619,12 +884,13 @@ function countMatches(src, re) {
  * @returns {Set<string>} The normalized URLs found in the text.
  */
 function collectUrls(src) {
+  const decoded = decodeEntities(src);
   const urls = new Set();
   const re = /https?:\/\/[^\s"'`)<>\]}\\]+/g;
-  let match = re.exec(src);
+  let match = re.exec(decoded);
   while (match !== null) {
     urls.add(normalizeUrl(match[0]));
-    match = re.exec(src);
+    match = re.exec(decoded);
   }
   return urls;
 }
@@ -768,7 +1034,41 @@ let sourceText;
 let pageText;
 try {
   sourceText = readFileSync(sourcePath, "utf8");
-  pageText = readFileSync(pagePath, "utf8");
+  const pageModulePath = resolve(pagePath);
+  // 相対 import はモジュールごとのディレクトリを基準に解決する。
+  // page.tsx の dir を使い回すとネストした相対 import を取り違え、
+  // 同一文字列を再走査すると循環 import で無限ループになるため、
+  // 解決済みパスの visited Set を持つワークキューで辿る。
+  const visited = new Set([pageModulePath]);
+  const queue = [pageModulePath];
+  const collected = [];
+  // 実 import の収集は collectLocalImportSpecifiers が担う（module の prelude だけを走査する）。
+  // ガイドページはコード例として import 文そのものを描画するため、描画テキストを実 import と
+  // 取り違えると未転写の本文が page 側の照合材料に混ざり「漏れなし」と誤判定する。
+  while (queue.length > 0) {
+    const modulePath = queue.shift();
+    const moduleText = readFileSync(modulePath, "utf8");
+    collected.push(moduleText);
+
+    const moduleDir = dirname(modulePath);
+    for (const relPath of collectLocalImportSpecifiers(moduleText)) {
+      const candidatePaths = [
+        resolve(moduleDir, `${relPath}.tsx`),
+        resolve(moduleDir, `${relPath}.ts`),
+        resolve(moduleDir, `${relPath}/index.tsx`),
+        resolve(moduleDir, `${relPath}/index.ts`),
+      ];
+      for (const cp of candidatePaths) {
+        if (!existsSync(cp)) continue;
+        if (!visited.has(cp)) {
+          visited.add(cp);
+          queue.push(cp);
+        }
+        break;
+      }
+    }
+  }
+  pageText = collected.join("\n");
 } catch (error) {
   console.error(`読み込み失敗: ${error instanceof Error ? error.message : String(error)}`);
   process.exit(2);

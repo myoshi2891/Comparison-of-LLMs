@@ -1,8 +1,8 @@
 # デザイン契約テスト — 実装パターン
 
-(最終更新日: 2026-08-11)
+(最終更新日: 2026-08-19)
 
-**用途**: SKILL.md §「8 + 4 契約」のうち、4件のデザイン契約テストで
+**用途**: SKILL.md §「デザイン契約」のうち、D-1〜D-8 のデザイン契約テストで
 自動検知するテストパターンを詳述する。CSS Modules ではクラス名が変換されるため、
 DOM 上の `data-testid` / `data-variant` 属性でデザイン意図を表現してテストする。
 
@@ -117,6 +117,143 @@ it("callout.label が data-testid='callout-label' を持つ", () => {
 
 ---
 
+## D-5〜D-8: CSS/スタイリング契約テスト（2026-08-19 追加）
+
+D-1〜D-4 はコンテンツ構造（callout / stepTag / voice）の契約だが、
+D-5〜D-8 は **CSS/スタイリングの移行漏れを防止する**契約テストである。
+
+### 追加の data-testid / data-* 属性一覧
+
+| 要素 | data-testid | 補足 |
+|---|---|---|
+| サイドバーナビゲーション | `sidebar-nav` | サイドバー全体の `<ul>` に付与 |
+| サイドバーナビリンク | `sidebar-nav-link` | 各 `<a>` に付与 |
+| コードブロックラッパー | `code-block` | `<pre>` または `.codeWrap` に付与 |
+| レイアウトルート | `layout-root` | `.layout` 最外殻の `<div>` に付与 |
+
+### 正しい page.tsx の書き方
+
+```tsx
+{/* ✅ layout-root */}
+<div className={styles.layout} data-testid="layout-root">
+
+{/* ✅ sidebar-nav */}
+<ul className={styles.sidebarNav} data-testid="sidebar-nav">
+  <li>
+    <a href="#overview" className={styles.tocLink}
+       data-testid="sidebar-nav-link">
+      <i className="ti ti-layout-dashboard" />
+      全体像
+    </a>
+  </li>
+</ul>
+
+{/* ✅ code-block */}
+<pre data-testid="code-block">
+  <code>...</code>
+</pre>
+```
+
+### テスト実装パターン
+
+```tsx
+// 原本から機械抽出した期待値。適用有無もここで宣言する
+// （--emit-headings と同様、原本を読んで一度だけ書き出す）。
+const EXPECTED_SIDEBAR_HREFS = [
+  "#overview",
+  "#step-01",
+  "#appendix",
+] as const;
+const EXPECTED_CODE_BLOCK_COUNT = 7;
+const EXPECTED_STYLESHEET_HREFS = [
+  "https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.31.0/dist/tabler-icons.min.css",
+] as const;
+
+// D-5: サイドバーナビが原本の TOC と順序込みで一致する（原本にサイドバーがある場合のみ）
+it("サイドバーナビのリンクが原本の TOC と順序込みで完全一致する", () => {
+  const { container } = render(<Page />);
+  const sidebarNav = container.querySelector("[data-testid='sidebar-nav']");
+  // expect(...).not.toBeNull() は型を絞り込まないため、明示的に null を弾いてから使う。
+  // 絞り込まずに querySelectorAll すると型エラーになり、`!` で握り潰すのは規約違反。
+  if (sidebarNav === null) throw new Error("sidebar-nav が存在しない");
+
+  // リンクはサイドバー配下だけを走査する。container 全体だと本文中の
+  // アンカーまで拾い、順序比較が原本の TOC と無関係に壊れる。
+  const navLinks = Array.from(
+    sidebarNav.querySelectorAll("[data-testid='sidebar-nav-link']")
+  );
+  // ❌ length > 0 では 1 本でも通る。href 配列を丸ごと比較する
+  expect(navLinks.map((link) => link.getAttribute("href"))).toEqual([
+    ...EXPECTED_SIDEBAR_HREFS,
+  ]);
+  // アンカーが実在する見出しを指すこと
+  for (const href of EXPECTED_SIDEBAR_HREFS) {
+    expect(container.querySelector(`[id='${href.slice(1)}']`)).not.toBeNull();
+  }
+});
+
+// D-6: コードブロックが原本と同数あり、すべて code 子要素を持つ（原本にコードブロックがある場合のみ）
+it("コードブロックが原本と同数存在し、各ブロックが <code> を持つ", () => {
+  const { container } = render(<Page />);
+  const codeBlocks = Array.from(
+    container.querySelectorAll("[data-testid='code-block']")
+  );
+  // ❌ if (codeBlocks.length > 0) で囲むと 0 件でも通ってしまう。無条件に件数を要求する
+  expect(codeBlocks).toHaveLength(EXPECTED_CODE_BLOCK_COUNT);
+  for (const block of codeBlocks) {
+    expect(block.querySelector("code")).not.toBeNull();
+  }
+});
+
+// D-6b: pre code のリセットが page.module.css に存在する（JSDOM では実 CSS が効かないため原文を検査）
+it("page.module.css が pre code のスタイルリセットを持つ", () => {
+  const css = readFileSync(new URL("./page.module.css", import.meta.url), "utf8");
+  const preCodeRule = /:global\(pre code\)\s*\{([^}]*)\}/.exec(css);
+  expect(preCodeRule).not.toBeNull();
+  expect(preCodeRule?.[1]).toMatch(/background:\s*none/);
+  expect(preCodeRule?.[1]).toMatch(/border:\s*none/);
+  expect(preCodeRule?.[1]).toMatch(/color:\s*inherit/);
+});
+
+// D-7: 原本 <head> の外部 CDN リンクが全件挿入されている（原本に CDN がある場合のみ）
+it("原本の外部 CDN スタイルシートが全件・完全一致で挿入されている", () => {
+  const { container } = render(<Page />);
+  const hrefs = Array.from(
+    container.querySelectorAll("link[rel='stylesheet']")
+  ).map((link) => link.getAttribute("href"));
+  // ❌ some(h => h?.includes("tabler")) はバージョン差異や重複を見逃す
+  expect(hrefs).toEqual([...EXPECTED_STYLESHEET_HREFS]);
+});
+
+// D-8: layout-root が .layout 最外殻であり全幅で展開する（全ページ無条件）
+it("layout-root が .layout 最外殻であり width: 100% を持つ", () => {
+  const { container } = render(<Page />);
+  const layoutRoot = container.querySelector("[data-testid='layout-root']");
+  expect(layoutRoot).not.toBeNull();
+  // 最外殻であること — container の直下に居る
+  expect(layoutRoot?.parentElement).toBe(container);
+  // .layout クラスそのものであること（別要素へ付け替えられていないこと）
+  expect(layoutRoot?.classList.contains(styles.layout)).toBe(true);
+
+  // JSDOM は CSS Modules の実値を解決しないため、CSS 原文で全幅を検証する
+  const css = readFileSync(new URL("./page.module.css", import.meta.url), "utf8");
+  const layoutRule = /^\.layout\s*\{([^}]*)\}/m.exec(css);
+  expect(layoutRule).not.toBeNull();
+  expect(layoutRule?.[1]).toMatch(/width:\s*100%/);
+});
+```
+
+> **適用条件**: **D-8 は原本の内容に依存せず全ページで必須**である
+> （`.layout` は移植先が必ず持つ最外殻であり、全幅レイアウト崩れは原本の要素構成と無関係に起こる）。
+> **D-5〜D-7 は条件付き**で、原本にサイドバー / コードブロック / CDN リンクがある場合のみ適用する。
+> 原本にない要素の契約テストを書くのは faithful 移植に反する。
+>
+> **弱い契約にしないための原則**: 期待値は**ページごとの配列・件数**として宣言し、
+> `toEqual` で順序込みに比較する。`length > 0` / `some(...)` / `if (…) { expect(…) }` は
+> 「要素を全部落としても通る」ため契約として認めない。
+
+---
+
 ## CSS — 原本 HTML を 100% 転写する原則
 
 原本 HTML の `<style>` ブロック（または `.css`）をそのまま `page.module.css` に転写する。
@@ -134,8 +271,15 @@ it("callout.label が data-testid='callout-label' を持つ", () => {
 | **インライン `code`** | 淡青背景＋濃青文字 (`var(--accent-soft)`) | 単色・文字のみ・ダーク背景 |
 | **コードブロック構文ハイライト** | 鮮やかなマルチカラー (紫/青/緑/黄/赤/グレー) | 単色プレーンテキスト放置 |
 | **コードブロック行改行** | `<div className={styles.codeLine}>` で1行毎ラッパー | 生テキスト直接配置 (`\n` 崩れ) |
+| **`pre code` リセット** | `background: none; border: none; color: inherit;` | インラインコードスタイルがブロック内に漏れる |
 | **Mermaid 図解テーマ** | 原本の `theme: 'base'` (白/青/金ライトテーマ) | デフォルトの `dark` (真っ黒) |
 | **運用チェックリスト** | 原本 HTML のリスト／カード／表構造 | 原本と異なる構造への変換 |
+| **サイドバーナビ文字色** | `color: var(--color-text-secondary)` | globals.css デフォルト色のまま |
+| **サイドバーアイコン色** | `color: var(--color-text-tertiary)` / active 時 `var(--accent)` | 色指定なし |
+| **`p` / `li` の文字色** | `color: var(--color-text-secondary)` | globals.css デフォルト（白/グレー）|
+| **リスト要素の型** | 原本が `<ol>` なら `<ol>`、`<ul>` なら `<ul>` | `<ol>` を `<ul>` に変えてしまう |
+| **全幅レイアウト** | `width: 100%` / `max-width: none` | `max-width: 1440px` 等の制約 |
+| **CDN リンク** | `<link>` で Tabler Icons 等を読み込み | リンクタグ挿入忘れ |
 
 チェックリストの正しいレイアウトは原本依存である。たとえば `openai-codex-guide` は縦1列リストだが、
 原本がカードグリッドならカードグリッドを、表なら表を維持し、別の構造へ置き換えない。
