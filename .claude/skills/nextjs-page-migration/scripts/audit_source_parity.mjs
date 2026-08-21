@@ -411,6 +411,58 @@ function normalizeUrl(url) {
     .toLowerCase();
 }
 
+/**
+ * Blanks comment and template-literal text so import declarations can be tokenized from code only.
+ *
+ * Quoted string contents are preserved because import specifiers live inside them.
+ * The scan runs from the top of the file, where real import declarations sit, so the
+ * state machine is always clean by the time it reaches them.
+ * @param {string} src - The module source text.
+ * @returns {string} The source with comment and template-literal text replaced by spaces.
+ */
+function blankNonCodeText(src) {
+  const blank = (text) => text.replace(/[^\n]/g, " ");
+  let out = "";
+  let index = 0;
+  while (index < src.length) {
+    const char = src[index];
+    const next = src[index + 1];
+    if (char === "/" && next === "/") {
+      const lineEnd = src.indexOf("\n", index);
+      const stop = lineEnd === -1 ? src.length : lineEnd;
+      out += blank(src.slice(index, stop));
+      index = stop;
+      continue;
+    }
+    if (char === "/" && next === "*") {
+      const commentEnd = src.indexOf("*/", index + 2);
+      const stop = commentEnd === -1 ? src.length : commentEnd + 2;
+      out += blank(src.slice(index, stop));
+      index = stop;
+      continue;
+    }
+    if (char === "`" || char === '"' || char === "'") {
+      let cursor = index + 1;
+      while (cursor < src.length) {
+        if (src[cursor] === "\\") {
+          cursor += 2;
+          continue;
+        }
+        if (src[cursor] === char) break;
+        if (char !== "`" && src[cursor] === "\n") break;
+        cursor += 1;
+      }
+      const body = src.slice(index + 1, Math.min(cursor, src.length));
+      out += char + (char === "`" ? blank(body) : body) + (src[cursor] === char ? char : "");
+      index = Math.min(cursor + 1, src.length);
+      continue;
+    }
+    out += char;
+    index += 1;
+  }
+  return out;
+}
+
 // --------------------------------------------------------------------------
 // インベントリ抽出
 // --------------------------------------------------------------------------
@@ -818,16 +870,22 @@ try {
   // それらの組み合わせ（`import A, { b }` / `import A, * as B`）も辿る。
   // 取りこぼすとそのモジュール配下の本文が監査対象から丸ごと外れ、
   // 移行漏れを「漏れなし」と誤判定する。
+  // 逆に、ガイドページはコード例として import 文そのものを描画する。これを実 import と
+  // 取り違えて隣のモジュールを読み込むと、未転写の本文が page 側の照合材料に混ざり、
+  // やはり「漏れなし」と誤判定する。そこで ① コメントとテンプレートリテラルの中身を
+  // 空白化し、② 行頭（列 0）の宣言だけを import 文とみなす。JSX 内に描画されるコード例は
+  // 必ずインデントされるため、この二段の絞り込みで実宣言だけが残る。
   const localImportRe =
-    /import\s+(?:type\s+)?(?:[\w$]+\s*,\s*)?(?:\{[^}]*\}|\*\s+as\s+[\w$]+|[\w$]+)\s+from\s+["'](\.[^"']+)["']/g;
+    /^import\s+(?:type\s+)?(?:[\w$]+\s*,\s*)?(?:\{[^}]*\}|\*\s+as\s+[\w$]+|[\w$]+)\s+from\s+["'](\.[^"']+)["']/gm;
   while (queue.length > 0) {
     const modulePath = queue.shift();
     const moduleText = readFileSync(modulePath, "utf8");
     collected.push(moduleText);
 
     const moduleDir = dirname(modulePath);
+    const moduleCode = blankNonCodeText(moduleText);
     localImportRe.lastIndex = 0;
-    let imp = localImportRe.exec(moduleText);
+    let imp = localImportRe.exec(moduleCode);
     while (imp !== null) {
       const relPath = imp[1];
       const candidatePaths = [
@@ -844,7 +902,7 @@ try {
         }
         break;
       }
-      imp = localImportRe.exec(moduleText);
+      imp = localImportRe.exec(moduleCode);
     }
   }
   pageText = collected.join("\n");

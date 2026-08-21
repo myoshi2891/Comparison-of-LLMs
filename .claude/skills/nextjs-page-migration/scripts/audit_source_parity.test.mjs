@@ -397,3 +397,34 @@ test("循環する相対 import があっても監査が完了する", () => {
 	assert.equal(result.status, 0);
 	assert.deepEqual(result.json.missingParagraphs, []);
 });
+
+test("コメント / テンプレートリテラル / 描画コード中の import 風テキストは辿らない", () => {
+	// ガイドページは「import 文」そのものをコード例として描画する。これを実 import と
+	// 取り違えて隣のモジュールを読み込むと、そのモジュールの本文が page 側の照合材料に
+	// 混ざり、実際には転写していない段落を「あり」と誤判定する（監査の意味が消える）。
+	const result = auditWithModules(
+		"<h2>Overview</h2><p>Only the unrelated module has this paragraph.</p>",
+		[
+			'import Section from "./sections/Section";',
+			'// import Unrelated from "./Unrelated";',
+			"const SAMPLE = `",
+			'import Unrelated from "./Unrelated";',
+			'import { MermaidDiagram } from "./Unrelated";',
+			"`;",
+			"<><h2>Overview</h2><Section />",
+			'  <pre><code>import Unrelated from "./Unrelated";</code></pre>',
+			"  <pre><code>{SAMPLE}</code></pre></>",
+		].join("\n"),
+		{
+			"sections/Section.tsx":
+				"export default function Section() { return <p>Section paragraph.</p>; }",
+			"Unrelated.tsx":
+				"export default function Unrelated() { return <p>Only the unrelated module has this paragraph.</p>; }",
+		},
+	);
+
+	assert.deepEqual(result.json.missingParagraphs, [
+		"Only the unrelated module has this paragraph.",
+	]);
+	assert.equal(result.status, 1);
+});
