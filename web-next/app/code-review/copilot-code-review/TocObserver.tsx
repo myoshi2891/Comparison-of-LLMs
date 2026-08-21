@@ -7,9 +7,9 @@ import styles from "./page.module.css";
 export const CHECKLIST_STORAGE_KEY = "copilotCodeReviewGuide.checklist.v1";
 
 /**
- * Renders a menu button that controls the table-of-contents sidebar and its checklist.
+ * Manages table-of-contents navigation and checklist interactions while rendering a sidebar toggle button.
  *
- * @returns A button for opening and closing the table-of-contents sidebar.
+ * @returns The button used to open and close the table-of-contents sidebar.
  */
 export default function TocObserver() {
   const [isOpen, setIsOpen] = useState(false);

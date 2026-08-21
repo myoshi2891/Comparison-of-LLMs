@@ -367,9 +367,9 @@ function resolveStringConstants(content, constants) {
 }
 
 /**
- * Collects Mermaid diagram sources from HTML in document order.
+ * Extracts Mermaid diagram declarations from HTML in document order.
  * @param {string} src - The complete HTML source.
- * @returns {string[]} The normalized Mermaid sources found in Mermaid blocks and diagram definitions.
+ * @returns {string[]} Normalized Mermaid diagram sources found in supported HTML containers, scripts, and definitions.
  */
 function collectHtmlMermaidSources(src) {
   const sources = [];
@@ -509,14 +509,11 @@ function skipQuoted(code, start) {
 }
 
 /**
- * Blanks balanced type-parameter and type-argument lists while preserving offsets.
+ * Masks balanced type-parameter and type-argument lists while preserving source offsets.
  *
- * An `=` inside `<…>` belongs to a type-parameter default (`<T = string>`) and an arrow inside it
- * belongs to a function type (`Map<string, () => void>`); neither opens an initializer or an
- * executable body. Arrows are stepped over so their `>` cannot close a list, and an unmatched `<`
- * — a comparison operator, not a list — leaves the source untouched.
+ * Arrow operators inside these lists are ignored so function-type syntax does not close the list.
  * @param {string} head - The declaration head to mask.
- * @returns {string} The head with the contents of balanced `<…>` lists replaced by spaces.
+ * @return {string} The head with each balanced angle-bracket list replaced by spaces.
  */
 function maskTypeArguments(head) {
   const chars = [...head];
