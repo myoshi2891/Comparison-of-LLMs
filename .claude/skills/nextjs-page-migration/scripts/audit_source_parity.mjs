@@ -463,6 +463,48 @@ function blankNonCodeText(src) {
   return out;
 }
 
+/**
+ * Collects relative import specifiers from a module's import prelude.
+ *
+ * The scan walks a cursor from the top of the module through directives, blanked
+ * comments, and import declarations, and stops at the first token that is not one
+ * of those. Import declarations are hoisted and always sit in that prelude, so
+ * anything the cursor never reaches — JSX text, `<pre>` code examples, strings —
+ * cannot be mistaken for a declaration regardless of its indentation.
+ * @param {string} src - The module source text.
+ * @returns {string[]} The relative specifiers of the module's import declarations.
+ */
+function collectLocalImportSpecifiers(src) {
+  const code = blankNonCodeText(src);
+  // 空白（＝空白化済みコメントを含む）と "use client" 等のディレクティブは読み飛ばす。
+  const skipRe = /(?:\s+|["'][^"'\n]*["']\s*;?)/y;
+  // 名前付き / default / namespace / type とその組み合わせ。取りこぼすとそのモジュール配下の
+  // 本文が監査対象から丸ごと外れる。
+  const importRe =
+    /import\s+(?:type\s+)?(?:[\w$]+\s*,\s*)?(?:\{[^}]*\}|\*\s+as\s+[\w$]+|[\w$]+)\s+from\s*(["'])([^"']+)\1\s*;?/y;
+  // 副作用 import（`import "./styles.css";`）。辿る対象ではないが、prelude の途中で
+  // 走査が止まって後続の実 import を見落とさないよう、ここで消費する。
+  const sideEffectRe = /import\s*(["'])([^"']+)\1\s*;?/y;
+
+  const specifiers = [];
+  let cursor = 0;
+  while (cursor < code.length) {
+    skipRe.lastIndex = cursor;
+    const skipped = skipRe.exec(code);
+    if (skipped !== null) {
+      cursor = skipRe.lastIndex;
+      continue;
+    }
+    importRe.lastIndex = cursor;
+    sideEffectRe.lastIndex = cursor;
+    const declaration = importRe.exec(code) ?? sideEffectRe.exec(code);
+    if (declaration === null) break;
+    if (declaration[2].startsWith(".")) specifiers.push(declaration[2]);
+    cursor += declaration[0].length;
+  }
+  return specifiers;
+}
+
 // --------------------------------------------------------------------------
 // インベントリ抽出
 // --------------------------------------------------------------------------
@@ -866,28 +908,16 @@ try {
   const visited = new Set([pageModulePath]);
   const queue = [pageModulePath];
   const collected = [];
-  // 名前付き import だけでなく、default / namespace / type import と
-  // それらの組み合わせ（`import A, { b }` / `import A, * as B`）も辿る。
-  // 取りこぼすとそのモジュール配下の本文が監査対象から丸ごと外れ、
-  // 移行漏れを「漏れなし」と誤判定する。
-  // 逆に、ガイドページはコード例として import 文そのものを描画する。これを実 import と
-  // 取り違えて隣のモジュールを読み込むと、未転写の本文が page 側の照合材料に混ざり、
-  // やはり「漏れなし」と誤判定する。そこで ① コメントとテンプレートリテラルの中身を
-  // 空白化し、② 行頭（列 0）の宣言だけを import 文とみなす。JSX 内に描画されるコード例は
-  // 必ずインデントされるため、この二段の絞り込みで実宣言だけが残る。
-  const localImportRe =
-    /^import\s+(?:type\s+)?(?:[\w$]+\s*,\s*)?(?:\{[^}]*\}|\*\s+as\s+[\w$]+|[\w$]+)\s+from\s+["'](\.[^"']+)["']/gm;
+  // 実 import の収集は collectLocalImportSpecifiers が担う（module の prelude だけを走査する）。
+  // ガイドページはコード例として import 文そのものを描画するため、描画テキストを実 import と
+  // 取り違えると未転写の本文が page 側の照合材料に混ざり「漏れなし」と誤判定する。
   while (queue.length > 0) {
     const modulePath = queue.shift();
     const moduleText = readFileSync(modulePath, "utf8");
     collected.push(moduleText);
 
     const moduleDir = dirname(modulePath);
-    const moduleCode = blankNonCodeText(moduleText);
-    localImportRe.lastIndex = 0;
-    let imp = localImportRe.exec(moduleCode);
-    while (imp !== null) {
-      const relPath = imp[1];
+    for (const relPath of collectLocalImportSpecifiers(moduleText)) {
       const candidatePaths = [
         resolve(moduleDir, `${relPath}.tsx`),
         resolve(moduleDir, `${relPath}.ts`),
@@ -902,7 +932,6 @@ try {
         }
         break;
       }
-      imp = localImportRe.exec(moduleCode);
     }
   }
   pageText = collected.join("\n");

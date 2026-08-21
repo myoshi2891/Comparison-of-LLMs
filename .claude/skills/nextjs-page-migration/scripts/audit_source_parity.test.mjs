@@ -428,3 +428,37 @@ test("コメント / テンプレートリテラル / 描画コード中の impo
 	]);
 	assert.equal(result.status, 1);
 });
+
+test("列 0 に描画された import 風テキストも辿らない", () => {
+	// <pre> の中身は整形時にインデントを保存されるため、コード例の import が列 0 に来る。
+	// 実 import の判定を桁位置に頼ると、この描画テキストを実 import と取り違える。
+	// ディレクティブ・コメント・副作用 import が先行しても、実 import は辿れること。
+	const result = auditWithModules(
+		"<h2>Overview</h2><p>Only the unrelated module has this paragraph.</p>",
+		[
+			'"use client";',
+			'// import Commented from "./Unrelated";',
+			'import "./page.module.css";',
+			'import Section from "./sections/Section";',
+			"<><h2>Overview</h2><Section />",
+			"  <pre><code>",
+			'import Unrelated from "./Unrelated";',
+			"  </code></pre></>",
+		].join("\n"),
+		{
+			"sections/Section.tsx":
+				"export default function Section() { return <p>Section paragraph.</p>; }",
+			"Unrelated.tsx":
+				"export default function Unrelated() { return <p>Only the unrelated module has this paragraph.</p>; }",
+		},
+	);
+
+	// 描画テキストは辿らない → 未転写の段落が漏れとして報告される。
+	assert.deepEqual(result.json.missingParagraphs, [
+		"Only the unrelated module has this paragraph.",
+	]);
+	assert.equal(result.status, 1);
+	// 実 import は辿れている → Section の段落だけが page 側に数えられている
+	// （Unrelated を辿っていればこの段落が漏れとして報告されない）。
+	assert.equal(result.json.counts.paragraphs.page, 1);
+});
