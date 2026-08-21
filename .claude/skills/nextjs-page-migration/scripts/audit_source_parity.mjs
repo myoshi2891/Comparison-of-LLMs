@@ -92,19 +92,41 @@ function decodeEntities(raw) {
 /**
  * Extracts display text from an HTML or JSX fragment.
  * @param {string} fragment - The markup fragment containing tags or JSX expressions.
- * @returns {string} The decoded display text with tags and expressions removed.
+ * @returns {string} The decoded display text: tags and identifier expressions are removed, while
+ *   the literal text of string expressions is kept.
  */
 function stripMarkup(fragment) {
-  return decodeEntities(
-    fragment
-      .replace(/\{\/\*[\s\S]*?\*\/\}/g, "")
-      .replace(/\{\s*"\\n"\s*\}|\{\s*'\\n'\s*\}|\{\s*`\\n`\s*\}/g, "\n")
-      .replace(/\{\s*"([^"]*)"\s*\}/g, "$1")
-      .replace(/\{\s*'([^']*)'\s*\}/g, "$1")
-      .replace(/\{\s*`([^`]*)`\s*\}/g, "$1")
-      .replace(/\{\s*(?:styles\.[A-Za-z0-9_-]+|[A-Za-z_$][\w$]*)\s*\}/g, "")
-      .replace(/<[^>]*>/g, "")
-  );
+  // JSX 文字列式の中身は「そのまま表示されるテキスト」であり、HTML に見える断片も本文の一部。
+  // タグ除去より前にプレースホルダへ退避しないと、原本側の &lt;style&gt; は（エンティティ復号が
+  // 最後なので）生き残るのに page 側の {"<style>"} だけが消え、一致している内容が漏れとして
+  // 誤検出される。復元はタグ除去の後・エンティティ復号の前に行い、両側の見え方を揃える。
+  //
+  // 例外は <br>。図解ラベルの改行指示として頻出し、原本側でも除去されるため、
+  // 文字どおりのテキストではなく空白として扱う（比較キーは空白を落とすので原本と一致する）。
+  const preserved = [];
+  const stash = (text) =>
+    `\u0000JSXSTR${preserved.push(text.replace(/<br\s*\/?>/gi, " ")) - 1}\u0000`;
+  const placeholderRe = /\u0000JSXSTR(\d+)\u0000/g;
+
+  let text = fragment
+    .replace(/\{\/\*[\s\S]*?\*\/\}/g, "")
+    .replace(/\{\s*"\\n"\s*\}|\{\s*'\\n'\s*\}|\{\s*`\\n`\s*\}/g, "\n")
+    .replace(/\{\s*"([^"]*)"\s*\}/g, (_match, value) => stash(value))
+    .replace(/\{\s*'([^']*)'\s*\}/g, (_match, value) => stash(value))
+    .replace(/\{\s*`([^`]*)`\s*\}/g, (_match, value) => stash(value))
+    .replace(/\{\s*(?:styles\.[A-Za-z0-9_-]+|[A-Za-z_$][\w$]*)\s*\}/g, "")
+    .replace(/<[^>]*>/g, "");
+
+  // 退避は入れ子になりうる（テンプレートリテラル式の中に "..." 式がある等）。
+  // String.replace は差し込んだ文字列を再走査しないため、1 回では内側のプレースホルダが
+  // 生テキストとして残り、その区間の本文が丸ごと欠落する。解けなくなるまで繰り返す。
+  // 内側は必ず先に採番されるので添字は単調減少し、ループは必ず停止する。
+  while (placeholderRe.test(text)) {
+    placeholderRe.lastIndex = 0;
+    text = text.replace(placeholderRe, (_match, index) => preserved[Number(index)]);
+  }
+
+  return decodeEntities(text);
 }
 
 /**
@@ -481,10 +503,10 @@ function collectLocalImportSpecifiers(src) {
   // 名前付き / default / namespace / type とその組み合わせ。取りこぼすとそのモジュール配下の
   // 本文が監査対象から丸ごと外れる。
   const importRe =
-    /import\s+(?:type\s+)?(?:[\w$]+\s*,\s*)?(?:\{[^}]*\}|\*\s+as\s+[\w$]+|[\w$]+)\s+from\s*(["'])([^"']+)\1\s*;?/y;
+    /import\s+(?:type\s+)?(?:[\w$]+\s*,\s*)?(?:\{[^}]*\}|\*\s+as\s+[\w$]+|[\w$]+)\s+from\s*(["'])([^"']+)\1(?:\s*(?:with|assert)\s*\{[^}]*\})?\s*;?/y;
   // 副作用 import（`import "./styles.css";`）。辿る対象ではないが、prelude の途中で
   // 走査が止まって後続の実 import を見落とさないよう、ここで消費する。
-  const sideEffectRe = /import\s*(["'])([^"']+)\1\s*;?/y;
+  const sideEffectRe = /import\s*(["'])([^"']+)\1(?:\s*(?:with|assert)\s*\{[^}]*\})?\s*;?/y;
 
   const specifiers = [];
   let cursor = 0;
@@ -636,7 +658,11 @@ function inventoryHtml(src) {
     .replace(/<link\b[^>]*\/?>/gi, "")
     .replace(
       /\u0000DATACODE(\d+)\u0000/g,
-      (_match, index) => `<code>${preservedCode[Number(index)]}</code>`
+      // 中身のタグは「表示されるコード」なので < > をエンティティ化して除去から守る。
+      // page 側の {"<style>…"} が復元されるのに合わせ、復号後に同じ文字列へ落ちる。
+      // & は触らない（原本が既に持つ &lt; を二重符号化しないため）。
+      (_match, index) =>
+        `<code>${preservedCode[Number(index)].replace(/</g, "&lt;").replace(/>/g, "&gt;")}</code>`
     );
   const headings = [];
   const headingRe = /<h([1-6])\b[^>]*>([\s\S]*?)<\/h\1>/gi;

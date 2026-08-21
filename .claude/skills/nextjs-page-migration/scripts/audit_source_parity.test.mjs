@@ -11,6 +11,31 @@ import {
 
 const auditScript = new URL("./audit_source_parity.mjs", import.meta.url);
 
+/**
+ * spawnSync の結果を検証してから JSON を解釈する。
+ * 起動失敗・タイムアウト・非 JSON 出力を素の JSON.parse に渡すと
+ * "Unexpected end of JSON input" だけが残り、stderr の実原因が失われる。
+ * @param {import("node:child_process").SpawnSyncReturns<string>} result - 監査プロセスの実行結果。
+ * @returns {object} 監査結果の JSON。
+ */
+function parseAuditResult(result) {
+	if (result.error) {
+		throw new Error(`監査プロセスの起動に失敗: ${result.error.message}`);
+	}
+	if (typeof result.stdout !== "string" || result.stdout.trim() === "") {
+		throw new Error(
+			`監査プロセスが JSON を出力しなかった (status=${result.status}, signal=${result.signal}): ${result.stderr ?? ""}`,
+		);
+	}
+	try {
+		return JSON.parse(result.stdout);
+	} catch {
+		throw new Error(
+			`監査出力を JSON として解釈できない: ${result.stdout}\n${result.stderr ?? ""}`,
+		);
+	}
+}
+
 function audit(source, page, sourceExtension = "html") {
 	const fixtureDir = mkdtempSync(join(tmpdir(), "source-parity-"));
 	const sourcePath = join(fixtureDir, `source.${sourceExtension}`);
@@ -29,7 +54,7 @@ function audit(source, page, sourceExtension = "html") {
 
 	return {
 		status: result.status,
-		json: JSON.parse(result.stdout),
+		json: parseAuditResult(result),
 	};
 }
 
@@ -315,7 +340,7 @@ function auditWithModules(source, page, modules) {
 	);
 	rmSync(fixtureDir, { recursive: true, force: true });
 
-	return { status: result.status, json: JSON.parse(result.stdout) };
+	return { status: result.status, json: parseAuditResult(result) };
 }
 
 test("data-code ブロック内の style 要素が除去されずコード全文が残る", () => {
@@ -461,4 +486,65 @@ test("列 0 に描画された import 風テキストも辿らない", () => {
 	// 実 import は辿れている → Section の段落だけが page 側に数えられている
 	// （Unrelated を辿っていればこの段落が漏れとして報告されない）。
 	assert.equal(result.json.counts.paragraphs.page, 1);
+});
+
+test("JSX 文字列式が保持する HTML 断片を原本のエンティティと同一視する", () => {
+	// 原本の &lt;style&gt; はエンティティ復号が最後なのでタグ除去を生き延びる。page 側の
+	// {"<style>"} も同じ表示テキストなので、退避せずタグ除去に晒すと片側だけ消えて誤検出になる。
+	const matching = audit(
+		[
+			"<p>Double &lt;style&gt; quoted.</p>",
+			"<p>Single &lt;input&gt; quoted.</p>",
+			"<p>Template &lt;div&gt; quoted.</p>",
+		].join("\n"),
+		[
+			'<p>Double {"<style>"} quoted.</p>',
+			"<p>Single {'<input>'} quoted.</p>",
+			"<p>Template {`<div>`} quoted.</p>",
+		].join("\n"),
+	);
+
+	assert.deepEqual(matching.json.missingParagraphs, []);
+	assert.equal(matching.status, 0);
+
+	// 保持した中身の差分は引き続き漏れとして検出できる。
+	const altered = audit(
+		"<p>Double &lt;style&gt; quoted.</p>",
+		'<p>Double {"<script>"} quoted.</p>',
+	);
+	assert.deepEqual(altered.json.missingParagraphs, ["Double <style> quoted."]);
+	assert.equal(altered.status, 1);
+});
+
+test("import 属性付き宣言の後続にある相対 import も辿る", () => {
+	// `with { type: "json" }` を消費しないと走査がそこで止まり、後続の実 import 配下の
+	// 本文が丸ごと監査対象から外れて「漏れなし」と誤判定される。
+	const result = auditWithModules(
+		"<h2>Overview</h2><p>Nested paragraph.</p>",
+		[
+			'import data from "./data.json" with { type: "json" };',
+			'import Section from "./sections/Section";',
+			"<><h2>Overview</h2><Section value={data} /></>",
+		].join("\n"),
+		{
+			"sections/Section.tsx":
+				"export default function Section() { return <p>Nested paragraph.</p>; }",
+		},
+	);
+
+	assert.deepEqual(result.json.missingParagraphs, []);
+	assert.equal(result.status, 0);
+});
+
+test("文字列式の <br> は文字ではなく改行として扱う", () => {
+	// 図解ラベルの {"Step9<br/>コスト最適化"} は「Step9コスト最適化」という表示テキストであり、
+	// <br/> という文字列ではない。原本側でも <br> は除去されるため、文字として保持すると
+	// 本文の連続性が切れて実在する項目を漏れと誤判定する。
+	const result = audit(
+		"<p>Step9 コスト最適化</p>",
+		'<p>{"Step9<br/>コスト最適化"}</p>',
+	);
+
+	assert.deepEqual(result.json.missingParagraphs, []);
+	assert.equal(result.status, 0);
 });
