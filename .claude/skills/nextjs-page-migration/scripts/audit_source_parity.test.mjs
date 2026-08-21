@@ -671,3 +671,45 @@ test("アロー関数の初期化子を持つ宣言では走査を止める", ()
 	]);
 	assert.equal(result.status, 1);
 });
+
+test("型引数デフォルトを持つ宣言を挟んだ後続の相対 import も辿る", () => {
+	// `<T = string>` の `=` を初期化子の開始と誤認すると、宣言の残り全体が初期化子として
+	// 扱われ、型の一部でしかない `=>` が実行本体の開始と誤判定されて走査が止まる。
+	const result = auditWithModules(
+		"<h2>Overview</h2><p>Nested paragraph.</p>",
+		[
+			'import dynamic from "next/dynamic";',
+			"type Formatter<T = string> = (value: T) => string;",
+			'import Section from "./sections/Section";',
+			"<><h2>Overview</h2><Section /></>",
+		].join("\n"),
+		{
+			"sections/Section.tsx":
+				"export default function Section() { return <p>Nested paragraph.</p>; }",
+		},
+	);
+
+	assert.deepEqual(result.json.missingParagraphs, []);
+	assert.equal(result.status, 0);
+});
+
+test("型引数の中に関数型を持つ初期化子を挟んだ後続の相対 import も辿る", () => {
+	// `new Map<string, () => void>()` の `=>` は型引数の一部であり実行本体ではない。
+	// 本体の開始と誤認して走査を止めると、後続の実 import 配下の本文が監査対象から外れる。
+	const result = auditWithModules(
+		"<h2>Overview</h2><p>Nested paragraph.</p>",
+		[
+			'import dynamic from "next/dynamic";',
+			"const registry = new Map<string, () => void>();",
+			'import Section from "./sections/Section";',
+			"<><h2>Overview</h2><Section /></>",
+		].join("\n"),
+		{
+			"sections/Section.tsx":
+				"export default function Section() { return <p>Nested paragraph.</p>; }",
+		},
+	);
+
+	assert.deepEqual(result.json.missingParagraphs, []);
+	assert.equal(result.status, 0);
+});

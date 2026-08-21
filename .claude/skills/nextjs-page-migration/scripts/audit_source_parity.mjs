@@ -513,12 +513,38 @@ function skipQuoted(code, start) {
 }
 
 /**
+ * Blanks balanced type-parameter and type-argument lists while preserving offsets.
+ *
+ * An `=` inside `<…>` belongs to a type-parameter default (`<T = string>`) and an arrow inside it
+ * belongs to a function type (`Map<string, () => void>`); neither opens an initializer or an
+ * executable body. Arrows are stepped over so their `>` cannot close a list, and an unmatched `<`
+ * — a comparison operator, not a list — leaves the source untouched.
+ * @param {string} head - The declaration head to mask.
+ * @returns {string} The head with the contents of balanced `<…>` lists replaced by spaces.
+ */
+function maskTypeArguments(head) {
+  const chars = [...head];
+  const opens = [];
+  for (let index = 0; index < chars.length; index += 1) {
+    if (chars[index] === "=" && chars[index + 1] === ">") {
+      index += 1;
+      continue;
+    }
+    if (chars[index] === "<") opens.push(index);
+    else if (chars[index] === ">" && opens.length > 0) {
+      for (let cursor = opens.pop(); cursor <= index; cursor += 1) chars[cursor] = " ";
+    }
+  }
+  return chars.join("");
+}
+
+/**
  * Finds the `=` that opens a declaration's initializer.
  *
  * Everything before it is a type annotation, where an arrow is just part of a function type.
  * Arrows and comparison operators contain an `=` of their own, so they are stepped over rather
  * than mistaken for the boundary.
- * @param {string} head - The declaration head, up to its first `{`, `;`, or line break.
+ * @param {string} head - The declaration head with its type-argument lists already masked.
  * @returns {number} The index of the initializer `=`, or -1 when the declaration has no initializer.
  */
 function initializerBoundary(head) {
@@ -552,8 +578,12 @@ function skipTopLevelDeclaration(code, start) {
   if (!DECLARATION_HEAD_RE.test(code)) return -1;
   const headEnd = code.slice(start).search(/[{;\n]/);
   const head = headEnd === -1 ? code.slice(start) : code.slice(start, start + headEnd);
-  const boundary = initializerBoundary(head);
-  const initializer = boundary === -1 ? "" : head.slice(boundary + 1);
+  // 型引数リストを伏せてから境界を探す。伏せないと `<T = string>` の `=` を初期化子の開始と
+  // 誤認し、`new Map<string, () => void>()` の型引数内のアローを実行本体の開始と誤認する。
+  // どちらも走査を止め、後続の実 import 配下の本文が監査対象から丸ごと外れる。
+  const maskedHead = maskTypeArguments(head);
+  const boundary = initializerBoundary(maskedHead);
+  const initializer = boundary === -1 ? "" : maskedHead.slice(boundary + 1);
   if (!TYPE_ONLY_HEAD_RE.test(head) && (/\b(?:function|class)\b/.test(head) || /=>/.test(initializer)))
     return -1;
 
