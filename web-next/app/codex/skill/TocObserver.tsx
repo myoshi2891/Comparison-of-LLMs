@@ -3,6 +3,9 @@
 import { useEffect } from "react";
 import styles from "./page.module.css";
 
+/**
+ * Observes document sections to highlight the active table-of-contents link and manage responsive sidebar controls.
+ */
 export default function TocObserver() {
   useEffect(() => {
     const tocLinks = Array.from(

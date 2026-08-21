@@ -57,6 +57,9 @@ const MERMAID_5 = `flowchart TB
     P2 --> P3["フェーズ3: 組織展開<br/>組織Ruleset・Agent Skills・MCPの標準化"]
     P3 --> P4["フェーズ4: 計測と改善<br/>採用率とfalse positive率をモニタリングし指示を継続改善"]`;
 
+/**
+ * Displays a Japanese practical guide to GitHub Copilot Code Review, including setup, customization, security, governance, team adoption, and operational guidance.
+ */
 export default function Page() {
   return (
     <>

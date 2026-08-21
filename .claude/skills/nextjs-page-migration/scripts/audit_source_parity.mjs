@@ -434,13 +434,9 @@ function normalizeUrl(url) {
 }
 
 /**
- * Blanks comment and template-literal text so import declarations can be tokenized from code only.
- *
- * Quoted string contents are preserved because import specifiers live inside them.
- * The scan runs from the top of the file, where real import declarations sit, so the
- * state machine is always clean by the time it reaches them.
+ * Masks comments and template-literal contents while preserving quoted string contents.
  * @param {string} src - The module source text.
- * @returns {string} The source with comment and template-literal text replaced by spaces.
+ * @return {string} The source with comments and template-literal contents replaced by spaces.
  */
 function blankNonCodeText(src) {
   const blank = (text) => text.replace(/[^\n]/g, " ");
@@ -559,19 +555,10 @@ function initializerBoundary(head) {
 }
 
 /**
- * Skips one top-level declaration so import declarations placed after it stay reachable.
- *
- * Only declarations that begin with a declaration keyword are skipped, and the scan gives up
- * as soon as the statement opens a function, class, or arrow body. Those bodies are where JSX
- * lives, so refusing to walk past them keeps rendered `import` examples out of the cursor's path.
- * An arrow counts as a body only when it sits after the initializer `=`; before it the arrow
- * belongs to a type annotation (`const load: () => Promise<X> = loader`), which has no executable
- * body. Type-only and ambient declarations are exempt from the check entirely: `type Loader =
- * () => …` is annotation all the way through. Stopping on either would strand every import
- * declared after it.
- * @param {string} code - The module source with comments and template literal bodies blanked.
- * @param {number} start - The cursor position at the first character of the statement.
- * @returns {number} The position just past the declaration, or -1 when the scan must stop.
+ * Advances past a top-level declaration when it can be safely skipped during import scanning.
+ * @param {string} code - Module source with comments and template literal bodies blanked.
+ * @param {number} start - Position at the beginning of the declaration.
+ * @returns {number} The position after the declaration, or `-1` if scanning must stop.
  */
 function skipTopLevelDeclaration(code, start) {
   DECLARATION_HEAD_RE.lastIndex = start;
@@ -608,13 +595,8 @@ function skipTopLevelDeclaration(code, start) {
 }
 
 /**
- * Collects relative import specifiers from a module's import prelude.
+ * Collects relative module specifiers from import declarations in a module's prelude.
  *
- * The scan walks a cursor from the top of the module through directives, blanked
- * comments, import declarations, and plain top-level declarations, and stops at the
- * first token that is not one of those. Import declarations are hoisted and always sit
- * in that prelude, so anything the cursor never reaches — JSX text, `<pre>` code
- * examples, strings — cannot be mistaken for a declaration regardless of its indentation.
  * @param {string} src - The module source text.
  * @returns {string[]} The relative specifiers of the module's import declarations.
  */
@@ -766,8 +748,8 @@ function inventoryMarkdown(src) {
 
 /**
  * Builds an inventory of headings and content elements found in an HTML document.
- * @param {string} src - The complete HTML source.
- * @return {Object} The extracted headings, element counts, normalized content, Mermaid sources, SVG elements, callouts, and external links.
+ * @param {string} src - The HTML source to inspect.
+ * @return {Object} The inventory of headings, lists, code blocks, table rows, paragraphs, Mermaid sources, SVG elements, callouts, and external links.
  */
 function inventoryHtml(src) {
   // data-code スクリプトの中身は「表示されるコードブロック」なので保存する。

@@ -37,7 +37,7 @@ if [ -f "$fonts_ts" ]; then
 fi
 
 # CSS コメント (/* ... */) を空白へ潰す。複数行コメントも跨いで除去する。
-# コメント内の `--old-token: 廃止` を「定義済み」と誤認するのを防ぐため。
+# strip_css_comments removes CSS comments from the specified file and writes the resulting content to standard output.
 strip_css_comments() {
   awk '
     {
@@ -62,7 +62,7 @@ strip_css_comments() {
 # カスタムプロパティの「定義」だけを抽出する。
 # 行頭アンカーだけだと `.layout { --x: 1px; }` のような同一行宣言を取りこぼすため、
 # 宣言境界 ({ } ;) で改行へ割ってから宣言の先頭として現れる --name: を拾う。
-# var(--x) のような「参照」は直後がコロンではないので混入しない。
+# extract_var_declarations extracts unique CSS custom-property names declared in a CSS file and writes them to stdout.
 extract_var_declarations() {
   strip_css_comments "$1" | tr '{};' '\n\n\n' \
     | { grep -oE '^[[:space:]]*--[a-zA-Z0-9_-]+[[:space:]]*:' || true; } \

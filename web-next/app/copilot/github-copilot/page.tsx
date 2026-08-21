@@ -160,7 +160,7 @@ const CHART_11 = `flowchart TD
     AP6 --> Fix6["→ 話題ごとに新しいセッションを開始する"]`;
 
 /**
- * Renders the GitHub Copilot Best Practices Guide page.
+ * Renders the Japanese GitHub Copilot best-practices guide with section navigation, diagrams, checklists, and references.
  */
 export default function GithubCopilotPage() {
   return (

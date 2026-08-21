@@ -1,13 +1,11 @@
 /**
- * Mermaid ソース比較用の共通正規化ヘルパー。
+ * Mermaid ソースを比較用に正規化する。
  *
- * `.claude/skills/nextjs-page-migration/scripts/audit_source_parity.mjs` の
- * `normalizeMermaidSource` と同一の規則で、改行コード・外側の空行・共通インデント
- * のみを揃える（インデントは Mermaid の構文上意味を持つため相対関係は保つ）。
+ * 改行コードを LF に統一し、外側の空行と各行末の空白を削除する。
+ * 共通インデントを除去し、行間の相対的なインデントは保持する。
  *
- * 期待値側もこのヘルパーで正規化してから比較すること。テンプレートリテラルの
- * 字下げ量はテストファイルの整形で変わりうるため、片側だけ正規化すると
- * 「実装は正しいのに整形で落ちる」テストになる。
+ * @param raw - 正規化する Mermaid ソース
+ * @returns 正規化された Mermaid ソース
  */
 export function normalizeMermaidSource(raw: string): string {
   const lines = raw.replace(/\r\n?/g, "\n").split("\n");

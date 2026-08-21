@@ -6,6 +6,11 @@ import styles from "./page.module.css";
 /** チェック状態の永続化キー。テストからも参照するため export する。 */
 export const CHECKLIST_STORAGE_KEY = "copilotCodeReviewGuide.checklist.v1";
 
+/**
+ * Renders a menu button that controls the table-of-contents sidebar and its checklist.
+ *
+ * @returns A button for opening and closing the table-of-contents sidebar.
+ */
 export default function TocObserver() {
   const [isOpen, setIsOpen] = useState(false);
   const toggleRef = useRef<HTMLButtonElement>(null);

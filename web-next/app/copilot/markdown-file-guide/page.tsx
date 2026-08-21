@@ -9,6 +9,12 @@ export const metadata: Metadata = {
     "copilot-instructions.md / .instructions.md / .prompt.md / .chatmode.md / .agent.md / SKILL.md / MCP / Plan Mode を、中級〜上級エンジニア向けにステップバイステップで解説します。",
 };
 
+/**
+ * Renders an external link that opens in a new browser tab.
+ *
+ * @param href - The destination URL
+ * @param children - The link content
+ */
 function Ext({ href, children }: { href: string; children: React.ReactNode }) {
   return (
     <a href={href} target="_blank" rel="noopener noreferrer">
@@ -124,6 +130,9 @@ const DIAGRAM_7 = `flowchart LR
     class Rev gray;
     class Done teal;`;
 
+/**
+ * Renders the GitHub Copilot AI specification-driven development guide page.
+ */
 export default function MarkdownFileGuidePage() {
   return (
     <div className={styles.layout}>

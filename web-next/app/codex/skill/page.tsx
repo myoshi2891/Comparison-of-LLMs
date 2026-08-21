@@ -113,6 +113,9 @@ description: アプリケーションを本番またはステージング環境�
 2. 本番ビルド: \`bun run build\`
 3. デプロイコマンドを実行し、ヘルスチェックを確認する`;
 
+/**
+ * Renders the Markdown and spec-driven development practical guide page.
+ */
 export default function Page() {
   return (
     <div className={styles.layout} data-testid="layout-root">

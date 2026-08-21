@@ -24,8 +24,12 @@ export interface IntersectionObserverController {
 }
 
 /**
- * global.IntersectionObserver を制御可能なスタブへ差し替える。
- * 返り値の emit() でコールバックを任意のタイミングで発火できる。
+ * Installs a controllable `IntersectionObserver` stub for tests.
+ *
+ * The returned controller exposes observed targets, disconnect counts, callback
+ * emission, and restoration of the original global observer.
+ *
+ * @returns A controller for inspecting and controlling the installed stub
  */
 export function installIntersectionObserverStub(): IntersectionObserverController {
   const state = {

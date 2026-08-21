@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import styles from "./page.module.css";
 
 /**
- * Initializes sidebar toggle behavior and keeps the table-of-contents link for the heading nearest the viewport top active.
+ * Initializes sidebar controls and highlights the table-of-contents link for the uppermost visible heading.
  *
  * @returns `null`
  */

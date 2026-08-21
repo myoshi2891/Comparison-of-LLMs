@@ -7,6 +7,11 @@ interface CopyButtonProps {
   text: string;
 }
 
+/**
+ * Renders a button that copies the supplied text to the clipboard and briefly indicates when copying succeeds.
+ *
+ * @param text - The text to copy to the clipboard
+ */
 export default function CopyButton({ text }: CopyButtonProps) {
   const [copied, setCopied] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);

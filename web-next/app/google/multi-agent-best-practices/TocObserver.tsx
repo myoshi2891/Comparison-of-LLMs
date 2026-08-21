@@ -3,6 +3,9 @@
 import { useEffect } from "react";
 import styles from "./page.module.css";
 
+/**
+ * Initializes sidebar controls and highlights the navigation link for the uppermost visible section.
+ */
 export default function TocObserver() {
   useEffect(() => {
     // 1. Mobile Sidebar toggle

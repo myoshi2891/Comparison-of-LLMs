@@ -449,6 +449,9 @@ const DIAGRAM_8 = `flowchart TD
     C --> D["Node D（LLMエージェント）<br/>確認メールの文面をドラフト"]
     D --> E`;
 
+/**
+ * Gemini CLI、ADK、A2A、Agent Engineを用いたマルチエージェント開発ガイドを表示します。
+ */
 export default function GeminiMultiAgentBestPracticesPage() {
   return (
     <div className={styles.layout} data-testid="layout-root">
