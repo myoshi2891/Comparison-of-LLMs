@@ -488,6 +488,9 @@ function blankNonCodeText(src) {
 /** 読み飛ばしてよいトップレベル宣言の開始キーワード。これ以外に出会ったら走査を止める。 */
 const DECLARATION_HEAD_RE = /(?:export|const|let|var|type|interface|declare|enum)\b/y;
 
+/** 実行される本体を持たない宣言（型エイリアス・interface・ambient 宣言）の先頭。 */
+const TYPE_ONLY_HEAD_RE = /^\s*(?:export\s+(?:default\s+)?)?(?:declare\b|(?:declare\s+)?(?:type|interface)\b)/;
+
 /**
  * Skips the quoted string that starts at the given position.
  * @param {string} code - The module source with comments and template literal bodies blanked.
@@ -515,6 +518,8 @@ function skipQuoted(code, start) {
  * Only declarations that begin with a declaration keyword are skipped, and the scan gives up
  * as soon as the statement opens a function, class, or arrow body. Those bodies are where JSX
  * lives, so refusing to walk past them keeps rendered `import` examples out of the cursor's path.
+ * Type-only and ambient declarations are exempt from that check: `type Loader = () => …` has no
+ * executable body, so stopping there would strand every import declared after it.
  * @param {string} code - The module source with comments and template literal bodies blanked.
  * @param {number} start - The cursor position at the first character of the statement.
  * @returns {number} The position just past the declaration, or -1 when the scan must stop.
@@ -524,7 +529,7 @@ function skipTopLevelDeclaration(code, start) {
   if (!DECLARATION_HEAD_RE.test(code)) return -1;
   const headEnd = code.slice(start).search(/[{;\n]/);
   const head = headEnd === -1 ? code.slice(start) : code.slice(start, start + headEnd);
-  if (/\b(?:function|class)\b|=>/.test(head)) return -1;
+  if (!TYPE_ONLY_HEAD_RE.test(head) && /\b(?:function|class)\b|=>/.test(head)) return -1;
 
   let depth = 0;
   let index = start;

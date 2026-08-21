@@ -598,3 +598,25 @@ test("トップレベル宣言の読み飛ばしは描画された import 風テ
 	assert.equal(result.status, 1);
 	assert.equal(result.json.counts.paragraphs.page, 1);
 });
+
+test("関数型の型エイリアスを挟んだ後続の相対 import も辿る", () => {
+	// `type Loader = () => …` の `=>` を実行本体の開始と誤認して走査を止めると、
+	// その後ろの実 import 配下の本文が監査対象から外れ、転写済みの段落が漏れと誤報告される。
+	const result = auditWithModules(
+		"<h2>Overview</h2><p>Nested paragraph.</p>",
+		[
+			'import dynamic from "next/dynamic";',
+			"type Loader = () => Promise<void>;",
+			"interface Props { load: Loader }",
+			'import Section from "./sections/Section";',
+			"<><h2>Overview</h2><Section /></>",
+		].join("\n"),
+		{
+			"sections/Section.tsx":
+				"export default function Section() { return <p>Nested paragraph.</p>; }",
+		},
+	);
+
+	assert.deepEqual(result.json.missingParagraphs, []);
+	assert.equal(result.status, 0);
+});
