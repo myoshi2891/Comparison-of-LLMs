@@ -513,13 +513,36 @@ function skipQuoted(code, start) {
 }
 
 /**
+ * Finds the `=` that opens a declaration's initializer.
+ *
+ * Everything before it is a type annotation, where an arrow is just part of a function type.
+ * Arrows and comparison operators contain an `=` of their own, so they are stepped over rather
+ * than mistaken for the boundary.
+ * @param {string} head - The declaration head, up to its first `{`, `;`, or line break.
+ * @returns {number} The index of the initializer `=`, or -1 when the declaration has no initializer.
+ */
+function initializerBoundary(head) {
+  for (let index = 0; index < head.length; index += 1) {
+    if (head[index] !== "=") continue;
+    // `=>` / `==` / `===` / `!=` / `<=` / `>=` はいずれも初期化子の開始ではない。
+    if (head[index + 1] === ">" || head[index + 1] === "=") continue;
+    if (index > 0 && "=!<>".includes(head[index - 1])) continue;
+    return index;
+  }
+  return -1;
+}
+
+/**
  * Skips one top-level declaration so import declarations placed after it stay reachable.
  *
  * Only declarations that begin with a declaration keyword are skipped, and the scan gives up
  * as soon as the statement opens a function, class, or arrow body. Those bodies are where JSX
  * lives, so refusing to walk past them keeps rendered `import` examples out of the cursor's path.
- * Type-only and ambient declarations are exempt from that check: `type Loader = () => …` has no
- * executable body, so stopping there would strand every import declared after it.
+ * An arrow counts as a body only when it sits after the initializer `=`; before it the arrow
+ * belongs to a type annotation (`const load: () => Promise<X> = loader`), which has no executable
+ * body. Type-only and ambient declarations are exempt from the check entirely: `type Loader =
+ * () => …` is annotation all the way through. Stopping on either would strand every import
+ * declared after it.
  * @param {string} code - The module source with comments and template literal bodies blanked.
  * @param {number} start - The cursor position at the first character of the statement.
  * @returns {number} The position just past the declaration, or -1 when the scan must stop.
@@ -529,7 +552,10 @@ function skipTopLevelDeclaration(code, start) {
   if (!DECLARATION_HEAD_RE.test(code)) return -1;
   const headEnd = code.slice(start).search(/[{;\n]/);
   const head = headEnd === -1 ? code.slice(start) : code.slice(start, start + headEnd);
-  if (!TYPE_ONLY_HEAD_RE.test(head) && /\b(?:function|class)\b|=>/.test(head)) return -1;
+  const boundary = initializerBoundary(head);
+  const initializer = boundary === -1 ? "" : head.slice(boundary + 1);
+  if (!TYPE_ONLY_HEAD_RE.test(head) && (/\b(?:function|class)\b/.test(head) || /=>/.test(initializer)))
+    return -1;
 
   let depth = 0;
   let index = start;

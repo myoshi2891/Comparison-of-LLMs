@@ -620,3 +620,54 @@ test("関数型の型エイリアスを挟んだ後続の相対 import も辿る
 	assert.deepEqual(result.json.missingParagraphs, []);
 	assert.equal(result.status, 0);
 });
+
+test("関数型の型注釈を持つ宣言を挟んだ後続の相対 import も辿る", () => {
+	// `const load: () => Promise<…> = loader;` の `=>` は型注釈の一部であり実行本体ではない。
+	// これを本体の開始と誤認して走査を止めると、後続の実 import 配下の本文が監査対象から外れ、
+	// 転写済みの段落が漏れと誤報告される。
+	const result = auditWithModules(
+		"<h2>Overview</h2><p>Nested paragraph.</p>",
+		[
+			'import type { ComponentType } from "react";',
+			'import { defaultLoader } from "next/dynamic";',
+			"const load: () => Promise<ComponentType> = defaultLoader;",
+			'import Section from "./sections/Section";',
+			"<><h2>Overview</h2><Section /></>",
+		].join("\n"),
+		{
+			"sections/Section.tsx":
+				"export default function Section() { return <p>Nested paragraph.</p>; }",
+		},
+	);
+
+	assert.deepEqual(result.json.missingParagraphs, []);
+	assert.equal(result.status, 0);
+});
+
+test("アロー関数の初期化子を持つ宣言では走査を止める", () => {
+	// 型注釈の `=>` を許したあとも、実行本体を開く `=>` は従来どおり走査の停止点でなければ
+	// ならない。本体に入ると <pre> のコード例が実 import として辿られてしまう。
+	const result = auditWithModules(
+		"<h2>Overview</h2><p>Only the unrelated module has this paragraph.</p>",
+		[
+			'import Section from "./sections/Section";',
+			"const Wrapper = () => (",
+			"  <pre><code>",
+			'import Unrelated from "./Unrelated";',
+			"  </code></pre>",
+			");",
+			"<><h2>Overview</h2><Section /></>",
+		].join("\n"),
+		{
+			"sections/Section.tsx":
+				"export default function Section() { return <p>Section paragraph.</p>; }",
+			"Unrelated.tsx":
+				"export default function Unrelated() { return <p>Only the unrelated module has this paragraph.</p>; }",
+		},
+	);
+
+	assert.deepEqual(result.json.missingParagraphs, [
+		"Only the unrelated module has this paragraph.",
+	]);
+	assert.equal(result.status, 1);
+});
