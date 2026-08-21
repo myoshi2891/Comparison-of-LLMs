@@ -548,3 +548,53 @@ test("文字列式の <br> は文字ではなく改行として扱う", () => {
 	assert.deepEqual(result.json.missingParagraphs, []);
 	assert.equal(result.status, 0);
 });
+
+test("トップレベル宣言を挟んだ後続の相対 import も辿る", () => {
+	// `export const metadata = {…};` のような宣言で走査が止まると、その後ろの実 import 配下の
+	// 本文が丸ごと監査対象から外れ、転写済みの段落が漏れとして誤報告される。
+	const result = auditWithModules(
+		"<h2>Overview</h2><p>Nested paragraph.</p>",
+		[
+			'import type { Metadata } from "next";',
+			'export const metadata: Metadata = { title: "Guide; not a terminator" };',
+			"export const revalidate = false;",
+			'import Section from "./sections/Section";',
+			"<><h2>Overview</h2><Section /></>",
+		].join("\n"),
+		{
+			"sections/Section.tsx":
+				"export default function Section() { return <p>Nested paragraph.</p>; }",
+		},
+	);
+
+	assert.deepEqual(result.json.missingParagraphs, []);
+	assert.equal(result.status, 0);
+});
+
+test("トップレベル宣言の読み飛ばしは描画された import 風テキストまで進まない", () => {
+	// 宣言を読み飛ばせるようにしても、JSX 本文に入ってはならない。入ると <pre> のコード例が
+	// 実 import として辿られ、未転写の段落が page 側の照合材料に混ざる。
+	const result = auditWithModules(
+		"<h2>Overview</h2><p>Only the unrelated module has this paragraph.</p>",
+		[
+			'import Section from "./sections/Section";',
+			"export const revalidate = false;",
+			"<><h2>Overview</h2><Section />",
+			"  <pre><code>",
+			'import Unrelated from "./Unrelated";',
+			"  </code></pre></>",
+		].join("\n"),
+		{
+			"sections/Section.tsx":
+				"export default function Section() { return <p>Section paragraph.</p>; }",
+			"Unrelated.tsx":
+				"export default function Unrelated() { return <p>Only the unrelated module has this paragraph.</p>; }",
+		},
+	);
+
+	assert.deepEqual(result.json.missingParagraphs, [
+		"Only the unrelated module has this paragraph.",
+	]);
+	assert.equal(result.status, 1);
+	assert.equal(result.json.counts.paragraphs.page, 1);
+});

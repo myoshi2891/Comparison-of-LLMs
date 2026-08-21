@@ -485,14 +485,75 @@ function blankNonCodeText(src) {
   return out;
 }
 
+/** 読み飛ばしてよいトップレベル宣言の開始キーワード。これ以外に出会ったら走査を止める。 */
+const DECLARATION_HEAD_RE = /(?:export|const|let|var|type|interface|declare|enum)\b/y;
+
+/**
+ * Skips the quoted string that starts at the given position.
+ * @param {string} code - The module source with comments and template literal bodies blanked.
+ * @param {number} start - The index of the opening quote.
+ * @returns {number} The index of the closing quote, or the end of the source when unterminated.
+ */
+function skipQuoted(code, start) {
+  const quote = code[start];
+  let index = start + 1;
+  while (index < code.length) {
+    if (code[index] === "\\") {
+      index += 2;
+      continue;
+    }
+    if (code[index] === quote) return index;
+    if (quote !== "`" && code[index] === "\n") return index - 1;
+    index += 1;
+  }
+  return code.length;
+}
+
+/**
+ * Skips one top-level declaration so import declarations placed after it stay reachable.
+ *
+ * Only declarations that begin with a declaration keyword are skipped, and the scan gives up
+ * as soon as the statement opens a function, class, or arrow body. Those bodies are where JSX
+ * lives, so refusing to walk past them keeps rendered `import` examples out of the cursor's path.
+ * @param {string} code - The module source with comments and template literal bodies blanked.
+ * @param {number} start - The cursor position at the first character of the statement.
+ * @returns {number} The position just past the declaration, or -1 when the scan must stop.
+ */
+function skipTopLevelDeclaration(code, start) {
+  DECLARATION_HEAD_RE.lastIndex = start;
+  if (!DECLARATION_HEAD_RE.test(code)) return -1;
+  const headEnd = code.slice(start).search(/[{;\n]/);
+  const head = headEnd === -1 ? code.slice(start) : code.slice(start, start + headEnd);
+  if (/\b(?:function|class)\b|=>/.test(head)) return -1;
+
+  let depth = 0;
+  let index = start;
+  while (index < code.length) {
+    const char = code[index];
+    if (char === '"' || char === "'" || char === "`") {
+      index = skipQuoted(code, index) + 1;
+      continue;
+    }
+    if (char === "(" || char === "[" || char === "{") depth += 1;
+    else if (char === ")" || char === "]" || char === "}") {
+      depth -= 1;
+      if (depth < 0) return -1;
+      // ブロックで閉じる宣言（`interface X { … }` 等）はセミコロンを伴わないことがある。
+      if (depth === 0 && char === "}" && !/^\s*;/.test(code.slice(index + 1))) return index + 1;
+    } else if (char === ";" && depth === 0) return index + 1;
+    index += 1;
+  }
+  return -1;
+}
+
 /**
  * Collects relative import specifiers from a module's import prelude.
  *
  * The scan walks a cursor from the top of the module through directives, blanked
- * comments, and import declarations, and stops at the first token that is not one
- * of those. Import declarations are hoisted and always sit in that prelude, so
- * anything the cursor never reaches — JSX text, `<pre>` code examples, strings —
- * cannot be mistaken for a declaration regardless of its indentation.
+ * comments, import declarations, and plain top-level declarations, and stops at the
+ * first token that is not one of those. Import declarations are hoisted and always sit
+ * in that prelude, so anything the cursor never reaches — JSX text, `<pre>` code
+ * examples, strings — cannot be mistaken for a declaration regardless of its indentation.
  * @param {string} src - The module source text.
  * @returns {string[]} The relative specifiers of the module's import declarations.
  */
@@ -520,7 +581,14 @@ function collectLocalImportSpecifiers(src) {
     importRe.lastIndex = cursor;
     sideEffectRe.lastIndex = cursor;
     const declaration = importRe.exec(code) ?? sideEffectRe.exec(code);
-    if (declaration === null) break;
+    if (declaration === null) {
+      // import 群の途中に挟まったトップレベル宣言（`export const revalidate = false;` 等）で
+      // 走査を止めると、後続の実 import 配下の本文が丸ごと監査対象から外れる。
+      const resumed = skipTopLevelDeclaration(code, cursor);
+      if (resumed === -1) break;
+      cursor = resumed;
+      continue;
+    }
     if (declaration[2].startsWith(".")) specifiers.push(declaration[2]);
     cursor += declaration[0].length;
   }
