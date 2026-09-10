@@ -3,7 +3,7 @@
 **発行元:** Scaled Agile, Inc.（*Certified AI-Native Foundations Professional*）
 **公式試験ガイド:** https://scaledagile.com/certification/ai-native-foundations/
 
-> 本ガイドは上記の公式試験ガイドページの出題範囲（Exam Guidelines）を基に、初学者が体系的に学習できるよう各項目を詳細に解説したものです。すべてのセクションに一次情報源（公式ドキュメント・学術論文・標準規格）へのリンクを付記しています。図解はすべて Mermaid、比較・整理はすべて Markdown 表で記述し、ASCIIアートは使用していません。
+> 本ガイドは上記の公式試験ガイドページの出題範囲（Exam Guidelines）を基に、初学者が体系的に学習できるよう各項目を詳細に解説したものです。主要な主張には、可能な範囲で参考リンク（公式ドキュメント・学術論文・標準規格、一部は解説記事）を付記しています（すべての項目に一次情報源が付いているわけではありません）。図解はすべて Mermaid、比較・整理はすべて Markdown 表で記述し、ASCIIアートは使用していません。
 
 ---
 
@@ -55,6 +55,7 @@ flowchart LR
 ---
 
 <a id="domain1"></a>
+
 ## 1. ドメイン1: Fundamentals and Core Architectures（26〜30%）
 
 ### 1.1 Agentic AIの理解
@@ -278,6 +279,7 @@ flowchart LR
 ---
 
 <a id="domain2"></a>
+
 ## 2. ドメイン2: Responsible AI, Governance, and Security（18〜22%）
 
 ### 2.1 責任あるAI（Responsible AI）の原則
@@ -299,12 +301,20 @@ flowchart LR
 出典: [NIST AI RMF 1.0（NIST.AI.100-1、公式）](https://www.nist.gov/publications/artificial-intelligence-risk-management-framework-ai-rmf-10) / [AI RMF Core機能の詳細（AIRC）](https://airc.nist.gov/airmf-resources/airmf/5-sec-core/)
 
 ```mermaid
-flowchart TD
-    G["Govern：組織文化・説明責任・方針の確立<br/>（他の3機能全体を横断する）"]
-    G --> M["Map：AIシステムの状況・利害関係者・<br/>リスクを特定する"]
-    M --> S["Measure：特定したリスクを<br/>指標で測定・評価する"]
-    S --> N["Manage：優先順位を付けてリスクに<br/>対応・軽減する"]
-    N --> M
+flowchart TB
+    G["Govern：組織文化・説明責任・方針の確立<br/>（Map／Measure／Manage すべてに横断的に作用する）"]
+    subgraph CORE["Map／Measure／Manage（固定の順序ではなく反復的に往復する）"]
+        direction LR
+        M["Map：AIシステムの状況・利害関係者・<br/>リスクを特定する"]
+        S["Measure：特定したリスクを<br/>指標で測定・評価する"]
+        N["Manage：優先順位を付けてリスクに<br/>対応・軽減する"]
+        M <--> S
+        S <--> N
+        M <--> N
+    end
+    G -.横断.-> M
+    G -.横断.-> S
+    G -.横断.-> N
 ```
 
 **ベストプラクティス**
@@ -334,9 +344,21 @@ AI活用において「技術的に可能か」だけでなく「倫理的に適
 
 ### 2.3 AIセキュリティのDos/Don'ts
 
-生成AI・LLMアプリケーション特有のセキュリティリスクを体系化した業界標準が **OWASP Top 10 for LLM Applications（2025年版）** です。
+生成AI・LLMアプリケーション特有のセキュリティリスクを体系化した業界標準が **OWASP Top 10 for LLM Applications** です。現行版は **2026年版**（OWASP GenAI Security Project、2026年8月公開）で、実インシデントのデータを順位付けに組み込んだ点が大きな変更です。
 
-出典: [OWASP Top 10 for LLM Applications 2025（公式PDF）](https://owasp.org/www-project-top-10-for-large-language-model-applications/assets/PDF/OWASP-Top-10-for-LLMs-v2025.pdf)
+2026年版の主な変更点:
+
+- プロンプトインジェクションと機密情報の漏えいは引き続き1位・2位。
+- **過剰な自律性（Excessive Agency）が3位へ上昇**（2025年版では6位）。エージェント利用の拡大を反映しています。
+- **システムプロンプトの漏えい → Hidden Context Exposure へ改称**。システムプロンプトだけでなく、アプリが保持する周辺コンテキスト全体を対象に広がりました。
+- **不適切な出力処理が10位へ下降**（2025年版では5位）。
+- 順位の75%は実務者投票、25%は実インシデントの分析に基づいて決定されています。
+
+出典: [OWASP GenAI LLM Top 10 2026（公式）](https://genai.owasp.org/resource/owasp-genai-llm-top-10-2026/) / [OWASP Top 10 for LLM and GenAI（プロジェクト公式）](https://genai.owasp.org/initiative/owasp-top-10-for-llm-and-genai/)
+
+下表は **2025年版** の10項目です。本ガイドが基にしている公式試験ガイドの出題範囲は2026年版の公開（2026年8月）より前に策定されており、試験で問われる項目名は2025年版に対応している可能性が高いため、学習用の一覧としては2025年版を残しています。実務では上記の2026年版を参照してください。
+
+出典（2025年版）: [OWASP Top 10 for LLM Applications 2025（公式PDF）](https://owasp.org/www-project-top-10-for-large-language-model-applications/assets/PDF/OWASP-Top-10-for-LLMs-v2025.pdf)
 
 | ID | リスク | 概要 |
 |---|---|---|
@@ -396,6 +418,7 @@ AI活用において「技術的に可能か」だけでなく「倫理的に適
 ---
 
 <a id="domain3"></a>
+
 ## 3. ドメイン3: Practical AI Application and Prompt Engineering（33〜37%）
 
 このドメインは出題比率が最も高く、実践的なプロンプト作成能力とワークフロー設計能力が問われます。
@@ -565,6 +588,7 @@ AIは「答えを出す」だけでなく、**「良い問いを立てる」た�
 ---
 
 <a id="domain4"></a>
+
 ## 4. ドメイン4: AI Business Strategy and Transition（12〜17%）
 
 ### 4.1 EDGE™ の4つの力とAI-Nativeケースをビジネス言語で説明する
@@ -694,6 +718,7 @@ flowchart TD
 ---
 
 <a id="tips"></a>
+
 ## 5. 試験対策のポイント
 
 - **配点の高いドメイン3・1を優先的に学習する:** 合計で試験の約6割を占めるため、プロンプトエンジニアリングの各テクニックと基礎用語（RAG・Agent・LLMの違いなど）は確実に押さえること
@@ -705,6 +730,7 @@ flowchart TD
 ---
 
 <a id="references"></a>
+
 ## 6. 参考文献・出典一覧
 
 | # | 出典 | URL |
@@ -720,6 +746,7 @@ flowchart TD
 | 9 | GDPR（Regulation (EU) 2016/679、公式条文） | https://eur-lex.europa.eu/eli/reg/2016/679/oj |
 | 10 | California Consumer Privacy Act（CCPA、公式） | https://oag.ca.gov/privacy/ccpa |
 | 11 | California Privacy Protection Agency（CPPA） | https://cppa.ca.gov/ |
-| 12 | OWASP Top 10 for LLM Applications 2025（公式PDF） | https://owasp.org/www-project-top-10-for-large-language-model-applications/assets/PDF/OWASP-Top-10-for-LLMs-v2025.pdf |
+| 12 | OWASP GenAI LLM Top 10 2026（現行版・公式） | https://genai.owasp.org/resource/owasp-genai-llm-top-10-2026/ |
+| 12-b | OWASP Top 10 for LLM Applications 2025（試験範囲に対応する旧版・公式PDF） | https://owasp.org/www-project-top-10-for-large-language-model-applications/assets/PDF/OWASP-Top-10-for-LLMs-v2025.pdf |
 | 13 | Anthropic - Prompt engineering overview（公式ドキュメント） | https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview |
 | 14 | The 5 Levels of AI Agents Explained（Pascal Bornet、5段階自律性モデルの一般的な参考） | https://medium.com/@knoonAi/the-5-levels-of-ai-agents-explained-agentic-artificial-intelligence-by-pascal-bornet-787c39fec1ea |

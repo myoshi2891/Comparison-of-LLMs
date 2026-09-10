@@ -4,19 +4,19 @@
 
 ## 目次
 
-1. [はじめに — AI Engineeringとは何か](#1-はじめに-aiエンジニアリングとは何か)
-2. [なぜ今、AI Engineeringなのか（歴史的背景）](#2-なぜ今aiエンジニアリングなのか歴史的背景)
-3. [AI EngineeringとMLエンジニアリングの違い](#3-aiエンジニアリングとmlエンジニアリングの違い)
+1. [はじめに — AI Engineeringとは何か](#1-はじめに--ai-engineeringとは何か)
+2. [なぜ今、AI Engineeringなのか（歴史的背景）](#2-なぜ今ai-engineeringなのか歴史的背景)
+3. [AI EngineeringとMLエンジニアリングの違い](#3-ai-engineeringとmlエンジニアリングの違い)
 4. [AIエンジニアリングスタック：3つの層](#4-aiエンジニアリングスタック3つの層)
-5. [Step 1 — Foundation Modelsの基礎を理解する](#5-step-1-foundation-modelsの基礎を理解する)
-6. [Step 2 — プロンプトエンジニアリングからコンテキストエンジニアリングへ](#6-step-2-プロンプトエンジニアリングからコンテキストエンジニアリングへ)
-7. [Step 3 — 評価（Evaluation）を設計する](#7-step-3-評価evaluationを設計する)
-8. [Step 4 — RAG（検索拡張生成）で外部知識を活用する](#8-step-4-rag検索拡張生成で外部知識を活用する)
-9. [Step 5 — AIエージェントを構築する](#9-step-5-aiエージェントを構築する)
-10. [Step 6 — Model Context Protocol（MCP）でツールを繋ぐ](#10-step-6-model-context-protocolmcpでツールを繋ぐ)
-11. [Step 7 — Fine-tuningが必要になる場面](#11-step-7-fine-tuningが必要になる場面)
-12. [Step 8 — 推論最適化とコスト・レイテンシ管理](#12-step-8-推論最適化とコストレイテンシ管理)
-13. [Step 9 — LLMOps：本番運用のオブザーバビリティ](#13-step-9-llmops本番運用のオブザーバビリティ)
+5. [Step 1 — Foundation Modelsの基礎を理解する](#5-step-1--foundation-modelsの基礎を理解する)
+6. [Step 2 — プロンプトエンジニアリングからコンテキストエンジニアリングへ](#6-step-2--プロンプトエンジニアリングからコンテキストエンジニアリングへ)
+7. [Step 3 — 評価（Evaluation）を設計する](#7-step-3--評価evaluationを設計する)
+8. [Step 4 — RAG（検索拡張生成）で外部知識を活用する](#8-step-4--rag検索拡張生成で外部知識を活用する)
+9. [Step 5 — AIエージェントを構築する](#9-step-5--aiエージェントを構築する)
+10. [Step 6 — Model Context Protocol（MCP）でツールを繋ぐ](#10-step-6--model-context-protocolmcpでツールを繋ぐ)
+11. [Step 7 — Fine-tuningが必要になる場面](#11-step-7--fine-tuningが必要になる場面)
+12. [Step 8 — 推論最適化とコスト・レイテンシ管理](#12-step-8--推論最適化とコストレイテンシ管理)
+13. [Step 9 — LLMOps：本番運用のオブザーバビリティ](#13-step-9--llmops本番運用のオブザーバビリティ)
 14. [セキュリティと安全性](#14-セキュリティと安全性)
 15. [AIエンジニアになるためのロードマップ](#15-aiエンジニアになるためのロードマップ)
 16. [まとめ](#16-まとめ)
@@ -55,7 +55,7 @@ flowchart TB
 
 ---
 
-## 3. AI Engineeringとエンジニアリングの違い
+## 3. AI EngineeringとMLエンジニアリングの違い
 
 Chip Huyenは著書の中で、AI EngineeringをMLエンジニアリング・フルスタックエンジニアリングと比較し、次のような違いを整理しています。
 
@@ -153,7 +153,9 @@ Huyenは、AIの利用が広がるほど致命的な失敗の機会も増える�
 | AI as a Judge（LLM-as-a-judge） | 別のLLMに出力を採点・比較させる | オープンエンドな生成、大規模な自動評価が必要な場面 |
 | 比較評価（Comparative Evaluation） | 複数モデル・複数プロンプトの出力を相対的にランキングする | モデル選定、プロンプトのA/Bテスト |
 
-LLM-as-a-judgeは人手評価に比べて大幅に低コスト・高速に評価をスケールできる一方、判定順序による位置バイアス、長い出力を過大評価する冗長性バイアス、同系統モデル同士を優遇する自己贔屓バイアスなど、既知の限界があることが2026年時点の複数の調査でも指摘されています。そのため、自動評価だけに依存せず、人間によるスポットチェックと組み合わせることが推奨されています。
+LLM-as-a-judgeは人手評価に比べて大幅に低コスト・高速に評価をスケールできる一方、既知のバイアスがあります。これらを体系的に測定した代表的な一次研究がZheng et al., "Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena"（NeurIPS 2023 Datasets and Benchmarks, arXiv:2306.05685）で、同論文は ①提示順序を入れ替えると判定が変わる**位置バイアス（position bias）**、②長い出力を過大評価する**冗長性バイアス（verbosity bias）**、③判定側と同系統のモデルの出力を優遇する**自己贔屓バイアス（self-enhancement bias）**を、実験によって定量的に報告しています。
+
+ただし、これらのバイアスの大きさは**タスクの種類・判定に使うモデル・プロンプトの書き方によって変動する**ため、論文の数値をそのまま自社システムに当てはめることはできません。自動評価だけに依存せず、人間によるスポットチェックと組み合わせ、自社データで判定器そのものを検証することが推奨されます。
 
 AI評価の専門家であるHamel Husainは、多くのチームが評価に取り組む際、いきなり汎用的な自動指標やダッシュボードを整えようとして失敗すると指摘しています。彼は、実際のプロダクトのアウトプットを人間が丁寧に読み込む「エラー分析」から始め、そこで見つかった具体的な失敗パターンをもとに評価基準を作るべきだと主張しています。この考え方は「まずデータを見る」というデータサイエンスの基本に立ち返るものとして、AI評価コミュニティで広く支持されています。
 
@@ -171,7 +173,7 @@ flowchart TB
 
 ## 8. Step 4 — RAG（検索拡張生成）で外部知識を活用する
 
-RAG（Retrieval-Augmented Generation）は、モデルの学習データにない私的な情報や最新情報をもとに回答させるための最も基本的で広く使われている手法です。2026年時点の業界解説では、単純なベクトル検索だけの「素朴なRAG（Naive RAG）」は本番環境では検索精度不足でおよそ40%前後の割合で誤った文書に基づいた回答を生成してしまうと報告されており、検索精度の作り込みが最大の課題であると繰り返し指摘されています。
+RAG（Retrieval-Augmented Generation）は、モデルの学習データにない私的な情報や最新情報をもとに回答させるための最も基本的で広く使われている手法です。単純なベクトル検索だけの「素朴なRAG（Naive RAG）」は本番環境で検索精度が不足しやすく、誤った文書に基づく回答が相当な割合で発生すると各所で報告されています（ベンダーやコミュニティの解説記事では「4割前後」といった数字も挙げられますが、評価条件や対象コーパスが明示されない報告例が多く、一次ベンチマークとして扱うべきではありません）。重要なのは数値そのものではなく、**自社のコーパスと実際の質問セットで検索の Recall / Precision を測り、そこを起点に改善する**という進め方です。
 
 ```mermaid
 flowchart TB
@@ -193,9 +195,9 @@ flowchart TB
 | Agentic RAG | エージェントが検索の要否・検索対象・粒度を自律的に判断する | 複数ステップの推論が必要な複雑な質問 |
 | Adaptive RAG | クエリの複雑さに応じて上記のパイプラインを動的に切り替える | 質問の種類が多岐にわたる汎用アシスタント |
 
-チャンク分割については、300〜500トークン程度で10〜15%のオーバーラップを持たせる再帰的チャンキングが2026年時点でも標準的な出発点として広く紹介されており、これで多くのユースケースの8割程度をカバーできるとされています。またチャンクには元文書名・見出し・親チャンクIDなどのメタデータを必ず付与し、引用や階層的な検索を可能にすることが推奨されています。
+チャンク分割については、300〜500トークン程度・10〜15%程度のオーバーラップを持たせる再帰的チャンキングが「まず試す初期値の例」として広く紹介されています（多くのユースケースをこれでカバーできるという解説もありますが、公開された統一ベンチマークに基づく数字ではありません）。実務では、この初期値のまま固定せず、代表的な質問と正解文書のペアを50〜100件用意して Recall@k などを実測し、結果に応じてチャンクサイズ・オーバーラップ・分割単位（見出し単位／文単位）を調整してください。またチャンクには元文書名・見出し・親チャンクIDなどのメタデータを必ず付与し、引用や階層的な検索を可能にすることが推奨されています。
 
-なお、Gemini 2.5やGPT-4.1のように100万トークン級の長いコンテキストウィンドウを持つモデルが普及した後も、コストの観点（大規模運用でRAGと比べ数百〜千倍のコスト差になり得るとする試算）と、長いコンテキストでは埋もれた情報の再現率が下がる傾向があることから、RAGは2026年時点でも既定のアーキテクチャであり続けています。
+なお、Gemini 2.5やGPT-4.1のように100万トークン級の長いコンテキストウィンドウを持つモデルが普及した後も、コストの観点（毎リクエストで長大なコンテキストを送る構成はRAGに比べ桁違いに高くつくという試算例があり、実際の差はトークン単価・キャッシュ利用・平均コンテキスト長に強く依存します）と、長いコンテキストでは埋もれた情報の再現率が下がる傾向があることから、RAGは2026年時点でも既定のアーキテクチャであり続けています。
 
 ---
 
@@ -251,9 +253,9 @@ flowchart TB
 
 MCPが登場する以前は、AIをそれぞれの外部サービスに接続するために毎回個別の統合コードを書く必要がありました。MCPは「ツール側がMCPサーバーとして機能を公開すれば、MCP対応のどのエージェントからも共通の方法で利用できる」という一方向の標準化を実現した点が評価されています。
 
-2026年時点でMCPは急速に業界標準化が進んでおり、2026年5月時点の業界レポートでは月間SDKダウンロード数が9,700万を超え、公開されているMCPサーバーの数は1万を突破したと報告されています。2025年12月9日にはAnthropicがMCPをLinux Foundation傘下の新団体「Agentic AI Foundation（AAIF）」に寄贈し、Block・OpenAIが共同創設メンバーとして、AWS・Google・Microsoft・Cloudflareなどがプラチナメンバーとして参加したことで、単一企業の技術から業界横断のオープンスタンダードへと移行しました。ChatGPT・Cursor・Gemini・Microsoft Copilot・VS Codeなど主要なAI開発ツールがMCPをサポートしています。
+2026年時点でMCPは急速に業界標準化が進んでいます。普及規模については、2025年12月9日のMCP公式（Anthropic）による発表が、月間SDKダウンロード数9,700万超・**アクティブなMCPサーバー**1万超という数字を示しています（いずれも同発表時点の値であり、測定方法は公表元の定義に依存します）。同じく2025年12月9日にAnthropicがMCPをLinux Foundation傘下の新団体「Agentic AI Foundation（AAIF）」に寄贈し、Block・OpenAIが共同創設メンバーとして、AWS・Google・Microsoft・Cloudflareなどがプラチナメンバーとして参加したことで、単一企業の技術から業界横断のオープンスタンダードへと移行しました。ChatGPT・Cursor・Gemini・Microsoft Copilot・VS Codeなど主要なAI開発ツールがMCPをサポートしています。
 
-一方で、急速な普及によってセキュリティの検証が追いついていない領域もあり、2025〜2026年にかけてMCPサーバーの脆弱性が複数報告されています。エンタープライズ導入では、まず読み取り専用の連携（レポート閲覧・ナレッジ検索など）から始め、書き込みを伴う操作（CRMの更新や送信など）には人間の承認ステップを挟むという段階的な導入が推奨されています。
+一方で、急速な普及によってセキュリティの検証が追いついていない領域もあり、2025〜2026年にかけて**個々のMCPサーバー実装（特定のプロダクト・特定バージョン）における脆弱性**が複数報告されています。これらはMCPというプロトコル仕様そのものの欠陥ではなく、あくまで実装側の問題として報告されたものです。導入するMCPサーバーを選定する際は、対象実装ごとにCVE/GHSAなどのアドバイザリと修正版の有無を個別に確認してください。エンタープライズ導入では、まず読み取り専用の連携（レポート閲覧・ナレッジ検索など）から始め、書き込みを伴う操作（CRMの更新や送信など）には人間の承認ステップを挟むという段階的な導入が推奨されています。
 
 ---
 
@@ -281,7 +283,7 @@ Fine-tuningを検討する際は、LoRAなどのパラメータ効率的ファ�
 モデルを選んで動かし始めると、次に直面するのがコストとレイテンシの最適化です。代表的な指標と手法は次の通りです。
 
 - **推論パフォーマンス指標**：初回トークンまでの時間（TTFT）、トークン生成速度、スループットなどをモニタリングします。
-- **量子化（Quantization）**：モデルの重みを低精度で表現し、メモリ使用量と推論速度を改善します。2026年の業界事例では、モデルの層ごとに異なる量子化戦略を組み合わせることで、ベンチマーク品質を保ちながらスループットを20%程度改善できたという報告もあります。
+- **量子化（Quantization）**：モデルの重みを低精度で表現し、メモリ使用量と推論速度を改善します。モデルの層ごとに異なる量子化戦略を組み合わせ、ベンチマーク品質を保ちながらスループットを改善できたという報告例もあります（改善幅はモデル・ハードウェア・バッチ設定に依存するため、自環境でのベンチマークが必須です）。
 - **モデルルーティング**：簡単なタスクは軽量・低コストなモデルに、難しいタスクは高性能モデルに振り分けるゲートウェイを導入し、コストと品質のバランスを取ります。
 - **キャッシュ**：頻出する質問や共通のプロンプトプレフィックスをキャッシュし、レイテンシとコストを削減します。
 
@@ -296,7 +298,7 @@ LLMを使ったアプリケーションは、従来のソフトウェアと違�
 | ツール | 特徴 |
 |---|---|
 | LangSmith | LangChain/LangGraphとの統合が深く、トレース可視化とアノテーションキューが強力。LangChain中心のチームに向く |
-| Langfuse | MITライセンスのオープンソースで、セルフホストによる完全なデータ主権を確保できる。トレーシングとプロンプトのバージョン管理を両立 |
+| Langfuse | コアがMITライセンスのオープンソースで、セルフホストすればトレースを自社インフラ内で管理しやすい（テレメトリ・保持期間・バックアップは運用者側の管理責任。データ保持ポリシー等の一部機能はEnterprise Editionが必要）。トレーシングとプロンプトのバージョン管理を両立 |
 | Arize Phoenix | RAGのデバッグや大規模なML計測に強く、エンタープライズのML運用と親和性が高い |
 | Helicone / Portkey | プロキシ型でコスト・ルーティングの可視化を素早く導入できる |
 | Datadog LLM Observability | 既存のDatadog導入企業向けに、インフラ監視とLLM監視を一体運用できる |
@@ -307,7 +309,7 @@ LLMを使ったアプリケーションは、従来のソフトウェアと違�
 
 ## 14. セキュリティと安全性
 
-Django共同開発者であり、"prompt injection"という用語の提唱者でもあるSimon Willisonは、AIエージェントが持つ本質的なリスクを「**Lethal Trifecta（致死の三要素）**」という概念で説明しています。これは、(1) 信頼できない外部コンテンツにさらされること（プロンプトインジェクションの入口）、(2) エージェントが自律的に行動できること、(3) 実際に影響のある操作（送金・送信・削除など）にアクセスできること、という3条件が同時に揃ったときに重大なリスクが生じるという枠組みです。Willisonは、LLMは指示に従うようにできているがゆえに「本質的に騙されやすい」性質を持ち、これは修正すべきバグではなくLLMという技術の特性そのものだと述べ、エージェントを実行する際にはサンドボックス化などで行動範囲を制限することを推奨しています。
+Django共同開発者であり、"prompt injection"という用語を広めたことで知られるSimon Willison（同語はhimbodhisattvaによる先行使用も指摘されています）は、AIエージェントが持つ本質的なリスクを「**Lethal Trifecta（致死の三要素）**」という概念で説明しています。これは、(1) 私的なデータへのアクセスを持つこと、(2) 信頼できないコンテンツにさらされること（プロンプトインジェクションの入口）、(3) 外部へ通信できる能力を持つこと（データを持ち出せる経路）、という3条件が同時に揃ったときに、攻撃者が機密データを外部へ流出させられるという枠組みです。自律性や影響のある操作の可否はリスクを増幅させますが、この三要素の定義には含まれません。Willisonは、LLMは指示に従うようにできているがゆえに「本質的に騙されやすい」性質を持ち、これは修正すべきバグではなくLLMという技術の特性そのものだと述べ、エージェントを実行する際にはサンドボックス化などで行動範囲を制限することを推奨しています。
 
 AIエンジニアリングにおける実務的なセキュリティ対策は以下の通りです。
 
@@ -358,7 +360,7 @@ AI Engineeringは、基盤モデルという強力な「素材」を、プロン
 
 **ソフトウェアの世代交代とコンテキストエンジニアリング（Andrej Karpathy）**
 - "Andrej Karpathy on Software 3.0: Software in the Age of AI"（Latent Space）— https://www.latent.space/p/s3
-- "Talk: Andrej Karpathy: Software Is Changing (Again)"（ikyle.me）— http://ikyle.me/blog/2025/andrej-karpathy-software-is-changing-again
+- "Talk: Andrej Karpathy: Software Is Changing (Again)"（ikyle.me）— https://ikyle.me/blog/2025/andrej-karpathy-software-is-changing-again
 - Andrej Karpathy, X（旧Twitter）投稿「コンテキストエンジニアリング」について — https://x.com/karpathy/status/1937902205765607626
 - "Context Engineering Vs Prompt Engineering: The Real Difference"（NextAgile）— https://nextagile.ai/blogs/gen-ai/context-engineering-vs-prompt-engineering/
 
@@ -369,7 +371,8 @@ AI Engineeringは、基盤モデルという強力な「素材」を、プロン
 **エージェントとワークフロー（Anthropic）**
 - Anthropic, "Building Effective Agents" — https://www.anthropic.com/engineering/building-effective-agents
 
-**評価（Hamel Husain）**
+**評価（LLM-as-a-judge・Hamel Husain）**
+- Lianmin Zheng et al., "Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena"（NeurIPS 2023 Datasets and Benchmarks Track）— https://arxiv.org/abs/2306.05685 ※位置バイアス・冗長性バイアス・自己贔屓バイアスの一次出典
 - Hamel Husain, "AI Evals: Everything You Need to Know" — https://hamel.dev/blog/posts/evals-faq/
 - Hamel Husain & Shreya Shankar, "Evals Skills for Coding Agents" — https://hamel.dev/blog/posts/evals-skills/
 - "LLM as a Judge: A 2026 Guide to Automated Model Assessment"（Label Your Data）— https://labelyourdata.com/articles/llm-as-a-judge
@@ -379,6 +382,8 @@ AI Engineeringは、基盤モデルという強力な「素材」を、プロン
 - Simon Willisonのブログ紹介（tomrochette.com）— https://tomrochette.com/agents/simon-willison/
 
 **Model Context Protocol（MCP）**
+- MCP公式サイト（仕様・SDK・サーバー一覧）— https://modelcontextprotocol.io/
+- Anthropic ニュースルーム（2025年12月9日のAgentic AI Foundation寄贈発表およびエコシステム統計の一次出典）— https://www.anthropic.com/news
 - "The MCP Ecosystem in 2026"（ChatForest）— https://chatforest.com/guides/mcp-ecosystem-2026-state-of-the-standard/
 - "MCP in 2026: The Universal Connector for AI Agents"（Raulji Technologies）— https://www.rauljitechnologies.com/blog/mcp-model-context-protocol-2026/
 - "MCP Adoption Statistics 2026"（Digital Applied）— https://www.digitalapplied.com/blog/mcp-adoption-statistics-2026-model-context-protocol

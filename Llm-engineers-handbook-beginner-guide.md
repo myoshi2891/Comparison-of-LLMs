@@ -6,7 +6,7 @@
 
 ## 目次
 
-1. [この本は何なのか ― 3行でつかむ](#この本は何なのか-3行でつかむ)
+1. [この本は何なのか ― 3行でつかむ](#この本は何なのか--3行でつかむ)
 2. [書籍情報まとめ](#書籍情報まとめ)
 3. [著者について](#著者について)
 4. [なぜ話題になっているのか(評価・レビュー)](#なぜ話題になっているのか評価レビュー)
@@ -313,18 +313,28 @@ flowchart TB
 | Python | 3.11 | ランタイム環境 |
 | Poetry | 1.8.3以上、2.0未満 | パッケージ管理 |
 | Docker | 27.1.1以上 | コンテナ化・ローカルインフラ |
+| Google Chrome / Chromium | Seleniumドライバと互換のバージョン | データ収集パイプラインのブラウザ自動操作 |
 | AWS CLI | 2.15.42以上 | クラウド管理 |
 | Git | 2.44.0以上 | バージョン管理 |
 
 ### セットアップの流れ(概要)
 
 1. リポジトリをクローンする:`git clone https://github.com/PacktPublishing/LLM-Engineers-Handbook.git`
-2. Python 3.11環境を用意する(pyenv推奨)
-3. Poetryで依存関係をインストールする:`poetry env use 3.11` → `poetry install --without aws` → `poetry run pre-commit install`
-4. `.env.example` を `.env` にコピーし、OpenAI APIキー・Hugging Faceトークン・Comet APIキーなどの認証情報を設定する
-5. `poetry poe local-infrastructure-up` でMongoDB・Qdrant・ZenMLのローカルインフラを起動する
-6. データ収集 → 特徴量エンジニアリング → 指示データセット生成 → 選好データセット生成、という順にZenMLパイプラインを実行する
-7. AWS SageMakerを使う場合のみ、`poetry install --with aws` で追加インストールし、学習・評価・推論エンドポイントのデプロイに進む
+2. クローンしたリポジトリへ移動する:`cd LLM-Engineers-Handbook`(以降のPoetryコマンドと`.env`の読み込みは、すべてこのディレクトリ内で実行する)
+3. Python 3.11環境を用意する(pyenv推奨)
+4. Poetryで依存関係をインストールする:`poetry env use 3.11` → `poetry install --without aws` → `poetry run pre-commit install`
+5. `.env.example` を `.env` にコピーし、OpenAI APIキー・Hugging Faceトークン・Comet APIキーなどの認証情報を設定する。**`.env` は `.gitignore` で除外されていることを必ず確認し、コミットも共有も絶対に行わない**(APIキーが第三者に渡ると不正利用や課金事故に直結する)
+6. `poetry poe local-infrastructure-up` でMongoDB・Qdrant・ZenMLのローカルインフラを起動する
+7. データ収集パイプラインを動かす前に、**Google ChromeまたはChromiumを導入する**。`LinkedInCrawler` / `MediumCrawler` が継承する `BaseSeleniumCrawler` は `webdriver.Chrome` を使うため、対応ブラウザが無いとクロールが起動時に失敗する。
+   - ローカルで動かす場合: macOSは `brew install --cask google-chrome`、Debian/Ubuntuは公式パッケージの `google-chrome-stable` を導入する（Seleniumのドライバ自動解決を使うため、Chrome本体のバージョンに合わせたChromeDriverが取得される）
+   - 環境を汚したくない場合: リポジトリ同梱の公式Dockerfile（`google-chrome-stable` を含む）でパイプラインを実行する
+8. データ収集 → 特徴量エンジニアリング → 指示データセット生成 → 選好データセット生成、という順にZenMLパイプラインを実行する
+9. AWS SageMakerを使う場合は、`poetry install --with aws` で追加インストールしたうえで、**デプロイ前にAWS側の設定を済ませる**:
+   - `aws configure` でAWS CLIの認証情報を設定する
+   - `.env` に `AWS_REGION`（例: `eu-central-1`）、`AWS_ACCESS_KEY`、`AWS_SECRET_KEY` を設定する
+   - SageMakerの実行ロール（execution role）を作成し、そのARNを `.env` の `AWS_ARN_ROLE` に設定する
+   - 手順の詳細は公式リポジトリのセットアップ手順（[INSTALL_AND_USAGE.md](https://github.com/PacktPublishing/LLM-Engineers-Handbook/blob/main/INSTALL_AND_USAGE.md)）を参照する
+   - 以上を済ませてから、学習・評価・推論エンドポイントのデプロイに進む
 
 ### プロジェクト構成の考え方
 
