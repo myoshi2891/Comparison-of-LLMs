@@ -365,12 +365,15 @@ flowchart TB
         B --> C["さらにノイズを加える<br/>繰り返し"]
         C --> D["完全なノイズ画像"]
     end
-    D --> F
     subgraph REV["逆拡散プロセス Reverse Diffusion"]
-        E["テキストプロンプト<br/>条件付け"] --> F["U-Netでノイズを予測・除去"]
-        F --> G["クロスアテンションで<br/>テキストと画像を対応付け"]
-        G --> H["少しずつノイズ除去を反復"]
+        subgraph UNET["U-Net"]
+            F["クロスアテンション層で<br/>テキスト条件を内部に注入"] --> G["ノイズを予測"]
+        end
+        E["テキストプロンプト<br/>条件付け"] --> F
+        G --> H["予測ノイズを除去して<br/>1ステップ更新"]
+        H -->|ステップを反復| F
     end
+    D --> F
     H --> I["生成された画像"]
 ```
 
@@ -406,20 +409,28 @@ flowchart TB
 ```mermaid
 flowchart TB
     A["アプリケーション<br/>Web/モバイル/業務システム"] --> B["Amazon Bedrock 統合API"]
-    B --> C["基盤モデル群<br/>Titan / Claude / Stable Diffusion 等"]
-    B --> D["ナレッジベース<br/>Knowledge Base for RAG"]
-    B --> E["エージェント<br/>Agents for Bedrock"]
-    B --> F["ガードレール<br/>Guardrails"]
-    C --> G["推論結果"]
-    D --> G
-    E --> G
-    F --> G
-    G --> H["データプライバシー・ネットワークセキュリティ層"]
-    H --> I["ガバナンス・モニタリング"]
-    I --> A
+    B --> GI["ガードレール<br/>推論前の入力評価"]
+    GI --> C["基盤モデル群<br/>Titan / Claude / Stable Diffusion 等"]
+    GI --> D["ナレッジベース<br/>Knowledge Base for RAG"]
+    GI --> E["エージェント<br/>Agents for Bedrock"]
+    C --> GO["ガードレール<br/>推論後の応答評価"]
+    D --> GO
+    E --> GO
+    GO --> G["推論結果"]
+    G --> A
+    subgraph X["推論フロー全体を横断する統制とテレメトリ"]
+        H["データプライバシー<br/>ネットワークセキュリティ"]
+        I["ガバナンス / AgentCore Observability<br/>メトリクス・トレース・ログ"]
+    end
+    X -.-> B
+    X -.-> GI
+    X -.-> C
+    X -.-> D
+    X -.-> E
+    X -.-> GO
 ```
 
-刊行当時（2023年）のBedrockには、AWS自社開発のAmazon Titanファミリーや、Stability AIのStable Diffusion系モデルが基盤モデルとして提供されていました。本章では、大規模言語モデル向けの推論API（SQLコード生成、テキスト要約、埋め込みベクトル生成など）、ファインチューニング機能、エージェント機能、そしてマルチモーダルモデル向けのAPI（テキストからの画像生成、画像からの画像生成）が一通り紹介され、最後にデータプライバシー・ネットワークセキュリティ、ガバナンス・モニタリングといった、企業利用に欠かせない観点でまとめられています。
+刊行当時（2023年）のBedrockには、AWS自社開発のAmazon Titanファミリーや、Stability AIのStable Diffusion系モデルが基盤モデルとして提供されていました。本章では、大規模言語モデル向けの推論API（SQLコード生成、テキスト要約、埋め込みベクトル生成など）、ファインチューニング機能、エージェント機能、そしてマルチモーダルモデル向けのAPI（テキストからの画像生成、画像からの画像生成）が一通り紹介され、最後にデータプライバシー・ネットワークセキュリティ、ガバナンス・モニタリングといった、企業利用に欠かせない観点でまとめられています。なお上図が示すとおり、ガードレールは推論結果と並ぶ独立の出力元ではなく、**推論前の入力と推論後の応答の両方を評価するフィルタ**として機能します。また、データプライバシー・セキュリティ・ガバナンス・モニタリングは推論後の後処理段ではなく、**推論フロー全体を横断する統制とテレメトリ**として捉えるのが実態に近く、AgentCore Observabilityもメトリクス・トレース・ログを推論プロセス全体にわたって収集します。
 
 この章の内容は、Bedrockという製品自体が今も高速に進化し続けているサービスであるため、刊行後のアップデートを踏まえて読む価値が特に高い部分です。次のセクションで、2026年9月時点での主な変化を補足します。
 
@@ -452,7 +463,7 @@ flowchart TB
 - **Transformerの仕組みをより深く**：Jay Alammar氏の「The Illustrated Transformer」は、TransformerやAttentionの仕組みを視覚的に解説した記事として、スタンフォードやハーバードなど多くの大学の講義でも参照されており、国際的に最も広く読まれている解説記事の一つです（参考文献8）。
 - **LoRA/QLoRAの実践的チューニング**：Sebastian Raschka氏によるLoRA・QLoRAの実験ブログは、ハイパーパラメータ選定の実務的な勘所を数値付きで示しており、第6章の理解を補完します（参考文献6・7）。
 - **RAGとエージェントの最新動向**：Andrew Ng氏によるAgentic RAGの紹介や、Chip Huyen氏の著書『AI Engineering』でのRAGとエージェントの統合的な解説は、第9章のテーマをより広い文脈で捉える助けになります（参考文献9・10）。
-- **Amazon Bedrockの最新状況**：AWS公式ブログのBedrock関連カテゴリおよびAgentCoreのリリースノートは、頻繁に更新される公式一次情報源です（参考文献12〜16）。
+- **Amazon Bedrockの最新状況**：AWS公式の一次情報源はAgentCoreのリリースノート、What's New、AWS Machine Learningブログです（参考文献13〜15）。参考文献12はAmazonのニュースルーム（About Amazon）による発表記事、参考文献16はEnterprise DNAによる第三者の解説記事であり、いずれもAWSの公式技術ドキュメントではありません。AWSの公式見解として扱う際は参考文献13〜15を根拠としてください。
 
 ---
 
@@ -486,11 +497,11 @@ flowchart TB
 | 9 | Andrew Ng氏によるRAG／Agentic RAGに関する投稿 | https://x.com/AndrewYNg/status/1945502636012445937 |
 | 10 | Chip Huyen氏『AI Engineering』RAGとエージェントの章に関する解説 | https://alexstrick.com/posts/2025-01-24-notes-on-ai-engineering-chip-huyen-chapter-6.html |
 | 11 | AWSブログ「Introducing Gemma 4 models on Amazon Bedrock」 | https://aws.amazon.com/blogs/machine-learning/introducing-gemma-4-models-on-amazon-bedrock/ |
-| 12 | About Amazon「New Amazon Bedrock AgentCore capabilities」 | https://www.aboutamazon.com/news/aws/aws-amazon-bedrock-agent-core-ai-agents |
+| 12 | About Amazon（Amazonニュースルーム／AWS公式技術ドキュメントではない）「New Amazon Bedrock AgentCore capabilities」 | https://www.aboutamazon.com/news/aws/aws-amazon-bedrock-agent-core-ai-agents |
 | 13 | Amazon Bedrock AgentCore 公式リリースノート | https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/release-notes.html |
 | 14 | AWS「Amazon Bedrock AgentCore expands to two new regions」 | https://aws.amazon.com/about-aws/whats-new/2026/08/bedrock-agentcore-two-new-regions/ |
 | 15 | AWSブログ「New in Amazon Bedrock AgentCore: broader knowledge and continuous learning」 | https://aws.amazon.com/blogs/machine-learning/new-in-amazon-bedrock-agentcore-build-agents-with-broader-knowledge-and-continuous-learning/ |
-| 16 | Enterprise DNA「AWS Retires Bedrock Agents: AgentCore Is the New Path」 | https://enterprisedna.co/resources/news/amazon-bedrock-agents-classic-agentcore-enterprise-july-2026/ |
+| 16 | Enterprise DNA（第三者資料）「AWS Retires Bedrock Agents: AgentCore Is the New Path」 | https://enterprisedna.co/resources/news/amazon-bedrock-agents-classic-agentcore-enterprise-july-2026/ |
 | 17 | AWSブログ「Introducing Amazon Bedrock Managed Knowledge Base」 | https://aws.amazon.com/blogs/aws/introducing-amazon-bedrock-managed-knowledge-base-for-faster-more-accurate-enterprise-ai-applications/ |
 
 > 本ガイドの記述内容は2026年9月10日時点で確認できた情報に基づいています。特にAmazon Bedrockまわりのサービス仕様は変更が頻繁なため、実装の際は必ずAWS公式ドキュメントの最新版をご確認ください。
