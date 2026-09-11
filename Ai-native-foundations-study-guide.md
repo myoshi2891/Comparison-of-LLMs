@@ -356,9 +356,9 @@ AI活用において「技術的に可能か」だけでなく「倫理的に適
 
 出典: [OWASP GenAI LLM Top 10 2026（公式）](https://genai.owasp.org/resource/owasp-genai-llm-top-10-2026/) / [OWASP Top 10 for LLM and GenAI（プロジェクト公式）](https://genai.owasp.org/initiative/owasp-top-10-for-llm-and-genai/)
 
-下表は **2025年版** の10項目です。本ガイドが基にしている公式試験ガイドの出題範囲は2026年版の公開（2026年8月）より前に策定されており、試験で問われる項目名は2025年版に対応している可能性が高いため、学習用の一覧としては2025年版を残しています。実務では上記の2026年版を参照してください。
+下表は **2025年版** の10項目です。公式試験ガイドはOWASP Top 10の特定のバージョンを指定していないため、どのバージョンが出題範囲に対応するかを推定することはできません。下表はあくまで版の変遷を追うための履歴的・補足的な参考資料として掲載しています。学習・実務のいずれにおいても、最新版である上記の2026年版を参照してください。
 
-出典（2025年版）: [OWASP Top 10 for LLM Applications 2025（公式PDF）](https://owasp.org/www-project-top-10-for-large-language-model-applications/assets/PDF/OWASP-Top-10-for-LLMs-v2025.pdf)
+出典（2025年版）: [OWASP Top 10 for LLM Applications 2025（公式）](https://genai.owasp.org/resource/owasp-top-10-for-llm-applications-2025/)
 
 | ID | リスク | 概要 |
 |---|---|---|
@@ -396,10 +396,10 @@ AI活用において「技術的に可能か」だけでなく「倫理的に適
 
 | 観点 | GDPR（EU） | CCPA/CPRA（カリフォルニア州） |
 |---|---|---|
-| 適用対象 | EU域内の個人データを扱う組織（域外適用あり） | 一定規模以上の事業者でカリフォルニア州住民のデータを扱う場合 |
+| 適用対象 | EU域内の拠点の活動に関連する処理、またはEU域外の組織によるEU域内の個人への商品・サービス提供・行動監視に関連する処理（Article 3） | 一定規模以上の事業者でカリフォルニア州住民のデータを扱う場合 |
 | 主な権利 | アクセス権、削除権（忘れられる権利）、データポータビリティ権 | 知る権利、削除権、オプトアウト権（販売・共有の停止） |
 | データ最小化原則 | 目的達成に必要な範囲でのみデータを収集・利用すること | 収集目的に照らして合理的に必要な範囲に限定すること |
-| AI活用時の留意点 | 個人データをLLMの学習・プロンプトに使う場合、法的根拠と目的の明確化が必要 | 個人情報を第三者のAIサービスに送信する行為も「共有」に該当しうる |
+| AI活用時の留意点 | 個人データをLLMの学習・プロンプトに使う場合、法的根拠と目的の明確化が必要 | 個人情報を第三者のAIサービスに送信する行為が「販売」「開示」「共有」のいずれに当たるかは、送信先の役割（サービスプロバイダか否か）・利用目的・契約条件によって異なる。法定の「共有」はクロスコンテキスト行動広告を目的とする場合に限られるため、一律に「共有」と扱わず個別に判定する |
 
 **匿名化・仮名化技術**
 
@@ -522,7 +522,7 @@ Anthropic社の公式ドキュメントをはじめ、業界で広く共有さ�
 | 明確かつ直接的な指示 | 曖昧な表現を避け、期待する出力（形式・長さ・トーン）を具体的に書く |
 | 役割（ロール）の付与 | 「あなたは◯◯の専門家です」と役割を与え、応答の質と一貫性を高める |
 | Few-shotプロンプティング | 期待する出力の具体例を数個示すことで、形式や粒度をモデルに伝える |
-| 思考の連鎖（Chain of Thought） | 複雑な問題では「順を追って考えて」と指示し、途中の推論過程を出力させる |
+| 思考の連鎖（Chain of Thought） | 複雑な問題では段階的な検討を促し、結論の根拠と検証手順だけを簡潔に出力させる（内部の思考過程そのものの開示は求めず、機密コンテキストは要約にも含めない） |
 | 出力形式の指定 | JSON形式や見出し構成など、後続処理がしやすい形式を明示する |
 | プロンプトの分割（チェイニング） | 1つの巨大なプロンプトに詰め込まず、生成→レビュー→改善のように工程を分ける |
 | 区切り記号・タグの活用 | 長い文書や複数の指示を扱う際、明確な区切り（見出しやタグ）で構造化する |
@@ -748,6 +748,6 @@ flowchart TD
 | 10 | California Consumer Privacy Act（CCPA、公式） | https://oag.ca.gov/privacy/ccpa |
 | 11 | California Privacy Protection Agency（CPPA） | https://cppa.ca.gov/ |
 | 12 | OWASP GenAI LLM Top 10 2026（現行版・公式） | https://genai.owasp.org/resource/owasp-genai-llm-top-10-2026/ |
-| 12-b | OWASP Top 10 for LLM Applications 2025（試験範囲に対応する旧版・公式PDF） | https://owasp.org/www-project-top-10-for-large-language-model-applications/assets/PDF/OWASP-Top-10-for-LLMs-v2025.pdf |
+| 12-b | OWASP Top 10 for LLM Applications 2025（旧版・履歴的参考資料・公式） | https://genai.owasp.org/resource/owasp-top-10-for-llm-applications-2025/ |
 | 13 | Anthropic - Prompt engineering overview（公式ドキュメント） | https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview |
 | 14 | The 5 Levels of AI Agents Explained（Pascal Bornet、5段階自律性モデルの一般的な参考） | https://medium.com/@knoonAi/the-5-levels-of-ai-agents-explained-agentic-artificial-intelligence-by-pascal-bornet-787c39fec1ea |
