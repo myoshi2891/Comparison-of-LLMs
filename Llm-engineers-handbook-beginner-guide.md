@@ -326,14 +326,15 @@ flowchart TB
 5. `.env.example` を `.env` にコピーし、OpenAI APIキー・Hugging Faceトークン・Comet APIキーなどの認証情報を設定する。**`.env` は `.gitignore` で除外されていることを必ず確認し、コミットも共有も絶対に行わない**(APIキーが第三者に渡ると不正利用や課金事故に直結する)
 6. `poetry poe local-infrastructure-up` でMongoDB・Qdrant・ZenMLのローカルインフラを起動する
 7. データ収集パイプラインを動かす前に、**Google ChromeまたはChromiumを導入する**。`LinkedInCrawler` / `MediumCrawler` が継承する `BaseSeleniumCrawler` は `webdriver.Chrome` を使うため、対応ブラウザが無いとクロールが起動時に失敗する。
-   - ローカルで動かす場合: macOSは `brew install --cask google-chrome`、Debian/Ubuntuは公式パッケージの `google-chrome-stable` を導入する（Seleniumのドライバ自動解決を使うため、Chrome本体のバージョンに合わせたChromeDriverが取得される）
+   - ローカルで動かす場合: macOSは `brew install --cask google-chrome`、Debian/Ubuntuは公式パッケージの `google-chrome-stable` を導入する（ChromeDriver自体は手動導入不要。`application.crawlers.base` の `chromedriver_autoinstaller.install()` が、インストール済みChromeのバージョンに対応するChromeDriverを自動取得する）
    - 環境を汚したくない場合: リポジトリ同梱の公式Dockerfile（`google-chrome-stable` を含む）でパイプラインを実行する
 8. データ収集 → 特徴量エンジニアリング → 指示データセット生成 → 選好データセット生成、という順にZenMLパイプラインを実行する
 9. AWS SageMakerを使う場合は、`poetry install --with aws` で追加インストールしたうえで、**デプロイ前にAWS側の設定を済ませる**:
-   - `aws configure` でAWS CLIの認証情報を設定する
-   - `.env` に `AWS_REGION`（例: `eu-central-1`）、`AWS_ACCESS_KEY`、`AWS_SECRET_KEY` を設定する
-   - SageMakerの実行ロール（execution role）を作成し、そのARNを `.env` の `AWS_ARN_ROLE` に設定する
-   - 手順の詳細は公式リポジトリのセットアップ手順（[INSTALL_AND_USAGE.md](https://github.com/PacktPublishing/LLM-Engineers-Handbook/blob/main/INSTALL_AND_USAGE.md)）を参照する
+   - **ブートストラップ（一時的な管理者権限）**：`aws configure` で管理者相当の認証情報を設定し、SageMakerの実行ロール（execution role）を作成する。この管理者キーの用途はロール作成までに限定する
+   - 作成した実行ロールのARNを `.env` の `AWS_ARN_ROLE` に設定し、`AWS_REGION`（例: `eu-central-1`）も設定する
+   - **運用用の最小権限ユーザーを別途作成する**：SageMakerの学習・デプロイ・推論に必要な権限のみを付与したIAMユーザーを作成してアクセスキーを発行し、`.env` の `AWS_ACCESS_KEY` と `AWS_SECRET_KEY` をそのユーザーの値に置き換える（管理者キーを `.env` に残さない）
+   - **ブートストラップ用の管理者キーは無効化または削除する**。以降の操作は最小権限ユーザーの認証情報だけで行う
+   - 手順の詳細は公式リポジトリのセットアップ手順（[README.md](https://github.com/PacktPublishing/LLM-Engineers-Handbook/blob/main/README.md)）を参照する
    - 以上を済ませてから、学習・評価・推論エンドポイントのデプロイに進む
 
 ### プロジェクト構成の考え方
