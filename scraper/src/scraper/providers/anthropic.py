@@ -21,7 +21,7 @@ _FALLBACKS: dict[str, tuple[float, float]] = {
     "Claude Opus 4.8":          (5.00,  25.00),
     "Claude Opus 4.7":          (5.00,  25.00),
     "Claude Opus 4.6":          (5.00,  25.00),
-    _CLAUDE_SONNET_5:           (3.00,  15.00),
+    _CLAUDE_SONNET_5:           (2.00,  10.00),
     "Claude Sonnet 4.6":        (3.00,  15.00),
     "Claude Haiku 4.5":         (1.00,   5.00),
     "Claude Haiku 3.5":         (0.80,   4.00),

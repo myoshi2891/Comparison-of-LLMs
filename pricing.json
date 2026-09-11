@@ -52,8 +52,8 @@
       "name": "Claude Sonnet 5",
       "tag": "最新 Sonnet",
       "cls": "tag-flag",
-      "price_in": 3.0,
-      "price_out": 15.0,
+      "price_in": 2.0,
+      "price_out": 10.0,
       "sub_ja": "最新Sonnet / 200K ctx / バランス最適",
       "sub_en": "Latest Sonnet / 200K ctx / optimal balance",
       "scrape_status": "fallback"
