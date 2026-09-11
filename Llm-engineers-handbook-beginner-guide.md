@@ -332,7 +332,7 @@ flowchart TB
 4. Poetryで依存関係をインストールする:`poetry env use 3.11` → `poetry install --without aws` → `poetry run pre-commit install`
 5. `.env.example` を `.env` にコピーし、OpenAI APIキー・Hugging Faceトークン・Comet APIキーなどの認証情報を設定する。**`.env` は `.gitignore` で除外されていることを必ず確認し、コミットも共有も絶対に行わない**(APIキーが第三者に渡ると不正利用や課金事故に直結する)
 6. `poetry poe local-infrastructure-up` でMongoDB・Qdrant・ZenMLのローカルインフラを起動する
-7. データ収集パイプラインを動かす前に、**Google ChromeまたはChromiumを導入する**。`LinkedInCrawler` / `MediumCrawler` が継承する `BaseSeleniumCrawler` は `webdriver.Chrome` を使うため、対応ブラウザが無いとクロールが起動時に失敗する。
+7. データ収集パイプラインを動かす前に、**Google ChromeまたはChromiumを導入する**。`MediumCrawler` が継承する `BaseSeleniumCrawler` は `webdriver.Chrome` を使うため、対応ブラウザが無いとクロールが起動時に失敗する。なお **`LinkedInCrawler` は非推奨（deprecated）であり、既定では利用できません**。同クラスは `is_deprecated=True` が設定されており、`login()` と `extract()` は `DeprecationWarning` を送出して処理を行いません。LinkedInを収集対象として前提にした手順は組まず、サポートされているデータソース（Medium・GitHub・個人ブログなど）で進めてください（LinkedInの自動収集は利用規約上の制約もあります。前述の「データ収集時の注意」を参照）。
    - ローカルで動かす場合: macOSは `brew install --cask google-chrome`、Debian/Ubuntuは公式パッケージの `google-chrome-stable` を導入する（ChromeDriver自体は手動導入不要。`llm_engineering.application.crawlers.base` の `chromedriver_autoinstaller.install()` が、インストール済みChromeのバージョンに対応するChromeDriverを自動取得する。ただしこの取得は `BaseSeleniumCrawler` の **import 時点** に走り、手元に該当バージョンのChromeDriverが無ければ**外部ネットワークからダウンロードする**。オフライン環境やプロキシで外部通信が制限された環境では import の時点で失敗するため、対応するChromeDriverを事前に配置するか、キャッシュ済みの状態にしておく必要がある）
    - 環境を汚したくない場合: リポジトリ同梱の公式Dockerfile（`google-chrome-stable` を含む）でパイプラインを実行する。`poetry poe build-docker-image` でイメージをビルドし、続けて `poetry poe run-docker-end-to-end-data-pipeline` でエンドツーエンドのデータパイプラインをコンテナ内で実行する（後者は `.env` を読み込むため、手順5を先に済ませておく）
 8. データ収集 → 特徴量エンジニアリング → 指示データセット生成 → 選好データセット生成、という順にZenMLパイプラインを実行する
