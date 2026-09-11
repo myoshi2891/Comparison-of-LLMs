@@ -97,6 +97,13 @@ flowchart TB
 
 このように「個人の書いたもの」を集め、検索可能な形に整え、モデルを微調整し、最終的に本人らしい文章を生成するAPI/サービスとして提供する、というエンドツーエンドの流れそのものが本書の教材になっています。
 
+なお、このデータ収集パイプラインで扱ってよいのは、**自分が著作権を持つコンテンツか、利用許諾を得たコンテンツに限られます**。LLM Twinは「自分の分身」を作る題材であり、他人のアカウントや第三者の投稿を無断で収集する用途を想定していません。実際にクローラーを動かす前に、少なくとも以下を確認してください。
+
+- **各サービスの利用規約（ToS）とrobots.txt**: LinkedInなど、自動収集を規約で明確に禁止・制限しているサービスがあります。自分のアカウントのデータであっても、取得方法（スクレイピング可否、公式APIやデータエクスポート機能の利用）に制約がかかる場合があります
+- **レート制限**: 短時間に大量アクセスを行うとサービス側に負荷をかけ、アカウント停止やIPブロックの対象になります。リクエスト間隔を空け、取得件数に上限を設ける
+- **保存期間**: 収集した生データをいつまで保持するかをあらかじめ決め、不要になったデータは削除する
+- **第三者の個人情報**: 自分の投稿であっても、コメント欄や本文に他人の氏名・連絡先などが含まれることがあります。学習データに混入させない、または取り込み時にマスキングする方針を決めておく
+
 ---
 
 ## アーキテクチャの核:FTIパイプライン設計
@@ -326,8 +333,8 @@ flowchart TB
 5. `.env.example` を `.env` にコピーし、OpenAI APIキー・Hugging Faceトークン・Comet APIキーなどの認証情報を設定する。**`.env` は `.gitignore` で除外されていることを必ず確認し、コミットも共有も絶対に行わない**(APIキーが第三者に渡ると不正利用や課金事故に直結する)
 6. `poetry poe local-infrastructure-up` でMongoDB・Qdrant・ZenMLのローカルインフラを起動する
 7. データ収集パイプラインを動かす前に、**Google ChromeまたはChromiumを導入する**。`LinkedInCrawler` / `MediumCrawler` が継承する `BaseSeleniumCrawler` は `webdriver.Chrome` を使うため、対応ブラウザが無いとクロールが起動時に失敗する。
-   - ローカルで動かす場合: macOSは `brew install --cask google-chrome`、Debian/Ubuntuは公式パッケージの `google-chrome-stable` を導入する（ChromeDriver自体は手動導入不要。`llm_engineering.application.crawlers.base` の `chromedriver_autoinstaller.install()` が、インストール済みChromeのバージョンに対応するChromeDriverを自動取得する）
-   - 環境を汚したくない場合: リポジトリ同梱の公式Dockerfile（`google-chrome-stable` を含む）でパイプラインを実行する
+   - ローカルで動かす場合: macOSは `brew install --cask google-chrome`、Debian/Ubuntuは公式パッケージの `google-chrome-stable` を導入する（ChromeDriver自体は手動導入不要。`llm_engineering.application.crawlers.base` の `chromedriver_autoinstaller.install()` が、インストール済みChromeのバージョンに対応するChromeDriverを自動取得する。ただしこの取得は `BaseSeleniumCrawler` の **import 時点** に走り、手元に該当バージョンのChromeDriverが無ければ**外部ネットワークからダウンロードする**。オフライン環境やプロキシで外部通信が制限された環境では import の時点で失敗するため、対応するChromeDriverを事前に配置するか、キャッシュ済みの状態にしておく必要がある）
+   - 環境を汚したくない場合: リポジトリ同梱の公式Dockerfile（`google-chrome-stable` を含む）でパイプラインを実行する。`poetry poe build-docker-image` でイメージをビルドし、続けて `poetry poe run-docker-end-to-end-data-pipeline` でエンドツーエンドのデータパイプラインをコンテナ内で実行する（後者は `.env` を読み込むため、手順5を先に済ませておく）
 8. データ収集 → 特徴量エンジニアリング → 指示データセット生成 → 選好データセット生成、という順にZenMLパイプラインを実行する
 9. AWS SageMakerを使う場合は、`poetry install --with aws` で追加インストールしたうえで、**デプロイ前にAWS側の設定を済ませる**:
    - **ブートストラップ（一時的な管理者権限）**：`aws configure` で管理者相当の認証情報を設定し、SageMakerの実行ロール（execution role）を作成する。この管理者キーの用途はロール作成までに限定する
