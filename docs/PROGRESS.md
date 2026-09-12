@@ -2,7 +2,7 @@
 
 > 本ファイルは Next.js 移行完了後の保守・改善フェーズにおける開発の進捗（特にテスト関連）および品質チェックのルールを記録する。
 >
-> - 最終更新日: **Updated 2026-08-20**
+> - 最終更新日: **Updated 2026-09-12**
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
 
@@ -11,16 +11,41 @@
 - **フェーズ**: 保守・機能改善・品質強化フェーズ
 - **ブランチ**: `dev`（本番 `main` への Next.js 移行マージ完了 🚀）
 - **動作検証**:
-  - `bun run build` ✅（Compiled successfully / 86 静的ページを生成。2026-08-20 実測）
-  - `bun run typecheck` ✅（`tsc --noEmit`。2026-08-20 実測）
-  - `bun run lint` ✅（Biome check / 478 files / 0 diagnostics。2026-08-20 実測）
+  - `bun run build` ✅（Compiled successfully / 88 静的ページを生成。2026-09-12 実測）
+  - `bun run typecheck` ✅（`tsc --noEmit`。2026-09-12 実測）
+  - `bun run lint` ✅（Biome check / 481 files / 0 diagnostics。2026-09-12 実測）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: `bun run test` で Vitest **171 files / 1545 tests すべて合格**（2026-08-20 実測。全 Green ✅）
+  - **フロントエンド (`web-next/`)**: `bun run test` で Vitest **174 files / 1577 tests すべて合格**（2026-09-12 実測。全 Green ✅）
     - `load(sourceHtml)` をモジュール初期化時に呼ぶ `governance/ai-governance/GuideContent.tsx` と
       `local-llm/finetuning-best-practices/GuideContent.tsx` は、import スモークでも読み込み可能であることを確認済み
-  - **バックエンド (`scraper/`)**: pytest 実行で **43 件すべて合格** (全 Green ✅)
+  - **バックエンド (`scraper/`)**: pytest 実行で **59 件 + 36 subtests すべて合格** (2026-09-12 実測。全 Green ✅)
 
 ## 最近の追加内容
+
+- **月次価格更新 2026-09 & スクレイパーのフォールバック優先順位バグ修正** (HEAD `3af819c4`):
+  - `pricing.json` が 2026-07-24 で約 7 週間停滞していたため、各社公式料金ページを実地調査して更新。
+    **API モデル 56 → 77 件 / コーディングツール 31 → 33 件**、USD/JPY 163.47 → 154.04 (2026-09-11)。
+  - **新モデル追加**: Claude Fable 5.1 / Opus 5 / Opus 4.5 / Sonnet 4.5、GPT-6 Astra / 5.5 Pro / 5.3 Codex /
+    5.2 Pro / 5.2 / 5.1 / 5 Pro / 4.1 Nano、Gemini 3.8 Flash / 3.7 Flash / 3.1 Flash-Lite、
+    Grok 4.6 / Grok Build 0.1、Kimi K2.7 Code / K2.7 Code Highspeed、GLM-5.3 / GLM-5.3-Flash、
+    GitHub Copilot Max ($100) / ChatGPT Pro Codex ($100)。
+  - **価格改定**: GPT-5.6 Sol $5/$30 → $4/$20、Terra $2.5/$15 → $2/$12、Luna $1/$6 → $0.2/$1.2、
+    Gemini 3.6 Flash $1.5/$7.5 → $0.75/$3.75（2026-12-31 までの特価。note に明記）、
+    Grok 4.20 $2/$6 → $1.25/$2.5、DeepSeek V4 Flash/Pro（標準価格を採用）、GLM-4.6 $0.43/$1.74 → $0.6/$2.2。
+    Amazon Nova Premier の出力単価はライブ取得で $10 → $12.5 に更新。
+  - **提供終了モデル**は行を残したまま `Retired` タグ + `tag-leg` へ降格（Gemini 3 Flash Preview /
+    Grok 4.1 Fast / DeepSeek-V3.2 / DeepSeek-R1 / Claude Opus 4.1 / Claude Haiku 3.5）。
+  - **バグ修正 1（フォールバック優先順位）**: 既存 `pricing.json` の値を出自を問わず `_FALLBACKS` より
+    優先していたため、ハードコード値を書き換えても既存モデルの価格が永久に反映されない状態だった。
+    既存値の採用条件に `scrape_status == "success"` を課し、`anthropic.py` の Claude Sonnet 5 個別ハックを削除。
+    あわせて 5 provider の抽出ループが `_FALLBACKS` を直接読んでいた不整合を `fallback_map` 参照へ統一。
+  - **バグ修正 2（遠距離マッチ）**: GitHub Copilot の価格抽出ギャップが無制限だったため、Max ティア新設後に
+    Pro / Pro+ の双方が特典クレジット `$100/month` を拾って `success` 判定され `pricing.json` が汚染された
+    （ライブスクレイプで実測）。`_GAP = [^$\n]{0,80}?` で距離を制限。
+  - **バグ修正 3（末尾改行）**: スクレイパー出力に末尾改行がなく `bun run lint` が pricing.json で落ちていたため
+    生成側で付与。
+  - 契約テストを scraper 側に 16 件追加（フォールバック優先順位 13 件 + Copilot 遠距離マッチ 3 件）。
+    `web-next/` の TypeScript・React・CSS は**一切変更していない**（UI は完全にデータ駆動のため）。
 
 - **Gemini マルチエージェント開発 ベストプラクティス完全ガイド（/google/multi-agent-best-practices）の Next.js アプリ移行 & コードブロック構文ハイライト化**:
   - `Gemini-multi-agent-best-practices.html` を `web-next/app/google/multi-agent-best-practices/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。
