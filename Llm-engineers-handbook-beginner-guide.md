@@ -341,14 +341,16 @@ flowchart TB
 7. データ収集パイプラインを動かす前に、**Google ChromeまたはChromiumを導入する**。`MediumCrawler` が継承する `BaseSeleniumCrawler` は `webdriver.Chrome` を使うため、対応ブラウザが無いとクロールが起動時に失敗する。なお **`LinkedInCrawler` は非推奨（deprecated）であり、既定では利用できません**。同クラスは `is_deprecated=True` が設定されており、`login()` と `extract()` は `DeprecationWarning` を送出して処理を行いません。LinkedInを収集対象として前提にした手順は組まず、サポートされているデータソース（Medium・GitHub・個人ブログなど）で進めてください（LinkedInの自動収集は利用規約上の制約もあります。前述の「データ収集時の注意」を参照）。
    - ローカルで動かす場合: macOSは `brew install --cask google-chrome`、Debian/Ubuntuは公式パッケージの `google-chrome-stable` を導入する（ChromeDriver自体は手動導入不要。`llm_engineering.application.crawlers.base` の `chromedriver_autoinstaller.install()` が、インストール済みChromeのバージョンに対応するChromeDriverを自動取得する。ただしこの処理は `BaseSeleniumCrawler` の **import 時点** に走り、**ネットワーク接続が前提**である点に注意する。`install()` はChromeのバージョンに対応するドライバのバージョンを解決するために外部エンドポイントへ問い合わせるため、ChromeDriverを事前に配置・キャッシュしてあっても、オフライン環境やプロキシで外部通信が制限された環境では import の時点で失敗しうる。オフラインで動かす必要がある場合、**`BaseSeleniumCrawler` を継承したクラス側で基底の `__init__` を呼ばないようにするだけでは不十分**である。`install()` は `BaseSeleniumCrawler` の `__init__` の中ではなく `llm_engineering.application.crawlers.base` の**モジュール直下**に書かれているため、クラスを継承するにせよインスタンス化しないにせよ、**当該モジュールを import した時点で必ず実行される**（`MediumCrawler` などの具象クローラーは base を import するため、これらを import するだけでも走る）。したがって回避するには、① `BaseSeleniumCrawler`（= `base` モジュール）を import しない独自のクローラー実装にするか、② モジュールレベルの `install()` 呼び出しを取り除いた base を用意する（フォークまたはローカルでの当該行の削除）かのいずれかが必要になる。そのうえで、`from selenium.webdriver.chrome.service import Service` として `webdriver.Chrome(service=Service("/path/to/chromedriver"), options=options)` のように、ローカルのChromeDriverのパスを明示してドライバを生成する。この①②いずれの手当てもしない限り、データ収集パイプラインの実行には外部ネットワークが必須である）
    - 環境を汚したくない場合: リポジトリ同梱の公式Dockerfile（`google-chrome-stable` を含む）でパイプラインを実行する。`poetry poe build-docker-image` でイメージをビルドし、続けて `poetry poe run-docker-end-to-end-data-pipeline` でエンドツーエンドのデータパイプラインをコンテナ内で実行する（後者は `.env` を読み込むため、手順5を先に済ませておく）
-8. データ収集 → 特徴量エンジニアリング → 指示データセット生成 → 選好データセット生成、という順にZenMLパイプラインを実行する
-9. AWS SageMakerを使う場合は、`poetry install --with aws` で追加インストールしたうえで、**デプロイ前にAWS側の設定を済ませる**:
-   - **ブートストラップ（一時的な管理者権限）**：`aws configure` で管理者相当の認証情報を設定し、SageMakerの実行ロール（execution role）を作成する。この管理者キーの用途はロール作成までに限定する
-   - 作成した実行ロールのARNを `.env` の `AWS_ARN_ROLE` に設定し、`AWS_REGION`（例: `eu-central-1`）も設定する
-   - **運用用の最小権限ユーザーを別途作成する**：SageMakerの学習・デプロイ・推論に必要な権限のみを付与したIAMユーザーを作成してアクセスキーを発行し、`.env` の `AWS_ACCESS_KEY` と `AWS_SECRET_KEY` をそのユーザーの値に置き換える（管理者キーを `.env` に残さない）
-   - **ブートストラップ用の管理者キーは無効化または削除する**。以降の操作は最小権限ユーザーの認証情報だけで行う
-   - 手順の詳細は公式リポジトリのセットアップ手順（[README.md](https://github.com/PacktPublishing/LLM-Engineers-Handbook/blob/main/README.md)）を参照する
-   - 以上を済ませてから、学習・評価・推論エンドポイントのデプロイに進む
+8. **（手順7でローカル実行を選んだ場合のみ）** データ収集 → 特徴量エンジニアリング → 指示データセット生成、という順にZenMLパイプラインを実行する。**手順7でDocker（`run-docker-end-to-end-data-pipeline`）を選んだ場合、この3工程はコンテナ内で実行済みのため本手順はスキップする**（再実行するとクロールとデータセット生成が二重に走る）
+   - なお `end_to_end_data` パイプラインは既定の `DatasetType.INSTRUCTION` で動くため、**生成されるのは指示（instruct）データセットのみで、選好（preference）データセットは含まれない**
+9. DPO（選好最適化）を行う場合は、選好データセットの生成を**別手順として**実行する:`poetry poe run-generate-preference-datasets-pipeline`（ローカル実行・Docker実行のどちらを選んだ場合でも必要。SFTのみを行う場合は不要）
+10. AWS SageMakerを使う場合は、`poetry install --with aws` で追加インストールしたうえで、**デプロイ前にAWS側の設定を済ませる**:
+    - **ブートストラップ（一時的な管理者権限）**：`aws configure` で管理者相当の認証情報を設定し、SageMakerの実行ロール（execution role）を作成する。この管理者キーの用途はロール作成までに限定する
+    - 作成した実行ロールのARNを `.env` の `AWS_ARN_ROLE` に設定し、`AWS_REGION`（例: `eu-central-1`）も設定する
+    - **運用用の最小権限ユーザーを別途作成する**：SageMakerの学習・デプロイ・推論に必要な権限のみを付与したIAMユーザーを作成してアクセスキーを発行し、`.env` の `AWS_ACCESS_KEY` と `AWS_SECRET_KEY` をそのユーザーの値に置き換える（管理者キーを `.env` に残さない）
+    - **ブートストラップ用の管理者キーは無効化または削除する**。以降の操作は最小権限ユーザーの認証情報だけで行う
+    - 手順の詳細は公式リポジトリのセットアップ手順（[README.md](https://github.com/PacktPublishing/LLM-Engineers-Handbook/blob/main/README.md)）を参照する
+    - 以上を済ませてから、学習・評価・推論エンドポイントのデプロイに進む
 
 ### プロジェクト構成の考え方
 
