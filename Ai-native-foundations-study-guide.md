@@ -19,7 +19,7 @@
 | 資格維持 | 年間 最低12 CEU（Continuing Education Unit）の取得が必要 |
 | 出題ドメイン数 | 4ドメイン |
 
-出典: [AI-Native Foundations Certification（公式ページ）](https://scaledagile.com/certification/ai-native-foundations/)
+出典: [AI-Native Foundations Certification（Scaled Agile, Inc. 公式ページ）](https://scaledagile.com/certification/ai-native-foundations/)（2026年9月12日確認）。本ガイドの合格ライン（80%）と各ドメインの出題比率は、この公式ページの記載のみを根拠としています。試験要項は予告なく改定されるため、受験前に必ず同ページの最新の記載を確認してください。
 
 ### 出題ドメインと配点比率
 

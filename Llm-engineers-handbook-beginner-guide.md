@@ -336,12 +336,17 @@ flowchart TB
 2. クローンしたリポジトリへ移動する:`cd LLM-Engineers-Handbook`(以降のPoetryコマンドと`.env`の読み込みは、すべてこのディレクトリ内で実行する)
 3. Python 3.11環境を用意する(pyenv推奨)
 4. Poetryで依存関係をインストールする:`poetry env use 3.11` → `poetry install --without aws` → `poetry run pre-commit install`
+   - 続けて、Poe the Poet を **Poetryプラグインとして** 追加する:`poetry self add 'poethepoet[poetry_plugin]'`。`poethepoet` 自体は `poetry install` で依存関係として入るが、それだけでは以降の手順で使う `poetry poe <task>` というサブコマンド形式が使えない(プラグインを入れない場合は、以降の `poetry poe <task>` をすべて `poetry run poe <task>` に読み替える)
 5. `.env.example` を `.env` にコピーし、OpenAI APIキー・Hugging Faceトークン・Comet APIキーなどの認証情報を設定する。**`.env` は `.gitignore` で除外されていることを必ず確認し、コミットも共有も絶対に行わない**(APIキーが第三者に渡ると不正利用や課金事故に直結する)
 6. `poetry poe local-infrastructure-up` でMongoDB・Qdrant・ZenMLのローカルインフラを起動する
 7. データ収集パイプラインを動かす前に、**Google ChromeまたはChromiumを導入する**。`MediumCrawler` が継承する `BaseSeleniumCrawler` は `webdriver.Chrome` を使うため、対応ブラウザが無いとクロールが起動時に失敗する。なお **`LinkedInCrawler` は非推奨（deprecated）であり、既定では利用できません**。同クラスは `is_deprecated=True` が設定されており、`login()` と `extract()` は `DeprecationWarning` を送出して処理を行いません。LinkedInを収集対象として前提にした手順は組まず、サポートされているデータソース（Medium・GitHub・個人ブログなど）で進めてください（LinkedInの自動収集は利用規約上の制約もあります。前述の「データ収集時の注意」を参照）。
    - ローカルで動かす場合: macOSは `brew install --cask google-chrome`、Debian/Ubuntuは公式パッケージの `google-chrome-stable` を導入する（ChromeDriver自体は手動導入不要。`llm_engineering.application.crawlers.base` の `chromedriver_autoinstaller.install()` が、インストール済みChromeのバージョンに対応するChromeDriverを自動取得する。ただしこの処理は `BaseSeleniumCrawler` の **import 時点** に走り、**ネットワーク接続が前提**である点に注意する。`install()` はChromeのバージョンに対応するドライバのバージョンを解決するために外部エンドポイントへ問い合わせるため、ChromeDriverを事前に配置・キャッシュしてあっても、オフライン環境やプロキシで外部通信が制限された環境では import の時点で失敗しうる。オフラインで動かす必要がある場合、**`BaseSeleniumCrawler` を継承したクラス側で基底の `__init__` を呼ばないようにするだけでは不十分**である。`install()` は `BaseSeleniumCrawler` の `__init__` の中ではなく `llm_engineering.application.crawlers.base` の**モジュール直下**に書かれているため、クラスを継承するにせよインスタンス化しないにせよ、**当該モジュールを import した時点で必ず実行される**（`MediumCrawler` などの具象クローラーは base を import するため、これらを import するだけでも走る）。したがって回避するには、① `BaseSeleniumCrawler`（= `base` モジュール）を import しない独自のクローラー実装にするか、② モジュールレベルの `install()` 呼び出しを取り除いた base を用意する（フォークまたはローカルでの当該行の削除）かのいずれかが必要になる。そのうえで、`from selenium.webdriver.chrome.service import Service` として `webdriver.Chrome(service=Service("/path/to/chromedriver"), options=options)` のように、ローカルのChromeDriverのパスを明示してドライバを生成する。この①②いずれの手当てもしない限り、データ収集パイプラインの実行には外部ネットワークが必須である）
    - 環境を汚したくない場合: リポジトリ同梱の公式Dockerfile（`google-chrome-stable` を含む）でパイプラインを実行する。`poetry poe build-docker-image` でイメージをビルドし、続けて `poetry poe run-docker-end-to-end-data-pipeline` でエンドツーエンドのデータパイプラインをコンテナ内で実行する（後者は `.env` を読み込むため、手順5を先に済ませておく）
 8. **（手順7でローカル実行を選んだ場合のみ）** データ収集 → 特徴量エンジニアリング → 指示データセット生成、という順にZenMLパイプラインを実行する。**手順7でDocker（`run-docker-end-to-end-data-pipeline`）を選んだ場合、この3工程はコンテナ内で実行済みのため本手順はスキップする**（再実行するとクロールとデータセット生成が二重に走る）
+   - データ収集:`poetry poe run-digital-data-etl`
+   - 特徴量エンジニアリング:`poetry poe run-feature-engineering-pipeline`
+   - 指示データセット生成:`poetry poe run-generate-instruct-datasets-pipeline`
+   - この3つを1本にまとめた `poetry poe run-end-to-end-data-pipeline` でも同じ工程を実行できる
    - なお `end_to_end_data` パイプラインは既定の `DatasetType.INSTRUCTION` で動くため、**生成されるのは指示（instruct）データセットのみで、選好（preference）データセットは含まれない**
 9. DPO（選好最適化）を行う場合は、選好データセットの生成を**別手順として**実行する:`poetry poe run-generate-preference-datasets-pipeline`（ローカル実行・Docker実行のどちらを選んだ場合でも必要。SFTのみを行う場合は不要）
 10. AWS SageMakerを使う場合は、`poetry install --with aws` で追加インストールしたうえで、**デプロイ前にAWS側の設定を済ませる**:

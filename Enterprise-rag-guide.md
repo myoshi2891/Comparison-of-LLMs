@@ -393,7 +393,7 @@ flowchart TD
 |---|---|---|
 | **Faithfulness（忠実性）** | 生成された回答の主張が、取得したコンテキストからどれだけ裏付けられるか | 生成 |
 | **Answer Relevancy（回答関連性）** | 生成された回答が、質問の意図にどれだけ合致しているか | 生成 |
-| **Context Precision（コンテキスト精度）** | 取得したコンテキストのうち、実際に回答生成に関連していた割合 | 検索 |
+| **Context Precision（コンテキスト精度）** | 取得したコンテキスト（`retrieved_contexts`）のうち、関連するチャンクがどれだけ上位に順位付けされているか。各ランク k の precision@k の平均として算出される（同じ関連チャンク数でも、上位に来るほどスコアが高くなる） | 検索 |
 | **Context Recall（コンテキスト再現率）** | 回答に必要な情報のうち、どれだけ検索で取得できていたか | 検索 |
 
 この4指標セットの実務上の価値は、工程を一対一で特定できることではなく、**どこから調査すべきかの優先順位を与えてくれること**にあります。FaithfulnessとAnswer Relevancyが低ければまず生成側（プロンプト設計やLLM選定）を、Context PrecisionとContext Recallが低ければまず検索側（チャンキングやEmbedding、検索アルゴリズム）を疑う、という当たりの付け方です。
@@ -534,7 +534,7 @@ flowchart TB
     SE5 -->|検査を通過した回答のみ配信| ANS
     I2 -.->|取り込み・再インデックスを記録| SE4
     R2 -.->|誰が何を検索し何がヒットしたかを記録| SE4
-    R4 -.->|生成結果とDLP判定を記録| SE4
+    R4 -.->|イベントID・DLP判定・参照情報のみを記録| SE4
     R4 --> OPS
     SE4 -.->|統制の証跡| OPS
     OPS -.->|改善のフィードバック| ING
@@ -585,7 +585,7 @@ flowchart TB
 - Pinecone Learning Center「Chunking Strategies for LLM Applications」: https://www.pinecone.io/learn/chunking-strategies/
 - OWASP Cheat Sheet Series「RAG Security Cheat Sheet」: https://cheatsheetseries.owasp.org/cheatsheets/RAG_Security_Cheat_Sheet.html
 - Barnett et al.「Seven Failure Points When Engineering a Retrieval Augmented Generation System」(arXiv, 2024): https://arxiv.org/abs/2401.05856
-- RAGAS公式ドキュメント「List of available metrics」: https://docs.ragas.io/en/stable/concepts/metrics/available_metrics/
+- RAGAS公式ドキュメント「Context Precision」（v0.2.1。本ガイドの指標定義はこのバージョンに基づく）: https://docs.ragas.io/en/v0.2.1/concepts/metrics/available_metrics/context_precision/
 - LangChain Blog「LangChain Announces Enterprise Agentic AI Platform Built with NVIDIA」（Harrison Chase CEOコメント）: https://www.langchain.com/blog/nvidia-enterprise
 - Jerry Liu（LlamaIndex CEO）LinkedIn投稿「Make RAG Production-Ready」: https://www.linkedin.com/posts/jerry-liu-64390071_llamaindex-webinar-make-rag-production-ready-activity-7098827023791398912-v9x8
 - AWS Machine Learning Blog（Jerry Liu共著）「Build powerful RAG pipelines with LlamaIndex and Amazon Bedrock」: https://aws.amazon.com/blogs/machine-learning/build-powerful-rag-pipelines-with-llamaindex-and-amazon-bedrock/

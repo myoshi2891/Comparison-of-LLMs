@@ -267,7 +267,7 @@ flowchart LR
 | QLoRA | 量子化モデル＋低ランク行列 | 非常に高い | メモリはさらに節約できるが学習時間はやや増加する傾向 |
 | プロンプトチューニング | ソフトプロンプトのみ | 非常に高い | モデル本体は一切変更しない |
 
-LoRAとQLoRAの実践的なチューニングについては、機械学習分野で著名な研究者・教育者であるSebastian Raschka氏が、数百〜数千回規模のLoRA/QLoRA実験を行った知見を公開しており、「QLoRAはメモリを約33%削減できる一方で学習時間が約33%増加するというトレードオフがある」といった具体的な指摘は今でも広く引用されています（参考文献7）。ただしこの数値は、同氏が特定の条件下で行った実験の実測値です。対象モデル、量子化の方式とビット数、LoRAのランクと適用先モジュール、シーケンス長、バッチサイズ、使用GPUといった設定によって削減率も増加率も変わるため、そのまま一般則として扱わず、必ず自分の設定で計測してください（実験条件の詳細は参考文献7の原典を参照）。本書の該当章と合わせて読むことで、理論だけでなく実務上の勘所もつかめます。
+LoRAとQLoRAの実践的なチューニングについては、機械学習分野で著名な研究者・教育者であるSebastian Raschka氏が、数百〜数千回規模のLoRA/QLoRA実験を行った知見を公開しており、「QLoRAはメモリを約33%削減できる一方で学習時間が約39%増加するというトレードオフがある」といった具体的な指摘は今でも広く引用されています（参考文献7・23）。なお同氏の詳細記事（参考文献23）には、この要約値39%と並んで、LoRA（bf16）1.85時間／QLoRA（4bit NF4）2.79時間という実測の学習時間も掲載されています。この2値からそのまま増加率を計算すると約50.8%となり、要約値の39%とは一致しません（記事上、この差がどこから生じるかは説明されていません）。引用する際は、要約値の39%と実測値から算出した約50.8%のどちらを根拠にしたのかを明示してください。いずれにせよこの数値は、同氏が特定の条件下で行った実験の実測値です。対象モデル、量子化の方式とビット数、LoRAのランクと適用先モジュール、シーケンス長、バッチサイズ、使用GPUといった設定によって削減率も増加率も変わるため、そのまま一般則として扱わず、必ず自分の設定で計測してください（実験条件の詳細は参考文献23の原典を参照）。本書の該当章と合わせて読むことで、理論だけでなく実務上の勘所もつかめます。
 
 ---
 
@@ -527,5 +527,6 @@ flowchart TB
 | 20 | AWS公式ドキュメント「Amazon Bedrock Knowledge Bases」 | https://docs.aws.amazon.com/bedrock/latest/userguide/knowledge-base.html |
 | 21 | AWS公式ドキュメント「Understanding intelligent prompt routing in Amazon Bedrock」 | https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-routing.html |
 | 22 | AWS公式ドキュメント「Add observability to your Amazon Bedrock AgentCore resources」 | https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/observability-configure.html |
+| 23 | Sebastian Raschka氏「Practical Tips for Finetuning LLMs Using LoRA (Low-Rank Adaptation)」（QLoRAのメモリ33%削減・学習時間39%増加および実測時間1.85h／2.79hの原典） | https://magazine.sebastianraschka.com/p/practical-tips-for-finetuning-llms |
 
 > 本ガイドの記述内容は2026年9月10日時点で確認できた情報に基づいています。特にAmazon Bedrockまわりのサービス仕様は変更が頻繁なため、実装の際は必ずAWS公式ドキュメントの最新版をご確認ください。

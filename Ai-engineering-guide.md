@@ -391,7 +391,8 @@ AI Engineeringは、基盤モデルという強力な「素材」を、プロン
 
 **Model Context Protocol（MCP）**
 - MCP公式サイト（仕様・SDK・サーバー一覧）— https://modelcontextprotocol.io/
-- Anthropic ニュースルーム（2025年12月9日のAgentic AI Foundation寄贈発表およびエコシステム統計の一次出典）— https://www.anthropic.com/news
+- MCP公式ブログ「MCP joins the Agentic AI Foundation」（2025年12月9日。月間SDKダウンロード9,700万超・アクティブサーバー1万超の一次出典）— https://blog.modelcontextprotocol.io/posts/2025-12-09-mcp-joins-agentic-ai-foundation/
+- Anthropic「Donating the Model Context Protocol and establishing the Agentic AI Foundation」（2025年12月9日。AAIFへの寄贈と参加企業の一次出典）— https://www.anthropic.com/news/donating-the-model-context-protocol-and-establishing-of-the-agentic-ai-foundation
 - "The MCP Ecosystem in 2026"（ChatForest）— https://chatforest.com/guides/mcp-ecosystem-2026-state-of-the-standard/
 - "MCP in 2026: The Universal Connector for AI Agents"（Raulji Technologies）— https://www.rauljitechnologies.com/blog/mcp-model-context-protocol-2026/
 - "MCP Adoption Statistics 2026"（Digital Applied）— https://www.digitalapplied.com/blog/mcp-adoption-statistics-2026-model-context-protocol
