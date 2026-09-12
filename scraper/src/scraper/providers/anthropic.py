@@ -156,7 +156,9 @@ def _build_models_from_results(
             sub_ja=_SUB_JA.get(n, ""),
             sub_en=_SUB_EN.get(n, ""),
             scrape_status=results[n][2],  # type: ignore[arg-type]
-            provenance=resolver.provenance(n, results[n][2] == "success"),
+            provenance=resolver.provenance(
+                n, results[n][2] == "success", (results[n][0], results[n][1])
+            ),
         )
         for n in order
         if n in results

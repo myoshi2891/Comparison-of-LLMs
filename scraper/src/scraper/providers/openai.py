@@ -207,7 +207,7 @@ def scrape(existing: list[ApiModel] | None = None) -> list[ApiModel]:
             sub_ja=_SUB_JA.get(name, ""),
             sub_en=_SUB_EN.get(name, ""),
             scrape_status=status,  # type: ignore[arg-type]
-            provenance=resolver.provenance(name, status == "success"),
+            provenance=resolver.provenance(name, status == "success", (pi, po)),
         ))
 
     return models

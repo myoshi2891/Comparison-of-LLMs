@@ -91,7 +91,7 @@ def scrape(existing: list[ApiModel] | None = None) -> list[ApiModel]:
             price_in=pi, price_out=po,
             sub_ja=_SUB_JA[name], sub_en=_SUB_EN[name],
             scrape_status=si if si == so else "fallback",  # type: ignore[arg-type]
-            provenance=resolver.provenance(name, si == "success" and so == "success"),
+            provenance=resolver.provenance(name, si == "success" and so == "success", (pi, po)),
         ))
     return models
 

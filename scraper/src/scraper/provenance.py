@@ -77,7 +77,12 @@ class FallbackResolver:
             return None
         return m.provenance
 
-    def provenance(self, name: str, scraped: bool) -> PriceProvenance:
+    def provenance(
+        self,
+        name: str,
+        scraped: bool,
+        prices: tuple[float, float] | None = None,
+    ) -> PriceProvenance:
         """出力する `ApiModel.provenance` を組み立てる。
 
         Parameters:
@@ -86,12 +91,18 @@ class FallbackResolver:
                 （= `scrape_status == "success"`）。入出力で成否が割れた場合は
                 False を渡す。保守的に「ハードコード由来」として扱われ、
                 次回実行でハードコード値が優先されるだけなので安全側に倒れる。
+            prices: 実際に出力する `(price_in, price_out)`。渡された場合、
+                引き継いだ出自を返すのは出力価格が引き継ぎ元と**完全に一致**する
+                ときだけに限定する。入出力の片方だけ抽出できた部分成功では
+                出力が「今回の抽出値 + 引き継ぎ値」の混成になるため、これを
+                「過去のスクレイプ成功値」として記録すると、次回実行で
+                混成ペアが 2 層目に採用されてしまう。
         """
         fb_in, fb_out = self.hardcoded.get(name, (0.0, 0.0))
         if scraped:
             return PriceProvenance(origin="scraped", fallback_in=fb_in, fallback_out=fb_out)
         carried = self.carried.get(name)
-        if carried is not None:
+        if carried is not None and (prices is None or prices == self.prices.get(name)):
             # 出力価格は引き継いだ過去のスクレイプ成功値そのもの
             return carried
         return PriceProvenance(origin="hardcoded", fallback_in=fb_in, fallback_out=fb_out)
