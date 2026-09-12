@@ -22,7 +22,7 @@ _PRICING_API = (
 )
 
 _FALLBACKS: dict[str, tuple[float, float]] = {
-    "Amazon Nova Premier": (2.50,  10.00),
+    "Amazon Nova Premier": (2.50,  12.50),
     "Amazon Nova Pro":     (0.80,   3.20),
     "Amazon Nova Lite":    (0.06,   0.24),
     "Amazon Nova Micro":   (0.035,  0.14),

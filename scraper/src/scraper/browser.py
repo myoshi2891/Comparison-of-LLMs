@@ -9,6 +9,7 @@ price_from_page() はページを JS レンダリングしてテキストを返�
 
 from __future__ import annotations
 import logging
+from collections.abc import Iterable
 import os
 import re
 
@@ -48,6 +49,37 @@ def get_page_text(url: str, wait_selector: str | None = None, timeout_ms: int = 
             return page.content()
         finally:
             browser.close()
+
+
+def model_key_pattern(name: str, all_names: Iterable[str]) -> str:
+    """モデル名を価格抽出用の正規表現キーへ変換する。
+
+    短い名前が「より長い派生モデル名」の価格を拾うのを防ぐため、名前の直後に
+    ① 数字が続く場合、② 設定済みの他モデル名の残り（" Pro" / "-Flash" 等）が
+    続く場合はマッチしない否定先読みを付ける。
+    （例: "GPT-5.2" が "GPT-5.2 Pro $21.00" を拾うと価格が汚染される）
+
+    Parameters:
+        name: 対象モデル名。
+        all_names: 同一プロバイダーで設定されている全モデル名。
+
+    Returns:
+        str: 否定先読み付きの正規表現キー（大小文字は呼び出し側で IGNORECASE）。
+    """
+    def _to_pattern(text: str) -> str:
+        return text.lower().replace(" ", "[-\\s]?").replace(".", r"\.")
+
+    key = _to_pattern(name)
+    lname = name.lower()
+    suffixes = sorted(
+        {
+            other.lower()[len(lname):]
+            for other in all_names
+            if other.lower() != lname and other.lower().startswith(lname)
+        }
+    )
+    guards = [r"\d"] + [_to_pattern(s) for s in suffixes if s]
+    return rf"{key}(?!{'|'.join(guards)})"
 
 
 def extract_price(text: str, patterns: list[str]) -> float | None:

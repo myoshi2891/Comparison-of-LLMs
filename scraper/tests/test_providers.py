@@ -143,6 +143,38 @@ class TestOpenAI:
             models = openai.scrape()
         _assert_all_fallback(models, openai._FALLBACKS, "OpenAI")
 
+    # 前方一致するモデル名（GPT-5.5 / GPT-5.5 Pro、GPT-5.2 / GPT-5.2 Pro）が
+    # 互いの価格を拾わないことを検証する（Copilot Pro/Pro Max と同型の汚染）。
+    _OVERLAP_HTML = (
+        "<html><body>"
+        "<p>GPT-5.5 Pro $31.00 / 1M tokens input</p>"
+        "<p>GPT-5.5 Pro output cost is $181.00</p>"
+        "<p>GPT-5.5 $5.50 / 1M tokens input</p>"
+        "<p>GPT-5.5 output cost is $31.50</p>"
+        "<p>GPT-5.2 Pro $22.00 / 1M tokens input</p>"
+        "<p>GPT-5.2 Pro output cost is $169.00</p>"
+        "<p>GPT-5.2 $1.85 / 1M tokens input</p>"
+        "<p>GPT-5.2 output cost is $14.50</p>"
+        "</body></html>"
+    )
+
+    @pytest.mark.parametrize(
+        ("name", "price_in", "price_out"),
+        [
+            ("GPT-5.5", 5.50, 31.50),
+            ("GPT-5.5 Pro", 31.00, 181.00),
+            ("GPT-5.2", 1.85, 14.50),
+            ("GPT-5.2 Pro", 22.00, 169.00),
+        ],
+    )
+    def test_overlapping_names_keep_own_prices(self, name, price_in, price_out):
+        with patch("scraper.providers.openai.get_page_text", return_value=self._OVERLAP_HTML):
+            models = openai.scrape()
+        m = _find(models, name)
+        assert m.price_in == price_in
+        assert m.price_out == price_out
+        assert m.scrape_status == "success"
+
 
 # --------------------------------------------------------------------------- #
 # Google AI（Google AI ページのみ抽出。Vertex は常に fallback）
@@ -331,6 +363,31 @@ class TestMoonshot:
             models = moonshot.scrape()
         _assert_all_fallback(models, moonshot._FALLBACKS, "Moonshot(Kimi)")
 
+    # "Kimi K2.7 Code" が "Kimi K2.7 Code Highspeed" の価格を拾わないこと。
+    _OVERLAP_HTML = (
+        "<html><body>"
+        "<p>Kimi K2.7 Code Highspeed $1.95</p>"
+        "<p>Kimi K2.7 Code Highspeed output $8.50</p>"
+        "<p>Kimi K2.7 Code $0.99</p>"
+        "<p>Kimi K2.7 Code output $4.50</p>"
+        "</body></html>"
+    )
+
+    @pytest.mark.parametrize(
+        ("name", "price_in", "price_out"),
+        [
+            ("Kimi K2.7 Code", 0.99, 4.50),
+            ("Kimi K2.7 Code Highspeed", 1.95, 8.50),
+        ],
+    )
+    def test_overlapping_names_keep_own_prices(self, name, price_in, price_out):
+        with patch("scraper.providers.moonshot.get_page_text", return_value=self._OVERLAP_HTML):
+            models = moonshot.scrape()
+        m = _find(models, name)
+        assert m.price_in == price_in
+        assert m.price_out == price_out
+        assert m.scrape_status == "success"
+
 
 # --------------------------------------------------------------------------- #
 # Zhipu(GLM)（"GLM-5.2" のみ。key "glm-5\.2" は "GLM-4.6" と衝突しない）
@@ -356,6 +413,31 @@ class TestZhipu:
         with patch("scraper.providers.zhipu.get_page_text", return_value="<html></html>"):
             models = zhipu.scrape()
         _assert_all_fallback(models, zhipu._FALLBACKS, "Zhipu(GLM)")
+
+    # "GLM-5.3" が "GLM-5.3-Flash" の価格を拾わないこと。
+    _OVERLAP_HTML = (
+        "<html><body>"
+        "<p>GLM-5.3-Flash $0.16</p>"
+        "<p>GLM-5.3-Flash output $0.55</p>"
+        "<p>GLM-5.3 $1.45</p>"
+        "<p>GLM-5.3 output $4.45</p>"
+        "</body></html>"
+    )
+
+    @pytest.mark.parametrize(
+        ("name", "price_in", "price_out"),
+        [
+            ("GLM-5.3", 1.45, 4.45),
+            ("GLM-5.3-Flash", 0.16, 0.55),
+        ],
+    )
+    def test_overlapping_names_keep_own_prices(self, name, price_in, price_out):
+        with patch("scraper.providers.zhipu.get_page_text", return_value=self._OVERLAP_HTML):
+            models = zhipu.scrape()
+        m = _find(models, name)
+        assert m.price_in == price_in
+        assert m.price_out == price_out
+        assert m.scrape_status == "success"
 
 
 # --------------------------------------------------------------------------- #
