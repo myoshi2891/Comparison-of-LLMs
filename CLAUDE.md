@@ -18,6 +18,7 @@ update.sh  ← オーケストレーター (scrape → copy)
 │       ├── models.py            PricingData / ApiModel / SubTool スキーマ
 │       ├── exchange.py          USD/JPY レート取得 (Frankfurter API)
 │       ├── browser.py           Playwright 共通ユーティリティ
+│       ├── provenance.py        3層フォールバックの出自解決 (FallbackResolver)
 │       ├── providers/           API プロバイダー別スクレイパー (anthropic, openai, google, aws, deepseek, xai, moonshot, zhipu)
 │       └── tools/               コーディングツール別スクレイパー (cursor, github_copilot, windsurf, claude_code, jetbrains, openai_codex, google_one, antigravity)
 ├── web-next/           Next.js 16 + React 19 + TypeScript + Tailwind v4 (bun)
@@ -205,6 +206,7 @@ Playwright ブラウザバイナリ（`/root/.cache/ms-playwright/`）はバイ�
 - **Noto Sans JP は自前ホスト。`next/font/google` へ戻さないこと**（2026-08-13）: `next/font/google` は Google Fonts が返す `@font-face` を**全件**ビルド時にダウンロードする（`subsets` は preload 判定にしか使われず、ダウンロード数を減らさない）。Noto Sans JP は CJK を `unicode-range` で 124 分割し weight 4 種を掛けた **496 `@font-face`** を返すため、Netlify のビルドで `fonts.gstatic.com` からの取得が失敗し、Turbopack が `Can't resolve '@vercel/turbopack-next/internal/font/google/font'` を 496 件出して停止した（`--webpack` 切り替えや SWC バイナリではなく、**ビルド時の外部ネットワーク依存**が原因）。対策として woff2 124 本と `@font-face` CSS を `web-next/public/fonts/` へ vendor し、`--font-sans` は `globals.css` の `:root` で定義、`app/layout.tsx` が React 19 の `precedence` 付き `<link rel="stylesheet">` と latin slice の preload を出す。フォント更新は `cd web-next && bun scripts/vendor-noto-sans-jp.ts` を実行して生成物をコミットする（出力は決定論的）。生成物のため `public/fonts` は `biome.json` の対象外
 - **3層フォールバック**: スクレイパーは「スクレイプ成功 → 既存 JSON の値 → ハードコードフォールバック」の順で価格を決定。`scrape_status` フィールド (`success` | `fallback` | `manual`) で出自を追跡
 - **既存 `pricing.json` の値は `scrape_status == "success"` のときのみフォールバックに採用する**（2026-09-12）: 2 層目は本来「過去に実際にスクレイプ成功した値」を守るためのもの。出自を問わず既存値を優先していたため、**`_FALLBACKS` のハードコード値を書き換えても既存モデルの価格が永久に反映されない**状態だった（`anthropic.py` が Claude Sonnet 5 だけ個別ハックで回避していた経緯がある）。各 provider の既存値取り込み条件に `and m.scrape_status == "success"` を課し、個別ハックは削除済み。あわせて `openai` / `deepseek` / `moonshot` / `xai` / `zhipu` の抽出ループが `_FALLBACKS` を直接読んでおり例外パス以外で 2 層目が無視されていた不整合も `fallback_map` 参照へ統一した。月次の価格改定は `_FALLBACKS` の更新だけで反映される
+- **価格の出自は `provenance` フィールドで実行をまたいで持ち越す**（2026-09-12）: `scrape_status` は「**その実行で**スクレイプが成功したか」しか表さないため、これだけを 2 層目の判定材料にすると、**スクレイプが 2 回連続で失敗したときに 1 回目で `fallback` へ落ちた過去の成功値が 2 回目で破棄され**、ハードコード値まで巻き戻る。`ApiModel.provenance`（`origin` + 記録時点のハードコード値 `fallback_in` / `fallback_out`）を持たせ、`scraper/src/scraper/provenance.py` の `FallbackResolver` が全 API プロバイダーの 2 層目判定を一元的に担う。採用ルールは ① `origin == "scraped"` かつ記録時点のハードコード値が現在の `_FALLBACKS` と一致 → 既存値を採用、② ハードコード値が改定されていれば **ハードコード値が勝つ**（上記の月次更新の設計判断を維持）、③ `provenance` を持たない旧スキーマの JSON は従来どおり `scrape_status == "success"` のときのみ採用。フィールドは既定値 `None` の後方互換追加のため既存 `pricing.json` はそのまま読める（次回スクレイプで自動的に埋まる）。**TypeScript 側（`web-next/types/pricing.ts` の `PriceProvenance` / `lib/pricing.ts` の `PriceProvenanceSchema`）と対で更新すること**
 - **価格抽出パターンのギャップは必ず上限付きで書く**（2026-09-12）: `[^$\n]*?` のような無制限ギャップは、改行の少ない巨大な 1 塊テキスト（GitHub Copilot の料金ページは約 890KB / 改行 520 行）を横断して無関係な金額に到達する。実際に Copilot Max ティア新設後、Pro / Pro+ の双方が Max の特典クレジット `$100/month in GitHub credits` を拾って `success` 判定され `pricing.json` が汚染された。`tools/github_copilot.py` の `_GAP = r"[^$\n]{0,80}?"` のように距離を制限し、近傍に無ければ fallback へ落とす
 - **Google AI/Vertex はライブ抽出を行わずフォールバック固定**（2026-07-24）: `providers/google.py` の `scrape()` は `get_page_text` を呼ばず、常に `_FALLBACKS`（WebSearch 確定値）を返す。Google AI 料金ページ (`ai.google.dev/pricing`) は ① モデル名が目次(TOC)に複数回先行出現、② 価格が `/1M` 等のアンカーを伴わない `Input price ... $1.50` ラベル、③ 1モデルに標準/キャッシュ等の複数価格が併記される、という構造のため正規表現抽出が構造的に不安定（実測で正しく取れるモデルが 0 件で、近傍の無関係な額を誤取得し `price_in` を汚染していた）。**この挙動を「スクレイプ復活」で戻さないこと**。価格改定は月次で `_FALLBACKS` を更新して反映する
 - **型の同期**: `scraper/src/scraper/models.py` (Pydantic) が SSoT、`web-next/types/pricing.ts` (TypeScript) が手動ミラー、`web-next/lib/pricing.ts` の `_AssertParity` でコンパイル時検証。**片方を変更したら必ずもう片方も更新すること**
@@ -291,7 +293,7 @@ Build:     cd web-next && bun run build
 以下を全て確認してからコミットすること：
 
 1. `cd web-next && bun run build` が成功（※Antigravityサンドボックス環境では実行禁止。他環境やCIでは必須）
-2. `cd web-next && bun run test` が完全に成功（1577 tests pass。収集失敗もブロッキング失敗として原因を調査する）
+2. `cd web-next && bun run test` が完全に成功（1583 tests pass。収集失敗もブロッキング失敗として原因を調査する）
 3. `cd web-next && bun run typecheck` が成功
 4. `cd web-next && bun run lint` が成功
 5. `cd scraper && uv run pytest` が成功
