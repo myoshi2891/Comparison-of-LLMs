@@ -368,3 +368,66 @@ def test_codex_distant_price_does_not_match_pro_tiers():
     for plan in ("ChatGPT Pro Codex", "ChatGPT Pro (Codex)"):
         assert by_name[plan].monthly == fb[plan], f"{plan} が遠方の $500 を拾っている"
         assert by_name[plan].scrape_status == "fallback", f"{plan} が誤って success 判定"
+
+
+_COPILOT_HTML_NEAR_MISS_BUSINESS_ENTERPRISE = (
+    "<html><body>"
+    "<div>Businesses running Copilot at scale can save up to $58 / user / month.</div>"
+    "<div>Enterprise-Grade compliance add-on is billed at $77 / user / month.</div>"
+    "</body></html>"
+)
+
+
+def test_copilot_business_enterprise_require_whole_word_match():
+    """"Businesses"（語尾拡張）/ "Enterprise-Grade"（ハイフン拡張）の
+    部分一致で無関係な月額を拾わない。
+
+    \\b だけでは語尾のハイフン接続を防げないため、\\w とハイフンの両方を
+    否定先読み・後読みで除外している。境界が緩いと "business" は
+    "Businesses" に、"enterprise" は "Enterprise-Grade" にマッチし、
+    _GAP が残りの語を食って直後の "$N / user / month" に到達してしまう。
+    """
+    from scraper.tools import github_copilot
+
+    with patch(
+        "scraper.tools.github_copilot.get_page_text",
+        return_value=_COPILOT_HTML_NEAR_MISS_BUSINESS_ENTERPRISE,
+    ):
+        tools = github_copilot.scrape()
+
+    by_name = {t.name: t for t in tools}
+    fb = {row[1]: row[2] for row in github_copilot._FALLBACKS}
+    for plan in ("Business", "Enterprise"):
+        assert by_name[plan].monthly == fb[plan], f"{plan} が部分一致で誤った価格を拾っている"
+        assert by_name[plan].scrape_status == "fallback", f"{plan} が誤って success 判定"
+
+
+_CODEX_HTML_NEAR_MISS_NAMES = (
+    "<html><body>"
+    "<div>Surplus credit packs are available for $45 / month.</div>"
+    "<div>Copilot Pro Codexers unlock extra rate limits for $65 / month.</div>"
+    "<div>Copilot Pro Max-Ultra bundle is priced at $120 / month.</div>"
+    "</body></html>"
+)
+
+
+def test_codex_plan_names_require_whole_word_match():
+    """"Surplus"（語尾拡張）/ "Pro Codexers"（語尾拡張）/ "Pro Max-Ultra"
+    （ハイフン拡張）の部分一致で無関係な月額を拾わない。
+
+    \\b だけでは語尾のハイフン接続を防げないため、\\w とハイフンの両方を
+    否定先読み・後読みで除外している。境界が緩いと "plus" は "Surplus" に、
+    "pro codex" は "Pro Codexers" に、"pro max" は "Pro Max-Ultra" に
+    マッチし、_GAP が残りを食って直後の "$N / month" に到達してしまう。
+    """
+    with patch(
+        "scraper.tools.openai_codex.get_page_text",
+        return_value=_CODEX_HTML_NEAR_MISS_NAMES,
+    ):
+        tools = openai_codex.scrape()
+
+    by_name = {t.name: t for t in tools}
+    fb = {row[_NAME]: row[_MONTHLY] for row in openai_codex._FALLBACKS}
+    for plan in ("ChatGPT Plus (Codex)", "ChatGPT Pro Codex", "ChatGPT Pro (Codex)"):
+        assert by_name[plan].monthly == fb[plan], f"{plan} が部分一致で誤った価格を拾っている"
+        assert by_name[plan].scrape_status == "fallback", f"{plan} が誤って success 判定"

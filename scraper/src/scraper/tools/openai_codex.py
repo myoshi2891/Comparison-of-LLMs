@@ -39,13 +39,19 @@ def scrape(existing: list[SubTool] | None = None) -> list[SubTool]:
     tools: list[SubTool] = []
     for group, name, fb_m, fb_a, tag, cls, note_ja, note_en in _FALLBACKS:
         price = None
+        # \b だけでは語尾のハイフン接続（例: "plus-one"）を防げないため、
+        # 前後を \w とハイフンの両方について否定先読み・後読みで除外する。
         if name == "ChatGPT Plus (Codex)":
-            price = extract_price(html, [rf"plus{_GAP}\$([\d]+)\s*/\s*month"])
+            price = extract_price(html, [rf"(?<![\w-])plus(?![\w-]){_GAP}\$([\d]+)\s*/\s*month"])
         elif name == "ChatGPT Pro Codex":
             # Pro が 2 ティアに分割されたため、総称の "pro" では両行が同じ値になる。
-            price = extract_price(html, [rf"pro\s+codex{_GAP}\$([\d]+)\s*/\s*month"])
+            price = extract_price(
+                html, [rf"(?<![\w-])pro\s+codex(?![\w-]){_GAP}\$([\d]+)\s*/\s*month"]
+            )
         elif name == "ChatGPT Pro (Codex)":
-            price = extract_price(html, [rf"pro\s+max{_GAP}\$([\d]+)\s*/\s*month"])
+            price = extract_price(
+                html, [rf"(?<![\w-])pro\s+max(?![\w-]){_GAP}\$([\d]+)\s*/\s*month"]
+            )
 
         cur_m = fb_m
         status = "fallback"

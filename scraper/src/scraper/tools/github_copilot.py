@@ -73,9 +73,15 @@ def scrape(existing: list[SubTool] | None = None) -> list[SubTool]:
             # \b がないと "Maximum" 等の部分一致から無関係な月額に到達する。
             price = extract_price(html, [rf"\bmax\b{_GAP}\$([\d]+)\s*/\s*month"])
         elif name == "Business":
-            price = extract_price(html, [rf"business{_GAP}\$([\d]+)\s*/\s*(?:user|seat)"])
+            # \b だけでは語尾のハイフン接続（例: "business-tier"）を防げないため、
+            # 前後を \w とハイフンの両方について否定先読み・後読みで除外する。
+            price = extract_price(
+                html, [rf"(?<![\w-])business(?![\w-]){_GAP}\$([\d]+)\s*/\s*(?:user|seat)"]
+            )
         elif name == "Enterprise":
-            price = extract_price(html, [rf"enterprise{_GAP}\$([\d]+)\s*/\s*(?:user|seat)"])
+            price = extract_price(
+                html, [rf"(?<![\w-])enterprise(?![\w-]){_GAP}\$([\d]+)\s*/\s*(?:user|seat)"]
+            )
 
         cur_m = fb_m
         status = "fallback"
