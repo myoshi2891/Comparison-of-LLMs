@@ -51,6 +51,10 @@ def scrape(existing: list[ApiModel] | None = None) -> list[ApiModel]:
                 fallback_map[m.name] = (m.price_in, m.price_out)
     for k, v in _FALLBACKS.items():
         fallback_map.setdefault(k, v)
+    # Claude Sonnet 5 はライブ抽出の対象外のため、既存 JSON の値は「過去のハードコード値の写し」に
+    # すぎない。setdefault のままだと旧価格が既存 JSON に固着して恒久的に反映されないため、
+    # このモデルだけはハードコード値で明示的に上書きする（他モデルは既存値優先を維持）。
+    fallback_map[_CLAUDE_SONNET_5] = _FALLBACKS[_CLAUDE_SONNET_5]
 
     try:
         html = get_page_text(_URL, timeout_ms=40_000)
