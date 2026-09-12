@@ -223,3 +223,69 @@ class TestAntigravity:
         Verify that when the scraper receives empty HTML, every Antigravity plan reports fallback pricing and a 'fallback' scrape status.
         """
         _assert_all_fallback(_run(antigravity, _EMPTY), antigravity._FALLBACKS)
+
+
+
+# --------------------------------------------------------------------------- #
+# GitHub Copilot: 遠距離マッチによるプラン価格の取り違え（2026-09-12 実測で再現）
+#
+# 価格抽出パターンのギャップが `[^$\n]*?` と無制限のため、プラン名から遠く
+# 離れた無関係な金額まで到達してしまう。実際の料金ページは約 890KB / 改行 520 行
+# の 1 塊テキストで、抽出可能な "$N/month" 表記は Max ティアの特典クレジット
+# "$100/month in GitHub credits" ただ 1 箇所しか存在しない。その結果 Pro と Pro+
+# の双方が $100 として success 判定され、pricing.json が汚染された。
+#
+# 正しい挙動は「近傍に価格がなければ抽出失敗 → fallback」。
+# --------------------------------------------------------------------------- #
+_COPILOT_HTML_DISTANT_PRICE = (
+    "<html><body>"
+    "<p>Copilot Pro is our plan for individual developers.</p>"
+    + "<p>" + ("unrelated marketing copy. " * 60) + "</p>"
+    + "<p>Copilot Max is built for sustained agent-driven workflows, "
+      "and includes $100/month in GitHub credits.</p>"
+    "</body></html>"
+)
+
+
+def test_copilot_distant_price_does_not_match_plan():
+    """プラン名から遠く離れた金額を拾わず fallback に落ちる。"""
+    from scraper.tools import github_copilot
+
+    with patch(
+        "scraper.tools.github_copilot.get_page_text",
+        return_value=_COPILOT_HTML_DISTANT_PRICE,
+    ):
+        tools = github_copilot.scrape()
+
+    by_name = {t.name: t for t in tools}
+    fb = {row[1]: row[2] for row in github_copilot._FALLBACKS}
+    for plan in ("Pro", "Pro+"):
+        assert by_name[plan].monthly == fb[plan], f"{plan} が遠方の $100 を拾っている"
+        assert by_name[plan].scrape_status == "fallback", f"{plan} が誤って success 判定"
+
+
+_COPILOT_HTML_WITH_MAX = (
+    "<html><body>"
+    "<div>Copilot Max $100 / month for sustained agent workflows</div>"
+    "<div>Copilot Pro $10 / month for individuals</div>"
+    "<div>Copilot Pro+ $39 / month with all models</div>"
+    "<div>Copilot Business $19 / user / month</div>"
+    "<div>Copilot Enterprise $39 / user / month</div>"
+    "</body></html>"
+)
+
+
+def test_copilot_max_tier_does_not_shadow_pro_prices():
+    """Max ($100) が近傍にあっても Pro=$10 / Pro+=$39 を取り違えない。"""
+    from scraper.tools import github_copilot
+
+    with patch(
+        "scraper.tools.github_copilot.get_page_text",
+        return_value=_COPILOT_HTML_WITH_MAX,
+    ):
+        tools = github_copilot.scrape()
+
+    by_name = {t.name: t for t in tools}
+    assert by_name["Pro"].monthly == 10, "Pro が Max/Pro+ の価格を拾っている"
+    assert by_name["Pro+"].monthly == 39, "Pro+ が Max の価格を拾っている"
+    assert by_name["Max"].monthly == 100
