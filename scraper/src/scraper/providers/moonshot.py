@@ -17,24 +17,34 @@ _URL = "https://platform.moonshot.ai/docs/pricing"
 
 # フォールバック価格（USD / 1M tokens、cache-miss 標準入力価格）
 _FALLBACKS: dict[str, tuple[float, float]] = {
-    "Kimi K3":   (3.00, 15.00),
-    "Kimi K2.6": (0.95,  4.00),
+    "Kimi K3":                   ( 3.00, 15.00),
+    "Kimi K2.7 Code Highspeed":  ( 1.90,  8.00),
+    "Kimi K2.7 Code":            ( 0.95,  4.00),
+    "Kimi K2.6":                 ( 0.95,  4.00),
 }
 _TAG = {
-    "Kimi K3":   "最新 Flagship",
-    "Kimi K2.6": "General",
+    "Kimi K3":                   "最新 Flagship",
+    "Kimi K2.7 Code Highspeed":  "Code 高速",
+    "Kimi K2.7 Code":            "Code 特化",
+    "Kimi K2.6":                 "General",
 }
 _CLS = {
-    "Kimi K3":   "tag-oss",
-    "Kimi K2.6": "tag-oss",
+    "Kimi K3":                   "tag-oss",
+    "Kimi K2.7 Code Highspeed":  "tag-oss",
+    "Kimi K2.7 Code":            "tag-oss",
+    "Kimi K2.6":                 "tag-oss",
 }
 _SUB_JA = {
-    "Kimi K3":   "2.8T MoE / 1M ctx / OSS / 2026-07-16 最新旗艦",
-    "Kimi K2.6": "前世代フラッグシップ / OSS / 1M ctx",
+    "Kimi K3":                   "2.8T MoE / 1M ctx / OSS / 最新旗艦",
+    "Kimi K2.7 Code Highspeed":  "コーディング特化 / 高速版",
+    "Kimi K2.7 Code":            "コーディング特化 / 標準速度",
+    "Kimi K2.6":                 "前世代フラッグシップ / OSS / 1M ctx",
 }
 _SUB_EN = {
-    "Kimi K3":   "2.8T MoE / 1M ctx / OSS / new flagship Jul 2026",
-    "Kimi K2.6": "Prev flagship / OSS / 1M ctx",
+    "Kimi K3":                   "2.8T MoE / 1M ctx / OSS / latest flagship",
+    "Kimi K2.7 Code Highspeed":  "Coding-specialized / high-speed variant",
+    "Kimi K2.7 Code":            "Coding-specialized / standard speed",
+    "Kimi K2.6":                 "Prev flagship / OSS / 1M ctx",
 }
 
 

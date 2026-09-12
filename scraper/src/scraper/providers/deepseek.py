@@ -14,34 +14,34 @@ logger = logging.getLogger(__name__)
 _URL = "https://platform.deepseek.com/api-docs/pricing"
 
 _FALLBACKS: dict[str, tuple[float, float]] = {
-    "DeepSeek V4 Flash": (0.140, 0.280),
-    "DeepSeek V4 Pro":   (0.435, 0.870),
-    "DeepSeek-V3.2":     (0.280, 0.420),
-    "DeepSeek-R1":       (0.550, 2.190),
+    "DeepSeek V4 Flash":  ( 0.30,  1.20),
+    "DeepSeek V4 Pro":    ( 1.32,  3.96),
+    "DeepSeek-V3.2":      ( 0.28,  0.42),
+    "DeepSeek-R1":        ( 0.55,  2.19),
 }
 _TAG = {
-    "DeepSeek V4 Flash": "最新 Flash",
-    "DeepSeek V4 Pro":   "最新 Pro",
-    "DeepSeek-V3.2":     "Legacy OSS",
-    "DeepSeek-R1":       "Legacy 推論",
+    "DeepSeek V4 Flash":  "最新 Flash",
+    "DeepSeek V4 Pro":    "最新 Pro",
+    "DeepSeek-V3.2":      "Retired",
+    "DeepSeek-R1":        "Retired",
 }
 _CLS = {
-    "DeepSeek V4 Flash": "tag-oss",
-    "DeepSeek V4 Pro":   "tag-oss",
-    "DeepSeek-V3.2":     "tag-oss",
-    "DeepSeek-R1":       "tag-oss",
+    "DeepSeek V4 Flash":  "tag-oss",
+    "DeepSeek V4 Pro":    "tag-oss",
+    "DeepSeek-V3.2":      "tag-leg",
+    "DeepSeek-R1":        "tag-leg",
 }
 _SUB_JA = {
-    "DeepSeek V4 Flash": "新フラッグシップ / 1M ctx / Apr 2026 / MIT",
-    "DeepSeek V4 Pro":   "高度推論 / 1M ctx / 1.6T MoE / MIT / 2026-05-22値下げ",
-    "DeepSeek-V3.2":     "671B MoE / OSS MIT / 128K",
-    "DeepSeek-R1":       "CoT推論 / OSS MIT",
+    "DeepSeek V4 Flash":  "1M ctx / MIT / off-peak は 50% 引き",
+    "DeepSeek V4 Pro":    "高度推論 / 1.6T MoE / MIT / off-peak は 50% 引き",
+    "DeepSeek-V3.2":      "公式料金表から削除 (提供終了)",
+    "DeepSeek-R1":        "公式料金表から削除 (提供終了)",
 }
 _SUB_EN = {
-    "DeepSeek V4 Flash": "New flagship Flash / 1M ctx / Apr 2026 / MIT",
-    "DeepSeek V4 Pro":   "Advanced reasoning / 1M ctx / 1.6T MoE / MIT / price cut May 2026",
-    "DeepSeek-V3.2":     "671B MoE / OSS MIT / 128K ctx",
-    "DeepSeek-R1":       "Chain-of-thought reasoning / OSS MIT",
+    "DeepSeek V4 Flash":  "1M ctx / MIT / 50% off during off-peak",
+    "DeepSeek V4 Pro":    "Advanced reasoning / 1.6T MoE / MIT / 50% off during off-peak",
+    "DeepSeek-V3.2":      "Removed from the official price list (retired)",
+    "DeepSeek-R1":        "Removed from the official price list (retired)",
 }
 
 

@@ -17,24 +17,34 @@ _URL = "https://z.ai/pricing"
 
 # フォールバック価格（USD / 1M tokens）
 _FALLBACKS: dict[str, tuple[float, float]] = {
-    "GLM-5.2": (1.40, 4.40),
-    "GLM-4.6": (0.43, 1.74),
+    "GLM-5.3":        ( 1.40,  4.40),
+    "GLM-5.2":        ( 1.40,  4.40),
+    "GLM-4.6":        ( 0.60,  2.20),
+    "GLM-5.3-Flash":  ( 0.15,  0.50),
 }
 _TAG = {
-    "GLM-5.2": "最新 Flagship",
-    "GLM-4.6": "Budget",
+    "GLM-5.3":        "最新 Flagship",
+    "GLM-5.2":        "Stable",
+    "GLM-4.6":        "Budget",
+    "GLM-5.3-Flash":  "Budget",
 }
 _CLS = {
-    "GLM-5.2": "tag-oss",
-    "GLM-4.6": "tag-oss",
+    "GLM-5.3":        "tag-oss",
+    "GLM-5.2":        "tag-oss",
+    "GLM-4.6":        "tag-oss",
+    "GLM-5.3-Flash":  "tag-oss",
 }
 _SUB_JA = {
-    "GLM-5.2": "最新旗艦 / OSS / 2026-06-16 / 高コスパ",
-    "GLM-4.6": "低コスト枠 / OSS / 前世代",
+    "GLM-5.3":        "最新旗艦 / OSS / 高コスパ",
+    "GLM-5.2":        "前世代旗艦 / OSS",
+    "GLM-4.6":        "低コスト枠 / OSS / 前世代 (公式値へ修正)",
+    "GLM-5.3-Flash":  "最安クラス / OSS / 大量処理向け",
 }
 _SUB_EN = {
-    "GLM-5.2": "Latest flagship / OSS / Jun 2026 / cost-efficient",
-    "GLM-4.6": "Budget tier / OSS / prev-gen",
+    "GLM-5.3":        "Latest flagship / OSS / cost-efficient",
+    "GLM-5.2":        "Prev flagship / OSS",
+    "GLM-4.6":        "Budget tier / OSS / prev-gen (corrected to official)",
+    "GLM-5.3-Flash":  "Cheapest class / OSS / high-volume",
 }
 
 

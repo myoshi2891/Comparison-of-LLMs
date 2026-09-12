@@ -21,6 +21,8 @@ _FALLBACKS: list[tuple[str, str, float, float | None, str, str, str, str]] = [
      "300 Premium req/月 | 学生無料",    "300 Premium req/mo | Free for students"),
     ("GitHub Copilot", "Pro+",       39,  390,  "Pro+",       "tag-flag",
      "1,500 req/月 | 全モデルアクセス", "1,500 req/mo | All model access"),
+    ("GitHub Copilot", "Max",        100, None, "Max",        "tag-flag",
+     "高負荷エージェント向け最上位",     "Top tier for sustained agent workflows"),
     ("GitHub Copilot", "Business",   19,  None, "Team",       "tag-bal",
      "超過 $0.04/req | /user/month",     "Overage $0.04/req | /user/month"),
     ("GitHub Copilot", "Enterprise", 39,  None, "Enterprise", "tag-flag",
