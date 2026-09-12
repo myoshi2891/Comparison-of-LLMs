@@ -28,10 +28,10 @@
 
 1. **実行コマンド制約（絶対遵守）**:
    - パッケージマネージャーは **bun** を使用してください（`npm` / `npx` / `node` の実行は禁止）。
-   - テスト実行は必ず `(cd web-next && bun run test <対象テストパス>)` で実行してください（`bun test` は vitest/jsdom 設定を無視するため禁止）。
+   - 対象を絞ったテスト実行は必ず `(cd web-next && bun run test <対象テストパス>)` のようにパスを指定してください（`bun test` は vitest/jsdom 設定を無視するため禁止）。ただし Phase 4 の全テストスイート実行（`bun run test` をパス引数なし）はリグレッション確認のための例外として許可します。
    - サンドボックス環境下での **`npm` コマンドおよび本番ビルド（`bun run build` / `next build`）の実行は禁止** です。
-   - Biome Lint 実行時は必ず対象ファイル/ディレクトリを指定してください（`bun run lint:fix` や `bunx biome check --write` をパス引数なしでリポジトリ全体に実行することは禁止）。
-   - `legacy/` 配下のファイル編集は禁止です。移行元の原本は削除せず、HTML は `archive/html/` 配下、Markdown は `archive/md/` 配下に保管してください。
+   - 対象を絞った Biome チェックは必ず対象ファイル/ディレクトリを指定してください。書き込みを伴うコマンド（`bun run lint:fix` や `bunx biome check --write`）はパス引数なしでリポジトリ全体に実行することを常に禁止します。読み取り専用の `bun run lint`（パス引数なし）は Phase 4 のコミット前チェックに限り全体実行を許可します。
+   - `legacy/` 配下のファイル編集は禁止です。移行元の原本は削除せず、`git mv`（または `mv`）で HTML は `archive/html/` 配下、Markdown は `archive/md/` 配下へ**移動**してください（コピーして元ファイルを残す運用は禁止）。
    - 設定ファイル（`next.config.ts`, `tsconfig.json`, `biome.json` 等）や依存関係の勝手な変更は禁止です。
 
 2. **100% 完全移植とスタイリング防犯原則（要約・省略・縮約の絶対禁止）**:
@@ -39,7 +39,7 @@
    - 標準ファイル 4 点セット構成（`page.tsx`, `page.module.css`, `page.test.tsx`, `TocObserver.tsx`）を守り、`page.tsx` は Server Component を維持してください（`"use client"` 禁止）。
    - `<SiteHeader>` / `<DisclaimerBanner>` は `layout.tsx` に配置済みのため、ページ側で再配置しないでください。
    - **スタイリング防犯ルール**:
-     - 表の全列左寄せ（`:global(th/td)` で `text-align: left !important`）
+     - 表の全列左寄せ（`:global(th)` と `:global(td)` それぞれに `text-align: left !important`）
      - コードブロックの先頭インデント保持（`{"    "}` 形式の明示埋め込み）と 1 行ごとの `.codeLine` ラッパー
      - コード構文ハイライト用 span トークン（`.ck`, `.cv`, `.cs` 等）の適用
      - `pre code` リセット（`background: none; border: none;`）
@@ -61,7 +61,7 @@
 
      ```bash
      bun .claude/skills/nextjs-page-migration/scripts/audit_source_parity.mjs \
-       <原本パス> web-next/app/<provider>/<slug>/page.tsx
+       <原本パス> web-next/app/<route>/page.tsx
      echo "exit=$?"
      ```
 
@@ -79,17 +79,17 @@
 
    ```bash
    bun .claude/skills/nextjs-page-migration/scripts/audit_source_parity.mjs \
-     <原本パス> web-next/app/<provider>/<slug>/page.tsx --emit-headings
+     <原本パス> web-next/app/<route>/page.tsx --emit-headings
    ```
 
 3. 移行計画（配置先パス、slug、登録カテゴリ、実装タスクリスト）を提示してください。
 
 ### Phase 2: [Red] 契約テストの作成とコミット
 
-1. `web-next/app/<provider>/<slug>/page.test.tsx` を作成します（`// @vitest-environment jsdom` を先頭に明記）。
+1. `web-next/app/<route>/page.test.tsx` を作成します（`// @vitest-environment jsdom` を先頭に明記）。
 2. `.claude/skills/nextjs-page-migration/SKILL.md` §5 Step 1 に従い、**最低 13 契約**（S-1〜S-4 原本照合契約、C-1〜C-5 コンテンツ契約、D-8 デザイン契約、Q-1〜Q-3 品質契約、および必要に応じた C-6 / D-1〜D-7）を記述します。
    - 見出しテストは順序込み完全一致（`toEqual([...EXPECTED_H2])`）で記述し、件数のみや部分一致の弱いアサーションは禁止します。
-3. `(cd web-next && bun run test app/<provider>/<slug>/page.test.tsx)` を実行し、**テストが失敗することを確認** します。
+3. `(cd web-next && bun run test app/<route>/page.test.tsx)` を実行し、**テストが失敗することを確認** します。
 4. PII 検査後、Red コミットを実行します:
    `test(<slug>): add failing contract specs for <page-title>`
 
@@ -101,14 +101,14 @@
 
    ```bash
    bun .claude/skills/nextjs-page-migration/scripts/audit_source_parity.mjs \
-     <原本パス> web-next/app/<provider>/<slug>/page.tsx
+     <原本パス> web-next/app/<route>/page.tsx
    echo "exit=$?" # 必ず 0 を確認
    ```
 
 4. 単体テストを実行し、すべてパス（Green）することを確認します:
 
    ```bash
-   (cd web-next && bun run test app/<provider>/<slug>/page.test.tsx)
+   (cd web-next && bun run test app/<route>/page.test.tsx)
    (cd web-next && bun run test tests/page-registry-coverage.test.ts)
    ```
 
@@ -120,7 +120,7 @@
 1. 対象コードの Lint チェックおよび型チェックを実行し、エラーがゼロであることを確認します:
 
    ```bash
-   (cd web-next && bunx biome check app/<provider>/<slug>)
+   (cd web-next && bunx biome check app/<route>)
    (cd web-next && bun run typecheck)
    ```
 
@@ -145,4 +145,4 @@
 1. `docs/PROGRESS.md`（および必要に応じて関連ドキュメント）の進捗状況・テスト数を実測値で更新します。
 2. PII 検査後、Docs コミットを実行します:
    `chore(docs): update docs/PROGRESS.md for <page-title>`
-3. ユーザーへ実装完了を報告し、ブラウザで確認すべきローカル URL（例: `http://localhost:3000/<provider>/<slug>`）を提示して目視確認を依頼してください。
+3. ユーザーへ実装完了を報告し、ブラウザで確認すべきローカル URL（例: `http://localhost:3000/<route>`）を提示して目視確認を依頼してください。
