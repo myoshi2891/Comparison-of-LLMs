@@ -54,7 +54,7 @@ GEMINI.md は Gemini CLI / Gemini Code Assist 向けの入り口。
 (cd web-next && bun run typecheck)   # OK（2026-09-12 実測）
 (cd web-next && bun run build)       # ✅ Compiled successfully / 88 静的ページ生成（2026-09-12 実測）
 (cd web-next && bun run lint)        # OK（481 files / 0 diagnostics。2026-09-12 実測）
-(cd scraper && uv run pytest)        # 68 件 + 36 subtests pass（2026-09-12 実測。全 Green ✅）
+(cd scraper && uv run pytest)        # 94 件 + 37 subtests pass（2026-09-12 実測。全 Green ✅）
 ```
 
 ## 次セッション再開プロンプト

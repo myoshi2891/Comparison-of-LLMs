@@ -130,7 +130,14 @@
    (cd web-next && bun run test)
    ```
 
-3. 必要に応じてリファクタリングを行い、PII 検査後、コミットを実行します（コード整理がある場合のみ）:
+3. CLAUDE.md の「コミット前チェック」に従い、リポジトリ全体の Lint とビルドも実行して成功を確認します（対象ディレクトリだけの Biome チェックでは検知できない違反・ビルドエラーを防ぐため）:
+
+   ```bash
+   (cd web-next && bun run lint)
+   (cd web-next && bun run build)   # ※Antigravity サンドボックス環境では実行禁止。他環境および CI では必須
+   ```
+
+4. 必要に応じてリファクタリングを行い、PII 検査後、コミットを実行します（コード整理がある場合のみ）:
    `refactor(<slug>): clean up styles and components for <page-title>`
 
 ### Phase 5: [Docs] ドキュメント同期とユーザー確認依頼
