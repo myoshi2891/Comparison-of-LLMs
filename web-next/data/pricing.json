@@ -64,7 +64,7 @@
       "tag": "Stable",
       "cls": "tag-flag",
       "price_in": 5.0,
-      "price_out": 17.0,
+      "price_out": 25.0,
       "sub_ja": "1M ctx / エージェントチーム / 旧トークナイザ",
       "sub_en": "1M ctx / agent teams / previous tokenizer",
       "scrape_status": "fallback"
@@ -97,7 +97,7 @@
       "tag": "Stable",
       "cls": "tag-flag",
       "price_in": 3.0,
-      "price_out": 17.0,
+      "price_out": 15.0,
       "sub_ja": "バランス最適 / 200K ctx / 前世代",
       "sub_en": "Optimal balance / 200K ctx / prev-gen",
       "scrape_status": "fallback"
@@ -119,7 +119,7 @@
       "tag": "Fast",
       "cls": "tag-mini",
       "price_in": 1.0,
-      "price_out": 17.0,
+      "price_out": 5.0,
       "sub_ja": "高速・高ボリューム向け",
       "sub_en": "Fast / high-volume use cases",
       "scrape_status": "fallback"
