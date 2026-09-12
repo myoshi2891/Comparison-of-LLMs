@@ -131,6 +131,9 @@ def _write_output(data: PricingData, output_path: Path) -> None:
 
     with output_path.open("w", encoding="utf-8") as f:
         json.dump(payload, f, ensure_ascii=False, indent=2)
+        # 末尾改行を付ける（Biome の formatter が要求するため。
+        # 無いと web-next 側の `bun run lint` が pricing.json で落ちる）
+        f.write("\n")
     logger.info("✓ pricing.json を書き込みました: %s", output_path)
     logger.info("  API モデル: %d件 / コーディングツール: %d件",
                 len(data.api_models), len(data.sub_tools))
@@ -143,6 +146,7 @@ def _write_output(data: PricingData, output_path: Path) -> None:
     if web_data_path.parent.exists():
         with web_data_path.open("w", encoding="utf-8") as f:
             json.dump(payload, f, ensure_ascii=False, indent=2)
+            f.write("\n")
         logger.info("  web/src/data/pricing.json にもコピー完了")
 
 
