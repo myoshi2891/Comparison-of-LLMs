@@ -356,3 +356,117 @@ class TestZhipu:
         with patch("scraper.providers.zhipu.get_page_text", return_value="<html></html>"):
             models = zhipu.scrape()
         _assert_all_fallback(models, zhipu._FALLBACKS, "Zhipu(GLM)")
+
+
+# --------------------------------------------------------------------------- #
+# 3層フォールバックの優先順位
+#
+# 「スクレイプ成功 → 既存 JSON の値 → ハードコード値」の 2 層目は、本来
+# **過去に実際にスクレイプ成功した値**を保持するためのもの。既存 JSON の値が
+# 単なるフォールバック値の写し（scrape_status == "fallback"）だった場合にまで
+# 優先してしまうと、_FALLBACKS 側の価格改定が永久に反映されなくなる。
+# --------------------------------------------------------------------------- #
+_FALLBACK_PRECEDENCE_CASES = [
+    # (provider モジュール, 価格取得関数のパッチ先, existing の provider 文字列)
+    (anthropic, "scraper.providers.anthropic.get_page_text", "Anthropic"),
+    (openai, "scraper.providers.openai.get_page_text", "OpenAI"),
+    (deepseek, "scraper.providers.deepseek.get_page_text", "DeepSeek"),
+    (moonshot, "scraper.providers.moonshot.get_page_text", "Moonshot(Kimi)"),
+    (xai, "scraper.providers.xai.get_page_text", "xAI"),
+    (zhipu, "scraper.providers.zhipu.get_page_text", "Zhipu(GLM)"),
+]
+
+_STALE_IN = 999.01
+_STALE_OUT = 999.02
+
+
+def _stale_existing(provider: str, name: str, status: str) -> list[ApiModel]:
+    """
+    Build a one-element existing-model list carrying deliberately wrong prices.
+
+    Parameters:
+        provider (str): Provider string the target scraper filters on.
+        name (str): Model name that must exist in the scraper's `_FALLBACKS`.
+        status (str): `scrape_status` to stamp on the stale entry.
+
+    Returns:
+        list[ApiModel]: Single stale model usable as the `existing` argument.
+    """
+    return [
+        ApiModel(
+            provider=provider,
+            name=name,
+            tag="",
+            cls="tag-bal",
+            price_in=_STALE_IN,
+            price_out=_STALE_OUT,
+            sub_ja="",
+            sub_en="",
+            scrape_status=status,  # type: ignore[arg-type]
+        )
+    ]
+
+
+@pytest.mark.parametrize(
+    "module,patch_target,provider",
+    _FALLBACK_PRECEDENCE_CASES,
+    ids=[c[2] for c in _FALLBACK_PRECEDENCE_CASES],
+)
+def test_stale_fallback_existing_does_not_shadow_hardcoded_price(
+    module, patch_target, provider
+):
+    """既存 JSON の値が fallback 由来なら _FALLBACKS のハードコード値が勝つ。"""
+    name = next(iter(module._FALLBACKS))
+    expected_in, expected_out = module._FALLBACKS[name]
+    existing = _stale_existing(provider, name, "fallback")
+
+    with patch(patch_target, return_value="<html></html>"):
+        models = module.scrape(existing)
+
+    m = _find(models, name)
+    assert m.price_in == expected_in, f"{provider}/{name} price_in"
+    assert m.price_out == expected_out, f"{provider}/{name} price_out"
+
+
+@pytest.mark.parametrize(
+    "module,patch_target,provider",
+    _FALLBACK_PRECEDENCE_CASES,
+    ids=[c[2] for c in _FALLBACK_PRECEDENCE_CASES],
+)
+def test_previously_scraped_existing_price_is_preserved(module, patch_target, provider):
+    """既存 JSON の値がスクレイプ成功由来なら、その値を保持する（3層設計の本来の意図）。"""
+    name = next(iter(module._FALLBACKS))
+    existing = _stale_existing(provider, name, "success")
+
+    with patch(patch_target, return_value="<html></html>"):
+        models = module.scrape(existing)
+
+    m = _find(models, name)
+    assert m.price_in == _STALE_IN, f"{provider}/{name} price_in"
+    assert m.price_out == _STALE_OUT, f"{provider}/{name} price_out"
+
+
+def test_aws_stale_fallback_existing_does_not_shadow_hardcoded_price():
+    """AWS は httpx 経由のため個別に検証する。"""
+    name = next(iter(aws._FALLBACKS))
+    expected_in, expected_out = aws._FALLBACKS[name]
+    existing = _stale_existing("AWS", name, "fallback")
+
+    with patch("scraper.providers.aws.httpx.get", side_effect=RuntimeError("offline")):
+        models = aws.scrape(existing)
+
+    m = _find(models, name)
+    assert m.price_in == expected_in
+    assert m.price_out == expected_out
+
+
+def test_aws_previously_scraped_existing_price_is_preserved():
+    name = next(iter(aws._FALLBACKS))
+    existing = _stale_existing("AWS", name, "success")
+
+    with patch("scraper.providers.aws.httpx.get", side_effect=RuntimeError("offline")):
+        models = aws.scrape(existing)
+
+    m = _find(models, name)
+    assert m.price_in == _STALE_IN
+    assert m.price_out == _STALE_OUT
