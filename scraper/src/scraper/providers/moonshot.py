@@ -53,7 +53,10 @@ def scrape(existing: list[ApiModel] | None = None) -> list[ApiModel]:
     fallback_map: dict[str, tuple[float, float]] = {}
     if existing:
         for m in existing:
-            if m.provider == _PROVIDER:
+            # 過去に実際にスクレイプ成功した値のみをフォールバックとして採用する。
+            # 単なるフォールバック値の写しを優先すると、_FALLBACKS 側の価格改定が
+            # 既存 JSON に固着して永久に反映されなくなる。
+            if m.provider == _PROVIDER and m.scrape_status == "success":
                 fallback_map[m.name] = (m.price_in, m.price_out)
     for k, v in _FALLBACKS.items():
         fallback_map.setdefault(k, v)
@@ -65,7 +68,9 @@ def scrape(existing: list[ApiModel] | None = None) -> list[ApiModel]:
         return _build_fallback(fallback_map)
 
     models = []
-    for name, (fb_in, fb_out) in _FALLBACKS.items():
+    for name in _FALLBACKS:
+        # ハードコード値ではなく fallback_map を見る（既存のスクレイプ成功値を尊重）
+        fb_in, fb_out = fallback_map[name]
         key = name.lower().replace(" ", "[-\\s]?").replace(".", r"\.")
         in_price = extract_price(html, [
             rf"{key}[^$]*?\$([\d.]+)",
