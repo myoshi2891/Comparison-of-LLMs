@@ -58,8 +58,12 @@ def scrape(existing: list[SubTool] | None = None) -> list[SubTool]:
         # 誤検出する（2026-09-12 実測）。近傍に無ければ fallback に落とすのが正しい。
         price = None
         if name == "Pro":
-            # "Pro+" / "Pro Max" を除外するため直後の + を禁止する
-            price = extract_price(html, [rf"pro(?!\+){_GAP}\$([\d]+)\s*/\s*month"])
+            # "Pro+" / "Pro Max" を除外する。直後の "+" だけを禁止すると
+            # "Pro Max" の "pro" にマッチし _GAP が " Max " を食って Max の
+            # 価格を Pro として拾うため、後続の max も明示的に除外する。
+            price = extract_price(
+                html, [rf"pro(?!\+)(?!\s*max){_GAP}\$([\d]+)\s*/\s*month"]
+            )
         elif name == "Pro+":
             price = extract_price(html, [rf"pro\+{_GAP}\$([\d]+)\s*/\s*month"])
         elif name == "Max":

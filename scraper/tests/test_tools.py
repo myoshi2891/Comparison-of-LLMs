@@ -289,3 +289,27 @@ def test_copilot_max_tier_does_not_shadow_pro_prices():
     assert by_name["Pro"].monthly == 10, "Pro が Max/Pro+ の価格を拾っている"
     assert by_name["Pro+"].monthly == 39, "Pro+ が Max の価格を拾っている"
     assert by_name["Max"].monthly == 100
+
+
+_COPILOT_HTML_PRO_MAX = (
+    "<html><body>"
+    "<div>Copilot Pro Max $100 / month for sustained agent workflows</div>"
+    "<div>Copilot Pro $10 / month for individuals</div>"
+    "<div>Copilot Pro+ $39 / month with all models</div>"
+    "</body></html>"
+)
+
+
+def test_copilot_pro_does_not_match_pro_max_tier():
+    """「Pro Max」表記が先行しても Pro が Max の価格を拾わない。"""
+    from scraper.tools import github_copilot
+
+    with patch(
+        "scraper.tools.github_copilot.get_page_text",
+        return_value=_COPILOT_HTML_PRO_MAX,
+    ):
+        tools = github_copilot.scrape()
+
+    by_name = {t.name: t for t in tools}
+    assert by_name["Pro"].monthly == 10, "Pro が Pro Max の価格を拾っている"
+    assert by_name["Pro+"].monthly == 39
