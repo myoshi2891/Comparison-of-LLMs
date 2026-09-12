@@ -2045,18 +2045,30 @@ flowchart TB
       const navToggle = document.getElementById('navToggle');
       const scrim = document.getElementById('scrim');
 
+      /* モバイル幅で閉じているサイドバーは画面外にあるだけでフォーカス可能なため、
+         inert でキーボード・支援技術の対象から外す（デスクトップ幅では常に解除）。 */
+      const MOBILE_BREAKPOINT = 960;
+      function syncSidebarInert() {
+        const hidden =
+          window.innerWidth <= MOBILE_BREAKPOINT && !sidebar.classList.contains('open');
+        sidebar.inert = hidden;
+      }
+
       function openSidebar() {
         sidebar.classList.add('open');
         scrim.classList.add('show');
         navToggle.classList.add('is-hidden');
         navToggle.setAttribute('aria-expanded', 'true');
+        syncSidebarInert();
       }
       function closeSidebar() {
         sidebar.classList.remove('open');
         scrim.classList.remove('show');
         navToggle.classList.remove('is-hidden');
         navToggle.setAttribute('aria-expanded', 'false');
+        syncSidebarInert();
       }
+      syncSidebarInert();
       navToggle.addEventListener('click', () => {
         sidebar.classList.contains('open') ? closeSidebar() : openSidebar();
       });
@@ -2105,7 +2117,8 @@ flowchart TB
       );
 
       window.addEventListener('resize', () => {
-        if (window.innerWidth > 960) closeSidebar();
+        if (window.innerWidth > MOBILE_BREAKPOINT) closeSidebar();
+        syncSidebarInert();
       });
 
       updateActiveNav();
