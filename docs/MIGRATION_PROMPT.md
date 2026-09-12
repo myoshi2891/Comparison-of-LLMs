@@ -118,7 +118,7 @@
 1. 対象コードの Lint チェックおよび型チェックを実行し、エラーがゼロであることを確認します:
 
    ```bash
-   (cd web-next && bun run lint app/<provider>/<slug>)
+   (cd web-next && bunx biome check app/<provider>/<slug>)
    (cd web-next && bun run typecheck)
    ```
 
