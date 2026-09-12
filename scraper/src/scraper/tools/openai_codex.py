@@ -13,6 +13,10 @@ logger = logging.getLogger(__name__)
 
 _URL = "https://openai.com/chatgpt/pricing/"
 
+# プラン名と価格の距離を制限する。無制限（[^$\n]*?）にすると、改行の少ない
+# 巨大な 1 塊テキストを横断して無関係な金額（別ティアの月額など）に到達しうる。
+_GAP = r"[^$\n]{0,80}?"
+
 _FALLBACKS: list[tuple[str, str, float, float | None, str, str, str, str]] = [
     ("OpenAI Codex", "ChatGPT Plus (Codex)",  20,  None, "Plus", "tag-bal",
      "30-150 tasks/5h | codex-1",    "30-150 tasks/5h | codex-1"),
@@ -36,12 +40,12 @@ def scrape(existing: list[SubTool] | None = None) -> list[SubTool]:
     for group, name, fb_m, fb_a, tag, cls, note_ja, note_en in _FALLBACKS:
         price = None
         if name == "ChatGPT Plus (Codex)":
-            price = extract_price(html, [r"plus[^$\n]*?\$([\d]+)\s*/\s*month"])
+            price = extract_price(html, [rf"plus{_GAP}\$([\d]+)\s*/\s*month"])
         elif name == "ChatGPT Pro Codex":
             # Pro が 2 ティアに分割されたため、総称の "pro" では両行が同じ値になる。
-            price = extract_price(html, [r"pro\s+codex[^$\n]*?\$([\d]+)\s*/\s*month"])
+            price = extract_price(html, [rf"pro\s+codex{_GAP}\$([\d]+)\s*/\s*month"])
         elif name == "ChatGPT Pro (Codex)":
-            price = extract_price(html, [r"pro\s+max[^$\n]*?\$([\d]+)\s*/\s*month"])
+            price = extract_price(html, [rf"pro\s+max{_GAP}\$([\d]+)\s*/\s*month"])
 
         cur_m = fb_m
         status = "fallback"

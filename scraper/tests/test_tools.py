@@ -313,3 +313,28 @@ def test_copilot_pro_does_not_match_pro_max_tier():
     by_name = {t.name: t for t in tools}
     assert by_name["Pro"].monthly == 10, "Pro が Pro Max の価格を拾っている"
     assert by_name["Pro+"].monthly == 39
+
+
+_CODEX_HTML_DISTANT_PRICE = (
+    "<html><body>"
+    "<p>ChatGPT Pro Codex raises Codex limits for heavy users.</p>"
+    "<p>ChatGPT Pro Max unlocks every feature.</p>"
+    + "<p>" + ("unrelated marketing copy. " * 60) + "</p>"
+    + "<p>Enterprise add-ons start at $500 / month.</p>"
+    "</body></html>"
+)
+
+
+def test_codex_distant_price_does_not_match_pro_tiers():
+    """Pro 系ティアがプラン名から遠く離れた金額を拾わず fallback に落ちる。"""
+    with patch(
+        "scraper.tools.openai_codex.get_page_text",
+        return_value=_CODEX_HTML_DISTANT_PRICE,
+    ):
+        tools = openai_codex.scrape()
+
+    by_name = {t.name: t for t in tools}
+    fb = {row[_NAME]: row[_MONTHLY] for row in openai_codex._FALLBACKS}
+    for plan in ("ChatGPT Pro Codex", "ChatGPT Pro (Codex)"):
+        assert by_name[plan].monthly == fb[plan], f"{plan} が遠方の $500 を拾っている"
+        assert by_name[plan].scrape_status == "fallback", f"{plan} が誤って success 判定"
