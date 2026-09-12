@@ -315,6 +315,36 @@ def test_copilot_pro_does_not_match_pro_max_tier():
     assert by_name["Pro+"].monthly == 39
 
 
+_COPILOT_HTML_NEAR_MISS_NAMES = (
+    "<html><body>"
+    "<div>Copilot Professional services start at $49 / month.</div>"
+    "<div>Maximum savings with annual billing: $77 / month.</div>"
+    "</body></html>"
+)
+
+
+def test_copilot_plan_names_require_whole_word_match():
+    """"Professional" / "Maximum" の部分一致で無関係な月額を拾わない。
+
+    プラン名パターンが語境界を要求しない場合、"pro" は "Professional" に、
+    "max" は "Maximum" にマッチし、_GAP が語の残りを食って直後の
+    "$N / month" に到達してしまう（Pro=$49 / Max=$77 として success 判定）。
+    """
+    from scraper.tools import github_copilot
+
+    with patch(
+        "scraper.tools.github_copilot.get_page_text",
+        return_value=_COPILOT_HTML_NEAR_MISS_NAMES,
+    ):
+        tools = github_copilot.scrape()
+
+    by_name = {t.name: t for t in tools}
+    fb = {row[1]: row[2] for row in github_copilot._FALLBACKS}
+    for plan in ("Pro", "Pro+", "Max"):
+        assert by_name[plan].monthly == fb[plan], f"{plan} が部分一致で誤った価格を拾っている"
+        assert by_name[plan].scrape_status == "fallback", f"{plan} が誤って success 判定"
+
+
 _CODEX_HTML_DISTANT_PRICE = (
     "<html><body>"
     "<p>ChatGPT Pro Codex raises Codex limits for heavy users.</p>"

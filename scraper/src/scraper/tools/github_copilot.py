@@ -61,13 +61,17 @@ def scrape(existing: list[SubTool] | None = None) -> list[SubTool]:
             # "Pro+" / "Pro Max" を除外する。直後の "+" だけを禁止すると
             # "Pro Max" の "pro" にマッチし _GAP が " Max " を食って Max の
             # 価格を Pro として拾うため、後続の max も明示的に除外する。
+            # さらに \b で語全体を要求する。これがないと "Professional" の
+            # "pro" にマッチし、_GAP が "fessional ..." を食って無関係な
+            # 月額を Pro の価格として拾う。
             price = extract_price(
-                html, [rf"pro(?!\+)(?!\s*max){_GAP}\$([\d]+)\s*/\s*month"]
+                html, [rf"\bpro\b(?!\+)(?!\s*max){_GAP}\$([\d]+)\s*/\s*month"]
             )
         elif name == "Pro+":
-            price = extract_price(html, [rf"pro\+{_GAP}\$([\d]+)\s*/\s*month"])
+            price = extract_price(html, [rf"\bpro\+{_GAP}\$([\d]+)\s*/\s*month"])
         elif name == "Max":
-            price = extract_price(html, [rf"max{_GAP}\$([\d]+)\s*/\s*month"])
+            # \b がないと "Maximum" 等の部分一致から無関係な月額に到達する。
+            price = extract_price(html, [rf"\bmax\b{_GAP}\$([\d]+)\s*/\s*month"])
         elif name == "Business":
             price = extract_price(html, [rf"business{_GAP}\$([\d]+)\s*/\s*(?:user|seat)"])
         elif name == "Enterprise":
