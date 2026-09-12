@@ -8,6 +8,22 @@
 
 export type ScrapeStatus = "success" | "fallback" | "manual";
 
+/** 価格そのものの出自（scrape_status は「その実行の結果」しか表さない） */
+export type PriceOrigin = "scraped" | "hardcoded";
+
+/**
+ * 価格の出自と、記録時点で有効だったハードコードフォールバック値。
+ * スクレイプが連続失敗しても過去の成功値を保持しつつ、
+ * ハードコード値の改定は取りこぼさないための判定材料。
+ */
+export interface PriceProvenance {
+  origin: PriceOrigin;
+  /** 記録時点の _FALLBACKS 入力価格（USD / 1M tokens） */
+  fallback_in: number;
+  /** 記録時点の _FALLBACKS 出力価格（USD / 1M tokens） */
+  fallback_out: number;
+}
+
 export interface ApiModel {
   provider: string;
   name: string;
@@ -20,6 +36,8 @@ export interface ApiModel {
   sub_ja: string;
   sub_en: string;
   scrape_status: ScrapeStatus;
+  /** 旧スキーマの pricing.json では欠落しうる（後方互換） */
+  provenance?: PriceProvenance | null;
 }
 
 export interface SubTool {
