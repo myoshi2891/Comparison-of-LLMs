@@ -101,7 +101,13 @@ flowchart TB
 
 - **各サービスの利用規約（ToS）とrobots.txt**: LinkedInなど、自動収集を規約で明確に禁止・制限しているサービスがあります。自分のアカウントのデータであっても、取得方法（スクレイピング可否、公式APIやデータエクスポート機能の利用）に制約がかかる場合があります
 - **レート制限**: 短時間に大量アクセスを行うとサービス側に負荷をかけ、アカウント停止やIPブロックの対象になります。リクエスト間隔を空け、取得件数に上限を設ける
-- **保存期間**: 収集した生データをいつまで保持するかをあらかじめ決め、不要になったデータは削除する
+- **保存期間と派生データの削除**: 保持期間は生データだけでなく、そこから派生したすべてのデータに適用します。元の投稿が削除された場合、利用許諾が撤回された場合、保存期限が到来した場合は、以下を漏れなく無効化・削除してください（LLM Twinでは1件の生データがMongoDB→チャンク→埋め込み→データセット→モデル→監視ログへと多段に複製されるため、生データだけ消しても実質的には残り続けます）
+  - MongoDBの生ドキュメント（データウェアハウス層）
+  - 特徴量パイプラインが生成したチャンクとその埋め込み、およびQdrant内の該当ポイント（`author_id` などのメタデータで絞り込んで削除する）
+  - 生成済みの指示データセット・選好データセット（該当サンプルを除去したうえで再生成する）
+  - 当該データで学習したファインチューニング済みモデル（影響が大きい場合は再学習する）
+  - プロンプト監視・トレースに保存された入出力ログ（Cometなどの監視基盤側の保持設定も確認する）
+  - 削除後は、削除対象の`author_id`や文書IDでMongoDB・Qdrant・データセット・監視ログをそれぞれ再検索し、ヒットが0件であることを確認して記録に残す
 - **第三者の個人情報**: 自分の投稿であっても、コメント欄や本文に他人の氏名・連絡先などが含まれることがあります。学習データに混入させない、または取り込み時にマスキングする方針を決めておく
 
 ---
@@ -333,7 +339,7 @@ flowchart TB
 5. `.env.example` を `.env` にコピーし、OpenAI APIキー・Hugging Faceトークン・Comet APIキーなどの認証情報を設定する。**`.env` は `.gitignore` で除外されていることを必ず確認し、コミットも共有も絶対に行わない**(APIキーが第三者に渡ると不正利用や課金事故に直結する)
 6. `poetry poe local-infrastructure-up` でMongoDB・Qdrant・ZenMLのローカルインフラを起動する
 7. データ収集パイプラインを動かす前に、**Google ChromeまたはChromiumを導入する**。`MediumCrawler` が継承する `BaseSeleniumCrawler` は `webdriver.Chrome` を使うため、対応ブラウザが無いとクロールが起動時に失敗する。なお **`LinkedInCrawler` は非推奨（deprecated）であり、既定では利用できません**。同クラスは `is_deprecated=True` が設定されており、`login()` と `extract()` は `DeprecationWarning` を送出して処理を行いません。LinkedInを収集対象として前提にした手順は組まず、サポートされているデータソース（Medium・GitHub・個人ブログなど）で進めてください（LinkedInの自動収集は利用規約上の制約もあります。前述の「データ収集時の注意」を参照）。
-   - ローカルで動かす場合: macOSは `brew install --cask google-chrome`、Debian/Ubuntuは公式パッケージの `google-chrome-stable` を導入する（ChromeDriver自体は手動導入不要。`llm_engineering.application.crawlers.base` の `chromedriver_autoinstaller.install()` が、インストール済みChromeのバージョンに対応するChromeDriverを自動取得する。ただしこの取得は `BaseSeleniumCrawler` の **import 時点** に走り、手元に該当バージョンのChromeDriverが無ければ**外部ネットワークからダウンロードする**。オフライン環境やプロキシで外部通信が制限された環境では import の時点で失敗するため、対応するChromeDriverを事前に配置するか、キャッシュ済みの状態にしておく必要がある）
+   - ローカルで動かす場合: macOSは `brew install --cask google-chrome`、Debian/Ubuntuは公式パッケージの `google-chrome-stable` を導入する（ChromeDriver自体は手動導入不要。`llm_engineering.application.crawlers.base` の `chromedriver_autoinstaller.install()` が、インストール済みChromeのバージョンに対応するChromeDriverを自動取得する。ただしこの処理は `BaseSeleniumCrawler` の **import 時点** に走り、**ネットワーク接続が前提**である点に注意する。`install()` はChromeのバージョンに対応するドライバのバージョンを解決するために外部エンドポイントへ問い合わせるため、ChromeDriverを事前に配置・キャッシュしてあっても、オフライン環境やプロキシで外部通信が制限された環境では import の時点で失敗しうる。オフラインで動かす必要がある場合は `install()` を経由させず、ローカルのChromeDriverのパスを明示して `webdriver.Chrome` に渡す方法を取る。具体的には `BaseSeleniumCrawler` を継承したクラス側で、`install()` 呼び出しを含む基底の初期化を使わずに、`from selenium.webdriver.chrome.service import Service` として `webdriver.Chrome(service=Service("/path/to/chromedriver"), options=options)` のようにドライバを生成する。この手当てをしない限り、データ収集パイプラインの実行には外部ネットワークが必須である）
    - 環境を汚したくない場合: リポジトリ同梱の公式Dockerfile（`google-chrome-stable` を含む）でパイプラインを実行する。`poetry poe build-docker-image` でイメージをビルドし、続けて `poetry poe run-docker-end-to-end-data-pipeline` でエンドツーエンドのデータパイプラインをコンテナ内で実行する（後者は `.env` を読み込むため、手順5を先に済ませておく）
 8. データ収集 → 特徴量エンジニアリング → 指示データセット生成 → 選好データセット生成、という順にZenMLパイプラインを実行する
 9. AWS SageMakerを使う場合は、`poetry install --with aws` で追加インストールしたうえで、**デプロイ前にAWS側の設定を済ませる**:
