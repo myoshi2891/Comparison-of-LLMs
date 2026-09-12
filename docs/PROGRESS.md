@@ -18,7 +18,7 @@
   - **フロントエンド (`web-next/`)**: `bun run test` で Vitest **174 files / 1583 tests すべて合格**（2026-09-12 実測。全 Green ✅）
     - `load(sourceHtml)` をモジュール初期化時に呼ぶ `governance/ai-governance/GuideContent.tsx` と
       `local-llm/finetuning-best-practices/GuideContent.tsx` は、import スモークでも読み込み可能であることを確認済み
-  - **バックエンド (`scraper/`)**: pytest 実行で **68 件 + 36 subtests すべて合格** (2026-09-12 実測。全 Green ✅)
+  - **バックエンド (`scraper/`)**: pytest 実行で **91 件 + 37 subtests すべて合格** (2026-09-12 実測。全 Green ✅)
 
 ## 最近の追加内容
 
@@ -39,6 +39,15 @@
     優先していたため、ハードコード値を書き換えても既存モデルの価格が永久に反映されない状態だった。
     既存値の採用条件に `scrape_status == "success"` を課し、`anthropic.py` の Claude Sonnet 5 個別ハックを削除。
     あわせて 5 provider の抽出ループが `_FALLBACKS` を直接読んでいた不整合を `fallback_map` 参照へ統一。
+    **※この採用条件は後続の `provenance` 導入で置き換わっている（下記「現行の 2 層目判定ルール」を参照）。**
+  - **現行の 2 層目判定ルール（`scraper/src/scraper/provenance.py` の `FallbackResolver`）**: `scrape_status` は
+    「その実行でスクレイプが成功したか」しか表さず、2 回連続失敗で過去の成功値がハードコード値まで巻き戻るため、
+    `ApiModel.provenance`（`origin` + 記録時点の `fallback_in` / `fallback_out`）を判定材料に加えた。採用条件は
+    ① `provenance.origin == "scraped"` かつ記録時点のハードコード値が現在の `_FALLBACKS` と一致 → 既存値を採用、
+    ② ハードコード値が改定されていれば **ハードコード値が勝つ**（月次の `_FALLBACKS` 更新が必ず反映される）、
+    ③ `provenance` を持たない旧スキーマの JSON に限り従来どおり `scrape_status == "success"` を条件とする。
+    つまり**持ち越される価格が常に `scrape_status == "success"` である必要はない**（前回失敗して `fallback` に
+    落ちた行でも、`provenance` が成功時の出自を保持していれば採用される）。
   - **バグ修正 2（遠距離マッチ）**: GitHub Copilot の価格抽出ギャップが無制限だったため、Max ティア新設後に
     Pro / Pro+ の双方が特典クレジット `$100/month` を拾って `success` 判定され `pricing.json` が汚染された
     （ライブスクレイプで実測）。`_GAP = [^$\n]{0,80}?` で距離を制限。
