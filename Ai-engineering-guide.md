@@ -387,6 +387,7 @@ AI Engineeringは、基盤モデルという強力な「素材」を、プロン
 - "LLM as a Judge: A 2026 Guide to Automated Model Assessment"（Label Your Data）— https://labelyourdata.com/articles/llm-as-a-judge
 
 **セキュリティ（Simon Willison）**
+- Simon Willison, "The lethal trifecta for AI agents: private data, untrusted content, and external communication"（2025年6月16日。Lethal Trifectaの一次出典）— https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/
 - "Simon Willison on Agentic Engineering: TDD, Prompt Injection, and the Lethal Trifecta"（Agent Wars）— https://agent-wars.com/news/2026-03-14-simon-willison-agentic-engineering-tdd-prompt-injection
 - Simon Willisonのブログ紹介（tomrochette.com）— https://tomrochette.com/agents/simon-willison/
 
