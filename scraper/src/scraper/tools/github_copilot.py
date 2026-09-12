@@ -13,6 +13,9 @@ logger = logging.getLogger(__name__)
 
 _URL = "https://github.com/features/copilot#pricing"
 
+# プラン名と価格の間に許容する最大文字数。料金表のセル内に収まる程度に狭くする。
+_GAP = r"[^$\n]{0,80}?"
+
 # フォールバック: (monthly, annual, tag, cls, note_ja, note_en)
 _FALLBACKS: list[tuple[str, str, float, float | None, str, str, str, str]] = [
     ("GitHub Copilot", "Free",       0,   0,    "Free",       "tag-mini",
@@ -49,16 +52,22 @@ def scrape(existing: list[SubTool] | None = None) -> list[SubTool]:
 
     tools: list[SubTool] = []
     for group, name, fb_m, fb_a, tag, cls, note_ja, note_en in _FALLBACKS:
-        # Pro プランの価格を検出してみる
+        # プラン名と価格の距離を _GAP で制限する。無制限（[^$\n]*?）にすると
+        # 約 890KB の 1 塊テキストを横断して無関係な金額へ到達し、Max ティアの
+        # 特典クレジット "$100/month in GitHub credits" を Pro / Pro+ の価格として
+        # 誤検出する（2026-09-12 実測）。近傍に無ければ fallback に落とすのが正しい。
         price = None
         if name == "Pro":
-            price = extract_price(html, [r"pro[^$\n]*?\$([\d]+)\s*/\s*month"])
+            # "Pro+" / "Pro Max" を除外するため直後の + を禁止する
+            price = extract_price(html, [rf"pro(?!\+){_GAP}\$([\d]+)\s*/\s*month"])
         elif name == "Pro+":
-            price = extract_price(html, [r"pro\+[^$\n]*?\$([\d]+)\s*/\s*month"])
+            price = extract_price(html, [rf"pro\+{_GAP}\$([\d]+)\s*/\s*month"])
+        elif name == "Max":
+            price = extract_price(html, [rf"max{_GAP}\$([\d]+)\s*/\s*month"])
         elif name == "Business":
-            price = extract_price(html, [r"business[^$\n]*?\$([\d]+)\s*/\s*(?:user|seat)"])
+            price = extract_price(html, [rf"business{_GAP}\$([\d]+)\s*/\s*(?:user|seat)"])
         elif name == "Enterprise":
-            price = extract_price(html, [r"enterprise[^$\n]*?\$([\d]+)\s*/\s*(?:user|seat)"])
+            price = extract_price(html, [rf"enterprise{_GAP}\$([\d]+)\s*/\s*(?:user|seat)"])
 
         cur_m = fb_m
         status = "fallback"
