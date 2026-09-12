@@ -14,6 +14,7 @@ import httpx
 
 from scraper.browser import sanity_check
 from scraper.models import ApiModel
+from scraper.provenance import FallbackResolver
 
 logger = logging.getLogger(__name__)
 
@@ -76,16 +77,9 @@ def scrape(existing: list[ApiModel] | None = None) -> list[ApiModel]:
     """
     logger.info("AWS: Pricing API から取得開始")
 
-    fallback_map: dict[str, tuple[float, float]] = {}
-    if existing:
-        for m in existing:
-            # 過去に実際にスクレイプ成功した値のみをフォールバックとして採用する。
-            # 単なるフォールバック値の写しを優先すると、_FALLBACKS 側の価格改定が
-            # 既存 JSON に固着して永久に反映されなくなる。
-            if m.provider == "AWS" and m.scrape_status == "success":
-                fallback_map[m.name] = (m.price_in, m.price_out)
-    for k, v in _FALLBACKS.items():
-        fallback_map.setdefault(k, v)
+    # 出自（provenance）ベースのフォールバック解決。判定ルールは provenance.py を参照。
+    resolver = FallbackResolver.build("AWS", _FALLBACKS, existing)
+    fallback_map = resolver.prices
 
     results: dict[str, tuple[float, float, str]] = {}
 
@@ -180,6 +174,7 @@ def scrape(existing: list[ApiModel] | None = None) -> list[ApiModel]:
             sub_ja=_SUB_JA.get(n, ""),
             sub_en=_SUB_EN.get(n, ""),
             scrape_status=results[n][2],  # type: ignore[arg-type]
+            provenance=resolver.provenance(n, results[n][2] == "success"),
         )
         for n in _FALLBACKS
         if n in results

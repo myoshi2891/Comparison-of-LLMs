@@ -9,7 +9,7 @@ from __future__ import annotations
 import logging
 
 from scraper.browser import get_page_text
-from scraper.models import ApiModel
+from scraper.models import ApiModel, PriceProvenance
 
 logger = logging.getLogger(__name__)
 
@@ -64,6 +64,10 @@ def scrape(existing: list[ApiModel] | None = None) -> list[ApiModel]:
             sub_ja=sub_ja,
             sub_en=sub_en,
             scrape_status="fallback",
+            # ライブ抽出を行わない設計のため、出自は常にハードコード値。
+            provenance=PriceProvenance(
+                origin="hardcoded", fallback_in=price_in, fallback_out=price_out
+            ),
         )
         for name, (price_in, price_out, provider, tag, cls, sub_ja, sub_en) in _FALLBACKS.items()
     ]

@@ -8,6 +8,7 @@ import logging
 
 from scraper.browser import get_page_text, extract_price, sanity_check
 from scraper.models import ApiModel
+from scraper.provenance import FallbackResolver
 
 logger = logging.getLogger(__name__)
 
@@ -49,22 +50,15 @@ def scrape(existing: list[ApiModel] | None = None) -> list[ApiModel]:
     logger.info("Anthropic: スクレイピング開始 %s", _URL)
 
     # 既存値をフォールバックとして使う（既存 JSON があれば）
-    fallback_map: dict[str, tuple[float, float]] = {}
-    if existing:
-        for m in existing:
-            # 過去に実際にスクレイプ成功した値のみをフォールバックとして採用する。
-            # 単なるフォールバック値の写しを優先すると、_FALLBACKS 側の価格改定が
-            # 既存 JSON に固着して永久に反映されなくなる。
-            if m.provider == "Anthropic" and m.scrape_status == "success":
-                fallback_map[m.name] = (m.price_in, m.price_out)
-    for k, v in _FALLBACKS.items():
-        fallback_map.setdefault(k, v)
+    # 出自（provenance）ベースのフォールバック解決。判定ルールは provenance.py を参照。
+    resolver = FallbackResolver.build("Anthropic", _FALLBACKS, existing)
+    fallback_map = resolver.prices
 
     try:
         html = get_page_text(_URL, timeout_ms=40_000)
     except Exception as exc:
         logger.error("Anthropic: ページ取得失敗 %s", exc)
-        return _build_models(fallback_map, "fallback")
+        return _build_models(resolver, "fallback")
 
     results: dict[str, tuple[float, float, str]] = {}
 
@@ -113,17 +107,17 @@ def scrape(existing: list[ApiModel] | None = None) -> list[ApiModel]:
             fb_in, fb_out = fallback_map.get(name, (0.0, 0.0))
             results[name] = (fb_in, fb_out, "fallback")
 
-    return _build_models_from_results(results, fallback_map)
+    return _build_models_from_results(results, resolver)
 
 
 def _build_models(
-    fallback_map: dict[str, tuple[float, float]], status: str
+    resolver: FallbackResolver, status: str
 ) -> list[ApiModel]:
     """
     Construct a list of ApiModel entries for all fallback models using provided prices and scrape status.
     
     Parameters:
-        fallback_map (dict[str, tuple[float, float]]): Mapping from model name to a tuple of (price_in, price_out) used for each ApiModel's pricing.
+        resolver (FallbackResolver): Fallback price/provenance resolver for the Anthropic provider.
         status (str): Scrape status value to assign to each ApiModel's `scrape_status` field.
     
     Returns:
@@ -135,11 +129,12 @@ def _build_models(
             name=n,
             tag=_TAG.get(n, ""),
             cls=_CLS.get(n, "tag-bal"),
-            price_in=fallback_map[n][0],
-            price_out=fallback_map[n][1],
+            price_in=resolver.prices[n][0],
+            price_out=resolver.prices[n][1],
             sub_ja=_SUB_JA.get(n, ""),
             sub_en=_SUB_EN.get(n, ""),
             scrape_status=status,  # type: ignore[arg-type]
+            provenance=resolver.provenance(n, status == "success"),
         )
         for n in _FALLBACKS
     ]
@@ -147,7 +142,7 @@ def _build_models(
 
 def _build_models_from_results(
     results: dict[str, tuple[float, float, str]],
-    fallback_map: dict[str, tuple[float, float]],
+    resolver: FallbackResolver,
 ) -> list[ApiModel]:
     order = list(_FALLBACKS.keys())
     return [
@@ -161,6 +156,7 @@ def _build_models_from_results(
             sub_ja=_SUB_JA.get(n, ""),
             sub_en=_SUB_EN.get(n, ""),
             scrape_status=results[n][2],  # type: ignore[arg-type]
+            provenance=resolver.provenance(n, results[n][2] == "success"),
         )
         for n in order
         if n in results

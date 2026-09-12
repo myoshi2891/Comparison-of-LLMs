@@ -8,6 +8,7 @@ import logging
 
 from scraper.browser import get_page_text, extract_price, sanity_check
 from scraper.models import ApiModel
+from scraper.provenance import FallbackResolver
 
 logger = logging.getLogger(__name__)
 
@@ -58,22 +59,15 @@ _SUB_EN = {
 def scrape(existing: list[ApiModel] | None = None) -> list[ApiModel]:
     logger.info("xAI: スクレイピング開始 %s", _URL)
 
-    fallback_map: dict[str, tuple[float, float]] = {}
-    if existing:
-        for m in existing:
-            # 過去に実際にスクレイプ成功した値のみをフォールバックとして採用する。
-            # 単なるフォールバック値の写しを優先すると、_FALLBACKS 側の価格改定が
-            # 既存 JSON に固着して永久に反映されなくなる。
-            if m.provider == "xAI" and m.scrape_status == "success":
-                fallback_map[m.name] = (m.price_in, m.price_out)
-    for k, v in _FALLBACKS.items():
-        fallback_map.setdefault(k, v)
+    # 出自（provenance）ベースのフォールバック解決。判定ルールは provenance.py を参照。
+    resolver = FallbackResolver.build("xAI", _FALLBACKS, existing)
+    fallback_map = resolver.prices
 
     try:
         html = get_page_text(_URL, timeout_ms=40_000)
     except Exception as exc:
         logger.error("xAI: ページ取得失敗 %s", exc)
-        return _build_fallback(fallback_map)
+        return _build_fallback(resolver)
 
     models = []
     for name in _FALLBACKS:
@@ -95,18 +89,20 @@ def scrape(existing: list[ApiModel] | None = None) -> list[ApiModel]:
             price_in=pi, price_out=po,
             sub_ja=_SUB_JA[name], sub_en=_SUB_EN[name],
             scrape_status=si if si == so else "fallback",  # type: ignore[arg-type]
+            provenance=resolver.provenance(name, si == "success" and so == "success"),
         ))
     return models
 
 
-def _build_fallback(fallback_map: dict[str, tuple[float, float]]) -> list[ApiModel]:
+def _build_fallback(resolver: FallbackResolver) -> list[ApiModel]:
     return [
         ApiModel(
             provider="xAI",
             name=n, tag=_TAG[n], cls=_CLS[n],
-            price_in=fallback_map[n][0], price_out=fallback_map[n][1],
+            price_in=resolver.prices[n][0], price_out=resolver.prices[n][1],
             sub_ja=_SUB_JA[n], sub_en=_SUB_EN[n],
             scrape_status="fallback",
+            provenance=resolver.provenance(n, False),
         )
         for n in _FALLBACKS
     ]
