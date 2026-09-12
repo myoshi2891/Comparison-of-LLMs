@@ -350,10 +350,11 @@ flowchart TB
    - なお `end_to_end_data` パイプラインは既定の `DatasetType.INSTRUCTION` で動くため、**生成されるのは指示（instruct）データセットのみで、選好（preference）データセットは含まれない**
 9. DPO（選好最適化）を行う場合は、選好データセットの生成を**別手順として**実行する:`poetry poe run-generate-preference-datasets-pipeline`（ローカル実行・Docker実行のどちらを選んだ場合でも必要。SFTのみを行う場合は不要）
 10. AWS SageMakerを使う場合は、`poetry install --with aws` で追加インストールしたうえで、**デプロイ前にAWS側の設定を済ませる**:
-    - **ブートストラップ（一時的な管理者権限）**：`aws configure` で管理者相当の認証情報を設定し、SageMakerの実行ロール（execution role）を作成する。この管理者キーの用途はロール作成までに限定する
-    - 作成した実行ロールのARNを `.env` の `AWS_ARN_ROLE` に設定し、`AWS_REGION`（例: `eu-central-1`）も設定する
-    - **運用用の最小権限ユーザーを別途作成する**：SageMakerの学習・デプロイ・推論に必要な権限のみを付与したIAMユーザーを作成してアクセスキーを発行し、`.env` の `AWS_ACCESS_KEY` と `AWS_SECRET_KEY` をそのユーザーの値に置き換える（管理者キーを `.env` に残さない）
-    - **ブートストラップ用の管理者キーは無効化または削除する**。以降の操作は最小権限ユーザーの認証情報だけで行う
+    - **ブートストラップ（一時的な管理者権限）**：まず `aws configure` で管理者相当の認証情報を設定し、あわせて `.env` の `AWS_REGION`（例: `eu-central-1`）を先に設定する（ロール作成スクリプトがリージョン設定を参照するため、順序を逆にすると失敗する）
+    - 続けて `poetry poe create-sagemaker-role` → `poetry poe create-sagemaker-execution-role` の順に実行してロールを作成する。この管理者キーの用途はここまでに限定する
+    - 各コマンドが出力した値（アクセスキー・シークレットキー・実行ロールのARN）を `.env` の `AWS_ACCESS_KEY` / `AWS_SECRET_KEY` / `AWS_ARN_ROLE` にコピーする
+    - ここで作られるのは**最小権限ユーザーではなく、ブートストラップ用の広い権限を持つユーザー**である点に注意する。公式手順は、SageMaker・CloudFormation・IAM・ECR・S3に対する広範な権限（各サービスのFullAccess相当）が付与されていることを前提にしており、学習・デプロイ・推論の一連の操作はこの前提で動く。本ガイドでは公式手順から外れないよう、用途を絞った独自IAMポリシーの作成手順は示さない（権限を削るとパイプラインのどこで失敗するかが読者側で切り分けにくくなるため）
+    - そのうえで、**ブートストラップ用の管理者キーは `.env` に残さず、無効化または削除する**。広い権限を持つ認証情報を扱っている自覚を持ち、学習用アカウント・サンドボックス環境で実行することを強く推奨する
     - 手順の詳細は公式リポジトリのセットアップ手順（[README.md](https://github.com/PacktPublishing/LLM-Engineers-Handbook/blob/main/README.md)）を参照する
     - 以上を済ませてから、学習・評価・推論エンドポイントのデプロイに進む
 

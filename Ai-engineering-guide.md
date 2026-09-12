@@ -30,7 +30,7 @@ AI Engineering（AIエンジニアリング）とは、ゼロからモデルを�
 
 以前は高度な機械学習の知識がなければAIを使った製品を作ることはできませんでした。しかし基盤モデルがAPIやオープンウェイトの形で誰でも使えるようになったことで、Web開発者やプロダクトエンジニアも「モデルを訓練する人」ではなく「モデルを使いこなして製品を作る人」としてAI開発に参加できるようになりました。これが数年で急速に確立された理由です。
 
-この職種は2023年前後に体系化され始めました。開発者コミュニティ「Latent Space」および「AI Engineer」カンファレンスの創設者であるShawn "swyx" Wangは、2023年のエッセイ「The Rise of the AI Engineer」の中で、AIを使う技術者・AI製品を作る技術者・AIそのものがエンジニアリング作業を行うケースという3つの新しい役割を整理し、これが「AI Engineer」という職業名が広まる出発点になりました。
+この職種は2023年前後に体系化され始めました。開発者コミュニティ「Latent Space」および「AI Engineer」カンファレンスの創設者であるShawn "swyx" Wangが2023年に公開したエッセイ「[The Rise of the AI Engineer](https://www.latent.space/p/ai-engineer)」は、基盤モデルのAPIを前提に製品を作る技術者を「AI Engineer」として位置づけ、この職業名が広まる出発点になりました。なお、「AIを使う技術者・AI製品を作る技術者・AIそのものがエンジニアリング作業を行うケース」という3分類は**同エッセイに明示されているものではなく、本ガイド独自の整理**です。原典の主張を確認する際は上記リンク先を直接参照してください。
 
 ---
 
@@ -373,6 +373,7 @@ AI Engineeringは、基盤モデルという強力な「素材」を、プロン
 - "Context Engineering Vs Prompt Engineering: The Real Difference"（NextAgile）— https://nextagile.ai/blogs/gen-ai/context-engineering-vs-prompt-engineering/
 
 **AI Engineerという職種の起源（swyx / Latent Space）**
+- swyx, "The Rise of the AI Engineer"（Latent Space, 2023年）— https://www.latent.space/p/ai-engineer ※本ガイド第1章で言及している原典
 - swyxプロフィール（AI Engineerカンファレンス）— https://ai.engineer/speakers/swyx
 - Latent Space About ページ — https://www.latent.space/about
 
