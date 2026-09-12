@@ -18,7 +18,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from scraper.models import ApiModel
+from scraper.models import ApiModel, PriceProvenance
 from scraper.providers import anthropic, aws, deepseek, google, moonshot, openai, xai, zhipu
 
 
@@ -97,6 +97,10 @@ class TestAnthropic:
         assert opus.price_out == 30.30
         assert opus.scrape_status == "success"
         assert opus.provider == "Anthropic"
+        # スクレイプ成功時は出自が "scraped" として刻まれ、次回以降の実行で
+        # ハードコード値へ巻き戻らないことを保証する
+        assert opus.provenance is not None
+        assert opus.provenance.origin == "scraped"
 
     def test_fallback_on_empty_html(self):
         with patch("scraper.providers.anthropic.get_page_text", return_value="<html></html>"):
@@ -462,7 +466,12 @@ _STALE_IN = 999.01
 _STALE_OUT = 999.02
 
 
-def _stale_existing(provider: str, name: str, status: str) -> list[ApiModel]:
+def _stale_existing(
+    provider: str,
+    name: str,
+    status: str,
+    provenance: PriceProvenance | None = None,
+) -> list[ApiModel]:
     """
     Build a one-element existing-model list carrying deliberately wrong prices.
 
@@ -470,6 +479,7 @@ def _stale_existing(provider: str, name: str, status: str) -> list[ApiModel]:
         provider (str): Provider string the target scraper filters on.
         name (str): Model name that must exist in the scraper's `_FALLBACKS`.
         status (str): `scrape_status` to stamp on the stale entry.
+        provenance (PriceProvenance | None): 価格の出自。None なら旧スキーマ相当。
 
     Returns:
         list[ApiModel]: Single stale model usable as the `existing` argument.
@@ -485,6 +495,7 @@ def _stale_existing(provider: str, name: str, status: str) -> list[ApiModel]:
             sub_ja="",
             sub_en="",
             scrape_status=status,  # type: ignore[arg-type]
+            provenance=provenance,
         )
     ]
 
@@ -552,3 +563,112 @@ def test_aws_previously_scraped_existing_price_is_preserved():
     m = _find(models, name)
     assert m.price_in == _STALE_IN
     assert m.price_out == _STALE_OUT
+
+
+# --------------------------------------------------------------------------- #
+# 出自（provenance）の持ち越し
+#
+# `scrape_status` は「その実行でスクレイプが成功したか」しか表さないため、
+# スクレイプが 2 回連続で失敗すると 1 回目で "fallback" へ落ちた過去の成功値が
+# 2 回目で破棄され、ハードコード値まで巻き戻ってしまう。
+# `ApiModel.provenance` はこれを防ぐ。ただしハードコード値が月次更新で
+# 改定されていた場合は、そちらを優先する（2026-09-12 の設計判断を維持）。
+# --------------------------------------------------------------------------- #
+def _scraped_provenance(fb: tuple[float, float]) -> PriceProvenance:
+    """記録時点のハードコード値が `fb` だったスクレイプ成功値の出自。"""
+    return PriceProvenance(origin="scraped", fallback_in=fb[0], fallback_out=fb[1])
+
+
+@pytest.mark.parametrize(
+    "module,patch_target,provider",
+    _FALLBACK_PRECEDENCE_CASES,
+    ids=[c[2] for c in _FALLBACK_PRECEDENCE_CASES],
+)
+def test_scraped_provenance_survives_consecutive_failures(module, patch_target, provider):
+    """2 回連続でスクレイプ失敗しても、過去のスクレイプ成功値は保持される。"""
+    name = next(iter(module._FALLBACKS))
+    # 1 回目の失敗で scrape_status は "fallback" に落ちているが、
+    # provenance には出自が残っている状態。
+    existing = _stale_existing(
+        provider, name, "fallback", _scraped_provenance(module._FALLBACKS[name])
+    )
+
+    with patch(patch_target, return_value="<html></html>"):
+        models = module.scrape(existing)
+
+    m = _find(models, name)
+    assert m.price_in == _STALE_IN, f"{provider}/{name} price_in"
+    assert m.price_out == _STALE_OUT, f"{provider}/{name} price_out"
+    assert m.provenance is not None and m.provenance.origin == "scraped"
+
+
+@pytest.mark.parametrize(
+    "module,patch_target,provider",
+    _FALLBACK_PRECEDENCE_CASES,
+    ids=[c[2] for c in _FALLBACK_PRECEDENCE_CASES],
+)
+def test_revised_hardcoded_price_beats_stale_scraped_value(module, patch_target, provider):
+    """ハードコード値が改定されていれば、過去のスクレイプ成功値より優先される。"""
+    name = next(iter(module._FALLBACKS))
+    expected_in, expected_out = module._FALLBACKS[name]
+    # 記録時点のハードコード値が現在と異なる = 月次更新で改定された
+    existing = _stale_existing(
+        provider, name, "fallback", _scraped_provenance((expected_in + 1, expected_out + 1))
+    )
+
+    with patch(patch_target, return_value="<html></html>"):
+        models = module.scrape(existing)
+
+    m = _find(models, name)
+    assert m.price_in == expected_in, f"{provider}/{name} price_in"
+    assert m.price_out == expected_out, f"{provider}/{name} price_out"
+
+
+@pytest.mark.parametrize(
+    "module,patch_target,provider",
+    _FALLBACK_PRECEDENCE_CASES,
+    ids=[c[2] for c in _FALLBACK_PRECEDENCE_CASES],
+)
+def test_fallback_run_stamps_hardcoded_provenance(module, patch_target, provider):
+    """フォールバック出力には、その時点のハードコード値が出自として刻まれる。"""
+    name = next(iter(module._FALLBACKS))
+    fb_in, fb_out = module._FALLBACKS[name]
+
+    with patch(patch_target, side_effect=RuntimeError("offline")):
+        models = module.scrape(None)
+
+    m = _find(models, name)
+    assert m.provenance is not None
+    assert m.provenance.origin == "hardcoded"
+    assert (m.provenance.fallback_in, m.provenance.fallback_out) == (fb_in, fb_out)
+
+
+def test_aws_scraped_provenance_survives_consecutive_failures():
+    """AWS は httpx 経由のため個別に検証する。"""
+    name = next(iter(aws._FALLBACKS))
+    existing = _stale_existing(
+        "AWS", name, "fallback", _scraped_provenance(aws._FALLBACKS[name])
+    )
+
+    with patch("scraper.providers.aws.httpx.get", side_effect=RuntimeError("offline")):
+        models = aws.scrape(existing)
+
+    m = _find(models, name)
+    assert m.price_in == _STALE_IN
+    assert m.price_out == _STALE_OUT
+    assert m.provenance is not None and m.provenance.origin == "scraped"
+
+
+def test_aws_revised_hardcoded_price_beats_stale_scraped_value():
+    name = next(iter(aws._FALLBACKS))
+    expected_in, expected_out = aws._FALLBACKS[name]
+    existing = _stale_existing(
+        "AWS", name, "fallback", _scraped_provenance((expected_in + 1, expected_out + 1))
+    )
+
+    with patch("scraper.providers.aws.httpx.get", side_effect=RuntimeError("offline")):
+        models = aws.scrape(existing)
+
+    m = _find(models, name)
+    assert m.price_in == expected_in
+    assert m.price_out == expected_out
