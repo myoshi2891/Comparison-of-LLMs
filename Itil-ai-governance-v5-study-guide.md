@@ -161,14 +161,12 @@ ITIL AI Governance のシラバスで特に重要なのが、**4つのガバナ�
 
 ```mermaid
 flowchart TB
-    subgraph patterns["4つのガバナンスパターン"]
+    subgraph patterns["4つのガバナンスパターン（リスクレベルに応じて使い分ける選択肢）"]
         D1["Directive<br/>指示型<br/>厳格なルール・低い裁量"]
         D2["Guided<br/>誘導型<br/>ガイドラインの範囲内で判断"]
         D3["Federated<br/>連邦型<br/>中央方針＋部門ごとの裁量"]
         D4["Autonomous<br/>自律型<br/>広い裁量・強い自己判断"]
     end
-
-    D1 --> D2 --> D3 --> D4
 ```
 
 | パターン | 特徴 | 適した状況の例 |
