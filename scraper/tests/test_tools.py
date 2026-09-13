@@ -402,6 +402,36 @@ def test_copilot_business_enterprise_require_whole_word_match():
         assert by_name[plan].scrape_status == "fallback", f"{plan} が誤って success 判定"
 
 
+_COPILOT_HTML_NEAR_MISS_PRO_MAX_HYPHEN = (
+    "<html><body>"
+    "<div>Copilot Pro-Max bundle is billed at $150 / month.</div>"
+    "<div>Copilot Max-Ultra unlocks unlimited agents for $200 / month.</div>"
+    "</body></html>"
+)
+
+
+def test_copilot_pro_max_require_whole_word_match_hyphenated():
+    """"Pro-Max" / "Max-Ultra"（ハイフン接続）の部分一致で無関係な月額を拾わない。
+
+    \\b はハイフンを非単語文字とみなして境界成立させてしまうため、
+    "Pro-Max" の "pro" や "Max-Ultra" の "max" にマッチし、_GAP が
+    残りのハイフン接続語を食って直後の "$N / month" に到達してしまう。
+    """
+    from scraper.tools import github_copilot
+
+    with patch(
+        "scraper.tools.github_copilot.get_page_text",
+        return_value=_COPILOT_HTML_NEAR_MISS_PRO_MAX_HYPHEN,
+    ):
+        tools = github_copilot.scrape()
+
+    by_name = {t.name: t for t in tools}
+    fb = {row[1]: row[2] for row in github_copilot._FALLBACKS}
+    for plan in ("Pro", "Max"):
+        assert by_name[plan].monthly == fb[plan], f"{plan} が部分一致で誤った価格を拾っている"
+        assert by_name[plan].scrape_status == "fallback", f"{plan} が誤って success 判定"
+
+
 _CODEX_HTML_NEAR_MISS_NAMES = (
     "<html><body>"
     "<div>Surplus credit packs are available for $45 / month.</div>"

@@ -63,15 +63,21 @@ def scrape(existing: list[SubTool] | None = None) -> list[SubTool]:
             # 価格を Pro として拾うため、後続の max も明示的に除外する。
             # さらに \b で語全体を要求する。これがないと "Professional" の
             # "pro" にマッチし、_GAP が "fessional ..." を食って無関係な
-            # 月額を Pro の価格として拾う。
+            # 月額を Pro の価格として拾う。\b はハイフン接続（例: "Pro-Max"）
+            # を境界とみなしてしまうため防げず、"-" を明示的に除外する。
             price = extract_price(
-                html, [rf"\bpro\b(?!\+)(?!\s*max){_GAP}\$([\d]+)\s*/\s*month"]
+                html, [rf"\bpro\b(?![\w+-])(?!\s*max){_GAP}\$([\d]+)\s*/\s*month"]
             )
         elif name == "Pro+":
             price = extract_price(html, [rf"\bpro\+{_GAP}\$([\d]+)\s*/\s*month"])
         elif name == "Max":
             # \b がないと "Maximum" 等の部分一致から無関係な月額に到達する。
-            price = extract_price(html, [rf"\bmax\b{_GAP}\$([\d]+)\s*/\s*month"])
+            # \b だけではハイフン接続（例: "Max-Ultra" の接尾、"Pro-Max" の
+            # 接頭）を防げないため、前後を \w とハイフンの両方について
+            # 否定先読み・後読みで除外する。
+            price = extract_price(
+                html, [rf"(?<![\w-])max(?![\w-]){_GAP}\$([\d]+)\s*/\s*month"]
+            )
         elif name == "Business":
             # \b だけでは語尾のハイフン接続（例: "business-tier"）を防げないため、
             # 前後を \w とハイフンの両方について否定先読み・後読みで除外する。
