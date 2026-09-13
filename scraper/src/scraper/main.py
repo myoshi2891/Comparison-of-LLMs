@@ -46,7 +46,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-_DEFAULT_OUTPUT = Path(__file__).parent.parent.parent.parent.parent / "pricing.json"
+_DEFAULT_OUTPUT = Path(__file__).parent.parent.parent.parent / "pricing.json"
 
 T = TypeVar("T")
 
