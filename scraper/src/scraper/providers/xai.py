@@ -14,44 +14,48 @@ logger = logging.getLogger(__name__)
 
 _URL = "https://x.ai/api"
 
+_GROK_4_6 = "Grok 4.6"
+_GROK_4_20 = "Grok 4.20"
+_GROK_BUILD_0_1 = "Grok Build 0.1"
+
 _FALLBACKS: dict[str, tuple[float, float]] = {
-    "Grok 4.6":        ( 2.00,  6.00),
+    _GROK_4_6:         ( 2.00,  6.00),
     "Grok 4.5":        ( 2.00,  6.00),
     "Grok 4.3":        ( 1.25,  2.50),
-    "Grok 4.20":       ( 1.25,  2.50),
-    "Grok Build 0.1":  ( 1.00,  2.00),
+    _GROK_4_20:        ( 1.25,  2.50),
+    _GROK_BUILD_0_1:   ( 1.00,  2.00),
     "Grok 4.1 Fast":   ( 0.20,  0.50),
 }
 _TAG = {
-    "Grok 4.6":        "最新 Flagship",
+    _GROK_4_6:         "最新 Flagship",
     "Grok 4.5":        "Stable",
     "Grok 4.3":        "Stable",
-    "Grok 4.20":       "Stable",
-    "Grok Build 0.1":  "Compact",
+    _GROK_4_20:        "Stable",
+    _GROK_BUILD_0_1:   "Compact",
     "Grok 4.1 Fast":   "Retired",
 }
 _CLS = {
-    "Grok 4.6":        "tag-flag",
+    _GROK_4_6:         "tag-flag",
     "Grok 4.5":        "tag-flag",
     "Grok 4.3":        "tag-flag",
-    "Grok 4.20":       "tag-flag",
-    "Grok Build 0.1":  "tag-mini",
+    _GROK_4_20:        "tag-flag",
+    _GROK_BUILD_0_1:   "tag-mini",
     "Grok 4.1 Fast":   "tag-leg",
 }
 _SUB_JA = {
-    "Grok 4.6":        "最新旗艦 / 500K ctx / 200K超は $4/$12",
+    _GROK_4_6:         "最新旗艦 / 500K ctx / 200K超は $4/$12",
     "Grok 4.5":        "前旗艦 / 500K ctx / 200K超は $4/$12",
     "Grok 4.3":        "1M ctx / 200K超は $2.5/$5",
-    "Grok 4.20":       "1M ctx / 値下げ ($2/$6→$1.25/$2.5)",
-    "Grok Build 0.1":  "256K ctx / 軽量ビルド向け",
+    _GROK_4_20:        "1M ctx / 値下げ ($2/$6→$1.25/$2.5)",
+    _GROK_BUILD_0_1:   "256K ctx / 軽量ビルド向け",
     "Grok 4.1 Fast":   "公式料金表から削除 (提供終了)",
 }
 _SUB_EN = {
-    "Grok 4.6":        "Latest flagship / 500K ctx / $4/$12 above 200K",
+    _GROK_4_6:         "Latest flagship / 500K ctx / $4/$12 above 200K",
     "Grok 4.5":        "Prev flagship / 500K ctx / $4/$12 above 200K",
     "Grok 4.3":        "1M ctx / $2.5/$5 above 200K",
-    "Grok 4.20":       "1M ctx / price cut ($2/$6 to $1.25/$2.5)",
-    "Grok Build 0.1":  "256K ctx / lightweight build tier",
+    _GROK_4_20:        "1M ctx / price cut ($2/$6 to $1.25/$2.5)",
+    _GROK_BUILD_0_1:   "256K ctx / lightweight build tier",
     "Grok 4.1 Fast":   "Removed from the official price list (retired)",
 }
 

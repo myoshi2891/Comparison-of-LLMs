@@ -16,35 +16,38 @@ logger = logging.getLogger(__name__)
 _PROVIDER = "Moonshot(Kimi)"
 _URL = "https://platform.moonshot.ai/docs/pricing"
 
+_KIMI_K2_7_CODE_HIGHSPEED = "Kimi K2.7 Code Highspeed"
+_KIMI_K2_7_CODE = "Kimi K2.7 Code"
+
 # フォールバック価格（USD / 1M tokens、cache-miss 標準入力価格）
 _FALLBACKS: dict[str, tuple[float, float]] = {
     "Kimi K3":                   ( 3.00, 15.00),
-    "Kimi K2.7 Code Highspeed":  ( 1.90,  8.00),
-    "Kimi K2.7 Code":            ( 0.95,  4.00),
+    _KIMI_K2_7_CODE_HIGHSPEED:   ( 1.90,  8.00),
+    _KIMI_K2_7_CODE:             ( 0.95,  4.00),
     "Kimi K2.6":                 ( 0.95,  4.00),
 }
 _TAG = {
     "Kimi K3":                   "最新 Flagship",
-    "Kimi K2.7 Code Highspeed":  "Code 高速",
-    "Kimi K2.7 Code":            "Code 特化",
+    _KIMI_K2_7_CODE_HIGHSPEED:   "Code 高速",
+    _KIMI_K2_7_CODE:             "Code 特化",
     "Kimi K2.6":                 "General",
 }
 _CLS = {
     "Kimi K3":                   "tag-oss",
-    "Kimi K2.7 Code Highspeed":  "tag-oss",
-    "Kimi K2.7 Code":            "tag-oss",
+    _KIMI_K2_7_CODE_HIGHSPEED:   "tag-oss",
+    _KIMI_K2_7_CODE:             "tag-oss",
     "Kimi K2.6":                 "tag-oss",
 }
 _SUB_JA = {
     "Kimi K3":                   "2.8T MoE / 1M ctx / OSS / 最新旗艦",
-    "Kimi K2.7 Code Highspeed":  "コーディング特化 / 高速版",
-    "Kimi K2.7 Code":            "コーディング特化 / 標準速度",
+    _KIMI_K2_7_CODE_HIGHSPEED:   "コーディング特化 / 高速版",
+    _KIMI_K2_7_CODE:             "コーディング特化 / 標準速度",
     "Kimi K2.6":                 "前世代フラッグシップ / OSS / 1M ctx",
 }
 _SUB_EN = {
     "Kimi K3":                   "2.8T MoE / 1M ctx / OSS / latest flagship",
-    "Kimi K2.7 Code Highspeed":  "Coding-specialized / high-speed variant",
-    "Kimi K2.7 Code":            "Coding-specialized / standard speed",
+    _KIMI_K2_7_CODE_HIGHSPEED:   "Coding-specialized / high-speed variant",
+    _KIMI_K2_7_CODE:             "Coding-specialized / standard speed",
     "Kimi K2.6":                 "Prev flagship / OSS / 1M ctx",
 }
 

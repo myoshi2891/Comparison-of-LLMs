@@ -14,34 +14,38 @@ logger = logging.getLogger(__name__)
 
 _URL = "https://platform.deepseek.com/api-docs/pricing"
 
+_DEEPSEEK_V4_FLASH = "DeepSeek V4 Flash"
+_DEEPSEEK_V4_PRO = "DeepSeek V4 Pro"
+_DEEPSEEK_V3_2 = "DeepSeek-V3.2"
+
 _FALLBACKS: dict[str, tuple[float, float]] = {
-    "DeepSeek V4 Flash":  ( 0.30,  1.20),
-    "DeepSeek V4 Pro":    ( 1.32,  3.96),
-    "DeepSeek-V3.2":      ( 0.28,  0.42),
+    _DEEPSEEK_V4_FLASH:   ( 0.30,  1.20),
+    _DEEPSEEK_V4_PRO:     ( 1.32,  3.96),
+    _DEEPSEEK_V3_2:       ( 0.28,  0.42),
     "DeepSeek-R1":        ( 0.55,  2.19),
 }
 _TAG = {
-    "DeepSeek V4 Flash":  "最新 Flash",
-    "DeepSeek V4 Pro":    "最新 Pro",
-    "DeepSeek-V3.2":      "Retired",
+    _DEEPSEEK_V4_FLASH:   "最新 Flash",
+    _DEEPSEEK_V4_PRO:     "最新 Pro",
+    _DEEPSEEK_V3_2:       "Retired",
     "DeepSeek-R1":        "Retired",
 }
 _CLS = {
-    "DeepSeek V4 Flash":  "tag-oss",
-    "DeepSeek V4 Pro":    "tag-oss",
-    "DeepSeek-V3.2":      "tag-leg",
+    _DEEPSEEK_V4_FLASH:   "tag-oss",
+    _DEEPSEEK_V4_PRO:     "tag-oss",
+    _DEEPSEEK_V3_2:       "tag-leg",
     "DeepSeek-R1":        "tag-leg",
 }
 _SUB_JA = {
-    "DeepSeek V4 Flash":  "1M ctx / MIT / off-peak は 50% 引き",
-    "DeepSeek V4 Pro":    "高度推論 / 1.6T MoE / MIT / off-peak は 50% 引き",
-    "DeepSeek-V3.2":      "公式料金表から削除 (提供終了)",
+    _DEEPSEEK_V4_FLASH:   "1M ctx / MIT / off-peak は 50% 引き",
+    _DEEPSEEK_V4_PRO:     "高度推論 / 1.6T MoE / MIT / off-peak は 50% 引き",
+    _DEEPSEEK_V3_2:       "公式料金表から削除 (提供終了)",
     "DeepSeek-R1":        "公式料金表から削除 (提供終了)",
 }
 _SUB_EN = {
-    "DeepSeek V4 Flash":  "1M ctx / MIT / 50% off during off-peak",
-    "DeepSeek V4 Pro":    "Advanced reasoning / 1.6T MoE / MIT / 50% off during off-peak",
-    "DeepSeek-V3.2":      "Removed from the official price list (retired)",
+    _DEEPSEEK_V4_FLASH:   "1M ctx / MIT / 50% off during off-peak",
+    _DEEPSEEK_V4_PRO:     "Advanced reasoning / 1.6T MoE / MIT / 50% off during off-peak",
+    _DEEPSEEK_V3_2:       "Removed from the official price list (retired)",
     "DeepSeek-R1":        "Removed from the official price list (retired)",
 }
 

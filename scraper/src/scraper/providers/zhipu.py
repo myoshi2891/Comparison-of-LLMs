@@ -16,36 +16,40 @@ logger = logging.getLogger(__name__)
 _PROVIDER = "Zhipu(GLM)"
 _URL = "https://z.ai/pricing"
 
+_GLM_5_3 = "GLM-5.3"
+_GLM_4_6 = "GLM-4.6"
+_GLM_5_3_FLASH = "GLM-5.3-Flash"
+
 # フォールバック価格（USD / 1M tokens）
 _FALLBACKS: dict[str, tuple[float, float]] = {
-    "GLM-5.3":        ( 1.40,  4.40),
+    _GLM_5_3:         ( 1.40,  4.40),
     "GLM-5.2":        ( 1.40,  4.40),
-    "GLM-4.6":        ( 0.60,  2.20),
-    "GLM-5.3-Flash":  ( 0.15,  0.50),
+    _GLM_4_6:         ( 0.60,  2.20),
+    _GLM_5_3_FLASH:   ( 0.15,  0.50),
 }
 _TAG = {
-    "GLM-5.3":        "最新 Flagship",
+    _GLM_5_3:         "最新 Flagship",
     "GLM-5.2":        "Stable",
-    "GLM-4.6":        "Budget",
-    "GLM-5.3-Flash":  "Budget",
+    _GLM_4_6:         "Budget",
+    _GLM_5_3_FLASH:   "Budget",
 }
 _CLS = {
-    "GLM-5.3":        "tag-oss",
+    _GLM_5_3:         "tag-oss",
     "GLM-5.2":        "tag-oss",
-    "GLM-4.6":        "tag-oss",
-    "GLM-5.3-Flash":  "tag-oss",
+    _GLM_4_6:         "tag-oss",
+    _GLM_5_3_FLASH:   "tag-oss",
 }
 _SUB_JA = {
-    "GLM-5.3":        "最新旗艦 / OSS / 高コスパ",
+    _GLM_5_3:         "最新旗艦 / OSS / 高コスパ",
     "GLM-5.2":        "前世代旗艦 / OSS",
-    "GLM-4.6":        "低コスト枠 / OSS / 前世代 (公式値へ修正)",
-    "GLM-5.3-Flash":  "最安クラス / OSS / 大量処理向け",
+    _GLM_4_6:         "低コスト枠 / OSS / 前世代 (公式値へ修正)",
+    _GLM_5_3_FLASH:   "最安クラス / OSS / 大量処理向け",
 }
 _SUB_EN = {
-    "GLM-5.3":        "Latest flagship / OSS / cost-efficient",
+    _GLM_5_3:         "Latest flagship / OSS / cost-efficient",
     "GLM-5.2":        "Prev flagship / OSS",
-    "GLM-4.6":        "Budget tier / OSS / prev-gen (corrected to official)",
-    "GLM-5.3-Flash":  "Cheapest class / OSS / high-volume",
+    _GLM_4_6:         "Budget tier / OSS / prev-gen (corrected to official)",
+    _GLM_5_3_FLASH:   "Cheapest class / OSS / high-volume",
 }
 
 
