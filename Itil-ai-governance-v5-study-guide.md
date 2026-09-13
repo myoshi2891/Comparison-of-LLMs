@@ -1,4 +1,5 @@
 # ITIL AI Governance (Version 5) 完全学習ガイド
+
 ### 初学者向け ステップバイステップ解説 + ベストプラクティス集
 
 ---
@@ -26,7 +27,7 @@
 | 参照 | オープンブック（公式 eBook・シナリオブックレットの参照可） |
 | 合格点 | 70%（40問中28問正解） |
 | Bloom's Taxonomy レベル | BL2（理解）、BL3（適用）、BL4（分析）が中心 |
-| 資格更新 | 3年ごと。(A) 他の ITIL 試験に合格する、または (B) PeopleCert Plus 会員として CPD ポイントを累積する、のいずれかで更新可能 |
+| 資格更新 | 3年ごと。次のいずれかで更新できる。(A) 同一プロダクトスイート（ITIL）の別資格を取得する、(B) 同じ資格の試験を再受験して合格する、(C) 3年間連続で毎年 20 CPD ポイント（合計 60 ポイント）を PeopleCert アカウントに記録する |
 
 *出典: [PeopleCert 公式製品ページ](https://www.peoplecert.org/browse-certifications/it-governance-and-service-management/ITIL-1/itil-ai-governance-version-5-4234), [ITSM Academy コース概要](https://itsmacademy.com/itil-ai-governance-course), [AGILEPM HUB コース概要](https://agilepmhub.com/itil-ai-governance)*
 
@@ -74,6 +75,7 @@ flowchart TB
 ---
 
 ## 第1章: AI の世界と AI ガバナンスの必要性
+
 *(Module 1: The AI World and the Need for AI Governance)*
 
 ### 1-1. なぜ今 AI ガバナンスが必要なのか
@@ -125,6 +127,7 @@ Module 1 では「良いAIガバナンスとは何か（What good looks like）�
 ---
 
 ## 第2章: ガバナンスの基本概念
+
 *(Module 2: Key Concepts of Governance)*
 
 ### 2-1. ガバナンス・マネジメント・リーダーシップの違い
@@ -198,6 +201,7 @@ flowchart TB
 ---
 
 ## 第3章: AI の基本概念とガバナンスが必要な理由
+
 *(Module 3: Key Concepts of AI and Why We Need AI Governance)*
 
 ### 3-1. AI の3つのタイプ
@@ -256,6 +260,7 @@ AI を統治対象として扱う上で重要な3つの特性が定義されま�
 ---
 
 ## 第4章: ITIL AI Capability Model（6C）とリスク・戦略
+
 *(Module 4: Risk, Strategy, and the Consequences of Getting It Wrong)*
 
 ### 4-1. 6C モデルとは
@@ -307,8 +312,8 @@ flowchart TB
 |---|---|---|
 | **意思決定権限とリスク管理**<br/>(Decision authority & risk management) | 誰が自律的なAI行動を承認するか | 自動エスカレーション、修復スクリプト実行の承認フロー |
 | **倫理原則**<br/>(Ethical principles) | バイアス・説明可能性・組織の価値観との整合は取れているか | バイアステスト、判断の説明可能性(explainability)確保 |
-| **データガバナンス**<br/>(Data governance) | 学習データの妥当性・モデルの劣化をどう監視するか | 学習データの監視、モデルドリフトの追跡、再学習の精度閾値設定 |
-| **規制コンプライアンス**<br/>(Regulatory compliance) | 適用される規制は何か、リスク分類にどう対応するか | EU AI Act のリスクレベル分類へのマッピング |
+| **データガバナンスとパフォーマンス管理**<br/>(Data Governance & Performance Management) | 学習データの妥当性・モデルの劣化をどう監視するか | 学習データの監視、モデルドリフトの追跡、再学習の精度閾値設定 |
+| **規制コンプライアンスと運用標準**<br/>(Regulatory Compliance & Operational Standards) | 適用される規制は何か、リスク分類にどう対応するか | EU AI Act のリスクレベル分類へのマッピング |
 
 これら4つの視点は独立ではなく**相互依存的（interdependent）**です。例えば、倫理原則で定めた透明性要件が、規制コンプライアンス（EU AI Act の説明可能性要件）と直接結びつくように、視点をまたいだ整合性の確保が重要になります。
 
@@ -337,6 +342,7 @@ Module 4 では、AI リスクカテゴリ（バイアス・プライバシー�
 ---
 
 ## 第5章: ガバナンスツールキットとしての ITIL
+
 *(Module 5: ITIL as a Governance Toolkit)*
 
 ### 5-1. ITIL Value System と価値の共創
@@ -379,11 +385,11 @@ ITIL の7つの指針原則は AI ガバナンスにもそのまま適用され�
 
 ### 5-4. ITIL Four Dimensions と AI
 
-ITIL (Version 5) では Four Dimensions（4つの側面）のうち、次の2つに AI 関連の内容が明示的に追加されています。
+ITIL (Version 5) では Four Dimensions（4つの側面）のうち、次の2つに AI 関連の内容が明示的に追加されています。次元の名称自体は ITIL 4 から変わっておらず、AI は各次元の中の節（例: 「Organizations, people and AI」）として扱われます。
 
 ```mermaid
 flowchart LR
-    D1["Organizations, People<br/>and AI<br/>(組織・人材・AI)"]
+    D1["Organizations and<br/>People<br/>(組織と人材)<br/>→ Organizations, people and AI 節"]
     D2["Information and<br/>Technology<br/>(情報と技術)<br/>→ ITIL AI Capability Model (6C)"]
     D3["Partners and<br/>Suppliers<br/>(パートナーと供給者)"]
     D4["Value Streams and<br/>Processes<br/>(バリューストリームと<br/>プロセス)"]
@@ -395,7 +401,7 @@ flowchart LR
     D4 --- CENTER
 ```
 
-- **Organizations, People and AI**: AI が組織構造・人材のスキルセット・役割分担にどう影響するかを扱う次元。AI ガバナンスの人的側面（誰が何に責任を持つか）はここに位置づけられます。
+- **Organizations and People**: 「Organizations, people and AI」の節が追加され、AI が組織構造・人材のスキルセット・役割分担にどう影響するかを扱う次元。AI ガバナンスの人的側面（誰が何に責任を持つか）はここに位置づけられます。
 - **Information and Technology**: 6C モデル（ITIL AI Capability Model）が組み込まれている次元。技術的な能力分類の土台です。
 
 ### 5-5. ITIL Maturity Model と AI Governance Maturity Assessment
@@ -421,6 +427,7 @@ AI の価値評価には、環境負荷（計算資源の消費など）を含�
 ---
 
 ## 第6章: ITIL AI Governance Improvement Model — Assess ＆ Design
+
 *(Module 6)*
 
 ### 6-1. なぜ専用モデルが必要か
@@ -513,6 +520,7 @@ Design ステップでは、Shadow AI を「見える化」し、正規の統制
 ---
 
 ## 第7章: ITIL AI Governance Improvement Model — Implement ＆ Maintain
+
 *(Module 7)*
 
 ### 7-1. Implement（実装）ステップ
@@ -582,14 +590,15 @@ flowchart TB
 
 > **ベストプラクティス**
 > - 規制・標準は「対応すべきチェックリスト」としてではなく、Assess-Design-Implement-Maintain サイクルへの継続的な入力として運用プロセスに組み込む。
-> - 保証エビデンスパックは、監査direct前に慌てて作るのではなく、日々の運用ログ・監視結果から自動的に蓄積される仕組みを最初から設計する。
+> - 保証エビデンスパックは、監査直前に慌てて作るのではなく、日々の運用ログ・監視結果から自動的に蓄積される仕組みを最初から設計する。
 > - サードパーティ AI を調達する際は、契約段階で「説明責任の所在」「インシデント時の通知義務」「監査への協力義務」を明記する。
 
-*出典: [AGILEPM HUB シラバス (Module 7)](https://agilepmhub.com/itil-ai-governance), [itcko.sk 解説記事](https://itcko.sk/en/itil-v5-ai-governance-module/), [ISO/IEC 42001 公式ページ](https://www.iso.org/standard/81230.html), [IEEE 7014-2024 公式ページ](https://standards.ieee.org/ieee/7014/7648/), [EU AI Act 公式情報](https://artificialintelligenceact.eu/)*
+*出典: [AGILEPM HUB シラバス (Module 7)](https://agilepmhub.com/itil-ai-governance), [itcko.sk 解説記事](https://itcko.sk/en/itil-v5-ai-governance-module/), [ISO/IEC 42001 公式ページ](https://www.iso.org/standard/81230.html), [IEEE 7014-2024 公式ページ](https://standards.ieee.org/ieee/7014/7648/), [EU AI Act 法令本文 (EUR-Lex)](https://eur-lex.europa.eu/eli/reg/2024/1689/oj)*
 
 ---
 
 ## 第8章: 自分の役割・業界で AI を活かす
+
 *(Module 8: AI in Your World: Unlock AI in Your Role, Industry, and Organizational Function)*
 
 ### 8-1. 価値実現（Value Realization）: 期待価値から実際価値へ
@@ -629,6 +638,7 @@ Module 8 では、シナリオを解釈し、AI ユースケースを体系的�
 ---
 
 ## 第9章: 他のフレームワーク・規制・標準との連携
+
 *(Module 9: Connecting AI Governance with Frameworks, Regulations, and Standards)*
 
 ### 9-1. なぜフレームワーク同士の連携が必要か
@@ -743,21 +753,26 @@ flowchart TB
 
 ## 参考文献・出典一覧
 
-本ガイドの内容は、以下の一次情報源（PeopleCert 公式サイトおよび PeopleCert 認定トレーニングパートナー各社の公開シラバス、関連標準の公式ページ）をもとに作成しました。特にモジュール構成・学習目標の詳細については、複数の独立したソースで内容が一致していることを確認しています。
+本ガイドの内容は、以下の資料をもとに作成しました。**一次情報源**（PeopleCert・ITIL.com の公式ページ、ISO・IEEE・EU の公式文書）と、**二次資料**（PeopleCert 認定トレーニングパートナー各社の公開シラバス、解説記事）を区別して記載します。特にモジュール構成・学習目標の詳細については、複数の独立したソースで内容が一致していることを確認しています。
+
+#### 一次情報源（公式資料）
 
 1. PeopleCert 公式製品ページ（ユーザー提供URL） — https://www.peoplecert.org/browse-certifications/it-governance-and-service-management/ITIL-1/itil-ai-governance-version-5-4234
 2. ITIL.com 公式資格ページ — https://www.itil.com/professionals/certifications/ITIL-AI-Governance-Version-5
-3. ITSM Academy（PeopleCert認定ATO）コース詳細・全9モジュールアウトライン — https://itsmacademy.com/itil-ai-governance-course
-4. AGILEPM HUB（PeopleCert認定ATO）コース詳細・全9モジュールアウトライン・試験詳細 — https://agilepmhub.com/itil-ai-governance
-5. ITčko（PeopleCert認定関連企業）解説記事「ITIL v5 AI Governance: a new module for responsible AI management」 — https://itcko.sk/en/itil-v5-ai-governance-module/
-6. GogoTraining ブログ「AI Governance – The ITIL Cert you Can't Live Without!」 — https://gogotraining.com/blog/2026/08/itil-ai-governance-the-itil-certification-you-cant-live-without/
-7. Innovative Learning コース概要 — https://www.innovativelearning.eu/products/itil-5/itil-ai-governance-5.html
-8. ITIL.org.uk トレーニングコース概要 — https://www.itil.org.uk/training/itil-extension-modules/itil-ai-governance-version-5-training-course
-9. itsm.tools「ITIL (Version 5) Changes Explained」（6Cモデル・Four Dimensions の変更点） — https://itsm.tools/itil-version-5-vs-itil-4-key-changes/
-10. PMG Academy「Information and Technology in ITIL Version 5」（6Cモデル各要素の説明） — https://www.pmgacademy.com/en/articles/itil/information-and-technology-in-itil-version-5-the-guide-for-the-ai-era-and-data-governance/
-11. AXELOS ITIL ベストプラクティスページ — https://www.axelos.com/best-practice-solutions/itil
-12. ISO/IEC 42001:2023（AIマネジメントシステム国際標準）公式ページ — https://www.iso.org/standard/81230.html
-13. IEEE 7014-2024（模倣共感の倫理的配慮に関する標準）公式ページ — https://standards.ieee.org/ieee/7014/7648/
-14. EU AI Act（EU AI法）解説ポータル — https://artificialintelligenceact.eu/
+3. AXELOS ITIL ベストプラクティスページ — https://www.axelos.com/best-practice-solutions/itil
+4. ISO/IEC 42001:2023（AIマネジメントシステム国際標準）公式ページ — https://www.iso.org/standard/81230.html
+5. IEEE 7014-2024（模倣共感の倫理的配慮に関する標準）公式ページ — https://standards.ieee.org/ieee/7014/7648/
+6. EU AI Act（Regulation (EU) 2024/1689）法令本文 — EUR-Lex: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+
+#### 二次資料（トレーニング事業者・解説記事）
+
+7. ITSM Academy（PeopleCert認定ATO）コース詳細・全9モジュールアウトライン — https://itsmacademy.com/itil-ai-governance-course
+8. AGILEPM HUB（PeopleCert認定ATO）コース詳細・全9モジュールアウトライン・試験詳細 — https://agilepmhub.com/itil-ai-governance
+9. ITčko（PeopleCert認定関連企業）解説記事「ITIL v5 AI Governance: a new module for responsible AI management」 — https://itcko.sk/en/itil-v5-ai-governance-module/
+10. GogoTraining ブログ「AI Governance – The ITIL Cert you Can't Live Without!」 — https://gogotraining.com/blog/2026/08/itil-ai-governance-the-itil-certification-you-cant-live-without/
+11. Innovative Learning コース概要 — https://www.innovativelearning.eu/products/itil-5/itil-ai-governance-5.html
+12. ITIL.org.uk トレーニングコース概要 — https://www.itil.org.uk/training/itil-extension-modules/itil-ai-governance-version-5-training-course
+13. itsm.tools「ITIL (Version 5) Changes Explained」（6Cモデル・Four Dimensions の変更点） — https://itsm.tools/itil-version-5-vs-itil-4-key-changes/
+14. PMG Academy「Information and Technology in ITIL Version 5」（6Cモデル各要素の説明） — https://www.pmgacademy.com/en/articles/itil/information-and-technology-in-itil-version-5-the-guide-for-the-ai-era-and-data-governance/
 
 > **免責事項**: 本ガイドは公開情報をもとにした学習補助資料であり、PeopleCert の公式教材・公式見解を代替するものではありません。ITIL® は PeopleCert グループの登録商標です。試験対策の最終確認には、必ず購入した公式 eBook / Learning Resource Kit をご利用ください。また、ITIL AI Governance (Version 5) は比較的新しい資格であるため、シラバスや試験形式が今後改定される可能性があります。受験前に必ず PeopleCert 公式サイトで最新情報をご確認ください。
