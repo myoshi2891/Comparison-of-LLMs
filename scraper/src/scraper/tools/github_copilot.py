@@ -79,8 +79,11 @@ def scrape(existing: list[SubTool] | None = None) -> list[SubTool]:
             # \b だけではハイフン接続（例: "Max-Ultra" の接尾、"Pro-Max" の
             # 接頭）を防げないため、前後を \w とハイフンの両方について
             # 否定先読み・後読みで除外する。
+            # さらに "month" の直後が特典クレジット文（"$100/month in GitHub
+            # credits"）なら価格ではないため、末尾でも否定先読みで除外する。
             price = extract_price(
-                html, [rf"(?<![\w-])max(?![\w-]){_GAP}\$([\d]+)\s*/\s*month"]
+                html,
+                [rf"(?<![\w-])max(?![\w-]){_GAP}\$([\d]+)\s*/\s*month(?!\s+in\s+\w+\s+credits)"],
             )
         elif name == "Business":
             # \b だけでは語尾のハイフン接続（例: "business-tier"）を防げないため、

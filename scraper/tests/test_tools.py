@@ -259,7 +259,7 @@ def test_copilot_distant_price_does_not_match_plan():
 
     by_name = {t.name: t for t in tools}
     fb = {row[1]: row[2] for row in github_copilot._FALLBACKS}
-    for plan in ("Pro", "Pro+"):
+    for plan in ("Pro", "Pro+", "Max"):
         assert by_name[plan].monthly == fb[plan], f"{plan} が遠方の $100 を拾っている"
         assert by_name[plan].scrape_status == "fallback", f"{plan} が誤って success 判定"
 
