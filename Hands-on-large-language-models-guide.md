@@ -131,7 +131,10 @@ flowchart LR
         A9["オープンモデルの拡大<br/>Llama, Mistral 等"]
     end
 
-    Era1 --> Era2 --> Era3 --> Era4 --> Era5
+    Era1 --> Era2
+    Era2 --> Era3
+    Era3 --> Era4
+    Era4 --> Era5
 
     classDef oldEra fill:#2a2f3a,stroke:#8a94a6,color:#e6e9ef
     classDef newEra fill:#1e3a5f,stroke:#7c9eff,color:#eaf1ff
