@@ -54,7 +54,9 @@
   - **バグ修正 3（末尾改行）**: スクレイパー出力に末尾改行がなく `bun run lint` が pricing.json で落ちていたため
     生成側で付与。
   - 契約テストを scraper 側に 16 件追加（フォールバック優先順位 13 件 + Copilot 遠距離マッチ 3 件）。
-    `web-next/` の TypeScript・React・CSS は**一切変更していない**（UI は完全にデータ駆動のため）。
+    `web-next/` は `PriceProvenance` 型（`types/pricing.ts`）と対応する Zod スキーマ（`lib/pricing.ts`）、
+    およびそのテスト（`lib/pricing.test.ts`）を追加・更新した一方、React コンポーネント・CSS は
+    **変更していない**（UI は完全にデータ駆動のため）。
 
 - **Gemini マルチエージェント開発 ベストプラクティス完全ガイド（/google/multi-agent-best-practices）の Next.js アプリ移行 & コードブロック構文ハイライト化**:
   - `Gemini-multi-agent-best-practices.html` を `web-next/app/google/multi-agent-best-practices/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。
