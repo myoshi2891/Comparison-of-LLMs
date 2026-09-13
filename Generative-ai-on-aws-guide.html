@@ -1,0 +1,2532 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      初学者向けガイド：Generative AI on AWS ―
+      コンテキスト認識型マルチモーダル推論アプリケーションの構築
+    </title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Noto+Sans+JP:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.46.0/dist/tabler-icons.min.css"
+      integrity="sha384-ND+q1IVc0KDElX60dZaqKc7Xl9cdxd2PpU2JfVUHcurCkFVtVLFdt9vJfxtHSL3p"
+      crossorigin="anonymous"
+    />
+    <style>
+      :root {
+        --paper: #faf6ec;
+        --paper-card: #fffdf8;
+        --paper-card-2: #f2ecdd;
+        --ink: #2a2418;
+        --ink-soft: #5c5544;
+        --indigo: #3f3d8a;
+        --indigo-dark: #2d2b66;
+        --indigo-soft: rgba(63, 61, 138, 0.08);
+        --indigo-tint: rgba(65, 61, 143, 0.045);
+        --gold: #b8862c;
+        --forest: #2f6b4f;
+        --plum: #7a3b63;
+        --border: #e4dcc8;
+        --hub-fill: #c9c4ef;
+        --hub-text: #221f52;
+        --done-fill: #bfe4d2;
+        --done-text: #123722;
+        --sidebar-w: 300px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        margin: 0;
+        background: var(--paper);
+        color: var(--ink);
+        font-family:
+          'Noto Sans JP',
+          'Hiragino Kaku Gothic ProN',
+          'Yu Gothic',
+          -apple-system,
+          BlinkMacSystemFont,
+          sans-serif;
+        font-size: 16px;
+        line-height: 1.85;
+        -webkit-font-smoothing: antialiased;
+      }
+      h1,
+      h2,
+      h3,
+      h4 {
+        font-family: 'Shippori Mincho', 'Noto Serif JP', 'Source Serif 4', serif;
+        color: var(--indigo-dark);
+        line-height: 1.5;
+        font-weight: 700;
+      }
+      a {
+        color: var(--indigo);
+      }
+      img {
+        max-width: 100%;
+      }
+
+      /* ---------- Layout ---------- */
+      .layout {
+        display: block;
+      }
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: var(--sidebar-w);
+        background: var(--paper-card);
+        border-right: 1px solid var(--border);
+        overflow-y: auto;
+        padding: 1.6rem 1.1rem 3rem;
+        z-index: 50;
+      }
+      .main {
+        margin-left: var(--sidebar-w);
+        padding: 0;
+      }
+      .content {
+        padding: 3rem 3.5rem 6rem;
+        max-width: none;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        font-family: 'Shippori Mincho', 'Noto Serif JP', serif;
+        font-weight: 700;
+        font-size: 1.15rem;
+        color: var(--indigo-dark);
+        margin-bottom: 1.6rem;
+        padding-bottom: 1.2rem;
+        border-bottom: 1px solid var(--border);
+      }
+      .brand i {
+        font-size: 1.4rem;
+        color: var(--gold);
+      }
+
+      .nav-group-label {
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--ink-soft);
+        letter-spacing: 0.02em;
+        margin: 1.3rem 0 0.5rem;
+        padding-left: 0.3rem;
+      }
+      .nav-group-label:first-child {
+        margin-top: 0;
+      }
+      .sidebar-nav {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+      .sidebar-nav li {
+        margin: 0;
+      }
+      .nav-a {
+        display: flex;
+        align-items: center;
+        gap: 0.55rem;
+        padding: 0.5rem 0.6rem;
+        border-radius: 0.5rem;
+        color: var(--ink-soft);
+        text-decoration: none;
+        font-size: 1rem;
+        line-height: 1.4;
+      }
+      .nav-a i {
+        font-size: 1.05rem;
+        color: var(--indigo);
+        flex-shrink: 0;
+      }
+      .nav-a:hover {
+        background: var(--indigo-soft);
+        color: var(--ink);
+      }
+      .nav-a.active {
+        background: var(--indigo-soft);
+        color: var(--indigo-dark);
+        font-weight: 700;
+      }
+      .n-num {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 1.6rem;
+        height: 1.6rem;
+        border-radius: 50%;
+        background: var(--paper-card-2);
+        color: var(--indigo-dark);
+        font-size: 1rem;
+        font-weight: 700;
+        flex-shrink: 0;
+      }
+
+      /* ---------- Mobile bar ---------- */
+      .mobile-bar,
+      .mobile-bar * {
+        font-size: 1rem;
+      }
+      .mobile-bar {
+        display: none;
+        position: sticky;
+        top: 0;
+        z-index: 60;
+        align-items: center;
+        justify-content: space-between;
+        background: var(--paper-card);
+        border-bottom: 1px solid var(--border);
+        padding: 0.9rem 1.2rem;
+      }
+      .mobile-bar .brand {
+        margin: 0;
+        padding: 0;
+        border: none;
+      }
+      .mobile-bar button {
+        background: var(--indigo);
+        color: #fff;
+        border: none;
+        border-radius: 0.5rem;
+        padding: 0.5rem 0.8rem;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        cursor: pointer;
+      }
+      .scrim {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(20, 16, 8, 0.4);
+        z-index: 49;
+      }
+      .scrim.show {
+        display: block;
+      }
+
+      /* ---------- Hero ---------- */
+      .hero {
+        background: linear-gradient(135deg, var(--indigo-dark), var(--indigo) 60%, var(--plum));
+        color: #fdfbf6;
+        padding: 3.6rem 3.5rem;
+        max-width: none;
+      }
+      .hero-kicker {
+        font-size: 1rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: #d9d4ff;
+        margin-bottom: 0.8rem;
+        font-weight: 700;
+      }
+      .hero h1 {
+        color: #fff;
+        font-size: 2.2rem;
+        margin: 0 0 1rem;
+      }
+      .hero p {
+        color: #eee9ff;
+        font-size: 1.1rem;
+        max-width: 70ch;
+        margin: 0 0 1.5rem;
+      }
+      .hero-meta {
+        display: flex;
+        gap: 1.2rem;
+        flex-wrap: wrap;
+      }
+      .hero-meta span {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        background: rgba(255, 255, 255, 0.12);
+        padding: 0.5rem 0.9rem;
+        border-radius: 2rem;
+        font-size: 1rem;
+      }
+      .hero-meta i {
+        color: #ffd98a;
+      }
+
+      /* ---------- Sections ---------- */
+      .section {
+        padding: 3.2rem 3.5rem;
+        border-bottom: 1px solid var(--border);
+        max-width: none;
+      }
+      .section:nth-child(even) {
+        background: var(--paper-card);
+      }
+      .section-kicker {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: var(--indigo-soft);
+        color: var(--indigo-dark);
+        font-weight: 700;
+        font-size: 1rem;
+        padding: 0.35rem 0.9rem;
+        border-radius: 2rem;
+        margin-bottom: 1rem;
+      }
+      .section h2 {
+        font-size: 1.7rem;
+        margin: 0 0 1.3rem;
+      }
+      .section h3 {
+        font-size: 1.3rem;
+        margin: 2rem 0 0.9rem;
+        color: var(--plum);
+      }
+      .prose {
+        max-width: none;
+        overflow-wrap: break-word;
+      }
+      .prose p {
+        margin: 0 0 1.15rem;
+        overflow-wrap: break-word;
+      }
+      .prose ul,
+      .prose ol {
+        margin: 0 0 1.15rem;
+        padding-left: 1.5rem;
+        overflow-wrap: break-word;
+      }
+      .prose li {
+        margin-bottom: 0.5rem;
+        overflow-wrap: break-word;
+      }
+      .prose strong {
+        color: var(--indigo-dark);
+      }
+      .prose code {
+        background: var(--paper-card-2);
+        border: 1px solid var(--border);
+        border-radius: 0.3rem;
+        padding: 0.1rem 0.4rem;
+        font-size: 1rem;
+        font-family: 'SFMono-Regular', Consolas, monospace;
+        color: var(--plum);
+      }
+      sup {
+        font-size: 1rem;
+        vertical-align: super;
+        line-height: 0;
+      }
+
+      .lead {
+        font-size: 1.15rem;
+        color: var(--ink-soft);
+      }
+
+      /* ---------- Cards / grid ---------- */
+      .card-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.2rem;
+        margin: 1.5rem 0;
+      }
+      @media (max-width: 980px) {
+        .card-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      .card {
+        background: var(--paper-card);
+        border: 1px solid var(--border);
+        border-radius: 0.8rem;
+        padding: 1.3rem;
+      }
+      .card h4 {
+        margin: 0 0 0.5rem;
+        font-size: 1.1rem;
+        color: var(--indigo-dark);
+      }
+      .card p {
+        margin: 0;
+        font-size: 1rem;
+        color: var(--ink-soft);
+      }
+
+      .people-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.2rem;
+        margin: 1.4rem 0;
+      }
+      @media (max-width: 980px) {
+        .people-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      .person-card {
+        background: var(--paper-card);
+        border: 1px solid var(--border);
+        border-left: 4px solid var(--gold);
+        border-radius: 0.6rem;
+        padding: 1.1rem 1.3rem;
+      }
+      .person-card h4 {
+        margin: 0 0 0.4rem;
+        font-size: 1.05rem;
+      }
+      .person-card p {
+        margin: 0;
+        font-size: 1rem;
+        color: var(--ink-soft);
+      }
+
+      /* ---------- Callouts ---------- */
+      .callout {
+        display: flex;
+        gap: 0.9rem;
+        background: var(--indigo-soft);
+        border: 1px solid var(--border);
+        border-left: 4px solid var(--indigo);
+        border-radius: 0.6rem;
+        padding: 1.1rem 1.3rem;
+        margin: 1.4rem 0;
+      }
+      .callout.gold {
+        border-left-color: var(--gold);
+        background: rgba(184, 134, 44, 0.08);
+      }
+      .callout.forest {
+        border-left-color: var(--forest);
+        background: rgba(47, 107, 79, 0.08);
+      }
+      .callout-body {
+        flex: 1;
+        min-width: 0;
+      }
+      .callout i {
+        font-size: 1.4rem;
+        color: var(--indigo);
+        flex-shrink: 0;
+        margin-top: 0.15rem;
+      }
+      .callout.gold i {
+        color: var(--gold);
+      }
+      .callout.forest i {
+        color: var(--forest);
+      }
+      .callout p {
+        margin: 0;
+        font-size: 1rem;
+        overflow-wrap: break-word;
+      }
+      .callout p + p {
+        margin-top: 0.6rem;
+      }
+
+      /* ---------- Global word-break safety net (long inline code/tokens outside .prose) ---------- */
+      p,
+      li,
+      td,
+      th,
+      dd,
+      dt,
+      blockquote {
+        overflow-wrap: break-word;
+      }
+      code {
+        overflow-wrap: anywhere;
+      }
+
+      /* ---------- Tables ---------- */
+      .table-wrap {
+        overflow-x: auto;
+        overflow-y: hidden;
+        border: 1px solid var(--border);
+        border-radius: 0.6rem;
+        margin: 1.4rem 0;
+      }
+      .table-title {
+        background: var(--indigo-dark);
+        color: #fdfbf6;
+        font-weight: 700;
+        font-size: 1rem;
+        padding: 0.7rem 1.1rem;
+        border-bottom: 1px solid var(--border);
+      }
+      table {
+        width: 100%;
+        min-width: 480px;
+        border-collapse: collapse;
+        font-size: 1rem;
+        background: var(--paper-card);
+      }
+      th,
+      td {
+        text-align: left;
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid var(--border);
+        overflow-wrap: anywhere;
+      }
+      thead th {
+        background: var(--indigo-dark);
+        color: #fdfbf6;
+        font-weight: 700;
+      }
+      tbody tr:nth-child(even) {
+        background: var(--indigo-tint);
+      }
+      tbody tr:hover {
+        background: var(--indigo-soft);
+      }
+
+      table.kv-table {
+        min-width: 320px;
+      }
+      .kv-table th {
+        background: transparent;
+        color: var(--ink);
+        font-weight: 700;
+        width: 34%;
+        border-right: 1px solid var(--border);
+      }
+      .kv-table tbody tr:nth-child(even) {
+        background: transparent;
+      }
+      .kv-table tr:hover {
+        background: var(--indigo-soft);
+      }
+
+      /* ---------- Diagrams ---------- */
+      .diagram-caption {
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--plum);
+        margin: 1.6rem 0 0.6rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .diagram-caption i {
+        color: var(--gold);
+      }
+      .diagram-wrap {
+        border: 1px solid var(--border);
+        background: var(--paper-card);
+        border-radius: 0.8rem;
+        padding: 1.4rem;
+        margin: 0 0 1.6rem;
+        overflow-x: auto;
+      }
+      pre.mermaid {
+        width: 100%;
+        display: flex;
+        justify-content: safe center;
+        margin: 0;
+      }
+      .mermaid {
+        min-height: 60px;
+      }
+      .diagram-loading {
+        font-size: 1rem;
+        color: var(--ink-soft);
+        text-align: center;
+        padding: 2rem;
+      }
+
+      /* ---------- Step marker ---------- */
+      .step-marker {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.7rem;
+        margin-bottom: 1rem;
+      }
+      .step-num {
+        font-family: 'Shippori Mincho', 'Source Serif 4', serif;
+        font-size: 1.6rem;
+        font-weight: 700;
+        color: #fff;
+        background: var(--indigo);
+        width: 2.6rem;
+        height: 2.6rem;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+      .step-tag {
+        font-size: 1rem;
+        color: var(--ink-soft);
+        font-weight: 700;
+        letter-spacing: 0.03em;
+      }
+
+      /* ---------- Checklist ---------- */
+      .checklist {
+        list-style: none;
+        margin: 1.4rem 0;
+        padding: 0;
+      }
+      .checklist li {
+        margin-bottom: 0.7rem;
+      }
+      .checklist label {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.8rem;
+        background: var(--paper-card);
+        border: 1px solid var(--border);
+        border-radius: 0.6rem;
+        padding: 0.85rem 1.1rem;
+        cursor: pointer;
+        font-size: 1rem;
+      }
+      .checklist input[type='checkbox'] {
+        appearance: none;
+        -webkit-appearance: none;
+        width: 1.35rem;
+        height: 1.35rem;
+        border: 2px solid var(--indigo);
+        border-radius: 0.35rem;
+        flex-shrink: 0;
+        margin-top: 0.05rem;
+        font-size: 1rem;
+        position: relative;
+        cursor: pointer;
+      }
+      .checklist input[type='checkbox']:checked {
+        background: var(--forest);
+        border-color: var(--forest);
+      }
+      .checklist input[type='checkbox']:checked::after {
+        content: '';
+        position: absolute;
+        left: 0.35rem;
+        top: 0.1rem;
+        width: 0.35rem;
+        height: 0.7rem;
+        border: solid #fff;
+        border-width: 0 0.18rem 0.18rem 0;
+        transform: rotate(45deg);
+      }
+      .checklist li.done label {
+        background: rgba(47, 107, 79, 0.08);
+        border-color: var(--forest);
+      }
+      .checklist-counter {
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--forest);
+        margin-bottom: 1rem;
+        display: inline-block;
+        background: rgba(47, 107, 79, 0.1);
+        padding: 0.5rem 1rem;
+        border-radius: 2rem;
+      }
+
+      /* ---------- References ---------- */
+      .ref-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.9rem;
+        margin: 1.5rem 0;
+      }
+      .ref-card {
+        display: flex;
+        gap: 1rem;
+        background: var(--paper-card);
+        border: 1px solid var(--border);
+        border-radius: 0.6rem;
+        padding: 1rem 1.2rem;
+        align-items: flex-start;
+      }
+      .ref-num {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #fff;
+        background: var(--plum);
+        width: 1.8rem;
+        height: 1.8rem;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+      .ref-body {
+        flex: 1;
+        min-width: 0;
+      }
+      .ref-title {
+        font-weight: 700;
+        font-size: 1rem;
+        margin-bottom: 0.25rem;
+        color: var(--ink);
+      }
+      .ref-note {
+        font-size: 1rem;
+        color: var(--ink-soft);
+        margin-bottom: 0.35rem;
+      }
+      .ref-url {
+        font-size: 1rem;
+        color: var(--indigo);
+        word-break: break-all;
+        overflow-wrap: anywhere;
+      }
+
+      /* ---------- Footer ---------- */
+      .footer {
+        padding: 2.4rem 3.5rem;
+        font-size: 1rem;
+        color: var(--ink-soft);
+        max-width: none;
+      }
+
+      /* ---------- Mermaid tooltip fix ---------- */
+      .mermaidTooltip {
+        font-size: 1rem !important;
+      }
+
+      /* ---------- Responsive ---------- */
+      @media (max-width: 980px) {
+        .sidebar {
+          transform: translateX(-100%);
+          transition: transform 0.25s ease;
+          width: min(300px, 82vw);
+        }
+        .sidebar.open {
+          transform: translateX(0);
+        }
+        .main {
+          margin-left: 0;
+        }
+        .mobile-bar {
+          display: flex;
+        }
+        .content,
+        .hero,
+        .section,
+        .footer {
+          padding-left: 1.3rem;
+          padding-right: 1.3rem;
+        }
+        .hero {
+          padding-top: 2.2rem;
+          padding-bottom: 2.2rem;
+        }
+        .section {
+          padding-top: 2.2rem;
+          padding-bottom: 2.2rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="scrim" id="scrim"></div>
+
+    <div class="mobile-bar">
+      <div class="brand"><i class="ti ti-book-2"></i>Generative AI on AWS</div>
+      <button id="mobileToggle" type="button"><i class="ti ti-menu-2"></i>メニュー</button>
+    </div>
+
+    <div class="layout">
+      <nav class="sidebar" id="sidebar">
+        <div class="brand"><i class="ti ti-book-2"></i>Gen AI on AWS ガイド</div>
+        <ul class="sidebar-nav">
+          <li>
+            <a class="nav-a" href="#intro"><i class="ti ti-sparkles"></i>はじめに</a>
+          </li>
+          <li>
+            <a class="nav-a" href="#book-info"><i class="ti ti-file-text"></i>書籍の基本情報</a>
+          </li>
+          <li>
+            <a class="nav-a" href="#authors"><i class="ti ti-users"></i>著者について</a>
+          </li>
+          <li>
+            <a class="nav-a" href="#audience"><i class="ti ti-target"></i>対象読者と読み方</a>
+          </li>
+          <li>
+            <a class="nav-a" href="#roadmap"><i class="ti ti-map-2"></i>学習ロードマップ</a>
+          </li>
+        </ul>
+        <div class="nav-group-label">ステップバイステップ</div>
+        <ul class="sidebar-nav">
+          <li>
+            <a class="nav-a" href="#step-1"
+              ><span class="n-num">1</span
+              ><i class="ti ti-route"></i>ユースケースとライフサイクル</a
+            >
+          </li>
+          <li>
+            <a class="nav-a" href="#step-2"
+              ><span class="n-num">2</span
+              ><i class="ti ti-message-2"></i>プロンプトエンジニアリング</a
+            >
+          </li>
+          <li>
+            <a class="nav-a" href="#step-3"
+              ><span class="n-num">3</span><i class="ti ti-brain"></i>大規模言語基盤モデル</a
+            >
+          </li>
+          <li>
+            <a class="nav-a" href="#step-4"
+              ><span class="n-num">4</span><i class="ti ti-cpu"></i>メモリと計算の最適化</a
+            >
+          </li>
+          <li>
+            <a class="nav-a" href="#step-5"
+              ><span class="n-num">5</span
+              ><i class="ti ti-adjustments"></i>ファインチューニングと評価</a
+            >
+          </li>
+          <li>
+            <a class="nav-a" href="#step-6"
+              ><span class="n-num">6</span><i class="ti ti-puzzle"></i>LoRA・QLoRA</a
+            >
+          </li>
+          <li>
+            <a class="nav-a" href="#step-7"
+              ><span class="n-num">7</span><i class="ti ti-git-branch"></i>RLHF</a
+            >
+          </li>
+          <li>
+            <a class="nav-a" href="#step-8"
+              ><span class="n-num">8</span><i class="ti ti-server-2"></i>モデルデプロイの最適化</a
+            >
+          </li>
+          <li>
+            <a class="nav-a" href="#step-9"
+              ><span class="n-num">9</span><i class="ti ti-search"></i>RAGとエージェント</a
+            >
+          </li>
+          <li>
+            <a class="nav-a" href="#step-10"
+              ><span class="n-num">10</span><i class="ti ti-photo"></i>マルチモーダル基盤モデル</a
+            >
+          </li>
+          <li>
+            <a class="nav-a" href="#step-11"
+              ><span class="n-num">11</span
+              ><i class="ti ti-wand"></i>制御生成とファインチューニング</a
+            >
+          </li>
+          <li>
+            <a class="nav-a" href="#step-12"
+              ><span class="n-num">12</span><i class="ti ti-cloud-computing"></i>Amazon Bedrock</a
+            >
+          </li>
+        </ul>
+        <div class="nav-group-label">仕上げ</div>
+        <ul class="sidebar-nav">
+          <li>
+            <a class="nav-a" href="#updates"><i class="ti ti-refresh"></i>2026年9月の最新動向</a>
+          </li>
+          <li>
+            <a class="nav-a" href="#resources"
+              ><i class="ti ti-external-link"></i>おすすめリソース</a
+            >
+          </li>
+          <li>
+            <a class="nav-a" href="#checklist"
+              ><i class="ti ti-checklist"></i>理解度チェックリスト</a
+            >
+          </li>
+          <li>
+            <a class="nav-a" href="#summary"><i class="ti ti-flag-3"></i>まとめ</a>
+          </li>
+          <li>
+            <a class="nav-a" href="#references"><i class="ti ti-bookmark"></i>参考文献・出典</a>
+          </li>
+        </ul>
+      </nav>
+
+      <div class="main">
+        <div class="content">
+          <section class="hero" id="top">
+            <div class="hero-kicker">初学者向け ステップバイステップガイド</div>
+            <h1>
+              Generative AI on AWS<br />コンテキスト認識型マルチモーダル推論アプリケーションの構築
+            </h1>
+            <p>
+              O'Reilly刊『Generative AI on AWS: Building Context-Aware Multimodal Reasoning
+              Applications』（Chris Fregly、Antje Barth、Shelbee Eigenbrode
+              著）の内容を、初めて生成AIを学ぶ人でも理解できるようステップバイステップで解説します。2026年9月10日時点の最新情報も踏まえてアップデートしています。
+            </p>
+            <div class="hero-meta">
+              <span><i class="ti ti-building-bank"></i>O'Reilly Media</span>
+              <span><i class="ti ti-calendar"></i>2023年11月刊行</span>
+              <span><i class="ti ti-stack-2"></i>全12章</span>
+              <span><i class="ti ti-refresh"></i>2026年9月更新情報つき</span>
+            </div>
+          </section>
+
+          <section class="section" id="intro">
+            <div class="section-kicker"><i class="ti ti-sparkles"></i>INTRODUCTION</div>
+            <h2>はじめに</h2>
+            <div class="prose">
+              <p>
+                生成AI（Generative
+                AI）は2023年前後から爆発的に注目を集め、今では多くの企業が自社の製品やサービスに組み込もうとしています。しかし「大規模言語モデルをAPIで呼び出せば終わり」という単純な話ではなく、ユースケースの定義からモデル選定、プロンプト設計、ファインチューニング、人間の価値観への整合（アライメント）、そして本番環境への安全なデプロイまで、一連のプロジェクトライフサイクルを理解する必要があります。
+              </p>
+              <p>
+                本書『Generative AI on
+                AWS』は、AWSの機械学習分野の専門家3名が、この一連のライフサイクル全体を体系的に解説した一冊です。原題のサブタイトルが示す通り、単なるテキスト生成にとどまらず、検索拡張生成（RAG）やエージェントを使った「コンテキストを理解する」アプリケーション、そして画像を含む「マルチモーダルな推論」を行うアプリケーションの構築までをカバーしているのが大きな特徴です。
+              </p>
+              <p>
+                本ガイドでは、この書籍の12章構成を1つずつ「Step」として区切り、各章で扱われている概念を図解（Mermaid）とともに初学者向けに噛み砕いて説明します。あわせて、書籍刊行（2023年11月）以降にAmazon
+                Bedrockまわりで起きた大きな変化についても、2026年9月時点の情報で補足します。
+              </p>
+            </div>
+          </section>
+
+          <section class="section" id="book-info">
+            <div class="section-kicker"><i class="ti ti-file-text"></i>BOOK INFO</div>
+            <h2>書籍の基本情報</h2>
+            <div class="table-wrap">
+              <div class="table-title">書籍データ</div>
+              <table class="kv-table">
+                <tbody>
+                  <tr>
+                    <th>タイトル</th>
+                    <td>
+                      Generative AI on AWS: Building Context-Aware Multimodal Reasoning Applications
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>著者</th>
+                    <td>Chris Fregly、Antje Barth、Shelbee Eigenbrode</td>
+                  </tr>
+                  <tr>
+                    <th>出版社</th>
+                    <td>O'Reilly Media, Inc.</td>
+                  </tr>
+                  <tr>
+                    <th>刊行日</th>
+                    <td>2023年11月</td>
+                  </tr>
+                  <tr>
+                    <th>ページ数</th>
+                    <td>312ページ</td>
+                  </tr>
+                  <tr>
+                    <th>オーディオブック</th>
+                    <td>約8時間15分（音声版あり）</td>
+                  </tr>
+                  <tr>
+                    <th>対象レベル</th>
+                    <td>中級〜上級（Intermediate to advanced）</td>
+                  </tr>
+                  <tr>
+                    <th>言語</th>
+                    <td>英語</td>
+                  </tr>
+                  <tr>
+                    <th>章構成</th>
+                    <td>序文＋全12章＋索引＋著者紹介</td>
+                  </tr>
+                  <tr>
+                    <th>サンドボックス</th>
+                    <td>O'Reillyプラットフォーム上でハンズオン実行環境（Sandbox）が付属</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="prose">
+              <p>
+                本書は「Intermediate to
+                advanced（中級〜上級）」向けと位置づけられており、Transformerや機械学習の基礎用語にある程度触れたことがある読者を想定しています。本ガイドはその内容を、初学者でも概念のつながりを見失わないように順序立てて解説する「地図」として使うことを意図しています。
+              </p>
+            </div>
+          </section>
+
+          <section class="section" id="authors">
+            <div class="section-kicker"><i class="ti ti-users"></i>AUTHORS</div>
+            <h2>著者について</h2>
+            <div class="people-grid">
+              <div class="person-card">
+                <h4>Chris Fregly</h4>
+                <p>
+                  AWSで生成AI関連の専門家として活動し、本書の姉妹書にあたる『Data Science on
+                  AWS』の共著者でもあります。
+                </p>
+              </div>
+              <div class="person-card">
+                <h4>Antje Barth</h4>
+                <p>
+                  AWSでAI/ML分野のPrincipal Developer Advocateを務め、「Generative AI on AWS
+                  Meetup」というグローバルなコミュニティの共同創設者です。AI・機械学習系カンファレンスでの登壇も多数。
+                </p>
+              </div>
+              <div class="person-card">
+                <h4>Shelbee Eigenbrode</h4>
+                <p>
+                  AWSで生成AI分野のPrincipal Solutions Architectを務め、「Women in Big
+                  Data」デンバー支部の共同創設者でもあります。
+                </p>
+              </div>
+            </div>
+            <div class="prose">
+              <p>
+                3人ともAWSの実務側から生成AIプロジェクトに深く関わってきた実践者であり、本書はアカデミックな理論書というより「実際にAWS上で生成AIアプリケーションを構築するための実務書」という色合いが強い構成になっています。
+              </p>
+            </div>
+            <div class="callout gold">
+              <i class="ti ti-quote"></i>
+              <div class="callout-body">
+                <p>
+                  MetaのApplied AIリーダーであるGeeta
+                  Chauhan氏は、実践的に生成AIを構築するための資料として本書を高く評価するコメントを寄せており、HRS
+                  GroupのデータサイエンスプラットフォームディレクターであるOlalekan
+                  Elesin氏も、AWS上で大規模に生成AIアプリケーションを構築する人にとって必読の一冊だと推薦しています（詳細は参考文献5を参照）。
+                </p>
+              </div>
+            </div>
+          </section>
+
+          <section class="section" id="audience">
+            <div class="section-kicker"><i class="ti ti-target"></i>WHO IS THIS FOR</div>
+            <h2>対象読者と本ガイドの読み方</h2>
+            <div class="prose">
+              <p>
+                O'Reillyの紹介文によれば、本書はCTO、機械学習エンジニア、アプリケーション開発者、ビジネスアナリスト、データエンジニア、データサイエンティストなど、幅広い職種を対象としています。本ガイドでは、特に次のような方を想定しています。
+              </p>
+              <ul>
+                <li>生成AIという言葉は知っているが、プロジェクトの全体像がつかめていない方</li>
+                <li>
+                  プロンプトエンジニアリングまでは触れたことがあるが、ファインチューニングやRAGの仕組みが曖昧な方
+                </li>
+                <li>
+                  AWS上で本格的に生成AIアプリケーションを作りたいが、どのサービスをどう組み合わせればよいか整理したい方
+                </li>
+              </ul>
+              <p>
+                各Stepは独立して読めるように構成していますが、初めての方は上から順に読むことで、生成AIプロジェクトの一連の流れ（ライフサイクル）が自然につながって理解できるようになっています。
+              </p>
+            </div>
+          </section>
+
+          <section class="section" id="roadmap">
+            <div class="section-kicker"><i class="ti ti-map-2"></i>ROADMAP</div>
+            <h2>学習ロードマップ全体像</h2>
+            <div class="prose">
+              <p>本書の12章は、大きく4つのフェーズに分けて捉えると理解しやすくなります。</p>
+            </div>
+            <div class="diagram-caption">
+              <i class="ti ti-chart-dots-3"></i>図：12章を4フェーズに整理した学習ロードマップ
+            </div>
+            <div class="diagram-wrap">
+              <pre
+                class="mermaid"
+                data-diagram="roadmap"
+              ><span class="diagram-loading">図を読み込み中…</span></pre>
+            </div>
+            <div class="prose">
+              <ul>
+                <li>
+                  <strong>フェーズ1（第1〜3章）</strong
+                  >：生成AIとは何か、どんなユースケースがあるか、そしてその中核であるTransformerベースの基盤モデルがどう動くかという「土台」を学びます。
+                </li>
+                <li>
+                  <strong>フェーズ2（第4〜8章）</strong
+                  >：巨大なモデルを実際に動かす・調整するための技術的な工夫（メモリ最適化、ファインチューニング、RLHF、デプロイ最適化）を学びます。
+                </li>
+                <li>
+                  <strong>フェーズ3（第9〜11章）</strong
+                  >：本書のサブタイトルにある「コンテキスト認識」「マルチモーダル」なアプリケーションの作り方、すなわちRAG・エージェント・画像生成モデルを学びます。
+                </li>
+                <li>
+                  <strong>フェーズ4（第12章）</strong
+                  >：これまで学んだ内容を、AWSのマネージドサービスであるAmazon
+                  Bedrockを使って実装する方法を学びます。
+                </li>
+              </ul>
+              <p>それでは、各章を1つずつStepとして見ていきましょう。</p>
+            </div>
+          </section>
+
+          <section class="section" id="step-1">
+            <div class="step-marker">
+              <span class="step-num">1</span><span class="step-tag">第1章</span>
+            </div>
+            <h2>生成AIのユースケースと基礎、プロジェクトライフサイクル</h2>
+            <div class="prose">
+              <p>
+                第1章は本書全体の地図にあたる章です。まず生成AIがどのようなタスク（テキスト生成、要約、翻訳、質問応答、コード生成など）に使えるかを整理し、次に「基盤モデル（Foundation
+                Model）」と「モデルハブ（Model
+                Hub）」という考え方を紹介します。基盤モデルとは、大量のデータで事前学習された汎用モデルのことで、Hugging
+                Face HubやAmazon SageMaker
+                JumpStartのようなモデルハブから選んで利用するのが一般的な進め方です。
+              </p>
+              <p>
+                第1章の後半では、生成AIプロジェクトが辿る典型的なライフサイクルが提示されます。これは本書全体の構成そのものにも対応しています。
+              </p>
+            </div>
+            <div class="diagram-caption">
+              <i class="ti ti-chart-dots-3"></i>図：生成AIプロジェクトのライフサイクル
+            </div>
+            <div class="diagram-wrap">
+              <pre
+                class="mermaid"
+                data-diagram="lifecycle"
+              ><span class="diagram-loading">図を読み込み中…</span></pre>
+            </div>
+            <div class="callout">
+              <i class="ti ti-bulb"></i>
+              <div class="callout-body">
+                <p>
+                  <strong>初学者向けのポイント</strong
+                  >：多くの入門記事は「プロンプトを工夫すれば終わり」という印象を与えがちですが、実際のプロジェクトでは「プロンプトだけで十分な性能が出るか」を判断し、不十分ならファインチューニングやRLHFに進むという分岐が発生します。このライフサイクル図を頭に入れておくと、以降の章（第2章〜第8章）がこの図のどの部分を深掘りしているのかが分かりやすくなります。
+                </p>
+              </div>
+            </div>
+            <div class="prose">
+              <p>
+                最後に第1章では「なぜAWS上で生成AIを構築するのか」という問いに対し、Amazon
+                SageMakerによる学習基盤、AWS
+                Trainium/Inferentiaのような専用ハードウェア、そしてAmazon
+                Bedrockのようなマネージドサービスの存在を理由として挙げています。
+              </p>
+            </div>
+          </section>
+
+          <section class="section" id="step-2">
+            <div class="step-marker">
+              <span class="step-num">2</span><span class="step-tag">第2章</span>
+            </div>
+            <h2>プロンプトエンジニアリングとインコンテキスト学習</h2>
+            <div class="prose">
+              <p>
+                第2章では、モデルに与える入力（プロンプト）と、モデルが出力する応答（コンプリーション）の関係、そしてプロンプトを構成する要素（指示・文脈・入力データ・出力形式の指定など）を整理します。あわせて「トークン」という単位についても解説されており、これは課金やコンテキストウィンドウの上限を理解する上で欠かせない基礎知識です。
+              </p>
+              <p>
+                本章の中心的なテーマが「インコンテキスト学習（In-Context
+                Learning）」です。これは、モデルの重みを一切更新せずに、プロンプトの中に例（デモンストレーション）を含めるだけでモデルの振る舞いを誘導する手法です。
+              </p>
+            </div>
+            <div class="table-wrap">
+              <div class="table-title">インコンテキスト学習の3つの型</div>
+              <table>
+                <thead>
+                  <tr>
+                    <th>手法</th>
+                    <th>説明</th>
+                    <th>例に必要なサンプル数</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Zero-Shot Inference</td>
+                    <td>例を1つも与えず、指示だけでタスクを実行させる</td>
+                    <td>0件</td>
+                  </tr>
+                  <tr>
+                    <td>One-Shot Inference</td>
+                    <td>1つの例をプロンプトに含めて実行させる</td>
+                    <td>1件</td>
+                  </tr>
+                  <tr>
+                    <td>Few-Shot Inference</td>
+                    <td>複数の例をプロンプトに含めて実行させる</td>
+                    <td>2件以上</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="prose">
+              <p>
+                一般に、モデルの規模が大きいほどZero-Shotでも高い性能を発揮しやすく、モデルが小さい場合はFew-Shotで例を増やすことで性能を補う、という関係があります。ただし、例を詰め込みすぎるとコンテキストウィンドウを圧迫したり、かえって性能が落ちる「インコンテキスト学習がうまくいかないケース」もあり、本章ではそのアンチパターンとベストプラクティスの両方が扱われています。
+              </p>
+              <p>
+                さらに、<code>temperature</code>（出力のランダム性）や<code>top-k</code>/<code>top-p</code>（サンプリング時に候補とするトークンの絞り込み方）といった推論設定パラメータも本章で扱われます。ただし、<strong>どのパラメータをサポートするか、既定値がいくつか、指定できる値の範囲がどこまでかはモデルごとに異なります</strong>。たとえば<code>top-k</code>は公開していないモデルもあり、<code>temperature</code>の上限値もモデルによって変わります。したがってこれらは「すべてのモデルで必ず調整する項目」ではなく、選択したモデルがそのパラメータをサポートしている場合に限り、対象モデルのドキュメント（Bedrockであれば各モデルの推論パラメータ仕様）で許容範囲を確認したうえで調整してください。
+              </p>
+            </div>
+          </section>
+
+          <section class="section" id="step-3">
+            <div class="step-marker">
+              <span class="step-num">3</span><span class="step-tag">第3章</span>
+            </div>
+            <h2>大規模言語基盤モデルの仕組み</h2>
+            <div class="prose">
+              <p>
+                第3章は、生成AIの中核技術であるTransformerアーキテクチャを解説する、本書の中でも技術的に濃い章の一つです。トークナイザ、埋め込みベクトル、そしてTransformer本体（エンコーダ・デコーダ）の各構成要素が順を追って説明されます。
+              </p>
+              <p>
+                次の図は、原論文 "Attention Is All You Need"
+                が提示した<strong>エンコーダ－デコーダ型（encoder-decoder）Transformer</strong>の構成です。エンコーダスタック・デコーダスタック・両者をつなぐエンコーダ－デコーダ注意層を持つこの型は、Transformerの一形態であってすべてのTransformerを代表するものではありません（GPT系はデコーダのみ、BERT系はエンコーダのみで構成されます）。
+              </p>
+            </div>
+            <div class="diagram-caption">
+              <i class="ti ti-chart-dots-3"></i>図：エンコーダ－デコーダ型Transformerの構成
+            </div>
+            <div class="diagram-wrap">
+              <pre
+                class="mermaid"
+                data-diagram="transformer"
+              ><span class="diagram-loading">図を読み込み中…</span></pre>
+            </div>
+            <div class="prose">
+              <p>
+                ポイントは「自己注意（Self-Attention）」の仕組みです。これは文中の各単語が、他のどの単語とどれくらい関連しているかを計算する仕組みで、これにより「it」のような代名詞が文中のどの名詞を指しているかをモデルが判断できるようになります。Transformerを視覚的に理解したい場合は、著名なブロガーであるJay
+                Alammar氏による「The Illustrated
+                Transformer」という解説記事が国際的に広く参照されており、本書と合わせて読むと理解が深まります（参考文献8）。
+              </p>
+              <p>
+                第3章の後半では、Transformerベースのモデルが「エンコーダのみ（BERT系）」「デコーダのみ（GPT系）」「エンコーダ-デコーダ両方（T5系）」の3種類に大別されることや、事前学習に使われるデータセットの規模、そして「スケーリング則（Scaling
+                Laws）」と呼ばれる、モデルサイズ・データ量・計算量と性能の関係についても解説されています。
+              </p>
+            </div>
+          </section>
+
+          <section class="section" id="step-4">
+            <div class="step-marker">
+              <span class="step-num">4</span><span class="step-tag">第4章</span>
+            </div>
+            <h2>メモリと計算の最適化</h2>
+            <div class="prose">
+              <p>
+                大規模言語モデルは数十億〜数千億パラメータに達するため、そのまま学習・推論しようとすると膨大なGPUメモリが必要になります。第4章では、このメモリ制約にどう対処するかが解説されます。
+              </p>
+            </div>
+            <div class="table-wrap">
+              <div class="table-title">数値精度の種類</div>
+              <table>
+                <thead>
+                  <tr>
+                    <th>数値精度</th>
+                    <th>ビット数</th>
+                    <th>特徴</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>fp32</td>
+                    <td>32bit</td>
+                    <td>標準的な精度。メモリ消費が最大</td>
+                  </tr>
+                  <tr>
+                    <td>fp16</td>
+                    <td>16bit</td>
+                    <td>メモリを半減できるが数値範囲が狭い</td>
+                  </tr>
+                  <tr>
+                    <td>bfloat16</td>
+                    <td>16bit</td>
+                    <td>fp32と同じ指数部を持ち、学習時の安定性が高い</td>
+                  </tr>
+                  <tr>
+                    <td>fp8</td>
+                    <td>8bit</td>
+                    <td>最新の推論高速化で使われる超低精度</td>
+                  </tr>
+                  <tr>
+                    <td>int8</td>
+                    <td>8bit</td>
+                    <td>量子化でよく使われる整数表現</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="prose">
+              <p>
+                この量子化（Quantization）に加えて、第4章では「FlashAttention」（自己注意の計算を高速化・省メモリ化する手法）や「Grouped-Query
+                Attention」（複数のクエリヘッドでキー・バリューを共有してメモリを削減する手法）といった、注意機構そのものを最適化する技術も紹介されます。
+              </p>
+              <p>
+                さらに、1台のGPUに収まらない巨大モデルを複数GPU・複数ノードに分散させる手法として「分散データ並列（Distributed
+                Data Parallel）」と「完全シャーディングデータ並列（Fully Sharded Data Parallel,
+                FSDP）」が比較され、AWS上ではAmazon
+                SageMakerのFSDPサポートや、AWS独自の学習用チップであるAWS
+                Trainiumを使う方法が紹介されています。
+              </p>
+            </div>
+          </section>
+
+          <section class="section" id="step-5">
+            <div class="step-marker">
+              <span class="step-num">5</span><span class="step-tag">第5章</span>
+            </div>
+            <h2>ファインチューニングと評価</h2>
+            <div class="prose">
+              <p>
+                第5章では、事前学習済みモデルを特定のタスクに適応させる「指示チューニング（Instruction
+                Fine-Tuning）」を扱います。Llama
+                2-Chat、Falcon-Chat、FLAN-T5といった、実際に指示チューニングによって作られた代表的なモデル群を例に、どのようなデータセット（指示とその模範解答のペア）を用意すればよいかが説明されます。
+              </p>
+              <p>
+                学習の実行環境としては、Amazon SageMaker StudioやSageMaker JumpStart、Hugging
+                Face向けのSageMaker
+                Estimatorが紹介されており、AWS上でどのようにファインチューニングのジョブを立ち上げるかという実務的な内容が中心です。
+              </p>
+              <p>
+                章の後半では「評価（Evaluation）」がテーマになります。ファインチューニングをしても、それが本当に性能向上につながったかを測定しなければ意味がありません。ROUGEやBLEUのような定量的な評価指標や、既存のベンチマークデータセットを使った評価方法が紹介されます。
+              </p>
+            </div>
+          </section>
+
+          <section class="section" id="step-6">
+            <div class="step-marker">
+              <span class="step-num">6</span><span class="step-tag">第6章</span>
+            </div>
+            <h2>パラメータ効率のよいファインチューニング</h2>
+            <div class="prose">
+              <p>
+                第6章の主役は「LoRA（Low-Rank
+                Adaptation）」と、その量子化版である「QLoRA」です。フルファインチューニング（Full
+                Fine-Tuning）ではモデルの全パラメータを更新するため、巨大なモデルほど膨大な計算資源が必要になります。LoRAはこの問題を解決するために考案された手法で、元のモデルの重みは凍結したまま、低ランクの小さな行列だけを新たに学習します。
+              </p>
+            </div>
+            <div class="diagram-caption"><i class="ti ti-chart-dots-3"></i>図：LoRAの仕組み</div>
+            <div class="diagram-wrap">
+              <pre
+                class="mermaid"
+                data-diagram="lora"
+              ><span class="diagram-loading">図を読み込み中…</span></pre>
+            </div>
+            <div class="prose">
+              <p>
+                推論時は、凍結した元の重みによる計算
+                <code>W x</code> と、低ランク行列によるアダプターの計算
+                <code>B(A x)</code> を<strong>加算</strong>し、その和が出力になります（<code
+                  >W x + B(A x)</code
+                >）。元の重みは書き換えず、差分だけを足し込む構造です。
+              </p>
+              <p>
+                学習対象になるのは行列AとBだけなので、更新すべきパラメータ数が劇的に減り、消費GPUメモリも小さくなります。QLoRAはこれをさらに発展させ、元のモデル自体を4bitに量子化した状態でLoRAを適用することで、より少ないメモリで大規模モデルのファインチューニングを可能にします。
+              </p>
+            </div>
+            <div class="table-wrap">
+              <div class="table-title">ファインチューニング手法の比較</div>
+              <table>
+                <thead>
+                  <tr>
+                    <th>手法</th>
+                    <th>更新対象</th>
+                    <th>メモリ効率</th>
+                    <th>備考</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>フルファインチューニング</td>
+                    <td>全パラメータ</td>
+                    <td>低い</td>
+                    <td>性能は高いが計算コストが最大</td>
+                  </tr>
+                  <tr>
+                    <td>LoRA</td>
+                    <td>低ランク行列のみ</td>
+                    <td>高い</td>
+                    <td>元モデルは凍結、アダプタを差し替え可能</td>
+                  </tr>
+                  <tr>
+                    <td>QLoRA</td>
+                    <td>量子化モデル＋低ランク行列</td>
+                    <td>非常に高い</td>
+                    <td>メモリはさらに節約できるが学習時間はやや増加する傾向</td>
+                  </tr>
+                  <tr>
+                    <td>プロンプトチューニング</td>
+                    <td>ソフトプロンプトのみ</td>
+                    <td>非常に高い</td>
+                    <td>モデル本体は一切変更しない</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="callout forest">
+              <i class="ti ti-flask-2"></i>
+              <div class="callout-body">
+                <p>
+                  LoRAとQLoRAの実践的なチューニングについては、機械学習分野で著名な研究者・教育者であるSebastian
+                  Raschka氏が、数百回規模のLoRA/QLoRA実験を行った知見を公開しており、「QLoRAはメモリを約33%削減できる一方で学習時間が約39%増加するというトレードオフがある」といった具体的な指摘は今でも広く引用されています（参考文献7・23）。
+                </p>
+                <p>
+                  なお同氏の詳細記事（参考文献23）には、この要約値39%と並んで、LoRA（bf16）1.85時間／QLoRA（4bit
+                  NF4）2.79時間という実測の学習時間も掲載されています。この2値からそのまま増加率を計算すると約50.8%となり、要約値の39%とは一致しません（記事上、この差がどこから生じるかは説明されていません）。引用する際は、要約値の39%と実測値から算出した約50.8%のどちらを根拠にしたのかを明示してください。
+                </p>
+                <p>
+                  いずれにせよこの数値は、同氏が特定の条件下で行った実験の実測値です。対象モデル、量子化の方式とビット数、LoRAのランクと適用先モジュール、シーケンス長、バッチサイズ、使用GPUといった設定によって削減率も増加率も変わるため、そのまま一般則として扱わず、必ず自分の設定で計測してください（実験条件の詳細は参考文献23の原典を参照）。本書の該当章と合わせて読むことで、理論だけでなく実務上の勘所もつかめます。
+                </p>
+              </div>
+            </div>
+          </section>
+
+          <section class="section" id="step-7">
+            <div class="step-marker">
+              <span class="step-num">7</span><span class="step-tag">第7章</span>
+            </div>
+            <h2>RLHFによる人間フィードバックからの強化学習</h2>
+            <div class="prose">
+              <p>
+                第7章は「人間の価値観にモデルをどう整合させるか」という、生成AIの安全性に直結するテーマを扱います。キーワードは「HHH（Helpful,
+                Honest, Harmless＝役に立ち、正直で、無害）」という3原則です。
+              </p>
+            </div>
+            <div class="diagram-caption"><i class="ti ti-chart-dots-3"></i>図：RLHFのループ</div>
+            <div class="diagram-wrap">
+              <pre
+                class="mermaid"
+                data-diagram="rlhf"
+              ><span class="diagram-loading">図を読み込み中…</span></pre>
+            </div>
+            <div class="prose">
+              <p>流れを整理すると次のようになります。</p>
+              <ol>
+                <li>
+                  <strong>報酬モデルの学習</strong>：Amazon SageMaker Ground
+                  Truthのような人手アノテーションの仕組みを使い、人間のラベラーが複数の応答にランキングを付け、そのデータから「どの応答が好ましいか」を予測する報酬モデルを訓練します。既存の毒性検出モデル（Meta製など）を報酬モデルとして流用するケースも紹介されています。
+                </li>
+                <li>
+                  <strong>強化学習によるファインチューニング</strong
+                  >：報酬モデルが出すスコアを最大化するように、PPO（Proximal Policy
+                  Optimization）というアルゴリズムでポリシー（＝生成AIモデル本体）を更新します。
+                </li>
+                <li>
+                  <strong>報酬ハッキングの緩和</strong
+                  >：報酬モデルを騙すような不自然な出力（報酬ハッキング）を防ぐため、元のモデルの出力分布から大きく逸脱しないようKLダイバージェンスによる制約をかけます。
+                </li>
+                <li>
+                  <strong>評価</strong
+                  >：定性的評価（人間による読み比べ）と定量的評価（毒性スコアなどの指標）の両方でRLHF後のモデルを検証します。
+                </li>
+              </ol>
+              <p>
+                第6章で学んだLoRAをRLHFのフェーズでも併用できる点（パラメータ効率のよいRLHF）が紹介されているのも実務上重要なポイントです。
+              </p>
+            </div>
+          </section>
+
+          <section class="section" id="step-8">
+            <div class="step-marker">
+              <span class="step-num">8</span><span class="step-tag">第8章</span>
+            </div>
+            <h2>モデルデプロイの最適化</h2>
+            <div class="prose">
+              <p>
+                学習・ファインチューニングが終わったモデルを、実際にユーザーに使ってもらうにはどう配置すればよいかを扱うのが第8章です。
+              </p>
+            </div>
+            <div class="table-wrap">
+              <div class="table-title">モデル圧縮手法</div>
+              <table>
+                <thead>
+                  <tr>
+                    <th>手法</th>
+                    <th>概要</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>プルーニング（Pruning）</td>
+                    <td>影響の小さいパラメータを削除してモデルを軽量化</td>
+                  </tr>
+                  <tr>
+                    <td>量子化（Post-Training Quantization / GPTQ）</td>
+                    <td>学習後のモデルの重みを低精度に変換して軽量化</td>
+                  </tr>
+                  <tr>
+                    <td>蒸留（Distillation）</td>
+                    <td>大きな教師モデルの出力を、小さな生徒モデルに学習させる</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="prose">
+              <p>
+                これらの最適化に加え、AWS
+                Inferentiaのような推論専用ハードウェアの活用や、モデル更新時のリスクを抑える「A/Bテスト」「シャドーデプロイ（本番トラフィックを使いつつ結果はユーザーに返さずに新モデルを検証する手法）」といったデプロイ戦略も紹介されています。本番運用ではメトリクスによるモニタリングと、負荷に応じてインスタンス数を自動調整する「オートスケーリングポリシー」の設計も欠かせない要素として扱われます。
+              </p>
+            </div>
+          </section>
+
+          <section class="section" id="step-9">
+            <div class="step-marker">
+              <span class="step-num">9</span><span class="step-tag">第9章</span>
+            </div>
+            <h2>RAGとエージェントによるコンテキスト認識推論アプリケーション</h2>
+            <div class="prose">
+              <p>
+                本書のサブタイトルにある「コンテキスト認識（Context-Aware）」という言葉が正面から扱われるのが第9章です。まず、大規模言語モデルには2つの根本的な限界があることが説明されます。
+              </p>
+              <ul>
+                <li>
+                  <strong>ハルシネーション（Hallucination）</strong
+                  >：事実に基づかない、もっともらしい嘘の情報を生成してしまう現象
+                </li>
+                <li>
+                  <strong>知識のカットオフ（Knowledge Cutoff）</strong
+                  >：学習データの収集時点以降の出来事や、学習データに含まれない社内情報などを知らない
+                </li>
+              </ul>
+              <p>
+                この2つの限界に対処する代表的な手法が「検索拡張生成（Retrieval-Augmented Generation,
+                RAG）」です。
+              </p>
+            </div>
+            <div class="diagram-caption">
+              <i class="ti ti-chart-dots-3"></i>図：RAGのワークフロー
+            </div>
+            <div class="diagram-wrap">
+              <pre
+                class="mermaid"
+                data-diagram="rag"
+              ><span class="diagram-loading">図を読み込み中…</span></pre>
+            </div>
+            <div class="prose">
+              <p>
+                RAGのワークフローは、社内文書のような外部知識源を「文書の読み込みとチャンク分割」→「埋め込みベクトル化してベクトルストアに格納」→「質問に類似した文書を検索・取得」→「取得した文脈をプロンプトに追加」→「LLMに推論させる」という流れで構成されます。
+              </p>
+              <p>
+                第9章のもう一つの柱が「エージェント（Agents）」です。エージェントは、LLM自身に「次に何をすべきか」を考えさせながら、外部ツール（検索、計算、API呼び出しなど）を呼び出させる仕組みです。本書ではその代表的な枠組みとして「ReActフレームワーク」と「Program-Aided
+                Language（PAL）フレームワーク」が紹介されています。
+              </p>
+            </div>
+            <div class="diagram-caption">
+              <i class="ti ti-chart-dots-3"></i>図：ReActエージェントのループ
+            </div>
+            <div class="diagram-wrap">
+              <pre
+                class="mermaid"
+                data-diagram="react"
+              ><span class="diagram-loading">図を読み込み中…</span></pre>
+            </div>
+            <div class="prose">
+              <p>
+                ReActは「Reasoning（推論）」と「Acting（行動）」を交互に繰り返すことで、モデルが単発の応答ではなく、複数ステップにわたってタスクを解決できるようにする枠組みです。DeepLearning.AIの創設者として国際的に知られるAndrew
+                Ng氏も、この種の「エージェント的なRAG（Agentic
+                RAG）」―実行時にエージェント自身がどのデータを取得すべきかを自律的に判断する発展形―を、今後大きく伸びる領域として紹介しています（参考文献9）。また、著書『AI
+                Engineering』で知られるChip
+                Huyen氏も、RAGとエージェントを統一的に捉える視点を提示しており、本章のテーマと強く重なります（参考文献10）。
+              </p>
+              <p>
+                第9章の最後では、これらのRAG・エージェントを含むアプリケーションを本番運用するための「FMOps（Foundation
+                Model
+                Ops）」という考え方が紹介されます。実験段階・開発段階・本番デプロイ段階のそれぞれで気をつけるべき観点が整理されています。
+              </p>
+            </div>
+          </section>
+
+          <section class="section" id="step-10">
+            <div class="step-marker">
+              <span class="step-num">10</span><span class="step-tag">第10章</span>
+            </div>
+            <h2>マルチモーダル基盤モデル</h2>
+            <div class="prose">
+              <p>
+                ここから本書のもう一つのテーマである「マルチモーダル（Multimodal）」の領域に入ります。第10章では、テキストだけでなく画像も扱えるモデルのユースケース（画像生成、画像編集・補正、画像キャプション生成、視覚的質問応答＝VQAなど）が紹介されます。
+              </p>
+              <p>画像生成タスクの中核技術が「拡散モデル（Diffusion Model）」です。</p>
+            </div>
+            <div class="diagram-caption">
+              <i class="ti ti-chart-dots-3"></i>図：拡散モデルの前方拡散と逆拡散
+            </div>
+            <div class="diagram-wrap">
+              <pre
+                class="mermaid"
+                data-diagram="diffusion"
+              ><span class="diagram-loading">図を読み込み中…</span></pre>
+            </div>
+            <div class="prose">
+              <p>
+                拡散モデルは、元画像に少しずつノイズを加えていく「前方拡散プロセス」と、そのノイズを少しずつ取り除きながら画像を復元していく「逆拡散プロセス」という2つのプロセスから成り立ちます。ここで注意したいのは、前方拡散が<strong>学習時の処理</strong>だという点です。学習データの画像を段階的にノイズ化し、「どのノイズが加えられたか」をU-Netに当てさせることでノイズ予測器を訓練します。
+              </p>
+              <p>
+                一方、テキストから画像を生成する<strong>推論時には元画像は不要</strong>で、ガウス分布からサンプリングした純粋なノイズ（Stable
+                Diffusionでは潜在空間上のノイズ）を出発点として逆拡散を回します（上図でも、学習時の入力である「ノイズを加えた画像」は点線でU-Netの入口へ入り、推論時は前方拡散の出力ではなく独立した「初期ノイズ」ノードから逆拡散へ接続しています）。テキストから画像を生成する場合は、この逆拡散プロセスの各ステップで、テキストプロンプトの情報を「クロスアテンション」という仕組みを通じてU-Netに注入し、ノイズ除去の方向をテキストの意味に沿ったものへと導きます。
+              </p>
+              <p>
+                本章ではStable Diffusion 2とStable Diffusion
+                XLという2つのアーキテクチャの違い（XLでは条件付けの仕組みが強化され、加えてRefinerモデルが用意されている点など）も具体的に解説されています。XLのBaseモデルはそれ単体で画像を生成でき、Refinerは生成された画像のディテールを仕上げるために<strong>任意で</strong>追加適用する別モデルです（必須の後段工程ではありません）。また、画像だけでなく「Inpainting（画像の一部を修復・置換）」「Outpainting（画像の外側を拡張）」「Depth-to-Image（深度情報から画像を生成）」といった応用的な画像編集タスクも扱われます。
+              </p>
+            </div>
+          </section>
+
+          <section class="section" id="step-11">
+            <div class="step-marker">
+              <span class="step-num">11</span><span class="step-tag">第11章</span>
+            </div>
+            <h2>Stable Diffusionの制御生成とファインチューニング</h2>
+            <div class="prose">
+              <p>
+                第10章で拡散モデルの基本を学んだ上で、第11章ではその出力をより精密にコントロールする手法や、特定のスタイル・被写体に特化させるファインチューニング手法が紹介されます。
+              </p>
+            </div>
+            <div class="table-wrap">
+              <div class="table-title">Stable Diffusionの制御・カスタマイズ手法</div>
+              <table>
+                <thead>
+                  <tr>
+                    <th>手法</th>
+                    <th>目的</th>
+                    <th>特徴</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>ControlNet</td>
+                    <td>生成する構図やポーズを制御</td>
+                    <td>エッジ検出画像や姿勢情報などを追加の条件として入力</td>
+                  </tr>
+                  <tr>
+                    <td>DreamBooth</td>
+                    <td>特定の被写体をモデルに学習させる</td>
+                    <td>少数の参照画像から特定の人物・物体を再現できるようにする</td>
+                  </tr>
+                  <tr>
+                    <td>DreamBooth + LoRA</td>
+                    <td>DreamBoothを軽量に実施</td>
+                    <td>第6章のLoRAの考え方を拡散モデルに応用し、学習コストを削減</td>
+                  </tr>
+                  <tr>
+                    <td>Textual Inversion</td>
+                    <td>新しい概念を単語として学習</td>
+                    <td>新しい「単語（トークン）」を1つ学習させ、既存モデルの語彙に追加する</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="prose">
+              <p>
+                本章の最後では、第7章で学んだRLHFの考え方を画像生成モデルにも応用する「人間の価値観に整合した画像生成」についても触れられており、テキスト生成とマルチモーダル生成の両方で「人間のフィードバックを取り込む」という発想が共通して現れることが分かります。
+              </p>
+            </div>
+          </section>
+
+          <section class="section" id="step-12">
+            <div class="step-marker">
+              <span class="step-num">12</span><span class="step-tag">第12章</span>
+            </div>
+            <h2>Amazon Bedrock ― マネージド生成AIサービス</h2>
+            <div class="prose">
+              <p>
+                最終章では、これまで学んできた技術要素を、AWSのマネージドサービスであるAmazon
+                Bedrockを使って実際にどう実装するかがまとめられています。
+              </p>
+            </div>
+            <div class="diagram-caption">
+              <i class="ti ti-chart-dots-3"></i>図：Amazon Bedrockのアーキテクチャ概観
+            </div>
+            <div class="diagram-wrap">
+              <pre
+                class="mermaid"
+                data-diagram="bedrock"
+              ><span class="diagram-loading">図を読み込み中…</span></pre>
+            </div>
+            <div class="prose">
+              <p>
+                刊行当時（2023年）のBedrockには、AWS自社開発のAmazon Titanファミリーや、Stability
+                AIのStable
+                Diffusion系モデルが基盤モデルとして提供されていました。本章では、大規模言語モデル向けの推論API（SQLコード生成、テキスト要約、埋め込みベクトル生成など）、ファインチューニング機能、エージェント機能、そしてマルチモーダルモデル向けのAPI（テキストからの画像生成、画像からの画像生成）が一通り紹介され、最後にデータプライバシー・ネットワークセキュリティ、ガバナンス・モニタリングといった、企業利用に欠かせない観点でまとめられています。
+              </p>
+            </div>
+            <div class="callout">
+              <i class="ti ti-shield-check"></i>
+              <div class="callout-body">
+                <p>
+                  上図が示すとおり、ガードレールは推論結果と並ぶ独立の出力元ではなく、<strong>ユーザー入力と、LLMが生成した応答の両方を評価するフィルタ</strong>として機能します。評価対象はこの2つであり、ナレッジベースから取得した参照文書そのものではありません。そのため上図では、ナレッジベースの検索結果を生成された応答とは別のノードとして分け、ガードレールを経由しない経路で基盤モデルへ渡しています。
+                </p>
+                <p>
+                  <code>RetrieveAndGenerate API</code> はこの「検索 →
+                  取得文書を文脈として与えて生成」までを一括で実行しますが、ガードレールの評価対象は<strong>入力クエリと生成された応答の2つ</strong>であり、検索で取得した参照文書そのものは評価されません。これに対し、エージェント型の検索を行う
+                  <code>AgenticRetrieveStream API</code> では、<code
+                    >agenticRetrieveConfiguration.policyConfiguration</code
+                  >
+                  でガードレールを設定し、<strong>検索（リトリーブ）の過程に</strong>適用します。ただしこの経路でサポートされるガードレールのアクションは
+                  <code>BLOCK</code>
+                  のみで、<code>MASK</code>（該当箇所のマスキング）はサポートされません。MASKを前提にした設計（機微情報を伏せたうえで検索結果を利用する等）はAgenticRetrieveStreamでは成立せず、該当時は検索自体がブロックされる点に注意してください。
+                </p>
+                <p>
+                  つまり両者は「どこで設定するか」も「何を評価するか」も異なるため、「ガードレールを有効にした」という一言でまとめず、使用するAPIごとに適用範囲を確認してください（設定項目の詳細は参考文献20のAWS公式ドキュメント最新版を参照）。
+                </p>
+              </div>
+            </div>
+            <div class="prose">
+              <p>
+                また、データプライバシー・セキュリティ・ガバナンス・モニタリングは推論後の後処理段ではなく、<strong>推論フロー全体を横断する統制</strong>として捉えるのが実態に近い点にも注意してください。ここで統制と可観測性は別のノードに分けています。
+              </p>
+            </div>
+            <div class="callout forest">
+              <i class="ti ti-gauge"></i>
+              <div class="callout-body">
+                <p>
+                  <strong
+                    >AgentCore Observabilityの対象は Amazon Bedrock AgentCore
+                    のリソースに限られます</strong
+                  >。ここで「ナレッジベース」を一括りにせず、区別しておく必要があります。<strong
+                    >Managed Knowledge BaseはBedrockのリソースですが、AgentCore
+                    Observabilityと統合されます</strong
+                  >（上図でもAgentCoreとは別ノードとして描き、統合関係を接続で示しています）。
+                </p>
+                <p>
+                  ただしこの統合も「つなげば見える」ものではありません。Managed Knowledge
+                  Base側の可観測性は、<code>AWS/Bedrock/KnowledgeBases</code>
+                  名前空間のランタイムメトリクスをCloudWatchへ出力することと、Retrieve系オペレーションのトレース（TRACES）をAWS
+                  X-Rayへ配信することを有効化してはじめてデータが集まります（参考文献17・20。Bedrock側の設定であり、AgentCoreの設定ではありません）。有効化していない場合、統合されていてもダッシュボードは空のままです。
+                </p>
+                <p>
+                  一方、<strong
+                    >従来のBedrock Knowledge
+                    Base、Bedrockへの直接のモデル呼び出し、ガードレールはAgentCoreのリソースではないため、AgentCore
+                    Observabilityの自動収集対象外です</strong
+                  >。これら対象外の要素を含めた統制・監査はCloudWatchやCloudTrailといった基盤側の仕組みで行います。上図でも、AgentCore
+                  ObservabilityはAgentCoreと（統合関係にある）Managed Knowledge
+                  Baseのノードにのみ接続しており、図中の「エージェント（Agents for
+                  Bedrock）」＝従来型のエージェントには接続していません。
+                </p>
+                <p>
+                  なお、AgentCore Observabilityのすべての機能に計装が要るわけではありません。<strong
+                    >組込みメトリクス（セッション数、レイテンシ、エラー率など）やAgentCore
+                    Memoryの標準スパンは、エージェント側に追加のコード計装を書かなくても収集されます</strong
+                  >。ただしこれは「何の設定も不要」という意味ではありません。コード計装が不要であることとは<strong>別の要件</strong>として、①AgentCore
+                  Memoryリソース側でトレースを有効化すること、②アカウント（リージョン）単位でCloudWatch
+                  Transaction
+                  Searchを有効化すること、の2点を満たす必要があります（参考文献22）。<strong
+                    >この2点はAgentCore固有の要件であり、上記のManaged Knowledge
+                    Base側の設定とは別物です</strong
+                  >。混同すると、片方だけを有効化して「統合したのにデータが出ない」という状態になります。
+                </p>
+                <p>
+                  <strong
+                    >エージェント側の計装（OpenTelemetry互換の設定）が必要になるのは、エージェント内部の処理を細かく追う詳細トレース（独自のスパン、ツール呼び出し、セッション単位の追跡など）や、独自のテレメトリを送る場合に限られます</strong
+                  >。
+                </p>
+              </div>
+            </div>
+            <div class="prose">
+              <p>
+                この章の内容は、Bedrockという製品自体が今も高速に進化し続けているサービスであるため、刊行後のアップデートを踏まえて読む価値が特に高い部分です。次のセクションで、2026年9月時点での主な変化を補足します。
+              </p>
+            </div>
+          </section>
+
+          <section class="section" id="updates">
+            <div class="section-kicker"><i class="ti ti-refresh"></i>2026 UPDATE</div>
+            <h2>2026年9月時点の最新動向とのギャップ</h2>
+            <div class="prose">
+              <p>
+                本書は2023年11月に刊行されており、第12章で解説されているAmazon
+                Bedrockの機能は、当時のスナップショットです。生成AIの分野、特にAWSのマネージドサービスはその後も急速に進化しているため、学習の際は以下の変化を念頭に置いてください。
+              </p>
+            </div>
+            <div class="table-wrap">
+              <div class="table-title">2023年刊行時 と 2026年9月時点の比較</div>
+              <table>
+                <thead>
+                  <tr>
+                    <th>分野</th>
+                    <th>2023年刊行当時</th>
+                    <th>2026年9月時点の状況</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>モデルラインナップ</td>
+                    <td>Titan、Stable Diffusion系が中心</td>
+                    <td>
+                      Anthropic Claude、Meta Llama、Mistral、Google Gemma、OpenAI GPT系、Amazon
+                      Nova、xAI
+                      Grokなど、20近いプロバイダーの100以上のモデルが利用可能に拡大（参考文献18・11）
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>エージェント機能</td>
+                    <td>「Agents」として第9章・第12章で紹介</td>
+                    <td>
+                      「Bedrock Agents」（現「Bedrock Agents
+                      Classic」）は2026年7月30日以降、新規顧客への提供を停止。ただし直前12か月以内に利用実績があるアカウントでは、既存エージェントの利用と新規エージェントの作成を引き続き行える。後継の「Amazon
+                      Bedrock AgentCore」がエージェント構築の中心的な仕組みに（参考文献19・13）
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>RAG関連機能</td>
+                    <td>自前でベクトルストアと検索チェーンを構築する解説が中心</td>
+                    <td>
+                      フルマネージドの「Bedrock Knowledge Base」やAgentCore経由の「Managed Knowledge
+                      Base」が登場し、データ接続・チャンク分割・再ランキングまで自動化される方向に進化（参考文献20・17）
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>ルーティング／コスト最適化</td>
+                    <td>明示的なモデル選択が前提</td>
+                    <td>
+                      同一モデルファミリ内であらかじめ指定したモデルを対象に、プロンプトごとの予測応答品質と設定したルーティング条件に基づいて送信先モデルを選択する「Intelligent
+                      Prompt
+                      Routing」などの最適化機能が追加。ただし<strong>最適化が有効なのは英語のプロンプトに限られ、日本語プロンプトでの最適化は保証されません</strong>（参考文献21）
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="callout gold">
+              <i class="ti ti-alert-triangle"></i>
+              <div class="callout-body">
+                <p>
+                  上表の各行は、末尾に示したAWS公式資料に基づいています。<strong
+                    >利用可能なモデル・リージョン、アカウントごとの提供条件（Bedrock Agents
+                    Classicの許可リスト判定）、Intelligent Prompt
+                    Routingの対象モデルファミリとルーティング条件は、いずれもリージョンとアカウントによって異なります</strong
+                  >。導入前に必ず参考文献18〜21の公式ドキュメントで自分のリージョン・アカウントの条件を確認してください。
+                </p>
+              </div>
+            </div>
+            <div class="prose">
+              <p>
+                とりわけ重要なのは、第9章・第12章で解説されている「Agents」の仕組みが、2026年時点では「Amazon
+                Bedrock
+                AgentCore」という新しいアーキテクチャに置き換わりつつある点です。AgentCoreはメモリ管理、ガバナンス（Policy機能による行動制御）、評価（Evaluations）、そして詳細な可観測性（Observability）を備えた、エージェントをより安全に本番運用するための基盤として位置づけられています（参考文献12〜16）。本書でReActフレームワークやエージェントの基本概念を理解した上で、実際にAWS上で構築する際は、最新のAgentCoreのドキュメントもあわせて確認することをおすすめします。
+              </p>
+            </div>
+          </section>
+
+          <section class="section" id="resources">
+            <div class="section-kicker"><i class="ti ti-external-link"></i>FURTHER READING</div>
+            <h2>さらに学びを深めるためのおすすめリソース</h2>
+            <div class="prose">
+              <p>
+                本書と組み合わせて読むことで理解が深まる、国際的に評価の高いリソースを分野別にまとめました。
+              </p>
+              <ul>
+                <li>
+                  <strong>書籍のコード実践</strong
+                  >：著者らが公開しているGitHubリポジトリには、本書の各章に対応したノートブックやワークショップ資料が公開されています（参考文献2・3）。
+                </li>
+                <li>
+                  <strong>Transformerの仕組みをより深く</strong>：Jay Alammar氏の「The Illustrated
+                  Transformer」は、TransformerやAttentionの仕組みを視覚的に解説した記事として、スタンフォードやハーバードなど多くの大学の講義でも参照されており、国際的に最も広く読まれている解説記事の一つです（参考文献8）。
+                </li>
+                <li>
+                  <strong>LoRA/QLoRAの実践的チューニング</strong>：Sebastian
+                  Raschka氏によるLoRA・QLoRAの実験ブログは、ハイパーパラメータ選定の実務的な勘所を数値付きで示しており、第6章の理解を補完します（参考文献6・7）。
+                </li>
+                <li>
+                  <strong>RAGとエージェントの最新動向</strong>：Andrew Ng氏によるAgentic
+                  RAGの紹介や、Chip Huyen氏の著書『AI
+                  Engineering』でのRAGとエージェントの統合的な解説は、第9章のテーマをより広い文脈で捉える助けになります（参考文献9・10）。
+                </li>
+                <li>
+                  <strong>Amazon Bedrockの最新状況</strong
+                  >：AWS公式の一次情報源はAgentCoreのリリースノート、What's New、AWS Machine
+                  Learningブログです（参考文献13〜15）。参考文献12はAmazonのニュースルーム（About
+                  Amazon）による発表記事、参考文献16はEnterprise
+                  DNAによる第三者の解説記事であり、いずれもAWSの公式技術ドキュメントではありません。AWSの公式見解として扱う際は参考文献13〜15を根拠としてください。
+                </li>
+              </ul>
+            </div>
+          </section>
+
+          <section class="section" id="checklist">
+            <div class="section-kicker"><i class="ti ti-checklist"></i>SELF CHECK</div>
+            <h2>理解度チェックリスト</h2>
+            <div class="prose">
+              <p>
+                各Stepの理解度を自己チェックするための一覧です。説明できるか怪しい項目があれば、該当のStepに戻って読み返してみてください。
+              </p>
+            </div>
+            <span class="checklist-counter" id="checklistCounter">0 / 13 完了</span>
+            <ul class="checklist">
+              <li>
+                <label
+                  ><input type="checkbox" /><span
+                    >生成AIプロジェクトのライフサイクル図を自分の言葉で説明できる（第1章）</span
+                  ></label
+                >
+              </li>
+              <li>
+                <label
+                  ><input type="checkbox" /><span
+                    >Zero-Shot・One-Shot・Few-Shot Inferenceの違いを説明できる（第2章）</span
+                  ></label
+                >
+              </li>
+              <li>
+                <label
+                  ><input type="checkbox" /><span
+                    >Transformerにおける自己注意（Self-Attention）の役割を説明できる（第3章）</span
+                  ></label
+                >
+              </li>
+              <li>
+                <label
+                  ><input type="checkbox" /><span
+                    >fp32・fp16・bfloat16・int8の違いと、量子化がなぜメモリ削減になるか理解した（第4章）</span
+                  ></label
+                >
+              </li>
+              <li>
+                <label
+                  ><input type="checkbox" /><span
+                    >指示チューニングと、ROUGE等の評価指標の役割を理解した（第5章）</span
+                  ></label
+                >
+              </li>
+              <li>
+                <label
+                  ><input type="checkbox" /><span
+                    >LoRAとQLoRAがなぜ効率的か、フルファインチューニングとの違いを説明できる（第6章）</span
+                  ></label
+                >
+              </li>
+              <li>
+                <label
+                  ><input type="checkbox" /><span
+                    >RLHFの4つのステップ（報酬モデル学習・強化学習・報酬ハッキング緩和・評価）を説明できる（第7章）</span
+                  ></label
+                >
+              </li>
+              <li>
+                <label
+                  ><input type="checkbox" /><span
+                    >プルーニング・量子化・蒸留という3つのモデル圧縮手法の違いを理解した（第8章）</span
+                  ></label
+                >
+              </li>
+              <li>
+                <label
+                  ><input type="checkbox" /><span
+                    >RAGのワークフローと、ReActエージェントの思考・行動・観察ループを説明できる（第9章）</span
+                  ></label
+                >
+              </li>
+              <li>
+                <label
+                  ><input type="checkbox" /><span
+                    >拡散モデルの前方拡散（学習時）と逆拡散（生成時）の違いを説明できる（第10章）</span
+                  ></label
+                >
+              </li>
+              <li>
+                <label
+                  ><input type="checkbox" /><span
+                    >ControlNet・DreamBooth・Textual Inversionの違いを理解した（第11章）</span
+                  ></label
+                >
+              </li>
+              <li>
+                <label
+                  ><input type="checkbox" /><span
+                    >Amazon
+                    Bedrockのガードレールが、どの範囲（入力・出力）に適用されるか説明できる（第12章）</span
+                  ></label
+                >
+              </li>
+              <li>
+                <label
+                  ><input type="checkbox" /><span
+                    >従来のBedrock AgentsとAmazon Bedrock
+                    AgentCoreの違いを理解した（2026年最新動向）</span
+                  ></label
+                >
+              </li>
+            </ul>
+          </section>
+
+          <section class="section" id="summary">
+            <div class="section-kicker"><i class="ti ti-flag-3"></i>SUMMARY</div>
+            <h2>まとめ</h2>
+            <div class="prose">
+              <p>
+                『Generative AI on
+                AWS』は、生成AIプロジェクトの全体像（ユースケース定義からデプロイまで）を、AWSという具体的なプラットフォーム上での実装と結び付けて解説した実務書です。本ガイドで見てきたように、12章の内容は次のように整理できます。
+              </p>
+              <ul>
+                <li>第1〜3章で、生成AIの基礎とTransformerの仕組みという「土台」を固める</li>
+                <li>
+                  第4〜8章で、巨大なモデルを効率よく学習・調整・デプロイするための技術（メモリ最適化、LoRA/QLoRA、RLHF、モデル圧縮）を身につける
+                </li>
+                <li>
+                  第9〜11章で、RAGとエージェントによる「コンテキスト認識」、そして拡散モデルによる「マルチモーダル」なアプリケーションの作り方を学ぶ
+                </li>
+                <li>第12章で、それらすべてをAmazon Bedrockという具体的なサービス上に落とし込む</li>
+              </ul>
+              <p>
+                生成AI、特にAWSのマネージドサービス周りは変化が非常に速い分野です。本書で体系的な「地図」を頭に入れつつ、Amazon
+                Bedrock
+                AgentCoreのような最新のサービスアップデートは都度、公式ドキュメントで確認しながら学習を進めることをおすすめします。
+              </p>
+            </div>
+          </section>
+
+          <section class="section" id="references">
+            <div class="section-kicker"><i class="ti ti-bookmark"></i>SOURCES</div>
+            <h2>参考文献・出典</h2>
+            <div class="ref-list">
+              <div class="ref-card">
+                <span class="ref-num">1</span>
+                <div class="ref-body">
+                  <div class="ref-title">O'Reilly公式書籍ページ「Generative AI on AWS」</div>
+                  <div class="ref-url">
+                    https://www.oreilly.com/library/view/generative-ai-on/9781098159214/
+                  </div>
+                </div>
+              </div>
+              <div class="ref-card">
+                <span class="ref-num">2</span>
+                <div class="ref-body">
+                  <div class="ref-title">著者公式GitHubリポジトリ generative-ai-on-aws</div>
+                  <div class="ref-url">
+                    https://github.com/generative-ai-on-aws/generative-ai-on-aws
+                  </div>
+                </div>
+              </div>
+              <div class="ref-card">
+                <span class="ref-num">3</span>
+                <div class="ref-body">
+                  <div class="ref-title">
+                    AWSサンプルのワークショップリポジトリ data-science-on-aws
+                  </div>
+                  <div class="ref-url">https://github.com/aws-samples/data-science-on-aws</div>
+                </div>
+              </div>
+              <div class="ref-card">
+                <span class="ref-num">4</span>
+                <div class="ref-body">
+                  <div class="ref-title">Bookshop.org 書籍情報・著者紹介ページ</div>
+                  <div class="ref-url">
+                    https://bookshop.org/p/books/generative-ai-on-aws-building-context-aware-multimodal-reasoning-applications-anje-barth/e415aa7851c60313
+                  </div>
+                </div>
+              </div>
+              <div class="ref-card">
+                <span class="ref-num">5</span>
+                <div class="ref-body">
+                  <div class="ref-title">Amazon.com 書籍ページ（推薦コメント掲載）</div>
+                  <div class="ref-url">
+                    https://www.amazon.com/Generative-AWS-Context-Aware-Multimodal-Applications/dp/1098159225
+                  </div>
+                </div>
+              </div>
+              <div class="ref-card">
+                <span class="ref-num">6</span>
+                <div class="ref-body">
+                  <div class="ref-title">Sebastian Raschka氏によるLoRA解説ブログ</div>
+                  <div class="ref-url">
+                    https://sebastianraschka.com/blog/2023/llm-finetuning-lora.html
+                  </div>
+                </div>
+              </div>
+              <div class="ref-card">
+                <span class="ref-num">7</span>
+                <div class="ref-body">
+                  <div class="ref-title">Sebastian Raschka氏によるLoRA/QLoRA実験知見の投稿</div>
+                  <div class="ref-url">https://x.com/rasbt/status/1712816975083155496</div>
+                </div>
+              </div>
+              <div class="ref-card">
+                <span class="ref-num">8</span>
+                <div class="ref-body">
+                  <div class="ref-title">Jay Alammar氏「The Illustrated Transformer」</div>
+                  <div class="ref-url">https://jalammar.github.io/illustrated-transformer/</div>
+                </div>
+              </div>
+              <div class="ref-card">
+                <span class="ref-num">9</span>
+                <div class="ref-body">
+                  <div class="ref-title">Andrew Ng氏によるRAG／Agentic RAGに関する投稿</div>
+                  <div class="ref-url">https://x.com/AndrewYNg/status/1945502636012445937</div>
+                </div>
+              </div>
+              <div class="ref-card">
+                <span class="ref-num">10</span>
+                <div class="ref-body">
+                  <div class="ref-title">
+                    Chip Huyen氏『AI Engineering』RAGとエージェントの章に関する解説
+                  </div>
+                  <div class="ref-url">
+                    https://alexstrick.com/posts/2025-01-24-notes-on-ai-engineering-chip-huyen-chapter-6.html
+                  </div>
+                </div>
+              </div>
+              <div class="ref-card">
+                <span class="ref-num">11</span>
+                <div class="ref-body">
+                  <div class="ref-title">
+                    AWSブログ「Introducing Gemma 4 models on Amazon Bedrock」
+                  </div>
+                  <div class="ref-url">
+                    https://aws.amazon.com/blogs/machine-learning/introducing-gemma-4-models-on-amazon-bedrock/
+                  </div>
+                </div>
+              </div>
+              <div class="ref-card">
+                <span class="ref-num">12</span>
+                <div class="ref-body">
+                  <div class="ref-title">
+                    About Amazon「New Amazon Bedrock AgentCore capabilities」
+                  </div>
+                  <div class="ref-note">
+                    Amazonニュースルームによる発表記事。AWS公式技術ドキュメントではない
+                  </div>
+                  <div class="ref-url">
+                    https://www.aboutamazon.com/news/aws/aws-amazon-bedrock-agent-core-ai-agents
+                  </div>
+                </div>
+              </div>
+              <div class="ref-card">
+                <span class="ref-num">13</span>
+                <div class="ref-body">
+                  <div class="ref-title">Amazon Bedrock AgentCore 公式リリースノート</div>
+                  <div class="ref-url">
+                    https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/release-notes.html
+                  </div>
+                </div>
+              </div>
+              <div class="ref-card">
+                <span class="ref-num">14</span>
+                <div class="ref-body">
+                  <div class="ref-title">
+                    AWS「Amazon Bedrock AgentCore expands to two new regions」
+                  </div>
+                  <div class="ref-url">
+                    https://aws.amazon.com/about-aws/whats-new/2026/08/bedrock-agentcore-two-new-regions/
+                  </div>
+                </div>
+              </div>
+              <div class="ref-card">
+                <span class="ref-num">15</span>
+                <div class="ref-body">
+                  <div class="ref-title">
+                    AWSブログ「New in Amazon Bedrock AgentCore: broader knowledge and continuous
+                    learning」
+                  </div>
+                  <div class="ref-url">
+                    https://aws.amazon.com/blogs/machine-learning/new-in-amazon-bedrock-agentcore-build-agents-with-broader-knowledge-and-continuous-learning/
+                  </div>
+                </div>
+              </div>
+              <div class="ref-card">
+                <span class="ref-num">16</span>
+                <div class="ref-body">
+                  <div class="ref-title">
+                    Enterprise DNA「AWS Retires Bedrock Agents: AgentCore Is the New Path」
+                  </div>
+                  <div class="ref-note">第三者による解説記事。AWS公式技術ドキュメントではない</div>
+                  <div class="ref-url">
+                    https://enterprisedna.co/resources/news/amazon-bedrock-agents-classic-agentcore-enterprise-july-2026/
+                  </div>
+                </div>
+              </div>
+              <div class="ref-card">
+                <span class="ref-num">17</span>
+                <div class="ref-body">
+                  <div class="ref-title">
+                    AWSブログ「Introducing Amazon Bedrock Managed Knowledge Base」
+                  </div>
+                  <div class="ref-url">
+                    https://aws.amazon.com/blogs/aws/introducing-amazon-bedrock-managed-knowledge-base-for-faster-more-accurate-enterprise-ai-applications/
+                  </div>
+                </div>
+              </div>
+              <div class="ref-card">
+                <span class="ref-num">18</span>
+                <div class="ref-body">
+                  <div class="ref-title">
+                    AWS公式ドキュメント「Supported foundation models in Amazon Bedrock」
+                  </div>
+                  <div class="ref-url">
+                    https://docs.aws.amazon.com/bedrock/latest/userguide/models-supported.html
+                  </div>
+                </div>
+              </div>
+              <div class="ref-card">
+                <span class="ref-num">19</span>
+                <div class="ref-body">
+                  <div class="ref-title">
+                    AWS公式ドキュメント「Amazon Bedrock Agents Classic maintenance mode」
+                  </div>
+                  <div class="ref-note">提供停止日と既存顧客の許可リスト条件を記載</div>
+                  <div class="ref-url">
+                    https://docs.aws.amazon.com/bedrock/latest/userguide/agents-classic-maintenance-mode.html
+                  </div>
+                </div>
+              </div>
+              <div class="ref-card">
+                <span class="ref-num">20</span>
+                <div class="ref-body">
+                  <div class="ref-title">AWS公式ドキュメント「Amazon Bedrock Knowledge Bases」</div>
+                  <div class="ref-url">
+                    https://docs.aws.amazon.com/bedrock/latest/userguide/knowledge-base.html
+                  </div>
+                </div>
+              </div>
+              <div class="ref-card">
+                <span class="ref-num">21</span>
+                <div class="ref-body">
+                  <div class="ref-title">
+                    AWS公式ドキュメント「Understanding intelligent prompt routing in Amazon
+                    Bedrock」
+                  </div>
+                  <div class="ref-url">
+                    https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-routing.html
+                  </div>
+                </div>
+              </div>
+              <div class="ref-card">
+                <span class="ref-num">22</span>
+                <div class="ref-body">
+                  <div class="ref-title">
+                    AWS公式ドキュメント「Add observability to your Amazon Bedrock AgentCore
+                    resources」
+                  </div>
+                  <div class="ref-url">
+                    https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/observability-configure.html
+                  </div>
+                </div>
+              </div>
+              <div class="ref-card">
+                <span class="ref-num">23</span>
+                <div class="ref-body">
+                  <div class="ref-title">
+                    Sebastian Raschka氏「Practical Tips for Finetuning LLMs Using LoRA (Low-Rank
+                    Adaptation)」
+                  </div>
+                  <div class="ref-note">
+                    QLoRAのメモリ33%削減・学習時間39%増加、および実測時間1.85時間／2.79時間の原典
+                  </div>
+                  <div class="ref-url">
+                    https://magazine.sebastianraschka.com/p/practical-tips-for-finetuning-llms
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <footer class="footer">
+            <p>
+              本ガイドの記述内容は2026年9月10日時点で確認できた情報に基づいています。特にAmazon
+              Bedrockまわりのサービス仕様は変更が頻繁なため、実装の際は必ずAWS公式ドキュメントの最新版をご確認ください。
+            </p>
+          </footer>
+        </div>
+      </div>
+    </div>
+
+    <script
+      src="https://cdn.jsdelivr.net/npm/mermaid@11.12.0/dist/mermaid.min.js"
+      integrity="sha384-o+g/BxPwhi0C3RK7oQBxQuNimeafQ3GE/ST4iT2BxVI4Wzt60SH4pq9iXVYujjaS"
+      crossorigin="anonymous"
+    ></script>
+    <script>
+      const DIAGRAMS = {
+        roadmap: `flowchart TB
+    P1["フェーズ1 基礎を学ぶ 第1〜3章"] --> A1["生成AIのユースケースとプロジェクトライフサイクル"]
+    A1 --> A2["プロンプトエンジニアリングとインコンテキスト学習"]
+    A2 --> A3["大規模言語基盤モデルの仕組み"]
+    A3 --> P2["フェーズ2 モデルを適応させる 第4〜8章"]
+    P2 --> B1["メモリと計算の最適化"]
+    B1 --> B2["ファインチューニングと評価"]
+    B2 --> B3["パラメータ効率の良いファインチューニング LoRAとQLoRA"]
+    B3 --> B4["RLHFによる人間整合"]
+    B4 --> B5["モデルデプロイの最適化"]
+    B5 --> P3["フェーズ3 アプリケーションを組む 第9〜11章"]
+    P3 --> C1["RAGとエージェントによるコンテキスト認識推論"]
+    C1 --> C2["マルチモーダル基盤モデル"]
+    C2 --> C3["Stable Diffusionの制御生成とファインチューニング"]
+    C3 --> P4["フェーズ4 AWSで実装する 第12章"]
+    P4 --> D1["Amazon Bedrock マネージド生成AIサービス"]
+    classDef hub fill:#c9c4ef,color:#221f52,stroke:#3f3d8a,stroke-width:1px;
+    classDef done fill:#bfe4d2,color:#123722,stroke:#2f6b4f,stroke-width:1px;
+    class P1 hub;
+    class D1 done;`,
+        lifecycle: `flowchart TB
+    A["ユースケースの定義 業務課題とゴールを明確化"] --> B["基盤モデルの選定 Model Hubから候補を比較"]
+    B --> C["プロンプトエンジニアリング Zero-Shot・One-Shot・Few-Shotで試行"]
+    C --> D{"性能は十分か"}
+    D -->|"はい"| H["アプリケーション統合 RAG・エージェント連携"]
+    D -->|"いいえ"| E["ファインチューニング 指示チューニング・LoRA等"]
+    E --> G["評価 ベンチマーク・人手評価"]
+    E -.->|"任意 価値観との整合が必要な場合"| F["人間フィードバックによる整合 RLHF"]
+    F --> G
+    G --> D
+    H --> I["デプロイ最適化 量子化・蒸留・オートスケーリング"]
+    I --> J["継続的モニタリング 本番運用とフィードバック収集"]
+    J -.->|"改善サイクル"| A
+    classDef hub fill:#c9c4ef,color:#221f52,stroke:#3f3d8a,stroke-width:1px;
+    classDef done fill:#bfe4d2,color:#123722,stroke:#2f6b4f,stroke-width:1px;
+    class A hub;
+    class J done;`,
+        transformer: `flowchart TB
+    INPUT["入力処理"] --> A["入力テキスト"]
+    A --> B["トークナイザ テキストをトークンIDへ分割"]
+    B --> C["埋め込み層 トークンをベクトル化"]
+    C --> D["位置エンコーディング 語順情報を付加"]
+    D --> ENC["エンコーダ"]
+    ENC --> E["自己注意層 Self-Attention"]
+    E --> F["フィードフォワード層 FFN"]
+    T["デコーダ入力 1つ右にずらした出力系列"] --> DEC["デコーダ"]
+    DEC --> G["マスク付き自己注意層 Masked Self-Attention"]
+    G -->|"クエリQ"| H["エンコーダ-デコーダ注意層 Cross-Attention"]
+    F -->|"エンコーダ出力をキーとバリューとして供給"| H
+    H --> I["フィードフォワード層 FFN"]
+    I --> J["Softmax出力層 次トークンの確率分布"]
+    J --> K["生成テキスト"]
+    classDef hub fill:#c9c4ef,color:#221f52,stroke:#3f3d8a,stroke-width:1px;
+    classDef done fill:#bfe4d2,color:#123722,stroke:#2f6b4f,stroke-width:1px;
+    class INPUT hub;
+    class K done;`,
+        lora: `flowchart LR
+    E["入力x"] --> A["元の重み行列W 凍結・更新なし"]
+    E --> B["低ランク行列A"]
+    B --> C["低ランク行列B"]
+    A -->|"元の重みによる出力"| S["加算"]
+    C -->|"低ランク行列による差分出力"| S
+    S --> D["出力"]
+    classDef hub fill:#c9c4ef,color:#221f52,stroke:#3f3d8a,stroke-width:1px;
+    classDef done fill:#bfe4d2,color:#123722,stroke:#2f6b4f,stroke-width:1px;
+    class E hub;
+    class D done;`,
+        rlhf: `flowchart TB
+    A["指示チューニング済みモデル SFTモデル"] --> B["同一プロンプトに対し複数の応答を生成"]
+    B --> C["人間のラベラーが応答をランキング評価"]
+    C --> D["報酬モデルを訓練 Reward Model"]
+    D --> E["ポリシーモデルがプロンプトへの応答を生成"]
+    E --> F["報酬モデルで応答をスコアリング"]
+    F --> G["PPOでポリシーモデルを更新 Proximal Policy Optimization"]
+    G --> H{"報酬は改善したか"}
+    H -->|"はい"| I["人間の価値観に整合したRLHF済みモデル"]
+    H -->|"いいえ・過学習の兆候"| J["報酬ハッキングを緩和 KLダイバージェンス制約など"]
+    J --> E
+    classDef hub fill:#c9c4ef,color:#221f52,stroke:#3f3d8a,stroke-width:1px;
+    classDef done fill:#bfe4d2,color:#123722,stroke:#2f6b4f,stroke-width:1px;
+    class A hub;
+    class I done;`,
+        rag: `flowchart TB
+    A["ユーザーの質問"] --> B["クエリを埋め込みベクトルに変換"]
+    B --> C["ベクトルストアで類似検索 Vector Store"]
+    C --> D["関連文書チャンクを取得 Document Retrieval"]
+    D --> E["最大限界関連性で再ランキング Maximum Marginal Relevance"]
+    E --> F["取得した文脈をプロンプトに追加 Prompt Augmentation"]
+    F --> G["LLMが文脈をもとに推論"]
+    G --> H["根拠に基づく回答を生成"]
+    classDef hub fill:#c9c4ef,color:#221f52,stroke:#3f3d8a,stroke-width:1px;
+    classDef done fill:#bfe4d2,color:#123722,stroke:#2f6b4f,stroke-width:1px;
+    class A hub;
+    class H done;`,
+        react: `flowchart TB
+    A["ユーザーのゴール"] --> B["思考 Thought 次に何をすべきか推論"]
+    B --> C["行動 Action ツールやAPIを呼び出す"]
+    C --> D["観察 Observation ツールの実行結果を取得"]
+    D --> E{"ゴールは達成されたか"}
+    E -->|"いいえ"| B
+    E -->|"はい"| F["最終回答を返す"]
+    classDef hub fill:#c9c4ef,color:#221f52,stroke:#3f3d8a,stroke-width:1px;
+    classDef done fill:#bfe4d2,color:#123722,stroke:#2f6b4f,stroke-width:1px;
+    class A hub;
+    class F done;`,
+        diffusion: `flowchart TB
+    FWD["前方拡散プロセス Forward Diffusion 学習時のみ"] --> A["学習データの元画像"]
+    A --> B["少しノイズを加える"]
+    B --> C["さらにノイズを加える 繰り返し"]
+    C --> D["ノイズを加えた画像 ノイズ予測の学習教材"]
+    REV["逆拡散プロセス Reverse Diffusion 生成時"] --> UNET["U-Net内部の処理"]
+    N["初期ノイズ ガウス分布からサンプリング 潜在空間のノイズ"] --> UNET
+    E["テキストプロンプト 条件付け"] --> UNET
+    UNET --> F["クロスアテンション層でテキスト条件を内部に注入"]
+    F --> G["ノイズを予測"]
+    G --> H["予測ノイズを除去して1ステップ更新"]
+    H -.->|"ステップを反復"| F
+    D -.->|"ノイズ予測器の学習 学習時の入力"| F
+    H --> I["生成された画像"]
+    classDef hub fill:#c9c4ef,color:#221f52,stroke:#3f3d8a,stroke-width:1px;
+    classDef done fill:#bfe4d2,color:#123722,stroke:#2f6b4f,stroke-width:1px;
+    class REV hub;
+    class I done;`,
+        bedrock: `flowchart TB
+    A["アプリケーション Web・モバイル・業務システム"] --> B["Amazon Bedrock 統合API"]
+    B --> GI["ガードレール 推論前の入力評価"]
+    GI --> C["基盤モデル群 Titan・Claude・Stable Diffusion等"]
+    GI --> D["ナレッジベース Knowledge Base for RAG"]
+    GI --> E["エージェント Agents for Bedrock"]
+    D --> DR["検索結果 参照文書・引用元 ガードレール評価の対象外"]
+    DR --> C
+    C --> GO["ガードレール 推論後の応答評価"]
+    E --> GO
+    GO --> G["推論結果"]
+    G --> A
+    X["推論フロー全体を横断する統制 データプライバシー・ネットワークセキュリティ・ガバナンス"]
+    X -.-> B
+    X -.-> GI
+    X -.-> C
+    X -.-> D
+    X -.-> DR
+    X -.-> E
+    X -.-> GO
+    AC["Amazon Bedrock AgentCore エージェント・Gateway・Memory"]
+    MKB["Bedrock Managed Knowledge Base"]
+    OBS["AgentCore Observability 対象はAgentCoreのリソースのみ"]
+    OBS -.-> AC
+    OBS -.->|"統合"| MKB
+    classDef hub fill:#c9c4ef,color:#221f52,stroke:#3f3d8a,stroke-width:1px;
+    classDef done fill:#bfe4d2,color:#123722,stroke:#2f6b4f,stroke-width:1px;
+    class A hub;
+    class G done;`,
+      };
+      function dedent(str) {
+        const lines = str
+          .replace(/^\n/, '')
+          .replace(/\n\s*$/, '')
+          .split('\n');
+        let minIndent = Infinity;
+        for (const line of lines) {
+          if (line.trim().length === 0) continue;
+          const m = line.match(/^(\s*)/);
+          minIndent = Math.min(minIndent, m[1].length);
+        }
+        if (!isFinite(minIndent)) minIndent = 0;
+        return lines.map((l) => l.slice(minIndent)).join('\n');
+      }
+
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: 'base',
+        themeVariables: {
+          primaryColor: '#fffdf8',
+          primaryBorderColor: '#3f3d8a',
+          primaryTextColor: '#2a2418',
+          lineColor: '#7a3b63',
+          fontFamily: 'Noto Sans JP, sans-serif',
+          fontSize: '16px',
+          edgeLabelBackground: '#faf6ec',
+        },
+        flowchart: { useMaxWidth: false, htmlLabels: true },
+      });
+
+      async function renderDiagrams() {
+        const nodes = document.querySelectorAll('[data-diagram]');
+        for (const el of nodes) {
+          const key = el.getAttribute('data-diagram');
+          const src = dedent(DIAGRAMS[key]);
+          const id = 'mmd-' + key;
+          try {
+            const { svg } = await mermaid.render(id, src);
+            el.innerHTML = svg;
+            const svgEl = el.querySelector('svg');
+            if (svgEl) {
+              svgEl.removeAttribute('width');
+              svgEl.removeAttribute('height');
+              const vb = svgEl.getAttribute('viewBox');
+              let w = null;
+              if (vb) {
+                const parts = vb.split(/\s+/).map(Number);
+                if (parts.length === 4) {
+                  w = parts[2];
+                  svgEl.setAttribute(
+                    'viewBox',
+                    `${parts[0]} ${parts[1]} ${parts[2]} ${parts[3] + 15}`,
+                  );
+                }
+              }
+              svgEl.style.display = 'block';
+              if (w) {
+                svgEl.style.width = w + 'px';
+              }
+              svgEl.style.maxWidth = 'none';
+              svgEl.style.height = 'auto';
+              svgEl.style.overflow = 'visible';
+              svgEl.style.flexShrink = '0';
+            }
+          } catch (e) {
+            el.innerHTML = '<p class="diagram-loading">図の読み込みに失敗しました</p>';
+            console.error('mermaid render failed for', key, e);
+          }
+        }
+      }
+
+      document.addEventListener('DOMContentLoaded', () => {
+        renderDiagrams();
+
+        // Mobile menu
+        const sidebar = document.getElementById('sidebar');
+        const scrim = document.getElementById('scrim');
+        const toggle = document.getElementById('mobileToggle');
+        function openMenu() {
+          sidebar.classList.add('open');
+          scrim.classList.add('show');
+        }
+        function closeMenu() {
+          sidebar.classList.remove('open');
+          scrim.classList.remove('show');
+        }
+        if (toggle) {
+          toggle.addEventListener('click', () => {
+            if (sidebar.classList.contains('open')) closeMenu();
+            else openMenu();
+          });
+        }
+        if (scrim) scrim.addEventListener('click', closeMenu);
+        document.querySelectorAll('.nav-a').forEach((a) => {
+          a.addEventListener('click', () => {
+            closeMenu();
+          });
+        });
+
+        // Checklist
+        const checklistItems = document.querySelectorAll('.checklist li');
+        const counter = document.getElementById('checklistCounter');
+        function updateCounter() {
+          const total = checklistItems.length;
+          const done = document.querySelectorAll('.checklist input[type=checkbox]:checked').length;
+          if (counter) counter.textContent = `${done} / ${total} 完了`;
+        }
+        checklistItems.forEach((li) => {
+          const input = li.querySelector('input[type=checkbox]');
+          if (!input) return;
+          input.addEventListener('change', () => {
+            li.classList.toggle('done', input.checked);
+            updateCounter();
+          });
+        });
+        updateCounter();
+
+        // Sidebar active-highlight via IntersectionObserver
+        const navLinks = Array.from(document.querySelectorAll('.nav-a'));
+        const linkByHref = {};
+        navLinks.forEach((a) => {
+          linkByHref[a.getAttribute('href')] = a;
+        });
+        const targets = navLinks
+          .map((a) => document.querySelector(a.getAttribute('href')))
+          .filter(Boolean);
+        const seen = new Set();
+        const uniqueTargets = targets.filter((t) => {
+          if (seen.has(t)) return false;
+          seen.add(t);
+          return true;
+        });
+
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                const id = '#' + entry.target.id;
+                const link = linkByHref[id];
+                if (link) {
+                  navLinks.forEach((a) => a.classList.remove('active'));
+                  link.classList.add('active');
+                }
+              }
+            });
+          },
+          { rootMargin: '-20% 0px -70% 0px' },
+        );
+
+        uniqueTargets.forEach((t) => observer.observe(t));
+      });
+    </script>
+  </body>
+</html>
