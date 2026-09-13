@@ -84,7 +84,7 @@
 
 ```mermaid
 flowchart TB
-    A["個人のデジタルデータ<br/>LinkedIn / Medium / GitHub / 記事"] --> B["データ収集パイプライン<br/>Webクローラー"]
+    A["個人のデジタルデータ<br/>Medium / GitHub / 記事<br/>（LinkedInは非推奨・対象外）"] --> B["データ収集パイプライン<br/>Webクローラー"]
     B --> C[("NoSQLデータウェアハウス<br/>MongoDB")]
     C --> D["特徴量パイプライン<br/>クレンジング・チャンク化・埋め込み"]
     D --> E[("ベクトルDB<br/>Qdrant")]
@@ -178,7 +178,7 @@ flowchart TB
 
 ### 第3章:データエンジニアリング
 
-LinkedIn・Medium・GitHub・個人ブログなど複数ソースから、それぞれ異なる形式のデータをクロールするための「ディスパッチャー + クローラー」パターンを実装します。取得したデータはODM(Object-Document Mapping)パターンを使ってMongoDBに正規化して保存されます。Webクローリング特有のトラブルシューティング(Seleniumのエラー対応など)も扱われます。
+Medium・GitHub・個人ブログなど複数ソースから、それぞれ異なる形式のデータをクロールするための「ディスパッチャー + クローラー」パターンを実装します(本書刊行時点ではLinkedInも対象に含まれていましたが、`LinkedInCrawler`は現在`is_deprecated=True`で既定では利用できません。詳細は後述の環境構築手順を参照)。取得したデータはODM(Object-Document Mapping)パターンを使ってMongoDBに正規化して保存されます。Webクローリング特有のトラブルシューティング(Seleniumのエラー対応など)も扱われます。
 
 ```mermaid
 flowchart TB
