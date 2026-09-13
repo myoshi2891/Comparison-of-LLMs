@@ -371,7 +371,7 @@ ReActは「Reasoning（推論）」と「Acting（行動）」を交互に繰り
 
 ```mermaid
 flowchart TB
-    subgraph FWD["前方拡散プロセス Forward Diffusion<br/>（標準的な学習プロセス）"]
+    subgraph FWD["前方拡散プロセス Forward Diffusion<br/>（潜在拡散モデル＝Stable Diffusion等における学習プロセス）"]
         A0["学習データの元画像<br/>（ピクセル空間）"] -->|"VAEエンコーダ"| A["元画像の潜在表現<br/>（潜在空間）"]
         A --> B["潜在表現に<br/>少しノイズを加える"]
         B --> C["さらにノイズを加える<br/>繰り返し"]
