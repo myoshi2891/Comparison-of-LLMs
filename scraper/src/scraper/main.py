@@ -131,19 +131,24 @@ def _write_output(data: PricingData, output_path: Path) -> None:
 
     with output_path.open("w", encoding="utf-8") as f:
         json.dump(payload, f, ensure_ascii=False, indent=2)
+        # 末尾改行を付ける（Biome の formatter が要求するため。
+        # 無いと web-next 側の `bun run lint` が pricing.json で落ちる）
+        f.write("\n")
     logger.info("✓ pricing.json を書き込みました: %s", output_path)
     logger.info("  API モデル: %d件 / コーディングツール: %d件",
                 len(data.api_models), len(data.sub_tools))
     logger.info("  USD/JPY: %.2f (as of %s)", data.jpy_rate, data.jpy_rate_date)
 
-    web_data_path = (
-        Path(__file__).parent.parent.parent.parent.parent
-        / "web" / "src" / "data" / "pricing.json"
-    )
-    if web_data_path.parent.exists():
-        with web_data_path.open("w", encoding="utf-8") as f:
-            json.dump(payload, f, ensure_ascii=False, indent=2)
-        logger.info("  web/src/data/pricing.json にもコピー完了")
+    repo_root = Path(__file__).parent.parent.parent.parent
+    for web_data_path in (
+        repo_root / "web-next" / "data" / "pricing.json",
+        repo_root / "web-next" / "public" / "pricing.json",
+    ):
+        if web_data_path.parent.exists():
+            with web_data_path.open("w", encoding="utf-8") as f:
+                json.dump(payload, f, ensure_ascii=False, indent=2)
+                f.write("\n")
+            logger.info("  %s にもコピー完了", web_data_path.relative_to(repo_root))
 
 
 def main(argv: list[str] | None = None) -> int:

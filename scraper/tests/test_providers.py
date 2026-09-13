@@ -18,7 +18,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from scraper.models import ApiModel
+from scraper.models import ApiModel, PriceProvenance
 from scraper.providers import anthropic, aws, deepseek, google, moonshot, openai, xai, zhipu
 
 
@@ -97,6 +97,10 @@ class TestAnthropic:
         assert opus.price_out == 30.30
         assert opus.scrape_status == "success"
         assert opus.provider == "Anthropic"
+        # スクレイプ成功時は出自が "scraped" として刻まれ、次回以降の実行で
+        # ハードコード値へ巻き戻らないことを保証する
+        assert opus.provenance is not None
+        assert opus.provenance.origin == "scraped"
 
     def test_fallback_on_empty_html(self):
         with patch("scraper.providers.anthropic.get_page_text", return_value="<html></html>"):
@@ -142,6 +146,38 @@ class TestOpenAI:
         with patch("scraper.providers.openai.get_page_text", return_value="<html></html>"):
             models = openai.scrape()
         _assert_all_fallback(models, openai._FALLBACKS, "OpenAI")
+
+    # 前方一致するモデル名（GPT-5.5 / GPT-5.5 Pro、GPT-5.2 / GPT-5.2 Pro）が
+    # 互いの価格を拾わないことを検証する（Copilot Pro/Pro Max と同型の汚染）。
+    _OVERLAP_HTML = (
+        "<html><body>"
+        "<p>GPT-5.5 Pro $31.00 / 1M tokens input</p>"
+        "<p>GPT-5.5 Pro output cost is $181.00</p>"
+        "<p>GPT-5.5 $5.50 / 1M tokens input</p>"
+        "<p>GPT-5.5 output cost is $31.50</p>"
+        "<p>GPT-5.2 Pro $22.00 / 1M tokens input</p>"
+        "<p>GPT-5.2 Pro output cost is $169.00</p>"
+        "<p>GPT-5.2 $1.85 / 1M tokens input</p>"
+        "<p>GPT-5.2 output cost is $14.50</p>"
+        "</body></html>"
+    )
+
+    @pytest.mark.parametrize(
+        ("name", "price_in", "price_out"),
+        [
+            ("GPT-5.5", 5.50, 31.50),
+            ("GPT-5.5 Pro", 31.00, 181.00),
+            ("GPT-5.2", 1.85, 14.50),
+            ("GPT-5.2 Pro", 22.00, 169.00),
+        ],
+    )
+    def test_overlapping_names_keep_own_prices(self, name, price_in, price_out):
+        with patch("scraper.providers.openai.get_page_text", return_value=self._OVERLAP_HTML):
+            models = openai.scrape()
+        m = _find(models, name)
+        assert m.price_in == price_in
+        assert m.price_out == price_out
+        assert m.scrape_status == "success"
 
 
 # --------------------------------------------------------------------------- #
@@ -331,6 +367,31 @@ class TestMoonshot:
             models = moonshot.scrape()
         _assert_all_fallback(models, moonshot._FALLBACKS, "Moonshot(Kimi)")
 
+    # "Kimi K2.7 Code" が "Kimi K2.7 Code Highspeed" の価格を拾わないこと。
+    _OVERLAP_HTML = (
+        "<html><body>"
+        "<p>Kimi K2.7 Code Highspeed $1.95</p>"
+        "<p>Kimi K2.7 Code Highspeed output $8.50</p>"
+        "<p>Kimi K2.7 Code $0.99</p>"
+        "<p>Kimi K2.7 Code output $4.50</p>"
+        "</body></html>"
+    )
+
+    @pytest.mark.parametrize(
+        ("name", "price_in", "price_out"),
+        [
+            ("Kimi K2.7 Code", 0.99, 4.50),
+            ("Kimi K2.7 Code Highspeed", 1.95, 8.50),
+        ],
+    )
+    def test_overlapping_names_keep_own_prices(self, name, price_in, price_out):
+        with patch("scraper.providers.moonshot.get_page_text", return_value=self._OVERLAP_HTML):
+            models = moonshot.scrape()
+        m = _find(models, name)
+        assert m.price_in == price_in
+        assert m.price_out == price_out
+        assert m.scrape_status == "success"
+
 
 # --------------------------------------------------------------------------- #
 # Zhipu(GLM)（"GLM-5.2" のみ。key "glm-5\.2" は "GLM-4.6" と衝突しない）
@@ -356,3 +417,293 @@ class TestZhipu:
         with patch("scraper.providers.zhipu.get_page_text", return_value="<html></html>"):
             models = zhipu.scrape()
         _assert_all_fallback(models, zhipu._FALLBACKS, "Zhipu(GLM)")
+
+    # "GLM-5.3" が "GLM-5.3-Flash" の価格を拾わないこと。
+    _OVERLAP_HTML = (
+        "<html><body>"
+        "<p>GLM-5.3-Flash $0.16</p>"
+        "<p>GLM-5.3-Flash output $0.55</p>"
+        "<p>GLM-5.3 $1.45</p>"
+        "<p>GLM-5.3 output $4.45</p>"
+        "</body></html>"
+    )
+
+    @pytest.mark.parametrize(
+        ("name", "price_in", "price_out"),
+        [
+            ("GLM-5.3", 1.45, 4.45),
+            ("GLM-5.3-Flash", 0.16, 0.55),
+        ],
+    )
+    def test_overlapping_names_keep_own_prices(self, name, price_in, price_out):
+        with patch("scraper.providers.zhipu.get_page_text", return_value=self._OVERLAP_HTML):
+            models = zhipu.scrape()
+        m = _find(models, name)
+        assert m.price_in == price_in
+        assert m.price_out == price_out
+        assert m.scrape_status == "success"
+
+
+# --------------------------------------------------------------------------- #
+# 3層フォールバックの優先順位
+#
+# 「スクレイプ成功 → 既存 JSON の値 → ハードコード値」の 2 層目は、本来
+# **過去に実際にスクレイプ成功した値**を保持するためのもの。既存 JSON の値が
+# 単なるフォールバック値の写し（scrape_status == "fallback"）だった場合にまで
+# 優先してしまうと、_FALLBACKS 側の価格改定が永久に反映されなくなる。
+# --------------------------------------------------------------------------- #
+_FALLBACK_PRECEDENCE_CASES = [
+    # (provider モジュール, 価格取得関数のパッチ先, existing の provider 文字列)
+    (anthropic, "scraper.providers.anthropic.get_page_text", "Anthropic"),
+    (openai, "scraper.providers.openai.get_page_text", "OpenAI"),
+    (deepseek, "scraper.providers.deepseek.get_page_text", "DeepSeek"),
+    (moonshot, "scraper.providers.moonshot.get_page_text", "Moonshot(Kimi)"),
+    (xai, "scraper.providers.xai.get_page_text", "xAI"),
+    (zhipu, "scraper.providers.zhipu.get_page_text", "Zhipu(GLM)"),
+]
+
+_STALE_IN = 999.01
+_STALE_OUT = 999.02
+
+
+def _stale_existing(
+    provider: str,
+    name: str,
+    status: str,
+    provenance: PriceProvenance | None = None,
+) -> list[ApiModel]:
+    """
+    Build a one-element existing-model list carrying deliberately wrong prices.
+
+    Parameters:
+        provider (str): Provider string the target scraper filters on.
+        name (str): Model name that must exist in the scraper's `_FALLBACKS`.
+        status (str): `scrape_status` to stamp on the stale entry.
+        provenance (PriceProvenance | None): 価格の出自。None なら旧スキーマ相当。
+
+    Returns:
+        list[ApiModel]: Single stale model usable as the `existing` argument.
+    """
+    return [
+        ApiModel(
+            provider=provider,
+            name=name,
+            tag="",
+            cls="tag-bal",
+            price_in=_STALE_IN,
+            price_out=_STALE_OUT,
+            sub_ja="",
+            sub_en="",
+            scrape_status=status,  # type: ignore[arg-type]
+            provenance=provenance,
+        )
+    ]
+
+
+@pytest.mark.parametrize(
+    "module,patch_target,provider",
+    _FALLBACK_PRECEDENCE_CASES,
+    ids=[c[2] for c in _FALLBACK_PRECEDENCE_CASES],
+)
+def test_stale_fallback_existing_does_not_shadow_hardcoded_price(
+    module, patch_target, provider
+):
+    """既存 JSON の値が fallback 由来なら _FALLBACKS のハードコード値が勝つ。"""
+    name = next(iter(module._FALLBACKS))
+    expected_in, expected_out = module._FALLBACKS[name]
+    existing = _stale_existing(provider, name, "fallback")
+
+    with patch(patch_target, return_value="<html></html>"):
+        models = module.scrape(existing)
+
+    m = _find(models, name)
+    assert m.price_in == expected_in, f"{provider}/{name} price_in"
+    assert m.price_out == expected_out, f"{provider}/{name} price_out"
+
+
+@pytest.mark.parametrize(
+    "module,patch_target,provider",
+    _FALLBACK_PRECEDENCE_CASES,
+    ids=[c[2] for c in _FALLBACK_PRECEDENCE_CASES],
+)
+def test_previously_scraped_existing_price_is_preserved(module, patch_target, provider):
+    """既存 JSON の値がスクレイプ成功由来なら、その値を保持する（3層設計の本来の意図）。"""
+    name = next(iter(module._FALLBACKS))
+    existing = _stale_existing(provider, name, "success")
+
+    with patch(patch_target, return_value="<html></html>"):
+        models = module.scrape(existing)
+
+    m = _find(models, name)
+    assert m.price_in == _STALE_IN, f"{provider}/{name} price_in"
+    assert m.price_out == _STALE_OUT, f"{provider}/{name} price_out"
+
+
+def test_aws_stale_fallback_existing_does_not_shadow_hardcoded_price():
+    """AWS は httpx 経由のため個別に検証する。"""
+    name = next(iter(aws._FALLBACKS))
+    expected_in, expected_out = aws._FALLBACKS[name]
+    existing = _stale_existing("AWS", name, "fallback")
+
+    with patch("scraper.providers.aws.httpx.get", side_effect=RuntimeError("offline")):
+        models = aws.scrape(existing)
+
+    m = _find(models, name)
+    assert m.price_in == expected_in
+    assert m.price_out == expected_out
+
+
+def test_aws_previously_scraped_existing_price_is_preserved():
+    name = next(iter(aws._FALLBACKS))
+    existing = _stale_existing("AWS", name, "success")
+
+    with patch("scraper.providers.aws.httpx.get", side_effect=RuntimeError("offline")):
+        models = aws.scrape(existing)
+
+    m = _find(models, name)
+    assert m.price_in == _STALE_IN
+    assert m.price_out == _STALE_OUT
+
+
+# --------------------------------------------------------------------------- #
+# 出自（provenance）の持ち越し
+#
+# `scrape_status` は「その実行でスクレイプが成功したか」しか表さないため、
+# スクレイプが 2 回連続で失敗すると 1 回目で "fallback" へ落ちた過去の成功値が
+# 2 回目で破棄され、ハードコード値まで巻き戻ってしまう。
+# `ApiModel.provenance` はこれを防ぐ。ただしハードコード値が月次更新で
+# 改定されていた場合は、そちらを優先する（2026-09-12 の設計判断を維持）。
+# --------------------------------------------------------------------------- #
+def _scraped_provenance(fb: tuple[float, float]) -> PriceProvenance:
+    """記録時点のハードコード値が `fb` だったスクレイプ成功値の出自。"""
+    return PriceProvenance(origin="scraped", fallback_in=fb[0], fallback_out=fb[1])
+
+
+@pytest.mark.parametrize(
+    "module,patch_target,provider",
+    _FALLBACK_PRECEDENCE_CASES,
+    ids=[c[2] for c in _FALLBACK_PRECEDENCE_CASES],
+)
+def test_scraped_provenance_survives_consecutive_failures(module, patch_target, provider):
+    """2 回連続でスクレイプ失敗しても、過去のスクレイプ成功値は保持される。"""
+    name = next(iter(module._FALLBACKS))
+    # 1 回目の失敗で scrape_status は "fallback" に落ちているが、
+    # provenance には出自が残っている状態。
+    existing = _stale_existing(
+        provider, name, "fallback", _scraped_provenance(module._FALLBACKS[name])
+    )
+
+    with patch(patch_target, return_value="<html></html>"):
+        models = module.scrape(existing)
+
+    m = _find(models, name)
+    assert m.price_in == _STALE_IN, f"{provider}/{name} price_in"
+    assert m.price_out == _STALE_OUT, f"{provider}/{name} price_out"
+    assert m.provenance is not None and m.provenance.origin == "scraped"
+
+
+@pytest.mark.parametrize(
+    "module,patch_target,provider",
+    _FALLBACK_PRECEDENCE_CASES,
+    ids=[c[2] for c in _FALLBACK_PRECEDENCE_CASES],
+)
+def test_revised_hardcoded_price_beats_stale_scraped_value(module, patch_target, provider):
+    """ハードコード値が改定されていれば、過去のスクレイプ成功値より優先される。"""
+    name = next(iter(module._FALLBACKS))
+    expected_in, expected_out = module._FALLBACKS[name]
+    # 記録時点のハードコード値が現在と異なる = 月次更新で改定された
+    existing = _stale_existing(
+        provider, name, "fallback", _scraped_provenance((expected_in + 1, expected_out + 1))
+    )
+
+    with patch(patch_target, return_value="<html></html>"):
+        models = module.scrape(existing)
+
+    m = _find(models, name)
+    assert m.price_in == expected_in, f"{provider}/{name} price_in"
+    assert m.price_out == expected_out, f"{provider}/{name} price_out"
+
+
+@pytest.mark.parametrize(
+    "module,patch_target,provider",
+    _FALLBACK_PRECEDENCE_CASES,
+    ids=[c[2] for c in _FALLBACK_PRECEDENCE_CASES],
+)
+def test_fallback_run_stamps_hardcoded_provenance(module, patch_target, provider):
+    """フォールバック出力には、その時点のハードコード値が出自として刻まれる。"""
+    name = next(iter(module._FALLBACKS))
+    fb_in, fb_out = module._FALLBACKS[name]
+
+    with patch(patch_target, side_effect=RuntimeError("offline")):
+        models = module.scrape(None)
+
+    m = _find(models, name)
+    assert m.provenance is not None
+    assert m.provenance.origin == "hardcoded"
+    assert (m.provenance.fallback_in, m.provenance.fallback_out) == (fb_in, fb_out)
+
+
+def test_aws_scraped_provenance_survives_consecutive_failures():
+    """AWS は httpx 経由のため個別に検証する。"""
+    name = next(iter(aws._FALLBACKS))
+    existing = _stale_existing(
+        "AWS", name, "fallback", _scraped_provenance(aws._FALLBACKS[name])
+    )
+
+    with patch("scraper.providers.aws.httpx.get", side_effect=RuntimeError("offline")):
+        models = aws.scrape(existing)
+
+    m = _find(models, name)
+    assert m.price_in == _STALE_IN
+    assert m.price_out == _STALE_OUT
+    assert m.provenance is not None and m.provenance.origin == "scraped"
+
+
+def test_aws_revised_hardcoded_price_beats_stale_scraped_value():
+    name = next(iter(aws._FALLBACKS))
+    expected_in, expected_out = aws._FALLBACKS[name]
+    existing = _stale_existing(
+        "AWS", name, "fallback", _scraped_provenance((expected_in + 1, expected_out + 1))
+    )
+
+    with patch("scraper.providers.aws.httpx.get", side_effect=RuntimeError("offline")):
+        models = aws.scrape(existing)
+
+    m = _find(models, name)
+    assert m.price_in == expected_in
+    assert m.price_out == expected_out
+
+
+def test_partial_extraction_does_not_inherit_scraped_provenance():
+    """入出力の片方だけ抽出できた混成ペアを「過去のスクレイプ成功値」として記録しない。
+
+    片方だけ抽出できると出力は「今回の抽出値 + 引き継ぎ値」の混成になる。これを
+    `origin="scraped"` で記録すると、次回の完全失敗時に混成ペアが 2 層目として
+    採用されてしまう（= 実際にはスクレイプ成功していない組み合わせが固着する）。
+    """
+    name = "DeepSeek V4 Flash"
+    fb_in, fb_out = deepseek._FALLBACKS[name]
+    existing = _stale_existing(
+        "DeepSeek", name, "fallback", _scraped_provenance((fb_in, fb_out))
+    )
+
+    # 入力価格だけ抽出できる HTML（"output" が無いため出力側は引き継ぎ値に落ちる）
+    partial_html = f"<html><body>{name} $0.44 per 1M tokens</body></html>"
+    with patch("scraper.providers.deepseek.get_page_text", return_value=partial_html):
+        first = deepseek.scrape(existing)
+
+    m = _find(first, name)
+    assert m.price_in == 0.44, "入力側は今回の抽出値"
+    assert m.price_out == _STALE_OUT, "出力側は引き継ぎ値"
+    assert m.scrape_status == "fallback"
+    assert m.provenance is not None
+    assert m.provenance.origin == "hardcoded", "混成ペアが scraped として記録されている"
+
+    # 次回実行が完全に失敗しても、混成ペアは 2 層目に採用されずハードコード値へ戻る
+    with patch(
+        "scraper.providers.deepseek.get_page_text", side_effect=RuntimeError("offline")
+    ):
+        second = deepseek.scrape(first)
+
+    m2 = _find(second, name)
+    assert (m2.price_in, m2.price_out) == (fb_in, fb_out)

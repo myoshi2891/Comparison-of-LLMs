@@ -1031,9 +1031,32 @@ if (positional.length < 2) {
 const [sourcePath, pagePath] = positional;
 
 let sourceText;
-let pageText;
 try {
   sourceText = readFileSync(sourcePath, "utf8");
+} catch (error) {
+  console.error(`読み込み失敗: ${error instanceof Error ? error.message : String(error)}`);
+  process.exit(2);
+}
+
+const sourceInventory = /\.(?:md|markdown)$/i.test(sourcePath)
+  ? inventoryMarkdown(sourceText)
+  : inventoryHtml(sourceText);
+
+if (flags.has("--emit-headings")) {
+  // 契約テスト S-1 に貼り付ける期待値配列を出力する。
+  // page.tsx がまだ存在しない Phase 1（見出し抽出）でも動くよう、
+  // page 側の読み込みより前に判定して抜ける。
+  for (let level = 1; level <= 6; level += 1) {
+    const headings = sourceInventory.headings.filter((h) => h.level === level).map((h) => h.text);
+    console.log(`const EXPECTED_H${level} = [`);
+    for (const text of headings) console.log(`  ${JSON.stringify(text)},`);
+    console.log(`] as const;${level < 6 ? "\n" : ""}`);
+  }
+  process.exit(0);
+}
+
+let pageText;
+try {
   const pageModulePath = resolve(pagePath);
   // 相対 import はモジュールごとのディレクトリを基準に解決する。
   // page.tsx の dir を使い回すとネストした相対 import を取り違え、
@@ -1074,22 +1097,8 @@ try {
   process.exit(2);
 }
 
-const sourceInventory = /\.(?:md|markdown)$/i.test(sourcePath)
-  ? inventoryMarkdown(sourceText)
-  : inventoryHtml(sourceText);
 const pageInventory = inventoryTsx(pageText);
 const result = compare(sourceInventory, pageInventory);
-
-if (flags.has("--emit-headings")) {
-  // 契約テスト S-1 に貼り付ける期待値配列を出力する
-  for (let level = 1; level <= 6; level += 1) {
-    const headings = sourceInventory.headings.filter((h) => h.level === level).map((h) => h.text);
-    console.log(`const EXPECTED_H${level} = [`);
-    for (const text of headings) console.log(`  ${JSON.stringify(text)},`);
-    console.log(`] as const;${level < 6 ? "\n" : ""}`);
-  }
-  process.exit(0);
-}
 
 if (flags.has("--json")) {
   console.log(

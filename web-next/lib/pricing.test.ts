@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   ApiModelSchema,
+  PriceProvenanceSchema,
   PricingDataSchema,
   ScrapeStatusSchema,
   SubToolSchema,
@@ -86,6 +87,44 @@ describe("ApiModelSchema", () => {
 
   it("rejects unknown extra fields (strict schema)", () => {
     expect(() => ApiModelSchema.parse({ ...validApiModel, extra_field: "x" })).toThrow();
+  });
+});
+
+describe("PriceProvenanceSchema", () => {
+  const validProvenance = { origin: "scraped", fallback_in: 5, fallback_out: 25 } as const;
+
+  it("有効な出自を受理する", () => {
+    expect(PriceProvenanceSchema.parse(validProvenance)).toEqual(validProvenance);
+  });
+
+  it("未知の origin を拒否する", () => {
+    expect(() => PriceProvenanceSchema.parse({ ...validProvenance, origin: "guessed" })).toThrow();
+  });
+
+  it("負のフォールバック価格を拒否する", () => {
+    expect(() => PriceProvenanceSchema.parse({ ...validProvenance, fallback_in: -1 })).toThrow();
+  });
+});
+
+describe("ApiModelSchema の provenance", () => {
+  it("provenance を省略した旧スキーマを受理する（後方互換）", () => {
+    expect(() => ApiModelSchema.parse(validApiModel)).not.toThrow();
+  });
+
+  it("provenance 付きのモデルを受理する", () => {
+    const withProvenance = {
+      ...validApiModel,
+      provenance: { origin: "hardcoded", fallback_in: 5, fallback_out: 25 },
+    };
+    expect(ApiModelSchema.parse(withProvenance)).toEqual(withProvenance);
+  });
+
+  it("provenance 内の未知キーを拒否する", () => {
+    const bad = {
+      ...validApiModel,
+      provenance: { origin: "scraped", fallback_in: 5, fallback_out: 25, extra: 1 },
+    };
+    expect(() => ApiModelSchema.parse(bad)).toThrow();
   });
 });
 

@@ -223,3 +223,211 @@ class TestAntigravity:
         Verify that when the scraper receives empty HTML, every Antigravity plan reports fallback pricing and a 'fallback' scrape status.
         """
         _assert_all_fallback(_run(antigravity, _EMPTY), antigravity._FALLBACKS)
+
+
+
+# --------------------------------------------------------------------------- #
+# GitHub Copilot: 遠距離マッチによるプラン価格の取り違え（2026-09-12 実測で再現）
+#
+# 価格抽出パターンのギャップが `[^$\n]*?` と無制限のため、プラン名から遠く
+# 離れた無関係な金額まで到達してしまう。実際の料金ページは約 890KB / 改行 520 行
+# の 1 塊テキストで、抽出可能な "$N/month" 表記は Max ティアの特典クレジット
+# "$100/month in GitHub credits" ただ 1 箇所しか存在しない。その結果 Pro と Pro+
+# の双方が $100 として success 判定され、pricing.json が汚染された。
+#
+# 正しい挙動は「近傍に価格がなければ抽出失敗 → fallback」。
+# --------------------------------------------------------------------------- #
+_COPILOT_HTML_DISTANT_PRICE = (
+    "<html><body>"
+    "<p>Copilot Pro is our plan for individual developers.</p>"
+    + "<p>" + ("unrelated marketing copy. " * 60) + "</p>"
+    + "<p>Copilot Max is built for sustained agent-driven workflows, "
+      "and includes $100/month in GitHub credits.</p>"
+    "</body></html>"
+)
+
+
+def test_copilot_distant_price_does_not_match_plan():
+    """プラン名から遠く離れた金額を拾わず fallback に落ちる。"""
+    from scraper.tools import github_copilot
+
+    with patch(
+        "scraper.tools.github_copilot.get_page_text",
+        return_value=_COPILOT_HTML_DISTANT_PRICE,
+    ):
+        tools = github_copilot.scrape()
+
+    by_name = {t.name: t for t in tools}
+    fb = {row[1]: row[2] for row in github_copilot._FALLBACKS}
+    for plan in ("Pro", "Pro+"):
+        assert by_name[plan].monthly == fb[plan], f"{plan} が遠方の $100 を拾っている"
+        assert by_name[plan].scrape_status == "fallback", f"{plan} が誤って success 判定"
+
+
+_COPILOT_HTML_WITH_MAX = (
+    "<html><body>"
+    "<div>Copilot Max $100 / month for sustained agent workflows</div>"
+    "<div>Copilot Pro $10 / month for individuals</div>"
+    "<div>Copilot Pro+ $39 / month with all models</div>"
+    "<div>Copilot Business $19 / user / month</div>"
+    "<div>Copilot Enterprise $39 / user / month</div>"
+    "</body></html>"
+)
+
+
+def test_copilot_max_tier_does_not_shadow_pro_prices():
+    """Max ($100) が近傍にあっても Pro=$10 / Pro+=$39 を取り違えない。"""
+    from scraper.tools import github_copilot
+
+    with patch(
+        "scraper.tools.github_copilot.get_page_text",
+        return_value=_COPILOT_HTML_WITH_MAX,
+    ):
+        tools = github_copilot.scrape()
+
+    by_name = {t.name: t for t in tools}
+    assert by_name["Pro"].monthly == 10, "Pro が Max/Pro+ の価格を拾っている"
+    assert by_name["Pro+"].monthly == 39, "Pro+ が Max の価格を拾っている"
+    assert by_name["Max"].monthly == 100
+
+
+_COPILOT_HTML_PRO_MAX = (
+    "<html><body>"
+    "<div>Copilot Pro Max $100 / month for sustained agent workflows</div>"
+    "<div>Copilot Pro $10 / month for individuals</div>"
+    "<div>Copilot Pro+ $39 / month with all models</div>"
+    "</body></html>"
+)
+
+
+def test_copilot_pro_does_not_match_pro_max_tier():
+    """「Pro Max」表記が先行しても Pro が Max の価格を拾わない。"""
+    from scraper.tools import github_copilot
+
+    with patch(
+        "scraper.tools.github_copilot.get_page_text",
+        return_value=_COPILOT_HTML_PRO_MAX,
+    ):
+        tools = github_copilot.scrape()
+
+    by_name = {t.name: t for t in tools}
+    assert by_name["Pro"].monthly == 10, "Pro が Pro Max の価格を拾っている"
+    assert by_name["Pro+"].monthly == 39
+
+
+_COPILOT_HTML_NEAR_MISS_NAMES = (
+    "<html><body>"
+    "<div>Copilot Professional services start at $49 / month.</div>"
+    "<div>Maximum savings with annual billing: $77 / month.</div>"
+    "</body></html>"
+)
+
+
+def test_copilot_plan_names_require_whole_word_match():
+    """"Professional" / "Maximum" の部分一致で無関係な月額を拾わない。
+
+    プラン名パターンが語境界を要求しない場合、"pro" は "Professional" に、
+    "max" は "Maximum" にマッチし、_GAP が語の残りを食って直後の
+    "$N / month" に到達してしまう（Pro=$49 / Max=$77 として success 判定）。
+    """
+    from scraper.tools import github_copilot
+
+    with patch(
+        "scraper.tools.github_copilot.get_page_text",
+        return_value=_COPILOT_HTML_NEAR_MISS_NAMES,
+    ):
+        tools = github_copilot.scrape()
+
+    by_name = {t.name: t for t in tools}
+    fb = {row[1]: row[2] for row in github_copilot._FALLBACKS}
+    for plan in ("Pro", "Pro+", "Max"):
+        assert by_name[plan].monthly == fb[plan], f"{plan} が部分一致で誤った価格を拾っている"
+        assert by_name[plan].scrape_status == "fallback", f"{plan} が誤って success 判定"
+
+
+_CODEX_HTML_DISTANT_PRICE = (
+    "<html><body>"
+    "<p>ChatGPT Pro Codex raises Codex limits for heavy users.</p>"
+    "<p>ChatGPT Pro Max unlocks every feature.</p>"
+    + "<p>" + ("unrelated marketing copy. " * 60) + "</p>"
+    + "<p>Enterprise add-ons start at $500 / month.</p>"
+    "</body></html>"
+)
+
+
+def test_codex_distant_price_does_not_match_pro_tiers():
+    """Pro 系ティアがプラン名から遠く離れた金額を拾わず fallback に落ちる。"""
+    with patch(
+        "scraper.tools.openai_codex.get_page_text",
+        return_value=_CODEX_HTML_DISTANT_PRICE,
+    ):
+        tools = openai_codex.scrape()
+
+    by_name = {t.name: t for t in tools}
+    fb = {row[_NAME]: row[_MONTHLY] for row in openai_codex._FALLBACKS}
+    for plan in ("ChatGPT Pro Codex", "ChatGPT Pro (Codex)"):
+        assert by_name[plan].monthly == fb[plan], f"{plan} が遠方の $500 を拾っている"
+        assert by_name[plan].scrape_status == "fallback", f"{plan} が誤って success 判定"
+
+
+_COPILOT_HTML_NEAR_MISS_BUSINESS_ENTERPRISE = (
+    "<html><body>"
+    "<div>Businesses running Copilot at scale can save up to $58 / user / month.</div>"
+    "<div>Enterprise-Grade compliance add-on is billed at $77 / user / month.</div>"
+    "</body></html>"
+)
+
+
+def test_copilot_business_enterprise_require_whole_word_match():
+    """"Businesses"（語尾拡張）/ "Enterprise-Grade"（ハイフン拡張）の
+    部分一致で無関係な月額を拾わない。
+
+    \\b だけでは語尾のハイフン接続を防げないため、\\w とハイフンの両方を
+    否定先読み・後読みで除外している。境界が緩いと "business" は
+    "Businesses" に、"enterprise" は "Enterprise-Grade" にマッチし、
+    _GAP が残りの語を食って直後の "$N / user / month" に到達してしまう。
+    """
+    from scraper.tools import github_copilot
+
+    with patch(
+        "scraper.tools.github_copilot.get_page_text",
+        return_value=_COPILOT_HTML_NEAR_MISS_BUSINESS_ENTERPRISE,
+    ):
+        tools = github_copilot.scrape()
+
+    by_name = {t.name: t for t in tools}
+    fb = {row[1]: row[2] for row in github_copilot._FALLBACKS}
+    for plan in ("Business", "Enterprise"):
+        assert by_name[plan].monthly == fb[plan], f"{plan} が部分一致で誤った価格を拾っている"
+        assert by_name[plan].scrape_status == "fallback", f"{plan} が誤って success 判定"
+
+
+_CODEX_HTML_NEAR_MISS_NAMES = (
+    "<html><body>"
+    "<div>Surplus credit packs are available for $45 / month.</div>"
+    "<div>Copilot Pro Codexers unlock extra rate limits for $65 / month.</div>"
+    "<div>Copilot Pro Max-Ultra bundle is priced at $120 / month.</div>"
+    "</body></html>"
+)
+
+
+def test_codex_plan_names_require_whole_word_match():
+    """"Surplus"（語尾拡張）/ "Pro Codexers"（語尾拡張）/ "Pro Max-Ultra"
+    （ハイフン拡張）の部分一致で無関係な月額を拾わない。
+
+    \\b だけでは語尾のハイフン接続を防げないため、\\w とハイフンの両方を
+    否定先読み・後読みで除外している。境界が緩いと "plus" は "Surplus" に、
+    "pro codex" は "Pro Codexers" に、"pro max" は "Pro Max-Ultra" に
+    マッチし、_GAP が残りを食って直後の "$N / month" に到達してしまう。
+    """
+    with patch(
+        "scraper.tools.openai_codex.get_page_text",
+        return_value=_CODEX_HTML_NEAR_MISS_NAMES,
+    ):
+        tools = openai_codex.scrape()
+
+    by_name = {t.name: t for t in tools}
+    fb = {row[_NAME]: row[_MONTHLY] for row in openai_codex._FALLBACKS}
+    for plan in ("ChatGPT Plus (Codex)", "ChatGPT Pro Codex", "ChatGPT Pro (Codex)"):
+        assert by_name[plan].monthly == fb[plan], f"{plan} が部分一致で誤った価格を拾っている"
+        assert by_name[plan].scrape_status == "fallback", f"{plan} が誤って success 判定"
