@@ -611,6 +611,22 @@ flowchart TD
 - **[8]** Chip Huyen, "Data Distribution Shifts and Monitoring"（後に書籍『Designing Machine Learning Systems』（O'Reilly, 2022）に発展）— https://huyenchip.com/2022/02/07/data-distribution-shifts-and-monitoring.html
 - **[12]** Bartosz Mikulski, "Shadow deployment vs. canary release of machine learning models" — https://mikulskibartosz.name/shadow-deployment-vs-canary-release
 
+[1]: https://www.oreilly.com/library/view/reliable-machine-learning/9781098106218/
+[2]: https://papers.nips.cc/paper/5656-hidden-technical-debt-in-machine-learning-systems
+[3]: https://developers.google.com/machine-learning/guides/rules-of-ml
+[4]: https://research.google/pubs/the-ml-test-score-a-rubric-for-ml-production-readiness-and-technical-debt-reduction/
+[5]: https://sre.google/sre-book/embracing-risk/
+[6]: https://sre.google/sre-book/service-best-practices/
+[7]: https://sre.google/workbook/implementing-slos/
+[8]: https://huyenchip.com/2022/02/07/data-distribution-shifts-and-monitoring.html
+[9]: https://docs.cloud.google.com/architecture/mlops-continuous-delivery-and-automation-pipelines-in-machine-learning
+[10]: https://www.uber.com/en-CA/blog/michelangelo-machine-learning-platform/
+[11]: https://www.uber.com/us/en/blog/scaling-michelangelo/
+[12]: https://mikulskibartosz.name/shadow-deployment-vs-canary-release
+[13]: https://developers.google.com/machine-learning/guides/intro-responsible-ai/fairness
+[14]: https://developers.google.com/machine-learning/managing-ml-projects/ethics
+[15]: https://ai.google/responsibilities/responsible-ai-practices/
+
 ---
 
 *本ガイドは教育目的の要約・再構成であり、原著書籍の内容を逐語的に複製したものではありません。より詳細な内容は原著書籍および上記の一次情報源を直接ご参照ください。*
