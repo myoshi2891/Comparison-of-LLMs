@@ -1120,66 +1120,66 @@ if (process.exitCode === undefined) {
             2
           )
         );
-        process.exit(result.blocking ? 1 : 0);
-      }
+        process.exitCode = result.blocking ? 1 : 0;
+      } else {
+        console.log(`source: ${sourcePath}`);
+        console.log(`page  : ${pagePath}\n`);
+        console.log("要素              原本    page.tsx  （参考値。判定は下の照合結果で行う）");
+        for (const [key, value] of Object.entries(result.counts)) {
+          console.log(
+            `${key.padEnd(16)}  ${String(value.source).padStart(5)}  ${String(value.page).padStart(8)}`
+          );
+        }
 
-      console.log(`source: ${sourcePath}`);
-      console.log(`page  : ${pagePath}\n`);
-      console.log("要素              原本    page.tsx  （参考値。判定は下の照合結果で行う）");
-      for (const [key, value] of Object.entries(result.counts)) {
+        if (result.missingHeadings.length > 0) {
+          console.log(`\n❌ page.tsx に存在しない原本の見出し (${result.missingHeadings.length} 件):`);
+          for (const h of result.missingHeadings) console.log(`  h${h.level}: ${h.text}`);
+        }
+        if (result.missingLinks.length > 0) {
+          console.log(`\n❌ page.tsx に存在しない原本の外部リンク (${result.missingLinks.length} 件):`);
+          for (const u of result.missingLinks) console.log(`  ${u}`);
+        }
+        if (result.missingListItems.length > 0) {
+          console.log(`\n❌ page.tsx 本文に見当たらない原本のリスト項目 (${result.missingListItems.length} 件):`);
+          for (const t of result.missingListItems) console.log(`  - ${t}`);
+        }
+        if (result.missingCodeBlocks.length > 0) {
+          console.log(`\n❌ page.tsx に存在しない原本のコードブロック (${result.missingCodeBlocks.length} 件):`);
+          for (const text of result.missingCodeBlocks) console.log(`  ${JSON.stringify(text)}`);
+        }
+        if (result.missingTableRows.length > 0) {
+          console.log(`\n❌ page.tsx に存在しない原本の表行 (${result.missingTableRows.length} 件):`);
+          for (const text of result.missingTableRows) console.log(`  ${JSON.stringify(text)}`);
+        }
+        if (result.missingParagraphs.length > 0) {
+          console.log(`\n❌ page.tsx に存在しない原本の段落 (${result.missingParagraphs.length} 件):`);
+          for (const text of result.missingParagraphs) console.log(`  ${JSON.stringify(text)}`);
+        }
+        if (result.missingSvgElements.length > 0) {
+          console.log(`\n❌ page.tsx に存在しないか改変された原本の SVG (${result.missingSvgElements.length} 件)`);
+        }
+        if (result.missingCalloutElements.length > 0) {
+          console.log(
+            `\n❌ page.tsx に存在しないか改変された原本の callout/alert (${result.missingCalloutElements.length} 件)`
+          );
+        }
+        if (!result.mermaidSourcesMatch) {
+          console.log("\n❌ Mermaid ソースが原本と順序・出現回数込みで一致しません:");
+          console.log(`  原本: ${JSON.stringify(result.sourceMermaidSources)}`);
+          console.log(`  page: ${JSON.stringify(result.pageMermaidSources)}`);
+        }
+        if (result.extraHeadings.length > 0) {
+          console.log(`\n⚠️ 原本に存在しない page.tsx の見出し (${result.extraHeadings.length} 件、要確認):`);
+          for (const h of result.extraHeadings) console.log(`  h${h.level}: ${h.text}`);
+        }
+
         console.log(
-          `${key.padEnd(16)}  ${String(value.source).padStart(5)}  ${String(value.page).padStart(8)}`
+          result.blocking
+            ? "\n判定: ❌ 移行漏れあり — Green コミット禁止。漏れを転写してから再実行すること。"
+            : "\n判定: ✅ 漏れなし — Green 判定に進んでよい。"
         );
+        process.exitCode = result.blocking ? 1 : 0;
       }
-
-      if (result.missingHeadings.length > 0) {
-        console.log(`\n❌ page.tsx に存在しない原本の見出し (${result.missingHeadings.length} 件):`);
-        for (const h of result.missingHeadings) console.log(`  h${h.level}: ${h.text}`);
-      }
-      if (result.missingLinks.length > 0) {
-        console.log(`\n❌ page.tsx に存在しない原本の外部リンク (${result.missingLinks.length} 件):`);
-        for (const u of result.missingLinks) console.log(`  ${u}`);
-      }
-      if (result.missingListItems.length > 0) {
-        console.log(`\n❌ page.tsx 本文に見当たらない原本のリスト項目 (${result.missingListItems.length} 件):`);
-        for (const t of result.missingListItems) console.log(`  - ${t}`);
-      }
-      if (result.missingCodeBlocks.length > 0) {
-        console.log(`\n❌ page.tsx に存在しない原本のコードブロック (${result.missingCodeBlocks.length} 件):`);
-        for (const text of result.missingCodeBlocks) console.log(`  ${JSON.stringify(text)}`);
-      }
-      if (result.missingTableRows.length > 0) {
-        console.log(`\n❌ page.tsx に存在しない原本の表行 (${result.missingTableRows.length} 件):`);
-        for (const text of result.missingTableRows) console.log(`  ${JSON.stringify(text)}`);
-      }
-      if (result.missingParagraphs.length > 0) {
-        console.log(`\n❌ page.tsx に存在しない原本の段落 (${result.missingParagraphs.length} 件):`);
-        for (const text of result.missingParagraphs) console.log(`  ${JSON.stringify(text)}`);
-      }
-      if (result.missingSvgElements.length > 0) {
-        console.log(`\n❌ page.tsx に存在しないか改変された原本の SVG (${result.missingSvgElements.length} 件)`);
-      }
-      if (result.missingCalloutElements.length > 0) {
-        console.log(
-          `\n❌ page.tsx に存在しないか改変された原本の callout/alert (${result.missingCalloutElements.length} 件)`
-        );
-      }
-      if (!result.mermaidSourcesMatch) {
-        console.log("\n❌ Mermaid ソースが原本と順序・出現回数込みで一致しません:");
-        console.log(`  原本: ${JSON.stringify(result.sourceMermaidSources)}`);
-        console.log(`  page: ${JSON.stringify(result.pageMermaidSources)}`);
-      }
-      if (result.extraHeadings.length > 0) {
-        console.log(`\n⚠️ 原本に存在しない page.tsx の見出し (${result.extraHeadings.length} 件、要確認):`);
-        for (const h of result.extraHeadings) console.log(`  h${h.level}: ${h.text}`);
-      }
-
-      console.log(
-        result.blocking
-          ? "\n判定: ❌ 移行漏れあり — Green コミット禁止。漏れを転写してから再実行すること。"
-          : "\n判定: ✅ 漏れなし — Green 判定に進んでよい。"
-      );
-      process.exit(result.blocking ? 1 : 0);
     }
   }
 }
