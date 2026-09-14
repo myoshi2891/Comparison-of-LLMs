@@ -289,6 +289,11 @@ def test_copilot_max_tier_does_not_shadow_pro_prices():
     assert by_name["Pro"].monthly == 10, "Pro が Max/Pro+ の価格を拾っている"
     assert by_name["Pro+"].monthly == 39, "Pro+ が Max の価格を拾っている"
     assert by_name["Max"].monthly == 100
+    for plan in ("Pro", "Pro+", "Max"):
+        assert by_name[plan].scrape_status == "success", (
+            f"{plan} がフォールバック値と偶然一致しているだけで、実際は正規表現が"
+            "マッチしていない可能性がある"
+        )
 
 
 _COPILOT_HTML_PRO_MAX = (
@@ -313,6 +318,11 @@ def test_copilot_pro_does_not_match_pro_max_tier():
     by_name = {t.name: t for t in tools}
     assert by_name["Pro"].monthly == 10, "Pro が Pro Max の価格を拾っている"
     assert by_name["Pro+"].monthly == 39
+    for plan in ("Pro", "Pro+"):
+        assert by_name[plan].scrape_status == "success", (
+            f"{plan} がフォールバック値と偶然一致しているだけで、実際は正規表現が"
+            "マッチしていない可能性がある"
+        )
 
 
 _COPILOT_HTML_NEAR_MISS_NAMES = (
@@ -430,6 +440,35 @@ def test_copilot_pro_max_require_whole_word_match_hyphenated():
     for plan in ("Pro", "Max"):
         assert by_name[plan].monthly == fb[plan], f"{plan} が部分一致で誤った価格を拾っている"
         assert by_name[plan].scrape_status == "fallback", f"{plan} が誤って success 判定"
+
+
+_COPILOT_HTML_NEAR_MISS_PRO_PLUS = (
+    "<html><body>"
+    "<div>Copilot Pro++ internal beta is priced at $500 / month.</div>"
+    "<div>Copilot Pro+-Enterprise bundle costs $600 / month.</div>"
+    "</body></html>"
+)
+
+
+def test_copilot_pro_plus_require_whole_word_match():
+    """"Pro++" / "Pro+-Enterprise" の部分一致で無関係な月額を拾わない。
+
+    "pro\\+" の末尾に境界がないと、"Pro++" や "Pro+-Enterprise" の
+    先頭 "pro+" にもマッチし、_GAP が残りを食って直後の "$N / month" に
+    到達してしまう。
+    """
+    from scraper.tools import github_copilot
+
+    with patch(
+        "scraper.tools.github_copilot.get_page_text",
+        return_value=_COPILOT_HTML_NEAR_MISS_PRO_PLUS,
+    ):
+        tools = github_copilot.scrape()
+
+    by_name = {t.name: t for t in tools}
+    fb = {row[1]: row[2] for row in github_copilot._FALLBACKS}
+    assert by_name["Pro+"].monthly == fb["Pro+"], "Pro+ が部分一致で誤った価格を拾っている"
+    assert by_name["Pro+"].scrape_status == "fallback", "Pro+ が誤って success 判定"
 
 
 _CODEX_HTML_NEAR_MISS_NAMES = (

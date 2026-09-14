@@ -71,8 +71,10 @@ def scrape(existing: list[SubTool] | None = None) -> list[SubTool]:
                 [rf"(?<![\w-])pro(?![\w+-])(?!\s*max){_GAP}\$([\d]+)\s*/\s*month"],
             )
         elif name == "Pro+":
+            # 末尾にも境界を要求する。これがないと "Pro++" や "Pro+-Enterprise" の
+            # ような隣接トークン内の "pro+" にもマッチしてしまう。
             price = extract_price(
-                html, [rf"(?<![\w-])pro\+{_GAP}\$([\d]+)\s*/\s*month"]
+                html, [rf"(?<![\w-])pro\+(?![\w+-]){_GAP}\$([\d]+)\s*/\s*month"]
             )
         elif name == "Max":
             # \b がないと "Maximum" 等の部分一致から無関係な月額に到達する。
