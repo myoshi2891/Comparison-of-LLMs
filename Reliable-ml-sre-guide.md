@@ -1,6 +1,6 @@
 # Reliable Machine Learning ― SREの原則をML本番運用に適用する 初学者向け完全ガイド
 
-> 本ガイドは、O'Reilly刊行の書籍 **"Reliable Machine Learning: Applying SRE Principles to ML in Production"**（著者: Cathy Chen, Niall Richard Murphy, Kranti Parisa, D. Sculley, Todd Underwood, 2022年9月刊）[1] の全15章にわたる構成・論点を土台としつつ、初めてMLOps/ML信頼性を学ぶエンジニアに向けて再構成した独自の10章＋まとめの構成です。書籍の記述に加え、著者らが所属・関与してきたGoogle SREの一次資料、Googleが公開している機械学習技術的負債に関する古典論文、Uber・実務ブログなど、国際的に著名なエンジニアの一次情報を参照し、それぞれの節末に出典番号（[N]）を付しています。書籍そのものの逐語的な再現は行っていません。
+> 本ガイドは、O'Reilly刊行の書籍 **"Reliable Machine Learning: Applying SRE Principles to ML in Production"**（著者: Cathy Chen, Niall Richard Murphy, Kranti Parisa, D. Sculley, Todd Underwood, 2022年9月刊）[1] の全15章にわたる構成・論点を土台としつつ、初めてMLOps/ML信頼性を学ぶエンジニアに向けて再構成した独自の全12章＋学習チェックリスト＋参考文献の構成です。書籍の記述に加え、著者らが所属・関与してきたGoogle SREの一次資料、Googleが公開している機械学習技術的負債に関する古典論文、Uber・実務ブログなど、国際的に著名なエンジニアの一次情報を参照し、それぞれの節末に出典番号（[N]）を付しています。書籍そのものの逐語的な再現は行っていません。
 
 ## この本の著者について
 

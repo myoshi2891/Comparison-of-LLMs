@@ -30,6 +30,7 @@
 ---
 
 <a id="chapter0"></a>
+
 ## 第0章：なぜMLプロジェクトは失敗するのか
 
 ### 0.1 「モデルはできた。でも本番に出せない」という壁
@@ -76,6 +77,7 @@ flowchart TD
 ---
 
 <a id="chapter1"></a>
+
 ## 第1章：プロダクトディスカバリーとリーン・デリバリー
 
 ### 1.1 「作れるもの」と「作るべきもの」は違う
@@ -134,6 +136,7 @@ flowchart LR
 ---
 
 <a id="chapter2"></a>
+
 ## 第2章：依存関係管理とコンテナ化
 
 ### 2.1 「私のPCでは動きます」問題
@@ -179,6 +182,7 @@ flowchart TD
 ---
 
 <a id="chapter3"></a>
+
 ## 第3章：自動テスト戦略の基礎
 
 ### 3.1 なぜMLチームはテストを後回しにしがちか
@@ -220,6 +224,7 @@ flowchart TD
 ---
 
 <a id="chapter4"></a>
+
 ## 第4章：MLモデルのテストと本番監視
 
 ### 4.1 モデルテストはなぜ難しいのか
@@ -270,6 +275,7 @@ flowchart TD
 ---
 
 <a id="chapter5"></a>
+
 ## 第5章：コードエディタ（IDE）の生産性向上
 
 ### 5.1 なぜIDEの習熟が軽視されがちか
@@ -302,6 +308,7 @@ flowchart LR
 ---
 
 <a id="chapter6"></a>
+
 ## 第6章：リファクタリングと技術的負債管理
 
 ### 6.1 技術的負債は「悪」ではなく「マネジメント対象」
@@ -342,6 +349,7 @@ flowchart TD
 ---
 
 <a id="chapter7"></a>
+
 ## 第7章：MLOpsとCD4ML（機械学習のための継続的デリバリー）
 
 ### 7.1 MLOpsだけでは足りないピース
@@ -410,6 +418,7 @@ flowchart LR
 ---
 
 <a id="chapter8"></a>
+
 ## 第8章：効果的なMLチームの内部構造
 
 ### 8.1 技術だけでは解決できない領域へ
@@ -466,6 +475,7 @@ flowchart TD
 ---
 
 <a id="chapter9"></a>
+
 ## 第9章：効果的なML組織とチームトポロジー
 
 ### 9.1 「チームの集合」としての組織
@@ -519,6 +529,7 @@ MLの文脈では、「コンプリケイテッド・サブシステムチーム
 ---
 
 <a id="chapter10"></a>
+
 ## 第10章：実践ロードマップとチェックリスト
 
 ここまでの内容を、実際にチームで着手する際のロードマップとしてまとめます。すべてを一度に導入する必要はありません。自分たちのチームが今どこにボトルネックを抱えているかを見極め、優先順位をつけて着手してください。
@@ -545,26 +556,27 @@ MLの文脈では、「コンプリケイテッド・サブシステムチーム
 ---
 
 <a id="references"></a>
+
 ## 参考文献
 
-- **[1]** David Tan, Ada Leung, David Colls. *Effective Machine Learning Teams: Best Practices for MLOps, Data Science, and Software Engineering*. O'Reilly Media, 2024年2月. 目次・概要: https://www.oreilly.com/library/view/effective-machine-learning/9781098144623/
-- **[2]** D. Sculley et al. "Hidden Technical Debt in Machine Learning Systems." *Advances in Neural Information Processing Systems 28 (NeurIPS 2015)*. https://papers.nips.cc/paper/5656-hidden-technical-debt-in-machine-learning-systems
-- **[3]** Martin Zinkevich. "Rules of Machine Learning: Best Practices for ML Engineering." Google for Developers. https://developers.google.com/machine-learning/guides/rules-of-ml
-- **[4]** DORA. "DORA's software delivery performance metrics." https://dora.dev/guides/dora-metrics-four-keys/
-- **[5]** Google Cloud Blog. "Use Four Keys metrics like change failure rate to measure your DevOps performance." https://cloud.google.com/blog/products/devops-sre/using-the-four-keys-to-measure-your-devops-performance
-- **[6]** batect (Build and Testing Environments as Code Tool), GitHubリポジトリREADME. https://github.com/batect/batect
-- **[7]** Martin Fowler (Thoughtworksによる寄稿記事). "The Practical Test Pyramid." https://martinfowler.com/articles/practical-test-pyramid.html
-- **[8]** Eric Breck, Shanqing Cai, Eric Nielsen, Michael Salib, D. Sculley. "The ML Test Score: A Rubric for ML Production Readiness and Technical Debt Reduction." *2017 IEEE International Conference on Big Data*, Google, Inc. 論文PDF: https://research.google.com/pubs/archive/aad9f93b86b7addfea4c419b9100c6cdd26cacea.pdf
-- **[9]** Google Research. "The ML test score: A rubric for ML production readiness and technical debt reduction"（論文概要ページ）. https://research.google/pubs/the-ml-test-score-a-rubric-for-ml-production-readiness-and-technical-debt-reduction/
-- **[10]** Chip Huyen. *Designing Machine Learning Systems: An Iterative Process for Production-Ready Applications*. O'Reilly Media, 2022. 著者公式サポートリポジトリ: https://github.com/chiphuyen/dmls-book
-- **[11]** Martin Fowler. "Definition Of Refactoring"（bliki）. https://martinfowler.com/bliki/DefinitionOfRefactoring.html
-- **[12]** Danilo Sato, Arif Wider, Christoph Windheuser (Thoughtworks). "Continuous Delivery for Machine Learning." martinfowler.com, 2019年9月19日. https://martinfowler.com/articles/cd4ml.html
-- **[13]** Google Cloud, Cloud Architecture Center. "MLOps: Continuous delivery and automation pipelines in machine learning." https://docs.cloud.google.com/architecture/mlops-continuous-delivery-and-automation-pipelines-in-machine-learning
-- **[14]** Google re:Work. "Guide: Understand team effectiveness"（Project Aristotle研究に基づく公式ガイド）. https://rework.withgoogle.com/intl/en/guides/understand-team-effectiveness
-- **[15]** Google re:Work Blog. "The five keys to a successful Google team." https://rework.withgoogle.com/blog/five-keys-to-a-successful-google-team/
-- **[16]** IT Revolution / Team Topologies公式サイト. "Book — Team Topologies." https://teamtopologies.com/book
-- **[17]** Team Topologies公式サイト. "Key concepts and practices for applying a Team Topologies approach." https://teamtopologies.com/key-concepts
-- **[18]** Ralf Kruse. "Book Review: 'Team Topologies' by Matthew Skelton and Manuel Pais." https://embeddeduse.com/2022/04/23/book-review-team-topologies-by-matthew-skelton-and-manuel-pais/
+[^1]: David Tan, Ada Leung, David Colls. *Effective Machine Learning Teams: Best Practices for MLOps, Data Science, and Software Engineering*. O'Reilly Media, 2024年2月. 目次・概要: https://www.oreilly.com/library/view/effective-machine-learning/9781098144623/
+[^2]: D. Sculley et al. "Hidden Technical Debt in Machine Learning Systems." *Advances in Neural Information Processing Systems 28 (NeurIPS 2015)*. https://papers.nips.cc/paper/5656-hidden-technical-debt-in-machine-learning-systems
+[^3]: Martin Zinkevich. "Rules of Machine Learning: Best Practices for ML Engineering." Google for Developers. https://developers.google.com/machine-learning/guides/rules-of-ml
+[^4]: DORA. "DORA's software delivery performance metrics." https://dora.dev/guides/dora-metrics-four-keys/
+[^5]: Google Cloud Blog. "Use Four Keys metrics like change failure rate to measure your DevOps performance." https://cloud.google.com/blog/products/devops-sre/using-the-four-keys-to-measure-your-devops-performance
+[^6]: batect (Build and Testing Environments as Code Tool), GitHubリポジトリREADME. https://github.com/batect/batect
+[^7]: Martin Fowler (Thoughtworksによる寄稿記事). "The Practical Test Pyramid." https://martinfowler.com/articles/practical-test-pyramid.html
+[^8]: Eric Breck, Shanqing Cai, Eric Nielsen, Michael Salib, D. Sculley. "The ML Test Score: A Rubric for ML Production Readiness and Technical Debt Reduction." *2017 IEEE International Conference on Big Data*, Google, Inc. 論文PDF: https://research.google.com/pubs/archive/aad9f93b86b7addfea4c419b9100c6cdd26cacea.pdf
+[^9]: Google Research. "The ML test score: A rubric for ML production readiness and technical debt reduction"（論文概要ページ）. https://research.google/pubs/the-ml-test-score-a-rubric-for-ml-production-readiness-and-technical-debt-reduction/
+[^10]: Chip Huyen. *Designing Machine Learning Systems: An Iterative Process for Production-Ready Applications*. O'Reilly Media, 2022. 著者公式サポートリポジトリ: https://github.com/chiphuyen/dmls-book
+[^11]: Martin Fowler. "Definition Of Refactoring"（bliki）. https://martinfowler.com/bliki/DefinitionOfRefactoring.html
+[^12]: Danilo Sato, Arif Wider, Christoph Windheuser (Thoughtworks). "Continuous Delivery for Machine Learning." martinfowler.com, 2019年9月19日. https://martinfowler.com/articles/cd4ml.html
+[^13]: Google Cloud, Cloud Architecture Center. "MLOps: Continuous delivery and automation pipelines in machine learning." https://docs.cloud.google.com/architecture/mlops-continuous-delivery-and-automation-pipelines-in-machine-learning
+[^14]: Google re:Work. "Guide: Understand team effectiveness"（Project Aristotle研究に基づく公式ガイド）. https://rework.withgoogle.com/intl/en/guides/understand-team-effectiveness
+[^15]: Google re:Work Blog. "The five keys to a successful Google team." https://rework.withgoogle.com/blog/five-keys-to-a-successful-google-team/
+[^16]: IT Revolution / Team Topologies公式サイト. "Book — Team Topologies." https://teamtopologies.com/book
+[^17]: Team Topologies公式サイト. "Key concepts and practices for applying a Team Topologies approach." https://teamtopologies.com/key-concepts
+[^18]: Ralf Kruse. "Book Review: 'Team Topologies' by Matthew Skelton and Manuel Pais." https://embeddeduse.com/2022/04/23/book-review-team-topologies-by-matthew-skelton-and-manuel-pais/
 
 ---
 
