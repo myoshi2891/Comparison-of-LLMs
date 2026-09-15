@@ -27,7 +27,7 @@
 | 参照 | オープンブック（公式 eBook・シナリオブックレットの参照可） |
 | 合格点 | 70%（40問中28問正解） |
 | Bloom's Taxonomy レベル | BL2（理解）、BL3（適用）、BL4（分析）が中心 |
-| 資格更新 | 3年ごと。次のいずれかで更新できる。(A) 同一プロダクトスイート（ITIL）の別資格を取得する、(B) 同じ資格の試験を再受験して合格する、(C) 3年間連続で毎年 20 CPD ポイント（合計 60 ポイント）を PeopleCert アカウントに記録する |
+| 資格更新 | 3年ごと。次のいずれかで更新できる。(A) 同一プロダクトスイート（ITIL）の別資格を取得する、(B) 同じ資格の試験を再受験して合格する、(C) PeopleCert Plus に3年間継続加入し、その期間中に毎年 20 CPD ポイント（合計 60 ポイント）を PeopleCert アカウントに記録する |
 
 *出典: [PeopleCert 公式製品ページ](https://www.peoplecert.org/browse-certifications/it-governance-and-service-management/ITIL-1/itil-ai-governance-version-5-4234), [ITSM Academy コース概要](https://itsmacademy.com/itil-ai-governance-course), [AGILEPM HUB コース概要](https://agilepmhub.com/itil-ai-governance)*
 
