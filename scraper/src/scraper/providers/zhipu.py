@@ -105,8 +105,8 @@ def _build_fallback(resolver: FallbackResolver) -> list[ApiModel]:
     Build model records using the supplied fallback prices.
     
     Parameters:
-    	fallback_map (dict[str, tuple[float, float]]): Maps each supported model name to its input and output prices.
-    
+    	resolver (FallbackResolver): Fallback price/provenance resolver for the Zhipu provider.
+
     Returns:
     	list[ApiModel]: Model records populated with fallback pricing and metadata.
     """

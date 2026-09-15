@@ -124,7 +124,7 @@ def _build_models(
         status (str): Scrape status value to assign to each ApiModel's `scrape_status` field.
     
     Returns:
-        list[ApiModel]: ApiModel objects for every model key in the `_FALLBACKS` order with provider set to "Anthropic", metadata fields (`tag`, `cls`, `sub_ja`, `sub_en`) populated from module maps, prices taken from `fallback_map`, and `scrape_status` set to `status`.
+        list[ApiModel]: ApiModel objects for every model key in the `_FALLBACKS` order with provider set to "Anthropic", metadata fields (`tag`, `cls`, `sub_ja`, `sub_en`) populated from module maps, prices taken from `resolver.prices`, and `scrape_status` set to `status`.
     """
     return [
         ApiModel(

@@ -104,8 +104,8 @@ def _build_fallback(resolver: FallbackResolver) -> list[ApiModel]:
     Builds model entries using fallback pricing.
     
     Parameters:
-    	fallback_map (dict[str, tuple[float, float]]): A mapping of model names to input and output prices in USD per 1 million tokens.
-    
+    	resolver (FallbackResolver): Fallback price/provenance resolver for the Moonshot(Kimi) provider.
+
     Returns:
     	list[ApiModel]: Model entries marked with a fallback scrape status.
     """
