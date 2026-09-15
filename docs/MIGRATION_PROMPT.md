@@ -21,6 +21,7 @@
 - `.claude/rules/mermaid-diagram-layout.md`
 - `.claude/rules/no-absolute-paths.md`
 - `.claude/skills/fix-mermaid/SKILL.md`
+- `web-next/node_modules/next/dist/docs/`（Next.js 16 は訓練データと挙動が異なる場合があるため、`page.tsx` の API 規約・非推奨事項を Phase 1 着手前に確認する）
 
 ---
 
