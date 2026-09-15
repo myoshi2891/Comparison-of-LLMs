@@ -13,10 +13,16 @@ logger = logging.getLogger(__name__)
 
 _URL = "https://openai.com/chatgpt/pricing/"
 
+# プラン名と価格の距離を制限する。無制限（[^$\n]*?）にすると、改行の少ない
+# 巨大な 1 塊テキストを横断して無関係な金額（別ティアの月額など）に到達しうる。
+_GAP = r"[^$\n]{0,80}?"
+
 _FALLBACKS: list[tuple[str, str, float, float | None, str, str, str, str]] = [
     ("OpenAI Codex", "ChatGPT Plus (Codex)",  20,  None, "Plus", "tag-bal",
      "30-150 tasks/5h | codex-1",    "30-150 tasks/5h | codex-1"),
-    ("OpenAI Codex", "ChatGPT Pro (Codex)",  200,  None, "Pro",  "tag-flag",
+    ("OpenAI Codex", "ChatGPT Pro Codex",    100,  None, "Pro Codex", "tag-flag",
+     "Codex 上限拡大ティア | 2026-04 新設", "Elevated Codex limits | added Apr 2026"),
+    ("OpenAI Codex", "ChatGPT Pro (Codex)",  200,  None, "Pro Max",   "tag-flag",
      "300-1500 tasks/5h | 全機能",   "300-1500 tasks/5h | All features"),
 ]
 
@@ -33,10 +39,19 @@ def scrape(existing: list[SubTool] | None = None) -> list[SubTool]:
     tools: list[SubTool] = []
     for group, name, fb_m, fb_a, tag, cls, note_ja, note_en in _FALLBACKS:
         price = None
-        if "Plus" in name:
-            price = extract_price(html, [r"plus[^$\n]*?\$([\d]+)\s*/\s*month"])
-        elif "Pro" in name:
-            price = extract_price(html, [r"(?:chatgpt\s+)?pro[^$\n]*?\$([\d]+)\s*/\s*month"])
+        # \b だけでは語尾のハイフン接続（例: "plus-one"）を防げないため、
+        # 前後を \w とハイフンの両方について否定先読み・後読みで除外する。
+        if name == "ChatGPT Plus (Codex)":
+            price = extract_price(html, [rf"(?<![\w-])plus(?![\w-]){_GAP}\$([\d]+)\s*/\s*month"])
+        elif name == "ChatGPT Pro Codex":
+            # Pro が 2 ティアに分割されたため、総称の "pro" では両行が同じ値になる。
+            price = extract_price(
+                html, [rf"(?<![\w-])pro\s+codex(?![\w-]){_GAP}\$([\d]+)\s*/\s*month"]
+            )
+        elif name == "ChatGPT Pro (Codex)":
+            price = extract_price(
+                html, [rf"(?<![\w-])pro\s+max(?![\w-]){_GAP}\$([\d]+)\s*/\s*month"]
+            )
 
         cur_m = fb_m
         status = "fallback"

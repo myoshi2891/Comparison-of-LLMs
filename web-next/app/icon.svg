@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" role="img" aria-label="AI Cost Simulator">
+  <title>AI Cost Simulator</title>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#3b82f6"/>
+      <stop offset="1" stop-color="#2dd4bf"/>
+    </linearGradient>
+  </defs>
+  <!-- 明色背景でも輪郭が立つようダーク(#05080f)の縁を 1px 残す -->
+  <rect width="32" height="32" rx="7.5" fill="#05080f"/>
+  <rect x="1" y="1" width="30" height="30" rx="6.5" fill="url(#bg)"/>
+  <!-- 右肩上がりの 3 本バー = 時間経過に伴う累積コスト -->
+  <g fill="#ffffff">
+    <rect x="5" y="18" width="5" height="9" rx="1.6" opacity="0.72"/>
+    <rect x="13.5" y="13" width="5" height="14" rx="1.6" opacity="0.86"/>
+    <rect x="22" y="7" width="5" height="20" rx="1.6"/>
+  </g>
+</svg>

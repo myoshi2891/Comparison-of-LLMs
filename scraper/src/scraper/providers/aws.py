@@ -14,6 +14,7 @@ import httpx
 
 from scraper.browser import sanity_check
 from scraper.models import ApiModel
+from scraper.provenance import FallbackResolver
 
 logger = logging.getLogger(__name__)
 
@@ -21,33 +22,35 @@ _PRICING_API = (
     "https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AmazonBedrock/current/index.json"
 )
 
+_AMAZON_NOVA_PREMIER = "Amazon Nova Premier"
+
 _FALLBACKS: dict[str, tuple[float, float]] = {
-    "Amazon Nova Premier": (2.50,  10.00),
+    _AMAZON_NOVA_PREMIER: (2.50,  12.50),
     "Amazon Nova Pro":     (0.80,   3.20),
     "Amazon Nova Lite":    (0.06,   0.24),
     "Amazon Nova Micro":   (0.035,  0.14),
 }
 
 _TAG = {
-    "Amazon Nova Premier": "最上位 Nova",
+    _AMAZON_NOVA_PREMIER: "最上位 Nova",
     "Amazon Nova Pro":     "Nova",
     "Amazon Nova Lite":    "Budget",
     "Amazon Nova Micro":   "Cheapest",
 }
 _CLS = {
-    "Amazon Nova Premier": "tag-flag",
+    _AMAZON_NOVA_PREMIER: "tag-flag",
     "Amazon Nova Pro":     "tag-bal",
     "Amazon Nova Lite":    "tag-mini",
     "Amazon Nova Micro":   "tag-mini",
 }
 _SUB_JA = {
-    "Amazon Nova Premier": "最上位 Nova / 高精度 / マルチモーダル",
+    _AMAZON_NOVA_PREMIER: "最上位 Nova / 高精度 / マルチモーダル",
     "Amazon Nova Pro":     "マルチモーダル / 300K ctx",
     "Amazon Nova Lite":    "低コスト / マルチモーダル",
     "Amazon Nova Micro":   "Bedrock最安モデル",
 }
 _SUB_EN = {
-    "Amazon Nova Premier": "Top-tier Nova / high accuracy / multimodal",
+    _AMAZON_NOVA_PREMIER: "Top-tier Nova / high accuracy / multimodal",
     "Amazon Nova Pro":     "Multimodal / 300K ctx",
     "Amazon Nova Lite":    "Low-cost / multimodal",
     "Amazon Nova Micro":   "Lowest-cost Bedrock model",
@@ -55,7 +58,7 @@ _SUB_EN = {
 
 # AWS Pricing API の model キーワードマッピング
 _AWS_KEYWORDS: dict[str, list[str]] = {
-    "Amazon Nova Premier": ["Nova Premier", "amazon.nova-premier"],
+    _AMAZON_NOVA_PREMIER: ["Nova Premier", "amazon.nova-premier"],
     "Amazon Nova Pro":     ["Nova Pro", "amazon.nova-pro"],
     "Amazon Nova Lite":    ["Nova Lite", "amazon.nova-lite"],
     "Amazon Nova Micro":   ["Nova Micro", "amazon.nova-micro"],
@@ -76,13 +79,9 @@ def scrape(existing: list[ApiModel] | None = None) -> list[ApiModel]:
     """
     logger.info("AWS: Pricing API から取得開始")
 
-    fallback_map: dict[str, tuple[float, float]] = {}
-    if existing:
-        for m in existing:
-            if m.provider == "AWS":
-                fallback_map[m.name] = (m.price_in, m.price_out)
-    for k, v in _FALLBACKS.items():
-        fallback_map.setdefault(k, v)
+    # 出自（provenance）ベースのフォールバック解決。判定ルールは provenance.py を参照。
+    resolver = FallbackResolver.build("AWS", _FALLBACKS, existing)
+    fallback_map = resolver.prices
 
     results: dict[str, tuple[float, float, str]] = {}
 
@@ -177,6 +176,9 @@ def scrape(existing: list[ApiModel] | None = None) -> list[ApiModel]:
             sub_ja=_SUB_JA.get(n, ""),
             sub_en=_SUB_EN.get(n, ""),
             scrape_status=results[n][2],  # type: ignore[arg-type]
+            provenance=resolver.provenance(
+                n, results[n][2] == "success", (results[n][0], results[n][1])
+            ),
         )
         for n in _FALLBACKS
         if n in results

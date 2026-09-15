@@ -1,0 +1,2615 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light" />
+    <meta name="darkreader-lock" />
+    <title>エンタープライズRAG完全ガイド：初学者のためのステップバイステップ解説</title>
+    <meta
+      name="description"
+      content="エンタープライズRAG(Retrieval-Augmented Generation)を初学者向けにステップバイステップで解説する技術ガイド。"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Noto+Sans+JP:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.6.1/mermaid.min.js"></script>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #eef1f4;
+        --surface: #ffffff;
+        --surface-2: #f4f6f8;
+        --surface-3: #e9edf1;
+        --ink: #16202c;
+        --ink-soft: #4e5a6b;
+        --ink-faint: #8996a6;
+        --border: #dce2e9;
+        --border-strong: #c4ccd6;
+        --accent: #b8763a;
+        --accent-ink: #7a4c22;
+        --accent-tint: #f3e4d2;
+        --accent-tint-strong: #ead0ac;
+        --teal: #1f5c57;
+        --teal-ink: #123b37;
+        --teal-tint: #dcebe8;
+        --code-bg: #282c34;
+        --code-ink: #cbd1dc;
+        --code-bar: #21252b;
+        --danger: #9a3b3b;
+        --radius-sm: 6px;
+        --radius: 12px;
+        --radius-lg: 18px;
+        --shadow-sm: 0 1px 2px rgba(22, 32, 44, 0.06);
+        --shadow-md: 0 10px 30px -14px rgba(22, 32, 44, 0.28);
+        --font-serif: 'Shippori Mincho', 'Noto Serif JP', serif;
+        --font-sans:
+          'Noto Sans JP', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', -apple-system,
+          BlinkMacSystemFont, sans-serif;
+        --font-mono:
+          'JetBrains Mono', 'Noto Sans JP', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        --sidebar-w: 308px;
+        --content-max: 1600px;
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        html {
+          scroll-behavior: auto;
+        }
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.001ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.001ms !important;
+        }
+      }
+
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: var(--font-sans);
+        font-size: 16px;
+        line-height: 1.9;
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+      }
+
+      a {
+        color: var(--accent-ink);
+        text-decoration-thickness: 1px;
+        text-underline-offset: 2px;
+      }
+      a:hover {
+        color: var(--accent);
+      }
+      a:focus-visible,
+      button:focus-visible,
+      summary:focus-visible {
+        outline: 2px solid var(--teal);
+        outline-offset: 2px;
+        border-radius: 4px;
+      }
+
+      ::selection {
+        background: var(--accent-tint-strong);
+        color: var(--ink);
+      }
+
+      /* ---------- レイアウト ---------- */
+      .layout {
+        display: flex;
+        min-height: 100vh;
+        align-items: flex-start;
+      }
+
+      .sidebar {
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        width: var(--sidebar-w);
+        flex: 0 0 var(--sidebar-w);
+        background: var(--surface-2);
+        border-right: 1px solid var(--border);
+        padding: 34px 26px 28px;
+        overflow-y: auto;
+        z-index: 40;
+      }
+      .sidebar-brand {
+        display: block;
+        font-family: var(--font-serif);
+        font-size: 1rem;
+        letter-spacing: 0.02em;
+        color: var(--ink-faint);
+        margin-bottom: 4px;
+      }
+      .sidebar-title {
+        font-family: var(--font-serif);
+        font-size: 21px;
+        line-height: 1.55;
+        color: var(--ink);
+        margin: 0 0 22px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid var(--border-strong);
+      }
+      .toc {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+      .toc-intro {
+        margin-bottom: 10px;
+      }
+      .toc-part {
+        margin: 0 0 4px;
+      }
+      .toc-substeps {
+        list-style: none;
+        margin: 2px 0 14px;
+        padding: 0 0 0 15px;
+        border-left: 1px solid var(--border-strong);
+      }
+      .toc-link {
+        display: block;
+        padding: 7px 10px;
+        border-radius: var(--radius-sm);
+        font-size: 1rem;
+        color: var(--ink-soft);
+        text-decoration: none;
+        line-height: 1.5;
+      }
+      .toc-link--part {
+        font-weight: 700;
+        font-size: 1rem;
+        color: var(--ink);
+        padding-left: 8px;
+      }
+      .toc-link--sub {
+        font-size: 1rem;
+      }
+      .toc-link:hover {
+        background: var(--surface-3);
+        color: var(--ink);
+      }
+      .toc-link.is-active {
+        background: var(--accent-tint);
+        color: var(--accent-ink);
+        font-weight: 600;
+      }
+      .toc-link--part.is-active {
+        background: var(--teal-tint);
+        color: var(--teal-ink);
+      }
+
+      .content-wrap {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        justify-content: center;
+        padding: 0 clamp(20px, 3vw, 56px);
+      }
+      main.article {
+        width: 100%;
+        max-width: var(--content-max);
+        padding: 56px 0 90px;
+      }
+
+      /* ---------- モバイル用ヘッダー ---------- */
+      .mobile-bar {
+        display: none;
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 16px;
+        background: var(--surface);
+        border-bottom: 1px solid var(--border);
+      }
+      .mobile-bar-title {
+        font-family: var(--font-serif);
+        font-size: 1rem;
+        color: var(--ink);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .menu-btn {
+        flex: 0 0 auto;
+        width: 38px;
+        height: 38px;
+        border-radius: 9px;
+        border: 1px solid var(--border-strong);
+        background: var(--surface);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+      }
+      .menu-btn span,
+      .menu-btn span::before,
+      .menu-btn span::after {
+        content: '';
+        display: block;
+        width: 16px;
+        height: 2px;
+        background: var(--ink);
+        position: relative;
+      }
+      .menu-btn span::before {
+        position: absolute;
+        top: -5px;
+      }
+      .menu-btn span::after {
+        position: absolute;
+        top: 5px;
+      }
+      .sidebar-backdrop {
+        display: none;
+      }
+
+      @media (max-width: 980px) {
+        .mobile-bar {
+          display: flex;
+        }
+        .sidebar {
+          position: fixed;
+          top: 0;
+          left: 0;
+          height: 100vh;
+          transform: translateX(-104%);
+          transition: transform 0.28s ease;
+          box-shadow: var(--shadow-md);
+        }
+        body.nav-open .sidebar {
+          transform: translateX(0);
+        }
+        body.nav-open .sidebar-backdrop {
+          display: block;
+          position: fixed;
+          inset: 0;
+          background: rgba(15, 20, 28, 0.4);
+          z-index: 35;
+        }
+        .content-wrap {
+          padding: 0 20px;
+        }
+        main.article {
+          padding: 30px 0 70px;
+        }
+      }
+
+      /* ---------- タイポグラフィ / 見出し ---------- */
+      h2,
+      h3,
+      h4 {
+        font-family: var(--font-serif);
+        color: var(--ink);
+        line-height: 1.5;
+        scroll-margin-top: 24px;
+      }
+      h2 {
+        font-size: 26px;
+        margin: 0 0 26px;
+      }
+      h3 {
+        font-size: 21px;
+        margin: 52px 0 18px;
+      }
+      h4 {
+        font-size: 17px;
+        margin: 34px 0 14px;
+        color: var(--ink);
+      }
+      p {
+        margin: 0 0 20px;
+      }
+      ul,
+      ol {
+        margin: 0 0 20px;
+        padding-left: 1.35em;
+      }
+      li {
+        margin: 0 0 8px;
+      }
+      li:last-child {
+        margin-bottom: 0;
+      }
+      strong {
+        font-weight: 700;
+        color: var(--ink);
+      }
+
+      .part-heading {
+        display: flex;
+        align-items: baseline;
+        gap: 14px;
+        flex-wrap: wrap;
+        margin-top: 78px;
+        padding-top: 34px;
+        border-top: 3px solid var(--teal);
+      }
+      main.article > h2.part-heading:first-of-type {
+        margin-top: 0;
+        padding-top: 0;
+        border-top: none;
+      }
+      .part-badge {
+        font-family: var(--font-mono);
+        font-size: 1rem;
+        letter-spacing: 0.06em;
+        color: var(--surface);
+        background: var(--teal);
+        padding: 4px 11px;
+        border-radius: 999px;
+        flex: 0 0 auto;
+      }
+      .part-label {
+        font-size: 25px;
+      }
+
+      .step-heading {
+        display: flex;
+        align-items: baseline;
+        gap: 14px;
+      }
+      .step-badge {
+        font-family: var(--font-mono);
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--accent-ink);
+        background: var(--accent-tint);
+        border: 1px solid var(--accent-tint-strong);
+        width: 38px;
+        height: 38px;
+        flex: 0 0 auto;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transform: translateY(1px);
+      }
+      .step-label {
+        font-size: 21px;
+      }
+
+      .sub-heading {
+        padding-bottom: 10px;
+        border-bottom: 1px solid var(--border);
+      }
+
+      /* ---------- はじめにパネル ---------- */
+      .page-header {
+        margin-bottom: 38px;
+      }
+      .page-title {
+        font-family: var(--font-serif);
+        font-size: 34px;
+        line-height: 1.45;
+        margin: 0 0 26px;
+        padding-bottom: 26px;
+        border-bottom: 4px solid var(--ink);
+      }
+
+      .intro-panel {
+        margin: 0 0 46px;
+        padding: 26px 28px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-left: 4px solid var(--accent);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-sm);
+      }
+      .intro-panel p {
+        margin: 0 0 14px;
+        font-size: 1rem;
+        color: var(--ink-soft);
+      }
+      .intro-panel p:last-child {
+        margin-bottom: 0;
+      }
+      .intro-panel strong {
+        color: var(--ink);
+      }
+
+      /* ---------- リンク / インラインコード ---------- */
+      main.article code {
+        font-family: var(--font-mono);
+        font-size: 1rem;
+        background: var(--surface-3);
+        border: 1px solid var(--border);
+        padding: 0.08em 0.42em;
+        border-radius: 5px;
+        color: var(--accent-ink);
+      }
+      a.ext-link {
+        font-weight: 600;
+        border-bottom: 1px solid var(--accent-tint-strong);
+      }
+
+      /* ---------- テーブル ---------- */
+      .table-scroll {
+        overflow-x: auto;
+        margin: 0 0 26px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-sm);
+        background: var(--surface);
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        min-width: 560px;
+        font-size: 1rem;
+      }
+      thead th {
+        text-align: left;
+        background: var(--teal-tint);
+        color: var(--teal-ink);
+        font-weight: 700;
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--border-strong);
+        white-space: nowrap;
+      }
+      tbody td {
+        padding: 13px 16px;
+        border-bottom: 1px solid var(--border);
+        vertical-align: top;
+        color: var(--ink-soft);
+      }
+      tbody tr:last-child td {
+        border-bottom: none;
+      }
+      tbody tr:nth-child(even) {
+        background: var(--surface-2);
+      }
+      td strong {
+        color: var(--ink);
+      }
+      td code,
+      th code {
+        white-space: normal;
+      }
+
+      /* ---------- コードブロック ---------- */
+      .code-card {
+        margin: 0 0 26px;
+        border-radius: var(--radius);
+        overflow: hidden;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid #1b1e23;
+      }
+      .code-card-bar {
+        display: flex;
+        align-items: center;
+        padding: 9px 16px;
+        background: var(--code-bar);
+        border-bottom: 1px solid #1b1e23;
+      }
+      .code-lang {
+        font-family: var(--font-mono);
+        font-size: 1rem;
+        letter-spacing: 0.04em;
+        color: #b7bfcc;
+      }
+      .code-card div.highlight {
+        margin: 0;
+        border-radius: 0;
+        box-shadow: none;
+        border: none;
+      }
+      div.highlight {
+        overflow: auto;
+      }
+      div.highlight pre {
+        margin: 0;
+        padding: 18px 20px;
+        font-family: var(--font-mono);
+        font-size: 1rem;
+        line-height: 1.8;
+        background: var(--code-bg);
+        color: var(--code-ink);
+        -webkit-font-smoothing: auto;
+      }
+      div.highlight pre span {
+        background: transparent !important;
+      }
+      /* Pygments(one-dark)の既定色よりコントラストを上げる上書き */
+      .highlight {
+        color: var(--code-ink) !important;
+      }
+      .highlight .c,
+      .highlight .ch,
+      .highlight .cm,
+      .highlight .cp,
+      .highlight .cpf,
+      .highlight .c1,
+      .highlight .cs {
+        color: #9aa6b8 !important;
+      }
+      .highlight .p,
+      .highlight .w,
+      .highlight .l,
+      .highlight .x,
+      .highlight .err,
+      .highlight .esc,
+      .highlight .g {
+        color: var(--code-ink) !important;
+      }
+
+      /* ---------- 参考ソース一覧 ---------- */
+      .source-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin: 0 0 26px;
+      }
+      .source-card {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+        padding: 16px 20px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        text-decoration: none;
+        box-shadow: var(--shadow-sm);
+        transition:
+          border-color 0.15s ease,
+          transform 0.15s ease,
+          background 0.15s ease;
+      }
+      .source-card:hover {
+        border-color: var(--accent-tint-strong);
+        background: var(--accent-tint);
+        transform: translateX(2px);
+      }
+      .source-card-main {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        min-width: 0;
+      }
+      .source-card-pub {
+        font-size: 1rem;
+        color: var(--teal-ink);
+        font-weight: 600;
+      }
+      .source-card-title {
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--ink);
+        line-height: 1.5;
+      }
+      .source-card-note {
+        font-size: 1rem;
+        color: var(--ink-faint);
+      }
+      .source-card-domain {
+        flex: 0 0 auto;
+        font-family: var(--font-mono);
+        font-size: 1rem;
+        color: var(--ink-soft);
+        background: var(--surface-3);
+        border: 1px solid var(--border-strong);
+        padding: 5px 10px;
+        border-radius: 999px;
+        white-space: nowrap;
+      }
+      @media (max-width: 640px) {
+        .source-card {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 10px;
+        }
+      }
+
+      /* ---------- mermaid ---------- */
+      .mermaid-card {
+        margin: 8px 0 30px;
+        padding: 26px 18px 20px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-sm);
+        overflow-x: auto;
+        text-align: center;
+      }
+      .mermaid-card svg {
+        max-width: 100%;
+        height: auto;
+      }
+      .mermaid-card pre.mermaid {
+        margin: 0;
+        background: transparent;
+      }
+
+      /* ---------- 区切り線 ---------- */
+      hr {
+        border: none;
+        border-top: 1px solid var(--border-strong);
+        margin: 44px 0;
+      }
+
+      /* ---------- 引用（本文中） ---------- */
+      blockquote:not(.intro-panel) {
+        margin: 0 0 22px;
+        padding: 4px 20px;
+        border-left: 3px solid var(--border-strong);
+        color: var(--ink-soft);
+      }
+
+      /* ---------- フッター ---------- */
+      .article-footer {
+        margin-top: 64px;
+        padding-top: 26px;
+        border-top: 1px solid var(--border-strong);
+      }
+      .article-footer p {
+        font-size: 1rem;
+        font-style: italic;
+        color: var(--ink-faint);
+        margin: 0;
+      }
+
+      /* ---------- back to top ---------- */
+      .top-btn {
+        position: fixed;
+        right: 26px;
+        bottom: 26px;
+        width: 46px;
+        height: 46px;
+        border-radius: 50%;
+        background: var(--ink);
+        color: #fff;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: var(--shadow-md);
+        opacity: 0;
+        pointer-events: none;
+        transition:
+          opacity 0.2s ease,
+          transform 0.2s ease;
+        z-index: 45;
+      }
+      .top-btn.is-visible {
+        opacity: 1;
+        pointer-events: auto;
+      }
+      .top-btn:hover {
+        transform: translateY(-2px);
+      }
+      .top-btn svg {
+        width: 18px;
+        height: 18px;
+      }
+
+      @media (max-width: 560px) {
+        .page-title {
+          font-size: 26px;
+        }
+        .part-label {
+          font-size: 20px;
+        }
+        .step-label {
+          font-size: 18px;
+        }
+        h3 {
+          font-size: 19px;
+        }
+      }
+
+      pre {
+        line-height: 125%;
+      }
+      td.linenos .normal {
+        color: inherit;
+        background-color: transparent;
+        padding-left: 5px;
+        padding-right: 5px;
+      }
+      span.linenos {
+        color: inherit;
+        background-color: transparent;
+        padding-left: 5px;
+        padding-right: 5px;
+      }
+      td.linenos .special {
+        color: #000000;
+        background-color: #ffffc0;
+        padding-left: 5px;
+        padding-right: 5px;
+      }
+      span.linenos.special {
+        color: #000000;
+        background-color: #ffffc0;
+        padding-left: 5px;
+        padding-right: 5px;
+      }
+      .highlight .hll {
+        background-color: #ffffcc;
+      }
+      .highlight {
+        background: #282c34;
+        color: #abb2bf;
+      }
+      .highlight .c {
+        color: #7f848e;
+      } /* Comment */
+      .highlight .err {
+        color: #abb2bf;
+      } /* Error */
+      .highlight .esc {
+        color: #abb2bf;
+      } /* Escape */
+      .highlight .g {
+        color: #abb2bf;
+      } /* Generic */
+      .highlight .k {
+        color: #c678dd;
+      } /* Keyword */
+      .highlight .l {
+        color: #abb2bf;
+      } /* Literal */
+      .highlight .n {
+        color: #e06c75;
+      } /* Name */
+      .highlight .o {
+        color: #56b6c2;
+      } /* Operator */
+      .highlight .x {
+        color: #abb2bf;
+      } /* Other */
+      .highlight .p {
+        color: #abb2bf;
+      } /* Punctuation */
+      .highlight .ch {
+        color: #7f848e;
+      } /* Comment.Hashbang */
+      .highlight .cm {
+        color: #7f848e;
+      } /* Comment.Multiline */
+      .highlight .cp {
+        color: #7f848e;
+      } /* Comment.Preproc */
+      .highlight .cpf {
+        color: #7f848e;
+      } /* Comment.PreprocFile */
+      .highlight .c1 {
+        color: #7f848e;
+      } /* Comment.Single */
+      .highlight .cs {
+        color: #7f848e;
+      } /* Comment.Special */
+      .highlight .gd {
+        color: #e06c75;
+      } /* Generic.Deleted */
+      .highlight .ge {
+        color: #abb2bf;
+        font-style: italic;
+      } /* Generic.Emph */
+      .highlight .ges {
+        color: #abb2bf;
+      } /* Generic.EmphStrong */
+      .highlight .gr {
+        color: #e06c75;
+      } /* Generic.Error */
+      .highlight .gh {
+        color: #abb2bf;
+        font-weight: bold;
+      } /* Generic.Heading */
+      .highlight .gi {
+        color: #98c379;
+      } /* Generic.Inserted */
+      .highlight .go {
+        color: #e06c75;
+      } /* Generic.Output */
+      .highlight .gp {
+        color: #abb2bf;
+      } /* Generic.Prompt */
+      .highlight .gs {
+        color: #abb2bf;
+        font-weight: bold;
+      } /* Generic.Strong */
+      .highlight .gu {
+        color: #abb2bf;
+        font-weight: bold;
+      } /* Generic.Subheading */
+      .highlight .gt {
+        color: #e06c75;
+      } /* Generic.Traceback */
+      .highlight .kc {
+        color: #e5c07b;
+      } /* Keyword.Constant */
+      .highlight .kd {
+        color: #c678dd;
+      } /* Keyword.Declaration */
+      .highlight .kn {
+        color: #c678dd;
+      } /* Keyword.Namespace */
+      .highlight .kp {
+        color: #c678dd;
+      } /* Keyword.Pseudo */
+      .highlight .kr {
+        color: #c678dd;
+      } /* Keyword.Reserved */
+      .highlight .kt {
+        color: #e5c07b;
+      } /* Keyword.Type */
+      .highlight .ld {
+        color: #abb2bf;
+      } /* Literal.Date */
+      .highlight .m {
+        color: #d19a66;
+      } /* Literal.Number */
+      .highlight .s {
+        color: #98c379;
+      } /* Literal.String */
+      .highlight .na {
+        color: #e06c75;
+      } /* Name.Attribute */
+      .highlight .nb {
+        color: #e5c07b;
+      } /* Name.Builtin */
+      .highlight .nc {
+        color: #e5c07b;
+      } /* Name.Class */
+      .highlight .no {
+        color: #e06c75;
+      } /* Name.Constant */
+      .highlight .nd {
+        color: #61afef;
+      } /* Name.Decorator */
+      .highlight .ni {
+        color: #e06c75;
+      } /* Name.Entity */
+      .highlight .ne {
+        color: #e06c75;
+      } /* Name.Exception */
+      .highlight .nf {
+        color: #61afef;
+        font-weight: bold;
+      } /* Name.Function */
+      .highlight .nl {
+        color: #e06c75;
+      } /* Name.Label */
+      .highlight .nn {
+        color: #e06c75;
+      } /* Name.Namespace */
+      .highlight .nx {
+        color: #e06c75;
+      } /* Name.Other */
+      .highlight .py {
+        color: #e06c75;
+      } /* Name.Property */
+      .highlight .nt {
+        color: #e06c75;
+      } /* Name.Tag */
+      .highlight .nv {
+        color: #e06c75;
+      } /* Name.Variable */
+      .highlight .ow {
+        color: #56b6c2;
+      } /* Operator.Word */
+      .highlight .pm {
+        color: #abb2bf;
+      } /* Punctuation.Marker */
+      .highlight .w {
+        color: #abb2bf;
+      } /* Text.Whitespace */
+      .highlight .mb {
+        color: #d19a66;
+      } /* Literal.Number.Bin */
+      .highlight .mf {
+        color: #d19a66;
+      } /* Literal.Number.Float */
+      .highlight .mh {
+        color: #d19a66;
+      } /* Literal.Number.Hex */
+      .highlight .mi {
+        color: #d19a66;
+      } /* Literal.Number.Integer */
+      .highlight .mo {
+        color: #d19a66;
+      } /* Literal.Number.Oct */
+      .highlight .sa {
+        color: #98c379;
+      } /* Literal.String.Affix */
+      .highlight .sb {
+        color: #98c379;
+      } /* Literal.String.Backtick */
+      .highlight .sc {
+        color: #98c379;
+      } /* Literal.String.Char */
+      .highlight .dl {
+        color: #98c379;
+      } /* Literal.String.Delimiter */
+      .highlight .sd {
+        color: #98c379;
+      } /* Literal.String.Doc */
+      .highlight .s2 {
+        color: #98c379;
+      } /* Literal.String.Double */
+      .highlight .se {
+        color: #98c379;
+      } /* Literal.String.Escape */
+      .highlight .sh {
+        color: #98c379;
+      } /* Literal.String.Heredoc */
+      .highlight .si {
+        color: #98c379;
+      } /* Literal.String.Interpol */
+      .highlight .sx {
+        color: #98c379;
+      } /* Literal.String.Other */
+      .highlight .sr {
+        color: #98c379;
+      } /* Literal.String.Regex */
+      .highlight .s1 {
+        color: #98c379;
+      } /* Literal.String.Single */
+      .highlight .ss {
+        color: #98c379;
+      } /* Literal.String.Symbol */
+      .highlight .bp {
+        color: #e5c07b;
+      } /* Name.Builtin.Pseudo */
+      .highlight .fm {
+        color: #56b6c2;
+        font-weight: bold;
+      } /* Name.Function.Magic */
+      .highlight .vc {
+        color: #e06c75;
+      } /* Name.Variable.Class */
+      .highlight .vg {
+        color: #e06c75;
+      } /* Name.Variable.Global */
+      .highlight .vi {
+        color: #e06c75;
+      } /* Name.Variable.Instance */
+      .highlight .vm {
+        color: #e06c75;
+      } /* Name.Variable.Magic */
+      .highlight .il {
+        color: #d19a66;
+      } /* Literal.Number.Integer.Long */
+    </style>
+  </head>
+  <body>
+    <div class="mobile-bar">
+      <button class="menu-btn" id="menuBtn" aria-label="目次を開く"><span></span></button>
+      <div class="mobile-bar-title">エンタープライズRAG完全ガイド</div>
+    </div>
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+    <div class="layout">
+      <nav class="sidebar" aria-label="目次">
+        <span class="sidebar-brand">Enterprise RAG Guide</span>
+        <p class="sidebar-title">初学者のための<br />ステップバイステップ解説</p>
+        <ul class="toc">
+          <li class="toc-intro"><a href="#intro" class="toc-link">はじめに</a></li>
+          <li class="toc-part">
+            <a href="#part-1-rag" class="toc-link toc-link--part">Part 1　RAGの基礎を理解する</a>
+            <ul class="toc-substeps">
+              <li>
+                <a href="#step-1-rag" class="toc-link toc-link--sub"
+                  >Step 1　なぜ企業にRAGが必要なのか</a
+                >
+              </li>
+              <li>
+                <a href="#step-2-rag2" class="toc-link toc-link--sub"
+                  >Step 2　RAGを支える2つのパイプライン</a
+                >
+              </li>
+            </ul>
+          </li>
+          <li class="toc-part">
+            <a href="#part-2-rag" class="toc-link toc-link--part"
+              >Part 2　エンタープライズRAGを支える主要技術</a
+            >
+            <ul class="toc-substeps">
+              <li>
+                <a href="#step-3" class="toc-link toc-link--sub"
+                  >Step 3　ドキュメントの前処理とチャンキング戦略</a
+                >
+              </li>
+              <li>
+                <a href="#step-4-embedding" class="toc-link toc-link--sub"
+                  >Step 4　Embeddingとベクトルデータベースの選定</a
+                >
+              </li>
+              <li>
+                <a href="#step-5" class="toc-link toc-link--sub"
+                  >Step 5　検索精度を高める：ハイブリッド検索とコンテキスト検索</a
+                >
+              </li>
+              <li>
+                <a href="#step-6" class="toc-link toc-link--sub"
+                  >Step 6　リランキングでノイズを除去する</a
+                >
+              </li>
+              <li>
+                <a href="#step-7-graphrag" class="toc-link toc-link--sub"
+                  >Step 7　GraphRAG：構造化された関係性を活用する</a
+                >
+              </li>
+              <li>
+                <a href="#step-8-ragagentic-rag" class="toc-link toc-link--sub"
+                  >Step 8　エージェント型RAG（Agentic RAG）</a
+                >
+              </li>
+            </ul>
+          </li>
+          <li class="toc-part">
+            <a href="#part-3" class="toc-link toc-link--part">Part 3　エンタープライズ特有の要件</a>
+            <ul class="toc-substeps">
+              <li>
+                <a href="#step-9" class="toc-link toc-link--sub"
+                  >Step 9　セキュリティとアクセス制御</a
+                >
+              </li>
+              <li>
+                <a href="#step-10" class="toc-link toc-link--sub">Step 10　評価とモニタリング</a>
+              </li>
+              <li>
+                <a href="#step-11" class="toc-link toc-link--sub"
+                  >Step 11　本番運用：スケーリングと継続的改善</a
+                >
+              </li>
+            </ul>
+          </li>
+          <li class="toc-part">
+            <a href="#part-4" class="toc-link toc-link--part">Part 4　まとめ</a>
+            <ul class="toc-substeps">
+              <li>
+                <a href="#rag" class="toc-link toc-link--sub"
+                  >エンタープライズRAG 全体アーキテクチャ</a
+                >
+              </li>
+              <li>
+                <a href="#_4" class="toc-link toc-link--sub"
+                  >よくある落とし穴とベストプラクティス</a
+                >
+              </li>
+              <li><a href="#_5" class="toc-link toc-link--sub">さらに学ぶために</a></li>
+              <li><a href="#_6" class="toc-link toc-link--sub">参考ソース一覧</a></li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+
+      <div class="content-wrap">
+        <main class="article">
+          <header class="page-header">
+            <h1 class="page-title">
+              エンタープライズRAG完全ガイド：初学者のためのステップバイステップ解説
+            </h1>
+          </header>
+
+          <blockquote class="intro-panel" id="intro">
+            <p>
+              <strong>対象読者</strong>：RAG（Retrieval-Augmented
+              Generation）という言葉は聞いたことがあるが、企業システムとして本番稼働させる際に何が必要になるのか体系的に理解したいエンジニア・アーキテクト志望者
+            </p>
+            <p>
+              <strong>前提知識</strong
+              >：LLM（大規模言語モデル）の基本的な仕組みを知っていること（詳しいプログラミング経験は不要）
+            </p>
+            <p>
+              <strong>情報基準日</strong
+              >：2026年9月10日時点の公開情報をもとに構成しています。RAGは変化の速い分野のため、実装前に一次情報（公式ドキュメント）を必ず確認してください。
+            </p>
+          </blockquote>
+          <h2 class="part-heading" id="part-1-rag">
+            <span class="part-badge">Part 1</span
+            ><span class="part-label">RAGの基礎を理解する</span>
+          </h2>
+          <h3 class="step-heading" id="step-1-rag">
+            <span class="step-badge">1</span
+            ><span class="step-label">なぜ企業にRAGが必要なのか</span>
+          </h3>
+          <p>LLMは膨大なテキストで事前学習されていますが、次の3つの弱点を抱えています。</p>
+          <ul>
+            <li>
+              <strong>知識が古い</strong
+              >：学習データのカットオフ以降の出来事や、社内の最新情報を知らない
+            </li>
+            <li>
+              <strong>社外秘の情報を知らない</strong
+              >：社内Wiki、契約書、顧客データベースなどは学習データに含まれていない
+            </li>
+            <li>
+              <strong>幻覚（ハルシネーション）を起こす</strong
+              >：知らないことでも、もっともらしい嘘の回答を生成してしまう
+            </li>
+          </ul>
+          <p>
+            これらの弱点を解消するために、企業がLLMに独自データを持たせる方法は大きく3つあります。
+          </p>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>アプローチ</th>
+                  <th>概要</th>
+                  <th>向いているケース</th>
+                  <th>弱点</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>プロンプトに全部詰め込む（Long Context）</strong></td>
+                  <td>関連文書をまるごとプロンプトに入れる</td>
+                  <td>
+                    知識ベースが小さい（目安：知識ベースだけでなく、システム指示・ユーザー質問・会話履歴・ツール定義・<code>max_tokens</code>（出力予約枠）を<strong>合算</strong>した総量が、利用するモデルのコンテキスト上限に運用上の余裕を残して収まること。例えばAnthropicは知識ベース側の目安として20万トークン未満を挙げている）
+                  </td>
+                  <td>知識ベースが大きくなるとコスト・レイテンシが跳ね上がる</td>
+                </tr>
+                <tr>
+                  <td><strong>ファインチューニング</strong></td>
+                  <td>モデルの重みを独自データで再学習する</td>
+                  <td>話し方・フォーマットなど「振る舞い」を変えたい場合</td>
+                  <td>知識の更新に再学習が必要でコストが高く、出典を明示できない</td>
+                </tr>
+                <tr>
+                  <td><strong>RAG（検索拡張生成）</strong></td>
+                  <td>質問ごとに外部知識ベースを検索し、関連情報をプロンプトに動的に追加する</td>
+                  <td>知識ベースが大きく頻繁に更新される、出典の提示が必要</td>
+                  <td>検索パイプライン全体の設計・運用コストがかかる</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            Anthropicの公式ガイダンスでも、知識ベースが20万トークン未満に収まる場合は無理にRAGを組まず、<a
+              class="ext-link"
+              href="https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching"
+              rel="noopener noreferrer"
+              target="_blank"
+              >プロンプトキャッシュ</a
+            >を使って全文をコンテキストに入れる方がシンプルで効果的だとされています。
+          </p>
+          <p>
+            ただし、この「20万トークン」は<strong>知識ベース単体の目安</strong>であり、そのままコンテキスト上限と読み替えてはいけません。実際に1リクエストが消費するのは、知識ベース本文に加えて、①システム指示（プロンプト）、②ユーザーの質問、③会話履歴（マルチターンでは累積する）、④ツール定義（Function
+            Calling のスキーマ）、⑤<code>max_tokens</code>
+            で予約する出力枠、の合計です。運用上は次の不等式を満たすように予算を組んでください。
+          </p>
+          <div class="code-card">
+            <div class="code-card-bar"><span class="code-lang">Plain text</span></div>
+            <div class="highlight">
+              <pre><span></span>知識ベース + システム指示 + ユーザー質問 + 会話履歴 + ツール定義 + max_tokens（出力予約）
+  &lt; 採用モデルのコンテキスト上限 − 運用ヘッドルーム
+</pre>
+            </div>
+          </div>
+          <p>
+            会話履歴とツール定義はターンを重ねるほど膨らむため、ヘッドルーム（例：上限の10〜20%）を確保しておかないと、パイロットでは通っていたリクエストが本番の長い会話で上限超過エラーになります。閾値はプロバイダと対象モデルのコンテキスト上限に依存するため、実際に採用するモデルの上限に対してこの合計値が収まることを必ず確認してください。知識ベースがスケールしてきた段階で、初めてRAGが本当に必要になります。
+          </p>
+          <h4 id="ragnaive-rag">RAGの基本的な流れ（Naive RAG）</h4>
+          <p>まずは最もシンプルなRAGの全体像を掴みましょう。</p>
+          <div class="mermaid-card">
+            <pre class="mermaid">
+flowchart LR
+    A[ユーザーの質問] --&gt; B[Embeddingへ変換]
+    B --&gt; C[(ベクトルDB)]
+    C --&gt; D[類似度検索&lt;br/&gt;上位K件のチャンク]
+    A --&gt; E[プロンプト組み立て]
+    D --&gt; E
+    E --&gt; F[LLMが生成]
+    F --&gt; G[回答と出典を提示]</pre
+            >
+          </div>
+          <p>
+            これが「Naive
+            RAG」と呼ばれる最小構成です。企業向けRAG（エンタープライズRAG）は、この基本形に
+            <strong>セキュリティ・精度・信頼性・運用性</strong>
+            を積み上げていくものだと理解してください。Manning社のMEAP（Manning Early Access
+            Program＝早期アクセスプログラム）として執筆・公開が進んでいる書籍『<a
+              class="ext-link"
+              href="https://www.manning.com/books/enterprise-rag"
+              rel="noopener noreferrer"
+              target="_blank"
+              >Enterprise RAG</a
+            >』（著者 Tyler Suard、Fortune
+            500企業でのRAG開発経験をもとに執筆）でも、単純なデモとして動くRAGと、実運用に耐えるRAGの間には大きなギャップがあると強調されています。MEAPは完成前の原稿を順次公開する形態のため、現時点で読めるのは全体の一部の章に限られ、内容も改訂される可能性がある点に留意してください。
+          </p>
+          <h3 class="step-heading" id="step-2-rag2">
+            <span class="step-badge">2</span
+            ><span class="step-label">RAGを支える2つのパイプライン</span>
+          </h3>
+          <p>本番のRAGシステムは、実は2つの独立したパイプラインで構成されています。</p>
+          <ol>
+            <li>
+              <strong>インデックスパイプライン（オフライン・バッチ処理）</strong
+              >：ドキュメントの取り込み〜ベクトル化までを、データ更新のたびに実行
+            </li>
+            <li>
+              <strong>クエリパイプライン（オンライン・リアルタイム処理）</strong
+              >：ユーザーの質問が来るたびに、厳しいレイテンシ制約の中で検索〜生成までを実行
+            </li>
+          </ol>
+          <h4 id="_1">インデックスパイプライン</h4>
+          <div class="mermaid-card">
+            <pre class="mermaid">
+flowchart TD
+    A[生ドキュメント&lt;br/&gt;PDF・Word・Confluence・DB] --&gt; B[パースとクレンジング]
+    B --&gt; C[チャンク分割]
+    C --&gt; D[チャンクにコンテキストを付与]
+    D --&gt; E[Embeddingモデルでベクトル化]
+    D --&gt; T[BM25用テキスト処理&lt;br/&gt;正規化・トークン化]
+    C --&gt; G[メタデータ付与&lt;br/&gt;部署・機密度・ACL]
+    E --&gt;|ベクトル| F[(ベクトルDB)]
+    T --&gt;|テキスト| H[(BM25インデックス)]
+    G --&gt; F
+    G --&gt; H</pre
+            >
+          </div>
+          <p>
+            ここで手を抜くと、後工程でどれだけ良いLLMを使っても精度は上がりません。実際、エンタープライズRAGの実装ガイド（Lasting
+            Dynamics）は、パイロットが本番に到達しない<strong>主要な失敗要因の一部</strong>として、チャンキング設計・Embedding選定・評価基盤の欠如を挙げています。また学術研究（Barnett
+            et al.,
+            2024）も、実運用システムで観測された失敗点のうちいくつかが取り込み・検索段のデータ処理に起因することを報告しています。いずれも「原因の大半がこの3点に集約される」といった割合や排他性を示すものではない点には注意が必要です。「Garbage
+            In, Garbage
+            Out」―ソースデータの品質がRAG全体の品質の上限を決めるという原則は、エンタープライズRAGにおいて特に重要です。
+          </p>
+          <h4 id="_2">クエリパイプライン（基本形）</h4>
+          <div class="mermaid-card">
+            <pre class="mermaid">
+flowchart TD
+    Q[ユーザークエリ] --&gt; QR[クエリ書き換え・拡張]
+    QR --&gt; RET[検索&lt;br/&gt;ベクトルDB]
+    RET --&gt; CTX[上位Kチャンクを&lt;br/&gt;プロンプトへ結合]
+    CTX --&gt; LLM[LLMが回答生成]
+    LLM --&gt; ANS[回答と引用元]</pre
+            >
+          </div>
+          <p>
+            この2つのパイプラインを意識して設計することが、エンタープライズRAGの第一歩です。以降のStepでは、それぞれの矢印の中身を具体的に深掘りしていきます。
+          </p>
+          <h2 class="part-heading" id="part-2-rag">
+            <span class="part-badge">Part 2</span
+            ><span class="part-label">エンタープライズRAGを支える主要技術</span>
+          </h2>
+          <h3 class="step-heading" id="step-3">
+            <span class="step-badge">3</span
+            ><span class="step-label">ドキュメントの前処理とチャンキング戦略</span>
+          </h3>
+          <p>
+            ドキュメントをそのままEmbeddingモデルに渡すことはできません。Embeddingモデルには入力できるトークン数の上限（コンテキストウィンドウ）があり、また検索の粒度を細かくするためにも、ドキュメントを「チャンク」と呼ばれる小さな単位に分割する必要があります。
+          </p>
+          <p>
+            チャンクが大きすぎると無関係な情報が混ざって検索精度が落ち、小さすぎると文脈が失われます。ベクトルDBを提供するPineconeの公式ラーニングセンターでは、この2つの制約のバランスを取ることがチャンキング設計の核心だと説明されています。
+          </p>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>手法</th>
+                  <th>概要</th>
+                  <th>長所</th>
+                  <th>短所</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>固定長分割（Fixed-size）</strong></td>
+                  <td>文字数・トークン数で機械的に分割</td>
+                  <td>実装が簡単、高速</td>
+                  <td>文の途中で切れて文脈が壊れやすい</td>
+                </tr>
+                <tr>
+                  <td><strong>再帰的分割（Recursive Character）</strong></td>
+                  <td>段落→文→単語の順に区切り文字を優先して分割</td>
+                  <td>自然な境界を保ちやすい、LangChain等の標準実装</td>
+                  <td>チャンクサイズにばらつきが出る</td>
+                </tr>
+                <tr>
+                  <td><strong>セマンティックチャンキング</strong></td>
+                  <td>文同士のEmbedding類似度が下がる箇所で分割</td>
+                  <td>意味的なまとまりを保持できる</td>
+                  <td>計算コストが高い</td>
+                </tr>
+                <tr>
+                  <td><strong>階層的チャンキング（親子・要約付与）</strong></td>
+                  <td>小さいチャンクに、親文書の要約やタイトルをメタデータとして注入</td>
+                  <td>局所的な精度と全体文脈を両立</td>
+                  <td>インデックス構造がやや複雑になる</td>
+                </tr>
+                <tr>
+                  <td><strong>レイトチャンキング（Late Chunking）</strong></td>
+                  <td>
+                    文書全体を長文対応Embeddingモデルに通してから、チャンク単位でベクトルを切り出す
+                  </td>
+                  <td>文書全体の文脈を保持したままチャンク化できる</td>
+                  <td>長文対応の埋め込みモデルが必要</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            チャンキング戦略の違いは検索再現率（Recall）に無視できない影響を与えます。実務では「512〜1024トークン、オーバーラップ10〜20%程度」が実用的な出発点とされることが多いものの、最適値はドメインとクエリの性質に依存するため、自社データで実測することが欠かせません（本ガイドでは、戦略間の差を定量化した検証条件の明示された一次情報を確認できなかったため、具体的な改善幅の数値は挙げません）。
+          </p>
+          <p>チャンキングの考え方をコードで示すと、次のようなイメージです（擬似コード）。</p>
+          <div class="code-card">
+            <div class="code-card-bar"><span class="code-lang">Python</span></div>
+            <div class="highlight">
+              <pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">langchain_text_splitters</span><span class="w"> </span><span class="kn">import</span> <span class="n">RecursiveCharacterTextSplitter</span>
+
+<span class="n">splitter</span> <span class="o">=</span> <span class="n">RecursiveCharacterTextSplitter</span><span class="p">(</span>
+    <span class="c1"># 注意: RecursiveCharacterTextSplitter の既定の長さ計算は len()＝「文字数」。</span>
+    <span class="c1"># 以下の 800 / 150 は上記のトークン推奨値（512〜1024トークン）ではなく文字数の設定値。</span>
+    <span class="n">chunk_size</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span>       <span class="c1"># 文字数(≒日本語で400〜800トークン相当。単位が違う点に注意)</span>
+    <span class="n">chunk_overlap</span><span class="o">=</span><span class="mi">150</span><span class="p">,</span>    <span class="c1"># 文字数。チャンク間の重なり(文脈の欠落を防ぐ)</span>
+    <span class="n">separators</span><span class="o">=</span><span class="p">[</span><span class="s2">"</span><span class="se">\n</span><span class="s2">## "</span><span class="p">,</span> <span class="s2">"</span><span class="se">\n\n</span><span class="s2">"</span><span class="p">,</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span> <span class="s2">"。"</span><span class="p">,</span> <span class="s2">" "</span><span class="p">,</span> <span class="s2">""</span><span class="p">],</span>  <span class="c1"># 末尾の "" は文字単位のフォールバック</span>
+<span class="p">)</span>
+
+<span class="n">chunks</span> <span class="o">=</span> <span class="n">splitter</span><span class="o">.</span><span class="n">split_text</span><span class="p">(</span><span class="n">document_text</span><span class="p">)</span>
+</pre>
+            </div>
+          </div>
+          <p>
+            トークン単位で揃えたい場合は、<strong>対象モデルのトークナイザを明示</strong>したうえでトークン基準の長さ計算を使います。<code
+              >from_tiktoken_encoder</code
+            >
+            は引数を省略すると既定の
+            <code>gpt2</code>
+            エンコーディングで数えてしまい、実際に使うモデルのトークン数とずれるため、<code>model_name</code>（または
+            <code>encoding_name</code>）を必ず指定してください。
+          </p>
+          <div class="code-card">
+            <div class="code-card-bar"><span class="code-lang">Python</span></div>
+            <div class="highlight">
+              <pre><span></span><span class="c1"># OpenAI系モデル: 対象モデルのエンコーディングを明示する(既定の gpt2 に依存しない)</span>
+<span class="n">splitter</span> <span class="o">=</span> <span class="n">RecursiveCharacterTextSplitter</span><span class="o">.</span><span class="n">from_tiktoken_encoder</span><span class="p">(</span>
+    <span class="n">model_name</span><span class="o">=</span><span class="s2">"gpt-4o-mini"</span><span class="p">,</span>   <span class="c1"># または encoding_name="o200k_base"</span>
+    <span class="n">chunk_size</span><span class="o">=</span><span class="mi">768</span><span class="p">,</span>             <span class="c1"># トークン数</span>
+    <span class="n">chunk_overlap</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+    <span class="n">separators</span><span class="o">=</span><span class="p">[</span><span class="s2">"</span><span class="se">\n</span><span class="s2">## "</span><span class="p">,</span> <span class="s2">"</span><span class="se">\n\n</span><span class="s2">"</span><span class="p">,</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span> <span class="s2">"。"</span><span class="p">,</span> <span class="s2">" "</span><span class="p">,</span> <span class="s2">""</span><span class="p">],</span>
+<span class="p">)</span>
+
+<span class="c1"># OpenAI以外のモデル: そのモデルのトークナイザでトークン数を返す length_function を渡す</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">AutoTokenizer</span>
+
+<span class="n">tokenizer</span> <span class="o">=</span> <span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">"&lt;対象モデルのID&gt;"</span><span class="p">)</span>
+<span class="n">splitter</span> <span class="o">=</span> <span class="n">RecursiveCharacterTextSplitter</span><span class="p">(</span>
+    <span class="n">chunk_size</span><span class="o">=</span><span class="mi">768</span><span class="p">,</span>
+    <span class="n">chunk_overlap</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+    <span class="n">length_function</span><span class="o">=</span><span class="k">lambda</span> <span class="n">text</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">add_special_tokens</span><span class="o">=</span><span class="kc">False</span><span class="p">)),</span>
+    <span class="n">separators</span><span class="o">=</span><span class="p">[</span><span class="s2">"</span><span class="se">\n</span><span class="s2">## "</span><span class="p">,</span> <span class="s2">"</span><span class="se">\n\n</span><span class="s2">"</span><span class="p">,</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span> <span class="s2">"。"</span><span class="p">,</span> <span class="s2">" "</span><span class="p">,</span> <span class="s2">""</span><span class="p">],</span>
+<span class="p">)</span>
+</pre>
+            </div>
+          </div>
+          <p>
+            tiktokenはOpenAIのモデル向けのトークナイザであり、Claude・Gemini・オープンウェイトモデル等のトークン数とは一致しません。<strong>埋め込みモデルと生成モデルでトークナイザが異なる場合は、チャンクサイズの基準にするトークナイザをどちらにするかを決めて記録しておきます。</strong>文字数のまま運用しても構いませんが、その場合は「512〜1024トークン」という推奨値と単位が異なるため、実測時に両者を混同しないよう記録を分けておくことが重要です(日本語は1トークンあたりの文字数が英語より少なく、換算比はモデルのトークナイザによって変わります)。
+          </p>
+          <p>
+            LlamaIndexの共同創業者・CEOであるJerry
+            Liu氏も、RAGを本番運用する際の重要な観点として、ユースケースごとにチャンクサイズを変える必要があること(要約タスクは全チャンクが必要、Q&amp;Aタスクは特定チャンクだけで良い)、そしてドキュメントの要約をメタデータとして小さいチャンクに注入する「階層的チャンキング」が有効であることを繰り返し発信しています。
+          </p>
+          <h3 class="step-heading" id="step-4-embedding">
+            <span class="step-badge">4</span
+            ><span class="step-label">Embeddingとベクトルデータベースの選定</span>
+          </h3>
+          <p>
+            チャンクをベクトル化する「Embeddingモデル」と、そのベクトルを保存・検索する「ベクトルデータベース」の組み合わせが検索性能の土台になります。
+          </p>
+          <h4 id="embedding">Embeddingモデルの選び方</h4>
+          <ul>
+            <li>
+              <strong>汎用用途</strong
+              >：OpenAIの<code>text-embedding-3-large</code>のような汎用モデルが安全な選択肢としてよく使われます
+            </li>
+            <li>
+              <strong>ドメイン特化</strong>：法務・金融など専門用語が多い領域では、Voyage
+              AIのようなドメイン特化型Embeddingが汎用モデルを上回るという報告があります
+            </li>
+            <li>
+              <strong>Anthropicの検証</strong
+              >：Anthropicが独自に行ったRAG精度検証では、テストしたモデルの中でVoyageとGoogle
+              Geminiの埋め込みが特に高い性能を示したと報告されています
+            </li>
+          </ul>
+          <h4 id="_3">ベクトルデータベースの選定基準</h4>
+          <p>
+            「唯一絶対の正解」はなく、既存インフラ・運用体制・スケールによって最適解が変わります。
+          </p>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>データベース</th>
+                  <th>特徴</th>
+                  <th>向いているケース</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Pinecone</strong></td>
+                  <td>フルマネージド、運用負荷が低い</td>
+                  <td>運用チームを増やさずに素早く始めたい場合</td>
+                </tr>
+                <tr>
+                  <td><strong>Weaviate</strong></td>
+                  <td>フルマネージド/セルフホスト両対応、ハイブリッド検索が標準搭載</td>
+                  <td>ベクトル検索とキーワード検索を同一基盤で扱いたい場合</td>
+                </tr>
+                <tr>
+                  <td><strong>Qdrant</strong></td>
+                  <td>セルフホストに強く、低レイテンシ</td>
+                  <td>インフラを自社管理しつつ高速な検索が必要な場合</td>
+                </tr>
+                <tr>
+                  <td><strong>Milvus</strong></td>
+                  <td>大規模分散処理に強いOSS</td>
+                  <td>数十億ベクトル規模の大規模運用</td>
+                </tr>
+                <tr>
+                  <td><strong>pgvector（PostgreSQL拡張）</strong></td>
+                  <td>既存のPostgreSQL資産を流用可能</td>
+                  <td>中規模データで新しいミドルウェアを増やしたくない場合</td>
+                </tr>
+                <tr>
+                  <td><strong>Elasticsearch / Vespa</strong></td>
+                  <td>全文検索とベクトル検索を同一インデックスで統合</td>
+                  <td>キーワード検索基盤が既にElastic系の場合</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            中規模のエンタープライズRAGであれば、pgvectorやQdrantで要件の大部分をカバーできるという実務者の見解もあります。重要なのは「流行っているから」ではなく、既存のデータ基盤・チームのスキルセット・コンプライアンス要件(自社ホストが必須か等)から逆算して選ぶことです。
+          </p>
+          <h3 class="step-heading" id="step-5">
+            <span class="step-badge">5</span
+            ><span class="step-label">検索精度を高める：ハイブリッド検索とコンテキスト検索</span>
+          </h3>
+          <h4 id="embedding-bm25">ハイブリッド検索（Embedding + BM25）</h4>
+          <p>
+            Embeddingによる意味検索は「言い換え」に強い一方、<code>エラーコード TS-999</code
+            >のような固有の識別子・型番の完全一致検索は苦手です。そこで、古典的なキーワード検索アルゴリズムである<strong>BM25</strong>（TF-IDFを改良したランキング関数）を組み合わせる構成が、実務上よく採られます。
+          </p>
+          <ol>
+            <li>文書をチャンクに分割する</li>
+            <li>
+              各チャンクについて、キーワード検索用の転置インデックス(語の出現位置と文書頻度・平均文書長などのコレクション統計)と、意味検索用のEmbeddingベクトルの両方を作成する。BM25スコアはインデックス作成時には確定せず、<strong
+                >クエリ時にクエリ語と統計情報から計算される</strong
+              >
+            </li>
+            <li>BM25で完全一致に強い候補を、Embeddingで意味的に近い候補をそれぞれ取得する</li>
+            <li>両者の結果をReciprocal Rank Fusion（RRF）などの手法で統合・重複排除する</li>
+            <li>上位K件をLLMのプロンプトに追加する</li>
+          </ol>
+          <h4 id="anthropiccontextual-retrieval">
+            Anthropicの「コンテキスト検索（Contextual Retrieval）」
+          </h4>
+          <p>
+            Anthropicは2024年9月に、チャンク分割によって文脈が失われる問題を解決する手法として「Contextual
+            Retrieval」を公式発表しました。チャンク単位の文脈欠落に対する具体的な対処法として、公開された実験結果とともに提示されている手法です。
+          </p>
+          <p>
+            考え方はシンプルです。通常のチャンクには元の文書のどの部分かという情報がありません。例えば以下のチャンクだけでは、どの企業のどの四半期の話か分かりません。
+          </p>
+          <div class="code-card">
+            <div class="code-card-bar"><span class="code-lang">Python</span></div>
+            <div class="highlight">
+              <pre><span></span><span class="n">original_chunk</span> <span class="o">=</span> <span class="s2">"同社の売上高は前四半期比3%増加した。"</span>
+
+<span class="c1"># コンテキスト検索では、埋め込み・BM25インデックス作成の前に</span>
+<span class="c1"># チャンク特有の説明文を付加する</span>
+<span class="n">contextualized_chunk</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">"このチャンクは、ACME社の2023年第2四半期の業績に関するSEC提出資料からの抜粋であり、"</span>
+    <span class="s2">"前四半期の売上高は3億1,400万ドルであった。"</span>
+    <span class="s2">"同社の売上高は前四半期比3%増加した。"</span>
+<span class="p">)</span>
+</pre>
+            </div>
+          </div>
+          <p>
+            この「文脈の要約」を、文書全体を渡した状態でLLM（Anthropicの実験ではClaude 3
+            Haiku）に生成させ、Embeddingおよび
+            BM25インデックスの作成前にチャンクへ付加します。Anthropicの公開実験結果では次のような改善が確認されています。
+          </p>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>手法</th>
+                  <th>検索失敗率（Top-20）</th>
+                  <th>ベースラインからの改善率</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>ベースライン（Embedding + BM25のみ）</td>
+                  <td>5.7%</td>
+                  <td>―</td>
+                </tr>
+                <tr>
+                  <td>コンテキスト付きEmbedding</td>
+                  <td>3.7%</td>
+                  <td>約35%削減</td>
+                </tr>
+                <tr>
+                  <td>コンテキスト付きEmbedding + コンテキスト付きBM25</td>
+                  <td>2.9%</td>
+                  <td>約49%削減</td>
+                </tr>
+                <tr>
+                  <td>上記 + リランキング</td>
+                  <td>1.9%</td>
+                  <td>約67%削減</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            また、Claudeのプロンプトキャッシュ機能を使うことで、コンテキスト検索の前処理コストは<strong>ドキュメント100万トークンあたり約1.02ドル</strong>まで抑えられると報告されています。ただしこの数値は特定のベンチマーク条件下での見積もりであり、前提は「Claude
+            3 Haikuを使用」「インデックス生成は一度きり(one-time
+            indexing)」「チャンクサイズ800トークン」「ドキュメント長8,000トークン」「指示文50トークン」「チャンクごとに生成するコンテキスト100トークン」です。モデル・チャンクサイズ・文書長が変われば単価も変わるため、自社の条件で再計算してください。なお、プロンプトキャッシュは「2回目以降のリクエストから文書を省ける」仕組みではありません。<strong>文書全体は毎回のリクエストに含めたまま</strong>で、サーバー側が共通の接頭辞(この場合は文書全体)に対応する<strong>キャッシュ済みトークンを再利用する</strong>ことで、再処理の計算量と課金額が下がる、という挙動です。プロンプトキャッシュ自体もレイテンシを半分以下に短縮し、コストを最大90%削減する効果があるとされ、エンタープライズ規模でRAGの前処理コストを現実的な水準に抑える鍵になっています。
+          </p>
+          <h3 class="step-heading" id="step-6">
+            <span class="step-badge">6</span
+            ><span class="step-label">リランキングでノイズを除去する</span>
+          </h3>
+          <p>
+            初期検索（ベクトル検索＋BM25）は、数十〜数百件の候補チャンクを高速だが粗い精度で取得します。ここに<strong
+              >リランキングモデル（Cross-Encoderやクラウド型Rerank API）</strong
+            >を挟むことで、クエリとチャンクの関連性をより精密にスコアリングし、本当に必要な上位数件だけをLLMに渡すことができます。
+          </p>
+          <p>
+            Anthropicの実験では、上位150件を初期検索で取得し、Cohereのリランカーで上位20件に絞り込むことで、先述の通り検索失敗率が67%削減されるという結果が出ています。リランキングは精度を上げる一方でレイテンシと追加コストを伴うため、「どれだけの候補をリランクするか」はユースケースごとにトレードオフを検証すべきポイントです。
+          </p>
+          <p>ここまでの技術を組み込んだ、より現実的なクエリパイプラインは次のようになります。</p>
+          <div class="mermaid-card">
+            <pre class="mermaid">
+flowchart TD
+    Q[ユーザークエリ] --&gt; QR[クエリ書き換え・拡張]
+    QR --&gt; AC[呼び出しユーザーの&lt;br/&gt;権限コンテキストを解決]
+    AC --&gt; VS[ベクトル検索&lt;br/&gt;意味的類似度&lt;br/&gt;※権限条件を検索フィルタに適用]
+    AC --&gt; BM[BM25検索&lt;br/&gt;キーワード一致&lt;br/&gt;※権限条件を検索フィルタに適用]
+    VS --&gt; RRF[結果統合&lt;br/&gt;Reciprocal Rank Fusion]
+    BM --&gt; RRF
+    RRF --&gt; ACL{最終防御&lt;br/&gt;権限を再チェック}
+    ACL --&gt; RR[リランキング&lt;br/&gt;Cross-Encoder]
+    RR --&gt; CTX[上位Kチャンクを&lt;br/&gt;プロンプトへ結合]
+    CTX --&gt; LLM[LLMが回答生成]
+    LLM --&gt; ANS[回答と引用元]</pre
+            >
+          </div>
+          <p>
+            権限条件は<strong>各検索処理（ベクトル検索・BM25検索）のフィルタとして適用</strong>し、未認可の候補がRRFの統合対象に入らないようにします。統合後の「最終防御」はあくまで多層防御の最後の砦であり、ここだけに頼る設計にはしません。詳細はStep
+            9で解説します。
+          </p>
+          <h3 class="step-heading" id="step-7-graphrag">
+            <span class="step-badge">7</span
+            ><span class="step-label">GraphRAG：構造化された関係性を活用する</span>
+          </h3>
+          <p>
+            ベクトル検索は「意味の近さ」に基づく検索に強い一方、「AとBはどう関連しているか」「複数の文書をまたいだ多段階の推論」が必要なクエリには弱いという弱点があります。これを補うのが、Microsoft
+            Researchが2024年に提案した<strong>GraphRAG</strong>です。
+          </p>
+          <p>
+            GraphRAGでは、ドキュメント群からLLMを使ってエンティティ（人物・組織・製品など）と関係性を抽出し、ナレッジグラフを構築します。検索はベクトル類似度を否定するものではなく、目的に応じて複数の方式を使い分けます。
+          </p>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>検索方式</th>
+                  <th>仕組み</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Basic Search</strong></td>
+                  <td>従来どおりチャンクに対するベクトル類似度検索を行う</td>
+                </tr>
+                <tr>
+                  <td><strong>Local Search</strong></td>
+                  <td>
+                    クエリに関連するエンティティを特定し、そのエンティティと近傍（関係するエンティティ・関連テキスト単位）をたどってコンテキストを組み立てる
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>Global Search</strong></td>
+                  <td>
+                    事前に生成したコミュニティレポート（グラフのクラスタ要約）を用い、コーパス全体にまたがる問いに答える
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>DRIFT Search</strong></td>
+                  <td>
+                    Local
+                    Searchのエンティティ探索とコミュニティレポートの情報を組み合わせ、両者の長所を取る
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>ベクトルRAGとの使い分けは次のとおりです。</p>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>方式</th>
+                  <th>得意なクエリ</th>
+                  <th>弱点</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>ベクトルRAG</strong></td>
+                  <td>単発の事実質問（例：「〇〇の定義は？」）</td>
+                  <td>複数文書にまたがる関係性の推論</td>
+                </tr>
+                <tr>
+                  <td><strong>GraphRAG</strong></td>
+                  <td>
+                    関係性をたどる複雑な質問（例：「A社とB社が関わったプロジェクトの影響範囲は？」）、複数文書の要約
+                  </td>
+                  <td>グラフ構築のコストと、元データの品質への依存度が高い</td>
+                </tr>
+                <tr>
+                  <td><strong>ハイブリッド（Vector + Graph）</strong></td>
+                  <td>上記両方をカバー</td>
+                  <td>アーキテクチャの複雑さが増す</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            エンタープライズで導入する場合、<strong>認可制御をグラフ側にも同じ強度で実装する</strong>必要があります。エンティティ・関係（エッジ）・コミュニティレポートに加え、<strong
+              >Local Searchがエンティティの近傍からたどるテキスト単位（text unit）</strong
+            >のそれぞれにも<strong>出典ドキュメントID・テナントID・ACL</strong>をメタデータとして伝播させ、①
+            グラフトラバーサルを開始する前に呼び出しユーザーの権限で対象ノード・エッジ・テキスト単位を絞り込み、②
+            組み立てたコンテキストをLLMプロンプトへ渡す直前に再度検証する、という二段構えで確認します。テキスト単位はエンティティ経由で本文がそのままプロンプトに載る最短経路であるため、エンティティ・エッジ・コミュニティレポートと<strong>同じ強度</strong>の認可検証を適用します。必要なメタデータが欠落している、または不正な要素（テキスト単位を含む）は<strong>fail-closed</strong>で除外します（「権限情報がないものは通す」という設計にしない）。コミュニティレポートは複数文書の内容を要約して混ぜ込むため、要約元にひとつでも未認可の文書が含まれていれば、そのレポート全体を対象外とする扱いが安全です。Step
+            9で述べた類似度検索側の認可（検索フィルタ＋最終防御）は、これまでどおり維持します。
+          </p>
+          <p>
+            Microsoft
+            Researchは、GraphRAGが複雑な複数文書の要約タスクにおいてベースラインのRAGよりも包括性・多様性の高い回答を生成できたと報告しています。複数ホップの質問応答についても、エンティティ間の関係をたどれるグラフ拡張型の検索が有利になりやすいと一般に説明されますが、本ガイドで確認できた一次情報はこのMicrosoft
+            Researchの報告に限られるため、改善幅の具体的な主張は控えます。ただし、GraphRAGはグラフ構築・保守のコストが高く、メタデータのガバナンスが不十分な組織では効果が出にくいことにも注意が必要です。「何でもGraphRAGにする」のではなく、関係性推論が本当に必要なユースケースに絞って導入するのが現実的です。
+          </p>
+          <h3 class="step-heading" id="step-8-ragagentic-rag">
+            <span class="step-badge">8</span
+            ><span class="step-label">エージェント型RAG（Agentic RAG）</span>
+          </h3>
+          <p>
+            これまでの検索は「1回検索して1回生成する」という固定的な流れでした。しかし複雑な業務質問では、1回の検索だけでは不十分なことがよくあります。そこで、検索そのものをLLMエージェントに動的に判断させる<strong
+              >エージェント型RAG（Agentic RAG）</strong
+            >の採用が進んでいます。
+          </p>
+          <p>代表的な手法は次の2つです。</p>
+          <ul>
+            <li>
+              <strong>Self-RAG</strong
+              >：モデル自身が「この検索結果は関連しているか（IsREL）」「生成内容は根拠に支えられているか（IsSUP）」「その回答は有用か（IsUSE）」といった内部トークンで自己評価しながら、必要に応じて再検索や再生成を行う手法
+            </li>
+            <li>
+              <strong>Corrective RAG（CRAG）</strong
+              >：軽量な評価モデルが取得した文書の品質を判定し、品質が低い場合は追加のWeb検索を行うなど、状況に応じた修正アクションを取る手法
+            </li>
+          </ul>
+          <p>
+            ただしCRAGの「品質が低ければWeb検索する」という分岐は、<strong>社内文書に由来する文字列を社外へ送信する経路</strong>そのものです。エンタープライズで有効化する場合は、次を要件として固定します。
+          </p>
+          <ul>
+            <li>
+              <strong>外部送信データの機密分類とマスキング</strong
+              >：検索クエリを組み立てる前に機密分類を適用し、社外送信が許されない区分（顧客名・契約情報・未公開の製品名・ソースコード断片・個人情報など）を含むクエリは、マスキングするか、そもそもWeb検索分岐に入れずfail-closedで打ち切る
+            </li>
+            <li>
+              <strong>承認済み検索プロバイダーへの限定</strong
+              >：利用する検索APIを事前審査で承認したプロバイダーのみに限定し、データ処理契約（送信クエリを学習に使わない、保持期間、保存リージョン）を締結したうえで接続する
+            </li>
+            <li>
+              <strong>egress（外向き通信）制御</strong
+              >：エージェント実行環境からの外向き通信を、承認済みプロバイダーのドメイン・IPだけを許可する<strong>宛先allowlist</strong>（エグレスプロキシ等）で制限し、想定外の宛先への送信をネットワーク層で遮断する
+            </li>
+            <li>
+              <strong>URL取得を許可する場合のSSRF対策</strong
+              >：検索結果のURLを実際にフェッチする構成にするなら、<strong>取得プロトコルをHTTPSのみに限定</strong>し（<code>http://</code>・<code>file://</code>・<code
+                >gopher://</code
+              >
+              等のスキームはリダイレクト先も含めて拒否する）、<strong>標準の証明書チェーン検証とホスト名検証を必ず有効にしたうえで</strong>（<code
+                >verify=False</code
+              >
+              相当の無効化や自己署名証明書の無条件受け入れ、ホスト名検証のスキップは平文化・なりすましを招くため一切認めない。検証済みIPへ直接接続する場合も、TLSのSNIとホスト名検証は元のホスト名で行う）、取得先を宛先allowlistで限定し、内部ネットワーク（プライベートIP、ループバック、リンクローカル、クラウドのメタデータエンドポイント等）への到達を<strong>DNS解決結果のレベルで拒否</strong>する。このとき、<strong>検証したIPアドレスと実際の接続先を同一リクエスト内で一致させる（ピン留めする）</strong>ことが必須である。「名前解決して検証し、その後あらためて同じホスト名で接続する」実装は、検証と接続の間に別のIPが返される<strong>DNSリバインディング（TOCTOU）</strong>によって回避される。具体的には、検証済みIPアドレスに対して直接接続する（Hostヘッダ・TLSのSNIはホスト名のまま送る）か、接続確立時点で宛先を検査するエグレスプロキシを経由させる。また、<strong>リダイレクトの自動追従は無効化する</strong>か、有効にする場合は<strong>リダイレクト先へ接続するたびに同じ検証（allowlist照合とDNS解決結果の検査、および接続先のピン留め）を毎回適用する</strong>。最終宛先だけを検証する実装では、途中のリダイレクトで内部ネットワークへ到達できてしまう。取得サイズ・タイムアウトの上限も設ける
+            </li>
+            <li>
+              <strong>ツールallowlistだけでは不十分</strong
+              >：「Web検索ツールの呼び出しを許可するか」の制御は、<strong>呼び出してよいかどうか</strong>しか判定しません。許可された呼び出しの<strong>引数（検索クエリ本文）に機密情報が載っていないか</strong>は別の検査対象であり、クエリ内容に対する機密分類・マスキングを独立に実装する必要があります
+            </li>
+          </ul>
+          <p>
+            LangChainの共同創業者兼CEOであるHarrison
+            Chase氏は、NVIDIAと共同発表したエンタープライズ向けエージェント基盤に関して、企業がエージェントを本番導入するうえで、信頼性・可観測性・統制といった運用面の要件が重要になると述べています（下記「参考ソース一覧」のLangChain
+            Blog記事）。エージェント型のアーキテクチャは、回答の確からしさを単発の検索ではなく、検索と自己検証のループによって担保しようとする発展形だと言えます。なお「エンタープライズLLM導入の最大の障壁は信頼であり、RAGがそのギャップを埋める」といった一般化した主張は、本ガイドで確認できた一次情報の範囲を超えるため、ここでは行いません。
+          </p>
+          <div class="mermaid-card">
+            <pre class="mermaid">
+flowchart TD
+    U[ユーザーの要求] --&gt; P[タスクをプランニング]
+    P --&gt; B{"反復予算の残りを確認&lt;br/&gt;試行回数・経過時間&lt;br/&gt;トークン/ツール呼び出し数&lt;br/&gt;同一状態の繰り返し検知"}
+    B --&gt;|予算超過| FC[fail-closed&lt;br/&gt;根拠不十分として打ち切り&lt;br/&gt;回答を生成せず理由を返す]
+    B --&gt;|予算内| D{追加の検索が&lt;br/&gt;必要か}
+    D --&gt;|必要| R[検索を実行&lt;br/&gt;文書・SQL・Web]
+    D --&gt;|不要| G[回答を生成]
+    R --&gt; EV[取得結果の質を評価&lt;br/&gt;Self-RAG・CRAG]
+    EV --&gt;|不十分・再試行| P
+    EV --&gt;|十分| G
+    G --&gt; V[出力の根拠を検証]
+    V --&gt;|根拠不足・再試行| P
+    V --&gt;|OK| ANS[最終回答を提示]</pre
+            >
+          </div>
+          <p>
+            再試行の経路（評価が不十分な場合・根拠検証に失敗した場合）は、いずれも必ずプランニング直後の<strong>反復予算チェック</strong>を通ります。反復回数・経過時間・トークンやツール呼び出しの上限、あるいは同一クエリ・同一検索結果の繰り返し検知のいずれかに達したら、無限に再検索を続けるのではなく<strong>fail-closed</strong>（「十分な根拠が得られなかった」という結果を返して終了）します。根拠が揃った場合の通常経路だけが最終回答に到達します。
+          </p>
+          <p>
+            先述のManning『Enterprise
+            RAG』も、エージェントベースの検索・クエリの書き換え・「トリアージロジック」（質問の種類に応じて検索先を振り分ける仕組み）を実務的なテーマとして扱っており、エンタープライズRAGの実装が単純なベクトル検索だけでは完結しないことを裏付けています。特筆すべきは、この書籍がSQLデータベースに対するRAG（構造化データへの自然言語質問応答）も扱っている点です。企業のデータの多くは非構造化文書だけでなく、RDBに保管されているため、自然言語をSQLクエリに変換する「Text-to-SQL」的なアプローチも、エンタープライズRAGの重要な一部門として押さえておくとよいでしょう。
+          </p>
+          <p>
+            ただしText-to-SQLは、LLMが生成した文字列をそのままデータベースに流す構造であるため、<strong>実行境界を明示的に設計しない限り本番投入してはいけません</strong>。最低限、次を要件として固定します。
+          </p>
+          <ul>
+            <li>
+              <strong>読み取り専用接続</strong
+              >で実行し、DDL（CREATE/DROP/ALTER）とDML（INSERT/UPDATE/DELETE）は接続レベルで拒否する
+            </li>
+            <li>
+              参照可能な<strong>スキーマ・テーブル・カラムを許可リスト</strong>で限定し、リスト外への参照はクエリを実行せず却下する
+            </li>
+            <li>
+              生成されたSQLは実行前に<strong>ASTへパースして構文木を検証</strong>し、許可されたSELECT文法（および許可リストで検証済みの参照先）だけを通す。関数呼び出しは一律に拒否するのではなく<strong>許可リストで判定</strong>し、<code
+                >COUNT</code
+              >
+              / <code>SUM</code> / <code>AVG</code> / <code>MIN</code> /
+              <code>MAX</code> などの読み取り専用の組み込み集約関数と、<code>LOWER</code> /
+              <code>DATE_TRUNC</code>
+              等の副作用のない組み込みスカラー関数だけを通す。ユーザー定義関数（UDF）、副作用を持つ関数、ストアドプロシージャの呼び出し、CALL文、システムカタログ（information_schema等）、外部テーブル・仮想テーブルへの参照は明示的に拒否する。採用したパーサや実行基盤の制約で集約関数を安全に判別できない場合は、<strong>許可するSELECT文法の定義そのものに「集約関数は非対応」と明記</strong>し、集計はアプリケーション側で行う。文字列の正規表現マッチによる検査は回避が容易なため、単独の防御手段としない
+            </li>
+            <li>
+              実行ロールには<strong>不要なEXECUTE権限を付与しない</strong>（パース時の拒否とデータベース側の権限設定を二重に効かせる）
+            </li>
+            <li>値は<strong>パラメータ化</strong>して埋め込み、文字列連結でクエリを組み立てない</li>
+            <li>
+              <strong>テナント単位・ユーザー単位の行レベル認可</strong
+              >（RLS等）をデータベース側で強制し、アプリ側の条件付与だけに依存しない。PostgreSQLの場合、テーブルの所有者・superuser・<code>BYPASSRLS</code>権限を持つロールはRLSポリシーを素通りするため、実行接続には<strong>所有者でも<code>BYPASSRLS</code>権限も持たない専用の実効ロール</strong>（<code>NOBYPASSRLS</code>）を割り当てる。他のDBMSでも同様に、行レベルセキュリティを回避しうる管理者権限・所有者権限を実行ロールから排除する。RLSを適用できないテーブル・接続構成では、その対象への実行を拒否する
+            </li>
+            <li>
+              <strong>返却行数の上限</strong
+              >と<strong>クエリタイムアウト</strong>を設定し、コストと情報漏洩の影響範囲を限定する
+            </li>
+          </ul>
+          <p>
+            さらに重要なのは、<strong>ユーザー入力や取得した文書に紛れ込んだ指示によって、許可されていないデータの参照や更新が実行されないこと</strong>です。生成されたSQLは「LLMの出力＝未信頼データ」として扱い、実行前に上記の境界に照らして検証してから実行します。
+          </p>
+          <h2 class="part-heading" id="part-3">
+            <span class="part-badge">Part 3</span
+            ><span class="part-label">エンタープライズ特有の要件</span>
+          </h2>
+          <h3 class="step-heading" id="step-9">
+            <span class="step-badge">9</span
+            ><span class="step-label">セキュリティとアクセス制御</span>
+          </h3>
+          <p>
+            個人向けのRAGプロトタイプと企業向けRAGの最大の違いがここにあります。OWASP（Open Web
+            Application Security
+            Project）はRAG向けのセキュリティチートシートを公開しており、その中で<strong>最も多いコンプライアンス違反</strong>として「ドキュメントレベルの権限が、取り込み時にはチェックされるが、検索時にはチェックされない」ケースを挙げています。この場合、ある部署にしかアクセス権のない文書のチャンクを、別部署のユーザーが検索結果として受け取ってしまう可能性があります。
+          </p>
+          <p>エンタープライズRAGで最低限考慮すべきセキュリティレイヤーは次の通りです。</p>
+          <ul>
+            <li>
+              <strong>検索時アクセス制御（Retrieval-time RBAC/ABAC）</strong
+              >：類似度検索を実行する際、必ずクエリを発行したユーザーの権限でフィルタリングする。元システム（SharePoint、Confluence等）のACLをベクトルDBのメタデータへ同期し続ける仕組みが必要
+            </li>
+            <li>
+              <strong>マルチテナント分離</strong
+              >：SaaS型で複数テナントを扱う場合、テナントIDをメタデータとインデックスのネームスペース両方に埋め込み、テナントをまたいだ漏洩を防ぐ
+            </li>
+            <li>
+              <strong>プロンプトインジェクション対策</strong
+              >：取得した文書は常に<strong>未信頼データ</strong>として扱い、システムプロンプト・ユーザー入力とは明確に区切ったうえでプロンプトへ渡す。そのうえで、①入力と検索コンテキストを検査して既知の攻撃パターンを検出する、②LLMの出力とツール呼び出しの引数を検証する、③呼び出してよいツールの許可リストと実行ユーザーの権限を<strong>モデルの判断とは独立に</strong>アプリケーション側で確認する、④送信・更新・決済などの高リスク操作には人間の明示的な承認を要求する、⑤いずれかの検査に失敗した場合は続行せず<strong>fail-closed</strong>で停止する、という多層の防御を組む。なお、<strong>プロンプト上でロールを分離するだけでは取得文書内に埋め込まれた指示を防げません</strong>（モデルは区切りを無視しうる）。分離は前提であって対策の完成形ではない点に注意する
+            </li>
+            <li>
+              <strong>出力フィルタリングとDLP（データ漏洩防止）</strong
+              >：LLMの出力をそのまま信頼せず、個人情報や機密情報が意図せず含まれていないかを配信前にチェックする
+            </li>
+            <li>
+              <strong>監査ログ</strong
+              >：誰が・いつ・どのクエリを発行し、どの文書（バージョンを含む）に基づいて回答が生成されたかを追跡できるようにし、コンプライアンス要件（金融・医療・法務など）に対応する。監査ログは、Step
+              10で述べるLLMOpsの<strong>トレースストアとは別系統の保護対象</strong>として扱う（トレースはデバッグ用途で保持期間が短く、削除・改変の要件も異なるため、監査証跡をトレースで代替しない）。具体的には次を満たす構成にします。
+            </li>
+            <li>
+              <strong>回答本文・プロンプト本文を監査ログに保存しない</strong
+              >：監査ログにはクエリID・回答イベントID・利用者ID・テナントID・参照チャンクIDとバージョン・タイムスタンプ・適用したポリシー判定結果といった<strong>参照情報のみ</strong>を記録し、本文が必要な調査ではイベントIDを鍵に、別途アクセス制御されたストアを参照する
+            </li>
+            <li>
+              <strong>保存前のマスキング</strong
+              >：それでもログに本文の一部（検索クエリ等）を残す必要がある場合は、書き込み前に個人情報・秘密情報・企業機密の機密分類に応じたマスキングまたはトークン化を適用する
+            </li>
+            <li>
+              <strong>テナント単位・ユーザー単位のアクセス制御</strong
+              >：監査ログの閲覧権限をテナント／プロジェクト単位で分離し、運用者・監査担当者が他テナントの記録を閲覧できないようにする。監査ログ自体への閲覧・エクスポート操作もログに記録する（追記専用・改変不可のストアを用いる）
+            </li>
+            <li>
+              <strong>保持期間と暗号化</strong
+              >：規制要件に合わせた保持期間を用途別に定めて自動削除し、保管時・転送時ともに暗号化する。鍵の管理権限とログの閲覧権限は分離する
+            </li>
+            <li>
+              <strong>削除要求の伝播</strong
+              >：文書削除やGDPR等の削除要求は、ベクトルDB・キャッシュ・トレースストアと同様に監査ログにも伝播させる。ただし監査証跡そのものは法令上の保存義務が優先する場合があるため、<strong>本文を消して参照情報を残す</strong>（上記のイベントID方式なら本文は元から別ストアにあるため、そちらの削除で足りる）、削除を実行した事実自体を追記する、legal
+              hold中の記録は削除の例外としてアクセスを凍結する、といった扱いを事前に明文化しておく
+            </li>
+          </ul>
+          <p>
+            これらは「後から足す」ものではなく、インデックスパイプラインの設計段階から組み込む必要があります。Step
+            2の図で示した「メタデータ付与（部署・機密度・ACL）」のステップが、このセキュリティレイヤーの土台になります。
+          </p>
+          <h3 class="step-heading" id="step-10">
+            <span class="step-badge">10</span><span class="step-label">評価とモニタリング</span>
+          </h3>
+          <p>
+            「なんとなく良さそう」を「定量的に良い」に変えるのが評価（Evaluation）です。RAGは検索と生成という2つの異なる性質のコンポーネントで構成されるため、評価も両方の軸で行う必要があります。
+          </p>
+          <h4 id="ragas">RAGAS：代表的な評価フレームワーク</h4>
+          <p>
+            オープンソースの評価フレームワーク<strong>RAGAS</strong>（Retrieval Augmented Generation
+            Assessment）は、次の4つの指標を中心にRAGパイプラインの品質を測定します。
+          </p>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>指標</th>
+                  <th>何を測るか</th>
+                  <th>対応する工程</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Faithfulness（忠実性）</strong></td>
+                  <td>生成された回答の主張が、取得したコンテキストからどれだけ裏付けられるか</td>
+                  <td>生成</td>
+                </tr>
+                <tr>
+                  <td><strong>Answer Relevancy（回答関連性）</strong></td>
+                  <td>生成された回答が、質問の意図にどれだけ合致しているか</td>
+                  <td>生成</td>
+                </tr>
+                <tr>
+                  <td><strong>Context Precision（コンテキスト精度）</strong></td>
+                  <td>
+                    取得したコンテキスト（<code>retrieved_contexts</code>）のうち、関連するチャンクがどれだけ上位に順位付けされているか。各ランク
+                    k の precision@k
+                    の平均として算出される（同じ関連チャンク数でも、上位に来るほどスコアが高くなる）
+                  </td>
+                  <td>検索</td>
+                </tr>
+                <tr>
+                  <td><strong>Context Recall（コンテキスト再現率）</strong></td>
+                  <td>回答に必要な情報のうち、どれだけ検索で取得できていたか</td>
+                  <td>検索</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            この4指標セットの実務上の価値は、工程を一対一で特定できることではなく、<strong>どこから調査すべきかの優先順位を与えてくれること</strong>にあります。FaithfulnessとAnswer
+            Relevancyが低ければまず生成側（プロンプト設計やLLM選定）を、Context PrecisionとContext
+            Recallが低ければまず検索側（チャンキングやEmbedding、検索アルゴリズム）を疑う、という当たりの付け方です。
+          </p>
+          <p>
+            ただし各指標は単一工程の欠陥を証明するものではありません。検索が取りこぼしていれば回答は根拠を欠いてFaithfulnessも落ちますし、プロンプトが長すぎてコンテキストが切り捨てられれば検索側の指標が良くても回答は劣化します。スコアが下がったときは、<strong>検索結果・最終的に投入されたコンテキスト・プロンプト・回答をセットで突き合わせて</strong>原因を確認してください。
+          </p>
+          <p>
+            また、RAGASは指標の定義や算出方法がバージョン間で変わるため、<strong>採用したバージョンを記録し、そのバージョンの指標定義に基づいて解釈する</strong>ことを前提とします（本ガイドの記述はRAGAS
+            v0.2系の定義に基づきます）。異なるバージョン間でスコアを直接比較しないでください。
+          </p>
+          <h4 id="7">7つの代表的な失敗パターン</h4>
+          <p>
+            RAGの失敗事例を体系的に整理した学術研究として、Barnett氏ら（Deakin
+            University、2024年）による "Seven Failure Points When Engineering a Retrieval Augmented
+            Generation System"
+            があります。研究・教育・生物医学の3分野での実運用事例を分析し、次の7つの失敗パターンを提示しています。
+          </p>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>失敗パターン</th>
+                  <th>内容</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1</td>
+                  <td><strong>Missing Content（内容の欠如）</strong></td>
+                  <td>そもそも知識ベースに答えとなる情報が存在しない</td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td><strong>Missed the Top Ranked Documents（上位に来ない）</strong></td>
+                  <td>答えを含む文書は存在するが、検索の上位K件に入らない</td>
+                </tr>
+                <tr>
+                  <td>3</td>
+                  <td><strong>Not in Context（コンテキストからの脱落）</strong></td>
+                  <td>候補が多すぎて、重要なチャンクがプロンプト構築時に切り捨てられる</td>
+                </tr>
+                <tr>
+                  <td>4</td>
+                  <td><strong>Not Extracted（抽出失敗）</strong></td>
+                  <td>
+                    コンテキストに答えはあるが、ノイズや矛盾する情報のせいでLLMが正しく抽出できない
+                  </td>
+                </tr>
+                <tr>
+                  <td>5</td>
+                  <td><strong>Wrong Format（フォーマット誤り）</strong></td>
+                  <td>内容は合っているが、指定された形式（JSON等）で出力されない</td>
+                </tr>
+                <tr>
+                  <td>6</td>
+                  <td><strong>Incorrect Specificity（粒度の誤り）</strong></td>
+                  <td>回答が曖昧すぎる、または逆に具体的すぎて質問の意図とズレている</td>
+                </tr>
+                <tr>
+                  <td>7</td>
+                  <td><strong>Incomplete（回答の不完全さ）</strong></td>
+                  <td>部分的には合っているが、必要な情報の一部が抜け落ちている</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            この論文の重要な結論の一つは、「RAGシステムの堅牢性は最初から設計しきれるものではなく、実運用を通じて進化させていくものである」という点です。つまり評価とモニタリングは一度作って終わりではなく、継続的なプロセスとして組み込む必要があります。
+          </p>
+          <h4 id="observability">観測性（Observability）とコスト管理</h4>
+          <p>
+            本番運用フェーズでは、LangSmith・Arize
+            AIのようなLLMOps系のツールを使い、各クエリがどのチャンクを取得し、どのプロンプトでLLMを呼び出し、どんな回答を返したかをトレースできるようにするのが一般的です。LangChainのLangSmithはオフライン評価（人手レビュー、LLM-as-judge、CI/CDへの組み込み）とオンライン評価（複数ターンにわたる会話全体のタスク達成度評価）の両方をサポートしていると案内されています。
+          </p>
+          <p>
+            ただし、これらのトレースには<strong>プロンプト・取得チャンク・生成された回答という機密性の高いデータがそのまま蓄積される</strong>点に注意が必要です。Step
+            9で述べた「回答配信前のDLP」とは別に、<strong>トレース保存時の保護要件</strong>として次を定めておきます。
+          </p>
+          <ul>
+            <li>
+              <strong>保存前のマスキング</strong
+              >：個人情報（PII）やAPIキー等の秘密情報に加え、<strong>企業機密（ソースコード、契約情報、価格・条件、テナント固有の業務記録など）</strong>も対象に含め、トレースストアへ送信する前に機密分類に応じてマスキングまたはトークン化する。機密度の高いワークロードでは、そもそも<strong>プロンプト本文と取得チャンクの保存自体を無効化</strong>し、メタデータとメトリクスのみを記録する構成を選べるようにしておく
+            </li>
+            <li>
+              <strong>テナント単位のアクセス制御</strong
+              >：トレースの閲覧権限をテナント／プロジェクト単位で分離し、運用者が他テナントのトレースを閲覧できないようにする
+            </li>
+            <li>
+              <strong>保持期間（リテンション）</strong
+              >：トレースを無期限に保持せず、用途に応じた保持期間と自動削除を設定する
+            </li>
+            <li>
+              <strong>暗号化</strong
+              >：転送時（TLS）と保存時（at-rest）の暗号化、および鍵管理の方針を明示する
+            </li>
+          </ul>
+          <p>
+            コスト面では、リランキングやコンテキスト検索のようにLLM呼び出しを追加する手法ほど精度は上がりやすい一方でコスト・レイテンシも増えるため、「どこまでの精度向上に、どこまでのコストをかけるか」をKPIとして事前に合意しておくことが重要です。
+          </p>
+          <h3 class="step-heading" id="step-11">
+            <span class="step-badge">11</span
+            ><span class="step-label">本番運用：スケーリングと継続的改善</span>
+          </h3>
+          <p>
+            エンタープライズRAGを安全に本番展開するための典型的な進め方は、次のような段階を踏みます。
+          </p>
+          <ol>
+            <li>
+              <strong>ユースケースを絞り込む</strong
+              >：全社的な「何でも答えるAI」から始めず、特定の部署・業務に対象を絞る
+            </li>
+            <li>
+              <strong>インデックスパイプラインを構築する</strong>：Step
+              2〜4の内容に基づき、データソースごとのコネクタとチャンキング戦略を確定する
+            </li>
+            <li>
+              <strong>検索品質を計測する</strong
+              >：RAGASなどのオフライン評価セットを作成し、ベースラインのスコアを取得する
+            </li>
+            <li>
+              <strong>ガードレールを追加する</strong>：Step 9のセキュリティ要件とStep
+              10の評価基盤を組み込む
+            </li>
+            <li>
+              <strong>キャッシュを認可コンテキストごとに分離する（パイロット開始の前提条件）</strong
+              >：レスポンスキャッシュと検索キャッシュのキーには、テナントIDに加えて<strong>有効な認可コンテキスト（ユーザーIDまたは権限バージョン）</strong>を必ず含め、権限の異なる利用者の間でキャッシュが再利用されないようにする。あわせて、<strong>ソースの更新・削除時</strong>と<strong>権限変更時</strong>には該当するキャッシュを無効化する。この分離と無効化は<strong>実ユーザーを入れる前に完了させる</strong>こと——パイロットであっても、権限の異なる利用者間でキャッシュが共有されれば実データの漏えいになるため、「小規模だから後回し」は成立しない
+            </li>
+            <li>
+              <strong>限定ユーザーでパイロット運用する</strong
+              >：フィードバックを収集し、失敗パターン（Step
+              10の7分類）を分析する。<strong>上記5のキャッシュ分離と無効化が完了していない状態でパイロットを開始してはならない</strong>。やむを得ず先行する場合は、レスポンスキャッシュと検索キャッシュを<strong>無効化した状態で</strong>運用し、分離と無効化の実装が完了・検証されるまで有効化しない
+            </li>
+            <li>
+              <strong>段階的にロールアウトする</strong
+              >：モデルルーティング、レート制限などを整備し、上記5のキャッシュ分離と無効化が機能していることを改めて確認したうえで、SLO（サービス品質目標）を定めて全社展開する
+            </li>
+          </ol>
+          <p>
+            また、データソースは一度取り込んだら終わりではなく、継続的に更新されます。ロバストなデータパイプラインは、データを一度だけロードする場合よりも、ソースデータが常に変化し続ける本番環境でこそ重要になるとLlamaIndexのコミュニティでも指摘されています。増分更新（差分だけを再インデックスする仕組み）は、地味ですが本番運用で最も事故が起きやすいポイントの一つです。
+          </p>
+          <p>
+            とりわけ注意が必要なのは、<strong>文書の削除・権限変更・有効期限切れを、ベクトルDBだけに反映して終わりにしないこと</strong>です。RAGパイプラインは元文書から多くの派生データを作るため、更新・削除フローは次のすべてに伝播させ、古い内容や古い権限が残らないようにします。
+          </p>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>派生データ</th>
+                  <th>削除・権限変更・失効時に必要な処理</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>ベクトルDB</td>
+                  <td>該当チャンクのベクトルとメタデータ（ACL含む）を削除または更新</td>
+                </tr>
+                <tr>
+                  <td>BM25／全文検索インデックス</td>
+                  <td>該当文書のポスティングを削除または再インデックス</td>
+                </tr>
+                <tr>
+                  <td>Embedding（再計算用の中間成果物・キャッシュ）</td>
+                  <td>該当チャンクの埋め込みを破棄し、再利用されないようにする</td>
+                </tr>
+                <tr>
+                  <td>GraphRAGのナレッジグラフ</td>
+                  <td>
+                    該当文書由来のエンティティ・関係（エッジ）とコミュニティ要約を無効化・再構築
+                  </td>
+                </tr>
+                <tr>
+                  <td>レスポンスキャッシュ／検索キャッシュ</td>
+                  <td>
+                    該当文書を根拠に含むエントリを失効させる（Step
+                    11-5の認可コンテキスト単位の分離と併用）
+                  </td>
+                </tr>
+                <tr>
+                  <td>LLMOpsのトレースストア（LangSmith・Arize AI等）</td>
+                  <td>
+                    該当文書のチャンク・プロンプト・回答を含むトレースを無効化または削除する。派生データの中で見落とされやすく、削除済み文書の本文がトレース閲覧権限者に残り続ける経路になる
+                  </td>
+                </tr>
+                <tr>
+                  <td>LLMのプロンプトキャッシュ（prompt cache）</td>
+                  <td>
+                    該当文書を含むキャッシュ接頭辞を<strong>再利用しない</strong>。文書削除・権限変更が発生した時点で、<strong>認可コンテキスト（権限セットのバージョン）またはコーパスのリビジョンIDを直ちに更新し</strong>、新しい接頭辞へ切り替えることで旧接頭辞が二度と参照されない状態にする（反映完了までは当該接頭辞のキャッシュ利用を停止する）。<strong>TTLの短縮は補助的な対策</strong>であり、旧キャッシュが参照されなくなった後の残存期間を短く抑えるためのものにすぎない。TTL満了を待つ設計は、満了までの間は旧キャッシュが参照され続けるため、無効化・権限剥奪の手段として単独で用いてはならない。あわせて、キャッシュ接頭辞またはキャッシュキーには<strong>テナントIDと、有効な認可コンテキスト</strong>（ユーザーID、または当該ユーザーに適用される権限セットのバージョン識別子）を必ず含める
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            いずれか一つでも取り残すと、「ベクトルDBからは消えているのにBM25検索で出てくる」「権限を剥奪したユーザーにキャッシュ経由で回答が返る」といった、検知が難しい漏洩が発生します。
+          </p>
+          <p>
+            プロンプトキャッシュについては、上記の識別子をキーに含めることが<strong>分離の前提条件</strong>です。テナントIDを含めなければ別テナントのユーザーに他社文書を含む接頭辞が再利用され、認可コンテキスト（ユーザーIDまたは権限バージョン）を含めなければ、同一テナント内で閲覧範囲の異なるユーザー間に文書が漏れます。そのうえで、<strong>ユーザーの権限変更・ロール剥奪・グループ離脱が発生した時点で、該当する認可コンテキストのプロンプトキャッシュを無効化</strong>します（権限バージョンをキーに含めていれば、バージョンを繰り上げるだけで旧キャッシュは参照されなくなります）。なお、利用するLLMプロバイダがテナント間・利用者間のキャッシュ分離を仕様として保証している場合は、その保証内容（分離の単位がアカウント単位か、APIキー単位か、組織単位か）と適用条件（対象モデル・対象エンドポイント・キャッシュのTTL・保証が及ばないケース）を、提供元の公式ドキュメントを根拠として設計書に明記してください。保証の単位が自社のテナント境界や権限境界より粗い場合、プロバイダ側の分離だけでは不十分であり、上記のキー設計による分離が依然として必要です。
+          </p>
+          <p>
+            トレースストアについては、削除・権限変更の伝播とあわせて<strong>保持ポリシーを明文化</strong>しておきます。具体的には、①
+            トレースの保持期間（例：デバッグ用途は30日、監査用途は規制要件に合わせた期間）を用途別に定めて自動削除を設定する、②
+            削除・権限変更の伝播は、保持期間内のトレースに対して原則リアルタイムに近い頻度で実行する、③
+            訴訟ホールド（legal
+            hold）や規制当局の保全命令が掛かっているトレースは削除の例外とし、削除する代わりにアクセスを凍結して保全理由・対象範囲・解除条件を記録する、の3点を定めます。例外を無制限に認めると削除フロー自体が形骸化するため、legal
+            holdは対象・期間を限定し、解除時には通常の保持ポリシーへ戻します。
+          </p>
+          <h2 class="part-heading" id="part-4">
+            <span class="part-badge">Part 4</span><span class="part-label">まとめ</span>
+          </h2>
+          <h3 class="sub-heading" id="rag">エンタープライズRAG 全体アーキテクチャ</h3>
+          <p>
+            最後に、ここまで解説してきた要素を統合した、エンタープライズRAGの全体アーキテクチャ図を示します。
+          </p>
+          <div class="mermaid-card">
+            <pre class="mermaid">
+flowchart TB
+    subgraph SRC[データソース層]
+        S1[社内Wiki・Confluence]
+        S2[SharePoint・Drive]
+        S3[SQLデータベース]
+        S4[チケット・CRM]
+    end
+
+    subgraph ING[インジェスト・インデックス層]
+        I1[コネクタ・ETL]
+        I2[パース・チャンク分割]
+        I3[コンテキスト付与とEmbedding]
+        I4[BM25用テキスト処理]
+        I5[(ベクトルDB)]
+        I6[(全文検索インデックス)]
+        I1 --&gt; I2
+        I2 --&gt; I3
+        I2 --&gt; I4
+        I3 --&gt;|ベクトル| I5
+        I4 --&gt;|テキスト| I6
+    end
+
+    subgraph SEC[セキュリティ・ガバナンス層]
+        SE1[認証・認可 SSO]
+        SE2[ACL同期・メタデータタグ]
+        SE3[PII検出・マスキング]
+        SE4[監査ログ]
+        SE5[出力DLP・機密フィルタ]
+    end
+
+    subgraph RET[検索・生成層]
+        R1[クエリ書き換え]
+        R2[ハイブリッド検索]
+        R3[リランキング]
+        R4[LLM生成と引用]
+        R1 --&gt; R2
+        R2 --&gt; R3
+        R3 --&gt; R4
+    end
+
+    subgraph OPS[運用・評価層]
+        O1[RAGASによるオフライン評価]
+        O2[観測性・トレーシング]
+        O3[コストとレイテンシ監視]
+        O4[フィードバックループ]
+    end
+
+    ANS[回答と出典を利用者へ配信]
+
+    SRC --&gt; I1
+    SE2 --&gt;|インデックス前にACLメタデータを付与| I2
+    SE3 --&gt;|インデックス前にPIIをマスキング| I2
+    I5 --&gt; R2
+    I6 --&gt; R2
+    SE1 --&gt;|リクエストごとに認可コンテキストを確定| R1
+    SE2 --&gt;|検索時に認可フィルタを適用| R2
+    R4 --&gt;|配信前に出力DLPへ渡す| SE5
+    SE5 --&gt;|検査を通過した回答のみ配信| ANS
+    I2 -.-&gt;|取り込み・再インデックスを記録| SE4
+    R2 -.-&gt;|誰が何を検索し何がヒットしたかを記録| SE4
+    R4 -.-&gt;|イベントID・DLP判定・参照情報のみを記録| SE4
+    R4 --&gt;|マスキング済みメタデータのみ送出&lt;br/&gt;未保護の本文・生成内容は含めない| OPS
+    SE4 -.-&gt;|統制の証跡| OPS
+    OPS -.-&gt;|改善のフィードバック| ING</pre
+            >
+          </div>
+          <p>
+            この図の各層が、本ガイドのStep
+            1〜11で解説してきた内容にそれぞれ対応しています。データソース層とインジェスト層がStep
+            2〜4、セキュリティ・ガバナンス層がStep 9、検索・生成層がStep 5〜8、運用・評価層がStep
+            10〜11に相当します。
+          </p>
+          <p>
+            ここで重要なのは、<strong>セキュリティ・ガバナンス層はパイプラインの途中に挟まる「1工程」ではなく、複数の地点に個別に効く横断的な統制である</strong>という点です。図中の各エッジは、それぞれ適用地点が異なります。
+          </p>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>統制</th>
+                  <th>適用地点</th>
+                  <th>図中のエッジ</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>ACLメタデータの付与</td>
+                  <td><strong>インデックス前</strong>（チャンクに権限情報を焼き込む）</td>
+                  <td>SE2 → I2</td>
+                </tr>
+                <tr>
+                  <td>PII検出・マスキング</td>
+                  <td>
+                    <strong>インデックス前</strong>（PIIを埋め込みベクトルや全文索引に残さない）
+                  </td>
+                  <td>SE3 → I2</td>
+                </tr>
+                <tr>
+                  <td>認可コンテキストの確定</td>
+                  <td>
+                    <strong>リクエスト受信時</strong>（呼び出し元ユーザーの権限を毎回解決する）
+                  </td>
+                  <td>SE1 → R1</td>
+                </tr>
+                <tr>
+                  <td>認可フィルタ</td>
+                  <td>
+                    <strong>検索時</strong
+                    >（権限外チャンクを候補集合から除外する。生成後の除外では遅い）
+                  </td>
+                  <td>SE2 → R2</td>
+                </tr>
+                <tr>
+                  <td>出力DLP</td>
+                  <td>
+                    <strong>配信直前</strong>（引用や生成文に混入した機密を最終ゲートで止める）
+                  </td>
+                  <td>R4 → SE5 → ANS</td>
+                </tr>
+                <tr>
+                  <td>監査ログ</td>
+                  <td>取り込み・検索・生成の各地点（点線）</td>
+                  <td>I2・R2・R4 ⇢ SE4</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            出力DLPは生成と配信の間に挟まる<strong>通過必須のゲート</strong>です。生成結果がDLP検査を通らなかった場合は回答を配信せず、<strong>fail-closed</strong>（マスキング後の回答か、「機密情報が含まれるため提示できない」という結果）で終了します。R4からANSへ直接抜ける経路を残すと、検査をすり抜けた回答が利用者に届くため、図でもそのエッジを設けていません。
+          </p>
+          <p>
+            とくに、ACL付与とPIIマスキングを<strong>インデックス後</strong>に回すと、権限情報のない、あるいはPIIを含んだベクトルが永続化されてしまい、後から認可フィルタをかけても取り返しがつきません。統制の適用順序そのものが要件である点に注意してください。
+          </p>
+          <h3 class="sub-heading" id="_4">よくある落とし穴とベストプラクティス</h3>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>落とし穴</th>
+                  <th>ベストプラクティス</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>デモでは動くが本番では精度が出ない</td>
+                  <td>最初から評価セット（RAGAS等）を用意し、変更のたびに定量比較する</td>
+                </tr>
+                <tr>
+                  <td>チャンクサイズを一度決めたら固定してしまう</td>
+                  <td>
+                    ユースケース（要約 vs Q&amp;A）ごとにチャンク戦略を変える、自社データで実測する
+                  </td>
+                </tr>
+                <tr>
+                  <td>ベクトル検索だけに頼る</td>
+                  <td>BM25とのハイブリッド検索、必要に応じてリランキングを併用する</td>
+                </tr>
+                <tr>
+                  <td>セキュリティを後回しにする</td>
+                  <td>
+                    インデックス設計の初期段階からACLメタデータと検索時フィルタリングを組み込む
+                  </td>
+                </tr>
+                <tr>
+                  <td>一度きりのデータ取り込みで満足する</td>
+                  <td>増分更新・削除反映を含む継続的なデータパイプラインを構築する</td>
+                </tr>
+                <tr>
+                  <td>精度改善のためにコストを無制限に積み増す</td>
+                  <td>リランキングやコンテキスト検索など各手法のコスト対効果をKPIとして管理する</td>
+                </tr>
+                <tr>
+                  <td>すべてをGraphRAG・エージェント型にしてしまう</td>
+                  <td>関係性推論や多段階検索が本当に必要なユースケースに絞って高度化する</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <h3 class="sub-heading" id="_5">さらに学ぶために</h3>
+          <p>
+            体系的にハンズオンで学びたい場合は、本ガイドの構成の参考にもした書籍『<a
+              class="ext-link"
+              href="https://www.manning.com/books/enterprise-rag"
+              rel="noopener noreferrer"
+              target="_blank"
+              >Enterprise RAG</a
+            >』（Tyler Suard著、Manning Publications、Fortune
+            500企業でのRAG開発経験をもとに執筆）が、スケーラブルなRAGシステムの構築、SQLデータベースに対するRAG、ハルシネーション防止、監視・スケーリング・保守、コスト効率の良いクラウド活用まで、エンタープライズRAGを実務目線で扱っています。本稿執筆時点ではMEAP（Manning
+            Early Access Program）として執筆中の書籍で、全10章中6章が公開されています。
+          </p>
+          <h3 class="sub-heading" id="_6">参考ソース一覧</h3>
+          <p>
+            本ガイドの作成にあたり参照した主要なソースです。実装の際は、必ず最新の一次情報をご確認ください。
+          </p>
+          <div class="source-list">
+            <a
+              class="source-card"
+              href="https://www.manning.com/books/enterprise-rag"
+              rel="noopener noreferrer"
+              target="_blank"
+              ><div class="source-card-main">
+                <span class="source-card-pub">Manning Publications</span
+                ><span class="source-card-title">Enterprise RAG</span
+                ><span class="source-card-note">（Tyler Suard著）</span>
+              </div>
+              <span class="source-card-domain">manning.com</span></a
+            ><a
+              class="source-card"
+              href="https://www.anthropic.com/engineering/contextual-retrieval"
+              rel="noopener noreferrer"
+              target="_blank"
+              ><div class="source-card-main">
+                <span class="source-card-pub">Anthropic Engineering Blog</span
+                ><span class="source-card-title">Introducing Contextual Retrieval</span>
+              </div>
+              <span class="source-card-domain">anthropic.com</span></a
+            ><a
+              class="source-card"
+              href="https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching"
+              rel="noopener noreferrer"
+              target="_blank"
+              ><div class="source-card-main">
+                <span class="source-card-pub">Anthropic</span
+                ><span class="source-card-title">Prompt caching</span
+                ><span class="source-card-note">ドキュメント</span>
+              </div>
+              <span class="source-card-domain">docs.anthropic.com</span></a
+            ><a
+              class="source-card"
+              href="https://www.microsoft.com/en-us/research/blog/graphrag-unlocking-llm-discovery-on-narrative-private-data/"
+              rel="noopener noreferrer"
+              target="_blank"
+              ><div class="source-card-main">
+                <span class="source-card-pub">Microsoft Research</span
+                ><span class="source-card-title"
+                  >GraphRAG: Unlocking LLM discovery on narrative private data</span
+                >
+              </div>
+              <span class="source-card-domain">microsoft.com</span></a
+            ><a
+              class="source-card"
+              href="https://www.pinecone.io/learn/retrieval-augmented-generation/"
+              rel="noopener noreferrer"
+              target="_blank"
+              ><div class="source-card-main">
+                <span class="source-card-pub">Pinecone Learning Center</span
+                ><span class="source-card-title">Retrieval-Augmented Generation (RAG)</span>
+              </div>
+              <span class="source-card-domain">pinecone.io</span></a
+            ><a
+              class="source-card"
+              href="https://www.pinecone.io/learn/chunking-strategies/"
+              rel="noopener noreferrer"
+              target="_blank"
+              ><div class="source-card-main">
+                <span class="source-card-pub">Pinecone Learning Center</span
+                ><span class="source-card-title">Chunking Strategies for LLM Applications</span>
+              </div>
+              <span class="source-card-domain">pinecone.io</span></a
+            ><a
+              class="source-card"
+              href="https://cheatsheetseries.owasp.org/cheatsheets/RAG_Security_Cheat_Sheet.html"
+              rel="noopener noreferrer"
+              target="_blank"
+              ><div class="source-card-main">
+                <span class="source-card-pub">OWASP Cheat Sheet Series</span
+                ><span class="source-card-title">RAG Security Cheat Sheet</span>
+              </div>
+              <span class="source-card-domain">cheatsheetseries.owasp.org</span></a
+            ><a
+              class="source-card"
+              href="https://arxiv.org/abs/2401.05856"
+              rel="noopener noreferrer"
+              target="_blank"
+              ><div class="source-card-main">
+                <span class="source-card-pub">Barnett et al.</span
+                ><span class="source-card-title"
+                  >Seven Failure Points When Engineering a Retrieval Augmented Generation
+                  System</span
+                ><span class="source-card-note">(arXiv, 2024)</span>
+              </div>
+              <span class="source-card-domain">arxiv.org</span></a
+            ><a
+              class="source-card"
+              href="https://docs.ragas.io/en/v0.2.1/concepts/metrics/available_metrics/context_precision/"
+              rel="noopener noreferrer"
+              target="_blank"
+              ><div class="source-card-main">
+                <span class="source-card-pub">RAGAS公式ドキュメント</span
+                ><span class="source-card-title">Context Precision</span
+                ><span class="source-card-note"
+                  >（v0.2.1。本ガイドの指標定義はこのバージョンに基づく）</span
+                >
+              </div>
+              <span class="source-card-domain">docs.ragas.io</span></a
+            ><a
+              class="source-card"
+              href="https://www.langchain.com/blog/nvidia-enterprise"
+              rel="noopener noreferrer"
+              target="_blank"
+              ><div class="source-card-main">
+                <span class="source-card-pub">LangChain Blog</span
+                ><span class="source-card-title"
+                  >LangChain Announces Enterprise Agentic AI Platform Built with NVIDIA</span
+                ><span class="source-card-note">（Harrison Chase CEOコメント）</span>
+              </div>
+              <span class="source-card-domain">langchain.com</span></a
+            ><a
+              class="source-card"
+              href="https://www.linkedin.com/posts/jerry-liu-64390071_llamaindex-webinar-make-rag-production-ready-activity-7098827023791398912-v9x8"
+              rel="noopener noreferrer"
+              target="_blank"
+              ><div class="source-card-main">
+                <span class="source-card-pub">Jerry Liu（LlamaIndex CEO）LinkedIn投稿</span
+                ><span class="source-card-title">Make RAG Production-Ready</span>
+              </div>
+              <span class="source-card-domain">linkedin.com</span></a
+            ><a
+              class="source-card"
+              href="https://aws.amazon.com/blogs/machine-learning/build-powerful-rag-pipelines-with-llamaindex-and-amazon-bedrock/"
+              rel="noopener noreferrer"
+              target="_blank"
+              ><div class="source-card-main">
+                <span class="source-card-pub">AWS Machine Learning Blog（Jerry Liu共著）</span
+                ><span class="source-card-title"
+                  >Build powerful RAG pipelines with LlamaIndex and Amazon Bedrock</span
+                >
+              </div>
+              <span class="source-card-domain">aws.amazon.com</span></a
+            ><a
+              class="source-card"
+              href="https://www.csoonline.com/article/4163888/securing-rag-pipelines-in-enterprise-saas.html"
+              rel="noopener noreferrer"
+              target="_blank"
+              ><div class="source-card-main">
+                <span class="source-card-pub">CSO Online</span
+                ><span class="source-card-title">Securing RAG pipelines in enterprise SaaS</span>
+              </div>
+              <span class="source-card-domain">csoonline.com</span></a
+            ><a
+              class="source-card"
+              href="https://www.lastingdynamics.com/blog/enterprise-rag-architecture-guide/"
+              rel="noopener noreferrer"
+              target="_blank"
+              ><div class="source-card-main">
+                <span class="source-card-pub">Lasting Dynamics</span
+                ><span class="source-card-title"
+                  >Enterprise RAG Architecture: A Perfect 2026 Guide</span
+                >
+              </div>
+              <span class="source-card-domain">lastingdynamics.com</span></a
+            ><a
+              class="source-card"
+              href="https://atlan.com/know/what-is-graphrag/"
+              rel="noopener noreferrer"
+              target="_blank"
+              ><div class="source-card-main">
+                <span class="source-card-pub">Atlan</span
+                ><span class="source-card-title"
+                  >What Is GraphRAG? Architecture, Enterprise Use Cases</span
+                >
+              </div>
+              <span class="source-card-domain">atlan.com</span></a
+            >
+          </div>
+
+          <footer class="article-footer">
+            <p>
+              本ドキュメントは2026年9月10日時点のウェブ公開情報をもとに作成した学習用資料です。数値・ベンチマークは各ソース元の実験条件に依存するため、自社の環境・データで再検証することを推奨します。
+            </p>
+          </footer>
+        </main>
+      </div>
+    </div>
+
+    <button class="top-btn" id="topBtn" aria-label="ページの先頭へ戻る">
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <line x1="12" y1="19" x2="12" y2="5"></line>
+        <polyline points="5 12 12 5 19 12"></polyline>
+      </svg>
+    </button>
+
+    <script>
+      mermaid.initialize({
+        startOnLoad: true,
+        theme: 'base',
+        securityLevel: 'loose',
+        fontFamily: '"Noto Sans JP", sans-serif',
+        flowchart: { curve: 'basis', htmlLabels: true, padding: 12 },
+        themeVariables: {
+          primaryColor: '#F3E4D2',
+          primaryTextColor: '#16202C',
+          primaryBorderColor: '#B8763A',
+          lineColor: '#4E5A6B',
+          secondaryColor: '#DCEBE8',
+          secondaryTextColor: '#123B37',
+          secondaryBorderColor: '#1F5C57',
+          tertiaryColor: '#FFFFFF',
+          tertiaryTextColor: '#16202C',
+          tertiaryBorderColor: '#C4CCD6',
+          clusterBkg: '#F4F6F8',
+          clusterBorder: '#C4CCD6',
+          edgeLabelBackground: '#FFFFFF',
+          fontSize: '15px',
+          nodeTextColor: '#16202C',
+        },
+      });
+    </script>
+    <script>
+      (function () {
+        var body = document.body;
+        var menuBtn = document.getElementById('menuBtn');
+        var backdrop = document.getElementById('sidebarBackdrop');
+        function closeNav() {
+          body.classList.remove('nav-open');
+        }
+        function toggleNav() {
+          body.classList.toggle('nav-open');
+        }
+        if (menuBtn) {
+          menuBtn.addEventListener('click', toggleNav);
+        }
+        if (backdrop) {
+          backdrop.addEventListener('click', closeNav);
+        }
+        document.querySelectorAll('.toc-link').forEach(function (a) {
+          a.addEventListener('click', closeNav);
+        });
+
+        var topBtn = document.getElementById('topBtn');
+        window.addEventListener(
+          'scroll',
+          function () {
+            if (window.scrollY > 480) {
+              topBtn.classList.add('is-visible');
+            } else {
+              topBtn.classList.remove('is-visible');
+            }
+          },
+          { passive: true },
+        );
+        topBtn.addEventListener('click', function () {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        var links = Array.prototype.slice.call(document.querySelectorAll('.toc-link'));
+        var targets = links
+          .map(function (a) {
+            var id = a.getAttribute('href').slice(1);
+            var el = document.getElementById(id);
+            return el ? { link: a, el: el } : null;
+          })
+          .filter(Boolean);
+
+        function onScroll() {
+          var pos = window.scrollY + 120;
+          var current = targets[0];
+          for (var i = 0; i < targets.length; i++) {
+            if (targets[i].el.offsetTop <= pos) {
+              current = targets[i];
+            }
+          }
+          links.forEach(function (a) {
+            a.classList.remove('is-active');
+          });
+          if (current) {
+            current.link.classList.add('is-active');
+          }
+        }
+        window.addEventListener('scroll', onScroll, { passive: true });
+        onScroll();
+      })();
+    </script>
+  </body>
+</html>

@@ -13,6 +13,9 @@ logger = logging.getLogger(__name__)
 
 _URL = "https://github.com/features/copilot#pricing"
 
+# プラン名と価格の間に許容する最大文字数。料金表のセル内に収まる程度に狭くする。
+_GAP = r"[^$\n]{0,80}?"
+
 # フォールバック: (monthly, annual, tag, cls, note_ja, note_en)
 _FALLBACKS: list[tuple[str, str, float, float | None, str, str, str, str]] = [
     ("GitHub Copilot", "Free",       0,   0,    "Free",       "tag-mini",
@@ -21,6 +24,8 @@ _FALLBACKS: list[tuple[str, str, float, float | None, str, str, str, str]] = [
      "300 Premium req/月 | 学生無料",    "300 Premium req/mo | Free for students"),
     ("GitHub Copilot", "Pro+",       39,  390,  "Pro+",       "tag-flag",
      "1,500 req/月 | 全モデルアクセス", "1,500 req/mo | All model access"),
+    ("GitHub Copilot", "Max",        100, None, "Max",        "tag-flag",
+     "高負荷エージェント向け最上位",     "Top tier for sustained agent workflows"),
     ("GitHub Copilot", "Business",   19,  None, "Team",       "tag-bal",
      "超過 $0.04/req | /user/month",     "Overage $0.04/req | /user/month"),
     ("GitHub Copilot", "Enterprise", 39,  None, "Enterprise", "tag-flag",
@@ -47,16 +52,51 @@ def scrape(existing: list[SubTool] | None = None) -> list[SubTool]:
 
     tools: list[SubTool] = []
     for group, name, fb_m, fb_a, tag, cls, note_ja, note_en in _FALLBACKS:
-        # Pro プランの価格を検出してみる
+        # プラン名と価格の距離を _GAP で制限する。無制限（[^$\n]*?）にすると
+        # 約 890KB の 1 塊テキストを横断して無関係な金額へ到達し、Max ティアの
+        # 特典クレジット "$100/month in GitHub credits" を Pro / Pro+ の価格として
+        # 誤検出する（2026-09-12 実測）。近傍に無ければ fallback に落とすのが正しい。
         price = None
         if name == "Pro":
-            price = extract_price(html, [r"pro[^$\n]*?\$([\d]+)\s*/\s*month"])
+            # "Pro+" / "Pro Max" を除外する。直後の "+" だけを禁止すると
+            # "Pro Max" の "pro" にマッチし _GAP が " Max " を食って Max の
+            # 価格を Pro として拾うため、後続の max も明示的に除外する。
+            # さらに語全体を要求する。これがないと "Professional" の
+            # "pro" にマッチし、_GAP が "fessional ..." を食って無関係な
+            # 月額を Pro の価格として拾う。\b はハイフン接続（例: "Pro-Max"）
+            # を境界とみなしてしまうため防げず、両側とも "-" を明示的に
+            # 除外する（Max / Business / Enterprise と同じ左側ガード）。
+            price = extract_price(
+                html,
+                [rf"(?<![\w-])pro(?![\w+-])(?!\s*max){_GAP}\$([\d]+)\s*/\s*month"],
+            )
         elif name == "Pro+":
-            price = extract_price(html, [r"pro\+[^$\n]*?\$([\d]+)\s*/\s*month"])
+            # 末尾にも境界を要求する。これがないと "Pro++" や "Pro+-Enterprise" の
+            # ような隣接トークン内の "pro+" にもマッチしてしまう。
+            price = extract_price(
+                html, [rf"(?<![\w-])pro\+(?![\w+-]){_GAP}\$([\d]+)\s*/\s*month"]
+            )
+        elif name == "Max":
+            # \b がないと "Maximum" 等の部分一致から無関係な月額に到達する。
+            # \b だけではハイフン接続（例: "Max-Ultra" の接尾、"Pro-Max" の
+            # 接頭）を防げないため、前後を \w とハイフンの両方について
+            # 否定先読み・後読みで除外する。
+            # さらに "month" の直後が特典クレジット文（"$100/month in GitHub
+            # credits"）なら価格ではないため、末尾でも否定先読みで除外する。
+            price = extract_price(
+                html,
+                [rf"(?<![\w-])max(?![\w-]){_GAP}\$([\d]+)\s*/\s*month(?!\s+in\s+\w+\s+credits)"],
+            )
         elif name == "Business":
-            price = extract_price(html, [r"business[^$\n]*?\$([\d]+)\s*/\s*(?:user|seat)"])
+            # \b だけでは語尾のハイフン接続（例: "business-tier"）を防げないため、
+            # 前後を \w とハイフンの両方について否定先読み・後読みで除外する。
+            price = extract_price(
+                html, [rf"(?<![\w-])business(?![\w-]){_GAP}\$([\d]+)\s*/\s*(?:user|seat)"]
+            )
         elif name == "Enterprise":
-            price = extract_price(html, [r"enterprise[^$\n]*?\$([\d]+)\s*/\s*(?:user|seat)"])
+            price = extract_price(
+                html, [rf"(?<![\w-])enterprise(?![\w-]){_GAP}\$([\d]+)\s*/\s*(?:user|seat)"]
+            )
 
         cur_m = fb_m
         status = "fallback"

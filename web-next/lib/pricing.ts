@@ -8,9 +8,19 @@
  */
 
 import { z } from "zod";
-import type { ApiModel, PricingData, SubTool } from "@/types/pricing";
+import type { ApiModel, PriceProvenance, PricingData, SubTool } from "@/types/pricing";
 
 export const ScrapeStatusSchema = z.enum(["success", "fallback", "manual"]);
+
+export const PriceOriginSchema = z.enum(["scraped", "hardcoded"]);
+
+export const PriceProvenanceSchema: z.ZodType<PriceProvenance> = z
+  .object({
+    origin: PriceOriginSchema,
+    fallback_in: z.number().nonnegative(),
+    fallback_out: z.number().nonnegative(),
+  })
+  .strict();
 
 /** YYYY-MM-DD 形式の日付文字列バリデーター（generated_at 用） */
 const dateString = z
@@ -31,6 +41,8 @@ export const ApiModelSchema: z.ZodType<ApiModel> = z
     sub_ja: z.string(),
     sub_en: z.string(),
     scrape_status: ScrapeStatusSchema,
+    // provenance を持たない旧スキーマの pricing.json も受け付ける
+    provenance: PriceProvenanceSchema.nullish(),
   })
   .strict();
 
@@ -74,6 +86,8 @@ export function parsePricingData(input: unknown): PricingData {
  * 影響しない（`never` 型の定数は tree-shake される）。
  */
 type _AssertParity = [
+  PriceProvenance extends z.infer<typeof PriceProvenanceSchema> ? true : never,
+  z.infer<typeof PriceProvenanceSchema> extends PriceProvenance ? true : never,
   ApiModel extends z.infer<typeof ApiModelSchema> ? true : never,
   z.infer<typeof ApiModelSchema> extends ApiModel ? true : never,
   SubTool extends z.infer<typeof SubToolSchema> ? true : never,
@@ -81,5 +95,5 @@ type _AssertParity = [
   PricingData extends z.infer<typeof PricingDataSchema> ? true : never,
   z.infer<typeof PricingDataSchema> extends PricingData ? true : never,
 ];
-const _parityCheck: _AssertParity = [true, true, true, true, true, true];
+const _parityCheck: _AssertParity = [true, true, true, true, true, true, true, true];
 void _parityCheck;

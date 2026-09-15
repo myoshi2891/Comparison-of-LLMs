@@ -9,6 +9,7 @@ price_from_page() はページを JS レンダリングしてテキストを返�
 
 from __future__ import annotations
 import logging
+from collections.abc import Iterable
 import os
 import re
 
@@ -19,6 +20,9 @@ logger = logging.getLogger(__name__)
 # 価格として有効な範囲（USD / 1M トークン）
 _PRICE_MIN = 0.001
 _PRICE_MAX = 2000.0
+
+# モデル名中の区切り（ハイフン / 空白）の表記ゆれを吸収する正規表現断片
+_SEP = r"[-\s]?"
 
 
 def get_page_text(url: str, wait_selector: str | None = None, timeout_ms: int = 30_000) -> str:
@@ -48,6 +52,50 @@ def get_page_text(url: str, wait_selector: str | None = None, timeout_ms: int = 
             return page.content()
         finally:
             browser.close()
+
+
+def model_key_pattern(name: str, all_names: Iterable[str]) -> str:
+    """モデル名を価格抽出用の正規表現キーへ変換する。
+
+    短い名前が「より長い派生モデル名」の価格を拾うのを防ぐため、名前の直後に
+    ① 数字が続く場合、② 設定済みの他モデル名の残り（" Pro" / "-Flash" 等）が
+    続く場合はマッチしない否定先読みを付ける。
+    （例: "GPT-5.2" が "GPT-5.2 Pro $21.00" を拾うと価格が汚染される）
+
+    Parameters:
+        name: 対象モデル名。
+        all_names: 同一プロバイダーで設定されている全モデル名。
+
+    Returns:
+        str: 否定先読み付きの正規表現キー（大小文字は呼び出し側で IGNORECASE）。
+    """
+    def _to_pattern(text: str) -> str:
+        r"""区切り文字（ハイフン / 空白）を正規化した正規表現断片へ変換する。
+
+        料金ページ側の表記ゆれ（"GPT-5.4 Mini" / "GPT-5.4-Mini"）を吸収するため、
+        区切りは一律 ``[-\s]?`` として扱う。先頭が区切りで始まる文字列
+        （否定先読み用のサフィックス " mini" / "-mini" 等）は先頭の区切りも保持する。
+        """
+        lowered = text.lower()
+        parts = [re.escape(part) for part in re.split(r"[-\s]+", lowered) if part]
+        if not parts:
+            return ""
+        body = _SEP.join(parts)
+        if re.match(r"^[-\s]", lowered):
+            body = _SEP + body
+        return body
+
+    key = _to_pattern(name)
+    lname = name.lower()
+    suffixes = sorted(
+        {
+            other.lower()[len(lname):]
+            for other in all_names
+            if other.lower() != lname and other.lower().startswith(lname)
+        }
+    )
+    guards = [r"\d"] + [_to_pattern(s) for s in suffixes if s]
+    return rf"{key}(?!{'|'.join(guards)})"
 
 
 def extract_price(text: str, patterns: list[str]) -> float | None:

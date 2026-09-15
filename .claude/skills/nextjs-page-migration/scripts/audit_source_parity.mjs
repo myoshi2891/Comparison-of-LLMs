@@ -1031,137 +1031,155 @@ if (positional.length < 2) {
 const [sourcePath, pagePath] = positional;
 
 let sourceText;
-let pageText;
 try {
   sourceText = readFileSync(sourcePath, "utf8");
-  const pageModulePath = resolve(pagePath);
-  // 相対 import はモジュールごとのディレクトリを基準に解決する。
-  // page.tsx の dir を使い回すとネストした相対 import を取り違え、
-  // 同一文字列を再走査すると循環 import で無限ループになるため、
-  // 解決済みパスの visited Set を持つワークキューで辿る。
-  const visited = new Set([pageModulePath]);
-  const queue = [pageModulePath];
-  const collected = [];
-  // 実 import の収集は collectLocalImportSpecifiers が担う（module の prelude だけを走査する）。
-  // ガイドページはコード例として import 文そのものを描画するため、描画テキストを実 import と
-  // 取り違えると未転写の本文が page 側の照合材料に混ざり「漏れなし」と誤判定する。
-  while (queue.length > 0) {
-    const modulePath = queue.shift();
-    const moduleText = readFileSync(modulePath, "utf8");
-    collected.push(moduleText);
+} catch (error) {
+  console.error(`読み込み失敗: ${error instanceof Error ? error.message : String(error)}`);
+  process.exitCode = 2;
+}
 
-    const moduleDir = dirname(modulePath);
-    for (const relPath of collectLocalImportSpecifiers(moduleText)) {
-      const candidatePaths = [
-        resolve(moduleDir, `${relPath}.tsx`),
-        resolve(moduleDir, `${relPath}.ts`),
-        resolve(moduleDir, `${relPath}/index.tsx`),
-        resolve(moduleDir, `${relPath}/index.ts`),
-      ];
-      for (const cp of candidatePaths) {
-        if (!existsSync(cp)) continue;
-        if (!visited.has(cp)) {
-          visited.add(cp);
-          queue.push(cp);
+// process.exit() は stdout/stderr がパイプ先の場合に非同期フラッシュを打ち切ることがある。
+// 以降の処理は exitCode 未設定（＝上の読み込みに成功した）場合のみ続行し、
+// 自然終了に委ねることでバッファを確実にフラッシュする。
+if (process.exitCode === undefined) {
+  const sourceInventory = /\.(?:md|markdown)$/i.test(sourcePath)
+    ? inventoryMarkdown(sourceText)
+    : inventoryHtml(sourceText);
+
+  if (flags.has("--emit-headings")) {
+    // 契約テスト S-1 に貼り付ける期待値配列を出力する。
+    // page.tsx がまだ存在しない Phase 1（見出し抽出）でも動くよう、
+    // page 側の読み込みより前に判定して抜ける。
+    for (let level = 1; level <= 6; level += 1) {
+      const headings = sourceInventory.headings.filter((h) => h.level === level).map((h) => h.text);
+      console.log(`const EXPECTED_H${level} = [`);
+      for (const text of headings) console.log(`  ${JSON.stringify(text)},`);
+      console.log(`] as const;${level < 6 ? "\n" : ""}`);
+    }
+    process.exitCode = 0;
+  } else {
+    let pageText;
+    try {
+      const pageModulePath = resolve(pagePath);
+      // 相対 import はモジュールごとのディレクトリを基準に解決する。
+      // page.tsx の dir を使い回すとネストした相対 import を取り違え、
+      // 同一文字列を再走査すると循環 import で無限ループになるため、
+      // 解決済みパスの visited Set を持つワークキューで辿る。
+      const visited = new Set([pageModulePath]);
+      const queue = [pageModulePath];
+      const collected = [];
+      // 実 import の収集は collectLocalImportSpecifiers が担う（module の prelude だけを走査する）。
+      // ガイドページはコード例として import 文そのものを描画するため、描画テキストを実 import と
+      // 取り違えると未転写の本文が page 側の照合材料に混ざり「漏れなし」と誤判定する。
+      while (queue.length > 0) {
+        const modulePath = queue.shift();
+        const moduleText = readFileSync(modulePath, "utf8");
+        collected.push(moduleText);
+
+        const moduleDir = dirname(modulePath);
+        for (const relPath of collectLocalImportSpecifiers(moduleText)) {
+          const candidatePaths = [
+            resolve(moduleDir, `${relPath}.tsx`),
+            resolve(moduleDir, `${relPath}.ts`),
+            resolve(moduleDir, `${relPath}/index.tsx`),
+            resolve(moduleDir, `${relPath}/index.ts`),
+          ];
+          for (const cp of candidatePaths) {
+            if (!existsSync(cp)) continue;
+            if (!visited.has(cp)) {
+              visited.add(cp);
+              queue.push(cp);
+            }
+            break;
+          }
         }
-        break;
+      }
+      pageText = collected.join("\n");
+    } catch (error) {
+      console.error(`読み込み失敗: ${error instanceof Error ? error.message : String(error)}`);
+      process.exitCode = 2;
+    }
+
+    // 上の読み込みが失敗した場合（exitCode 設定済み）は後続の照合処理を行わず、
+    // 自然終了に委ねて stderr のフラッシュを保証する（トップレベルと同じ理由）。
+    if (process.exitCode === undefined) {
+      const pageInventory = inventoryTsx(pageText);
+      const result = compare(sourceInventory, pageInventory);
+
+      if (flags.has("--json")) {
+        console.log(
+          JSON.stringify(
+            {
+              source: sourcePath,
+              page: pagePath,
+              ...result,
+              missingHeadings: result.missingHeadings,
+              extraHeadings: result.extraHeadings,
+            },
+            null,
+            2
+          )
+        );
+        process.exitCode = result.blocking ? 1 : 0;
+      } else {
+        console.log(`source: ${sourcePath}`);
+        console.log(`page  : ${pagePath}\n`);
+        console.log("要素              原本    page.tsx  （参考値。判定は下の照合結果で行う）");
+        for (const [key, value] of Object.entries(result.counts)) {
+          console.log(
+            `${key.padEnd(16)}  ${String(value.source).padStart(5)}  ${String(value.page).padStart(8)}`
+          );
+        }
+
+        if (result.missingHeadings.length > 0) {
+          console.log(`\n❌ page.tsx に存在しない原本の見出し (${result.missingHeadings.length} 件):`);
+          for (const h of result.missingHeadings) console.log(`  h${h.level}: ${h.text}`);
+        }
+        if (result.missingLinks.length > 0) {
+          console.log(`\n❌ page.tsx に存在しない原本の外部リンク (${result.missingLinks.length} 件):`);
+          for (const u of result.missingLinks) console.log(`  ${u}`);
+        }
+        if (result.missingListItems.length > 0) {
+          console.log(`\n❌ page.tsx 本文に見当たらない原本のリスト項目 (${result.missingListItems.length} 件):`);
+          for (const t of result.missingListItems) console.log(`  - ${t}`);
+        }
+        if (result.missingCodeBlocks.length > 0) {
+          console.log(`\n❌ page.tsx に存在しない原本のコードブロック (${result.missingCodeBlocks.length} 件):`);
+          for (const text of result.missingCodeBlocks) console.log(`  ${JSON.stringify(text)}`);
+        }
+        if (result.missingTableRows.length > 0) {
+          console.log(`\n❌ page.tsx に存在しない原本の表行 (${result.missingTableRows.length} 件):`);
+          for (const text of result.missingTableRows) console.log(`  ${JSON.stringify(text)}`);
+        }
+        if (result.missingParagraphs.length > 0) {
+          console.log(`\n❌ page.tsx に存在しない原本の段落 (${result.missingParagraphs.length} 件):`);
+          for (const text of result.missingParagraphs) console.log(`  ${JSON.stringify(text)}`);
+        }
+        if (result.missingSvgElements.length > 0) {
+          console.log(`\n❌ page.tsx に存在しないか改変された原本の SVG (${result.missingSvgElements.length} 件)`);
+        }
+        if (result.missingCalloutElements.length > 0) {
+          console.log(
+            `\n❌ page.tsx に存在しないか改変された原本の callout/alert (${result.missingCalloutElements.length} 件)`
+          );
+        }
+        if (!result.mermaidSourcesMatch) {
+          console.log("\n❌ Mermaid ソースが原本と順序・出現回数込みで一致しません:");
+          console.log(`  原本: ${JSON.stringify(result.sourceMermaidSources)}`);
+          console.log(`  page: ${JSON.stringify(result.pageMermaidSources)}`);
+        }
+        if (result.extraHeadings.length > 0) {
+          console.log(`\n⚠️ 原本に存在しない page.tsx の見出し (${result.extraHeadings.length} 件、要確認):`);
+          for (const h of result.extraHeadings) console.log(`  h${h.level}: ${h.text}`);
+        }
+
+        console.log(
+          result.blocking
+            ? "\n判定: ❌ 移行漏れあり — Green コミット禁止。漏れを転写してから再実行すること。"
+            : "\n判定: ✅ 漏れなし — Green 判定に進んでよい。"
+        );
+        process.exitCode = result.blocking ? 1 : 0;
       }
     }
   }
-  pageText = collected.join("\n");
-} catch (error) {
-  console.error(`読み込み失敗: ${error instanceof Error ? error.message : String(error)}`);
-  process.exit(2);
 }
-
-const sourceInventory = /\.(?:md|markdown)$/i.test(sourcePath)
-  ? inventoryMarkdown(sourceText)
-  : inventoryHtml(sourceText);
-const pageInventory = inventoryTsx(pageText);
-const result = compare(sourceInventory, pageInventory);
-
-if (flags.has("--emit-headings")) {
-  // 契約テスト S-1 に貼り付ける期待値配列を出力する
-  for (let level = 1; level <= 6; level += 1) {
-    const headings = sourceInventory.headings.filter((h) => h.level === level).map((h) => h.text);
-    console.log(`const EXPECTED_H${level} = [`);
-    for (const text of headings) console.log(`  ${JSON.stringify(text)},`);
-    console.log(`] as const;${level < 6 ? "\n" : ""}`);
-  }
-  process.exit(0);
-}
-
-if (flags.has("--json")) {
-  console.log(
-    JSON.stringify(
-      {
-        source: sourcePath,
-        page: pagePath,
-        ...result,
-        missingHeadings: result.missingHeadings,
-        extraHeadings: result.extraHeadings,
-      },
-      null,
-      2
-    )
-  );
-  process.exit(result.blocking ? 1 : 0);
-}
-
-console.log(`source: ${sourcePath}`);
-console.log(`page  : ${pagePath}\n`);
-console.log("要素              原本    page.tsx  （参考値。判定は下の照合結果で行う）");
-for (const [key, value] of Object.entries(result.counts)) {
-  console.log(
-    `${key.padEnd(16)}  ${String(value.source).padStart(5)}  ${String(value.page).padStart(8)}`
-  );
-}
-
-if (result.missingHeadings.length > 0) {
-  console.log(`\n❌ page.tsx に存在しない原本の見出し (${result.missingHeadings.length} 件):`);
-  for (const h of result.missingHeadings) console.log(`  h${h.level}: ${h.text}`);
-}
-if (result.missingLinks.length > 0) {
-  console.log(`\n❌ page.tsx に存在しない原本の外部リンク (${result.missingLinks.length} 件):`);
-  for (const u of result.missingLinks) console.log(`  ${u}`);
-}
-if (result.missingListItems.length > 0) {
-  console.log(`\n❌ page.tsx 本文に見当たらない原本のリスト項目 (${result.missingListItems.length} 件):`);
-  for (const t of result.missingListItems) console.log(`  - ${t}`);
-}
-if (result.missingCodeBlocks.length > 0) {
-  console.log(`\n❌ page.tsx に存在しない原本のコードブロック (${result.missingCodeBlocks.length} 件):`);
-  for (const text of result.missingCodeBlocks) console.log(`  ${JSON.stringify(text)}`);
-}
-if (result.missingTableRows.length > 0) {
-  console.log(`\n❌ page.tsx に存在しない原本の表行 (${result.missingTableRows.length} 件):`);
-  for (const text of result.missingTableRows) console.log(`  ${JSON.stringify(text)}`);
-}
-if (result.missingParagraphs.length > 0) {
-  console.log(`\n❌ page.tsx に存在しない原本の段落 (${result.missingParagraphs.length} 件):`);
-  for (const text of result.missingParagraphs) console.log(`  ${JSON.stringify(text)}`);
-}
-if (result.missingSvgElements.length > 0) {
-  console.log(`\n❌ page.tsx に存在しないか改変された原本の SVG (${result.missingSvgElements.length} 件)`);
-}
-if (result.missingCalloutElements.length > 0) {
-  console.log(
-    `\n❌ page.tsx に存在しないか改変された原本の callout/alert (${result.missingCalloutElements.length} 件)`
-  );
-}
-if (!result.mermaidSourcesMatch) {
-  console.log("\n❌ Mermaid ソースが原本と順序・出現回数込みで一致しません:");
-  console.log(`  原本: ${JSON.stringify(result.sourceMermaidSources)}`);
-  console.log(`  page: ${JSON.stringify(result.pageMermaidSources)}`);
-}
-if (result.extraHeadings.length > 0) {
-  console.log(`\n⚠️ 原本に存在しない page.tsx の見出し (${result.extraHeadings.length} 件、要確認):`);
-  for (const h of result.extraHeadings) console.log(`  h${h.level}: ${h.text}`);
-}
-
-console.log(
-  result.blocking
-    ? "\n判定: ❌ 移行漏れあり — Green コミット禁止。漏れを転写してから再実行すること。"
-    : "\n判定: ✅ 漏れなし — Green 判定に進んでよい。"
-);
-process.exit(result.blocking ? 1 : 0);
