@@ -7,6 +7,7 @@
 
 from __future__ import annotations
 import logging
+from datetime import date
 
 from scraper.browser import get_page_text
 from scraper.models import ApiModel, PriceProvenance
@@ -15,6 +16,18 @@ logger = logging.getLogger(__name__)
 
 _URL_GOOGLE_AI = "https://ai.google.dev/pricing"
 _URL_VERTEX = "https://cloud.google.com/vertex-ai/generative-ai/pricing"
+
+# 3.6/3.7/3.8 Flash の $0.75/$3.75 特価はこの日付まで。以降は自動的に標準価格 $1.50/$7.50 へ切り替える。
+_FLASH_PROMO_EXPIRY = date(2026, 12, 31)
+_FLASH_PROMO_NAMES = {"Gemini 3.8 Flash", "Gemini 3.7 Flash", "Gemini 3.6 Flash"}
+_FLASH_STANDARD_PRICE = (1.50, 7.50)
+
+
+def _resolve_price(name: str, price_in: float, price_out: float) -> tuple[float, float]:
+    if name in _FLASH_PROMO_NAMES and date.today() > _FLASH_PROMO_EXPIRY:
+        return _FLASH_STANDARD_PRICE
+    return price_in, price_out
+
 
 _FALLBACKS: dict[str, tuple[float, float, str, str, str, str, str]] = {
     # name: (price_in, price_out, provider, tag, cls, sub_ja, sub_en)
@@ -53,21 +66,24 @@ def scrape(existing: list[ApiModel] | None = None) -> list[ApiModel]:
     """
     logger.info("Google AI / Vertex AI: フォールバック値を使用（ライブ抽出は無効）")
 
-    return [
-        ApiModel(
-            provider=provider,
-            name=name,
-            tag=tag,
-            cls=cls,
-            price_in=price_in,
-            price_out=price_out,
-            sub_ja=sub_ja,
-            sub_en=sub_en,
-            scrape_status="fallback",
-            # ライブ抽出を行わない設計のため、出自は常にハードコード値。
-            provenance=PriceProvenance(
-                origin="hardcoded", fallback_in=price_in, fallback_out=price_out
-            ),
+    models: list[ApiModel] = []
+    for name, (price_in, price_out, provider, tag, cls, sub_ja, sub_en) in _FALLBACKS.items():
+        price_in, price_out = _resolve_price(name, price_in, price_out)
+        models.append(
+            ApiModel(
+                provider=provider,
+                name=name,
+                tag=tag,
+                cls=cls,
+                price_in=price_in,
+                price_out=price_out,
+                sub_ja=sub_ja,
+                sub_en=sub_en,
+                scrape_status="fallback",
+                # ライブ抽出を行わない設計のため、出自は常にハードコード値。
+                provenance=PriceProvenance(
+                    origin="hardcoded", fallback_in=price_in, fallback_out=price_out
+                ),
+            )
         )
-        for name, (price_in, price_out, provider, tag, cls, sub_ja, sub_en) in _FALLBACKS.items()
-    ]
+    return models
