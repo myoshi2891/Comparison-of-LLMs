@@ -104,16 +104,17 @@ GoogleのMartin Zinkevich氏が2016年前後に社内向けにまとめ、現在
 
 プロダクトディスカバリーで方向性を決めたら、次は「小さく作って、頻繁に届けて、学ぶ」というデリバリーのリズム（ケイデンス）を確立します。ここで役立つのが、DevOps Research and Assessment（DORA）チームが特定した4つの指標（Four Keys）です。DORAはGoogle Cloudの一部として、Nicole Forsgren・Jez Humble・Gene Kimらの著書『Accelerate』の研究を継続しています[^4]。
 
-| 指標 | 何を測るか | 高パフォーマンスチームの目安 |
+| 指標 | 何を測るか | 目安 |
 |---|---|---|
-| デプロイ頻度（Deployment Frequency） | どれだけ頻繁に本番リリースできているか | 1日に複数回〜週次 |
-| 変更のリードタイム（Lead Time for Changes） | コミットから本番稼働までの時間 | 1時間未満〜1日未満 |
-| 変更失敗率（Change Failure Rate） | リリースが障害を引き起こす割合 | 0〜15%程度 |
-| 平均復旧時間（Time to Restore Service） | 障害発生から復旧までの時間 | 1時間未満 |
+| デプロイ頻度（Deployment Frequency） | どれだけ頻繁に本番リリースできているか | （2019年調査の高パフォーマンスチーム参考値）1日に複数回〜週次 |
+| 変更のリードタイム（Change Lead Time） | コミットから本番稼働までの時間 | （2019年調査の高パフォーマンスチーム参考値）1時間未満〜1日未満 |
+| 変更失敗率（Change Failure Rate） | リリースが障害を引き起こす割合 | （2019年調査の高パフォーマンスチーム参考値）0〜15%程度 |
+| 障害復旧時間（Failed Deployment Recovery Time） | 失敗したデプロイから復旧するまでの時間 | （2019年調査の高パフォーマンスチーム参考値）1時間未満 |
+| デプロイの手戻り率（Deployment Rework Rate） | 障害対応など計画外の修正が目的のデプロイが占める割合 | 固定の目安値は設けず、自社の過去トレンドからの継続的な改善を追跡することが推奨される |
 
 出典：DORA公式ガイド「DORA's software delivery performance metrics」[^4]、Google Cloud Blog「Use Four Keys metrics like change failure rate to measure your DevOps performance」[^5]
 
-この4指標のうち、デプロイ頻度とリードタイムは「速さ（スループット）」を、変更失敗率と復旧時間は「安定性」を表します[^5]。DORAの研究の重要な発見は、**速さと安定性はトレードオフではなく、高パフォーマンスチームは両方を同時に達成している**という点です[^4]。MLチームにおいても、「モデルの実験速度」と「本番の安定性」を対立させず、両方を計測対象にすることが推奨されます。
+上表のうち、障害復旧時間とデプロイの手戻り率は、DORAが2024年の調査で指標体系を4指標から5指標へ更新した際に追加・再分類されたものです（障害復旧時間は従来「安定性」側の指標でしたが、この更新で「速さ（スループット）」側に再分類されました）。また、2019年調査時点の数値目安は固定の合格ラインではなく、以降の年次調査でも継続的に見直されています。そのため2019年の数値は歴史的な参考値として捉え、実務では自社の過去トレンドと継続的な改善を追跡することを重視してください。この5指標のうち、デプロイ頻度と変更のリードタイムは「速さ（スループット）」を、変更失敗率とデプロイの手戻り率は「安定性」を表します[^5]。DORAの研究の重要な発見は、**速さと安定性はトレードオフではなく、高パフォーマンスチームは両方を同時に達成している**という点です[^4]。MLチームにおいても、「モデルの実験速度」と「本番の安定性」を対立させず、両方を計測対象にすることが推奨されます。
 
 ```mermaid
 flowchart LR
@@ -562,7 +563,7 @@ MLの文脈では、「コンプリケイテッド・サブシステムチーム
 [^1]: David Tan, Ada Leung, David Colls. *Effective Machine Learning Teams: Best Practices for MLOps, Data Science, and Software Engineering*. O'Reilly Media, 2024年2月. 目次・概要: https://www.oreilly.com/library/view/effective-machine-learning/9781098144623/
 [^2]: D. Sculley et al. "Hidden Technical Debt in Machine Learning Systems." *Advances in Neural Information Processing Systems 28 (NeurIPS 2015)*. https://papers.nips.cc/paper/5656-hidden-technical-debt-in-machine-learning-systems
 [^3]: Martin Zinkevich. "Rules of Machine Learning: Best Practices for ML Engineering." Google for Developers. https://developers.google.com/machine-learning/guides/rules-of-ml
-[^4]: DORA. "DORA's software delivery performance metrics." https://dora.dev/guides/dora-metrics-four-keys/
+[^4]: DORA. "DORA's software delivery performance metrics."（2024年更新で4指標から5指標体系へ改訂） https://dora.dev/guides/dora-metrics/
 [^5]: Google Cloud Blog. "Use Four Keys metrics like change failure rate to measure your DevOps performance." https://cloud.google.com/blog/products/devops-sre/using-the-four-keys-to-measure-your-devops-performance
 [^6]: batect (Build and Testing Environments as Code Tool), GitHubリポジトリREADME. https://github.com/batect/batect
 [^7]: Martin Fowler (Thoughtworksによる寄稿記事). "The Practical Test Pyramid." https://martinfowler.com/articles/practical-test-pyramid.html
