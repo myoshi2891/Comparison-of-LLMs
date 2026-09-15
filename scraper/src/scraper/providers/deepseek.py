@@ -6,7 +6,7 @@
 from __future__ import annotations
 import logging
 
-from scraper.browser import get_page_text, extract_price, sanity_check
+from scraper.browser import get_page_text, extract_price, model_key_pattern, sanity_check
 from scraper.models import ApiModel
 from scraper.provenance import FallbackResolver
 
@@ -67,7 +67,7 @@ def scrape(existing: list[ApiModel] | None = None) -> list[ApiModel]:
     for name in _FALLBACKS:
         # ハードコード値ではなく fallback_map を見る（既存のスクレイプ成功値を尊重）
         fb_in, fb_out = fallback_map[name]
-        key = name.lower().replace("-", "[-]?").replace(".", r"\.")
+        key = model_key_pattern(name, _FALLBACKS)
         in_price = extract_price(html, [
             rf"{key}[^$]*?\$([\d.]+)",
             rf"\$([\d.]+)[^$]*?{key}",
