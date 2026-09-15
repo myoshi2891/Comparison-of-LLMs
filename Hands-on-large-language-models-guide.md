@@ -691,8 +691,8 @@ RLHFは「報酬モデルを訓練し、その報酬を強化学習で最大化�
 
 ```mermaid
 flowchart TB
-    Ch2["2章 トークンと埋め込み"] --> T1["トークナイザーフリー<br/>バイトレベルLLMの実用化"]
-    Ch8["8章 セマンティック検索とRAG"] --> T2["Agentic RAG<br/>Contextual Retrieval<br/>GraphRAGの普及"]
+    Ch2["2章 トークンと埋め込み"] --> T1["トークナイザーフリー<br/>バイトレベルLLMの研究進展"]
+    Ch8["8章 セマンティック検索とRAG"] --> T2["Agentic RAG<br/>Contextual Retrieval<br/>GraphRAGの<br/>設計パターンの展開"]
     Ch10["10章 埋め込みモデル作成"] --> T3["MTEB上位モデルの<br/>多言語・長文対応の進化"]
     Ch12["12章 生成モデルの<br/>ファインチューニング"] --> T4["QLoRA・DoRAの活用<br/>GRPOの台頭"]
     Ch7_9["7章・9章<br/>エージェント/マルチモーダル"] --> T5["マルチエージェントシステムへの<br/>本格的な拡張"]

@@ -4,7 +4,7 @@
 
 ## この本の著者について
 
-5人の著者は全員、Googleや大手テック企業でSRE（Site Reliability Engineering）とMLの両方に深く関わってきた実務家です。共著者のNiall Richard Murphyは、SREという分野を確立した名著『Site Reliability Engineering』（通称"SRE本"）の共著者でもあり、Cathy ChenはGoogleのSREチームに所属、D. Sculleyは後述する「隠れた技術的負債」論文の筆頭著者としてML工学分野で世界的に知られる研究者です[1][2]。つまりこの本は、「SREという学問がソフトウェアの信頼性にもたらした規律を、そのままMLシステムに輸入したらどうなるか」という問いに、その分野を作った当事者たちが答えた一冊だと言えます。
+5人の著者は全員、Googleや大手テック企業でSRE（Site Reliability Engineering）とMLの両方に深く関わってきた実務家です。共著者のNiall Richard Murphyは、SREという分野を確立した名著『Site Reliability Engineering』（通称"SRE本"）の共著者でもあり、Cathy ChenはGoogleのSREチームに所属、D. Sculleyは後述する「隠れた技術的負債」論文の筆頭著者としてML工学分野で世界的に知られる研究者です[1]。つまりこの本は、「SREという学問がソフトウェアの信頼性にもたらした規律を、そのままMLシステムに輸入したらどうなるか」という問いに、その分野を作った当事者たちが答えた一冊だと言えます。
 
 ---
 
