@@ -192,8 +192,20 @@ class TestGoogle:
         構造的に不安定（実測で正しく取れるモデルが 0 件で、近傍の無関係な額を誤取得する）。
         誤値を静かに混入させるより、WebSearch 確定値の _FALLBACKS を決定論的に採用する。
         価格改定は月次で _FALLBACKS を更新して反映する。
+
+        Flash プロモ価格の期限（2026-12-31）到来後は _resolve_price が標準価格へ
+        切り替えるため、日付を固定しないと本テストは期限後に失敗する。境界値検証は
+        test_flash_promo_price_on_expiry_date / test_flash_promo_price_after_expiry
+        が別途担う。
         """
-        models = google.scrape()
+
+        class _FrozenDate(date):
+            @classmethod
+            def today(cls):
+                return date(2026, 12, 31)
+
+        with patch("scraper.providers.google.date", _FrozenDate):
+            models = google.scrape()
         # _FALLBACKS の値は 7-tuple（[0]=price_in, [1]=price_out）
         assert len(models) == len(google._FALLBACKS)
         for m in models:
