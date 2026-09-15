@@ -14,6 +14,7 @@ fallback パスしか通らない**。本ファイルは get_page_text / httpx.g
 from __future__ import annotations
 
 import logging
+from datetime import date
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -206,6 +207,36 @@ class TestGoogle:
         with patch("scraper.providers.google.get_page_text") as mock_fetch:
             google.scrape()
         mock_fetch.assert_not_called()
+
+    def test_flash_promo_price_on_expiry_date(self):
+        """終了日(2026-12-31)当日はまだプロモ価格 $0.75/$3.75 を維持する（`>` 判定の境界値）。"""
+
+        class _FrozenDate(date):
+            @classmethod
+            def today(cls):
+                return date(2026, 12, 31)
+
+        with patch("scraper.providers.google.date", _FrozenDate):
+            models = google.scrape()
+        for name in google._FLASH_PROMO_NAMES:
+            m = _find(models, name)
+            assert m.price_in == 0.75
+            assert m.price_out == 3.75
+
+    def test_flash_promo_price_after_expiry(self):
+        """終了日の翌日(2027-01-01)以降は標準価格 $1.50/$7.50 に切り替わる。"""
+
+        class _FrozenDate(date):
+            @classmethod
+            def today(cls):
+                return date(2027, 1, 1)
+
+        with patch("scraper.providers.google.date", _FrozenDate):
+            models = google.scrape()
+        for name in google._FLASH_PROMO_NAMES:
+            m = _find(models, name)
+            assert m.price_in == 1.50
+            assert m.price_out == 7.50
 
 
 # --------------------------------------------------------------------------- #
