@@ -12,7 +12,7 @@
 4. [なぜ話題になっているのか(評価・レビュー)](#なぜ話題になっているのか評価レビュー)
 5. [全体像:「LLM Twin」という教材プロジェクト](#全体像llm-twinという教材プロジェクト)
 6. [アーキテクチャの核:FTIパイプライン設計](#アーキテクチャの核ftiパイプライン設計)
-7. [章立てで見る本書の構成(全11章+付録)](#章立てで見る本書の構成全11章付録)
+7. [章立てで見る本書の構成(全12章)](#章立てで見る本書の構成全12章)
 8. [初学者向け・学習ロードマップ](#初学者向け学習ロードマップ)
 9. [ハンズオン:公式GitHubリポジトリを動かす](#ハンズオン公式githubリポジトリを動かす)
 10. [使用される主要ツール・サービス一覧](#使用される主要ツールサービス一覧)
@@ -149,9 +149,9 @@ flowchart TB
 
 ---
 
-## 章立てで見る本書の構成(全11章+付録)
+## 章立てで見る本書の構成(全12章)
 
-本書は全11章+付録1本で構成されています。以下、各章の狙いを初学者向けに要約します。
+本書は全12章で構成されています。以下、各章の狙いを初学者向けに要約します。
 
 | 章 | タイトル(原題) | この章で学ぶこと |
 |---|---|---|
@@ -166,7 +166,7 @@ flowchart TB
 | 9 | RAG Inference Pipeline | クエリ拡張・Self-Querying・フィルタ付きベクトル検索・リランキングによるAdvanced RAGの実装 |
 | 10 | Inference Pipeline Deployment | AWS SageMakerへのモデルデプロイ、FastAPIによるマイクロサービス化、オートスケーリング |
 | 11 | MLOps and LLMOps | DevOps→MLOps→LLMOpsの発展、CI/CD/CTパイプライン、プロンプト監視、アラート設計 |
-| 付録 | MLOps Principles | 自動化・バージョニング・実験管理・テスト・監視・再現性という6原則の総まとめ |
+| 12 | MLOps Principles | 自動化・バージョニング・実験管理・テスト・監視・再現性という6原則の総まとめ |
 
 ### 第1章:LLM Twinの概念とアーキテクチャ理解
 
@@ -289,7 +289,7 @@ flowchart TB
     Alert --> Dev
 ```
 
-### 付録:MLOpsの原則
+### 第12章:MLOpsの原則
 
 自動化(オペレーション化)、バージョニング、実験管理、テスト、監視、再現性という6つの原則を、本編の実装に紐づけながら総まとめする章です。監視についてはログ・メトリクス(システム/モデル)・ドリフト検知・アラートまで細かく整理されています。
 
@@ -341,7 +341,7 @@ flowchart TB
 5. `.env.example` を `.env` にコピーし、OpenAI APIキー・Hugging Faceトークン・Comet APIキーなどの認証情報を設定する。**`.env` は `.gitignore` で除外されていることを必ず確認し、コミットも共有も絶対に行わない**(APIキーが第三者に渡ると不正利用や課金事故に直結する)
 6. `poetry poe local-infrastructure-up` でMongoDB・Qdrant・ZenMLのローカルインフラを起動する
 7. データ収集パイプラインを動かす前に、**Google ChromeまたはChromiumを導入する**。`MediumCrawler` が継承する `BaseSeleniumCrawler` は `webdriver.Chrome` を使うため、対応ブラウザが無いとクロールが起動時に失敗する。なお **`LinkedInCrawler` は非推奨（deprecated）であり、既定では利用できません**。同クラスは `is_deprecated=True` が設定されており、`login()` と `extract()` は `DeprecationWarning` を送出して処理を行いません。LinkedInを収集対象として前提にした手順は組まず、サポートされているデータソース（Medium・GitHub・個人ブログなど）で進めてください（LinkedInの自動収集は利用規約上の制約もあります。前述の「データ収集時の注意」を参照）。
-   - ローカルで動かす場合: macOSは `brew install --cask google-chrome`、Debian/Ubuntuは公式パッケージの `google-chrome-stable` を導入する（ChromeDriver自体は手動導入不要。`llm_engineering.application.crawlers.base` の `chromedriver_autoinstaller.install()` が、インストール済みChromeのバージョンに対応するChromeDriverを自動取得する。ただしこの処理は `BaseSeleniumCrawler` の **import 時点** に走り、**ネットワーク接続が前提**である点に注意する。`install()` はChromeのバージョンに対応するドライバのバージョンを解決するために外部エンドポイントへ問い合わせるため、ChromeDriverを事前に配置・キャッシュしてあっても、オフライン環境やプロキシで外部通信が制限された環境では import の時点で失敗しうる。オフラインで動かす必要がある場合、**`BaseSeleniumCrawler` を継承したクラス側で基底の `__init__` を呼ばないようにするだけでは不十分**である。`install()` は `BaseSeleniumCrawler` の `__init__` の中ではなく `llm_engineering.application.crawlers.base` の**モジュール直下**に書かれているため、クラスを継承するにせよインスタンス化しないにせよ、**当該モジュールを import した時点で必ず実行される**（`MediumCrawler` などの具象クローラーは base を import するため、これらを import するだけでも走る）。したがって回避するには、① `BaseSeleniumCrawler`（= `base` モジュール）を import しない独自のクローラー実装にするか、② モジュールレベルの `install()` 呼び出しを取り除いた base を用意する（フォークまたはローカルでの当該行の削除）かのいずれかが必要になる。そのうえで、`from selenium.webdriver.chrome.service import Service` として、`options = webdriver.ChromeOptions()` で `options` を定義したうえで `webdriver.Chrome(service=Service("/path/to/chromedriver"), options=options)` のように、ローカルのChromeDriverのパスを明示してドライバを生成する。この①②いずれの手当てもしない限り、データ収集パイプラインの実行には外部ネットワークが必須である）
+   - ローカルで動かす場合: macOSは `brew install --cask google-chrome`、Debian/Ubuntuは公式パッケージの `google-chrome-stable` を導入する（ChromeDriver自体は手動導入不要。`llm_engineering.application.crawlers.base` の `chromedriver_autoinstaller.install()` が、インストール済みChromeのバージョンに対応するChromeDriverを自動取得する。ただしこの処理は `BaseSeleniumCrawler` の **import 時点** に走り、**ネットワーク接続が前提**である点に注意する。`install()` はChromeのバージョンに対応するドライバのバージョンを解決するために外部エンドポイントへ問い合わせるため、ChromeDriverを事前に配置・キャッシュしてあっても、オフライン環境やプロキシで外部通信が制限された環境では import の時点で失敗しうる。オフラインで動かす必要がある場合、**`BaseSeleniumCrawler` を継承したクラス側で基底の `__init__` を呼ばないようにするだけでは不十分**である。`install()` は `BaseSeleniumCrawler` の `__init__` の中ではなく `llm_engineering.application.crawlers.base` の**モジュール直下**に書かれているため、クラスを継承するにせよインスタンス化しないにせよ、**当該モジュールを import した時点で必ず実行される**（`MediumCrawler` などの具象クローラーは base を import するため、これらを import するだけでも走る）。したがって回避するには、① `BaseSeleniumCrawler`（= `base` モジュール）を import しない独自のクローラー実装にするか、② モジュールレベルの `install()` 呼び出しを取り除いた base を用意する（フォークまたはローカルでの当該行の削除）かのいずれかが必要になる。そのうえで、`from selenium import webdriver` と `from selenium.webdriver.chrome.service import Service` の両方をimportし、`options = webdriver.ChromeOptions()` で `options` を定義したうえで `webdriver.Chrome(service=Service("/path/to/chromedriver"), options=options)` のように、ローカルのChromeDriverのパスを明示してドライバを生成する。この①②いずれの手当てもしない限り、データ収集パイプラインの実行には外部ネットワークが必須である）
    - 環境を汚したくない場合: リポジトリ同梱の公式Dockerfile（`google-chrome-stable` を含む）でパイプラインを実行する。`poetry poe build-docker-image` でイメージをビルドし、続けて `poetry poe run-docker-end-to-end-data-pipeline` でエンドツーエンドのデータパイプラインをコンテナ内で実行する（後者は `.env` を読み込むため、手順5を先に済ませておく）
 8. **（手順7でローカル実行を選んだ場合のみ）** データ収集 → 特徴量エンジニアリング → 指示データセット生成、という順にZenMLパイプラインを実行する。**手順7でDocker（`run-docker-end-to-end-data-pipeline`）を選んだ場合、この3工程はコンテナ内で実行済みのため本手順はスキップする**（再実行するとクロールとデータセット生成が二重に走る）
    - データ収集:`poetry poe run-digital-data-etl`
@@ -353,7 +353,7 @@ flowchart TB
 10. AWS SageMakerを使う場合は、`poetry install --with aws` で追加インストールしたうえで、**デプロイ前にAWS側の設定を済ませる**:
     - **ブートストラップ（一時的な管理者権限）**：`create-sagemaker-role` / `create-sagemaker-execution-role` は `aws configure` で設定するAWS CLIの認証情報ではなく、pydantic-settings経由で読み込む `.env` の `AWS_REGION` / `AWS_ACCESS_KEY` / `AWS_SECRET_KEY` を直接参照する（未設定だと `AWS_ACCESS_KEY is not set.` 等のアサーションで即座に失敗する）。そのため `aws configure` だけでは不十分で、**管理者相当の一時的なアクセスキー・シークレットキーを `.env` の `AWS_ACCESS_KEY` / `AWS_SECRET_KEY` に、あわせて `AWS_REGION`（例: `eu-central-1`）を先に設定してから**次のロール作成コマンドを実行する
     - 続けて `poetry poe create-sagemaker-role` → `poetry poe create-sagemaker-execution-role` の順に実行する。前者は `sagemaker-deployer` ユーザーを、後者はSageMaker実行ロールをそれぞれ作成する。この管理者キーの用途はここまでに限定する
-    - 各コマンドが出力した値（新規作成される専用ユーザー`sagemaker-deployer`のアクセスキー・シークレットキー、および実行ロールのARN）を `.env` の `AWS_ACCESS_KEY` / `AWS_SECRET_KEY` / `AWS_ARN_ROLE` に**書き換える**（ブートストラップに使った管理者キーをそのまま使い続けない）
+    - 各コマンドはリポジトリルートにJSONファイルを出力する。`create-sagemaker-role` は `sagemaker_user_credentials.json` に新規作成される専用ユーザー`sagemaker-deployer`のアクセスキー・シークレットキーを、`create-sagemaker-execution-role` は `sagemaker_execution_role.json` に実行ロールのARNを、それぞれ出力する。これらの値を `.env` の `AWS_ACCESS_KEY` / `AWS_SECRET_KEY`（`sagemaker_user_credentials.json` 由来）と `AWS_ARN_ROLE`（`sagemaker_execution_role.json` 由来）に**書き換える**（ブートストラップに使った管理者キーをそのまま使い続けない）
     - ブートストラップの管理者キーとは別人格の`sagemaker-deployer`ユーザーが新規作成されるが、これは**最小権限ユーザーではなく、パイプラインの実運用（学習・デプロイ・推論）にそのまま使う広い権限を持つユーザー**である点に注意する。公式手順は、SageMaker・CloudFormation・IAM・ECR・S3に対する広範な権限（各サービスのFullAccess相当）が付与されていることを前提にしており、学習・デプロイ・推論の一連の操作はこの前提で動く。本ガイドでは公式手順から外れないよう、用途を絞った独自IAMポリシーの作成手順は示さない（権限を削るとパイプラインのどこで失敗するかが読者側で切り分けにくくなるため）
     - そのうえで、**ブートストラップ用の管理者キーは `.env` に残さず、無効化または削除する**。広い権限を持つ認証情報を扱っている自覚を持ち、学習用アカウント・サンドボックス環境で実行することを強く推奨する
     - 手順の詳細は公式リポジトリのセットアップ手順（[README.md](https://github.com/PacktPublishing/LLM-Engineers-Handbook/blob/main/README.md)）を参照する

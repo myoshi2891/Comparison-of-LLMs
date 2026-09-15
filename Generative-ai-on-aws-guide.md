@@ -468,7 +468,7 @@ flowchart TB
 |---|---|---|
 | モデルラインナップ | Titan、Stable Diffusion系が中心 | Anthropic Claude、Meta Llama、Mistral、Google Gemma、OpenAI GPT系、Amazon Nova、xAI Grokなど、20近いプロバイダーの100以上のモデルが利用可能に拡大（参考文献18・11） |
 | エージェント機能 | 「Agents」として第9章・第12章で紹介 | 「Bedrock Agents」（現「Bedrock Agents Classic」）は2026年7月30日以降、新規顧客への提供を停止。ただし直前12か月以内に利用実績があるアカウントでは、既存エージェントの利用と新規エージェントの作成を引き続き行える。後継の「Amazon Bedrock AgentCore」がエージェント構築の中心的な仕組みに（参考文献19・13） |
-| RAG関連機能 | 自前でベクトルストアと検索チェーンを構築する解説が中心 | フルマネージドの「Bedrock Knowledge Base」に加え、データ接続・チャンク分割・再ランキングまで自動化する「Managed Knowledge Base」が登場。いずれもAmazon Bedrock側のリソースであり、必要に応じてAgentCore Gatewayから接続することもできる（参考文献20・17） |
+| RAG関連機能 | 自前でベクトルストアと検索チェーンを構築する解説が中心 | Amazon Bedrock Knowledge Basesは「Customer-managed Knowledge Base」（従来型、自前でベクトルストア等を構成）と「Managed Knowledge Base」（データ接続・チャンク分割・再ランキングまで自動化）の2形態に整理。AgentCore Gatewayとのネイティブ統合（MCP経由での検索呼び出し）はManaged Knowledge Base側の機能で、Customer-managed Knowledge Baseは対象外（参考文献20・17） |
 | ルーティング／コスト最適化 | 明示的なモデル選択が前提 | 同一モデルファミリ内であらかじめ指定したモデルを対象に、プロンプトごとの予測応答品質と設定したルーティング条件に基づいて送信先モデルを選択する「Intelligent Prompt Routing」などの最適化機能が追加。ただし**最適化が有効なのは英語のプロンプトに限られ、日本語プロンプトでの最適化は保証されません**（参考文献21） |
 
 > 上表の各行は、末尾に示したAWS公式資料に基づいています。**利用可能なモデル・リージョン、アカウントごとの提供条件（Bedrock Agents Classic の許可リスト判定）、Intelligent Prompt Routing の対象モデルファミリとルーティング条件は、いずれもリージョンとアカウントによって異なります**。導入前に必ず参考文献18〜21の公式ドキュメントで自分のリージョン・アカウントの条件を確認してください。
