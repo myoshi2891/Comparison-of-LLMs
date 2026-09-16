@@ -23,6 +23,7 @@
 ---
 
 <a id="ch1"></a>
+
 ## 1. イントロダクション：なぜ今「AI支援プログラミング」を学ぶのか
 
 ### 1.1 このガイドが扱うこと
@@ -60,6 +61,7 @@ flowchart LR
 ---
 
 <a id="ch2"></a>
+
 ## 2. 基礎知識：コーディングアシスタントの仕組みと限界
 
 ### 2.1 LLMは「賢いが過信しがちなジュニアエンジニア」
@@ -70,7 +72,7 @@ Google Chromeチームのエンジニアリングリーダーであり著名な�
 
 ### 2.2 補完型 vs チャット型 vs エージェント型
 
-コーディングアシスタントは大きく4つの動作モードに分類できます。GitHub Copilotを例に取ると、2026年時点でVS Code上には「Ask（質問）」「Edit（編集）」「Agent（エージェント）」という3つの明確なモードがあり、さらにGitHubのサーバー側で非同期に動く「Coding Agent（コーディングエージェント）」が加わります<sup>[22][21]</sup>。このAgent Modeは2025年2月、GitHubがMicrosoft創業50周年に合わせて発表した機能拡張の一部としてMCP（Model Context Protocol）対応とともに発表されたもので、Copilotを「コード補完ツール」から「エージェント的な開発パートナー」へと転換させる契機になりました<sup>[10]</sup>。
+コーディングアシスタントは大きく4つの動作モードに分類できます。GitHub Copilotを例に取ると、2026年時点でVS Code上には「Ask（質問）」「Edit（編集）」「Agent（エージェント）」という3つの明確なモードがあり、さらにGitHubのサーバー側で非同期に動く「Coding Agent（コーディングエージェント）」が加わります<sup>[22], [21]</sup>。このAgent Modeは2025年2月、GitHubがMicrosoft創業50周年に合わせて発表した機能拡張の一部としてMCP（Model Context Protocol）対応とともに発表されたもので、Copilotを「コード補完ツール」から「エージェント的な開発パートナー」へと転換させる契機になりました<sup>[10]</sup>。
 
 | モード | 典型例 | 動作の特徴 | 人間の関与度 |
 |---|---|---|---|
@@ -101,6 +103,7 @@ Anthropicの内部調査によれば、Claude Codeを使った典型的なセッ
 ---
 
 <a id="ch3"></a>
+
 ## 3. プロンプト戦略とコンテキストエンジニアリング
 
 ### 3.1 プロンプトエンジニアリングの基本
@@ -144,6 +147,7 @@ flowchart TB
 ---
 
 <a id="ch4"></a>
+
 ## 4. 2026年の主要ツールとMCP（Model Context Protocol）
 
 ### 4.1 主要コーディングエージェントの比較
@@ -152,7 +156,7 @@ flowchart TB
 
 | ツール | 提供元 | 主な形態 | 特徴 |
 |---|---|---|---|
-| GitHub Copilot（Agent Mode / Coding Agent） | GitHub / Microsoft | IDE拡張＋CLI＋クラウド | VS Code / JetBrains でAgent Modeが一般提供。Issueを渡すと自律的にPRを作成するCoding Agentも提供<sup>[22][21]</sup> |
+| GitHub Copilot（Agent Mode / Coding Agent） | GitHub / Microsoft | IDE拡張＋CLI＋クラウド | VS Code / JetBrains でAgent Modeが一般提供。Issueを渡すと自律的にPRを作成するCoding Agentも提供<sup>[22], [21]</sup> |
 | Cursor | Anysphere | AIネイティブIDE（VS Codeフォーク） | コードベース全体のインデックスに強み。Claude・GPT系など複数モデルを切り替え可能<sup>[24]</sup> |
 | Claude Code | Anthropic | ターミナル常駐のCLIエージェント | ファイルシステムとコマンド実行への直接アクセスを持つ「エージェント的コーディング」向けCLI<sup>[7]</sup> |
 | Codex CLI / Gemini CLI | OpenAI / Google | ターミナル常駐のCLIエージェント | Claude Codeと同様の思想を持つ競合CLIツール群 |
@@ -192,6 +196,7 @@ flowchart LR
 ---
 
 <a id="ch5"></a>
+
 ## 5. Vibe CodingからAgentic Engineeringへ：開発ワークフローの設計
 
 ### 5.1 Explore → Plan → Code → Commit
@@ -230,6 +235,7 @@ flowchart LR
 ---
 
 <a id="ch6"></a>
+
 ## 6. Webフロントエンド開発とAI支援：HTML/CSS/JavaScript
 
 ### 6.1 ビジネス課題からの機能分解
@@ -270,6 +276,7 @@ flowchart TB
 ---
 
 <a id="ch7"></a>
+
 ## 7. バックエンドとAPI開発：AI支援によるWeb API構築
 
 ### 7.1 AI支援でのAPI設計の進め方
@@ -279,7 +286,7 @@ flowchart TB
 1. **API仕様を先に書く**：エンドポイント一覧、リクエスト/レスポンスのスキーマ、認証方式をMarkdownやOpenAPI形式でまとめる
 2. **エージェントに仕様を渡し、実装させる**：Explore→Plan→Code→Commitのループ（第5章）に沿って、まず既存コードを調査させてから実装させる
 3. **エージェントにテストを書かせる／既存テストを実行させる**：CLAUDE.mdやAGENTS.md相当のファイルに「必ず`pytest`を実行してからコミットする」といったルールを明記する
-4. **MCPサーバーとして公開する（必要な場合）**：社内API・データベースをAIエージェントから安全に利用可能にしたい場合、MCPサーバーとしてラップすることで、Claude Code・Cursorなど複数のホストから同じインターフェースで呼び出せるようになる<sup>[18]</sup>
+4. **MCPサーバーとして公開する（必要な場合）**：社内API・データベースをMCPサーバーとしてラップすることで、Claude Code・Cursorなど複数のホストから同じインターフェースで呼び出せるようになる。ただしMCP化そのものは共通インターフェースを提供するに過ぎず、認証・認可・最小権限・入力検証・監査ログ・データ保護・承認フローといった安全性は別途設計・実装する必要がある点に注意する<sup>[18]</sup>
 
 ```mermaid
 flowchart TB
@@ -299,17 +306,18 @@ flowchart TB
 ---
 
 <a id="ch8"></a>
+
 ## 8. 機械学習ワークフローとAI支援：データ探索からモデル構築まで
 
 ### 8.1 Jupyterノートブックと AI アシスタントの相性
 
-機械学習の実務では、Jupyterノートブックのような対話的な実行環境が中心的な役割を果たします。2026年時点でのAIツールの対応状況を整理した比較記事によれば、GitHub CopilotはVS CodeのJupyter拡張を通じて`.ipynb`ファイル内でインライン補完とチャットによる支援を提供できるものの、「実行中のデータフレームを検査したり、ノートブックの分析の流れを理解したり、可視化結果を直接読み取ったりすることはできない」という限界が指摘されています<sup>[22]</sup>。一方でCursorは.ipynbファイルを扱えるものの、より本領を発揮するのは.pyスクリプトでの開発であり、「ロジックはCursor上の.pyファイルで反復し、プレゼンテーションや共有のためにノートブックへ書き出す」というハイブリッドな使い方が実務的だと紹介されています<sup>[24]</sup>。
+機械学習の実務では、Jupyterノートブックのような対話的な実行環境が中心的な役割を果たします。GitHub CopilotはVS CodeのJupyter拡張を通じて`.ipynb`ファイル内でインライン補完やチャットによる支援を提供できますが、これらは実行中のカーネルにアクセスしないモードのため、「実行中のデータフレームを検査したり、ノートブックの分析の流れを理解したり、可視化結果を直接読み取ったりすることはできない」という制約があります。これに対しVS CodeのAgentモードはセルの作成・編集・実行に加えて出力の検査やエラーからの反復も行えるため、この制約はインライン補完・チャットなどランタイムのコンテキストを持たないモードに限られる点に注意が必要です<sup>[27]</sup>。一方でCursorは.ipynbファイルを扱えるものの、より本領を発揮するのは.pyスクリプトでの開発であり、「ロジックはCursor上の.pyファイルで反復し、プレゼンテーションや共有のためにノートブックへ書き出す」というハイブリッドな使い方が実務的だと紹介されています<sup>[24]</sup>。
 
 これに対し、ノートブックのカーネル内部（変数・セル・データフレーム・プロットの状態）を直接読み取れる「ノートブックネイティブ」なAIエージェント拡張も登場しており、コードの記述・実行・デバッグ・反復を1つの継続的なループの中で行えるようになってきています<sup>[25]</sup>。
 
 | ツールの系統 | 例 | ノートブックとの統合度 | 主な用途 |
 |---|---|---|---|
-| IDE拡張型 | GitHub Copilot（VS Code Jupyter拡張） | セル内補完・チャットのみ、実行結果は見えない<sup>[22]</sup> | pandas/matplotlib/scikit-learnの定型コード生成 |
+| IDE拡張型 | GitHub Copilot（VS Code Jupyter拡張） | インライン補完・チャットは実行結果が見えない（Agentモードはセル出力を検査可能）<sup>[27]</sup> | pandas/matplotlib/scikit-learnの定型コード生成 |
 | コードベース横断型 | Cursor | .ipynbを扱えるが.pyでの開発が中心<sup>[24]</sup> | パイプライン全体（ingest/transform/train）を横断した実験 |
 | ノートブックネイティブ型 | Jupyter AI、ノートブック常駐エージェント拡張 | カーネルの変数・データフレーム・プロットを直接読み取り可能<sup>[25]</sup><sup>[26]</sup> | 探索的データ分析、反復的な可視化 |
 | ターミナル常駐型 | Claude Code、Aider | .ipynbをJSONとして編集可能だが、カーネルの実行状態は見えない | ノートブックを含むリポジトリ全体のリファクタリング |
@@ -335,6 +343,7 @@ flowchart LR
 ---
 
 <a id="ch9"></a>
+
 ## 9. モデル構築とチューニング：AIとの協働による実験サイクル
 
 ### 9.1 モデル構築を反復ループとして捉える
@@ -368,6 +377,7 @@ AIエージェントは「複数のバリエーションを高速に試す」実
 ---
 
 <a id="ch10"></a>
+
 ## 10. テストと品質保証：AI生成コードを信頼できるものにする
 
 ### 10.1 「テストを書き換えるジニー」問題
@@ -407,13 +417,14 @@ flowchart TB
 ---
 
 <a id="ch11"></a>
+
 ## 11. セキュリティとリスク管理
 
 ### 11.1 AI生成コードの脆弱性率
 
 AI支援プログラミングの普及に伴い、生成されたコードのセキュリティ品質を定量的に調べる調査が2025年から2026年にかけて相次いで発表されています。セキュリティ企業Cycodeが2026年8月にまとめた報告によれば、ある調査では「AIが生成したコードサンプルの45%がOWASP Top 10の脆弱性を含んでおり、新規に生成されたJavaコードに限ると失敗率は72%という驚くべき高さだった」とされています<sup>[17]</sup>。同記事はまた、「Y Combinatorの2025年冬クールに参加したスタートアップの25%が、コードベースの95%がAI生成であると報告した」こと、そして「約5,600のvibe-codedアプリケーションを調査したセキュリティ研究者が、2,000件を超える脆弱性と400件以上の露出したシークレットを発見した」ことも紹介しています<sup>[17]</sup>。
 
-セキュリティ企業OX Securityによる分析では、「AIコーディングアシスタントは構文の正確性で95%を超える一方、セキュリティの合格率は約55%で横ばいのままであり、これが人間のレビューをすり抜けやすい“流暢な構造的負債”を生み出している」と指摘されています<sup>[16]</sup>。同分析は、2026年版のOWASP Top 10において、依存関係やビルドシステム、パッケージレジストリを対象とする新カテゴリ「A03: Software Supply Chain Failures（ソフトウェアサプライチェーンの失敗）」が新設された背景として、「生成されたコードが人間の単発ミスとしてではなく、複数のマイクロサービスにまたがって既知の脆弱性を大規模に複製してしまう」構造的な問題を挙げています<sup>[16]</sup>。
+セキュリティ企業OX Securityによる分析では、「AIコーディングアシスタントは構文の正確性で95%を超える一方、セキュリティの合格率は約55%で横ばいのままであり、これが人間のレビューをすり抜けやすい“流暢な構造的負債”を生み出している」と指摘されています<sup>[16]</sup>。同分析は、OWASP Top 10:2025において、依存関係やビルドシステム、パッケージレジストリを対象とする新カテゴリ「A03:2025: Software Supply Chain Failures（ソフトウェアサプライチェーンの失敗）」が新設された背景として、「生成されたコードが人間の単発ミスとしてではなく、複数のマイクロサービスにまたがって既知の脆弱性を大規模に複製してしまう」構造的な問題を挙げています<sup>[16]</sup>。
 
 | 指摘元 | 主な数値 |
 |---|---|
@@ -451,6 +462,7 @@ flowchart TB
 ---
 
 <a id="ch12"></a>
+
 ## 12. エージェントとマルチエージェントシステムの基礎
 
 ### 12.1 「ワークフロー」と「エージェント」の違い
@@ -501,6 +513,7 @@ flowchart TB
 ---
 
 <a id="ch13"></a>
+
 ## 13. 実務への統合：チーム開発・ガバナンス、そしてこれから
 
 ### 13.1 チームでの設定共有
@@ -526,6 +539,7 @@ flowchart TB
 ---
 
 <a id="ch14"></a>
+
 ## 14. まとめと実践チェックリスト
 
 本ガイドで扱った内容を、日々の実践に落とし込むためのチェックリストとしてまとめます。
@@ -545,6 +559,7 @@ AI支援プログラミングは、初学者にとって「コードを書く」
 ---
 
 <a id="ref"></a>
+
 ## 参考文献
 
 1. Andrej Karpathy, X（旧Twitter）投稿「There's a new kind of coding I call "vibe coding"」（2025年2月2日）: https://x.com/karpathy/status/1886192184808149383
@@ -573,6 +588,7 @@ AI支援プログラミングは、初学者にとって「コードを書く」
 24. letdataspeak.com, "Cursor AI for Data Science: A Practical Guide (2026)"（2026年3月24日）: https://letdataspeak.com/cursor-ai-for-data-science/
 25. Kanaries, "AI Agent Turns Jupyter Notebook Into a Data Science Co-Pilot"（2025年11月14日）: https://docs.kanaries.net/articles/jupyter-ai-runcell
 26. Exploring Artificial Intelligence（Substack）, "Jupyter AI: Transforming the Notebook": https://exploringartificialintelligence.substack.com/p/jupyter-ai-transforming-the-notebook
+27. Visual Studio Code Docs, "Work with Jupyter notebooks using AI in VS Code": https://code.visualstudio.com/docs/agents/guides/notebooks-with-ai
 
 ---
 
