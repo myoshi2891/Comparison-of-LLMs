@@ -52,6 +52,8 @@ scraper/coverage.xml
 !.env.example
 credentials.json
 config.ini
+/sagemaker_user_credentials.json
+/sagemaker_execution_role.json
 
 # Logs
 *.log
