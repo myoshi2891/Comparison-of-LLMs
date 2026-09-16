@@ -279,7 +279,7 @@ min_θ  E[ max_{δ∈Δ(x)}  L( f_θ(x+δ), y ) ]
 
 ## Step 7 防御2 証明可能な頑健性 Certified Robustness
 
-書籍第6〜9章(Convex relaxation、Layer-wise relaxation、Dual approach、Probabilistic verification)および第11章(Certified defense)に対応します。Adversarial Trainingが「経験的に頑健」であるのに対し、Certified Robustness(証明可能な頑健性)は**数学的に「この範囲の摂動なら絶対に予測が変わらない」と保証**することを目指します。
+書籍第6〜9章(Convex relaxation、Layer-wise relaxation、Dual approach、Probabilistic verification)、第11章(Certified defense)、および第12章(Randomization)に対応します。Adversarial Trainingが「経験的に頑健」であるのに対し、Certified Robustness(証明可能な頑健性)は**数学的に「この範囲の摂動なら絶対に予測が変わらない」と保証**することを目指します。
 
 書籍前半の6〜9章は、ニューラルネットワークの各層を凸緩和(convex relaxation)や区間演算で上下に挟み込み、出力の変動範囲を数学的に証明するアプローチ(いわゆる形式的検証 Formal Verification に近い手法群)を扱っています。
 
@@ -374,7 +374,7 @@ NIST AI 100-2e2025は、Apostol Vassilev氏(NIST)、Alina Oprea氏(Northeastern 
 
 ### 10-3 何がどこまで同じで何が違うのか
 
-- **同じ点**: 「モデルの出力を意図的に誤らせる精密な入力を作る」という基本構造や、White-box/Black-box、転移性といった概念はそのままLLMにも当てはまります。実際GCGはPGD的な最適化の考え方を離散トークン空間に応用したものと位置づけられます。
+- **同じ点**: 「モデルの出力を意図的に誤らせる精密な入力を作る」という基本構造や、White-box/Black-box、転移性といった概念はそのままLLMにも当てはまります。実際GCGは勾配情報を手がかりにした貪欲座標探索(gradient-guided greedy coordinate search)を離散トークン空間に応用したものと位置づけられます。
 - **異なる点**: LLMでは入力・出力ともに自然言語という離散的・意味を持つ空間であるため、「Lpノルムで微小」という古典的な制約がそのまま使えません。代わりに、prompt injection(外部データ経由での指示の乗っ取り)やjailbreak(安全対策の迂回)といった、LLM特有の脅威カテゴリが中心的な関心事になっています。
 
 ---
@@ -441,7 +441,7 @@ flowchart LR
 - [ ] Obfuscated Gradientsがなぜ危険な落とし穴なのかを説明できる
 - [ ] AutoAttackやRobustBenchが果たす役割を理解している
 - [ ] Backdoor攻撃がEvasion攻撃とどう違うかを説明できる
-- [ ] GCGのような攻撃が、古典的なPGDの考え方とどうつながっているかを説明できる
+- [ ] GCGのような勾配ガイド付き貪欲座標探索(gradient-guided greedy coordinate search)が、古典的なPGDの考え方とどうつながっているかを説明できる
 - [ ] NIST AI 100-2、MITRE ATLAS、OWASP Top 10 for LLM and GenAIがそれぞれ何のためのフレームワークかを説明できる
 
 ---
