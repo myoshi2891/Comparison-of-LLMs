@@ -54,7 +54,7 @@ flowchart LR
 
 ### 1.3 数字で見る変化の速度
 
-普及の速さを示す数字として、Anthropic自身が2025年10月〜2026年4月の約6か月間に収集した約40万件のClaude Codeセッションを分析した調査では、「コーディングエージェントの活動があるGitHubプロジェクトの割合は2025年後半以降に2倍以上に増加した」こと、そして「Claude Codeユーザーは平均して週20時間このツールを使用している」ことが報告されています<sup>[9]</sup>。また、AI開発教育で著名なアンドリュー・ング（Andrew Ng）は2026年8月、1万件超の求人情報分析に基づき「AIエンジニアリング・スキルマップ」を公開し、「コーディングエージェントを使いこなすスキル」を主要4スキルの1つに位置づけています<sup>[13]</sup>。
+普及の速さを示す数字として、Anthropic自身が2025年10月〜2026年4月の約6か月間に収集した約40万件のClaude Codeセッションを分析した調査では、「コーディングエージェントの活動があるGitHubプロジェクトの割合は2025年後半以降に2倍以上に増加した」こと、そして「Claude Codeユーザーは平均して週20時間このツールを使用している」ことが報告されています<sup>[9]</sup>。また、AI開発教育で著名なアンドリュー・ング（Andrew Ng）は2026年9月4日、1万件超の求人情報分析に基づき「AIエンジニアリング・スキルマップ」を公開し、「コーディングエージェントを使いこなすスキル」を主要4スキルの1つに位置づけています<sup>[13]</sup>。
 
 一方で、こうした急速な普及には影の側面もあります。詳細は第11章で扱いますが、AIが生成したコードの安全性検証は依然として大きな課題であり続けています<sup>[15]</sup><sup>[16]</sup><sup>[17]</sup>。本ガイドは、この「速さ」と「責任」の両方を初学者に伝えることを目指します。
 
@@ -72,7 +72,7 @@ Google Chromeチームのエンジニアリングリーダーであり著名な�
 
 ### 2.2 補完型 vs チャット型 vs エージェント型
 
-コーディングアシスタントは大きく4つの動作モードに分類できます。GitHub Copilotを例に取ると、2026年時点でVS Code上には「Ask（質問）」「Edit（編集）」「Agent（エージェント）」という3つの明確なモードがあり、さらにGitHubのサーバー側で非同期に動く「Coding Agent（コーディングエージェント）」が加わります<sup>[22], [21]</sup>。このAgent Modeは2025年2月、GitHubがMicrosoft創業50周年に合わせて発表した機能拡張の一部としてMCP（Model Context Protocol）対応とともに発表されたもので、Copilotを「コード補完ツール」から「エージェント的な開発パートナー」へと転換させる契機になりました<sup>[10]</sup>。
+コーディングアシスタントは大きく4つの動作モードに分類できます。GitHub Copilotを例に取ると、2026年時点でVS Code上には「Ask（質問）」「Edit（編集）」「Agent（エージェント）」という3つの明確なモードがあり、さらにGitHubのサーバー側で非同期に動く「Coding Agent（コーディングエージェント）」が加わります<sup>[22], [21]</sup>。このAgent Modeは2025年2月、GitHubがMicrosoft創業50周年に合わせて発表した機能拡張の一部として発表されたもので、Copilotを「コード補完ツール」から「エージェント的な開発パートナー」へと転換させる契機になりました<sup>[10]</sup>。MCP（Model Context Protocol）対応はその後段階的に展開され、2025年7月にVS Code版が一般提供となり、2025年8月にはJetBrains・Eclipse・Xcode版でも一般提供されています<sup>[28], [29]</sup>。
 
 | モード | 典型例 | 動作の特徴 | 人間の関与度 |
 |---|---|---|---|
@@ -108,7 +108,7 @@ Anthropicの内部調査によれば、Claude Codeを使った典型的なセッ
 
 ### 3.1 プロンプトエンジニアリングの基本
 
-Anthropicの公式ドキュメントでは、プロンプトエンジニアリングを「AIモデルから望む出力を得るために、指示を注意深く設計するプロセス」と定義し、明確さ、具体例（multishot prompting）、XMLタグによる構造化、思考の連鎖（chain of thought）、役割設定（role prompting）といった技法を中核として挙げています<sup>[8]</sup>。土台となった書籍では、この基本を踏まえた上で、独自の4つのプロンプトパターン（TAG: Task-Action-Guideline、PIC: Persona-Instruction-Context、Exploratory、LIFE: Learn-Improvise-Feedback-Evaluate）を提案し、Web開発とデータサイエンスのそれぞれで使い分けることを推奨していました<sup>[20]</sup>。これらのパターンは今なお「タスクを分解し、役割を与え、反復的に検証する」という普遍的な考え方として有効です。
+Anthropicの公式ドキュメントでは、プロンプトエンジニアリングを「AIモデルから望む出力を得るために、指示を注意深く設計するプロセス」と定義し、明確さ、具体例（multishot prompting）、XMLタグによる構造化、思考の連鎖（chain of thought）、役割設定（role prompting）といった技法を中核として挙げています<sup>[8]</sup>。土台となった書籍では、この基本を踏まえた上で、独自の3つのプロンプトパターン（TAG: Task-Action-Guideline、PIC: Persona-Instruction-Context、LIFE: Learn-Improvise-Feedback-Evaluate）を提案し、Web開発とデータサイエンスのそれぞれで使い分けることを推奨していました<sup>[20]</sup>。これらのパターンは今なお「タスクを分解し、役割を与え、反復的に検証する」という普遍的な考え方として有効です。
 
 以下は、この考え方を2026年の実務に合わせて整理した基本パターンです。
 
@@ -532,7 +532,7 @@ flowchart TB
 
 ### 13.3 これからの展望：長時間稼働エージェントと「Shaping the Build」
 
-アンドリュー・ングが2026年8月に公開した「AIエンジニアリング・スキルマップ」は、（1）AIアプリケーションの構築とデプロイ、（2）ソフトウェア工学の基礎、（3）コーディングエージェントの活用、（4）ビルドを方向づける（Shaping the Build）、という4つの上位スキルから構成されています<sup>[13]</sup>。ング自身、コーディングエージェントを操作するスキルについて「進化のペースが非常に速いため、他の上位スキルよりも速く変化し続けている」と述べ、継続的な実験・構築・学習のプロセスが必要だと強調しています<sup>[13]</sup>。
+アンドリュー・ングが2026年9月4日に公開した「AIエンジニアリング・スキルマップ」は、（1）AIアプリケーションの構築とデプロイ、（2）ソフトウェア工学の基礎、（3）コーディングエージェントの活用、（4）ビルドを方向づける（Shaping the Build）、という4つの上位スキルから構成されています<sup>[13]</sup>。ング自身、コーディングエージェントを操作するスキルについて「進化のペースが非常に速いため、他の上位スキルよりも速く変化し続けている」と述べ、継続的な実験・構築・学習のプロセスが必要だと強調しています<sup>[13]</sup>。
 
 同時に、「あなたが最高の仕事をするとき、それは単に誰かが仕様を決めたプロダクトを実装することではなく、あなた自身がビルドを能動的に方向づけることになる」というング自身の言葉が示すように、AIエージェントの自律性が高まるほど、人間に求められる役割は「タイピング」から「意思決定と品質保証」へとシフトしていきます。これは第1章で紹介した「Vibe Coding」から「Agentic Engineering」への変遷、そして第5章の「3つのループ」の議論と一貫しています。
 
@@ -589,6 +589,8 @@ AI支援プログラミングは、初学者にとって「コードを書く」
 25. Kanaries, "AI Agent Turns Jupyter Notebook Into a Data Science Co-Pilot"（2025年11月14日）: https://docs.kanaries.net/articles/jupyter-ai-runcell
 26. Exploring Artificial Intelligence（Substack）, "Jupyter AI: Transforming the Notebook": https://exploringartificialintelligence.substack.com/p/jupyter-ai-transforming-the-notebook
 27. Visual Studio Code Docs, "Work with Jupyter notebooks using AI in VS Code": https://code.visualstudio.com/docs/agents/guides/notebooks-with-ai
+28. GitHub Changelog, "Model Context Protocol (MCP) support in VS Code is generally available"（2025年7月14日）: https://github.blog/changelog/2025-07-14-model-context-protocol-mcp-support-in-vs-code-is-generally-available/
+29. GitHub Changelog, "Model Context Protocol (MCP) support for JetBrains, Eclipse, and Xcode is now generally available"（2025年8月13日）: https://github.blog/changelog/2025-08-13-model-context-protocol-mcp-support-for-jetbrains-eclipse-and-xcode-is-now-generally-available/
 
 ---
 
