@@ -18,7 +18,7 @@
 - [Step 0 前提知識のおさらい](#step-0-前提知識のおさらい)
 - [Step 1 Adversarial Example の発見と直感](#step-1-adversarial-example-の発見と直感)
 - [Step 2 脅威モデル Threat Model を理解する](#step-2-脅威モデル-threat-model-を理解する)
-- [Step 3 代表的なWhite-box攻撃 FGSM PGD CampW](#step-3-代表的なwhite-box攻撃-fgsm-pgd-campw)
+- [Step 3 代表的なWhite-box攻撃 FGSM PGD C&W](#step-3-代表的なwhite-box攻撃-fgsm-pgd-cw)
 - [Step 4 Black-box攻撃と転移性](#step-4-black-box攻撃と転移性)
 - [Step 5 物理世界での攻撃](#step-5-物理世界での攻撃)
 - [Step 6 防御1 Adversarial Training](#step-6-防御1-adversarial-training)
@@ -140,10 +140,14 @@ flowchart TD
     T[脅威モデル Threat Model] --> K1[攻撃者の知識]
     K1 --> K1a[White-box 勾配やパラメータを完全に把握]
     K1 --> K1b[Black-box 入力と出力のみ観測可能]
-    T --> G[攻撃者の目的]
-    G --> G1[Evasion 推論時に誤分類を狙う]
-    G --> G2[Poisoning 学習データを汚染する]
-    G --> G3[Privacy 訓練データやモデル自体を盗む]
+    T --> C[攻撃クラス]
+    C --> C1[Evasion 推論時に誤分類を狙う]
+    C --> C2[Poisoning 学習データを汚染する]
+    T --> P[攻撃者の目的 プライバシー侵害]
+    P --> P1[Privacy 訓練データやモデル自体を盗む]
+    T --> TM[攻撃のタイミング]
+    TM --> TM1[学習時 Training-time]
+    TM --> TM2[推論時 Deployment-time]
     T --> N[摂動の制約]
     N --> N1[Lpノルムボール 微小な数値的摂動]
     N --> N2[物理的制約 パッチやステッカーなど現実の改変]
@@ -153,9 +157,11 @@ flowchart TD
 |---|---|---|
 | 攻撃者の知識 | White-box | モデルの構造・パラメータ・勾配まで全て把握している最も強い前提 |
 | 攻撃者の知識 | Black-box | 入力を送って出力(ラベルやスコア)を見ることしかできない |
-| 攻撃のタイミング | Evasion(回避) | 学習済みモデルに対し推論時に誤分類を狙う、最も研究が進んだ領域 |
-| 攻撃のタイミング | Poisoning(汚染) | 学習データ自体を汚染し、モデルの挙動を歪める |
-| 攻撃のタイミング | Privacy(プライバシー) | 学習データやモデルパラメータ自体を盗み出す |
+| 攻撃クラス | Evasion(回避) | 学習済みモデルに対し推論時に誤分類を狙う、最も研究が進んだ領域 |
+| 攻撃クラス | Poisoning(汚染) | 学習データ自体を汚染し、モデルの挙動を歪める |
+| 攻撃者の目的(プライバシー侵害) | Privacy(プライバシー) | 学習データやモデルパラメータ自体を盗み出す |
+| 攻撃のタイミング | 学習時(Training-time) | Poisoningなど、モデルの学習プロセス自体を狙う |
+| 攻撃のタイミング | 推論時(Deployment-time) | Evasionなど、学習済みモデルへの入力を操作する |
 | 摂動の種類 | デジタル摂動 | L∞やL2などのノルムで制約された微小な数値変化 |
 | 摂動の種類 | 物理摂動 | ステッカーや印刷物など、現実世界に存在できる改変 |
 
@@ -163,7 +169,7 @@ flowchart TD
 
 ---
 
-## Step 3 代表的なWhite-box攻撃 FGSM PGD CampW
+## Step 3 代表的なWhite-box攻撃 FGSM PGD C&W
 
 書籍の第1章(White-box attack)に対応する内容です。White-box攻撃はモデルの勾配を直接利用できるため、攻撃の仕組みそのものを学ぶのに最適です。
 
@@ -196,7 +202,7 @@ flowchart TD
 
 Madry氏らはPGDを「あらゆる一次(勾配ベース)攻撃の中でほぼ最強かつ普遍的な攻撃」と位置づけ、これをベースにした **PGD Adversarial Training** が、以後の防御研究の事実上の標準ベースラインになりました。
 
-### 3-3 Carlini and Wagner攻撃 CampW
+### 3-3 Carlini and Wagner攻撃 C&W
 
 2017年、Nicholas Carlini氏とDavid Wagner氏(UC Berkeley)は論文「Towards Evaluating the Robustness of Neural Networks」で、当時提案されていた**Defensive Distillation**という防御手法が、実は攻撃者側を過小評価していただけであることを示し、これを打ち破る最適化ベースの攻撃(C&W攻撃)を提案しました。攻撃の成功率を95%から0.5%まで下げたと主張していた防御を、ほぼ完全に無効化した点が大きなインパクトを持ちました。
 
@@ -360,7 +366,7 @@ flowchart TD
 
 | フレームワーク | 発行元 | 概要 |
 |---|---|---|
-| NIST AI 100-2e2025 | 米国国立標準技術研究所(NIST) | Predictive AI (PredAI) とGenerative AI (GenAI) の両方を対象に、Evasion・Poisoning・Privacy・Abuseという4分類でAdversarial ML用語を標準化 |
+| NIST AI 100-2e2025 | 米国国立標準技術研究所(NIST) | Predictive AI (PredAI) を対象とするEvasion・Poisoning・Privacyの3分類に、Generative AI (GenAI) 固有のMisuse分類を加えた4分類でAdversarial ML用語を標準化 |
 | MITRE ATLAS | MITRE Corporation | ATT&CKと同じマトリクス形式で、AIシステムに対する実際の攻撃事例と戦術・技術をカタログ化。2026年2月更新でエージェント特有の攻撃技術も追加 |
 | OWASP Top 10 for LLM and GenAI 2026 | OWASP GenAI Security Project | Prompt Injectionをはじめ、LLMアプリケーション特有のリスクを優先順位付けした実務者向けガイド。2026年8月に最新版を公開 |
 
