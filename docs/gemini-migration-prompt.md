@@ -42,6 +42,8 @@
 - パッケージマネージャーは **bun** を使用してください（`npm` / `npx` / `node` の実行は禁止）。
 - テスト実行は必ず `(cd web-next && bun run test <対象テストパス>)` で実行してください
   （`bun test` は vitest/jsdom 設定を無視するため禁止）。
+  Phase 4 の全体リグレッション確認時に限り、対象パスを省略した `bun run test`
+  （フルスイート実行）を許容します。
 - サンドボックス環境下での **`npm` コマンドおよび本番ビルド（`bun run build` / `next build`）の実行は禁止** です。
 - Biome Lint 実行時は必ず対象ファイル/ディレクトリを指定してください
   （`bun run lint:fix` や `bunx biome check --write` をパス引数なしでリポジトリ全体に実行することは禁止）。
@@ -160,7 +162,7 @@ echo "exit=$?"
 1. 対象コードの Lint チェックおよび型チェックを実行し、エラーがゼロであることを確認します:
 
    ```bash
-   (cd web-next && bun run lint app/<provider>/<slug>)
+   (cd web-next && bunx biome check app/<provider>/<slug>)
    (cd web-next && bun run typecheck)
    ```
 
