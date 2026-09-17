@@ -2,7 +2,7 @@
 
 > 本ファイルは Next.js 移行完了後の保守・改善フェーズにおける開発の進捗（特にテスト関連）および品質チェックのルールを記録する。
 >
-> - 最終更新日: **Updated 2026-09-12**
+> - 最終更新日: **Updated 2026-09-17**
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
 
@@ -12,15 +12,25 @@
 - **ブランチ**: `dev`（本番 `main` への Next.js 移行マージ完了 🚀）
 - **動作検証**:
   - `bun run build` ✅（Compiled successfully / 88 静的ページを生成。2026-09-12 実測）
-  - `bun run typecheck` ✅（`tsc --noEmit`。2026-09-12 実測）
-  - `bun run lint` ✅（Biome check / 481 files / 0 diagnostics。2026-09-12 実測）
+  - `bun run typecheck` ✅（`tsc --noEmit`。2026-09-17 実測）
+  - `bun run lint` ✅（Biome check / 482 files / 0 diagnostics。2026-09-17 実測）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: `bun run test` で Vitest **174 files / 1583 tests すべて合格**（2026-09-12 実測。全 Green ✅）
+  - **フロントエンド (`web-next/`)**: `bun run test` で Vitest **175 files / 1600 tests すべて合格**（2026-09-17 実測。全 Green ✅）
     - `load(sourceHtml)` をモジュール初期化時に呼ぶ `governance/ai-governance/GuideContent.tsx` と
       `local-llm/finetuning-best-practices/GuideContent.tsx` は、import スモークでも読み込み可能であることを確認済み
   - **バックエンド (`scraper/`)**: pytest 実行で **94 件 + 37 subtests すべて合格** (2026-09-12 実測。全 Green ✅)
 
 ## 最近の追加内容
+
+- **Generative AI for Software Development ガイド（/books/generative-ai-for-software-development）の Next.js アプリ移行 & ナビ「推薦書籍」グループ新設**:
+  - `Generative-ai-for-software-development-guide.html` を `web-next/app/books/generative-ai-for-software-development/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。
+  - 要約・省略一切なしで全17セクション（この本について〜参考文献・出典URL一覧）、全33サブセクション（h3）、全表（12個）、7個のMermaid図解（`MermaidDiagram`）、TOCスクロール追従・モバイルドロワー・チェックリストカウンター（`TocObserver.tsx`）、全9項目の学習チェックリスト、全47件の参考文献・外部リンク安全属性（`target="_blank" rel="noopener noreferrer"`）、全幅レイアウトを完全再現。
+  - グローバルナビゲーション（`web-next/lib/nav-taxonomy.ts`）に新グループ「推薦書籍」を新設し、トップレベルドロップダウンに追加。`components/site/SiteHeader.test.tsx` のドロップダウン数（5 → 6）および `tests/nav-derivation.test.ts` のグループ数（8 → 9）を同期更新。
+  - 原本 `Generative-ai-for-software-development-guide.html` は `archive/html/books/Generative-ai-for-software-development-guide.html` へ退避保存。
+  - 原本照合監査スクリプト `audit_source_parity.mjs` で exit code 0（漏れなし ✅）を確認。
+  - `web-next/lib/page-registry.ts` に新規エントリ（`slug: "/books/generative-ai-for-software-development"`, `group: "推薦書籍"`）を登録。
+  - 契約テスト17件（S-1〜S-4, C-1〜C-6, D-1, D-5, D-7, D-8, Q-1〜Q-3）を作成し、Vitest **175 files / 1600 tests** 全 Green ✅、typecheck ✅、Biome lint ✅ を確認。
+
 
 - **月次価格更新 2026-09 & スクレイパーのフォールバック優先順位バグ修正** (HEAD `3af819c4`):
   - `pricing.json` が 2026-07-24 で約 7 週間停滞していたため、各社公式料金ページを実地調査して更新。
