@@ -11,16 +11,24 @@
 - **フェーズ**: 保守・機能改善・品質強化フェーズ
 - **ブランチ**: `dev`（本番 `main` への Next.js 移行マージ完了 🚀）
 - **動作検証**:
-  - `bun run build` ✅（Compiled successfully / 89 静的ページを生成。2026-09-17 実測）
+  - `bun run build` ✅（Compiled successfully / 90 静的ページを生成。2026-09-17 実測）
   - `bun run typecheck` ✅（`tsc --noEmit`。2026-09-17 実測）
-  - `bun run lint` ✅（Biome check / 482 files / 0 diagnostics。2026-09-17 実測）
+  - `bun run lint` ✅（Biome check / 489 files / 0 diagnostics。2026-09-17 実測）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: `bun run test` で Vitest **175 files / 1603 tests すべて合格**（2026-09-17 実測。全 Green ✅）
+  - **フロントエンド (`web-next/`)**: `bun run test` で Vitest **176 files / 1621 tests すべて合格**（2026-09-17 実測。全 Green ✅）
     - `load(sourceHtml)` をモジュール初期化時に呼ぶ `governance/ai-governance/GuideContent.tsx` と
       `local-llm/finetuning-best-practices/GuideContent.tsx` は、import スモークでも読み込み可能であることを確認済み
-  - **バックエンド (`scraper/`)**: pytest 実行で **94 件 + 37 subtests すべて合格** (2026-09-12 実測。全 Green ✅)
+  - **バックエンド (`scraper/`)**: pytest 実行で **100 件すべて合格** (2026-09-17 実測。全 Green ✅)
 
 ## 最近の追加内容
+
+- **AI Engineering 入門ガイド（/books/ai-engineering-guide）の Next.js アプリ移行**:
+  - `Ai-engineering-guide.html` を `web-next/app/books/ai-engineering-guide/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。
+  - 要約・省略一切なしで全17セクション（はじめに〜参考文献・出典）、全10サブセクション（h3）、全表（6個）、9個のMermaid図解（`MermaidDiagram`）、TOCスクロール追従・モバイルドロワー（`TocObserver.tsx`）、全28件の参考文献・外部リンク安全属性（`target="_blank" rel="noopener noreferrer"`）、全幅レイアウトを完全再現。
+  - 原本 `Ai-engineering-guide.html` は `archive/html/books/Ai-engineering-guide.html` へ退避保存。
+  - 原本照合監査スクリプト `audit_source_parity.mjs` で exit code 0（漏れなし ✅）を確認。あわせて識別子キー（クォートなしオブジェクトリテラル）の Mermaid 抽出に対応。
+  - `web-next/lib/page-registry.ts` に新規エントリ（`slug: "/books/ai-engineering-guide"`, `group: "推薦書籍"`）を登録。
+  - 契約テスト18件（S-1〜S-4, C-1〜C-6, D-1, D-5, D-7, D-8, D-9, D-10, Q-2, Q-3）を作成し、Vitest **176 files / 1621 tests** 全 Green ✅、typecheck ✅、Biome lint ✅、build ✅（90静的ページ）を確認。
 
 - **Generative AI for Software Development ガイド（/books/generative-ai-for-software-development）の UI / スタイル / インタラクション完全適合化**:
   - **公開日・最終確認バッジ**: グローバル鮮度バーの黒背景・青文字による違和感を解消するため、本ページではヒーローセクション最上部に統合。背景色をヒーロー色（`#faf7ef`）、文字色を黒文字（`var(--ink)` / `var(--ink-soft)`）に設定し、グローバルの黒バーを非表示化。
