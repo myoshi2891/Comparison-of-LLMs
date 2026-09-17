@@ -388,10 +388,16 @@ function collectHtmlMermaidSources(src) {
     script = scriptRe.exec(src);
   }
 
-  const diagramEntryRe = /(?:["'][^"']+["']|[A-Za-z_$][\w$]*)\s*:\s*`([\s\S]*?)`/g;
+  const diagramEntryRe =
+    /(?:["'][^"']+["']|[A-Za-z_$][\w$]*)\s*:\s*(?:`([\s\S]*?)`|'((?:[^'\\]|\\.)*)'|"((?:[^"\\]|\\.)*)")/g;
   let entry = diagramEntryRe.exec(src);
   while (entry !== null) {
-    sources.push({ index: entry.index, source: normalizeMermaidSource(entry[1]) });
+    const raw = entry[1] ?? (entry[2] ?? entry[3] ?? "")
+      .replace(/\\n/g, "\n")
+      .replace(/\\'/g, "'")
+      .replace(/\\"/g, '"')
+      .replace(/\\\\/g, "\\");
+    sources.push({ index: entry.index, source: normalizeMermaidSource(raw) });
     entry = diagramEntryRe.exec(src);
   }
 
