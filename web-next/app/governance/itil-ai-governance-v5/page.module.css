@@ -13,8 +13,8 @@
   --color-plum: #8c3a5c;
   --border: #e1e4ec;
   --sidebar-w: 288px;
-  --font-serif: 'Source Serif 4', Georgia, 'Hiragino Mincho ProN', serif;
-  --font-sans: 'Inter', -apple-system, 'Hiragino Sans', 'Yu Gothic', sans-serif;
+  --font-serif: "Source Serif 4", Georgia, "Hiragino Mincho ProN", serif;
+  --font-sans: "Inter", -apple-system, "Hiragino Sans", "Yu Gothic", sans-serif;
 
   width: 100%;
   min-height: 100vh;
@@ -126,7 +126,9 @@
   color: var(--color-ink-soft);
   border-left: 3px solid transparent;
   line-height: 1.4;
-  transition: background 0.15s ease, color 0.15s ease;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
 }
 
 .toc a:hover {

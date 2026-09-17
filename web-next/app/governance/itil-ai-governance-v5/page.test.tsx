@@ -10,9 +10,7 @@ vi.mock("@/components/docs/MermaidDiagram", () => ({
   },
 }));
 
-const EXPECTED_H1 = [
-  "ITIL AI Governance (Version 5) 完全学習ガイド",
-] as const;
+const EXPECTED_H1 = ["ITIL AI Governance (Version 5) 完全学習ガイド"] as const;
 
 const EXPECTED_H2 = [
   "この教材について",
@@ -123,41 +121,33 @@ describe("ITIL AI Governance (Version 5) 完全学習ガイド - 契約テスト
   // S-1: 原本見出し契約（順序込み完全一致）
   it("S-1: H1見出しが原本と完全一致する", () => {
     const { container } = render(<Page />);
-    const h1s = Array.from(container.querySelectorAll("h1")).map((el) =>
-      el.textContent?.trim()
-    );
+    const h1s = Array.from(container.querySelectorAll("h1")).map((el) => el.textContent?.trim());
     expect(h1s).toEqual([...EXPECTED_H1]);
   });
 
   it("S-1: H2見出しが原本と順序込み完全一致する", () => {
     const { container } = render(<Page />);
-    const h2s = Array.from(container.querySelectorAll("h2")).map((el) =>
-      el.textContent?.trim()
-    );
+    const h2s = Array.from(container.querySelectorAll("h2")).map((el) => el.textContent?.trim());
     expect(h2s).toEqual([...EXPECTED_H2]);
   });
 
   it("S-1: H3見出しが原本と順序込み完全一致する", () => {
     const { container } = render(<Page />);
-    const h3s = Array.from(container.querySelectorAll("h3")).map((el) =>
-      el.textContent?.trim()
-    );
+    const h3s = Array.from(container.querySelectorAll("h3")).map((el) => el.textContent?.trim());
     expect(h3s).toEqual([...EXPECTED_H3]);
   });
 
   it("S-1: H4見出しが原本と順序込み完全一致する", () => {
     const { container } = render(<Page />);
-    const h4s = Array.from(container.querySelectorAll("h4")).map((el) =>
-      el.textContent?.trim()
-    );
+    const h4s = Array.from(container.querySelectorAll("h4")).map((el) => el.textContent?.trim());
     expect(h4s).toEqual([...EXPECTED_H4]);
   });
 
   // S-2: 外部リンク契約
   it("S-2: 原本の主要外部リンクがすべて含まれる", () => {
     const { container } = render(<Page />);
-    const links = Array.from(container.querySelectorAll("a[href^='http']")).map(
-      (el) => el.getAttribute("href")
+    const links = Array.from(container.querySelectorAll("a[href^='http']")).map((el) =>
+      el.getAttribute("href")
     );
     for (const expectedUrl of EXPECTED_EXTERNAL_LINKS) {
       expect(links).toContain(expectedUrl);
@@ -167,9 +157,9 @@ describe("ITIL AI Governance (Version 5) 完全学習ガイド - 契約テスト
   // S-3: 目次（TOC）アンカーリンク契約
   it("S-3: 目次（TOC）のhrefが原本の全12セクションと完全一致する", () => {
     const { container } = render(<Page />);
-    const tocLinks = Array.from(
-      container.querySelectorAll("nav[data-testid='toc'] a")
-    ).map((el) => el.getAttribute("href"));
+    const tocLinks = Array.from(container.querySelectorAll("nav[data-testid='toc'] a")).map((el) =>
+      el.getAttribute("href")
+    );
     expect(tocLinks).toEqual([...EXPECTED_TOC_HREFS]);
   });
 
@@ -189,9 +179,9 @@ describe("ITIL AI Governance (Version 5) 完全学習ガイド - 契約テスト
     expect(container.querySelector("h1")?.textContent).toBe(
       "ITIL AI Governance (Version 5) 完全学習ガイド"
     );
-    expect(
-      container.querySelector("h1 + h3")?.textContent
-    ).toBe("初学者向け ステップバイステップ解説 + ベストプラクティス集");
+    expect(container.querySelector("h1 + h3")?.textContent).toBe(
+      "初学者向け ステップバイステップ解説 + ベストプラクティス集"
+    );
   });
 
   // C-2: テーブル契約（111行相当のテーブル構造）
@@ -199,9 +189,9 @@ describe("ITIL AI Governance (Version 5) 完全学習ガイド - 契約テスト
     const { container } = render(<Page />);
     const tables = container.querySelectorAll("table");
     expect(tables.length).toBeGreaterThanOrEqual(10);
-    const firstThs = Array.from(
-      tables[0].querySelectorAll("thead th")
-    ).map((th) => th.textContent?.trim());
+    const firstThs = Array.from(tables[0].querySelectorAll("thead th")).map((th) =>
+      th.textContent?.trim()
+    );
     expect(firstThs).toEqual(["項目", "内容"]);
   });
 
@@ -221,9 +211,7 @@ describe("ITIL AI Governance (Version 5) 完全学習ガイド - 契約テスト
     );
     expect(sourceCallouts).toHaveLength(11);
 
-    const noteCallouts = container.querySelectorAll(
-      "[data-testid='callout'][data-variant='note']"
-    );
+    const noteCallouts = container.querySelectorAll("[data-testid='callout'][data-variant='note']");
     expect(noteCallouts).toHaveLength(4);
   });
 
@@ -232,11 +220,24 @@ describe("ITIL AI Governance (Version 5) 完全学習ガイド - 契約テスト
     const { container } = render(<Page />);
     const refCards = container.querySelectorAll("[data-testid='ref-card']");
     expect(refCards).toHaveLength(14);
-    const badges = Array.from(
-      container.querySelectorAll("[data-testid='ref-badge']")
-    ).map((b) => b.textContent?.trim());
+    const badges = Array.from(container.querySelectorAll("[data-testid='ref-badge']")).map((b) =>
+      b.textContent?.trim()
+    );
     expect(badges).toEqual([
-      "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14"
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6",
+      "7",
+      "8",
+      "9",
+      "10",
+      "11",
+      "12",
+      "13",
+      "14",
     ]);
   });
 
@@ -276,9 +277,7 @@ describe("ITIL AI Governance (Version 5) 完全学習ガイド - 契約テスト
 
   // Q-1: メタデータ契約
   it("Q-1: 正しいメタデータがエクスポートされている", () => {
-    expect(metadata.title).toBe(
-      "ITIL AI Governance (Version 5) 完全学習ガイド"
-    );
+    expect(metadata.title).toBe("ITIL AI Governance (Version 5) 完全学習ガイド");
     expect(metadata.description).toContain(
       "PeopleCert 認定資格 ITIL AI Governance (Version 5) の出題範囲"
     );

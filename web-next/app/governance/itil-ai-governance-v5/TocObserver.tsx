@@ -13,7 +13,7 @@ export default function TocObserver() {
     const sections = navLinks
       .map((a) => {
         const href = a.getAttribute("href");
-        if (!href || !href.startsWith("#")) return null;
+        if (!href?.startsWith("#")) return null;
         return document.getElementById(decodeURIComponent(href.slice(1)));
       })
       .filter((el): el is HTMLElement => el !== null);
