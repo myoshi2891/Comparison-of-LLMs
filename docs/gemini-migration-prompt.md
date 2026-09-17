@@ -87,7 +87,9 @@
 ```bash
 bun .gemini/skills/nextjs-page-migration/scripts/audit_source_parity.mjs \
   <原本HTMLパス> web-next/app/<provider>/<slug>/page.tsx
-echo "exit=$?"
+status=$?
+echo "exit=$status"
+[ "$status" -eq 0 ] || exit "$status"
 ```
 
 ### 5. ページレジストリ（`page-registry.ts`）への登録
@@ -142,7 +144,9 @@ echo "exit=$?"
    ```bash
    bun .gemini/skills/nextjs-page-migration/scripts/audit_source_parity.mjs \
      <原本HTMLパス> web-next/app/<provider>/<slug>/page.tsx
-   echo "exit=$?"   # 必ず 0 を確認
+   status=$?
+   echo "exit=$status"   # 必ず 0 を確認
+   [ "$status" -eq 0 ] || exit "$status"   # 監査失敗時は Green コミットへ進まない
    ```
 
 4. 単体テストを実行し、すべてパス（Green）することを確認します:
@@ -244,5 +248,6 @@ echo "exit=$?"
 | テストが Red のままコミット | `bun run test` の実際の出力を確認し、失敗理由に基づき実装を修正する |
 | `bun run lint` でエラー | `bunx biome check --write <対象ファイルパス>` でファイル単位修正（リポジトリ全体への実行は禁止） |
 | Mermaid が描画されない | `.gemini/skills/fix-mermaid/SKILL.md` を参照し、バージョン互換と ESM 設定を確認する |
+| **Mermaid Syntax Error（ブラウザでだけ図が全滅）** | 原本 HTML の Mermaid ノードラベルに全角括弧 `（）`・全角スラッシュ `／`・全角波ダッシュ `〜` が含まれていないか確認する（`.gemini/skills/fix-mermaid/SKILL.md` Part 1-b 参照）。**移行前に原本 HTML を先にクリーニングすること** |
 | CSS 変数が `globals.css` に未定義 | `.layout` ブロック内でその変数をフォールバック値つきで自己定義する |
 | PII 混入（絶対パス等） | `git diff --cached` の出力を確認し、絶対パスを相対パスに置き換えてから再コミット |
