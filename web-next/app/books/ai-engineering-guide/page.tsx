@@ -119,12 +119,14 @@ const DIAGRAM_ROADMAP = `flowchart TB
 
 export default function AiEngineeringGuidePage() {
   return (
-    <div className={styles.layout} data-testid="layout-root">
+    <div className={styles.layout} data-testid="layout-root" data-page="ai-engineering-guide">
       {/*
        * ページ固有スタイル: Server Component として SSR 時から即時適用。
        * CSS Module :global() より先に読まれるため、JS ハイドレーション前から
        * body 背景をページのベージュに揃え、隙間が「黒い線」に見えるのを防ぐ。
        * border-bottom: none で disclaimer 下の線も除去。
+       * #site-freshness-bar は data-page で本ページに限定し、React 19 の
+       * <style precedence> が遷移後も <head> に残存しても他ページへ波及しないようにする。
        */}
       <style href="ai-engineering-guide-page-overrides" precedence="default">{`
         body:has([data-testid="layout-root"]) {
@@ -142,7 +144,7 @@ export default function AiEngineeringGuidePage() {
           backdrop-filter: none !important;
           -webkit-backdrop-filter: none !important;
         }
-        #site-freshness-bar {
+        body:has([data-testid="layout-root"][data-page="ai-engineering-guide"]) #site-freshness-bar {
           display: none !important;
           height: 0 !important;
           padding: 0 !important;

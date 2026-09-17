@@ -32,8 +32,12 @@
   font-family: "Noto Sans JP", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
-/* 本ページ表示時: グローバルの黒背景鮮度バッジを非表示にし、ヒーロー内に統合 */
-:global(#site-freshness-bar) {
+/* 本ページ表示時: グローバルの黒背景鮮度バッジを非表示にし、ヒーロー内に統合
+   data-page で本ページ限定にし、他ページの鮮度バーまで消えるのを防ぐ */
+:global(
+    body:has([data-testid="layout-root"][data-page="generative-ai-for-software-development"])
+    #site-freshness-bar
+  ) {
   display: none !important;
 }
 

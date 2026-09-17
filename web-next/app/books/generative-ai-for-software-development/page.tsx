@@ -99,7 +99,11 @@ const DIAGRAM_MMD_6 = `flowchart TD
 
 export default function Page() {
   return (
-    <div className={styles.layout} data-testid="layout-root">
+    <div
+      className={styles.layout}
+      data-testid="layout-root"
+      data-page="generative-ai-for-software-development"
+    >
       <link
         rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Noto+Serif+JP:wght@600;700&display=swap"

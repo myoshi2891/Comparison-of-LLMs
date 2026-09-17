@@ -28,15 +28,18 @@ export default function TocObserver() {
       navToggle.classList.add(styles.isHidden);
       navToggle.setAttribute("aria-expanded", "true");
       syncSidebarInert();
+      sidebar.querySelector<HTMLAnchorElement>(`.${styles.navlist} a`)?.focus();
     }
 
     function closeSidebar() {
       if (!sidebar || !scrim || !navToggle) return;
+      const hadFocus = sidebar.contains(document.activeElement);
       sidebar.classList.remove(styles.open);
       scrim.classList.remove(styles.show);
       navToggle.classList.remove(styles.isHidden);
       navToggle.setAttribute("aria-expanded", "false");
       syncSidebarInert();
+      if (hadFocus) navToggle.focus();
     }
 
     syncSidebarInert();

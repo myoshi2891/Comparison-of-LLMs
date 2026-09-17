@@ -37,8 +37,12 @@
   -webkit-font-smoothing: antialiased;
 }
 
-/* 本ページ表示時: 鮮度バーを完全に潰す（高さ・余白ごと除去して黒い線を防ぐ） */
-:global(#site-freshness-bar) {
+/* 本ページ表示時: 鮮度バーを完全に潰す（高さ・余白ごと除去して黒い線を防ぐ）
+   data-page で本ページ限定にし、他ページの鮮度バーまで消えるのを防ぐ */
+:global(
+    body:has([data-testid="layout-root"][data-page="ai-engineering-guide"])
+    #site-freshness-bar
+  ) {
   display: none !important;
   height: 0 !important;
   padding: 0 !important;
