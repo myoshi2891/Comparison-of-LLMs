@@ -292,7 +292,7 @@
       }
 
       /* ---------- Mermaid ---------- */
-      .mermaid {
+      .mermaid-diagram {
         background: var(--bg-elevated);
         border: 1px solid var(--border);
         border-radius: 12px;
@@ -300,10 +300,22 @@
         margin: 28px 0;
         overflow-x: auto;
         text-align: center;
+        min-height: 60px;
       }
-      .mermaid svg {
+      .mermaid-diagram svg {
         max-width: 100%;
         height: auto;
+      }
+      .mermaid-diagram .diagram-error {
+        color: #8a1220;
+        background: #fdecee;
+        border: 1px solid #d64550;
+        border-radius: 8px;
+        padding: 12px 16px;
+        text-align: left;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.85rem;
+        white-space: pre-wrap;
       }
 
       /* ---------- テーブル ---------- */
@@ -891,17 +903,7 @@
               >2</a
             >。
           </p>
-          <div class="mermaid notranslate" translate="no">
-            flowchart LR subgraph TRAD["従来のソフトウェアの信頼性"] T1[コードをデプロイ] --&gt;
-            T2[入力を受け取る] T2 --&gt; T3[決定的なロジックで処理] T3 --&gt; T4["同じ入力 →
-            同じ出力"] end subgraph MLSYS["MLシステムの信頼性"] M1[モデルをデプロイ] --&gt;
-            M2[入力データを受け取る] M2 --&gt; M3["確率的な推論（学習済みパラメータに依存）"] M3
-            --&gt; M4["同じコードでもデータ次第で出力が変化"] M4 --&gt;
-            M5[本番データが学習データと乖離] M5 -.-&gt;|フィードバック| M3 end classDef okFill
-            fill:#123524,stroke:#2f9e6f,color:#d9f5e8 classDef warnFill
-            fill:#4a3a12,stroke:#c08a2e,color:#f5e8d0 class T1,T2,T3,T4 okFill class M1,M2,M3,M4,M5
-            warnFill
-          </div>
+          <div class="mermaid-diagram notranslate" id="mermaid-diagram-0" translate="no"></div>
           <p>
             この図が示す通り、MLシステムの信頼性は「コードのバグを潰す」だけでは達成できません。データの品質・鮮度・分布の変化までを継続的に監視し、対応する体制が必要になります。これは従来のSREが得意としてきた「変化を制御し、リスクを定量化する」考え方の延長線上にありますが、対象が「コード」から「コード＋データ＋モデル」に広がった分、監視すべき対象も対応すべき障害の種類も増えます。
           </p>
@@ -931,13 +933,7 @@
               >1</a
             >。
           </p>
-          <div class="mermaid notranslate" translate="no">
-            flowchart TD A["① データ収集と分析"] --&gt; B["② 学習パイプライン"] B --&gt; C["③
-            アプリケーションの構築・検証"] C --&gt; D["④ 品質とパフォーマンスの評価"] D --&gt; E["⑤
-            SLOの定義と計測"] E --&gt; F["⑥ ローンチ"] F --&gt; G["⑦
-            本番モニタリングとフィードバックループ"] G -.-&gt;|次のサイクルへ| A classDef infoFill
-            fill:#1a2a4a,stroke:#4a7fd6,color:#d9e6ff class A,B,C,D,E,F,G infoFill
-          </div>
+          <div class="mermaid-diagram notranslate" id="mermaid-diagram-1" translate="no"></div>
           <p>
             このループが従来のソフトウェア開発ライフサイクル（設計→実装→テスト→リリース→運用）と決定的に違うのは、<strong>⑦の結果が①に直接影響を与える</strong>という点です。本番でユーザーがモデルの予測にどう反応したか（クリックした、購入した、無視した）自体が新しい学習データになり得るため、モデルが自分自身の未来の学習データに影響を与える「フィードバックループ」が常に存在します。これは11章で改めて掘り下げます。
           </p>
@@ -1010,13 +1006,7 @@
           <h3 id="32-データのライフサイクル6つのフェーズ">
             3.2 データのライフサイクル：6つのフェーズ
           </h3>
-          <div class="mermaid notranslate" translate="no">
-            flowchart LR P1[作成 Creation] --&gt; P2[取り込み Ingestion] P2 --&gt; P3[処理
-            Processing] P3 --&gt; P4[保存 Storage] P4 --&gt; P5[管理 Management] P5 --&gt;
-            P6["分析・可視化 Analysis &amp; Visualization"] P6
-            -.-&gt;|新しい示唆から新しいデータ収集へ| P1 classDef infoFill
-            fill:#1a2a4a,stroke:#4a7fd6,color:#d9e6ff class P1,P2,P3,P4,P5,P6 infoFill
-          </div>
+          <div class="mermaid-diagram notranslate" id="mermaid-diagram-2" translate="no"></div>
           <p>
             それぞれのフェーズで問われるべき問いは異なります。「作成」の段階ではデータの出所と収集方法の妥当性、「取り込み」ではスキーマの検証、「処理」では変換ロジックの再現性、「保存」では暗号化とアクセス制御、「管理」ではライフサイクルポリシー（いつ削除するか）、「分析・可視化」では統計的な誤読を防ぐ仕組みが重要になります。
           </p>
@@ -1137,17 +1127,7 @@
           <h3 id="42-モデル作成のワークフローと脆弱性ポイント">
             4.2 モデル作成のワークフローと脆弱性ポイント
           </h3>
-          <div class="mermaid notranslate" translate="no">
-            flowchart TD D1[生データ] --&gt; D2["特徴量エンジニアリング"] D2 --&gt; D3["学習データ +
-            ラベル"] D3 --&gt; D4["学習アルゴリズム × ハイパーパラメータ"] D4 --&gt;
-            D5["学習済みモデル"] D5 --&gt; D6["サービング環境へデプロイ"] V1{{"脆弱性:
-            学習データの偏り"}} -.-&gt; D3 V2{{"脆弱性: ラベルの品質"}} -.-&gt; D3 V3{{"脆弱性:
-            インフラ・パイプラインの不整合"}} -.-&gt; D4 V4{{"脆弱性:
-            学習時と推論時の前処理の差異"}} -.-&gt; D6 classDef infoFill
-            fill:#1a2a4a,stroke:#4a7fd6,color:#d9e6ff classDef dangerFill
-            fill:#4a1620,stroke:#c05a6e,color:#f5d8de class D1,D2,D3,D4,D5,D6 infoFill class
-            V1,V2,V3,V4 dangerFill
-          </div>
+          <div class="mermaid-diagram notranslate" id="mermaid-diagram-3" translate="no"></div>
           <p>
             書籍は、モデルの脆弱性を検討する際に問うべき「有用な質問集」を提示しています<a
               class="cite-badge"
@@ -1201,18 +1181,7 @@
               >11</a
             >。
           </p>
-          <div class="mermaid notranslate" translate="no">
-            flowchart TB subgraph OFFLINE["オフラインパイプライン（バッチ）"]
-            O1[ログ・トランザクションデータ] --&gt; O2[バッチ集計処理] O2 --&gt;
-            O3["特徴量テーブル（学習用）"] end subgraph
-            ONLINE["オンラインパイプライン（リアルタイム）"] N1[ストリーミングイベント] --&gt;
-            N2["低レイテンシ集計"] N2 --&gt; N3["特徴量キャッシュ（推論用）"] end O3 --&gt;
-            FS["フィーチャーストア"] N3 --&gt; FS FS --&gt; TR["モデル学習"] FS --&gt;
-            SV["モデルサービング（推論）"] classDef infoFill
-            fill:#1a2a4a,stroke:#4a7fd6,color:#d9e6ff classDef okFill
-            fill:#123524,stroke:#2f9e6f,color:#d9f5e8 class O1,O2,O3,N1,N2,N3 infoFill class
-            FS,TR,SV okFill
-          </div>
+          <div class="mermaid-diagram notranslate" id="mermaid-diagram-4" translate="no"></div>
           <div class="callout-practice">
             <span class="callout-label">ベストプラクティス</span>
             <p class="callout-body">
@@ -1292,14 +1261,7 @@
             >。これは書籍の「検証と評価の運用化（Operationalizing Verification and
             Evaluation）」の節とも強く関連する、実務で広く参照されているフレームワークです。
           </p>
-          <div class="mermaid notranslate" translate="no">
-            flowchart TD CENTER["MLテストスコア&lt;br/&gt;（4つのカテゴリ×複数のテスト）"] CENTER
-            --&gt; C1["① データとその特徴量に関するテスト"] CENTER --&gt; C2["②
-            モデル開発に関するテスト"] CENTER --&gt; C3["③ MLインフラに関するテスト"] CENTER --&gt;
-            C4["④ モニタリングに関するテスト"] classDef infoFill
-            fill:#1a2a4a,stroke:#4a7fd6,color:#d9e6ff classDef okFill
-            fill:#123524,stroke:#2f9e6f,color:#d9f5e8 class CENTER infoFill class C1,C2,C3,C4 okFill
-          </div>
+          <div class="mermaid-diagram notranslate" id="mermaid-diagram-5" translate="no"></div>
           <div class="table-scroll">
             <table>
               <thead>
@@ -1384,16 +1346,7 @@
               >15</a
             >。
           </p>
-          <div class="mermaid notranslate" translate="no">
-            flowchart LR S1["ユースケースの検討"] --&gt; S2["データ収集・クリーニング"] S2 --&gt;
-            S3["モデル作成・学習"] S3 --&gt; S4["モデル検証・品質評価"] S4 --&gt;
-            S5["モデルデプロイ"] S5 --&gt; S6["市場投入後の製品"]
-            N1["公平性・プライバシー・説明可能性は&lt;br/&gt;すべての段階で問い直す"] -.-&gt; S1 N1
-            -.-&gt; S2 N1 -.-&gt; S3 N1 -.-&gt; S4 N1 -.-&gt; S5 N1 -.-&gt; S6 classDef infoFill
-            fill:#1a2a4a,stroke:#4a7fd6,color:#d9e6ff classDef warnFill
-            fill:#4a3a12,stroke:#c08a2e,color:#f5e8d0 class S1,S2,S3,S4,S5,S6 infoFill class N1
-            warnFill
-          </div>
+          <div class="mermaid-diagram notranslate" id="mermaid-diagram-6" translate="no"></div>
           <div class="callout-practice">
             <span class="callout-label">ベストプラクティス</span>
             <p class="callout-body">
@@ -1416,14 +1369,7 @@
               >1</a
             >。
           </p>
-          <div class="mermaid notranslate" translate="no">
-            flowchart TD REQ["要件定義"] --&gt; ORCH["オーケストレーション"] ORCH --&gt;
-            FEAT["特徴量取得（フィーチャーストア）"] FEAT --&gt; TRAIN["学習ジョブの実行"] TRAIN
-            --&gt; QEVAL["品質評価"] QEVAL --&gt; MGMT["モデル管理システム（バージョニング）"] MGMT
-            --&gt; MON["モニタリング"] MON -.-&gt;|問題があれば再学習をトリガー| ORCH classDef
-            infoFill fill:#1a2a4a,stroke:#4a7fd6,color:#d9e6ff class
-            REQ,ORCH,FEAT,TRAIN,QEVAL,MGMT,MON infoFill
-          </div>
+          <div class="mermaid-diagram notranslate" id="mermaid-diagram-7" translate="no"></div>
           <h3 id="82-一般的な信頼性の原則">8.2 一般的な信頼性の原則</h3>
           <p>
             書籍は学習システムに関する「一般的な信頼性の原則」を、やや逆説的な短いフレーズの形で列挙しています<a
@@ -1565,17 +1511,7 @@
               >12</a
             >。
           </p>
-          <div class="mermaid notranslate" translate="no">
-            flowchart LR STABLE["現行モデル（100%トラフィック）"] --&gt; SHADOW["①
-            シャドーデプロイ&lt;br/&gt;新モデルは複製トラフィックを受けるが&lt;br/&gt;結果はユーザーに見せない"]
-            SHADOW --&gt; CANARY1["② カナリア 1%"] CANARY1 --&gt; CANARY2["③ カナリア 20%〜50%"]
-            CANARY2 --&gt; FULL["④ 全トラフィックへ切り替え"] CANARY1
-            -.-&gt;|異常検知時はロールバック| STABLE CANARY2 -.-&gt;|異常検知時はロールバック|
-            STABLE classDef infoFill fill:#1a2a4a,stroke:#4a7fd6,color:#d9e6ff classDef okFill
-            fill:#123524,stroke:#2f9e6f,color:#d9f5e8 classDef dangerFill
-            fill:#4a1620,stroke:#c05a6e,color:#f5d8de class STABLE,SHADOW,CANARY1,CANARY2 infoFill
-            class FULL okFill
-          </div>
+          <div class="mermaid-diagram notranslate" id="mermaid-diagram-8" translate="no"></div>
           <div class="callout-practice">
             <span class="callout-label">ベストプラクティス</span>
             <p class="callout-body">
@@ -1619,14 +1555,7 @@
               >8</a
             >。
           </p>
-          <div class="mermaid notranslate" translate="no">
-            flowchart TB subgraph L1["レイヤー1: 生データの監視"] A1["入力データのスキーマ・欠損率"]
-            end subgraph L2["レイヤー2: 特徴量の監視"] A2["各特徴量の分布（平均・分散・欠損）"] end
-            subgraph L3["レイヤー3: 予測結果の監視"] A3["予測値そのものの分布のシフト"] end subgraph
-            L4["レイヤー4: ビジネス指標の監視"] A4["最終的なビジネスKPI（CTR、売上など）"] end L1
-            --&gt; L2 --&gt; L3 --&gt; L4 classDef infoFill
-            fill:#1a2a4a,stroke:#4a7fd6,color:#d9e6ff class A1,A2,A3,A4 infoFill
-          </div>
+          <div class="mermaid-diagram notranslate" id="mermaid-diagram-9" translate="no"></div>
           <div class="table-scroll">
             <table>
               <thead>
@@ -1707,14 +1636,7 @@
               >1</a
             >。
           </p>
-          <div class="mermaid notranslate" translate="no">
-            flowchart LR TE["本番トラフィックから&lt;br/&gt;新しい学習データが生まれる"] --&gt;
-            TL["新しい学習ラベルの付与"] TL --&gt; FILTER["不良データのフィルタリング"] FILTER
-            --&gt; FS["フィーチャーストア／データ管理"] FS --&gt; UPDATE["モデルの更新（再学習）"]
-            UPDATE --&gt; PUSH["更新済みモデルをサービングへプッシュ"] PUSH
-            -.-&gt;|新しい予測がまた新しいトラフィックを生む| TE classDef infoFill
-            fill:#1a2a4a,stroke:#4a7fd6,color:#d9e6ff class TE,TL,FILTER,FS,UPDATE,PUSH infoFill
-          </div>
+          <div class="mermaid-diagram notranslate" id="mermaid-diagram-10" translate="no"></div>
           <p>
             このループには、以下のような特有の観察事項が伴います<a class="cite-badge" href="#ref-1"
               >1</a
@@ -1807,21 +1729,7 @@
             >。ここで重要なのは、「モデル（Model）」という言葉が、学習済みの重みファイルだけでなく、前処理コード・特徴量パイプライン・サービングインフラを含む広い意味で使われる場面があるという、用語の再確認です。これを怠ると、インシデント対応の関係者間で「モデルを直す」という言葉の指す範囲が食い違い、対応が混乱します。
           </p>
           <h3 id="122-役割ごとのインシデント対応責務">12.2 役割ごとのインシデント対応責務</h3>
-          <div class="mermaid notranslate" translate="no">
-            flowchart TD INC["MLインシデント発生"] --&gt;
-            ROLE1["モデル開発者／データサイエンティスト&lt;br/&gt;モデルロジック・学習データを調査"]
-            INC --&gt;
-            ROLE2["ソフトウェアエンジニア&lt;br/&gt;サービングインフラ・APIレイヤーを調査"] INC
-            --&gt; ROLE3["ML
-            SRE／プロダクションエンジニア&lt;br/&gt;全体のオーケストレーションと復旧を主導"] INC
-            --&gt;
-            ROLE4["プロダクトマネージャー／事業責任者&lt;br/&gt;ビジネスインパクトの判断とユーザーへの説明"]
-            ROLE1 --&gt; SYNC["役割間の情報同期（インシデント指揮者経由）"] ROLE2 --&gt; SYNC ROLE3
-            --&gt; SYNC ROLE4 --&gt; SYNC classDef infoFill
-            fill:#1a2a4a,stroke:#4a7fd6,color:#d9e6ff classDef okFill
-            fill:#123524,stroke:#2f9e6f,color:#d9f5e8 class INC infoFill class
-            ROLE1,ROLE2,ROLE3,ROLE4,SYNC okFill
-          </div>
+          <div class="mermaid-diagram notranslate" id="mermaid-diagram-11" translate="no"></div>
           <div class="table-scroll">
             <table>
               <thead>
@@ -2220,8 +2128,189 @@
       crossorigin="anonymous"
     ></script>
     <script>
+      // Mermaidの図ソースはJSテンプレートリテラルとして保持する。
+      // <div class="mermaid">に生テキストを直接置かないのは、IDEの保存時フォーマッタ
+      // (VS Code / Prettier等)がHTMLタグの中身を「安全に」再インデントしてしまい、
+      // Mermaidの構文(カラム0前提)を壊すという既知の不具合を避けるため
+      // (テンプレートリテラルの中身はJS文字列としてほぼ変更されない)。
+      const MERMAID_DIAGRAMS = {
+        'mermaid-diagram-0': `flowchart LR
+    subgraph TRAD["従来のソフトウェアの信頼性"]
+        T1[コードをデプロイ] --> T2[入力を受け取る]
+        T2 --> T3[決定的なロジックで処理]
+        T3 --> T4["同じ入力 → 同じ出力"]
+    end
+
+    subgraph MLSYS["MLシステムの信頼性"]
+        M1[モデルをデプロイ] --> M2[入力データを受け取る]
+        M2 --> M3["確率的な推論：学習済みパラメータに依存"]
+        M3 --> M4["同じコードでもデータ次第で出力が変化"]
+        M4 --> M5[本番データが学習データと乖離]
+        M5 -.->|フィードバック| M3
+    end
+
+    classDef okFill fill:#123524,stroke:#2f9e6f,color:#d9f5e8
+    classDef warnFill fill:#4a3a12,stroke:#c08a2e,color:#f5e8d0
+    class T1,T2,T3,T4 okFill
+    class M1,M2,M3,M4,M5 warnFill`,
+        'mermaid-diagram-1': `flowchart TD
+    A["① データ収集と分析"] --> B["② 学習パイプライン"]
+    B --> C["③ アプリケーションの構築・検証"]
+    C --> D["④ 品質とパフォーマンスの評価"]
+    D --> E["⑤ SLOの定義と計測"]
+    E --> F["⑥ ローンチ"]
+    F --> G["⑦ 本番モニタリングとフィードバックループ"]
+    G -.->|次のサイクルへ| A
+
+    classDef infoFill fill:#1a2a4a,stroke:#4a7fd6,color:#d9e6ff
+    class A,B,C,D,E,F,G infoFill`,
+        'mermaid-diagram-2': `flowchart LR
+    P1[作成 Creation] --> P2[取り込み Ingestion]
+    P2 --> P3[処理 Processing]
+    P3 --> P4[保存 Storage]
+    P4 --> P5[管理 Management]
+    P5 --> P6["分析・可視化 Analysis & Visualization"]
+    P6 -.->|新しい示唆から新しいデータ収集へ| P1
+
+    classDef infoFill fill:#1a2a4a,stroke:#4a7fd6,color:#d9e6ff
+    class P1,P2,P3,P4,P5,P6 infoFill`,
+        'mermaid-diagram-3': `flowchart TD
+    D1[生データ] --> D2["特徴量エンジニアリング"]
+    D2 --> D3["学習データ + ラベル"]
+    D3 --> D4["学習アルゴリズム × ハイパーパラメータ"]
+    D4 --> D5["学習済みモデル"]
+    D5 --> D6["サービング環境へデプロイ"]
+
+    V1{{"脆弱性: 学習データの偏り"}} -.-> D3
+    V2{{"脆弱性: ラベルの品質"}} -.-> D3
+    V3{{"脆弱性: インフラ・パイプラインの不整合"}} -.-> D4
+    V4{{"脆弱性: 学習時と推論時の前処理の差異"}} -.-> D6
+
+    classDef infoFill fill:#1a2a4a,stroke:#4a7fd6,color:#d9e6ff
+    classDef dangerFill fill:#4a1620,stroke:#c05a6e,color:#f5d8de
+    class D1,D2,D3,D4,D5,D6 infoFill
+    class V1,V2,V3,V4 dangerFill`,
+        'mermaid-diagram-4': `flowchart TB
+    subgraph OFFLINE["オフラインパイプライン：バッチ"]
+        O1[ログ・トランザクションデータ] --> O2[バッチ集計処理]
+        O2 --> O3["特徴量テーブル：学習用"]
+    end
+
+    subgraph ONLINE["オンラインパイプライン：リアルタイム"]
+        N1[ストリーミングイベント] --> N2["低レイテンシ集計"]
+        N2 --> N3["特徴量キャッシュ：推論用"]
+    end
+
+    O3 --> FS["フィーチャーストア"]
+    N3 --> FS
+    FS --> TR["モデル学習"]
+    FS --> SV["モデルサービング：推論"]
+
+    classDef infoFill fill:#1a2a4a,stroke:#4a7fd6,color:#d9e6ff
+    classDef okFill fill:#123524,stroke:#2f9e6f,color:#d9f5e8
+    class O1,O2,O3,N1,N2,N3 infoFill
+    class FS,TR,SV okFill`,
+        'mermaid-diagram-5': `flowchart TD
+    CENTER["MLテストスコア<br/>4つのカテゴリ×複数のテスト"]
+    CENTER --> C1["① データとその特徴量に関するテスト"]
+    CENTER --> C2["② モデル開発に関するテスト"]
+    CENTER --> C3["③ MLインフラに関するテスト"]
+    CENTER --> C4["④ モニタリングに関するテスト"]
+
+    classDef infoFill fill:#1a2a4a,stroke:#4a7fd6,color:#d9e6ff
+    classDef okFill fill:#123524,stroke:#2f9e6f,color:#d9f5e8
+    class CENTER infoFill
+    class C1,C2,C3,C4 okFill`,
+        'mermaid-diagram-6': `flowchart LR
+    S1["ユースケースの検討"] --> S2["データ収集・クリーニング"]
+    S2 --> S3["モデル作成・学習"]
+    S3 --> S4["モデル検証・品質評価"]
+    S4 --> S5["モデルデプロイ"]
+    S5 --> S6["市場投入後の製品"]
+
+    N1["公平性・プライバシー・説明可能性は<br/>すべての段階で問い直す"] -.-> S1
+    N1 -.-> S2
+    N1 -.-> S3
+    N1 -.-> S4
+    N1 -.-> S5
+    N1 -.-> S6
+
+    classDef infoFill fill:#1a2a4a,stroke:#4a7fd6,color:#d9e6ff
+    classDef warnFill fill:#4a3a12,stroke:#c08a2e,color:#f5e8d0
+    class S1,S2,S3,S4,S5,S6 infoFill
+    class N1 warnFill`,
+        'mermaid-diagram-7': `flowchart TD
+    REQ["要件定義"] --> ORCH["オーケストレーション"]
+    ORCH --> FEAT["特徴量取得：フィーチャーストア"]
+    FEAT --> TRAIN["学習ジョブの実行"]
+    TRAIN --> QEVAL["品質評価"]
+    QEVAL --> MGMT["モデル管理システム：バージョニング"]
+    MGMT --> MON["モニタリング"]
+    MON -.->|問題があれば再学習をトリガー| ORCH
+
+    classDef infoFill fill:#1a2a4a,stroke:#4a7fd6,color:#d9e6ff
+    class REQ,ORCH,FEAT,TRAIN,QEVAL,MGMT,MON infoFill`,
+        'mermaid-diagram-8': `flowchart LR
+    STABLE["現行モデル：100%トラフィック"] --> SHADOW["① シャドーデプロイ<br/>新モデルは複製トラフィックを受けるが<br/>結果はユーザーに見せない"]
+    SHADOW --> CANARY1["② カナリア 1%"]
+    CANARY1 --> CANARY2["③ カナリア 20%から50%"]
+    CANARY2 --> FULL["④ 全トラフィックへ切り替え"]
+
+    CANARY1 -.->|異常検知時はロールバック| STABLE
+    CANARY2 -.->|異常検知時はロールバック| STABLE
+
+    classDef infoFill fill:#1a2a4a,stroke:#4a7fd6,color:#d9e6ff
+    classDef okFill fill:#123524,stroke:#2f9e6f,color:#d9f5e8
+    classDef dangerFill fill:#4a1620,stroke:#c05a6e,color:#f5d8de
+    class STABLE,SHADOW,CANARY1,CANARY2 infoFill
+    class FULL okFill`,
+        'mermaid-diagram-9': `flowchart TB
+    subgraph L1["レイヤー1: 生データの監視"]
+        A1["入力データのスキーマ・欠損率"]
+    end
+    subgraph L2["レイヤー2: 特徴量の監視"]
+        A2["各特徴量の分布：平均・分散・欠損"]
+    end
+    subgraph L3["レイヤー3: 予測結果の監視"]
+        A3["予測値そのものの分布のシフト"]
+    end
+    subgraph L4["レイヤー4: ビジネス指標の監視"]
+        A4["最終的なビジネスKPI：CTR、売上など"]
+    end
+
+    L1 --> L2 --> L3 --> L4
+
+    classDef infoFill fill:#1a2a4a,stroke:#4a7fd6,color:#d9e6ff
+    class A1,A2,A3,A4 infoFill`,
+        'mermaid-diagram-10': `flowchart LR
+    TE["本番トラフィックから<br/>新しい学習データが生まれる"] --> TL["新しい学習ラベルの付与"]
+    TL --> FILTER["不良データのフィルタリング"]
+    FILTER --> FS["フィーチャーストア・データ管理"]
+    FS --> UPDATE["モデルの更新：再学習"]
+    UPDATE --> PUSH["更新済みモデルをサービングへプッシュ"]
+    PUSH -.->|新しい予測がまた新しいトラフィックを生む| TE
+
+    classDef infoFill fill:#1a2a4a,stroke:#4a7fd6,color:#d9e6ff
+    class TE,TL,FILTER,FS,UPDATE,PUSH infoFill`,
+        'mermaid-diagram-11': `flowchart TD
+    INC["MLインシデント発生"] --> ROLE1["モデル開発者・データサイエンティスト<br/>モデルロジック・学習データを調査"]
+    INC --> ROLE2["ソフトウェアエンジニア<br/>サービングインフラ・APIレイヤーを調査"]
+    INC --> ROLE3["ML SRE・プロダクションエンジニア<br/>全体のオーケストレーションと復旧を主導"]
+    INC --> ROLE4["プロダクトマネージャー・事業責任者<br/>ビジネスインパクトの判断とユーザーへの説明"]
+
+    ROLE1 --> SYNC["役割間の情報同期：インシデント指揮者経由"]
+    ROLE2 --> SYNC
+    ROLE3 --> SYNC
+    ROLE4 --> SYNC
+
+    classDef infoFill fill:#1a2a4a,stroke:#4a7fd6,color:#d9e6ff
+    classDef okFill fill:#123524,stroke:#2f9e6f,color:#d9f5e8
+    class INC infoFill
+    class ROLE1,ROLE2,ROLE3,ROLE4,SYNC okFill`,
+      };
+
       mermaid.initialize({
-        startOnLoad: true,
+        startOnLoad: false,
         theme: 'base',
         themeVariables: {
           background: '#f5f7fb',
@@ -2239,6 +2328,31 @@
         },
         flowchart: { useMaxWidth: true, htmlLabels: true },
       });
+
+      (async () => {
+        if (document.fonts) {
+          try {
+            await document.fonts.ready;
+          } catch (e) {
+            /* ignore */
+          }
+        }
+        for (const [id, source] of Object.entries(MERMAID_DIAGRAMS)) {
+          const container = document.getElementById(id);
+          if (!container) continue;
+          try {
+            const { svg } = await mermaid.render('svg-' + id, source);
+            container.innerHTML = svg;
+          } catch (err) {
+            // 汎用の「爆弾アイコン」ではなく、実際のエラーメッセージをページ上に
+            // そのまま表示する(devtoolsのConsoleを開かなくても原因がわかるように)。
+            const msg = err && err.message ? err.message : String(err);
+            container.innerHTML =
+              '<div class="diagram-error">図の描画に失敗しました(' + id + ')：\n' + msg + '</div>';
+            console.error('Mermaid render error for', id, err);
+          }
+        }
+      })();
     </script>
 
     <script>
