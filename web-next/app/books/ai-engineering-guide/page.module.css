@@ -37,6 +37,24 @@
   -webkit-font-smoothing: antialiased;
 }
 
+/* 本ページ表示時: グローバルの黒背景鮮度バッジ（黒い線）を非表示にし、ヒーロー内に統合 */
+:global(#site-freshness-bar) {
+  display: none !important;
+}
+
+/* 本ページ表示時: スクロール時の文字重なり防止のため、固定ヘッダーと警告バナーを完全不透明化 */
+:global(body:has([data-testid="layout-root"]) #common-header) {
+  background-color: #05080f !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+:global(body:has([data-testid="layout-root"]) .ch-disclaimer) {
+  background-color: #120e04 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
 .layout h1,
 .layout h2,
 .layout h3,
