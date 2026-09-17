@@ -1,4 +1,5 @@
 # Adversarial Robustness for Machine Learning 初学者ガイド
+
 ### ~ なぜAIは"だまされる"のか、そしてどう守るのか ~
 
 本ガイドは、Pin-Yu Chen氏(IBM Thomas J. Watson Research Center, Principal Research Scientist)とCho-Jui Hsieh氏(UCLA Computer Science, Associate Professor)による書籍
@@ -88,7 +89,7 @@ Pin-Yu Chen氏はIBMのオープンソースライブラリ **Adversarial Robust
 | 25 | Representation learning | その他の脅威と応用 |
 | 26 | Privacy and watermarking | その他の脅威と応用 |
 
-本ガイドのStep 3〜9はこの1〜26章の内容を初学者向けに要約したものです。Step 10のみ、書籍刊行後にLLMを中心として発展した領域を補足しています。
+本ガイドのStep 3〜9はこの1〜22章の内容を初学者向けに要約したものです(23〜26章は本ガイドの対象外です)。Step 10のみ、書籍刊行後にLLMを中心として発展した領域を補足しています。
 
 ---
 
@@ -326,7 +327,7 @@ Nicholas Carlini氏(現Anthropic、以前はGoogle DeepMind)は自身のブロ�
 
 ## Step 9 画像分類を超えて
 
-書籍第14〜26章に対応する内容を、初学者向けに要点だけ整理します。
+書籍第14〜22章に対応する内容を、初学者向けに要点だけ整理します。
 
 | 分野 | 書籍の章 | 要点 |
 |---|---|---|
@@ -367,10 +368,10 @@ flowchart TD
 | フレームワーク | 発行元 | 概要 |
 |---|---|---|
 | NIST AI 100-2e2025 | 米国国立標準技術研究所(NIST) | Predictive AI (PredAI) を対象とするEvasion・Poisoning・Privacyの3分類に、Generative AI (GenAI) 固有のMisuse分類を加えた4分類でAdversarial ML用語を標準化 |
-| MITRE ATLAS | MITRE Corporation | ATT&CKと同じマトリクス形式で、AIシステムに対する実際の攻撃事例と戦術・技術をカタログ化。2026年2月更新でエージェント特有の攻撃技術も追加 |
-| OWASP Top 10 for LLM and GenAI 2026 | OWASP GenAI Security Project | Prompt Injectionをはじめ、LLMアプリケーション特有のリスクを優先順位付けした実務者向けガイド。2026年8月に最新版を公開 |
+| MITRE ATLAS | MITRE Corporation | ATT&CKと同じマトリクス形式で、AIシステムに対する実際の攻撃事例と戦術・技術をカタログ化。2026年2月更新でエージェント特有の攻撃技術も追加<sup>[18]</sup> |
+| OWASP Top 10 for LLM Applications 2026 | OWASP GenAI Security Project | Prompt Injectionをはじめ、LLMアプリケーション特有のリスクを優先順位付けした実務者向けガイド。2026年8月に最新版を公開 |
 
-NIST AI 100-2e2025は、Apostol Vassilev氏(NIST)、Alina Oprea氏(Northeastern University)らに加え、英国AI Security Institute・米国AI Safety Institute・Ciscoの研究者も著者に名を連ねており、国際的な合意形成の一例といえます。MITRE ATLASはMicrosoftとの協業から始まり、MITREは2023年11月のプレスリリースで、政府・学術・産業界の「well over 100(100を大きく超える)」組織が参加するコミュニティ主導のナレッジベースであると説明しています。
+NIST AI 100-2e2025は、Apostol Vassilev氏(NIST)、Alina Oprea氏(Northeastern University)らに加え、英国AI Security Institute・米国AI Safety Institute・Ciscoの研究者も著者に名を連ねており、複数機関の共同執筆・協力によって策定された文書の一例です。MITRE ATLASはMicrosoftとの協業から始まり、MITREは2023年11月のプレスリリースで、政府・学術・産業界の「well over 100(100を大きく超える)」組織が参加するコミュニティ主導のナレッジベースであると説明しています。
 
 ### 10-3 何がどこまで同じで何が違うのか
 
@@ -479,8 +480,8 @@ flowchart LR
 
 16. Zou, Wang, Carlini, Nasr, Kolter, Fredrikson, "Universal and Transferable Adversarial Attacks on Aligned Language Models" (2023) — [https://arxiv.org/abs/2307.15043](https://arxiv.org/abs/2307.15043)
 17. NIST AI 100-2e2025, "Adversarial Machine Learning: A Taxonomy and Terminology of Attacks and Mitigations" — [https://nvlpubs.nist.gov/nistpubs/ai/nist.ai.100-2e2025.pdf](https://nvlpubs.nist.gov/nistpubs/ai/nist.ai.100-2e2025.pdf)
-18. MITRE ATLAS(Adversarial Threat Landscape for Artificial-Intelligence Systems) — [https://atlas.mitre.org/](https://atlas.mitre.org/) / パートナー組織数の出典: MITRE, "MITRE and Microsoft Collaborate to Address Generative AI Security Risks" (2023年11月) — [https://www.mitre.org/news-insights/news-release/mitre-and-microsoft-collaborate-address-generative-ai-security-risks](https://www.mitre.org/news-insights/news-release/mitre-and-microsoft-collaborate-address-generative-ai-security-risks)
-19. OWASP GenAI Security Project, "Top 10 for LLM and GenAI" — [https://genai.owasp.org/initiatives/top-10-for-llm-and-genai/](https://genai.owasp.org/initiatives/top-10-for-llm-and-genai/)
+18. MITRE ATLAS(Adversarial Threat Landscape for Artificial-Intelligence Systems) — [https://atlas.mitre.org/](https://atlas.mitre.org/) / パートナー組織数の出典: MITRE, "MITRE and Microsoft Collaborate to Address Generative AI Security Risks" (2023年11月) — [https://www.mitre.org/news-insights/news-release/mitre-and-microsoft-collaborate-address-generative-ai-security-risks](https://www.mitre.org/news-insights/news-release/mitre-and-microsoft-collaborate-address-generative-ai-security-risks) / エージェント特有技術追加(2026年2月)の出典: MITRE Center for Threat-Informed Defense, "MITRE ATLAS OpenClaw Investigation Discovers New and Likeliest Techniques" (2026年2月9日) — [https://ctid.mitre.org/blog/2026/02/09/mitre-atlas-openclaw-investigation/](https://ctid.mitre.org/blog/2026/02/09/mitre-atlas-openclaw-investigation/)
+19. OWASP GenAI Security Project, "OWASP GenAI LLM Top 10 2026" — [https://genai.owasp.org/initiatives/top-10-for-llm-and-genai/](https://genai.owasp.org/initiatives/top-10-for-llm-and-genai/)
 
 ### ツール ライブラリ
 
