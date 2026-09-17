@@ -1,4 +1,5 @@
 # AI-Powered Developer: Supercharge Your Productivity with LLMs and AI Tools
+
 ## ― 初学者のためのステップバイステップ完全ガイド（2026年9月版）
 
 > **本ガイドについて**
@@ -361,7 +362,7 @@ flowchart TB
 | 過剰な自律性（Excessive Agency） | AIエージェントに与える権限・実行範囲が過大で、意図しない操作を自律的に行ってしまう |
 | サプライチェーンの脆弱性 | 利用するモデルやプラグイン、学習データの出どころに起因するリスク |
 
-2026年版のOWASPガイドラインでは、AIが自律的に「行動する」エージェント時代を踏まえ、プロンプトインジェクションが依然として最重要リスクとされる一方、ツール呼び出しの乗っ取り（tool-call hijacking）のような新しい攻撃パターンも追加されています。書籍第8章で学ぶ「ChatGPTを使った脅威モデリング」の考え方は、いまや「AIを組み込んだアプリケーション自体をどう守るか」という新しい脅威モデリングの対象にも、そのまま応用できる考え方です。
+2026年版のOWASP LLM Top 10[17]では、AIが自律的に「行動する」エージェント時代を踏まえ、プロンプトインジェクションが依然として最重要リスクとされる一方、権限を超えたツール呼び出し（unauthorized tool invocation）は「LLM03:2026 Excessive Agency」の一部として位置づけられています。なお、正規に付与された権限内でエージェントがツールを不適切に使ってしまう「ツールの誤用」は、別ガイドであるOWASP Top 10 for Agentic Applications[22]の「ASI02: Tool Misuse & Exploitation」で個別に扱われています。書籍第8章で学ぶ「ChatGPTを使った脅威モデリング」の考え方は、いまや「AIを組み込んだアプリケーション自体をどう守るか」という新しい脅威モデリングの対象にも、そのまま応用できる考え方です。
 
 ---
 
@@ -417,7 +418,7 @@ flowchart LR
 
 ### (2) AIコーディングの生産性と信頼のギャップ
 
-Stack Overflowの2025年開発者調査によると、AIツールの利用率は84%まで拡大した一方、出力を信頼すると答えた開発者は29%にとどまりました。ソフトウェアエンジニアリングブログの著者Josh CollinsworthやIEEE Xploreに掲載された研究でも、LLMの支援効果は「定型的な作業」や「経験の浅い開発者」にとって特に大きく、その範囲を外れるほど効果が薄れる、という共通した傾向が報告されています。
+Stack Overflowの2025年開発者調査[14]によると、AIツールの利用率は84%まで拡大した一方、出力を信頼すると答えた開発者は29%にとどまりました。ソフトウェアエンジニアリングブログの著者Josh Collinsworth[21]も、LLMの支援効果は「定型的な作業」や「専門外の領域」にとって特に大きく、その範囲を外れるほど効果が薄れるという傾向を指摘しています。
 
 一方でAnthropic社内での利用実態調査（Martin Fowlerが紹介）では、開発者の59%が業務の一部にAIを利用し、平均で約50%の生産性向上が見られ、特に「パワーユーザー」と呼ばれる層（全体の14%）ではさらに大きな効果が得られているとされています。効果の大きさは「どう使うか」次第であり、書籍第2章のプロンプトエンジニアリングや、第6章のテスト駆動の考え方が、この効果差を左右する実務スキルといえます。
 
@@ -431,7 +432,7 @@ Extreme Programming（XP）とTDDの提唱者として知られるKent Beckは�
 
 ### (4) AI活用を前提にしたセキュリティの標準化
 
-OWASPは「LLMアプリケーションのためのTop 10」を継続的に更新しており、2026年版ではAIエージェントが自律的に「行動する」ことを前提とした新しいリスク項目（ツール呼び出しの乗っ取りなど）が追加されています。書籍第8章の脅威モデリングの考え方に、こうした「AIを組み込んだシステムそのものを守る」という新しい観点を重ねて学ぶことが、2026年の開発者には求められています。
+OWASPは「LLMアプリケーションのためのTop 10」を継続的に更新しており、2026年版ではAIエージェントが自律的に「行動する」ことを前提に、権限を超えたツール呼び出しが「LLM03:2026 Excessive Agency」として上位リスクに位置づけられています（ツールの誤用に特化した観点は別ガイドのOWASP Top 10 for Agentic ApplicationsのASI02が扱います）。書籍第8章の脅威モデリングの考え方に、こうした「AIを組み込んだシステムそのものを守る」という新しい観点を重ねて学ぶことが、2026年の開発者には求められています。
 
 ### (5) ローカルLLMの実用化
 
@@ -506,13 +507,15 @@ OWASPは「LLMアプリケーションのためのTop 10」を継続的に更新
 14. Stack Overflow 2025 Developer Survey — AIセクション — https://survey.stackoverflow.co/2025/ai
 15. Stack Overflow公式プレスリリース「2025 Developer Survey Reveals Trust in AI at an All Time Low」 — https://stackoverflow.co/company/press/archive/stack-overflow-2025-developer-survey/
 16. Stack Overflow Blog「Closing the AI trust gap for developers」 — https://stackoverflow.blog/2026/02/18/closing-the-developer-ai-trust-gap/
-17. OWASP Top 10 for Large Language Model Applications（OWASP公式） — https://owasp.github.io/www-project-top-10-for-large-language-model-applications/
+17. OWASP Top 10 for LLM Applications 2026（OWASP GenAI Security Project公式） — https://genai.owasp.org/resource/owasp-genai-llm-top-10-2026/
 18. AWS公式ドキュメント「Amazon Q Developer rename - Summary of changes」（CodeWhisperer→Q Developer統合の一次情報） — https://docs.aws.amazon.com/amazonq/latest/qdeveloper-ug/service-rename.html
 
 ### ローカルLLMツール（2026年時点）
 
 19. 「Ollama: How to Run Any Open-Source LLM Locally with Your Existing Tools」（Better Stack） — https://betterstack.com/community/guides/ai/ollama-local-llm/
 20. 「Top 5 Local LLM Tools and Models in 2026」（Pinggy Blog） — https://pinggy.io/blog/top_5_local_llm_tools_and_models/
+21. Josh Collinsworth「LLMs and performative productivity」 — https://joshcollinsworth.com/blog/productivity
+22. OWASP Top 10 for Agentic Applications 2026（OWASP GenAI Security Project公式） — https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/
 
 ---
 

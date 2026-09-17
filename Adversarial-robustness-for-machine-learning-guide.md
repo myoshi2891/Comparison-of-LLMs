@@ -339,7 +339,7 @@ Nicholas Carlini氏(現Anthropic、以前はGoogle DeepMind)は自身のブロ�
 | 音声モデル | 19章 | 人間には聞こえない音声への埋め込みで音声認識を誤動作させる |
 | マルチモーダルモデル | 20章 | 画像とテキストなど複数モダリティを跨いだ攻撃 |
 
-特に21〜22章の **Backdoor攻撃** と **Data Poisoning攻撃** は、評価時ではなく学習時にモデルを狙う点で、これまでのEvasion攻撃と根本的に性質が異なります。2019年、Tianyu Gu氏らはIEEE Access誌の論文「BadNets: Evaluating Backdooring Attacks on Deep Neural Networks」で、学習データにごく小さな「トリガー」パターン(例えばストップ標識の隅に貼った小さなステッカー)を混入させることで、クリーンな入力に対しては通常通り高精度に動作しながら、トリガーが付いた入力にだけ攻撃者が意図した誤分類を起こす「BadNet」を作れることを示しました。クラウドで訓練を外部委託したり、事前学習済みモデルを再利用したりする現代的なMLパイプラインでは、この種のサプライチェーンリスクへの注意が特に重要になっています。イタリアCagliari大学のBattista Biggio氏とFabio Roli氏による2018年のサーベイ論文「Wild Patterns: Ten Years After the Rise of Adversarial Machine Learning」も、Adversarial Machine Learningの前史(2000年代のスパムフィルタ回避攻撃研究など)を含めた分野全体の歴史を俯瞰する重要な文献としてよく引用されます。
+特に21〜22章の **Backdoor攻撃** と **Data Poisoning攻撃** は、評価時ではなく学習時にモデルを狙う点で、これまでのEvasion攻撃と根本的に性質が異なります。2017年、Tianyu Gu氏・Brendan Dolan-Gavitt氏・Siddharth Garg氏は論文「BadNets: Identifying Vulnerabilities in the Machine Learning Model Supply Chain」で、学習データにごく小さな「トリガー」パターン(例えばストップ標識の隅に貼った小さなステッカー)を混入させることで、クリーンな入力に対しては通常通り高精度に動作しながら、トリガーが付いた入力にだけ攻撃者が意図した誤分類を起こす「BadNet」を作れることを示しました。クラウドで訓練を外部委託したり、事前学習済みモデルを再利用したりする現代的なMLパイプラインでは、この種のサプライチェーンリスクへの注意が特に重要になっています。イタリアCagliari大学のBattista Biggio氏とFabio Roli氏による2018年のサーベイ論文「Wild Patterns: Ten Years After the Rise of Adversarial Machine Learning」も、Adversarial Machine Learningの前史(2000年代のスパムフィルタ回避攻撃研究など)を含めた分野全体の歴史を俯瞰する重要な文献としてよく引用されます。
 
 ---
 
@@ -473,7 +473,7 @@ flowchart LR
 
 ### Backdoor Poisoning 歴史的サーベイ
 
-14. Gu, Liu, Dolan-Gavitt, Garg, "BadNets: Evaluating Backdooring Attacks on Deep Neural Networks", IEEE Access, 2019 — [https://arxiv.org/abs/1708.06733](https://arxiv.org/abs/1708.06733)
+14. Gu, Dolan-Gavitt, Garg, "BadNets: Identifying Vulnerabilities in the Machine Learning Model Supply Chain", 2017 — [https://arxiv.org/abs/1708.06733](https://arxiv.org/abs/1708.06733)
 15. Biggio, Roli, "Wild Patterns: Ten Years After the Rise of Adversarial Machine Learning", Pattern Recognition, 2018 — [https://arxiv.org/abs/1712.03141](https://arxiv.org/abs/1712.03141)
 
 ### LLM 時代の脅威フレームワーク 2026年9月時点
