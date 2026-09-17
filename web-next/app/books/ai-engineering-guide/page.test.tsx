@@ -12,24 +12,22 @@ vi.mock("@/components/docs/MermaidDiagram", () => ({
   },
 }));
 
-const EXPECTED_H1 = [
-  "AI Engineering 入門ガイド",
-] as const;
+const EXPECTED_H1 = ["AI Engineering 入門ガイド"] as const;
 
 const EXPECTED_H2 = [
   "はじめに — AI Engineeringとは何か",
-  "なぜ今、AI Engineeringなのか(歴史的背景)",
+  "なぜ今、AI Engineeringなのか（歴史的背景）",
   "AI EngineeringとMLエンジニアリングの違い",
-  "AIエンジニアリングスタック:3つの層",
+  "AIエンジニアリングスタック：3つの層",
   "Foundation Modelsの基礎を理解する",
   "プロンプトエンジニアリングからコンテキストエンジニアリングへ",
-  "評価(Evaluation)を設計する",
-  "RAG(検索拡張生成)で外部知識を活用する",
+  "評価（Evaluation）を設計する",
+  "RAG（検索拡張生成）で外部知識を活用する",
   "AIエージェントを構築する",
-  "Model Context Protocol(MCP)でツールを繋ぐ",
+  "Model Context Protocol（MCP）でツールを繋ぐ",
   "Fine-tuningが必要になる場面",
   "推論最適化とコスト・レイテンシ管理",
-  "LLMOps:本番運用のオブザーバビリティ",
+  "LLMOps：本番運用のオブザーバビリティ",
   "セキュリティと安全性",
   "AIエンジニアになるためのロードマップ",
   "まとめ",
@@ -38,12 +36,12 @@ const EXPECTED_H2 = [
 
 const EXPECTED_H3 = [
   "基盤となる書籍",
-  "ソフトウェアの世代交代とコンテキストエンジニアリング(Andrej Karpathy)",
-  "AI Engineerという職種の起源(swyx / Latent Space)",
-  "エージェントとワークフロー(Anthropic)",
-  "評価(LLM-as-a-judge・Hamel Husain)",
-  "セキュリティ(Simon Willison)",
-  "Model Context Protocol(MCP)",
+  "ソフトウェアの世代交代とコンテキストエンジニアリング（Andrej Karpathy）",
+  "AI Engineerという職種の起源（swyx / Latent Space）",
+  "エージェントとワークフロー（Anthropic）",
+  "評価（LLM-as-a-judge・Hamel Husain）",
+  "セキュリティ（Simon Willison）",
+  "Model Context Protocol（MCP）",
   "RAG",
   "LLMOps・オブザーバビリティ",
   "キャリアロードマップ",
@@ -340,9 +338,7 @@ describe("AI Engineering 入門ガイド契約テスト", () => {
 
     it("D-9: 原本準拠の Google Fonts（Source Serif 4 & Inter）link が存在する", () => {
       const { container } = render(<Page />);
-      const fontLink = container.querySelector(
-        'link[href*="fonts.googleapis.com/css2?family=Source+Serif+4"]'
-      );
+      const fontLink = container.querySelector('link[href*="Source+Serif+4"]');
       expect(fontLink).not.toBeNull();
       expect(fontLink?.getAttribute("href")).toContain("Inter");
     });

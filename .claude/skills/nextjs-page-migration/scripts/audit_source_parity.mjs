@@ -388,7 +388,7 @@ function collectHtmlMermaidSources(src) {
     script = scriptRe.exec(src);
   }
 
-  const diagramEntryRe = /["'][^"']+["']\s*:\s*`([\s\S]*?)`/g;
+  const diagramEntryRe = /(?:["'][^"']+["']|[A-Za-z_$][\w$]*)\s*:\s*`([\s\S]*?)`/g;
   let entry = diagramEntryRe.exec(src);
   while (entry !== null) {
     sources.push({ index: entry.index, source: normalizeMermaidSource(entry[1]) });

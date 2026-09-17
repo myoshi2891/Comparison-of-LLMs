@@ -148,6 +148,18 @@ const entries: PageEntry[] = [
     lastReviewed: "2026-07-31",
   },
   {
+    slug: "/books/ai-engineering-guide",
+    title: "AI Engineering 入門ガイド",
+    description:
+      "基盤モデル時代のソフトウェア開発を実務の順序で学ぶ入門ガイド。Chip Huyen著『AI Engineering』の章構成を土台に17セクションで解説。",
+    group: "推薦書籍",
+    topics: ["ai-engineering", "llm", "rag", "agent", "mcp", "fine-tuning"],
+    summary:
+      "基盤モデル時代のソフトウェア開発を実務の順序で学ぶ入門ガイド。Chip Huyen著『AI Engineering』の章構成を土台に17セクションで解説。",
+    addedAt: "2026-09-17",
+    lastReviewed: "2026-09-17",
+  },
+  {
     slug: "/books/generative-ai-for-software-development",
     title: "Generative AI for Software Development",
     description:
