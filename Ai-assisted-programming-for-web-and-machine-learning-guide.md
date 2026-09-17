@@ -161,7 +161,7 @@ flowchart TB
 | Claude Code | Anthropic | ターミナル常駐のCLIエージェント | ファイルシステムとコマンド実行への直接アクセスを持つ「エージェント的コーディング」向けCLI<sup>[7]</sup> |
 | Codex CLI / Gemini CLI | OpenAI / Google | ターミナル常駐のCLIエージェント | Claude Codeと同様の思想を持つ競合CLIツール群 |
 
-これらのツールに共通するのは、「単なる自動補完」から「計画→実行→検証→反復」というループを自律的に回せる「エージェント」へと進化した点です。GitHubは2026年3月の更新で、Agent ModeをVS CodeとJetBrainsの両方で一般提供とし、カスタムエージェントやサブエージェント、プランモードもGA（一般提供）となったと発表しています<sup>[21]</sup>。
+これらのツールに共通するのは、「単なる自動補完」から「計画→実行→検証→反復」というループを自律的に回せる「エージェント」へと進化した点です。Agent Mode自体はVS Codeで2025年4月、JetBrainsで2025年7月に一般提供済みですが、GitHubは2026年3月の更新で、カスタムエージェントやサブエージェント、プランモードをJetBrainsにも展開し、これらの機能がJetBrainsでもGA（一般提供）に達したと発表しています<sup>[21]</sup>。
 
 ### 4.2 Claude Codeの基本ワークフロー
 
@@ -230,7 +230,7 @@ flowchart LR
 
 ここまでの内容を統合すると、2025年から2026年にかけての用語の変遷は、単なる呼び方の違いではなく、「AIにどこまでの裁量を与え、人間がどこで責任を持って監督するか」という実務上の設計判断の違いを反映しています。ウィリソンは自身のニュースレター「Agentic Engineering Patterns」の中で、「red/green TDD」「まずテストを実行する」「自分のできることを蓄積する」といったパターンに名前を与える取り組みを、オブジェクト指向プログラミングにおけるGoFの『デザインパターン』本になぞらえています<sup>[12]</sup>。これは、既にAI支援開発を実践している人々が独立に到達していた慣行に、共有できる語彙を与える試みだと説明されています<sup>[12]</sup>。
 
-初学者にとっての実務的な教訓は、「使い捨てのプロトタイプであればVibe Codingでよいが、本番運用するソフトウェアには必ずテスト・計画・レビューという“これまでソフトウェア工学を機能させてきた実践”を組み合わせる」という一点に集約されます<sup>[2][4]</sup>。
+初学者にとっての実務的な教訓は、「使い捨てのプロトタイプであればVibe Codingでよいが、本番運用するソフトウェアには必ずテスト・計画・レビューという“これまでソフトウェア工学を機能させてきた実践”を組み合わせる」という一点に集約されます<sup>[2], [4]</sup>。
 
 ---
 
@@ -301,7 +301,7 @@ flowchart TB
 
 ### 7.2 バックエンド固有の落とし穴
 
-フロントエンドと異なり、バックエンドのバグは「見た目では気づけない」ことが多いという特性があります。特に、認証・認可、入力検証、データベースクエリの安全性（SQLインジェクション対策など）は、AIが「動くコード」を生成しても、セキュリティ上安全とは限らない典型的な領域です。この点は第11章で扱う「AI生成コードの脆弱性率」の議論と直結します<sup>[16][17]</sup>。
+フロントエンドと異なり、バックエンドのバグは「見た目では気づけない」ことが多いという特性があります。特に、認証・認可、入力検証、データベースクエリの安全性（SQLインジェクション対策など）は、AIが「動くコード」を生成しても、セキュリティ上安全とは限らない典型的な領域です。この点は第11章で扱う「AI生成コードの脆弱性率」の議論と直結します<sup>[16], [17]</sup>。
 
 ---
 
@@ -590,7 +590,7 @@ AI支援プログラミングは、初学者にとって「コードを書く」
 26. Exploring Artificial Intelligence（Substack）, "Jupyter AI: Transforming the Notebook": https://exploringartificialintelligence.substack.com/p/jupyter-ai-transforming-the-notebook
 27. Visual Studio Code Docs, "Work with Jupyter notebooks using AI in VS Code": https://code.visualstudio.com/docs/agents/guides/notebooks-with-ai
 28. GitHub Changelog, "Model Context Protocol (MCP) support in VS Code is generally available"（2025年7月14日）: https://github.blog/changelog/2025-07-14-model-context-protocol-mcp-support-in-vs-code-is-generally-available/
-29. GitHub Changelog, "Model Context Protocol (MCP) support for JetBrains, Eclipse, and Xcode is now generally available"（2025年8月13日）: https://github.blog/changelog/2025-08-13-model-context-protocol-mcp-support-for-jetbrains-eclipse-and-xcode-is-now-generally-available/
+29. GitHub Changelog, "Model Context Protocol (MCP) support for JetBrains, Eclipse, and Xcode is now generally available"（2025年8月14日）: https://github.blog/changelog/2025-08-13-model-context-protocol-mcp-support-for-jetbrains-eclipse-and-xcode-is-now-generally-available/
 
 ---
 
