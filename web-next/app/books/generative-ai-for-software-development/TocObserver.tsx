@@ -54,7 +54,7 @@ export default function TocObserver() {
         const href = a.getAttribute("href");
         return {
           link: a,
-          el: href && href.startsWith("#") ? document.querySelector(href) : null,
+          el: href?.startsWith("#") ? document.querySelector(href) : null,
         };
       })
       .filter((t): t is { link: HTMLAnchorElement; el: Element } => t.el !== null);

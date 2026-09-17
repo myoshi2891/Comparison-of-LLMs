@@ -59,19 +59,19 @@ describe("Phase A - SiteHeader root structure", () => {
 });
 
 // F-4'（plans/008）: ナビは page-registry からの導出になり、トップレベルは
-// 5 ドロップダウン（Providers / Agent 開発 / 開発プロセス / 運用・品質 / モデル・データ）
-// + Home / What's New のフラットリンクへ集約された。Providers のみ 2 段ネストする。
+// 6 ドロップダウン（Providers / Agent 開発 / 開発プロセス / 運用・品質 / モデル・データ / 推薦書籍）
+// + Home / What's New / 検索 のフラットリンクへ集約された。Providers のみ 2 段ネストする。
 describe("SiteHeader dropdown rendering", () => {
-  it("renders 5 dropdowns (Providers / Agent 開発 / 開発プロセス / 運用・品質 / モデル・データ)", () => {
+  it("renders 6 dropdowns (Providers / Agent 開発 / 開発プロセス / 運用・品質 / モデル・データ / 推薦書籍)", () => {
     const { container } = render(<SiteHeader pathname="/" />);
     const dropdowns = container.querySelectorAll("li.ch-dropdown");
-    expect(dropdowns.length).toBe(5);
+    expect(dropdowns.length).toBe(6);
   });
 
   it("each dropdown has a .ch-dropdown-toggle button with aria-haspopup=true", () => {
     const { container } = render(<SiteHeader pathname="/" />);
     const toggles = container.querySelectorAll("li.ch-dropdown > .ch-dropdown-toggle");
-    expect(toggles.length).toBe(5);
+    expect(toggles.length).toBe(6);
     toggles.forEach((btn) => {
       expect(btn.getAttribute("aria-haspopup")).toBe("true");
     });
@@ -80,7 +80,7 @@ describe("SiteHeader dropdown rendering", () => {
   it("each dropdown has a .ch-submenu <ul> with at least one child", () => {
     const { container } = render(<SiteHeader pathname="/" />);
     const submenus = container.querySelectorAll("li.ch-dropdown > ul.ch-submenu");
-    expect(submenus.length).toBe(5);
+    expect(submenus.length).toBe(6);
     submenus.forEach((ul) => {
       expect(ul.querySelectorAll("li").length).toBeGreaterThan(0);
     });

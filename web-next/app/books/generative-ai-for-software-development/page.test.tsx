@@ -235,9 +235,7 @@ describe("Generative AI for Software Development ガイド契約テスト", () =
     it("S-3: 原本の外部リンク URL が全件存在する", () => {
       const { container } = render(<Page />);
       const renderedUrls = new Set(
-        Array.from(container.querySelectorAll('a[href^="http"]')).map((a) =>
-          a.getAttribute("href")
-        )
+        Array.from(container.querySelectorAll('a[href^="http"]')).map((a) => a.getAttribute("href"))
       );
       for (const url of EXPECTED_EXTERNAL_LINKS) {
         expect(renderedUrls).toContain(url);
@@ -269,14 +267,13 @@ describe("Generative AI for Software Development ガイド契約テスト", () =
       const { container } = render(<Page />);
       const h1 = container.querySelector("h1");
       expect(h1).not.toBeNull();
-      expect(cleanText(h1!)).toBe(EXPECTED_H1[0]);
+      if (!h1) throw new Error("h1 not found");
+      expect(cleanText(h1)).toBe(EXPECTED_H1[0]);
     });
 
     it("C-2: クイックナビ（TOC リンク）が 17 件存在し href='#...' 形式である", () => {
       const { container } = render(<Page />);
-      const tocLinks = Array.from(
-        container.querySelectorAll('[data-testid="sidebar-nav-link"]')
-      );
+      const tocLinks = Array.from(container.querySelectorAll('[data-testid="sidebar-nav-link"]'));
       expect(tocLinks.length).toBe(EXPECTED_TOC_HREFS.length);
       for (const link of tocLinks) {
         const href = link.getAttribute("href");
@@ -320,9 +317,7 @@ describe("Generative AI for Software Development ガイド契約テスト", () =
       const actualSources = Array.from(container.querySelectorAll('[data-testid="mermaid"]')).map(
         (el) => normalizeMermaidSource(el.textContent ?? "")
       );
-      const expectedNormalized = EXPECTED_MERMAID_SOURCES.map((src) =>
-        normalizeMermaidSource(src)
-      );
+      const expectedNormalized = EXPECTED_MERMAID_SOURCES.map((src) => normalizeMermaidSource(src));
 
       for (const src of actualSources) {
         expect(MERMAID_DIAGRAM_DECLARATION.test(src)).toBe(true);
@@ -347,9 +342,9 @@ describe("Generative AI for Software Development ガイド契約テスト", () =
       const nav = container.querySelector('[data-testid="sidebar-nav"]');
       expect(nav).not.toBeNull();
 
-      const hrefs = Array.from(
-        container.querySelectorAll('[data-testid="sidebar-nav-link"]')
-      ).map((a) => a.getAttribute("href"));
+      const hrefs = Array.from(container.querySelectorAll('[data-testid="sidebar-nav-link"]')).map(
+        (a) => a.getAttribute("href")
+      );
       expect(hrefs).toEqual([...EXPECTED_TOC_HREFS]);
     });
 
@@ -385,15 +380,13 @@ describe("Generative AI for Software Development ガイド契約テスト", () =
     it("Q-2: metadata の title / description が空でなく title が h1 と整合する", () => {
       expect(metadata.title).toBeTruthy();
       expect(metadata.description).toBeTruthy();
-      const titleStr = typeof metadata.title === "string" ? metadata.title : (metadata.title as any)?.default;
+      const titleStr = typeof metadata.title === "string" ? metadata.title : "";
       expect(titleStr).toContain("Generative AI for Software Development");
     });
 
     it("Q-3: 見出し階層が飛ばない（h1 → h2 → h3）", () => {
       const { container } = render(<Page />);
-      const headings = Array.from(
-        container.querySelectorAll("h1, h2, h3, h4, h5, h6")
-      );
+      const headings = Array.from(container.querySelectorAll("h1, h2, h3, h4, h5, h6"));
       let maxLevelSeen = 0;
       for (const h of headings) {
         const level = parseInt(h.tagName.substring(1), 10);
