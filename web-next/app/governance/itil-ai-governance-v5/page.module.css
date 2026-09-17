@@ -26,8 +26,9 @@
   box-sizing: border-box;
 }
 
-/* 本ページ表示時: 鮮度バーを非表示化し、ヘッダー・免責バナーとの重なりを防ぐ */
-:global(#site-freshness-bar) {
+/* 本ページ表示時: 鮮度バーを非表示化し、ヘッダー・免責バナーとの重なりを防ぐ
+   data-itil-ai-governance で本ページ限定にし、他ページの鮮度バーまで消えるのを防ぐ */
+:global(body:has([data-itil-ai-governance="true"]) #site-freshness-bar) {
   display: none !important;
   height: 0 !important;
   padding: 0 !important;
@@ -80,7 +81,42 @@
   border-right: 1px solid var(--border);
   padding: 28px 18px 40px;
   box-sizing: border-box;
-  z-index: 10;
+  z-index: 60;
+  transition: transform 0.25s ease;
+}
+
+.navToggle {
+  display: none;
+  position: fixed;
+  top: 0.9rem;
+  left: 0.9rem;
+  z-index: 70;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--color-paper-raised);
+  box-shadow: 0 10px 28px rgba(22, 27, 38, 0.12);
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  color: var(--color-ink);
+  cursor: pointer;
+  opacity: 1;
+  transition: opacity 0.2s ease;
+}
+
+.navToggle.isHidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.scrim {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(22, 27, 38, 0.35);
+  z-index: 55;
 }
 
 :global(body.has-common-header) .sidebar {
@@ -416,8 +452,18 @@
 
 /* ---------- Responsive ---------- */
 @media (max-width: 860px) {
+  .navToggle {
+    display: flex;
+  }
   .sidebar {
-    display: none;
+    transform: translateX(-100%);
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.25);
+  }
+  .sidebar.open {
+    transform: translateX(0);
+  }
+  .scrim.show {
+    display: block;
   }
   .main {
     margin-left: 0;

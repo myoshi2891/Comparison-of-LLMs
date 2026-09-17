@@ -248,12 +248,14 @@ class IMP hub;`;
 
 export default function ItilAiGovernancePage() {
   return (
-    <div className={styles.layout} data-testid="layout-root">
+    <div className={styles.layout} data-testid="layout-root" data-itil-ai-governance="true">
       {/*
        * ページ固有スタイル: Server Component として SSR 時から即時適用。
        * CSS Module :global() より先に読まれるため、JS ハイドレーション前から
        * body 背景をページの薄灰(#F6F7F9)に揃え、隙間が「黒い線」に見えるのを防ぐ。
        * border-bottom: none で disclaimer 下の線も除去。
+       * #site-freshness-bar は data-itil-ai-governance で本ページに限定し、他ページの
+       * 鮮度バーまで消えるのを防ぐ。
        */}
       <style href="itil-ai-governance-page-overrides" precedence="default">{`
         body:has([data-testid="layout-root"]) {
@@ -271,7 +273,7 @@ export default function ItilAiGovernancePage() {
           backdrop-filter: none !important;
           -webkit-backdrop-filter: none !important;
         }
-        #site-freshness-bar {
+        body:has([data-itil-ai-governance="true"]) #site-freshness-bar {
           display: none !important;
           height: 0 !important;
           padding: 0 !important;
@@ -305,6 +307,19 @@ export default function ItilAiGovernancePage() {
       />
 
       <TocObserver />
+
+      <button
+        type="button"
+        className={styles.navToggle}
+        id="navToggle"
+        aria-label="目次を開く"
+        aria-expanded="false"
+        aria-controls="sidebar"
+      >
+        <i className="ti ti-menu-2" />
+      </button>
+
+      <div className={styles.scrim} id="scrim" />
 
       <div className={styles.sidebar} id="sidebar">
         <div className={styles.brand}>
