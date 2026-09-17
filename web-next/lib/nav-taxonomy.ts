@@ -20,6 +20,7 @@ export const NAV_GROUPS = [
   "開発プロセス",
   "運用・品質",
   "モデル・データ",
+  "推薦書籍",
   "検索",
   "What's New",
 ] as const;

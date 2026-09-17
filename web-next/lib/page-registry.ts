@@ -148,6 +148,18 @@ const entries: PageEntry[] = [
     lastReviewed: "2026-07-31",
   },
   {
+    slug: "/books/generative-ai-for-software-development",
+    title: "Generative AI for Software Development",
+    description:
+      "O'Reilly刊『Generative AI for Software Development』の構成をベースに、コード生成、UI/UX、コードレビュー、テスト、ドキュメント、チャットボット、実装成功事例、ワークフロー実践、リスクガバナンスまでを網羅した初学者のためのステップバイステップ解説ガイド。",
+    group: "推薦書籍",
+    topics: ["book", "software-development", "generative-ai", "vibe-coding", "guide"],
+    summary:
+      "O'Reilly刊『Generative AI for Software Development』をベースに、コード生成からUI/UX、コードレビュー、テスト、ドキュメント、エージェント、ワークフロー実践、リスクガバナンスまでを網羅した初学者のためのステップバイステップ解説ガイド。",
+    addedAt: "2026-09-17",
+    lastReviewed: "2026-09-17",
+  },
+  {
     slug: "/ci-cd/ai-cicd-automation-best-practices",
     title: "AI CI/CD Automation",
     group: "開発プロセス",
