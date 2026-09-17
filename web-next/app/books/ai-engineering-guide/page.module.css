@@ -37,9 +37,13 @@
   -webkit-font-smoothing: antialiased;
 }
 
-/* 本ページ表示時: グローバルの黒背景鮮度バッジ（黒い線）を非表示にし、ヒーロー内に統合 */
+/* 本ページ表示時: 鮮度バーを完全に潰す（高さ・余白ごと除去して黒い線を防ぐ） */
 :global(#site-freshness-bar) {
   display: none !important;
+  height: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  overflow: hidden !important;
 }
 
 /* 本ページ表示時: スクロール時の文字重なり防止のため、固定ヘッダーと警告バナーを完全不透明化 */
@@ -53,6 +57,18 @@
   background-color: #120e04 !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
+  border-bottom: none !important;
+  box-shadow: none !important;
+}
+
+/*
+ * 根本修正: JS ロード後に DisclaimerBanner の useEffect が --ch-disclaimer-height を
+ * 書き込むと body.has-common-header の margin-top が増加し、固定バナーとページ本文の間に
+ * 隙間が生じる。その隙間に body のダーク背景(#05080f)が透けて「黒い線」に見えるため、
+ * このページだけ body 背景をページのベージュ (#f7f2e7) に揃えて隙間を不可視化する。
+ */
+:global(body:has([data-testid="layout-root"])) {
+  background: #f7f2e7 !important;
 }
 
 .layout h1,

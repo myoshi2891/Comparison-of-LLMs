@@ -120,6 +120,36 @@ const DIAGRAM_ROADMAP = `flowchart TB
 export default function AiEngineeringGuidePage() {
   return (
     <div className={styles.layout} data-testid="layout-root">
+      {/*
+       * ページ固有スタイル: Server Component として SSR 時から即時適用。
+       * CSS Module :global() より先に読まれるため、JS ハイドレーション前から
+       * body 背景をページのベージュに揃え、隙間が「黒い線」に見えるのを防ぐ。
+       * border-bottom: none で disclaimer 下の線も除去。
+       */}
+      <style href="ai-engineering-guide-page-overrides" precedence="default">{`
+        body:has([data-testid="layout-root"]) {
+          background: #f7f2e7 !important;
+        }
+        body:has([data-testid="layout-root"]) .ch-disclaimer {
+          background-color: #120e04 !important;
+          border-bottom: none !important;
+          box-shadow: none !important;
+          backdrop-filter: none !important;
+          -webkit-backdrop-filter: none !important;
+        }
+        body:has([data-testid="layout-root"]) #common-header {
+          background-color: #05080f !important;
+          backdrop-filter: none !important;
+          -webkit-backdrop-filter: none !important;
+        }
+        #site-freshness-bar {
+          display: none !important;
+          height: 0 !important;
+          padding: 0 !important;
+          margin: 0 !important;
+          overflow: hidden !important;
+        }
+      `}</style>
       {/* 外部CSS（Tabler Icons）SRI付き */}
       <link
         rel="stylesheet"
