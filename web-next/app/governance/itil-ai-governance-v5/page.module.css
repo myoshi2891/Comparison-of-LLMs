@@ -1,0 +1,394 @@
+/* ==========================================================================
+   ITIL AI Governance (Version 5) 完全学習ガイド - スタイル定義
+   ========================================================================== */
+
+.layout {
+  --color-paper: #f6f7f9;
+  --color-paper-raised: #ffffff;
+  --color-ink: #161b26;
+  --color-ink-soft: #585f72;
+  --color-indigo: #2e3f72;
+  --color-gold: #b8802a;
+  --color-forest: #1b6e6a;
+  --color-plum: #8c3a5c;
+  --border: #e1e4ec;
+  --sidebar-w: 288px;
+  --font-serif: 'Source Serif 4', Georgia, 'Hiragino Mincho ProN', serif;
+  --font-sans: 'Inter', -apple-system, 'Hiragino Sans', 'Yu Gothic', sans-serif;
+
+  width: 100%;
+  min-height: 100vh;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.7;
+  box-sizing: border-box;
+}
+
+/* 本ページ表示時: 鮮度バーを非表示化し、ヘッダー・免責バナーとの重なりを防ぐ */
+:global(#site-freshness-bar) {
+  display: none !important;
+  height: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+}
+
+:global(#common-header) {
+  background-color: #05080f !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+:global(.ch-disclaimer) {
+  background-color: #120e04 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.layout a {
+  color: var(--color-indigo);
+  text-decoration: none;
+}
+
+.layout a:hover {
+  text-decoration: underline;
+}
+
+/* ---------- Layout ---------- */
+.sidebar {
+  position: fixed;
+  top: var(--header-height, 60px);
+  left: 0;
+  width: var(--sidebar-w);
+  height: calc(100vh - var(--header-height, 60px));
+  overflow-y: auto;
+  background: var(--color-paper-raised);
+  border-right: 1px solid var(--border);
+  padding: 28px 18px 40px;
+  box-sizing: border-box;
+  z-index: 10;
+}
+
+.main {
+  margin-left: var(--sidebar-w);
+  padding: 56px 64px 96px;
+  min-width: 0;
+}
+
+.prose {
+  width: 100%;
+  max-width: none;
+}
+
+/* ---------- Sidebar brand ---------- */
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 4px 8px 20px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 20px;
+}
+
+.brand svg {
+  flex: none;
+}
+
+.brandText {
+  font-family: var(--font-serif);
+  font-size: 14px;
+  line-height: 1.35;
+  color: var(--color-ink);
+  font-weight: 600;
+}
+
+.brandSub {
+  font-size: 11px;
+  color: var(--color-ink-soft);
+  font-weight: 400;
+  margin-top: 2px;
+}
+
+/* ---------- Nav ---------- */
+.toc {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.toc a {
+  display: block;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 14px;
+  color: var(--color-ink-soft);
+  border-left: 3px solid transparent;
+  line-height: 1.4;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.toc a:hover {
+  background: #eef1f8;
+  text-decoration: none;
+  color: var(--color-indigo);
+}
+
+.toc a:global(.active) {
+  background: #eef1f8;
+  color: var(--color-indigo);
+  border-left-color: var(--color-indigo);
+  font-weight: 600;
+}
+
+/* ---------- Typography ---------- */
+.prose h1 {
+  font-family: var(--font-serif);
+  font-size: 26px;
+  line-height: 1.35;
+  margin: 0 0 6px;
+  color: var(--color-ink);
+}
+
+.subtitle {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 16px;
+  color: var(--color-ink-soft);
+  margin: 0 0 28px;
+}
+
+.prose h2 {
+  font-family: var(--font-serif);
+  font-size: 22px;
+  line-height: 1.4;
+  color: var(--color-indigo);
+  margin: 56px 0 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--color-indigo);
+  scroll-margin-top: calc(var(--header-height, 60px) + 80px);
+}
+
+.prose h2:first-of-type {
+  margin-top: 0;
+}
+
+.prose h3 {
+  font-family: var(--font-serif);
+  font-size: 18px;
+  color: var(--color-ink);
+  margin: 36px 0 14px;
+  scroll-margin-top: calc(var(--header-height, 60px) + 80px);
+}
+
+.prose h4 {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--color-indigo);
+  margin: 28px 0 12px;
+  scroll-margin-top: calc(var(--header-height, 60px) + 80px);
+}
+
+.prose p {
+  margin: 0 0 16px;
+}
+
+.prose em {
+  color: var(--color-ink-soft);
+  font-style: normal;
+}
+
+.prose ul,
+.prose ol {
+  margin: 0 0 16px;
+  padding-left: 1.4em;
+}
+
+.prose li {
+  margin-bottom: 6px;
+}
+
+.divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 40px 0;
+}
+
+.prose strong {
+  font-weight: 700;
+}
+
+/* ---------- Tables（防犯原則: 全列左寄せ） ---------- */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0 0 24px;
+  font-size: 15px;
+  background: var(--color-paper-raised);
+}
+
+.table :global(thead th),
+.table thead th {
+  background: var(--color-indigo);
+  color: #fff;
+  text-align: left !important;
+  padding: 10px 14px;
+  font-weight: 600;
+}
+
+.table :global(tbody td),
+.table :global(tbody th),
+.table tbody td,
+.table tbody th {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+  text-align: left !important;
+}
+
+.table tbody tr:nth-child(even) {
+  background: #f8f9fb;
+}
+
+.table code {
+  background: #eef1f8;
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+/* ---------- Diagrams ---------- */
+.diagramWrap {
+  display: flex;
+  justify-content: center;
+  margin: 28px 0;
+  width: 100%;
+}
+
+/* ---------- Callouts ---------- */
+.callout {
+  border-radius: 10px;
+  margin: 0 0 24px;
+  border: 1px solid var(--border);
+  border-left-width: 4px;
+  background: var(--color-paper-raised);
+  overflow: hidden;
+}
+
+.calloutHead {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.calloutHead i {
+  font-size: 16px;
+}
+
+.calloutBody {
+  padding: 2px 16px 16px;
+}
+
+.calloutBody p:last-child,
+.calloutBody ul:last-child {
+  margin-bottom: 0;
+}
+
+.callout.practice {
+  border-left-color: var(--color-gold);
+}
+
+.callout.practice .calloutHead {
+  color: var(--color-gold);
+  background: #faf1df;
+}
+
+.callout.source {
+  border-left-color: var(--color-forest);
+}
+
+.callout.source .calloutHead {
+  color: var(--color-forest);
+  background: #e9f3f2;
+}
+
+.callout.note {
+  border-left-color: var(--color-plum);
+}
+
+.callout.note .calloutHead {
+  color: var(--color-plum);
+  background: #f5eaf0;
+}
+
+/* ---------- Reference cards ---------- */
+.refList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0 0 28px;
+}
+
+.refCard {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  background: var(--color-paper-raised);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+
+.refBadge {
+  flex: none;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--color-indigo);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: var(--font-sans);
+}
+
+.refBody {
+  min-width: 0;
+}
+
+.refTitle {
+  font-weight: 600;
+  font-size: 15px;
+  word-break: break-word;
+}
+
+.refNote {
+  font-size: 13px;
+  color: var(--color-ink-soft);
+  margin-top: 3px;
+}
+
+.refUrl {
+  font-size: 12px;
+  color: var(--color-ink-soft);
+  margin-top: 4px;
+  word-break: break-all;
+  font-family: monospace;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 860px) {
+  .sidebar {
+    display: none;
+  }
+  .main {
+    margin-left: 0;
+    padding: 32px 20px 64px;
+  }
+}

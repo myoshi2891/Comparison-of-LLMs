@@ -663,6 +663,16 @@ const entries: PageEntry[] = [
     lastReviewed: "2026-07-17",
   },
   {
+    slug: "/governance/itil-ai-governance-v5",
+    title: "ITIL AI Governance (Version 5) 完全学習ガイド",
+    group: "資格試験",
+    topics: ["itil", "ai-governance", "compliance", "risk-management"],
+    summary:
+      "PeopleCert認定資格「ITIL AI Governance (Version 5)」の出題範囲（Module 1〜9）を網羅した初学者向け完全学習ガイド。6Cモデル、Assess-Design-Implement-Maintainモデル、各フレームワーク・規制との連携を体系的に解説。",
+    addedAt: "2026-09-17",
+    lastReviewed: "2026-09-17",
+  },
+  {
     slug: "/infra/amazon-bedrock-best-practices-2026-intermediate",
     title: "Amazon Bedrock 完全ガイド",
     group: "運用・品質",

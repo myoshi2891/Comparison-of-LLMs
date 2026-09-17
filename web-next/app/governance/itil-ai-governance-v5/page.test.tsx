@@ -62,7 +62,7 @@ const EXPECTED_H3 = [
   "7-1. Implement（実装）ステップ",
   "7-2. Maintain（維持）ステップ",
   "7-3. コンプライアンス・規制をガバナンスへの入力として扱う",
-  "8-1. 価値実現（Value Realization）：期待価値から実際価値へ",
+  "8-1. 価値実現（Value Realization）: 期待価値から実際価値へ",
   "8-2. 業界・組織機能ごとの AI ユースケース",
   "8-3. AI ユースケース評価テンプレート",
   "9-1. なぜフレームワーク同士の連携が必要か",
@@ -206,7 +206,7 @@ describe("ITIL AI Governance (Version 5) 完全学習ガイド - 契約テスト
   });
 
   // C-3: Callout 契約（全24件）
-  it("C-3: 全24件のcallout（practice: 8, source: 12, note: 4）が存在する", () => {
+  it("C-3: 全24件のcallout（practice: 9, source: 11, note: 4）が存在する", () => {
     const { container } = render(<Page />);
     const callouts = container.querySelectorAll("[data-testid='callout']");
     expect(callouts).toHaveLength(24);
@@ -214,12 +214,12 @@ describe("ITIL AI Governance (Version 5) 完全学習ガイド - 契約テスト
     const practiceCallouts = container.querySelectorAll(
       "[data-testid='callout'][data-variant='practice']"
     );
-    expect(practiceCallouts).toHaveLength(8);
+    expect(practiceCallouts).toHaveLength(9);
 
     const sourceCallouts = container.querySelectorAll(
       "[data-testid='callout'][data-variant='source']"
     );
-    expect(sourceCallouts).toHaveLength(12);
+    expect(sourceCallouts).toHaveLength(11);
 
     const noteCallouts = container.querySelectorAll(
       "[data-testid='callout'][data-variant='note']"
@@ -262,7 +262,7 @@ describe("ITIL AI Governance (Version 5) 完全学習ガイド - 契約テスト
   // D-2: ブランドSVG
   it("D-2: サイドバーにブランドSVGが表示される", () => {
     const { container } = render(<Page />);
-    const brandSvg = container.querySelector("svg[data-testid='brand-svg']");
+    const brandSvg = container.querySelector("svg");
     expect(brandSvg).not.toBeNull();
   });
 

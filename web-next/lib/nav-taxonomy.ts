@@ -21,6 +21,7 @@ export const NAV_GROUPS = [
   "運用・品質",
   "モデル・データ",
   "推薦書籍",
+  "資格試験",
   "検索",
   "What's New",
 ] as const;
