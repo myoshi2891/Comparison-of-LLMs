@@ -25,6 +25,7 @@
 - **AI Engineering 入門ガイド（/books/ai-engineering-guide）の Next.js アプリ移行**:
   - `Ai-engineering-guide.html` を `web-next/app/books/ai-engineering-guide/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。
   - 要約・省略一切なしで全17セクション（はじめに〜参考文献・出典）、全10サブセクション（h3）、全表（6個）、9個のMermaid図解（`MermaidDiagram`）、TOCスクロール追従・モバイルドロワー（`TocObserver.tsx`）、全28件の参考文献・外部リンク安全属性（`target="_blank" rel="noopener noreferrer"`）、全幅レイアウトを完全再現。
+  - **ヘッダー・ディスクレーマー境界スタイリング適合化**: グローバル鮮度バー（`#site-freshness-bar`）を非表示化（`display: none !important`）し、ディスクレーマーとヒーローセクション間の不自然な黒い線を解消。ヒーローセクション（`#f7f2e7`）の色合いを優先させ、固定ヘッダーと警告バナーの不透明化によりスクロール時の二重写りを防止。
   - 原本 `Ai-engineering-guide.html` は `archive/html/books/Ai-engineering-guide.html` へ退避保存。
   - 原本照合監査スクリプト `audit_source_parity.mjs` で exit code 0（漏れなし ✅）を確認。あわせて識別子キー（クォートなしオブジェクトリテラル）の Mermaid 抽出に対応。
   - `web-next/lib/page-registry.ts` に新規エントリ（`slug: "/books/ai-engineering-guide"`, `group: "推薦書籍"`）を登録。
