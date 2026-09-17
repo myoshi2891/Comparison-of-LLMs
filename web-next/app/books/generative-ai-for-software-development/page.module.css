@@ -33,7 +33,7 @@
 }
 
 /* 本ページ表示時: グローバルの黒背景鮮度バッジを非表示にし、ヒーロー内に統合 */
-:global(body:has([data-testid="layout-root"]) > div:has(time)) {
+:global(#site-freshness-bar) {
   display: none !important;
 }
 
@@ -505,6 +505,23 @@
   border-radius: 13px;
   padding: 1.3rem;
   box-shadow: var(--shadow);
+  /* 原本 .mermaid-target 相当：幅広い図は横スクロールで表示 */
+  overflow-x: auto;
+}
+
+/* 原本 .mermaid-target: safe center ＋ 横スクロール */
+.diagramCard :global(.mermaid-scroll .mermaid) {
+  display: flex;
+  justify-content: safe center;
+  min-height: 90px;
+}
+
+/* 原本 .mermaid-target svg: flex-shrink:0 で縮小させない */
+.diagramCard :global(.mermaid-scroll svg) {
+  max-width: none !important;
+  flex-shrink: 0;
+  height: auto;
+  overflow: visible;
 }
 
 .diagramCaption {

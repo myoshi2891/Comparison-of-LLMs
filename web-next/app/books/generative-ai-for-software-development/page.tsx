@@ -9,6 +9,18 @@ export const metadata: Metadata = {
     "O'Reilly刊『Generative AI for Software Development』の構成をベースに、コード生成、UI/UX、コードレビュー、テスト、ドキュメント、チャットボット、実装成功事例、ワークフロー実践、リスクガバナンスまでを網羅した初学者のためのステップバイステップ解説ガイド。",
 };
 
+/** 原本 mermaid.initialize themeVariables と完全一致（ライトテーマ） */
+const BOOK_THEME_VARS = {
+  fontFamily: "'Noto Sans JP', sans-serif",
+  fontSize: "16px",
+  primaryColor: "#f2ecdd",
+  primaryTextColor: "#2a2620",
+  primaryBorderColor: "#413d8f",
+  lineColor: "#8a8470",
+  secondaryColor: "#e4ddc9",
+  tertiaryColor: "#faf7ef",
+} as const;
+
 const DIAGRAM_MMD_0 = `flowchart LR
     A["要件定義"] --> B["設計・UIプロトタイプ"]
     B --> C["コード生成"]
@@ -417,7 +429,7 @@ export default function Page() {
 
           <div className={styles.diagramWrap} data-testid="mermaid-diagram">
             <div className={styles.diagramCard}>
-              <MermaidDiagram chart={DIAGRAM_MMD_0} />
+              <MermaidDiagram chart={DIAGRAM_MMD_0} theme="base" themeVariables={BOOK_THEME_VARS} />
             </div>
             <div className={styles.diagramCaption}>
               図1:
@@ -578,7 +590,7 @@ export default function Page() {
           <h3>1-3. 使い分けの考え方</h3>
           <div className={styles.diagramWrap} data-testid="mermaid-diagram">
             <div className={styles.diagramCard}>
-              <MermaidDiagram chart={DIAGRAM_MMD_1} />
+              <MermaidDiagram chart={DIAGRAM_MMD_1} theme="base" themeVariables={BOOK_THEME_VARS} />
             </div>
             <div className={styles.diagramCaption}>
               図2: タスクの性質に応じたコード生成ツールの使い分け
@@ -828,7 +840,7 @@ export default function Page() {
           <h3>3-3. レビューワークフローの実際</h3>
           <div className={styles.diagramWrap} data-testid="mermaid-diagram">
             <div className={styles.diagramCard}>
-              <MermaidDiagram chart={DIAGRAM_MMD_2} />
+              <MermaidDiagram chart={DIAGRAM_MMD_2} theme="base" themeVariables={BOOK_THEME_VARS} />
             </div>
             <div className={styles.diagramCaption}>
               図3: AIレビューボットを組み込んだプルリクエストのレビューフロー
@@ -957,7 +969,7 @@ export default function Page() {
           <h3>4-3. テストピラミッドとAIの役割</h3>
           <div className={styles.diagramWrap} data-testid="mermaid-diagram">
             <div className={styles.diagramCard}>
-              <MermaidDiagram chart={DIAGRAM_MMD_3} />
+              <MermaidDiagram chart={DIAGRAM_MMD_3} theme="base" themeVariables={BOOK_THEME_VARS} />
             </div>
             <div className={styles.diagramCaption}>図4: テストピラミッドの各層とAIが担う役割</div>
           </div>
@@ -1176,7 +1188,7 @@ export default function Page() {
 
           <div className={styles.diagramWrap} data-testid="mermaid-diagram">
             <div className={styles.diagramCard}>
-              <MermaidDiagram chart={DIAGRAM_MMD_4} />
+              <MermaidDiagram chart={DIAGRAM_MMD_4} theme="base" themeVariables={BOOK_THEME_VARS} />
             </div>
             <div className={styles.diagramCaption}>
               図5: 従来型チャットボットとAIエージェントの違い
@@ -1415,7 +1427,7 @@ export default function Page() {
 
           <div className={styles.diagramWrap} data-testid="mermaid-diagram">
             <div className={styles.diagramCard}>
-              <MermaidDiagram chart={DIAGRAM_MMD_5} />
+              <MermaidDiagram chart={DIAGRAM_MMD_5} theme="base" themeVariables={BOOK_THEME_VARS} />
             </div>
             <div className={styles.diagramCaption}>
               図6: エージェント中心の開発ループ ― 定義・委任・検証・承認または再試行
@@ -1580,7 +1592,7 @@ export default function Page() {
 
           <div className={styles.diagramWrap} data-testid="mermaid-diagram">
             <div className={styles.diagramCard}>
-              <MermaidDiagram chart={DIAGRAM_MMD_6} />
+              <MermaidDiagram chart={DIAGRAM_MMD_6} theme="base" themeVariables={BOOK_THEME_VARS} />
             </div>
             <div className={styles.diagramCaption}>
               図7: 「致死の三要素」が揃うことで生じるリスクと対策
