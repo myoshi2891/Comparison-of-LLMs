@@ -144,7 +144,7 @@ LovableとBolt.newはいずれも異例の速さで成長したことで知ら�
 
 ### 3-1. なぜAIコードレビューが急速に普及したのか
 
-DORAの2025年レポートでは、AI活用度が高いチームはマージするプルリクエスト数が従来比で大幅に増加した一方、平均的なPRのサイズも拡大し、レビューにかかる時間も伸びたと報告されています<sup>[21]</sup>。つまり「AIがコードを書く速度」に「人間がレビューする速度」が追いつかなくなりつつあるということです。この課題に対応する形で、AIによる自動コードレビューツールの利用が急速に広がりました。業界調査では、2026年時点で開発チームの4割超が何らかのAIコードレビューツールを導入しているという報告があります<sup>[22][23]</sup>。
+DORAの2025年レポートでは、AI活用度が高いチームはマージするプルリクエスト数が従来比で大幅に増加した一方、平均的なPRのサイズも拡大し、レビューにかかる時間も伸びたと報告されています<sup>[5][6]</sup>。つまり「AIがコードを書く速度」に「人間がレビューする速度」が追いつかなくなりつつあるということです。この課題に対応する形で、AIによる自動コードレビューツールの利用が急速に広がりました。業界調査では、2026年時点で開発チームの4割超が何らかのAIコードレビューツールを導入しているという報告があります<sup>[22][23]</sup>。
 
 ### 3-2. 代表的なツール
 
@@ -367,7 +367,7 @@ flowchart TD
 
 ### 10-1. 「レビューの質」対「開発の速さ」のトレードオフ
 
-DORAの調査では、AI活用度の高いチームほどPRのマージ数や機能追加のスピードが上がる一方で、インシデント(障害)の発生率やレビュー時間も増加する傾向が報告されています<sup>[21][24]</sup>。これは「AIによって開発が速くなった分、品質管理のプロセスも同じだけ強化しないと、事故の増加という形でしっぺ返しを受ける」ことを意味します。
+DORAの調査では、AI活用度の高いチームほどPRのマージ数や機能追加のスピードが上がる一方で、インシデント(障害)の発生率やレビュー時間も増加する傾向が報告されています<sup>[5][6]</sup>。これは「AIによって開発が速くなった分、品質管理のプロセスも同じだけ強化しないと、事故の増加という形でしっぺ返しを受ける」ことを意味します。
 
 ### 10-2. プロンプトインジェクションと「致死の三要素」
 
@@ -501,8 +501,8 @@ CodeRabbitが470件のオープンソースGitHub PR(AI共同作成320件、人�
     https://www.nxcode.io/resources/news/cognition-windsurf-acquisition-swe-1-5-codemaps-2026
 15. TechCrunch: Cognition, maker of the AI coding agent Devin, acquires Windsurf
     https://www.techcrunch.com/2025/07/14/cognition-maker-of-the-ai-coding-agent-devin-acquires-windsurf/
-16. Petronella Cybersecurity News: Cursor AI IDE 2026 — Setup, Agents, Security Guide
-    https://petronellatech.com/blog/cursor-ai-ide-setup-guide/
+16. Claude by Anthropic: Claude Code — AI Coding Agent, Terminal, IDE
+    https://claude.com/product/claude-code
 17. ToolJet Blog: Lovable vs Bolt vs V0 — Best AI App Builder Compared in 2026
     https://blog.tooljet.com/lovable-vs-bolt-vs-v0/
 18. NxCode: Bolt.new vs Lovable in 2026
