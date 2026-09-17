@@ -11,16 +11,23 @@
 - **フェーズ**: 保守・機能改善・品質強化フェーズ
 - **ブランチ**: `dev`（本番 `main` への Next.js 移行マージ完了 🚀）
 - **動作検証**:
-  - `bun run build` ✅（Compiled successfully / 88 静的ページを生成。2026-09-12 実測）
+  - `bun run build` ✅（Compiled successfully / 89 静的ページを生成。2026-09-17 実測）
   - `bun run typecheck` ✅（`tsc --noEmit`。2026-09-17 実測）
   - `bun run lint` ✅（Biome check / 482 files / 0 diagnostics。2026-09-17 実測）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: `bun run test` で Vitest **175 files / 1600 tests すべて合格**（2026-09-17 実測。全 Green ✅）
+  - **フロントエンド (`web-next/`)**: `bun run test` で Vitest **175 files / 1603 tests すべて合格**（2026-09-17 実測。全 Green ✅）
     - `load(sourceHtml)` をモジュール初期化時に呼ぶ `governance/ai-governance/GuideContent.tsx` と
       `local-llm/finetuning-best-practices/GuideContent.tsx` は、import スモークでも読み込み可能であることを確認済み
   - **バックエンド (`scraper/`)**: pytest 実行で **94 件 + 37 subtests すべて合格** (2026-09-12 実測。全 Green ✅)
 
 ## 最近の追加内容
+
+- **Generative AI for Software Development ガイド（/books/generative-ai-for-software-development）の UI / スタイル / インタラクション完全適合化**:
+  - **公開日・最終確認バッジ**: グローバル鮮度バーの黒背景・青文字による違和感を解消するため、本ページではヒーローセクション最上部に統合。背景色をヒーロー色（`#faf7ef`）、文字色を黒文字（`var(--ink)` / `var(--ink-soft)`）に設定し、グローバルの黒バーを非表示化。
+  - **フォント完全移行**: 原本準拠の Google Fonts（`Source Serif 4` および `Noto Serif JP`）の `<link>` を追加し、見出し・カバーのセリフ体を原本と 100% 同一に再現。
+  - **ヘッダー・スクロール重なり防止**: スクロール時に本文テキストが半透明ヘッダーの裏に透けて二重写しになる問題を解消するため、本ページ表示時に固定ヘッダー（`#common-header`）および免責バナー（`.ch-disclaimer`）の背景を完全不透明化（solid）。アンカー移動の見出しめり込み防止（`scroll-margin-top`）も設定。
+  - **学習チェックリストの完全移行**: 全9項目に `.check-item` クラスを確実に付与し、`TocObserver.tsx` で初期表示時のカウンター（`0 / 9 完了`）およびクリック時のトグル・打消し線連携を修正。`color-scheme: light` によりブラウザのダークモード判定による黒四角（■）化を防止し、原本の白背景＋グレー枠線＋深緑（`var(--forest)`）チェックを完全再現。
+  - 契約テストを 17 件から 20 件（D-9, D-10, Q-4 追加）へ拡充し、Vitest **175 files / 1603 tests** 全 Green ✅、typecheck ✅、Biome check ✅、原本照合監査 `exit=0` ✅ を確認。
 
 - **Generative AI for Software Development ガイド（/books/generative-ai-for-software-development）の Next.js アプリ移行 & ナビ「推薦書籍」グループ新設**:
   - `Generative-ai-for-software-development-guide.html` を `web-next/app/books/generative-ai-for-software-development/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。
