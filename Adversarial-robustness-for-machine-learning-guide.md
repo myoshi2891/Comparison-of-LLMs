@@ -279,18 +279,18 @@ min_θ  E[ max_{δ∈Δ(x)}  L( f_θ(x+δ), y ) ]
 
 ## Step 7 防御2 証明可能な頑健性 Certified Robustness
 
-書籍第6〜9章(Convex relaxation、Layer-wise relaxation、Dual approach、Probabilistic verification)、第11章(Certified defense)、および第12章(Randomization)に対応します。Adversarial Trainingが「経験的に頑健」であるのに対し、Certified Robustness(証明可能な頑健性)は**数学的に「この範囲の摂動なら絶対に予測が変わらない」と保証**することを目指します。
+書籍第6〜9章(Convex relaxation、Layer-wise relaxation、Dual approach、Probabilistic verification)、第11章(Certified defense)、および第12章(Randomization)に対応します。Adversarial Trainingが「経験的に頑健」であるのに対し、Certified Robustness(証明可能な頑健性)は、**各手法が前提とする証明条件(緩和の妥当性やサンプリング設定など)が満たされている場合に限り**、「この範囲の摂動なら予測が変わらない」ことを数学的に保証することを目指します。
 
 書籍前半の6〜9章は、ニューラルネットワークの各層を凸緩和(convex relaxation)や区間演算で上下に挟み込み、出力の変動範囲を数学的に証明するアプローチ(いわゆる形式的検証 Formal Verification に近い手法群)を扱っています。
 
-より実務で広く使われているのが **Randomized Smoothing(ランダム化平滑化)** です。2019年、Jeremy Cohen氏・Elan Rosenfeld氏・J. Zico Kolter氏(いずれもCMU)は論文「Certified Adversarial Robustness via Randomized Smoothing」で、ガウスノイズ下でうまく分類できる任意のベースモデルを、L2ノルムに対して証明可能な頑健性を持つ新しい分類器に変換する手法を提案しました。
+より実務で広く使われているのが **Randomized Smoothing(ランダム化平滑化)** です。2019年、Jeremy Cohen氏・Elan Rosenfeld氏・J. Zico Kolter氏(いずれもCMU)は論文「Certified Adversarial Robustness via Randomized Smoothing」で、ガウスノイズ下でうまく分類できる任意のベースモデルを、L2ノルムに対して証明可能な頑健性を持つ新しい分類器に変換する手法を提案しました。具体的には、ガウスノイズを加えた入力を多数サンプリングして各クラスの出力確率をモンテカルロ推定し、信頼度水準 1−α のもとでその下限・上限を統計的に見積もった上で証明可能な半径を計算します。この半径は、サンプル数や信頼度水準といった前提条件が満たされている場合にのみ「証明済み」とみなせます。
 
 ```mermaid
 flowchart LR
-    A[任意の基底分類器] --> B[入力にガウスノイズを加えて何度も推論]
+    A[任意の基底分類器] --> B[ガウスノイズ付き入力を多数サンプリングし推論]
     B --> C[最も多く出力されたクラスを最終予測とする]
-    C --> D[統計的な信頼区間から証明可能な半径を計算]
-    D --> E[その半径の中では予測が変わらないと数学的に保証]
+    C --> D[モンテカルロ推定で信頼度水準1-αの信頼区間を計算]
+    D --> E[前提条件を満たす場合その半径の中で予測が変わらないと証明]
 ```
 
 この手法は当時、ImageNet級の大規模データセットに対して実用的な証明可能防御を実現した数少ない方法として大きな注目を集め、IBMのAdversarial Robustness Toolboxにも標準実装として取り込まれています。
@@ -370,7 +370,7 @@ flowchart TD
 | MITRE ATLAS | MITRE Corporation | ATT&CKと同じマトリクス形式で、AIシステムに対する実際の攻撃事例と戦術・技術をカタログ化。2026年2月更新でエージェント特有の攻撃技術も追加 |
 | OWASP Top 10 for LLM and GenAI 2026 | OWASP GenAI Security Project | Prompt Injectionをはじめ、LLMアプリケーション特有のリスクを優先順位付けした実務者向けガイド。2026年8月に最新版を公開 |
 
-NIST AI 100-2e2025は、Apostol Vassilev氏(NIST)、Alina Oprea氏(Northeastern University)らに加え、英国AI Security Institute・米国AI Safety Institute・Ciscoの研究者も著者に名を連ねており、国際的な合意形成の一例といえます。MITRE ATLASはMicrosoftとの協業から始まり、現在は企業・学術機関12団体以上のパートナーシップで運営される、コミュニティ主導のナレッジベースです。
+NIST AI 100-2e2025は、Apostol Vassilev氏(NIST)、Alina Oprea氏(Northeastern University)らに加え、英国AI Security Institute・米国AI Safety Institute・Ciscoの研究者も著者に名を連ねており、国際的な合意形成の一例といえます。MITRE ATLASはMicrosoftとの協業から始まり、MITREは2023年11月のプレスリリースで、政府・学術・産業界の「well over 100(100を大きく超える)」組織が参加するコミュニティ主導のナレッジベースであると説明しています。
 
 ### 10-3 何がどこまで同じで何が違うのか
 
@@ -393,7 +393,7 @@ flowchart TD
 
 | ツール | 開発元 | 主な特徴 |
 |---|---|---|
-| Adversarial Robustness Toolbox (ART) | IBM Research(現Linux Foundation AI and Data配下のグラデュエートプロジェクト) | Evasion・Poisoning・Extraction・Inferenceの4種類の脅威を横断する総合ライブラリ。55以上の攻撃と30以上の防御を実装し、TensorFlow/PyTorch/scikit-learn等の主要フレームワークに対応 |
+| Adversarial Robustness Toolbox (ART) | IBM Research(現Linux Foundation AI and Data配下のグラデュエートプロジェクト) | Evasion・Poisoning・Extraction・Inferenceの4種類の脅威を横断する総合ライブラリ。多数の攻撃・防御手法を継続的に実装し、TensorFlow/PyTorch/scikit-learn等の主要フレームワークに対応(具体的な実装数は公式リポジトリの attacks/defences ドキュメントを参照) |
 | Foolbox | Bethge Lab(University of Tübingen) Jonas Rauber氏ら | PyTorch・TensorFlow・JAXすべてに対応した、モデル頑健性のベンチマークに特化したライブラリ |
 | CleverHans | 元Google Brain発、現在はCleverHans Labが継続開発 | 分野初期から使われている老舗ライブラリ。攻撃の再現実装のリファレンスとして広く参照される |
 | RobustBench | Francesco Croce氏・Matthias Hein氏ら(Tübingen大学 / EPFL / Princeton大学など) | AutoAttackを用いた標準ベンチマーク。80以上の頑健なモデルを含むModel Zooをpipから直接利用可能 |
@@ -479,7 +479,7 @@ flowchart LR
 
 16. Zou, Wang, Carlini, Nasr, Kolter, Fredrikson, "Universal and Transferable Adversarial Attacks on Aligned Language Models" (2023) — [https://arxiv.org/abs/2307.15043](https://arxiv.org/abs/2307.15043)
 17. NIST AI 100-2e2025, "Adversarial Machine Learning: A Taxonomy and Terminology of Attacks and Mitigations" — [https://nvlpubs.nist.gov/nistpubs/ai/nist.ai.100-2e2025.pdf](https://nvlpubs.nist.gov/nistpubs/ai/nist.ai.100-2e2025.pdf)
-18. MITRE ATLAS(Adversarial Threat Landscape for Artificial-Intelligence Systems) — [https://atlas.mitre.org/](https://atlas.mitre.org/)
+18. MITRE ATLAS(Adversarial Threat Landscape for Artificial-Intelligence Systems) — [https://atlas.mitre.org/](https://atlas.mitre.org/) / パートナー組織数の出典: MITRE, "MITRE and Microsoft Collaborate to Address Generative AI Security Risks" (2023年11月) — [https://www.mitre.org/news-insights/news-release/mitre-and-microsoft-collaborate-address-generative-ai-security-risks](https://www.mitre.org/news-insights/news-release/mitre-and-microsoft-collaborate-address-generative-ai-security-risks)
 19. OWASP GenAI Security Project, "Top 10 for LLM and GenAI" — [https://genai.owasp.org/initiatives/top-10-for-llm-and-genai/](https://genai.owasp.org/initiatives/top-10-for-llm-and-genai/)
 
 ### ツール ライブラリ
