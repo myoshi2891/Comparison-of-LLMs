@@ -13,14 +13,23 @@
 - **動作検証**:
   - `bun run build` ✅（Compiled successfully / 90 静的ページを生成。2026-09-17 実測）
   - `bun run typecheck` ✅（`tsc --noEmit`。2026-09-17 実測）
-  - `bun run lint` ✅（Biome check / 489 files / 0 diagnostics。2026-09-17 実測）
+  - `bun run lint` ✅（Biome check / 4 files / 0 diagnostics。2026-09-17 実測）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: `bun run test` で Vitest **176 files / 1621 tests すべて合格**（2026-09-17 実測。全 Green ✅）
+  - **フロントエンド (`web-next/`)**: `bun run test` で Vitest **177 files / 1638 tests すべて合格**（2026-09-17 実測。全 Green ✅）
     - `load(sourceHtml)` をモジュール初期化時に呼ぶ `governance/ai-governance/GuideContent.tsx` と
       `local-llm/finetuning-best-practices/GuideContent.tsx` は、import スモークでも読み込み可能であることを確認済み
   - **バックエンド (`scraper/`)**: pytest 実行で **100 件すべて合格** (2026-09-17 実測。全 Green ✅)
 
 ## 最近の追加内容
+
+- **ITIL AI Governance (Version 5) 完全学習ガイド（/governance/itil-ai-governance-v5）の Next.js アプリ移行 & ナビ「資格試験」グループ新設**:
+  - `Itil-ai-governance-v5-study-guide.html` を `web-next/app/governance/itil-ai-governance-v5/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。
+  - 要約・省略一切なしで全12セクション（この教材について〜参考文献・出典一覧）、全44サブセクション（h3）、全8サブサブセクション（h4）、全表（111行相当）、14個のMermaid図解（`MermaidDiagram`）、TOCスクロール追従（`TocObserver.tsx`）、全24件のcallout（practice: 9, source: 11, note: 4）、全14件の参考文献カード・外部リンク安全属性（`target="_blank" rel="noopener noreferrer"`）、ブランドSVGを完全再現。
+  - グローバルナビゲーション（`web-next/lib/nav-taxonomy.ts`）に新グループ「資格試験」を新設し、トップレベルドロップダウンに追加。`components/site/SiteHeader.test.tsx` のドロップダウン数（6 → 7）および `tests/nav-derivation.test.ts` のグループ数（9 → 10）を同期更新。
+  - 原本照合監査スクリプト `audit_source_parity.mjs` を拡張し、シングル・ダブルクォート文字列の Mermaid 抽出に対応した上で、原本とのパリティ監査で exit code 0（漏れなし ✅）を確認。
+  - 原本 `Itil-ai-governance-v5-study-guide.html` および `Itil-ai-governance-v5-study-guide.md` は `archive/html/governance/` および `archive/md/governance/` へ退避保存。
+  - `web-next/lib/page-registry.ts` に新規エントリ（`slug: "/governance/itil-ai-governance-v5"`, `group: "資格試験"`）を登録。
+  - 契約テスト17件（S-1〜S-4, C-1〜C-5, D-1〜D-3, Q-1〜Q-2）を作成し、Vitest **177 files / 1638 tests** 全 Green ✅、typecheck ✅、Biome lint ✅ を確認。
 
 - **AI Engineering 入門ガイド（/books/ai-engineering-guide）の Next.js アプリ移行**:
   - `Ai-engineering-guide.html` を `web-next/app/books/ai-engineering-guide/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。
