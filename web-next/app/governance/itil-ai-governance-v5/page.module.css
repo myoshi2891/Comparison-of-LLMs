@@ -35,16 +35,28 @@
   overflow: hidden !important;
 }
 
-:global(#common-header) {
+:global(body:has([data-testid="layout-root"]) #common-header) {
   background-color: #05080f !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
 }
 
-:global(.ch-disclaimer) {
+:global(body:has([data-testid="layout-root"]) .ch-disclaimer) {
   background-color: #120e04 !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
+  border-bottom: none !important;
+  box-shadow: none !important;
+}
+
+/*
+ * 根本修正: JS ロード後に DisclaimerBanner の useEffect が --ch-disclaimer-height を
+ * 書き込むと body.has-common-header の margin-top が増加し、固定バナーとページ本文の間に
+ * 隙間が生じる。その隙間に body のダーク背景(#05080f)が透けて「黒い線」に見えるため、
+ * このページだけ body 背景をページの薄灰 (#f6f7f9) に揃えて隙間を不可視化する。
+ */
+:global(body:has([data-testid="layout-root"])) {
+  background: #f6f7f9 !important;
 }
 
 .layout a {
@@ -59,16 +71,21 @@
 /* ---------- Layout ---------- */
 .sidebar {
   position: fixed;
-  top: var(--header-height, 60px);
+  top: calc(var(--ch-height, 60px) + var(--ch-disclaimer-height, 0px) + 10px);
   left: 0;
   width: var(--sidebar-w);
-  height: calc(100vh - var(--header-height, 60px));
+  height: calc(100vh - var(--ch-height, 60px) - var(--ch-disclaimer-height, 0px) - 20px);
   overflow-y: auto;
   background: var(--color-paper-raised);
   border-right: 1px solid var(--border);
   padding: 28px 18px 40px;
   box-sizing: border-box;
   z-index: 10;
+}
+
+:global(body.has-common-header) .sidebar {
+  top: calc(var(--ch-height, 60px) + var(--ch-disclaimer-height, 0px) + 10px);
+  height: calc(100vh - var(--ch-height, 60px) - var(--ch-disclaimer-height, 0px) - 20px);
 }
 
 .main {
@@ -169,7 +186,7 @@
   margin: 56px 0 20px;
   padding-bottom: 12px;
   border-bottom: 2px solid var(--color-indigo);
-  scroll-margin-top: calc(var(--header-height, 60px) + 80px);
+  scroll-margin-top: calc(var(--ch-height, 60px) + var(--ch-disclaimer-height, 0px) + 30px);
 }
 
 .prose h2:first-of-type {
@@ -181,7 +198,7 @@
   font-size: 18px;
   color: var(--color-ink);
   margin: 36px 0 14px;
-  scroll-margin-top: calc(var(--header-height, 60px) + 80px);
+  scroll-margin-top: calc(var(--ch-height, 60px) + var(--ch-disclaimer-height, 0px) + 30px);
 }
 
 .prose h4 {
@@ -190,7 +207,7 @@
   font-size: 16px;
   color: var(--color-indigo);
   margin: 28px 0 12px;
-  scroll-margin-top: calc(var(--header-height, 60px) + 80px);
+  scroll-margin-top: calc(var(--ch-height, 60px) + var(--ch-disclaimer-height, 0px) + 30px);
 }
 
 .prose p {
@@ -266,6 +283,19 @@
   justify-content: center;
   margin: 28px 0;
   width: 100%;
+  overflow-x: auto;
+}
+
+.diagramWrap :global(.mermaid) {
+  max-width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.diagramWrap :global(svg) {
+  max-width: 100%;
+  height: auto;
+  overflow: visible;
 }
 
 /* ---------- Callouts ---------- */

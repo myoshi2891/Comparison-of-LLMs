@@ -5,8 +5,24 @@ import Page, { metadata } from "./page";
 import styles from "./page.module.css";
 
 vi.mock("@/components/docs/MermaidDiagram", () => ({
-  default: function DummyMermaidDiagram({ chart }: { chart: string }) {
-    return <pre data-testid="mermaid">{chart}</pre>;
+  default: function DummyMermaidDiagram({
+    chart,
+    theme,
+    themeVariables,
+  }: {
+    chart: string;
+    theme?: string;
+    themeVariables?: Record<string, string>;
+  }) {
+    return (
+      <pre
+        data-testid="mermaid"
+        data-theme={theme}
+        data-has-theme-vars={String(Boolean(themeVariables))}
+      >
+        {chart}
+      </pre>
+    );
   },
 }));
 
@@ -164,12 +180,14 @@ describe("ITIL AI Governance (Version 5) 完全学習ガイド - 契約テスト
   });
 
   // S-4: Mermaid ダイアグラム契約（全14図解）
-  it("S-4: 14個のMermaid図解が描画され、それぞれ構文を持つ", () => {
+  it("S-4: 14個のMermaid図解が描画され、ライトテーマ(theme='base')とthemeVariablesが設定されている", () => {
     const { container } = render(<Page />);
     const diagrams = container.querySelectorAll("[data-testid='mermaid']");
     expect(diagrams).toHaveLength(14);
     for (const diagram of Array.from(diagrams)) {
       expect(diagram.textContent).toMatch(/flowchart\s+(?:TB|LR)/);
+      expect(diagram.getAttribute("data-theme")).toBe("base");
+      expect(diagram.getAttribute("data-has-theme-vars")).toBe("true");
     }
   });
 
@@ -273,6 +291,13 @@ describe("ITIL AI Governance (Version 5) 完全学習ガイド - 契約テスト
     expect(styles.sidebar).toBeDefined();
     expect(styles.main).toBeDefined();
     expect(styles.callout).toBeDefined();
+  });
+
+  // D-4: レイアウトルート契約（黒線防止用）
+  it("D-4: layout-root data-testid が付与されている", () => {
+    const { container } = render(<Page />);
+    const layoutRoot = container.querySelector("[data-testid='layout-root']");
+    expect(layoutRoot).not.toBeNull();
   });
 
   // Q-1: メタデータ契約

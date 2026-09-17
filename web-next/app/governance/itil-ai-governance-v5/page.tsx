@@ -9,6 +9,22 @@ export const metadata: Metadata = {
     "PeopleCert 認定資格 ITIL AI Governance (Version 5) の出題範囲（Module 1〜9）を初学者向けに体系的に解説した完全学習ガイド。6Cモデル、Assess-Design-Implement-Maintainモデル、各フレームワーク・規制との連携を網羅。",
 };
 
+const ITIL_THEME_VARS: Record<string, string> = {
+  background: "#F6F7F9",
+  primaryColor: "#EEF1F8",
+  primaryTextColor: "#161B26",
+  primaryBorderColor: "#2E3F72",
+  lineColor: "#2E3F72",
+  textColor: "#161B26",
+  fontSize: "15px",
+  edgeLabelBackground: "#F6F7F9",
+  clusterBkg: "#FFFFFF",
+  clusterBorder: "#DCE3EC",
+  titleColor: "#161B26",
+  nodeTextColor: "#161B26",
+  mainBkg: "#EEF1F8",
+};
+
 const DIAGRAM_0 = `flowchart TB
 subgraph found["土台となる考え方"]
 A["ガバナンスとは何か<br/>(Module 2)"]
@@ -232,7 +248,37 @@ class IMP hub;`;
 
 export default function ItilAiGovernancePage() {
   return (
-    <div className={styles.layout}>
+    <div className={styles.layout} data-testid="layout-root">
+      {/*
+       * ページ固有スタイル: Server Component として SSR 時から即時適用。
+       * CSS Module :global() より先に読まれるため、JS ハイドレーション前から
+       * body 背景をページの薄灰(#F6F7F9)に揃え、隙間が「黒い線」に見えるのを防ぐ。
+       * border-bottom: none で disclaimer 下の線も除去。
+       */}
+      <style href="itil-ai-governance-page-overrides" precedence="default">{`
+        body:has([data-testid="layout-root"]) {
+          background: #f6f7f9 !important;
+        }
+        body:has([data-testid="layout-root"]) .ch-disclaimer {
+          background-color: #120e04 !important;
+          border-bottom: none !important;
+          box-shadow: none !important;
+          backdrop-filter: none !important;
+          -webkit-backdrop-filter: none !important;
+        }
+        body:has([data-testid="layout-root"]) #common-header {
+          background-color: #05080f !important;
+          backdrop-filter: none !important;
+          -webkit-backdrop-filter: none !important;
+        }
+        #site-freshness-bar {
+          display: none !important;
+          height: 0 !important;
+          padding: 0 !important;
+          margin: 0 !important;
+          overflow: hidden !important;
+        }
+      `}</style>
       {/* 外部フォント & アイコン */}
       <link
         rel="stylesheet"
@@ -462,7 +508,7 @@ export default function ItilAiGovernancePage() {
           </div>
           <h3>全体像（この資格で学ぶ主要モデル）</h3>
           <div className={styles.diagramWrap}>
-            <MermaidDiagram chart={DIAGRAM_0} />
+            <MermaidDiagram chart={DIAGRAM_0} theme="base" themeVariables={ITIL_THEME_VARS} />
           </div>
           <hr className={styles.divider} />
           <h2 id="第1章-AI-の世界と-AI-ガバナンスの必要性">
@@ -525,7 +571,7 @@ export default function ItilAiGovernancePage() {
             のコース資料では、組織における AI の役割は次のように段階的に進化すると説明されています。
           </p>
           <div className={styles.diagramWrap}>
-            <MermaidDiagram chart={DIAGRAM_1} />
+            <MermaidDiagram chart={DIAGRAM_1} theme="base" themeVariables={ITIL_THEME_VARS} />
           </div>
           <p>
             この進行に伴って必要な統治の水準（人間の監督範囲、意思決定権限の委譲範囲など）も段階的に変化していきます。
@@ -656,7 +702,7 @@ export default function ItilAiGovernancePage() {
             </li>
           </ul>
           <div className={styles.diagramWrap}>
-            <MermaidDiagram chart={DIAGRAM_2} />
+            <MermaidDiagram chart={DIAGRAM_2} theme="base" themeVariables={ITIL_THEME_VARS} />
           </div>
           <p>
             さらに本章では、<strong>コーポレートガバナンス（企業全体の統治）</strong>、
@@ -680,7 +726,7 @@ export default function ItilAiGovernancePage() {
             の意思決定を行うか」を分類する枠組みで、複数の公式トレーニングパートナー資料で一貫して次の4種類として説明されています。
           </p>
           <div className={styles.diagramWrap}>
-            <MermaidDiagram chart={DIAGRAM_3} />
+            <MermaidDiagram chart={DIAGRAM_3} theme="base" themeVariables={ITIL_THEME_VARS} />
           </div>
           <table className={styles.table}>
             <thead>
@@ -819,7 +865,7 @@ export default function ItilAiGovernancePage() {
           <h3>3-1. AI の3つのタイプ</h3>
           <p>ITIL AI Governance では AI を大きく3つのタイプに分類します。</p>
           <div className={styles.diagramWrap}>
-            <MermaidDiagram chart={DIAGRAM_4} />
+            <MermaidDiagram chart={DIAGRAM_4} theme="base" themeVariables={ITIL_THEME_VARS} />
           </div>
           <table className={styles.table}>
             <thead>
@@ -985,7 +1031,7 @@ export default function ItilAiGovernancePage() {
             システムが<strong>何をしているか</strong>を6つの機能カテゴリで分類します。
           </p>
           <div className={styles.diagramWrap}>
-            <MermaidDiagram chart={DIAGRAM_5} />
+            <MermaidDiagram chart={DIAGRAM_5} theme="base" themeVariables={ITIL_THEME_VARS} />
           </div>
           <table className={styles.table}>
             <thead>
@@ -1272,7 +1318,7 @@ export default function ItilAiGovernancePage() {
             co-creation）」という考え方の中に、ガバナンスが明示的に組み込まれています。
           </p>
           <div className={styles.diagramWrap}>
-            <MermaidDiagram chart={DIAGRAM_6} />
+            <MermaidDiagram chart={DIAGRAM_6} theme="base" themeVariables={ITIL_THEME_VARS} />
           </div>
           <h3>5-2. ITIL Product and Service Lifecycle Model と AI</h3>
           <p>
@@ -1333,7 +1379,7 @@ export default function ItilAiGovernancePage() {
             は各次元の中の節（例: 「Organizations, people and AI」）として扱われます。
           </p>
           <div className={styles.diagramWrap}>
-            <MermaidDiagram chart={DIAGRAM_7} />
+            <MermaidDiagram chart={DIAGRAM_7} theme="base" themeVariables={ITIL_THEME_VARS} />
           </div>
           <ul>
             <li>
@@ -1456,7 +1502,7 @@ export default function ItilAiGovernancePage() {
             ガバナンスを一過性の対応ではなく、継続的に評価・調整するための4ステップの改善サイクルとして提供します。
           </p>
           <div className={styles.diagramWrap}>
-            <MermaidDiagram chart={DIAGRAM_8} />
+            <MermaidDiagram chart={DIAGRAM_8} theme="base" themeVariables={ITIL_THEME_VARS} />
           </div>
           <p>
             本章（Module 6）では前半の <strong>Assess</strong> と<strong>Design</strong>{" "}
@@ -1560,7 +1606,7 @@ export default function ItilAiGovernancePage() {
           </div>
           <h4>6-3-3. 統制の3類型（Preventive / Detective / Corrective）</h4>
           <div className={styles.diagramWrap}>
-            <MermaidDiagram chart={DIAGRAM_9} />
+            <MermaidDiagram chart={DIAGRAM_9} theme="base" themeVariables={ITIL_THEME_VARS} />
           </div>
           <table className={styles.table}>
             <thead>
@@ -1703,7 +1749,7 @@ export default function ItilAiGovernancePage() {
           <h3>7-2. Maintain（維持）ステップ</h3>
           <p>導入した統制を継続的に機能させ、改善し続ける段階です。</p>
           <div className={styles.diagramWrap}>
-            <MermaidDiagram chart={DIAGRAM_10} />
+            <MermaidDiagram chart={DIAGRAM_10} theme="base" themeVariables={ITIL_THEME_VARS} />
           </div>
           <ul>
             <li>
@@ -1733,7 +1779,7 @@ export default function ItilAiGovernancePage() {
             <strong>Design・Implement・Maintain 全体を貫く入力（input）</strong>として扱われます。
           </p>
           <div className={styles.diagramWrap}>
-            <MermaidDiagram chart={DIAGRAM_11} />
+            <MermaidDiagram chart={DIAGRAM_11} theme="base" themeVariables={ITIL_THEME_VARS} />
           </div>
           <h4>7-3-1. 世界的な規制の潮流（The Global Regulatory Landscape）</h4>
           <ul>
@@ -2029,7 +2075,7 @@ export default function ItilAiGovernancePage() {
             では、これらが競合するのではなく補完し合う関係にあることを理解します。
           </p>
           <div className={styles.diagramWrap}>
-            <MermaidDiagram chart={DIAGRAM_12} />
+            <MermaidDiagram chart={DIAGRAM_12} theme="base" themeVariables={ITIL_THEME_VARS} />
           </div>
           <table className={styles.table}>
             <thead>
@@ -2101,7 +2147,7 @@ export default function ItilAiGovernancePage() {
             view」というトピックタイトルを踏まえた、本ガイド独自の整理です。実際の7モデルの厳密な定義は公式eBookを参照してください。
           </p>
           <div className={styles.diagramWrap}>
-            <MermaidDiagram chart={DIAGRAM_13} />
+            <MermaidDiagram chart={DIAGRAM_13} theme="base" themeVariables={ITIL_THEME_VARS} />
           </div>
           <div
             className={`${styles.callout} ${styles.practice}`}
