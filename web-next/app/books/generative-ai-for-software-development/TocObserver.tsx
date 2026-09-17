@@ -113,6 +113,11 @@ export default function TocObserver() {
 
     for (const c of checkItems) {
       c.addEventListener("change", handleCheckboxChange);
+      const parent = c.closest(".check-item");
+      if (parent && c.checked) {
+        parent.classList.add(styles.done);
+        parent.classList.add("done");
+      }
     }
     updateCounter();
 

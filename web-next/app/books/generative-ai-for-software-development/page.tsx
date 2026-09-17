@@ -90,6 +90,11 @@ export default function Page() {
     <div className={styles.layout} data-testid="layout-root">
       <link
         rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Noto+Serif+JP:wght@600;700&display=swap"
+        crossOrigin="anonymous"
+      />
+      <link
+        rel="stylesheet"
         href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.46.0/dist/tabler-icons.min.css"
         integrity="sha384-ND+q1IVc0KDElX60dZaqKc7Xl9cdxd2PpU2JfVUHcurCkFVtVLFdt9vJfxtHSL3p"
         crossOrigin="anonymous"
@@ -194,6 +199,23 @@ export default function Page() {
 
       <main className={styles.main} id="top">
         <header className={styles.hero}>
+          <div className={styles.freshnessBar} lang="ja" data-testid="page-freshness">
+            <span className={styles.freshnessItem}>
+              最終確認{" "}
+              <time className={styles.freshnessValue} dateTime="2026-09-17">
+                2026-09-17
+              </time>
+            </span>
+            <span className={styles.freshnessSep} aria-hidden="true">
+              /
+            </span>
+            <span className={styles.freshnessItem}>
+              公開{" "}
+              <time className={styles.freshnessValue} dateTime="2026-09-17">
+                2026-09-17
+              </time>
+            </span>
+          </div>
           <div className={styles.heroKicker}>
             {" "}
             <i className="ti ti-sparkles"></i>初学者向け解説ガイド
@@ -1823,56 +1845,56 @@ export default function Page() {
             0 / 9 完了
           </div>
           <ul className={styles.checklist} id="checklistItems">
-            <li className={styles.checkItem} data-testid="check-item">
+            <li className={`${styles.checkItem} check-item`} data-testid="check-item">
               <input type="checkbox" id="c1" />{" "}
               <label htmlFor="c1">
                 ブラウザ型(ChatGPT/Gemini)とIDE統合型(Cursor/Copilot/Claude
                 Code等)のコード生成ツールの違いを説明できる
               </label>
             </li>
-            <li className={styles.checkItem} data-testid="check-item">
+            <li className={`${styles.checkItem} check-item`} data-testid="check-item">
               <input type="checkbox" id="c2" />{" "}
               <label htmlFor="c2">
                 AIアプリビルダー(Bolt.new/Lovable/v0)がそれぞれ得意とする用途の違いを理解している
               </label>
             </li>
-            <li className={styles.checkItem} data-testid="check-item">
+            <li className={`${styles.checkItem} check-item`} data-testid="check-item">
               <input type="checkbox" id="c3" />{" "}
               <label htmlFor="c3">
                 AIコードレビューツールが「機械的な問題」と「ビジネスロジックの妥当性」のどちらに強く、どちらに弱いかを説明できる
               </label>
             </li>
-            <li className={styles.checkItem} data-testid="check-item">
+            <li className={`${styles.checkItem} check-item`} data-testid="check-item">
               <input type="checkbox" id="c4" />{" "}
               <label htmlFor="c4">
                 AIテストツールの3つのアプローチ(自然言語ベース/セルフヒーリング/自律エージェント)を区別できる
               </label>
             </li>
-            <li className={styles.checkItem} data-testid="check-item">
+            <li className={`${styles.checkItem} check-item`} data-testid="check-item">
               <input type="checkbox" id="c5" />{" "}
               <label htmlFor="c5">
                 ドキュメントの「陳腐化問題」に対して、コード連動ドキュメントという解決アプローチがあることを理解している
               </label>
             </li>
-            <li className={styles.checkItem} data-testid="check-item">
+            <li className={`${styles.checkItem} check-item`} data-testid="check-item">
               <input type="checkbox" id="c6" />{" "}
               <label htmlFor="c6">
                 従来型チャットボットとAIエージェントの違い(外部ツールを使って行動できるかどうか)を説明できる
               </label>
             </li>
-            <li className={styles.checkItem} data-testid="check-item">
+            <li className={`${styles.checkItem} check-item`} data-testid="check-item">
               <input type="checkbox" id="c7" />{" "}
               <label htmlFor="c7">
                 「致死の三要素」を避けるためのセキュリティ設計の基本を理解している
               </label>
             </li>
-            <li className={styles.checkItem} data-testid="check-item">
+            <li className={`${styles.checkItem} check-item`} data-testid="check-item">
               <input type="checkbox" id="c8" />{" "}
               <label htmlFor="c8">
                 自分たちのユースケースに合わせたツール評価フレームワークを作成できる
               </label>
             </li>
-            <li className={styles.checkItem} data-testid="check-item">
+            <li className={`${styles.checkItem} check-item`} data-testid="check-item">
               <input type="checkbox" id="c9" />{" "}
               <label htmlFor="c9">
                 AIによる自動化が「職業を消滅させるケース」と「役割を変化させるケース」の両方があることを説明できる

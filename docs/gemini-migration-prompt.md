@@ -47,7 +47,10 @@
 - サンドボックス環境下での **`npm` コマンドおよび本番ビルド（`bun run build` / `next build`）の実行は禁止** です。
 - Biome Lint 実行時は必ず対象ファイル/ディレクトリを指定してください
   （`bun run lint:fix` や `bunx biome check --write` をパス引数なしでリポジトリ全体に実行することは禁止）。
-- `legacy/` 配下のファイル編集は禁止です。移行元 HTML は削除せず `archive/` 配下に保管してください。
+- `legacy/` 配下のファイル編集は禁止です。移行元の HTML ファイル・Markdown ファイルは **絶対に削除せず**、移行完了後に必ず `archive/` 配下の適切なサブディレクトリへ移動（`git mv`）してください。
+  - HTML ファイルの移動先: `archive/html/<ベンダー名>/` （例: `archive/html/openai/`）
+  - Markdown ファイルの移動先: `archive/md/<ベンダー名>/` （例: `archive/md/openai/`）
+  - 既存の `archive/` ディレクトリ構造を確認し、同カテゴリのファイルと同じパス規則に揃えてください。
 - 設定ファイル（`next.config.ts`, `tsconfig.json`, `biome.json` 等）や依存関係の勝手な変更は禁止です。
 
 ### 2. 100% 完全移植とスタイリング防犯原則（要約・省略・縮約の絶対禁止）
@@ -149,11 +152,27 @@ echo "exit=$?"
    (cd web-next && bun run test tests/page-registry-coverage.test.ts)
    ```
 
-5. PII 検査後、Green コミットを実行します:
+5. 原本ファイルを `archive/` 配下の適切なサブディレクトリへ移動します:
+
+   ```bash
+   # HTML ファイルの場合
+   git mv <原本HTMLパス> archive/html/<ベンダー名>/<ファイル名>.html
+
+   # Markdown ファイルの場合
+   git mv <原本MDパス> archive/md/<ベンダー名>/<ファイル名>.md
+   ```
+
+   移動先の `archive/` サブディレクトリが存在しない場合は事前に作成してください。
+   既存の `archive/` 内のディレクトリ構造（`ls archive/html/` や `ls archive/md/`）を確認し、
+   同カテゴリの他ファイルと同じパス規則に揃えること。
+
+6. PII 検査後、Green コミットを実行します:
 
    ```
    feat(<slug>): implement <page-title> with 100% source parity
    ```
+
+   > **注**: `git mv` によるアーカイブ移動も同一コミットに含めてください。
 
 ---
 

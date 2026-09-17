@@ -365,16 +365,64 @@ describe("Generative AI for Software Development ガイド契約テスト", () =
       const layout = container.querySelector('[data-testid="layout-root"]');
       expect(layout).not.toBeNull();
     });
+
+    it("D-9: 原本準拠の Google Fonts（Source Serif 4 & Noto Serif JP）link が存在する", () => {
+      const { container } = render(<Page />);
+      const fontLink = container.querySelector(
+        'link[href*="fonts.googleapis.com/css2?family=Source+Serif+4"]'
+      );
+      expect(fontLink).not.toBeNull();
+      expect(fontLink?.getAttribute("href")).toContain("Noto+Serif+JP");
+    });
+
+    it("D-10: ヒーローセクション内に最終確認日および公開日バッジが存在する", () => {
+      const { container } = render(<Page />);
+      const badge = container.querySelector('[data-testid="page-freshness"]');
+      expect(badge).not.toBeNull();
+      expect(badge?.textContent).toContain("最終確認");
+      expect(badge?.textContent).toContain("公開");
+      const times = badge?.querySelectorAll("time");
+      expect(times?.length).toBe(2);
+      expect(times?.[0].getAttribute("dateTime")).toBe("2026-09-17");
+      expect(times?.[1].getAttribute("dateTime")).toBe("2026-09-17");
+    });
   });
 
   // Q. 品質契約 (3件・必須)
   describe("Q. 品質契約", () => {
     it("Q-1: 学習チェックリストのアイテムが 9 件存在し、カウンター要素 checkCounter を持つ", () => {
       const { container } = render(<Page />);
-      const checkItems = container.querySelectorAll(".check-item, [data-testid='check-item']");
+      const checkItems = container.querySelectorAll(".check-item");
       expect(checkItems.length).toBe(9);
+      const checkboxes = container.querySelectorAll(".check-item input[type='checkbox']");
+      expect(checkboxes.length).toBe(9);
       const counter = container.querySelector("#checkCounter, [data-testid='check-counter']");
       expect(counter).not.toBeNull();
+      expect(counter?.textContent?.trim()).toBe("0 / 9 完了");
+    });
+
+    it("Q-4: チェックボックス操作時にカウンターが更新され、done クラスが付与される", () => {
+      const { container } = render(<Page />);
+      const counter = container.querySelector("#checkCounter");
+      const firstCheck = container.querySelector<HTMLInputElement>(
+        ".check-item input[type='checkbox']"
+      );
+      const firstItem = container.querySelector(".check-item");
+
+      expect(firstCheck).not.toBeNull();
+      expect(counter?.textContent?.trim()).toBe("0 / 9 完了");
+
+      if (firstCheck && firstItem) {
+        firstCheck.checked = true;
+        firstCheck.dispatchEvent(new Event("change", { bubbles: true }));
+        expect(counter?.textContent?.trim()).toBe("1 / 9 完了");
+        expect(firstItem.classList.contains("done")).toBe(true);
+
+        firstCheck.checked = false;
+        firstCheck.dispatchEvent(new Event("change", { bubbles: true }));
+        expect(counter?.textContent?.trim()).toBe("0 / 9 完了");
+        expect(firstItem.classList.contains("done")).toBe(false);
+      }
     });
 
     it("Q-2: metadata の title / description が空でなく title が h1 と整合する", () => {
