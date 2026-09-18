@@ -325,7 +325,7 @@ export default function AiEngineeringGuidePage() {
             2024年12月刊）の章構成を土台に、Andrej
             Karpathy、Shawn&nbsp;&quot;swyx&quot;&nbsp;Wang、Simon&nbsp;Willison、Hamel&nbsp;Husainなど、国際的に著名な開発者・エンジニアの発信内容を参照しながら、初学者向けにステップバイステップで再構成しています。AI分野は変化が非常に速いため、実際に手を動かす際は巻末の「
             <a href="#sec-17">参考文献・出典</a>
-            」セクションに集約したURLから最新情報を確認してください（出典URLは各セクション末尾ではなく、Section&nbsp;17にのみまとめています）。
+            」セクションに集約したURLから最新情報を確認してください（出典URLはSection&nbsp;17に集約していますが、一部は本文中にも記載しています）。
           </div>
         </div>
 
