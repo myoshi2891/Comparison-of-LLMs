@@ -367,7 +367,7 @@ function resolveStringConstants(content, constants) {
 }
 
 /**
- * Decodes `\n`, `\'`, `\"`, and `\\` escape sequences in a single left-to-right pass.
+ * Decodes `\n`, `\r`, `\'`, `\"`, and `\\` escape sequences in a single left-to-right pass.
  *
  * A sequential chain of independent `.replace()` calls (one per escape) can re-interpret
  * a decoded backslash produced by an earlier step as part of a later escape — an escaped
@@ -385,6 +385,8 @@ function decodeQuotedEntryEscapes(raw) {
       const next = raw[index + 1];
       if (next === "n") {
         out += "\n";
+      } else if (next === "r") {
+        out += "\r";
       } else if (next === "'" || next === '"' || next === "\\") {
         out += next;
       } else {

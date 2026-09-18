@@ -283,6 +283,31 @@ export default function Page() {
 	assert.deepEqual(result.json.pageMermaidSources, [chartValue]);
 });
 
+test("decodes an escaped \\r\\n in a DIAGRAMS entry to match a page's actual CRLF newline", () => {
+	const backslash = "\\";
+	const escapedCrlf = `${backslash}r${backslash}n`; // literal 4-char escape: decodes to a real CRLF
+
+	const htmlEntryValue = `flowchart TD${escapedCrlf}A-->B`;
+	const source = `<script>
+const DIAGRAMS = {
+  "sample": "${htmlEntryValue}"
+};
+</script>`;
+
+	// The page holds the equivalent content with an actual CRLF newline embedded
+	// in the template literal (as Windows-authored source might contain).
+	const chartValue = "flowchart TD\r\nA-->B";
+	const page = `const CHART = \`${chartValue}\`;
+export default function Page() {
+  return <MermaidDiagram chart={CHART} />;
+}`;
+
+	const result = audit(source, page);
+
+	assert.equal(result.status, 0);
+	assert.equal(result.json.mermaidSourcesMatch, true);
+});
+
 test("treats normalized HTML and Markdown paragraphs as blocking parity elements", () => {
 	const matchingHtml = audit(
 		"<p>First ordinary paragraph.</p><p>Second ordinary paragraph.</p>",
