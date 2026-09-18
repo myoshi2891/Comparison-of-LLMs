@@ -397,7 +397,7 @@ flowchart TD
 | Adversarial Robustness Toolbox (ART) | IBM Research(現Linux Foundation AI and Data配下のグラデュエートプロジェクト) | Evasion・Poisoning・Extraction・Inferenceの4種類の脅威を横断する総合ライブラリ。多数の攻撃・防御手法を継続的に実装し、TensorFlow/PyTorch/scikit-learn等の主要フレームワークに対応(具体的な実装数は公式リポジトリの attacks/defences ドキュメントを参照) |
 | Foolbox | Bethge Lab(University of Tübingen) Jonas Rauber氏ら | PyTorch・TensorFlow・JAXすべてに対応した、モデル頑健性のベンチマークに特化したライブラリ |
 | CleverHans | 元Google Brain発、現在はCleverHans Labが継続開発 | 分野初期から使われている老舗ライブラリ。攻撃の再現実装のリファレンスとして広く参照される |
-| RobustBench | Francesco Croce氏・Matthias Hein氏ら(Tübingen大学 / EPFL / Princeton大学など) | AutoAttackを用いた標準ベンチマーク。80以上の頑健なモデルを含むModel Zooをpipから直接利用可能 |
+| RobustBench | Francesco Croce氏・Matthias Hein氏ら(Tübingen大学 / EPFL / Princeton大学など) | AutoAttackを用いた標準ベンチマーク。多数の頑健なモデルを含むModel Zooをpipから直接利用可能(最新のモデル数は公式リーダーボードを参照) |
 
 書籍の著者であるPin-Yu Chen氏自身がART開発陣の一員であることもあり、この書籍とARTは内容的にも親和性が高く、書籍を読みながらARTのサンプルコードで手を動かすという学び方がおすすめです。
 
