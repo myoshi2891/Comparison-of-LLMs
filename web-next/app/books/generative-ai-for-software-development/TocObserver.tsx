@@ -19,6 +19,9 @@ export default function TocObserver() {
       if (!sidebar) return;
       const hidden =
         window.innerWidth <= MOBILE_BREAKPOINT && !sidebar.classList.contains(styles.open);
+      if (hidden && menuToggle && sidebar.contains(document.activeElement)) {
+        menuToggle.focus();
+      }
       sidebar.inert = hidden;
     };
 
