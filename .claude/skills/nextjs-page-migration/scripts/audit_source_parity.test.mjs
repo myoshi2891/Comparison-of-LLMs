@@ -254,6 +254,35 @@ test("recognizes every allowed Mermaid diagram declaration including pie", () =>
 	assert.doesNotMatch("block-beta\ncolumns 1", MERMAID_DIAGRAM_DECLARATION);
 });
 
+test("decodes an escaped backslash before a literal 'n' in a DIAGRAMS entry without producing a newline", () => {
+	const backslash = "\\";
+	const lineBreakEscape = `${backslash}n`; // 2-char escape: decodes to a real newline
+	const escapedBackslashThenN = `${backslash}${backslash}n`; // 3-char escape: decodes to backslash + literal "n"
+
+	const htmlEntryValue = `flowchart TD${lineBreakEscape}A[C:${escapedBackslashThenN}Drive] --> B[End]`;
+	const source = `<script>
+const DIAGRAMS = {
+  "sample": '${htmlEntryValue}'
+};
+</script>`;
+
+	// Raw backtick content is captured verbatim (no escape decoding), so this is
+	// already the expected decoded form: a real newline after "TD", then a literal
+	// backslash + "n" (not a newline) embedded in the node label.
+	const chartValue = `flowchart TD\nA[C:${backslash}nDrive] --> B[End]`;
+	const page = `const CHART = \`${chartValue}\`;
+export default function Page() {
+  return <MermaidDiagram chart={CHART} />;
+}`;
+
+	const result = audit(source, page);
+
+	assert.equal(result.status, 0);
+	assert.equal(result.json.mermaidSourcesMatch, true);
+	assert.deepEqual(result.json.sourceMermaidSources, [chartValue]);
+	assert.deepEqual(result.json.pageMermaidSources, [chartValue]);
+});
+
 test("treats normalized HTML and Markdown paragraphs as blocking parity elements", () => {
 	const matchingHtml = audit(
 		"<p>First ordinary paragraph.</p><p>Second ordinary paragraph.</p>",

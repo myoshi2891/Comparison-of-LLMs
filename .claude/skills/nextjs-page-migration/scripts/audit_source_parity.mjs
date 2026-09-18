@@ -367,6 +367,38 @@ function resolveStringConstants(content, constants) {
 }
 
 /**
+ * Decodes `\n`, `\'`, `\"`, and `\\` escape sequences in a single left-to-right pass.
+ *
+ * A sequential chain of independent `.replace()` calls (one per escape) can re-interpret
+ * a decoded backslash produced by an earlier step as part of a later escape — an escaped
+ * backslash immediately followed by a literal `n` (source text `\\n`) would otherwise
+ * decode to a newline instead of a literal backslash + "n". Consuming each escape exactly
+ * once avoids that.
+ * @param {string} raw - Quoted string content with escape sequences still literal.
+ * @returns {string} The decoded text.
+ */
+function decodeQuotedEntryEscapes(raw) {
+  let out = "";
+  for (let index = 0; index < raw.length; index += 1) {
+    const char = raw[index];
+    if (char === "\\" && index + 1 < raw.length) {
+      const next = raw[index + 1];
+      if (next === "n") {
+        out += "\n";
+      } else if (next === "'" || next === '"' || next === "\\") {
+        out += next;
+      } else {
+        out += char + next;
+      }
+      index += 1;
+      continue;
+    }
+    out += char;
+  }
+  return out;
+}
+
+/**
  * Extracts Mermaid diagram declarations from HTML in document order.
  * @param {string} src - The complete HTML source.
  * @returns {string[]} Normalized Mermaid diagram sources found in supported HTML containers, scripts, and definitions.
@@ -394,11 +426,7 @@ function collectHtmlMermaidSources(src) {
     /(?:["'][^"']+["']|[\p{L}_$][\p{L}\p{N}_$]*)\s*:\s*(?:`([\s\S]*?)`|'((?:[^'\\]|\\.)*)'|"((?:[^"\\]|\\.)*)")/gu;
   let entry = diagramEntryRe.exec(src);
   while (entry !== null) {
-    const raw = entry[1] ?? (entry[2] ?? entry[3] ?? "")
-      .replace(/\\n/g, "\n")
-      .replace(/\\'/g, "'")
-      .replace(/\\"/g, '"')
-      .replace(/\\\\/g, "\\");
+    const raw = entry[1] ?? decodeQuotedEntryEscapes(entry[2] ?? entry[3] ?? "");
     sources.push({ index: entry.index, source: normalizeMermaidSource(raw) });
     entry = diagramEntryRe.exec(src);
   }
