@@ -129,17 +129,17 @@ export default function AiEngineeringGuidePage() {
        * <style precedence> が遷移後も <head> に残存しても他ページへ波及しないようにする。
        */}
       <style href="ai-engineering-guide-page-overrides" precedence="default">{`
-        body:has([data-testid="layout-root"]) {
+        body:has([data-testid="layout-root"][data-page="ai-engineering-guide"]) {
           background: #f7f2e7 !important;
         }
-        body:has([data-testid="layout-root"]) .ch-disclaimer {
+        body:has([data-testid="layout-root"][data-page="ai-engineering-guide"]) .ch-disclaimer {
           background-color: #120e04 !important;
           border-bottom: none !important;
           box-shadow: none !important;
           backdrop-filter: none !important;
           -webkit-backdrop-filter: none !important;
         }
-        body:has([data-testid="layout-root"]) #common-header {
+        body:has([data-testid="layout-root"][data-page="ai-engineering-guide"]) #common-header {
           background-color: #05080f !important;
           backdrop-filter: none !important;
           -webkit-backdrop-filter: none !important;

@@ -368,13 +368,13 @@ describe("AI Engineering 入門ガイド契約テスト", () => {
     it("Q-3: 見出し階層が飛ばない（h1 → h2 → h3）", () => {
       const { container } = render(<Page />);
       const headings = Array.from(container.querySelectorAll("h1, h2, h3, h4, h5, h6"));
-      let maxLevelSeen = 0;
+      let previousLevel = 0;
       for (const h of headings) {
         const level = parseInt(h.tagName.substring(1), 10);
-        if (maxLevelSeen > 0) {
-          expect(level - maxLevelSeen).toBeLessThanOrEqual(1);
+        if (previousLevel > 0) {
+          expect(level - previousLevel).toBeLessThanOrEqual(1);
         }
-        maxLevelSeen = Math.max(maxLevelSeen, level);
+        previousLevel = level;
       }
     });
   });

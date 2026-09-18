@@ -62,10 +62,20 @@ describe("Phase A - SiteHeader root structure", () => {
 // 7 ドロップダウン（Providers / Agent 開発 / 開発プロセス / 運用・品質 / モデル・データ / 推薦書籍 / 資格試験）
 // + Home / What's New / 検索 のフラットリンクへ集約された。Providers のみ 2 段ネストする。
 describe("SiteHeader dropdown rendering", () => {
-  it("renders 7 dropdowns (Providers / Agent 開発 / 開発プロセス / 運用・品質 / モデル・データ / 推薦書籍 / 資格試験)", () => {
+  it("renders 7 dropdowns (Providers / Agent 開発 / 開発プロセス / 運用・品質 / モデル・データ / 推薦書籍 / 資格試験) in order", () => {
     const { container } = render(<SiteHeader pathname="/" />);
     const dropdowns = container.querySelectorAll("li.ch-dropdown");
-    expect(dropdowns.length).toBe(7);
+    expect(
+      Array.from(dropdowns).map((li) => li.querySelector(".ch-dropdown-toggle")?.textContent)
+    ).toEqual([
+      "Providers",
+      "Agent 開発",
+      "開発プロセス",
+      "運用・品質",
+      "モデル・データ",
+      "推薦書籍",
+      "資格試験",
+    ]);
   });
 
   it("each dropdown has a .ch-dropdown-toggle button with aria-haspopup=true", () => {
