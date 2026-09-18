@@ -135,6 +135,25 @@ describe("generative-ai-for-software-development TocObserver - mobile sidebar", 
     expect(sidebar.inert).toBe(true);
   });
 
+  it("closes the open menu and hides the scrim when resizing past the breakpoint to desktop", () => {
+    renderToc();
+    const toggle = document.getElementById("menuToggle") as HTMLButtonElement;
+    const scrim = document.getElementById("scrim") as HTMLElement;
+    const sidebar = document.getElementById("sidebar") as HTMLElement & { inert: boolean };
+
+    fireEvent.click(toggle); // open at mobile width
+    expect(sidebar.classList.contains(styles.open)).toBe(true);
+    expect(scrim.classList.contains(styles.show)).toBe(true);
+
+    setInnerWidth(1200);
+    fireEvent(window, new Event("resize"));
+
+    expect(sidebar.classList.contains(styles.open)).toBe(false);
+    expect(scrim.classList.contains(styles.show)).toBe(false);
+    expect(toggle.getAttribute("aria-expanded")).toBe("false");
+    expect(sidebar.inert).toBe(false);
+  });
+
   it("moves focus to menuToggle instead of trapping it inside the sidebar as it becomes inert", () => {
     renderToc();
     const toggle = document.getElementById("menuToggle") as HTMLButtonElement;

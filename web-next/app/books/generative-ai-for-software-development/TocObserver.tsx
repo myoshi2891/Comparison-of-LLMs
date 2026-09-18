@@ -42,8 +42,16 @@ export default function TocObserver() {
       if (hadFocus) menuToggle?.focus();
     };
 
+    const handleResize = () => {
+      if (window.innerWidth > MOBILE_BREAKPOINT && sidebar?.classList.contains(styles.open)) {
+        closeMenu();
+      } else {
+        syncSidebarInert();
+      }
+    };
+
     syncSidebarInert();
-    window.addEventListener("resize", syncSidebarInert);
+    window.addEventListener("resize", handleResize);
 
     const handleToggle = () => {
       if (sidebar?.classList.contains(styles.open)) {
@@ -156,7 +164,7 @@ export default function TocObserver() {
         a.removeEventListener("click", handleLinkClick);
       }
       window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", syncSidebarInert);
+      window.removeEventListener("resize", handleResize);
       for (const c of checkItems) {
         c.removeEventListener("change", handleCheckboxChange);
       }
