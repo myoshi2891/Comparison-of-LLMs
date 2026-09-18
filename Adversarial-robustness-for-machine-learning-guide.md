@@ -321,7 +321,7 @@ Nicholas Carlini氏(現Anthropic、以前はGoogle DeepMind)は自身のブロ�
 
 ### 8-2 標準化された評価 AutoAttack と RobustBench
 
-こうした「見かけ上の頑健性」を防ぐため、2020年にFrancesco Croce氏とMatthias Hein氏(University of Tübingen)は、複数の攻撃を組み合わせたアンサンブル攻撃 **AutoAttack** と、それを使って公平にモデルを比較する標準ベンチマーク **RobustBench**(robustbench.github.io)を提案しました。RobustBenchは120以上のモデルの評価結果を公開リーダーボードとして管理し、80以上の頑健なモデルをすぐ使えるModel Zooとして提供しています。新しい防御手法を発表する際は、まずこのような標準化された攻撃で自己評価し、可能であれば第三者による再現評価を受けることが、現在の分野のベストプラクティスとされています。
+こうした「見かけ上の頑健性」を防ぐため、2020年にFrancesco Croce氏とMatthias Hein氏(University of Tübingen)は、複数の攻撃を組み合わせたアンサンブル攻撃 **AutoAttack** と、それを使って公平にモデルを比較する標準ベンチマーク **RobustBench**(robustbench.github.io)を提案しました。RobustBenchは多数のモデルの評価結果を公開リーダーボードとして管理し、頑健なモデルをすぐ使えるModel Zooとして提供しています(登録モデル数は日々更新されるため、最新の件数はリーダーボードを直接ご確認ください)。新しい防御手法を発表する際は、まずこのような標準化された攻撃で自己評価し、可能であれば第三者による再現評価を受けることが、現在の分野のベストプラクティスとされています。
 
 ---
 
