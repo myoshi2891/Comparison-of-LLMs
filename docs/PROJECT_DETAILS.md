@@ -13,7 +13,7 @@ LLM-Studies は、単一リポジトリで 2 つの役割を担うプロジェ�
 | 役割 | 内容 | 主な成果物 |
 |---|---|---|
 | AI モデル コスト計算機 | 各社 API / サブスクツールの料金を横断比較する Web アプリ | `pricing.json`, `web-next/out/` |
-| AI ツール導入ガイド群 | Claude Code / OpenAI Codex / GitHub Copilot / Gemini / Antigravity 等の設定・運用ガイド | `web-next/app/**/page.tsx`（84 ページ） |
+| AI ツール導入ガイド群 | Claude Code / OpenAI Codex / GitHub Copilot / Gemini / Antigravity 等の設定・運用ガイド | `web-next/app/**/page.tsx`（80 ガイドページ、ホーム/検索/What's New 等を含む全ルートは 83） |
 
 処理の流れは大きく 2 段階です。
 
@@ -29,7 +29,7 @@ LLM-Studies は、単一リポジトリで 2 つの役割を担うプロジェ�
 | 機能 | 概要 | 実装の中心 |
 |---|---|---|
 | コスト計算機 | API 従量課金モデルとサブスクツールの時間別コストを算出 | `app/page.tsx`, `components/HomePage.tsx`, `lib/cost.ts` |
-| ガイドページ群（84 ページ） | プロバイダー/ツール別の導入・運用ガイド | `app/<provider>/<slug>/page.tsx` |
+| ガイドページ群（80 ページ） | プロバイダー/ツール別の導入・運用ガイド | `app/<provider>/<slug>/page.tsx` |
 | 横断検索 | タイトル/要約/タグの全件部分一致検索、`?q=` `?tag=` で状態共有 | `app/search/`, `lib/search.ts` |
 | What's New | 新着・最近更新ページの一覧 | `app/whats-new/` |
 | RSS フィード | `output: 'export'` 下でも静的生成される RSS 2.0 | `app/rss.xml/route.ts` |
@@ -95,7 +95,7 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    PR["page-registry.ts<br/>全 84 ページのメタデータ SSoT"] --> NAV["ナビゲーション<br/>(nav-links.ts)"]
+    PR["page-registry.ts<br/>全 83 ページのメタデータ SSoT"] --> NAV["ナビゲーション<br/>(nav-links.ts)"]
     PR --> SITEMAP["sitemap.ts"]
     PR --> RSS["/rss.xml"]
     PR --> SEARCH["/search 横断検索"]
@@ -118,7 +118,7 @@ flowchart TD
 | `scraper/src/scraper/tools/` | コーディングツール別スクレイパー（cursor / github_copilot / windsurf / claude_code / jetbrains / openai_codex / google_one / antigravity） |
 | [`web-next/lib/page-registry.ts`](../web-next/lib/page-registry.ts) | 全ページメタデータの SSoT |
 | [`web-next/lib/pricing.ts`](../web-next/lib/pricing.ts) | Zod スキーマ + 型パリティのコンパイル時検証 |
-| `web-next/app/` | App Router のページ実体（コスト計算機ホーム + 84 ガイドページ） |
+| `web-next/app/` | App Router のページ実体（コスト計算機ホーム + 80 ガイドページ + 検索/What's New 等。全 83 ルート） |
 | `web-next/components/site/` | 共通インフラ（`SiteHeader` / `DisclaimerBanner` / `PageFreshness` / `RelatedPages`） |
 | [`web-next/data/pricing.json`](../web-next/data/pricing.json) | ビルド時 static import 用 |
 | [`web-next/public/pricing.json`](../web-next/public/pricing.json) | `/pricing.json` URL 配信用 |

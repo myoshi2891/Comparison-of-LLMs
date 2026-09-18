@@ -25,7 +25,7 @@ LLM-Studies（AI-Model-Cost-Calculator）は、**「AI モデル・コーディ�
 
 ### 2. AI エンジニアリング & ガバナンス ガイドハブ (Studies Hub)
 
-- **90 以上の専門ガイド**: Claude Code, OpenAI Codex, GitHub Copilot, Google Gemini / Antigravity の活用法から、AI ガバナンス（ITIL AI Governance 等）、AI セキュリティ、RAG、マルチモーダル、コンテキストエンジニアリング、CI/CD 自動化、推薦書籍ガイドまでを網羅。
+- **80 の専門ガイド**: Claude Code, OpenAI Codex, GitHub Copilot, Google Gemini / Antigravity の活用法から、AI ガバナンス（ITIL AI Governance 等）、AI セキュリティ、RAG、マルチモーダル、コンテキストエンジニアリング、CI/CD 自動化、推薦書籍ガイドまでを網羅。
 - **100% Faithful 完全移植**: 原本の章立て、詳細な表、コード例、Mermaid 図解、実践チェックリスト、参考文献リンクを完全再現。
 - **快適な読書体験**: 目次スクロール追従（TOC Observer）、シンタックスハイライト、ワンクリックコードコピー、横断検索、What's New、RSS フィード対応。
 
@@ -87,7 +87,7 @@ flowchart LR
     subgraph FRONTEND["⚡ Next.js 16 (SSG: output 'export')"]
         ZOD["Zod 型検証"]
         HOME["app/page.tsx (コスト計算機)"]
-        GUIDES["app/{provider}/* (90+ ガイドページ)"]
+        GUIDES["app/{provider}/* (80 ガイドページ)"]
     end
 
     subgraph CDN["🚀 Netlify CDN"]
@@ -204,7 +204,7 @@ bun run dev
 本リポジトリでは厳格なテスト駆動開発（TDD）と機械的検証を義務付けています。
 
 1. **契約テスト (Contract Tests)**:
-   - 全 90 以上のガイドページに対し、見出し順序の完全一致（`toEqual([...EXPECTED_H2])`）、リンク安全属性、Mermaid 図解描画、コードブロック要素の存在を検証。
+   - 全 80 ガイドページに対し、見出し順序の完全一致（`toEqual([...EXPECTED_H2])`）、リンク安全属性、Mermaid 図解描画、コードブロック要素の存在を検証。
 2. **原本照合監査 (Source Parity Audit)**:
    - 原本 HTML/Markdown からの移植時、内容の脱落を防止するため照合監査スクリプトを実行し `exit code 0` を確認。
    ```bash
