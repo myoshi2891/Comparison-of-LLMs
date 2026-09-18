@@ -388,8 +388,10 @@ function collectHtmlMermaidSources(src) {
     script = scriptRe.exec(src);
   }
 
+  // 非クォートキーは Unicode 識別子（"図解: `...`" 等）も許容する。CJK 見出しをキーに
+  // 使う DIAGRAMS オブジェクトが実在し、ASCII 限定だと該当エントリが監査から漏れる。
   const diagramEntryRe =
-    /(?:["'][^"']+["']|[A-Za-z_$][\w$]*)\s*:\s*(?:`([\s\S]*?)`|'((?:[^'\\]|\\.)*)'|"((?:[^"\\]|\\.)*)")/g;
+    /(?:["'][^"']+["']|[\p{L}_$][\p{L}\p{N}_$]*)\s*:\s*(?:`([\s\S]*?)`|'((?:[^'\\]|\\.)*)'|"((?:[^"\\]|\\.)*)")/gu;
   let entry = diagramEntryRe.exec(src);
   while (entry !== null) {
     const raw = entry[1] ?? (entry[2] ?? entry[3] ?? "")
