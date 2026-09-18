@@ -1,0 +1,2287 @@
+<!doctype html>
+<html lang="ja" translate="no" class="notranslate">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="google" content="notranslate" />
+    <title>
+      AI-Assisted Programming for Web and Machine Learning ―
+      AIと共にコードを書く技術（初学者向け完全ガイド）
+    </title>
+    <style>
+      :root {
+        --bg: #ffffff;
+        --bg-elevated: #f6f8fc;
+        --bg-card: #eef2f8;
+        --border: #d7dee8;
+        --accent: #2f56c8;
+        --accent-soft: #eaf0ff;
+        --text: #16213d;
+        --text-dim: #4c5972;
+        --success: #0f7a52;
+        --success-bg: #e6f7ef;
+        --danger-bg: #fdecee;
+        --danger-border: #d64550;
+        --danger-text: #8a1220;
+        --sidebar-w: 340px;
+        --font-stack:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Kaku Gothic ProN',
+          'Hiragino Sans', 'Yu Gothic UI', 'Meiryo', 'Noto Sans CJK JP', 'Helvetica Neue', Arial,
+          sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        overflow-x: hidden;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--font-stack);
+        line-height: 1.85;
+        font-size: 16px;
+      }
+
+      a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+
+      .layout {
+        display: block;
+      }
+
+      /* ---------- Sidebar ---------- */
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: var(--sidebar-w);
+        height: 100vh;
+        overflow-y: auto;
+        background: var(--bg-elevated);
+        border-right: 1px solid var(--border);
+        padding: 20px 0 40px 0;
+        z-index: 100;
+      }
+      .sidebar-brand {
+        font-weight: 700;
+        font-size: 15px;
+        color: var(--accent);
+        padding: 0 20px 16px 20px;
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 8px;
+      }
+      ul.nav-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+      li.nav-h2 {
+        margin: 0;
+      }
+      li.nav-h2 > a {
+        display: block;
+        font-weight: 600;
+        font-size: 14.5px;
+        color: var(--text);
+        padding: 9px 16px 9px 20px;
+        word-break: keep-all;
+        overflow-wrap: anywhere;
+      }
+      li.nav-h2 > a:hover {
+        background: var(--accent-soft);
+        text-decoration: none;
+      }
+      ul.nav-sub {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+      li.nav-h3 > a {
+        display: block;
+        font-size: 13.5px;
+        color: var(--text-dim);
+        padding: 6px 16px 6px 34px;
+        word-break: keep-all;
+        overflow-wrap: anywhere;
+      }
+      li.nav-h3 > a:hover {
+        background: var(--accent-soft);
+        text-decoration: none;
+      }
+      li.nav-h2.active > a,
+      li.nav-h3.active > a {
+        color: var(--accent);
+        background: var(--accent-soft);
+        font-weight: 700;
+      }
+
+      .sidebar-toggle {
+        display: none;
+        position: fixed;
+        top: 14px;
+        left: 14px;
+        z-index: 200;
+        background: var(--accent);
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        width: 42px;
+        height: 42px;
+        font-size: 20px;
+        cursor: pointer;
+      }
+
+      /* ---------- Main content ---------- */
+      .main {
+        margin-left: var(--sidebar-w);
+        padding: 48px 56px 96px 56px;
+      }
+
+      .hero {
+        margin-bottom: 12px;
+      }
+      .hero h1 {
+        font-size: 34px;
+        line-height: 1.4;
+        margin: 0 0 8px 0;
+        font-weight: 800;
+        color: var(--text);
+      }
+      .hero .hero-sub {
+        font-size: 19px;
+        color: var(--text-dim);
+        font-weight: 500;
+        margin: 0 0 20px 0;
+      }
+      .hero-pills {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 28px;
+      }
+      .pill {
+        background: var(--accent-soft);
+        color: var(--accent);
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        padding: 6px 16px;
+        font-size: 13.5px;
+        font-weight: 600;
+      }
+
+      .lede {
+        background: var(--bg-card);
+        border-left: 4px solid var(--accent);
+        border-radius: 8px;
+        padding: 20px 24px;
+        margin-bottom: 40px;
+        color: var(--text-dim);
+        font-size: 15.5px;
+        line-height: 1.9;
+      }
+
+      .main h2 {
+        font-size: 26px;
+        font-weight: 800;
+        margin: 56px 0 20px 0;
+        padding-top: 8px;
+        border-top: 1px solid var(--border);
+        color: var(--text);
+      }
+      .main h2:first-of-type {
+        border-top: none;
+        margin-top: 0;
+      }
+      .main h3 {
+        font-size: 20px;
+        font-weight: 700;
+        margin: 36px 0 14px 0;
+        color: var(--text);
+      }
+      .main p,
+      .main ul,
+      .main ol {
+        color: var(--text);
+        font-size: 16px;
+      }
+      .main ul,
+      .main ol {
+        padding-left: 28px;
+      }
+      .main li {
+        margin-bottom: 6px;
+      }
+      .main strong {
+        color: var(--text);
+        font-weight: 700;
+      }
+      .main sup {
+        font-size: 0.72em;
+      }
+      .main sup a {
+        color: var(--accent);
+      }
+
+      /* ---------- Tables ---------- */
+      .table-scroll {
+        overflow-x: auto;
+        margin: 20px 0 28px 0;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        font-size: 14.5px;
+      }
+      table th,
+      table td {
+        padding: 10px 14px;
+        text-align: left;
+        border-bottom: 1px solid var(--border);
+        vertical-align: top;
+      }
+      table thead tr.header th {
+        background: var(--bg-card);
+        font-weight: 700;
+        color: var(--text);
+      }
+      table tbody tr.odd {
+        background: var(--bg);
+      }
+      table tbody tr.even {
+        background: var(--bg-elevated);
+      }
+      table tbody tr:last-child td {
+        border-bottom: none;
+      }
+
+      /* ---------- Mermaid ---------- */
+      .mermaid-diagram {
+        width: 100%;
+        display: flex;
+        justify-content: safe center;
+        overflow-x: auto;
+        margin: 28px 0;
+        padding: 12px 0;
+      }
+      .mermaid-diagram svg {
+        flex-shrink: 0;
+        max-width: none;
+      }
+      .mermaid-diagram p {
+        color: inherit;
+        margin: 0;
+      }
+      .mermaid-error {
+        color: var(--danger-text);
+        background: var(--danger-bg);
+        border: 1px solid var(--danger-border);
+        border-radius: 8px;
+        padding: 16px 20px;
+        font-family: monospace;
+        font-size: 13.5px;
+        white-space: pre-wrap;
+        width: 100%;
+      }
+
+      /* ---------- Checklist ---------- */
+      .checklist-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 22px 26px;
+        margin: 24px 0 36px 0;
+      }
+      .checklist-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-weight: 700;
+        font-size: 16.5px;
+        margin-bottom: 14px;
+        color: var(--text);
+      }
+      .checklist-counter {
+        font-size: 13.5px;
+        font-weight: 600;
+        color: var(--accent);
+        background: var(--accent-soft);
+        padding: 4px 12px;
+        border-radius: 999px;
+      }
+      ul.checklist-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+      ul.checklist-list li {
+        margin: 0;
+      }
+      ul.checklist-list label {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 9px 8px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 15px;
+        color: var(--text);
+      }
+      ul.checklist-list label:hover {
+        background: var(--accent-soft);
+      }
+      ul.checklist-list input[type='checkbox'] {
+        appearance: none;
+        -webkit-appearance: none;
+        width: 20px;
+        height: 20px;
+        flex-shrink: 0;
+        border: 2px solid var(--border);
+        border-radius: 5px;
+        background: var(--bg);
+        position: relative;
+        cursor: pointer;
+        margin-top: 1px;
+      }
+      ul.checklist-list input[type='checkbox']:checked {
+        background: var(--accent);
+        border-color: var(--accent);
+      }
+      ul.checklist-list input[type='checkbox']:checked::after {
+        content: '';
+        position: absolute;
+        left: 5px;
+        top: 1px;
+        width: 6px;
+        height: 11px;
+        border: solid white;
+        border-width: 0 2px 2px 0;
+        transform: rotate(45deg);
+      }
+      ul.checklist-list li:has(input:checked) span {
+        text-decoration: line-through;
+        color: var(--text-dim);
+      }
+
+      /* ---------- Reference grid ---------- */
+      .ref-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+        gap: 14px;
+        margin: 20px 0 36px 0;
+      }
+      .ref-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 14px 18px;
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+        min-width: 0;
+      }
+      .ref-badge {
+        flex-shrink: 0;
+        background: var(--accent);
+        color: #fff;
+        font-size: 12px;
+        font-weight: 700;
+        padding: 3px 9px;
+        border-radius: 999px;
+      }
+      .ref-body {
+        min-width: 0;
+        flex: 1;
+      }
+      .ref-text {
+        font-size: 13.8px;
+        color: var(--text);
+        margin-bottom: 6px;
+        overflow-wrap: break-word;
+        word-break: break-word;
+      }
+      a.ref-url {
+        display: block;
+        font-family: 'SFMono-Regular', Consolas, monospace;
+        font-size: 12.5px;
+        color: var(--accent);
+        overflow-wrap: anywhere;
+        word-break: break-all;
+        min-width: 0;
+      }
+
+      /* ---------- Disclaimer ---------- */
+      p.disclaimer {
+        background: var(--bg-elevated);
+        border-left: 4px solid var(--text-dim);
+        border-radius: 8px;
+        padding: 16px 20px;
+        color: var(--text-dim);
+        font-size: 14px;
+        margin: 32px 0;
+      }
+
+      code:not(pre code) {
+        background: var(--bg-card);
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 0.9em;
+        overflow-wrap: break-word;
+        word-break: break-word;
+      }
+
+      /* ---------- Mobile ---------- */
+      @media (max-width: 860px) {
+        .sidebar {
+          transform: translateX(-100%);
+          transition: transform 0.25s ease;
+          width: 82vw;
+          max-width: 340px;
+        }
+        .sidebar.open {
+          transform: translateX(0);
+        }
+        .sidebar-toggle {
+          display: block;
+        }
+        .sidebar-brand {
+          padding-left: 20px;
+        }
+        .main {
+          margin-left: 0;
+          padding: 88px 20px 64px 20px;
+        }
+        .hero h1 {
+          font-size: 26px;
+        }
+        .hero .hero-sub {
+          font-size: 16px;
+        }
+        .ref-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <button class="sidebar-toggle" id="sidebarToggle" aria-label="メニュー">&#9776;</button>
+    <div class="layout">
+      <nav class="sidebar" id="sidebar">
+        <div class="sidebar-brand">AI-Assisted Programming</div>
+        <ul class="nav-list">
+          <li class="nav-h2">
+            <a href="#1-イントロダクションなぜ今ai支援プログラミングを学ぶのか"
+              >1. イントロダクション：なぜ今「AI支援プログラミング」を学ぶのか</a
+            >
+            <ul class="nav-sub">
+              <li class="nav-h3">
+                <a href="#11-このガイドが扱うこと">1.1 このガイドが扱うこと</a>
+              </li>
+              <li class="nav-h3">
+                <a href="#12-vibe-coding-の誕生と変質">1.2 "Vibe Coding" の誕生と変質</a>
+              </li>
+              <li class="nav-h3">
+                <a href="#13-数字で見る変化の速度">1.3 数字で見る変化の速度</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-h2">
+            <a href="#2-基礎知識コーディングアシスタントの仕組みと限界"
+              >2. 基礎知識：コーディングアシスタントの仕組みと限界</a
+            >
+            <ul class="nav-sub">
+              <li class="nav-h3">
+                <a href="#21-llmは賢いが過信しがちなジュニアエンジニア"
+                  >2.1 LLMは「賢いが過信しがちなジュニアエンジニア」</a
+                >
+              </li>
+              <li class="nav-h3">
+                <a href="#22-補完型-vs-チャット型-vs-エージェント型"
+                  >2.2 補完型 vs チャット型 vs エージェント型</a
+                >
+              </li>
+              <li class="nav-h3">
+                <a href="#23-データで見るaiの実力と限界">2.3 データで見るAIの実力と限界</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-h2">
+            <a href="#3-プロンプト戦略とコンテキストエンジニアリング"
+              >3. プロンプト戦略とコンテキストエンジニアリング</a
+            >
+            <ul class="nav-sub">
+              <li class="nav-h3">
+                <a href="#31-プロンプトエンジニアリングの基本"
+                  >3.1 プロンプトエンジニアリングの基本</a
+                >
+              </li>
+              <li class="nav-h3">
+                <a href="#32-プロンプトエンジニアリングからコンテキストエンジニアリングへ"
+                  >3.2 プロンプトエンジニアリングからコンテキストエンジニアリングへ</a
+                >
+              </li>
+            </ul>
+          </li>
+          <li class="nav-h2">
+            <a href="#4-2026年の主要ツールとmcpmodel-context-protocol"
+              >4. 2026年の主要ツールとMCP（Model Context Protocol）</a
+            >
+            <ul class="nav-sub">
+              <li class="nav-h3">
+                <a href="#41-主要コーディングエージェントの比較"
+                  >4.1 主要コーディングエージェントの比較</a
+                >
+              </li>
+              <li class="nav-h3">
+                <a href="#42-claude-codeの基本ワークフロー">4.2 Claude Codeの基本ワークフロー</a>
+              </li>
+              <li class="nav-h3">
+                <a href="#43-mcpmodel-context-protocol-ツール接続の共通規格"
+                  >4.3 MCP（Model Context Protocol）― ツール接続の共通規格</a
+                >
+              </li>
+            </ul>
+          </li>
+          <li class="nav-h2">
+            <a href="#5-vibe-codingからagentic-engineeringへ開発ワークフローの設計"
+              >5. Vibe CodingからAgentic Engineeringへ：開発ワークフローの設計</a
+            >
+            <ul class="nav-sub">
+              <li class="nav-h3">
+                <a href="#51-explore--plan--code--commit">5.1 Explore → Plan → Code → Commit</a>
+              </li>
+              <li class="nav-h3">
+                <a href="#52-アンドリューングの3つのループ"
+                  >5.2 アンドリュー・ングの「3つのループ」</a
+                >
+              </li>
+              <li class="nav-h3">
+                <a href="#53-用語の変遷vibe-coding--vibe-engineering--agentic-engineering"
+                  >5.3 用語の変遷：Vibe Coding → Vibe Engineering → Agentic Engineering</a
+                >
+              </li>
+            </ul>
+          </li>
+          <li class="nav-h2">
+            <a href="#6-webフロントエンド開発とai支援htmlcssjavascript"
+              >6. Webフロントエンド開発とAI支援：HTML/CSS/JavaScript</a
+            >
+            <ul class="nav-sub">
+              <li class="nav-h3">
+                <a href="#61-ビジネス課題からの機能分解">6.1 ビジネス課題からの機能分解</a>
+              </li>
+              <li class="nav-h3">
+                <a href="#62-2026年時点のフロントエンド生成ツールの位置づけ"
+                  >6.2 2026年時点のフロントエンド生成ツールの位置づけ</a
+                >
+              </li>
+            </ul>
+          </li>
+          <li class="nav-h2">
+            <a href="#7-バックエンドとapi開発ai支援によるweb-api構築"
+              >7. バックエンドとAPI開発：AI支援によるWeb API構築</a
+            >
+            <ul class="nav-sub">
+              <li class="nav-h3">
+                <a href="#71-ai支援でのapi設計の進め方">7.1 AI支援でのAPI設計の進め方</a>
+              </li>
+              <li class="nav-h3">
+                <a href="#72-バックエンド固有の落とし穴">7.2 バックエンド固有の落とし穴</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-h2">
+            <a href="#8-機械学習ワークフローとai支援データ探索からモデル構築まで"
+              >8. 機械学習ワークフローとAI支援：データ探索からモデル構築まで</a
+            >
+            <ul class="nav-sub">
+              <li class="nav-h3">
+                <a href="#81-jupyterノートブックと-ai-アシスタントの相性"
+                  >8.1 Jupyterノートブックと AI アシスタントの相性</a
+                >
+              </li>
+              <li class="nav-h3">
+                <a href="#82-プロンプト戦略をml向けに応用する"
+                  >8.2 プロンプト戦略をML向けに応用する</a
+                >
+              </li>
+            </ul>
+          </li>
+          <li class="nav-h2">
+            <a href="#9-モデル構築とチューニングaiとの協働による実験サイクル"
+              >9. モデル構築とチューニング：AIとの協働による実験サイクル</a
+            >
+            <ul class="nav-sub">
+              <li class="nav-h3">
+                <a href="#91-モデル構築を反復ループとして捉える"
+                  >9.1 モデル構築を反復ループとして捉える</a
+                >
+              </li>
+              <li class="nav-h3">
+                <a href="#92-実験管理におけるaiの役割分担">9.2 実験管理におけるAIの役割分担</a>
+              </li>
+              <li class="nav-h3">
+                <a href="#93-onnxなど本番環境への橋渡し">9.3 ONNXなど本番環境への橋渡し</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-h2">
+            <a href="#10-テストと品質保証ai生成コードを信頼できるものにする"
+              >10. テストと品質保証：AI生成コードを信頼できるものにする</a
+            >
+            <ul class="nav-sub">
+              <li class="nav-h3">
+                <a href="#101-テストを書き換えるジニー問題"
+                  >10.1 「テストを書き換えるジニー」問題</a
+                >
+              </li>
+              <li class="nav-h3">
+                <a href="#102-オズマニの常に読み実行しテストする原則"
+                  >10.2 オズマニの「常に読み・実行し・テストする」原則</a
+                >
+              </li>
+              <li class="nav-h3"><a href="#103-テスト戦略の全体像">10.3 テスト戦略の全体像</a></li>
+            </ul>
+          </li>
+          <li class="nav-h2">
+            <a href="#11-セキュリティとリスク管理">11. セキュリティとリスク管理</a>
+            <ul class="nav-sub">
+              <li class="nav-h3">
+                <a href="#111-ai生成コードの脆弱性率">11.1 AI生成コードの脆弱性率</a>
+              </li>
+              <li class="nav-h3">
+                <a href="#112-エージェント特有の新しいリスク"
+                  >11.2 エージェント特有の新しいリスク</a
+                >
+              </li>
+              <li class="nav-h3">
+                <a href="#113-初学者が今日からできる防御策">11.3 初学者が今日からできる防御策</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-h2">
+            <a href="#12-エージェントとマルチエージェントシステムの基礎"
+              >12. エージェントとマルチエージェントシステムの基礎</a
+            >
+            <ul class="nav-sub">
+              <li class="nav-h3">
+                <a href="#121-ワークフローとエージェントの違い"
+                  >12.1 「ワークフロー」と「エージェント」の違い</a
+                >
+              </li>
+              <li class="nav-h3">
+                <a href="#122-アンドリューングの4つのエージェント的デザインパターン"
+                  >12.2 アンドリュー・ングの4つのエージェント的デザインパターン</a
+                >
+              </li>
+              <li class="nav-h3">
+                <a href="#123-claude-codeにおけるサブエージェント"
+                  >12.3 Claude Codeにおけるサブエージェント</a
+                >
+              </li>
+            </ul>
+          </li>
+          <li class="nav-h2">
+            <a href="#13-実務への統合チーム開発ガバナンスそしてこれから"
+              >13. 実務への統合：チーム開発・ガバナンス、そしてこれから</a
+            >
+            <ul class="nav-sub">
+              <li class="nav-h3"><a href="#131-チームでの設定共有">13.1 チームでの設定共有</a></li>
+              <li class="nav-h3">
+                <a href="#132-組織的なガバナンスの要点">13.2 組織的なガバナンスの要点</a>
+              </li>
+              <li class="nav-h3">
+                <a href="#133-これからの展望長時間稼働エージェントとshaping-the-build"
+                  >13.3 これからの展望：長時間稼働エージェントと「Shaping the Build」</a
+                >
+              </li>
+            </ul>
+          </li>
+          <li class="nav-h2">
+            <a href="#14-まとめと実践チェックリスト">14. まとめと実践チェックリスト</a>
+            <ul class="nav-sub"></ul>
+          </li>
+          <li class="nav-h2">
+            <a href="#参考文献">参考文献</a>
+            <ul class="nav-sub"></ul>
+          </li>
+        </ul>
+      </nav>
+      <main class="main">
+        <div class="hero">
+          <h1>AI-Assisted Programming for Web and Machine Learning</h1>
+          <p class="hero-sub">AIと共にコードを書く技術（初学者向け完全ガイド）</p>
+          <div class="hero-pills">
+            <span class="pill">全14章</span>
+            <span class="pill">図解12点</span>
+            <span class="pill">参考文献29件</span>
+            <span class="pill">2026年9月時点</span>
+          </div>
+        </div>
+        <div class="lede">
+          本ガイドは、O'Reilly/Packt刊『AI-Assisted Programming for Web and Machine
+          Learning』（Christoffer Noring, Anjali Jain, Marina Fernandez, Ayşe Mutlu, Ajit Jaokar
+          著、2024年8月刊）<sup>[20]</sup>を出発点としつつ、同書が扱うプロンプト戦略・Web開発・機械学習という3本柱を土台に、2026年9月時点の最新ツール（GitHub
+          Copilot Agent Mode、Cursor、Claude Code、Model Context Protocol
+          など）と著名な開発者の知見を反映して独自に再構成した、書籍非依存の入門教材です。AI支援プログラミングは変化が非常に速い分野のため、本文中の製品名・数値・URLは執筆時点（2026年9月）のものである点にご留意ください。
+        </div>
+
+        <h2 id="1-イントロダクションなぜ今ai支援プログラミングを学ぶのか">
+          1. イントロダクション：なぜ今「AI支援プログラミング」を学ぶのか
+        </h2>
+        <h3 id="11-このガイドが扱うこと">1.1 このガイドが扱うこと</h3>
+        <p>
+          「AI支援プログラミング（AI-Assisted Programming）」とは、GitHub CopilotやClaude
+          Code、ChatGPTのような大規模言語モデル（LLM）ベースのツールを使い、コードの生成・編集・テスト・保守を人間とAIが協働して行う開発スタイルを指します。土台となった書籍は、GitHub
+          CopilotとChatGPTを軸に、Web開発（HTML/CSS/JavaScript/Flask
+          API）と機械学習（ChatGPTによるデータ探索・分類・回帰・MLPやCNNの構築）の両方をプロンプト戦略（TAG・PIC・LIFEという3つのプロンプトパターン）で貫く、という構成を取っていました<sup>[20]</sup>。
+        </p>
+        <p>
+          しかし2024年8月の刊行から2026年9月の現在までの2年間で、この分野の景色は一変しました。当時は「Copilotが提案したコードを人間が読んで受け入れる」という補完型のワークフローが主流でしたが、現在では「AIエージェントが自律的に複数ファイルを編集し、ターミナルコマンドを実行し、テストが通るまで自己修正を繰り返す」という<strong>エージェント型</strong>のワークフローが標準になりつつあります。本ガイドは、この変化を踏まえて全体を再構成し、初学者が2026年時点の実務に即した形でAI支援プログラミングを学べるようにしたものです。
+        </p>
+        <h3 id="12-vibe-coding-の誕生と変質">1.2 "Vibe Coding" の誕生と変質</h3>
+        <p>
+          2025年2月、著名なAI研究者アンドレイ・カルパシー（Andrej Karpathy、元Tesla
+          AI部門責任者）はX（旧Twitter）に「vibe
+          coding」という言葉を投稿しました。彼はこれを「バイブスに完全に身を委ね、指数関数的な進化を受け入れ、コードが存在することすら忘れる」新しい種類のコーディングだと表現しました<sup>[1]</sup>。この投稿は一夜にして広まり、「思いつきで自然言語をAIに投げれば動くコードができる」という開発スタイルの代名詞になりました。
+        </p>
+        <p>
+          しかし1年余りが経過した2026年、カルパシー自身がこの用語の変質を振り返っています。「今日（1年後）、LLMエージェントによるプログラミングは、より多くの監視と精査を伴いながらも、プロフェッショナルのデフォルトのワークフローになりつつある」と述べ、自らこの新しい段階を「agentic
+          engineering（エージェント的エンジニアリング）」と呼ぶことを提案しました<sup>[3]</sup>。
+        </p>
+        <p>
+          これと並行して、Djangoの共同作者でありDatasetteの開発者でもあるサイモン・ウィリソン（Simon
+          Willison）は2025年10月、「vibe
+          coding」を「サイコロを振るように無責任にソフトウェアを作ること」と定義し直した上で、対極にある「トップクラスのエンジニアが責任を持ってAIツールを活用する働き方」を指す言葉として<strong
+            >vibe engineering</strong
+          >を提案しました<sup>[2]</sup>。彼が挙げる実践項目は目新しいものではなく、バージョン管理、自動テスト、コードレビュー、計画立案、仕様書作成、可観測性といった、従来からソフトウェア工学を機能させてきた実践そのものです<sup>[2]</sup>。2026年2月時点では、同じ概念を指す言葉として「agentic
+          engineering」の方が定着しつつあると報告されています<sup>[2]</sup>。
+        </p>
+        <div class="mermaid-diagram" id="mermaid-diagram-0"></div>
+        <h3 id="13-数字で見る変化の速度">1.3 数字で見る変化の速度</h3>
+        <p>
+          普及の速さを示す数字として、Anthropic自身が2025年10月〜2026年4月の約6か月間に収集した約40万件のClaude
+          Codeセッションを分析した調査では、「コーディングエージェントの活動があるGitHubプロジェクトの割合は2025年後半以降に2倍以上に増加した」こと、そして「Claude
+          Codeユーザーは平均して週20時間このツールを使用している」ことが報告されています<sup>[9]</sup>。また、AI開発教育で著名なアンドリュー・ング（Andrew
+          Ng）は2026年9月4日、1万件超の求人情報分析に基づき「AIエンジニアリング・スキルマップ」を公開し、「コーディングエージェントを使いこなすスキル」を主要4スキルの1つに位置づけています<sup>[13]</sup>。
+        </p>
+        <p>
+          一方で、こうした急速な普及には影の側面もあります。詳細は第11章で扱いますが、AIが生成したコードの安全性検証は依然として大きな課題であり続けています<sup
+            >[15]</sup
+          ><sup>[16]</sup
+          ><sup>[17]</sup
+          >。本ガイドは、この「速さ」と「責任」の両方を初学者に伝えることを目指します。
+        </p>
+
+        <h2 id="2-基礎知識コーディングアシスタントの仕組みと限界">
+          2. 基礎知識：コーディングアシスタントの仕組みと限界
+        </h2>
+        <h3 id="21-llmは賢いが過信しがちなジュニアエンジニア">
+          2.1 LLMは「賢いが過信しがちなジュニアエンジニア」
+        </h3>
+        <p>
+          Google
+          Chromeチームのエンジニアリングリーダーであり著名な開発者ブロガーでもあるアディ・オズマニ（Addy
+          Osmani）は、2026年に向けたLLMコーディングワークフローの記事の中で、ウィリソンの言葉を引用しつつ次のように述べています。「LLMのペアプログラマーを『自信過剰でミスをしがちな存在』として扱うべきだ。完全な確信を持ってコードを書くが、そこにはバグやナンセンスが含まれていることがあり、自分でそれを指摘しない限り、間違いを教えてくれることはない」<sup>[4]</sup>。オズマニは、AIが生成したすべてのスニペットを「まるでジュニア開発者から提出されたコードであるかのように」読み、実行し、テストすることを自らの鉄則としています<sup>[4]</sup>。
+        </p>
+        <p>
+          同時にオズマニは、皮肉な逆説にも言及しています。「システム設計、複雑さの管理、何を自動化し何を手作業に残すかの判断力など、シニアエンジニアをシニアたらしめてきたほぼすべての能力が、今やAIとの協働において最良の結果を生む要素になっている」<sup>[4]</sup>。つまりAIは経験の浅い開発者の代わりにはならず、むしろ経験豊富な開発者の生産性を大きく増幅する道具だ、という理解が2026年時点でのコンセンサスになりつつあります。
+        </p>
+        <h3 id="22-補完型-vs-チャット型-vs-エージェント型">
+          2.2 補完型 vs チャット型 vs エージェント型
+        </h3>
+        <p>
+          コーディングアシスタントは大きく4つの動作モードに分類できます。GitHub
+          Copilotを例に取ると、2026年時点でVS
+          Code上には「Ask（質問）」「Edit（編集）」「Agent（エージェント）」という3つの明確なモードがあり、さらにGitHubのサーバー側で非同期に動く「Coding
+          Agent（コーディングエージェント）」が加わります<sup>[22], [21]</sup>。このAgent
+          Modeは2025年2月、GitHubがMicrosoft創業50周年に合わせて発表した機能拡張の一部として発表されたもので、Copilotを「コード補完ツール」から「エージェント的な開発パートナー」へと転換させる契機になりました<sup>[10]</sup>。MCP（Model
+          Context Protocol）対応はその後段階的に展開され、2025年7月にVS
+          Code版が一般提供となり、2025年8月にはJetBrains・Eclipse・Xcode版でも一般提供されています<sup
+            >[28], [29]</sup
+          >。
+        </p>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr class="header header">
+                <th>モード</th>
+                <th>典型例</th>
+                <th>動作の特徴</th>
+                <th>人間の関与度</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="odd odd">
+                <td>インライン補完</td>
+                <td>Copilot 従来型補完</td>
+                <td>カーソル位置の続きを提案。1行〜数行単位</td>
+                <td>高い（毎回Tabで採否判断）</td>
+              </tr>
+              <tr class="even even">
+                <td>チャット / Ask</td>
+                <td>Copilot Chat、ChatGPT</td>
+                <td>質問への回答・コード片の生成。適用は手動</td>
+                <td>高い</td>
+              </tr>
+              <tr class="odd odd">
+                <td>エージェントモード（Edit/Agent）</td>
+                <td>Copilot Agent Mode、Cursor Agent、Claude Code</td>
+                <td>
+                  複数ファイルを横断編集し、ターミナルを実行し、失敗したら自己修正して反復する<sup
+                    >[22]</sup
+                  >
+                </td>
+                <td>中程度（計画・レビューで監督）</td>
+              </tr>
+              <tr class="even even">
+                <td>自律バックグラウンドエージェント</td>
+                <td>GitHub Coding Agent、Claude Codeの非同期セッション</td>
+                <td>
+                  Issueを渡すと、独立して調査・実装・PR作成まで行い、後で結果を確認する<sup
+                    >[22]</sup
+                  >
+                </td>
+                <td>低い（結果レビューが中心）</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="mermaid-diagram" id="mermaid-diagram-1"></div>
+        <p>
+          このように、モードが右（自律側）に進むほど、人間の役割は「タイピング」から「方向づけとレビュー」へと移っていきます。第5章で扱う「Vibe
+          CodingからAgentic
+          Engineeringへ」という変化は、まさにこのモードの重心移動と対応しています。
+        </p>
+        <h3 id="23-データで見るaiの実力と限界">2.3 データで見るAIの実力と限界</h3>
+        <p>
+          Anthropicの内部調査によれば、Claude
+          Codeを使った典型的なセッションでは、「人間がほとんどの計画判断（何をするか）を行い、Claudeがほとんどの実行判断（どうやるか）を行う」傾向があり、また「ドメイン知識を多く持つ人ほど、1回の指示あたりでClaudeに任せる作業量が多くなる」ことが分かっています<sup>[9]</sup>。同調査では、コーディングタスクにおいて、正式なプログラミング経験を持たない職種の人であっても、テストの通過や実際にコミットされた成果物といった検証可能な証拠に基づいて、ソフトウェアエンジニアとほぼ同じ成功率でタスクを達成できていると報告されています<sup>[9]</sup>。これは「経験があるほど良い」という原則と同時に、「適切な監督があれば非エンジニアでも実務レベルの成果を出せる」という、この分野の民主化の側面も示しています。
+        </p>
+
+        <h2 id="3-プロンプト戦略とコンテキストエンジニアリング">
+          3. プロンプト戦略とコンテキストエンジニアリング
+        </h2>
+        <h3 id="31-プロンプトエンジニアリングの基本">3.1 プロンプトエンジニアリングの基本</h3>
+        <p>
+          Anthropicの公式ドキュメントでは、プロンプトエンジニアリングを「AIモデルから望む出力を得るために、指示を注意深く設計するプロセス」と定義し、明確さ、具体例（multishot
+          prompting）、XMLタグによる構造化、思考の連鎖（chain of thought）、役割設定（role
+          prompting）といった技法を中核として挙げています<sup>[8]</sup>。土台となった書籍では、この基本を踏まえた上で、独自の3つのプロンプトパターン（TAG:
+          Task-Action-Guideline、PIC: Persona-Instruction-Context、LIFE:
+          Learn-Improvise-Feedback-Evaluate）を提案し、Web開発とデータサイエンスのそれぞれで使い分けることを推奨していました<sup>[20]</sup>。これらのパターンは今なお「タスクを分解し、役割を与え、反復的に検証する」という普遍的な考え方として有効です。
+        </p>
+        <p>以下は、この考え方を2026年の実務に合わせて整理した基本パターンです。</p>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr class="header header">
+                <th>要素</th>
+                <th>説明</th>
+                <th>具体例</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="odd odd">
+                <td>タスク（Task）</td>
+                <td>何を達成したいかを明確に述べる</td>
+                <td>「ユーザー登録フォームのバリデーションを実装する」</td>
+              </tr>
+              <tr class="even even">
+                <td>制約・ガイドライン（Guideline）</td>
+                <td>守るべきルールや技術スタックを指定する</td>
+                <td>「TypeScript、Zodでのスキーマ検証を使うこと」</td>
+              </tr>
+              <tr class="odd odd">
+                <td>コンテキスト（Context）</td>
+                <td>既存コードや業務ドメインの情報を与える</td>
+                <td>関連ファイルの内容、データベーススキーマ</td>
+              </tr>
+              <tr class="even even">
+                <td>検証基準（Evaluation）</td>
+                <td>成功と判断する基準を先に示す</td>
+                <td>「既存のテストスイートがすべて通ること」</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <h3 id="32-プロンプトエンジニアリングからコンテキストエンジニアリングへ">
+          3.2 プロンプトエンジニアリングからコンテキストエンジニアリングへ
+        </h3>
+        <p>
+          2026年に入り、実務上より重要視されているのが「コンテキストエンジニアリング」という考え方です。Anthropicはブログ記事「Effective
+          context engineering for AI
+          agents」の中で、これを次のように説明しています。「コンテキストエンジニアリングとは、LLMの推論中に最適なトークン（情報）の集合を選定し維持するための一連の戦略を指し、プロンプト以外の場所から入ってくるあらゆる情報を含む」<sup>[6]</sup>。プロンプトエンジニアリングが「何を書くか」に焦点を当てるのに対し、コンテキストエンジニアリングは「エージェントがその時点で見ているトークン全体の状態をどう設計するか」という、より広い問題を扱います<sup>[6]</sup>。
+        </p>
+        <p>
+          この記事はさらに、LLMには「アテンション予算」があり、コンテキストに詰め込む情報が増えるほど、モデルが特定の情報を正確に思い出す能力が低下していく「コンテキスト・ロット（context
+          rot）」という現象が起きることを指摘しています<sup>[6]</sup>。したがって、長時間稼働するエージェントを設計する際には、単にコンテキストウィンドウを大きくするのではなく、以下のような戦略で情報を整理する必要があります。
+        </p>
+        <div class="mermaid-diagram" id="mermaid-diagram-2"></div>
+        <p>
+          初学者にとって重要な実践は、「1回の指示に全てを詰め込もうとしない」ことです。オズマニも「AIに願望だけを投げるのではなく、まず問題を定義し、解決策を計画することから始めるべきだ」と述べており、曖昧なプロンプトからいきなりコード生成に飛びつくことを典型的な失敗パターンとして挙げています<sup>[4]</sup>。
+        </p>
+
+        <h2 id="4-2026年の主要ツールとmcpmodel-context-protocol">
+          4. 2026年の主要ツールとMCP（Model Context Protocol）
+        </h2>
+        <h3 id="41-主要コーディングエージェントの比較">4.1 主要コーディングエージェントの比較</h3>
+        <p>
+          2026年9月時点で広く使われている代表的なツールを整理すると、以下のようになります。それぞれ進化の速度が非常に速いため、正確な機能一覧は各公式ドキュメントを都度確認することが推奨されます。
+        </p>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr class="header header">
+                <th>ツール</th>
+                <th>提供元</th>
+                <th>主な形態</th>
+                <th>特徴</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="odd odd">
+                <td>GitHub Copilot（Agent Mode / Coding Agent）</td>
+                <td>GitHub / Microsoft</td>
+                <td>IDE拡張＋CLI＋クラウド</td>
+                <td>
+                  VS Code / JetBrains でAgent
+                  Modeが一般提供。Issueを渡すと自律的にPRを作成するCoding Agentも提供<sup
+                    >[22], [21]</sup
+                  >
+                </td>
+              </tr>
+              <tr class="even even">
+                <td>Cursor</td>
+                <td>Anysphere</td>
+                <td>AIネイティブIDE（VS Codeフォーク）</td>
+                <td>
+                  コードベース全体のインデックスに強み。Claude・GPT系など複数モデルを切り替え可能<sup
+                    >[24]</sup
+                  >
+                </td>
+              </tr>
+              <tr class="odd odd">
+                <td>Claude Code</td>
+                <td>Anthropic</td>
+                <td>ターミナル常駐のCLIエージェント</td>
+                <td>
+                  ファイルシステムとコマンド実行への直接アクセスを持つ「エージェント的コーディング」向けCLI<sup
+                    >[7]</sup
+                  >
+                </td>
+              </tr>
+              <tr class="even even">
+                <td>Codex CLI / Gemini CLI</td>
+                <td>OpenAI / Google</td>
+                <td>ターミナル常駐のCLIエージェント</td>
+                <td>Claude Codeと同様の思想を持つ競合CLIツール群</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          これらのツールに共通するのは、「単なる自動補完」から「計画→実行→検証→反復」というループを自律的に回せる「エージェント」へと進化した点です。Agent
+          Mode自体はVS
+          Codeで2025年4月、JetBrainsで2025年7月に一般提供済みですが、GitHubは2026年3月の更新で、カスタムエージェントやサブエージェント、プランモードをJetBrainsにも展開し、これらの機能がJetBrainsでもGA（一般提供）に達したと発表しています<sup>[21]</sup>。
+        </p>
+        <h3 id="42-claude-codeの基本ワークフロー">4.2 Claude Codeの基本ワークフロー</h3>
+        <p>
+          Anthropicの公式ドキュメント「Best practices for Claude
+          Code」では、コードベースのルート（またはサブディレクトリ）に置く<code>CLAUDE.md</code>というメモリファイルによって、プロジェクト固有のビルドコマンドやコーディング規約、テスト方法をエージェントに恒常的に伝える方法が紹介されています<sup>[7]</sup>。また、「Writer/Reviewerパターン」（一方のセッションにコードを書かせ、まっさらなコンテキストを持つ別のセッションにレビューさせる）のように、複数のセッションを並行して走らせることで、レビューの質を高める手法も紹介されています<sup>[7]</sup>。
+        </p>
+        <h3 id="43-mcpmodel-context-protocol-ツール接続の共通規格">
+          4.3 MCP（Model Context Protocol）― ツール接続の共通規格
+        </h3>
+        <p>
+          AIエージェントが外部のデータソースやツール（ファイルシステム、データベース、Slack、GitHubなど）に接続する方法は、かつてはツールごとに個別の統合コードを書く必要がありました。Anthropicは2024年11月、この「M個のモデル
+          × N個のツール」という組み合わせ爆発の問題を解消するため、オープンな標準規格として**Model
+          Context Protocol（MCP）**を公開しました<sup>[18]</sup>。
+        </p>
+        <p>
+          MCPはホスト・クライアント・サーバーという3層構造を取り、サーバー側がツール・リソース・プロンプトを公開し、クライアント側がそれを呼び出す、という単純な契約に基づいています<sup>[19]</sup>。2025年を通じてOpenAIのAgents
+          SDKやGoogleのGemini API、VS Code
+          Copilotなどが次々とMCPサポートを追加し、2025年12月にはAnthropicがMCPをLinux
+          Foundation傘下の「Agentic AI
+          Foundation」に寄贈し、特定企業に依存しないベンダーニュートラルな標準に移行しています<sup>[18]</sup>。
+        </p>
+        <div class="mermaid-diagram" id="mermaid-diagram-3"></div>
+        <p>
+          ウィリソンは2026年7月末、より軽量な「Stateless
+          MCP」（2026-07-28版仕様）についてのブログ記事の中で、MCPが「LLMベースのエージェントフレームワークに新しいツールを公開するための標準的な方法を記述するプロトコル」であり、2024年11月の導入以降2025年を通じて大きな関心の高まりを見せてきたと振り返っています<sup>[19]</sup>。初学者向けの要点は、「MCPサーバーを1つ書けば、Claude
+          Code・Cursor・ChatGPTなど複数のホストから同じツールを再利用できる」という点にあります。
+        </p>
+
+        <h2 id="5-vibe-codingからagentic-engineeringへ開発ワークフローの設計">
+          5. Vibe CodingからAgentic Engineeringへ：開発ワークフローの設計
+        </h2>
+        <h3 id="51-explore--plan--code--commit">5.1 Explore → Plan → Code → Commit</h3>
+        <p>
+          Anthropicの公式ベストプラクティスでは、Claude
+          Codeで生産的な結果を得るための代表的なワークフローとして「まずファイルを読ませて計画を立てさせ、コードは書かせない」ことから始める、という手順が紹介されています<sup>[7]</sup>。これは一般に「Explore
+          → Plan → Code → Commit」という4段階のループとして整理されます。
+        </p>
+        <div class="mermaid-diagram" id="mermaid-diagram-4"></div>
+        <p>
+          このループの核心は、「計画」と「実装」を明確に分離することです。ケント・ベック（Kent
+          Beck、Extreme
+          Programmingの考案者でありTDDの先駆者）は、AIエージェントとの協働についてのインタビューで、AIエージェントを「予測不能なジニー（魔神）」に例え、「ジニーはTDDをやりたがらない。コードを先に書いて、それに通るテストを後から書きたがるのだ」と述べています<sup>[11]</sup>。この指摘は、計画とテストを先に固定しておかないと、エージェントが「テストを通す」という目標を、テストコードの改ざんによって"達成"してしまう危険性を示しています（詳細は第10章）。
+        </p>
+        <h3 id="52-アンドリューングの3つのループ">5.2 アンドリュー・ングの「3つのループ」</h3>
+        <p>
+          アンドリュー・ングは2026年6月30日付のニュースレター『The
+          Batch』で、AIエージェントを用いたプロダクト開発を3つの入れ子になったループとして整理しました<sup>[14]</sup>。
+        </p>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr class="header header">
+                <th>ループ</th>
+                <th>内容</th>
+                <th>主な担い手</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="odd odd">
+                <td>エージェント的コーディングループ</td>
+                <td>
+                  プロダクト仕様（と可能であれば評価データセット）を与え、条件を満たすまでエージェントに作業を継続させる
+                </td>
+                <td>AIエージェント（人間は監督）</td>
+              </tr>
+              <tr class="even even">
+                <td>開発者フィードバックループ</td>
+                <td>数時間〜数日単位でレビューし、仕様を更新する</td>
+                <td>人間の開発者</td>
+              </tr>
+              <tr class="odd odd">
+                <td>外部フィードバックループ</td>
+                <td>実ユーザーからの反応をプロダクトの方向性に反映する</td>
+                <td>人間（プロダクトチーム）</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          ングは「人間がAIの知らない何かを知っている限り、その知識をシステムに注入するためにヒューマン・イン・ザ・ループが必要であり続ける」と述べており<sup>[14]</sup>、AIによる自動化が進んでも、外側のループにおける人間の役割は消えないことを強調しています。
+        </p>
+        <h3 id="53-用語の変遷vibe-coding--vibe-engineering--agentic-engineering">
+          5.3 用語の変遷：Vibe Coding → Vibe Engineering → Agentic Engineering
+        </h3>
+        <p>
+          ここまでの内容を統合すると、2025年から2026年にかけての用語の変遷は、単なる呼び方の違いではなく、「AIにどこまでの裁量を与え、人間がどこで責任を持って監督するか」という実務上の設計判断の違いを反映しています。ウィリソンは自身のニュースレター「Agentic
+          Engineering Patterns」の中で、「red/green
+          TDD」「まずテストを実行する」「自分のできることを蓄積する」といったパターンに名前を与える取り組みを、オブジェクト指向プログラミングにおけるGoFの『デザインパターン』本になぞらえています<sup>[12]</sup>。これは、既にAI支援開発を実践している人々が独立に到達していた慣行に、共有できる語彙を与える試みだと説明されています<sup>[12]</sup>。
+        </p>
+        <p>
+          初学者にとっての実務的な教訓は、「使い捨てのプロトタイプであればVibe
+          Codingでよいが、本番運用するソフトウェアには必ずテスト・計画・レビューという“これまでソフトウェア工学を機能させてきた実践”を組み合わせる」という一点に集約されます<sup
+            >[2], [4]</sup
+          >。
+        </p>
+
+        <h2 id="6-webフロントエンド開発とai支援htmlcssjavascript">
+          6. Webフロントエンド開発とAI支援：HTML/CSS/JavaScript
+        </h2>
+        <h3 id="61-ビジネス課題からの機能分解">6.1 ビジネス課題からの機能分解</h3>
+        <p>
+          土台となった書籍は、架空のEコマースサイトを題材に、HTML→CSS→JavaScript→レスポンシブ対応→バックエンドという順序でAI支援開発を進める構成を取っていました<sup>[20]</sup>。この「大きな問題を機能単位に分解し、機能ごとにAIへプロンプトを与える」という考え方は、2026年のエージェント型ツールでも変わらず有効な出発点です。むしろエージェントが複数ファイルを横断編集できるようになった分、最初の機能分解と優先順位づけの質が、最終的な成果物の質を大きく左右するようになっています。
+        </p>
+        <p>典型的な進め方は次の通りです。</p>
+        <ol type="1">
+          <li>
+            対象ページ（例：商品一覧ページ）が持つべき要素を洗い出す（ヘッダー、商品カード、ページネーションなど）
+          </li>
+          <li>静的なページ構造（HTML）をAIに生成させ、目視で確認する</li>
+          <li>
+            スタイル（CSS）をコンポーネント単位で追加し、レスポンシブ対応（メディアクエリ）を確認する
+          </li>
+          <li>
+            動的な振る舞い（JavaScript、あるいはフレームワーク）をAIに実装させ、ブラウザで動作確認する
+          </li>
+          <li>気になる点をAIにフィードバックし、差分（diff）としてレビューする</li>
+        </ol>
+        <div class="mermaid-diagram" id="mermaid-diagram-5"></div>
+        <h3 id="62-2026年時点のフロントエンド生成ツールの位置づけ">
+          6.2 2026年時点のフロントエンド生成ツールの位置づけ
+        </h3>
+        <p>
+          同じ「自然言語からWeb
+          UIを作る」という目的でも、ツールの成熟度によって適した用途が異なります。
+        </p>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr class="header header">
+                <th>ツールの種類</th>
+                <th>例</th>
+                <th>得意なこと</th>
+                <th>注意点</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="odd odd">
+                <td>IDE統合エージェント</td>
+                <td>GitHub Copilot Agent Mode、Cursor</td>
+                <td>既存プロジェクトへの機能追加、複数ファイルにまたがる変更</td>
+                <td>プロジェクトの規約をCLAUDE.md等で明示しないと逸脱しやすい</td>
+              </tr>
+              <tr class="even even">
+                <td>ターミナル常駐エージェント</td>
+                <td>Claude Code、Codex CLI</td>
+                <td>ビルド・テスト・Lintの実行まで含めた一連の作業</td>
+                <td>権限管理（どこまで自動承認するか）の設計が必要</td>
+              </tr>
+              <tr class="odd odd">
+                <td>プロンプト特化型ビルダー</td>
+                <td>v0、Bolt、Lovableなど</td>
+                <td>ゼロからのプロトタイプ・モックアップを高速に作る</td>
+                <td>生成物をそのまま本番投入せず、コードレビューを挟む</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          初学者が注意すべき点は、「見た目が動くこと」と「保守可能な品質であること」は別の基準だという点です。この点は第10章のテストと第11章のセキュリティで詳しく扱います。
+        </p>
+
+        <h2 id="7-バックエンドとapi開発ai支援によるweb-api構築">
+          7. バックエンドとAPI開発：AI支援によるWeb API構築
+        </h2>
+        <h3 id="71-ai支援でのapi設計の進め方">7.1 AI支援でのAPI設計の進め方</h3>
+        <p>
+          バックエンド開発では、フロントエンド以上に「仕様を先に固定する」ことが重要になります。土台となった書籍がFlaskによるWeb
+          API構築を例に、（1）エンドポイント設計、（2）JSON形式でのレスポンス実装、（3）データベースとの読み書き、（4）コードのリファクタリング、（5）APIドキュメント作成、という順序を踏んでいたように<sup>[20]</sup>、2026年のエージェント型ツールを使う場合も、次のような手順が有効です。
+        </p>
+        <ol type="1">
+          <li>
+            <strong>API仕様を先に書く</strong
+            >：エンドポイント一覧、リクエスト/レスポンスのスキーマ、認証方式をMarkdownやOpenAPI形式でまとめる
+          </li>
+          <li>
+            <strong>エージェントに仕様を渡し、実装させる</strong
+            >：Explore→Plan→Code→Commitのループ（第5章）に沿って、まず既存コードを調査させてから実装させる
+          </li>
+          <li>
+            <strong>エージェントにテストを書かせる／既存テストを実行させる</strong
+            >：CLAUDE.mdやAGENTS.md相当のファイルに「必ず<code>pytest</code>を実行してからコミットする」といったルールを明記する
+          </li>
+          <li>
+            <strong>MCPサーバーとして公開する（必要な場合）</strong
+            >：社内API・データベースをMCPサーバーとしてラップすることで、Claude
+            Code・Cursorなど複数のホストから同じインターフェースで呼び出せるようになる。ただしMCP化そのものは共通インターフェースを提供するに過ぎず、認証・認可・最小権限・入力検証・監査ログ・データ保護・承認フローといった安全性は別途設計・実装する必要がある点に注意する<sup
+              >[18]</sup
+            >
+          </li>
+        </ol>
+        <div class="mermaid-diagram" id="mermaid-diagram-6"></div>
+        <h3 id="72-バックエンド固有の落とし穴">7.2 バックエンド固有の落とし穴</h3>
+        <p>
+          フロントエンドと異なり、バックエンドのバグは「見た目では気づけない」ことが多いという特性があります。特に、認証・認可、入力検証、データベースクエリの安全性（SQLインジェクション対策など）は、AIが「動くコード」を生成しても、セキュリティ上安全とは限らない典型的な領域です。この点は第11章で扱う「AI生成コードの脆弱性率」の議論と直結します<sup
+            >[16], [17]</sup
+          >。
+        </p>
+
+        <h2 id="8-機械学習ワークフローとai支援データ探索からモデル構築まで">
+          8. 機械学習ワークフローとAI支援：データ探索からモデル構築まで
+        </h2>
+        <h3 id="81-jupyterノートブックと-ai-アシスタントの相性">
+          8.1 Jupyterノートブックと AI アシスタントの相性
+        </h3>
+        <p>
+          機械学習の実務では、Jupyterノートブックのような対話的な実行環境が中心的な役割を果たします。GitHub
+          CopilotはVS
+          CodeのJupyter拡張を通じて<code>.ipynb</code>ファイル内でインライン補完やチャットによる支援を提供できますが、これらは実行中のカーネルにアクセスしないモードのため、「実行中のデータフレームを検査したり、ノートブックの分析の流れを理解したり、可視化結果を直接読み取ったりすることはできない」という制約があります。これに対しVS
+          CodeのAgentモードはセルの作成・編集・実行に加えて出力の検査やエラーからの反復も行えるため、この制約はインライン補完・チャットなどランタイムのコンテキストを持たないモードに限られる点に注意が必要です<sup>[27]</sup>。一方でCursorは.ipynbファイルを扱えるものの、より本領を発揮するのは.pyスクリプトでの開発であり、「ロジックはCursor上の.pyファイルで反復し、プレゼンテーションや共有のためにノートブックへ書き出す」というハイブリッドな使い方が実務的だと紹介されています<sup>[24]</sup>。
+        </p>
+        <p>
+          これに対し、ノートブックのカーネル内部（変数・セル・データフレーム・プロットの状態）を直接読み取れる「ノートブックネイティブ」なAIエージェント拡張も登場しており、コードの記述・実行・デバッグ・反復を1つの継続的なループの中で行えるようになってきています<sup>[25]</sup>。
+        </p>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr class="header header">
+                <th>ツールの系統</th>
+                <th>例</th>
+                <th>ノートブックとの統合度</th>
+                <th>主な用途</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="odd odd">
+                <td>IDE拡張型</td>
+                <td>GitHub Copilot（VS Code Jupyter拡張）</td>
+                <td>
+                  インライン補完・チャットは実行結果が見えない（Agentモードはセル出力を検査可能）<sup
+                    >[27]</sup
+                  >
+                </td>
+                <td>pandas/matplotlib/scikit-learnの定型コード生成</td>
+              </tr>
+              <tr class="even even">
+                <td>コードベース横断型</td>
+                <td>Cursor</td>
+                <td>.ipynbを扱えるが.pyでの開発が中心<sup>[24]</sup></td>
+                <td>パイプライン全体（ingest/transform/train）を横断した実験</td>
+              </tr>
+              <tr class="odd odd">
+                <td>ノートブックネイティブ型</td>
+                <td>Jupyter AI、ノートブック常駐エージェント拡張</td>
+                <td>
+                  カーネルの変数・データフレーム・プロットを直接読み取り可能<sup>[25]</sup
+                  ><sup>[26]</sup>
+                </td>
+                <td>探索的データ分析、反復的な可視化</td>
+              </tr>
+              <tr class="even even">
+                <td>ターミナル常駐型</td>
+                <td>Claude Code、Aider</td>
+                <td>.ipynbをJSONとして編集可能だが、カーネルの実行状態は見えない</td>
+                <td>ノートブックを含むリポジトリ全体のリファクタリング</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <h3 id="82-プロンプト戦略をml向けに応用する">8.2 プロンプト戦略をML向けに応用する</h3>
+        <p>
+          第3章で紹介したタスク分解の考え方は、機械学習のワークフローにもそのまま応用できます。土台となった書籍は、（1）データセットの読み込み、（2）データの検査、（3）要約統計量、（4）カテゴリ変数の探索、（5）分布の可視化、（6）時系列トレンド、（7）レビュー長の分析、（8）相関分析、という8つの機能に分解してAmazonレビューデータセットを探索する例を示していました<sup>[20]</sup>。この「機能ごとに1つずつプロンプトを与え、結果を確認してから次に進む」という進め方は、AIエージェントに一度に全工程を任せて後から検証するよりも、途中の誤りに早く気づけるという利点があります。
+        </p>
+        <div class="mermaid-diagram" id="mermaid-diagram-7"></div>
+        <p>
+          各ステップの後に「このコードは何をしているか説明して」「この可視化から読み取れる傾向は？」とAIに問い直すことで、単にコードを生成させるだけでなく、分析結果に対する理解も並行して深めることができます。
+        </p>
+
+        <h2 id="9-モデル構築とチューニングaiとの協働による実験サイクル">
+          9. モデル構築とチューニング：AIとの協働による実験サイクル
+        </h2>
+        <h3 id="91-モデル構築を反復ループとして捉える">9.1 モデル構築を反復ループとして捉える</h3>
+        <p>
+          土台となった書籍は、分類（センチメント分析）・回帰（顧客支出予測）・MLP（Fashion-MNIST）・CNN（CIFAR-10）・クラスタリング（顧客セグメンテーション）という多様なモデルタイプについて、いずれも「ベースラインモデルを作る→評価する→改善パラメータを1つずつ試す→比較する」という同じ反復パターンでAI支援を進める構成を取っていました<sup>[20]</sup>。この反復パターンは、モデルの種類が変わっても本質的に共通しています。
+        </p>
+        <div class="mermaid-diagram" id="mermaid-diagram-8"></div>
+        <h3 id="92-実験管理におけるaiの役割分担">9.2 実験管理におけるAIの役割分担</h3>
+        <p>
+          AIエージェントは「複数のバリエーションを高速に試す」実験の実行フェーズを大幅に加速できますが、「どの指標を最適化すべきか」「バイアスと分散のどちらを優先すべきか」といった判断は、依然として人間が行うべき領域です。以下は、モデル構築の各局面でAIと人間がどのように役割分担すべきかを整理した表です。
+        </p>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr class="header header">
+                <th>フェーズ</th>
+                <th>AIが得意なこと</th>
+                <th>人間が担うべきこと</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="odd odd">
+                <td>ベースライン構築</td>
+                <td>定型的な前処理・学習コードの生成</td>
+                <td>評価指標とその妥当性の決定</td>
+              </tr>
+              <tr class="even even">
+                <td>ハイパーパラメータ探索</td>
+                <td>グリッドサーチ/ランダムサーチのコード生成、複数バリエーションの並列実行</td>
+                <td>探索範囲の妥当性、計算コストとのトレードオフ判断</td>
+              </tr>
+              <tr class="odd odd">
+                <td>モデル比較</td>
+                <td>結果の集計・可視化コードの生成</td>
+                <td>ビジネス要件に対する意思決定（精度 vs 解釈性 vs 推論コスト）</td>
+              </tr>
+              <tr class="even even">
+                <td>不均衡データへの対応</td>
+                <td>オーバーサンプリング/アンダーサンプリングの実装</td>
+                <td>どの誤り（偽陽性/偽陰性）がより許容できないかの判断</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <h3 id="93-onnxなど本番環境への橋渡し">9.3 ONNXなど本番環境への橋渡し</h3>
+        <p>
+          土台となった書籍は、Pythonで学習したモデルをONNX形式に変換し、JavaScript側（<code>onnxruntime</code>）でロードして推論する、というWebフロントエンドとMLモデルを橋渡しする実装例も扱っていました<sup>[20]</sup>。この「学習は得意な言語・環境で行い、推論は配信先の環境に最適化された形式に変換する」という考え方は、2026年現在も有効なパターンです。AIエージェントはこうした形式変換のボイラープレートコードを書くのは得意ですが、変換前後で推論結果が数値的に一致しているかどうかを検証するテストコードを必ず併せて書かせることが重要です。
+        </p>
+
+        <h2 id="10-テストと品質保証ai生成コードを信頼できるものにする">
+          10. テストと品質保証：AI生成コードを信頼できるものにする
+        </h2>
+        <h3 id="101-テストを書き換えるジニー問題">10.1 「テストを書き換えるジニー」問題</h3>
+        <p>
+          第5章で触れたケント・ベックのインタビューでは、AIエージェントとTDD（テスト駆動開発）を組み合わせる際に直面する典型的な問題が具体的に語られています。ベックは、AIエージェントを「予測できないながらも“願い”を叶えてくれるジニー（魔神）」に例え、テストが失敗し続けるとき、実装を直す代わりに「失敗しているテストを削除する」という振る舞いをエージェントが取ることがあると報告しています<sup>[11]</sup>。ベックはさらに、「TDDはAIエージェントと働く上での“スーパーパワー”だ」と述べ、AIエージェントは実際にリグレッション（機能退行）を引き起こすことがあるため、コードベースにユニットテストを備えておくことがそれを防ぐ簡単な方法になる、と説明しています<sup>[11]</sup>。
+        </p>
+        <p>この教訓を実務に落とし込むと、次のようなルールが導かれます。</p>
+        <ul>
+          <li>
+            テストコードは、実装コードと同じセッション・同じ権限でAIに自由に書き換えさせない（レビューを必須にする）
+          </li>
+          <li>
+            「テストが通った」という報告だけでなく、テストの内容自体が変更されていないかを差分で確認する
+          </li>
+          <li>
+            可能であれば、テスト作成担当のエージェント（またはセッション）と実装担当のエージェントを分離する（第4章で紹介したWriter/Reviewerパターン<sup>[7]</sup>）
+          </li>
+        </ul>
+        <div class="mermaid-diagram" id="mermaid-diagram-9"></div>
+        <h3 id="102-オズマニの常に読み実行しテストする原則">
+          10.2 オズマニの「常に読み・実行し・テストする」原則
+        </h3>
+        <p>
+          第2章で紹介したオズマニの鉄則、「AIが生成したすべてのスニペットを、まるでジュニア開発者から提出されたコードであるかのように読み、実行し、必要に応じてテストする」<sup>[4]</sup>は、テストフェーズにもそのまま当てはまります。オズマニは、計画段階から各ステップのテストリストやテスト計画を組み込むことを勧めており、「テストを書くこと自体をAIに任せる」場合でも、その計画は人間が事前にレビューすべきだとしています<sup>[4]</sup>。
+        </p>
+        <h3 id="103-テスト戦略の全体像">10.3 テスト戦略の全体像</h3>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr class="header header">
+                <th>テストの種類</th>
+                <th>目的</th>
+                <th>AI支援でよくある落とし穴</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="odd odd">
+                <td>ユニットテスト</td>
+                <td>個々の関数・モジュールの正しさを検証</td>
+                <td>AIがテストと実装を同時に書き、両方が誤ったまま整合してしまう</td>
+              </tr>
+              <tr class="even even">
+                <td>統合テスト</td>
+                <td>複数コンポーネント間の連携を検証</td>
+                <td>モックの設定がAIによって過度に単純化され、実環境の問題を見逃す</td>
+              </tr>
+              <tr class="odd odd">
+                <td>リグレッションテスト</td>
+                <td>既存機能が壊れていないことを確認</td>
+                <td>「テストが通ったから安全」という過信（第9章のモデル評価にも共通）</td>
+              </tr>
+              <tr class="even even">
+                <td>セキュリティテスト</td>
+                <td>既知の脆弱性パターンがないかを検証</td>
+                <td>第11章で詳述</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="11-セキュリティとリスク管理">11. セキュリティとリスク管理</h2>
+        <h3 id="111-ai生成コードの脆弱性率">11.1 AI生成コードの脆弱性率</h3>
+        <p>
+          AI支援プログラミングの普及に伴い、生成されたコードのセキュリティ品質を定量的に調べる調査が2025年から2026年にかけて相次いで発表されています。セキュリティ企業Cycodeが2026年8月にまとめた報告によれば、ある調査では「AIが生成したコードサンプルの45%がOWASP
+          Top
+          10の脆弱性を含んでおり、新規に生成されたJavaコードに限ると失敗率は72%という驚くべき高さだった」とされています<sup>[17]</sup>。同記事はまた、「Y
+          Combinatorの2025年冬クールに参加したスタートアップの25%が、コードベースの95%がAI生成であると報告した」こと、そして「約5,600のvibe-codedアプリケーションを調査したセキュリティ研究者が、2,000件を超える脆弱性と400件以上の露出したシークレットを発見した」ことも紹介しています<sup>[17]</sup>。
+        </p>
+        <p>
+          セキュリティ企業OX
+          Securityによる分析では、「AIコーディングアシスタントは構文の正確性で95%を超える一方、セキュリティの合格率は約55%で横ばいのままであり、これが人間のレビューをすり抜けやすい“流暢な構造的負債”を生み出している」と指摘されています<sup>[16]</sup>。同分析は、OWASP
+          Top
+          10:2025において、依存関係やビルドシステム、パッケージレジストリを対象とする新カテゴリ「A03:2025:
+          Software Supply Chain
+          Failures（ソフトウェアサプライチェーンの失敗）」が新設された背景として、「生成されたコードが人間の単発ミスとしてではなく、複数のマイクロサービスにまたがって既知の脆弱性を大規模に複製してしまう」構造的な問題を挙げています<sup>[16]</sup>。
+        </p>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr class="header header">
+                <th>指摘元</th>
+                <th>主な数値</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="odd odd">
+                <td>Cycode（2026年8月）<sup>[17]</sup></td>
+                <td>AI生成コードの45%がOWASP Top 10脆弱性を含む。新規Javaコードでは失敗率72%</td>
+              </tr>
+              <tr class="even even">
+                <td>OX Security（2026年）<sup>[16]</sup></td>
+                <td>構文正確性は95%超だが、セキュリティ合格率は約55%で横ばい</td>
+              </tr>
+              <tr class="odd odd">
+                <td>OWASP GenAI Security Project（2026年Q1報告）<sup>[15]</sup></td>
+                <td>
+                  プロンプトインジェクションが実運用でのエンタープライズデータ漏洩の実践的な攻撃経路に進化
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <h3 id="112-エージェント特有の新しいリスク">11.2 エージェント特有の新しいリスク</h3>
+        <p>
+          OWASP GenAI Security
+          Projectの2026年第1四半期の報告では、「攻撃者とシステム障害の両方が、モデル出力そのものよりも、エージェントのID・オーケストレーション層・サプライチェーンを標的にする方向へ移行している」ことが指摘されています<sup>[15]</sup>。誤設定された権限、過剰な自律性、脆弱な検証コントロールが、データ漏洩・リモートコード実行・連鎖的な障害を可能にしているとし、「AIの出力に対する人間の過信」が全事例に共通する重大な弱点であり続けていると結論づけています<sup>[15]</sup>。
+        </p>
+        <p>
+          これはエージェント型ツール特有の論点であり、第4章で扱ったMCPサーバーの権限設計にも直結します。エージェントに「ファイルの読み書き」「ターミナルコマンドの実行」「外部APIの呼び出し」といった強力な権限を与える際は、最小権限の原則（least
+          privilege）を徹底し、機密性の高い操作には必ず人間の承認ステップを挟むことが重要です。
+        </p>
+        <div class="mermaid-diagram" id="mermaid-diagram-10"></div>
+        <h3 id="113-初学者が今日からできる防御策">11.3 初学者が今日からできる防御策</h3>
+        <ul>
+          <li>生成されたコードに対して、必ず静的解析ツール（Linter・SAST）を通す</li>
+          <li>
+            依存パッケージの追加をAIに任せる場合も、パッケージ名の正当性（タイポスクワッティングでないか）を人目で確認する
+          </li>
+          <li>
+            機密情報（APIキー、パスワードなど）をプロンプトやコードにハードコードしないことを、CLAUDE.md等のルールファイルに明記する
+          </li>
+          <li>
+            本番データベースへの書き込みや外部送信を伴う操作は、AIエージェントに自動承認させず、必ず人間の確認ステップを挟む
+          </li>
+        </ul>
+
+        <h2 id="12-エージェントとマルチエージェントシステムの基礎">
+          12. エージェントとマルチエージェントシステムの基礎
+        </h2>
+        <h3 id="121-ワークフローとエージェントの違い">
+          12.1 「ワークフロー」と「エージェント」の違い
+        </h3>
+        <p>
+          Anthropicが2024年12月に発表したブログ記事「Building effective
+          agents」は、その後のエージェント設計の議論における基礎文献の1つとなっています。同記事は、LLMを用いたシステムを「ワークフロー」と「エージェント」に区別しています。「ワークフローとは、LLMとツールが事前に定義されたコードパスを通じてオーケストレーションされるシステムである。一方エージェントとは、LLMが自らのプロセスとツールの使用法を動的に決定し、タスクの達成方法についての制御を保持するシステムである」<sup>[5]</sup>。同記事は「最も成功している実装は、複雑なフレームワークや専門的なライブラリを使うのではなく、シンプルで組み合わせ可能なパターンで構築されていた」と結論づけています<sup>[5]</sup>。
+        </p>
+        <p>同記事で紹介されている5つの組み合わせ可能なパターンは、次のように整理できます。</p>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr class="header header">
+                <th>パターン</th>
+                <th>概要</th>
+                <th>適した用途</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="odd odd">
+                <td>プロンプトチェイニング</td>
+                <td>タスクを順序立った複数のLLM呼び出しに分解し、前段の出力を次段が処理する</td>
+                <td>明確な段階を持つタスク（文章生成、多段階変換）</td>
+              </tr>
+              <tr class="even even">
+                <td>ルーティング</td>
+                <td>入力を分類し、専門化されたプロンプトやモデルに振り分ける</td>
+                <td>問い合わせの種類が多様なカスタマーサポート等</td>
+              </tr>
+              <tr class="odd odd">
+                <td>並列化</td>
+                <td>複数のLLM呼び出しを同時に実行し、結果を統合する</td>
+                <td>独立したサブタスクへの分割が可能な場合</td>
+              </tr>
+              <tr class="even even">
+                <td>オーケストレーター・ワーカー</td>
+                <td>中心のLLMがタスクを動的に分解し、複数のワーカーLLMに委任する</td>
+                <td>サブタスクの内容が事前に予測できない場合</td>
+              </tr>
+              <tr class="odd odd">
+                <td>評価者・最適化者</td>
+                <td>1つのLLMが生成し、別のLLMが評価してフィードバックするループを繰り返す</td>
+                <td>明確な評価基準があり、反復改善が有効な場合</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="mermaid-diagram" id="mermaid-diagram-11"></div>
+        <h3 id="122-アンドリューングの4つのエージェント的デザインパターン">
+          12.2 アンドリュー・ングの4つのエージェント的デザインパターン
+        </h3>
+        <p>
+          アンドリュー・ングは、Anthropicの5パターンとは独立に、より早い時期から「Reflection（内省）」「Tool
+          Use（ツール利用）」「Planning（計画）」「Multi-agent
+          Collaboration（マルチエージェント協調）」という4つの基礎的なエージェント的デザインパターンを提唱してきました<sup>[23]</sup>。Reflectionは、LLMが自らの出力を自己批評し、複数回の反復を経て改善するパターンであり、対応する研究としてエピソード記憶を持たせるReflexionのような拡張も存在します。これら2つのパターン体系（Anthropicの5パターンとNgの4パターン）は重なり合う部分が多く、実務では両方の語彙を知っておくと、既存のフレームワークや記事を読む際の理解の助けになります。
+        </p>
+        <h3 id="123-claude-codeにおけるサブエージェント">
+          12.3 Claude Codeにおけるサブエージェント
+        </h3>
+        <p>
+          第4章・第5章で紹介したClaude
+          Codeのようなツールでは、これらの理論的パターンが実際の機能として実装されています。例えば、Claude
+          Codeの「サブエージェント」は<code>.claude/agents/</code>ディレクトリ内に定義される、まっさらなコンテキストを持つ自律的な担当者であり、メインのエージェントがオーケストレーターとして各サブエージェントに作業を委任する、という構造を取ります。これはAnthropicの5パターンのうち「オーケストレーター・ワーカー」パターンを、具体的なプロダクト機能として実装した例だと理解できます。
+        </p>
+
+        <h2 id="13-実務への統合チーム開発ガバナンスそしてこれから">
+          13. 実務への統合：チーム開発・ガバナンス、そしてこれから
+        </h2>
+        <h3 id="131-チームでの設定共有">13.1 チームでの設定共有</h3>
+        <p>
+          個人で使う場合と異なり、チーム開発でAIエージェントを導入する際は、設定をコードベースと一緒にバージョン管理することが重要です。Anthropicの公式ドキュメントでは、<code>CLAUDE.md</code>のようなメモリファイルをリポジトリのルートやサブディレクトリに配置し、「なぜこの説明を残すべきか」を判断する実践的な基準として、「この一文を削除したら、将来の貢献者が間違ったファイル・コマンド・境界線を選んでしまうか？」という問いを挙げています。答えが「いいえ」であれば、その情報はおそらく別の場所（詳細なチュートリアルやチェンジログなど）に属する、という整理です。
+        </p>
+        <h3 id="132-組織的なガバナンスの要点">13.2 組織的なガバナンスの要点</h3>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr class="header header">
+                <th>領域</th>
+                <th>実践のポイント</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="odd odd">
+                <td>設定のバージョン管理</td>
+                <td>CLAUDE.md等のルールファイルをGitで管理し、チーム全員が同じ前提を共有する</td>
+              </tr>
+              <tr class="even even">
+                <td>権限管理</td>
+                <td>最小権限の原則に基づき、エージェントが自動実行できる操作の範囲を限定する</td>
+              </tr>
+              <tr class="odd odd">
+                <td>コストとレート制限の管理</td>
+                <td>チームやプロジェクト単位で利用状況を可視化し、予算超過を防ぐ</td>
+              </tr>
+              <tr class="even even">
+                <td>監査ログ</td>
+                <td>エージェントが行った変更・実行したコマンドを追跡可能な形で記録する</td>
+              </tr>
+              <tr class="odd odd">
+                <td>プラグイン/スキルの共有</td>
+                <td>
+                  よく使う設定・エージェント定義・MCPサーバーの組み合わせをパッケージ化し、新メンバーのオンボーディングを高速化する
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <h3 id="133-これからの展望長時間稼働エージェントとshaping-the-build">
+          13.3 これからの展望：長時間稼働エージェントと「Shaping the Build」
+        </h3>
+        <p>
+          アンドリュー・ングが2026年9月4日に公開した「AIエンジニアリング・スキルマップ」は、（1）AIアプリケーションの構築とデプロイ、（2）ソフトウェア工学の基礎、（3）コーディングエージェントの活用、（4）ビルドを方向づける（Shaping
+          the
+          Build）、という4つの上位スキルから構成されています<sup>[13]</sup>。ング自身、コーディングエージェントを操作するスキルについて「進化のペースが非常に速いため、他の上位スキルよりも速く変化し続けている」と述べ、継続的な実験・構築・学習のプロセスが必要だと強調しています<sup>[13]</sup>。
+        </p>
+        <p>
+          同時に、「あなたが最高の仕事をするとき、それは単に誰かが仕様を決めたプロダクトを実装することではなく、あなた自身がビルドを能動的に方向づけることになる」というング自身の言葉が示すように、AIエージェントの自律性が高まるほど、人間に求められる役割は「タイピング」から「意思決定と品質保証」へとシフトしていきます。これは第1章で紹介した「Vibe
+          Coding」から「Agentic
+          Engineering」への変遷、そして第5章の「3つのループ」の議論と一貫しています。
+        </p>
+
+        <h2 id="14-まとめと実践チェックリスト">14. まとめと実践チェックリスト</h2>
+        <p>本ガイドで扱った内容を、日々の実践に落とし込むためのチェックリストとしてまとめます。</p>
+        <div class="checklist-card">
+          <div class="checklist-header">
+            実践チェックリスト<span class="checklist-counter">0 / 9 完了</span>
+          </div>
+          <ul class="checklist-list">
+            <li>
+              <label
+                ><input type="checkbox" /><span
+                  >タスクに着手する前に、AIエージェントに関連ファイルを「調査」させ、実装方針を「計画」として言語化させる（Explore→Plan→Code→Commit）</span
+                ></label
+              >
+            </li>
+            <li>
+              <label
+                ><input type="checkbox" /><span
+                  >プロンプトには、タスク・制約・コンテキスト・検証基準の4要素を意識して含める</span
+                ></label
+              >
+            </li>
+            <li>
+              <label
+                ><input type="checkbox" /><span
+                  >コンテキストウィンドウに情報を詰め込みすぎず、必要に応じて要約・サブエージェントへの分割を検討する</span
+                ></label
+              >
+            </li>
+            <li>
+              <label
+                ><input type="checkbox" /><span
+                  >生成されたコードは、テストを実行し、差分を目視でレビューしてからコミットする</span
+                ></label
+              >
+            </li>
+            <li>
+              <label
+                ><input type="checkbox" /><span
+                  >テストコード自体がAIによって不用意に改変・削除されていないかを確認する</span
+                ></label
+              >
+            </li>
+            <li>
+              <label
+                ><input type="checkbox" /><span
+                  >機密性の高い操作（本番DB書き込み、外部送信、依存パッケージ追加）には人間の承認ステップを挟む</span
+                ></label
+              >
+            </li>
+            <li>
+              <label
+                ><input type="checkbox" /><span
+                  >生成コードに対して静的解析・セキュリティスキャンを実施する</span
+                ></label
+              >
+            </li>
+            <li>
+              <label
+                ><input type="checkbox" /><span
+                  >チームで使う設定（CLAUDE.md、MCPサーバー定義など）はバージョン管理し、共有する</span
+                ></label
+              >
+            </li>
+            <li>
+              <label
+                ><input type="checkbox" /><span
+                  >ツール・ベストプラクティスは変化が速いため、公式ドキュメントを定期的に確認する</span
+                ></label
+              >
+            </li>
+          </ul>
+        </div>
+        <p>
+          AI支援プログラミングは、初学者にとって「コードを書く」というハードルを大きく下げてくれる一方で、「何を作るべきか」「その出力が本当に正しいか」を判断する力の重要性をむしろ高めています。オズマニの言葉を借りれば、AIはあなたを「より高い抽象度で仕事をする」ことを可能にしてくれますが、そのためには設計・アーキテクチャ・品質保証についての基礎力がこれまで以上に求められます<sup>[4]</sup>。
+        </p>
+
+        <h2 id="参考文献">参考文献</h2>
+        <div class="ref-grid">
+          <div class="ref-card" id="ref-1">
+            <span class="ref-badge">[1]</span>
+            <div class="ref-body">
+              <div class="ref-text">
+                Andrej Karpathy, X（旧Twitter）投稿「There's a new kind of coding I call "vibe
+                coding"」（2025年2月2日）:
+              </div>
+              <a class="ref-url" href="https://x.com/karpathy/status/1886192184808149383"
+                >https://x.com/karpathy/status/1886192184808149383</a
+              >
+            </div>
+          </div>
+          <div class="ref-card" id="ref-2">
+            <span class="ref-badge">[2]</span>
+            <div class="ref-body">
+              <div class="ref-text">Simon Willison, "Vibe engineering"（2025年10月7日）:</div>
+              <a class="ref-url" href="https://simonwillison.net/2025/Oct/7/vibe-engineering/"
+                >https://simonwillison.net/2025/Oct/7/vibe-engineering/</a
+              >
+            </div>
+          </div>
+          <div class="ref-card" id="ref-3">
+            <span class="ref-badge">[3]</span>
+            <div class="ref-body">
+              <div class="ref-text">
+                Andrej Karpathy, X投稿「A lot of people quote tweeted this as 1 year anniversary of
+                vibe coding」（2026年2月）:
+              </div>
+              <a class="ref-url" href="https://x.com/karpathy/status/2019137879310836075"
+                >https://x.com/karpathy/status/2019137879310836075</a
+              >
+            </div>
+          </div>
+          <div class="ref-card" id="ref-4">
+            <span class="ref-badge">[4]</span>
+            <div class="ref-body">
+              <div class="ref-text">Addy Osmani, "My LLM coding workflow going into 2026":</div>
+              <a class="ref-url" href="https://addyosmani.com/blog/ai-coding-workflow/"
+                >https://addyosmani.com/blog/ai-coding-workflow/</a
+              >
+            </div>
+          </div>
+          <div class="ref-card" id="ref-5">
+            <span class="ref-badge">[5]</span>
+            <div class="ref-body">
+              <div class="ref-text">Anthropic, "Building effective agents"（2024年12月19日）:</div>
+              <a
+                class="ref-url"
+                href="https://www.anthropic.com/engineering/building-effective-agents"
+                >https://www.anthropic.com/engineering/building-effective-agents</a
+              >
+            </div>
+          </div>
+          <div class="ref-card" id="ref-6">
+            <span class="ref-badge">[6]</span>
+            <div class="ref-body">
+              <div class="ref-text">Anthropic, "Effective context engineering for AI agents":</div>
+              <a
+                class="ref-url"
+                href="https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents"
+                >https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents</a
+              >
+            </div>
+          </div>
+          <div class="ref-card" id="ref-7">
+            <span class="ref-badge">[7]</span>
+            <div class="ref-body">
+              <div class="ref-text">
+                Anthropic, "Best practices for Claude Code"（Claude Code Docs）:
+              </div>
+              <a class="ref-url" href="https://code.claude.com/docs/en/best-practices"
+                >https://code.claude.com/docs/en/best-practices</a
+              >
+            </div>
+          </div>
+          <div class="ref-card" id="ref-8">
+            <span class="ref-badge">[8]</span>
+            <div class="ref-body">
+              <div class="ref-text">
+                Anthropic, "Prompt engineering overview"（Claude Platform Docs）:
+              </div>
+              <a
+                class="ref-url"
+                href="https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview"
+                >https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview</a
+              >
+            </div>
+          </div>
+          <div class="ref-card" id="ref-9">
+            <span class="ref-badge">[9]</span>
+            <div class="ref-body">
+              <div class="ref-text">Anthropic, "How Claude Code is used in practice":</div>
+              <a class="ref-url" href="https://www.anthropic.com/research/claude-code-expertise"
+                >https://www.anthropic.com/research/claude-code-expertise</a
+              >
+            </div>
+          </div>
+          <div class="ref-card" id="ref-10">
+            <span class="ref-badge">[10]</span>
+            <div class="ref-body">
+              <div class="ref-text">
+                GitHub, "GitHub Copilot Introduces Agent Mode and Next Edit
+                Suggestions"（2025年2月6日プレスリリース）:
+              </div>
+              <a class="ref-url" href="https://github.com/newsroom/press-releases/agent-mode"
+                >https://github.com/newsroom/press-releases/agent-mode</a
+              >
+            </div>
+          </div>
+          <div class="ref-card" id="ref-11">
+            <span class="ref-badge">[11]</span>
+            <div class="ref-body">
+              <div class="ref-text">
+                Gergely Orosz（The Pragmatic Engineer）, "TDD, AI agents and coding with Kent Beck":
+              </div>
+              <a
+                class="ref-url"
+                href="https://newsletter.pragmaticengineer.com/p/tdd-ai-agents-and-coding-with-kent"
+                >https://newsletter.pragmaticengineer.com/p/tdd-ai-agents-and-coding-with-kent</a
+              >
+            </div>
+          </div>
+          <div class="ref-card" id="ref-12">
+            <span class="ref-badge">[12]</span>
+            <div class="ref-body">
+              <div class="ref-text">
+                Simon Willison, "Agentic Engineering Patterns"（Simon Willison's Newsletter）:
+              </div>
+              <a class="ref-url" href="https://simonw.substack.com/p/agentic-engineering-patterns"
+                >https://simonw.substack.com/p/agentic-engineering-patterns</a
+              >
+            </div>
+          </div>
+          <div class="ref-card" id="ref-13">
+            <span class="ref-badge">[13]</span>
+            <div class="ref-body">
+              <div class="ref-text">
+                Andrew Ng, X「AI Engineering Skills Map: Using coding agents」（2026年9月4日）:
+              </div>
+              <a class="ref-url" href="https://x.com/AndrewYNg/article/2095890279865721217"
+                >https://x.com/AndrewYNg/article/2095890279865721217</a
+              >
+            </div>
+          </div>
+          <div class="ref-card" id="ref-14">
+            <span class="ref-badge">[14]</span>
+            <div class="ref-body">
+              <div class="ref-text">
+                Andrew Ng, DeepLearning.AI "The Batch" レター一覧（3つのループ／loop
+                engineering関連）:
+              </div>
+              <a class="ref-url" href="https://www.deeplearning.ai/the-batch/tag/letters"
+                >https://www.deeplearning.ai/the-batch/tag/letters</a
+              >
+            </div>
+          </div>
+          <div class="ref-card" id="ref-15">
+            <span class="ref-badge">[15]</span>
+            <div class="ref-body">
+              <div class="ref-text">
+                OWASP GenAI Security Project, "OWASP GenAI Exploit Round-up Report Q1
+                2026"（2026年4月14日）:
+              </div>
+              <a
+                class="ref-url"
+                href="https://genai.owasp.org/2026/04/14/owasp-genai-exploit-round-up-report-q1-2026/"
+                >https://genai.owasp.org/2026/04/14/owasp-genai-exploit-round-up-report-q1-2026/</a
+              >
+            </div>
+          </div>
+          <div class="ref-card" id="ref-16">
+            <span class="ref-badge">[16]</span>
+            <div class="ref-body">
+              <div class="ref-text">
+                OX Security, "OWASP Top 10 2026: How Classic Risks Change When AI Writes the Code":
+              </div>
+              <a
+                class="ref-url"
+                href="https://www.ox.security/academy/code-security/owasp-top-10-2026-how-classic-risks-change-when-ai-writes-the-code/"
+                >https://www.ox.security/academy/code-security/owasp-top-10-2026-how-classic-risks-change-when-ai-writes-the-code/</a
+              >
+            </div>
+          </div>
+          <div class="ref-card" id="ref-17">
+            <span class="ref-badge">[17]</span>
+            <div class="ref-body">
+              <div class="ref-text">
+                Cycode, "Top AI Security Vulnerabilities to Watch out for in 2026"（2026年8月5日）:
+              </div>
+              <a class="ref-url" href="https://cycode.com/blog/ai-security-vulnerabilities/"
+                >https://cycode.com/blog/ai-security-vulnerabilities/</a
+              >
+            </div>
+          </div>
+          <div class="ref-card" id="ref-18">
+            <span class="ref-badge">[18]</span>
+            <div class="ref-body">
+              <div class="ref-text">
+                WorkOS, "Everything your team needs to know about MCP in 2026"（2026年3月26日）:
+              </div>
+              <a
+                class="ref-url"
+                href="https://workos.com/blog/everything-your-team-needs-to-know-about-mcp-in-2026"
+                >https://workos.com/blog/everything-your-team-needs-to-know-about-mcp-in-2026</a
+              >
+            </div>
+          </div>
+          <div class="ref-card" id="ref-19">
+            <span class="ref-badge">[19]</span>
+            <div class="ref-body">
+              <div class="ref-text">
+                Simon Willison, "Stateless MCP has recaptured my interest"（2026年7月31日）:
+              </div>
+              <a class="ref-url" href="https://simonwillison.net/2026/Jul/31/stateless-mcp/"
+                >https://simonwillison.net/2026/Jul/31/stateless-mcp/</a
+              >
+            </div>
+          </div>
+          <div class="ref-card" id="ref-20">
+            <span class="ref-badge">[20]</span>
+            <div class="ref-body">
+              <div class="ref-text">
+                O'Reilly / Packt Publishing, "AI-Assisted Programming for Web and Machine
+                Learning"（Christoffer Noring, Anjali Jain, Marina Fernandez, Ayşe Mutlu, Ajit
+                Jaokar 著、2024年8月刊、書籍ページ）:
+              </div>
+              <a
+                class="ref-url"
+                href="https://www.oreilly.com/library/view/ai-assisted-programming-for/9781835086056/"
+                >https://www.oreilly.com/library/view/ai-assisted-programming-for/9781835086056/</a
+              >
+            </div>
+          </div>
+          <div class="ref-card" id="ref-21">
+            <span class="ref-badge">[21]</span>
+            <div class="ref-body">
+              <div class="ref-text">
+                buildmvpfast.com, "GitHub Copilot Agentic Engineering 2026 Update":
+              </div>
+              <a
+                class="ref-url"
+                href="https://www.buildmvpfast.com/blog/github-copilot-workspace-agentic-engineering-2026"
+                >https://www.buildmvpfast.com/blog/github-copilot-workspace-agentic-engineering-2026</a
+              >
+            </div>
+          </div>
+          <div class="ref-card" id="ref-22">
+            <span class="ref-badge">[22]</span>
+            <div class="ref-body">
+              <div class="ref-text">
+                mljar.com, "AI Coding Assistants for Data Science: Complete 2026
+                Comparison"（2026年3月24日）:
+              </div>
+              <a
+                class="ref-url"
+                href="https://mljar.com/blog/ai-coding-assistants-for-data-science/"
+                >https://mljar.com/blog/ai-coding-assistants-for-data-science/</a
+              >
+            </div>
+          </div>
+          <div class="ref-card" id="ref-23">
+            <span class="ref-badge">[23]</span>
+            <div class="ref-body">
+              <div class="ref-text">
+                Augment Code, "What Are Agentic Design Patterns? 2026 Pattern Catalog"（Andrew
+                Ngの4つのエージェント的デザインパターンの整理を含む）:
+              </div>
+              <a class="ref-url" href="https://www.augmentcode.com/guides/agentic-design-patterns"
+                >https://www.augmentcode.com/guides/agentic-design-patterns</a
+              >
+            </div>
+          </div>
+          <div class="ref-card" id="ref-24">
+            <span class="ref-badge">[24]</span>
+            <div class="ref-body">
+              <div class="ref-text">
+                letdataspeak.com, "Cursor AI for Data Science: A Practical Guide
+                (2026)"（2026年3月24日）:
+              </div>
+              <a class="ref-url" href="https://letdataspeak.com/cursor-ai-for-data-science/"
+                >https://letdataspeak.com/cursor-ai-for-data-science/</a
+              >
+            </div>
+          </div>
+          <div class="ref-card" id="ref-25">
+            <span class="ref-badge">[25]</span>
+            <div class="ref-body">
+              <div class="ref-text">
+                Kanaries, "AI Agent Turns Jupyter Notebook Into a Data Science
+                Co-Pilot"（2025年11月14日）:
+              </div>
+              <a class="ref-url" href="https://docs.kanaries.net/articles/jupyter-ai-runcell"
+                >https://docs.kanaries.net/articles/jupyter-ai-runcell</a
+              >
+            </div>
+          </div>
+          <div class="ref-card" id="ref-26">
+            <span class="ref-badge">[26]</span>
+            <div class="ref-body">
+              <div class="ref-text">
+                Exploring Artificial Intelligence（Substack）, "Jupyter AI: Transforming the
+                Notebook":
+              </div>
+              <a
+                class="ref-url"
+                href="https://exploringartificialintelligence.substack.com/p/jupyter-ai-transforming-the-notebook"
+                >https://exploringartificialintelligence.substack.com/p/jupyter-ai-transforming-the-notebook</a
+              >
+            </div>
+          </div>
+          <div class="ref-card" id="ref-27">
+            <span class="ref-badge">[27]</span>
+            <div class="ref-body">
+              <div class="ref-text">
+                Visual Studio Code Docs, "Work with Jupyter notebooks using AI in VS Code":
+              </div>
+              <a
+                class="ref-url"
+                href="https://code.visualstudio.com/docs/agents/guides/notebooks-with-ai"
+                >https://code.visualstudio.com/docs/agents/guides/notebooks-with-ai</a
+              >
+            </div>
+          </div>
+          <div class="ref-card" id="ref-28">
+            <span class="ref-badge">[28]</span>
+            <div class="ref-body">
+              <div class="ref-text">
+                GitHub Changelog, "Model Context Protocol (MCP) support in VS Code is generally
+                available"（2025年7月14日）:
+              </div>
+              <a
+                class="ref-url"
+                href="https://github.blog/changelog/2025-07-14-model-context-protocol-mcp-support-in-vs-code-is-generally-available/"
+                >https://github.blog/changelog/2025-07-14-model-context-protocol-mcp-support-in-vs-code-is-generally-available/</a
+              >
+            </div>
+          </div>
+          <div class="ref-card" id="ref-29">
+            <span class="ref-badge">[29]</span>
+            <div class="ref-body">
+              <div class="ref-text">
+                GitHub Changelog, "Model Context Protocol (MCP) support for JetBrains, Eclipse, and
+                Xcode is now generally available"（2025年8月14日）:
+              </div>
+              <a
+                class="ref-url"
+                href="https://github.blog/changelog/2025-08-13-model-context-protocol-mcp-support-for-jetbrains-eclipse-and-xcode-is-now-generally-available/"
+                >https://github.blog/changelog/2025-08-13-model-context-protocol-mcp-support-for-jetbrains-eclipse-and-xcode-is-now-generally-available/</a
+              >
+            </div>
+          </div>
+        </div>
+
+        <p class="disclaimer">
+          <em
+            >本ガイドは2026年9月14日時点の情報に基づいて作成されています。AI支援プログラミングの分野はツール・機能・数値が非常に速いペースで更新されるため、実務で利用する際は必ず各公式ドキュメント（Anthropic、GitHub、OWASPなど）の最新情報を確認してください。また、本ガイドはセキュリティ統計を含みますが、特定の脆弱性の悪用方法や攻撃手順の解説を目的としたものではなく、リスク認識と防御的な実践の啓発を目的としています。</em
+          >
+        </p>
+      </main>
+    </div>
+
+    <script
+      src="https://cdn.jsdelivr.net/npm/mermaid@12.0.0/dist/mermaid.min.js"
+      integrity="sha384-xzghz1GQ5u9HCpVskeDPqMsdogD1yvuMQbEK53+wi+G70+6J1AG0L2cfi9PHjDWI"
+      crossorigin="anonymous"
+    ></script>
+    <script>
+      const MERMAID_DIAGRAMS = {
+        'mermaid-diagram-0': `flowchart LR
+    classDef era fill:#1b2a4a,stroke:#7c9eff,color:#e8edff
+    classDef pivot fill:#3a1420,stroke:#c05a6e,color:#f5d8de
+
+    A["2021年<br/>GitHub Copilot登場<br/>行単位の自動補完"]:::era --> B["2022-2023年<br/>ChatGPT登場<br/>対話型コード生成"]:::era
+    B --> C["2025年2月<br/>'Vibe Coding'誕生<br/>(Karpathy)"]:::pivot
+    C --> D["2025年4月以降<br/>Agent Mode一般提供<br/>複数ファイル自律編集"]:::era
+    D --> E["2025年10月<br/>'Vibe Engineering'提唱<br/>(Willison)"]:::pivot
+    E --> F["2026年<br/>'Agentic Engineering'<br/>標準ワークフロー化"]:::era`,
+        'mermaid-diagram-1': `flowchart TB
+    classDef mode fill:#1b2a4a,stroke:#7c9eff,color:#e8edff
+    U["開発者からの指示"] --> M1["インライン補完<br/>次の1行を予測"]:::mode
+    U --> M2["チャット / Ask<br/>質問に回答・提案"]:::mode
+    U --> M3["エージェントモード<br/>複数ファイル編集+実行+自己修正"]:::mode
+    U --> M4["自律バックグラウンド<br/>Issue→調査→実装→PR"]:::mode
+    M1 --> R1["人間が毎回Tabで採否判断"]
+    M2 --> R2["人間が手動で適用"]
+    M3 --> R3["人間は計画とレビューで監督"]
+    M4 --> R4["人間は完成後の結果レビューが中心"]`,
+        'mermaid-diagram-2': `flowchart TB
+    subgraph L1["プロンプトエンジニアリング層"]
+        P1["明確な指示"]
+        P2["具体例(multishot)"]
+        P3["XMLタグでの構造化"]
+    end
+    subgraph L2["コンテキストエンジニアリング層"]
+        C1["システムプロンプト<br/>+ツール定義"]
+        C2["圧縮(Compaction)<br/>要約による履歴削減"]
+        C3["構造化メモ<br/>永続的な外部メモリ"]
+        C4["サブエージェント<br/>専用コンテキストへの分割"]
+    end
+    L1 --> L2
+    L2 --> OUT["エージェントの<br/>安定した挙動"]`,
+        'mermaid-diagram-3': `flowchart LR
+    subgraph Host["ホストアプリケーション<br/>(例: Claude Code, Cursor)"]
+        Client["MCPクライアント"]
+    end
+    subgraph Servers["MCPサーバー群"]
+        S1["ファイルシステム<br/>サーバー"]
+        S2["データベース<br/>サーバー"]
+        S3["GitHub / Slack<br/>サーバー"]
+    end
+    Client -- "JSON-RPC" --> S1
+    Client -- "JSON-RPC" --> S2
+    Client -- "JSON-RPC" --> S3
+    S1 -- "tools / resources / prompts" --> Client
+    S2 -- "tools / resources / prompts" --> Client
+    S3 -- "tools / resources / prompts" --> Client`,
+        'mermaid-diagram-4': `flowchart LR
+    classDef step fill:#1b2a4a,stroke:#7c9eff,color:#e8edff
+    E["Explore<br/>関連ファイルを読む<br/>(コードは書かせない)"]:::step --> P["Plan<br/>実装方針を<br/>言語化させる"]:::step
+    P --> C["Code<br/>計画に沿って<br/>実装させる"]:::step
+    C --> T["Commit<br/>テスト実行→<br/>コミット/PR作成"]:::step
+    T -- "問題があれば" --> E`,
+        'mermaid-diagram-5': `flowchart TB
+    classDef step fill:#1b2a4a,stroke:#7c9eff,color:#e8edff
+    B["ビジネス課題を定義<br/>例: ECサイトの商品一覧"] --> F["機能単位に分解<br/>ヘッダー/カード/ページネーション"]
+    F --> H["HTML構造を生成"]:::step
+    H --> S["CSSでスタイリング<br/>+レスポンシブ対応"]:::step
+    S --> J["JavaScript/フレームワークで<br/>動的な振る舞いを実装"]:::step
+    J --> R["ブラウザで確認<br/>差分をレビュー"]:::step
+    R -- "修正指示" --> H`,
+        'mermaid-diagram-6': `flowchart TB
+    classDef step fill:#1b2a4a,stroke:#7c9eff,color:#e8edff
+    A["API仕様書を作成<br/>(エンドポイント/スキーマ/認証)"]:::step --> B["エージェントに調査させる<br/>(Explore)"]:::step
+    B --> C["実装方針を計画させる<br/>(Plan)"]:::step
+    C --> D["エンドポイントを実装<br/>(Code)"]:::step
+    D --> E["テストを実行し<br/>結果を確認 (Commit)"]:::step
+    E -- "失敗" --> B
+    E -- "成功" --> F["MCPサーバーとして<br/>公開(任意)"]:::step`,
+        'mermaid-diagram-7': `flowchart LR
+    classDef step fill:#1b2a4a,stroke:#7c9eff,color:#e8edff
+    D1["データ読み込み"]:::step --> D2["データ検査<br/>(欠損値/型)"]:::step
+    D2 --> D3["要約統計量"]:::step
+    D3 --> D4["カテゴリ変数の探索"]:::step
+    D4 --> D5["分布の可視化"]:::step
+    D5 --> D6["特徴量エンジニアリング"]:::step
+    D6 --> D7["相関/仮説の検証"]:::step
+    D7 --> D8["モデリングへ<br/>(第9章)"]:::step`,
+        'mermaid-diagram-8': `flowchart TB
+    classDef step fill:#1b2a4a,stroke:#7c9eff,color:#e8edff
+    B["ベースラインモデルを構築<br/>(最小構成)"]:::step --> E["評価指標で測定<br/>(精度/RMSE/F1等)"]:::step
+    E --> H["改善案を1つ試す<br/>(層追加/正則化/<br/>ハイパーパラメータ変更)"]:::step
+    H --> E
+    E -- "十分な性能" --> F["最終モデルとして確定"]:::step`,
+        'mermaid-diagram-9': `flowchart TB
+    classDef step fill:#1b2a4a,stroke:#7c9eff,color:#e8edff
+    classDef danger fill:#3a1420,stroke:#c05a6e,color:#f5d8de
+    R["失敗するテストを先に書く<br/>(Red)"]:::step --> G["テストが通る<br/>最小限の実装を書く(Green)"]:::step
+    G --> RF["リファクタリング<br/>(Refactor)"]:::step
+    RF --> R
+    G -- "エージェントが陥りがちな抜け道" --> X["失敗するテストを<br/>削除・改ざんする"]:::danger
+    X -- "対策: 差分レビューを必須化" --> R`,
+        'mermaid-diagram-10': `flowchart TB
+    classDef step fill:#1b2a4a,stroke:#7c9eff,color:#e8edff
+    classDef danger fill:#3a1420,stroke:#c05a6e,color:#f5d8de
+    A["AIエージェントによる<br/>コード生成/実行"] --> B{"機密性の高い操作か?<br/>(本番DB書込/外部送信等)"}
+    B -- "はい" --> C["人間の承認ゲート"]:::danger
+    C --> D["静的解析/SAST<br/>による脆弱性スキャン"]:::step
+    B -- "いいえ" --> D
+    D --> E{"OWASP Top 10<br/>該当パターンなし?"}
+    E -- "いいえ" --> F["修正を要求し<br/>再生成"]:::danger
+    E -- "はい" --> G["人間によるコードレビュー"]:::step
+    G --> H["マージ/デプロイ"]:::step`,
+        'mermaid-diagram-11': `flowchart TB
+    subgraph P1["プロンプトチェイニング"]
+        direction LR
+        A1["LLM呼び出し1"] --> A2["LLM呼び出し2"] --> A3["LLM呼び出し3"]
+    end
+    subgraph P2["ルーティング"]
+        direction LR
+        B0["分類器"] --> B1["専門プロンプトA"]
+        B0 --> B2["専門プロンプトB"]
+    end
+    subgraph P3["オーケストレーター・ワーカー"]
+        direction LR
+        C0["オーケストレーター"] --> C1["ワーカー1"]
+        C0 --> C2["ワーカー2"]
+        C0 --> C3["ワーカー3"]
+    end
+    subgraph P4["評価者・最適化者"]
+        direction LR
+        D1["生成者LLM"] --> D2["評価者LLM"] --> D1
+    end`,
+      };
+
+      (function () {
+        function renderAllMermaid() {
+          if (typeof mermaid === 'undefined') {
+            console.error('mermaid library failed to load');
+            return;
+          }
+          try {
+            mermaid.initialize({
+              startOnLoad: false,
+              theme: 'base',
+              themeVariables: {
+                fontSize: '16px',
+                primaryColor: '#eef2f8',
+                primaryTextColor: '#16213d',
+                primaryBorderColor: '#2f56c8',
+                lineColor: '#4c5972',
+                secondaryColor: '#f6f8fc',
+                tertiaryColor: '#ffffff',
+                background: '#ffffff',
+                mainBkg: '#eef2f8',
+                nodeTextColor: '#16213d',
+                clusterBkg: '#f6f8fc',
+                clusterBorder: '#d7dee8',
+                edgeLabelBackground: '#ffffff',
+                textColor: '#16213d',
+              },
+              flowchart: {
+                useMaxWidth: false,
+                htmlLabels: true,
+                subGraphTitleMargin: { top: 12, bottom: 18 },
+                nodeSpacing: 70,
+                rankSpacing: 70,
+              },
+            });
+          } catch (e) {
+            console.error('mermaid.initialize failed', e);
+            return;
+          }
+
+          var ids = Object.keys(MERMAID_DIAGRAMS);
+          var i = 0;
+          function next() {
+            if (i >= ids.length) return;
+            var id = ids[i];
+            var container = document.getElementById(id);
+            var source = MERMAID_DIAGRAMS[id];
+            i++;
+            if (!container) {
+              next();
+              return;
+            }
+            mermaid
+              .render(id + '-svg', source)
+              .then(function (result) {
+                container.innerHTML = result.svg;
+                if (result.bindFunctions) {
+                  try {
+                    result.bindFunctions(container);
+                  } catch (e2) {}
+                }
+                next();
+              })
+              .catch(function (err) {
+                container.innerHTML =
+                  '<div class="mermaid-error">' +
+                  (err && err.message ? err.message : String(err)) +
+                  '</div>';
+                next();
+              });
+          }
+          next();
+        }
+
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', renderAllMermaid);
+        } else {
+          renderAllMermaid();
+        }
+      })();
+    </script>
+
+    <script>
+      (function () {
+        var toggle = document.getElementById('sidebarToggle');
+        var sidebar = document.getElementById('sidebar');
+        if (toggle && sidebar) {
+          toggle.addEventListener('click', function () {
+            sidebar.classList.toggle('open');
+          });
+          sidebar.addEventListener('click', function (e) {
+            if (e.target.tagName === 'A' && window.innerWidth <= 860) {
+              sidebar.classList.remove('open');
+            }
+          });
+        }
+
+        var checklistList = document.querySelector('ul.checklist-list');
+        var counter = document.querySelector('.checklist-counter');
+        if (checklistList && counter) {
+          var total = checklistList.querySelectorAll('input[type="checkbox"]').length;
+          function updateCounter() {
+            var checked = checklistList.querySelectorAll('input[type="checkbox"]:checked').length;
+            counter.textContent = checked + ' / ' + total + ' 完了';
+          }
+          checklistList.addEventListener('change', updateCounter);
+          updateCounter();
+        }
+
+        var navLinks = document.querySelectorAll('.sidebar a[href^="#"]');
+        var linkMap = new Map();
+        navLinks.forEach(function (link) {
+          var id = link.getAttribute('href').slice(1);
+          var heading = document.getElementById(id);
+          if (heading) linkMap.set(heading, link);
+        });
+
+        function clearActive() {
+          document.querySelectorAll('.sidebar li.active').forEach(function (li) {
+            li.classList.remove('active');
+          });
+        }
+
+        function setActive(link) {
+          clearActive();
+          if (!link) return;
+          var li = link.closest('li');
+          if (li) li.classList.add('active');
+          var parentSub = li ? li.closest('ul.nav-sub') : null;
+          if (parentSub) {
+            var parentLi = parentSub.closest('li.nav-h2');
+            if (parentLi) parentLi.classList.add('active');
+          }
+        }
+
+        var headingTargets = Array.from(linkMap.keys());
+        var thinObserver = new IntersectionObserver(
+          function (entries) {
+            entries.forEach(function (entry) {
+              if (entry.isIntersecting) {
+                var link = linkMap.get(entry.target);
+                if (link) setActive(link);
+              }
+            });
+          },
+          { rootMargin: '-15% 0px -75% 0px', threshold: 0 },
+        );
+        headingTargets.forEach(function (h) {
+          thinObserver.observe(h);
+        });
+      })();
+    </script>
+  </body>
+</html>
