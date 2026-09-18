@@ -1,8 +1,10 @@
 # 概要
 
-最終更新日: 2026-07-01
+最終更新日: 2026-09-18
 
-**関連ソースファイル**: `CLAUDE.md` / `AGENTS.md` / `GEMINI.md` / `web-next/` / `scraper/`
+> プロジェクト全体の概要やクイックスタートについては、ルートの [`README.md`](../README.md) を参照してください。
+
+**関連ソースファイル**: `README.md` / `CLAUDE.md` / `AGENTS.md` / `GEMINI.md` / `web-next/` / `scraper/`
 
 このドキュメントは、LLM-Studies リポジトリの構造・アーキテクチャ・主要サブシステムの概要を説明します。コードベースの構成と各コンポーネントの連携を理解するための出発点として機能します。
 
@@ -206,7 +208,7 @@ cd scraper && uv run pytest
 ```bash
 cd web-next && bun run build      # 全ルートが ○ (Static)
 cd web-next && bun run typecheck  # 型エラーゼロ
-cd web-next && bun run test       # 743 件 pass
+cd web-next && bun run test       # 1638+ 件 pass（全 Green ✅）
 cd web-next && bun run lint       # 新規違反ゼロ
-cd scraper && uv run pytest       # 38/38 passed
+cd scraper && uv run pytest       # 100/100 passed（全 Green ✅）
 ```
