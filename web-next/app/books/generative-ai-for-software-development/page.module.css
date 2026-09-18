@@ -41,14 +41,21 @@
   display: none !important;
 }
 
-/* 本ページ表示時: スクロール時の文字重なり防止のため、固定ヘッダーと警告バナーを完全不透明化 */
-:global(body:has([data-testid="layout-root"]) #common-header) {
+/* 本ページ表示時: スクロール時の文字重なり防止のため、固定ヘッダーと警告バナーを完全不透明化
+   data-page で本ページ限定にし、他ページのヘッダー/バナー色まで変わるのを防ぐ */
+:global(
+    body:has([data-testid="layout-root"][data-page="generative-ai-for-software-development"])
+    #common-header
+  ) {
   background-color: #05080f !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
 }
 
-:global(body:has([data-testid="layout-root"]) .ch-disclaimer) {
+:global(
+    body:has([data-testid="layout-root"][data-page="generative-ai-for-software-development"])
+    .ch-disclaimer
+  ) {
   background-color: #120e04 !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;

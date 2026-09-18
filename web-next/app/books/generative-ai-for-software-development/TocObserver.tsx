@@ -3,6 +3,8 @@
 import { useEffect } from "react";
 import styles from "./page.module.css";
 
+const MOBILE_BREAKPOINT = 980;
+
 /**
  * Observes document sections for active TOC tracking, mobile menu toggling, and checklist interactivity.
  */
@@ -13,15 +15,31 @@ export default function TocObserver() {
     const scrim = document.getElementById("scrim");
     const menuToggle = document.getElementById("menuToggle");
 
+    const syncSidebarInert = () => {
+      if (!sidebar) return;
+      const hidden =
+        window.innerWidth <= MOBILE_BREAKPOINT && !sidebar.classList.contains(styles.open);
+      sidebar.inert = hidden;
+    };
+
     const openMenu = () => {
       sidebar?.classList.add(styles.open);
       scrim?.classList.add(styles.show);
+      menuToggle?.setAttribute("aria-expanded", "true");
+      syncSidebarInert();
+      sidebar?.querySelector<HTMLAnchorElement>(`.${styles.navA}`)?.focus();
     };
 
     const closeMenu = () => {
+      const hadFocus = !!sidebar?.contains(document.activeElement);
       sidebar?.classList.remove(styles.open);
       scrim?.classList.remove(styles.show);
+      menuToggle?.setAttribute("aria-expanded", "false");
+      syncSidebarInert();
+      if (hadFocus) menuToggle?.focus();
     };
+
+    syncSidebarInert();
 
     const handleToggle = () => {
       if (sidebar?.classList.contains(styles.open)) {
@@ -34,12 +52,17 @@ export default function TocObserver() {
     menuToggle?.addEventListener("click", handleToggle);
     scrim?.addEventListener("click", closeMenu);
 
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeMenu();
+    };
+    document.addEventListener("keydown", handleKeyDown);
+
     const navLinks = Array.from(
       document.querySelectorAll<HTMLAnchorElement>(`.${styles.sidebar} .${styles.navA}`)
     );
 
     const handleLinkClick = () => {
-      if (window.innerWidth <= 980) {
+      if (window.innerWidth <= MOBILE_BREAKPOINT) {
         closeMenu();
       }
     };
@@ -124,6 +147,7 @@ export default function TocObserver() {
     return () => {
       menuToggle?.removeEventListener("click", handleToggle);
       scrim?.removeEventListener("click", closeMenu);
+      document.removeEventListener("keydown", handleKeyDown);
       for (const a of navLinks) {
         a.removeEventListener("click", handleLinkClick);
       }

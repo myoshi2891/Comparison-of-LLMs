@@ -122,7 +122,7 @@ export default function Page() {
           {" "}
           <i className="ti ti-rocket"></i>GenAI for Software Dev
         </a>
-        <button id="menuToggle" type="button" aria-label="メニューを開く">
+        <button id="menuToggle" type="button" aria-label="メニューを開く" aria-expanded="false">
           <i className="ti ti-menu-2"></i>メニュー
         </button>
       </div>
