@@ -1,6 +1,9 @@
 // @vitest-environment jsdom
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { render } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
+import { normalizeMermaidSource } from "@/tests/helpers/mermaid";
 import Page, { metadata } from "./page";
 import styles from "./page.module.css";
 
@@ -133,6 +136,216 @@ const EXPECTED_EXTERNAL_LINKS = [
   "https://www.itil.org.uk/training/itil-extension-modules/itil-ai-governance-version-5-training-course",
 ] as const;
 
+const EXPECTED_MERMAID_SOURCES = [
+  `flowchart TB
+subgraph found["土台となる考え方"]
+A["ガバナンスとは何か<br/>(Module 2)"]
+B["AIとは何か<br/>(Module 3)"]
+end
+
+subgraph core["中核となる2つのモデル"]
+C["ITIL AI Capability Model<br/>6C モデル<br/>(Module 4)"]
+D["ITIL AI Governance<br/>Improvement Model<br/>Assess-Design-Implement-Maintain<br/>(Module 6・7)"]
+end
+
+subgraph support["支える基盤と外部連携"]
+E["ITIL Value System /<br/>Four Dimensions<br/>(Module 5)"]
+F["規制・外部標準<br/>EU AI Act / ISO 42001 等<br/>(Module 7・9)"]
+G["PRINCE2 / DevOps との連携<br/>(Module 9)"]
+end
+
+H["実務適用<br/>役割・業界別の実践<br/>(Module 8)"]
+
+found --> core
+core --> support
+support --> H
+classDef box fill:#EEF1F8,stroke:#2E3F72,color:#161B26;
+classDef hub fill:#FAF1DF,stroke:#B8802A,color:#161B26;
+classDef done fill:#EAF4EC,stroke:#2F6B3D,color:#161B26;
+class A,B,E,F,G box;
+class C,D hub;
+class H done;`,
+  `flowchart LR
+A["ツールとしてのAI<br/>(AI as a Tool)"] --> B["アシスタントとしてのAI<br/>(AI as an Assistant)"]
+B --> C["同僚としてのAI<br/>(AI as a Co-worker)"]
+C --> D["AI対応ワークフォース<br/>(AI-enabled Workforce)"]
+classDef box fill:#EEF1F8,stroke:#2E3F72,color:#161B26;
+classDef hub fill:#FAF1DF,stroke:#B8802A,color:#161B26;
+classDef done fill:#EAF4EC,stroke:#2F6B3D,color:#161B26;
+class A,B,C box;
+class D done;`,
+  `flowchart TB
+G["ガバナンス<br/>Governance<br/>(方向づけ・監督・説明責任)"] -->|"方針・境界を設定"| M["マネジメント<br/>Management<br/>(計画・実行・統制)"]
+M -->|"実績・課題をフィードバック"| G
+L["リーダーシップ<br/>Leadership<br/>(動機づけ・方向性への共感)"] -.->|"下支えする"| G
+L -.->|"下支えする"| M
+classDef box fill:#EEF1F8,stroke:#2E3F72,color:#161B26;
+classDef hub fill:#FAF1DF,stroke:#B8802A,color:#161B26;
+classDef done fill:#EAF4EC,stroke:#2F6B3D,color:#161B26;
+class M,L box;
+class G hub;`,
+  `flowchart TB
+subgraph patterns["4つのガバナンスパターン"]
+D1["Directive<br/>指示型<br/>厳格なルール・低い裁量"]
+D2["Guided<br/>誘導型<br/>ガイドラインの範囲内で判断"]
+D3["Federated<br/>連邦型<br/>中央方針＋部門ごとの裁量"]
+D4["Autonomous<br/>自律型<br/>広い裁量・強い自己判断"]
+end
+classDef box fill:#EEF1F8,stroke:#2E3F72,color:#161B26;
+classDef hub fill:#FAF1DF,stroke:#B8802A,color:#161B26;
+classDef done fill:#EAF4EC,stroke:#2F6B3D,color:#161B26;
+class D1,D2,D3,D4 box;`,
+  `flowchart LR
+N["Narrow AI<br/>特化型AI<br/>単一タスクに特化<br/>例: 需要予測モデル"]
+G["Generative AI<br/>生成AI<br/>コンテンツ・コードを新規生成<br/>例: チャットボット, コード生成"]
+A["Agentic AI<br/>エージェント型AI<br/>目標達成のため自律的に<br/>複数ステップを実行"]
+
+N -->|"自律性・複雑性が増す"| G --> A
+classDef box fill:#EEF1F8,stroke:#2E3F72,color:#161B26;
+classDef hub fill:#FAF1DF,stroke:#B8802A,color:#161B26;
+classDef done fill:#EAF4EC,stroke:#2F6B3D,color:#161B26;
+class N,G box;
+class A hub;`,
+  `flowchart TB
+Hub(("6C Model"))
+C1["Creation<br/>創出<br/>新規コンテンツ・コード・<br/>ドキュメントの生成"]
+C2["Curation<br/>キュレーション<br/>既存データの重複排除・<br/>品質/関連性の向上"]
+C3["Clarification<br/>明確化<br/>複雑な情報の要約・<br/>ナビゲーション支援"]
+C4["Cognition<br/>認知<br/>パターン検出・予測・<br/>問題の予兆把握"]
+C5["Communication<br/>コミュニケーション<br/>チャットボット等の<br/>自然な対話インターフェース"]
+C6["Coordination<br/>調整<br/>複数タスク・エージェント間の<br/>連携とオーケストレーション"]
+
+Hub --- C1
+Hub --- C2
+Hub --- C3
+Hub --- C4
+Hub --- C5
+Hub --- C6
+classDef box fill:#EEF1F8,stroke:#2E3F72,color:#161B26;
+classDef hub fill:#FAF1DF,stroke:#B8802A,color:#161B26;
+classDef done fill:#EAF4EC,stroke:#2F6B3D,color:#161B26;
+class C1,C2,C3,C4,C5,C6 box;
+class Hub hub;`,
+  `flowchart TB
+subgraph VS["ITIL Value System"]
+GP["Guiding Principles<br/>指針となる原則"]
+GOV["Governance<br/>ガバナンス"]
+PSL["Product and Service<br/>Lifecycle Model<br/>旧称: Value Chain"]
+PRAC["Practices<br/>プラクティス"]
+CIM["Continual Improvement<br/>継続的改善"]
+end
+
+OPP["機会・需要<br/>Opportunity/Demand"] --> VS --> VAL["価値<br/>Value"]
+GOV -.->|"境界・方向づけ"| PSL
+GP -.->|"判断の指針"| PSL
+CIM -.->|"フィードバック"| VS
+classDef box fill:#EEF1F8,stroke:#2E3F72,color:#161B26;
+classDef hub fill:#FAF1DF,stroke:#B8802A,color:#161B26;
+classDef done fill:#EAF4EC,stroke:#2F6B3D,color:#161B26;
+class GP,PSL,PRAC,CIM,OPP box;
+class GOV hub;
+class VAL done;`,
+  `flowchart LR
+D1["Organizations and<br/>People<br/>組織と人材<br/>Organizations, people and AI 節"]
+D2["Information and<br/>Technology<br/>情報と技術<br/>ITIL AI Capability Model 6C"]
+D3["Partners and<br/>Suppliers<br/>パートナーと供給者"]
+D4["Value Streams and<br/>Processes<br/>バリューストリームと<br/>プロセス"]
+
+CENTER(("Product and<br/>Service<br/>Lifecycle"))
+D1 --- CENTER
+D2 --- CENTER
+D3 --- CENTER
+D4 --- CENTER
+classDef box fill:#EEF1F8,stroke:#2E3F72,color:#161B26;
+classDef hub fill:#FAF1DF,stroke:#B8802A,color:#161B26;
+classDef done fill:#EAF4EC,stroke:#2F6B3D,color:#161B26;
+class D1,D2,D3,D4 box;
+class CENTER hub;`,
+  `flowchart LR
+A["Assess<br/>アセス<br/>現状のガバナンス成熟度を<br/>評価し、ストレステストする"] --> B["Design<br/>デザイン<br/>ガバナンス要件を定義し、<br/>統制・調整策を設計する"]
+B --> C["Implement<br/>インプリメント<br/>ガバナンスの調整策を<br/>導入する"]
+C --> D["Maintain<br/>メンテイン<br/>監視・保証・継続的改善を<br/>通じて維持する"]
+D -.->|"継続的なフィードバック"| A
+classDef box fill:#EEF1F8,stroke:#2E3F72,color:#161B26;
+classDef hub fill:#FAF1DF,stroke:#B8802A,color:#161B26;
+classDef done fill:#EAF4EC,stroke:#2F6B3D,color:#161B26;
+class A,B,C,D hub;`,
+  `flowchart LR
+subgraph timeline["時間軸で見た統制の役割"]
+P["Preventive<br/>予防的統制<br/>問題の発生を未然に防ぐ"]
+DT["Detective<br/>発見的統制<br/>発生した問題を検知する"]
+CR["Corrective<br/>是正的統制<br/>検知した問題を修正する"]
+end
+P -->|"発生前"| DT -->|"発生後"| CR
+classDef box fill:#EEF1F8,stroke:#2E3F72,color:#161B26;
+classDef hub fill:#FAF1DF,stroke:#B8802A,color:#161B26;
+classDef done fill:#EAF4EC,stroke:#2F6B3D,color:#161B26;
+class P,DT,CR box;`,
+  `flowchart TB
+IMP["Implement<br/>導入"] --> OBS["Observability<br/>可観測性の確保"]
+OBS --> MON["Monitoring<br/>継続的な監視"]
+MON --> AUD["Auditability<br/>監査可能性の担保"]
+AUD --> ASSU["Assurance Evidence Pack<br/>保証のためのエビデンス収集"]
+ASSU -->|"改善点をフィードバック"| IMP
+classDef box fill:#EEF1F8,stroke:#2E3F72,color:#161B26;
+classDef hub fill:#FAF1DF,stroke:#B8802A,color:#161B26;
+classDef done fill:#EAF4EC,stroke:#2F6B3D,color:#161B26;
+class IMP,OBS,MON,AUD box;
+class ASSU done;`,
+  `flowchart TB
+subgraph inputs["外部からの入力"]
+REG["各国・地域の規制<br/>EU AI Act 等"]
+ISO["ISO/IEC 42001<br/>AIマネジメントシステム標準"]
+IEEE["IEEE 7014-2024<br/>擬似共感の倫理的配慮"]
+end
+
+subgraph aig["ITIL AI Governance<br/>Improvement Model"]
+ASS["Assess"] --> DES["Design"] --> IMPL["Implement"] --> MAI["Maintain"]
+end
+
+inputs --> aig
+classDef box fill:#EEF1F8,stroke:#2E3F72,color:#161B26;
+classDef hub fill:#FAF1DF,stroke:#B8802A,color:#161B26;
+classDef done fill:#EAF4EC,stroke:#2F6B3D,color:#161B26;
+class REG,ISO,IEEE box;
+class ASS,DES,IMPL,MAI hub;`,
+  `flowchart TB
+ITILHUB(("ITIL AI<br/>Governance"))
+
+P2["PRINCE2<br/>このAI導入プロジェクトを<br/>どう管理・統制するか<br/>に答える"]
+DO["DevOps<br/>AIをどう安全かつ迅速に<br/>継続的にデリバリーするか<br/>に答える"]
+REG["規制・外部標準<br/>何が法的・社会的に<br/>許容されるかに答える"]
+
+ITILHUB ---|"プロダクト・サービス全体の<br/>統治の枠組みを提供"| P2
+ITILHUB ---|"パイプラインへの<br/>ガバナンス組み込み"| DO
+ITILHUB ---|"統制設計への<br/>入力として反映"| REG
+classDef box fill:#EEF1F8,stroke:#2E3F72,color:#161B26;
+classDef hub fill:#FAF1DF,stroke:#B8802A,color:#161B26;
+classDef done fill:#EAF4EC,stroke:#2F6B3D,color:#161B26;
+class P2,DO,REG box;
+class ITILHUB hub;`,
+  `flowchart TB
+VS["ITIL Value System /<br/>Four Dimensions<br/>第5章"]
+PAT["4つのガバナンスパターン<br/>Directive/Guided/<br/>Federated/Autonomous<br/>第2章"]
+PERS["4つのガバナンス視点<br/>権限/倫理/データ/規制<br/>第4章"]
+CAP["6C Capability Model<br/>第4章"]
+IMP["ITIL AI Governance<br/>Improvement Model<br/>Assess-Design-Implement-Maintain<br/>第6・7章"]
+MAT["ITIL Maturity Model /<br/>AI Governance Maturity<br/>Assessment 第5章"]
+EXT["外部標準・規制<br/>EU AI Act/ISO42001/<br/>IEEE7014 第7・9章"]
+
+VS --> CAP
+CAP --> PERS
+PAT --> IMP
+PERS --> IMP
+MAT --> IMP
+EXT --> IMP
+classDef box fill:#EEF1F8,stroke:#2E3F72,color:#161B26;
+classDef hub fill:#FAF1DF,stroke:#B8802A,color:#161B26;
+classDef done fill:#EAF4EC,stroke:#2F6B3D,color:#161B26;
+class VS,PAT,PERS,CAP,MAT,EXT box;
+class IMP hub;`,
+] as const;
+
 describe("ITIL AI Governance (Version 5) 完全学習ガイド - 契約テスト", () => {
   // S-1: 原本見出し契約（順序込み完全一致）
   it("S-1: H1見出しが原本と完全一致する", () => {
@@ -179,13 +392,19 @@ describe("ITIL AI Governance (Version 5) 完全学習ガイド - 契約テスト
     expect(tocLinks).toEqual([...EXPECTED_TOC_HREFS]);
   });
 
-  // S-4: Mermaid ダイアグラム契約（全14図解）
-  it("S-4: 14個のMermaid図解が描画され、ライトテーマ(theme='base')とthemeVariablesが設定されている", () => {
+  // S-4: Mermaid ダイアグラム契約（全14図解、原本ソースと順序・内容込みで完全一致）
+  it("S-4: 14個のMermaid図解が原本のソースと順序・内容込みで完全一致し、ライトテーマ(theme='base')とthemeVariablesが設定されている", () => {
     const { container } = render(<Page />);
     const diagrams = container.querySelectorAll("[data-testid='mermaid']");
     expect(diagrams).toHaveLength(14);
+
+    const actualSources = Array.from(diagrams).map((diagram) =>
+      normalizeMermaidSource(diagram.textContent ?? "")
+    );
+    const expectedSources = EXPECTED_MERMAID_SOURCES.map((src) => normalizeMermaidSource(src));
+    expect(actualSources).toEqual(expectedSources);
+
     for (const diagram of Array.from(diagrams)) {
-      expect(diagram.textContent).toMatch(/flowchart\s+(?:TB|LR)/);
       expect(diagram.getAttribute("data-theme")).toBe("base");
       expect(diagram.getAttribute("data-has-theme-vars")).toBe("true");
     }
@@ -286,11 +505,11 @@ describe("ITIL AI Governance (Version 5) 完全学習ガイド - 契約テスト
   });
 
   // D-3: 鮮度バー非表示
-  it("D-3: page.module.css にグローバル鮮度バー非表示クラスが含まれている", () => {
-    expect(styles.layout).toBeDefined();
-    expect(styles.sidebar).toBeDefined();
-    expect(styles.main).toBeDefined();
-    expect(styles.callout).toBeDefined();
+  it("D-3: page.module.css が本ページ限定で #site-freshness-bar を display: none !important で非表示化する", () => {
+    const css = readFileSync(join(__dirname, "page.module.css"), "utf8");
+    expect(css).toMatch(
+      /:global\(body:has\(\[data-itil-ai-governance="true"\]\)\s*#site-freshness-bar\)\s*\{[^}]*display:\s*none\s*!important/s
+    );
   });
 
   // D-4: レイアウトルート契約（黒線防止用）
