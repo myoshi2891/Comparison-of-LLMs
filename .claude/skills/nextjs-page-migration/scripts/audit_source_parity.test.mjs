@@ -308,6 +308,34 @@ export default function Page() {
 	assert.equal(result.json.mermaidSourcesMatch, true);
 });
 
+test("keeps the rest of a template-literal DIAGRAMS entry after an escaped backtick in a Mermaid node label", () => {
+	// A Mermaid markdown-string node label wrapped in backticks (e.g. A["`code`"]) forces the
+	// backticks to be escaped when the whole entry is itself delimited by a JS template literal.
+	// A non-escape-aware extractor would treat the first escaped backtick as the entry's closing
+	// delimiter and drop everything after it (here, the edge to B). The chart is kept single-line
+	// and the page-side constant single-quoted so this exercises only the HTML-side template-literal
+	// branch under test, not the (separate, unrelated) page-side constant extractor.
+	const backtick = "`";
+	const chartValue = `flowchart TD;A["${backtick}code${backtick}"]-->B`;
+	const source = `<script>
+const DIAGRAMS = {
+  "sample": \`flowchart TD;A["\\${backtick}code\\${backtick}"]-->B\`
+};
+</script>`;
+
+	const page = `const CHART = 'flowchart TD;A["${backtick}code${backtick}"]-->B';
+export default function Page() {
+  return <MermaidDiagram chart={CHART} />;
+}`;
+
+	const result = audit(source, page);
+
+	assert.equal(result.status, 0);
+	assert.equal(result.json.mermaidSourcesMatch, true);
+	assert.deepEqual(result.json.sourceMermaidSources, [chartValue]);
+	assert.deepEqual(result.json.pageMermaidSources, [chartValue]);
+});
+
 test("treats normalized HTML and Markdown paragraphs as blocking parity elements", () => {
 	const matchingHtml = audit(
 		"<p>First ordinary paragraph.</p><p>Second ordinary paragraph.</p>",

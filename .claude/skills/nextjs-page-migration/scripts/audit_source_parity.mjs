@@ -367,14 +367,14 @@ function resolveStringConstants(content, constants) {
 }
 
 /**
- * Decodes `\n`, `\r`, `\'`, `\"`, and `\\` escape sequences in a single left-to-right pass.
+ * Decodes `\n`, `\r`, `\'`, `\"`, `` \` ``, and `\\` escape sequences in a single left-to-right pass.
  *
  * A sequential chain of independent `.replace()` calls (one per escape) can re-interpret
  * a decoded backslash produced by an earlier step as part of a later escape — an escaped
  * backslash immediately followed by a literal `n` (source text `\\n`) would otherwise
  * decode to a newline instead of a literal backslash + "n". Consuming each escape exactly
  * once avoids that.
- * @param {string} raw - Quoted string content with escape sequences still literal.
+ * @param {string} raw - Quoted or template-literal string content with escape sequences still literal.
  * @returns {string} The decoded text.
  */
 function decodeQuotedEntryEscapes(raw) {
@@ -387,7 +387,7 @@ function decodeQuotedEntryEscapes(raw) {
         out += "\n";
       } else if (next === "r") {
         out += "\r";
-      } else if (next === "'" || next === '"' || next === "\\") {
+      } else if (next === "'" || next === '"' || next === "`" || next === "\\") {
         out += next;
       } else {
         out += char + next;
@@ -424,11 +424,15 @@ function collectHtmlMermaidSources(src) {
 
   // 非クォートキーは Unicode 識別子（"図解: `...`" 等）も許容する。CJK 見出しをキーに
   // 使う DIAGRAMS オブジェクトが実在し、ASCII 限定だと該当エントリが監査から漏れる。
+  // テンプレートリテラル分岐は非貪欲な `` `([\s\S]*?)` `` だと、値の中の Mermaid ノード
+  // ラベルがバッククォートを含む場合（例: `A["\`code\`"]`）、エスケープされた
+  // バッククォートで閉じたと誤認し、以降の本文が丸ごと欠落する。他の分岐と同様に
+  // エスケープシーケンスを読み飛ばしてから閉じバッククォートを探す。
   const diagramEntryRe =
-    /(?:["'][^"']+["']|[\p{L}_$][\p{L}\p{N}_$]*)\s*:\s*(?:`([\s\S]*?)`|'((?:[^'\\]|\\.)*)'|"((?:[^"\\]|\\.)*)")/gu;
+    /(?:["'][^"']+["']|[\p{L}_$][\p{L}\p{N}_$]*)\s*:\s*(?:`((?:[^`\\]|\\.)*)`|'((?:[^'\\]|\\.)*)'|"((?:[^"\\]|\\.)*)")/gu;
   let entry = diagramEntryRe.exec(src);
   while (entry !== null) {
-    const raw = entry[1] ?? decodeQuotedEntryEscapes(entry[2] ?? entry[3] ?? "");
+    const raw = decodeQuotedEntryEscapes(entry[1] ?? entry[2] ?? entry[3] ?? "");
     sources.push({ index: entry.index, source: normalizeMermaidSource(raw) });
     entry = diagramEntryRe.exec(src);
   }
