@@ -1,15 +1,16 @@
 # Testing
 
-Updated 2026-07-01
+Updated 2026-09-18
 
-> テスト戦略・実行方法・テスト追加ガイドライン。
+> テスト戦略・実行方法・テスト追加ガイドライン。数値は本更新日に `bun run test` / `uv run pytest` を実際に実行して確認した実測値。
 
 ## 現状のテスト体制
 
-| 領域 | フレームワーク | 状態 | コマンド |
+| 領域 | フレームワーク | 状態（実測 2026-09-18） | コマンド |
 | ------ | --------------- | ------ | ---------- |
-| フロントエンド (web-next/) | Vitest + @testing-library/react | 743 passed（全 Green、google新規コンポーネントテスト含む） | `cd web-next && bun run test` |
-| スクレイパー (scraper/) | pytest | 38/38 passed | `cd scraper && uv run pytest` |
+| フロントエンド (web-next/) | Vitest + @testing-library/react | **177 files / 1639 tests** 全 Green | `cd web-next && bun run test` |
+| スクレイパー (scraper/) | pytest | **100 tests（5 ファイル）** 全 Green | `cd scraper && uv run pytest` |
+| E2E (web-next/e2e/) | Playwright | 実装済みだが **CI 未組込・一部が現行 DOM と不整合**（詳細は後述） | `cd web-next && bun run test:e2e` |
 
 ## テスト実行
 
@@ -17,28 +18,28 @@ Updated 2026-07-01
 
 ```bash
 cd web-next
-bun run test           # vitest 実行 (watch モード)
-bun run test --run     # 単発実行 (CI 用)
+bun run test           # vitest 実行（単発、デフォルトで `vitest run`）
+bun run test:watch     # watch モード
+bun run test:coverage  # カバレッジ付き実行（lcov.info 生成、CI/make sonar 用）
 ```
 
 **設定ファイル:**
 
-- テストランナー: `vitest` (`web-next/vitest.config.ts`)
+- テストランナー: `vitest`（`web-next/vitest.config.ts`）
 - DOM 環境: `jsdom`
-- セットアップ: `web-next/` 内の各 `page.test.tsx` が担当
 - tsconfig: `web-next/tsconfig.json` の `strict: true` + `erasableSyntaxOnly: true`
 
-**既存テスト構成:**
+**実際のテストファイル配置（177 files の内訳）:**
 
-```text
-web-next/tests/
-  cost.test.ts              - lib/cost.ts 純粋関数テスト
-  pricing.test.ts           - Zod スキーマバリデーション
-  i18n.test.ts              - i18n ヘルパーテスト
-  ...
-web-next/app/{claude,gemini,codex,copilot}/*/page.test.tsx
-  - 各ガイドページの contract テスト（タイトル・セクション数・外部リンク rel・metadata）
-```
+| 配置場所 | ファイル数 | 内容 |
+| --- | --- | --- |
+| `web-next/app/**/page.test.tsx` | 136 | 各ページの contract テスト（タイトル・セクション数・外部リンク rel・metadata 等） |
+| `web-next/components/**/*.test.tsx` | 18 | 共有コンポーネント（`SiteHeader` / `PageFreshness` / `ScenarioSelector` 等）のレンダリングテスト |
+| `web-next/tests/*.test.ts` | 15 | 横断的な契約テスト（`page-registry-coverage.test.ts` / `nav-derivation.test.ts` / `rss.test.ts` / `netlify-redirects.test.ts` / `fonts-selfhost.test.ts` 等） |
+| `web-next/lib/*.test.ts` | 7 | 純粋関数のユニットテスト（`cost.test.ts` / `pricing.test.ts` / `i18n.test.ts` 等。**ソースファイルと同一ディレクトリに配置**） |
+| `web-next/types/pricing.test.ts` | 1 | 型スキーマのバリデーションテスト |
+
+> **旧版との差分**: 以前の版では `cost.test.ts` / `pricing.test.ts` / `i18n.test.ts` を `web-next/tests/` 配下と記載していたが、実際は `web-next/lib/` にソースファイルと同居している。ユニットテストはソース隣接配置、横断的な契約テストのみ `web-next/tests/` に集約する運用。
 
 ### スクレイパー
 
@@ -49,21 +50,47 @@ uv run pytest -v           # 詳細出力
 uv run pytest -k "test_"   # パターンマッチ
 ```
 
-**設定:**
+**実際のテストファイル構成（100 tests の内訳）:**
 
-- `pyproject.toml` の `[dependency-groups]` dev に `pytest>=9.0.2`
-- 単純なインポート検証 (`test_imports.py`) および基本的なスモークテスト (`tests/smoke/`) が設定されています。
+```text
+scraper/tests/
+  smoke/test_smoke.py    - 4 tests   CLI 全体のスモークテスト
+  test_browser.py        - 8 tests   価格抽出ロジック（extract_price / sanity_check 等）
+  test_imports.py        - 1 test    全モジュールのインポート検証
+  test_providers.py      - 62 tests  API プロバイダー別スクレイパー（anthropic/openai/google/aws/deepseek/xai/moonshot/zhipu）
+  test_tools.py          - 25 tests  コーディングツール別スクレイパー（cursor/github_copilot/windsurf 等）
+```
+
+> **旧版との差分**: 以前の版では `test_models.py` / `test_exchange.py` / `test_main.py` という構成を記載していたが、これらのファイルは現在のリポジトリに存在しない。上記が実際の構成。
 
 ## CI での実行
 
-GitHub Actions で自動実行:
+GitHub Actions に 3 つのワークフローが存在する。
 
 ```text
-push / pull_request
-  ├── web-next/** 変更時  → cd web-next && bun run test
-  ├── web-next/** 変更時  → cd web-next && bun run typecheck
-  └── scraper/** 変更時   → cd scraper && uv run pytest
+.github/workflows/test.yaml       # プッシュ / PR ごとに実行。パスフィルタで変更領域のみテスト
+  ├── web-next/** 変更時   → bun install --frozen-lockfile → bun audit → bun run test
+  └── scraper/** 変更時    → uv sync --frozen → uv run pytest
+
+.github/workflows/sonarqube.yml   # push:main,dev および PR。カバレッジ生成 → SonarQube Cloud 解析
+  ├── bun run test:coverage（web-next）
+  ├── uv run pytest --cov --cov-report=xml（scraper）
+  └── SONAR_TOKEN 未設定時はスキャン自体をスキップ（フォーク PR でも同様にスキップ）
+
+.github/workflows/auto-fix.yml    # test.yaml の失敗を検知して GitHub Issue を自動作成
+  └── 既存の "CI Failure — Auto Fix Needed" Issue が無い場合のみ新規作成
 ```
+
+**重要な注意点**: `bun run typecheck` / `bun run lint` / `bun run build` は **GitHub Actions のいずれのワークフローにも含まれていない**。これらは `CLAUDE.md` の「コミット前チェック」に定義されたローカル/エージェント向けの手動チェック項目であり、リモート CI では強制されていない。CI で自動検証されるのは `bun run test`（+ `bun audit`）と `uv run pytest` のみ。
+
+## E2E テスト（`web-next/e2e/`）の位置づけ
+
+`package.json` には `test:e2e`（`playwright test`）スクリプトと `web-next/e2e/calculator.e2e.ts` / `web-next/e2e/smoke.e2e.ts` の 2 ファイルが存在するが、以下の点に注意すること。
+
+- **CI 未組込**: `.github/workflows/` のいずれからも `test:e2e` は呼び出されない。手動実行専用。
+- **`smoke.e2e.ts`** はホームページの `.hero`（`components/Hero.tsx`）・`nav#common-header`（`components/site/SiteHeader.tsx`）等、現行の DOM 構造と一致するセレクタを使用しており、実行できる可能性が高い（未実測）。
+- **`calculator.e2e.ts` の `should load calculator UI elements` は現行コードと不整合**: `#scenario-selector` と `#api-pricing-table` という ID をアサートしているが、この 2 つの ID は `web-next/` 配下のソースコード全体（`e2e/calculator.e2e.ts` 自身を除く）のどこにも定義されていない（`grep -rn` で確認済み、2026-09-18）。実行すれば失敗する可能性が高い。旧 Vite 版フロントエンド（`legacy/`）由来のテストが Next.js 移行時に更新されないまま残存したものと推測される。
+- `docs/TESTING.md` の旧版および現行の方針（後述）は「ブラウザ自動化テストは書かない」としているが、これらのファイル自体は削除されずリポジトリに残っている。**削除するか現行 DOM に合わせて修正するかは、このドキュメント更新の時点では未決定**（本ドキュメントは事実の記録に留め、方針変更は行わない）。
 
 ## テスト追加ガイドライン
 
@@ -72,8 +99,10 @@ push / pull_request
 #### ファイル命名規則
 
 ```text
-web-next/tests/<name>.test.ts       # ユーティリティテスト
-web-next/app/<provider>/<slug>/page.test.tsx  # ガイドページ contract テスト
+web-next/lib/<name>.test.ts                    # lib/ 配下の純粋関数テスト（ソースと同居）
+web-next/components/<name>.test.tsx             # コンポーネントテスト（ソースと同居）
+web-next/tests/<name>.test.ts                   # 横断的な契約テスト（page-registry / nav / rss 等）
+web-next/app/<provider>/<slug>/page.test.tsx     # ガイドページ contract テスト
 ```
 
 #### 推奨テストパターン
@@ -81,8 +110,8 @@ web-next/app/<provider>/<slug>/page.test.tsx  # ガイドページ contract テ�
 **1. コスト計算ロジック (`lib/cost.ts`)** — 最優先
 
 ```typescript
-// web-next/tests/cost.test.ts
-import { calcApiCost, calcSubCost, colorIndex, fmtUSD, fmtJPY } from '@/lib/cost'
+// web-next/lib/cost.test.ts
+import { calcApiCost, calcSubCost, colorIndex, fmtUSD, fmtJPY } from './cost'
 
 describe('calcApiCost', () => {
   it('1時間のコストを正しく計算する', () => {
@@ -138,10 +167,10 @@ describe('fmtUSD', () => {
 })
 ```
 
-## **2. コンポーネントテスト**
+**2. コンポーネントテスト**
 
 ```typescript
-// src/components/ScenarioSelector.test.tsx
+// web-next/components/ScenarioSelector.test.tsx
 import { render, screen, fireEvent } from '@testing-library/react'
 import { ScenarioSelector } from './ScenarioSelector'
 
@@ -166,62 +195,31 @@ describe('ScenarioSelector', () => {
 
 - `vi.fn()` でモック関数を作成（jest.fn() ではない）
 - `vi.mock()` でモジュールモック
-- `@testing-library/jest-dom` のマッチャー (`toBeInTheDocument` 等) は `setupTests.ts` で自動読み込み
+- `@testing-library/jest-dom` のマッチャー (`toBeInTheDocument` 等) は自動読み込み
 
 ### スクレイパー (`scraper/`)
 
 #### ファイル配置
 
 ```text
-scraper/
-├── tests/
-│   ├── __init__.py
-│   ├── test_models.py      # Pydantic モデルのバリデーション
-│   ├── test_exchange.py     # 為替レート取得 (モック)
-│   ├── test_browser.py      # 価格抽出ロジック
-│   └── test_main.py         # CLI エントリポイント
+scraper/tests/
+├── __init__.py
+├── test_browser.py      # 価格抽出ロジック（extract_price / sanity_check）
+├── test_imports.py      # 全モジュールのインポート検証
+├── test_providers.py    # API プロバイダー別スクレイパーのテスト
+├── test_tools.py        # コーディングツール別スクレイパーのテスト
+└── smoke/
+    └── test_smoke.py    # CLI 全体のスモークテスト
 ```
 
-#### 推奨テストパターン2
+新規プロバイダー/ツールを追加した場合は、既存の `test_providers.py` / `test_tools.py` に対応するテストケースを追記する（新規ファイルを作る必要はない。詳細は `.claude/skills/add-provider/` / `.claude/skills/add-tool/`）。
 
-**1. モデルバリデーション** — 最優先
+#### 推奨テストパターン
 
-```python
-# tests/test_models.py
-import pytest
-from pydantic import ValidationError
-from scraper.models import ApiModel, SubTool, PricingData
-
-class TestApiModel:
-    def test_valid_model(self):
-        """正常な ApiModel を生成できる"""
-        m = ApiModel(
-            provider="TestProvider",
-            name="Test Model",
-            tag="Test",
-            cls="tag-bal",
-            price_in=3.0,
-            price_out=15.0,
-            sub_ja="テスト",
-            sub_en="Test",
-            scrape_status="success",
-        )
-        assert m.price_in == 3.0
-
-    def test_negative_price_rejected(self):
-        """負の価格は ValidationError"""
-        with pytest.raises(ValidationError):
-            ApiModel(
-                provider="X", name="X", tag="X", cls="X",
-                price_in=-1.0, price_out=0.0,
-                sub_ja="", sub_en="",
-            )
-```
-
-## **2. 価格抽出ロジック (外部通信なし)**
+**1. 価格抽出ロジック (外部通信なし)** — 最優先
 
 ```python
-# tests/test_browser.py
+# scraper/tests/test_browser.py
 from scraper.browser import extract_price, sanity_check
 
 class TestExtractPrice:
@@ -236,12 +234,6 @@ class TestExtractPrice:
         result = extract_price("no price here", [r"\$\s*([\d.]+)"])
         assert result is None
 
-    def test_out_of_range_rejected(self):
-        """範囲外の値は None"""
-        html = "$999999.00"
-        result = extract_price(html, [r"\$([\d.]+)"])
-        assert result is None
-
 class TestSanityCheck:
     def test_valid_value(self):
         value, status = sanity_check(3.0, "test", 5.0)
@@ -254,38 +246,17 @@ class TestSanityCheck:
         assert status == "fallback"
 ```
 
-## **3. 為替レート取得 (httpx モック)**
+**2. プロバイダー/ツールのスクレイプ関数テスト（既存 HTML フィクスチャに対する抽出検証）**
 
 ```python
-# tests/test_exchange.py
-from unittest.mock import patch, MagicMock
-from scraper.exchange import fetch_jpy_rate
-
-class TestFetchJpyRate:
-    def test_success(self):
-        mock_resp = MagicMock()
-        mock_resp.json.return_value = {
-            "rates": {"JPY": 155.22},
-            "date": "2026-02-21",
-        }
-        mock_resp.raise_for_status = MagicMock()
-
-        with patch("scraper.exchange.httpx.get", return_value=mock_resp):
-            rate, date = fetch_jpy_rate()
-            assert rate == 155.22
-            assert date == "2026-02-21"
-
-    def test_failure_returns_fallback(self):
-        with patch("scraper.exchange.httpx.get", side_effect=Exception("timeout")):
-            rate, date = fetch_jpy_rate(fallback=150.0)
-            assert rate == 150.0
-            assert date == "fallback"
+# scraper/tests/test_providers.py の既存パターンに追記する形で実装する
+# 実際のネットワーク呼び出しは行わず、HTML 文字列や既存 JSON をそのまま関数に渡して検証する
 ```
 
 ### スクレイパーテストの原則
 
 - **外部通信はモック必須**: Playwright や httpx の実際のネットワーク呼び出しはテストしない
-- **ロジック部分をテスト**: `extract_price`, `sanity_check`, モデルバリデーション
+- **ロジック部分をテスト**: `extract_price`, `sanity_check`, 各プロバイダー/ツールの抽出関数
 - **E2E スクレイプテストは書かない**: 外部サイトの HTML 構造変更で壊れるため
 
 ## AAA パターン
@@ -305,3 +276,6 @@ Assert:  期待結果を検証
 - `pricing.json` のハードコードされた値への依存（価格は頻繁に変わる）
 - 実装の内部詳細への依存（プライベート関数のテスト等）
 - タイマーやタイムアウトに依存するテスト
+- 件数のみ・存在のみ・部分一致のみのアサーション（移行漏れ等を素通しする。詳細は `.claude/rules/tdd-mandatory-cycle.md` の「テスト強度の下限」）
+
+> ブラウザ自動化テスト（Playwright 等）は本ドキュメントの方針としては新規に書かないこととしているが、`web-next/e2e/` に既存の実装が残っている。上記「E2E テストの位置づけ」を参照。

@@ -29,7 +29,7 @@
   - 原本照合監査スクリプト `audit_source_parity.mjs` を拡張し、シングル・ダブルクォート文字列の Mermaid 抽出に対応した上で、原本とのパリティ監査で exit code 0（漏れなし ✅）を確認。
   - 原本 `Itil-ai-governance-v5-study-guide.html` および `Itil-ai-governance-v5-study-guide.md` は `archive/html/governance/` および `archive/md/governance/` へ退避保存。
   - `web-next/lib/page-registry.ts` に新規エントリ（`slug: "/governance/itil-ai-governance-v5"`, `group: "資格試験"`）を登録。
-  - 契約テスト17件（S-1〜S-4, C-1〜C-5, D-1〜D-3, Q-1〜Q-2）を作成し、Vitest **177 files / 1638 tests** 全 Green ✅、typecheck ✅、Biome lint ✅ を確認。
+  - 契約テスト17件（S-1〜S-4, C-1〜C-5, D-1〜D-3, Q-1〜Q-2）を作成し、Vitest **177 files / 1639 tests** 全 Green ✅、typecheck ✅、Biome lint ✅ を確認。
 
 - **AI Engineering 入門ガイド（/books/ai-engineering-guide）の Next.js アプリ移行**:
   - `Ai-engineering-guide.html` を `web-next/app/books/ai-engineering-guide/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。

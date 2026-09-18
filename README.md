@@ -208,7 +208,7 @@ bun run dev
 2. **原本照合監査 (Source Parity Audit)**:
    - 原本 HTML/Markdown からの移植時、内容の脱落を防止するため照合監査スクリプトを実行し `exit code 0` を確認。
    ```bash
-   bun scripts/audit_source_parity.mjs <原本ファイル> <page.tsx>
+   bun .claude/skills/nextjs-page-migration/scripts/audit_source_parity.mjs <原本ファイル> <page.tsx>
    ```
 3. **型パリティ検証**:
    - バックエンドの Pydantic モデル（`models.py`）とフロントエンドの TypeScript 型（`pricing.ts`）の型整合性をコンパイル時に検証。
