@@ -40,6 +40,7 @@ export default function TocObserver() {
     };
 
     syncSidebarInert();
+    window.addEventListener("resize", syncSidebarInert);
 
     const handleToggle = () => {
       if (sidebar?.classList.contains(styles.open)) {
@@ -152,6 +153,7 @@ export default function TocObserver() {
         a.removeEventListener("click", handleLinkClick);
       }
       window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", syncSidebarInert);
       for (const c of checkItems) {
         c.removeEventListener("change", handleCheckboxChange);
       }

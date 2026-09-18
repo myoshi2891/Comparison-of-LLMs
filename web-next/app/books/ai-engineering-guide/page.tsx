@@ -1797,7 +1797,7 @@ export default function AiEngineeringGuidePage() {
 
         <footer className={styles.pageFooter}>
           AI Engineering 入門ガイド &middot; 情報基準日 2026年9月9日 &middot;
-          出典は各セクションおよびセクション17に記載
+          出典はセクション17に集約して記載（一部は本文中にも記載）
         </footer>
       </div>
 

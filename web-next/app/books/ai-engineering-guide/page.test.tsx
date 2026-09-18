@@ -214,8 +214,9 @@ describe("AI Engineering 入門ガイド契約テスト", () => {
 
     it("S-4: 全 h2/h3 が一意な id を持ち、TOC アンカーが実在する見出しを指す", () => {
       const { container } = render(<Page />);
-      const idElements = Array.from(container.querySelectorAll("section[id], h2[id], h3[id]"));
-      const ids = idElements.map((el) => el.getAttribute("id")).filter(Boolean);
+      const headingElements = Array.from(container.querySelectorAll("h2, h3"));
+      const ids = headingElements.map((el) => el.getAttribute("id"));
+      expect(ids.every((id) => !!id)).toBe(true);
       const uniqueIds = new Set(ids);
       expect(uniqueIds.size).toBe(ids.length);
 

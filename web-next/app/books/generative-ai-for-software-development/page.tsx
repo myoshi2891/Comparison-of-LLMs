@@ -255,7 +255,7 @@ export default function Page() {
               {" "}
               <i className="ti ti-book-2"></i>
             </div>
-            <h2>この本について</h2>
+            <h2 id="book-info-h2">この本について</h2>
           </div>
           <div className={styles.bookCard}>
             <div className={styles.bookCover}>
@@ -324,10 +324,10 @@ export default function Page() {
               {" "}
               <i className="ti ti-telescope"></i>
             </div>
-            <h2>Step 0. なぜ今このテーマなのか</h2>
+            <h2 id="step0-h2">Step 0. なぜ今このテーマなのか</h2>
           </div>
 
-          <h3>0-1. 数字で見る「AIが当たり前になった」開発現場</h3>
+          <h3 id="sub-0-1">0-1. 数字で見る「AIが当たり前になった」開発現場</h3>
           <p>
             生成AIはこの数年でソフトウェア開発の「特別な機能」から「標準装備」へと変わりました。GitHubが2025年10月に発表したOctoverse
             2025レポートでは、2024年9月〜2025年8月の1年間でGitHub上の開発者数が1億8000万人を突破し、新規開発者の約8割が登録から1週間以内にGitHub
@@ -384,7 +384,7 @@ export default function Page() {
             。
           </p>
 
-          <h3>0-2. 「バイブコーディング」という言葉の広がり</h3>
+          <h3 id="sub-0-2">0-2. 「バイブコーディング」という言葉の広がり</h3>
           <p>
             2025年初頭、AI研究者のAndrej Karpathy氏が提唱した「vibe
             coding(バイブコーディング)」という言葉は、自然言語での指示だけでアプリケーションを作り上げる開発スタイルを指す言葉として一気に広まりました。2026年時点では、世界で本番稼働しているコードのうち4割前後がAI支援によって生成されているという業界記事による推計もあり、AIファーストのアプリビルダー市場は前年から大きく成長しています{" "}
@@ -425,7 +425,7 @@ export default function Page() {
             </div>
           </div>
 
-          <h3>0-3. 本ガイドの読み方</h3>
+          <h3 id="sub-0-3">0-3. 本ガイドの読み方</h3>
           <p>
             以下のStepは、原書の章構成(第1章〜第8章)に沿って、それぞれ「どんな種類のツールがあるか」「代表的な製品」「2026年時点の最新動向」「実務での使い方のコツ」を解説します。Step
             9以降は原書の内容を踏まえた実践編・応用編として、AIを組み込んだ開発ワークフロー全体像、リスク管理、ツール選定の考え方、そして今後の展望をまとめています。
@@ -448,19 +448,19 @@ export default function Page() {
               {" "}
               <i className="ti ti-code"></i>
             </div>
-            <h2>Step 1. コード生成とオートコンプリート</h2>
+            <h2 id="step1-h2">Step 1. コード生成とオートコンプリート</h2>
           </div>
           <p className={styles.lead}>
             原書第1章のテーマです。コード生成ツールは大きく「ブラウザ(チャット)ベース」と「IDE統合型」の2種類に分けられます。
           </p>
 
-          <h3>1-1. ブラウザベースのツール</h3>
+          <h3 id="sub-1-1">1-1. ブラウザベースのツール</h3>
           <p>
             ChatGPTやGoogle
             Geminiのようなチャット型AIは、コードスニペットの生成、アルゴリズムの説明、エラーメッセージの解読など、エディタを離れて「相談する」使い方に向いています。コードベース全体を継続的に把握するわけではないため、独立した小さな問題を解く場面で特に力を発揮します。
           </p>
 
-          <h3>1-2. IDE統合型ツール(2026年の主戦場)</h3>
+          <h3 id="sub-1-2">1-2. IDE統合型ツール(2026年の主戦場)</h3>
           <p>
             2023年頃は「次の1行を提案するオートコンプリート」が主流でしたが、2026年時点では「コードベース全体を読み、計画を立て、複数ファイルを編集し、ターミナルコマンドを実行し、自分の出力を検証する」自律型のコーディングエージェントが標準になっています{" "}
             <sup>
@@ -591,7 +591,7 @@ export default function Page() {
             。
           </p>
 
-          <h3>1-3. 使い分けの考え方</h3>
+          <h3 id="sub-1-3">1-3. 使い分けの考え方</h3>
           <div className={styles.diagramWrap} data-testid="mermaid-diagram">
             <div className={styles.diagramCard}>
               <MermaidDiagram chart={DIAGRAM_MMD_1} theme="base" themeVariables={BOOK_THEME_VARS} />
@@ -612,13 +612,13 @@ export default function Page() {
               {" "}
               <i className="ti ti-palette"></i>
             </div>
-            <h2>Step 2. UI/UXデザインとフロントエンド開発</h2>
+            <h2 id="step2-h2">Step 2. UI/UXデザインとフロントエンド開発</h2>
           </div>
           <p className={styles.lead}>
             原書第2章のテーマです。自然言語の指示だけでUIやフロントエンドアプリケーションを生成するツールは、2025年以降のAI開発ツール市場で最も成長が著しい分野の一つです。
           </p>
 
-          <h3>2-1. 主要な「AIアプリビルダー」</h3>
+          <h3 id="sub-2-1">2-1. 主要な「AIアプリビルダー」</h3>
           <div className={styles.tableWrap}>
             <div className={styles.tableTitle}>主要なAIアプリビルダー</div>
             <table>
@@ -707,7 +707,7 @@ export default function Page() {
             。これらの数字はベンダー発表や業界サイトの推計を含むため幅がありますが、「アイデアを言葉にするだけでアプリの骨格ができる」体験が市場に強いインパクトを与えたことは間違いありません。
           </p>
 
-          <h3>2-2. 使う上での注意点(初学者向け)</h3>
+          <h3 id="sub-2-2">2-2. 使う上での注意点(初学者向け)</h3>
           <ul>
             <li>
               <strong>バックエンドの制約を理解する</strong>:
@@ -738,13 +738,13 @@ export default function Page() {
               {" "}
               <i className="ti ti-bug-off"></i>
             </div>
-            <h2>Step 3. バグ検出とコードレビュー</h2>
+            <h2 id="step3-h2">Step 3. バグ検出とコードレビュー</h2>
           </div>
           <p className={styles.lead}>
             原書第3章のテーマです。AIがコードを書く量が増えるほど、レビューする量も増えるというのが2026年の大きな課題になっています。
           </p>
 
-          <h3>3-1. なぜAIコードレビューが急速に普及したのか</h3>
+          <h3 id="sub-3-1">3-1. なぜAIコードレビューが急速に普及したのか</h3>
           <p>
             DORAの2025年レポートでは、AI活用度が高いチームはマージするプルリクエスト数が従来比で大幅に増加した一方、平均的なPRのサイズも拡大し、レビューにかかる時間も伸びたと報告されています{" "}
             <sup>
@@ -769,7 +769,7 @@ export default function Page() {
             。
           </p>
 
-          <h3>3-2. 代表的なツール</h3>
+          <h3 id="sub-3-2">3-2. 代表的なツール</h3>
           <div className={styles.tableWrap}>
             <div className={styles.tableTitle}>代表的なAIコードレビューツール</div>
             <table>
@@ -841,7 +841,7 @@ export default function Page() {
             。
           </p>
 
-          <h3>3-3. レビューワークフローの実際</h3>
+          <h3 id="sub-3-3">3-3. レビューワークフローの実際</h3>
           <div className={styles.diagramWrap} data-testid="mermaid-diagram">
             <div className={styles.diagramCard}>
               <MermaidDiagram chart={DIAGRAM_MMD_2} theme="base" themeVariables={BOOK_THEME_VARS} />
@@ -870,13 +870,13 @@ export default function Page() {
               {" "}
               <i className="ti ti-test-pipe"></i>
             </div>
-            <h2>Step 4. 自動テストと品質保証(QA)</h2>
+            <h2 id="step4-h2">Step 4. 自動テストと品質保証(QA)</h2>
           </div>
           <p className={styles.lead}>
             原書第4章のテーマです。テストの世界でも「テストケースを人間が全部書く」時代から「AIが自律的にアプリを探索してテストを書く」時代への移行が進んでいます。
           </p>
 
-          <h3>4-1. AIテストツールの3つの型</h3>
+          <h3 id="sub-4-1">4-1. AIテストツールの3つの型</h3>
           <p>
             2026年のAIテストツール市場は、大きく次の3つのアプローチに分類できます{" "}
             <sup>
@@ -917,7 +917,7 @@ export default function Page() {
             </li>
           </ol>
 
-          <h3>4-2. 代表的なツール</h3>
+          <h3 id="sub-4-2">4-2. 代表的なツール</h3>
           <div className={styles.tableWrap}>
             <div className={styles.tableTitle}>代表的なAIテストツール</div>
             <table>
@@ -970,7 +970,7 @@ export default function Page() {
             </table>
           </div>
 
-          <h3>4-3. テストピラミッドとAIの役割</h3>
+          <h3 id="sub-4-3">4-3. テストピラミッドとAIの役割</h3>
           <div className={styles.diagramWrap} data-testid="mermaid-diagram">
             <div className={styles.diagramCard}>
               <MermaidDiagram chart={DIAGRAM_MMD_3} theme="base" themeVariables={BOOK_THEME_VARS} />
@@ -998,13 +998,13 @@ export default function Page() {
               {" "}
               <i className="ti ti-chart-line"></i>
             </div>
-            <h2>Step 5. 予測分析とパフォーマンス最適化</h2>
+            <h2 id="step5-h2">Step 5. 予測分析とパフォーマンス最適化</h2>
           </div>
           <p className={styles.lead}>
             原書第5章のテーマです。この章は、開発中に生成されるログやメトリクスをAIで分析し、性能改善やユーザー行動の予測に役立てる領域を扱っています。
           </p>
 
-          <h3>5-1. 主なユースケース</h3>
+          <h3 id="sub-5-1">5-1. 主なユースケース</h3>
           <ul>
             <li>
               <strong>パフォーマンスボトルネックの検出</strong>:
@@ -1020,7 +1020,7 @@ export default function Page() {
             </li>
           </ul>
 
-          <h3>5-2. 代表的なツールの位置づけ</h3>
+          <h3 id="sub-5-2">5-2. 代表的なツールの位置づけ</h3>
           <div className={styles.tableWrap}>
             <div className={styles.tableTitle}>予測分析・性能最適化の代表的なツール</div>
             <table>
@@ -1058,11 +1058,11 @@ export default function Page() {
               {" "}
               <i className="ti ti-notebook"></i>
             </div>
-            <h2>Step 6. ドキュメントとテクニカルライティング</h2>
+            <h2 id="step6-h2">Step 6. ドキュメントとテクニカルライティング</h2>
           </div>
           <p className={styles.lead}>原書第6章のテーマです。</p>
 
-          <h3>6-1. 「ドキュメントは書かれない」から「ドキュメントは陳腐化する」へ</h3>
+          <h3 id="sub-6-1">6-1. 「ドキュメントは書かれない」から「ドキュメントは陳腐化する」へ</h3>
           <p>
             これまでソフトウェア開発の課題は「十分なドキュメントが書かれないこと」でした。しかし2026年になると、AIがドキュメントを素早く生成できるようになった結果、課題は「AIが書いたコードとAIが書いたドキュメントの整合性をどう保つか」に移っています{" "}
             <sup>
@@ -1091,7 +1091,7 @@ export default function Page() {
             。
           </p>
 
-          <h3>6-2. 代表的なツール</h3>
+          <h3 id="sub-6-2">6-2. 代表的なツール</h3>
           <div className={styles.tableWrap}>
             <div className={styles.tableTitle}>代表的なドキュメント生成ツール</div>
             <table>
@@ -1137,7 +1137,7 @@ export default function Page() {
             </table>
           </div>
 
-          <h3>6-3. 実践のコツ</h3>
+          <h3 id="sub-6-3">6-3. 実践のコツ</h3>
           <ul>
             <li>
               <strong>リファレンス系ドキュメント(API仕様等)はAI生成との相性が良い</strong>:
@@ -1171,13 +1171,13 @@ export default function Page() {
               {" "}
               <i className="ti ti-message-chatbot"></i>
             </div>
-            <h2>Step 7. チャットボットとバーチャルアシスタント</h2>
+            <h2 id="step7-h2">Step 7. チャットボットとバーチャルアシスタント</h2>
           </div>
           <p className={styles.lead}>
             原書第7章のテーマです。この章は「AIチャットボット」自体の作り方を扱っています。
           </p>
 
-          <h3>7-1. チャットボットからエージェントへ</h3>
+          <h3 id="sub-7-1">7-1. チャットボットからエージェントへ</h3>
           <p>
             従来の「あらかじめ決められた応答パターンを返すチャットボット」と、現在主流になりつつある「ツールを使って状態を変化させることができるAIエージェント」は明確に区別されるようになりました{" "}
             <sup>
@@ -1199,7 +1199,7 @@ export default function Page() {
             </div>
           </div>
 
-          <h3>7-2. 代表的なツール・フレームワーク</h3>
+          <h3 id="sub-7-2">7-2. 代表的なツール・フレームワーク</h3>
           <div className={styles.tableWrap}>
             <div className={styles.tableTitle}>
               代表的なチャットボット・エージェントフレームワーク
@@ -1256,7 +1256,7 @@ export default function Page() {
             。LangGraphのようなフレームワークは、まさにこの「確認・修正・再試行」のループを構造化して実装するために設計されています。
           </p>
 
-          <h3>7-3. 使い分けの目安</h3>
+          <h3 id="sub-7-3">7-3. 使い分けの目安</h3>
           <ul>
             <li>
               単純な一問一答のFAQボットであれば、Chatbase等のノーコードツールで十分なケースが多い。
@@ -1284,14 +1284,14 @@ export default function Page() {
               {" "}
               <i className="ti ti-trophy"></i>
             </div>
-            <h2>Step 8. 実装成功事例から学ぶ</h2>
+            <h2 id="step8-h2">Step 8. 実装成功事例から学ぶ</h2>
           </div>
           <p className={styles.lead}>
             原書第8章のテーマです。原書ではPieter
             Levels氏(個人開発者)とShopify(大企業)という対照的な2つの事例が紹介されています。ここでは2026年時点でのアップデートを交えて解説します。
           </p>
 
-          <h3>8-1. 個人開発者の事例: Pieter Levels</h3>
+          <h3 id="sub-8-1">8-1. 個人開発者の事例: Pieter Levels</h3>
           <p>
             Pieter Levels氏は、Nomad List、Remote OK、Photo
             AIなど複数のプロダクトを一人で開発・運営してきたインディーハッカーの代表格です。2026年2月には、ブラウザ上で動くフライトシミュレーター「fly.pieter.com」を一人でAIツール(CursorとThree.jsを利用)を使って開発し、公開から17日でARR(年間経常収益)100万ドルに到達したと報告されています{" "}
@@ -1324,7 +1324,7 @@ export default function Page() {
             。AIによる開発コストの低下は、個人開発者に大きな追い風であると同時に、参入障壁の低下が既存プレイヤーの競争優位を脅かすという二面性を持つことを示す事例です。
           </p>
 
-          <h3>8-2. 大企業の事例: Shopify</h3>
+          <h3 id="sub-8-2">8-2. 大企業の事例: Shopify</h3>
           <p>
             ECプラットフォームを運営するShopifyのCEO、Tobi
             Lütke氏は2025年4月、全社員に向けた社内メモを公開しました。このメモでは「効果的にAIを使うことは、もはや任意ではなく基本的な期待事項である」と明言され、追加の人員やリソースを要求する前に「なぜAIでその仕事ができないのか」を説明する責任が各チームに課されることになりました{" "}
@@ -1357,7 +1357,7 @@ export default function Page() {
             このメモは大きな話題を呼び、「AIの活用を組織文化として明文化した先駆的な事例」として2026年に入ってからも頻繁に参照されています。Shopifyのように数千人規模の開発組織を抱える企業が、トップダウンでAI活用を制度化した事例は、企業がAI導入を検討する際のベンチマークの一つになっています。
           </p>
 
-          <h3>8-3. 2つの事例から見えるパターン</h3>
+          <h3 id="sub-8-3">8-3. 2つの事例から見えるパターン</h3>
           <div className={styles.tableWrap}>
             <div className={styles.tableTitle}>個人開発者と大企業、2つの事例の比較</div>
             <table>
@@ -1404,14 +1404,14 @@ export default function Page() {
               {" "}
               <i className="ti ti-route"></i>
             </div>
-            <h2>Step 9. AI時代のソフトウェア開発ワークフロー実践編</h2>
+            <h2 id="step9-h2">Step 9. AI時代のソフトウェア開発ワークフロー実践編</h2>
           </div>
           <p className={styles.lead}>
             ここからは原書の内容を踏まえた応用編です。Step
             1〜8で見てきた各カテゴリのツールを、実際の開発ワークフローの中でどう組み合わせるかを整理します。
           </p>
 
-          <h3>9-1. エージェント中心の開発ループ</h3>
+          <h3 id="sub-9-1">9-1. エージェント中心の開発ループ</h3>
           <p>
             Simon
             Willison氏は、AIコーディングエージェントを効果的に使うための実践パターンとして、明確なタスクの切り出し、エージェントの作業結果の検証手順の設計、そして失敗したときにどこまで手戻りを許容するかをあらかじめ決めておくことの重要性を繰り返し説いています{" "}
@@ -1473,7 +1473,7 @@ export default function Page() {
             </div>
           </div>
 
-          <h3>9-2. 段階別に見るツールの組み合わせ例</h3>
+          <h3 id="sub-9-2">9-2. 段階別に見るツールの組み合わせ例</h3>
           <div className={styles.tableWrap}>
             <div className={styles.tableTitle}>開発フェーズ別のツールの組み合わせ例</div>
             <table>
@@ -1557,10 +1557,10 @@ export default function Page() {
               {" "}
               <i className="ti ti-shield-lock"></i>
             </div>
-            <h2>Step 10. リスクとガバナンス、責任あるAI活用</h2>
+            <h2 id="step10-h2">Step 10. リスクとガバナンス、責任あるAI活用</h2>
           </div>
 
-          <h3>10-1. 「レビューの質」対「開発の速さ」のトレードオフ</h3>
+          <h3 id="sub-10-1">10-1. 「レビューの質」対「開発の速さ」のトレードオフ</h3>
           <p>
             DORAの調査では、AI活用度の高いチームほどPRのマージ数や機能追加のスピードが上がる一方で、インシデント(障害)の発生率やレビュー時間も増加する傾向が報告されています{" "}
             <sup>
@@ -1577,7 +1577,7 @@ export default function Page() {
             。これは「AIによって開発が速くなった分、品質管理のプロセスも同じだけ強化しないと、事故の増加という形でしっぺ返しを受ける」ことを意味します。
           </p>
 
-          <h3>10-2. プロンプトインジェクションと「致死の三要素」</h3>
+          <h3 id="sub-10-2">10-2. プロンプトインジェクションと「致死の三要素」</h3>
           <p>
             Simon Willison氏が提唱した概念に「lethal
             trifecta(致死の三要素)」があります。これは、AIエージェントが (1)
@@ -1603,7 +1603,7 @@ export default function Page() {
             </div>
           </div>
 
-          <h3>10-3. 「AIが書いたコードは1.7倍の問題を含む」という調査</h3>
+          <h3 id="sub-10-3">10-3. 「AIが書いたコードは1.7倍の問題を含む」という調査</h3>
           <p>
             CodeRabbitが470件のオープンソースGitHub
             PR(AI共同作成320件、人間のみ150件)を分析した調査では、AI共同作成PRの平均指摘事項数(バグ・脆弱性・スタイル逸脱等)が10.83件だったのに対し、人間のみのPRでは6.45件と、約1.7倍の差があったと報告されています{" "}
@@ -1617,7 +1617,7 @@ export default function Page() {
             。これは「AI生成コードのレビューはむしろ強化すべき」という考え方の裏付けとしてよく引用される数字です。AIにコードを書かせることと、AIが書いたコードを別の仕組み(あるいは人間)でチェックすることは、常にセットで運用する必要があります。
           </p>
 
-          <h3>10-4. 実務者への提言</h3>
+          <h3 id="sub-10-4">10-4. 実務者への提言</h3>
           <ul>
             <li>
               コーディングエージェントに大きな権限(本番環境へのデプロイ権限、外部APIの実行権限等)を与える場合は、段階的に権限を拡大し、最初は読み取り専用や承認制から始める。
@@ -1637,7 +1637,7 @@ export default function Page() {
               {" "}
               <i className="ti ti-scale"></i>
             </div>
-            <h2>Step 11. ツール選定のための評価フレームワーク</h2>
+            <h2 id="step11-h2">Step 11. ツール選定のための評価フレームワーク</h2>
           </div>
           <p className={styles.lead}>
             原書は、各章で「評価プロセス」という共通のステップを設けており、個別ツールのレビューに入る前に「何を基準に評価するか」を明確にすることを重視しています。ここではその考え方を一般化した評価フレームワークを提示します。
@@ -1698,7 +1698,7 @@ export default function Page() {
               {" "}
               <i className="ti ti-compass"></i>
             </div>
-            <h2>Step 12. ソフトウェア開発の未来</h2>
+            <h2 id="step12-h2">Step 12. ソフトウェア開発の未来</h2>
           </div>
           <p className={styles.lead}>
             原書の結論部分では、AIによる自動化が過去の技術革新とどう似ていて、どう違うのかを考えるための3つの類推が紹介されています。
@@ -1723,7 +1723,7 @@ export default function Page() {
             これらの類推が示唆するのは、「AIによる自動化が仕事そのものを完全に消し去るケース」と「仕事の中身を変化させるケース」の両方があり、ソフトウェア開発がどちらに近いのかは職種やタスクの性質によって異なる、という視点です。
           </p>
 
-          <h3>12-1. 2026年時点で見えてきた変化の兆し</h3>
+          <h3 id="sub-12-1">12-1. 2026年時点で見えてきた変化の兆し</h3>
           <ul>
             <li>
               <strong>開発者の役割の変化</strong>:
@@ -1763,7 +1763,7 @@ export default function Page() {
             </li>
           </ul>
 
-          <h3>12-2. まとめ</h3>
+          <h3 id="sub-12-2">12-2. まとめ</h3>
           <p>
             生成AIはソフトウェア開発のあらゆる工程(要件定義からコード生成、レビュー、テスト、ドキュメント、運用監視まで)に浸透しつつありますが、その恩恵を最大化するのは「AIに何を任せ、何を人間が担うか」という設計を丁寧に行うチーム・個人です。本ガイドで紹介した各ツールカテゴリの特性を理解し、Step
             11の評価フレームワークを使って自分たちのユースケースに合ったツールを見極めることが、変化の速いこの分野で長く役立つスキルになります。
@@ -1776,7 +1776,7 @@ export default function Page() {
               {" "}
               <i className="ti ti-brain"></i>
             </div>
-            <h2>用語集</h2>
+            <h2 id="glossary-h2">用語集</h2>
           </div>
           <div className={styles.tableWrap}>
             <table>
@@ -1855,7 +1855,7 @@ export default function Page() {
               {" "}
               <i className="ti ti-checklist"></i>
             </div>
-            <h2>学習チェックリスト</h2>
+            <h2 id="checklist-h2">学習チェックリスト</h2>
           </div>
           <div className={styles.checklistCounter} id="checkCounter" data-testid="check-counter">
             0 / 9 完了
@@ -1925,7 +1925,7 @@ export default function Page() {
               {" "}
               <i className="ti ti-link"></i>
             </div>
-            <h2>参考文献・出典URL一覧</h2>
+            <h2 id="references-h2">参考文献・出典URL一覧</h2>
           </div>
           <p className={styles.lead}>
             本ガイドの作成にあたり、2026年9月14日時点で参照した情報源です。番号は本文中の引用番号に対応します。
