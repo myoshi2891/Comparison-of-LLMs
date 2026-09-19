@@ -336,6 +336,31 @@ export default function Page() {
 	assert.deepEqual(result.json.pageMermaidSources, [chartValue]);
 });
 
+test("decodes an escaped interpolation marker (\\${name}) in a DIAGRAMS entry to its literal form", () => {
+	// A Mermaid node label containing a literal "${name}" must be escaped as \${name} when the
+	// whole entry is itself delimited by a JS template literal, or it would be interpreted as
+	// interpolation. decodeQuotedEntryEscapes must resolve that escape to the literal "${name}"
+	// (dropping the backslash) so it matches the page side's actual literal text.
+	const chartValue = 'flowchart TD;A["${name}"]-->B';
+	const source = `<script>
+const DIAGRAMS = {
+  "sample": \`flowchart TD;A["\\\${name}"]-->B\`
+};
+</script>`;
+
+	const page = `const CHART = '${chartValue}';
+export default function Page() {
+  return <MermaidDiagram chart={CHART} />;
+}`;
+
+	const result = audit(source, page);
+
+	assert.equal(result.status, 0);
+	assert.equal(result.json.mermaidSourcesMatch, true);
+	assert.deepEqual(result.json.sourceMermaidSources, [chartValue]);
+	assert.deepEqual(result.json.pageMermaidSources, [chartValue]);
+});
+
 test("treats normalized HTML and Markdown paragraphs as blocking parity elements", () => {
 	const matchingHtml = audit(
 		"<p>First ordinary paragraph.</p><p>Second ordinary paragraph.</p>",
