@@ -29,11 +29,11 @@ bun run test:coverage  # カバレッジ付き実行（lcov.info 生成、CI/mak
 - DOM 環境: `jsdom`
 - tsconfig: `web-next/tsconfig.json` の `strict: true` + `erasableSyntaxOnly: true`
 
-**実際のテストファイル配置（177 files の内訳）:**
+**実際のテストファイル配置（123 files の内訳）:**
 
 | 配置場所 | ファイル数 | 内容 |
 | --- | --- | --- |
-| `web-next/app/**/page.test.tsx` | 136 | 各ページの contract テスト（タイトル・セクション数・外部リンク rel・metadata 等） |
+| `web-next/app/**/page.test.tsx` | 82 | 各ページの contract テスト（タイトル・セクション数・外部リンク rel・metadata 等） |
 | `web-next/components/**/*.test.tsx` | 18 | 共有コンポーネント（`SiteHeader` / `PageFreshness` / `ScenarioSelector` 等）のレンダリングテスト |
 | `web-next/tests/*.test.ts` | 15 | 横断的な契約テスト（`page-registry-coverage.test.ts` / `nav-derivation.test.ts` / `rss.test.ts` / `netlify-redirects.test.ts` / `fonts-selfhost.test.ts` 等） |
 | `web-next/lib/*.test.ts` | 7 | 純粋関数のユニットテスト（`cost.test.ts` / `pricing.test.ts` / `i18n.test.ts` 等。**ソースファイルと同一ディレクトリに配置**） |
