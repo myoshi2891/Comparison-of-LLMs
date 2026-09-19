@@ -57,7 +57,8 @@ LLM-Studies/
 │   └── data/pricing.json      ビルド時インポート用データ
 ├── docs/                 プロジェクト仕様書・設計書・テスト進捗記録
 ├── archive/              移行元 HTML/Markdown の退避保存場所 (削除厳禁)
-├── scripts/              Markdown 整形・原本照合監査スクリプト
+├── scripts/              Markdown 整形・HTML/MD → TSX 変換スクリプト
+│                         (原本照合監査スクリプトは .claude/skills/nextjs-page-migration/scripts/)
 ├── docker-compose.yml    Docker 開発・実行環境定義
 ├── Makefile              共通運用コマンド
 └── update.sh             データ更新オーケストレーター (scrape → copy → build)

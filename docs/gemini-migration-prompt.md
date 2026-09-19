@@ -119,11 +119,18 @@ echo "exit=$status"
 
 1. `web-next/app/<provider>/<slug>/page.test.tsx` を作成します
    （`// @vitest-environment jsdom` を先頭に明記）。
+   `TocObserver.tsx` を作成する場合は、同じ作業単位で
+   `web-next/app/<provider>/<slug>/TocObserver.test.tsx` も作成します
+   （SKILL.md §6-a）。
 2. `.gemini/skills/nextjs-page-migration/SKILL.md` §5 Step 1 に従い、**最低 13 契約**
    （S-1〜S-4 原本照合契約、C-1〜C-5 コンテンツ契約、D-8 デザイン契約、Q-1〜Q-3 品質契約、
    および必要に応じた C-6 / D-1〜D-7）を記述します。
    - 見出しテストは順序込み完全一致（`toEqual([...EXPECTED_H2])`）で記述し、
      件数のみや部分一致の弱いアサーションは禁止します。
+   - Q-1: `TocObserver.test.tsx` は `TocObserver.tsx` が持つ全ての公開挙動
+     （アクティブ見出しの遷移、モバイルサイドバー/メニューの開閉、リンククリック時の
+     自動クローズ、resize によるブレークポイント跨ぎの挙動、`inert` の付与/解除など）
+     をすべてカバーします。
 3. `(cd web-next && bun run test app/<provider>/<slug>/page.test.tsx)` を実行し、
    **テストが失敗することを確認** します。
 4. PII 検査後、Red コミットを実行します:
@@ -153,7 +160,15 @@ echo "exit=$status"
 
    ```bash
    (cd web-next && bun run test app/<provider>/<slug>/page.test.tsx)
+   (cd web-next && bun run test app/<provider>/<slug>/TocObserver.test.tsx)
    (cd web-next && bun run test tests/page-registry-coverage.test.ts)
+   ```
+
+   `TocObserver.test.tsx` を作成した場合は、対象コンポーネントのカバレッジも確認します
+   （Q-1・§6-a の全公開挙動カバレッジ要件を満たすこと）:
+
+   ```bash
+   (cd web-next && bun run test:coverage -- app/<provider>/<slug>/TocObserver.test.tsx)
    ```
 
 5. 原本ファイルを `archive/` 配下の適切なサブディレクトリへ移動します:

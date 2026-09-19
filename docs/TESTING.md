@@ -83,7 +83,7 @@ GitHub Actions に 3 つのワークフローが存在する。
   └── 既存の "CI Failure — Auto Fix Needed" Issue が無い場合のみ新規作成
 ```
 
-**重要な注意点**: `bun run typecheck` / `bun run lint` / `bun run build` は **GitHub Actions のいずれのワークフローにも含まれていない**。これらは `CLAUDE.md` の「コミット前チェック」に定義されたローカル/エージェント向けの手動チェック項目であり、リモート CI では強制されていない。CI で自動検証されるのは `bun run test`（+ `bun audit`）と `uv run pytest` のみ。
+**重要な注意点**: `bun run typecheck` / `bun run lint` / `bun run build` は **GitHub Actions のいずれのワークフローにも含まれていない**。これらは `CLAUDE.md` の「コミット前チェック」に定義されたローカル/エージェント向けの手動チェック項目であり、リモート CI では強制されていない。CI で自動検証されるのは `test.yaml` の `bun run test`（+ `bun audit`）・`uv run pytest`、および `sonarqube.yml` の `bun run test:coverage`・`uv run pytest --cov --cov-report=xml` のみ。
 
 ## E2E テスト（`web-next/e2e/`）の位置づけ
 
