@@ -481,10 +481,11 @@ describe("ITIL AI Governance (Version 5) 完全学習ガイド - 契約テスト
   // C-5: 外部リンクのセキュリティ属性
   it("C-5: 外部へのリンクに target='_blank' と rel='noopener noreferrer' が設定されている", () => {
     const { container } = render(<Page />);
-    const extLinks = container.querySelectorAll("a[href^='http']");
+    const extLinks = container.querySelectorAll<HTMLAnchorElement>("a[href^='http']");
     for (const link of Array.from(extLinks)) {
       expect(link.getAttribute("target")).toBe("_blank");
-      expect(link.getAttribute("rel")).toContain("noopener");
+      expect(link.relList.contains("noopener")).toBe(true);
+      expect(link.relList.contains("noreferrer")).toBe(true);
     }
   });
 

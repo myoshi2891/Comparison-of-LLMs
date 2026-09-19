@@ -2405,7 +2405,7 @@ export default function ItilAiGovernancePage() {
                   className={styles.refTitle}
                   href="https://www.peoplecert.org/browse-certifications/it-governance-and-service-management/ITIL-1/itil-ai-governance-version-5-4234"
                   target="_blank"
-                  rel="noopener"
+                  rel="noopener noreferrer"
                 >
                   PeopleCert 公式製品ページ
                 </a>
@@ -2424,7 +2424,7 @@ export default function ItilAiGovernancePage() {
                   className={styles.refTitle}
                   href="https://www.itil.com/professionals/certifications/ITIL-AI-Governance-Version-5"
                   target="_blank"
-                  rel="noopener"
+                  rel="noopener noreferrer"
                 >
                   ITIL.com 公式資格ページ
                 </a>
@@ -2443,7 +2443,7 @@ export default function ItilAiGovernancePage() {
                   className={styles.refTitle}
                   href="https://www.axelos.com/best-practice-solutions/itil"
                   target="_blank"
-                  rel="noopener"
+                  rel="noopener noreferrer"
                 >
                   AXELOS ITIL ベストプラクティスページ
                 </a>
@@ -2462,7 +2462,7 @@ export default function ItilAiGovernancePage() {
                   className={styles.refTitle}
                   href="https://www.iso.org/standard/81230.html"
                   target="_blank"
-                  rel="noopener"
+                  rel="noopener noreferrer"
                 >
                   ISO/IEC 42001:2023 公式ページ
                 </a>
@@ -2479,7 +2479,7 @@ export default function ItilAiGovernancePage() {
                   className={styles.refTitle}
                   href="https://standards.ieee.org/ieee/7014/7648/"
                   target="_blank"
-                  rel="noopener"
+                  rel="noopener noreferrer"
                 >
                   IEEE 7014-2024 公式ページ
                 </a>
@@ -2496,7 +2496,7 @@ export default function ItilAiGovernancePage() {
                   className={styles.refTitle}
                   href="https://eur-lex.europa.eu/eli/reg/2024/1689/oj"
                   target="_blank"
-                  rel="noopener"
+                  rel="noopener noreferrer"
                 >
                   EU AI Act 法令本文 (EUR-Lex)
                 </a>
@@ -2516,7 +2516,7 @@ export default function ItilAiGovernancePage() {
                   className={styles.refTitle}
                   href="https://itsmacademy.com/itil-ai-governance-course"
                   target="_blank"
-                  rel="noopener"
+                  rel="noopener noreferrer"
                 >
                   ITSM Academy コース詳細
                 </a>
@@ -2535,7 +2535,7 @@ export default function ItilAiGovernancePage() {
                   className={styles.refTitle}
                   href="https://agilepmhub.com/itil-ai-governance"
                   target="_blank"
-                  rel="noopener"
+                  rel="noopener noreferrer"
                 >
                   AGILEPM HUB コース詳細
                 </a>
@@ -2554,7 +2554,7 @@ export default function ItilAiGovernancePage() {
                   className={styles.refTitle}
                   href="https://itcko.sk/en/itil-v5-ai-governance-module/"
                   target="_blank"
-                  rel="noopener"
+                  rel="noopener noreferrer"
                 >
                   ITčko 解説記事
                 </a>
@@ -2575,7 +2575,7 @@ export default function ItilAiGovernancePage() {
                   className={styles.refTitle}
                   href="https://gogotraining.com/blog/2026/08/itil-ai-governance-the-itil-certification-you-cant-live-without/"
                   target="_blank"
-                  rel="noopener"
+                  rel="noopener noreferrer"
                 >
                   GogoTraining ブログ
                 </a>
@@ -2596,7 +2596,7 @@ export default function ItilAiGovernancePage() {
                   className={styles.refTitle}
                   href="https://www.innovativelearning.eu/products/itil-5/itil-ai-governance-5.html"
                   target="_blank"
-                  rel="noopener"
+                  rel="noopener noreferrer"
                 >
                   Innovative Learning コース概要
                 </a>
@@ -2615,7 +2615,7 @@ export default function ItilAiGovernancePage() {
                   className={styles.refTitle}
                   href="https://www.itil.org.uk/training/itil-extension-modules/itil-ai-governance-version-5-training-course"
                   target="_blank"
-                  rel="noopener"
+                  rel="noopener noreferrer"
                 >
                   ITIL.org.uk トレーニングコース概要
                 </a>
@@ -2634,7 +2634,7 @@ export default function ItilAiGovernancePage() {
                   className={styles.refTitle}
                   href="https://itsm.tools/itil-version-5-vs-itil-4-key-changes/"
                   target="_blank"
-                  rel="noopener"
+                  rel="noopener noreferrer"
                 >
                   itsm.tools 解説記事
                 </a>
@@ -2655,7 +2655,7 @@ export default function ItilAiGovernancePage() {
                   className={styles.refTitle}
                   href="https://www.pmgacademy.com/en/articles/itil/information-and-technology-in-itil-version-5-the-guide-for-the-ai-era-and-data-governance/"
                   target="_blank"
-                  rel="noopener"
+                  rel="noopener noreferrer"
                 >
                   PMG Academy 解説記事
                 </a>
