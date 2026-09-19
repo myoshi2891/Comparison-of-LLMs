@@ -295,7 +295,7 @@ export default function AiEngineeringGuidePage() {
         </ul>
       </nav>
 
-      <div className={styles.main} id="main">
+      <main className={styles.main} id="main">
         <header className={styles.hero}>
           <span className={styles.eyebrow}>
             <i className="ti ti-sparkles" /> 初学者向けステップバイステップガイド
@@ -1799,7 +1799,7 @@ export default function AiEngineeringGuidePage() {
           AI Engineering 入門ガイド &middot; 情報基準日 2026年9月9日 &middot;
           出典はセクション17に集約して記載（一部は本文中にも記載）
         </footer>
-      </div>
+      </main>
 
       <TocObserver />
     </div>
