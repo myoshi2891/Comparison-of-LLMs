@@ -134,6 +134,24 @@ describe("ai-engineering-guide TocObserver - mobile sidebar", () => {
     expect(sidebar.classList.contains(styles.open)).toBe(true);
   });
 
+  it("does not steal focus to the hidden desktop toggle when Escape is pressed with focus inside the sidebar", () => {
+    setInnerWidth(1200);
+    renderToc();
+    const toggle = document.getElementById("navToggle") as HTMLButtonElement;
+    const sidebar = document.getElementById("sidebar") as HTMLElement;
+    const link = sidebar.querySelector(`.${styles.navlist} a`) as HTMLAnchorElement;
+
+    // 目次リンクへ直接フォーカスがある desktop 幅の状態を再現する
+    // (navToggle は display:none で不可視のため、フォーカスの奪還先になってはならない)
+    link.focus();
+    expect(document.activeElement).toBe(link);
+
+    fireEvent.keyDown(document, { key: "Escape" });
+
+    expect(document.activeElement).toBe(link);
+    expect(document.activeElement).not.toBe(toggle);
+  });
+
   it("closes and re-hides the sidebar when resized past the breakpoint to desktop width", () => {
     setInnerWidth(500);
     renderToc();
@@ -186,9 +204,21 @@ describe("ai-engineering-guide TocObserver - scroll spy", () => {
 
   it("removes scroll and resize listeners on unmount", () => {
     setInnerWidth(1200);
+    const addSpy = vi.spyOn(window, "addEventListener");
+    const removeSpy = vi.spyOn(window, "removeEventListener");
     const { unmount } = renderToc();
+
+    const scrollCallback = addSpy.mock.calls.find(([type]) => type === "scroll")?.[1];
+    const resizeCallback = addSpy.mock.calls.find(([type]) => type === "resize")?.[1];
+    expect(scrollCallback).toBeTypeOf("function");
+    expect(resizeCallback).toBeTypeOf("function");
+
     unmount();
-    expect(() => fireEvent.scroll(window)).not.toThrow();
-    expect(() => fireEvent(window, new Event("resize"))).not.toThrow();
+
+    expect(removeSpy).toHaveBeenCalledWith("scroll", scrollCallback);
+    expect(removeSpy).toHaveBeenCalledWith("resize", resizeCallback);
+
+    addSpy.mockRestore();
+    removeSpy.mockRestore();
   });
 });

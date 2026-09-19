@@ -42,7 +42,7 @@ export default function TocObserver() {
       navToggle.classList.remove(styles.isHidden);
       navToggle.setAttribute("aria-expanded", "false");
       syncSidebarInert();
-      if (hadFocus) navToggle.focus();
+      if (hadFocus && window.innerWidth <= MOBILE_BREAKPOINT) navToggle.focus();
     }
 
     syncSidebarInert();

@@ -1,5 +1,5 @@
 import { fireEvent, render } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import styles from "./page.module.css";
 import TocObserver from "./TocObserver";
 
@@ -29,6 +29,10 @@ function renderToc() {
 
 beforeEach(() => {
   setInnerWidth(500);
+});
+
+afterEach(() => {
+  vi.unstubAllGlobals();
 });
 
 describe("generative-ai-for-software-development TocObserver - mobile sidebar", () => {
@@ -186,7 +190,6 @@ describe("generative-ai-for-software-development TocObserver - scroll spy", () =
       return 0;
     });
     fireEvent.scroll(window);
-    vi.unstubAllGlobals();
 
     expect(links[0].classList.contains(styles.active)).toBe(true);
     expect(links[1].classList.contains(styles.active)).toBe(false);
@@ -194,10 +197,22 @@ describe("generative-ai-for-software-development TocObserver - scroll spy", () =
 
   it("removes scroll and resize listeners on unmount", () => {
     setInnerWidth(1200);
+    const addSpy = vi.spyOn(window, "addEventListener");
+    const removeSpy = vi.spyOn(window, "removeEventListener");
     const { unmount } = renderToc();
+
+    const scrollCallback = addSpy.mock.calls.find(([type]) => type === "scroll")?.[1];
+    const resizeCallback = addSpy.mock.calls.find(([type]) => type === "resize")?.[1];
+    expect(scrollCallback).toBeTypeOf("function");
+    expect(resizeCallback).toBeTypeOf("function");
+
     unmount();
-    expect(() => fireEvent.scroll(window)).not.toThrow();
-    expect(() => fireEvent(window, new Event("resize"))).not.toThrow();
+
+    expect(removeSpy).toHaveBeenCalledWith("scroll", scrollCallback);
+    expect(removeSpy).toHaveBeenCalledWith("resize", resizeCallback);
+
+    addSpy.mockRestore();
+    removeSpy.mockRestore();
   });
 });
 
