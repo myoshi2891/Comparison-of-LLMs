@@ -118,7 +118,7 @@ flowchart LR
 | | **TypeScript** | 静的型検査 (`strict: true`, `erasableSyntaxOnly: true`) |
 | | **Tailwind CSS v4** + CSS Modules | デザイントークン & コンポーネントスタイリング |
 | | **Bun** | パッケージマネージャー & JS ランタイム |
-| | **Vitest** | フロントエンド契約テスト・単体テスト (1638+ tests) |
+| | **Vitest** | フロントエンド契約テスト・単体テスト |
 | | **Biome** | 高速 Linter / Formatter |
 | | **Zod** | 実行時データバリデーション |
 | **バックエンド** | **Python 3.12+** | データ抽出ランタイム |
