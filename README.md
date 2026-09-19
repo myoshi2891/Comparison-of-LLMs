@@ -158,6 +158,7 @@ make test
 ### 2. ネイティブ環境でセットアップする場合
 
 #### 前提条件
+
 - [Python 3.12+](https://www.python.org/)
 - [uv](https://docs.astral.sh/uv/)
 - [Bun](https://bun.sh/)
@@ -207,9 +208,11 @@ bun run dev
    - 全 80 ガイドページに対し、見出し順序の完全一致（`toEqual([...EXPECTED_H2])`）、リンク安全属性、Mermaid 図解描画、コードブロック要素の存在を検証。
 2. **原本照合監査 (Source Parity Audit)**:
    - 原本 HTML/Markdown からの移植時、内容の脱落を防止するため照合監査スクリプトを実行し `exit code 0` を確認。
+
    ```bash
    bun .claude/skills/nextjs-page-migration/scripts/audit_source_parity.mjs <原本ファイル> <page.tsx>
    ```
+
 3. **型パリティ検証**:
    - バックエンドの Pydantic モデル（`models.py`）とフロントエンドの TypeScript 型（`pricing.ts`）の型整合性をコンパイル時に検証。
 
@@ -220,11 +223,13 @@ bun run dev
 本プロジェクトは Claude Code, Gemini CLI, Antigravity, OpenAI Codex 等の AI エージェントとのペアプログラミングを前提に最適化されています。
 
 エージェントが作業を開始する際は、以下のファイルを順に確認してください：
+
 1. [`CODEX.md`](CODEX.md): 作業種別に対応するスキル・ルールの必読ルーティング表
 2. [`CLAUDE.md`](CLAUDE.md) / [`GEMINI.md`](GEMINI.md) / [`AGENTS.md`](AGENTS.md): 全体の基本方針・禁止事項
 3. [`docs/PROGRESS.md`](docs/PROGRESS.md): 最新の開発ステータスと再開手順
 
 ### 主な絶対遵守事項
+
 - **要約・省略の禁止**: 原本からのドキュメント移行時は、一切の縮約や代表抽出を認めず、忠実に全要素を移植すること。
 - **原本ファイルの削除禁止**: 移行済みの HTML/Markdown ファイルは削除せず、必ず `archive/` ディレクトリ配下に退避すること。
 - **リポジトリ全体への一括自動フォーマット禁止**: `bun run lint:fix` や `biome check --write` は対象ファイル単位で実行すること。
