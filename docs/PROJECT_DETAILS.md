@@ -47,7 +47,7 @@ LLM-Studies は、単一リポジトリで 2 つの役割を担うプロジェ�
 | `calcApiCost` | `priceIn`（USD/100万トークン）, `priceOut`, `inputTokens`, `outputTokens`, `hours` | USD 金額 | `(input/1e6 * priceIn + output/1e6 * priceOut) * hours` の単純計算。丸め処理なし |
 | `calcSubCost` | `monthly`（USD月額）, `annual`（USD年額 or `null`）, `hours` | USD 金額 | `hours >= 8760` は年額をそのまま採用、`hours <= 720` は月額を時間按分、それ以外は `hours/720` で月額を按分。`monthly=0` かつ `annual` 未設定なら常に 0 |
 | `colorIndex` | 金額 | 表示用インデックス | UI 上の価格帯の色分けに使用 |
-| `fmtUSD` / `fmtJPY` | 金額（+ `fmtJPY` は為替レート） | 表示用文字列 | `$0.001` 未満は `<$0.01` と表示。`fmtJPY` は `ja-JP` ロケールで桁区切り |
+| `fmtUSD` / `fmtJPY` | 金額（+ `fmtJPY` は為替レート） | 表示用文字列 | `$0.005` 未満は `<$0.01` と表示。`fmtJPY` は `ja-JP` ロケールで桁区切り |
 
 期間プリセット（`PERIODS`）は `1h / 8h / 24h / 7d / 30d / 4mo / 12mo` の 7 段階固定（`web-next/lib/cost.ts:13-21`）。ユーザーはこの期間とモデル/ツールを選択し、`HomePage.tsx` が `pricing.json`（`data/pricing.json` から static import）の価格データと組み合わせて上記関数を呼び出し、比較表を描画します。
 

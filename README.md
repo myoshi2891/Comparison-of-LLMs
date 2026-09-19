@@ -5,7 +5,7 @@
 [![Next.js](https://img.shields.io/badge/Next.js-16_App_Router-black?logo=next.js)](https://nextjs.org/)
 [![React](https://img.shields.io/badge/React-19-61dafb?logo=react)](https://react.dev/)
 [![Python](https://img.shields.io/badge/Python-3.12+-3776ab?logo=python)](https://www.python.org/)
-[![Vitest](https://img.shields.io/badge/Vitest-1638+_Passed-green?logo=vitest)](https://vitest.dev/)
+[![Vitest](https://img.shields.io/badge/Vitest-1639+_Passed-green?logo=vitest)](https://vitest.dev/)
 [![Pytest](https://img.shields.io/badge/Pytest-100_Passed-green?logo=pytest)](https://docs.pytest.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
