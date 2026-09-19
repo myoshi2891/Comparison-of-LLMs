@@ -248,6 +248,6 @@ echo "exit=$status"
 | テストが Red のままコミット | `bun run test` の実際の出力を確認し、失敗理由に基づき実装を修正する |
 | `bun run lint` でエラー | `bunx biome check --write <対象ファイルパス>` でファイル単位修正（リポジトリ全体への実行は禁止） |
 | Mermaid が描画されない | `.gemini/skills/fix-mermaid/SKILL.md` を参照し、バージョン互換と ESM 設定を確認する |
-| **Mermaid Syntax Error（ブラウザでだけ図が全滅）** | 原本 HTML の Mermaid ノードラベルに全角括弧 `（）`・全角スラッシュ `／`・全角波ダッシュ `〜` が含まれていないか確認する（`.gemini/skills/fix-mermaid/SKILL.md` Part 1-b 参照）。**移行前に原本 HTML を先にクリーニングすること** |
+| **Mermaid Syntax Error（ブラウザでだけ図が全滅）** | 原本 HTML の Mermaid ノードラベルに全角括弧 `（）`・全角スラッシュ `／`・全角波ダッシュ `〜` が含まれていないか確認する（`.gemini/skills/fix-mermaid/SKILL.md` Part 1-b 参照）。**含まれているというだけで機械的に置換してはならない。ブラウザで実際に Syntax Error を再現した場合のみ、移行先 page.tsx の Mermaid ソースを最小限修正し、再現条件と修正内容を記録する。原本 HTML は変更しない** |
 | CSS 変数が `globals.css` に未定義 | `.layout` ブロック内でその変数をフォールバック値つきで自己定義する |
 | PII 混入（絶対パス等） | `git diff --cached` の出力を確認し、絶対パスを相対パスに置き換えてから再コミット |
