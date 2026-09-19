@@ -2287,15 +2287,15 @@ export default function Page() {
               <div className={styles.refNum}>16</div>
               <div className={styles.refBody}>
                 <div className={styles.refTitle}>
-                  Petronella Cybersecurity News: Cursor AI IDE 2026 ― Setup, Agents, Security Guide
+                  Claude by Anthropic: Claude Code ― AI Coding Agent, Terminal, IDE
                 </div>
                 <a
                   className={styles.refUrl}
-                  href="https://petronellatech.com/blog/cursor-ai-ide-setup-guide/"
+                  href="https://claude.com/product/claude-code"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  petronellatech.com/blog/cursor-ai-ide-setup-guide
+                  claude.com/product/claude-code
                 </a>
               </div>
             </li>

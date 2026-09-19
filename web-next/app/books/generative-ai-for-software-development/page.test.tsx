@@ -95,7 +95,7 @@ const EXPECTED_EXTERNAL_LINKS = [
   "https://cognition.com/blog/windsurf",
   "https://www.nxcode.io/resources/news/cognition-windsurf-acquisition-swe-1-5-codemaps-2026",
   "https://www.techcrunch.com/2025/07/14/cognition-maker-of-the-ai-coding-agent-devin-acquires-windsurf/",
-  "https://petronellatech.com/blog/cursor-ai-ide-setup-guide/",
+  "https://claude.com/product/claude-code",
   "https://www.buildmvpfast.com/blog/best-ai-code-review-tools-anthropic-2026",
   "https://reptile.haus/journal/ai-code-review-mainstream-adopt-without-losing-quality-2026/",
   "https://www.ideaplan.io/blog/ai-code-review-tools-market-share-2026",
