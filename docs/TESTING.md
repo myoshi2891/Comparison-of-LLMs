@@ -1,14 +1,14 @@
 # Testing
 
-Updated 2026-09-18
+Updated 2026-09-19
 
 > テスト戦略・実行方法・テスト追加ガイドライン。数値は本更新日に `bun run test` / `uv run pytest` を実際に実行して確認した実測値。
 
 ## 現状のテスト体制
 
-| 領域 | フレームワーク | 状態（実測 2026-09-18） | コマンド |
+| 領域 | フレームワーク | 状態（実測 2026-09-19） | コマンド |
 | ------ | --------------- | ------ | ---------- |
-| フロントエンド (web-next/) | Vitest + @testing-library/react | **177 files / 1639 tests** 全 Green | `cd web-next && bun run test` |
+| フロントエンド (web-next/) | Vitest + @testing-library/react | **180 files / 1681 tests** 全 Green | `cd web-next && bun run test` |
 | スクレイパー (scraper/) | pytest | **100 tests（5 ファイル）** 全 Green | `cd scraper && uv run pytest` |
 | E2E (web-next/e2e/) | Playwright | 実装済みだが **CI 未組込・一部が現行 DOM と不整合**（詳細は後述） | `cd web-next && bun run test:e2e` |
 
@@ -29,14 +29,16 @@ bun run test:coverage  # カバレッジ付き実行（lcov.info 生成、CI/mak
 - DOM 環境: `jsdom`
 - tsconfig: `web-next/tsconfig.json` の `strict: true` + `erasableSyntaxOnly: true`
 
-**実際のテストファイル配置（123 files の内訳）:**
+**実際のテストファイル配置（180 files の内訳）:**
 
 | 配置場所 | ファイル数 | 内容 |
 | --- | --- | --- |
 | `web-next/app/**/page.test.tsx` | 82 | 各ページの contract テスト（タイトル・セクション数・外部リンク rel・metadata 等） |
+| `web-next/app/**/{TocObserver,Checklist,ChecklistCard,SidebarToggle,CopyButton}.test.tsx` | 56 | 各ページに同居する補助コンポーネント（目次スクロール監視・チェックリスト等）のテスト |
+| `web-next/app/sitemap.test.ts` | 1 | `sitemap.ts` の生成ロジックテスト |
 | `web-next/components/**/*.test.tsx` | 18 | 共有コンポーネント（`SiteHeader` / `PageFreshness` / `ScenarioSelector` 等）のレンダリングテスト |
-| `web-next/tests/*.test.ts` | 15 | 横断的な契約テスト（`page-registry-coverage.test.ts` / `nav-derivation.test.ts` / `rss.test.ts` / `netlify-redirects.test.ts` / `fonts-selfhost.test.ts` 等） |
-| `web-next/lib/*.test.ts` | 7 | 純粋関数のユニットテスト（`cost.test.ts` / `pricing.test.ts` / `i18n.test.ts` 等。**ソースファイルと同一ディレクトリに配置**） |
+| `web-next/tests/*.test.{ts,tsx}` | 15 | 横断的な契約テスト（`page-registry-coverage.test.ts` / `nav-derivation.test.ts` / `rss.test.ts` / `netlify-redirects.test.ts` / `fonts-selfhost.test.ts` 等） |
+| `web-next/lib/*.test.{ts,tsx}` | 7 | 純粋関数のユニットテスト（`cost.test.ts` / `pricing.test.ts` / `i18n.test.ts` 等。**ソースファイルと同一ディレクトリに配置**） |
 | `web-next/types/pricing.test.ts` | 1 | 型スキーマのバリデーションテスト |
 
 > **旧版との差分**: 以前の版では `cost.test.ts` / `pricing.test.ts` / `i18n.test.ts` を `web-next/tests/` 配下と記載していたが、実際は `web-next/lib/` にソースファイルと同居している。ユニットテストはソース隣接配置、横断的な契約テストのみ `web-next/tests/` に集約する運用。
