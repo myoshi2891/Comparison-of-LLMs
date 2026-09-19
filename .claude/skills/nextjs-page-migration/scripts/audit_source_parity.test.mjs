@@ -254,6 +254,113 @@ test("recognizes every allowed Mermaid diagram declaration including pie", () =>
 	assert.doesNotMatch("block-beta\ncolumns 1", MERMAID_DIAGRAM_DECLARATION);
 });
 
+test("decodes an escaped backslash before a literal 'n' in a DIAGRAMS entry without producing a newline", () => {
+	const backslash = "\\";
+	const lineBreakEscape = `${backslash}n`; // 2-char escape: decodes to a real newline
+	const escapedBackslashThenN = `${backslash}${backslash}n`; // 3-char escape: decodes to backslash + literal "n"
+
+	const htmlEntryValue = `flowchart TD${lineBreakEscape}A[C:${escapedBackslashThenN}Drive] --> B[End]`;
+	const source = `<script>
+const DIAGRAMS = {
+  "sample": '${htmlEntryValue}'
+};
+</script>`;
+
+	// Raw backtick content is captured verbatim (no escape decoding), so this is
+	// already the expected decoded form: a real newline after "TD", then a literal
+	// backslash + "n" (not a newline) embedded in the node label.
+	const chartValue = `flowchart TD\nA[C:${backslash}nDrive] --> B[End]`;
+	const page = `const CHART = \`${chartValue}\`;
+export default function Page() {
+  return <MermaidDiagram chart={CHART} />;
+}`;
+
+	const result = audit(source, page);
+
+	assert.equal(result.status, 0);
+	assert.equal(result.json.mermaidSourcesMatch, true);
+	assert.deepEqual(result.json.sourceMermaidSources, [chartValue]);
+	assert.deepEqual(result.json.pageMermaidSources, [chartValue]);
+});
+
+test("decodes an escaped \\r\\n in a DIAGRAMS entry to match a page's actual CRLF newline", () => {
+	const backslash = "\\";
+	const escapedCrlf = `${backslash}r${backslash}n`; // literal 4-char escape: decodes to a real CRLF
+
+	const htmlEntryValue = `flowchart TD${escapedCrlf}A-->B`;
+	const source = `<script>
+const DIAGRAMS = {
+  "sample": "${htmlEntryValue}"
+};
+</script>`;
+
+	// The page holds the equivalent content with an actual CRLF newline embedded
+	// in the template literal (as Windows-authored source might contain).
+	const chartValue = "flowchart TD\r\nA-->B";
+	const page = `const CHART = \`${chartValue}\`;
+export default function Page() {
+  return <MermaidDiagram chart={CHART} />;
+}`;
+
+	const result = audit(source, page);
+
+	assert.equal(result.status, 0);
+	assert.equal(result.json.mermaidSourcesMatch, true);
+});
+
+test("keeps the rest of a template-literal DIAGRAMS entry after an escaped backtick in a Mermaid node label", () => {
+	// A Mermaid markdown-string node label wrapped in backticks (e.g. A["`code`"]) forces the
+	// backticks to be escaped when the whole entry is itself delimited by a JS template literal.
+	// A non-escape-aware extractor would treat the first escaped backtick as the entry's closing
+	// delimiter and drop everything after it (here, the edge to B). The chart is kept single-line
+	// and the page-side constant single-quoted so this exercises only the HTML-side template-literal
+	// branch under test, not the (separate, unrelated) page-side constant extractor.
+	const backtick = "`";
+	const chartValue = `flowchart TD;A["${backtick}code${backtick}"]-->B`;
+	const source = `<script>
+const DIAGRAMS = {
+  "sample": \`flowchart TD;A["\\${backtick}code\\${backtick}"]-->B\`
+};
+</script>`;
+
+	const page = `const CHART = 'flowchart TD;A["${backtick}code${backtick}"]-->B';
+export default function Page() {
+  return <MermaidDiagram chart={CHART} />;
+}`;
+
+	const result = audit(source, page);
+
+	assert.equal(result.status, 0);
+	assert.equal(result.json.mermaidSourcesMatch, true);
+	assert.deepEqual(result.json.sourceMermaidSources, [chartValue]);
+	assert.deepEqual(result.json.pageMermaidSources, [chartValue]);
+});
+
+test("decodes an escaped interpolation marker (\\${name}) in a DIAGRAMS entry to its literal form", () => {
+	// A Mermaid node label containing a literal "${name}" must be escaped as \${name} when the
+	// whole entry is itself delimited by a JS template literal, or it would be interpreted as
+	// interpolation. decodeQuotedEntryEscapes must resolve that escape to the literal "${name}"
+	// (dropping the backslash) so it matches the page side's actual literal text.
+	const chartValue = 'flowchart TD;A["${name}"]-->B';
+	const source = `<script>
+const DIAGRAMS = {
+  "sample": \`flowchart TD;A["\\\${name}"]-->B\`
+};
+</script>`;
+
+	const page = `const CHART = '${chartValue}';
+export default function Page() {
+  return <MermaidDiagram chart={CHART} />;
+}`;
+
+	const result = audit(source, page);
+
+	assert.equal(result.status, 0);
+	assert.equal(result.json.mermaidSourcesMatch, true);
+	assert.deepEqual(result.json.sourceMermaidSources, [chartValue]);
+	assert.deepEqual(result.json.pageMermaidSources, [chartValue]);
+});
+
 test("treats normalized HTML and Markdown paragraphs as blocking parity elements", () => {
 	const matchingHtml = audit(
 		"<p>First ordinary paragraph.</p><p>Second ordinary paragraph.</p>",

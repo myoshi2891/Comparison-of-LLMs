@@ -1,6 +1,6 @@
 # GEMINI.md
 
-Updated 2026-09-12
+Updated 2026-09-18
 
 GEMINI.md は Gemini CLI / Gemini Code Assist 向けの入り口。
 本リポジトリでは **CLAUDE.md が正本** とし、GEMINI.md はその委譲 pointer として機能する。
@@ -50,11 +50,11 @@ GEMINI.md は Gemini CLI / Gemini Code Assist 向けの入り口。
 ## 検証コマンド
 
 ```bash
-(cd web-next && bun run test)        # 174 files / 1583 tests pass（2026-09-12 実測。全 Green ✅）
-(cd web-next && bun run typecheck)   # OK（2026-09-12 実測）
-(cd web-next && bun run build)       # ✅ Compiled successfully / 88 静的ページ生成（2026-09-12 実測）
-(cd web-next && bun run lint)        # OK（481 files / 0 diagnostics。2026-09-12 実測）
-(cd scraper && uv run pytest)        # 94 件 + 37 subtests pass（2026-09-12 実測。全 Green ✅）
+(cd web-next && bun run test)        # 177 files / 1639 tests pass（2026-09-17 実測。全 Green ✅）
+(cd web-next && bun run typecheck)   # OK（2026-09-17 実測）
+(cd web-next && bun run build)       # ✅ Compiled successfully / 89 静的ページ生成（2026-09-18 実測。docs/PROGRESS.md の 90 件は 2026-09-17 時点・別コミットでの計測値）
+(cd web-next && bun run lint)        # OK（4 files / 0 diagnostics。2026-09-17 実測）
+(cd scraper && uv run pytest)        # 100 件 pass（2026-09-17 実測。全 Green ✅）
 ```
 
 ## 次セッション再開プロンプト

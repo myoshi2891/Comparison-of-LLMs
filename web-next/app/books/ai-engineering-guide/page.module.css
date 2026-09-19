@@ -1,0 +1,611 @@
+.layout {
+  --paper: #f7f2e7;
+  --paper-alt: #efe7d6;
+  --paper-card: #ffffff;
+  --ink: #241f17;
+  --ink-soft: #5b5140;
+  --ink-faint: #8c8067;
+  --border: #e1d6bc;
+  --border-soft: #ebe2cc;
+
+  --indigo: #3b4a87;
+  --indigo-deep: #28345f;
+  --indigo-soft: #e7e9f5;
+
+  --gold: #9c6b1f;
+  --gold-soft: #f3e7cc;
+
+  --forest: #3d6b4c;
+  --forest-soft: #e4efe5;
+
+  --plum: #6c3f63;
+  --plum-soft: #f0e3ed;
+
+  --sidebar-w: 296px;
+  --radius-card: 14px;
+  --radius-sm: 6px;
+  --shadow-card: 0 10px 28px rgba(40, 33, 20, 0.08);
+
+  display: block;
+  width: 100%;
+  min-height: 100vh;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "Inter", -apple-system, "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
+  font-size: 16px;
+  line-height: 1.75;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 本ページ表示時: 鮮度バーを完全に潰す（高さ・余白ごと除去して黒い線を防ぐ）
+   data-page で本ページ限定にし、他ページの鮮度バーまで消えるのを防ぐ */
+:global(
+    body:has([data-testid="layout-root"][data-page="ai-engineering-guide"])
+    #site-freshness-bar
+  ) {
+  display: none !important;
+  height: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+}
+
+/* 本ページ表示時: スクロール時の文字重なり防止のため、固定ヘッダーと警告バナーを完全不透明化
+   data-page で本ページ限定にし、他ページのヘッダー/バナー色まで変わるのを防ぐ */
+:global(body:has([data-testid="layout-root"][data-page="ai-engineering-guide"]) #common-header) {
+  background-color: #05080f !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+:global(body:has([data-testid="layout-root"][data-page="ai-engineering-guide"]) .ch-disclaimer) {
+  background-color: #120e04 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border-bottom: none !important;
+  box-shadow: none !important;
+}
+
+/*
+ * 根本修正: JS ロード後に DisclaimerBanner の useEffect が --ch-disclaimer-height を
+ * 書き込むと body.has-common-header の margin-top が増加し、固定バナーとページ本文の間に
+ * 隙間が生じる。その隙間に body のダーク背景(#05080f)が透けて「黒い線」に見えるため、
+ * このページだけ body 背景をページのベージュ (#f7f2e7) に揃えて隙間を不可視化する。
+ * data-page で本ページ限定にし、他ページの body 背景まで変わるのを防ぐ。
+ */
+:global(body:has([data-testid="layout-root"][data-page="ai-engineering-guide"])) {
+  background: #f7f2e7 !important;
+}
+
+.layout h1,
+.layout h2,
+.layout h3,
+.layout h4 {
+  font-family: "Source Serif 4", "Noto Serif JP", serif;
+  color: var(--ink);
+  line-height: 1.35;
+  font-weight: 600;
+  margin: 0 0 0.6em 0;
+}
+
+.layout a {
+  color: var(--indigo);
+  text-decoration-color: rgba(59, 74, 135, 0.35);
+  text-underline-offset: 3px;
+}
+
+.layout a:hover {
+  color: var(--indigo-deep);
+}
+
+.skipLink {
+  position: absolute;
+  left: -999px;
+  top: 0;
+  background: var(--indigo);
+  color: #fff;
+  padding: 0.8em 1.2em;
+  border-radius: 0 0 8px 0;
+  z-index: 1000;
+  font-size: 1rem;
+}
+
+.skipLink:focus {
+  left: 0;
+}
+
+/* ---------- Sidebar ---------- */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: var(--sidebar-w);
+  height: 100vh;
+  overflow-y: auto;
+  background: var(--paper-alt);
+  border-right: 1px solid var(--border);
+  padding: 1.6rem 1.1rem 3rem 1.1rem;
+  z-index: 60;
+  transition: transform 0.25s ease;
+}
+
+.sidebarBrand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: "Source Serif 4", serif;
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--ink);
+  padding: 0.3rem 0.5rem 1.1rem 0.5rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 1rem;
+}
+
+.sidebarBrand i {
+  color: var(--indigo);
+  font-size: 1.3rem;
+}
+
+.sidebarBrand small {
+  display: block;
+  font-family: "Inter", sans-serif;
+  font-weight: 500;
+  font-size: 1rem;
+  color: var(--ink-faint);
+  letter-spacing: 0.02em;
+}
+
+.navlist {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.navlist li {
+  margin: 0.1rem 0;
+}
+
+.navlist a {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.5rem 0.6rem;
+  border-radius: var(--radius-sm);
+  color: var(--ink-soft);
+  text-decoration: none;
+  font-size: 1rem;
+  border-left: 3px solid transparent;
+}
+
+.navlist a i {
+  color: var(--ink-faint);
+  font-size: 1.05rem;
+  width: 1.2rem;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.navlist a:hover {
+  background: rgba(59, 74, 135, 0.07);
+  color: var(--ink);
+}
+
+.navlist a.active {
+  background: var(--indigo-soft);
+  color: var(--indigo-deep);
+  border-left: 3px solid var(--indigo);
+  font-weight: 600;
+}
+
+.navlist a.active i {
+  color: var(--indigo);
+}
+
+.navlist .n {
+  display: inline-block;
+  min-width: 1.1rem;
+  color: inherit;
+  opacity: 0.55;
+  font-variant-numeric: tabular-nums;
+  font-size: 1rem;
+}
+
+.navToggle {
+  display: none;
+  position: fixed;
+  top: 0.9rem;
+  left: 0.9rem;
+  z-index: 70;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--paper-card);
+  box-shadow: var(--shadow-card);
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  color: var(--ink);
+  cursor: pointer;
+  opacity: 1;
+  transition: opacity 0.2s ease;
+}
+
+.navToggle.isHidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.scrim {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(36, 31, 23, 0.35);
+  z-index: 55;
+}
+
+.main {
+  margin-left: var(--sidebar-w);
+  max-width: none;
+  padding: 3.4rem 4.2rem 5rem 4.2rem;
+}
+
+/* ---------- Hero ---------- */
+.hero {
+  max-width: none;
+  margin: 0 0 3.2rem 0;
+}
+
+.hero .eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  color: var(--indigo-deep);
+  background: var(--indigo-soft);
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  margin-bottom: 1.1rem;
+}
+
+.hero h1 {
+  font-size: 2.6rem;
+  letter-spacing: -0.01em;
+  margin-bottom: 0.7rem;
+}
+
+.hero .lede {
+  font-size: 1.15rem;
+  color: var(--ink-soft);
+  font-family: "Source Serif 4", serif;
+  font-style: italic;
+  line-height: 1.6;
+  margin: 0 0 1.3rem 0;
+}
+
+.heroMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  font-size: 1rem;
+  color: var(--ink-faint);
+}
+
+.heroMeta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border: 1px solid var(--border);
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  background: var(--paper-card);
+}
+
+.callout {
+  background: var(--gold-soft);
+  border-left: 4px solid var(--gold);
+  padding: 1rem 1.3rem;
+  border-radius: 0 10px 10px 0;
+  margin: 1.6rem 0;
+  font-size: 1rem;
+  color: var(--ink-soft);
+}
+
+.callout strong {
+  color: var(--ink);
+}
+
+.callout[data-variant="warn"] {
+  background: var(--plum-soft);
+  border-left-color: var(--plum);
+}
+
+.callout[data-variant="info"] {
+  background: var(--indigo-soft);
+  border-left-color: var(--indigo);
+}
+
+/* ---------- Prose ---------- */
+.prose {
+  max-width: none;
+}
+
+.prose,
+.prose p,
+.prose li {
+  overflow-wrap: break-word;
+}
+
+.prose p {
+  margin: 0 0 1.15em 0;
+}
+
+.prose ul,
+.prose ol {
+  margin: 0 0 1.2em 0;
+  padding-left: 1.4em;
+}
+
+.prose li {
+  margin: 0.35em 0;
+}
+
+.prose strong {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.chapter {
+  max-width: none;
+  padding-top: 1rem;
+  margin-top: 1.2rem;
+  scroll-margin-top: calc(var(--header-height, 60px) + 80px);
+}
+
+.chapter + .chapter {
+  border-top: 1px solid var(--border-soft);
+  padding-top: 3rem;
+  margin-top: 3rem;
+}
+
+.chapterKicker {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin-bottom: 0.6rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--indigo);
+  letter-spacing: 0.01em;
+}
+
+.chapterKicker i {
+  font-size: 1rem;
+}
+
+.chapter h2 {
+  font-size: 1.7rem;
+  margin-bottom: 1.1rem;
+  scroll-margin-top: calc(var(--header-height, 60px) + 80px);
+}
+
+.chapter h3 {
+  font-size: 1.2rem;
+  margin-top: 1.6rem;
+  scroll-margin-top: calc(var(--header-height, 60px) + 80px);
+}
+
+/* ---------- Tables (R2: 全列左寄せ) ---------- */
+.tableWrap {
+  overflow-x: auto;
+  margin: 1.6rem 0;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.tableWrap table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 1rem;
+  background: var(--paper-card);
+}
+
+.tableWrap :global(th),
+.tableWrap :global(td) {
+  text-align: left !important;
+}
+
+.tableWrap thead th {
+  background: var(--indigo-soft);
+  color: var(--indigo-deep);
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.tableWrap tbody td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border-soft);
+  vertical-align: top;
+  color: var(--ink-soft);
+}
+
+.tableWrap tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.tableWrap tbody tr:nth-child(even) {
+  background: rgba(239, 231, 214, 0.35);
+}
+
+.tableWrap table td:first-child,
+.tableWrap table th:first-child {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+/* ---------- Mermaid diagrams ---------- */
+.diagramCard {
+  background: var(--paper-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  padding: 1.4rem 1.2rem;
+  margin: 1.8rem 0;
+  box-shadow: var(--shadow-card);
+}
+
+.diagramCaption {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  color: var(--ink-faint);
+  margin-bottom: 0.9rem;
+}
+
+.diagramCaption i {
+  color: var(--indigo);
+}
+
+.mermaidWrapper {
+  width: 100%;
+  display: flex;
+  justify-content: safe center;
+  overflow-x: auto;
+  padding-bottom: 0.2rem;
+}
+
+.mermaidWrapper :global(svg) {
+  flex-shrink: 0;
+  height: auto;
+  max-width: 100%;
+}
+
+.mermaidLoading {
+  font-size: 1rem;
+  color: var(--ink-faint);
+  padding: 1rem;
+  text-align: center;
+}
+
+/* ---------- Reference list ---------- */
+.refGroup {
+  margin: 1.6rem 0 2rem 0;
+}
+
+.refGroup h3 {
+  font-size: 1rem;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.7rem;
+}
+
+.refGroup h3 i {
+  color: var(--plum);
+}
+
+.refList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.refItem {
+  display: flex;
+  gap: 0.6rem;
+  align-items: flex-start;
+  border: 1px solid var(--border-soft);
+  background: var(--paper-card);
+  border-radius: 10px;
+  padding: 0.7rem 0.9rem;
+  font-size: 1rem;
+}
+
+.refItem i {
+  color: var(--forest);
+  margin-top: 0.2rem;
+  flex-shrink: 0;
+}
+
+.refItem .refTitle {
+  color: var(--ink);
+  font-weight: 600;
+  display: block;
+}
+
+.refItem .refUrl {
+  color: var(--ink-faint);
+  word-break: break-all;
+  font-size: 1rem;
+}
+
+.refItem .refNote {
+  color: var(--ink-soft);
+  font-size: 1rem;
+  display: block;
+  margin-top: 0.15rem;
+}
+
+.pageFooter {
+  max-width: none;
+  margin-top: 3.5rem;
+  padding-top: 1.6rem;
+  border-top: 1px solid var(--border);
+  color: var(--ink-faint);
+  font-size: 1rem;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 960px) {
+  .navToggle {
+    display: flex;
+  }
+  .sidebar {
+    transform: translateX(-100%);
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.25);
+  }
+  .sidebar.open {
+    transform: translateX(0);
+  }
+  .scrim.show {
+    display: block;
+  }
+  .main {
+    margin-left: 0;
+    padding: 5rem 1.3rem 4rem 1.3rem;
+  }
+  .hero h1 {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 520px) {
+  .main {
+    padding: 5rem 1rem 3rem 1rem;
+  }
+  .diagramCard {
+    padding: 1rem 0.7rem;
+  }
+  .tableWrap thead th,
+  .tableWrap tbody td {
+    padding: 0.6rem 0.7rem;
+  }
+}
+
+:focus-visible {
+  outline: 3px solid var(--indigo);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .layout * {
+    transition: none !important;
+  }
+}

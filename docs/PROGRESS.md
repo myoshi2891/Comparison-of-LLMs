@@ -2,7 +2,7 @@
 
 > 本ファイルは Next.js 移行完了後の保守・改善フェーズにおける開発の進捗（特にテスト関連）および品質チェックのルールを記録する。
 >
-> - 最終更新日: **Updated 2026-09-12**
+> - 最終更新日: **Updated 2026-09-17**
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
 
@@ -11,16 +11,51 @@
 - **フェーズ**: 保守・機能改善・品質強化フェーズ
 - **ブランチ**: `dev`（本番 `main` への Next.js 移行マージ完了 🚀）
 - **動作検証**:
-  - `bun run build` ✅（Compiled successfully / 88 静的ページを生成。2026-09-12 実測）
-  - `bun run typecheck` ✅（`tsc --noEmit`。2026-09-12 実測）
-  - `bun run lint` ✅（Biome check / 481 files / 0 diagnostics。2026-09-12 実測）
+  - `bun run build` ✅（Compiled successfully / 90 静的ページを生成。2026-09-17 実測）
+  - `bun run typecheck` ✅（`tsc --noEmit`。2026-09-17 実測）
+  - `bun run lint` ✅（Biome check / 4 files / 0 diagnostics。2026-09-17 実測）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: `bun run test` で Vitest **174 files / 1583 tests すべて合格**（2026-09-12 実測。全 Green ✅）
+  - **フロントエンド (`web-next/`)**: `bun run test` で Vitest **177 files / 1639 tests すべて合格**（2026-09-17 実測。全 Green ✅）
     - `load(sourceHtml)` をモジュール初期化時に呼ぶ `governance/ai-governance/GuideContent.tsx` と
       `local-llm/finetuning-best-practices/GuideContent.tsx` は、import スモークでも読み込み可能であることを確認済み
-  - **バックエンド (`scraper/`)**: pytest 実行で **94 件 + 37 subtests すべて合格** (2026-09-12 実測。全 Green ✅)
+  - **バックエンド (`scraper/`)**: pytest 実行で **100 件すべて合格** (2026-09-17 実測。全 Green ✅)
 
 ## 最近の追加内容
+
+- **ITIL AI Governance (Version 5) 完全学習ガイド（/governance/itil-ai-governance-v5）の Next.js アプリ移行 & ナビ「資格試験」グループ新設**:
+  - `Itil-ai-governance-v5-study-guide.html` を `web-next/app/governance/itil-ai-governance-v5/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。
+  - 要約・省略一切なしで全12セクション（この教材について〜参考文献・出典一覧）、全44サブセクション（h3）、全8サブサブセクション（h4）、全表（111行相当）、14個のMermaid図解（`MermaidDiagram`）、TOCスクロール追従（`TocObserver.tsx`）、全24件のcallout（practice: 9, source: 11, note: 4）、全14件の参考文献カード・外部リンク安全属性（`target="_blank" rel="noopener noreferrer"`）、ブランドSVGを完全再現。
+  - グローバルナビゲーション（`web-next/lib/nav-taxonomy.ts`）に新グループ「資格試験」を新設し、トップレベルドロップダウンに追加。`components/site/SiteHeader.test.tsx` のドロップダウン数（6 → 7）および `tests/nav-derivation.test.ts` のグループ数（9 → 10）を同期更新。
+  - 原本照合監査スクリプト `audit_source_parity.mjs` を拡張し、シングル・ダブルクォート文字列の Mermaid 抽出に対応した上で、原本とのパリティ監査で exit code 0（漏れなし ✅）を確認。
+  - 原本 `Itil-ai-governance-v5-study-guide.html` および `Itil-ai-governance-v5-study-guide.md` は `archive/html/governance/` および `archive/md/governance/` へ退避保存。
+  - `web-next/lib/page-registry.ts` に新規エントリ（`slug: "/governance/itil-ai-governance-v5"`, `group: "資格試験"`）を登録。
+  - 契約テスト14件（S-1〜S-4, C-1〜C-5, D-1〜D-3, Q-1〜Q-2）を作成し、Vitest **177 files / 1639 tests** 全 Green ✅、typecheck ✅、Biome lint ✅ を確認。
+
+- **AI Engineering 入門ガイド（/books/ai-engineering-guide）の Next.js アプリ移行**:
+  - `Ai-engineering-guide.html` を `web-next/app/books/ai-engineering-guide/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。
+  - 要約・省略一切なしで全17セクション（はじめに〜参考文献・出典）、全10サブセクション（h3）、全表（6個）、9個のMermaid図解（`MermaidDiagram`）、TOCスクロール追従・モバイルドロワー（`TocObserver.tsx`）、全28件の参考文献・外部リンク安全属性（`target="_blank" rel="noopener noreferrer"`）、全幅レイアウトを完全再現。
+  - **ヘッダー・ディスクレーマー境界スタイリング適合化**: グローバル鮮度バー（`#site-freshness-bar`）を非表示化（`display: none !important`）し、ディスクレーマーとヒーローセクション間の不自然な黒い線を解消。ヒーローセクション（`#f7f2e7`）の色合いを優先させ、固定ヘッダーと警告バナーの不透明化によりスクロール時の二重写りを防止。
+  - 原本 `Ai-engineering-guide.html` は `archive/html/books/Ai-engineering-guide.html` へ退避保存。
+  - 原本照合監査スクリプト `audit_source_parity.mjs` で exit code 0（漏れなし ✅）を確認。あわせて識別子キー（クォートなしオブジェクトリテラル）の Mermaid 抽出に対応。
+  - `web-next/lib/page-registry.ts` に新規エントリ（`slug: "/books/ai-engineering-guide"`, `group: "推薦書籍"`）を登録。
+  - 契約テスト18件（S-1〜S-4, C-1〜C-6, D-1, D-5, D-7, D-8, D-9, D-10, Q-2, Q-3）を作成し、Vitest **176 files / 1621 tests** 全 Green ✅、typecheck ✅、Biome lint ✅、build ✅（90静的ページ）を確認。
+
+- **Generative AI for Software Development ガイド（/books/generative-ai-for-software-development）の UI / スタイル / インタラクション完全適合化**:
+  - **公開日・最終確認バッジ**: グローバル鮮度バーの黒背景・青文字による違和感を解消するため、本ページではヒーローセクション最上部に統合。背景色をヒーロー色（`#faf7ef`）、文字色を黒文字（`var(--ink)` / `var(--ink-soft)`）に設定し、グローバルの黒バーを非表示化。
+  - **フォント完全移行**: 原本準拠の Google Fonts（`Source Serif 4` および `Noto Serif JP`）の `<link>` を追加し、見出し・カバーのセリフ体を原本と 100% 同一に再現。
+  - **ヘッダー・スクロール重なり防止**: スクロール時に本文テキストが半透明ヘッダーの裏に透けて二重写しになる問題を解消するため、本ページ表示時に固定ヘッダー（`#common-header`）および免責バナー（`.ch-disclaimer`）の背景を完全不透明化（solid）。アンカー移動の見出しめり込み防止（`scroll-margin-top`）も設定。
+  - **学習チェックリストの完全移行**: 全9項目に `.check-item` クラスを確実に付与し、`TocObserver.tsx` で初期表示時のカウンター（`0 / 9 完了`）およびクリック時のトグル・打消し線連携を修正。`color-scheme: light` によりブラウザのダークモード判定による黒四角（■）化を防止し、原本の白背景＋グレー枠線＋深緑（`var(--forest)`）チェックを完全再現。
+  - 契約テストを 17 件から 20 件（D-9, D-10, Q-4 追加）へ拡充し、Vitest **175 files / 1603 tests** 全 Green ✅、typecheck ✅、Biome check ✅、原本照合監査 `exit=0` ✅ を確認。
+
+- **Generative AI for Software Development ガイド（/books/generative-ai-for-software-development）の Next.js アプリ移行 & ナビ「推薦書籍」グループ新設**:
+  - `Generative-ai-for-software-development-guide.html` を `web-next/app/books/generative-ai-for-software-development/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。
+  - 要約・省略一切なしで全17セクション（この本について〜参考文献・出典URL一覧）、全33サブセクション（h3）、全表（12個）、7個のMermaid図解（`MermaidDiagram`）、TOCスクロール追従・モバイルドロワー・チェックリストカウンター（`TocObserver.tsx`）、全9項目の学習チェックリスト、全47件の参考文献・外部リンク安全属性（`target="_blank" rel="noopener noreferrer"`）、全幅レイアウトを完全再現。
+  - グローバルナビゲーション（`web-next/lib/nav-taxonomy.ts`）に新グループ「推薦書籍」を新設し、トップレベルドロップダウンに追加。`components/site/SiteHeader.test.tsx` のドロップダウン数（5 → 6）および `tests/nav-derivation.test.ts` のグループ数（8 → 9）を同期更新。
+  - 原本 `Generative-ai-for-software-development-guide.html` は `archive/html/books/Generative-ai-for-software-development-guide.html` へ退避保存。
+  - 原本照合監査スクリプト `audit_source_parity.mjs` で exit code 0（漏れなし ✅）を確認。
+  - `web-next/lib/page-registry.ts` に新規エントリ（`slug: "/books/generative-ai-for-software-development"`, `group: "推薦書籍"`）を登録。
+  - 契約テスト17件（S-1〜S-4, C-1〜C-6, D-1, D-5, D-7, D-8, Q-1〜Q-3）を作成し、Vitest **175 files / 1600 tests** 全 Green ✅、typecheck ✅、Biome lint ✅ を確認。
+
 
 - **月次価格更新 2026-09 & スクレイパーのフォールバック優先順位バグ修正** (HEAD `3af819c4`):
   - `pricing.json` が 2026-07-24 で約 7 週間停滞していたため、各社公式料金ページを実地調査して更新。

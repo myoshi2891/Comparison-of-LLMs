@@ -148,6 +148,30 @@ const entries: PageEntry[] = [
     lastReviewed: "2026-07-31",
   },
   {
+    slug: "/books/ai-engineering-guide",
+    title: "AI Engineering 入門ガイド",
+    description:
+      "基盤モデル時代のソフトウェア開発を実務の順序で学ぶ入門ガイド。Chip Huyen著『AI Engineering』の章構成を土台に17セクションで解説。",
+    group: "推薦書籍",
+    topics: ["ai-engineering", "llm", "rag", "agent", "mcp", "fine-tuning"],
+    summary:
+      "基盤モデル時代のソフトウェア開発を実務の順序で学ぶ入門ガイド。Chip Huyen著『AI Engineering』の章構成を土台に17セクションで解説。",
+    addedAt: "2026-09-17",
+    lastReviewed: "2026-09-17",
+  },
+  {
+    slug: "/books/generative-ai-for-software-development",
+    title: "Generative AI for Software Development",
+    description:
+      "O'Reilly刊『Generative AI for Software Development』の構成をベースに、コード生成、UI/UX、コードレビュー、テスト、ドキュメント、チャットボット、実装成功事例、ワークフロー実践、リスクガバナンスまでを網羅した初学者のためのステップバイステップ解説ガイド。",
+    group: "推薦書籍",
+    topics: ["book", "software-development", "generative-ai", "vibe-coding", "guide"],
+    summary:
+      "O'Reilly刊『Generative AI for Software Development』をベースに、コード生成からUI/UX、コードレビュー、テスト、ドキュメント、エージェント、ワークフロー実践、リスクガバナンスまでを網羅した初学者のためのステップバイステップ解説ガイド。",
+    addedAt: "2026-09-17",
+    lastReviewed: "2026-09-17",
+  },
+  {
     slug: "/ci-cd/ai-cicd-automation-best-practices",
     title: "AI CI/CD Automation",
     group: "開発プロセス",
@@ -637,6 +661,16 @@ const entries: PageEntry[] = [
       "AIガバナンスの基礎、国際フレームワーク、組織での構築手順、RACIマトリクスを初学者向けに解説する実践ガイド。",
     addedAt: "2026-07-17",
     lastReviewed: "2026-07-17",
+  },
+  {
+    slug: "/governance/itil-ai-governance-v5",
+    title: "ITIL AI Governance (Version 5) 完全学習ガイド",
+    group: "資格試験",
+    topics: ["itil", "ai-governance", "compliance", "risk-management"],
+    summary:
+      "PeopleCert認定資格「ITIL AI Governance (Version 5)」の出題範囲（Module 1〜9）を網羅した初学者向け完全学習ガイド。6Cモデル、Assess-Design-Implement-Maintainモデル、各フレームワーク・規制との連携を体系的に解説。",
+    addedAt: "2026-09-17",
+    lastReviewed: "2026-09-17",
   },
   {
     slug: "/infra/amazon-bedrock-best-practices-2026-intermediate",

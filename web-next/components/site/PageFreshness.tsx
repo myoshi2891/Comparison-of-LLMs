@@ -18,7 +18,7 @@ export function PageFreshness({ pathname: pathnameProp }: { pathname?: string } 
   if (!entry) return null;
 
   return (
-    <div className={styles.bar} lang="ja">
+    <div className={styles.bar} id="site-freshness-bar" lang="ja">
       <span className={styles.item}>
         最終確認
         <time className={styles.value} dateTime={entry.lastReviewed}>

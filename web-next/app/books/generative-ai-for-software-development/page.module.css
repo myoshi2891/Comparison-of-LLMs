@@ -1,0 +1,792 @@
+/* ==========================================================================
+   Generative AI for Software Development ガイド スタイルシート
+   原本 HTML の <style> を 100% 転写し、CSS Modules スコープ化
+   ========================================================================== */
+
+.layout {
+  --paper: #faf7ef;
+  --paper-card: #ffffff;
+  --paper-card-2: #f2ecdd;
+  --ink: #2a2620;
+  --ink-soft: #5c574c;
+  --indigo: #413d8f;
+  --indigo-dark: #2e2a68;
+  --indigo-soft: rgba(65, 61, 143, 0.09);
+  --gold: #b9852f;
+  --gold-dark: #7a5714;
+  --forest: #2f6b4f;
+  --forest-dark: #123722;
+  --plum: #7a3b5e;
+  --plum-dark: #54213b;
+  --border: #e4ddc9;
+  --shadow: 0 4px 18px rgba(42, 38, 32, 0.08);
+
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  background: var(--paper);
+  color: var(--ink);
+  line-height: 1.9;
+  font-size: 1rem;
+  font-family: "Noto Sans JP", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+/* 本ページ表示時: グローバルの黒背景鮮度バッジを非表示にし、ヒーロー内に統合
+   data-page で本ページ限定にし、他ページの鮮度バーまで消えるのを防ぐ */
+:global(
+    body:has([data-testid="layout-root"][data-page="generative-ai-for-software-development"])
+    #site-freshness-bar
+  ) {
+  display: none !important;
+}
+
+/* 本ページ表示時: スクロール時の文字重なり防止のため、固定ヘッダーと警告バナーを完全不透明化
+   data-page で本ページ限定にし、他ページのヘッダー/バナー色まで変わるのを防ぐ */
+:global(
+    body:has([data-testid="layout-root"][data-page="generative-ai-for-software-development"])
+    #common-header
+  ) {
+  background-color: #05080f !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+:global(
+    body:has([data-testid="layout-root"][data-page="generative-ai-for-software-development"])
+    .ch-disclaimer
+  ) {
+  background-color: #120e04 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.layout * {
+  box-sizing: border-box;
+}
+
+.layout :global(h1),
+.layout :global(h2),
+.layout :global(h3),
+.layout :global(h4) {
+  font-family: "Source Serif 4", "Noto Serif JP", serif;
+  line-height: 1.4;
+  color: var(--indigo-dark);
+  scroll-margin-top: calc(var(--ch-height, 60px) + var(--ch-disclaimer-height, 40px) + 24px);
+}
+
+.layout :global(a) {
+  color: var(--indigo);
+}
+
+.layout :global(img) {
+  max-width: 100%;
+}
+
+.layout :global(p),
+.layout :global(li),
+.layout :global(td),
+.layout :global(th),
+.layout :global(dd),
+.layout :global(dt),
+.layout :global(blockquote) {
+  overflow-wrap: break-word;
+}
+
+.layout :global(code) {
+  overflow-wrap: anywhere;
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+}
+
+.layout :global(sup) {
+  font-size: 1rem;
+  vertical-align: super;
+  line-height: 0;
+}
+
+/* アンカー移動の見出しめり込み防止 */
+.layout :global(section[id]),
+.layout :global(h2[id]),
+.layout :global(h3[id]),
+.refCard {
+  scroll-margin-top: calc(var(--header-height, 60px) + 40px);
+}
+
+/* ---------- Sidebar ---------- */
+.sidebar {
+  position: fixed;
+  top: var(--header-height, 60px);
+  left: 0;
+  width: 290px;
+  height: calc(100vh - var(--header-height, 60px));
+  overflow-y: auto;
+  background: var(--paper-card);
+  border-right: 1px solid var(--border);
+  padding: 1.6rem 1.1rem 3rem;
+  z-index: 100;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: "Source Serif 4", serif;
+  font-weight: 700;
+  font-size: 1.15rem;
+  color: var(--indigo-dark);
+  margin-bottom: 0.3rem;
+  text-decoration: none;
+}
+
+.brandSub {
+  font-size: 1rem;
+  color: var(--ink-soft);
+  margin-bottom: 1.6rem;
+}
+
+.navGroupLabel {
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--plum-dark);
+  font-weight: 700;
+  margin: 1.3rem 0 0.5rem;
+  padding-left: 0.6rem;
+}
+
+.navA {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 0.6rem;
+  border-radius: 8px;
+  color: var(--ink);
+  text-decoration: none;
+  font-size: 1rem;
+  line-height: 1.35;
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+
+.navA :global(i) {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+  color: var(--ink-soft);
+}
+
+.navA:hover {
+  background: var(--indigo-soft);
+  color: var(--indigo-dark);
+}
+
+.navA.active {
+  background: var(--indigo-soft);
+  color: var(--indigo-dark);
+  font-weight: 700;
+}
+
+.navA.active :global(i) {
+  color: var(--indigo-dark);
+}
+
+/* ---------- Mobile bar ---------- */
+.mobileBar {
+  display: none;
+  position: sticky;
+  top: var(--header-height, 60px);
+  z-index: 200;
+  background: var(--paper-card);
+  border-bottom: 1px solid var(--border);
+  padding: 0.75rem 1rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.mobileBar,
+.mobileBar * {
+  font-size: 1rem;
+}
+
+.mobileBar .brand {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.mobileBar button {
+  background: none;
+  border: none;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  cursor: pointer;
+  padding: 0.4rem;
+}
+
+.mobileBar button :global(i) {
+  font-size: 1.3rem;
+}
+
+.scrim {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 18, 12, 0.4);
+  z-index: 150;
+}
+
+.scrim.show {
+  display: block;
+}
+
+/* ---------- Main ---------- */
+.main {
+  margin-left: 290px;
+  max-width: none;
+  padding: 0 3.2rem 6rem;
+}
+
+.hero {
+  padding: 1.8rem 0 2.2rem;
+  border-bottom: 2px solid var(--border);
+  margin-bottom: 1rem;
+}
+
+.freshnessBar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  padding: 0 0 1.25rem;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+
+.freshnessItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  white-space: nowrap;
+}
+
+.freshnessValue {
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.freshnessSep {
+  color: var(--border);
+  padding: 0 0.15rem;
+}
+
+.heroKicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--plum-dark);
+  font-weight: 700;
+  margin-bottom: 0.9rem;
+}
+
+.heroTitle {
+  font-size: 2.15rem;
+  margin-bottom: 1rem;
+  max-width: none;
+}
+
+.heroLead {
+  font-size: 1.12rem;
+  color: var(--ink-soft);
+  max-width: none;
+  margin-bottom: 1rem;
+}
+
+.heroNote {
+  font-size: 1rem;
+  color: var(--ink-soft);
+  background: var(--paper-card-2);
+  border-radius: 8px;
+  padding: 0.8rem 1rem;
+  max-width: none;
+}
+
+.section {
+  padding: 2.6rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.section:last-of-type {
+  border-bottom: none;
+}
+
+.sectionHead {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  margin-bottom: 1.3rem;
+}
+
+.sectionIcon {
+  width: 46px;
+  height: 46px;
+  border-radius: 11px;
+  background: var(--indigo-soft);
+  color: var(--indigo-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.45rem;
+  flex-shrink: 0;
+}
+
+.section :global(h2) {
+  font-size: 1.55rem;
+  margin: 0;
+}
+
+.section :global(h3) {
+  font-size: 1.22rem;
+  margin: 1.7rem 0 0.7rem;
+  color: var(--ink);
+}
+
+.section :global(h4) {
+  font-size: 1.05rem;
+  margin: 1.2rem 0 0.5rem;
+  color: var(--indigo-dark);
+}
+
+.section :global(p) {
+  margin: 0 0 1.05rem;
+}
+
+.section :global(ul),
+.section :global(ol) {
+  margin: 0 0 1.1rem 1.5rem;
+  padding: 0;
+}
+
+.section :global(li) {
+  margin-bottom: 0.5rem;
+}
+
+.lead {
+  font-size: 1.08rem;
+  color: var(--ink-soft);
+}
+
+/* ---------- Callout ---------- */
+.callout {
+  display: flex;
+  gap: 0.9rem;
+  background: var(--paper-card-2);
+  border-left: 4px solid var(--gold);
+  border-radius: 9px;
+  padding: 1.05rem 1.25rem;
+  margin: 1.3rem 0;
+}
+
+.callout.plum {
+  border-left-color: var(--plum);
+}
+
+.callout.forest {
+  border-left-color: var(--forest);
+}
+
+.calloutIcon {
+  flex-shrink: 0;
+  color: var(--gold-dark);
+  font-size: 1.35rem;
+  margin-top: 0.1rem;
+}
+
+.callout.plum .calloutIcon {
+  color: var(--plum-dark);
+}
+
+.callout.forest .calloutIcon {
+  color: var(--forest-dark);
+}
+
+.calloutBody {
+  flex: 1;
+  min-width: 0;
+}
+
+.calloutBody :global(p) {
+  margin: 0 0 0.6rem;
+}
+
+.calloutBody :global(p:last-child) {
+  margin-bottom: 0;
+}
+
+.calloutTitle {
+  font-weight: 700;
+  margin-bottom: 0.3rem;
+  display: block;
+}
+
+/* ---------- Table ---------- */
+.tableWrap {
+  overflow-x: auto;
+  overflow-y: hidden;
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  margin: 1.3rem 0;
+  background: var(--paper-card);
+}
+
+.tableTitle {
+  background: var(--indigo-dark);
+  color: #fdfbf6;
+  font-weight: 700;
+  font-size: 1rem;
+  padding: 0.65rem 1.05rem;
+}
+
+.layout :global(table) {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 480px;
+  font-size: 1rem;
+}
+
+/* 全列左寄せの防犯原則 */
+.layout :global(th),
+.layout :global(td),
+.layout :global(thead th:not(:first-child)) {
+  padding: 0.68rem 0.95rem;
+  text-align: left !important;
+  border-bottom: 1px solid var(--border);
+  overflow-wrap: anywhere;
+  vertical-align: top;
+}
+
+.layout :global(thead th) {
+  background: var(--indigo-dark);
+  color: #fdfbf6;
+  font-weight: 700;
+}
+
+.layout :global(tbody tr:nth-child(even)) {
+  background: rgba(65, 61, 143, 0.045);
+}
+
+.layout :global(tbody tr:hover) {
+  background: var(--indigo-soft);
+}
+
+.kvTable {
+  min-width: 0;
+}
+
+.kvTable :global(th) {
+  background: transparent;
+  color: var(--ink);
+  font-weight: 700;
+  border-right: 1px solid var(--border);
+  width: 32%;
+}
+
+.kvTable :global(tbody tr:nth-child(even)) {
+  background: transparent;
+}
+
+.kvTable :global(tr:hover) {
+  background: var(--indigo-soft);
+}
+
+/* ---------- Diagram ---------- */
+.diagramWrap {
+  margin: 1.6rem 0;
+}
+
+.diagramCard {
+  background: var(--paper-card);
+  border: 1px solid var(--border);
+  border-radius: 13px;
+  padding: 1.3rem;
+  box-shadow: var(--shadow);
+  /* 原本 .mermaid-target 相当：幅広い図は横スクロールで表示 */
+  overflow-x: auto;
+}
+
+/* 原本 .mermaid-target: safe center ＋ 横スクロール */
+.diagramCard :global(.mermaid-scroll .mermaid) {
+  display: flex;
+  justify-content: safe center;
+  min-height: 90px;
+}
+
+/* 原本 .mermaid-target svg: flex-shrink:0 で縮小させない */
+.diagramCard :global(.mermaid-scroll svg) {
+  max-width: none !important;
+  flex-shrink: 0;
+  height: auto;
+  overflow: visible;
+}
+
+.diagramCaption {
+  font-size: 1rem;
+  color: var(--ink-soft);
+  text-align: center;
+  margin-top: 0.8rem;
+  font-style: italic;
+}
+
+.diagramLoading {
+  color: var(--ink-soft);
+  font-size: 1rem;
+  text-align: center;
+  padding: 2.2rem;
+}
+
+/* ---------- Book card ---------- */
+.bookCard {
+  display: flex;
+  gap: 1.6rem;
+  background: var(--paper-card);
+  border: 1px solid var(--border);
+  border-radius: 15px;
+  padding: 1.6rem;
+  align-items: stretch;
+  flex-wrap: wrap;
+  box-shadow: var(--shadow);
+}
+
+.bookCover {
+  flex: 0 0 180px;
+  min-height: 220px;
+  background: linear-gradient(160deg, var(--indigo), var(--plum-dark));
+  border-radius: 11px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1.3rem;
+  color: #fdfbf6;
+}
+
+.bookCoverTitle {
+  font-family: "Source Serif 4", serif;
+  font-size: 1.18rem;
+  line-height: 1.45;
+}
+
+.bookCoverAuthor {
+  font-size: 1rem;
+  opacity: 0.88;
+}
+
+.bookCardBody {
+  flex: 1;
+  min-width: 0;
+}
+
+.bookCardBody :global(p) {
+  margin: 0 0 0.9rem;
+}
+
+/* ---------- Checklist ---------- */
+.checklistCounter {
+  font-weight: 700;
+  color: var(--indigo-dark);
+  margin-bottom: 1rem;
+  font-size: 1.08rem;
+}
+
+.checklist {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  color-scheme: light;
+}
+
+.checkItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.65rem 0.5rem;
+  border-bottom: 1px dashed var(--border);
+  border-radius: 6px;
+  transition: background 0.15s;
+}
+
+.checkItem:hover {
+  background: rgba(42, 38, 32, 0.03);
+}
+
+.checkItem input[type="checkbox"] {
+  color-scheme: light;
+  width: 1.3rem;
+  height: 1.3rem;
+  margin-top: 0.2rem;
+  accent-color: var(--forest);
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.checkItem label {
+  font-size: 1rem;
+  cursor: pointer;
+  flex: 1;
+  user-select: none;
+}
+
+.checkItem:global(.done) label,
+.checkItem.done label {
+  color: var(--ink-soft);
+  text-decoration: line-through;
+}
+
+/* ---------- References ---------- */
+.refGroupLabel {
+  margin: 1.7rem 0 0.6rem;
+  font-size: 1.12rem;
+  font-weight: 700;
+  color: var(--indigo-dark);
+}
+
+.refList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.refCard {
+  display: flex;
+  gap: 0.9rem;
+  padding: 0.85rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.refNum {
+  flex-shrink: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--plum-dark);
+  width: 2.1rem;
+}
+
+.refBody {
+  flex: 1;
+  min-width: 0;
+}
+
+.refTitle {
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.refNote {
+  font-size: 1rem;
+  color: var(--gold-dark);
+  margin-bottom: 0.25rem;
+}
+
+.refUrl {
+  font-size: 1rem;
+  word-break: break-all;
+  color: var(--indigo);
+  text-decoration: none;
+}
+
+.refUrl:hover {
+  text-decoration: underline;
+}
+
+.citeLink {
+  color: var(--plum-dark);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.citeLink:hover {
+  text-decoration: underline;
+}
+
+/* ---------- Glossary & Misc ---------- */
+.glossaryTerm {
+  color: var(--indigo-dark);
+  font-weight: 700;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: var(--indigo-soft);
+  color: var(--indigo-dark);
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 99px;
+  padding: 0.28rem 0.8rem;
+  margin: 0 0.4rem 0.4rem 0;
+}
+
+.roadmapTable :global(td) {
+  font-size: 1rem;
+}
+
+.footer {
+  font-size: 1rem;
+  color: var(--ink-soft);
+  padding: 2.4rem 0 1rem;
+  text-align: center;
+}
+
+.backTop {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: var(--indigo);
+  text-decoration: none;
+  font-size: 1rem;
+  margin-top: 0.6rem;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 980px) {
+  .sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.25);
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  .main {
+    margin-left: 0;
+    padding: 0 1.15rem 5rem;
+  }
+
+  .mobileBar {
+    display: flex;
+  }
+
+  .hero {
+    padding-top: 1.8rem;
+  }
+
+  .heroTitle {
+    font-size: 1.65rem;
+  }
+
+  .bookCard {
+    flex-direction: column;
+  }
+
+  .bookCover {
+    flex: 0 0 auto;
+  }
+}
