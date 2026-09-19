@@ -428,7 +428,7 @@ flowchart LR
 - 防御はAdversarial Training(経験的)とCertified Robustness(数学的に証明可能)の大きく2系統があり、それぞれにトレードオフがある
 - 「頑健に見えるだけ」のObfuscated Gradientsという落とし穴があり、AutoAttack/RobustBenchのような標準化された評価が分野の信頼性を支えている
 - Backdoor攻撃やData Poisoningのように、学習時を狙う脅威はサプライチェーン全体のリスクとして重要性を増している
-- 2022年の書籍刊行以降、LLMの台頭によりGCGのような新しい攻撃手法や、NIST・MITRE・OWASPといった国際的な標準フレームワークが整備され、分野はAIセキュリティ全体へと拡大している
+- 2022年の書籍刊行以降、LLMの台頭によりGCGのような新しい攻撃手法や、NIST・MITRE・OWASPといった国際的なガイダンス／フレームワークが整備され、分野はAIセキュリティ全体へと拡大している
 
 ---
 

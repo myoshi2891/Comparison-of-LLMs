@@ -161,7 +161,7 @@ flowchart TB
 | Claude Code | Anthropic | ターミナル常駐のCLIエージェント | ファイルシステムとコマンド実行への直接アクセスを持つ「エージェント的コーディング」向けCLI<sup>[7]</sup> |
 | Codex CLI / Gemini CLI | OpenAI / Google | ターミナル常駐のCLIエージェント | Claude Codeと同様の思想を持つ競合CLIツール群 |
 
-これらのツールに共通するのは、「単なる自動補完」から「計画→実行→検証→反復」というループを自律的に回せる「エージェント」へと進化した点です。Agent Mode自体はVS Codeで2025年4月、JetBrainsで2025年7月に一般提供済みですが、GitHubは2026年3月の更新で、カスタムエージェントやサブエージェント、プランモードをJetBrainsにも展開し、これらの機能がJetBrainsでもGA（一般提供）に達したと発表しています<sup>[21]</sup>。
+これらのツールに共通するのは、「単なる自動補完」から「計画→実行→検証→反復」というループを自律的に回せる「エージェント」へと進化した点です。Agent Mode自体はVS Codeで2025年4月、JetBrainsで2025年7月に一般提供済みですが、GitHubは2026年3月の更新で、カスタムエージェントやサブエージェント、プランモードをJetBrainsにも展開し、これらの機能がJetBrainsでもGA（一般提供）に達したと発表しています<sup>[21], [30]</sup>。
 
 ### 4.2 Claude Codeの基本ワークフロー
 
@@ -216,7 +216,7 @@ flowchart LR
 
 ### 5.2 アンドリュー・ングの「3つのループ」
 
-アンドリュー・ングは2026年6月30日付のニュースレター『The Batch』で、AIエージェントを用いたプロダクト開発を3つの入れ子になったループとして整理しました<sup>[14]</sup>。
+アンドリュー・ングは2026年6月26日付のニュースレター『The Batch』で、AIエージェントを用いたプロダクト開発を3つの入れ子になったループとして整理しました<sup>[14]</sup>。
 
 | ループ | 内容 | 主な担い手 |
 |---|---|---|
@@ -575,7 +575,7 @@ AI支援プログラミングは、初学者にとって「コードを書く」
 11. Gergely Orosz（The Pragmatic Engineer）, "TDD, AI agents and coding with Kent Beck": https://newsletter.pragmaticengineer.com/p/tdd-ai-agents-and-coding-with-kent
 12. Simon Willison, "Agentic Engineering Patterns"（Simon Willison's Newsletter）: https://simonw.substack.com/p/agentic-engineering-patterns
 13. Andrew Ng, X「AI Engineering Skills Map: Using coding agents」（2026年9月4日）: https://x.com/AndrewYNg/article/2095890279865721217
-14. Andrew Ng, DeepLearning.AI "The Batch" レター一覧（3つのループ／loop engineering関連）: https://www.deeplearning.ai/the-batch/tag/letters
+14. Andrew Ng, "Loop Engineering: Three Key Loops for Building Great Software", DeepLearning.AI "The Batch" (2026-06-26): https://www.deeplearning.ai/the-batch/three-key-loops-for-building-great-software
 15. OWASP GenAI Security Project, "OWASP GenAI Exploit Round-up Report Q1 2026"（2026年4月14日）: https://genai.owasp.org/2026/04/14/owasp-genai-exploit-round-up-report-q1-2026/
 16. OX Security, "OWASP Top 10 2026: How Classic Risks Change When AI Writes the Code": https://www.ox.security/academy/code-security/owasp-top-10-2026-how-classic-risks-change-when-ai-writes-the-code/
 17. Cycode, "Top AI Security Vulnerabilities to Watch out for in 2026"（2026年8月5日）: https://cycode.com/blog/ai-security-vulnerabilities/
@@ -591,6 +591,7 @@ AI支援プログラミングは、初学者にとって「コードを書く」
 27. Visual Studio Code Docs, "Work with Jupyter notebooks using AI in VS Code": https://code.visualstudio.com/docs/agents/guides/notebooks-with-ai
 28. GitHub Changelog, "Model Context Protocol (MCP) support in VS Code is generally available"（2025年7月14日）: https://github.blog/changelog/2025-07-14-model-context-protocol-mcp-support-in-vs-code-is-generally-available/
 29. GitHub Changelog, "Model Context Protocol (MCP) support for JetBrains, Eclipse, and Xcode is now generally available"（2025年8月14日）: https://github.blog/changelog/2025-08-13-model-context-protocol-mcp-support-for-jetbrains-eclipse-and-xcode-is-now-generally-available/
+30. GitHub Changelog, "Major agentic capabilities improvements in GitHub Copilot for JetBrains IDEs"（2026年3月11日）: https://github.blog/changelog/2026-03-11-major-agentic-capabilities-improvements-in-github-copilot-for-jetbrains-ides/
 
 ---
 
