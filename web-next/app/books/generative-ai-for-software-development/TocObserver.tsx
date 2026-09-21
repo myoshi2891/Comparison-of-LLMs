@@ -39,7 +39,7 @@ export default function TocObserver() {
       scrim?.classList.remove(styles.show);
       menuToggle?.setAttribute("aria-expanded", "false");
       syncSidebarInert();
-      if (hadFocus) menuToggle?.focus();
+      if (hadFocus && window.innerWidth <= MOBILE_BREAKPOINT) menuToggle?.focus();
     };
 
     const handleResize = () => {
