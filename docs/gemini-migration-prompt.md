@@ -163,11 +163,17 @@ echo "exit=$status"
 
    ```bash
    (cd web-next && bun run test app/<provider>/<slug>/page.test.tsx)
-   (cd web-next && bun run test app/<provider>/<slug>/TocObserver.test.tsx)
    (cd web-next && bun run test tests/page-registry-coverage.test.ts)
    ```
 
-   `TocObserver.test.tsx` を作成した場合は、対象コンポーネントのカバレッジも確認します
+   `TocObserver.tsx` を作成した場合（Phase 2-1 と同条件）は、
+   `TocObserver.test.tsx` も実行します:
+
+   ```bash
+   (cd web-next && bun run test app/<provider>/<slug>/TocObserver.test.tsx)
+   ```
+
+   あわせて、対象コンポーネントのカバレッジも確認します
    （Q-1・§6-a の全公開挙動カバレッジ要件を満たすこと）:
 
    ```bash
