@@ -634,18 +634,25 @@ def upsert_triples(tx, triples: list[dict]) -> None:
     # 埋め込む前に必ず許可リストで検証する(Cypherインジェクション対策)。
     # 呼び出し側の検証漏れを前提にせず、この関数自身でも弾く。
     for t in triples:
+        head, tail = t.get("head"), t.get("tail")
         if (
             t.get("head_type") not in ALLOWED_ENTITY_TYPES
             or t.get("tail_type") not in ALLOWED_ENTITY_TYPES
             or t.get("relation") not in ALLOWED_RELATIONS
+            # head / tail が欠けていると、下の tx.run で KeyError になる。
+            # 空文字や空白だけの名前は、名前のないノードを作ってしまうのでここで弾く。
+            or not isinstance(head, str)
+            or not head.strip()
+            or not isinstance(tail, str)
+            or not tail.strip()
         ):
-            raise ValueError(f"スキーマ外のトリプルは書き込めません: {t}")
+            raise ValueError(f"検証に通らないトリプルは書き込めません: {t}")
         tx.run(
             f"MERGE (h:{t['head_type']} {{name: $head}}) "
             f"MERGE (t:{t['tail_type']} {{name: $tail}}) "
             f"MERGE (h)-[:{t['relation']}]->(t)",
-            head=t["head"],
-            tail=t["tail"],
+            head=head,
+            tail=tail,
         )
 
 # 使い方(neo4jドライバ 5.x を想定):
