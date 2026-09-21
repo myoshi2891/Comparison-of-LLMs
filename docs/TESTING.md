@@ -8,7 +8,7 @@ Updated 2026-09-19
 
 | 領域 | フレームワーク | 状態（実測 2026-09-19） | コマンド |
 | ------ | --------------- | ------ | ---------- |
-| フロントエンド (web-next/) | Vitest + @testing-library/react | **180 files / 1681 tests** 全 Green | `cd web-next && bun run test` |
+| フロントエンド (web-next/) | Vitest + @testing-library/react | **180 files / 1682 tests** 全 Green | `cd web-next && bun run test` |
 | スクレイパー (scraper/) | pytest | **100 tests（5 ファイル）** 全 Green | `cd scraper && uv run pytest` |
 | E2E (web-next/e2e/) | Playwright | 実装済みだが **CI 未組込・一部が現行 DOM と不整合**（詳細は後述） | `cd web-next && bun run test:e2e` |
 

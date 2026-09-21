@@ -208,7 +208,7 @@ cd scraper && uv run pytest
 ```bash
 cd web-next && bun run build      # 全ルートが ○ (Static)
 cd web-next && bun run typecheck  # 型エラーゼロ
-cd web-next && bun run test       # 1639+ 件 pass（全 Green ✅）
+cd web-next && bun run test       # 180 files / 1682 件 pass（2026-09-19 実測。全 Green ✅）
 cd web-next && bun run lint       # 新規違反ゼロ
 cd scraper && uv run pytest       # 100/100 passed（全 Green ✅）
 ```

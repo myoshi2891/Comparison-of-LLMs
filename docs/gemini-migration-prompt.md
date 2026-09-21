@@ -133,6 +133,9 @@ echo "exit=$status"
      をすべてカバーします。
 3. `(cd web-next && bun run test app/<provider>/<slug>/page.test.tsx)` を実行し、
    **テストが失敗することを確認** します。
+   `TocObserver.test.tsx` を作成した場合は、
+   `(cd web-next && bun run test app/<provider>/<slug>/TocObserver.test.tsx)` も実行し、
+   こちらも **Red コミット前に失敗することを確認** します。
 4. PII 検査後、Red コミットを実行します:
 
    ```
