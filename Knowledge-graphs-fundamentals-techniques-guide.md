@@ -1002,15 +1002,55 @@ ORDER BY ?label
 Python の rdflib で実行して確認した結果は、`Osaka` と `Tokyo` の2件でした。
 
 ```python
+# rdflib は pip install rdflib で入る。このブロックだけで完結して動きます。
 from rdflib import Graph
 
+# 2.4 節の Turtle をそのまま文字列として持つ。三重引用符なので改行を含められる。
+ttl = """
+@prefix ex:   <http://example.org/> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+ex:Tokyo   rdf:type ex:City ;
+           rdfs:label "Tokyo"@en, "東京"@ja ;
+           ex:locatedIn ex:Japan .
+
+ex:Osaka   rdf:type ex:City ;
+           rdfs:label "Osaka"@en ;
+           ex:locatedIn ex:Japan .
+
+ex:Japan   rdf:type ex:Country ;
+           rdfs:label "Japan"@en .
+
+ex:City    rdfs:subClassOf ex:Place .
+ex:Country rdfs:subClassOf ex:Place .
+"""
+
+# 上の SPARQL も同じように文字列として持つ。
+sparql_text = """
+PREFIX ex:   <http://example.org/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT ?city ?label
+WHERE {
+  ?city a ex:City ;
+        ex:locatedIn ex:Japan ;
+        rdfs:label ?label .
+  FILTER (lang(?label) = "en")
+}
+ORDER BY ?label
+"""
+
 g = Graph()
-# 先ほどの Turtle 文字列（ttl）を読み込む。rdflib は pip install rdflib で入る。
 g.parse(data=ttl, format="turtle")
 
 # query の引数に、上の SPARQL の文字列を渡す。
 for row in g.query(sparql_text):
     print(row.city, row.label)
+
+# 出力:
+# http://example.org/Osaka Osaka
+# http://example.org/Tokyo Tokyo
 ```
 
 SPARQL のクエリ形式には SELECT のほかに、ASK（はい・いいえ）、CONSTRUCT（結果を新しいグラフとして作る）、DESCRIBE（実体の説明を得る）があります。
@@ -1020,14 +1060,22 @@ SPARQL のクエリ形式には SELECT のほかに、ASK（はい・いいえ�
 KG のトリプルを、関係データベースの3列の表（主語、述語、目的語）として保存し、SQL で問い合わせる方法があります。上の SPARQL と同じ問いは、次のように書けます。
 
 ```sql
--- 同じ表 triples を2回使う自己結合（セルフジョイン）で、
--- 「型が City」かつ「日本に位置する」という2つの事実を持つ主語を探す。
-SELECT t1.s
+-- 同じ表 triples を3回使う自己結合（セルフジョイン）で、
+-- 「型が City」「日本に位置する」「英語ラベルを持つ」の3つの事実を持つ主語を探す。
+-- SPARQL の SELECT ?city ?label に合わせ、主語とラベルの2列を返す。
+SELECT t1.s AS city, t3.o AS label
 FROM triples t1
 JOIN triples t2 ON t1.s = t2.s
+JOIN triples t3 ON t1.s = t3.s
 WHERE t1.p = 'rdf:type'     AND t1.o = 'ex:City'
-  AND t2.p = 'ex:locatedIn' AND t2.o = 'ex:Japan';
+  AND t2.p = 'ex:locatedIn' AND t2.o = 'ex:Japan'
+  -- 言語タグは目的語の列に文字列として埋まっているので、LIKE で英語だけに絞る。
+  -- SPARQL の FILTER (lang(?label) = "en") に相当する条件。
+  AND t3.p = 'rdfs:label'   AND t3.o LIKE '%@en'
+ORDER BY t3.o;
 ```
+
+結果は SPARQL と同じ Osaka と Tokyo の2件です。ただし `label` 列には `"Osaka"@en` のように言語タグが付いたままの文字列が入ります。SPARQL では `lang()` 関数が言語タグを構造として扱えるのに対し、3列の表では言語タグをただの文字列として持つしかなく、`LIKE` で文字列を探る必要がある点が違いです。
 
 条件が増えるほど自己結合が増え、処理が重くなる点が、この方式の課題です。
 
