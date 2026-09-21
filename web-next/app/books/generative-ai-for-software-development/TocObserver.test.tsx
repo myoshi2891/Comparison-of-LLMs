@@ -3,6 +3,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import styles from "./page.module.css";
 import TocObserver from "./TocObserver";
 
+// TocObserver.tsx のモジュール内定数のミラー（同ファイルは非 export のため）。
+const MOBILE_BREAKPOINT = 980;
+
 function setInnerWidth(width: number): void {
   Object.defineProperty(window, "innerWidth", { value: width, configurable: true, writable: true });
 }
@@ -149,6 +152,10 @@ describe("generative-ai-for-software-development TocObserver - mobile sidebar", 
     expect(sidebar.classList.contains(styles.open)).toBe(true);
     expect(scrim.classList.contains(styles.show)).toBe(true);
 
+    // openMenu が最初のサイドバーリンクへフォーカスを移している。
+    const firstLink = sidebar.querySelector(`.${styles.navA}`) as HTMLAnchorElement;
+    expect(document.activeElement).toBe(firstLink);
+
     setInnerWidth(1200);
     fireEvent(window, new Event("resize"));
 
@@ -156,6 +163,13 @@ describe("generative-ai-for-software-development TocObserver - mobile sidebar", 
     expect(scrim.classList.contains(styles.show)).toBe(false);
     expect(toggle.getAttribute("aria-expanded")).toBe("false");
     expect(sidebar.inert).toBe(false);
+
+    // デスクトップ幅では closeMenu が menuToggle へフォーカスを奪い返さない
+    // (`window.innerWidth <= MOBILE_BREAKPOINT` ガードの false 側)。
+    // サイドバーは inert ではないので、リンクにフォーカスが残るのが正しい。
+    if (window.innerWidth > MOBILE_BREAKPOINT) {
+      expect(document.activeElement).toBe(firstLink);
+    }
   });
 
   it("moves focus to menuToggle instead of trapping it inside the sidebar as it becomes inert", () => {
