@@ -276,7 +276,8 @@ python -m venv venv
 source venv/bin/activate      # Windows は venv\Scripts\activate
 ```
 
-> **[補足]** 2026年時点では Python 3.8 はすでにサポート終了しています。ライブラリの互換性を優先し、まずは README が示す 3.10 以前で試し、動いたら新しい版に上げて検証するのが安全です。
+> **[補足]** 2026年時点では Python 3.8 はすでにサポート終了しています。README が示す範囲のうち **3.10 を最小バージョン**として選び、動いたら新しい版に上げて検証するのが安全です。
+> 本ガイド内のサンプルコードは `list[dict]` や `dict | None` といった 3.10 以降の型注釈構文を使うため、3.8 / 3.9 では動作しません（3.9 以前で動かす場合は `typing.List` / `typing.Dict` / `typing.Optional` へ置き換えてください）。
 
 **Step C: Neo4j の準備**
 
@@ -430,7 +431,7 @@ flowchart TD
 |---|---|---|
 | 1 | DB を作り、`Resource.uri` などに制約・インデックスを作成 | 検索と重複防止 |
 | 2 | n10s（neosemantics）を設定し、`hp.owl` を取り込む | オントロジーをグラフ化 |
-| 3 | ID が `HP_` で始まる `Resource` ノードに `HpoPhenotype` ラベルと `id` を付与 | 表現型ノードを扱いやすくする |
+| 3 | `Resource.uri` が `http://purl.obolibrary.org/obo/HP_` で始まるノードに `HpoPhenotype` ラベルを付与し、uri 末尾の `HP_0000001` をコロン形式へ変換した `id`（`HP:0000001`）を設定 | 表現型ノードを扱いやすくする。`phenotype.hpoa` と Cypher で使う ID 表記を `HP:` 形式に統一する |
 | 4 | `phenotype.hpoa` を `LOAD CSV` で読み込み、疾患ノード（`HpoDisease`）を `MERGE` | 疾患ノードの作成 |
 | 5 | 疾患から表現型への `HAS_PHENOTYPIC_FEATURE` 関係を作り、根拠・頻度・発症時期などをプロパティとして付与 | **関係のメタデータを保持** |
 | 6 | クエリ: 疾患の特徴取得、観察された特徴で疾患をランキング、根拠の確認 | 診断支援の探索 |
@@ -630,8 +631,15 @@ def extract_triples(llm_call: Callable[[str], str], text: str) -> list[dict]:
 ```python
 def upsert_triples(tx, triples: list[dict]) -> None:
     # ラベルや関係名は変数にできないため文字列で埋め込む。
-    # 上の許可リストで検証済みの値だけを使うこと(Cypherインジェクション対策)。
+    # 埋め込む前に必ず許可リストで検証する(Cypherインジェクション対策)。
+    # 呼び出し側の検証漏れを前提にせず、この関数自身でも弾く。
     for t in triples:
+        if (
+            t.get("head_type") not in ALLOWED_ENTITY_TYPES
+            or t.get("tail_type") not in ALLOWED_ENTITY_TYPES
+            or t.get("relation") not in ALLOWED_RELATIONS
+        ):
+            raise ValueError(f"スキーマ外のトリプルは書き込めません: {t}")
         tx.run(
             f"MERGE (h:{t['head_type']} {{name: $head}}) "
             f"MERGE (t:{t['tail_type']} {{name: $tail}}) "
