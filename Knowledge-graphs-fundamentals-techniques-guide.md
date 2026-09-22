@@ -1503,7 +1503,9 @@ Microsoft のプロジェクトページは、GraphRAG と LazyGraphRAG が、Az
 | 目次（MIT Press 電子書籍ビューア） | https://mitpress.ublish.com/book/knowledge-graphs-fundamentals-techniques-and-applications | 全17章の節タイトル、演習130問、章末構成 |
 | Kejriwal, *Knowledge Graphs: A Practical Review of the Research Landscape* | https://www.researchgate.net/publication/367745990_Knowledge_Graphs_A_Practical_Review_of_the_Research_Landscape | A-Box と T-Box の説明、個数制約の例 |
 
-### 20.3 著名な研究者・開発元による一次資料
+### 20.3 著名な研究者・開発元による一次資料と、技術メディアの解説記事
+
+以下は原則として研究者・開発元による一次資料です。ただし The New Stack の記事は技術メディアによる二次資料であり、一次資料（ISO/IEC 39075 と Neo4j 標準化チームの解説）の補足として挙げています。
 
 | 発信者 | 情報源 | URL | 使った箇所 |
 |--------|--------|-----|-----------|
@@ -1521,7 +1523,7 @@ Microsoft のプロジェクトページは、GraphRAG と LazyGraphRAG が、Az
 | Neo4j | The GraphRAG manifesto | https://neo4j.com/blog/genai/graphrag-manifesto/ | 第18章 |
 | Neo4j 標準化チーム | Creating the GQL database language standard | https://neo4j.com/blog/cypher-and-gql/gql-database-language-standard/ | 第12章 |
 | Stefan Plantikow（Neo4j、GQL 編集者） | NODES 2024 セッション | https://neo4j.com/nodes2024/agenda/a-new-era-for-graph-queries-iso-iec-39075-gql/ | 第12章（補足） |
-| The New Stack | GQL: A New ISO Standard for Querying Graph Databases | https://thenewstack.io/gql-a-new-iso-standard-for-querying-graph-databases/ | 第12章 |
+| The New Stack（二次資料） | GQL: A New ISO Standard for Querying Graph Databases | https://thenewstack.io/gql-a-new-iso-standard-for-querying-graph-databases/ | 第12章 |
 | Google Cloud | Spanner Graph and ISO standards | https://docs.cloud.google.com/spanner/docs/graph/iso-standards | 第12章 |
 
 ### 20.4 標準化団体の仕様
