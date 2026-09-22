@@ -41,14 +41,14 @@
 | 副題 | Build AI systems using connected data | [S1] |
 | 著者 | Alessandro Negro（共著: Vlastimil Kůs, Giuseppe Futia, Fabio Montagna） | [S1] |
 | 序文 | Maxime Labonne、Khalifeh AlJadda | [S1] |
-| 出版社 | Manning Publications | [S1][S2] |
-| 刊行 | 2025年10月 | [S1][S2] |
-| ISBN | 9781633439894 | [S1][S2] |
-| ページ数 | 472 ページ | [S1][S2] |
+| 出版社 | Manning Publications | [S1] [S2] |
+| 刊行 | 2025年10月 | [S1] [S2] |
+| ISBN | 9781633439894 | [S1] [S2] |
+| ページ数 | 472 ページ | [S1] [S2] |
 | 難易度表記 | Intermediate to advanced（O'Reilly の表記） | [S2] |
 | 想定読者 | ML/AI エンジニア、データサイエンティスト、データエンジニア。サンプルは Python | [S1] |
 | 翻訳 | ポーランド語、ロシア語、簡体字中国語（Manning のページに記載） | [S1] |
-| コード | GitHub リポジトリ `alenegro81/knowledge-graphs-and-llms-in-action` | [S1][S8] |
+| コード | GitHub リポジトリ `alenegro81/knowledge-graphs-and-llms-in-action` | [S1] [S8] |
 | 著者紹介 | Negro 氏は GraphAware の Chief Scientist で、*Graph-Powered Machine Learning* の著者 | [S1] |
 
 > **[補足]** 書籍自体の難易度は「中級〜上級」と表記されています。本ガイドは、その前段として**初学者が全体像と用語をつかみ、読書とハンズオンに入れる状態**になることを目標にしています。
@@ -115,7 +115,7 @@ flowchart TD
 | 5 | Ch15 | LangGraph による QA エージェント | 状態を持つパイプラインとして実装する流れが分かる |
 | 付録 | A〜C | グラフ入門 / Neo4j / 構造化ソースからの KG 構築 | 環境構築と基礎を補える |
 
-出典: 目次 [S2][S3]。「到達点」は目次と章概要 [S3][S4][S5][S6] を基にした筆者の整理です。
+出典: 目次 [S2] [S3]。「到達点」は目次と章概要 [S3] [S4] [S5] [S6] を基にした筆者の整理です。
 
 ### 3.3 初学者向け 3 つの読み進め方
 
@@ -259,7 +259,7 @@ flowchart TD
 
 **Step A: 書籍とコードの入手**
 
-- 書籍は Manning の liveBook や O'Reilly から読めます（購読やアカウントが必要）[S1][S2]。
+- 書籍は Manning の liveBook や O'Reilly から読めます（購読やアカウントが必要）[S1] [S2]。
 - コードは公式リポジトリ [S8] から取得します。
 
 ```bash
@@ -616,9 +616,18 @@ def extract_triples(llm_call: Callable[[str], str], text: str) -> list[dict]:
         relations=sorted(ALLOWED_RELATIONS),
         text=text,
     )
+    # JSON として読めても、形が期待どおりとは限らない。
+    # json.JSONDecodeError はここでは握りつぶさず、呼び出し側のリトライ方針に委ねる。
     data = json.loads(llm_call(prompt))
+    if not isinstance(data, dict):
+        return []  # トップレベルが辞書でなければ .get() が使えない
+    triples = data.get("triples")
+    if not isinstance(triples, list):
+        return []  # triples がリストでなければ走査できない
     valid = []
-    for t in data.get("triples", []):
+    for t in triples:
+        if not isinstance(t, dict):
+            continue  # 辞書でない要素は .get() が使えないので捨てる
         if (
             t.get("head_type") in ALLOWED_ENTITY_TYPES
             and t.get("tail_type") in ALLOWED_ENTITY_TYPES
@@ -923,11 +932,22 @@ flowchart TD
 **学習用の独自サンプル（Python）: KG Retriever を「道具」として用意する**
 
 ```python
+import itertools
+import re
+
 from neo4j import GraphDatabase
 
 driver = GraphDatabase.driver(
     "bolt://localhost:7687", auth=("neo4j_readonly", "your-password")
 )
+
+# 書き込み・管理系の句。LLM が生成した Cypher をそのまま実行しない。
+# 単語境界で見るため、dataset のような語に含まれる set では誤検知しない。
+WRITE_CLAUSES = re.compile(
+    r"\b(create|merge|delete|detach|set|remove|drop|foreach|load\s+csv)\b"
+)
+QUERY_TIMEOUT_SECONDS = 5
+MAX_RECORDS = 100
 
 
 def kg_retriever(cypher: str, params: dict | None = None) -> list[dict]:
@@ -935,10 +955,17 @@ def kg_retriever(cypher: str, params: dict | None = None) -> list[dict]:
 
     セッションのアクセスモードは環境によって書き込みの防止を保証しない場合が
     あるため、接続ユーザー自体を読み取り専用ロールにしておくこと。
+    下の句の検査は多層防御の一枚目であり、これだけに頼らない。
     """
+    if WRITE_CLAUSES.search(cypher.lower()):
+        raise ValueError(f"読み取り専用のクエリだけを実行できます: {cypher}")
+
     with driver.session() as session:
-        result = session.run(cypher, params or {})
-        return [record.data() for record in result]
+        # timeout で重いクエリを打ち切り、LIMIT のないクエリでも
+        # 取り出す件数を MAX_RECORDS で頭打ちにする(結果の全件展開を防ぐ)。
+        with session.begin_transaction(timeout=QUERY_TIMEOUT_SECONDS) as tx:
+            result = tx.run(cypher, params or {})
+            return [r.data() for r in itertools.islice(result, MAX_RECORDS)]
 ```
 
 #### つまずきポイント
@@ -1052,7 +1079,7 @@ CYPHER_PROMPT = """あなたはグラフデータベースの専門家です。
 
 ### Step 10: LangGraph で QA エージェントを実装する（Part 5 / 第15章）
 
-#### [書籍情報] 第15章の要点 [S6][S7]
+#### [書籍情報] 第15章の要点 [S6] [S7]
 
 - 第14章の考え方を統合し、**LangGraph** でオーケストレーション、**Streamlit** でフロントエンドを作る。
 - LangGraph は、状態を持つ複数アクターの LLM アプリを構築するためのライブラリと説明されている [S7]。
@@ -1188,10 +1215,10 @@ MATCH (n) DETACH DELETE n;
 
 | # | トピック | 確認できた要点 | 書籍の対応章 | 出典 |
 |---|---|---|---|---|
-| 1 | **Microsoft GraphRAG** | 2024年4月の論文（Edge, Larson ら）。LLM で文書から**エンティティ KG を作り、関連するエンティティ群（コミュニティ）ごとの要約を事前生成**。質問時は各要約から部分回答を作り、最後に統合する。約 100 万トークン級のデータに対する「全体を俯瞰する質問」で、従来の RAG より包括性と多様性が向上したと報告 | Ch6, Ch13 | [S9][S10] |
+| 1 | **Microsoft GraphRAG** | 2024年4月の論文（Edge, Larson ら）。LLM で文書から**エンティティ KG を作り、関連するエンティティ群（コミュニティ）ごとの要約を事前生成**。質問時は各要約から部分回答を作り、最後に統合する。約 100 万トークン級のデータに対する「全体を俯瞰する質問」で、従来の RAG より包括性と多様性が向上したと報告 | Ch6, Ch13 | [S9] [S10] |
 | 2 | **LazyGraphRAG** | Microsoft Research が 2024年11月に発表。**事前の要約生成を不要**にし、索引コストを抑える方式。同社の報告では、索引コストはベクトル RAG と同等で、フル GraphRAG の 0.1% 程度。全体質問でも同等の品質を、クエリ費用 700 倍超の低減で実現とされる（ベンダー自身の報告）。2025年6月の追記で Microsoft Discovery と Azure Local（パブリックプレビュー）への統合が案内されている | Ch13 | [S11] |
-| 3 | **LlamaIndex Property Graph Index** | ノードにラベルとプロパティを持つ**本格的なプロパティグラフ**を扱う構成。グラフ構築器と検索器がモジュール化。Neo4j をストアにできる。LlamaIndex 外で作られたグラフには text-to-Cypher や Cypher テンプレートの検索器が有用とドキュメントが説明 | Ch3, Ch13, Ch14 | [S12][S13][S14] |
-| 4 | **Neo4j 開発者の実践記事**（Tomaž Bratanič ら） | 2025年8月の記事で、LlamaCloud による契約書の情報抽出と Neo4j での KG 構築を紹介。エンティティの重複排除やカスタム検索での GraphRAG 精度向上も扱う。Neo4j の週次ニュースでは、契約書 KG を使った**エージェント型 GraphRAG**も紹介 | Ch5-6, Ch13 | [S12][S15][S22] |
+| 3 | **LlamaIndex Property Graph Index** | ノードにラベルとプロパティを持つ**本格的なプロパティグラフ**を扱う構成。グラフ構築器と検索器がモジュール化。Neo4j をストアにできる。LlamaIndex 外で作られたグラフには text-to-Cypher や Cypher テンプレートの検索器が有用とドキュメントが説明 | Ch3, Ch13, Ch14 | [S12] [S13] [S14] |
+| 4 | **Neo4j 開発者の実践記事**（Tomaž Bratanič ら） | 2025年8月の記事で、LlamaCloud による契約書の情報抽出と Neo4j での KG 構築を紹介。エンティティの重複排除やカスタム検索での GraphRAG 精度向上も扱う。Neo4j の週次ニュースでは、契約書 KG を使った**エージェント型 GraphRAG**も紹介 | Ch5-6, Ch13 | [S12] [S15] [S22] |
 | 5 | **KG の質と大きさ** | LLM 生成 KG にエンティティ解決と誤りトリプルの除去を施し、エンティティと関係を約 40% 減らしても、4 種のグラフベース RAG の性能が向上したという研究（DEG-RAG） | Ch6-8 | [S18] |
 | 6 | **エージェント型 KG-RAG** | KG への問い合わせをエージェントの中核能力とし、**複数ホップの推論**を行う手法の研究（INRAExplorer） | Ch13-15 | [S19] |
 | 7 | **text-to-Cypher の評価** | 現代的な KG に対する精密な検索を評価するベンチマーク CypherBench。GraphRAG の検索部分の評価という位置づけ | Ch14 | [S20] |
@@ -1202,7 +1229,7 @@ MATCH (n) DETACH DELETE n;
 |---|---|
 | **ベンダー自身の数値** | LazyGraphRAG のコスト比較などは提供元による報告です。自社データでの検証が前提です [S11] |
 | **評価手法の偏り** | GraphRAG の優位性は「LLM による判定」に依存する評価で示されることが多く、判定の偏り（位置や長さなど）を補正すると差が縮むとの指摘があります。ただし、これは二次的なブログ記事での分析なので、**一次資料（原論文・追試）で確認**してください [S21] |
-| **コストの現実** | フル GraphRAG は索引時に多数の LLM 呼び出しが必要になり、コストが大きくなりえます。だからこそ軽量化の動き（LazyGraphRAG など）が出ています [S11][S21] |
+| **コストの現実** | フル GraphRAG は索引時に多数の LLM 呼び出しが必要になり、コストが大きくなりえます。だからこそ軽量化の動き（LazyGraphRAG など）が出ています [S11] [S21] |
 | **書籍の立ち位置** | 書籍は特定の手法（GraphRAG 等）の紹介にとどまらず、**KG の設計・構築・機械学習・問い合わせ**を横断して扱う点が特徴です [S1] |
 
 ### 9.3 さらに学ぶための関連書籍・資料
@@ -1210,7 +1237,7 @@ MATCH (n) DETACH DELETE n;
 - Manning の書籍ページの関連タイトルに *Essential GraphRAG* などが並んでいます [S1]。Bratanič 氏がこの書籍を題材にしたオンラインイベントも開催されています [S17]。
 - Neo4j の 2023年の開発者ブログは、KG が初めての人向けに、Jim Webber・Jesús Barrasa 両氏の無料書籍 *Building Knowledge Graphs: A Practitioner's Guide* を案内しています [S16]。
 
-> 正誤表や改訂情報など、書籍刊行後の更新については本調査では確認していません。Manning の書籍ページと GitHub リポジトリの更新履歴を参照してください [S1][S8]。
+> 正誤表や改訂情報など、書籍刊行後の更新については本調査では確認していません。Manning の書籍ページと GitHub リポジトリの更新履歴を参照してください [S1] [S8]。
 
 ---
 
@@ -1317,7 +1344,7 @@ NER は「Apple」が固有表現だと見つけること。NED は、その「A
 <details>
 <summary>問題 8: GraphRAG 系の手法の効果を評価するときの注意点を述べてください。</summary>
 
-提供元の数値は自社データで検証する。LLM 判定による評価の偏り（位置や長さなど）に留意する。KG の質（重複排除・誤り除去）が性能に影響する [S11][S18][S21]。
+提供元の数値は自社データで検証する。LLM 判定による評価の偏り（位置や長さなど）に留意する。KG の質（重複排除・誤り除去）が性能に影響する [S11] [S18] [S21]。
 </details>
 
 ---
@@ -1391,4 +1418,4 @@ NER は「Apple」が固有表現だと見つけること。NED は、その「A
 
 - 書籍の本文は転載していません。章の解説は公開情報に基づく要約と、筆者による補足で構成されています。
 - 正確な内容・最新の手順は、書籍本文、公式リポジトリ、各ツールの公式ドキュメントで必ず確認してください。
-- 書籍の内容を深く学ぶには、Manning または O'Reilly で書籍を入手して読むことを強く推奨します [S1][S2]。
+- 書籍の内容を深く学ぶには、Manning または O'Reilly で書籍を入手して読むことを強く推奨します [S1] [S2]。
