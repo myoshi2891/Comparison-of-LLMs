@@ -1,4 +1,5 @@
 # LangChain in your Pocket 徹底解説ガイド
+
 ### 初学者のためのステップバイステップ学習マニュアル
 
 > 原著: *LangChain in your Pocket: Beginner's Guide to Building Generative AI Applications using LLMs*
@@ -271,6 +272,9 @@ result = chain.run(category="スポーツウェア")
 
 ```python
 # LCELによる書き方
+from langchain_core.output_parsers import StrOutputParser
+
+output_parser = StrOutputParser()
 chain = prompt | llm | output_parser
 result = chain.invoke({"category": "スポーツウェア"})
 ```
@@ -286,7 +290,7 @@ flowchart LR
 
 原著は `SimpleSequentialChain`（単一入出力を順に繋ぐ）、`SequentialChain`（複数の入出力変数を扱う）などのチェーン種別を紹介しています。
 
-> **2026年9月時点の補足**: `LLMChain` は **LangChain 0.1.17で非推奨化され、1.0で完全に削除** されました。現在は本章で紹介されている `prompt | llm` というLCELの書き方がそのまま標準です（[Aurelio AI: LangChain Expression Language解説](https://www.aurelio.ai/learn/langchain-lcel)）。また `SimpleSequentialChain` 等の旧式チェーンクラスも `langchain_classic` パッケージに後方互換性維持のためだけに残されている状態で、新規開発では非推奨とされています（[LangChain Reference: langchain_classic](https://reference.langchain.com/python/langchain-classic/langchain_classic)）。つまり、原著の5.5節で「これから使うべき書き方」として紹介されたLCELが、2026年現在ではまさに主流になっています。
+> **2026年9月時点の補足**: `LLMChain` は **LangChain 0.1.17で非推奨化され、1.0では本体の `langchain` パッケージから `langchain-classic` パッケージへ移され、そこで非推奨のまま残されて** います。現在は本章で紹介されている `prompt | llm` というLCELの書き方がそのまま標準です（[Aurelio AI: LangChain Expression Language解説](https://www.aurelio.ai/learn/langchain-lcel)）。また `SimpleSequentialChain` 等の旧式チェーンクラスも `langchain_classic` パッケージに後方互換性維持のためだけに残されている状態で、新規開発では非推奨とされています（[LangChain Reference: langchain_classic](https://reference.langchain.com/python/langchain-classic/langchain_classic)）。つまり、原著の5.5節で「これから使うべき書き方」として紹介されたLCELが、2026年現在ではまさに主流になっています。
 
 ---
 
@@ -454,8 +458,15 @@ chunks = splitter.split_documents(docs)
 vectorstore = Chroma.from_documents(chunks, OpenAIEmbeddings())
 retriever = vectorstore.as_retriever()
 
+# RAG用プロンプト（context と question を受け取る）
+from langchain_core.prompts import ChatPromptTemplate
+
+rag_prompt = ChatPromptTemplate.from_template(
+    "次の文脈だけを使って質問に答えてください。\n\n文脈:\n{context}\n\n質問: {question}"
+)
+
 # RAGチェーン（LCEL）
-rag_chain = {"context": retriever, "question": lambda x: x} | prompt | llm
+rag_chain = {"context": retriever, "question": lambda x: x} | rag_prompt | llm
 ```
 
 ### 9.4〜9.5 Multi-document RAGとレコメンドシステム
@@ -655,7 +666,7 @@ app = FastAPI()
 add_routes(app, rag_chain, path="/rag")
 ```
 
-> **2026年9月時点の補足（重要）**: **LangServeは2024年11月18日付で正式に非推奨（deprecated）となり、2026年5月5日にGitHubリポジトリがアーカイブされました。** 公式には新規プロジェクトでの利用は推奨されておらず、後継として **LangGraph Platform** への移行が案内されています（[LangServe公式GitHubの非推奨表示](https://github.com/langchain-ai/langserve)）。実務コミュニティの評価では、LangServeは「最初の2〜4週間は非常に便利だが、要件が複雑化する3ヶ月目あたりから抽象化の限界が露呈しやすい」という指摘もありました（[Enterprise DNA: LangServeの実運用レビュー](https://enterprisedna.co/resources/blog/practitioner-langserve-review)）。一方LangSmithは現役かつ主力製品として継続的に機能強化されており、2026年にはAgent Builder（会話からエージェントを直接生成する機能）やInsights Agent（定期レポートの自動生成）などが追加されています。
+> **2026年9月時点の補足（重要）**: **LangServeは2024年11月18日付で正式に非推奨（deprecated）となり、2026年5月5日にGitHubリポジトリがアーカイブされました。** 公式には新規プロジェクトでの利用は推奨されておらず、後継として **LangSmith Deployment**（旧 LangGraph Platform）への移行が案内されています（[LangServe公式GitHubの非推奨表示](https://github.com/langchain-ai/langserve)）。実務コミュニティの評価では、LangServeは「最初の2〜4週間は非常に便利だが、要件が複雑化する3ヶ月目あたりから抽象化の限界が露呈しやすい」という指摘もありました（[Enterprise DNA: LangServeの実運用レビュー](https://enterprisedna.co/resources/blog/practitioner-langserve-review)）。一方LangSmithは現役かつ主力製品として継続的に機能強化されており、2026年にはAgent Builder（会話からエージェントを直接生成する機能）やInsights Agent（定期レポートの自動生成）などが追加されています。
 
 ---
 
@@ -690,11 +701,11 @@ robust_llm = primary_llm.with_fallbacks([backup_llm])
 
 | 本書（2024年）のAPI・概念 | 2026年9月時点の現行アプローチ |
 |---|---|
-| `LLMChain` | `prompt \| llm`（LCEL）、または `create_agent` |
+| `LLMChain` | `prompt \| llm`（LCEL）。ツール呼び出しの実行ループを伴うエージェント動作が必要な場合のみ `create_agent` |
 | `initialize_agent` / `AgentExecutor` | `langchain.agents.create_agent`（LangGraphランタイム上で動作） |
 | `ConversationBufferMemory` 等の旧Memoryクラス | LangGraphの checkpointer によるスレッド単位の状態永続化 |
 | `SimpleSequentialChain` 等の旧チェーン群 | `langchain_classic` に後方互換として残存、新規開発では非推奨 |
-| LangServeでのAPI化 | LangGraph Platform への移行が公式推奨（LangServeは2026年5月にアーカイブ） |
+| LangServeでのAPI化 | LangSmith Deployment（旧 LangGraph Platform）への移行が公式推奨（LangServeは2026年5月にアーカイブ） |
 | 手動での `verbose=True` デバッグ | LangSmithのトレーシング・評価（Evaluation/Experiments）機能 |
 
 ```mermaid
@@ -711,7 +722,7 @@ flowchart LR
     subgraph Y2026["2026年9月: 現在"]
         C1["LangGraph checkpointerが\nMemoryを代替"]
         C2["LangSmithが評価・監視の中核"]
-        C3["LangServeはアーカイブ済み\n→ LangGraph Platformへ移行"]
+        C3["LangServeはアーカイブ済み\n→ LangSmith Deploymentへ移行"]
     end
     Y2024 --> Y2025 --> Y2026
 ```
