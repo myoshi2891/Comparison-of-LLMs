@@ -337,7 +337,7 @@ def get_shipping_status(order_id: str) -> str:
     return f"注文 {order_id} は配送中です。"
 ```
 
-> **2026年9月時点の補足**: `initialize_agent` と `AgentExecutor` は **非推奨（deprecated）で、2026年12月までの移行が公式に推奨** されています。現在の標準的なエージェント構築方法は `langchain.agents.create_agent` です。内部的にはLangGraphのランタイム上でエージェントループが動作しており、開発者は高レベルAPI（`create_agent`）のまま使うことも、必要に応じてLangGraphの `StateGraph` まで降りて細かく制御することもできます（[uvik.net: LangChain vs LangGraph 2026年版ガイド](https://uvik.net/blog/langchain-vs-langgraph/)）。
+> **2026年9月時点の補足**: `initialize_agent` と `AgentExecutor` は **`create_agent` を推奨とする形で非推奨（deprecated）** になっています。なお「2026年12月」はこれらAPIの移行期限ではなく、LangChain 0.3 系のメンテナンスサポート終了時期です。非推奨APIはLangChain 1.x でも `langchain-classic` パッケージ経由で引き続き動作しますが、新規コードでは `create_agent` を使うのが推奨です。現在の標準的なエージェント構築方法は `langchain.agents.create_agent` です。内部的にはLangGraphのランタイム上でエージェントループが動作しており、開発者は高レベルAPI（`create_agent`）のまま使うことも、必要に応じてLangGraphの `StateGraph` まで降りて細かく制御することもできます（[uvik.net: LangChain vs LangGraph 2026年版ガイド](https://uvik.net/blog/langchain-vs-langgraph/)）。
 
 ```python
 # 2026年時点の推奨される書き方
