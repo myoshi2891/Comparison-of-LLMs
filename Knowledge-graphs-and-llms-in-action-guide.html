@@ -1,0 +1,3897 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Knowledge Graphs and LLMs in Action 完全ガイド</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/3.19.0/tabler-icons.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css"
+    />
+    <style>
+      :root {
+        --bg-primary: #07111e;
+        --bg-secondary: #0d1a2c;
+        --bg-tertiary: #132437;
+        --bg-code: #0a1622;
+        --accent: #7c9eff;
+        --accent-soft: #2a3e63;
+        --border-primary: #24405f;
+        --border-secondary: #1c3350;
+        --border-tertiary: #16283f;
+        --text-primary: #eaf0fb;
+        --text-secondary: #aebcd6;
+        --text-tertiary: #7c8bab;
+        --color-source: #7c9eff;
+        --color-source-bg: #1a2c4a;
+        --color-supplement: #6fcf97;
+        --color-supplement-bg: #16302a;
+        --color-trend: #e5a34d;
+        --color-trend-bg: #362613;
+        --color-danger: #e5786b;
+        --color-danger-bg: #3a1f1c;
+        --font-sans:
+          'Noto Sans JP', 'Hiragino Kaku Gothic ProN', 'Helvetica Neue', Arial, sans-serif;
+        --font-mono: 'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;
+        --radius-md: 8px;
+        --radius-lg: 12px;
+        --radius-xl: 16px;
+        --sidebar-width: 320px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        background: var(--bg-primary);
+        color: var(--text-primary);
+        font-family: var(--font-sans);
+        font-size: 16px;
+        line-height: 1.7;
+        font-weight: 400;
+      }
+
+      a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+
+      .layout {
+        display: block;
+      }
+
+      /* ---------------- Sidebar ---------------- */
+
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: var(--sidebar-width);
+        overflow-y: auto;
+        background: var(--bg-secondary);
+        border-right: 1px solid var(--border-tertiary);
+        padding: 28px 20px 40px;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 24px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid var(--border-tertiary);
+      }
+
+      .brand__mark {
+        width: 40px;
+        height: 40px;
+        border-radius: var(--radius-md);
+        background: var(--accent-soft);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--accent);
+        font-size: 20px;
+        flex-shrink: 0;
+      }
+
+      .brand__text {
+        min-width: 0;
+      }
+
+      .brand__title {
+        font-size: 16px;
+        font-weight: 500;
+        color: var(--text-primary);
+        line-height: 1.3;
+      }
+
+      .brand__subtitle {
+        font-size: 16px;
+        color: var(--text-tertiary);
+        margin-top: 2px;
+      }
+
+      .nav {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+
+      .nav__link {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 9px 10px;
+        border-radius: var(--radius-md);
+        color: var(--text-secondary);
+        font-size: 16px;
+        line-height: 1.45;
+        transition: none;
+      }
+
+      .nav__link:hover {
+        background: var(--bg-tertiary);
+        text-decoration: none;
+        color: var(--text-primary);
+      }
+
+      .nav__link.active {
+        background: var(--accent-soft);
+        color: var(--text-primary);
+        font-weight: 500;
+      }
+
+      .nav__link i {
+        font-size: 16px;
+        margin-top: 1px;
+        flex-shrink: 0;
+        color: var(--text-tertiary);
+      }
+      .nav__link.active i {
+        color: var(--accent);
+      }
+
+      .nav__sub {
+        display: flex;
+        flex-direction: column;
+        gap: 1px;
+        margin: 2px 0 8px 34px;
+        border-left: 1px solid var(--border-tertiary);
+        padding-left: 10px;
+      }
+
+      .nav__sub-link {
+        padding: 6px 8px;
+        border-radius: var(--radius-md);
+        font-size: 16px;
+        color: var(--text-tertiary);
+        line-height: 1.4;
+      }
+
+      .nav__sub-link:hover {
+        background: var(--bg-tertiary);
+        color: var(--text-primary);
+        text-decoration: none;
+      }
+      .nav__sub-link.active {
+        color: var(--accent);
+        font-weight: 500;
+      }
+
+      /* ---------------- Main content ---------------- */
+
+      .main {
+        margin-left: var(--sidebar-width);
+        padding: 56px 64px 120px;
+      }
+
+      .hero {
+        margin-bottom: 48px;
+      }
+
+      .hero h1 {
+        font-size: 32px;
+        line-height: 1.35;
+        font-weight: 500;
+        margin: 0 0 16px;
+        color: var(--text-primary);
+      }
+
+      .hero__subtitle {
+        font-size: 18px;
+        color: var(--text-secondary);
+        font-weight: 500;
+        margin: 0 0 20px;
+      }
+
+      .hero .callout {
+        margin-top: 0;
+      }
+
+      .prose {
+        max-width: none;
+      }
+
+      .section {
+        padding-top: 56px;
+        margin-top: 0;
+        scroll-margin-top: 24px;
+      }
+
+      .section:first-of-type {
+        padding-top: 0;
+      }
+
+      h2 {
+        font-size: 24px;
+        font-weight: 500;
+        margin: 0 0 20px;
+        padding-bottom: 14px;
+        border-bottom: 1px solid var(--border-tertiary);
+        color: var(--text-primary);
+        scroll-margin-top: 24px;
+      }
+
+      h3 {
+        font-size: 19px;
+        font-weight: 500;
+        margin: 36px 0 14px;
+        color: var(--text-primary);
+        scroll-margin-top: 24px;
+      }
+
+      h4 {
+        font-size: 16px;
+        font-weight: 500;
+        margin: 26px 0 10px;
+        color: var(--text-primary);
+      }
+
+      p {
+        margin: 0 0 16px;
+        color: var(--text-secondary);
+      }
+      strong {
+        color: var(--text-primary);
+        font-weight: 500;
+      }
+
+      ul,
+      ol {
+        margin: 0 0 16px;
+        padding-left: 24px;
+        color: var(--text-secondary);
+      }
+      li {
+        margin-bottom: 6px;
+      }
+      li > ul,
+      li > ol {
+        margin-top: 6px;
+        margin-bottom: 0;
+      }
+
+      hr {
+        border: none;
+        border-top: 1px solid var(--border-tertiary);
+        margin: 0;
+        display: none;
+      }
+
+      /* ---------------- Badges (evidence markers) ---------------- */
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 2px 9px;
+        border-radius: 999px;
+        font-size: 16px;
+        font-weight: 500;
+        line-height: 1.6;
+        white-space: nowrap;
+      }
+
+      .badge--source {
+        background: var(--color-source-bg);
+        color: var(--color-source);
+      }
+      .badge--supplement {
+        background: var(--color-supplement-bg);
+        color: var(--color-supplement);
+      }
+      .badge--trend {
+        background: var(--color-trend-bg);
+        color: var(--color-trend);
+      }
+
+      /* ---------------- Callouts (blockquotes) ---------------- */
+
+      blockquote {
+        margin: 0 0 20px;
+        padding: 16px 20px;
+        background: var(--bg-tertiary);
+        border-left: 3px solid var(--accent);
+        border-radius: 0 var(--radius-md) var(--radius-md) 0;
+        color: var(--text-secondary);
+      }
+
+      blockquote p:last-child {
+        margin-bottom: 0;
+      }
+      blockquote p {
+        margin: 0 0 8px;
+      }
+
+      /* ---------------- Tables ---------------- */
+
+      .table-wrap {
+        overflow-x: auto;
+        margin: 0 0 20px;
+        border: 1px solid var(--border-tertiary);
+        border-radius: var(--radius-md);
+      }
+
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        font-size: 16px;
+      }
+
+      th,
+      td {
+        padding: 10px 14px;
+        text-align: left;
+        border-bottom: 1px solid var(--border-tertiary);
+        vertical-align: top;
+        color: var(--text-secondary);
+      }
+
+      th {
+        background: var(--bg-tertiary);
+        color: var(--text-primary);
+        font-weight: 500;
+        white-space: nowrap;
+      }
+
+      tr:last-child td {
+        border-bottom: none;
+      }
+      td strong {
+        color: var(--text-primary);
+      }
+
+      /* ---------------- Code blocks ---------------- */
+
+      code {
+        font-family: var(--font-mono);
+        font-size: 16px;
+        background: var(--bg-tertiary);
+        padding: 2px 6px;
+        border-radius: 4px;
+        color: var(--accent);
+      }
+
+      .code-block {
+        margin: 0 0 20px;
+        border: 1px solid var(--border-tertiary);
+        border-radius: var(--radius-md);
+        overflow: hidden;
+        background: var(--bg-code);
+      }
+
+      .code-block__bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 14px;
+        background: var(--bg-tertiary);
+        border-bottom: 1px solid var(--border-tertiary);
+      }
+
+      .code-block__lang {
+        font-size: 16px;
+        color: var(--text-tertiary);
+        font-family: var(--font-mono);
+      }
+
+      .code-block__copy {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: transparent;
+        border: 1px solid var(--border-secondary);
+        color: var(--text-secondary);
+        font-size: 16px;
+        font-family: var(--font-sans);
+        padding: 4px 10px;
+        border-radius: var(--radius-md);
+        cursor: pointer;
+      }
+
+      .code-block__copy:hover {
+        color: var(--text-primary);
+        border-color: var(--text-tertiary);
+      }
+      .code-block__copy.copied {
+        color: var(--color-supplement);
+        border-color: var(--color-supplement);
+      }
+
+      .code-block pre {
+        margin: 0;
+        padding: 16px 18px;
+        overflow-x: auto;
+      }
+
+      .code-block code {
+        background: none;
+        padding: 0;
+        color: var(--text-primary);
+        font-size: 16px;
+        line-height: 1.6;
+      }
+
+      /* ---------------- Mermaid ---------------- */
+
+      .mermaid-container {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        margin: 0 0 24px;
+        padding: 20px;
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-tertiary);
+        border-radius: var(--radius-lg);
+        overflow-x: auto;
+      }
+
+      .mermaid-target {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+      }
+      .mermaid-target svg {
+        max-width: 100%;
+        height: auto;
+      }
+
+      /* ---------------- Details / accordion ---------------- */
+
+      details {
+        margin: 0 0 16px;
+        border: 1px solid var(--border-tertiary);
+        border-radius: var(--radius-md);
+        background: var(--bg-secondary);
+        overflow: hidden;
+      }
+
+      summary {
+        padding: 12px 16px;
+        cursor: pointer;
+        font-weight: 500;
+        color: var(--accent);
+        list-style: none;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      summary::-webkit-details-marker {
+        display: none;
+      }
+
+      summary::before {
+        content: '\ea61';
+        font-family: 'tabler-icons';
+        font-size: 16px;
+        transition: none;
+        flex-shrink: 0;
+      }
+
+      details[open] summary::before {
+        content: '\ea5f';
+      }
+
+      details > *:not(summary) {
+        padding: 0 16px 16px 40px;
+      }
+
+      details p,
+      details ol,
+      details ul {
+        color: var(--text-secondary);
+        margin-bottom: 8px;
+      }
+      details ol,
+      details ul {
+        padding-left: 20px;
+      }
+
+      /* ---------------- Footer ---------------- */
+
+      .footer {
+        margin-top: 56px;
+        padding-top: 24px;
+        border-top: 1px solid var(--border-tertiary);
+        color: var(--text-tertiary);
+        font-size: 16px;
+      }
+
+      /* ---------------- Responsive ---------------- */
+
+      @media (max-width: 960px) {
+        .sidebar {
+          position: static;
+          width: auto;
+          border-right: none;
+          border-bottom: 1px solid var(--border-tertiary);
+        }
+        .main {
+          margin-left: 0;
+          padding: 40px 24px 80px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="layout">
+      <nav class="sidebar" aria-label="目次">
+        <div class="brand">
+          <div class="brand__mark"><i class="ti ti-topology-star-3"></i></div>
+          <div class="brand__text">
+            <div class="brand__title">Knowledge Graphs<br />and LLMs in Action</div>
+            <div class="brand__subtitle">初学者向け完全ガイド</div>
+          </div>
+        </div>
+        <div class="nav">
+          <a class="nav__link" data-nav-target="sec-0" href="#sec-0"
+            ><i class="ti ti-info-circle"></i><span>0. この文書について</span></a
+          >
+          <a class="nav__link" data-nav-target="sec-1" href="#sec-1"
+            ><i class="ti ti-book-2"></i><span>1. 書籍の基本情報</span></a
+          >
+          <a class="nav__link" data-nav-target="sec-2" href="#sec-2"
+            ><i class="ti ti-target-arrow"></i><span>2. 本書がめざすこと</span></a
+          >
+          <a class="nav__link" data-nav-target="sec-3" href="#sec-3"
+            ><i class="ti ti-map-2"></i><span>3. 全体マップ</span></a
+          >
+          <a class="nav__link" data-nav-target="sec-4" href="#sec-4"
+            ><i class="ti ti-abc"></i><span>4. 基礎用語（Step 0）</span></a
+          >
+          <a class="nav__link" data-nav-target="sec-5" href="#sec-5"
+            ><i class="ti ti-git-merge"></i><span>5. なぜ KG と LLM か</span></a
+          >
+          <a class="nav__link" data-nav-target="sec-6" href="#sec-6"
+            ><i class="ti ti-tool"></i><span>6. 学習環境の準備</span></a
+          >
+          <a class="nav__link" data-nav-target="sec-7" href="#sec-7"
+            ><i class="ti ti-stairs-up"></i><span>7. 章ごとの解説</span></a
+          >
+          <div class="nav__sub">
+            <a class="nav__sub-link" data-nav-target="step-1" href="#step-1">Step 1: 基礎を固める</a
+            ><a class="nav__sub-link" data-nav-target="step-2" href="#step-2"
+              >Step 2: 構造化データ・オントロジーから最初の KG を作る</a
+            ><a class="nav__sub-link" data-nav-target="step-3" href="#step-3"
+              >Step 3: 複数ソースの統合と LLM による解釈</a
+            ><a class="nav__sub-link" data-nav-target="step-4" href="#step-4"
+              >Step 4: テキストから KG を作る</a
+            ><a class="nav__sub-link" data-nav-target="step-5" href="#step-5"
+              >Step 5: 固有表現の曖昧性解消 NED</a
+            ><a class="nav__sub-link" data-nav-target="step-6" href="#step-6"
+              >Step 6: グラフ上の機械学習の基本</a
+            ><a class="nav__sub-link" data-nav-target="step-7" href="#step-7"
+              >Step 7: 埋め込みと GNN</a
+            ><a class="nav__sub-link" data-nav-target="step-8" href="#step-8"
+              >Step 8: KG を使った RAG</a
+            ><a class="nav__sub-link" data-nav-target="step-9" href="#step-9"
+              >Step 9: 自然言語で KG に問い合わせる</a
+            ><a class="nav__sub-link" data-nav-target="step-10" href="#step-10"
+              >Step 10: LangGraph で QA エージェントを実装する</a
+            >
+          </div>
+          <a class="nav__link" data-nav-target="sec-8" href="#sec-8"
+            ><i class="ti ti-puzzle"></i><span>8. 付録の使い方</span></a
+          >
+          <a class="nav__link" data-nav-target="sec-9" href="#sec-9"
+            ><i class="ti ti-trending-up"></i><span>9. 最新動向</span></a
+          >
+          <a class="nav__link" data-nav-target="sec-10" href="#sec-10"
+            ><i class="ti ti-calendar-time"></i><span>10. 学習ロードマップ</span></a
+          >
+          <a class="nav__link" data-nav-target="sec-11" href="#sec-11"
+            ><i class="ti ti-checkup-list"></i><span>11. 実務での判断</span></a
+          >
+          <a class="nav__link" data-nav-target="sec-12" href="#sec-12"
+            ><i class="ti ti-help-hexagon"></i><span>12. 総合確認問題</span></a
+          >
+          <a class="nav__link" data-nav-target="sec-13" href="#sec-13"
+            ><i class="ti ti-link"></i><span>13. 参考文献・ソース URL</span></a
+          >
+        </div>
+      </nav>
+
+      <main class="main">
+        <header class="hero">
+          <h1>Knowledge Graphs and LLMs in Action 完全ガイド</h1>
+          <p class="hero__subtitle">
+            接続されたデータ（Connected Data）で AI システムを作る —
+            初学者向けステップバイステップ解説
+          </p>
+          <blockquote>
+            <p>
+              <strong>調査基準日: 2026年9月21日</strong><br />
+              本ガイドは、出版社（Manning）・O'Reilly の公開ページ（目次・章概要・FAQ）、著者の
+              GitHub リポジトリ、および関連する一次情報（Microsoft Research、Neo4j
+              開発者ブログ、LlamaIndex ドキュメント、arXiv
+              論文など）をウェブ検索で確認したうえで作成しています。出典は文中の
+              <code>[S1]</code> などの番号で示し、URL は「13. 参考文献・ソース
+              URL」にまとめています。
+            </p>
+          </blockquote>
+        </header>
+
+        <div class="prose">
+          <section id="sec-0" class="section">
+            <h2 id="sec-0">0. この文書について（必ずお読みください）</h2>
+
+            <h3>0.1 根拠の範囲と限界</h3>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>区分</th>
+                    <th>内容</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <strong><span class="badge badge--source">書籍情報</span></strong>
+                    </td>
+                    <td>
+                      出版社・O'Reilly の公開ページ（目次、章概要、FAQ、リポジトリ
+                      README）から確認できた事実に基づく記述
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <strong><span class="badge badge--supplement">補足</span></strong>
+                    </td>
+                    <td>
+                      初学者が理解しやすいよう、筆者が一般知識として補った説明、たとえ話、学習用の<strong
+                        >独自サンプルコード</strong
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <strong><span class="badge badge--trend">動向</span></strong>
+                    </td>
+                    <td>
+                      2026年9月21日時点でウェブ検索により確認した、書籍の外側（GraphRAG
+                      など）の最新情報
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <ul>
+              <li>
+                書籍の<strong>全文は参照していません</strong>。章ごとの解説は公開されている目次・章概要に沿った「読書ガイド」であり、書籍本文の要約や転載ではありません。
+              </li>
+              <li>
+                本文中のコードは、概念を理解するための<strong>学習用の簡略例</strong>です。書籍の実コードは公式リポジトリ
+                [S8] を参照してください。
+              </li>
+              <li>
+                書籍が想定している環境のバージョン（Neo4j 5.20.0
+                など）は執筆時点のものです。2026年9月時点の最新版との互換性は未確認のため、必ずリポジトリの
+                README と各章の指示で確認してください。
+              </li>
+            </ul>
+            <blockquote>
+              <p>
+                <strong>医療事例に関する注意</strong><br />
+                本書には希少疾患の診断支援や臨床意思決定支援などの医療事例が登場します。本ガイドでの医療関連の記述は<strong
+                  >技術学習（KG の構築・活用手法の理解）を目的とした説明</strong
+                >であり、診断・治療・投薬に関する助言ではありません。
+              </p>
+            </blockquote>
+            <h3>0.2 このガイドの使い方</h3>
+            <ol>
+              <li>
+                先に
+                <strong>第3章の全体マップ</strong
+                >と<strong>第4章の基礎用語</strong>を読み、言葉に慣れる。
+              </li>
+              <li><strong>第6章</strong>で環境を用意する（手を動かさず読むだけでも可）。</li>
+              <li>
+                <strong>第7章</strong
+                >で書籍の章を順番に追う。各ステップに「やさしい説明」「図」「つまずきポイント」「確認問題」があります。
+              </li>
+              <li>
+                <strong>第11章</strong
+                >で実務での判断基準、<strong>第12章</strong>で確認問題を通して理解度を測る。
+              </li>
+            </ol>
+            <hr />
+          </section>
+          <section id="sec-1" class="section">
+            <h2 id="sec-1">1. 書籍の基本情報</h2>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>項目</th>
+                    <th>内容</th>
+                    <th>出典</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>タイトル</td>
+                    <td>Knowledge Graphs and LLMs in Action</td>
+                    <td>[S1]</td>
+                  </tr>
+                  <tr>
+                    <td>副題</td>
+                    <td>Build AI systems using connected data</td>
+                    <td>[S1]</td>
+                  </tr>
+                  <tr>
+                    <td>著者</td>
+                    <td>Alessandro Negro（共著: Vlastimil Kůs, Giuseppe Futia, Fabio Montagna）</td>
+                    <td>[S1]</td>
+                  </tr>
+                  <tr>
+                    <td>序文</td>
+                    <td>Maxime Labonne、Khalifeh AlJadda</td>
+                    <td>[S1]</td>
+                  </tr>
+                  <tr>
+                    <td>出版社</td>
+                    <td>Manning Publications</td>
+                    <td>[S1][S2]</td>
+                  </tr>
+                  <tr>
+                    <td>刊行</td>
+                    <td>2025年10月</td>
+                    <td>[S1][S2]</td>
+                  </tr>
+                  <tr>
+                    <td>ISBN</td>
+                    <td>9781633439894</td>
+                    <td>[S1][S2]</td>
+                  </tr>
+                  <tr>
+                    <td>ページ数</td>
+                    <td>472 ページ</td>
+                    <td>[S1][S2]</td>
+                  </tr>
+                  <tr>
+                    <td>難易度表記</td>
+                    <td>Intermediate to advanced（O'Reilly の表記）</td>
+                    <td>[S2]</td>
+                  </tr>
+                  <tr>
+                    <td>想定読者</td>
+                    <td>
+                      ML/AI エンジニア、データサイエンティスト、データエンジニア。サンプルは Python
+                    </td>
+                    <td>[S1]</td>
+                  </tr>
+                  <tr>
+                    <td>翻訳</td>
+                    <td>ポーランド語、ロシア語、簡体字中国語（Manning のページに記載）</td>
+                    <td>[S1]</td>
+                  </tr>
+                  <tr>
+                    <td>コード</td>
+                    <td>
+                      GitHub リポジトリ <code>alenegro81/knowledge-graphs-and-llms-in-action</code>
+                    </td>
+                    <td>[S1][S8]</td>
+                  </tr>
+                  <tr>
+                    <td>著者紹介</td>
+                    <td>
+                      Negro 氏は GraphAware の Chief Scientist で、<em
+                        >Graph-Powered Machine Learning</em
+                      >
+                      の著者
+                    </td>
+                    <td>[S1]</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <blockquote>
+              <p>
+                <strong><span class="badge badge--supplement">補足</span></strong>
+                書籍自体の難易度は「中級〜上級」と表記されています。本ガイドは、その前段として<strong>初学者が全体像と用語をつかみ、読書とハンズオンに入れる状態</strong>になることを目標にしています。
+              </p>
+            </blockquote>
+            <hr />
+          </section>
+          <section id="sec-2" class="section">
+            <h2 id="sec-2">2. 本書がめざすこと（ひとことで）</h2>
+
+            <p>
+              <strong
+                >「LLM
+                の弱点（不正確さ・説明できなさ・最新性・社内データを知らない）を、ナレッジグラフ（KG）で補い、信頼できる
+                AI システムを作る方法」</strong
+              >
+              を、理論からコードまで学ぶ本です。
+            </p>
+            <p>出版社の紹介では、次の 5 点が学習目標として示されています [S1]。</p>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>学習目標（意訳）</th>
+                    <th>対応する Part</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>1</td>
+                    <td>ビジネスのニーズから出発し、反復的・トップダウンに KG をモデリングする</td>
+                    <td>Part 1〜2</td>
+                  </tr>
+                  <tr>
+                    <td>2</td>
+                    <td>オントロジー、タクソノミー、構造化データから KG を作る</td>
+                    <td>Part 2</td>
+                  </tr>
+                  <tr>
+                    <td>3</td>
+                    <td>LLM を使って、非構造化データ（文章）から KG を作る</td>
+                    <td>Part 3</td>
+                  </tr>
+                  <tr>
+                    <td>4</td>
+                    <td>機械学習で KG を補完し、そこから洞察を得る</td>
+                    <td>Part 4</td>
+                  </tr>
+                  <tr>
+                    <td>5</td>
+                    <td>KG 上で推論し、KG を使った RAG システムを構築する</td>
+                    <td>Part 5</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p>
+              さらに書籍では、ヘルスケアや金融犯罪検知など実世界の領域で「アドバイザー型アプリケーション」を作る事例が紹介されています
+              [S1]。
+            </p>
+            <hr />
+          </section>
+          <section id="sec-3" class="section">
+            <h2 id="sec-3">3. 全体マップ（Part 構成と読み進め方）</h2>
+
+            <h3>3.1 Part 構成の図解</h3>
+            <div class="mermaid-container"><div class="mermaid-target" id="mermaid-0"></div></div>
+
+            <h3>3.2 章の一覧と学習の見どころ</h3>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Part</th>
+                    <th>章</th>
+                    <th>テーマ</th>
+                    <th>到達点（できるようになること）</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>1</td>
+                    <td>Ch1</td>
+                    <td>KG と LLM: 最強の組み合わせ</td>
+                    <td>なぜ組み合わせるのか、KG を使うべきかを説明できる</td>
+                  </tr>
+                  <tr>
+                    <td>1</td>
+                    <td>Ch2</td>
+                    <td>知能システム: ハイブリッドアプローチ</td>
+                    <td>知識表現・推論・推論エンジンの中での LLM の役割を説明できる</td>
+                  </tr>
+                  <tr>
+                    <td>2</td>
+                    <td>Ch3</td>
+                    <td>オントロジーから最初の KG を作る</td>
+                    <td>RDF と LPG の違いを踏まえ、KG 構築の手順を追える</td>
+                  </tr>
+                  <tr>
+                    <td>2</td>
+                    <td>Ch4</td>
+                    <td>単純なネットワークから複数ソース統合へ</td>
+                    <td>生物医学分野の複数データを統合し、LLM で解釈を補助する流れが分かる</td>
+                  </tr>
+                  <tr>
+                    <td>3</td>
+                    <td>Ch5</td>
+                    <td>非構造化データからのドメイン知識抽出</td>
+                    <td>NER・関係抽出と、LLM によるプロンプト設計の基本が分かる</td>
+                  </tr>
+                  <tr>
+                    <td>3</td>
+                    <td>Ch6</td>
+                    <td>LLM で KG を作る</td>
+                    <td>正規化・クレンジング・エンティティ解決を含む構築の全体像が分かる</td>
+                  </tr>
+                  <tr>
+                    <td>3</td>
+                    <td>Ch7</td>
+                    <td>固有表現の曖昧性解消（NED）</td>
+                    <td>認識と曖昧性解消の違い、KG を活用した検索・発見が分かる</td>
+                  </tr>
+                  <tr>
+                    <td>3</td>
+                    <td>Ch8</td>
+                    <td>オープン LLM とオントロジーによる NED</td>
+                    <td>ローカル LLM（Ollama）で NED を実装する流れが分かる</td>
+                  </tr>
+                  <tr>
+                    <td>4</td>
+                    <td>Ch9</td>
+                    <td>グラフ上の機械学習入門</td>
+                    <td>ノード分類・リンク予測・クラスタリングなどのタスクを区別できる</td>
+                  </tr>
+                  <tr>
+                    <td>4</td>
+                    <td>Ch10</td>
+                    <td>グラフ特徴量エンジニアリング</td>
+                    <td>次数・PageRank など代表的指標の意味を説明できる</td>
+                  </tr>
+                  <tr>
+                    <td>4</td>
+                    <td>Ch11</td>
+                    <td>グラフ表現学習と GNN</td>
+                    <td>埋め込み・メッセージパッシングの考え方が分かる</td>
+                  </tr>
+                  <tr>
+                    <td>4</td>
+                    <td>Ch12</td>
+                    <td>GNN によるノード分類とリンク予測</td>
+                    <td>不正送金検知・映画推薦の 2 事例の設計が分かる</td>
+                  </tr>
+                  <tr>
+                    <td>5</td>
+                    <td>Ch13</td>
+                    <td>KG を活用した RAG</td>
+                    <td>ベクトル RAG の限界と Graph RAG の設計が分かる</td>
+                  </tr>
+                  <tr>
+                    <td>5</td>
+                    <td>Ch14</td>
+                    <td>自然言語で KG に問い合わせる</td>
+                    <td>意図検出・スキーマ活用・Cypher 生成の設計が分かる</td>
+                  </tr>
+                  <tr>
+                    <td>5</td>
+                    <td>Ch15</td>
+                    <td>LangGraph による QA エージェント</td>
+                    <td>状態を持つパイプラインとして実装する流れが分かる</td>
+                  </tr>
+                  <tr>
+                    <td>付録</td>
+                    <td>A〜C</td>
+                    <td>グラフ入門 / Neo4j / 構造化ソースからの KG 構築</td>
+                    <td>環境構築と基礎を補える</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p>
+              出典: 目次 [S2][S3]。「到達点」は目次と章概要 [S3][S4][S5][S6]
+              を基にした筆者の整理です。
+            </p>
+            <h3>3.3 初学者向け 3 つの読み進め方</h3>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>ルート</th>
+                    <th>向いている人</th>
+                    <th>読む順番の目安</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>A: 全体像優先</strong></td>
+                    <td>まず概念を理解したい</td>
+                    <td>Ch1 → Ch2 → Ch13 → Ch14 → 余裕があれば Ch3</td>
+                  </tr>
+                  <tr>
+                    <td><strong>B: ハンズオン優先</strong></td>
+                    <td>手を動かして覚えたい</td>
+                    <td>付録B → Ch3 → Ch5-6 → Ch13 → Ch14-15</td>
+                  </tr>
+                  <tr>
+                    <td><strong>C: 機械学習重視</strong></td>
+                    <td>ML/データサイエンス経験者</td>
+                    <td>Ch1 → Ch9 → Ch10 → Ch11-12 → Ch13</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <hr />
+          </section>
+          <section id="sec-4" class="section">
+            <h2 id="sec-4">4. まず押さえる基礎用語（Step 0）</h2>
+
+            <h3>4.1 グラフとナレッジグラフ（KG）とは</h3>
+            <p>
+              <strong>グラフ</strong
+              >とは「点（ノード）」と「線（エッジ）」でつながりを表すデータ構造です。<strong>ナレッジグラフ（KG）</strong>は、その点と線に「意味」を持たせ、世の中の事実（人・組織・製品・出来事とその関係）を表現したものです。
+            </p>
+            <p>
+              たとえば「山田さんは Alpha 社で働き、Alpha 社は製品 X
+              を開発している」という知識は、次のように表せます。
+            </p>
+            <div class="mermaid-container"><div class="mermaid-target" id="mermaid-1"></div></div>
+
+            <p>
+              この 1 本 1 本の線は <strong>トリプル（主語・述語・目的語）</strong> として読めます。
+            </p>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>主語（Subject）</th>
+                    <th>述語（Predicate）</th>
+                    <th>目的語（Object）</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>山田さん</td>
+                    <td>WORKS_AT</td>
+                    <td>Alpha社</td>
+                  </tr>
+                  <tr>
+                    <td>Alpha社</td>
+                    <td>DEVELOPS</td>
+                    <td>製品X</td>
+                  </tr>
+                  <tr>
+                    <td>山田さん</td>
+                    <td>KNOWS</td>
+                    <td>佐藤さん</td>
+                  </tr>
+                  <tr>
+                    <td>佐藤さん</td>
+                    <td>WORKS_AT</td>
+                    <td>Alpha社</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p>
+              <strong>ポイント:</strong> 表（リレーショナル
+              DB）では「山田さんの同僚の、その同僚が作っている製品は？」のような<strong>関係をたどる問い</strong>が
+              JOIN の連鎖になりがちです。グラフでは、線をたどるだけで答えられます。
+            </p>
+            <h3>4.2 用語集（初学者向けのやさしい説明）</h3>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>用語</th>
+                    <th>やさしい説明</th>
+                    <th>主に関係する章</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>ノード</td>
+                    <td>グラフの「点」。人・会社・病気など実体を表す</td>
+                    <td>全体</td>
+                  </tr>
+                  <tr>
+                    <td>エッジ（関係）</td>
+                    <td>点と点をつなぐ「線」。「働いている」など意味を持つ</td>
+                    <td>全体</td>
+                  </tr>
+                  <tr>
+                    <td>プロパティ</td>
+                    <td>ノードやエッジにつける属性（名前、日付、根拠など）</td>
+                    <td>Ch3</td>
+                  </tr>
+                  <tr>
+                    <td>トリプル</td>
+                    <td>主語・述語・目的語の 3 つ組。事実の最小単位</td>
+                    <td>Ch3</td>
+                  </tr>
+                  <tr>
+                    <td>KG（ナレッジグラフ）</td>
+                    <td>意味を持つノードとエッジで知識を表したデータ</td>
+                    <td>全体</td>
+                  </tr>
+                  <tr>
+                    <td>タクソノミー</td>
+                    <td>上位・下位の<strong>階層分類</strong>（例: 哺乳類 → 犬）</td>
+                    <td>Ch1, Ch3</td>
+                  </tr>
+                  <tr>
+                    <td>オントロジー</td>
+                    <td>
+                      概念・関係・制約を<strong>形式的に定義した語彙体系</strong>。用語のそろえ役
+                    </td>
+                    <td>Ch1, Ch3</td>
+                  </tr>
+                  <tr>
+                    <td>RDF</td>
+                    <td>標準化されたトリプル中心のデータモデル。オントロジー記述に強い</td>
+                    <td>Ch3</td>
+                  </tr>
+                  <tr>
+                    <td>LPG（ラベル付きプロパティグラフ）</td>
+                    <td>ノードとエッジに直接プロパティを持てるモデル。Neo4j が代表例</td>
+                    <td>Ch3</td>
+                  </tr>
+                  <tr>
+                    <td>Cypher</td>
+                    <td>Neo4j などで使うグラフ問い合わせ言語</td>
+                    <td>付録B, Ch14</td>
+                  </tr>
+                  <tr>
+                    <td>LLM</td>
+                    <td>大規模言語モデル。文章の理解・生成が得意</td>
+                    <td>全体</td>
+                  </tr>
+                  <tr>
+                    <td>ハルシネーション</td>
+                    <td>LLM がもっともらしい誤りを出力してしまうこと</td>
+                    <td>Ch13</td>
+                  </tr>
+                  <tr>
+                    <td>RAG</td>
+                    <td>外部の情報を検索して LLM に渡し、根拠に基づいて回答させる方式</td>
+                    <td>Ch13</td>
+                  </tr>
+                  <tr>
+                    <td>ベクトル検索</td>
+                    <td>文章を数値ベクトルにして「意味の近さ」で探す検索</td>
+                    <td>Ch13</td>
+                  </tr>
+                  <tr>
+                    <td>Graph RAG</td>
+                    <td>検索元に KG（グラフ構造）を使う RAG</td>
+                    <td>Ch13</td>
+                  </tr>
+                  <tr>
+                    <td>NER</td>
+                    <td>固有表現認識。文章中の人名・組織名などを見つける</td>
+                    <td>Ch5, Ch7</td>
+                  </tr>
+                  <tr>
+                    <td>NED</td>
+                    <td>固有表現の曖昧性解消。同じ名前でも別物を区別して正しい対象に結びつける</td>
+                    <td>Ch7, Ch8</td>
+                  </tr>
+                  <tr>
+                    <td>エンティティ解決</td>
+                    <td>別表記・重複したデータを同一の実体に統合する</td>
+                    <td>Ch6</td>
+                  </tr>
+                  <tr>
+                    <td>埋め込み（embedding）</td>
+                    <td>ノードや単語を数値ベクトルで表したもの</td>
+                    <td>Ch11</td>
+                  </tr>
+                  <tr>
+                    <td>GNN</td>
+                    <td>グラフ構造を扱うニューラルネットワーク</td>
+                    <td>Ch11, Ch12</td>
+                  </tr>
+                  <tr>
+                    <td>エージェント</td>
+                    <td>
+                      目標に向けて道具（検索・DB 問い合わせなど）を選びながら動く LLM ベースの仕組み
+                    </td>
+                    <td>Ch13〜15</td>
+                  </tr>
+                  <tr>
+                    <td>LangGraph</td>
+                    <td>状態を持つ複数ステップの LLM アプリを組むためのライブラリ</td>
+                    <td>Ch15</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <h3>4.3 タクソノミーとオントロジーの違い</h3>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>観点</th>
+                    <th>タクソノミー</th>
+                    <th>オントロジー</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>主な構造</td>
+                    <td>木構造（親子関係）</td>
+                    <td>概念・関係・制約のネットワーク</td>
+                  </tr>
+                  <tr>
+                    <td>表せること</td>
+                    <td>「AはBの一種」</td>
+                    <td>「AはBの一種」「AはCを持つ」「AとDは同時に成り立たない」など</td>
+                  </tr>
+                  <tr>
+                    <td>使いどころ</td>
+                    <td>分類・カテゴリ整理</td>
+                    <td>用語の統一、データ統合、推論の土台</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <h3>4.4 RDF と LPG の比較（第3章の中心テーマ）</h3>
+            <p>
+              第3章は、RDF と LPG
+              を「どちらが優れているか」ではなく<strong>目的（ユースケース）で選ぶ</strong>という姿勢で比較しています
+              [S3]。
+            </p>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>観点</th>
+                    <th>RDF</th>
+                    <th>LPG（ラベル付きプロパティグラフ）</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>得意なこと</td>
+                    <td>標準化・相互運用性、豊かな意味表現（推論）、オントロジー記述</td>
+                    <td>関係に直接プロパティを持たせられる。効率的なたどり（トラバーサル）</td>
+                  </tr>
+                  <tr>
+                    <td>関係へのメタデータ</td>
+                    <td>n 項関係、名前付きグラフ、RDF-star などの工夫が必要</td>
+                    <td>エッジに直接持たせられる</td>
+                  </tr>
+                  <tr>
+                    <td>章での使い分け</td>
+                    <td>ヒト表現型オントロジー（HPO）自体は RDF/OWL 形式</td>
+                    <td>
+                      KG
+                      本体は、根拠・頻度・発症時期などの<strong>関係のメタデータ</strong>が重要なので
+                      LPG（Neo4j）を選択
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p>出典: 第3章の章概要と FAQ [S3]。</p>
+            <hr />
+          </section>
+          <section id="sec-5" class="section">
+            <h2 id="sec-5">5. なぜ KG と LLM を組み合わせるのか</h2>
+
+            <h3>5.1 LLM 単体の課題と、KG による補い方</h3>
+            <p>
+              第13章の概要は、LLM
+              を本番で使う際の課題として、ハルシネーション、知識のカットオフ、不透明性、プライバシーとアクセス制御、コスト、バイアスを挙げ、その対策として
+              RAG を位置づけています [S4]。さらに、ベクトル検索ベースの RAG
+              には次の限界があると整理されています [S4]。
+            </p>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>ベクトル RAG の限界（[S4] の整理）</th>
+                    <th>KG（Graph RAG）での補い方</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>文脈が断片化しやすい</td>
+                    <td>エンティティと関係で文脈を構造的につなぐ</td>
+                  </tr>
+                  <tr>
+                    <td>複数ステップ（マルチホップ）の推論が弱い</td>
+                    <td>関係をたどって答えを組み立てる</td>
+                  </tr>
+                  <tr>
+                    <td>埋め込みが固有名詞や細かなドメイン差を取りこぼす</td>
+                    <td>固有名詞をノードとして正確に指定して検索できる</td>
+                  </tr>
+                  <tr>
+                    <td>ノイズの混入や、重要情報の検索漏れ</td>
+                    <td>スキーマに沿った問い合わせで精密に取得できる</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p>
+              また、KG は「管理された・解釈可能な・更新可能な信頼できる情報源」として LLM
+              を補完する役割だと説明されています [S4]。
+            </p>
+            <h3>5.2 逆方向: LLM が KG づくりを助ける</h3>
+            <p>
+              KG と LLM
+              の関係は一方通行ではありません。書籍全体で、次のような<strong>相互補完</strong>が描かれています（目次
+              [S2] から読み取れる構成）。
+            </p>
+            <div class="mermaid-container"><div class="mermaid-target" id="mermaid-2"></div></div>
+
+            <blockquote>
+              <p>
+                <strong><span class="badge badge--supplement">補足</span> 一言でまとめると:</strong>
+                KG は「事実と関係の正確な地図」、LLM
+                は「言葉を操る通訳兼ガイド」。地図があるから通訳が迷わず、通訳がいるから地図を自然な言葉で読める、という関係です。
+              </p>
+            </blockquote>
+            <h3>5.3 KG を使うべきかの判断</h3>
+            <p>
+              第1章には「KG を使うべきか判断する」節（1.5.3）があります
+              [S2]。その詳細は本文を参照してください。本ガイドの<strong>第11章</strong>では、筆者による実務向けの判断フローを補足として示します。
+            </p>
+            <hr />
+          </section>
+          <section id="sec-6" class="section">
+            <h2 id="sec-6">6. 学習環境の準備（Step-by-Step）</h2>
+
+            <h3>6.1 全体の流れ</h3>
+            <div class="mermaid-container"><div class="mermaid-target" id="mermaid-3"></div></div>
+
+            <h3>6.2 各ステップ</h3>
+            <p><strong>Step A: 書籍とコードの入手</strong></p>
+            <ul>
+              <li>
+                書籍は Manning の liveBook や O'Reilly
+                から読めます（購読やアカウントが必要）[S1][S2]。
+              </li>
+              <li>コードは公式リポジトリ [S8] から取得します。</li>
+            </ul>
+            <div class="code-block">
+              <div class="code-block__bar">
+                <span class="code-block__lang">bash</span
+                ><button class="code-block__copy" type="button" data-copy-target="code-1">
+                  <i class="ti ti-copy"></i>コピー
+                </button>
+              </div>
+              <pre><code id="code-1" class="language-bash">git clone https://github.com/alenegro81/knowledge-graphs-and-llms-in-action.git
+cd knowledge-graphs-and-llms-in-action</code></pre>
+            </div>
+
+            <p><strong>Step B: Python 仮想環境</strong></p>
+            <p>
+              リポジトリの README は、仮想環境の利用を推奨し、コードは Python 3.8 / 3.9 / 3.10
+              でテストされていると記載しています [S8]。
+            </p>
+            <div class="code-block">
+              <div class="code-block__bar">
+                <span class="code-block__lang">bash</span
+                ><button class="code-block__copy" type="button" data-copy-target="code-2">
+                  <i class="ti ti-copy"></i>コピー
+                </button>
+              </div>
+              <pre><code id="code-2" class="language-bash">python -m venv venv
+source venv/bin/activate      # Windows は venv\Scripts\activate</code></pre>
+            </div>
+
+            <blockquote>
+              <p>
+                <strong><span class="badge badge--supplement">補足</span></strong> 2026年時点では
+                Python 3.8 はすでにサポート終了しています。README が示す範囲のうち
+                <strong>3.10 を最小バージョン</strong
+                >として選び、動いたら新しい版に上げて検証するのが安全です。<br />
+                本ガイド内のサンプルコードは <code>list[dict]</code> や
+                <code>dict | None</code> といった 3.10 以降の型注釈構文を使うため、3.8 / 3.9
+                では動作しません（3.9 以前で動かす場合は <code>typing.List</code> /
+                <code>typing.Dict</code> / <code>typing.Optional</code> へ置き換えてください）。
+              </p>
+            </blockquote>
+            <p><strong>Step C: Neo4j の準備</strong></p>
+            <ul>
+              <li>
+                Neo4j のインストール手順は<strong>付録B</strong>（サーバー版と Desktop
+                版）で解説されています [S2]。
+              </li>
+              <li>
+                第3章の FAQ によれば、第3章のサンプルは Neo4j 5.20.0（Enterprise）、APOC
+                5.20.0、neosemantics（n10s）5.20.0 を前提としています [S3]。
+              </li>
+            </ul>
+            <p><strong>Step D: プラグインの導入</strong></p>
+            <p>
+              付録B.4 で APOC Core と GDS（Graph Data Science）のインストールが扱われます [S2]。APOC
+              は便利なユーティリティ群、GDS は PageRank
+              などのグラフアルゴリズム集です（第10章で使用）。
+            </p>
+            <p><strong>Step E: 接続情報の設定</strong></p>
+            <p>
+              README は、Neo4j が起動していることを確認し、<code>config.ini</code>
+              に認証情報を書くよう指示しています [S8]。
+            </p>
+            <p><strong>Step F: Makefile による実行</strong></p>
+            <p>
+              各章は Makefile ベースで操作を簡略化しているため、<code>make</code>
+              コマンドが使える必要があります [S8]。
+            </p>
+            <div class="code-block">
+              <div class="code-block__bar">
+                <span class="code-block__lang">bash</span
+                ><button class="code-block__copy" type="button" data-copy-target="code-3">
+                  <i class="ti ti-copy"></i>コピー
+                </button>
+              </div>
+              <pre><code id="code-3" class="language-bash">make --version     # インストール確認</code></pre>
+            </div>
+
+            <p><strong>第8章で使うローカル LLM（Ollama）</strong></p>
+            <p>
+              第8章は Ollama と Llama 3.1 8B でモデルをセットアップします
+              [S2]。一般的な手順は次のとおりです（<span class="badge badge--supplement">補足</span
+              >）。
+            </p>
+            <div class="code-block">
+              <div class="code-block__bar">
+                <span class="code-block__lang">bash</span
+                ><button class="code-block__copy" type="button" data-copy-target="code-4">
+                  <i class="ti ti-copy"></i>コピー
+                </button>
+              </div>
+              <pre><code id="code-4" class="language-bash">ollama pull llama3.1:8b
+ollama run llama3.1:8b &quot;こんにちは&quot;</code></pre>
+            </div>
+
+            <h3>6.3 つまずきポイント</h3>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>症状</th>
+                    <th>よくある原因</th>
+                    <th>対処</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Neo4j に接続できない</td>
+                    <td>サービス未起動、ポート/認証情報の誤り</td>
+                    <td>起動確認、<code>config.ini</code> の URI・ユーザー・パスワードを再確認</td>
+                  </tr>
+                  <tr>
+                    <td><code>apoc</code> や <code>n10s</code> のプロシージャが見つからない</td>
+                    <td>プラグイン未導入、設定ファイルでの許可漏れ</td>
+                    <td>付録B.4 の手順に従い、Neo4j の版とプラグインの版をそろえる</td>
+                  </tr>
+                  <tr>
+                    <td><code>make</code> が無い</td>
+                    <td>OS に未導入</td>
+                    <td>
+                      パッケージマネージャで導入（README に Windows/Debian 系/macOS の例あり）[S8]
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>ライブラリのエラー</td>
+                    <td>Python やライブラリの版の差</td>
+                    <td>仮想環境を作り直し、README 記載の版に合わせる</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <hr />
+          </section>
+          <section id="sec-7" class="section">
+            <h2 id="sec-7">7. ステップバイステップ解説（章ごと）</h2>
+
+            <p>各ステップは次の構成です。</p>
+            <ul>
+              <li>
+                <strong><span class="badge badge--source">書籍情報</span></strong>
+                公開されている目次・章概要から分かる内容
+              </li>
+              <li>
+                <strong>やさしい説明 <span class="badge badge--supplement">補足</span></strong>
+                たとえ話や図での理解
+              </li>
+              <li><strong>つまずきポイント</strong> 初学者がつまずきやすい点</li>
+              <li><strong>確認問題</strong> 答えは折りたたみの中にあります</li>
+            </ul>
+            <hr />
+            <h3 id="step-1">Step 1: 基礎を固める（Part 1 / 第1章・第2章）</h3>
+            <h4>
+              <span class="badge badge--source">書籍情報</span> 第1章「KG と LLM:
+              最強の組み合わせ」の構成 [S2]
+            </h4>
+            <ul>
+              <li>1.1 ナレッジグラフ / 1.2 大規模言語モデル / 1.3 KG と LLM: 一緒だから強い</li>
+              <li>
+                1.4 データ駆動型アプリケーションにおけるパラダイムシフト（1.4.1 KG の 4 本柱）
+              </li>
+              <li>
+                1.5 KG と LLM でデータ駆動型アプリを作る（創薬・顧客サポート向け会話 AI の事例、KG
+                を使うべきかの判断）
+              </li>
+              <li>1.6 KG の技術（タクソノミーとオントロジー）</li>
+              <li>1.7 本書での教え方</li>
+            </ul>
+            <h4>
+              <span class="badge badge--source">書籍情報</span> 第2章「知能システム:
+              ハイブリッドアプローチ」の構成 [S2]
+            </h4>
+            <ul>
+              <li>知能とは何か / 知能システムの設計（定義、分類、特徴）</li>
+              <li>知識の獲得と表現 / 推論 / 推論エンジン</li>
+              <li>
+                純粋な演繹推論エンジンの限界、帰納推論と機械学習の活用、<strong
+                  >推論エンジンにおける LLM の役割</strong
+                >
+              </li>
+              <li>KG によるアプローチ</li>
+            </ul>
+            <h4>やさしい説明 <span class="badge badge--supplement">補足</span></h4>
+            <p>知能システムを「新人コンサルタント」にたとえると分かりやすくなります。</p>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>構成要素</th>
+                    <th>たとえ</th>
+                    <th>システムでは</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>知識の獲得</td>
+                    <td>資料を読み、担当者に聞き取りをする</td>
+                    <td>データ収集、文章からの抽出</td>
+                  </tr>
+                  <tr>
+                    <td>知識の表現</td>
+                    <td>情報を整理したノートを作る</td>
+                    <td>KG・オントロジー</td>
+                  </tr>
+                  <tr>
+                    <td>推論</td>
+                    <td>ノートから結論を導く</td>
+                    <td>ルール推論、機械学習、LLM</td>
+                  </tr>
+                  <tr>
+                    <td>出力・説明</td>
+                    <td>顧客に報告し根拠も示す</td>
+                    <td>回答と根拠の提示</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="mermaid-container"><div class="mermaid-target" id="mermaid-4"></div></div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>推論の種類</th>
+                    <th>特徴</th>
+                    <th>弱点</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>演繹（ルール）</td>
+                    <td>前提が正しければ結論も確実。説明しやすい</td>
+                    <td>ルールを人が書く必要があり、想定外に弱い</td>
+                  </tr>
+                  <tr>
+                    <td>帰納（機械学習）</td>
+                    <td>データから傾向を学び、未知にも対応</td>
+                    <td>確率的で、根拠の説明が難しい場合がある</td>
+                  </tr>
+                  <tr>
+                    <td>LLM</td>
+                    <td>自然な言語で柔軟に対応</td>
+                    <td>事実の正確性・再現性・説明性に課題</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <blockquote>
+              <p>
+                第2章の見出しは、これらを組み合わせる<strong>ハイブリッド</strong>なアプローチを示唆しています
+                [S2]。
+              </p>
+            </blockquote>
+            <h4>つまずきポイント</h4>
+            <ul>
+              <li>
+                「KG と LLM
+                のどちらが主役か」と考えがちですが、本書の立場は<strong>相互補完</strong>です。
+              </li>
+              <li>
+                「オントロジーは難しそう」と感じたら、まず「用語の統一ルール表」だと捉えれば十分です。
+              </li>
+            </ul>
+            <h4>確認問題</h4>
+            <ol>
+              <li>タクソノミーとオントロジーの違いを一言で説明してください。</li>
+              <li>純粋な演繹推論エンジンだけで知能システムを作ると、どんな限界がありますか。</li>
+            </ol>
+            <details>
+              <summary>答え</summary>
+              <ol>
+                <li>
+                  タクソノミーは階層的な分類、オントロジーは概念・関係・制約まで形式的に定義した語彙体系。
+                </li>
+                <li>
+                  ルールを人手で書き尽くす必要があり、想定外のケースや曖昧なデータに弱い。そのため帰納推論（機械学習）や
+                  LLM と組み合わせる（第2章の構成 [S2] に沿った整理）。
+                </li>
+              </ol>
+            </details>
+            <hr />
+            <h3 id="step-2">
+              Step 2: 構造化データ・オントロジーから最初の KG を作る（Part 2 / 第3章）
+            </h3>
+            <h4><span class="badge badge--source">書籍情報</span> 第3章の要点 [S3]</h4>
+            <ul>
+              <li>
+                KG
+                構築を、異なる形式・意味を持つデータの<strong>意味的統合</strong>の問題として捉える。
+              </li>
+              <li>
+                オントロジーを<strong>参照スキーマ兼統制語彙</strong>として使い、同義語の統一、略語の曖昧性解消、粒度の違いの調整を行う。
+              </li>
+              <li>
+                ユースケースは、臨床医が<strong>希少疾患を認識する</strong>のを支援する
+                KG。ヒト表現型オントロジー（HPO）と、疾患と表現型を結びつける注釈データを使う。
+              </li>
+              <li>
+                RDF と LPG
+                を比較し、関係ごとのメタデータ（根拠・頻度・発症時期・キュレーター等）が重要なため、<strong
+                  >LPG を中核に採用</strong
+                >。
+              </li>
+              <li>
+                手順は、ビジネス理解、データ理解、データ準備、KG モデル作成、クエリという
+                <strong>CRISP-DM を KG 向けに適応した流れ</strong>。
+              </li>
+              <li>
+                使用データは 2 種類: <code>hp.owl</code>（HPO 本体、OWL/RDF）と
+                <code>phenotype.hpoa</code>（疾患と表現型の注釈、TSV）。
+              </li>
+              <li>
+                環境: Neo4j 5.20.0（Enterprise）、APOC、neosemantics（n10s）。RDF の探索には Python
+                の rdflib も紹介。
+              </li>
+            </ul>
+            <h4>やさしい説明 <span class="badge badge--supplement">補足</span></h4>
+            <p>
+              <strong>KG 構築は「技術選び」ではなく「目的の確認」から始まる</strong
+              >というのが、この章の最大のメッセージです。
+            </p>
+            <div class="mermaid-container"><div class="mermaid-target" id="mermaid-5"></div></div>
+
+            <p><strong>章の実装ステップ（[S3] の FAQ に基づく整理）</strong></p>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>手順</th>
+                    <th>目的</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>1</td>
+                    <td>DB を作り、<code>Resource.uri</code> などに制約・インデックスを作成</td>
+                    <td>検索と重複防止</td>
+                  </tr>
+                  <tr>
+                    <td>2</td>
+                    <td>n10s（neosemantics）を設定し、<code>hp.owl</code> を取り込む</td>
+                    <td>オントロジーをグラフ化</td>
+                  </tr>
+                  <tr>
+                    <td>3</td>
+                    <td>
+                      <code>Resource.uri</code> が
+                      <code
+                        ><a
+                          href="http://purl.obolibrary.org/obo/HP_"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          >http://purl.obolibrary.org/obo/HP_</a
+                        ></code
+                      >
+                      で始まるノードに <code>HpoPhenotype</code> ラベルを付与し、uri 末尾の
+                      <code>HP_0000001</code> をコロン形式へ変換した
+                      <code>id</code>（<code>HP:0000001</code>）を設定
+                    </td>
+                    <td>
+                      表現型ノードを扱いやすくする。<code>phenotype.hpoa</code> と Cypher で使う ID
+                      表記を <code>HP:</code> 形式に統一する
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>4</td>
+                    <td>
+                      <code>phenotype.hpoa</code> を
+                      <code>LOAD CSV</code> で読み込み、疾患ノード（<code>HpoDisease</code>）を
+                      <code>MERGE</code>
+                    </td>
+                    <td>疾患ノードの作成</td>
+                  </tr>
+                  <tr>
+                    <td>5</td>
+                    <td>
+                      疾患から表現型への
+                      <code>HAS_PHENOTYPIC_FEATURE</code>
+                      関係を作り、根拠・頻度・発症時期などをプロパティとして付与
+                    </td>
+                    <td><strong>関係のメタデータを保持</strong></td>
+                  </tr>
+                  <tr>
+                    <td>6</td>
+                    <td>クエリ: 疾患の特徴取得、観察された特徴で疾患をランキング、根拠の確認</td>
+                    <td>診断支援の探索</td>
+                  </tr>
+                  <tr>
+                    <td>7</td>
+                    <td>
+                      推論: <code>SUBCLASSOF</code> の階層をたどり、上位概念から下位の特徴を展開
+                    </td>
+                    <td>粒度の異なる概念のつなぎ</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p><strong>イメージ図: 疾患と表現型、その階層</strong></p>
+            <div class="mermaid-container"><div class="mermaid-target" id="mermaid-6"></div></div>
+
+            <p>
+              <strong>学習用の独自サンプル（Cypher）</strong> — ID
+              や値はすべてダミーです。書籍の実コードは [S8] を参照してください。
+            </p>
+            <div class="code-block">
+              <div class="code-block__bar">
+                <span class="code-block__lang">cypher</span
+                ><button class="code-block__copy" type="button" data-copy-target="code-5">
+                  <i class="ti ti-copy"></i>コピー
+                </button>
+              </div>
+              <pre><code id="code-5" class="language-sql">// 疾患-表現型の関係に「根拠」をプロパティとして持たせるイメージ
+MERGE (d:HpoDisease {id: &#x27;OMIM:000000&#x27;})
+MERGE (p:HpoPhenotype {id: &#x27;HP:0000000&#x27;})
+MERGE (d)-[r:HAS_PHENOTYPIC_FEATURE]-&gt;(p)
+SET r.source = &#x27;PMID:0000000&#x27;,
+    r.evidence = &#x27;dummy-evidence&#x27;,
+    r.frequency = &#x27;dummy-frequency&#x27;</code></pre>
+            </div>
+
+            <div class="code-block">
+              <div class="code-block__bar">
+                <span class="code-block__lang">cypher</span
+                ><button class="code-block__copy" type="button" data-copy-target="code-6">
+                  <i class="ti ti-copy"></i>コピー
+                </button>
+              </div>
+              <pre><code id="code-6" class="language-sql">// 観察された特徴(ダミーID)に多く当てはまる疾患を上位から出す
+WITH [&#x27;HP:0000001&#x27;, &#x27;HP:0000002&#x27;, &#x27;HP:0000003&#x27;] AS observed
+MATCH (d:HpoDisease)-[:HAS_PHENOTYPIC_FEATURE]-&gt;(p:HpoPhenotype)
+WHERE p.id IN observed
+RETURN d.id AS disease, count(DISTINCT p) AS matched
+ORDER BY matched DESC
+LIMIT 10</code></pre>
+            </div>
+
+            <blockquote>
+              <p>
+                LPG の強みは「エッジにそのまま根拠を持てる」ことです。RDF
+                で同じことをするには、関係を表すノードを間に挟む、名前付きグラフを使う、RDF-star
+                を使う、といった工夫が必要になります [S3]。
+              </p>
+            </blockquote>
+            <h4>つまずきポイント</h4>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>つまずき</th>
+                    <th>説明</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>「RDF と LPG のどちらを覚えるべき？」</td>
+                    <td>
+                      両方の考え方を知り、<strong>ユースケースで選ぶ</strong>のが本章の結論 [S3]
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>「オントロジーをそのまま入れると重い」</td>
+                    <td>
+                      章では、不要なオントロジーの足場を整理（プルーニング）してから使う流れが説明されている
+                      [S3]
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>「ID の扱いが複雑」</td>
+                    <td>
+                      同じ名称でも文脈により疾患か症状かが異なりうるため、ID
+                      設計が重要（章でも図解あり）[S3]
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <h4>確認問題</h4>
+            <ol>
+              <li>なぜこの章では KG の中核に LPG を選んだのですか。</li>
+              <li>オントロジーを使うと、データ統合でどんな問題が解決しやすくなりますか。</li>
+            </ol>
+            <details>
+              <summary>答え</summary>
+              <ol>
+                <li>
+                  疾患と表現型の<strong>関係ごとに</strong>、根拠・頻度・発症時期などのメタデータを付けたい。LPG
+                  ならエッジにプロパティを直接持てて、たどり検索も効率的だから [S3]。
+                </li>
+                <li>同義語・略語の曖昧さ、粒度の違いを、共通の語彙と構造で調整できる [S3]。</li>
+              </ol>
+            </details>
+            <hr />
+            <h3 id="step-3">Step 3: 複数ソースの統合と LLM による解釈（Part 2 / 第4章）</h3>
+            <h4><span class="badge badge--source">書籍情報</span> 第4章の構成 [S2]</h4>
+            <ul>
+              <li>4.1 生物医学 KG とその応用</li>
+              <li>
+                4.2 マルチオミクス応用:
+                PPI（タンパク質間相互作用）ネットワークとタンパク質-疾患ネットワークから KG
+                を作成、全体分析、ドメイン固有の分析
+              </li>
+              <li>
+                4.3 創薬・製薬応用: Hetionet KG の詳細分析、<strong
+                  >LLM による経路（パスウェイ）解析結果の解釈支援</strong
+                >
+              </li>
+              <li>4.4 臨床応用: <strong>LLM 主導の臨床意思決定支援分析</strong></li>
+            </ul>
+            <h4>やさしい説明 <span class="badge badge--supplement">補足</span></h4>
+            <p>
+              第3章が「1 つのデータからの KG」なら、第4章は「<strong
+                >複数の情報源を 1 枚の地図に統合する</strong
+              >」段階です。
+            </p>
+            <div class="mermaid-container"><div class="mermaid-target" id="mermaid-7"></div></div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>観点</th>
+                    <th>初学者向けの理解</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>なぜ統合が必要か</td>
+                    <td>
+                      1 つのデータだけでは見えない、間接的なつながり（薬-標的-疾患）が見えるから
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>LLM の役割</td>
+                    <td>
+                      グラフ分析の<strong>数値結果や一覧を人間が読める説明にする</strong>（構築ではなく解釈側での活用）[S2]
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>注意点</td>
+                    <td>
+                      LLM の解釈は必ず元データ（KG
+                      上の根拠）と照合する。医療用途では専門家の確認が前提
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <h4>つまずきポイント</h4>
+            <ul>
+              <li>
+                生物医学の専門用語（PPI、オミクスなど）が壁になりがちです。<strong>用語の詳細より「複数データの統合の流れ」</strong>に注目すれば十分です。
+              </li>
+              <li>
+                ここでの LLM は KG
+                を作る側ではなく、<strong>分析結果を解釈する側</strong>として登場します。
+              </li>
+            </ul>
+            <h4>確認問題</h4>
+            <ol>
+              <li>複数のデータソースを KG に統合する利点を 1 つ挙げてください。</li>
+              <li>第4章で LLM が担う役割は何ですか。</li>
+            </ol>
+            <details>
+              <summary>答え</summary>
+              <ol>
+                <li>
+                  単一データでは見えない間接的な関係（例: 薬・標的・疾患のつながり）を探索できる。
+                </li>
+                <li>パスウェイ解析結果や臨床意思決定支援の分析結果の解釈を助ける [S2]。</li>
+              </ol>
+            </details>
+            <hr />
+            <h3 id="step-4">Step 4: テキストから KG を作る（Part 3 / 第5章・第6章）</h3>
+            <h4>
+              <span class="badge badge--source">書籍情報</span>
+              第5章「非構造化データからのドメイン知識抽出」 [S2]
+            </h4>
+            <ul>
+              <li>5.1 アーカイブの課題 / 5.2 知識抽出の基本概念（固有表現認識、関係抽出）</li>
+              <li>
+                5.3 LLM で KG を作る（LLM
+                の使い方、プロンプトエンジニアリングの例とガイドライン、<strong
+                  >従来の NLP と LLM のどちらを使うか</strong
+                >）
+              </li>
+            </ul>
+            <h4>
+              <span class="badge badge--source">書籍情報</span> 第6章「LLM による KG 構築」 [S2]
+            </h4>
+            <ul>
+              <li>
+                6.1 アーカイブを KG
+                に変換（グラフモデリング、メタグラフ、正規化とクレンジング、<strong>グラフベースのエンティティ解決</strong>）
+              </li>
+              <li>6.2 知的ネットワーク分析: グラフの価値</li>
+              <li>6.3 Rockefeller Archive Center プロジェクトの次のステップ</li>
+              <li>6.4 LLM 時代における KG の価値</li>
+            </ul>
+            <h4>やさしい説明 <span class="badge badge--supplement">補足</span></h4>
+            <p>文章から KG を作る流れは、次のようなパイプラインになります。</p>
+            <div class="mermaid-container"><div class="mermaid-target" id="mermaid-8"></div></div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>用語</th>
+                    <th>やさしい説明</th>
+                    <th>例</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>固有表現認識（NER）</td>
+                    <td>文章から人名・組織名・場所などを見つける</td>
+                    <td>「山田は Alpha 社に入社」→ 山田（人）、Alpha 社（組織）</td>
+                  </tr>
+                  <tr>
+                    <td>関係抽出</td>
+                    <td>見つけた固有表現同士の関係を見つける</td>
+                    <td>山田 — WORKS_AT — Alpha 社</td>
+                  </tr>
+                  <tr>
+                    <td>エンティティ解決</td>
+                    <td>「山田太郎」「山田 T.」「Yamada」を同一人物としてまとめる</td>
+                    <td>ノードの重複を防ぐ</td>
+                  </tr>
+                  <tr>
+                    <td>メタグラフ</td>
+                    <td>
+                      データの構造（どんな種類のノードや関係があるか）を表すグラフ（章の見出しにある概念。詳細は本文で確認）[S2]
+                    </td>
+                    <td>—</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p>
+              <strong
+                >従来 NLP と LLM の比較 <span class="badge badge--supplement">補足</span></strong
+              >
+            </p>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>観点</th>
+                    <th>従来 NLP（ルール・専用モデル）</th>
+                    <th>LLM</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>準備</td>
+                    <td>ドメインごとの学習データやルールが必要</td>
+                    <td>プロンプトと数例で開始できる</td>
+                  </tr>
+                  <tr>
+                    <td>柔軟性</td>
+                    <td>想定外の表現に弱い</td>
+                    <td>多様な表現に対応しやすい</td>
+                  </tr>
+                  <tr>
+                    <td>安定性</td>
+                    <td>出力が決定的で検証しやすい</td>
+                    <td>出力が揺れる。検証層が必要</td>
+                  </tr>
+                  <tr>
+                    <td>コスト</td>
+                    <td>推論は軽い</td>
+                    <td>大量文書では費用・時間がかかる</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <blockquote>
+              <p>
+                書籍は「従来の NLP か LLM
+                か」という比較の節を設けています（5.3.4）[S2]。結論は本文で確認してください。
+              </p>
+            </blockquote>
+            <p>
+              <strong
+                >学習用の独自サンプル（Python）: LLM でトリプルを抽出し、スキーマで検証する</strong
+              >
+            </p>
+            <p>
+              <code>llm_call</code> は「プロンプトを受け取り文字列を返す関数」です。どの LLM の SDK
+              でも差し替えられます。
+            </p>
+            <div class="code-block">
+              <div class="code-block__bar">
+                <span class="code-block__lang">python</span
+                ><button class="code-block__copy" type="button" data-copy-target="code-7">
+                  <i class="ti ti-copy"></i>コピー
+                </button>
+              </div>
+              <pre><code id="code-7" class="language-python">import json
+from typing import Callable
+
+ALLOWED_ENTITY_TYPES = {&quot;Person&quot;, &quot;Company&quot;, &quot;Product&quot;}
+ALLOWED_RELATIONS = {&quot;WORKS_AT&quot;, &quot;DEVELOPS&quot;, &quot;KNOWS&quot;}
+
+PROMPT_TEMPLATE = &quot;&quot;&quot;次の文章から、エンティティと関係を抽出してください。
+制約:
+- エンティティ種別は {entity_types} のいずれか
+- 関係種別は {relations} のいずれか
+- 文章に明示されていない事実は出力しない
+- 出力は JSON のみ:
+  {{&quot;triples&quot;: [{{&quot;head&quot;: &quot;...&quot;, &quot;head_type&quot;: &quot;...&quot;, &quot;relation&quot;: &quot;...&quot;, &quot;tail&quot;: &quot;...&quot;, &quot;tail_type&quot;: &quot;...&quot;}}]}}
+
+文章:
+{text}
+&quot;&quot;&quot;
+
+
+def extract_triples(llm_call: Callable[[str], str], text: str) -&gt; list[dict]:
+    prompt = PROMPT_TEMPLATE.format(
+        entity_types=sorted(ALLOWED_ENTITY_TYPES),
+        relations=sorted(ALLOWED_RELATIONS),
+        text=text,
+    )
+    data = json.loads(llm_call(prompt))
+    valid = []
+    for t in data.get(&quot;triples&quot;, []):
+        if (
+            t.get(&quot;head_type&quot;) in ALLOWED_ENTITY_TYPES
+            and t.get(&quot;tail_type&quot;) in ALLOWED_ENTITY_TYPES
+            and t.get(&quot;relation&quot;) in ALLOWED_RELATIONS
+        ):
+            valid.append(t)  # スキーマ外の出力は捨てる
+    return valid</code></pre>
+            </div>
+
+            <div class="code-block">
+              <div class="code-block__bar">
+                <span class="code-block__lang">python</span
+                ><button class="code-block__copy" type="button" data-copy-target="code-8">
+                  <i class="ti ti-copy"></i>コピー
+                </button>
+              </div>
+              <pre><code id="code-8" class="language-python">def upsert_triples(tx, triples: list[dict]) -&gt; None:
+    # ラベルや関係名は変数にできないため文字列で埋め込む。
+    # 埋め込む前に必ず許可リストで検証する(Cypherインジェクション対策)。
+    # 呼び出し側の検証漏れを前提にせず、この関数自身でも弾く。
+    for t in triples:
+        head, tail = t.get(&quot;head&quot;), t.get(&quot;tail&quot;)
+        if (
+            t.get(&quot;head_type&quot;) not in ALLOWED_ENTITY_TYPES
+            or t.get(&quot;tail_type&quot;) not in ALLOWED_ENTITY_TYPES
+            or t.get(&quot;relation&quot;) not in ALLOWED_RELATIONS
+            # head / tail が欠けていると、下の tx.run で KeyError になる。
+            # 空文字や空白だけの名前は、名前のないノードを作ってしまうのでここで弾く。
+            or not isinstance(head, str)
+            or not head.strip()
+            or not isinstance(tail, str)
+            or not tail.strip()
+        ):
+            raise ValueError(f&quot;検証に通らないトリプルは書き込めません: {t}&quot;)
+        tx.run(
+            f&quot;MERGE (h:{t[&#x27;head_type&#x27;]} {{name: $head}}) &quot;
+            f&quot;MERGE (t:{t[&#x27;tail_type&#x27;]} {{name: $tail}}) &quot;
+            f&quot;MERGE (h)-[:{t[&#x27;relation&#x27;]}]-&gt;(t)&quot;,
+            head=head,
+            tail=tail,
+        )
+
+# 使い方(neo4jドライバ 5.x を想定):
+# with driver.session() as session:
+#     session.execute_write(upsert_triples, triples)</code></pre>
+            </div>
+
+            <h4>つまずきポイント</h4>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>つまずき</th>
+                    <th>対処</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>LLM の出力が JSON にならない</td>
+                    <td>出力形式を明示し、パース失敗時は再試行。可能なら構造化出力機能を使う</td>
+                  </tr>
+                  <tr>
+                    <td>同じ人物のノードが増える</td>
+                    <td>
+                      エンティティ解決（第6章）で統合する。<code>MERGE</code>
+                      だけでは表記ゆれは防げない
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>事実でない関係が混ざる</td>
+                    <td>
+                      「文章に明示された事実のみ」と指示し、スキーマ検証と人手サンプリングで確認
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <h4>確認問題</h4>
+            <ol>
+              <li>NER と関係抽出の違いは何ですか。</li>
+              <li>上のサンプルで、許可リストによる検証を入れる理由を 2 つ挙げてください。</li>
+            </ol>
+            <details>
+              <summary>答え</summary>
+              <ol>
+                <li>
+                  NER
+                  は文章中の「もの」（人・組織など）を見つけること、関係抽出はそれらの間の「つながり」を見つけること。
+                </li>
+                <li>
+                  (1) LLM がスキーマ外の種別や関係を出力してもグラフを汚さないため。(2)
+                  ラベルや関係名を Cypher
+                  文字列に埋め込むため、未検証の値を入れるとインジェクションの危険があるため。
+                </li>
+              </ol>
+            </details>
+            <hr />
+            <h3 id="step-5">Step 5: 固有表現の曖昧性解消 NED（Part 3 / 第7章・第8章）</h3>
+            <h4><span class="badge badge--source">書籍情報</span> 第7章の構成 [S2]</h4>
+            <ul>
+              <li>7.1 認識から曖昧性解消へ / 7.2 NED とは / 7.3 ドメインベースの NED と LLM</li>
+              <li>7.4〜7.5 ビジネスとデータの理解（非構造化データ、ドメインオントロジー）</li>
+              <li>
+                7.6
+                <strong>SoHO KG</strong>
+                の構築（スキーマ定義、文書の取り込み、医療エンティティの曖昧性解消と取り込み、オントロジーの処理・マッピング、エンティティの共起生成）
+              </li>
+              <li>
+                7.7 KG
+                を活用したユースケース（概念検索、構造化知識に基づく検索、解釈可能性と発見、新しい知識の発見）
+              </li>
+            </ul>
+            <h4>
+              <span class="badge badge--source">書籍情報</span> 第8章「オープン LLM
+              とドメインオントロジーによる NED」の構成 [S2]
+            </h4>
+            <ul>
+              <li>従来の NED システムの限界 / ドメインオントロジーの取り込み</li>
+              <li><strong>Ollama と Llama 3.1 8B</strong> によるモデル設定</li>
+              <li>
+                エンドツーエンドの NED: 固有表現認識、<strong>候補選択</strong>、<strong
+                  >候補の曖昧性解消</strong
+                >
+              </li>
+            </ul>
+            <h4>やさしい説明 <span class="badge badge--supplement">補足</span></h4>
+            <p>
+              NER は「名前を見つける」、NED
+              は「<strong>それがどの実体を指すかを決める</strong>」作業です。「Apple」が企業なのか果物なのかを、文脈とオントロジーで判断するイメージです。
+            </p>
+            <div class="mermaid-container"><div class="mermaid-target" id="mermaid-9"></div></div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>観点</th>
+                    <th>ポイント</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>なぜオントロジーが必要か</td>
+                    <td>候補の集合と正しい ID を与える「辞書兼地図」になるため</td>
+                  </tr>
+                  <tr>
+                    <td>なぜ候補選択を挟むか</td>
+                    <td>
+                      LLM に全候補を渡すと精度と費用が悪化するため、先に絞り込む（<span
+                        class="badge badge--supplement"
+                        >補足</span
+                      >。章の段階構成 [S2] と整合）
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>なぜオープン LLM（Ollama 等）か</td>
+                    <td>
+                      データを外部に出さずにローカルで動かせる、費用を抑えやすい（<span
+                        class="badge badge--supplement"
+                        >補足</span
+                      >。一般的な利点）
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <blockquote>
+              <p>
+                <strong
+                  ><span class="badge badge--supplement">補足</span> 曖昧性解消の質は KG
+                  全体の質を決める。</strong
+                >
+                誤った実体に結びつくと、後続の検索・RAG・分析がすべて誤った土台に載ります。近年の研究でも、LLM
+                が生成した KG
+                に対してエンティティ解決と誤りトリプルの除去を行い、エンティティと関係を約 40%
+                減らしながらグラフベース RAG の性能が向上したという報告があります [S18]。<strong
+                  >「KG は大きさより質」</strong
+                >という見方の裏づけとして参考になります。
+              </p>
+            </blockquote>
+            <h4>つまずきポイント</h4>
+            <ul>
+              <li>
+                NER と NED の区別:
+                「見つける」と「特定する」の違いを、必ず具体例（同名異人）で確認しましょう。
+              </li>
+              <li>
+                ローカル LLM は PC
+                の性能に依存します。まず小さなデータで動作確認してから拡大しましょう。
+              </li>
+            </ul>
+            <h4>確認問題</h4>
+            <ol>
+              <li>NED の 3 段階を順に答えてください。</li>
+              <li>NED の質が悪いと、KG を使った RAG にどんな影響が出ますか。</li>
+            </ol>
+            <details>
+              <summary>答え</summary>
+              <ol>
+                <li>固有表現認識、候補選択、候補の曖昧性解消 [S2]。</li>
+                <li>
+                  誤ったノードに結びつくため、関連情報の取り違えや検索漏れが起き、回答の根拠が誤る。
+                </li>
+              </ol>
+            </details>
+            <hr />
+            <h3 id="step-6">Step 6: グラフ上の機械学習の基本（Part 4 / 第9章・第10章）</h3>
+            <h4><span class="badge badge--source">書籍情報</span> 構成 [S2]</h4>
+            <ul>
+              <li>
+                <strong>第9章</strong>: なぜ（Why）・何を（What）・どう（How）の 3
+                段構成。タスクは、ノード分類、リンク予測（関係予測）、クラスタリング/コミュニティ検出、グラフ分類。
+              </li>
+              <li>
+                <strong>第10章</strong>:
+                手作業のノード特徴量（次数、三角形、密度、最短経路、近接中心性、媒介中心性、PageRank）、関係の特徴量（ノードベース、パスベース）、半自動の特徴抽出（ReFeX）。
+              </li>
+            </ul>
+            <h4>やさしい説明 <span class="badge badge--supplement">補足</span></h4>
+            <p><strong>4 つのタスク</strong></p>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>タスク</th>
+                    <th>何をするか</th>
+                    <th>例</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>ノード分類</td>
+                    <td>各ノードにラベル（種別）を予測</td>
+                    <td>口座が不正かどうか</td>
+                  </tr>
+                  <tr>
+                    <td>リンク予測（関係予測）</td>
+                    <td>まだ無い関係が存在するかを予測</td>
+                    <td>ユーザーが好みそうな映画</td>
+                  </tr>
+                  <tr>
+                    <td>クラスタリング/コミュニティ検出</td>
+                    <td>密につながるグループを見つける</td>
+                    <td>似た話題の文書群</td>
+                  </tr>
+                  <tr>
+                    <td>グラフ分類</td>
+                    <td>グラフ全体にラベルを予測</td>
+                    <td>分子が有効かどうか</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p><strong>代表的なノード特徴量（第10章の見出し [S2] にある指標）</strong></p>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>指標</th>
+                    <th>やさしい意味</th>
+                    <th>たとえ</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>次数（Degree）</td>
+                    <td>つながっている線の数</td>
+                    <td>友達の人数</td>
+                  </tr>
+                  <tr>
+                    <td>三角形（Triangles）</td>
+                    <td>3 者が互いにつながる数</td>
+                    <td>友達同士も友達</td>
+                  </tr>
+                  <tr>
+                    <td>密度（Density）</td>
+                    <td>実際の線 ÷ ありうる線の最大数</td>
+                    <td>グループの結束の強さ</td>
+                  </tr>
+                  <tr>
+                    <td>最短経路（Geodesic）</td>
+                    <td>2 点間の最短のつながり</td>
+                    <td>知人を介した最短ルート</td>
+                  </tr>
+                  <tr>
+                    <td>近接中心性（Closeness）</td>
+                    <td>他のノードへの近さ</td>
+                    <td>街の中心地に近い店</td>
+                  </tr>
+                  <tr>
+                    <td>媒介中心性（Betweenness）</td>
+                    <td>他ノード間の最短経路上に乗る度合い</td>
+                    <td>橋渡し役</td>
+                  </tr>
+                  <tr>
+                    <td>PageRank</td>
+                    <td>重要なノードからの参照を重視した重要度</td>
+                    <td>影響力のある人に紹介される人</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p><strong>学習用の独自サンプル（Cypher + GDS）: PageRank を計算する</strong></p>
+            <p>
+              GDS プラグイン（付録B.4.2 [S2]）が入っている前提の例です。<code>Person</code> と
+              <code>KNOWS</code> は説明用のラベルです。
+            </p>
+            <div class="code-block">
+              <div class="code-block__bar">
+                <span class="code-block__lang">cypher</span
+                ><button class="code-block__copy" type="button" data-copy-target="code-9">
+                  <i class="ti ti-copy"></i>コピー
+                </button>
+              </div>
+              <pre><code id="code-9" class="language-sql">// 1. 分析用のグラフ投影を作る
+CALL gds.graph.project(&#x27;social&#x27;, &#x27;Person&#x27;, &#x27;KNOWS&#x27;);
+
+// 2. PageRank をストリームで取得して上位を見る
+CALL gds.pageRank.stream(&#x27;social&#x27;)
+YIELD nodeId, score
+RETURN gds.util.asNode(nodeId).name AS name, score
+ORDER BY score DESC
+LIMIT 5;</code></pre>
+            </div>
+
+            <div class="mermaid-container"><div class="mermaid-target" id="mermaid-10"></div></div>
+
+            <blockquote>
+              <p>
+                <strong><span class="badge badge--supplement">補足</span></strong>
+                特徴量を人が設計する方法（第10章）は、次のステップ（第11章）の「特徴量を自動で学習する」方法の土台になります。
+              </p>
+            </blockquote>
+            <h4>つまずきポイント</h4>
+            <ul>
+              <li>
+                指標が多くて覚えきれない場合は、<strong>「どんな問いに答えるための指標か」</strong>で整理しましょう（人気者を探す
+                = 次数/PageRank、橋渡し役 = 媒介中心性）。
+              </li>
+            </ul>
+            <h4>確認問題</h4>
+            <ol>
+              <li>リンク予測は何を予測するタスクですか。</li>
+              <li>媒介中心性が高いノードは、ネットワーク上でどんな役割を持ちますか。</li>
+            </ol>
+            <details>
+              <summary>答え</summary>
+              <ol>
+                <li>まだグラフに存在しない（または欠けている）関係が存在するかどうか。</li>
+                <li>他のノード間の最短経路上によく現れる「橋渡し役」。</li>
+              </ol>
+            </details>
+            <hr />
+            <h3 id="step-7">Step 7: 埋め込みと GNN（Part 4 / 第11章・第12章）</h3>
+            <h4><span class="badge badge--source">書籍情報</span> 第11章の構成 [S2]</h4>
+            <ul>
+              <li>グラフ埋め込み: 離散から連続へ、実世界の応用</li>
+              <li>
+                <strong>エンコーダ-デコーダモデル</strong
+                >（構造をベクトルに変換するエンコーダ、性質を復元するデコーダ、Node2Vec の例）
+              </li>
+              <li>
+                <strong>浅い埋め込み</strong>とその限界 / KG
+                における埋め込み（損失関数、マルチリレーションのデコーダ）
+              </li>
+              <li><strong>メッセージパッシングと GNN</strong>（基本モデル、自己ループ）</li>
+              <li>
+                一般化した集約・更新（近傍の正規化、近傍アテンション、マルチヘッドアテンションと
+                Transformer とのつながり、更新の一般化）
+              </li>
+              <li><strong>GNN と LLM の相乗効果</strong></li>
+            </ul>
+            <h4><span class="badge badge--source">書籍情報</span> 第12章の構成 [S2]</h4>
+            <ul>
+              <li>
+                12.1 <strong>マネーロンダリング対策のためのノード分類</strong>（PyG
+                の同種グラフ、エンコーダ-デコーダ、評価・分析）
+              </li>
+              <li>
+                12.2 <strong>映画推薦のためのリンク予測</strong>（PyG
+                の異種グラフ、エンコーダ-デコーダ、評価・分析）
+              </li>
+            </ul>
+            <h4>やさしい説明 <span class="badge badge--supplement">補足</span></h4>
+            <p>
+              <strong>埋め込み（embedding）</strong
+              >とは、ノードを「意味の近いものは近くに並ぶ」数値ベクトルに変えることです。
+            </p>
+            <div class="mermaid-container"><div class="mermaid-target" id="mermaid-11"></div></div>
+
+            <p>
+              <strong>メッセージパッシング（GNN の核心）:</strong>
+              各ノードが<strong>隣人から情報（メッセージ）を集め、自分の状態を更新する</strong>ことを繰り返します。「隣人の様子から自分の特徴が見えてくる」というたとえで理解できます。
+            </p>
+            <div class="mermaid-container"><div class="mermaid-target" id="mermaid-12"></div></div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>方式</th>
+                    <th>特徴</th>
+                    <th>限界・注意</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>浅い埋め込み（Node2Vec など）</td>
+                    <td>ノードごとにベクトルを学習。仕組みがシンプル</td>
+                    <td>
+                      一般に、新しいノードへの対応や属性の活用が難しい（章でも限界を扱う）[S2]
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>GNN</td>
+                    <td>近傍の集約で表現を作る。属性も活用しやすい</td>
+                    <td>
+                      層を深くしすぎると表現が似通う等の課題（<span class="badge badge--supplement"
+                        >補足</span
+                      >。一般的な知見）
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p><strong>第12章の 2 事例の整理</strong></p>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>事例</th>
+                    <th>タスク</th>
+                    <th>グラフの種類</th>
+                    <th>ポイント</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>マネーロンダリング対策</td>
+                    <td>ノード分類</td>
+                    <td>同種グラフ（PyG）</td>
+                    <td>不正の疑いがあるノードを識別</td>
+                  </tr>
+                  <tr>
+                    <td>映画推薦</td>
+                    <td>リンク予測</td>
+                    <td>異種グラフ（PyG）</td>
+                    <td>ユーザーと映画など<strong>種類の違うノード</strong>を扱う</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <blockquote>
+              <p>「GNN と LLM の相乗効果」（11.7 [S2]）の中身は本文で確認してください。</p>
+            </blockquote>
+            <h4>つまずきポイント</h4>
+            <ul>
+              <li>
+                数式が難しく感じる場合は、<strong>「集める → 混ぜる → 更新する」</strong>の 3
+                語で流れを追いましょう。
+              </li>
+              <li>
+                第12章は PyG（PyTorch Geometric）を使うため、PyTorch
+                の基礎があるとスムーズです（<span class="badge badge--supplement">補足</span>）。
+              </li>
+            </ul>
+            <h4>確認問題</h4>
+            <ol>
+              <li>メッセージパッシングを一言で説明してください。</li>
+              <li>同種グラフと異種グラフの違いは何ですか。</li>
+            </ol>
+            <details>
+              <summary>答え</summary>
+              <ol>
+                <li>
+                  各ノードが隣接ノードの情報を集約して自分の表現を更新する処理を繰り返すこと。
+                </li>
+                <li>
+                  同種グラフはノード（と関係）の種類が 1
+                  種類。異種グラフはユーザー・映画など複数の種類を含む。
+                </li>
+              </ol>
+            </details>
+            <hr />
+            <h3 id="step-8">Step 8: KG を使った RAG（Part 5 / 第13章）</h3>
+            <h4><span class="badge badge--source">書籍情報</span> 第13章の要点 [S4]</h4>
+            <ul>
+              <li>
+                LLM
+                を「エージェント」として役立てる文脈から始め、本番運用の課題（ハルシネーション、知識のカットオフ、不透明性、プライバシーとアクセス制御、コスト、バイアス）を整理。
+              </li>
+              <li>
+                従来型の<strong>ベクトル RAG</strong>:
+                文書を分割・埋め込み・ベクトルストアに索引化し、意味の近いチャンクを検索して LLM
+                に渡す。ただし文脈の断片化、マルチホップ推論の弱さ、拡張性のトレードオフ、埋め込みの盲点、ノイズ/取りこぼしがある。
+              </li>
+              <li>
+                <strong>Graph RAG</strong>: KG を「管理された・解釈可能な・最新の真実の源」として
+                LLM を補う。テキスト付きの KG を使い、3 種類のツールを追加する。<br />
+                1. <strong>KG Retriever</strong>: スキーマを意識した Cypher
+                でエンティティ・プロパティ・経路・集計を取得<br />
+                2. <strong>KG-Enhanced Document Retriever</strong>:
+                特定のエンティティや関係に言及する文書を正確に取得<br />
+                3. <strong>セマンティック Retriever</strong>: バックアップとして意味検索
+              </li>
+              <li>
+                <strong>ReAct 型のエージェント</strong>（例:
+                LangChain）が問いを分解し、構造化された事実と根拠文書を取得して回答を構成する。
+              </li>
+              <li>本番向けの改善案: Cypher の自己修正、文書の再ランキング、ツールの拡張。</li>
+            </ul>
+            <h4>やさしい説明 <span class="badge badge--supplement">補足</span></h4>
+            <div class="mermaid-container"><div class="mermaid-target" id="mermaid-13"></div></div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>観点</th>
+                    <th>ベクトル RAG</th>
+                    <th>Graph RAG</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>得意な質問</td>
+                    <td>「〜について書かれた箇所は？」（意味の近さ）</td>
+                    <td>「AとBの関係は？」「条件に合うものを集計して」（構造・経路・集計）</td>
+                  </tr>
+                  <tr>
+                    <td>根拠の見え方</td>
+                    <td>取得チャンク</td>
+                    <td>関係・経路・元文書へのリンク</td>
+                  </tr>
+                  <tr>
+                    <td>弱点</td>
+                    <td>断片化、複数ホップ</td>
+                    <td>KG の構築・保守コスト、スキーマ設計</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <blockquote>
+              <p>
+                「ReAct」は、推論（Reason）と行動（Act）を交互に繰り返して道具を使いこなすエージェントの型です（<span
+                  class="badge badge--supplement"
+                  >補足</span
+                >。用語の一般的な説明）。
+              </p>
+            </blockquote>
+            <p>
+              <strong>学習用の独自サンプル（Python）: KG Retriever を「道具」として用意する</strong>
+            </p>
+            <div class="code-block">
+              <div class="code-block__bar">
+                <span class="code-block__lang">python</span
+                ><button class="code-block__copy" type="button" data-copy-target="code-10">
+                  <i class="ti ti-copy"></i>コピー
+                </button>
+              </div>
+              <pre><code id="code-10" class="language-python">from neo4j import GraphDatabase
+
+driver = GraphDatabase.driver(
+    &quot;bolt://localhost:7687&quot;, auth=(&quot;neo4j_readonly&quot;, &quot;your-password&quot;)
+)
+
+
+def kg_retriever(cypher: str, params: dict | None = None) -&gt; list[dict]:
+    &quot;&quot;&quot;エージェントに渡す道具: Cypherを実行して結果を辞書のリストで返す。
+
+    セッションのアクセスモードは環境によって書き込みの防止を保証しない場合が
+    あるため、接続ユーザー自体を読み取り専用ロールにしておくこと。
+    &quot;&quot;&quot;
+    with driver.session() as session:
+        result = session.run(cypher, params or {})
+        return [record.data() for record in result]</code></pre>
+            </div>
+
+            <h4>つまずきポイント</h4>
+            <ul>
+              <li>
+                「Graph RAG はベクトル RAG
+                の完全な置き換え」ではありません。本書もセマンティック検索を<strong>バックアップ</strong>として併用する構成です
+                [S4]。
+              </li>
+              <li>
+                質問の種類によって最適な道具が違うため、エージェントが<strong>道具を選べる設計</strong>が重要です。
+              </li>
+            </ul>
+            <h4>確認問題</h4>
+            <ol>
+              <li>ベクトル RAG の限界を 2 つ挙げてください。</li>
+              <li>第13章の Graph RAG で追加される 3 つのツールを答えてください。</li>
+            </ol>
+            <details>
+              <summary>答え</summary>
+              <ol>
+                <li>
+                  文脈の断片化、マルチホップ推論の弱さ、埋め込みが固有名詞などを取りこぼす、ノイズや取りこぼし、のうち
+                  2 つ [S4]。
+                </li>
+                <li>
+                  KG Retriever、KG-Enhanced Document Retriever、セマンティック Retriever [S4]。
+                </li>
+              </ol>
+            </details>
+            <hr />
+            <h3 id="step-9">Step 9: 自然言語で KG に問い合わせる（Part 5 / 第14章）</h3>
+            <h4><span class="badge badge--source">書籍情報</span> 第14章の要点 [S5]</h4>
+            <ul>
+              <li>
+                舞台は警察・法執行の領域。ドメインの専門家が KG
+                に直感的にアクセスできる必要性から始まる。
+              </li>
+              <li>
+                RAG だけに頼らず、<strong>専門家の振る舞いを模倣する</strong>枠組みを提案。4
+                本柱:<br />
+                1. ユーザーの<strong>意図の検出とルーティング</strong><br />
+                2. <strong>スキーマ/メタデータの抽出と拡張</strong>（LLM が使いやすい形に）<br />
+                3. 専門家のような<strong>推論による精密なクエリ構築</strong><br />
+                4. 生の結果を<strong>簡潔で実行可能な要約</strong>に変換
+              </li>
+              <li>
+                RAG の弱点:
+                回答が取得の完全性と粒度に左右され、文脈が欠けたり断片化すると結論が変わりうる。
+              </li>
+              <li>
+                発想の転換:
+                「答えを生成する」から「<strong>正しい質問をする</strong>」へ。自然言語を、スキーマを意識した制約付きのたどりに変換する。
+              </li>
+              <li>
+                意図は、表示形式（グラフ/表/チャート/地図）と要求の種類（データ関連、システム文書、スキーマ質問、フィードバック）で分類。簡単で検証しやすいプロンプトから始める。
+              </li>
+              <li>
+                技術的なスキーマを、簡潔で概念的な<strong>LLM 向け表現</strong
+                >に変換し、用語・コード・関係の意味などの注釈を
+                <strong>YAML 設定</strong>で管理する。
+              </li>
+              <li>
+                クエリ生成は<strong>推論を先に行う構造化プロンプト</strong>:
+                使いたい関係を列挙し、計画を書き、そのうえで Cypher を出す。
+              </li>
+            </ul>
+            <h4>やさしい説明 <span class="badge badge--supplement">補足</span></h4>
+            <div class="mermaid-container"><div class="mermaid-target" id="mermaid-14"></div></div>
+
+            <p><strong>学習用の独自サンプル: スキーマ注釈（YAML）と推論先行プロンプト</strong></p>
+            <div class="code-block">
+              <div class="code-block__bar">
+                <span class="code-block__lang">yaml</span
+                ><button class="code-block__copy" type="button" data-copy-target="code-11">
+                  <i class="ti ti-copy"></i>コピー
+                </button>
+              </div>
+              <pre><code id="code-11" class="language-yaml"># schema_annotations.yaml (説明用のダミー)
+nodes:
+  Person:
+    description: &quot;人物。氏名と生年月日を持つ&quot;
+  Vehicle:
+    description: &quot;車両。色とナンバーの一部を持つ&quot;
+relationships:
+  OWNS:
+    description: &quot;人物が車両を所有している&quot;
+skip:
+  - InternalAuditLog   # ノイズになるため LLM には見せない</code></pre>
+            </div>
+
+            <div class="code-block">
+              <div class="code-block__bar">
+                <span class="code-block__lang">python</span
+                ><button class="code-block__copy" type="button" data-copy-target="code-0">
+                  <i class="ti ti-copy"></i>コピー
+                </button>
+              </div>
+              <pre><code id="code-0" class="language-python">CYPHER_PROMPT = &quot;&quot;&quot;あなたはグラフデータベースの専門家です。
+以下のスキーマだけを使って、質問に答える読み取り専用の Cypher を作ってください。
+
+# スキーマ
+{schema}
+
+# 質問
+{question}
+
+# 手順(この順番で出力)
+1. 使う予定のノード種別と関係を箇条書きにする
+2. クエリの計画を 2〜3 行で書く
+3. 最後に Cypher を ```cypher ブロックで 1 つだけ出す
+
+制約: CREATE / MERGE / DELETE / SET は使わない。スキーマに無い名前は使わない。
+&quot;&quot;&quot;</code></pre>
+            </div>
+
+            <p>
+              <strong>安全面の注意 <span class="badge badge--supplement">補足</span>:</strong> LLM
+              が生成した Cypher を実行する場合は、(1) 読み取り専用ユーザーで接続する、(2)
+              スキーマ検証や構文チェックを通す、(3) 件数上限（<code>LIMIT</code>）を課す、(4)
+              失敗時は誤りを伝えて再生成させる、といった対策を併用してください。
+            </p>
+            <p>
+              <strong>関連研究 <span class="badge badge--trend">動向</span>:</strong> テキストから
+              Cypher への変換を評価するベンチマーク CypherBench [S20]
+              など、この分野の研究も進んでいます。
+            </p>
+            <h4>つまずきポイント</h4>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>つまずき</th>
+                    <th>対処</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>生成された Cypher が存在しない関係名を使う</td>
+                    <td>スキーマを明示し、注釈で語彙を補う。実行前に検証する</td>
+                  </tr>
+                  <tr>
+                    <td>質問が曖昧で意図に合わない</td>
+                    <td>意図検出を独立ステップにして、必要なら聞き返す</td>
+                  </tr>
+                  <tr>
+                    <td>結果が大量で読めない</td>
+                    <td>要約ステップで洞察に変換し、表示形式の意図も活用する</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <h4>確認問題</h4>
+            <ol>
+              <li>第14章の 4 本柱を挙げてください。</li>
+              <li>なぜ「推論を先に書かせてから Cypher を出させる」のですか。</li>
+            </ol>
+            <details>
+              <summary>答え</summary>
+              <ol>
+                <li>
+                  意図の検出とルーティング、スキーマ/メタデータの抽出と拡張、専門家のような推論によるクエリ構築、結果の要約
+                  [S5]。
+                </li>
+                <li>
+                  使う関係や計画を先に明示させることで、スキーマから外れた誤ったクエリや論理の飛躍を減らせるため（章が推論先行の構造化プロンプトを採る理由
+                  [S5] に沿った整理）。
+                </li>
+              </ol>
+            </details>
+            <hr />
+            <h3 id="step-10">Step 10: LangGraph で QA エージェントを実装する（Part 5 / 第15章）</h3>
+            <h4><span class="badge badge--source">書籍情報</span> 第15章の要点 [S6][S7]</h4>
+            <ul>
+              <li>
+                第14章の考え方を統合し、<strong>LangGraph</strong> でオーケストレーション、<strong
+                  >Streamlit</strong
+                >
+                でフロントエンドを作る。
+              </li>
+              <li>
+                LangGraph は、状態を持つ複数アクターの LLM
+                アプリを構築するためのライブラリと説明されている [S7]。
+              </li>
+              <li>
+                パイプラインは、共有の状態を読み書きする専門エージェント（ノード）のモジュール型。<strong
+                  >Configuration Provider</strong
+                >
+                がプロンプト・例・ドメインメモを集約し、<strong>Schema Provider</strong> が Neo4j
+                の技術的スキーマを LLM 向けの概念ビューに変換する。
+              </li>
+              <li>
+                エージェントは、意図検出、スキーマ抽出、text-to-Cypher
+                生成（注釈とユーザーの現在の選択で補強）、エラー処理付きクエリ実行、リトライ/要約への動的ルーティング、最終要約を担う。
+              </li>
+              <li>
+                統合レイヤーは、パイプラインの実行を<strong>型付きのイベントストリーム</strong>として公開し、フロントエンドが進捗と結果を追跡できる。
+              </li>
+              <li>
+                Streamlit
+                アプリは会話履歴を保持し、処理の途中経過をリアルタイムに表示する。結果はグラフ・地図・表など最適な形式で出す。
+              </li>
+              <li>
+                ハンズオン: 発生中の犯罪から出発し、近くの
+                ANPR（ナンバー自動読取）カメラを探し、色や部分ナンバーの条件に合う車両を絞り込む調査を再現する
+                [S6]。
+              </li>
+            </ul>
+            <h4>やさしい説明 <span class="badge badge--supplement">補足</span></h4>
+            <div class="mermaid-container"><div class="mermaid-target" id="mermaid-15"></div></div>
+
+            <p>
+              <strong
+                >LangGraph の考え方（<span class="badge badge--supplement">補足</span>）:</strong
+              >
+              各ステップを「ノード」、ステップ間の遷移を「エッジ」、全ノードが共有するデータを「状態（State）」として定義します。<strong>条件付きエッジ</strong>を使えば、上図のようなリトライのループも自然に書けます。
+            </p>
+            <p><strong>学習用の独自サンプル: 状態とリトライを持つ最小の擬似実装</strong></p>
+            <div class="code-block">
+              <div class="code-block__bar">
+                <span class="code-block__lang">python</span
+                ><button class="code-block__copy" type="button" data-copy-target="code-12">
+                  <i class="ti ti-copy"></i>コピー
+                </button>
+              </div>
+              <pre><code id="code-12" class="language-python">from typing import TypedDict
+from langgraph.graph import StateGraph, START, END
+
+
+class State(TypedDict, total=False):
+    question: str
+    cypher: str
+    result: list
+    error: str
+    summary: str
+    retries: int
+
+
+def generate_cypher(state: State) -&gt; State:
+    # LLMでCypherを生成(実際にはスキーマ・注釈を注入する)
+    return {&quot;cypher&quot;: &quot;MATCH (n) RETURN n LIMIT 1&quot;}
+
+
+def execute_query(state: State) -&gt; State:
+    try:
+        # 実際にはDBで実行し、結果を辞書のリストで返す
+        return {&quot;result&quot;: [], &quot;error&quot;: &quot;&quot;}
+    except Exception as e:  # noqa: BLE001
+        return {&quot;error&quot;: str(e), &quot;retries&quot;: state.get(&quot;retries&quot;, 0) + 1}
+
+
+def summarize(state: State) -&gt; State:
+    return {&quot;summary&quot;: &quot;結果の要約(LLMで生成)&quot;}
+
+
+def route_after_execute(state: State) -&gt; str:
+    if state.get(&quot;error&quot;) and state.get(&quot;retries&quot;, 0) &lt; 2:
+        return &quot;retry&quot;
+    return &quot;summarize&quot;
+
+
+graph = StateGraph(State)
+graph.add_node(&quot;generate_cypher&quot;, generate_cypher)
+graph.add_node(&quot;execute_query&quot;, execute_query)
+graph.add_node(&quot;summarize&quot;, summarize)
+
+graph.add_edge(START, &quot;generate_cypher&quot;)
+graph.add_edge(&quot;generate_cypher&quot;, &quot;execute_query&quot;)
+graph.add_conditional_edges(
+    &quot;execute_query&quot;,
+    route_after_execute,
+    {&quot;retry&quot;: &quot;generate_cypher&quot;, &quot;summarize&quot;: &quot;summarize&quot;},
+)
+graph.add_edge(&quot;summarize&quot;, END)
+
+app = graph.compile()
+print(app.invoke({&quot;question&quot;: &quot;ダミーの質問&quot;, &quot;retries&quot;: 0}))</code></pre>
+            </div>
+
+            <blockquote>
+              <p>
+                LangGraph の API
+                は更新が続いています。上記は概念を示す簡略例なので、実装時は必ず公式ドキュメントの最新の書き方を確認してください。
+              </p>
+            </blockquote>
+            <h4>つまずきポイント</h4>
+            <ul>
+              <li>
+                <strong>状態の設計</strong
+                >が要です。何をどのノードが読み書きするかを最初に決めると、デバッグが容易になります（章にも「状態管理の設計」の節があります
+                [S2]）。
+              </li>
+              <li>
+                リトライは<strong>上限を必ず設ける</strong>こと。無限ループはコストと遅延の原因になります。
+              </li>
+            </ul>
+            <h4>確認問題</h4>
+            <ol>
+              <li>LangGraph のノード・エッジ・状態はそれぞれ何を表しますか。</li>
+              <li>章のパイプラインで「動的ルーティング」は何のために使われますか。</li>
+            </ol>
+            <details>
+              <summary>答え</summary>
+              <ol>
+                <li>
+                  ノード = 処理ステップ（エージェント）、エッジ = ステップ間の遷移、状態 =
+                  ノード間で共有するデータ。
+                </li>
+                <li>クエリ実行の結果に応じて、リトライか要約かを切り替えるため [S6]。</li>
+              </ol>
+            </details>
+            <hr />
+          </section>
+          <section id="sec-8" class="section">
+            <h2 id="sec-8">8. 付録（A〜C）の使い方</h2>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>付録</th>
+                    <th>内容 [S2]</th>
+                    <th>いつ読むか</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>A グラフ入門</strong></td>
+                    <td>グラフとは、ネットワークのモデルとしてのグラフ、グラフの表現方法</td>
+                    <td>グラフ理論に不慣れなら Ch1 と並行して</td>
+                  </tr>
+                  <tr>
+                    <td><strong>B Neo4j</strong></td>
+                    <td>
+                      Neo4j
+                      入門、インストール（サーバー/Desktop）、Cypher、プラグイン（APOC、GDS）、クリーニング
+                    </td>
+                    <td>ハンズオン開始前（Ch3 の前）に必須</td>
+                  </tr>
+                  <tr>
+                    <td><strong>C 構造化ソースからの KG 構築</strong></td>
+                    <td>
+                      microRNA-疾患関連を題材にした KG 構築（ウォームアップ、KG 構築、探索・分析）
+                    </td>
+                    <td>Ch3 の理解を補強したいとき</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p>
+              <strong
+                >Cypher の最初の 3 文（<span class="badge badge--supplement">補足</span>
+                学習用）</strong
+              >
+            </p>
+            <div class="code-block">
+              <div class="code-block__bar">
+                <span class="code-block__lang">cypher</span
+                ><button class="code-block__copy" type="button" data-copy-target="code-13">
+                  <i class="ti ti-copy"></i>コピー
+                </button>
+              </div>
+              <pre><code id="code-13" class="language-sql">// 作る
+CREATE (a:Person {name: &#x27;山田&#x27;})-[:WORKS_AT]-&gt;(c:Company {name: &#x27;Alpha&#x27;});
+
+// 探す
+MATCH (p:Person)-[:WORKS_AT]-&gt;(c:Company)
+RETURN p.name AS person, c.name AS company;
+
+// 全部消す(学習用DBでのみ実行すること)
+MATCH (n) DETACH DELETE n;</code></pre>
+            </div>
+
+            <hr />
+          </section>
+          <section id="sec-9" class="section">
+            <h2 id="sec-9">9. 書籍の外側の最新動向（2026年9月21日時点で確認できた範囲）</h2>
+
+            <p>
+              書籍が扱う「KG × LLM ×
+              RAG」は、書籍刊行（2025年10月）の前後も急速に動いています。国際的に知られた開発者・研究組織の一次情報を中心に整理します。
+            </p>
+            <h3>9.1 動向の整理</h3>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>トピック</th>
+                    <th>確認できた要点</th>
+                    <th>書籍の対応章</th>
+                    <th>出典</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>1</td>
+                    <td><strong>Microsoft GraphRAG</strong></td>
+                    <td>
+                      2024年4月の論文（Edge, Larson ら）。LLM で文書から<strong
+                        >エンティティ KG
+                        を作り、関連するエンティティ群（コミュニティ）ごとの要約を事前生成</strong
+                      >。質問時は各要約から部分回答を作り、最後に統合する。約 100
+                      万トークン級のデータに対する「全体を俯瞰する質問」で、従来の RAG
+                      より包括性と多様性が向上したと報告
+                    </td>
+                    <td>Ch6, Ch13</td>
+                    <td>[S9][S10]</td>
+                  </tr>
+                  <tr>
+                    <td>2</td>
+                    <td><strong>LazyGraphRAG</strong></td>
+                    <td>
+                      Microsoft Research が
+                      2024年11月に発表。<strong>事前の要約生成を不要</strong>にし、索引コストを抑える方式。同社の報告では、索引コストはベクトル
+                      RAG と同等で、フル GraphRAG の 0.1% 程度。全体質問でも同等の品質を、クエリ費用
+                      700 倍超の低減で実現とされる（ベンダー自身の報告）。2025年6月の追記で
+                      Microsoft Discovery と Azure
+                      Local（パブリックプレビュー）への統合が案内されている
+                    </td>
+                    <td>Ch13</td>
+                    <td>[S11]</td>
+                  </tr>
+                  <tr>
+                    <td>3</td>
+                    <td><strong>LlamaIndex Property Graph Index</strong></td>
+                    <td>
+                      ノードにラベルとプロパティを持つ<strong>本格的なプロパティグラフ</strong>を扱う構成。グラフ構築器と検索器がモジュール化。Neo4j
+                      をストアにできる。LlamaIndex 外で作られたグラフには text-to-Cypher や Cypher
+                      テンプレートの検索器が有用とドキュメントが説明
+                    </td>
+                    <td>Ch3, Ch13, Ch14</td>
+                    <td>[S12][S13][S14]</td>
+                  </tr>
+                  <tr>
+                    <td>4</td>
+                    <td><strong>Neo4j 開発者の実践記事</strong>（Tomaž Bratanič ら）</td>
+                    <td>
+                      2025年8月の記事で、LlamaCloud による契約書の情報抽出と Neo4j での KG
+                      構築を紹介。エンティティの重複排除やカスタム検索での GraphRAG
+                      精度向上も扱う。Neo4j の週次ニュースでは、契約書 KG を使った<strong
+                        >エージェント型 GraphRAG</strong
+                      >も紹介
+                    </td>
+                    <td>Ch5-6, Ch13</td>
+                    <td>[S12][S15][S22]</td>
+                  </tr>
+                  <tr>
+                    <td>5</td>
+                    <td><strong>KG の質と大きさ</strong></td>
+                    <td>
+                      LLM 生成 KG
+                      にエンティティ解決と誤りトリプルの除去を施し、エンティティと関係を約 40%
+                      減らしても、4 種のグラフベース RAG の性能が向上したという研究（DEG-RAG）
+                    </td>
+                    <td>Ch6-8</td>
+                    <td>[S18]</td>
+                  </tr>
+                  <tr>
+                    <td>6</td>
+                    <td><strong>エージェント型 KG-RAG</strong></td>
+                    <td>
+                      KG
+                      への問い合わせをエージェントの中核能力とし、<strong>複数ホップの推論</strong>を行う手法の研究（INRAExplorer）
+                    </td>
+                    <td>Ch13-15</td>
+                    <td>[S19]</td>
+                  </tr>
+                  <tr>
+                    <td>7</td>
+                    <td><strong>text-to-Cypher の評価</strong></td>
+                    <td>
+                      現代的な KG に対する精密な検索を評価するベンチマーク CypherBench。GraphRAG
+                      の検索部分の評価という位置づけ
+                    </td>
+                    <td>Ch14</td>
+                    <td>[S20]</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <h3>9.2 読み解くときの注意点</h3>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>注意点</th>
+                    <th>説明</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>ベンダー自身の数値</strong></td>
+                    <td>
+                      LazyGraphRAG
+                      のコスト比較などは提供元による報告です。自社データでの検証が前提です [S11]
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><strong>評価手法の偏り</strong></td>
+                    <td>
+                      GraphRAG の優位性は「LLM
+                      による判定」に依存する評価で示されることが多く、判定の偏り（位置や長さなど）を補正すると差が縮むとの指摘があります。ただし、これは二次的なブログ記事での分析なので、<strong>一次資料（原論文・追試）で確認</strong>してください
+                      [S21]
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><strong>コストの現実</strong></td>
+                    <td>
+                      フル GraphRAG は索引時に多数の LLM
+                      呼び出しが必要になり、コストが大きくなりえます。だからこそ軽量化の動き（LazyGraphRAG
+                      など）が出ています [S11][S21]
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><strong>書籍の立ち位置</strong></td>
+                    <td>
+                      書籍は特定の手法（GraphRAG 等）の紹介にとどまらず、<strong
+                        >KG の設計・構築・機械学習・問い合わせ</strong
+                      >を横断して扱う点が特徴です [S1]
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <h3>9.3 さらに学ぶための関連書籍・資料</h3>
+            <ul>
+              <li>
+                Manning の書籍ページの関連タイトルに <em>Essential GraphRAG</em> などが並んでいます
+                [S1]。Bratanič 氏がこの書籍を題材にしたオンラインイベントも開催されています [S17]。
+              </li>
+              <li>
+                Neo4j の 2023年の開発者ブログは、KG が初めての人向けに、Jim Webber・Jesús Barrasa
+                両氏の無料書籍
+                <em>Building Knowledge Graphs: A Practitioner's Guide</em> を案内しています [S16]。
+              </li>
+            </ul>
+            <blockquote>
+              <p>
+                正誤表や改訂情報など、書籍刊行後の更新については本調査では確認していません。Manning
+                の書籍ページと GitHub リポジトリの更新履歴を参照してください [S1][S8]。
+              </p>
+            </blockquote>
+            <hr />
+          </section>
+          <section id="sec-10" class="section">
+            <h2 id="sec-10">10. 学習ロードマップ（8 週間の目安）</h2>
+
+            <p>以下は、筆者の<strong>提案例</strong>です（週 5〜8 時間を想定）。</p>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>週</th>
+                    <th>対象</th>
+                    <th>ゴール</th>
+                    <th>成果物</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>1</td>
+                    <td>本ガイド第3〜6章、Ch1、付録A・B</td>
+                    <td>用語に慣れ、Neo4j を動かす</td>
+                    <td>環境構築完了、小さな KG（10 ノード程度）</td>
+                  </tr>
+                  <tr>
+                    <td>2</td>
+                    <td>Ch2、Ch3</td>
+                    <td>オントロジーからの KG 構築の流れを理解</td>
+                    <td>Ch3 のコードを再現</td>
+                  </tr>
+                  <tr>
+                    <td>3</td>
+                    <td>Ch4、付録C</td>
+                    <td>複数データ統合と LLM 解釈を体験</td>
+                    <td>統合 KG の簡単な分析メモ</td>
+                  </tr>
+                  <tr>
+                    <td>4</td>
+                    <td>Ch5、Ch6</td>
+                    <td>LLM による抽出パイプラインを作る</td>
+                    <td>自分の文書 5〜10 件で抽出→格納</td>
+                  </tr>
+                  <tr>
+                    <td>5</td>
+                    <td>Ch7、Ch8</td>
+                    <td>NED の 3 段階を実装</td>
+                    <td>Ollama で NED を試す</td>
+                  </tr>
+                  <tr>
+                    <td>6</td>
+                    <td>Ch9、Ch10（余裕があれば Ch11-12）</td>
+                    <td>グラフ特徴量と機械学習の基礎</td>
+                    <td>PageRank などの結果の解釈</td>
+                  </tr>
+                  <tr>
+                    <td>7</td>
+                    <td>Ch13</td>
+                    <td>KG-RAG の設計を理解</td>
+                    <td>3 つのツールを持つ簡単なエージェント</td>
+                  </tr>
+                  <tr>
+                    <td>8</td>
+                    <td>Ch14、Ch15</td>
+                    <td>自然言語問い合わせの QA エージェント</td>
+                    <td>LangGraph の最小パイプライン</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="mermaid-container"><div class="mermaid-target" id="mermaid-16"></div></div>
+
+            <hr />
+          </section>
+          <section id="sec-11" class="section">
+            <h2 id="sec-11">11. 実務での判断: KG を使うべきか、どう失敗を避けるか</h2>
+
+            <h3>11.1 判断フロー（<span class="badge badge--supplement">補足</span> 筆者の整理）</h3>
+            <p>
+              第1章には「KG を使うべきか判断する」節があります
+              [S2]。以下は、実務でよく使われる観点をまとめた<strong>独自の判断フロー</strong>です。書籍の結論とは異なる可能性があるため、本文と併せて検討してください。
+            </p>
+            <div class="mermaid-container"><div class="mermaid-target" id="mermaid-17"></div></div>
+
+            <h3>11.2 よくある落とし穴と対策</h3>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>落とし穴</th>
+                    <th>症状</th>
+                    <th>対策</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>ユースケース不明のまま構築</td>
+                    <td>誰も使わない大きな KG ができる</td>
+                    <td>第3章の姿勢どおり、<strong>ビジネス目標と利用者</strong>から始める [S3]</td>
+                  </tr>
+                  <tr>
+                    <td>エンティティの重複・表記ゆれ</td>
+                    <td>同一人物が複数ノードに分裂</td>
+                    <td>エンティティ解決（Ch6）、NED（Ch7-8）で統合 [S18]</td>
+                  </tr>
+                  <tr>
+                    <td>LLM 抽出の誤り</td>
+                    <td>存在しない関係がグラフに混入</td>
+                    <td>スキーマ検証、根拠文の保存、サンプリング確認</td>
+                  </tr>
+                  <tr>
+                    <td>生成 Cypher の誤り・危険</td>
+                    <td>存在しない関係名、意図しない書き込み</td>
+                    <td>スキーマ注入、読み取り専用ユーザー、検証、リトライ上限</td>
+                  </tr>
+                  <tr>
+                    <td>更新運用の欠如</td>
+                    <td>KG が古くなり、RAG の答えがずれる</td>
+                    <td>更新の担当・頻度・差分取り込みを設計</td>
+                  </tr>
+                  <tr>
+                    <td>アクセス制御の見落とし</td>
+                    <td>機密データが回答に混ざる</td>
+                    <td>ノード/関係単位の権限設計、ユーザー別の問い合わせ制約</td>
+                  </tr>
+                  <tr>
+                    <td>コストの見積り不足</td>
+                    <td>LLM の索引費用が想定超過</td>
+                    <td>小規模で試算、軽量手法（LazyGraphRAG 等）も検討 [S11]</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <hr />
+          </section>
+          <section id="sec-12" class="section">
+            <h2 id="sec-12">12. 総合確認問題</h2>
+
+            <details>
+              <summary>
+                問題 1: KG と LLM を組み合わせる理由を、「補い合い」の観点で説明してください。
+              </summary>
+              <p>
+                KG は正確な関係・根拠・統一語彙を提供し、LLM のハルシネーションや不透明性を補う。LLM
+                は文章からの知識抽出、曖昧性解消、自然言語での問い合わせと要約で KG
+                の構築・活用を助ける。
+              </p>
+            </details>
+            <details>
+              <summary>問題 2: RDF と LPG のどちらを選ぶか、判断基準を述べてください。</summary>
+              <p>
+                用途で決める。標準化・相互運用・推論・オントロジー記述を重視するなら
+                RDF、関係ごとのメタデータや効率的なたどりを重視するなら
+                LPG。第3章は、関係のメタデータが重要な事例で LPG を採用している [S3]。
+              </p>
+            </details>
+            <details>
+              <summary>問題 3: NER と NED の違いを例で説明してください。</summary>
+              <p>
+                NER は「Apple」が固有表現だと見つけること。NED
+                は、その「Apple」が企業か果物かを文脈とオントロジーで特定し、正しいノードに結びつけること。
+              </p>
+            </details>
+            <details>
+              <summary>
+                問題 4: ベクトル RAG では苦手で、Graph RAG が得意な質問の例を挙げてください。
+              </summary>
+              <p>
+                「A
+                社の子会社の、そのまた取引先で、条件を満たす企業を集計して」のような、複数ホップの関係をたどって集計する質問。
+              </p>
+            </details>
+            <details>
+              <summary>
+                問題 5: LLM に Cypher を生成させるとき、精度と安全性を上げる工夫を 3
+                つ挙げてください。
+              </summary>
+              <p>
+                スキーマと注釈を渡す、推論を先に書かせてから Cypher
+                を出力させる、読み取り専用ユーザーで実行する、実行前の検証とエラー時の再生成、件数上限の設定、など
+                [S5]（一部は筆者の補足）。
+              </p>
+            </details>
+            <details>
+              <summary>問題 6: GNN のメッセージパッシングを説明してください。</summary>
+              <p>
+                各ノードが隣接ノードの情報を集約し、自分の表現を更新する処理を繰り返すことで、構造と属性を反映したベクトルを得る。
+              </p>
+            </details>
+            <details>
+              <summary>
+                問題 7: LangGraph で「リトライ付き」のパイプラインを作るとき、必要な要素は？
+              </summary>
+              <p>
+                共有の状態（エラー・再試行回数を含む）、各処理ノード、条件付きエッジ（成功なら要約、失敗なら再生成、上限到達なら打ち切り）。
+              </p>
+            </details>
+            <details>
+              <summary>
+                問題 8: GraphRAG 系の手法の効果を評価するときの注意点を述べてください。
+              </summary>
+              <p>
+                提供元の数値は自社データで検証する。LLM
+                判定による評価の偏り（位置や長さなど）に留意する。KG
+                の質（重複排除・誤り除去）が性能に影響する [S11][S18][S21]。
+              </p>
+            </details>
+            <hr />
+          </section>
+          <section id="sec-13" class="section">
+            <h2 id="sec-13">13. 参考文献・ソース URL</h2>
+
+            <p>
+              以下は本ガイドの作成にあたって確認した情報源です（確認日: 2026年9月21日）。本文の
+              <code>[S番号]</code> に対応します。
+            </p>
+            <h3>A. 書籍の公式情報（出版社・配信元）</h3>
+            <ul>
+              <li>
+                <strong>[S1] Manning 書籍ページ</strong> —
+                書誌情報、学習目標、著者、序文、価格・関連書籍<br />
+                <a
+                  href="https://www.manning.com/books/knowledge-graphs-and-llms-in-action"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >https://www.manning.com/books/knowledge-graphs-and-llms-in-action</a
+                >
+              </li>
+              <li>
+                <strong>[S2] O'Reilly 書籍ページ</strong> —
+                目次（章・節の見出し）、難易度・ページ数<br />
+                <a
+                  href="https://www.oreilly.com/library/view/knowledge-graphs-and/9781633439894/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >https://www.oreilly.com/library/view/knowledge-graphs-and/9781633439894/</a
+                >
+              </li>
+              <li>
+                <strong>[S3] Manning 第3章プレビュー</strong> — 章概要、FAQ（RDF と
+                LPG、HPO、環境）<br />
+                <a
+                  href="https://www.manning.com/preview/knowledge-graphs-and-llms-in-action/chapter-3"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >https://www.manning.com/preview/knowledge-graphs-and-llms-in-action/chapter-3</a
+                >
+              </li>
+              <li>
+                <strong>[S4] Manning 第13章プレビュー</strong> — KG-RAG、ベクトル RAG の限界、3
+                つのツール<br />
+                <a
+                  href="https://www.manning.com/preview/knowledge-graphs-and-llms-in-action/chapter-13"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >https://www.manning.com/preview/knowledge-graphs-and-llms-in-action/chapter-13</a
+                >
+              </li>
+              <li>
+                <strong>[S5] Manning 第14章プレビュー</strong> — 自然言語での KG 問い合わせ、4
+                本柱<br />
+                <a
+                  href="https://www.manning.com/preview/knowledge-graphs-and-llms-in-action/chapter-14"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >https://www.manning.com/preview/knowledge-graphs-and-llms-in-action/chapter-14</a
+                >
+              </li>
+              <li>
+                <strong>[S6] Manning 第15章プレビュー</strong> — LangGraph パイプラインと Streamlit
+                アプリ<br />
+                <a
+                  href="https://www.manning.com/preview/knowledge-graphs-and-llms-in-action/chapter-15"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >https://www.manning.com/preview/knowledge-graphs-and-llms-in-action/chapter-15</a
+                >
+              </li>
+              <li>
+                <strong>[S7] liveBook 第15章</strong> — LangGraph の説明、章の構成<br />
+                <a
+                  href="https://livebook.manning.com/book/knowledge-graphs-and-llms-in-action/chapter-15"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >https://livebook.manning.com/book/knowledge-graphs-and-llms-in-action/chapter-15</a
+                >
+              </li>
+            </ul>
+            <h3>B. 書籍のコード</h3>
+            <ul>
+              <li>
+                <strong>[S8] GitHub: alenegro81/knowledge-graphs-and-llms-in-action</strong> —
+                各章のコード、README（Python の版、config.ini、make）<br />
+                <a
+                  href="https://github.com/alenegro81/knowledge-graphs-and-llms-in-action"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >https://github.com/alenegro81/knowledge-graphs-and-llms-in-action</a
+                >
+              </li>
+            </ul>
+            <h3>C. GraphRAG（Microsoft Research）</h3>
+            <ul>
+              <li>
+                <strong
+                  >[S9] "From Local to Global: A Graph RAG Approach to Query-Focused
+                  Summarization"</strong
+                >（Edge, Trinh, Cheng, Bradley, Chao, Mody, Truitt, Metropolitansky, Ness,
+                Larson）<br />
+                <a href="https://arxiv.org/pdf/2404.16130" target="_blank" rel="noopener noreferrer"
+                  >https://arxiv.org/pdf/2404.16130</a
+                >
+              </li>
+              <li>
+                <strong>[S10] Microsoft Research: Project GraphRAG — Publications</strong><br />
+                <a
+                  href="https://www.microsoft.com/en-us/research/project/graphrag/publications/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >https://www.microsoft.com/en-us/research/project/graphrag/publications/</a
+                >
+              </li>
+              <li>
+                <strong
+                  >[S11] Microsoft Research Blog: LazyGraphRAG: Setting a new standard for quality
+                  and cost</strong
+                >（Darren Edge, Ha Trinh, Jonathan Larson）<br />
+                <a
+                  href="https://www.microsoft.com/en-us/research/blog/lazygraphrag-setting-a-new-standard-for-quality-and-cost/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >https://www.microsoft.com/en-us/research/blog/lazygraphrag-setting-a-new-standard-for-quality-and-cost/</a
+                >
+              </li>
+            </ul>
+            <h3>D. 実装ツールと開発者の実践記事</h3>
+            <ul>
+              <li>
+                <strong
+                  >[S12] Neo4j Developer Blog: Customizing property graph index in
+                  LlamaIndex</strong
+                >（Tomaž Bratanič）<br />
+                <a
+                  href="https://neo4j.com/blog/developer/property-graph-index-llamaindex/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >https://neo4j.com/blog/developer/property-graph-index-llamaindex/</a
+                >
+              </li>
+              <li>
+                <strong>[S13] Neo4j Labs: LlamaIndex 連携</strong><br />
+                <a
+                  href="https://neo4j.com/labs/genai-ecosystem/llamaindex/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >https://neo4j.com/labs/genai-ecosystem/llamaindex/</a
+                >
+              </li>
+              <li>
+                <strong>[S14] LlamaIndex ドキュメント: Neo4j Property Graph Index</strong><br />
+                <a
+                  href="https://developers.llamaindex.ai/python/examples/property_graph/property_graph_neo4j/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >https://developers.llamaindex.ai/python/examples/property_graph/property_graph_neo4j/</a
+                >
+              </li>
+              <li>
+                <strong>[S15] Tomaž Bratanič: From Legal Documents to Knowledge Graphs</strong
+                >（2025年8月）<br />
+                <a
+                  href="https://medium.com/neo4j/from-legal-documents-to-knowledge-graphs-ccd9cb062320"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >https://medium.com/neo4j/from-legal-documents-to-knowledge-graphs-ccd9cb062320</a
+                >
+              </li>
+              <li>
+                <strong
+                  >[S16] Neo4j Developer Blog: Knowledge Graphs &amp; LLMs: Real-Time Graph
+                  Analytics</strong
+                >（NaLLM プロジェクト、2023年）<br />
+                <a
+                  href="https://neo4j.com/blog/developer/knowledge-graph-llm-analytics/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >https://neo4j.com/blog/developer/knowledge-graph-llm-analytics/</a
+                >
+              </li>
+              <li>
+                <strong>[S17] Neo4j Live: Essential GraphRAG（イベントページ）</strong><br />
+                <a href="https://luma.com/27yn94zs" target="_blank" rel="noopener noreferrer"
+                  >https://luma.com/27yn94zs</a
+                >
+              </li>
+              <li>
+                <strong
+                  >[S22] This week in Neo4j: NODES, GraphRAG, agents, knowledge graph and
+                  more</strong
+                ><br />
+                <a
+                  href="https://neo4j.com/blog/twin4j/this-week-in-neo4j-graphrag-nodes-agents-knowledgegraph-and-more/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >https://neo4j.com/blog/twin4j/this-week-in-neo4j-graphrag-nodes-agents-knowledgegraph-and-more/</a
+                >
+              </li>
+            </ul>
+            <h3>E. 研究論文・二次資料</h3>
+            <ul>
+              <li>
+                <strong
+                  >[S18] "Less is More: Denoising Knowledge Graphs For Retrieval Augmented
+                  Generation"（DEG-RAG）</strong
+                ><br />
+                <a href="https://arxiv.org/pdf/2510.14271" target="_blank" rel="noopener noreferrer"
+                  >https://arxiv.org/pdf/2510.14271</a
+                >
+              </li>
+              <li>
+                <strong
+                  >[S19] "Agentic RAG with Knowledge Graphs for Complex Multi-Hop Reasoning in
+                  Real-World Applications"（INRAExplorer）</strong
+                ><br />
+                <a href="https://arxiv.org/pdf/2507.16507" target="_blank" rel="noopener noreferrer"
+                  >https://arxiv.org/pdf/2507.16507</a
+                >
+              </li>
+              <li>
+                <strong
+                  >[S20] "CypherBench: Towards Precise Retrieval over Full-scale Modern Knowledge
+                  Graphs in the LLM Era"</strong
+                ><br />
+                <a href="https://arxiv.org/pdf/2412.18702" target="_blank" rel="noopener noreferrer"
+                  >https://arxiv.org/pdf/2412.18702</a
+                >
+              </li>
+              <li>
+                <strong
+                  >[S21] Beancount.io Research Log: GraphRAG: From Local to Global Query-Focused
+                  Summarization</strong
+                >（二次資料。評価の偏りやコストに関する分析。参考レベルとして扱い、一次資料で確認してください）<br />
+                <a
+                  href="https://beancount.io/bean-labs/research-logs/2026/06/04/graphrag-local-to-global-query-focused-summarization"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >https://beancount.io/bean-labs/research-logs/2026/06/04/graphrag-local-to-global-query-focused-summarization</a
+                >
+              </li>
+            </ul>
+            <hr />
+            <h3>付記: 本ガイドの取り扱い</h3>
+            <ul>
+              <li>
+                書籍の本文は転載していません。章の解説は公開情報に基づく要約と、筆者による補足で構成されています。
+              </li>
+              <li>
+                正確な内容・最新の手順は、書籍本文、公式リポジトリ、各ツールの公式ドキュメントで必ず確認してください。
+              </li>
+              <li>
+                書籍の内容を深く学ぶには、Manning または O'Reilly
+                で書籍を入手して読むことを強く推奨します [S1][S2]。
+              </li>
+            </ul>
+          </section>
+        </div>
+
+        <footer class="footer">
+          <p>
+            本ガイドは Manning Publications の書籍「Knowledge Graphs and LLMs in Action」(著:
+            Alessandro Negro ほか) の非公式な読書ガイドです。書籍本文は転載していません。
+          </p>
+        </footer>
+      </main>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.12.0/mermaid.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/sql.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/yaml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
+    <script>
+      const DIAGRAMS = [
+        'flowchart TD\n  P1["Part 1 基礎 (Ch1-2)<br/>KGとLLMの関係・知能システムの設計"]\n  P2["Part 2 構造化データからKG構築 (Ch3-4)<br/>オントロジー・複数ソース統合"]\n  P3["Part 3 テキストからKG構築 (Ch5-8)<br/>抽出・LLM活用・固有表現の曖昧性解消"]\n  P4["Part 4 グラフ上の機械学習 (Ch9-12)<br/>特徴量・埋め込み・GNN"]\n  P5["Part 5 KG×LLMの情報検索 (Ch13-15)<br/>KG-RAG・自然言語での問い合わせ・QAエージェント"]\n\n  P1 --> P2\n  P1 --> P3\n  P2 --> P4\n  P3 --> P4\n  P2 --> P5\n  P3 --> P5\n  P4 -.->|"補完・推薦・不正検知を強化"| P5\n',
+        'flowchart LR\n  A["山田さん<br/>(Person)"] -->|"WORKS_AT"| B["Alpha社<br/>(Company)"]\n  B -->|"DEVELOPS"| C["製品X<br/>(Product)"]\n  A -->|"KNOWS"| D["佐藤さん<br/>(Person)"]\n  D -->|"WORKS_AT"| B\n',
+        'flowchart LR\n  KG["ナレッジグラフ<br/>構造化された関係・根拠・語彙"]\n  LLM["LLM<br/>言語理解・抽出・生成"]\n\n  KG -->|"根拠と文脈を供給<br/>(Ch13 KG-RAG)"| LLM\n  KG -->|"スキーマと語彙を供給<br/>(Ch14 Cypher生成)"| LLM\n  LLM -->|"文章から抽出<br/>(Ch5-6 KG構築)"| KG\n  LLM -->|"曖昧な名前を判別<br/>(Ch7-8 NED)"| KG\n  LLM -->|"結果を解釈・要約<br/>(Ch4, Ch14)"| KG\n',
+        'flowchart TD\n  S1["Step A: 書籍とコードを入手"] --> S2["Step B: Python仮想環境を作る"]\n  S2 --> S3["Step C: Neo4jを用意する(付録B)"]\n  S3 --> S4["Step D: プラグイン導入(APOC, GDS等)"]\n  S4 --> S5["Step E: config.iniに接続情報を書く"]\n  S5 --> S6["Step F: 各章のMakefileで実行"]\n',
+        'flowchart LR\n  A["知識の獲得<br/>文書・DB・専門家"] --> B["知識の表現<br/>KG・オントロジー"]\n  B --> C["推論エンジン"]\n  C --> D["回答・意思決定支援"]\n\n  subgraph R["推論エンジンの内訳 (Ch2 2.5)"]\n    C1["演繹推論<br/>ルールで確実に導く"]\n    C2["帰納推論・ML<br/>データからパターンを学ぶ"]\n    C3["LLM<br/>言語の理解と生成"]\n  end\n  C --- R\n',
+        'flowchart TD\n  B["ビジネス理解<br/>誰の何を助けるKGか"] --> D["データ理解<br/>どんなデータがあり、どんな意味か"]\n  D --> P["データ準備<br/>IDやラベルを整える"]\n  P --> M["KGモデル作成・更新<br/>ノード・エッジ・プロパティ"]\n  M --> Q["クエリ・推論<br/>臨床医の問いに答える"]\n  Q -.->|"改善点を反映"| B\n',
+        'flowchart LR\n  D["HpoDisease<br/>疾患ノード"] -->|"HAS_PHENOTYPIC_FEATURE<br/>(source, evidence, onset, frequency...)"| P1["HpoPhenotype<br/>具体的な特徴"]\n  P1 -->|"SUBCLASSOF"| P2["HpoPhenotype<br/>上位の特徴カテゴリ"]\n',
+        'flowchart LR\n  S1["PPIネットワーク<br/>(タンパク質同士の関係)"] --> M["IDの対応付け<br/>・統合"]\n  S2["タンパク質-疾患<br/>ネットワーク"] --> M\n  S3["公開KG (Hetionet)"] --> M\n  M --> KG["統合KG"]\n  KG --> A["グラフ分析<br/>(中心性・コミュニティ等)"]\n  A --> L["LLMが分析結果を<br/>自然言語で解釈・説明"]\n',
+        'flowchart TD\n  T["文書・アーカイブ"] --> C["チャンク分割"]\n  C --> E["LLMによる抽出<br/>エンティティ・関係"]\n  E --> V["検証<br/>スキーマ違反を除外"]\n  V --> N["正規化・クレンジング<br/>表記ゆれ・不要データの整理"]\n  N --> R["エンティティ解決<br/>同一実体を統合"]\n  R --> G["KGへ格納"]\n  G --> A["分析・検索・RAGで活用"]\n',
+        'flowchart LR\n  T["文章"] --> N["1. NER<br/>言及を見つける"]\n  N --> C["2. 候補選択<br/>オントロジーから候補を絞る"]\n  C --> D["3. 候補の曖昧性解消<br/>文脈でLLMが最適候補を選ぶ"]\n  D --> K["KGのノードへ結びつけ"]\n',
+        'flowchart LR\n  G["KG (Neo4j)"] --> F["グラフ特徴量<br/>次数・PageRank等"]\n  F --> T["表形式の特徴量テーブル"]\n  T --> M["通常のMLモデル<br/>(分類・回帰)"]\n  M --> R["予測結果をKGへ書き戻す"]\n',
+        'flowchart LR\n  G["グラフ構造"] --> ENC["エンコーダ<br/>ノードをベクトルへ"]\n  ENC --> Z["ノード埋め込み"]\n  Z --> DEC["デコーダ<br/>構造・関係・ラベルを復元/予測"]\n  DEC --> LOSS["損失を計算"]\n  LOSS -.->|"学習で更新"| ENC\n',
+        'flowchart TD\n  N1["隣人ノード1の情報"] --> AGG["集約<br/>(平均・和・アテンション)"]\n  N2["隣人ノード2の情報"] --> AGG\n  N3["隣人ノード3の情報"] --> AGG\n  SELF["自分の現在の状態"] --> UPD["更新"]\n  AGG --> UPD\n  UPD --> NEW["自分の新しい状態(表現)"]\n',
+        'flowchart TD\n  U["ユーザーの質問"] --> AG["ReAct型エージェント<br/>質問を分解して計画"]\n  AG --> T1["KG Retriever<br/>Cypherで事実・経路・集計を取得"]\n  AG --> T2["KG拡張 文書Retriever<br/>特定エンティティに言及する文書を取得"]\n  AG --> T3["セマンティックRetriever<br/>意味検索(バックアップ)"]\n  T1 --> CTX["根拠(構造化事実+文書)"]\n  T2 --> CTX\n  T3 --> CTX\n  CTX --> LLM["LLMが根拠に基づき回答を生成"]\n  LLM --> ANS["回答 + 根拠の提示"]\n',
+        'flowchart TD\n  Q["自然言語の質問"] --> I["1. 意図検出<br/>表示形式・要求の種類"]\n  I -->|"データ関連"| S["2. スキーマ取得・注釈付与<br/>LLM向けの概念スキーマ"]\n  I -->|"文書・スキーマ質問"| DOC["説明を返す"]\n  I -->|"フィードバック"| FB["記録する"]\n  S --> R["3. 推論先行のプロンプト<br/>関係の列挙 → 計画 → Cypher"]\n  R --> X["クエリ実行"]\n  X --> SUM["4. 結果の要約<br/>洞察として提示"]\n',
+        'flowchart TD\n  ST(["開始: ユーザーの質問"]) --> INT["意図検出ノード"]\n  INT --> SCH["スキーマ抽出ノード"]\n  SCH --> GEN["Cypher生成ノード"]\n  GEN --> EXE["クエリ実行ノード"]\n  EXE -->|"成功"| SUM["要約ノード"]\n  EXE -->|"エラー かつ 再試行回数に余裕あり"| GEN\n  EXE -->|"エラー かつ 上限到達"| SUM\n  SUM --> FIN(["終了: 回答と根拠を返す"])\n',
+        'flowchart LR\n  W1["週1<br/>環境・基礎"] --> W2["週2-3<br/>構造化データからKG"]\n  W2 --> W4["週4-5<br/>テキストからKG・NED"]\n  W4 --> W6["週6<br/>グラフML"]\n  W6 --> W7["週7-8<br/>KG-RAG・QAエージェント"]\n',
+        'flowchart TD\n  Q1{"データ同士の<br/>関係性が価値の中心か"}\n  Q1 -->|"はい"| Q2{"複数ホップの推論・説明責任・<br/>用語の統一が必要か"}\n  Q1 -->|"いいえ"| A1["通常のDBやベクトルRAGで<br/>十分な可能性が高い"]\n  Q2 -->|"はい"| Q3{"構築・保守の<br/>体制とコストを確保できるか"}\n  Q2 -->|"いいえ"| A2["まずベクトルRAGで開始し<br/>限界が出たらKGを検討"]\n  Q3 -->|"はい"| A3["KGの導入を検討<br/>小さな範囲から反復的に"]\n  Q3 -->|"いいえ"| A4["範囲を絞る、または<br/>既存KGやオントロジーの活用を検討"]\n',
+      ];
+
+      async function renderMermaid() {
+        if (typeof mermaid === 'undefined') return;
+        mermaid.initialize({
+          startOnLoad: false,
+          theme: 'dark',
+          securityLevel: 'loose',
+          fontFamily: '"Noto Sans JP", sans-serif',
+          flowchart: { useMaxWidth: false, htmlLabels: true },
+          themeVariables: {
+            fontSize: '16px',
+            primaryColor: '#132437',
+            primaryTextColor: '#eaf0fb',
+            primaryBorderColor: '#3d5a86',
+            lineColor: '#5c7aab',
+            secondaryColor: '#16283f',
+            tertiaryColor: '#0d1a2c',
+            background: '#07111e',
+            mainBkg: '#132437',
+            nodeTextColor: '#eaf0fb',
+            clusterBkg: '#0d1a2c',
+            clusterBorder: '#24405f',
+            edgeLabelBackground: '#132437',
+            textColor: '#eaf0fb',
+          },
+        });
+
+        if (document.fonts && document.fonts.ready) {
+          await document.fonts.ready;
+        }
+
+        for (let i = 0; i < DIAGRAMS.length; i++) {
+          const target = document.getElementById('mermaid-' + i);
+          if (!target) continue;
+          try {
+            const { svg } = await mermaid.render('mermaid-svg-' + i, DIAGRAMS[i]);
+            target.innerHTML = svg;
+            const svgEl = target.querySelector('svg');
+            if (svgEl) {
+              const vb = svgEl.getAttribute('viewBox');
+              svgEl.removeAttribute('width');
+              svgEl.removeAttribute('height');
+              svgEl.style.maxWidth = '100%';
+              svgEl.style.height = 'auto';
+              svgEl.style.overflow = 'visible';
+              if (vb) {
+                const parts = vb.split(/\s+/).map(Number);
+                if (parts.length === 4) {
+                  const isSeqOrState = /sequenceDiagram|stateDiagram/.test(DIAGRAMS[i]);
+                  const pad = isSeqOrState ? 110 : 15;
+                  svgEl.setAttribute(
+                    'viewBox',
+                    parts[0] + ' ' + parts[1] + ' ' + parts[2] + ' ' + (parts[3] + pad),
+                  );
+                  svgEl.style.width = parts[2] + 'px';
+                }
+              }
+            }
+          } catch (err) {
+            target.innerHTML =
+              '<pre style="color:#e5786b;font-size:13px;">Mermaid render error: ' +
+              String(err && err.message ? err.message : err) +
+              '</pre>';
+          }
+        }
+      }
+
+      function setupCopyButtons() {
+        function fallbackCopy(text) {
+          const ta = document.createElement('textarea');
+          ta.value = text;
+          ta.style.position = 'fixed';
+          ta.style.opacity = '0';
+          document.body.appendChild(ta);
+          ta.focus();
+          ta.select();
+          let ok = false;
+          try {
+            ok = document.execCommand('copy');
+          } catch (e) {
+            ok = false;
+          }
+          document.body.removeChild(ta);
+          return ok;
+        }
+
+        document.querySelectorAll('.code-block__copy').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            const id = btn.getAttribute('data-copy-target');
+            const codeEl = document.getElementById(id);
+            if (!codeEl) return;
+            const text = codeEl.textContent;
+
+            function onCopied() {
+              btn.classList.add('copied');
+              const original = btn.innerHTML;
+              btn.innerHTML = '<i class="ti ti-check"></i>コピー済み';
+              setTimeout(function () {
+                btn.classList.remove('copied');
+                btn.innerHTML = original;
+              }, 1600);
+            }
+
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+              navigator.clipboard.writeText(text).then(onCopied, function () {
+                if (fallbackCopy(text)) onCopied();
+              });
+            } else {
+              if (fallbackCopy(text)) onCopied();
+            }
+          });
+        });
+      }
+
+      function setupActiveNav() {
+        const watchIds = [
+          'sec-0',
+          'sec-1',
+          'sec-2',
+          'sec-3',
+          'sec-4',
+          'sec-5',
+          'sec-6',
+          'sec-7',
+          'sec-8',
+          'sec-9',
+          'sec-10',
+          'sec-11',
+          'sec-12',
+          'sec-13',
+          'step-1',
+          'step-2',
+          'step-3',
+          'step-4',
+          'step-5',
+          'step-6',
+          'step-7',
+          'step-8',
+          'step-9',
+          'step-10',
+        ];
+        const links = {};
+        document.querySelectorAll('.nav__link, .nav__sub-link').forEach(function (a) {
+          links[a.getAttribute('data-nav-target')] = a;
+        });
+
+        const observer = new IntersectionObserver(
+          function (entries) {
+            entries.forEach(function (entry) {
+              const id = entry.target.id;
+              const link = links[id];
+              if (!link) return;
+              if (entry.isIntersecting) {
+                Object.values(links).forEach(function (l) {
+                  l.classList.remove('active');
+                });
+                link.classList.add('active');
+              }
+            });
+          },
+          { rootMargin: '-20% 0px -70% 0px' },
+        );
+
+        watchIds.forEach(function (id) {
+          const el = document.getElementById(id);
+          if (el) observer.observe(el);
+        });
+      }
+
+      document.addEventListener('DOMContentLoaded', function () {
+        renderMermaid().then(function () {
+          if (typeof hljs !== 'undefined') {
+            hljs.configure({ ignoreUnescapedHTML: true });
+            hljs.highlightAll();
+          }
+        });
+        setupCopyButtons();
+        setupActiveNav();
+      });
+    </script>
+  </body>
+</html>
