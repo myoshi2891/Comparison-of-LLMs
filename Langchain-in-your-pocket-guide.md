@@ -466,7 +466,23 @@ rag_prompt = ChatPromptTemplate.from_template(
 )
 
 # RAGチェーン（LCEL）
-rag_chain = {"context": retriever, "question": lambda x: x} | rag_prompt | llm
+# 入力は {"question": "..."} 形式。retriever には質問文字列だけを渡し、
+# 取得した Document の page_content を連結して context にする。
+from operator import itemgetter
+
+
+def format_docs(docs):
+    return "\n\n".join(doc.page_content for doc in docs)
+
+
+rag_chain = (
+    {
+        "context": itemgetter("question") | retriever | format_docs,
+        "question": itemgetter("question"),
+    }
+    | rag_prompt
+    | llm
+)
 ```
 
 ### 9.4〜9.5 Multi-document RAGとレコメンドシステム
