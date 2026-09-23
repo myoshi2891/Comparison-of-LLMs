@@ -166,7 +166,7 @@ flowchart LR
     D --> E["生成結果"]
 ```
 
-> **2026年9月時点の補足**: ローカルLLM運用は2026年時点でさらに一般化しており、Ollama・LM Studio・vLLMなどのツールがLangChainの `ChatOllama` 等の統合を通じて簡単に接続できます。またAPIキー管理は `.env` ファイルではなく、シークレットマネージャーやLangSmithのプロジェクト単位の環境変数管理を使うのが実務上の標準になっています。
+> **2026年9月時点の補足**: ローカルLLM運用は2026年時点でさらに一般化しており、Ollama・LM Studio・vLLMなどのツールがLangChainの `ChatOllama` 等の統合を通じて簡単に接続できます。またAPIキー管理は、本番では `.env` ファイルではなく、AWS Secrets Manager や Google Secret Manager などの外部シークレットマネージャーを使うのが実務上の標準になっています。LangSmith Deployment にデプロイする場合は、デプロイ設定のシークレット（環境変数）として登録します。なお LangSmith の「プロジェクト」はトレースを整理する単位であり、アプリケーションのシークレットを設定する場所ではありません。
 
 ---
 
