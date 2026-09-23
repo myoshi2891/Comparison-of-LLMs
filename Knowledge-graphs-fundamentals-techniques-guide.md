@@ -129,7 +129,7 @@ flowchart LR
 
 💡 この章では、本書の Chapter 1「Introduction to Knowledge Graphs」に相当する内容として、KG の基本イメージ、グラフの基礎、実世界の例を説明します。
 
-### 1.1 【本書の範囲】この章の節
+### 1.1 【本書の範囲】このガイドで扱う主な節
 
 1.1 Graphs、1.2 Representing Knowledge as Graphs、1.3 Examples of Knowledge Graphs、1.4 How to Read This Text
 
@@ -213,7 +213,7 @@ Hogan らの論文 *Knowledge Graphs*（ACM Computing Surveys, 第54巻第4号, 
 
 💡 この章では、Chapter 2「Modeling and Representing Knowledge Graphs」に相当する内容として、KG をコンピュータで扱うためのデータの書き方（モデル）を説明します。KG を作る際の最初の設計判断がここで決まります。
 
-### 2.1 【本書の範囲】この章の節
+### 2.1 【本書の範囲】このガイドで扱う主な節
 
 2.1 Introduction、2.2 RDF Schema、2.3 Property-Centric Models、2.4 Wikidata Model、2.5 The Semantic Web Layer Cake、2.6 Schema Heterogeneity and Semantic Labeling
 
@@ -369,7 +369,7 @@ Candidate Recommendation は、勧告（Recommendation）に進む前の段階�
 
 💡 この章では、Chapter 3 に相当する内容として、KG を作る材料になるデータを、どうやって探し集めるかを説明します。Part II（構築）の入り口です。
 
-### 3.1 【本書の範囲】この章の節
+### 3.1 【本書の範囲】このガイドで扱う主な節
 
 3.1 Introduction、3.2 Focused Crawling、3.3 Influential Systems and Methodologies
 
@@ -435,7 +435,7 @@ flowchart TD
 
 💡 この章では、Chapter 4 に相当する内容として、文章から「人名」「組織名」「地名」などの名前を見つけ出す技術を説明します。文章を KG のノードに変える最初の一歩です。
 
-### 4.1 【本書の範囲】この章の節
+### 4.1 【本書の範囲】このガイドで扱う主な節
 
 4.1 Introduction、4.2 Why Is Information Extraction Hard?、4.3 Approaches for Named Entity Recognition、4.4 Deep Learning for Named Entity Recognition、4.5 Domain-Specific Named Entity Recognition、4.6 Evaluating Information Extraction Quality
 
@@ -508,7 +508,7 @@ PER は人名、ORG は組織名を表します。「Tim Berners-Lee」が2単�
 
 💡 この章では、Chapter 5 に相当する内容として、Web ページの構造を手がかりにデータを取り出す方法を説明します。文章だけでなく、商品一覧のような「型のあるページ」から効率よく事実を集められます。
 
-### 5.1 【本書の範囲】この章の節
+### 5.1 【本書の範囲】このガイドで扱う主な節
 
 5.1 Introduction、5.2 Wrapper Generation、5.3 Beyond Wrappers: Information Extraction over Structured Data
 
@@ -579,7 +579,7 @@ XPath とは、HTML の中の位置を指定する書き方です。次の式は
 
 💡 この章では、Chapter 6 に相当する内容として、文章から「AとBはどんな関係か」を取り出す技術を説明します。第4章で見つけた名前どうしを、線でつなぐ工程です。
 
-### 6.1 【本書の範囲】この章の節
+### 6.1 【本書の範囲】このガイドで扱う主な節
 
 6.1 Introduction、6.2 Ontologies and Programs、6.3 Techniques for Relation Extraction、6.4 Recent Research: Deep Learning for Relation Extraction、6.5 Beyond Relation Extraction: Event Extraction and Joint Information Extraction
 
@@ -644,7 +644,7 @@ flowchart TD
 
 💡 この章では、Chapter 7 に相当する内容として、事前に関係の種類を決められない場合や、SNS のような荒れた文章から知識を取り出す方法を説明します。
 
-### 7.1 【本書の範囲】この章の節
+### 7.1 【本書の範囲】このガイドで扱う主な節
 
 7.1 Introduction、7.2 Open Information Extraction、7.3 Social Media Information Extraction、7.4 Other Kinds of Nontraditional Information Extraction
 
@@ -682,7 +682,7 @@ SNS の文章には、略語、絵文字、ハッシュタグ、誤字、短さ�
 
 💡 この章では、Chapter 8 に相当する内容として、別々のデータ源にある「同じ実体を指すレコード」を見つけて結びつける技術を説明します。Part III（知識の追加・改良）の中心です。
 
-### 8.1 【本書の範囲】この章の節
+### 8.1 【本書の範囲】このガイドで扱う主な節
 
 8.1 Introduction、8.2 Formalism、8.3 Why Is Instance Matching Challenging?、8.4 Two-Step Pipeline、8.5 Evaluating the Two-Step Pipeline、8.6 Postsimilarity Steps、8.7 Formalizing Instance Matching: Swoosh、8.8 A Note on Research Frontiers、8.9 Data Cleaning beyond Instance Matching
 
@@ -759,7 +759,7 @@ flowchart LR
 
 💡 この章では、Chapter 9 に相当する内容として、KG の事実が「確実ではなく、確率的に正しい」という前提で、事実どうしの依存関係を使って正しさを判定する方法を説明します。
 
-### 9.1 【本書の範囲】この章の節
+### 9.1 【本書の範囲】このガイドで扱う主な節
 
 9.1 Introduction、9.2 Modeling Dependencies、9.3 Statistical Relational Learning Frameworks、9.4 Knowledge Graph Identification、9.5 Other Applications、9.6 Advanced Research: Data Programming
 
@@ -819,7 +819,7 @@ flowchart TD
 
 💡 この章では、Chapter 10 に相当する内容として、KG のノードと関係を数値ベクトルに変換して、機械学習で扱えるようにする方法を説明します。欠けた事実を予測する（リンク予測）ときの土台です。
 
-### 10.1 【本書の範囲】この章の節
+### 10.1 【本書の範囲】このガイドで扱う主な節
 
 10.1 Introduction、10.2 Embedding Architectures: A Primer、10.3 Embeddings beyond Words、10.4 Knowledge Graph Embeddings、10.5 Influential KGE Systems、10.6 Extrafactual Contexts、10.7 Applications
 
@@ -915,7 +915,7 @@ TransE は単純さが強みですが、【補足】1つの関係に対して多
 
 💡 この章では、Chapter 11 に相当する内容として、KG に書かれていない事実を「導き出す」推論と、必要な情報を「探し出す」検索を説明します。Part IV（KG へのアクセス）の入り口です。
 
-### 11.1 【本書の範囲】この章の節
+### 11.1 【本書の範囲】このガイドで扱う主な節
 
 11.1 Introduction、11.2 Reasoning、11.3 Retrieval、11.4 Retrieval versus Reasoning
 
@@ -971,7 +971,7 @@ flowchart TD
 
 💡 この章では、Chapter 12 に相当する内容として、KG から欲しい情報を取り出すための問い合わせ言語（SPARQL、SQL、グラフ DB の言語）を説明します。実務で最もよく使う章です。
 
-### 12.1 【本書の範囲】この章の節
+### 12.1 【本書の範囲】このガイドで扱う主な節
 
 12.1 Introduction、12.2 SPARQL、12.3 Relational Processing of Queries over Knowledge Graphs、12.4 NoSQL
 
@@ -1135,7 +1135,7 @@ GQL（Graph Query Language）は、プロパティグラフのための ISO 標�
 
 💡 この章では、Chapter 13 に相当する内容として、自然な言葉の質問に、KG を使って答える仕組みを説明します。第12章の問い合わせ言語を、利用者が意識せずに使えるようにする層です。
 
-### 13.1 【本書の範囲】この章の節
+### 13.1 【本書の範囲】このガイドで扱う主な節
 
 13.1 Introduction、13.2 Question Answering as a Stand-Alone Application、13.3 Question Answering as Knowledge Graph Querying
 
@@ -1199,7 +1199,7 @@ Turtle データに含まれる `ex:locatedIn` を使う形に変更しました
 
 💡 この章では、Chapter 14 に相当する内容として、世界中の KG を Web でつなぎ合わせる考え方を説明します。Part V（エコシステム）の最初の章です。
 
-### 14.1 【本書の範囲】この章の節
+### 14.1 【本書の範囲】このガイドで扱う主な節
 
 14.1 Introduction、14.2 Impact and Adoption of Linked Data Principles、14.3 Important Knowledge Graphs in Linked Open Data
 
@@ -1250,7 +1250,7 @@ flowchart LR
 
 💡 この章では、Chapter 15 に相当する内容として、企業と政府が KG をどう使うかを説明します。
 
-### 15.1 【本書の範囲】この章の節
+### 15.1 【本書の範囲】このガイドで扱う主な節
 
 15.1 Introduction、15.2 Enterprise、15.3 Governments and Nonprofits、15.4 Where Is the Future Headed?
 
@@ -1285,7 +1285,7 @@ flowchart LR
 
 💡 この章では、Chapter 16 に相当する内容として、生物学・化学・地球科学のような科学分野で KG とオントロジーがどう使われるかを説明します。
 
-### 16.1 【本書の範囲】この章の節
+### 16.1 【本書の範囲】このガイドで扱う主な節
 
 16.1 Introduction、16.2 Biology、16.3 Chemistry、16.4 Earth, Environment, and Geosciences
 
@@ -1313,7 +1313,7 @@ flowchart LR
 
 💡 この章では、Chapter 17 に相当する内容として、特定の領域の課題に絞って、Web から情報を集めて KG にし、分析に役立てる考え方を説明します。
 
-### 17.1 【本書の範囲】この章の節
+### 17.1 【本書の範囲】このガイドで扱う主な節
 
 17.1 Introduction、17.2 Domain-Specific Insight Graphs、17.3 Alternative System: DeepDive、17.4 Applications and Use-Cases
 
