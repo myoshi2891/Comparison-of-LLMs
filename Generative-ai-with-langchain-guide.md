@@ -129,6 +129,19 @@ flowchart LR
 
 ### 3-1. インストール（2026年9月時点の方法）
 
+まずプロジェクト専用の仮想環境を作成・有効化し、システムの Python 環境を汚さないようにします。
+
+```bash
+# 仮想環境を作成
+python -m venv .venv
+
+# 有効化（macOS / Linux）
+source .venv/bin/activate
+
+# 有効化（Windows PowerShell）
+# .venv\Scripts\Activate.ps1
+```
+
 ```bash
 # 最新の安定版 LangChain をインストール
 pip install -U langchain
@@ -247,7 +260,17 @@ flowchart TD
 | Human-in-the-loop | ツール実行前に人間の承認・編集・却下を挟む（送金やメール送信など重要な操作向け） |
 | Summarization | 会話履歴がコンテキスト上限に近づいたら古いメッセージを要約し、トークン超過を防ぐ |
 | PII Redaction | 個人識別情報（PII）を検出しマスキングする |
-| Model Router / Auto Mode | タスクの内容に応じて呼び出すモデルを動的に切り替える（2026年に追加された実験的機能） |
+
+> **組み込みではない実験的ミドルウェア**: タスクの内容に応じて呼び出すモデルを動的に切り替える **Model Router / Auto Mode** は、LangChain 本体の組み込みミドルウェアではなく、外部パッケージ **langchain-typesafe** が提供する実験的ミドルウェアです。3-1 のセットアップだけでは利用できないため、別途インストールしてからそのパッケージを import します（API は変更される可能性があるため、公開名はパッケージのドキュメントで確認してください）。
+>
+> ```bash
+> pip install -U langchain-typesafe
+> ```
+>
+> ```python
+> # Model Router / Auto Mode は langchain 本体ではなく langchain_typesafe から import する
+> import langchain_typesafe
+> ```
 
 ### 4-5. 標準コンテンツブロック（Standard Content Blocks）
 
@@ -255,7 +278,7 @@ LangChain 1.0のもう一つの目玉が「標準コンテンツブロック」�
 
 ### 4-6. MCP（Model Context Protocol）ツールとの統合
 
-2026年に入り、`langchain.mcp` 名前空間が正式に組み込まれ、外部のMCPサーバーが提供するツールを `create_agent` にそのまま接続できるようになりました。サーバー側からの追加入力要求（elicitation）はLangGraphの `interrupt()` 機構にマッピングされ、人間の回答を待ってから処理を再開する、という高度なフローも標準機能で扱えます。
+2026年に入り、`langchain.mcp` 名前空間が追加され、外部のMCPサーバーが提供するツールを `create_agent` にそのまま接続できるようになりました。サーバー側からの追加入力要求（elicitation）はLangGraphの `interrupt()` 機構にマッピングされ、人間の回答を待ってから処理を再開する、という高度なフローも `langchain.mcp` の機能として扱えます。ただし LangChain 1.4.2 時点で `langchain.mcp` は**ベータ**であり、API は今後変更される可能性があります。本番利用ではバージョンを固定し、アップグレード時は Changelog を確認してください。
 
 ---
 
