@@ -343,7 +343,7 @@ RDF は現在、改訂の途中にあります。私が確認できた範囲の�
 | SPARQL 1.2 | Working Draft（草案）の段階の文書が複数公開されている | W3C |
 | RDF 1.2 の主な追加 | ノードの種類に「triple term（トリプルを部品として扱う要素）」が加わる | W3C RDF 1.2 Concepts |
 
-Candidate Recommendation は、勧告（Recommendation）に進む前の段階です。W3C は、テストスイートに対して2つ以上の独立した実装が合格することなどを、次の段階へ進む条件にしています。**この状況は変わる可能性があるため、実装に使う前に W3C の最新ページを確認してください。**
+Candidate Recommendation は、勧告（Recommendation）に進む前の段階です。RDF 1.2 の場合、W3C は実装を募る公告の中で「十分な実装経験」を次の段階へ進む条件の一つとして示しています。具体的な出口条件（必要な実装数やテストスイートの合格条件等）は仕様ごとに異なるため、**実装に使う前に W3C の最新ページを確認してください。この状況は変わる可能性があります。**
 
 ### 2.10 ステップ7：Semantic Web Layer Cake と、スキーマの不一致
 
@@ -1158,9 +1158,9 @@ SPARQL や Cypher を書けるのは、一部の技術者だけです。「日�
 
 ```mermaid
 flowchart TD
-    Q["質問 日本の首都は"]
+    Q["質問 日本にある場所は"]
     Link["実体を特定 日本を ex:Japan に対応づける"]
-    Rel["関係を特定 首都を ex:capital に対応づける"]
+    Rel["関係を特定 「ある場所」を ex:locatedIn に対応づける"]
     Query["問い合わせを組み立てる"]
     KG["KG に実行"]
     Ans["答えを返す"]
@@ -1169,14 +1169,16 @@ flowchart TD
 
 各ノードの意味：
 - 「実体を特定」：質問中の言葉を、KG の実体に結びつける（エンティティリンキング）
-- 「関係を特定」：質問の表現（「首都」）を、KG の関係の名前に結びつける
+- 「関係を特定」：質問の表現（「にある場所」）を、KG の関係の名前に結びつける
 - 「問い合わせを組み立てる」：次のような SPARQL に変換する
 
 ```sparql
 PREFIX ex: <http://example.org/>
-# 主語と述語を固定し、目的語だけを変数 ?answer にして、それを返してもらう。
-SELECT ?answer WHERE { ex:Japan ex:capital ?answer }
+# ?answer ex:locatedIn ex:Japan → Japan に属するたるノードを変数 ?answer で受け、それを返す。
+SELECT ?answer WHERE { ?answer ex:locatedIn ex:Japan }
 ```
+
+Turtle データに含まれる `ex:locatedIn` を使う形に変更しました。元の問いの「日本の首都は？」を表現するには、別途 `ex:capital` のトリプル（`ex:Japan ex:capital ex:Tokyo`）をデータに追加する必要があります。ここでは既存の `ex:locatedIn` を使い、「日本に属する場所は？」という問いに変更しています。結果は Tokyo と Osaka の 2 件になります。
 
 ### 13.5 難しさ
 
@@ -1547,7 +1549,7 @@ Microsoft のプロジェクトページは、GraphRAG と LazyGraphRAG が、Az
 | RDF 1.2 Concepts and Abstract Data Model（W3C） | https://www.w3.org/TR/rdf12-concepts/ | 第2章、第18章 |
 | RDF 1.2 Semantics（W3C、CR Snapshot 2026-04-07） | https://www.w3.org/TR/2026/CR-rdf12-semantics-20260407/ | 第2章 |
 | W3C ニュース：RDF 1.2 の実装募集（2026-04-07） | https://www.w3.org/news/2026/w3c-invites-implementations-of-rdf-1-2-concepts-and-abstract-data-model-and-rdf-1-2-semantics/ | 第2章 |
-| What's New in RDF 1.2（W3C） | https://www.w3.org/TR/2026/DNOTE-rdf12-new-20260714/ | 第2章 |
+| What's New in RDF 1.2（W3C Group Note Draft・非規範文書） | https://www.w3.org/TR/2026/DNOTE-rdf12-new-20260714/ | 第2章 |
 | SPARQL 1.1 Query Language（W3C） | https://www.w3.org/TR/sparql11-query/ | 第12章 |
 | SPARQL 1.2 Protocol（W3C） | https://www.w3.org/TR/sparql12-protocol/ | 第12章、第18章 |
 
