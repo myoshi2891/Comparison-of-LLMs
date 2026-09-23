@@ -585,7 +585,7 @@ XPath とは、HTML の中の位置を指定する書き方です。次の式は
 
 ### 6.2 なぜ関係抽出が必要か
 
-名前だけを集めても、KG にはなりません。KG の価値は「関係」にあります。文章「Tim Berners-Lee proposed the Web at CERN」からは、「Tim Berners-Lee」と「CERN」の間の関係（働いていた、所属した、など）を取り出したいわけです。
+名前だけを集めても、KG にはなりません。KG の価値は「関係」にあります。文章「Tim Berners-Lee proposed the Web at CERN」からは、「Tim Berners-Lee」と「CERN」の間のどのような関係を取り出すかを慎重に考える必要があります。この文が直接支持するのは「提案イベントが CERN で起きた」という `proposedAt` のような関係であり、「勤務・所属」を表す `worksAt` を導くには「CERN で提案した」だけでは不十分です（別途 worksAt を裏付ける情報が必要です）。関係抽出では、文が実際に支持する関係の種類だけを取り出すことが重要です。
 
 ### 6.3 ステップ1：オントロジーで「取り出したい関係」を決める（6.2節）
 
@@ -855,6 +855,8 @@ head の座標 + relation のベクトル ≒ tail の座標
 
 - 正しい事実 (Tokyo, capital_of, Japan)：(1, 1) + (2, 0) = (3, 1)。Japan の座標と一致するので、距離は 0
 - 誤った事実 (Tokyo, capital_of, France)：(3, 1) と (0, 3) の距離は √13 ≒ 3.61。距離が大きく、誤りらしいと判断
+
+【前提】以下のコード例は **NumPy** を使用します。実行するには事前に `pip install numpy` でインストールしてください。NumPy を使わずに確認したい場合は、`np.array` を `list`、`np.linalg.norm` を手動の距離計算（`sum((a-b)**2 for a,b in zip(h,t))**0.5`）に置き換えると標準ライブラリだけで動作します。
 
 ```python
 import numpy as np
