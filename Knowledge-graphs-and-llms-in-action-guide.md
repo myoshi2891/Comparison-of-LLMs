@@ -288,6 +288,8 @@ source venv/bin/activate      # Windows は venv\Scripts\activate
 
 付録B.4 で APOC Core と GDS（Graph Data Science）のインストールが扱われます [S2]。APOC は便利なユーティリティ群、GDS は PageRank などのグラフアルゴリズム集です（第10章で使用）。
 
+> **セキュリティ上の注意**（[補足]）: APOC には `apoc.load.json` のように外部 URL を読み込むプロシージャがあります。LLM が生成した Cypher を実行する構成（第13章）では、`neo4j.conf` の `dbms.security.procedures.allowlist` で使うプロシージャだけを許可し、あわせてファイアウォール等で Neo4j サーバーの外向き通信を信頼できる宛先に限定してください。
+
 **Step E: 接続情報の設定**
 
 README は、Neo4j が起動していることを確認し、`config.ini` に認証情報を書くよう指示しています [S8]。
@@ -951,6 +953,9 @@ driver = GraphDatabase.driver(
 WRITE_CLAUSES = re.compile(
     r"\b(create|merge|delete|detach|set|remove|drop|foreach|load\s+csv)\b"
 )
+# プロシージャ呼び出し。apoc.load.json のような外部 URL 読み込みを防ぐため、
+# エージェント経由では CALL を一律に拒否する(必要なら許可リスト方式に切り替える)。
+PROCEDURE_CALL = re.compile(r"\bcall\b")
 # 文字列リテラル（シングル・ダブル引用符）を取り除く正規表現。
 # キーワード検査の前に適用して、リテラル内の delete/set 等による誤検知を防ぐ。
 _STRIP_LITERALS = re.compile(r"'[^']*'|\"[^\"]*\"")
@@ -959,13 +964,14 @@ MAX_RECORDS = 100
 
 
 def _is_write_query(cypher: str) -> bool:
-    """文字列リテラルを除いた Cypher に書き込み句が含まれるか判定する。
+    """文字列リテラルを除いた Cypher に書き込み句またはプロシージャ呼び出しが含まれるか判定する。
 
     例: MATCH (n {action: 'delete'}) RETURN n  →  リテラル内の delete を無視し False
         MERGE (n:Person {name: 'Alice'})        →  MERGE を検出し True
+        CALL apoc.load.json('https://...')      →  CALL を検出し True
     """
-    cypher_without_literals = _STRIP_LITERALS.sub("", cypher)
-    return bool(WRITE_CLAUSES.search(cypher_without_literals.lower()))
+    lowered = _STRIP_LITERALS.sub("", cypher).lower()
+    return bool(WRITE_CLAUSES.search(lowered) or PROCEDURE_CALL.search(lowered))
 
 
 def kg_retriever(cypher: str, params: dict | None = None) -> dict[str, list[dict] | bool]:
