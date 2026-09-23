@@ -1,4 +1,5 @@
 # 『Generative AI with LangChain』徹底解説ガイド
+
 ### 初学者のためのステップバイステップ学習ガイド（2026年9月版）
 
 > 対象書籍: **Generative AI with LangChain**（著者: Ben Auffarth、出版: Packt Publishing、2023年12月刊、376ページ）
@@ -80,7 +81,7 @@ flowchart LR
 | モデルファミリー | 開発元 | 書籍執筆時（2023年） | 2026年9月時点の位置づけ |
 |---|---|---|---|
 | GPTシリーズ | OpenAI | GPT-3.5 / GPT-4 | GPT-5世代へ進化、エージェント用途の関数呼び出しが標準化 |
-| Claudeシリーズ | Anthropic | Claude 1〜3 | Claude 4系・Sonnet/Opus/Haiku構成に加え、上位の Mythos ティアが登場 |
+| Claudeシリーズ | Anthropic | Claude 1〜3 | Claude Opus 5.5 / Sonnet 5 / Haiku 4.5 の構成に加え、上位ティアの Claude Fable 5.1 が登場（出典: [Anthropic Models overview](https://docs.claude.com/en/docs/about-claude/models/overview)） |
 | Gemini / PaLM | Google | PaLM, 初代Gemini | Gemini 3系へ進化 |
 | Llamaシリーズ | Meta | Llama 2 | 後継モデル群へ世代交代、オープンウェイト戦略が継続 |
 
@@ -134,6 +135,9 @@ pip install -U langchain
 
 # よく使う周辺パッケージ
 pip install -U langchain-anthropic langchain-openai langchain-google-genai
+
+# 後述の langchain_classic / langchain.mcp の例で使うパッケージ
+pip install -U langchain-classic "langchain[mcp]"
 ```
 
 ### 3-2. 重要な変更点：`langchain-classic` の登場
@@ -288,7 +292,7 @@ flowchart LR
 
 ### 5-4. 会話メモリのパターンと2026年の実装方針
 
-書籍では `ConversationBufferMemory`、`ConversationSummaryMemory`、`ConversationKGMemory` など複数のメモリクラスが紹介されています。これらは `langchain-classic` に残る歴史的な実装ですが、2026年の実務では、エージェントの状態（会話履歴を含む）を **LangGraphのState機構とCheckpointer（永続化レイヤー）** で管理するのが標準的な設計になっています。長時間動作するエージェントでは、会話履歴が肥大化した際に前述の Summarization ミドルウェアが自動的に古いメッセージを要約し、直近のやり取りだけを保持します。
+書籍では `ConversationBufferMemory`、`ConversationSummaryMemory`、`ConversationKGMemory` など複数のメモリクラスが紹介されています。これらは `langchain-classic` に残る歴史的な実装ですが、2026年の実務では、エージェントの状態（会話履歴を含む）を **LangGraphのState機構とCheckpointer（永続化レイヤー）** で管理するのが標準的な設計になっています。ただし State と Checkpointer は履歴を保持・永続化するだけで、メッセージを要約する機能は持ちません。長時間動作するエージェントで履歴の肥大化を抑えたい場合は、`create_agent` に前述の `SummarizationMiddleware` を明示的に組み込み、要約を発動するトリガー（トークン数やメッセージ数のしきい値）を設定します。こうして初めて、古いメッセージが要約され直近のやり取りだけが保持されます。
 
 ### 5-5. ガードレールとモデレーション
 
@@ -345,7 +349,7 @@ flowchart TD
 
 ### 8-3. 2026年の補足：モデルプロファイル
 
-LangChain 1.1（1.0の後続マイナーリリース）では、各Chat Modelが `.profile` 属性を通じて「構造化出力に対応しているか」「関数呼び出しをサポートするか」等の機能を宣言的に取得できるようになりました。このプロファイル情報はオープンソースプロジェクト **models.dev** から供給されており、プロバイダーごとの機能差を意識せずにコードを書きやすくなっています。
+LangChain 1.1（1.0の後続マイナーリリース）では、対応するChat Modelで `.profile` 属性を通じて「構造化出力に対応しているか」「関数呼び出しをサポートするか」等の機能を宣言的に取得できるようになりました。このプロファイル情報はオープンソースプロジェクト **models.dev** から供給されています。ただし `.profile` はベータ機能であり、モデルによっては未設定（`None`）だったり、項目が欠けていたり、実際の挙動と一致しない場合があります。機能判定に使う際は未設定・欠落を前提にし、取得できない場合は安全側の既定値（例: 構造化出力非対応として扱う）へフォールバックするか、プロバイダーのドキュメントや実際の呼び出し結果で確認するようにしましょう。
 
 ---
 
