@@ -946,8 +946,21 @@ driver = GraphDatabase.driver(
 WRITE_CLAUSES = re.compile(
     r"\b(create|merge|delete|detach|set|remove|drop|foreach|load\s+csv)\b"
 )
+# 文字列リテラル（シングル・ダブル引用符）を取り除く正規表現。
+# キーワード検査の前に適用して、リテラル内の delete/set 等による誤検知を防ぐ。
+_STRIP_LITERALS = re.compile(r"'[^']*'|\"[^\"]*\"")
 QUERY_TIMEOUT_SECONDS = 5
 MAX_RECORDS = 100
+
+
+def _is_write_query(cypher: str) -> bool:
+    """文字列リテラルを除いた Cypher に書き込み句が含まれるか判定する。
+
+    例: MATCH (n {action: 'delete'}) RETURN n  →  リテラル内の delete を無視し False
+        MERGE (n:Person {name: 'Alice'})        →  MERGE を検出し True
+    """
+    cypher_without_literals = _STRIP_LITERALS.sub("", cypher)
+    return bool(WRITE_CLAUSES.search(cypher_without_literals.lower()))
 
 
 def kg_retriever(cypher: str, params: dict | None = None) -> list[dict]:
@@ -957,7 +970,7 @@ def kg_retriever(cypher: str, params: dict | None = None) -> list[dict]:
     あるため、接続ユーザー自体を読み取り専用ロールにしておくこと。
     下の句の検査は多層防御の一枚目であり、これだけに頼らない。
     """
-    if WRITE_CLAUSES.search(cypher.lower()):
+    if _is_write_query(cypher):
         raise ValueError(f"読み取り専用のクエリだけを実行できます: {cypher}")
 
     with driver.session() as session:
@@ -1138,9 +1151,23 @@ def summarize(state: State) -> State:
     return {"summary": "結果の要約(LLMで生成)"}
 
 
+def handle_query_error(state: State) -> State:
+    """リトライ上限に達したエラーをユーザー向けのメッセージに変換する。"""
+    err = state.get("error") or "不明なエラーが発生しました"
+    return {"summary": f"クエリ実行に失敗しました: {err}"}
+
+
 def route_after_execute(state: State) -> str:
-    if state.get("error") and state.get("retries", 0) < 2:
-        return "retry"
+    """実行結果に応じて次のノードを決める。
+
+    - エラーあり かつ リトライ残り → "retry" (generate_cypher に戻る)
+    - エラーあり かつ リトライ上限超過 → "error" (handle_query_error へ)
+    - エラーなし → "summarize"
+    """
+    if state.get("error"):
+        if state.get("retries", 0) < 2:
+            return "retry"
+        return "error"
     return "summarize"
 
 
@@ -1148,15 +1175,17 @@ graph = StateGraph(State)
 graph.add_node("generate_cypher", generate_cypher)
 graph.add_node("execute_query", execute_query)
 graph.add_node("summarize", summarize)
+graph.add_node("handle_query_error", handle_query_error)
 
 graph.add_edge(START, "generate_cypher")
 graph.add_edge("generate_cypher", "execute_query")
 graph.add_conditional_edges(
     "execute_query",
     route_after_execute,
-    {"retry": "generate_cypher", "summarize": "summarize"},
+    {"retry": "generate_cypher", "summarize": "summarize", "error": "handle_query_error"},
 )
 graph.add_edge("summarize", END)
+graph.add_edge("handle_query_error", END)
 
 app = graph.compile()
 print(app.invoke({"question": "ダミーの質問", "retries": 0}))
