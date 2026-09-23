@@ -856,7 +856,7 @@ head の座標 + relation のベクトル ≒ tail の座標
 - 正しい事実 (Tokyo, capital_of, Japan)：(1, 1) + (2, 0) = (3, 1)。Japan の座標と一致するので、距離は 0
 - 誤った事実 (Tokyo, capital_of, France)：(3, 1) と (0, 3) の距離は √13 ≒ 3.61。距離が大きく、誤りらしいと判断
 
-【前提】以下のコード例は **NumPy** を使用します。実行するには事前に `pip install numpy` でインストールしてください。NumPy を使わずに確認したい場合は、`np.array` を `list`、`np.linalg.norm` を手動の距離計算（`sum((a-b)**2 for a,b in zip(h,t))**0.5`）に置き換えると標準ライブラリだけで動作します。
+【前提】以下のコード例は **NumPy** を使用します。実行するには事前に `pip install numpy` でインストールしてください。NumPy を使わずに確認したい場合は、`np.array` を `list`、`np.linalg.norm` を手動の距離計算（`pred = [a + b for a, b in zip(entity[h], relation[r])]` を作り、`sum((p - q) ** 2 for p, q in zip(pred, entity[t])) ** 0.5`）に置き換えると標準ライブラリだけで動作します。
 
 ```python
 import numpy as np
@@ -1174,7 +1174,7 @@ flowchart TD
 
 ```sparql
 PREFIX ex: <http://example.org/>
-# ?answer ex:locatedIn ex:Japan → Japan に属するたるノードを変数 ?answer で受け、それを返す。
+# ?answer ex:locatedIn ex:Japan → 日本に属するノードを変数 ?answer で受け、それを返す。
 SELECT ?answer WHERE { ?answer ex:locatedIn ex:Japan }
 ```
 
