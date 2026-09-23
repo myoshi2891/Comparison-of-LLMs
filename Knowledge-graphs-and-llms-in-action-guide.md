@@ -628,10 +628,15 @@ def extract_triples(llm_call: Callable[[str], str], text: str) -> list[dict]:
     for t in triples:
         if not isinstance(t, dict):
             continue  # 辞書でない要素は .get() が使えないので捨てる
+        head_type = t.get("head_type")
+        tail_type = t.get("tail_type")
+        relation  = t.get("relation")
+        # isinstance チェックを先に行い、非文字列値（None・int 等）が
+        # 集合の検索に渡されないようにする。
         if (
-            t.get("head_type") in ALLOWED_ENTITY_TYPES
-            and t.get("tail_type") in ALLOWED_ENTITY_TYPES
-            and t.get("relation") in ALLOWED_RELATIONS
+            isinstance(head_type, str) and head_type in ALLOWED_ENTITY_TYPES
+            and isinstance(tail_type, str) and tail_type in ALLOWED_ENTITY_TYPES
+            and isinstance(relation,  str) and relation  in ALLOWED_RELATIONS
         ):
             valid.append(t)  # スキーマ外の出力は捨てる
     return valid
@@ -976,9 +981,13 @@ def kg_retriever(cypher: str, params: dict | None = None) -> list[dict]:
     with driver.session() as session:
         # timeout で重いクエリを打ち切り、LIMIT のないクエリでも
         # 取り出す件数を MAX_RECORDS で頭打ちにする(結果の全件展開を防ぐ)。
+        # MAX_RECORDS + 1 件を試読みし、101件目が存在するかどうかで
+        # 切り捨てが起きたかを検出する。呼び出し側は truncated フラグで判断できる。
         with session.begin_transaction(timeout=QUERY_TIMEOUT_SECONDS) as tx:
             result = tx.run(cypher, params or {})
-            return [r.data() for r in itertools.islice(result, MAX_RECORDS)]
+            rows = [r.data() for r in itertools.islice(result, MAX_RECORDS + 1)]
+            truncated = len(rows) > MAX_RECORDS
+            return {"records": rows[:MAX_RECORDS], "truncated": truncated}
 ```
 
 #### つまずきポイント
