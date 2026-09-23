@@ -219,7 +219,7 @@ Flavio Copes氏の記事によれば、返ってくる`score`は各段階番号�
 const urgentQuestion = noul("The message conveys urgency or time-sensitivity");
 ```
 
-返ってくる値は`noul`という1つの数値（0〜1）だけです。1に近いほど「強くyes」、0に近いほど「強くno」、0.5付近は「yesともnoとも言い切れない」ことを意味します。Nounには`confidence`フィールドがありません。理由は、確率そのものがすでに不確実性を表しているためです。
+返ってくる値は`noul`という1つの数値（0〜1）だけです。1に近いほど「強くyes」、0に近いほど「強くno」、0.5付近は「yesともnoとも言い切れない」ことを意味します。Noulには`confidence`フィールドがありません。理由は、確率そのものがすでに不確実性を表しているためです。
 
 TypeSafe公式ドキュメントは、Noulの質問文は「高い値＝yes」になるように書くことを推奨しています。例えば「顧客は怒っているか」という問いに対し、`true`が「no」を意味するような反転した設計にすると、モデルの精度が落ちるだけでなく、半年後にコードを読む人も混乱します（この点は第12章の「矛盾した指示と基準」でも再度触れます）。
 
@@ -664,10 +664,16 @@ const { answers } = await client.systemOne({
   },
 });
 
-if (answers.risk.choice === "irreversible" || answers.deletes_files.noul > 0.5) {
+if (
+  answers.risk.choice !== "read_only" ||
+  answers.risk.confidence < 0.5 || // read_only 判定でも確信度が低ければ確認する
+  answers.deletes_files.noul > 0.5
+) {
   // 確信度が低い危険判定ほど、人間の確認を挟むべき
   await askHumanToConfirm(shellCommand);
 }
+// 注意: Jev の判定は確認を挟むかどうかの目安にすぎない。実際のシェル実行は
+// 許可リスト（allowlist）やサンドボックスなど決定論的な制御で必ず制限すること
 ```
 
 （DEV Community記事が紹介した実例では、曖昧な`rm -rf`コマンドが「irreversible」と判定されたものの確率0.56・確信度0.33と低く出たため、コード側が自動実行せず人間に確認を求める、という挙動が報告されています。）
@@ -784,7 +790,7 @@ DEV Community記事によれば、jev-1.13のレート制限は1秒あたり250,
 
 ```typescript
 // jev-latest ではなく、検証済みのバージョンを明示的に固定する
-const client = new TypeSafeClient({ model: "jev-1.13.0" });
+const client = new TypeSafeClient({ defaultModel: "jev-1.13.0" });
 ```
 
 ### コストの考え方
