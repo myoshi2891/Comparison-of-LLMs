@@ -173,8 +173,8 @@ echo "exit=$status"
    (cd web-next && bun run test app/<provider>/<slug>/TocObserver.test.tsx)
    ```
 
-   あわせて、対象コンポーネントのカバレッジも確認します
-   （Q-1・§6-a の全公開挙動カバレッジ要件を満たすこと）:
+   同じく `TocObserver.tsx` を作成した場合に限り、対象コンポーネントのカバレッジも確認します
+   （Q-1・§6-a の全公開挙動カバレッジ要件を満たすこと。作成していない場合はこの手順を省略）:
 
    ```bash
    (cd web-next && bun run test:coverage -- app/<provider>/<slug>/TocObserver.test.tsx)
