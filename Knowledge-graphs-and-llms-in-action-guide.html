@@ -2660,8 +2660,10 @@ driver = GraphDatabase.driver(
 )
 
 
-def kg_retriever(cypher: str, params: dict | None = None) -&gt; list[dict]:
-    &quot;&quot;&quot;エージェントに渡す道具: Cypherを実行して結果を辞書のリストで返す。
+def kg_retriever(cypher: str, params: dict | None = None) -&gt; dict[str, list[dict] | bool]:
+    &quot;&quot;&quot;エージェントに渡す道具: Cypherを実行し、結果を辞書で返す。
+
+    戻り値は {&quot;records&quot;: 結果行(辞書)のリスト, &quot;truncated&quot;: 件数上限で切り捨てたか} の形。
 
     セッションのアクセスモードは環境によって書き込みの防止を保証しない場合が
     あるため、接続ユーザー自体を読み取り専用ロールにしておくこと。

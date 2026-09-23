@@ -968,8 +968,10 @@ def _is_write_query(cypher: str) -> bool:
     return bool(WRITE_CLAUSES.search(cypher_without_literals.lower()))
 
 
-def kg_retriever(cypher: str, params: dict | None = None) -> list[dict]:
-    """エージェントに渡す道具: Cypherを実行して結果を辞書のリストで返す。
+def kg_retriever(cypher: str, params: dict | None = None) -> dict[str, list[dict] | bool]:
+    """エージェントに渡す道具: Cypherを実行し、結果を辞書で返す。
+
+    戻り値は {"records": 結果行(辞書)のリスト, "truncated": 件数上限で切り捨てたか} の形。
 
     セッションのアクセスモードは環境によって書き込みの防止を保証しない場合が
     あるため、接続ユーザー自体を読み取り専用ロールにしておくこと。
