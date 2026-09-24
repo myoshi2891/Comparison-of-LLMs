@@ -281,7 +281,7 @@ LangChain 1.0のもう一つの目玉が「標準コンテンツブロック」�
 
 ### 4-6. MCP（Model Context Protocol）ツールとの統合
 
-2026年に入り、`langchain.mcp` 名前空間が追加され、外部のMCPサーバーが提供するツールを `create_agent` にそのまま接続できるようになりました。サーバー側からの追加入力要求（elicitation）はLangGraphの `interrupt()` 機構にマッピングされ、人間の回答を待ってから処理を再開する、という高度なフローも `langchain.mcp` の機能として扱えます。この挙動を有効にするには `MCPAdapter` を `elicitation="interrupt"` で構成する必要があり、また interrupt 後に処理を再開するため（他の interrupt と同様に）**checkpointer の設定が必須**です。ただし LangChain 1.4.2 時点で `langchain.mcp` は**ベータ**であり、API は今後変更される可能性があります。本番利用ではバージョンを固定し、アップグレード時は Changelog を確認してください。
+2026年に入り、`langchain.mcp` 名前空間が追加され、外部のMCPサーバーが提供するツールを `create_agent` にそのまま接続できるようになりました。サーバー側からの追加入力要求（elicitation）はLangGraphの `interrupt()` 機構にマッピングされ、人間の回答を待ってから処理を再開する、という高度なフローも `langchain.mcp` の機能として扱えます。`MCPAdapter` に elicitation 用の設定引数はなく、挙動はクライアントのハンドラーから決まります。独自の elicitation ハンドラーを持たないクライアントでは既定で interrupt に変換され、ハンドラーを持つ事前構築済みクライアントではそのハンドラーが応答します。なお interrupt 後に処理を再開するため（他の interrupt と同様に）**checkpointer の設定が必須**です。ただし LangChain 1.4.2 時点で `langchain.mcp` は**ベータ**であり、API は今後変更される可能性があります。本番利用ではバージョンを固定し、アップグレード時は Changelog を確認してください。
 
 ---
 
