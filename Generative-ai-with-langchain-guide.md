@@ -266,7 +266,8 @@ flowchart TD
 > **組み込みではない実験的ミドルウェア**: タスクの内容に応じて呼び出すモデルを動的に切り替える **Model Router / Auto Mode** は、LangChain 本体の組み込みミドルウェアではなく、外部パッケージ **langchain-typesafe** が提供する実験的ミドルウェアです。3-1 のセットアップだけでは利用できないため、別途インストールしてからそのパッケージを import します（API は変更される可能性があるため、公開名はパッケージのドキュメントで確認してください）。
 >
 > ```bash
-> pip install -U langchain-typesafe
+> # ModelRouterMiddleware / AutoModeMiddleware には experimental extra が必要
+> pip install -U "langchain-typesafe[experimental]"
 > ```
 >
 > ```python
