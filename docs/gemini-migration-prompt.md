@@ -133,6 +133,9 @@ echo "exit=$status"
      をすべてカバーします。
 3. `(cd web-next && bun run test app/<provider>/<slug>/page.test.tsx)` を実行し、
    **テストが失敗することを確認** します。
+   `TocObserver.test.tsx` を作成した場合は、
+   `(cd web-next && bun run test app/<provider>/<slug>/TocObserver.test.tsx)` も実行し、
+   こちらも **Red コミット前に失敗することを確認** します。
 4. PII 検査後、Red コミットを実行します:
 
    ```
@@ -160,12 +163,18 @@ echo "exit=$status"
 
    ```bash
    (cd web-next && bun run test app/<provider>/<slug>/page.test.tsx)
-   (cd web-next && bun run test app/<provider>/<slug>/TocObserver.test.tsx)
    (cd web-next && bun run test tests/page-registry-coverage.test.ts)
    ```
 
-   `TocObserver.test.tsx` を作成した場合は、対象コンポーネントのカバレッジも確認します
-   （Q-1・§6-a の全公開挙動カバレッジ要件を満たすこと）:
+   `TocObserver.tsx` を作成した場合（Phase 2-1 と同条件）は、
+   `TocObserver.test.tsx` も実行します:
+
+   ```bash
+   (cd web-next && bun run test app/<provider>/<slug>/TocObserver.test.tsx)
+   ```
+
+   同じく `TocObserver.tsx` を作成した場合に限り、対象コンポーネントのカバレッジも確認します
+   （Q-1・§6-a の全公開挙動カバレッジ要件を満たすこと。作成していない場合はこの手順を省略）:
 
    ```bash
    (cd web-next && bun run test:coverage -- app/<provider>/<slug>/TocObserver.test.tsx)
