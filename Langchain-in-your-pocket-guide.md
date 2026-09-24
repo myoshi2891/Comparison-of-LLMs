@@ -392,7 +392,7 @@ memory = ConversationBufferMemory()
 memory.save_context({"input": "こんにちは"}, {"output": "こんにちは、ご用件は？"})
 ```
 
-> **2026年9月時点の補足**: `ConversationBufferMemory` を含む旧来のインプロセスMemoryクラス群は、**LangChain 1.0で非推奨** となりました。現在の本番運用では、LangGraphの **チェックポインター（checkpointer）** がスレッド単位で会話状態を永続化する仕組みに置き換わっています。これにより、複雑な状態管理コードを自前で書かずに、会話の途中再開や並行セッション管理が可能になっています（[Atlan: What is LangChain? 2026](https://atlan.com/know/ai-agent/ai-agent-memory/what-is-langchain/)）。構造化出力についても、現在は `create_agent` の `response_format` パラメータでPydanticモデルを直接指定する方法が主流になりつつあります。
+> **2026年9月時点の補足**: `ConversationBufferMemory` を含む旧来のインプロセスMemoryクラス群は、**LangChain 1.0で非推奨** となりました。現在の本番運用では、**スレッド単位の短期的な会話履歴** については、LangGraphの **チェックポインター（checkpointer）** が会話状態を永続化する仕組みに置き換わっています。ただしチェックポインターは `ConversationSummaryMemory` のような履歴の要約や、スレッドをまたいで共有する長期記憶までは代替しません。要約はミドルウェア（Summarization 等）、長期記憶は LangGraph の Store など、別の仕組みで扱う必要があります。これにより、複雑な状態管理コードを自前で書かずに、会話の途中再開や並行セッション管理が可能になっています（[Atlan: What is LangChain? 2026](https://atlan.com/know/ai-agent/ai-agent-memory/what-is-langchain/)）。構造化出力についても、現在は `create_agent` の `response_format` パラメータでPydanticモデルを直接指定する方法が主流になりつつあります。
 
 ---
 
