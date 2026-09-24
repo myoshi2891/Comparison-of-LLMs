@@ -689,7 +689,7 @@ app = FastAPI()
 add_routes(app, rag_chain, path="/rag")
 ```
 
-> **2026年9月時点の補足（重要）**: **LangServeは2024年11月18日付で正式に非推奨（deprecated）となり、2026年5月5日にGitHubリポジトリがアーカイブされました。** 公式には新規プロジェクトでの利用は推奨されておらず、後継として **LangSmith Deployment**（旧 LangGraph Platform）への移行が案内されています（[LangServe公式GitHubの非推奨表示](https://github.com/langchain-ai/langserve)）。実務コミュニティの評価では、LangServeは「最初の2〜4週間は非常に便利だが、要件が複雑化する3ヶ月目あたりから抽象化の限界が露呈しやすい」という指摘もありました（[Enterprise DNA: LangServeの実運用レビュー](https://enterprisedna.co/resources/blog/practitioner-langserve-review)）。一方LangSmithは現役かつ主力製品として継続的に機能強化されており、2026年にはAgent Builder（会話からエージェントを直接生成する機能）やInsights Agent（定期レポートの自動生成）などが追加されています。
+> **2026年9月時点の補足（重要）**: **LangServeは2024年11月18日付で正式に非推奨（deprecated）となり、2026年5月5日にGitHubリポジトリがアーカイブされました。** 公式には新規プロジェクトでの利用は推奨されておらず、後継として **LangSmith Deployment**（旧 LangGraph Platform）への移行が案内されています（[LangServe公式GitHubの非推奨表示](https://github.com/langchain-ai/langserve)）。実務コミュニティの評価では、LangServeは「最初の2〜4週間は非常に便利だが、要件が複雑化する3ヶ月目あたりから抽象化の限界が露呈しやすい」という指摘もありました（[Enterprise DNA: LangServeの実運用レビュー](https://enterprisedna.co/resources/blog/practitioner-langserve-review)）。一方LangSmithは現役かつ主力製品として継続的に機能強化されており、2025年10月23日にInsights Agent（定期レポートの自動生成）が発表され、2025年10月29日にAgent Builder（会話からエージェントを直接生成する機能）が公開されました。Agent Builder は2026年3月以降、**LangSmith Fleet** に名称変更されています（[LangChain公式ブログ: Introducing LangSmith Fleet](https://www.langchain.com/blog/introducing-langsmith-fleet)）。
 
 ---
 
