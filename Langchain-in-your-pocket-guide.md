@@ -113,7 +113,7 @@ flowchart LR
 
 LangChainを使うことで、モデルプロバイダーを切り替えたり、ツール呼び出しやRAGを組み込んだりする際に、アプリケーションのコアロジックを書き換える必要がなくなります。
 
-> **2026年9月時点の補足**: この「モデルを差し替え可能にする」という思想は現在も変わっていません。ただし2025年10月のLangChain 1.0リリース以降、LangChainは「フレームワーク」から「エージェントエンジニアリングプラットフォーム」へと位置づけが進化し、Uber・JPMorgan・LinkedIn・Ciscoなど大企業の本番運用でも採用が進んでいます（[FutureAGI: What is LangChain? 2026](https://futureagi.com/blog/what-is-langchain/)）。
+> **2026年9月時点の補足**: この「モデルを差し替え可能にする」という思想は現在も変わっていません。ただし2025年10月のLangChain 1.0リリース以降、OSSの **LangChain 1.0 はエージェントフレームワーク**、**LangSmith はエージェントエンジニアリングプラットフォーム**（評価・監視・デプロイ）という役割分担が明確になり、これらを組み合わせた構成が Uber・JPMorgan・LinkedIn・Ciscoなど大企業の本番運用でも採用が進んでいます（[FutureAGI: What is LangChain? 2026](https://futureagi.com/blog/what-is-langchain/)）。
 
 ---
 
@@ -312,6 +312,13 @@ flowchart TB
 ### 6.2〜6.3 Agentの構築とタイプ
 
 原著は `initialize_agent` 関数と、`ZERO_SHOT_REACT_DESCRIPTION` などのエージェントタイプ（推論戦略）を使ったエージェント構築を解説しています。
+
+`serpapi` ツールを動かすには、事前に SerpAPI 用パッケージの導入と API キーの設定が必要です（キーはコードに直書きせず環境変数で渡します）。
+
+```bash
+pip install google-search-results
+export SERPAPI_API_KEY="your-serpapi-key"
+```
 
 ```python
 # 原著の書き方（2024年当時のAgent API）
@@ -743,7 +750,7 @@ flowchart LR
     Y2024 --> Y2025 --> Y2026
 ```
 
-この移行の背景については、LangChain公式の設計思想の変遷が [langchain-philosophy ドキュメント](https://docs.langchain.com/oss/python/langchain-philosophy) で詳しく解説されています。要点は「LangChainは高レベルの使いやすいインターフェースを提供し、より細かい制御が必要になった開発者はLangGraphに降りていける」という二層構造の考え方です。またLangChain 0.3系は2026年12月まで **メンテナンスモード（セキュリティパッチのみ）** として継続サポートされる予定であり、旧APIから急いで移行する必要はないものの、新規プロジェクトでは1.0系の採用が推奨されています（[LangChain公式: リリースポリシー](https://docs.langchain.com/oss/python/release-policy)）。
+この移行の背景については、LangChain公式の設計思想の変遷が [langchain-philosophy ドキュメント](https://docs.langchain.com/oss/python/langchain-philosophy) で詳しく解説されています。要点は「LangChainは高レベルの使いやすいインターフェースを提供し、より細かい制御が必要になった開発者はLangGraphに降りていける」という二層構造の考え方です。またLangChain 0.3系は2026年12月まで **メンテナンスモード（セキュリティパッチと重大な不具合修正）** として継続サポートされる予定であり、旧APIから急いで移行する必要はないものの、新規プロジェクトでは1.0系の採用が推奨されています（[LangChain公式: リリースポリシー](https://docs.langchain.com/oss/python/release-policy)）。
 
 ---
 
