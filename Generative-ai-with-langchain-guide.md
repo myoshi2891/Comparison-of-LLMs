@@ -80,7 +80,7 @@ flowchart LR
 
 | モデルファミリー | 開発元 | 書籍執筆時（2023年） | 2026年9月時点の位置づけ |
 |---|---|---|---|
-| GPTシリーズ | OpenAI | GPT-3.5 / GPT-4 | GPT-6世代へ進化。**GPT-6 Astra**（最上位）は一部組織へ段階展開中で、ChatGPT（Plus 以上）・API・Azure・Bedrock で提供予定。**GPT-6 Sol / Luna**（2026年9月22日発表の高速・低価格版）は API・ChatGPT・Codex で提供開始済みだが、発表時点で Azure・Bedrock には未掲載（出典: [OpenAI: GPT-6 Astra](https://openai.com/index/gpt-6-astra/)、[OpenAI Developer Community: GPT-6 Sol / Luna](https://community.openai.com/t/announcing-gpt-6-sol-and-gpt-6-luna-in-the-api-codex-and-chatgpt/1399925)） |
+| GPTシリーズ | OpenAI | GPT-3.5 / GPT-4 | GPT-6世代へ進化。**GPT-6 Astra**（最上位）は一部組織へ段階展開中で、ChatGPT（Plus 以上）・API・Azure で提供予定。**GPT-6 Sol / Luna**（2026年9月22日発表の高速・低価格版）は API・**ChatGPT Work**・Codex で提供開始済み（通常の ChatGPT では利用不可）。Microsoft Foundry では一般提供済み（出典: [OpenAI: GPT-6 Astra](https://openai.com/index/gpt-6-astra/)、[OpenAI Developer Community: GPT-6 Sol / Luna](https://community.openai.com/t/announcing-gpt-6-sol-and-gpt-6-luna-in-the-api-codex-and-chatgpt/1399925)、[Microsoft Foundry: GPT-6 Sol / Luna](https://ai.azure.com/)） |
 | Claudeシリーズ | Anthropic | Claude 1〜3 | Claude Opus 5.5 / Sonnet 5 / Haiku 4.5 の構成に加え、上位ティアの Claude Fable 5.1 が登場（出典: [Anthropic Models overview](https://docs.claude.com/en/docs/about-claude/models/overview)） |
 | Gemini / PaLM | Google | PaLM, 初代Gemini | Gemini 3系へ進化 |
 | Llamaシリーズ | Meta | Llama 2 | 後継モデル群へ世代交代、オープンウェイト戦略が継続 |
