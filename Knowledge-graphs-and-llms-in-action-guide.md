@@ -651,10 +651,12 @@ def upsert_triples(tx, triples: list[dict]) -> None:
     # 呼び出し側の検証漏れを前提にせず、この関数自身でも弾く。
     for t in triples:
         head, tail = t.get("head"), t.get("tail")
+        head_type, tail_type, relation = t.get("head_type"), t.get("tail_type"), t.get("relation")
         if (
-            t.get("head_type") not in ALLOWED_ENTITY_TYPES
-            or t.get("tail_type") not in ALLOWED_ENTITY_TYPES
-            or t.get("relation") not in ALLOWED_RELATIONS
+            # 非文字列（list 等のハッシュ不能な値）を集合検索に渡すと TypeError になるため先に型を確認する
+            not isinstance(head_type, str) or head_type not in ALLOWED_ENTITY_TYPES
+            or not isinstance(tail_type, str) or tail_type not in ALLOWED_ENTITY_TYPES
+            or not isinstance(relation, str) or relation not in ALLOWED_RELATIONS
             # head / tail が欠けていると、下の tx.run で KeyError になる。
             # 空文字や空白だけの名前は、名前のないノードを作ってしまうのでここで弾く。
             or not isinstance(head, str)
