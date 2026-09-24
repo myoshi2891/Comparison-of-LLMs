@@ -126,6 +126,9 @@ LangChainを使うことで、モデルプロバイダーを切り替えたり�
 ```python
 # インストール
 # pip install langchain langchain-openai
+# 本ガイドの「原著の書き方」の例（langchain.chains / langchain.agents の initialize_agent・load_tools /
+# langchain.memory / langchain.evaluation）は 1.x では動きません。試す場合は別の仮想環境で 0.3 系を固定します:
+# pip install "langchain>=0.3,<0.4" "langchain-community>=0.3,<0.4" "langchain-openai<1.0"
 
 import os
 os.environ["OPENAI_API_KEY"] = "sk-..."
