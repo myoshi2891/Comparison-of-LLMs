@@ -349,6 +349,12 @@ if (action.confidence < 0.5) {
   } else {
     askUserToConfirm(accountId);
   }
+} else if (action.choice === "support") {
+  // サポート窓口へ回す。対応できない場合も undefined のまま終わらせず人間へ
+  routeToSupport(userMessage);
+} else {
+  // 想定外の選択肢は人間へフォールバック
+  routeToHuman(userMessage);
 }
 ```
 
