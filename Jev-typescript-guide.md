@@ -354,6 +354,8 @@ if (action.confidence < 0.5) {
 
 （出典: [Flavio Copes氏「A deep dive into Jev」](https://flaviocopes.com/jev/)）
 
+> ⚠️ **送金は常に本人確認と認可が前提です**: `confirmThenExecute` は、確信度にかかわらず**認証済みユーザー本人による明示的な確認と認可を必ず経てから**送金を実行します。ここでの `0.9` は「確認を省略してよい」閾値ではなく、「自動化されたフロー（確認付き）で進めるか、人間のレビューに回すか」の境界です。
+
 以下は確信度に基づく分岐の流れを図にしたものです。上から下へ読み進めてください。
 
 ```mermaid
@@ -641,6 +643,9 @@ router = ModelRouterMiddleware(
     },
     instructions="Choose the least costly model that can complete the task.",
 )
+
+# ルーターをミドルウェアとして渡し、エージェントにモデルルーティングを適用する
+agent = create_agent(model="openai:luna", tools=[], middleware=[router])
 ```
 
 （出典: [LangChain公式ブログ](https://www.langchain.com/blog/building-a-harness-with-jev)。上記はPython版の例ですが、本書の主題であるTypeScript SDKでも同様の`ModelRouterMiddleware`相当の設計をJevの`choice()`で自作できます。）
