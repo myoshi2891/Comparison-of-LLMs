@@ -1,6 +1,6 @@
 # Jev: TypeScriptで学ぶ System One AI 完全ガイド
 
-> このガイドは、書籍『[Jev: The Definitive Guide to System One AI in TypeScript](https://leanpub.com/Jev)』（著者: Edgar Milvus, Leanpub, 2026年9月21日時点で完成度100%・全20章）の構成をベースに、TypeSafe AI公式ドキュメント、LangChain公式ブログ、および著名な開発者による技術記事（Flavio Copes氏、DEV Community記事など）を2026年9月21日時点でWeb調査した内容を組み合わせ、初学者向けに再構成したものです。Jev（およびSystem One AI）自体が2026年9月15日に発表されたばかりの新しい技術であるため、本ガイドの一次情報の多くはTypeSafe AI公式ドキュメント（`docs.typesafe.ai`）に基づきます。各章末に参照元を明記し、巻末に参考文献一覧を掲載しています。
+> このガイドは、書籍『[Jev: The Definitive Guide to System One AI in TypeScript](https://leanpub.com/Jev)』（著者: Edgar Milvus, Leanpub）の構成をベースに、TypeSafe AI公式ドキュメント、LangChain公式ブログ、および著名な開発者による技術記事（Flavio Copes氏、DEV Community記事など）を2026年9月21日時点でWeb調査した内容を組み合わせ、初学者向けに再構成したものです。Jev（およびSystem One AI）自体が2026年9月15日に発表されたばかりの新しい技術であるため、本ガイドの一次情報の多くはTypeSafe AI公式ドキュメント（`docs.typesafe.ai`）に基づきます。各章末に参照元を明記し、巻末に参考文献一覧を掲載しています。
 
 ---
 

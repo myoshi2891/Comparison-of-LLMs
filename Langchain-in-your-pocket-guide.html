@@ -1,0 +1,2209 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LangChain in your Pocket 徹底解説ガイド</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/3.44.0/tabler-icons.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css"
+    />
+    <style>
+      :root {
+        --color-background-primary: #07111e;
+        --color-background-secondary: #0d1826;
+        --color-background-tertiary: #101d2c;
+        --color-background-info: #16233a;
+        --color-background-danger: #2a1418;
+        --color-background-success: #12241c;
+        --color-background-warning: #2a2013;
+        --color-text-primary: #e8edf5;
+        --color-text-secondary: #a9b6c9;
+        --color-text-tertiary: #8592a3;
+        --color-text-info: #8fb4ff;
+        --color-text-danger: #ff9a9a;
+        --color-text-success: #7fd9a8;
+        --color-text-warning: #f0c674;
+        --color-border-primary: #223447;
+        --color-border-secondary: #1c2b3f;
+        --color-border-tertiary: #15212f;
+        --font-sans:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial,
+          'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+        --font-mono:
+          ui-monospace, SFMono-Regular, 'SF Mono', Consolas, 'Liberation Mono', monospace;
+        --border-radius-md: 8px;
+        --border-radius-lg: 12px;
+        --border-radius-xl: 16px;
+        --accent: #7c9eff;
+        --accent-soft: #16233a;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        background: var(--color-background-primary);
+        color: var(--color-text-primary);
+        font-family: var(--font-sans);
+        font-size: 16px;
+        line-height: 1.7;
+        font-weight: 400;
+      }
+      a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+      .layout {
+        display: block;
+      }
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: 288px;
+        background: var(--color-background-secondary);
+        border-right: 1px solid var(--color-border-primary);
+        overflow-y: auto;
+        padding: 28px 20px 40px;
+      }
+      .sidebar .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 24px;
+      }
+      .sidebar .brand .mark {
+        width: 36px;
+        height: 36px;
+        border-radius: var(--border-radius-md);
+        background: var(--accent-soft);
+        border: 1px solid var(--color-border-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--accent);
+        font-size: 18px;
+      }
+      .sidebar .brand .name {
+        font-size: 15px;
+        font-weight: 500;
+        color: var(--color-text-primary);
+        line-height: 1.3;
+      }
+      .sidebar .brand .sub {
+        font-size: 12.5px;
+        color: var(--color-text-tertiary);
+      }
+      .sidebar nav {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+      .sidebar nav .grp {
+        margin-top: 18px;
+        margin-bottom: 4px;
+        font-size: 11.5px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--color-text-tertiary);
+        font-weight: 500;
+      }
+      .sidebar nav a {
+        display: block;
+        padding: 7px 10px;
+        border-radius: var(--border-radius-md);
+        color: var(--color-text-secondary);
+        font-size: 14.5px;
+        border-left: 2px solid transparent;
+      }
+      .sidebar nav a:hover {
+        background: var(--color-background-tertiary);
+        text-decoration: none;
+        color: var(--color-text-primary);
+      }
+      .sidebar nav a.active {
+        background: var(--accent-soft);
+        color: var(--accent);
+        border-left: 2px solid var(--accent);
+        font-weight: 500;
+      }
+      .main {
+        margin-left: 288px;
+        padding: 56px 64px 120px;
+      }
+      .hero {
+        border-bottom: 1px solid var(--color-border-primary);
+        padding-bottom: 36px;
+        margin-bottom: 40px;
+      }
+      .hero .kicker {
+        color: var(--accent);
+        font-size: 13.5px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        font-weight: 500;
+        margin-bottom: 12px;
+      }
+      .hero h1 {
+        font-size: 34px;
+        line-height: 1.25;
+        margin: 0 0 14px;
+        font-weight: 500;
+      }
+      .hero .meta {
+        color: var(--color-text-secondary);
+        font-size: 15.5px;
+        margin-bottom: 6px;
+      }
+      .hero .meta a {
+        color: var(--color-text-secondary);
+        text-decoration: underline;
+      }
+      h1 {
+        font-size: 28px;
+        font-weight: 500;
+      }
+      h2 {
+        font-size: 22px;
+        font-weight: 500;
+        margin-top: 56px;
+        padding-top: 20px;
+        border-top: 1px solid var(--color-border-primary);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      h2 .num {
+        color: var(--accent);
+        font-size: 15px;
+        font-weight: 500;
+        background: var(--accent-soft);
+        border: 1px solid var(--color-border-primary);
+        border-radius: 999px;
+        padding: 3px 11px;
+      }
+      h3 {
+        font-size: 18px;
+        font-weight: 500;
+        margin-top: 34px;
+        color: var(--color-text-primary);
+      }
+      p {
+        color: var(--color-text-secondary);
+      }
+      strong {
+        color: var(--color-text-primary);
+        font-weight: 500;
+      }
+      .section {
+        scroll-margin-top: 24px;
+      }
+      ul,
+      ol {
+        color: var(--color-text-secondary);
+        padding-left: 1.3em;
+      }
+      li {
+        margin: 6px 0;
+      }
+      li::marker {
+        color: var(--color-text-tertiary);
+      }
+      code {
+        font-family: var(--font-mono);
+        font-size: 14.5px;
+        background: var(--color-background-tertiary);
+        border: 1px solid var(--color-border-tertiary);
+        border-radius: 5px;
+        padding: 1px 6px;
+        color: var(--color-text-info);
+      }
+      pre {
+        background: #0b1622;
+        border: 1px solid var(--color-border-primary);
+        border-radius: var(--border-radius-lg);
+        padding: 18px 20px;
+        overflow-x: auto;
+        margin: 18px 0;
+      }
+      pre code {
+        background: none;
+        border: none;
+        padding: 0;
+        font-size: 14px;
+        color: inherit;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+        font-size: 15px;
+      }
+      thead th {
+        text-align: left;
+        color: var(--color-text-tertiary);
+        font-weight: 500;
+        font-size: 12.5px;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        padding: 0 14px 10px;
+        border-bottom: 1px solid var(--color-border-primary);
+      }
+      tbody td {
+        padding: 12px 14px;
+        border-bottom: 1px solid var(--color-border-tertiary);
+        color: var(--color-text-secondary);
+        vertical-align: top;
+      }
+      tbody tr:hover td {
+        background: var(--color-background-secondary);
+      }
+      tbody td:first-child {
+        color: var(--color-text-primary);
+        font-weight: 500;
+        white-space: nowrap;
+      }
+      .callout {
+        border: 1px solid var(--color-border-primary);
+        border-left: 3px solid var(--accent);
+        background: var(--color-background-secondary);
+        border-radius: var(--border-radius-lg);
+        padding: 16px 20px;
+        margin: 22px 0;
+        display: flex;
+        gap: 13px;
+      }
+      .callout .ic {
+        color: var(--accent);
+        font-size: 19px;
+        flex-shrink: 0;
+        margin-top: 1px;
+      }
+      .callout .body {
+        color: var(--color-text-secondary);
+        font-size: 15.5px;
+      }
+      .callout .body strong {
+        color: var(--color-text-primary);
+      }
+      .callout.important {
+        border-left-color: var(--color-text-danger);
+        background: var(--color-background-danger);
+      }
+      .callout.important .ic {
+        color: var(--color-text-danger);
+      }
+      .mermaid-wrap {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        margin: 26px 0;
+      }
+      .mermaid-wrap svg {
+        max-width: 100%;
+        height: auto;
+      }
+      .chip-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin: 18px 0;
+      }
+      .chip {
+        font-size: 13px;
+        color: var(--color-text-secondary);
+        background: var(--color-background-tertiary);
+        border: 1px solid var(--color-border-primary);
+        border-radius: 999px;
+        padding: 5px 12px;
+      }
+      .ref-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin: 20px 0;
+      }
+      .ref-card {
+        display: flex;
+        gap: 14px;
+        align-items: flex-start;
+        padding: 14px 16px;
+        border: 1px solid var(--color-border-primary);
+        background: var(--color-background-secondary);
+        border-radius: var(--border-radius-lg);
+      }
+      .ref-card .badge {
+        flex-shrink: 0;
+        width: 26px;
+        height: 26px;
+        border-radius: 999px;
+        background: var(--accent-soft);
+        color: var(--accent);
+        font-size: 13px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid var(--color-border-primary);
+      }
+      .ref-card .txt {
+        font-size: 15px;
+        color: var(--color-text-secondary);
+      }
+      .ref-card .txt .t {
+        color: var(--color-text-primary);
+        font-weight: 500;
+        display: block;
+        margin-bottom: 2px;
+      }
+      .ref-card .txt a {
+        word-break: break-all;
+      }
+      .book-toc {
+        border: 1px solid var(--color-border-primary);
+        border-radius: var(--border-radius-lg);
+        overflow: hidden;
+        margin: 24px 0;
+      }
+      .book-toc table {
+        margin: 0;
+      }
+      .book-toc thead th {
+        padding: 12px 16px;
+        background: var(--color-background-secondary);
+      }
+      .book-toc tbody td {
+        padding: 11px 16px;
+      }
+      footer {
+        margin-top: 70px;
+        padding-top: 24px;
+        border-top: 1px solid var(--color-border-primary);
+        color: var(--color-text-tertiary);
+        font-size: 13.5px;
+      }
+      @media (max-width: 900px) {
+        .sidebar {
+          position: static;
+          width: auto;
+          border-right: none;
+          border-bottom: 1px solid var(--color-border-primary);
+          overflow-y: visible;
+          padding: 24px 22px;
+        }
+        .main {
+          margin-left: 0;
+          padding: 36px 22px 90px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="layout">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="mark"><i class="ti ti-link"></i></div>
+          <div>
+            <div class="name">LangChain in your Pocket</div>
+            <div class="sub">徹底解説ガイド</div>
+          </div>
+        </div>
+        <nav id="nav">
+          <a href="#intro">この解説ガイドについて</a>
+          <div class="grp">基礎編</div>
+          <a href="#ch1">第1章 LLMとLangChainの基礎</a>
+          <a href="#ch2">第2章 Hello World</a>
+          <a href="#ch3">第3章 モジュール構成</a>
+          <a href="#ch4">第4章 Models and Prompts</a>
+          <div class="grp">コア機能編</div>
+          <a href="#ch5">第5章 Chains</a>
+          <a href="#ch6">第6章 Agents</a>
+          <a href="#ch7">第7章 OutputParsers and Memory</a>
+          <a href="#ch8">第8章 Callbacks</a>
+          <a href="#ch9">第9章 RAGとベクトルDB</a>
+          <a href="#ch10">第10章 NLPタスク</a>
+          <div class="grp">応用編</div>
+          <a href="#ch11">第11章 ハルシネーション対策</a>
+          <a href="#ch12">第12章 LLMの評価</a>
+          <a href="#ch13">第13章 高度なプロンプト設計</a>
+          <a href="#ch14">第14章 自律型AIエージェント</a>
+          <a href="#ch15">第15章 LangSmith / LangServe</a>
+          <a href="#ch16">第16章 追加機能</a>
+          <div class="grp">まとめ</div>
+          <a href="#update2026">2026年最新動向まとめ</a>
+          <a href="#refs">参考文献・ソース一覧</a>
+        </nav>
+      </aside>
+      <main class="main">
+        <div class="hero">
+          <div class="kicker">Beginner Guide &middot; 全16章 徹底解説</div>
+          <h1>LangChain in your Pocket 徹底解説ガイド</h1>
+          <div class="meta">初学者のためのステップバイステップ学習マニュアル</div>
+          <div class="meta">
+            原著:
+            <em
+              >LangChain in your Pocket: Beginner's Guide to Building Generative AI Applications
+              using LLMs</em
+            >
+          </div>
+          <div class="meta">
+            著者: Mehul Gupta / 出版: Packt Publishing（O'Reilly収録, 2024年5月, 152ページ）
+          </div>
+          <div class="meta">
+            参照元:
+            <a
+              href="https://www.oreilly.com/library/view/langchain-in-your/9781836201250/"
+              target="_blank"
+              rel="noopener"
+              >O'Reilly 書籍ページ</a
+            >
+          </div>
+        </div>
+
+        <section class="section" id="intro">
+          <h2><span class="num">Guide</span>この解説ガイドについて</h2>
+          <p>
+            このガイドは、Mehul Gupta 氏の著書
+            <em>LangChain in your Pocket</em>
+            を初学者向けに再構成し、各章の要点をステップバイステップで解説するものです。原著は2024年1月〜5月に刊行されたため、<code
+              >LLMChain</code
+            >
+            や <code>ConversationBufferMemory</code> のような LangChain
+            0.1系のAPIを中心に説明しています。
+          </p>
+          <div class="callout important">
+            <div class="ic"><i class="ti ti-alert-triangle"></i></div>
+            <div class="body">
+              <strong>重要な注意点:</strong> LangChainは2025年10月22日に
+              <strong>LangChain 1.0 / LangGraph 1.0</strong>
+              を同時リリースし、エージェントの実行基盤が根本的に刷新されました（<a
+                href="https://docs.langchain.com/oss/python/langchain-philosophy"
+                target="_blank"
+                rel="noopener"
+                >LangChain公式ドキュメント</a
+              >）。本ガイドでは原著の構成・用語をそのまま解説しつつ、各章末に「<strong>2026年9月時点の補足</strong>」を設け、現在の推奨アプローチとの違いを明記しています。これにより、書籍の学習効果を損なわずに、実務で通用する最新知識も同時に得られる構成にしています。
+            </div>
+          </div>
+
+          <h3>本ガイドの読み方（全体マップ）</h3>
+          <div class="mermaid-wrap"><div class="mermaid-target" data-diagram="bookmap"></div></div>
+
+          <h3>書籍の目次（原著全16章）</h3>
+          <div class="book-toc">
+            <table>
+              <thead>
+                <tr>
+                  <th>章</th>
+                  <th>タイトル</th>
+                  <th>主な内容</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1</td>
+                  <td>Introduction</td>
+                  <td>LLMとは何か、LangChainが必要な理由</td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td>Hello World</td>
+                  <td>セットアップ、Name Generator、Storyteller</td>
+                </tr>
+                <tr>
+                  <td>3</td>
+                  <td>Different LangChain Modules</td>
+                  <td>LangChainのモジュール全体像</td>
+                </tr>
+                <tr>
+                  <td>4</td>
+                  <td>Models and Prompts</td>
+                  <td>LLM/ChatModel、PromptTemplate</td>
+                </tr>
+                <tr>
+                  <td>5</td>
+                  <td>Chains</td>
+                  <td>LLMChain、Auto-SQL、LCEL</td>
+                </tr>
+                <tr>
+                  <td>6</td>
+                  <td>Agents</td>
+                  <td>Chainとの違い、カスタムツール</td>
+                </tr>
+                <tr>
+                  <td>7</td>
+                  <td>OutputParsers and Memory</td>
+                  <td>出力整形、会話記憶</td>
+                </tr>
+                <tr>
+                  <td>8</td>
+                  <td>Callbacks</td>
+                  <td>実行フックの仕組み</td>
+                </tr>
+                <tr>
+                  <td>9</td>
+                  <td>RAG Framework and Vector Databases</td>
+                  <td>RAGとベクトル検索</td>
+                </tr>
+                <tr>
+                  <td>10</td>
+                  <td>LangChain for NLP problems</td>
+                  <td>要約・分類・NER・Few-Shot</td>
+                </tr>
+                <tr>
+                  <td>11</td>
+                  <td>Handling LLM Hallucinations</td>
+                  <td>ハルシネーション対策</td>
+                </tr>
+                <tr>
+                  <td>12</td>
+                  <td>Evaluating LLMs</td>
+                  <td>評価手法</td>
+                </tr>
+                <tr>
+                  <td>13</td>
+                  <td>Advanced Prompt Engineering</td>
+                  <td>CoT、ReAct、Tree of Thoughts</td>
+                </tr>
+                <tr>
+                  <td>14</td>
+                  <td>Autonomous AI agents</td>
+                  <td>AutoGPT、BabyAGI、HuggingGPT</td>
+                </tr>
+                <tr>
+                  <td>15</td>
+                  <td>LangSmith and LangServe</td>
+                  <td>可観測性とデプロイ</td>
+                </tr>
+                <tr>
+                  <td>16</td>
+                  <td>Additional Features</td>
+                  <td>Fallback、Safety、デバッグ</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="font-size: 13.5px; color: var(--color-text-tertiary)">
+            出典:
+            <a
+              href="https://www.oreilly.com/library/view/langchain-in-your/9781836201250/"
+              target="_blank"
+              rel="noopener"
+              >O'Reilly収録版 目次</a
+            >
+          </p>
+        </section>
+        <section class="section" id="ch1">
+          <h2><span class="num">Ch.1</span>LLMとLangChainの基礎知識</h2>
+          <h3>1.1 LLM（大規模言語モデル）とは</h3>
+          <p>
+            LLM（Large Language
+            Model）は、大量のテキストデータから「次に来る単語」を予測することを学習した深層学習モデルです。原著では、ChatGPTが2022年末に登場して以降、AI業界が劇的に変化したことがLangChain誕生の背景として紹介されています。
+          </p>
+          <p>LLM単体では以下のような制約があります。</p>
+          <ul>
+            <li>学習データの時点までの知識しか持たない（最新情報を知らない）</li>
+            <li>外部ツール（検索、計算機、DB）を自分では呼び出せない</li>
+            <li>長い会話の文脈を保持する仕組みがない</li>
+            <li>出力形式（JSON化など）を厳密に制御しづらい</li>
+          </ul>
+
+          <h3>1.2 LLMのファミリー（主要な系統）</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>ファミリー</th>
+                <th>提供元</th>
+                <th>特徴</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>GPTシリーズ</td>
+                <td>OpenAI</td>
+                <td>汎用性が高く商用利用の主力</td>
+              </tr>
+              <tr>
+                <td>Claudeシリーズ</td>
+                <td>Anthropic</td>
+                <td>長文コンテキスト、安全性重視</td>
+              </tr>
+              <tr>
+                <td>Geminiシリーズ</td>
+                <td>Google</td>
+                <td>マルチモーダル対応</td>
+              </tr>
+              <tr>
+                <td>Llamaシリーズ</td>
+                <td>Meta</td>
+                <td>オープンウェイトモデル</td>
+              </tr>
+              <tr>
+                <td>Mistral / Mixtral</td>
+                <td>Mistral AI</td>
+                <td>軽量・高効率なオープンモデル</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h3>1.3 なぜLangChainが必要なのか</h3>
+          <p>
+            LangChainは、LLM単体の弱点を補うための「接着剤（グルーコード）」を提供するフレームワークです。具体的には次の機能を統一的なインターフェースで扱えるようにします。
+          </p>
+          <div class="mermaid-wrap"><div class="mermaid-target" data-diagram="features"></div></div>
+          <p>
+            LangChainを使うことで、モデルプロバイダーを切り替えたり、ツール呼び出しやRAGを組み込んだりする際に、アプリケーションのコアロジックを書き換える必要がなくなります。
+          </p>
+
+          <div class="callout">
+            <div class="ic"><i class="ti ti-info-circle"></i></div>
+            <div class="body">
+              <strong>2026年9月時点の補足:</strong>
+              この「モデルを差し替え可能にする」という思想は現在も変わっていません。ただし2025年10月のLangChain
+              1.0リリース以降、OSSの LangChain 1.0
+              は<strong>エージェントフレームワーク</strong>、LangSmith
+              は<strong>エージェントエンジニアリングプラットフォーム</strong>（評価・監視・デプロイ）という役割分担が明確になり、これらを組み合わせた構成が
+              Uber・JPMorgan・LinkedIn・Ciscoなど大企業の本番運用でも採用が進んでいます（<a
+                href="https://futureagi.com/blog/what-is-langchain/"
+                target="_blank"
+                rel="noopener"
+                >FutureAGI: What is LangChain? 2026</a
+              >）。
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="ch2">
+          <h2><span class="num">Ch.2</span>Hello World ― 環境構築と最初のアプリ</h2>
+          <h3>2.1 LangChainのセットアップ</h3>
+          <p>原著のPythonベースの基本セットアップは以下の通りです（書籍刊行時点のAPI）。</p>
+          <pre><code class="language-python"># インストール
+# pip install langchain langchain-openai
+# 本ガイドの「原著の書き方」の例（langchain.chains / langchain.agents の initialize_agent・load_tools /
+# langchain.memory / langchain.evaluation）は 1.x では動きません。試す場合は別の仮想環境で 0.3 系を固定します:
+# pip install "langchain&gt;=0.3,&lt;0.4" "langchain-community&gt;=0.3,&lt;0.4" "langchain-openai&lt;1.0"
+
+import os
+os.environ["OPENAI_API_KEY"] = "sk-..."
+
+from langchain_openai import ChatOpenAI
+
+llm = ChatOpenAI(model="gpt-3.5-turbo")
+response = llm.invoke("こんにちは、自己紹介してください")
+print(response.content)</code></pre>
+
+          <h3>2.2 Name Generator（最初の実践例）</h3>
+          <p>
+            原著の最初のハンズオン例は「商品名を生成するアプリ」です。プロンプトテンプレートを使い、入力（商品カテゴリ）に応じた出力を得る流れを学びます。
+          </p>
+          <pre><code class="language-python">from langchain_core.prompts import PromptTemplate
+
+prompt = PromptTemplate.from_template(
+    "{category}のブランドに相応しい名前を3つ提案してください。"
+)
+chain = prompt | llm
+result = chain.invoke({"category": "オーガニック紅茶"})
+print(result.content)</code></pre>
+          <p>
+            このコードの <code>|</code>（パイプ）演算子は
+            <strong>LCEL（LangChain Expression Language）</strong>
+            と呼ばれる書き方で、「プロンプト→モデル」という処理の流れを直感的に表現します。第5章で詳しく扱います。
+          </p>
+
+          <h3>2.3 テキスト前処理／2.4 Storyteller／2.5 ローカルLLM</h3>
+          <p>
+            原著ではこの後、テキストクリーニング（不要な空白・記号の除去）、物語生成（Storyteller）、そして
+            <code>llama.cpp</code> や
+            <code>Ollama</code>
+            のようなツールを使ったローカルLLM実行にも触れています。ローカルLLMは、APIコストをかけずに検証したい場合や、機密データを外部に送信できない場合に有効な選択肢です。
+          </p>
+          <div class="mermaid-wrap">
+            <div class="mermaid-target" data-diagram="helloflow"></div>
+          </div>
+
+          <div class="callout">
+            <div class="ic"><i class="ti ti-info-circle"></i></div>
+            <div class="body">
+              <strong>2026年9月時点の補足:</strong>
+              ローカルLLM運用は2026年時点でさらに一般化しており、Ollama・LM
+              Studio・vLLMなどのツールがLangChainの
+              <code>ChatOllama</code>
+              等の統合を通じて簡単に接続できます。またAPIキー管理は、本番では
+              <code>.env</code> ファイルではなく、AWS Secrets Manager や Google Secret Manager
+              などの外部シークレットマネージャーを使うのが実務上の標準になっています。LangSmith
+              Deployment
+              にデプロイする場合は、デプロイ設定のシークレット（環境変数）として登録します。
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="ch3">
+          <h2><span class="num">Ch.3</span>LangChainのモジュール構成</h2>
+          <p>
+            原著は第3章で、LangChainを構成する主要モジュールの全体像を提示します。各モジュールは独立して使うことも、組み合わせて使うこともできます。
+          </p>
+          <table>
+            <thead>
+              <tr>
+                <th>モジュール</th>
+                <th>役割</th>
+                <th>詳しく学ぶ章</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Models</td>
+                <td>LLM/ChatModelの呼び出し</td>
+                <td>第4章</td>
+              </tr>
+              <tr>
+                <td>Prompts</td>
+                <td>プロンプトのテンプレート管理</td>
+                <td>第4章</td>
+              </tr>
+              <tr>
+                <td>Chains</td>
+                <td>複数処理の連結</td>
+                <td>第5章</td>
+              </tr>
+              <tr>
+                <td>Agents</td>
+                <td>ツールを使う自律的な意思決定</td>
+                <td>第6章</td>
+              </tr>
+              <tr>
+                <td>OutputParsers</td>
+                <td>出力の構造化</td>
+                <td>第7章</td>
+              </tr>
+              <tr>
+                <td>Memory</td>
+                <td>会話履歴の保持</td>
+                <td>第7章</td>
+              </tr>
+              <tr>
+                <td>Callbacks</td>
+                <td>実行中のイベントフック</td>
+                <td>第8章</td>
+              </tr>
+              <tr>
+                <td>Indexes（Retrieval）</td>
+                <td>外部ドキュメントの検索</td>
+                <td>第9章</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="mermaid-wrap">
+            <div class="mermaid-target" data-diagram="modulemap"></div>
+          </div>
+        </section>
+
+        <section class="section" id="ch4">
+          <h2><span class="num">Ch.4</span>Models and Prompts</h2>
+          <h3>4.1 Models: LLM と ChatModel の違い</h3>
+          <p>原著は2種類のモデルインターフェースを区別しています。</p>
+          <ul>
+            <li>
+              <strong>LLM:</strong> 文字列を入力し、文字列を返すシンプルなインターフェース（例:
+              <code>text-davinci-003</code> のような補完型モデル）
+            </li>
+            <li>
+              <strong>ChatModel:</strong>
+              メッセージのリスト（system/human/aiロール）を入出力とする、対話向けのインターフェース（例:
+              <code>gpt-3.5-turbo</code>, <code>gpt-4</code>）
+            </li>
+          </ul>
+          <pre><code class="language-python">from langchain_core.messages import HumanMessage, SystemMessage
+from langchain_openai import ChatOpenAI
+
+chat = ChatOpenAI(model="gpt-4o-mini")
+messages = [
+    SystemMessage(content="あなたは丁寧な日本語アシスタントです。"),
+    HumanMessage(content="LangChainのChatModelとLLMの違いを教えてください。"),
+]
+response = chat.invoke(messages)
+print(response.content)</code></pre>
+          <p>
+            補完型（純粋なLLM）モデルは現在ではほとんど提供が終了しており、実務ではChatModelインターフェースを使うのが標準です。
+          </p>
+
+          <h3>4.2 Prompts: PromptTemplate と ChatPromptTemplate</h3>
+          <p>
+            <code>PromptTemplate</code> は単一の文字列プロンプトに変数を埋め込む仕組み、<code
+              >ChatPromptTemplate</code
+            >
+            はロールごとにメッセージを組み立てる仕組みです。
+          </p>
+          <pre><code class="language-python">from langchain_core.prompts import ChatPromptTemplate
+
+template = ChatPromptTemplate.from_messages([
+    ("system", "あなたは{domain}の専門家です。"),
+    ("human", "{question}"),
+])
+formatted = template.invoke({"domain": "栄養学", "question": "タンパク質摂取の目安は？"})</code></pre>
+
+          <div class="callout">
+            <div class="ic"><i class="ti ti-info-circle"></i></div>
+            <div class="body">
+              <strong>2026年9月時点の補足:</strong> <code>PromptTemplate</code> /
+              <code>ChatPromptTemplate</code> のAPI自体は現在も現役で、<code>langchain-core</code>
+              パッケージの安定した基盤機能として維持されています。ただし大規模なプロンプト管理は現在、LangSmithの「Prompt
+              Hub」でバージョン管理・A/Bテストを行うのが一般的です。
+            </div>
+          </div>
+        </section>
+        <section class="section" id="ch5">
+          <h2><span class="num">Ch.5</span>Chains（チェーン）</h2>
+          <h3>5.1〜5.4 LLMChain・Auto-SQL Chain・MathsChain・DALL-E連携</h3>
+          <p>
+            原著では
+            <code>LLMChain</code>
+            を軸に、プロンプトとモデルを1つの処理単位として結合する方法を学びます。さらに応用例として、自然言語をSQLに変換する<strong
+              >Auto-SQL Chain</strong
+            >、数式を解く<strong>MathsChain</strong>、画像生成モデルと連携する<strong
+              >DALL-E Chain</strong
+            >が紹介されます。
+          </p>
+          <pre><code class="language-python"># 原著の書き方（LLMChain、2024年当時の標準）
+from langchain.chains import LLMChain
+
+chain = LLMChain(llm=llm, prompt=prompt)
+result = chain.run(category="スポーツウェア")</code></pre>
+
+          <h3>5.5 Custom Chains using LCEL</h3>
+          <p>
+            原著は本章の後半で<strong>LCEL（LangChain Expression Language）</strong>を紹介し、<code
+              >|</code
+            >
+            演算子でRunnableを連結する新しい書き方を提示しています。これは書籍刊行当時から「今後推奨される書き方」として案内されていました。
+          </p>
+          <pre><code class="language-python"># LCELによる書き方
+from langchain_core.output_parsers import StrOutputParser
+
+output_parser = StrOutputParser()
+chain = prompt | llm | output_parser
+result = chain.invoke({"category": "スポーツウェア"})</code></pre>
+          <div class="mermaid-wrap"><div class="mermaid-target" data-diagram="lcel"></div></div>
+
+          <h3>5.6 Types of Chains</h3>
+          <p>
+            原著は
+            <code>SimpleSequentialChain</code
+            >（単一入出力を順に繋ぐ）、<code>SequentialChain</code>（複数の入出力変数を扱う）などのチェーン種別を紹介しています。
+          </p>
+
+          <div class="callout">
+            <div class="ic"><i class="ti ti-info-circle"></i></div>
+            <div class="body">
+              <strong>2026年9月時点の補足:</strong> <code>LLMChain</code> は<strong
+                >LangChain 0.1.17で非推奨化され、1.0では本体の <code>langchain</code> パッケージから
+                <code>langchain-classic</code>
+                パッケージへ移され、そこで非推奨のまま残されて</strong
+              >います。現在は本章で紹介されている
+              <code>prompt | llm</code> というLCELの書き方がそのまま標準です（<a
+                href="https://www.aurelio.ai/learn/langchain-lcel"
+                target="_blank"
+                rel="noopener"
+                >Aurelio AI: LangChain Expression Language解説</a
+              >）。また <code>SimpleSequentialChain</code> 等の旧式チェーンクラスも
+              <code>langchain_classic</code>
+              パッケージに後方互換性維持のためだけに残されている状態で、新規開発では非推奨とされています（<a
+                href="https://reference.langchain.com/python/langchain-classic/langchain_classic"
+                target="_blank"
+                rel="noopener"
+                >LangChain Reference: langchain_classic</a
+              >）。つまり、原著の5.5節で「これから使うべき書き方」として紹介されたLCELが、2026年現在ではまさに主流になっています。
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="ch6">
+          <h2><span class="num">Ch.6</span>Agents（エージェント）</h2>
+          <h3>6.1 AgentとChainの違い</h3>
+          <p>
+            Chainは「あらかじめ決められた処理の順序」を実行するのに対し、<strong>Agent（エージェント）はLLM自身が次にどのツールを使うかを都度判断する</strong>点が根本的に異なります。
+          </p>
+          <div class="mermaid-wrap">
+            <div class="mermaid-target" data-diagram="agentloop"></div>
+          </div>
+
+          <h3>6.2〜6.3 Agentの構築とタイプ</h3>
+          <p>
+            原著は <code>initialize_agent</code> 関数と、<code>ZERO_SHOT_REACT_DESCRIPTION</code>
+            などのエージェントタイプ（推論戦略）を使ったエージェント構築を解説しています。
+          </p>
+          <p>
+            <code>serpapi</code> ツールを動かすには、事前に SerpAPI 用パッケージの導入と API
+            キーの設定が必要です（キーはコードに直書きせず環境変数で渡します）。
+          </p>
+          <pre><code class="language-bash">pip install google-search-results
+export SERPAPI_API_KEY="your-serpapi-key"</code></pre>
+          <pre><code class="language-python"># 原著の書き方（2024年当時のAgent API）
+from langchain.agents import initialize_agent, AgentType, load_tools
+
+tools = load_tools(["serpapi", "llm-math"], llm=llm)
+agent = initialize_agent(
+    tools, llm, agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION, verbose=True
+)
+agent.run("2024年のノーベル物理学賞受賞者の年齢を2倍した数値は？")</code></pre>
+
+          <h3>6.4 Custom Tools for Agents</h3>
+          <p>
+            エージェントに独自のツール（社内APIやデータベース照会関数など）を追加する方法も紹介されており、<code
+              >@tool</code
+            >
+            デコレータを使ってPython関数をエージェントが呼び出せるツールに変換します。
+          </p>
+          <pre><code class="language-python">from langchain_core.tools import tool
+
+@tool
+def get_shipping_status(order_id: str) -> str:
+    """注文IDから配送状況を取得する"""
+    return f"注文 {order_id} は配送中です。"</code></pre>
+
+          <div class="callout">
+            <div class="ic"><i class="ti ti-info-circle"></i></div>
+            <div class="body">
+              <strong>2026年9月時点の補足:</strong> <code>initialize_agent</code> と
+              <code>AgentExecutor</code> は
+              <code>create_agent</code>
+              を推奨とする形で非推奨（deprecated）になっています。なお「2026年12月」はこれらAPIの移行期限ではなく、LangChain
+              0.3 系のメンテナンスサポート終了時期です。非推奨APIはLangChain 1.x でも
+              <code>langchain-classic</code> パッケージ経由で引き続き動作しますが、新規コードでは
+              <code>create_agent</code>
+              を使うのが推奨です。内部的にはLangGraphのランタイム上でエージェントループが動作しており、開発者は高レベルAPI（<code>create_agent</code>）のまま使うことも、必要に応じてLangGraphの
+              <code>StateGraph</code> まで降りて細かく制御することもできます（<a
+                href="https://uvik.net/blog/langchain-vs-langgraph/"
+                target="_blank"
+                rel="noopener"
+                >uvik.net: LangChain vs LangGraph 2026年版ガイド</a
+              >）。
+            </div>
+          </div>
+          <pre><code class="language-python"># 2026年時点の推奨される書き方
+from langchain.agents import create_agent
+
+agent = create_agent(
+    model="openai:gpt-5",
+    tools=[get_shipping_status],
+    system_prompt="あなたはECサイトのカスタマーサポート担当です。",
+)
+result = agent.invoke({"messages": [{"role": "user", "content": "注文12345の状況は？"}]})</code></pre>
+          <p style="font-size: 13.5px; color: var(--color-text-tertiary)">
+            出典:
+            <a
+              href="https://www.educative.io/courses/langchain-llm/what-is-create-agent"
+              target="_blank"
+              rel="noopener"
+              >Educative: What Is create_agent?</a
+            >
+          </p>
+        </section>
+
+        <section class="section" id="ch7">
+          <h2><span class="num">Ch.7</span>OutputParsers and Memory</h2>
+          <h3>7.1 OutputParsers（出力パーサー）</h3>
+          <p>
+            LLMの出力はデフォルトでは自由形式のテキストです。<code>OutputParser</code>
+            はこれを構造化データ（リスト、JSON、独自クラス）に変換する仕組みです。
+          </p>
+          <pre><code class="language-python">from langchain_core.output_parsers import CommaSeparatedListOutputParser
+
+parser = CommaSeparatedListOutputParser()
+# LLMに「カンマ区切りで答えて」と指示するプロンプトと組み合わせて使う</code></pre>
+          <p>
+            原著では、パース失敗時にLLM自身に修正させる<strong>Magic Output Fixer</strong>（<code
+              >OutputFixingParser</code
+            >
+            に相当）というテクニックも紹介されています。これは「出力が期待した形式でない場合、その旨をLLMに伝えて再生成させる」仕組みです。
+          </p>
+
+          <h3>7.2 Memory（会話記憶）</h3>
+          <p>
+            <code>ConversationBufferMemory</code> はすべての会話履歴をそのまま保持し、<code
+              >ConversationSummaryMemory</code
+            >
+            は履歴が長くなるとLLMを使って要約する仕組みです。
+          </p>
+          <pre><code class="language-python"># 原著の書き方（2024年当時のMemory API）
+from langchain.memory import ConversationBufferMemory
+
+memory = ConversationBufferMemory()
+memory.save_context({"input": "こんにちは"}, {"output": "こんにちは、ご用件は？"})</code></pre>
+
+          <div class="callout">
+            <div class="ic"><i class="ti ti-info-circle"></i></div>
+            <div class="body">
+              <strong>2026年9月時点の補足:</strong>
+              <code>ConversationBufferMemory</code>
+              を含む旧来のインプロセスMemoryクラス群は、<strong>LangChain 1.0で非推奨</strong
+              >となりました。現在の本番運用では、<strong>スレッド単位の短期的な会話履歴</strong>については、LangGraphの<strong>チェックポインター（checkpointer）</strong>が会話状態を永続化する仕組みに置き換わっています。ただしチェックポインターは
+              <code>ConversationSummaryMemory</code>
+              のような履歴の要約や、スレッドをまたいで共有する長期記憶までは代替しません。要約はミドルウェア（Summarization
+              等）、長期記憶は LangGraph の Store など、別の仕組みで扱う必要があります（<a
+                href="https://atlan.com/know/ai-agent/ai-agent-memory/what-is-langchain/"
+                target="_blank"
+                rel="noopener"
+                >Atlan: What is LangChain? 2026</a
+              >）。構造化出力についても、現在は <code>create_agent</code> の
+              <code>response_format</code>
+              パラメータでPydanticモデルを直接指定する方法が主流になりつつあります。
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="ch8">
+          <h2><span class="num">Ch.8</span>Callbacks</h2>
+          <p>
+            Callbacksは、チェーンやエージェントの実行中に発生するイベント（開始・終了・トークン生成・エラーなど）をフックして処理を差し込む仕組みです。
+          </p>
+          <div class="mermaid-wrap">
+            <div class="mermaid-target" data-diagram="callbacks"></div>
+          </div>
+          <p>
+            原著では
+            <code>StdOutputCallbackHandler</code
+            >（標準出力にログを流す）、<code>FileCallbackHandler</code>（ファイルにログを保存する）、そして独自のロジックを実装する<strong
+              >Custom Callbacks</strong
+            >が紹介されています。ログ収集、コスト計測、リアルタイムのトークンストリーミング表示など、実務上のデバッグ・監視用途で重要な機能です。
+          </p>
+
+          <div class="callout">
+            <div class="ic"><i class="ti ti-info-circle"></i></div>
+            <div class="body">
+              <strong>2026年9月時点の補足:</strong>
+              Callbacksの仕組み自体は現在も健在ですが、本番環境でのトレース・監視は自作のCallbackHandlerよりも<strong>LangSmith</strong>のトレーシング機能を使うのが標準的です。LangSmithはトレースの入出力表示のカスタマイズやベースライン比較機能などが2026年に入ってから拡充されています（<a
+                href="https://blog.langchain.com/febraury-2026-langchain-newsletter"
+                target="_blank"
+                rel="noopener"
+                >LangChain 2026年2月ニュースレター</a
+              >）。
+            </div>
+          </div>
+        </section>
+        <section class="section" id="ch9">
+          <h2><span class="num">Ch.9</span>RAGフレームワークとベクトルデータベース</h2>
+          <p>本章は原著の中でも特に実務価値の高いパートです。</p>
+          <h3>9.1 RAGとは何か</h3>
+          <p>
+            RAG（Retrieval-Augmented
+            Generation、検索拡張生成）とは、LLMが回答を生成する前に、外部データソースから関連情報を検索し、その情報をプロンプトに含めることで、最新情報や社内固有情報に基づいた回答を可能にする手法です。
+          </p>
+          <div class="mermaid-wrap"><div class="mermaid-target" data-diagram="ragpipe"></div></div>
+
+          <h3>9.2〜9.3 RAGの構成要素とLangChainでの実装</h3>
+          <p>RAGパイプラインは主に4つの要素で構成されます。</p>
+          <table>
+            <thead>
+              <tr>
+                <th>構成要素</th>
+                <th>役割</th>
+                <th>原著で扱われるクラス例</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Document Loader</td>
+                <td>元データ（PDF, Webページ, DB等）を読み込む</td>
+                <td><code>PyPDFLoader</code>, <code>WebBaseLoader</code></td>
+              </tr>
+              <tr>
+                <td>Text Splitter</td>
+                <td>長い文書を検索しやすい単位に分割</td>
+                <td><code>RecursiveCharacterTextSplitter</code></td>
+              </tr>
+              <tr>
+                <td>Embeddings</td>
+                <td>テキストをベクトルに変換</td>
+                <td><code>OpenAIEmbeddings</code></td>
+              </tr>
+              <tr>
+                <td>Vector Store</td>
+                <td>ベクトルを保存し類似度検索する</td>
+                <td><code>Chroma</code>, <code>FAISS</code>, <code>Pinecone</code></td>
+              </tr>
+            </tbody>
+          </table>
+          <pre><code class="language-python">from langchain_community.document_loaders import WebBaseLoader
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_openai import OpenAIEmbeddings
+from langchain_chroma import Chroma
+
+loader = WebBaseLoader("https://example.com/docs")
+docs = loader.load()
+
+splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
+chunks = splitter.split_documents(docs)
+
+vectorstore = Chroma.from_documents(chunks, OpenAIEmbeddings())
+retriever = vectorstore.as_retriever()
+
+# RAG用プロンプト（context と question を受け取る）
+from langchain_core.prompts import ChatPromptTemplate
+
+rag_prompt = ChatPromptTemplate.from_template(
+    "次の文脈だけを使って質問に答えてください。\n\n文脈:\n{context}\n\n質問: {question}"
+)
+
+# RAGチェーン（LCEL）
+# 入力は {"question": "..."} 形式。retriever には質問文字列だけを渡し、
+# 取得した Document の page_content を連結して context にする。
+from operator import itemgetter
+
+
+def format_docs(docs):
+    return "\n\n".join(doc.page_content for doc in docs)
+
+
+rag_chain = (
+    {
+        "context": itemgetter("question") | retriever | format_docs,
+        "question": itemgetter("question"),
+    }
+    | rag_prompt
+    | llm
+)</code></pre>
+
+          <h3>9.4〜9.5 Multi-document RAGとレコメンドシステム</h3>
+          <p>
+            原著は複数文書にまたがる検索（Multi-document
+            RAG）と、RAGの応用としてのレコメンドシステム構築にも触れています。複数ドキュメントを扱う際は、メタデータフィルタリング（例:
+            部署別、日付別）を組み合わせることで検索精度を高めるのが実務上のポイントです。
+          </p>
+
+          <h3>9.6 ベクトルデータベースの選び方</h3>
+          <p>
+            原著執筆時点（2024年）ではPinecone・FAISS・Chromaなどが主に紹介されていましたが、2026年現在のベクトルDBの選択肢は以下のように整理できます。
+          </p>
+          <table>
+            <thead>
+              <tr>
+                <th>データベース</th>
+                <th>得意分野</th>
+                <th>ホスティング</th>
+                <th>2026年の位置づけ</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Pinecone</td>
+                <td>運用負荷ゼロの本番RAG</td>
+                <td>フルマネージド</td>
+                <td>サーバーレス化で運用簡易性No.1</td>
+              </tr>
+              <tr>
+                <td>Qdrant</td>
+                <td>高性能なセルフホスト</td>
+                <td>セルフホスト / クラウド</td>
+                <td>コストパフォーマンスに優れる</td>
+              </tr>
+              <tr>
+                <td>Weaviate</td>
+                <td>ハイブリッド検索（BM25+ベクトル）</td>
+                <td>両対応</td>
+                <td>マルチモーダル検索に強い</td>
+              </tr>
+              <tr>
+                <td>Chroma</td>
+                <td>ローカル開発・プロトタイピング</td>
+                <td>組込み / セルフホスト</td>
+                <td>学習・検証用途で依然人気</td>
+              </tr>
+              <tr>
+                <td>pgvector</td>
+                <td>既存のPostgreSQL活用</td>
+                <td>セルフホスト（拡張機能）</td>
+                <td>追加インフラ不要で運用がシンプル</td>
+              </tr>
+            </tbody>
+          </table>
+          <p style="font-size: 13.5px; color: var(--color-text-tertiary)">
+            出典:
+            <a
+              href="https://www.braintrust.dev/articles/best-vector-databases-for-rag-2026"
+              target="_blank"
+              rel="noopener"
+              >Braintrust: Best Vector Databases for RAG 2026</a
+            >,
+            <a href="https://dupple.com/learn/best-vector-databases" target="_blank" rel="noopener"
+              >Dupple: Best Vector Databases 2026</a
+            >
+          </p>
+
+          <div class="callout">
+            <div class="ic"><i class="ti ti-info-circle"></i></div>
+            <div class="body">
+              <strong>2026年9月時点の補足:</strong>
+              2026年時点では「ベクトル検索単体」ではなく、BM25のようなキーワード検索とベクトル検索を組み合わせた<strong>ハイブリッド検索</strong>が本番RAGの標準的な構成になっています。また、ベクトル検索機能がPostgreSQL・MongoDB
+              Atlas・主要クラウドのマネージドDBに標準搭載されるようになり、「専用ベクトルDBを新規導入するかどうか」自体が設計判断のポイントになっています（<a
+                href="https://solguruz.com/generative-ai/vector-database/"
+                target="_blank"
+                rel="noopener"
+                >Solguruz: Vector Database解説</a
+              >）。
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="ch10">
+          <h2><span class="num">Ch.10</span>LangChainを使ったNLPタスク</h2>
+          <p>
+            原著は本章で、LangChainを従来型のNLP（自然言語処理）タスクに応用する方法を紹介しています。
+          </p>
+          <table>
+            <thead>
+              <tr>
+                <th>タスク</th>
+                <th>説明</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>10.1 Summarization</td>
+                <td>長文の要約（<code>load_summarize_chain</code> 等）</td>
+              </tr>
+              <tr>
+                <td>10.2 Text Tagging / Classification</td>
+                <td>テキストへのラベル付け・分類</td>
+              </tr>
+              <tr>
+                <td>10.3 Named Entity Recognition (NER)</td>
+                <td>固有表現抽出（人名・地名・組織名など）</td>
+              </tr>
+              <tr>
+                <td>10.4 Text Embeddings</td>
+                <td>テキストの意味的ベクトル表現</td>
+              </tr>
+              <tr>
+                <td>10.5 Few-Shot Classification</td>
+                <td>少数の例示から分類させる手法</td>
+              </tr>
+              <tr>
+                <td>10.6 POS Tagging, Segmentation</td>
+                <td>品詞タグ付け・文分割</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h3>Few-Shot Learningの考え方</h3>
+          <p>
+            Few-Shot
+            Learningとは、モデルを再学習させることなく、プロンプト内にいくつかの「入力と正解のペア（例示）」を含めることで、望ましい出力形式や分類基準をLLMに理解させる手法です。
+          </p>
+          <pre><code class="language-python">from langchain_core.prompts import FewShotPromptTemplate, PromptTemplate
+
+examples = [
+    {"text": "このカレーは辛すぎる", "label": "ネガティブ"},
+    {"text": "サービスがとても丁寧だった", "label": "ポジティブ"},
+]
+example_prompt = PromptTemplate.from_template("入力: {text}\n分類: {label}")
+
+few_shot_prompt = FewShotPromptTemplate(
+    examples=examples,
+    example_prompt=example_prompt,
+    suffix="入力: {input}\n分類:",
+    input_variables=["input"],
+)</code></pre>
+          <p>
+            <strong>Example Selection</strong
+            >（原著10.5.3節）は、大量の例示候補の中から、入力に最も類似した例だけを動的に選んで使う手法で、ベクトル類似度検索（第9章のRAGと同じ仕組み）を応用します。
+          </p>
+
+          <div class="callout">
+            <div class="ic"><i class="ti ti-info-circle"></i></div>
+            <div class="body">
+              <strong>2026年9月時点の補足:</strong>
+              従来のNLPタスク（分類・NER・要約）は、2026年現在では汎用LLM（GPT-5, Claude Sonnet
+              4.5等）に直接プロンプトで指示するだけで、専用モデルの訓練なしに高精度な結果が得られるケースが大半です。ただし超高速・低コストが求められる大量バッチ処理では、依然として軽量な専用モデル（spaCy等）とLLMを併用する設計が採られています。
+            </div>
+          </div>
+        </section>
+        <section class="section" id="ch11">
+          <h2><span class="num">Ch.11</span>LLMのハルシネーション対策</h2>
+          <h3>11.1〜11.2 ハルシネーションとは、なぜ起きるのか</h3>
+          <p>
+            ハルシネーション（Hallucination）とは、LLMが事実に基づかない内容を、あたかも真実であるかのように生成してしまう現象です。原著では、LLMが確率的に「もっともらしい単語列」を生成する仕組み上、学習データにない情報や、曖昧な質問に対して誤った内容を「自信満々に」出力してしまうことが原因として説明されています。
+          </p>
+          <div class="mermaid-wrap"><div class="mermaid-target" data-diagram="hallu"></div></div>
+
+          <h3>11.3〜11.4 LLMCheckerChainとLLMSummarizationChain</h3>
+          <p>
+            原著は、LLM自身に自分の回答の妥当性をチェックさせる
+            <code>LLMCheckerChain</code> や、要約結果の正確性を検証する
+            <code>LLMSummarizationChain</code>
+            を対策として紹介しています。これは「LLMにLLMの出力を検証させる」というセルフチェック方式です。
+          </p>
+
+          <h3>11.5 RAGによるハルシネーション回避</h3>
+          <p>
+            最も効果的な対策として原著が強調しているのが、第9章で学んだRAGです。回答の根拠となる情報を検索結果としてプロンプトに含めることで、LLMが「知らないことを作り話しする」リスクを大幅に減らせます。
+          </p>
+
+          <div class="callout">
+            <div class="ic"><i class="ti ti-info-circle"></i></div>
+            <div class="body">
+              <strong>2026年9月時点の補足:</strong>
+              ハルシネーション対策は2026年でも生成AI活用の中心課題であり続けています。RAGに加えて、<strong>出典の引用（Citation）を強制する仕組み</strong>、<strong>複数モデルによるクロスチェック</strong>、そして評価パイプライン（第12章）を使った継続的なハルシネーション率のモニタリングが標準的な実務プラクティスとして定着しています。
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="ch12">
+          <h2><span class="num">Ch.12</span>LLMの評価（Evaluating LLMs）</h2>
+          <p>
+            原著は、LLMを使ったアプリケーションの品質を定量的に測るための評価手法を紹介しています。
+          </p>
+          <table>
+            <thead>
+              <tr>
+                <th>評価手法</th>
+                <th>説明</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>12.1 String Evaluators</td>
+                <td>出力文字列を基準に評価（正解と完全一致するか等）</td>
+              </tr>
+              <tr>
+                <td>12.1.1 Criteria Evaluators</td>
+                <td>「簡潔さ」「正確性」等の基準でLLM自身に採点させる</td>
+              </tr>
+              <tr>
+                <td>12.1.2 Custom Evaluators</td>
+                <td>独自の評価ロジックを実装</td>
+              </tr>
+              <tr>
+                <td>12.2 Comparison Evaluators</td>
+                <td>2つの出力のどちらが優れているかを比較評価</td>
+              </tr>
+              <tr>
+                <td>12.3 Trajectory Evaluators</td>
+                <td>エージェントの意思決定プロセス全体（ツール呼び出しの順序等）を評価</td>
+              </tr>
+            </tbody>
+          </table>
+          <pre><code class="language-python"># 原著の書き方（Criteria Evaluatorの例）
+from langchain.evaluation import load_evaluator
+
+evaluator = load_evaluator("criteria", criteria="conciseness")
+eval_result = evaluator.evaluate_strings(
+    prediction="LangChainはLLMアプリ開発用のフレームワークです。",
+    input="LangChainとは何ですか？",
+)</code></pre>
+
+          <div class="callout">
+            <div class="ic"><i class="ti ti-info-circle"></i></div>
+            <div class="body">
+              <strong>2026年9月時点の補足:</strong>
+              評価（Evaluation）はLangChainエコシステムの中でも特に進化が著しい領域です。現在は<strong>LangSmith上のEvaluation/Experiments機能</strong>を使い、データセットに対してチェーンやエージェントをバッチ実行し、複数の評価指標（正確性・レイテンシ・コストなど）を継続的にトラッキングするのが標準です。2026年2月のアップデートでは、実験結果を「ベースラインとしてピン留めし、以降の変更との差分を自動比較する」機能が追加されており、CI/CDパイプラインに評価を組み込む動きが加速しています（<a
+                href="https://blog.langchain.com/febraury-2026-langchain-newsletter"
+                target="_blank"
+                rel="noopener"
+                >LangChain 2026年2月ニュースレター</a
+              >）。
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="ch13">
+          <h2><span class="num">Ch.13</span>高度なプロンプトエンジニアリング</h2>
+          <h3>13.1 Chain of Thought（思考の連鎖）</h3>
+          <p>
+            <strong>Chain of Thought（CoT）</strong
+            >は、LLMに最終的な答えだけでなく、そこに至る推論過程を段階的に出力させることで、複雑な問題への回答精度を高める手法です。
+          </p>
+          <ul>
+            <li>
+              <strong>13.1.1 Think Step by Step:</strong>
+              プロンプトに「ステップバイステップで考えてください」という指示を加えるだけの手軽な手法（Zero-shot
+              CoT）
+            </li>
+            <li>
+              <strong>13.1.2 Few-Shot Prompting:</strong>
+              推論過程を含む例示をいくつか与えることで、より安定した推論パターンをLLMに学習させる手法
+            </li>
+          </ul>
+
+          <h3>13.2 ReAct（Reasoning + Acting）</h3>
+          <p>
+            <strong>ReAct</strong
+            >は「推論（Reasoning）」と「行動（Acting）」を交互に繰り返すことで、LLMがツールを使いながら段階的に問題を解決していく手法です。第6章のAgentの内部動作の理論的基盤にもなっています。
+          </p>
+          <div class="mermaid-wrap"><div class="mermaid-target" data-diagram="react"></div></div>
+
+          <h3>13.3 Tree of Thoughts（思考の木）</h3>
+          <p>
+            <strong>Tree of Thoughts（ToT）</strong
+            >は、CoTが一本道の推論であるのに対し、複数の推論経路を並行して探索し、有望な経路を評価・選択しながら最終解に到達する、より高度な推論戦略です。
+          </p>
+
+          <h3>13.4 その他のプロンプトエンジニアリング手法</h3>
+          <p>
+            原著はこのほか、Self-Consistency（複数回生成し多数決を取る）などの手法にも触れています。
+          </p>
+
+          <div class="callout">
+            <div class="ic"><i class="ti ti-info-circle"></i></div>
+            <div class="body">
+              <strong>2026年9月時点の補足:</strong>
+              CoT・ReAct・ToTはいずれも2026年時点でも有効な基礎テクニックですが、GPT-5やClaude
+              Sonnet系のような「推論（reasoning）」に最適化されたモデルでは、モデル自体が内部的に段階的思考を行うため、明示的な「ステップバイステップで考えて」という指示なしでも高い推論性能を発揮するようになっています。とはいえ、エージェントの意思決定プロセスを人間が検証・デバッグしやすくするという観点で、ReAct的な「思考の可視化」は現在も実務上重要な設計パターンです。
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="ch14">
+          <h2><span class="num">Ch.14</span>自律型AIエージェント（Autonomous AI agents）</h2>
+          <h3>14.1 AGIとは</h3>
+          <p>
+            原著は本章の導入として、AGI（Artificial General
+            Intelligence、汎用人工知能）という概念と、2023年頃に話題となった「完全自律型エージェント」の実験プロジェクト群を紹介しています。
+          </p>
+
+          <h3>14.2〜14.4 AutoGPT・BabyAGI・HuggingGPT</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>プロジェクト</th>
+                <th>コンセプト</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>AutoGPT</td>
+                <td>
+                  与えられた大目標を、LLM自身がサブタスクに分解し、ツール（Web検索・ファイル操作等）を使って自律的に達成を目指す
+                </td>
+              </tr>
+              <tr>
+                <td>BabyAGI</td>
+                <td>
+                  タスクリストを動的に生成・優先順位付け・実行するループ構造で、シンプルな自律エージェントの実装例として知られる
+                </td>
+              </tr>
+              <tr>
+                <td>HuggingGPT</td>
+                <td>
+                  LLMを「司令塔」とし、Hugging
+                  Face上の多数の専門特化モデル（画像認識、音声認識等）をタスクに応じて呼び分ける仕組み
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="mermaid-wrap">
+            <div class="mermaid-target" data-diagram="autonomous"></div>
+          </div>
+          <p>
+            これらのプロジェクトは2023年当時、完全自律型AIの可能性を示す一方で、「無限ループに陥る」「コストが予測不能に膨らむ」といった実務上の課題も広く指摘されました。
+          </p>
+
+          <div class="callout">
+            <div class="ic"><i class="ti ti-info-circle"></i></div>
+            <div class="body">
+              <strong>2026年9月時点の補足:</strong>
+              AutoGPT・BabyAGIのような「完全放任型」の自律エージェントは実務での採用が限定的だった一方、その設計思想は2026年の<strong>LangGraph</strong>による「制御可能な自律性」へと発展的に継承されています。LangGraphでは、エージェントのループ構造をグラフとして明示的に定義し、人間による承認ステップ（Human-in-the-loop）や実行予算の上限設定（<code
+                >langchain-runcycles</code
+              >
+              のようなミドルウェアによるツール呼び出し回数の制御等）を組み込めるため、「暴走しない自律エージェント」の実現が進んでいます。また、常時バックグラウンドでイベントを監視し続ける「アンビエントエージェント（Ambient
+              Agents）」という新しい概念も、LangChain CEO Harrison
+              Chase氏によって提唱されています（<a
+                href="https://sequoiacap.com/?p=17611"
+                target="_blank"
+                rel="noopener"
+                >Sequoia Capital: Harrison Chase インタビュー</a
+              >）。
+            </div>
+          </div>
+        </section>
+        <section class="section" id="ch15">
+          <h2><span class="num">Ch.15</span>LangSmith and LangServe</h2>
+          <h3>15.1 LangSmith</h3>
+          <p>
+            <strong>LangSmith</strong
+            >は、LangChainアプリケーションの実行トレース収集、デバッグ、評価（第12章参照）を行うための観測プラットフォームです。原著刊行時点でも「本番運用に耐えるアプリケーションを作るための必須ツール」として紹介されています。
+          </p>
+
+          <h3>15.2 LangServe</h3>
+          <p>
+            <strong>LangServe</strong>は、LangChainのRunnable（Chain/Agent）をFastAPIベースのREST
+            APIとして即座に公開するためのライブラリです。原著では <code>/invoke</code>,
+            <code>/batch</code>,
+            <code>/stream</code> といった標準エンドポイントが自動生成される点が紹介されています。
+          </p>
+          <pre><code class="language-python"># 原著の書き方（LangServeによるデプロイ例）
+from fastapi import FastAPI
+from langserve import add_routes
+
+app = FastAPI()
+add_routes(app, rag_chain, path="/rag")</code></pre>
+
+          <div class="callout important">
+            <div class="ic"><i class="ti ti-alert-triangle"></i></div>
+            <div class="body">
+              <strong>2026年9月時点の補足（重要）:</strong>
+              <strong
+                >LangServeは2024年11月18日付で正式に非推奨（deprecated）となり、2026年5月5日にGitHubリポジトリがアーカイブされました。</strong
+              >公式には新規プロジェクトでの利用は推奨されておらず、後継として<strong
+                >LangSmith Deployment</strong
+              >（旧 LangGraph Platform）への移行が案内されています（<a
+                href="https://github.com/langchain-ai/langserve"
+                target="_blank"
+                rel="noopener"
+                >LangServe公式GitHubの非推奨表示</a
+              >）。実務コミュニティの評価では、LangServeは「最初の2〜4週間は非常に便利だが、要件が複雑化する3ヶ月目あたりから抽象化の限界が露呈しやすい」という指摘もありました（<a
+                href="https://enterprisedna.co/resources/blog/practitioner-langserve-review"
+                target="_blank"
+                rel="noopener"
+                >Enterprise DNA: LangServeの実運用レビュー</a
+              >）。一方LangSmithは現役かつ主力製品として継続的に機能強化されており、2025年10月23日にInsights
+              Agent（定期レポートの自動生成）が発表され、2025年10月29日にAgent
+              Builder（会話からエージェントを直接生成する機能）が公開されました。Agent Builder
+              は2026年3月以降、<strong>LangSmith Fleet</strong> に名称変更されています（<a
+                href="https://www.langchain.com/blog/introducing-langsmith-fleet"
+                target="_blank"
+                rel="noopener"
+                >LangChain公式ブログ: Introducing LangSmith Fleet</a
+              >）。
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="ch16">
+          <h2><span class="num">Ch.16</span>追加機能（Additional Features）</h2>
+          <h3>16.1 Fallbacks（フォールバック）</h3>
+          <p>
+            <strong>Fallback</strong
+            >は、あるモデルやチェーンの呼び出しが失敗（レート制限、タイムアウト、エラー等）した際に、代替のモデルやロジックへ自動的に切り替える仕組みです。原著ではLLM単体に対するFallbackと、Chain全体に対するFallbackの両方が紹介されています。
+          </p>
+          <pre><code class="language-python"># 原著の書き方（Fallbackの概念例）
+primary_llm = ChatOpenAI(model="gpt-4o")
+backup_llm = ChatOpenAI(model="gpt-4o-mini")
+robust_llm = primary_llm.with_fallbacks([backup_llm])</code></pre>
+
+          <h3>16.2 Safety（安全性）</h3>
+          <p>
+            <code>OpenAIModerationChain</code>（有害コンテンツの検出）や
+            <code>ConstitutionalChain</code
+            >（あらかじめ定義した倫理原則に沿うよう出力を修正する仕組み）が、安全性確保のための機能として紹介されています。
+          </p>
+
+          <h3>16.3〜16.4 Model LaboratoryとDebugging</h3>
+          <p>
+            <code>ModelLaboratory</code> は複数モデルの出力を並べて比較する実験用ツール、そして
+            <code>verbose=True</code>
+            の設定やデバッグモードは、チェーン・エージェントの内部動作を可視化するための基本的な手段として紹介されています。
+          </p>
+
+          <div class="callout">
+            <div class="ic"><i class="ti ti-info-circle"></i></div>
+            <div class="body">
+              <strong>2026年9月時点の補足:</strong>
+              Fallback機能は2026年現在も現役の重要パターンであり、<code>create_agent</code>
+              のミドルウェアシステムを通じてより柔軟に設定できるようになっています。Safety機能についても、単一のModerationChainだけでなく、入力・出力の両方を多層的にガードレール（Guardrails）でチェックする設計が業界標準になりつつあります。デバッグに関しては、<code
+                >verbose=True</code
+              >
+              のようなテキストログよりも、LangSmithのトレースビューでツール呼び出し・トークン使用量・レイテンシを可視的に追う方法が主流です。
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="update2026">
+          <h2><span class="num">2026</span>2026年9月時点の最新動向まとめ</h2>
+          <p>
+            本書は2024年前半の執筆であり、LangChainは2025年10月22日の<strong
+              >v1.0 / LangGraph v1.0 同時リリース</strong
+            >を境に大きく進化しました。本書で学んだ概念を実務に活かす際は、以下の対応関係を押さえておくと役立ちます。
+          </p>
+          <table>
+            <thead>
+              <tr>
+                <th>本書（2024年）のAPI・概念</th>
+                <th>2026年9月時点の現行アプローチ</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>LLMChain</code></td>
+                <td>
+                  <code>prompt | llm</code
+                  >（LCEL）。ツール呼び出しの実行ループを伴うエージェント動作が必要な場合のみ
+                  <code>create_agent</code>
+                </td>
+              </tr>
+              <tr>
+                <td><code>initialize_agent</code> / <code>AgentExecutor</code></td>
+                <td><code>langchain.agents.create_agent</code>（LangGraphランタイム上で動作）</td>
+              </tr>
+              <tr>
+                <td><code>ConversationBufferMemory</code> 等の旧Memoryクラス</td>
+                <td>
+                  用途別に置き換え：スレッド単位の会話履歴はLangGraphの checkpointer
+                  で永続化、履歴の要約はSummarizationミドルウェア、スレッドをまたぐ長期記憶はLangGraph
+                  Store
+                </td>
+              </tr>
+              <tr>
+                <td><code>SimpleSequentialChain</code> 等の旧チェーン群</td>
+                <td><code>langchain_classic</code> に後方互換として残存、新規開発では非推奨</td>
+              </tr>
+              <tr>
+                <td>LangServeでのAPI化</td>
+                <td>
+                  LangSmith Deployment（旧 LangGraph
+                  Platform）への移行が公式推奨（LangServeは2026年5月にアーカイブ）
+                </td>
+              </tr>
+              <tr>
+                <td>手動での <code>verbose=True</code> デバッグ</td>
+                <td>LangSmithのトレーシング・評価（Evaluation/Experiments）機能</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="mermaid-wrap"><div class="mermaid-target" data-diagram="timeline"></div></div>
+          <p>
+            この移行の背景については、LangChain公式の設計思想の変遷が
+            <a
+              href="https://docs.langchain.com/oss/python/langchain-philosophy"
+              target="_blank"
+              rel="noopener"
+              >langchain-philosophy ドキュメント</a
+            >で詳しく解説されています。要点は「LangChainは高レベルの使いやすいインターフェースを提供し、より細かい制御が必要になった開発者はLangGraphに降りていける」という二層構造の考え方です。またLangChain
+            0.3系は2026年12月まで<strong>メンテナンスモード（セキュリティパッチと重大な不具合修正）</strong>として継続サポートされる予定であり、旧APIから急いで移行する必要はないものの、新規プロジェクトでは1.0系の採用が推奨されています（<a
+              href="https://docs.langchain.com/oss/python/release-policy"
+              target="_blank"
+              rel="noopener"
+              >LangChain公式: リリースポリシー</a
+            >）。
+          </p>
+        </section>
+
+        <section class="section" id="refs">
+          <h2><span class="num">Refs</span>参考文献・ソース一覧</h2>
+          <p>
+            本ガイドの作成にあたり、以下の情報源を参照しました。書籍の詳細情報は公式・著者本人の投稿を、2026年時点の技術動向は国際的に著名な開発者・企業の一次情報を優先して参照しています。
+          </p>
+          <div class="ref-list">
+            <div class="ref-card">
+              <div class="badge">1</div>
+              <div class="txt">
+                <span class="t"
+                  >O'Reilly（Packt Publishing収録）書籍ページ「LangChain in your Pocket」</span
+                ><a
+                  href="https://www.oreilly.com/library/view/langchain-in-your/9781836201250/"
+                  target="_blank"
+                  rel="noopener"
+                  >https://www.oreilly.com/library/view/langchain-in-your/9781836201250/</a
+                >
+              </div>
+            </div>
+            <div class="ref-card">
+              <div class="badge">2</div>
+              <div class="txt">
+                <span class="t"
+                  >著者 Mehul Gupta 氏によるDEV Community投稿（書籍出版のアナウンス）</span
+                ><a
+                  href="https://dev.to/mehulgupta7991/my-debut-book-langchain-in-your-pocket-is-out--7oc"
+                  target="_blank"
+                  rel="noopener"
+                  >https://dev.to/mehulgupta7991/my-debut-book-langchain-in-your-pocket-is-out--7oc</a
+                >
+              </div>
+            </div>
+            <div class="ref-card">
+              <div class="badge">3</div>
+              <div class="txt">
+                <span class="t">Amazon書籍ページ（目次・Key Features）</span
+                ><a
+                  href="https://www.amazon.com/LangChain-your-Pocket-Generative-Applications-ebook/dp/B0CTHQHT25"
+                  target="_blank"
+                  rel="noopener"
+                  >https://www.amazon.com/LangChain-your-Pocket-Generative-Applications-ebook/dp/B0CTHQHT25</a
+                >
+              </div>
+            </div>
+            <div class="ref-card">
+              <div class="badge">4</div>
+              <div class="txt">
+                <span class="t"
+                  >LangChain公式ドキュメント「LangChain
+                  philosophy」（LangGraphへの統合の経緯）</span
+                ><a
+                  href="https://docs.langchain.com/oss/python/langchain-philosophy"
+                  target="_blank"
+                  rel="noopener"
+                  >https://docs.langchain.com/oss/python/langchain-philosophy</a
+                >
+              </div>
+            </div>
+            <div class="ref-card">
+              <div class="badge">5</div>
+              <div class="txt">
+                <span class="t"
+                  >LangChain公式ドキュメント「Release policy」（LTSとバージョン方針）</span
+                ><a
+                  href="https://docs.langchain.com/oss/python/release-policy"
+                  target="_blank"
+                  rel="noopener"
+                  >https://docs.langchain.com/oss/python/release-policy</a
+                >
+              </div>
+            </div>
+            <div class="ref-card">
+              <div class="badge">6</div>
+              <div class="txt">
+                <span class="t"
+                  >LangChain Reference「langchain_classic」（非推奨モジュール一覧）</span
+                ><a
+                  href="https://reference.langchain.com/python/langchain-classic/langchain_classic"
+                  target="_blank"
+                  rel="noopener"
+                  >https://reference.langchain.com/python/langchain-classic/langchain_classic</a
+                >
+              </div>
+            </div>
+            <div class="ref-card">
+              <div class="badge">7</div>
+              <div class="txt">
+                <span class="t">Aurelio AI「LangChain Expression Language (LCEL)」解説</span
+                ><a
+                  href="https://www.aurelio.ai/learn/langchain-lcel"
+                  target="_blank"
+                  rel="noopener"
+                  >https://www.aurelio.ai/learn/langchain-lcel</a
+                >
+              </div>
+            </div>
+            <div class="ref-card">
+              <div class="badge">8</div>
+              <div class="txt">
+                <span class="t"
+                  >uvik.net「LangChain vs LangGraph: A Senior Engineer's 2026 Decision Guide」</span
+                ><a
+                  href="https://uvik.net/blog/langchain-vs-langgraph/"
+                  target="_blank"
+                  rel="noopener"
+                  >https://uvik.net/blog/langchain-vs-langgraph/</a
+                >
+              </div>
+            </div>
+            <div class="ref-card">
+              <div class="badge">9</div>
+              <div class="txt">
+                <span class="t">Educative「What Is create_agent?」</span
+                ><a
+                  href="https://www.educative.io/courses/langchain-llm/what-is-create-agent"
+                  target="_blank"
+                  rel="noopener"
+                  >https://www.educative.io/courses/langchain-llm/what-is-create-agent</a
+                >
+              </div>
+            </div>
+            <div class="ref-card">
+              <div class="badge">10</div>
+              <div class="txt">
+                <span class="t"
+                  >Atlan「What is LangChain? Open-Source AI Framework Explained (2026)」</span
+                ><a
+                  href="https://atlan.com/know/ai-agent/ai-agent-memory/what-is-langchain/"
+                  target="_blank"
+                  rel="noopener"
+                  >https://atlan.com/know/ai-agent/ai-agent-memory/what-is-langchain/</a
+                >
+              </div>
+            </div>
+            <div class="ref-card">
+              <div class="badge">11</div>
+              <div class="txt">
+                <span class="t"
+                  >FutureAGI「What is LangChain? A 2026 Production Engineer's Guide」</span
+                ><a
+                  href="https://futureagi.com/blog/what-is-langchain/"
+                  target="_blank"
+                  rel="noopener"
+                  >https://futureagi.com/blog/what-is-langchain/</a
+                >
+              </div>
+            </div>
+            <div class="ref-card">
+              <div class="badge">12</div>
+              <div class="txt">
+                <span class="t">LangServe 公式GitHubリポジトリ（非推奨・アーカイブ表示）</span
+                ><a href="https://github.com/langchain-ai/langserve" target="_blank" rel="noopener"
+                  >https://github.com/langchain-ai/langserve</a
+                >
+              </div>
+            </div>
+            <div class="ref-card">
+              <div class="badge">13</div>
+              <div class="txt">
+                <span class="t"
+                  >Enterprise DNA「LangServe: What Engineers Actually Found」実運用レビュー</span
+                ><a
+                  href="https://enterprisedna.co/resources/blog/practitioner-langserve-review"
+                  target="_blank"
+                  rel="noopener"
+                  >https://enterprisedna.co/resources/blog/practitioner-langserve-review</a
+                >
+              </div>
+            </div>
+            <div class="ref-card">
+              <div class="badge">14</div>
+              <div class="txt">
+                <span class="t"
+                  >LangChain公式ブログ「2026年2月ニュースレター」（LangSmith新機能、Interrupt
+                  2026）</span
+                ><a
+                  href="https://blog.langchain.com/febraury-2026-langchain-newsletter"
+                  target="_blank"
+                  rel="noopener"
+                  >https://blog.langchain.com/febraury-2026-langchain-newsletter</a
+                >
+              </div>
+            </div>
+            <div class="ref-card">
+              <div class="badge">15</div>
+              <div class="txt">
+                <span class="t"
+                  >Sequoia Capital「LangChain's Harrison Chase on Building the Orchestration Layer
+                  for AI Agents」</span
+                ><a href="https://sequoiacap.com/?p=17611" target="_blank" rel="noopener"
+                  >https://sequoiacap.com/?p=17611</a
+                >
+              </div>
+            </div>
+            <div class="ref-card">
+              <div class="badge">16</div>
+              <div class="txt">
+                <span class="t">Braintrust「Best Vector Databases for RAG in 2026」</span
+                ><a
+                  href="https://www.braintrust.dev/articles/best-vector-databases-for-rag-2026"
+                  target="_blank"
+                  rel="noopener"
+                  >https://www.braintrust.dev/articles/best-vector-databases-for-rag-2026</a
+                >
+              </div>
+            </div>
+            <div class="ref-card">
+              <div class="badge">17</div>
+              <div class="txt">
+                <span class="t"
+                  >Dupple「Best Vector Databases in 2026: 8 Options Tested for RAG and Scale」</span
+                ><a
+                  href="https://dupple.com/learn/best-vector-databases"
+                  target="_blank"
+                  rel="noopener"
+                  >https://dupple.com/learn/best-vector-databases</a
+                >
+              </div>
+            </div>
+            <div class="ref-card">
+              <div class="badge">18</div>
+              <div class="txt">
+                <span class="t">Solguruz「Vector Database解説（2026年時点の市場動向）」</span
+                ><a
+                  href="https://solguruz.com/generative-ai/vector-database/"
+                  target="_blank"
+                  rel="noopener"
+                  >https://solguruz.com/generative-ai/vector-database/</a
+                >
+              </div>
+            </div>
+            <div class="ref-card">
+              <div class="badge">19</div>
+              <div class="txt">
+                <span class="t">LangChain公式ブログ「Introducing LangSmith Fleet」</span
+                ><a
+                  href="https://www.langchain.com/blog/introducing-langsmith-fleet"
+                  target="_blank"
+                  rel="noopener"
+                  >https://www.langchain.com/blog/introducing-langsmith-fleet</a
+                >
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <footer>
+          本ガイドはPackt
+          Publishing刊行の書籍を要約・解説する二次的な学習資料であり、原著の全文を転載するものではありません。より詳細な内容やコード全文は、上記O'Reilly/Packtの公式書籍でご確認ください。
+        </footer>
+      </main>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.12.0/mermaid.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script>
+      window.DIAGRAMS = {
+        bookmap: `flowchart TB
+    A["第1章 LLMとLangChainの基礎"] --> B["第2章 Hello World"]
+    B --> C["第3章 LangChainのモジュール構成"]
+    C --> D["第4章 Models and Prompts"]
+    D --> E["第5章 Chains"]
+    E --> F["第6章 Agents"]
+    F --> G["第7章 OutputParsers and Memory"]
+    G --> H["第8章 Callbacks"]
+    H --> I["第9章 RAGとベクトルDB"]
+    I --> J["第10章 NLPタスクへの応用"]
+    J --> K["第11章 ハルシネーション対策"]
+    K --> L["第12章 LLMの評価"]
+    L --> M["第13章 高度なプロンプト設計"]
+    M --> N["第14章 自律型AIエージェント"]
+    N --> O["第15章 LangSmith and LangServe"]
+    O --> P["第16章 追加機能"]
+    P --> Q["2026年最新動向まとめ"]
+
+    classDef basic fill:#241b3d,stroke:#8f7ae5,color:#ece7fb
+    classDef core fill:#0f2a28,stroke:#35b8a8,color:#d7f5f0
+    classDef advanced fill:#331a17,stroke:#e2735a,color:#ffe1d8
+    class A,B,C,D basic
+    class E,F,G,H,I,J core
+    class K,L,M,N,O,P,Q advanced`,
+
+        features: `flowchart LR
+    subgraph Core["LangChainが提供する主な機能"]
+        direction TB
+        M["Models: 複数プロバイダーを共通APIで呼び出す"]
+        P["Prompts: プロンプトのテンプレート化"]
+        Ch["Chains: 複数ステップの処理を連結"]
+        Ag["Agents: ツールを使った自律的な意思決定"]
+        Mem["Memory: 会話履歴の保持"]
+        R["Retrieval: 外部データの検索・RAG"]
+    end
+    LLM["LLM単体"] --> Core --> App["実用的なAIアプリケーション"]`,
+
+        helloflow: `flowchart LR
+    A["入力テキスト"] --> B["Text Pre-processing\\n記号/空白除去"]
+    B --> C["PromptTemplate"]
+    C --> D["LLM呼び出し\\nクラウドAPI or ローカルLLM"]
+    D --> E["生成結果"]`,
+
+        modulemap: `flowchart TB
+    subgraph Input["入力層"]
+        Pr["Prompts"]
+    end
+    subgraph Processing["処理層"]
+        Mo["Models"]
+        Ch["Chains"]
+        Ag["Agents"]
+    end
+    subgraph Support["支援層"]
+        Me["Memory"]
+        Op["OutputParsers"]
+        Cb["Callbacks"]
+        Idx["Indexes / Retrieval"]
+    end
+    Pr --> Mo --> Ch --> Ag
+    Me -.-> Ch
+    Op -.-> Ch
+    Cb -.-> Ch
+    Idx -.-> Ag`,
+
+        lcel: `flowchart LR
+    P["PromptTemplate"] -->|"パイプ演算子"| M["ChatModel"]
+    M -->|"パイプ演算子"| O["OutputParser"]
+    O --> R["最終結果"]`,
+
+        agentloop: `flowchart TB
+    U["ユーザーの質問"] --> LLM["LLMが思考"]
+    LLM --> D{"ツールが必要か?"}
+    D -->|"必要"| T["ツールを実行\\n検索/計算/DB照会など"]
+    T --> LLM
+    D -->|"不要 / 十分な情報が揃った"| A["最終回答を生成"]`,
+
+        callbacks: `sequenceDiagram
+    participant App as アプリケーション
+    participant Chain as Chain/Agent
+    participant CB as CallbackHandler
+    App->>Chain: invoke()
+    Chain->>CB: on_chain_start
+    Chain->>CB: on_llm_start
+    Chain->>CB: on_llm_new_token(ストリーミング時)
+    Chain->>CB: on_llm_end
+    Chain->>CB: on_chain_end
+    Chain-->>App: 結果を返す`,
+
+        ragpipe: `flowchart LR
+    Q["ユーザーの質問"] --> Emb["質問をベクトル化\\nEmbedding"]
+    Emb --> VDB[("ベクトルデータベース")]
+    VDB -->|"類似度検索"| Chunks["関連ドキュメントの\\nチャンクを取得"]
+    Chunks --> Prompt["質問 + 検索結果を\\nプロンプトに結合"]
+    Prompt --> LLM["LLMが回答を生成"]
+    LLM --> Ans["最終回答"]
+
+    Docs["元ドキュメント群"] --> Split["チャンク分割"]
+    Split --> Emb2["Embedding化"]
+    Emb2 --> VDB`,
+
+        hallu: `flowchart TB
+    Q["質問"] --> LLM["LLMが確率的に\\n次の単語を予測"]
+    LLM --> Known{"学習データに\\n十分な根拠があるか?"}
+    Known -->|"Yes"| Correct["事実に基づいた回答"]
+    Known -->|"No"| Guess["もっともらしいが\\n誤った内容を生成\\n=ハルシネーション"]`,
+
+        react: `flowchart LR
+    T1["Thought: 何を調べるべきか考える"] --> A1["Action: ツールを実行"]
+    A1 --> O1["Observation: 実行結果を確認"]
+    O1 --> T2["Thought: 次に何をすべきか再度考える"]
+    T2 --> A2["Action: 次のツールを実行 / 回答を確定"]`,
+
+        autonomous: `flowchart TB
+    Goal["大目標の入力"] --> Plan["LLMがタスクに分解"]
+    Plan --> Queue["タスクキュー"]
+    Queue --> Exec["1つのタスクを実行\\nツール呼び出し"]
+    Exec --> Eval["結果を評価し\\n新たなタスクを追加/更新"]
+    Eval --> Queue
+    Eval -->|"目標達成"| Done["完了"]`,
+
+        timeline: `flowchart LR
+    subgraph Y2024["2024年: 本書刊行当時"]
+        A1["LLMChain / initialize_agent"]
+        A2["ConversationBufferMemory"]
+        A3["LangServeでAPI化"]
+    end
+    subgraph Y2025["2025年10月: v1.0リリース"]
+        B1["create_agentがエージェント構築の\\n新しい正面玄関に"]
+        B2["LangGraphがLangChain\\nエージェントの実行基盤に統合"]
+    end
+    subgraph Y2026["2026年9月: 現在"]
+        C1["会話履歴: checkpointer\\n要約: ミドルウェア / 長期記憶: Store"]
+        C2["LangSmithが評価・監視の中核"]
+        C3["LangServeはアーカイブ済み\\n→ LangSmith Deploymentへ移行"]
+    end
+    Y2024 --> Y2025 --> Y2026`,
+      };
+
+      document.addEventListener('DOMContentLoaded', async function () {
+        if (window.document && document.fonts && document.fonts.ready) {
+          try {
+            await document.fonts.ready;
+          } catch (e) {}
+        }
+
+        // CDN 読み込み失敗時もハンドラ全体を止めず、後続の hljs ハイライトを実行する
+        if (window.mermaid) {
+        mermaid.initialize({
+          startOnLoad: false,
+          theme: 'dark',
+          securityLevel: 'loose',
+          fontFamily: 'inherit',
+          themeVariables: {
+            darkMode: true,
+            background: '#07111e',
+            primaryColor: '#16233a',
+            primaryTextColor: '#e8edf5',
+            primaryBorderColor: '#3b5b8c',
+            lineColor: '#4d6485',
+            secondaryColor: '#101d2c',
+            tertiaryColor: '#0d1826',
+            mainBkg: '#101d2c',
+            nodeBorder: '#3b5b8c',
+            clusterBkg: '#0d1826',
+            clusterBorder: '#223447',
+            edgeLabelBackground: '#0d1826',
+            fontSize: '16px',
+            actorBkg: '#101d2c',
+            actorBorder: '#3b5b8c',
+            actorTextColor: '#e8edf5',
+            actorLineColor: '#4d6485',
+            signalColor: '#8fb4ff',
+            signalTextColor: '#e8edf5',
+            labelBoxBkgColor: '#16233a',
+            labelBoxBorderColor: '#3b5b8c',
+            labelTextColor: '#e8edf5',
+            loopTextColor: '#a9b6c9',
+            noteBkgColor: '#2a2013',
+            noteTextColor: '#f0c674',
+            noteBorderColor: '#b8802a',
+            activationBkgColor: '#16233a',
+            activationBorderColor: '#3b5b8c',
+          },
+          flowchart: { useMaxWidth: false, htmlLabels: true, nodeSpacing: 45, rankSpacing: 50 },
+          sequence: { useMaxWidth: false },
+        });
+
+        var targets = document.querySelectorAll('.mermaid-target');
+        for (var i = 0; i < targets.length; i++) {
+          var el = targets[i];
+          var key = el.getAttribute('data-diagram');
+          var src = window.DIAGRAMS[key];
+          if (!src) continue;
+          var id = 'mmd-' + key + '-' + i;
+          try {
+            var result = await mermaid.render(id, src);
+            el.innerHTML = result.svg;
+            var svg = el.querySelector('svg');
+            if (svg) {
+              svg.removeAttribute('width');
+              svg.removeAttribute('height');
+              svg.style.width = 'auto';
+              svg.style.maxWidth = '100%';
+              svg.style.height = 'auto';
+              svg.style.overflow = 'visible';
+              var vb = svg.getAttribute('viewBox');
+              if (vb) {
+                var parts = vb.split(/\s+/).map(Number);
+                var extra = /sequenceDiagram|stateDiagram/.test(src) ? 110 : 15;
+                parts[3] = parts[3] + extra;
+                svg.setAttribute('viewBox', parts.join(' '));
+              }
+            }
+          } catch (e) {
+            el.innerHTML =
+              '<div style="color:#ff9a9a;font-size:13px;">diagram render error (' + key + ')</div>';
+            console.error('mermaid render error for', key, e);
+          }
+        }
+        } else {
+          console.error('mermaid が読み込まれていないため図解の描画をスキップしました');
+        }
+
+        if (window.hljs) {
+          document.querySelectorAll('pre code').forEach(function (block) {
+            hljs.highlightElement(block);
+          });
+        }
+
+        var navLinks = Array.prototype.slice.call(document.querySelectorAll('#nav a'));
+        var map = {};
+        navLinks.forEach(function (a) {
+          map[a.getAttribute('href').slice(1)] = a;
+        });
+        var sections = navLinks
+          .map(function (a) {
+            return document.querySelector(a.getAttribute('href'));
+          })
+          .filter(Boolean);
+        var obs = new IntersectionObserver(
+          function (entries) {
+            entries.forEach(function (entry) {
+              var link = map[entry.target.id];
+              if (!link) return;
+              if (entry.isIntersecting) {
+                navLinks.forEach(function (l) {
+                  l.classList.remove('active');
+                });
+                link.classList.add('active');
+              }
+            });
+          },
+          { rootMargin: '-20% 0px -70% 0px' },
+        );
+        sections.forEach(function (s) {
+          obs.observe(s);
+        });
+      });
+    </script>
+  </body>
+</html>
