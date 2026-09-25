@@ -23,7 +23,7 @@
         --color-background-warning: #2a2013;
         --color-text-primary: #e8edf5;
         --color-text-secondary: #a9b6c9;
-        --color-text-tertiary: #6b7788;
+        --color-text-tertiary: #8592a3;
         --color-text-info: #8fb4ff;
         --color-text-danger: #ff9a9a;
         --color-text-success: #7fd9a8;
@@ -397,7 +397,12 @@
       }
       @media (max-width: 900px) {
         .sidebar {
-          display: none;
+          position: static;
+          width: auto;
+          border-right: none;
+          border-bottom: 1px solid var(--color-border-primary);
+          overflow-y: visible;
+          padding: 24px 22px;
         }
         .main {
           margin-left: 0;
@@ -1644,7 +1649,11 @@ robust_llm = primary_llm.with_fallbacks([backup_llm])</code></pre>
               </tr>
               <tr>
                 <td><code>ConversationBufferMemory</code> 等の旧Memoryクラス</td>
-                <td>LangGraphの checkpointer によるスレッド単位の状態永続化</td>
+                <td>
+                  用途別に置き換え：スレッド単位の会話履歴はLangGraphの checkpointer
+                  で永続化、履歴の要約はSummarizationミドルウェア、スレッドをまたぐ長期記憶はLangGraph
+                  Store
+                </td>
               </tr>
               <tr>
                 <td><code>SimpleSequentialChain</code> 等の旧チェーン群</td>
@@ -2068,7 +2077,7 @@ robust_llm = primary_llm.with_fallbacks([backup_llm])</code></pre>
         B2["LangGraphがLangChain\\nエージェントの実行基盤に統合"]
     end
     subgraph Y2026["2026年9月: 現在"]
-        C1["LangGraph checkpointerが\\nMemoryを代替"]
+        C1["会話履歴: checkpointer\\n要約: ミドルウェア / 長期記憶: Store"]
         C2["LangSmithが評価・監視の中核"]
         C3["LangServeはアーカイブ済み\\n→ LangSmith Deploymentへ移行"]
     end
@@ -2082,6 +2091,8 @@ robust_llm = primary_llm.with_fallbacks([backup_llm])</code></pre>
           } catch (e) {}
         }
 
+        // CDN 読み込み失敗時もハンドラ全体を止めず、後続の hljs ハイライトを実行する
+        if (window.mermaid) {
         mermaid.initialize({
           startOnLoad: false,
           theme: 'dark',
@@ -2153,6 +2164,9 @@ robust_llm = primary_llm.with_fallbacks([backup_llm])</code></pre>
               '<div style="color:#ff9a9a;font-size:13px;">diagram render error (' + key + ')</div>';
             console.error('mermaid render error for', key, e);
           }
+        }
+        } else {
+          console.error('mermaid が読み込まれていないため図解の描画をスキップしました');
         }
 
         if (window.hljs) {
