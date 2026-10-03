@@ -360,6 +360,12 @@
       .diagram-target svg {
         max-width: 100%;
       }
+      .diagram-fallback {
+        margin: 0;
+        max-width: 72ch;
+        font-size: 15px;
+        line-height: 1.7;
+      }
 
       /* ---------- section number badges ---------- */
       .step-badge {
@@ -648,7 +654,7 @@
           <p>LLM、特にGPT系モデルがテキストを生成する流れは次の通りです。</p>
 
           <div class="diagram-card">
-            <div class="diagram-wrap"><div id="diagram-llmFlow" class="diagram-target"></div></div>
+            <div class="diagram-wrap"><div id="diagram-llmFlow" class="diagram-target"><p class="diagram-fallback">入力テキスト → トークン化（Tokenization） → 埋め込みベクトル化（Embedding） → Transformer層（Self-Attention） → 次トークン予測 → 生成終了か判定。終了でなければ生成トークンを入力に追加してTransformer層へ戻り、終了なら出力テキストを返す。</p></div></div>
             <div class="diagram-caption">図1：LLMがテキストを生成するまでの基本フロー</div>
           </div>
 
@@ -708,7 +714,7 @@
                   <td>Anthropic</td>
                   <td>Claude 1〜2</td>
                   <td>
-                    Claude Opus 5.5 / Sonnet 5 / Haiku 4.5 の構成に加え、上位ティアのClaude Fable
+                    Claude Opus 5.5 / Sonnet 5.5 / Haiku 4.5 の構成に加え、上位ティアのClaude Fable
                     5.1が登場（出典：後掲の参考文献 [20]）
                   </td>
                 </tr>
@@ -795,7 +801,7 @@
 
           <h3>2-3. 2022年〜2026年：LangChainの進化タイムライン</h3>
           <div class="diagram-card">
-            <div class="diagram-wrap"><div id="diagram-timeline" class="diagram-target"></div></div>
+            <div class="diagram-wrap"><div id="diagram-timeline" class="diagram-target"><p class="diagram-fallback">2022年10月 LangChain誕生（Harrison Chase） → 2023年 Chains / Agents / Memory中心の設計（本書の解説範囲） → 2024年 LCEL普及・LangGraph登場 → 2025年10月 LangChain 1.0 / LangGraph 1.0、create_agentが標準に → 2026年 Deep Agents / MCP統合 / Context Engineering / Harness Engineering。</p></div></div>
             <div class="diagram-caption">図2：LangChainの主要な進化タイムライン</div>
           </div>
 
@@ -906,15 +912,21 @@ pip install -U langchain-classic "langchain[mcp]"</code></pre>
           <h3>3-3. APIキーの設定</h3>
           <pre><code class="language-bash"># APIキーはソースコードに書かず、シェル・CIのシークレット・.env（Git管理外）で設定する
 export ANTHROPIC_API_KEY="..."
+# 以下は OpenAI / Google のインテグレーションを使う場合のみ（任意）
 export OPENAI_API_KEY="..."
 export GOOGLE_API_KEY="..."</code></pre>
           <pre><code class="language-python">import os
 
 # 各インテグレーションは環境変数から自動でキーを読み込むため、コード内でキーを代入しない
-required = ("ANTHROPIC_API_KEY", "OPENAI_API_KEY", "GOOGLE_API_KEY")
-missing = [k for k in required if not os.environ.get(k)]
-if missing:
-    raise RuntimeError(f"環境変数が未設定です: {', '.join(missing)}")</code></pre>
+# 次節の例は Anthropic を使うため、必須なのは ANTHROPIC_API_KEY のみ
+if not os.environ.get("ANTHROPIC_API_KEY"):
+    raise RuntimeError("環境変数が未設定です: ANTHROPIC_API_KEY")
+
+# OpenAI / Google は、それぞれのインテグレーションを使う場合のみ設定する（任意）
+optional = ("OPENAI_API_KEY", "GOOGLE_API_KEY")
+unset = [k for k in optional if not os.environ.get(k)]
+if unset:
+    print(f"任意の環境変数が未設定です（該当プロバイダーを使う場合のみ必要）: {', '.join(unset)}")</code></pre>
 
           <h3>3-4. Chat Modelの基本呼び出し（最初のステップ）</h3>
           <pre><code class="language-python">from langchain.chat_models import init_chat_model
@@ -988,7 +1000,7 @@ result = agent.invoke({
           <h3>4-3. エージェントループの図解</h3>
           <div class="diagram-card">
             <div class="diagram-wrap">
-              <div id="diagram-agentLoop" class="diagram-target"></div>
+              <div id="diagram-agentLoop" class="diagram-target"><p class="diagram-fallback">ユーザー入力 → LLM推論 → ツール呼び出しが必要か判定。必要ならミドルウェア適用（Human-in-the-loop 等） → ツール実行 → LLM推論へ戻る。不要なら最終応答を返す。</p></div>
             </div>
             <div class="diagram-caption">図3：create_agent のエージェントループ</div>
           </div>
@@ -1089,7 +1101,7 @@ import langchain_typesafe</code></pre>
 
           <h3>5-2. RAGパイプラインの全体像</h3>
           <div class="diagram-card">
-            <div class="diagram-wrap"><div id="diagram-rag" class="diagram-target"></div></div>
+            <div class="diagram-wrap"><div id="diagram-rag" class="diagram-target"><p class="diagram-fallback">元ドキュメント → Document Loader → Text Splitter（チャンク分割） → Embedding Model → Vector Store。ユーザーの質問 → Embedding Model → Retriever（Vector Storeを類似検索） → 関連コンテキスト。関連コンテキストとユーザーの質問をLLMに渡し、回答を生成する。</p></div></div>
             <div class="diagram-caption">図4：RAGパイプラインの全体像</div>
           </div>
 
@@ -1154,7 +1166,7 @@ import langchain_typesafe</code></pre>
 
           <h3>6-1. コード生成エージェントの基本パターン</h3>
           <div class="diagram-card">
-            <div class="diagram-wrap"><div id="diagram-codeLoop" class="diagram-target"></div></div>
+            <div class="diagram-wrap"><div id="diagram-codeLoop" class="diagram-target"><p class="diagram-fallback">タスク仕様の入力 → LLMがコードを生成 → テスト・Lintを実行 → エラーがあるか判定。あればエラーメッセージをLLMにフィードバックしてコード生成へ戻り、なければ完成したコードを出力する。</p></div></div>
             <div class="diagram-caption">図5：コード生成エージェントのフィードバックループ</div>
           </div>
 
@@ -1284,7 +1296,7 @@ import langchain_typesafe</code></pre>
 
           <div class="diagram-card">
             <div class="diagram-wrap">
-              <div id="diagram-langsmith" class="diagram-target"></div>
+              <div id="diagram-langsmith" class="diagram-target"><p class="diagram-fallback">エージェント実行 → LangSmithへトレース送信 → 「トレース閲覧・デバッグ」と「評価データセットでのスコアリング」 → 改善（プロンプト / ツール / ミドルウェア調整） → エージェント実行へ戻る。</p></div>
             </div>
             <div class="diagram-caption">図6：LangSmithを中心とした観測・改善サイクル</div>
           </div>
@@ -1358,7 +1370,7 @@ import langchain_typesafe</code></pre>
           </p>
 
           <div class="diagram-card">
-            <div class="diagram-wrap"><div id="diagram-stack" class="diagram-target"></div></div>
+            <div class="diagram-wrap"><div id="diagram-stack" class="diagram-target"><p class="diagram-fallback">LangChainの2026年スタック（上から）：Deep Agents（長時間稼働する自律エージェント） → LangChain（create_agent / middleware によるエージェント構築の中心レイヤー） → LangGraph（グラフベースの実行基盤・永続化）。LangSmith（可観測性・評価・トレース）が3層すべてを監視する。</p></div></div>
             <div class="diagram-caption">図7：LangChainの2026年スタック構成</div>
           </div>
 
@@ -1373,7 +1385,7 @@ import langchain_typesafe</code></pre>
 
           <h3>11-1. おすすめの学習順序</h3>
           <div class="diagram-card">
-            <div class="diagram-wrap"><div id="diagram-roadmap" class="diagram-target"></div></div>
+            <div class="diagram-wrap"><div id="diagram-roadmap" class="diagram-target"><p class="diagram-fallback">1. 本ガイド第1〜3章で基礎を理解 → 2. 公式ドキュメントのMigration Guideに目を通す → 3. LangChain Academyの無料LangGraphコースを受講 → 4. DeepLearning.AIの短期講座で基礎概念を補強 → 5. create_agent + Middlewareで小さなエージェントを自作 → 6. RAGパイプラインを自前のデータで構築 → 7. LangSmithでトレース・評価を実践。</p></div></div>
             <div class="diagram-caption">図8：おすすめの学習ロードマップ</div>
           </div>
 
@@ -1895,6 +1907,11 @@ class G highlightNode`,
             await document.fonts.ready;
           } catch (e) {}
         }
+        // Mermaid が読み込めない場合は各図のテキスト代替（.diagram-fallback）をそのまま表示する
+        if (!window.mermaid) {
+          console.error('mermaid is not available; showing text fallbacks');
+          return;
+        }
         mermaid.initialize({
           startOnLoad: false,
           theme: 'dark',
@@ -1928,8 +1945,14 @@ class G highlightNode`,
               }
             }
           } catch (err) {
-            target.innerHTML =
-              '<p style="color:var(--color-text-danger);font-size:16px;">図の描画に失敗しました。</p>';
+            // テキスト代替を残したまま、失敗の旨を先頭に表示する
+            const fallback = target.querySelector('.diagram-fallback');
+            if (fallback) {
+              fallback.insertAdjacentHTML(
+                'afterbegin',
+                '<strong style="color:var(--color-text-danger);">図の描画に失敗しました。図の内容：</strong><br>'
+              );
+            }
             console.error('mermaid render error:', key, err);
           }
         }

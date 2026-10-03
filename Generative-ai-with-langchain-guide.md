@@ -81,7 +81,7 @@ flowchart LR
 | モデルファミリー | 開発元 | 書籍執筆時（2023年） | 2026年9月時点の位置づけ |
 |---|---|---|---|
 | GPTシリーズ | OpenAI | GPT-3.5 / GPT-4 | GPT-6世代へ進化。**GPT-6 Astra**（最上位）は API（`gpt-6-astra`）・Microsoft Foundry・ChatGPT で提供中。ChatGPT では Pro $100 / Pro $200 / Business / Enterprise が Astra 搭載の GPT-6 Pro を利用でき、Plus は ChatGPT Work と Codex 内でのみ利用可能（Enterprise / Edu は既定で無効、管理者が有効化）。利用量は各プランの既存の利用枠から消費され、対象プラン・アカウントでは超過分をクレジットの追加購入で補える（Enterprise 契約では超過分が該当するトークン単価で課金される場合がある）。**GPT-6 Sol / Luna**（2026年9月22日発表の高速・低価格版）は API・**ChatGPT Work**・Codex で提供開始済み（通常の ChatGPT では利用不可）。Microsoft Foundry では一般提供済み（出典: [OpenAI: GPT-6 Astra](https://openai.com/index/gpt-6-astra/)、[OpenAI Developer Community: GPT-6 Sol / Luna](https://community.openai.com/t/announcing-gpt-6-sol-and-gpt-6-luna-in-the-api-codex-and-chatgpt/1399925)、[Microsoft Azure Blog: GPT-6 Astra, Sol, and Luna in Microsoft Foundry](https://azure.microsoft.com/en-us/blog/gpt-6-astra-sol-and-luna-for-production-agents-in-microsoft-foundry/)、[OpenAI Help Center: Managing usage with GPT-6 Astra](https://help.openai.com/en/articles/20001516-managing-usage-with-gpt-6-astra-in-work-and-codex)） |
-| Claudeシリーズ | Anthropic | Claude 1〜2 | Claude Opus 5.5 / Sonnet 5 / Haiku 4.5 の構成に加え、上位ティアの Claude Fable 5.1 が登場（出典: [Anthropic Models overview](https://docs.claude.com/en/docs/about-claude/models/overview)） |
+| Claudeシリーズ | Anthropic | Claude 1〜2 | Claude Opus 5.5 / Sonnet 5.5 / Haiku 4.5 の構成に加え、上位ティアの Claude Fable 5.1 が登場（出典: [Anthropic Models overview](https://docs.claude.com/en/docs/about-claude/models/overview)） |
 | Gemini / PaLM | Google | PaLM, 初代Gemini | Gemini 3系へ進化 |
 | Llamaシリーズ | Meta | Llama 2 | 後継モデル群へ世代交代、オープンウェイト戦略が継続 |
 
@@ -174,6 +174,7 @@ LangChain 1.0（2025年10月リリース）以降、`langchain` パッケージ�
 ```bash
 # APIキーはソースコードに書かず、シェル・CIのシークレット・.env（Git管理外）で設定する
 export ANTHROPIC_API_KEY="..."
+# 以下は OpenAI / Google のインテグレーションを使う場合のみ（任意）
 export OPENAI_API_KEY="..."
 export GOOGLE_API_KEY="..."
 ```
@@ -182,10 +183,15 @@ export GOOGLE_API_KEY="..."
 import os
 
 # 各インテグレーションは環境変数から自動でキーを読み込むため、コード内でキーを代入しない
-required = ("ANTHROPIC_API_KEY", "OPENAI_API_KEY", "GOOGLE_API_KEY")
-missing = [k for k in required if not os.environ.get(k)]
-if missing:
-    raise RuntimeError(f"環境変数が未設定です: {', '.join(missing)}")
+# 次節の例は Anthropic を使うため、必須なのは ANTHROPIC_API_KEY のみ
+if not os.environ.get("ANTHROPIC_API_KEY"):
+    raise RuntimeError("環境変数が未設定です: ANTHROPIC_API_KEY")
+
+# OpenAI / Google は、それぞれのインテグレーションを使う場合のみ設定する（任意）
+optional = ("OPENAI_API_KEY", "GOOGLE_API_KEY")
+unset = [k for k in optional if not os.environ.get(k)]
+if unset:
+    print(f"任意の環境変数が未設定です（該当プロバイダーを使う場合のみ必要）: {', '.join(unset)}")
 ```
 
 ### 3-4. Chat Modelの基本呼び出し（最初のステップ）
