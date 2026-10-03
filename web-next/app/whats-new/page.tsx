@@ -70,10 +70,19 @@ export default function WhatsNewPage() {
         <h2 className={styles.h2} id="newest">
           新着ページ
         </h2>
-        <p className={styles.sectionNote}>公開日（初回追加日）の新しい順・上位 {LIST_LIMIT} 件</p>
+        <p className={styles.sectionNote}>
+          公開日（初回追加日）の新しい順・上位 {LIST_LIMIT} 件。Home
+          は価格データの更新日を再公開日として表示します
+        </p>
         <ul className={styles.list}>
           {newest.map((entry) => (
-            <PageCard key={entry.slug} entry={entry} date={entry.addedAt} dateLabel="公開" />
+            <PageCard
+              key={entry.slug}
+              entry={entry}
+              date={entry.addedAt}
+              // Home はデータ更新そのものが再公開にあたるため、addedAt を再公開日として扱う
+              dateLabel={entry.slug === "/" ? "再公開" : "公開"}
+            />
           ))}
         </ul>
       </section>
