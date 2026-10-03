@@ -72,7 +72,12 @@ describe("AI-Powered Developer hydration and shared layout regressions", () => {
       color: "#000",
       background: "var(--paper)",
       "font-size": "0.8rem",
+      "text-align": "right",
     });
+  });
+  it("adds modest space around the hero and above the guide explanation", () => {
+    expect(declarations(".main .hero")).toEqual({ margin: "0.75rem 1rem" });
+    expect(declarations(".hero .heroNote")).toEqual({ "margin-top": "1rem" });
   });
   it("removes the shared date bar and surplus body offset only on this page", () => {
     expect(declarations(`:global(${scope})`)).toEqual({
