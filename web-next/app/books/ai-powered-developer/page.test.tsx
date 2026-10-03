@@ -15,25 +15,30 @@ vi.mock("@/components/docs/MermaidDiagram", () => ({
     id,
     theme,
     themeVariables,
+    flowchartHtmlLabels,
   }: {
     chart: string;
     id: string;
     theme: string;
     themeVariables: Record<string, string>;
+    flowchartHtmlLabels?: boolean;
   }) => (
     <pre
       data-testid="mermaid"
       id={id}
       data-theme={theme}
       data-theme-variables={JSON.stringify(themeVariables)}
+      data-html-labels={String(flowchartHtmlLabels)}
     >
       {chart}
     </pre>
   ),
 }));
 vi.mock("./TocObserver", () => ({ default: () => null }));
-const css = readFileSync(new URL("./page.module.css", import.meta.url), "utf8");
+const css = readFileSync("app/books/ai-powered-developer/page.module.css", "utf8");
 const normalize = (s: string) => s.replace(/\s+/g, " ").trim();
+// Biome changes CSS string delimiters; their rendered values remain identical.
+const normalizeCss = (s: string) => normalize(s).replace(/'/g, '"');
 const text = (e: Element) => normalize(e.textContent ?? "");
 const nodes = (root: ParentNode, selector: string) => Array.from(root.querySelectorAll(selector));
 const main = () => render(<Page />).container.querySelector(`.${styles.main}`) as HTMLElement;
@@ -41,7 +46,7 @@ const cssRules: { selector: string; media: string | null; declarations: Record<s
   [];
 parse(css).walkRules((rule) => {
   cssRules.push({
-    selector: normalize(rule.selector).replace(/\s*,\s*/g, ", "),
+    selector: normalizeCss(rule.selector).replace(/\s*,\s*/g, ", "),
     media: rule.parent?.type === "atrule" ? rule.parent.params : null,
     declarations: Object.fromEntries(
       rule.nodes.filter((n) => n.type === "decl").map((n) => [n.prop, n.value])
@@ -50,6 +55,34 @@ parse(css).walkRules((rule) => {
 });
 
 describe("/books/ai-powered-developer — strict source parity", () => {
+  it("Mermaid uses SVG labels so the original hub/done/box text colours remain effective", () => {
+    const diagrams = nodes(main(), '[data-testid="mermaid"]');
+    expect(diagrams.map((e) => e.getAttribute("data-html-labels"))).toEqual(
+      source.charts.map(() => "false")
+    );
+    for (const name of ["hub", "done", "box"]) {
+      const colourRule = cssRules.find((r) => r.selector === `.mermaidWrap :global(.${name} text)`);
+      expect(colourRule?.declarations).toEqual({ fill: `var(--${name}-text)` });
+    }
+  });
+  it("fixed sidebar and mobile toolbar clear the dynamically sized disclaimer", () => {
+    expect(cssRules).toContainEqual({
+      selector: ".sidebar",
+      media: null,
+      declarations: {
+        top: "calc(var(--header-height, 60px) + var(--ch-disclaimer-height, 0px) + 16px)",
+        height:
+          "calc(100dvh - var(--header-height, 60px) - var(--ch-disclaimer-height, 0px) - 16px)",
+      },
+    });
+    expect(cssRules).toContainEqual({
+      selector: ".mobileBar",
+      media: "(max-width: 980px)",
+      declarations: {
+        top: "calc(var(--header-height, 60px) + var(--ch-disclaimer-height, 0px))",
+      },
+    });
+  });
   it("S-1: every h2 matches the source in order", () => {
     expect(nodes(main(), "h2").map(text)).toEqual(source.h2);
   });
@@ -224,10 +257,10 @@ describe("/books/ai-powered-developer — strict source parity", () => {
       expect(
         cssRules.some(
           (actual) =>
-            actual.selector === normalize(rule.selector).replace(/\s*,\s*/g, ", ") &&
+            actual.selector === normalizeCss(rule.selector).replace(/\s*,\s*/g, ", ") &&
             actual.media === rule.media &&
             Object.entries(rule.declarations).every(
-              ([p, v]) => normalize(actual.declarations[p] ?? "") === normalize(v)
+              ([p, v]) => normalizeCss(actual.declarations[p] ?? "") === normalizeCss(v)
             )
         ),
         rule.selector

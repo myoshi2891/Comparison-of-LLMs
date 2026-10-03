@@ -58,6 +58,10 @@ function expectClosed(mobile = true) {
 }
 beforeEach(() => {
   width(500);
+  // jsdom has no layout: put the second section below the initial viewport.
+  vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(function () {
+    return { top: this.id === "step1" ? 900 : 0 } as DOMRect;
+  });
   vi.stubGlobal("requestAnimationFrame", vi.fn());
   vi.stubGlobal("cancelAnimationFrame", vi.fn());
 });
