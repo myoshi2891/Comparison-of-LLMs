@@ -42,7 +42,7 @@ def scrape(existing: list[SubTool] | None = None) -> list[SubTool]:
         elif name == "Teams":
             # 基本料（$80/month）を席単価として拾わないよう、席単価の表記に限定する
             price = extract_price(html, [
-                r"team[^\n]{0,200}?\$([\d]+)\s*/\s*month\s*per\s*(?:full\s*)?(?:developer\s*)?seat",
+                r"team[^\n]{0,200}?\$([\d]+)\s*/\s*mo(?:nth)?\s*per\s*(?:full\s*)?(?:dev(?:eloper)?\s*)?seat",
                 r"team[^$\n]{0,80}?\$([\d]+)\s*/\s*(?:user|seat)",
             ])
 
