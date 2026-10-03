@@ -676,7 +676,7 @@
           <h3>1-3. モデルファミリーの現在地（書籍執筆時 vs 2026年9月）</h3>
           <p>
             書籍執筆時（2023年）はGPT-3.5/4、PaLM、Llama 2、Claude
-            1〜3が主な選択肢でした。2026年9月時点では各社のモデルが大きく世代交代しています。
+            1〜2が主な選択肢でした。2026年9月時点では各社のモデルが大きく世代交代しています。
           </p>
 
           <div class="table-wrap">
@@ -706,7 +706,7 @@
                 <tr>
                   <td>Claudeシリーズ</td>
                   <td>Anthropic</td>
-                  <td>Claude 1〜3</td>
+                  <td>Claude 1〜2</td>
                   <td>
                     Claude Opus 5.5 / Sonnet 5 / Haiku 4.5 の構成に加え、上位ティアのClaude Fable
                     5.1が登場（出典：後掲の参考文献 [20]）
@@ -904,11 +904,17 @@ pip install -U langchain-classic "langchain[mcp]"</code></pre>
           </div>
 
           <h3>3-3. APIキーの設定</h3>
+          <pre><code class="language-bash"># APIキーはソースコードに書かず、シェル・CIのシークレット・.env（Git管理外）で設定する
+export ANTHROPIC_API_KEY="..."
+export OPENAI_API_KEY="..."
+export GOOGLE_API_KEY="..."</code></pre>
           <pre><code class="language-python">import os
 
-os.environ["ANTHROPIC_API_KEY"] = "sk-ant-..."
-os.environ["OPENAI_API_KEY"] = "sk-..."
-os.environ["GOOGLE_API_KEY"] = "..."</code></pre>
+# 各インテグレーションは環境変数から自動でキーを読み込むため、コード内でキーを代入しない
+required = ("ANTHROPIC_API_KEY", "OPENAI_API_KEY", "GOOGLE_API_KEY")
+missing = [k for k in required if not os.environ.get(k)]
+if missing:
+    raise RuntimeError(f"環境変数が未設定です: {', '.join(missing)}")</code></pre>
 
           <h3>3-4. Chat Modelの基本呼び出し（最初のステップ）</h3>
           <pre><code class="language-python">from langchain.chat_models import init_chat_model
@@ -954,9 +960,9 @@ result = chain.invoke({"role": "AIエンジニア", "question": "RAGとは何で
 
 @tool
 def search_web(query: str) -> str:
-    """指定したクエリでウェブ検索を行う。"""
-    ...
-    return "検索結果のテキスト"</code></pre>
+    """指定したクエリでウェブ検索を行う（デモ用モック。実際の検索は行わない）。"""
+    # 本番では検索APIの呼び出しに置き換える。ここではクエリを含む固定テキストを返す
+    return f"[モック] 「{query}」の検索結果"</code></pre>
 
           <h3>4-2. 【2026年の標準】<code>create_agent</code> とミドルウェア</h3>
           <p>
@@ -976,7 +982,7 @@ agent = create_agent(
 )
 
 result = agent.invoke({
-    "messages": [{"role": "user", "content": "AI安全性の最新トレンドを調べて"}]
+    "messages": [{"role": "user", "content": "search_webで「LangChain」を検索し、結果を要約して"}]
 })</code></pre>
 
           <h3>4-3. エージェントループの図解</h3>
@@ -1394,7 +1400,7 @@ import langchain_typesafe</code></pre>
                   <td>LangChain for LLM Application Development</td>
                   <td>DeepLearning.AI（Andrew Ng・Harrison Chase講師）</td>
                   <td>
-                    無料の短期講座（約3時間）。モデル・プロンプト・パーサー、メモリ、チェーン、ドキュメントQ&amp;A、エージェント、評価という基礎概念を、開発者自身であるHarrison
+                    無料の短期講座（約1時間48分）。モデル・プロンプト・パーサー、メモリ、チェーン、ドキュメントQ&amp;A、エージェント、評価という基礎概念を、開発者自身であるHarrison
                     Chase氏から直接学べる。2023年収録のためAPIの一部は古いが、概念理解には現在も有用
                   </td>
                 </tr>
@@ -1640,10 +1646,10 @@ import langchain_typesafe</code></pre>
                 <span class="ref-title"
                   >DeepLearning.AI「LangChain for LLM Application Development」講座ページ</span
                 ><a
-                  href="https://www.coursera.org/projects/langchain-for-llm-application-development-project"
+                  href="https://www.deeplearning.ai/short-courses/langchain-for-llm-application-development/"
                   target="_blank"
                   rel="noopener"
-                  >https://www.coursera.org/projects/langchain-for-llm-application-development-project</a
+                  >https://www.deeplearning.ai/short-courses/langchain-for-llm-application-development/</a
                 >
               </div>
             </div>
@@ -1765,6 +1771,8 @@ import langchain_typesafe</code></pre>
     <script>
       window.DIAGRAMS = {
         llmFlow: `flowchart LR
+accTitle: LLMのテキスト生成フロー
+accDescr: 入力テキストをトークン化し、埋め込みベクトルに変換してTransformer層で次トークンを予測する。生成終了でなければ生成トークンを入力に追加してTransformer層へ戻り、終了したら出力テキストを返すループ。
 A["入力テキスト"] --> B["トークン化<br/>Tokenization"]
 B --> C["埋め込みベクトル化<br/>Embedding"]
 C --> D["Transformer層<br/>Self-Attention"]
@@ -1778,6 +1786,8 @@ classDef highlightNode fill:#115e59,stroke:#99f6e4,color:#ccfbf1
 class A,H accentNode
 class F highlightNode`,
         timeline: `flowchart LR
+accTitle: LangChainの進化の年表
+accDescr: 2022年10月のLangChain誕生から、2023年のChains・Agents・Memory中心の設計（本書の解説範囲）、2024年のLCEL普及とLangGraph登場、2025年10月のLangChain 1.0・LangGraph 1.0とcreate_agentの標準化、2026年のDeep Agents・MCP統合・Context Engineering・Harness Engineeringまでの流れ。
 A["2022年10月<br/>LangChain誕生<br/>(Harrison Chase)"] --> B["2023年<br/>Chains / Agents / Memory<br/>中心の設計<br/>（本書の解説範囲）"]
 B --> C["2024年<br/>LCEL普及<br/>LangGraphが登場"]
 C --> D["2025年10月<br/>LangChain 1.0 / LangGraph 1.0<br/>create_agentが標準に"]
@@ -1787,6 +1797,8 @@ classDef highlightNode fill:#115e59,stroke:#99f6e4,color:#ccfbf1
 class A accentNode
 class E highlightNode`,
         agentLoop: `flowchart TD
+accTitle: create_agentのエージェントループ
+accDescr: ユーザー入力をLLMが推論し、ツール呼び出しが必要ならHuman-in-the-loopなどのミドルウェアを適用してツールを実行し、結果をLLM推論へ戻す。ツール呼び出しが不要になったら最終応答を返す。
 A["ユーザー入力"] --> B["LLM推論"]
 B --> C{"ツール呼び出しが必要?"}
 C -- "Yes" --> D["ミドルウェア適用<br/>(Human-in-the-loop 等)"]
@@ -1798,6 +1810,8 @@ classDef highlightNode fill:#115e59,stroke:#99f6e4,color:#ccfbf1
 class A accentNode
 class F highlightNode`,
         rag: `flowchart LR
+accTitle: RAGパイプラインの構成
+accDescr: 元ドキュメントをDocument Loaderで読み込み、Text Splitterでチャンク分割し、Embedding ModelでベクトルにしてVector Storeへ格納する。ユーザーの質問もEmbedding Modelでベクトル化してRetrieverが類似検索し、得られた関連コンテキストと質問をLLMへ渡して回答を生成する。
 A["元ドキュメント"] --> B["Document Loader"]
 B --> C["Text Splitter<br/>(チャンク分割)"]
 C --> D["Embedding Model"]
@@ -1814,6 +1828,8 @@ classDef highlightNode fill:#115e59,stroke:#99f6e4,color:#ccfbf1
 class E accentNode
 class K highlightNode`,
         codeLoop: `flowchart TD
+accTitle: コード生成のフィードバックループ
+accDescr: タスク仕様を入力するとLLMがコードを生成し、テストとLintを実行する。エラーがあればエラーメッセージをLLMにフィードバックして再生成し、エラーがなければ完成したコードを出力する。
 A["タスク仕様の入力"] --> B["LLMがコードを生成"]
 B --> C["テスト・Lintを実行"]
 C --> D{"エラーあり?"}
@@ -1825,6 +1841,8 @@ classDef highlightNode fill:#115e59,stroke:#99f6e4,color:#ccfbf1
 class A accentNode
 class F highlightNode`,
         langsmith: `flowchart LR
+accTitle: LangSmithによる改善サイクル
+accDescr: エージェント実行のトレースをLangSmithへ送信し、トレース閲覧によるデバッグと評価データセットでのスコアリングを行う。両方の結果をもとにプロンプト・ツール・ミドルウェアを調整し、再びエージェントを実行する循環。
 A["エージェント実行"] --> B["LangSmithへトレース送信"]
 B --> C["トレース閲覧・デバッグ"]
 B --> D["評価データセットでのスコアリング"]
@@ -1836,6 +1854,8 @@ classDef highlightNode fill:#115e59,stroke:#99f6e4,color:#ccfbf1
 class B accentNode
 class E highlightNode`,
         stack: `flowchart TB
+accTitle: LangChainの2026年スタック
+accDescr: 上から長時間稼働する自律エージェントのDeep Agents、create_agentとmiddlewareを持つ中心レイヤーのLangChain、グラフベースの実行基盤と永続化を担うLangGraphの3層が積み重なり、可観測性・評価・トレースを担うLangSmithが3層すべてを監視する。
 subgraph Stack["LangChainの2026年スタック"]
 direction TB
 A["Deep Agents<br/>長時間稼働する自律エージェント"]
@@ -1851,6 +1871,8 @@ classDef highlightNode fill:#115e59,stroke:#99f6e4,color:#ccfbf1
 class A accentNode
 class D highlightNode`,
         roadmap: `flowchart TD
+accTitle: 学習ロードマップ
+accDescr: 1. 本ガイド第1〜3章で基礎を理解、2. 公式Migration Guideに目を通す、3. LangChain Academyの無料LangGraphコースを受講、4. DeepLearning.AIの短期講座で基礎概念を補強、5. create_agentとMiddlewareで小さなエージェントを自作、6. 自前のデータでRAGパイプラインを構築、7. LangSmithでトレースと評価を実践、の順に進む。
 A["1. 本ガイド 第1〜3章で基礎を理解"] --> B["2. 公式ドキュメントの<br/>Migration Guideに目を通す"]
 B --> C["3. LangChain Academyの<br/>無料LangGraphコースを受講"]
 C --> D["4. DeepLearning.AIの<br/>短期講座で基礎概念を補強"]
