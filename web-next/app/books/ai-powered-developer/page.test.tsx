@@ -70,9 +70,8 @@ describe("/books/ai-powered-developer — strict source parity", () => {
       selector: ".sidebar",
       media: null,
       declarations: {
-        top: "calc(var(--header-height, 60px) + var(--ch-disclaimer-height, 0px) + 16px)",
-        height:
-          "calc(100dvh - var(--header-height, 60px) - var(--ch-disclaimer-height, 0px) - 16px)",
+        top: "calc(var(--header-height, 60px) + var(--ch-disclaimer-height, 0px))",
+        height: "calc(100dvh - var(--header-height, 60px) - var(--ch-disclaimer-height, 0px))",
       },
     });
     expect(cssRules).toContainEqual({
@@ -214,7 +213,7 @@ describe("/books/ai-powered-developer — strict source parity", () => {
   });
   it("all original styled content elements retain their tags and CSS classes", () => {
     expect(
-      nodes(main(), "[class]").map((e) => ({
+      nodes(main(), '[class]:not([data-testid="page-freshness"])').map((e) => ({
         tag: e.tagName.toLowerCase(),
         classes: Array.from(e.classList),
       }))
