@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-09-13",
-  "jpy_rate": 154.04,
-  "jpy_rate_date": "2026-09-11",
+  "generated_at": "2026-10-03",
+  "jpy_rate": 157.67,
+  "jpy_rate_date": "2026-10-02",
   "api_models": [
     {
       "provider": "Anthropic",
@@ -37,13 +37,29 @@
     },
     {
       "provider": "Anthropic",
-      "name": "Claude Opus 5",
+      "name": "Claude Opus 5.5",
       "tag": "最新 Opus",
+      "cls": "tag-flag",
+      "price_in": 4.0,
+      "price_out": 20.0,
+      "sub_ja": "現行フラッグシップ / 1M ctx / キャッシュ読取0.05x / Fast mode対応",
+      "sub_en": "Current flagship / 1M ctx / 0.05x cache reads / Fast mode",
+      "scrape_status": "fallback",
+      "provenance": {
+        "origin": "hardcoded",
+        "fallback_in": 4.0,
+        "fallback_out": 20.0
+      }
+    },
+    {
+      "provider": "Anthropic",
+      "name": "Claude Opus 5",
+      "tag": "Stable",
       "cls": "tag-flag",
       "price_in": 5.0,
       "price_out": 25.0,
-      "sub_ja": "現行フラッグシップ / 1M ctx / Fast mode対応 / 新トークナイザ",
-      "sub_en": "Current flagship / 1M ctx / Fast mode / new tokenizer",
+      "sub_ja": "前世代フラッグシップ / 1M ctx / Fast mode対応 / 新トークナイザ",
+      "sub_en": "Prev flagship / 1M ctx / Fast mode / new tokenizer",
       "scrape_status": "fallback",
       "provenance": {
         "origin": "hardcoded",
@@ -117,13 +133,29 @@
     },
     {
       "provider": "Anthropic",
-      "name": "Claude Sonnet 5",
+      "name": "Claude Sonnet 5.5",
       "tag": "最新 Sonnet",
       "cls": "tag-flag",
       "price_in": 2.0,
       "price_out": 10.0,
-      "sub_ja": "最新Sonnet / 200K ctx / $2/$10 が恒久価格に確定",
-      "sub_en": "Latest Sonnet / 200K ctx / $2/$10 now permanent",
+      "sub_ja": "最新Sonnet / バランス型 / 新トークナイザ",
+      "sub_en": "Latest Sonnet / balanced / new tokenizer",
+      "scrape_status": "fallback",
+      "provenance": {
+        "origin": "hardcoded",
+        "fallback_in": 2.0,
+        "fallback_out": 10.0
+      }
+    },
+    {
+      "provider": "Anthropic",
+      "name": "Claude Sonnet 5",
+      "tag": "Stable",
+      "cls": "tag-flag",
+      "price_in": 2.0,
+      "price_out": 10.0,
+      "sub_ja": "前世代Sonnet / 200K ctx / $2/$10 が恒久価格に確定",
+      "sub_en": "Prev Sonnet / 200K ctx / $2/$10 now permanent",
       "scrape_status": "fallback",
       "provenance": {
         "origin": "hardcoded",
@@ -225,6 +257,54 @@
         "origin": "hardcoded",
         "fallback_in": 10.0,
         "fallback_out": 50.0
+      }
+    },
+    {
+      "provider": "OpenAI",
+      "name": "GPT-6.1 Sol",
+      "tag": "Balanced",
+      "cls": "tag-bal",
+      "price_in": 2.0,
+      "price_out": 10.0,
+      "sub_ja": "GPT-6 世代の中位モデル / 最新版",
+      "sub_en": "GPT-6 mid tier / latest revision",
+      "scrape_status": "fallback",
+      "provenance": {
+        "origin": "hardcoded",
+        "fallback_in": 2.0,
+        "fallback_out": 10.0
+      }
+    },
+    {
+      "provider": "OpenAI",
+      "name": "GPT-6 Sol",
+      "tag": "Balanced",
+      "cls": "tag-bal",
+      "price_in": 2.0,
+      "price_out": 10.0,
+      "sub_ja": "GPT-6 世代の中位モデル",
+      "sub_en": "GPT-6 mid tier",
+      "scrape_status": "fallback",
+      "provenance": {
+        "origin": "hardcoded",
+        "fallback_in": 2.0,
+        "fallback_out": 10.0
+      }
+    },
+    {
+      "provider": "OpenAI",
+      "name": "GPT-6 Luna",
+      "tag": "Value",
+      "cls": "tag-bal",
+      "price_in": 0.1,
+      "price_out": 0.5,
+      "sub_ja": "GPT-6 世代の低価格モデル",
+      "sub_en": "GPT-6 value tier",
+      "scrape_status": "fallback",
+      "provenance": {
+        "origin": "hardcoded",
+        "fallback_in": 0.1,
+        "fallback_out": 0.5
       }
     },
     {
@@ -949,13 +1029,13 @@
     },
     {
       "provider": "DeepSeek",
-      "name": "DeepSeek V4 Flash",
+      "name": "DeepSeek V4.1 Flash",
       "tag": "最新 Flash",
       "cls": "tag-oss",
       "price_in": 0.3,
       "price_out": 1.2,
-      "sub_ja": "1M ctx / MIT / off-peak は 50% 引き",
-      "sub_en": "1M ctx / MIT / 50% off during off-peak",
+      "sub_ja": "V4 Flash の後継 / 画像理解対応 / off-peak は 50% 引き",
+      "sub_en": "Successor to V4 Flash / vision / 50% off during off-peak",
       "scrape_status": "fallback",
       "provenance": {
         "origin": "hardcoded",
@@ -1121,6 +1201,22 @@
         "origin": "hardcoded",
         "fallback_in": 0.6,
         "fallback_out": 2.2
+      }
+    },
+    {
+      "provider": "Zhipu(GLM)",
+      "name": "GLM-5.3-FlashX",
+      "tag": "Fast",
+      "cls": "tag-oss",
+      "price_in": 0.37,
+      "price_out": 1.25,
+      "sub_ja": "Flash の高速版 / OSS / 低遅延向け",
+      "sub_en": "Faster Flash variant / OSS / low latency",
+      "scrape_status": "fallback",
+      "provenance": {
+        "origin": "hardcoded",
+        "fallback_in": 0.37,
+        "fallback_out": 1.25
       }
     },
     {
@@ -1361,7 +1457,7 @@
     {
       "group": "Windsurf",
       "name": "Pro",
-      "monthly": 15.0,
+      "monthly": 20.0,
       "annual": null,
       "tag": "Individual",
       "cls": "tag-bal",
@@ -1371,14 +1467,25 @@
     },
     {
       "group": "Windsurf",
+      "name": "Max",
+      "monthly": 200.0,
+      "annual": null,
+      "tag": "Top Tier",
+      "cls": "tag-flag",
+      "note_ja": "最上位個人プラン (2026-09 新設)",
+      "note_en": "Top individual tier (new Sep 2026)",
+      "scrape_status": "fallback"
+    },
+    {
+      "group": "Windsurf",
       "name": "Teams",
-      "monthly": 80.0,
+      "monthly": 40.0,
       "annual": null,
       "tag": "Team",
       "cls": "tag-bal",
-      "note_ja": "500 credits/user + 管理機能",
-      "note_en": "500 credits/user + admin features",
-      "scrape_status": "success"
+      "note_ja": "1席あたり + 基本料 $80/月 | 管理機能",
+      "note_en": "Per seat + $80/mo base fee | admin features",
+      "scrape_status": "fallback"
     },
     {
       "group": "Claude Code",
