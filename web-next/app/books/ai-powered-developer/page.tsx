@@ -356,59 +356,46 @@ export default function Page() {
                   <tbody>
                     <tr>
                       <th>{"書名"}</th>
-
                       <td>{"AI-Powered Developer: Build software with ChatGPT and Copilot"}</td>
                     </tr>
-
                     <tr>
                       <th>{"著者"}</th>
-
                       <td>{"Nathan B. Crocker（Checker Corp. 共同創業者 兼 CTO）"}</td>
                     </tr>
-
                     <tr>
                       <th>{"技術編集者"}</th>
                       <td>{"Nicolai Nielsen"}</td>
                     </tr>
-
                     <tr>
                       <th>{"出版社"}</th>
                       <td>{"Manning Publications"}</td>
                     </tr>
-
                     <tr>
                       <th>{"出版時期"}</th>
                       <td>{"2024年8月"}</td>
                     </tr>
-
                     <tr>
                       <th>{"ページ数"}</th>
                       <td>{"240ページ"}</td>
                     </tr>
-
                     <tr>
                       <th>{"ISBN"}</th>
                       <td>{"9781633437616"}</td>
                     </tr>
-
                     <tr>
                       <th>{"対象読者"}</th>
                       <td>{"中級ソフトウェア開発者（AI経験は不要）"}</td>
                     </tr>
-
                     <tr>
                       <th>{"翻訳版"}</th>
                       <td>{"ドイツ語、簡体字中国語"}</td>
                     </tr>
-
                     <tr>
                       <th>{"題材アプリ"}</th>
                       <td>{"IT資産管理システム（ITAM）"}</td>
                     </tr>
-
                     <tr>
                       <th>{"書籍ページ"}</th>
-
                       <td>
                         {" "}
                         <a
@@ -503,92 +490,66 @@ export default function Page() {
                   <th>{"Step"}</th>
                   <th>{"書籍の章"}</th>
                   <th>{"章タイトル（原題）"}</th>
-
                   <th>{"主な内容"}</th>
                 </tr>
               </thead>
-
               <tbody>
                 <tr>
                   <td>{"Step1"}</td>
                   <td>{"第1章"}</td>
-
                   <td>{"Understanding large language models"}</td>
-
                   <td>{"LLMの基礎、生成AIの利点、使うべき場面・避けるべき場面"}</td>
                 </tr>
-
                 <tr>
                   <td>{"Step2"}</td>
                   <td>{"第2章"}</td>
-
                   <td>{"Getting started with large language models"}</td>
-
                   <td>
                     {
                       " ChatGPT/Copilot/CodeWhispererの使い方比較、プロンプトエンジニアリングパターン "
                     }
                   </td>
                 </tr>
-
                 <tr>
                   <td>{"Step3"}</td>
                   <td>{"第3章"}</td>
                   <td>{"Designing software with ChatGPT"}</td>
-
                   <td>{"ITAMシステムの設計、Mermaidによるアーキテクチャ文書化"}</td>
                 </tr>
-
                 <tr>
                   <td>{"Step4"}</td>
                   <td>{"第4章"}</td>
-
                   <td>{"Building software with GitHub Copilot"}</td>
-
                   <td>{"ドメインモデル実装、デザインパターン、ヘキサゴナルアーキテクチャ"}</td>
                 </tr>
-
                 <tr>
                   <td>{"Step5"}</td>
                   <td>{"第5章"}</td>
-
                   <td>{"Managing data with GitHub Copilot and Copilot Chat"}</td>
-
                   <td>{"データ永続化、Kafkaストリーミング、Sparkによる分析"}</td>
                 </tr>
-
                 <tr>
                   <td>{"Step6"}</td>
                   <td>{"第6章"}</td>
-
                   <td>{"Testing, assessing, and explaining with LLMs"}</td>
-
                   <td>{"単体/統合/振る舞いテスト、品質評価、バグ検出、コード説明・翻訳"}</td>
                 </tr>
-
                 <tr>
                   <td>{"Step7"}</td>
                   <td>{"第7章"}</td>
-
                   <td>{"Coding infrastructure and managing deployments"}</td>
-
                   <td>{"Docker、Terraform、コンテナレジストリ、Kubernetes、CI/CD"}</td>
                 </tr>
-
                 <tr>
                   <td>{"Step8"}</td>
                   <td>{"第8章"}</td>
-
                   <td>{"Secure application development with ChatGPT"}</td>
-
                   <td>{"脅威モデリング、脆弱性評価、セキュリティのベストプラクティス、暗号化"}</td>
                 </tr>
-
                 <tr>
                   <td>{"Step9"}</td>
                   <td>{"第9章"}</td>
                   <td>{"GPT-ing on the go"}</td>
-
                   <td>{"ローカルLLM（Llama 2、GPT4All）の実行と比較、オフライン活用の判断基準"}</td>
                 </tr>
               </tbody>
@@ -707,29 +668,22 @@ export default function Page() {
                   <th>{"特徴"}</th>
                 </tr>
               </thead>
-
               <tbody>
                 <tr>
                   <td>{"ChatGPT（GPT-4 / GPT-3.5）"}</td>
-
                   <td>{"チャット形式での対話、設計相談、コード生成・説明"}</td>
-
                   <td>{"汎用的な対話能力が高く、設計や説明のような「会話」が必要な場面に強い"}</td>
                 </tr>
-
                 <tr>
                   <td>{"GitHub Copilot"}</td>
                   <td>{"IDE内でのインライン補完、Copilot Chat"}</td>
-
                   <td>
                     {"エディタに統合されており、実装作業の流れを止めずにコードを書き進められる"}
                   </td>
                 </tr>
-
                 <tr>
                   <td>{"AWS CodeWhisperer"}</td>
                   <td>{"IDE内でのインライン補完"}</td>
-
                   <td>{"AWSサービスとの親和性が高く、AWS SDKやIaCコードの提案に強み"}</td>
                 </tr>
               </tbody>
@@ -754,50 +708,36 @@ export default function Page() {
                   <th>{"使い方の例（意訳）"}</th>
                 </tr>
               </thead>
-
               <tbody>
                 <tr>
                   <td>{"Persona（ペルソナ）"}</td>
                   <td>{"AIに特定の役割・専門性を与える"}</td>
-
                   <td>
                     {
                       " 「あなたはシニアバックエンドエンジニアです。以下のAPI設計をレビューしてください」 "
                     }
                   </td>
                 </tr>
-
                 <tr>
                   <td>{"Audience Persona（想定読者ペルソナ）"}</td>
-
                   <td>{"出力の説明レベルを読者に合わせる"}</td>
-
                   <td>
                     {" 「プログラミング初心者にもわかるように、この関数の動きを説明してください」 "}
                   </td>
                 </tr>
-
                 <tr>
                   <td>{"Refinement（リファインメント）"}</td>
-
                   <td>{"一度の回答で終わらせず、対話的に改善する"}</td>
-
                   <td>{"「この実装を、可読性を優先する方向でもう一度書き直してください」"}</td>
                 </tr>
-
                 <tr>
                   <td>{"Flipped Interaction（質問の逆転）"}</td>
-
                   <td>{"AI側から必要な情報を質問させる"}</td>
-
                   <td>{"「設計を提案する前に、不明な点があれば先に質問してください」"}</td>
                 </tr>
-
                 <tr>
                   <td>{"Cognitive Verifier（検証の分解）"}</td>
-
                   <td>{"複雑な問いを小さな確認問いに分解させる"}</td>
-
                   <td>
                     {" 「この要件を満たすために確認すべき前提条件を、先に箇条書きにしてください」 "}
                   </td>
@@ -1122,29 +1062,20 @@ export default function Page() {
                   <th>{"AIが役立つ場面"}</th>
                 </tr>
               </thead>
-
               <tbody>
                 <tr>
                   <td>{"単体テスト（Unit Testing）"}</td>
-
                   <td>{"個々の関数・クラスの正しさを検証する"}</td>
-
                   <td>{"典型的なテストケースの下書き生成、境界値の洗い出し"}</td>
                 </tr>
-
                 <tr>
                   <td>{"統合テスト（Integration Testing）"}</td>
-
                   <td>{"複数コンポーネント間の連携を検証する"}</td>
-
                   <td>{"テスト用のモック・スタブコードの生成"}</td>
                 </tr>
-
                 <tr>
                   <td>{"振る舞いテスト（Behavior Testing）"}</td>
-
                   <td>{"ユーザー視点での挙動を検証する"}</td>
-
                   <td>{"自然言語のシナリオからテストコードへの変換"}</td>
                 </tr>
               </tbody>
@@ -1352,45 +1283,35 @@ export default function Page() {
                   <th>{"概要"}</th>
                 </tr>
               </thead>
-
               <tbody>
                 <tr>
                   <td>{"プロンプトインジェクション"}</td>
-
                   <td>{"外部からの入力によってLLMの挙動を意図しない方向に操作される"}</td>
                 </tr>
-
                 <tr>
                   <td>{"機微情報の漏えい"}</td>
-
                   <td>
                     {"LLMの出力を通じて、学習データや内部プロンプトに含まれる機密情報が漏れる"}
                   </td>
                 </tr>
-
                 <tr>
                   <td>{"不適切な出力処理"}</td>
-
                   <td>
                     {
                       " LLMの出力をそのまま実行・表示することで、XSSやコードインジェクションなど従来型の脆弱性が再発する "
                     }
                   </td>
                 </tr>
-
                 <tr>
                   <td>{"過剰な自律性（Excessive Agency）"}</td>
-
                   <td>
                     {
                       " AIエージェントに与える権限・実行範囲が過大で、意図しない操作を自律的に行ってしまう "
                     }
                   </td>
                 </tr>
-
                 <tr>
                   <td>{"サプライチェーンの脆弱性"}</td>
-
                   <td>{"利用するモデルやプラグイン、学習データの出どころに起因するリスク"}</td>
                 </tr>
               </tbody>
@@ -1475,42 +1396,33 @@ export default function Page() {
                   <th>{"2026年（現在）"}</th>
                 </tr>
               </thead>
-
               <tbody>
                 <tr>
                   <td>{"代表的なツール"}</td>
                   <td>{"Llama 2、GPT4All"}</td>
-
                   <td>{"Ollama、LM Studio（両者とも安定版が2年以上継続提供）"}</td>
                 </tr>
-
                 <tr>
                   <td>{"実行環境"}</td>
                   <td>{"CLIやデスクトップアプリが中心"}</td>
-
                   <td>
                     {
                       " OpenAI互換APIを備えたローカルサーバーとして、IDEやコーディングエージェントから直接呼び出せる "
                     }
                   </td>
                 </tr>
-
                 <tr>
                   <td>{"実用性の目安"}</td>
-
                   <td>{"クラウドモデルとの性能差が大きく、限定的な用途向け"}</td>
-
                   <td>
                     {
                       " 8B〜35B前後のオープンウェイトモデルでも、一般的な開発マシンで実用的な速度と品質を達成 "
                     }
                   </td>
                 </tr>
-
                 <tr>
                   <td>{"主な用途"}</td>
                   <td>{"オフライン時の代替手段"}</td>
-
                   <td>
                     {
                       " 機密コードの解析、コスト削減、レイテンシ削減、プライバシー保護が必要な場面での積極的な選択肢 "
