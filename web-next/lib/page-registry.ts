@@ -160,6 +160,16 @@ const entries: PageEntry[] = [
     lastReviewed: "2026-09-17",
   },
   {
+    slug: "/books/ai-powered-developer",
+    title: "AI-Powered Developer",
+    group: "推薦書籍",
+    topics: ["book", "ai-coding", "llm", "copilot", "tdd", "security"],
+    summary:
+      "Nathan B. Crocker 著『AI-Powered Developer』を土台に、LLMの基礎・設計・実装・テスト・インフラ・セキュリティ・ローカルLLMを学ぶ初学者向けステップガイド。2026年9月の補足動向、用語集、学習チェックリストと出典を収録。",
+    addedAt: "2026-10-03",
+    lastReviewed: "2026-10-03",
+  },
+  {
     slug: "/books/generative-ai-for-software-development",
     title: "Generative AI for Software Development",
     description:

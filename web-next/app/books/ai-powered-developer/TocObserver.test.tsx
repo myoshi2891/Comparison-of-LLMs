@@ -59,7 +59,9 @@ function expectClosed(mobile = true) {
 beforeEach(() => {
   width(500);
   // jsdom has no layout: put the second section below the initial viewport.
-  vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(function () {
+  vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(function (
+    this: HTMLElement
+  ) {
     return { top: this.id === "step1" ? 900 : 0 } as DOMRect;
   });
   vi.stubGlobal("requestAnimationFrame", vi.fn());
