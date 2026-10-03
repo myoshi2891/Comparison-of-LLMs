@@ -733,6 +733,7 @@
   color: #000;
   background: var(--paper);
   font-size: 0.8rem;
+  text-align: right;
 }
 :global(body:has([data-page="ai-powered-developer"]) nav[aria-label="関連ページ"]) {
   margin-left: 288px;
@@ -752,4 +753,11 @@
   .freshness {
     padding: 1rem 1.5rem 0;
   }
+}
+
+.main .hero {
+  margin: 0.75rem 1rem;
+}
+.hero .heroNote {
+  margin-top: 1rem;
 }
