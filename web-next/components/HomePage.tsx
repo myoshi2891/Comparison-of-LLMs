@@ -18,6 +18,7 @@ import { t, tRich } from "@/lib/i18n";
 import type { PricingData } from "@/types/pricing";
 import { ApiTable } from "./ApiTable";
 import { Hero } from "./Hero";
+import styles from "./HomePage.module.css";
 import { LanguageToggle } from "./LanguageToggle";
 import { MathSection } from "./MathSection";
 import { RefLinks } from "./RefLinks";
@@ -54,7 +55,7 @@ export function HomePage({ data }: Props) {
   const toolCount = sub_tools.length;
 
   return (
-    <>
+    <div className={styles.calculator}>
       <LanguageToggle lang={lang} onToggle={setLang} />
 
       <Hero lang={lang} data={data} apiCount={apiCount} toolCount={toolCount} />
@@ -149,6 +150,6 @@ export function HomePage({ data }: Props) {
         </span>
         <span>{t("footerFormula", lang)}</span>
       </footer>
-    </>
+    </div>
   );
 }
