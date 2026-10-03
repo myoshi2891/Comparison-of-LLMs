@@ -1136,6 +1136,12 @@ memory.save_context({"input": "こんにちは"}, {"output": "こんにちは、
               </tr>
             </tbody>
           </table>
+          <p>
+            以下のコードを新しい環境で動かすには、<code>langchain_community</code> と
+            <code>langchain_chroma</code> を提供するパッケージを事前に導入します（<code>WebBaseLoader</code>
+            は内部で <code>beautifulsoup4</code> を使用します）。
+          </p>
+          <pre><code class="language-bash">pip install langchain-community langchain-chroma beautifulsoup4</code></pre>
           <pre><code class="language-python">from langchain_community.document_loaders import WebBaseLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_openai import OpenAIEmbeddings
@@ -1947,6 +1953,8 @@ robust_llm = primary_llm.with_fallbacks([backup_llm])</code></pre>
     <script>
       window.DIAGRAMS = {
         bookmap: `flowchart TB
+    accTitle: 本書の章構成マップ
+    accDescr: 第1章 LLMとLangChainの基礎から第16章 追加機能、最後に2026年最新動向まとめまでを順に進む学習ルート。第1〜4章は基礎、第5〜10章はコア機能、第11章以降は応用編。
     A["第1章 LLMとLangChainの基礎"] --> B["第2章 Hello World"]
     B --> C["第3章 LangChainのモジュール構成"]
     C --> D["第4章 Models and Prompts"]
@@ -1972,6 +1980,8 @@ robust_llm = primary_llm.with_fallbacks([backup_llm])</code></pre>
     class K,L,M,N,O,P,Q advanced`,
 
         features: `flowchart LR
+    accTitle: LangChainが提供する主な機能
+    accDescr: LLM単体に、Models、Prompts、Chains、Agents、Memory、Retrievalの6機能を組み合わせることで実用的なAIアプリケーションになることを示す図。
     subgraph Core["LangChainが提供する主な機能"]
         direction TB
         M["Models: 複数プロバイダーを共通APIで呼び出す"]
@@ -1984,12 +1994,16 @@ robust_llm = primary_llm.with_fallbacks([backup_llm])</code></pre>
     LLM["LLM単体"] --> Core --> App["実用的なAIアプリケーション"]`,
 
         helloflow: `flowchart LR
+    accTitle: Hello Worldの処理フロー
+    accDescr: 入力テキストを前処理で記号や空白を除去し、PromptTemplateに埋め込んでクラウドAPIまたはローカルLLMを呼び出し、生成結果を得る流れ。
     A["入力テキスト"] --> B["Text Pre-processing\\n記号/空白除去"]
     B --> C["PromptTemplate"]
     C --> D["LLM呼び出し\\nクラウドAPI or ローカルLLM"]
     D --> E["生成結果"]`,
 
         modulemap: `flowchart TB
+    accTitle: LangChainのモジュール構成
+    accDescr: 入力層のPromptsから処理層のModels、Chains、Agentsへ順に流れ、支援層のMemory、OutputParsers、CallbacksがChainsを、Indexes / RetrievalがAgentsを補助する構成。
     subgraph Input["入力層"]
         Pr["Prompts"]
     end
@@ -2011,11 +2025,15 @@ robust_llm = primary_llm.with_fallbacks([backup_llm])</code></pre>
     Idx -.-> Ag`,
 
         lcel: `flowchart LR
+    accTitle: LCELのパイプライン
+    accDescr: PromptTemplateをパイプ演算子でChatModelへ、さらにパイプ演算子でOutputParserへつなぎ、最終結果を得る流れ。
     P["PromptTemplate"] -->|"パイプ演算子"| M["ChatModel"]
     M -->|"パイプ演算子"| O["OutputParser"]
     O --> R["最終結果"]`,
 
         agentloop: `flowchart TB
+    accTitle: エージェントの実行ループ
+    accDescr: ユーザーの質問を受けてLLMが思考し、ツールが必要なら検索・計算・DB照会などのツールを実行して再びLLMへ戻る。ツールが不要または十分な情報が揃ったら最終回答を生成する。
     U["ユーザーの質問"] --> LLM["LLMが思考"]
     LLM --> D{"ツールが必要か?"}
     D -->|"必要"| T["ツールを実行\\n検索/計算/DB照会など"]
@@ -2023,6 +2041,8 @@ robust_llm = primary_llm.with_fallbacks([backup_llm])</code></pre>
     D -->|"不要 / 十分な情報が揃った"| A["最終回答を生成"]`,
 
         callbacks: `sequenceDiagram
+    accTitle: Callbacksのイベント発火順序
+    accDescr: アプリケーションがChainまたはAgentのinvokeを呼ぶと、ChainがCallbackHandlerへon_chain_start、on_llm_start、ストリーミング時はon_llm_new_token、on_llm_end、on_chain_endの順にイベントを通知し、最後に結果をアプリケーションへ返す。
     participant App as アプリケーション
     participant Chain as Chain/Agent
     participant CB as CallbackHandler
@@ -2035,6 +2055,8 @@ robust_llm = primary_llm.with_fallbacks([backup_llm])</code></pre>
     Chain-->>App: 結果を返す`,
 
         ragpipe: `flowchart LR
+    accTitle: RAGパイプライン
+    accDescr: 事前準備として元ドキュメント群をチャンク分割してEmbedding化しベクトルデータベースへ格納する。質問時は質問をベクトル化して類似度検索で関連チャンクを取得し、質問と検索結果をプロンプトに結合してLLMが最終回答を生成する。
     Q["ユーザーの質問"] --> Emb["質問をベクトル化\\nEmbedding"]
     Emb --> VDB[("ベクトルデータベース")]
     VDB -->|"類似度検索"| Chunks["関連ドキュメントの\\nチャンクを取得"]
@@ -2047,18 +2069,24 @@ robust_llm = primary_llm.with_fallbacks([backup_llm])</code></pre>
     Emb2 --> VDB`,
 
         hallu: `flowchart TB
+    accTitle: ハルシネーションの発生メカニズム
+    accDescr: LLMは質問に対し確率的に次の単語を予測する。学習データに十分な根拠があれば事実に基づいた回答になり、根拠がなければもっともらしいが誤った内容、つまりハルシネーションを生成する。
     Q["質問"] --> LLM["LLMが確率的に\\n次の単語を予測"]
     LLM --> Known{"学習データに\\n十分な根拠があるか?"}
     Known -->|"Yes"| Correct["事実に基づいた回答"]
     Known -->|"No"| Guess["もっともらしいが\\n誤った内容を生成\\n=ハルシネーション"]`,
 
         react: `flowchart LR
+    accTitle: ReActの思考サイクル
+    accDescr: Thoughtで何を調べるべきか考え、Actionでツールを実行し、Observationで結果を確認し、再びThoughtで次の行動を考えて次のツール実行または回答確定へ進む。
     T1["Thought: 何を調べるべきか考える"] --> A1["Action: ツールを実行"]
     A1 --> O1["Observation: 実行結果を確認"]
     O1 --> T2["Thought: 次に何をすべきか再度考える"]
     T2 --> A2["Action: 次のツールを実行 / 回答を確定"]`,
 
         autonomous: `flowchart TB
+    accTitle: 自律型AIエージェントの動作
+    accDescr: 大目標を入力するとLLMがタスクに分解してタスクキューに入れ、1つずつツール呼び出しで実行する。結果を評価して新たなタスクを追加・更新しキューへ戻し、目標達成で完了する。
     Goal["大目標の入力"] --> Plan["LLMがタスクに分解"]
     Plan --> Queue["タスクキュー"]
     Queue --> Exec["1つのタスクを実行\\nツール呼び出し"]
@@ -2067,6 +2095,8 @@ robust_llm = primary_llm.with_fallbacks([backup_llm])</code></pre>
     Eval -->|"目標達成"| Done["完了"]`,
 
         timeline: `flowchart LR
+    accTitle: LangChainの変遷タイムライン
+    accDescr: 2024年の本書刊行当時はLLMChain、initialize_agent、ConversationBufferMemory、LangServeが中心。2025年10月のv1.0でcreate_agentが導入されLangGraphが実行基盤に統合。2026年9月現在は会話履歴をcheckpointer、要約をミドルウェア、長期記憶をStoreで扱い、LangSmithが評価・監視の中核、LangServeはアーカイブされLangSmith Deploymentへ移行。
     subgraph Y2024["2024年: 本書刊行当時"]
         A1["LLMChain / initialize_agent"]
         A2["ConversationBufferMemory"]
