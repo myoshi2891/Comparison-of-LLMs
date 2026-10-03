@@ -158,6 +158,9 @@ def scrape(existing: list[ApiModel] | None = None) -> list[ApiModel]:
 
             pi, si = sanity_check(in_price, f"AWS/{model_name}/in", fb_in)
             po, so = sanity_check(out_price, f"AWS/{model_name}/out", fb_out)
+            # 片側だけ抽出できた混成ペアは採用しない（取れた側も誤抽出のことが多い）
+            if si != so:
+                pi, po = fb_in, fb_out
             results[model_name] = (pi, po, si if si == so else "fallback")
 
     except Exception as exc:

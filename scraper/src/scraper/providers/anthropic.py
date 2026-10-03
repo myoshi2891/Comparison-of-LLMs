@@ -13,9 +13,11 @@ from scraper.provenance import FallbackResolver
 logger = logging.getLogger(__name__)
 
 _URL = "https://www.anthropic.com/pricing"
+_CLAUDE_SONNET_5_5 = "Claude Sonnet 5.5"
 _CLAUDE_SONNET_5 = "Claude Sonnet 5"
 _CLAUDE_FABLE_5 = "Claude Fable 5"
 _CLAUDE_FABLE_51 = "Claude Fable 5.1"
+_CLAUDE_OPUS_5_5 = "Claude Opus 5.5"
 _CLAUDE_OPUS_5 = "Claude Opus 5"
 _CLAUDE_OPUS_4_5 = "Claude Opus 4.5"
 _CLAUDE_SONNET_4_5 = "Claude Sonnet 4.5"
@@ -24,11 +26,13 @@ _CLAUDE_SONNET_4_5 = "Claude Sonnet 4.5"
 _FALLBACKS: dict[str, tuple[float, float]] = {
     _CLAUDE_FABLE_51:           (10.00, 50.00),
     _CLAUDE_FABLE_5:            (10.00, 50.00),
+    _CLAUDE_OPUS_5_5:           (4.00,  20.00),
     _CLAUDE_OPUS_5:             (5.00,  25.00),
     "Claude Opus 4.8":          (5.00,  25.00),
     "Claude Opus 4.7":          (5.00,  25.00),
     "Claude Opus 4.6":          (5.00,  25.00),
     _CLAUDE_OPUS_4_5:           (5.00,  25.00),
+    _CLAUDE_SONNET_5_5:         (2.00,  10.00),
     _CLAUDE_SONNET_5:           (2.00,  10.00),
     "Claude Sonnet 4.6":        (3.00,  15.00),
     _CLAUDE_SONNET_4_5:         (3.00,  15.00),
@@ -76,6 +80,9 @@ def scrape(existing: list[ApiModel] | None = None) -> list[ApiModel]:
     fb_in, fb_out = fallback_map["Claude Opus 4.6"]
     pi, si = sanity_check(in_price, "Anthropic/Opus4.6/in", fb_in)
     po, so = sanity_check(out_price, "Anthropic/Opus4.6/out", fb_out)
+    # 片側だけ抽出できた混成ペアは採用しない（取れた側も誤抽出のことが多い）
+    if si != so:
+        pi, po = fb_in, fb_out
     results["Claude Opus 4.6"] = (pi, po, si if si == so else "fallback")
 
     # Claude Sonnet 4.6: $3 / $15
@@ -89,6 +96,9 @@ def scrape(existing: list[ApiModel] | None = None) -> list[ApiModel]:
     fb_in, fb_out = fallback_map["Claude Sonnet 4.6"]
     pi, si = sanity_check(in_price, "Anthropic/Sonnet4.6/in", fb_in)
     po, so = sanity_check(out_price, "Anthropic/Sonnet4.6/out", fb_out)
+    # 片側だけ抽出できた混成ペアは採用しない（取れた側も誤抽出のことが多い）
+    if si != so:
+        pi, po = fb_in, fb_out
     results["Claude Sonnet 4.6"] = (pi, po, si if si == so else "fallback")
 
     # Claude Haiku 4.5: $1 / $5
@@ -102,6 +112,9 @@ def scrape(existing: list[ApiModel] | None = None) -> list[ApiModel]:
     fb_in, fb_out = fallback_map["Claude Haiku 4.5"]
     pi, si = sanity_check(in_price, "Anthropic/Haiku4.5/in", fb_in)
     po, so = sanity_check(out_price, "Anthropic/Haiku4.5/out", fb_out)
+    # 片側だけ抽出できた混成ペアは採用しない（取れた側も誤抽出のことが多い）
+    if si != so:
+        pi, po = fb_in, fb_out
     results["Claude Haiku 4.5"] = (pi, po, si if si == so else "fallback")
 
     # 未スクレイプのモデルはフォールバック維持
@@ -171,12 +184,14 @@ def _build_models_from_results(
 _TAG = {
     _CLAUDE_FABLE_51:           "最上位 Flagship",
     _CLAUDE_FABLE_5:            "最上位 前世代",
-    _CLAUDE_OPUS_5:             "最新 Opus",
+    _CLAUDE_OPUS_5_5:           "最新 Opus",
+    _CLAUDE_OPUS_5:             "Stable",
     "Claude Opus 4.8":          "Stable",
     "Claude Opus 4.7":          "Stable",
     "Claude Opus 4.6":          "Stable",
     _CLAUDE_OPUS_4_5:           "Stable",
-    _CLAUDE_SONNET_5:           "最新 Sonnet",
+    _CLAUDE_SONNET_5_5:         "最新 Sonnet",
+    _CLAUDE_SONNET_5:           "Stable",
     "Claude Sonnet 4.6":        "Stable",
     _CLAUDE_SONNET_4_5:         "Stable",
     "Claude Haiku 4.5":         "Fast",
@@ -186,11 +201,13 @@ _TAG = {
 _CLS = {
     _CLAUDE_FABLE_51:           "tag-flag",
     _CLAUDE_FABLE_5:            "tag-flag",
+    _CLAUDE_OPUS_5_5:           "tag-flag",
     _CLAUDE_OPUS_5:             "tag-flag",
     "Claude Opus 4.8":          "tag-flag",
     "Claude Opus 4.7":          "tag-flag",
     "Claude Opus 4.6":          "tag-flag",
     _CLAUDE_OPUS_4_5:           "tag-flag",
+    _CLAUDE_SONNET_5_5:         "tag-flag",
     _CLAUDE_SONNET_5:           "tag-flag",
     "Claude Sonnet 4.6":        "tag-flag",
     _CLAUDE_SONNET_4_5:         "tag-flag",
@@ -201,12 +218,14 @@ _CLS = {
 _SUB_JA = {
     _CLAUDE_FABLE_51:           "最上位モデル / 1M ctx / キャッシュ読取0.025x / 新トークナイザ",
     _CLAUDE_FABLE_5:            "最上位 前世代 / 1M ctx / 長期エージェント / 新トークナイザ",
-    _CLAUDE_OPUS_5:             "現行フラッグシップ / 1M ctx / Fast mode対応 / 新トークナイザ",
+    _CLAUDE_OPUS_5_5:           "現行フラッグシップ / 1M ctx / キャッシュ読取0.05x / Fast mode対応",
+    _CLAUDE_OPUS_5:             "前世代フラッグシップ / 1M ctx / Fast mode対応 / 新トークナイザ",
     "Claude Opus 4.8":          "1M ctx / Adaptive thinking / Fast mode対応 / 新トークナイザ",
     "Claude Opus 4.7":          "SWE-bench 87.6% / コーディング特化 / 新トークナイザ",
     "Claude Opus 4.6":          "1M ctx / エージェントチーム / 旧トークナイザ",
     _CLAUDE_OPUS_4_5:           "1M ctx / 前世代 Opus / 旧トークナイザ",
-    _CLAUDE_SONNET_5:           "最新Sonnet / 200K ctx / $2/$10 が恒久価格に確定",
+    _CLAUDE_SONNET_5_5:         "最新Sonnet / バランス型 / 新トークナイザ",
+    _CLAUDE_SONNET_5:           "前世代Sonnet / 200K ctx / $2/$10 が恒久価格に確定",
     "Claude Sonnet 4.6":        "バランス最適 / 200K ctx / 前世代",
     _CLAUDE_SONNET_4_5:         "バランス型 / 200K ctx / 前々世代",
     "Claude Haiku 4.5":         "高速・高ボリューム向け",
@@ -216,12 +235,14 @@ _SUB_JA = {
 _SUB_EN = {
     _CLAUDE_FABLE_51:           "Most capable / 1M ctx / 0.025x cache reads / new tokenizer",
     _CLAUDE_FABLE_5:            "Prev top-tier / 1M ctx / long-horizon agent / new tokenizer",
-    _CLAUDE_OPUS_5:             "Current flagship / 1M ctx / Fast mode / new tokenizer",
+    _CLAUDE_OPUS_5_5:           "Current flagship / 1M ctx / 0.05x cache reads / Fast mode",
+    _CLAUDE_OPUS_5:             "Prev flagship / 1M ctx / Fast mode / new tokenizer",
     "Claude Opus 4.8":          "1M ctx / Adaptive thinking / Fast mode / new tokenizer",
     "Claude Opus 4.7":          "SWE-bench 87.6% / coding-focused / new tokenizer",
     "Claude Opus 4.6":          "1M ctx / agent teams / previous tokenizer",
     _CLAUDE_OPUS_4_5:           "1M ctx / prev-gen Opus / previous tokenizer",
-    _CLAUDE_SONNET_5:           "Latest Sonnet / 200K ctx / $2/$10 now permanent",
+    _CLAUDE_SONNET_5_5:         "Latest Sonnet / balanced / new tokenizer",
+    _CLAUDE_SONNET_5:           "Prev Sonnet / 200K ctx / $2/$10 now permanent",
     "Claude Sonnet 4.6":        "Optimal balance / 200K ctx / prev-gen",
     _CLAUDE_SONNET_4_5:         "Balanced / 200K ctx / two gens back",
     "Claude Haiku 4.5":         "Fast / high-volume use cases",

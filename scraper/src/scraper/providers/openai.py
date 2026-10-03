@@ -15,6 +15,9 @@ logger = logging.getLogger(__name__)
 _URL = "https://openai.com/api/pricing/"
 
 _GPT_6_ASTRA = "GPT-6 Astra"
+_GPT_6_1_SOL = "GPT-6.1 Sol"
+_GPT_6_SOL = "GPT-6 Sol"
+_GPT_6_LUNA = "GPT-6 Luna"
 _GPT_5_6_SOL = "GPT-5.6 Sol"
 _GPT_5_6_TERRA = "GPT-5.6 Terra"
 _GPT_5_6_LUNA = "GPT-5.6 Luna"
@@ -44,6 +47,9 @@ _GPT_5_NANO = "GPT-5 Nano"
 
 _FALLBACKS: dict[str, tuple[float, float]] = {
     _GPT_6_ASTRA:     ( 10.00,  50.00),
+    _GPT_6_1_SOL:     (  2.00,  10.00),
+    _GPT_6_SOL:       (  2.00,  10.00),
+    _GPT_6_LUNA:      (  0.10,   0.50),
     _GPT_5_6_SOL:     (  4.00,  20.00),
     _GPT_5_6_TERRA:   (  2.00,  12.00),
     _GPT_5_6_LUNA:    (  0.20,   1.20),
@@ -74,6 +80,9 @@ _FALLBACKS: dict[str, tuple[float, float]] = {
 
 _TAG = {
     _GPT_6_ASTRA:     "最新 Flagship",
+    _GPT_6_1_SOL:     "Balanced",
+    _GPT_6_SOL:       "Balanced",
+    _GPT_6_LUNA:      "Value",
     _GPT_5_6_SOL:     "Flagship",
     _GPT_5_6_TERRA:   "Balanced",
     _GPT_5_6_LUNA:    "Value",
@@ -104,6 +113,9 @@ _TAG = {
 
 _CLS = {
     _GPT_6_ASTRA:     "tag-flag",
+    _GPT_6_1_SOL:     "tag-bal",
+    _GPT_6_SOL:       "tag-bal",
+    _GPT_6_LUNA:      "tag-bal",
     _GPT_5_6_SOL:     "tag-flag",
     _GPT_5_6_TERRA:   "tag-flag",
     _GPT_5_6_LUNA:    "tag-bal",
@@ -134,6 +146,9 @@ _CLS = {
 
 _SUB_JA = {
     _GPT_6_ASTRA:     "最新フラッグシップ / GPT-6 世代",
+    _GPT_6_1_SOL:     "GPT-6 世代の中位モデル / 最新版",
+    _GPT_6_SOL:       "GPT-6 世代の中位モデル",
+    _GPT_6_LUNA:      "GPT-6 世代の低価格モデル",
     _GPT_5_6_SOL:     "1M ctx / 2026-07 値下げ ($5/$30→$4/$20)",
     _GPT_5_6_TERRA:   "バランス型 / 1M ctx / 値下げ済み",
     _GPT_5_6_LUNA:    "コスト重視 / 1M ctx / 大幅値下げ ($1/$6→$0.2/$1.2)",
@@ -164,6 +179,9 @@ _SUB_JA = {
 
 _SUB_EN = {
     _GPT_6_ASTRA:     "Latest flagship / GPT-6 generation",
+    _GPT_6_1_SOL:     "GPT-6 mid tier / latest revision",
+    _GPT_6_SOL:       "GPT-6 mid tier",
+    _GPT_6_LUNA:      "GPT-6 value tier",
     _GPT_5_6_SOL:     "1M ctx / price cut Jul 2026 ($5/$30 to $4/$20)",
     _GPT_5_6_TERRA:   "Balanced / 1M ctx / price cut applied",
     _GPT_5_6_LUNA:    "Value tier / 1M ctx / major price cut ($1/$6 to $0.2/$1.2)",
@@ -224,6 +242,9 @@ def scrape(existing: list[ApiModel] | None = None) -> list[ApiModel]:
         ])
         pi, si = sanity_check(in_price, f"OpenAI/{name}/in", fb_in)
         po, so = sanity_check(out_price, f"OpenAI/{name}/out", fb_out)
+        # 片側だけ抽出できた混成ペアは採用しない（取れた側も誤抽出のことが多い）
+        if si != so:
+            pi, po = fb_in, fb_out
         status = si if si == so else "fallback"
         models.append(ApiModel(
             provider="OpenAI",

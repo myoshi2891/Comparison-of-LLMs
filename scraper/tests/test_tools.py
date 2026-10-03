@@ -140,6 +140,16 @@ class TestWindsurf:
         assert pro.monthly == 18
         assert pro.scrape_status == "success"
 
+    def test_teams_extracts_per_seat_not_base_fee(self):
+        # 基本料 $80/month を席単価として拾わない（2026-09 の料金ページ表記）
+        tools = _run(
+            windsurf,
+            "<p>Teams $80/month base + $45/month per full developer seat</p>",
+        )
+        teams = _find(tools, "Teams")
+        assert teams.monthly == 45
+        assert teams.scrape_status == "success"
+
     def test_fallback_on_empty_html(self):
         _assert_all_fallback(_run(windsurf, _EMPTY), windsurf._FALLBACKS)
 

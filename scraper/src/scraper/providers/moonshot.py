@@ -87,6 +87,9 @@ def scrape(existing: list[ApiModel] | None = None) -> list[ApiModel]:
         ])
         pi, si = sanity_check(in_price, f"Moonshot/{name}/in", fb_in)
         po, so = sanity_check(out_price, f"Moonshot/{name}/out", fb_out)
+        # 片側だけ抽出できた混成ペアは採用しない（取れた側も誤抽出のことが多い）
+        if si != so:
+            pi, po = fb_in, fb_out
         models.append(ApiModel(
             provider=_PROVIDER,
             name=name,

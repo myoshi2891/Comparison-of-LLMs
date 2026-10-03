@@ -14,36 +14,36 @@ logger = logging.getLogger(__name__)
 
 _URL = "https://platform.deepseek.com/api-docs/pricing"
 
-_DEEPSEEK_V4_FLASH = "DeepSeek V4 Flash"
+_DEEPSEEK_V4_1_FLASH = "DeepSeek V4.1 Flash"
 _DEEPSEEK_V4_PRO = "DeepSeek V4 Pro"
 _DEEPSEEK_V3_2 = "DeepSeek-V3.2"
 
 _FALLBACKS: dict[str, tuple[float, float]] = {
-    _DEEPSEEK_V4_FLASH:   ( 0.30,  1.20),
+    _DEEPSEEK_V4_1_FLASH: ( 0.30,  1.20),
     _DEEPSEEK_V4_PRO:     ( 1.32,  3.96),
     _DEEPSEEK_V3_2:       ( 0.28,  0.42),
     "DeepSeek-R1":        ( 0.55,  2.19),
 }
 _TAG = {
-    _DEEPSEEK_V4_FLASH:   "最新 Flash",
+    _DEEPSEEK_V4_1_FLASH: "最新 Flash",
     _DEEPSEEK_V4_PRO:     "最新 Pro",
     _DEEPSEEK_V3_2:       "Retired",
     "DeepSeek-R1":        "Retired",
 }
 _CLS = {
-    _DEEPSEEK_V4_FLASH:   "tag-oss",
+    _DEEPSEEK_V4_1_FLASH: "tag-oss",
     _DEEPSEEK_V4_PRO:     "tag-oss",
     _DEEPSEEK_V3_2:       "tag-leg",
     "DeepSeek-R1":        "tag-leg",
 }
 _SUB_JA = {
-    _DEEPSEEK_V4_FLASH:   "1M ctx / MIT / off-peak は 50% 引き",
+    _DEEPSEEK_V4_1_FLASH: "V4 Flash の後継 / 画像理解対応 / off-peak は 50% 引き",
     _DEEPSEEK_V4_PRO:     "高度推論 / 1.6T MoE / MIT / off-peak は 50% 引き",
     _DEEPSEEK_V3_2:       "公式料金表から削除 (提供終了)",
     "DeepSeek-R1":        "公式料金表から削除 (提供終了)",
 }
 _SUB_EN = {
-    _DEEPSEEK_V4_FLASH:   "1M ctx / MIT / 50% off during off-peak",
+    _DEEPSEEK_V4_1_FLASH: "Successor to V4 Flash / vision / 50% off during off-peak",
     _DEEPSEEK_V4_PRO:     "Advanced reasoning / 1.6T MoE / MIT / 50% off during off-peak",
     _DEEPSEEK_V3_2:       "Removed from the official price list (retired)",
     "DeepSeek-R1":        "Removed from the official price list (retired)",
@@ -78,6 +78,9 @@ def scrape(existing: list[ApiModel] | None = None) -> list[ApiModel]:
         ])
         pi, si = sanity_check(in_price, f"DeepSeek/{name}/in", fb_in)
         po, so = sanity_check(out_price, f"DeepSeek/{name}/out", fb_out)
+        # 片側だけ抽出できた混成ペアは採用しない（取れた側も誤抽出のことが多い）
+        if si != so:
+            pi, po = fb_in, fb_out
         models.append(ApiModel(
             provider="DeepSeek",
             name=name,
