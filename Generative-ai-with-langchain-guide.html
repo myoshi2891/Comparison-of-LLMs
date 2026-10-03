@@ -103,6 +103,12 @@
         padding: 1px 6px;
         color: var(--color-text-info);
       }
+      .code-label {
+        margin: 18px 0 -10px;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--color-text-secondary);
+      }
       pre {
         background: #0b1526;
         border: 1px solid var(--color-border-secondary);
@@ -910,11 +916,19 @@ pip install -U langchain-classic "langchain[mcp]"</code></pre>
           </div>
 
           <h3>3-3. APIキーの設定</h3>
+          <p class="code-label">Bash（macOS / Linux）</p>
           <pre><code class="language-bash"># APIキーはソースコードに書かず、シェル・CIのシークレット・.env（Git管理外）で設定する
 export ANTHROPIC_API_KEY="..."
 # 以下は OpenAI / Google のインテグレーションを使う場合のみ（任意）
 export OPENAI_API_KEY="..."
 export GOOGLE_API_KEY="..."</code></pre>
+          <p class="code-label">PowerShell（Windows）</p>
+          <pre><code class="language-powershell"># APIキーはソースコードに書かず、シェル・CIのシークレット・.env（Git管理外）で設定する
+# 現在の PowerShell セッションにのみ設定される
+$env:ANTHROPIC_API_KEY = "..."
+# 以下は OpenAI / Google のインテグレーションを使う場合のみ（任意）
+$env:OPENAI_API_KEY = "..."
+$env:GOOGLE_API_KEY = "..."</code></pre>
           <pre><code class="language-python">import os
 
 # 各インテグレーションは環境変数から自動でキーを読み込むため、コード内でキーを代入しない
