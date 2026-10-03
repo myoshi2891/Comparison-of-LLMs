@@ -54,10 +54,10 @@ GEMINI.md は Gemini CLI / Gemini Code Assist 向けの入り口。
 ## 検証コマンド
 
 ```bash
-(cd web-next && NODE_OPTIONS=--no-experimental-webstorage bun run test) # 182 files / 1722 tests pass（2026-10-03 実測）
+(cd web-next && NODE_OPTIONS=--no-experimental-webstorage bun run test) # 183 files / 1727 tests pass（2026-10-03 実測）
 (cd web-next && bun run typecheck)   # OK（2026-10-03 実測）
 # ビルドは今回ユーザー指定で未実行（過去: 2026-09-18 に89静的ページ生成）
-(cd web-next && bun run lint)        # OK（503 files / 0 diagnostics。2026-10-03 実測）
+(cd web-next && bun run lint)        # OK（504 files / 0 diagnostics。2026-10-03 実測）
 (cd scraper && uv run pytest)        # 100 件 pass（2026-09-17 実測。全 Green ✅）
 ```
 

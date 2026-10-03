@@ -10,21 +10,28 @@
 
 - **フェーズ**: 保守・機能改善・品質強化フェーズ
 - **ブランチ**: `dev`（本番 `main` への Next.js 移行マージ完了 🚀）
-- **最新実装 HEAD**: `e3e4d28d`（AI-Powered Developer の CSS 整理。Green は `557d0f16`）
+- **最新実装 HEAD**: `c9ddda02`（AI-Powered Developer 日付右寄せ・ヒーロー余白。表構造と共通レイアウト修正は `1021dde4`）
 - **次の作業**: `/books/ai-powered-developer` の目視確認（ユーザー担当）。ビルドは今回の依頼では実行しない。
 - **ルート実数**: `page.tsx` 84 件、registry 85 エントリ（RSS の `/rss.xml` を含む）。全ルート登録・ナビ導出テストは合格。
 - **動作検証**:
   - ビルド: 今回はユーザー指定で未実行。過去の成功記録は 2026-09-17 の 90 静的ページであり、今回の変更を検証した値ではない。
   - `bun run typecheck` ✅（`tsc --noEmit`。2026-10-03 実測）
-  - `bun run lint` ✅（Biome check / 503 files / 0 diagnostics。2026-10-03 実測）
+  - `bun run lint` ✅（Biome check / 504 files / 0 diagnostics。2026-10-03 実測）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test` で Vitest **182 files / 1722 tests すべて合格**（2026-10-03 実測。全 Green ✅）
+  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test` で Vitest **183 files / 1727 tests すべて合格**（2026-10-03 実測。全 Green ✅）
     - 開始時のベースラインは **180 files / 1682 tests**。この実行環境では通常実行で既存 Checklist 5 件が Node の `localStorage` により失敗するため、実行時オプションだけで回避した。依存・設定ファイルは変更していない。
     - `load(sourceHtml)` をモジュール初期化時に呼ぶ `governance/ai-governance/GuideContent.tsx` と
       `local-llm/finetuning-best-practices/GuideContent.tsx` は、import スモークでも読み込み可能であることを確認済み
   - **バックエンド (`scraper/`)**: pytest 実行で **100 件すべて合格** (2026-09-17 実測。全 Green ✅)
 
 ## 最近の追加内容
+
+- **AI-Powered Developer のコンソールエラー・共通レイアウト修正（2026-10-03）**:
+  - 全7表の `table`／`thead`／`tbody`／`tr` 直下から空白テキストを除去。明示的な `{" "}` だけでなく、同一行のタグ間空白も検査する。React要素ツリーの全表構造を走査し、許可する子要素以外・文字列ノードが一切ないことを完全一致で検証。
+  - 日付は registry の `lastReviewed`／`addedAt` を使い、本文の最初に黒文字・右寄せで表示。ページ限定で共通日付バーを非表示にし、bodyの追加10pxとサイドバーの追加16pxを除去。免責バナー直下から本文とサイドバーの背景が始まる。
+  - 共通「関連ページ」はデスクトップでサイドバー幅288pxを避け、980px以下では左余白を0に戻す。本ページ限定の淡色変数を渡す。ヒーロー周囲に0.75rem／1rem、「本ガイドについて」の上に1remの余白を追加。
+  - 回帰テスト5件を追加（ページ合計45件）。原本の固定オラクルは変更せず、追加日付要素だけを原本クラス照合から除外して別途検証。原本監査exit 0、全体183 files／1727 tests、typecheck・lintを確認。Red `744192c8` → Green `1021dde4` → Refactor `dd0d38c9`、追加指定Red `5628bfea` → Green `c9ddda02` を分離。
+  - CSS変更後に開発サーバーを停止し、キャッシュを一時ディレクトリへ退避してポート3000で再起動。npm・ビルド・ブラウザ自動確認は未実行、目視確認はユーザー担当。
 
 - **AI-Powered Developer ガイド（/books/ai-powered-developer）の Next.js 移行（2026-10-03）**:
   - 原本の全18 H2・25 H3・45段落・10リスト／35項目・7表／46行・9 Mermaid・9更新callout・10項目チェックリスト・22参考文献カードを Pure JSX へ転写。
@@ -254,12 +261,12 @@
 
 ```text
 AGENTS.md → CODEX.md → CLAUDE.md → docs/PROGRESS.md → Phase A–F 計画の順で読む。
-最新実装 HEAD: e3e4d28d（AI-Powered Developer CSS 整理。Green: 557d0f16）
+最新実装 HEAD: c9ddda02（日付右寄せ・ヒーロー余白。表構造・共通レイアウト修正: 1021dde4）
 次の作業: /books/ai-powered-developer の目視確認結果に対応する。目視確認はユーザー担当。
 AI-Powered-Developer.html は archive/html/books/、Markdown は archive/md/books/ に保存済み。
-移行漏れ監査は exit 0。全体 Vitest 182 files / 1722 tests、typecheck、lint が成功。
+移行漏れ監査は exit 0。全体 Vitest 183 files / 1727 tests、typecheck、lint が成功。
 この実行環境のテストは NODE_OPTIONS=--no-experimental-webstorage bun run test を使用する。
-今回追加した40契約は本文とCSS・Mermaid・目次・チェックリストの完全一致と操作を検証する。
+ページの45テストは本文とCSS・Mermaid・目次・チェックリストに加え、全表の構造・右寄せの日付・関連ページ配置・余白を検証する。
 原本の期待値を移植先に合わせて変更しない。原本の本文情報基準日は2026-09-17のまま。
 サンドボックスでは npm とビルドを実行しない。目視結果への修正も Red → Green → Refactor → Docs で分離コミットする。
 ルート直下に残る未移行HTML候補は12件（2026-10-03にファイル一覧で実測）。次の移行対象は未指定。

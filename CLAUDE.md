@@ -14,8 +14,8 @@ AIモデルの時間別コスト計算機 + AI ツール導入ガイド群。Pyt
 目次・モバイルメニュー・チェックリストを扱う `TocObserver.tsx` を配置し、
 `page-registry.ts` の「推薦書籍」エントリからナビ・検索・RSS・関連リンクを導出する。
 原本は `archive/html/books/AI-Powered-Developer.html` と `archive/md/books/AI-Powered-Developer.md` に内容無変更で保存。
-この移行では原本から固定した構造・本文・CSSの期待値と40契約を追加し、全体の実測は Vitest
-**182 files / 1722 tests**、typecheck・lint は成功（2026-10-03）。この実行環境の既存 `localStorage`
+この移行では原本から固定した構造・本文・CSSの期待値と45契約（表構造・日付・関連ページ配置の回帰5件を含む）を追加し、全体の実測は Vitest
+**183 files / 1727 tests**、typecheck・lint は成功（2026-10-03）。この実行環境の既存 `localStorage`
 失敗は `NODE_OPTIONS=--no-experimental-webstorage bun run test` で回避し、設定や依存は変更していない。
 ビルドはユーザー指定で未実行、目視確認はユーザー担当。詳細と再開手順は `docs/PROGRESS.md` を参照。
 
