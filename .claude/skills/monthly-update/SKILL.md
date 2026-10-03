@@ -101,6 +101,8 @@ grep -n -A3 'slug: "/claude/agent"' lib/page-registry.ts   # 該当エントリ�
   （plans/006 §4）
 - 内容に変更がなくても「確認した」事実として `lastReviewed` は更新する。
   `addedAt`（公開日）は**絶対に変更しない**
+  - **例外: Home（`slug: "/"`）**。価格データ（`pricing.json`）を更新した場合は `addedAt` と
+    `lastReviewed` を両方とも更新当日の日付へ書き換える（データ更新 = 再公開のため。2026-10-03 ユーザー指示）
 - 確認しなかったページの `lastReviewed` は触らない（古いまま表示されるのが正しい振る舞い）
 
 ### 5. ローカル静的検証 & テスト
