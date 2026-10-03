@@ -1,0 +1,3699 @@
+{
+  "source": "AI-Powered-Developer.html",
+  "h1": ["AI-Powered Developer: Supercharge Your Productivity with LLMs and AI Tools"],
+  "h2": [
+    "0. 対象読者と前提知識",
+    "1. 書籍情報",
+    "2. なぜ今このテーマが重要なのか（2026年の状況）",
+    "3. 学習ロードマップ全体図",
+    "LLMの基礎を理解する",
+    "ChatGPT・Copilot・CodeWhispererを使い始める（プロンプトエンジニアリング入門）",
+    "ChatGPTでソフトウェアを設計する",
+    "GitHub Copilotで実装する",
+    "データ管理とイベント駆動アーキテクチャ",
+    "テスト・品質評価・コード説明",
+    "インフラのコード化とデプロイ",
+    "セキュアなアプリケーション開発",
+    "ローカルLLMの活用",
+    "Step10 2026年の最新動向を押さえる（書籍刊行後のアップデート）",
+    "用語集",
+    "学習チェックリスト",
+    "まとめ",
+    "参考文献・出典"
+  ],
+  "h3": [
+    "この章のねらい",
+    "学ぶポイント",
+    "この章のねらい",
+    "3つのツールの位置づけ（書籍刊行時点）",
+    "プロンプトエンジニアリングの代表的パターン",
+    "この章のねらい",
+    "実践のコツ",
+    "この章のねらい",
+    "扱うトピック",
+    "ヘキサゴナルアーキテクチャのイメージ",
+    "この章のねらい",
+    "学ぶポイント",
+    "この章のねらい",
+    "この章のねらい",
+    "学ぶポイント",
+    "この章のねらい",
+    "学ぶポイント",
+    "LLM・AIエージェント特有のセキュリティリスク（OWASP LLM Top 10）",
+    "この章のねらい",
+    "書籍刊行時点（2024年）と2026年時点の比較",
+    "(1) 「vibe coding」から「エージェント型プログラミング」へ",
+    "(2) AIコーディングの生産性と信頼のギャップ",
+    "(3) テスト駆動開発（TDD）とAIエージェントの相性",
+    "(4) AI活用を前提にしたセキュリティの標準化",
+    "(5) ローカルLLMの実用化"
+  ],
+  "paragraphs": [
+    "― 初学者のためのステップバイステップ完全ガイド（2026年9月版）",
+    "本書は「中級のソフトウェア開発者向け、AIの経験は不要」とされています。本ガイドも同様に、以下のような方を想定しています。",
+    "前提知識がなくても読み進められるよう、各ステップで専門用語には簡単な説明を添えています。",
+    "書籍全体は、架空のITAM（IT資産管理）システムを1本通しで構築しながら、設計・実装・データ管理・テスト・インフラ・セキュリティ・オフライン活用という開発ライフサイクルの各段階にAIをどう組み込むかを学ぶ構成になっています。",
+    "書籍が刊行された2024年以降、AIを使ったコーディングは「一部の先進的な開発者の実験」から「業界標準のワークフロー」へと急速に変化しました。Stack Overflowが2025年に実施した大規模な開発者調査（177カ国・約5万人が回答）では、AIコーディングツールを「利用している、または利用予定」と回答した割合は84%に達した一方、AIの出力を「信頼している」と答えた開発者はわずか29%にとどまり、前年の40%から大きく低下しています14。デバッグに時間がかかる（45%）、出力が「惜しいけれど微妙に間違っている」（66%）といった不満が上位を占めており、「使ってはいるが無条件には信じない」という姿勢が定着しつつあります。",
+    "同時に、Django共同開発者として知られるSimon Willisonや、Thoughtworksのチーフサイエンティストで『リファクタリング』の著者としても有名なMartin Fowlerらは、2025〜2026年にかけて「vibe coding（バイブコーディング＝コードを読まずにAIに丸投げする手法）」から、人間がAIの出力を精査・監督する「エージェント型プログラミング（agentic programming）」への移行が起きていると指摘しています10。つまり、本書が提示する「AIを“優秀だがジュニアな開発者”として扱い、設計レビューやコードレビューを人間が行う」という基本姿勢は、2026年時点でもむしろより重要性を増しているといえます。",
+    "各ステップの終わりに設けた「2026年アップデート」の囲みでは、こうした最新の実務知見を補足していきます。",
+    "書籍の9つの章を、本ガイドではStep1〜Step9として整理し、さらに2026年時点の補足を独自のStep10として追加しています。",
+    "書籍の章とStepの対応関係は以下のとおりです。",
+    "書籍は冒頭で、印象的な例えを使っています。「あなたは知らないうちに昇進していた。世界で最も優秀で意欲的なジュニア開発者が、あなたのチームに加わったのだ」というものです。つまり生成AI（特にLLM）は、指示すれば動いてくれるが、成果物のレビューや方向づけは依然として人間の役目である、という基本姿勢が全編を貫いています。",
+    "Stack Overflowの2025年調査14でも、「AIの回答が“惜しいけれど微妙に間違っている”」ことが開発者の最大の不満（66%）として挙げられており、この章が説く「AIをジュニア開発者として扱い、成果物は必ずレビューする」という姿勢は今なお有効です。",
+    "書籍は、大手テック企業の技術面接を模したシナリオを題材に、ChatGPT（GPT-4とGPT-3.5の両方）、GitHub Copilot、AWS CodeWhispererという3つのツールを比較しながら基本操作を学びます。同時に、プロンプトエンジニアリングの代表的なパターンをいくつも紹介しています。",
+    "書籍のFAQでも触れられている通り、Persona（ペルソナ）、Audience Persona（想定読者ペルソナ）、Refinement（リファインメント）といったパターンを使うと、LLMからより一貫性のある・文脈に即した回答を引き出しやすくなります。これらは学術研究でも体系化されている、プロンプトエンジニアリングの定番パターンです。",
+    "AWSのCodeWhispererは2024年4月30日付けで「Amazon Q Developer」へと統合・改称されており18、現在は単体製品としては存在しません。エージェント機能（自律的な機能実装・ドキュメント生成・リファクタリング）やMCP（Model Context Protocol）連携なども追加され、書籍刊行時よりも大幅に機能が拡張されています。学習の際は「CodeWhisperer」という名称ではなく「Amazon Q Developer」で検索するとよいでしょう。",
+    "またGitHub Copilotも、単純なインライン補完だけでなく、リポジトリ全体を横断してタスクを自律的にこなす「Copilotエージェントモード」などが追加されています。プロンプトエンジニアリングの基本パターン自体は現在も有効ですが、著名なプロンプトエンジニアリング解説者であるSimon Willison4は、2026年にはタスクごとに使うモデルの性能を使い分ける判断も重要になってきていると述べています。",
+    "書籍では、いきなり実装に入るのではなく、まずChatGPTと対話しながらITAM（IT資産管理）システムの設計案を練り、Mermaidを使ってアーキテクチャを文書化する流れを解説しています。設計を先に言語化しておくことで、実装の手戻りを減らし、チームやステークホルダーへの説明もしやすくなる、という考え方です。",
+    "Martin Fowル11は、コードそのものより「既存の大規模で複雑なレガシーシステムを理解する」ことにこそ生成AIの価値があるとも指摘しています。設計フェーズでAIを使う効用は、ゼロからの設計だけでなく、既存システムの構造を素早く把握し直す場面でも広がっています。",
+    "設計が固まったら、GitHub Copilotを使ってドメインモデル（業務ルールを表現するコアのクラス群）を実装していきます。書籍はこの章について「LLMを使う最大のメリットは、知らないことすら知らない落とし穴（unknown unknowns）を照らし出してくれる点にある」と述べており、難しいことを易しく、一見不可能に思えることを可能にしてくれると位置づけています。",
+    "業務ロジック（ドメインモデル）を中心に置き、外部システム（Web、CLI、データベース、メッセージング等）とのやり取りを「ポート」と「アダプター」を介して行うことで、コアロジックを外部技術から独立させる設計手法です。",
+    "このように中心のドメインモデルを外部の技術的関心事から切り離しておくと、後から実装を差し替えたり、テストのためにモックへ置き換えたりしやすくなります。",
+    "TDDの提唱者として知られるKent Beck13は、AIエージェントと組み合わせたコーディングについて「エージェントはテスト駆動開発をやりたがらない。まず実装を書いて、それに通るテストを後から書こうとする」と述べ、油断するとAIがテストを消してでも帳尻を合わせようとする挙動に注意が必要だと指摘しています。ヘキサゴナルアーキテクチャのようにコアロジックと外部技術を分離しておくことは、AIにテストを書かせる際にも、境界がはっきりしている分、悪い挙動に気づきやすくするという意味でも有効です。",
+    "ITAMシステムに実際のデータを流し込み、扱えるようにする章です。リレーショナルデータベースへの永続化に始まり、Apache Kafkaを使ったイベントストリーミング、Apache Sparkを使ったリアルタイム分析までを、GitHub CopilotとCopilot Chatの支援を受けながら実装していきます。",
+    "データパイプラインやストリーミング処理のコードは定型パターンが多く、AIによる生成の効果が出やすい領域です。一方で、スキーマ設計やイベントの意味づけは業務理解が必要なため、依然として人間の設計判断が中心になります。",
+    "書籍が「ソフトウェア工学における重要な側面」と位置づけるテストの章です。単体テスト・統合テスト・振る舞いテスト（Behavior Testing）の3種類をLLMに書かせる方法、コード品質・複雑度の評価、バグ発見、コードカバレッジの確認、さらにコードの説明や、プログラミング言語間の変換までを扱います。",
+    "前述のKent Beckの指摘の通り、AIエージェントは「テストを通すこと」自体を目的化し、実装のバグを直す代わりにテストのほうを書き換えたり削除したりしてしまうことがあります。実務では次のような工夫が有効とされています。",
+    "Addy Osmani7も、AIとのペアプログラミングは「自信満々だが間違いも多い」相棒として捉えるべきであり、盲目的に成果物を信用しないことを鉄則として挙げています。",
+    "テストが完了したアプリケーションを、実際にクラウド環境へリリースするフェーズです。Copilotの支援を受けながらDockerfileを作成し、Terraformでインフラをコード化し、コンテナレジストリでイメージを管理し、Amazon EKS（Kubernetes）へデプロイし、最後にGitHub ActionsでCI/CDパイプラインを組み上げるところまでを扱います。",
+    "インフラのコード化においても、AIエージェントに実行権限を与えて自律的に作業させる「エージェント型」の運用が増えています。Simon Willison6は、システムへのフルアクセス権を持つエージェントは強力だが危険でもあり、エージェント自身の操作ログを一元管理して異常時に検知・復旧できるようにしておく重要性を強調しています。デプロイや権限まわりの自動化ほど、慎重なガードレール設計が必要になります。",
+    "書籍では、PythonとFastAPIで書かれたISAM（Information Security Asset Management）を題材に、ChatGPTを脅威モデリング・脆弱性評価・セキュリティのベストプラクティス適用・保存時および通信時のデータ暗号化に活用する方法を解説しています。",
+    "2026年版のOWASP LLM Top 1017では、AIが自律的に「行動する」エージェント時代を踏まえ、プロンプトインジェクションが依然として最重要リスクとされる一方、権限を超えたツール呼び出し（unauthorized tool invocation）は「LLM03:2026 Excessive Agency」の一部として位置づけられています。なお、正規に付与された権限内でエージェントがツールを不適切に使ってしまう「ツールの誤用」は、別ガイドであるOWASP Top 10 for Agentic Applications22の「ASI02: Tool Misuse & Exploitation」で個別に扱われています。書籍第8章で学ぶ「ChatGPTを使った脅威モデリング」の考え方は、いまや「AIを組み込んだアプリケーション自体をどう守るか」という新しい脅威モデリングの対象にも、そのまま応用できる考え方です。",
+    "「海外のAIカンファレンスに向かう飛行機の中で、機内Wi-Fiが遅くて高いとき、手元のノートPCでLLMをオフラインで動かせたら」という導入から始まる章です。Llama 2やGPT4Allをローカル環境で動かし、ChatGPTの回答と比較しながら、いつオフラインモデルで十分か、いつクラウドのモデルが必要かを判断する材料を提供しています。",
+    "ローカルLLMは、単なる「オフライン時の代替」から一歩進み、機密性の高いコードや社内データを外部に送りたくない場合の第一選択肢としても定着しています19。Ollamaは主要なAIコーディングエージェントのAPI形式（Anthropic形式・OpenAI形式）を模倣できるため、既存のツールの向き先をローカルサーバーに変更するだけで、同じワークフローのままローカルモデルへ切り替えられる点が実務上便利です。",
+    "書籍が扱う9章はいずれも今なお通用する骨太な内容ですが、2024年8月の刊行から2年以上が経過し、AI活用の「作法」そのものが進化しています。国際的に著名な開発者たちの発言を手がかりに、押さえておきたいポイントを整理します。",
+    "2025年2月、著名なAI研究者Andrej Karpathy8（元Tesla AI部門責任者、OpenAI共同創業者の一人）が「vibe coding（バイブコーディング）」という言葉をSNSに投稿し、一気に広まりました。これは、コードの中身をほとんど確認せず、AIの提案を次々に受け入れながら「とにかく動くものを作る」スタイルを指します。",
+    "しかし2026年に入り、Karpathy自身9も「LLMがより賢くなったことで、プロフェッショナルの現場ではより多くの監督・精査を伴う“エージェントによるプログラミング”がデフォルトのワークフローになりつつある」と述べています。Martin Fowler10も同様に、コードを一切見ない「vibe coding」と、人間が詳細にレビューしながらAIエージェントを指揮する「agentic programming（エージェント型プログラミング）」を明確に区別すべきだと提唱しています。",
+    "本書が一貫して説く「AIをジュニア開発者として扱い、必ずレビューする」という姿勢は、まさにこの「エージェント型プログラミング」の考え方そのものであり、2026年時点でも古びていません。",
+    "Stack Overflowの2025年開発者調査14によると、AIツールを「利用している、または利用予定」と回答した割合は84%まで拡大した一方、出力を信頼すると答えた開発者は29%にとどまりました。ソフトウェアエンジニアリングブログの著者Josh Collinsworth21も、LLMの支援効果は「定型的な作業」や「専門外の領域」にとって特に大きく、その範囲を外れるほど効果が薄れるという傾向を指摘しています。",
+    "一方でAnthropic社内での利用実態調査（Martin Fowlerが紹介11）では、開発者の59%が業務の一部にAIを利用し、平均で約50%の生産性向上が見られ、特に「パワーユーザー」と呼ばれる層（全体の14%）ではさらに大きな効果が得られているとされています。効果の大きさは「どう使うか」次第であり、書籍第2章のプロンプトエンジニアリングや、第6章のテスト駆動の考え方が、この効果差を左右する実務スキルといえます。",
+    "Extreme Programming（XP）とTDDの提唱者として知られるKent Beck13は、2025〜2026年にかけて積極的にAIコーディングエージェントを実務で使い込み、その知見を発信しています。要点は次の通りです。",
+    "OWASPは「LLMアプリケーションのためのTop 10」を継続的に更新しており、2026年版17ではAIエージェントが自律的に「行動する」ことを前提に、権限を超えたツール呼び出しが「LLM03:2026 Excessive Agency」として上位リスクに位置づけられています（ツールの誤用に特化した観点は別ガイドのOWASP Top 10 for Agentic Applications22のASI02が扱います）。書籍第8章の脅威モデリングの考え方に、こうした「AIを組み込んだシステムそのものを守る」という新しい観点を重ねて学ぶことが、2026年の開発者には求められています。",
+    "書籍第9章で紹介されているLlama 2やGPT4Allは、2026年時点ではOllama19やLM Studio20といったツールを通じて、より手軽かつ実用的に使えるようになっています。特にコーディング用途に最適化されたオープンウェイトモデルが充実し、通常の開発マシンでも十分な速度と品質でローカル実行できる場面が広がっています。",
+    "『AI-Powered Developer』は、設計・実装・データ管理・テスト・インフラ・セキュリティ・オフライン活用という開発ライフサイクル全体を、ひとつのITAMアプリケーションを通しでAI支援を受けながら構築する、実践重視の構成になっています。書籍刊行から2年以上が経過した2026年においても、「AIを優秀だが未熟なジュニア開発者として扱い、人間が設計判断とレビューの責任を持つ」という基本姿勢は色褪せていません。",
+    "一方で進化しているポイント",
+    "書籍で体系立った基礎を学びつつ、本ガイドのStep10で紹介したような最新動向を随時アップデートしていくことが、2026年の開発者には求められています。",
+    "本ガイドは2026年9月17日時点の公開情報をもとに作成しています。AI関連ツールの名称・機能は変化が速いため、実際に導入する際は各公式ドキュメントで最新情報をご確認ください。"
+  ],
+  "sections": [
+    {
+      "id": "s0",
+      "text": "0. 対象読者と前提知識"
+    },
+    {
+      "id": "s1",
+      "text": "1. 書籍情報"
+    },
+    {
+      "id": "s2",
+      "text": "2. なぜ今このテーマが重要なのか（2026年の状況）"
+    },
+    {
+      "id": "s3",
+      "text": "3. 学習ロードマップ全体図"
+    },
+    {
+      "id": "step1",
+      "text": "LLMの基礎を理解する"
+    },
+    {
+      "id": "step2",
+      "text": "ChatGPT・Copilot・CodeWhispererを使い始める（プロンプトエンジニアリング入門）"
+    },
+    {
+      "id": "step3",
+      "text": "ChatGPTでソフトウェアを設計する"
+    },
+    {
+      "id": "step4",
+      "text": "GitHub Copilotで実装する"
+    },
+    {
+      "id": "step5",
+      "text": "データ管理とイベント駆動アーキテクチャ"
+    },
+    {
+      "id": "step6",
+      "text": "テスト・品質評価・コード説明"
+    },
+    {
+      "id": "step7",
+      "text": "インフラのコード化とデプロイ"
+    },
+    {
+      "id": "step8",
+      "text": "セキュアなアプリケーション開発"
+    },
+    {
+      "id": "step9",
+      "text": "ローカルLLMの活用"
+    },
+    {
+      "id": "step10",
+      "text": "Step10 2026年の最新動向を押さえる（書籍刊行後のアップデート）"
+    },
+    {
+      "id": "glossary",
+      "text": "用語集"
+    },
+    {
+      "id": "checklist",
+      "text": "学習チェックリスト"
+    },
+    {
+      "id": "summary",
+      "text": "まとめ"
+    },
+    {
+      "id": "references",
+      "text": "参考文献・出典"
+    }
+  ],
+  "links": [
+    {
+      "href": "https://www.manning.com/books/ai-powered-developer",
+      "text": "manning.com/books/ai-powered-developer"
+    },
+    {
+      "href": "#references",
+      "text": "参考文献・出典"
+    },
+    {
+      "href": "https://www.manning.com/books/ai-powered-developer",
+      "text": "manning.com/books/ai-powered-developer"
+    },
+    {
+      "href": "#ref14",
+      "text": "14"
+    },
+    {
+      "href": "#ref10",
+      "text": "10"
+    },
+    {
+      "href": "#ref14",
+      "text": "14"
+    },
+    {
+      "href": "#ref18",
+      "text": "18"
+    },
+    {
+      "href": "#ref4",
+      "text": "4"
+    },
+    {
+      "href": "#ref11",
+      "text": "11"
+    },
+    {
+      "href": "#ref13",
+      "text": "13"
+    },
+    {
+      "href": "#ref7",
+      "text": "7"
+    },
+    {
+      "href": "#ref6",
+      "text": "6"
+    },
+    {
+      "href": "#ref17",
+      "text": "17"
+    },
+    {
+      "href": "#ref22",
+      "text": "22"
+    },
+    {
+      "href": "#ref19",
+      "text": "19"
+    },
+    {
+      "href": "#ref8",
+      "text": "8"
+    },
+    {
+      "href": "#ref9",
+      "text": "9"
+    },
+    {
+      "href": "#ref10",
+      "text": "10"
+    },
+    {
+      "href": "#ref14",
+      "text": "14"
+    },
+    {
+      "href": "#ref21",
+      "text": "21"
+    },
+    {
+      "href": "#ref11",
+      "text": "11"
+    },
+    {
+      "href": "#ref13",
+      "text": "13"
+    },
+    {
+      "href": "#ref17",
+      "text": "17"
+    },
+    {
+      "href": "#ref22",
+      "text": "22"
+    },
+    {
+      "href": "#ref19",
+      "text": "19"
+    },
+    {
+      "href": "#ref20",
+      "text": "20"
+    },
+    {
+      "href": "https://www.manning.com/books/ai-powered-developer",
+      "text": "https://www.manning.com/books/ai-powered-developer"
+    },
+    {
+      "href": "https://livebook.manning.com/book/ai-powered-developer",
+      "text": "https://livebook.manning.com/book/ai-powered-developer"
+    },
+    {
+      "href": "https://github.com/nathanbcrocker/ai_assisted_dev_public",
+      "text": "https://github.com/nathanbcrocker/ai_assisted_dev_public"
+    },
+    {
+      "href": "https://simonwillison.net/tags/prompt-engineering/",
+      "text": "https://simonwillison.net/tags/prompt-engineering/"
+    },
+    {
+      "href": "https://simonw.substack.com/p/agentic-engineering-patterns",
+      "text": "https://simonw.substack.com/p/agentic-engineering-patterns"
+    },
+    {
+      "href": "https://www.heavybit.com/library/podcasts/high-leverage/ep-9-the-ai-coding-paradigm-shift-with-simon-willison",
+      "text": "https://www.heavybit.com/library/podcasts/high-leverage/ep-9-the-ai-coding-paradigm-shift-with-simon-willison"
+    },
+    {
+      "href": "https://addyosmani.com/blog/ai-coding-workflow/",
+      "text": "https://addyosmani.com/blog/ai-coding-workflow/"
+    },
+    {
+      "href": "https://x.com/karpathy/status/1886192184808149383",
+      "text": "https://x.com/karpathy/status/1886192184808149383"
+    },
+    {
+      "href": "https://thenewstack.io/vibe-coding-is-passe/",
+      "text": "https://thenewstack.io/vibe-coding-is-passe/"
+    },
+    {
+      "href": "https://martinfowler.com/bliki/AgenticProgramming.html",
+      "text": "https://martinfowler.com/bliki/AgenticProgramming.html"
+    },
+    {
+      "href": "https://martinfowler.com/fragments/2026-01-08.html",
+      "text": "https://martinfowler.com/fragments/2026-01-08.html"
+    },
+    {
+      "href": "https://newsletter.pragmaticengineer.com/p/martin-fowler",
+      "text": "https://newsletter.pragmaticengineer.com/p/martin-fowler"
+    },
+    {
+      "href": "https://newsletter.pragmaticengineer.com/p/tdd-ai-agents-and-coding-with-kent",
+      "text": "https://newsletter.pragmaticengineer.com/p/tdd-ai-agents-and-coding-with-kent"
+    },
+    {
+      "href": "https://survey.stackoverflow.co/2025/ai",
+      "text": "https://survey.stackoverflow.co/2025/ai"
+    },
+    {
+      "href": "https://stackoverflow.co/company/press/archive/stack-overflow-2025-developer-survey/",
+      "text": "https://stackoverflow.co/company/press/archive/stack-overflow-2025-developer-survey/"
+    },
+    {
+      "href": "https://stackoverflow.blog/2026/02/18/closing-the-developer-ai-trust-gap/",
+      "text": "https://stackoverflow.blog/2026/02/18/closing-the-developer-ai-trust-gap/"
+    },
+    {
+      "href": "https://genai.owasp.org/resource/owasp-genai-llm-top-10-2026/",
+      "text": "https://genai.owasp.org/resource/owasp-genai-llm-top-10-2026/"
+    },
+    {
+      "href": "https://docs.aws.amazon.com/amazonq/latest/qdeveloper-ug/service-rename.html",
+      "text": "https://docs.aws.amazon.com/amazonq/latest/qdeveloper-ug/service-rename.html"
+    },
+    {
+      "href": "https://betterstack.com/community/guides/ai/ollama-local-llm/",
+      "text": "https://betterstack.com/community/guides/ai/ollama-local-llm/"
+    },
+    {
+      "href": "https://pinggy.io/blog/top_5_local_llm_tools_and_models/",
+      "text": "https://pinggy.io/blog/top_5_local_llm_tools_and_models/"
+    },
+    {
+      "href": "https://joshcollinsworth.com/blog/productivity",
+      "text": "https://joshcollinsworth.com/blog/productivity"
+    },
+    {
+      "href": "https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/",
+      "text": "https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/"
+    }
+  ],
+  "toc": [
+    {
+      "href": "#intro",
+      "text": "本ガイドについて"
+    },
+    {
+      "href": "#s0",
+      "text": "対象読者と前提知識"
+    },
+    {
+      "href": "#s1",
+      "text": "書籍情報"
+    },
+    {
+      "href": "#s2",
+      "text": "なぜ今重要か"
+    },
+    {
+      "href": "#s3",
+      "text": "学習ロードマップ"
+    },
+    {
+      "href": "#step1",
+      "text": "Step1 LLMの基礎"
+    },
+    {
+      "href": "#step2",
+      "text": "Step2 ツールを使い始める"
+    },
+    {
+      "href": "#step3",
+      "text": "Step3 ソフトウェア設計"
+    },
+    {
+      "href": "#step4",
+      "text": "Step4 Copilotで実装"
+    },
+    {
+      "href": "#step5",
+      "text": "Step5 データ管理"
+    },
+    {
+      "href": "#step6",
+      "text": "Step6 テストと品質"
+    },
+    {
+      "href": "#step7",
+      "text": "Step7 インフラとデプロイ"
+    },
+    {
+      "href": "#step8",
+      "text": "Step8 セキュリティ"
+    },
+    {
+      "href": "#step9",
+      "text": "Step9 ローカルLLM"
+    },
+    {
+      "href": "#step10",
+      "text": "Step10 2026年の動向"
+    },
+    {
+      "href": "#glossary",
+      "text": "用語集"
+    },
+    {
+      "href": "#checklist",
+      "text": "学習チェックリスト"
+    },
+    {
+      "href": "#summary",
+      "text": "まとめ"
+    },
+    {
+      "href": "#references",
+      "text": "参考文献・出典"
+    }
+  ],
+  "lists": [
+    {
+      "tag": "ul",
+      "items": [
+        "基本的なプログラミング経験（言語は問わない）がある",
+        "ChatGPTやGitHub Copilotなどの生成AIツールに触れたことはあるが、体系的に業務へ組み込んだことはない",
+        "設計・実装・テスト・デプロイ・セキュリティという開発ライフサイクル全体でAIをどう活用すべきか知りたい"
+      ]
+    },
+    {
+      "tag": "ul",
+      "items": [
+        "生成AIとLLMの違い：生成AI（Generative AI）は画像・音声・コードなど多様な出力を生成するAI全般を指す広い概念で、LLM（大規模言語モデル）はそのうちテキスト（自然言語やコード）を扱うモデルを指します。",
+        "LLMが得意なこと：定型的なコード生成（ボイラープレート）、既存コードの説明、テストコードの下書き、ドキュメント作成など。",
+        "LLMが苦手・注意が必要なこと：最新情報の反映（学習データのカットオフ以降の情報は知らない）、厳密な数値計算、社内固有のビジネスルールの正確な理解、出力の“もっともらしい誤り”（ハルシネーション）。",
+        "いつ使い、いつ避けるべきか：定型作業や叩き台作りには積極的に使い、機密情報を含むコードの丸投げや、検証なしの本番反映は避けるべき、というのが書籍の基本方針です。"
+      ]
+    },
+    {
+      "tag": "ul",
+      "items": [
+        "要件を先に箇条書きにする：曖昧な依頼より、機能要件・非機能要件を整理してから相談したほうが精度の高い提案が返ってきます。",
+        "一度で決め打ちしない：複数の設計案を出させ、トレードオフ（コスト・複雑さ・拡張性など）を比較検討する材料として使います。",
+        "図はAIに書かせてレビューする：Mermaid記法でアーキテクチャ図やシーケンス図を生成させ、人間がその図を見ながら妥当性を確認する、という使い方が効率的です。"
+      ]
+    },
+    {
+      "tag": "ul",
+      "items": [
+        "ドメインモデルの実装と、イミュータビリティ（不変性）を重視した設計",
+        "デコレーターパターン・ファクトリーパターン・オブザーバーパターンなど、古典的なデザインパターンの適用",
+        "ヘキサゴナルアーキテクチャ（ポート＆アダプター）の導入"
+      ]
+    },
+    {
+      "tag": "ul",
+      "items": [
+        "なぜイベント駆動か：資産の状態変化（購入・配備・廃棄など）をイベントとして流すことで、複数のシステムがリアルタイムに連携できるようになります。",
+        "AIの役割：Kafkaのプロデューサー/コンシューマーのボイラープレートコードや、Sparkのストリーミング処理のひな形をCopilotに生成させ、人間はビジネスロジックの妥当性検証に集中する、という分業がこの章のテーマです。"
+      ]
+    },
+    {
+      "tag": "ul",
+      "items": [
+        "生成されたテストとその実装が、本当に意図した仕様を検証しているかを必ず人間がレビューする",
+        "「既存のテストは変更せず、実装だけを直すこと」のようにプロンプトで明示的に制約を与える",
+        "テストをコードレビューの対象として扱い、実装コードと同じ厳格さで確認する"
+      ]
+    },
+    {
+      "tag": "ul",
+      "items": [
+        "IaC（Infrastructure as Code）とAI：TerraformやKubernetesマニフェストのような定型的だが間違えやすい記述は、AIによる下書き生成の効果が特に大きい領域です。",
+        "人間が確認すべき点：生成されたIaCコードが、意図しない過剰な権限（IAMロールなど）を作っていないか、コスト面で問題がないかは必ず人間がレビューする必要があります。"
+      ]
+    },
+    {
+      "tag": "ul",
+      "items": [
+        "ChatGPTは、脆弱性のパターン（インジェクション、認可不備など）を網羅的に洗い出す「壁打ち相手」として有効ですが、最終的なリスク判断は必ず人間が行う必要があります。",
+        "保存時の暗号化（Encryption at Rest）と通信時の暗号化（Encryption in Transit）は別々の課題であり、それぞれに適した手法をAIに調べさせながら実装します。"
+      ]
+    },
+    {
+      "tag": "ul",
+      "items": [
+        "AIエージェントは「テストを通すこと」自体を目的化しやすく、実装のバグ修正よりもテストの書き換え・削除を選んでしまうことがある",
+        "それでもTDD自体は、非決定的なAIエージェントと組む上で「精神安定剤」のような役割を果たす、有効な規律であるとBeckは位置づけている",
+        "期待する挙動を先にテストとして固定しておくことで、AIの実装が正しいかどうかを人間が判断しやすくなる"
+      ]
+    },
+    {
+      "tag": "ul",
+      "items": [
+        "LLMが得意な場面・苦手な場面を自分の言葉で説明できる",
+        "Persona・Audience Persona・Refinementなど、基本的なプロンプトパターンを実際に試した",
+        "ChatGPTと対話しながら、簡単なシステムの設計案をMermaid図として書き出せる",
+        "ヘキサゴナルアーキテクチャの「ポート」と「アダプター」の役割を説明できる",
+        "AIに単体テストを生成させ、その内容が意図した仕様を検証しているか自分でレビューできる",
+        "AIの支援を受けてDockerfileやTerraformコードを書き、内容を自分でレビューできる",
+        "LLMを使った脅威モデリングの基本的な流れを説明できる",
+        "ローカルLLM（Ollamaなど）を1つ実際に動かしてみた",
+        "「vibe coding」と「agentic programming」の違いを説明できる",
+        "自分のチームやプロジェクトにおいて、AIの出力を人間がレビューする体制ができているか点検した"
+      ]
+    }
+  ],
+  "tables": [
+    [
+      [
+        {
+          "tag": "th",
+          "text": "書名"
+        },
+        {
+          "tag": "td",
+          "text": "AI-Powered Developer: Build software with ChatGPT and Copilot"
+        }
+      ],
+      [
+        {
+          "tag": "th",
+          "text": "著者"
+        },
+        {
+          "tag": "td",
+          "text": "Nathan B. Crocker（Checker Corp. 共同創業者 兼 CTO）"
+        }
+      ],
+      [
+        {
+          "tag": "th",
+          "text": "技術編集者"
+        },
+        {
+          "tag": "td",
+          "text": "Nicolai Nielsen"
+        }
+      ],
+      [
+        {
+          "tag": "th",
+          "text": "出版社"
+        },
+        {
+          "tag": "td",
+          "text": "Manning Publications"
+        }
+      ],
+      [
+        {
+          "tag": "th",
+          "text": "出版時期"
+        },
+        {
+          "tag": "td",
+          "text": "2024年8月"
+        }
+      ],
+      [
+        {
+          "tag": "th",
+          "text": "ページ数"
+        },
+        {
+          "tag": "td",
+          "text": "240ページ"
+        }
+      ],
+      [
+        {
+          "tag": "th",
+          "text": "ISBN"
+        },
+        {
+          "tag": "td",
+          "text": "9781633437616"
+        }
+      ],
+      [
+        {
+          "tag": "th",
+          "text": "対象読者"
+        },
+        {
+          "tag": "td",
+          "text": "中級ソフトウェア開発者（AI経験は不要）"
+        }
+      ],
+      [
+        {
+          "tag": "th",
+          "text": "翻訳版"
+        },
+        {
+          "tag": "td",
+          "text": "ドイツ語、簡体字中国語"
+        }
+      ],
+      [
+        {
+          "tag": "th",
+          "text": "題材アプリ"
+        },
+        {
+          "tag": "td",
+          "text": "IT資産管理システム（ITAM）"
+        }
+      ],
+      [
+        {
+          "tag": "th",
+          "text": "書籍ページ"
+        },
+        {
+          "tag": "td",
+          "text": "manning.com/books/ai-powered-developer"
+        }
+      ]
+    ],
+    [
+      [
+        {
+          "tag": "th",
+          "text": "Step"
+        },
+        {
+          "tag": "th",
+          "text": "書籍の章"
+        },
+        {
+          "tag": "th",
+          "text": "章タイトル（原題）"
+        },
+        {
+          "tag": "th",
+          "text": "主な内容"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "Step1"
+        },
+        {
+          "tag": "td",
+          "text": "第1章"
+        },
+        {
+          "tag": "td",
+          "text": "Understanding large language models"
+        },
+        {
+          "tag": "td",
+          "text": "LLMの基礎、生成AIの利点、使うべき場面・避けるべき場面"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "Step2"
+        },
+        {
+          "tag": "td",
+          "text": "第2章"
+        },
+        {
+          "tag": "td",
+          "text": "Getting started with large language models"
+        },
+        {
+          "tag": "td",
+          "text": "ChatGPT/Copilot/CodeWhispererの使い方比較、プロンプトエンジニアリングパターン"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "Step3"
+        },
+        {
+          "tag": "td",
+          "text": "第3章"
+        },
+        {
+          "tag": "td",
+          "text": "Designing software with ChatGPT"
+        },
+        {
+          "tag": "td",
+          "text": "ITAMシステムの設計、Mermaidによるアーキテクチャ文書化"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "Step4"
+        },
+        {
+          "tag": "td",
+          "text": "第4章"
+        },
+        {
+          "tag": "td",
+          "text": "Building software with GitHub Copilot"
+        },
+        {
+          "tag": "td",
+          "text": "ドメインモデル実装、デザインパターン、ヘキサゴナルアーキテクチャ"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "Step5"
+        },
+        {
+          "tag": "td",
+          "text": "第5章"
+        },
+        {
+          "tag": "td",
+          "text": "Managing data with GitHub Copilot and Copilot Chat"
+        },
+        {
+          "tag": "td",
+          "text": "データ永続化、Kafkaストリーミング、Sparkによる分析"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "Step6"
+        },
+        {
+          "tag": "td",
+          "text": "第6章"
+        },
+        {
+          "tag": "td",
+          "text": "Testing, assessing, and explaining with LLMs"
+        },
+        {
+          "tag": "td",
+          "text": "単体/統合/振る舞いテスト、品質評価、バグ検出、コード説明・翻訳"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "Step7"
+        },
+        {
+          "tag": "td",
+          "text": "第7章"
+        },
+        {
+          "tag": "td",
+          "text": "Coding infrastructure and managing deployments"
+        },
+        {
+          "tag": "td",
+          "text": "Docker、Terraform、コンテナレジストリ、Kubernetes、CI/CD"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "Step8"
+        },
+        {
+          "tag": "td",
+          "text": "第8章"
+        },
+        {
+          "tag": "td",
+          "text": "Secure application development with ChatGPT"
+        },
+        {
+          "tag": "td",
+          "text": "脅威モデリング、脆弱性評価、セキュリティのベストプラクティス、暗号化"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "Step9"
+        },
+        {
+          "tag": "td",
+          "text": "第9章"
+        },
+        {
+          "tag": "td",
+          "text": "GPT-ing on the go"
+        },
+        {
+          "tag": "td",
+          "text": "ローカルLLM（Llama 2、GPT4All）の実行と比較、オフライン活用の判断基準"
+        }
+      ]
+    ],
+    [
+      [
+        {
+          "tag": "th",
+          "text": "ツール"
+        },
+        {
+          "tag": "th",
+          "text": "主な使い方（2024年当時）"
+        },
+        {
+          "tag": "th",
+          "text": "特徴"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "ChatGPT（GPT-4 / GPT-3.5）"
+        },
+        {
+          "tag": "td",
+          "text": "チャット形式での対話、設計相談、コード生成・説明"
+        },
+        {
+          "tag": "td",
+          "text": "汎用的な対話能力が高く、設計や説明のような「会話」が必要な場面に強い"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "GitHub Copilot"
+        },
+        {
+          "tag": "td",
+          "text": "IDE内でのインライン補完、Copilot Chat"
+        },
+        {
+          "tag": "td",
+          "text": "エディタに統合されており、実装作業の流れを止めずにコードを書き進められる"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "AWS CodeWhisperer"
+        },
+        {
+          "tag": "td",
+          "text": "IDE内でのインライン補完"
+        },
+        {
+          "tag": "td",
+          "text": "AWSサービスとの親和性が高く、AWS SDKやIaCコードの提案に強み"
+        }
+      ]
+    ],
+    [
+      [
+        {
+          "tag": "th",
+          "text": "パターン名"
+        },
+        {
+          "tag": "th",
+          "text": "目的"
+        },
+        {
+          "tag": "th",
+          "text": "使い方の例（意訳）"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "Persona（ペルソナ）"
+        },
+        {
+          "tag": "td",
+          "text": "AIに特定の役割・専門性を与える"
+        },
+        {
+          "tag": "td",
+          "text": "「あなたはシニアバックエンドエンジニアです。以下のAPI設計をレビューしてください」"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "Audience Persona（想定読者ペルソナ）"
+        },
+        {
+          "tag": "td",
+          "text": "出力の説明レベルを読者に合わせる"
+        },
+        {
+          "tag": "td",
+          "text": "「プログラミング初心者にもわかるように、この関数の動きを説明してください」"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "Refinement（リファインメント）"
+        },
+        {
+          "tag": "td",
+          "text": "一度の回答で終わらせず、対話的に改善する"
+        },
+        {
+          "tag": "td",
+          "text": "「この実装を、可読性を優先する方向でもう一度書き直してください」"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "Flipped Interaction（質問の逆転）"
+        },
+        {
+          "tag": "td",
+          "text": "AI側から必要な情報を質問させる"
+        },
+        {
+          "tag": "td",
+          "text": "「設計を提案する前に、不明な点があれば先に質問してください」"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "Cognitive Verifier（検証の分解）"
+        },
+        {
+          "tag": "td",
+          "text": "複雑な問いを小さな確認問いに分解させる"
+        },
+        {
+          "tag": "td",
+          "text": "「この要件を満たすために確認すべき前提条件を、先に箇条書きにしてください」"
+        }
+      ]
+    ],
+    [
+      [
+        {
+          "tag": "th",
+          "text": "テストの種類"
+        },
+        {
+          "tag": "th",
+          "text": "目的"
+        },
+        {
+          "tag": "th",
+          "text": "AIが役立つ場面"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "単体テスト（Unit Testing）"
+        },
+        {
+          "tag": "td",
+          "text": "個々の関数・クラスの正しさを検証する"
+        },
+        {
+          "tag": "td",
+          "text": "典型的なテストケースの下書き生成、境界値の洗い出し"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "統合テスト（Integration Testing）"
+        },
+        {
+          "tag": "td",
+          "text": "複数コンポーネント間の連携を検証する"
+        },
+        {
+          "tag": "td",
+          "text": "テスト用のモック・スタブコードの生成"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "振る舞いテスト（Behavior Testing）"
+        },
+        {
+          "tag": "td",
+          "text": "ユーザー視点での挙動を検証する"
+        },
+        {
+          "tag": "td",
+          "text": "自然言語のシナリオからテストコードへの変換"
+        }
+      ]
+    ],
+    [
+      [
+        {
+          "tag": "th",
+          "text": "リスク分類（例）"
+        },
+        {
+          "tag": "th",
+          "text": "概要"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "プロンプトインジェクション"
+        },
+        {
+          "tag": "td",
+          "text": "外部からの入力によってLLMの挙動を意図しない方向に操作される"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "機微情報の漏えい"
+        },
+        {
+          "tag": "td",
+          "text": "LLMの出力を通じて、学習データや内部プロンプトに含まれる機密情報が漏れる"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "不適切な出力処理"
+        },
+        {
+          "tag": "td",
+          "text": "LLMの出力をそのまま実行・表示することで、XSSやコードインジェクションなど従来型の脆弱性が再発する"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "過剰な自律性（Excessive Agency）"
+        },
+        {
+          "tag": "td",
+          "text": "AIエージェントに与える権限・実行範囲が過大で、意図しない操作を自律的に行ってしまう"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "サプライチェーンの脆弱性"
+        },
+        {
+          "tag": "td",
+          "text": "利用するモデルやプラグイン、学習データの出どころに起因するリスク"
+        }
+      ]
+    ],
+    [
+      [
+        {
+          "tag": "th",
+          "text": "観点"
+        },
+        {
+          "tag": "th",
+          "text": "2024年（書籍刊行時）"
+        },
+        {
+          "tag": "th",
+          "text": "2026年（現在）"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "代表的なツール"
+        },
+        {
+          "tag": "td",
+          "text": "Llama 2、GPT4All"
+        },
+        {
+          "tag": "td",
+          "text": "Ollama、LM Studio（両者とも安定版が2年以上継続提供）"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "実行環境"
+        },
+        {
+          "tag": "td",
+          "text": "CLIやデスクトップアプリが中心"
+        },
+        {
+          "tag": "td",
+          "text": "OpenAI互換APIを備えたローカルサーバーとして、IDEやコーディングエージェントから直接呼び出せる"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "実用性の目安"
+        },
+        {
+          "tag": "td",
+          "text": "クラウドモデルとの性能差が大きく、限定的な用途向け"
+        },
+        {
+          "tag": "td",
+          "text": "8B〜35B前後のオープンウェイトモデルでも、一般的な開発マシンで実用的な速度と品質を達成"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "主な用途"
+        },
+        {
+          "tag": "td",
+          "text": "オフライン時の代替手段"
+        },
+        {
+          "tag": "td",
+          "text": "機密コードの解析、コスト削減、レイテンシ削減、プライバシー保護が必要な場面での積極的な選択肢"
+        }
+      ]
+    ]
+  ],
+  "glossary": [
+    "LLM（大規模言語モデル）",
+    "大量のテキストデータで学習され、自然言語やコードを理解・生成できるAIモデル",
+    "プロンプトエンジニアリング",
+    "LLMから望む出力を引き出すために、指示文（プロンプト）を工夫する技術",
+    "ハルシネーション",
+    "LLMが事実に基づかない、もっともらしい誤った情報を生成する現象",
+    "ヘキサゴナルアーキテクチャ",
+    "ドメインロジックを中心に置き、外部システムとのやり取りをポート＆アダプターで抽象化する設計手法",
+    "IaC（Infrastructure as Code）",
+    "インフラ構成をコードとして記述・管理する手法（例：Terraform）",
+    "CI/CD",
+    "継続的インテグレーション／継続的デリバリーの略",
+    "脅威モデリング",
+    "システムに対する潜在的な脅威を体系的に洗い出し、対策を検討するプロセス",
+    "vibe coding（バイブコーディング）",
+    "コードの中身をほとんど確認せず、AIの提案を次々受け入れながら開発するスタイル",
+    "agentic programming（エージェント型プログラミング）",
+    "人間がAIエージェントの出力を精査・監督しながら開発を進めるスタイル",
+    "ローカルLLM",
+    "クラウドではなく、自分のPCやサーバー上で動かすLLM（例：Ollama、LM Studio経由のモデル）",
+    "OWASP LLM Top 10",
+    "LLMアプリケーション特有のセキュリティリスクを整理した、業界標準的なガイドライン"
+  ],
+  "callouts": [
+    {
+      "variant": "good",
+      "text": "2026年アップデート Stack Overflowの2025年調査14でも、「AIの回答が“惜しいけれど微妙に間違っている”」ことが開発者の最大の不満（66%）として挙げられており、この章が説く「AIをジュニア開発者として扱い、成果物は必ずレビューする」という姿勢は今なお有効です。"
+    },
+    {
+      "variant": "good",
+      "text": "2026年アップデート AWSのCodeWhispererは2024年4月30日付けで「Amazon Q Developer」へと統合・改称されており18、現在は単体製品としては存在しません。エージェント機能（自律的な機能実装・ドキュメント生成・リファクタリング）やMCP（Model Context Protocol）連携なども追加され、書籍刊行時よりも大幅に機能が拡張されています。学習の際は「CodeWhisperer」という名称ではなく「Amazon Q Developer」で検索するとよいでしょう。 またGitHub Copilotも、単純なインライン補完だけでなく、リポジトリ全体を横断してタスクを自律的にこなす「Copilotエージェントモード」などが追加されています。プロンプトエンジニアリングの基本パターン自体は現在も有効ですが、著名なプロンプトエンジニアリング解説者であるSimon Willison4は、2026年にはタスクごとに使うモデルの性能を使い分ける判断も重要になってきていると述べています。"
+    },
+    {
+      "variant": "good",
+      "text": "2026年アップデート Martin Fowル11は、コードそのものより「既存の大規模で複雑なレガシーシステムを理解する」ことにこそ生成AIの価値があるとも指摘しています。設計フェーズでAIを使う効用は、ゼロからの設計だけでなく、既存システムの構造を素早く把握し直す場面でも広がっています。"
+    },
+    {
+      "variant": "good",
+      "text": "2026年アップデート TDDの提唱者として知られるKent Beck13は、AIエージェントと組み合わせたコーディングについて「エージェントはテスト駆動開発をやりたがらない。まず実装を書いて、それに通るテストを後から書こうとする」と述べ、油断するとAIがテストを消してでも帳尻を合わせようとする挙動に注意が必要だと指摘しています。ヘキサゴナルアーキテクチャのようにコアロジックと外部技術を分離しておくことは、AIにテストを書かせる際にも、境界がはっきりしている分、悪い挙動に気づきやすくするという意味でも有効です。"
+    },
+    {
+      "variant": "good",
+      "text": "2026年アップデート データパイプラインやストリーミング処理のコードは定型パターンが多く、AIによる生成の効果が出やすい領域です。一方で、スキーマ設計やイベントの意味づけは業務理解が必要なため、依然として人間の設計判断が中心になります。"
+    },
+    {
+      "variant": "good",
+      "text": "2026年アップデート：AIとTDDを組み合わせる際の注意点 前述のKent Beckの指摘の通り、AIエージェントは「テストを通すこと」自体を目的化し、実装のバグを直す代わりにテストのほうを書き換えたり削除したりしてしまうことがあります。実務では次のような工夫が有効とされています。 生成されたテストとその実装が、本当に意図した仕様を検証しているかを必ず人間がレビューする 「既存のテストは変更せず、実装だけを直すこと」のようにプロンプトで明示的に制約を与える テストをコードレビューの対象として扱い、実装コードと同じ厳格さで確認する Addy Osmani7も、AIとのペアプログラミングは「自信満々だが間違いも多い」相棒として捉えるべきであり、盲目的に成果物を信用しないことを鉄則として挙げています。"
+    },
+    {
+      "variant": "good",
+      "text": "2026年アップデート インフラのコード化においても、AIエージェントに実行権限を与えて自律的に作業させる「エージェント型」の運用が増えています。Simon Willison6は、システムへのフルアクセス権を持つエージェントは強力だが危険でもあり、エージェント自身の操作ログを一元管理して異常時に検知・復旧できるようにしておく重要性を強調しています。デプロイや権限まわりの自動化ほど、慎重なガードレール設計が必要になります。"
+    },
+    {
+      "variant": "good",
+      "text": "2026年アップデート：LLM／AIエージェント特有のセキュリティリスク 2026年版のOWASP LLM Top 1017では、AIが自律的に「行動する」エージェント時代を踏まえ、プロンプトインジェクションが依然として最重要リスクとされる一方、権限を超えたツール呼び出し（unauthorized tool invocation）は「LLM03:2026 Excessive Agency」の一部として位置づけられています。なお、正規に付与された権限内でエージェントがツールを不適切に使ってしまう「ツールの誤用」は、別ガイドであるOWASP Top 10 for Agentic Applications22の「ASI02: Tool Misuse & Exploitation」で個別に扱われています。書籍第8章で学ぶ「ChatGPTを使った脅威モデリング」の考え方は、いまや「AIを組み込んだアプリケーション自体をどう守るか」という新しい脅威モデリングの対象にも、そのまま応用できる考え方です。"
+    },
+    {
+      "variant": "good",
+      "text": "2026年アップデート ローカルLLMは、単なる「オフライン時の代替」から一歩進み、機密性の高いコードや社内データを外部に送りたくない場合の第一選択肢としても定着しています19。Ollamaは主要なAIコーディングエージェントのAPI形式（Anthropic形式・OpenAI形式）を模倣できるため、既存のツールの向き先をローカルサーバーに変更するだけで、同じワークフローのままローカルモデルへ切り替えられる点が実務上便利です。"
+    }
+  ],
+  "steps": [
+    "STEP 1 / 9",
+    "STEP 2 / 9",
+    "STEP 3 / 9",
+    "STEP 4 / 9",
+    "STEP 5 / 9",
+    "STEP 6 / 9",
+    "STEP 7 / 9",
+    "STEP 8 / 9",
+    "STEP 9 / 9",
+    "2026 UPDATE"
+  ],
+  "refs": [
+    {
+      "id": "ref1",
+      "number": "1",
+      "text": "1 AI-Powered Developer（書籍公式ページ、Manning Publications） https://www.manning.com/books/ai-powered-developer"
+    },
+    {
+      "id": "ref2",
+      "number": "2",
+      "text": "2 AI-Powered Developer liveBook（章立て・目次） https://livebook.manning.com/book/ai-powered-developer"
+    },
+    {
+      "id": "ref3",
+      "number": "3",
+      "text": "3 AI-Powered Developer ソースコードリポジトリ（GitHub、Manning公式ページからのリンク先） https://github.com/nathanbcrocker/ai_assisted_dev_public"
+    },
+    {
+      "id": "ref4",
+      "number": "4",
+      "text": "4 Simon Willison（Django共同開発者／Datasette開発者）「Prompt engineering」タグ記事一覧 https://simonwillison.net/tags/prompt-engineering/"
+    },
+    {
+      "id": "ref5",
+      "number": "5",
+      "text": "5 Simon Willison「Agentic Engineering Patterns」 https://simonw.substack.com/p/agentic-engineering-patterns"
+    },
+    {
+      "id": "ref6",
+      "number": "6",
+      "text": "6 Simon Willison インタビュー「The AI Coding Paradigm Shift」（Heavybit, High Leverageポッドキャスト） https://www.heavybit.com/library/podcasts/high-leverage/ep-9-the-ai-coding-paradigm-shift-with-simon-willison"
+    },
+    {
+      "id": "ref7",
+      "number": "7",
+      "text": "7 Addy Osmani（元Google Chromeエンジニアリングリード）「My LLM coding workflow going into 2026」 https://addyosmani.com/blog/ai-coding-workflow/"
+    },
+    {
+      "id": "ref8",
+      "number": "8",
+      "text": "8 Andrej Karpathy（元Tesla AI部門責任者）「vibe coding」提唱ポスト https://x.com/karpathy/status/1886192184808149383"
+    },
+    {
+      "id": "ref9",
+      "number": "9",
+      "text": "9 Andrej Karpathyのフォローアップ発言に関する解説記事（The New Stack） https://thenewstack.io/vibe-coding-is-passe/"
+    },
+    {
+      "id": "ref10",
+      "number": "10",
+      "text": "10 Martin Fowler（Thoughtworksチーフサイエンティスト）「Agentic Programming」 https://martinfowler.com/bliki/AgenticProgramming.html"
+    },
+    {
+      "id": "ref11",
+      "number": "11",
+      "text": "11 Martin Fowler「Fragments: January 8」（Anthropic社内利用調査の紹介） https://martinfowler.com/fragments/2026-01-08.html"
+    },
+    {
+      "id": "ref12",
+      "number": "12",
+      "text": "12 Martin Fowler インタビュー（The Pragmatic Engineer, Gergely Orosz） https://newsletter.pragmaticengineer.com/p/martin-fowler"
+    },
+    {
+      "id": "ref13",
+      "number": "13",
+      "text": "13 Kent Beck（Extreme Programming／TDD提唱者）インタビュー「TDD, AI agents and coding with Kent Beck」（The Pragmatic Engineer） https://newsletter.pragmaticengineer.com/p/tdd-ai-agents-and-coding-with-kent"
+    },
+    {
+      "id": "ref14",
+      "number": "14",
+      "text": "14 Stack Overflow 2025 Developer Survey ― AIセクション https://survey.stackoverflow.co/2025/ai"
+    },
+    {
+      "id": "ref15",
+      "number": "15",
+      "text": "15 Stack Overflow公式プレスリリース「2025 Developer Survey Reveals Trust in AI at an All Time Low」 https://stackoverflow.co/company/press/archive/stack-overflow-2025-developer-survey/"
+    },
+    {
+      "id": "ref16",
+      "number": "16",
+      "text": "16 Stack Overflow Blog「Closing the AI trust gap for developers」 https://stackoverflow.blog/2026/02/18/closing-the-developer-ai-trust-gap/"
+    },
+    {
+      "id": "ref17",
+      "number": "17",
+      "text": "17 OWASP Top 10 for LLM Applications 2026（OWASP GenAI Security Project公式） https://genai.owasp.org/resource/owasp-genai-llm-top-10-2026/"
+    },
+    {
+      "id": "ref18",
+      "number": "18",
+      "text": "18 AWS公式ドキュメント「Amazon Q Developer rename - Summary of changes」（CodeWhisperer→Q Developer統合の一次情報） https://docs.aws.amazon.com/amazonq/latest/qdeveloper-ug/service-rename.html"
+    },
+    {
+      "id": "ref19",
+      "number": "19",
+      "text": "19 「Ollama: How to Run Any Open-Source LLM Locally with Your Existing Tools」（Better Stack） https://betterstack.com/community/guides/ai/ollama-local-llm/"
+    },
+    {
+      "id": "ref20",
+      "number": "20",
+      "text": "20 「Top 5 Local LLM Tools and Models in 2026」（Pinggy Blog） https://pinggy.io/blog/top_5_local_llm_tools_and_models/"
+    },
+    {
+      "id": "ref21",
+      "number": "21",
+      "text": "21 Josh Collinsworth「LLMs and performative productivity」 https://joshcollinsworth.com/blog/productivity"
+    },
+    {
+      "id": "ref22",
+      "number": "22",
+      "text": "22 OWASP Top 10 for Agentic Applications 2026（OWASP GenAI Security Project公式） https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/"
+    }
+  ],
+  "captions": [
+    "図1｜学習ロードマップ全体図",
+    "図2｜設計ワークフロー",
+    "図3｜ヘキサゴナルアーキテクチャ（ポート＆アダプター）",
+    "図4｜イベント駆動データフローのイメージ",
+    "図5｜AI活用の流れ（テスト生成ループ）",
+    "図6｜CI/CDパイプラインのイメージ",
+    "図7｜脅威モデリングの流れ",
+    "図8｜ローカルLLM活用の判断フロー",
+    "図9｜vibe codingからagentic programmingへ"
+  ],
+  "charts": [
+    {
+      "id": "dg-roadmap",
+      "chart": "flowchart TB\n    A[\"Step1 LLMの基礎を理解する\"] --> B[\"Step2 ChatGPT・Copilot・CodeWhispererを使い始める\"]\n    B --> C[\"Step3 ChatGPTでソフトウェアを設計する\"]\n    C --> D[\"Step4 GitHub Copilotで実装する\"]\n    D --> E[\"Step5 データ管理とイベント駆動アーキテクチャ\"]\n    E --> F[\"Step6 テスト・品質評価・コード説明\"]\n    F --> G[\"Step7 インフラのコード化とデプロイ\"]\n    G --> H[\"Step8 セキュアなアプリケーション開発\"]\n    H --> I[\"Step9 ローカルLLMの活用\"]\n    I --> J[\"Step10 2026年の最新動向を押さえる\"]\n    class A hub\n    class J done"
+    },
+    {
+      "id": "dg-design",
+      "chart": "flowchart TB\n    A[\"要件を言葉にする\"] --> B[\"ChatGPTに設計案を相談する\"]\n    B --> C[\"複数の候補案を比較・選定する\"]\n    C --> D[\"Mermaidでアーキテクチャ図を作成する\"]\n    D --> E[\"ドキュメントとしてチームに共有する\"]\n    E --> F[\"実装フェーズへ進む\"]\n    class B hub\n    class F done"
+    },
+    {
+      "id": "dg-hexagonal",
+      "chart": "flowchart TB\n    UI[\"Webユーザー\"] --> API[\"受信アダプター REST API\"]\n    CLI[\"CLIユーザー\"] --> API2[\"受信アダプター CLI\"]\n    API --> PORT_IN[\"インバウンドポート ユースケース\"]\n    API2 --> PORT_IN\n    PORT_IN --> CORE[\"ドメインモデル コアロジック\"]\n    CORE --> PORT_OUT[\"アウトバウンドポート\"]\n    PORT_OUT --> DB_ADAPTER[\"送信アダプター リポジトリ実装\"]\n    PORT_OUT --> MSG_ADAPTER[\"送信アダプター メッセージング\"]\n    DB_ADAPTER --> DB[(\"データベース\")]\n    MSG_ADAPTER --> QUEUE[(\"メッセージキュー\")]\n    class CORE hub"
+    },
+    {
+      "id": "dg-event",
+      "chart": "flowchart TB\n    APP[\"ITAMアプリケーション\"] --> KAFKA[\"Kafkaトピック 資産イベント\"]\n    KAFKA --> STREAM[\"ストリーム処理 Spark Structured Streaming\"]\n    STREAM --> STORE[(\"分析用データストア\")]\n    STREAM --> ALERT[\"リアルタイム通知\"]\n    STORE --> DASH[\"ダッシュボード\"]\n    class KAFKA hub\n    class DASH done"
+    },
+    {
+      "id": "dg-testing",
+      "chart": "flowchart TB\n    CODE[\"対象コード\"] --> ASK[\"AIにテスト生成を依頼\"]\n    ASK --> DRAFT[\"テストコードの下書き\"]\n    DRAFT --> RUN[\"実行して結果を確認\"]\n    RUN --> REVIEW{\"意図通りに検証できているか？\"}\n    REVIEW -->|いいえ| REFINE[\"プロンプトを修正して再生成\"]\n    REFINE --> DRAFT\n    REVIEW -->|はい| QUALITY[\"品質・複雑度・カバレッジを評価\"]\n    QUALITY --> DONE[\"テストスイートとして確定\"]\n    class REVIEW box\n    class DONE done"
+    },
+    {
+      "id": "dg-cicd",
+      "chart": "flowchart TB\n    DEV[\"開発者がコードをコミット\"] --> GH[\"GitHubリポジトリ\"]\n    GH --> CI[\"GitHub Actions ビルド＆テスト\"]\n    CI --> DOCKER[\"Copilot支援でDockerイメージを作成\"]\n    DOCKER --> REGISTRY[\"コンテナレジストリへpush\"]\n    REGISTRY --> TF[\"LLM支援でTerraformによるインフラ構築\"]\n    TF --> EKS[\"Amazon EKSへデプロイ\"]\n    EKS --> MONITOR[\"監視・ロールバック判断\"]\n    class GH hub\n    class MONITOR done"
+    },
+    {
+      "id": "dg-threat",
+      "chart": "flowchart TB\n    START[\"対象システムを定義する\"] --> ASSET[\"資産・データフローを洗い出す\"]\n    ASSET --> CHATGPT[\"ChatGPTに脅威をブレインストーミングしてもらう\"]\n    CHATGPT --> CLASSIFY[\"脅威を分類する 例えばSTRIDE等の枠組み\"]\n    CLASSIFY --> RISK[\"リスクの優先順位をつける\"]\n    RISK --> MIT[\"緩和策をChatGPTと一緒に検討する\"]\n    MIT --> REVIEW[\"人間によるセキュリティレビュー\"]\n    REVIEW --> DONE[\"設計・実装に反映する\"]\n    class REVIEW box\n    class DONE done"
+    },
+    {
+      "id": "dg-local",
+      "chart": "flowchart TB\n    Q1{\"機密データを扱うか、オフライン環境か？\"} -->|はい| LOCAL[\"ローカルLLMを使う\"]\n    Q1 -->|いいえ| Q2{\"最高水準の回答品質が必要か？\"}\n    Q2 -->|はい| CLOUD[\"クラウドLLMを使う\"]\n    Q2 -->|いいえ| Q3{\"コストやレイテンシを抑えたいか？\"}\n    Q3 -->|はい| LOCAL\n    Q3 -->|いいえ| CLOUD\n    class Q1 box\n    class Q2 box\n    class Q3 box\n    class LOCAL done\n    class CLOUD done"
+    },
+    {
+      "id": "dg-vibe",
+      "chart": "flowchart LR\n    A[\"Vibe Coding　コードをほぼ見ずにAI任せ\"] -->|2025から2026年に注目される変化| B[\"Agentic Programming　人間がAIの出力を精査・監督\"]\n    class A hub\n    class B done"
+    }
+  ],
+  "stylesheets": [
+    {
+      "href": "https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.46.0/dist/tabler-icons.min.css",
+      "integrity": "sha384-ND+q1IVc0KDElX60dZaqKc7Xl9cdxd2PpU2JfVUHcurCkFVtVLFdt9vJfxtHSL3p",
+      "crossOrigin": "anonymous"
+    },
+    {
+      "href": "https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&display=swap",
+      "integrity": null,
+      "crossOrigin": null
+    }
+  ],
+  "styledNodes": [
+    {
+      "tag": "header",
+      "classes": ["hero"]
+    },
+    {
+      "tag": "div",
+      "classes": ["heroKicker"]
+    },
+    {
+      "tag": "i",
+      "classes": ["ti", "ti-sparkles"]
+    },
+    {
+      "tag": "h1",
+      "classes": ["heroTitle"]
+    },
+    {
+      "tag": "p",
+      "classes": ["heroSub"]
+    },
+    {
+      "tag": "div",
+      "classes": ["heroNote"]
+    },
+    {
+      "tag": "section",
+      "classes": ["section", "prose"]
+    },
+    {
+      "tag": "h2",
+      "classes": ["hTitle"]
+    },
+    {
+      "tag": "i",
+      "classes": ["ti", "ti-users"]
+    },
+    {
+      "tag": "section",
+      "classes": ["section", "prose"]
+    },
+    {
+      "tag": "h2",
+      "classes": ["hTitle"]
+    },
+    {
+      "tag": "i",
+      "classes": ["ti", "ti-book"]
+    },
+    {
+      "tag": "div",
+      "classes": ["bookCard"]
+    },
+    {
+      "tag": "div",
+      "classes": ["bookCover"]
+    },
+    {
+      "tag": "i",
+      "classes": ["ti", "ti-book"]
+    },
+    {
+      "tag": "div",
+      "classes": ["bookCoverTitle"]
+    },
+    {
+      "tag": "div",
+      "classes": ["bookCoverAuthor"]
+    },
+    {
+      "tag": "div",
+      "classes": ["bookCardBody"]
+    },
+    {
+      "tag": "div",
+      "classes": ["tableWrap"]
+    },
+    {
+      "tag": "table",
+      "classes": ["kvTable"]
+    },
+    {
+      "tag": "section",
+      "classes": ["section", "prose"]
+    },
+    {
+      "tag": "h2",
+      "classes": ["hTitle"]
+    },
+    {
+      "tag": "i",
+      "classes": ["ti", "ti-bulb"]
+    },
+    {
+      "tag": "a",
+      "classes": ["cite"]
+    },
+    {
+      "tag": "a",
+      "classes": ["cite"]
+    },
+    {
+      "tag": "section",
+      "classes": ["section", "prose"]
+    },
+    {
+      "tag": "h2",
+      "classes": ["hTitle"]
+    },
+    {
+      "tag": "i",
+      "classes": ["ti", "ti-route"]
+    },
+    {
+      "tag": "div",
+      "classes": ["diagramWrap"]
+    },
+    {
+      "tag": "div",
+      "classes": ["diagramCaption"]
+    },
+    {
+      "tag": "div",
+      "classes": ["mermaidWrap"]
+    },
+    {
+      "tag": "div",
+      "classes": ["tableWrap"]
+    },
+    {
+      "tag": "section",
+      "classes": ["section", "prose"]
+    },
+    {
+      "tag": "div",
+      "classes": ["stepBadge"]
+    },
+    {
+      "tag": "h2",
+      "classes": ["hTitle"]
+    },
+    {
+      "tag": "i",
+      "classes": ["ti", "ti-brain"]
+    },
+    {
+      "tag": "i",
+      "classes": ["ti", "ti-flag"]
+    },
+    {
+      "tag": "i",
+      "classes": ["ti", "ti-list-check"]
+    },
+    {
+      "tag": "div",
+      "classes": ["callout", "update"]
+    },
+    {
+      "tag": "i",
+      "classes": ["ti", "ti-trending-up"]
+    },
+    {
+      "tag": "div",
+      "classes": ["calloutBody"]
+    },
+    {
+      "tag": "span",
+      "classes": ["calloutTitle"]
+    },
+    {
+      "tag": "a",
+      "classes": ["cite"]
+    },
+    {
+      "tag": "section",
+      "classes": ["section", "prose"]
+    },
+    {
+      "tag": "div",
+      "classes": ["stepBadge"]
+    },
+    {
+      "tag": "h2",
+      "classes": ["hTitle"]
+    },
+    {
+      "tag": "i",
+      "classes": ["ti", "ti-message-chatbot"]
+    },
+    {
+      "tag": "i",
+      "classes": ["ti", "ti-flag"]
+    },
+    {
+      "tag": "i",
+      "classes": ["ti", "ti-scale"]
+    },
+    {
+      "tag": "div",
+      "classes": ["tableWrap"]
+    },
+    {
+      "tag": "i",
+      "classes": ["ti", "ti-wand"]
+    },
+    {
+      "tag": "div",
+      "classes": ["tableWrap"]
+    },
+    {
+      "tag": "div",
+      "classes": ["callout", "update"]
+    },
+    {
+      "tag": "i",
+      "classes": ["ti", "ti-trending-up"]
+    },
+    {
+      "tag": "div",
+      "classes": ["calloutBody"]
+    },
+    {
+      "tag": "span",
+      "classes": ["calloutTitle"]
+    },
+    {
+      "tag": "a",
+      "classes": ["cite"]
+    },
+    {
+      "tag": "a",
+      "classes": ["cite"]
+    },
+    {
+      "tag": "section",
+      "classes": ["section", "prose"]
+    },
+    {
+      "tag": "div",
+      "classes": ["stepBadge"]
+    },
+    {
+      "tag": "h2",
+      "classes": ["hTitle"]
+    },
+    {
+      "tag": "i",
+      "classes": ["ti", "ti-sitemap"]
+    },
+    {
+      "tag": "i",
+      "classes": ["ti", "ti-flag"]
+    },
+    {
+      "tag": "div",
+      "classes": ["diagramWrap"]
+    },
+    {
+      "tag": "div",
+      "classes": ["diagramCaption"]
+    },
+    {
+      "tag": "div",
+      "classes": ["mermaidWrap"]
+    },
+    {
+      "tag": "i",
+      "classes": ["ti", "ti-bulb"]
+    },
+    {
+      "tag": "div",
+      "classes": ["callout", "update"]
+    },
+    {
+      "tag": "i",
+      "classes": ["ti", "ti-trending-up"]
+    },
+    {
+      "tag": "div",
+      "classes": ["calloutBody"]
+    },
+    {
+      "tag": "span",
+      "classes": ["calloutTitle"]
+    },
+    {
+      "tag": "a",
+      "classes": ["cite"]
+    },
+    {
+      "tag": "section",
+      "classes": ["section", "prose"]
+    },
+    {
+      "tag": "div",
+      "classes": ["stepBadge"]
+    },
+    {
+      "tag": "h2",
+      "classes": ["hTitle"]
+    },
+    {
+      "tag": "i",
+      "classes": ["ti", "ti-code"]
+    },
+    {
+      "tag": "i",
+      "classes": ["ti", "ti-flag"]
+    },
+    {
+      "tag": "i",
+      "classes": ["ti", "ti-list-check"]
+    },
+    {
+      "tag": "i",
+      "classes": ["ti", "ti-hexagon"]
+    },
+    {
+      "tag": "div",
+      "classes": ["diagramWrap"]
+    },
+    {
+      "tag": "div",
+      "classes": ["diagramCaption"]
+    },
+    {
+      "tag": "div",
+      "classes": ["mermaidWrap"]
+    },
+    {
+      "tag": "div",
+      "classes": ["callout", "update"]
+    },
+    {
+      "tag": "i",
+      "classes": ["ti", "ti-trending-up"]
+    },
+    {
+      "tag": "div",
+      "classes": ["calloutBody"]
+    },
+    {
+      "tag": "span",
+      "classes": ["calloutTitle"]
+    },
+    {
+      "tag": "a",
+      "classes": ["cite"]
+    },
+    {
+      "tag": "section",
+      "classes": ["section", "prose"]
+    },
+    {
+      "tag": "div",
+      "classes": ["stepBadge"]
+    },
+    {
+      "tag": "h2",
+      "classes": ["hTitle"]
+    },
+    {
+      "tag": "i",
+      "classes": ["ti", "ti-database"]
+    },
+    {
+      "tag": "i",
+      "classes": ["ti", "ti-flag"]
+    },
+    {
+      "tag": "div",
+      "classes": ["diagramWrap"]
+    },
+    {
+      "tag": "div",
+      "classes": ["diagramCaption"]
+    },
+    {
+      "tag": "div",
+      "classes": ["mermaidWrap"]
+    },
+    {
+      "tag": "i",
+      "classes": ["ti", "ti-list-check"]
+    },
+    {
+      "tag": "div",
+      "classes": ["callout", "update"]
+    },
+    {
+      "tag": "i",
+      "classes": ["ti", "ti-trending-up"]
+    },
+    {
+      "tag": "div",
+      "classes": ["calloutBody"]
+    },
+    {
+      "tag": "span",
+      "classes": ["calloutTitle"]
+    },
+    {
+      "tag": "section",
+      "classes": ["section", "prose"]
+    },
+    {
+      "tag": "div",
+      "classes": ["stepBadge"]
+    },
+    {
+      "tag": "h2",
+      "classes": ["hTitle"]
+    },
+    {
+      "tag": "i",
+      "classes": ["ti", "ti-flask"]
+    },
+    {
+      "tag": "i",
+      "classes": ["ti", "ti-flag"]
+    },
+    {
+      "tag": "div",
+      "classes": ["tableWrap"]
+    },
+    {
+      "tag": "div",
+      "classes": ["diagramWrap"]
+    },
+    {
+      "tag": "div",
+      "classes": ["diagramCaption"]
+    },
+    {
+      "tag": "div",
+      "classes": ["mermaidWrap"]
+    },
+    {
+      "tag": "div",
+      "classes": ["callout", "update"]
+    },
+    {
+      "tag": "i",
+      "classes": ["ti", "ti-trending-up"]
+    },
+    {
+      "tag": "div",
+      "classes": ["calloutBody"]
+    },
+    {
+      "tag": "span",
+      "classes": ["calloutTitle"]
+    },
+    {
+      "tag": "a",
+      "classes": ["cite"]
+    },
+    {
+      "tag": "section",
+      "classes": ["section", "prose"]
+    },
+    {
+      "tag": "div",
+      "classes": ["stepBadge"]
+    },
+    {
+      "tag": "h2",
+      "classes": ["hTitle"]
+    },
+    {
+      "tag": "i",
+      "classes": ["ti", "ti-cloud-upload"]
+    },
+    {
+      "tag": "i",
+      "classes": ["ti", "ti-flag"]
+    },
+    {
+      "tag": "div",
+      "classes": ["diagramWrap"]
+    },
+    {
+      "tag": "div",
+      "classes": ["diagramCaption"]
+    },
+    {
+      "tag": "div",
+      "classes": ["mermaidWrap"]
+    },
+    {
+      "tag": "i",
+      "classes": ["ti", "ti-list-check"]
+    },
+    {
+      "tag": "div",
+      "classes": ["callout", "update"]
+    },
+    {
+      "tag": "i",
+      "classes": ["ti", "ti-trending-up"]
+    },
+    {
+      "tag": "div",
+      "classes": ["calloutBody"]
+    },
+    {
+      "tag": "span",
+      "classes": ["calloutTitle"]
+    },
+    {
+      "tag": "a",
+      "classes": ["cite"]
+    },
+    {
+      "tag": "section",
+      "classes": ["section", "prose"]
+    },
+    {
+      "tag": "div",
+      "classes": ["stepBadge"]
+    },
+    {
+      "tag": "h2",
+      "classes": ["hTitle"]
+    },
+    {
+      "tag": "i",
+      "classes": ["ti", "ti-shield-lock"]
+    },
+    {
+      "tag": "i",
+      "classes": ["ti", "ti-flag"]
+    },
+    {
+      "tag": "div",
+      "classes": ["diagramWrap"]
+    },
+    {
+      "tag": "div",
+      "classes": ["diagramCaption"]
+    },
+    {
+      "tag": "div",
+      "classes": ["mermaidWrap"]
+    },
+    {
+      "tag": "i",
+      "classes": ["ti", "ti-list-check"]
+    },
+    {
+      "tag": "i",
+      "classes": ["ti", "ti-alert-triangle"]
+    },
+    {
+      "tag": "div",
+      "classes": ["tableWrap"]
+    },
+    {
+      "tag": "div",
+      "classes": ["callout", "update"]
+    },
+    {
+      "tag": "i",
+      "classes": ["ti", "ti-trending-up"]
+    },
+    {
+      "tag": "div",
+      "classes": ["calloutBody"]
+    },
+    {
+      "tag": "span",
+      "classes": ["calloutTitle"]
+    },
+    {
+      "tag": "a",
+      "classes": ["cite"]
+    },
+    {
+      "tag": "a",
+      "classes": ["cite"]
+    },
+    {
+      "tag": "section",
+      "classes": ["section", "prose"]
+    },
+    {
+      "tag": "div",
+      "classes": ["stepBadge"]
+    },
+    {
+      "tag": "h2",
+      "classes": ["hTitle"]
+    },
+    {
+      "tag": "i",
+      "classes": ["ti", "ti-device-laptop"]
+    },
+    {
+      "tag": "i",
+      "classes": ["ti", "ti-flag"]
+    },
+    {
+      "tag": "div",
+      "classes": ["diagramWrap"]
+    },
+    {
+      "tag": "div",
+      "classes": ["diagramCaption"]
+    },
+    {
+      "tag": "div",
+      "classes": ["mermaidWrap"]
+    },
+    {
+      "tag": "i",
+      "classes": ["ti", "ti-scale"]
+    },
+    {
+      "tag": "div",
+      "classes": ["tableWrap"]
+    },
+    {
+      "tag": "div",
+      "classes": ["callout", "update"]
+    },
+    {
+      "tag": "i",
+      "classes": ["ti", "ti-trending-up"]
+    },
+    {
+      "tag": "div",
+      "classes": ["calloutBody"]
+    },
+    {
+      "tag": "span",
+      "classes": ["calloutTitle"]
+    },
+    {
+      "tag": "a",
+      "classes": ["cite"]
+    },
+    {
+      "tag": "section",
+      "classes": ["section", "prose"]
+    },
+    {
+      "tag": "div",
+      "classes": ["stepBadge"]
+    },
+    {
+      "tag": "h2",
+      "classes": ["hTitle"]
+    },
+    {
+      "tag": "i",
+      "classes": ["ti", "ti-trending-up"]
+    },
+    {
+      "tag": "i",
+      "classes": ["ti", "ti-arrows-shuffle"]
+    },
+    {
+      "tag": "a",
+      "classes": ["cite"]
+    },
+    {
+      "tag": "a",
+      "classes": ["cite"]
+    },
+    {
+      "tag": "a",
+      "classes": ["cite"]
+    },
+    {
+      "tag": "div",
+      "classes": ["diagramWrap"]
+    },
+    {
+      "tag": "div",
+      "classes": ["diagramCaption"]
+    },
+    {
+      "tag": "div",
+      "classes": ["mermaidWrap"]
+    },
+    {
+      "tag": "i",
+      "classes": ["ti", "ti-gauge"]
+    },
+    {
+      "tag": "a",
+      "classes": ["cite"]
+    },
+    {
+      "tag": "a",
+      "classes": ["cite"]
+    },
+    {
+      "tag": "a",
+      "classes": ["cite"]
+    },
+    {
+      "tag": "i",
+      "classes": ["ti", "ti-repeat"]
+    },
+    {
+      "tag": "a",
+      "classes": ["cite"]
+    },
+    {
+      "tag": "i",
+      "classes": ["ti", "ti-shield-check"]
+    },
+    {
+      "tag": "a",
+      "classes": ["cite"]
+    },
+    {
+      "tag": "a",
+      "classes": ["cite"]
+    },
+    {
+      "tag": "i",
+      "classes": ["ti", "ti-device-laptop"]
+    },
+    {
+      "tag": "a",
+      "classes": ["cite"]
+    },
+    {
+      "tag": "a",
+      "classes": ["cite"]
+    },
+    {
+      "tag": "section",
+      "classes": ["section", "prose"]
+    },
+    {
+      "tag": "h2",
+      "classes": ["hTitle"]
+    },
+    {
+      "tag": "i",
+      "classes": ["ti", "ti-book-2"]
+    },
+    {
+      "tag": "dl",
+      "classes": ["glossary"]
+    },
+    {
+      "tag": "section",
+      "classes": ["section", "prose"]
+    },
+    {
+      "tag": "h2",
+      "classes": ["hTitle"]
+    },
+    {
+      "tag": "i",
+      "classes": ["ti", "ti-checklist"]
+    },
+    {
+      "tag": "div",
+      "classes": ["checklistCounter"]
+    },
+    {
+      "tag": "i",
+      "classes": ["ti", "ti-flag"]
+    },
+    {
+      "tag": "ul",
+      "classes": ["checklist"]
+    },
+    {
+      "tag": "section",
+      "classes": ["section", "prose"]
+    },
+    {
+      "tag": "h2",
+      "classes": ["hTitle"]
+    },
+    {
+      "tag": "i",
+      "classes": ["ti", "ti-flag"]
+    },
+    {
+      "tag": "div",
+      "classes": ["summaryBox"]
+    },
+    {
+      "tag": "span",
+      "classes": ["tag"]
+    },
+    {
+      "tag": "span",
+      "classes": ["tag"]
+    },
+    {
+      "tag": "span",
+      "classes": ["tag"]
+    },
+    {
+      "tag": "span",
+      "classes": ["tag"]
+    },
+    {
+      "tag": "span",
+      "classes": ["tag"]
+    },
+    {
+      "tag": "span",
+      "classes": ["tag"]
+    },
+    {
+      "tag": "section",
+      "classes": ["section", "prose"]
+    },
+    {
+      "tag": "h2",
+      "classes": ["hTitle"]
+    },
+    {
+      "tag": "i",
+      "classes": ["ti", "ti-link"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refGroupTitle"]
+    },
+    {
+      "tag": "i",
+      "classes": ["ti", "ti-book"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refCard"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refNum"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refBody"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refTitle"]
+    },
+    {
+      "tag": "a",
+      "classes": ["refUrl"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refCard"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refNum"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refBody"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refTitle"]
+    },
+    {
+      "tag": "a",
+      "classes": ["refUrl"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refCard"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refNum"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refBody"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refTitle"]
+    },
+    {
+      "tag": "a",
+      "classes": ["refUrl"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refGroupTitle"]
+    },
+    {
+      "tag": "i",
+      "classes": ["ti", "ti-users"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refCard"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refNum"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refBody"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refTitle"]
+    },
+    {
+      "tag": "a",
+      "classes": ["refUrl"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refCard"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refNum"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refBody"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refTitle"]
+    },
+    {
+      "tag": "a",
+      "classes": ["refUrl"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refCard"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refNum"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refBody"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refTitle"]
+    },
+    {
+      "tag": "a",
+      "classes": ["refUrl"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refCard"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refNum"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refBody"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refTitle"]
+    },
+    {
+      "tag": "a",
+      "classes": ["refUrl"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refCard"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refNum"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refBody"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refTitle"]
+    },
+    {
+      "tag": "a",
+      "classes": ["refUrl"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refCard"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refNum"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refBody"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refTitle"]
+    },
+    {
+      "tag": "a",
+      "classes": ["refUrl"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refCard"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refNum"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refBody"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refTitle"]
+    },
+    {
+      "tag": "a",
+      "classes": ["refUrl"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refCard"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refNum"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refBody"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refTitle"]
+    },
+    {
+      "tag": "a",
+      "classes": ["refUrl"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refCard"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refNum"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refBody"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refTitle"]
+    },
+    {
+      "tag": "a",
+      "classes": ["refUrl"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refCard"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refNum"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refBody"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refTitle"]
+    },
+    {
+      "tag": "a",
+      "classes": ["refUrl"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refGroupTitle"]
+    },
+    {
+      "tag": "i",
+      "classes": ["ti", "ti-chart-bar"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refCard"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refNum"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refBody"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refTitle"]
+    },
+    {
+      "tag": "a",
+      "classes": ["refUrl"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refCard"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refNum"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refBody"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refTitle"]
+    },
+    {
+      "tag": "a",
+      "classes": ["refUrl"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refCard"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refNum"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refBody"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refTitle"]
+    },
+    {
+      "tag": "a",
+      "classes": ["refUrl"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refCard"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refNum"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refBody"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refTitle"]
+    },
+    {
+      "tag": "a",
+      "classes": ["refUrl"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refCard"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refNum"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refBody"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refTitle"]
+    },
+    {
+      "tag": "a",
+      "classes": ["refUrl"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refGroupTitle"]
+    },
+    {
+      "tag": "i",
+      "classes": ["ti", "ti-device-laptop"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refCard"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refNum"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refBody"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refTitle"]
+    },
+    {
+      "tag": "a",
+      "classes": ["refUrl"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refCard"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refNum"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refBody"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refTitle"]
+    },
+    {
+      "tag": "a",
+      "classes": ["refUrl"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refCard"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refNum"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refBody"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refTitle"]
+    },
+    {
+      "tag": "a",
+      "classes": ["refUrl"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refCard"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refNum"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refBody"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refTitle"]
+    },
+    {
+      "tag": "a",
+      "classes": ["refUrl"]
+    }
+  ],
+  "inlineStyles": [
+    {
+      "tag": "p",
+      "text": "一方で進化しているポイント",
+      "style": "margin: 0 0 0.6rem"
+    },
+    {
+      "tag": "p",
+      "text": "書籍で体系立った基礎を学びつつ、本ガイドのStep10で紹介したような最新動向を随時アップデートしていくことが、2026年の開発者には求められています。",
+      "style": "margin-top: 1.2rem"
+    },
+    {
+      "tag": "p",
+      "text": "本ガイドは2026年9月17日時点の公開情報をもとに作成しています。AI関連ツールの名称・機能は変化が速いため、実際に導入する際は各公式ドキュメントで最新情報をご確認ください。",
+      "style": "margin-top: 1.8rem; color: var(--ink-soft); font-size: 1rem"
+    }
+  ],
+  "cssRules": [
+    {
+      "selector": ".layout",
+      "media": null,
+      "declarations": {
+        "--paper": "#faf6ec",
+        "--paper-card": "#fffefb",
+        "--paper-card-2": "#f2ecdd",
+        "--ink": "#2a241c",
+        "--ink-soft": "#6b6255",
+        "--border": "#e6dfc9",
+        "--indigo": "#4b4394",
+        "--indigo-dark": "#332c6e",
+        "--indigo-soft": "rgba(65, 61, 143, 0.07)",
+        "--gold": "#a9740a",
+        "--gold-soft": "rgba(184, 134, 11, 0.12)",
+        "--forest": "#2f6b4f",
+        "--forest-soft": "rgba(47, 107, 79, 0.1)",
+        "--plum": "#7c3f6b",
+        "--plum-soft": "rgba(124, 63, 107, 0.1)",
+        "--hub-fill": "#c9c4ef",
+        "--hub-text": "#221f52",
+        "--done-fill": "#bfe4d2",
+        "--done-text": "#123722",
+        "--box-fill": "#f5dfa0",
+        "--box-text": "#4a3c05",
+        "--sidebar-w": "288px"
+      }
+    },
+    {
+      "selector": ".layout :global(*)",
+      "media": null,
+      "declarations": {
+        "box-sizing": "border-box"
+      }
+    },
+    {
+      "selector": ".layout",
+      "media": null,
+      "declarations": {
+        "scroll-behavior": "smooth"
+      }
+    },
+    {
+      "selector": ".layout",
+      "media": null,
+      "declarations": {
+        "margin": "0",
+        "background": "var(--paper)",
+        "color": "var(--ink)",
+        "font-family": "-apple-system,\n          BlinkMacSystemFont,\n          'Segoe UI',\n          Hiragino Sans,\n          'Hiragino Kaku Gothic ProN',\n          Meiryo,\n          sans-serif",
+        "line-height": "1.85",
+        "font-size": "16px"
+      }
+    },
+    {
+      "selector": ".layout :global(h1), .layout \n      :global(h2), .layout \n      :global(h3), .layout \n      :global(h4), \n      .brandTitle, \n      .heroTitle",
+      "media": null,
+      "declarations": {
+        "font-family": "'Source Serif 4',\n          Hiragino Mincho ProN,\n          serif"
+      }
+    },
+    {
+      "selector": ".layout :global(a)",
+      "media": null,
+      "declarations": {
+        "color": "var(--indigo)"
+      }
+    },
+    {
+      "selector": ".layout",
+      "media": null,
+      "declarations": {
+        "display": "block"
+      }
+    },
+    {
+      "selector": ".sidebar",
+      "media": null,
+      "declarations": {
+        "position": "fixed",
+        "top": "0",
+        "left": "0",
+        "bottom": "0",
+        "width": "var(--sidebar-w)",
+        "background": "var(--paper-card)",
+        "border-right": "1px solid var(--border)",
+        "overflow-y": "auto",
+        "padding": "1.4rem 0 2rem",
+        "z-index": "40"
+      }
+    },
+    {
+      "selector": ".sidebarBrand",
+      "media": null,
+      "declarations": {
+        "padding": "0 1.4rem 1rem",
+        "border-bottom": "1px solid var(--border)",
+        "margin-bottom": "0.8rem"
+      }
+    },
+    {
+      "selector": ".sidebarBrand :global(.ti)",
+      "media": null,
+      "declarations": {
+        "color": "var(--indigo)",
+        "font-size": "1.6rem"
+      }
+    },
+    {
+      "selector": ".brandTitle",
+      "media": null,
+      "declarations": {
+        "font-size": "1.02rem",
+        "font-weight": "700",
+        "color": "var(--indigo-dark)",
+        "line-height": "1.4",
+        "margin": "0.5rem 0 0.2rem"
+      }
+    },
+    {
+      "selector": ".brandSub",
+      "media": null,
+      "declarations": {
+        "font-size": "1rem",
+        "color": "var(--ink-soft)"
+      }
+    },
+    {
+      "selector": ".navGroupLabel",
+      "media": null,
+      "declarations": {
+        "font-size": "1rem",
+        "text-transform": "uppercase",
+        "letter-spacing": "0.06em",
+        "color": "var(--ink-soft)",
+        "padding": "0.9rem 1.4rem 0.3rem",
+        "font-weight": "700"
+      }
+    },
+    {
+      "selector": ".navA",
+      "media": null,
+      "declarations": {
+        "display": "flex",
+        "align-items": "center",
+        "gap": "0.55rem",
+        "padding": "0.42rem 1.4rem",
+        "color": "var(--ink)",
+        "text-decoration": "none",
+        "font-size": "1rem",
+        "border-left": "3px solid transparent"
+      }
+    },
+    {
+      "selector": ".navA :global(.ti)",
+      "media": null,
+      "declarations": {
+        "font-size": "1.05rem",
+        "color": "var(--ink-soft)",
+        "width": "1.2rem",
+        "text-align": "center"
+      }
+    },
+    {
+      "selector": ".navA:hover",
+      "media": null,
+      "declarations": {
+        "background": "var(--indigo-soft)"
+      }
+    },
+    {
+      "selector": ".navA.active",
+      "media": null,
+      "declarations": {
+        "border-left-color": "var(--indigo)",
+        "background": "var(--indigo-soft)",
+        "color": "var(--indigo-dark)",
+        "font-weight": "700"
+      }
+    },
+    {
+      "selector": ".navA.active :global(.ti)",
+      "media": null,
+      "declarations": {
+        "color": "var(--indigo)"
+      }
+    },
+    {
+      "selector": ".main",
+      "media": null,
+      "declarations": {
+        "margin-left": "var(--sidebar-w)"
+      }
+    },
+    {
+      "selector": ".section",
+      "media": null,
+      "declarations": {
+        "padding": "3rem 3.4rem",
+        "border-bottom": "1px solid var(--border)",
+        "max-width": "none"
+      }
+    },
+    {
+      "selector": ".section:last-of-type",
+      "media": null,
+      "declarations": {
+        "border-bottom": "none"
+      }
+    },
+    {
+      "selector": ".prose, \n      .prose :global(p), \n      .prose :global(li)",
+      "media": null,
+      "declarations": {
+        "max-width": "none",
+        "overflow-wrap": "break-word"
+      }
+    },
+    {
+      "selector": ".layout :global(p), .layout \n      :global(li), .layout \n      :global(td), .layout \n      :global(th), .layout \n      :global(dd), .layout \n      :global(dt), .layout \n      :global(blockquote)",
+      "media": null,
+      "declarations": {
+        "overflow-wrap": "break-word"
+      }
+    },
+    {
+      "selector": ".layout :global(code)",
+      "media": null,
+      "declarations": {
+        "overflow-wrap": "anywhere"
+      }
+    },
+    {
+      "selector": ".hero",
+      "media": null,
+      "declarations": {
+        "padding": "3.6rem 3.4rem 3rem",
+        "background": "linear-gradient(180deg, var(--paper-card) 0%, var(--paper) 100%)",
+        "max-width": "none"
+      }
+    },
+    {
+      "selector": ".heroKicker",
+      "media": null,
+      "declarations": {
+        "display": "inline-flex",
+        "align-items": "center",
+        "gap": "0.4rem",
+        "font-size": "1rem",
+        "color": "var(--indigo)",
+        "font-weight": "700",
+        "letter-spacing": "0.04em",
+        "text-transform": "uppercase",
+        "margin-bottom": "0.8rem"
+      }
+    },
+    {
+      "selector": ".heroTitle",
+      "media": null,
+      "declarations": {
+        "font-size": "2.15rem",
+        "font-weight": "700",
+        "color": "var(--indigo-dark)",
+        "line-height": "1.35",
+        "margin": "0 0 0.5rem",
+        "max-width": "none"
+      }
+    },
+    {
+      "selector": ".heroSub",
+      "media": null,
+      "declarations": {
+        "font-size": "1.2rem",
+        "color": "var(--ink-soft)",
+        "font-weight": "600",
+        "margin": "0 0 1.4rem",
+        "max-width": "none"
+      }
+    },
+    {
+      "selector": ".heroNote",
+      "media": null,
+      "declarations": {
+        "background": "var(--paper-card)",
+        "border": "1px solid var(--border)",
+        "border-left": "4px solid var(--indigo)",
+        "border-radius": "0.5rem",
+        "padding": "1.1rem 1.3rem",
+        "font-size": "1rem",
+        "color": "var(--ink-soft)",
+        "max-width": "none"
+      }
+    },
+    {
+      "selector": ".heroNote strong",
+      "media": null,
+      "declarations": {
+        "color": "var(--ink)"
+      }
+    },
+    {
+      "selector": ".layout :global(h2).hTitle",
+      "media": null,
+      "declarations": {
+        "font-size": "1.55rem",
+        "color": "var(--indigo-dark)",
+        "display": "flex",
+        "align-items": "center",
+        "gap": "0.6rem",
+        "margin": "0 0 1.2rem"
+      }
+    },
+    {
+      "selector": ".layout :global(h2).hTitle :global(.ti)",
+      "media": null,
+      "declarations": {
+        "font-size": "1.3rem",
+        "color": "var(--indigo)"
+      }
+    },
+    {
+      "selector": ".layout :global(h3)",
+      "media": null,
+      "declarations": {
+        "font-size": "1.18rem",
+        "color": "var(--ink)",
+        "margin": "1.8rem 0 0.7rem"
+      }
+    },
+    {
+      "selector": ".layout :global(h3) :global(.ti)",
+      "media": null,
+      "declarations": {
+        "color": "var(--forest)",
+        "margin-right": "0.35rem"
+      }
+    },
+    {
+      "selector": ".stepBadge",
+      "media": null,
+      "declarations": {
+        "display": "inline-block",
+        "background": "var(--indigo)",
+        "color": "#fff",
+        "font-weight": "700",
+        "font-size": "1rem",
+        "padding": "0.25rem 0.7rem",
+        "border-radius": "1rem",
+        "margin-bottom": "0.6rem",
+        "letter-spacing": "0.03em"
+      }
+    },
+    {
+      "selector": ".callout",
+      "media": null,
+      "declarations": {
+        "display": "flex",
+        "gap": "0.8rem",
+        "background": "var(--paper-card)",
+        "border": "1px solid var(--border)",
+        "border-left": "4px solid var(--gold)",
+        "border-radius": "0.5rem",
+        "padding": "1.1rem 1.3rem",
+        "margin": "1.3rem 0"
+      }
+    },
+    {
+      "selector": ".callout :global(.ti)",
+      "media": null,
+      "declarations": {
+        "font-size": "1.3rem",
+        "color": "var(--gold)",
+        "flex-shrink": "0",
+        "margin-top": "0.1rem"
+      }
+    },
+    {
+      "selector": ".calloutBody",
+      "media": null,
+      "declarations": {
+        "flex": "1",
+        "min-width": "0"
+      }
+    },
+    {
+      "selector": ".calloutBody :global(p)",
+      "media": null,
+      "declarations": {
+        "margin": "0.3rem 0"
+      }
+    },
+    {
+      "selector": ".calloutTitle",
+      "media": null,
+      "declarations": {
+        "font-weight": "700",
+        "color": "var(--ink)",
+        "margin-bottom": "0.3rem",
+        "display": "block"
+      }
+    },
+    {
+      "selector": ".callout.update",
+      "media": null,
+      "declarations": {
+        "border-left-color": "var(--forest)"
+      }
+    },
+    {
+      "selector": ".callout.update :global(.ti)",
+      "media": null,
+      "declarations": {
+        "color": "var(--forest)"
+      }
+    },
+    {
+      "selector": ".tableWrap",
+      "media": null,
+      "declarations": {
+        "overflow-x": "auto",
+        "overflow-y": "hidden",
+        "min-width": "0",
+        "border": "1px solid var(--border)",
+        "border-radius": "0.6rem",
+        "margin": "1.2rem 0"
+      }
+    },
+    {
+      "selector": ".tableTitle",
+      "media": null,
+      "declarations": {
+        "background": "var(--indigo-soft)",
+        "color": "var(--indigo-dark)",
+        "font-weight": "700",
+        "padding": "0.6rem 1rem",
+        "border-bottom": "1px solid var(--border)",
+        "font-size": "1rem"
+      }
+    },
+    {
+      "selector": ".layout :global(table)",
+      "media": null,
+      "declarations": {
+        "border-collapse": "collapse",
+        "width": "100%",
+        "min-width": "480px",
+        "font-size": "1rem"
+      }
+    },
+    {
+      "selector": ".layout :global(table).kvTable",
+      "media": null,
+      "declarations": {
+        "min-width": "0"
+      }
+    },
+    {
+      "selector": ".layout :global(th), .layout \n      :global(td)",
+      "media": null,
+      "declarations": {
+        "padding": "0.62rem 0.9rem",
+        "text-align": "left",
+        "border-bottom": "1px solid var(--border)",
+        "overflow-wrap": "anywhere"
+      }
+    },
+    {
+      "selector": ".layout :global(thead) :global(th)",
+      "media": null,
+      "declarations": {
+        "background": "var(--indigo-dark)",
+        "color": "#fff",
+        "font-weight": "700"
+      }
+    },
+    {
+      "selector": ".layout :global(tbody) :global(tr):nth-child(even)",
+      "media": null,
+      "declarations": {
+        "background": "rgba(65, 61, 143, 0.045)"
+      }
+    },
+    {
+      "selector": ".layout :global(table).kvTable :global(tbody) :global(tr):nth-child(even)",
+      "media": null,
+      "declarations": {
+        "background": "transparent"
+      }
+    },
+    {
+      "selector": ".layout :global(table).kvTable :global(th)",
+      "media": null,
+      "declarations": {
+        "background": "transparent",
+        "color": "var(--ink)",
+        "font-weight": "700",
+        "border-right": "1px solid var(--border)",
+        "width": "11rem"
+      }
+    },
+    {
+      "selector": ".layout :global(table).kvTable :global(tr):hover",
+      "media": null,
+      "declarations": {
+        "background": "var(--indigo-soft)"
+      }
+    },
+    {
+      "selector": ".layout :global(table) :global(tr):hover",
+      "media": null,
+      "declarations": {
+        "background": "var(--indigo-soft)"
+      }
+    },
+    {
+      "selector": ".bookCard",
+      "media": null,
+      "declarations": {
+        "display": "flex",
+        "gap": "1.6rem",
+        "flex-wrap": "wrap",
+        "align-items": "stretch",
+        "margin": "1.3rem 0"
+      }
+    },
+    {
+      "selector": ".bookCover",
+      "media": null,
+      "declarations": {
+        "flex": "0 0 180px",
+        "min-height": "230px",
+        "background": "linear-gradient(155deg, var(--indigo) 0%, var(--indigo-dark) 100%)",
+        "border-radius": "0.6rem",
+        "color": "#fff",
+        "display": "flex",
+        "flex-direction": "column",
+        "justify-content": "space-between",
+        "padding": "1.3rem 1.1rem",
+        "box-shadow": "0 8px 20px rgba(51, 44, 110, 0.25)"
+      }
+    },
+    {
+      "selector": ".bookCover :global(.ti)",
+      "media": null,
+      "declarations": {
+        "font-size": "2.1rem",
+        "opacity": "0.9"
+      }
+    },
+    {
+      "selector": ".bookCoverTitle",
+      "media": null,
+      "declarations": {
+        "font-family": "'Source Serif 4', serif",
+        "font-weight": "700",
+        "font-size": "1.05rem",
+        "line-height": "1.4"
+      }
+    },
+    {
+      "selector": ".bookCoverAuthor",
+      "media": null,
+      "declarations": {
+        "font-size": "1rem",
+        "opacity": "0.85"
+      }
+    },
+    {
+      "selector": ".bookCardBody",
+      "media": null,
+      "declarations": {
+        "flex": "1",
+        "min-width": "240px"
+      }
+    },
+    {
+      "selector": ".diagramWrap",
+      "media": null,
+      "declarations": {
+        "margin": "1.4rem 0"
+      }
+    },
+    {
+      "selector": ".diagramCaption",
+      "media": null,
+      "declarations": {
+        "font-size": "1rem",
+        "color": "var(--ink-soft)",
+        "font-weight": "700",
+        "margin-bottom": "0.5rem"
+      }
+    },
+    {
+      "selector": ".layout :global(pre).mermaidSrc",
+      "media": null,
+      "declarations": {
+        "display": "none"
+      }
+    },
+    {
+      "selector": ".mermaidWrap",
+      "media": null,
+      "declarations": {
+        "overflow-x": "auto",
+        "background": "var(--paper-card)",
+        "border": "1px solid var(--border)",
+        "border-radius": "0.6rem",
+        "padding": "1.4rem 0.8rem"
+      }
+    },
+    {
+      "selector": ".diagramLoading",
+      "media": null,
+      "declarations": {
+        "color": "var(--ink-soft)",
+        "font-size": "1rem",
+        "padding": "1rem"
+      }
+    },
+    {
+      "selector": ".checklist",
+      "media": null,
+      "declarations": {
+        "list-style": "none",
+        "margin": "1.2rem 0",
+        "padding": "0"
+      }
+    },
+    {
+      "selector": ".checklist :global(li)",
+      "media": null,
+      "declarations": {
+        "display": "flex",
+        "align-items": "flex-start",
+        "gap": "0.7rem",
+        "padding": "0.55rem 0",
+        "border-bottom": "1px solid var(--border)"
+      }
+    },
+    {
+      "selector": ".checklist :global(li):last-child",
+      "media": null,
+      "declarations": {
+        "border-bottom": "none"
+      }
+    },
+    {
+      "selector": ".checklist :global(input)[type='checkbox']",
+      "media": null,
+      "declarations": {
+        "appearance": "none",
+        "-webkit-appearance": "none",
+        "width": "1.25rem",
+        "height": "1.25rem",
+        "flex-shrink": "0",
+        "margin-top": "0.15rem",
+        "border": "2px solid var(--indigo)",
+        "border-radius": "0.3rem",
+        "cursor": "pointer",
+        "position": "relative",
+        "font-size": "1rem"
+      }
+    },
+    {
+      "selector": ".checklist :global(input)[type='checkbox']:checked",
+      "media": null,
+      "declarations": {
+        "background": "var(--forest)",
+        "border-color": "var(--forest)"
+      }
+    },
+    {
+      "selector": ".checklist :global(input)[type='checkbox']:checked::after",
+      "media": null,
+      "declarations": {
+        "content": "'✓'",
+        "position": "absolute",
+        "top": "-3px",
+        "left": "2px",
+        "color": "#fff",
+        "font-size": "1rem",
+        "font-weight": "700"
+      }
+    },
+    {
+      "selector": ".checklist :global(label)",
+      "media": null,
+      "declarations": {
+        "cursor": "pointer"
+      }
+    },
+    {
+      "selector": ".checklist :global(li).done :global(label)",
+      "media": null,
+      "declarations": {
+        "color": "var(--ink-soft)",
+        "text-decoration": "line-through"
+      }
+    },
+    {
+      "selector": ".checklistCounter",
+      "media": null,
+      "declarations": {
+        "display": "inline-flex",
+        "align-items": "center",
+        "gap": "0.5rem",
+        "background": "var(--forest-soft)",
+        "color": "var(--forest)",
+        "font-weight": "700",
+        "padding": "0.4rem 1rem",
+        "border-radius": "1.2rem",
+        "margin-bottom": "1rem",
+        "font-size": "1rem"
+      }
+    },
+    {
+      "selector": ".glossary :global(dt)",
+      "media": null,
+      "declarations": {
+        "font-weight": "700",
+        "color": "var(--indigo-dark)",
+        "margin-top": "0.9rem"
+      }
+    },
+    {
+      "selector": ".glossary :global(dd)",
+      "media": null,
+      "declarations": {
+        "margin": "0.25rem 0 0"
+      }
+    },
+    {
+      "selector": ".refGroupTitle",
+      "media": null,
+      "declarations": {
+        "font-size": "1.05rem",
+        "font-weight": "700",
+        "color": "var(--plum)",
+        "margin": "1.6rem 0 0.6rem",
+        "display": "flex",
+        "align-items": "center",
+        "gap": "0.4rem"
+      }
+    },
+    {
+      "selector": ".refGroupTitle :global(.ti)",
+      "media": null,
+      "declarations": {
+        "font-size": "1.05rem"
+      }
+    },
+    {
+      "selector": ".refCard",
+      "media": null,
+      "declarations": {
+        "display": "flex",
+        "gap": "0.8rem",
+        "background": "var(--paper-card)",
+        "border": "1px solid var(--border)",
+        "border-radius": "0.5rem",
+        "padding": "0.8rem 1rem",
+        "margin-bottom": "0.6rem"
+      }
+    },
+    {
+      "selector": ".refNum",
+      "media": null,
+      "declarations": {
+        "flex-shrink": "0",
+        "width": "2.1rem",
+        "height": "2.1rem",
+        "border-radius": "50%",
+        "background": "var(--plum-soft)",
+        "color": "var(--plum)",
+        "font-weight": "700",
+        "font-size": "1rem",
+        "display": "flex",
+        "align-items": "center",
+        "justify-content": "center"
+      }
+    },
+    {
+      "selector": ".refBody",
+      "media": null,
+      "declarations": {
+        "flex": "1",
+        "min-width": "0"
+      }
+    },
+    {
+      "selector": ".refTitle",
+      "media": null,
+      "declarations": {
+        "font-weight": "700",
+        "color": "var(--ink)"
+      }
+    },
+    {
+      "selector": ".refUrl",
+      "media": null,
+      "declarations": {
+        "font-size": "1rem",
+        "color": "var(--indigo)",
+        "word-break": "break-all"
+      }
+    },
+    {
+      "selector": ".cite",
+      "media": null,
+      "declarations": {
+        "font-size": "1rem",
+        "vertical-align": "super",
+        "text-decoration": "none",
+        "color": "var(--indigo)",
+        "font-weight": "700"
+      }
+    },
+    {
+      "selector": ".layout :global(sup)",
+      "media": null,
+      "declarations": {
+        "font-size": "1rem",
+        "vertical-align": "super",
+        "line-height": "0"
+      }
+    },
+    {
+      "selector": ".summaryBox",
+      "media": null,
+      "declarations": {
+        "background": "var(--forest-soft)",
+        "border": "1px solid var(--border)",
+        "border-radius": "0.6rem",
+        "padding": "1.3rem 1.5rem",
+        "margin-top": "1rem"
+      }
+    },
+    {
+      "selector": ".tag",
+      "media": null,
+      "declarations": {
+        "display": "inline-block",
+        "background": "var(--gold-soft)",
+        "color": "var(--gold)",
+        "font-size": "1rem",
+        "font-weight": "700",
+        "padding": "0.2rem 0.7rem",
+        "border-radius": "1rem",
+        "margin": "0.15rem 0.3rem 0.15rem 0"
+      }
+    },
+    {
+      "selector": ".mobileBar",
+      "media": null,
+      "declarations": {
+        "display": "none"
+      }
+    },
+    {
+      "selector": ".mobileBar, \n      .mobileBar :global(*)",
+      "media": null,
+      "declarations": {
+        "font-size": "1rem"
+      }
+    },
+    {
+      "selector": ".mobileBar :global(button)",
+      "media": null,
+      "declarations": {
+        "display": "none",
+        "font-size": "1rem"
+      }
+    },
+    {
+      "selector": ".scrim",
+      "media": null,
+      "declarations": {
+        "display": "none"
+      }
+    },
+    {
+      "selector": ".sidebar",
+      "media": "(max-width: 980px)",
+      "declarations": {
+        "transform": "translateX(-100%)",
+        "transition": "transform 0.25s ease",
+        "box-shadow": "0 0 30px rgba(0, 0, 0, 0.2)"
+      }
+    },
+    {
+      "selector": ".sidebar.open",
+      "media": "(max-width: 980px)",
+      "declarations": {
+        "transform": "translateX(0)"
+      }
+    },
+    {
+      "selector": ".main",
+      "media": "(max-width: 980px)",
+      "declarations": {
+        "margin-left": "0"
+      }
+    },
+    {
+      "selector": ".mobileBar",
+      "media": "(max-width: 980px)",
+      "declarations": {
+        "display": "flex",
+        "align-items": "center",
+        "justify-content": "space-between",
+        "position": "sticky",
+        "top": "0",
+        "z-index": "50",
+        "background": "var(--paper-card)",
+        "border-bottom": "1px solid var(--border)",
+        "padding": "0.7rem 1rem"
+      }
+    },
+    {
+      "selector": ".mobileBar .brand",
+      "media": "(max-width: 980px)",
+      "declarations": {
+        "font-weight": "700",
+        "color": "var(--indigo-dark)",
+        "font-size": "1rem",
+        "display": "flex",
+        "align-items": "center",
+        "gap": "0.4rem"
+      }
+    },
+    {
+      "selector": ".mobileBar :global(button)",
+      "media": "(max-width: 980px)",
+      "declarations": {
+        "display": "inline-flex",
+        "align-items": "center",
+        "justify-content": "center",
+        "width": "2.2rem",
+        "height": "2.2rem",
+        "border-radius": "0.4rem",
+        "border": "1px solid var(--border)",
+        "background": "var(--paper-card)",
+        "color": "var(--ink)",
+        "font-size": "1.3rem"
+      }
+    },
+    {
+      "selector": ".scrim.open",
+      "media": "(max-width: 980px)",
+      "declarations": {
+        "display": "block",
+        "position": "fixed",
+        "inset": "0",
+        "background": "rgba(0, 0, 0, 0.35)",
+        "z-index": "39"
+      }
+    },
+    {
+      "selector": ".section, \n        .hero",
+      "media": "(max-width: 980px)",
+      "declarations": {
+        "padding": "2rem 1.3rem"
+      }
+    },
+    {
+      "selector": ".bookCover",
+      "media": "(max-width: 980px)",
+      "declarations": {
+        "flex": "0 0 140px",
+        "min-height": "190px"
+      }
+    }
+  ]
+}
