@@ -16,10 +16,13 @@ _URL = "https://windsurf.com/pricing"
 _FALLBACKS: list[tuple[str, str, float, float | None, str, str, str, str]] = [
     ("Windsurf", "Free",  0,  None, "Free",       "tag-mini",
      "25 credits/月 | 全モデル対応",   "25 credits/mo | All models"),
-    ("Windsurf", "Pro",   15, None, "Individual", "tag-bal",
-     "500 credits/月 | SWE-1.5 含む", "500 credits/mo | Includes SWE-1.5"),
-    ("Windsurf", "Teams", 30, None, "Team",       "tag-bal",
-     "500 credits/user + 管理機能",    "500 credits/user + admin features"),
+    ("Windsurf", "Pro",   20, None, "Individual", "tag-bal",
+     "Free より拡大した使用枠 | OpenAI・Claude・Gemini 等のフロンティアモデル",
+     "Increased quotas | Frontier models from OpenAI, Claude, Gemini, etc."),
+    ("Windsurf", "Max",   200, None, "Top Tier",  "tag-flag",
+     "最上位個人プラン (2026-09 新設)", "Top individual tier (new Sep 2026)"),
+    ("Windsurf", "Teams", 40, None, "Team",       "tag-bal",
+     "1席あたり + 基本料 $80/月 | 管理機能", "Per seat + $80/mo base fee | admin features"),
 ]
 
 
@@ -38,7 +41,11 @@ def scrape(existing: list[SubTool] | None = None) -> list[SubTool]:
         if name == "Pro":
             price = extract_price(html, [r"pro[^$\n]*?\$([\d]+)\s*/\s*month"])
         elif name == "Teams":
-            price = extract_price(html, [r"team[^$\n]*?\$([\d]+)\s*/\s*(?:user|month)"])
+            # 基本料（$80/month）を席単価として拾わないよう、席単価の表記に限定する
+            price = extract_price(html, [
+                r"team[^\n]{0,200}?\$([\d]+)\s*/\s*mo(?:nth)?\s*per\s*(?:full\s*)?(?:dev(?:eloper)?\s*)?seat",
+                r"team[^$\n]{0,80}?\$([\d]+)\s*/\s*(?:user|seat)",
+            ])
 
         cur_m = fb_m
         status = "fallback"

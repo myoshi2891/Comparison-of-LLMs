@@ -1,0 +1,327 @@
+/* Keep the visual refresh within the calculator, including inherited tokens. */
+.calculator {
+  --bg2: #0d1523;
+  --srf: #101a2b;
+  --srf2: #152137;
+  --brd: #253249;
+  --brd2: #354763;
+  --txt2: #bac7dc;
+  --txt3: #95a6bf;
+  position: relative;
+  background: #090f1b;
+  color: var(--txt);
+  color-scheme: dark;
+}
+
+.calculator :global(.lang-toggle) {
+  position: absolute;
+  top: 24px;
+  right: max(24px, calc((100% - 1344px) / 2));
+  z-index: 2;
+  padding: 4px;
+  gap: 4px;
+  background: var(--bg2);
+  border-radius: 12px;
+  box-shadow: none;
+}
+
+.calculator :global(.lang-btn) {
+  min-height: 36px;
+  border-radius: 7px;
+}
+
+.calculator :global(.hero) {
+  padding: 64px 48px 38px;
+  background: radial-gradient(ellipse at 85% 0%, #142c48 0%, transparent 60%), #0c1422;
+}
+
+.calculator :global(.hero)::after {
+  display: none;
+}
+
+.calculator :global(.hero-inner) {
+  max-width: 1344px;
+}
+
+.calculator :global(.hero h1) {
+  margin-bottom: 20px;
+  font-size: clamp(28px, 3.5vw, 46px);
+  line-height: 1.35;
+  letter-spacing: -0.035em;
+}
+
+.calculator :global(.hero-desc) {
+  font-size: 14px;
+  line-height: 1.9;
+}
+
+.calculator :global(.hero-meta) {
+  gap: 10px 24px;
+  margin-top: 24px;
+}
+
+.calculator :global(.rate-badge) {
+  flex-wrap: wrap;
+  margin-top: 20px;
+  padding: 8px 12px;
+  border-radius: 8px;
+}
+
+.calculator :global(.container) {
+  padding-top: 28px;
+}
+
+.calculator :global(.panel),
+.calculator :global(.math-section),
+.calculator :global(.ref-section) {
+  padding: 28px;
+  border-radius: 16px;
+  box-shadow: 0 8px 28px #00000018;
+}
+
+.calculator :global(.panel-title),
+.calculator :global(.math-title),
+.calculator :global(.ref-title) {
+  color: var(--txt);
+  font-size: 15px;
+  letter-spacing: 0.02em;
+  margin-bottom: 20px;
+}
+
+.calculator :global(.scenarios) {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.calculator :global(.scenario-btn) {
+  flex-wrap: wrap;
+  min-height: 64px;
+  padding: 16px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  background: var(--bg2);
+  transition:
+    border-color 0.18s,
+    background-color 0.18s;
+}
+
+.calculator :global(.scenario-btn .rate) {
+  margin-left: auto;
+  font-size: 11px;
+}
+
+.calculator :global(.scenario-btn.active) {
+  background: #1a3152;
+  border-color: #75b5ff;
+  color: #e2efff;
+  box-shadow: inset 0 0 0 1px #75b5ff;
+}
+
+.calculator :global(.scenario-btn.active .rate) {
+  color: #b9daff;
+  opacity: 1;
+}
+
+.calculator :global(.assumption-bar) {
+  gap: 8px 12px;
+  margin-top: 20px;
+  padding: 14px 16px;
+  background: var(--bg2);
+  border-color: var(--brd);
+  line-height: 1.8;
+}
+
+.calculator :global(.custom-grid),
+.calculator :global(.math-grid),
+.calculator :global(.ref-grid) {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+}
+
+.calculator :global(.input-row) {
+  flex-wrap: wrap;
+}
+
+.calculator :global(.input-row input[type="range"]) {
+  min-width: 80px;
+}
+
+.calculator :global(.input-row input[type="number"]) {
+  min-height: 40px;
+}
+
+.calculator :global(.time-badges) {
+  gap: 6px;
+  margin: 28px 0 16px;
+}
+
+.calculator :global(.time-badge) {
+  border-radius: 5px;
+}
+
+.calculator :global(.tabs) {
+  width: fit-content;
+  max-width: 100%;
+  padding: 5px;
+  margin-bottom: 18px;
+  background: var(--bg2);
+  border: 1px solid var(--brd);
+  border-radius: 12px;
+}
+
+.calculator :global(.tab-btn) {
+  min-height: 44px;
+  padding: 10px 22px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+}
+
+.calculator :global(.tab-btn.active) {
+  background: #203b60;
+  border-color: #466b99;
+  color: #f0f6ff;
+  box-shadow: 0 2px 6px #00000026;
+}
+
+.calculator :global(.table-wrap) {
+  border-radius: 12px;
+  background: var(--bg2);
+  scrollbar-color: var(--brd2) var(--bg2);
+}
+
+.calculator :global(thead th) {
+  padding: 16px 14px;
+  font-size: 11px;
+  background: #18263c;
+}
+
+.calculator :global(td) {
+  padding: 13px 14px;
+}
+
+.calculator :global(tbody tr:hover) {
+  background: #192b43;
+}
+
+.calculator :global(.group-header td) {
+  padding: 12px 14px;
+  background: #142035;
+  border-top: 1px solid var(--brd2);
+}
+
+.calculator :global(.model-cell) {
+  gap: 4px;
+}
+
+.calculator :global(.model-name) {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.calculator :global(.cost-wrap) {
+  font-variant-numeric: tabular-nums;
+  line-height: 1.6;
+}
+
+.calculator :global(.cost-usd) {
+  font-size: 13px;
+}
+
+.calculator :global(.cost-jpy) {
+  font-size: 11px;
+  color: #bccbe0;
+  opacity: 1;
+}
+
+.calculator :global(.cc-7),
+.calculator :global(.cc-8),
+.calculator :global(.cc-9),
+.calculator :global(.cc-10) {
+  color: #fda4a4;
+}
+
+.calculator :global(.math-card),
+.calculator :global(.ref-card) {
+  padding: 20px;
+  border-radius: 10px;
+  min-width: 0;
+}
+
+.calculator :global(.formula) {
+  overflow-wrap: anywhere;
+}
+
+.calculator :global(.note-box),
+.calculator :global(.disclaimer-box) {
+  padding: 16px 20px;
+  line-height: 1.9;
+  border-radius: 10px;
+}
+
+.calculator :global(footer) {
+  padding: 24px 48px;
+  line-height: 1.8;
+}
+
+@media (max-width: 900px) {
+  .calculator :global(.hero) {
+    padding: 76px 24px 32px;
+  }
+
+  .calculator :global(.container) {
+    padding: 24px 20px 48px;
+  }
+
+  .calculator :global(.scenarios) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 540px) {
+  .calculator :global(.hero) {
+    padding-inline: 16px;
+  }
+
+  .calculator :global(.container) {
+    padding-inline: 12px;
+  }
+
+  .calculator :global(.panel),
+  .calculator :global(.math-section),
+  .calculator :global(.ref-section) {
+    padding: 18px 14px;
+  }
+
+  .calculator :global(.scenario-btn) {
+    gap: 8px;
+    padding: 12px;
+    font-size: 12px;
+  }
+
+  .calculator :global(.scenario-btn .rate) {
+    flex-basis: 100%;
+    text-align: left;
+    padding-left: 16px;
+  }
+
+  .calculator :global(.tabs) {
+    width: 100%;
+  }
+
+  .calculator :global(.tab-btn) {
+    flex: 1;
+    padding: 10px 8px;
+    font-size: 12px;
+  }
+
+  .calculator :global(.cell-note-label) {
+    flex-basis: 100%;
+    margin-top: 4px;
+  }
+
+  .calculator :global(footer) {
+    padding: 20px 16px;
+  }
+}

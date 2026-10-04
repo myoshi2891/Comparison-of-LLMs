@@ -33,6 +33,23 @@ describe("/whats-new page", () => {
     expect(container.textContent).toContain(newest.summary);
   });
 
+  it("新着セクションで Home は「再公開」、他ページは「公開」ラベルを使う", () => {
+    // Arrange
+    const newest = byAddedAtDesc(12);
+    const { container } = render(<Page />);
+    const section = container.querySelector('section[aria-labelledby="newest"]');
+
+    // Act
+    const labels = Array.from(section?.querySelectorAll("li") ?? []).map((li) => {
+      const date = li.querySelector("time")?.parentElement?.textContent ?? "";
+      return date.replace(/\s*\d{4}-\d{2}-\d{2}$/, "").trim();
+    });
+
+    // Assert
+    expect(labels).toEqual(newest.map((e) => (e.slug === "/" ? "再公開" : "公開")));
+    expect(section?.textContent).toContain("Home は価格データの更新日を再公開日として表示");
+  });
+
   it("最近更新セクションが lastReviewed 降順の先頭ページを含む", () => {
     const freshest = byLastReviewedDesc(1)[0];
     const { container } = render(<Page />);

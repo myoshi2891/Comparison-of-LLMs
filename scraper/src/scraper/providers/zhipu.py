@@ -18,6 +18,7 @@ _URL = "https://z.ai/pricing"
 
 _GLM_5_3 = "GLM-5.3"
 _GLM_4_6 = "GLM-4.6"
+_GLM_5_3_FLASHX = "GLM-5.3-FlashX"
 _GLM_5_3_FLASH = "GLM-5.3-Flash"
 
 # フォールバック価格（USD / 1M tokens）
@@ -25,30 +26,35 @@ _FALLBACKS: dict[str, tuple[float, float]] = {
     _GLM_5_3:         ( 1.40,  4.40),
     "GLM-5.2":        ( 1.40,  4.40),
     _GLM_4_6:         ( 0.60,  2.20),
+    _GLM_5_3_FLASHX:  ( 0.37,  1.25),
     _GLM_5_3_FLASH:   ( 0.15,  0.50),
 }
 _TAG = {
     _GLM_5_3:         "最新 Flagship",
     "GLM-5.2":        "Stable",
     _GLM_4_6:         "Budget",
+    _GLM_5_3_FLASHX:  "Fast",
     _GLM_5_3_FLASH:   "Budget",
 }
 _CLS = {
     _GLM_5_3:         "tag-oss",
     "GLM-5.2":        "tag-oss",
     _GLM_4_6:         "tag-oss",
+    _GLM_5_3_FLASHX:  "tag-oss",
     _GLM_5_3_FLASH:   "tag-oss",
 }
 _SUB_JA = {
     _GLM_5_3:         "最新旗艦 / OSS / 高コスパ",
     "GLM-5.2":        "前世代旗艦 / OSS",
     _GLM_4_6:         "低コスト枠 / OSS / 前世代 (公式値へ修正)",
+    _GLM_5_3_FLASHX:  "Flash の高速版 / OSS / 低遅延向け",
     _GLM_5_3_FLASH:   "最安クラス / OSS / 大量処理向け",
 }
 _SUB_EN = {
     _GLM_5_3:         "Latest flagship / OSS / cost-efficient",
     "GLM-5.2":        "Prev flagship / OSS",
     _GLM_4_6:         "Budget tier / OSS / prev-gen (corrected to official)",
+    _GLM_5_3_FLASHX:  "Faster Flash variant / OSS / low latency",
     _GLM_5_3_FLASH:   "Cheapest class / OSS / high-volume",
 }
 
@@ -88,6 +94,9 @@ def scrape(existing: list[ApiModel] | None = None) -> list[ApiModel]:
         ])
         pi, si = sanity_check(in_price, f"Zhipu/{name}/in", fb_in)
         po, so = sanity_check(out_price, f"Zhipu/{name}/out", fb_out)
+        # 片側だけ抽出できた混成ペアは採用しない（取れた側も誤抽出のことが多い）
+        if si != so:
+            pi, po = fb_in, fb_out
         models.append(ApiModel(
             provider=_PROVIDER,
             name=name,

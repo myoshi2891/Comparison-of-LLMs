@@ -140,6 +140,21 @@ class TestWindsurf:
         assert pro.monthly == 18
         assert pro.scrape_status == "success"
 
+    @pytest.mark.parametrize(
+        "html",
+        [
+            # 基本料 $80/month を席単価として拾わない（2026-09 の料金ページ表記）
+            "<p>Teams $80/month base + $45/month per full developer seat</p>",
+            # 省略表記 "/mo per full dev seat" でも席単価を抽出する
+            "<p>Teams $80/mo base + $45/mo per full dev seat</p>",
+        ],
+    )
+    def test_teams_extracts_per_seat_not_base_fee(self, html):
+        tools = _run(windsurf, html)
+        teams = _find(tools, "Teams")
+        assert teams.monthly == 45
+        assert teams.scrape_status == "success"
+
     def test_fallback_on_empty_html(self):
         _assert_all_fallback(_run(windsurf, _EMPTY), windsurf._FALLBACKS)
 

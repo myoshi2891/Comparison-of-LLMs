@@ -76,12 +76,12 @@ flowchart LR
 
 ### 1-3. モデルファミリーの現在地（書籍執筆時 vs 2026年9月）
 
-書籍執筆時（2023年）はGPT-3.5/4、PaLM、Llama 2、Claude 1〜3が主な選択肢でした。2026年9月時点では各社のモデルが大きく世代交代しています。
+書籍執筆時（2023年）はGPT-3.5/4、PaLM、Llama 2、Claude 1〜2が主な選択肢でした。2026年9月時点では各社のモデルが大きく世代交代しています。
 
 | モデルファミリー | 開発元 | 書籍執筆時（2023年） | 2026年9月時点の位置づけ |
 |---|---|---|---|
-| GPTシリーズ | OpenAI | GPT-3.5 / GPT-4 | GPT-5世代へ進化、エージェント用途の関数呼び出しが標準化 |
-| Claudeシリーズ | Anthropic | Claude 1〜3 | Claude Opus 5.5 / Sonnet 5 / Haiku 4.5 の構成に加え、上位ティアの Claude Fable 5.1 が登場（出典: [Anthropic Models overview](https://docs.claude.com/en/docs/about-claude/models/overview)） |
+| GPTシリーズ | OpenAI | GPT-3.5 / GPT-4 | GPT-6世代へ進化。**GPT-6 Astra**（最上位）は API（`gpt-6-astra`）・Microsoft Foundry・ChatGPT で提供中。ChatGPT では Pro $100 / Pro $200 / Business / Enterprise が Astra 搭載の GPT-6 Pro を利用でき、Plus は ChatGPT Work と Codex 内でのみ利用可能（Enterprise / Edu は既定で無効、管理者が有効化）。利用量は各プランの既存の利用枠から消費され、対象プラン・アカウントでは超過分をクレジットの追加購入で補える（Enterprise 契約では超過分が該当するトークン単価で課金される場合がある）。**GPT-6 Sol / Luna**（2026年9月22日発表の高速・低価格版）は API・**ChatGPT Work**・Codex で提供開始済み（通常の ChatGPT では利用不可）。Microsoft Foundry では一般提供済み（出典: [OpenAI: GPT-6 Astra](https://openai.com/index/gpt-6-astra/)、[OpenAI Developer Community: GPT-6 Sol / Luna](https://community.openai.com/t/announcing-gpt-6-sol-and-gpt-6-luna-in-the-api-codex-and-chatgpt/1399925)、[Microsoft Azure Blog: GPT-6 Astra, Sol, and Luna in Microsoft Foundry](https://azure.microsoft.com/en-us/blog/gpt-6-astra-sol-and-luna-for-production-agents-in-microsoft-foundry/)、[OpenAI Help Center: Managing usage with GPT-6 Astra](https://help.openai.com/en/articles/20001516-managing-usage-with-gpt-6-astra-in-work-and-codex)） |
+| Claudeシリーズ | Anthropic | Claude 1〜2 | Claude Opus 5.5 / Sonnet 5.5 / Haiku 4.5 の構成に加え、上位ティアの Claude Fable 5.1 が登場（出典: [Anthropic Models overview](https://docs.claude.com/en/docs/about-claude/models/overview)） |
 | Gemini / PaLM | Google | PaLM, 初代Gemini | Gemini 3系へ進化 |
 | Llamaシリーズ | Meta | Llama 2 | 後継モデル群へ世代交代、オープンウェイト戦略が継続 |
 
@@ -171,12 +171,43 @@ LangChain 1.0（2025年10月リリース）以降、`langchain` パッケージ�
 
 ### 3-3. APIキーの設定
 
+```bash
+# APIキーはソースコードに書かず、シェル・CIのシークレット・.env（Git管理外）で設定する
+export ANTHROPIC_API_KEY="..."
+# 以下は OpenAI / Google のインテグレーションを使う場合のみ（任意）
+export OPENAI_API_KEY="..."
+export GOOGLE_API_KEY="..."
+```
+
+`.env` ファイルを使う場合、Python は `.env` を自動では読み込みません。次のどちらかの方法で、`os.environ` を読む前に環境変数へ反映してください。
+
+```bash
+# 方法1: 実行前にシェルへ読み込む（macOS / Linux）
+set -a; source .env; set +a
+
+# 方法2: python-dotenv を使い、コード内で読み込む
+pip install -U python-dotenv
+```
+
 ```python
 import os
 
-os.environ["ANTHROPIC_API_KEY"] = "sk-ant-..."
-os.environ["OPENAI_API_KEY"] = "sk-..."
-os.environ["GOOGLE_API_KEY"] = "..."
+from dotenv import load_dotenv
+
+# .env の値を環境変数へ反映する（方法2の場合。os.environ を読む前に呼ぶ）
+# 既にシェルで設定済みの環境変数は上書きしない
+load_dotenv()
+
+# 各インテグレーションは環境変数から自動でキーを読み込むため、コード内でキーを代入しない
+# 次節の例は Anthropic を使うため、必須なのは ANTHROPIC_API_KEY のみ
+if not os.environ.get("ANTHROPIC_API_KEY"):
+    raise RuntimeError("環境変数が未設定です: ANTHROPIC_API_KEY")
+
+# OpenAI / Google は、それぞれのインテグレーションを使う場合のみ設定する（任意）
+optional = ("OPENAI_API_KEY", "GOOGLE_API_KEY")
+unset = [k for k in optional if not os.environ.get(k)]
+if unset:
+    print(f"任意の環境変数が未設定です（該当プロバイダーを使う場合のみ必要）: {', '.join(unset)}")
 ```
 
 ### 3-4. Chat Modelの基本呼び出し（最初のステップ）
@@ -220,9 +251,9 @@ from langchain_core.tools import tool
 
 @tool
 def search_web(query: str) -> str:
-    """指定したクエリでウェブ検索を行う。"""
-    ...
-    return "検索結果のテキスト"
+    """指定したクエリでウェブ検索を行う（デモ用モック。実際の検索は行わない）。"""
+    # 本番では検索APIの呼び出しに置き換える。ここではクエリを含む固定テキストを返す
+    return f"[モック] 「{query}」の検索結果"
 ```
 
 ### 4-2. 【2026年の標準】`create_agent` とミドルウェア
@@ -239,7 +270,7 @@ agent = create_agent(
 )
 
 result = agent.invoke({
-    "messages": [{"role": "user", "content": "AI安全性の最新トレンドを調べて"}]
+    "messages": [{"role": "user", "content": "search_webで「LangChain」を検索し、結果を要約して"}]
 })
 ```
 
@@ -464,7 +495,7 @@ flowchart TD
 | リソース | 提供元 | 特徴 |
 |---|---|---|
 | LangChain Academy（LangGraphコース） | LangChain公式 | 無料。State machineとしてのエージェント構築、Checkpointerによる永続化、Human-in-the-loop、ストリーミング、LangServe/LangSmithを使ったデプロイまで実践的にカバー。2025〜2026年にかけて継続的に最新パターンへ更新されている |
-| LangChain for LLM Application Development | DeepLearning.AI（Andrew Ng・Harrison Chase講師） | 無料の短期講座（約3時間）。モデル・プロンプト・パーサー、メモリ、チェーン、ドキュメントQ&A、エージェント、評価という基礎概念を、開発者自身であるHarrison Chase氏から直接学べる。2023年収録のためAPIの一部は古いが、概念理解には現在も有用 |
+| LangChain for LLM Application Development | DeepLearning.AI（Andrew Ng・Harrison Chase講師） | 無料の短期講座（約1時間48分）。モデル・プロンプト・パーサー、メモリ、チェーン、ドキュメントQ&A、エージェント、評価という基礎概念を、開発者自身であるHarrison Chase氏から直接学べる。2023年収録のためAPIの一部は古いが、概念理解には現在も有用 |
 | Functions, Tools and Agents with LangChain | DeepLearning.AI | ツール呼び出しとエージェント構築に特化した続編講座 |
 | LangChain公式ドキュメント（docs.langchain.com） | LangChain公式 | `create_agent`、Middleware、Migration Guideなど最新仕様の一次情報源 |
 | LangChain公式ブログ / Changelog | LangChain公式 | バージョンごとの新機能・破壊的変更の告知 |
@@ -513,7 +544,7 @@ flowchart TD
 13. DEV Community「LangChain — Deep Dive」（2026年のLangChain社の事業動向）
     https://dev.to/gautammanak1/langchain-deep-dive-4ill
 14. DeepLearning.AI「LangChain for LLM Application Development」講座ページ
-    https://www.coursera.org/projects/langchain-for-llm-application-development-project
+    https://www.deeplearning.ai/short-courses/langchain-for-llm-application-development/
 15. AI Agent Rank「Best LangChain courses 2026」（学習リソース比較）
     https://aiagentrank.io/blog/best-langchain-courses-2026
 16. ClickIT Tech「LangChain 1.0 vs LangGraph 1.0: Which One to Use in 2026」

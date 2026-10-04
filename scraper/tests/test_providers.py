@@ -717,36 +717,35 @@ def test_aws_revised_hardcoded_price_beats_stale_scraped_value():
     assert m.price_out == expected_out
 
 
-def test_partial_extraction_does_not_inherit_scraped_provenance():
-    """入出力の片方だけ抽出できた混成ペアを「過去のスクレイプ成功値」として記録しない。
+def test_partial_extraction_falls_back_as_pair():
+    """入出力の片方だけ抽出できた場合は混成ペアを作らず、ペアごと 2 層目へ落とす。
 
-    片方だけ抽出できると出力は「今回の抽出値 + 引き継ぎ値」の混成になる。これを
-    `origin="scraped"` で記録すると、次回の完全失敗時に混成ペアが 2 層目として
-    採用されてしまう（= 実際にはスクレイプ成功していない組み合わせが固着する）。
+    片方だけ取れたときは、取れた側も誤抽出（キャッシュ価格や同じ行の別モデルの額）で
+    あることが多い。混成ペアを出力すると pricing.json が汚染されるため、
+    入出力とも fallback_map の値（ここでは過去のスクレイプ成功値）を使う。
     """
-    name = "DeepSeek V4 Flash"
+    name = "DeepSeek V4.1 Flash"
     fb_in, fb_out = deepseek._FALLBACKS[name]
     existing = _stale_existing(
         "DeepSeek", name, "fallback", _scraped_provenance((fb_in, fb_out))
     )
 
-    # 入力価格だけ抽出できる HTML（"output" が無いため出力側は引き継ぎ値に落ちる）
+    # 入力価格だけ抽出できる HTML（"output" が無いため出力側は抽出失敗）
     partial_html = f"<html><body>{name} $0.44 per 1M tokens</body></html>"
     with patch("scraper.providers.deepseek.get_page_text", return_value=partial_html):
         first = deepseek.scrape(existing)
 
     m = _find(first, name)
-    assert m.price_in == 0.44, "入力側は今回の抽出値"
-    assert m.price_out == _STALE_OUT, "出力側は引き継ぎ値"
+    assert (m.price_in, m.price_out) == (_STALE_IN, _STALE_OUT), "混成ペアが出力されている"
     assert m.scrape_status == "fallback"
     assert m.provenance is not None
-    assert m.provenance.origin == "hardcoded", "混成ペアが scraped として記録されている"
+    assert m.provenance.origin == "scraped", "過去のスクレイプ成功値の出自が失われている"
 
-    # 次回実行が完全に失敗しても、混成ペアは 2 層目に採用されずハードコード値へ戻る
+    # 次回実行が完全に失敗しても、同じ 2 層目の値が維持される
     with patch(
         "scraper.providers.deepseek.get_page_text", side_effect=RuntimeError("offline")
     ):
         second = deepseek.scrape(first)
 
     m2 = _find(second, name)
-    assert (m2.price_in, m2.price_out) == (fb_in, fb_out)
+    assert (m2.price_in, m2.price_out) == (_STALE_IN, _STALE_OUT)

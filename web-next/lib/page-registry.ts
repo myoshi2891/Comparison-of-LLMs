@@ -70,8 +70,8 @@ const entries: PageEntry[] = [
     topics: [],
     summary:
       "AI モデルの API 料金とコーディングツールのサブスク料金を時間別に比較するコスト計算機。",
-    addedAt: "2026-04-11",
-    lastReviewed: "2026-04-13",
+    addedAt: "2026-10-03",
+    lastReviewed: "2026-10-03",
   },
   {
     slug: "/agent/context-engineering-best-practices",
@@ -158,6 +158,16 @@ const entries: PageEntry[] = [
       "基盤モデル時代のソフトウェア開発を実務の順序で学ぶ入門ガイド。Chip Huyen著『AI Engineering』の章構成を土台に17セクションで解説。",
     addedAt: "2026-09-17",
     lastReviewed: "2026-09-17",
+  },
+  {
+    slug: "/books/ai-powered-developer",
+    title: "AI-Powered Developer",
+    group: "推薦書籍",
+    topics: ["book", "ai-coding", "llm", "copilot", "tdd", "security"],
+    summary:
+      "Nathan B. Crocker 著『AI-Powered Developer』を土台に、LLMの基礎・設計・実装・テスト・インフラ・セキュリティ・ローカルLLMを学ぶ初学者向けステップガイド。2026年9月の補足動向、用語集、学習チェックリストと出典を収録。",
+    addedAt: "2026-10-03",
+    lastReviewed: "2026-10-03",
   },
   {
     slug: "/books/generative-ai-for-software-development",

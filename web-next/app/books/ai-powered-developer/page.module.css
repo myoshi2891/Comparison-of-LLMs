@@ -1,0 +1,743 @@
+/* Original HTML styles, scoped to this page. Shared Mermaid handles diagram layout. */
+.layout :global(p) {
+  margin: 1em 0;
+}
+.layout :global(h1),
+.layout :global(h2),
+.layout :global(h3),
+.layout :global(h4) {
+  font-weight: 700;
+}
+.layout :global(ul) {
+  list-style-type: disc;
+  padding-left: 40px;
+  margin: 1em 0;
+}
+.layout :global(ol) {
+  list-style-type: decimal;
+  padding-left: 40px;
+  margin: 1em 0;
+}
+.layout :global(a) {
+  text-decoration: underline;
+}
+.layout :global(button),
+.layout :global(input) {
+  font-family: inherit;
+}
+.layout {
+  --paper: #faf6ec;
+  --paper-card: #fffefb;
+  --paper-card-2: #f2ecdd;
+  --ink: #2a241c;
+  --ink-soft: #6b6255;
+  --border: #e6dfc9;
+  --indigo: #4b4394;
+  --indigo-dark: #332c6e;
+  --indigo-soft: rgba(65, 61, 143, 0.07);
+  --gold: #a9740a;
+  --gold-soft: rgba(184, 134, 11, 0.12);
+  --forest: #2f6b4f;
+  --forest-soft: rgba(47, 107, 79, 0.1);
+  --plum: #7c3f6b;
+  --plum-soft: rgba(124, 63, 107, 0.1);
+  --hub-fill: #c9c4ef;
+  --hub-text: #221f52;
+  --done-fill: #bfe4d2;
+  --done-text: #123722;
+  --box-fill: #f5dfa0;
+  --box-text: #4a3c05;
+  --sidebar-w: 288px;
+}
+.layout :global(*) {
+  box-sizing: border-box;
+}
+.layout {
+  scroll-behavior: smooth;
+}
+.layout {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Hiragino Sans,
+    "Hiragino Kaku Gothic ProN",
+    Meiryo,
+    sans-serif;
+  line-height: 1.85;
+  font-size: 16px;
+}
+.layout :global(h1),
+.layout :global(h2),
+.layout :global(h3),
+.layout :global(h4),
+.brandTitle,
+.heroTitle {
+  font-family:
+    "Source Serif 4",
+    Hiragino Mincho ProN,
+    serif;
+}
+.layout :global(a) {
+  color: var(--indigo);
+}
+.layout {
+  display: block;
+}
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: var(--sidebar-w);
+  background: var(--paper-card);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  padding: 1.4rem 0 2rem;
+  z-index: 40;
+}
+.sidebarBrand {
+  padding: 0 1.4rem 1rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 0.8rem;
+}
+.sidebarBrand :global(.ti) {
+  color: var(--indigo);
+  font-size: 1.6rem;
+}
+.brandTitle {
+  font-size: 1.02rem;
+  font-weight: 700;
+  color: var(--indigo-dark);
+  line-height: 1.4;
+  margin: 0.5rem 0 0.2rem;
+}
+.brandSub {
+  font-size: 1rem;
+  color: var(--ink-soft);
+}
+.navGroupLabel {
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-soft);
+  padding: 0.9rem 1.4rem 0.3rem;
+  font-weight: 700;
+}
+.navA {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.42rem 1.4rem;
+  color: var(--ink);
+  text-decoration: none;
+  font-size: 1rem;
+  border-left: 3px solid transparent;
+}
+.navA :global(.ti) {
+  font-size: 1.05rem;
+  color: var(--ink-soft);
+  width: 1.2rem;
+  text-align: center;
+}
+.navA:hover {
+  background: var(--indigo-soft);
+}
+.navA.active {
+  border-left-color: var(--indigo);
+  background: var(--indigo-soft);
+  color: var(--indigo-dark);
+  font-weight: 700;
+}
+.navA.active :global(.ti) {
+  color: var(--indigo);
+}
+.main {
+  margin-left: var(--sidebar-w);
+}
+.section {
+  padding: 3rem 3.4rem;
+  border-bottom: 1px solid var(--border);
+  max-width: none;
+}
+.section:last-of-type {
+  border-bottom: none;
+}
+.prose,
+.prose :global(p),
+.prose :global(li) {
+  max-width: none;
+  overflow-wrap: break-word;
+}
+.layout :global(p),
+.layout :global(li),
+.layout :global(td),
+.layout :global(th),
+.layout :global(dd),
+.layout :global(dt),
+.layout :global(blockquote) {
+  overflow-wrap: break-word;
+}
+.layout :global(code) {
+  overflow-wrap: anywhere;
+}
+.hero {
+  padding: 3.6rem 3.4rem 3rem;
+  background: linear-gradient(180deg, var(--paper-card) 0%, var(--paper) 100%);
+  max-width: none;
+}
+.heroKicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 1rem;
+  color: var(--indigo);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: 0.8rem;
+}
+.heroTitle {
+  font-size: 2.15rem;
+  font-weight: 700;
+  color: var(--indigo-dark);
+  line-height: 1.35;
+  margin: 0 0 0.5rem;
+  max-width: none;
+}
+.heroSub {
+  font-size: 1.2rem;
+  color: var(--ink-soft);
+  font-weight: 600;
+  margin: 0 0 1.4rem;
+  max-width: none;
+}
+.heroNote {
+  background: var(--paper-card);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--indigo);
+  border-radius: 0.5rem;
+  padding: 1.1rem 1.3rem;
+  font-size: 1rem;
+  color: var(--ink-soft);
+  max-width: none;
+}
+.heroNote strong {
+  color: var(--ink);
+}
+.layout :global(h2).hTitle {
+  font-size: 1.55rem;
+  color: var(--indigo-dark);
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0 0 1.2rem;
+}
+.layout :global(h2).hTitle :global(.ti) {
+  font-size: 1.3rem;
+  color: var(--indigo);
+}
+.layout :global(h3) {
+  font-size: 1.18rem;
+  color: var(--ink);
+  margin: 1.8rem 0 0.7rem;
+}
+.layout :global(h3) :global(.ti) {
+  color: var(--forest);
+  margin-right: 0.35rem;
+}
+.stepBadge {
+  display: inline-block;
+  background: var(--indigo);
+  color: #fff;
+  font-weight: 700;
+  font-size: 1rem;
+  padding: 0.25rem 0.7rem;
+  border-radius: 1rem;
+  margin-bottom: 0.6rem;
+  letter-spacing: 0.03em;
+}
+.callout {
+  display: flex;
+  gap: 0.8rem;
+  background: var(--paper-card);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--gold);
+  border-radius: 0.5rem;
+  padding: 1.1rem 1.3rem;
+  margin: 1.3rem 0;
+}
+.callout :global(.ti) {
+  font-size: 1.3rem;
+  color: var(--gold);
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+.calloutBody {
+  flex: 1;
+  min-width: 0;
+}
+.calloutBody :global(p) {
+  margin: 0.3rem 0;
+}
+.calloutTitle {
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 0.3rem;
+  display: block;
+}
+.callout.update {
+  border-left-color: var(--forest);
+}
+.callout.update :global(.ti) {
+  color: var(--forest);
+}
+.tableWrap {
+  overflow-x: auto;
+  overflow-y: hidden;
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-radius: 0.6rem;
+  margin: 1.2rem 0;
+}
+.tableTitle {
+  background: var(--indigo-soft);
+  color: var(--indigo-dark);
+  font-weight: 700;
+  padding: 0.6rem 1rem;
+  border-bottom: 1px solid var(--border);
+  font-size: 1rem;
+}
+.layout :global(table) {
+  border-collapse: collapse;
+  width: 100%;
+  min-width: 480px;
+  font-size: 1rem;
+}
+.layout :global(table).kvTable {
+  min-width: 0;
+}
+.layout :global(th),
+.layout :global(td) {
+  padding: 0.62rem 0.9rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  overflow-wrap: anywhere;
+}
+.layout :global(thead) :global(th) {
+  background: var(--indigo-dark);
+  color: #fff;
+  font-weight: 700;
+}
+.layout :global(tbody) :global(tr):nth-child(even) {
+  background: rgba(65, 61, 143, 0.045);
+}
+.layout :global(table).kvTable :global(tbody) :global(tr):nth-child(even) {
+  background: transparent;
+}
+.layout :global(table).kvTable :global(th) {
+  background: transparent;
+  color: var(--ink);
+  font-weight: 700;
+  border-right: 1px solid var(--border);
+  width: 11rem;
+}
+.layout :global(table).kvTable :global(tr):hover {
+  background: var(--indigo-soft);
+}
+.layout :global(table) :global(tr):hover {
+  background: var(--indigo-soft);
+}
+.bookCard {
+  display: flex;
+  gap: 1.6rem;
+  flex-wrap: wrap;
+  align-items: stretch;
+  margin: 1.3rem 0;
+}
+.bookCover {
+  flex: 0 0 180px;
+  min-height: 230px;
+  background: linear-gradient(155deg, var(--indigo) 0%, var(--indigo-dark) 100%);
+  border-radius: 0.6rem;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1.3rem 1.1rem;
+  box-shadow: 0 8px 20px rgba(51, 44, 110, 0.25);
+}
+.bookCover :global(.ti) {
+  font-size: 2.1rem;
+  opacity: 0.9;
+}
+.bookCoverTitle {
+  font-family: "Source Serif 4", serif;
+  font-weight: 700;
+  font-size: 1.05rem;
+  line-height: 1.4;
+}
+.bookCoverAuthor {
+  font-size: 1rem;
+  opacity: 0.85;
+}
+.bookCardBody {
+  flex: 1;
+  min-width: 240px;
+}
+.diagramWrap {
+  margin: 1.4rem 0;
+}
+.diagramCaption {
+  font-size: 1rem;
+  color: var(--ink-soft);
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+.layout :global(pre).mermaidSrc {
+  display: none;
+}
+.mermaidWrap {
+  overflow-x: auto;
+  background: var(--paper-card);
+  border: 1px solid var(--border);
+  border-radius: 0.6rem;
+  padding: 1.4rem 0.8rem;
+}
+.diagramLoading {
+  color: var(--ink-soft);
+  font-size: 1rem;
+  padding: 1rem;
+}
+.checklist {
+  list-style: none;
+  margin: 1.2rem 0;
+  padding: 0;
+}
+.checklist :global(li) {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+  padding: 0.55rem 0;
+  border-bottom: 1px solid var(--border);
+}
+.checklist :global(li):last-child {
+  border-bottom: none;
+}
+.checklist :global(input)[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 1.25rem;
+  height: 1.25rem;
+  flex-shrink: 0;
+  margin-top: 0.15rem;
+  border: 2px solid var(--indigo);
+  border-radius: 0.3rem;
+  cursor: pointer;
+  position: relative;
+  font-size: 1rem;
+}
+.checklist :global(input)[type="checkbox"]:checked {
+  background: var(--forest);
+  border-color: var(--forest);
+}
+.checklist :global(input)[type="checkbox"]:checked::after {
+  content: "✓";
+  position: absolute;
+  top: -3px;
+  left: 2px;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 700;
+}
+.checklist :global(label) {
+  cursor: pointer;
+}
+.checklist :global(li).done :global(label) {
+  color: var(--ink-soft);
+  text-decoration: line-through;
+}
+.checklistCounter {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--forest-soft);
+  color: var(--forest);
+  font-weight: 700;
+  padding: 0.4rem 1rem;
+  border-radius: 1.2rem;
+  margin-bottom: 1rem;
+  font-size: 1rem;
+}
+.glossary :global(dt) {
+  font-weight: 700;
+  color: var(--indigo-dark);
+  margin-top: 0.9rem;
+}
+.glossary :global(dd) {
+  margin: 0.25rem 0 0;
+}
+.refGroupTitle {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--plum);
+  margin: 1.6rem 0 0.6rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.refGroupTitle :global(.ti) {
+  font-size: 1.05rem;
+}
+.refCard {
+  display: flex;
+  gap: 0.8rem;
+  background: var(--paper-card);
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  padding: 0.8rem 1rem;
+  margin-bottom: 0.6rem;
+}
+.refNum {
+  flex-shrink: 0;
+  width: 2.1rem;
+  height: 2.1rem;
+  border-radius: 50%;
+  background: var(--plum-soft);
+  color: var(--plum);
+  font-weight: 700;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.refBody {
+  flex: 1;
+  min-width: 0;
+}
+.refTitle {
+  font-weight: 700;
+  color: var(--ink);
+}
+.refUrl {
+  font-size: 1rem;
+  color: var(--indigo);
+  word-break: break-all;
+}
+.cite {
+  font-size: 1rem;
+  vertical-align: super;
+  text-decoration: none;
+  color: var(--indigo);
+  font-weight: 700;
+}
+.layout :global(sup) {
+  font-size: 1rem;
+  vertical-align: super;
+  line-height: 0;
+}
+.summaryBox {
+  background: var(--forest-soft);
+  border: 1px solid var(--border);
+  border-radius: 0.6rem;
+  padding: 1.3rem 1.5rem;
+  margin-top: 1rem;
+}
+.tag {
+  display: inline-block;
+  background: var(--gold-soft);
+  color: var(--gold);
+  font-size: 1rem;
+  font-weight: 700;
+  padding: 0.2rem 0.7rem;
+  border-radius: 1rem;
+  margin: 0.15rem 0.3rem 0.15rem 0;
+}
+.mobileBar {
+  display: none;
+}
+.mobileBar,
+.mobileBar :global(*) {
+  font-size: 1rem;
+}
+.mobileBar :global(button) {
+  display: none;
+  font-size: 1rem;
+}
+.scrim {
+  display: none;
+}
+@media (max-width: 980px) {
+  .sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
+  }
+  .sidebar.open {
+    transform: translateX(0);
+  }
+  .main {
+    margin-left: 0;
+  }
+  .mobileBar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: var(--paper-card);
+    border-bottom: 1px solid var(--border);
+    padding: 0.7rem 1rem;
+  }
+  .mobileBar .brand {
+    font-weight: 700;
+    color: var(--indigo-dark);
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .mobileBar :global(button) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.2rem;
+    height: 2.2rem;
+    border-radius: 0.4rem;
+    border: 1px solid var(--border);
+    background: var(--paper-card);
+    color: var(--ink);
+    font-size: 1.3rem;
+  }
+  .scrim.open {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+    z-index: 39;
+  }
+  .section,
+  .hero {
+    padding: 2rem 1.3rem;
+  }
+  .bookCover {
+    flex: 0 0 140px;
+    min-height: 190px;
+  }
+}
+
+/* Integration with the fixed site header and Tailwind's browser reset. */
+.layout {
+  width: 100%;
+  max-width: 100%;
+  color-scheme: light;
+}
+.main {
+  min-width: 0;
+  width: calc(100% - var(--sidebar-w));
+}
+.sidebar {
+  top: calc(var(--header-height, 60px) + var(--ch-disclaimer-height, 0px));
+  height: calc(100dvh - var(--header-height, 60px) - var(--ch-disclaimer-height, 0px));
+}
+.layout .checklist {
+  list-style: none;
+  padding: 0;
+  margin: 1.2rem 0;
+}
+.layout :global(th),
+.layout :global(td),
+.layout :global(thead th:not(:first-child)) {
+  text-align: left !important;
+}
+.layout :global(h1),
+.layout :global(h2),
+.layout :global(h3),
+.layout :global(section[id]),
+.layout :global(header[id]) {
+  scroll-margin-top: calc(var(--header-height, 60px) + var(--ch-disclaimer-height, 0px) + 80px);
+}
+.layout :global(input[type="checkbox"]) {
+  box-sizing: border-box;
+}
+@media (max-width: 980px) {
+  .sidebar {
+    visibility: hidden;
+    pointer-events: none;
+  }
+  .sidebar.open {
+    visibility: visible;
+    pointer-events: auto;
+  }
+  .mobileBar {
+    top: calc(var(--header-height, 60px) + var(--ch-disclaimer-height, 0px));
+  }
+  .main {
+    width: 100%;
+  }
+}
+/* Equivalent to the original runtime classDef block; chart text remains unchanged. */
+.mermaidWrap :global(.hub rect),
+.mermaidWrap :global(.hub polygon),
+.mermaidWrap :global(.hub path) {
+  fill: var(--hub-fill) !important;
+  stroke: var(--hub-text) !important;
+  stroke-width: 1px !important;
+}
+.mermaidWrap :global(.hub .nodeLabel) {
+  color: var(--hub-text) !important;
+}
+.mermaidWrap :global(.hub text) {
+  fill: var(--hub-text) !important;
+}
+.mermaidWrap :global(.done rect),
+.mermaidWrap :global(.done polygon),
+.mermaidWrap :global(.done path) {
+  fill: var(--done-fill) !important;
+  stroke: var(--done-text) !important;
+  stroke-width: 1px !important;
+}
+.mermaidWrap :global(.done .nodeLabel) {
+  color: var(--done-text) !important;
+}
+.mermaidWrap :global(.done text) {
+  fill: var(--done-text) !important;
+}
+.mermaidWrap :global(.box rect),
+.mermaidWrap :global(.box polygon),
+.mermaidWrap :global(.box path) {
+  fill: var(--box-fill) !important;
+  stroke: var(--box-text) !important;
+  stroke-width: 1px !important;
+}
+.mermaidWrap :global(.box .nodeLabel) {
+  color: var(--box-text) !important;
+}
+.mermaidWrap :global(.box text) {
+  fill: var(--box-text) !important;
+}
+
+/* Shared chrome overrides for this page live in app/globals.css (body:has scope). */
+.freshness {
+  padding: 1rem 3.4rem 0;
+  color: #000;
+  background: var(--paper);
+  font-size: 0.8rem;
+  text-align: right;
+}
+@media (max-width: 980px) {
+  .freshness {
+    padding: 1rem 1.5rem 0;
+  }
+}
+
+.main .hero {
+  margin: 0.75rem 1rem;
+}
+.hero .heroNote {
+  margin-top: 1rem;
+}

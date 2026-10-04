@@ -2,7 +2,7 @@
 
 > 本ファイルは Next.js 移行完了後の保守・改善フェーズにおける開発の進捗（特にテスト関連）および品質チェックのルールを記録する。
 >
-> - 最終更新日: **Updated 2026-09-17**
+> - 最終更新日: **Updated 2026-10-03**
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
 
@@ -10,17 +10,37 @@
 
 - **フェーズ**: 保守・機能改善・品質強化フェーズ
 - **ブランチ**: `dev`（本番 `main` への Next.js 移行マージ完了 🚀）
+- **最新実装 HEAD**: `c9ddda02`（AI-Powered Developer 日付右寄せ・ヒーロー余白。表構造と共通レイアウト修正は `1021dde4`）
+- **次の作業**: `/books/ai-powered-developer` の目視確認（ユーザー担当）。ビルドは今回の依頼では実行しない。
+- **ルート実数**: `page.tsx` 84 件、registry 85 エントリ（RSS の `/rss.xml` を含む）。全ルート登録・ナビ導出テストは合格。
 - **動作検証**:
-  - `bun run build` ✅（Compiled successfully / 90 静的ページを生成。2026-09-17 実測）
-  - `bun run typecheck` ✅（`tsc --noEmit`。2026-09-17 実測）
-  - `bun run lint` ✅（Biome check / 4 files / 0 diagnostics。2026-09-17 実測）
+  - ビルド: 今回はユーザー指定で未実行。過去の成功記録は 2026-09-17 の 90 静的ページであり、今回の変更を検証した値ではない。
+  - `bun run typecheck` ✅（`tsc --noEmit`。2026-10-03 実測）
+  - `bun run lint` ✅（Biome check / 504 files / 0 diagnostics。2026-10-03 実測）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: `bun run test` で Vitest **177 files / 1639 tests すべて合格**（2026-09-17 実測。全 Green ✅）
+  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test` で Vitest **183 files / 1727 tests すべて合格**（2026-10-03 実測。全 Green ✅）
+    - 開始時のベースラインは **180 files / 1682 tests**。この実行環境では通常実行で既存 Checklist 5 件が Node の `localStorage` により失敗するため、実行時オプションだけで回避した。依存・設定ファイルは変更していない。
     - `load(sourceHtml)` をモジュール初期化時に呼ぶ `governance/ai-governance/GuideContent.tsx` と
       `local-llm/finetuning-best-practices/GuideContent.tsx` は、import スモークでも読み込み可能であることを確認済み
   - **バックエンド (`scraper/`)**: pytest 実行で **100 件すべて合格** (2026-09-17 実測。全 Green ✅)
 
 ## 最近の追加内容
+
+- **AI-Powered Developer のコンソールエラー・共通レイアウト修正（2026-10-03）**:
+  - 全7表の `table`／`thead`／`tbody`／`tr` 直下から空白テキストを除去。明示的な `{" "}` だけでなく、同一行のタグ間空白も検査する。React要素ツリーの全表構造を走査し、許可する子要素以外・文字列ノードが一切ないことを完全一致で検証。
+  - 日付は registry の `lastReviewed`／`addedAt` を使い、本文の最初に黒文字・右寄せで表示。ページ限定で共通日付バーを非表示にし、bodyの追加10pxとサイドバーの追加16pxを除去。免責バナー直下から本文とサイドバーの背景が始まる。
+  - 共通「関連ページ」はデスクトップでサイドバー幅288pxを避け、980px以下では左余白を0に戻す。本ページ限定の淡色変数を渡す。ヒーロー周囲に0.75rem／1rem、「本ガイドについて」の上に1remの余白を追加。
+  - 回帰テスト5件を追加（ページ合計45件）。原本の固定オラクルは変更せず、追加日付要素だけを原本クラス照合から除外して別途検証。原本監査exit 0、全体183 files／1727 tests、typecheck・lintを確認。Red `744192c8` → Green `1021dde4` → Refactor `dd0d38c9`、追加指定Red `5628bfea` → Green `c9ddda02` を分離。
+  - CSS変更後に開発サーバーを停止し、キャッシュを一時ディレクトリへ退避してポート3000で再起動。npm・ビルド・ブラウザ自動確認は未実行、目視確認はユーザー担当。
+
+- **AI-Powered Developer ガイド（/books/ai-powered-developer）の Next.js 移行（2026-10-03）**:
+  - 原本の全18 H2・25 H3・45段落・10リスト／35項目・7表／46行・9 Mermaid・9更新callout・10項目チェックリスト・22参考文献カードを Pure JSX へ転写。
+  - 事前に原本から固定した `source-contract.json` で本文・リンク・見出し・リストの型と全項目・表の全セル・アイコン／クラス・99 CSSルールとレスポンシブ指定を順序込みで照合。箇条書きの点、番号付きリスト指定、チェックリストのマーカーなし、表の全列左寄せを追加検証。
+  - 原本照合監査 `audit_source_parity.mjs` は exit 0。監査上の callout 10 件は更新callout 9 件と `ti-alert-triangle` アイコン 1 件であり、実際のcallout 9 件は内容・順序・variant まで別途テストする。
+  - 契約テスト26件と操作テスト14件を追加。目次の追従・980px境界・トグル／scrim／Escape／リンクによる開閉・フォーカス／inert・resize・フレームとイベントのcleanup・チェック状態とカウンターを検証。`TocObserver.tsx` のカバレッジは lines/functions 100%、branches 94.44%（対象限定実測）。
+  - Next.js との統合差分: サイドバーを固定のまま共有ヘッダー＋動的免責バナーの下へ配置。Tailwind が消すブラウザ標準のリスト・段落余白を復元。Mermaid のサイズ・中央寄せは共有部品へ委譲し、原本 runtime classDef の hub/done/box 配色はページ限定の SVG CSS へ転写。共有部品の foreignObject 色上書きを避けるため SVG ラベルを使い、図ソース自体は完全一致を維持。
+  - 原本 HTML／Markdown はそれぞれ `archive/html/books/AI-Powered-Developer.html`／`archive/md/books/AI-Powered-Developer.md` へ退避。移動前後の SHA-256 が一致し、内容は無変更。移行の正本は指定された HTML。本文の情報基準日は原本の2026-09-17を保持し、情報更新は行っていない。
+  - 推薦書籍グループに registry 登録し、ナビ・検索・RSS・関連リンクへ自動導出。新規ルート・ナビの全単射テストも合格。Red `071b4e2b`、追加Red `1dcf1808`、Green `557d0f16`、Refactor `e3e4d28d` を分離。CSS 整理後の40契約・typecheck・対象Biome・監査も合格。ビルド・npm・ブラウザ自動確認は実行していない。目視はユーザー担当。
 
 - **ITIL AI Governance (Version 5) 完全学習ガイド（/governance/itil-ai-governance-v5）の Next.js アプリ移行 & ナビ「資格試験」グループ新設**:
   - `Itil-ai-governance-v5-study-guide.html` を `web-next/app/governance/itil-ai-governance-v5/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。
@@ -55,7 +75,6 @@
   - 原本照合監査スクリプト `audit_source_parity.mjs` で exit code 0（漏れなし ✅）を確認。
   - `web-next/lib/page-registry.ts` に新規エントリ（`slug: "/books/generative-ai-for-software-development"`, `group: "推薦書籍"`）を登録。
   - 契約テスト17件（S-1〜S-4, C-1〜C-6, D-1, D-5, D-7, D-8, Q-1〜Q-3）を作成し、Vitest **175 files / 1600 tests** 全 Green ✅、typecheck ✅、Biome lint ✅ を確認。
-
 
 - **月次価格更新 2026-09 & スクレイパーのフォールバック優先順位バグ修正** (HEAD `3af819c4`):
   - `pricing.json` が 2026-07-24 で約 7 週間停滞していたため、各社公式料金ページを実地調査して更新。
@@ -102,7 +121,6 @@
   - `web-next/lib/page-registry.ts` に新規エントリ（`slug: "/google/multi-agent-best-practices"`）を登録し、グローバルナビゲーション（`components/site/nav-links.ts`）に自動導出。
   - 契約テスト20件（S-1〜S-4, C-1〜C-6, D-5〜D-8, Q-2〜Q-3）を作成し、Vitest **170 files / 1539 tests** 全 Green ✅、typecheck ✅、Biome lint ✅ を確認。
 
-
 - **AI仕様駆動開発におけるMarkdownファイル実践ガイド（/codex/skill）の Pure JSX 完全置き換え移行**:
   - `Ai-spec-driven-development-markdown-best-practices.html` を `web-next/app/codex/skill/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。
   - 要約・省略一切なしで全15章（SDDとは何か〜参考文献）、全12サブセクション（h3）、全表（3個）、全コードブロック（4個：CopyButton & Atom One Dark シンタックスハイライト対応）、4個のMermaid図解（`MermaidDiagram`）、TOCスクロール追従・モバイルドロワー（`TocObserver.tsx`）、全12項目のチェックリスト、全33件の参考文献・外部リンク安全属性（`target="_blank" rel="noopener noreferrer"`）、callout（3個）を完全再現。
@@ -110,14 +128,12 @@
   - 原本 `Ai-spec-driven-development-markdown-best-practices.html` は `archive/html/SDD/Ai-spec-driven-development-markdown-best-practices.html` へ退避保存。
   - 契約テスト21件（S-1〜S-4, C-1〜C-6, D-1〜D-8, Q-2〜Q-3）を作成し、Vitest **169 files / 1510 tests** 全 Green ✅、typecheck ✅、Biome lint ✅ を確認。
 
-
 - **GitHub Copilot Code Review 実践ガイド（/code-review/copilot-code-review）の Pure JSX 完全置き換え移行**:
   - `Github-copilot-code-review-best-practices.html` を `web-next/app/code-review/copilot-code-review/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。
   - 要約・省略一切なしで全13セクション（はじめに〜参考文献・出典）、全15サブセクション（h3）、全8サブセクション（h4）、全表、全コードブロック、5個のMermaid図解（`MermaidDiagram`）、TOCスクロール追従（`TocObserver.tsx`）、全25件の参考文献・外部リンク安全属性（`target="_blank" rel="noopener noreferrer"`）、callout、チェックリストを完全再現。
   - 原本 `Github-copilot-code-review-best-practices.html` は `archive/html/Microsoft/Github-copilot-code-review-best-practices.html` へ退避保存。
   - 原本照合監査スクリプト `audit_source_parity.mjs` で exit code 0（漏れなし ✅）を確認。
   - 契約テスト16件および TocObserver テスト1件（計17件）を作成・更新し、Vitest **168 files / 1496 tests** 全 Green ✅、typecheck ✅、Biome lint ✅ を確認。
-
 
 - **Next.js ガイドページ移行スキル（nextjs-page-migration）のブラッシュアップ & デザイン移行チェックリスト整備**:
   - 原本 HTML からの移行時に頻発していた「デザイン・CSS 移行漏れ」（サイドバー配色、コードブロック配色、全幅レイアウト、CDN リンク、リスト要素型、`pre code` リセット、テキスト・段落色）を根絶するため、スキル体系を大幅強化。
@@ -240,3 +256,19 @@
 - **Claude Code AI仕様駆動開発ガイド（/claude/skill）の Pure JSX 完全置き換え移行**: `Claude-code-spec-driven-development-guide.html` を `web-next/app/claude/skill/page.tsx` に Pure JSX として 100% Faithful 完全移植 🚀。要約・省略なしで全15セクション（s0〜s14）・全表・全コードブロック・5 Mermaid図 (`diagram-workflow`, `diagram-login-sequence`, `diagram-implementation`, `diagram-context-loading`, `diagram-data-flow`)・TOCスクロール追従（`TocObserver.tsx`）・外部リンク安全属性・`page-registry.ts`（`lastReviewed` 更新）を完了。既存の旧 `/claude/skill` コンテンツと完全入れ替え完了。原本 `Claude-code-spec-driven-development-guide.html` および `.md` は `archive/html/Anthropic/` および `archive/md/Anthropic/` へ `git mv` 退避保存。契約テスト9件を更新・通過し全クリア（Vitest **152 files / 1366 tests** 全 Green ✅）。
 
 - **SonarQube 新規コードカバレッジ修正**: `MermaidDiagram` の例外型別正規化、初期化失敗、`foreignObject` 配色、一時描画要素の競合 cleanup を検証する9ケースを追加。対象ファイルは line coverage **100%**、branch coverage **94.53%**、function coverage **100%**、全体 line coverage **92.25%**。目視・ビルドは依頼により省略。Vitest **152 files / 1357 tests** と typecheck は Green。
+
+## 次回セッションでの再開・実行依頼プロンプト
+
+```text
+AGENTS.md → CODEX.md → CLAUDE.md → docs/PROGRESS.md → Phase A–F 計画の順で読む。
+最新実装 HEAD: c9ddda02（日付右寄せ・ヒーロー余白。表構造・共通レイアウト修正: 1021dde4）
+次の作業: /books/ai-powered-developer の目視確認結果に対応する。目視確認はユーザー担当。
+AI-Powered-Developer.html は archive/html/books/、Markdown は archive/md/books/ に保存済み。
+移行漏れ監査は exit 0。全体 Vitest 183 files / 1727 tests、typecheck、lint が成功。
+この実行環境のテストは NODE_OPTIONS=--no-experimental-webstorage bun run test を使用する。
+ページの45テストは本文とCSS・Mermaid・目次・チェックリストに加え、全表の構造・右寄せの日付・関連ページ配置・余白を検証する。
+原本の期待値を移植先に合わせて変更しない。原本の本文情報基準日は2026-09-17のまま。
+サンドボックスでは npm とビルドを実行しない。目視結果への修正も Red → Green → Refactor → Docs で分離コミットする。
+ルート直下に残る未移行HTML候補は12件（2026-10-03にファイル一覧で実測）。次の移行対象は未指定。
+page.tsx 84 件、registry 85 エントリ（RSS を含む）。次のページは指示されてから扱う。
+```
