@@ -85,7 +85,10 @@ describe("/books/effective-ml-teams — complete source contracts", () => {
   });
   it("S-3: all citations and external links preserve URLs, wording, order and multiplicity", () => {
     expect(
-      nodes(main(), "a").map((e) => ({ href: e.getAttribute("href"), text: text(e) }))
+      nodes(main(), "a").map((e) => ({
+        ...(e.hasAttribute("href") ? { href: e.getAttribute("href") } : {}),
+        text: text(e),
+      }))
     ).toEqual(source.links);
   });
   it("S-4: every heading has a unique anchor and every TOC/citation anchor resolves", () => {
@@ -125,7 +128,7 @@ describe("/books/effective-ml-teams — complete source contracts", () => {
       nodes(main(), 'a[href^="http"]').map((e) => [e.getAttribute("target"), e.getAttribute("rel")])
     ).toEqual(
       source.links
-        .filter((e) => e.href.startsWith("http"))
+        .filter((e) => e.href?.startsWith("http"))
         .map(() => ["_blank", "noopener noreferrer"])
     );
   });
