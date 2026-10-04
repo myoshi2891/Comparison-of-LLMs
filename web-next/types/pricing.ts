@@ -46,6 +46,8 @@ export interface SubTool {
   monthly: number;
   /** null = 年払いなし、値 = 月換算年払い */
   annual: number | null;
+  /** 席数に依存しない組織単位の月額基本料（monthly は席単価）。未設定 = 基本料なし */
+  base_fee?: number | null;
   tag: string;
   cls: string;
   note_ja: string;

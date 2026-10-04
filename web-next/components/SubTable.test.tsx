@@ -191,6 +191,38 @@ describe("SubTable - tool rows", () => {
   });
 });
 
+describe("SubTable - base fee", () => {
+  const teams: SubTool = {
+    group: "Windsurf",
+    name: "Teams",
+    monthly: 40,
+    annual: null,
+    base_fee: 80,
+    tag: "Team",
+    cls: "tag-bal",
+    note_ja: "1席あたり + 基本料 $80/月",
+    note_en: "Per seat + $80/mo base fee",
+    scrape_status: "fallback",
+  };
+
+  it("shows the one-seat monthly total including the base fee", () => {
+    const { container } = render(<SubTable lang="ja" tools={[teams]} jpyRate={150} />);
+    const sub = container.querySelector(".model-sub")?.textContent ?? "";
+    expect(sub.startsWith("$120.00/mo (")).toBe(true);
+    expect(sub).toContain("$40.00/席 + 基本料 $80.00");
+  });
+
+  it("includes the base fee in the 30d period cell", () => {
+    const { container } = render(<SubTable lang="en" tools={[teams]} jpyRate={150} />);
+    const cells = container.querySelectorAll("tbody tr:not(.group-header) .cost-wrap");
+    // 期間順: 1h, 8h, 24h, 7d, 30d, 4mo, 12mo
+    expect(cells[4]?.textContent).toContain("$120.00");
+    expect(container.querySelector(".model-sub")?.textContent).toContain(
+      "$40.00/seat + base $80.00"
+    );
+  });
+});
+
 describe("SubTable - DualCell period cells", () => {
   it("renders DualCell in each of 7 period columns per data row", () => {
     const { container } = render(<SubTable lang="ja" tools={sampleTools} jpyRate={150} />);

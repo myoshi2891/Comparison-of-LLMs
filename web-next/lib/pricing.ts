@@ -52,6 +52,8 @@ export const SubToolSchema: z.ZodType<SubTool> = z
     name: z.string(),
     monthly: z.number().nonnegative(),
     annual: z.number().nonnegative().nullable(),
+    // base_fee を持たない旧スキーマの pricing.json も受け付ける
+    base_fee: z.number().nonnegative().nullish(),
     tag: z.string(),
     cls: z.string(),
     note_ja: z.string(),
