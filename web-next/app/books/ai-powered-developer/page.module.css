@@ -720,14 +720,7 @@
   fill: var(--box-text) !important;
 }
 
-/* Shared chrome follows this page's fixed sidebar and light content palette. */
-:global(body:has([data-page="ai-powered-developer"])) {
-  margin-top: calc(var(--ch-height, 60px) + var(--ch-disclaimer-height, 0px));
-  background: #faf6ec;
-}
-:global(body:has([data-page="ai-powered-developer"]) #site-freshness-bar) {
-  display: none;
-}
+/* Shared chrome overrides for this page live in app/globals.css (body:has scope). */
 .freshness {
   padding: 1rem 3.4rem 0;
   color: #000;
@@ -735,21 +728,7 @@
   font-size: 0.8rem;
   text-align: right;
 }
-:global(body:has([data-page="ai-powered-developer"]) nav[aria-label="関連ページ"]) {
-  margin-left: 288px;
-  margin-right: 0;
-  margin-top: 0;
-  max-width: none;
-  --line: #e4dac6;
-  --card: #fffefb;
-  --fg: #2a241c;
-  --muted: #6b6255;
-  --accent: #4b4b85;
-}
 @media (max-width: 980px) {
-  :global(body:has([data-page="ai-powered-developer"]) nav[aria-label="関連ページ"]) {
-    margin-left: 0;
-  }
   .freshness {
     padding: 1rem 1.5rem 0;
   }

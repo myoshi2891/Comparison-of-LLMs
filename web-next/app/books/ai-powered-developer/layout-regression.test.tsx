@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { readFileSync } from "node:fs";
 import { render } from "@testing-library/react";
-import { parse } from "postcss";
+import { parse, type Root } from "postcss";
 import { Children, isValidElement, type ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
 import Page from "./page";
@@ -10,10 +10,12 @@ import styles from "./page.module.css";
 vi.mock("@/components/docs/MermaidDiagram", () => ({ default: () => null }));
 vi.mock("./TocObserver", () => ({ default: () => null }));
 const css = parse(readFileSync("app/books/ai-powered-developer/page.module.css", "utf8"));
+// ページ外の共有クロームに作用する純グローバルなルールは globals.css 側に置く
+const globalCss = parse(readFileSync("app/globals.css", "utf8"));
 const scope = 'body:has([data-page="ai-powered-developer"])';
-function declarations(selector: string, media: string | null = null) {
+function declarations(selector: string, media: string | null = null, root: Root = css) {
   const result: Record<string, string> = {};
-  css.walkRules((rule) => {
+  root.walkRules((rule) => {
     const parentMedia = rule.parent?.type === "atrule" ? rule.parent.params : null;
     if (rule.selector.replace(/\s+/g, " ").trim() !== selector || parentMedia !== media) return;
     rule.walkDecls((decl) => {
@@ -80,11 +82,13 @@ describe("AI-Powered Developer hydration and shared layout regressions", () => {
     expect(declarations(".hero .heroNote")).toEqual({ "margin-top": "1rem" });
   });
   it("removes the shared date bar and surplus body offset only on this page", () => {
-    expect(declarations(`:global(${scope})`)).toEqual({
+    expect(declarations(scope, null, globalCss)).toEqual({
       "margin-top": "calc(var(--ch-height, 60px) + var(--ch-disclaimer-height, 0px))",
       background: "#faf6ec",
     });
-    expect(declarations(`:global(${scope} #site-freshness-bar)`)).toEqual({ display: "none" });
+    expect(declarations(`${scope} #site-freshness-bar`, null, globalCss)).toEqual({
+      display: "none",
+    });
     expect(declarations(".sidebar").top).toBe(
       "calc(var(--header-height, 60px) + var(--ch-disclaimer-height, 0px))"
     );
@@ -93,8 +97,8 @@ describe("AI-Powered Developer hydration and shared layout regressions", () => {
     );
   });
   it("keeps the related-page footer inside the desktop content column and resets it on mobile", () => {
-    const selector = `:global(${scope} nav[aria-label="関連ページ"])`;
-    expect(declarations(selector)).toEqual({
+    const selector = `${scope} nav[aria-label="関連ページ"]`;
+    expect(declarations(selector, null, globalCss)).toEqual({
       "margin-left": "288px",
       "margin-right": "0",
       "margin-top": "0",
@@ -105,6 +109,15 @@ describe("AI-Powered Developer hydration and shared layout regressions", () => {
       "--muted": "#6b6255",
       "--accent": "#4b4b85",
     });
-    expect(declarations(selector, "(max-width: 980px)")).toEqual({ "margin-left": "0" });
+    expect(declarations(selector, "(max-width: 980px)", globalCss)).toEqual({
+      "margin-left": "0",
+    });
+  });
+  it("keeps the CSS Module free of global-only selectors without local class anchors", () => {
+    const globalOnly: string[] = [];
+    css.walkRules((rule) => {
+      if (rule.selector.trim().startsWith(":global(body")) globalOnly.push(rule.selector);
+    });
+    expect(globalOnly).toEqual([]);
   });
 });

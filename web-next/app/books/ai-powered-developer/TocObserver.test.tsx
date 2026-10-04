@@ -30,24 +30,28 @@ function fixture() {
           Absent
         </a>
       </nav>
-      <header id="intro" />
-      <section id="step1" />
-      <span id="checklistCounterText">0 / 2 完了</span>
-      <ul id="checklistItems">
-        <li>
-          <input aria-label="one" type="checkbox" />
-        </li>
-        <li>
-          <input aria-label="two" type="checkbox" />
-        </li>
-      </ul>
-      <input aria-label="unrelated" type="checkbox" />
+      <div className={styles.main} data-testid="main-content">
+        <header id="intro" />
+        <section id="step1" />
+        <span id="checklistCounterText">0 / 2 完了</span>
+        <ul id="checklistItems">
+          <li>
+            <input aria-label="one" type="checkbox" />
+          </li>
+          <li>
+            <input aria-label="two" type="checkbox" />
+          </li>
+        </ul>
+        <input aria-label="unrelated" type="checkbox" />
+      </div>
       <TocObserver />
     </div>
   );
 }
 const sidebar = () => document.getElementById("sidebar") as HTMLElement & { inert: boolean };
 const toggle = () => document.getElementById("menuToggle") as HTMLButtonElement;
+const main = () =>
+  document.querySelector('[data-testid="main-content"]') as HTMLElement & { inert: boolean };
 const open = () => fireEvent.click(toggle());
 function expectClosed(mobile = true) {
   expect(sidebar().classList.contains(styles.open)).toBe(false);
@@ -55,6 +59,7 @@ function expectClosed(mobile = true) {
   expect(toggle().getAttribute("aria-expanded")).toBe("false");
   expect(toggle().getAttribute("aria-label")).toBe("目次を開く");
   expect(sidebar().inert).toBe(mobile);
+  expect(main().inert).toBe(false);
 }
 beforeEach(() => {
   width(500);
@@ -97,6 +102,14 @@ describe("TocObserver — all public interactions", () => {
     expect(toggle().getAttribute("aria-expanded")).toBe("true");
     expect(toggle().getAttribute("aria-label")).toBe("目次を閉じる");
     expect(document.activeElement).toBe(sidebar().querySelector("a"));
+  });
+  it("makes the main content inert while the mobile menu is open and restores it on close", () => {
+    fixture();
+    expect(main().inert).toBe(false);
+    open();
+    expect(main().inert).toBe(true);
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(main().inert).toBe(false);
   });
   it("toggles closed and returns focus", () => {
     fixture();

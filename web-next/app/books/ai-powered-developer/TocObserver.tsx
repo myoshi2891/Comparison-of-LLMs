@@ -13,6 +13,7 @@ export default function TocObserver() {
     const sidebar = root.querySelector<HTMLElement>("#sidebar");
     const toggle = root.querySelector<HTMLButtonElement>("#menuToggle");
     const scrim = root.querySelector<HTMLElement>("#scrim");
+    const main = root.querySelector<HTMLElement>(`.${styles.main}`);
     const links = Array.from(root.querySelectorAll<HTMLAnchorElement>(`.${styles.navA}`));
     const targets = links.flatMap((link) => {
       const target = document.getElementById(link.hash.slice(1));
@@ -26,10 +27,13 @@ export default function TocObserver() {
 
     function syncInert() {
       if (!sidebar) return;
-      const hidden =
-        window.innerWidth <= MOBILE_BREAKPOINT && !sidebar.classList.contains(styles.open);
+      const mobile = window.innerWidth <= MOBILE_BREAKPOINT;
+      const open = sidebar.classList.contains(styles.open);
+      const hidden = mobile && !open;
       if (hidden && sidebar.contains(document.activeElement)) toggle?.focus();
       sidebar.inert = hidden;
+      // メニュー展開中は scrim 背後の本文へ Tab でフォーカスが抜けないよう本文を inert にする
+      if (main) main.inert = mobile && open;
     }
 
     function setOpen(open: boolean) {

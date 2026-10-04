@@ -1501,3 +1501,30 @@ body.has-common-header {
   color: var(--ylw2) !important;
   fill: var(--ylw2) !important;
 }
+
+/* /books/ai-powered-developer: 共有クローム（body / 日付バー / 関連ページ）を
+   ページ固有の固定サイドバーと淡色パレットに合わせる。CSS Module は純グローバル
+   セレクタを持てないため、data-page 属性の body:has スコープでここに置く。 */
+body:has([data-page="ai-powered-developer"]) {
+  margin-top: calc(var(--ch-height, 60px) + var(--ch-disclaimer-height, 0px));
+  background: #faf6ec;
+}
+body:has([data-page="ai-powered-developer"]) #site-freshness-bar {
+  display: none;
+}
+body:has([data-page="ai-powered-developer"]) nav[aria-label="関連ページ"] {
+  margin-left: 288px;
+  margin-right: 0;
+  margin-top: 0;
+  max-width: none;
+  --line: #e4dac6;
+  --card: #fffefb;
+  --fg: #2a241c;
+  --muted: #6b6255;
+  --accent: #4b4b85;
+}
+@media (max-width: 980px) {
+  body:has([data-page="ai-powered-developer"]) nav[aria-label="関連ページ"] {
+    margin-left: 0;
+  }
+}
