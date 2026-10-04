@@ -84,10 +84,9 @@ describe("/books/effective-ml-teams — complete source contracts", () => {
     );
     for (const [index, chart] of source.charts.entries()) {
       for (const match of chart.matchAll(/classDef\s+(\w+)\s+[^;]*color:(#[0-9a-f]+);/g)) {
-        hasRule(
-          `.mermaidWrap :global(#effective-ml-diagram-${index + 1} .${match[1]} text)`,
-          { fill: match[2] }
-        );
+        hasRule(`.mermaidWrap :global(#effective-ml-diagram-${index + 1} .${match[1]} text)`, {
+          fill: match[2],
+        });
       }
     }
   });
