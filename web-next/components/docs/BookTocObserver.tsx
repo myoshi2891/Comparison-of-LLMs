@@ -17,6 +17,22 @@ interface BookTocObserverProps {
   mobileBreakpoint: number;
 }
 
+/**
+ * `link.hash` は非 ASCII 文字をパーセントエンコードして返すため、生の値で見つからなければ復号して再検索する。
+ * 生の値を優先するのは、`%` を含む ID が復号で別名に化けたり URIError になったりするのを避けるため。
+ */
+function findFragmentTarget(fragment: string): HTMLElement | null {
+  const raw = document.getElementById(fragment);
+  if (raw) return raw;
+  try {
+    return document.getElementById(decodeURIComponent(fragment));
+  } catch (error) {
+    // 不正なエンコードは対象なしとして扱い、それ以外の例外は握りつぶさない
+    if (error instanceof URIError) return null;
+    throw error;
+  }
+}
+
 /** Preserve the original scroll spy, mobile menu and checklist interactions. */
 export default function BookTocObserver({
   classNames: styles,
@@ -31,7 +47,7 @@ export default function BookTocObserver({
     const main = root.querySelector<HTMLElement>(`.${styles.main}`);
     const links = Array.from(root.querySelectorAll<HTMLAnchorElement>(`.${styles.navA}`));
     const targets = links.flatMap((link) => {
-      const target = document.getElementById(link.hash.slice(1));
+      const target = findFragmentTarget(link.hash.slice(1));
       return target ? [{ link, target }] : [];
     });
     const boxes = Array.from(
