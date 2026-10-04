@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Updated 2026-10-03
+Updated 2026-10-04
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
@@ -9,6 +9,17 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 AIモデルの時間別コスト計算機 + AI ツール導入ガイド群。Python スクレイパーが各社料金ページから価格を自動取得し `pricing.json` を生成、**Next.js 16 App Router（SSG / `output: 'export'`）** がそれを読み込んで Netlify CDN へ配信する。Phase 1–14 でコスト計算機ページが Next.js 化済み。18 枚のガイドページ（旧 `legacy/` 配下）は Phase A–F で **全移行完了**（計画書は [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](docs/archive/NEXTJS_PHASE_A_F_PLAN.md) に保存）。さらに追加移行ページとして `/claude/managed-agents` や `/code-review/coderabbit-guide` 等を設置。
 
 ## アーキテクチャ
+
+推薦書籍 `/books/effective-ml-teams` を追加（2026-10-04）。
+`web-next/app/books/effective-ml-teams/` の `page.tsx`、`page.module.css`、`TocObserver.tsx` に
+全13 H2・29 H3・59段落・18リスト／66項目・5表／26行・11図解・12チェック項目・18参考文献を移植。
+原本由来の固定期待値で本文・構造・74 CSS規則を照合し、29ページ契約と15操作テストを追加した。
+registry の「推薦書籍」からナビ・検索・RSS・関連リンクを導出する。原本HTML／Markdownは
+`archive/html/books/Effective-ml-teams-guide.html`／`archive/md/books/Effective-ml-teams-guide.md` に
+内容無変更で保存し、本文の情報基準日2026-09-13を維持する。図ごとのclassDef配色をIDで区切り、
+原本の箇条書き・番号・チェックリスト構造を保持する。最新実測は Vitest **185 files / 1779 tests**、
+typecheck・lint（510 files）・pytest（104 tests）が成功。原本監査はexit 0。
+ビルド・npmはユーザー指定で未実行、目視確認はユーザー担当。復旧の経緯は `docs/PROGRESS.md` を参照。
 
 推薦書籍の `/books/ai-powered-developer` を追加（2026-10-03）。`page.tsx` と CSS Modules、
 目次・モバイルメニュー・チェックリストを扱う `TocObserver.tsx` を配置し、
@@ -302,7 +313,7 @@ Build:     cd web-next && bun run build
 以下を全て確認してからコミットすること：
 
 1. `cd web-next && bun run build` が成功（※Antigravityサンドボックス環境では実行禁止。他環境やCIでは必須）
-2. `cd web-next && bun run test` が完全に成功（180 files / 1682 tests pass。収集失敗もブロッキング失敗として原因を調査する）
+2. `cd web-next && bun run test` が完全に成功（185 files / 1779 tests pass、2026-10-04実測。収集失敗もブロッキング失敗として原因を調査する）
 3. `cd web-next && bun run typecheck` が成功
 4. `cd web-next && bun run lint` が成功
 5. `cd scraper && uv run pytest` が成功
