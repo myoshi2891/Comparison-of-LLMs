@@ -170,6 +170,18 @@ const entries: PageEntry[] = [
     lastReviewed: "2026-10-03",
   },
   {
+    slug: "/books/effective-ml-teams",
+    title: "Effective Machine Learning Teams 入門ガイド",
+    description:
+      "『Effective Machine Learning Teams』を土台に、プロダクト開発、依存関係管理、テスト、MLOps・CD4ML、チームと組織の設計を学ぶ入門ガイド。全11図解、12項目の実践チェックリスト、18件の参考文献を収録。",
+    group: "推薦書籍",
+    topics: ["mlops", "machine-learning", "testing", "team-topologies", "cd4ml"],
+    summary:
+      "MLプロジェクトを本番へ届けるためのプロダクト開発、ソフトウェアエンジニアリング、MLOps、チームと組織の実践ガイド。",
+    addedAt: "2026-10-04",
+    lastReviewed: "2026-10-04",
+  },
+  {
     slug: "/books/generative-ai-for-software-development",
     title: "Generative AI for Software Development",
     description:
