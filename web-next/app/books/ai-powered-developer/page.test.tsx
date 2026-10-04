@@ -293,7 +293,10 @@ describe("/books/ai-powered-developer — strict source parity", () => {
         selector:
           ".layout :global(h1), .layout :global(h2), .layout :global(h3), .layout :global(section[id])",
         media: null,
-        declarations: { "scroll-margin-top": "calc(var(--header-height, 60px) + 80px)" },
+        declarations: {
+          "scroll-margin-top":
+            "calc(var(--header-height, 60px) + var(--ch-disclaimer-height, 0px) + 80px)",
+        },
       },
     ];
     for (const r of required) expect(cssRules).toContainEqual(r);
