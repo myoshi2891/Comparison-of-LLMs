@@ -472,19 +472,60 @@
 }
 
 /* Preserve each original classDef text colour with SVG labels. */
-.mermaidWrap :global(.highlightFill text) { fill: #eaf1ff; }
-.mermaidWrap :global(.goalFill text) { fill: #e3fbee; }
-.mermaidWrap :global(.loopFill text) { fill: #eaf1ff; }
-.mermaidWrap :global(.problemFill text) { fill: #f5d8de; }
-.mermaidWrap :global(.resultFill text) { fill: #e3fbee; }
-.mermaidWrap :global(.baseFill text) { fill: #eaf1ff; }
-.mermaidWrap :global(.topFill text) { fill: #eaf1ff; }
-.mermaidWrap :global(.centerFill text) { fill: #eaf1ff; }
-.mermaidWrap :global(.stageFill text) { fill: #eaf1ff; }
-.mermaidWrap :global(.dangerFill text) { fill: #f5d8de; }
-.mermaidWrap :global(.okFill text) { fill: #e3fbee; }
-.mermaidWrap :global(.axisFill text) { fill: #eaf1ff; }
-.mermaidWrap :global(.lvl0 text) { fill: #f5d8de; }
-.mermaidWrap :global(.lvl1 text) { fill: #f5ecd8; }
-.mermaidWrap :global(.lvl2 text) { fill: #e3fbee; }
-.mermaidWrap :global(.mainFill text) { fill: #eaf1ff; }
+.mermaidWrap :global(#effective-ml-diagram-1 .highlightFill text) {
+  fill: #eaf1ff;
+}
+.mermaidWrap :global(#effective-ml-diagram-1 .goalFill text) {
+  fill: #e3fbee;
+}
+.mermaidWrap :global(#effective-ml-diagram-2 .loopFill text) {
+  fill: #eaf1ff;
+}
+.mermaidWrap :global(#effective-ml-diagram-3 .problemFill text) {
+  fill: #f5d8de;
+}
+.mermaidWrap :global(#effective-ml-diagram-3 .resultFill text) {
+  fill: #e3fbee;
+}
+.mermaidWrap :global(#effective-ml-diagram-4 .baseFill text) {
+  fill: #e3fbee;
+}
+.mermaidWrap :global(#effective-ml-diagram-4 .topFill text) {
+  fill: #eaf1ff;
+}
+.mermaidWrap :global(#effective-ml-diagram-5 .centerFill text) {
+  fill: #eaf1ff;
+}
+.mermaidWrap :global(#effective-ml-diagram-6 .stageFill text) {
+  fill: #eaf1ff;
+}
+.mermaidWrap :global(#effective-ml-diagram-6 .resultFill text) {
+  fill: #e3fbee;
+}
+.mermaidWrap :global(#effective-ml-diagram-7 .dangerFill text) {
+  fill: #f5d8de;
+}
+.mermaidWrap :global(#effective-ml-diagram-7 .okFill text) {
+  fill: #e3fbee;
+}
+.mermaidWrap :global(#effective-ml-diagram-8 .axisFill text) {
+  fill: #eaf1ff;
+}
+.mermaidWrap :global(#effective-ml-diagram-9 .lvl0 text) {
+  fill: #f5d8de;
+}
+.mermaidWrap :global(#effective-ml-diagram-9 .lvl1 text) {
+  fill: #f5ecd8;
+}
+.mermaidWrap :global(#effective-ml-diagram-9 .lvl2 text) {
+  fill: #e3fbee;
+}
+.mermaidWrap :global(#effective-ml-diagram-10 .baseFill text) {
+  fill: #eaf1ff;
+}
+.mermaidWrap :global(#effective-ml-diagram-10 .resultFill text) {
+  fill: #e3fbee;
+}
+.mermaidWrap :global(#effective-ml-diagram-11 .mainFill text) {
+  fill: #eaf1ff;
+}
