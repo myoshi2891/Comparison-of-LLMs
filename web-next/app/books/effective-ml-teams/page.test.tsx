@@ -52,7 +52,7 @@ parse(css).walkRules((r) => {
 });
 function hasRule(
   selector: string,
-  declarations: Record<string, string>,
+  declarations: Record<string, string | undefined>,
   media: string | null = null
 ) {
   expect(
@@ -60,7 +60,9 @@ function hasRule(
       (r) =>
         r.selector === selector &&
         r.media === media &&
-        Object.entries(declarations).every(([k, v]) => r.declarations[k] === cssNormalize(v))
+        Object.entries(declarations).every(
+          ([k, v]) => typeof v === "string" && r.declarations[k] === cssNormalize(v)
+        )
     ),
     selector
   ).toBe(true);
