@@ -167,6 +167,21 @@ class TestWindsurf:
         assert _find(tools, "Teams").base_fee == 80
         assert _find(tools, "Pro").base_fee is None
 
+    @pytest.mark.parametrize(
+        "html",
+        [
+            "<p>Teams $95/month base + $45/month per full developer seat</p>",
+            "<p>Teams $95/mo base + $45/mo per full dev seat</p>",
+            "<p>Teams base fee: $95 + $45/month per seat</p>",
+        ],
+    )
+    def test_teams_publishes_extracted_base_fee(self, html):
+        # Arrange / Act
+        teams = _find(_run(windsurf, html), "Teams")
+        # Assert: 抽出値を採用し、席単価とは混同しない
+        assert teams.base_fee == 95
+        assert teams.monthly == 45
+
 
 class TestGithubCopilot:
     def test_success_extracts_business_price(self):

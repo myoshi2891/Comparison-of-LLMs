@@ -25,8 +25,26 @@ _FALLBACKS: list[tuple[str, str, float, float | None, str, str, str, str]] = [
      "1席あたり + 基本料 $80/月 | 管理機能", "Per seat + $80/mo base fee | admin features"),
 ]
 
-# 席単価（monthly）とは別に課金される組織単位の月額基本料
+# 席単価（monthly）とは別に課金される組織単位の月額基本料（抽出失敗時のフォールバック）
 _BASE_FEES: dict[str, float] = {"Teams": 80}
+
+# 基本料の表記に限定する（席単価 "$45/month per seat" を基本料として拾わない）
+_BASE_FEE_PATTERNS: dict[str, list[str]] = {
+    "Teams": [
+        r"team[^$\n]{0,80}?\$([\d]+)\s*/\s*mo(?:nth)?\s*base",
+        r"team[^$\n]{0,80}?base\s*fee[^$\n]{0,20}?\$([\d]+)",
+    ],
+}
+
+
+def _extract_base_fee(html: str, name: str) -> float | None:
+    """基本料をページから抽出し、失敗時は _BASE_FEES の値を返す。"""
+    fallback = _BASE_FEES.get(name)
+    patterns = _BASE_FEE_PATTERNS.get(name)
+    if fallback is None or patterns is None:
+        return fallback
+    fee, _ = sanity_check(extract_price(html, patterns), f"Windsurf/{name}/base_fee", fallback)
+    return fee
 
 
 def scrape(existing: list[SubTool] | None = None) -> list[SubTool]:
@@ -59,7 +77,7 @@ def scrape(existing: list[SubTool] | None = None) -> list[SubTool]:
 
         tools.append(SubTool(
             group=group, name=name,
-            monthly=cur_m, annual=fb_a, base_fee=_BASE_FEES.get(name),
+            monthly=cur_m, annual=fb_a, base_fee=_extract_base_fee(html, name),
             tag=tag, cls=cls,
             note_ja=note_ja, note_en=note_en,
             scrape_status=status,  # type: ignore[arg-type]
