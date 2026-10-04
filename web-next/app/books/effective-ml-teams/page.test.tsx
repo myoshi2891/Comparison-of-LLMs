@@ -12,17 +12,20 @@ import source from "./source-contract.json";
 
 vi.mock("@/components/docs/MermaidDiagram", () => ({
   default: ({
+    id,
     chart,
     theme,
     themeVariables,
     flowchartHtmlLabels,
   }: {
+    id: string;
     chart: string;
     theme: string;
     themeVariables: Record<string, string>;
     flowchartHtmlLabels?: boolean;
   }) => (
     <pre
+      id={id}
       data-testid="mermaid"
       data-theme={theme}
       data-theme-variables={JSON.stringify(themeVariables)}
@@ -73,11 +76,18 @@ function hasRule(
 
 describe("/books/effective-ml-teams — complete source contracts", () => {
   it("original classDef label colours survive the shared foreignObject colour override", () => {
-    expect(nodes(main(), '[data-testid="mermaid"]').map(e => e.getAttribute("data-html-labels")))
-      .toEqual(source.charts.map(() => "false"));
-    for (const chart of source.charts) {
+    expect(
+      nodes(main(), '[data-testid="mermaid"]').map((e) => e.getAttribute("data-html-labels"))
+    ).toEqual(source.charts.map(() => "false"));
+    expect(nodes(main(), '[data-testid="mermaid"]').map((e) => e.id)).toEqual(
+      source.charts.map((_, index) => `effective-ml-diagram-${index + 1}`)
+    );
+    for (const [index, chart] of source.charts.entries()) {
       for (const match of chart.matchAll(/classDef\s+(\w+)\s+[^;]*color:(#[0-9a-f]+);/g)) {
-        hasRule(`.mermaidWrap :global(.${match[1]} text)`, { fill: match[2] });
+        hasRule(
+          `.mermaidWrap :global(#effective-ml-diagram-${index + 1} .${match[1]} text)`,
+          { fill: match[2] }
+        );
       }
     }
   });
