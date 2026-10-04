@@ -1481,6 +1481,7 @@
       "name": "Teams",
       "monthly": 40.0,
       "annual": null,
+      "base_fee": 80.0,
       "tag": "Team",
       "cls": "tag-bal",
       "note_ja": "1席あたり + 基本料 $80/月 | 管理機能",
