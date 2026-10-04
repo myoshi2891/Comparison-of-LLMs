@@ -158,6 +158,15 @@ class TestWindsurf:
     def test_fallback_on_empty_html(self):
         _assert_all_fallback(_run(windsurf, _EMPTY), windsurf._FALLBACKS)
 
+    @pytest.mark.parametrize(
+        "html",
+        [_EMPTY, "<p>Teams $80/month base + $45/month per full developer seat</p>"],
+    )
+    def test_teams_keeps_base_fee_separate_from_seat_price(self, html):
+        tools = _run(windsurf, html)
+        assert _find(tools, "Teams").base_fee == 80
+        assert _find(tools, "Pro").base_fee is None
+
 
 class TestGithubCopilot:
     def test_success_extracts_business_price(self):

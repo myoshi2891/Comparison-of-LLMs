@@ -49,6 +49,7 @@ class SubTool(BaseModel):
     name: str
     monthly: float = Field(ge=0)
     annual: float | None = None     # None = 年払いなし、値 = 月換算年払い
+    base_fee: float | None = Field(default=None, ge=0)  # 席数に依存しない組織単位の月額基本料（monthly は席単価）
     tag: str
     cls: str
     note_ja: str

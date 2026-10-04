@@ -25,6 +25,9 @@ _FALLBACKS: list[tuple[str, str, float, float | None, str, str, str, str]] = [
      "1席あたり + 基本料 $80/月 | 管理機能", "Per seat + $80/mo base fee | admin features"),
 ]
 
+# 席単価（monthly）とは別に課金される組織単位の月額基本料
+_BASE_FEES: dict[str, float] = {"Teams": 80}
+
 
 def scrape(existing: list[SubTool] | None = None) -> list[SubTool]:
     logger.info("Windsurf: スクレイピング開始 %s", _URL)
@@ -56,7 +59,7 @@ def scrape(existing: list[SubTool] | None = None) -> list[SubTool]:
 
         tools.append(SubTool(
             group=group, name=name,
-            monthly=cur_m, annual=fb_a,
+            monthly=cur_m, annual=fb_a, base_fee=_BASE_FEES.get(name),
             tag=tag, cls=cls,
             note_ja=note_ja, note_en=note_en,
             scrape_status=status,  # type: ignore[arg-type]
@@ -66,7 +69,8 @@ def scrape(existing: list[SubTool] | None = None) -> list[SubTool]:
 
 def _build_fallback() -> list[SubTool]:
     return [
-        SubTool(group=g, name=n, monthly=m, annual=a, tag=t, cls=c,
+        SubTool(group=g, name=n, monthly=m, annual=a, base_fee=_BASE_FEES.get(n),
+                tag=t, cls=c,
                 note_ja=nj, note_en=ne, scrape_status="fallback")
         for g, n, m, a, t, c, nj, ne in _FALLBACKS
     ]
