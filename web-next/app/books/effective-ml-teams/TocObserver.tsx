@@ -3,7 +3,7 @@
 import BookTocObserver from "@/components/docs/BookTocObserver";
 import styles from "./page.module.css";
 
-const MOBILE_BREAKPOINT = 980;
+const MOBILE_BREAKPOINT = 900;
 const CLASS_NAMES = {
   main: styles.main,
   navA: styles.navA,

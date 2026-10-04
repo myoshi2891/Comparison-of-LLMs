@@ -48,13 +48,27 @@ export function calcApiCost(
  * - For periods >= 8760 hours, returns `annual` when it is provided.
  * - For periods <= 720 hours, prorates `monthly` by hours; if `monthly` is 0 and `annual` is provided, prorates `annual` by hours.
  * - Otherwise prorates `monthly` by (hours / 720).
+ * - `baseFee`（席数に依存しない月額基本料）は 1 席分のコストに加算する。年払いを採用する
+ *   期間（>= 8760 時間かつ `annual` あり）は 12 か月分、それ以外は時間按分で加算する。
  *
- * @param monthly - Monthly subscription price in USD
+ * @param monthly - Monthly subscription price in USD (per seat)
  * @param annual - Annual subscription price in USD, or `null` if not available
  * @param hours - Time window in hours used to prorate the subscription
- * @returns The subscription cost in USD for the specified `hours`
+ * @param baseFee - Seat-independent monthly base fee in USD (default 0)
+ * @returns The one-seat subscription cost in USD for the specified `hours`
  */
-export function calcSubCost(monthly: number, annual: number | null, hours: number): number {
+export function calcSubCost(
+  monthly: number,
+  annual: number | null,
+  hours: number,
+  baseFee = 0
+): number {
+  const baseCost = hours >= 8760 && annual != null ? baseFee * 12 : (baseFee * hours) / 720;
+  return calcSeatCost(monthly, annual, hours) + baseCost;
+}
+
+/** 席単価のみの按分コスト（calcSubCost の従来ロジック） */
+function calcSeatCost(monthly: number, annual: number | null, hours: number): number {
   if (monthly === 0 && (!annual || annual === 0)) return 0;
   if (hours >= 8760 && annual != null) return annual;
   if (hours <= 720) {

@@ -71,13 +71,21 @@ export function SubTable({ lang, tools, jpyRate }: Props) {
             const color = GROUP_COLORS[tool.group] ?? "#aaa";
             const note = lang === "ja" ? tool.note_ja : tool.note_en;
 
+            // 基本料は席数に依存しないため、1 席あたりの表示額へ加算する
+            const baseFee = tool.base_fee ?? 0;
+            const monthlyTotal = tool.monthly + baseFee;
+            const annualTotal = tool.annual != null ? tool.annual + baseFee * 12 : null;
+            const breakdown =
+              baseFee > 0
+                ? ` = ${fmtUSD(tool.monthly)}/${t("perSeatLabel", lang)} + ${t("baseFeeLabel", lang)} ${fmtUSD(baseFee)}`
+                : "";
             const mStr =
-              tool.monthly === 0 && (tool.annual == null || tool.annual === 0)
+              monthlyTotal === 0 && (annualTotal == null || annualTotal === 0)
                 ? t("free", lang)
-                : `${fmtUSD(tool.monthly)}/mo (${fmtJPY(tool.monthly, jpyRate)})`;
+                : `${fmtUSD(monthlyTotal)}/mo (${fmtJPY(monthlyTotal, jpyRate)})${breakdown}`;
             const aStr =
-              tool.annual != null
-                ? ` | ${t("annualLabel", lang)} ${fmtUSD(tool.annual)}/yr (${fmtJPY(tool.annual, jpyRate)})`
+              annualTotal != null
+                ? ` | ${t("annualLabel", lang)} ${fmtUSD(annualTotal)}/yr (${fmtJPY(annualTotal, jpyRate)})`
                 : "";
 
             return [
@@ -108,10 +116,10 @@ export function SubTable({ lang, tools, jpyRate }: Props) {
                   </div>
                 </td>
                 {PERIODS.map((p) => {
-                  const usd = calcSubCost(tool.monthly, tool.annual, p.hours);
+                  const usd = calcSubCost(tool.monthly, tool.annual, p.hours, baseFee);
                   const annualNote =
-                    p.hours >= 8760 && tool.annual != null && tool.annual < tool.monthly * 12
-                      ? `${t("annualLabel", lang)} ${fmtUSD(tool.annual)}/yr (${fmtJPY(tool.annual, jpyRate)})`
+                    p.hours >= 8760 && annualTotal != null && annualTotal < monthlyTotal * 12
+                      ? `${t("annualLabel", lang)} ${fmtUSD(annualTotal)}/yr (${fmtJPY(annualTotal, jpyRate)})`
                       : null;
                   return (
                     <td key={p.key}>

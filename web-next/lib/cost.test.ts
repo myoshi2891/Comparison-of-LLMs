@@ -88,6 +88,21 @@ describe("calcSubCost", () => {
     expect(calcSubCost(20, null, 8760)).toBeCloseTo(20 * (8760 / 720), 10);
   });
 
+  it("adds the seat-independent base fee to the one-seat monthly cost", () => {
+    // Windsurf Teams: $40/seat + $80 base → 1 席 $120/月
+    expect(calcSubCost(40, null, 720, 80)).toBe(120);
+    expect(calcSubCost(40, null, 360, 80)).toBeCloseTo(60, 10);
+    expect(calcSubCost(40, null, 8760, 80)).toBeCloseTo(120 * (8760 / 720), 10);
+  });
+
+  it("does not short-circuit to 0 when only the base fee is charged", () => {
+    expect(calcSubCost(0, null, 720, 80)).toBe(80);
+  });
+
+  it("adds 12 months of base fee when the annual price is used", () => {
+    expect(calcSubCost(20, 192, 8760, 10)).toBe(192 + 120);
+  });
+
   it("does not apply annual price below 8760h", () => {
     // At 4mo (2920h), must use monthly extrapolation, not annual
     const monthlyExtrapolated = 20 * (2920 / 720);

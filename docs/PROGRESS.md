@@ -2,7 +2,7 @@
 
 > 本ファイルは Next.js 移行完了後の保守・改善フェーズにおける開発の進捗（特にテスト関連）および品質チェックのルールを記録する。
 >
-> - 最終更新日: **Updated 2026-10-03**
+> - 最終更新日: **Updated 2026-10-04**
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
 
@@ -10,21 +10,32 @@
 
 - **フェーズ**: 保守・機能改善・品質強化フェーズ
 - **ブランチ**: `dev`（本番 `main` への Next.js 移行マージ完了 🚀）
-- **最新実装 HEAD**: `c9ddda02`（AI-Powered Developer 日付右寄せ・ヒーロー余白。表構造と共通レイアウト修正は `1021dde4`）
-- **次の作業**: `/books/ai-powered-developer` の目視確認（ユーザー担当）。ビルドは今回の依頼では実行しない。
-- **ルート実数**: `page.tsx` 84 件、registry 85 エントリ（RSS の `/rss.xml` を含む）。全ルート登録・ナビ導出テストは合格。
+- **最新実装 HEAD**: `f516525e`（Effective ML Teams の整形・検証。承認済み復旧のGreenは `9b5be18b`）
+- **次の作業**: `/books/effective-ml-teams` の目視確認（ユーザー担当）と、その結果への対応。npm・ビルドは今回の依頼では実行しない。
+- **ルート実数**: `page.tsx` 85 件、registry 86 エントリ（RSS の `/rss.xml` を含む）。全ルート登録・ナビ導出テストは合格。
 - **動作検証**:
   - ビルド: 今回はユーザー指定で未実行。過去の成功記録は 2026-09-17 の 90 静的ページであり、今回の変更を検証した値ではない。
-  - `bun run typecheck` ✅（`tsc --noEmit`。2026-10-03 実測）
-  - `bun run lint` ✅（Biome check / 504 files / 0 diagnostics。2026-10-03 実測）
+  - `bun run typecheck` ✅（`tsc --noEmit`。2026-10-04 実測）
+  - `bun run lint` ✅（Biome check / 510 files / 0 diagnostics。2026-10-04 実測）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test` で Vitest **183 files / 1727 tests すべて合格**（2026-10-03 実測。全 Green ✅）
-    - 開始時のベースラインは **180 files / 1682 tests**。この実行環境では通常実行で既存 Checklist 5 件が Node の `localStorage` により失敗するため、実行時オプションだけで回避した。依存・設定ファイルは変更していない。
+  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test` で Vitest **185 files / 1779 tests すべて合格**（2026-10-04 実測。全 Green ✅）
+    - 今回の開始時ベースラインは **183 files / 1735 tests**（HEAD `e0a1a4fa`）。既存環境の `localStorage` 問題を避ける実行時オプションを継続使用し、依存・設定ファイルは変更していない。
     - `load(sourceHtml)` をモジュール初期化時に呼ぶ `governance/ai-governance/GuideContent.tsx` と
       `local-llm/finetuning-best-practices/GuideContent.tsx` は、import スモークでも読み込み可能であることを確認済み
-  - **バックエンド (`scraper/`)**: pytest 実行で **100 件すべて合格** (2026-09-17 実測。全 Green ✅)
+  - **バックエンド (`scraper/`)**: pytest 実行で **104 件すべて合格** (2026-10-04 実測。全 Green ✅)
 
 ## 最近の追加内容
+
+- **Effective Machine Learning Teams 入門ガイドの移行と承認済み復旧（2026-10-04）**:
+  - `/books/effective-ml-teams` に全13 H2・29 H3・59段落・18リスト／66項目・5表／26行・11 Mermaid・12チェック項目・18参考文献カードをPure JSXへ転写。calloutはpractice 10件／source 4件、引用3件、TOC 42リンクを保持。原本に通常コードブロック・SVG・外部CSSは存在しないため追加していない。
+  - 実装前に固定した `source-contract.json` で本文・リンク全文とURL・見出しID・リスト型と全項目・表の全セルとタグ・全装飾クラス・74 CSS規則とレスポンシブ指定を順序込み照合。表直下のテキストノード禁止、箇条書きの点・decimal番号・チェックリストとTOCのマーカーなし、全列左寄せ、アンカー余白も検証。原本期待値は実装に合わせて変更していない。
+  - 原本HTML／Markdownは `archive/html/books/Effective-ml-teams-guide.html`／`archive/md/books/Effective-ml-teams-guide.md` へ内容無変更で退避。SHA-256は移動前後で一致。指定されたHTMLを移行の正本とし、本文の情報基準日2026-09-13を保持。registryの追加・確認日は2026-10-04であり、本文の情報更新は行っていない。
+  - 固定サイドバーとモバイルボタンを共有ヘッダー＋動的免責バナーの下へ配置。900px境界、トグル／scrim／Escape／リンク開閉、フォーカス・inert、resize、スクロール追従、cleanup、チェックカウンターの15操作テストを追加。操作処理の対象限定カバレッジは行・関数100%、分岐92.5%。CSSキャッシュは一時ディレクトリへ退避済み。ポート3000で稼働中の開発サーバーはなく、目視確認はユーザー担当。
+  - Mermaid本文は全11図の順序・内容込みで完全一致。共有部品のforeignObject文字色上書きを避けるSVGラベルを使い、原本classDefの文字色を各図IDに限定。同名 `baseFill` が図4では緑系、図10では青系となる原本の差を維持。配色・レイアウトは原本から保持し、図のサイズと中央寄せは共有部品へ委譲。
+  - 原本のhrefを持たない `references` アンカーも保持。テスト抽出を属性不在に対応させ、その要素のlintだけに理由付き除外を明記。calloutのgood/info variantは定数で渡してDOM契約で全文と共に検証し、静的監査では原本のcalloutマーカーを維持する。
+  - RSSの既存順序テストはHomeのURLをchannelリンクと取り違えていたため、記事ごとのURL順序を完全一致で照合する形へ修正（`5fb2c5f7`）。RSS実装自体は変更していない。
+  - **手順違反と復旧の記録**: 追加配色テストの失敗後にGreen `c9a487f2` を作成したミスを即報告し、修正を停止。ユーザーの承認後、追加Red `c56f8eb2` → 修復Green `9b5be18b` → Refactor `f516525e` を分離して復旧した。履歴のreset・書き換えは行っていない。初回Redは `511fe2c3`、配色追加Redは `f1d673ea`。
+  - 最終検証はページ29契約＋操作15契約、全体Vitest **185 files／1779 tests**、typecheck、lint **510 files／0 diagnostics**、pytest **104 tests**が成功。原本監査・CSS変数監査もexit 0。npm・ビルド・ブラウザ自動確認は未実行。依存・設定ファイルは変更していない。
 
 - **AI-Powered Developer のコンソールエラー・共通レイアウト修正（2026-10-03）**:
   - 全7表の `table`／`thead`／`tbody`／`tr` 直下から空白テキストを除去。明示的な `{" "}` だけでなく、同一行のタグ間空白も検査する。React要素ツリーの全表構造を走査し、許可する子要素以外・文字列ノードが一切ないことを完全一致で検証。
@@ -261,14 +272,16 @@
 
 ```text
 AGENTS.md → CODEX.md → CLAUDE.md → docs/PROGRESS.md → Phase A–F 計画の順で読む。
-最新実装 HEAD: c9ddda02（日付右寄せ・ヒーロー余白。表構造・共通レイアウト修正: 1021dde4）
-次の作業: /books/ai-powered-developer の目視確認結果に対応する。目視確認はユーザー担当。
-AI-Powered-Developer.html は archive/html/books/、Markdown は archive/md/books/ に保存済み。
-移行漏れ監査は exit 0。全体 Vitest 183 files / 1727 tests、typecheck、lint が成功。
+最新実装 HEAD: f516525e（Effective ML Teams 整形・検証。承認済み復旧Green: 9b5be18b）
+次の作業: /books/effective-ml-teams の目視確認結果に対応する。目視確認はユーザー担当。
+Effective-ml-teams-guide.html は archive/html/books/、Markdown は archive/md/books/ に保存済み。
+移行漏れ監査は exit 0。全体 Vitest 185 files / 1779 tests、typecheck、lint、pytest 104件が成功。
 この実行環境のテストは NODE_OPTIONS=--no-experimental-webstorage bun run test を使用する。
-ページの45テストは本文とCSS・Mermaid・目次・チェックリストに加え、全表の構造・右寄せの日付・関連ページ配置・余白を検証する。
-原本の期待値を移植先に合わせて変更しない。原本の本文情報基準日は2026-09-17のまま。
+ページ29契約と操作15契約は本文・全表・全リスト・CSS・Mermaid・目次・チェックリストを厳密に照合する。
+原本の期待値を移植先に合わせて変更しない。原本の本文情報基準日は2026-09-13のまま。
+Mermaidの文字色は図ごとのIDで区切る。同名baseFillの色をページ全体で共通化しない。
+初回Greenでの手順違反は報告・ユーザー承認・追加Red/Green/Refactorで復旧済み。履歴は保持した。
 サンドボックスでは npm とビルドを実行しない。目視結果への修正も Red → Green → Refactor → Docs で分離コミットする。
-ルート直下に残る未移行HTML候補は12件（2026-10-03にファイル一覧で実測）。次の移行対象は未指定。
-page.tsx 84 件、registry 85 エントリ（RSS を含む）。次のページは指示されてから扱う。
+ルート直下に残る未移行HTML候補は11件（2026-10-04にファイル一覧で実測）。次の移行対象は未指定。
+page.tsx 85 件、registry 86 エントリ（RSS を含む）。次のページは指示されてから扱う。
 ```

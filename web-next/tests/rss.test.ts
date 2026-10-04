@@ -51,9 +51,13 @@ describe("F-3' - GET /rss.xml", () => {
   it("item は addedAt 降順で並ぶ", async () => {
     const xml = await GET().text();
     const expected = byAddedAtDesc(MAX_ITEMS).map((e) => e.slug);
-    const positions = expected.map((slug) => xml.indexOf(`${slug}</link>`));
-    expect(positions.every((p) => p >= 0)).toBe(true);
-    expect(positions).toEqual([...positions].sort((a, b) => a - b));
+    // The channel also links to Home. Inspect item links only so Home remains
+    // correctly checked even when a newer guide sorts ahead of it.
+    const document = new DOMParser().parseFromString(xml, "application/xml");
+    const actual = Array.from(document.querySelectorAll("item > link")).map(
+      (link) => new URL(link.textContent ?? "").pathname
+    );
+    expect(actual).toEqual(expected);
   });
 
   it("pubDate が RFC 822 形式（RSS 2.0 の要求）", async () => {

@@ -158,6 +158,33 @@ class TestWindsurf:
     def test_fallback_on_empty_html(self):
         _assert_all_fallback(_run(windsurf, _EMPTY), windsurf._FALLBACKS)
 
+    @pytest.mark.parametrize(
+        "html",
+        [_EMPTY, "<p>Teams $80/month base + $45/month per full developer seat</p>"],
+    )
+    def test_teams_keeps_base_fee_separate_from_seat_price(self, html):
+        tools = _run(windsurf, html)
+        assert _find(tools, "Teams").base_fee == 80
+        assert _find(tools, "Pro").base_fee is None
+
+    @pytest.mark.parametrize(
+        "html",
+        [
+            "<p>Teams $95/month base + $45/month per full developer seat</p>",
+            "<p>Teams $95/mo base + $45/mo per full dev seat</p>",
+            "<p>Teams base fee: $95 + $45/month per seat</p>",
+        ],
+    )
+    def test_teams_publishes_extracted_base_fee(self, html):
+        # Arrange / Act
+        teams = _find(_run(windsurf, html), "Teams")
+        # Assert: 抽出値を採用し、席単価とは混同しない
+        assert teams.base_fee == 95
+        assert teams.monthly == 45
+        # note も採用された基本料に追従する（固定 $80 を残さない）
+        assert "$95/月" in teams.note_ja and "$80" not in teams.note_ja
+        assert "$95/mo" in teams.note_en and "$80" not in teams.note_en
+
 
 class TestGithubCopilot:
     def test_success_extracts_business_price(self):
