@@ -179,8 +179,24 @@ export OPENAI_API_KEY="..."
 export GOOGLE_API_KEY="..."
 ```
 
+`.env` ファイルを使う場合、Python は `.env` を自動では読み込みません。次のどちらかの方法で、`os.environ` を読む前に環境変数へ反映してください。
+
+```bash
+# 方法1: 実行前にシェルへ読み込む（macOS / Linux）
+set -a; source .env; set +a
+
+# 方法2: python-dotenv を使い、コード内で読み込む
+pip install -U python-dotenv
+```
+
 ```python
 import os
+
+from dotenv import load_dotenv
+
+# .env の値を環境変数へ反映する（方法2の場合。os.environ を読む前に呼ぶ）
+# 既にシェルで設定済みの環境変数は上書きしない
+load_dotenv()
 
 # 各インテグレーションは環境変数から自動でキーを読み込むため、コード内でキーを代入しない
 # 次節の例は Anthropic を使うため、必須なのは ANTHROPIC_API_KEY のみ
