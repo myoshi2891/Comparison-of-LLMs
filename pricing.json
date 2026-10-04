@@ -1461,8 +1461,8 @@
       "annual": null,
       "tag": "Individual",
       "cls": "tag-bal",
-      "note_ja": "500 credits/月 | SWE-1.5 含む",
-      "note_en": "500 credits/mo | Includes SWE-1.5",
+      "note_ja": "Free より拡大した使用枠 | OpenAI・Claude・Gemini 等のフロンティアモデル",
+      "note_en": "Increased quotas | Frontier models from OpenAI, Claude, Gemini, etc.",
       "scrape_status": "fallback"
     },
     {
