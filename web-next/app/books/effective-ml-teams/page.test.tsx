@@ -15,15 +15,18 @@ vi.mock("@/components/docs/MermaidDiagram", () => ({
     chart,
     theme,
     themeVariables,
+    flowchartHtmlLabels,
   }: {
     chart: string;
     theme: string;
     themeVariables: Record<string, string>;
+    flowchartHtmlLabels?: boolean;
   }) => (
     <pre
       data-testid="mermaid"
       data-theme={theme}
       data-theme-variables={JSON.stringify(themeVariables)}
+      data-html-labels={String(flowchartHtmlLabels)}
     >
       {chart}
     </pre>
@@ -69,6 +72,15 @@ function hasRule(
 }
 
 describe("/books/effective-ml-teams — complete source contracts", () => {
+  it("original classDef label colours survive the shared foreignObject colour override", () => {
+    expect(nodes(main(), '[data-testid="mermaid"]').map(e => e.getAttribute("data-html-labels")))
+      .toEqual(source.charts.map(() => "false"));
+    for (const chart of source.charts) {
+      for (const match of chart.matchAll(/classDef\s+(\w+)\s+[^;]*color:(#[0-9a-f]+);/g)) {
+        hasRule(`.mermaidWrap :global(.${match[1]} text)`, { fill: match[2] });
+      }
+    }
+  });
   it("S-1: every h2 preserves full wording and order", () => {
     expect(nodes(main(), "h2").map(text)).toEqual(source.h2);
   });
