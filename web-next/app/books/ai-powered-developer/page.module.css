@@ -657,7 +657,8 @@
 .layout :global(h1),
 .layout :global(h2),
 .layout :global(h3),
-.layout :global(section[id]) {
+.layout :global(section[id]),
+.layout :global(header[id]) {
   scroll-margin-top: calc(var(--header-height, 60px) + var(--ch-disclaimer-height, 0px) + 80px);
 }
 .layout :global(input[type="checkbox"]) {

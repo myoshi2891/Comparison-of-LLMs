@@ -291,7 +291,7 @@ describe("/books/ai-powered-developer — strict source parity", () => {
       },
       {
         selector:
-          ".layout :global(h1), .layout :global(h2), .layout :global(h3), .layout :global(section[id])",
+          ".layout :global(h1), .layout :global(h2), .layout :global(h3), .layout :global(section[id]), .layout :global(header[id])",
         media: null,
         declarations: {
           "scroll-margin-top":
