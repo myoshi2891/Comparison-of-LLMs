@@ -181,6 +181,9 @@ class TestWindsurf:
         # Assert: 抽出値を採用し、席単価とは混同しない
         assert teams.base_fee == 95
         assert teams.monthly == 45
+        # note も採用された基本料に追従する（固定 $80 を残さない）
+        assert "$95/月" in teams.note_ja and "$80" not in teams.note_ja
+        assert "$95/mo" in teams.note_en and "$80" not in teams.note_en
 
 
 class TestGithubCopilot:

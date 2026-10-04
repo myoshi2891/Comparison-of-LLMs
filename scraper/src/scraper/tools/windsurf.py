@@ -22,7 +22,7 @@ _FALLBACKS: list[tuple[str, str, float, float | None, str, str, str, str]] = [
     ("Windsurf", "Max",   200, None, "Top Tier",  "tag-flag",
      "最上位個人プラン (2026-09 新設)", "Top individual tier (new Sep 2026)"),
     ("Windsurf", "Teams", 40, None, "Team",       "tag-bal",
-     "1席あたり + 基本料 $80/月 | 管理機能", "Per seat + $80/mo base fee | admin features"),
+     "1席あたり + 基本料 ${base_fee}/月 | 管理機能", "Per seat + ${base_fee}/mo base fee | admin features"),
 ]
 
 # 席単価（monthly）とは別に課金される組織単位の月額基本料（抽出失敗時のフォールバック）
@@ -45,6 +45,13 @@ def _extract_base_fee(html: str, name: str) -> float | None:
         return fallback
     fee, _ = sanity_check(extract_price(html, patterns), f"Windsurf/{name}/base_fee", fallback)
     return fee
+
+
+def _format_note(note: str, base_fee: float | None) -> str:
+    """note 内の {base_fee} を採用された基本料で置換する（固定額と実値の乖離を防ぐ）。"""
+    if base_fee is None or "{base_fee}" not in note:
+        return note
+    return note.replace("{base_fee}", f"{base_fee:g}")
 
 
 def scrape(existing: list[SubTool] | None = None) -> list[SubTool]:
@@ -75,11 +82,12 @@ def scrape(existing: list[SubTool] | None = None) -> list[SubTool]:
             cur_m = new_m
             status = s
 
+        base_fee = _extract_base_fee(html, name)
         tools.append(SubTool(
             group=group, name=name,
-            monthly=cur_m, annual=fb_a, base_fee=_extract_base_fee(html, name),
+            monthly=cur_m, annual=fb_a, base_fee=base_fee,
             tag=tag, cls=cls,
-            note_ja=note_ja, note_en=note_en,
+            note_ja=_format_note(note_ja, base_fee), note_en=_format_note(note_en, base_fee),
             scrape_status=status,  # type: ignore[arg-type]
         ))
     return tools
@@ -89,6 +97,7 @@ def _build_fallback() -> list[SubTool]:
     return [
         SubTool(group=g, name=n, monthly=m, annual=a, base_fee=_BASE_FEES.get(n),
                 tag=t, cls=c,
-                note_ja=nj, note_en=ne, scrape_status="fallback")
+                note_ja=_format_note(nj, _BASE_FEES.get(n)),
+                note_en=_format_note(ne, _BASE_FEES.get(n)), scrape_status="fallback")
         for g, n, m, a, t, c, nj, ne in _FALLBACKS
     ]
