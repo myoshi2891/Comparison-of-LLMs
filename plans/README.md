@@ -13,8 +13,8 @@ Updated 2026-10-03
 基準コミット（drift 検出用）: `45940fd`
 
 保守同期（2026-10-03）: 推薦書籍 `/books/ai-powered-developer` を既存レジストリへ登録。
-新しい基盤プランは起票せず、既存007〜009の DONE 状態を維持する。原本照合・40契約追加後の
-Vitest は **182 files / 1722 tests**、typecheck・lint は成功。ビルドはユーザー指定で未実行。
+新しい基盤プランは起票せず、既存007〜009の DONE 状態を維持する。原本照合・45契約追加後の
+Vitest は **183 files / 1727 tests**、typecheck・lint は成功。ビルドはユーザー指定で未実行。
 目視確認が次の作業であり、`docs/PROGRESS.md` に移行と再開手順を記録する。
 
 保守同期（2026-07-28）: Fable 5 の `lastReviewed` を `2026-07-26` へ統一し、Claude / SDD ガイドのレビュー修正と契約テスト拡充後に Vitest **1232 件**の Green を確認。
