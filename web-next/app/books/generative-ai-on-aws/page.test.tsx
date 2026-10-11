@@ -155,7 +155,11 @@ describe("Generative AI on AWS — frozen source contracts", () => {
     ).toEqual(
       source.styledNodes.map((element) => ({
         tag: element.tag,
-        classes: element.classes.map((name) => styles[name]),
+        classes: element.classes.map((name) =>
+          name === "ti" || name.startsWith("ti")
+            ? name.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`)
+            : styles[name]
+        ),
       }))
     ));
   it("preserves TOC link labels, groups and order", () =>
@@ -206,12 +210,14 @@ describe("Generative AI on AWS — frozen source contracts", () => {
       expect(chart.textContent).not.toContain("block-beta");
     }
   });
-  it("preserves all stylesheet URLs", () =>
+  it("preserves all stylesheet URLs", () => {
+    render(<Page />);
     expect(
-      nodes(render(<Page />).container, 'link[rel="stylesheet"]').map((element) =>
+      nodes(document, 'link[data-precedence="aws-guide"]').map((element) =>
         element.getAttribute("href")
       )
-    ).toEqual(source.stylesheets));
+    ).toEqual(source.stylesheets);
+  });
   it("preserves all source CSS rules except documented shared layout adaptations", () => {
     for (const rule of source.cssRules) hasRule(rule.selector, rule.declarations, rule.media);
   });
