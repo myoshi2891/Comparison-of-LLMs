@@ -212,7 +212,7 @@ export default function Page() {
           <ul className={styles.sidebarNav}>
             <li>
               <a
-                className={styles.navA + " " + styles.active}
+                className={`${styles.navA} ${styles.active}`}
                 href="#intro"
                 data-testid="sidebar-nav-link"
               >
@@ -528,7 +528,7 @@ export default function Page() {
                 </p>
               </div>
               <div
-                className={styles.callout + " " + styles.gold}
+                className={`${styles.callout} ${styles.gold}`}
                 data-testid="callout"
                 data-variant={VARIANT_PLAIN}
               >
@@ -989,7 +989,7 @@ export default function Page() {
                 </table>
               </div>
               <div
-                className={styles.callout + " " + styles.forest}
+                className={`${styles.callout} ${styles.forest}`}
                 data-testid="callout"
                 data-variant={VARIANT_FOREST}
               >
@@ -1413,7 +1413,7 @@ export default function Page() {
                 </p>
               </div>
               <div
-                className={styles.callout + " " + styles.forest}
+                className={`${styles.callout} ${styles.forest}`}
                 data-testid="callout"
                 data-variant={VARIANT_FOREST}
               >
@@ -1564,7 +1564,7 @@ export default function Page() {
                 </table>
               </div>
               <div
-                className={styles.callout + " " + styles.gold}
+                className={`${styles.callout} ${styles.gold}`}
                 data-testid="callout"
                 data-variant={VARIANT_PLAIN}
               >
