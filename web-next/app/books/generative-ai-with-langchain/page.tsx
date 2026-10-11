@@ -508,7 +508,7 @@ export default function Page() {
                 </table>{" "}
               </div>
               <div
-                className={styles.callout + " " + styles.tip}
+                className={`${styles.callout} ${styles.tip}`}
                 data-testid="callout"
                 data-variant={TIP_VARIANT}
               >
@@ -633,7 +633,7 @@ export default function Page() {
               </h2>
               <h3 id="langchain-subheading-10">{"3-1. インストール（2026年9月時点の方法）"}</h3>
               <div
-                className={styles.callout + " " + styles.info}
+                className={`${styles.callout} ${styles.info}`}
                 data-testid="callout"
                 data-variant="info"
               >
@@ -811,7 +811,7 @@ export default function Page() {
                 </table>{" "}
               </div>
               <div
-                className={styles.callout + " " + styles.warning}
+                className={`${styles.callout} ${styles.warning}`}
                 data-testid="callout"
                 data-variant="warn"
               >
@@ -1426,7 +1426,7 @@ export default function Page() {
                 </table>{" "}
               </div>
               <div
-                className={styles.callout + " " + styles.warning}
+                className={`${styles.callout} ${styles.warning}`}
                 data-testid="callout"
                 data-variant="warn"
               >
@@ -1521,7 +1521,7 @@ export default function Page() {
                 {"です。 "}
               </p>
               <div
-                className={styles.callout + " " + styles.warning}
+                className={`${styles.callout} ${styles.warning}`}
                 data-testid="callout"
                 data-variant="warn"
               >
