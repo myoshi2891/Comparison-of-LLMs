@@ -1,5 +1,6 @@
 import { act, render } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import MermaidDiagram from "@/components/docs/MermaidDiagram";
 import DiagramWithFallback from "./DiagramWithFallback";
 import styles from "./page.module.css";
 
@@ -38,6 +39,19 @@ const props = {
 function notify() {
   act(() => callback([], {} as MutationObserver));
 }
+function renderDiagram() {
+  return render(
+    <DiagramWithFallback id={props.id}>
+      <MermaidDiagram
+        chart={props.chart}
+        id={`${props.id}-svg`}
+        theme="dark"
+        flowchartHtmlLabels={false}
+      />
+      <p className={styles.diagramFallback}>{props.fallback}</p>
+    </DiagramWithFallback>
+  );
+}
 beforeEach(() => {
   drawInitially = false;
   vi.clearAllMocks();
@@ -63,7 +77,7 @@ describe("LangChain diagrams — preserve original fallback lifecycle", () => {
     expect(view.container.querySelector("p")?.textContent).toBe("原本から直接転写した代替説明");
   });
   it("preserves full fallback text while the shared renderer is pending", () => {
-    const view = render(<DiagramWithFallback {...props} />);
+    const view = renderDiagram();
     const root = view.container.firstElementChild as HTMLElement;
     expect([root.id, root.className]).toEqual([props.id, styles.diagramTarget]);
     expect(view.container.querySelector("p")?.textContent).toBe(props.fallback);
@@ -76,7 +90,7 @@ describe("LangChain diagrams — preserve original fallback lifecycle", () => {
     ]).toEqual([props.chart, "dark", "false"]);
   });
   it("hides but does not remove fallback text after an SVG appears", () => {
-    const view = render(<DiagramWithFallback {...props} />);
+    const view = renderDiagram();
     view
       .getByTestId("mermaid")
       .appendChild(document.createElementNS("http://www.w3.org/2000/svg", "svg"));
@@ -86,18 +100,18 @@ describe("LangChain diagrams — preserve original fallback lifecycle", () => {
   });
   it("recognizes a renderer that has already produced an SVG", () => {
     drawInitially = true;
-    const view = render(<DiagramWithFallback {...props} />);
+    const view = renderDiagram();
     expect(view.container.querySelector("p")?.hidden).toBe(true);
   });
   it("keeps fallback text visible when the renderer fails or produces no SVG", () => {
-    const view = render(<DiagramWithFallback {...props} />);
+    const view = renderDiagram();
     view.getByTestId("mermaid").textContent = "⚠️ ダイアグラムを描画できませんでした";
     notify();
     expect(view.container.querySelector("p")?.hidden).toBe(false);
     expect(view.container.querySelector("p")?.textContent).toBe(props.fallback);
   });
   it("restores fallback text if a previous SVG disappears", () => {
-    const view = render(<DiagramWithFallback {...props} />);
+    const view = renderDiagram();
     const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     view.getByTestId("mermaid").appendChild(svg);
     notify();
@@ -107,7 +121,7 @@ describe("LangChain diagrams — preserve original fallback lifecycle", () => {
     expect(view.container.querySelector("p")?.hidden).toBe(false);
   });
   it("disconnects its mutation observer on unmount", () => {
-    const view = render(<DiagramWithFallback {...props} />);
+    const view = renderDiagram();
     view.unmount();
     expect(disconnect.mock.calls).toEqual([[]]);
   });
