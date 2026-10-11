@@ -10,6 +10,25 @@ AIモデルの時間別コスト計算機 + AI ツール導入ガイド群。Pyt
 
 ## アーキテクチャ
 
+推薦書籍 `/books/generative-ai-with-langchain` を追加（2026-10-11）。指定HTMLの全13 H2・
+38 H3・49段落（図解の代替説明8件を含む）・4リスト／15項目・11表／67行・12コード例・
+8 Mermaid・5 callout・12ステップ・22参考文献カードをPure JSXへ転写。
+原本から固定した本文・構造・76 CSS規則を32ページ契約と16操作契約で照合する。
+コードの空白・改行・バックスラッシュ、箇条書きの点・番号、ブラウザ既定の見出し／リスト余白も保持。
+900px以下の目次は原本どおり本文上部の通常フローとし、ハンバーガーメニューを追加しない。
+固定サイドバーは280pxで、共有ヘッダーと動的免責バナーを避け、暗色ネイティブスクロールバーを使う。
+共通日付バー・bodyは本文と同じ `#07111e`、関連ページはデスクトップのサイドバー幅を避ける。
+補正はCSS Modulesのローカルクラスを含む `:has()` で本ページに限定する。
+図のサイズ・中央寄せは共有部品へ委譲し、darkテーマとSVGラベルで原本の紫／青緑classDef配色を保持。
+図解と代替段落はpage.tsxに直接記述し、描画待ち・失敗時は代替説明を表示、SVG成功時のみ隠す。
+HTML／Markdownは `archive/html/books/Generative-ai-with-langchain-guide.html`／
+`archive/md/books/Generative-ai-with-langchain-guide.md` に内容無変更で保存。
+指定HTMLを正本とし、本文の情報基準日2026-09-23を維持。registryの追加・確認日は2026-10-11。
+HTML原本監査exit 0、Mermaid 10.9.8で全8図の構文解析が成功。
+Green時の全体Vitest **192 files / 1876 tests**、整理後の48契約・typecheck・
+lint（527 files／0 diagnostics）が成功。npm・ビルド・スクレイパー検証・ブラウザ自動確認は未実行。
+CSSキャッシュ退避後に開発サーバーを再起動し、目視確認はユーザー担当。
+
 推薦書籍 `/books/generative-ai-on-aws` を追加（2026-10-11）。原本HTMLの全22 H2・著者3 H4・
 76段落・本文7リスト／35項目・7表／39行・9 Mermaid・6 callout・13チェック項目・
 23参考文献カードをPure JSXへ転写。原本から固定した本文・構造・109 CSS規則を28ページ契約と
@@ -329,7 +348,7 @@ Build:     cd web-next && bun run build
 以下を全て確認してからコミットすること：
 
 1. `cd web-next && bun run build` が成功（※Antigravityサンドボックス環境では実行禁止。他環境やCIでは必須）
-2. `cd web-next && bun run test` が完全に成功（189 files / 1828 tests pass、2026-10-11実測。Node 24で `NODE_OPTIONS=--no-experimental-webstorage` と `--maxWorkers=1 --testTimeout=30000` を使用。収集失敗もブロッキング失敗として原因を調査する）
+2. `cd web-next && bun run test` が完全に成功（192 files / 1876 tests pass、2026-10-11実測。Node 24で `NODE_OPTIONS=--no-experimental-webstorage` と `--maxWorkers=1 --testTimeout=30000` を使用。収集失敗もブロッキング失敗として原因を調査する）
 3. `cd web-next && bun run typecheck` が成功
 4. `cd web-next && bun run lint` が成功
 5. `cd scraper && uv run pytest` が成功

@@ -9,22 +9,35 @@
 ## 現在のステータス
 
 - **フェーズ**: 保守・機能改善・品質強化フェーズ
-- **ブランチ**: `main`（今回の開始HEADは `6c443d6e`。ブランチ新設・pushは行っていない）
-- **最新実装 HEAD**: `3d473b2c`（Generative AI on AWSのスクロールバー・共通フッター・日付背景修正）
-- **次の作業**: `/books/generative-ai-on-aws` の目視確認（ユーザー担当）と、その結果への対応。npm・ビルドは禁止、スクレイパー検証はユーザー指定で対象外。
-- **ルート実数**: `page.tsx` 86 件、registry 87 エントリ（RSS の `/rss.xml` を含む）。全ルート登録・ナビ導出テストは合格。
+- **ブランチ**: `main`（今回の開始HEADは `66d08f77`。ブランチ新設・pushは行っていない）
+- **最新実装 HEAD**: `934408a1`（Generative AI with LangChain移行後のクラス指定整理。Greenは `8868adbd`）
+- **次の作業**: `/books/generative-ai-with-langchain` の目視確認（ユーザー担当）と、その結果への対応。npm・ビルドは禁止、スクレイパー検証はユーザー指定で対象外。
+- **ルート実数**: `page.tsx` 87 件、registry 88 エントリ（RSS の `/rss.xml` を含む）。全ルート登録・ナビ導出テストは合格。
 - **動作検証**:
   - ビルド: 今回はユーザー指定で未実行。過去の成功記録は 2026-09-17 の 90 静的ページであり、今回の変更を検証した値ではない。
   - `bun run typecheck` ✅（`tsc --noEmit`。2026-10-11 実測）
-  - `bun run lint` ✅（Biome check / 519 files / 0 diagnostics。2026-10-11 実測）
+  - `bun run lint` ✅（Biome check / 527 files / 0 diagnostics。2026-10-11 実測）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: Node 24で `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000` を実行し、Vitest **189 files / 1828 tests すべて合格**（2026-10-11 実測）
-    - 今回の開始時ベースラインは **186 files / 1781 tests**（HEAD `6c443d6e`）。既存環境の `localStorage` 問題を避ける実行時オプションを継続使用し、依存・設定ファイルは変更していない。開始時から存在した `web-next/bun.lock` の差分はコミット対象外。
+  - **フロントエンド (`web-next/`)**: Node 24で `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000` を実行し、Vitest **192 files / 1876 tests すべて合格**（2026-10-11、Green時実測）。整理後も48契約とtypecheck・lint・原本監査が成功。
+    - 今回の開始時ベースラインは **189 files / 1828 tests**（HEAD `66d08f77`）。既存環境の `localStorage` 問題を避ける実行時オプションを継続使用し、依存・設定ファイルは変更していない。開始時から存在した `web-next/bun.lock` の差分はコミット対象外。
     - `load(sourceHtml)` をモジュール初期化時に呼ぶ `governance/ai-governance/GuideContent.tsx` と
       `local-llm/finetuning-best-practices/GuideContent.tsx` は、import スモークでも読み込み可能であることを確認済み
-  - **バックエンド (`scraper/`)**: 今回はユーザー指定で検証対象外。`uv`が見つからず起動できなかった後、実行不要の指示を受けた。過去の成功記録は104件（2026-10-04）であり、今回の実測値ではない。
+  - **バックエンド (`scraper/`)**: 今回はユーザー指定で検証対象外。実行していない。過去の成功記録は104件（2026-10-04）であり、今回の実測値ではない。
 
 ## 最近の追加内容
+
+- **Generative AI with LangChainガイドの移行（2026-10-11）**:
+  - `/books/generative-ai-with-langchain` に全13 H2・38 H3・49段落（図解の代替説明8件を含む）・4リスト／15項目・11表／67行・12コード例・8 Mermaid・5 callout・12ステップ・22参考文献カードをPure JSXへ転写。手書きSVG・引用・チェックリストは原本に存在しないため追加していない。
+  - Redで固定した `source-contract.json` により、本文・見出し・リンク全文とURL・表の全セルとタグ・リストの型と全項目・装飾クラス・76 CSS規則を順序込み完全一致で検証。全コードの空白・改行・バックスラッシュ、先頭インデント、highlight.jsの元CSSを使うspanトークン、全8図のソース・代替説明・キャプションを照合する。表構造の空白ノード禁止、箇条書きのdisc・番号のdecimal、全列左寄せ、アンカー余白も検証。原本期待値は実装に合わせて変更していない。
+  - 共通CSSリセットで失われるh2／h3の下余白とリストの上下余白・既定40pxインデントを復元し、本文の `.prose` 内では原本22pxを維持する。900px以下では原本どおり上部目次を通常フローに置き、ハンバーガーメニューを追加しない。デスクトップの高さ補正がモバイルの `height: auto` を上書きしないことを、CSSの実際の順序で検証する。
+  - 固定サイドバー幅280px、暗色のネイティブスクロールバー、共有ヘッダー＋動的免責バナーを差し引く高さを保持。共通日付バーとbodyを本文の `#07111e` に揃え、関連ページはサイドバー幅だけ右へ配置し、900px以下で全幅へ戻す。CSS Modulesのローカルクラスを含む `:has()` で他ページへの影響を防ぐ。
+  - Mermaidのdarkテーマ、紫／青緑のclassDef配色、SVGラベルを使用。サイズ・中央寄せの3 CSS規則は共有部品へ委譲し、原本の配色を保持する。図解と代替段落をpage.tsxに直接記述し、専用client部品はSVGの有無だけを監視する。描画待ち・失敗時は全文を表示し、SVG成功時のみ段落を隠し、SVGが消えたら復元。代替本文はDOMにも残す。Mermaid 10.9.8で全8図の構文解析が成功。
+  - タイトルのないwarning 2件は原本の本文をそのままラベル契約の対象とし、見出しを創作しない。tipのgood variantとコードの `{role}`／`{question}`／`{query}` は定数で渡し、固定DOM契約で表示文字列を完全一致検証する。監査スクリプトや原本の期待値は変更していない。
+  - HTML／Markdownは `archive/html/books/Generative-ai-with-langchain-guide.html`／`archive/md/books/Generative-ai-with-langchain-guide.md` へ内容無変更で退避。SHA-256はHTML `f19bbcda51c3495be8a441be508a13de8bf2659cdaefaa3e1cc3bd4ad0687edd`、Markdown `5329901cad76e9a894119f3e37ebafc55f13abfa28176496ad975308de36dd11` で移動前後一致。指定HTMLを正本とし、本文の情報基準日2026-09-23を維持。registryの追加・確認日は2026-10-11。
+  - HTML原本監査はexit 0。監査上のcallout 6件は実際の5 calloutと `ti-alert-triangle` アイコン1件。外部URL数の差は元の2 CDN stylesheetをJSXに挿入したため。Markdownも監査したが、見出し14件・表2行・段落21件・図ソース8件などの構造／表記差とコードの監査正規化差がありexit 1。指定HTMLの内容を正とし、Markdownから異なる本文や図を混ぜず、そのまま保存する。
+  - 32ページ契約＋目次9契約＋図解代替表示7契約の計48件を追加。操作部品の対象限定カバレッジは行・関数100%、分岐88.88%、statement 97.77%。テストのIO模擬データは型検査で不足項目を検出し、正規の `IntersectionObserverEntry` 全フィールドを追加した。期待値は変更せず、修正コミットを実装と分離する。
+  - 分離履歴: 初回Red `bfc91601` → 図解／CSS export追加Red `40197e27` → モバイル高さ追加Red `65087a07` → 図解の入力fixture調整 `6b25076c` → 既定余白追加Red `3642b28f` → IO型fixture修正 `a2760046` → Green `8868adbd` → Refactor `934408a1`。各追加Redは実際の失敗を確認し、実装・テスト・Docsの一括コミットは行っていない。
+  - 開始時ベースライン189 files／1828 tests、Green時の全体192 files／1876 testsが成功。Refactor後も48契約・typecheck・lint（527 files／0 diagnostics）・原本監査exit 0が成功。全体テストと型検査は順次実行し、検証中はこのリポジトリのdevサーバーを一時停止。CSSキャッシュを一時ディレクトリへ退避してlocalhostのポート3000で再起動した。起動時の自動生成AGENTS差分は元へ戻した。npm・ビルド・スクレイパー・ブラウザ自動確認は未実行。目視はユーザー担当。
 
 - **Generative AI on AWSの共通クローム修正（2026-10-11）**:
   - 原本に独自スクロールバー指定はない。共通viewportの `colorScheme: dark` が変えるネイティブの外観を、ページの `color-scheme: light` で原本の淡色表示へ戻す。固定配置・独立縦スクロール・余白と、目次の操作処理は変更していない。
@@ -290,16 +303,16 @@
 
 ```text
 AGENTS.md → CODEX.md → CLAUDE.md → docs/PROGRESS.md → Phase A–F 計画の順で読む。
-最新実装 HEAD: 3d473b2c（Generative AI on AWSのスクロールバー・共通クローム修正）
-次の作業: /books/generative-ai-on-aws の目視確認結果に対応する。目視確認はユーザー担当。
-Generative-ai-on-aws-guide.html は archive/html/books/、Markdown は archive/md/books/ に保存済み。
-HTML原本監査は exit 0。全体 Vitest 189 files / 1828 tests、typecheck、lint（519 files）が成功。pytestは今回対象外。
+最新実装 HEAD: 934408a1（Generative AI with LangChain移行後のクラス指定整理。Green: 8868adbd）
+次の作業: /books/generative-ai-with-langchain の目視確認結果に対応する。目視確認はユーザー担当。
+Generative-ai-with-langchain-guide.html は archive/html/books/、Markdown は archive/md/books/ に保存済み。
+HTML原本監査は exit 0。Green時の全体 Vitest 192 files / 1876 tests、整理後の48契約・typecheck・lint（527 files）が成功。pytestは今回対象外。
 この実行環境ではNode 24で NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000 を使用する。
-ページ28契約と操作15契約は本文・全表・全リスト・109 CSS規則・9 Mermaid・目次・13チェック項目を厳密に照合する。共通クロームのCSS回帰契約も4件追加済み。
-原本の期待値を移植先に合わせて変更しない。指定HTMLが正本で本文情報基準日は2026-09-10のまま。
-著者H4の既存階層と参考URLの文字列表示を維持する。Mermaidのhub/done配色はSVGラベルへ適用する。
+ページ32契約と操作16契約は本文・全11表・全4リスト・76 CSS規則・12コード例・8 Mermaidと代替説明・目次を厳密に照合する。
+原本の期待値を移植先に合わせて変更しない。指定HTMLが正本で本文情報基準日は2026-09-23のまま。
+900px以下の通常フロー目次、ネイティブ暗色スクロールバー、リストの点・番号・既定余白を保持する。図解はdarkテーマとSVGラベルで紫／青緑配色を保持する。
 開発サーバーはCSSキャッシュ退避後、ポート3000で再起動済み。既存bun.lock差分はコミットしていない。
 サンドボックスでは npm とビルドを実行しない。目視結果への修正も Red → Green → Refactor → Docs で分離コミットする。
-ルート直下に残る未移行HTML候補は10件（2026-10-11にGit追跡ファイル一覧で実測）。次の移行対象は未指定。
-page.tsx 86 件、registry 87 エントリ（RSS を含む）。次のページは指示されてから扱う。
+ルート直下に残る未移行HTML候補は9件（2026-10-11にGit追跡ファイル一覧で実測）。次の移行対象は未指定。
+page.tsx 87 件、registry 88 エントリ（RSS を含む）。次のページは指示されてから扱う。
 ```
