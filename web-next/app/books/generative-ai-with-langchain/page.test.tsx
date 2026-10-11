@@ -297,6 +297,30 @@ describe("LangChain guide — frozen original content and design contracts", () 
   it("defines the fallback wrapper as an actual CSS Modules export", () => {
     expect(declarations(".diagramTarget")).toEqual({ "min-width": "0" });
   });
+  it("restores browser-default heading and list spacing removed by the shared reset", () => {
+    expect([
+      declarations(".layout :global(h2)")["margin-bottom"],
+      declarations(".layout :global(h3)")["margin-bottom"],
+    ]).toEqual(["0.83em", "1em"]);
+    expect(declarations(".layout :global(ul), .layout :global(ol)")).toEqual({
+      margin: "1em 0",
+      "padding-left": "40px",
+    });
+    const chapterLists = Object.assign(
+      {},
+      ...rules
+        .filter(
+          (rule) =>
+            !rule.media &&
+            [
+              ".layout :global(ul), .layout :global(ol)",
+              ".prose :global(ul), .prose :global(ol)",
+            ].includes(rule.selector)
+        )
+        .map((rule) => rule.declarations)
+    );
+    expect([chapterLists.margin, chapterLists["padding-left"]]).toEqual(["1em 0", "22px"]);
+  });
   it("restores disc and decimal markers and prevents hidden table alignment overrides", () => {
     expect(declarations(".layout :global(ul)")["list-style-type"]).toBe("disc");
     expect(declarations(".layout :global(ol)")["list-style-type"]).toBe("decimal");
