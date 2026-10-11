@@ -31,10 +31,19 @@ const active = () =>
 function intersect(entries: { id: string; isIntersecting: boolean }[]) {
   act(() =>
     callback(
-      entries.map((entry) => ({
-        target: document.getElementById(entry.id) ?? document.createElement("section"),
-        isIntersecting: entry.isIntersecting,
-      })) as IntersectionObserverEntry[],
+      entries.map((entry) => {
+        const target = document.getElementById(entry.id) ?? document.createElement("section");
+        const bounds = target.getBoundingClientRect();
+        return {
+          target,
+          isIntersecting: entry.isIntersecting,
+          time: 0,
+          rootBounds: null,
+          boundingClientRect: bounds,
+          intersectionRect: bounds,
+          intersectionRatio: entry.isIntersecting ? 1 : 0,
+        };
+      }),
       {} as IntersectionObserver
     )
   );
