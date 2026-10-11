@@ -54,6 +54,14 @@ beforeEach(() => {
 });
 afterEach(() => vi.unstubAllGlobals());
 describe("LangChain diagrams — preserve original fallback lifecycle", () => {
+  it("preserves caller-owned diagram content for static source auditing", () => {
+    const view = render(
+      <DiagramWithFallback {...props}>
+        <p className={styles.diagramFallback}>原本から直接転写した代替説明</p>
+      </DiagramWithFallback>
+    );
+    expect(view.container.querySelector("p")?.textContent).toBe("原本から直接転写した代替説明");
+  });
   it("preserves full fallback text while the shared renderer is pending", () => {
     const view = render(<DiagramWithFallback {...props} />);
     const root = view.container.firstElementChild as HTMLElement;

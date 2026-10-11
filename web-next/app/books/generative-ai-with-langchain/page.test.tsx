@@ -294,6 +294,9 @@ describe("LangChain guide — frozen original content and design contracts", () 
       ".diagramTarget :global(svg)",
     ]);
   });
+  it("defines the fallback wrapper as an actual CSS Modules export", () => {
+    expect(declarations(".diagramTarget")).toEqual({ "min-width": "0" });
+  });
   it("restores disc and decimal markers and prevents hidden table alignment overrides", () => {
     expect(declarations(".layout :global(ul)")["list-style-type"]).toBe("disc");
     expect(declarations(".layout :global(ol)")["list-style-type"]).toBe("decimal");
