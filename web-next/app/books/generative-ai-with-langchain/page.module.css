@@ -1,0 +1,536 @@
+.layout {
+  --color-background-primary: #07111e;
+  --color-background-secondary: #0d1a2b;
+  --color-background-tertiary: #142238;
+  --color-background-info: rgba(124, 158, 255, 0.12);
+  --color-background-danger: rgba(255, 138, 138, 0.12);
+  --color-background-success: rgba(124, 224, 179, 0.12);
+  --color-background-warning: rgba(255, 207, 124, 0.12);
+  --color-text-primary: #e8edf7;
+  --color-text-secondary: #a8b3c7;
+  --color-text-tertiary: #8592a3;
+  --color-text-info: #93b4ff;
+  --color-text-danger: #ff9a9a;
+  --color-text-success: #8fe8bc;
+  --color-text-warning: #ffd68f;
+  --color-border-tertiary: #141d33;
+  --color-border-secondary: #212e4a;
+  --color-border-primary: #34456b;
+  --font-sans:
+    -apple-system, "Segoe UI", "Hiragino Kaku Gothic ProN", "Noto Sans JP", system-ui, sans-serif;
+  --font-serif: ui-serif, Georgia, serif;
+  --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  --border-radius-md: 8px;
+  --border-radius-lg: 12px;
+  --border-radius-xl: 16px;
+  --accent: #7c9eff;
+}
+.layout :global(*) {
+  box-sizing: border-box;
+}
+.layout,
+.layout {
+  margin: 0;
+  padding: 0;
+}
+.layout {
+  background: var(--color-background-primary);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.7;
+  font-weight: 400;
+}
+.layout :global(a) {
+  color: var(--accent);
+  text-decoration: none;
+}
+.layout :global(a):hover {
+  text-decoration: underline;
+}
+.layout :global(h1),
+.layout :global(h2),
+.layout :global(h3),
+.layout :global(h4) {
+  font-weight: 500;
+  color: var(--color-text-primary);
+  line-height: 1.4;
+}
+.layout :global(h1) {
+  font-size: 22px;
+}
+.layout :global(h2) {
+  font-size: 18px;
+  margin-top: 56px;
+  margin-bottom: 0.83em;
+  padding-top: 16px;
+  border-top: 1px solid var(--color-border-tertiary);
+}
+.layout :global(h3) {
+  font-size: 16px;
+  margin-top: 32px;
+  margin-bottom: 1em;
+  color: var(--color-text-info);
+}
+.layout :global(h4) {
+  font-size: 16px;
+  color: var(--color-text-secondary);
+}
+.layout :global(p) {
+  margin: 14px 0;
+  color: var(--color-text-primary);
+}
+.layout :global(code) {
+  font-family: var(--font-mono);
+  font-size: 16px;
+  background: var(--color-background-tertiary);
+  border: 1px solid var(--color-border-tertiary);
+  border-radius: 4px;
+  padding: 1px 6px;
+  color: var(--color-text-info);
+}
+.codeLabel {
+  margin: 18px 0 -10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+.layout :global(pre) {
+  background: #0b1526;
+  border: 1px solid var(--color-border-secondary);
+  border-radius: var(--border-radius-lg);
+  padding: 18px 20px;
+  overflow-x: auto;
+  margin: 18px 0;
+}
+.layout :global(pre) :global(code) {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--color-text-primary);
+  font-size: 16px;
+  line-height: 1.6;
+}
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 280px;
+  height: 100vh;
+  overflow-y: auto;
+  background: var(--color-background-secondary);
+  border-right: 1px solid var(--color-border-tertiary);
+  padding: 28px 18px 40px;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  padding: 0 6px 20px;
+  border-bottom: 1px solid var(--color-border-tertiary);
+  margin-bottom: 16px;
+}
+.brand :global(i) {
+  color: var(--accent);
+  font-size: 20px;
+}
+.sidebar :global(nav) {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.sidebar :global(nav) :global(a) {
+  display: block;
+  font-size: 16px;
+  color: var(--color-text-secondary);
+  padding: 8px 10px;
+  border-radius: var(--border-radius-md);
+  border-left: 2px solid transparent;
+}
+.sidebar :global(nav) :global(a):hover {
+  color: var(--color-text-primary);
+  text-decoration: none;
+  background: var(--color-background-tertiary);
+}
+.sidebar :global(nav) :global(a).active {
+  color: var(--color-text-primary);
+  background: var(--color-background-tertiary);
+  border-left: 2px solid var(--accent);
+  font-weight: 500;
+}
+.sidebar :global(nav) :global(a).sub {
+  padding-left: 22px;
+  font-size: 16px;
+  color: var(--color-text-tertiary);
+}
+.main {
+  display: block;
+  margin-left: 280px;
+  min-height: 100vh;
+}
+.layout :global(main).section {
+  padding: 56px 72px 100px;
+}
+.hero {
+  padding-bottom: 32px;
+  border-bottom: 1px solid var(--color-border-tertiary);
+  margin-bottom: 40px;
+}
+.hero .kicker {
+  color: var(--color-text-info);
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+.hero :global(h1) {
+  font-size: 22px;
+  margin: 10px 0 6px;
+}
+.hero .sub {
+  color: var(--color-text-secondary);
+  font-size: 16px;
+  margin: 0 0 18px;
+}
+.bookCard {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  background: var(--color-background-tertiary);
+  border: 1px solid var(--color-border-secondary);
+  border-radius: var(--border-radius-lg);
+  padding: 18px 20px;
+}
+.bookCard :global(i) {
+  font-size: 26px;
+  color: var(--accent);
+  margin-top: 2px;
+}
+.bookCard .meta {
+  color: var(--color-text-secondary);
+  font-size: 16px;
+}
+.bookCard .meta :global(b) {
+  color: var(--color-text-primary);
+}
+.bookCard .meta :global(a) {
+  display: inline-block;
+  margin-top: 6px;
+}
+.layout :global(section) {
+  margin-bottom: 8px;
+}
+.layout :global(ul),
+.layout :global(ol) {
+  margin: 1em 0;
+  padding-left: 40px;
+}
+.prose :global(ul),
+.prose :global(ol) {
+  padding-left: 22px;
+}
+.prose :global(li) {
+  margin: 6px 0;
+}
+.lead {
+  color: var(--color-text-secondary);
+}
+.tableWrap {
+  overflow-x: auto;
+  margin: 18px 0;
+  border-radius: var(--border-radius-lg);
+  border: 1px solid var(--color-border-secondary);
+}
+.layout :global(table) {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 16px;
+}
+.layout :global(thead) :global(th) {
+  background: var(--color-background-tertiary);
+  color: var(--color-text-primary);
+  text-align: left;
+  font-weight: 500;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--color-border-primary);
+  white-space: nowrap;
+}
+.layout :global(tbody) :global(td) {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--color-border-tertiary);
+  color: var(--color-text-secondary);
+  vertical-align: top;
+}
+.layout :global(tbody) :global(tr):last-child :global(td) {
+  border-bottom: none;
+}
+.layout :global(tbody) :global(td):first-child {
+  color: var(--color-text-primary);
+  font-weight: 500;
+}
+.callout {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  border-radius: var(--border-radius-lg);
+  border: 1px solid var(--color-border-secondary);
+  background: var(--color-background-tertiary);
+  padding: 16px 18px;
+  margin: 20px 0;
+}
+.callout :global(i) {
+  font-size: 20px;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+.callout .calloutTitle {
+  font-weight: 500;
+  margin-bottom: 4px;
+  display: block;
+}
+.callout .calloutBody :global(p) {
+  margin: 6px 0;
+  font-size: 16px;
+  color: var(--color-text-secondary);
+}
+.callout .calloutBody :global(pre) {
+  margin: 10px 0 0;
+}
+.callout.tip {
+  border-color: rgba(143, 232, 188, 0.35);
+  background: var(--color-background-success);
+}
+.callout.tip :global(i),
+.callout.tip .calloutTitle {
+  color: var(--color-text-success);
+}
+.callout.info {
+  border-color: rgba(147, 180, 255, 0.35);
+  background: var(--color-background-info);
+}
+.callout.info :global(i),
+.callout.info .calloutTitle {
+  color: var(--color-text-info);
+}
+.callout.warning {
+  border-color: rgba(255, 214, 143, 0.4);
+  background: var(--color-background-warning);
+}
+.callout.warning :global(i),
+.callout.warning .calloutTitle {
+  color: var(--color-text-warning);
+}
+.diagramCard {
+  background: var(--color-background-secondary);
+  border: 1px solid var(--color-border-secondary);
+  border-radius: var(--border-radius-xl);
+  padding: 20px;
+  margin: 22px 0;
+}
+.diagramCaption {
+  font-size: 16px;
+  color: var(--color-text-tertiary);
+  margin-top: 10px;
+  text-align: center;
+}
+.diagramFallback {
+  margin: 0;
+  max-width: 72ch;
+  font-size: 15px;
+  line-height: 1.7;
+}
+.stepBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--color-background-tertiary);
+  border: 1px solid var(--color-border-primary);
+  color: var(--accent);
+  font-size: 16px;
+  font-weight: 500;
+  margin-right: 8px;
+}
+.refList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 20px 0;
+}
+.refCard {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  background: var(--color-background-tertiary);
+  border: 1px solid var(--color-border-secondary);
+  border-radius: var(--border-radius-lg);
+  padding: 14px 16px;
+}
+.refNum {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--color-background-primary);
+  border: 1px solid var(--color-border-primary);
+  color: var(--color-text-info);
+  font-size: 16px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.refBody .refTitle {
+  color: var(--color-text-primary);
+  font-weight: 500;
+  display: block;
+  margin-bottom: 2px;
+}
+.refBody :global(a) {
+  font-size: 16px;
+  word-break: break-all;
+}
+.chapterMap :global(td):nth-child(1) {
+  white-space: nowrap;
+}
+.disclaimer {
+  margin-top: 56px;
+  padding: 20px 22px;
+  border: 1px dashed var(--color-border-primary);
+  border-radius: var(--border-radius-lg);
+  color: var(--color-text-tertiary);
+  font-size: 16px;
+  background: var(--color-background-secondary);
+}
+.disclaimer .calloutTitle {
+  color: var(--color-text-secondary);
+  font-weight: 500;
+  display: block;
+  margin-bottom: 6px;
+}
+.footer {
+  margin-top: 40px;
+  color: var(--color-text-tertiary);
+  font-size: 16px;
+  text-align: center;
+}
+@media (max-width: 900px) {
+  .sidebar {
+    position: static;
+    width: auto;
+    height: auto;
+    border-right: none;
+    border-bottom: 1px solid var(--color-border-tertiary);
+  }
+  .main {
+    margin-left: 0;
+  }
+  .layout :global(main).section {
+    padding: 36px 20px 72px;
+  }
+  .bookCard {
+    flex-direction: column;
+  }
+}
+
+.layout {
+  width: 100%;
+  color-scheme: dark;
+}
+.main {
+  min-width: 0;
+  width: calc(100% - 280px);
+}
+.layout :global(ul) {
+  list-style-type: disc;
+}
+.layout :global(ol) {
+  list-style-type: decimal;
+}
+.layout :global(th),
+.layout :global(td),
+.layout :global(thead th:not(:first-child)) {
+  text-align: left !important;
+}
+.layout :global(h2),
+.layout :global(h3),
+.layout :global(section),
+.layout :global(header) {
+  scroll-margin-top: calc(var(--header-height, 60px) + 80px);
+}
+.sidebar {
+  top: calc(var(--header-height, 60px) + var(--ch-disclaimer-height, 0px));
+  height: calc(100dvh - var(--header-height, 60px) - var(--ch-disclaimer-height, 0px));
+}
+.codeLine {
+  white-space: pre;
+}
+.diagramWrap :global(.accentNode text) {
+  fill: #ede9fe;
+}
+.diagramWrap :global(.highlightNode text) {
+  fill: #ccfbf1;
+}
+@media (max-width: 900px) {
+  .sidebar {
+    top: auto;
+    height: auto;
+  }
+  .main {
+    width: 100%;
+  }
+}
+:global(body):has(.layout) {
+  background: #07111e;
+}
+:global(body):has(.layout) :global(#site-freshness-bar) {
+  box-sizing: border-box;
+  max-width: none;
+  width: calc(100% - 280px);
+  margin-left: 280px;
+  margin-right: 0;
+  padding-right: 72px;
+  background: #07111e;
+  color: #a8b3c7;
+  justify-content: flex-end;
+}
+:global(body):has(.layout) :global(#site-freshness-bar) :global(time) {
+  color: #e8edf7;
+}
+:global(body):has(.layout) :global(nav[aria-label="関連ページ"]) {
+  --line: #212e4a;
+  --card: #0d1a2b;
+  --fg: #e8edf7;
+  --muted: #a8b3c7;
+  --accent: #7c9eff;
+  box-sizing: border-box;
+  max-width: none;
+  width: calc(100% - 280px);
+  margin-left: 280px;
+  margin-right: 0;
+  padding-left: 72px;
+  padding-right: 72px;
+}
+@media (max-width: 900px) {
+  :global(body):has(.layout) :global(#site-freshness-bar),
+  :global(body):has(.layout) :global(nav[aria-label="関連ページ"]) {
+    width: 100%;
+    margin-left: 0;
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+}
+.diagramTarget {
+  min-width: 0;
+}
+
+.layout :global(pre code) {
+  background: none;
+  border: none;
+  padding: 0;
+  color: inherit;
+}
