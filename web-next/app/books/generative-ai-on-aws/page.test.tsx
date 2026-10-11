@@ -50,7 +50,7 @@ parse(css).walkRules((rule) => {
 });
 function hasRule(
   selector: string,
-  declarations: Record<string, string>,
+  declarations: Record<string, string | undefined>,
   media: string | null = null
 ) {
   expect(
@@ -59,7 +59,8 @@ function hasRule(
         rule.selector === cssNormalize(selector) &&
         rule.media === media &&
         Object.entries(declarations).every(
-          ([property, value]) => rule.declarations[property] === cssNormalize(value)
+          ([property, value]) =>
+            typeof value === "string" && rule.declarations[property] === cssNormalize(value)
         )
     ),
     selector
