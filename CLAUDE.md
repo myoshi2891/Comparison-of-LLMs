@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Updated 2026-10-04
+Updated 2026-10-11
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
@@ -10,6 +10,17 @@ AIモデルの時間別コスト計算機 + AI ツール導入ガイド群。Pyt
 
 ## アーキテクチャ
 
+推薦書籍 `/books/generative-ai-on-aws` を追加（2026-10-11）。原本HTMLの全22 H2・著者3 H4・
+76段落・本文7リスト／35項目・7表／39行・9 Mermaid・6 callout・13チェック項目・
+23参考文献カードをPure JSXへ転写。原本から固定した本文・構造・109 CSS規則を28ページ契約と
+15操作契約で照合する。registryの「推薦書籍」からナビ・検索・RSS・関連リンクを導出する。
+原本HTML／Markdownは `archive/html/books/Generative-ai-on-aws-guide.html`／
+`archive/md/books/Generative-ai-on-aws-guide.md` に内容無変更で保存。指定HTMLを正本とし、
+本文の情報基準日2026-09-10、著者のH4、参考URLの文字列表示を保持する。
+HTML原本監査exit 0、Mermaid 10.9.8の構文解析は全9図成功。Vitest **188 files / 1824 tests**、
+typecheck、lint（518 files／0 diagnostics）が成功。npm・ビルドは実行禁止、
+スクレイパー検証はユーザー指定で対象外。目視確認はユーザー担当。
+
 推薦書籍 `/books/effective-ml-teams` を追加（2026-10-04）。
 `web-next/app/books/effective-ml-teams/` の `page.tsx`、`page.module.css`、`TocObserver.tsx` に
 全13 H2・29 H3・59段落・18リスト／66項目・5表／26行・11図解・12チェック項目・18参考文献を移植。
@@ -17,7 +28,7 @@ AIモデルの時間別コスト計算機 + AI ツール導入ガイド群。Pyt
 registry の「推薦書籍」からナビ・検索・RSS・関連リンクを導出する。原本HTML／Markdownは
 `archive/html/books/Effective-ml-teams-guide.html`／`archive/md/books/Effective-ml-teams-guide.md` に
 内容無変更で保存し、本文の情報基準日2026-09-13を維持する。図ごとのclassDef配色をIDで区切り、
-原本の箇条書き・番号・チェックリスト構造を保持する。最新実測は Vitest **185 files / 1779 tests**、
+原本の箇条書き・番号・チェックリスト構造を保持する。当時の実測は Vitest **185 files / 1779 tests**、
 typecheck・lint（510 files）・pytest（104 tests）が成功。原本監査はexit 0。
 ビルド・npmはユーザー指定で未実行、目視確認はユーザー担当。復旧の経緯は `docs/PROGRESS.md` を参照。
 
@@ -313,7 +324,7 @@ Build:     cd web-next && bun run build
 以下を全て確認してからコミットすること：
 
 1. `cd web-next && bun run build` が成功（※Antigravityサンドボックス環境では実行禁止。他環境やCIでは必須）
-2. `cd web-next && bun run test` が完全に成功（185 files / 1779 tests pass、2026-10-04実測。収集失敗もブロッキング失敗として原因を調査する）
+2. `cd web-next && bun run test` が完全に成功（188 files / 1824 tests pass、2026-10-11実測。収集失敗もブロッキング失敗として原因を調査する）
 3. `cd web-next && bun run typecheck` が成功
 4. `cd web-next && bun run lint` が成功
 5. `cd scraper && uv run pytest` が成功

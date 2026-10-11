@@ -1,6 +1,6 @@
 # GEMINI.md
 
-Updated 2026-10-04
+Updated 2026-10-11
 
 GEMINI.md は Gemini CLI / Gemini Code Assist 向けの入り口。
 本リポジトリでは **CLAUDE.md が正本** とし、GEMINI.md はその委譲 pointer として機能する。
@@ -14,6 +14,12 @@ GEMINI.md は Gemini CLI / Gemini Code Assist 向けの入り口。
 
 @./CLAUDE.md
 @docs/PROGRESS.md
+
+2026-10-11 に `/books/generative-ai-on-aws` を推薦書籍へ追加。指定HTMLから本文・構造・
+109 CSS規則・9図解・13チェック項目・23参考文献カードを固定期待値で照合する。
+28ページ契約と15操作契約を追加し、HTML監査exit 0、Vitest **188 files／1824 tests**、
+typecheck・lint（518 files／0 diagnostics）が成功。原本2形式は内容無変更で退避済み。
+npm・ビルドは未実行、スクレイパー検証はユーザー指定で対象外。目視はユーザー担当。
 
 2026-10-04 に `/books/effective-ml-teams` を推薦書籍へ追加。原本の本文・CSS・11図解・12チェック項目を
 固定期待値で照合し、registry から全導線を導出する。44契約と原本監査exit 0、
@@ -59,11 +65,11 @@ Vitest 185 files／1779 tests、typecheck・lint・pytest 104件が成功。復�
 ## 検証コマンド
 
 ```bash
-(cd web-next && NODE_OPTIONS=--no-experimental-webstorage bun run test) # 185 files / 1779 tests pass（2026-10-04 実測）
-(cd web-next && bun run typecheck)   # OK（2026-10-04 実測）
+(cd web-next && NODE_OPTIONS=--no-experimental-webstorage bun run test) # 188 files / 1824 tests pass（2026-10-11 実測）
+(cd web-next && bun run typecheck)   # OK（2026-10-11 実測）
 # ビルドは今回ユーザー指定で未実行（過去: 2026-09-18 に89静的ページ生成）
-(cd web-next && bun run lint)        # OK（510 files / 0 diagnostics。2026-10-04 実測）
-(cd scraper && uv run pytest)        # 104 件 pass（2026-10-04 実測。全 Green ✅）
+(cd web-next && bun run lint)        # OK（518 files / 0 diagnostics。2026-10-11 実測）
+(cd scraper && uv run pytest)        # 今回対象外。過去の成功は104件（2026-10-04）
 ```
 
 ## 次セッション再開プロンプト

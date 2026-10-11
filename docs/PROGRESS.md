@@ -2,29 +2,39 @@
 
 > 本ファイルは Next.js 移行完了後の保守・改善フェーズにおける開発の進捗（特にテスト関連）および品質チェックのルールを記録する。
 >
-> - 最終更新日: **Updated 2026-10-04**
+> - 最終更新日: **Updated 2026-10-11**
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
 
 ## 現在のステータス
 
 - **フェーズ**: 保守・機能改善・品質強化フェーズ
-- **ブランチ**: `dev`（本番 `main` への Next.js 移行マージ完了 🚀）
-- **最新実装 HEAD**: `f516525e`（Effective ML Teams の整形・検証。承認済み復旧のGreenは `9b5be18b`）
-- **次の作業**: `/books/effective-ml-teams` の目視確認（ユーザー担当）と、その結果への対応。npm・ビルドは今回の依頼では実行しない。
-- **ルート実数**: `page.tsx` 85 件、registry 86 エントリ（RSS の `/rss.xml` を含む）。全ルート登録・ナビ導出テストは合格。
+- **ブランチ**: `main`（今回の開始HEADは `6c443d6e`。ブランチ新設・pushは行っていない）
+- **最新実装 HEAD**: `054eb8f7`（Generative AI on AWSのクラス結合整理。Greenは `7014827d`）
+- **次の作業**: `/books/generative-ai-on-aws` の目視確認（ユーザー担当）と、その結果への対応。npm・ビルドは禁止、スクレイパー検証はユーザー指定で対象外。
+- **ルート実数**: `page.tsx` 86 件、registry 87 エントリ（RSS の `/rss.xml` を含む）。全ルート登録・ナビ導出テストは合格。
 - **動作検証**:
   - ビルド: 今回はユーザー指定で未実行。過去の成功記録は 2026-09-17 の 90 静的ページであり、今回の変更を検証した値ではない。
-  - `bun run typecheck` ✅（`tsc --noEmit`。2026-10-04 実測）
-  - `bun run lint` ✅（Biome check / 510 files / 0 diagnostics。2026-10-04 実測）
+  - `bun run typecheck` ✅（`tsc --noEmit`。2026-10-11 実測）
+  - `bun run lint` ✅（Biome check / 518 files / 0 diagnostics。2026-10-11 実測）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test` で Vitest **185 files / 1779 tests すべて合格**（2026-10-04 実測。全 Green ✅）
-    - 今回の開始時ベースラインは **183 files / 1735 tests**（HEAD `e0a1a4fa`）。既存環境の `localStorage` 問題を避ける実行時オプションを継続使用し、依存・設定ファイルは変更していない。
+  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test` で Vitest **188 files / 1824 tests すべて合格**（2026-10-11 実測）
+    - 今回の開始時ベースラインは **186 files / 1781 tests**（HEAD `6c443d6e`）。既存環境の `localStorage` 問題を避ける実行時オプションを継続使用し、依存・設定ファイルは変更していない。開始時から存在した `web-next/bun.lock` の差分はコミット対象外。
     - `load(sourceHtml)` をモジュール初期化時に呼ぶ `governance/ai-governance/GuideContent.tsx` と
       `local-llm/finetuning-best-practices/GuideContent.tsx` は、import スモークでも読み込み可能であることを確認済み
-  - **バックエンド (`scraper/`)**: pytest 実行で **104 件すべて合格** (2026-10-04 実測。全 Green ✅)
+  - **バックエンド (`scraper/`)**: 今回はユーザー指定で検証対象外。`uv`が見つからず起動できなかった後、実行不要の指示を受けた。過去の成功記録は104件（2026-10-04）であり、今回の実測値ではない。
 
 ## 最近の追加内容
+
+- **Generative AI on AWSガイドの移行（2026-10-11）**:
+  - `/books/generative-ai-on-aws` に全22 H2・著者3 H4・76段落・本文7リスト／35項目・7表／39行・9 Mermaid・6 callout・13チェック項目・23参考文献カードをPure JSXへ転写。サイドバーの3リスト／22項目を含め全57リスト項目を保持。通常コードブロック・SVG・引用は原本に存在しない。冒頭計画の段落77件はscript内のエラー表示用HTML文字列1件を含む生タグ数であり、本文DOMは76段落。
+  - Redで固定した`source-contract.json`により本文・見出し・リンク・表の全セル・リストの型と全項目・装飾クラス・109 CSS規則を順序込み完全一致で検証。箇条書きのdisc、番号付きリストのdecimal、TOC／チェックリストのマーカーなし、全列左寄せ、アンカー余白を検証。期待値は実装に合わせて変更していない。Reactのstylesheet巻き上げと外部アイコンのグローバルクラスに対応するテスト抽出だけを追加Redで修正し、CSS期待値の任意キーに対応する補助関数の型修正を分離した。
+  - 原本の著者カードはH2直下にH4があり、最初の著者でのみ階層が飛ぶ。この既存構造は変更せず、全見出しのタグ・文言と既存の例外を固定契約で検証。参考文献URLは原本どおり文字列表示を保持し、外部リンクへの変換は行っていない。H2には一意の見出しIDを追加し、既存sectionのTOCアンカーも保持。
+  - 28ページ契約と15操作契約を追加。980px境界、トグル／scrim／Escape／リンク開閉、フォーカス・inert、resize、スクロール追従、cleanup、チェックカウンターを検証。原本の9図ソースは全文・順序込み一致。ライトテーマ、hub/doneの配色を保持し、サイズ・中央寄せは共有部品へ委譲。Mermaid 10.9.8で全9図の構文解析が成功し、原本のMermaid 11依存をアプリへ追加していない。
+  - HTML／Markdownを`archive/html/books/Generative-ai-on-aws-guide.html`／`archive/md/books/Generative-ai-on-aws-guide.md`へ無変更で退避。SHA-256はHTML `f9a750b5fd561c7aea4cbf89fe61715d6ff71b87abe961f941ff25ca3c982bf8`、Markdown `cf6c2fac50dbe3611c90fabbfa653897cad4e93d271d4528e880c244f5548f0c`で移動前後一致。本文の情報基準日2026-09-10を維持し、registryの追加・確認日は移行日の2026-10-11。
+  - 指定HTMLの原本監査はexit 0。Markdownにも監査を実行したが、章番号を含む見出し表現・別構造の9図・旧URL2件・本文差があるため不一致。指定されたHTMLを正本にし、Markdownから古い本文や図を混ぜない。Markdownもそのまま保存する。
+  - Red `a85b33d8`、テスト抽出追加Red `d4960ec6`、テスト補助型修正 `1b73a3b9` → Green `7014827d` → Refactor `054eb8f7`を分離。原本監査exit 0、全体Vitest **188 files／1824 tests**、typecheck、lint **518 files／0 diagnostics**が成功。npm・ビルド・ブラウザ自動確認は未実行。スクレイパー検証はユーザー指定で対象外。
+  - CSSキャッシュを一時ディレクトリへ退避し、既存の開発サーバーをポート3000で再起動。`next dev`が自動変更した`web-next/AGENTS.md`は元の内容へ戻し、設定やルール変更は含めていない。目視確認はユーザー担当。移行後のルート直下の未移行HTML候補は10件（Git追跡ファイルで実測）。
 
 - **Effective Machine Learning Teams 入門ガイドの移行と承認済み復旧（2026-10-04）**:
   - `/books/effective-ml-teams` に全13 H2・29 H3・59段落・18リスト／66項目・5表／26行・11 Mermaid・12チェック項目・18参考文献カードをPure JSXへ転写。calloutはpractice 10件／source 4件、引用3件、TOC 42リンクを保持。原本に通常コードブロック・SVG・外部CSSは存在しないため追加していない。
@@ -272,16 +282,16 @@
 
 ```text
 AGENTS.md → CODEX.md → CLAUDE.md → docs/PROGRESS.md → Phase A–F 計画の順で読む。
-最新実装 HEAD: f516525e（Effective ML Teams 整形・検証。承認済み復旧Green: 9b5be18b）
-次の作業: /books/effective-ml-teams の目視確認結果に対応する。目視確認はユーザー担当。
-Effective-ml-teams-guide.html は archive/html/books/、Markdown は archive/md/books/ に保存済み。
-移行漏れ監査は exit 0。全体 Vitest 185 files / 1779 tests、typecheck、lint、pytest 104件が成功。
+最新実装 HEAD: 054eb8f7（Generative AI on AWS整理。Green: 7014827d）
+次の作業: /books/generative-ai-on-aws の目視確認結果に対応する。目視確認はユーザー担当。
+Generative-ai-on-aws-guide.html は archive/html/books/、Markdown は archive/md/books/ に保存済み。
+HTML原本監査は exit 0。全体 Vitest 188 files / 1824 tests、typecheck、lintが成功。pytestは今回対象外。
 この実行環境のテストは NODE_OPTIONS=--no-experimental-webstorage bun run test を使用する。
-ページ29契約と操作15契約は本文・全表・全リスト・CSS・Mermaid・目次・チェックリストを厳密に照合する。
-原本の期待値を移植先に合わせて変更しない。原本の本文情報基準日は2026-09-13のまま。
-Mermaidの文字色は図ごとのIDで区切る。同名baseFillの色をページ全体で共通化しない。
-初回Greenでの手順違反は報告・ユーザー承認・追加Red/Green/Refactorで復旧済み。履歴は保持した。
+ページ28契約と操作15契約は本文・全表・全リスト・109 CSS規則・9 Mermaid・目次・13チェック項目を厳密に照合する。
+原本の期待値を移植先に合わせて変更しない。指定HTMLが正本で本文情報基準日は2026-09-10のまま。
+著者H4の既存階層と参考URLの文字列表示を維持する。Mermaidのhub/done配色はSVGラベルへ適用する。
+開発サーバーはCSSキャッシュ退避後、ポート3000で再起動済み。既存bun.lock差分はコミットしていない。
 サンドボックスでは npm とビルドを実行しない。目視結果への修正も Red → Green → Refactor → Docs で分離コミットする。
-ルート直下に残る未移行HTML候補は11件（2026-10-04にファイル一覧で実測）。次の移行対象は未指定。
-page.tsx 85 件、registry 86 エントリ（RSS を含む）。次のページは指示されてから扱う。
+ルート直下に残る未移行HTML候補は10件（2026-10-11にGit追跡ファイル一覧で実測）。次の移行対象は未指定。
+page.tsx 86 件、registry 87 エントリ（RSS を含む）。次のページは指示されてから扱う。
 ```
