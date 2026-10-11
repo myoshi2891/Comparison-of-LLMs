@@ -194,6 +194,16 @@ const entries: PageEntry[] = [
     lastReviewed: "2026-09-17",
   },
   {
+    slug: "/books/generative-ai-on-aws",
+    title: "Generative AI on AWS 入門ガイド",
+    group: "推薦書籍",
+    topics: ["book", "generative-ai", "aws", "bedrock", "rag", "fine-tuning", "multimodal"],
+    summary:
+      "『Generative AI on AWS』の全12章を基に、生成AIの基礎・モデル最適化・RAG・マルチモーダル・Amazon Bedrockを順に学ぶ初学者向けガイド。13項目のチェックリストと23件の出典を収録。",
+    addedAt: "2026-10-11",
+    lastReviewed: "2026-10-11",
+  },
+  {
     slug: "/ci-cd/ai-cicd-automation-best-practices",
     title: "AI CI/CD Automation",
     group: "開発プロセス",
