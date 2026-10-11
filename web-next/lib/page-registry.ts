@@ -194,6 +194,28 @@ const entries: PageEntry[] = [
     lastReviewed: "2026-09-17",
   },
   {
+    slug: "/books/generative-ai-with-langchain",
+    title: "Generative AI with LangChain",
+    description:
+      "Ben Auffarth著『Generative AI with LangChain』を基に、LLMの基礎、LangChain 1.x・LangGraph・create_agent、RAG、評価・本番運用を学ぶ初学者向けガイド。2026年9月23日時点の補足情報、12コード例・8図解・22件の出典を収録。",
+    group: "推薦書籍",
+    topics: ["book", "generative-ai", "langchain", "langgraph", "agent", "rag"],
+    summary:
+      "Ben Auffarth著『Generative AI with LangChain』の基礎概念を、LangChain 1.x・LangGraph・create_agent・RAG・LangSmithを使う2026年9月時点の実践へ橋渡しする初学者向けガイド。",
+    addedAt: "2026-10-11",
+    lastReviewed: "2026-10-11",
+  },
+  {
+    slug: "/books/generative-ai-on-aws",
+    title: "Generative AI on AWS 入門ガイド",
+    group: "推薦書籍",
+    topics: ["book", "generative-ai", "aws", "bedrock", "rag", "fine-tuning", "multimodal"],
+    summary:
+      "『Generative AI on AWS』の全12章を基に、生成AIの基礎・モデル最適化・RAG・マルチモーダル・Amazon Bedrockを順に学ぶ初学者向けガイド。13項目のチェックリストと23件の出典を収録。",
+    addedAt: "2026-10-11",
+    lastReviewed: "2026-10-11",
+  },
+  {
     slug: "/ci-cd/ai-cicd-automation-best-practices",
     title: "AI CI/CD Automation",
     group: "開発プロセス",

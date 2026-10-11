@@ -1,6 +1,6 @@
 # GEMINI.md
 
-Updated 2026-10-04
+Updated 2026-10-11
 
 GEMINI.md は Gemini CLI / Gemini Code Assist 向けの入り口。
 本リポジトリでは **CLAUDE.md が正本** とし、GEMINI.md はその委譲 pointer として機能する。
@@ -14,6 +14,25 @@ GEMINI.md は Gemini CLI / Gemini Code Assist 向けの入り口。
 
 @./CLAUDE.md
 @docs/PROGRESS.md
+
+2026-10-11 に `/books/generative-ai-with-langchain` を推薦書籍へ追加。指定HTMLの本文・構造・
+76 CSS規則・12コード例・8図解・22参考文献カードを固定期待値で照合する。
+32ページ契約と16操作契約を追加し、HTML監査exit 0、全体Vitest **192 files／1876 tests**、
+整理後の48契約・typecheck・lint（527 files／0 diagnostics）が成功。原本2形式は内容無変更で保存。
+900px以下の通常フロー目次、暗色ネイティブスクロールバー、見出し／リストの既定余白を保持。
+日付バーの背景と関連ページの重なり補正は本ページ限定。図解の代替説明はSVG成功時のみ隠す。
+本文の情報基準日2026-09-23を維持し、依存・設定ファイルは変更しない。
+npm・ビルド・スクレイパー・ブラウザ自動確認は未実行。CSSキャッシュ更新とdev再起動後の目視はユーザー担当。
+
+2026-10-11 に `/books/generative-ai-on-aws` を推薦書籍へ追加。指定HTMLから本文・構造・
+109 CSS規則・9図解・13チェック項目・23参考文献カードを固定期待値で照合する。
+28ページ契約と15操作契約を追加し、HTML監査exit 0、共通クローム修正後のVitest **189 files／1828 tests**、
+typecheck・lint（519 files／0 diagnostics）が成功。原本2形式は内容無変更で退避済み。
+npm・ビルドは未実行、スクレイパー検証はユーザー指定で対象外。目視はユーザー担当。
+
+同ページのスクロールバーは共通のダーク設定をページ限定の `color-scheme: light` で補正する。
+共通日付バーとbodyは本文の紙色へ統一。共通関連ページは固定サイドバー幅300pxを避け、
+980px以下では全幅に戻す。4件のCSS回帰契約を追加し、共通部品と原本オラクルは変更しない。
 
 2026-10-04 に `/books/effective-ml-teams` を推薦書籍へ追加。原本の本文・CSS・11図解・12チェック項目を
 固定期待値で照合し、registry から全導線を導出する。44契約と原本監査exit 0、
@@ -59,11 +78,11 @@ Vitest 185 files／1779 tests、typecheck・lint・pytest 104件が成功。復�
 ## 検証コマンド
 
 ```bash
-(cd web-next && NODE_OPTIONS=--no-experimental-webstorage bun run test) # 185 files / 1779 tests pass（2026-10-04 実測）
-(cd web-next && bun run typecheck)   # OK（2026-10-04 実測）
+(cd web-next && NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000) # Node 24 / 192 files / 1876 tests pass（2026-10-11 実測）
+(cd web-next && bun run typecheck)   # OK（2026-10-11 実測）
 # ビルドは今回ユーザー指定で未実行（過去: 2026-09-18 に89静的ページ生成）
-(cd web-next && bun run lint)        # OK（510 files / 0 diagnostics。2026-10-04 実測）
-(cd scraper && uv run pytest)        # 104 件 pass（2026-10-04 実測。全 Green ✅）
+(cd web-next && bun run lint)        # OK（527 files / 0 diagnostics。2026-10-11 実測）
+(cd scraper && uv run pytest)        # 今回対象外。過去の成功は104件（2026-10-04）
 ```
 
 ## 次セッション再開プロンプト

@@ -1,0 +1,3243 @@
+{
+  "htmlSha256": "f19bbcda51c3495be8a441be508a13de8bf2659cdaefaa3e1cc3bd4ad0687edd",
+  "markdownSha256": "5329901cad76e9a894119f3e37ebafc55f13abfa28176496ad975308de36dd11",
+  "title": "Generative AI with LangChain 徹底解説ガイド",
+  "h1": ["『Generative AI with LangChain』徹底解説ガイド"],
+  "h2": [
+    "0. このガイドについて",
+    "1生成AIとLLMの基礎知識（書籍 Chapter 1 対応）",
+    "2LangChainとは何か（書籍 Chapter 2 対応）",
+    "3開発環境のセットアップと基本要素（書籍 Chapter 3 対応）",
+    "4AIエージェントの構築（書籍 Chapter 4 対応・2026年最新版）",
+    "5チャットボットとRAG（Retrieval-Augmented Generation）（書籍 Chapter 5 対応）",
+    "6生成AIによるソフトウェア開発（書籍 Chapter 6 対応）",
+    "7データサイエンスへのLLM活用（書籍 Chapter 7 対応）",
+    "8LLMのカスタマイズ（書籍 Chapter 8 対応）",
+    "9本番運用：評価・デプロイ・監視（書籍 Chapter 9 対応）",
+    "10生成AIの未来：2023年の予測 vs 2026年9月の現実（書籍 Chapter 10 対応）",
+    "11学習ロードマップと最新リソース",
+    "12参考文献・出典URL一覧"
+  ],
+  "h3": [
+    "0-1. なぜこのガイドが必要か",
+    "0-2. 対象読者",
+    "0-3. 本ガイドの構成",
+    "1-1. 生成AIとは何か",
+    "1-2. LLMの仕組み：ステップバイステップ",
+    "1-3. モデルファミリーの現在地（書籍執筆時 vs 2026年9月）",
+    "2-1. LLM単体の限界とLangChainが解決しようとしたこと",
+    "2-2. LangChainの歴史的な主要コンポーネント（書籍が解説する概念）",
+    "2-3. 2022年〜2026年：LangChainの進化タイムライン",
+    "3-1. インストール（2026年9月時点の方法）",
+    "3-2. 重要な変更点：langchain-classic の登場",
+    "3-3. APIキーの設定",
+    "3-4. Chat Modelの基本呼び出し（最初のステップ）",
+    "3-5. Prompt Templateの基本",
+    "4-1. ツール使用（Tool Use）の基本概念",
+    "4-2. 【2026年の標準】create_agent とミドルウェア",
+    "4-3. エージェントループの図解",
+    "4-4. 代表的な組み込みミドルウェア",
+    "4-5. 標準コンテンツブロック（Standard Content Blocks）",
+    "4-6. MCP（Model Context Protocol）ツールとの統合",
+    "5-1. RAGとは何か",
+    "5-2. RAGパイプラインの全体像",
+    "5-3. 主なRetrieverの種類",
+    "5-4. 会話メモリのパターンと2026年の実装方針",
+    "5-5. ガードレールとモデレーション",
+    "6-1. コード生成エージェントの基本パターン",
+    "8-1. LLMを条件付けする4つの方法",
+    "8-2. プロンプトエンジニアリング技法",
+    "8-3. 2026年の補足：モデルプロファイル",
+    "9-1. 評価の考え方",
+    "9-2. デプロイ方法",
+    "9-3. 観測性（Observability）：LangSmith",
+    "10-1. 書籍が挙げていた論点",
+    "10-2. 2026年9月時点の実際の姿",
+    "10-3. LangChainの2026年スタック構成",
+    "11-1. おすすめの学習順序",
+    "11-2. 主要な学習リソース",
+    "11-3. 書籍の章と2026年公式ドキュメントの対応表"
+  ],
+  "headings": [
+    {
+      "tag": "h1",
+      "text": "『Generative AI with LangChain』徹底解説ガイド"
+    },
+    {
+      "tag": "h2",
+      "text": "0. このガイドについて"
+    },
+    {
+      "tag": "h3",
+      "text": "0-1. なぜこのガイドが必要か"
+    },
+    {
+      "tag": "h3",
+      "text": "0-2. 対象読者"
+    },
+    {
+      "tag": "h3",
+      "text": "0-3. 本ガイドの構成"
+    },
+    {
+      "tag": "h2",
+      "text": "1生成AIとLLMの基礎知識（書籍 Chapter 1 対応）"
+    },
+    {
+      "tag": "h3",
+      "text": "1-1. 生成AIとは何か"
+    },
+    {
+      "tag": "h3",
+      "text": "1-2. LLMの仕組み：ステップバイステップ"
+    },
+    {
+      "tag": "h3",
+      "text": "1-3. モデルファミリーの現在地（書籍執筆時 vs 2026年9月）"
+    },
+    {
+      "tag": "h2",
+      "text": "2LangChainとは何か（書籍 Chapter 2 対応）"
+    },
+    {
+      "tag": "h3",
+      "text": "2-1. LLM単体の限界とLangChainが解決しようとしたこと"
+    },
+    {
+      "tag": "h3",
+      "text": "2-2. LangChainの歴史的な主要コンポーネント（書籍が解説する概念）"
+    },
+    {
+      "tag": "h3",
+      "text": "2-3. 2022年〜2026年：LangChainの進化タイムライン"
+    },
+    {
+      "tag": "h2",
+      "text": "3開発環境のセットアップと基本要素（書籍 Chapter 3 対応）"
+    },
+    {
+      "tag": "h3",
+      "text": "3-1. インストール（2026年9月時点の方法）"
+    },
+    {
+      "tag": "h3",
+      "text": "3-2. 重要な変更点：langchain-classic の登場"
+    },
+    {
+      "tag": "h3",
+      "text": "3-3. APIキーの設定"
+    },
+    {
+      "tag": "h3",
+      "text": "3-4. Chat Modelの基本呼び出し（最初のステップ）"
+    },
+    {
+      "tag": "h3",
+      "text": "3-5. Prompt Templateの基本"
+    },
+    {
+      "tag": "h2",
+      "text": "4AIエージェントの構築（書籍 Chapter 4 対応・2026年最新版）"
+    },
+    {
+      "tag": "h3",
+      "text": "4-1. ツール使用（Tool Use）の基本概念"
+    },
+    {
+      "tag": "h3",
+      "text": "4-2. 【2026年の標準】create_agent とミドルウェア"
+    },
+    {
+      "tag": "h3",
+      "text": "4-3. エージェントループの図解"
+    },
+    {
+      "tag": "h3",
+      "text": "4-4. 代表的な組み込みミドルウェア"
+    },
+    {
+      "tag": "h3",
+      "text": "4-5. 標準コンテンツブロック（Standard Content Blocks）"
+    },
+    {
+      "tag": "h3",
+      "text": "4-6. MCP（Model Context Protocol）ツールとの統合"
+    },
+    {
+      "tag": "h2",
+      "text": "5チャットボットとRAG（Retrieval-Augmented Generation）（書籍 Chapter 5 対応）"
+    },
+    {
+      "tag": "h3",
+      "text": "5-1. RAGとは何か"
+    },
+    {
+      "tag": "h3",
+      "text": "5-2. RAGパイプラインの全体像"
+    },
+    {
+      "tag": "h3",
+      "text": "5-3. 主なRetrieverの種類"
+    },
+    {
+      "tag": "h3",
+      "text": "5-4. 会話メモリのパターンと2026年の実装方針"
+    },
+    {
+      "tag": "h3",
+      "text": "5-5. ガードレールとモデレーション"
+    },
+    {
+      "tag": "h2",
+      "text": "6生成AIによるソフトウェア開発（書籍 Chapter 6 対応）"
+    },
+    {
+      "tag": "h3",
+      "text": "6-1. コード生成エージェントの基本パターン"
+    },
+    {
+      "tag": "h2",
+      "text": "7データサイエンスへのLLM活用（書籍 Chapter 7 対応）"
+    },
+    {
+      "tag": "h2",
+      "text": "8LLMのカスタマイズ（書籍 Chapter 8 対応）"
+    },
+    {
+      "tag": "h3",
+      "text": "8-1. LLMを条件付けする4つの方法"
+    },
+    {
+      "tag": "h3",
+      "text": "8-2. プロンプトエンジニアリング技法"
+    },
+    {
+      "tag": "h3",
+      "text": "8-3. 2026年の補足：モデルプロファイル"
+    },
+    {
+      "tag": "h2",
+      "text": "9本番運用：評価・デプロイ・監視（書籍 Chapter 9 対応）"
+    },
+    {
+      "tag": "h3",
+      "text": "9-1. 評価の考え方"
+    },
+    {
+      "tag": "h3",
+      "text": "9-2. デプロイ方法"
+    },
+    {
+      "tag": "h3",
+      "text": "9-3. 観測性（Observability）：LangSmith"
+    },
+    {
+      "tag": "h2",
+      "text": "10生成AIの未来：2023年の予測 vs 2026年9月の現実（書籍 Chapter 10 対応）"
+    },
+    {
+      "tag": "h3",
+      "text": "10-1. 書籍が挙げていた論点"
+    },
+    {
+      "tag": "h3",
+      "text": "10-2. 2026年9月時点の実際の姿"
+    },
+    {
+      "tag": "h3",
+      "text": "10-3. LangChainの2026年スタック構成"
+    },
+    {
+      "tag": "h2",
+      "text": "11学習ロードマップと最新リソース"
+    },
+    {
+      "tag": "h3",
+      "text": "11-1. おすすめの学習順序"
+    },
+    {
+      "tag": "h3",
+      "text": "11-2. 主要な学習リソース"
+    },
+    {
+      "tag": "h3",
+      "text": "11-3. 書籍の章と2026年公式ドキュメントの対応表"
+    },
+    {
+      "tag": "h2",
+      "text": "12参考文献・出典URL一覧"
+    }
+  ],
+  "paragraphs": [
+    "書籍の基礎概念から、2026年9月現在のLangChain 1.x / LangGraph 1.0 / create_agent 中心のアーキテクチャまでを橋渡しする学習ガイドです。",
+    "Generative AI with LangChain は2023年12月に出版された書籍で、LangChainの基本思想（Chains・Agents・Memory・Tools）とLLMアプリケーション開発の全体像を体系的に学べる良書です。しかし、LangChainは2023年以降きわめて速いペースで進化しており、特に2025年10月のLangChain 1.0 / LangGraph 1.0リリースを境に、コアとなる開発パターンが大きく刷新されました。書籍に出てくる LLMChain、AgentExecutor、ConversationBufferMemory といったクラスの多くは、2026年9月現在は langchain-classic という後方互換パッケージに移動し、実務では create_agent とミドルウェア（middleware）を中心とした新しい設計が標準になっています。",
+    "そこで本ガイドは、次の3層構造で構成しています。",
+    "初学者の方は「書籍の基礎概念」→「現在の実装方法」の順に読むことで、古い情報に惑わされずに実践的なスキルを身につけられます。",
+    "生成AI（Generative AI）とは、テキスト・画像・音声・コードなど、新しいコンテンツを生成できるAIモデルの総称です。その中核をなすのが大規模言語モデル（LLM: Large Language Model）で、大量のテキストデータから「次に来る単語（トークン）」を予測する学習を行うことで、文章の生成・要約・翻訳・質問応答など多様なタスクをこなせるようになります。",
+    "LLM、特にGPT系モデルがテキストを生成する流れは次の通りです。",
+    "入力テキスト → トークン化（Tokenization） → 埋め込みベクトル化（Embedding） → Transformer層（Self-Attention） → 次トークン予測 → 生成終了か判定。終了でなければ生成トークンを入力に追加してTransformer層へ戻り、終了なら出力テキストを返す。",
+    "書籍執筆時（2023年）はGPT-3.5/4、PaLM、Llama 2、Claude 1〜2が主な選択肢でした。2026年9月時点では各社のモデルが大きく世代交代しています。",
+    "書籍のモデル固有の説明（PaLM、Llama 2など）は歴史的背景として読み、実際に手を動かす際は各プロバイダーの最新モデルIDをLangChainの init_chat_model 等で指定するようにしましょう。",
+    "書籍が指摘する通り、LLM単体（\"stochastic parrot\"＝統計的なオウム返し）には次のような限界があります。",
+    "LangChainは、こうした限界を外部ツール連携・検索拡張・記憶管理・推論制御の仕組みを提供することで補うために、Harrison Chase氏によって2022年10月に開発が始まったオープンソースフレームワークです。",
+    "2022年10月 LangChain誕生（Harrison Chase） → 2023年 Chains / Agents / Memory中心の設計（本書の解説範囲） → 2024年 LCEL普及・LangGraph登場 → 2025年10月 LangChain 1.0 / LangGraph 1.0、create_agentが標準に → 2026年 Deep Agents / MCP統合 / Context Engineering / Harness Engineering。",
+    "2026年時点でLangChain社は、単なるライブラリ提供元から「エージェントエンジニアリングプラットフォーム」へと事業の重心を移しています。LangChain共同創業者兼CEOのHarrison Chase氏は、エージェントの成否を分けるのは主にモデル性能そのものよりも「適切な情報を適切な形式・タイミングでLLMに与えられているか」であると繰り返し説明しており、この考え方は「コンテキストエンジニアリング（Context Engineering）」、さらにその発展形として「ハーネスエンジニアリング（Harness Engineering）」と呼ばれています。ハーネスとは、エージェントがループしながらツールを呼び出し、長時間タスクを自律的にこなせるようにする実行基盤（土台）を指す言葉です。",
+    "LangChain 1.x はPython 3.10 以上が必要です。python --version で確認してから以下の手順に進んでください。",
+    "まずプロジェクト専用の仮想環境を作成・有効化し、システムのPython環境を汚さないようにします。",
+    "有効化（Windows PowerShell）",
+    "LangChain 1.0（2025年10月リリース）以降、langchain パッケージの名前空間は「エージェント構築に必要な最小限の部品」に整理されました。書籍で解説されている LLMChain、旧来の AgentExecutor、langchain.retrievers 配下のクラス、Hub連携機能などはlangchain-classicという別パッケージに移動しています。",
+    "既存の学習コンテンツやブログ記事のコードが動かない場合、まずこの名前空間の変更が原因でないかを疑いましょう。",
+    "Bash（macOS / Linux）",
+    "PowerShell（Windows）",
+    "このように |（パイプ）演算子でコンポーネントを連結する記法はLCEL（LangChain Expression Language）と呼ばれ、書籍が刊行された2023年当時から現在まで一貫して使われている基本パターンです。ただし、2026年時点では「複雑なエージェントを組み立てる主役」の座はLCELチェーンから次章で解説する create_agent に移っており、LCELは主に単純な入出力パイプラインの記述に使われる位置づけとなっています。",
+    "書籍が解説する通り、エージェントの核心は「LLMに外部ツールを持たせ、状況判断させながら実行させる」ことです。基本の関数をツール化する方法は現在も同様です。",
+    "書籍のChapter 4で解説される AgentExecutor ベースの実装は、現在は create_agent（LangGraphランタイム上で動作）に置き換わっています。create_agent は「モデル呼び出し → ツール選択・実行 → 結果をモデルに戻す」というエージェントループをLangGraphの上に構築し、そこにミドルウェア（middleware）という差し込み可能な処理ステップを追加できる設計になっています。",
+    "ユーザー入力 → LLM推論 → ツール呼び出しが必要か判定。必要ならミドルウェア適用（Human-in-the-loop 等） → ツール実行 → LLM推論へ戻る。不要なら最終応答を返す。",
+    "タスクの内容に応じて呼び出すモデルを動的に切り替えるModel Router / Auto Modeは、LangChain本体の組み込みミドルウェアではなく、外部パッケージlangchain-typesafeが提供する実験的ミドルウェアです。3-1のセットアップだけでは利用できないため、別途インストールしてからそのパッケージをimportします（APIは変更される可能性があるため、公開名はパッケージのドキュメントで確認してください）。",
+    "LangChain 1.0のもう一つの目玉が「標準コンテンツブロック」です。従来はプロバイダーごとにレスポンス形式が異なり、推論過程（reasoning）や引用（citation）、サーバー側ツール呼び出しの扱いがバラバラでした。これを content_blocks プロパティで統一的に扱えるようにしたことで、モデルを切り替えてもコードの大部分を書き換えずに済むようになっています。",
+    "2026年に入り、langchain.mcp 名前空間が追加され、外部のMCPサーバーが提供するツールを create_agent にそのまま接続できるようになりました。サーバー側からの追加入力要求（elicitation）はLangGraphの interrupt() 機構にマッピングされ、人間の回答を待ってから処理を再開する、という高度なフローも langchain.mcp の機能として扱えます。MCPAdapter に elicitation 用の設定引数はなく、挙動はクライアントのハンドラーから決まります。独自の elicitation ハンドラーを持たないクライアントでは既定で interrupt に変換され、ハンドラーを持つ事前構築済みクライアントではそのハンドラーが応答します。なお interrupt 後に処理を再開するため（他の interrupt と同様に）checkpointer の設定が必須です。",
+    "ただし LangChain 1.4.2 時点で langchain.mcp はベータであり、APIは今後変更される可能性があります。本番利用ではバージョンを固定し、アップグレード時はChangelogを確認してください。",
+    "RAG（検索拡張生成）とは、LLMが回答を生成する前に、外部の知識ベースから関連情報を検索し、その情報をプロンプトに含めることで、最新かつ正確な回答を可能にする手法です。書籍のChapter 5で解説される「ベクトル埋め込み→ベクトルストア→Retriever→チャットボット」という流れは、2026年現在もRAGの基本設計として変わらず有効です。",
+    "元ドキュメント → Document Loader → Text Splitter（チャンク分割） → Embedding Model → Vector Store。ユーザーの質問 → Embedding Model → Retriever（Vector Storeを類似検索） → 関連コンテキスト。関連コンテキストとユーザーの質問をLLMに渡し、回答を生成する。",
+    "書籍では ConversationBufferMemory、ConversationSummaryMemory、ConversationKGMemory など複数のメモリクラスが紹介されています。これらは langchain-classic に残る歴史的な実装ですが、2026年の実務では、エージェントの状態（会話履歴を含む）をLangGraphのState機構とCheckpointer（永続化レイヤー）で管理するのが標準的な設計になっています。ただしStateとCheckpointerは履歴を保持・永続化するだけで、メッセージを要約する機能は持ちません。長時間動作するエージェントで履歴の肥大化を抑えたい場合は、create_agent に前述の SummarizationMiddleware を明示的に組み込み、要約を発動するトリガー（トークン数やメッセージ数のしきい値）を設定します。こうして初めて、古いメッセージが要約され直近のやり取りだけが保持されます。",
+    "不適切な入出力を防ぐガードレールの重要性は書籍執筆時から変わりません。PII Redactionミドルウェアのように、入出力のフィルタリングをエージェントループの一部として組み込む設計が2026年の主流です。",
+    "書籍のChapter 6では、Vertex AI、StarCoder、StarChat、Llama 2などのコードLLMを用いた自動開発エージェント（フィードバックループを持つ「開発者エージェント」）の構築が解説されています。",
+    "タスク仕様の入力 → LLMがコードを生成 → テスト・Lintを実行 → エラーがあるか判定。あればエラーメッセージをLLMにフィードバックしてコード生成へ戻り、なければ完成したコードを出力する。",
+    "このフィードバックループの考え方（コード生成→実行→エラーを読ませて再修正）は、2026年の実務用コーディングエージェント（例：Claude Code のような専用ツール）でも中核をなしており、書籍の設計思想は現在も有効です。異なるのは、2026年時点ではこの種のエージェントが create_agent とファイル操作・シェル実行ツール、そして長時間タスクに耐える「Deep Agents」パターン（後述）の上に構築される点です。",
+    "書籍のChapter 7では、LLMを使ったデータ収集・可視化（EDA）・前処理・特徴量抽出の自動化、およびAutoML的な活用法が解説されています。基本アイデアは「自然言語の指示をエージェントが解釈し、Pythonのデータ分析コードを生成・実行して結果を解釈する」というもので、これは create_agent にPythonコード実行ツール（サンドボックス環境）を持たせることで2026年時点でも同様に実現できます。Harrison Chase氏は2026年のインタビューで、こうしたコード実行を安全に行う「コードサンドボックス」がエージェント基盤における次の重要領域になると述べています。",
+    "LangChain 1.1（1.0の後続マイナーリリース）では、対応するChat Modelで .profile 属性を通じて「構造化出力に対応しているか」「関数呼び出しをサポートするか」等の機能を宣言的に取得できるようになりました。このプロファイル情報はオープンソースプロジェクトmodels.devから供給されています。ただし .profile はベータ機能であり、モデルによっては未設定（None）だったり、項目が欠けていたり、実際の挙動と一致しない場合があります。機能判定に使う際は未設定・欠落を前提にし、取得できない場合は安全側の既定値（例：構造化出力非対応として扱う）へフォールバックするか、プロバイダーのドキュメントや実際の呼び出し結果で確認するようにしましょう。",
+    "書籍が解説する「2つの出力を比較する」「基準に照らして評価する」「文字列比較／意味的比較」「データセットに対する評価を実行する」という評価の基本枠組みは2026年も変わりません。",
+    "書籍ではFastAPIを使ったWebサーバー化や、Rayを使った分散実行が紹介されています。これらは現在もLLMアプリのデプロイ手段として広く使われています。",
+    "LangSmithはLangChain社が提供するトレーシング・評価・監視プラットフォームで、書籍執筆時から現在まで一貫してLangChainエコシステムの観測性を担っています。2026年9月時点のアップデートとして、LangSmith SaaSにおける拡張トレース保持期間が最大180日に制限される変更が2026年9月14日から適用されるなど、エンタープライズ向けの運用ルールが継続的に更新されています（セルフホスト／BYOC環境は対象外）。",
+    "エージェント実行 → LangSmithへトレース送信 → 「トレース閲覧・デバッグ」と「評価データセットでのスコアリング」 → 改善（プロンプト / ツール / ミドルウェア調整） → エージェント実行へ戻る。",
+    "書籍のChapter 10では、モデル開発のトレンド、Big Tech対中小企業の構図、AGIへの展望、創造産業・教育・法律・製造業・医療・軍事への影響、誤情報・サイバーセキュリティ、規制上の課題など、幅広い論点が予測的に議論されています。",
+    "書籍刊行から約3年が経過した2026年、生成AI・エージェント分野で実際に起きた主な変化は次の通りです。",
+    "Harrison Chase氏はLangChainの技術スタックを「LangGraphを中核（コアの実行基盤）とし、その上にLangChainがエージェント構築レイヤーとして乗り、さらにその上にDeep Agentsが積み重なる」構造として説明しています。",
+    "LangChainの2026年スタック（上から）：Deep Agents（長時間稼働する自律エージェント） → LangChain（create_agent / middleware によるエージェント構築の中心レイヤー） → LangGraph（グラフベースの実行基盤・永続化）。LangSmith（可観測性・評価・トレース）が3層すべてを監視する。",
+    "「エージェントが失敗するときはコンテキストが不足しているときであり、成功するときは適切な情報が適切な形式・タイミングでLLMに渡されているときだ」という趣旨の発言に象徴されるように、2026年のLangChain開発思想はモデル性能そのものよりもコンテキストエンジニアリングと、それを支える実行基盤（ハーネス）の設計に重心が置かれています。",
+    "1. 本ガイド第1〜3章で基礎を理解 → 2. 公式ドキュメントのMigration Guideに目を通す → 3. LangChain Academyの無料LangGraphコースを受講 → 4. DeepLearning.AIの短期講座で基礎概念を補強 → 5. create_agent + Middlewareで小さなエージェントを自作 → 6. RAGパイプラインを自前のデータで構築 → 7. LangSmithでトレース・評価を実践。",
+    "本ガイドの2026年時点の情報は、2026年9月23日時点でのウェブ検索により、可能な限りLangChain公式および著名な国際的情報源を優先して収集しました。",
+    "本ガイドは書籍 Generative AI with LangChain（Ben Auffarth著）の目次・概要と、2026年9月23日時点の公開ウェブ情報をもとにAnthropic Claudeが作成した学習補助資料です。書籍本文の逐語的な引用は含まれておらず、内容はすべて独自にまとめ直したものです。LangChainのAPIは今後も更新される可能性があるため、実装の際は必ず公式ドキュメント（docs.langchain.com）の最新版を確認してください。"
+  ],
+  "links": [
+    {
+      "href": "https://www.oreilly.com/library/view/generative-ai-with/9781835083468/",
+      "text": "O'Reilly 掲載ページを見る"
+    },
+    {
+      "href": "https://www.oreilly.com/library/view/generative-ai-with/9781835083468/",
+      "text": "https://www.oreilly.com/library/view/generative-ai-with/9781835083468/"
+    },
+    {
+      "href": "https://www.langchain.com/blog/langchain-langgraph-1dot0",
+      "text": "https://www.langchain.com/blog/langchain-langgraph-1dot0"
+    },
+    {
+      "href": "https://changelog.langchain.com/announcements/langchain-1-0-now-generally-available",
+      "text": "https://changelog.langchain.com/announcements/langchain-1-0-now-generally-available"
+    },
+    {
+      "href": "https://changelog.langchain.com/announcements/langchain-1-1",
+      "text": "https://changelog.langchain.com/announcements/langchain-1-1"
+    },
+    {
+      "href": "https://docs.langchain.com/oss/python/releases/langchain-v1",
+      "text": "https://docs.langchain.com/oss/python/releases/langchain-v1"
+    },
+    {
+      "href": "https://docs.langchain.com/oss/python/migrate/langchain-v1",
+      "text": "https://docs.langchain.com/oss/python/migrate/langchain-v1"
+    },
+    {
+      "href": "https://docs.langchain.com/oss/python/releases/changelog",
+      "text": "https://docs.langchain.com/oss/python/releases/changelog"
+    },
+    {
+      "href": "https://releasebot.io/updates/langchain-ai",
+      "text": "https://releasebot.io/updates/langchain-ai"
+    },
+    {
+      "href": "https://releases.sh/langchain",
+      "text": "https://releases.sh/langchain"
+    },
+    {
+      "href": "https://www.cbinsights.com/company/langchain",
+      "text": "https://www.cbinsights.com/company/langchain"
+    },
+    {
+      "href": "https://rosetta.to/person/harrison-chase",
+      "text": "https://rosetta.to/person/harrison-chase"
+    },
+    {
+      "href": "https://www.antoinebuteau.com/lessons-from-harrison-chase/",
+      "text": "https://www.antoinebuteau.com/lessons-from-harrison-chase/"
+    },
+    {
+      "href": "https://dev.to/gautammanak1/langchain-deep-dive-4ill",
+      "text": "https://dev.to/gautammanak1/langchain-deep-dive-4ill"
+    },
+    {
+      "href": "https://www.deeplearning.ai/short-courses/langchain-for-llm-application-development/",
+      "text": "https://www.deeplearning.ai/short-courses/langchain-for-llm-application-development/"
+    },
+    {
+      "href": "https://aiagentrank.io/blog/best-langchain-courses-2026",
+      "text": "https://aiagentrank.io/blog/best-langchain-courses-2026"
+    },
+    {
+      "href": "https://www.clickittech.com/ai/langchain-1-0-vs-langgraph-1-0/",
+      "text": "https://www.clickittech.com/ai/langchain-1-0-vs-langgraph-1-0/"
+    },
+    {
+      "href": "https://en.wikipedia.org/wiki/LangChain",
+      "text": "https://en.wikipedia.org/wiki/LangChain"
+    },
+    {
+      "href": "https://openai.com/index/gpt-6-astra/",
+      "text": "https://openai.com/index/gpt-6-astra/"
+    },
+    {
+      "href": "https://community.openai.com/t/announcing-gpt-6-sol-and-gpt-6-luna-in-the-api-codex-and-chatgpt/1399925",
+      "text": "https://community.openai.com/t/announcing-gpt-6-sol-and-gpt-6-luna-in-the-api-codex-and-chatgpt/1399925"
+    },
+    {
+      "href": "https://docs.claude.com/en/docs/about-claude/models/overview",
+      "text": "https://docs.claude.com/en/docs/about-claude/models/overview"
+    },
+    {
+      "href": "https://azure.microsoft.com/en-us/blog/gpt-6-astra-sol-and-luna-for-production-agents-in-microsoft-foundry/",
+      "text": "https://azure.microsoft.com/en-us/blog/gpt-6-astra-sol-and-luna-for-production-agents-in-microsoft-foundry/"
+    },
+    {
+      "href": "https://help.openai.com/en/articles/20001516-managing-usage-with-gpt-6-astra-in-work-and-codex",
+      "text": "https://help.openai.com/en/articles/20001516-managing-usage-with-gpt-6-astra-in-work-and-codex"
+    }
+  ],
+  "toc": [
+    {
+      "href": "#intro",
+      "text": "このガイドについて"
+    },
+    {
+      "href": "#ch1",
+      "text": "1. 生成AIとLLMの基礎"
+    },
+    {
+      "href": "#ch2",
+      "text": "2. LangChainとは何か"
+    },
+    {
+      "href": "#ch3",
+      "text": "3. 開発環境と基本要素"
+    },
+    {
+      "href": "#ch4",
+      "text": "4. AIエージェントの構築"
+    },
+    {
+      "href": "#ch5",
+      "text": "5. チャットボットとRAG"
+    },
+    {
+      "href": "#ch6",
+      "text": "6. 生成AIとソフトウェア開発"
+    },
+    {
+      "href": "#ch7",
+      "text": "7. データサイエンスへの応用"
+    },
+    {
+      "href": "#ch8",
+      "text": "8. LLMのカスタマイズ"
+    },
+    {
+      "href": "#ch9",
+      "text": "9. 本番運用"
+    },
+    {
+      "href": "#ch10",
+      "text": "10. 生成AIの未来"
+    },
+    {
+      "href": "#ch11",
+      "text": "11. 学習ロードマップ"
+    },
+    {
+      "href": "#ch12",
+      "text": "12. 参考文献"
+    }
+  ],
+  "lists": [
+    {
+      "tag": "ol",
+      "items": [
+        "書籍の章立てに沿って生成AI・LLM・LangChainの基礎概念をステップバイステップで解説する",
+        "各章の内容が2026年9月時点でどう変化したかを明記する",
+        "最新の公式情報（LangChain公式ブログ・ドキュメント・DeepLearning.AI講座・業界インタビュー等）を根拠として提示する"
+      ]
+    },
+    {
+      "tag": "ul",
+      "items": [
+        "Python の基本文法は理解しているが、LLMアプリケーション開発は未経験の方",
+        "ChatGPTやClaudeは使ったことがあるが、「自分でLLMを使ったアプリを作る」経験がない方",
+        "書籍 Generative AI with LangChain を購入予定、または購入済みで学習を始めたい方"
+      ]
+    },
+    {
+      "tag": "ol",
+      "items": [
+        "トークン化（Tokenization）：入力文を「トークン」と呼ばれる単位（単語やサブワード）に分割する",
+        "埋め込み（Embedding）：各トークンを数百〜数千次元の数値ベクトルに変換する",
+        "事前学習（Pre-training）：Transformerアーキテクチャ（Self-Attention機構）を使い、大量のテキストから「文脈に応じた次トークン予測」を学習する",
+        "条件付け（Conditioning）：指示（プロンプト）やシステムメッセージによって出力の方向性を制御する",
+        "生成（Generation）：予測したトークンを1つずつ追加しながら文章を完成させる"
+      ]
+    },
+    {
+      "tag": "ul",
+      "items": [
+        "学習データの時点までの知識しか持たない（最新情報を知らない）",
+        "外部システム（DB、API、ファイル）を直接操作できない",
+        "長い会話の文脈を無限に保持できない",
+        "ハルシネーション（もっともらしい誤った情報の生成）を起こす"
+      ]
+    }
+  ],
+  "tables": [
+    [
+      [
+        {
+          "tag": "th",
+          "text": "章"
+        },
+        {
+          "tag": "th",
+          "text": "内容"
+        },
+        {
+          "tag": "th",
+          "text": "書籍との対応"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "第1章"
+        },
+        {
+          "tag": "td",
+          "text": "生成AIとLLMの基礎"
+        },
+        {
+          "tag": "td",
+          "text": "書籍 Chapter 1"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "第2章"
+        },
+        {
+          "tag": "td",
+          "text": "LangChainとは何か"
+        },
+        {
+          "tag": "td",
+          "text": "書籍 Chapter 2"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "第3章"
+        },
+        {
+          "tag": "td",
+          "text": "開発環境と基本要素"
+        },
+        {
+          "tag": "td",
+          "text": "書籍 Chapter 3"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "第4章"
+        },
+        {
+          "tag": "td",
+          "text": "AIエージェントの構築"
+        },
+        {
+          "tag": "td",
+          "text": "書籍 Chapter 4"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "第5章"
+        },
+        {
+          "tag": "td",
+          "text": "チャットボットとRAG"
+        },
+        {
+          "tag": "td",
+          "text": "書籍 Chapter 5"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "第6章"
+        },
+        {
+          "tag": "td",
+          "text": "生成AIによるソフトウェア開発"
+        },
+        {
+          "tag": "td",
+          "text": "書籍 Chapter 6"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "第7章"
+        },
+        {
+          "tag": "td",
+          "text": "データサイエンスへの応用"
+        },
+        {
+          "tag": "td",
+          "text": "書籍 Chapter 7"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "第8章"
+        },
+        {
+          "tag": "td",
+          "text": "LLMのカスタマイズ"
+        },
+        {
+          "tag": "td",
+          "text": "書籍 Chapter 8"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "第9章"
+        },
+        {
+          "tag": "td",
+          "text": "本番運用（評価・デプロイ・監視）"
+        },
+        {
+          "tag": "td",
+          "text": "書籍 Chapter 9"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "第10章"
+        },
+        {
+          "tag": "td",
+          "text": "生成AIの未来（2023年予測 vs 2026年現実）"
+        },
+        {
+          "tag": "td",
+          "text": "書籍 Chapter 10"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "第11章"
+        },
+        {
+          "tag": "td",
+          "text": "学習ロードマップと最新リソース"
+        },
+        {
+          "tag": "td",
+          "text": "追加章"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "第12章"
+        },
+        {
+          "tag": "td",
+          "text": "参考文献・出典URL一覧"
+        },
+        {
+          "tag": "td",
+          "text": "追加章"
+        }
+      ]
+    ],
+    [
+      [
+        {
+          "tag": "th",
+          "text": "モデルファミリー"
+        },
+        {
+          "tag": "th",
+          "text": "開発元"
+        },
+        {
+          "tag": "th",
+          "text": "書籍執筆時（2023年）"
+        },
+        {
+          "tag": "th",
+          "text": "2026年9月時点の位置づけ"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "GPTシリーズ"
+        },
+        {
+          "tag": "td",
+          "text": "OpenAI"
+        },
+        {
+          "tag": "td",
+          "text": "GPT-3.5 / GPT-4"
+        },
+        {
+          "tag": "td",
+          "text": "GPT-6世代へ進化。GPT-6 Astra（最上位）はAPI（gpt-6-astra）・Microsoft Foundry・ChatGPTで提供中。ChatGPTではPro $100 / Pro $200 / Business / EnterpriseがAstra搭載のGPT-6 Proを利用でき、PlusはChatGPT WorkとCodex内でのみ利用可能（Enterprise / Eduは既定で無効、管理者が有効化）。利用量は各プランの既存の利用枠から消費され、対象プラン・アカウントでは超過分をクレジットの追加購入で補える（Enterprise契約では超過分が該当するトークン単価で課金される場合がある）。GPT-6 Sol / Luna（2026年9月22日発表の高速・低価格版）はAPI・ChatGPT Work・Codexで提供開始済み（通常のChatGPTでは利用不可）。Microsoft Foundryでは一般提供済み（出典：後掲の参考文献 [18][19][21][22]）"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "Claudeシリーズ"
+        },
+        {
+          "tag": "td",
+          "text": "Anthropic"
+        },
+        {
+          "tag": "td",
+          "text": "Claude 1〜2"
+        },
+        {
+          "tag": "td",
+          "text": "Claude Opus 5.5 / Sonnet 5.5 / Haiku 4.5 の構成に加え、上位ティアのClaude Fable 5.1が登場（出典：後掲の参考文献 [20]）"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "Gemini / PaLM"
+        },
+        {
+          "tag": "td",
+          "text": "Google"
+        },
+        {
+          "tag": "td",
+          "text": "PaLM, 初代Gemini"
+        },
+        {
+          "tag": "td",
+          "text": "Gemini 3系へ進化"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "Llamaシリーズ"
+        },
+        {
+          "tag": "td",
+          "text": "Meta"
+        },
+        {
+          "tag": "td",
+          "text": "Llama 2"
+        },
+        {
+          "tag": "td",
+          "text": "後継モデル群へ世代交代、オープンウェイト戦略が継続"
+        }
+      ]
+    ],
+    [
+      [
+        {
+          "tag": "th",
+          "text": "コンポーネント"
+        },
+        {
+          "tag": "th",
+          "text": "役割"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "Chains"
+        },
+        {
+          "tag": "td",
+          "text": "複数のLLM呼び出しや処理ステップを一連の流れとして連結する仕組み"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "Agents"
+        },
+        {
+          "tag": "td",
+          "text": "LLMを「推論エンジン」として使い、状況に応じて動的にツールを選択・実行する仕組み"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "Memory"
+        },
+        {
+          "tag": "td",
+          "text": "会話の履歴や状態を保持し、複数ターンにまたがる対話を可能にする仕組み"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "Tools"
+        },
+        {
+          "tag": "td",
+          "text": "検索、計算、DB操作などLLMが呼び出せる外部機能"
+        }
+      ]
+    ],
+    [
+      [
+        {
+          "tag": "th",
+          "text": "用途"
+        },
+        {
+          "tag": "th",
+          "text": "書籍時点（〜2024年）のインポート"
+        },
+        {
+          "tag": "th",
+          "text": "2026年9月時点のインポート"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "チェーン"
+        },
+        {
+          "tag": "td",
+          "text": "from langchain.chains import LLMChain"
+        },
+        {
+          "tag": "td",
+          "text": "from langchain_classic.chains import LLMChain"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "Retriever"
+        },
+        {
+          "tag": "td",
+          "text": "from langchain.retrievers import ..."
+        },
+        {
+          "tag": "td",
+          "text": "from langchain_classic.retrievers import ..."
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "Indexing"
+        },
+        {
+          "tag": "td",
+          "text": "from langchain.indexes import ..."
+        },
+        {
+          "tag": "td",
+          "text": "from langchain_classic.indexes import ..."
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "プロンプトHub"
+        },
+        {
+          "tag": "td",
+          "text": "from langchain import hub"
+        },
+        {
+          "tag": "td",
+          "text": "from langchain_classic import hub"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "エージェント作成"
+        },
+        {
+          "tag": "td",
+          "text": "from langgraph.prebuilt import create_react_agent"
+        },
+        {
+          "tag": "td",
+          "text": "from langchain.agents import create_agent"
+        }
+      ]
+    ],
+    [
+      [
+        {
+          "tag": "th",
+          "text": "ミドルウェア"
+        },
+        {
+          "tag": "th",
+          "text": "役割"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "Human-in-the-loop"
+        },
+        {
+          "tag": "td",
+          "text": "ツール実行前に人間の承認・編集・却下を挟む（送金やメール送信など重要な操作向け）"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "Summarization"
+        },
+        {
+          "tag": "td",
+          "text": "会話履歴がコンテキスト上限に近づいたら古いメッセージを要約し、トークン超過を防ぐ"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "PII Redaction"
+        },
+        {
+          "tag": "td",
+          "text": "個人識別情報（PII）を検出しマスキングする"
+        }
+      ]
+    ],
+    [
+      [
+        {
+          "tag": "th",
+          "text": "Retriever種類"
+        },
+        {
+          "tag": "th",
+          "text": "特徴"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "kNN Retriever"
+        },
+        {
+          "tag": "td",
+          "text": "ベクトル間の距離（近傍）に基づき類似文書を検索するシンプルな方式"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "カスタムRetriever"
+        },
+        {
+          "tag": "td",
+          "text": "独自の検索ロジック（キーワード＋ベクトルのハイブリッド等）を実装"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "ドメイン特化Retriever"
+        },
+        {
+          "tag": "td",
+          "text": "例：PubMed retrieverのように特定データソースに特化した検索器"
+        }
+      ]
+    ],
+    [
+      [
+        {
+          "tag": "th",
+          "text": "手法"
+        },
+        {
+          "tag": "th",
+          "text": "概要"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "RLHF（人間フィードバックからの強化学習）"
+        },
+        {
+          "tag": "td",
+          "text": "人間の評価をもとに報酬モデルを学習し、モデルの応答傾向を調整する"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "LoRA（低ランク適応）"
+        },
+        {
+          "tag": "td",
+          "text": "少量の追加パラメータのみを学習し、効率的にファインチューニングする手法"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "推論時条件付け"
+        },
+        {
+          "tag": "td",
+          "text": "プロンプトやFew-shot例など、学習を伴わずに出力を制御する方法"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "ファインチューニング"
+        },
+        {
+          "tag": "td",
+          "text": "オープンソースモデル・商用モデルの重みを追加データで再学習する"
+        }
+      ]
+    ],
+    [
+      [
+        {
+          "tag": "th",
+          "text": "技法"
+        },
+        {
+          "tag": "th",
+          "text": "概要"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "Zero-shot prompting"
+        },
+        {
+          "tag": "td",
+          "text": "例を示さず、指示のみでタスクを実行させる"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "Few-shot learning"
+        },
+        {
+          "tag": "td",
+          "text": "少数の入出力例を提示してから本番の入力を渡す"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "CoT（Chain-of-Thought）prompting"
+        },
+        {
+          "tag": "td",
+          "text": "「段階的に考えてください」と指示し、推論過程を明示的に出力させる"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "Self-consistency"
+        },
+        {
+          "tag": "td",
+          "text": "同じ問いに対し複数回推論させ、多数決的に最も一貫した答えを採用する"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "ToT（Tree-of-Thought）"
+        },
+        {
+          "tag": "td",
+          "text": "複数の推論の枝を木構造的に探索し、有望な経路を選んで深掘りする"
+        }
+      ]
+    ],
+    [
+      [
+        {
+          "tag": "th",
+          "text": "書籍（2023年）での位置づけ"
+        },
+        {
+          "tag": "th",
+          "text": "2026年9月時点の実際"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "チャット主体のLLMアプリ（対話ボックス中心）"
+        },
+        {
+          "tag": "td",
+          "text": "「対話ボックスに別れを告げ、長時間稼働するエージェント（Long-Horizon Agents）の時代へ」という業界観測が広がっている"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "Chains / AgentExecutorが中心設計"
+        },
+        {
+          "tag": "td",
+          "text": "create_agent ＋ Middleware ＋ LangGraphランタイムが標準設計に"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "LangChainは主にオープンソースライブラリ"
+        },
+        {
+          "tag": "td",
+          "text": "LangChain社はVC出資を受けた「エージェントエンジニアリングプラットフォーム」企業に進化"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "単発タスクの自動化が主眼"
+        },
+        {
+          "tag": "td",
+          "text": "「Deep Agents」と呼ばれる、計画・長期記憶・継続実行能力を持つエージェント層が登場"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "ツール呼び出しは各フレームワークで独自実装"
+        },
+        {
+          "tag": "td",
+          "text": "MCP（Model Context Protocol）による外部ツール接続の標準化が進行"
+        }
+      ]
+    ],
+    [
+      [
+        {
+          "tag": "th",
+          "text": "リソース"
+        },
+        {
+          "tag": "th",
+          "text": "提供元"
+        },
+        {
+          "tag": "th",
+          "text": "特徴"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "LangChain Academy（LangGraphコース）"
+        },
+        {
+          "tag": "td",
+          "text": "LangChain公式"
+        },
+        {
+          "tag": "td",
+          "text": "無料。State machineとしてのエージェント構築、Checkpointerによる永続化、Human-in-the-loop、ストリーミング、LangServe/LangSmithを使ったデプロイまで実践的にカバー。2025〜2026年にかけて継続的に最新パターンへ更新されている"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "LangChain for LLM Application Development"
+        },
+        {
+          "tag": "td",
+          "text": "DeepLearning.AI（Andrew Ng・Harrison Chase講師）"
+        },
+        {
+          "tag": "td",
+          "text": "無料の短期講座（約1時間48分）。モデル・プロンプト・パーサー、メモリ、チェーン、ドキュメントQ&A、エージェント、評価という基礎概念を、開発者自身であるHarrison Chase氏から直接学べる。2023年収録のためAPIの一部は古いが、概念理解には現在も有用"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "Functions, Tools and Agents with LangChain"
+        },
+        {
+          "tag": "td",
+          "text": "DeepLearning.AI"
+        },
+        {
+          "tag": "td",
+          "text": "ツール呼び出しとエージェント構築に特化した続編講座"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "LangChain公式ドキュメント（docs.langchain.com）"
+        },
+        {
+          "tag": "td",
+          "text": "LangChain公式"
+        },
+        {
+          "tag": "td",
+          "text": "create_agent、Middleware、Migration Guideなど最新仕様の一次情報源"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "LangChain公式ブログ / Changelog"
+        },
+        {
+          "tag": "td",
+          "text": "LangChain公式"
+        },
+        {
+          "tag": "td",
+          "text": "バージョンごとの新機能・破壊的変更の告知"
+        }
+      ]
+    ],
+    [
+      [
+        {
+          "tag": "th",
+          "text": "書籍の章"
+        },
+        {
+          "tag": "th",
+          "text": "キーワード"
+        },
+        {
+          "tag": "th",
+          "text": "2026年時点で参照すべき公式トピック"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "Chapter 2〜3"
+        },
+        {
+          "tag": "td",
+          "text": "Chains, LCEL, 基本セットアップ"
+        },
+        {
+          "tag": "td",
+          "text": "\"What's new in LangChain v1\" / Migration Guide"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "Chapter 4"
+        },
+        {
+          "tag": "td",
+          "text": "Agents, Tools"
+        },
+        {
+          "tag": "td",
+          "text": "Agents（create_agent）, Middleware"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "Chapter 5"
+        },
+        {
+          "tag": "td",
+          "text": "RAG, Memory, Retrievers"
+        },
+        {
+          "tag": "td",
+          "text": "Retrieval, LangGraph State & Checkpointers"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "Chapter 8"
+        },
+        {
+          "tag": "td",
+          "text": "Fine-tuning, Prompting"
+        },
+        {
+          "tag": "td",
+          "text": "Model Profiles（.profile）"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "Chapter 9"
+        },
+        {
+          "tag": "td",
+          "text": "評価・デプロイ・観測性"
+        },
+        {
+          "tag": "td",
+          "text": "LangSmith Docs"
+        }
+      ],
+      [
+        {
+          "tag": "td",
+          "text": "（新規）"
+        },
+        {
+          "tag": "td",
+          "text": "外部ツール接続"
+        },
+        {
+          "tag": "td",
+          "text": "langchain.mcp（MCP統合）"
+        }
+      ]
+    ]
+  ],
+  "codes": [
+    {
+      "language": "language-bash",
+      "text": "# 仮想環境を作成\npython -m venv .venv\n\n# 有効化（macOS / Linux）\nsource .venv/bin/activate"
+    },
+    {
+      "language": "language-powershell",
+      "text": ".venv\\Scripts\\Activate.ps1"
+    },
+    {
+      "language": "language-bash",
+      "text": "# 最新の安定版 LangChain をインストール\npip install -U langchain\n\n# よく使う周辺パッケージ\npip install -U langchain-anthropic langchain-openai langchain-google-genai\n\n# 後述の langchain_classic / langchain.mcp の例で使うパッケージ\npip install -U langchain-classic \"langchain[mcp]\""
+    },
+    {
+      "language": "language-bash",
+      "text": "# APIキーはソースコードに書かず、シェル・CIのシークレット・.env（Git管理外）で設定する\nexport ANTHROPIC_API_KEY=\"...\"\n# 以下は OpenAI / Google のインテグレーションを使う場合のみ（任意）\nexport OPENAI_API_KEY=\"...\"\nexport GOOGLE_API_KEY=\"...\""
+    },
+    {
+      "language": "language-powershell",
+      "text": "# APIキーはソースコードに書かず、シェル・CIのシークレット・.env（Git管理外）で設定する\n# 現在の PowerShell セッションにのみ設定される\n$env:ANTHROPIC_API_KEY = \"...\"\n# 以下は OpenAI / Google のインテグレーションを使う場合のみ（任意）\n$env:OPENAI_API_KEY = \"...\"\n$env:GOOGLE_API_KEY = \"...\""
+    },
+    {
+      "language": "language-python",
+      "text": "import os\n\n# 各インテグレーションは環境変数から自動でキーを読み込むため、コード内でキーを代入しない\n# 次節の例は Anthropic を使うため、必須なのは ANTHROPIC_API_KEY のみ\nif not os.environ.get(\"ANTHROPIC_API_KEY\"):\n    raise RuntimeError(\"環境変数が未設定です: ANTHROPIC_API_KEY\")\n\n# OpenAI / Google は、それぞれのインテグレーションを使う場合のみ設定する（任意）\noptional = (\"OPENAI_API_KEY\", \"GOOGLE_API_KEY\")\nunset = [k for k in optional if not os.environ.get(k)]\nif unset:\n    print(f\"任意の環境変数が未設定です（該当プロバイダーを使う場合のみ必要）: {', '.join(unset)}\")"
+    },
+    {
+      "language": "language-python",
+      "text": "from langchain.chat_models import init_chat_model\n\n# プロバイダーを問わず統一インターフェースでモデルを初期化できる\nmodel = init_chat_model(\"claude-sonnet-4-6\", model_provider=\"anthropic\")\n\nresponse = model.invoke(\"LangChainを一言で説明してください。\")\nprint(response.content)"
+    },
+    {
+      "language": "language-python",
+      "text": "from langchain_core.prompts import ChatPromptTemplate\n\nprompt = ChatPromptTemplate.from_messages([\n    (\"system\", \"あなたは親切な{role}です。\"),\n    (\"human\", \"{question}\"),\n])\n\nchain = prompt | model\nresult = chain.invoke({\"role\": \"AIエンジニア\", \"question\": \"RAGとは何ですか？\"})"
+    },
+    {
+      "language": "language-python",
+      "text": "from langchain_core.tools import tool\n\n@tool\ndef search_web(query: str) -> str:\n    \"\"\"指定したクエリでウェブ検索を行う（デモ用モック。実際の検索は行わない）。\"\"\"\n    # 本番では検索APIの呼び出しに置き換える。ここではクエリを含む固定テキストを返す\n    return f\"[モック] 「{query}」の検索結果\""
+    },
+    {
+      "language": "language-python",
+      "text": "from langchain.agents import create_agent\n\nagent = create_agent(\n    model=\"claude-sonnet-4-6\",\n    tools=[search_web],\n    system_prompt=\"あなたは有能なリサーチアシスタントです。\",\n)\n\nresult = agent.invoke({\n    \"messages\": [{\"role\": \"user\", \"content\": \"search_webで「LangChain」を検索し、結果を要約して\"}]\n})"
+    },
+    {
+      "language": "language-bash",
+      "text": "# ModelRouterMiddleware / AutoModeMiddleware には experimental extra が必要\npip install -U \"langchain-typesafe[experimental]\""
+    },
+    {
+      "language": "language-python",
+      "text": "# Model Router / Auto Mode は langchain 本体ではなく langchain_typesafe から import する\nimport langchain_typesafe"
+    }
+  ],
+  "inlineCodes": [
+    "Generative AI with LangChain",
+    "LLMChain",
+    "AgentExecutor",
+    "ConversationBufferMemory",
+    "langchain-classic",
+    "create_agent",
+    "Generative AI with LangChain",
+    "gpt-6-astra",
+    "init_chat_model",
+    "python --version",
+    "langchain-classic",
+    "langchain",
+    "LLMChain",
+    "AgentExecutor",
+    "langchain.retrievers",
+    "langchain-classic",
+    "from langchain.chains import LLMChain",
+    "from langchain_classic.chains import LLMChain",
+    "from langchain.retrievers import ...",
+    "from langchain_classic.retrievers import ...",
+    "from langchain.indexes import ...",
+    "from langchain_classic.indexes import ...",
+    "from langchain import hub",
+    "from langchain_classic import hub",
+    "from langgraph.prebuilt import create_react_agent",
+    "from langchain.agents import create_agent",
+    "|",
+    "create_agent",
+    "create_agent",
+    "AgentExecutor",
+    "create_agent",
+    "create_agent",
+    "content_blocks",
+    "langchain.mcp",
+    "create_agent",
+    "interrupt()",
+    "langchain.mcp",
+    "MCPAdapter",
+    "langchain.mcp",
+    "ConversationBufferMemory",
+    "ConversationSummaryMemory",
+    "ConversationKGMemory",
+    "langchain-classic",
+    "create_agent",
+    "SummarizationMiddleware",
+    "create_agent",
+    "create_agent",
+    ".profile",
+    ".profile",
+    "None",
+    "create_agent",
+    "create_agent",
+    "create_agent",
+    ".profile",
+    "langchain.mcp",
+    "Generative AI with LangChain"
+  ],
+  "callouts": [
+    {
+      "classes": ["callout", "tip"],
+      "variant": "good",
+      "text": "学習のポイント 書籍のモデル固有の説明（PaLM、Llama 2など）は歴史的背景として読み、実際に手を動かす際は各プロバイダーの最新モデルIDをLangChainの init_chat_model 等で指定するようにしましょう。"
+    },
+    {
+      "classes": ["callout", "info"],
+      "variant": "info",
+      "text": "前提条件 LangChain 1.x はPython 3.10 以上が必要です。python --version で確認してから以下の手順に進んでください。"
+    },
+    {
+      "classes": ["callout", "warning"],
+      "variant": "warn",
+      "text": "既存の学習コンテンツやブログ記事のコードが動かない場合、まずこの名前空間の変更が原因でないかを疑いましょう。"
+    },
+    {
+      "classes": ["callout", "warning"],
+      "variant": "warn",
+      "text": "組み込みではない実験的ミドルウェア タスクの内容に応じて呼び出すモデルを動的に切り替えるModel Router / Auto Modeは、LangChain本体の組み込みミドルウェアではなく、外部パッケージlangchain-typesafeが提供する実験的ミドルウェアです。3-1のセットアップだけでは利用できないため、別途インストールしてからそのパッケージをimportします（APIは変更される可能性があるため、公開名はパッケージのドキュメントで確認してください）。 # ModelRouterMiddleware / AutoModeMiddleware には experimental extra が必要 pip install -U \"langchain-typesafe[experimental]\" # Model Router / Auto Mode は langchain 本体ではなく langchain_typesafe から import する import langchain_typesafe"
+    },
+    {
+      "classes": ["callout", "warning"],
+      "variant": "warn",
+      "text": "ただし LangChain 1.4.2 時点で langchain.mcp はベータであり、APIは今後変更される可能性があります。本番利用ではバージョンを固定し、アップグレード時はChangelogを確認してください。"
+    }
+  ],
+  "refs": [
+    "1 O'Reilly 書籍ページ（目次・著者情報）https://www.oreilly.com/library/view/generative-ai-with/9781835083468/",
+    "2 LangChain公式ブログ「LangChain and LangGraph Agent Frameworks Reach v1.0 Milestones」https://www.langchain.com/blog/langchain-langgraph-1dot0",
+    "3 LangChain公式Changelog「LangChain 1.0 now generally available」https://changelog.langchain.com/announcements/langchain-1-0-now-generally-available",
+    "4 LangChain公式Changelog「LangChain 1.1」（モデルプロファイル）https://changelog.langchain.com/announcements/langchain-1-1",
+    "5 LangChain公式ドキュメント「What's new in LangChain v1」https://docs.langchain.com/oss/python/releases/langchain-v1",
+    "6 LangChain公式ドキュメント「Migration Guide: langchain v1」https://docs.langchain.com/oss/python/migrate/langchain-v1",
+    "7 LangChain公式ドキュメント Changelog（v1.4, MCP統合・Model Profiles）https://docs.langchain.com/oss/python/releases/changelog",
+    "8 LangChainリリース情報まとめ（2026年9月, langchain-typesafe等）https://releasebot.io/updates/langchain-ai",
+    "9 LangChainリリース情報まとめ（LangSmithトレース保持期間の変更）https://releases.sh/langchain",
+    "10 CB Insights「LangChain Company Profile」（Harrison Chase氏のコンテキストエンジニアリング／ハーネスエンジニアリング発言）https://www.cbinsights.com/company/langchain",
+    "11 Sequoia Capital Training Data ポッドキャスト出演情報（Harrison Chase氏）https://rosetta.to/person/harrison-chase",
+    "12 Antoine Buteau「Lessons from Harrison Chase」（LangChainの設計思想まとめ）https://www.antoinebuteau.com/lessons-from-harrison-chase/",
+    "13 DEV Community「LangChain — Deep Dive」（2026年のLangChain社の事業動向）https://dev.to/gautammanak1/langchain-deep-dive-4ill",
+    "14 DeepLearning.AI「LangChain for LLM Application Development」講座ページhttps://www.deeplearning.ai/short-courses/langchain-for-llm-application-development/",
+    "15 AI Agent Rank「Best LangChain courses 2026」（学習リソース比較）https://aiagentrank.io/blog/best-langchain-courses-2026",
+    "16 ClickIT Tech「LangChain 1.0 vs LangGraph 1.0: Which One to Use in 2026」https://www.clickittech.com/ai/langchain-1-0-vs-langgraph-1-0/",
+    "17 Wikipedia「LangChain」（基本沿革）https://en.wikipedia.org/wiki/LangChain",
+    "18 OpenAI「GPT-6 Astra」発表ページhttps://openai.com/index/gpt-6-astra/",
+    "19 OpenAI Developer Community「Announcing GPT-6 Sol and GPT-6 Luna in the API, Codex, and ChatGPT」https://community.openai.com/t/announcing-gpt-6-sol-and-gpt-6-luna-in-the-api-codex-and-chatgpt/1399925",
+    "20 Anthropic「Models overview」公式ドキュメントhttps://docs.claude.com/en/docs/about-claude/models/overview",
+    "21 Microsoft Azure Blog「GPT-6 Astra, Sol, and Luna for production AI agents in Microsoft Foundry」（2026年9月22日）https://azure.microsoft.com/en-us/blog/gpt-6-astra-sol-and-luna-for-production-agents-in-microsoft-foundry/",
+    "22 OpenAI Help Center「Managing usage with GPT-6 Astra in Work and Codex」https://help.openai.com/en/articles/20001516-managing-usage-with-gpt-6-astra-in-work-and-codex"
+  ],
+  "steps": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
+  "styledNodes": [
+    {
+      "tag": "header",
+      "classes": ["hero"]
+    },
+    {
+      "tag": "div",
+      "classes": ["kicker"]
+    },
+    {
+      "tag": "p",
+      "classes": ["sub"]
+    },
+    {
+      "tag": "div",
+      "classes": ["bookCard"]
+    },
+    {
+      "tag": "i",
+      "classes": ["ti", "ti-book-2"]
+    },
+    {
+      "tag": "div",
+      "classes": ["meta"]
+    },
+    {
+      "tag": "i",
+      "classes": ["ti", "ti-external-link"]
+    },
+    {
+      "tag": "div",
+      "classes": ["prose"]
+    },
+    {
+      "tag": "div",
+      "classes": ["prose"]
+    },
+    {
+      "tag": "div",
+      "classes": ["tableWrap"]
+    },
+    {
+      "tag": "section",
+      "classes": ["prose"]
+    },
+    {
+      "tag": "span",
+      "classes": ["stepBadge"]
+    },
+    {
+      "tag": "div",
+      "classes": ["diagramCard"]
+    },
+    {
+      "tag": "div",
+      "classes": ["diagramWrap"]
+    },
+    {
+      "tag": "div",
+      "classes": ["diagramTarget"]
+    },
+    {
+      "tag": "p",
+      "classes": ["diagramFallback"]
+    },
+    {
+      "tag": "div",
+      "classes": ["diagramCaption"]
+    },
+    {
+      "tag": "div",
+      "classes": ["tableWrap"]
+    },
+    {
+      "tag": "div",
+      "classes": ["callout", "tip"]
+    },
+    {
+      "tag": "i",
+      "classes": ["ti", "ti-bulb"]
+    },
+    {
+      "tag": "div",
+      "classes": ["calloutBody"]
+    },
+    {
+      "tag": "span",
+      "classes": ["calloutTitle"]
+    },
+    {
+      "tag": "section",
+      "classes": ["prose"]
+    },
+    {
+      "tag": "span",
+      "classes": ["stepBadge"]
+    },
+    {
+      "tag": "div",
+      "classes": ["tableWrap"]
+    },
+    {
+      "tag": "div",
+      "classes": ["diagramCard"]
+    },
+    {
+      "tag": "div",
+      "classes": ["diagramWrap"]
+    },
+    {
+      "tag": "div",
+      "classes": ["diagramTarget"]
+    },
+    {
+      "tag": "p",
+      "classes": ["diagramFallback"]
+    },
+    {
+      "tag": "div",
+      "classes": ["diagramCaption"]
+    },
+    {
+      "tag": "section",
+      "classes": ["prose"]
+    },
+    {
+      "tag": "span",
+      "classes": ["stepBadge"]
+    },
+    {
+      "tag": "div",
+      "classes": ["callout", "info"]
+    },
+    {
+      "tag": "i",
+      "classes": ["ti", "ti-info-circle"]
+    },
+    {
+      "tag": "div",
+      "classes": ["calloutBody"]
+    },
+    {
+      "tag": "span",
+      "classes": ["calloutTitle"]
+    },
+    {
+      "tag": "code",
+      "classes": ["language-bash"]
+    },
+    {
+      "tag": "p",
+      "classes": ["codeLabel"]
+    },
+    {
+      "tag": "code",
+      "classes": ["language-powershell"]
+    },
+    {
+      "tag": "code",
+      "classes": ["language-bash"]
+    },
+    {
+      "tag": "div",
+      "classes": ["tableWrap"]
+    },
+    {
+      "tag": "div",
+      "classes": ["callout", "warning"]
+    },
+    {
+      "tag": "i",
+      "classes": ["ti", "ti-alert-triangle"]
+    },
+    {
+      "tag": "div",
+      "classes": ["calloutBody"]
+    },
+    {
+      "tag": "p",
+      "classes": ["codeLabel"]
+    },
+    {
+      "tag": "code",
+      "classes": ["language-bash"]
+    },
+    {
+      "tag": "p",
+      "classes": ["codeLabel"]
+    },
+    {
+      "tag": "code",
+      "classes": ["language-powershell"]
+    },
+    {
+      "tag": "code",
+      "classes": ["language-python"]
+    },
+    {
+      "tag": "code",
+      "classes": ["language-python"]
+    },
+    {
+      "tag": "code",
+      "classes": ["language-python"]
+    },
+    {
+      "tag": "section",
+      "classes": ["prose"]
+    },
+    {
+      "tag": "span",
+      "classes": ["stepBadge"]
+    },
+    {
+      "tag": "code",
+      "classes": ["language-python"]
+    },
+    {
+      "tag": "code",
+      "classes": ["language-python"]
+    },
+    {
+      "tag": "div",
+      "classes": ["diagramCard"]
+    },
+    {
+      "tag": "div",
+      "classes": ["diagramWrap"]
+    },
+    {
+      "tag": "div",
+      "classes": ["diagramTarget"]
+    },
+    {
+      "tag": "p",
+      "classes": ["diagramFallback"]
+    },
+    {
+      "tag": "div",
+      "classes": ["diagramCaption"]
+    },
+    {
+      "tag": "div",
+      "classes": ["tableWrap"]
+    },
+    {
+      "tag": "div",
+      "classes": ["callout", "warning"]
+    },
+    {
+      "tag": "i",
+      "classes": ["ti", "ti-alert-triangle"]
+    },
+    {
+      "tag": "div",
+      "classes": ["calloutBody"]
+    },
+    {
+      "tag": "span",
+      "classes": ["calloutTitle"]
+    },
+    {
+      "tag": "code",
+      "classes": ["language-bash"]
+    },
+    {
+      "tag": "code",
+      "classes": ["language-python"]
+    },
+    {
+      "tag": "div",
+      "classes": ["callout", "warning"]
+    },
+    {
+      "tag": "i",
+      "classes": ["ti", "ti-alert-triangle"]
+    },
+    {
+      "tag": "div",
+      "classes": ["calloutBody"]
+    },
+    {
+      "tag": "section",
+      "classes": ["prose"]
+    },
+    {
+      "tag": "span",
+      "classes": ["stepBadge"]
+    },
+    {
+      "tag": "div",
+      "classes": ["diagramCard"]
+    },
+    {
+      "tag": "div",
+      "classes": ["diagramWrap"]
+    },
+    {
+      "tag": "div",
+      "classes": ["diagramTarget"]
+    },
+    {
+      "tag": "p",
+      "classes": ["diagramFallback"]
+    },
+    {
+      "tag": "div",
+      "classes": ["diagramCaption"]
+    },
+    {
+      "tag": "div",
+      "classes": ["tableWrap"]
+    },
+    {
+      "tag": "section",
+      "classes": ["prose"]
+    },
+    {
+      "tag": "span",
+      "classes": ["stepBadge"]
+    },
+    {
+      "tag": "div",
+      "classes": ["diagramCard"]
+    },
+    {
+      "tag": "div",
+      "classes": ["diagramWrap"]
+    },
+    {
+      "tag": "div",
+      "classes": ["diagramTarget"]
+    },
+    {
+      "tag": "p",
+      "classes": ["diagramFallback"]
+    },
+    {
+      "tag": "div",
+      "classes": ["diagramCaption"]
+    },
+    {
+      "tag": "section",
+      "classes": ["prose"]
+    },
+    {
+      "tag": "span",
+      "classes": ["stepBadge"]
+    },
+    {
+      "tag": "section",
+      "classes": ["prose"]
+    },
+    {
+      "tag": "span",
+      "classes": ["stepBadge"]
+    },
+    {
+      "tag": "div",
+      "classes": ["tableWrap"]
+    },
+    {
+      "tag": "div",
+      "classes": ["tableWrap"]
+    },
+    {
+      "tag": "section",
+      "classes": ["prose"]
+    },
+    {
+      "tag": "span",
+      "classes": ["stepBadge"]
+    },
+    {
+      "tag": "div",
+      "classes": ["diagramCard"]
+    },
+    {
+      "tag": "div",
+      "classes": ["diagramWrap"]
+    },
+    {
+      "tag": "div",
+      "classes": ["diagramTarget"]
+    },
+    {
+      "tag": "p",
+      "classes": ["diagramFallback"]
+    },
+    {
+      "tag": "div",
+      "classes": ["diagramCaption"]
+    },
+    {
+      "tag": "section",
+      "classes": ["prose"]
+    },
+    {
+      "tag": "span",
+      "classes": ["stepBadge"]
+    },
+    {
+      "tag": "div",
+      "classes": ["tableWrap"]
+    },
+    {
+      "tag": "div",
+      "classes": ["diagramCard"]
+    },
+    {
+      "tag": "div",
+      "classes": ["diagramWrap"]
+    },
+    {
+      "tag": "div",
+      "classes": ["diagramTarget"]
+    },
+    {
+      "tag": "p",
+      "classes": ["diagramFallback"]
+    },
+    {
+      "tag": "div",
+      "classes": ["diagramCaption"]
+    },
+    {
+      "tag": "section",
+      "classes": ["prose"]
+    },
+    {
+      "tag": "span",
+      "classes": ["stepBadge"]
+    },
+    {
+      "tag": "div",
+      "classes": ["diagramCard"]
+    },
+    {
+      "tag": "div",
+      "classes": ["diagramWrap"]
+    },
+    {
+      "tag": "div",
+      "classes": ["diagramTarget"]
+    },
+    {
+      "tag": "p",
+      "classes": ["diagramFallback"]
+    },
+    {
+      "tag": "div",
+      "classes": ["diagramCaption"]
+    },
+    {
+      "tag": "div",
+      "classes": ["tableWrap"]
+    },
+    {
+      "tag": "div",
+      "classes": ["tableWrap"]
+    },
+    {
+      "tag": "table",
+      "classes": ["chapterMap"]
+    },
+    {
+      "tag": "section",
+      "classes": ["prose"]
+    },
+    {
+      "tag": "span",
+      "classes": ["stepBadge"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refList"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refCard"]
+    },
+    {
+      "tag": "span",
+      "classes": ["refNum"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refBody"]
+    },
+    {
+      "tag": "span",
+      "classes": ["refTitle"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refCard"]
+    },
+    {
+      "tag": "span",
+      "classes": ["refNum"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refBody"]
+    },
+    {
+      "tag": "span",
+      "classes": ["refTitle"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refCard"]
+    },
+    {
+      "tag": "span",
+      "classes": ["refNum"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refBody"]
+    },
+    {
+      "tag": "span",
+      "classes": ["refTitle"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refCard"]
+    },
+    {
+      "tag": "span",
+      "classes": ["refNum"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refBody"]
+    },
+    {
+      "tag": "span",
+      "classes": ["refTitle"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refCard"]
+    },
+    {
+      "tag": "span",
+      "classes": ["refNum"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refBody"]
+    },
+    {
+      "tag": "span",
+      "classes": ["refTitle"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refCard"]
+    },
+    {
+      "tag": "span",
+      "classes": ["refNum"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refBody"]
+    },
+    {
+      "tag": "span",
+      "classes": ["refTitle"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refCard"]
+    },
+    {
+      "tag": "span",
+      "classes": ["refNum"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refBody"]
+    },
+    {
+      "tag": "span",
+      "classes": ["refTitle"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refCard"]
+    },
+    {
+      "tag": "span",
+      "classes": ["refNum"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refBody"]
+    },
+    {
+      "tag": "span",
+      "classes": ["refTitle"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refCard"]
+    },
+    {
+      "tag": "span",
+      "classes": ["refNum"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refBody"]
+    },
+    {
+      "tag": "span",
+      "classes": ["refTitle"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refCard"]
+    },
+    {
+      "tag": "span",
+      "classes": ["refNum"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refBody"]
+    },
+    {
+      "tag": "span",
+      "classes": ["refTitle"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refCard"]
+    },
+    {
+      "tag": "span",
+      "classes": ["refNum"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refBody"]
+    },
+    {
+      "tag": "span",
+      "classes": ["refTitle"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refCard"]
+    },
+    {
+      "tag": "span",
+      "classes": ["refNum"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refBody"]
+    },
+    {
+      "tag": "span",
+      "classes": ["refTitle"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refCard"]
+    },
+    {
+      "tag": "span",
+      "classes": ["refNum"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refBody"]
+    },
+    {
+      "tag": "span",
+      "classes": ["refTitle"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refCard"]
+    },
+    {
+      "tag": "span",
+      "classes": ["refNum"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refBody"]
+    },
+    {
+      "tag": "span",
+      "classes": ["refTitle"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refCard"]
+    },
+    {
+      "tag": "span",
+      "classes": ["refNum"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refBody"]
+    },
+    {
+      "tag": "span",
+      "classes": ["refTitle"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refCard"]
+    },
+    {
+      "tag": "span",
+      "classes": ["refNum"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refBody"]
+    },
+    {
+      "tag": "span",
+      "classes": ["refTitle"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refCard"]
+    },
+    {
+      "tag": "span",
+      "classes": ["refNum"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refBody"]
+    },
+    {
+      "tag": "span",
+      "classes": ["refTitle"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refCard"]
+    },
+    {
+      "tag": "span",
+      "classes": ["refNum"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refBody"]
+    },
+    {
+      "tag": "span",
+      "classes": ["refTitle"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refCard"]
+    },
+    {
+      "tag": "span",
+      "classes": ["refNum"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refBody"]
+    },
+    {
+      "tag": "span",
+      "classes": ["refTitle"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refCard"]
+    },
+    {
+      "tag": "span",
+      "classes": ["refNum"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refBody"]
+    },
+    {
+      "tag": "span",
+      "classes": ["refTitle"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refCard"]
+    },
+    {
+      "tag": "span",
+      "classes": ["refNum"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refBody"]
+    },
+    {
+      "tag": "span",
+      "classes": ["refTitle"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refCard"]
+    },
+    {
+      "tag": "span",
+      "classes": ["refNum"]
+    },
+    {
+      "tag": "div",
+      "classes": ["refBody"]
+    },
+    {
+      "tag": "span",
+      "classes": ["refTitle"]
+    },
+    {
+      "tag": "div",
+      "classes": ["disclaimer"]
+    },
+    {
+      "tag": "span",
+      "classes": ["calloutTitle"]
+    },
+    {
+      "tag": "i",
+      "classes": ["ti", "ti-shield-check"]
+    },
+    {
+      "tag": "div",
+      "classes": ["footer"]
+    }
+  ],
+  "diagrams": [
+    {
+      "id": "diagram-llmFlow",
+      "chart": "flowchart LR\naccTitle: LLMのテキスト生成フロー\naccDescr: 入力テキストをトークン化し、埋め込みベクトルに変換してTransformer層で次トークンを予測する。生成終了でなければ生成トークンを入力に追加してTransformer層へ戻り、終了したら出力テキストを返すループ。\nA[\"入力テキスト\"] --> B[\"トークン化<br/>Tokenization\"]\nB --> C[\"埋め込みベクトル化<br/>Embedding\"]\nC --> D[\"Transformer層<br/>Self-Attention\"]\nD --> E[\"次トークン予測<br/>Next-Token Prediction\"]\nE --> F{\"生成終了?\"}\nF -- \"No\" --> G[\"生成トークンを<br/>入力に追加\"]\nG --> D\nF -- \"Yes\" --> H[\"出力テキスト\"]\nclassDef accentNode fill:#4c1d95,stroke:#ddd6fe,color:#ede9fe\nclassDef highlightNode fill:#115e59,stroke:#99f6e4,color:#ccfbf1\nclass A,H accentNode\nclass F highlightNode",
+      "fallback": "入力テキスト → トークン化（Tokenization） → 埋め込みベクトル化（Embedding） → Transformer層（Self-Attention） → 次トークン予測 → 生成終了か判定。終了でなければ生成トークンを入力に追加してTransformer層へ戻り、終了なら出力テキストを返す。",
+      "caption": "図1：LLMがテキストを生成するまでの基本フロー"
+    },
+    {
+      "id": "diagram-timeline",
+      "chart": "flowchart LR\naccTitle: LangChainの進化の年表\naccDescr: 2022年10月のLangChain誕生から、2023年のChains・Agents・Memory中心の設計（本書の解説範囲）、2024年のLCEL普及とLangGraph登場、2025年10月のLangChain 1.0・LangGraph 1.0とcreate_agentの標準化、2026年のDeep Agents・MCP統合・Context Engineering・Harness Engineeringまでの流れ。\nA[\"2022年10月<br/>LangChain誕生<br/>(Harrison Chase)\"] --> B[\"2023年<br/>Chains / Agents / Memory<br/>中心の設計<br/>（本書の解説範囲）\"]\nB --> C[\"2024年<br/>LCEL普及<br/>LangGraphが登場\"]\nC --> D[\"2025年10月<br/>LangChain 1.0 / LangGraph 1.0<br/>create_agentが標準に\"]\nD --> E[\"2026年<br/>Deep Agents / MCP統合<br/>Context Engineering / Harness Engineering\"]\nclassDef accentNode fill:#4c1d95,stroke:#ddd6fe,color:#ede9fe\nclassDef highlightNode fill:#115e59,stroke:#99f6e4,color:#ccfbf1\nclass A accentNode\nclass E highlightNode",
+      "fallback": "2022年10月 LangChain誕生（Harrison Chase） → 2023年 Chains / Agents / Memory中心の設計（本書の解説範囲） → 2024年 LCEL普及・LangGraph登場 → 2025年10月 LangChain 1.0 / LangGraph 1.0、create_agentが標準に → 2026年 Deep Agents / MCP統合 / Context Engineering / Harness Engineering。",
+      "caption": "図2：LangChainの主要な進化タイムライン"
+    },
+    {
+      "id": "diagram-agentLoop",
+      "chart": "flowchart TD\naccTitle: create_agentのエージェントループ\naccDescr: ユーザー入力をLLMが推論し、ツール呼び出しが必要ならHuman-in-the-loopなどのミドルウェアを適用してツールを実行し、結果をLLM推論へ戻す。ツール呼び出しが不要になったら最終応答を返す。\nA[\"ユーザー入力\"] --> B[\"LLM推論\"]\nB --> C{\"ツール呼び出しが必要?\"}\nC -- \"Yes\" --> D[\"ミドルウェア適用<br/>(Human-in-the-loop 等)\"]\nD --> E[\"ツール実行\"]\nE --> B\nC -- \"No\" --> F[\"最終応答を返す\"]\nclassDef accentNode fill:#4c1d95,stroke:#ddd6fe,color:#ede9fe\nclassDef highlightNode fill:#115e59,stroke:#99f6e4,color:#ccfbf1\nclass A accentNode\nclass F highlightNode",
+      "fallback": "ユーザー入力 → LLM推論 → ツール呼び出しが必要か判定。必要ならミドルウェア適用（Human-in-the-loop 等） → ツール実行 → LLM推論へ戻る。不要なら最終応答を返す。",
+      "caption": "図3：create_agent のエージェントループ"
+    },
+    {
+      "id": "diagram-rag",
+      "chart": "flowchart LR\naccTitle: RAGパイプラインの構成\naccDescr: 元ドキュメントをDocument Loaderで読み込み、Text Splitterでチャンク分割し、Embedding ModelでベクトルにしてVector Storeへ格納する。ユーザーの質問もEmbedding Modelでベクトル化してRetrieverが類似検索し、得られた関連コンテキストと質問をLLMへ渡して回答を生成する。\nA[\"元ドキュメント\"] --> B[\"Document Loader\"]\nB --> C[\"Text Splitter<br/>(チャンク分割)\"]\nC --> D[\"Embedding Model\"]\nD --> E[(\"Vector Store\")]\nF[\"ユーザーの質問\"] --> G[\"Embedding Model\"]\nG --> H[\"Retriever<br/>(類似検索)\"]\nE --> H\nH --> I[\"関連コンテキスト\"]\nI --> J[\"LLM\"]\nF --> J\nJ --> K[\"回答\"]\nclassDef accentNode fill:#4c1d95,stroke:#ddd6fe,color:#ede9fe\nclassDef highlightNode fill:#115e59,stroke:#99f6e4,color:#ccfbf1\nclass E accentNode\nclass K highlightNode",
+      "fallback": "元ドキュメント → Document Loader → Text Splitter（チャンク分割） → Embedding Model → Vector Store。ユーザーの質問 → Embedding Model → Retriever（Vector Storeを類似検索） → 関連コンテキスト。関連コンテキストとユーザーの質問をLLMに渡し、回答を生成する。",
+      "caption": "図4：RAGパイプラインの全体像"
+    },
+    {
+      "id": "diagram-codeLoop",
+      "chart": "flowchart TD\naccTitle: コード生成のフィードバックループ\naccDescr: タスク仕様を入力するとLLMがコードを生成し、テストとLintを実行する。エラーがあればエラーメッセージをLLMにフィードバックして再生成し、エラーがなければ完成したコードを出力する。\nA[\"タスク仕様の入力\"] --> B[\"LLMがコードを生成\"]\nB --> C[\"テスト・Lintを実行\"]\nC --> D{\"エラーあり?\"}\nD -- \"Yes\" --> E[\"エラーメッセージを<br/>LLMにフィードバック\"]\nE --> B\nD -- \"No\" --> F[\"完成したコードを出力\"]\nclassDef accentNode fill:#4c1d95,stroke:#ddd6fe,color:#ede9fe\nclassDef highlightNode fill:#115e59,stroke:#99f6e4,color:#ccfbf1\nclass A accentNode\nclass F highlightNode",
+      "fallback": "タスク仕様の入力 → LLMがコードを生成 → テスト・Lintを実行 → エラーがあるか判定。あればエラーメッセージをLLMにフィードバックしてコード生成へ戻り、なければ完成したコードを出力する。",
+      "caption": "図5：コード生成エージェントのフィードバックループ"
+    },
+    {
+      "id": "diagram-langsmith",
+      "chart": "flowchart LR\naccTitle: LangSmithによる改善サイクル\naccDescr: エージェント実行のトレースをLangSmithへ送信し、トレース閲覧によるデバッグと評価データセットでのスコアリングを行う。両方の結果をもとにプロンプト・ツール・ミドルウェアを調整し、再びエージェントを実行する循環。\nA[\"エージェント実行\"] --> B[\"LangSmithへトレース送信\"]\nB --> C[\"トレース閲覧・デバッグ\"]\nB --> D[\"評価データセットでのスコアリング\"]\nC --> E[\"改善（プロンプト/ツール/ミドルウェア調整）\"]\nD --> E\nE --> A\nclassDef accentNode fill:#4c1d95,stroke:#ddd6fe,color:#ede9fe\nclassDef highlightNode fill:#115e59,stroke:#99f6e4,color:#ccfbf1\nclass B accentNode\nclass E highlightNode",
+      "fallback": "エージェント実行 → LangSmithへトレース送信 → 「トレース閲覧・デバッグ」と「評価データセットでのスコアリング」 → 改善（プロンプト / ツール / ミドルウェア調整） → エージェント実行へ戻る。",
+      "caption": "図6：LangSmithを中心とした観測・改善サイクル"
+    },
+    {
+      "id": "diagram-stack",
+      "chart": "flowchart TB\naccTitle: LangChainの2026年スタック\naccDescr: 上から長時間稼働する自律エージェントのDeep Agents、create_agentとmiddlewareを持つ中心レイヤーのLangChain、グラフベースの実行基盤と永続化を担うLangGraphの3層が積み重なり、可観測性・評価・トレースを担うLangSmithが3層すべてを監視する。\nsubgraph Stack[\"LangChainの2026年スタック\"]\ndirection TB\nA[\"Deep Agents<br/>長時間稼働する自律エージェント\"]\nB[\"LangChain<br/>エージェント構築の中心レイヤー<br/>(create_agent / middleware)\"]\nC[\"LangGraph<br/>グラフベースの実行基盤・永続化\"]\nend\nA --> B --> C\nD[\"LangSmith<br/>可観測性・評価・トレース\"] -.監視.-> A\nD -.監視.-> B\nD -.監視.-> C\nclassDef accentNode fill:#4c1d95,stroke:#ddd6fe,color:#ede9fe\nclassDef highlightNode fill:#115e59,stroke:#99f6e4,color:#ccfbf1\nclass A accentNode\nclass D highlightNode",
+      "fallback": "LangChainの2026年スタック（上から）：Deep Agents（長時間稼働する自律エージェント） → LangChain（create_agent / middleware によるエージェント構築の中心レイヤー） → LangGraph（グラフベースの実行基盤・永続化）。LangSmith（可観測性・評価・トレース）が3層すべてを監視する。",
+      "caption": "図7：LangChainの2026年スタック構成"
+    },
+    {
+      "id": "diagram-roadmap",
+      "chart": "flowchart TD\naccTitle: 学習ロードマップ\naccDescr: 1. 本ガイド第1〜3章で基礎を理解、2. 公式Migration Guideに目を通す、3. LangChain Academyの無料LangGraphコースを受講、4. DeepLearning.AIの短期講座で基礎概念を補強、5. create_agentとMiddlewareで小さなエージェントを自作、6. 自前のデータでRAGパイプラインを構築、7. LangSmithでトレースと評価を実践、の順に進む。\nA[\"1. 本ガイド 第1〜3章で基礎を理解\"] --> B[\"2. 公式ドキュメントの<br/>Migration Guideに目を通す\"]\nB --> C[\"3. LangChain Academyの<br/>無料LangGraphコースを受講\"]\nC --> D[\"4. DeepLearning.AIの<br/>短期講座で基礎概念を補強\"]\nD --> E[\"5. create_agent + Middlewareで<br/>小さなエージェントを自作\"]\nE --> F[\"6. RAGパイプラインを<br/>自前のデータで構築\"]\nF --> G[\"7. LangSmithでトレース・評価を実践\"]\nclassDef accentNode fill:#4c1d95,stroke:#ddd6fe,color:#ede9fe\nclassDef highlightNode fill:#115e59,stroke:#99f6e4,color:#ccfbf1\nclass A accentNode\nclass G highlightNode",
+      "fallback": "1. 本ガイド第1〜3章で基礎を理解 → 2. 公式ドキュメントのMigration Guideに目を通す → 3. LangChain Academyの無料LangGraphコースを受講 → 4. DeepLearning.AIの短期講座で基礎概念を補強 → 5. create_agent + Middlewareで小さなエージェントを自作 → 6. RAGパイプラインを自前のデータで構築 → 7. LangSmithでトレース・評価を実践。",
+      "caption": "図8：おすすめの学習ロードマップ"
+    }
+  ],
+  "stylesheets": [
+    "https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/3.44.0/tabler-icons.min.css",
+    "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css"
+  ],
+  "cssRules": [
+    {
+      "selector": ".layout",
+      "media": null,
+      "delegated": false,
+      "declarations": {
+        "--color-background-primary": "#07111e",
+        "--color-background-secondary": "#0d1a2b",
+        "--color-background-tertiary": "#142238",
+        "--color-background-info": "rgba(124, 158, 255, 0.12)",
+        "--color-background-danger": "rgba(255, 138, 138, 0.12)",
+        "--color-background-success": "rgba(124, 224, 179, 0.12)",
+        "--color-background-warning": "rgba(255, 207, 124, 0.12)",
+        "--color-text-primary": "#e8edf7",
+        "--color-text-secondary": "#a8b3c7",
+        "--color-text-tertiary": "#8592a3",
+        "--color-text-info": "#93b4ff",
+        "--color-text-danger": "#ff9a9a",
+        "--color-text-success": "#8fe8bc",
+        "--color-text-warning": "#ffd68f",
+        "--color-border-tertiary": "#141d33",
+        "--color-border-secondary": "#212e4a",
+        "--color-border-primary": "#34456b",
+        "--font-sans": "-apple-system, 'Segoe UI', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', system-ui,\n          sans-serif",
+        "--font-serif": "ui-serif, Georgia, serif",
+        "--font-mono": "'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace",
+        "--border-radius-md": "8px",
+        "--border-radius-lg": "12px",
+        "--border-radius-xl": "16px",
+        "--accent": "#7c9eff"
+      }
+    },
+    {
+      "selector": ".layout :global(*)",
+      "media": null,
+      "delegated": false,
+      "declarations": {
+        "box-sizing": "border-box"
+      }
+    },
+    {
+      "selector": ".layout, .layout",
+      "media": null,
+      "delegated": false,
+      "declarations": {
+        "margin": "0",
+        "padding": "0"
+      }
+    },
+    {
+      "selector": ".layout",
+      "media": null,
+      "delegated": false,
+      "declarations": {
+        "background": "var(--color-background-primary)",
+        "color": "var(--color-text-primary)",
+        "font-family": "var(--font-sans)",
+        "font-size": "16px",
+        "line-height": "1.7",
+        "font-weight": "400"
+      }
+    },
+    {
+      "selector": ".layout :global(a)",
+      "media": null,
+      "delegated": false,
+      "declarations": {
+        "color": "var(--accent)",
+        "text-decoration": "none"
+      }
+    },
+    {
+      "selector": ".layout :global(a):hover",
+      "media": null,
+      "delegated": false,
+      "declarations": {
+        "text-decoration": "underline"
+      }
+    },
+    {
+      "selector": ".layout :global(h1), .layout :global(h2), .layout :global(h3), .layout :global(h4)",
+      "media": null,
+      "delegated": false,
+      "declarations": {
+        "font-weight": "500",
+        "color": "var(--color-text-primary)",
+        "line-height": "1.4"
+      }
+    },
+    {
+      "selector": ".layout :global(h1)",
+      "media": null,
+      "delegated": false,
+      "declarations": {
+        "font-size": "22px"
+      }
+    },
+    {
+      "selector": ".layout :global(h2)",
+      "media": null,
+      "delegated": false,
+      "declarations": {
+        "font-size": "18px",
+        "margin-top": "56px",
+        "padding-top": "16px",
+        "border-top": "1px solid var(--color-border-tertiary)"
+      }
+    },
+    {
+      "selector": ".layout :global(h3)",
+      "media": null,
+      "delegated": false,
+      "declarations": {
+        "font-size": "16px",
+        "margin-top": "32px",
+        "color": "var(--color-text-info)"
+      }
+    },
+    {
+      "selector": ".layout :global(h4)",
+      "media": null,
+      "delegated": false,
+      "declarations": {
+        "font-size": "16px",
+        "color": "var(--color-text-secondary)"
+      }
+    },
+    {
+      "selector": ".layout :global(p)",
+      "media": null,
+      "delegated": false,
+      "declarations": {
+        "margin": "14px 0",
+        "color": "var(--color-text-primary)"
+      }
+    },
+    {
+      "selector": ".layout :global(code)",
+      "media": null,
+      "delegated": false,
+      "declarations": {
+        "font-family": "var(--font-mono)",
+        "font-size": "16px",
+        "background": "var(--color-background-tertiary)",
+        "border": "1px solid var(--color-border-tertiary)",
+        "border-radius": "4px",
+        "padding": "1px 6px",
+        "color": "var(--color-text-info)"
+      }
+    },
+    {
+      "selector": ".codeLabel",
+      "media": null,
+      "delegated": false,
+      "declarations": {
+        "margin": "18px 0 -10px",
+        "font-size": "13px",
+        "font-weight": "600",
+        "color": "var(--color-text-secondary)"
+      }
+    },
+    {
+      "selector": ".layout :global(pre)",
+      "media": null,
+      "delegated": false,
+      "declarations": {
+        "background": "#0b1526",
+        "border": "1px solid var(--color-border-secondary)",
+        "border-radius": "var(--border-radius-lg)",
+        "padding": "18px 20px",
+        "overflow-x": "auto",
+        "margin": "18px 0"
+      }
+    },
+    {
+      "selector": ".layout :global(pre) :global(code)",
+      "media": null,
+      "delegated": false,
+      "declarations": {
+        "background": "none",
+        "border": "none",
+        "padding": "0",
+        "color": "var(--color-text-primary)",
+        "font-size": "16px",
+        "line-height": "1.6"
+      }
+    },
+    {
+      "selector": ".sidebar",
+      "media": null,
+      "delegated": false,
+      "declarations": {
+        "position": "fixed",
+        "top": "0",
+        "left": "0",
+        "width": "280px",
+        "height": "100vh",
+        "overflow-y": "auto",
+        "background": "var(--color-background-secondary)",
+        "border-right": "1px solid var(--color-border-tertiary)",
+        "padding": "28px 18px 40px"
+      }
+    },
+    {
+      "selector": ".brand",
+      "media": null,
+      "delegated": false,
+      "declarations": {
+        "display": "flex",
+        "align-items": "center",
+        "gap": "10px",
+        "font-size": "16px",
+        "font-weight": "500",
+        "color": "var(--color-text-primary)",
+        "padding": "0 6px 20px",
+        "border-bottom": "1px solid var(--color-border-tertiary)",
+        "margin-bottom": "16px"
+      }
+    },
+    {
+      "selector": ".brand :global(i)",
+      "media": null,
+      "delegated": false,
+      "declarations": {
+        "color": "var(--accent)",
+        "font-size": "20px"
+      }
+    },
+    {
+      "selector": ".sidebar :global(nav)",
+      "media": null,
+      "delegated": false,
+      "declarations": {
+        "display": "flex",
+        "flex-direction": "column",
+        "gap": "2px"
+      }
+    },
+    {
+      "selector": ".sidebar :global(nav) :global(a)",
+      "media": null,
+      "delegated": false,
+      "declarations": {
+        "display": "block",
+        "font-size": "16px",
+        "color": "var(--color-text-secondary)",
+        "padding": "8px 10px",
+        "border-radius": "var(--border-radius-md)",
+        "border-left": "2px solid transparent"
+      }
+    },
+    {
+      "selector": ".sidebar :global(nav) :global(a):hover",
+      "media": null,
+      "delegated": false,
+      "declarations": {
+        "color": "var(--color-text-primary)",
+        "text-decoration": "none",
+        "background": "var(--color-background-tertiary)"
+      }
+    },
+    {
+      "selector": ".sidebar :global(nav) :global(a).active",
+      "media": null,
+      "delegated": false,
+      "declarations": {
+        "color": "var(--color-text-primary)",
+        "background": "var(--color-background-tertiary)",
+        "border-left": "2px solid var(--accent)",
+        "font-weight": "500"
+      }
+    },
+    {
+      "selector": ".sidebar :global(nav) :global(a).sub",
+      "media": null,
+      "delegated": false,
+      "declarations": {
+        "padding-left": "22px",
+        "font-size": "16px",
+        "color": "var(--color-text-tertiary)"
+      }
+    },
+    {
+      "selector": ".main",
+      "media": null,
+      "delegated": false,
+      "declarations": {
+        "display": "block",
+        "margin-left": "280px",
+        "min-height": "100vh"
+      }
+    },
+    {
+      "selector": ".layout :global(main).section",
+      "media": null,
+      "delegated": false,
+      "declarations": {
+        "padding": "56px 72px 100px"
+      }
+    },
+    {
+      "selector": ".hero",
+      "media": null,
+      "delegated": false,
+      "declarations": {
+        "padding-bottom": "32px",
+        "border-bottom": "1px solid var(--color-border-tertiary)",
+        "margin-bottom": "40px"
+      }
+    },
+    {
+      "selector": ".hero .kicker",
+      "media": null,
+      "delegated": false,
+      "declarations": {
+        "color": "var(--color-text-info)",
+        "font-size": "16px",
+        "font-weight": "500",
+        "letter-spacing": "0.02em"
+      }
+    },
+    {
+      "selector": ".hero :global(h1)",
+      "media": null,
+      "delegated": false,
+      "declarations": {
+        "font-size": "22px",
+        "margin": "10px 0 6px"
+      }
+    },
+    {
+      "selector": ".hero .sub",
+      "media": null,
+      "delegated": false,
+      "declarations": {
+        "color": "var(--color-text-secondary)",
+        "font-size": "16px",
+        "margin": "0 0 18px"
+      }
+    },
+    {
+      "selector": ".bookCard",
+      "media": null,
+      "delegated": false,
+      "declarations": {
+        "display": "flex",
+        "gap": "16px",
+        "align-items": "flex-start",
+        "background": "var(--color-background-tertiary)",
+        "border": "1px solid var(--color-border-secondary)",
+        "border-radius": "var(--border-radius-lg)",
+        "padding": "18px 20px"
+      }
+    },
+    {
+      "selector": ".bookCard :global(i)",
+      "media": null,
+      "delegated": false,
+      "declarations": {
+        "font-size": "26px",
+        "color": "var(--accent)",
+        "margin-top": "2px"
+      }
+    },
+    {
+      "selector": ".bookCard .meta",
+      "media": null,
+      "delegated": false,
+      "declarations": {
+        "color": "var(--color-text-secondary)",
+        "font-size": "16px"
+      }
+    },
+    {
+      "selector": ".bookCard .meta :global(b)",
+      "media": null,
+      "delegated": false,
+      "declarations": {
+        "color": "var(--color-text-primary)"
+      }
+    },
+    {
+      "selector": ".bookCard .meta :global(a)",
+      "media": null,
+      "delegated": false,
+      "declarations": {
+        "display": "inline-block",
+        "margin-top": "6px"
+      }
+    },
+    {
+      "selector": ".layout :global(section)",
+      "media": null,
+      "delegated": false,
+      "declarations": {
+        "margin-bottom": "8px"
+      }
+    },
+    {
+      "selector": ".prose :global(ul), .prose :global(ol)",
+      "media": null,
+      "delegated": false,
+      "declarations": {
+        "padding-left": "22px"
+      }
+    },
+    {
+      "selector": ".prose :global(li)",
+      "media": null,
+      "delegated": false,
+      "declarations": {
+        "margin": "6px 0"
+      }
+    },
+    {
+      "selector": ".lead",
+      "media": null,
+      "delegated": false,
+      "declarations": {
+        "color": "var(--color-text-secondary)"
+      }
+    },
+    {
+      "selector": ".tableWrap",
+      "media": null,
+      "delegated": false,
+      "declarations": {
+        "overflow-x": "auto",
+        "margin": "18px 0",
+        "border-radius": "var(--border-radius-lg)",
+        "border": "1px solid var(--color-border-secondary)"
+      }
+    },
+    {
+      "selector": ".layout :global(table)",
+      "media": null,
+      "delegated": false,
+      "declarations": {
+        "border-collapse": "collapse",
+        "width": "100%",
+        "font-size": "16px"
+      }
+    },
+    {
+      "selector": ".layout :global(thead) :global(th)",
+      "media": null,
+      "delegated": false,
+      "declarations": {
+        "background": "var(--color-background-tertiary)",
+        "color": "var(--color-text-primary)",
+        "text-align": "left",
+        "font-weight": "500",
+        "padding": "12px 16px",
+        "border-bottom": "1px solid var(--color-border-primary)",
+        "white-space": "nowrap"
+      }
+    },
+    {
+      "selector": ".layout :global(tbody) :global(td)",
+      "media": null,
+      "delegated": false,
+      "declarations": {
+        "padding": "12px 16px",
+        "border-bottom": "1px solid var(--color-border-tertiary)",
+        "color": "var(--color-text-secondary)",
+        "vertical-align": "top"
+      }
+    },
+    {
+      "selector": ".layout :global(tbody) :global(tr):last-child :global(td)",
+      "media": null,
+      "delegated": false,
+      "declarations": {
+        "border-bottom": "none"
+      }
+    },
+    {
+      "selector": ".layout :global(tbody) :global(td):first-child",
+      "media": null,
+      "delegated": false,
+      "declarations": {
+        "color": "var(--color-text-primary)",
+        "font-weight": "500"
+      }
+    },
+    {
+      "selector": ".callout",
+      "media": null,
+      "delegated": false,
+      "declarations": {
+        "display": "flex",
+        "gap": "14px",
+        "align-items": "flex-start",
+        "border-radius": "var(--border-radius-lg)",
+        "border": "1px solid var(--color-border-secondary)",
+        "background": "var(--color-background-tertiary)",
+        "padding": "16px 18px",
+        "margin": "20px 0"
+      }
+    },
+    {
+      "selector": ".callout :global(i)",
+      "media": null,
+      "delegated": false,
+      "declarations": {
+        "font-size": "20px",
+        "margin-top": "2px",
+        "flex-shrink": "0"
+      }
+    },
+    {
+      "selector": ".callout .calloutTitle",
+      "media": null,
+      "delegated": false,
+      "declarations": {
+        "font-weight": "500",
+        "margin-bottom": "4px",
+        "display": "block"
+      }
+    },
+    {
+      "selector": ".callout .calloutBody :global(p)",
+      "media": null,
+      "delegated": false,
+      "declarations": {
+        "margin": "6px 0",
+        "font-size": "16px",
+        "color": "var(--color-text-secondary)"
+      }
+    },
+    {
+      "selector": ".callout .calloutBody :global(pre)",
+      "media": null,
+      "delegated": false,
+      "declarations": {
+        "margin": "10px 0 0"
+      }
+    },
+    {
+      "selector": ".callout.tip",
+      "media": null,
+      "delegated": false,
+      "declarations": {
+        "border-color": "rgba(143, 232, 188, 0.35)",
+        "background": "var(--color-background-success)"
+      }
+    },
+    {
+      "selector": ".callout.tip :global(i), .callout.tip .calloutTitle",
+      "media": null,
+      "delegated": false,
+      "declarations": {
+        "color": "var(--color-text-success)"
+      }
+    },
+    {
+      "selector": ".callout.info",
+      "media": null,
+      "delegated": false,
+      "declarations": {
+        "border-color": "rgba(147, 180, 255, 0.35)",
+        "background": "var(--color-background-info)"
+      }
+    },
+    {
+      "selector": ".callout.info :global(i), .callout.info .calloutTitle",
+      "media": null,
+      "delegated": false,
+      "declarations": {
+        "color": "var(--color-text-info)"
+      }
+    },
+    {
+      "selector": ".callout.warning",
+      "media": null,
+      "delegated": false,
+      "declarations": {
+        "border-color": "rgba(255, 214, 143, 0.4)",
+        "background": "var(--color-background-warning)"
+      }
+    },
+    {
+      "selector": ".callout.warning :global(i), .callout.warning .calloutTitle",
+      "media": null,
+      "delegated": false,
+      "declarations": {
+        "color": "var(--color-text-warning)"
+      }
+    },
+    {
+      "selector": ".diagramCard",
+      "media": null,
+      "delegated": false,
+      "declarations": {
+        "background": "var(--color-background-secondary)",
+        "border": "1px solid var(--color-border-secondary)",
+        "border-radius": "var(--border-radius-xl)",
+        "padding": "20px",
+        "margin": "22px 0"
+      }
+    },
+    {
+      "selector": ".diagramCaption",
+      "media": null,
+      "delegated": false,
+      "declarations": {
+        "font-size": "16px",
+        "color": "var(--color-text-tertiary)",
+        "margin-top": "10px",
+        "text-align": "center"
+      }
+    },
+    {
+      "selector": ".diagramWrap",
+      "media": null,
+      "delegated": true,
+      "declarations": {
+        "width": "100%",
+        "display": "flex",
+        "justify-content": "center"
+      }
+    },
+    {
+      "selector": ".diagramTarget",
+      "media": null,
+      "delegated": true,
+      "declarations": {
+        "min-width": "0",
+        "max-width": "100%"
+      }
+    },
+    {
+      "selector": ".diagramTarget :global(svg)",
+      "media": null,
+      "delegated": true,
+      "declarations": {
+        "max-width": "100%"
+      }
+    },
+    {
+      "selector": ".diagramFallback",
+      "media": null,
+      "delegated": false,
+      "declarations": {
+        "margin": "0",
+        "max-width": "72ch",
+        "font-size": "15px",
+        "line-height": "1.7"
+      }
+    },
+    {
+      "selector": ".stepBadge",
+      "media": null,
+      "delegated": false,
+      "declarations": {
+        "display": "inline-flex",
+        "align-items": "center",
+        "justify-content": "center",
+        "width": "26px",
+        "height": "26px",
+        "border-radius": "50%",
+        "background": "var(--color-background-tertiary)",
+        "border": "1px solid var(--color-border-primary)",
+        "color": "var(--accent)",
+        "font-size": "16px",
+        "font-weight": "500",
+        "margin-right": "8px"
+      }
+    },
+    {
+      "selector": ".refList",
+      "media": null,
+      "delegated": false,
+      "declarations": {
+        "display": "flex",
+        "flex-direction": "column",
+        "gap": "10px",
+        "margin": "20px 0"
+      }
+    },
+    {
+      "selector": ".refCard",
+      "media": null,
+      "delegated": false,
+      "declarations": {
+        "display": "flex",
+        "gap": "14px",
+        "align-items": "flex-start",
+        "background": "var(--color-background-tertiary)",
+        "border": "1px solid var(--color-border-secondary)",
+        "border-radius": "var(--border-radius-lg)",
+        "padding": "14px 16px"
+      }
+    },
+    {
+      "selector": ".refNum",
+      "media": null,
+      "delegated": false,
+      "declarations": {
+        "flex-shrink": "0",
+        "width": "28px",
+        "height": "28px",
+        "border-radius": "50%",
+        "background": "var(--color-background-primary)",
+        "border": "1px solid var(--color-border-primary)",
+        "color": "var(--color-text-info)",
+        "font-size": "16px",
+        "font-weight": "500",
+        "display": "flex",
+        "align-items": "center",
+        "justify-content": "center"
+      }
+    },
+    {
+      "selector": ".refBody .refTitle",
+      "media": null,
+      "delegated": false,
+      "declarations": {
+        "color": "var(--color-text-primary)",
+        "font-weight": "500",
+        "display": "block",
+        "margin-bottom": "2px"
+      }
+    },
+    {
+      "selector": ".refBody :global(a)",
+      "media": null,
+      "delegated": false,
+      "declarations": {
+        "font-size": "16px",
+        "word-break": "break-all"
+      }
+    },
+    {
+      "selector": ".chapterMap :global(td):nth-child(1)",
+      "media": null,
+      "delegated": false,
+      "declarations": {
+        "white-space": "nowrap"
+      }
+    },
+    {
+      "selector": ".disclaimer",
+      "media": null,
+      "delegated": false,
+      "declarations": {
+        "margin-top": "56px",
+        "padding": "20px 22px",
+        "border": "1px dashed var(--color-border-primary)",
+        "border-radius": "var(--border-radius-lg)",
+        "color": "var(--color-text-tertiary)",
+        "font-size": "16px",
+        "background": "var(--color-background-secondary)"
+      }
+    },
+    {
+      "selector": ".disclaimer .calloutTitle",
+      "media": null,
+      "delegated": false,
+      "declarations": {
+        "color": "var(--color-text-secondary)",
+        "font-weight": "500",
+        "display": "block",
+        "margin-bottom": "6px"
+      }
+    },
+    {
+      "selector": ".footer",
+      "media": null,
+      "delegated": false,
+      "declarations": {
+        "margin-top": "40px",
+        "color": "var(--color-text-tertiary)",
+        "font-size": "16px",
+        "text-align": "center"
+      }
+    },
+    {
+      "selector": ".sidebar",
+      "media": "(max-width: 900px)",
+      "delegated": false,
+      "declarations": {
+        "position": "static",
+        "width": "auto",
+        "height": "auto",
+        "border-right": "none",
+        "border-bottom": "1px solid var(--color-border-tertiary)"
+      }
+    },
+    {
+      "selector": ".main",
+      "media": "(max-width: 900px)",
+      "delegated": false,
+      "declarations": {
+        "margin-left": "0"
+      }
+    },
+    {
+      "selector": ".layout :global(main).section",
+      "media": "(max-width: 900px)",
+      "delegated": false,
+      "declarations": {
+        "padding": "36px 20px 72px"
+      }
+    },
+    {
+      "selector": ".bookCard",
+      "media": "(max-width: 900px)",
+      "delegated": false,
+      "declarations": {
+        "flex-direction": "column"
+      }
+    }
+  ]
+}
