@@ -11,7 +11,11 @@ function declarations(selector: string, media: string | null = null) {
   const result: Record<string, string> = {};
   css.walkRules((rule) => {
     const parentMedia = rule.parent?.type === "atrule" ? rule.parent.params : null;
-    if (rule.selector !== selector || parentMedia !== media) return;
+    if (
+      rule.selector.replace(/\s+/g, " ") !== selector.replace(/\s+/g, " ") ||
+      parentMedia !== media
+    )
+      return;
     rule.walkDecls((declaration) => {
       result[declaration.prop] = declaration.value;
     });
