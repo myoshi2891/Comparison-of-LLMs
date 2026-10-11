@@ -9,7 +9,7 @@
 ## 現在のステータス
 
 - **フェーズ**: 保守・機能改善・品質強化フェーズ
-- **ブランチ**: `main`（今回の開始HEADは `66d08f77`。ブランチ新設・pushは行っていない）
+- **ブランチ**: `dev`（LangChain移行の開始HEADは `66d08f77`。ブランチ新設・pushは行っていない）
 - **最新実装 HEAD**: `934408a1`（Generative AI with LangChain移行後のクラス指定整理。Greenは `8868adbd`）
 - **次の作業**: `/books/generative-ai-with-langchain` の目視確認（ユーザー担当）と、その結果への対応。npm・ビルドは禁止、スクレイパー検証はユーザー指定で対象外。
 - **ルート実数**: `page.tsx` 87 件、registry 88 エントリ（RSS の `/rss.xml` を含む）。全ルート登録・ナビ導出テストは合格。
@@ -26,6 +26,7 @@
 
 ## 最近の追加内容
 
+- **`bun audit` 脆弱性対応（2026-10-11）**: `next` を 16.3.6→16.3.8（GHSA-cjq9-62q9-8jv4 ほか6件）、`overrides` で `sharp` ^0.35.5・`source-map-js` ^1.2.2・`katex` ^0.18.2 に更新し、`bun audit` は0件。`katex` は mermaid 10.9.8 の範囲外だが、Mermaid の `$$` 数式記法を使う図が無く実行経路に乗らないため override で固定。typecheck・lint（527 files）・Vitest 192 files / 1876 tests が成功。ビルドは未実行。
 - **Generative AI with LangChainガイドの移行（2026-10-11）**:
   - `/books/generative-ai-with-langchain` に全13 H2・38 H3・49段落（図解の代替説明8件を含む）・4リスト／15項目・11表／67行・12コード例・8 Mermaid・5 callout・12ステップ・22参考文献カードをPure JSXへ転写。手書きSVG・引用・チェックリストは原本に存在しないため追加していない。
   - Redで固定した `source-contract.json` により、本文・見出し・リンク全文とURL・表の全セルとタグ・リストの型と全項目・装飾クラス・76 CSS規則を順序込み完全一致で検証。全コードの空白・改行・バックスラッシュ、先頭インデント、highlight.jsの元CSSを使うspanトークン、全8図のソース・代替説明・キャプションを照合する。表構造の空白ノード禁止、箇条書きのdisc・番号のdecimal、全列左寄せ、アンカー余白も検証。原本期待値は実装に合わせて変更していない。
