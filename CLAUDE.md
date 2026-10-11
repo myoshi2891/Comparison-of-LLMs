@@ -17,9 +17,14 @@ AIモデルの時間別コスト計算機 + AI ツール導入ガイド群。Pyt
 原本HTML／Markdownは `archive/html/books/Generative-ai-on-aws-guide.html`／
 `archive/md/books/Generative-ai-on-aws-guide.md` に内容無変更で保存。指定HTMLを正本とし、
 本文の情報基準日2026-09-10、著者のH4、参考URLの文字列表示を保持する。
-HTML原本監査exit 0、Mermaid 10.9.8の構文解析は全9図成功。Vitest **188 files / 1824 tests**、
-typecheck、lint（518 files／0 diagnostics）が成功。npm・ビルドは実行禁止、
+HTML原本監査exit 0、Mermaid 10.9.8の構文解析は全9図成功。共通クローム修正後のVitest **189 files / 1828 tests**、
+typecheck、lint（519 files／0 diagnostics）が成功。npm・ビルドは実行禁止、
 スクレイパー検証はユーザー指定で対象外。目視確認はユーザー担当。
+
+同ページの共通クロームをページ限定で補正。ネイティブのスクロールバーを `color-scheme: light` で
+原本の淡色表示へ戻し、共通日付バーとbodyを本文の紙色に揃える。共通関連ページは300pxの
+固定サイドバーを避け、980px以下では全幅に戻す。CSS Modulesのローカルクラスを含む
+`:has()` で他ルートへの影響を防ぐ。4件の回帰契約を追加し、元の本文・CSSオラクルは変更しない。
 
 推薦書籍 `/books/effective-ml-teams` を追加（2026-10-04）。
 `web-next/app/books/effective-ml-teams/` の `page.tsx`、`page.module.css`、`TocObserver.tsx` に
@@ -324,7 +329,7 @@ Build:     cd web-next && bun run build
 以下を全て確認してからコミットすること：
 
 1. `cd web-next && bun run build` が成功（※Antigravityサンドボックス環境では実行禁止。他環境やCIでは必須）
-2. `cd web-next && bun run test` が完全に成功（188 files / 1824 tests pass、2026-10-11実測。収集失敗もブロッキング失敗として原因を調査する）
+2. `cd web-next && bun run test` が完全に成功（189 files / 1828 tests pass、2026-10-11実測。Node 24で `NODE_OPTIONS=--no-experimental-webstorage` と `--maxWorkers=1 --testTimeout=30000` を使用。収集失敗もブロッキング失敗として原因を調査する）
 3. `cd web-next && bun run typecheck` が成功
 4. `cd web-next && bun run lint` が成功
 5. `cd scraper && uv run pytest` が成功

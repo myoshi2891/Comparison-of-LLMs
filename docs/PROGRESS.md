@@ -10,21 +10,29 @@
 
 - **フェーズ**: 保守・機能改善・品質強化フェーズ
 - **ブランチ**: `main`（今回の開始HEADは `6c443d6e`。ブランチ新設・pushは行っていない）
-- **最新実装 HEAD**: `054eb8f7`（Generative AI on AWSのクラス結合整理。Greenは `7014827d`）
+- **最新実装 HEAD**: `3d473b2c`（Generative AI on AWSのスクロールバー・共通フッター・日付背景修正）
 - **次の作業**: `/books/generative-ai-on-aws` の目視確認（ユーザー担当）と、その結果への対応。npm・ビルドは禁止、スクレイパー検証はユーザー指定で対象外。
 - **ルート実数**: `page.tsx` 86 件、registry 87 エントリ（RSS の `/rss.xml` を含む）。全ルート登録・ナビ導出テストは合格。
 - **動作検証**:
   - ビルド: 今回はユーザー指定で未実行。過去の成功記録は 2026-09-17 の 90 静的ページであり、今回の変更を検証した値ではない。
   - `bun run typecheck` ✅（`tsc --noEmit`。2026-10-11 実測）
-  - `bun run lint` ✅（Biome check / 518 files / 0 diagnostics。2026-10-11 実測）
+  - `bun run lint` ✅（Biome check / 519 files / 0 diagnostics。2026-10-11 実測）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test` で Vitest **188 files / 1824 tests すべて合格**（2026-10-11 実測）
+  - **フロントエンド (`web-next/`)**: Node 24で `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000` を実行し、Vitest **189 files / 1828 tests すべて合格**（2026-10-11 実測）
     - 今回の開始時ベースラインは **186 files / 1781 tests**（HEAD `6c443d6e`）。既存環境の `localStorage` 問題を避ける実行時オプションを継続使用し、依存・設定ファイルは変更していない。開始時から存在した `web-next/bun.lock` の差分はコミット対象外。
     - `load(sourceHtml)` をモジュール初期化時に呼ぶ `governance/ai-governance/GuideContent.tsx` と
       `local-llm/finetuning-best-practices/GuideContent.tsx` は、import スモークでも読み込み可能であることを確認済み
   - **バックエンド (`scraper/`)**: 今回はユーザー指定で検証対象外。`uv`が見つからず起動できなかった後、実行不要の指示を受けた。過去の成功記録は104件（2026-10-04）であり、今回の実測値ではない。
 
 ## 最近の追加内容
+
+- **Generative AI on AWSの共通クローム修正（2026-10-11）**:
+  - 原本に独自スクロールバー指定はない。共通viewportの `colorScheme: dark` が変えるネイティブの外観を、ページの `color-scheme: light` で原本の淡色表示へ戻す。固定配置・独立縦スクロール・余白と、目次の操作処理は変更していない。
+  - 共通「関連ページ」をデスクトップのサイドバー幅300pxだけ右へ配置し、980px以下では全幅へ戻す。本文と同じ淡色トークンを渡し、全カードを保持する。
+  - 共通の日付バーとbodyを本文と同じ `#faf6ec` にし、日付は濃い文字・右寄せで表示。CSS Modulesのローカルクラスを含む `:has()` で本ページだけに適用し、他ページ・共通部品・元の固定オラクルは変更しない。
+  - 4件のCSS回帰契約は宣言の全体一致とモバイル指定、独自スクロールバーの不在を照合する。実装前のRed `6d17b184` と、セレクタの空白を正規化するテスト抽出修正 `a5a1cce1` をGreen前に分離。
+  - 検証環境ではログインシェルのNode 20ではなくNode 24を使用し、`NODE_OPTIONS=--no-experimental-webstorage` を指定する。並列検証中に既存テストの5秒timeoutとaxeの連鎖失敗が出たため、実行時の `--maxWorkers=1 --testTimeout=30000` で再検証し、全189 files／1828 testsが成功。個別に指定された15秒制限はそのまま維持し、依存・設定ファイルやテストの期待値は変更していない。型検査・lint（519 files／0 diagnostics）・原本監査exit 0も成功し、Green `3d473b2c` を分離。追加の整理は不要と判断し、空のRefactorコミットは作成しない。
+  - CSSキャッシュを一時ディレクトリへ退避し、ポート3000で開発サーバーを再起動。起動時に自動生成された `web-next/AGENTS.md` の差分は元へ戻し、ルーティング規約を保持する。目視確認はユーザー担当。
 
 - **Generative AI on AWSガイドの移行（2026-10-11）**:
   - `/books/generative-ai-on-aws` に全22 H2・著者3 H4・76段落・本文7リスト／35項目・7表／39行・9 Mermaid・6 callout・13チェック項目・23参考文献カードをPure JSXへ転写。サイドバーの3リスト／22項目を含め全57リスト項目を保持。通常コードブロック・SVG・引用は原本に存在しない。冒頭計画の段落77件はscript内のエラー表示用HTML文字列1件を含む生タグ数であり、本文DOMは76段落。
@@ -282,12 +290,12 @@
 
 ```text
 AGENTS.md → CODEX.md → CLAUDE.md → docs/PROGRESS.md → Phase A–F 計画の順で読む。
-最新実装 HEAD: 054eb8f7（Generative AI on AWS整理。Green: 7014827d）
+最新実装 HEAD: 3d473b2c（Generative AI on AWSのスクロールバー・共通クローム修正）
 次の作業: /books/generative-ai-on-aws の目視確認結果に対応する。目視確認はユーザー担当。
 Generative-ai-on-aws-guide.html は archive/html/books/、Markdown は archive/md/books/ に保存済み。
-HTML原本監査は exit 0。全体 Vitest 188 files / 1824 tests、typecheck、lintが成功。pytestは今回対象外。
-この実行環境のテストは NODE_OPTIONS=--no-experimental-webstorage bun run test を使用する。
-ページ28契約と操作15契約は本文・全表・全リスト・109 CSS規則・9 Mermaid・目次・13チェック項目を厳密に照合する。
+HTML原本監査は exit 0。全体 Vitest 189 files / 1828 tests、typecheck、lint（519 files）が成功。pytestは今回対象外。
+この実行環境ではNode 24で NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000 を使用する。
+ページ28契約と操作15契約は本文・全表・全リスト・109 CSS規則・9 Mermaid・目次・13チェック項目を厳密に照合する。共通クロームのCSS回帰契約も4件追加済み。
 原本の期待値を移植先に合わせて変更しない。指定HTMLが正本で本文情報基準日は2026-09-10のまま。
 著者H4の既存階層と参考URLの文字列表示を維持する。Mermaidのhub/done配色はSVGラベルへ適用する。
 開発サーバーはCSSキャッシュ退避後、ポート3000で再起動済み。既存bun.lock差分はコミットしていない。
