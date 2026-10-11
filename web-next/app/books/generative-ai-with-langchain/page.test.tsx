@@ -340,6 +340,23 @@ describe("LangChain guide — frozen original content and design contracts", () 
     ]);
     expect(declarations(".main", "(max-width: 900px)").width).toBe("100%");
   });
+  it("keeps mobile sidebar height automatic after desktop chrome offsets cascade", () => {
+    const effective = Object.assign(
+      {},
+      ...rules
+        .filter(
+          (rule) =>
+            rule.selector === ".sidebar" && (!rule.media || rule.media === "(max-width: 900px)")
+        )
+        .map((rule) => rule.declarations)
+    );
+    expect([effective.position, effective.width, effective.height, effective.top]).toEqual([
+      "static",
+      "auto",
+      "auto",
+      "auto",
+    ]);
+  });
   it("matches shared date and footer backgrounds to the guide and clears the desktop sidebar", () => {
     expect(declarations(body)).toEqual({ background: "#07111e" });
     expect(declarations(freshness)).toEqual({
