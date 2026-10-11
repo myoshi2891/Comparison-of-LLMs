@@ -666,6 +666,7 @@
 
 .layout {
   width: 100%;
+  color-scheme: light;
 }
 .layout :global(ul) {
   list-style-type: disc;
@@ -722,5 +723,47 @@
   }
   .main {
     width: 100%;
+  }
+}
+
+:global(body):has(.layout) {
+  --sidebar-w: 300px;
+  background: #faf6ec;
+}
+:global(body):has(.layout) :global(#site-freshness-bar) {
+  box-sizing: border-box;
+  max-width: none;
+  width: calc(100% - var(--sidebar-w));
+  margin-left: var(--sidebar-w);
+  margin-right: 0;
+  padding-right: 3.5rem;
+  background: #faf6ec;
+  color: #5c5544;
+  justify-content: flex-end;
+}
+:global(body):has(.layout) :global(#site-freshness-bar) :global(time) {
+  color: #2a2418;
+}
+:global(body):has(.layout) :global(nav[aria-label="関連ページ"]) {
+  --line: #e4dcc8;
+  --card: #fffdf8;
+  --fg: #2a2418;
+  --muted: #5c5544;
+  --accent: #3f3d8a;
+  box-sizing: border-box;
+  max-width: none;
+  width: calc(100% - var(--sidebar-w));
+  margin-left: var(--sidebar-w);
+  margin-right: 0;
+  padding-left: 3.5rem;
+  padding-right: 3.5rem;
+}
+@media (max-width: 980px) {
+  :global(body):has(.layout) :global(#site-freshness-bar),
+  :global(body):has(.layout) :global(nav[aria-label="関連ページ"]) {
+    width: 100%;
+    margin-left: 0;
+    padding-left: 1.3rem;
+    padding-right: 1.3rem;
   }
 }
