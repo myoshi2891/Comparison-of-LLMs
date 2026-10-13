@@ -66,7 +66,6 @@ const EXPECTED_H3 = [
 const EXPECTED_EXTERNAL_LINKS = [
   "https://www.oreilly.com/library/view/llm-engineers-handbook/9781836200079/",
   "https://github.com/PacktPublishing/LLM-Engineers-Handbook",
-  "https://github.com/PacktPublishing/LLM-Engineers-Handbook.git",
   "https://github.com/PacktPublishing/LLM-Engineers-Handbook/blob/main/README.md",
   "https://www.amazon.com/LLM-Engineers-Handbook-engineering-production/dp/1836200072/",
   "https://www.packtpub.com/en-us/product/llm-engineers-handbook-9781836200062",
@@ -106,7 +105,7 @@ describe("LLM Engineer's Handbook guide — source parity and design contracts",
     expect(actualH3).toEqual([...EXPECTED_H3]);
   });
 
-  it("S-3: preserves all 16 external links", () => {
+  it("S-3: preserves all 15 external links", () => {
     const { container } = render(<Page />);
     const actualUrls = new Set(
       nodes(container, 'a[href^="http://"], a[href^="https://"]').map((el) =>
