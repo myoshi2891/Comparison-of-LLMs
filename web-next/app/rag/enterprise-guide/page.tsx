@@ -453,8 +453,10 @@ export default function EnterpriseRagGuidePage() {
               </div>
               <div className={`${styles.highlight} highlight`}>
                 <pre>
-                  <span></span>知識ベース + システム指示 + ユーザー質問 + 会話履歴 + ツール定義 +
-                  max_tokens（出力予約） &lt; 採用モデルのコンテキスト上限 − 運用ヘッドルーム
+                  <span className={`${styles.codeLine} code-line`}>
+                    知識ベース + システム指示 + ユーザー質問 + 会話履歴 + ツール定義 +
+                    max_tokens（出力予約） &lt; 採用モデルのコンテキスト上限 − 運用ヘッドルーム
+                  </span>
                 </pre>
               </div>
             </div>
@@ -602,60 +604,79 @@ export default function EnterpriseRagGuidePage() {
               </div>
               <div className={`${styles.highlight} highlight`}>
                 <pre>
-                  <span></span>
-                  <span className="kn">from</span>
-                  <span className="w"> </span>
-                  <span className="nn">langchain_text_splitters</span>
-                  <span className="w"> </span>
-                  <span className="kn">import</span>{" "}
-                  <span className="n">RecursiveCharacterTextSplitter</span>
-                  <span className="n">splitter</span> <span className="o">=</span>{" "}
-                  <span className="n">RecursiveCharacterTextSplitter</span>
-                  <span className="p">(</span>
-                  <span className="c1">
-                    # 注意: RecursiveCharacterTextSplitter の既定の長さ計算は len()＝「文字数」。
+                  <span className={`${styles.codeLine} code-line`}>
+                    <span className="kn">from</span>{" "}
+                    <span className="nn">langchain_text_splitters</span>{" "}
+                    <span className="kn">import</span>{" "}
+                    <span className="n">RecursiveCharacterTextSplitter</span>
                   </span>
-                  <span className="c1">
-                    # 以下の 800 / 150
-                    は上記のトークン推奨値（512〜1024トークン）ではなく文字数の設定値。
+                  <span className={`${styles.codeLine} code-line`}> </span>
+                  <span className={`${styles.codeLine} code-line`}>
+                    <span className="n">splitter</span> <span className="o">=</span>{" "}
+                    <span className="n">RecursiveCharacterTextSplitter</span>
+                    <span className="p">(</span>
                   </span>
-                  <span className="n">chunk_size</span>
-                  <span className="o">=</span>
-                  <span className="mi">800</span>
-                  <span className="p">,</span>{" "}
-                  <span className="c1">
-                    # 文字数(≒日本語で400〜800トークン相当。単位が違う点に注意)
+                  <span className={`${styles.codeLine} code-line`}>
+                    {"    "}
+                    <span className="c1">
+                      # 注意: RecursiveCharacterTextSplitter の既定の長さ計算は len()＝「文字数」。
+                    </span>
                   </span>
-                  <span className="n">chunk_overlap</span>
-                  <span className="o">=</span>
-                  <span className="mi">150</span>
-                  <span className="p">,</span>{" "}
-                  <span className="c1"># 文字数。チャンク間の重なり(文脈の欠落を防ぐ)</span>
-                  <span className="n">separators</span>
-                  <span className="o">=</span>
-                  <span className="p">[</span>
-                  <span className="s2">"</span>
-                  <span className="se">\n</span>
-                  <span className="s2">## "</span>
-                  <span className="p">,</span> <span className="s2">"</span>
-                  <span className="se">\n\n</span>
-                  <span className="s2">"</span>
-                  <span className="p">,</span> <span className="s2">"</span>
-                  <span className="se">\n</span>
-                  <span className="s2">"</span>
-                  <span className="p">,</span> <span className="s2">"。"</span>
-                  <span className="p">,</span> <span className="s2">" "</span>
-                  <span className="p">,</span> <span className="s2">""</span>
-                  <span className="p">],</span>{" "}
-                  <span className="c1"># 末尾の "" は文字単位のフォールバック</span>
-                  <span className="p">)</span>
-                  <span className="n">chunks</span> <span className="o">=</span>{" "}
-                  <span className="n">splitter</span>
-                  <span className="o">.</span>
-                  <span className="n">split_text</span>
-                  <span className="p">(</span>
-                  <span className="n">document_text</span>
-                  <span className="p">)</span>
+                  <span className={`${styles.codeLine} code-line`}>
+                    {"    "}
+                    <span className="c1">
+                      # 以下の 800 / 150
+                      は上記のトークン推奨値（512〜1024トークン）ではなく文字数の設定値。
+                    </span>
+                  </span>
+                  <span className={`${styles.codeLine} code-line`}>
+                    {"    "}
+                    <span className="n">chunk_size</span>
+                    <span className="o">=</span>
+                    <span className="mi">800</span>
+                    <span className="p">,</span>
+                    {"       "}
+                    <span className="c1">
+                      # 文字数(≒日本語で400〜800トークン相当。単位が違う点に注意)
+                    </span>
+                  </span>
+                  <span className={`${styles.codeLine} code-line`}>
+                    {"    "}
+                    <span className="n">chunk_overlap</span>
+                    <span className="o">=</span>
+                    <span className="mi">150</span>
+                    <span className="p">,</span>
+                    {"    "}
+                    <span className="c1"># 文字数。チャンク間の重なり(文脈の欠落を防ぐ)</span>
+                  </span>
+                  <span className={`${styles.codeLine} code-line`}>
+                    {"    "}
+                    <span className="n">separators</span>
+                    <span className="o">=</span>
+                    <span className="p">[</span>
+                    <span className="s2">&quot;\n## &quot;</span>
+                    <span className="p">,</span> <span className="s2">&quot;\n\n&quot;</span>
+                    <span className="p">,</span> <span className="s2">&quot;\n&quot;</span>
+                    <span className="p">,</span> <span className="s2">&quot;。&quot;</span>
+                    <span className="p">,</span> <span className="s2">&quot; &quot;</span>
+                    <span className="p">,</span> <span className="s2">&quot;&quot;</span>
+                    <span className="p">],</span>
+                    {"  "}
+                    <span className="c1"># 末尾の &quot;&quot; は文字単位のフォールバック</span>
+                  </span>
+                  <span className={`${styles.codeLine} code-line`}>
+                    <span className="p">)</span>
+                  </span>
+                  <span className={`${styles.codeLine} code-line`}> </span>
+                  <span className={`${styles.codeLine} code-line`}>
+                    <span className="n">chunks</span> <span className="o">=</span>{" "}
+                    <span className="n">splitter</span>
+                    <span className="o">.</span>
+                    <span className="n">split_text</span>
+                    <span className="p">(</span>
+                    <span className="n">document_text</span>
+                    <span className="p">)</span>
+                  </span>
                 </pre>
               </div>
             </div>
@@ -674,104 +695,133 @@ export default function EnterpriseRagGuidePage() {
               </div>
               <div className={`${styles.highlight} highlight`}>
                 <pre>
-                  <span></span>
-                  <span className="c1">
-                    # OpenAI系モデル: 対象モデルのエンコーディングを明示する(既定の gpt2
-                    に依存しない)
+                  <span className={`${styles.codeLine} code-line`}>
+                    <span className="c1">
+                      # OpenAI系モデル: 対象モデルのエンコーディングを明示する(既定の gpt2
+                      に依存しない)
+                    </span>
                   </span>
-                  <span className="n">splitter</span> <span className="o">=</span>{" "}
-                  <span className="n">RecursiveCharacterTextSplitter</span>
-                  <span className="o">.</span>
-                  <span className="n">from_tiktoken_encoder</span>
-                  <span className="p">(</span>
-                  <span className="n">model_name</span>
-                  <span className="o">=</span>
-                  <span className="s2">"gpt-4o-mini"</span>
-                  <span className="p">,</span>{" "}
-                  <span className="c1"># または encoding_name="o200k_base"</span>
-                  <span className="n">chunk_size</span>
-                  <span className="o">=</span>
-                  <span className="mi">768</span>
-                  <span className="p">,</span> <span className="c1"># トークン数</span>
-                  <span className="n">chunk_overlap</span>
-                  <span className="o">=</span>
-                  <span className="mi">100</span>
-                  <span className="p">,</span>
-                  <span className="n">separators</span>
-                  <span className="o">=</span>
-                  <span className="p">[</span>
-                  <span className="s2">"</span>
-                  <span className="se">\n</span>
-                  <span className="s2">## "</span>
-                  <span className="p">,</span> <span className="s2">"</span>
-                  <span className="se">\n\n</span>
-                  <span className="s2">"</span>
-                  <span className="p">,</span> <span className="s2">"</span>
-                  <span className="se">\n</span>
-                  <span className="s2">"</span>
-                  <span className="p">,</span> <span className="s2">"。"</span>
-                  <span className="p">,</span> <span className="s2">" "</span>
-                  <span className="p">,</span> <span className="s2">""</span>
-                  <span className="p">],</span>
-                  <span className="p">)</span>
-                  <span className="c1">
-                    # OpenAI以外のモデル: そのモデルのトークナイザでトークン数を返す length_function
-                    を渡す
+                  <span className={`${styles.codeLine} code-line`}>
+                    <span className="n">splitter</span> <span className="o">=</span>{" "}
+                    <span className="n">RecursiveCharacterTextSplitter</span>
+                    <span className="o">.</span>
+                    <span className="n">from_tiktoken_encoder</span>
+                    <span className="p">(</span>
                   </span>
-                  <span className="kn">from</span>
-                  <span className="w"> </span>
-                  <span className="nn">transformers</span>
-                  <span className="w"> </span>
-                  <span className="kn">import</span> <span className="n">AutoTokenizer</span>
-                  <span className="n">tokenizer</span> <span className="o">=</span>{" "}
-                  <span className="n">AutoTokenizer</span>
-                  <span className="o">.</span>
-                  <span className="n">from_pretrained</span>
-                  <span className="p">(</span>
-                  <span className="s2">"&lt;対象モデルのID&gt;"</span>
-                  <span className="p">)</span>
-                  <span className="n">splitter</span> <span className="o">=</span>{" "}
-                  <span className="n">RecursiveCharacterTextSplitter</span>
-                  <span className="p">(</span>
-                  <span className="n">chunk_size</span>
-                  <span className="o">=</span>
-                  <span className="mi">768</span>
-                  <span className="p">,</span>
-                  <span className="n">chunk_overlap</span>
-                  <span className="o">=</span>
-                  <span className="mi">100</span>
-                  <span className="p">,</span>
-                  <span className="n">length_function</span>
-                  <span className="o">=</span>
-                  <span className="k">lambda</span> <span className="n">text</span>
-                  <span className="p">:</span> <span className="nb">len</span>
-                  <span className="p">(</span>
-                  <span className="n">tokenizer</span>
-                  <span className="o">.</span>
-                  <span className="n">encode</span>
-                  <span className="p">(</span>
-                  <span className="n">text</span>
-                  <span className="p">,</span> <span className="n">add_special_tokens</span>
-                  <span className="o">=</span>
-                  <span className="kc">False</span>
-                  <span className="p">)),</span>
-                  <span className="n">separators</span>
-                  <span className="o">=</span>
-                  <span className="p">[</span>
-                  <span className="s2">"</span>
-                  <span className="se">\n</span>
-                  <span className="s2">## "</span>
-                  <span className="p">,</span> <span className="s2">"</span>
-                  <span className="se">\n\n</span>
-                  <span className="s2">"</span>
-                  <span className="p">,</span> <span className="s2">"</span>
-                  <span className="se">\n</span>
-                  <span className="s2">"</span>
-                  <span className="p">,</span> <span className="s2">"。"</span>
-                  <span className="p">,</span> <span className="s2">" "</span>
-                  <span className="p">,</span> <span className="s2">""</span>
-                  <span className="p">],</span>
-                  <span className="p">)</span>
+                  <span className={`${styles.codeLine} code-line`}>
+                    {"    "}
+                    <span className="n">model_name</span>
+                    <span className="o">=</span>
+                    <span className="s2">&quot;gpt-4o-mini&quot;</span>
+                    <span className="p">,</span>
+                    {"   "}
+                    <span className="c1"># または encoding_name=&quot;o200k_base&quot;</span>
+                  </span>
+                  <span className={`${styles.codeLine} code-line`}>
+                    {"    "}
+                    <span className="n">chunk_size</span>
+                    <span className="o">=</span>
+                    <span className="mi">768</span>
+                    <span className="p">,</span>
+                    {"             "}
+                    <span className="c1"># トークン数</span>
+                  </span>
+                  <span className={`${styles.codeLine} code-line`}>
+                    {"    "}
+                    <span className="n">chunk_overlap</span>
+                    <span className="o">=</span>
+                    <span className="mi">100</span>
+                    <span className="p">,</span>
+                  </span>
+                  <span className={`${styles.codeLine} code-line`}>
+                    {"    "}
+                    <span className="n">separators</span>
+                    <span className="o">=</span>
+                    <span className="p">[</span>
+                    <span className="s2">&quot;\n## &quot;</span>
+                    <span className="p">,</span> <span className="s2">&quot;\n\n&quot;</span>
+                    <span className="p">,</span> <span className="s2">&quot;\n&quot;</span>
+                    <span className="p">,</span> <span className="s2">&quot;。&quot;</span>
+                    <span className="p">,</span> <span className="s2">&quot; &quot;</span>
+                    <span className="p">,</span> <span className="s2">&quot;&quot;</span>
+                    <span className="p">],</span>
+                  </span>
+                  <span className={`${styles.codeLine} code-line`}>
+                    <span className="p">)</span>
+                  </span>
+                  <span className={`${styles.codeLine} code-line`}> </span>
+                  <span className={`${styles.codeLine} code-line`}>
+                    <span className="c1">
+                      # OpenAI以外のモデル: そのモデルのトークナイザでトークン数を返す
+                      length_function を渡す
+                    </span>
+                  </span>
+                  <span className={`${styles.codeLine} code-line`}>
+                    <span className="kn">from</span> <span className="nn">transformers</span>{" "}
+                    <span className="kn">import</span> <span className="n">AutoTokenizer</span>
+                  </span>
+                  <span className={`${styles.codeLine} code-line`}> </span>
+                  <span className={`${styles.codeLine} code-line`}>
+                    <span className="n">tokenizer</span> <span className="o">=</span>{" "}
+                    <span className="n">AutoTokenizer</span>
+                    <span className="o">.</span>
+                    <span className="n">from_pretrained</span>
+                    <span className="p">(</span>
+                    <span className="s2">&quot;&lt;対象モデルのID&gt;&quot;</span>
+                    <span className="p">)</span>
+                  </span>
+                  <span className={`${styles.codeLine} code-line`}>
+                    <span className="n">splitter</span> <span className="o">=</span>{" "}
+                    <span className="n">RecursiveCharacterTextSplitter</span>
+                    <span className="p">(</span>
+                  </span>
+                  <span className={`${styles.codeLine} code-line`}>
+                    {"    "}
+                    <span className="n">chunk_size</span>
+                    <span className="o">=</span>
+                    <span className="mi">768</span>
+                    <span className="p">,</span>
+                  </span>
+                  <span className={`${styles.codeLine} code-line`}>
+                    {"    "}
+                    <span className="n">chunk_overlap</span>
+                    <span className="o">=</span>
+                    <span className="mi">100</span>
+                    <span className="p">,</span>
+                  </span>
+                  <span className={`${styles.codeLine} code-line`}>
+                    {"    "}
+                    <span className="n">length_function</span>
+                    <span className="o">=</span>
+                    <span className="k">lambda</span> <span className="n">text</span>
+                    <span className="p">:</span> <span className="nb">len</span>
+                    <span className="p">(</span>
+                    <span className="n">tokenizer</span>
+                    <span className="o">.</span>
+                    <span className="n">encode</span>
+                    <span className="p">(</span>
+                    <span className="n">text</span>
+                    <span className="p">,</span> <span className="n">add_special_tokens</span>
+                    <span className="o">=</span>
+                    <span className="kc">False</span>
+                    <span className="p">)),</span>
+                  </span>
+                  <span className={`${styles.codeLine} code-line`}>
+                    {"    "}
+                    <span className="n">separators</span>
+                    <span className="o">=</span>
+                    <span className="p">[</span>
+                    <span className="s2">&quot;\n## &quot;</span>
+                    <span className="p">,</span> <span className="s2">&quot;\n\n&quot;</span>
+                    <span className="p">,</span> <span className="s2">&quot;\n&quot;</span>
+                    <span className="p">,</span> <span className="s2">&quot;。&quot;</span>
+                    <span className="p">,</span> <span className="s2">&quot; &quot;</span>
+                    <span className="p">,</span> <span className="s2">&quot;&quot;</span>
+                    <span className="p">],</span>
+                  </span>
+                  <span className={`${styles.codeLine} code-line`}>
+                    <span className="p">)</span>
+                  </span>
                 </pre>
               </div>
             </div>
@@ -912,21 +962,42 @@ export default function EnterpriseRagGuidePage() {
               </div>
               <div className={`${styles.highlight} highlight`}>
                 <pre>
-                  <span></span>
-                  <span className="n">original_chunk</span> <span className="o">=</span>{" "}
-                  <span className="s2">"同社の売上高は前四半期比3%増加した。"</span>
-                  <span className="c1">
-                    # コンテキスト検索では、埋め込み・BM25インデックス作成の前に
+                  <span className={`${styles.codeLine} code-line`}>
+                    <span className="n">original_chunk</span> <span className="o">=</span>{" "}
+                    <span className="s2">&quot;同社の売上高は前四半期比3%増加した。&quot;</span>
                   </span>
-                  <span className="c1"># チャンク特有の説明文を付加する</span>
-                  <span className="n">contextualized_chunk</span> <span className="o">=</span>{" "}
-                  <span className="p">(</span>
-                  <span className="s2">
-                    "このチャンクは、ACME社の2023年第2四半期の業績に関するSEC提出資料からの抜粋であり、"
+                  <span className={`${styles.codeLine} code-line`}> </span>
+                  <span className={`${styles.codeLine} code-line`}>
+                    <span className="c1">
+                      # コンテキスト検索では、埋め込み・BM25インデックス作成の前に
+                    </span>
                   </span>
-                  <span className="s2">"前四半期の売上高は3億1,400万ドルであった。"</span>
-                  <span className="s2">"同社の売上高は前四半期比3%増加した。"</span>
-                  <span className="p">)</span>
+                  <span className={`${styles.codeLine} code-line`}>
+                    <span className="c1"># チャンク特有の説明文を付加する</span>
+                  </span>
+                  <span className={`${styles.codeLine} code-line`}>
+                    <span className="n">contextualized_chunk</span> <span className="o">=</span>{" "}
+                    <span className="p">(</span>
+                  </span>
+                  <span className={`${styles.codeLine} code-line`}>
+                    {"    "}
+                    <span className="s2">
+                      &quot;このチャンクは、ACME社の2023年第2四半期の業績に関するSEC提出資料からの抜粋であり、&quot;
+                    </span>
+                  </span>
+                  <span className={`${styles.codeLine} code-line`}>
+                    {"    "}
+                    <span className="s2">
+                      &quot;前四半期の売上高は3億1,400万ドルであった。&quot;
+                    </span>
+                  </span>
+                  <span className={`${styles.codeLine} code-line`}>
+                    {"    "}
+                    <span className="s2">&quot;同社の売上高は前四半期比3%増加した。&quot;</span>
+                  </span>
+                  <span className={`${styles.codeLine} code-line`}>
+                    <span className="p">)</span>
+                  </span>
                 </pre>
               </div>
             </div>

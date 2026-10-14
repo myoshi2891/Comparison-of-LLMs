@@ -122,6 +122,9 @@ describe("Enterprise RAG guide — source parity and design contracts", () => {
     expect(codeCards.length).toBe(4);
     const langs = nodes(container, "main .code-lang").map(text);
     expect(langs).toEqual(["Plain text", "Python", "Python", "Python"]);
+
+    const codeLines = nodes(container, "main .code-line");
+    expect(codeLines.length).toBe(39);
   });
 
   it("C-3: renders all 6 Mermaid diagrams with expected IDs and theme", () => {
