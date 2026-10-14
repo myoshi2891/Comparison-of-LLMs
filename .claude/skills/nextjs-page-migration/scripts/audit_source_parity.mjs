@@ -429,7 +429,7 @@ function collectHtmlMermaidSources(src) {
   // バッククォートで閉じたと誤認し、以降の本文が丸ごと欠落する。他の分岐と同様に
   // エスケープシーケンスを読み飛ばしてから閉じバッククォートを探す。
   const diagramEntryRe =
-    /(?:["'][^"']+["']|[\p{L}_$][\p{L}\p{N}_$]*)\s*:\s*(?:`((?:[^`\\]|\\.)*)`|'((?:[^'\\]|\\.)*)'|"((?:[^"\\]|\\.)*)")/gu;
+    /(?:["'][^"']+["']|[\p{L}_$][\p{L}\p{N}_$]*)\s*:\s*(?:dedent\s*\(\s*)?(?:`((?:[^`\\]|\\.)*)`|'((?:[^'\\]|\\.)*)'|"((?:[^"\\]|\\.)*)"\s*\)?)/gu;
   let entry = diagramEntryRe.exec(src);
   while (entry !== null) {
     const raw = decodeQuotedEntryEscapes(entry[1] ?? entry[2] ?? entry[3] ?? "");
