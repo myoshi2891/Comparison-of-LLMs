@@ -10,21 +10,37 @@
 
 - **フェーズ**: 保守・機能改善・品質強化フェーズ
 - **ブランチ**: `dev`
-- **最新実装 HEAD**: `695c45a1`（Adversarial Robustness for Machine Learning ガイドの完全移行・ヒーロー内鮮度バー黒文字統合・フッター淡色ペーパー同期。Greenは `695c45a1`、Redは `f605b780`）
-- **次の作業**: `/books/adversarial-robustness` の目視確認（ユーザー担当）。npm・ビルドは禁止、スクレイパー検証はユーザー指定で対象外。
-- **ルート実数**: `page.tsx` 89 件、registry 90 エントリ（RSS の `/rss.xml` を含む）。全ルート登録・ナビ導出テストは合格。
+- **最新実装 HEAD**: `d24781a9`（エンタープライズRAG完全ガイドの移行・原本アーカイブ・Biome/a11y調整。Greenは `736e336e`、Redは `ffa4b1d1`、Refactorは `d24781a9`）
+- **次の作業**: `/rag/enterprise-guide` の目視確認（ユーザー担当）。npm・ビルドは禁止、スクレイパー検証はユーザー指定で対象外。
+- **ルート実数**: `page.tsx` 90 件、registry 91 エントリ（RSS の `/rss.xml` を含む）。全ルート登録・ナビ導出テストは合格。
 - **動作検証**:
   - ビルド: 今回はユーザー指定で未実行。過去の成功記録は 2026-09-17 の 90 静的ページであり、今回の変更を検証した値ではない。
   - `bun run typecheck` ✅（`tsc --noEmit`。2026-10-14 実測）
-  - `bun run lint` ✅（Biome check / 535 files / 0 diagnostics。2026-10-14 実測）
+  - `bun run lint` ✅（Biome check / 539 files / 0 diagnostics。2026-10-14 実測）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: Node 24で `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000` を実行し、Vitest **194 files / 1917 tests すべて合格**（2026-10-14 実測）。20契約・typecheck・lint・原本監査がすべて成功。
-    - 今回の開始時ベースラインは **193 files / 1897 tests**。既存環境の `localStorage` 問題を避ける実行時オプションを継続使用し、依存・設定ファイルは変更していない。
+  - **フロントエンド (`web-next/`)**: Node 24で `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000` を実行し、Vitest **195 files / 1936 tests すべて合格**（2026-10-14 実測）。19契約・typecheck・lint・原本監査（exit 0）がすべて成功。
+    - 今回の開始時ベースラインは **194 files / 1917 tests**。既存環境の `localStorage` 問題を避ける実行時オプションを継続使用し、依存・設定ファイルは変更していない。
     - `load(sourceHtml)` をモジュール初期化時に呼ぶ `governance/ai-governance/GuideContent.tsx` と
       `local-llm/finetuning-best-practices/GuideContent.tsx` は、import スモークでも読み込み可能であることを確認済み
   - **バックエンド (`scraper/`)**: 今回はユーザー指定で検証対象外。実行していない。過去の成功記録は104件（2026-10-04）であり、今回の実測値ではない。
 
 ## 最近の追加内容
+
+- **エンタープライズRAG完全ガイドの移行・原本アーカイブ・スタイル調整（2026-10-14）**:
+  - `/rag/enterprise-guide` に全4 H2・15 H3・10 H4・73段落・15リスト／68項目・11表／67行・4コードブロック・6 Mermaid図解・18外部リンク（15参考ソースカード含む）をPure JSXへ転写。
+  - 原本HTML `Enterprise-rag-guide.html` は移行・検証完了後に `archive/html/rag/Enterprise-rag-guide.html` へ `git mv` 退避（内容無変更）。情報基準日2026年9月10日を完全維持。
+  - 原本照合監査スクリプト（`audit_source_parity.mjs`）は exit 0 で漏れなしを確認（クラス名 `mermaid-card` を誤検知しないよう `divRe` 正規表現を微修正）。
+  - スタイリング・共通クローム調整:
+    1. グローバル黒背景鮮度バー（`#site-freshness-bar`）を非表示化し、ディスクレイマー下の余計な余白を解消。
+    2. 背景色を淡色グレーブルー（`#eef1f4`）に統一し、308px固定サイドバーとコンテンツ幅の調和を確保。
+    3. 共通レイアウトフッター（`nav[aria-label="関連ページ"]`）を308pxサイドバーからオフセット（`margin-left: 308px; width: calc(100% - 308px)`）し、980px以下では全幅へ戻す。
+    4. テーブルの全列左寄せ（`:global(th), :global(td)` で `text-align: left !important`）。
+    5. コードブロックの先頭インデント保持とPygments(one-dark)対応spanトークン、`.highlight` ラッパー。
+    6. 全6箇所の Mermaid 図解に淡色パレット（`theme="base"`）を適用。
+    7. 目次スクロール追従（`TocObserver`、見出し＋トップ）とアンカー移動時の見出しめり込み防止（`scroll-margin-top`）。
+  - 19件の契約テスト（S-1〜S-4 原本照合、C-1〜C-6 コンテンツ、D-1〜D-6 デザイン、Q-1〜Q-3 品質契約）を追加。
+  - 分離履歴: Red `ffa4b1d1` → Green `736e336e` → Refactor `d24781a9`。
+  - 全体テスト: 195 files / 1936 tests すべて成功。typecheck、lint（539 files / 0 diagnostics）も成功。
 
 - **Adversarial Robustness for Machine Learningガイドの移行・共通クローム／スタイル調整（2026-10-14）**:
   - `/books/adversarial-robustness` に全19 H2・12 H3・41段落・34リスト項目・7表／66行（書籍情報kv表8行、全26章一覧表27行を含む）・1数式ブロック（minimax最適化問題）・12 Mermaid図解・3 callout・10チェック項目・22参考文献カード（23外部リンク）をPure JSXへ転写。
