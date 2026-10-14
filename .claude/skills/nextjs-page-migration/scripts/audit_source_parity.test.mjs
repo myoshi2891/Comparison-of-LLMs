@@ -197,6 +197,24 @@ export default function Page() {
 	]);
 });
 
+test("recognizes the mermaid class token only at whitespace or quote boundaries", () => {
+	// 非 ASCII 文字が隣接する "図mermaid" / "mermaidé" は別トークンであり、図解ではない。
+	const source = `<div class="図mermaid">graph TD
+A --> B</div>
+<div class='mermaidé'>graph TD
+C --> D</div>
+<div class="diagram\tmermaid">graph TD
+E --> F</div>`;
+	const page = `const CHART = \`graph TD
+E --> F\`;
+export default function Page() {
+  return <MermaidDiagram chart={CHART} />;
+}`;
+	const result = audit(source, page);
+	assert.deepEqual(result.json.sourceMermaidSources, ["graph TD\nE --> F"]);
+	assert.equal(result.json.mermaidSourcesMatch, true);
+});
+
 test("does not treat a Markdown Mermaid fence as a normal code block", () => {
 	const source = `Intro paragraph.
 

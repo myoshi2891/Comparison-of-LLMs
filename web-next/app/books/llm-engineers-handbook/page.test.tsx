@@ -254,11 +254,25 @@ describe("LLM Engineer's Handbook guide — source parity and design contracts",
 
     const fs = require("node:fs");
     const path = require("node:path");
-    const css = fs.readFileSync(path.resolve(__dirname, "./page.module.css"), "utf8");
-    expect(css).toContain('data-page="llm-engineers-handbook"');
-    expect(css).toContain("display: none !important");
-    expect(css).toContain('nav[aria-label="関連ページ"]');
-    expect(css).toContain("margin-left: 280px");
+    // 共有クロームの上書きは globals.css を唯一の真実の源とし、CSS Module には複製しない。
+    const globals = fs.readFileSync(path.resolve(__dirname, "../../globals.css"), "utf8");
+    expect(globals).toContain(
+      'body:has([data-page="llm-engineers-handbook"]) #site-freshness-bar {\n  display: none !important;'
+    );
+    expect(globals).toContain(
+      'body:has([data-page="llm-engineers-handbook"]) nav[aria-label="関連ページ"] {'
+    );
+    expect(globals).toContain("margin-left: 280px !important;");
+    const moduleCss = fs.readFileSync(path.resolve(__dirname, "./page.module.css"), "utf8");
+    expect(moduleCss).not.toContain('data-page="llm-engineers-handbook"');
+  });
+
+  it("D-12: menu toggle references the sidebar via aria-controls", () => {
+    const { container } = render(<Page />);
+    const toggle = container.querySelector("#menuToggle");
+    expect(toggle?.getAttribute("aria-controls")).toBe("sidebar");
+    expect(toggle?.getAttribute("aria-expanded")).toBe("false");
+    expect(container.querySelector("#sidebar")).not.toBeNull();
   });
 
   it("D-11: renders all 8 Mermaid diagrams with light-mode theme='base'", () => {
