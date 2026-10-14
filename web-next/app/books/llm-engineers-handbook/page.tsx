@@ -115,7 +115,11 @@ const DIAGRAM_ROADMAP = `flowchart TB
 
 export default function Page() {
   return (
-    <div className={styles.layout} data-testid="layout-root">
+    <div
+      className={styles.layout}
+      data-testid="layout-root"
+      data-page="llm-engineers-handbook"
+    >
       <link
         rel="stylesheet"
         href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.46.0/dist/tabler-icons.min.css"

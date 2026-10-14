@@ -1528,3 +1528,48 @@ body:has([data-page="ai-powered-developer"]) nav[aria-label="関連ページ"] {
     margin-left: 0;
   }
 }
+
+/* /books/llm-engineers-handbook: 共有クローム（body / 日付バー / 関連ページ）を
+   ページ固有の固定サイドバー（280px）と淡色パレット（#fcfbf7）に合わせる。 */
+body:has([data-page="llm-engineers-handbook"]) {
+  background: #fcfbf7;
+}
+body:has([data-page="llm-engineers-handbook"]) #site-freshness-bar {
+  box-sizing: border-box;
+  max-width: none;
+  width: calc(100% - 280px);
+  margin-left: 280px;
+  margin-right: 0;
+  padding-right: 3.5rem;
+  background: #fcfbf7;
+  color: #1a1a2e !important;
+  justify-content: flex-end;
+}
+body:has([data-page="llm-engineers-handbook"]) #site-freshness-bar time,
+body:has([data-page="llm-engineers-handbook"]) #site-freshness-bar span {
+  color: #1a1a2e !important;
+}
+body:has([data-page="llm-engineers-handbook"]) nav[aria-label="関連ページ"] {
+  margin-left: 280px;
+  margin-right: 0;
+  margin-top: 0;
+  max-width: none;
+  width: calc(100% - 280px);
+  padding-left: 3.5rem;
+  padding-right: 3.5rem;
+  --line: #e5e7eb;
+  --card: #ffffff;
+  --fg: #1a1a2e;
+  --muted: #555566;
+  --accent: #1e3a8a;
+  background: #fcfbf7;
+}
+@media (max-width: 960px) {
+  body:has([data-page="llm-engineers-handbook"]) #site-freshness-bar,
+  body:has([data-page="llm-engineers-handbook"]) nav[aria-label="関連ページ"] {
+    width: 100%;
+    margin-left: 0;
+    padding-left: 1.2rem;
+    padding-right: 1.2rem;
+  }
+}
