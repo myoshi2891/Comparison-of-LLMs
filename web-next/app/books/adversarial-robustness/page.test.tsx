@@ -18,9 +18,7 @@ const normalize = (value: string) => value.replace(/\s+/g, " ").trim();
 const text = (element: Element) => normalize(element.textContent ?? "");
 const nodes = (root: ParentNode, selector: string) => Array.from(root.querySelectorAll(selector));
 
-const EXPECTED_H1 = [
-  "Adversarial Robustness for Machine Learning 初学者ガイド",
-] as const;
+const EXPECTED_H1 = ["Adversarial Robustness for Machine Learning 初学者ガイド"] as const;
 
 const EXPECTED_H2 = [
   "この記事の対象読者",
@@ -122,9 +120,7 @@ describe("Adversarial Robustness guide — source parity and design contracts", 
 
   it("S-4: preserves all external links with exact URLs in original order", () => {
     const { container } = render(<Page />);
-    const actualLinks = nodes(container, "main a[href^='http']").map((a) =>
-      a.getAttribute("href")
-    );
+    const actualLinks = nodes(container, "main a[href^='http']").map((a) => a.getAttribute("href"));
     expect(actualLinks).toEqual([...EXPECTED_EXTERNAL_LINKS]);
   });
 
@@ -138,7 +134,9 @@ describe("Adversarial Robustness guide — source parity and design contracts", 
 
   it("C-2: preserves the book-info kv-table with 8 rows", () => {
     const { container } = render(<Page />);
-    const kvTable = container.querySelector("table.kvTable, table.kv-table, table[data-testid='kv-table']");
+    const kvTable = container.querySelector(
+      "table.kvTable, table.kv-table, table[data-testid='kv-table']"
+    );
     expect(kvTable).not.toBeNull();
     const rows = nodes(kvTable as Element, "tr");
     expect(rows).toHaveLength(8);
@@ -154,9 +152,13 @@ describe("Adversarial Robustness guide — source parity and design contracts", 
 
   it("C-4: renders the formula block with minimax optimization equation", () => {
     const { container } = render(<Page />);
-    const formulaPre = container.querySelector("[data-testid='formula-block'] pre, div.formulaBlock pre, div.formula-block pre");
+    const formulaPre = container.querySelector(
+      "[data-testid='formula-block'] pre, div.formulaBlock pre, div.formula-block pre"
+    );
     expect(formulaPre).not.toBeNull();
-    expect(normalize(formulaPre?.textContent ?? "")).toContain("min_θ E[ max_{δ∈Δ(x)} L( f_θ(x+δ), y ) ]");
+    expect(normalize(formulaPre?.textContent ?? "")).toContain(
+      "min_θ E[ max_{δ∈Δ(x)} L( f_θ(x+δ), y ) ]"
+    );
   });
 
   it("C-5: renders the 10-item checklist with counter and checkboxes", () => {
@@ -220,7 +222,9 @@ describe("Adversarial Robustness guide — source parity and design contracts", 
     expect(metadata.description).toContain("Pin-Yu Chen");
     expect(metadata.description).toContain("Adversarial Robustness");
     expect(metadata.alternates?.canonical).toBe("/books/adversarial-robustness");
-    expect(metadata.openGraph?.title).toBe("Adversarial Robustness for Machine Learning 初学者ガイド");
+    expect(metadata.openGraph?.title).toBe(
+      "Adversarial Robustness for Machine Learning 初学者ガイド"
+    );
   });
 
   it("Q-2: table direct children do not include loose text nodes", () => {
@@ -237,9 +241,10 @@ describe("Adversarial Robustness guide — source parity and design contracts", 
 
   it("Q-3: sidebar navigation links match all 19 section anchors plus top", () => {
     const { container } = render(<Page />);
-    const navAnchors = nodes(container, "aside nav a, aside .navList a, aside [data-testid='nav-list'] a").map(
-      (a) => a.getAttribute("href")
-    );
+    const navAnchors = nodes(
+      container,
+      "aside nav a, aside .navList a, aside [data-testid='nav-list'] a"
+    ).map((a) => a.getAttribute("href"));
     const expectedAnchors = [
       "#top",
       "#audience",
