@@ -247,7 +247,6 @@ describe("Adversarial Robustness guide — source parity and design contracts", 
     expect(globalsCss).toContain("margin-left: 300px !important");
   });
 
-
   it("Q-1: exports metadata with canonical URL and open graph fields", () => {
     expect(metadata.title).toBe("Adversarial Robustness for Machine Learning 初学者ガイド");
     expect(metadata.description).toContain("Pin-Yu Chen");

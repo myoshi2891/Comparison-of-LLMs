@@ -145,11 +145,7 @@ class E done;`;
 
 export default function AdversarialRobustnessGuidePage() {
   return (
-    <div
-      className={styles.layout}
-      data-testid="layout-root"
-      data-page="adversarial-robustness"
-    >
+    <div className={styles.layout} data-testid="layout-root" data-page="adversarial-robustness">
       <TocObserver />
 
       <div className={styles.mobileBar}>
