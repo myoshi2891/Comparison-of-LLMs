@@ -217,6 +217,37 @@ describe("Adversarial Robustness guide — source parity and design contracts", 
     expect(tocObserver).toHaveBeenCalled();
   });
 
+  it("D-5: renders in-hero freshness bar with dark ink text and correct dates", () => {
+    const { container } = render(<Page />);
+    const freshness = container.querySelector('[data-testid="page-freshness"]');
+    expect(freshness).not.toBeNull();
+    expect(freshness?.textContent).toContain("最終確認");
+    expect(freshness?.textContent).toContain("2026-10-14");
+    expect(freshness?.textContent).toContain("公開");
+  });
+
+  it("D-6: renders layout root with data-testid='layout-root' and data-page='adversarial-robustness'", () => {
+    const { container } = render(<Page />);
+    const layout = container.querySelector('[data-testid="layout-root"]');
+    expect(layout).not.toBeNull();
+    expect(layout?.getAttribute("data-page")).toBe("adversarial-robustness");
+  });
+
+  it("D-7: hides global freshness bar and offsets related-pages from 300px sidebar in css", () => {
+    const fs = require("node:fs");
+    const path = require("node:path");
+    const moduleCss = fs.readFileSync(path.resolve(__dirname, "./page.module.css"), "utf8");
+    expect(moduleCss).toContain('data-page="adversarial-robustness"');
+    expect(moduleCss).toContain("display: none !important");
+    expect(moduleCss).toContain('nav[aria-label="関連ページ"]');
+    expect(moduleCss).toContain("margin-left: 300px");
+
+    const globalsCss = fs.readFileSync(path.resolve(__dirname, "../../globals.css"), "utf8");
+    expect(globalsCss).toContain('data-page="adversarial-robustness"');
+    expect(globalsCss).toContain("margin-left: 300px !important");
+  });
+
+
   it("Q-1: exports metadata with canonical URL and open graph fields", () => {
     expect(metadata.title).toBe("Adversarial Robustness for Machine Learning 初学者ガイド");
     expect(metadata.description).toContain("Pin-Yu Chen");
