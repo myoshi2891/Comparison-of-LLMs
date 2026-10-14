@@ -34,8 +34,12 @@ function fixture() {
 
 const byId = (id: string) => document.getElementById(id) as HTMLElement;
 
-function setOffsetTop(id: string, value: number) {
-  Object.defineProperty(byId(id), "offsetTop", { configurable: true, value });
+// offsetTop は祖先基準の値なので、文書座標（viewport top + scrollY）とわざと食い違わせる。
+function setDocumentTop(id: string, documentTop: number, misleadingOffsetTop: number) {
+  const el = byId(id);
+  Object.defineProperty(el, "offsetTop", { configurable: true, value: misleadingOffsetTop });
+  el.getBoundingClientRect = () =>
+    ({ top: documentTop - window.scrollY }) as DOMRect;
 }
 
 function scrollTo(y: number) {
@@ -126,11 +130,11 @@ describe("Enterprise RAG TocObserver", () => {
     expect(byId("topBtn").classList.contains("is-visible")).toBe(false);
   });
 
-  it("marks the last section above the scroll position as active", () => {
+  it("marks the last section above the scroll position by document coordinates", () => {
     // Arrange
     fixture();
-    setOffsetTop("intro", 0);
-    setOffsetTop("part1", 1000);
+    setDocumentTop("intro", 0, 0);
+    setDocumentTop("part1", 1000, 50);
     const activeHrefs = () =>
       Array.from(document.querySelectorAll(".is-active")).map((a) => a.getAttribute("href"));
     // Act
@@ -142,6 +146,21 @@ describe("Enterprise RAG TocObserver", () => {
     scrollTo(950);
     // Assert
     expect(activeHrefs()).toEqual(["#part1"]);
+  });
+
+  it("removes the TOC link click handlers on unmount", () => {
+    // Arrange
+    const { unmount } = fixture();
+    const links = Array.from(document.querySelectorAll<HTMLAnchorElement>("a.toc-link"));
+    const added = links.map((link) => vi.spyOn(link, "addEventListener"));
+    const removed = links.map((link) => vi.spyOn(link, "removeEventListener"));
+    // Act
+    unmount();
+    // Assert
+    expect(added.every((spy) => spy.mock.calls.length === 0)).toBe(true);
+    for (const spy of removed) {
+      expect(spy).toHaveBeenCalledWith("click", expect.any(Function));
+    }
   });
 
   it("removes listeners and the open state on unmount", () => {
