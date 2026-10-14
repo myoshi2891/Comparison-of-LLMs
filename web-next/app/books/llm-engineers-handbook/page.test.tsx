@@ -81,6 +81,12 @@ const EXPECTED_EXTERNAL_LINKS = [
   "https://huggingface.co/mlabonne/TwinLlama-3.1-8B-DPO",
 ] as const;
 
+/** 原本で本文中に複数回リンクされる URL の出現回数（未記載の URL は 1 回）。 */
+const EXPECTED_LINK_REPEATS: Readonly<Partial<Record<string, number>>> = {
+  "https://github.com/PacktPublishing/LLM-Engineers-Handbook": 3,
+  "https://www.oreilly.com/library/view/llm-engineers-handbook/9781836200079/": 2,
+};
+
 const EXPECTED_DIAGRAM_IDS = [
   "diag-overview",
   "diag-fti",
@@ -154,7 +160,12 @@ describe("LLM Engineer's Handbook guide — source parity and design contracts",
   it("C-4: keeps external links secure with target='_blank' and rel='noopener noreferrer'", () => {
     const { container } = render(<Page />);
     const externalLinks = nodes(container, 'a[href^="http://"], a[href^="https://"]');
-    expect(externalLinks.length).toBeGreaterThanOrEqual(16);
+    const expectedHrefs = EXPECTED_EXTERNAL_LINKS.flatMap((url) =>
+      Array<string>(EXPECTED_LINK_REPEATS[url] ?? 1).fill(url)
+    );
+    expect(externalLinks.map((el) => el.getAttribute("href")).sort()).toEqual(
+      [...expectedHrefs].sort()
+    );
     for (const link of externalLinks) {
       expect(link.getAttribute("target")).toBe("_blank");
       expect(link.getAttribute("rel")).toMatch(/noopener/);
