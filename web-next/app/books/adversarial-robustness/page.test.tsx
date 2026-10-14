@@ -217,6 +217,14 @@ describe("Adversarial Robustness guide — source parity and design contracts", 
     expect(tocObserver).toHaveBeenCalled();
   });
 
+  it("D-8: exposes the collapsed menu state and the controlled sidebar to assistive technology", () => {
+    const { container } = render(<Page />);
+    const toggle = container.querySelector("#menuToggle");
+    expect(toggle?.getAttribute("aria-expanded")).toBe("false");
+    expect(toggle?.getAttribute("aria-controls")).toBe("sidebar");
+    expect(container.querySelector("#sidebar")).not.toBeNull();
+  });
+
   it("D-5: renders in-hero freshness bar with dark ink text and correct dates", () => {
     const { container } = render(<Page />);
     const freshness = container.querySelector('[data-testid="page-freshness"]');
@@ -236,16 +244,11 @@ describe("Adversarial Robustness guide — source parity and design contracts", 
   it("D-7: hides global freshness bar and offsets related-pages from 300px sidebar with paper palette matching main content", () => {
     const fs = require("node:fs");
     const path = require("node:path");
+    // 共有クローム（body / 日付バー / 関連ページ）の補正は globals.css が唯一の真実の源
     const moduleCss = fs.readFileSync(path.resolve(__dirname, "./page.module.css"), "utf8");
-    expect(moduleCss).toContain('data-page="adversarial-robustness"');
-    expect(moduleCss).toContain("display: none !important");
-    expect(moduleCss).toContain('nav[aria-label="関連ページ"]');
-    expect(moduleCss).toContain("margin-left: 300px");
-    expect(moduleCss).toContain("background: #f6f1e3 !important");
-    expect(moduleCss).toContain("--card: #fffdf7");
-    expect(moduleCss).toContain("--fg: #241f18");
-    expect(moduleCss).toContain("--line: #e4dbc4");
-    expect(moduleCss).toContain("--accent: #413d8f");
+    expect(moduleCss).not.toContain('data-page="adversarial-robustness"');
+    expect(moduleCss).not.toContain("#site-freshness-bar");
+    expect(moduleCss).not.toContain('nav[aria-label="関連ページ"]');
 
     const globalsCss = fs.readFileSync(path.resolve(__dirname, "../../globals.css"), "utf8");
     expect(globalsCss).toContain('data-page="adversarial-robustness"');
