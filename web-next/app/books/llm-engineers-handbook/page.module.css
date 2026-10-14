@@ -153,9 +153,42 @@
 
 /* Hero */
 .hero {
-  padding: 3.4rem 3.2rem 2.6rem;
+  padding: 1.6rem 3.2rem 2.6rem;
   background: linear-gradient(160deg, var(--indigo-soft) 0%, var(--paper) 60%);
   border-bottom: 1px solid var(--border);
+}
+
+.freshnessBar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  padding: 0 0 1.25rem;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--ink);
+}
+
+.freshnessItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  white-space: nowrap;
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.freshnessValue {
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.freshnessSep {
+  color: var(--ink-soft);
+  opacity: 0.5;
+  padding: 0 0.15rem;
 }
 
 .kicker {
@@ -663,49 +696,40 @@
 
 :global(body:has([data-page="llm-engineers-handbook"])) {
   --sidebar-w: 280px;
-  background: var(--paper);
+  background: var(--paper) !important;
+  margin-top: calc(var(--ch-height, 60px) + var(--ch-disclaimer-height, 0px)) !important;
 }
 
 :global(body:has([data-page="llm-engineers-handbook"]) #site-freshness-bar) {
-  box-sizing: border-box;
-  max-width: none;
-  width: calc(100% - 280px);
-  margin-left: 280px;
-  margin-right: 0;
-  padding-right: 3.5rem;
-  background: var(--paper);
-  color: #1a1a2e !important;
-  justify-content: flex-end;
-}
-
-:global(body:has([data-page="llm-engineers-handbook"]) #site-freshness-bar time),
-:global(body:has([data-page="llm-engineers-handbook"]) #site-freshness-bar span) {
-  color: #1a1a2e !important;
+  display: none !important;
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
 }
 
 :global(body:has([data-page="llm-engineers-handbook"]) nav[aria-label="関連ページ"]) {
+  box-sizing: border-box !important;
+  margin-left: 280px !important;
+  margin-right: 0 !important;
+  margin-top: 0 !important;
+  max-width: none !important;
+  width: calc(100% - 280px) !important;
+  padding-left: 3.2rem !important;
+  padding-right: 3.2rem !important;
+  background: var(--paper) !important;
   --line: #e5e7eb;
   --card: #ffffff;
   --fg: #1a1a2e;
   --muted: #555566;
   --accent: #1e3a8a;
-  box-sizing: border-box;
-  max-width: none;
-  width: calc(100% - 280px);
-  margin-left: 280px;
-  margin-right: 0;
-  margin-top: 0;
-  padding-left: 3.5rem;
-  padding-right: 3.5rem;
-  background: var(--paper);
 }
 
 @media (max-width: 960px) {
-  :global(body:has([data-page="llm-engineers-handbook"]) #site-freshness-bar),
   :global(body:has([data-page="llm-engineers-handbook"]) nav[aria-label="関連ページ"]) {
-    width: 100%;
-    margin-left: 0;
-    padding-left: 1.2rem;
-    padding-right: 1.2rem;
+    width: 100% !important;
+    margin-left: 0 !important;
+    padding-left: 1.2rem !important;
+    padding-right: 1.2rem !important;
   }
 }

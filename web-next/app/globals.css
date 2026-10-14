@@ -1530,46 +1530,41 @@ body:has([data-page="ai-powered-developer"]) nav[aria-label="関連ページ"] {
 }
 
 /* /books/llm-engineers-handbook: 共有クローム（body / 日付バー / 関連ページ）を
-   ページ固有の固定サイドバー（280px）と淡色パレット（#fcfbf7）に合わせる。 */
+   ページ固有の固定サイドバー（280px）と淡色パレット（#faf6ec）に合わせる。 */
+body:has([data-page="llm-engineers-handbook"]).has-common-header,
 body:has([data-page="llm-engineers-handbook"]) {
-  background: #fcfbf7;
+  margin-top: calc(var(--ch-height, 60px) + var(--ch-disclaimer-height, 0px)) !important;
+  background: #faf6ec !important;
 }
 body:has([data-page="llm-engineers-handbook"]) #site-freshness-bar {
-  box-sizing: border-box;
-  max-width: none;
-  width: calc(100% - 280px);
-  margin-left: 280px;
-  margin-right: 0;
-  padding-right: 3.5rem;
-  background: #fcfbf7;
-  color: #1a1a2e !important;
-  justify-content: flex-end;
-}
-body:has([data-page="llm-engineers-handbook"]) #site-freshness-bar time,
-body:has([data-page="llm-engineers-handbook"]) #site-freshness-bar span {
-  color: #1a1a2e !important;
+  display: none !important;
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
 }
 body:has([data-page="llm-engineers-handbook"]) nav[aria-label="関連ページ"] {
-  margin-left: 280px;
-  margin-right: 0;
-  margin-top: 0;
-  max-width: none;
-  width: calc(100% - 280px);
-  padding-left: 3.5rem;
-  padding-right: 3.5rem;
-  --line: #e5e7eb;
-  --card: #ffffff;
-  --fg: #1a1a2e;
-  --muted: #555566;
-  --accent: #1e3a8a;
-  background: #fcfbf7;
+  box-sizing: border-box !important;
+  margin-left: 280px !important;
+  margin-right: 0 !important;
+  margin-top: 0 !important;
+  max-width: none !important;
+  width: calc(100% - 280px) !important;
+  padding-left: 3.2rem !important;
+  padding-right: 3.2rem !important;
+  background: #faf6ec !important;
+  --line: #ddd0ab;
+  --card: #fffdf8;
+  --fg: #241f18;
+  --muted: #5b5346;
+  --accent: #33417a;
 }
 @media (max-width: 960px) {
-  body:has([data-page="llm-engineers-handbook"]) #site-freshness-bar,
   body:has([data-page="llm-engineers-handbook"]) nav[aria-label="関連ページ"] {
-    width: 100%;
-    margin-left: 0;
-    padding-left: 1.2rem;
-    padding-right: 1.2rem;
+    width: 100% !important;
+    margin-left: 0 !important;
+    padding-left: 1.2rem !important;
+    padding-right: 1.2rem !important;
   }
 }
+

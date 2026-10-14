@@ -115,11 +115,7 @@ const DIAGRAM_ROADMAP = `flowchart TB
 
 export default function Page() {
   return (
-    <div
-      className={styles.layout}
-      data-testid="layout-root"
-      data-page="llm-engineers-handbook"
-    >
+    <div className={styles.layout} data-testid="layout-root" data-page="llm-engineers-handbook">
       <link
         rel="stylesheet"
         href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.46.0/dist/tabler-icons.min.css"
@@ -377,6 +373,23 @@ export default function Page() {
 
       <main className={styles.main}>
         <header className={styles.hero}>
+          <div className={styles.freshnessBar} lang="ja" data-testid="page-freshness">
+            <span className={styles.freshnessItem}>
+              最終確認{" "}
+              <time className={styles.freshnessValue} dateTime="2026-10-14">
+                2026-10-14
+              </time>
+            </span>
+            <span className={styles.freshnessSep} aria-hidden="true">
+              /
+            </span>
+            <span className={styles.freshnessItem}>
+              公開{" "}
+              <time className={styles.freshnessValue} dateTime="2026-10-14">
+                2026-10-14
+              </time>
+            </span>
+          </div>
           <span className={styles.kicker}>
             <i className="ti ti-sparkles" />
             2026年9月9日時点の調査に基づく解説ガイド
