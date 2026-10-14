@@ -18,8 +18,7 @@ const MERMAID_THEME_VARIABLES = {
   secondaryColor: "#e6e9f5",
   tertiaryColor: "#f2e3ba",
   fontSize: "16px",
-  fontFamily:
-    'ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif',
+  fontFamily: 'ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif',
   edgeLabelBackground: "#fcfbf7",
 } as const;
 
