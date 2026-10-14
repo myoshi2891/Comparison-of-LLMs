@@ -910,6 +910,16 @@ const entries: PageEntry[] = [
     lastReviewed: "2026-07-12",
   },
   {
+    slug: "/rag/enterprise-guide",
+    title: "エンタープライズRAG完全ガイド",
+    group: "モデル・データ",
+    topics: ["rag", "enterprise", "vector-db", "embedding", "agentic-rag", "graphrag"],
+    summary:
+      "エンタープライズRAG(Retrieval-Augmented Generation)を初学者向けにステップバイステップで解説する技術ガイド。ドキュメント前処理・チャンキング、Embedding・ベクトルDB選定、ハイブリッド検索、リランキング、GraphRAG、Agentic RAG、セキュリティ、評価フレームワーク、本番運用の全体像を網羅。",
+    addedAt: "2026-10-14",
+    lastReviewed: "2026-10-14",
+  },
+  {
     slug: "/search",
     title: "検索",
     group: "検索",
