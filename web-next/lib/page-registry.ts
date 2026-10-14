@@ -238,6 +238,25 @@ const entries: PageEntry[] = [
     lastReviewed: "2026-10-14",
   },
   {
+    slug: "/books/adversarial-robustness",
+    title: "Adversarial Robustness for Machine Learning",
+    description:
+      "Pin-Yu Chen氏・Cho-Jui Hsieh氏著『Adversarial Robustness for Machine Learning』をベースに、敵対的攻撃(FGSM/PGD/C&W)、防御(Adversarial Training/Certified Robustness)、評価方法、およびLLM時代のセキュリティ(GCG/NIST/MITRE)を体系的に学ぶ初学者向け実践ガイド。",
+    group: "推薦書籍",
+    topics: [
+      "book",
+      "security",
+      "adversarial-robustness",
+      "machine-learning",
+      "llm-security",
+      "guide",
+    ],
+    summary:
+      "Pin-Yu Chen氏・Cho-Jui Hsieh氏著『Adversarial Robustness for Machine Learning』を土台に、敵対的攻撃(FGSM/PGD/C&W)、防御(Adversarial Training/Certified Robustness)、評価方法、およびLLM時代のセキュリティ(GCG/NIST/MITRE)をステップバイステップで学ぶ初学者向けガイド。",
+    addedAt: "2026-10-14",
+    lastReviewed: "2026-10-14",
+  },
+  {
     slug: "/ci-cd/ai-cicd-automation-best-practices",
     title: "AI CI/CD Automation",
     group: "開発プロセス",
