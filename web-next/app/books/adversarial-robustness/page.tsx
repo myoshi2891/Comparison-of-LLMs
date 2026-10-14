@@ -153,7 +153,13 @@ export default function AdversarialRobustnessGuidePage() {
           <i className="ti ti-shield-lock" />
           &nbsp;Adversarial Robustness ガイド
         </div>
-        <button id="menuToggle" aria-label="メニューを開く" type="button">
+        <button
+          id="menuToggle"
+          aria-label="メニューを開く"
+          aria-expanded="false"
+          aria-controls="sidebar"
+          type="button"
+        >
           <i className="ti ti-menu-2" />
         </button>
       </div>

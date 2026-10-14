@@ -33,54 +33,6 @@
   -webkit-font-smoothing: antialiased;
 }
 
-/* グローバル黒背景鮮度バーの非表示と余白解消 */
-:global(body:has([data-page="adversarial-robustness"])) {
-  --sidebar-w: 300px;
-  background: #f6f1e3 !important;
-  margin-top: calc(var(--ch-height, 60px) + var(--ch-disclaimer-height, 0px)) !important;
-}
-
-:global(body:has([data-page="adversarial-robustness"]) #site-freshness-bar) {
-  display: none !important;
-  height: 0 !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  overflow: hidden !important;
-}
-
-/* 関連ページフッターの重なり解消とメインコンテンツ淡色テーマ同期 */
-:global(body:has([data-page="adversarial-robustness"]) nav[aria-label="関連ページ"]) {
-  box-sizing: border-box !important;
-  margin-left: 300px !important;
-  margin-right: 0 !important;
-  margin-top: 0 !important;
-  max-width: none !important;
-  width: calc(100% - 300px) !important;
-  padding-left: 3.2rem !important;
-  padding-right: 3.2rem !important;
-  padding-bottom: 4rem !important;
-  background: #f6f1e3 !important;
-  --line: #e4dbc4;
-  --card: #fffdf7;
-  --fg: #241f18;
-  --muted: #5a5342;
-  --accent: #413d8f;
-}
-
-:global(body:has([data-page="adversarial-robustness"]) nav[aria-label="関連ページ"] a:hover) {
-  border-color: #413d8f !important;
-  box-shadow: 0 4px 14px rgba(65, 61, 143, 0.12) !important;
-}
-
-@media (max-width: 980px) {
-  :global(body:has([data-page="adversarial-robustness"]) nav[aria-label="関連ページ"]) {
-    width: 100% !important;
-    margin-left: 0 !important;
-    padding-left: 1.2rem !important;
-    padding-right: 1.2rem !important;
-  }
-}
-
 .layout h1,
 .layout h2,
 .layout h3,
