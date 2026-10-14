@@ -408,7 +408,7 @@ function decodeQuotedEntryEscapes(raw) {
 function collectHtmlMermaidSources(src) {
   const sources = [];
   const divRe =
-    /<(?:div|pre)\b([^>]*\bclass=["'][^"']*(?<![a-zA-Z0-9_-])mermaid(?![a-zA-Z0-9_-])[^"']*["'][^>]*)>([\s\S]*?)<\/(?:div|pre)\s*>/gi;
+    /<(?:div|pre)\b([^>]*\bclass=["'][^"']*(?<=["'\t\n\f\r ])mermaid(?=["'\t\n\f\r ])[^"']*["'][^>]*)>([\s\S]*?)<\/(?:div|pre)\s*>/gi;
   let div = divRe.exec(src);
   while (div !== null) {
     sources.push({ index: div.index, source: normalizeMermaidSource(div[2]) });

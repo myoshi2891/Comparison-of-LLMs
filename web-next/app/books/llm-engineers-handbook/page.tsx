@@ -137,6 +137,7 @@ export default function Page() {
         id="menuToggle"
         aria-label="メニューを開く"
         aria-expanded="false"
+        aria-controls="sidebar"
       >
         <i className="ti ti-menu-2" />
       </button>

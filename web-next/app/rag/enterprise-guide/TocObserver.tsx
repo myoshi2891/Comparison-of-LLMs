@@ -8,8 +8,9 @@ export default function TocObserver() {
     if (!root) return;
 
     // --- 1. Mobile Navigation Toggle ---
-    const menuBtn = root.querySelector("#menuBtn");
-    const backdrop = root.querySelector("#sidebarBackdrop");
+    // メニュー・背景幕・Top ボタンは layout-root の兄弟として描画されるため document から引く。
+    const menuBtn = document.getElementById("menuBtn");
+    const backdrop = document.getElementById("sidebarBackdrop");
     const body = document.body;
 
     function closeNav() {
@@ -37,7 +38,7 @@ export default function TocObserver() {
     }
 
     // --- 2. Back to Top Button ---
-    const topBtn = root.querySelector<HTMLButtonElement>("#topBtn");
+    const topBtn = document.getElementById("topBtn");
     function handleScroll() {
       if (topBtn) {
         if (window.scrollY > 480) {
