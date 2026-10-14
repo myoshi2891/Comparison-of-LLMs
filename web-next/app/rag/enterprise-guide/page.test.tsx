@@ -81,14 +81,7 @@ const EXPECTED_EXTERNAL_LINKS = [
   "https://atlan.com/know/what-is-graphrag/",
 ] as const;
 
-const EXPECTED_DIAGRAM_IDS = [
-  "dg-0",
-  "dg-1",
-  "dg-2",
-  "dg-3",
-  "dg-4",
-  "dg-5",
-] as const;
+const EXPECTED_DIAGRAM_IDS = ["dg-0", "dg-1", "dg-2", "dg-3", "dg-4", "dg-5"] as const;
 
 describe("Enterprise RAG guide — source parity and design contracts", () => {
   it("S-1: preserves every H2 heading in original order", () => {
@@ -111,9 +104,7 @@ describe("Enterprise RAG guide — source parity and design contracts", () => {
 
   it("S-4: preserves all external links with exact URLs in original order", () => {
     const { container } = render(<Page />);
-    const actualLinks = nodes(container, "main a[href^='http']").map((a) =>
-      a.getAttribute("href"),
-    );
+    const actualLinks = nodes(container, "main a[href^='http']").map((a) => a.getAttribute("href"));
     expect(actualLinks).toEqual([...EXPECTED_EXTERNAL_LINKS]);
   });
 
@@ -189,19 +180,7 @@ describe("Enterprise RAG guide — source parity and design contracts", () => {
     const partBadges = nodes(container, ".part-badge").map(text);
     expect(partBadges).toEqual(["Part 1", "Part 2", "Part 3", "Part 4"]);
     const stepBadges = nodes(container, ".step-badge").map(text);
-    expect(stepBadges).toEqual([
-      "1",
-      "2",
-      "3",
-      "4",
-      "5",
-      "6",
-      "7",
-      "8",
-      "9",
-      "10",
-      "11",
-    ]);
+    expect(stepBadges).toEqual(["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11"]);
   });
 
   it("D-4: renders mobile top-bar and back-to-top button", () => {
@@ -227,10 +206,10 @@ describe("Enterprise RAG guide — source parity and design contracts", () => {
 
   it("Q-1: exports metadata with canonical URL and open graph fields", () => {
     expect(metadata.title).toBe(
-      "エンタープライズRAG完全ガイド：初学者のためのステップバイステップ解説",
+      "エンタープライズRAG完全ガイド：初学者のためのステップバイステップ解説"
     );
     expect(metadata.description).toContain(
-      "エンタープライズRAG(Retrieval-Augmented Generation)を初学者向けにステップバイステップで解説",
+      "エンタープライズRAG(Retrieval-Augmented Generation)を初学者向けにステップバイステップで解説"
     );
     expect(metadata.alternates?.canonical).toBe("/rag/enterprise-guide");
   });

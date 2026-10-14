@@ -25,7 +25,9 @@ export default function TocObserver() {
     menuBtn?.addEventListener("click", toggleNav);
     backdrop?.addEventListener("click", closeNav);
 
-    const tocLinks = Array.from(root.querySelectorAll<HTMLAnchorElement>("a.toc-link, [class*='tocLink']"));
+    const tocLinks = Array.from(
+      root.querySelectorAll<HTMLAnchorElement>("a.toc-link, [class*='tocLink']")
+    );
     for (const a of tocLinks) {
       a.addEventListener("click", () => {
         if (window.innerWidth <= 980) {
