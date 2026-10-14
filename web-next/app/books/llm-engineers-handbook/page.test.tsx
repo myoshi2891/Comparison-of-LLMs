@@ -4,8 +4,21 @@ import { describe, expect, it, vi } from "vitest";
 import Page, { metadata } from "./page";
 
 vi.mock("@/components/docs/MermaidDiagram", () => ({
-  default: ({ chart, id }: { chart: string; id?: string }) => (
-    <div data-testid="mermaid-diagram" data-chart={chart} id={id}>
+  default: ({
+    chart,
+    id,
+    theme,
+  }: {
+    chart: string;
+    id?: string;
+    theme?: string;
+  }) => (
+    <div
+      data-testid="mermaid-diagram"
+      data-chart={chart}
+      data-theme={theme}
+      id={id}
+    >
       {chart}
     </div>
   ),
@@ -217,6 +230,32 @@ describe("LLM Engineer's Handbook guide — source parity and design contracts",
     const { container } = render(<Page />);
     const layout = container.querySelector('[data-testid="layout-root"]');
     expect(layout).not.toBeNull();
+  });
+
+  it("D-9: calculates sidebar top and height using --ch-disclaimer-height", () => {
+    const fs = require("node:fs");
+    const path = require("node:path");
+    const css = fs.readFileSync(path.resolve(__dirname, "./page.module.css"), "utf8");
+    expect(css).toContain("calc(var(--header-height, 60px) + var(--ch-disclaimer-height, 0px))");
+    expect(css).toContain("calc(100dvh - var(--header-height, 60px) - var(--ch-disclaimer-height, 0px))");
+    expect(css).toContain("scroll-margin-top: calc(var(--header-height, 60px) + var(--ch-disclaimer-height, 0px) + 80px)");
+  });
+
+  it("D-10: aligns site-freshness-bar and related-pages with sidebar offset in light theme", () => {
+    const fs = require("node:fs");
+    const path = require("node:path");
+    const css = fs.readFileSync(path.resolve(__dirname, "./page.module.css"), "utf8");
+    expect(css).toContain(":global(body):has(.layout) :global(#site-freshness-bar)");
+    expect(css).toContain(":global(body):has(.layout) :global(nav[aria-label=\"関連ページ\"])");
+  });
+
+  it("D-11: renders all 8 Mermaid diagrams with light-mode theme='base'", () => {
+    const { container } = render(<Page />);
+    const diagrams = nodes(container, '[data-testid="mermaid-diagram"]');
+    expect(diagrams).toHaveLength(8);
+    for (const diagram of diagrams) {
+      expect(diagram.getAttribute("data-theme")).toBe("base");
+    }
   });
 
   it("Q-1: mounts TocObserver for scroll, mobile menu, and checklist interactions", () => {
