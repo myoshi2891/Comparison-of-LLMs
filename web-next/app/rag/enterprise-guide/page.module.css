@@ -209,7 +209,6 @@
 
 .article {
   width: 100%;
-  max-width: var(--content-max);
   padding: 56px 0 90px;
 }
 
@@ -283,11 +282,15 @@
     left: 0;
     height: 100vh;
     transform: translateX(-104%);
-    transition: transform 0.28s ease;
+    visibility: hidden;
+    transition:
+      transform 0.28s ease,
+      visibility 0.28s ease;
     box-shadow: var(--shadow-md);
   }
   :global(body.nav-open) .sidebar {
     transform: translateX(0);
+    visibility: visible;
   }
   :global(body.nav-open) .sidebarBackdrop {
     display: block;
@@ -802,15 +805,18 @@ a.extLink {
   cursor: pointer;
   box-shadow: var(--shadow-md);
   opacity: 0;
+  visibility: hidden;
   pointer-events: none;
   transition:
     opacity 0.2s ease,
-    transform 0.2s ease;
+    transform 0.2s ease,
+    visibility 0.2s ease;
   z-index: 45;
 }
 
 .topBtn:global(.is-visible) {
   opacity: 1;
+  visibility: visible;
   pointer-events: auto;
 }
 

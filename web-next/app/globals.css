@@ -1647,7 +1647,7 @@ body:has([data-page="hands-on-large-language-models"]) nav[aria-label="関連ペ
   border-color: #7c9eff !important;
   box-shadow: 0 4px 14px rgba(124, 158, 255, 0.12) !important;
 }
-@media (max-width: 980px) {
+@media (max-width: 900px) {
   body:has([data-page="hands-on-large-language-models"]) nav[aria-label="関連ページ"] {
     width: 100% !important;
     margin-left: 0 !important;

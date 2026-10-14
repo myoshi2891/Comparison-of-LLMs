@@ -39,6 +39,9 @@
 /* グローバル黒帯鮮度バーの非表示（ヒーロー直結）と body マージン補正 */
 :global(body:has([data-page="hands-on-large-language-models"])) {
   --sidebar-w: 340px;
+  /* .layout の兄弟である .sidebarToggle からも参照できるよう body 側にも定義する */
+  --panel: #0d1a2e;
+  --text: #dbe4f5;
   background: #07111e !important;
   margin-top: calc(var(--ch-height, 60px) + var(--ch-disclaimer-height, 0px)) !important;
 }
@@ -426,7 +429,7 @@ p.disclaimer em,
 /* ---------- Reference grid ---------- */
 .refGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr));
   gap: 14px;
   margin: 0 0 28px 0;
 }
