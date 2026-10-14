@@ -10,6 +10,21 @@ AIモデルの時間別コスト計算機 + AI ツール導入ガイド群。Pyt
 
 ## アーキテクチャ
 
+推薦書籍 `/books/hands-on-large-language-models` を追加（2026-10-14）。指定HTMLの全10 H2・
+22 H3・16 H4・96段落・56リスト項目・7表／64行（書籍情報kv表8行、アーキテクチャ比較表、
+RAG/ファインチューニング比較表等）・27 Mermaid図解・17チェック項目・24参考文献カード（24外部リンク）を
+Pure JSXへ転写。原本から固定した本文・構造を22件の契約テストで照合する。
+表の全列左寄せ、アンカー移動の見出しめり込み防止を徹底。
+書籍情報カード（O'Reilly公式ページリンク、著者Jay Alammar & Maarten Grootendorst）、Hero kicker、
+メタ情報タグ4件、全27箇所の Mermaid 図解に淡色パレット（theme='base'）を適用。
+ヒーローセクション内に日付（最終確認日・公開日）を黒文字（var(--text)）で統合し、
+グローバルの黒背景鮮度バーを完全非表示（display: none !important）にして余白を解消。
+関連ページフッターを固定サイドバー幅（340px）オフセットし、980px以下では全幅に戻す。
+原本HTML／Markdownは `archive/html/books/Hands-on-large-language-models-guide.html`／
+`archive/md/books/Hands-on-large-language-models-guide.md` に内容無変更で保存。
+指定HTMLを正本とし、registryの追加・確認日は2026-10-14。HTML原本監査exit 0、全体Vitest **197 files / 1970 tests**、
+typecheck、lint（545 files／0 diagnostics）が成功。npm・ビルドは未実行、目視確認はユーザー担当。
+
 推薦書籍 `/books/adversarial-robustness` を追加（2026-10-14）。指定HTMLの全19 H2・
 12 H3・41段落・34リスト項目・7表／66行（書籍情報kv表8行、全26章一覧表27行を含む）・
 1数式ブロック（minimax最適化問題）・12 Mermaid図解・3 callout・10チェック項目・

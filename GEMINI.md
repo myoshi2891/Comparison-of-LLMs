@@ -15,6 +15,17 @@ GEMINI.md は Gemini CLI / Gemini Code Assist 向けの入り口。
 @./CLAUDE.md
 @docs/PROGRESS.md
 
+2026-10-14 に `/books/hands-on-large-language-models` を推薦書籍へ追加。指定HTMLの本文・構造・
+27図解・7表64行・17チェック項目・24参考文献カード（24リンク）を固定期待値で照合する。
+22契約と12操作契約を追加し、HTML監査exit 0、全体Vitest **197 files／1970 tests**、
+typecheck・lint（545 files／0 diagnostics）が成功。原本2形式は内容無変更で保存。
+書籍情報カード（O'Reilly公式リンク、著者Jay Alammar & Maarten Grootendorst）、Hero kicker、
+メタ情報タグ4件、全27箇所の Mermaid 図解に淡色パレット（theme='base'）を適用。
+ヒーローセクション内に日付を黒文字で統合し、グローバル黒帯鮮度バー非表示でディスクレイマー下の余白を解消。
+関連ページフッターの重なり解消（340pxオフセット、980px以下全幅）も完了。
+表の全列左寄せ、アンカー移動の見出しめり込み防止を徹底。
+registryの追加日は2026-10-14。npm・ビルドは未実行、目視確認はユーザー担当。
+
 2026-10-14 に `/rag/enterprise-guide` をモデル・データへ追加。指定HTMLの本文・構造・
 6図解・4コードブロック・11表67行・18外部リンク（15参考ソースカード含む）を固定期待値で照合する。
 19契約を追加し、HTML監査exit 0、全体Vitest **195 files／1936 tests**、
@@ -107,10 +118,10 @@ Vitest 185 files／1779 tests、typecheck・lint・pytest 104件が成功。復�
 ## 検証コマンド
 
 ```bash
-(cd web-next && NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000) # Node 24 / 195 files / 1936 tests pass（2026-10-14 実測）
+(cd web-next && NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000) # Node 24 / 197 files / 1970 tests pass（2026-10-14 実測）
 (cd web-next && bun run typecheck)   # OK（2026-10-14 実測）
 # ビルドは今回ユーザー指定で未実行（過去: 2026-09-18 に89静的ページ生成）
-(cd web-next && bun run lint)        # OK（539 files / 0 diagnostics。2026-10-14 実測）
+(cd web-next && bun run lint)        # OK（545 files / 0 diagnostics。2026-10-14 実測）
 (cd scraper && uv run pytest)        # 今回対象外。過去の成功は104件（2026-10-04）
 ```
 

@@ -10,21 +10,37 @@
 
 - **フェーズ**: 保守・機能改善・品質強化フェーズ
 - **ブランチ**: `dev`
-- **最新実装 HEAD**: `3da13d68`（エンタープライズRAG完全ガイドのコードブロック改行修正、固定サイドバー常駐・フッター途切れ解消、免責バー透過文字被り防止。Greenは `736e336e`、Redは `ffa4b1d1`、Refactorは `d24781a9`、StyleFixは `3da13d68`）
-- **次の作業**: `/rag/enterprise-guide` の目視確認（ユーザー担当）。npm・ビルドは禁止、スクレイパー検証はユーザー指定で対象外。
-- **ルート実数**: `page.tsx` 90 件、registry 91 エントリ（RSS の `/rss.xml` を含む）。全ルート登録・ナビ導出テストは合格。
+- **最新実装 HEAD**: `0399f9c5`（Hands-On Large Language Modelsガイドのリファクタリング・スタイル調整・テーマ変数整理。Refactorは `0399f9c5`、Greenは `ac3453b2`、Redは `750c27d3`）
+- **次の作業**: `/books/hands-on-large-language-models` の目視確認（ユーザー担当）。npm・ビルドは禁止、スクレイパー検証はユーザー指定で対象外。
+- **ルート実数**: `page.tsx` 91 件、registry 92 エントリ（RSS の `/rss.xml` を含む）。全ルート登録・ナビ導出テストは合格。
 - **動作検証**:
   - ビルド: 今回はユーザー指定で未実行。過去の成功記録は 2026-09-17 の 90 静的ページであり、今回の変更を検証した値ではない。
   - `bun run typecheck` ✅（`tsc --noEmit`。2026-10-14 実測）
-  - `bun run lint` ✅（Biome check / 539 files / 0 diagnostics。2026-10-14 実測）
+  - `bun run lint` ✅（Biome check / 545 files / 0 diagnostics。2026-10-14 実測）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: Node 24で `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000` を実行し、Vitest **195 files / 1936 tests すべて合格**（2026-10-14 実測）。19契約・typecheck・lint・原本監査（exit 0）がすべて成功。
-    - 今回の開始時ベースラインは **194 files / 1917 tests**。既存環境の `localStorage` 問題を避ける実行時オプションを継続使用し、依存・設定ファイルは変更していない。
+  - **フロントエンド (`web-next/`)**: Node 24で `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000` を実行し、Vitest **197 files / 1970 tests すべて合格**（2026-10-14 実測）。22契約・12操作契約・typecheck・lint・原本監査（exit 0）がすべて成功。
+    - 今回の開始時ベースラインは **195 files / 1936 tests**。既存環境の `localStorage` 問題を避ける実行時オプションを継続使用し、依存・設定ファイルは変更していない。
     - `load(sourceHtml)` をモジュール初期化時に呼ぶ `governance/ai-governance/GuideContent.tsx` と
       `local-llm/finetuning-best-practices/GuideContent.tsx` は、import スモークでも読み込み可能であることを確認済み
   - **バックエンド (`scraper/`)**: 今回はユーザー指定で検証対象外。実行していない。過去の成功記録は104件（2026-10-04）であり、今回の実測値ではない。
 
 ## 最近の追加内容
+
+- **Hands-On Large Language Modelsガイドの移行・原本アーカイブ・スタイル調整（2026-10-14）**:
+  - `/books/hands-on-large-language-models` に全10 H2・22 H3・16 H4・96段落・56リスト項目・7表／64行（書籍情報kv表8行、アーキテクチャ比較表、RAG/ファインチューニング比較表等）・27 Mermaid図解・17チェック項目・24参考文献カード（24外部リンク）をPure JSXへ転写。
+  - 原本HTML `Hands-on-large-language-models-guide.html` および Markdown `Hands-on-large-language-models-guide.md` は内容無変更で `archive/html/books/` および `archive/md/books/` へ `git mv` 退避（ユーザー指示によりMarkdownファイルも同時に退避保存）。指定HTMLを正本とし、registryの追加・確認日は2026-10-14。
+  - 原本照合監査スクリプト（`audit_source_parity.mjs`）は exit 0 で漏れなしを確認。
+  - スタイリング・共通クローム対応:
+    1. 書籍情報カード（O'Reilly公式ページリンク、著者Jay Alammar & Maarten Grootendorst）、Hero kicker、メタ情報タグ4件。
+    2. ヒーローセクション内に最終確認日・公開日を黒文字（`var(--text)`）で統合し、グローバル黒帯鮮度バー（`#site-freshness-bar`）を非表示化してディスクレイマー下の余計な余白を解消。
+    3. 共通レイアウトフッター（`nav[aria-label="関連ページ"]`）を固定サイドバー（340px）からオフセット（`margin-left: 340px; width: calc(100% - 340px)`）し、980px以下では全幅（`margin-left: 0; width: 100%`）へ戻す。
+    4. テーブルの全列左寄せ（`:global(th), :global(td)` で `text-align: left !important`）。
+    5. 全27箇所の Mermaid 図解に淡色パレット（`theme="base"`, `themeVariables`）を適用。
+    6. 目次スクロール追従（`TocObserver`、見出し＋トップ）とアンカー移動時の見出しめり込み防止（`scroll-margin-top`）。
+    7. インタラクティブチェックリスト（17項目、チェック進捗カウンター連動）。
+  - 22件の契約テスト（S-1〜S-4 原本照合、C-1〜C-6 コンテンツ、D-1〜D-9 デザイン、Q-1〜Q-3 品質契約）および 12件の TocObserver 操作テストを追加。
+  - 分離履歴: Red `750c27d3` → Green `ac3453b2` → Refactor `0399f9c5`。
+  - 全体テスト: 197 files / 1970 tests すべて成功。typecheck、lint（545 files / 0 diagnostics）も成功。
 
 - **エンタープライズRAG完全ガイドのコードブロック改行・サイドバー常駐・フッターデザイン改善（2026-10-14）**:
   - コードブロック改行・インデント崩れの解消:

@@ -43,10 +43,10 @@ AGENTS.md は Codex / Cursor / Cline など AGENTS.md 規約を読む AI ツー�
 ## 検証コマンド
 
 ```bash
-(cd web-next && NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000) # Node 24 / 195 files / 1936 tests pass（2026-10-14 実測。全 Green ✅）
+(cd web-next && NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000) # Node 24 / 197 files / 1970 tests pass（2026-10-14 実測。全 Green ✅）
 (cd web-next && bun run typecheck)   # OK（2026-10-14 実測）
 # ビルドは今回ユーザー指定で未実行（過去: 2026-09-18 に89静的ページ生成）
-(cd web-next && bun run lint)        # OK（539 files / 0 diagnostics。2026-10-14 実測）
+(cd web-next && bun run lint)        # OK（545 files / 0 diagnostics。2026-10-14 実測）
 (cd scraper && uv run pytest)        # 今回対象外。過去の成功は104件（2026-10-04）
 ```
 
