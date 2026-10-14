@@ -210,7 +210,7 @@ describe("Hands-On Large Language Models guide — source parity and design cont
     const { container } = render(<Page />);
     const disclaimer = container.querySelector("p.disclaimer");
     expect(disclaimer).not.toBeNull();
-    expect(disclaimer?.textContent).toContain("免責事項");
+    expect(disclaimer?.textContent).toContain("学習支援を目的とした独自の教育コンテンツ");
   });
 
   it("D-4: renders accessible sidebar toggle button and navigation", () => {

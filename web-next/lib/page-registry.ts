@@ -257,6 +257,27 @@ const entries: PageEntry[] = [
     lastReviewed: "2026-10-14",
   },
   {
+    slug: "/books/hands-on-large-language-models",
+    title: "Hands-On Large Language Models 完全読解ガイド",
+    description:
+      "Jay Alammar 氏・Maarten Grootendorst 氏著『Hands-On Large Language Models』を土台に、LLMの基礎、トークンと埋め込み、Transformer内部構造、分類・検索・生成・RAG・マルチモーダル、訓練とファインチューニング、2026年9月の最新動向までを体系的に学ぶ実践ガイド。",
+    group: "推薦書籍",
+    topics: [
+      "book",
+      "llm",
+      "transformer",
+      "embeddings",
+      "rag",
+      "fine-tuning",
+      "multimodal",
+      "guide",
+    ],
+    summary:
+      "Jay Alammar 氏・Maarten Grootendorst 氏著『Hands-On Large Language Models』の全12章を土台に、言語モデルの基礎から実践的活用、モデル訓練・ファインチューニング、2026年9月動向までを27のMermaid図解とともに学ぶ初学者向け完全読解ガイド。",
+    addedAt: "2026-10-14",
+    lastReviewed: "2026-10-14",
+  },
+  {
     slug: "/ci-cd/ai-cicd-automation-best-practices",
     title: "AI CI/CD Automation",
     group: "開発プロセス",
