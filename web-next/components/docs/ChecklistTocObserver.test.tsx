@@ -2,10 +2,10 @@
 import { act, fireEvent, render } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import AdversarialTocObserver from "@/app/books/adversarial-robustness/TocObserver";
 import adversarialStyles from "@/app/books/adversarial-robustness/page.module.css";
-import HandbookTocObserver from "@/app/books/llm-engineers-handbook/TocObserver";
+import AdversarialTocObserver from "@/app/books/adversarial-robustness/TocObserver";
 import handbookStyles from "@/app/books/llm-engineers-handbook/page.module.css";
+import HandbookTocObserver from "@/app/books/llm-engineers-handbook/TocObserver";
 import ChecklistTocObserver from "./ChecklistTocObserver";
 
 const CLASS_NAMES = { open: "open", show: "show", active: "active", done: "done" };
@@ -159,7 +159,10 @@ describe("ChecklistTocObserver — チェックリスト", () => {
 
   it("チェックリストが存在しなくても例外を投げない", () => {
     // Arrange / Act
-    const { container } = fixture(sharedObserver(), { checklist: "other", counter: "otherCounter" });
+    const { container } = fixture(sharedObserver(), {
+      checklist: "other",
+      counter: "otherCounter",
+    });
 
     // Assert
     expect(container.querySelector("#otherCounter")?.textContent).toBe("");
