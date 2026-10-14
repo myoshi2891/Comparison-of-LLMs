@@ -38,8 +38,7 @@ const byId = (id: string) => document.getElementById(id) as HTMLElement;
 function setDocumentTop(id: string, documentTop: number, misleadingOffsetTop: number) {
   const el = byId(id);
   Object.defineProperty(el, "offsetTop", { configurable: true, value: misleadingOffsetTop });
-  el.getBoundingClientRect = () =>
-    ({ top: documentTop - window.scrollY }) as DOMRect;
+  el.getBoundingClientRect = () => ({ top: documentTop - window.scrollY }) as DOMRect;
 }
 
 function scrollTo(y: number) {
