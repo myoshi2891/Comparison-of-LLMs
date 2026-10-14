@@ -12,11 +12,14 @@ AIモデルの時間別コスト計算機 + AI ツール導入ガイド群。Pyt
 
 推薦書籍 `/books/llm-engineers-handbook` を追加（2026-10-14）。指定HTMLの全15 H2・
 20 H3・55段落・83リスト項目・55表行・2コードブロック・8 Mermaid・5 callout・10チェック項目・
-15参考文献リンクをPure JSXへ転写。原本から固定した本文・構造を18件の契約テストで照合する。
+15参考文献リンクをPure JSXへ転写。原本から固定した本文・構造を21件の契約テストで照合する。
 表の全列左寄せ、コードブロックのインデント、アンカー移動の見出しめり込み防止を徹底。
+ヒーローセクション内に日付（最終確認日・公開日）を黒文字で統合し、グローバルの黒背景鮮度バーを
+完全非表示（display: none !important）にしてディスクレイマー下の不要余白を解消。
+関連ページフッターを固定サイドバー幅（280px）オフセットし、Mermaid 8図解に淡色パレット（theme='base'）を適用。
 原本HTML／Markdownは `archive/html/books/Llm-engineers-handbook-beginner-guide.html`／
 `archive/md/books/Llm-engineers-handbook-beginner-guide.md` に内容無変更で保存。指定HTMLを正本とし、
-registryの追加・確認日は2026-10-14。HTML原本監査exit 0、全体Vitest **193 files / 1894 tests**、
+registryの追加・確認日は2026-10-14。HTML原本監査exit 0、全体Vitest **193 files / 1897 tests**、
 typecheck、lint（531 files／0 diagnostics）が成功。npm・ビルドは未実行、目視確認はユーザー担当。
 
 推薦書籍 `/books/generative-ai-with-langchain` を追加（2026-10-11）。指定HTMLの全13 H2・

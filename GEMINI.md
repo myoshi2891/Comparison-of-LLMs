@@ -17,8 +17,10 @@ GEMINI.md は Gemini CLI / Gemini Code Assist 向けの入り口。
 
 2026-10-14 に `/books/llm-engineers-handbook` を推薦書籍へ追加。指定HTMLの本文・構造・
 8図解・2コード例・55表行・15参考文献リンクを固定期待値で照合する。
-18契約を追加し、HTML監査exit 0、全体Vitest **193 files／1894 tests**、
+21契約を追加し、HTML監査exit 0、全体Vitest **193 files／1897 tests**、
 typecheck・lint（531 files／0 diagnostics）が成功。原本2形式は内容無変更で保存。
+ヒーローセクション内に日付を黒文字で統合し、グローバル黒帯鮮度バー非表示でディスクレイマー下の余白を解消。
+関連ページフッターの重なり解消とMermaid baseテーマ適用も完了。
 表の全列左寄せ、コードブロックのインデント、アンカー移動の見出しめり込み防止を徹底。
 registryの追加日は2026-10-14。npm・ビルドは未実行、目視確認はユーザー担当。
 

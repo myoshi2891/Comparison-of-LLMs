@@ -10,7 +10,7 @@
 
 - **フェーズ**: 保守・機能改善・品質強化フェーズ
 - **ブランチ**: `dev`
-- **最新実装 HEAD**: `c11006ab`（LLM Engineer's Handbook移行後のコード・スタイル整形。Greenは `a614dbda`、Redは `48ddd3d4`）
+- **最新実装 HEAD**: `5afd7acb`（LLM Engineer's Handbook ヒーロー内鮮度バー統合・ディスクレイマー余白解消・Mermaid baseテーマ適用。Greenは `5afd7acb`、Redは `d73b06da`）
 - **次の作業**: `/books/llm-engineers-handbook` の目視確認（ユーザー担当）。npm・ビルドは禁止、スクレイパー検証はユーザー指定で対象外。
 - **ルート実数**: `page.tsx` 88 件、registry 89 エントリ（RSS の `/rss.xml` を含む）。全ルート登録・ナビ導出テストは合格。
 - **動作検証**:
@@ -18,7 +18,7 @@
   - `bun run typecheck` ✅（`tsc --noEmit`。2026-10-14 実測）
   - `bun run lint` ✅（Biome check / 531 files / 0 diagnostics。2026-10-14 実測）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: Node 24で `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000` を実行し、Vitest **193 files / 1894 tests すべて合格**（2026-10-14 実測）。18契約・typecheck・lint・原本監査がすべて成功。
+  - **フロントエンド (`web-next/`)**: Node 24で `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000` を実行し、Vitest **193 files / 1897 tests すべて合格**（2026-10-14 実測）。21契約・typecheck・lint・原本監査がすべて成功。
     - 今回の開始時ベースラインは **192 files / 1876 tests**。既存環境の `localStorage` 問題を避ける実行時オプションを継続使用し、依存・設定ファイルは変更していない。
     - `load(sourceHtml)` をモジュール初期化時に呼ぶ `governance/ai-governance/GuideContent.tsx` と
       `local-llm/finetuning-best-practices/GuideContent.tsx` は、import スモークでも読み込み可能であることを確認済み
@@ -26,13 +26,19 @@
 
 ## 最近の追加内容
 
-- **LLM Engineer's Handbookガイドの移行（2026-10-14）**:
+- **LLM Engineer's Handbookガイドの移行・共通クローム／スタイル調整（2026-10-14）**:
   - `/books/llm-engineers-handbook` に全15 H2・20 H3・55段落・83リスト項目・55表行・2コードブロック・8 Mermaid・5 callout・10チェック項目・15参考文献リンクをPure JSXへ転写。
   - 原本HTML/Markdownは `archive/html/books/Llm-engineers-handbook-beginner-guide.html`／`archive/md/books/Llm-engineers-handbook-beginner-guide.md` へ内容無変更で退避。SHA-256はHTML `ab1c7ad51535b222d61eaef9b3ccefec1efb9e2c96b2d85bcb3e10a8b1de3d62`、Markdown `7fefe969a6e7ef24bc1c5c5feed3b8b02d1576d49c4231d5e49941c0a4d22690` で移動前後一致。指定HTMLを正本とし、registryの追加・確認日は2026-10-14。
   - 原本照合監査スクリプト（`audit_source_parity.mjs`）は exit 0 で漏れなしを確認。
-  - 18件の契約テスト（S-1〜S-4 原本照合、C-1〜C-6 コンテンツ、D-1, D-5〜D-8 デザイン、Q-1〜Q-3 品質契約）を追加。
-  - 分離履歴: Red `48ddd3d4` → Green `a614dbda` → Refactor `c11006ab`。
-  - 全体テスト: 193 files / 1894 tests すべて成功。typecheck、lint（531 files / 0 diagnostics）も成功。
+  - スタイリング・共通クローム調整:
+    1. 免責バナー（`DisclaimerBanner`）と固定サイドバー（280px）・メインコンテンツの高さ同期（`--ch-disclaimer-height` 連動、見出しめり込み防止 `scroll-margin-top` 補正）。
+    2. グローバルの黒背景鮮度バー（`#site-freshness-bar`）を `display: none !important; height: 0 !important;` で非表示化し、`margin-top` の余計な余白（+10px）を削除してディスクレイマー直下にヒーローをピタッと接続。
+    3. ヒーローセクション内に最終確認日・公開日を黒文字（`var(--ink)`、`#241f18`）で統合。
+    4. 関連ページフッター（`nav[aria-label="関連ページ"]`）のサイドバー下潜り込みを解消（`margin-left: 280px; width: calc(100% - 280px)`）。
+    5. 全8箇所の Mermaid 図解にライトモード淡色パレット（`theme="base"`, `themeVariables`）を適用し、通常ノード・classDefノードの可読性を確保。
+  - 21件の契約テスト（S-1〜S-4 原本照合、C-1〜C-6 コンテンツ、D-1, D-5〜D-11 デザイン、Q-1〜Q-3 品質契約）を追加。
+  - 分離履歴: Red `48ddd3d4` → Green `a614dbda` → Refactor `c11006ab` → 追加Red `d73b06da` → 追加Green `5afd7acb`。
+  - 全体テスト: 193 files / 1897 tests すべて成功。typecheck、lint（531 files / 0 diagnostics）も成功。
 
 - **`bun audit` 脆弱性対応（2026-10-11）**: `next` を 16.3.6→16.3.8（GHSA-cjq9-62q9-8jv4 ほか6件）、`overrides` で `sharp` ^0.35.5・`source-map-js` ^1.2.2・`katex` ^0.18.2 に更新し、`bun audit` は0件。`katex` は mermaid 10.9.8 の範囲外だが、Mermaid の `$$` 数式記法を使う図が無く実行経路に乗らないため override で固定。typecheck・lint（527 files）・Vitest 192 files / 1876 tests が成功。ビルドは未実行。
 - **Generative AI with LangChainガイドの移行（2026-10-11）**:
