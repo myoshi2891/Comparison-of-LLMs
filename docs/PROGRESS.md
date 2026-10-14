@@ -10,7 +10,7 @@
 
 - **フェーズ**: 保守・機能改善・品質強化フェーズ
 - **ブランチ**: `dev`
-- **最新実装 HEAD**: `d24781a9`（エンタープライズRAG完全ガイドの移行・原本アーカイブ・Biome/a11y調整。Greenは `736e336e`、Redは `ffa4b1d1`、Refactorは `d24781a9`）
+- **最新実装 HEAD**: `3da13d68`（エンタープライズRAG完全ガイドのコードブロック改行修正、固定サイドバー常駐・フッター途切れ解消、免責バー透過文字被り防止。Greenは `736e336e`、Redは `ffa4b1d1`、Refactorは `d24781a9`、StyleFixは `3da13d68`）
 - **次の作業**: `/rag/enterprise-guide` の目視確認（ユーザー担当）。npm・ビルドは禁止、スクレイパー検証はユーザー指定で対象外。
 - **ルート実数**: `page.tsx` 90 件、registry 91 エントリ（RSS の `/rss.xml` を含む）。全ルート登録・ナビ導出テストは合格。
 - **動作検証**:
@@ -25,6 +25,22 @@
   - **バックエンド (`scraper/`)**: 今回はユーザー指定で検証対象外。実行していない。過去の成功記録は104件（2026-10-04）であり、今回の実測値ではない。
 
 ## 最近の追加内容
+
+- **エンタープライズRAG完全ガイドのコードブロック改行・サイドバー常駐・フッターデザイン改善（2026-10-14）**:
+  - コードブロック改行・インデント崩れの解消:
+    - JSX `<pre>` 内のタグ間改行が空白ノードとしてインライン連結されていた問題を解消。
+    - スタイリング防犯原則 R2 に準拠し、全4箇所のコードブロックを39行の `<span className="codeLine code-line">` で行単位に構造化。
+    - `page.module.css` に `.codeLine { display: block; min-height: 1.8em; white-space: pre; }` を定義し、行単位の改行・空行・`{"    "}` インデントを完全担保。
+  - サイドバー常駐化とフッター途切れの解消:
+    - `.sidebar` を親コンテナ `.layout` 内の `sticky` から `position: fixed; top: calc(var(--header-height, 60px) + var(--ch-disclaimer-height, 0px)); bottom: 0;` に変更。
+    - ページ最下部スクロール時にサイドバーが途切れてフッター左側が空白になる問題を解消し、画面下端までサイドバー枠線と背景が常駐するよう設計。
+    - `.contentWrap` に `margin-left: var(--sidebar-w);` を設定（モバイル `@media (max-width: 980px)` では `margin-left: 0;`）。
+    - 共通フッター（`nav[aria-label="関連ページ"]`）の背景色（`#eef1f4`）、カード（`#ffffff`）、枠線（`#dce2e9`）、アクセント（`#1f5c57`）を淡色テーマへ同期。
+    - スクロール時に免責事項バナーの背後に本文テキストが透けて重なる現象を防止するため、`.ch-disclaimer` に不透明背景色（`#1a1712`）と `backdrop-filter: none` を適用。
+  - テスト・検証:
+    - `page.test.tsx` の C-2 契約に 39 行の `.code-line` の構造化検証を追加。
+    - 原本照合監査スクリプト `audit_source_parity.mjs` で `exit=0` を確認。
+    - 全体 Vitest（195 files / 1936 tests）、Typecheck（`tsc --noEmit`）、Biome check（539 files / 0 diagnostics）すべて成功。
 
 - **エンタープライズRAG完全ガイドの移行・原本アーカイブ・スタイル調整（2026-10-14）**:
   - `/rag/enterprise-guide` に全4 H2・15 H3・10 H4・73段落・15リスト／68項目・11表／67行・4コードブロック・6 Mermaid図解・18外部リンク（15参考ソースカード含む）をPure JSXへ転写。
