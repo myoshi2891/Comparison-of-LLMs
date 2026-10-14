@@ -21,13 +21,17 @@ export default function TocObserver() {
     };
 
     toggle?.addEventListener("click", handleToggle);
-    const navLinks = sidebar ? Array.from(sidebar.querySelectorAll<HTMLAnchorElement>(".nav-link")) : [];
+    const navLinks = sidebar
+      ? Array.from(sidebar.querySelectorAll<HTMLAnchorElement>(".nav-link"))
+      : [];
     for (const a of navLinks) {
       a.addEventListener("click", handleLinkClick);
     }
 
     // 2. Checklist counter
-    const cards = Array.from(document.querySelectorAll<HTMLElement>(".checklist-card, [data-testid='checklist-card']"));
+    const cards = Array.from(
+      document.querySelectorAll<HTMLElement>(".checklist-card, [data-testid='checklist-card']")
+    );
     const cleanups: Array<() => void> = [];
 
     for (const card of cards) {

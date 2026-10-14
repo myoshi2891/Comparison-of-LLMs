@@ -142,7 +142,9 @@ describe("Hands-On Large Language Models guide — source parity and design cont
 
   it("C-2: preserves the book-info kv-table with 8 data rows", () => {
     const { container } = render(<Page />);
-    const bookTable = container.querySelector("#本書について + .table-scroll table, #本書について ~ div table");
+    const bookTable = container.querySelector(
+      "#本書について + .table-scroll table, #本書について ~ div table"
+    );
     expect(bookTable).not.toBeNull();
     const rows = nodes(bookTable as Element, "tbody tr");
     expect(rows).toHaveLength(8);
@@ -173,7 +175,9 @@ describe("Hands-On Large Language Models guide — source parity and design cont
     const { container } = render(<Page />);
     const refCards = nodes(container, ".ref-card, [data-testid='ref-card']");
     expect(refCards).toHaveLength(24);
-    const badges = refCards.map((c) => text(c.querySelector(".ref-badge, [data-testid='ref-badge']") as Element));
+    const badges = refCards.map((c) =>
+      text(c.querySelector(".ref-badge, [data-testid='ref-badge']") as Element)
+    );
     expect(badges).toEqual(Array.from({ length: 24 }, (_, i) => String(i + 1)));
   });
 
@@ -203,7 +207,9 @@ describe("Hands-On Large Language Models guide — source parity and design cont
     const { container } = render(<Page />);
     const lede = container.querySelector("blockquote.lede");
     expect(lede).not.toBeNull();
-    expect(lede?.textContent).toContain("本ガイドは、Jay Alammar 氏と Maarten Grootendorst 氏による");
+    expect(lede?.textContent).toContain(
+      "本ガイドは、Jay Alammar 氏と Maarten Grootendorst 氏による"
+    );
   });
 
   it("D-3: renders the disclaimer paragraph", () => {
@@ -250,9 +256,11 @@ describe("Hands-On Large Language Models guide — source parity and design cont
 
   it("Q-1: provides non-empty metadata matching H1 and describes content", () => {
     expect(metadata.title).toBeDefined();
-    expect(typeof metadata.title === "string" ? metadata.title : (metadata.title as { default: string })?.default).toContain(
-      "Hands-On Large Language Models"
-    );
+    expect(
+      typeof metadata.title === "string"
+        ? metadata.title
+        : (metadata.title as { default: string })?.default
+    ).toContain("Hands-On Large Language Models");
     expect(metadata.description).toBeDefined();
     expect(metadata.description?.length).toBeGreaterThan(20);
   });
