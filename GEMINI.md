@@ -15,6 +15,15 @@ GEMINI.md は Gemini CLI / Gemini Code Assist 向けの入り口。
 @./CLAUDE.md
 @docs/PROGRESS.md
 
+2026-10-14 に `/books/adversarial-robustness` を推薦書籍へ追加。指定HTMLの本文・構造・
+12図解・1数式・7表66行・22参考文献カード（23リンク）を固定期待値で照合する。
+17契約を追加し、HTML監査exit 0、全体Vitest **194 files／1914 tests**、
+typecheck・lint（535 files／0 diagnostics）が成功。原本2形式は内容無変更で保存。
+書籍情報カード（Plum callout、Elsevier公式リンク）、Hero kicker（AI Security 初学者ガイド）、
+メタ情報タグ4件、全12箇所の Mermaid 図解に淡色パレット（theme='base'）を適用。
+表の全列左寄せ、コードブロックのインデント、アンカー移動の見出しめり込み防止を徹底。
+registryの追加日は2026-10-14。npm・ビルドは未実行、目視確認はユーザー担当。
+
 2026-10-14 に `/books/llm-engineers-handbook` を推薦書籍へ追加。指定HTMLの本文・構造・
 8図解・2コード例・55表行・15参考文献リンクを固定期待値で照合する。
 21契約を追加し、HTML監査exit 0、全体Vitest **193 files／1897 tests**、
@@ -87,10 +96,10 @@ Vitest 185 files／1779 tests、typecheck・lint・pytest 104件が成功。復�
 ## 検証コマンド
 
 ```bash
-(cd web-next && NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000) # Node 24 / 193 files / 1894 tests pass（2026-10-14 実測）
+(cd web-next && NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000) # Node 24 / 194 files / 1914 tests pass（2026-10-14 実測）
 (cd web-next && bun run typecheck)   # OK（2026-10-14 実測）
 # ビルドは今回ユーザー指定で未実行（過去: 2026-09-18 に89静的ページ生成）
-(cd web-next && bun run lint)        # OK（531 files / 0 diagnostics。2026-10-14 実測）
+(cd web-next && bun run lint)        # OK（535 files / 0 diagnostics。2026-10-14 実測）
 (cd scraper && uv run pytest)        # 今回対象外。過去の成功は104件（2026-10-04）
 ```
 

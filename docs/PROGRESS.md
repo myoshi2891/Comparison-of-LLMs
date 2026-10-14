@@ -10,21 +10,36 @@
 
 - **フェーズ**: 保守・機能改善・品質強化フェーズ
 - **ブランチ**: `dev`
-- **最新実装 HEAD**: `5afd7acb`（LLM Engineer's Handbook ヒーロー内鮮度バー統合・ディスクレイマー余白解消・Mermaid baseテーマ適用。Greenは `5afd7acb`、Redは `d73b06da`）
-- **次の作業**: `/books/llm-engineers-handbook` の目視確認（ユーザー担当）。npm・ビルドは禁止、スクレイパー検証はユーザー指定で対象外。
-- **ルート実数**: `page.tsx` 88 件、registry 89 エントリ（RSS の `/rss.xml` を含む）。全ルート登録・ナビ導出テストは合格。
+- **最新実装 HEAD**: `bdf3b74c`（Adversarial Robustness for Machine Learning ガイドの完全移行・Biomeフォーマット。Greenは `2ff5a863`、Redは `eeef014a`、Refactorは `bdf3b74c`）
+- **次の作業**: `/books/adversarial-robustness` の目視確認（ユーザー担当）。npm・ビルドは禁止、スクレイパー検証はユーザー指定で対象外。
+- **ルート実数**: `page.tsx` 89 件、registry 90 エントリ（RSS の `/rss.xml` を含む）。全ルート登録・ナビ導出テストは合格。
 - **動作検証**:
   - ビルド: 今回はユーザー指定で未実行。過去の成功記録は 2026-09-17 の 90 静的ページであり、今回の変更を検証した値ではない。
   - `bun run typecheck` ✅（`tsc --noEmit`。2026-10-14 実測）
-  - `bun run lint` ✅（Biome check / 531 files / 0 diagnostics。2026-10-14 実測）
+  - `bun run lint` ✅（Biome check / 535 files / 0 diagnostics。2026-10-14 実測）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: Node 24で `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000` を実行し、Vitest **193 files / 1897 tests すべて合格**（2026-10-14 実測）。21契約・typecheck・lint・原本監査がすべて成功。
-    - 今回の開始時ベースラインは **192 files / 1876 tests**。既存環境の `localStorage` 問題を避ける実行時オプションを継続使用し、依存・設定ファイルは変更していない。
+  - **フロントエンド (`web-next/`)**: Node 24で `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000` を実行し、Vitest **194 files / 1914 tests すべて合格**（2026-10-14 実測）。17契約・typecheck・lint・原本監査がすべて成功。
+    - 今回の開始時ベースラインは **193 files / 1897 tests**。既存環境の `localStorage` 問題を避ける実行時オプションを継続使用し、依存・設定ファイルは変更していない。
     - `load(sourceHtml)` をモジュール初期化時に呼ぶ `governance/ai-governance/GuideContent.tsx` と
       `local-llm/finetuning-best-practices/GuideContent.tsx` は、import スモークでも読み込み可能であることを確認済み
   - **バックエンド (`scraper/`)**: 今回はユーザー指定で検証対象外。実行していない。過去の成功記録は104件（2026-10-04）であり、今回の実測値ではない。
 
 ## 最近の追加内容
+
+- **Adversarial Robustness for Machine Learningガイドの移行（2026-10-14）**:
+  - `/books/adversarial-robustness` に全19 H2・12 H3・41段落・34リスト項目・7表／66行（書籍情報kv表8行、全26章一覧表27行を含む）・1数式ブロック（minimax最適化問題）・12 Mermaid図解・3 callout・10チェック項目・22参考文献カード（23外部リンク）をPure JSXへ転写。
+  - 原本HTML/Markdownは `archive/html/books/Adversarial-robustness-for-machine-learning-guide.html`／`archive/md/books/Adversarial-robustness-for-machine-learning-guide.md` へ内容無変更で退避。SHA-256はHTML `f090ff7345d31ca233f2c529f77f763db4eb6c1f2e1dfda1fe44ebfc844cf530`、Markdown `202848a3852028fa6ea9d9e47265a7f9a1284d74268e309cbffc6e7a2df23d7f` で移動前後一致。指定HTMLを正本とし、registryの追加・確認日は2026-10-14。
+  - 原本照合監査スクリプト（`audit_source_parity.mjs`）は exit 0 で漏れなしを確認。
+  - スタイリング・共通クローム対応:
+    1. 書籍情報カード（Plum callout、Elsevier公式リンク）、Hero kicker（AI Security 初学者ガイド）、メタ情報タグ4件。
+    2. 数式ブロック（minimax saddle-point 問題）、攻撃 taxonomy・防御 taxonomy・歴史的経緯の各詳細表（全列左寄せ）。
+    3. 全12箇所の Mermaid 図解に淡色パレット（`theme="base"`, `themeVariables`）を適用。
+    4. 目次追従（`TocObserver`、19見出し＋トップ）とアンカー移動時の見出しめり込み防止（`scroll-margin-top`）。
+    5. インタラクティブチェックリスト（10項目、チェック進捗カウンター連動）。
+  - 17件の契約テスト（S-1〜S-4 原本照合、C-1〜C-6 コンテンツ、D-1〜D-4 デザイン、Q-1〜Q-3 品質契約）を追加。
+  - 分離履歴: Red `eeef014a` → Green `2ff5a863` → Refactor `bdf3b74c`。
+  - 全体テスト: 194 files / 1914 tests すべて成功。typecheck、lint（535 files / 0 diagnostics）も成功。
+
 
 - **LLM Engineer's Handbookガイドの移行・共通クローム／スタイル調整（2026-10-14）**:
   - `/books/llm-engineers-handbook` に全15 H2・20 H3・55段落・83リスト項目・55表行・2コードブロック・8 Mermaid・5 callout・10チェック項目・15参考文献リンクをPure JSXへ転写。
@@ -318,16 +333,16 @@
 
 ```text
 AGENTS.md → CODEX.md → CLAUDE.md → docs/PROGRESS.md → Phase A–F 計画の順で読む。
-最新実装 HEAD: 934408a1（Generative AI with LangChain移行後のクラス指定整理。Green: 8868adbd）
-次の作業: /books/generative-ai-with-langchain の目視確認結果に対応する。目視確認はユーザー担当。
-Generative-ai-with-langchain-guide.html は archive/html/books/、Markdown は archive/md/books/ に保存済み。
-HTML原本監査は exit 0。Green時の全体 Vitest 192 files / 1876 tests、整理後の48契約・typecheck・lint（527 files）が成功。pytestは今回対象外。
+最新実装 HEAD: bdf3b74c（Adversarial Robustness for Machine Learning移行後のBiomeフォーマット。Green: 2ff5a863、Red: eeef014a）
+次の作業: /books/adversarial-robustness の目視確認結果に対応する。目視確認はユーザー担当。
+Adversarial-robustness-for-machine-learning-guide.html は archive/html/books/、Markdown は archive/md/books/ に退避保存済み（SHA-256一致確認済み）。
+HTML原本監査は exit 0。全体 Vitest 194 files / 1914 tests、17契約・typecheck・lint（535 files / 0 diagnostics）が成功。pytestは今回対象外。
 この実行環境ではNode 24で NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000 を使用する。
-ページ32契約と操作16契約は本文・全11表・全4リスト・76 CSS規則・12コード例・8 Mermaidと代替説明・目次を厳密に照合する。
-原本の期待値を移植先に合わせて変更しない。指定HTMLが正本で本文情報基準日は2026-09-23のまま。
-900px以下の通常フロー目次、ネイティブ暗色スクロールバー、リストの点・番号・既定余白を保持する。図解はdarkテーマとSVGラベルで紫／青緑配色を保持する。
-開発サーバーはCSSキャッシュ退避後、ポート3000で再起動済み。既存bun.lock差分はコミットしていない。
+契約17件は本文・全7表・1数式・12 Mermaid・10チェック項目・22参考文献カード（23リンク）・目次を厳密に照合する。
+原本の期待値を移植先に合わせて変更しない。指定HTMLが正本。
+全列左寄せ、コードインデント、アンカー見出しめり込み防止を徹底。Mermaidはbaseテーマで淡色配色を保持する。
 サンドボックスでは npm とビルドを実行しない。目視結果への修正も Red → Green → Refactor → Docs で分離コミットする。
-ルート直下に残る未移行HTML候補は9件（2026-10-11にGit追跡ファイル一覧で実測）。次の移行対象は未指定。
-page.tsx 87 件、registry 88 エントリ（RSS を含む）。次のページは指示されてから扱う。
+ルート直下に残る未移行HTML候補は7件（2026-10-14に実測）。次の移行対象は未指定。
+page.tsx 89 件、registry 90 エントリ（RSS を含む）。次のページは指示されてから扱う。
 ```
+

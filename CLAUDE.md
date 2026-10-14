@@ -10,6 +10,18 @@ AIモデルの時間別コスト計算機 + AI ツール導入ガイド群。Pyt
 
 ## アーキテクチャ
 
+推薦書籍 `/books/adversarial-robustness` を追加（2026-10-14）。指定HTMLの全19 H2・
+12 H3・41段落・34リスト項目・7表／66行（書籍情報kv表8行、全26章一覧表27行を含む）・
+1数式ブロック（minimax最適化問題）・12 Mermaid図解・3 callout・10チェック項目・
+22参考文献カード（23外部リンク）をPure JSXへ転写。原本から固定した本文・構造を17件の契約テストで照合する。
+表の全列左寄せ、コードブロックのインデント、アンカー移動の見出しめり込み防止を徹底。
+書籍情報カード（Plum callout、Elsevier公式リンク）、Hero kicker（AI Security 初学者ガイド）、
+メタ情報タグ4件、全12箇所の Mermaid 図解に淡色パレット（theme='base'）を適用。
+原本HTML／Markdownは `archive/html/books/Adversarial-robustness-for-machine-learning-guide.html`／
+`archive/md/books/Adversarial-robustness-for-machine-learning-guide.md` に内容無変更で保存。
+指定HTMLを正本とし、registryの追加・確認日は2026-10-14。HTML原本監査exit 0、全体Vitest **194 files / 1914 tests**、
+typecheck、lint（535 files／0 diagnostics）が成功。npm・ビルドは未実行、目視確認はユーザー担当。
+
 推薦書籍 `/books/llm-engineers-handbook` を追加（2026-10-14）。指定HTMLの全15 H2・
 20 H3・55段落・83リスト項目・55表行・2コードブロック・8 Mermaid・5 callout・10チェック項目・
 15参考文献リンクをPure JSXへ転写。原本から固定した本文・構造を21件の契約テストで照合する。
