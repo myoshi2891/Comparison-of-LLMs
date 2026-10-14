@@ -145,7 +145,11 @@ class E done;`;
 
 export default function AdversarialRobustnessGuidePage() {
   return (
-    <div className={styles.layout} data-testid="layout-root">
+    <div
+      className={styles.layout}
+      data-testid="layout-root"
+      data-page="adversarial-robustness"
+    >
       <TocObserver />
 
       <div className={styles.mobileBar}>
@@ -273,6 +277,23 @@ export default function AdversarialRobustnessGuidePage() {
 
       <main className={styles.main} id="top">
         <header className={styles.hero}>
+          <div className={styles.freshnessBar} lang="ja" data-testid="page-freshness">
+            <span className={styles.freshnessItem}>
+              最終確認{" "}
+              <time className={styles.freshnessValue} dateTime="2026-10-14">
+                2026-10-14
+              </time>
+            </span>
+            <span className={styles.freshnessSep} aria-hidden="true">
+              /
+            </span>
+            <span className={styles.freshnessItem}>
+              公開{" "}
+              <time className={styles.freshnessValue} dateTime="2026-10-14">
+                2026-10-14
+              </time>
+            </span>
+          </div>
           <span className={styles.heroKicker}>
             <i className="ti ti-shield-lock" />
             AI Security 初学者ガイド
