@@ -29,12 +29,13 @@ export default function TocObserver() {
     const tocLinks = Array.from(
       root.querySelectorAll<HTMLAnchorElement>("a.toc-link, [class*='tocLink']")
     );
+    function handleTocLinkClick() {
+      if (window.innerWidth <= 980) {
+        closeNav();
+      }
+    }
     for (const a of tocLinks) {
-      a.addEventListener("click", () => {
-        if (window.innerWidth <= 980) {
-          closeNav();
-        }
-      });
+      a.addEventListener("click", handleTocLinkClick);
     }
 
     // --- 2. Back to Top Button ---
@@ -72,7 +73,9 @@ export default function TocObserver() {
       const pos = window.scrollY + 120;
       let current = targets[0];
       for (const target of targets) {
-        if (target.el.offsetTop <= pos) {
+        // offsetTop は offsetParent 基準のため、文書座標に換算して比較する。
+        const documentTop = target.el.getBoundingClientRect().top + window.scrollY;
+        if (documentTop <= pos) {
           current = target;
         }
       }
@@ -90,6 +93,9 @@ export default function TocObserver() {
     return () => {
       menuBtn?.removeEventListener("click", toggleNav);
       backdrop?.removeEventListener("click", closeNav);
+      for (const a of tocLinks) {
+        a.removeEventListener("click", handleTocLinkClick);
+      }
       window.removeEventListener("scroll", handleScroll);
       topBtn?.removeEventListener("click", scrollToTop);
       window.removeEventListener("scroll", onScrollSpy);
