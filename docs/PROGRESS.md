@@ -32,12 +32,16 @@
   - 原本照合監査スクリプト（`audit_source_parity.mjs`）は exit 0 で漏れなしを確認。
   - スタイリング・共通クローム対応:
     1. 書籍情報カード（O'Reilly公式ページリンク、著者Jay Alammar & Maarten Grootendorst）、Hero kicker、メタ情報タグ4件。
-    2. ヒーローセクション内に最終確認日・公開日を黒文字（`var(--text)`）で統合し、グローバル黒帯鮮度バー（`#site-freshness-bar`）を非表示化してディスクレイマー下の余計な余白を解消。
-    3. 共通レイアウトフッター（`nav[aria-label="関連ページ"]`）を固定サイドバー（340px）からオフセット（`margin-left: 340px; width: calc(100% - 340px)`）し、980px以下では全幅（`margin-left: 0; width: 100%`）へ戻す。
-    4. テーブルの全列左寄せ（`:global(th), :global(td)` で `text-align: left !important`）。
-    5. 全27箇所の Mermaid 図解に淡色パレット（`theme="base"`, `themeVariables`）を適用。
-    6. 目次スクロール追従（`TocObserver`、見出し＋トップ）とアンカー移動時の見出しめり込み防止（`scroll-margin-top`）。
-    7. インタラクティブチェックリスト（17項目、チェック進捗カウンター連動）。
+    2. ヒーローセクション内に最終確認日・公開日を黒文字（`var(--text)`）で統合し、グローバル黒帯鮮度バー（`#site-freshness-bar`）を非表示化。
+    3. ヘッダー・ディスクレーマーとサイドバー・メインコンテンツの配置調整:
+       - サイドバー被りの解消: `.sidebar` の `top` を `calc(var(--header-height, 60px) + var(--ch-disclaimer-height, 0px))` に設定し、ディスクレーマーバナー直下に正しく配置（全幅バナーの左端被りを解消）。
+       - ディスクレーマー下の余計な隙間の解消: `globals.css` および `page.module.css` に `:global(body:has([data-page="hands-on-large-language-models"]))` を定義し、`body.has-common-header` の過剰な `+10px` マージンを打ち消し。さらに `.main` の上部パディングを `32px` に調整。
+       - Mermaid構文エラーの解消: 原本HTML由来のHTMLエンティティ（`--&gt;`, `&lt;br/&gt;` 等）を適切な記法（`-->`, `<br/>`）に正規化し、全27箇所のダイアグラムが正常にSVG描画されるよう修正（監査オラクルのexit 0を維持）。
+    4. 共通レイアウトフッター（`nav[aria-label="関連ページ"]`）を固定サイドバー（340px）からオフセット（`margin-left: 340px; width: calc(100% - 340px)`）し、980px以下では全幅（`margin-left: 0; width: 100%`）へ戻す。
+    5. テーブルの全列左寄せ（`:global(th), :global(td)` で `text-align: left !important`）。
+    6. 全27箇所の Mermaid 図解に淡色パレット（`theme="base"`, `themeVariables`）を適用。
+    7. 目次スクロール追従（`TocObserver`、見出し＋トップ）とアンカー移動時の見出しめり込み防止（`scroll-margin-top`）。
+    8. インタラクティブチェックリスト（17項目、チェック進捗カウンター連動）。
   - 22件の契約テスト（S-1〜S-4 原本照合、C-1〜C-6 コンテンツ、D-1〜D-9 デザイン、Q-1〜Q-3 品質契約）および 12件の TocObserver 操作テストを追加。
   - 分離履歴: Red `750c27d3` → Green `ac3453b2` → Refactor `0399f9c5`。
   - 全体テスト: 197 files / 1970 tests すべて成功。typecheck、lint（545 files / 0 diagnostics）も成功。

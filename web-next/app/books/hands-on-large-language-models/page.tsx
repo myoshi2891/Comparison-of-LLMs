@@ -23,13 +23,13 @@ const MERMAID_THEME_VARS: Record<string, string> = {
 };
 
 const DIAGRAM_0 = `flowchart TB
-    Start(["Hands-On Large Language Models"]) --&gt; P1["第1部&lt;br/&gt;言語モデルを理解する&lt;br/&gt;（1〜3章）"]
-    P1 --&gt; P2["第2部&lt;br/&gt;事前学習済み言語モデルを使う&lt;br/&gt;（4〜9章）"]
-    P2 --&gt; P3["第3部&lt;br/&gt;言語モデルの訓練と&lt;br/&gt;ファインチューニング（10〜12章）"]
+    Start(["Hands-On Large Language Models"]) --> P1["第1部<br/>言語モデルを理解する<br/>（1〜3章）"]
+    P1 --> P2["第2部<br/>事前学習済み言語モデルを使う<br/>（4〜9章）"]
+    P2 --> P3["第3部<br/>言語モデルの訓練と<br/>ファインチューニング（10〜12章）"]
 
-    P1 -.-&gt;|土台となる仕組みの理解| Goal1["Transformerの内部構造を理解する"]
-    P2 -.-&gt;|既製モデルの実践的活用| Goal2["分類・検索・生成・マルチモーダル応用を使いこなす"]
-    P3 -.-&gt;|モデル自体を作り変える| Goal3["埋め込み・分類・生成モデルを自分のタスクに合わせて訓練する"]
+    P1 -.->|土台となる仕組みの理解| Goal1["Transformerの内部構造を理解する"]
+    P2 -.->|既製モデルの実践的活用| Goal2["分類・検索・生成・マルチモーダル応用を使いこなす"]
+    P3 -.->|モデル自体を作り変える| Goal3["埋め込み・分類・生成モデルを自分のタスクに合わせて訓練する"]
 
     classDef partStyle fill:#1e3a5f,stroke:#7c9eff,color:#eaf1ff
     classDef goalStyle fill:#123024,stroke:#4caf7d,color:#d9f5e6
@@ -38,26 +38,26 @@ const DIAGRAM_0 = `flowchart TB
 
 const DIAGRAM_1 = `flowchart LR
     subgraph Era1["表現学習以前"]
-        A1["Bag-of-Words&lt;br/&gt;単語の出現回数で文書を表現"]
+        A1["Bag-of-Words<br/>単語の出現回数で文書を表現"]
     end
     subgraph Era2["密なベクトル表現の時代"]
-        A2["Word2Vec&lt;br/&gt;意味の近さをベクトルの近さで表現"]
+        A2["Word2Vec<br/>意味の近さをベクトルの近さで表現"]
     end
     subgraph Era3["文脈化表現の時代"]
-        A3["RNN / LSTM&lt;br/&gt;系列を順に処理し文脈を保持"]
-        A4["Attention機構の登場&lt;br/&gt;系列内の重要な部分に注目"]
+        A3["RNN / LSTM<br/>系列を順に処理し文脈を保持"]
+        A4["Attention機構の登場<br/>系列内の重要な部分に注目"]
     end
     subgraph Era4["Transformerの時代"]
-        A5["Transformer&lt;br/&gt;Attentionのみで並列処理"]
-        A6["BERT&lt;br/&gt;エンコーダのみで文脈理解に特化"]
-        A7["GPTシリーズ&lt;br/&gt;デコーダのみで文生成に特化"]
+        A5["Transformer<br/>Attentionのみで並列処理"]
+        A6["BERT<br/>エンコーダのみで文脈理解に特化"]
+        A7["GPTシリーズ<br/>デコーダのみで文生成に特化"]
     end
     subgraph Era5["生成AIの時代"]
-        A8["ChatGPTの登場&lt;br/&gt;指示追従・対話が一般化"]
-        A9["オープンモデルの拡大&lt;br/&gt;Llama, Mistral 等"]
+        A8["ChatGPTの登場<br/>指示追従・対話が一般化"]
+        A9["オープンモデルの拡大<br/>Llama, Mistral 等"]
     end
 
-    Era1 --&gt; Era2 --&gt; Era3 --&gt; Era4 --&gt; Era5
+    Era1 --> Era2 --> Era3 --> Era4 --> Era5
 
     classDef oldEra fill:#2a2f3a,stroke:#8a94a6,color:#e6e9ef
     classDef newEra fill:#1e3a5f,stroke:#7c9eff,color:#eaf1ff
@@ -67,11 +67,11 @@ const DIAGRAM_1 = `flowchart LR
 const DIAGRAM_2 = `flowchart TB
     subgraph BoW["Bag-of-Words表現"]
         direction LR
-        D1["文書：猫が寝ている"] --&gt; V1["ベクトル：&lt;br/&gt;[猫:1, が:1, 寝る:1, いる:1, ...]&lt;br/&gt;語彙サイズ次元のスパースな表現"]
+        D1["文書：猫が寝ている"] --> V1["ベクトル：<br/>[猫:1, が:1, 寝る:1, いる:1, ...]<br/>語彙サイズ次元のスパースな表現"]
     end
     subgraph Dense["密なベクトル埋め込み表現"]
         direction LR
-        D2["文書：猫が寝ている"] --&gt; V2["ベクトル：&lt;br/&gt;[0.12, -0.44, 0.81, ...]&lt;br/&gt;数百次元の密な表現&lt;br/&gt;意味的に近い文書ほど近い位置に"]
+        D2["文書：猫が寝ている"] --> V2["ベクトル：<br/>[0.12, -0.44, 0.81, ...]<br/>数百次元の密な表現<br/>意味的に近い文書ほど近い位置に"]
     end
 
     classDef sparseStyle fill:#3a1420,stroke:#c05a6e,color:#f5d8de
@@ -80,11 +80,11 @@ const DIAGRAM_2 = `flowchart TB
     class V2 denseStyle`;
 
 const DIAGRAM_3 = `flowchart LR
-    Input["入力テキスト"] --&gt; Enc["エンコーダのみのモデル&lt;br/&gt;（表現モデル）&lt;br/&gt;例：BERT"]
-    Input --&gt; Dec["デコーダのみのモデル&lt;br/&gt;（生成モデル）&lt;br/&gt;例：GPTシリーズ"]
+    Input["入力テキスト"] --> Enc["エンコーダのみのモデル<br/>（表現モデル）<br/>例：BERT"]
+    Input --> Dec["デコーダのみのモデル<br/>（生成モデル）<br/>例：GPTシリーズ"]
 
-    Enc --&gt; EncOut["文脈を理解した&lt;br/&gt;ベクトル表現を出力&lt;br/&gt;分類・検索・クラスタリングに強い"]
-    Dec --&gt; DecOut["次に来るトークンを&lt;br/&gt;1つずつ予測し文章を生成&lt;br/&gt;要約・対話・執筆に強い"]
+    Enc --> EncOut["文脈を理解した<br/>ベクトル表現を出力<br/>分類・検索・クラスタリングに強い"]
+    Dec --> DecOut["次に来るトークンを<br/>1つずつ予測し文章を生成<br/>要約・対話・執筆に強い"]
 
     classDef encStyle fill:#1e3a5f,stroke:#7c9eff,color:#eaf1ff
     classDef decStyle fill:#3a2a1e,stroke:#e0a45c,color:#f7e3c9
@@ -92,119 +92,119 @@ const DIAGRAM_3 = `flowchart LR
     class Dec,DecOut decStyle`;
 
 const DIAGRAM_4 = `flowchart LR
-    T1["入力テキスト&lt;br/&gt;&amp;quot;埋め込みを学ぶ&amp;quot;"] --&gt; T2["トークナイザーによる分割&lt;br/&gt;（サブワード単位）"]
-    T2 --&gt; T3["トークンID列への変換&lt;br/&gt;[1023, 88, 4471, ...]"]
-    T3 --&gt; T4["埋め込み層で&lt;br/&gt;各トークンIDをベクトルに変換"]
-    T4 --&gt; T5["Transformer本体へ入力"]
+    T1["入力テキスト<br/>&amp;quot;埋め込みを学ぶ&amp;quot;"] --> T2["トークナイザーによる分割<br/>（サブワード単位）"]
+    T2 --> T3["トークンID列への変換<br/>[1023, 88, 4471, ...]"]
+    T3 --> T4["埋め込み層で<br/>各トークンIDをベクトルに変換"]
+    T4 --> T5["Transformer本体へ入力"]
 
     classDef stepStyle fill:#1e3a5f,stroke:#7c9eff,color:#eaf1ff
     class T1,T2,T3,T4,T5 stepStyle`;
 
 const DIAGRAM_5 = `flowchart TB
-    W["同じ単語：&amp;quot;桃&amp;quot;"] --&gt; C1["文脈1：&amp;quot;桃を食べる&amp;quot;&lt;br/&gt;→ 果物としての桃を表す埋め込み"]
-    W --&gt; C2["文脈2：&amp;quot;桃太郎の桃&amp;quot;&lt;br/&gt;→ 物語のモチーフとしての桃を表す埋め込み"]
+    W["同じ単語：&amp;quot;桃&amp;quot;"] --> C1["文脈1：&amp;quot;桃を食べる&amp;quot;<br/>→ 果物としての桃を表す埋め込み"]
+    W --> C2["文脈2：&amp;quot;桃太郎の桃&amp;quot;<br/>→ 物語のモチーフとしての桃を表す埋め込み"]
 
     classDef ctxStyle fill:#1e3a5f,stroke:#7c9eff,color:#eaf1ff
     class C1,C2 ctxStyle`;
 
 const DIAGRAM_6 = `flowchart TB
-    In["入力：これまでの&lt;br/&gt;トークン列"] --&gt; Emb["トークン埋め込み&lt;br/&gt;+ 位置情報の付与"]
-    Emb --&gt; Blocks["Transformerブロックを&lt;br/&gt;複数回繰り返し適用"]
-    Blocks --&gt; Logits["語彙全体に対する&lt;br/&gt;スコア（ロジット）"]
-    Logits --&gt; Prob["確率分布への変換&lt;br/&gt;（softmax）"]
-    Prob --&gt; Sample["サンプリング手法で&lt;br/&gt;次の1トークンを選択"]
-    Sample --&gt; Append["選ばれたトークンを&lt;br/&gt;入力列に追加して繰り返す"]
-    Append -.-&gt; In
+    In["入力：これまでの<br/>トークン列"] --> Emb["トークン埋め込み<br/>+ 位置情報の付与"]
+    Emb --> Blocks["Transformerブロックを<br/>複数回繰り返し適用"]
+    Blocks --> Logits["語彙全体に対する<br/>スコア（ロジット）"]
+    Logits --> Prob["確率分布への変換<br/>（softmax）"]
+    Prob --> Sample["サンプリング手法で<br/>次の1トークンを選択"]
+    Sample --> Append["選ばれたトークンを<br/>入力列に追加して繰り返す"]
+    Append -.-> In
 
     classDef stepStyle fill:#1e3a5f,stroke:#7c9eff,color:#eaf1ff
     class In,Emb,Blocks,Logits,Prob,Sample,Append stepStyle`;
 
 const DIAGRAM_7 = `flowchart TB
     subgraph Block["1つのTransformerブロック"]
-        In2["ブロックへの入力"] --&gt; Attn["Multi-Head&lt;br/&gt;Self-Attention"]
-        In2 --&gt; Res1["残差接続"]
-        Attn --&gt; Add1["加算 + 正規化"]
-        Res1 --&gt; Add1
-        Add1 --&gt; FFN["フィードフォワード&lt;br/&gt;ネットワーク"]
-        Add1 --&gt; Res2["残差接続"]
-        FFN --&gt; Add2["加算 + 正規化"]
-        Res2 --&gt; Add2
-        Add2 --&gt; Out2["ブロックからの出力"]
+        In2["ブロックへの入力"] --> Attn["Multi-Head<br/>Self-Attention"]
+        In2 --> Res1["残差接続"]
+        Attn --> Add1["加算 + 正規化"]
+        Res1 --> Add1
+        Add1 --> FFN["フィードフォワード<br/>ネットワーク"]
+        Add1 --> Res2["残差接続"]
+        FFN --> Add2["加算 + 正規化"]
+        Res2 --> Add2
+        Add2 --> Out2["ブロックからの出力"]
     end
 
     classDef blockStyle fill:#1e3a5f,stroke:#7c9eff,color:#eaf1ff
     class Attn,FFN blockStyle`;
 
 const DIAGRAM_8 = `flowchart LR
-    Step1["1トークン目生成&lt;br/&gt;KVを計算しキャッシュ"] --&gt; Step2["2トークン目生成&lt;br/&gt;キャッシュ済みKVを再利用&lt;br/&gt;+新規分のみ計算"]
-    Step2 --&gt; Step3["3トークン目生成&lt;br/&gt;キャッシュがさらに蓄積"]
-    Step3 --&gt; StepN["以降のトークンも&lt;br/&gt;同様に高速化"]
+    Step1["1トークン目生成<br/>KVを計算しキャッシュ"] --> Step2["2トークン目生成<br/>キャッシュ済みKVを再利用<br/>+新規分のみ計算"]
+    Step2 --> Step3["3トークン目生成<br/>キャッシュがさらに蓄積"]
+    Step3 --> StepN["以降のトークンも<br/>同様に高速化"]
 
     classDef cacheStyle fill:#123024,stroke:#4caf7d,color:#d9f5e6
     class Step1,Step2,Step3,StepN cacheStyle`;
 
 const DIAGRAM_9 = `flowchart TB
-    Task["テキスト分類タスク&lt;br/&gt;（例：レビューの感情分析）"] --&gt; App1["アプローチ1：&lt;br/&gt;タスク特化モデルを使う&lt;br/&gt;（既に感情分析用に&lt;br/&gt;ファインチューニング済みのモデル）"]
-    Task --&gt; App2["アプローチ2：&lt;br/&gt;埋め込み+分類器&lt;br/&gt;（汎用埋め込みモデルで&lt;br/&gt;ベクトル化しロジスティック回帰等で分類）"]
-    Task --&gt; App3["アプローチ3：&lt;br/&gt;生成モデルに分類させる&lt;br/&gt;（T5やChatGPTに&lt;br/&gt;プロンプトで分類させる）"]
+    Task["テキスト分類タスク<br/>（例：レビューの感情分析）"] --> App1["アプローチ1：<br/>タスク特化モデルを使う<br/>（既に感情分析用に<br/>ファインチューニング済みのモデル）"]
+    Task --> App2["アプローチ2：<br/>埋め込み+分類器<br/>（汎用埋め込みモデルで<br/>ベクトル化しロジスティック回帰等で分類）"]
+    Task --> App3["アプローチ3：<br/>生成モデルに分類させる<br/>（T5やChatGPTに<br/>プロンプトで分類させる）"]
 
-    App2 --&gt; Sub1["ラベル付きデータがある場合：&lt;br/&gt;教師あり分類器を訓練"]
-    App2 --&gt; Sub2["ラベルがない場合：&lt;br/&gt;ラベル自体を埋め込み、&lt;br/&gt;類似度で疑似ラベル付け"]
+    App2 --> Sub1["ラベル付きデータがある場合：<br/>教師あり分類器を訓練"]
+    App2 --> Sub2["ラベルがない場合：<br/>ラベル自体を埋め込み、<br/>類似度で疑似ラベル付け"]
 
     classDef appStyle fill:#1e3a5f,stroke:#7c9eff,color:#eaf1ff
     class App1,App2,App3 appStyle`;
 
 const DIAGRAM_10 = `flowchart LR
-    S1["文書群"] --&gt; S2["文書埋め込み&lt;br/&gt;（埋め込みモデルでベクトル化）"]
-    S2 --&gt; S3["次元削減&lt;br/&gt;（高次元埋め込みを&lt;br/&gt;可視化・計算しやすい低次元へ）"]
-    S3 --&gt; S4["クラスタリング&lt;br/&gt;（類似する文書をグループ化）"]
-    S4 --&gt; S5["クラスタの検査&lt;br/&gt;（各クラスタの内容を人間が確認）"]
+    S1["文書群"] --> S2["文書埋め込み<br/>（埋め込みモデルでベクトル化）"]
+    S2 --> S3["次元削減<br/>（高次元埋め込みを<br/>可視化・計算しやすい低次元へ）"]
+    S3 --> S4["クラスタリング<br/>（類似する文書をグループ化）"]
+    S4 --> S5["クラスタの検査<br/>（各クラスタの内容を人間が確認）"]
 
     classDef pipeStyle fill:#1e3a5f,stroke:#7c9eff,color:#eaf1ff
     class S1,S2,S3,S4,S5 pipeStyle`;
 
 const DIAGRAM_11 = `flowchart TB
     subgraph BERTopicPipeline["BERTopicのモジュール構成"]
-        B1["文書埋め込み&lt;br/&gt;Lego Block"] --&gt; B2["次元削減&lt;br/&gt;Lego Block"]
-        B2 --&gt; B3["クラスタリング&lt;br/&gt;Lego Block"]
-        B3 --&gt; B4["トピック表現の抽出&lt;br/&gt;Lego Block&lt;br/&gt;（c-TF-IDF等）"]
-        B4 --&gt; B5["生成モデルによる&lt;br/&gt;トピックラベルの言語化&lt;br/&gt;（追加のLego Block）"]
+        B1["文書埋め込み<br/>Lego Block"] --> B2["次元削減<br/>Lego Block"]
+        B2 --> B3["クラスタリング<br/>Lego Block"]
+        B3 --> B4["トピック表現の抽出<br/>Lego Block<br/>（c-TF-IDF等）"]
+        B4 --> B5["生成モデルによる<br/>トピックラベルの言語化<br/>（追加のLego Block）"]
     end
 
     classDef legoStyle fill:#3a2a1e,stroke:#e0a45c,color:#f7e3c9
     class B1,B2,B3,B4,B5 legoStyle`;
 
 const DIAGRAM_12 = `flowchart TB
-    Root["プロンプトエンジニアリングの技法"] --&gt; Basic["基本のプロンプト設計&lt;br/&gt;（指示・文脈・出力形式の指定）"]
-    Root --&gt; ICL["In-Context Learning&lt;br/&gt;例をいくつか提示して&lt;br/&gt;タスクを理解させる"]
-    Root --&gt; Chain["Chain Prompting&lt;br/&gt;複雑な問題を&lt;br/&gt;複数の小さなプロンプトに分割"]
-    Root --&gt; Reason["推論を引き出す技法"]
-    Root --&gt; Verify["出力の検証"]
+    Root["プロンプトエンジニアリングの技法"] --> Basic["基本のプロンプト設計<br/>（指示・文脈・出力形式の指定）"]
+    Root --> ICL["In-Context Learning<br/>例をいくつか提示して<br/>タスクを理解させる"]
+    Root --> Chain["Chain Prompting<br/>複雑な問題を<br/>複数の小さなプロンプトに分割"]
+    Root --> Reason["推論を引き出す技法"]
+    Root --> Verify["出力の検証"]
 
-    Reason --&gt; CoT["Chain-of-Thought&lt;br/&gt;答える前に考える過程を出力させる"]
-    Reason --&gt; SC["Self-Consistency&lt;br/&gt;複数回サンプリングし多数決を取る"]
-    Reason --&gt; ToT["Tree-of-Thought&lt;br/&gt;複数の思考経路を探索・評価する"]
+    Reason --> CoT["Chain-of-Thought<br/>答える前に考える過程を出力させる"]
+    Reason --> SC["Self-Consistency<br/>複数回サンプリングし多数決を取る"]
+    Reason --> ToT["Tree-of-Thought<br/>複数の思考経路を探索・評価する"]
 
-    Verify --&gt; Grammar["文法制約付きサンプリング&lt;br/&gt;（出力形式を強制）"]
+    Verify --> Grammar["文法制約付きサンプリング<br/>（出力形式を強制）"]
 
     classDef techStyle fill:#1e3a5f,stroke:#7c9eff,color:#eaf1ff
     class Basic,ICL,Chain,CoT,SC,ToT,Grammar techStyle`;
 
 const DIAGRAM_13 = `flowchart TB
-    Q["問題"] --&gt; T1["思考候補A"]
-    Q --&gt; T2["思考候補B"]
-    Q --&gt; T3["思考候補C"]
+    Q["問題"] --> T1["思考候補A"]
+    Q --> T2["思考候補B"]
+    Q --> T3["思考候補C"]
 
-    T1 --&gt; Eval1{"評価：有望か"}
-    T2 --&gt; Eval2{"評価：有望か"}
-    T3 --&gt; Eval3{"評価：有望か"}
+    T1 --> Eval1{"評価：有望か"}
+    T2 --> Eval2{"評価：有望か"}
+    T3 --> Eval3{"評価：有望か"}
 
-    Eval1 --&gt;|有望| Expand1["さらに思考を展開"]
-    Eval2 --&gt;|見込み薄| Prune["枝を刈る"]
-    Eval3 --&gt;|有望| Expand3["さらに思考を展開"]
+    Eval1 -->|有望| Expand1["さらに思考を展開"]
+    Eval2 -->|見込み薄| Prune["枝を刈る"]
+    Eval3 -->|有望| Expand3["さらに思考を展開"]
 
-    Expand1 --&gt; Final["最終的な回答を選択"]
-    Expand3 --&gt; Final
+    Expand1 --> Final["最終的な回答を選択"]
+    Expand3 --> Final
 
     classDef evalStyle fill:#3a2a1e,stroke:#e0a45c,color:#f7e3c9
     classDef pruneStyle fill:#3a1420,stroke:#c05a6e,color:#f5d8de
@@ -213,50 +213,50 @@ const DIAGRAM_13 = `flowchart TB
 
 const DIAGRAM_14 = `flowchart TB
     subgraph ModelIO["Model I/O"]
-        M1["量子化モデルのロード&lt;br/&gt;（GGUF形式など）"]
+        M1["量子化モデルのロード<br/>（GGUF形式など）"]
     end
     subgraph Chains["Chains"]
         C1["単一のプロンプトテンプレート"]
-        C2["複数プロンプトを連結した&lt;br/&gt;複合チェーン"]
+        C2["複数プロンプトを連結した<br/>複合チェーン"]
     end
     subgraph Memory["Memory"]
-        Mem1["会話バッファ&lt;br/&gt;（全履歴を保持）"]
-        Mem2["ウィンドウ付き会話バッファ&lt;br/&gt;（直近N件のみ保持）"]
-        Mem3["会話の要約&lt;br/&gt;（履歴を圧縮して保持）"]
+        Mem1["会話バッファ<br/>（全履歴を保持）"]
+        Mem2["ウィンドウ付き会話バッファ<br/>（直近N件のみ保持）"]
+        Mem3["会話の要約<br/>（履歴を圧縮して保持）"]
     end
     subgraph Agents["Agents"]
-        A1["ReAct&lt;br/&gt;推論と行動を交互に繰り返す"]
-        A2["ツール呼び出し&lt;br/&gt;（検索・計算等の外部機能）"]
+        A1["ReAct<br/>推論と行動を交互に繰り返す"]
+        A2["ツール呼び出し<br/>（検索・計算等の外部機能）"]
     end
 
-    ModelIO --&gt; Chains --&gt; Memory --&gt; Agents
+    ModelIO --> Chains --> Memory --> Agents
 
     classDef groupStyle fill:#1e3a5f,stroke:#7c9eff,color:#eaf1ff
     class M1,C1,C2,Mem1,Mem2,Mem3,A1,A2 groupStyle`;
 
 const DIAGRAM_15 = `flowchart LR
-    Q1["ユーザーの質問"] --&gt; Embed1["質問文を埋め込みベクトル化"]
-    Embed1 --&gt; Search["ベクトルデータベースで&lt;br/&gt;類似文書を高速検索&lt;br/&gt;（密検索）"]
-    Search --&gt; Top["上位候補&lt;br/&gt;（例：上位20件）"]
-    Top --&gt; Rerank["リランカーで&lt;br/&gt;より精密に並べ替え"]
-    Rerank --&gt; TopN["最終候補&lt;br/&gt;（例：上位3〜5件）"]
+    Q1["ユーザーの質問"] --> Embed1["質問文を埋め込みベクトル化"]
+    Embed1 --> Search["ベクトルデータベースで<br/>類似文書を高速検索<br/>（密検索）"]
+    Search --> Top["上位候補<br/>（例：上位20件）"]
+    Top --> Rerank["リランカーで<br/>より精密に並べ替え"]
+    Rerank --> TopN["最終候補<br/>（例：上位3〜5件）"]
 
     classDef searchStyle fill:#1e3a5f,stroke:#7c9eff,color:#eaf1ff
     class Q1,Embed1,Search,Top,Rerank,TopN searchStyle`;
 
 const DIAGRAM_16 = `flowchart TB
-    Q2["ユーザーの質問"] --&gt; Retrieve["検索：関連文書を取得"]
-    Retrieve --&gt; Augment["拡張：取得した文書を&lt;br/&gt;プロンプトに組み込む"]
-    Augment --&gt; Generate["生成：LLMが文書を&lt;br/&gt;根拠として回答を生成"]
-    Generate --&gt; Answer["根拠付きの回答"]
+    Q2["ユーザーの質問"] --> Retrieve["検索：関連文書を取得"]
+    Retrieve --> Augment["拡張：取得した文書を<br/>プロンプトに組み込む"]
+    Augment --> Generate["生成：LLMが文書を<br/>根拠として回答を生成"]
+    Generate --> Answer["根拠付きの回答"]
 
     subgraph Advanced["高度なRAGの工夫"]
         Rewrite["クエリの書き換え・分解"]
-        HybridS["キーワード検索と&lt;br/&gt;密検索のハイブリッド化"]
-        MultiHop["複数文書をまたぐ&lt;br/&gt;多段階の検索"]
+        HybridS["キーワード検索と<br/>密検索のハイブリッド化"]
+        MultiHop["複数文書をまたぐ<br/>多段階の検索"]
     end
 
-    Retrieve -.-&gt; Advanced
+    Retrieve -.-> Advanced
 
     classDef ragStyle fill:#1e3a5f,stroke:#7c9eff,color:#eaf1ff
     classDef advStyle fill:#123024,stroke:#4caf7d,color:#d9f5e6
@@ -265,22 +265,22 @@ const DIAGRAM_16 = `flowchart TB
 
 const DIAGRAM_17 = `flowchart TB
     subgraph CLIP["CLIPの仕組み"]
-        Img["画像"] --&gt; ImgEnc["画像エンコーダ"]
-        Txt["テキスト&lt;br/&gt;（キャプション）"] --&gt; TxtEnc["テキストエンコーダ"]
-        ImgEnc --&gt; ImgVec["画像埋め込み"]
-        TxtEnc --&gt; TxtVec["テキスト埋め込み"]
-        ImgVec --&gt; Contrast["対照学習：&lt;br/&gt;対応するペアは近く、&lt;br/&gt;無関係なペアは遠くなるよう学習"]
-        TxtVec --&gt; Contrast
+        Img["画像"] --> ImgEnc["画像エンコーダ"]
+        Txt["テキスト<br/>（キャプション）"] --> TxtEnc["テキストエンコーダ"]
+        ImgEnc --> ImgVec["画像埋め込み"]
+        TxtEnc --> TxtVec["テキスト埋め込み"]
+        ImgVec --> Contrast["対照学習：<br/>対応するペアは近く、<br/>無関係なペアは遠くなるよう学習"]
+        TxtVec --> Contrast
     end
 
     classDef clipStyle fill:#1e3a5f,stroke:#7c9eff,color:#eaf1ff
     class Img,Txt,ImgEnc,TxtEnc,ImgVec,TxtVec,Contrast clipStyle`;
 
 const DIAGRAM_18 = `flowchart LR
-    Image2["入力画像"] --&gt; FrozenImg["凍結された&lt;br/&gt;画像エンコーダ"]
-    FrozenImg --&gt; QFormer["Q-Former&lt;br/&gt;（橋渡し役の軽量モジュール）"]
-    QFormer --&gt; FrozenLLM["凍結された&lt;br/&gt;言語モデル"]
-    FrozenLLM --&gt; OutputText["画像を踏まえた&lt;br/&gt;テキスト出力"]
+    Image2["入力画像"] --> FrozenImg["凍結された<br/>画像エンコーダ"]
+    FrozenImg --> QFormer["Q-Former<br/>（橋渡し役の軽量モジュール）"]
+    QFormer --> FrozenLLM["凍結された<br/>言語モデル"]
+    FrozenLLM --> OutputText["画像を踏まえた<br/>テキスト出力"]
 
     classDef frozenStyle fill:#2a2f3a,stroke:#8a94a6,color:#e6e9ef
     classDef bridgeStyle fill:#3a2a1e,stroke:#e0a45c,color:#f7e3c9
@@ -289,50 +289,50 @@ const DIAGRAM_18 = `flowchart LR
 
 const DIAGRAM_19 = `flowchart TB
     subgraph SBERT["SBERTの訓練構成"]
-        S1["文A"] --&gt; Enc1["共有された&lt;br/&gt;BERTエンコーダ"]
-        S2["文B"] --&gt; Enc2["共有された&lt;br/&gt;BERTエンコーダ"]
-        Enc1 --&gt; V1s["埋め込みA"]
-        Enc2 --&gt; V2s["埋め込みB"]
-        V1s --&gt; Loss["損失関数：&lt;br/&gt;類似する文のペアは近く、&lt;br/&gt;異なる文のペアは遠くなるよう学習"]
-        V2s --&gt; Loss
+        S1["文A"] --> Enc1["共有された<br/>BERTエンコーダ"]
+        S2["文B"] --> Enc2["共有された<br/>BERTエンコーダ"]
+        Enc1 --> V1s["埋め込みA"]
+        Enc2 --> V2s["埋め込みB"]
+        V1s --> Loss["損失関数：<br/>類似する文のペアは近く、<br/>異なる文のペアは遠くなるよう学習"]
+        V2s --> Loss
     end
 
     classDef sbertStyle fill:#1e3a5f,stroke:#7c9eff,color:#eaf1ff
     class Enc1,Enc2 sbertStyle`;
 
 const DIAGRAM_20 = `flowchart TB
-    Few["各クラス数件程度の&lt;br/&gt;少数の訓練例"] --&gt; Gen["対照学習用ペアを&lt;br/&gt;大量に生成&lt;br/&gt;（同クラス同士は正例、&lt;br/&gt;異クラス間は負例）"]
-    Gen --&gt; FineEmb["埋め込みモデルを&lt;br/&gt;この生成ペアで&lt;br/&gt;ファインチューニング"]
-    FineEmb --&gt; Head["軽量な分類ヘッドを&lt;br/&gt;埋め込みの上に訓練"]
-    Head --&gt; Result["少数データでも&lt;br/&gt;実用的な分類器が完成"]
+    Few["各クラス数件程度の<br/>少数の訓練例"] --> Gen["対照学習用ペアを<br/>大量に生成<br/>（同クラス同士は正例、<br/>異クラス間は負例）"]
+    Gen --> FineEmb["埋め込みモデルを<br/>この生成ペアで<br/>ファインチューニング"]
+    FineEmb --> Head["軽量な分類ヘッドを<br/>埋め込みの上に訓練"]
+    Head --> Result["少数データでも<br/>実用的な分類器が完成"]
 
     classDef setfitStyle fill:#1e3a5f,stroke:#7c9eff,color:#eaf1ff
     class Few,Gen,FineEmb,Head,Result setfitStyle`;
 
 const DIAGRAM_21 = `flowchart LR
-    Raw["生テキスト"] --&gt; Tag["トークンごとに&lt;br/&gt;BIOタグ等でラベル付け&lt;br/&gt;（人名の開始/継続、&lt;br/&gt;組織名、その他 等）"]
-    Tag --&gt; Align["トークナイザーの&lt;br/&gt;サブワード分割と&lt;br/&gt;ラベルを整合させる"]
-    Align --&gt; Train2["トークン分類ヘッド付き&lt;br/&gt;モデルをファインチューニング"]
-    Train2 --&gt; NERModel["固有表現認識モデル"]
+    Raw["生テキスト"] --> Tag["トークンごとに<br/>BIOタグ等でラベル付け<br/>（人名の開始/継続、<br/>組織名、その他 等）"]
+    Tag --> Align["トークナイザーの<br/>サブワード分割と<br/>ラベルを整合させる"]
+    Align --> Train2["トークン分類ヘッド付き<br/>モデルをファインチューニング"]
+    Train2 --> NERModel["固有表現認識モデル"]
 
     classDef nerStyle fill:#1e3a5f,stroke:#7c9eff,color:#eaf1ff
     class Raw,Tag,Align,Train2,NERModel nerStyle`;
 
 const DIAGRAM_22 = `flowchart LR
-    Stage1["ステージ1：事前学習&lt;br/&gt;（Pretraining）&lt;br/&gt;大量のテキストで&lt;br/&gt;次トークン予測を学習"] --&gt; Stage2["ステージ2：&lt;br/&gt;教師ありファインチューニング&lt;br/&gt;（SFT）&lt;br/&gt;指示と応答のペアで&lt;br/&gt;指示追従能力を獲得"]
-    Stage2 --&gt; Stage3["ステージ3：&lt;br/&gt;選好チューニング&lt;br/&gt;（Preference Tuning）&lt;br/&gt;人間の好みに沿う出力を&lt;br/&gt;強化・調整"]
+    Stage1["ステージ1：事前学習<br/>（Pretraining）<br/>大量のテキストで<br/>次トークン予測を学習"] --> Stage2["ステージ2：<br/>教師ありファインチューニング<br/>（SFT）<br/>指示と応答のペアで<br/>指示追従能力を獲得"]
+    Stage2 --> Stage3["ステージ3：<br/>選好チューニング<br/>（Preference Tuning）<br/>人間の好みに沿う出力を<br/>強化・調整"]
 
     classDef stageStyle fill:#1e3a5f,stroke:#7c9eff,color:#eaf1ff
     class Stage1,Stage2,Stage3 stageStyle`;
 
 const DIAGRAM_23 = `flowchart TB
     subgraph QLoRA["QLoRAの構成"]
-        Base["事前学習済みモデルの重み&lt;br/&gt;（4bitに量子化し凍結）"] --&gt; Frozen["推論時もこの重みは&lt;br/&gt;更新されない"]
-        Base --&gt; LoRA_A["低ランク行列A&lt;br/&gt;（訓練対象）"]
-        LoRA_A --&gt; LoRA_B["低ランク行列B&lt;br/&gt;（訓練対象）"]
-        Frozen --&gt; Combine["元の出力 + 低ランク行列による&lt;br/&gt;差分を加算"]
-        LoRA_B --&gt; Combine
-        Combine --&gt; FinalOut["ファインチューニング後の出力"]
+        Base["事前学習済みモデルの重み<br/>（4bitに量子化し凍結）"] --> Frozen["推論時もこの重みは<br/>更新されない"]
+        Base --> LoRA_A["低ランク行列A<br/>（訓練対象）"]
+        LoRA_A --> LoRA_B["低ランク行列B<br/>（訓練対象）"]
+        Frozen --> Combine["元の出力 + 低ランク行列による<br/>差分を加算"]
+        LoRA_B --> Combine
+        Combine --> FinalOut["ファインチューニング後の出力"]
     end
 
     classDef frozenStyle fill:#2a2f3a,stroke:#8a94a6,color:#e6e9ef
@@ -342,11 +342,11 @@ const DIAGRAM_23 = `flowchart TB
 
 const DIAGRAM_24 = `flowchart TB
     subgraph RLHF["RLHFのパイプライン"]
-        R1["人間による選好データ収集&lt;br/&gt;（2つの出力のどちらが良いか）"] --&gt; R2["報酬モデルを訓練&lt;br/&gt;（出力の質をスコア化）"]
-        R2 --&gt; R3["強化学習で&lt;br/&gt;生成モデルを更新&lt;br/&gt;（報酬を最大化する方向へ）"]
+        R1["人間による選好データ収集<br/>（2つの出力のどちらが良いか）"] --> R2["報酬モデルを訓練<br/>（出力の質をスコア化）"]
+        R2 --> R3["強化学習で<br/>生成モデルを更新<br/>（報酬を最大化する方向へ）"]
     end
     subgraph DPO["DPOのパイプライン"]
-        D1["人間による選好データ収集&lt;br/&gt;（2つの出力のどちらが良いか）"] --&gt; D2["報酬モデルを訓練せず&lt;br/&gt;選好データから直接&lt;br/&gt;分類問題として最適化"]
+        D1["人間による選好データ収集<br/>（2つの出力のどちらが良いか）"] --> D2["報酬モデルを訓練せず<br/>選好データから直接<br/>分類問題として最適化"]
     end
 
     classDef rlhfStyle fill:#3a2a1e,stroke:#e0a45c,color:#f7e3c9
@@ -355,11 +355,11 @@ const DIAGRAM_24 = `flowchart TB
     class D1,D2 dpoStyle`;
 
 const DIAGRAM_25 = `flowchart TB
-    Ch2["2章 トークンと埋め込み"] --&gt; T1["トークナイザーフリー&lt;br/&gt;バイトレベルLLMの実用化"]
-    Ch8["8章 セマンティック検索とRAG"] --&gt; T2["Agentic RAG&lt;br/&gt;Contextual Retrieval&lt;br/&gt;GraphRAGの普及"]
-    Ch10["10章 埋め込みモデル作成"] --&gt; T3["MTEB上位モデルの&lt;br/&gt;多言語・長文対応の進化"]
-    Ch12["12章 生成モデルの&lt;br/&gt;ファインチューニング"] --&gt; T4["QLoRA+DoRAの標準化&lt;br/&gt;GRPOの台頭"]
-    Ch7_9["7章・9章&lt;br/&gt;エージェント/マルチモーダル"] --&gt; T5["マルチエージェントシステムへの&lt;br/&gt;本格的な拡張"]
+    Ch2["2章 トークンと埋め込み"] --> T1["トークナイザーフリー<br/>バイトレベルLLMの実用化"]
+    Ch8["8章 セマンティック検索とRAG"] --> T2["Agentic RAG<br/>Contextual Retrieval<br/>GraphRAGの普及"]
+    Ch10["10章 埋め込みモデル作成"] --> T3["MTEB上位モデルの<br/>多言語・長文対応の進化"]
+    Ch12["12章 生成モデルの<br/>ファインチューニング"] --> T4["QLoRA+DoRAの標準化<br/>GRPOの台頭"]
+    Ch7_9["7章・9章<br/>エージェント/マルチモーダル"] --> T5["マルチエージェントシステムへの<br/>本格的な拡張"]
 
     classDef chapStyle fill:#2a2f3a,stroke:#8a94a6,color:#e6e9ef
     classDef trendStyle fill:#1e3a5f,stroke:#7c9eff,color:#eaf1ff
@@ -367,13 +367,13 @@ const DIAGRAM_25 = `flowchart TB
     class T1,T2,T3,T4,T5 trendStyle`;
 
 const DIAGRAM_26 = `flowchart TB
-    Step0["0. 前提知識の確認&lt;br/&gt;Python・機械学習の基礎"] --&gt; Step1["1. 第1部を通読&lt;br/&gt;（1〜3章）&lt;br/&gt;Transformerの仕組みを理解する"]
-    Step1 --&gt; Step2["2. 実際にコードを動かす&lt;br/&gt;公式GitHubのChapter1-3&lt;br/&gt;ノートブックをColabで実行"]
-    Step2 --&gt; Step3["3. 第2部を関心のある&lt;br/&gt;章から読む（4〜9章）&lt;br/&gt;分類・クラスタリング・&lt;br/&gt;プロンプト・RAG・マルチモーダル"]
-    Step3 --&gt; Step4["4. 第2部のコード例を&lt;br/&gt;自分のデータで試す"]
-    Step4 --&gt; Step5["5. 第3部を通読&lt;br/&gt;（10〜12章）&lt;br/&gt;埋め込み・分類・生成モデルの&lt;br/&gt;ファインチューニング"]
-    Step5 --&gt; Step6["6. 小規模モデルで&lt;br/&gt;QLoRAファインチューニングを&lt;br/&gt;実際に試す"]
-    Step6 --&gt; Step7["7. 第4部（本ガイド独自）で&lt;br/&gt;2026年時点の発展形を確認し&lt;br/&gt;実務でのアップデートを把握する"]
+    Step0["0. 前提知識の確認<br/>Python・機械学習の基礎"] --> Step1["1. 第1部を通読<br/>（1〜3章）<br/>Transformerの仕組みを理解する"]
+    Step1 --> Step2["2. 実際にコードを動かす<br/>公式GitHubのChapter1-3<br/>ノートブックをColabで実行"]
+    Step2 --> Step3["3. 第2部を関心のある<br/>章から読む（4〜9章）<br/>分類・クラスタリング・<br/>プロンプト・RAG・マルチモーダル"]
+    Step3 --> Step4["4. 第2部のコード例を<br/>自分のデータで試す"]
+    Step4 --> Step5["5. 第3部を通読<br/>（10〜12章）<br/>埋め込み・分類・生成モデルの<br/>ファインチューニング"]
+    Step5 --> Step6["6. 小規模モデルで<br/>QLoRAファインチューニングを<br/>実際に試す"]
+    Step6 --> Step7["7. 第4部（本ガイド独自）で<br/>2026年時点の発展形を確認し<br/>実務でのアップデートを把握する"]
 
     classDef roadStyle fill:#1e3a5f,stroke:#7c9eff,color:#eaf1ff
     class Step0,Step1,Step2,Step3,Step4,Step5,Step6,Step7 roadStyle`;

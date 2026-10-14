@@ -36,19 +36,29 @@
   min-height: 100vh;
 }
 
-/* グローバル黒帯鮮度バーの非表示（ヒーロー直結） */
-:global(#site-freshness-bar) {
+/* グローバル黒帯鮮度バーの非表示（ヒーロー直結）と body マージン補正 */
+:global(body:has([data-page="hands-on-large-language-models"])) {
+  --sidebar-w: 340px;
+  background: #07111e !important;
+  margin-top: calc(var(--ch-height, 60px) + var(--ch-disclaimer-height, 0px)) !important;
+}
+
+:global(body:has([data-page="hands-on-large-language-models"]) #site-freshness-bar) {
   display: none !important;
   height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
 }
 
 /* ---------- Sidebar ---------- */
 .sidebar {
   position: fixed;
-  top: var(--header-height, 60px);
+  top: calc(var(--header-height, 60px) + var(--ch-disclaimer-height, 0px));
   left: 0;
+  bottom: 0;
   width: var(--sidebar-w);
-  height: calc(100vh - var(--header-height, 60px));
+  height: calc(100vh - var(--header-height, 60px) - var(--ch-disclaimer-height, 0px));
   overflow-y: auto;
   background: var(--panel);
   border-right: 1px solid var(--border);
@@ -125,7 +135,7 @@
 .sidebarToggle {
   display: none;
   position: fixed;
-  top: calc(var(--header-height, 60px) + 14px);
+  top: calc(var(--header-height, 60px) + var(--ch-disclaimer-height, 0px) + 14px);
   left: 14px;
   z-index: 200;
   width: 44px;
@@ -143,7 +153,7 @@
 /* ---------- Main ---------- */
 .main {
   margin-left: var(--sidebar-w);
-  padding: 56px 64px 100px 64px;
+  padding: 32px 64px 100px 64px;
   min-width: 0;
 }
 
