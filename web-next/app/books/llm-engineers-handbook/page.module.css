@@ -50,16 +50,16 @@
 }
 
 .layout [id] {
-  scroll-margin-top: calc(var(--header-height, 60px) + 80px);
+  scroll-margin-top: calc(var(--header-height, 60px) + var(--ch-disclaimer-height, 0px) + 80px);
 }
 
 /* Sidebar */
 .sidebar {
   position: fixed;
-  top: calc(var(--header-height, 60px) + 36px);
+  top: calc(var(--header-height, 60px) + var(--ch-disclaimer-height, 0px));
   left: 0;
   width: var(--sidebar-w);
-  height: calc(100vh - var(--header-height, 60px) - 36px);
+  height: calc(100dvh - var(--header-height, 60px) - var(--ch-disclaimer-height, 0px));
   overflow-y: auto;
   background: var(--paper-card);
   border-right: 1px solid var(--border);
@@ -466,6 +466,14 @@
   padding: 1.3rem 1rem;
 }
 
+.diagramWrap :global(.hub text) {
+  fill: #3a2900 !important;
+}
+
+.diagramWrap :global(.done text) {
+  fill: #0d2417 !important;
+}
+
 .diagramCaption {
   text-align: center;
   font-size: 1rem;
@@ -588,7 +596,7 @@
 .menuToggle {
   display: none;
   position: fixed;
-  top: calc(var(--header-height, 60px) + 12px);
+  top: calc(var(--header-height, 60px) + var(--ch-disclaimer-height, 0px) + 12px);
   left: 1rem;
   z-index: 50;
   width: 2.8rem;
@@ -650,5 +658,51 @@
     inset: 0;
     background: rgba(36, 31, 24, 0.35);
     z-index: 35;
+  }
+}
+
+:global(body):has(.layout) {
+  --sidebar-w: 280px;
+  background: var(--paper);
+}
+
+:global(body):has(.layout) :global(#site-freshness-bar) {
+  box-sizing: border-box;
+  max-width: none;
+  width: calc(100% - var(--sidebar-w));
+  margin-left: var(--sidebar-w);
+  margin-right: 0;
+  padding-right: 3.5rem;
+  background: var(--paper);
+  color: var(--ink-soft);
+  justify-content: flex-end;
+}
+
+:global(body):has(.layout) :global(#site-freshness-bar) :global(time) {
+  color: var(--ink);
+}
+
+:global(body):has(.layout) :global(nav[aria-label="関連ページ"]) {
+  --line: #e5e7eb;
+  --card: #ffffff;
+  --fg: #1a1a2e;
+  --muted: #555566;
+  --accent: #1e3a8a;
+  box-sizing: border-box;
+  max-width: none;
+  width: calc(100% - var(--sidebar-w));
+  margin-left: var(--sidebar-w);
+  margin-right: 0;
+  padding-left: 3.5rem;
+  padding-right: 3.5rem;
+}
+
+@media (max-width: 960px) {
+  :global(body):has(.layout) :global(#site-freshness-bar),
+  :global(body):has(.layout) :global(nav[aria-label="関連ページ"]) {
+    width: 100%;
+    margin-left: 0;
+    padding-left: 1.2rem;
+    padding-right: 1.2rem;
   }
 }

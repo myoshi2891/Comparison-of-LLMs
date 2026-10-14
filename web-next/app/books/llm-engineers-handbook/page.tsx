@@ -9,6 +9,20 @@ export const metadata: Metadata = {
     "Paul Iusztin、Maxime Labonne 著『LLM Engineer's Handbook』の全体像、FTIパイプライン、全11章+付録の要点、ハンズオン手順、主要ツール群を体系的に学べる初学者向け完全解説ガイド。",
 };
 
+const MERMAID_THEME_VARIABLES = {
+  background: "transparent",
+  primaryColor: "#f1e9d6",
+  primaryTextColor: "#241f18",
+  primaryBorderColor: "#33417a",
+  lineColor: "#5b5346",
+  secondaryColor: "#e6e9f5",
+  tertiaryColor: "#f2e3ba",
+  fontSize: "16px",
+  fontFamily:
+    'ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif',
+  edgeLabelBackground: "#fcfbf7",
+} as const;
+
 const DIAGRAM_OVERVIEW = `flowchart TB
     A[個人のデジタルデータ LinkedInやMedium GitHub 個人記事など] --> B[データ収集パイプライン Webクローラー]
     B --> C[[MongoDBデータウェアハウス]]
@@ -641,7 +655,13 @@ export default function Page() {
             </p>
 
             <div className={styles.diagramWrap}>
-              <MermaidDiagram id="diag-overview" chart={DIAGRAM_OVERVIEW} />
+              <MermaidDiagram
+                id="diag-overview"
+                chart={DIAGRAM_OVERVIEW}
+                theme="base"
+                themeVariables={MERMAID_THEME_VARIABLES}
+                flowchartHtmlLabels={false}
+              />
             </div>
             <p className={styles.diagramCaption}>
               図:LLM Twin全体のデータフロー(データ収集からAI分身の応答生成まで)
@@ -738,7 +758,13 @@ export default function Page() {
             </p>
 
             <div className={styles.diagramWrap}>
-              <MermaidDiagram id="diag-fti" chart={DIAGRAM_FTI} />
+              <MermaidDiagram
+                id="diag-fti"
+                chart={DIAGRAM_FTI}
+                theme="base"
+                themeVariables={MERMAID_THEME_VARIABLES}
+                flowchartHtmlLabels={false}
+              />
             </div>
             <p className={styles.diagramCaption}>
               図:FTI(Feature / Training / Inference)パイプラインアーキテクチャ
@@ -909,7 +935,13 @@ export default function Page() {
               Mapping)パターンを使ってMongoDBに正規化して保存されます。Webクローリング特有のトラブルシューティング(Seleniumのエラー対応など)も扱われます。
             </p>
             <div className={styles.diagramWrap}>
-              <MermaidDiagram id="diag-crawler" chart={DIAGRAM_CRAWLER} />
+              <MermaidDiagram
+                id="diag-crawler"
+                chart={DIAGRAM_CRAWLER}
+                theme="base"
+                themeVariables={MERMAID_THEME_VARIABLES}
+                flowchartHtmlLabels={false}
+              />
             </div>
             <p className={styles.diagramCaption}>図:データ収集クローラーパイプライン</p>
           </section>
@@ -926,7 +958,13 @@ export default function Page() {
               (前処理・検索・後処理それぞれの最適化)まで体系的に解説されます。実装面では、ZenMLパイプラインでクリーニング→チャンク化→埋め込み→ベクトルDB格納までを行います。
             </p>
             <div className={styles.diagramWrap}>
-              <MermaidDiagram id="diag-rag" chart={DIAGRAM_RAG} />
+              <MermaidDiagram
+                id="diag-rag"
+                chart={DIAGRAM_RAG}
+                theme="base"
+                themeVariables={MERMAID_THEME_VARIABLES}
+                flowchartHtmlLabels={false}
+              />
             </div>
             <p className={styles.diagramCaption}>
               図:RAG特徴量パイプライン(Ingestion〜Retrieval〜Generation)
@@ -983,7 +1021,13 @@ export default function Page() {
               という2つのアライメント手法を比較しながら、実際にDPOを実装してTwinLlama-3.1-8Bモデルを仕上げます。
             </p>
             <div className={styles.diagramWrap}>
-              <MermaidDiagram id="diag-align" chart={DIAGRAM_ALIGN} />
+              <MermaidDiagram
+                id="diag-align"
+                chart={DIAGRAM_ALIGN}
+                theme="base"
+                themeVariables={MERMAID_THEME_VARIABLES}
+                flowchartHtmlLabels={false}
+              />
             </div>
             <p className={styles.diagramCaption}>図:選好アライメント(RLHF/DPO)による仕上げ工程</p>
           </section>
@@ -1062,7 +1106,13 @@ export default function Page() {
               でビジネスロジック側のサービスを構築、オートスケーリング設定まで行います。
             </p>
             <div className={styles.diagramWrap}>
-              <MermaidDiagram id="diag-deploy" chart={DIAGRAM_DEPLOY} />
+              <MermaidDiagram
+                id="diag-deploy"
+                chart={DIAGRAM_DEPLOY}
+                theme="base"
+                themeVariables={MERMAID_THEME_VARIABLES}
+                flowchartHtmlLabels={false}
+              />
             </div>
             <p className={styles.diagramCaption}>図:推論パイプラインのデプロイ構成</p>
           </section>
@@ -1079,7 +1129,13 @@ export default function Page() {
               ActionsでCI(継続的インテグレーション)・CD(継続的デリバリー)・CT(継続的学習トリガー)を組み上げます。
             </p>
             <div className={styles.diagramWrap}>
-              <MermaidDiagram id="diag-mlops" chart={DIAGRAM_MLOPS} />
+              <MermaidDiagram
+                id="diag-mlops"
+                chart={DIAGRAM_MLOPS}
+                theme="base"
+                themeVariables={MERMAID_THEME_VARIABLES}
+                flowchartHtmlLabels={false}
+              />
             </div>
             <p className={styles.diagramCaption}>図:CI/CD/CTによるMLOps/LLMOps運用サイクル</p>
           </section>
@@ -1106,7 +1162,13 @@ export default function Page() {
               522ページというボリュームと「中級〜上級」という難易度表示に圧倒されず読み進めるための、おすすめの学習順序です。
             </p>
             <div className={styles.diagramWrap}>
-              <MermaidDiagram id="diag-roadmap" chart={DIAGRAM_ROADMAP} />
+              <MermaidDiagram
+                id="diag-roadmap"
+                chart={DIAGRAM_ROADMAP}
+                theme="base"
+                themeVariables={MERMAID_THEME_VARIABLES}
+                flowchartHtmlLabels={false}
+              />
             </div>
             <p className={styles.diagramCaption}>図:初学者向け学習ロードマップ(ステップ1〜9)</p>
             <div
