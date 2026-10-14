@@ -2,7 +2,7 @@
 
 > 本ファイルは Next.js 移行完了後の保守・改善フェーズにおける開発の進捗（特にテスト関連）および品質チェックのルールを記録する。
 >
-> - 最終更新日: **Updated 2026-10-14**
+> - 最終更新日: **Updated 2026-10-15**
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
 
@@ -10,7 +10,7 @@
 
 - **フェーズ**: 保守・機能改善・品質強化フェーズ
 - **ブランチ**: `dev`
-- **最新実装 HEAD**: `0399f9c5`（Hands-On Large Language Modelsガイドのリファクタリング・スタイル調整・テーマ変数整理。Refactorは `0399f9c5`、Greenは `ac3453b2`、Redは `750c27d3`）
+- **最新実装 HEAD**: `dc0fbf8c`（SonarCloud新規コードカバレッジ対応とレビュー指摘修正。CSS修正は `dc0fbf8c`、Greenは `0712fb2b`、Redは `7607bb98`。Hands-On LLM移行本体は Refactor `0399f9c5`／Green `ac3453b2`／Red `750c27d3`）
 - **次の作業**: `/books/hands-on-large-language-models` の目視確認（ユーザー担当）。npm・ビルドは禁止、スクレイパー検証はユーザー指定で対象外。
 - **ルート実数**: `page.tsx` 91 件、registry 92 エントリ（RSS の `/rss.xml` を含む）。全ルート登録・ナビ導出テストは合格。
 - **動作検証**:
@@ -18,13 +18,21 @@
   - `bun run typecheck` ✅（`tsc --noEmit`。2026-10-14 実測）
   - `bun run lint` ✅（Biome check / 545 files / 0 diagnostics。2026-10-14 実測）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: Node 24で `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000` を実行し、Vitest **197 files / 1970 tests すべて合格**（2026-10-14 実測）。22契約・12操作契約・typecheck・lint・原本監査（exit 0）がすべて成功。
+  - **フロントエンド (`web-next/`)**: Node 24で `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000` を実行し、Vitest **199 files / 1985 tests すべて合格**（2026-10-15 実測）。typecheck・lint（547 files／0 diagnostics）・原本監査（Hands-On LLM／LLM Engineer's Handbook／Adversarial Robustness／Enterprise RAG すべて exit 0）・監査スクリプトの node:test 33件が成功。
     - 今回の開始時ベースラインは **195 files / 1936 tests**。既存環境の `localStorage` 問題を避ける実行時オプションを継続使用し、依存・設定ファイルは変更していない。
     - `load(sourceHtml)` をモジュール初期化時に呼ぶ `governance/ai-governance/GuideContent.tsx` と
       `local-llm/finetuning-best-practices/GuideContent.tsx` は、import スモークでも読み込み可能であることを確認済み
   - **バックエンド (`scraper/`)**: 今回はユーザー指定で検証対象外。実行していない。過去の成功記録は104件（2026-10-04）であり、今回の実測値ではない。
 
 ## 最近の追加内容
+
+- **SonarCloud新規コードカバレッジ対応・レビュー指摘修正（2026-10-15）**:
+  - `hands-on-large-language-models/TocObserver.tsx`（0%）と `rag/enterprise-guide/TocObserver.tsx`（0%）に単体テストを追加。ページテストは TocObserver をモックするため、単体テストがないとカバレッジに反映されなかった。
+  - enterprise-guide の `#menuBtn`・`#sidebarBackdrop`・`#topBtn` は `layout-root` の兄弟要素で、`root.querySelector` では取得できずモバイル目次とTopボタンが動いていなかった。`document` から取得するよう修正。
+  - llm-engineers-handbook: `aria-controls="sidebar"` を追加し、`globals.css` と重複していた共有クロームの上書きを CSS Module から削除（D-10 は `globals.css` を検証）。
+  - hands-on: 兄弟要素のトグル用に `--panel`/`--text` を body スコープでも定義し、参考文献グリッドを `minmax(min(340px, 100%), 1fr)` に変更。関連ページの全幅化を 900px（サイドバー折りたたみ幅）に揃えた。
+  - enterprise-guide: `.article` の `max-width` を削除。閉じたサイドバーと非表示の Top ボタンに `visibility: hidden` を付け、キーボードのフォーカス対象から外した。
+  - `audit_source_parity.mjs`: Mermaid の class トークン境界を HTML 空白とクォートだけに限定した（「図mermaid」のように非 ASCII 文字と隣接するものは誤検出しない）。
 
 - **Hands-On Large Language Modelsガイドの移行・原本アーカイブ・スタイル調整（2026-10-14）**:
   - `/books/hands-on-large-language-models` に全10 H2・22 H3・16 H4・96段落・56リスト項目・7表／64行（書籍情報kv表8行、アーキテクチャ比較表、RAG/ファインチューニング比較表等）・27 Mermaid図解・17チェック項目・24参考文献カード（24外部リンク）をPure JSXへ転写。
@@ -389,17 +397,17 @@
 
 ```text
 AGENTS.md → CODEX.md → CLAUDE.md → docs/PROGRESS.md → Phase A–F 計画の順で読む。
-最新実装 HEAD: 695c45a1（Adversarial Robustness for Machine Learning移行・ヒーロー鮮度バー黒文字統合・フッター淡色ペーパー同期。Green: 695c45a1、Red: f605b780）
-次の作業: /books/adversarial-robustness の目視確認結果に対応する。目視確認はユーザー担当。
-Adversarial-robustness-for-machine-learning-guide.html は archive/html/books/、Markdown は archive/md/books/ に退避保存済み（SHA-256一致確認済み）。
-HTML原本監査は exit 0。全体 Vitest 194 files / 1917 tests、20契約・typecheck・lint（535 files / 0 diagnostics）が成功。pytestは今回対象外。
+最新実装 HEAD: dc0fbf8c（SonarCloudカバレッジ対応・レビュー指摘修正。Red: 7607bb98、Green: 0712fb2b、CSS: dc0fbf8c）
+次の作業: /books/hands-on-large-language-models と /rag/enterprise-guide の目視確認（モバイル目次・Topボタン・参考文献グリッド。ユーザー担当）。
+Hands-on-large-language-models-guide.html は archive/html/books/、Markdown は archive/md/books/ に退避保存済み。
+HTML原本監査は Hands-On LLM／LLM Engineer's Handbook／Adversarial Robustness／Enterprise RAG すべて exit 0。
+全体 Vitest 199 files / 1985 tests、typecheck・lint（547 files / 0 diagnostics）が成功。pytestは今回対象外。
 この実行環境ではNode 24で NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000 を使用する。
-契約20件は本文・全7表・1数式・12 Mermaid・10チェック項目・22参考文献カード（23リンク）・目次・ヒーロー鮮度バー・フッター淡色ペーパー同期を厳密に照合する。
 原本の期待値を移植先に合わせて変更しない。指定HTMLが正本。
 全列左寄せ、コードインデント、アンカー見出しめり込み防止を徹底。Mermaidはbaseテーマで淡色配色を保持する。
+共有クローム（body／鮮度バー／関連ページ）の上書きは globals.css を正とし、CSS Module に複製しない。
 サンドボックスでは npm とビルドを実行しない。目視結果への修正も Red → Green → Refactor → Docs で分離コミットする。
-ルート直下に残る未移行HTML候補は7件（2026-10-14に実測）。次の移行対象は未指定。
-page.tsx 89 件、registry 90 エントリ（RSS を含む）。次のページは指示されてから扱う。
+page.tsx 91 件、registry 92 エントリ（RSS を含む）。次のページは指示されてから扱う。
 ```
 
 
