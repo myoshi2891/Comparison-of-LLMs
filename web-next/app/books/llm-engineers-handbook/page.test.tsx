@@ -233,12 +233,19 @@ describe("LLM Engineer's Handbook guide — source parity and design contracts",
     );
   });
 
-  it("D-10: aligns site-freshness-bar and related-pages with sidebar offset in light theme with dark text", () => {
+  it("D-10: integrates page-freshness in hero with dark text and hides global bar while offsetting related-pages", () => {
+    const { container } = render(<Page />);
+    const freshness = container.querySelector('[data-testid="page-freshness"]');
+    expect(freshness).not.toBeNull();
+    expect(freshness?.textContent).toContain("最終確認");
+    expect(freshness?.textContent).toContain("2026-10-14");
+    expect(freshness?.textContent).toContain("公開");
+
     const fs = require("node:fs");
     const path = require("node:path");
     const css = fs.readFileSync(path.resolve(__dirname, "./page.module.css"), "utf8");
     expect(css).toContain('data-page="llm-engineers-handbook"');
-    expect(css).toContain("#site-freshness-bar");
+    expect(css).toContain("display: none !important");
     expect(css).toContain('nav[aria-label="関連ページ"]');
     expect(css).toContain("margin-left: 280px");
   });
