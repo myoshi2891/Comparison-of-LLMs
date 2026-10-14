@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import MermaidDiagram from "@/components/docs/MermaidDiagram";
-import TocObserver from "./TocObserver";
 import styles from "./page.module.css";
+import TocObserver from "./TocObserver";
 
 export const metadata: Metadata = {
   title: "「LLM Engineer's Handbook」徹底解説ガイド ― 初学者のためのステップバイステップ入門",
@@ -118,7 +118,13 @@ export default function Page() {
         referrerPolicy="no-referrer"
       />
 
-      <button className={styles.menuToggle} id="menuToggle" aria-label="メニューを開く" aria-expanded="false">
+      <button
+        type="button"
+        className={styles.menuToggle}
+        id="menuToggle"
+        aria-label="メニューを開く"
+        aria-expanded="false"
+      >
         <i className="ti ti-menu-2" />
       </button>
       <div className={styles.sidebarScrim} id="scrim" />
@@ -135,138 +141,217 @@ export default function Page() {
         <nav aria-label="目次" data-testid="sidebar-nav">
           <ul className={styles.sideNav}>
             <li>
-              <a className={`${styles.sideLink} ${styles.active}`} href="#intro" data-testid="sidebar-nav-link">
-                <i className="ti ti-bulb" />この本は何なのか
+              <a
+                className={`${styles.sideLink} ${styles.active}`}
+                href="#intro"
+                data-testid="sidebar-nav-link"
+              >
+                <i className="ti ti-bulb" />
+                この本は何なのか
               </a>
             </li>
             <li>
               <a className={styles.sideLink} href="#book-info" data-testid="sidebar-nav-link">
-                <i className="ti ti-book-2" />書籍情報まとめ
+                <i className="ti ti-book-2" />
+                書籍情報まとめ
               </a>
             </li>
             <li>
               <a className={styles.sideLink} href="#authors" data-testid="sidebar-nav-link">
-                <i className="ti ti-users" />著者について
+                <i className="ti ti-users" />
+                著者について
               </a>
             </li>
             <li>
               <a className={styles.sideLink} href="#reviews" data-testid="sidebar-nav-link">
-                <i className="ti ti-star" />なぜ話題になっているのか
+                <i className="ti ti-star" />
+                なぜ話題になっているのか
               </a>
             </li>
             <li>
               <a className={styles.sideLink} href="#llm-twin" data-testid="sidebar-nav-link">
-                <i className="ti ti-robot" />全体像:LLM Twin
+                <i className="ti ti-robot" />
+                全体像:LLM Twin
               </a>
             </li>
             <li>
               <a className={styles.sideLink} href="#data-ethics" data-testid="sidebar-nav-link">
-                <i className="ti ti-shield-check" />データ収集時の注意
+                <i className="ti ti-shield-check" />
+                データ収集時の注意
               </a>
             </li>
             <li>
               <a className={styles.sideLink} href="#fti" data-testid="sidebar-nav-link">
-                <i className="ti ti-sitemap" />FTIパイプライン設計
+                <i className="ti ti-sitemap" />
+                FTIパイプライン設計
               </a>
             </li>
             <li>
               <a className={styles.sideLink} href="#ch-overview" data-testid="sidebar-nav-link">
-                <i className="ti ti-list-details" />章立て一覧
+                <i className="ti ti-list-details" />
+                章立て一覧
               </a>
             </li>
             <li>
-              <a className={`${styles.sideLink} ${styles.sideSub}`} href="#ch1" data-testid="sidebar-nav-link">
-                <i className="ti ti-map" />第1章 概念と設計
+              <a
+                className={`${styles.sideLink} ${styles.sideSub}`}
+                href="#ch1"
+                data-testid="sidebar-nav-link"
+              >
+                <i className="ti ti-map" />
+                第1章 概念と設計
               </a>
             </li>
             <li>
-              <a className={`${styles.sideLink} ${styles.sideSub}`} href="#ch2" data-testid="sidebar-nav-link">
-                <i className="ti ti-tool" />第2章 ツール準備
+              <a
+                className={`${styles.sideLink} ${styles.sideSub}`}
+                href="#ch2"
+                data-testid="sidebar-nav-link"
+              >
+                <i className="ti ti-tool" />
+                第2章 ツール準備
               </a>
             </li>
             <li>
-              <a className={`${styles.sideLink} ${styles.sideSub}`} href="#ch3" data-testid="sidebar-nav-link">
-                <i className="ti ti-database" />第3章 データ工学
+              <a
+                className={`${styles.sideLink} ${styles.sideSub}`}
+                href="#ch3"
+                data-testid="sidebar-nav-link"
+              >
+                <i className="ti ti-database" />
+                第3章 データ工学
               </a>
             </li>
             <li>
-              <a className={`${styles.sideLink} ${styles.sideSub}`} href="#ch4" data-testid="sidebar-nav-link">
-                <i className="ti ti-search" />第4章 RAG特徴量
+              <a
+                className={`${styles.sideLink} ${styles.sideSub}`}
+                href="#ch4"
+                data-testid="sidebar-nav-link"
+              >
+                <i className="ti ti-search" />
+                第4章 RAG特徴量
               </a>
             </li>
             <li>
-              <a className={`${styles.sideLink} ${styles.sideSub}`} href="#ch5" data-testid="sidebar-nav-link">
-                <i className="ti ti-adjustments" />第5章 SFT
+              <a
+                className={`${styles.sideLink} ${styles.sideSub}`}
+                href="#ch5"
+                data-testid="sidebar-nav-link"
+              >
+                <i className="ti ti-adjustments" />
+                第5章 SFT
               </a>
             </li>
             <li>
-              <a className={`${styles.sideLink} ${styles.sideSub}`} href="#ch6" data-testid="sidebar-nav-link">
-                <i className="ti ti-heart-handshake" />第6章 選好整合
+              <a
+                className={`${styles.sideLink} ${styles.sideSub}`}
+                href="#ch6"
+                data-testid="sidebar-nav-link"
+              >
+                <i className="ti ti-heart-handshake" />
+                第6章 選好整合
               </a>
             </li>
             <li>
-              <a className={`${styles.sideLink} ${styles.sideSub}`} href="#ch7" data-testid="sidebar-nav-link">
-                <i className="ti ti-report-analytics" />第7章 評価
+              <a
+                className={`${styles.sideLink} ${styles.sideSub}`}
+                href="#ch7"
+                data-testid="sidebar-nav-link"
+              >
+                <i className="ti ti-report-analytics" />
+                第7章 評価
               </a>
             </li>
             <li>
-              <a className={`${styles.sideLink} ${styles.sideSub}`} href="#ch8" data-testid="sidebar-nav-link">
-                <i className="ti ti-bolt" />第8章 推論最適化
+              <a
+                className={`${styles.sideLink} ${styles.sideSub}`}
+                href="#ch8"
+                data-testid="sidebar-nav-link"
+              >
+                <i className="ti ti-bolt" />
+                第8章 推論最適化
               </a>
             </li>
             <li>
-              <a className={`${styles.sideLink} ${styles.sideSub}`} href="#ch9" data-testid="sidebar-nav-link">
-                <i className="ti ti-filter" />第9章 RAG推論
+              <a
+                className={`${styles.sideLink} ${styles.sideSub}`}
+                href="#ch9"
+                data-testid="sidebar-nav-link"
+              >
+                <i className="ti ti-filter" />
+                第9章 RAG推論
               </a>
             </li>
             <li>
-              <a className={`${styles.sideLink} ${styles.sideSub}`} href="#ch10" data-testid="sidebar-nav-link">
-                <i className="ti ti-cloud-upload" />第10章 デプロイ
+              <a
+                className={`${styles.sideLink} ${styles.sideSub}`}
+                href="#ch10"
+                data-testid="sidebar-nav-link"
+              >
+                <i className="ti ti-cloud-upload" />
+                第10章 デプロイ
               </a>
             </li>
             <li>
-              <a className={`${styles.sideLink} ${styles.sideSub}`} href="#ch11" data-testid="sidebar-nav-link">
-                <i className="ti ti-refresh" />第11章 MLOps
+              <a
+                className={`${styles.sideLink} ${styles.sideSub}`}
+                href="#ch11"
+                data-testid="sidebar-nav-link"
+              >
+                <i className="ti ti-refresh" />
+                第11章 MLOps
               </a>
             </li>
             <li>
-              <a className={`${styles.sideLink} ${styles.sideSub}`} href="#appendix" data-testid="sidebar-nav-link">
-                <i className="ti ti-clipboard-list" />付録 MLOps原則
+              <a
+                className={`${styles.sideLink} ${styles.sideSub}`}
+                href="#appendix"
+                data-testid="sidebar-nav-link"
+              >
+                <i className="ti ti-clipboard-list" />
+                付録 MLOps原則
               </a>
             </li>
             <li>
               <a className={styles.sideLink} href="#roadmap" data-testid="sidebar-nav-link">
-                <i className="ti ti-route" />学習ロードマップ
+                <i className="ti ti-route" />
+                学習ロードマップ
               </a>
             </li>
             <li>
               <a className={styles.sideLink} href="#hands-on" data-testid="sidebar-nav-link">
-                <i className="ti ti-terminal-2" />ハンズオン
+                <i className="ti ti-terminal-2" />
+                ハンズオン
               </a>
             </li>
             <li>
               <a className={styles.sideLink} href="#tools" data-testid="sidebar-nav-link">
-                <i className="ti ti-stack-2" />主要ツール一覧
+                <i className="ti ti-stack-2" />
+                主要ツール一覧
               </a>
             </li>
             <li>
               <a className={styles.sideLink} href="#prerequisites" data-testid="sidebar-nav-link">
-                <i className="ti ti-school" />前提知識
+                <i className="ti ti-school" />
+                前提知識
               </a>
             </li>
             <li>
               <a className={styles.sideLink} href="#faq" data-testid="sidebar-nav-link">
-                <i className="ti ti-help-circle" />よくある質問
+                <i className="ti ti-help-circle" />
+                よくある質問
               </a>
             </li>
             <li>
               <a className={styles.sideLink} href="#summary" data-testid="sidebar-nav-link">
-                <i className="ti ti-flag" />まとめ
+                <i className="ti ti-flag" />
+                まとめ
               </a>
             </li>
             <li>
               <a className={styles.sideLink} href="#references" data-testid="sidebar-nav-link">
-                <i className="ti ti-link" />参考文献・出典
+                <i className="ti ti-link" />
+                参考文献・出典
               </a>
             </li>
           </ul>
@@ -276,23 +361,39 @@ export default function Page() {
       <main className={styles.main}>
         <header className={styles.hero}>
           <span className={styles.kicker}>
-            <i className="ti ti-sparkles" />2026年9月9日時点の調査に基づく解説ガイド
+            <i className="ti ti-sparkles" />
+            2026年9月9日時点の調査に基づく解説ガイド
           </span>
           <h1>
             「LLM Engineer&apos;s Handbook」徹底解説
-            <br />
-            ― 初学者のためのステップバイステップ入門
+            <br />― 初学者のためのステップバイステップ入門
           </h1>
           <p className={styles.lead}>
-            本書 <strong>“LLM Engineer&apos;s Handbook”</strong>(Paul Iusztin、Maxime Labonne 著、Packt
+            本書 <strong>“LLM Engineer&apos;s Handbook”</strong>(Paul Iusztin、Maxime Labonne
+            著、Packt
             Publishing、2024年10月刊)を、LLMエンジニアリングを学び始めたばかりの人でも迷わず全体像をつかめるよう、章立てに沿って噛み砕いて解説します。O&apos;Reilly公式ページ・GitHub公式リポジトリ・国際的に著名な開発者や著者による言及を調査し、末尾に出典URLをまとめました。
           </p>
           <div className={styles.chipRow}>
-            <span className={styles.chip}><i className="ti ti-user-edit" />Paul Iusztin &amp; Maxime Labonne</span>
-            <span className={styles.chip}><i className="ti ti-building" />Packt Publishing / 2024年10月</span>
-            <span className={styles.chip}><i className="ti ti-stack-2" />522ページ / 全11章+付録</span>
-            <span className={styles.chip}><i className="ti ti-gauge" />難易度:中級〜上級</span>
-            <span className={styles.chip}><i className="ti ti-brand-github" />公式コード配布あり</span>
+            <span className={styles.chip}>
+              <i className="ti ti-user-edit" />
+              Paul Iusztin &amp; Maxime Labonne
+            </span>
+            <span className={styles.chip}>
+              <i className="ti ti-building" />
+              Packt Publishing / 2024年10月
+            </span>
+            <span className={styles.chip}>
+              <i className="ti ti-stack-2" />
+              522ページ / 全11章+付録
+            </span>
+            <span className={styles.chip}>
+              <i className="ti ti-gauge" />
+              難易度:中級〜上級
+            </span>
+            <span className={styles.chip}>
+              <i className="ti ti-brand-github" />
+              公式コード配布あり
+            </span>
           </div>
         </header>
 
@@ -300,17 +401,21 @@ export default function Page() {
           {/* ===================== INTRO ===================== */}
           <section className={styles.section} id="intro">
             <div className={styles.sectionHead}>
-              <span className={styles.iconBadge}><i className="ti ti-bulb" /></span>
+              <span className={styles.iconBadge}>
+                <i className="ti ti-bulb" />
+              </span>
               <h2>この本は何なのか ― 3行でつかむ</h2>
             </div>
             <ul>
               <li>
-                <strong>「LLM Twin」</strong>と呼ばれる、自分の文章スタイルを模倣するAIアシスタントを、企画から本番デプロイまで一気通貫で作りながらLLMエンジニアリングを学ぶ実践書です。
+                <strong>「LLM Twin」</strong>
+                と呼ばれる、自分の文章スタイルを模倣するAIアシスタントを、企画から本番デプロイまで一気通貫で作りながらLLMエンジニアリングを学ぶ実践書です。
               </li>
               <li>
                 データ収集 → RAG(検索拡張生成) → ファインチューニング → 評価 → 推論最適化 →
-                クラウドデプロイ →
-                MLOps/LLMOps運用まで、<strong>プロダクションレベルのLLMシステム開発の全工程</strong>を1冊でカバーしています。
+                クラウドデプロイ → MLOps/LLMOps運用まで、
+                <strong>プロダクションレベルのLLMシステム開発の全工程</strong>
+                を1冊でカバーしています。
               </li>
               <li>
                 対象読者は「AIエンジニア・NLPエンジニア・LLM実務者」で、O&apos;Reillyの公式ページでは難易度が
@@ -323,7 +428,9 @@ export default function Page() {
           {/* ===================== BOOK INFO ===================== */}
           <section className={styles.section} id="book-info">
             <div className={styles.sectionHead}>
-              <span className={styles.iconBadge}><i className="ti ti-book-2" /></span>
+              <span className={styles.iconBadge}>
+                <i className="ti ti-book-2" />
+              </span>
               <h2>書籍情報まとめ</h2>
             </div>
             <div className={styles.tableWrap}>
@@ -409,7 +516,9 @@ export default function Page() {
           {/* ===================== AUTHORS ===================== */}
           <section className={styles.section} id="authors">
             <div className={styles.sectionHead}>
-              <span className={styles.iconBadge}><i className="ti ti-users" /></span>
+              <span className={styles.iconBadge}>
+                <i className="ti ti-users" />
+              </span>
               <h2>著者について</h2>
             </div>
             <p>本書の信頼性を測るうえで、著者の実務背景は重要な手がかりです。</p>
@@ -423,7 +532,9 @@ export default function Page() {
                 </thead>
                 <tbody>
                   <tr>
-                    <td><strong>Paul Iusztin</strong></td>
+                    <td>
+                      <strong>Paul Iusztin</strong>
+                    </td>
                     <td>
                       シニアAIエンジニア。ニュースレター・知見発信プラットフォーム
                       <strong>Decoding ML(Decoding AI)</strong>
@@ -432,15 +543,17 @@ export default function Page() {
                     </td>
                   </tr>
                   <tr>
-                    <td><strong>Maxime Labonne</strong></td>
+                    <td>
+                      <strong>Maxime Labonne</strong>
+                    </td>
                     <td>
                       Liquid AI の<strong>Head of Post-Training</strong>(Senior Staff Machine
                       Learning Scientist)。パリ理工科大学(Polytechnic Institute of
                       Paris)で機械学習の博士号を取得し、Google Developer
                       Expert(AI/ML分野)にも認定されている。GitHub上で8万スター超を集める人気教材「
                       <strong>LLM Course</strong>
-                      」の作者としても国際的に広く知られており、書籍『Hands-On Graph Neural
-                      Networks Using Python』(Packt)の著者でもある。
+                      」の作者としても国際的に広く知られており、書籍『Hands-On Graph Neural Networks
+                      Using Python』(Packt)の著者でもある。
                     </td>
                   </tr>
                 </tbody>
@@ -454,7 +567,9 @@ export default function Page() {
           {/* ===================== REVIEWS ===================== */}
           <section className={styles.section} id="reviews">
             <div className={styles.sectionHead}>
-              <span className={styles.iconBadge}><i className="ti ti-star" /></span>
+              <span className={styles.iconBadge}>
+                <i className="ti ti-star" />
+              </span>
               <h2>なぜ話題になっているのか(評価・レビュー)</h2>
             </div>
             <p>
@@ -471,22 +586,25 @@ export default function Page() {
                 Zorz氏執筆)では、本書がFTI(feature/training/inference)パイプライン設計を軸に、現実的な計算リソース制約(小規模チーム・限られたGPU)を前提とした実務的なロードマップを提示している点を評価しつつ、「初心者向けの入門書ではなく、LLM・ベクトルDB・MLOpsパターンにある程度慣れている読者を想定している」と率直に指摘しています。
               </li>
               <li>
-                テック系ブログメディア<strong>Javarevisited</strong>(35,000人超のフォロワーを持つ著名執筆者
-                javinpaul
-                氏)によるレビュー(2025年6月)では、本書が<strong>1万部以上</strong>販売されている実績を紹介し、「LangChainの使い方を教えるだけでなく、AIプロダクトアーキテクトとしての思考法を教えてくれる」と評しています。
+                テック系ブログメディア<strong>Javarevisited</strong>
+                (35,000人超のフォロワーを持つ著名執筆者 javinpaul
+                氏)によるレビュー(2025年6月)では、本書が<strong>1万部以上</strong>
+                販売されている実績を紹介し、「LangChainの使い方を教えるだけでなく、AIプロダクトアーキテクトとしての思考法を教えてくれる」と評しています。
               </li>
               <li>
-                学習コミュニティ<strong>DataTalks.Club</strong>(データエンジニアリング/ML教育で著名なAlexey
-                Grigorev氏が運営)では、本書が「Book of the Week」として紹介されています。
+                学習コミュニティ<strong>DataTalks.Club</strong>
+                (データエンジニアリング/ML教育で著名なAlexey Grigorev氏が運営)では、本書が「Book of
+                the Week」として紹介されています。
               </li>
               <li>
-                RAG/LLMアプリケーション開発の分野で著名なエンジニア<strong>duarteocarmo</strong>氏が公開したおすすめリソース集(GitHub
-                Gist)には、Jason Liu氏やSimon Willison氏、Ben
+                RAG/LLMアプリケーション開発の分野で著名なエンジニア<strong>duarteocarmo</strong>
+                氏が公開したおすすめリソース集(GitHub Gist)には、Jason Liu氏やSimon Willison氏、Ben
                 Clavié氏といった国際的に著名なLLM/RAG実務者の発信と並んで、本書が実践的リソースの一つとして掲載されています。
               </li>
               <li>
-                LLM関連リソースのキュレーションリポジトリ<strong>SylphAI-Inc/LLM-engineer-handbook</strong>(READMEで言及)では、本書が
-                Andrej Karpathy氏の講義や Sebastian Raschka氏・Chip
+                LLM関連リソースのキュレーションリポジトリ
+                <strong>SylphAI-Inc/LLM-engineer-handbook</strong>(READMEで言及)では、本書が Andrej
+                Karpathy氏の講義や Sebastian Raschka氏・Chip
                 Huyen氏の著作と並んで、LLMライフサイクル(学習・提供・ファインチューニング・アプリ構築)を学ぶための代表的な書籍として紹介されています。
               </li>
               <li>
@@ -494,7 +612,11 @@ export default function Page() {
                 Brownlee氏)によると、Amazonレーティングは4.6、Goodreadsレーティングは3.85となっています(2026年9月時点の調査ベース)。
               </li>
             </ul>
-            <div className={`${styles.callout} ${styles.info}`} data-testid="callout" data-variant="info">
+            <div
+              className={`${styles.callout} ${styles.info}`}
+              data-testid="callout"
+              data-variant="info"
+            >
               <i className="ti ti-info-circle" />
               <div className={styles.calloutBody}>
                 <p>
@@ -507,7 +629,9 @@ export default function Page() {
           {/* ===================== LLM TWIN OVERVIEW ===================== */}
           <section className={styles.section} id="llm-twin">
             <div className={styles.sectionHead}>
-              <span className={styles.iconBadge}><i className="ti ti-robot" /></span>
+              <span className={styles.iconBadge}>
+                <i className="ti ti-robot" />
+              </span>
               <h2>全体像:「LLM Twin」という教材プロジェクト</h2>
             </div>
             <p>
@@ -531,17 +655,27 @@ export default function Page() {
           {/* ===================== DATA ETHICS ===================== */}
           <section className={styles.section} id="data-ethics">
             <div className={styles.sectionHead}>
-              <span className={styles.iconBadge}><i className="ti ti-shield-check" /></span>
+              <span className={styles.iconBadge}>
+                <i className="ti ti-shield-check" />
+              </span>
               <h2>データ収集時の注意</h2>
             </div>
-            <div className={`${styles.callout} ${styles.warn}`} data-testid="callout" data-variant="warn">
+            <div
+              className={`${styles.callout} ${styles.warn}`}
+              data-testid="callout"
+              data-variant="warn"
+            >
               <i className="ti ti-alert-triangle" />
               <div className={styles.calloutBody}>
                 <strong className={styles.calloutTitle}>
                   収集してよいのは自分のコンテンツ、または許諾を得たコンテンツのみ
                 </strong>
                 <p>
-                  このデータ収集パイプラインで扱ってよいのは、<strong>自分が著作権を持つコンテンツか、利用許諾を得たコンテンツに限られます</strong>。LLM
+                  このデータ収集パイプラインで扱ってよいのは、
+                  <strong>
+                    自分が著作権を持つコンテンツか、利用許諾を得たコンテンツに限られます
+                  </strong>
+                  。LLM
                   Twinは「自分の分身」を作る題材であり、他人のアカウントや第三者の投稿を無断で収集する用途を想定していません。
                 </p>
               </div>
@@ -558,12 +692,14 @@ export default function Page() {
               </li>
               <li>
                 <strong>保存期間と派生データの削除</strong>
-                :保持期間は生データだけでなく、そこから派生した<em>すべてのデータ</em>に適用します。元の投稿が削除された場合、利用許諾が撤回された場合、保存期限が到来した場合は、以下を漏れなく無効化・削除してください。LLM
+                :保持期間は生データだけでなく、そこから派生した<em>すべてのデータ</em>
+                に適用します。元の投稿が削除された場合、利用許諾が撤回された場合、保存期限が到来した場合は、以下を漏れなく無効化・削除してください。LLM
                 Twinでは1件の生データがMongoDB→チャンク→埋め込み→データセット→モデル→監視ログへと多段に複製されるため、生データだけ消しても実質的には残り続けます。
                 <ul>
                   <li>MongoDBの生ドキュメント(データウェアハウス層)</li>
                   <li>
-                    特徴量パイプラインが生成したチャンクとその埋め込み、およびQdrant内の該当ポイント(<code>author_id</code>などのメタデータで絞り込んで削除する)
+                    特徴量パイプラインが生成したチャンクとその埋め込み、およびQdrant内の該当ポイント(
+                    <code>author_id</code>などのメタデータで絞り込んで削除する)
                   </li>
                   <li>
                     生成済みの指示データセット・選好データセット(該当サンプルを除去したうえで再生成する)
@@ -575,7 +711,8 @@ export default function Page() {
                     プロンプト監視・トレースに保存された入出力ログ(Cometなどの監視基盤側の保持設定も確認する)
                   </li>
                   <li>
-                    削除後は、削除対象の<code>author_id</code>や文書IDでMongoDB・Qdrant・データセット・監視ログをそれぞれ再検索し、ヒットが0件であることを確認して記録に残す
+                    削除後は、削除対象の<code>author_id</code>
+                    や文書IDでMongoDB・Qdrant・データセット・監視ログをそれぞれ再検索し、ヒットが0件であることを確認して記録に残す
                   </li>
                 </ul>
               </li>
@@ -589,7 +726,9 @@ export default function Page() {
           {/* ===================== FTI ===================== */}
           <section className={styles.section} id="fti">
             <div className={styles.sectionHead}>
-              <span className={styles.iconBadge}><i className="ti ti-sitemap" /></span>
+              <span className={styles.iconBadge}>
+                <i className="ti ti-sitemap" />
+              </span>
               <h2>アーキテクチャの核:FTIパイプライン設計</h2>
             </div>
             <p>
@@ -610,7 +749,11 @@ export default function Page() {
             </p>
             <ul>
               <li>
-                各パイプラインを<strong>異なるチーム・異なる言語・異なるインフラで独立して開発・スケールできる</strong>こと
+                各パイプラインを
+                <strong>
+                  異なるチーム・異なる言語・異なるインフラで独立して開発・スケールできる
+                </strong>
+                こと
               </li>
               <li>
                 「特徴量ストア」と「モデルレジストリ」という共有の受け渡し場所(インターフェース)さえ守れば、内部実装を自由に差し替えられること
@@ -629,7 +772,9 @@ export default function Page() {
           {/* ===================== CHAPTER OVERVIEW ===================== */}
           <section className={styles.section} id="ch-overview">
             <div className={styles.sectionHead}>
-              <span className={styles.iconBadge}><i className="ti ti-list-details" /></span>
+              <span className={styles.iconBadge}>
+                <i className="ti ti-list-details" />
+              </span>
               <h2>章立てで見る本書の構成(全11章+付録)</h2>
             </div>
             <p>
@@ -732,7 +877,9 @@ export default function Page() {
 
           {/* ===================== CHAPTER 1 ===================== */}
           <section className={styles.section} id="ch1">
-            <h3><span className={styles.h3Num}>1</span>LLM Twinの概念とアーキテクチャ理解</h3>
+            <h3>
+              <span className={styles.h3Num}>1</span>LLM Twinの概念とアーキテクチャ理解
+            </h3>
             <p>
               なぜ既存のチャットボット(ChatGPTなど)をそのまま使うのではなく、自分専用のLLMシステムを構築する意味があるのかという「Why」から始まり、MVPの要件定義、そして前述のFTIパイプライン設計に落とし込むまでの思考プロセスを学びます。ここで学ぶ設計原則は、以降のすべての章の土台になります。
             </p>
@@ -740,7 +887,9 @@ export default function Page() {
 
           {/* ===================== CHAPTER 2 ===================== */}
           <section className={styles.section} id="ch2">
-            <h3><span className={styles.h3Num}>2</span>ツールとインストール</h3>
+            <h3>
+              <span className={styles.h3Num}>2</span>ツールとインストール
+            </h3>
             <p>
               本書の実装は特定の技術スタックに強く依存しているため、この章で環境を整えることが後続章をスムーズに進める鍵になります。Poetry(依存関係管理)、Poe
               the Poet(タスクランナー)、ZenML(オーケストレーション)、Comet
@@ -751,7 +900,9 @@ export default function Page() {
 
           {/* ===================== CHAPTER 3 ===================== */}
           <section className={styles.section} id="ch3">
-            <h3><span className={styles.h3Num}>3</span>データエンジニアリング</h3>
+            <h3>
+              <span className={styles.h3Num}>3</span>データエンジニアリング
+            </h3>
             <p>
               LinkedIn・Medium・GitHub・個人ブログなど複数ソースから、それぞれ異なる形式のデータをクロールするための「ディスパッチャー
               + クローラー」パターンを実装します。取得したデータはODM(Object-Document
@@ -765,7 +916,9 @@ export default function Page() {
 
           {/* ===================== CHAPTER 4 ===================== */}
           <section className={styles.section} id="ch4">
-            <h3><span className={styles.h3Num}>4</span>RAG特徴量パイプライン</h3>
+            <h3>
+              <span className={styles.h3Num}>4</span>RAG特徴量パイプライン
+            </h3>
             <p>
               RAG(Retrieval-Augmented
               Generation)がなぜ必要か(ハルシネーション対策、情報の鮮度対策)という基礎から始まり、埋め込み・ベクトルDBの仕組み、そして「Vanilla
@@ -782,7 +935,9 @@ export default function Page() {
 
           {/* ===================== CHAPTER 5 ===================== */}
           <section className={styles.section} id="ch5">
-            <h3><span className={styles.h3Num}>5</span>教師ありファインチューニング(SFT)</h3>
+            <h3>
+              <span className={styles.h3Num}>5</span>教師ありファインチューニング(SFT)
+            </h3>
             <p>
               質の高い指示データセットをどう作るか(データ量・データキュレーション・重複排除・データ汚染除去・データ品質評価)を丁寧に扱ったうえで、いつファインチューニングすべきか、チャットテンプレートの扱い方、そしてLoRA・QLoRAといったパラメータ効率の良いファインチューニング手法(PEFT)を実装します。
             </p>
@@ -818,11 +973,13 @@ export default function Page() {
 
           {/* ===================== CHAPTER 6 ===================== */}
           <section className={styles.section} id="ch6">
-            <h3><span className={styles.h3Num}>6</span>選好アライメントによるファインチューニング</h3>
+            <h3>
+              <span className={styles.h3Num}>6</span>選好アライメントによるファインチューニング
+            </h3>
             <p>
               SFTだけでは「文法的に正しいが人間の好みに沿わない」出力になりがちな問題に対し、選好データセット(どちらの回答がより好ましいかのペア)を作成し、
-              <strong>RLHF(Reinforcement Learning from Human Feedback)</strong>
-              と<strong>DPO(Direct Preference Optimization)</strong>
+              <strong>RLHF(Reinforcement Learning from Human Feedback)</strong>と
+              <strong>DPO(Direct Preference Optimization)</strong>
               という2つのアライメント手法を比較しながら、実際にDPOを実装してTwinLlama-3.1-8Bモデルを仕上げます。
             </p>
             <div className={styles.diagramWrap}>
@@ -833,15 +990,21 @@ export default function Page() {
 
           {/* ===================== CHAPTER 7 ===================== */}
           <section className={styles.section} id="ch7">
-            <h3><span className={styles.h3Num}>7</span>LLMの評価</h3>
+            <h3>
+              <span className={styles.h3Num}>7</span>LLMの評価
+            </h3>
             <p>
-              従来のML評価とLLM評価の違いを整理したうえで、汎用LLM評価・ドメイン特化評価・タスク特化評価という3レイヤーで評価手法を体系化しています。RAGパイプラインの評価には<strong>Ragas</strong>や<strong>ARES</strong>といった専用フレームワークを使い、実際に自分たちが作ったTwinLlama-3.1-8Bモデルの回答を生成・評価・分析するところまで実践します。
+              従来のML評価とLLM評価の違いを整理したうえで、汎用LLM評価・ドメイン特化評価・タスク特化評価という3レイヤーで評価手法を体系化しています。RAGパイプラインの評価には
+              <strong>Ragas</strong>や<strong>ARES</strong>
+              といった専用フレームワークを使い、実際に自分たちが作ったTwinLlama-3.1-8Bモデルの回答を生成・評価・分析するところまで実践します。
             </p>
           </section>
 
           {/* ===================== CHAPTER 8 ===================== */}
           <section className={styles.section} id="ch8">
-            <h3><span className={styles.h3Num}>8</span>推論最適化</h3>
+            <h3>
+              <span className={styles.h3Num}>8</span>推論最適化
+            </h3>
             <p>
               学習が終わったモデルを、実際に低遅延・高スループットで動かすための最適化技術を扱います。KVキャッシュ、Continuous
               Batching、Speculative
@@ -875,20 +1038,28 @@ export default function Page() {
 
           {/* ===================== CHAPTER 9 ===================== */}
           <section className={styles.section} id="ch9">
-            <h3><span className={styles.h3Num}>9</span>RAG推論パイプライン</h3>
+            <h3>
+              <span className={styles.h3Num}>9</span>RAG推論パイプライン
+            </h3>
             <p>
               第4章で扱ったRAGの基礎を踏まえ、実際の推論時に効くAdvanced
-              RAGテクニックを実装します。前処理側では<strong>クエリ拡張</strong>と<strong>Self-Querying</strong>、検索側では<strong>フィルタ付きベクトル検索</strong>、後処理側では<strong>リランキング</strong>を組み合わせ、それらを1本のRAG推論パイプラインとして統合します。
+              RAGテクニックを実装します。前処理側では<strong>クエリ拡張</strong>と
+              <strong>Self-Querying</strong>、検索側では<strong>フィルタ付きベクトル検索</strong>
+              、後処理側では<strong>リランキング</strong>
+              を組み合わせ、それらを1本のRAG推論パイプラインとして統合します。
             </p>
           </section>
 
           {/* ===================== CHAPTER 10 ===================== */}
           <section className={styles.section} id="ch10">
-            <h3><span className={styles.h3Num}>10</span>推論パイプラインのデプロイ</h3>
+            <h3>
+              <span className={styles.h3Num}>10</span>推論パイプラインのデプロイ
+            </h3>
             <p>
               「オンラインのリアルタイム推論」「非同期推論」「オフラインのバッチ推論」という3つのデプロイ方式それぞれの特徴と使い分け、さらに「モノリシック」対「マイクロサービス」というモデル提供アーキテクチャの選び方を整理したうえで、実際に
               <strong>AWS SageMaker</strong>
-              へLLMマイクロサービスをデプロイし、<strong>FastAPI</strong>でビジネスロジック側のサービスを構築、オートスケーリング設定まで行います。
+              へLLMマイクロサービスをデプロイし、<strong>FastAPI</strong>
+              でビジネスロジック側のサービスを構築、オートスケーリング設定まで行います。
             </p>
             <div className={styles.diagramWrap}>
               <MermaidDiagram id="diag-deploy" chart={DIAGRAM_DEPLOY} />
@@ -898,7 +1069,9 @@ export default function Page() {
 
           {/* ===================== CHAPTER 11 ===================== */}
           <section className={styles.section} id="ch11">
-            <h3><span className={styles.h3Num}>11</span>MLOpsとLLMOps</h3>
+            <h3>
+              <span className={styles.h3Num}>11</span>MLOpsとLLMOps
+            </h3>
             <p>
               DevOps→MLOps→LLMOpsという概念の発展の歴史を整理し、人間からのフィードバック・ガードレール・プロンプト監視といったLLMOps特有の要素を導入します。実装面では、LLM
               Twinの各パイプラインをクラウド(MongoDB・Qdrant・ZenML
@@ -913,7 +1086,9 @@ export default function Page() {
 
           {/* ===================== APPENDIX ===================== */}
           <section className={styles.section} id="appendix">
-            <h3><span className={styles.h3Num}>付</span>付録:MLOpsの原則</h3>
+            <h3>
+              <span className={styles.h3Num}>付</span>付録:MLOpsの原則
+            </h3>
             <p>
               自動化(オペレーション化)、バージョニング、実験管理、テスト、監視、再現性という6つの原則を、本編の実装に紐づけながら総まとめする章です。監視についてはログ・メトリクス(システム/モデル)・ドリフト検知・アラートまで細かく整理されています。
             </p>
@@ -922,7 +1097,9 @@ export default function Page() {
           {/* ===================== ROADMAP ===================== */}
           <section className={styles.section} id="roadmap">
             <div className={styles.sectionHead}>
-              <span className={styles.iconBadge}><i className="ti ti-route" /></span>
+              <span className={styles.iconBadge}>
+                <i className="ti ti-route" />
+              </span>
               <h2>初学者向け・学習ロードマップ</h2>
             </div>
             <p>
@@ -932,13 +1109,18 @@ export default function Page() {
               <MermaidDiagram id="diag-roadmap" chart={DIAGRAM_ROADMAP} />
             </div>
             <p className={styles.diagramCaption}>図:初学者向け学習ロードマップ(ステップ1〜9)</p>
-            <div className={`${styles.callout} ${styles.default}`} data-testid="callout" data-variant="default">
+            <div
+              className={`${styles.callout} ${styles.default}`}
+              data-testid="callout"
+              data-variant="default"
+            >
               <i className="ti ti-flag-3" />
               <div className={styles.calloutBody}>
                 <strong className={styles.calloutTitle}>ポイント</strong>
                 <p>
                   第2章(環境構築)を後回しにせず先に済ませておくと、第3章以降の「実際に手を動かす」パートで詰まりにくくなります。また、AWSやOpenAI
-                  APIの利用は従量課金のため、GitHub公式リポジトリのREADMEでは一通り実行した場合のコストが<strong>おおよそ25米ドル程度</strong>(主にAWS
+                  APIの利用は従量課金のため、GitHub公式リポジトリのREADMEでは一通り実行した場合のコストが
+                  <strong>おおよそ25米ドル程度</strong>(主にAWS
                   SageMakerでの学習・推論費用)になると案内されています。予算感を把握したうえで進めることをおすすめします。
                 </p>
               </div>
@@ -948,7 +1130,9 @@ export default function Page() {
           {/* ===================== HANDS-ON ===================== */}
           <section className={styles.section} id="hands-on">
             <div className={styles.sectionHead}>
-              <span className={styles.iconBadge}><i className="ti ti-terminal-2" /></span>
+              <span className={styles.iconBadge}>
+                <i className="ti ti-terminal-2" />
+              </span>
               <h2>ハンズオン:公式GitHubリポジトリを動かす</h2>
             </div>
             <p>
@@ -963,7 +1147,9 @@ export default function Page() {
               で公開されており、書籍刊行後も継続的にメンテナンスされています(書籍本文とコードに差異がある場合は、常にこのリポジトリが最新版として優先されます)。
             </p>
 
-            <h3><span className={styles.h3Num}>a</span>ローカル環境の依存関係</h3>
+            <h3>
+              <span className={styles.h3Num}>a</span>ローカル環境の依存関係
+            </h3>
             <div className={styles.tableWrap}>
               <table>
                 <thead>
@@ -1013,41 +1199,43 @@ export default function Page() {
               </table>
             </div>
 
-            <h3><span className={styles.h3Num}>b</span>セットアップの流れ(概要)</h3>
+            <h3>
+              <span className={styles.h3Num}>b</span>セットアップの流れ(概要)
+            </h3>
             <ul className={styles.checklist} id="setupChecklist">
               <li>
                 <input type="checkbox" id="s1" />
                 <label htmlFor="s1">
                   リポジトリをクローンする:
-                  <code>git clone https://github.com/PacktPublishing/LLM-Engineers-Handbook.git</code>
+                  <code>
+                    git clone https://github.com/PacktPublishing/LLM-Engineers-Handbook.git
+                  </code>
                 </label>
               </li>
               <li>
                 <input type="checkbox" id="s2" />
                 <label htmlFor="s2">
                   クローンしたリポジトリへ移動する:<code>cd LLM-Engineers-Handbook</code>
-                  (以降のPoetryコマンドと<code>.env</code>の読み込みは、すべてこのディレクトリ内で実行する)
+                  (以降のPoetryコマンドと<code>.env</code>
+                  の読み込みは、すべてこのディレクトリ内で実行する)
                 </label>
               </li>
               <li>
                 <input type="checkbox" id="s3" />
-                <label htmlFor="s3">
-                  Python 3.11環境を用意する(pyenv推奨)
-                </label>
+                <label htmlFor="s3">Python 3.11環境を用意する(pyenv推奨)</label>
               </li>
               <li>
                 <input type="checkbox" id="s4" />
-                <label htmlFor="s4">
-                  Poetryで依存関係をインストールする(下記コマンド参照)
-                </label>
+                <label htmlFor="s4">Poetryで依存関係をインストールする(下記コマンド参照)</label>
               </li>
               <li>
                 <input type="checkbox" id="s5" />
                 <label htmlFor="s5">
-                  <code>.env.example</code> を <code>.env</code> にコピーし、OpenAI
-                  APIキー・Hugging Faceトークン・Comet APIキーなどの認証情報を設定する。
+                  <code>.env.example</code> を <code>.env</code> にコピーし、OpenAI APIキー・Hugging
+                  Faceトークン・Comet APIキーなどの認証情報を設定する。
                   <strong>
-                    <code>.env</code> は <code>.gitignore</code> で除外されていることを必ず確認し、コミットも共有も絶対に行わない
+                    <code>.env</code> は <code>.gitignore</code>{" "}
+                    で除外されていることを必ず確認し、コミットも共有も絶対に行わない
                   </strong>
                   (APIキーが第三者に渡ると不正利用や課金事故に直結する)
                 </label>
@@ -1089,7 +1277,9 @@ export default function Page() {
                 </label>
               </li>
             </ul>
-            <p className={styles.checklistCounter} id="checklistCounter">0/10 完了</p>
+            <p className={styles.checklistCounter} id="checklistCounter">
+              0/10 完了
+            </p>
 
             <div className={styles.codeBlock} data-testid="code-block">
               <div className={styles.codeLabel}>手順4:Poetryでの依存関係インストール</div>
@@ -1102,7 +1292,11 @@ export default function Page() {
               </pre>
             </div>
 
-            <div className={`${styles.callout} ${styles.warn}`} data-testid="callout" data-variant="warn">
+            <div
+              className={`${styles.callout} ${styles.warn}`}
+              data-testid="callout"
+              data-variant="warn"
+            >
               <i className="ti ti-alert-triangle" />
               <div className={styles.calloutBody}>
                 <strong className={styles.calloutTitle}>
@@ -1116,9 +1310,7 @@ export default function Page() {
                     <code>LinkedInCrawler</code> は非推奨(deprecated)であり、既定では利用できません
                   </strong>
                   。同クラスは <code>is_deprecated=True</code> が設定されており、
-                  <code>login()</code>
-                  と <code>extract()</code> は
-                  <code>DeprecationWarning</code>
+                  <code>login()</code>と <code>extract()</code> は<code>DeprecationWarning</code>
                   を送出して処理を行いません。LinkedInを収集対象として前提にした手順は組まず、サポートされているデータソース(Medium・GitHub・個人ブログなど)で進めてください(LinkedInの自動収集は利用規約上の制約もあります。前述の「データ収集時の注意」を参照)。
                 </p>
                 <p>
@@ -1126,15 +1318,14 @@ export default function Page() {
                   <code>brew install --cask google-chrome</code>、Debian/Ubuntuは公式パッケージの
                   <code>google-chrome-stable</code>
                   を導入します。ChromeDriver自体は手動導入不要で、
-                  <code>llm_engineering.application.crawlers.base</code>
-                  の
+                  <code>llm_engineering.application.crawlers.base</code>の
                   <code>chromedriver_autoinstaller.install()</code>
                   がインストール済みChromeのバージョンに対応するChromeDriverを自動取得します。
                 </p>
                 <p>
                   ただしこの処理は
-                  <code>BaseSeleniumCrawler</code>
-                  の<strong>import時点</strong>に走り、<strong>ネットワーク接続が前提</strong>である点に注意してください。
+                  <code>BaseSeleniumCrawler</code>の<strong>import時点</strong>に走り、
+                  <strong>ネットワーク接続が前提</strong>である点に注意してください。
                   <code>install()</code>
                   はChromeのバージョンに対応するドライバのバージョンを解決するために外部エンドポイントへ問い合わせるため、ChromeDriverを事前に配置・キャッシュしてあっても、オフライン環境やプロキシで外部通信が制限された環境では
                   import の時点で失敗しうります。
@@ -1147,10 +1338,11 @@ export default function Page() {
                   </strong>
                   です。<code>install()</code> は <code>BaseSeleniumCrawler</code> の
                   <code>__init__</code> の中ではなく
-                  <code>llm_engineering.application.crawlers.base</code>
-                  の<strong>モジュール直下</strong>に書かれているため、クラスを継承するにせよインスタンス化しないにせよ、
-                  <strong>当該モジュールをimportした時点で必ず実行されます</strong>
-                  (<code>MediumCrawler</code>
+                  <code>llm_engineering.application.crawlers.base</code>の
+                  <strong>モジュール直下</strong>
+                  に書かれているため、クラスを継承するにせよインスタンス化しないにせよ、
+                  <strong>当該モジュールをimportした時点で必ず実行されます</strong>(
+                  <code>MediumCrawler</code>
                   などの具象クローラーは base を import するため、これらを import
                   するだけでも走ります)。したがって回避するには次のいずれかが必要です。
                 </p>
@@ -1187,25 +1379,38 @@ export default function Page() {
               <pre>
                 <code className="language-bash">
                   <span className={styles.codeLine}>poetry poe build-docker-image</span>
-                  <span className={styles.codeLine}>poetry poe run-docker-end-to-end-data-pipeline</span>
+                  <span className={styles.codeLine}>
+                    poetry poe run-docker-end-to-end-data-pipeline
+                  </span>
                 </code>
               </pre>
             </div>
             <p>
               後者は <code>.env</code> を読み込むため、手順5を先に済ませておく必要があります。また
               <strong>
-                Docker(<code>run-docker-end-to-end-data-pipeline</code>)を選んだ場合、手順8のデータ収集〜データセット生成はコンテナ内で実行済みのため重複実行しないでください
+                Docker(<code>run-docker-end-to-end-data-pipeline</code>
+                )を選んだ場合、手順8のデータ収集〜データセット生成はコンテナ内で実行済みのため重複実行しないでください
               </strong>
               (再実行するとクロールとデータセット生成が二重に走ります)。なお
               <code>end_to_end_data</code> パイプラインは既定の
               <code>DatasetType.INSTRUCTION</code>
-              で動くため、<strong>生成されるのは指示(instruct)データセットのみで、選好(preference)データセットは含まれません</strong>。選好データセットが必要な場合は手順9を別途実行してください(ローカル実行・Docker実行のどちらを選んだ場合でも必要。SFTのみを行う場合は不要です)。
+              で動くため、
+              <strong>
+                生成されるのは指示(instruct)データセットのみで、選好(preference)データセットは含まれません
+              </strong>
+              。選好データセットが必要な場合は手順9を別途実行してください(ローカル実行・Docker実行のどちらを選んだ場合でも必要。SFTのみを行う場合は不要です)。
             </p>
 
-            <div className={`${styles.callout} ${styles.info}`} data-testid="callout" data-variant="info">
+            <div
+              className={`${styles.callout} ${styles.info}`}
+              data-testid="callout"
+              data-variant="info"
+            >
               <i className="ti ti-cloud-lock" />
               <div className={styles.calloutBody}>
-                <strong className={styles.calloutTitle}>手順10:AWSの権限設計(最小権限の原則)</strong>
+                <strong className={styles.calloutTitle}>
+                  手順10:AWSの権限設計(最小権限の原則)
+                </strong>
                 <ul>
                   <li>
                     <strong>ブートストラップ(一時的な管理者権限)</strong>:<code>aws configure</code>
@@ -1213,16 +1418,14 @@ export default function Page() {
                     role)を作成する。この管理者キーの用途はロール作成までに限定する
                   </li>
                   <li>
-                    作成した実行ロールのARNを <code>.env</code> の
-                    <code>AWS_ARN_ROLE</code>
+                    作成した実行ロールのARNを <code>.env</code> の<code>AWS_ARN_ROLE</code>
                     に設定し、<code>AWS_REGION</code>(例:<code>eu-central-1</code>)も設定する
                   </li>
                   <li>
                     <strong>運用用の最小権限ユーザーを別途作成する</strong>
                     :SageMakerの学習・デプロイ・推論に必要な権限のみを付与したIAMユーザーを作成してアクセスキーを発行し、
-                    <code>.env</code>
-                    の <code>AWS_ACCESS_KEY</code> と
-                    <code>AWS_SECRET_KEY</code> をそのユーザーの値に置き換える(管理者キーを
+                    <code>.env</code>の <code>AWS_ACCESS_KEY</code> と<code>AWS_SECRET_KEY</code>{" "}
+                    をそのユーザーの値に置き換える(管理者キーを
                     <code>.env</code> に残さない)
                   </li>
                   <li>
@@ -1244,9 +1447,15 @@ export default function Page() {
               </div>
             </div>
 
-            <h3><span className={styles.h3Num}>c</span>プロジェクト構成の考え方</h3>
+            <h3>
+              <span className={styles.h3Num}>c</span>プロジェクト構成の考え方
+            </h3>
             <p>
-              コードは<strong>ドメイン駆動設計(DDD)</strong>の思想に基づき、<code>domain/</code>(コアなビジネスエンティティ)→<code>application/</code>(クローラーやRAGなどのビジネスロジック)→<code>model/</code>(学習・推論)→<code>infrastructure/</code>(AWS・Qdrant・MongoDB・FastAPIなど外部サービス連携)という層に分割されています。パイプライン全体の入口は
+              コードは<strong>ドメイン駆動設計(DDD)</strong>の思想に基づき、<code>domain/</code>
+              (コアなビジネスエンティティ)→<code>application/</code>
+              (クローラーやRAGなどのビジネスロジック)→<code>model/</code>(学習・推論)→
+              <code>infrastructure/</code>
+              (AWS・Qdrant・MongoDB・FastAPIなど外部サービス連携)という層に分割されています。パイプライン全体の入口は
               <code>pipelines/</code>
               ディレクトリのZenMLパイプライン定義であり、迷ったときはまずここから読むのが公式README推奨のアプローチです。
             </p>
@@ -1255,7 +1464,9 @@ export default function Page() {
           {/* ===================== TOOLS ===================== */}
           <section className={styles.section} id="tools">
             <div className={styles.sectionHead}>
-              <span className={styles.iconBadge}><i className="ti ti-stack-2" /></span>
+              <span className={styles.iconBadge}>
+                <i className="ti ti-stack-2" />
+              </span>
               <h2>使用される主要ツール・サービス一覧</h2>
             </div>
             <div className={styles.tableWrap}>
@@ -1326,7 +1537,9 @@ export default function Page() {
           {/* ===================== PREREQUISITES ===================== */}
           <section className={styles.section} id="prerequisites">
             <div className={styles.sectionHead}>
-              <span className={styles.iconBadge}><i className="ti ti-school" /></span>
+              <span className={styles.iconBadge}>
+                <i className="ti ti-school" />
+              </span>
               <h2>読む前に押さえておきたい前提知識</h2>
             </div>
             <p>
@@ -1349,8 +1562,8 @@ export default function Page() {
               </li>
             </ul>
             <p>
-              これらの前提知識を補いたい場合、著者の一人であるMaxime
-              Labonne氏が公開している無料の<strong>「LLM Course」</strong>
+              これらの前提知識を補いたい場合、著者の一人であるMaxime Labonne氏が公開している無料の
+              <strong>「LLM Course」</strong>
               (GitHub上で8万スター超)は、LLMの基礎からファインチューニング・量子化までをロードマップ形式で学べる教材として、本書と併読する形で参照されることが多い教材です。
             </p>
           </section>
@@ -1358,29 +1571,39 @@ export default function Page() {
           {/* ===================== FAQ ===================== */}
           <section className={styles.section} id="faq">
             <div className={styles.sectionHead}>
-              <span className={styles.iconBadge}><i className="ti ti-help-circle" /></span>
+              <span className={styles.iconBadge}>
+                <i className="ti ti-help-circle" />
+              </span>
               <h2>よくある質問(FAQ)</h2>
             </div>
 
-            <h3><span className={styles.h3Num}>Q</span>プログラミング初心者でもいきなり読めますか?</h3>
+            <h3>
+              <span className={styles.h3Num}>Q</span>プログラミング初心者でもいきなり読めますか?
+            </h3>
             <p>
               本書自体はO&apos;Reillyの表示どおり「中級〜上級」向けであり、Pythonの実務経験がまったくない状態でいきなり全章を実装するのは難易度が高めです。まずはPythonの基礎とAPI/クラウドの基本概念を押さえたうえで、第1〜2章で全体設計とツール群を理解し、写経しながら第3章以降に進むのが挫折しにくい進め方です。
             </p>
 
-            <h3><span className={styles.h3Num}>Q</span>高性能なGPUを持っていなくても実践できますか?</h3>
+            <h3>
+              <span className={styles.h3Num}>Q</span>高性能なGPUを持っていなくても実践できますか?
+            </h3>
             <p>
               学習・推論はAWS
               SageMaker上で行う設計になっており、ローカルに強力なGPUがなくても進められます。ただしAWSやOpenAI
-              APIは従量課金のため、公式リポジトリのREADMEでは一通り実行した場合のコスト目安として<strong>約25米ドル</strong>が案内されています。
+              APIは従量課金のため、公式リポジトリのREADMEでは一通り実行した場合のコスト目安として
+              <strong>約25米ドル</strong>が案内されています。
             </p>
 
-            <h3><span className={styles.h3Num}>Q</span>日本語で読めるバージョンはありますか?</h3>
+            <h3>
+              <span className={styles.h3Num}>Q</span>日本語で読めるバージョンはありますか?
+            </h3>
             <p>
               2026年9月時点で調査した範囲では、原著は英語版のみの提供です(O&apos;Reilly上の書誌情報でも言語表示は英語)。
             </p>
 
             <h3>
-              <span className={styles.h3Num}>Q</span>この本と、実務でよく聞く「LLMOps」はどう関係していますか?
+              <span className={styles.h3Num}>Q</span>
+              この本と、実務でよく聞く「LLMOps」はどう関係していますか?
             </h3>
             <p>
               第11章がまさにLLMOpsの章にあたり、DevOps→MLOps→LLMOpsという発展の流れと、人間フィードバック・ガードレール・プロンプト監視といったLLM特有の運用要素を、本書のLLM
@@ -1388,7 +1611,8 @@ export default function Page() {
             </p>
 
             <h3>
-              <span className={styles.h3Num}>Q</span>本を読まずにGitHubリポジトリだけ動かすことはできますか?
+              <span className={styles.h3Num}>Q</span>
+              本を読まずにGitHubリポジトリだけ動かすことはできますか?
             </h3>
             <p>
               技術的には可能ですが、公式READMEでも「Chapter 2で各ツールの解説、Chapter
@@ -1399,7 +1623,9 @@ export default function Page() {
           {/* ===================== SUMMARY ===================== */}
           <section className={styles.section} id="summary">
             <div className={styles.sectionHead}>
-              <span className={styles.iconBadge}><i className="ti ti-flag" /></span>
+              <span className={styles.iconBadge}>
+                <i className="ti ti-flag" />
+              </span>
               <h2>まとめ</h2>
             </div>
             <p>
@@ -1420,12 +1646,16 @@ export default function Page() {
           {/* ===================== REFERENCES ===================== */}
           <section className={styles.section} id="references">
             <div className={styles.sectionHead}>
-              <span className={styles.iconBadge}><i className="ti ti-link" /></span>
+              <span className={styles.iconBadge}>
+                <i className="ti ti-link" />
+              </span>
               <h2>参考文献・出典URL一覧</h2>
             </div>
             <ul className={styles.refList}>
               <li>
-                <div className={styles.refTitle}>O&apos;Reilly公式書籍ページ(目次・概要・著者紹介)</div>
+                <div className={styles.refTitle}>
+                  O&apos;Reilly公式書籍ページ(目次・概要・著者紹介)
+                </div>
                 <a
                   href="https://www.oreilly.com/library/view/llm-engineers-handbook/9781836200079/"
                   target="_blank"
@@ -1435,7 +1665,9 @@ export default function Page() {
                 </a>
               </li>
               <li>
-                <div className={styles.refTitle}>公式GitHubリポジトリ(コード・README・セットアップ手順)</div>
+                <div className={styles.refTitle}>
+                  公式GitHubリポジトリ(コード・README・セットアップ手順)
+                </div>
                 <a
                   href="https://github.com/PacktPublishing/LLM-Engineers-Handbook"
                   target="_blank"
@@ -1548,13 +1780,21 @@ export default function Page() {
                 </a>
               </li>
               <li>
-                <div className={styles.refTitle}>Maxime Labonne氏「LLM Course」(GitHub、8万スター超)</div>
-                <a href="https://github.com/mlabonne/llm-course" target="_blank" rel="noopener noreferrer">
+                <div className={styles.refTitle}>
+                  Maxime Labonne氏「LLM Course」(GitHub、8万スター超)
+                </div>
+                <a
+                  href="https://github.com/mlabonne/llm-course"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   https://github.com/mlabonne/llm-course
                 </a>
               </li>
               <li>
-                <div className={styles.refTitle}>学習済みモデル(TwinLlama-3.1-8B-DPO、Hugging Face)</div>
+                <div className={styles.refTitle}>
+                  学習済みモデル(TwinLlama-3.1-8B-DPO、Hugging Face)
+                </div>
                 <a
                   href="https://huggingface.co/mlabonne/TwinLlama-3.1-8B-DPO"
                   target="_blank"

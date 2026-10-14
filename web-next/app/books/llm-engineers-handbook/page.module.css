@@ -23,8 +23,9 @@
   min-height: 100vh;
   background: var(--paper);
   color: var(--ink);
-  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto,
-    'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif;
+  font-family:
+    ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Hiragino Kaku Gothic ProN",
+    "Noto Sans JP", sans-serif;
   line-height: 1.8;
   font-size: 16px;
   position: relative;
@@ -42,7 +43,7 @@
 .layout h2,
 .layout h3,
 .layout h4 {
-  font-family: 'Source Serif 4', ui-serif, Georgia, serif;
+  font-family: "Source Serif 4", ui-serif, Georgia, serif;
   color: var(--ink);
   line-height: 1.4;
   scroll-margin-top: calc(var(--header-height, 60px) + 80px);
@@ -82,7 +83,7 @@
 }
 
 .bTitle {
-  font-family: 'Source Serif 4', serif;
+  font-family: "Source Serif 4", serif;
   font-size: 1.05rem;
   font-weight: 700;
   margin-top: 0.3rem;
@@ -109,7 +110,9 @@
   text-decoration: none;
   font-size: 1rem;
   border-left: 3px solid transparent;
-  transition: background 0.15s ease, color 0.15s ease;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
 }
 
 .sideLink :global(i) {
@@ -366,7 +369,7 @@
   color: var(--indigo);
   border-bottom: 2px solid var(--indigo);
   padding: 0.65rem 0.9rem;
-  font-family: 'Source Serif 4', serif;
+  font-family: "Source Serif 4", serif;
   font-weight: 700;
 }
 
@@ -448,7 +451,7 @@
 .calloutTitle {
   display: block;
   margin-bottom: 0.3rem;
-  font-family: 'Source Serif 4', serif;
+  font-family: "Source Serif 4", serif;
   font-weight: 700;
 }
 
@@ -488,7 +491,9 @@
   border: 1px solid var(--border);
   border-radius: 9px;
   background: var(--paper-card);
-  transition: background 0.2s, border-color 0.2s;
+  transition:
+    background 0.2s,
+    border-color 0.2s;
 }
 
 .checklist li.done,
@@ -497,7 +502,7 @@
   border-color: var(--forest) !important;
 }
 
-.checklist input[type='checkbox'] {
+.checklist input[type="checkbox"] {
   appearance: none;
   -webkit-appearance: none;
   width: 1.25rem;
@@ -512,12 +517,12 @@
   background: var(--paper-card);
 }
 
-.checklist input[type='checkbox']:checked {
+.checklist input[type="checkbox"]:checked {
   background: var(--indigo);
 }
 
-.checklist input[type='checkbox']:checked::after {
-  content: '';
+.checklist input[type="checkbox"]:checked::after {
+  content: "";
   position: absolute;
   left: 4px;
   top: 0px;

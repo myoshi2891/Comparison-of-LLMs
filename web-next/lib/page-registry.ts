@@ -221,7 +221,17 @@ const entries: PageEntry[] = [
     description:
       "Packt刊『LLM Engineer's Handbook』を基に、LLM Twinという1つの具体的プロダクト構築を通じて、データ収集・RAG・ファインチューニング・評価・推論最適化・デプロイ・MLOps/LLMOpsまでを学ぶ初学者向け実践ガイド。",
     group: "推薦書籍",
-    topics: ["book", "generative-ai", "llmops", "rag", "fine-tuning", "sft", "dpo", "mlops", "guide"],
+    topics: [
+      "book",
+      "generative-ai",
+      "llmops",
+      "rag",
+      "fine-tuning",
+      "sft",
+      "dpo",
+      "mlops",
+      "guide",
+    ],
     summary:
       "Packt刊『LLM Engineer's Handbook』をベースに、自分の文章スタイルを模倣するAI分身「LLM Twin」の構築を通じて、データ収集・RAG・SFT・DPO・評価・推論最適化・デプロイ・MLOps/LLMOpsを体系的に学ぶ初学者向けガイド。",
     addedAt: "2026-10-14",

@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { render, screen } from "@testing-library/react";
+import { render } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import Page, { metadata } from "./page";
 
@@ -191,7 +191,7 @@ describe("LLM Engineer's Handbook guide — source parity and design contracts",
     const { container } = render(<Page />);
     const nav = container.querySelector('[data-testid="sidebar-nav"]');
     expect(nav).not.toBeNull();
-    const links = nodes(nav!, '[data-testid="sidebar-nav-link"]');
+    const links = nav ? nodes(nav, '[data-testid="sidebar-nav-link"]') : [];
     expect(links.length).toBe(27);
   });
 
@@ -209,12 +209,8 @@ describe("LLM Engineer's Handbook guide — source parity and design contracts",
     const cdnLinks = nodes(container, 'link[rel="stylesheet"]').map((el) =>
       el.getAttribute("href")
     );
-    expect(
-      cdnLinks.some((href) => href?.includes("@tabler/icons-webfont"))
-    ).toBe(true);
-    expect(
-      cdnLinks.some((href) => href?.includes("highlightjs"))
-    ).toBe(true);
+    expect(cdnLinks.some((href) => href?.includes("@tabler/icons-webfont"))).toBe(true);
+    expect(cdnLinks.some((href) => href?.includes("highlightjs"))).toBe(true);
   });
 
   it("D-8: renders layout root with data-testid='layout-root'", () => {
