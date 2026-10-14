@@ -233,7 +233,7 @@ describe("Adversarial Robustness guide — source parity and design contracts", 
     expect(layout?.getAttribute("data-page")).toBe("adversarial-robustness");
   });
 
-  it("D-7: hides global freshness bar and offsets related-pages from 300px sidebar in css", () => {
+  it("D-7: hides global freshness bar and offsets related-pages from 300px sidebar with paper palette matching main content", () => {
     const fs = require("node:fs");
     const path = require("node:path");
     const moduleCss = fs.readFileSync(path.resolve(__dirname, "./page.module.css"), "utf8");
@@ -241,10 +241,18 @@ describe("Adversarial Robustness guide — source parity and design contracts", 
     expect(moduleCss).toContain("display: none !important");
     expect(moduleCss).toContain('nav[aria-label="関連ページ"]');
     expect(moduleCss).toContain("margin-left: 300px");
+    expect(moduleCss).toContain("background: #f6f1e3 !important");
+    expect(moduleCss).toContain("--card: #fffdf7");
+    expect(moduleCss).toContain("--fg: #241f18");
+    expect(moduleCss).toContain("--line: #e4dbc4");
+    expect(moduleCss).toContain("--accent: #413d8f");
 
     const globalsCss = fs.readFileSync(path.resolve(__dirname, "../../globals.css"), "utf8");
     expect(globalsCss).toContain('data-page="adversarial-robustness"');
     expect(globalsCss).toContain("margin-left: 300px !important");
+    expect(globalsCss).toContain("background: #f6f1e3 !important");
+    expect(globalsCss).toContain("--card: #fffdf7");
+    expect(globalsCss).toContain("--fg: #241f18");
   });
 
   it("Q-1: exports metadata with canonical URL and open graph fields", () => {
