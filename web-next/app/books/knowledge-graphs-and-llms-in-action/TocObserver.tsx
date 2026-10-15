@@ -15,24 +15,37 @@ export default function TocObserver() {
       const target = document.getElementById(link.hash.slice(1));
       if (target) targets.set(target, link);
     }
+    function updateActiveLink() {
+      // Compare viewport coordinates directly so large jumps and restored scroll
+      // positions work even when no short heading crosses the observer band.
+      const headerHeight =
+        Number.parseFloat(
+          getComputedStyle(document.documentElement).getPropertyValue("--header-height")
+        ) || 60;
+      const activationLine = headerHeight + 80;
+      let current = targets.values().next().value;
+      for (const [target, link] of targets) {
+        if (target.getBoundingClientRect().top <= activationLine) current = link;
+      }
+      for (const link of links) {
+        link.classList.toggle(styles.active, link === current);
+        if (link === current) link.setAttribute("aria-current", "location");
+        else link.removeAttribute("aria-current");
+      }
+    }
     const observer =
       typeof IntersectionObserver === "function"
         ? new IntersectionObserver(
             (entries) => {
-              for (const entry of entries) {
-                const current = targets.get(entry.target);
-                if (!entry.isIntersecting || !current) continue;
-                for (const link of links) {
-                  link.classList.toggle(styles.active, link === current);
-                  if (link === current) link.setAttribute("aria-current", "location");
-                  else link.removeAttribute("aria-current");
-                }
-              }
+              if (entries.some((entry) => targets.has(entry.target))) updateActiveLink();
             },
             { rootMargin: "-20% 0px -70% 0px" }
           )
         : null;
     for (const target of targets.keys()) observer?.observe(target);
+    window.addEventListener("scroll", updateActiveLink, { passive: true });
+    window.addEventListener("resize", updateActiveLink);
+    updateActiveLink();
     const states = new Map<
       HTMLButtonElement,
       { children: Node[]; timer?: ReturnType<typeof setTimeout> }
@@ -95,6 +108,8 @@ export default function TocObserver() {
     return () => {
       mounted = false;
       observer?.disconnect();
+      window.removeEventListener("scroll", updateActiveLink);
+      window.removeEventListener("resize", updateActiveLink);
       root.removeEventListener("click", copy);
       for (const state of states.values()) clearTimeout(state.timer);
     };

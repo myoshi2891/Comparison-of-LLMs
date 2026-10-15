@@ -583,3 +583,21 @@
 .layout {
   box-sizing: border-box;
 }
+
+/* Scope the original TOC palette above .layout a and .layout a:hover. */
+.sidebar .nav__link {
+  color: var(--text-secondary);
+}
+.sidebar .nav__sub-link {
+  color: var(--text-tertiary);
+}
+.sidebar .nav__link:hover,
+.sidebar .nav__link.active,
+.sidebar .nav__sub-link:hover {
+  color: var(--text-primary);
+  text-decoration: none;
+}
+.sidebar .nav__sub-link.active {
+  color: var(--accent);
+  text-decoration: none;
+}
