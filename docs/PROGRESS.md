@@ -10,21 +10,35 @@
 
 - **フェーズ**: 保守・機能改善・品質強化フェーズ
 - **ブランチ**: `dev`
-- **最新実装 HEAD**: `909335c5`（Knowledge Graphs基礎ガイド19.2／19.3の学習補足・解答開閉。Red `51b9bc21` → Green `437d9ef7` → Refactor `909335c5`）
-- **次の作業**: `/books/knowledge-graphs-fundamentals-techniques#sec-19-2` の目視確認（ユーザー担当。ポート3001）。問題カードの番号、各解答の開閉、具体例・解説・注意点・復習リンク、モバイル表示を確認する。既存ページ全体の目視も引き続きユーザー担当。npm・ビルドは禁止。
-- **ルート実数**: `page.tsx` 93 件、registry 94 エントリ（RSS の `/rss.xml` を含む）。全ルート登録・ナビ導出テストは合格。
+- **最新実装 HEAD**: `5f681c9a`（LangChain in your Pocket完全読解ガイドの移行。Red `12ebd87c` → Green `a9f19779` → Refactor `5f681c9a`）
+- **次の作業**: `/books/langchain-in-your-pocket` の目視確認（ユーザー担当。ポート3000）。Mermaid図解の描画、320px固定目次のスクロール追従、テーブルの左寄せ、コードブロックのインデント、外部リンク、モバイル表示を確認する。既存ページ全体の目視も引き続きユーザー担当。npm・ビルドは禁止。
+- **ルート実数**: `page.tsx` 94 件、registry 95 エントリ（RSS の `/rss.xml` を含む）。全ルート登録・ナビ導出テストは合格。
 - **動作検証**:
   - ビルド: 今回はユーザー指定で未実行。過去の成功記録は 2026-09-17 の 90 静的ページであり、今回の変更を検証した値ではない。
   - `bun run typecheck` ✅（`tsc --noEmit`。2026-10-15 実測）
   - `bun run lint` ✅（Biome check / 562 files / 0 diagnostics。2026-10-15 実測）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000` でVitest **204 files / 2093 tests すべて合格**（2026-10-15 実測）。対象52契約、typecheck・lint（562 files／0 diagnostics）、HTML原本監査exit 0が成功。元の全内容と追加の学習補足を分けて厳密に検証する。
-    - 今回の開始時は対象44契約が成功、直前の全体検証は **203 files / 2085 tests**、開始HEADは `2625a905`。依存・設定・ロック・アーカイブ原本・既存の固定期待値は変更していない。
+  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000` でVitest **206 files / 2118 tests すべて合格**（2026-10-15 実測）。対象25契約、typecheck・lint（0 diagnostics）、HTML原本監査exit 0が成功。
+    - 今回の開始時は対象25契約が成功、直前の全体検証は **204 files / 2093 tests**、開始HEADは `909335c5`。依存・設定・ロック・アーカイブ原本・既存の固定期待値は変更していない。
     - `load(sourceHtml)` をモジュール初期化時に呼ぶ `governance/ai-governance/GuideContent.tsx` と
       `local-llm/finetuning-best-practices/GuideContent.tsx` は、import スモークでも読み込み可能であることを確認済み
   - **バックエンド (`scraper/`)**: 今回はユーザー指定で検証対象外。実行していない。過去の成功記録は104件（2026-10-04）であり、今回の実測値ではない。
 
 ## 最近の追加内容
+
+- **LangChain in your Pocket完全読解ガイドの移行（2026-10-15）**:
+  - Mehul Gupta著『LangChain in your Pocket』の全16章を基にした完全読解ガイドを `/books/langchain-in-your-pocket` に Pure JSX へ完全転写。
+  - 指定HTML原本 `Langchain-in-your-pocket-guide.html`（SHA-256: `a94d5e02f7ca828f8934c7dd1115d26cefc11e3cf495c7c23a2fb117656c1a8b`）および対応Markdown `Langchain-in-your-pocket-guide.md`（SHA-256: `03a1f5bd728cce99a8565cf60362d3f4a0006ebecee1a29750b72fd9263a3d57`）は内容無変更で `archive/html/books/` および `archive/md/books/` へ `git mv` 退避（移動前後のSHA-256一致）。指定HTMLを正本とする。
+  - 原本照合監査スクリプト `audit_source_parity.mjs` で **`exit=0`**（漏れなし）を確認。全1 H1、19 H2、37 H3、55段落、8リスト項目、9表67行、18コードブロック、12 Mermaid図解、16 callout、41外部リンク（原本本文20件＋参考ソース19件＋書籍リンク2件）を100%転写。
+  - スタイリング防犯原則 R2 に準拠：
+    1. 表の全列左寄せ（`:global(th), :global(td)` で `text-align: left !important`）。
+    2. コードブロックの行単位構造化（`<span className="codeLine code-line">`）によるインデントと改行の完全担保。
+    3. 全12箇所の Mermaid 図解に淡色パレット（`theme="base"`, `themeVariables`）を適用し、共有コンポーネント `MermaidDiagram` で遅延描画。
+    4. 320px 固定目次サイドバーとスクロール連動アクティブハイライト（`TocObserver`）、アンカー移動時のめり込み防止（`scroll-margin-top: calc(var(--header-height, 60px) + var(--ch-disclaimer-height, 0px) + 80px)`）。
+    5. 共通クローム（黒帯鮮度バー非表示、白背景統一、関連ページフッターの340pxオフセットと980px以下全幅化）。
+  - 21件の契約テスト（S-1〜S-4 原本照合、C-1〜C-6 コンテンツ、D-1, D-2, D-5〜D-10 デザイン、Q-1〜Q-3 品質契約）および 4件の TocObserver 操作テストを追加（合計25契約すべて合格）。
+  - 全体テスト: **206 files / 2118 tests すべて合格**。`tsc --noEmit` および Biome check も 0 diagnostics で成功。
+  - 分離履歴: Red `12ebd87c` → Green `a9f19779` → Refactor `5f681c9a`。
 
 - **19.2 確認問題・19.3 解答のブラッシュアップ（2026-10-15）**:
   - 元の8問・8解答を全文・順序・番号リストごと保持し、問題カードへテーマ・分野・確認するポイントを追加。解答はHTML標準のdetails／summaryで個別に開閉でき、初期状態では閉じる。追加のJavaScriptや依存は不要。
@@ -429,16 +443,13 @@
 
 ```text
 AGENTS.md → CODEX.md → CLAUDE.md → docs/PROGRESS.md → Phase A–F 計画の順で読む。
-最新実装 HEAD: 909335c5（Knowledge Graphs基礎ガイド19.2／19.3。Red 51b9bc21 → Green 437d9ef7 → Refactor 909335c5）
-次の作業: /books/knowledge-graphs-fundamentals-techniques#sec-19-2 の目視確認（ユーザー担当）。開発サーバーはポート3001。
-元の8問・8解答を保持し、問題カードの学習目標、個別に開閉する解答、具体例・考え方・注意点・復習リンクを追加した。
-番号・開閉マーカー、Enter／Spaceによる標準操作とフォーカス表示、600px以下の余白を確認する。
-原本2形式とsource-contract.json／syntax-contract.jsonは無変更。原文と補足は別々の固定期待値で検証する。
-HTML原本監査exit 0、対象52契約、全体Vitest 204 files / 2093 tests、typecheck・lint（562 files / 0 diagnostics）が成功。
+最新実装 HEAD: 5f681c9a（LangChain in your Pocket完全読解ガイド。Red 12ebd87c → Green a9f19779 → Refactor 5f681c9a）
+次の作業: /books/langchain-in-your-pocket の目視確認（ユーザー担当）。開発サーバーはポート3000。
+Mermaid図解12箇所の描画、320px固定目次のスクロール追従、テーブルの左寄せ、コードブロックのインデント、外部リンク、モバイル表示を確認する。
+原本2形式（HTMLおよびMarkdown）はarchive/へ退避済み（SHA-256一致）。
+HTML原本監査exit 0、対象25契約、全体Vitest 206 files / 2118 tests、typecheck・lint（0 diagnostics）が成功。
 NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000 を使用する。
-既存の16 Mermaid図と構文色には変更なし。本文の基準日2026年9月21日を保持する。
-既存のKnowledge Graphs and LLMs in Action／Hands-On LLM／Enterprise RAGを含むページ全体の目視もユーザー担当。
 共有クロームの補正はglobals.cssへ集約。依存・設定・ロック・監査スクリプトは変更していない。
 サンドボックスではnpmとビルドを実行しない。修正もRed → Green → Refactor → Docsの分離コミットを守る。
-page.tsx 93件、registry 94エントリ（RSSを含む）。次ページは指示されてから扱う。
+page.tsx 94件、registry 95エントリ（RSSを含む）。次ページは指示されてから扱う。
 ```
