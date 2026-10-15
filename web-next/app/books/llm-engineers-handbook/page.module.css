@@ -652,12 +652,19 @@
 @media (max-width: 960px) {
   .sidebar {
     transform: translateX(-102%);
+    visibility: hidden;
+    pointer-events: none;
+    transition:
+      transform 0.25s ease,
+      visibility 0.25s ease;
     box-shadow: 0 0 24px var(--shadow);
   }
 
   .sidebar.open,
   .open {
     transform: translateX(0);
+    visibility: visible;
+    pointer-events: auto;
   }
 
   .main {

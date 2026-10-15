@@ -827,12 +827,18 @@
 @media (max-width: 980px) {
   .sidebar {
     transform: translateX(-100%);
-    transition: transform 0.25s ease;
+    visibility: hidden;
+    pointer-events: none;
+    transition:
+      transform 0.25s ease,
+      visibility 0.25s ease;
     box-shadow: 0 0 30px rgba(0, 0, 0, 0.25);
   }
 
   .sidebar.open {
     transform: translateX(0);
+    visibility: visible;
+    pointer-events: auto;
   }
 
   .main {
