@@ -19,11 +19,9 @@ const normalize = (value: string) => value.replace(/\s+/g, " ").trim();
 const text = (element: Element) => normalize(element.textContent ?? "");
 const nodes = (root: ParentNode, selector: string) => Array.from(root.querySelectorAll(selector));
 
-export const EXPECTED_H1 = [
-  "LangChain in your Pocket 徹底解説ガイド",
-] as const;
+const EXPECTED_H1 = ["LangChain in your Pocket 徹底解説ガイド"] as const;
 
-export const EXPECTED_H2 = [
+const EXPECTED_H2 = [
   "Guideこの解説ガイドについて",
   "Ch.1LLMとLangChainの基礎知識",
   "Ch.2Hello World ― 環境構築と最初のアプリ",
@@ -45,7 +43,7 @@ export const EXPECTED_H2 = [
   "Refs参考文献・ソース一覧",
 ] as const;
 
-export const EXPECTED_H3 = [
+const EXPECTED_H3 = [
   "本ガイドの読み方（全体マップ）",
   "書籍の目次（原著全16章）",
   "1.1 LLM（大規模言語モデル）とは",
@@ -85,7 +83,7 @@ export const EXPECTED_H3 = [
   "16.3〜16.4 Model LaboratoryとDebugging",
 ] as const;
 
-export const EXPECTED_NAV_LINKS = [
+const EXPECTED_NAV_LINKS = [
   { href: "#intro", text: "この解説ガイドについて" },
   { href: "#ch1", text: "第1章 LLMとLangChainの基礎" },
   { href: "#ch2", text: "第2章 Hello World" },
@@ -107,7 +105,7 @@ export const EXPECTED_NAV_LINKS = [
   { href: "#refs", text: "参考文献・ソース一覧" },
 ] as const;
 
-export const EXPECTED_EXTERNAL_URLS = [
+const EXPECTED_EXTERNAL_URLS = [
   "https://www.oreilly.com/library/view/langchain-in-your/9781836201250/",
   "https://docs.langchain.com/oss/python/langchain-philosophy",
   "https://futureagi.com/blog/what-is-langchain/",
@@ -129,7 +127,7 @@ export const EXPECTED_EXTERNAL_URLS = [
   "https://amazon.com/LangChain-your-Pocket-Generative-Applications-ebook/dp/B0CTHQHT25",
 ] as const;
 
-export const EXPECTED_DIAGRAM_KEYS = [
+const EXPECTED_DIAGRAM_KEYS = [
   "bookmap",
   "features",
   "helloflow",
@@ -160,11 +158,11 @@ describe("LangChain in your Pocket guide — source parity and design contracts"
 
   it("S-3: preserves all expected external links", () => {
     const { container } = render(<Page />);
-    const actualHrefList = nodes(container, 'a[href^="http"]').map((a) =>
-      a.getAttribute("href")
-    );
+    const actualHrefList = nodes(container, 'a[href^="http"]').map((a) => a.getAttribute("href"));
     for (const expected of EXPECTED_EXTERNAL_URLS) {
-      const match = actualHrefList.some((url) => url?.includes(expected.replace("https://amazon.com", "")));
+      const match = actualHrefList.some((url) =>
+        url?.includes(expected.replace("https://amazon.com", ""))
+      );
       expect(match).toBe(true);
     }
   });
@@ -182,14 +180,14 @@ describe("LangChain in your Pocket guide — source parity and design contracts"
   it("C-1: H1 matches title text exactly", () => {
     const { container } = render(<Page />);
     const h1 = container.querySelector("h1");
-    expect(text(h1!)).toBe(EXPECTED_H1[0]);
+    expect(text(h1 as Element)).toBe(EXPECTED_H1[0]);
   });
 
   it("C-2: renders 19 quick navigation links matching #anchor format", () => {
     const { container } = render(<Page />);
     const nav = container.querySelector('[data-testid="sidebar-nav"]');
     expect(nav).not.toBeNull();
-    const links = nodes(nav!, "a");
+    const links = nodes(nav as Element, "a");
     expect(links).toHaveLength(19);
     for (const [i, link] of links.entries()) {
       expect(link.getAttribute("href")).toBe(EXPECTED_NAV_LINKS[i].href);
@@ -232,6 +230,9 @@ describe("LangChain in your Pocket guide — source parity and design contracts"
     expect(wrappers).toHaveLength(12);
     const diagrams = nodes(container, '[data-testid="mermaid-diagram"]');
     expect(diagrams).toHaveLength(12);
+    for (const [i, key] of EXPECTED_DIAGRAM_KEYS.entries()) {
+      expect(diagrams[i].getAttribute("id")).toBe(`diagram-${key}`);
+    }
     for (const wrapper of wrappers) {
       expect(wrapper.querySelector('[data-testid="mermaid-diagram"]')).not.toBeNull();
     }
@@ -260,7 +261,7 @@ describe("LangChain in your Pocket guide — source parity and design contracts"
     const { container } = render(<Page />);
     const nav = container.querySelector('[data-testid="sidebar-nav"]');
     expect(nav).not.toBeNull();
-    const links = nodes(nav!, '[data-testid="sidebar-nav-link"]');
+    const links = nodes(nav as Element, '[data-testid="sidebar-nav-link"]');
     expect(links).toHaveLength(19);
     const hrefs = links.map((l) => l.getAttribute("href"));
     expect(hrefs).toEqual(EXPECTED_NAV_LINKS.map((l) => l.href));

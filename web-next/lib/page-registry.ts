@@ -286,15 +286,7 @@ const entries: PageEntry[] = [
     description:
       "Mehul Gupta著『LangChain in your Pocket』を基に、LLMの基礎、Models/Prompts、Chains、Agents、OutputParsers/Memory、Callbacks、RAG、評価、自律型AIエージェント、2026年9月の最新動向までを網羅した初学者向け完全読解ガイド。",
     group: "推薦書籍",
-    topics: [
-      "book",
-      "langchain",
-      "llm",
-      "rag",
-      "agent",
-      "prompt-engineering",
-      "guide",
-    ],
+    topics: ["book", "langchain", "llm", "rag", "agent", "prompt-engineering", "guide"],
     summary:
       "Mehul Gupta著『LangChain in your Pocket』の全16章を土台に、LLMとLangChainの基礎からLCEL、エージェント、RAG、プロンプトエンジニアリング、自律型AIエージェント、2026年9月最新動向までを12のMermaid図解とともに学ぶ完全読解ガイド。",
     addedAt: "2026-10-15",
