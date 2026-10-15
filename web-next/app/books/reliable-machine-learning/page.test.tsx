@@ -273,6 +273,31 @@ describe("Reliable Machine Learning ガイド契約テスト", () => {
     }
   });
 
+  it("D-12: サイドバーが position: fixed で常駐し、メインにマージンが定義されている", () => {
+    const cssPath = path.join(__dirname, "page.module.css");
+    const css = fs.readFileSync(cssPath, "utf-8");
+    expect(css).toMatch(/\.sidebar\s*\{[^}]*position:\s*fixed;/);
+    expect(css).toMatch(/\.main\s*\{[^}]*margin-left:\s*var\(--sidebar-w\);/);
+  });
+
+  it("D-13: globals.css に共有クローム（body / 日付バー / 関連ページ）のスタイルが定義されている", () => {
+    const globalsCssPath = path.join(__dirname, "../../globals.css");
+    const css = fs.readFileSync(globalsCssPath, "utf-8");
+    expect(css).toContain('body:has([data-page="reliable-machine-learning"])');
+    expect(css).toMatch(
+      /body:has\(\[data-page="reliable-machine-learning"\]\)\s*nav\[aria-label="関連ページ"\]\s*\{[^}]*background:\s*#ffffff\s*!important/
+    );
+    expect(css).toMatch(
+      /body:has\(\[data-page="reliable-machine-learning"\]\)\s*nav\[aria-label="関連ページ"\]\s*\{[^}]*margin-left:\s*300px\s*!important/
+    );
+  });
+
+  it("D-14: タイポグラフィがサイト全体と調和するスケーリング（ベース 15px）に調整されている", () => {
+    const cssPath = path.join(__dirname, "page.module.css");
+    const css = fs.readFileSync(cssPath, "utf-8");
+    expect(css).toMatch(/\.layout\s*\{[^}]*font-size:\s*15px;/);
+  });
+
   // Q. 品質契約 (2件)
   it("Q-2: metadata の title と description が適切に定義され、H1 と整合する", () => {
     expect(metadata.title).toBeDefined();
