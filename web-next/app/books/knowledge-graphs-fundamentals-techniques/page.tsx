@@ -2788,8 +2788,15 @@ export default function Page() {
                 <span className={styles.codeLine} data-testid="code-line">
                   <span className="hljs-keyword" data-token="keyword">
                     {"def"}
+                  </span>{" "}
+                  <span className="hljs-title function_" data-token="title">
+                    {"distance"}
                   </span>
-                  {" distance(h, r, t):"}
+                  {"("}
+                  <span className="hljs-params" data-token="params">
+                    {"h, r, t"}
+                  </span>
+                  {"):"}
                 </span>
                 {"\n"}
                 <span className={styles.codeLine} data-testid="code-line">
@@ -2812,8 +2819,11 @@ export default function Page() {
                   {"    "}
                   <span className="hljs-keyword" data-token="keyword">
                     {"return"}
+                  </span>{" "}
+                  <span className="hljs-built_in" data-token="built_in">
+                    {"float"}
                   </span>
-                  {" float(np.linalg.norm(entity[h] + relation[r] - entity[t]))"}
+                  {"(np.linalg.norm(entity[h] + relation[r] - entity[t]))"}
                 </span>
                 {"\n"}
                 <span className={styles.codeLine} data-testid="code-line"></span>
@@ -2839,10 +2849,14 @@ export default function Page() {
                 {"\n"}
                 <span className={styles.codeLine} data-testid="code-line">
                   {"    "}
-                  <span className="hljs-keyword" data-token="keyword">
+                  <span className="hljs-built_in" data-token="built_in">
                     {"print"}
                   </span>
-                  {"(cand, round(distance("}
+                  {"(cand, "}
+                  <span className="hljs-built_in" data-token="built_in">
+                    {"round"}
+                  </span>
+                  {"(distance("}
                   <span className="hljs-string" data-token="string">
                     {'"Tokyo"'}
                   </span>
@@ -3250,118 +3264,100 @@ export default function Page() {
                 <span className={styles.codeLine} data-testid="code-line">
                   {"ttl = "}
                   <span className="hljs-string" data-token="string">
-                    {'""'}
-                  </span>
-                  {'"'}
-                </span>
-                {"\n"}
-                <span className={styles.codeLine} data-testid="code-line">
-                  {"@prefix ex:   <http://example.org/> ."}
-                </span>
-                {"\n"}
-                <span className={styles.codeLine} data-testid="code-line">
-                  {"@prefix rdf:  <http://www.w3.org/"}
-                  <span className="hljs-number" data-token="number">
-                    {"1999"}
-                  </span>
-                  {"/"}
-                  <span className="hljs-number" data-token="number">
-                    {"02"}
-                  </span>
-                  {"/"}
-                  <span className="hljs-number" data-token="number">
-                    {"22"}
-                  </span>
-                  {"-rdf-syntax-ns"}
-                  <span className="hljs-comment" data-token="comment">
-                    {"#> ."}
+                    {'"""'}
                   </span>
                 </span>
                 {"\n"}
                 <span className={styles.codeLine} data-testid="code-line">
-                  {"@prefix rdfs: <http://www.w3.org/"}
-                  <span className="hljs-number" data-token="number">
-                    {"2000"}
+                  <span className="hljs-string" data-token="string">
+                    {"@prefix ex:   <http://example.org/> ."}
                   </span>
-                  {"/"}
-                  <span className="hljs-number" data-token="number">
-                    {"01"}
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  <span className="hljs-string" data-token="string">
+                    {"@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> ."}
                   </span>
-                  {"/rdf-schema"}
-                  <span className="hljs-comment" data-token="comment">
-                    {"#> ."}
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  <span className="hljs-string" data-token="string">
+                    {"@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> ."}
                   </span>
                 </span>
                 {"\n"}
                 <span className={styles.codeLine} data-testid="code-line"></span>
                 {"\n"}
                 <span className={styles.codeLine} data-testid="code-line">
-                  {"ex:Tokyo   rdf:type ex:City ;"}
+                  <span className="hljs-string" data-token="string">
+                    {"ex:Tokyo   rdf:type ex:City ;"}
+                  </span>
                 </span>
                 {"\n"}
                 <span className={styles.codeLine} data-testid="code-line">
-                  {"           rdfs:label "}
                   <span className="hljs-string" data-token="string">
-                    {'"Tokyo"'}
+                    {'           rdfs:label "Tokyo"@en, "東京"@ja ;'}
                   </span>
-                  {"@en, "}
-                  <span className="hljs-string" data-token="string">
-                    {'"東京"'}
-                  </span>
-                  {"@ja ;"}
                 </span>
                 {"\n"}
                 <span className={styles.codeLine} data-testid="code-line">
-                  {"           ex:locatedIn ex:Japan ."}
+                  <span className="hljs-string" data-token="string">
+                    {"           ex:locatedIn ex:Japan ."}
+                  </span>
                 </span>
                 {"\n"}
                 <span className={styles.codeLine} data-testid="code-line"></span>
                 {"\n"}
                 <span className={styles.codeLine} data-testid="code-line">
-                  {"ex:Osaka   rdf:type ex:City ;"}
-                </span>
-                {"\n"}
-                <span className={styles.codeLine} data-testid="code-line">
-                  {"           rdfs:label "}
                   <span className="hljs-string" data-token="string">
-                    {'"Osaka"'}
+                    {"ex:Osaka   rdf:type ex:City ;"}
                   </span>
-                  {"@en ;"}
                 </span>
                 {"\n"}
                 <span className={styles.codeLine} data-testid="code-line">
-                  {"           ex:locatedIn ex:Japan ."}
+                  <span className="hljs-string" data-token="string">
+                    {'           rdfs:label "Osaka"@en ;'}
+                  </span>
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  <span className="hljs-string" data-token="string">
+                    {"           ex:locatedIn ex:Japan ."}
+                  </span>
                 </span>
                 {"\n"}
                 <span className={styles.codeLine} data-testid="code-line"></span>
                 {"\n"}
                 <span className={styles.codeLine} data-testid="code-line">
-                  {"ex:Japan   rdf:type ex:Country ;"}
+                  <span className="hljs-string" data-token="string">
+                    {"ex:Japan   rdf:type ex:Country ;"}
+                  </span>
                 </span>
                 {"\n"}
                 <span className={styles.codeLine} data-testid="code-line">
-                  {"           rdfs:label "}
                   <span className="hljs-string" data-token="string">
-                    {'"Japan"'}
+                    {'           rdfs:label "Japan"@en .'}
                   </span>
-                  {"@en ."}
                 </span>
                 {"\n"}
                 <span className={styles.codeLine} data-testid="code-line"></span>
                 {"\n"}
                 <span className={styles.codeLine} data-testid="code-line">
-                  {"ex:City    rdfs:subClassOf ex:Place ."}
-                </span>
-                {"\n"}
-                <span className={styles.codeLine} data-testid="code-line">
-                  {"ex:Country rdfs:subClassOf ex:Place ."}
+                  <span className="hljs-string" data-token="string">
+                    {"ex:City    rdfs:subClassOf ex:Place ."}
+                  </span>
                 </span>
                 {"\n"}
                 <span className={styles.codeLine} data-testid="code-line">
                   <span className="hljs-string" data-token="string">
-                    {'""'}
+                    {"ex:Country rdfs:subClassOf ex:Place ."}
                   </span>
-                  {'"'}
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  <span className="hljs-string" data-token="string">
+                    {'"""'}
+                  </span>
                 </span>
                 {"\n"}
                 <span className={styles.codeLine} data-testid="code-line"></span>
@@ -3375,73 +3371,76 @@ export default function Page() {
                 <span className={styles.codeLine} data-testid="code-line">
                   {"sparql_text = "}
                   <span className="hljs-string" data-token="string">
-                    {'""'}
+                    {'"""'}
                   </span>
-                  {'"'}
                 </span>
                 {"\n"}
                 <span className={styles.codeLine} data-testid="code-line">
-                  {"PREFIX ex:   <http://example.org/>"}
+                  <span className="hljs-string" data-token="string">
+                    {"PREFIX ex:   <http://example.org/>"}
+                  </span>
                 </span>
                 {"\n"}
                 <span className={styles.codeLine} data-testid="code-line">
-                  {"PREFIX rdfs: <http://www.w3.org/"}
-                  <span className="hljs-number" data-token="number">
-                    {"2000"}
-                  </span>
-                  {"/"}
-                  <span className="hljs-number" data-token="number">
-                    {"01"}
-                  </span>
-                  {"/rdf-schema"}
-                  <span className="hljs-comment" data-token="comment">
-                    {"#>"}
+                  <span className="hljs-string" data-token="string">
+                    {"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>"}
                   </span>
                 </span>
                 {"\n"}
                 <span className={styles.codeLine} data-testid="code-line"></span>
                 {"\n"}
                 <span className={styles.codeLine} data-testid="code-line">
-                  {"SELECT ?city ?label"}
-                </span>
-                {"\n"}
-                <span className={styles.codeLine} data-testid="code-line">
-                  {"WHERE {"}
-                </span>
-                {"\n"}
-                <span className={styles.codeLine} data-testid="code-line">
-                  {"  ?city a ex:City ;"}
-                </span>
-                {"\n"}
-                <span className={styles.codeLine} data-testid="code-line">
-                  {"        ex:locatedIn ex:Japan ;"}
-                </span>
-                {"\n"}
-                <span className={styles.codeLine} data-testid="code-line">
-                  {"        rdfs:label ?label ."}
-                </span>
-                {"\n"}
-                <span className={styles.codeLine} data-testid="code-line">
-                  {"  FILTER (lang(?label) = "}
                   <span className="hljs-string" data-token="string">
-                    {'"en"'}
+                    {"SELECT ?city ?label"}
                   </span>
-                  {")"}
-                </span>
-                {"\n"}
-                <span className={styles.codeLine} data-testid="code-line">
-                  {"}"}
-                </span>
-                {"\n"}
-                <span className={styles.codeLine} data-testid="code-line">
-                  {"ORDER BY ?label"}
                 </span>
                 {"\n"}
                 <span className={styles.codeLine} data-testid="code-line">
                   <span className="hljs-string" data-token="string">
-                    {'""'}
+                    {"WHERE {"}
                   </span>
-                  {'"'}
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  <span className="hljs-string" data-token="string">
+                    {"  ?city a ex:City ;"}
+                  </span>
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  <span className="hljs-string" data-token="string">
+                    {"        ex:locatedIn ex:Japan ;"}
+                  </span>
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  <span className="hljs-string" data-token="string">
+                    {"        rdfs:label ?label ."}
+                  </span>
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  <span className="hljs-string" data-token="string">
+                    {'  FILTER (lang(?label) = "en")'}
+                  </span>
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  <span className="hljs-string" data-token="string">
+                    {"}"}
+                  </span>
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  <span className="hljs-string" data-token="string">
+                    {"ORDER BY ?label"}
+                  </span>
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  <span className="hljs-string" data-token="string">
+                    {'"""'}
+                  </span>
                 </span>
                 {"\n"}
                 <span className={styles.codeLine} data-testid="code-line"></span>
@@ -3451,7 +3450,11 @@ export default function Page() {
                 </span>
                 {"\n"}
                 <span className={styles.codeLine} data-testid="code-line">
-                  {"g.parse(data=ttl, format="}
+                  {"g.parse(data=ttl, "}
+                  <span className="hljs-built_in" data-token="built_in">
+                    {"format"}
+                  </span>
+                  {"="}
                   <span className="hljs-string" data-token="string">
                     {'"turtle"'}
                   </span>
@@ -3479,7 +3482,7 @@ export default function Page() {
                 {"\n"}
                 <span className={styles.codeLine} data-testid="code-line">
                   {"    "}
-                  <span className="hljs-keyword" data-token="keyword">
+                  <span className="hljs-built_in" data-token="built_in">
                     {"print"}
                   </span>
                   {"(row.city, row.label)"}
@@ -3609,7 +3612,11 @@ export default function Page() {
                   <span className="hljs-keyword" data-token="keyword">
                     {"ON"}
                   </span>
-                  {" t1.s = t2.s"}
+                  {" t1.s "}
+                  <span className="hljs-operator" data-token="operator">
+                    {"="}
+                  </span>
+                  {" t2.s"}
                 </span>
                 {"\n"}
                 <span className={styles.codeLine} data-testid="code-line">
@@ -3620,14 +3627,21 @@ export default function Page() {
                   <span className="hljs-keyword" data-token="keyword">
                     {"ON"}
                   </span>
-                  {" t1.s = t3.s"}
+                  {" t1.s "}
+                  <span className="hljs-operator" data-token="operator">
+                    {"="}
+                  </span>
+                  {" t3.s"}
                 </span>
                 {"\n"}
                 <span className={styles.codeLine} data-testid="code-line">
                   <span className="hljs-keyword" data-token="keyword">
                     {"WHERE"}
                   </span>
-                  {" t1.p = "}
+                  {" t1.p "}
+                  <span className="hljs-operator" data-token="operator">
+                    {"="}
+                  </span>{" "}
                   <span className="hljs-string" data-token="string">
                     {"'rdf:type'"}
                   </span>
@@ -3635,7 +3649,10 @@ export default function Page() {
                   <span className="hljs-keyword" data-token="keyword">
                     {"AND"}
                   </span>
-                  {" t1.o = "}
+                  {" t1.o "}
+                  <span className="hljs-operator" data-token="operator">
+                    {"="}
+                  </span>{" "}
                   <span className="hljs-string" data-token="string">
                     {"'ex:City'"}
                   </span>
@@ -3646,14 +3663,20 @@ export default function Page() {
                   <span className="hljs-keyword" data-token="keyword">
                     {"AND"}
                   </span>
-                  {" t2.p = "}
+                  {" t2.p "}
+                  <span className="hljs-operator" data-token="operator">
+                    {"="}
+                  </span>{" "}
                   <span className="hljs-string" data-token="string">
                     {"'ex:locatedIn'"}
                   </span>{" "}
                   <span className="hljs-keyword" data-token="keyword">
                     {"AND"}
                   </span>
-                  {" t2.o = "}
+                  {" t2.o "}
+                  <span className="hljs-operator" data-token="operator">
+                    {"="}
+                  </span>{" "}
                   <span className="hljs-string" data-token="string">
                     {"'ex:Japan'"}
                   </span>
@@ -3680,7 +3703,10 @@ export default function Page() {
                   <span className="hljs-keyword" data-token="keyword">
                     {"AND"}
                   </span>
-                  {" t3.p = "}
+                  {" t3.p "}
+                  <span className="hljs-operator" data-token="operator">
+                    {"="}
+                  </span>{" "}
                   <span className="hljs-string" data-token="string">
                     {"'rdfs:label'"}
                   </span>
@@ -3688,14 +3714,23 @@ export default function Page() {
                   <span className="hljs-keyword" data-token="keyword">
                     {"AND"}
                   </span>
-                  {" t3.o LIKE "}
+                  {" t3.o "}
+                  <span className="hljs-keyword" data-token="keyword">
+                    {"LIKE"}
+                  </span>{" "}
                   <span className="hljs-string" data-token="string">
                     {"'%@en'"}
                   </span>
                 </span>
                 {"\n"}
                 <span className={styles.codeLine} data-testid="code-line">
-                  {"ORDER BY t3.o;"}
+                  <span className="hljs-keyword" data-token="keyword">
+                    {"ORDER"}
+                  </span>{" "}
+                  <span className="hljs-keyword" data-token="keyword">
+                    {"BY"}
+                  </span>
+                  {" t3.o;"}
                 </span>
                 {"\n"}
                 <span className={styles.codeLine} data-testid="code-line"></span>
