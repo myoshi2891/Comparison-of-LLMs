@@ -479,11 +479,11 @@
 
 ```text
 AGENTS.md → CODEX.md → CLAUDE.md → docs/PROGRESS.md → Phase A–F 計画の順で読む。
-最新実装 HEAD: d8a8b268（Reliable Machine Learning ガイドのタイポグラフィ最適化・Mermaidコントラスト修復・共有クローム完全統合。移行 Red 908a6769 → Green 0170db70 → Refactor 927a9174、改善 Red b20dfcb1 → Green d8a8b268）
+最新実装 HEAD: 16409358（Reliable Machine Learning ガイドのタイポグラフィ最適化・Mermaidコントラスト修復・共有クローム完全統合・チェックリスト修正、移行済みMarkdown原本のarchive退避を含む。移行 Red 908a6769 → Green 0170db70 → Refactor 927a9174、改善 Red b20dfcb1 → Green d8a8b268、チェックリスト修正 Red cd400014 → Green 8adaec5b → Refactor 5fe96d4b、archive退避 3285bb5b → 16409358）
 次の作業: /books/reliable-machine-learning の目視確認（ユーザー担当）。開発サーバーはポート3000/3001。
 Mermaid図解12箇所（ライトテーマ・コントラスト保護）、300px固定常駐目次サイドバー、テーブルの左寄せ、チェックリスト（10項目）の進捗カウンター連動、白背景と調和した共通フッター、不透明ヘッダー・免責バナー、モバイル表示を確認する。
 原本2形式（HTMLおよびMarkdown）はarchive/へ退避済み（SHA-256一致）。
-HTML原本監査exit 0、対象26契約、全体Vitest 208 files / 2149 tests、typecheck・lint（0 diagnostics）が成功。
+HTML原本監査exit 0、対象27契約、全体Vitest 208 files / 2150 tests、typecheck・lint（0 diagnostics）が成功。
 NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000 を使用する。
 共有クロームの補正はglobals.cssへ集約。依存・設定・ロック・監査スクリプトは変更していない。
 サンドボックスではnpmとビルドを実行しない。修正もRed → Green → Refactor → Docsの分離コミットを守る。
