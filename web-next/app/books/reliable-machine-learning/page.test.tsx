@@ -255,14 +255,14 @@ describe("Reliable Machine Learning ガイド契約テスト", () => {
     const { container } = render(<Page />);
     const checkboxes = nodes(container, "input[type='checkbox']");
     expect(checkboxes.length).toBe(10);
-    const counter = container.querySelector(".checklist-counter");
+    const counter = container.querySelector(`.${styles.checklistCounter}`);
     expect(counter).not.toBeNull();
     expect(text(counter!)).toBe("0/10");
   });
 
   it("D-11: 参考文献カードが 15 件存在し、ref-1 〜 ref-15 の ID を持つ", () => {
     const { container } = render(<Page />);
-    const cards = nodes(container, ".ref-card");
+    const cards = nodes(container, `.${styles.refCard}`);
     expect(cards.length).toBe(15);
     for (let i = 1; i <= 15; i++) {
       const card = container.querySelector(`#ref-${i}`);
