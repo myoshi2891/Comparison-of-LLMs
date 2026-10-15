@@ -15,6 +15,19 @@ GEMINI.md は Gemini CLI / Gemini Code Assist 向けの入り口。
 @./CLAUDE.md
 @docs/PROGRESS.md
 
+推薦書籍 `/books/reliable-machine-learning` を追加（2026-10-15）。
+指定HTMLの全1 H1・15 H2・36 H3・70段落・85リスト項目・10表64行・12 Mermaid図解・
+7 callout（ベストプラクティス）・10チェック項目・15参考文献カード（15外部リンク）をPure JSXへ完全転写。
+19ページ契約と4操作契約で原本照合し、HTML原本監査exit 0を確認。
+原本の300px固定目次、スクロール連動ハイライト、表の全列左寄せ、アンカー移動の見出しめり込み防止を保持。
+全12箇所のMermaid図解に原本準拠のライトテーマ変数（background: #f5f7fb、primaryColor: #eaeef6等）を反映。
+チェックリスト10項目の進捗カウンター連動（0/10）を実装。
+共有クロームの補正（鮮度バーの非表示統合、共通フッターの300px !important オフセット）を適用。
+HTML／Markdownはarchive/html/books/／archive/md/books/へ内容無変更で保存（SHA-256一致）。
+全体Vitest **208 files / 2146 tests**、対象23契約、typecheck・lint（572 files / 0 diagnostics）が成功。
+分離履歴: 移行 Red `908a6769` → Green `0170db70` → Refactor `927a9174`。
+npm・ビルドは未実行、目視確認はユーザー担当（ポート3000/3001）。
+
 推薦書籍 `/books/langchain-in-your-pocket` を追加（2026-10-15）。
 指定HTMLの全1 H1・19 H2・37 H3・55段落・8リスト項目・9表67行・18コード例・
 12 Mermaid図解・16 callout・41外部リンクをPure JSXへ完全転写。
@@ -168,10 +181,10 @@ Vitest 185 files／1779 tests、typecheck・lint・pytest 104件が成功。復�
 ## 検証コマンド
 
 ```bash
-(cd web-next && NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000) # 206 files / 2123 tests pass（2026-10-15 実測）
+(cd web-next && NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000) # 208 files / 2146 tests pass（2026-10-15 実測）
 (cd web-next && bun run typecheck)   # OK（2026-10-15 実測）
 # ビルドは今回ユーザー指定で未実行（過去: 2026-09-18 に89静的ページ生成）
-(cd web-next && bun run lint)        # OK（567 files / 0 diagnostics。2026-10-15 実測）
+(cd web-next && bun run lint)        # OK（572 files / 0 diagnostics。2026-10-15 実測）
 (cd scraper && uv run pytest)        # 今回対象外。過去の成功は104件（2026-10-04）
 ```
 

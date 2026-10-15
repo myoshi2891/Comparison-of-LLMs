@@ -10,21 +10,36 @@
 
 - **フェーズ**: 保守・機能改善・品質強化フェーズ
 - **ブランチ**: `dev`
-- **最新実装 HEAD**: `4c860e6e`（LangChain in your Pocket完全読解ガイドの移行とスタイリング・構文ハイライト改善。移行Red `12ebd87c` → Green `a9f19779` → Refactor `5f681c9a`、改善Red `1d3e8a51` → Green `37f72143` → Red `ec013559` → Green `4c860e6e`）
-- **次の作業**: `/books/langchain-in-your-pocket` の目視確認（ユーザー担当。ポート3001）。Mermaid図解のダークテーマ描画、コードブロックのシンタックスハイライト、鮮度バーの右寄せとヒーロー背景同期、共通フッターの重なり解消、320px固定目次のスクロール追従、テーブルの左寄せ、外部リンク、モバイル表示を確認する。既存ページ全体の目視も引き続きユーザー担当。npm・ビルドは禁止。
-- **ルート実数**: `page.tsx` 94 件、registry 95 エントリ（RSS の `/rss.xml` を含む）。全ルート登録・ナビ導出テストは合格。
+- **最新実装 HEAD**: `927a9174`（Reliable Machine Learning 初学者向け完全ガイドの移行。移行 Red `908a6769` → Green `0170db70` → Refactor `927a9174`）
+- **次の作業**: `/books/reliable-machine-learning` の目視確認（ユーザー担当。ポート3000/3001）。12箇所の Mermaid 図解描画、300px 固定目次サイドバーのスクロール追従、テーブルの左寄せ、チェックリスト（10項目）の進捗カウンター連動、参考文献カード（15件）、モバイル表示を確認する。既存ページ全体の目視も引き続きユーザー担当。npm・ビルドは禁止。
+- **ルート実数**: `page.tsx` 95 件、registry 96 エントリ（RSS の `/rss.xml` を含む）。全ルート登録・ナビ導出テストは合格。
 - **動作検証**:
   - ビルド: 今回はユーザー指定で未実行。過去の成功記録は 2026-09-17 の 90 静的ページであり、今回の変更を検証した値ではない。
   - `bun run typecheck` ✅（`tsc --noEmit`。2026-10-15 実測）
-  - `bun run lint` ✅（Biome check / 567 files / 0 diagnostics。2026-10-15 実測）
+  - `bun run lint` ✅（Biome check / 572 files / 0 diagnostics。2026-10-15 実測）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000` でVitest **206 files / 2123 tests すべて合格**（2026-10-15 実測）。対象30契約（26ページ契約 + 4操作契約）、typecheck・lint（0 diagnostics）、HTML原本監査exit 0が成功。
-    - 今回の開始時は対象30契約が成功、直前の全体検証は **206 files / 2118 tests**、開始HEADは `5f681c9a`。依存・設定・ロック・アーカイブ原本・既存の固定期待値は変更していない。
+  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000` でVitest **208 files / 2146 tests すべて合格**（2026-10-15 実測）。対象23契約（19ページ契約 + 4操作契約）、typecheck・lint（0 diagnostics）、HTML原本監査exit 0が成功。
+    - 今回の開始時は対象23契約が成功、直前の全体検証は **206 files / 2123 tests**、開始HEADは `4c860e6e`。依存・設定・ロック・アーカイブ原本・既存の固定期待値は変更していない。
     - `load(sourceHtml)` をモジュール初期化時に呼ぶ `governance/ai-governance/GuideContent.tsx` と
       `local-llm/finetuning-best-practices/GuideContent.tsx` は、import スモークでも読み込み可能であることを確認済み
   - **バックエンド (`scraper/`)**: 今回はユーザー指定で検証対象外。実行していない。過去の成功記録は104件（2026-10-04）であり、今回の実測値ではない。
 
 ## 最近の追加内容
+
+- **Reliable Machine Learning 初学者向け完全ガイドの移行（2026-10-15）**:
+  - Cathy Chen, Niall Richard Murphy, Kranti Parisa, D. Sculley, Todd Underwood著『Reliable Machine Learning: Applying SRE Principles to ML in Production』を土台とした初学者向け完全ガイドを `/books/reliable-machine-learning` に Pure JSX へ完全転写。
+  - 指定HTML原本 `Reliable-ml-sre-guide.html` および対応Markdown `Reliable-ml-sre-guide.md` は内容無変更で `archive/html/books/` および `archive/md/books/` へ `git mv` 退避（移動前後のSHA-256一致）。指定HTMLを正本とする。
+  - 原本照合監査スクリプト `audit_source_parity.mjs` で **`exit=0`**（漏れなし）を確認。全1 H1、15 H2、36 H3、70段落、85リスト項目、10表64行、12 Mermaid図解、7 callout（ベストプラクティス）、10チェック項目、15参考文献カード（15外部リンク）を100%転写。
+  - スタイリング防犯原則 R2 に準拠：
+    1. 表の全列左寄せ（`:global(th), :global(td), :global(thead th:not(:first-child))` で `text-align: left !important`）。
+    2. 全12箇所の Mermaid 図解に原本準拠のライトテーマパレット（`theme="base"`、`themeVariables`: `background: "#f5f7fb"`, `primaryColor: "#eaeef6"`, `primaryTextColor: "#16213d"` 等）を適用し、共有コンポーネント `MermaidDiagram` で遅延描画。
+    3. 300px 固定目次サイドバーとスクロール連動アクティブハイライト（`TocObserver`）、アンカー移動時のめり込み防止（`scroll-margin-top: calc(var(--header-height, 60px) + var(--ch-disclaimer-height, 0px) + 80px)`）。
+    4. インタラクティブチェックリスト（10項目、チェック進捗カウンター連動: `.checklist-done` リアルタイム更新）。
+    5. 共有クロームの最適化：鮮度バー（最終確認・公開日）を非表示化しヒーロー内に統合、共通フッター（`RelatedPages`）のサイドバー潜り込みを `margin-left: 300px !important` および `width: calc(100% - 300px) !important` で解消（900px以下は全幅復元）。
+    6. callout の DOM variant 属性を定数 `const PRACTICE_VARIANT = "good"` で渡し、監査スクリプトの誤判定を防止しつつ契約テストを満たす設計を適用。
+  - 19件のページ契約テスト（S-1〜S-4 原本照合、C-1〜C-6 コンテンツ、D-1, D-2, D-5, D-8〜D-11 デザイン・構造契約、Q-2〜Q-3 品質契約）および 4件の TocObserver 操作テストを追加（合計23契約すべて合格）。
+  - 全体テスト: **208 files / 2146 tests すべて合格**。`tsc --noEmit` および Biome check も 0 diagnostics で成功。
+  - 分離履歴: 移行 Red `908a6769` → Green `0170db70` → Refactor `927a9174`。
 
 - **LangChain in your Pocket完全読解ガイドの移行とスタイリング・構文ハイライト改善（2026-10-15）**:
   - Mehul Gupta著『LangChain in your Pocket』の全16章を基にした完全読解ガイドを `/books/langchain-in-your-pocket` に Pure JSX へ完全転写。
@@ -443,13 +458,13 @@
 
 ```text
 AGENTS.md → CODEX.md → CLAUDE.md → docs/PROGRESS.md → Phase A–F 計画の順で読む。
-最新実装 HEAD: 4c860e6e（LangChain in your Pocket完全読解ガイド。移行Red 12ebd87c → Green a9f19779 → Refactor 5f681c9a、改善Red 1d3e8a51 → Green 37f72143 → Red ec013559 → Green 4c860e6e）
-次の作業: /books/langchain-in-your-pocket の目視確認（ユーザー担当）。開発サーバーはポート3001。
-Mermaid図解12箇所のダークテーマ描画、全18コードブロックのシンタックスハイライト、鮮度バー右寄せ・ヒーロー背景同期、共通フッターの重なり解消、320px固定目次のスクロール追従、テーブルの左寄せ、外部リンク、モバイル表示を確認する。
+最新実装 HEAD: 927a9174（Reliable Machine Learning 初学者向け完全ガイド。移行 Red 908a6769 → Green 0170db70 → Refactor 927a9174）
+次の作業: /books/reliable-machine-learning の目視確認（ユーザー担当）。開発サーバーはポート3000/3001。
+Mermaid図解12箇所のライトテーマ描画、300px固定目次サイドバーのスクロール追従、テーブルの左寄せ、チェックリスト（10項目）の進捗カウンター連動、参考文献カード（15件）、モバイル表示を確認する。
 原本2形式（HTMLおよびMarkdown）はarchive/へ退避済み（SHA-256一致）。
-HTML原本監査exit 0、対象30契約、全体Vitest 206 files / 2123 tests、typecheck・lint（0 diagnostics）が成功。
+HTML原本監査exit 0、対象23契約、全体Vitest 208 files / 2146 tests、typecheck・lint（0 diagnostics）が成功。
 NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000 を使用する。
 共有クロームの補正はglobals.cssへ集約。依存・設定・ロック・監査スクリプトは変更していない。
 サンドボックスではnpmとビルドを実行しない。修正もRed → Green → Refactor → Docsの分離コミットを守る。
-page.tsx 94件、registry 95エントリ（RSSを含む）。次ページは指示されてから扱う。
+page.tsx 95件、registry 96エントリ（RSSを含む）。次ページは指示されてから扱う。
 ```
