@@ -100,7 +100,12 @@ export default function Page() {
           </div>
         </div>
         <nav id="nav" data-testid="sidebar-nav">
-          <a href="#intro" className={styles.active} data-testid="sidebar-nav-link">
+          <a
+            href="#intro"
+            className={styles.active}
+            aria-current="location"
+            data-testid="sidebar-nav-link"
+          >
             {"この解説ガイドについて"}
           </a>
           <div className={[styles.grp].filter(Boolean).join(" ")}>{"基礎編"}</div>

@@ -177,12 +177,22 @@ describe("LangChain in your Pocket guide — source parity and design contracts"
 
   it("S-3: preserves all expected external links", () => {
     const { container } = render(<Page />);
-    const actualHrefList = nodes(container, 'a[href^="http"]').map((a) => a.getAttribute("href"));
+    // URL構成要素を正規化して完全一致で照合する（部分一致だと末尾に不正パスが付いても通るため）
+    const normalizeUrl = (value: string) => {
+      const url = new URL(value);
+      return `${url.protocol}//${url.hostname}${url.pathname}${url.search}${url.hash}`;
+    };
+    // 原本のAmazonリンクのみ、移植先で www. 付きホストへ正規化されている
+    const normalizeExpected = (value: string) => {
+      const url = new URL(value);
+      if (url.hostname === "amazon.com") url.hostname = "www.amazon.com";
+      return normalizeUrl(url.href);
+    };
+    const actualHrefs = new Set(
+      nodes(container, 'a[href^="http"]').map((a) => normalizeUrl(a.getAttribute("href") ?? ""))
+    );
     for (const expected of EXPECTED_EXTERNAL_URLS) {
-      const match = actualHrefList.some((url) =>
-        url?.includes(expected.replace("https://amazon.com", ""))
-      );
-      expect(match).toBe(true);
+      expect(actualHrefs.has(normalizeExpected(expected)), expected).toBe(true);
     }
   });
 
