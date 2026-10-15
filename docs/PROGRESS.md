@@ -10,21 +10,32 @@
 
 - **フェーズ**: 保守・機能改善・品質強化フェーズ
 - **ブランチ**: `dev`
-- **最新実装 HEAD**: `dc0fbf8c`（SonarCloud新規コードカバレッジ対応とレビュー指摘修正。CSS修正は `dc0fbf8c`、Greenは `0712fb2b`、Redは `7607bb98`。Hands-On LLM移行本体は Refactor `0399f9c5`／Green `ac3453b2`／Red `750c27d3`）
-- **次の作業**: `/books/hands-on-large-language-models` の目視確認（ユーザー担当）。npm・ビルドは禁止、スクレイパー検証はユーザー指定で対象外。
-- **ルート実数**: `page.tsx` 91 件、registry 92 エントリ（RSS の `/rss.xml` を含む）。全ルート登録・ナビ導出テストは合格。
+- **最新実装 HEAD**: `631b0d87`（Knowledge Graphs and LLMs in Action移行。Red `8dc7ffdd` → Green `93a028d7` → Refactor `631b0d87`。監査形式対応は Red `274d72d8` → Green `9e0d4b45`）
+- **次の作業**: `/books/knowledge-graphs-and-llms-in-action` の目視確認（ユーザー担当。開発サーバーはポート3002）。既存の Hands-On LLM／Enterprise RAG の目視確認もユーザー担当のまま。npm・ビルドは禁止、スクレイパー検証は今回対象外。
+- **ルート実数**: `page.tsx` 92 件、registry 93 エントリ（RSS の `/rss.xml` を含む）。全ルート登録・ナビ導出テストは合格。
 - **動作検証**:
   - ビルド: 今回はユーザー指定で未実行。過去の成功記録は 2026-09-17 の 90 静的ページであり、今回の変更を検証した値ではない。
-  - `bun run typecheck` ✅（`tsc --noEmit`。2026-10-14 実測）
-  - `bun run lint` ✅（Biome check / 545 files / 0 diagnostics。2026-10-14 実測）
+  - `bun run typecheck` ✅（`tsc --noEmit`。2026-10-15 実測）
+  - `bun run lint` ✅（Biome check / 553 files / 0 diagnostics。2026-10-15 実測）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: Node 24で `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000` を実行し、Vitest **199 files / 1985 tests すべて合格**（2026-10-15 実測）。typecheck・lint（547 files／0 diagnostics）・原本監査（Hands-On LLM／LLM Engineer's Handbook／Adversarial Robustness／Enterprise RAG すべて exit 0）・監査スクリプトの node:test 33件が成功。
-    - 今回の開始時ベースラインは **195 files / 1936 tests**。既存環境の `localStorage` 問題を避ける実行時オプションを継続使用し、依存・設定ファイルは変更していない。
+  - **フロントエンド (`web-next/`)**: Node 24で `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000` を実行し、Vitest **201 files / 2030 tests すべて合格**（2026-10-15 実測）。整理後の対象44契約、typecheck・lint（553 files／0 diagnostics）・Knowledge Graphs and LLMs in ActionのHTML原本監査exit 0・監査スクリプト38件も成功。
+    - 今回の開始時ベースラインは **199 files / 1986 tests**。既存環境の `localStorage` 問題を避ける実行時オプションを継続使用し、依存・設定ファイルは変更していない。
     - `load(sourceHtml)` をモジュール初期化時に呼ぶ `governance/ai-governance/GuideContent.tsx` と
       `local-llm/finetuning-best-practices/GuideContent.tsx` は、import スモークでも読み込み可能であることを確認済み
   - **バックエンド (`scraper/`)**: 今回はユーザー指定で検証対象外。実行していない。過去の成功記録は104件（2026-10-04）であり、今回の実測値ではない。
 
 ## 最近の追加内容
+
+- **Knowledge Graphs and LLMs in Action完全ガイドの移行（2026-10-15）**:
+  - `/books/knowledge-graphs-and-llms-in-action` に全1 H1・14 H2・36 H3・44 H4・80段落・53リスト／157項目・31表／195行・14コード例・18 Mermaid図解・14引用・18折りたたみ・46根拠バッジをPure JSXで転写。参考文献22リンクを含む本文23リンク、目次24リンク、フッターも原本から固定した期待値と照合する。
+  - 本文・構造・76 CSS規則を31ページ契約で照合し、13操作テストで目次追従・コピー成功／拒否／代替コピー／後片付けを検証。表の全列左寄せ、リストの点・番号・入れ子、コードの改行・先頭空白、アンカー余白を保持する。
+  - 原本の暗色テーマとMermaidテーマ変数、320px固定目次、960px以下の通常フロー目次を保持。共有クロームの背景・日付バー・関連ページ配置は本ページ限定の `globals.css` へ集約。原本のsectionとH2のID重複は見出し側のアンカーを残して解消し、H3にも一意なIDを付けた。
+  - HTML／Markdownを `archive/html/books/Knowledge-graphs-and-llms-in-action-guide.html`／`archive/md/books/Knowledge-graphs-and-llms-in-action-guide.md` に内容無変更で保存（移動前後のSHA-256一致）。指定HTMLを正本とし、本文の調査基準日2026年9月21日、registryの追加・確認日2026-10-15を保持する。対応MarkdownはLangGraph再試行上限時の分岐などがHTMLと異なるため、移植先の期待値へ混ぜない。
+  - 監査が原本の `DIAGRAMS` 配列・数値文字参照・エスケープ済みJSX文字列・ハイライトで分割されたURLを扱えなかったため、失敗する4テストを先にコミットして形式対応を追加。監査はHTMLのコード内プレースホルダーをJSXとして除去せず、配列は実行せず解析する。既存の監査スクリプト／監査テストの未コミット差分は今回のコミットに含めていない。
+  - HTML原本監査exit 0、Mermaid 10.9.8で全18図の構文解析成功。全体Vitest **201 files / 2030 tests**、整理後の44契約、typecheck・lint（553 files／0 diagnostics）が成功。
+  - 操作処理のV8カバレッジは行100%・関数100%・分岐86.84%。既存インストールではカバレッジ変換器が `js-tokens` 4を解決して失敗するため、検証時だけ一時ローダーでロックファイル指定のキャッシュ済み10.0.0へ解決した。依存・設定・ロックファイルは変更していない。
+  - 分離履歴: 移行Red `8dc7ffdd` → Green `93a028d7` → Refactor `631b0d87`。監査Red `274d72d8` → Green `9e0d4b45`。
+  - `.next` が存在しない状態から開発サーバーをポート3002で起動し、移行先URLのHTTP 200を確認（目視・ブラウザ操作なし）。`next dev` が自動更新したAGENTS.mdは起動前の内容へ戻した。目視確認はユーザー担当。npm・ビルド・スクレイパー・ブラウザ自動確認は未実行。
 
 - **SonarCloud新規コードカバレッジ対応・レビュー指摘修正（2026-10-15）**:
   - `hands-on-large-language-models/TocObserver.tsx`（0%）と `rag/enterprise-guide/TocObserver.tsx`（0%）に単体テストを追加。ページテストは TocObserver をモックするため、単体テストがないとカバレッジに反映されなかった。
@@ -102,8 +113,6 @@
   - 20件の契約テスト（S-1〜S-4 原本照合、C-1〜C-6 コンテンツ、D-1〜D-7 デザイン、Q-1〜Q-3 品質契約）を追加。
   - 分離履歴: Red `eeef014a` → Green `2ff5a863` → Refactor `bdf3b74c` → 追加Red `ddc6febc` → 追加Green `50fda30b` → 追加Refactor `b59641bc` → フッターRed `f605b780` → フッターGreen `695c45a1`。
   - 全体テスト: 194 files / 1917 tests すべて成功。typecheck、lint（535 files / 0 diagnostics）も成功。
-
-
 
 - **LLM Engineer's Handbookガイドの移行・共通クローム／スタイル調整（2026-10-14）**:
   - `/books/llm-engineers-handbook` に全15 H2・20 H3・55段落・83リスト項目・55表行・2コードブロック・8 Mermaid・5 callout・10チェック項目・15参考文献リンクをPure JSXへ転写。
@@ -397,17 +406,17 @@
 
 ```text
 AGENTS.md → CODEX.md → CLAUDE.md → docs/PROGRESS.md → Phase A–F 計画の順で読む。
-最新実装 HEAD: dc0fbf8c（SonarCloudカバレッジ対応・レビュー指摘修正。Red: 7607bb98、Green: 0712fb2b、CSS: dc0fbf8c）
-次の作業: /books/hands-on-large-language-models と /rag/enterprise-guide の目視確認（モバイル目次・Topボタン・参考文献グリッド。ユーザー担当）。
-Hands-on-large-language-models-guide.html は archive/html/books/、Markdown は archive/md/books/ に退避保存済み。
-HTML原本監査は Hands-On LLM／LLM Engineer's Handbook／Adversarial Robustness／Enterprise RAG すべて exit 0。
-全体 Vitest 199 files / 1985 tests、typecheck・lint（547 files / 0 diagnostics）が成功。pytestは今回対象外。
+最新実装 HEAD: 631b0d87（Knowledge Graphs and LLMs in Action移行。Red: 8dc7ffdd、Green: 93a028d7、Refactor: 631b0d87）
+次の作業: /books/knowledge-graphs-and-llms-in-action の目視確認（リストの点・番号、コピー、折りたたみ、18図解、960px前後の目次配置。ユーザー担当）。開発サーバーはポート3002。
+Hands-On LLM／Enterprise RAGの目視確認も引き続きユーザー担当。
+Knowledge-graphs-and-llms-in-action-guide.html は archive/html/books/、Markdown は archive/md/books/ に内容無変更で退避保存済み。
+指定HTMLの原本監査exit 0、18図解はMermaid 10.9.8の構文解析成功。Markdownには異なる記述があるため期待値へ混ぜない。
+全体 Vitest 201 files / 2030 tests、整理後の44契約、typecheck・lint（553 files / 0 diagnostics）が成功。監査テスト38件成功。pytestは今回対象外。
 この実行環境ではNode 24で NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000 を使用する。
 原本の期待値を移植先に合わせて変更しない。指定HTMLが正本。
-全列左寄せ、コードインデント、アンカー見出しめり込み防止を徹底。Mermaidはbaseテーマで淡色配色を保持する。
+全列左寄せ、コードインデント、アンカー見出しめり込み防止を徹底。今回のMermaidは原本どおりdarkテーマと暗色変数を保持する。
 共有クローム（body／鮮度バー／関連ページ）の上書きは globals.css を正とし、CSS Module に複製しない。
+監査スクリプト2ファイルにはセッション開始前の未コミット変更を保持している。混ぜてコミットしない。
 サンドボックスでは npm とビルドを実行しない。目視結果への修正も Red → Green → Refactor → Docs で分離コミットする。
-page.tsx 91 件、registry 92 エントリ（RSS を含む）。次のページは指示されてから扱う。
+page.tsx 92 件、registry 93 エントリ（RSS を含む）。次のページは指示されてから扱う。
 ```
-
-

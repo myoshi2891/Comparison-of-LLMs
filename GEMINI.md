@@ -1,6 +1,6 @@
 # GEMINI.md
 
-Updated 2026-10-14
+Updated 2026-10-15
 
 GEMINI.md は Gemini CLI / Gemini Code Assist 向けの入り口。
 本リポジトリでは **CLAUDE.md が正本** とし、GEMINI.md はその委譲 pointer として機能する。
@@ -14,6 +14,14 @@ GEMINI.md は Gemini CLI / Gemini Code Assist 向けの入り口。
 
 @./CLAUDE.md
 @docs/PROGRESS.md
+
+2026-10-15 に `/books/knowledge-graphs-and-llms-in-action` を推薦書籍へ追加。
+指定HTMLの95見出し・53リスト・31表・14コード例・18図解を含む本文とCSSを固定期待値で照合する。
+31ページ契約と13操作契約を追加し、HTML監査exit 0、全体Vitest **201 files／2030 tests**、
+typecheck・lint（553 files／0 diagnostics）が成功。原本2形式は内容無変更で保存。
+原本の暗色テーマ、320px固定目次、960px以下の通常フロー目次、リストの点・番号を保持する。
+監査形式対応は独立したRed／Greenコミット。開始前からある監査2ファイルの差分は未コミットで保持。
+目視確認はユーザー担当（ポート3002）。npm・ビルドは未実行。履歴は `docs/PROGRESS.md` を参照。
 
 2026-10-14 に `/books/hands-on-large-language-models` を推薦書籍へ追加。指定HTMLの本文・構造・
 27図解・7表64行・17チェック項目・24参考文献カード（24リンク）を固定期待値で照合する。
@@ -118,10 +126,10 @@ Vitest 185 files／1779 tests、typecheck・lint・pytest 104件が成功。復�
 ## 検証コマンド
 
 ```bash
-(cd web-next && NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000) # Node 24 / 197 files / 1970 tests pass（2026-10-14 実測）
-(cd web-next && bun run typecheck)   # OK（2026-10-14 実測）
+(cd web-next && NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000) # Node 24 / 201 files / 2030 tests pass（2026-10-15 実測）
+(cd web-next && bun run typecheck)   # OK（2026-10-15 実測）
 # ビルドは今回ユーザー指定で未実行（過去: 2026-09-18 に89静的ページ生成）
-(cd web-next && bun run lint)        # OK（545 files / 0 diagnostics。2026-10-14 実測）
+(cd web-next && bun run lint)        # OK（553 files / 0 diagnostics。2026-10-15 実測）
 (cd scraper && uv run pytest)        # 今回対象外。過去の成功は104件（2026-10-04）
 ```
 

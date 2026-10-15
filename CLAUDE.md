@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Updated 2026-10-14
+Updated 2026-10-15
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
@@ -9,6 +9,17 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 AIモデルの時間別コスト計算機 + AI ツール導入ガイド群。Python スクレイパーが各社料金ページから価格を自動取得し `pricing.json` を生成、**Next.js 16 App Router（SSG / `output: 'export'`）** がそれを読み込んで Netlify CDN へ配信する。Phase 1–14 でコスト計算機ページが Next.js 化済み。18 枚のガイドページ（旧 `legacy/` 配下）は Phase A–F で **全移行完了**（計画書は [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](docs/archive/NEXTJS_PHASE_A_F_PLAN.md) に保存）。さらに追加移行ページとして `/claude/managed-agents` や `/code-review/coderabbit-guide` 等を設置。
 
 ## アーキテクチャ
+
+推薦書籍 `/books/knowledge-graphs-and-llms-in-action` を追加（2026-10-15）。指定HTMLの全95見出し・
+80段落・53リスト／157項目・31表／195行・14コード例・18 Mermaid図解・14引用・18折りたたみ・
+46根拠バッジをPure JSXへ転写。31ページ契約と13操作契約で本文・構造・CSS・コピー・目次追従を照合する。
+320px固定目次と960px以下の通常フロー目次、原本の暗色配色・図解テーマ、リストの点・番号・入れ子を保持。
+HTML／Markdownは内容無変更で `archive/html/books/`／`archive/md/books/` に保存。指定HTMLを正本とし、
+本文の調査基準日2026年9月21日を維持する。両形式にはLangGraphのエラー分岐などに差がある。
+原本監査exit 0、18図解の構文解析成功、全体Vitest **201 files / 2030 tests**、
+typecheck・lint（553 files／0 diagnostics）が成功。操作処理は行・関数100%、分岐86.84%。
+監査のDIAGRAMS配列・文字参照・JSXエスケープ対応を4つのRedテストから追加し、監査38件成功。
+既存の未コミット監査変更は保持。依存・設定は変更せず、npm・ビルドは未実行。目視確認はユーザー担当。
 
 推薦書籍 `/books/hands-on-large-language-models` を追加（2026-10-14）。指定HTMLの全10 H2・
 22 H3・16 H4・96段落・56リスト項目・7表／64行（書籍情報kv表8行、アーキテクチャ比較表、
@@ -391,7 +402,7 @@ Build:     cd web-next && bun run build
 以下を全て確認してからコミットすること：
 
 1. `cd web-next && bun run build` が成功（※Antigravityサンドボックス環境では実行禁止。他環境やCIでは必須）
-2. `cd web-next && bun run test` が完全に成功（192 files / 1876 tests pass、2026-10-11実測。Node 24で `NODE_OPTIONS=--no-experimental-webstorage` と `--maxWorkers=1 --testTimeout=30000` を使用。収集失敗もブロッキング失敗として原因を調査する）
+2. `cd web-next && bun run test` が完全に成功（201 files / 2030 tests pass、2026-10-15実測。Node 24で `NODE_OPTIONS=--no-experimental-webstorage` と `--maxWorkers=1 --testTimeout=30000` を使用。収集失敗もブロッキング失敗として原因を調査する）
 3. `cd web-next && bun run typecheck` が成功
 4. `cd web-next && bun run lint` が成功
 5. `cd scraper && uv run pytest` が成功
