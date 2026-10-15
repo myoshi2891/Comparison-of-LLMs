@@ -261,6 +261,14 @@ describe("Reliable Machine Learning ガイド契約テスト", () => {
     const counter = container.querySelector(`.${styles.checklistCounter}`);
     expect(counter).not.toBeNull();
     expect(counter ? text(counter) : "").toBe("0/10");
+
+    const card = container.querySelector(".checklist-card");
+    expect(card).not.toBeNull();
+    const done = container.querySelector(".checklist-done");
+    expect(done).not.toBeNull();
+    expect(done?.textContent).toBe("0");
+    const itemBoxes = container.querySelectorAll(".checklist-checkbox");
+    expect(itemBoxes.length).toBe(10);
   });
 
   it("D-11: 参考文献カードが 15 件存在し、ref-1 〜 ref-15 の ID を持つ", () => {

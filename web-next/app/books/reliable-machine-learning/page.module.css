@@ -489,9 +489,16 @@
   transition: color 0.15s;
 }
 
-.checklistItem:has(.checklistCheckbox:checked) .checklistText {
+.checklistItem:has(.checklistCheckbox:checked) .checklistText,
+.checklistItem:has(input[type="checkbox"]:checked) .checklistText,
+.checklistItem.done .checklistText,
+.checklistItem:global(.done) .checklistText {
   color: var(--text-dim);
   text-decoration: line-through;
+}
+
+.done {
+  /* class marker for completed checklist items */
 }
 
 /* ---------- 参考文献 ---------- */

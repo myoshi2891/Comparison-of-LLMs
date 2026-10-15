@@ -33,17 +33,46 @@ export default function TocObserver() {
     }
 
     // 2. Checklist counter
-    const cards = Array.from(document.querySelectorAll<HTMLElement>(".checklist-card"));
+    const cardSelector = [
+      styles.checklistCard ? `.${styles.checklistCard}` : "",
+      ".checklist-card",
+    ]
+      .filter(Boolean)
+      .join(", ");
+    const cards = Array.from(document.querySelectorAll<HTMLElement>(cardSelector));
     const cleanups: Array<() => void> = [];
 
+    const boxSelector = [
+      styles.checklistCheckbox ? `.${styles.checklistCheckbox}` : "",
+      ".checklist-checkbox",
+      "input[type='checkbox']",
+    ]
+      .filter(Boolean)
+      .join(", ");
+
+    const doneSelector = [
+      styles.checklistDone ? `.${styles.checklistDone}` : "",
+      ".checklist-done",
+    ]
+      .filter(Boolean)
+      .join(", ");
+
     for (const card of cards) {
-      const boxes = Array.from(card.querySelectorAll<HTMLInputElement>("input[type='checkbox']"));
-      const doneEl = card.querySelector<HTMLElement>(".checklist-done");
+      const boxes = Array.from(card.querySelectorAll<HTMLInputElement>(boxSelector));
+      const doneEl = card.querySelector<HTMLElement>(doneSelector);
 
       const updateProgress = () => {
         let count = 0;
         for (const b of boxes) {
-          if (b.checked) count++;
+          const item = b.closest("li");
+          if (b.checked) {
+            count++;
+            if (styles.done) item?.classList.add(styles.done);
+            item?.classList.add("done");
+          } else {
+            if (styles.done) item?.classList.remove(styles.done);
+            item?.classList.remove("done");
+          }
         }
         if (doneEl) {
           doneEl.textContent = String(count);
