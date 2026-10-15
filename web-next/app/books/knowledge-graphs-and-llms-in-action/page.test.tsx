@@ -376,6 +376,69 @@ describe("Knowledge Graphs and LLMs in Action — frozen source contracts", () =
       nodes(root, '[data-testid="code-block"]').map((element) => element.querySelector("code")?.id)
     ).toEqual(source.codes.map((code) => code.id));
   });
+  for (const [kind, baseColor, activeColor] of [
+    ["nav__link", "rgb(174, 188, 214)", "rgb(234, 240, 251)"],
+    ["nav__sub-link", "rgb(124, 139, 171)", "rgb(124, 158, 255)"],
+  ] as const) {
+    it(`keeps original ${kind} colors and decorations through the actual selector cascade`, () => {
+      const variables = Object.assign(
+        {},
+        ...source.cssRules
+          .filter((rule) => rule.selector === ".layout")
+          .map((rule) => rule.declarations)
+      );
+      const stylesheet = document.createElement("style");
+      // jsdom does not resolve CSS variables. Substitute the frozen source palette,
+      // then let its CSS engine decide specificity rather than just checking rule presence.
+      stylesheet.textContent = rules
+        .filter((rule) => !rule.media)
+        .map((rule) => {
+          const selector = rule.selector
+            .replace(/:global\(([^)]+)\)/g, "$1")
+            .replace(/\.([A-Za-z_][\w-]*)/g, (_match, name) => `.${styles[name]}`)
+            .replace(/:hover/g, '[data-test-hover="true"]');
+          const declarations = Object.entries(rule.declarations)
+            .filter(([property]) =>
+              ["color", "text-decoration", "background", "font-weight"].includes(property)
+            )
+            .map(
+              ([property, value]) =>
+                `${property}:${value.replace(/var\((--[\w-]+)\)/g, (_match, name) => variables[name] ?? "inherit")}`
+            )
+            .join(";");
+          return `${selector}{${declarations}}`;
+        })
+        .join("\n");
+      document.head.appendChild(stylesheet);
+      try {
+        const { container } = render(<Page />);
+        const link = container.querySelector(`.${styles[kind]}`) as HTMLAnchorElement;
+        link.classList.remove(styles.active);
+        expect([getComputedStyle(link).color, getComputedStyle(link).textDecoration]).toEqual([
+          baseColor,
+          "none",
+        ]);
+        link.dataset.testHover = "true";
+        expect([getComputedStyle(link).color, getComputedStyle(link).textDecoration]).toEqual([
+          "rgb(234, 240, 251)",
+          "none",
+        ]);
+        delete link.dataset.testHover;
+        link.classList.add(styles.active);
+        expect([getComputedStyle(link).color, getComputedStyle(link).textDecoration]).toEqual([
+          activeColor,
+          "none",
+        ]);
+        link.dataset.testHover = "true";
+        expect([getComputedStyle(link).color, getComputedStyle(link).textDecoration]).toEqual([
+          activeColor,
+          "none",
+        ]);
+      } finally {
+        stylesheet.remove();
+      }
+    });
+  }
   it("registers metadata and derived navigation", () => {
     expect(metadata.title).toBe(`${source.title} | LLM コスト計算機`);
     const entry = findBySlug("/books/knowledge-graphs-and-llms-in-action");

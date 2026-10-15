@@ -9,7 +9,7 @@ const observe = vi.fn();
 const disconnect = vi.fn();
 const writeText = vi.fn();
 const execCommand = vi.fn();
-function mount() {
+function mount(withNextSection = false) {
   return render(
     <>
       <div data-page="knowledge-graphs-and-llms-in-action">
@@ -25,12 +25,18 @@ function mount() {
           <a href="#step-1" data-nav-target="step-1">
             Second
           </a>
+          {withNextSection && (
+            <a href="#sec-8" data-nav-target="sec-8">
+              Next section
+            </a>
+          )}
           <a href="#missing" data-nav-target="missing">
             Missing
           </a>
         </nav>
         <h2 id="sec-0">First</h2>
         <h3 id="step-1">Second</h3>
+        {withNextSection && <h2 id="sec-8">Next section</h2>}
         <button type="button" data-copy-target="code-0">
           <i className="ti ti-copy" />
           コピー
@@ -51,6 +57,24 @@ const clickCopy = async (container: HTMLElement) => {
 };
 beforeEach(() => {
   vi.useFakeTimers();
+  vi.stubGlobal("scrollY", 0);
+  vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(function (
+    this: HTMLElement
+  ) {
+    const top =
+      ({ "sec-0": 200, "step-1": 1200, "sec-8": 2400 } as Record<string, number>)[this.id] ?? 0;
+    return {
+      top: top - window.scrollY,
+      bottom: top - window.scrollY + 30,
+      height: 30,
+      left: 0,
+      right: 100,
+      width: 100,
+      x: 0,
+      y: top - window.scrollY,
+      toJSON: () => ({}),
+    };
+  });
   vi.stubGlobal(
     "IntersectionObserver",
     vi.fn(function (this: IntersectionObserver, cb: IntersectionObserverCallback) {
@@ -83,6 +107,7 @@ describe("guide navigation and copy behavior", () => {
   });
   it("moves current styling and aria state to an intersecting step", () => {
     const { container } = mount();
+    vi.stubGlobal("scrollY", 1250);
     act(() =>
       callback(
         [
@@ -116,6 +141,81 @@ describe("guide navigation and copy behavior", () => {
     expect(container.querySelector('[aria-current="location"]')?.getAttribute("href")).toBe(
       "#sec-0"
     );
+  });
+  const current = (container: HTMLElement) =>
+    Array.from(container.querySelectorAll('[aria-current="location"]')).map((link) =>
+      link.getAttribute("href")
+    );
+  function scrollToPosition(position: number) {
+    vi.stubGlobal("scrollY", position);
+    fireEvent.scroll(window);
+  }
+  it("tracks large downward jumps and upward return without any intersection callback", () => {
+    const { container } = mount(true);
+    scrollToPosition(1250);
+    expect(current(container)).toEqual(["#step-1"]);
+    expect(
+      Array.from(container.querySelectorAll(`a.${styles.active}`)).map((link) =>
+        link.getAttribute("href")
+      )
+    ).toEqual(["#step-1"]);
+    scrollToPosition(2500);
+    expect(current(container)).toEqual(["#sec-8"]);
+    scrollToPosition(0);
+    expect(current(container)).toEqual(["#sec-0"]);
+  });
+  it("retains the chapter step between headings and follows the next parent section", () => {
+    const { container } = mount(true);
+    scrollToPosition(1700);
+    expect(current(container)).toEqual(["#step-1"]);
+    scrollToPosition(2261);
+    expect(current(container)).toEqual(["#sec-8"]);
+  });
+  it("initializes the current heading on a restored deep scroll position", () => {
+    vi.stubGlobal("scrollY", 1250);
+    const { container } = mount();
+    expect(current(container)).toEqual(["#step-1"]);
+  });
+  it("recalculates the current heading on resize", () => {
+    const { container } = mount();
+    vi.stubGlobal("scrollY", 1250);
+    fireEvent.resize(window);
+    expect(current(container)).toEqual(["#step-1"]);
+  });
+  it("updates even when IntersectionObserver is unavailable", () => {
+    vi.stubGlobal("IntersectionObserver", undefined);
+    const { container } = mount();
+    scrollToPosition(1250);
+    expect(current(container)).toEqual(["#step-1"]);
+  });
+  it("chooses document order rather than the order of observer entries", () => {
+    const { container } = mount();
+    vi.stubGlobal("scrollY", 1250);
+    act(() =>
+      callback(
+        [
+          { target: container.querySelector("#step-1"), isIntersecting: true },
+          { target: container.querySelector("#sec-0"), isIntersecting: true },
+        ] as IntersectionObserverEntry[],
+        {} as IntersectionObserver
+      )
+    );
+    expect(current(container)).toEqual(["#step-1"]);
+  });
+  it("removes scroll and resize listeners on unmount", () => {
+    const add = vi.spyOn(window, "addEventListener");
+    const remove = vi.spyOn(window, "removeEventListener");
+    const { unmount } = mount();
+    const listeners = add.mock.calls.filter(([type]) => ["scroll", "resize"].includes(type));
+    expect(listeners.map(([type]) => type).sort()).toEqual(["resize", "scroll"]);
+    unmount();
+    for (const [type, handler] of listeners)
+      expect(remove.mock.calls.some((call) => call[0] === type && call[1] === handler)).toBe(true);
+    const rect = vi.mocked(HTMLElement.prototype.getBoundingClientRect);
+    rect.mockClear();
+    fireEvent.scroll(window);
+    fireEvent.resize(window);
+    expect(rect.mock.calls).toEqual([]);
   });
   it("copies exact whitespace through a click on the nested icon and resets after 1600ms", async () => {
     const { container } = mount();
