@@ -15,7 +15,24 @@ GEMINI.md は Gemini CLI / Gemini Code Assist 向けの入り口。
 @./CLAUDE.md
 @docs/PROGRESS.md
 
-2026-10-15 の同ページ保守で、サイドバーのCSS詳細度競合とスクロール追従の取りこぼしを修正。
+推薦書籍 `/books/knowledge-graphs-fundamentals-techniques` を追加（2026-10-15）。
+指定HTMLの全22 H2・121 H3・190段落・32リスト／129項目・40表／195行・9コード例・
+16 Mermaid図解・44 callout・本文28外部リンクをPure JSXへ完全転写。80 CSS規則と本文を
+原本由来の固定期待値で照合し、30ページ契約と14操作契約で移行漏れを検知する。
+原本の320px固定目次、980px以下の通常フロー、用語集2列／1列、リストの点・番号・入れ子を保持。
+表の全列左寄せ、コードの改行・インデント、見出しのスクロール余白と目次リンクのCSSカスケードを検証。
+Python／SQLの構文色は原本のhighlight.js 11.9.0で生成した全トークンと完全一致し、
+三重引用符の複数行文字列も保持する。Turtle／SPARQL／textは原本どおりプレーン表示。
+共有クロームのページ限定補正はglobals.cssへ集約し、registryからナビ・検索・RSSを導出する。
+HTML／Markdownはarchive/html/books/／archive/md/books/へ内容無変更で保存（SHA-256一致）。
+HTMLを正本とし、本文の基準日2026年9月21日を維持。Markdownはラベル表記などに差があるため混在させない。
+原本監査exit 0、全16図はMermaid 10.9.8で解析成功。全体Vitest **203 files / 2085 tests**、
+対象44契約、typecheck・lint（560 files／0 diagnostics）が成功。操作処理の行・関数・分岐は100%。
+計測時だけ既存の一時ローダーでキャッシュ済みjs-tokens 10を解決し、依存・設定・ロックは変更しない。
+npm・ビルド・スクレイパー検証・ブラウザ自動確認は未実行。CSSキャッシュを退避してdevを3001番で再起動し、
+新規ルートのHTTP 200を確認。目視はユーザー担当。
+
+2026-10-15 のKnowledge Graphs and LLMs in Action保守で、サイドバーのCSS詳細度競合とスクロール追従の取りこぼしを修正。
 原本の固定期待値を変えず9契約を追加し、対象53契約・全体Vitest **201 files／2039 tests**、
 typecheck・lint（553 files／0 diagnostics）・原本監査exit 0が成功。npm・ビルドは未実行。
 目視確認はユーザー担当（ポート3002）。原因と分離履歴は `docs/PROGRESS.md` を参照。
@@ -131,10 +148,10 @@ Vitest 185 files／1779 tests、typecheck・lint・pytest 104件が成功。復�
 ## 検証コマンド
 
 ```bash
-(cd web-next && NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000) # Node 24 / 201 files / 2039 tests pass（2026-10-15 実測）
+(cd web-next && NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000) # 203 files / 2085 tests pass（2026-10-15 実測）
 (cd web-next && bun run typecheck)   # OK（2026-10-15 実測）
 # ビルドは今回ユーザー指定で未実行（過去: 2026-09-18 に89静的ページ生成）
-(cd web-next && bun run lint)        # OK（553 files / 0 diagnostics。2026-10-15 実測）
+(cd web-next && bun run lint)        # OK（560 files / 0 diagnostics。2026-10-15 実測）
 (cd scraper && uv run pytest)        # 今回対象外。過去の成功は104件（2026-10-04）
 ```
 

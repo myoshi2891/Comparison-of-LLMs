@@ -12,6 +12,12 @@ Updated 2026-10-15
 
 基準コミット（drift 検出用）: `45940fd`
 
+保守同期（2026-10-15）: 推薦書籍 `/books/knowledge-graphs-fundamentals-techniques` を追加。
+既存007〜009のDONE状態を維持し、新規の基盤プランは起票していない。
+原本由来の44契約、HTML原本監査exit 0、全16図の構文解析、全体Vitest **203 files／2085 tests**、
+typecheck・lint（560 files／0 diagnostics）が成功。HTML／Markdownは内容無変更で保存。
+目視はユーザー担当（ポート3001）。npm・ビルドは未実行。履歴は `docs/PROGRESS.md` を参照。
+
 保守同期（2026-10-15）: 推薦書籍 `/books/knowledge-graphs-and-llms-in-action` を既存レジストリへ登録。
 既存007〜009のDONE状態を維持し、新しい基盤プランは起票していない。
 44契約を追加し、HTML原本監査exit 0、全体Vitest **201 files／2030 tests**、

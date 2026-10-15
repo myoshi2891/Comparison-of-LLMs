@@ -10,7 +10,24 @@ AIモデルの時間別コスト計算機 + AI ツール導入ガイド群。Pyt
 
 ## アーキテクチャ
 
-同ページのサイドバー保守（2026-10-15）: `.layout a` の詳細度が目次の通常色・ホバー装飾を上書きする
+推薦書籍 `/books/knowledge-graphs-fundamentals-techniques` を追加（2026-10-15）。
+指定HTMLの全22 H2・121 H3・190段落・32リスト／129項目・40表／195行・9コード例・
+16 Mermaid図解・44 callout・本文28外部リンクをPure JSXへ完全転写。80 CSS規則と本文を
+原本由来の固定期待値で照合し、30ページ契約と14操作契約で移行漏れを検知する。
+原本の320px固定目次、980px以下の通常フロー、用語集2列／1列、リストの点・番号・入れ子を保持。
+表の全列左寄せ、コードの改行・インデント、見出しのスクロール余白と目次リンクのCSSカスケードを検証。
+Python／SQLの構文色は原本のhighlight.js 11.9.0で生成した全トークンと完全一致し、
+三重引用符の複数行文字列も保持する。Turtle／SPARQL／textは原本どおりプレーン表示。
+共有クロームのページ限定補正はglobals.cssへ集約し、registryからナビ・検索・RSSを導出する。
+HTML／Markdownはarchive/html/books/／archive/md/books/へ内容無変更で保存（SHA-256一致）。
+HTMLを正本とし、本文の基準日2026年9月21日を維持。Markdownはラベル表記などに差があるため混在させない。
+原本監査exit 0、全16図はMermaid 10.9.8で解析成功。全体Vitest **203 files / 2085 tests**、
+対象44契約、typecheck・lint（560 files／0 diagnostics）が成功。操作処理の行・関数・分岐は100%。
+計測時だけ既存の一時ローダーでキャッシュ済みjs-tokens 10を解決し、依存・設定・ロックは変更しない。
+npm・ビルド・スクレイパー検証・ブラウザ自動確認は未実行。CSSキャッシュを退避してdevを3001番で再起動し、
+新規ルートのHTTP 200を確認。目視はユーザー担当。
+
+Knowledge Graphs and LLMs in Actionのサイドバー保守（2026-10-15）: `.layout a` の詳細度が目次の通常色・ホバー装飾を上書きする
 競合をページ内で補正。CSSエンジンによるカスケード2契約とスクロール操作7契約を追加し、
 原本の固定期待値を変えず計53契約で検証する。短い見出しの交差通知を取りこぼす問題は、
 スクロール・リサイズ・初期表示時のviewport座標による位置判定で修正。通知順にも依存しない。
@@ -409,7 +426,7 @@ Build:     cd web-next && bun run build
 以下を全て確認してからコミットすること：
 
 1. `cd web-next && bun run build` が成功（※Antigravityサンドボックス環境では実行禁止。他環境やCIでは必須）
-2. `cd web-next && bun run test` が完全に成功（201 files / 2039 tests pass、2026-10-15実測。Node 24で `NODE_OPTIONS=--no-experimental-webstorage` と `--maxWorkers=1 --testTimeout=30000` を使用。収集失敗もブロッキング失敗として原因を調査する）
+2. `cd web-next && bun run test` が完全に成功（203 files / 2085 tests pass、2026-10-15実測。`NODE_OPTIONS=--no-experimental-webstorage` と `--maxWorkers=1 --testTimeout=30000` を使用。収集失敗もブロッキング失敗として原因を調査する）
 3. `cd web-next && bun run typecheck` が成功
 4. `cd web-next && bun run lint` が成功
 5. `cd scraper && uv run pytest` が成功

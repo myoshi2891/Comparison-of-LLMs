@@ -10,21 +10,30 @@
 
 - **フェーズ**: 保守・機能改善・品質強化フェーズ
 - **ブランチ**: `dev`
-- **最新実装 HEAD**: `797947d4`（Knowledge Graphs and LLMs in Actionの目次CSS競合・スクロール追従修正。Red `25f1d505` → Green `6e36150c` → Refactor `797947d4`）
-- **次の作業**: `/books/knowledge-graphs-and-llms-in-action` の目視確認（ユーザー担当。開発サーバーはポート3002）。既存の Hands-On LLM／Enterprise RAG の目視確認もユーザー担当のまま。npm・ビルドは禁止、スクレイパー検証は今回対象外。
-- **ルート実数**: `page.tsx` 92 件、registry 93 エントリ（RSS の `/rss.xml` を含む）。全ルート登録・ナビ導出テストは合格。
+- **最新実装 HEAD**: `bdcc48d6`（Knowledge Graphs基礎・技法・応用ガイド。移行Red `983f04bd`／補強Red `31601475` → Green `2b1b7788` → Refactor `b62462c5`。構文色Red `9baf7104` → Green `bdcc48d6`）
+- **次の作業**: `/books/knowledge-graphs-fundamentals-techniques` の目視確認（ユーザー担当。ポート3001）。980px前後の目次配置、用語集・リストの点と番号、表、複数行コードの色、16図解、目次追従と上へ戻るを確認する。既存書籍／Enterprise RAGの目視もユーザー担当。npm・ビルドは禁止。
+- **ルート実数**: `page.tsx` 93 件、registry 94 エントリ（RSS の `/rss.xml` を含む）。全ルート登録・ナビ導出テストは合格。
 - **動作検証**:
   - ビルド: 今回はユーザー指定で未実行。過去の成功記録は 2026-09-17 の 90 静的ページであり、今回の変更を検証した値ではない。
   - `bun run typecheck` ✅（`tsc --noEmit`。2026-10-15 実測）
-  - `bun run lint` ✅（Biome check / 553 files / 0 diagnostics。2026-10-15 実測）
+  - `bun run lint` ✅（Biome check / 560 files / 0 diagnostics。2026-10-15 実測）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: Node 24で `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000` を実行し、Vitest **201 files / 2039 tests すべて合格**（2026-10-15 実測）。修正後の対象53契約、typecheck・lint（553 files／0 diagnostics）・Knowledge Graphs and LLMs in ActionのHTML原本監査exit 0・監査スクリプト38件も成功。
-    - 今回のサイドバー修正前のベースラインは **201 files / 2030 tests**。既存環境の `localStorage` 問題を避ける実行時オプションを継続使用し、依存・設定ファイルは変更していない。
+  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000` でVitest **203 files / 2085 tests すべて合格**（2026-10-15 実測）。対象44契約、typecheck・lint（560 files／0 diagnostics）、HTML原本監査exit 0、全16図の構文解析が成功。操作処理の行・関数・分岐は100%。
+    - 今回の開始時ベースラインは **201 files / 2041 tests**、開始HEADは `c3017945`。既存のlocalStorage対策を継続し、依存・設定・ロックは変更していない。
     - `load(sourceHtml)` をモジュール初期化時に呼ぶ `governance/ai-governance/GuideContent.tsx` と
       `local-llm/finetuning-best-practices/GuideContent.tsx` は、import スモークでも読み込み可能であることを確認済み
   - **バックエンド (`scraper/`)**: 今回はユーザー指定で検証対象外。実行していない。過去の成功記録は104件（2026-10-04）であり、今回の実測値ではない。
 
 ## 最近の追加内容
+
+- **Knowledge Graphs基礎・技法・応用ガイドの完全移行（2026-10-15）**:
+  - 全22章・121小見出し・190段落・32リスト／129項目・40表／195行・9コード例・16図解・44 callout・本文28外部リンクをPure JSX化。HTML由来の本文・構造・80 CSS規則を固定し、30ページ契約＋14操作契約で順序・内容を照合する。原本の期待値は実装に合わせて変更していない。
+  - リストの点・番号・入れ子、用語集の2列／1列、320px固定目次と980px以下の通常フローを保持。実際のCSS適用順でモバイル高さの上書きを検出し、追加Redを先行コミットして修正した。表全列左寄せ、コードの空白・改行、アンカー余白、目次リンクのCSSカスケードも検証する。
+  - Python／SQLの構文色は原本と同じhighlight.js 11.9.0の全トークンを固定し、三重引用符の複数行文字列も一致する。文法処理は一時生成時だけ行い、実行時のCDNスクリプト・依存追加はない。元のCSS／フォントリンクは3件すべて保持する。
+  - HTML／Markdownはそれぞれ `archive/html/books/Knowledge-graphs-fundamentals-techniques-guide.html`／`archive/md/books/Knowledge-graphs-fundamentals-techniques-guide.md` に内容無変更で保存（移動前後のSHA-256一致）。指定HTMLが正本。Markdownとの差は主に【本書の範囲】等のラベル、用語集アイコン、段落／リスト表現で、混在させない。本文の基準日は2026年9月21日を維持する。
+  - HTML原本監査exit 0、全16図はアプリ既存のMermaid 10.9.8で解析成功。原本のdarkテーマと全テーマ変数を保持し、サイズ・中央寄せは共有部品へ委譲。JSX文字列の図解は監査可能な定数参照にし、テストではフローチャートの先頭空白だけ正規化する。calloutのDOM variantは定数で渡し、監査が原本のクラス分類と混同しないようにした。
+  - 全体Vitest **203 files / 2085 tests**、対象44契約、typecheck・lint（560 files／0 diagnostics）が成功。カバレッジ変換器の既存js-tokens解決問題は、一時ローダーでキャッシュ済み10.0.0を参照して回避。操作部品の行・関数・分岐は100%。依存・設定・ロック・監査スクリプトは変更していない。
+  - 分離履歴: Red `983f04bd`／補強Red `31601475` → Green `2b1b7788` → Refactor `b62462c5` → 構文色Red `9baf7104` → Green `bdcc48d6`。CSSキャッシュを退避して3001番でdevを再起動し、ルートのHTTP 200と応答HTMLの全要素数を確認。npm・ビルド・スクレイパー検証・ブラウザ自動確認は未実行。目視はユーザー担当。
 
 - **Knowledge Graphs and LLMs in ActionのサイドバーCSS・スクロール追従修正（2026-10-15）**:
   - `.layout a`／`.layout a:hover` の詳細度が元の目次クラスを上回り、通常リンクの灰色とホバー時の装飾を上書きしていた。原本CSSの固定オラクルは変更せず、サイドバー内へ限定した詳細度の高い補正で、通常・ホバー・アクティブの原本色と下線なしを復元した。CSS変数だけを固定パレットへ置換し、jsdomのCSSエンジンで実際のカスケードを検証する2契約を追加。
@@ -413,17 +422,18 @@
 
 ```text
 AGENTS.md → CODEX.md → CLAUDE.md → docs/PROGRESS.md → Phase A–F 計画の順で読む。
-最新実装 HEAD: 797947d4（Knowledge Graphs and LLMs in Action目次修正。Red: 25f1d505、Green: 6e36150c、Refactor: 797947d4）
-次の作業: /books/knowledge-graphs-and-llms-in-action の目視確認（リストの点・番号、コピー、折りたたみ、18図解、960px前後の目次配置。ユーザー担当）。開発サーバーはポート3002。
-Hands-On LLM／Enterprise RAGの目視確認も引き続きユーザー担当。
-Knowledge-graphs-and-llms-in-action-guide.html は archive/html/books/、Markdown は archive/md/books/ に内容無変更で退避保存済み。
-指定HTMLの原本監査exit 0、18図解はMermaid 10.9.8の構文解析成功。Markdownには異なる記述があるため期待値へ混ぜない。
-全体 Vitest 201 files / 2039 tests、修正後の53契約、typecheck・lint（553 files / 0 diagnostics）が成功。監査テスト38件成功。pytestは今回対象外。
-この実行環境ではNode 24で NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000 を使用する。
-原本の期待値を移植先に合わせて変更しない。指定HTMLが正本。
-全列左寄せ、コードインデント、アンカー見出しめり込み防止を徹底。今回のMermaidは原本どおりdarkテーマと暗色変数を保持する。
-共有クローム（body／鮮度バー／関連ページ）の上書きは globals.css を正とし、CSS Module に複製しない。
-監査スクリプト2ファイルにはセッション開始前の未コミット変更を保持している。混ぜてコミットしない。
-サンドボックスでは npm とビルドを実行しない。目視結果への修正も Red → Green → Refactor → Docs で分離コミットする。
-page.tsx 92 件、registry 93 エントリ（RSS を含む）。次のページは指示されてから扱う。
+最新実装 HEAD: bdcc48d6（Knowledge Graphs基礎・技法・応用。Red 983f04bd／31601475 → Green 2b1b7788 → Refactor b62462c5 → 構文色Red 9baf7104 → Green bdcc48d6）
+次の作業: /books/knowledge-graphs-fundamentals-techniques の目視確認（ユーザー担当）。開発サーバーはポート3001。
+980px前後の目次配置、用語集2列／1列、リストの点・番号、40表、9コード例の空白と色、16図解、目次追従・上へ戻るを確認する。
+既存のKnowledge Graphs and LLMs in Action／Hands-On LLM／Enterprise RAGの目視もユーザー担当。
+原本HTML／Markdownはarchive/html/books/／archive/md/books/に内容無変更で保存し、SHA-256一致を確認済み。
+指定HTMLが正本。本文の基準日2026年9月21日を保持し、Markdown固有のラベル・段落構造を混在させない。
+HTML原本監査exit 0、全16図はMermaid 10.9.8で構文解析成功。darkテーマと原本の全テーマ変数を保持する。
+全体Vitest 203 files / 2085 tests、対象44契約、typecheck・lint（560 files / 0 diagnostics）が成功。操作部品の行・関数・分岐100%。
+NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000 を使用する。
+カバレッジのみ既存の一時ローダーでjs-tokens 10を解決。依存・設定・ロックファイルは変更しない。
+原本の固定期待値を実装へ合わせて変更しない。表全列左寄せ、明示的コードインデント、アンカー余白を維持する。
+共有クロームの補正はglobals.cssへ集約し、CSS Moduleへ複製しない。開始時の作業ツリーはクリーンだった。
+サンドボックスではnpmとビルドを実行しない。目視修正もRed → Green → Refactor → Docsの分離コミットを守る。
+page.tsx 93件、registry 94エントリ（RSSを含む）。次ページは指示されてから扱う。
 ```
