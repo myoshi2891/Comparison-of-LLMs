@@ -94,3 +94,21 @@ test("preserves literal backslash-n versus actual line breaks", () => {
 		0,
 	);
 });
+test("reports a missing diagram when the DIAGRAMS array omits its trailing semicolon", () => {
+	const chart = "flowchart TD\nA --> B";
+	const source = `<script>const DIAGRAMS = ${JSON.stringify([chart])}\n</script>`;
+	const missing = audit(source, "<div></div>");
+	assert.equal(missing.status, 1);
+	assert.deepEqual(missing.data.counts.mermaidSources, { source: 1, page: 0 });
+	assert.equal(
+		audit(source, `const D = ${JSON.stringify(chart)};<MermaidDiagram chart={D}/>`).status,
+		0,
+	);
+});
+test("reads JSX string expressions that carry an inline block comment", () => {
+	const value = "http://purl.obolibrary.org/obo/HP_";
+	const source = `<p>prefix <code>${value}</code> suffix</p>`;
+	const page = `<p>prefix <code>{\n  ${JSON.stringify(value)} /* NOSONAR: identifier */\n}</code> suffix</p>`;
+	assert.equal(audit(source, page).status, 0);
+	assert.equal(audit(source, page.replace(value, "http://example.com/other")).status, 1);
+});

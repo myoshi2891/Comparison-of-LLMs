@@ -116,7 +116,8 @@ function stripMarkup(fragment, jsx = true) {
   if (jsx) {
     text = text
       .replace(/\{\/\*[\s\S]*?\*\/\}/g, "")
-      .replace(/\{\s*(?:"((?:[^"\\]|\\.)*)"|'((?:[^'\\]|\\.)*)'|`((?:[^`\\]|\\.)*)`)\s*\}/g,
+      // 式内のブロックコメント（`{"http://…" /* NOSONAR */}` 等）は表示されないため読み飛ばす。
+      .replace(/\{\s*(?:\/\*[\s\S]*?\*\/\s*)*(?:"((?:[^"\\]|\\.)*)"|'((?:[^'\\]|\\.)*)'|`((?:[^`\\]|\\.)*)`)\s*(?:\/\*[\s\S]*?\*\/\s*)*\}/g,
         (_match, double, single, template) => stash(decodeQuotedEntryEscapes(double ?? single ?? template)))
       .replace(/\{\s*(?:styles\.[A-Za-z0-9_-]+|[A-Za-z_$][\w$]*)\s*\}/g, "");
   }
@@ -478,7 +479,7 @@ function collectHtmlMermaidSources(src) {
   }
 
   // Plain string arrays are used by standalone guides; parse strings without executing source JS.
-  const arrayRe = /\b(?:const|let|var)\s+DIAGRAMS\s*=\s*\[((?:\s*(?:"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|`(?:[^`\\]|\\.)*`)\s*,?)+)\s*\]\s*;/g;
+  const arrayRe = /\b(?:const|let|var)\s+DIAGRAMS\s*=\s*\[((?:\s*(?:"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|`(?:[^`\\]|\\.)*`)\s*,?)+)\s*\]\s*;?/g;
   for (const array of src.matchAll(arrayRe)) {
     const stringRe = /"((?:[^"\\]|\\.)*)"|'((?:[^'\\]|\\.)*)'|`((?:[^`\\]|\\.)*)`/g;
     for (const value of array[1].matchAll(stringRe)) {
