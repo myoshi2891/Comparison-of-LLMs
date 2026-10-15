@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import MermaidDiagram from "@/components/docs/MermaidDiagram";
+import { findBySlug } from "@/lib/page-registry";
 import styles from "./page.module.css";
 import TocObserver from "./TocObserver";
 
@@ -114,6 +115,8 @@ const DIAGRAM_ROADMAP = `flowchart TB
     class S9 done`;
 
 export default function Page() {
+  const entry = findBySlug("/books/llm-engineers-handbook");
+  if (!entry) throw new Error("page-registry entry is missing: /books/llm-engineers-handbook");
   return (
     <div className={styles.layout} data-testid="layout-root" data-page="llm-engineers-handbook">
       <link
@@ -377,8 +380,8 @@ export default function Page() {
           <div className={styles.freshnessBar} lang="ja" data-testid="page-freshness">
             <span className={styles.freshnessItem}>
               最終確認{" "}
-              <time className={styles.freshnessValue} dateTime="2026-10-14">
-                2026-10-14
+              <time className={styles.freshnessValue} dateTime={entry.lastReviewed}>
+                {entry.lastReviewed}
               </time>
             </span>
             <span className={styles.freshnessSep} aria-hidden="true">

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import MermaidDiagram from "@/components/docs/MermaidDiagram";
+import { findBySlug } from "@/lib/page-registry";
 import styles from "./page.module.css";
 import TocObserver from "./TocObserver";
 
@@ -144,6 +145,8 @@ ${CLASSDEFS}
 class E done;`;
 
 export default function AdversarialRobustnessGuidePage() {
+  const entry = findBySlug("/books/adversarial-robustness");
+  if (!entry) throw new Error("page-registry entry is missing: /books/adversarial-robustness");
   return (
     <div className={styles.layout} data-testid="layout-root" data-page="adversarial-robustness">
       <TocObserver />
@@ -282,8 +285,8 @@ export default function AdversarialRobustnessGuidePage() {
           <div className={styles.freshnessBar} lang="ja" data-testid="page-freshness">
             <span className={styles.freshnessItem}>
               最終確認{" "}
-              <time className={styles.freshnessValue} dateTime="2026-10-14">
-                2026-10-14
+              <time className={styles.freshnessValue} dateTime={entry.lastReviewed}>
+                {entry.lastReviewed}
               </time>
             </span>
             <span className={styles.freshnessSep} aria-hidden="true">
