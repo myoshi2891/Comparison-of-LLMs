@@ -350,6 +350,26 @@ describe("LangChain in your Pocket guide — source parity and design contracts"
     expect(globalsCss).toContain("calc(100% - 288px)");
   });
 
+  it("D-14: code blocks contain syntax highlighting tokens (hljs-keyword, hljs-string, hljs-comment)", () => {
+    const { container } = render(<Page />);
+    const tokens = nodes(container, ".hljs-keyword, .hljs-string, .hljs-comment");
+    expect(tokens.length).toBeGreaterThanOrEqual(50);
+  });
+
+  it("D-15: globals.css enforces !important on margin-left and max-width for related pages footer", () => {
+    const globalsCssPath = path.resolve(process.cwd(), "app/globals.css");
+    const globalsCss = fs.readFileSync(globalsCssPath, "utf-8");
+    expect(globalsCss).toContain(
+      'body:has([data-page="langchain-in-your-pocket"]) nav[aria-label="関連ページ"]'
+    );
+    expect(globalsCss).toMatch(
+      /body:has\(\[data-page="langchain-in-your-pocket"\]\)\s+nav\[aria-label="関連ページ"\][\s\S]*?margin-left:\s*288px\s*!important/
+    );
+    expect(globalsCss).toMatch(
+      /body:has\(\[data-page="langchain-in-your-pocket"\]\)\s+nav\[aria-label="関連ページ"\][\s\S]*?max-width:\s*none\s*!important/
+    );
+  });
+
   // Q. 品質契約 (3件・必須)
   it("Q-1: metadata title and description are non-empty and title matches H1", () => {
     expect(typeof metadata.title === "string" ? metadata.title : "").toContain(EXPECTED_H1[0]);
