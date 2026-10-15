@@ -13,14 +13,15 @@ AIモデルの時間別コスト計算機 + AI ツール導入ガイド群。Pyt
 推薦書籍 `/books/reliable-machine-learning` を追加（2026-10-15）。
 指定HTMLの全1 H1・15 H2・36 H3・70段落・85リスト項目・10表64行・12 Mermaid図解・
 7 callout（ベストプラクティス）・10チェック項目・15参考文献カード（15外部リンク）をPure JSXへ完全転写。
-19ページ契約と4操作契約で原本照合し、HTML原本監査exit 0を確認。
-原本の300px固定目次、スクロール連動ハイライト、表の全列左寄せ、アンカー移動の見出しめり込み防止を保持。
-全12箇所のMermaid図解に原本準拠のライトテーマ変数（background: #f5f7fb、primaryColor: #eaeef6等）を反映。
+22ページ契約と4操作契約で原本照合し、HTML原本監査exit 0を確認。
+原本の300px固定常駐目次、スクロール連動ハイライト、表の全列左寄せ、アンカー移動の見出しめり込み防止を保持。
+全12箇所のMermaid図解に原本準拠のライトテーマ変数を反映し、classDef明色テキストの保護でコントラストを復元。
+サイト全体の13pxベースと調和するようH1・見出し・目次・ベースフォント（15px）を上品に最適化。
 チェックリスト10項目の進捗カウンター連動（0/10）を実装。
-共有クロームの補正（鮮度バーの非表示統合、共通フッターの300px !important オフセット）を適用。
+共有クロームの補正（globals.css集約: ヘッダー・免責バナー不透明化、鮮度バー非表示、共通フッターの白背景・300pxオフセット）を適用。
 HTML／Markdownはarchive/html/books/／archive/md/books/へ内容無変更で保存（SHA-256一致）。
-全体Vitest **208 files / 2146 tests**、対象23契約、typecheck・lint（572 files / 0 diagnostics）が成功。
-分離履歴: 移行 Red `908a6769` → Green `0170db70` → Refactor `927a9174`。
+全体Vitest **208 files / 2149 tests**、対象26契約、typecheck・lint（572 files / 0 diagnostics）が成功。
+分離履歴: 移行 Red `908a6769` → Green `0170db70` → Refactor `927a9174`、改善 Red `b20dfcb1` → Green `d8a8b268`。
 npm・ビルドは未実行、目視確認はユーザー担当（ポート3000/3001）。
 
 推薦書籍 `/books/langchain-in-your-pocket` を追加（2026-10-15）。
