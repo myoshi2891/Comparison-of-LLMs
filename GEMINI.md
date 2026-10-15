@@ -32,6 +32,12 @@ HTMLを正本とし、本文の基準日2026年9月21日を維持。Markdownは�
 npm・ビルド・スクレイパー検証・ブラウザ自動確認は未実行。CSSキャッシュを退避してdevを3001番で再起動し、
 新規ルートのHTTP 200を確認。目視はユーザー担当。
 
+2026-10-15 に同ガイドの19.2／19.3をブラッシュアップ。既存8問・8解答は保持し、
+問題カードの学習目標、解答ごとのネイティブ開閉、全8件の具体例・解説・注意点・復習リンクを追加。
+原本の固定期待値は変更せず、補足の内容と開閉・番号・フォーカス表示を8契約で追加検証する。
+対象52契約、HTML原本監査exit 0、全体Vitest **204 files / 2093 tests**、typecheck・
+lint（562 files／0 diagnostics）が成功。npm・ビルドは未実行、目視はユーザー担当（ポート3001）。
+
 2026-10-15 のKnowledge Graphs and LLMs in Action保守で、サイドバーのCSS詳細度競合とスクロール追従の取りこぼしを修正。
 原本の固定期待値を変えず9契約を追加し、対象53契約・全体Vitest **201 files／2039 tests**、
 typecheck・lint（553 files／0 diagnostics）・原本監査exit 0が成功。npm・ビルドは未実行。
@@ -148,10 +154,10 @@ Vitest 185 files／1779 tests、typecheck・lint・pytest 104件が成功。復�
 ## 検証コマンド
 
 ```bash
-(cd web-next && NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000) # 203 files / 2085 tests pass（2026-10-15 実測）
+(cd web-next && NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000) # 204 files / 2093 tests pass（2026-10-15 実測）
 (cd web-next && bun run typecheck)   # OK（2026-10-15 実測）
 # ビルドは今回ユーザー指定で未実行（過去: 2026-09-18 に89静的ページ生成）
-(cd web-next && bun run lint)        # OK（560 files / 0 diagnostics。2026-10-15 実測）
+(cd web-next && bun run lint)        # OK（562 files / 0 diagnostics。2026-10-15 実測）
 (cd scraper && uv run pytest)        # 今回対象外。過去の成功は104件（2026-10-04）
 ```
 

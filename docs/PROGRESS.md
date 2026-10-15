@@ -10,21 +10,28 @@
 
 - **フェーズ**: 保守・機能改善・品質強化フェーズ
 - **ブランチ**: `dev`
-- **最新実装 HEAD**: `bdcc48d6`（Knowledge Graphs基礎・技法・応用ガイド。移行Red `983f04bd`／補強Red `31601475` → Green `2b1b7788` → Refactor `b62462c5`。構文色Red `9baf7104` → Green `bdcc48d6`）
-- **次の作業**: `/books/knowledge-graphs-fundamentals-techniques` の目視確認（ユーザー担当。ポート3001）。980px前後の目次配置、用語集・リストの点と番号、表、複数行コードの色、16図解、目次追従と上へ戻るを確認する。既存書籍／Enterprise RAGの目視もユーザー担当。npm・ビルドは禁止。
+- **最新実装 HEAD**: `909335c5`（Knowledge Graphs基礎ガイド19.2／19.3の学習補足・解答開閉。Red `51b9bc21` → Green `437d9ef7` → Refactor `909335c5`）
+- **次の作業**: `/books/knowledge-graphs-fundamentals-techniques#sec-19-2` の目視確認（ユーザー担当。ポート3001）。問題カードの番号、各解答の開閉、具体例・解説・注意点・復習リンク、モバイル表示を確認する。既存ページ全体の目視も引き続きユーザー担当。npm・ビルドは禁止。
 - **ルート実数**: `page.tsx` 93 件、registry 94 エントリ（RSS の `/rss.xml` を含む）。全ルート登録・ナビ導出テストは合格。
 - **動作検証**:
   - ビルド: 今回はユーザー指定で未実行。過去の成功記録は 2026-09-17 の 90 静的ページであり、今回の変更を検証した値ではない。
   - `bun run typecheck` ✅（`tsc --noEmit`。2026-10-15 実測）
-  - `bun run lint` ✅（Biome check / 560 files / 0 diagnostics。2026-10-15 実測）
+  - `bun run lint` ✅（Biome check / 562 files / 0 diagnostics。2026-10-15 実測）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000` でVitest **203 files / 2085 tests すべて合格**（2026-10-15 実測）。対象44契約、typecheck・lint（560 files／0 diagnostics）、HTML原本監査exit 0、全16図の構文解析が成功。操作処理の行・関数・分岐は100%。
-    - 今回の開始時ベースラインは **201 files / 2041 tests**、開始HEADは `c3017945`。既存のlocalStorage対策を継続し、依存・設定・ロックは変更していない。
+  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000` でVitest **204 files / 2093 tests すべて合格**（2026-10-15 実測）。対象52契約、typecheck・lint（562 files／0 diagnostics）、HTML原本監査exit 0が成功。元の全内容と追加の学習補足を分けて厳密に検証する。
+    - 今回の開始時は対象44契約が成功、直前の全体検証は **203 files / 2085 tests**、開始HEADは `2625a905`。依存・設定・ロック・アーカイブ原本・既存の固定期待値は変更していない。
     - `load(sourceHtml)` をモジュール初期化時に呼ぶ `governance/ai-governance/GuideContent.tsx` と
       `local-llm/finetuning-best-practices/GuideContent.tsx` は、import スモークでも読み込み可能であることを確認済み
   - **バックエンド (`scraper/`)**: 今回はユーザー指定で検証対象外。実行していない。過去の成功記録は104件（2026-10-04）であり、今回の実測値ではない。
 
 ## 最近の追加内容
+
+- **19.2 確認問題・19.3 解答のブラッシュアップ（2026-10-15）**:
+  - 元の8問・8解答を全文・順序・番号リストごと保持し、問題カードへテーマ・分野・確認するポイントを追加。解答はHTML標準のdetails／summaryで個別に開閉でき、初期状態では閉じる。追加のJavaScriptや依存は不要。
+  - 全8解答に具体例・考え方・つまずきやすい点・対応節への復習リンクを追加。適合率80%／再現率40%の計算例、49,995,000組の比較例、TransEの距離0の数値例などで、定義を具体的に確認できる。RDFの制約・空白ノードの識別子は[W3C RDF 1.1](https://www.w3.org/TR/rdf11-concepts/)で確認し、TransEは[原論文](https://proceedings.neurips.cc/paper_files/paper/2013/hash/1cecc7a77928ca8133fa24680a88d2f9-Abstract.html)、コミュニティ要約型GraphRAGは[公式説明](https://microsoft.github.io/graphrag/)と照合した。
+  - 問題と解答の対応、全補足文・復習先、各解答の独立した開閉、初期状態、ネイティブ番号・開閉マーカー、キーボードフォーカスを8契約で検証。既存のHTML原本・source-contract.json・syntax-contract.jsonは無変更。既存契約は補足だけを除いて原文を照合し、補足の内容・構造は独立した固定期待値で全件照合する。原本監査exit 0、全129リスト項目・195表行・190原本段落・144見出し・16図・44 calloutを保持。補足により実ページの段落は232件となった。
+  - 対象52契約、全体Vitest **204 files / 2093 tests**、typecheck・lint（562 files／0 diagnostics）とCSS変数検査が成功。CSSは当該リストのdata属性でページ内へ限定し、600px以下の余白を調整。原本CSS80規則の契約も維持する。
+  - 分離履歴: Red `51b9bc21` → Green `437d9ef7` → Refactor `909335c5`。CSSキャッシュを退避して既存devを3001番で再起動し、HTTP 200を確認。npm・ビルド・ブラウザ自動確認・スクレイパー検証は未実行。目視はユーザー担当。
 
 - **Knowledge Graphs基礎・技法・応用ガイドの完全移行（2026-10-15）**:
   - 全22章・121小見出し・190段落・32リスト／129項目・40表／195行・9コード例・16図解・44 callout・本文28外部リンクをPure JSX化。HTML由来の本文・構造・80 CSS規則を固定し、30ページ契約＋14操作契約で順序・内容を照合する。原本の期待値は実装に合わせて変更していない。
@@ -422,18 +429,16 @@
 
 ```text
 AGENTS.md → CODEX.md → CLAUDE.md → docs/PROGRESS.md → Phase A–F 計画の順で読む。
-最新実装 HEAD: bdcc48d6（Knowledge Graphs基礎・技法・応用。Red 983f04bd／31601475 → Green 2b1b7788 → Refactor b62462c5 → 構文色Red 9baf7104 → Green bdcc48d6）
-次の作業: /books/knowledge-graphs-fundamentals-techniques の目視確認（ユーザー担当）。開発サーバーはポート3001。
-980px前後の目次配置、用語集2列／1列、リストの点・番号、40表、9コード例の空白と色、16図解、目次追従・上へ戻るを確認する。
-既存のKnowledge Graphs and LLMs in Action／Hands-On LLM／Enterprise RAGの目視もユーザー担当。
-原本HTML／Markdownはarchive/html/books/／archive/md/books/に内容無変更で保存し、SHA-256一致を確認済み。
-指定HTMLが正本。本文の基準日2026年9月21日を保持し、Markdown固有のラベル・段落構造を混在させない。
-HTML原本監査exit 0、全16図はMermaid 10.9.8で構文解析成功。darkテーマと原本の全テーマ変数を保持する。
-全体Vitest 203 files / 2085 tests、対象44契約、typecheck・lint（560 files / 0 diagnostics）が成功。操作部品の行・関数・分岐100%。
+最新実装 HEAD: 909335c5（Knowledge Graphs基礎ガイド19.2／19.3。Red 51b9bc21 → Green 437d9ef7 → Refactor 909335c5）
+次の作業: /books/knowledge-graphs-fundamentals-techniques#sec-19-2 の目視確認（ユーザー担当）。開発サーバーはポート3001。
+元の8問・8解答を保持し、問題カードの学習目標、個別に開閉する解答、具体例・考え方・注意点・復習リンクを追加した。
+番号・開閉マーカー、Enter／Spaceによる標準操作とフォーカス表示、600px以下の余白を確認する。
+原本2形式とsource-contract.json／syntax-contract.jsonは無変更。原文と補足は別々の固定期待値で検証する。
+HTML原本監査exit 0、対象52契約、全体Vitest 204 files / 2093 tests、typecheck・lint（562 files / 0 diagnostics）が成功。
 NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000 を使用する。
-カバレッジのみ既存の一時ローダーでjs-tokens 10を解決。依存・設定・ロックファイルは変更しない。
-原本の固定期待値を実装へ合わせて変更しない。表全列左寄せ、明示的コードインデント、アンカー余白を維持する。
-共有クロームの補正はglobals.cssへ集約し、CSS Moduleへ複製しない。開始時の作業ツリーはクリーンだった。
-サンドボックスではnpmとビルドを実行しない。目視修正もRed → Green → Refactor → Docsの分離コミットを守る。
+既存の16 Mermaid図と構文色には変更なし。本文の基準日2026年9月21日を保持する。
+既存のKnowledge Graphs and LLMs in Action／Hands-On LLM／Enterprise RAGを含むページ全体の目視もユーザー担当。
+共有クロームの補正はglobals.cssへ集約。依存・設定・ロック・監査スクリプトは変更していない。
+サンドボックスではnpmとビルドを実行しない。修正もRed → Green → Refactor → Docsの分離コミットを守る。
 page.tsx 93件、registry 94エントリ（RSSを含む）。次ページは指示されてから扱う。
 ```

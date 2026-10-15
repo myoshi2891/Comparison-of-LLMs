@@ -27,6 +27,12 @@ HTMLを正本とし、本文の基準日2026年9月21日を維持。Markdownは�
 npm・ビルド・スクレイパー検証・ブラウザ自動確認は未実行。CSSキャッシュを退避してdevを3001番で再起動し、
 新規ルートのHTTP 200を確認。目視はユーザー担当。
 
+2026-10-15 に同ガイドの19.2／19.3をブラッシュアップ。既存8問・8解答は保持し、
+問題カードの学習目標、解答ごとのネイティブ開閉、全8件の具体例・解説・注意点・復習リンクを追加。
+原本の固定期待値は変更せず、補足の内容と開閉・番号・フォーカス表示を8契約で追加検証する。
+対象52契約、HTML原本監査exit 0、全体Vitest **204 files / 2093 tests**、typecheck・
+lint（562 files／0 diagnostics）が成功。npm・ビルドは未実行、目視はユーザー担当（ポート3001）。
+
 Knowledge Graphs and LLMs in Actionのサイドバー保守（2026-10-15）: `.layout a` の詳細度が目次の通常色・ホバー装飾を上書きする
 競合をページ内で補正。CSSエンジンによるカスケード2契約とスクロール操作7契約を追加し、
 原本の固定期待値を変えず計53契約で検証する。短い見出しの交差通知を取りこぼす問題は、
@@ -426,7 +432,7 @@ Build:     cd web-next && bun run build
 以下を全て確認してからコミットすること：
 
 1. `cd web-next && bun run build` が成功（※Antigravityサンドボックス環境では実行禁止。他環境やCIでは必須）
-2. `cd web-next && bun run test` が完全に成功（203 files / 2085 tests pass、2026-10-15実測。`NODE_OPTIONS=--no-experimental-webstorage` と `--maxWorkers=1 --testTimeout=30000` を使用。収集失敗もブロッキング失敗として原因を調査する）
+2. `cd web-next && bun run test` が完全に成功（204 files / 2093 tests pass、2026-10-15実測。`NODE_OPTIONS=--no-experimental-webstorage` と `--maxWorkers=1 --testTimeout=30000` を使用。収集失敗もブロッキング失敗として原因を調査する）
 3. `cd web-next && bun run typecheck` が成功
 4. `cd web-next && bun run lint` が成功
 5. `cd scraper && uv run pytest` が成功
