@@ -1528,3 +1528,217 @@ body:has([data-page="ai-powered-developer"]) nav[aria-label="関連ページ"] {
     margin-left: 0;
   }
 }
+
+/* /books/llm-engineers-handbook: 共有クローム（body / 日付バー / 関連ページ）を
+   ページ固有の固定サイドバー（280px）と淡色パレット（#faf6ec）に合わせる。 */
+body:has([data-page="llm-engineers-handbook"]).has-common-header,
+body:has([data-page="llm-engineers-handbook"]) {
+  margin-top: calc(var(--ch-height, 60px) + var(--ch-disclaimer-height, 0px)) !important;
+  background: #faf6ec !important;
+}
+body:has([data-page="llm-engineers-handbook"]) #site-freshness-bar {
+  display: none !important;
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+body:has([data-page="llm-engineers-handbook"]) nav[aria-label="関連ページ"] {
+  box-sizing: border-box !important;
+  margin-left: 280px !important;
+  margin-right: 0 !important;
+  margin-top: 0 !important;
+  max-width: none !important;
+  width: calc(100% - 280px) !important;
+  padding-left: 3.2rem !important;
+  padding-right: 3.2rem !important;
+  background: #faf6ec !important;
+  --line: #ddd0ab;
+  --card: #fffdf8;
+  --fg: #241f18;
+  --muted: #5b5346;
+  --accent: #33417a;
+}
+@media (max-width: 960px) {
+  body:has([data-page="llm-engineers-handbook"]) nav[aria-label="関連ページ"] {
+    width: 100% !important;
+    margin-left: 0 !important;
+    padding-left: 1.2rem !important;
+    padding-right: 1.2rem !important;
+  }
+}
+
+/* /books/adversarial-robustness: 共有クローム（body / 日付バー / 関連ページ）を
+   ページ固有の固定サイドバー（300px）と淡色パレット（#f6f1e3）に合わせる。 */
+body:has([data-page="adversarial-robustness"]).has-common-header,
+body:has([data-page="adversarial-robustness"]) {
+  margin-top: calc(var(--ch-height, 60px) + var(--ch-disclaimer-height, 0px)) !important;
+  background: #f6f1e3 !important;
+}
+body:has([data-page="adversarial-robustness"]) #site-freshness-bar {
+  display: none !important;
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+body:has([data-page="adversarial-robustness"]) nav[aria-label="関連ページ"] {
+  box-sizing: border-box !important;
+  margin-left: 300px !important;
+  margin-right: 0 !important;
+  margin-top: 0 !important;
+  max-width: none !important;
+  width: calc(100% - 300px) !important;
+  padding-left: 3.2rem !important;
+  padding-right: 3.2rem !important;
+  padding-bottom: 4rem !important;
+  background: #f6f1e3 !important;
+  --line: #e4dbc4;
+  --card: #fffdf7;
+  --fg: #241f18;
+  --muted: #5a5342;
+  --accent: #413d8f;
+}
+body:has([data-page="adversarial-robustness"]) nav[aria-label="関連ページ"] a:hover {
+  border-color: #413d8f !important;
+  box-shadow: 0 4px 14px rgba(65, 61, 143, 0.12) !important;
+}
+@media (max-width: 980px) {
+  body:has([data-page="adversarial-robustness"]) nav[aria-label="関連ページ"] {
+    width: 100% !important;
+    margin-left: 0 !important;
+    padding-left: 1.2rem !important;
+    padding-right: 1.2rem !important;
+  }
+}
+
+/* /books/hands-on-large-language-models: 共有クローム（body / 日付バー / 関連ページ）を
+   ページ固有の固定サイドバー（340px）と背景色（#07111e）に合わせる。 */
+body:has([data-page="hands-on-large-language-models"]).has-common-header,
+body:has([data-page="hands-on-large-language-models"]) {
+  margin-top: calc(var(--ch-height, 60px) + var(--ch-disclaimer-height, 0px)) !important;
+  background: #07111e !important;
+}
+body:has([data-page="hands-on-large-language-models"]) #site-freshness-bar {
+  display: none !important;
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+body:has([data-page="hands-on-large-language-models"]) nav[aria-label="関連ページ"] {
+  box-sizing: border-box !important;
+  margin-left: 340px !important;
+  margin-right: 0 !important;
+  margin-top: 0 !important;
+  max-width: none !important;
+  width: calc(100% - 340px) !important;
+  padding-left: 3.2rem !important;
+  padding-right: 3.2rem !important;
+  padding-bottom: 4rem !important;
+  background: #07111e !important;
+  --line: #1c2e4a;
+  --card: #0d1a2e;
+  --fg: #dbe4f5;
+  --muted: #8ea0c2;
+  --accent: #7c9eff;
+}
+body:has([data-page="hands-on-large-language-models"]) nav[aria-label="関連ページ"] a:hover {
+  border-color: #7c9eff !important;
+  box-shadow: 0 4px 14px rgba(124, 158, 255, 0.12) !important;
+}
+@media (max-width: 900px) {
+  body:has([data-page="hands-on-large-language-models"]) nav[aria-label="関連ページ"] {
+    width: 100% !important;
+    margin-left: 0 !important;
+    padding-left: 1.2rem !important;
+    padding-right: 1.2rem !important;
+  }
+}
+
+
+
+
+/* Knowledge Graphs and LLMs in Action: shared chrome follows the original dark guide. */
+body:has([data-page="knowledge-graphs-and-llms-in-action"]) {
+  background: #07111e;
+}
+body:has([data-page="knowledge-graphs-and-llms-in-action"]) #site-freshness-bar {
+  box-sizing: border-box;
+  max-width: none;
+  width: calc(100% - 320px);
+  margin-left: 320px;
+  margin-right: 0;
+  padding-right: 64px;
+  background: #07111e;
+  color: #aebcd6;
+  justify-content: flex-end;
+}
+body:has([data-page="knowledge-graphs-and-llms-in-action"]) #site-freshness-bar time {
+  color: #eaf0fb;
+}
+body:has([data-page="knowledge-graphs-and-llms-in-action"]) nav[aria-label="関連ページ"] {
+  --line: #24405f;
+  --card: #0d1a2c;
+  --fg: #eaf0fb;
+  --muted: #aebcd6;
+  --accent: #7c9eff;
+  box-sizing: border-box;
+  max-width: none;
+  width: calc(100% - 320px);
+  margin-left: 320px;
+  margin-right: 0;
+  padding-left: 64px;
+  padding-right: 64px;
+}
+@media (max-width: 960px) {
+  body:has([data-page="knowledge-graphs-and-llms-in-action"]) #site-freshness-bar,
+  body:has([data-page="knowledge-graphs-and-llms-in-action"]) nav[aria-label="関連ページ"] {
+    width: 100%;
+    margin-left: 0;
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+}
+
+/* Knowledge Graphs fundamentals: shared chrome follows the original dark guide. */
+body:has([data-page="knowledge-graphs-fundamentals-techniques"]) {
+  background: #07111e;
+}
+body:has([data-page="knowledge-graphs-fundamentals-techniques"]) #site-freshness-bar {
+  box-sizing: border-box;
+  max-width: none;
+  width: calc(100% - 320px);
+  margin-left: 320px;
+  margin-right: 0;
+  padding-right: 64px;
+  background: #07111e;
+  color: #a9b8cf;
+  justify-content: flex-end;
+}
+body:has([data-page="knowledge-graphs-fundamentals-techniques"]) #site-freshness-bar time {
+  color: #e8edf6;
+}
+body:has([data-page="knowledge-graphs-fundamentals-techniques"]) nav[aria-label="関連ページ"] {
+  --line: rgba(232, 237, 246, 0.16);
+  --card: #0d1a2e;
+  --fg: #e8edf6;
+  --muted: #a9b8cf;
+  --accent: #7c9eff;
+  box-sizing: border-box;
+  max-width: none;
+  width: calc(100% - 320px);
+  margin-left: 320px;
+  margin-right: 0;
+  padding-left: 64px;
+  padding-right: 64px;
+}
+@media (max-width: 980px) {
+  body:has([data-page="knowledge-graphs-fundamentals-techniques"]) #site-freshness-bar,
+  body:has([data-page="knowledge-graphs-fundamentals-techniques"]) nav[aria-label="関連ページ"] {
+    width: 100%;
+    margin-left: 0;
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+}

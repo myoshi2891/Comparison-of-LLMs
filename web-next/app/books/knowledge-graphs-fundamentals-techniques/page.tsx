@@ -1,0 +1,5903 @@
+import type { Metadata } from "next";
+import MermaidDiagram from "@/components/docs/MermaidDiagram";
+import styles from "./page.module.css";
+import TocObserver from "./TocObserver";
+
+const DIAGRAM_0 =
+  'flowchart TD\n    P1["Part I 基礎 Fundamentals"]\n    P2["Part II 構築 Constructing"]\n    P3["Part III 追加と改良 Refining"]\n    P4["Part IV 利用 Accessing"]\n    P5["Part V 応用エコシステム Ecosystems"]\n    C1["Ch1 KG入門 / Ch2 モデリング"]\n    C2["Ch3 ドメイン発見 / Ch4 NER / Ch5 Web抽出 / Ch6 関係抽出 / Ch7 非伝統的抽出"]\n    C3["Ch8 インスタンス照合 / Ch9 統計的関係学習 / Ch10 表現学習"]\n    C4["Ch11 推論と検索 / Ch12 構造化問い合わせ / Ch13 質問応答"]\n    C5["Ch14 Linked Data / Ch15 企業と政府 / Ch16 科学 / Ch17 社会的インパクト"]\n    P1 --> P2 --> P3 --> P4 --> P5\n    P1 --- C1\n    P2 --- C2\n    P3 --- C3\n    P4 --- C4\n    P5 --- C5';
+const DIAGRAM_1 =
+  'flowchart LR\n    A["1 モデルを決める Ch1-2"]\n    B["2 データを集めて抽出する Ch3-7"]\n    C["3 重複を統合し欠けを補う Ch8-10"]\n    D["4 検索し推論し問い合わせる Ch11-13"]\n    E["5 応用して価値を出す Ch14-17"]\n    A --> B --> C --> D --> E\n    E -->|"フィードバック"| A';
+const DIAGRAM_2 =
+  'flowchart LR\n    Tokyo["東京 Tokyo"]\n    Osaka["大阪 Osaka"]\n    Japan["日本 Japan"]\n    City["City 都市の型"]\n    Country["Country 国の型"]\n    Tokyo -->|"locatedIn"| Japan\n    Osaka -->|"locatedIn"| Japan\n    Tokyo -->|"type"| City\n    Osaka -->|"type"| City\n    Japan -->|"type"| Country';
+const DIAGRAM_3 =
+  'flowchart TD\n    subgraph TBox["T-Box 概念の層"]\n        Place["Place"]\n        CityT["City"]\n        CountryT["Country"]\n        CityT -->|"subClassOf"| Place\n        CountryT -->|"subClassOf"| Place\n    end\n    subgraph ABox["A-Box 実体の層"]\n        TokyoA["Tokyo"]\n        JapanA["Japan"]\n        TokyoA -->|"locatedIn"| JapanA\n    end\n    TokyoA -.->|"rdf:type"| CityT\n    JapanA -.->|"rdf:type"| CountryT';
+const DIAGRAM_4 =
+  'flowchart TD\n    Seed["種のページを用意"]\n    Fetch["ページを取得"]\n    Judge{"分野に関係あるか"}\n    Save["保存して抽出の対象にする"]\n    Links["リンクを取り出す"]\n    Frontier["優先度付きの待ち行列 フロンティア"]\n    Skip["破棄する"]\n    Seed --> Fetch --> Judge\n    Judge -->|"関係あり"| Save --> Links --> Frontier\n    Judge -->|"関係なし"| Skip\n    Frontier --> Fetch';
+const DIAGRAM_5 =
+  'flowchart LR\n    Sample["サンプルページ"]\n    Label["欲しい項目に印を付ける"]\n    Induce["ルールを作る ラッパー生成"]\n    Apply["大量のページに適用"]\n    Triples["トリプルに変換"]\n    Sample --> Label --> Induce --> Apply --> Triples';
+const DIAGRAM_6 =
+  'flowchart TD\n    Text["文章"]\n    NER["名前を見つける NER"]\n    Pairs["名前のペアを作る"]\n    Classify["関係の種類を予測"]\n    Check{"オントロジーの制約に合うか"}\n    Add["トリプルとして KG に追加"]\n    Drop["除外または確認待ち"]\n    Text --> NER --> Pairs --> Classify --> Check\n    Check -->|"合う"| Add\n    Check -->|"合わない"| Drop';
+const DIAGRAM_7 =
+  'flowchart LR\n    Data["レコードの集合"]\n    Block["1 ブロッキング 候補の組を絞る"]\n    Sim["2 類似度計算 組ごとに判定"]\n    Post["3 後処理 結果を整える"]\n    Merge["同じ実体を1つに統合"]\n    Data --> Block --> Sim --> Post --> Merge';
+const DIAGRAM_8 =
+  'flowchart TD\n    Ext["不確かな抽出結果 抽出グラフ"]\n    Rules["依存関係のルール"]\n    Infer["全体として整合する事実を選ぶ"]\n    KG["整理された KG"]\n    Ext --> Infer\n    Rules --> Infer\n    Infer --> KG';
+const DIAGRAM_9 =
+  'flowchart LR\n    KG["既存の KG のトリプル"]\n    Train["埋め込みを学習"]\n    Query["Tokyo capital_of 何か を問う"]\n    Score["全候補の距離を計算"]\n    Rank["距離の小さい順に並べる"]\n    KG --> Train --> Score\n    Query --> Score --> Rank';
+const DIAGRAM_10 =
+  'flowchart TD\n    A["渋谷 locatedIn 東京"]\n    B["東京 locatedIn 日本"]\n    Rule["ルール locatedIn を推移的と宣言"]\n    C["導出 渋谷 locatedIn 日本"]\n    A --> Rule\n    B --> Rule\n    Rule --> C';
+const DIAGRAM_11 =
+  'flowchart TD\n    Q["質問 日本にある場所は"]\n    Link["実体を特定 日本を ex:Japan に対応づける"]\n    Rel["関係を特定 「ある場所」を ex:locatedIn に対応づける"]\n    Query["問い合わせを組み立てる"]\n    KG["KG に実行"]\n    Ans["答えを返す"]\n    Q --> Link --> Rel --> Query --> KG --> Ans';
+const DIAGRAM_12 =
+  'flowchart LR\n    DB["DBpedia の Tokyo"]\n    WD["Wikidata の Tokyo"]\n    GN["別のデータセットの Tokyo"]\n    DB ---|"same as"| WD\n    WD ---|"same as"| GN';
+const DIAGRAM_13 =
+  'flowchart TD\n    A["ドメインを決める"]\n    B["関連ページを集める 第3章"]\n    C["情報を抽出する 第4章から第7章"]\n    D["同じ実体を統合する 第8章"]\n    E["KG を作る 第2章"]\n    F["検索と分析 第11章から第13章"]\n    A --> B --> C --> D --> E --> F';
+const DIAGRAM_14 =
+  'flowchart LR\n    KG["Knowledge Graph 事実を明示"]\n    LLM["LLM 言語の理解と生成"]\n    KG -->|"1 外部知識を与える"| LLM\n    LLM -->|"2 構築と補完を助ける"| KG\n    KG <-->|"3 相互に補い合う"| LLM';
+const DIAGRAM_15 =
+  'flowchart TD\n    Doc["文書"]\n    Ext["LLM で実体と関係を抽出"]\n    Graph["KG を構築"]\n    Comm["コミュニティの階層を作る"]\n    Sum["各コミュニティの要約を作る"]\n    Ans["質問に応じて要約と関連部分を使い LLM が回答"]\n    Doc --> Ext --> Graph --> Comm --> Sum --> Ans';
+// Keep the DOM variant explicit without conflating it with source callout classes in the audit.
+const INTRO_VARIANT = "info";
+const THEME_VARS = {
+  background: "#07111e",
+  primaryColor: "#122238",
+  primaryTextColor: "#e8edf6",
+  primaryBorderColor: "#7c9eff",
+  lineColor: "#5d7bbd",
+  secondaryColor: "#0f2a24",
+  tertiaryColor: "#0d1a2e",
+  clusterBkg: "#0d1a2e",
+  clusterBorder: "#3a4f7a",
+  edgeLabelBackground: "#122238",
+  fontSize: "16px",
+};
+export const metadata: Metadata = {
+  title:
+    "Knowledge Graphs: Fundamentals, Techniques, and Applications 初学者向けステップバイステップ解説 | LLM コスト計算機",
+  description:
+    "Knowledge Graphs: Fundamentals, Techniques, and Applicationsを土台に、RDF・情報抽出・照合・表現学習・SPARQL・質問応答・GraphRAGを段階的に学ぶ初学者向けガイド。",
+};
+export default function Page() {
+  return (
+    <div
+      className={styles.layout}
+      data-testid="layout-root"
+      data-page="knowledge-graphs-fundamentals-techniques"
+    >
+      <TocObserver />
+      <link
+        data-guide="kg-fundamentals"
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap"
+      />
+      <link
+        data-guide="kg-fundamentals"
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.31.0/dist/tabler-icons.min.css"
+      />
+      <link
+        data-guide="kg-fundamentals"
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css"
+      />{" "}
+      <aside className={styles.sidebar}>
+        {" "}
+        <div className={styles["sidebar-brand"]}>
+          {" "}
+          <div className={styles["sidebar-brand-mark"]}>
+            <i className={["ti", "ti-affiliate"].join(" ")} aria-hidden="true"></i>
+          </div>{" "}
+          <div className={styles["sidebar-brand-text"]}>
+            {" "}
+            <strong>{"Knowledge Graphs"}</strong>
+            {"Fundamentals, Techniques, and Applications "}
+          </div>{" "}
+        </div>{" "}
+        <div className={styles["sidebar-meta"]}>
+          {" 初学者向けステップバイステップ解説"}
+          <br />
+          {" 基準日：2026年9月21日 "}
+        </div>{" "}
+        <nav className={styles.toc} aria-label="目次" data-testid="sidebar-nav">
+          {" "}
+          <a
+            href="#sec-0"
+            title="このガイドの読み方（必ず最初に読んでください）"
+            data-testid="sidebar-nav-link"
+            data-nav-target="sec-0"
+            className={styles.active}
+            aria-current="location"
+          >
+            <span className={styles["toc-num"]}>{"0"}</span>
+            <span className={styles["toc-label"]}>
+              {"このガイドの読み方（必ず最初に読んでください）"}
+            </span>
+          </a>{" "}
+          <a
+            href="#sec-0-5"
+            title="書籍の全体マップ"
+            data-testid="sidebar-nav-link"
+            data-nav-target="sec-0-5"
+          >
+            <span className={styles["toc-num"]}>{"0.5"}</span>
+            <span className={styles["toc-label"]}>{"書籍の全体マップ"}</span>
+          </a>{" "}
+          <a
+            href="#sec-1"
+            title="第1章：ナレッジグラフとは何か"
+            data-testid="sidebar-nav-link"
+            data-nav-target="sec-1"
+          >
+            <span className={styles["toc-num"]}>{"1"}</span>
+            <span className={styles["toc-label"]}>{"ナレッジグラフとは何か"}</span>
+          </a>{" "}
+          <a
+            href="#sec-2"
+            title="第2章：KG のモデル化と表現（RDF・プロパティグラフ・Wikidata）"
+            data-testid="sidebar-nav-link"
+            data-nav-target="sec-2"
+          >
+            <span className={styles["toc-num"]}>{"2"}</span>
+            <span className={styles["toc-label"]}>
+              {"KG のモデル化と表現（RDF・プロパティグラフ・Wikidata）"}
+            </span>
+          </a>{" "}
+          <a
+            href="#sec-3"
+            title="第3章：ドメイン発見（Domain Discovery）"
+            data-testid="sidebar-nav-link"
+            data-nav-target="sec-3"
+          >
+            <span className={styles["toc-num"]}>{"3"}</span>
+            <span className={styles["toc-label"]}>{"ドメイン発見（Domain Discovery）"}</span>
+          </a>{" "}
+          <a
+            href="#sec-4"
+            title="第4章：固有表現認識（Named Entity Recognition, NER）"
+            data-testid="sidebar-nav-link"
+            data-nav-target="sec-4"
+          >
+            <span className={styles["toc-num"]}>{"4"}</span>
+            <span className={styles["toc-label"]}>
+              {"固有表現認識（Named Entity Recognition, NER）"}
+            </span>
+          </a>{" "}
+          <a
+            href="#sec-5"
+            title="第5章：Web からの情報抽出（Web Information Extraction）"
+            data-testid="sidebar-nav-link"
+            data-nav-target="sec-5"
+          >
+            <span className={styles["toc-num"]}>{"5"}</span>
+            <span className={styles["toc-label"]}>
+              {"Web からの情報抽出（Web Information Extraction）"}
+            </span>
+          </a>{" "}
+          <a
+            href="#sec-6"
+            title="第6章：関係抽出（Relation Extraction）"
+            data-testid="sidebar-nav-link"
+            data-nav-target="sec-6"
+          >
+            <span className={styles["toc-num"]}>{"6"}</span>
+            <span className={styles["toc-label"]}>{"関係抽出（Relation Extraction）"}</span>
+          </a>{" "}
+          <a
+            href="#sec-7"
+            title="第7章：非伝統的な情報抽出（Nontraditional Information Extraction）"
+            data-testid="sidebar-nav-link"
+            data-nav-target="sec-7"
+          >
+            <span className={styles["toc-num"]}>{"7"}</span>
+            <span className={styles["toc-label"]}>
+              {"非伝統的な情報抽出（Nontraditional Information Extraction）"}
+            </span>
+          </a>{" "}
+          <a
+            href="#sec-8"
+            title="第8章：インスタンス照合（Instance Matching）"
+            data-testid="sidebar-nav-link"
+            data-nav-target="sec-8"
+          >
+            <span className={styles["toc-num"]}>{"8"}</span>
+            <span className={styles["toc-label"]}>{"インスタンス照合（Instance Matching）"}</span>
+          </a>{" "}
+          <a
+            href="#sec-9"
+            title="第9章：統計的関係学習（Statistical Relational Learning, SRL）"
+            data-testid="sidebar-nav-link"
+            data-nav-target="sec-9"
+          >
+            <span className={styles["toc-num"]}>{"9"}</span>
+            <span className={styles["toc-label"]}>
+              {"統計的関係学習（Statistical Relational Learning, SRL）"}
+            </span>
+          </a>{" "}
+          <a
+            href="#sec-10"
+            title="第10章：KG の表現学習（Knowledge Graph Embeddings）"
+            data-testid="sidebar-nav-link"
+            data-nav-target="sec-10"
+          >
+            <span className={styles["toc-num"]}>{"10"}</span>
+            <span className={styles["toc-label"]}>
+              {"KG の表現学習（Knowledge Graph Embeddings）"}
+            </span>
+          </a>{" "}
+          <a
+            href="#sec-11"
+            title="第11章：推論と検索（Reasoning and Retrieval）"
+            data-testid="sidebar-nav-link"
+            data-nav-target="sec-11"
+          >
+            <span className={styles["toc-num"]}>{"11"}</span>
+            <span className={styles["toc-label"]}>{"推論と検索（Reasoning and Retrieval）"}</span>
+          </a>{" "}
+          <a
+            href="#sec-12"
+            title="第12章：構造化問い合わせ（Structured Querying）"
+            data-testid="sidebar-nav-link"
+            data-nav-target="sec-12"
+          >
+            <span className={styles["toc-num"]}>{"12"}</span>
+            <span className={styles["toc-label"]}>{"構造化問い合わせ（Structured Querying）"}</span>
+          </a>{" "}
+          <a
+            href="#sec-13"
+            title="第13章：質問応答（Question Answering, QA）"
+            data-testid="sidebar-nav-link"
+            data-nav-target="sec-13"
+          >
+            <span className={styles["toc-num"]}>{"13"}</span>
+            <span className={styles["toc-label"]}>{"質問応答（Question Answering, QA）"}</span>
+          </a>{" "}
+          <a
+            href="#sec-14"
+            title="第14章：Linked Data"
+            data-testid="sidebar-nav-link"
+            data-nav-target="sec-14"
+          >
+            <span className={styles["toc-num"]}>{"14"}</span>
+            <span className={styles["toc-label"]}>{"Linked Data"}</span>
+          </a>{" "}
+          <a
+            href="#sec-15"
+            title="第15章：企業と政府（Enterprise and Government）"
+            data-testid="sidebar-nav-link"
+            data-nav-target="sec-15"
+          >
+            <span className={styles["toc-num"]}>{"15"}</span>
+            <span className={styles["toc-label"]}>{"企業と政府（Enterprise and Government）"}</span>
+          </a>{" "}
+          <a
+            href="#sec-16"
+            title="第16章：科学分野の KG とオントロジー"
+            data-testid="sidebar-nav-link"
+            data-nav-target="sec-16"
+          >
+            <span className={styles["toc-num"]}>{"16"}</span>
+            <span className={styles["toc-label"]}>{"科学分野の KG とオントロジー"}</span>
+          </a>{" "}
+          <a
+            href="#sec-17"
+            title="第17章：領域特化の社会的インパクトを目指す KG"
+            data-testid="sidebar-nav-link"
+            data-nav-target="sec-17"
+          >
+            <span className={styles["toc-num"]}>{"17"}</span>
+            <span className={styles["toc-label"]}>{"領域特化の社会的インパクトを目指す KG"}</span>
+          </a>{" "}
+          <a
+            href="#sec-18"
+            title="本書のあとの世界：LLM 時代の KG（2026年9月時点）"
+            data-testid="sidebar-nav-link"
+            data-nav-target="sec-18"
+          >
+            <span className={styles["toc-num"]}>{"18"}</span>
+            <span className={styles["toc-label"]}>
+              {"本書のあとの世界：LLM 時代の KG（2026年9月時点）"}
+            </span>
+          </a>{" "}
+          <a
+            href="#sec-19"
+            title="学習ロードマップと確認問題"
+            data-testid="sidebar-nav-link"
+            data-nav-target="sec-19"
+          >
+            <span className={styles["toc-num"]}>{"19"}</span>
+            <span className={styles["toc-label"]}>{"学習ロードマップと確認問題"}</span>
+          </a>{" "}
+          <a
+            href="#sec-20"
+            title="参考文献・根拠となるソース URL"
+            data-testid="sidebar-nav-link"
+            data-nav-target="sec-20"
+          >
+            <span className={styles["toc-num"]}>{"20"}</span>
+            <span className={styles["toc-label"]}>{"参考文献・根拠となるソース URL"}</span>
+          </a>{" "}
+        </nav>{" "}
+      </aside>{" "}
+      <main className={styles.content}>
+        {" "}
+        <header className={styles.hero}>
+          {" "}
+          <span className={styles["hero-eyebrow"]}>
+            <i className={["ti", "ti-book"].join(" ")} aria-hidden="true"></i>
+            {" 初学者向け学習ガイド"}
+          </span>{" "}
+          <h1 className={styles["hero-title"]}>
+            {
+              " Knowledge Graphs: Fundamentals, Techniques, and Applications 初学者向けステップバイステップ解説 "
+            }
+          </h1>{" "}
+          <blockquote className={styles["hero-quote"]} data-testid="voice">
+            {" "}
+            <p>
+              {
+                " 対象書籍：Mayank Kejriwal, Craig A. Knoblock, Pedro Szekely 著 *Knowledge Graphs: Fundamentals, Techniques, and Applications*（MIT Press, 2021） "
+              }
+            </p>{" "}
+            <p>{"情報の基準日：2026年9月21日"}</p>{" "}
+            <p>
+              {
+                " 想定読者：ナレッジグラフ（Knowledge Graph、以下 KG）を初めて学ぶソフトウェア／AI エンジニア "
+              }
+            </p>{" "}
+          </blockquote>{" "}
+        </header>{" "}
+        <section id="sec-0" className={styles.chapter}>
+          {" "}
+          <h2 id="sec-0-heading">{"0. このガイドの読み方（必ず最初に読んでください）"}</h2>{" "}
+          <div
+            className={[styles.callout, styles["callout-intro"]].join(" ")}
+            data-variant={INTRO_VARIANT}
+          >
+            {" "}
+            <i
+              className={["ti", "ti-bulb", styles["callout-icon"]].join(" ")}
+              aria-hidden="true"
+            ></i>{" "}
+            <div className={styles["callout-body"]}>
+              {
+                " この章では、ガイドの位置づけ、書籍の全体像、章ごとの読み進め方を説明します。ここを読んでおくと、後の章で「いま全体のどこを学んでいるのか」が分かります。 "
+              }
+            </div>{" "}
+          </div>{" "}
+          <h3 id="sec-0-1">{"0.1 このガイドは何か"}</h3>{" "}
+          <p>
+            {" このガイドは、書籍の"}
+            <strong>{"公開されている目次・出版社の紹介文・著者らの公開資料"}</strong>
+            {"と、W3C や ISO などの"}
+            <strong>{"一次情報"}</strong>
+            {
+              "を手がかりに作った学習ガイドです。書籍本文の要約や転載ではありません。書籍を読む前の地図、または読みながら手元に置く副読本として使ってください。 "
+            }
+          </p>{" "}
+          <p>{"情報の確度を区別するため、各章に次の2種類のラベルを付けています。"}</p>{" "}
+          <table>
+            <thead>
+              <tr>
+                <th>{"ラベル"} </th>
+                <th>{"意味"} </th>
+                <th>{"確度"} </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <span className={[styles.tag, styles["tag-scope"]].join(" ")}>
+                    {"本書の範囲"}
+                  </span>{" "}
+                </td>
+                <td>{"出版社が公開している目次（節タイトル）に基づく内容"} </td>
+                <td>{"高い"} </td>
+              </tr>
+              <tr>
+                <td>
+                  <span className={[styles.tag, styles["tag-note"]].join(" ")}>{"補足"}</span>{" "}
+                </td>
+                <td>
+                  {
+                    " 一般的な KG の知識や公開資料に基づく、筆者による補足解説。書籍本文の記述とは限らない "
+                  }{" "}
+                </td>
+                <td>{"書籍と一致するとは限らない"} </td>
+              </tr>
+            </tbody>
+          </table>{" "}
+          <h3 id="sec-0-2">{"0.2 書名についての注記"}</h3>{" "}
+          <p>
+            {
+              " ご指定の書名は「Knowledge Graphs: Fundamentals and Techniques」ですが、Google ブックスと MIT Press の書誌では、正式な書名は "
+            }
+            <strong>{"Knowledge Graphs: Fundamentals, Techniques, and Applications"}</strong>
+            {"（基礎・技法・応用）です。同じ書籍（Google ブックス ID "}
+            <code>{"iqvuDwAAQBAJ"}</code>
+            {"）として扱っています。 "}
+          </p>{" "}
+          <h3 id="sec-0-3">{"0.3 書誌情報"}</h3>{" "}
+          <table>
+            <thead>
+              <tr>
+                <th>{"項目"} </th>
+                <th>{"内容"} </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{"著者"} </td>
+                <td>
+                  {
+                    " Mayank Kejriwal, Craig A. Knoblock, Pedro Szekely（いずれも南カリフォルニア大学 USC の関係者） "
+                  }{" "}
+                </td>
+              </tr>
+              <tr>
+                <td>{"出版社"} </td>
+                <td>{"MIT Press（Adaptive Computation and Machine Learning series）"} </td>
+              </tr>
+              <tr>
+                <td>{"発行日"} </td>
+                <td>{"2021年3月30日"} </td>
+              </tr>
+              <tr>
+                <td>{"ISBN"} </td>
+                <td>{"978-0-262-04509-4（ハードカバー）、978-0-262-36188-0（電子版）"} </td>
+              </tr>
+              <tr>
+                <td>{"ページ数"} </td>
+                <td>{"約560〜568ページ（書店・データベースにより表記が異なる）"} </td>
+              </tr>
+              <tr>
+                <td>{"構成"} </td>
+                <td>
+                  {
+                    " 全17章、演習問題は合計130問。各章末に「Software and Resources」と「Bibliographic Notes」がある "
+                  }{" "}
+                </td>
+              </tr>
+            </tbody>
+          </table>{" "}
+          <h3 id="sec-0-4">{"0.4 用語の約束"}</h3>{" "}
+          <p>
+            {
+              " 専門用語は初出時に（＝平易な説明）を付けます。各章末には「📖 このセクションで登場した用語」をまとめています。英語の技術用語は、検索やドキュメント参照のために英語のまま残します。 "
+            }
+          </p>{" "}
+          <div
+            className={[styles.callout, styles["callout-glossary"]].join(" ")}
+            data-variant="glossary"
+          >
+            {" "}
+            <i
+              className={["ti", "ti-book-2", styles["callout-icon"]].join(" ")}
+              aria-hidden="true"
+            ></i>{" "}
+            <div className={styles["callout-body"]}>
+              {" "}
+              <p className={styles["callout-title"]}>{"このセクションで登場した用語"}</p>{" "}
+              <ul className={styles["glossary-list"]}>
+                {" "}
+                <li>
+                  {" "}
+                  <strong>{"KG（Knowledge Graph）"}</strong>
+                  {
+                    "：現実世界の物事（実体）と、その間の関係を、点と線でつないで表したデータの集まり "
+                  }
+                </li>{" "}
+                <li>
+                  {" "}
+                  <strong>{"一次情報"}</strong>
+                  {"：標準化団体の仕様書や、開発元本人の公式ブログなど、情報の出どころそのもの "}
+                </li>{" "}
+              </ul>{" "}
+            </div>{" "}
+          </div>{" "}
+        </section>{" "}
+        <section id="sec-0-5" className={styles.chapter}>
+          {" "}
+          <h2 id="sec-0-5-heading">{"0.5 書籍の全体マップ"}</h2>{" "}
+          <div
+            className={[styles.callout, styles["callout-intro"]].join(" ")}
+            data-variant={INTRO_VARIANT}
+          >
+            {" "}
+            <i
+              className={["ti", "ti-bulb", styles["callout-icon"]].join(" ")}
+              aria-hidden="true"
+            ></i>{" "}
+            <div className={styles["callout-body"]}>
+              {
+                " この章では、17章の構成を5つのパートに分けて俯瞰します。地図を先に見ておくと、細かい話で迷子になりません。 "
+              }
+            </div>{" "}
+          </div>{" "}
+          <h3 id="sec-0-5-sub-1">{"0.5.1 なぜ全体マップが必要か"}</h3>{" "}
+          <p>
+            {
+              " KG の学習範囲は、データの表現方法、文章からの知識抽出、機械学習、データベース、応用事例と、多くの分野にまたがります。全体の流れを先につかんでおくと、各章が「作る」「直す・増やす」「使う」のどこに当たるかを判断できます。 "
+            }
+          </p>{" "}
+          <h3 id="sec-0-5-sub-2">{"0.5.2 5つのパート構成"}</h3>{" "}
+          <p>
+            {
+              " 出版社の紹介文は、本書の流れを「導入と背景 → KG の構築 → 知識の追加・改良 → KG へのアクセス（検索・問い合わせ）→ 具体的なエコシステムと事例」と説明しています。この流れに沿って章を並べると、次の図になります（パート名の一部は紹介文に沿った筆者の整理です）。 "
+            }
+          </p>{" "}
+          <p>
+            {
+              " この図は、本書の章がどのパートに属し、どの順番で学ぶかを表しています。上から下へ読み進めてください。 "
+            }
+          </p>{" "}
+          <div className={styles["mermaid-wrap"]}>
+            {" "}
+            <div id="mmd-0" className={styles["mermaid-diagram"]} role="img" aria-label="図">
+              <MermaidDiagram
+                chart={DIAGRAM_0}
+                id="mmd-0-svg"
+                theme="dark"
+                themeVariables={THEME_VARS}
+              />
+            </div>{" "}
+          </div>{" "}
+          <p>
+            {" 各ノードの意味："}
+            <br />
+            {" - 「Part I〜V」：本書の大きな流れ。左から右ではなく、上から下へ進みます"}
+            <br />
+            {" - 「Ch○○」：各パートに含まれる章。線（"}
+            <code>{"---"}</code>
+            {"）でパートとつながっています"}
+            <br />
+            {
+              " - Part I と Part IV の名称は目次に明記されています。Part II・III・V の名称は、出版社の紹介文にある「構築」「追加・改良」「エコシステム」に基づく整理です "
+            }
+          </p>{" "}
+          <h3 id="sec-0-5-sub-3">{"0.5.3 「KG のライフサイクル」で見る全体像"}</h3>{" "}
+          <p>
+            {
+              " KG は一度作って終わりではありません。作り、直し、使い、その結果をまた作る工程に戻します。 "
+            }
+          </p>{" "}
+          <p>
+            {
+              " この図は、KG のライフサイクル（＝作成から運用までの一連の流れ）を表しています。時計回りに読んでください。 "
+            }
+          </p>{" "}
+          <div className={styles["mermaid-wrap"]}>
+            {" "}
+            <div id="mmd-1" className={styles["mermaid-diagram"]} role="img" aria-label="図">
+              <MermaidDiagram
+                chart={DIAGRAM_1}
+                id="mmd-1-svg"
+                theme="dark"
+                themeVariables={THEME_VARS}
+              />
+            </div>{" "}
+          </div>{" "}
+          <p>
+            {" 各ノードの意味："}
+            <br />
+            {" - 「1 モデルを決める」：何を実体とし、どんな関係を持たせるかを設計する"}
+            <br />
+            {" - 「2 データを集めて抽出する」：Web や文章から事実を取り出す"}
+            <br />
+            {" - 「3 重複を統合し欠けを補う」：同じ物の別表記をまとめ、足りない関係を予測する"}
+            <br />
+            {" - 「4 検索し推論し問い合わせる」：作った KG を使って答えを得る"}
+            <br />
+            {" - 「5 応用して価値を出す」：企業、科学、社会課題へ適用する"}
+            <br />
+            {" - 「フィードバック」：応用で見つかった不足を、モデルや抽出へ戻して直す "}
+          </p>{" "}
+          <h3 id="sec-0-5-sub-4">{"0.5.4 初学者向けの読み進め方"}</h3>{" "}
+          <table>
+            <thead>
+              <tr>
+                <th>{"学習の目的"} </th>
+                <th>{"おすすめの順番"} </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{"まず概念を理解したい"} </td>
+                <td>{"Ch1 → Ch2 → Ch12 → Ch14"} </td>
+              </tr>
+              <tr>
+                <td>{"KG を作る実務をしたい"} </td>
+                <td>{"Ch1 → Ch2 → Ch4 → Ch6 → Ch8"} </td>
+              </tr>
+              <tr>
+                <td>{"機械学習で KG を扱いたい"} </td>
+                <td>{"Ch1 → Ch2 → Ch10 → Ch11"} </td>
+              </tr>
+              <tr>
+                <td>{"LLM と組み合わせたい"} </td>
+                <td>{"Ch1 → Ch2 → Ch12 → Ch13 → 本ガイド第18章"} </td>
+              </tr>
+            </tbody>
+          </table>{" "}
+          <div
+            className={[styles.callout, styles["callout-glossary"]].join(" ")}
+            data-variant="glossary"
+          >
+            {" "}
+            <i
+              className={["ti", "ti-book-2", styles["callout-icon"]].join(" ")}
+              aria-hidden="true"
+            ></i>{" "}
+            <div className={styles["callout-body"]}>
+              {" "}
+              <p className={styles["callout-title"]}>{"このセクションで登場した用語"}</p>{" "}
+              <ul className={styles["glossary-list"]}>
+                {" "}
+                <li>
+                  {" "}
+                  <strong>{"ライフサイクル"}</strong>
+                  {"：物事が生まれてから使われ、更新されていく一連の流れ "}
+                </li>{" "}
+                <li>
+                  {" "}
+                  <strong>{"エコシステム"}</strong>
+                  {"：複数のデータ・ツール・組織が互いに関わり合って成り立つ仕組み全体 "}
+                </li>{" "}
+              </ul>{" "}
+            </div>{" "}
+          </div>{" "}
+        </section>{" "}
+        <section id="sec-1" className={styles.chapter}>
+          {" "}
+          <h2 id="sec-1-heading">{"1. 第1章：ナレッジグラフとは何か"}</h2>{" "}
+          <div
+            className={[styles.callout, styles["callout-intro"]].join(" ")}
+            data-variant={INTRO_VARIANT}
+          >
+            {" "}
+            <i
+              className={["ti", "ti-bulb", styles["callout-icon"]].join(" ")}
+              aria-hidden="true"
+            ></i>{" "}
+            <div className={styles["callout-body"]}>
+              {
+                " この章では、本書の Chapter 1「Introduction to Knowledge Graphs」に相当する内容として、KG の基本イメージ、グラフの基礎、実世界の例を説明します。 "
+              }
+            </div>{" "}
+          </div>{" "}
+          <h3 id="sec-1-1">
+            {" 1.1 "}
+            <span className={[styles.tag, styles["tag-scope"]].join(" ")}>{"本書の範囲"}</span>
+            {" このガイドで扱う主な節 "}
+          </h3>{" "}
+          <p>
+            {
+              " 1.1 Graphs、1.2 Representing Knowledge as Graphs、1.3 Examples of Knowledge Graphs、1.4 How to Read This Text "
+            }
+          </p>{" "}
+          <h3 id="sec-1-2">{"1.2 なぜ KG が必要なのか"}</h3>{" "}
+          <p>
+            {
+              " コンピュータは、文字列（string）をそのままでは「意味」として理解できません。たとえば「Taj Mahal」という文字列は、世界遺産の建物、音楽家、カジノを指すことがあります。Google は2012年に KG を発表したとき、「"
+            }
+            <strong>{"things, not strings"}</strong>
+            {
+              "（文字列ではなく、物事）」という考え方を掲げ、キーワードの一致から、実世界の物事とその関係の理解へ移ると説明しました。同じ発表によると、発表時点の KG には5億以上のオブジェクトと、35億以上の事実・関係が入っていました。 "
+            }
+          </p>{" "}
+          <h3 id="sec-1-3">{"1.3 例え話：地下鉄の路線図"}</h3>{" "}
+          <p>
+            {
+              " KG は、地下鉄の路線図に似ています。駅（＝点）と、駅をつなぐ線（＝線）があります。路線図があれば「渋谷から東京駅へ行くには、どの駅を通るか」を線をたどって答えられます。KG では、駅の代わりに「人」「場所」「作品」などが並び、線には「生まれた場所」「作った人」などの意味の名前が付きます。 "
+            }
+          </p>{" "}
+          <h3 id="sec-1-4">{"1.4 ステップ1：グラフの基礎"}</h3>{" "}
+          <p>
+            {" グラフとは、"}
+            <strong>{"ノード（点）"}</strong>
+            {"と"}
+            <strong>{"エッジ（線）"}</strong>
+            {"でできた構造です。 "}
+          </p>{" "}
+          <table>
+            <thead>
+              <tr>
+                <th>{"用語"} </th>
+                <th>{"意味"} </th>
+                <th>{"例"} </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{"ノード（node）"} </td>
+                <td>{"点。実体や値を表す"} </td>
+                <td>{"東京、日本"} </td>
+              </tr>
+              <tr>
+                <td>{"エッジ（edge）"} </td>
+                <td>{"点と点をつなぐ線。向きと名前（ラベル）を持てる"} </td>
+                <td>{"「首都である」"} </td>
+              </tr>
+              <tr>
+                <td>{"有向グラフ"} </td>
+                <td>{"線に向きがあるグラフ"} </td>
+                <td>{"東京 → 日本"} </td>
+              </tr>
+              <tr>
+                <td>{"ラベル付きグラフ"} </td>
+                <td>{"線に意味の名前が付いたグラフ"} </td>
+                <td>{"「locatedIn」"} </td>
+              </tr>
+            </tbody>
+          </table>{" "}
+          <h3 id="sec-1-5">{"1.5 ステップ2：知識をグラフで表す"}</h3>{" "}
+          <p>
+            {" なぜグラフで表すのかというと、「AはBと関係がある」という"}
+            <strong>{"事実（ファクト）"}</strong>
+            {
+              "を、そのまま1本の線で書けるからです。事実は「主語 → 関係 → 目的語」の3つ組（トリプル）で書けます。 "
+            }
+          </p>{" "}
+          <p>{"次の図は、小さな KG の例です。矢印のラベルが関係の名前を表しています。"}</p>{" "}
+          <div className={styles["mermaid-wrap"]}>
+            {" "}
+            <div id="mmd-2" className={styles["mermaid-diagram"]} role="img" aria-label="図">
+              <MermaidDiagram
+                chart={DIAGRAM_2}
+                id="mmd-2-svg"
+                theme="dark"
+                themeVariables={THEME_VARS}
+              />
+            </div>{" "}
+          </div>{" "}
+          <p>
+            {" 各ノードの意味："}
+            <br />
+            {" - 「Tokyo」「Osaka」「Japan」：具体的な実体（インスタンス）です"}
+            <br />
+            {" - 「City」「Country」：実体がどの種類（型）に属するかを表す概念です"}
+            <br />
+            {" - 「locatedIn」の矢印：「〜に位置する」という関係です"}
+            <br />
+            {" - 「type」の矢印：「〜という種類である」という関係です "}
+          </p>{" "}
+          <h3 id="sec-1-6">{"1.6 ステップ3：実世界の KG を見る"}</h3>{" "}
+          <table>
+            <thead>
+              <tr>
+                <th>{"KG"} </th>
+                <th>{"何をするか"} </th>
+                <th>{"参考にした情報"} </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{"Google Knowledge Graph"} </td>
+                <td>{"検索結果に、物事の要点や関連情報を添える"} </td>
+                <td>{"Google 公式ブログ（2012年）"} </td>
+              </tr>
+              <tr>
+                <td>{"Wikidata"} </td>
+                <td>
+                  {
+                    " Wikipedia の事実を、多言語で共同編集できる「データのための Wikipedia」として管理する "
+                  }{" "}
+                </td>
+                <td>{"CACM 論文（Vrandečić & Krötzsch, 2014）"} </td>
+              </tr>
+              <tr>
+                <td>{"DBpedia"} </td>
+                <td>{"Wikipedia の内容を構造化データに変換した KG"} </td>
+                <td>
+                  <span className={[styles.tag, styles["tag-note"]].join(" ")}>{"補足"}</span>
+                  {" 広く知られた公開 KG"}{" "}
+                </td>
+              </tr>
+            </tbody>
+          </table>{" "}
+          <h3 id="sec-1-7">{"1.7 KG とほかのデータ形式の違い"}</h3>{" "}
+          <table>
+            <thead>
+              <tr>
+                <th>{"観点"} </th>
+                <th>{"表（リレーショナルDB）"} </th>
+                <th>{"KG"} </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{"基本の形"} </td>
+                <td>{"行と列"} </td>
+                <td>{"ノードとエッジ"} </td>
+              </tr>
+              <tr>
+                <td>{"関係の扱い"} </td>
+                <td>{"外部キーと結合（JOIN）で表す"} </td>
+                <td>{"関係そのものが一級の要素"} </td>
+              </tr>
+              <tr>
+                <td>{"構造の変更"} </td>
+                <td>{"列の追加に設計変更が必要になりやすい"} </td>
+                <td>{"新しい種類の線を足しやすい"} </td>
+              </tr>
+              <tr>
+                <td>{"得意な問い"} </td>
+                <td>{"集計、整合性の高い業務処理"} </td>
+                <td>{"「Aとつながる Bの、さらにその先」を追う問い"} </td>
+              </tr>
+              <tr>
+                <td>{"意味づけ"} </td>
+                <td>{"列名に頼る"} </td>
+                <td>{"型（クラス）と関係の定義（オントロジー）で意味を表せる"} </td>
+              </tr>
+            </tbody>
+          </table>{" "}
+          <h3 id="sec-1-8">{"1.8 ステップ4：KG の「知識」とは何か"}</h3>{" "}
+          <p>
+            {" Hogan らの論文 "}
+            <em>{"Knowledge Graphs"}</em>
+            {
+              "（ACM Computing Surveys, 第54巻第4号, 2021年）は、KG を包括的に紹介する入門的な調査論文です。Aidan Hogan、Claudia d'Amato、Juan Sequeda、Steffen Staab、Antoine Zimmermann ら、国際的な研究者が共著者に名を連ねています。KG が、多様で変化が速く大規模なデータを活用する場面で、産業界と学術界の両方から注目されている点を出発点にしています。本書の Part I と併読すると、用語の整理に役立ちます。 "
+            }
+          </p>{" "}
+          <div
+            className={[styles.callout, styles["callout-glossary"]].join(" ")}
+            data-variant="glossary"
+          >
+            {" "}
+            <i
+              className={["ti", "ti-book-2", styles["callout-icon"]].join(" ")}
+              aria-hidden="true"
+            ></i>{" "}
+            <div className={styles["callout-body"]}>
+              {" "}
+              <p className={styles["callout-title"]}>{"このセクションで登場した用語"}</p>{" "}
+              <ul className={styles["glossary-list"]}>
+                {" "}
+                <li>
+                  <strong>{"ノード"}</strong>
+                  {"：グラフの「点」。人や場所などの実体、または値"}
+                </li>{" "}
+                <li>
+                  <strong>{"エッジ"}</strong>
+                  {"：グラフの「線」。点と点の関係"}
+                </li>{" "}
+                <li>
+                  <strong>{"トリプル"}</strong>
+                  {"：主語・関係・目的語の3つ組で書いた1つの事実"}
+                </li>{" "}
+                <li>
+                  <strong>{"インスタンス"}</strong>
+                  {"：具体的な1つ1つの実体（例：東京）"}
+                </li>{" "}
+                <li>
+                  {" "}
+                  <strong>{"オントロジー"}</strong>
+                  {"：どんな種類の物事があり、どんな関係が許されるかを定めた「意味の設計図」 "}
+                </li>{" "}
+              </ul>{" "}
+            </div>{" "}
+          </div>{" "}
+        </section>{" "}
+        <section id="sec-2" className={styles.chapter}>
+          {" "}
+          <h2 id="sec-2-heading">
+            {"2. 第2章：KG のモデル化と表現（RDF・プロパティグラフ・Wikidata）"}
+          </h2>{" "}
+          <div
+            className={[styles.callout, styles["callout-intro"]].join(" ")}
+            data-variant={INTRO_VARIANT}
+          >
+            {" "}
+            <i
+              className={["ti", "ti-bulb", styles["callout-icon"]].join(" ")}
+              aria-hidden="true"
+            ></i>{" "}
+            <div className={styles["callout-body"]}>
+              {
+                " この章では、Chapter 2「Modeling and Representing Knowledge Graphs」に相当する内容として、KG をコンピュータで扱うためのデータの書き方（モデル）を説明します。KG を作る際の最初の設計判断がここで決まります。 "
+              }
+            </div>{" "}
+          </div>{" "}
+          <h3 id="sec-2-1">
+            {" 2.1 "}
+            <span className={[styles.tag, styles["tag-scope"]].join(" ")}>{"本書の範囲"}</span>
+            {" このガイドで扱う主な節 "}
+          </h3>{" "}
+          <p>
+            {
+              " 2.1 Introduction、2.2 RDF Schema、2.3 Property-Centric Models、2.4 Wikidata Model、2.5 The Semantic Web Layer Cake、2.6 Schema Heterogeneity and Semantic Labeling "
+            }
+          </p>{" "}
+          <h3 id="sec-2-2">{"2.2 なぜモデルが必要か"}</h3>{" "}
+          <p>
+            {
+              " 同じ「東京は日本にある」という事実でも、システムごとに書き方が違うと、データを交換したり統合したりできません。モデルは、KG のデータの書き方を揃える約束事です。 "
+            }
+          </p>{" "}
+          <h3 id="sec-2-3">{"2.3 ステップ1：RDF の基本（トリプルと3種類の要素）"}</h3>{" "}
+          <p>
+            {
+              " RDF（Resource Description Framework）は、W3C が標準化した、KG を表すための代表的なデータモデルです。RDF のグラフは、主語（subject）・述語（predicate）・目的語（object）の3つ組の集まりです。W3C の RDF 1.1 の仕様では、RDF グラフのノードは次の3種類です。 "
+            }
+          </p>{" "}
+          <table>
+            <thead>
+              <tr>
+                <th>{"要素"} </th>
+                <th>{"意味"} </th>
+                <th>{"例え話"} </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{"IRI"} </td>
+                <td>{"世界で一意になる名前（Web の住所のような識別子）"} </td>
+                <td>{"マイナンバーのように、他と重ならない ID"} </td>
+              </tr>
+              <tr>
+                <td>{"リテラル（literal）"} </td>
+                <td>{"文字列や数値などの具体的な値。言語タグやデータ型を付けられる"} </td>
+                <td>{"名札に書かれた文字そのもの"} </td>
+              </tr>
+              <tr>
+                <td>{"空白ノード（blank node）"} </td>
+                <td>{"世界共通の名前を付けずに「何かがある」とだけ表すノード"} </td>
+                <td>{"「誰かは分からないが、絵の背景に木がある」の「木」"} </td>
+              </tr>
+            </tbody>
+          </table>{" "}
+          <p>
+            {
+              " W3C の RDF Primer では、空白ノードの例として、モナリザの背景にある「名前のない糸杉（cypress tree）」が使われています。 "
+            }
+          </p>{" "}
+          <p>
+            {
+              " トリプルの各位置には制約があります。主語は IRI か空白ノード、述語は IRI だけ、目的語は IRI・リテラル・空白ノードのいずれかです。 "
+            }
+          </p>{" "}
+          <h3 id="sec-2-4">{"2.4 ステップ2：Turtle で実際に書く"}</h3>{" "}
+          <p>
+            {
+              " 次のコードは、第1章の東京と大阪の KG を、RDF の書き方の一つである Turtle 形式で書いたものです。人が読み書きしやすい形式なので、学習用に向いています。 "
+            }
+          </p>{" "}
+          <div className={styles["code-block"]}>
+            {" "}
+            <span className={styles["code-lang"]}>{"Turtle"}</span>{" "}
+            <pre data-testid="code-block">
+              <code className={["language-turtle"].join(" ")}>
+                <span className={styles.codeLine} data-testid="code-line">
+                  {
+                    "# 接頭辞の宣言。長い IRI を毎回書くと読みにくいので、短い別名（ex:）を定義する。"
+                  }
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  {"@prefix ex:   <http://example.org/> ."}
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  {"@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> ."}
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  {"@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> ."}
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  {""}
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  {
+                    "# 「東京は City という型である」。rdf:type は、実体（インスタンス）と型（クラス）を結ぶ標準の述語。"
+                  }
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  {"# セミコロンは「主語を省略して、同じ主語で次の文を続ける」という記号。"}
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  {"ex:Tokyo   rdf:type ex:City ;"}
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  {
+                    '           rdfs:label "Tokyo"@en, "東京"@ja ;   # 言語タグ @en @ja を付け、同じ物の多言語ラベルを区別する'
+                  }
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  {"           ex:locatedIn ex:Japan .              # 文の終わりはピリオド"}
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  {""}
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  {"ex:Osaka   rdf:type ex:City ;"}
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  {'           rdfs:label "Osaka"@en ;'}
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  {"           ex:locatedIn ex:Japan ."}
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  {""}
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  {"ex:Japan   rdf:type ex:Country ;"}
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  {'           rdfs:label "Japan"@en .'}
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  {""}
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  {
+                    "# 型どうしの関係（スキーマ）。City も Country も Place の一種だと宣言しておくと、"
+                  }
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  {"# 「Place を全部探す」という問いに、東京も日本も含められる。"}
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  {"ex:City    rdfs:subClassOf ex:Place ."}
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  {"ex:Country rdfs:subClassOf ex:Place ."}
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  {""}
+                </span>
+              </code>
+            </pre>{" "}
+          </div>{" "}
+          <p>
+            {
+              " トリプルの数を数えると、東京4個、大阪3個、日本2個、型の関係2個で、合計11個です（rdflib で読み込んで 11 と確認済みです）。 "
+            }
+          </p>{" "}
+          <h3 id="sec-2-5">{"2.5 ステップ3：A-Box と T-Box を区別する"}</h3>{" "}
+          <p>
+            {" KG の中身は、2層に分けて考えると整理できます。Kejriwal 氏の解説論文（"}
+            <em>{"Knowledge Graphs: A Practical Review of the Research Landscape"}</em>
+            {"）でも、この区別が使われています。 "}
+          </p>{" "}
+          <table>
+            <thead>
+              <tr>
+                <th>{"層"} </th>
+                <th>{"内容"} </th>
+                <th>{"例"} </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{"A-Box（実体の層）"} </td>
+                <td>{"具体的な事実"} </td>
+                <td>{"東京は日本にある"} </td>
+              </tr>
+              <tr>
+                <td>{"T-Box（概念の層）"} </td>
+                <td>{"型と、許される関係の定義（オントロジー）"} </td>
+                <td>{"City は Place の一種。locatedIn の対象は Place"} </td>
+              </tr>
+            </tbody>
+          </table>{" "}
+          <p>
+            {" "}
+            <code>{"rdf:type"}</code>
+            {
+              " は、A-Box の実体を T-Box の型に結ぶ橋の役割をします。T-Box には制約も書けます。同解説論文は、例として「married_to は最大1つの相手にだけ結べる」という個数の制約（cardinality constraint）を挙げています。 "
+            }
+          </p>{" "}
+          <p>{"この図は、A-Box と T-Box が rdf:type でつながる様子を表しています。"}</p>{" "}
+          <div className={styles["mermaid-wrap"]}>
+            {" "}
+            <div id="mmd-3" className={styles["mermaid-diagram"]} role="img" aria-label="図">
+              <MermaidDiagram
+                chart={DIAGRAM_3}
+                id="mmd-3-svg"
+                theme="dark"
+                themeVariables={THEME_VARS}
+              />
+            </div>{" "}
+          </div>{" "}
+          <p>
+            {" 各ノードの意味："}
+            <br />
+            {" - 上の枠（T-Box）：型と型の関係だけを置く場所です"}
+            <br />
+            {" - 下の枠（A-Box）：具体的な実体と事実を置く場所です"}
+            <br />
+            {" - 点線の矢印（rdf:type）：実体がどの型に属するかを示し、2つの層をつなぎます "}
+          </p>{" "}
+          <h3 id="sec-2-6">{"2.6 ステップ4：RDF Schema でスキーマを表す"}</h3>{" "}
+          <p>
+            {
+              " RDFS（RDF Schema）は、RDF で型の階層などを書くための語彙です。本書の 2.2 節に対応します。先ほどの "
+            }
+            <code>{"rdfs:subClassOf"}</code>
+            {
+              " が代表例です。RDFS を使うと、「東京は City であり、City は Place の一種である。したがって東京は Place でもある」という推論の材料をデータ自身に持たせられます。推論の詳細は、このガイドの第11章で扱います。 "
+            }
+          </p>{" "}
+          <h3 id="sec-2-7">{"2.7 ステップ5：プロパティグラフという別の流儀"}</h3>{" "}
+          <p>
+            {
+              " 本書の 2.3 節は Property-Centric Models（＝プロパティ中心のモデル）を扱っています。ここでは、代表例であるプロパティグラフ（property graph）を補足します。プロパティグラフでは、ノードにもエッジにも、キーと値の組（プロパティ）を直接付けられます。 "
+            }
+          </p>{" "}
+          <table>
+            <thead>
+              <tr>
+                <th>{"観点"} </th>
+                <th>{"RDF"} </th>
+                <th>{"プロパティグラフ"} </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{"基本単位"} </td>
+                <td>{"トリプル"} </td>
+                <td>{"ノードとエッジ（それぞれにプロパティを持てる）"} </td>
+              </tr>
+              <tr>
+                <td>{"識別子"} </td>
+                <td>{"IRI で世界的に一意"} </td>
+                <td>{"データベース内の ID が中心"} </td>
+              </tr>
+              <tr>
+                <td>{"意味づけ"} </td>
+                <td>{"RDFS・OWL などの標準"} </td>
+                <td>{"標準の意味論は弱く、製品ごとの慣習が多い"} </td>
+              </tr>
+              <tr>
+                <td>{"問い合わせ言語"} </td>
+                <td>{"SPARQL"} </td>
+                <td>{"Cypher、GQL（ISO 標準）"} </td>
+              </tr>
+              <tr>
+                <td>{"得意な場面"} </td>
+                <td>{"異なる組織のデータを統合・公開する"} </td>
+                <td>{"単一システム内で関係をたどる処理"} </td>
+              </tr>
+            </tbody>
+          </table>{" "}
+          <p>
+            {" "}
+            <span className={[styles.tag, styles["tag-note"]].join(" ")}>{"補足"}</span>
+            {
+              " プロパティグラフの問い合わせ言語 GQL は、2024年4月に ISO/IEC 39075:2024 として発行されました。SQL の標準化（1987年）以来、ISO が発行した最初の新しいデータベース問い合わせ言語だと、The New Stack などが報じています。詳しくは、このガイドの第12章で扱います。 "
+            }
+          </p>{" "}
+          <h3 id="sec-2-8">{"2.8 ステップ6：Wikidata のモデル"}</h3>{" "}
+          <p>
+            {
+              " 本書の 2.4 節は Wikidata Model を扱います。Wikidata は、プロジェクトの設計者である Vrandečić と Krötzsch が CACM の論文で、多言語の「Wikipedia のためのデータ」として説明しています。論文の見出しには「Simple Data（Properties and Values）」「Not-So-Simple Data」「Citation Needed」があり、Wikidata の設計の特徴を、見出しと一般的な説明で整理すると次のとおりです。 "
+            }
+          </p>{" "}
+          <table>
+            <thead>
+              <tr>
+                <th>{"特徴"} </th>
+                <th>{"説明"} </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{"プロパティと値"} </td>
+                <td>{"「人口」「首都」のような性質と、その値の組で事実を書く"} </td>
+              </tr>
+              <tr>
+                <td>{"付加情報の付与"} </td>
+                <td>{"事実に、いつの値か、といった補足条件を付けられる"} </td>
+              </tr>
+              <tr>
+                <td>{"出典"} </td>
+                <td>{"事実に、根拠となる参照元を付けられる（Citation Needed の思想）"} </td>
+              </tr>
+            </tbody>
+          </table>{" "}
+          <p>
+            {" "}
+            <span className={[styles.tag, styles["tag-note"]].join(" ")}>{"補足"}</span>
+            {
+              " 付加情報（qualifier）と出典（reference）を事実に付ける仕組みが、素の RDF トリプルでは書きにくい部分を補っています。RDF 1.2 が「トリプル項（triple term）」を導入したのも、事実そのものについて述べる需要に応えるためです（次の2.9節）。 "
+            }
+          </p>{" "}
+          <h3 id="sec-2-9">{"2.9 RDF の標準は今どうなっているか（2026年9月時点）"}</h3>{" "}
+          <p>{"RDF は現在、改訂の途中にあります。私が確認できた範囲の状況は次のとおりです。"}</p>{" "}
+          <table>
+            <thead>
+              <tr>
+                <th>{"仕様"} </th>
+                <th>{"状況"} </th>
+                <th>{"確認元"} </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{"RDF 1.1"} </td>
+                <td>{"2014年に W3C 勧告（安定版）"} </td>
+                <td>{"W3C"} </td>
+              </tr>
+              <tr>
+                <td>{"RDF 1.2 Concepts / Semantics"} </td>
+                <td>{"2026年4月7日に Candidate Recommendation Snapshot（実装を募る段階）"} </td>
+                <td>{"W3C ニュース（2026-04-07）"} </td>
+              </tr>
+              <tr>
+                <td>{"SPARQL 1.2"} </td>
+                <td>{"Working Draft（草案）の段階の文書が複数公開されている"} </td>
+                <td>{"W3C"} </td>
+              </tr>
+              <tr>
+                <td>{"RDF 1.2 の主な追加"} </td>
+                <td>{"ノードの種類に「triple term（トリプルを部品として扱う要素）」が加わる"} </td>
+                <td>{"W3C RDF 1.2 Concepts"} </td>
+              </tr>
+            </tbody>
+          </table>{" "}
+          <p>
+            {
+              " Candidate Recommendation は、勧告（Recommendation）に進む前の段階です。RDF 1.2 の場合、W3C は実装を募る公告の中で「十分な実装経験」を次の段階へ進む条件の一つとして示しています。具体的な出口条件（必要な実装数やテストスイートの合格条件等）は仕様ごとに異なるため、"
+            }
+            <strong>
+              {
+                "実装に使う前に W3C の最新ページを確認してください。この状況は変わる可能性があります。"
+              }
+            </strong>{" "}
+          </p>{" "}
+          <h3 id="sec-2-10">{"2.10 ステップ7：Semantic Web Layer Cake と、スキーマの不一致"}</h3>{" "}
+          <p>
+            {
+              " 本書の 2.5 節「The Semantic Web Layer Cake」は、Semantic Web の技術（識別子、RDF、RDFS、オントロジー、ルール、論理など）を、下から上へ積み重なる層として示す有名な図です。上の層は下の層に依存します。 "
+            }
+          </p>{" "}
+          <p>
+            {
+              " 2.6 節「Schema Heterogeneity and Semantic Labeling」は、データ源ごとに列名や構造が違うという現実的な問題を扱います。たとえば、ある表では「所在地」、別の表では「place」と書かれていても、同じ「locatedIn」に対応づけたいことがあります。この対応づけを、データの列に意味のラベル（オントロジーの語彙）を付ける作業、すなわちセマンティックラベリングと呼びます。 "
+            }
+          </p>{" "}
+          <div
+            className={[styles.callout, styles["callout-glossary"]].join(" ")}
+            data-variant="glossary"
+          >
+            {" "}
+            <i
+              className={["ti", "ti-book-2", styles["callout-icon"]].join(" ")}
+              aria-hidden="true"
+            ></i>{" "}
+            <div className={styles["callout-body"]}>
+              {" "}
+              <p className={styles["callout-title"]}>{"このセクションで登場した用語"}</p>{" "}
+              <ul className={styles["glossary-list"]}>
+                {" "}
+                <li>
+                  {" "}
+                  <strong>{"RDF"}</strong>
+                  {"：主語・述語・目的語の3つ組で知識を表す W3C 標準のデータモデル "}
+                </li>{" "}
+                <li>
+                  {" "}
+                  <strong>{"IRI"}</strong>
+                  {
+                    "：物事に付ける、世界で一意な識別子（URL に似ているが、Web ページの住所とは限らない） "
+                  }
+                </li>{" "}
+                <li>
+                  <strong>{"リテラル"}</strong>
+                  {"：文字列・数値・日付などの具体的な値"}
+                </li>{" "}
+                <li>
+                  <strong>{"空白ノード"}</strong>
+                  {"：識別子を持たない、名前のないノード"}
+                </li>{" "}
+                <li>
+                  <strong>{"Turtle"}</strong>
+                  {"：RDF を人間が読み書きしやすい形で書く記法"}
+                </li>{" "}
+                <li>
+                  <strong>{"A-Box / T-Box"}</strong>
+                  {"：実体の層 / 概念（型）の層"}
+                </li>{" "}
+                <li>
+                  <strong>{"RDFS"}</strong>
+                  {"：RDF で型の階層などを書くための語彙"}
+                </li>{" "}
+                <li>
+                  {" "}
+                  <strong>{"プロパティグラフ"}</strong>
+                  {"：ノードとエッジにキーと値のプロパティを付けられるモデル "}
+                </li>{" "}
+                <li>
+                  {" "}
+                  <strong>{"Candidate Recommendation"}</strong>
+                  {"：W3C 標準化で「勧告」の前にある、実装を募る段階 "}
+                </li>{" "}
+                <li>
+                  {" "}
+                  <strong>{"セマンティックラベリング"}</strong>
+                  {"：データの列などに、オントロジーの語彙で意味の名前を付けること "}
+                </li>{" "}
+              </ul>{" "}
+            </div>{" "}
+          </div>{" "}
+        </section>{" "}
+        <section id="sec-3" className={styles.chapter}>
+          {" "}
+          <h2 id="sec-3-heading">{"3. 第3章：ドメイン発見（Domain Discovery）"}</h2>{" "}
+          <div
+            className={[styles.callout, styles["callout-intro"]].join(" ")}
+            data-variant={INTRO_VARIANT}
+          >
+            {" "}
+            <i
+              className={["ti", "ti-bulb", styles["callout-icon"]].join(" ")}
+              aria-hidden="true"
+            ></i>{" "}
+            <div className={styles["callout-body"]}>
+              {
+                " この章では、Chapter 3 に相当する内容として、KG を作る材料になるデータを、どうやって探し集めるかを説明します。Part II（構築）の入り口です。 "
+              }
+            </div>{" "}
+          </div>{" "}
+          <h3 id="sec-3-1">
+            {" 3.1 "}
+            <span className={[styles.tag, styles["tag-scope"]].join(" ")}>{"本書の範囲"}</span>
+            {" このガイドで扱う主な節 "}
+          </h3>{" "}
+          <p>
+            {"3.1 Introduction、3.2 Focused Crawling、3.3 Influential Systems and Methodologies"}
+          </p>{" "}
+          <h3 id="sec-3-2">{"3.2 なぜドメイン発見が必要か"}</h3>{" "}
+          <p>
+            {
+              " KG を作るとき、最初の壁は「どのデータを集めればよいか」です。Web 全体は広すぎて、すべてを集めるには時間と費用がかかります。そこで、作りたい KG の"
+            }
+            <strong>{"分野（ドメイン）"}</strong>
+            {"に関係するページだけを狙って集めます。これがドメイン発見です。 "}
+          </p>{" "}
+          <h3 id="sec-3-3">{"3.3 例え話：釣りと底引き網"}</h3>{" "}
+          <p>
+            {
+              " 一般的なクローラ（Web を巡回してページを集めるプログラム）は、海全体を底引き網で引くようなものです。一方、"
+            }
+            <strong>{"フォーカスト・クローラ（focused crawler）"}</strong>
+            {
+              "は、特定の魚のいる場所だけを狙って釣り糸を垂らす方法です。狙った分野のページだけを集めるので、無駄が少なくなります。 "
+            }
+          </p>{" "}
+          <table>
+            <thead>
+              <tr>
+                <th>{"観点"} </th>
+                <th>{"一般的なクローラ"} </th>
+                <th>{"フォーカスト・クローラ"} </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{"集める範囲"} </td>
+                <td>{"見つけたリンクを広く辿る"} </td>
+                <td>{"分野に関係しそうなリンクを優先して辿る"} </td>
+              </tr>
+              <tr>
+                <td>{"必要な判定"} </td>
+                <td>{"少ない"} </td>
+                <td>{"「このページは分野に合うか」を判定する仕組みが必要"} </td>
+              </tr>
+              <tr>
+                <td>{"向いている用途"} </td>
+                <td>{"検索エンジンの索引づくり"} </td>
+                <td>{"特定分野の KG づくり"} </td>
+              </tr>
+            </tbody>
+          </table>{" "}
+          <h3 id="sec-3-4">{"3.4 ステップ・バイ・ステップ：フォーカスト・クローリングの流れ"}</h3>{" "}
+          <ol>
+            {" "}
+            <li>
+              {" "}
+              <strong>{"種（seed）を決める"}</strong>
+              {"：分野に確実に関係する数個のページを用意します "}
+            </li>{" "}
+            <li>
+              <strong>{"ページを取得する"}</strong>
+              {"：種のページをダウンロードします"}
+            </li>{" "}
+            <li>
+              {" "}
+              <strong>{"関連度を判定する"}</strong>
+              {"：分類器（＝ページを「関係あり／なし」に振り分けるプログラム）で判定します "}
+            </li>{" "}
+            <li>
+              {" "}
+              <strong>{"リンクの優先度を付ける"}</strong>
+              {
+                "：関係ありと判定したページのリンクを、優先度付きの待ち行列（フロンティア）に入れます "
+              }
+            </li>{" "}
+            <li>
+              {" "}
+              <strong>{"繰り返す"}</strong>
+              {"：フロンティアから優先度の高いページを取り出して、2に戻ります "}
+            </li>{" "}
+          </ol>{" "}
+          <p>
+            {
+              " この図は、フォーカスト・クローリングの処理の流れを表しています。上から下へ読み進めてください。 "
+            }
+          </p>{" "}
+          <div className={styles["mermaid-wrap"]}>
+            {" "}
+            <div id="mmd-4" className={styles["mermaid-diagram"]} role="img" aria-label="図">
+              <MermaidDiagram
+                chart={DIAGRAM_4}
+                id="mmd-4-svg"
+                theme="dark"
+                themeVariables={THEME_VARS}
+              />
+            </div>{" "}
+          </div>{" "}
+          <p>
+            {" 各ノードの意味："}
+            <br />
+            {" - 「種のページを用意」：処理の開始点。人が選ぶ"}
+            <br />
+            {" - 「分野に関係あるか」（ひし形）：分類器の判定。分岐点"}
+            <br />
+            {" - 「フロンティア」：これから訪れる候補ページの優先順位つきリスト"}
+            <br />
+            {" - 「破棄する」：関係のないページを捨てて、無駄な取得を減らす "}
+          </p>{" "}
+          <h3 id="sec-3-5">{"3.5 現場での注意点"}</h3>{" "}
+          <p>
+            {" "}
+            <span className={[styles.tag, styles["tag-note"]].join(" ")}>{"補足"}</span>
+            {" ページを取得するときは、対象サイトの利用規約と "}
+            <code>{"robots.txt"}</code>
+            {
+              "（＝クローラに許可・禁止する範囲を伝える設定ファイル）を確認してください。アクセス頻度を抑えることも、サイトへの負荷を避けるために必要です。 "
+            }
+          </p>{" "}
+          <div
+            className={[styles.callout, styles["callout-glossary"]].join(" ")}
+            data-variant="glossary"
+          >
+            {" "}
+            <i
+              className={["ti", "ti-book-2", styles["callout-icon"]].join(" ")}
+              aria-hidden="true"
+            ></i>{" "}
+            <div className={styles["callout-body"]}>
+              {" "}
+              <p className={styles["callout-title"]}>{"このセクションで登場した用語"}</p>{" "}
+              <ul className={styles["glossary-list"]}>
+                {" "}
+                <li>
+                  <strong>{"ドメイン"}</strong>
+                  {"：扱う分野（例：旅行、医療、製品）"}
+                </li>{" "}
+                <li>
+                  <strong>{"クローラ"}</strong>
+                  {"：Web ページを自動で巡回して集めるプログラム"}
+                </li>{" "}
+                <li>
+                  {" "}
+                  <strong>{"フォーカスト・クローラ"}</strong>
+                  {"：特定の分野に関係するページを優先して集めるクローラ "}
+                </li>{" "}
+                <li>
+                  <strong>{"種（seed）"}</strong>
+                  {"：巡回の出発点になるページ"}
+                </li>{" "}
+                <li>
+                  <strong>{"フロンティア"}</strong>
+                  {"：これから訪れるページの候補一覧"}
+                </li>{" "}
+              </ul>{" "}
+            </div>{" "}
+          </div>{" "}
+        </section>{" "}
+        <section id="sec-4" className={styles.chapter}>
+          {" "}
+          <h2 id="sec-4-heading">{"4. 第4章：固有表現認識（Named Entity Recognition, NER）"}</h2>{" "}
+          <div
+            className={[styles.callout, styles["callout-intro"]].join(" ")}
+            data-variant={INTRO_VARIANT}
+          >
+            {" "}
+            <i
+              className={["ti", "ti-bulb", styles["callout-icon"]].join(" ")}
+              aria-hidden="true"
+            ></i>{" "}
+            <div className={styles["callout-body"]}>
+              {
+                " この章では、Chapter 4 に相当する内容として、文章から「人名」「組織名」「地名」などの名前を見つけ出す技術を説明します。文章を KG のノードに変える最初の一歩です。 "
+              }
+            </div>{" "}
+          </div>{" "}
+          <h3 id="sec-4-1">
+            {" 4.1 "}
+            <span className={[styles.tag, styles["tag-scope"]].join(" ")}>{"本書の範囲"}</span>
+            {" このガイドで扱う主な節 "}
+          </h3>{" "}
+          <p>
+            {
+              " 4.1 Introduction、4.2 Why Is Information Extraction Hard?、4.3 Approaches for Named Entity Recognition、4.4 Deep Learning for Named Entity Recognition、4.5 Domain-Specific Named Entity Recognition、4.6 Evaluating Information Extraction Quality "
+            }
+          </p>{" "}
+          <h3 id="sec-4-2">{"4.2 なぜ NER が必要か"}</h3>{" "}
+          <p>
+            {
+              " KG のノードになるのは、人や組織や場所です。文章の中から、それらの名前の範囲と種類を見つけなければ、ノードを作れません。 "
+            }
+          </p>{" "}
+          <h3 id="sec-4-3">{"4.3 ステップ1：NER の入力と出力"}</h3>{" "}
+          <p>
+            {" 入力は文章、出力は「どの範囲の文字が、どの種類の名前か」です。よく使われる書き方が "}
+            <strong>{"BIO タグ"}</strong>
+            {"（＝各単語に「名前の先頭 B」「名前の続き I」「名前ではない O」を付ける方式）です。 "}
+          </p>{" "}
+          <p>{"例文：「Tim Berners-Lee proposed the Web at CERN」"}</p>{" "}
+          <table>
+            <thead>
+              <tr>
+                <th>{"単語"} </th>
+                <th>{"Tim"} </th>
+                <th>{"Berners-Lee"} </th>
+                <th>{"proposed"} </th>
+                <th>{"the"} </th>
+                <th>{"Web"} </th>
+                <th>{"at"} </th>
+                <th>{"CERN"} </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{"タグ"} </td>
+                <td>{"B-PER"} </td>
+                <td>{"I-PER"} </td>
+                <td>{"O"} </td>
+                <td>{"O"} </td>
+                <td>{"O"} </td>
+                <td>{"O"} </td>
+                <td>{"B-ORG"} </td>
+              </tr>
+            </tbody>
+          </table>{" "}
+          <p>
+            {
+              " PER は人名、ORG は組織名を表します。「Tim Berners-Lee」が2単語で1つの人名だと、B と I の並びで分かります。 "
+            }
+          </p>{" "}
+          <h3 id="sec-4-4">{"4.4 ステップ2：なぜ情報抽出は難しいのか（4.2節）"}</h3>{" "}
+          <table>
+            <thead>
+              <tr>
+                <th>{"難しさの原因"} </th>
+                <th>{"例"} </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{"曖昧さ"} </td>
+                <td>{"「Apple」は果物か、企業か"} </td>
+              </tr>
+              <tr>
+                <td>{"表記の揺れ"} </td>
+                <td>{"「東京都」「東京」「Tokyo」"} </td>
+              </tr>
+              <tr>
+                <td>{"未知の名前"} </td>
+                <td>{"辞書に載っていない新しい会社名や製品名"} </td>
+              </tr>
+              <tr>
+                <td>{"文脈への依存"} </td>
+                <td>{"「Washington」は人名、都市名、州名のいずれにもなる"} </td>
+              </tr>
+            </tbody>
+          </table>{" "}
+          <h3 id="sec-4-5">{"4.5 ステップ3：3つのアプローチ（4.3〜4.4節）"}</h3>{" "}
+          <table>
+            <thead>
+              <tr>
+                <th>{"方式"} </th>
+                <th>{"仕組み"} </th>
+                <th>{"長所"} </th>
+                <th>{"短所"} </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{"辞書・ルール"} </td>
+                <td>{"名前の一覧や規則（大文字で始まる語など）で照合する"} </td>
+                <td>{"仕組みが分かりやすい"} </td>
+                <td>{"未知の名前と表記の揺れに弱い"} </td>
+              </tr>
+              <tr>
+                <td>{"機械学習（系列ラベリング）"} </td>
+                <td>{"正解付きの文章から、前後の語を手がかりにタグを予測する"} </td>
+                <td>{"文脈を使える"} </td>
+                <td>{"正解付きデータの用意が必要"} </td>
+              </tr>
+              <tr>
+                <td>{"深層学習"} </td>
+                <td>{"ニューラルネットワークが文脈を学習して、タグを予測する"} </td>
+                <td>{"高い精度を出しやすい"} </td>
+                <td>{"大量のデータと計算資源が必要になりやすい"} </td>
+              </tr>
+            </tbody>
+          </table>{" "}
+          <p>
+            {" "}
+            <span className={[styles.tag, styles["tag-note"]].join(" ")}>{"補足"}</span>
+            {
+              " 機械学習の代表例に CRF（Conditional Random Field、＝隣り合うタグの関係も考慮して、文全体で最も自然なタグ列を選ぶ手法）があります。深層学習では、Transformer 系のモデルが広く使われています。 "
+            }
+          </p>{" "}
+          <h3 id="sec-4-6">{"4.6 ステップ4：品質の測り方（4.6節）"}</h3>{" "}
+          <p>
+            {" 抽出の品質は、"}
+            <strong>{"適合率（precision）"}</strong>
+            {"、"}
+            <strong>{"再現率（recall）"}</strong>
+            {"、"}
+            <strong>{"F1 値"}</strong>
+            {"で測ります。 "}
+          </p>{" "}
+          <ul>
+            {" "}
+            <li>{"適合率：見つけたもののうち、正しかった割合"}</li>{" "}
+            <li>{"再現率：見つけるべきもののうち、実際に見つけられた割合"}</li>{" "}
+            <li>
+              {
+                " F1 値：適合率と再現率のバランスを1つの数字にしたもの（＝2 × 適合率 × 再現率 ÷ 適合率と再現率の和） "
+              }
+            </li>{" "}
+          </ul>{" "}
+          <p>
+            {
+              " 数値例：正解の名前が12個ある文章で、システムが10個を出力し、そのうち8個が正解だったとします。 "
+            }
+          </p>{" "}
+          <table>
+            <thead>
+              <tr>
+                <th>{"数え方"} </th>
+                <th>{"値"} </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{"正しく見つけた数 TP"} </td>
+                <td>{"8"} </td>
+              </tr>
+              <tr>
+                <td>{"間違って出した数 FP"} </td>
+                <td>{"2（出力10個のうち不正解）"} </td>
+              </tr>
+              <tr>
+                <td>{"見逃した数 FN"} </td>
+                <td>{"4（正解12個のうち見つけられなかった）"} </td>
+              </tr>
+              <tr>
+                <td>{"適合率"} </td>
+                <td>{"8 ÷ (8 + 2) = 0.80"} </td>
+              </tr>
+              <tr>
+                <td>{"再現率"} </td>
+                <td>{"8 ÷ (8 + 4) ≒ 0.67"} </td>
+              </tr>
+              <tr>
+                <td>{"F1 値"} </td>
+                <td>{"≒ 0.73"} </td>
+              </tr>
+            </tbody>
+          </table>{" "}
+          <p>
+            {
+              " 「適合率が高くても、再現率が低い」場合は、慎重すぎて見逃しが多い状態です。KG の目的に合わせて、どちらを重視するかを決めます。 "
+            }
+          </p>{" "}
+          <div
+            className={[styles.callout, styles["callout-glossary"]].join(" ")}
+            data-variant="glossary"
+          >
+            {" "}
+            <i
+              className={["ti", "ti-book-2", styles["callout-icon"]].join(" ")}
+              aria-hidden="true"
+            ></i>{" "}
+            <div className={styles["callout-body"]}>
+              {" "}
+              <p className={styles["callout-title"]}>{"このセクションで登場した用語"}</p>{" "}
+              <ul className={styles["glossary-list"]}>
+                {" "}
+                <li>
+                  {" "}
+                  <strong>{"NER"}</strong>
+                  {"：文章から人名・組織名・地名などを見つけて種類を付ける技術 "}
+                </li>{" "}
+                <li>
+                  {" "}
+                  <strong>{"BIO タグ"}</strong>
+                  {"：名前の範囲を先頭（B）・続き（I）・外（O）で表す書き方 "}
+                </li>{" "}
+                <li>
+                  <strong>{"適合率"}</strong>
+                  {"：出力のうち正しかった割合"}
+                </li>{" "}
+                <li>
+                  <strong>{"再現率"}</strong>
+                  {"：正解のうち見つけられた割合"}
+                </li>{" "}
+                <li>
+                  <strong>{"F1 値"}</strong>
+                  {"：適合率と再現率のバランスを表す指標"}
+                </li>{" "}
+              </ul>{" "}
+            </div>{" "}
+          </div>{" "}
+        </section>{" "}
+        <section id="sec-5" className={styles.chapter}>
+          {" "}
+          <h2 id="sec-5-heading">{"5. 第5章：Web からの情報抽出（Web Information Extraction）"}</h2>{" "}
+          <div
+            className={[styles.callout, styles["callout-intro"]].join(" ")}
+            data-variant={INTRO_VARIANT}
+          >
+            {" "}
+            <i
+              className={["ti", "ti-bulb", styles["callout-icon"]].join(" ")}
+              aria-hidden="true"
+            ></i>{" "}
+            <div className={styles["callout-body"]}>
+              {
+                " この章では、Chapter 5 に相当する内容として、Web ページの構造を手がかりにデータを取り出す方法を説明します。文章だけでなく、商品一覧のような「型のあるページ」から効率よく事実を集められます。 "
+              }
+            </div>{" "}
+          </div>{" "}
+          <h3 id="sec-5-1">
+            {" 5.1 "}
+            <span className={[styles.tag, styles["tag-scope"]].join(" ")}>{"本書の範囲"}</span>
+            {" このガイドで扱う主な節 "}
+          </h3>{" "}
+          <p>
+            {
+              " 5.1 Introduction、5.2 Wrapper Generation、5.3 Beyond Wrappers: Information Extraction over Structured Data "
+            }
+          </p>{" "}
+          <h3 id="sec-5-2">{"5.2 なぜ Web 用の抽出が必要か"}</h3>{" "}
+          <p>
+            {
+              " 同じサイトのページは、同じテンプレート（ひな型）で作られていることが多いです。ひな型の構造を利用すれば、文章の意味を理解しなくても、価格や名前の場所を特定して取り出せます。 "
+            }
+          </p>{" "}
+          <h3 id="sec-5-3">{"5.3 例え話：型抜き"}</h3>{" "}
+          <p>
+            {" "}
+            <strong>{"ラッパー（wrapper）"}</strong>
+            {
+              "は、クッキーの型抜きに似ています。生地（＝ページ）のどの位置を抜けば欲しい形（＝価格や商品名）が取れるかを、型として一度作っておけば、同じ形の生地から何枚でも抜けます。 "
+            }
+          </p>{" "}
+          <h3 id="sec-5-4">{"5.4 ステップ・バイ・ステップ：ラッパー生成の流れ"}</h3>{" "}
+          <ol>
+            {" "}
+            <li>{"同じテンプレートのサンプルページを数枚集めます"}</li>{" "}
+            <li>{"サンプルの中で、欲しい項目（商品名、価格など）に印を付けます"}</li>{" "}
+            <li>{"印の付いた位置から、ルール（例：XPath）を作ります"}</li>{" "}
+            <li>{"ルールを大量のページに適用して、項目を取り出します"}</li>{" "}
+            <li>{"取り出した値を、KG のトリプルに変換します"}</li>{" "}
+          </ol>{" "}
+          <p>
+            {
+              " この図は、ラッパー生成から KG への変換までの流れを表しています。左から右へ読み進めてください。 "
+            }
+          </p>{" "}
+          <div className={styles["mermaid-wrap"]}>
+            {" "}
+            <div id="mmd-5" className={styles["mermaid-diagram"]} role="img" aria-label="図">
+              <MermaidDiagram
+                chart={DIAGRAM_5}
+                id="mmd-5-svg"
+                theme="dark"
+                themeVariables={THEME_VARS}
+              />
+            </div>{" "}
+          </div>{" "}
+          <p>
+            {" 各ノードの意味："}
+            <br />
+            {" - 「サンプルページ」：同じひな型で作られたページを数枚"}
+            <br />
+            {" - 「ルールを作る」：印の位置から、取り出しルールを自動または手動で作る"}
+            <br />
+            {" - 「トリプルに変換」：取り出した値を「商品 → 価格 → 1200円」のような形にする "}
+          </p>{" "}
+          <h3 id="sec-5-5">{"5.5 XPath の例"}</h3>{" "}
+          <p>
+            {
+              " XPath とは、HTML の中の位置を指定する書き方です。次の式は、商品ブロックの中にある価格の文字を取り出します。 "
+            }
+          </p>{" "}
+          <div className={styles["code-block"]}>
+            {" "}
+            <span className={styles["code-lang"]}>{"TEXT"}</span>{" "}
+            <pre data-testid="code-block">
+              <code className={["language-text"].join(" ")}>
+                <span className={styles.codeLine} data-testid="code-line">
+                  {'//div[@class="product"]/span[@class="price"]/text()'}
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  {""}
+                </span>
+              </code>
+            </pre>{" "}
+          </div>{" "}
+          <p>
+            {
+              " この式の意味は、「class が product の div の直下にある、class が price の span の文字を取り出す」です。サイトのひな型が変わると動かなくなる、という弱点があります。 "
+            }
+          </p>{" "}
+          <h3 id="sec-5-6">{"5.6 ステップ：ラッパーを超えて（5.3節）"}</h3>{" "}
+          <p>
+            {" "}
+            <span className={[styles.tag, styles["tag-scope"]].join(" ")}>{"本書の範囲"}</span>
+            {
+              " 5.3 節の題名は「Beyond Wrappers: Information Extraction over Structured Data」で、構造化されたデータ（表など）からの抽出を扱います。 "
+            }
+          </p>{" "}
+          <p>
+            {" "}
+            <span className={[styles.tag, styles["tag-note"]].join(" ")}>{"補足"}</span>
+            {
+              " 表形式のデータ（CSV、スプレッドシート、JSON など）は、列名の意味を KG の語彙に対応づける作業（第2章のセマンティックラベリング）が要になります。著者らの研究グループ（USC ISI）は、データ源を RDF などの KG に対応づけるツールも公開してきました（例：Karma）。具体的な内容は、各章末の Software and Resources で確認してください。 "
+            }
+          </p>{" "}
+          <table>
+            <thead>
+              <tr>
+                <th>{"入力の種類"} </th>
+                <th>{"主な方法"} </th>
+                <th>{"課題"} </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{"ひな型のあるHTML"} </td>
+                <td>{"ラッパー"} </td>
+                <td>{"ひな型の変更に弱い"} </td>
+              </tr>
+              <tr>
+                <td>{"表・CSV"} </td>
+                <td>{"列と語彙の対応づけ"} </td>
+                <td>{"列名の揺れ、単位の違い"} </td>
+              </tr>
+              <tr>
+                <td>{"文章"} </td>
+                <td>{"NER と関係抽出（第4・6章）"} </td>
+                <td>{"曖昧さ、表記の揺れ"} </td>
+              </tr>
+            </tbody>
+          </table>{" "}
+          <div
+            className={[styles.callout, styles["callout-glossary"]].join(" ")}
+            data-variant="glossary"
+          >
+            {" "}
+            <i
+              className={["ti", "ti-book-2", styles["callout-icon"]].join(" ")}
+              aria-hidden="true"
+            ></i>{" "}
+            <div className={styles["callout-body"]}>
+              {" "}
+              <p className={styles["callout-title"]}>{"このセクションで登場した用語"}</p>{" "}
+              <ul className={styles["glossary-list"]}>
+                {" "}
+                <li>
+                  <strong>{"ラッパー"}</strong>
+                  {"：ページの構造から目的の項目を取り出すルール"}
+                </li>{" "}
+                <li>
+                  <strong>{"XPath"}</strong>
+                  {"：HTML/XML の中の位置を指定する書き方"}
+                </li>{" "}
+                <li>
+                  <strong>{"テンプレート"}</strong>
+                  {"：同じサイト内で繰り返し使われるページのひな型"}
+                </li>{" "}
+                <li>
+                  {" "}
+                  <strong>{"セマンティックラベリング"}</strong>
+                  {"：データの列に、意味を表す語彙（オントロジー）を対応づけること "}
+                </li>{" "}
+              </ul>{" "}
+            </div>{" "}
+          </div>{" "}
+        </section>{" "}
+        <section id="sec-6" className={styles.chapter}>
+          {" "}
+          <h2 id="sec-6-heading">{"6. 第6章：関係抽出（Relation Extraction）"}</h2>{" "}
+          <div
+            className={[styles.callout, styles["callout-intro"]].join(" ")}
+            data-variant={INTRO_VARIANT}
+          >
+            {" "}
+            <i
+              className={["ti", "ti-bulb", styles["callout-icon"]].join(" ")}
+              aria-hidden="true"
+            ></i>{" "}
+            <div className={styles["callout-body"]}>
+              {
+                " この章では、Chapter 6 に相当する内容として、文章から「AとBはどんな関係か」を取り出す技術を説明します。第4章で見つけた名前どうしを、線でつなぐ工程です。 "
+              }
+            </div>{" "}
+          </div>{" "}
+          <h3 id="sec-6-1">
+            {" 6.1 "}
+            <span className={[styles.tag, styles["tag-scope"]].join(" ")}>{"本書の範囲"}</span>
+            {" このガイドで扱う主な節 "}
+          </h3>{" "}
+          <p>
+            {
+              " 6.1 Introduction、6.2 Ontologies and Programs、6.3 Techniques for Relation Extraction、6.4 Recent Research: Deep Learning for Relation Extraction、6.5 Beyond Relation Extraction: Event Extraction and Joint Information Extraction "
+            }
+          </p>{" "}
+          <h3 id="sec-6-2">{"6.2 なぜ関係抽出が必要か"}</h3>{" "}
+          <p>
+            {
+              " 名前だけを集めても、KG にはなりません。KG の価値は「関係」にあります。文章「Tim Berners-Lee proposed the Web at CERN」からは、「Tim Berners-Lee」と「CERN」の間のどのような関係を取り出すかを慎重に考える必要があります。この文が直接支持するのは「提案イベントが CERN で起きた」という "
+            }
+            <code>{"proposedAt"}</code>
+            {" のような関係であり、「勤務・所属」を表す "}
+            <code>{"worksAt"}</code>
+            {
+              " を導くには「CERN で提案した」だけでは不十分です（別途 worksAt を裏付ける情報が必要です）。関係抽出では、文が実際に支持する関係の種類だけを取り出すことが重要です。 "
+            }
+          </p>{" "}
+          <h3 id="sec-6-3">
+            {"6.3 ステップ1：オントロジーで「取り出したい関係」を決める（6.2節）"}
+          </h3>{" "}
+          <p>
+            {
+              " 関係抽出は、あらかじめオントロジーで関係の種類を決めておくと、目標が明確になります。たとえば "
+            }
+            <code>{"worksAt"}</code>
+            {
+              "（勤務先）の関係には、「主語は人、目的語は組織」という制約を付けられます。抽出結果がこの制約に合わなければ、誤りとして除外できます。 "
+            }
+          </p>{" "}
+          <h3 id="sec-6-4">{"6.4 ステップ2：代表的な手法（6.3〜6.4節）"}</h3>{" "}
+          <p>
+            {" "}
+            <span className={[styles.tag, styles["tag-note"]].join(" ")}>{"補足"}</span>
+            {
+              " 関係抽出の代表的な手法は、次の4つに整理できます。各手法の細部は、書籍の 6.3 節で確認してください。 "
+            }
+          </p>{" "}
+          <table>
+            <thead>
+              <tr>
+                <th>{"手法"} </th>
+                <th>{"仕組み"} </th>
+                <th>{"例"} </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{"パターン（ルール）"} </td>
+                <td>{"文の型を手作業で書く"} </td>
+                <td>{"「X such as Y」から、Y は X の一種と取り出す"} </td>
+              </tr>
+              <tr>
+                <td>{"教師あり学習"} </td>
+                <td>{"関係にラベルを付けた文章で分類器を学習する"} </td>
+                <td>{"名前のペアを見て、関係の種類を予測する"} </td>
+              </tr>
+              <tr>
+                <td>{"遠隔教師あり学習"} </td>
+                <td>{"既存の KG の事実を使って、文章に自動でラベルを付ける"} </td>
+                <td>{"既知の「(A, worksAt, B)」を含む文を正例にする"} </td>
+              </tr>
+              <tr>
+                <td>{"深層学習"} </td>
+                <td>{"文脈全体の表現から関係を予測する"} </td>
+                <td>{"Transformer 系のモデルなど"} </td>
+              </tr>
+            </tbody>
+          </table>{" "}
+          <p>
+            {
+              " 遠隔教師あり学習は、手作業でラベルを付ける手間を減らせる一方で、既存の事実を含んでいても関係を表していない文が混ざり、ラベルにノイズ（誤り）が入りやすい点に注意が必要です。 "
+            }
+          </p>{" "}
+          <h3 id="sec-6-5">{"6.5 ステップ3：全体の流れ"}</h3>{" "}
+          <p>
+            {
+              " この図は、文章から関係を取り出して KG に加えるまでの流れを表しています。上から下へ読み進めてください。 "
+            }
+          </p>{" "}
+          <div className={styles["mermaid-wrap"]}>
+            {" "}
+            <div id="mmd-6" className={styles["mermaid-diagram"]} role="img" aria-label="図">
+              <MermaidDiagram
+                chart={DIAGRAM_6}
+                id="mmd-6-svg"
+                theme="dark"
+                themeVariables={THEME_VARS}
+              />
+            </div>{" "}
+          </div>{" "}
+          <p>
+            {" 各ノードの意味："}
+            <br />
+            {" - 「名前のペアを作る」：文の中の名前を2つずつ組み合わせる"}
+            <br />
+            {" - 「関係の種類を予測」：ペアの間の関係を、分類器が選ぶ"}
+            <br />
+            {
+              " - 「オントロジーの制約に合うか」（ひし形）：主語・目的語の型が、関係の定義と合うかを確認する "
+            }
+          </p>{" "}
+          <h3 id="sec-6-6">{"6.6 イベント抽出と共同抽出（6.5節）"}</h3>{" "}
+          <p>
+            {" 関係抽出を超えて、「出来事（イベント）」と、その参加者・日時・場所を取り出す"}
+            <strong>{"イベント抽出"}</strong>
+            {"があります。また、名前の抽出と関係の抽出を別々にせず一緒に学習する"}
+            <strong>{"共同（joint）抽出"}</strong>
+            {"は、前段の誤りが後段に伝わる問題を減らす目的で研究されています。 "}
+          </p>{" "}
+          <div
+            className={[styles.callout, styles["callout-glossary"]].join(" ")}
+            data-variant="glossary"
+          >
+            {" "}
+            <i
+              className={["ti", "ti-book-2", styles["callout-icon"]].join(" ")}
+              aria-hidden="true"
+            ></i>{" "}
+            <div className={styles["callout-body"]}>
+              {" "}
+              <p className={styles["callout-title"]}>{"このセクションで登場した用語"}</p>{" "}
+              <ul className={styles["glossary-list"]}>
+                {" "}
+                <li>
+                  <strong>{"関係抽出"}</strong>
+                  {"：文章から、実体どうしの関係を取り出す技術"}
+                </li>{" "}
+                <li>
+                  {" "}
+                  <strong>{"遠隔教師あり学習"}</strong>
+                  {"：既存の知識ベースを使って、学習用ラベルを自動生成する方法 "}
+                </li>{" "}
+                <li>
+                  <strong>{"ノイズ"}</strong>
+                  {"：データに混ざった誤り"}
+                </li>{" "}
+                <li>
+                  <strong>{"イベント抽出"}</strong>
+                  {"：出来事とその参加者・日時・場所を取り出す技術"}
+                </li>{" "}
+                <li>
+                  <strong>{"共同抽出"}</strong>
+                  {"：名前と関係の抽出を一緒に行う方法"}
+                </li>{" "}
+              </ul>{" "}
+            </div>{" "}
+          </div>{" "}
+        </section>{" "}
+        <section id="sec-7" className={styles.chapter}>
+          {" "}
+          <h2 id="sec-7-heading">
+            {"7. 第7章：非伝統的な情報抽出（Nontraditional Information Extraction）"}
+          </h2>{" "}
+          <div
+            className={[styles.callout, styles["callout-intro"]].join(" ")}
+            data-variant={INTRO_VARIANT}
+          >
+            {" "}
+            <i
+              className={["ti", "ti-bulb", styles["callout-icon"]].join(" ")}
+              aria-hidden="true"
+            ></i>{" "}
+            <div className={styles["callout-body"]}>
+              {
+                " この章では、Chapter 7 に相当する内容として、事前に関係の種類を決められない場合や、SNS のような荒れた文章から知識を取り出す方法を説明します。 "
+              }
+            </div>{" "}
+          </div>{" "}
+          <h3 id="sec-7-1">
+            {" 7.1 "}
+            <span className={[styles.tag, styles["tag-scope"]].join(" ")}>{"本書の範囲"}</span>
+            {" このガイドで扱う主な節 "}
+          </h3>{" "}
+          <p>
+            {
+              " 7.1 Introduction、7.2 Open Information Extraction、7.3 Social Media Information Extraction、7.4 Other Kinds of Nontraditional Information Extraction "
+            }
+          </p>{" "}
+          <h3 id="sec-7-2">{"7.2 ステップ1：オープン情報抽出（Open IE）"}</h3>{" "}
+          <p>
+            {
+              " なぜ必要かというと、第6章の方法は、取り出す関係の種類を先に決める必要があるからです。Web 上のあらゆる文章の関係を事前に列挙するのは現実的ではありません。Open IE は、関係の種類を決めずに、文の中の表現をそのまま関係として取り出します。 "
+            }
+          </p>{" "}
+          <table>
+            <thead>
+              <tr>
+                <th>{"文"} </th>
+                <th>{"Open IE の出力（主語, 関係の表現, 目的語）"} </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{"Tokyo is the capital of Japan"} </td>
+                <td>{"(Tokyo, is the capital of, Japan)"} </td>
+              </tr>
+              <tr>
+                <td>{"CERN hosted the first web server"} </td>
+                <td>{"(CERN, hosted, the first web server)"} </td>
+              </tr>
+            </tbody>
+          </table>{" "}
+          <p>
+            {
+              " 長所は、事前の設計が要らず、幅広く取れることです。短所は、同じ意味の関係が別の表現で出てくること（例：「is the capital of」と「is Japan's capital」）で、KG に入れる前に、表現の統合が必要になることです。 "
+            }
+          </p>{" "}
+          <h3 id="sec-7-3">{"7.3 ステップ2：SNS などからの抽出（7.3節）"}</h3>{" "}
+          <p>
+            {
+              " SNS の文章には、略語、絵文字、ハッシュタグ、誤字、短さといった特徴があり、新聞記事向けに作られた手法がそのまま働きません。"
+            }
+            <span className={[styles.tag, styles["tag-note"]].join(" ")}>{"補足"}</span>
+            {
+              " そのため、SNS 向けの学習データや、表記の正規化（略語や誤字を標準の形に直す処理）が必要になります。 "
+            }
+          </p>{" "}
+          <h3 id="sec-7-4">{"7.4 使い分けの目安"}</h3>{" "}
+          <table>
+            <thead>
+              <tr>
+                <th>{"状況"} </th>
+                <th>{"向いている方法"} </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{"取り出す関係が決まっていて、正解データがある"} </td>
+                <td>{"第6章の関係抽出"} </td>
+              </tr>
+              <tr>
+                <td>{"関係の種類が多様で、事前に決められない"} </td>
+                <td>{"Open IE"} </td>
+              </tr>
+              <tr>
+                <td>{"SNS や口語の文章が中心"} </td>
+                <td>{"SNS 向けの抽出（表記の正規化を含む）"} </td>
+              </tr>
+            </tbody>
+          </table>{" "}
+          <div
+            className={[styles.callout, styles["callout-glossary"]].join(" ")}
+            data-variant="glossary"
+          >
+            {" "}
+            <i
+              className={["ti", "ti-book-2", styles["callout-icon"]].join(" ")}
+              aria-hidden="true"
+            ></i>{" "}
+            <div className={styles["callout-body"]}>
+              {" "}
+              <p className={styles["callout-title"]}>{"このセクションで登場した用語"}</p>{" "}
+              <ul className={styles["glossary-list"]}>
+                {" "}
+                <li>
+                  {" "}
+                  <strong>{"Open IE"}</strong>
+                  {"：関係の種類を事前に決めず、文の表現をそのまま関係として取り出す方法 "}
+                </li>{" "}
+                <li>
+                  <strong>{"正規化"}</strong>
+                  {"：表記の揺れを、標準の形にそろえる処理"}
+                </li>{" "}
+                <li>
+                  <strong>{"ハッシュタグ"}</strong>
+                  {"：SNS で話題を示す「#」付きの言葉"}
+                </li>{" "}
+              </ul>{" "}
+            </div>{" "}
+          </div>{" "}
+        </section>{" "}
+        <section id="sec-8" className={styles.chapter}>
+          {" "}
+          <h2 id="sec-8-heading">{"8. 第8章：インスタンス照合（Instance Matching）"}</h2>{" "}
+          <div
+            className={[styles.callout, styles["callout-intro"]].join(" ")}
+            data-variant={INTRO_VARIANT}
+          >
+            {" "}
+            <i
+              className={["ti", "ti-bulb", styles["callout-icon"]].join(" ")}
+              aria-hidden="true"
+            ></i>{" "}
+            <div className={styles["callout-body"]}>
+              {
+                " この章では、Chapter 8 に相当する内容として、別々のデータ源にある「同じ実体を指すレコード」を見つけて結びつける技術を説明します。Part III（知識の追加・改良）の中心です。 "
+              }
+            </div>{" "}
+          </div>{" "}
+          <h3 id="sec-8-1">
+            {" 8.1 "}
+            <span className={[styles.tag, styles["tag-scope"]].join(" ")}>{"本書の範囲"}</span>
+            {" このガイドで扱う主な節 "}
+          </h3>{" "}
+          <p>
+            {
+              " 8.1 Introduction、8.2 Formalism、8.3 Why Is Instance Matching Challenging?、8.4 Two-Step Pipeline、8.5 Evaluating the Two-Step Pipeline、8.6 Postsimilarity Steps、8.7 Formalizing Instance Matching: Swoosh、8.8 A Note on Research Frontiers、8.9 Data Cleaning beyond Instance Matching "
+            }
+          </p>{" "}
+          <h3 id="sec-8-2">{"8.2 なぜインスタンス照合が必要か"}</h3>{" "}
+          <p>
+            {
+              " 複数のデータ源から KG を作ると、同じ人が「John Smith」「Jon Smith」「J. Smith」のように別々のノードになります。統合しないと、同じ人の情報が分散し、問い合わせの結果も不完全になります。別名で、エンティティ解決（entity resolution）や名寄せとも呼ばれます。 "
+            }
+          </p>{" "}
+          <h3 id="sec-8-3">{"8.3 例え話：名簿の突き合わせ"}</h3>{" "}
+          <p>
+            {
+              " 2つの町内会の名簿を1つにまとめる作業を想像してください。「山田太郎さん」が両方にいても、住所の書き方や漢字が違うと、同じ人か判断が要ります。全員を総当たりで見比べると、人数が多いほど時間がかかります。 "
+            }
+          </p>{" "}
+          <h3 id="sec-8-4">{"8.4 ステップ1：なぜ総当たりではだめなのか"}</h3>{" "}
+          <p>
+            {
+              " レコード数が n 件のとき、すべての組み合わせは n × (n − 1) ÷ 2 組です。1,000件なら 499,500 組、100万件なら約5,000億組になり、現実的な時間で比較できません。 "
+            }
+          </p>{" "}
+          <h3 id="sec-8-5">{"8.5 ステップ2：2段階パイプライン（8.4節）"}</h3>{" "}
+          <p>
+            {"本書は、インスタンス照合を"}
+            <strong>{"2段階のパイプライン"}</strong>
+            {"として説明します。"}
+          </p>{" "}
+          <table>
+            <thead>
+              <tr>
+                <th>{"段階"} </th>
+                <th>{"役割"} </th>
+                <th>{"考え方"} </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{"1. ブロッキング（blocking）"} </td>
+                <td>{"比較する組を、見込みのあるものだけに絞る"} </td>
+                <td>
+                  {
+                    " 「同じ郵便番号のレコードだけ」のような粗い条件で、グループ（ブロック）に分ける "
+                  }{" "}
+                </td>
+              </tr>
+              <tr>
+                <td>{"2. 類似度計算（similarity）"} </td>
+                <td>{"絞った組ごとに、同じ実体かを判定する"} </td>
+                <td>{"名前・住所などの文字列の似ている度合いを数値にする"} </td>
+              </tr>
+            </tbody>
+          </table>{" "}
+          <p>{"この図は、2段階パイプラインの流れを表しています。左から右へ読み進めてください。"}</p>{" "}
+          <div className={styles["mermaid-wrap"]}>
+            {" "}
+            <div id="mmd-7" className={styles["mermaid-diagram"]} role="img" aria-label="図">
+              <MermaidDiagram
+                chart={DIAGRAM_7}
+                id="mmd-7-svg"
+                theme="dark"
+                themeVariables={THEME_VARS}
+              />
+            </div>{" "}
+          </div>{" "}
+          <p>
+            {" 各ノードの意味："}
+            <br />
+            {" - 「ブロッキング」：総当たりを避けるため、比べる組を減らす"}
+            <br />
+            {" - 「類似度計算」：残った組の似ている度合いを数値にして、一致か不一致かを決める"}
+            <br />
+            {
+              " - 「後処理」：本書の 8.6 節（Postsimilarity Steps）に相当する工程。一致と判定した結果どうしの矛盾などを整える "
+            }
+          </p>{" "}
+          <h3 id="sec-8-6">{"8.6 ステップ3：類似度を実際に計算する"}</h3>{" "}
+          <p>
+            {" 文字列の類似度の代表例に、"}
+            <strong>{"Jaccard 係数"}</strong>
+            {
+              "があります。2つの集合の「共通の要素数 ÷ 全体の要素数」です。ここでは文字を2文字ずつに区切った集合（バイグラム）で比べます。 "
+            }
+          </p>{" "}
+          <p>{"計算例（Python で確認した値です）："}</p>{" "}
+          <table>
+            <thead>
+              <tr>
+                <th>{"比べる2つの名前"} </th>
+                <th>{"Jaccard 係数"} </th>
+                <th>{"判断の目安"} </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{"john smith と jon smith"} </td>
+                <td>{"0.70"} </td>
+                <td>{"高い。同じ人の可能性が高い"} </td>
+              </tr>
+              <tr>
+                <td>{"john smith と mary jones"} </td>
+                <td>{"約 0.06"} </td>
+                <td>{"低い。別の人"} </td>
+              </tr>
+              <tr>
+                <td>{"john smith と jonathan smyth"} </td>
+                <td>{"約 0.31"} </td>
+                <td>{"中間。ほかの情報（住所など）を併用して判断する"} </td>
+              </tr>
+            </tbody>
+          </table>{" "}
+          <p>
+            {
+              " しきい値（例：0.6 以上なら一致）を決めて判定しますが、しきい値の決め方で結果が変わります。中間の値は、複数の属性を組み合わせて判断します。 "
+            }
+          </p>{" "}
+          <h3 id="sec-8-7">{"8.7 ステップ4：評価の仕方（8.5節）"}</h3>{" "}
+          <p>
+            {" "}
+            <span className={[styles.tag, styles["tag-note"]].join(" ")}>{"補足"}</span>
+            {
+              " インスタンス照合の評価には、第4章で説明した適合率・再現率・F1 値を、「正しく統合した組」を単位にして使います。ブロッキングについては、「本当は同じ実体の組が、同じブロックに残っているか」（＝再現率に近い指標）と、「比べる組がどれだけ減ったか」を併せて見ます。 "
+            }
+          </p>{" "}
+          <h3 id="sec-8-8">{"8.8 Swoosh と、データクリーニング全般"}</h3>{" "}
+          <p>
+            {" 本書の 8.7 節は、インスタンス照合を形式的に定式化する枠組みとして "}
+            <strong>{"Swoosh"}</strong>
+            {
+              " を扱います。8.9 節「Data Cleaning beyond Instance Matching」は、照合以外のデータの誤り直し（欠損値、形式の不統一など）を扱います。 "
+            }
+          </p>{" "}
+          <div
+            className={[styles.callout, styles["callout-glossary"]].join(" ")}
+            data-variant="glossary"
+          >
+            {" "}
+            <i
+              className={["ti", "ti-book-2", styles["callout-icon"]].join(" ")}
+              aria-hidden="true"
+            ></i>{" "}
+            <div className={styles["callout-body"]}>
+              {" "}
+              <p className={styles["callout-title"]}>{"このセクションで登場した用語"}</p>{" "}
+              <ul className={styles["glossary-list"]}>
+                {" "}
+                <li>
+                  {" "}
+                  <strong>{"インスタンス照合"}</strong>
+                  {"：別々のレコードが同じ実体を指すかを判定し、結びつける技術 "}
+                </li>{" "}
+                <li>
+                  <strong>{"ブロッキング"}</strong>
+                  {"：比べる組を、見込みのあるものだけに絞る前処理"}
+                </li>{" "}
+                <li>
+                  <strong>{"Jaccard 係数"}</strong>
+                  {"：2つの集合の重なり具合を 0〜1 で表す指標"}
+                </li>{" "}
+                <li>
+                  <strong>{"バイグラム"}</strong>
+                  {"：文字列を2文字ずつ区切った断片"}
+                </li>{" "}
+                <li>
+                  <strong>{"しきい値"}</strong>
+                  {"：一致とみなす類似度の境目"}
+                </li>{" "}
+              </ul>{" "}
+            </div>{" "}
+          </div>{" "}
+        </section>{" "}
+        <section id="sec-9" className={styles.chapter}>
+          {" "}
+          <h2 id="sec-9-heading">
+            {"9. 第9章：統計的関係学習（Statistical Relational Learning, SRL）"}
+          </h2>{" "}
+          <div
+            className={[styles.callout, styles["callout-intro"]].join(" ")}
+            data-variant={INTRO_VARIANT}
+          >
+            {" "}
+            <i
+              className={["ti", "ti-bulb", styles["callout-icon"]].join(" ")}
+              aria-hidden="true"
+            ></i>{" "}
+            <div className={styles["callout-body"]}>
+              {
+                " この章では、Chapter 9 に相当する内容として、KG の事実が「確実ではなく、確率的に正しい」という前提で、事実どうしの依存関係を使って正しさを判定する方法を説明します。 "
+              }
+            </div>{" "}
+          </div>{" "}
+          <h3 id="sec-9-1">
+            {" 9.1 "}
+            <span className={[styles.tag, styles["tag-scope"]].join(" ")}>{"本書の範囲"}</span>
+            {" このガイドで扱う主な節 "}
+          </h3>{" "}
+          <p>
+            {
+              " 9.1 Introduction、9.2 Modeling Dependencies、9.3 Statistical Relational Learning Frameworks、9.4 Knowledge Graph Identification、9.5 Other Applications、9.6 Advanced Research: Data Programming "
+            }
+          </p>{" "}
+          <h3 id="sec-9-2">{"9.2 なぜ確率を使うのか"}</h3>{" "}
+          <p>
+            {
+              " 第4〜7章で自動抽出した事実には、誤りが混ざります。しかも、事実どうしには関係があります。たとえば、「Aは東京に住んでいる」が正しいなら、「Aは日本に住んでいる」もほぼ正しいはずです。事実をばらばらに判定せず、"
+            }
+            <strong>{"依存関係を使って全体で整合する答えを選ぶ"}</strong>
+            {"のが SRL の狙いです。 "}
+          </p>{" "}
+          <h3 id="sec-9-3">{"9.3 例え話：クロスワード"}</h3>{" "}
+          <p>
+            {
+              " クロスワードは、縦の言葉と横の言葉が交差する文字を共有します。1つの言葉の自信が低くても、交差する言葉が確実なら、そこから決まります。SRL では、事実どうしが「交差」して、互いの確からしさを支え合います。 "
+            }
+          </p>{" "}
+          <h3 id="sec-9-4">{"9.4 ステップ・バイ・ステップ"}</h3>{" "}
+          <ol>
+            {" "}
+            <li>{"候補の事実に、抽出システムが付けた確信度（0〜1）を持たせます"}</li>{" "}
+            <li>{"事実どうしの依存関係を、ルールで書きます（例：「東京にある → 日本にある」）"}</li>{" "}
+            <li>{"全体として、ルールに最も違反しない事実の集合を選びます"}</li>{" "}
+          </ol>{" "}
+          <h3 id="sec-9-5">{"9.5 KG identification（9.4節）"}</h3>{" "}
+          <p>
+            {" "}
+            <strong>{"Knowledge Graph Identification"}</strong>
+            {
+              " は、Pujara らが提案したタスクです。論文の要旨によれば、大規模な情報抽出システムは相互に関連する事実を大量に取り出すものの、その候補を有用な知識に変えるのは難しい課題です。そこで、不確かな抽出結果を1つのグラフ（抽出グラフ）にまとめ、ノイズの除去、欠けた情報の推論、どの候補を KG に入れるかの判断を同時に行います。 "
+            }
+          </p>{" "}
+          <p>
+            {"この図は、KG identification の考え方を表しています。上から下へ読み進めてください。"}
+          </p>{" "}
+          <div className={styles["mermaid-wrap"]}>
+            {" "}
+            <div id="mmd-8" className={styles["mermaid-diagram"]} role="img" aria-label="図">
+              <MermaidDiagram
+                chart={DIAGRAM_8}
+                id="mmd-8-svg"
+                theme="dark"
+                themeVariables={THEME_VARS}
+              />
+            </div>{" "}
+          </div>{" "}
+          <p>
+            {" 各ノードの意味："}
+            <br />
+            {" - 「抽出グラフ」：確信度つきの候補の事実の集まり"}
+            <br />
+            {" - 「依存関係のルール」：型の制約や、事実どうしの含意などの規則"}
+            <br />
+            {" - 「整合する事実を選ぶ」：ノイズ除去と欠落の補完を同時に行う推論 "}
+          </p>{" "}
+          <h3 id="sec-9-6">{"9.6 代表的な枠組み"}</h3>{" "}
+          <p>
+            {" "}
+            <span className={[styles.tag, styles["tag-note"]].join(" ")}>{"補足"}</span>
+            {
+              " SRL の代表的な枠組みとして、Markov Logic Network（ルールに重みを付けて確率モデルにする方法）や Probabilistic Soft Logic（PSL、真偽を 0〜1 の連続値で扱う方法）が知られています。本書の 9.3 節で、どの枠組みを詳しく扱うかは書籍で確認してください。 "
+            }
+          </p>{" "}
+          <h3 id="sec-9-7">{"9.7 データプログラミング（9.6節）"}</h3>{" "}
+          <p>
+            {
+              " データプログラミング（data programming）は、人手のラベルの代わりに、ルールやヒューリスティック（＝経験則）を複数書いて、それらのノイズを含む出力をまとめて学習用ラベルにする方法です。第6章の遠隔教師あり学習と近い動機（ラベル付けの手間の削減）から使われます。 "
+            }
+          </p>{" "}
+          <div
+            className={[styles.callout, styles["callout-glossary"]].join(" ")}
+            data-variant="glossary"
+          >
+            {" "}
+            <i
+              className={["ti", "ti-book-2", styles["callout-icon"]].join(" ")}
+              aria-hidden="true"
+            ></i>{" "}
+            <div className={styles["callout-body"]}>
+              {" "}
+              <p className={styles["callout-title"]}>{"このセクションで登場した用語"}</p>{" "}
+              <ul className={styles["glossary-list"]}>
+                {" "}
+                <li>
+                  <strong>{"SRL"}</strong>
+                  {"：事実どうしの関係と、確率を一緒に扱う機械学習の枠組み"}
+                </li>{" "}
+                <li>
+                  <strong>{"確信度"}</strong>
+                  {"：抽出した事実がどのくらい正しそうかを表す 0〜1 の数"}
+                </li>{" "}
+                <li>
+                  {" "}
+                  <strong>{"KG identification"}</strong>
+                  {"：不確かな抽出結果から、KG に入れる事実を選ぶ作業 "}
+                </li>{" "}
+                <li>
+                  <strong>{"ヒューリスティック"}</strong>
+                  {"：厳密ではないが、経験的に役立つ判断規則"}
+                </li>{" "}
+              </ul>{" "}
+            </div>{" "}
+          </div>{" "}
+        </section>{" "}
+        <section id="sec-10" className={styles.chapter}>
+          {" "}
+          <h2 id="sec-10-heading">{"10. 第10章：KG の表現学習（Knowledge Graph Embeddings）"}</h2>{" "}
+          <div
+            className={[styles.callout, styles["callout-intro"]].join(" ")}
+            data-variant={INTRO_VARIANT}
+          >
+            {" "}
+            <i
+              className={["ti", "ti-bulb", styles["callout-icon"]].join(" ")}
+              aria-hidden="true"
+            ></i>{" "}
+            <div className={styles["callout-body"]}>
+              {
+                " この章では、Chapter 10 に相当する内容として、KG のノードと関係を数値ベクトルに変換して、機械学習で扱えるようにする方法を説明します。欠けた事実を予測する（リンク予測）ときの土台です。 "
+              }
+            </div>{" "}
+          </div>{" "}
+          <h3 id="sec-10-1">
+            {" 10.1 "}
+            <span className={[styles.tag, styles["tag-scope"]].join(" ")}>{"本書の範囲"}</span>
+            {" このガイドで扱う主な節 "}
+          </h3>{" "}
+          <p>
+            {
+              " 10.1 Introduction、10.2 Embedding Architectures: A Primer、10.3 Embeddings beyond Words、10.4 Knowledge Graph Embeddings、10.5 Influential KGE Systems、10.6 Extrafactual Contexts、10.7 Applications "
+            }
+          </p>{" "}
+          <h3 id="sec-10-2">{"10.2 なぜベクトルにするのか"}</h3>{" "}
+          <p>
+            {
+              " 機械学習は数値の計算が得意ですが、「東京」という記号そのものは計算できません。そこで、各実体と関係を、数字の並び（ベクトル）に対応づけます。似た意味のものが近い位置に来るように学習します。 "
+            }
+          </p>{" "}
+          <h3 id="sec-10-3">{"10.3 例え話：地図上の座標"}</h3>{" "}
+          <p>
+            {
+              " 地図では、都市に緯度・経度という座標を付けると、「東京と横浜は近い」と距離で分かります。埋め込み（embedding）は、KG の実体に座標を付ける作業です。 "
+            }
+          </p>{" "}
+          <h3 id="sec-10-4">{"10.4 ステップ1：TransE の考え方"}</h3>{" "}
+          <p>
+            {" "}
+            <strong>{"TransE"}</strong>
+            {
+              " は、Bordes らが NeurIPS（当時は NIPS）2013 で提案した、代表的な KG 埋め込み手法です。論文の要旨によれば、関係を、実体の低次元の埋め込みに作用する「平行移動（translation）」として解釈します。単純な仮定ですが、2つの知識ベースでのリンク予測で、当時の最先端手法を大きく上回ったと報告されています。 "
+            }
+          </p>{" "}
+          <p>{"考え方は次の式で書けます。"}</p>{" "}
+          <div className={styles["code-block"]}>
+            {" "}
+            <span className={styles["code-lang"]}>{"TEXT"}</span>{" "}
+            <pre data-testid="code-block">
+              <code className={["language-text"].join(" ")}>
+                <span className={styles.codeLine} data-testid="code-line">
+                  {"head の座標 + relation のベクトル ≒ tail の座標"}
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  {""}
+                </span>
+              </code>
+            </pre>{" "}
+          </div>{" "}
+          <p>
+            {
+              " この式は、「主語の座標に、関係のベクトルを足すと、目的語の座標に近づく」ことを表します。 "
+            }
+          </p>{" "}
+          <h3 id="sec-10-5">{"10.5 ステップ2：小さな数値例"}</h3>{" "}
+          <p>
+            {
+              " 次の例では、座標を2次元で置きます。「capital_of（首都である）」は、右へ2進むベクトル (2, 0) です。 "
+            }
+          </p>{" "}
+          <table>
+            <thead>
+              <tr>
+                <th>{"実体"} </th>
+                <th>{"座標"} </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{"Tokyo"} </td>
+                <td>{"(1, 1)"} </td>
+              </tr>
+              <tr>
+                <td>{"Japan"} </td>
+                <td>{"(3, 1)"} </td>
+              </tr>
+              <tr>
+                <td>{"France"} </td>
+                <td>{"(0, 3)"} </td>
+              </tr>
+            </tbody>
+          </table>{" "}
+          <ul>
+            {" "}
+            <li>
+              {
+                " 正しい事実 (Tokyo, capital_of, Japan)：(1, 1) + (2, 0) = (3, 1)。Japan の座標と一致するので、距離は 0 "
+              }
+            </li>{" "}
+            <li>
+              {
+                " 誤った事実 (Tokyo, capital_of, France)：(3, 1) と (0, 3) の距離は √13 ≒ 3.61。距離が大きく、誤りらしいと判断 "
+              }
+            </li>{" "}
+          </ul>{" "}
+          <p>
+            {" "}
+            <span className={[styles.tag, styles["tag-premise"]].join(" ")}>{"前提"}</span>
+            {" 以下のコード例は "}
+            <strong>{"NumPy"}</strong>
+            {" を使用します。実行するには事前に "}
+            <code>{"pip install numpy"}</code>
+            {" でインストールしてください。NumPy を使わずに確認したい場合は、"}
+            <code>{"np.array"}</code>
+            {" を "}
+            <code>{"list"}</code>
+            {"、"}
+            <code>{"np.linalg.norm"}</code>
+            {" を手動の距離計算（"}
+            <code>{"pred = [a + b for a, b in zip(entity[h], relation[r])]"}</code>
+            {" を作り、"}
+            <code>{"sum((p - q) ** 2 for p, q in zip(pred, entity[t])) ** 0.5"}</code>
+            {"）に置き換えると標準ライブラリだけで動作します。 "}
+          </p>{" "}
+          <div className={styles["code-block"]}>
+            {" "}
+            <span className={styles["code-lang"]}>{"Python"}</span>{" "}
+            <pre data-testid="code-block">
+              <code className={["language-python"].join(" ")}>
+                <span className={styles.codeLine} data-testid="code-line">
+                  <span className="hljs-keyword" data-token="keyword">
+                    {"import"}
+                  </span>
+                  {" numpy "}
+                  <span className="hljs-keyword" data-token="keyword">
+                    {"as"}
+                  </span>
+                  {" np"}
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line"></span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  <span className="hljs-comment" data-token="comment">
+                    {
+                      "# 実体と関係を2次元ベクトルで表す。実際の学習では、この値をデータから学習で求める。"
+                    }
+                  </span>
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  {"entity = {"}
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  {"    "}
+                  <span className="hljs-string" data-token="string">
+                    {'"Tokyo"'}
+                  </span>
+                  {":  np.array(["}
+                  <span className="hljs-number" data-token="number">
+                    {"1.0"}
+                  </span>
+                  {", "}
+                  <span className="hljs-number" data-token="number">
+                    {"1.0"}
+                  </span>
+                  {"]),"}
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  {"    "}
+                  <span className="hljs-string" data-token="string">
+                    {'"Japan"'}
+                  </span>
+                  {":  np.array(["}
+                  <span className="hljs-number" data-token="number">
+                    {"3.0"}
+                  </span>
+                  {", "}
+                  <span className="hljs-number" data-token="number">
+                    {"1.0"}
+                  </span>
+                  {"]),"}
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  {"    "}
+                  <span className="hljs-string" data-token="string">
+                    {'"France"'}
+                  </span>
+                  {": np.array(["}
+                  <span className="hljs-number" data-token="number">
+                    {"0.0"}
+                  </span>
+                  {", "}
+                  <span className="hljs-number" data-token="number">
+                    {"3.0"}
+                  </span>
+                  {"]),"}
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  {"}"}
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  {"relation = {"}
+                  <span className="hljs-string" data-token="string">
+                    {'"capital_of"'}
+                  </span>
+                  {": np.array(["}
+                  <span className="hljs-number" data-token="number">
+                    {"2.0"}
+                  </span>
+                  {", "}
+                  <span className="hljs-number" data-token="number">
+                    {"0.0"}
+                  </span>
+                  {"])}"}
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line"></span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  <span className="hljs-keyword" data-token="keyword">
+                    {"def"}
+                  </span>{" "}
+                  <span className="hljs-title function_" data-token="title">
+                    {"distance"}
+                  </span>
+                  {"("}
+                  <span className="hljs-params" data-token="params">
+                    {"h, r, t"}
+                  </span>
+                  {"):"}
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  {"    "}
+                  <span className="hljs-comment" data-token="comment">
+                    {
+                      "# head + relation が tail に近いほど「正しそうな事実」なので、その差の長さを測る。"
+                    }
+                  </span>
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  {"    "}
+                  <span className="hljs-comment" data-token="comment">
+                    {"# 差が0に近いほど、事実として自然だと判断できる。"}
+                  </span>
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  {"    "}
+                  <span className="hljs-keyword" data-token="keyword">
+                    {"return"}
+                  </span>{" "}
+                  <span className="hljs-built_in" data-token="built_in">
+                    {"float"}
+                  </span>
+                  {"(np.linalg.norm(entity[h] + relation[r] - entity[t]))"}
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line"></span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  <span className="hljs-keyword" data-token="keyword">
+                    {"for"}
+                  </span>
+                  {" cand "}
+                  <span className="hljs-keyword" data-token="keyword">
+                    {"in"}
+                  </span>
+                  {" ["}
+                  <span className="hljs-string" data-token="string">
+                    {'"Japan"'}
+                  </span>
+                  {", "}
+                  <span className="hljs-string" data-token="string">
+                    {'"France"'}
+                  </span>
+                  {"]:"}
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  {"    "}
+                  <span className="hljs-built_in" data-token="built_in">
+                    {"print"}
+                  </span>
+                  {"(cand, "}
+                  <span className="hljs-built_in" data-token="built_in">
+                    {"round"}
+                  </span>
+                  {"(distance("}
+                  <span className="hljs-string" data-token="string">
+                    {'"Tokyo"'}
+                  </span>
+                  {", "}
+                  <span className="hljs-string" data-token="string">
+                    {'"capital_of"'}
+                  </span>
+                  {", cand), "}
+                  <span className="hljs-number" data-token="number">
+                    {"2"}
+                  </span>
+                  {"))"}
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  <span className="hljs-comment" data-token="comment">
+                    {"# 出力（実行して確認済み）：Japan 0.0 / France 3.61"}
+                  </span>
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line"></span>
+              </code>
+            </pre>{" "}
+          </div>{" "}
+          <h3 id="sec-10-6">{"10.6 ステップ3：リンク予測"}</h3>{" "}
+          <p>
+            {
+              " この図は、埋め込みを使った欠けた事実の予測の流れを表しています。左から右へ読み進めてください。 "
+            }
+          </p>{" "}
+          <div className={styles["mermaid-wrap"]}>
+            {" "}
+            <div id="mmd-9" className={styles["mermaid-diagram"]} role="img" aria-label="図">
+              <MermaidDiagram
+                chart={DIAGRAM_9}
+                id="mmd-9-svg"
+                theme="dark"
+                themeVariables={THEME_VARS}
+              />
+            </div>{" "}
+          </div>{" "}
+          <p>
+            {" 各ノードの意味："}
+            <br />
+            {
+              " - 「埋め込みを学習」：既存の事実で、head + relation が tail に近づくように座標を調整する"
+            }
+            <br />
+            {" - 「全候補の距離を計算」：欠けている部分に入れる候補すべてで距離を出す"}
+            <br />
+            {" - 「距離の小さい順に並べる」：上位を、欠けた事実の候補として提示する "}
+          </p>{" "}
+          <h3 id="sec-10-7">{"10.7 限界と発展"}</h3>{" "}
+          <p>
+            {" TransE は単純さが強みですが、"}
+            <span className={[styles.tag, styles["tag-note"]].join(" ")}>{"補足"}</span>
+            {
+              " 1つの関係に対して多くの相手がいる場合（例：「〜の出身者」）に表現しにくい点が知られています。この課題を扱う TransH、TransR などの発展手法があります。10.5 節の「Influential KGE Systems」で、影響の大きいシステムが整理されています。10.6 節の「Extrafactual Contexts」は、トリプル以外の文脈情報を使う話題です。 "
+            }
+          </p>{" "}
+          <div
+            className={[styles.callout, styles["callout-glossary"]].join(" ")}
+            data-variant="glossary"
+          >
+            {" "}
+            <i
+              className={["ti", "ti-book-2", styles["callout-icon"]].join(" ")}
+              aria-hidden="true"
+            ></i>{" "}
+            <div className={styles["callout-body"]}>
+              {" "}
+              <p className={styles["callout-title"]}>{"このセクションで登場した用語"}</p>{" "}
+              <ul className={styles["glossary-list"]}>
+                {" "}
+                <li>
+                  {" "}
+                  <strong>{"埋め込み（embedding）"}</strong>
+                  {"：実体や関係を、数値ベクトルに変換したもの "}
+                </li>{" "}
+                <li>
+                  <strong>{"ベクトル"}</strong>
+                  {"：数字の並び（座標のようなもの）"}
+                </li>{" "}
+                <li>
+                  <strong>{"リンク予測"}</strong>
+                  {"：KG に欠けている事実（線）を予測するタスク"}
+                </li>{" "}
+                <li>
+                  <strong>{"TransE"}</strong>
+                  {"：関係を「ベクトルの平行移動」として表す代表的な手法"}
+                </li>{" "}
+              </ul>{" "}
+            </div>{" "}
+          </div>{" "}
+        </section>{" "}
+        <section id="sec-11" className={styles.chapter}>
+          {" "}
+          <h2 id="sec-11-heading">{"11. 第11章：推論と検索（Reasoning and Retrieval）"}</h2>{" "}
+          <div
+            className={[styles.callout, styles["callout-intro"]].join(" ")}
+            data-variant={INTRO_VARIANT}
+          >
+            {" "}
+            <i
+              className={["ti", "ti-bulb", styles["callout-icon"]].join(" ")}
+              aria-hidden="true"
+            ></i>{" "}
+            <div className={styles["callout-body"]}>
+              {
+                " この章では、Chapter 11 に相当する内容として、KG に書かれていない事実を「導き出す」推論と、必要な情報を「探し出す」検索を説明します。Part IV（KG へのアクセス）の入り口です。 "
+              }
+            </div>{" "}
+          </div>{" "}
+          <h3 id="sec-11-1">
+            {" 11.1 "}
+            <span className={[styles.tag, styles["tag-scope"]].join(" ")}>{"本書の範囲"}</span>
+            {" このガイドで扱う主な節 "}
+          </h3>{" "}
+          <p>
+            {"11.1 Introduction、11.2 Reasoning、11.3 Retrieval、11.4 Retrieval versus Reasoning"}
+          </p>{" "}
+          <h3 id="sec-11-2">{"11.2 なぜ推論が必要か"}</h3>{" "}
+          <p>
+            {
+              " KG にすべての事実を書き込むのは現実的ではありません。「渋谷は東京にあり、東京は日本にある」と書いてあるとき、「locatedIn は推移的である」というルールをオントロジーで宣言しておけば、「渋谷は日本にある」は書かなくても導けます。推論は、こうしたルールを使って、書かれていない事実を補う仕組みです。逆に言えば、ルールを宣言していなければ、この導出は起こりません。 "
+            }
+          </p>{" "}
+          <h3 id="sec-11-3">{"11.3 ステップ・バイ・ステップ：2種類の推論"}</h3>{" "}
+          <table>
+            <thead>
+              <tr>
+                <th>{"推論"} </th>
+                <th>{"ルール"} </th>
+                <th>{"例"} </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{"型の階層による推論（RDFS）"} </td>
+                <td>{"City は Place の一種"} </td>
+                <td>{"Tokyo が City なら、Tokyo は Place でもある"} </td>
+              </tr>
+              <tr>
+                <td>{"推移性のルール"} </td>
+                <td>{"locatedIn を推移的と宣言する（A→B、B→C なら A→C）"} </td>
+                <td>{"渋谷→東京、東京→日本 から、渋谷→日本"} </td>
+              </tr>
+            </tbody>
+          </table>{" "}
+          <p>
+            {"この図は、推移性のルールによる推論を表しています。上から下へ読み進めてください。"}
+          </p>{" "}
+          <div className={styles["mermaid-wrap"]}>
+            {" "}
+            <div id="mmd-10" className={styles["mermaid-diagram"]} role="img" aria-label="図">
+              <MermaidDiagram
+                chart={DIAGRAM_10}
+                id="mmd-10-svg"
+                theme="dark"
+                themeVariables={THEME_VARS}
+              />
+            </div>{" "}
+          </div>{" "}
+          <p>
+            {" 各ノードの意味："}
+            <br />
+            {" - 上の2つ：KG にすでに書かれている事実"}
+            <br />
+            {" - 「ルール」：推論のもとになる規則"}
+            <br />
+            {" - 「導出」：ルールから新しく導かれた事実。KG に書かれていなくても、答えられる "}
+          </p>{" "}
+          <p>
+            {" "}
+            <span className={[styles.tag, styles["tag-note"]].join(" ")}>{"補足"}</span>
+            {
+              " 推移性は、述語の名前から自動的に適用されるものではありません。2.4節の Turtle データに "
+            }
+            <code>{"@prefix owl: <http://www.w3.org/2002/07/owl#> ."}</code>
+            {" を追加し、"}
+            <code>{"ex:locatedIn a owl:TransitiveProperty ."}</code>
+            {
+              " のように性質を宣言したうえで、それを解釈する推論器（OWL RL などのプロファイルに対応したもの）を動かして初めて、「渋谷 locatedIn 日本」が導出されます。たとえば第12章で使う rdflib は、読み込みと問い合わせだけでは推論を行わないため、宣言だけを書いても導出された事実は返りません。 "
+            }
+          </p>{" "}
+          <h3 id="sec-11-4">{"11.4 検索（Retrieval）と推論の違い（11.4節）"}</h3>{" "}
+          <table>
+            <thead>
+              <tr>
+                <th>{"観点"} </th>
+                <th>{"検索（retrieval）"} </th>
+                <th>{"推論（reasoning）"} </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{"何をするか"} </td>
+                <td>{"書かれている情報を探して返す"} </td>
+                <td>{"書かれていない情報をルールで導く"} </td>
+              </tr>
+              <tr>
+                <td>{"例え"} </td>
+                <td>{"図書館で本を探す"} </td>
+                <td>{"本の内容から結論を導く"} </td>
+              </tr>
+              <tr>
+                <td>{"コスト"} </td>
+                <td>{"索引があれば速い"} </td>
+                <td>{"ルールの数と KG の大きさで重くなりやすい"} </td>
+              </tr>
+            </tbody>
+          </table>{" "}
+          <p>
+            {" "}
+            <span className={[styles.tag, styles["tag-note"]].join(" ")}>{"補足"}</span>
+            {
+              " 実際のシステムでは、事前に推論結果をすべて計算して保存する方法（先に計算する）と、問い合わせのときに必要な分だけ推論する方法（後で計算する）の、どちらかを選ぶ設計判断があります。 "
+            }
+          </p>{" "}
+          <div
+            className={[styles.callout, styles["callout-glossary"]].join(" ")}
+            data-variant="glossary"
+          >
+            {" "}
+            <i
+              className={["ti", "ti-book-2", styles["callout-icon"]].join(" ")}
+              aria-hidden="true"
+            ></i>{" "}
+            <div className={styles["callout-body"]}>
+              {" "}
+              <p className={styles["callout-title"]}>{"このセクションで登場した用語"}</p>{" "}
+              <ul className={styles["glossary-list"]}>
+                {" "}
+                <li>
+                  <strong>{"推論"}</strong>
+                  {"：既存の事実とルールから、新しい事実を導くこと"}
+                </li>{" "}
+                <li>
+                  <strong>{"推移性"}</strong>
+                  {"：AがBと、BがCとつながるとき、AがCとつながる性質"}
+                </li>{" "}
+                <li>
+                  <strong>{"検索"}</strong>
+                  {"：書かれた情報を探し出すこと"}
+                </li>{" "}
+              </ul>{" "}
+            </div>{" "}
+          </div>{" "}
+        </section>{" "}
+        <section id="sec-12" className={styles.chapter}>
+          {" "}
+          <h2 id="sec-12-heading">{"12. 第12章：構造化問い合わせ（Structured Querying）"}</h2>{" "}
+          <div
+            className={[styles.callout, styles["callout-intro"]].join(" ")}
+            data-variant={INTRO_VARIANT}
+          >
+            {" "}
+            <i
+              className={["ti", "ti-bulb", styles["callout-icon"]].join(" ")}
+              aria-hidden="true"
+            ></i>{" "}
+            <div className={styles["callout-body"]}>
+              {
+                " この章では、Chapter 12 に相当する内容として、KG から欲しい情報を取り出すための問い合わせ言語（SPARQL、SQL、グラフ DB の言語）を説明します。実務で最もよく使う章です。 "
+              }
+            </div>{" "}
+          </div>{" "}
+          <h3 id="sec-12-1">
+            {" 12.1 "}
+            <span className={[styles.tag, styles["tag-scope"]].join(" ")}>{"本書の範囲"}</span>
+            {" このガイドで扱う主な節 "}
+          </h3>{" "}
+          <p>
+            {
+              " 12.1 Introduction、12.2 SPARQL、12.3 Relational Processing of Queries over Knowledge Graphs、12.4 NoSQL "
+            }
+          </p>{" "}
+          <h3 id="sec-12-2">{"12.2 なぜ問い合わせ言語が必要か"}</h3>{" "}
+          <p>
+            {
+              " KG のデータは、日本語や英語のような自然な文章では取り出せません。「都市であって、日本にあり、英語ラベルを持つものを全部」という条件を、機械が正確に解釈できる形で書く言語が必要です。 "
+            }
+          </p>{" "}
+          <h3 id="sec-12-3">{"12.3 ステップ1：SPARQL の基本"}</h3>{" "}
+          <p>
+            {
+              " SPARQL は、W3C が標準化した RDF 用の問い合わせ言語です。SPARQL 1.1 は2013年3月21日に W3C 勧告になりました。W3C の仕様書は、SELECT 句で結果に出す変数を、WHERE 句で照合するパターン（基本グラフパターン）を指定する、と説明しています。パターンは、トリプルの一部を変数（"
+            }
+            <code>{"?"}</code>
+            {"で始まる名前）にしたものです。 "}
+          </p>{" "}
+          <p>{"先ほどの Turtle データに対する問い合わせ例です。"}</p>{" "}
+          <div className={styles["code-block"]}>
+            {" "}
+            <span className={styles["code-lang"]}>{"SPARQL"}</span>{" "}
+            <pre data-testid="code-block">
+              <code className={["language-sparql"].join(" ")}>
+                <span className={styles.codeLine} data-testid="code-line">
+                  {"PREFIX ex:   <http://example.org/>"}
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  {"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>"}
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  {""}
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  {"# 結果として city と label の2つの変数を返す。"}
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  {"SELECT ?city ?label"}
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  {"WHERE {"}
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  {"  # 「型が City で、日本に位置し、ラベルを持つ」実体を探す。"}
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  {"  # 3つの条件をセミコロンでつなぎ、同じ ?city について条件を重ねている。"}
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  {"  ?city a ex:City ;"}
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  {"        ex:locatedIn ex:Japan ;"}
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  {"        rdfs:label ?label ."}
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  {
+                    "  # ラベルが多言語で複数あるので、英語だけに絞る。絞らないと同じ都市が言語の数だけ出る。"
+                  }
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  {'  FILTER (lang(?label) = "en")'}
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  {"}"}
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  {"ORDER BY ?label"}
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  {""}
+                </span>
+              </code>
+            </pre>{" "}
+          </div>{" "}
+          <p>
+            {" Python の rdflib で実行して確認した結果は、"}
+            <code>{"Osaka"}</code>
+            {" と "}
+            <code>{"Tokyo"}</code>
+            {" の2件でした。 "}
+          </p>{" "}
+          <div className={styles["code-block"]}>
+            {" "}
+            <span className={styles["code-lang"]}>{"Python"}</span>{" "}
+            <pre data-testid="code-block">
+              <code className={["language-python"].join(" ")}>
+                <span className={styles.codeLine} data-testid="code-line">
+                  <span className="hljs-comment" data-token="comment">
+                    {"# rdflib は pip install rdflib で入る。このブロックだけで完結して動きます。"}
+                  </span>
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  <span className="hljs-keyword" data-token="keyword">
+                    {"from"}
+                  </span>
+                  {" rdflib "}
+                  <span className="hljs-keyword" data-token="keyword">
+                    {"import"}
+                  </span>
+                  {" Graph"}
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line"></span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  <span className="hljs-comment" data-token="comment">
+                    {
+                      "# 2.4 節の Turtle をそのまま文字列として持つ。三重引用符なので改行を含められる。"
+                    }
+                  </span>
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  {"ttl = "}
+                  <span className="hljs-string" data-token="string">
+                    {'"""'}
+                  </span>
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  <span className="hljs-string" data-token="string">
+                    {"@prefix ex:   <http://example.org/> ."}
+                  </span>
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  <span className="hljs-string" data-token="string">
+                    {"@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> ."}
+                  </span>
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  <span className="hljs-string" data-token="string">
+                    {"@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> ."}
+                  </span>
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line"></span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  <span className="hljs-string" data-token="string">
+                    {"ex:Tokyo   rdf:type ex:City ;"}
+                  </span>
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  <span className="hljs-string" data-token="string">
+                    {'           rdfs:label "Tokyo"@en, "東京"@ja ;'}
+                  </span>
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  <span className="hljs-string" data-token="string">
+                    {"           ex:locatedIn ex:Japan ."}
+                  </span>
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line"></span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  <span className="hljs-string" data-token="string">
+                    {"ex:Osaka   rdf:type ex:City ;"}
+                  </span>
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  <span className="hljs-string" data-token="string">
+                    {'           rdfs:label "Osaka"@en ;'}
+                  </span>
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  <span className="hljs-string" data-token="string">
+                    {"           ex:locatedIn ex:Japan ."}
+                  </span>
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line"></span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  <span className="hljs-string" data-token="string">
+                    {"ex:Japan   rdf:type ex:Country ;"}
+                  </span>
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  <span className="hljs-string" data-token="string">
+                    {'           rdfs:label "Japan"@en .'}
+                  </span>
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line"></span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  <span className="hljs-string" data-token="string">
+                    {"ex:City    rdfs:subClassOf ex:Place ."}
+                  </span>
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  <span className="hljs-string" data-token="string">
+                    {"ex:Country rdfs:subClassOf ex:Place ."}
+                  </span>
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  <span className="hljs-string" data-token="string">
+                    {'"""'}
+                  </span>
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line"></span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  <span className="hljs-comment" data-token="comment">
+                    {"# 上の SPARQL も同じように文字列として持つ。"}
+                  </span>
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  {"sparql_text = "}
+                  <span className="hljs-string" data-token="string">
+                    {'"""'}
+                  </span>
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  <span className="hljs-string" data-token="string">
+                    {"PREFIX ex:   <http://example.org/>"}
+                  </span>
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  <span className="hljs-string" data-token="string">
+                    {"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>"}
+                  </span>
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line"></span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  <span className="hljs-string" data-token="string">
+                    {"SELECT ?city ?label"}
+                  </span>
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  <span className="hljs-string" data-token="string">
+                    {"WHERE {"}
+                  </span>
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  <span className="hljs-string" data-token="string">
+                    {"  ?city a ex:City ;"}
+                  </span>
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  <span className="hljs-string" data-token="string">
+                    {"        ex:locatedIn ex:Japan ;"}
+                  </span>
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  <span className="hljs-string" data-token="string">
+                    {"        rdfs:label ?label ."}
+                  </span>
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  <span className="hljs-string" data-token="string">
+                    {'  FILTER (lang(?label) = "en")'}
+                  </span>
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  <span className="hljs-string" data-token="string">
+                    {"}"}
+                  </span>
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  <span className="hljs-string" data-token="string">
+                    {"ORDER BY ?label"}
+                  </span>
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  <span className="hljs-string" data-token="string">
+                    {'"""'}
+                  </span>
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line"></span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  {"g = Graph()"}
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  {"g.parse(data=ttl, "}
+                  <span className="hljs-built_in" data-token="built_in">
+                    {"format"}
+                  </span>
+                  {"="}
+                  <span className="hljs-string" data-token="string">
+                    {'"turtle"'}
+                  </span>
+                  {")"}
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line"></span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  <span className="hljs-comment" data-token="comment">
+                    {"# query の引数に、上の SPARQL の文字列を渡す。"}
+                  </span>
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  <span className="hljs-keyword" data-token="keyword">
+                    {"for"}
+                  </span>
+                  {" row "}
+                  <span className="hljs-keyword" data-token="keyword">
+                    {"in"}
+                  </span>
+                  {" g.query(sparql_text):"}
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  {"    "}
+                  <span className="hljs-built_in" data-token="built_in">
+                    {"print"}
+                  </span>
+                  {"(row.city, row.label)"}
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line"></span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  <span className="hljs-comment" data-token="comment">
+                    {"# 出力:"}
+                  </span>
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  <span className="hljs-comment" data-token="comment">
+                    {"# http://example.org/Osaka Osaka"}
+                  </span>
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  <span className="hljs-comment" data-token="comment">
+                    {"# http://example.org/Tokyo Tokyo"}
+                  </span>
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line"></span>
+              </code>
+            </pre>{" "}
+          </div>{" "}
+          <p>
+            {
+              " SPARQL のクエリ形式には SELECT のほかに、ASK（はい・いいえ）、CONSTRUCT（結果を新しいグラフとして作る）、DESCRIBE（実体の説明を得る）があります。 "
+            }
+          </p>{" "}
+          <h3 id="sec-12-4">{"12.4 ステップ2：関係データベースで処理する（12.3節）"}</h3>{" "}
+          <p>
+            {
+              " KG のトリプルを、関係データベースの3列の表（主語、述語、目的語）として保存し、SQL で問い合わせる方法があります。 "
+            }
+          </p>{" "}
+          <p>
+            {" 次の SQL は、そのまま実行できるサンプルではなく、"}
+            <strong>{"考え方を示すための概念例"}</strong>
+            {
+              "です（特定の SQL 方言を前提にしていません）。読むにあたって、次の前提を置いています。 "
+            }
+          </p>{" "}
+          <ul>
+            {" "}
+            <li>
+              {" 表は "}
+              <code>{"triples(s TEXT, p TEXT, o TEXT)"}</code>
+              {" の3列で、3列とも文字列型とする "}
+            </li>{" "}
+            <li>
+              {" IRI は "}
+              <code>{"<http://example.org/City>"}</code>
+              {" のような完全な形ではなく、"}
+              <code>{"ex:City"}</code>
+              {" のように接頭辞で短縮した名前を"}
+              <strong>{"文字列として"}</strong>
+              {"格納する "}
+            </li>{" "}
+            <li>
+              {" 言語タグ付きリテラルは、タグを分けずに "}
+              <code>{'"Osaka"@en'}</code>
+              {" という1つの文字列として格納する "}
+            </li>{" "}
+          </ul>{" "}
+          <p>
+            {
+              " 実際のトリプルストアは、IRI とリテラルを別の列や別の表に分け、辞書表で整数 ID に置き換えるのが普通です。ここでは比較を分かりやすくするために、すべてを1つの文字列列に潰しています。 "
+            }
+          </p>{" "}
+          <div className={styles["code-block"]}>
+            {" "}
+            <span className={styles["code-lang"]}>{"SQL"}</span>{" "}
+            <pre data-testid="code-block">
+              <code className={["language-sql"].join(" ")}>
+                <span className={styles.codeLine} data-testid="code-line">
+                  <span className="hljs-comment" data-token="comment">
+                    {"-- 同じ表 triples を3回使う自己結合（セルフジョイン）で、"}
+                  </span>
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  <span className="hljs-comment" data-token="comment">
+                    {
+                      "-- 「型が City」「日本に位置する」「英語ラベルを持つ」の3つの事実を持つ主語を探す。"
+                    }
+                  </span>
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  <span className="hljs-comment" data-token="comment">
+                    {"-- SPARQL の SELECT ?city ?label に合わせ、主語とラベルの2列を返す。"}
+                  </span>
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  <span className="hljs-keyword" data-token="keyword">
+                    {"SELECT"}
+                  </span>
+                  {" t1.s "}
+                  <span className="hljs-keyword" data-token="keyword">
+                    {"AS"}
+                  </span>
+                  {" city, t3.o "}
+                  <span className="hljs-keyword" data-token="keyword">
+                    {"AS"}
+                  </span>
+                  {" label"}
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  <span className="hljs-keyword" data-token="keyword">
+                    {"FROM"}
+                  </span>
+                  {" triples t1"}
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  <span className="hljs-keyword" data-token="keyword">
+                    {"JOIN"}
+                  </span>
+                  {" triples t2 "}
+                  <span className="hljs-keyword" data-token="keyword">
+                    {"ON"}
+                  </span>
+                  {" t1.s "}
+                  <span className="hljs-operator" data-token="operator">
+                    {"="}
+                  </span>
+                  {" t2.s"}
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  <span className="hljs-keyword" data-token="keyword">
+                    {"JOIN"}
+                  </span>
+                  {" triples t3 "}
+                  <span className="hljs-keyword" data-token="keyword">
+                    {"ON"}
+                  </span>
+                  {" t1.s "}
+                  <span className="hljs-operator" data-token="operator">
+                    {"="}
+                  </span>
+                  {" t3.s"}
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  <span className="hljs-keyword" data-token="keyword">
+                    {"WHERE"}
+                  </span>
+                  {" t1.p "}
+                  <span className="hljs-operator" data-token="operator">
+                    {"="}
+                  </span>{" "}
+                  <span className="hljs-string" data-token="string">
+                    {"'rdf:type'"}
+                  </span>
+                  {"     "}
+                  <span className="hljs-keyword" data-token="keyword">
+                    {"AND"}
+                  </span>
+                  {" t1.o "}
+                  <span className="hljs-operator" data-token="operator">
+                    {"="}
+                  </span>{" "}
+                  <span className="hljs-string" data-token="string">
+                    {"'ex:City'"}
+                  </span>
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  {"  "}
+                  <span className="hljs-keyword" data-token="keyword">
+                    {"AND"}
+                  </span>
+                  {" t2.p "}
+                  <span className="hljs-operator" data-token="operator">
+                    {"="}
+                  </span>{" "}
+                  <span className="hljs-string" data-token="string">
+                    {"'ex:locatedIn'"}
+                  </span>{" "}
+                  <span className="hljs-keyword" data-token="keyword">
+                    {"AND"}
+                  </span>
+                  {" t2.o "}
+                  <span className="hljs-operator" data-token="operator">
+                    {"="}
+                  </span>{" "}
+                  <span className="hljs-string" data-token="string">
+                    {"'ex:Japan'"}
+                  </span>
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  {"  "}
+                  <span className="hljs-comment" data-token="comment">
+                    {
+                      "-- 言語タグは目的語の列に文字列として埋まっているので、LIKE で英語だけに絞る。"
+                    }
+                  </span>
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  {"  "}
+                  <span className="hljs-comment" data-token="comment">
+                    {'-- SPARQL の FILTER (lang(?label) = "en") に相当する条件。'}
+                  </span>
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  {"  "}
+                  <span className="hljs-keyword" data-token="keyword">
+                    {"AND"}
+                  </span>
+                  {" t3.p "}
+                  <span className="hljs-operator" data-token="operator">
+                    {"="}
+                  </span>{" "}
+                  <span className="hljs-string" data-token="string">
+                    {"'rdfs:label'"}
+                  </span>
+                  {"   "}
+                  <span className="hljs-keyword" data-token="keyword">
+                    {"AND"}
+                  </span>
+                  {" t3.o "}
+                  <span className="hljs-keyword" data-token="keyword">
+                    {"LIKE"}
+                  </span>{" "}
+                  <span className="hljs-string" data-token="string">
+                    {"'%@en'"}
+                  </span>
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  <span className="hljs-keyword" data-token="keyword">
+                    {"ORDER"}
+                  </span>{" "}
+                  <span className="hljs-keyword" data-token="keyword">
+                    {"BY"}
+                  </span>
+                  {" t3.o;"}
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line"></span>
+              </code>
+            </pre>{" "}
+          </div>{" "}
+          <p>
+            {" この前提のもとでは、結果は SPARQL と同じ Osaka と Tokyo の2件になります。ただし "}
+            <code>{"label"}</code>
+            {" 列には "}
+            <code>{'"Osaka"@en'}</code>
+            {" のように言語タグが付いたままの文字列が入ります。SPARQL では "}
+            <code>{"lang()"}</code>
+            {
+              " 関数が言語タグを構造として扱えるのに対し、3列の表では言語タグをただの文字列として持つしかなく、"
+            }
+            <code>{"LIKE"}</code>
+            {" で文字列を探る必要がある点が違いです。 "}
+          </p>{" "}
+          <p>{"条件が増えるほど自己結合が増え、処理が重くなる点が、この方式の課題です。"}</p>{" "}
+          <h3 id="sec-12-5">{"12.5 ステップ3：グラフデータベースと NoSQL（12.4節）"}</h3>{" "}
+          <p>{"プロパティグラフの問い合わせ言語の例として、Cypher 風の書き方を示します。"}</p>{" "}
+          <div className={styles["code-block"]}>
+            {" "}
+            <span className={styles["code-lang"]}>{"TEXT"}</span>{" "}
+            <pre data-testid="code-block">
+              <code className={["language-text"].join(" ")}>
+                <span className={styles.codeLine} data-testid="code-line">
+                  {"MATCH (c:City)-[:LOCATED_IN]->(:Country {name: 'Japan'})"}
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  {"RETURN c.name"}
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  {""}
+                </span>
+              </code>
+            </pre>{" "}
+          </div>{" "}
+          <p>
+            {
+              " この式は、「City ラベルのノード c から、LOCATED_IN の関係で、名前が Japan の Country ノードにつながるものを探し、c の名前を返す」という意味です。矢印の形でパターンを書くので、関係をたどる問いを直感的に書けます。 "
+            }
+          </p>{" "}
+          <h3 id="sec-12-6">
+            {" 12.6 "}
+            <span className={[styles.tag, styles["tag-note"]].join(" ")}>{"補足"}</span>
+            {" GQL：プロパティグラフの国際標準 "}
+          </h3>{" "}
+          <p>
+            {" GQL（Graph Query Language）は、プロパティグラフのための ISO 標準で、"}
+            <strong>{"ISO/IEC 39075:2024"}</strong>
+            {
+              " として2024年4月に発行されました。Neo4j の標準化チームのブログは、GQL が openCypher のパターン記法を受け継ぎ、SQL と互換性のあるデータ型を備えることを説明しています。The New Stack は、ISO が SQL を標準化した1987年以来の、最初の新しいデータベース問い合わせ言語だと報じています。SQL の一部として、プロパティグラフの問い合わせを扱う SQL/PGQ（ISO/IEC 9075-16:2023）も別に定められており、Google の Spanner Graph は両方の標準に対応すると説明しています。 "
+            }
+          </p>{" "}
+          <table>
+            <thead>
+              <tr>
+                <th>{"標準"} </th>
+                <th>{"対象"} </th>
+                <th>{"状況"} </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{"SPARQL 1.1"} </td>
+                <td>{"RDF"} </td>
+                <td>{"2013年 W3C 勧告"} </td>
+              </tr>
+              <tr>
+                <td>{"SPARQL 1.2"} </td>
+                <td>{"RDF 1.2"} </td>
+                <td>{"草案の段階（2026年9月時点で私が確認できた範囲）"} </td>
+              </tr>
+              <tr>
+                <td>{"GQL（ISO/IEC 39075）"} </td>
+                <td>{"プロパティグラフ"} </td>
+                <td>{"2024年 ISO 発行"} </td>
+              </tr>
+              <tr>
+                <td>{"SQL/PGQ（ISO/IEC 9075-16）"} </td>
+                <td>{"SQL 上のプロパティグラフ問い合わせ"} </td>
+                <td>{"2023年 ISO 発行"} </td>
+              </tr>
+            </tbody>
+          </table>{" "}
+          <h3 id="sec-12-7">{"12.7 3つの方式の使い分け"}</h3>{" "}
+          <table>
+            <thead>
+              <tr>
+                <th>{"方式"} </th>
+                <th>{"向いている場面"} </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{"RDF ＋ SPARQL"} </td>
+                <td>{"公開データとの連携、異なる組織のデータ統合、意味の標準を重視する場面"} </td>
+              </tr>
+              <tr>
+                <td>{"関係データベース ＋ SQL"} </td>
+                <td>{"すでに関係データベースの運用資産があり、関係をたどる深さが浅い場面"} </td>
+              </tr>
+              <tr>
+                <td>{"プロパティグラフ ＋ Cypher / GQL"} </td>
+                <td>{"関係を何段もたどる処理や、アプリケーション内の関係分析"} </td>
+              </tr>
+            </tbody>
+          </table>{" "}
+          <div
+            className={[styles.callout, styles["callout-glossary"]].join(" ")}
+            data-variant="glossary"
+          >
+            {" "}
+            <i
+              className={["ti", "ti-book-2", styles["callout-icon"]].join(" ")}
+              aria-hidden="true"
+            ></i>{" "}
+            <div className={styles["callout-body"]}>
+              {" "}
+              <p className={styles["callout-title"]}>{"このセクションで登場した用語"}</p>{" "}
+              <ul className={styles["glossary-list"]}>
+                {" "}
+                <li>
+                  <strong>{"SPARQL"}</strong>
+                  {"：RDF のデータを問い合わせる W3C 標準の言語"}
+                </li>{" "}
+                <li>
+                  {" "}
+                  <strong>{"基本グラフパターン"}</strong>
+                  {"：トリプルの一部を変数にした、照合したい形の集まり "}
+                </li>{" "}
+                <li>
+                  <strong>{"自己結合"}</strong>
+                  {"：同じ表を2回以上使って結合すること"}
+                </li>{" "}
+                <li>
+                  <strong>{"Cypher"}</strong>
+                  {"：プロパティグラフの問い合わせ言語の1つ"}
+                </li>{" "}
+                <li>
+                  {" "}
+                  <strong>{"GQL"}</strong>
+                  {"：プロパティグラフ向けの ISO 標準の問い合わせ言語（GraphQL とは別物） "}
+                </li>{" "}
+                <li>
+                  {" "}
+                  <strong>{"SQL/PGQ"}</strong>
+                  {"：SQL の中でプロパティグラフを問い合わせる ISO 標準の拡張 "}
+                </li>{" "}
+              </ul>{" "}
+            </div>{" "}
+          </div>{" "}
+        </section>{" "}
+        <section id="sec-13" className={styles.chapter}>
+          {" "}
+          <h2 id="sec-13-heading">{"13. 第13章：質問応答（Question Answering, QA）"}</h2>{" "}
+          <div
+            className={[styles.callout, styles["callout-intro"]].join(" ")}
+            data-variant={INTRO_VARIANT}
+          >
+            {" "}
+            <i
+              className={["ti", "ti-bulb", styles["callout-icon"]].join(" ")}
+              aria-hidden="true"
+            ></i>{" "}
+            <div className={styles["callout-body"]}>
+              {
+                " この章では、Chapter 13 に相当する内容として、自然な言葉の質問に、KG を使って答える仕組みを説明します。第12章の問い合わせ言語を、利用者が意識せずに使えるようにする層です。 "
+              }
+            </div>{" "}
+          </div>{" "}
+          <h3 id="sec-13-1">
+            {" 13.1 "}
+            <span className={[styles.tag, styles["tag-scope"]].join(" ")}>{"本書の範囲"}</span>
+            {" このガイドで扱う主な節 "}
+          </h3>{" "}
+          <p>
+            {
+              " 13.1 Introduction、13.2 Question Answering as a Stand-Alone Application、13.3 Question Answering as Knowledge Graph Querying "
+            }
+          </p>{" "}
+          <h3 id="sec-13-2">{"13.2 なぜ QA が必要か"}</h3>{" "}
+          <p>
+            {
+              " SPARQL や Cypher を書けるのは、一部の技術者だけです。「日本の首都はどこ？」のような質問をそのまま入力できれば、誰でも KG の情報を使えます。 "
+            }
+          </p>{" "}
+          <h3 id="sec-13-3">{"13.3 2つの見方（13.2〜13.3節）"}</h3>{" "}
+          <p>{"本書の節の題名は、QA を2つの見方で説明しています。"}</p>{" "}
+          <table>
+            <thead>
+              <tr>
+                <th>{"見方"} </th>
+                <th>{"内容"} </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{"単独のアプリケーションとしての QA"} </td>
+                <td>{"質問から答えを返す仕組み全体を、1つの応用として見る"} </td>
+              </tr>
+              <tr>
+                <td>{"KG への問い合わせとしての QA"} </td>
+                <td>{"質問を、KG への構造化された問い合わせに変換して、答えを取り出す"} </td>
+              </tr>
+            </tbody>
+          </table>{" "}
+          <h3 id="sec-13-4">{"13.4 ステップ・バイ・ステップ：KG 上の QA"}</h3>{" "}
+          <p>
+            {
+              " この図は、質問から答えが返るまでの流れを表しています。上から下へ読み進めてください。 "
+            }
+          </p>{" "}
+          <div className={styles["mermaid-wrap"]}>
+            {" "}
+            <div id="mmd-11" className={styles["mermaid-diagram"]} role="img" aria-label="図">
+              <MermaidDiagram
+                chart={DIAGRAM_11}
+                id="mmd-11-svg"
+                theme="dark"
+                themeVariables={THEME_VARS}
+              />
+            </div>{" "}
+          </div>{" "}
+          <p>
+            {" 各ノードの意味："}
+            <br />
+            {" - 「実体を特定」：質問中の言葉を、KG の実体に結びつける（エンティティリンキング）"}
+            <br />
+            {" - 「関係を特定」：質問の表現（「にある場所」）を、KG の関係の名前に結びつける"}
+            <br />
+            {" - 「問い合わせを組み立てる」：次のような SPARQL に変換する "}
+          </p>{" "}
+          <div className={styles["code-block"]}>
+            {" "}
+            <span className={styles["code-lang"]}>{"SPARQL"}</span>{" "}
+            <pre data-testid="code-block">
+              <code className={["language-sparql"].join(" ")}>
+                <span className={styles.codeLine} data-testid="code-line">
+                  {"PREFIX ex: <http://example.org/>"}
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  {
+                    "# ?answer ex:locatedIn ex:Japan → 日本に属するノードを変数 ?answer で受け、それを返す。"
+                  }
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  {"SELECT ?answer WHERE { ?answer ex:locatedIn ex:Japan }"}
+                </span>
+                {"\n"}
+                <span className={styles.codeLine} data-testid="code-line">
+                  {""}
+                </span>
+              </code>
+            </pre>{" "}
+          </div>{" "}
+          <p>
+            {" Turtle データに含まれる "}
+            <code>{"ex:locatedIn"}</code>
+            {" を使う形に変更しました。元の問いの「日本の首都は？」を表現するには、別途 "}
+            <code>{"ex:capital"}</code>
+            {" のトリプル（"}
+            <code>{"ex:Japan ex:capital ex:Tokyo"}</code>
+            {"）をデータに追加する必要があります。ここでは既存の "}
+            <code>{"ex:locatedIn"}</code>
+            {
+              " を使い、「日本に属する場所は？」という問いに変更しています。結果は Tokyo と Osaka の 2 件になります。 "
+            }
+          </p>{" "}
+          <h3 id="sec-13-5">{"13.5 難しさ"}</h3>{" "}
+          <table>
+            <thead>
+              <tr>
+                <th>{"難しさ"} </th>
+                <th>{"例"} </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{"言い換え"} </td>
+                <td>{"「首都は？」「首都はどこ？」「どこが首都？」"} </td>
+              </tr>
+              <tr>
+                <td>{"曖昧さ"} </td>
+                <td>{"「Washington」は州か都市か人か"} </td>
+              </tr>
+              <tr>
+                <td>{"複数段の質問"} </td>
+                <td>{"「東京がある国の、人口が最も多い都市は」"} </td>
+              </tr>
+            </tbody>
+          </table>{" "}
+          <div
+            className={[styles.callout, styles["callout-glossary"]].join(" ")}
+            data-variant="glossary"
+          >
+            {" "}
+            <i
+              className={["ti", "ti-book-2", styles["callout-icon"]].join(" ")}
+              aria-hidden="true"
+            ></i>{" "}
+            <div className={styles["callout-body"]}>
+              {" "}
+              <p className={styles["callout-title"]}>{"このセクションで登場した用語"}</p>{" "}
+              <ul className={styles["glossary-list"]}>
+                {" "}
+                <li>
+                  <strong>{"QA"}</strong>
+                  {"：質問に対して答えを返す技術"}
+                </li>{" "}
+                <li>
+                  {" "}
+                  <strong>{"エンティティリンキング"}</strong>
+                  {"：文中の言葉を、KG の実体に結びつける処理 "}
+                </li>{" "}
+                <li>
+                  {" "}
+                  <strong>{"セマンティックパーシング"}</strong>
+                  {"：文を、機械が実行できる問い合わせに変換すること "}
+                </li>{" "}
+              </ul>{" "}
+            </div>{" "}
+          </div>{" "}
+        </section>{" "}
+        <section id="sec-14" className={styles.chapter}>
+          {" "}
+          <h2 id="sec-14-heading">{"14. 第14章：Linked Data"}</h2>{" "}
+          <div
+            className={[styles.callout, styles["callout-intro"]].join(" ")}
+            data-variant={INTRO_VARIANT}
+          >
+            {" "}
+            <i
+              className={["ti", "ti-bulb", styles["callout-icon"]].join(" ")}
+              aria-hidden="true"
+            ></i>{" "}
+            <div className={styles["callout-body"]}>
+              {
+                " この章では、Chapter 14 に相当する内容として、世界中の KG を Web でつなぎ合わせる考え方を説明します。Part V（エコシステム）の最初の章です。 "
+              }
+            </div>{" "}
+          </div>{" "}
+          <h3 id="sec-14-1">
+            {" 14.1 "}
+            <span className={[styles.tag, styles["tag-scope"]].join(" ")}>{"本書の範囲"}</span>
+            {" このガイドで扱う主な節 "}
+          </h3>{" "}
+          <p>
+            {
+              " 14.1 Introduction、14.2 Impact and Adoption of Linked Data Principles、14.3 Important Knowledge Graphs in Linked Open Data "
+            }
+          </p>{" "}
+          <h3 id="sec-14-2">{"14.2 なぜ Linked Data か"}</h3>{" "}
+          <p>
+            {
+              " KG がそれぞれ孤立していると、同じ実体の情報が組織ごとに分断されます。Web ページがリンクでつながって世界規模の情報網になったように、データも IRI とリンクでつなげば、組織を越えて使えます。 "
+            }
+          </p>{" "}
+          <h3 id="sec-14-3">{"14.3 4つの原則"}</h3>{" "}
+          <p>
+            {" "}
+            <span className={[styles.tag, styles["tag-note"]].join(" ")}>{"補足"}</span>
+            {" Linked Data は、Tim Berners-Lee が示した次の4つの原則で知られています。 "}
+          </p>{" "}
+          <table>
+            <thead>
+              <tr>
+                <th>{"原則"} </th>
+                <th>{"意味"} </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{"1. 物事の名前に IRI を使う"} </td>
+                <td>{"実体を世界で一意に識別する"} </td>
+              </tr>
+              <tr>
+                <td>{"2. HTTP の IRI を使う"} </td>
+                <td>{"誰でも名前から情報を引ける"} </td>
+              </tr>
+              <tr>
+                <td>{"3. IRI を引いたら、標準（RDF、SPARQL）で有用な情報を返す"} </td>
+                <td>{"機械が読める形にする"} </td>
+              </tr>
+              <tr>
+                <td>{"4. 他の IRI へのリンクを含める"} </td>
+                <td>{"さらに情報を発見できるようにする"} </td>
+              </tr>
+            </tbody>
+          </table>{" "}
+          <h3 id="sec-14-4">{"14.4 データセットどうしのつながり"}</h3>{" "}
+          <p>
+            {
+              " この図は、複数の公開 KG が、同じ実体を指す IRI どうしをリンクでつなぐ様子を表しています。 "
+            }
+          </p>{" "}
+          <div className={styles["mermaid-wrap"]}>
+            {" "}
+            <div id="mmd-12" className={styles["mermaid-diagram"]} role="img" aria-label="図">
+              <MermaidDiagram
+                chart={DIAGRAM_12}
+                id="mmd-12-svg"
+                theme="dark"
+                themeVariables={THEME_VARS}
+              />
+            </div>{" "}
+          </div>{" "}
+          <p>
+            {" 各ノードの意味："}
+            <br />
+            {" - 3つのノード：別々の KG にある、同じ都市「東京」を指す実体"}
+            <br />
+            {
+              " - 「same as」の線：「同じものを指す」という宣言で、第8章のインスタンス照合の結果を、公開できる形にしたもの "
+            }
+          </p>{" "}
+          <h3 id="sec-14-5">{"14.5 主要な KG（14.3節）"}</h3>{" "}
+          <p>
+            {" "}
+            <span className={[styles.tag, styles["tag-note"]].join(" ")}>{"補足"}</span>
+            {
+              " Linked Open Data には、DBpedia、Wikidata、GeoNames などが含まれます。本書の 14.3 節で、どの KG が取り上げられているかは、書籍で確認してください。Wikidata は第2章で説明したとおり、CACM 論文（Vrandečić & Krötzsch, 2014）が主要な参考文献です。 "
+            }
+          </p>{" "}
+          <div
+            className={[styles.callout, styles["callout-glossary"]].join(" ")}
+            data-variant="glossary"
+          >
+            {" "}
+            <i
+              className={["ti", "ti-book-2", styles["callout-icon"]].join(" ")}
+              aria-hidden="true"
+            ></i>{" "}
+            <div className={styles["callout-body"]}>
+              {" "}
+              <p className={styles["callout-title"]}>{"このセクションで登場した用語"}</p>{" "}
+              <ul className={styles["glossary-list"]}>
+                {" "}
+                <li>
+                  <strong>{"Linked Data"}</strong>
+                  {"：IRI とリンクで、世界中のデータをつなぐ考え方"}
+                </li>{" "}
+                <li>
+                  {" "}
+                  <strong>{"LOD（Linked Open Data）"}</strong>
+                  {"：公開されて自由に使える Linked Data "}
+                </li>{" "}
+                <li>
+                  <strong>{"same as"}</strong>
+                  {"：2つの IRI が同じ実体を指すという宣言"}
+                </li>{" "}
+              </ul>{" "}
+            </div>{" "}
+          </div>{" "}
+        </section>{" "}
+        <section id="sec-15" className={styles.chapter}>
+          {" "}
+          <h2 id="sec-15-heading">{"15. 第15章：企業と政府（Enterprise and Government）"}</h2>{" "}
+          <div
+            className={[styles.callout, styles["callout-intro"]].join(" ")}
+            data-variant={INTRO_VARIANT}
+          >
+            {" "}
+            <i
+              className={["ti", "ti-bulb", styles["callout-icon"]].join(" ")}
+              aria-hidden="true"
+            ></i>{" "}
+            <div className={styles["callout-body"]}>
+              {
+                " この章では、Chapter 15 に相当する内容として、企業と政府が KG をどう使うかを説明します。 "
+              }
+            </div>{" "}
+          </div>{" "}
+          <h3 id="sec-15-1">
+            {" 15.1 "}
+            <span className={[styles.tag, styles["tag-scope"]].join(" ")}>{"本書の範囲"}</span>
+            {" このガイドで扱う主な節 "}
+          </h3>{" "}
+          <p>
+            {
+              " 15.1 Introduction、15.2 Enterprise、15.3 Governments and Nonprofits、15.4 Where Is the Future Headed? "
+            }
+          </p>{" "}
+          <h3 id="sec-15-2">{"15.2 なぜ組織で KG を使うのか"}</h3>{" "}
+          <p>
+            {
+              " 組織の中では、顧客、商品、契約、文書などのデータが、部署ごとのシステムに分かれています。KG で共通の意味の枠組み（オントロジー）を用意すれば、部署を越えてつなげられます。 "
+            }
+          </p>{" "}
+          <h3 id="sec-15-3">{"15.3 使い方の例"}</h3>{" "}
+          <p>
+            {" "}
+            <span className={[styles.tag, styles["tag-note"]].join(" ")}>{"補足"}</span>
+            {
+              " この表は、一般的に知られる利用場面の整理です。書籍の 15.2 節、15.3 節の具体的な事例とは一致しない場合があります。 "
+            }
+          </p>{" "}
+          <table>
+            <thead>
+              <tr>
+                <th>{"分野"} </th>
+                <th>{"使い方の例"} </th>
+                <th>{"KG が効く理由"} </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{"企業（商品情報）"} </td>
+                <td>{"商品どうしの関係や属性を統合して、検索や推薦に使う"} </td>
+                <td>{"別々の商品データを、同じ実体としてつなげる（第8章）"} </td>
+              </tr>
+              <tr>
+                <td>{"企業（社内文書）"} </td>
+                <td>{"文書・人・プロジェクトの関係を探す"} </td>
+                <td>{"関係をたどる問いが多い（第12章）"} </td>
+              </tr>
+              <tr>
+                <td>{"政府・非営利"} </td>
+                <td>{"公開データを統合して、公開・分析に使う"} </td>
+                <td>{"データを標準で公開しやすい（第14章）"} </td>
+              </tr>
+            </tbody>
+          </table>{" "}
+          <h3 id="sec-15-4">{"15.4 導入の進め方"}</h3>{" "}
+          <ol>
+            {" "}
+            <li>{"解決したい問い（ユースケース）を先に決める"}</li>{" "}
+            <li>{"その問いに必要な実体と関係だけで、小さくオントロジーを作る"}</li>{" "}
+            <li>{"既存データを取り込み、第8章の名寄せで統合する"}</li>{" "}
+            <li>{"問い合わせ（第12章）で価値を確認してから、範囲を広げる"}</li>{" "}
+          </ol>{" "}
+          <div
+            className={[styles.callout, styles["callout-glossary"]].join(" ")}
+            data-variant="glossary"
+          >
+            {" "}
+            <i
+              className={["ti", "ti-book-2", styles["callout-icon"]].join(" ")}
+              aria-hidden="true"
+            ></i>{" "}
+            <div className={styles["callout-body"]}>
+              {" "}
+              <p className={styles["callout-title"]}>{"このセクションで登場した用語"}</p>{" "}
+              <ul className={styles["glossary-list"]}>
+                {" "}
+                <li>
+                  {" "}
+                  <strong>{"ユースケース"}</strong>
+                  {"：システムをどんな目的でどう使うかを表した具体的な場面 "}
+                </li>{" "}
+                <li>
+                  <strong>{"名寄せ"}</strong>
+                  {"：同じ実体を指す複数のレコードを、1つにまとめること"}
+                </li>{" "}
+              </ul>{" "}
+            </div>{" "}
+          </div>{" "}
+        </section>{" "}
+        <section id="sec-16" className={styles.chapter}>
+          {" "}
+          <h2 id="sec-16-heading">{"16. 第16章：科学分野の KG とオントロジー"}</h2>{" "}
+          <div
+            className={[styles.callout, styles["callout-intro"]].join(" ")}
+            data-variant={INTRO_VARIANT}
+          >
+            {" "}
+            <i
+              className={["ti", "ti-bulb", styles["callout-icon"]].join(" ")}
+              aria-hidden="true"
+            ></i>{" "}
+            <div className={styles["callout-body"]}>
+              {
+                " この章では、Chapter 16 に相当する内容として、生物学・化学・地球科学のような科学分野で KG とオントロジーがどう使われるかを説明します。 "
+              }
+            </div>{" "}
+          </div>{" "}
+          <h3 id="sec-16-1">
+            {" 16.1 "}
+            <span className={[styles.tag, styles["tag-scope"]].join(" ")}>{"本書の範囲"}</span>
+            {" このガイドで扱う主な節 "}
+          </h3>{" "}
+          <p>
+            {
+              " 16.1 Introduction、16.2 Biology、16.3 Chemistry、16.4 Earth, Environment, and Geosciences "
+            }
+          </p>{" "}
+          <h3 id="sec-16-2">{"16.2 なぜ科学分野で KG か"}</h3>{" "}
+          <p>
+            {
+              " 科学では、遺伝子、化合物、地域などの膨大な実体が、複雑な関係でつながっています。研究グループごとに用語が違うと、論文やデータを横断して調べられません。共通のオントロジーで用語をそろえると、データを統合して探せます。 "
+            }
+          </p>{" "}
+          <h3 id="sec-16-3">{"16.3 分野ごとの主な題材"}</h3>{" "}
+          <p>
+            {" "}
+            <span className={[styles.tag, styles["tag-note"]].join(" ")}>{"補足"}</span>
+            {
+              " 次は、各分野で KG になりやすい題材の一般的な例です。書籍の具体的な内容は、各節で確認してください。 "
+            }
+          </p>{" "}
+          <table>
+            <thead>
+              <tr>
+                <th>{"分野"} </th>
+                <th>{"KG のノードになりやすいもの"} </th>
+                <th>{"関係の例"} </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{"生物学"} </td>
+                <td>{"遺伝子、タンパク質、疾患"} </td>
+                <td>{"「〜を制御する」「〜に関与する」"} </td>
+              </tr>
+              <tr>
+                <td>{"化学"} </td>
+                <td>{"化合物、反応、物性"} </td>
+                <td>{"「〜から生成する」「〜の性質を持つ」"} </td>
+              </tr>
+              <tr>
+                <td>{"地球・環境"} </td>
+                <td>{"地域、観測点、現象"} </td>
+                <td>{"「〜に位置する」「〜を観測した」"} </td>
+              </tr>
+            </tbody>
+          </table>{" "}
+          <div
+            className={[styles.callout, styles["callout-glossary"]].join(" ")}
+            data-variant="glossary"
+          >
+            {" "}
+            <i
+              className={["ti", "ti-book-2", styles["callout-icon"]].join(" ")}
+              aria-hidden="true"
+            ></i>{" "}
+            <div className={styles["callout-body"]}>
+              {" "}
+              <p className={styles["callout-title"]}>{"このセクションで登場した用語"}</p>{" "}
+              <ul className={styles["glossary-list"]}>
+                {" "}
+                <li>
+                  {" "}
+                  <strong>{"オントロジー"}</strong>
+                  {"：分野の用語と関係を、共通の定義として整理したもの "}
+                </li>{" "}
+                <li>
+                  <strong>{"横断検索"}</strong>
+                  {"：複数のデータ源にまたがって探すこと"}
+                </li>{" "}
+              </ul>{" "}
+            </div>{" "}
+          </div>{" "}
+        </section>{" "}
+        <section id="sec-17" className={styles.chapter}>
+          {" "}
+          <h2 id="sec-17-heading">{"17. 第17章：領域特化の社会的インパクトを目指す KG"}</h2>{" "}
+          <div
+            className={[styles.callout, styles["callout-intro"]].join(" ")}
+            data-variant={INTRO_VARIANT}
+          >
+            {" "}
+            <i
+              className={["ti", "ti-bulb", styles["callout-icon"]].join(" ")}
+              aria-hidden="true"
+            ></i>{" "}
+            <div className={styles["callout-body"]}>
+              {
+                " この章では、Chapter 17 に相当する内容として、特定の領域の課題に絞って、Web から情報を集めて KG にし、分析に役立てる考え方を説明します。 "
+              }
+            </div>{" "}
+          </div>{" "}
+          <h3 id="sec-17-1">
+            {" 17.1 "}
+            <span className={[styles.tag, styles["tag-scope"]].join(" ")}>{"本書の範囲"}</span>
+            {" このガイドで扱う主な節 "}
+          </h3>{" "}
+          <p>
+            {
+              " 17.1 Introduction、17.2 Domain-Specific Insight Graphs、17.3 Alternative System: DeepDive、17.4 Applications and Use-Cases "
+            }
+          </p>{" "}
+          <h3 id="sec-17-2">{"17.2 なぜ領域特化か"}</h3>{" "}
+          <p>
+            {
+              " 汎用の巨大な KG より、対象を絞った KG のほうが、その領域の専門的な問いに、深く答えられます。出版社の紹介文は、KG が、サイバー攻撃の予測、商品の推薦、COVID-19 に関する数千本の論文からの洞察の抽出などに使われていると説明しています。 "
+            }
+          </p>{" "}
+          <h3 id="sec-17-3">{"17.3 領域特化の KG の作り方"}</h3>{" "}
+          <p>
+            {
+              " この図は、領域特化の KG を作り、分析に使うまでの流れを、これまでの章と結びつけて表しています。上から下へ読み進めてください。 "
+            }
+          </p>{" "}
+          <div className={styles["mermaid-wrap"]}>
+            {" "}
+            <div id="mmd-13" className={styles["mermaid-diagram"]} role="img" aria-label="図">
+              <MermaidDiagram
+                chart={DIAGRAM_13}
+                id="mmd-13-svg"
+                theme="dark"
+                themeVariables={THEME_VARS}
+              />
+            </div>{" "}
+          </div>{" "}
+          <p>
+            {" 各ノードの意味："}
+            <br />
+            {" - 「ドメインを決める」：解決したい課題の領域を絞る"}
+            <br />
+            {" - 「関連ページを集める」：第3章のフォーカスト・クローリング"}
+            <br />
+            {" - 「情報を抽出する」：名前、関係、Web ページの構造からの抽出"}
+            <br />
+            {" - 「検索と分析」：第11〜13章の推論・問い合わせ・QA で活用する "}
+          </p>{" "}
+          <h3 id="sec-17-4">{"17.4 DeepDive（17.3節）"}</h3>{" "}
+          <p>
+            {
+              " DeepDive は、本書が「代替のシステム」として取り上げている情報抽出システムです。詳細は書籍で確認してください。 "
+            }
+          </p>{" "}
+          <h3 id="sec-17-5">{"17.5 使うときの注意"}</h3>{" "}
+          <p>
+            {" "}
+            <span className={[styles.tag, styles["tag-note"]].join(" ")}>{"補足"}</span>
+            {
+              " 領域特化の KG は、個人に関する情報や、影響の大きい判断（例：捜査、医療）に使われる場合があります。抽出の誤りが人に不利益を与えないよう、精度の評価（第4章）と、人による確認の工程を設けることが必要です。 "
+            }
+          </p>{" "}
+          <div
+            className={[styles.callout, styles["callout-glossary"]].join(" ")}
+            data-variant="glossary"
+          >
+            {" "}
+            <i
+              className={["ti", "ti-book-2", styles["callout-icon"]].join(" ")}
+              aria-hidden="true"
+            ></i>{" "}
+            <div className={styles["callout-body"]}>
+              {" "}
+              <p className={styles["callout-title"]}>{"このセクションで登場した用語"}</p>{" "}
+              <ul className={styles["glossary-list"]}>
+                {" "}
+                <li>
+                  <strong>{"領域特化"}</strong>
+                  {"：特定の分野に絞ること"}
+                </li>{" "}
+                <li>
+                  {" "}
+                  <strong>{"Insight Graph"}</strong>
+                  {"：特定の領域で、洞察を得るために作る KG（本書の 17.2 節の題名にある語） "}
+                </li>{" "}
+              </ul>{" "}
+            </div>{" "}
+          </div>{" "}
+        </section>{" "}
+        <section id="sec-18" className={styles.chapter}>
+          {" "}
+          <h2 id="sec-18-heading">{"18. 本書のあとの世界：LLM 時代の KG（2026年9月時点）"}</h2>{" "}
+          <div
+            className={[styles.callout, styles["callout-intro"]].join(" ")}
+            data-variant={INTRO_VARIANT}
+          >
+            {" "}
+            <i
+              className={["ti", "ti-bulb", styles["callout-icon"]].join(" ")}
+              aria-hidden="true"
+            ></i>{" "}
+            <div className={styles["callout-body"]}>
+              {
+                " この章では、本書の出版（2021年）以降に大きく動いた、LLM（大規模言語モデル）と KG の関係、標準の動きを説明します。本書の各章が今どこで役立つかも整理します。 "
+              }
+            </div>{" "}
+          </div>{" "}
+          <h3 id="sec-18-1">{"18.1 なぜ本書の内容が、いまも役立つのか"}</h3>{" "}
+          <p>
+            {
+              " LLM は、文章を作る力に優れますが、事実を持たない、あるいは古い、間違った内容を出力する（ハルシネーション）という弱点があります。KG は事実を構造として明示するので、この弱点を補う組み合わせが注目されています。 "
+            }
+          </p>{" "}
+          <h3 id="sec-18-2">{"18.2 LLM と KG の3つの組み合わせ方"}</h3>{" "}
+          <p>
+            {" Shirui Pan らのロードマップ論文（"}
+            <em>{"Unifying Large Language Models and Knowledge Graphs: A Roadmap"}</em>
+            {"、IEEE TKDE 2024）は、次の3つの枠組みで、既存研究を整理しています。 "}
+          </p>{" "}
+          <table>
+            <thead>
+              <tr>
+                <th>{"枠組み"} </th>
+                <th>{"意味"} </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{"KG-enhanced LLMs"} </td>
+                <td>{"KG で LLM を強化する（外部知識や解釈のしやすさを補う）"} </td>
+              </tr>
+              <tr>
+                <td>{"LLM-augmented KGs"} </td>
+                <td>{"LLM で KG の作成や補完を助ける"} </td>
+              </tr>
+              <tr>
+                <td>{"Synergized LLMs + KGs"} </td>
+                <td>{"両者が対等に補い合い、データと知識の両方で推論する"} </td>
+              </tr>
+            </tbody>
+          </table>{" "}
+          <p>
+            {
+              " 論文は、LLM がブラックボックスで事実の知識を捉えにくいのに対し、KG は事実を明示して蓄えるものの、作成や更新が難しい、という補完関係を出発点にしています。 "
+            }
+          </p>{" "}
+          <p>{"この図は、3つの枠組みの関係を表しています。"}</p>{" "}
+          <div className={styles["mermaid-wrap"]}>
+            {" "}
+            <div id="mmd-14" className={styles["mermaid-diagram"]} role="img" aria-label="図">
+              <MermaidDiagram
+                chart={DIAGRAM_14}
+                id="mmd-14-svg"
+                theme="dark"
+                themeVariables={THEME_VARS}
+              />
+            </div>{" "}
+          </div>{" "}
+          <p>
+            {" 各ノードの意味："}
+            <br />
+            {" - 「1」の矢印：KG-enhanced LLMs（KG から LLM へ）"}
+            <br />
+            {" - 「2」の矢印：LLM-augmented KGs（LLM から KG へ）"}
+            <br />
+            {" - 「3」の矢印：Synergized LLMs + KGs（双方向） "}
+          </p>{" "}
+          <h3 id="sec-18-3">{"18.3 GraphRAG：文書から KG を作って検索に使う"}</h3>{" "}
+          <p>
+            {
+              " RAG（Retrieval-Augmented Generation、＝検索で見つけた資料を LLM への入力に加えて答えさせる方法）は、多くの LLM アプリで使われます。Microsoft Research は、2024年2月13日のブログ「GraphRAG: Unlocking LLM discovery on narrative private data」（Jonathan Larson、Steven Truitt）で、"
+            }
+            <strong>{"LLM が生成した KG"}</strong>
+            {
+              " を使う GraphRAG を紹介しました。ベクトル類似度による通常の RAG が苦手な場面を補う狙いです。2024年7月2日にはオープンソースとして GitHub 公開を発表しています。 "
+            }
+          </p>{" "}
+          <p>
+            {
+              " 公開ドキュメントの説明では、GraphRAG の処理は、生の文章から KG を取り出し、コミュニティ（＝密につながったノードのまとまり）の階層を作り、各コミュニティの要約を作って、それらを RAG に使う、という流れです。 "
+            }
+          </p>{" "}
+          <p>{"この図は、GraphRAG の処理の流れを表しています。上から下へ読み進めてください。"}</p>{" "}
+          <div className={styles["mermaid-wrap"]}>
+            {" "}
+            <div id="mmd-15" className={styles["mermaid-diagram"]} role="img" aria-label="図">
+              <MermaidDiagram
+                chart={DIAGRAM_15}
+                id="mmd-15-svg"
+                theme="dark"
+                themeVariables={THEME_VARS}
+              />
+            </div>{" "}
+          </div>{" "}
+          <p>
+            {" 各ノードの意味："}
+            <br />
+            {" - 「LLM で実体と関係を抽出」：本書の第4〜7章の情報抽出を、LLM が担う部分"}
+            <br />
+            {" - 「コミュニティの階層」：全体の話題の構造をつかむための単位"}
+            <br />
+            {" - 「要約」：文書全体を見渡す質問（「主な論点は何か」など）に答えるための材料 "}
+          </p>{" "}
+          <p>
+            {
+              " Neo4j のブログ「The GraphRAG manifesto」は、Microsoft の報告として、LLM が生成した KG によって、RAG の検索部分が改善し、より関連性の高い内容がコンテキストに入り、根拠の出どころも捉えられると紹介しています。同ブログは、他の方式と比べてトークン数（＝LLM が処理する量）が26%〜97%少なかったという報告にも触れています。"
+            }
+            <strong>
+              {
+                "数値は Neo4j による紹介で、条件により変わるため、採用前に一次資料（Microsoft のブログと論文）で確認してください。"
+              }
+            </strong>{" "}
+          </p>{" "}
+          <p>
+            {
+              " Microsoft のプロジェクトページは、GraphRAG と LazyGraphRAG が、Azure 上の科学研究向けエージェント基盤「Microsoft Discovery」で利用できると案内しています（2026年9月時点で確認できた記載）。 "
+            }
+          </p>{" "}
+          <h3 id="sec-18-4">{"18.4 本書の章と LLM 時代の対応（筆者の整理）"}</h3>{" "}
+          <p>
+            {" "}
+            <span className={[styles.tag, styles["tag-note"]].join(" ")}>{"補足"}</span>
+            {
+              " 次の表は、本書の章と、LLM を使った現在の取り組みとの対応を、筆者が整理したものです。書籍が LLM を扱っているという意味ではありません（本書は2021年の出版です）。 "
+            }
+          </p>{" "}
+          <table>
+            <thead>
+              <tr>
+                <th>{"本書の章"} </th>
+                <th>{"LLM 時代に対応する話題"} </th>
+                <th>{"注意点"} </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{"第2章 モデル化"} </td>
+                <td>{"LLM で KG を作る場合も、スキーマの設計は必要"} </td>
+                <td>{"スキーマがないと、LLM の出力の表記が揺れやすい"} </td>
+              </tr>
+              <tr>
+                <td>{"第4〜7章 情報抽出"} </td>
+                <td>{"LLM による抽出（GraphRAG の抽出工程など）"} </td>
+                <td>{"抽出の誤りを、第4章の適合率・再現率で測る"} </td>
+              </tr>
+              <tr>
+                <td>{"第8章 インスタンス照合"} </td>
+                <td>{"LLM が抽出した実体の名寄せ"} </td>
+                <td>{"別表記が別ノードになる問題は残る"} </td>
+              </tr>
+              <tr>
+                <td>{"第10章 埋め込み"} </td>
+                <td>{"ベクトル検索との併用"} </td>
+                <td>{"グラフの構造情報は、通常のテキスト埋め込みには入らない"} </td>
+              </tr>
+              <tr>
+                <td>{"第11章 推論"} </td>
+                <td>{"複数段の関係をたどる質問への対応"} </td>
+                <td>{"ルール推論と LLM の推測を区別して扱う"} </td>
+              </tr>
+              <tr>
+                <td>{"第12〜13章 問い合わせと QA"} </td>
+                <td>{"自然言語から SPARQL や Cypher を生成する"} </td>
+                <td>{"生成した問い合わせを実行する前に検証する"} </td>
+              </tr>
+            </tbody>
+          </table>{" "}
+          <h3 id="sec-18-5">{"18.5 標準の動き（2026年9月時点で確認できた範囲）"}</h3>{" "}
+          <table>
+            <thead>
+              <tr>
+                <th>{"動き"} </th>
+                <th>{"状況"} </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{"RDF 1.2"} </td>
+                <td>
+                  {
+                    "Candidate Recommendation Snapshot（2026年4月7日）。triple term などが加わる"
+                  }{" "}
+                </td>
+              </tr>
+              <tr>
+                <td>{"SPARQL 1.2"} </td>
+                <td>{"草案（Working Draft）の文書が公開されている"} </td>
+              </tr>
+              <tr>
+                <td>{"GQL（ISO/IEC 39075）"} </td>
+                <td>{"2024年4月に発行。実装は各製品で進行中"} </td>
+              </tr>
+              <tr>
+                <td>{"SQL/PGQ（ISO/IEC 9075-16）"} </td>
+                <td>{"2023年に発行"} </td>
+              </tr>
+            </tbody>
+          </table>{" "}
+          <p>
+            {" "}
+            <strong>{"この表は変わる可能性があります。"}</strong>
+            {" 実装に使う前に、W3C と ISO の最新の情報を確認してください。 "}
+          </p>{" "}
+          <div
+            className={[styles.callout, styles["callout-glossary"]].join(" ")}
+            data-variant="glossary"
+          >
+            {" "}
+            <i
+              className={["ti", "ti-book-2", styles["callout-icon"]].join(" ")}
+              aria-hidden="true"
+            ></i>{" "}
+            <div className={styles["callout-body"]}>
+              {" "}
+              <p className={styles["callout-title"]}>{"このセクションで登場した用語"}</p>{" "}
+              <ul className={styles["glossary-list"]}>
+                {" "}
+                <li>
+                  <strong>{"LLM"}</strong>
+                  {"：大量の文章で学習した、文章を理解・生成する AI モデル"}
+                </li>{" "}
+                <li>
+                  {" "}
+                  <strong>{"ハルシネーション"}</strong>
+                  {"：もっともらしいが事実でない内容を、LLM が出力すること "}
+                </li>{" "}
+                <li>
+                  <strong>{"RAG"}</strong>
+                  {"：検索した資料を LLM の入力に加えて答えさせる方法"}
+                </li>{" "}
+                <li>
+                  {" "}
+                  <strong>{"GraphRAG"}</strong>
+                  {"：文書から KG を作り、RAG に使う方法（Microsoft Research が提案） "}
+                </li>{" "}
+                <li>
+                  {" "}
+                  <strong>{"コミュニティ"}</strong>
+                  {"：グラフの中で、互いに密につながったノードのまとまり "}
+                </li>{" "}
+                <li>
+                  <strong>{"トークン"}</strong>
+                  {"：LLM が処理する文字の断片の単位"}
+                </li>{" "}
+              </ul>{" "}
+            </div>{" "}
+          </div>{" "}
+        </section>{" "}
+        <section id="sec-19" className={styles.chapter}>
+          {" "}
+          <h2 id="sec-19-heading">{"19. 学習ロードマップと確認問題"}</h2>{" "}
+          <div
+            className={[styles.callout, styles["callout-intro"]].join(" ")}
+            data-variant={INTRO_VARIANT}
+          >
+            {" "}
+            <i
+              className={["ti", "ti-bulb", styles["callout-icon"]].join(" ")}
+              aria-hidden="true"
+            ></i>{" "}
+            <div className={styles["callout-body"]}>
+              {
+                " この章では、ここまでの内容を、実際の学習の進め方と、理解度の確認問題にまとめます。 "
+              }
+            </div>{" "}
+          </div>{" "}
+          <h3 id="sec-19-1">{"19.1 4週間の学習プラン"}</h3>{" "}
+          <table>
+            <thead>
+              <tr>
+                <th>{"週"} </th>
+                <th>{"学ぶこと"} </th>
+                <th>{"やってみること"} </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{"1週目"} </td>
+                <td>{"第1〜2章（KG の考え方、RDF）"} </td>
+                <td>{"第2章の Turtle を自分の題材（趣味、職場）で書き換える"} </td>
+              </tr>
+              <tr>
+                <td>{"2週目"} </td>
+                <td>{"第12章（SPARQL）"} </td>
+                <td>{"rdflib で SPARQL を書き、結果を確認する"} </td>
+              </tr>
+              <tr>
+                <td>{"3週目"} </td>
+                <td>{"第4・6・8章（抽出と名寄せ）"} </td>
+                <td>{"数十件の文章で、名前と関係を手作業で取り出し、適合率・再現率を計算する"} </td>
+              </tr>
+              <tr>
+                <td>{"4週目"} </td>
+                <td>{"第10・18章（埋め込みと LLM）"} </td>
+                <td>
+                  {
+                    " 第10章の小さな例を、自分のデータに変えて動かす。GraphRAG のドキュメントを読む "
+                  }{" "}
+                </td>
+              </tr>
+            </tbody>
+          </table>{" "}
+          <h3 id="sec-19-2">{"19.2 確認問題"}</h3>{" "}
+          <p data-study-addition="" data-review-instructions="">
+            まずは解答を開かず、8問に自分の言葉で答えてみましょう。各問の「確認すること」を説明できるかが目安です。
+          </p>
+          <ol data-review-list="questions" aria-labelledby="sec-19-2">
+            <li data-review-number="1">
+              <div data-study-addition="" data-review-meta="">
+                <span data-review-category="">{"基礎"}</span>
+                <span data-review-topic="">{"トリプル"}</span>
+              </div>
+              <div data-review-question="">{"KG の事実は、どんな形の3つ組で表しますか"}</div>
+              <p data-study-addition="" data-review-goal-row="">
+                <strong>確認すること：</strong>
+                <span data-review-goal="">
+                  {"主語・述語・目的語を具体例に当てはめて説明する。"}
+                </span>
+              </p>
+            </li>{" "}
+            <li data-review-number="2">
+              <div data-study-addition="" data-review-meta="">
+                <span data-review-category="">{"基礎"}</span>
+                <span data-review-topic="">{"RDF の要素"}</span>
+              </div>
+              <div data-review-question="">{"RDF のノードの3種類は何ですか"}</div>
+              <p data-study-addition="" data-review-goal-row="">
+                <strong>確認すること：</strong>
+                <span data-review-goal="">
+                  {"IRI・リテラル・空白ノードの違いと、置ける位置を説明する。"}
+                </span>
+              </p>
+            </li>{" "}
+            <li data-review-number="3">
+              <div data-study-addition="" data-review-meta="">
+                <span data-review-category="">{"基礎"}</span>
+                <span data-review-topic="">{"A-Box と T-Box"}</span>
+              </div>
+              <div data-review-question="">{"A-Box と T-Box の違いを説明してください"}</div>
+              <p data-study-addition="" data-review-goal-row="">
+                <strong>確認すること：</strong>
+                <span data-review-goal="">{"具体的な事実と、概念・関係の定義を区別する。"}</span>
+              </p>
+            </li>{" "}
+            <li data-review-number="4">
+              <div data-study-addition="" data-review-meta="">
+                <span data-review-category="">{"評価"}</span>
+                <span data-review-topic="">{"適合率と再現率"}</span>
+              </div>
+              <div data-review-question="">{"適合率と再現率の違いを説明してください"}</div>
+              <p data-study-addition="" data-review-goal-row="">
+                <strong>確認すること：</strong>
+                <span data-review-goal="">
+                  {"同じ正解数でも、分母によって評価が変わることを説明する。"}
+                </span>
+              </p>
+            </li>{" "}
+            <li data-review-number="5">
+              <div data-study-addition="" data-review-meta="">
+                <span data-review-category="">{"構築"}</span>
+                <span data-review-topic="">{"ブロッキング"}</span>
+              </div>
+              <div data-review-question="">
+                {"インスタンス照合で、ブロッキングが必要な理由は何ですか"}
+              </div>
+              <p data-study-addition="" data-review-goal-row="">
+                <strong>確認すること：</strong>
+                <span data-review-goal="">
+                  {"比較する候補を絞る目的と、候補から漏らすリスクを説明する。"}
+                </span>
+              </p>
+            </li>{" "}
+            <li data-review-number="6">
+              <div data-study-addition="" data-review-meta="">
+                <span data-review-category="">{"表現学習"}</span>
+                <span data-review-topic="">{"TransE"}</span>
+              </div>
+              <div data-review-question="">
+                {"TransE では、どんな条件のとき、事実が正しそうだと判断しますか"}
+              </div>
+              <p data-study-addition="" data-review-goal-row="">
+                <strong>確認すること：</strong>
+                <span data-review-goal="">
+                  {"head + relation と tail の距離が、スコアにどう関わるかを説明する。"}
+                </span>
+              </p>
+            </li>{" "}
+            <li data-review-number="7">
+              <div data-study-addition="" data-review-meta="">
+                <span data-review-category="">{"問い合わせ"}</span>
+                <span data-review-topic="">{"SPARQL"}</span>
+              </div>
+              <div data-review-question="">
+                {"SPARQL の SELECT 句と WHERE 句の役割を説明してください"}
+              </div>
+              <p data-study-addition="" data-review-goal-row="">
+                <strong>確認すること：</strong>
+                <span data-review-goal="">
+                  {"返す列と、グラフに照合する条件を分けて説明する。"}
+                </span>
+              </p>
+            </li>{" "}
+            <li data-review-number="8">
+              <div data-study-addition="" data-review-meta="">
+                <span data-review-category="">{"応用"}</span>
+                <span data-review-topic="">{"GraphRAG"}</span>
+              </div>
+              <div data-review-question="">
+                {"GraphRAG が、通常のベクトル検索の RAG に加える工夫は何ですか"}
+              </div>
+              <p data-study-addition="" data-review-goal-row="">
+                <strong>確認すること：</strong>
+                <span data-review-goal="">
+                  {"文書の類似度検索に、関係やコミュニティの情報をどう加えるか説明する。"}
+                </span>
+              </p>
+            </li>{" "}
+          </ol>{" "}
+          <h3 id="sec-19-3">{"19.3 解答"}</h3>{" "}
+          <p data-study-addition="" data-review-instructions="">
+            答え合わせは1問ずつ開いて行えます。元の解答に加え、具体例・考え方・つまずきやすい点を確認し、迷ったら復習先へ戻りましょう。
+          </p>
+          <ol data-review-list="answers" aria-labelledby="sec-19-3">
+            <li data-review-number="1">
+              <details>
+                <summary data-study-addition="">{"問題1｜トリプル — 解答・解説"}</summary>
+                <div data-review-answer-body="">
+                  <div data-review-original-answer="">
+                    {"主語・述語（関係）・目的語の3つ組（トリプル）です"}
+                  </div>
+                  <div data-study-addition="" data-review-extras="">
+                    <p>
+                      <strong>具体例</strong>
+                      <span data-review-example="">
+                        {
+                          "「東京は日本に位置する」なら、主語は東京、述語は locatedIn、目的語は日本です。"
+                        }
+                      </span>
+                    </p>
+                    <p>
+                      <strong>考え方</strong>
+                      <span data-review-explanation="">
+                        {
+                          "点が実体を、向きのある線が関係を表します。「誰が・どんな関係で・何につながるか」を分けると、同じ形式で事実を追加できます。"
+                        }
+                      </span>
+                    </p>
+                    <p data-review-caution="">
+                      <strong>つまずきやすい点</strong>
+                      <span data-review-pitfall="">
+                        {
+                          "3つの単語を並べるだけではなく、それぞれが主語・述語・目的語のどの役割なのかまで答えましょう。"
+                        }
+                      </span>
+                    </p>
+                    <p data-review-reference-row="">
+                      <strong>復習先</strong>
+                      <a data-review-reference="" href="#sec-1-5">
+                        {"第1章 1.5 知識をグラフで表す"}
+                      </a>
+                    </p>
+                  </div>
+                </div>
+              </details>
+            </li>{" "}
+            <li data-review-number="2">
+              <details>
+                <summary data-study-addition="">{"問題2｜RDF の要素 — 解答・解説"}</summary>
+                <div data-review-answer-body="">
+                  <div data-review-original-answer="">
+                    {"IRI、リテラル、空白ノードです（RDF 1.1）"}
+                  </div>
+                  <div data-study-addition="" data-review-extras="">
+                    <p>
+                      <strong>具体例</strong>
+                      <span data-review-example="">
+                        {
+                          "ex:Tokyo は接頭辞で短縮した IRI、「東京」のような値はリテラルです。空白ノードは、そのグラフで IRI を付けずに表す対象に使います。"
+                        }
+                      </span>
+                    </p>
+                    <p>
+                      <strong>考え方</strong>
+                      <span data-review-explanation="">
+                        {
+                          "主語には IRI または空白ノード、述語には IRI、目的語には IRI・リテラル・空白ノードを置けます。種類を挙げるだけでなく、この制約も確認してください。"
+                        }
+                      </span>
+                    </p>
+                    <p data-review-caution="">
+                      <strong>つまずきやすい点</strong>
+                      <span data-review-pitfall="">
+                        {
+                          "リテラルを主語や述語に置くことはできません。また、空白ノードの識別子を、別のデータセットでも同じ実体を指す共通 ID と考えないようにしましょう。"
+                        }
+                      </span>
+                    </p>
+                    <p data-review-reference-row="">
+                      <strong>復習先</strong>
+                      <a data-review-reference="" href="#sec-2-3">
+                        {"第2章 2.3 RDF の基本"}
+                      </a>
+                    </p>
+                  </div>
+                </div>
+              </details>
+            </li>{" "}
+            <li data-review-number="3">
+              <details>
+                <summary data-study-addition="">{"問題3｜A-Box と T-Box — 解答・解説"}</summary>
+                <div data-review-answer-body="">
+                  <div data-review-original-answer="">
+                    {"A-Box は具体的な事実の層、T-Box は型と関係の定義（オントロジー）の層です"}
+                  </div>
+                  <div data-study-addition="" data-review-extras="">
+                    <p>
+                      <strong>具体例</strong>
+                      <span data-review-example="">
+                        {
+                          "「Tokyo は City である」は A-Box の事実です。「City は Place の下位クラスである」は T-Box の定義です。"
+                        }
+                      </span>
+                    </p>
+                    <p>
+                      <strong>考え方</strong>
+                      <span data-review-explanation="">
+                        {
+                          "個別の実体について述べる層と、その実体を分類する概念や関係の層を分けると、別々の都市のデータにも同じ定義を使えます。"
+                        }
+                      </span>
+                    </p>
+                    <p data-review-caution="">
+                      <strong>つまずきやすい点</strong>
+                      <span data-review-pitfall="">
+                        {
+                          "名前に City と入っているかどうかで判定せず、個別の実体についての記述か、クラス同士の定義かを見てください。"
+                        }
+                      </span>
+                    </p>
+                    <p data-review-reference-row="">
+                      <strong>復習先</strong>
+                      <a data-review-reference="" href="#sec-2-5">
+                        {"第2章 2.5 A-Box と T-Box"}
+                      </a>
+                    </p>
+                  </div>
+                </div>
+              </details>
+            </li>{" "}
+            <li data-review-number="4">
+              <details>
+                <summary data-study-addition="">{"問題4｜適合率と再現率 — 解答・解説"}</summary>
+                <div data-review-answer-body="">
+                  <div data-review-original-answer="">
+                    {
+                      " 適合率は「出力のうち正しかった割合」、再現率は「正解のうち見つけられた割合」です "
+                    }
+                  </div>
+                  <div data-study-addition="" data-review-extras="">
+                    <p>
+                      <strong>具体例</strong>
+                      <span data-review-example="">
+                        {
+                          "抽出した10件のうち8件が正しく、見つけるべき正解が全部で20件なら、適合率は 8 ÷ 10 = 80%、再現率は 8 ÷ 20 = 40% です。"
+                        }
+                      </span>
+                    </p>
+                    <p>
+                      <strong>考え方</strong>
+                      <span data-review-explanation="">
+                        {
+                          "適合率は誤検出の少なさ、再現率は見逃しの少なさを確かめる指標です。この例では、出力は比較的正しくても、多くの正解を取りこぼしています。"
+                        }
+                      </span>
+                    </p>
+                    <p data-review-caution="">
+                      <strong>つまずきやすい点</strong>
+                      <span data-review-pitfall="">
+                        {
+                          "「8件正解した」という数だけでは評価できません。出力件数と、正解全体の件数を区別してください。"
+                        }
+                      </span>
+                    </p>
+                    <p data-review-reference-row="">
+                      <strong>復習先</strong>
+                      <a data-review-reference="" href="#sec-4-6">
+                        {"第4章 4.6 品質の測り方"}
+                      </a>
+                    </p>
+                  </div>
+                </div>
+              </details>
+            </li>{" "}
+            <li data-review-number="5">
+              <details>
+                <summary data-study-addition="">{"問題5｜ブロッキング — 解答・解説"}</summary>
+                <div data-review-answer-body="">
+                  <div data-review-original-answer="">
+                    {
+                      " 全ての組を比べると、組の数が n × (n − 1) ÷ 2 に増えて、現実的な時間で処理できないためです "
+                    }
+                  </div>
+                  <div data-study-addition="" data-review-extras="">
+                    <p>
+                      <strong>具体例</strong>
+                      <span data-review-example="">
+                        {
+                          "1つの集合に10,000件のレコードがあると、異なる2件の組は 10,000 × 9,999 ÷ 2 = 49,995,000組です。候補を絞らず全部比較すると、比較回数が急増します。"
+                        }
+                      </span>
+                    </p>
+                    <p>
+                      <strong>考え方</strong>
+                      <span data-review-explanation="">
+                        {
+                          "ブロッキングは、名前や地域などの手がかりで比較候補を選ぶ前処理です。その後で類似度を計算して、同じ実体かを判定します。"
+                        }
+                      </span>
+                    </p>
+                    <p data-review-caution="">
+                      <strong>つまずきやすい点</strong>
+                      <span data-review-pitfall="">
+                        {
+                          "同じブロックに入っただけで同一実体とは限りません。候補を絞りすぎると、本来一致する組を比較前に落としてしまいます。"
+                        }
+                      </span>
+                    </p>
+                    <p data-review-reference-row="">
+                      <strong>復習先</strong>
+                      <a data-review-reference="" href="#sec-8-5">
+                        {"第8章 8.5 2段階パイプライン"}
+                      </a>
+                    </p>
+                  </div>
+                </div>
+              </details>
+            </li>{" "}
+            <li data-review-number="6">
+              <details>
+                <summary data-study-addition="">{"問題6｜TransE — 解答・解説"}</summary>
+                <div data-review-answer-body="">
+                  <div data-review-original-answer="">
+                    {
+                      " head の座標に relation のベクトルを足した結果が、tail の座標に近いとき（距離が小さいとき）です "
+                    }
+                  </div>
+                  <div data-study-addition="" data-review-extras="">
+                    <p>
+                      <strong>具体例</strong>
+                      <span data-review-example="">
+                        {
+                          "Tokyo = (1, 1)、capital_of = (2, 0)、Japan = (3, 1) なら、Tokyo + capital_of = Japan となり、距離は0です。"
+                        }
+                      </span>
+                    </p>
+                    <p>
+                      <strong>考え方</strong>
+                      <span data-review-explanation="">
+                        {
+                          "TransE は、関係をベクトルの平行移動として表します。学習した表現で head + relation が tail に近いほど、そのトリプルをもっともらしい候補として扱います。"
+                        }
+                      </span>
+                    </p>
+                    <p data-review-caution="">
+                      <strong>つまずきやすい点</strong>
+                      <span data-review-pitfall="">
+                        {
+                          "距離が小さいことは、現実の事実が正しいという証明ではありません。埋め込みモデルによるスコアである点を区別してください。"
+                        }
+                      </span>
+                    </p>
+                    <p data-review-reference-row="">
+                      <strong>復習先</strong>
+                      <a data-review-reference="" href="#sec-10-4">
+                        {"第10章 10.4 TransE の考え方"}
+                      </a>
+                    </p>
+                  </div>
+                </div>
+              </details>
+            </li>{" "}
+            <li data-review-number="7">
+              <details>
+                <summary data-study-addition="">{"問題7｜SPARQL — 解答・解説"}</summary>
+                <div data-review-answer-body="">
+                  <div data-review-original-answer="">
+                    {"SELECT 句は結果として返す変数を、WHERE 句は照合するパターンを指定します"}
+                  </div>
+                  <div data-study-addition="" data-review-extras="">
+                    <p>
+                      <strong>具体例</strong>
+                      <span data-review-example="">
+                        {
+                          "日本にある都市を探すなら、WHERE 句で「都市である」「日本に位置する」というパターンを照合し、SELECT 句で結果に表示する都市の変数を指定します。"
+                        }
+                      </span>
+                    </p>
+                    <p>
+                      <strong>考え方</strong>
+                      <span data-review-explanation="">
+                        {
+                          "WHERE 句で条件に合う変数の組を見つけ、SELECT 句でその中から返す変数を選びます。返す列を指定するだけでは、都市を探す条件にはなりません。"
+                        }
+                      </span>
+                    </p>
+                    <p data-review-caution="">
+                      <strong>つまずきやすい点</strong>
+                      <span data-review-pitfall="">
+                        {
+                          "SELECT 句を検索条件、WHERE 句を表示する列の指定として、逆に覚えないようにしてください。"
+                        }
+                      </span>
+                    </p>
+                    <p data-review-reference-row="">
+                      <strong>復習先</strong>
+                      <a data-review-reference="" href="#sec-12-3">
+                        {"第12章 12.3 SPARQL の基本"}
+                      </a>
+                    </p>
+                  </div>
+                </div>
+              </details>
+            </li>{" "}
+            <li data-review-number="8">
+              <details>
+                <summary data-study-addition="">{"問題8｜GraphRAG — 解答・解説"}</summary>
+                <div data-review-answer-body="">
+                  <div data-review-original-answer="">
+                    {
+                      " LLM で文書から KG を作り、コミュニティの階層と要約を作って、検索と回答に使う点です "
+                    }
+                  </div>
+                  <div data-study-addition="" data-review-extras="">
+                    <p>
+                      <strong>具体例</strong>
+                      <span data-review-example="">
+                        {
+                          "複数文書に登場する組織や人物を関係でつなぎ、関連する集まりの要約を用意すると、1つの文書断片だけでは捉えにくい話題の全体像を回答に使えます。"
+                        }
+                      </span>
+                    </p>
+                    <p>
+                      <strong>考え方</strong>
+                      <span data-review-explanation="">
+                        {
+                          "このガイドの18.3節で扱う方式は、文書から実体・関係を抽出し、KG、コミュニティの階層、要約を作って検索と回答に使います。単にベクトルの類似度で文書断片を探す流れと対比してください。"
+                        }
+                      </span>
+                    </p>
+                    <p data-review-caution="">
+                      <strong>つまずきやすい点</strong>
+                      <span data-review-pitfall="">
+                        {
+                          "ここでは18.3節で紹介した方式について答えます。KG を作っただけで回答の正しさが保証されるわけではなく、抽出や要約の品質にも注意が必要です。"
+                        }
+                      </span>
+                    </p>
+                    <p data-review-reference-row="">
+                      <strong>復習先</strong>
+                      <a data-review-reference="" href="#sec-18-3">
+                        {"第18章 18.3 GraphRAG"}
+                      </a>
+                    </p>
+                  </div>
+                </div>
+              </details>
+            </li>{" "}
+          </ol>{" "}
+          <div
+            className={[styles.callout, styles["callout-glossary"]].join(" ")}
+            data-variant="glossary"
+          >
+            {" "}
+            <i
+              className={["ti", "ti-book-2", styles["callout-icon"]].join(" ")}
+              aria-hidden="true"
+            ></i>{" "}
+            <div className={styles["callout-body"]}>
+              {" "}
+              <p className={styles["callout-title"]}>{"このセクションで登場した用語"}</p>{" "}
+              <ul className={styles["glossary-list"]}>
+                {" "}
+                <li>
+                  <strong>{"ロードマップ"}</strong>
+                  {"：目標に至るまでの計画の道筋"}
+                </li>{" "}
+              </ul>{" "}
+            </div>{" "}
+          </div>{" "}
+        </section>{" "}
+        <section id="sec-20" className={styles.chapter}>
+          {" "}
+          <h2 id="sec-20-heading">{"20. 参考文献・根拠となるソース URL"}</h2>{" "}
+          <div
+            className={[styles.callout, styles["callout-intro"]].join(" ")}
+            data-variant={INTRO_VARIANT}
+          >
+            {" "}
+            <i
+              className={["ti", "ti-bulb", styles["callout-icon"]].join(" ")}
+              aria-hidden="true"
+            ></i>{" "}
+            <div className={styles["callout-body"]}>
+              {
+                " この章では、本ガイドの根拠にした情報源の URL を、種類別にまとめます。確認日はすべて2026年9月21日です。 "
+              }
+            </div>{" "}
+          </div>{" "}
+          <h3 id="sec-20-1">{"20.1 情報の確度と、このガイドの限界"}</h3>{" "}
+          <table>
+            <thead>
+              <tr>
+                <th>{"項目"} </th>
+                <th>{"内容"} </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{"書籍本文"} </td>
+                <td>
+                  {
+                    " 書籍本文は確認していません。章の節タイトルは、MIT Press の電子書籍ビューアに掲載された目次に基づきます "
+                  }{" "}
+                </td>
+              </tr>
+              <tr>
+                <td>{"パート名"} </td>
+                <td>
+                  {
+                    " Part I と Part IV の名称は目次に明記されています。Part II・III・V の名称は、出版社紹介文に基づく筆者の整理です "
+                  }{" "}
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <span className={[styles.tag, styles["tag-note"]].join(" ")}>{"補足"}</span>
+                  {" の記述"}{" "}
+                </td>
+                <td>{"一般的な知識に基づく解説で、書籍本文の記述と一致するとは限りません"} </td>
+              </tr>
+              <tr>
+                <td>{"標準の状況"} </td>
+                <td>{"RDF 1.2 や SPARQL 1.2 は策定中で、変わる可能性があります"} </td>
+              </tr>
+              <tr>
+                <td>{"図の検証"} </td>
+                <td>
+                  {
+                    " Mermaid 図16点は、mermaid v11 の構文チェック（parse）に全て合格しました。ブラウザでの描画の見た目は未確認のため、ご利用の環境で表示を確認してください "
+                  }{" "}
+                </td>
+              </tr>
+            </tbody>
+          </table>{" "}
+          <h3 id="sec-20-2">{"20.2 書籍そのものに関する情報"}</h3>{" "}
+          <table>
+            <thead>
+              <tr>
+                <th>{"情報源"} </th>
+                <th>{"URL"} </th>
+                <th>{"使った箇所"} </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{"Google ブックス（ご指定のページ）"} </td>
+                <td>
+                  {" "}
+                  <a
+                    href="https://books.google.co.jp/books/about/Knowledge_Graphs.html?id=iqvuDwAAQBAJ&redir_esc=y"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {
+                      "https://books.google.co.jp/books/about/Knowledge_Graphs.html?id=iqvuDwAAQBAJ&redir_esc=y"
+                    }
+                  </a>{" "}
+                </td>
+                <td>{"正式書名、著者、出版社、ISBN、紹介文"} </td>
+              </tr>
+              <tr>
+                <td>{"MIT Press 書籍ページ"} </td>
+                <td>
+                  {" "}
+                  <a
+                    href="https://mitpress.mit.edu/9780262045094/knowledge-graphs/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {"https://mitpress.mit.edu/9780262045094/knowledge-graphs/"}
+                  </a>{" "}
+                </td>
+                <td>{"書誌情報、紹介文"} </td>
+              </tr>
+              <tr>
+                <td>{"目次（MIT Press 電子書籍ビューア）"} </td>
+                <td>
+                  {" "}
+                  <a
+                    href="https://mitpress.ublish.com/book/knowledge-graphs-fundamentals-techniques-and-applications"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {
+                      "https://mitpress.ublish.com/book/knowledge-graphs-fundamentals-techniques-and-applications"
+                    }
+                  </a>{" "}
+                </td>
+                <td>{"全17章の節タイトル、演習130問、章末構成"} </td>
+              </tr>
+              <tr>
+                <td>
+                  {" Kejriwal, "}
+                  <em>{"Knowledge Graphs: A Practical Review of the Research Landscape"}</em>{" "}
+                </td>
+                <td>
+                  {" "}
+                  <a
+                    href="https://www.researchgate.net/publication/367745990_Knowledge_Graphs_A_Practical_Review_of_the_Research_Landscape"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {
+                      "https://www.researchgate.net/publication/367745990_Knowledge_Graphs_A_Practical_Review_of_the_Research_Landscape"
+                    }
+                  </a>{" "}
+                </td>
+                <td>{"A-Box と T-Box の説明、個数制約の例"} </td>
+              </tr>
+            </tbody>
+          </table>{" "}
+          <h3 id="sec-20-3">
+            {"20.3 著名な研究者・開発元による一次資料と、技術メディアの解説記事"}
+          </h3>{" "}
+          <p>
+            {
+              " 以下は原則として研究者・開発元による一次資料です。ただし The New Stack の記事は技術メディアによる二次資料であり、一次資料（ISO/IEC 39075 と Neo4j 標準化チームの解説）の補足として挙げています。 "
+            }
+          </p>{" "}
+          <table>
+            <thead>
+              <tr>
+                <th>{"発信者"} </th>
+                <th>{"情報源"} </th>
+                <th>{"URL"} </th>
+                <th>{"使った箇所"} </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{"Google（Amit Singhal）"} </td>
+                <td>{"Introducing the Knowledge Graph: things, not strings（2012）"} </td>
+                <td>
+                  {" "}
+                  <a
+                    href="https://blog.google/products/search/introducing-knowledge-graph-things-not/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {"https://blog.google/products/search/introducing-knowledge-graph-things-not/"}
+                  </a>{" "}
+                </td>
+                <td>{"第1章"} </td>
+              </tr>
+              <tr>
+                <td>{"Aidan Hogan ら"} </td>
+                <td>{"Knowledge Graphs, ACM Computing Surveys（2021）"} </td>
+                <td>
+                  {" "}
+                  <a
+                    href="https://doi.org/10.1145/3447772"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {"https://doi.org/10.1145/3447772"}
+                  </a>{" "}
+                </td>
+                <td>{"第1章の参考文献"} </td>
+              </tr>
+              <tr>
+                <td>{"Denny Vrandečić、Markus Krötzsch"} </td>
+                <td>{"Wikidata: A Free Collaborative Knowledgebase, CACM（2014）"} </td>
+                <td>
+                  {" "}
+                  <a
+                    href="https://cacm.acm.org/research/wikidata/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {"https://cacm.acm.org/research/wikidata/"}
+                  </a>{" "}
+                </td>
+                <td>{"第2章、第14章"} </td>
+              </tr>
+              <tr>
+                <td>{"Antoine Bordes ら"} </td>
+                <td>{"Translating Embeddings for Modeling Multi-relational Data（NIPS 2013）"} </td>
+                <td>
+                  {" "}
+                  <a
+                    href="https://papers.nips.cc/paper/5071-translating-embeddings-for-modeling-multi-relational-data"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {
+                      "https://papers.nips.cc/paper/5071-translating-embeddings-for-modeling-multi-relational-data"
+                    }
+                  </a>{" "}
+                </td>
+                <td>{"第10章"} </td>
+              </tr>
+              <tr>
+                <td>{"Pujara ら"} </td>
+                <td>{"Knowledge Graph Identification（ISWC 2013）"} </td>
+                <td>
+                  {" "}
+                  <a
+                    href="https://link.springer.com/chapter/10.1007/978-3-642-41335-3_34"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {"https://link.springer.com/chapter/10.1007/978-3-642-41335-3_34"}
+                  </a>{" "}
+                </td>
+                <td>{"第9章"} </td>
+              </tr>
+              <tr>
+                <td>{"Shirui Pan ら"} </td>
+                <td>
+                  {
+                    " Unifying Large Language Models and Knowledge Graphs: A Roadmap（IEEE TKDE 2024） "
+                  }{" "}
+                </td>
+                <td>
+                  {" "}
+                  <a
+                    href="https://arxiv.org/abs/2306.08302"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {"https://arxiv.org/abs/2306.08302"}
+                  </a>{" "}
+                </td>
+                <td>{"第18章"} </td>
+              </tr>
+              <tr>
+                <td>{"Shirui Pan"} </td>
+                <td>{"上記論文についての著者本人の投稿（LinkedIn）"} </td>
+                <td>
+                  {" "}
+                  <a
+                    href="https://www.linkedin.com/posts/shirui-pan_unifying-large-language-models-and-knowledge-activity-7075334111829114880-5iQl"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {
+                      "https://www.linkedin.com/posts/shirui-pan_unifying-large-language-models-and-knowledge-activity-7075334111829114880-5iQl"
+                    }
+                  </a>{" "}
+                </td>
+                <td>{"第18章"} </td>
+              </tr>
+              <tr>
+                <td>{"Microsoft Research（Jonathan Larson、Steven Truitt）"} </td>
+                <td>
+                  {
+                    " GraphRAG: Unlocking LLM discovery on narrative private data（2024年2月13日） "
+                  }{" "}
+                </td>
+                <td>
+                  {" "}
+                  <a
+                    href="https://www.microsoft.com/en-us/research/blog/graphrag-unlocking-llm-discovery-on-narrative-private-data/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {
+                      "https://www.microsoft.com/en-us/research/blog/graphrag-unlocking-llm-discovery-on-narrative-private-data/"
+                    }
+                  </a>{" "}
+                </td>
+                <td>{"第18章"} </td>
+              </tr>
+              <tr>
+                <td>{"Microsoft Research"} </td>
+                <td>{"Project GraphRAG"} </td>
+                <td>
+                  {" "}
+                  <a
+                    href="https://www.microsoft.com/en-us/research/project/graphrag/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {"https://www.microsoft.com/en-us/research/project/graphrag/"}
+                  </a>{" "}
+                </td>
+                <td>{"第18章"} </td>
+              </tr>
+              <tr>
+                <td>{"Microsoft"} </td>
+                <td>{"GraphRAG 公式ドキュメント"} </td>
+                <td>
+                  {" "}
+                  <a
+                    href="https://microsoft.github.io/graphrag/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {"https://microsoft.github.io/graphrag/"}
+                  </a>{" "}
+                </td>
+                <td>{"第18章"} </td>
+              </tr>
+              <tr>
+                <td>{"Microsoft Research"} </td>
+                <td>{"GraphRAG 論文（プレプリント）"} </td>
+                <td>
+                  {" "}
+                  <a
+                    href="https://arxiv.org/abs/2404.16130"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {"https://arxiv.org/abs/2404.16130"}
+                  </a>{" "}
+                </td>
+                <td>{"第18章（一次資料での確認用）"} </td>
+              </tr>
+              <tr>
+                <td>{"Neo4j"} </td>
+                <td>{"The GraphRAG manifesto"} </td>
+                <td>
+                  {" "}
+                  <a
+                    href="https://neo4j.com/blog/genai/graphrag-manifesto/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {"https://neo4j.com/blog/genai/graphrag-manifesto/"}
+                  </a>{" "}
+                </td>
+                <td>{"第18章"} </td>
+              </tr>
+              <tr>
+                <td>{"Neo4j 標準化チーム"} </td>
+                <td>{"Creating the GQL database language standard"} </td>
+                <td>
+                  {" "}
+                  <a
+                    href="https://neo4j.com/blog/cypher-and-gql/gql-database-language-standard/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {"https://neo4j.com/blog/cypher-and-gql/gql-database-language-standard/"}
+                  </a>{" "}
+                </td>
+                <td>{"第12章"} </td>
+              </tr>
+              <tr>
+                <td>{"Stefan Plantikow（Neo4j、GQL 編集者）"} </td>
+                <td>{"NODES 2024 セッション"} </td>
+                <td>
+                  {" "}
+                  <a
+                    href="https://neo4j.com/nodes2024/agenda/a-new-era-for-graph-queries-iso-iec-39075-gql/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {
+                      "https://neo4j.com/nodes2024/agenda/a-new-era-for-graph-queries-iso-iec-39075-gql/"
+                    }
+                  </a>{" "}
+                </td>
+                <td>{"第12章（補足）"} </td>
+              </tr>
+              <tr>
+                <td>{"The New Stack（二次資料）"} </td>
+                <td>{"GQL: A New ISO Standard for Querying Graph Databases"} </td>
+                <td>
+                  {" "}
+                  <a
+                    href="https://thenewstack.io/gql-a-new-iso-standard-for-querying-graph-databases/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {"https://thenewstack.io/gql-a-new-iso-standard-for-querying-graph-databases/"}
+                  </a>{" "}
+                </td>
+                <td>{"第12章"} </td>
+              </tr>
+              <tr>
+                <td>{"Google Cloud"} </td>
+                <td>{"Spanner Graph and ISO standards"} </td>
+                <td>
+                  {" "}
+                  <a
+                    href="https://docs.cloud.google.com/spanner/docs/graph/iso-standards"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {"https://docs.cloud.google.com/spanner/docs/graph/iso-standards"}
+                  </a>{" "}
+                </td>
+                <td>{"第12章"} </td>
+              </tr>
+            </tbody>
+          </table>{" "}
+          <h3 id="sec-20-4">{"20.4 標準化団体の仕様"}</h3>{" "}
+          <table>
+            <thead>
+              <tr>
+                <th>{"仕様"} </th>
+                <th>{"URL"} </th>
+                <th>{"使った箇所"} </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{"RDF 1.1 Primer（W3C）"} </td>
+                <td>
+                  {" "}
+                  <a
+                    href="https://www.w3.org/TR/rdf11-primer/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {"https://www.w3.org/TR/rdf11-primer/"}
+                  </a>{" "}
+                </td>
+                <td>{"第2章"} </td>
+              </tr>
+              <tr>
+                <td>{"RDF 1.1 Concepts and Abstract Syntax（W3C）"} </td>
+                <td>
+                  {" "}
+                  <a
+                    href="https://www.w3.org/TR/rdf11-concepts/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {"https://www.w3.org/TR/rdf11-concepts/"}
+                  </a>{" "}
+                </td>
+                <td>{"第2章"} </td>
+              </tr>
+              <tr>
+                <td>{"RDF 1.2 Concepts and Abstract Data Model（W3C）"} </td>
+                <td>
+                  {" "}
+                  <a
+                    href="https://www.w3.org/TR/rdf12-concepts/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {"https://www.w3.org/TR/rdf12-concepts/"}
+                  </a>{" "}
+                </td>
+                <td>{"第2章、第18章"} </td>
+              </tr>
+              <tr>
+                <td>{"RDF 1.2 Semantics（W3C、CR Snapshot 2026-04-07）"} </td>
+                <td>
+                  {" "}
+                  <a
+                    href="https://www.w3.org/TR/2026/CR-rdf12-semantics-20260407/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {"https://www.w3.org/TR/2026/CR-rdf12-semantics-20260407/"}
+                  </a>{" "}
+                </td>
+                <td>{"第2章"} </td>
+              </tr>
+              <tr>
+                <td>{"W3C ニュース：RDF 1.2 の実装募集（2026-04-07）"} </td>
+                <td>
+                  {" "}
+                  <a
+                    href="https://www.w3.org/news/2026/w3c-invites-implementations-of-rdf-1-2-concepts-and-abstract-data-model-and-rdf-1-2-semantics/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {
+                      "https://www.w3.org/news/2026/w3c-invites-implementations-of-rdf-1-2-concepts-and-abstract-data-model-and-rdf-1-2-semantics/"
+                    }
+                  </a>{" "}
+                </td>
+                <td>{"第2章"} </td>
+              </tr>
+              <tr>
+                <td>{"What's New in RDF 1.2（W3C Group Note Draft・非規範文書）"} </td>
+                <td>
+                  {" "}
+                  <a
+                    href="https://www.w3.org/TR/2026/DNOTE-rdf12-new-20260714/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {"https://www.w3.org/TR/2026/DNOTE-rdf12-new-20260714/"}
+                  </a>{" "}
+                </td>
+                <td>{"第2章"} </td>
+              </tr>
+              <tr>
+                <td>{"SPARQL 1.1 Query Language（W3C）"} </td>
+                <td>
+                  {" "}
+                  <a
+                    href="https://www.w3.org/TR/sparql11-query/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {"https://www.w3.org/TR/sparql11-query/"}
+                  </a>{" "}
+                </td>
+                <td>{"第12章"} </td>
+              </tr>
+              <tr>
+                <td>{"SPARQL 1.2 Protocol（W3C）"} </td>
+                <td>
+                  {" "}
+                  <a
+                    href="https://www.w3.org/TR/sparql12-protocol/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {"https://www.w3.org/TR/sparql12-protocol/"}
+                  </a>{" "}
+                </td>
+                <td>{"第12章、第18章"} </td>
+              </tr>
+            </tbody>
+          </table>{" "}
+          <h3 id="sec-20-5">{"20.5 さらに学ぶための読み方"}</h3>{" "}
+          <ol>
+            {" "}
+            <li>{"まず本書の目次（20.2）で、読みたい章を選ぶ"}</li>{" "}
+            <li>{"用語の全体像は Hogan らの調査論文で確認する"}</li>{" "}
+            <li>
+              {
+                " 実装に入るときは、W3C の仕様（20.4）と、各製品のドキュメントで最新の状況を確認する "
+              }
+            </li>{" "}
+            <li>
+              {
+                " LLM との組み合わせは、Pan らのロードマップ論文と、GraphRAG の公式ドキュメントから読む "
+              }
+            </li>{" "}
+          </ol>{" "}
+          <div
+            className={[styles.callout, styles["callout-glossary"]].join(" ")}
+            data-variant="glossary"
+          >
+            {" "}
+            <i
+              className={["ti", "ti-book-2", styles["callout-icon"]].join(" ")}
+              aria-hidden="true"
+            ></i>{" "}
+            <div className={styles["callout-body"]}>
+              {" "}
+              <p className={styles["callout-title"]}>{"このセクションで登場した用語"}</p>{" "}
+              <ul className={styles["glossary-list"]}>
+                {" "}
+                <li>
+                  {" "}
+                  <strong>{"一次資料"}</strong>
+                  {"：情報の出どころ本人が公開した資料（論文、仕様書、公式ブログなど） "}
+                </li>{" "}
+                <li>
+                  <strong>{"プレプリント"}</strong>
+                  {"：査読前に公開された論文原稿"}
+                </li>{" "}
+              </ul>{" "}
+            </div>{" "}
+          </div>{" "}
+        </section>{" "}
+        <footer className={styles.footer}>
+          {" "}
+          <p>
+            {
+              " 本ガイドは書籍の公開目次・出版社紹介文・W3C や ISO などの一次情報をもとに作成した学習補助資料です。書籍本文の要約・転載ではありません。詳細な出典は第20章を参照してください。 "
+            }
+          </p>{" "}
+        </footer>{" "}
+      </main>{" "}
+      <button
+        id="back-to-top"
+        className={styles["back-to-top"]}
+        aria-label="ページ上部に戻る"
+        type="button"
+      >
+        {" "}
+        <i className={["ti", "ti-arrow-up"].join(" ")} aria-hidden="true"></i>{" "}
+      </button>
+    </div>
+  );
+}

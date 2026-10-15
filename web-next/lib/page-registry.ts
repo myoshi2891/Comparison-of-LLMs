@@ -216,6 +216,92 @@ const entries: PageEntry[] = [
     lastReviewed: "2026-10-11",
   },
   {
+    slug: "/books/llm-engineers-handbook",
+    title: "LLM Engineer's Handbook",
+    description:
+      "Packt刊『LLM Engineer's Handbook』を基に、LLM Twinという1つの具体的プロダクト構築を通じて、データ収集・RAG・ファインチューニング・評価・推論最適化・デプロイ・MLOps/LLMOpsまでを学ぶ初学者向け実践ガイド。",
+    group: "推薦書籍",
+    topics: [
+      "book",
+      "generative-ai",
+      "llmops",
+      "rag",
+      "fine-tuning",
+      "sft",
+      "dpo",
+      "mlops",
+      "guide",
+    ],
+    summary:
+      "Packt刊『LLM Engineer's Handbook』をベースに、自分の文章スタイルを模倣するAI分身「LLM Twin」の構築を通じて、データ収集・RAG・SFT・DPO・評価・推論最適化・デプロイ・MLOps/LLMOpsを体系的に学ぶ初学者向けガイド。",
+    addedAt: "2026-10-14",
+    lastReviewed: "2026-10-14",
+  },
+  {
+    slug: "/books/adversarial-robustness",
+    title: "Adversarial Robustness for Machine Learning",
+    description:
+      "Pin-Yu Chen氏・Cho-Jui Hsieh氏著『Adversarial Robustness for Machine Learning』をベースに、敵対的攻撃(FGSM/PGD/C&W)、防御(Adversarial Training/Certified Robustness)、評価方法、およびLLM時代のセキュリティ(GCG/NIST/MITRE)を体系的に学ぶ初学者向け実践ガイド。",
+    group: "推薦書籍",
+    topics: [
+      "book",
+      "security",
+      "adversarial-robustness",
+      "machine-learning",
+      "llm-security",
+      "guide",
+    ],
+    summary:
+      "Pin-Yu Chen氏・Cho-Jui Hsieh氏著『Adversarial Robustness for Machine Learning』を土台に、敵対的攻撃(FGSM/PGD/C&W)、防御(Adversarial Training/Certified Robustness)、評価方法、およびLLM時代のセキュリティ(GCG/NIST/MITRE)をステップバイステップで学ぶ初学者向けガイド。",
+    addedAt: "2026-10-14",
+    lastReviewed: "2026-10-14",
+  },
+  {
+    slug: "/books/knowledge-graphs-fundamentals-techniques",
+    title: "Knowledge Graphs 基礎・技法・応用ガイド",
+    description:
+      "Knowledge Graphs: Fundamentals, Techniques, and Applicationsを土台に、RDF・情報抽出・照合・表現学習・SPARQL・質問応答・GraphRAGを段階的に学ぶ初学者向けガイド。",
+    group: "推薦書籍",
+    topics: ["book", "knowledge-graph", "rdf", "sparql", "llm", "graphrag"],
+    summary:
+      "Knowledge Graphs: Fundamentals, Techniques, and Applicationsを土台に、RDF・情報抽出・照合・表現学習・SPARQL・質問応答・GraphRAGを段階的に学ぶ初学者向けガイド。",
+    addedAt: "2026-10-15",
+    lastReviewed: "2026-10-15",
+  },
+  {
+    slug: "/books/knowledge-graphs-and-llms-in-action",
+    title: "Knowledge Graphs and LLMs in Action 完全ガイド",
+    description:
+      "Knowledge Graphs and LLMs in Actionを土台に、ナレッジグラフの構築、グラフ機械学習、GraphRAG、Neo4j、LangGraphによるQAエージェントを学ぶ初学者向け完全ガイド。",
+    group: "推薦書籍",
+    topics: ["book", "knowledge-graph", "llm", "rag", "graphrag", "neo4j", "langgraph"],
+    summary:
+      "Knowledge Graphs and LLMs in Actionを土台に、ナレッジグラフの構築、グラフ機械学習、GraphRAG、Neo4j、LangGraphによるQAエージェントを学ぶ初学者向け完全ガイド。",
+    addedAt: "2026-10-15",
+    lastReviewed: "2026-10-15",
+  },
+  {
+    slug: "/books/hands-on-large-language-models",
+    title: "Hands-On Large Language Models 完全読解ガイド",
+    description:
+      "Jay Alammar 氏・Maarten Grootendorst 氏著『Hands-On Large Language Models』を土台に、LLMの基礎、トークンと埋め込み、Transformer内部構造、分類・検索・生成・RAG・マルチモーダル、訓練とファインチューニング、2026年9月の最新動向までを体系的に学ぶ実践ガイド。",
+    group: "推薦書籍",
+    topics: [
+      "book",
+      "llm",
+      "transformer",
+      "embeddings",
+      "rag",
+      "fine-tuning",
+      "multimodal",
+      "guide",
+    ],
+    summary:
+      "Jay Alammar 氏・Maarten Grootendorst 氏著『Hands-On Large Language Models』の全12章を土台に、言語モデルの基礎から実践的活用、モデル訓練・ファインチューニング、2026年9月動向までを27のMermaid図解とともに学ぶ初学者向け完全読解ガイド。",
+    addedAt: "2026-10-14",
+    lastReviewed: "2026-10-14",
+  },
+  {
     slug: "/ci-cd/ai-cicd-automation-best-practices",
     title: "AI CI/CD Automation",
     group: "開発プロセス",
@@ -867,6 +953,16 @@ const entries: PageEntry[] = [
       "RAG (検索拡張生成) と Embedding (埋め込み) についてゼロから実務レベルまで理解できるように、チャンキング、モデル選定、ベクトルDB、検索最適化、本番運用、評価方法などを体系的に解説する完全ガイド。",
     addedAt: "2026-07-12",
     lastReviewed: "2026-07-12",
+  },
+  {
+    slug: "/rag/enterprise-guide",
+    title: "エンタープライズRAG完全ガイド",
+    group: "モデル・データ",
+    topics: ["rag", "enterprise", "vector-db", "embedding", "agentic-rag", "graphrag"],
+    summary:
+      "エンタープライズRAG(Retrieval-Augmented Generation)を初学者向けにステップバイステップで解説する技術ガイド。ドキュメント前処理・チャンキング、Embedding・ベクトルDB選定、ハイブリッド検索、リランキング、GraphRAG、Agentic RAG、セキュリティ、評価フレームワーク、本番運用の全体像を網羅。",
+    addedAt: "2026-10-14",
+    lastReviewed: "2026-10-14",
   },
   {
     slug: "/search",

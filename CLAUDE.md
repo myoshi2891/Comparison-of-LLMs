@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Updated 2026-10-11
+Updated 2026-10-15
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
@@ -9,6 +9,90 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 AIモデルの時間別コスト計算機 + AI ツール導入ガイド群。Python スクレイパーが各社料金ページから価格を自動取得し `pricing.json` を生成、**Next.js 16 App Router（SSG / `output: 'export'`）** がそれを読み込んで Netlify CDN へ配信する。Phase 1–14 でコスト計算機ページが Next.js 化済み。18 枚のガイドページ（旧 `legacy/` 配下）は Phase A–F で **全移行完了**（計画書は [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](docs/archive/NEXTJS_PHASE_A_F_PLAN.md) に保存）。さらに追加移行ページとして `/claude/managed-agents` や `/code-review/coderabbit-guide` 等を設置。
 
 ## アーキテクチャ
+
+推薦書籍 `/books/knowledge-graphs-fundamentals-techniques` を追加（2026-10-15）。
+指定HTMLの全22 H2・121 H3・190段落・32リスト／129項目・40表／195行・9コード例・
+16 Mermaid図解・44 callout・本文28外部リンクをPure JSXへ完全転写。80 CSS規則と本文を
+原本由来の固定期待値で照合し、30ページ契約と14操作契約で移行漏れを検知する。
+原本の320px固定目次、980px以下の通常フロー、用語集2列／1列、リストの点・番号・入れ子を保持。
+表の全列左寄せ、コードの改行・インデント、見出しのスクロール余白と目次リンクのCSSカスケードを検証。
+Python／SQLの構文色は原本のhighlight.js 11.9.0で生成した全トークンと完全一致し、
+三重引用符の複数行文字列も保持する。Turtle／SPARQL／textは原本どおりプレーン表示。
+共有クロームのページ限定補正はglobals.cssへ集約し、registryからナビ・検索・RSSを導出する。
+HTML／Markdownはarchive/html/books/／archive/md/books/へ内容無変更で保存（SHA-256一致）。
+HTMLを正本とし、本文の基準日2026年9月21日を維持。Markdownはラベル表記などに差があるため混在させない。
+原本監査exit 0、全16図はMermaid 10.9.8で解析成功。全体Vitest **203 files / 2085 tests**、
+対象44契約、typecheck・lint（560 files／0 diagnostics）が成功。操作処理の行・関数・分岐は100%。
+計測時だけ既存の一時ローダーでキャッシュ済みjs-tokens 10を解決し、依存・設定・ロックは変更しない。
+npm・ビルド・スクレイパー検証・ブラウザ自動確認は未実行。CSSキャッシュを退避してdevを3001番で再起動し、
+新規ルートのHTTP 200を確認。目視はユーザー担当。
+
+2026-10-15 に同ガイドの19.2／19.3をブラッシュアップ。既存8問・8解答は保持し、
+問題カードの学習目標、解答ごとのネイティブ開閉、全8件の具体例・解説・注意点・復習リンクを追加。
+原本の固定期待値は変更せず、補足の内容と開閉・番号・フォーカス表示を8契約で追加検証する。
+対象52契約、HTML原本監査exit 0、全体Vitest **204 files / 2093 tests**、typecheck・
+lint（562 files／0 diagnostics）が成功。npm・ビルドは未実行、目視はユーザー担当（ポート3001）。
+
+Knowledge Graphs and LLMs in Actionのサイドバー保守（2026-10-15）: `.layout a` の詳細度が目次の通常色・ホバー装飾を上書きする
+競合をページ内で補正。CSSエンジンによるカスケード2契約とスクロール操作7契約を追加し、
+原本の固定期待値を変えず計53契約で検証する。短い見出しの交差通知を取りこぼす問題は、
+スクロール・リサイズ・初期表示時のviewport座標による位置判定で修正。通知順にも依存しない。
+全体Vitest **201 files / 2039 tests**、typecheck・lint（553 files／0 diagnostics）・原本監査exit 0が成功。
+npm・ビルドは未実行、目視はユーザー担当。
+
+推薦書籍 `/books/knowledge-graphs-and-llms-in-action` を追加（2026-10-15）。指定HTMLの全95見出し・
+80段落・53リスト／157項目・31表／195行・14コード例・18 Mermaid図解・14引用・18折りたたみ・
+46根拠バッジをPure JSXへ転写。31ページ契約と13操作契約で本文・構造・CSS・コピー・目次追従を照合する。
+320px固定目次と960px以下の通常フロー目次、原本の暗色配色・図解テーマ、リストの点・番号・入れ子を保持。
+HTML／Markdownは内容無変更で `archive/html/books/`／`archive/md/books/` に保存。指定HTMLを正本とし、
+本文の調査基準日2026年9月21日を維持する。両形式にはLangGraphのエラー分岐などに差がある。
+原本監査exit 0、18図解の構文解析成功、全体Vitest **201 files / 2030 tests**、
+typecheck・lint（553 files／0 diagnostics）が成功。操作処理は行・関数100%、分岐86.84%。
+監査のDIAGRAMS配列・文字参照・JSXエスケープ対応を4つのRedテストから追加し、監査38件成功。
+既存の未コミット監査変更は保持。依存・設定は変更せず、npm・ビルドは未実行。目視確認はユーザー担当。
+
+推薦書籍 `/books/hands-on-large-language-models` を追加（2026-10-14）。指定HTMLの全10 H2・
+22 H3・16 H4・96段落・56リスト項目・7表／64行（書籍情報kv表8行、アーキテクチャ比較表、
+RAG/ファインチューニング比較表等）・27 Mermaid図解・17チェック項目・24参考文献カード（24外部リンク）を
+Pure JSXへ転写。原本から固定した本文・構造を22件の契約テストで照合する。
+表の全列左寄せ、アンカー移動の見出しめり込み防止を徹底。
+書籍情報カード（O'Reilly公式ページリンク、著者Jay Alammar & Maarten Grootendorst）、Hero kicker、
+メタ情報タグ4件、全27箇所の Mermaid 図解に淡色パレット（theme='base'）を適用。
+ヒーローセクション内に日付（最終確認日・公開日）を黒文字（var(--text)）で統合し、
+グローバルの黒背景鮮度バーを完全非表示（display: none !important）にして余白を解消。
+関連ページフッターを固定サイドバー幅（340px）オフセットし、900px以下では全幅に戻す。
+原本HTML／Markdownは `archive/html/books/Hands-on-large-language-models-guide.html`／
+`archive/md/books/Hands-on-large-language-models-guide.md` に内容無変更で保存。
+指定HTMLを正本とし、registryの追加・確認日は2026-10-14。HTML原本監査exit 0、全体Vitest **197 files / 1970 tests**、
+typecheck、lint（545 files／0 diagnostics）が成功。npm・ビルドは未実行、目視確認はユーザー担当。
+
+推薦書籍 `/books/adversarial-robustness` を追加（2026-10-14）。指定HTMLの全19 H2・
+12 H3・41段落・34リスト項目・7表／66行（書籍情報kv表8行、全26章一覧表27行を含む）・
+1数式ブロック（minimax最適化問題）・12 Mermaid図解・3 callout・10チェック項目・
+22参考文献カード（23外部リンク）をPure JSXへ転写。原本から固定した本文・構造を20件の契約テストで照合する。
+表の全列左寄せ、コードブロックのインデント、アンカー移動の見出しめり込み防止を徹底。
+書籍情報カード（Plum callout、Elsevier公式リンク）、Hero kicker（AI Security 初学者ガイド）、
+メタ情報タグ4件、全12箇所の Mermaid 図解に淡色パレット（theme='base'）を適用。
+ヒーローセクション内に日付（最終確認日・公開日）を黒文字（var(--ink)、#241f18）で統合し、
+グローバルの黒背景鮮度バーを完全非表示（display: none !important）にして余白を解消。
+関連ページフッターを固定サイドバー幅（300px）オフセットし、背景色（#f6f1e3）および
+カード配色（#fffdf7 / #e4dbc4）をメインコンテンツと完全に同期。
+原本HTML／Markdownは `archive/html/books/Adversarial-robustness-for-machine-learning-guide.html`／
+`archive/md/books/Adversarial-robustness-for-machine-learning-guide.md` に内容無変更で保存。
+指定HTMLを正本とし、registryの追加・確認日は2026-10-14。HTML原本監査exit 0、全体Vitest **194 files / 1917 tests**、
+typecheck、lint（535 files／0 diagnostics）が成功。npm・ビルドは未実行、目視確認はユーザー担当。
+
+推薦書籍 `/books/llm-engineers-handbook` を追加（2026-10-14）。指定HTMLの全15 H2・
+20 H3・55段落・83リスト項目・55表行・2コードブロック・8 Mermaid・5 callout・10チェック項目・
+15参考文献リンクをPure JSXへ転写。原本から固定した本文・構造を21件の契約テストで照合する。
+表の全列左寄せ、コードブロックのインデント、アンカー移動の見出しめり込み防止を徹底。
+ヒーローセクション内に日付（最終確認日・公開日）を黒文字で統合し、グローバルの黒背景鮮度バーを
+完全非表示（display: none !important）にしてディスクレイマー下の不要余白を解消。
+関連ページフッターを固定サイドバー幅（280px）オフセットし、Mermaid 8図解に淡色パレット（theme='base'）を適用。
+原本HTML／Markdownは `archive/html/books/Llm-engineers-handbook-beginner-guide.html`／
+`archive/md/books/Llm-engineers-handbook-beginner-guide.md` に内容無変更で保存。指定HTMLを正本とし、
+registryの追加・確認日は2026-10-14。HTML原本監査exit 0、全体Vitest **193 files / 1897 tests**、
+typecheck、lint（531 files／0 diagnostics）が成功。npm・ビルドは未実行、目視確認はユーザー担当。
 
 推薦書籍 `/books/generative-ai-with-langchain` を追加（2026-10-11）。指定HTMLの全13 H2・
 38 H3・49段落（図解の代替説明8件を含む）・4リスト／15項目・11表／67行・12コード例・
@@ -348,7 +432,7 @@ Build:     cd web-next && bun run build
 以下を全て確認してからコミットすること：
 
 1. `cd web-next && bun run build` が成功（※Antigravityサンドボックス環境では実行禁止。他環境やCIでは必須）
-2. `cd web-next && bun run test` が完全に成功（192 files / 1876 tests pass、2026-10-11実測。Node 24で `NODE_OPTIONS=--no-experimental-webstorage` と `--maxWorkers=1 --testTimeout=30000` を使用。収集失敗もブロッキング失敗として原因を調査する）
+2. `cd web-next && bun run test` が完全に成功（204 files / 2093 tests pass、2026-10-15実測。`NODE_OPTIONS=--no-experimental-webstorage` と `--maxWorkers=1 --testTimeout=30000` を使用。収集失敗もブロッキング失敗として原因を調査する）
 3. `cd web-next && bun run typecheck` が成功
 4. `cd web-next && bun run lint` が成功
 5. `cd scraper && uv run pytest` が成功

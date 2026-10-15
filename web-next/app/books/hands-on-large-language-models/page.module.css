@@ -1,0 +1,502 @@
+/* Hands-On Large Language Models 完全読解ガイド スタイルシート */
+
+.layout {
+  --bg: #07111e;
+  --panel: #0d1a2e;
+  --panel-2: #101f36;
+  --border: #1c2e4a;
+  --text: #dbe4f5;
+  --text-dim: #8ea0c2;
+  --accent: #7c9eff;
+  --accent-dim: #4f6db3;
+  --danger-bg: #3a1420;
+  --danger-border: #c05a6e;
+  --danger-text: #f5d8de;
+  --warn-bg: #3a2a1e;
+  --warn-border: #e0a45c;
+  --warn-text: #f7e3c9;
+  --success-bg: #123024;
+  --success-border: #4caf7d;
+  --success-text: #d9f5e6;
+  --neutral-bg: #2a2f3a;
+  --neutral-border: #8a94a6;
+  --neutral-text: #e6e9ef;
+  --sidebar-w: 340px;
+  --font-stack:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Kaku Gothic ProN", "Hiragino Sans",
+    "Yu Gothic UI", "Meiryo", system-ui, sans-serif;
+
+  display: block;
+  width: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-stack);
+  line-height: 1.85;
+  font-size: 16.5px;
+  min-height: 100vh;
+}
+
+/* body・日付バー・関連ページの共有クローム補正は globals.css が担当する。
+   ここでは .layout の兄弟である .sidebarToggle が参照する変数のみ body 側に定義する。 */
+:global(body:has([data-page="hands-on-large-language-models"])) {
+  --panel: #0d1a2e;
+  --text: #dbe4f5;
+}
+
+/* ---------- Sidebar ---------- */
+.sidebar {
+  position: fixed;
+  top: calc(var(--header-height, 60px) + var(--ch-disclaimer-height, 0px));
+  left: 0;
+  bottom: 0;
+  width: var(--sidebar-w);
+  height: calc(100vh - var(--header-height, 60px) - var(--ch-disclaimer-height, 0px));
+  overflow-y: auto;
+  background: var(--panel);
+  border-right: 1px solid var(--border);
+  padding: 24px 0 40px 0;
+  z-index: 100;
+}
+
+.sidebarBrand {
+  padding: 0 20px 18px 22px;
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--accent);
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 10px;
+  letter-spacing: 0.02em;
+}
+
+.navList {
+  list-style: none;
+  margin: 0;
+  padding: 0 10px;
+}
+
+.navH2 {
+  margin: 2px 0;
+}
+
+.navSub {
+  list-style: none;
+  margin: 2px 0 6px 0;
+  padding-left: 14px;
+  border-left: 1px solid var(--border);
+}
+
+.navH3 {
+  margin: 1px 0;
+}
+
+.navLink {
+  display: block;
+  padding: 7px 12px;
+  border-radius: 8px;
+  color: var(--text-dim);
+  text-decoration: none;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+
+.navLinkH2 {
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.navLinkH3 {
+  font-size: 13.5px;
+}
+
+.navLink:hover {
+  background: var(--panel-2);
+  color: var(--accent);
+}
+
+.navLink.active,
+.active {
+  background: var(--panel-2);
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.sidebarToggle {
+  display: none;
+  position: fixed;
+  top: calc(var(--header-height, 60px) + var(--ch-disclaimer-height, 0px) + 14px);
+  left: 14px;
+  z-index: 200;
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-size: 20px;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+/* ---------- Main ---------- */
+.main {
+  margin-left: var(--sidebar-w);
+  padding: 32px 64px 100px 64px;
+  min-width: 0;
+}
+
+.hero {
+  margin-bottom: 40px;
+}
+
+.hero h1 {
+  font-size: clamp(28px, 4vw, 42px);
+  line-height: 1.35;
+  margin: 0 0 18px 0;
+  background: linear-gradient(90deg, #eaf1ff, var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.heroPills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 16px;
+  border-radius: 999px;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  color: var(--accent);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.main h2 {
+  font-size: 28px;
+  margin: 56px 0 20px 0;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--border);
+  color: #f0f4ff;
+  scroll-margin-top: calc(var(--header-height, 60px) + 80px);
+}
+
+.main h3 {
+  font-size: 22px;
+  margin: 40px 0 16px 0;
+  color: #e3ebff;
+  scroll-margin-top: calc(var(--header-height, 60px) + 80px);
+}
+
+.main h4 {
+  font-size: 17.5px;
+  margin: 30px 0 12px 0;
+  color: var(--accent);
+  scroll-margin-top: calc(var(--header-height, 60px) + 80px);
+}
+
+.main p,
+.main ul,
+.main ol {
+  color: var(--text);
+  margin: 0 0 18px 0;
+}
+
+.main ul,
+.main ol {
+  padding-left: 1.4em;
+}
+
+.main li {
+  margin-bottom: 6px;
+}
+
+.main strong {
+  color: #fff;
+}
+
+.main hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 44px 0;
+}
+
+.main a {
+  color: var(--accent);
+}
+
+.main :global(code) {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.9em;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--panel-2);
+  color: var(--accent);
+  border: 1px solid var(--border);
+}
+
+blockquote.lede,
+.lede {
+  margin: 0 0 32px 0;
+  padding: 20px 24px;
+  background: var(--panel);
+  border-left: 4px solid var(--accent);
+  border-radius: 0 10px 10px 0;
+  color: var(--text-dim);
+  font-size: 15.5px;
+}
+
+blockquote.lede p,
+.lede p {
+  margin: 0;
+  color: var(--text-dim);
+}
+
+p.disclaimer,
+.disclaimer {
+  margin-top: 48px;
+  padding: 16px 20px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text-dim);
+  font-size: 14px;
+}
+
+p.disclaimer em,
+.disclaimer em {
+  color: var(--text-dim);
+  font-style: italic;
+}
+
+/* ---------- Tables ---------- */
+.tableScroll {
+  overflow-x: auto;
+  margin: 0 0 28px 0;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+}
+
+.tableScroll :global(table) {
+  border-collapse: collapse;
+  width: 100%;
+  min-width: 480px;
+}
+
+.tableScroll :global(th),
+.tableScroll :global(td),
+.tableScroll :global(thead th:not(:first-child)) {
+  padding: 12px 16px;
+  text-align: left !important;
+  font-size: 15px;
+  border-bottom: 1px solid var(--border);
+}
+
+.tableScroll :global(thead tr.header),
+.tableScroll :global(thead tr) {
+  background: var(--panel-2);
+}
+
+.tableScroll :global(th) {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.tableScroll :global(tr.odd) {
+  background: var(--panel);
+}
+
+.tableScroll :global(tr.even) {
+  background: var(--bg);
+}
+
+/* ---------- Mermaid Diagram Wrapper ---------- */
+.mermaidWrap {
+  width: 100%;
+  margin: 0 0 32px 0;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px 12px;
+  overflow-x: auto;
+}
+
+/* ---------- Checklist ---------- */
+.checklistCard {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px 22px 8px 22px;
+  margin: 0 0 28px 0;
+}
+
+.checklistHeader {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 10px;
+}
+
+.checklistProgress {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--accent);
+  background: var(--panel-2);
+  padding: 4px 12px;
+  border-radius: 999px;
+}
+
+.checklistList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.checklistList li {
+  border-top: 1px solid var(--border);
+  margin: 0;
+}
+
+.checklistList li:hover {
+  background: var(--panel-2);
+}
+
+.checklistList label {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 6px;
+  cursor: pointer;
+  color: var(--text);
+}
+
+.checklistList input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  border: 2px solid var(--accent-dim);
+  border-radius: 5px;
+  margin-top: 2px;
+  position: relative;
+  cursor: pointer;
+  background: transparent;
+}
+
+.checklistList input[type="checkbox"]:checked {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.checklistList input[type="checkbox"]:checked::after {
+  content: "";
+  position: absolute;
+  left: 5px;
+  top: 1px;
+  width: 5px;
+  height: 10px;
+  border: solid var(--bg);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.checklistList li:has(input:checked) label span {
+  text-decoration: line-through;
+  color: var(--text-dim);
+}
+
+/* ---------- Reference grid ---------- */
+.refGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr));
+  gap: 14px;
+  margin: 0 0 28px 0;
+}
+
+.refCard {
+  display: flex;
+  gap: 14px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px 18px;
+  min-width: 0;
+}
+
+.refBadge {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: var(--panel-2);
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.refBody {
+  min-width: 0;
+  flex: 1;
+}
+
+.refDesc {
+  margin: 0 0 8px 0;
+  font-size: 14.5px;
+  color: var(--text);
+}
+
+.refLink {
+  display: block;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12.5px;
+  color: var(--accent);
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  text-decoration: none;
+}
+
+.refLink:hover {
+  text-decoration: underline;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 900px) {
+  .sidebar {
+    transform: translateX(-100%);
+    visibility: hidden;
+    pointer-events: none;
+    transition:
+      transform 0.2s ease,
+      visibility 0.2s ease;
+    width: min(340px, 84vw);
+  }
+  .sidebar.open,
+  .open {
+    transform: translateX(0);
+    visibility: visible;
+    pointer-events: auto;
+  }
+  .main {
+    margin-left: 0;
+    padding: 80px 20px 80px 20px;
+  }
+  .sidebarToggle {
+    display: flex;
+  }
+  .sidebarBrand {
+    padding-left: 66px;
+  }
+}

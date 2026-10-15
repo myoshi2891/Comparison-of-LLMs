@@ -73,6 +73,10 @@ function matchKey(raw) {
  */
 function decodeEntities(raw) {
   return raw
+    .replace(/&#(?:x([0-9a-f]+)|(\d+));/gi, (match, hex, decimal) => {
+      const point = Number.parseInt(hex ?? decimal, hex === undefined ? 10 : 16);
+      return point <= 0x10ffff ? String.fromCodePoint(point) : match;
+    })
     .replace(/&lt;/g, "<")
     .replace(/&gt;/g, ">")
     .replace(/&quot;/g, '"')
@@ -95,7 +99,7 @@ function decodeEntities(raw) {
  * @returns {string} The decoded display text: tags and identifier expressions are removed, while
  *   the literal text of string expressions is kept.
  */
-function stripMarkup(fragment) {
+function stripMarkup(fragment, jsx = true) {
   // JSX 文字列式の中身は「そのまま表示されるテキスト」であり、HTML に見える断片も本文の一部。
   // タグ除去より前にプレースホルダへ退避しないと、原本側の &lt;style&gt; は（エンティティ復号が
   // 最後なので）生き残るのに page 側の {"<style>"} だけが消え、一致している内容が漏れとして
@@ -108,14 +112,16 @@ function stripMarkup(fragment) {
     `\u0000JSXSTR${preserved.push(text.replace(/<br\s*\/?>/gi, " ")) - 1}\u0000`;
   const placeholderRe = /\u0000JSXSTR(\d+)\u0000/g;
 
-  let text = fragment
-    .replace(/\{\/\*[\s\S]*?\*\/\}/g, "")
-    .replace(/\{\s*"\\n"\s*\}|\{\s*'\\n'\s*\}|\{\s*`\\n`\s*\}/g, "\n")
-    .replace(/\{\s*"([^"]*)"\s*\}/g, (_match, value) => stash(value))
-    .replace(/\{\s*'([^']*)'\s*\}/g, (_match, value) => stash(value))
-    .replace(/\{\s*`([^`]*)`\s*\}/g, (_match, value) => stash(value))
-    .replace(/\{\s*(?:styles\.[A-Za-z0-9_-]+|[A-Za-z_$][\w$]*)\s*\}/g, "")
-    .replace(/<[^>]*>/g, "");
+  let text = fragment;
+  if (jsx) {
+    text = text
+      .replace(/\{\/\*[\s\S]*?\*\/\}/g, "")
+      // 式内のブロックコメント（`{"http://…" /* NOSONAR */}` 等）は表示されないため読み飛ばす。
+      .replace(/\{\s*(?:\/\*[\s\S]*?\*\/\s*)*(?:"((?:[^"\\]|\\.)*)"|'((?:[^'\\]|\\.)*)'|`((?:[^`\\]|\\.)*)`)\s*(?:\/\*[\s\S]*?\*\/\s*)*\}/g,
+        (_match, double, single, template) => stash(decodeQuotedEntryEscapes(double ?? single ?? template)))
+      .replace(/\{\s*(?:styles\.[A-Za-z0-9_-]+|[A-Za-z_$][\w$]*)\s*\}/g, "");
+  }
+  text = text.replace(/<[^>]*>/g, "");
 
   // 退避は入れ子になりうる（テンプレートリテラル式の中に "..." 式がある等）。
   // String.replace は差し込んだ文字列を再走査しないため、1 回では内側のプレースホルダが
@@ -146,8 +152,8 @@ function stripMarkdownInline(raw) {
  * @param {string} raw - Element content that may contain HTML or JSX markup.
  * @returns {string} Text with markup and JSX whitespace expressions removed.
  */
-function normalizeElementContent(raw) {
-  return normalize(stripMarkup(raw));
+function normalizeElementContent(raw, jsx = true) {
+  return normalize(stripMarkup(raw, jsx));
 }
 
 /**
@@ -345,10 +351,13 @@ function extractElementContents(src, predicate) {
 function collectStringConstants(src) {
   const constants = new Map();
   const constantRe =
-    /\bconst\s+([A-Za-z_$][\w$]*)\s*=\s*(?:String\.raw\s*)?(`([\s\S]*?)`|"([^"\\]*(?:\\.[^"\\]*)*)"|'([^'\\]*(?:\\.[^'\\]*)*)')\s*;/g;
+    /\bconst\s+([A-Za-z_$][\w$]*)\s*=\s*(String\.raw\s*)?(?:`([\s\S]*?)`|"([^"\\]*(?:\\.[^"\\]*)*)"|'([^'\\]*(?:\\.[^'\\]*)*)')\s*;/g;
   let constant = constantRe.exec(src);
   while (constant !== null) {
-    constants.set(constant[1], constant[3] ?? constant[4] ?? constant[5] ?? "");
+    const value = constant[3] ?? constant[4] ?? constant[5] ?? "";
+    // 復号を抑止するのは接頭辞として String.raw を持つ場合だけ。値の中の "String.raw" という
+    // テキストで判定すると、通常の文字列定数のエスケープまで生のまま残る。
+    constants.set(constant[1], constant[3] !== undefined || constant[2] !== undefined ? value : decodeQuotedEntryEscapes(value));
     constant = constantRe.exec(src);
   }
   return constants;
@@ -387,6 +396,8 @@ function decodeQuotedEntryEscapes(raw) {
         out += "\n";
       } else if (next === "r") {
         out += "\r";
+      } else if (next === "t") {
+        out += "\t";
       } else if (next === "'" || next === '"' || next === "`" || next === "\\" || next === "$") {
         out += next;
       } else {
@@ -401,16 +412,50 @@ function decodeQuotedEntryEscapes(raw) {
 }
 
 /**
+ * Decodes HTML character references in an attribute value in a single pass, including numeric references.
+ *
+ * Each reference is decoded exactly once, so `&amp;#9;` becomes the literal text `&#9;` rather than a tab.
+ * @param {string} raw - The raw attribute value.
+ * @returns {string} The decoded attribute value.
+ */
+function decodeAttributeValue(raw) {
+  return raw.replace(/&(?:#(\d+)|#[xX]([0-9A-Fa-f]+)|[A-Za-z]+);/g, (match, decimal, hex) => {
+    if (decimal === undefined && hex === undefined) return decodeEntities(match);
+    const codePoint = decimal === undefined ? Number.parseInt(hex, 16) : Number(decimal);
+    return codePoint <= 0x10ffff ? String.fromCodePoint(codePoint) : match;
+  });
+}
+
+/**
+ * Determines whether a class attribute value contains the `mermaid` token after decoding it as a browser would.
+ * @param {string} rawClass - The raw class attribute value.
+ * @returns {boolean} True when one of the whitespace-separated class tokens is `mermaid`.
+ */
+function hasMermaidClassToken(rawClass) {
+  return decodeAttributeValue(rawClass)
+    .split(/[\t\n\f\r ]+/)
+    .some((token) => token.toLowerCase() === "mermaid");
+}
+
+/**
  * Extracts Mermaid diagram declarations from HTML in document order.
  * @param {string} src - The complete HTML source.
  * @returns {string[]} Normalized Mermaid diagram sources found in supported HTML containers, scripts, and definitions.
  */
 function collectHtmlMermaidSources(src) {
   const sources = [];
-  const divRe = /<(?:div|pre)\b([^>]*\bclass=["'][^"']*\bmermaid\b[^"']*["'][^>]*)>([\s\S]*?)<\/(?:div|pre)\s*>/gi;
+  // class の直前は空白を要求する。`\b` だと `data-class=` の `-` 直後でも一致し、
+  // 後続の本物の class="mermaid" を見落とす。
+  const divRe =
+    /<(?:div|pre)\b([^>]*?\sclass=(["'])([^"']*)\2[^>]*)>([\s\S]*?)<\/(?:div|pre)\s*>/gi;
   let div = divRe.exec(src);
   while (div !== null) {
-    sources.push({ index: div.index, source: normalizeMermaidSource(div[2]) });
+    if (hasMermaidClassToken(div[3])) {
+      sources.push({ index: div.index, source: normalizeMermaidSource(div[4]) });
+    } else {
+      // 非 Mermaid の要素で本文ごと読み飛ばすと、入れ子の Mermaid 図解を見落とす。
+      divRe.lastIndex = div.index + 1;
+    }
     div = divRe.exec(src);
   }
 
@@ -429,12 +474,25 @@ function collectHtmlMermaidSources(src) {
   // バッククォートで閉じたと誤認し、以降の本文が丸ごと欠落する。他の分岐と同様に
   // エスケープシーケンスを読み飛ばしてから閉じバッククォートを探す。
   const diagramEntryRe =
-    /(?:["'][^"']+["']|[\p{L}_$][\p{L}\p{N}_$]*)\s*:\s*(?:`((?:[^`\\]|\\.)*)`|'((?:[^'\\]|\\.)*)'|"((?:[^"\\]|\\.)*)")/gu;
+    /(?:["'][^"']+["']|[\p{L}_$][\p{L}\p{N}_$]*)\s*:\s*(?:dedent\s*\(\s*)?(?:`((?:[^`\\]|\\.)*)`|'((?:[^'\\]|\\.)*)'|"((?:[^"\\]|\\.)*)"\s*\)?)/gu;
   let entry = diagramEntryRe.exec(src);
   while (entry !== null) {
     const raw = decodeQuotedEntryEscapes(entry[1] ?? entry[2] ?? entry[3] ?? "");
     sources.push({ index: entry.index, source: normalizeMermaidSource(raw) });
     entry = diagramEntryRe.exec(src);
+  }
+
+  // Plain string arrays are used by standalone guides; parse strings without executing source JS.
+  // 要素間の `// …` / `/* … */` コメントも許容する。抽出は文字列を先に照合するため、
+  // 文字列内の `//` や `/*`（URL を含むノードラベル等）はコメントと誤認しない。
+  const arrayRe = /\b(?:const|let|var)\s+DIAGRAMS\s*=\s*\[((?:\s*(?:"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|`(?:[^`\\]|\\.)*`|\/\/[^\n]*|\/\*[\s\S]*?\*\/)\s*,?)+)\s*\]\s*;?/g;
+  for (const array of src.matchAll(arrayRe)) {
+    const tokenRe = /"((?:[^"\\]|\\.)*)"|'((?:[^'\\]|\\.)*)'|`((?:[^`\\]|\\.)*)`|\/\/[^\n]*|\/\*[\s\S]*?\*\//g;
+    for (const value of array[1].matchAll(tokenRe)) {
+      const raw = value[1] ?? value[2] ?? value[3];
+      if (raw === undefined) continue;
+      sources.push({ index: array.index + value.index, source: normalizeMermaidSource(decodeQuotedEntryEscapes(raw)) });
+    }
   }
 
   return sources
@@ -818,7 +876,7 @@ function inventoryHtml(src) {
   const headingRe = /<h([1-6])\b[^>]*>([\s\S]*?)<\/h\1>/gi;
   let match = headingRe.exec(body);
   while (match !== null) {
-    headings.push({ level: Number(match[1]), text: normalize(stripMarkup(match[2])) });
+    headings.push({ level: Number(match[1]), text: normalize(stripMarkup(match[2], false)) });
     match = headingRe.exec(body);
   }
 
@@ -826,18 +884,18 @@ function inventoryHtml(src) {
   const liRe = /<li\b[^>]*>([\s\S]*?)<\/li>/gi;
   let li = liRe.exec(body);
   while (li !== null) {
-    listTexts.push(normalize(stripMarkup(li[1])));
+    listTexts.push(normalize(stripMarkup(li[1], false)));
     li = liRe.exec(body);
   }
 
   const codeBlockTexts = extractElementContents(body, (openingTag) =>
     /^<pre\b/i.test(openingTag) && !/\bclass=["'][^"']*\bmermaid\b/i.test(openingTag)
-  ).map(({ content }) => normalizeElementContent(content));
+  ).map(({ content }) => normalizeElementContent(content, false));
   const tableRowTexts = extractTagContents(body, "tr").map(({ content }) =>
-    normalizeElementContent(content)
+    normalizeElementContent(content, false)
   );
   const paragraphTexts = extractTagContents(body, "p").map(({ content }) =>
-    normalizeElementContent(content)
+    normalizeElementContent(content, false)
   );
 
   return {
@@ -905,7 +963,7 @@ function inventoryTsx(src) {
     mermaidSources: collectTsxMermaidSources(src),
     svgElements: collectSvgElements(src),
     calloutElements: collectMarkupCalloutElements(src),
-    externalLinks: collectUrls(src),
+    externalLinks: collectUrls(`${src}\n${stripMarkup(src.replace(/>\s+</g, "><").replace(/\}\s*(?=<|\{)/g, "}").replace(/>\s*(?=\{)/g, ">"))}`),
   };
 }
 

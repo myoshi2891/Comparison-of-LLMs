@@ -1,6 +1,6 @@
 # GEMINI.md
 
-Updated 2026-10-11
+Updated 2026-10-15
 
 GEMINI.md は Gemini CLI / Gemini Code Assist 向けの入り口。
 本リポジトリでは **CLAUDE.md が正本** とし、GEMINI.md はその委譲 pointer として機能する。
@@ -14,6 +14,82 @@ GEMINI.md は Gemini CLI / Gemini Code Assist 向けの入り口。
 
 @./CLAUDE.md
 @docs/PROGRESS.md
+
+推薦書籍 `/books/knowledge-graphs-fundamentals-techniques` を追加（2026-10-15）。
+指定HTMLの全22 H2・121 H3・190段落・32リスト／129項目・40表／195行・9コード例・
+16 Mermaid図解・44 callout・本文28外部リンクをPure JSXへ完全転写。80 CSS規則と本文を
+原本由来の固定期待値で照合し、30ページ契約と14操作契約で移行漏れを検知する。
+原本の320px固定目次、980px以下の通常フロー、用語集2列／1列、リストの点・番号・入れ子を保持。
+表の全列左寄せ、コードの改行・インデント、見出しのスクロール余白と目次リンクのCSSカスケードを検証。
+Python／SQLの構文色は原本のhighlight.js 11.9.0で生成した全トークンと完全一致し、
+三重引用符の複数行文字列も保持する。Turtle／SPARQL／textは原本どおりプレーン表示。
+共有クロームのページ限定補正はglobals.cssへ集約し、registryからナビ・検索・RSSを導出する。
+HTML／Markdownはarchive/html/books/／archive/md/books/へ内容無変更で保存（SHA-256一致）。
+HTMLを正本とし、本文の基準日2026年9月21日を維持。Markdownはラベル表記などに差があるため混在させない。
+原本監査exit 0、全16図はMermaid 10.9.8で解析成功。全体Vitest **203 files / 2085 tests**、
+対象44契約、typecheck・lint（560 files／0 diagnostics）が成功。操作処理の行・関数・分岐は100%。
+計測時だけ既存の一時ローダーでキャッシュ済みjs-tokens 10を解決し、依存・設定・ロックは変更しない。
+npm・ビルド・スクレイパー検証・ブラウザ自動確認は未実行。CSSキャッシュを退避してdevを3001番で再起動し、
+新規ルートのHTTP 200を確認。目視はユーザー担当。
+
+2026-10-15 に同ガイドの19.2／19.3をブラッシュアップ。既存8問・8解答は保持し、
+問題カードの学習目標、解答ごとのネイティブ開閉、全8件の具体例・解説・注意点・復習リンクを追加。
+原本の固定期待値は変更せず、補足の内容と開閉・番号・フォーカス表示を8契約で追加検証する。
+対象52契約、HTML原本監査exit 0、全体Vitest **204 files / 2093 tests**、typecheck・
+lint（562 files／0 diagnostics）が成功。npm・ビルドは未実行、目視はユーザー担当（ポート3001）。
+
+2026-10-15 のKnowledge Graphs and LLMs in Action保守で、サイドバーのCSS詳細度競合とスクロール追従の取りこぼしを修正。
+原本の固定期待値を変えず9契約を追加し、対象53契約・全体Vitest **201 files／2039 tests**、
+typecheck・lint（553 files／0 diagnostics）・原本監査exit 0が成功。npm・ビルドは未実行。
+目視確認はユーザー担当（ポート3002）。原因と分離履歴は `docs/PROGRESS.md` を参照。
+
+2026-10-15 に `/books/knowledge-graphs-and-llms-in-action` を推薦書籍へ追加。
+指定HTMLの95見出し・53リスト・31表・14コード例・18図解を含む本文とCSSを固定期待値で照合する。
+31ページ契約と13操作契約を追加し、HTML監査exit 0、全体Vitest **201 files／2030 tests**、
+typecheck・lint（553 files／0 diagnostics）が成功。原本2形式は内容無変更で保存。
+原本の暗色テーマ、320px固定目次、960px以下の通常フロー目次、リストの点・番号を保持する。
+監査形式対応は独立したRed／Greenコミット。開始前からある監査2ファイルの差分は未コミットで保持。
+目視確認はユーザー担当（ポート3002）。npm・ビルドは未実行。履歴は `docs/PROGRESS.md` を参照。
+
+2026-10-14 に `/books/hands-on-large-language-models` を推薦書籍へ追加。指定HTMLの本文・構造・
+27図解・7表64行・17チェック項目・24参考文献カード（24リンク）を固定期待値で照合する。
+22契約と12操作契約を追加し、HTML監査exit 0、全体Vitest **197 files／1970 tests**、
+typecheck・lint（545 files／0 diagnostics）が成功。原本2形式は内容無変更で保存。
+書籍情報カード（O'Reilly公式リンク、著者Jay Alammar & Maarten Grootendorst）、Hero kicker、
+メタ情報タグ4件、全27箇所の Mermaid 図解に淡色パレット（theme='base'）を適用。
+ヒーローセクション内に日付を黒文字で統合し、グローバル黒帯鮮度バー非表示でディスクレイマー下の余白を解消。
+関連ページフッターの重なり解消（340pxオフセット、900px以下全幅）も完了。
+表の全列左寄せ、アンカー移動の見出しめり込み防止を徹底。
+registryの追加日は2026-10-14。npm・ビルドは未実行、目視確認はユーザー担当。
+
+2026-10-14 に `/rag/enterprise-guide` をモデル・データへ追加。指定HTMLの本文・構造・
+6図解・4コードブロック・11表67行・18外部リンク（15参考ソースカード含む）を固定期待値で照合する。
+19契約を追加し、HTML監査exit 0、全体Vitest **195 files／1936 tests**、
+typecheck・lint（539 files／0 diagnostics）が成功。原本HTMLは移行完了後に `archive/html/rag/` へ退避。
+背景色（#eef1f4）の統一、グローバル黒帯鮮度バー非表示でディスクレイマー下の余白を解消。
+関連ページフッターの重なり解消（308pxオフセット）、全6箇所の Mermaid 図解に淡色パレット（theme='base'）を適用。
+表の全列左寄せ、コードブロックのインデント、アンカー移動の見出しめり込み防止を徹底。
+registryの追加日は2026-10-14。npm・ビルドは未実行、目視確認はユーザー担当。
+
+2026-10-14 に `/books/adversarial-robustness` を推薦書籍へ追加。指定HTMLの本文・構造・
+12図解・1数式・7表66行・22参考文献カード（23リンク）を固定期待値で照合する。
+20契約を追加し、HTML監査exit 0、全体Vitest **194 files／1917 tests**、
+typecheck・lint（535 files／0 diagnostics）が成功。原本2形式は内容無変更で保存。
+書籍情報カード（Plum callout、Elsevier公式リンク）、Hero kicker（AI Security 初学者ガイド）、
+メタ情報タグ4件、全12箇所の Mermaid 図解に淡色パレット（theme='base'）を適用。
+ヒーローセクション内に日付を黒文字で統合し、グローバル黒帯鮮度バー非表示でディスクレイマー下の余白を解消。
+関連ページフッターの重なり解消とメインコンテンツ背景色（#f6f1e3）およびカード配色（#fffdf7）への完全同期も完了。
+表の全列左寄せ、コードブロックのインデント、アンカー移動の見出しめり込み防止を徹底。
+registryの追加日は2026-10-14。npm・ビルドは未実行、目視確認はユーザー担当。
+
+2026-10-14 に `/books/llm-engineers-handbook` を推薦書籍へ追加。指定HTMLの本文・構造・
+8図解・2コード例・55表行・15参考文献リンクを固定期待値で照合する。
+21契約を追加し、HTML監査exit 0、全体Vitest **193 files／1897 tests**、
+typecheck・lint（531 files／0 diagnostics）が成功。原本2形式は内容無変更で保存。
+ヒーローセクション内に日付を黒文字で統合し、グローバル黒帯鮮度バー非表示でディスクレイマー下の余白を解消。
+関連ページフッターの重なり解消とMermaid baseテーマ適用も完了。
+表の全列左寄せ、コードブロックのインデント、アンカー移動の見出しめり込み防止を徹底。
+registryの追加日は2026-10-14。npm・ビルドは未実行、目視確認はユーザー担当。
 
 2026-10-11 に `/books/generative-ai-with-langchain` を推薦書籍へ追加。指定HTMLの本文・構造・
 76 CSS規則・12コード例・8図解・22参考文献カードを固定期待値で照合する。
@@ -78,10 +154,10 @@ Vitest 185 files／1779 tests、typecheck・lint・pytest 104件が成功。復�
 ## 検証コマンド
 
 ```bash
-(cd web-next && NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000) # Node 24 / 192 files / 1876 tests pass（2026-10-11 実測）
-(cd web-next && bun run typecheck)   # OK（2026-10-11 実測）
+(cd web-next && NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000) # 204 files / 2093 tests pass（2026-10-15 実測）
+(cd web-next && bun run typecheck)   # OK（2026-10-15 実測）
 # ビルドは今回ユーザー指定で未実行（過去: 2026-09-18 に89静的ページ生成）
-(cd web-next && bun run lint)        # OK（527 files / 0 diagnostics。2026-10-11 実測）
+(cd web-next && bun run lint)        # OK（562 files / 0 diagnostics。2026-10-15 実測）
 (cd scraper && uv run pytest)        # 今回対象外。過去の成功は104件（2026-10-04）
 ```
 

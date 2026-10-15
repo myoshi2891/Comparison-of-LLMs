@@ -2,29 +2,154 @@
 
 > 本ファイルは Next.js 移行完了後の保守・改善フェーズにおける開発の進捗（特にテスト関連）および品質チェックのルールを記録する。
 >
-> - 最終更新日: **Updated 2026-10-11**
+> - 最終更新日: **Updated 2026-10-15**
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
 
 ## 現在のステータス
 
 - **フェーズ**: 保守・機能改善・品質強化フェーズ
-- **ブランチ**: `dev`（LangChain移行の開始HEADは `66d08f77`。ブランチ新設・pushは行っていない）
-- **最新実装 HEAD**: `934408a1`（Generative AI with LangChain移行後のクラス指定整理。Greenは `8868adbd`）
-- **次の作業**: `/books/generative-ai-with-langchain` の目視確認（ユーザー担当）と、その結果への対応。npm・ビルドは禁止、スクレイパー検証はユーザー指定で対象外。
-- **ルート実数**: `page.tsx` 87 件、registry 88 エントリ（RSS の `/rss.xml` を含む）。全ルート登録・ナビ導出テストは合格。
+- **ブランチ**: `dev`
+- **最新実装 HEAD**: `909335c5`（Knowledge Graphs基礎ガイド19.2／19.3の学習補足・解答開閉。Red `51b9bc21` → Green `437d9ef7` → Refactor `909335c5`）
+- **次の作業**: `/books/knowledge-graphs-fundamentals-techniques#sec-19-2` の目視確認（ユーザー担当。ポート3001）。問題カードの番号、各解答の開閉、具体例・解説・注意点・復習リンク、モバイル表示を確認する。既存ページ全体の目視も引き続きユーザー担当。npm・ビルドは禁止。
+- **ルート実数**: `page.tsx` 93 件、registry 94 エントリ（RSS の `/rss.xml` を含む）。全ルート登録・ナビ導出テストは合格。
 - **動作検証**:
   - ビルド: 今回はユーザー指定で未実行。過去の成功記録は 2026-09-17 の 90 静的ページであり、今回の変更を検証した値ではない。
-  - `bun run typecheck` ✅（`tsc --noEmit`。2026-10-11 実測）
-  - `bun run lint` ✅（Biome check / 527 files / 0 diagnostics。2026-10-11 実測）
+  - `bun run typecheck` ✅（`tsc --noEmit`。2026-10-15 実測）
+  - `bun run lint` ✅（Biome check / 562 files / 0 diagnostics。2026-10-15 実測）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: Node 24で `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000` を実行し、Vitest **192 files / 1876 tests すべて合格**（2026-10-11、Green時実測）。整理後も48契約とtypecheck・lint・原本監査が成功。
-    - 今回の開始時ベースラインは **189 files / 1828 tests**（HEAD `66d08f77`）。既存環境の `localStorage` 問題を避ける実行時オプションを継続使用し、依存・設定ファイルは変更していない。開始時から存在した `web-next/bun.lock` の差分はコミット対象外。
+  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000` でVitest **204 files / 2093 tests すべて合格**（2026-10-15 実測）。対象52契約、typecheck・lint（562 files／0 diagnostics）、HTML原本監査exit 0が成功。元の全内容と追加の学習補足を分けて厳密に検証する。
+    - 今回の開始時は対象44契約が成功、直前の全体検証は **203 files / 2085 tests**、開始HEADは `2625a905`。依存・設定・ロック・アーカイブ原本・既存の固定期待値は変更していない。
     - `load(sourceHtml)` をモジュール初期化時に呼ぶ `governance/ai-governance/GuideContent.tsx` と
       `local-llm/finetuning-best-practices/GuideContent.tsx` は、import スモークでも読み込み可能であることを確認済み
   - **バックエンド (`scraper/`)**: 今回はユーザー指定で検証対象外。実行していない。過去の成功記録は104件（2026-10-04）であり、今回の実測値ではない。
 
 ## 最近の追加内容
+
+- **19.2 確認問題・19.3 解答のブラッシュアップ（2026-10-15）**:
+  - 元の8問・8解答を全文・順序・番号リストごと保持し、問題カードへテーマ・分野・確認するポイントを追加。解答はHTML標準のdetails／summaryで個別に開閉でき、初期状態では閉じる。追加のJavaScriptや依存は不要。
+  - 全8解答に具体例・考え方・つまずきやすい点・対応節への復習リンクを追加。適合率80%／再現率40%の計算例、49,995,000組の比較例、TransEの距離0の数値例などで、定義を具体的に確認できる。RDFの制約・空白ノードの識別子は[W3C RDF 1.1](https://www.w3.org/TR/rdf11-concepts/)で確認し、TransEは[原論文](https://proceedings.neurips.cc/paper_files/paper/2013/hash/1cecc7a77928ca8133fa24680a88d2f9-Abstract.html)、コミュニティ要約型GraphRAGは[公式説明](https://microsoft.github.io/graphrag/)と照合した。
+  - 問題と解答の対応、全補足文・復習先、各解答の独立した開閉、初期状態、ネイティブ番号・開閉マーカー、キーボードフォーカスを8契約で検証。既存のHTML原本・source-contract.json・syntax-contract.jsonは無変更。既存契約は補足だけを除いて原文を照合し、補足の内容・構造は独立した固定期待値で全件照合する。原本監査exit 0、全129リスト項目・195表行・190原本段落・144見出し・16図・44 calloutを保持。補足により実ページの段落は232件となった。
+  - 対象52契約、全体Vitest **204 files / 2093 tests**、typecheck・lint（562 files／0 diagnostics）とCSS変数検査が成功。CSSは当該リストのdata属性でページ内へ限定し、600px以下の余白を調整。原本CSS80規則の契約も維持する。
+  - 分離履歴: Red `51b9bc21` → Green `437d9ef7` → Refactor `909335c5`。CSSキャッシュを退避して既存devを3001番で再起動し、HTTP 200を確認。npm・ビルド・ブラウザ自動確認・スクレイパー検証は未実行。目視はユーザー担当。
+
+- **Knowledge Graphs基礎・技法・応用ガイドの完全移行（2026-10-15）**:
+  - 全22章・121小見出し・190段落・32リスト／129項目・40表／195行・9コード例・16図解・44 callout・本文28外部リンクをPure JSX化。HTML由来の本文・構造・80 CSS規則を固定し、30ページ契約＋14操作契約で順序・内容を照合する。原本の期待値は実装に合わせて変更していない。
+  - リストの点・番号・入れ子、用語集の2列／1列、320px固定目次と980px以下の通常フローを保持。実際のCSS適用順でモバイル高さの上書きを検出し、追加Redを先行コミットして修正した。表全列左寄せ、コードの空白・改行、アンカー余白、目次リンクのCSSカスケードも検証する。
+  - Python／SQLの構文色は原本と同じhighlight.js 11.9.0の全トークンを固定し、三重引用符の複数行文字列も一致する。文法処理は一時生成時だけ行い、実行時のCDNスクリプト・依存追加はない。元のCSS／フォントリンクは3件すべて保持する。
+  - HTML／Markdownはそれぞれ `archive/html/books/Knowledge-graphs-fundamentals-techniques-guide.html`／`archive/md/books/Knowledge-graphs-fundamentals-techniques-guide.md` に内容無変更で保存（移動前後のSHA-256一致）。指定HTMLが正本。Markdownとの差は主に【本書の範囲】等のラベル、用語集アイコン、段落／リスト表現で、混在させない。本文の基準日は2026年9月21日を維持する。
+  - HTML原本監査exit 0、全16図はアプリ既存のMermaid 10.9.8で解析成功。原本のdarkテーマと全テーマ変数を保持し、サイズ・中央寄せは共有部品へ委譲。JSX文字列の図解は監査可能な定数参照にし、テストではフローチャートの先頭空白だけ正規化する。calloutのDOM variantは定数で渡し、監査が原本のクラス分類と混同しないようにした。
+  - 全体Vitest **203 files / 2085 tests**、対象44契約、typecheck・lint（560 files／0 diagnostics）が成功。カバレッジ変換器の既存js-tokens解決問題は、一時ローダーでキャッシュ済み10.0.0を参照して回避。操作部品の行・関数・分岐は100%。依存・設定・ロック・監査スクリプトは変更していない。
+  - 分離履歴: Red `983f04bd`／補強Red `31601475` → Green `2b1b7788` → Refactor `b62462c5` → 構文色Red `9baf7104` → Green `bdcc48d6`。CSSキャッシュを退避して3001番でdevを再起動し、ルートのHTTP 200と応答HTMLの全要素数を確認。npm・ビルド・スクレイパー検証・ブラウザ自動確認は未実行。目視はユーザー担当。
+
+- **Knowledge Graphs and LLMs in ActionのサイドバーCSS・スクロール追従修正（2026-10-15）**:
+  - `.layout a`／`.layout a:hover` の詳細度が元の目次クラスを上回り、通常リンクの灰色とホバー時の装飾を上書きしていた。原本CSSの固定オラクルは変更せず、サイドバー内へ限定した詳細度の高い補正で、通常・ホバー・アクティブの原本色と下線なしを復元した。CSS変数だけを固定パレットへ置換し、jsdomのCSSエンジンで実際のカスケードを検証する2契約を追加。
+  - 原本の重複ID解消後は監視対象が長いsectionから短い見出しへ変わり、狭いIntersectionObserver帯域を飛び越すスクロールでは更新が起きなかった。スクロール・リサイズ・初期表示時に見出しのviewport座標をアンカー余白（ヘッダー高＋80px）と比較して現在位置を決定する。交差通知も同じ再計算を使い、通知順に依存しない。アクティブクラスと `aria-current` を同期する。
+  - 大きな上下移動、見出し間の保持、次の親セクションへの遷移、途中位置での初期表示、リサイズ、IntersectionObserver非対応、通知順、イベント解除の7操作契約を追加。追加9件が修正前に失敗し、修正後は33ページ契約＋20操作契約の全53件成功。現在位置が変わらない場合のDOM属性更新も省く。
+  - 全体Vitest **201 files / 2039 tests**、typecheck・lint（553 files／0 diagnostics）、HTML原本監査exit 0が成功。操作処理のV8カバレッジは行100%・関数100%・分岐85.71%。カバレッジ計測時だけ既述の一時ローダーを使用し、依存・設定は変更していない。
+  - 分離履歴: Red `25f1d505` → Green `6e36150c` → Refactor `797947d4`。CSSキャッシュを退避し、同リポジトリの既存開発サーバーがポート3002で更新後のCSSとHTTP 200を返すことを確認。目視はユーザー担当。npm・ビルドは未実行。
+
+- **Knowledge Graphs and LLMs in Action完全ガイドの移行（2026-10-15）**:
+  - `/books/knowledge-graphs-and-llms-in-action` に全1 H1・14 H2・36 H3・44 H4・80段落・53リスト／157項目・31表／195行・14コード例・18 Mermaid図解・14引用・18折りたたみ・46根拠バッジをPure JSXで転写。参考文献22リンクを含む本文23リンク、目次24リンク、フッターも原本から固定した期待値と照合する。
+  - 本文・構造・76 CSS規則を31ページ契約で照合し、13操作テストで目次追従・コピー成功／拒否／代替コピー／後片付けを検証。表の全列左寄せ、リストの点・番号・入れ子、コードの改行・先頭空白、アンカー余白を保持する。
+  - 原本の暗色テーマとMermaidテーマ変数、320px固定目次、960px以下の通常フロー目次を保持。共有クロームの背景・日付バー・関連ページ配置は本ページ限定の `globals.css` へ集約。原本のsectionとH2のID重複は見出し側のアンカーを残して解消し、H3にも一意なIDを付けた。
+  - HTML／Markdownを `archive/html/books/Knowledge-graphs-and-llms-in-action-guide.html`／`archive/md/books/Knowledge-graphs-and-llms-in-action-guide.md` に内容無変更で保存（移動前後のSHA-256一致）。指定HTMLを正本とし、本文の調査基準日2026年9月21日、registryの追加・確認日2026-10-15を保持する。対応MarkdownはLangGraph再試行上限時の分岐などがHTMLと異なるため、移植先の期待値へ混ぜない。
+  - 監査が原本の `DIAGRAMS` 配列・数値文字参照・エスケープ済みJSX文字列・ハイライトで分割されたURLを扱えなかったため、失敗する4テストを先にコミットして形式対応を追加。監査はHTMLのコード内プレースホルダーをJSXとして除去せず、配列は実行せず解析する。既存の監査スクリプト／監査テストの未コミット差分は今回のコミットに含めていない。
+  - HTML原本監査exit 0、Mermaid 10.9.8で全18図の構文解析成功。全体Vitest **201 files / 2030 tests**、整理後の44契約、typecheck・lint（553 files／0 diagnostics）が成功。
+  - 操作処理のV8カバレッジは行100%・関数100%・分岐86.84%。既存インストールではカバレッジ変換器が `js-tokens` 4を解決して失敗するため、検証時だけ一時ローダーでロックファイル指定のキャッシュ済み10.0.0へ解決した。依存・設定・ロックファイルは変更していない。
+  - 分離履歴: 移行Red `8dc7ffdd` → Green `93a028d7` → Refactor `631b0d87`。監査Red `274d72d8` → Green `9e0d4b45`。
+  - `.next` が存在しない状態から開発サーバーをポート3002で起動し、移行先URLのHTTP 200を確認（目視・ブラウザ操作なし）。`next dev` が自動更新したAGENTS.mdは起動前の内容へ戻した。目視確認はユーザー担当。npm・ビルド・スクレイパー・ブラウザ自動確認は未実行。
+
+- **SonarCloud新規コードカバレッジ対応・レビュー指摘修正（2026-10-15）**:
+  - `hands-on-large-language-models/TocObserver.tsx`（0%）と `rag/enterprise-guide/TocObserver.tsx`（0%）に単体テストを追加。ページテストは TocObserver をモックするため、単体テストがないとカバレッジに反映されなかった。
+  - enterprise-guide の `#menuBtn`・`#sidebarBackdrop`・`#topBtn` は `layout-root` の兄弟要素で、`root.querySelector` では取得できずモバイル目次とTopボタンが動いていなかった。`document` から取得するよう修正。
+  - llm-engineers-handbook: `aria-controls="sidebar"` を追加し、`globals.css` と重複していた共有クロームの上書きを CSS Module から削除（D-10 は `globals.css` を検証）。
+  - hands-on: 兄弟要素のトグル用に `--panel`/`--text` を body スコープでも定義し、参考文献グリッドを `minmax(min(340px, 100%), 1fr)` に変更。関連ページの全幅化を 900px（サイドバー折りたたみ幅）に揃えた。
+  - enterprise-guide: `.article` の `max-width` を削除。閉じたサイドバーと非表示の Top ボタンに `visibility: hidden` を付け、キーボードのフォーカス対象から外した。
+  - `audit_source_parity.mjs`: Mermaid の class トークン境界を HTML 空白とクォートだけに限定した（「図mermaid」のように非 ASCII 文字と隣接するものは誤検出しない）。
+
+- **Hands-On Large Language Modelsガイドの移行・原本アーカイブ・スタイル調整（2026-10-14）**:
+  - `/books/hands-on-large-language-models` に全10 H2・22 H3・16 H4・96段落・56リスト項目・7表／64行（書籍情報kv表8行、アーキテクチャ比較表、RAG/ファインチューニング比較表等）・27 Mermaid図解・17チェック項目・24参考文献カード（24外部リンク）をPure JSXへ転写。
+  - 原本HTML `Hands-on-large-language-models-guide.html` および Markdown `Hands-on-large-language-models-guide.md` は内容無変更で `archive/html/books/` および `archive/md/books/` へ `git mv` 退避（ユーザー指示によりMarkdownファイルも同時に退避保存）。指定HTMLを正本とし、registryの追加・確認日は2026-10-14。
+  - 原本照合監査スクリプト（`audit_source_parity.mjs`）は exit 0 で漏れなしを確認。
+  - スタイリング・共通クローム対応:
+    1. 書籍情報カード（O'Reilly公式ページリンク、著者Jay Alammar & Maarten Grootendorst）、Hero kicker、メタ情報タグ4件。
+    2. ヒーローセクション内に最終確認日・公開日を黒文字（`var(--text)`）で統合し、グローバル黒帯鮮度バー（`#site-freshness-bar`）を非表示化。
+    3. ヘッダー・ディスクレーマーとサイドバー・メインコンテンツの配置調整:
+       - サイドバー被りの解消: `.sidebar` の `top` を `calc(var(--header-height, 60px) + var(--ch-disclaimer-height, 0px))` に設定し、ディスクレーマーバナー直下に正しく配置（全幅バナーの左端被りを解消）。
+       - ディスクレーマー下の余計な隙間の解消: `globals.css` および `page.module.css` に `:global(body:has([data-page="hands-on-large-language-models"]))` を定義し、`body.has-common-header` の過剰な `+10px` マージンを打ち消し。さらに `.main` の上部パディングを `32px` に調整。
+       - Mermaid構文エラーの解消: 原本HTML由来のHTMLエンティティ（`--&gt;`, `&lt;br/&gt;` 等）を適切な記法（`-->`, `<br/>`）に正規化し、全27箇所のダイアグラムが正常にSVG描画されるよう修正（監査オラクルのexit 0を維持）。
+    4. 共通レイアウトフッター（`nav[aria-label="関連ページ"]`）を固定サイドバー（340px）からオフセット（`margin-left: 340px; width: calc(100% - 340px)`）し、900px以下では全幅（`margin-left: 0; width: 100%`）へ戻す。
+    5. テーブルの全列左寄せ（`:global(th), :global(td)` で `text-align: left !important`）。
+    6. 全27箇所の Mermaid 図解に淡色パレット（`theme="base"`, `themeVariables`）を適用。
+    7. 目次スクロール追従（`TocObserver`、見出し＋トップ）とアンカー移動時の見出しめり込み防止（`scroll-margin-top`）。
+    8. インタラクティブチェックリスト（17項目、チェック進捗カウンター連動）。
+  - 22件の契約テスト（S-1〜S-4 原本照合、C-1〜C-6 コンテンツ、D-1〜D-9 デザイン、Q-1〜Q-3 品質契約）および 12件の TocObserver 操作テストを追加。
+  - 分離履歴: Red `750c27d3` → Green `ac3453b2` → Refactor `0399f9c5`。
+  - 全体テスト: 197 files / 1970 tests すべて成功。typecheck、lint（545 files / 0 diagnostics）も成功。
+
+- **エンタープライズRAG完全ガイドのコードブロック改行・サイドバー常駐・フッターデザイン改善（2026-10-14）**:
+  - コードブロック改行・インデント崩れの解消:
+    - JSX `<pre>` 内のタグ間改行が空白ノードとしてインライン連結されていた問題を解消。
+    - スタイリング防犯原則 R2 に準拠し、全4箇所のコードブロックを39行の `<span className="codeLine code-line">` で行単位に構造化。
+    - `page.module.css` に `.codeLine { display: block; min-height: 1.8em; white-space: pre; }` を定義し、行単位の改行・空行・`{"    "}` インデントを完全担保。
+  - サイドバー常駐化とフッター途切れの解消:
+    - `.sidebar` を親コンテナ `.layout` 内の `sticky` から `position: fixed; top: calc(var(--header-height, 60px) + var(--ch-disclaimer-height, 0px)); bottom: 0;` に変更。
+    - ページ最下部スクロール時にサイドバーが途切れてフッター左側が空白になる問題を解消し、画面下端までサイドバー枠線と背景が常駐するよう設計。
+    - `.contentWrap` に `margin-left: var(--sidebar-w);` を設定（モバイル `@media (max-width: 980px)` では `margin-left: 0;`）。
+    - 共通フッター（`nav[aria-label="関連ページ"]`）の背景色（`#eef1f4`）、カード（`#ffffff`）、枠線（`#dce2e9`）、アクセント（`#1f5c57`）を淡色テーマへ同期。
+    - スクロール時に免責事項バナーの背後に本文テキストが透けて重なる現象を防止するため、`.ch-disclaimer` に不透明背景色（`#1a1712`）と `backdrop-filter: none` を適用。
+  - テスト・検証:
+    - `page.test.tsx` の C-2 契約に 39 行の `.code-line` の構造化検証を追加。
+    - 原本照合監査スクリプト `audit_source_parity.mjs` で `exit=0` を確認。
+    - 全体 Vitest（195 files / 1936 tests）、Typecheck（`tsc --noEmit`）、Biome check（539 files / 0 diagnostics）すべて成功。
+
+- **エンタープライズRAG完全ガイドの移行・原本アーカイブ・スタイル調整（2026-10-14）**:
+  - `/rag/enterprise-guide` に全4 H2・15 H3・10 H4・73段落・15リスト／68項目・11表／67行・4コードブロック・6 Mermaid図解・18外部リンク（15参考ソースカード含む）をPure JSXへ転写。
+  - 原本HTML `Enterprise-rag-guide.html` は移行・検証完了後に `archive/html/rag/Enterprise-rag-guide.html` へ `git mv` 退避（内容無変更）。情報基準日2026年9月10日を完全維持。
+  - 原本照合監査スクリプト（`audit_source_parity.mjs`）は exit 0 で漏れなしを確認（クラス名 `mermaid-card` を誤検知しないよう `divRe` 正規表現を微修正）。
+  - スタイリング・共通クローム調整:
+    1. グローバル黒背景鮮度バー（`#site-freshness-bar`）を非表示化し、ディスクレイマー下の余計な余白を解消。
+    2. 背景色を淡色グレーブルー（`#eef1f4`）に統一し、308px固定サイドバーとコンテンツ幅の調和を確保。
+    3. 共通レイアウトフッター（`nav[aria-label="関連ページ"]`）を308pxサイドバーからオフセット（`margin-left: 308px; width: calc(100% - 308px)`）し、980px以下では全幅へ戻す。
+    4. テーブルの全列左寄せ（`:global(th), :global(td)` で `text-align: left !important`）。
+    5. コードブロックの先頭インデント保持とPygments(one-dark)対応spanトークン、`.highlight` ラッパー。
+    6. 全6箇所の Mermaid 図解に淡色パレット（`theme="base"`）を適用。
+    7. 目次スクロール追従（`TocObserver`、見出し＋トップ）とアンカー移動時の見出しめり込み防止（`scroll-margin-top`）。
+  - 19件の契約テスト（S-1〜S-4 原本照合、C-1〜C-6 コンテンツ、D-1〜D-6 デザイン、Q-1〜Q-3 品質契約）を追加。
+  - 分離履歴: Red `ffa4b1d1` → Green `736e336e` → Refactor `d24781a9`。
+  - 全体テスト: 195 files / 1936 tests すべて成功。typecheck、lint（539 files / 0 diagnostics）も成功。
+
+- **Adversarial Robustness for Machine Learningガイドの移行・共通クローム／スタイル調整（2026-10-14）**:
+  - `/books/adversarial-robustness` に全19 H2・12 H3・41段落・34リスト項目・7表／66行（書籍情報kv表8行、全26章一覧表27行を含む）・1数式ブロック（minimax最適化問題）・12 Mermaid図解・3 callout・10チェック項目・22参考文献カード（23外部リンク）をPure JSXへ転写。
+  - 原本HTML/Markdownは `archive/html/books/Adversarial-robustness-for-machine-learning-guide.html`／`archive/md/books/Adversarial-robustness-for-machine-learning-guide.md` へ内容無変更で退避。SHA-256はHTML `f090ff7345d31ca233f2c529f77f763db4eb6c1f2e1dfda1fe44ebfc844cf530`、Markdown `202848a3852028fa6ea9d9e47265a7f9a1284d74268e309cbffc6e7a2df23d7f` で移動前後一致。指定HTMLを正本とし、registryの追加・確認日は2026-10-14。
+  - 原本照合監査スクリプト（`audit_source_parity.mjs`）は exit 0 で漏れなしを確認。
+  - スタイリング・共通クローム対応:
+    1. 書籍情報カード（Plum callout、Elsevier公式リンク）、Hero kicker（AI Security 初学者ガイド）、メタ情報タグ4件。
+    2. ヒーローセクション内に最終確認日・公開日をメインコンテンツの背景色に合わせた黒文字（`var(--ink)`、`#241f18`）で統合し、グローバル黒帯鮮度バー（`#site-freshness-bar`）を非表示化してディスクレイマー下の不要余白を解消。
+    3. 共通レイアウトフッター（`nav[aria-label="関連ページ"]`）を固定サイドバー（300px）からオフセット（`margin-left: 300px; width: calc(100% - 300px)`）し、サイドバー下への潜り込みを解消。
+    4. フッター全体の背景色をメインコンテンツと同じ淡色ペーパー色（`#f6f1e3`）に統一し、カード（`#fffdf7`）、枠線（`#e4dbc4`）、タイトル（`#241f18`）、要約（`#5a5342`）、アクセント（`#413d8f`）を調和させてダークテーマの浮きを完全に解消。
+    5. 数式ブロック（minimax saddle-point 問題）、攻撃 taxonomy・防御 taxonomy・歴史的経緯の各詳細表（全列左寄せ）。
+    6. 全12箇所の Mermaid 図解に淡色パレット（`theme="base"`, `themeVariables`）を適用。
+    7. 目次追従（`TocObserver`、19見出し＋トップ）とアンカー移動時の見出しめり込み防止（`scroll-margin-top`）。
+    8. インタラクティブチェックリスト（10項目、チェック進捗カウンター連動）。
+  - 20件の契約テスト（S-1〜S-4 原本照合、C-1〜C-6 コンテンツ、D-1〜D-7 デザイン、Q-1〜Q-3 品質契約）を追加。
+  - 分離履歴: Red `eeef014a` → Green `2ff5a863` → Refactor `bdf3b74c` → 追加Red `ddc6febc` → 追加Green `50fda30b` → 追加Refactor `b59641bc` → フッターRed `f605b780` → フッターGreen `695c45a1`。
+  - 全体テスト: 194 files / 1917 tests すべて成功。typecheck、lint（535 files / 0 diagnostics）も成功。
+
+- **LLM Engineer's Handbookガイドの移行・共通クローム／スタイル調整（2026-10-14）**:
+  - `/books/llm-engineers-handbook` に全15 H2・20 H3・55段落・83リスト項目・55表行・2コードブロック・8 Mermaid・5 callout・10チェック項目・15参考文献リンクをPure JSXへ転写。
+  - 原本HTML/Markdownは `archive/html/books/Llm-engineers-handbook-beginner-guide.html`／`archive/md/books/Llm-engineers-handbook-beginner-guide.md` へ内容無変更で退避。SHA-256はHTML `ab1c7ad51535b222d61eaef9b3ccefec1efb9e2c96b2d85bcb3e10a8b1de3d62`、Markdown `7fefe969a6e7ef24bc1c5c5feed3b8b02d1576d49c4231d5e49941c0a4d22690` で移動前後一致。指定HTMLを正本とし、registryの追加・確認日は2026-10-14。
+  - 原本照合監査スクリプト（`audit_source_parity.mjs`）は exit 0 で漏れなしを確認。
+  - スタイリング・共通クローム調整:
+    1. 免責バナー（`DisclaimerBanner`）と固定サイドバー（280px）・メインコンテンツの高さ同期（`--ch-disclaimer-height` 連動、見出しめり込み防止 `scroll-margin-top` 補正）。
+    2. グローバルの黒背景鮮度バー（`#site-freshness-bar`）を `display: none !important; height: 0 !important;` で非表示化し、`margin-top` の余計な余白（+10px）を削除してディスクレイマー直下にヒーローをピタッと接続。
+    3. ヒーローセクション内に最終確認日・公開日を黒文字（`var(--ink)`、`#241f18`）で統合。
+    4. 関連ページフッター（`nav[aria-label="関連ページ"]`）のサイドバー下潜り込みを解消（`margin-left: 280px; width: calc(100% - 280px)`）。
+    5. 全8箇所の Mermaid 図解にライトモード淡色パレット（`theme="base"`, `themeVariables`）を適用し、通常ノード・classDefノードの可読性を確保。
+  - 21件の契約テスト（S-1〜S-4 原本照合、C-1〜C-6 コンテンツ、D-1, D-5〜D-11 デザイン、Q-1〜Q-3 品質契約）を追加。
+  - 分離履歴: Red `48ddd3d4` → Green `a614dbda` → Refactor `c11006ab` → 追加Red `d73b06da` → 追加Green `5afd7acb`。
+  - 全体テスト: 193 files / 1897 tests すべて成功。typecheck、lint（531 files / 0 diagnostics）も成功。
 
 - **`bun audit` 脆弱性対応（2026-10-11）**: `next` を 16.3.6→16.3.8（GHSA-cjq9-62q9-8jv4 ほか6件）、`overrides` で `sharp` ^0.35.5・`source-map-js` ^1.2.2・`katex` ^0.18.2 に更新し、`bun audit` は0件。`katex` は mermaid 10.9.8 の範囲外だが、Mermaid の `$$` 数式記法を使う図が無く実行経路に乗らないため override で固定。typecheck・lint（527 files）・Vitest 192 files / 1876 tests が成功。ビルドは未実行。
 - **Generative AI with LangChainガイドの移行（2026-10-11）**:
@@ -304,16 +429,16 @@
 
 ```text
 AGENTS.md → CODEX.md → CLAUDE.md → docs/PROGRESS.md → Phase A–F 計画の順で読む。
-最新実装 HEAD: 934408a1（Generative AI with LangChain移行後のクラス指定整理。Green: 8868adbd）
-次の作業: /books/generative-ai-with-langchain の目視確認結果に対応する。目視確認はユーザー担当。
-Generative-ai-with-langchain-guide.html は archive/html/books/、Markdown は archive/md/books/ に保存済み。
-HTML原本監査は exit 0。Green時の全体 Vitest 192 files / 1876 tests、整理後の48契約・typecheck・lint（527 files）が成功。pytestは今回対象外。
-この実行環境ではNode 24で NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000 を使用する。
-ページ32契約と操作16契約は本文・全11表・全4リスト・76 CSS規則・12コード例・8 Mermaidと代替説明・目次を厳密に照合する。
-原本の期待値を移植先に合わせて変更しない。指定HTMLが正本で本文情報基準日は2026-09-23のまま。
-900px以下の通常フロー目次、ネイティブ暗色スクロールバー、リストの点・番号・既定余白を保持する。図解はdarkテーマとSVGラベルで紫／青緑配色を保持する。
-開発サーバーはCSSキャッシュ退避後、ポート3000で再起動済み。既存bun.lock差分はコミットしていない。
-サンドボックスでは npm とビルドを実行しない。目視結果への修正も Red → Green → Refactor → Docs で分離コミットする。
-ルート直下に残る未移行HTML候補は9件（2026-10-11にGit追跡ファイル一覧で実測）。次の移行対象は未指定。
-page.tsx 87 件、registry 88 エントリ（RSS を含む）。次のページは指示されてから扱う。
+最新実装 HEAD: 909335c5（Knowledge Graphs基礎ガイド19.2／19.3。Red 51b9bc21 → Green 437d9ef7 → Refactor 909335c5）
+次の作業: /books/knowledge-graphs-fundamentals-techniques#sec-19-2 の目視確認（ユーザー担当）。開発サーバーはポート3001。
+元の8問・8解答を保持し、問題カードの学習目標、個別に開閉する解答、具体例・考え方・注意点・復習リンクを追加した。
+番号・開閉マーカー、Enter／Spaceによる標準操作とフォーカス表示、600px以下の余白を確認する。
+原本2形式とsource-contract.json／syntax-contract.jsonは無変更。原文と補足は別々の固定期待値で検証する。
+HTML原本監査exit 0、対象52契約、全体Vitest 204 files / 2093 tests、typecheck・lint（562 files / 0 diagnostics）が成功。
+NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000 を使用する。
+既存の16 Mermaid図と構文色には変更なし。本文の基準日2026年9月21日を保持する。
+既存のKnowledge Graphs and LLMs in Action／Hands-On LLM／Enterprise RAGを含むページ全体の目視もユーザー担当。
+共有クロームの補正はglobals.cssへ集約。依存・設定・ロック・監査スクリプトは変更していない。
+サンドボックスではnpmとビルドを実行しない。修正もRed → Green → Refactor → Docsの分離コミットを守る。
+page.tsx 93件、registry 94エントリ（RSSを含む）。次ページは指示されてから扱う。
 ```
