@@ -257,6 +257,18 @@ const entries: PageEntry[] = [
     lastReviewed: "2026-10-14",
   },
   {
+    slug: "/books/knowledge-graphs-and-llms-in-action",
+    title: "Knowledge Graphs and LLMs in Action 完全ガイド",
+    description:
+      "Knowledge Graphs and LLMs in Actionを土台に、ナレッジグラフの構築、グラフ機械学習、GraphRAG、Neo4j、LangGraphによるQAエージェントを学ぶ初学者向け完全ガイド。",
+    group: "推薦書籍",
+    topics: ["book", "knowledge-graph", "llm", "rag", "graphrag", "neo4j", "langgraph"],
+    summary:
+      "Knowledge Graphs and LLMs in Actionを土台に、ナレッジグラフの構築、グラフ機械学習、GraphRAG、Neo4j、LangGraphによるQAエージェントを学ぶ初学者向け完全ガイド。",
+    addedAt: "2026-10-15",
+    lastReviewed: "2026-10-15",
+  },
+  {
     slug: "/books/hands-on-large-language-models",
     title: "Hands-On Large Language Models 完全読解ガイド",
     description:

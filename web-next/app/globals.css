@@ -1658,3 +1658,45 @@ body:has([data-page="hands-on-large-language-models"]) nav[aria-label="関連ペ
 
 
 
+
+/* Knowledge Graphs and LLMs in Action: shared chrome follows the original dark guide. */
+body:has([data-page="knowledge-graphs-and-llms-in-action"]) {
+  background: #07111e;
+}
+body:has([data-page="knowledge-graphs-and-llms-in-action"]) #site-freshness-bar {
+  box-sizing: border-box;
+  max-width: none;
+  width: calc(100% - 320px);
+  margin-left: 320px;
+  margin-right: 0;
+  padding-right: 64px;
+  background: #07111e;
+  color: #aebcd6;
+  justify-content: flex-end;
+}
+body:has([data-page="knowledge-graphs-and-llms-in-action"]) #site-freshness-bar time {
+  color: #eaf0fb;
+}
+body:has([data-page="knowledge-graphs-and-llms-in-action"]) nav[aria-label="関連ページ"] {
+  --line: #24405f;
+  --card: #0d1a2c;
+  --fg: #eaf0fb;
+  --muted: #aebcd6;
+  --accent: #7c9eff;
+  box-sizing: border-box;
+  max-width: none;
+  width: calc(100% - 320px);
+  margin-left: 320px;
+  margin-right: 0;
+  padding-left: 64px;
+  padding-right: 64px;
+}
+@media (max-width: 960px) {
+  body:has([data-page="knowledge-graphs-and-llms-in-action"]) #site-freshness-bar,
+  body:has([data-page="knowledge-graphs-and-llms-in-action"]) nav[aria-label="関連ページ"] {
+    width: 100%;
+    margin-left: 0;
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+}
