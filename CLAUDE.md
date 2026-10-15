@@ -37,7 +37,7 @@ Pure JSXへ転写。原本から固定した本文・構造を22件の契約テ�
 メタ情報タグ4件、全27箇所の Mermaid 図解に淡色パレット（theme='base'）を適用。
 ヒーローセクション内に日付（最終確認日・公開日）を黒文字（var(--text)）で統合し、
 グローバルの黒背景鮮度バーを完全非表示（display: none !important）にして余白を解消。
-関連ページフッターを固定サイドバー幅（340px）オフセットし、980px以下では全幅に戻す。
+関連ページフッターを固定サイドバー幅（340px）オフセットし、900px以下では全幅に戻す。
 原本HTML／Markdownは `archive/html/books/Hands-on-large-language-models-guide.html`／
 `archive/md/books/Hands-on-large-language-models-guide.md` に内容無変更で保存。
 指定HTMLを正本とし、registryの追加・確認日は2026-10-14。HTML原本監査exit 0、全体Vitest **197 files / 1970 tests**、

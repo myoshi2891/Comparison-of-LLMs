@@ -63,7 +63,7 @@
        - サイドバー被りの解消: `.sidebar` の `top` を `calc(var(--header-height, 60px) + var(--ch-disclaimer-height, 0px))` に設定し、ディスクレーマーバナー直下に正しく配置（全幅バナーの左端被りを解消）。
        - ディスクレーマー下の余計な隙間の解消: `globals.css` および `page.module.css` に `:global(body:has([data-page="hands-on-large-language-models"]))` を定義し、`body.has-common-header` の過剰な `+10px` マージンを打ち消し。さらに `.main` の上部パディングを `32px` に調整。
        - Mermaid構文エラーの解消: 原本HTML由来のHTMLエンティティ（`--&gt;`, `&lt;br/&gt;` 等）を適切な記法（`-->`, `<br/>`）に正規化し、全27箇所のダイアグラムが正常にSVG描画されるよう修正（監査オラクルのexit 0を維持）。
-    4. 共通レイアウトフッター（`nav[aria-label="関連ページ"]`）を固定サイドバー（340px）からオフセット（`margin-left: 340px; width: calc(100% - 340px)`）し、980px以下では全幅（`margin-left: 0; width: 100%`）へ戻す。
+    4. 共通レイアウトフッター（`nav[aria-label="関連ページ"]`）を固定サイドバー（340px）からオフセット（`margin-left: 340px; width: calc(100% - 340px)`）し、900px以下では全幅（`margin-left: 0; width: 100%`）へ戻す。
     5. テーブルの全列左寄せ（`:global(th), :global(td)` で `text-align: left !important`）。
     6. 全27箇所の Mermaid 図解に淡色パレット（`theme="base"`, `themeVariables`）を適用。
     7. 目次スクロール追従（`TocObserver`、見出し＋トップ）とアンカー移動時の見出しめり込み防止（`scroll-margin-top`）。
