@@ -280,8 +280,10 @@ export default function AdversarialRobustnessGuidePage() {
         </nav>
       </aside>
 
-      <main className={styles.main} id="top">
-        <header className={styles.hero}>
+      <main className={styles.main}>
+        {/* #top は main 全体ではなくヒーローに置く。常に交差し続ける main では
+            IntersectionObserver が再通知せず、先頭へ戻っても目次が点灯しない。 */}
+        <header className={styles.hero} id="top">
           <div className={styles.freshnessBar} lang="ja" data-testid="page-freshness">
             <span className={styles.freshnessItem}>
               最終確認{" "}

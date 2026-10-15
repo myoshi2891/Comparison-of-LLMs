@@ -310,4 +310,13 @@ describe("Adversarial Robustness guide — source parity and design contracts", 
     ];
     expect(navAnchors).toEqual(expectedAnchors);
   });
+
+  it("Q-3b: #top スクロール監視対象は main 全体ではなくヒーローヘッダー", () => {
+    // IntersectionObserver は交差状態の変化でのみ通知する。本文全体を包む main は
+    // 判定帯と常に交差し続けるため、ヒーローへ戻っても #top が再点灯しない。
+    const { container } = render(<Page />);
+    const top = container.querySelector("#top");
+    expect(top?.tagName).toBe("HEADER");
+    expect(container.querySelector("main")?.id).toBe("");
+  });
 });
