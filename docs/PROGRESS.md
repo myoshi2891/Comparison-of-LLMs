@@ -10,7 +10,7 @@
 
 - **フェーズ**: 保守・機能改善・品質強化フェーズ
 - **ブランチ**: `dev`
-- **最新実装 HEAD**: `5fe96d4b`（Reliable Machine Learning ガイドの学習チェックリスト連動・カウンター更新・取り消し線スタイルの修復。移行 Red `908a6769` → Green `0170db70` → Refactor `927a9174`、改善 Red `b20dfcb1` → Green `d8a8b268`、チェックリスト修正 Red `cd400014` → Green `8adaec5b` → Refactor `5fe96d4b`）
+- **最新実装 HEAD**: `3285bb5b`（ディレクトリ直下の移行済みガイド原本退避 `3285bb5b`、Reliable Machine Learning ガイドの学習チェックリスト連動・カウンター更新・取り消し線スタイルの修復 Red `cd400014` → Green `8adaec5b` → Refactor `5fe96d4b` → Docs `6aec0f8f`）
 - **次の作業**: `/books/reliable-machine-learning` の目視確認（ユーザー担当。ポート3000/3001）。12箇所の Mermaid 図解（ライトテーマ・コントラスト保護）、300px 固定常駐目次サイドバー、テーブルの左寄せ、学習チェックリスト（10項目）のチェックボックスON/OFF連動（右上の進捗バッジ 0/10〜10/10 リアルタイム更新、チェック項目の line-through 取り消し線スタイル反映）、白背景と調和した共通フッター、不透明ヘッダー・免責バナー、モバイル表示を確認する。既存ページ全体の目視も引き続きユーザー担当。npm・ビルドは禁止。
 - **ルート実数**: `page.tsx` 95 件、registry 96 エントリ（RSS の `/rss.xml` を含む）。全ルート登録・ナビ導出テストは合格。
 - **動作検証**:
@@ -25,6 +25,10 @@
   - **バックエンド (`scraper/`)**: 今回はユーザー指定で検証対象外。実行していない。過去の成功記録は104件（2026-10-04）であり、今回の実測値ではない。
 
 ## 最近の追加内容
+
+- **移行済み Markdown ガイド原本の archive/ 退避（2026-10-15）**:
+  - リポジトリ直下に残っていた移行済み原本 Markdown ファイル 3 件（`Ai-engineering-guide.md` → `archive/md/books/`、`Enterprise-rag-guide.md` → `archive/md/rag/`、`Generative-ai-for-software-development-guide.md` → `archive/md/books/`）を `archive/` 配下へ完全移動（`3285bb5b`）。
+  - ディレクトリ直下の未移行ファイル（`Ai-assisted-programming-for-web-and-machine-learning-guide.md`, `Ai-native-foundations-study-guide.md`, `Jev-typescript-guide.html`, `Jev-typescript-guide.md`）はそのまま保持。
 
 - **Reliable Machine Learning 学習チェックリスト連動バグ修正（2026-10-15）**:
   - `/books/reliable-machine-learning` の第13章「学習チェックリスト」において、チェックボックスをクリックしても右上の進捗カウンター（`.checklist-done` / `0/10`）が更新されず、取り消し線（`line-through`）スタイルも反映されない問題を精査・修正。
