@@ -462,46 +462,64 @@ export default function Page() {
           <pre data-testid="code-block">
             <code className="language-python">
               <span className={styles.codeLine} data-testid="code-line">
-                {"# インストール"}
+                <span className="hljs-comment">{"# インストール"}</span>
               </span>
               <span className={styles.codeLine} data-testid="code-line">
-                {"# pip install langchain langchain-openai"}
+                <span className="hljs-comment">{"# pip install langchain langchain-openai"}</span>
               </span>
               <span className={styles.codeLine} data-testid="code-line">
-                {
-                  "# 本ガイドの「原著の書き方」の例（langchain.chains / langchain.agents の initialize_agent・load_tools /"
-                }
+                <span className="hljs-comment">
+                  {
+                    "# 本ガイドの「原著の書き方」の例（langchain.chains / langchain.agents の initialize_agent・load_tools /"
+                  }
+                </span>
               </span>
               <span className={styles.codeLine} data-testid="code-line">
-                {
-                  "# langchain.memory / langchain.evaluation）は 1.x では動きません。試す場合は別の仮想環境で 0.3 系を固定します:"
-                }
+                <span className="hljs-comment">
+                  {
+                    "# langchain.memory / langchain.evaluation）は 1.x では動きません。試す場合は別の仮想環境で 0.3 系を固定します:"
+                  }
+                </span>
               </span>
               <span className={styles.codeLine} data-testid="code-line">
-                {
-                  '# pip install "langchain>=0.3,<0.4" "langchain-community>=0.3,<0.4" "langchain-openai<1.0"'
-                }
-              </span>
-              <span className={styles.codeLine} data-testid="code-line"></span>
-              <span className={styles.codeLine} data-testid="code-line">
-                {"import os"}
-              </span>
-              <span className={styles.codeLine} data-testid="code-line">
-                {'os.environ["OPENAI_API_KEY"] = "sk-..."'}
-              </span>
-              <span className={styles.codeLine} data-testid="code-line"></span>
-              <span className={styles.codeLine} data-testid="code-line">
-                {"from langchain_openai import ChatOpenAI"}
+                <span className="hljs-comment">
+                  {
+                    '# pip install "langchain>=0.3,<0.4" "langchain-community>=0.3,<0.4" "langchain-openai<1.0"'
+                  }
+                </span>
               </span>
               <span className={styles.codeLine} data-testid="code-line"></span>
               <span className={styles.codeLine} data-testid="code-line">
-                {'llm = ChatOpenAI(model="gpt-3.5-turbo")'}
+                <span className="hljs-keyword">{"import"}</span>
+                {" os"}
               </span>
               <span className={styles.codeLine} data-testid="code-line">
-                {'response = llm.invoke("こんにちは、自己紹介してください")'}
+                {"os.environ["}
+                <span className="hljs-string">{'"OPENAI_API_KEY"'}</span>
+                {"] = "}
+                <span className="hljs-string">{'"sk-..."'}</span>
+              </span>
+              <span className={styles.codeLine} data-testid="code-line"></span>
+              <span className={styles.codeLine} data-testid="code-line">
+                <span className="hljs-keyword">{"from"}</span>
+                {" langchain_openai "}
+                <span className="hljs-keyword">{"import"}</span>
+                {" ChatOpenAI"}
+              </span>
+              <span className={styles.codeLine} data-testid="code-line"></span>
+              <span className={styles.codeLine} data-testid="code-line">
+                {"llm = ChatOpenAI(model="}
+                <span className="hljs-string">{'"gpt-3.5-turbo"'}</span>
+                {")"}
               </span>
               <span className={styles.codeLine} data-testid="code-line">
-                {"print(response.content)"}
+                {"response = llm.invoke("}
+                <span className="hljs-string">{'"こんにちは、自己紹介してください"'}</span>
+                {")"}
+              </span>
+              <span className={styles.codeLine} data-testid="code-line">
+                <span className="hljs-built_in">{"print"}</span>
+                {"(response.content)"}
               </span>
             </code>
           </pre>
@@ -514,7 +532,10 @@ export default function Page() {
           <pre data-testid="code-block">
             <code className="language-python">
               <span className={styles.codeLine} data-testid="code-line">
-                {"from langchain_core.prompts import PromptTemplate"}
+                <span className="hljs-keyword">{"from"}</span>
+                {" langchain_core.prompts "}
+                <span className="hljs-keyword">{"import"}</span>
+                {" PromptTemplate"}
               </span>
               <span className={styles.codeLine} data-testid="code-line"></span>
               <span className={styles.codeLine} data-testid="code-line">
@@ -522,7 +543,9 @@ export default function Page() {
               </span>
               <span className={styles.codeLine} data-testid="code-line">
                 {"    "}
-                {'"{category}のブランドに相応しい名前を3つ提案してください。"'}
+                <span className="hljs-string">
+                  {'"{category}のブランドに相応しい名前を3つ提案してください。"'}
+                </span>
               </span>
               <span className={styles.codeLine} data-testid="code-line">
                 {")"}
@@ -531,10 +554,15 @@ export default function Page() {
                 {"chain = prompt | llm"}
               </span>
               <span className={styles.codeLine} data-testid="code-line">
-                {'result = chain.invoke({"category": "オーガニック紅茶"})'}
+                {"result = chain.invoke({"}
+                <span className="hljs-string">{'"category"'}</span>
+                {": "}
+                <span className="hljs-string">{'"オーガニック紅茶"'}</span>
+                {"})"}
               </span>
               <span className={styles.codeLine} data-testid="code-line">
-                {"print(result.content)"}
+                <span className="hljs-built_in">{"print"}</span>
+                {"(result.content)"}
               </span>
             </code>
           </pre>
@@ -685,25 +713,37 @@ export default function Page() {
           <pre data-testid="code-block">
             <code className="language-python">
               <span className={styles.codeLine} data-testid="code-line">
-                {"from langchain_core.messages import HumanMessage, SystemMessage"}
+                <span className="hljs-keyword">{"from"}</span>
+                {" langchain_core.messages "}
+                <span className="hljs-keyword">{"import"}</span>
+                {" HumanMessage, SystemMessage"}
               </span>
               <span className={styles.codeLine} data-testid="code-line">
-                {"from langchain_openai import ChatOpenAI"}
+                <span className="hljs-keyword">{"from"}</span>
+                {" langchain_openai "}
+                <span className="hljs-keyword">{"import"}</span>
+                {" ChatOpenAI"}
               </span>
               <span className={styles.codeLine} data-testid="code-line"></span>
               <span className={styles.codeLine} data-testid="code-line">
-                {'chat = ChatOpenAI(model="gpt-4o-mini")'}
+                {"chat = ChatOpenAI(model="}
+                <span className="hljs-string">{'"gpt-4o-mini"'}</span>
+                {")"}
               </span>
               <span className={styles.codeLine} data-testid="code-line">
                 {"messages = ["}
               </span>
               <span className={styles.codeLine} data-testid="code-line">
-                {"    "}
-                {'SystemMessage(content="あなたは丁寧な日本語アシスタントです。"),'}
+                {"    SystemMessage(content="}
+                <span className="hljs-string">{'"あなたは丁寧な日本語アシスタントです。"'}</span>
+                {"),"}
               </span>
               <span className={styles.codeLine} data-testid="code-line">
-                {"    "}
-                {'HumanMessage(content="LangChainのChatModelとLLMの違いを教えてください。"),'}
+                {"    HumanMessage(content="}
+                <span className="hljs-string">
+                  {'"LangChainのChatModelとLLMの違いを教えてください。"'}
+                </span>
+                {"),"}
               </span>
               <span className={styles.codeLine} data-testid="code-line">
                 {"]"}
@@ -712,7 +752,8 @@ export default function Page() {
                 {"response = chat.invoke(messages)"}
               </span>
               <span className={styles.codeLine} data-testid="code-line">
-                {"print(response.content)"}
+                <span className="hljs-built_in">{"print"}</span>
+                {"(response.content)"}
               </span>
             </code>
           </pre>
@@ -731,27 +772,42 @@ export default function Page() {
           <pre data-testid="code-block">
             <code className="language-python">
               <span className={styles.codeLine} data-testid="code-line">
-                {"from langchain_core.prompts import ChatPromptTemplate"}
+                <span className="hljs-keyword">{"from"}</span>
+                {" langchain_core.prompts "}
+                <span className="hljs-keyword">{"import"}</span>
+                {" ChatPromptTemplate"}
               </span>
               <span className={styles.codeLine} data-testid="code-line"></span>
               <span className={styles.codeLine} data-testid="code-line">
                 {"template = ChatPromptTemplate.from_messages(["}
               </span>
               <span className={styles.codeLine} data-testid="code-line">
-                {"    "}
-                {'("system", "あなたは{domain}の専門家です。"),'}
+                {"    ("}
+                <span className="hljs-string">{'"system"'}</span>
+                {", "}
+                <span className="hljs-string">{'"あなたは{domain}の専門家です。"'}</span>
+                {"),"}
               </span>
               <span className={styles.codeLine} data-testid="code-line">
-                {"    "}
-                {'("human", "{question}"),'}
+                {"    ("}
+                <span className="hljs-string">{'"human"'}</span>
+                {", "}
+                <span className="hljs-string">{'"{question}"'}</span>
+                {"),"}
               </span>
               <span className={styles.codeLine} data-testid="code-line">
                 {"])"}
               </span>
               <span className={styles.codeLine} data-testid="code-line">
-                {
-                  'formatted = template.invoke({"domain": "栄養学", "question": "タンパク質摂取の目安は？"})'
-                }
+                {"formatted = template.invoke({"}
+                <span className="hljs-string">{'"domain"'}</span>
+                {": "}
+                <span className="hljs-string">{'"栄養学"'}</span>
+                {", "}
+                <span className="hljs-string">{'"question"'}</span>
+                {": "}
+                <span className="hljs-string">{'"タンパク質摂取の目安は？"'}</span>
+                {"})"}
               </span>
             </code>
           </pre>
@@ -793,17 +849,24 @@ export default function Page() {
           <pre data-testid="code-block">
             <code className="language-python">
               <span className={styles.codeLine} data-testid="code-line">
-                {"# 原著の書き方（LLMChain、2024年当時の標準）"}
+                <span className="hljs-comment">
+                  {"# 原著の書き方（LLMChain、2024年当時の標準）"}
+                </span>
               </span>
               <span className={styles.codeLine} data-testid="code-line">
-                {"from langchain.chains import LLMChain"}
+                <span className="hljs-keyword">{"from"}</span>
+                {" langchain.chains "}
+                <span className="hljs-keyword">{"import"}</span>
+                {" LLMChain"}
               </span>
               <span className={styles.codeLine} data-testid="code-line"></span>
               <span className={styles.codeLine} data-testid="code-line">
                 {"chain = LLMChain(llm=llm, prompt=prompt)"}
               </span>
               <span className={styles.codeLine} data-testid="code-line">
-                {'result = chain.run(category="スポーツウェア")'}
+                {"result = chain.run(category="}
+                <span className="hljs-string">{'"スポーツウェア"'}</span>
+                {")"}
               </span>
             </code>
           </pre>
@@ -820,10 +883,13 @@ export default function Page() {
           <pre data-testid="code-block">
             <code className="language-python">
               <span className={styles.codeLine} data-testid="code-line">
-                {"# LCELによる書き方"}
+                <span className="hljs-comment">{"# LCELによる書き方"}</span>
               </span>
               <span className={styles.codeLine} data-testid="code-line">
-                {"from langchain_core.output_parsers import StrOutputParser"}
+                <span className="hljs-keyword">{"from"}</span>
+                {" langchain_core.output_parsers "}
+                <span className="hljs-keyword">{"import"}</span>
+                {" StrOutputParser"}
               </span>
               <span className={styles.codeLine} data-testid="code-line"></span>
               <span className={styles.codeLine} data-testid="code-line">
@@ -833,7 +899,11 @@ export default function Page() {
                 {"chain = prompt | llm | output_parser"}
               </span>
               <span className={styles.codeLine} data-testid="code-line">
-                {'result = chain.invoke({"category": "スポーツウェア"})'}
+                {"result = chain.invoke({"}
+                <span className="hljs-string">{'"category"'}</span>
+                {": "}
+                <span className="hljs-string">{'"スポーツウェア"'}</span>
+                {"})"}
               </span>
             </code>
           </pre>
@@ -940,34 +1010,47 @@ export default function Page() {
                 {"pip install google-search-results"}
               </span>
               <span className={styles.codeLine} data-testid="code-line">
-                {'export SERPAPI_API_KEY="your-serpapi-key"'}
+                <span className="hljs-built_in">{"export"}</span>
+                {" SERPAPI_API_KEY="}
+                <span className="hljs-string">{'"your-serpapi-key"'}</span>
               </span>
             </code>
           </pre>
           <pre data-testid="code-block">
             <code className="language-python">
               <span className={styles.codeLine} data-testid="code-line">
-                {"# 原著の書き方（2024年当時のAgent API）"}
+                <span className="hljs-comment">{"# 原著の書き方（2024年当時のAgent API）"}</span>
               </span>
               <span className={styles.codeLine} data-testid="code-line">
-                {"from langchain.agents import initialize_agent, AgentType, load_tools"}
+                <span className="hljs-keyword">{"from"}</span>
+                {" langchain.agents "}
+                <span className="hljs-keyword">{"import"}</span>
+                {" initialize_agent, AgentType, load_tools"}
               </span>
               <span className={styles.codeLine} data-testid="code-line"></span>
               <span className={styles.codeLine} data-testid="code-line">
-                {'tools = load_tools(["serpapi", "llm-math"], llm=llm)'}
+                {"tools = load_tools(["}
+                <span className="hljs-string">{'"serpapi"'}</span>
+                {", "}
+                <span className="hljs-string">{'"llm-math"'}</span>
+                {"], llm=llm)"}
               </span>
               <span className={styles.codeLine} data-testid="code-line">
                 {"agent = initialize_agent("}
               </span>
               <span className={styles.codeLine} data-testid="code-line">
-                {"    "}
-                {"tools, llm, agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION, verbose=True"}
+                {"    tools, llm, agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION, verbose="}
+                <span className="hljs-literal">{"True"}</span>
               </span>
               <span className={styles.codeLine} data-testid="code-line">
                 {")"}
               </span>
               <span className={styles.codeLine} data-testid="code-line">
-                {'agent.run("2024年のノーベル物理学賞受賞者の年齢を2倍した数値は？")'}
+                {"agent.run("}
+                <span className="hljs-string">
+                  {'"2024年のノーベル物理学賞受賞者の年齢を2倍した数値は？"'}
+                </span>
+                {")"}
               </span>
             </code>
           </pre>
@@ -984,22 +1067,39 @@ export default function Page() {
           <pre data-testid="code-block">
             <code className="language-python">
               <span className={styles.codeLine} data-testid="code-line">
-                {"from langchain_core.tools import tool"}
+                <span className="hljs-keyword">{"from"}</span>
+                {" langchain_core.tools "}
+                <span className="hljs-keyword">{"import"}</span>
+                {" tool"}
               </span>
               <span className={styles.codeLine} data-testid="code-line"></span>
               <span className={styles.codeLine} data-testid="code-line">
-                {"@tool"}
+                <span className="hljs-meta">{"@tool"}</span>
               </span>
               <span className={styles.codeLine} data-testid="code-line">
-                {"def get_shipping_status(order_id: str) -> str:"}
+                <span className="hljs-keyword">{"def"}</span>{" "}
+                <span className="hljs-title function_">{"get_shipping_status"}</span>
+                {"("}
+                <span className="hljs-params">
+                  {"order_id: "}
+                  <span className="hljs-built_in">{"str"}</span>
+                </span>
+                {") -> "}
+                <span className="hljs-built_in">{"str"}</span>
+                {":"}
               </span>
               <span className={styles.codeLine} data-testid="code-line">
                 {"    "}
-                {'"""注文IDから配送状況を取得する"""'}
+                <span className="hljs-string">{'"""注文IDから配送状況を取得する"""'}</span>
               </span>
               <span className={styles.codeLine} data-testid="code-line">
                 {"    "}
-                {'return f"注文 {order_id} は配送中です。"'}
+                <span className="hljs-keyword">{"return"}</span>{" "}
+                <span className="hljs-string">
+                  {'f"注文 '}
+                  <span className="hljs-subst">{"{order_id}"}</span>
+                  {' は配送中です。"'}
+                </span>
               </span>
             </code>
           </pre>
@@ -1039,34 +1139,48 @@ export default function Page() {
           <pre data-testid="code-block">
             <code className="language-python">
               <span className={styles.codeLine} data-testid="code-line">
-                {"# 2026年時点の推奨される書き方"}
+                <span className="hljs-comment">{"# 2026年時点の推奨される書き方"}</span>
               </span>
               <span className={styles.codeLine} data-testid="code-line">
-                {"from langchain.agents import create_agent"}
+                <span className="hljs-keyword">{"from"}</span>
+                {" langchain.agents "}
+                <span className="hljs-keyword">{"import"}</span>
+                {" create_agent"}
               </span>
               <span className={styles.codeLine} data-testid="code-line"></span>
               <span className={styles.codeLine} data-testid="code-line">
                 {"agent = create_agent("}
               </span>
               <span className={styles.codeLine} data-testid="code-line">
-                {"    "}
-                {'model="openai:gpt-5",'}
+                {"    model="}
+                <span className="hljs-string">{'"openai:gpt-5"'}</span>
+                {","}
               </span>
               <span className={styles.codeLine} data-testid="code-line">
-                {"    "}
-                {"tools=[get_shipping_status],"}
+                {"    tools=[get_shipping_status],"}
               </span>
               <span className={styles.codeLine} data-testid="code-line">
-                {"    "}
-                {'system_prompt="あなたはECサイトのカスタマーサポート担当です。",'}
+                {"    system_prompt="}
+                <span className="hljs-string">
+                  {'"あなたはECサイトのカスタマーサポート担当です。"'}
+                </span>
+                {","}
               </span>
               <span className={styles.codeLine} data-testid="code-line">
                 {")"}
               </span>
               <span className={styles.codeLine} data-testid="code-line">
-                {
-                  'result = agent.invoke({"messages": [{"role": "user", "content": "注文12345の状況は？"}]})'
-                }
+                {"result = agent.invoke({"}
+                <span className="hljs-string">{'"messages"'}</span>
+                {": [{"}
+                <span className="hljs-string">{'"role"'}</span>
+                {": "}
+                <span className="hljs-string">{'"user"'}</span>
+                {", "}
+                <span className="hljs-string">{'"content"'}</span>
+                {": "}
+                <span className="hljs-string">{'"注文12345の状況は？"'}</span>
+                {"}]})"}
               </span>
             </code>
           </pre>
@@ -1097,14 +1211,19 @@ export default function Page() {
           <pre data-testid="code-block">
             <code className="language-python">
               <span className={styles.codeLine} data-testid="code-line">
-                {"from langchain_core.output_parsers import CommaSeparatedListOutputParser"}
+                <span className="hljs-keyword">{"from"}</span>
+                {" langchain_core.output_parsers "}
+                <span className="hljs-keyword">{"import"}</span>
+                {" CommaSeparatedListOutputParser"}
               </span>
               <span className={styles.codeLine} data-testid="code-line"></span>
               <span className={styles.codeLine} data-testid="code-line">
                 {"parser = CommaSeparatedListOutputParser()"}
               </span>
               <span className={styles.codeLine} data-testid="code-line">
-                {"# LLMに「カンマ区切りで答えて」と指示するプロンプトと組み合わせて使う"}
+                <span className="hljs-comment">
+                  {"# LLMに「カンマ区切りで答えて」と指示するプロンプトと組み合わせて使う"}
+                </span>
               </span>
             </code>
           </pre>
@@ -1127,19 +1246,28 @@ export default function Page() {
           <pre data-testid="code-block">
             <code className="language-python">
               <span className={styles.codeLine} data-testid="code-line">
-                {"# 原著の書き方（2024年当時のMemory API）"}
+                <span className="hljs-comment">{"# 原著の書き方（2024年当時のMemory API）"}</span>
               </span>
               <span className={styles.codeLine} data-testid="code-line">
-                {"from langchain.memory import ConversationBufferMemory"}
+                <span className="hljs-keyword">{"from"}</span>
+                {" langchain.memory "}
+                <span className="hljs-keyword">{"import"}</span>
+                {" ConversationBufferMemory"}
               </span>
               <span className={styles.codeLine} data-testid="code-line"></span>
               <span className={styles.codeLine} data-testid="code-line">
                 {"memory = ConversationBufferMemory()"}
               </span>
               <span className={styles.codeLine} data-testid="code-line">
-                {
-                  'memory.save_context({"input": "こんにちは"}, {"output": "こんにちは、ご用件は？"})'
-                }
+                {"memory.save_context({"}
+                <span className="hljs-string">{'"input"'}</span>
+                {": "}
+                <span className="hljs-string">{'"こんにちは"'}</span>
+                {"}, {"}
+                <span className="hljs-string">{'"output"'}</span>
+                {": "}
+                <span className="hljs-string">{'"こんにちは、ご用件は？"'}</span>
+                {"})"}
               </span>
             </code>
           </pre>
@@ -1321,27 +1449,45 @@ export default function Page() {
           <pre data-testid="code-block">
             <code className="language-python">
               <span className={styles.codeLine} data-testid="code-line">
-                {"from langchain_community.document_loaders import WebBaseLoader"}
+                <span className="hljs-keyword">{"from"}</span>
+                {" langchain_community.document_loaders "}
+                <span className="hljs-keyword">{"import"}</span>
+                {" WebBaseLoader"}
               </span>
               <span className={styles.codeLine} data-testid="code-line">
-                {"from langchain_text_splitters import RecursiveCharacterTextSplitter"}
+                <span className="hljs-keyword">{"from"}</span>
+                {" langchain_text_splitters "}
+                <span className="hljs-keyword">{"import"}</span>
+                {" RecursiveCharacterTextSplitter"}
               </span>
               <span className={styles.codeLine} data-testid="code-line">
-                {"from langchain_openai import OpenAIEmbeddings"}
+                <span className="hljs-keyword">{"from"}</span>
+                {" langchain_openai "}
+                <span className="hljs-keyword">{"import"}</span>
+                {" OpenAIEmbeddings"}
               </span>
               <span className={styles.codeLine} data-testid="code-line">
-                {"from langchain_chroma import Chroma"}
+                <span className="hljs-keyword">{"from"}</span>
+                {" langchain_chroma "}
+                <span className="hljs-keyword">{"import"}</span>
+                {" Chroma"}
               </span>
               <span className={styles.codeLine} data-testid="code-line"></span>
               <span className={styles.codeLine} data-testid="code-line">
-                {'loader = WebBaseLoader("https://example.com/docs")'}
+                {"loader = WebBaseLoader("}
+                <span className="hljs-string">{'"https://example.com/docs"'}</span>
+                {")"}
               </span>
               <span className={styles.codeLine} data-testid="code-line">
                 {"docs = loader.load()"}
               </span>
               <span className={styles.codeLine} data-testid="code-line"></span>
               <span className={styles.codeLine} data-testid="code-line">
-                {"splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)"}
+                {"splitter = RecursiveCharacterTextSplitter(chunk_size="}
+                <span className="hljs-number">{"500"}</span>
+                {", chunk_overlap="}
+                <span className="hljs-number">{"50"}</span>
+                {")"}
               </span>
               <span className={styles.codeLine} data-testid="code-line">
                 {"chunks = splitter.split_documents(docs)"}
@@ -1355,10 +1501,15 @@ export default function Page() {
               </span>
               <span className={styles.codeLine} data-testid="code-line"></span>
               <span className={styles.codeLine} data-testid="code-line">
-                {"# RAG用プロンプト（context と question を受け取る）"}
+                <span className="hljs-comment">
+                  {"# RAG用プロンプト（context と question を受け取る）"}
+                </span>
               </span>
               <span className={styles.codeLine} data-testid="code-line">
-                {"from langchain_core.prompts import ChatPromptTemplate"}
+                <span className="hljs-keyword">{"from"}</span>
+                {" langchain_core.prompts "}
+                <span className="hljs-keyword">{"import"}</span>
+                {" ChatPromptTemplate"}
               </span>
               <span className={styles.codeLine} data-testid="code-line"></span>
               <span className={styles.codeLine} data-testid="code-line">
@@ -1366,34 +1517,53 @@ export default function Page() {
               </span>
               <span className={styles.codeLine} data-testid="code-line">
                 {"    "}
-                {
-                  '"次の文脈だけを使って質問に答えてください。\\n\\n文脈:\\n{context}\\n\\n質問: {question}"'
-                }
+                <span className="hljs-string">
+                  {
+                    '"次の文脈だけを使って質問に答えてください。\\n\\n文脈:\\n{context}\\n\\n質問: {question}"'
+                  }
+                </span>
               </span>
               <span className={styles.codeLine} data-testid="code-line">
                 {")"}
               </span>
               <span className={styles.codeLine} data-testid="code-line"></span>
               <span className={styles.codeLine} data-testid="code-line">
-                {"# RAGチェーン（LCEL）"}
+                <span className="hljs-comment">{"# RAGチェーン（LCEL）"}</span>
               </span>
               <span className={styles.codeLine} data-testid="code-line">
-                {'# 入力は {"question": "..."} 形式。retriever には質問文字列だけを渡し、'}
+                <span className="hljs-comment">
+                  {'# 入力は {"question": "..."} 形式。retriever には質問文字列だけを渡し、'}
+                </span>
               </span>
               <span className={styles.codeLine} data-testid="code-line">
-                {"# 取得した Document の page_content を連結して context にする。"}
+                <span className="hljs-comment">
+                  {"# 取得した Document の page_content を連結して context にする。"}
+                </span>
               </span>
               <span className={styles.codeLine} data-testid="code-line">
-                {"from operator import itemgetter"}
+                <span className="hljs-keyword">{"from"}</span>
+                {" operator "}
+                <span className="hljs-keyword">{"import"}</span>
+                {" itemgetter"}
               </span>
               <span className={styles.codeLine} data-testid="code-line"></span>
               <span className={styles.codeLine} data-testid="code-line"></span>
               <span className={styles.codeLine} data-testid="code-line">
-                {"def format_docs(docs):"}
+                <span className="hljs-keyword">{"def"}</span>{" "}
+                <span className="hljs-title function_">{"format_docs"}</span>
+                {"("}
+                <span className="hljs-params">{"docs"}</span>
+                {"):"}
               </span>
               <span className={styles.codeLine} data-testid="code-line">
                 {"    "}
-                {'return "\\n\\n".join(doc.page_content for doc in docs)'}
+                <span className="hljs-keyword">{"return"}</span>{" "}
+                <span className="hljs-string">{'"\\n\\n"'}</span>
+                {".join(doc.page_content "}
+                <span className="hljs-keyword">{"for"}</span>
+                {" doc "}
+                <span className="hljs-keyword">{"in"}</span>
+                {" docs)"}
               </span>
               <span className={styles.codeLine} data-testid="code-line"></span>
               <span className={styles.codeLine} data-testid="code-line"></span>
@@ -1401,28 +1571,30 @@ export default function Page() {
                 {"rag_chain = ("}
               </span>
               <span className={styles.codeLine} data-testid="code-line">
-                {"    "}
-                {"{"}
+                {"    {"}
               </span>
               <span className={styles.codeLine} data-testid="code-line">
                 {"        "}
-                {'"context": itemgetter("question") | retriever | format_docs,'}
+                <span className="hljs-string">{'"context"'}</span>
+                {": itemgetter("}
+                <span className="hljs-string">{'"question"'}</span>
+                {") | retriever | format_docs,"}
               </span>
               <span className={styles.codeLine} data-testid="code-line">
                 {"        "}
-                {'"question": itemgetter("question"),'}
+                <span className="hljs-string">{'"question"'}</span>
+                {": itemgetter("}
+                <span className="hljs-string">{'"question"'}</span>
+                {"),"}
               </span>
               <span className={styles.codeLine} data-testid="code-line">
-                {"    "}
-                {"}"}
+                {"    }"}
               </span>
               <span className={styles.codeLine} data-testid="code-line">
-                {"    "}
-                {"| rag_prompt"}
+                {"    | rag_prompt"}
               </span>
               <span className={styles.codeLine} data-testid="code-line">
-                {"    "}
-                {"| llm"}
+                {"    | llm"}
               </span>
               <span className={styles.codeLine} data-testid="code-line">
                 {")"}
@@ -1582,45 +1754,64 @@ export default function Page() {
           <pre data-testid="code-block">
             <code className="language-python">
               <span className={styles.codeLine} data-testid="code-line">
-                {"from langchain_core.prompts import FewShotPromptTemplate, PromptTemplate"}
+                <span className="hljs-keyword">{"from"}</span>
+                {" langchain_core.prompts "}
+                <span className="hljs-keyword">{"import"}</span>
+                {" FewShotPromptTemplate, PromptTemplate"}
               </span>
               <span className={styles.codeLine} data-testid="code-line"></span>
               <span className={styles.codeLine} data-testid="code-line">
                 {"examples = ["}
               </span>
               <span className={styles.codeLine} data-testid="code-line">
-                {"    "}
-                {'{"text": "このカレーは辛すぎる", "label": "ネガティブ"},'}
+                {"    {"}
+                <span className="hljs-string">{'"text"'}</span>
+                {": "}
+                <span className="hljs-string">{'"このカレーは辛すぎる"'}</span>
+                {", "}
+                <span className="hljs-string">{'"label"'}</span>
+                {": "}
+                <span className="hljs-string">{'"ネガティブ"'}</span>
+                {"},"}
               </span>
               <span className={styles.codeLine} data-testid="code-line">
-                {"    "}
-                {'{"text": "サービスがとても丁寧だった", "label": "ポジティブ"},'}
+                {"    {"}
+                <span className="hljs-string">{'"text"'}</span>
+                {": "}
+                <span className="hljs-string">{'"サービスがとても丁寧だった"'}</span>
+                {", "}
+                <span className="hljs-string">{'"label"'}</span>
+                {": "}
+                <span className="hljs-string">{'"ポジティブ"'}</span>
+                {"},"}
               </span>
               <span className={styles.codeLine} data-testid="code-line">
                 {"]"}
               </span>
               <span className={styles.codeLine} data-testid="code-line">
-                {'example_prompt = PromptTemplate.from_template("入力: {text}\\n分類: {label}")'}
+                {"example_prompt = PromptTemplate.from_template("}
+                <span className="hljs-string">{'"入力: {text}\\n分類: {label}"'}</span>
+                {")"}
               </span>
               <span className={styles.codeLine} data-testid="code-line"></span>
               <span className={styles.codeLine} data-testid="code-line">
                 {"few_shot_prompt = FewShotPromptTemplate("}
               </span>
               <span className={styles.codeLine} data-testid="code-line">
-                {"    "}
-                {"examples=examples,"}
+                {"    examples=examples,"}
               </span>
               <span className={styles.codeLine} data-testid="code-line">
-                {"    "}
-                {"example_prompt=example_prompt,"}
+                {"    example_prompt=example_prompt,"}
               </span>
               <span className={styles.codeLine} data-testid="code-line">
-                {"    "}
-                {'suffix="入力: {input}\\n分類:",'}
+                {"    suffix="}
+                <span className="hljs-string">{'"入力: {input}\\n分類:"'}</span>
+                {","}
               </span>
               <span className={styles.codeLine} data-testid="code-line">
-                {"    "}
-                {'input_variables=["input"],'}
+                {"    input_variables=["}
+                <span className="hljs-string">{'"input"'}</span>
+                {"],"}
               </span>
               <span className={styles.codeLine} data-testid="code-line">
                 {")"}
@@ -1741,25 +1932,38 @@ export default function Page() {
           <pre data-testid="code-block">
             <code className="language-python">
               <span className={styles.codeLine} data-testid="code-line">
-                {"# 原著の書き方（Criteria Evaluatorの例）"}
+                <span className="hljs-comment">{"# 原著の書き方（Criteria Evaluatorの例）"}</span>
               </span>
               <span className={styles.codeLine} data-testid="code-line">
-                {"from langchain.evaluation import load_evaluator"}
+                <span className="hljs-keyword">{"from"}</span>
+                {" langchain.evaluation "}
+                <span className="hljs-keyword">{"import"}</span>
+                {" load_evaluator"}
               </span>
               <span className={styles.codeLine} data-testid="code-line"></span>
               <span className={styles.codeLine} data-testid="code-line">
-                {'evaluator = load_evaluator("criteria", criteria="conciseness")'}
+                {"evaluator = load_evaluator("}
+                <span className="hljs-string">{'"criteria"'}</span>
+                {", criteria="}
+                <span className="hljs-string">{'"conciseness"'}</span>
+                {")"}
               </span>
               <span className={styles.codeLine} data-testid="code-line">
                 {"eval_result = evaluator.evaluate_strings("}
               </span>
               <span className={styles.codeLine} data-testid="code-line">
-                {"    "}
-                {'prediction="LangChainはLLMアプリ開発用のフレームワークです。",'}
+                {"    prediction="}
+                <span className="hljs-string">
+                  {'"LangChainはLLMアプリ開発用のフレームワークです。"'}
+                </span>
+                {","}
               </span>
               <span className={styles.codeLine} data-testid="code-line">
                 {"    "}
-                {'input="LangChainとは何ですか？",'}
+                <span className="hljs-built_in">{"input"}</span>
+                {"="}
+                <span className="hljs-string">{'"LangChainとは何ですか？"'}</span>
+                {","}
               </span>
               <span className={styles.codeLine} data-testid="code-line">
                 {")"}
@@ -1967,20 +2171,30 @@ export default function Page() {
           <pre data-testid="code-block">
             <code className="language-python">
               <span className={styles.codeLine} data-testid="code-line">
-                {"# 原著の書き方（LangServeによるデプロイ例）"}
+                <span className="hljs-comment">
+                  {"# 原著の書き方（LangServeによるデプロイ例）"}
+                </span>
               </span>
               <span className={styles.codeLine} data-testid="code-line">
-                {"from fastapi import FastAPI"}
+                <span className="hljs-keyword">{"from"}</span>
+                {" fastapi "}
+                <span className="hljs-keyword">{"import"}</span>
+                {" FastAPI"}
               </span>
               <span className={styles.codeLine} data-testid="code-line">
-                {"from langserve import add_routes"}
+                <span className="hljs-keyword">{"from"}</span>
+                {" langserve "}
+                <span className="hljs-keyword">{"import"}</span>
+                {" add_routes"}
               </span>
               <span className={styles.codeLine} data-testid="code-line"></span>
               <span className={styles.codeLine} data-testid="code-line">
                 {"app = FastAPI()"}
               </span>
               <span className={styles.codeLine} data-testid="code-line">
-                {'add_routes(app, rag_chain, path="/rag")'}
+                {"add_routes(app, rag_chain, path="}
+                <span className="hljs-string">{'"/rag"'}</span>
+                {")"}
               </span>
             </code>
           </pre>
@@ -2049,13 +2263,17 @@ export default function Page() {
           <pre data-testid="code-block">
             <code className="language-python">
               <span className={styles.codeLine} data-testid="code-line">
-                {"# 原著の書き方（Fallbackの概念例）"}
+                <span className="hljs-comment">{"# 原著の書き方（Fallbackの概念例）"}</span>
               </span>
               <span className={styles.codeLine} data-testid="code-line">
-                {'primary_llm = ChatOpenAI(model="gpt-4o")'}
+                {"primary_llm = ChatOpenAI(model="}
+                <span className="hljs-string">{'"gpt-4o"'}</span>
+                {")"}
               </span>
               <span className={styles.codeLine} data-testid="code-line">
-                {'backup_llm = ChatOpenAI(model="gpt-4o-mini")'}
+                {"backup_llm = ChatOpenAI(model="}
+                <span className="hljs-string">{'"gpt-4o-mini"'}</span>
+                {")"}
               </span>
               <span className={styles.codeLine} data-testid="code-line">
                 {"robust_llm = primary_llm.with_fallbacks([backup_llm])"}

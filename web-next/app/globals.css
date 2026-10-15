@@ -1762,26 +1762,29 @@ body:has([data-page="langchain-in-your-pocket"]) #site-freshness-bar time {
   color: #e8edf5;
 }
 body:has([data-page="langchain-in-your-pocket"]) nav[aria-label="関連ページ"] {
+  box-sizing: border-box !important;
+  margin-left: 288px !important;
+  margin-right: 0 !important;
+  margin-top: 0 !important;
+  max-width: none !important;
+  width: calc(100% - 288px) !important;
+  padding-left: 64px !important;
+  padding-right: 64px !important;
+  padding-bottom: 4rem !important;
+  background: #07111e !important;
   --line: #223447;
   --card: #0d1826;
   --fg: #e8edf5;
   --muted: #a9b6c9;
   --accent: #7c9eff;
-  box-sizing: border-box;
-  max-width: none;
-  width: calc(100% - 288px);
-  margin-left: 288px;
-  margin-right: 0;
-  padding-left: 64px;
-  padding-right: 64px;
 }
 @media (max-width: 900px) {
   body:has([data-page="langchain-in-your-pocket"]) #site-freshness-bar,
   body:has([data-page="langchain-in-your-pocket"]) nav[aria-label="関連ページ"] {
-    width: 100%;
-    margin-left: 0;
-    padding-left: 22px;
-    padding-right: 22px;
+    width: 100% !important;
+    margin-left: 0 !important;
+    padding-left: 22px !important;
+    padding-right: 22px !important;
   }
 }
 
