@@ -46,9 +46,16 @@
   position: relative;
 }
 
-/* グローバル背景色統一・鮮度バー非表示・余白解消 */
+/* グローバル背景色統一・鮮度バー非表示・余白解消。
+   .layout の兄弟である .mobileBar と #topBtn が参照するテーマ変数も body 側に定義する。 */
 :global(body:has([data-page="enterprise-rag-guide"])) {
   --sidebar-w: 308px;
+  --surface: #ffffff;
+  --ink: #16202c;
+  --border: #dce2e9;
+  --border-strong: #c4ccd6;
+  --shadow-md: 0 10px 30px -14px rgba(22, 32, 44, 0.28);
+  --font-serif: "Shippori Mincho", "Noto Serif JP", serif;
   background: #eef1f4 !important;
   margin-top: calc(var(--ch-height, 60px) + var(--ch-disclaimer-height, 0px)) !important;
 }
