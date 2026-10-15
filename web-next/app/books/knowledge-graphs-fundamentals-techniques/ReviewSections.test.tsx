@@ -26,9 +26,10 @@ const css = readFileSync(
   "app/books/knowledge-graphs-fundamentals-techniques/page.module.css",
   "utf8"
 );
+const stylesheet = parse(css);
 function declarations(selector: string) {
   const out: Record<string, string> = {};
-  parse(css).walkRules((r) => {
+  stylesheet.walkRules((r) => {
     if (r.selector === selector)
       r.walkDecls((d) => {
         out[d.prop] = d.value;
