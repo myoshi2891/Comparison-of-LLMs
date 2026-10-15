@@ -29,31 +29,31 @@ export const EXPECTED_H2 = [
   "Ch.2Hello World ― 環境構築と最初のアプリ",
   "Ch.3LangChainのモジュール構成",
   "Ch.4Models and Prompts",
-  "Ch.5Chains(チェーン)",
-  "Ch.6Agents(エージェント)",
+  "Ch.5Chains（チェーン）",
+  "Ch.6Agents（エージェント）",
   "Ch.7OutputParsers and Memory",
   "Ch.8Callbacks",
   "Ch.9RAGフレームワークとベクトルデータベース",
   "Ch.10LangChainを使ったNLPタスク",
   "Ch.11LLMのハルシネーション対策",
-  "Ch.12LLMの評価(Evaluating LLMs)",
+  "Ch.12LLMの評価（Evaluating LLMs）",
   "Ch.13高度なプロンプトエンジニアリング",
-  "Ch.14自律型AIエージェント(Autonomous AI agents)",
+  "Ch.14自律型AIエージェント（Autonomous AI agents）",
   "Ch.15LangSmith and LangServe",
-  "Ch.16追加機能(Additional Features)",
+  "Ch.16追加機能（Additional Features）",
   "20262026年9月時点の最新動向まとめ",
   "Refs参考文献・ソース一覧",
 ] as const;
 
 export const EXPECTED_H3 = [
-  "本ガイドの読み方(全体マップ)",
-  "書籍の目次(原著全16章)",
-  "1.1 LLM(大規模言語モデル)とは",
-  "1.2 LLMのファミリー(主要な系統)",
+  "本ガイドの読み方（全体マップ）",
+  "書籍の目次（原著全16章）",
+  "1.1 LLM（大規模言語モデル）とは",
+  "1.2 LLMのファミリー（主要な系統）",
   "1.3 なぜLangChainが必要なのか",
   "2.1 LangChainのセットアップ",
-  "2.2 Name Generator(最初の実践例)",
-  "2.3 テキスト前処理/2.4 Storyteller/2.5 ローカルLLM",
+  "2.2 Name Generator（最初の実践例）",
+  "2.3 テキスト前処理／2.4 Storyteller／2.5 ローカルLLM",
   "4.1 Models: LLM と ChatModel の違い",
   "4.2 Prompts: PromptTemplate と ChatPromptTemplate",
   "5.1〜5.4 LLMChain・Auto-SQL Chain・MathsChain・DALL-E連携",
@@ -62,8 +62,8 @@ export const EXPECTED_H3 = [
   "6.1 AgentとChainの違い",
   "6.2〜6.3 Agentの構築とタイプ",
   "6.4 Custom Tools for Agents",
-  "7.1 OutputParsers(出力パーサー)",
-  "7.2 Memory(会話記憶)",
+  "7.1 OutputParsers（出力パーサー）",
+  "7.2 Memory（会話記憶）",
   "9.1 RAGとは何か",
   "9.2〜9.3 RAGの構成要素とLangChainでの実装",
   "9.4〜9.5 Multi-document RAGとレコメンドシステム",
@@ -72,16 +72,16 @@ export const EXPECTED_H3 = [
   "11.1〜11.2 ハルシネーションとは、なぜ起きるのか",
   "11.3〜11.4 LLMCheckerChainとLLMSummarizationChain",
   "11.5 RAGによるハルシネーション回避",
-  "13.1 Chain of Thought(思考の連鎖)",
-  "13.2 ReAct(Reasoning + Acting)",
-  "13.3 Tree of Thoughts(思考の木)",
+  "13.1 Chain of Thought（思考の連鎖）",
+  "13.2 ReAct（Reasoning + Acting）",
+  "13.3 Tree of Thoughts（思考の木）",
   "13.4 その他のプロンプトエンジニアリング手法",
   "14.1 AGIとは",
   "14.2〜14.4 AutoGPT・BabyAGI・HuggingGPT",
   "15.1 LangSmith",
   "15.2 LangServe",
-  "16.1 Fallbacks(フォールバック)",
-  "16.2 Safety(安全性)",
+  "16.1 Fallbacks（フォールバック）",
+  "16.2 Safety（安全性）",
   "16.3〜16.4 Model LaboratoryとDebugging",
 ] as const;
 
@@ -238,21 +238,21 @@ describe("LangChain in your Pocket guide — source parity and design contracts"
   });
 
   // D. デザイン契約 (該当要素に応じて)
-  it("D-1: renders all 16 callouts with data-testid='callout' and appropriate variants", () => {
+  it("D-1: renders all 16 callouts with data-testid='callout' including important callouts", () => {
     const { container } = render(<Page />);
     const callouts = nodes(container, '[data-testid="callout"]');
     expect(callouts).toHaveLength(16);
-    const variants = callouts.map((c) => c.getAttribute("data-variant"));
-    expect(variants.some((v) => v === "info" || v === "note")).toBe(true);
-    expect(variants.some((v) => v === "warn" || v === "warning" || v === "danger")).toBe(true);
+    const importantCallouts = callouts.filter((c) => c.className.includes(styles.important));
+    expect(importantCallouts).toHaveLength(2);
   });
 
-  it("D-2: warn callouts contain warning label element or strong tag", () => {
+  it("D-2: important callouts contain strong tag emphasizing critical notes", () => {
     const { container } = render(<Page />);
-    const warnCallouts = nodes(container, '[data-testid="callout"][data-variant="warn"], [data-testid="callout"][data-variant="danger"]');
-    expect(warnCallouts.length).toBeGreaterThan(0);
-    for (const warn of warnCallouts) {
-      expect(warn.querySelector(`.${styles.calloutLabel}, strong`)).not.toBeNull();
+    const callouts = nodes(container, '[data-testid="callout"]');
+    const importantCallouts = callouts.filter((c) => c.className.includes(styles.important));
+    expect(importantCallouts.length).toBeGreaterThan(0);
+    for (const callout of importantCallouts) {
+      expect(callout.querySelector("strong")).not.toBeNull();
     }
   });
 
