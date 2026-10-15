@@ -112,3 +112,15 @@ test("reads JSX string expressions that carry an inline block comment", () => {
 	assert.equal(audit(source, page).status, 0);
 	assert.equal(audit(source, page.replace(value, "http://example.com/other")).status, 1);
 });
+test("reads every DIAGRAMS entry when comments sit between entries", () => {
+	const first = 'flowchart TD\nA["http://example.com/*x*/"] --> B';
+	const second = "flowchart LR\nC --> D";
+	const source = `<script>const DIAGRAMS = [\n  // 図1 "not a diagram"\n  ${JSON.stringify(first)},\n  /* 図2 */ ${JSON.stringify(second)}, // 末尾\n];</script>`;
+	const page = (charts) =>
+		charts.map((chart, i) => `const D${i} = ${JSON.stringify(chart)};`).join("\n") +
+		charts.map((_, i) => `<MermaidDiagram chart={D${i}} />`).join("");
+	const match = audit(source, page([first, second]));
+	assert.equal(match.status, 0);
+	assert.deepEqual(match.data.counts.mermaidSources, { source: 2, page: 2 });
+	assert.equal(audit(source, page([first])).status, 1);
+});

@@ -479,11 +479,15 @@ function collectHtmlMermaidSources(src) {
   }
 
   // Plain string arrays are used by standalone guides; parse strings without executing source JS.
-  const arrayRe = /\b(?:const|let|var)\s+DIAGRAMS\s*=\s*\[((?:\s*(?:"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|`(?:[^`\\]|\\.)*`)\s*,?)+)\s*\]\s*;?/g;
+  // 要素間の `// …` / `/* … */` コメントも許容する。抽出は文字列を先に照合するため、
+  // 文字列内の `//` や `/*`（URL を含むノードラベル等）はコメントと誤認しない。
+  const arrayRe = /\b(?:const|let|var)\s+DIAGRAMS\s*=\s*\[((?:\s*(?:"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|`(?:[^`\\]|\\.)*`|\/\/[^\n]*|\/\*[\s\S]*?\*\/)\s*,?)+)\s*\]\s*;?/g;
   for (const array of src.matchAll(arrayRe)) {
-    const stringRe = /"((?:[^"\\]|\\.)*)"|'((?:[^'\\]|\\.)*)'|`((?:[^`\\]|\\.)*)`/g;
-    for (const value of array[1].matchAll(stringRe)) {
-      sources.push({ index: array.index + value.index, source: normalizeMermaidSource(decodeQuotedEntryEscapes(value[1] ?? value[2] ?? value[3])) });
+    const tokenRe = /"((?:[^"\\]|\\.)*)"|'((?:[^'\\]|\\.)*)'|`((?:[^`\\]|\\.)*)`|\/\/[^\n]*|\/\*[\s\S]*?\*\//g;
+    for (const value of array[1].matchAll(tokenRe)) {
+      const raw = value[1] ?? value[2] ?? value[3];
+      if (raw === undefined) continue;
+      sources.push({ index: array.index + value.index, source: normalizeMermaidSource(decodeQuotedEntryEscapes(raw)) });
     }
   }
 
