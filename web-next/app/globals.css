@@ -1742,3 +1742,46 @@ body:has([data-page="knowledge-graphs-fundamentals-techniques"]) nav[aria-label=
     padding-right: 24px;
   }
 }
+
+/* LangChain in your Pocket: shared chrome follows the original dark guide. */
+body:has([data-page="langchain-in-your-pocket"]) {
+  background: #07111e;
+}
+body:has([data-page="langchain-in-your-pocket"]) #site-freshness-bar {
+  box-sizing: border-box;
+  max-width: none;
+  width: calc(100% - 288px);
+  margin-left: 288px;
+  margin-right: 0;
+  padding-right: 48px;
+  background: #07111e;
+  color: #a9b6c9;
+  justify-content: flex-end;
+}
+body:has([data-page="langchain-in-your-pocket"]) #site-freshness-bar time {
+  color: #e8edf5;
+}
+body:has([data-page="langchain-in-your-pocket"]) nav[aria-label="関連ページ"] {
+  --line: #223447;
+  --card: #0d1826;
+  --fg: #e8edf5;
+  --muted: #a9b6c9;
+  --accent: #7c9eff;
+  box-sizing: border-box;
+  max-width: none;
+  width: calc(100% - 288px);
+  margin-left: 288px;
+  margin-right: 0;
+  padding-left: 64px;
+  padding-right: 64px;
+}
+@media (max-width: 900px) {
+  body:has([data-page="langchain-in-your-pocket"]) #site-freshness-bar,
+  body:has([data-page="langchain-in-your-pocket"]) nav[aria-label="関連ページ"] {
+    width: 100%;
+    margin-left: 0;
+    padding-left: 22px;
+    padding-right: 22px;
+  }
+}
+

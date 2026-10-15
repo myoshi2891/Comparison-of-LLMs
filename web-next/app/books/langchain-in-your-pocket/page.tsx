@@ -45,9 +45,39 @@ const DIAGRAM_AUTONOMOUS =
 const DIAGRAM_TIMELINE =
   'flowchart LR\n    accTitle: LangChainの変遷タイムライン\n    accDescr: 2024年の本書刊行当時はLLMChain、initialize_agent、ConversationBufferMemory、LangServeが中心。2025年10月のv1.0でcreate_agentが導入されLangGraphが実行基盤に統合。2026年9月現在は会話履歴をcheckpointer、要約をミドルウェア、長期記憶をStoreで扱い、LangSmithが評価・監視の中核、LangServeはアーカイブされLangSmith Deploymentへ移行。\n    subgraph Y2024["2024年: 本書刊行当時"]\n        A1["LLMChain / initialize_agent"]\n        A2["ConversationBufferMemory"]\n        A3["LangServeでAPI化"]\n    end\n    subgraph Y2025["2025年10月: v1.0リリース"]\n        B1["create_agentがエージェント構築の\\n新しい正面玄関に"]\n        B2["LangGraphがLangChain\\nエージェントの実行基盤に統合"]\n    end\n    subgraph Y2026["2026年9月: 現在"]\n        C1["会話履歴: checkpointer\\n要約: ミドルウェア / 長期記憶: Store"]\n        C2["LangSmithが評価・監視の中核"]\n        C3["LangServeはアーカイブ済み\\n→ LangSmith Deploymentへ移行"]\n    end\n    Y2024 --> Y2025 --> Y2026';
 
+const DIAGRAM_THEME = {
+  fontSize: "16px",
+  primaryColor: "#16233a",
+  primaryTextColor: "#e8edf5",
+  primaryBorderColor: "#3b5b8c",
+  lineColor: "#4d6485",
+  secondaryColor: "#101d2c",
+  tertiaryColor: "#0d1826",
+  mainBkg: "#101d2c",
+  nodeBorder: "#3b5b8c",
+  clusterBkg: "#0d1826",
+  clusterBorder: "#223447",
+  edgeLabelBackground: "#0d1826",
+  actorBkg: "#101d2c",
+  actorBorder: "#3b5b8c",
+  actorTextColor: "#e8edf5",
+  actorLineColor: "#4d6485",
+  signalColor: "#8fb4ff",
+  signalTextColor: "#e8edf5",
+  labelBoxBkgColor: "#16233a",
+  labelBoxBorderColor: "#3b5b8c",
+  labelTextColor: "#e8edf5",
+  loopTextColor: "#a9b6c9",
+  noteBkgColor: "#2a2013",
+  noteTextColor: "#f0c674",
+  noteBorderColor: "#b8802a",
+  activationBkgColor: "#16233a",
+  activationBorderColor: "#3b5b8c",
+} as const;
+
 export default function Page() {
   return (
-    <div className={styles.layout} data-testid="layout-root">
+    <div className={styles.layout} data-testid="layout-root" data-page="langchain-in-your-pocket">
       <link
         rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/3.44.0/tabler-icons.min.css"
@@ -210,7 +240,12 @@ export default function Page() {
           </div>
           <h3>{"本ガイドの読み方（全体マップ）"}</h3>
           <div className={styles.mermaidWrap}>
-            <MermaidDiagram chart={DIAGRAM_BOOKMAP} id="diagram-bookmap" theme="base" />
+            <MermaidDiagram
+              chart={DIAGRAM_BOOKMAP}
+              id="diagram-bookmap"
+              theme="dark"
+              themeVariables={DIAGRAM_THEME}
+            />
           </div>
           <h3>{"書籍の目次（原著全16章）"}</h3>
           <div className={[styles.bookToc].filter(Boolean).join(" ")}>
@@ -379,7 +414,12 @@ export default function Page() {
             }
           </p>
           <div className={styles.mermaidWrap}>
-            <MermaidDiagram chart={DIAGRAM_FEATURES} id="diagram-features" theme="base" />
+            <MermaidDiagram
+              chart={DIAGRAM_FEATURES}
+              id="diagram-features"
+              theme="dark"
+              themeVariables={DIAGRAM_THEME}
+            />
           </div>
           <p>
             {
@@ -520,7 +560,12 @@ export default function Page() {
             }
           </p>
           <div className={styles.mermaidWrap}>
-            <MermaidDiagram chart={DIAGRAM_HELLOFLOW} id="diagram-helloflow" theme="base" />
+            <MermaidDiagram
+              chart={DIAGRAM_HELLOFLOW}
+              id="diagram-helloflow"
+              theme="dark"
+              themeVariables={DIAGRAM_THEME}
+            />
           </div>
           <div className={[styles.callout].filter(Boolean).join(" ")} data-testid="callout">
             <div className={[styles.ic].filter(Boolean).join(" ")}>
@@ -604,7 +649,12 @@ export default function Page() {
             </tbody>
           </table>
           <div className={styles.mermaidWrap}>
-            <MermaidDiagram chart={DIAGRAM_MODULEMAP} id="diagram-modulemap" theme="base" />
+            <MermaidDiagram
+              chart={DIAGRAM_MODULEMAP}
+              id="diagram-modulemap"
+              theme="dark"
+              themeVariables={DIAGRAM_THEME}
+            />
           </div>
         </section>
         <section className={[styles.section].filter(Boolean).join(" ")} id="ch4">
@@ -788,7 +838,12 @@ export default function Page() {
             </code>
           </pre>
           <div className={styles.mermaidWrap}>
-            <MermaidDiagram chart={DIAGRAM_LCEL} id="diagram-lcel" theme="base" />
+            <MermaidDiagram
+              chart={DIAGRAM_LCEL}
+              id="diagram-lcel"
+              theme="dark"
+              themeVariables={DIAGRAM_THEME}
+            />
           </div>
           <h3>{"5.6 Types of Chains"}</h3>
           <p>
@@ -856,7 +911,12 @@ export default function Page() {
             {"点が根本的に異なります。\n          "}
           </p>
           <div className={styles.mermaidWrap}>
-            <MermaidDiagram chart={DIAGRAM_AGENTLOOP} id="diagram-agentloop" theme="base" />
+            <MermaidDiagram
+              chart={DIAGRAM_AGENTLOOP}
+              id="diagram-agentloop"
+              theme="dark"
+              themeVariables={DIAGRAM_THEME}
+            />
           </div>
           <h3>{"6.2〜6.3 Agentの構築とタイプ"}</h3>
           <p>
@@ -1131,7 +1191,12 @@ export default function Page() {
             }
           </p>
           <div className={styles.mermaidWrap}>
-            <MermaidDiagram chart={DIAGRAM_CALLBACKS} id="diagram-callbacks" theme="base" />
+            <MermaidDiagram
+              chart={DIAGRAM_CALLBACKS}
+              id="diagram-callbacks"
+              theme="dark"
+              themeVariables={DIAGRAM_THEME}
+            />
           </div>
           <p>
             {"\n            原著では\n            "}
@@ -1181,7 +1246,12 @@ export default function Page() {
             }
           </p>
           <div className={styles.mermaidWrap}>
-            <MermaidDiagram chart={DIAGRAM_RAGPIPE} id="diagram-ragpipe" theme="base" />
+            <MermaidDiagram
+              chart={DIAGRAM_RAGPIPE}
+              id="diagram-ragpipe"
+              theme="dark"
+              themeVariables={DIAGRAM_THEME}
+            />
           </div>
           <h3>{"9.2〜9.3 RAGの構成要素とLangChainでの実装"}</h3>
           <p>{"RAGパイプラインは主に4つの要素で構成されます。"}</p>
@@ -1587,7 +1657,12 @@ export default function Page() {
             }
           </p>
           <div className={styles.mermaidWrap}>
-            <MermaidDiagram chart={DIAGRAM_HALLU} id="diagram-hallu" theme="base" />
+            <MermaidDiagram
+              chart={DIAGRAM_HALLU}
+              id="diagram-hallu"
+              theme="dark"
+              themeVariables={DIAGRAM_THEME}
+            />
           </div>
           <h3>{"11.3〜11.4 LLMCheckerChainとLLMSummarizationChain"}</h3>
           <p>
@@ -1749,7 +1824,12 @@ export default function Page() {
             }
           </p>
           <div className={styles.mermaidWrap}>
-            <MermaidDiagram chart={DIAGRAM_REACT} id="diagram-react" theme="base" />
+            <MermaidDiagram
+              chart={DIAGRAM_REACT}
+              id="diagram-react"
+              theme="dark"
+              themeVariables={DIAGRAM_THEME}
+            />
           </div>
           <h3>{"13.3 Tree of Thoughts（思考の木）"}</h3>
           <p>
@@ -1823,7 +1903,12 @@ export default function Page() {
             </tbody>
           </table>
           <div className={styles.mermaidWrap}>
-            <MermaidDiagram chart={DIAGRAM_AUTONOMOUS} id="diagram-autonomous" theme="base" />
+            <MermaidDiagram
+              chart={DIAGRAM_AUTONOMOUS}
+              id="diagram-autonomous"
+              theme="dark"
+              themeVariables={DIAGRAM_THEME}
+            />
           </div>
           <p>
             {
@@ -2096,7 +2181,12 @@ export default function Page() {
             </tbody>
           </table>
           <div className={styles.mermaidWrap}>
-            <MermaidDiagram chart={DIAGRAM_TIMELINE} id="diagram-timeline" theme="base" />
+            <MermaidDiagram
+              chart={DIAGRAM_TIMELINE}
+              id="diagram-timeline"
+              theme="dark"
+              themeVariables={DIAGRAM_THEME}
+            />
           </div>
           <p>
             {

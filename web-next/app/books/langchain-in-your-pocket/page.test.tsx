@@ -344,7 +344,9 @@ describe("LangChain in your Pocket guide — source parity and design contracts"
     const globalsCssPath = path.resolve(process.cwd(), "app/globals.css");
     const globalsCss = fs.readFileSync(globalsCssPath, "utf-8");
     expect(globalsCss).toContain('body:has([data-page="langchain-in-your-pocket"])');
-    expect(globalsCss).toContain('body:has([data-page="langchain-in-your-pocket"]) #site-freshness-bar');
+    expect(globalsCss).toContain(
+      'body:has([data-page="langchain-in-your-pocket"]) #site-freshness-bar'
+    );
     expect(globalsCss).toContain("calc(100% - 288px)");
   });
 
