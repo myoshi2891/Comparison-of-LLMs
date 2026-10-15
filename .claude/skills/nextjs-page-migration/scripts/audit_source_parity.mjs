@@ -351,11 +351,13 @@ function extractElementContents(src, predicate) {
 function collectStringConstants(src) {
   const constants = new Map();
   const constantRe =
-    /\bconst\s+([A-Za-z_$][\w$]*)\s*=\s*(?:String\.raw\s*)?(`([\s\S]*?)`|"([^"\\]*(?:\\.[^"\\]*)*)"|'([^'\\]*(?:\\.[^'\\]*)*)')\s*;/g;
+    /\bconst\s+([A-Za-z_$][\w$]*)\s*=\s*(String\.raw\s*)?(?:`([\s\S]*?)`|"([^"\\]*(?:\\.[^"\\]*)*)"|'([^'\\]*(?:\\.[^'\\]*)*)')\s*;/g;
   let constant = constantRe.exec(src);
   while (constant !== null) {
     const value = constant[3] ?? constant[4] ?? constant[5] ?? "";
-    constants.set(constant[1], constant[3] !== undefined || constant[0].includes("String.raw") ? value : decodeQuotedEntryEscapes(value));
+    // 復号を抑止するのは接頭辞として String.raw を持つ場合だけ。値の中の "String.raw" という
+    // テキストで判定すると、通常の文字列定数のエスケープまで生のまま残る。
+    constants.set(constant[1], constant[3] !== undefined || constant[2] !== undefined ? value : decodeQuotedEntryEscapes(value));
     constant = constantRe.exec(src);
   }
   return constants;
@@ -442,8 +444,10 @@ function hasMermaidClassToken(rawClass) {
  */
 function collectHtmlMermaidSources(src) {
   const sources = [];
+  // class の直前は空白を要求する。`\b` だと `data-class=` の `-` 直後でも一致し、
+  // 後続の本物の class="mermaid" を見落とす。
   const divRe =
-    /<(?:div|pre)\b([^>]*?\bclass=(["'])([^"']*)\2[^>]*)>([\s\S]*?)<\/(?:div|pre)\s*>/gi;
+    /<(?:div|pre)\b([^>]*?\sclass=(["'])([^"']*)\2[^>]*)>([\s\S]*?)<\/(?:div|pre)\s*>/gi;
   let div = divRe.exec(src);
   while (div !== null) {
     if (hasMermaidClassToken(div[3])) {

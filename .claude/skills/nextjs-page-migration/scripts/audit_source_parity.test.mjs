@@ -856,3 +856,38 @@ test("型引数の中に関数型を持つ初期化子を挟んだ後続の相�
 	assert.deepEqual(result.json.missingParagraphs, []);
 	assert.equal(result.status, 0);
 });
+
+test("data-class が先にある要素でも本物の class 属性から Mermaid を判定する", () => {
+	// `\bclass=` は `data-class=` の `-` と `c` の間でも境界一致し、data-class の値を
+	// class として読んでしまう。直後の本物の class="mermaid" が見落とされ図解が漏れる。
+	const result = audit(
+		`<div data-class="note" class="mermaid">graph TD
+A --&gt; B</div>`,
+		`const CHART = \`graph TD
+A --> B\`;
+export default function Page() {
+  return <MermaidDiagram chart={CHART} />;
+}`,
+	);
+
+	assert.deepEqual(result.json.sourceMermaidSources, ["graph TD\nA --> B"]);
+	assert.equal(result.json.mermaidSourcesMatch, true);
+	assert.equal(result.status, 0);
+});
+
+test("本文に String.raw という文字列を含む通常の文字列定数もエスケープを復号する", () => {
+	// String.raw の判定を初期化子全体の部分一致で行うと、値の中の "String.raw" という
+	// テキストだけで復号が抑止され、`\n` が改行にならず原本と一致しなくなる。
+	const result = audit(
+		`<div class="mermaid">graph TD
+A[&quot;String.raw&quot;] --&gt; B</div>`,
+		`const CHART = 'graph TD\\nA["String.raw"] --> B';
+export default function Page() {
+  return <MermaidDiagram chart={CHART} />;
+}`,
+	);
+
+	assert.deepEqual(result.json.pageMermaidSources, ['graph TD\nA["String.raw"] --> B']);
+	assert.equal(result.json.mermaidSourcesMatch, true);
+	assert.equal(result.status, 0);
+});
