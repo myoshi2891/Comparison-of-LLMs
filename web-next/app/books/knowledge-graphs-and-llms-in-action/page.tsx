@@ -1820,7 +1820,9 @@ export default function Page() {
                             target="_blank"
                             rel="noopener noreferrer"
                           >
-                            {"http://purl.obolibrary.org/obo/HP_"}
+                            {
+                              "http://purl.obolibrary.org/obo/HP_" /* NOSONAR: 通信先ではなく Cypher で照合する RDF の URI 接頭辞（原本どおり） */
+                            }
                           </a>
                         </code>
                         {" で始まるノードに "}
