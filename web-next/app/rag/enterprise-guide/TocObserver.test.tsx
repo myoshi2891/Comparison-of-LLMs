@@ -147,6 +147,25 @@ describe("Enterprise RAG TocObserver", () => {
     expect(activeHrefs()).toEqual(["#part1"]);
   });
 
+  it("activates the section a TOC click scrolled to its scroll-margin-top position", () => {
+    // Arrange: 見出しは scroll-margin-top（60px + 80px）の位置へ止まる。
+    fixture();
+    setDocumentTop("intro", 0, 0);
+    setDocumentTop("part1", 1000, 50);
+    for (const id of ["intro", "part1"]) byId(id).style.scrollMarginTop = "140px";
+    const activeHrefs = () =>
+      Array.from(document.querySelectorAll(".is-active")).map((a) => a.getAttribute("href"));
+    // Act: #part1 クリック後のスクロール位置（1000 - 140）
+    scrollTo(860);
+    // Assert
+    expect(activeHrefs()).toEqual(["#part1"]);
+
+    // Act: 境界の手前（丸め誤差の許容 1px を超えて上）
+    scrollTo(858);
+    // Assert
+    expect(activeHrefs()).toEqual(["#intro"]);
+  });
+
   it("removes the TOC link click handlers on unmount", () => {
     // Arrange
     const { unmount } = fixture();

@@ -69,12 +69,24 @@ export default function TocObserver() {
       })
       .filter((item): item is { link: HTMLAnchorElement; el: HTMLElement } => item !== null);
 
+    // 従来の判定オフセット。scroll-margin-top がこれより小さい（未指定は 0px）場合の下限。
+    const MIN_OFFSET = 120;
+    // 実ブラウザのスクロール位置は小数になりうるため、境界に 1px の許容を持たせる。
+    const ROUNDING_TOLERANCE = 1;
+
+    // TOC クリックで見出しが止まる位置（scroll-margin-top）まで判定線を下げる。
+    // 固定値だとそれより大きい margin のセクションへ移動しても直前の項目が点灯したままになる。
+    function activationOffset(el: HTMLElement): number {
+      const margin = Number.parseFloat(window.getComputedStyle(el).scrollMarginTop);
+      return Number.isFinite(margin) ? Math.max(MIN_OFFSET, margin) : MIN_OFFSET;
+    }
+
     function onScrollSpy() {
-      const pos = window.scrollY + 120;
       let current = targets[0];
       for (const target of targets) {
         // offsetTop は offsetParent 基準のため、文書座標に換算して比較する。
         const documentTop = target.el.getBoundingClientRect().top + window.scrollY;
+        const pos = window.scrollY + activationOffset(target.el) + ROUNDING_TOLERANCE;
         if (documentTop <= pos) {
           current = target;
         }
