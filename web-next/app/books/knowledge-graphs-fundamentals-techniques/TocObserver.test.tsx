@@ -72,7 +72,7 @@ beforeEach(() => {
   });
   vi.stubGlobal(
     "IntersectionObserver",
-    vi.fn((cb: IntersectionObserverCallback) => {
+    vi.fn(function (this: IntersectionObserver, cb: IntersectionObserverCallback) {
       callback = cb;
       return { observe, disconnect };
     })
@@ -120,7 +120,7 @@ describe("guide navigation and back to top", () => {
         [
           { target: container.querySelector("#third"), isIntersecting: true },
           { target: container.querySelector("#second"), isIntersecting: true },
-        ] as IntersectionObserverEntry[],
+        ] as unknown as IntersectionObserverEntry[],
         {} as IntersectionObserver
       )
     );
@@ -131,7 +131,7 @@ describe("guide navigation and back to top", () => {
     vi.stubGlobal("scrollY", 2300);
     act(() =>
       callback(
-        [{ target: document.body, isIntersecting: true }] as IntersectionObserverEntry[],
+        [{ target: document.body, isIntersecting: true }] as unknown as IntersectionObserverEntry[],
         {} as IntersectionObserver
       )
     );

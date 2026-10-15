@@ -214,7 +214,9 @@ describe("Knowledge Graphs fundamentals — frozen original contracts", () => {
       main(),
       `.${styles["mermaid-wrap"]} .${styles["mermaid-diagram"]} [data-testid="mermaid"]`
     );
-    expect(ds.map((e) => e.textContent)).toEqual(source.diagrams.map((d) => d.chart));
+    expect(ds.map((e) => e.textContent?.replace(/^ {4}/gm, ""))).toEqual(
+      source.diagrams.map((d) => d.chart)
+    );
     expect(ds.map((e) => e.getAttribute("data-theme"))).toEqual(source.diagrams.map(() => "dark"));
     expect(ds.map((e) => JSON.parse(e.getAttribute("data-variables") ?? "{}"))).toEqual(
       source.diagrams.map(() => source.theme)
@@ -312,6 +314,19 @@ describe("Knowledge Graphs fundamentals — frozen original contracts", () => {
       height: "auto",
       top: "auto",
     });
+    // Apply matching base and mobile rules in source order, including later overrides.
+    expect(
+      Object.assign(
+        {},
+        ...rules
+          .filter(
+            (r) =>
+              r.selector === ".layout .sidebar" &&
+              (r.media === null || r.media === "(max-width: 980px)")
+          )
+          .map((r) => r.declarations)
+      )
+    ).toMatchObject({ position: "static", height: "auto", width: "auto", top: "auto" });
     expect(declarations(".layout .content", "(max-width: 980px)")).toMatchObject({
       width: "100%",
       "margin-left": "0",
