@@ -7,6 +7,7 @@ import { findBySlug } from "@/lib/page-registry";
 import Page, { metadata } from "./page";
 import styles from "./page.module.css";
 import source from "./source-contract.json";
+import syntax from "./syntax-contract.json";
 
 vi.mock("./TocObserver", () => ({ default: () => null }));
 vi.mock("@/components/docs/MermaidDiagram", () => ({
@@ -405,6 +406,16 @@ describe("Knowledge Graphs fundamentals — frozen original contracts", () => {
     expect(
       nodes(main(), '[data-testid="code-block"]').map((e) => e.querySelector("code")?.className)
     ).toEqual(source.codes.map((c) => c.language));
+  });
+  it("preserves every original highlight.js token including multiline Python strings", () => {
+    expect(
+      nodes(main(), "pre code").map((code) =>
+        nodes(code, "[data-token]").map((token) => ({
+          text: token.textContent,
+          classes: Array.from(token.classList),
+        }))
+      )
+    ).toEqual(syntax.tokens);
   });
   it("registers metadata and derived navigation", () => {
     expect(metadata.title).toBe(`${source.title} | LLM コスト計算機`);

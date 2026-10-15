@@ -1,0 +1,449 @@
+{
+  "engine": "highlight.js 11.9.0 (original CDN bundle)",
+  "tokens": [
+    [],
+    [],
+    [],
+    [
+      {
+        "text": "import",
+        "classes": ["hljs-keyword"]
+      },
+      {
+        "text": "as",
+        "classes": ["hljs-keyword"]
+      },
+      {
+        "text": "# 実体と関係を2次元ベクトルで表す。実際の学習では、この値をデータから学習で求める。",
+        "classes": ["hljs-comment"]
+      },
+      {
+        "text": "\"Tokyo\"",
+        "classes": ["hljs-string"]
+      },
+      {
+        "text": "1.0",
+        "classes": ["hljs-number"]
+      },
+      {
+        "text": "1.0",
+        "classes": ["hljs-number"]
+      },
+      {
+        "text": "\"Japan\"",
+        "classes": ["hljs-string"]
+      },
+      {
+        "text": "3.0",
+        "classes": ["hljs-number"]
+      },
+      {
+        "text": "1.0",
+        "classes": ["hljs-number"]
+      },
+      {
+        "text": "\"France\"",
+        "classes": ["hljs-string"]
+      },
+      {
+        "text": "0.0",
+        "classes": ["hljs-number"]
+      },
+      {
+        "text": "3.0",
+        "classes": ["hljs-number"]
+      },
+      {
+        "text": "\"capital_of\"",
+        "classes": ["hljs-string"]
+      },
+      {
+        "text": "2.0",
+        "classes": ["hljs-number"]
+      },
+      {
+        "text": "0.0",
+        "classes": ["hljs-number"]
+      },
+      {
+        "text": "def",
+        "classes": ["hljs-keyword"]
+      },
+      {
+        "text": "distance",
+        "classes": ["hljs-title", "function_"]
+      },
+      {
+        "text": "h, r, t",
+        "classes": ["hljs-params"]
+      },
+      {
+        "text": "# head + relation が tail に近いほど「正しそうな事実」なので、その差の長さを測る。",
+        "classes": ["hljs-comment"]
+      },
+      {
+        "text": "# 差が0に近いほど、事実として自然だと判断できる。",
+        "classes": ["hljs-comment"]
+      },
+      {
+        "text": "return",
+        "classes": ["hljs-keyword"]
+      },
+      {
+        "text": "float",
+        "classes": ["hljs-built_in"]
+      },
+      {
+        "text": "for",
+        "classes": ["hljs-keyword"]
+      },
+      {
+        "text": "in",
+        "classes": ["hljs-keyword"]
+      },
+      {
+        "text": "\"Japan\"",
+        "classes": ["hljs-string"]
+      },
+      {
+        "text": "\"France\"",
+        "classes": ["hljs-string"]
+      },
+      {
+        "text": "print",
+        "classes": ["hljs-built_in"]
+      },
+      {
+        "text": "round",
+        "classes": ["hljs-built_in"]
+      },
+      {
+        "text": "\"Tokyo\"",
+        "classes": ["hljs-string"]
+      },
+      {
+        "text": "\"capital_of\"",
+        "classes": ["hljs-string"]
+      },
+      {
+        "text": "2",
+        "classes": ["hljs-number"]
+      },
+      {
+        "text": "# 出力（実行して確認済み）：Japan 0.0 / France 3.61",
+        "classes": ["hljs-comment"]
+      }
+    ],
+    [],
+    [
+      {
+        "text": "# rdflib は pip install rdflib で入る。このブロックだけで完結して動きます。",
+        "classes": ["hljs-comment"]
+      },
+      {
+        "text": "from",
+        "classes": ["hljs-keyword"]
+      },
+      {
+        "text": "import",
+        "classes": ["hljs-keyword"]
+      },
+      {
+        "text": "# 2.4 節の Turtle をそのまま文字列として持つ。三重引用符なので改行を含められる。",
+        "classes": ["hljs-comment"]
+      },
+      {
+        "text": "\"\"\"",
+        "classes": ["hljs-string"]
+      },
+      {
+        "text": "@prefix ex:   <http://example.org/> .",
+        "classes": ["hljs-string"]
+      },
+      {
+        "text": "@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .",
+        "classes": ["hljs-string"]
+      },
+      {
+        "text": "@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .",
+        "classes": ["hljs-string"]
+      },
+      {
+        "text": "ex:Tokyo   rdf:type ex:City ;",
+        "classes": ["hljs-string"]
+      },
+      {
+        "text": "           rdfs:label \"Tokyo\"@en, \"東京\"@ja ;",
+        "classes": ["hljs-string"]
+      },
+      {
+        "text": "           ex:locatedIn ex:Japan .",
+        "classes": ["hljs-string"]
+      },
+      {
+        "text": "ex:Osaka   rdf:type ex:City ;",
+        "classes": ["hljs-string"]
+      },
+      {
+        "text": "           rdfs:label \"Osaka\"@en ;",
+        "classes": ["hljs-string"]
+      },
+      {
+        "text": "           ex:locatedIn ex:Japan .",
+        "classes": ["hljs-string"]
+      },
+      {
+        "text": "ex:Japan   rdf:type ex:Country ;",
+        "classes": ["hljs-string"]
+      },
+      {
+        "text": "           rdfs:label \"Japan\"@en .",
+        "classes": ["hljs-string"]
+      },
+      {
+        "text": "ex:City    rdfs:subClassOf ex:Place .",
+        "classes": ["hljs-string"]
+      },
+      {
+        "text": "ex:Country rdfs:subClassOf ex:Place .",
+        "classes": ["hljs-string"]
+      },
+      {
+        "text": "\"\"\"",
+        "classes": ["hljs-string"]
+      },
+      {
+        "text": "# 上の SPARQL も同じように文字列として持つ。",
+        "classes": ["hljs-comment"]
+      },
+      {
+        "text": "\"\"\"",
+        "classes": ["hljs-string"]
+      },
+      {
+        "text": "PREFIX ex:   <http://example.org/>",
+        "classes": ["hljs-string"]
+      },
+      {
+        "text": "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>",
+        "classes": ["hljs-string"]
+      },
+      {
+        "text": "SELECT ?city ?label",
+        "classes": ["hljs-string"]
+      },
+      {
+        "text": "WHERE {",
+        "classes": ["hljs-string"]
+      },
+      {
+        "text": "  ?city a ex:City ;",
+        "classes": ["hljs-string"]
+      },
+      {
+        "text": "        ex:locatedIn ex:Japan ;",
+        "classes": ["hljs-string"]
+      },
+      {
+        "text": "        rdfs:label ?label .",
+        "classes": ["hljs-string"]
+      },
+      {
+        "text": "  FILTER (lang(?label) = \"en\")",
+        "classes": ["hljs-string"]
+      },
+      {
+        "text": "}",
+        "classes": ["hljs-string"]
+      },
+      {
+        "text": "ORDER BY ?label",
+        "classes": ["hljs-string"]
+      },
+      {
+        "text": "\"\"\"",
+        "classes": ["hljs-string"]
+      },
+      {
+        "text": "format",
+        "classes": ["hljs-built_in"]
+      },
+      {
+        "text": "\"turtle\"",
+        "classes": ["hljs-string"]
+      },
+      {
+        "text": "# query の引数に、上の SPARQL の文字列を渡す。",
+        "classes": ["hljs-comment"]
+      },
+      {
+        "text": "for",
+        "classes": ["hljs-keyword"]
+      },
+      {
+        "text": "in",
+        "classes": ["hljs-keyword"]
+      },
+      {
+        "text": "print",
+        "classes": ["hljs-built_in"]
+      },
+      {
+        "text": "# 出力:",
+        "classes": ["hljs-comment"]
+      },
+      {
+        "text": "# http://example.org/Osaka Osaka",
+        "classes": ["hljs-comment"]
+      },
+      {
+        "text": "# http://example.org/Tokyo Tokyo",
+        "classes": ["hljs-comment"]
+      }
+    ],
+    [
+      {
+        "text": "-- 同じ表 triples を3回使う自己結合（セルフジョイン）で、",
+        "classes": ["hljs-comment"]
+      },
+      {
+        "text": "-- 「型が City」「日本に位置する」「英語ラベルを持つ」の3つの事実を持つ主語を探す。",
+        "classes": ["hljs-comment"]
+      },
+      {
+        "text": "-- SPARQL の SELECT ?city ?label に合わせ、主語とラベルの2列を返す。",
+        "classes": ["hljs-comment"]
+      },
+      {
+        "text": "SELECT",
+        "classes": ["hljs-keyword"]
+      },
+      {
+        "text": "AS",
+        "classes": ["hljs-keyword"]
+      },
+      {
+        "text": "AS",
+        "classes": ["hljs-keyword"]
+      },
+      {
+        "text": "FROM",
+        "classes": ["hljs-keyword"]
+      },
+      {
+        "text": "JOIN",
+        "classes": ["hljs-keyword"]
+      },
+      {
+        "text": "ON",
+        "classes": ["hljs-keyword"]
+      },
+      {
+        "text": "=",
+        "classes": ["hljs-operator"]
+      },
+      {
+        "text": "JOIN",
+        "classes": ["hljs-keyword"]
+      },
+      {
+        "text": "ON",
+        "classes": ["hljs-keyword"]
+      },
+      {
+        "text": "=",
+        "classes": ["hljs-operator"]
+      },
+      {
+        "text": "WHERE",
+        "classes": ["hljs-keyword"]
+      },
+      {
+        "text": "=",
+        "classes": ["hljs-operator"]
+      },
+      {
+        "text": "'rdf:type'",
+        "classes": ["hljs-string"]
+      },
+      {
+        "text": "AND",
+        "classes": ["hljs-keyword"]
+      },
+      {
+        "text": "=",
+        "classes": ["hljs-operator"]
+      },
+      {
+        "text": "'ex:City'",
+        "classes": ["hljs-string"]
+      },
+      {
+        "text": "AND",
+        "classes": ["hljs-keyword"]
+      },
+      {
+        "text": "=",
+        "classes": ["hljs-operator"]
+      },
+      {
+        "text": "'ex:locatedIn'",
+        "classes": ["hljs-string"]
+      },
+      {
+        "text": "AND",
+        "classes": ["hljs-keyword"]
+      },
+      {
+        "text": "=",
+        "classes": ["hljs-operator"]
+      },
+      {
+        "text": "'ex:Japan'",
+        "classes": ["hljs-string"]
+      },
+      {
+        "text": "-- 言語タグは目的語の列に文字列として埋まっているので、LIKE で英語だけに絞る。",
+        "classes": ["hljs-comment"]
+      },
+      {
+        "text": "-- SPARQL の FILTER (lang(?label) = \"en\") に相当する条件。",
+        "classes": ["hljs-comment"]
+      },
+      {
+        "text": "AND",
+        "classes": ["hljs-keyword"]
+      },
+      {
+        "text": "=",
+        "classes": ["hljs-operator"]
+      },
+      {
+        "text": "'rdfs:label'",
+        "classes": ["hljs-string"]
+      },
+      {
+        "text": "AND",
+        "classes": ["hljs-keyword"]
+      },
+      {
+        "text": "LIKE",
+        "classes": ["hljs-keyword"]
+      },
+      {
+        "text": "'%@en'",
+        "classes": ["hljs-string"]
+      },
+      {
+        "text": "ORDER",
+        "classes": ["hljs-keyword"]
+      },
+      {
+        "text": "BY",
+        "classes": ["hljs-keyword"]
+      }
+    ],
+    [],
+    []
+  ]
+}
