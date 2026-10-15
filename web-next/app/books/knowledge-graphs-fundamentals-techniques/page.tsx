@@ -4807,41 +4807,469 @@ export default function Page() {
             </tbody>
           </table>{" "}
           <h3 id="sec-19-2">{"19.2 確認問題"}</h3>{" "}
-          <ol>
-            {" "}
-            <li>{"KG の事実は、どんな形の3つ組で表しますか"}</li>{" "}
-            <li>{"RDF のノードの3種類は何ですか"}</li>{" "}
-            <li>{"A-Box と T-Box の違いを説明してください"}</li>{" "}
-            <li>{"適合率と再現率の違いを説明してください"}</li>{" "}
-            <li>{"インスタンス照合で、ブロッキングが必要な理由は何ですか"}</li>{" "}
-            <li>{"TransE では、どんな条件のとき、事実が正しそうだと判断しますか"}</li>{" "}
-            <li>{"SPARQL の SELECT 句と WHERE 句の役割を説明してください"}</li>{" "}
-            <li>{"GraphRAG が、通常のベクトル検索の RAG に加える工夫は何ですか"}</li>{" "}
+          <p data-study-addition="" data-review-instructions="">
+            まずは解答を開かず、8問に自分の言葉で答えてみましょう。各問の「確認すること」を説明できるかが目安です。
+          </p>
+          <ol data-review-list="questions" aria-labelledby="sec-19-2">
+            <li data-review-number="1">
+              <div data-study-addition="" data-review-meta="">
+                <span data-review-category="">{"基礎"}</span>
+                <span data-review-topic="">{"トリプル"}</span>
+              </div>
+              <div data-review-question="">{"KG の事実は、どんな形の3つ組で表しますか"}</div>
+              <p data-study-addition="" data-review-goal-row="">
+                <strong>確認すること：</strong>
+                <span data-review-goal="">
+                  {"主語・述語・目的語を具体例に当てはめて説明する。"}
+                </span>
+              </p>
+            </li>{" "}
+            <li data-review-number="2">
+              <div data-study-addition="" data-review-meta="">
+                <span data-review-category="">{"基礎"}</span>
+                <span data-review-topic="">{"RDF の要素"}</span>
+              </div>
+              <div data-review-question="">{"RDF のノードの3種類は何ですか"}</div>
+              <p data-study-addition="" data-review-goal-row="">
+                <strong>確認すること：</strong>
+                <span data-review-goal="">
+                  {"IRI・リテラル・空白ノードの違いと、置ける位置を説明する。"}
+                </span>
+              </p>
+            </li>{" "}
+            <li data-review-number="3">
+              <div data-study-addition="" data-review-meta="">
+                <span data-review-category="">{"基礎"}</span>
+                <span data-review-topic="">{"A-Box と T-Box"}</span>
+              </div>
+              <div data-review-question="">{"A-Box と T-Box の違いを説明してください"}</div>
+              <p data-study-addition="" data-review-goal-row="">
+                <strong>確認すること：</strong>
+                <span data-review-goal="">{"具体的な事実と、概念・関係の定義を区別する。"}</span>
+              </p>
+            </li>{" "}
+            <li data-review-number="4">
+              <div data-study-addition="" data-review-meta="">
+                <span data-review-category="">{"評価"}</span>
+                <span data-review-topic="">{"適合率と再現率"}</span>
+              </div>
+              <div data-review-question="">{"適合率と再現率の違いを説明してください"}</div>
+              <p data-study-addition="" data-review-goal-row="">
+                <strong>確認すること：</strong>
+                <span data-review-goal="">
+                  {"同じ正解数でも、分母によって評価が変わることを説明する。"}
+                </span>
+              </p>
+            </li>{" "}
+            <li data-review-number="5">
+              <div data-study-addition="" data-review-meta="">
+                <span data-review-category="">{"構築"}</span>
+                <span data-review-topic="">{"ブロッキング"}</span>
+              </div>
+              <div data-review-question="">
+                {"インスタンス照合で、ブロッキングが必要な理由は何ですか"}
+              </div>
+              <p data-study-addition="" data-review-goal-row="">
+                <strong>確認すること：</strong>
+                <span data-review-goal="">
+                  {"比較する候補を絞る目的と、候補から漏らすリスクを説明する。"}
+                </span>
+              </p>
+            </li>{" "}
+            <li data-review-number="6">
+              <div data-study-addition="" data-review-meta="">
+                <span data-review-category="">{"表現学習"}</span>
+                <span data-review-topic="">{"TransE"}</span>
+              </div>
+              <div data-review-question="">
+                {"TransE では、どんな条件のとき、事実が正しそうだと判断しますか"}
+              </div>
+              <p data-study-addition="" data-review-goal-row="">
+                <strong>確認すること：</strong>
+                <span data-review-goal="">
+                  {"head + relation と tail の距離が、スコアにどう関わるかを説明する。"}
+                </span>
+              </p>
+            </li>{" "}
+            <li data-review-number="7">
+              <div data-study-addition="" data-review-meta="">
+                <span data-review-category="">{"問い合わせ"}</span>
+                <span data-review-topic="">{"SPARQL"}</span>
+              </div>
+              <div data-review-question="">
+                {"SPARQL の SELECT 句と WHERE 句の役割を説明してください"}
+              </div>
+              <p data-study-addition="" data-review-goal-row="">
+                <strong>確認すること：</strong>
+                <span data-review-goal="">
+                  {"返す列と、グラフに照合する条件を分けて説明する。"}
+                </span>
+              </p>
+            </li>{" "}
+            <li data-review-number="8">
+              <div data-study-addition="" data-review-meta="">
+                <span data-review-category="">{"応用"}</span>
+                <span data-review-topic="">{"GraphRAG"}</span>
+              </div>
+              <div data-review-question="">
+                {"GraphRAG が、通常のベクトル検索の RAG に加える工夫は何ですか"}
+              </div>
+              <p data-study-addition="" data-review-goal-row="">
+                <strong>確認すること：</strong>
+                <span data-review-goal="">
+                  {"文書の類似度検索に、関係やコミュニティの情報をどう加えるか説明する。"}
+                </span>
+              </p>
+            </li>{" "}
           </ol>{" "}
           <h3 id="sec-19-3">{"19.3 解答"}</h3>{" "}
-          <ol>
-            {" "}
-            <li>{"主語・述語（関係）・目的語の3つ組（トリプル）です"}</li>{" "}
-            <li>{"IRI、リテラル、空白ノードです（RDF 1.1）"}</li>{" "}
-            <li>{"A-Box は具体的な事実の層、T-Box は型と関係の定義（オントロジー）の層です"}</li>{" "}
-            <li>
-              {" 適合率は「出力のうち正しかった割合」、再現率は「正解のうち見つけられた割合」です "}
+          <p data-study-addition="" data-review-instructions="">
+            答え合わせは1問ずつ開いて行えます。元の解答に加え、具体例・考え方・つまずきやすい点を確認し、迷ったら復習先へ戻りましょう。
+          </p>
+          <ol data-review-list="answers" aria-labelledby="sec-19-3">
+            <li data-review-number="1">
+              <details>
+                <summary data-study-addition="">{"問題1｜トリプル — 解答・解説"}</summary>
+                <div data-review-answer-body="">
+                  <div data-review-original-answer="">
+                    {"主語・述語（関係）・目的語の3つ組（トリプル）です"}
+                  </div>
+                  <div data-study-addition="" data-review-extras="">
+                    <p>
+                      <strong>具体例</strong>
+                      <span data-review-example="">
+                        {
+                          "「東京は日本に位置する」なら、主語は東京、述語は locatedIn、目的語は日本です。"
+                        }
+                      </span>
+                    </p>
+                    <p>
+                      <strong>考え方</strong>
+                      <span data-review-explanation="">
+                        {
+                          "点が実体を、向きのある線が関係を表します。「誰が・どんな関係で・何につながるか」を分けると、同じ形式で事実を追加できます。"
+                        }
+                      </span>
+                    </p>
+                    <p data-review-caution="">
+                      <strong>つまずきやすい点</strong>
+                      <span data-review-pitfall="">
+                        {
+                          "3つの単語を並べるだけではなく、それぞれが主語・述語・目的語のどの役割なのかまで答えましょう。"
+                        }
+                      </span>
+                    </p>
+                    <p data-review-reference-row="">
+                      <strong>復習先</strong>
+                      <a data-review-reference="" href="#sec-1-5">
+                        {"第1章 1.5 知識をグラフで表す"}
+                      </a>
+                    </p>
+                  </div>
+                </div>
+              </details>
             </li>{" "}
-            <li>
-              {
-                " 全ての組を比べると、組の数が n × (n − 1) ÷ 2 に増えて、現実的な時間で処理できないためです "
-              }
+            <li data-review-number="2">
+              <details>
+                <summary data-study-addition="">{"問題2｜RDF の要素 — 解答・解説"}</summary>
+                <div data-review-answer-body="">
+                  <div data-review-original-answer="">
+                    {"IRI、リテラル、空白ノードです（RDF 1.1）"}
+                  </div>
+                  <div data-study-addition="" data-review-extras="">
+                    <p>
+                      <strong>具体例</strong>
+                      <span data-review-example="">
+                        {
+                          "ex:Tokyo は接頭辞で短縮した IRI、「東京」のような値はリテラルです。空白ノードは、そのグラフで IRI を付けずに表す対象に使います。"
+                        }
+                      </span>
+                    </p>
+                    <p>
+                      <strong>考え方</strong>
+                      <span data-review-explanation="">
+                        {
+                          "主語には IRI または空白ノード、述語には IRI、目的語には IRI・リテラル・空白ノードを置けます。種類を挙げるだけでなく、この制約も確認してください。"
+                        }
+                      </span>
+                    </p>
+                    <p data-review-caution="">
+                      <strong>つまずきやすい点</strong>
+                      <span data-review-pitfall="">
+                        {
+                          "リテラルを主語や述語に置くことはできません。また、空白ノードの識別子を、別のデータセットでも同じ実体を指す共通 ID と考えないようにしましょう。"
+                        }
+                      </span>
+                    </p>
+                    <p data-review-reference-row="">
+                      <strong>復習先</strong>
+                      <a data-review-reference="" href="#sec-2-3">
+                        {"第2章 2.3 RDF の基本"}
+                      </a>
+                    </p>
+                  </div>
+                </div>
+              </details>
             </li>{" "}
-            <li>
-              {
-                " head の座標に relation のベクトルを足した結果が、tail の座標に近いとき（距離が小さいとき）です "
-              }
+            <li data-review-number="3">
+              <details>
+                <summary data-study-addition="">{"問題3｜A-Box と T-Box — 解答・解説"}</summary>
+                <div data-review-answer-body="">
+                  <div data-review-original-answer="">
+                    {"A-Box は具体的な事実の層、T-Box は型と関係の定義（オントロジー）の層です"}
+                  </div>
+                  <div data-study-addition="" data-review-extras="">
+                    <p>
+                      <strong>具体例</strong>
+                      <span data-review-example="">
+                        {
+                          "「Tokyo は City である」は A-Box の事実です。「City は Place の下位クラスである」は T-Box の定義です。"
+                        }
+                      </span>
+                    </p>
+                    <p>
+                      <strong>考え方</strong>
+                      <span data-review-explanation="">
+                        {
+                          "個別の実体について述べる層と、その実体を分類する概念や関係の層を分けると、別々の都市のデータにも同じ定義を使えます。"
+                        }
+                      </span>
+                    </p>
+                    <p data-review-caution="">
+                      <strong>つまずきやすい点</strong>
+                      <span data-review-pitfall="">
+                        {
+                          "名前に City と入っているかどうかで判定せず、個別の実体についての記述か、クラス同士の定義かを見てください。"
+                        }
+                      </span>
+                    </p>
+                    <p data-review-reference-row="">
+                      <strong>復習先</strong>
+                      <a data-review-reference="" href="#sec-2-5">
+                        {"第2章 2.5 A-Box と T-Box"}
+                      </a>
+                    </p>
+                  </div>
+                </div>
+              </details>
             </li>{" "}
-            <li>{"SELECT 句は結果として返す変数を、WHERE 句は照合するパターンを指定します"}</li>{" "}
-            <li>
-              {
-                " LLM で文書から KG を作り、コミュニティの階層と要約を作って、検索と回答に使う点です "
-              }
+            <li data-review-number="4">
+              <details>
+                <summary data-study-addition="">{"問題4｜適合率と再現率 — 解答・解説"}</summary>
+                <div data-review-answer-body="">
+                  <div data-review-original-answer="">
+                    {
+                      " 適合率は「出力のうち正しかった割合」、再現率は「正解のうち見つけられた割合」です "
+                    }
+                  </div>
+                  <div data-study-addition="" data-review-extras="">
+                    <p>
+                      <strong>具体例</strong>
+                      <span data-review-example="">
+                        {
+                          "抽出した10件のうち8件が正しく、見つけるべき正解が全部で20件なら、適合率は 8 ÷ 10 = 80%、再現率は 8 ÷ 20 = 40% です。"
+                        }
+                      </span>
+                    </p>
+                    <p>
+                      <strong>考え方</strong>
+                      <span data-review-explanation="">
+                        {
+                          "適合率は誤検出の少なさ、再現率は見逃しの少なさを確かめる指標です。この例では、出力は比較的正しくても、多くの正解を取りこぼしています。"
+                        }
+                      </span>
+                    </p>
+                    <p data-review-caution="">
+                      <strong>つまずきやすい点</strong>
+                      <span data-review-pitfall="">
+                        {
+                          "「8件正解した」という数だけでは評価できません。出力件数と、正解全体の件数を区別してください。"
+                        }
+                      </span>
+                    </p>
+                    <p data-review-reference-row="">
+                      <strong>復習先</strong>
+                      <a data-review-reference="" href="#sec-4-6">
+                        {"第4章 4.6 品質の測り方"}
+                      </a>
+                    </p>
+                  </div>
+                </div>
+              </details>
+            </li>{" "}
+            <li data-review-number="5">
+              <details>
+                <summary data-study-addition="">{"問題5｜ブロッキング — 解答・解説"}</summary>
+                <div data-review-answer-body="">
+                  <div data-review-original-answer="">
+                    {
+                      " 全ての組を比べると、組の数が n × (n − 1) ÷ 2 に増えて、現実的な時間で処理できないためです "
+                    }
+                  </div>
+                  <div data-study-addition="" data-review-extras="">
+                    <p>
+                      <strong>具体例</strong>
+                      <span data-review-example="">
+                        {
+                          "1つの集合に10,000件のレコードがあると、異なる2件の組は 10,000 × 9,999 ÷ 2 = 49,995,000組です。候補を絞らず全部比較すると、比較回数が急増します。"
+                        }
+                      </span>
+                    </p>
+                    <p>
+                      <strong>考え方</strong>
+                      <span data-review-explanation="">
+                        {
+                          "ブロッキングは、名前や地域などの手がかりで比較候補を選ぶ前処理です。その後で類似度を計算して、同じ実体かを判定します。"
+                        }
+                      </span>
+                    </p>
+                    <p data-review-caution="">
+                      <strong>つまずきやすい点</strong>
+                      <span data-review-pitfall="">
+                        {
+                          "同じブロックに入っただけで同一実体とは限りません。候補を絞りすぎると、本来一致する組を比較前に落としてしまいます。"
+                        }
+                      </span>
+                    </p>
+                    <p data-review-reference-row="">
+                      <strong>復習先</strong>
+                      <a data-review-reference="" href="#sec-8-5">
+                        {"第8章 8.5 2段階パイプライン"}
+                      </a>
+                    </p>
+                  </div>
+                </div>
+              </details>
+            </li>{" "}
+            <li data-review-number="6">
+              <details>
+                <summary data-study-addition="">{"問題6｜TransE — 解答・解説"}</summary>
+                <div data-review-answer-body="">
+                  <div data-review-original-answer="">
+                    {
+                      " head の座標に relation のベクトルを足した結果が、tail の座標に近いとき（距離が小さいとき）です "
+                    }
+                  </div>
+                  <div data-study-addition="" data-review-extras="">
+                    <p>
+                      <strong>具体例</strong>
+                      <span data-review-example="">
+                        {
+                          "Tokyo = (1, 1)、capital_of = (2, 0)、Japan = (3, 1) なら、Tokyo + capital_of = Japan となり、距離は0です。"
+                        }
+                      </span>
+                    </p>
+                    <p>
+                      <strong>考え方</strong>
+                      <span data-review-explanation="">
+                        {
+                          "TransE は、関係をベクトルの平行移動として表します。学習した表現で head + relation が tail に近いほど、そのトリプルをもっともらしい候補として扱います。"
+                        }
+                      </span>
+                    </p>
+                    <p data-review-caution="">
+                      <strong>つまずきやすい点</strong>
+                      <span data-review-pitfall="">
+                        {
+                          "距離が小さいことは、現実の事実が正しいという証明ではありません。埋め込みモデルによるスコアである点を区別してください。"
+                        }
+                      </span>
+                    </p>
+                    <p data-review-reference-row="">
+                      <strong>復習先</strong>
+                      <a data-review-reference="" href="#sec-10-4">
+                        {"第10章 10.4 TransE の考え方"}
+                      </a>
+                    </p>
+                  </div>
+                </div>
+              </details>
+            </li>{" "}
+            <li data-review-number="7">
+              <details>
+                <summary data-study-addition="">{"問題7｜SPARQL — 解答・解説"}</summary>
+                <div data-review-answer-body="">
+                  <div data-review-original-answer="">
+                    {"SELECT 句は結果として返す変数を、WHERE 句は照合するパターンを指定します"}
+                  </div>
+                  <div data-study-addition="" data-review-extras="">
+                    <p>
+                      <strong>具体例</strong>
+                      <span data-review-example="">
+                        {
+                          "日本にある都市を探すなら、WHERE 句で「都市である」「日本に位置する」というパターンを照合し、SELECT 句で結果に表示する都市の変数を指定します。"
+                        }
+                      </span>
+                    </p>
+                    <p>
+                      <strong>考え方</strong>
+                      <span data-review-explanation="">
+                        {
+                          "WHERE 句で条件に合う変数の組を見つけ、SELECT 句でその中から返す変数を選びます。返す列を指定するだけでは、都市を探す条件にはなりません。"
+                        }
+                      </span>
+                    </p>
+                    <p data-review-caution="">
+                      <strong>つまずきやすい点</strong>
+                      <span data-review-pitfall="">
+                        {
+                          "SELECT 句を検索条件、WHERE 句を表示する列の指定として、逆に覚えないようにしてください。"
+                        }
+                      </span>
+                    </p>
+                    <p data-review-reference-row="">
+                      <strong>復習先</strong>
+                      <a data-review-reference="" href="#sec-12-3">
+                        {"第12章 12.3 SPARQL の基本"}
+                      </a>
+                    </p>
+                  </div>
+                </div>
+              </details>
+            </li>{" "}
+            <li data-review-number="8">
+              <details>
+                <summary data-study-addition="">{"問題8｜GraphRAG — 解答・解説"}</summary>
+                <div data-review-answer-body="">
+                  <div data-review-original-answer="">
+                    {
+                      " LLM で文書から KG を作り、コミュニティの階層と要約を作って、検索と回答に使う点です "
+                    }
+                  </div>
+                  <div data-study-addition="" data-review-extras="">
+                    <p>
+                      <strong>具体例</strong>
+                      <span data-review-example="">
+                        {
+                          "複数文書に登場する組織や人物を関係でつなぎ、関連する集まりの要約を用意すると、1つの文書断片だけでは捉えにくい話題の全体像を回答に使えます。"
+                        }
+                      </span>
+                    </p>
+                    <p>
+                      <strong>考え方</strong>
+                      <span data-review-explanation="">
+                        {
+                          "このガイドの18.3節で扱う方式は、文書から実体・関係を抽出し、KG、コミュニティの階層、要約を作って検索と回答に使います。単にベクトルの類似度で文書断片を探す流れと対比してください。"
+                        }
+                      </span>
+                    </p>
+                    <p data-review-caution="">
+                      <strong>つまずきやすい点</strong>
+                      <span data-review-pitfall="">
+                        {
+                          "ここでは18.3節で紹介した方式について答えます。KG を作っただけで回答の正しさが保証されるわけではなく、抽出や要約の品質にも注意が必要です。"
+                        }
+                      </span>
+                    </p>
+                    <p data-review-reference-row="">
+                      <strong>復習先</strong>
+                      <a data-review-reference="" href="#sec-18-3">
+                        {"第18章 18.3 GraphRAG"}
+                      </a>
+                    </p>
+                  </div>
+                </div>
+              </details>
             </li>{" "}
           </ol>{" "}
           <div

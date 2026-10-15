@@ -609,3 +609,113 @@
     height: auto;
   }
 }
+
+/* Chapter 19 study aids extend the original questions and answers. */
+.layout :global(ol[data-review-list]) {
+  list-style-type: decimal;
+  padding-left: 30px;
+  display: grid;
+  gap: 12px;
+  margin: 20px 0 32px;
+}
+.layout :global([data-review-list] > li) {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  background: var(--color-background-secondary);
+  border: 1px solid var(--color-border-secondary);
+  border-radius: var(--border-radius-lg);
+  margin-bottom: 0;
+}
+.layout :global([data-review-list] > li)::marker {
+  color: var(--accent);
+  font-weight: 700;
+}
+.layout :global([data-review-list="questions"] > li) {
+  padding: 18px 20px;
+}
+.layout :global([data-review-meta]) {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  font-size: 12px;
+  color: var(--color-text-tertiary);
+}
+.layout :global([data-review-category]) {
+  color: var(--color-text-info);
+  background: var(--color-background-info);
+  border: 1px solid var(--color-border-secondary);
+  border-radius: 999px;
+  padding: 2px 9px;
+}
+.layout :global([data-review-question]) {
+  color: var(--color-text-primary);
+  font-weight: 500;
+  line-height: 1.7;
+}
+.layout :global(p[data-review-goal-row]) {
+  margin: 12px 0 0;
+  font-size: 14px;
+}
+.layout :global([data-review-list] summary) {
+  display: list-item;
+  list-style-type: disclosure-closed;
+  list-style-position: inside;
+  cursor: pointer;
+  padding: 16px 18px;
+  color: var(--color-text-primary);
+  font-weight: 500;
+  border-radius: var(--border-radius-lg);
+}
+.layout :global([data-review-list] summary:hover) {
+  background: var(--color-background-tertiary);
+}
+.layout :global([data-review-list] summary:focus-visible) {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
+.layout :global([data-review-list] details[open] > summary) {
+  list-style-type: disclosure-open;
+  border-bottom: 1px solid var(--color-border-secondary);
+  border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
+}
+.layout :global([data-review-answer-body]) {
+  padding: 20px;
+}
+.layout :global([data-review-original-answer]) {
+  color: var(--color-text-primary);
+  font-weight: 500;
+  border-left: 3px solid var(--accent);
+  padding: 8px 14px;
+  margin-bottom: 20px;
+  background: var(--color-background-info);
+}
+.layout :global([data-review-extras] > p) {
+  margin-bottom: 16px;
+  font-size: 14px;
+}
+.layout :global([data-review-extras] > p > strong) {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--color-text-info);
+  font-size: 13px;
+}
+.layout :global([data-review-extras] > p[data-review-caution]) {
+  padding: 12px 14px;
+  background: var(--color-background-warning);
+  border-radius: var(--border-radius-md);
+}
+.layout :global([data-review-extras] > p[data-review-caution] > strong) {
+  color: var(--color-text-warning);
+}
+.layout :global([data-review-extras] > p[data-review-reference-row]) {
+  margin-bottom: 0;
+}
+@media (max-width: 600px) {
+  .layout :global([data-review-list="questions"] > li),
+  .layout :global([data-review-list] summary),
+  .layout :global([data-review-answer-body]) {
+    padding: 14px;
+  }
+}
