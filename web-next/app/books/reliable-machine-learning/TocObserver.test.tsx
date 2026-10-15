@@ -166,4 +166,49 @@ describe("Reliable Machine Learning ガイド TocObserver", () => {
     intersect([{ id: "ch1", isIntersecting: false }]);
     expect(active()).toEqual([["#ch1", "location"]]);
   });
+
+  it("O-5: CSS Modules クラス (styles.checklistCard) でレンダリングされた場合でもカウンターと完了スタイルが連動する", () => {
+    render(
+      <div>
+        <div className={styles.checklistCard} data-total="2">
+          <div className={styles.checklistCounter}>
+            <span className={styles.checklistDone}>0</span>/2
+          </div>
+          <ul className={styles.checklistList}>
+            <li className={styles.checklistItem}>
+              <label>
+                <input className={styles.checklistCheckbox} type="checkbox" aria-label="mod-task1" />
+                <span className={styles.checklistText}>Task 1</span>
+              </label>
+            </li>
+            <li className={styles.checklistItem}>
+              <label>
+                <input className={styles.checklistCheckbox} type="checkbox" aria-label="mod-task2" />
+                <span className={styles.checklistText}>Task 2</span>
+              </label>
+            </li>
+          </ul>
+        </div>
+        <TocObserver />
+      </div>
+    );
+
+    const done = document.querySelector(`.${styles.checklistDone}`) as HTMLElement;
+    expect(done.textContent).toBe("0");
+
+    const checkbox1 = document.querySelector('input[aria-label="mod-task1"]') as HTMLInputElement;
+    const item1 = checkbox1.closest(`.${styles.checklistItem}`) as HTMLElement;
+
+    fireEvent.click(checkbox1);
+    expect(done.textContent).toBe("1");
+    expect(item1.classList.contains("done") || item1.classList.contains(styles.done)).toBe(true);
+
+    const checkbox2 = document.querySelector('input[aria-label="mod-task2"]') as HTMLInputElement;
+    fireEvent.click(checkbox2);
+    expect(done.textContent).toBe("2");
+
+    fireEvent.click(checkbox1);
+    expect(done.textContent).toBe("1");
+    expect(item1.classList.contains("done") || item1.classList.contains(styles.done)).toBe(false);
+  });
 });
