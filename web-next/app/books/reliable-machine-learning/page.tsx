@@ -1829,7 +1829,9 @@ export default function ReliableMachineLearningPage() {
             </p>
             <div className={`${styles.checklistCard} checklist-card`} data-total="10">
               <div className={`${styles.checklistHeader} checklist-header`}>
-                <span className={`${styles.checklistTitle} checklist-title`}>学習チェックリスト</span>
+                <span className={`${styles.checklistTitle} checklist-title`}>
+                  学習チェックリスト
+                </span>
                 <span className={`${styles.checklistCounter} checklist-counter`}>
                   <span className={`${styles.checklistDone} checklist-done`}>0</span>/10
                 </span>
@@ -1837,7 +1839,10 @@ export default function ReliableMachineLearningPage() {
               <ul className={`${styles.checklistList} checklist-list`}>
                 <li className={`${styles.checklistItem} checklist-item`}>
                   <label>
-                    <input className={`${styles.checklistCheckbox} checklist-checkbox`} type="checkbox" />
+                    <input
+                      className={`${styles.checklistCheckbox} checklist-checkbox`}
+                      type="checkbox"
+                    />
                     <span className={`${styles.checklistText} checklist-text`}>
                       自分たちのMLシステムにおける「データ」「モデル」「学習済みモデル」の違いをチーム内で共通言語として説明できるか
                     </span>
@@ -1845,7 +1850,10 @@ export default function ReliableMachineLearningPage() {
                 </li>
                 <li className={`${styles.checklistItem} checklist-item`}>
                   <label>
-                    <input className={`${styles.checklistCheckbox} checklist-checkbox`} type="checkbox" />
+                    <input
+                      className={`${styles.checklistCheckbox} checklist-checkbox`}
+                      type="checkbox"
+                    />
                     <span className={`${styles.checklistText} checklist-text`}>
                       学習に使うデータのライフサイクル（作成〜分析・可視化）の各段階で、責任者と品質チェックが明確になっているか
                     </span>
@@ -1853,7 +1861,10 @@ export default function ReliableMachineLearningPage() {
                 </li>
                 <li className={`${styles.checklistItem} checklist-item`}>
                   <label>
-                    <input className={`${styles.checklistCheckbox} checklist-checkbox`} type="checkbox" />
+                    <input
+                      className={`${styles.checklistCheckbox} checklist-checkbox`}
+                      type="checkbox"
+                    />
                     <span className={`${styles.checklistText} checklist-text`}>
                       MLテストスコアの4カテゴリ（データ、モデル開発、インフラ、モニタリング）のうち、自分たちが最も弱いカテゴリを特定できているか
                     </span>
@@ -1861,7 +1872,10 @@ export default function ReliableMachineLearningPage() {
                 </li>
                 <li className={`${styles.checklistItem} checklist-item`}>
                   <label>
-                    <input className={`${styles.checklistCheckbox} checklist-checkbox`} type="checkbox" />
+                    <input
+                      className={`${styles.checklistCheckbox} checklist-checkbox`}
+                      type="checkbox"
+                    />
                     <span className={`${styles.checklistText} checklist-text`}>
                       公平性・プライバシーへの配慮を、モデル完成後ではなくユースケース検討の最初の段階から組み込んでいるか
                     </span>
@@ -1869,7 +1883,10 @@ export default function ReliableMachineLearningPage() {
                 </li>
                 <li className={`${styles.checklistItem} checklist-item`}>
                   <label>
-                    <input className={`${styles.checklistCheckbox} checklist-checkbox`} type="checkbox" />
+                    <input
+                      className={`${styles.checklistCheckbox} checklist-checkbox`}
+                      type="checkbox"
+                    />
                     <span className={`${styles.checklistText} checklist-text`}>
                       新しいモデルをシャドーデプロイやカナリアリリースといった段階的な手順でロールアウトできる仕組みがあるか
                     </span>
@@ -1877,7 +1894,10 @@ export default function ReliableMachineLearningPage() {
                 </li>
                 <li className={`${styles.checklistItem} checklist-item`}>
                   <label>
-                    <input className={`${styles.checklistCheckbox} checklist-checkbox`} type="checkbox" />
+                    <input
+                      className={`${styles.checklistCheckbox} checklist-checkbox`}
+                      type="checkbox"
+                    />
                     <span className={`${styles.checklistText} checklist-text`}>
                       予測分布や特徴量分布など、ラベルなしで即座に計算できる「先行指標」を監視できているか
                     </span>
@@ -1885,7 +1905,10 @@ export default function ReliableMachineLearningPage() {
                 </li>
                 <li className={`${styles.checklistItem} checklist-item`}>
                   <label>
-                    <input className={`${styles.checklistCheckbox} checklist-checkbox`} type="checkbox" />
+                    <input
+                      className={`${styles.checklistCheckbox} checklist-checkbox`}
+                      type="checkbox"
+                    />
                     <span className={`${styles.checklistText} checklist-text`}>
                       可用性・レイテンシに加えて、データ鮮度やモデル品質を含むML特有のSLIを定義しているか
                     </span>
@@ -1893,7 +1916,10 @@ export default function ReliableMachineLearningPage() {
                 </li>
                 <li className={`${styles.checklistItem} checklist-item`}>
                   <label>
-                    <input className={`${styles.checklistCheckbox} checklist-checkbox`} type="checkbox" />
+                    <input
+                      className={`${styles.checklistCheckbox} checklist-checkbox`}
+                      type="checkbox"
+                    />
                     <span className={`${styles.checklistText} checklist-text`}>
                       MLインシデント発生時に、モデル開発者・ソフトウェアエンジニア・ML
                       SRE・プロダクトマネージャーの役割分担が明確になっているか
@@ -1902,7 +1928,10 @@ export default function ReliableMachineLearningPage() {
                 </li>
                 <li className={`${styles.checklistItem} checklist-item`}>
                   <label>
-                    <input className={`${styles.checklistCheckbox} checklist-checkbox`} type="checkbox" />
+                    <input
+                      className={`${styles.checklistCheckbox} checklist-checkbox`}
+                      type="checkbox"
+                    />
                     <span className={`${styles.checklistText} checklist-text`}>
                       インシデント対応において、技術的な復旧だけでなく公平性・倫理面への影響も確認する手順があるか
                     </span>
@@ -1910,7 +1939,10 @@ export default function ReliableMachineLearningPage() {
                 </li>
                 <li className={`${styles.checklistItem} checklist-item`}>
                   <label>
-                    <input className={`${styles.checklistCheckbox} checklist-checkbox`} type="checkbox" />
+                    <input
+                      className={`${styles.checklistCheckbox} checklist-checkbox`}
+                      type="checkbox"
+                    />
                     <span className={`${styles.checklistText} checklist-text`}>
                       学習パイプラインが再現可能であり、問題発生時に迅速にロールバックできる状態を保っているか
                     </span>

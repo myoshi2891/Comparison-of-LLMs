@@ -177,13 +177,21 @@ describe("Reliable Machine Learning ガイド TocObserver", () => {
           <ul className={styles.checklistList}>
             <li className={styles.checklistItem}>
               <label>
-                <input className={styles.checklistCheckbox} type="checkbox" aria-label="mod-task1" />
+                <input
+                  className={styles.checklistCheckbox}
+                  type="checkbox"
+                  aria-label="mod-task1"
+                />
                 <span className={styles.checklistText}>Task 1</span>
               </label>
             </li>
             <li className={styles.checklistItem}>
               <label>
-                <input className={styles.checklistCheckbox} type="checkbox" aria-label="mod-task2" />
+                <input
+                  className={styles.checklistCheckbox}
+                  type="checkbox"
+                  aria-label="mod-task2"
+                />
                 <span className={styles.checklistText}>Task 2</span>
               </label>
             </li>

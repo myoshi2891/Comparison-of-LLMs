@@ -33,10 +33,7 @@ export default function TocObserver() {
     }
 
     // 2. Checklist counter
-    const cardSelector = [
-      styles.checklistCard ? `.${styles.checklistCard}` : "",
-      ".checklist-card",
-    ]
+    const cardSelector = [styles.checklistCard ? `.${styles.checklistCard}` : "", ".checklist-card"]
       .filter(Boolean)
       .join(", ");
     const cards = Array.from(document.querySelectorAll<HTMLElement>(cardSelector));
@@ -50,10 +47,7 @@ export default function TocObserver() {
       .filter(Boolean)
       .join(", ");
 
-    const doneSelector = [
-      styles.checklistDone ? `.${styles.checklistDone}` : "",
-      ".checklist-done",
-    ]
+    const doneSelector = [styles.checklistDone ? `.${styles.checklistDone}` : "", ".checklist-done"]
       .filter(Boolean)
       .join(", ");
 
