@@ -15,6 +15,7 @@ export default function TocObserver() {
       const target = document.getElementById(link.hash.slice(1));
       if (target) targets.set(target, link);
     }
+    let activeLink: HTMLAnchorElement | null | undefined = null;
     function updateActiveLink() {
       // Compare viewport coordinates directly so large jumps and restored scroll
       // positions work even when no short heading crosses the observer band.
@@ -27,6 +28,9 @@ export default function TocObserver() {
       for (const [target, link] of targets) {
         if (target.getBoundingClientRect().top <= activationLine) current = link;
       }
+      // Scrolling within the same section should not rewrite all 24 links.
+      if (current === activeLink) return;
+      activeLink = current;
       for (const link of links) {
         link.classList.toggle(styles.active, link === current);
         if (link === current) link.setAttribute("aria-current", "location");
