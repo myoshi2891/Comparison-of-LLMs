@@ -136,7 +136,7 @@ describe("Reliable Machine Learning ガイド契約テスト", () => {
     const actualUrls = new Set(
       nodes(container, "a[href^='http']")
         .map((a) => a.getAttribute("href")?.trim())
-        .filter((href): href is string => Boolean(href)),
+        .filter((href): href is string => Boolean(href))
     );
     for (const url of EXPECTED_EXTERNAL_LINKS) {
       expect(actualUrls.has(url)).toBe(true);
@@ -149,7 +149,10 @@ describe("Reliable Machine Learning ガイド契約テスト", () => {
     const ids = headings.map((h) => h.getAttribute("id")).filter(Boolean);
     expect(new Set(ids).size).toBe(headings.length);
 
-    const tocLinks = nodes(container, "nav.sidebar a[href^='#'], nav[data-testid='sidebar-nav'] a[href^='#']");
+    const tocLinks = nodes(
+      container,
+      "nav.sidebar a[href^='#'], nav[data-testid='sidebar-nav'] a[href^='#']"
+    );
     expect(tocLinks.length).toBe(51); // 15 H2 + 36 H3
     for (const link of tocLinks) {
       const targetId = decodeURIComponent(link.getAttribute("href")?.slice(1) ?? "");
@@ -257,7 +260,7 @@ describe("Reliable Machine Learning ガイド契約テスト", () => {
     expect(checkboxes.length).toBe(10);
     const counter = container.querySelector(`.${styles.checklistCounter}`);
     expect(counter).not.toBeNull();
-    expect(text(counter!)).toBe("0/10");
+    expect(counter ? text(counter) : "").toBe("0/10");
   });
 
   it("D-11: 参考文献カードが 15 件存在し、ref-1 〜 ref-15 の ID を持つ", () => {

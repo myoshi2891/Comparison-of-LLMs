@@ -12,7 +12,12 @@ const construct = vi.fn();
 function fixture() {
   return render(
     <div className={styles.layout} data-testid="layout-root">
-      <button type="button" id="sidebarToggle" className={styles.sidebarToggle} aria-label="メニューを開く" />
+      <button
+        type="button"
+        id="sidebarToggle"
+        className={styles.sidebarToggle}
+        aria-label="メニューを開く"
+      />
       <div id="sidebarOverlay" className={styles.sidebarOverlay} />
       <nav id="sidebar" className={styles.sidebar}>
         <a href="#intro" className={`${styles.navLink} ${styles.active}`} aria-current="location">
