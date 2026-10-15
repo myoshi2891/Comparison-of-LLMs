@@ -74,34 +74,32 @@ export default function Page() {
         data-guide="kgllm"
       />
       <div
-        className={[styles["layout"]].join(" ")}
+        className={styles.layout}
         data-testid="layout-root"
         data-page="knowledge-graphs-and-llms-in-action"
       >
         {" "}
-        <nav className={[styles["sidebar"]].join(" ")} aria-label="目次" data-testid="sidebar-nav">
+        <nav className={styles.sidebar} aria-label="目次" data-testid="sidebar-nav">
           {" "}
-          <div className={[styles["brand"]].join(" ")}>
+          <div className={styles.brand}>
             {" "}
-            <div className={[styles["brand__mark"]].join(" ")}>
+            <div className={styles.brand__mark}>
               <i className={["ti", "ti-topology-star-3"].join(" ")}></i>
             </div>{" "}
-            <div className={[styles["brand__text"]].join(" ")}>
+            <div className={styles.brand__text}>
               {" "}
-              <div className={[styles["brand__title"]].join(" ")}>
+              <div className={styles.brand__title}>
                 {"Knowledge Graphs"}
                 <br />
                 {"and LLMs in Action"}
               </div>{" "}
-              <div className={[styles["brand__subtitle"]].join(" ")}>
-                {"初学者向け完全ガイド"}
-              </div>{" "}
+              <div className={styles.brand__subtitle}>{"初学者向け完全ガイド"}</div>{" "}
             </div>{" "}
           </div>{" "}
-          <div className={[styles["nav"]].join(" ")}>
+          <div className={styles.nav}>
             {" "}
             <a
-              className={[styles["nav__link"], styles["active"]].join(" ")}
+              className={[styles.nav__link, styles.active].join(" ")}
               data-nav-target="sec-0"
               href="#sec-0"
               aria-current="location"
@@ -111,7 +109,7 @@ export default function Page() {
               <span>{"0. この文書について"}</span>
             </a>{" "}
             <a
-              className={[styles["nav__link"]].join(" ")}
+              className={styles.nav__link}
               data-nav-target="sec-1"
               href="#sec-1"
               data-testid="sidebar-nav-link"
@@ -120,7 +118,7 @@ export default function Page() {
               <span>{"1. 書籍の基本情報"}</span>
             </a>{" "}
             <a
-              className={[styles["nav__link"]].join(" ")}
+              className={styles.nav__link}
               data-nav-target="sec-2"
               href="#sec-2"
               data-testid="sidebar-nav-link"
@@ -129,7 +127,7 @@ export default function Page() {
               <span>{"2. 本書がめざすこと"}</span>
             </a>{" "}
             <a
-              className={[styles["nav__link"]].join(" ")}
+              className={styles.nav__link}
               data-nav-target="sec-3"
               href="#sec-3"
               data-testid="sidebar-nav-link"
@@ -138,7 +136,7 @@ export default function Page() {
               <span>{"3. 全体マップ"}</span>
             </a>{" "}
             <a
-              className={[styles["nav__link"]].join(" ")}
+              className={styles.nav__link}
               data-nav-target="sec-4"
               href="#sec-4"
               data-testid="sidebar-nav-link"
@@ -147,7 +145,7 @@ export default function Page() {
               <span>{"4. 基礎用語（Step 0）"}</span>
             </a>{" "}
             <a
-              className={[styles["nav__link"]].join(" ")}
+              className={styles.nav__link}
               data-nav-target="sec-5"
               href="#sec-5"
               data-testid="sidebar-nav-link"
@@ -156,7 +154,7 @@ export default function Page() {
               <span>{"5. なぜ KG と LLM か"}</span>
             </a>{" "}
             <a
-              className={[styles["nav__link"]].join(" ")}
+              className={styles.nav__link}
               data-nav-target="sec-6"
               href="#sec-6"
               data-testid="sidebar-nav-link"
@@ -165,7 +163,7 @@ export default function Page() {
               <span>{"6. 学習環境の準備"}</span>
             </a>{" "}
             <a
-              className={[styles["nav__link"]].join(" ")}
+              className={styles.nav__link}
               data-nav-target="sec-7"
               href="#sec-7"
               data-testid="sidebar-nav-link"
@@ -173,10 +171,10 @@ export default function Page() {
               <i className={["ti", "ti-stairs-up"].join(" ")}></i>
               <span>{"7. 章ごとの解説"}</span>
             </a>{" "}
-            <div className={[styles["nav__sub"]].join(" ")}>
+            <div className={styles.nav__sub}>
               {" "}
               <a
-                className={[styles["nav__sub-link"]].join(" ")}
+                className={styles["nav__sub-link"]}
                 data-nav-target="step-1"
                 href="#step-1"
                 data-testid="sidebar-nav-link"
@@ -184,7 +182,7 @@ export default function Page() {
                 {"Step 1: 基礎を固める"}
               </a>
               <a
-                className={[styles["nav__sub-link"]].join(" ")}
+                className={styles["nav__sub-link"]}
                 data-nav-target="step-2"
                 href="#step-2"
                 data-testid="sidebar-nav-link"
@@ -192,7 +190,7 @@ export default function Page() {
                 {"Step 2: 構造化データ・オントロジーから最初の KG を作る"}
               </a>
               <a
-                className={[styles["nav__sub-link"]].join(" ")}
+                className={styles["nav__sub-link"]}
                 data-nav-target="step-3"
                 href="#step-3"
                 data-testid="sidebar-nav-link"
@@ -200,7 +198,7 @@ export default function Page() {
                 {"Step 3: 複数ソースの統合と LLM による解釈"}
               </a>
               <a
-                className={[styles["nav__sub-link"]].join(" ")}
+                className={styles["nav__sub-link"]}
                 data-nav-target="step-4"
                 href="#step-4"
                 data-testid="sidebar-nav-link"
@@ -208,7 +206,7 @@ export default function Page() {
                 {"Step 4: テキストから KG を作る"}
               </a>
               <a
-                className={[styles["nav__sub-link"]].join(" ")}
+                className={styles["nav__sub-link"]}
                 data-nav-target="step-5"
                 href="#step-5"
                 data-testid="sidebar-nav-link"
@@ -216,7 +214,7 @@ export default function Page() {
                 {"Step 5: 固有表現の曖昧性解消 NED"}
               </a>
               <a
-                className={[styles["nav__sub-link"]].join(" ")}
+                className={styles["nav__sub-link"]}
                 data-nav-target="step-6"
                 href="#step-6"
                 data-testid="sidebar-nav-link"
@@ -224,7 +222,7 @@ export default function Page() {
                 {"Step 6: グラフ上の機械学習の基本"}
               </a>
               <a
-                className={[styles["nav__sub-link"]].join(" ")}
+                className={styles["nav__sub-link"]}
                 data-nav-target="step-7"
                 href="#step-7"
                 data-testid="sidebar-nav-link"
@@ -232,7 +230,7 @@ export default function Page() {
                 {"Step 7: 埋め込みと GNN"}
               </a>
               <a
-                className={[styles["nav__sub-link"]].join(" ")}
+                className={styles["nav__sub-link"]}
                 data-nav-target="step-8"
                 href="#step-8"
                 data-testid="sidebar-nav-link"
@@ -240,7 +238,7 @@ export default function Page() {
                 {"Step 8: KG を使った RAG"}
               </a>
               <a
-                className={[styles["nav__sub-link"]].join(" ")}
+                className={styles["nav__sub-link"]}
                 data-nav-target="step-9"
                 href="#step-9"
                 data-testid="sidebar-nav-link"
@@ -248,7 +246,7 @@ export default function Page() {
                 {"Step 9: 自然言語で KG に問い合わせる"}
               </a>
               <a
-                className={[styles["nav__sub-link"]].join(" ")}
+                className={styles["nav__sub-link"]}
                 data-nav-target="step-10"
                 href="#step-10"
                 data-testid="sidebar-nav-link"
@@ -257,7 +255,7 @@ export default function Page() {
               </a>{" "}
             </div>{" "}
             <a
-              className={[styles["nav__link"]].join(" ")}
+              className={styles.nav__link}
               data-nav-target="sec-8"
               href="#sec-8"
               data-testid="sidebar-nav-link"
@@ -266,7 +264,7 @@ export default function Page() {
               <span>{"8. 付録の使い方"}</span>
             </a>{" "}
             <a
-              className={[styles["nav__link"]].join(" ")}
+              className={styles.nav__link}
               data-nav-target="sec-9"
               href="#sec-9"
               data-testid="sidebar-nav-link"
@@ -275,7 +273,7 @@ export default function Page() {
               <span>{"9. 最新動向"}</span>
             </a>{" "}
             <a
-              className={[styles["nav__link"]].join(" ")}
+              className={styles.nav__link}
               data-nav-target="sec-10"
               href="#sec-10"
               data-testid="sidebar-nav-link"
@@ -284,7 +282,7 @@ export default function Page() {
               <span>{"10. 学習ロードマップ"}</span>
             </a>{" "}
             <a
-              className={[styles["nav__link"]].join(" ")}
+              className={styles.nav__link}
               data-nav-target="sec-11"
               href="#sec-11"
               data-testid="sidebar-nav-link"
@@ -293,7 +291,7 @@ export default function Page() {
               <span>{"11. 実務での判断"}</span>
             </a>{" "}
             <a
-              className={[styles["nav__link"]].join(" ")}
+              className={styles.nav__link}
               data-nav-target="sec-12"
               href="#sec-12"
               data-testid="sidebar-nav-link"
@@ -302,7 +300,7 @@ export default function Page() {
               <span>{"12. 総合確認問題"}</span>
             </a>{" "}
             <a
-              className={[styles["nav__link"]].join(" ")}
+              className={styles.nav__link}
               data-nav-target="sec-13"
               href="#sec-13"
               data-testid="sidebar-nav-link"
@@ -312,12 +310,12 @@ export default function Page() {
             </a>{" "}
           </div>{" "}
         </nav>{" "}
-        <main className={[styles["main"]].join(" ")}>
+        <main className={styles.main}>
           {" "}
-          <header className={[styles["hero"]].join(" ")}>
+          <header className={styles.hero}>
             {" "}
             <h1>{"Knowledge Graphs and LLMs in Action 完全ガイド"}</h1>{" "}
-            <p className={[styles["hero__subtitle"]].join(" ")}>
+            <p className={styles.hero__subtitle}>
               {
                 " 接続されたデータ（Connected Data）で AI システムを作る — 初学者向けステップバイステップ解説 "
               }
@@ -338,13 +336,13 @@ export default function Page() {
               </div>
             </blockquote>{" "}
           </header>{" "}
-          <div className={[styles["prose"]].join(" ")}>
+          <div className={styles.prose}>
             {" "}
-            <section className={[styles["section"]].join(" ")}>
+            <section className={styles.section}>
               {" "}
               <h2 id="sec-0">{"0. この文書について（必ずお読みください）"}</h2>{" "}
               <h3 id="heading-1">{"0.1 根拠の範囲と限界"}</h3>{" "}
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 {" "}
                 <table>
                   <thead>
@@ -358,7 +356,7 @@ export default function Page() {
                       <td>
                         {" "}
                         <strong>
-                          <span className={[styles["badge"], styles["badge--source"]].join(" ")}>
+                          <span className={[styles.badge, styles["badge--source"]].join(" ")}>
                             {"書籍情報"}
                           </span>
                         </strong>{" "}
@@ -373,9 +371,7 @@ export default function Page() {
                       <td>
                         {" "}
                         <strong>
-                          <span
-                            className={[styles["badge"], styles["badge--supplement"]].join(" ")}
-                          >
+                          <span className={[styles.badge, styles["badge--supplement"]].join(" ")}>
                             {"補足"}
                           </span>
                         </strong>{" "}
@@ -391,7 +387,7 @@ export default function Page() {
                       <td>
                         {" "}
                         <strong>
-                          <span className={[styles["badge"], styles["badge--trend"]].join(" ")}>
+                          <span className={[styles.badge, styles["badge--trend"]].join(" ")}>
                             {"動向"}
                           </span>
                         </strong>{" "}
@@ -471,10 +467,10 @@ export default function Page() {
               </ol>{" "}
               <hr />{" "}
             </section>{" "}
-            <section className={[styles["section"]].join(" ")}>
+            <section className={styles.section}>
               {" "}
               <h2 id="sec-1">{"1. 書籍の基本情報"}</h2>{" "}
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 {" "}
                 <table>
                   <thead>
@@ -574,7 +570,7 @@ export default function Page() {
                   <p>
                     {" "}
                     <strong>
-                      <span className={[styles["badge"], styles["badge--supplement"]].join(" ")}>
+                      <span className={[styles.badge, styles["badge--supplement"]].join(" ")}>
                         {"補足"}
                       </span>
                     </strong>
@@ -588,7 +584,7 @@ export default function Page() {
               </blockquote>{" "}
               <hr />{" "}
             </section>{" "}
-            <section className={[styles["section"]].join(" ")}>
+            <section className={styles.section}>
               {" "}
               <h2 id="sec-2">{"2. 本書がめざすこと（ひとことで）"}</h2>{" "}
               <p>
@@ -601,7 +597,7 @@ export default function Page() {
                 {" を、理論からコードまで学ぶ本です。 "}
               </p>{" "}
               <p>{"出版社の紹介では、次の 5 点が学習目標として示されています [S1]。"}</p>{" "}
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 {" "}
                 <table>
                   <thead>
@@ -651,11 +647,11 @@ export default function Page() {
               </p>{" "}
               <hr />{" "}
             </section>{" "}
-            <section className={[styles["section"]].join(" ")}>
+            <section className={styles.section}>
               {" "}
               <h2 id="sec-3">{"3. 全体マップ（Part 構成と読み進め方）"}</h2>{" "}
               <h3 id="heading-3">{"3.1 Part 構成の図解"}</h3>{" "}
-              <div className={[styles["mermaid-container"]].join(" ")}>
+              <div className={styles["mermaid-container"]}>
                 <div id="mermaid-0" className={styles["mermaid-target"]}>
                   <MermaidDiagram
                     id="kgllm-chart-0"
@@ -666,7 +662,7 @@ export default function Page() {
                 </div>
               </div>{" "}
               <h3 id="heading-4">{"3.2 章の一覧と学習の見どころ"}</h3>{" "}
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 {" "}
                 <table>
                   <thead>
@@ -785,7 +781,7 @@ export default function Page() {
                 }
               </p>{" "}
               <h3 id="heading-5">{"3.3 初学者向け 3 つの読み進め方"}</h3>{" "}
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 {" "}
                 <table>
                   <thead>
@@ -822,7 +818,7 @@ export default function Page() {
               </div>{" "}
               <hr />{" "}
             </section>{" "}
-            <section className={[styles["section"]].join(" ")}>
+            <section className={styles.section}>
               {" "}
               <h2 id="sec-4">{"4. まず押さえる基礎用語（Step 0）"}</h2>{" "}
               <h3 id="heading-6">{"4.1 グラフとナレッジグラフ（KG）とは"}</h3>{" "}
@@ -840,7 +836,7 @@ export default function Page() {
                   " たとえば「山田さんは Alpha 社で働き、Alpha 社は製品 X を開発している」という知識は、次のように表せます。 "
                 }
               </p>{" "}
-              <div className={[styles["mermaid-container"]].join(" ")}>
+              <div className={styles["mermaid-container"]}>
                 <div id="mermaid-1" className={styles["mermaid-target"]}>
                   <MermaidDiagram
                     id="kgllm-chart-1"
@@ -855,7 +851,7 @@ export default function Page() {
                 <strong>{"トリプル（主語・述語・目的語）"}</strong>
                 {" として読めます。 "}
               </p>{" "}
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 {" "}
                 <table>
                   <thead>
@@ -899,7 +895,7 @@ export default function Page() {
                 {"が JOIN の連鎖になりがちです。グラフでは、線をたどるだけで答えられます。 "}
               </p>{" "}
               <h3 id="heading-7">{"4.2 用語集（初学者向けのやさしい説明）"}</h3>{" "}
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 {" "}
                 <table>
                   <thead>
@@ -1040,7 +1036,7 @@ export default function Page() {
                 </table>{" "}
               </div>{" "}
               <h3 id="heading-8">{"4.3 タクソノミーとオントロジーの違い"}</h3>{" "}
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 {" "}
                 <table>
                   <thead>
@@ -1075,7 +1071,7 @@ export default function Page() {
                 <strong>{"目的（ユースケース）で選ぶ"}</strong>
                 {"という姿勢で比較しています [S3]。 "}
               </p>{" "}
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 {" "}
                 <table>
                   <thead>
@@ -1112,7 +1108,7 @@ export default function Page() {
               </div>{" "}
               <p>{"出典: 第3章の章概要と FAQ [S3]。"}</p> <hr />{" "}
             </section>{" "}
-            <section className={[styles["section"]].join(" ")}>
+            <section className={styles.section}>
               {" "}
               <h2 id="sec-5">{"5. なぜ KG と LLM を組み合わせるのか"}</h2>{" "}
               <h3 id="heading-10">{"5.1 LLM 単体の課題と、KG による補い方"}</h3>{" "}
@@ -1121,7 +1117,7 @@ export default function Page() {
                   " 第13章の概要は、LLM を本番で使う際の課題として、ハルシネーション、知識のカットオフ、不透明性、プライバシーとアクセス制御、コスト、バイアスを挙げ、その対策として RAG を位置づけています [S4]。さらに、ベクトル検索ベースの RAG には次の限界があると整理されています [S4]。 "
                 }
               </p>{" "}
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 {" "}
                 <table>
                   <thead>
@@ -1161,7 +1157,7 @@ export default function Page() {
                 <strong>{"相互補完"}</strong>
                 {"が描かれています（目次 [S2] から読み取れる構成）。 "}
               </p>{" "}
-              <div className={[styles["mermaid-container"]].join(" ")}>
+              <div className={styles["mermaid-container"]}>
                 <div id="mermaid-2" className={styles["mermaid-target"]}>
                   <MermaidDiagram
                     id="kgllm-chart-2"
@@ -1177,7 +1173,7 @@ export default function Page() {
                   <p>
                     {" "}
                     <strong>
-                      <span className={[styles["badge"], styles["badge--supplement"]].join(" ")}>
+                      <span className={[styles.badge, styles["badge--supplement"]].join(" ")}>
                         {"補足"}
                       </span>
                       {" 一言でまとめると:"}
@@ -1198,11 +1194,11 @@ export default function Page() {
               </p>{" "}
               <hr />{" "}
             </section>{" "}
-            <section className={[styles["section"]].join(" ")}>
+            <section className={styles.section}>
               {" "}
               <h2 id="sec-6">{"6. 学習環境の準備（Step-by-Step）"}</h2>{" "}
               <h3 id="heading-13">{"6.1 全体の流れ"}</h3>{" "}
-              <div className={[styles["mermaid-container"]].join(" ")}>
+              <div className={styles["mermaid-container"]}>
                 <div id="mermaid-3" className={styles["mermaid-target"]}>
                   <MermaidDiagram
                     id="kgllm-chart-3"
@@ -1225,13 +1221,13 @@ export default function Page() {
                 </li>{" "}
                 <li>{"コードは公式リポジトリ [S8] から取得します。"}</li>{" "}
               </ul>{" "}
-              <div className={[styles["code-block"]].join(" ")} data-testid="code-block">
+              <div className={styles["code-block"]} data-testid="code-block">
                 {" "}
-                <div className={[styles["code-block__bar"]].join(" ")}>
+                <div className={styles["code-block__bar"]}>
                   {" "}
-                  <span className={[styles["code-block__lang"]].join(" ")}>{"bash"}</span>
+                  <span className={styles["code-block__lang"]}>{"bash"}</span>
                   <button
-                    className={[styles["code-block__copy"]].join(" ")}
+                    className={styles["code-block__copy"]}
                     type="button"
                     data-copy-target="code-1"
                   >
@@ -1268,13 +1264,13 @@ export default function Page() {
                   " リポジトリの README は、仮想環境の利用を推奨し、コードは Python 3.8 / 3.9 / 3.10 でテストされていると記載しています [S8]。 "
                 }
               </p>{" "}
-              <div className={[styles["code-block"]].join(" ")} data-testid="code-block">
+              <div className={styles["code-block"]} data-testid="code-block">
                 {" "}
-                <div className={[styles["code-block__bar"]].join(" ")}>
+                <div className={styles["code-block__bar"]}>
                   {" "}
-                  <span className={[styles["code-block__lang"]].join(" ")}>{"bash"}</span>
+                  <span className={styles["code-block__lang"]}>{"bash"}</span>
                   <button
-                    className={[styles["code-block__copy"]].join(" ")}
+                    className={styles["code-block__copy"]}
                     type="button"
                     data-copy-target="code-2"
                   >
@@ -1304,7 +1300,7 @@ export default function Page() {
                   <p>
                     {" "}
                     <strong>
-                      <span className={[styles["badge"], styles["badge--supplement"]].join(" ")}>
+                      <span className={[styles.badge, styles["badge--supplement"]].join(" ")}>
                         {"補足"}
                       </span>
                     </strong>
@@ -1370,13 +1366,13 @@ export default function Page() {
                 <code>{"make"}</code>
                 {" コマンドが使える必要があります [S8]。 "}
               </p>{" "}
-              <div className={[styles["code-block"]].join(" ")} data-testid="code-block">
+              <div className={styles["code-block"]} data-testid="code-block">
                 {" "}
-                <div className={[styles["code-block__bar"]].join(" ")}>
+                <div className={styles["code-block__bar"]}>
                   {" "}
-                  <span className={[styles["code-block__lang"]].join(" ")}>{"bash"}</span>
+                  <span className={styles["code-block__lang"]}>{"bash"}</span>
                   <button
-                    className={[styles["code-block__copy"]].join(" ")}
+                    className={styles["code-block__copy"]}
                     type="button"
                     data-copy-target="code-3"
                   >
@@ -1403,18 +1399,18 @@ export default function Page() {
                 {
                   " 第8章は Ollama と Llama 3.1 8B でモデルをセットアップします [S2]。一般的な手順は次のとおりです（"
                 }
-                <span className={[styles["badge"], styles["badge--supplement"]].join(" ")}>
+                <span className={[styles.badge, styles["badge--supplement"]].join(" ")}>
                   {"補足"}
                 </span>
                 {"）。 "}
               </p>{" "}
-              <div className={[styles["code-block"]].join(" ")} data-testid="code-block">
+              <div className={styles["code-block"]} data-testid="code-block">
                 {" "}
-                <div className={[styles["code-block__bar"]].join(" ")}>
+                <div className={styles["code-block__bar"]}>
                   {" "}
-                  <span className={[styles["code-block__lang"]].join(" ")}>{"bash"}</span>
+                  <span className={styles["code-block__lang"]}>{"bash"}</span>
                   <button
-                    className={[styles["code-block__copy"]].join(" ")}
+                    className={styles["code-block__copy"]}
                     type="button"
                     data-copy-target="code-4"
                   >
@@ -1447,7 +1443,7 @@ export default function Page() {
                 </pre>{" "}
               </div>{" "}
               <h3 id="heading-15">{"6.3 つまずきポイント"}</h3>{" "}
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 {" "}
                 <table>
                   <thead>
@@ -1499,7 +1495,7 @@ export default function Page() {
               </div>{" "}
               <hr />{" "}
             </section>{" "}
-            <section className={[styles["section"]].join(" ")}>
+            <section className={styles.section}>
               {" "}
               <h2 id="sec-7">{"7. ステップバイステップ解説（章ごと）"}</h2>{" "}
               <p>{"各ステップは次の構成です。"}</p>{" "}
@@ -1508,7 +1504,7 @@ export default function Page() {
                 <li>
                   {" "}
                   <strong>
-                    <span className={[styles["badge"], styles["badge--source"]].join(" ")}>
+                    <span className={[styles.badge, styles["badge--source"]].join(" ")}>
                       {"書籍情報"}
                     </span>
                   </strong>
@@ -1518,7 +1514,7 @@ export default function Page() {
                   {" "}
                   <strong>
                     {"やさしい説明 "}
-                    <span className={[styles["badge"], styles["badge--supplement"]].join(" ")}>
+                    <span className={[styles.badge, styles["badge--supplement"]].join(" ")}>
                       {"補足"}
                     </span>
                   </strong>
@@ -1536,7 +1532,7 @@ export default function Page() {
               <hr /> <h3 id="step-1">{"Step 1: 基礎を固める（Part 1 / 第1章・第2章）"}</h3>{" "}
               <h4>
                 {" "}
-                <span className={[styles["badge"], styles["badge--source"]].join(" ")}>
+                <span className={[styles.badge, styles["badge--source"]].join(" ")}>
                   {"書籍情報"}
                 </span>
                 {" 第1章「KG と LLM: 最強の組み合わせ」の構成 [S2] "}
@@ -1561,7 +1557,7 @@ export default function Page() {
               </ul>{" "}
               <h4>
                 {" "}
-                <span className={[styles["badge"], styles["badge--source"]].join(" ")}>
+                <span className={[styles.badge, styles["badge--source"]].join(" ")}>
                   {"書籍情報"}
                 </span>
                 {" 第2章「知能システム: ハイブリッドアプローチ」の構成 [S2] "}
@@ -1578,12 +1574,12 @@ export default function Page() {
               </ul>{" "}
               <h4>
                 {"やさしい説明 "}
-                <span className={[styles["badge"], styles["badge--supplement"]].join(" ")}>
+                <span className={[styles.badge, styles["badge--supplement"]].join(" ")}>
                   {"補足"}
                 </span>
               </h4>{" "}
               <p>{"知能システムを「新人コンサルタント」にたとえると分かりやすくなります。"}</p>{" "}
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 {" "}
                 <table>
                   <thead>
@@ -1617,7 +1613,7 @@ export default function Page() {
                   </tbody>
                 </table>{" "}
               </div>{" "}
-              <div className={[styles["mermaid-container"]].join(" ")}>
+              <div className={styles["mermaid-container"]}>
                 <div id="mermaid-4" className={styles["mermaid-target"]}>
                   <MermaidDiagram
                     id="kgllm-chart-4"
@@ -1627,7 +1623,7 @@ export default function Page() {
                   />
                 </div>
               </div>{" "}
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 {" "}
                 <table>
                   <thead>
@@ -1710,7 +1706,7 @@ export default function Page() {
                 {" Step 2: 構造化データ・オントロジーから最初の KG を作る（Part 2 / 第3章） "}
               </h3>{" "}
               <h4>
-                <span className={[styles["badge"], styles["badge--source"]].join(" ")}>
+                <span className={[styles.badge, styles["badge--source"]].join(" ")}>
                   {"書籍情報"}
                 </span>
                 {" 第3章の要点 [S3]"}
@@ -1761,7 +1757,7 @@ export default function Page() {
               </ul>{" "}
               <h4>
                 {"やさしい説明 "}
-                <span className={[styles["badge"], styles["badge--supplement"]].join(" ")}>
+                <span className={[styles.badge, styles["badge--supplement"]].join(" ")}>
                   {"補足"}
                 </span>
               </h4>{" "}
@@ -1770,7 +1766,7 @@ export default function Page() {
                 <strong>{"KG 構築は「技術選び」ではなく「目的の確認」から始まる"}</strong>
                 {"というのが、この章の最大のメッセージです。 "}
               </p>{" "}
-              <div className={[styles["mermaid-container"]].join(" ")}>
+              <div className={styles["mermaid-container"]}>
                 <div id="mermaid-5" className={styles["mermaid-target"]}>
                   <MermaidDiagram
                     id="kgllm-chart-5"
@@ -1783,7 +1779,7 @@ export default function Page() {
               <p>
                 <strong>{"章の実装ステップ（[S3] の FAQ に基づく整理）"}</strong>
               </p>{" "}
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 {" "}
                 <table>
                   <thead>
@@ -1894,7 +1890,7 @@ export default function Page() {
               <p>
                 <strong>{"イメージ図: 疾患と表現型、その階層"}</strong>
               </p>{" "}
-              <div className={[styles["mermaid-container"]].join(" ")}>
+              <div className={styles["mermaid-container"]}>
                 <div id="mermaid-6" className={styles["mermaid-target"]}>
                   <MermaidDiagram
                     id="kgllm-chart-6"
@@ -1909,13 +1905,13 @@ export default function Page() {
                 <strong>{"学習用の独自サンプル（Cypher）"}</strong>
                 {" — ID や値はすべてダミーです。書籍の実コードは [S8] を参照してください。 "}
               </p>{" "}
-              <div className={[styles["code-block"]].join(" ")} data-testid="code-block">
+              <div className={styles["code-block"]} data-testid="code-block">
                 {" "}
-                <div className={[styles["code-block__bar"]].join(" ")}>
+                <div className={styles["code-block__bar"]}>
                   {" "}
-                  <span className={[styles["code-block__lang"]].join(" ")}>{"cypher"}</span>
+                  <span className={styles["code-block__lang"]}>{"cypher"}</span>
                   <button
-                    className={[styles["code-block__copy"]].join(" ")}
+                    className={styles["code-block__copy"]}
                     type="button"
                     data-copy-target="code-5"
                   >
@@ -1971,7 +1967,8 @@ export default function Page() {
                     </span>
                     {"\n"}
                     <span className={styles.codeLine} data-testid="code-line">
-                      {"    r.evidence = "}
+                      {"    "}
+                      {"r.evidence = "}
                       <span className="hljs-string" data-token="string">
                         {"'dummy-evidence'"}
                       </span>
@@ -1979,7 +1976,8 @@ export default function Page() {
                     </span>
                     {"\n"}
                     <span className={styles.codeLine} data-testid="code-line">
-                      {"    r.frequency = "}
+                      {"    "}
+                      {"r.frequency = "}
                       <span className="hljs-string" data-token="string">
                         {"'dummy-frequency'"}
                       </span>
@@ -1987,13 +1985,13 @@ export default function Page() {
                   </code>
                 </pre>{" "}
               </div>{" "}
-              <div className={[styles["code-block"]].join(" ")} data-testid="code-block">
+              <div className={styles["code-block"]} data-testid="code-block">
                 {" "}
-                <div className={[styles["code-block__bar"]].join(" ")}>
+                <div className={styles["code-block__bar"]}>
                   {" "}
-                  <span className={[styles["code-block__lang"]].join(" ")}>{"cypher"}</span>
+                  <span className={styles["code-block__lang"]}>{"cypher"}</span>
                   <button
-                    className={[styles["code-block__copy"]].join(" ")}
+                    className={styles["code-block__copy"]}
                     type="button"
                     data-copy-target="code-6"
                   >
@@ -2074,7 +2072,7 @@ export default function Page() {
                 </div>
               </blockquote>{" "}
               <h4>{"つまずきポイント"}</h4>{" "}
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 {" "}
                 <table>
                   <thead>
@@ -2139,7 +2137,7 @@ export default function Page() {
               <hr />{" "}
               <h3 id="step-3">{"Step 3: 複数ソースの統合と LLM による解釈（Part 2 / 第4章）"}</h3>{" "}
               <h4>
-                <span className={[styles["badge"], styles["badge--source"]].join(" ")}>
+                <span className={[styles.badge, styles["badge--source"]].join(" ")}>
                   {"書籍情報"}
                 </span>
                 {" 第4章の構成 [S2]"}
@@ -2163,7 +2161,7 @@ export default function Page() {
               </ul>{" "}
               <h4>
                 {"やさしい説明 "}
-                <span className={[styles["badge"], styles["badge--supplement"]].join(" ")}>
+                <span className={[styles.badge, styles["badge--supplement"]].join(" ")}>
                   {"補足"}
                 </span>
               </h4>{" "}
@@ -2172,7 +2170,7 @@ export default function Page() {
                 <strong>{"複数の情報源を 1 枚の地図に統合する"}</strong>
                 {"」段階です。 "}
               </p>{" "}
-              <div className={[styles["mermaid-container"]].join(" ")}>
+              <div className={styles["mermaid-container"]}>
                 <div id="mermaid-7" className={styles["mermaid-target"]}>
                   <MermaidDiagram
                     id="kgllm-chart-7"
@@ -2182,7 +2180,7 @@ export default function Page() {
                   />
                 </div>
               </div>{" "}
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 {" "}
                 <table>
                   <thead>
@@ -2258,7 +2256,7 @@ export default function Page() {
               <h3 id="step-4">{"Step 4: テキストから KG を作る（Part 3 / 第5章・第6章）"}</h3>{" "}
               <h4>
                 {" "}
-                <span className={[styles["badge"], styles["badge--source"]].join(" ")}>
+                <span className={[styles.badge, styles["badge--source"]].join(" ")}>
                   {"書籍情報"}
                 </span>
                 {" 第5章「非構造化データからのドメイン知識抽出」 [S2] "}
@@ -2276,7 +2274,7 @@ export default function Page() {
               </ul>{" "}
               <h4>
                 {" "}
-                <span className={[styles["badge"], styles["badge--source"]].join(" ")}>
+                <span className={[styles.badge, styles["badge--source"]].join(" ")}>
                   {"書籍情報"}
                 </span>
                 {" 第6章「LLM による KG 構築」 [S2] "}
@@ -2296,12 +2294,12 @@ export default function Page() {
               </ul>{" "}
               <h4>
                 {"やさしい説明 "}
-                <span className={[styles["badge"], styles["badge--supplement"]].join(" ")}>
+                <span className={[styles.badge, styles["badge--supplement"]].join(" ")}>
                   {"補足"}
                 </span>
               </h4>{" "}
               <p>{"文章から KG を作る流れは、次のようなパイプラインになります。"}</p>{" "}
-              <div className={[styles["mermaid-container"]].join(" ")}>
+              <div className={styles["mermaid-container"]}>
                 <div id="mermaid-8" className={styles["mermaid-target"]}>
                   <MermaidDiagram
                     id="kgllm-chart-8"
@@ -2311,7 +2309,7 @@ export default function Page() {
                   />
                 </div>
               </div>{" "}
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 {" "}
                 <table>
                   <thead>
@@ -2353,12 +2351,12 @@ export default function Page() {
                 {" "}
                 <strong>
                   {"従来 NLP と LLM の比較 "}
-                  <span className={[styles["badge"], styles["badge--supplement"]].join(" ")}>
+                  <span className={[styles.badge, styles["badge--supplement"]].join(" ")}>
                     {"補足"}
                   </span>
                 </strong>{" "}
               </p>{" "}
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 {" "}
                 <table>
                   <thead>
@@ -2415,13 +2413,13 @@ export default function Page() {
                   " は「プロンプトを受け取り文字列を返す関数」です。どの LLM の SDK でも差し替えられます。 "
                 }
               </p>{" "}
-              <div className={[styles["code-block"]].join(" ")} data-testid="code-block">
+              <div className={styles["code-block"]} data-testid="code-block">
                 {" "}
-                <div className={[styles["code-block__bar"]].join(" ")}>
+                <div className={styles["code-block__bar"]}>
                   {" "}
-                  <span className={[styles["code-block__lang"]].join(" ")}>{"python"}</span>
+                  <span className={styles["code-block__lang"]}>{"python"}</span>
                   <button
-                    className={[styles["code-block__copy"]].join(" ")}
+                    className={styles["code-block__copy"]}
                     type="button"
                     data-copy-target="code-7"
                   >
@@ -2515,7 +2513,8 @@ export default function Page() {
                     </span>
                     {"\n"}
                     <span className={styles.codeLine} data-testid="code-line">
-                      {"  {{"}
+                      {"  "}
+                      {"{{"}
                       <span className="hljs-string" data-token="string">
                         {'"triples"'}
                       </span>
@@ -2591,35 +2590,42 @@ export default function Page() {
                     </span>
                     {"\n"}
                     <span className={styles.codeLine} data-testid="code-line">
-                      {"    prompt = PROMPT_TEMPLATE.format("}
+                      {"    "}
+                      {"prompt = PROMPT_TEMPLATE.format("}
                     </span>
                     {"\n"}
                     <span className={styles.codeLine} data-testid="code-line">
-                      {"        entity_types=sorted(ALLOWED_ENTITY_TYPES),"}
+                      {"        "}
+                      {"entity_types=sorted(ALLOWED_ENTITY_TYPES),"}
                     </span>
                     {"\n"}
                     <span className={styles.codeLine} data-testid="code-line">
-                      {"        relations=sorted(ALLOWED_RELATIONS),"}
+                      {"        "}
+                      {"relations=sorted(ALLOWED_RELATIONS),"}
                     </span>
                     {"\n"}
                     <span className={styles.codeLine} data-testid="code-line">
-                      {"        text=text,"}
-                    </span>
-                    {"\n"}
-                    <span className={styles.codeLine} data-testid="code-line">
-                      {"    )"}
-                    </span>
-                    {"\n"}
-                    <span className={styles.codeLine} data-testid="code-line">
-                      {"    data = json.loads(llm_call(prompt))"}
-                    </span>
-                    {"\n"}
-                    <span className={styles.codeLine} data-testid="code-line">
-                      {"    valid = []"}
+                      {"        "}
+                      {"text=text,"}
                     </span>
                     {"\n"}
                     <span className={styles.codeLine} data-testid="code-line">
                       {"    "}
+                      {")"}
+                    </span>
+                    {"\n"}
+                    <span className={styles.codeLine} data-testid="code-line">
+                      {"    "}
+                      {"data = json.loads(llm_call(prompt))"}
+                    </span>
+                    {"\n"}
+                    <span className={styles.codeLine} data-testid="code-line">
+                      {"    "}
+                      {"valid = []"}
+                    </span>
+                    {"\n"}
+                    <span className={styles.codeLine} data-testid="code-line">
+                      {"   "}{" "}
                       <span className="hljs-keyword" data-token="keyword">
                         {"for"}
                       </span>
@@ -2635,7 +2641,7 @@ export default function Page() {
                     </span>
                     {"\n"}
                     <span className={styles.codeLine} data-testid="code-line">
-                      {"        "}
+                      {"       "}{" "}
                       <span className="hljs-keyword" data-token="keyword">
                         {"if"}
                       </span>
@@ -2643,7 +2649,8 @@ export default function Page() {
                     </span>
                     {"\n"}
                     <span className={styles.codeLine} data-testid="code-line">
-                      {"            t.get("}
+                      {"            "}
+                      {"t.get("}
                       <span className="hljs-string" data-token="string">
                         {'"head_type"'}
                       </span>
@@ -2655,7 +2662,8 @@ export default function Page() {
                     </span>
                     {"\n"}
                     <span className={styles.codeLine} data-testid="code-line">
-                      {"            and t.get("}
+                      {"            "}
+                      {"and t.get("}
                       <span className="hljs-string" data-token="string">
                         {'"tail_type"'}
                       </span>
@@ -2667,7 +2675,8 @@ export default function Page() {
                     </span>
                     {"\n"}
                     <span className={styles.codeLine} data-testid="code-line">
-                      {"            and t.get("}
+                      {"            "}
+                      {"and t.get("}
                       <span className="hljs-string" data-token="string">
                         {'"relation"'}
                       </span>
@@ -2679,18 +2688,20 @@ export default function Page() {
                     </span>
                     {"\n"}
                     <span className={styles.codeLine} data-testid="code-line">
-                      {"        ):"}
+                      {"        "}
+                      {"):"}
                     </span>
                     {"\n"}
                     <span className={styles.codeLine} data-testid="code-line">
-                      {"            valid.append(t)  "}
+                      {"            "}
+                      {"valid.append(t)  "}
                       <span className="hljs-comment" data-token="comment">
                         {"# スキーマ外の出力は捨てる"}
                       </span>
                     </span>
                     {"\n"}
                     <span className={styles.codeLine} data-testid="code-line">
-                      {"    "}
+                      {"   "}{" "}
                       <span className="hljs-keyword" data-token="keyword">
                         {"return"}
                       </span>
@@ -2699,13 +2710,13 @@ export default function Page() {
                   </code>
                 </pre>{" "}
               </div>{" "}
-              <div className={[styles["code-block"]].join(" ")} data-testid="code-block">
+              <div className={styles["code-block"]} data-testid="code-block">
                 {" "}
-                <div className={[styles["code-block__bar"]].join(" ")}>
+                <div className={styles["code-block__bar"]}>
                   {" "}
-                  <span className={[styles["code-block__lang"]].join(" ")}>{"python"}</span>
+                  <span className={styles["code-block__lang"]}>{"python"}</span>
                   <button
-                    className={[styles["code-block__copy"]].join(" ")}
+                    className={styles["code-block__copy"]}
                     type="button"
                     data-copy-target="code-8"
                   >
@@ -2728,28 +2739,28 @@ export default function Page() {
                     </span>
                     {"\n"}
                     <span className={styles.codeLine} data-testid="code-line">
-                      {"    "}
+                      {"   "}{" "}
                       <span className="hljs-comment" data-token="comment">
                         {"# ラベルや関係名は変数にできないため文字列で埋め込む。"}
                       </span>
                     </span>
                     {"\n"}
                     <span className={styles.codeLine} data-testid="code-line">
-                      {"    "}
+                      {"   "}{" "}
                       <span className="hljs-comment" data-token="comment">
                         {"# 埋め込む前に必ず許可リストで検証する(Cypherインジェクション対策)。"}
                       </span>
                     </span>
                     {"\n"}
                     <span className={styles.codeLine} data-testid="code-line">
-                      {"    "}
+                      {"   "}{" "}
                       <span className="hljs-comment" data-token="comment">
                         {"# 呼び出し側の検証漏れを前提にせず、この関数自身でも弾く。"}
                       </span>
                     </span>
                     {"\n"}
                     <span className={styles.codeLine} data-testid="code-line">
-                      {"    "}
+                      {"   "}{" "}
                       <span className="hljs-keyword" data-token="keyword">
                         {"for"}
                       </span>
@@ -2761,7 +2772,8 @@ export default function Page() {
                     </span>
                     {"\n"}
                     <span className={styles.codeLine} data-testid="code-line">
-                      {"        head, tail = t.get("}
+                      {"        "}
+                      {"head, tail = t.get("}
                       <span className="hljs-string" data-token="string">
                         {'"head"'}
                       </span>
@@ -2773,7 +2785,7 @@ export default function Page() {
                     </span>
                     {"\n"}
                     <span className={styles.codeLine} data-testid="code-line">
-                      {"        "}
+                      {"       "}{" "}
                       <span className="hljs-keyword" data-token="keyword">
                         {"if"}
                       </span>
@@ -2781,7 +2793,8 @@ export default function Page() {
                     </span>
                     {"\n"}
                     <span className={styles.codeLine} data-testid="code-line">
-                      {"            t.get("}
+                      {"            "}
+                      {"t.get("}
                       <span className="hljs-string" data-token="string">
                         {'"head_type"'}
                       </span>
@@ -2793,7 +2806,8 @@ export default function Page() {
                     </span>
                     {"\n"}
                     <span className={styles.codeLine} data-testid="code-line">
-                      {"            or t.get("}
+                      {"            "}
+                      {"or t.get("}
                       <span className="hljs-string" data-token="string">
                         {'"tail_type"'}
                       </span>
@@ -2805,7 +2819,8 @@ export default function Page() {
                     </span>
                     {"\n"}
                     <span className={styles.codeLine} data-testid="code-line">
-                      {"            or t.get("}
+                      {"            "}
+                      {"or t.get("}
                       <span className="hljs-string" data-token="string">
                         {'"relation"'}
                       </span>
@@ -2817,14 +2832,14 @@ export default function Page() {
                     </span>
                     {"\n"}
                     <span className={styles.codeLine} data-testid="code-line">
-                      {"            "}
+                      {"           "}{" "}
                       <span className="hljs-comment" data-token="comment">
                         {"# head / tail が欠けていると、下の tx.run で KeyError になる。"}
                       </span>
                     </span>
                     {"\n"}
                     <span className={styles.codeLine} data-testid="code-line">
-                      {"            "}
+                      {"           "}{" "}
                       <span className="hljs-comment" data-token="comment">
                         {
                           "# 空文字や空白だけの名前は、名前のないノードを作ってしまうのでここで弾く。"
@@ -2833,27 +2848,33 @@ export default function Page() {
                     </span>
                     {"\n"}
                     <span className={styles.codeLine} data-testid="code-line">
-                      {"            or not isinstance(head, str)"}
+                      {"            "}
+                      {"or not isinstance(head, str)"}
                     </span>
                     {"\n"}
                     <span className={styles.codeLine} data-testid="code-line">
-                      {"            or not head.strip()"}
+                      {"            "}
+                      {"or not head.strip()"}
                     </span>
                     {"\n"}
                     <span className={styles.codeLine} data-testid="code-line">
-                      {"            or not isinstance(tail, str)"}
+                      {"            "}
+                      {"or not isinstance(tail, str)"}
                     </span>
                     {"\n"}
                     <span className={styles.codeLine} data-testid="code-line">
-                      {"            or not tail.strip()"}
+                      {"            "}
+                      {"or not tail.strip()"}
                     </span>
                     {"\n"}
                     <span className={styles.codeLine} data-testid="code-line">
-                      {"        ):"}
+                      {"        "}
+                      {"):"}
                     </span>
                     {"\n"}
                     <span className={styles.codeLine} data-testid="code-line">
-                      {"            raise ValueError(f"}
+                      {"            "}
+                      {"raise ValueError(f"}
                       <span className="hljs-string" data-token="string">
                         {'"検証に通らないトリプルは書き込めません: {t}"'}
                       </span>
@@ -2861,25 +2882,29 @@ export default function Page() {
                     </span>
                     {"\n"}
                     <span className={styles.codeLine} data-testid="code-line">
-                      {"        tx.run("}
+                      {"        "}
+                      {"tx.run("}
                     </span>
                     {"\n"}
                     <span className={styles.codeLine} data-testid="code-line">
-                      {"            f"}
+                      {"            "}
+                      {"f"}
                       <span className="hljs-string" data-token="string">
                         {"\"MERGE (h:{t['head_type']} {{name: $head}}) \""}
                       </span>
                     </span>
                     {"\n"}
                     <span className={styles.codeLine} data-testid="code-line">
-                      {"            f"}
+                      {"            "}
+                      {"f"}
                       <span className="hljs-string" data-token="string">
                         {"\"MERGE (t:{t['tail_type']} {{name: $tail}}) \""}
                       </span>
                     </span>
                     {"\n"}
                     <span className={styles.codeLine} data-testid="code-line">
-                      {"            f"}
+                      {"            "}
+                      {"f"}
                       <span className="hljs-string" data-token="string">
                         {"\"MERGE (h)-[:{t['relation']}]->(t)\""}
                       </span>
@@ -2887,15 +2912,18 @@ export default function Page() {
                     </span>
                     {"\n"}
                     <span className={styles.codeLine} data-testid="code-line">
-                      {"            head=head,"}
+                      {"            "}
+                      {"head=head,"}
                     </span>
                     {"\n"}
                     <span className={styles.codeLine} data-testid="code-line">
-                      {"            tail=tail,"}
+                      {"            "}
+                      {"tail=tail,"}
                     </span>
                     {"\n"}
                     <span className={styles.codeLine} data-testid="code-line">
-                      {"        )"}
+                      {"        "}
+                      {")"}
                     </span>
                     {"\n"}
                     <span className={styles.codeLine} data-testid="code-line"></span>
@@ -2921,7 +2949,7 @@ export default function Page() {
                 </pre>{" "}
               </div>{" "}
               <h4>{"つまずきポイント"}</h4>{" "}
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 {" "}
                 <table>
                   <thead>
@@ -2986,7 +3014,7 @@ export default function Page() {
               <hr />{" "}
               <h3 id="step-5">{"Step 5: 固有表現の曖昧性解消 NED（Part 3 / 第7章・第8章）"}</h3>{" "}
               <h4>
-                <span className={[styles["badge"], styles["badge--source"]].join(" ")}>
+                <span className={[styles.badge, styles["badge--source"]].join(" ")}>
                   {"書籍情報"}
                 </span>
                 {" 第7章の構成 [S2]"}
@@ -3012,7 +3040,7 @@ export default function Page() {
               </ul>{" "}
               <h4>
                 {" "}
-                <span className={[styles["badge"], styles["badge--source"]].join(" ")}>
+                <span className={[styles.badge, styles["badge--source"]].join(" ")}>
                   {"書籍情報"}
                 </span>
                 {" 第8章「オープン LLM とドメインオントロジーによる NED」の構成 [S2] "}
@@ -3033,7 +3061,7 @@ export default function Page() {
               </ul>{" "}
               <h4>
                 {"やさしい説明 "}
-                <span className={[styles["badge"], styles["badge--supplement"]].join(" ")}>
+                <span className={[styles.badge, styles["badge--supplement"]].join(" ")}>
                   {"補足"}
                 </span>
               </h4>{" "}
@@ -3044,7 +3072,7 @@ export default function Page() {
                   "」作業です。「Apple」が企業なのか果物なのかを、文脈とオントロジーで判断するイメージです。 "
                 }
               </p>{" "}
-              <div className={[styles["mermaid-container"]].join(" ")}>
+              <div className={styles["mermaid-container"]}>
                 <div id="mermaid-9" className={styles["mermaid-target"]}>
                   <MermaidDiagram
                     id="kgllm-chart-9"
@@ -3054,7 +3082,7 @@ export default function Page() {
                   />
                 </div>
               </div>{" "}
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 {" "}
                 <table>
                   <thead>
@@ -3072,7 +3100,7 @@ export default function Page() {
                       <td>{"なぜ候補選択を挟むか"} </td>
                       <td>
                         {" LLM に全候補を渡すと精度と費用が悪化するため、先に絞り込む（"}
-                        <span className={[styles["badge"], styles["badge--supplement"]].join(" ")}>
+                        <span className={[styles.badge, styles["badge--supplement"]].join(" ")}>
                           {"補足"}
                         </span>
                         {"。章の段階構成 [S2] と整合） "}{" "}
@@ -3082,7 +3110,7 @@ export default function Page() {
                       <td>{"なぜオープン LLM（Ollama 等）か"} </td>
                       <td>
                         {" データを外部に出さずにローカルで動かせる、費用を抑えやすい（"}
-                        <span className={[styles["badge"], styles["badge--supplement"]].join(" ")}>
+                        <span className={[styles.badge, styles["badge--supplement"]].join(" ")}>
                           {"補足"}
                         </span>
                         {"。一般的な利点） "}{" "}
@@ -3097,7 +3125,7 @@ export default function Page() {
                   <p>
                     {" "}
                     <strong>
-                      <span className={[styles["badge"], styles["badge--supplement"]].join(" ")}>
+                      <span className={[styles.badge, styles["badge--supplement"]].join(" ")}>
                         {"補足"}
                       </span>
                       {" 曖昧性解消の質は KG 全体の質を決める。"}
@@ -3146,7 +3174,7 @@ export default function Page() {
               <hr />{" "}
               <h3 id="step-6">{"Step 6: グラフ上の機械学習の基本（Part 4 / 第9章・第10章）"}</h3>{" "}
               <h4>
-                <span className={[styles["badge"], styles["badge--source"]].join(" ")}>
+                <span className={[styles.badge, styles["badge--source"]].join(" ")}>
                   {"書籍情報"}
                 </span>
                 {" 構成 [S2]"}
@@ -3170,14 +3198,14 @@ export default function Page() {
               </ul>{" "}
               <h4>
                 {"やさしい説明 "}
-                <span className={[styles["badge"], styles["badge--supplement"]].join(" ")}>
+                <span className={[styles.badge, styles["badge--supplement"]].join(" ")}>
                   {"補足"}
                 </span>
               </h4>{" "}
               <p>
                 <strong>{"4 つのタスク"}</strong>
               </p>{" "}
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 {" "}
                 <table>
                   <thead>
@@ -3214,7 +3242,7 @@ export default function Page() {
               <p>
                 <strong>{"代表的なノード特徴量（第10章の見出し [S2] にある指標）"}</strong>
               </p>{" "}
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 {" "}
                 <table>
                   <thead>
@@ -3273,13 +3301,13 @@ export default function Page() {
                 <code>{"KNOWS"}</code>
                 {" は説明用のラベルです。 "}
               </p>{" "}
-              <div className={[styles["code-block"]].join(" ")} data-testid="code-block">
+              <div className={styles["code-block"]} data-testid="code-block">
                 {" "}
-                <div className={[styles["code-block__bar"]].join(" ")}>
+                <div className={styles["code-block__bar"]}>
                   {" "}
-                  <span className={[styles["code-block__lang"]].join(" ")}>{"cypher"}</span>
+                  <span className={styles["code-block__lang"]}>{"cypher"}</span>
                   <button
-                    className={[styles["code-block__copy"]].join(" ")}
+                    className={styles["code-block__copy"]}
                     type="button"
                     data-copy-target="code-9"
                   >
@@ -3359,7 +3387,7 @@ export default function Page() {
                   </code>
                 </pre>{" "}
               </div>{" "}
-              <div className={[styles["mermaid-container"]].join(" ")}>
+              <div className={styles["mermaid-container"]}>
                 <div id="mermaid-10" className={styles["mermaid-target"]}>
                   <MermaidDiagram
                     id="kgllm-chart-10"
@@ -3375,7 +3403,7 @@ export default function Page() {
                   <p>
                     {" "}
                     <strong>
-                      <span className={[styles["badge"], styles["badge--supplement"]].join(" ")}>
+                      <span className={[styles.badge, styles["badge--supplement"]].join(" ")}>
                         {"補足"}
                       </span>
                     </strong>
@@ -3411,7 +3439,7 @@ export default function Page() {
               </details>{" "}
               <hr /> <h3 id="step-7">{"Step 7: 埋め込みと GNN（Part 4 / 第11章・第12章）"}</h3>{" "}
               <h4>
-                <span className={[styles["badge"], styles["badge--source"]].join(" ")}>
+                <span className={[styles.badge, styles["badge--source"]].join(" ")}>
                   {"書籍情報"}
                 </span>
                 {" 第11章の構成 [S2]"}
@@ -3443,7 +3471,7 @@ export default function Page() {
                 </li>{" "}
               </ul>{" "}
               <h4>
-                <span className={[styles["badge"], styles["badge--source"]].join(" ")}>
+                <span className={[styles.badge, styles["badge--source"]].join(" ")}>
                   {"書籍情報"}
                 </span>
                 {" 第12章の構成 [S2]"}
@@ -3463,7 +3491,7 @@ export default function Page() {
               </ul>{" "}
               <h4>
                 {"やさしい説明 "}
-                <span className={[styles["badge"], styles["badge--supplement"]].join(" ")}>
+                <span className={[styles.badge, styles["badge--supplement"]].join(" ")}>
                   {"補足"}
                 </span>
               </h4>{" "}
@@ -3472,7 +3500,7 @@ export default function Page() {
                 <strong>{"埋め込み（embedding）"}</strong>
                 {"とは、ノードを「意味の近いものは近くに並ぶ」数値ベクトルに変えることです。 "}
               </p>{" "}
-              <div className={[styles["mermaid-container"]].join(" ")}>
+              <div className={styles["mermaid-container"]}>
                 <div id="mermaid-11" className={styles["mermaid-target"]}>
                   <MermaidDiagram
                     id="kgllm-chart-11"
@@ -3491,7 +3519,7 @@ export default function Page() {
                   "ことを繰り返します。「隣人の様子から自分の特徴が見えてくる」というたとえで理解できます。 "
                 }
               </p>{" "}
-              <div className={[styles["mermaid-container"]].join(" ")}>
+              <div className={styles["mermaid-container"]}>
                 <div id="mermaid-12" className={styles["mermaid-target"]}>
                   <MermaidDiagram
                     id="kgllm-chart-12"
@@ -3501,7 +3529,7 @@ export default function Page() {
                   />
                 </div>
               </div>{" "}
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 {" "}
                 <table>
                   <thead>
@@ -3526,7 +3554,7 @@ export default function Page() {
                       <td>{"近傍の集約で表現を作る。属性も活用しやすい"} </td>
                       <td>
                         {" 層を深くしすぎると表現が似通う等の課題（"}
-                        <span className={[styles["badge"], styles["badge--supplement"]].join(" ")}>
+                        <span className={[styles.badge, styles["badge--supplement"]].join(" ")}>
                           {"補足"}
                         </span>
                         {"。一般的な知見） "}{" "}
@@ -3538,7 +3566,7 @@ export default function Page() {
               <p>
                 <strong>{"第12章の 2 事例の整理"}</strong>
               </p>{" "}
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 {" "}
                 <table>
                   <thead>
@@ -3589,7 +3617,7 @@ export default function Page() {
                   {
                     " 第12章は PyG（PyTorch Geometric）を使うため、PyTorch の基礎があるとスムーズです（"
                   }
-                  <span className={[styles["badge"], styles["badge--supplement"]].join(" ")}>
+                  <span className={[styles.badge, styles["badge--supplement"]].join(" ")}>
                     {"補足"}
                   </span>
                   {"）。 "}
@@ -3620,7 +3648,7 @@ export default function Page() {
               </details>{" "}
               <hr /> <h3 id="step-8">{"Step 8: KG を使った RAG（Part 5 / 第13章）"}</h3>{" "}
               <h4>
-                <span className={[styles["badge"], styles["badge--source"]].join(" ")}>
+                <span className={[styles.badge, styles["badge--source"]].join(" ")}>
                   {"書籍情報"}
                 </span>
                 {" 第13章の要点 [S4]"}
@@ -3671,11 +3699,11 @@ export default function Page() {
               </ul>{" "}
               <h4>
                 {"やさしい説明 "}
-                <span className={[styles["badge"], styles["badge--supplement"]].join(" ")}>
+                <span className={[styles.badge, styles["badge--supplement"]].join(" ")}>
                   {"補足"}
                 </span>
               </h4>{" "}
-              <div className={[styles["mermaid-container"]].join(" ")}>
+              <div className={styles["mermaid-container"]}>
                 <div id="mermaid-13" className={styles["mermaid-target"]}>
                   <MermaidDiagram
                     id="kgllm-chart-13"
@@ -3685,7 +3713,7 @@ export default function Page() {
                   />
                 </div>
               </div>{" "}
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 {" "}
                 <table>
                   <thead>
@@ -3723,7 +3751,7 @@ export default function Page() {
                     {
                       " 「ReAct」は、推論（Reason）と行動（Act）を交互に繰り返して道具を使いこなすエージェントの型です（"
                     }
-                    <span className={[styles["badge"], styles["badge--supplement"]].join(" ")}>
+                    <span className={[styles.badge, styles["badge--supplement"]].join(" ")}>
                       {"補足"}
                     </span>
                     {"。用語の一般的な説明）。 "}
@@ -3736,13 +3764,13 @@ export default function Page() {
                   {"学習用の独自サンプル（Python）: KG Retriever を「道具」として用意する"}
                 </strong>{" "}
               </p>{" "}
-              <div className={[styles["code-block"]].join(" ")} data-testid="code-block">
+              <div className={styles["code-block"]} data-testid="code-block">
                 {" "}
-                <div className={[styles["code-block__bar"]].join(" ")}>
+                <div className={styles["code-block__bar"]}>
                   {" "}
-                  <span className={[styles["code-block__lang"]].join(" ")}>{"python"}</span>
+                  <span className={styles["code-block__lang"]}>{"python"}</span>
                   <button
-                    className={[styles["code-block__copy"]].join(" ")}
+                    className={styles["code-block__copy"]}
                     type="button"
                     data-copy-target="code-10"
                   >
@@ -3771,7 +3799,7 @@ export default function Page() {
                     </span>
                     {"\n"}
                     <span className={styles.codeLine} data-testid="code-line">
-                      {"    "}
+                      {"   "}{" "}
                       <span className="hljs-string" data-token="string">
                         {'"bolt://localhost:7687"'}
                       </span>
@@ -3810,7 +3838,7 @@ export default function Page() {
                     </span>
                     {"\n"}
                     <span className={styles.codeLine} data-testid="code-line">
-                      {"    "}
+                      {"   "}{" "}
                       <span className="hljs-string" data-token="string">
                         {'""'}
                       </span>
@@ -3820,7 +3848,8 @@ export default function Page() {
                     <span className={styles.codeLine} data-testid="code-line"></span>
                     {"\n"}
                     <span className={styles.codeLine} data-testid="code-line">
-                      {"    戻り値は {"}
+                      {"    "}
+                      {"戻り値は {"}
                       <span className="hljs-string" data-token="string">
                         {'"records"'}
                       </span>
@@ -3840,11 +3869,12 @@ export default function Page() {
                     </span>
                     {"\n"}
                     <span className={styles.codeLine} data-testid="code-line">
-                      {"    あるため、接続ユーザー自体を読み取り専用ロールにしておくこと。"}
+                      {"    "}
+                      {"あるため、接続ユーザー自体を読み取り専用ロールにしておくこと。"}
                     </span>
                     {"\n"}
                     <span className={styles.codeLine} data-testid="code-line">
-                      {"    "}
+                      {"   "}{" "}
                       <span className="hljs-string" data-token="string">
                         {'""'}
                       </span>
@@ -3852,7 +3882,8 @@ export default function Page() {
                     </span>
                     {"\n"}
                     <span className={styles.codeLine} data-testid="code-line">
-                      {"    with driver.session() "}
+                      {"    "}
+                      {"with driver.session() "}
                       <span className="hljs-keyword" data-token="keyword">
                         {"as"}
                       </span>
@@ -3860,11 +3891,12 @@ export default function Page() {
                     </span>
                     {"\n"}
                     <span className={styles.codeLine} data-testid="code-line">
-                      {"        result = session.run(cypher, params or {})"}
+                      {"        "}
+                      {"result = session.run(cypher, params or {})"}
                     </span>
                     {"\n"}
                     <span className={styles.codeLine} data-testid="code-line">
-                      {"        "}
+                      {"       "}{" "}
                       <span className="hljs-keyword" data-token="keyword">
                         {"return"}
                       </span>
@@ -3923,7 +3955,7 @@ export default function Page() {
               <hr />{" "}
               <h3 id="step-9">{"Step 9: 自然言語で KG に問い合わせる（Part 5 / 第14章）"}</h3>{" "}
               <h4>
-                <span className={[styles["badge"], styles["badge--source"]].join(" ")}>
+                <span className={[styles.badge, styles["badge--source"]].join(" ")}>
                   {"書籍情報"}
                 </span>
                 {" 第14章の要点 [S5]"}
@@ -3984,11 +4016,11 @@ export default function Page() {
               </ul>{" "}
               <h4>
                 {"やさしい説明 "}
-                <span className={[styles["badge"], styles["badge--supplement"]].join(" ")}>
+                <span className={[styles.badge, styles["badge--supplement"]].join(" ")}>
                   {"補足"}
                 </span>
               </h4>{" "}
-              <div className={[styles["mermaid-container"]].join(" ")}>
+              <div className={styles["mermaid-container"]}>
                 <div id="mermaid-14" className={styles["mermaid-target"]}>
                   <MermaidDiagram
                     id="kgllm-chart-14"
@@ -4001,13 +4033,13 @@ export default function Page() {
               <p>
                 <strong>{"学習用の独自サンプル: スキーマ注釈（YAML）と推論先行プロンプト"}</strong>
               </p>{" "}
-              <div className={[styles["code-block"]].join(" ")} data-testid="code-block">
+              <div className={styles["code-block"]} data-testid="code-block">
                 {" "}
-                <div className={[styles["code-block__bar"]].join(" ")}>
+                <div className={styles["code-block__bar"]}>
                   {" "}
-                  <span className={[styles["code-block__lang"]].join(" ")}>{"yaml"}</span>
+                  <span className={styles["code-block__lang"]}>{"yaml"}</span>
                   <button
-                    className={[styles["code-block__copy"]].join(" ")}
+                    className={styles["code-block__copy"]}
                     type="button"
                     data-copy-target="code-11"
                   >
@@ -4029,22 +4061,26 @@ export default function Page() {
                     </span>
                     {"\n"}
                     <span className={styles.codeLine} data-testid="code-line">
-                      {"  Person:"}
+                      {"  "}
+                      {"Person:"}
                     </span>
                     {"\n"}
                     <span className={styles.codeLine} data-testid="code-line">
-                      {"    description: "}
+                      {"    "}
+                      {"description: "}
                       <span className="hljs-string" data-token="string">
                         {'"人物。氏名と生年月日を持つ"'}
                       </span>
                     </span>
                     {"\n"}
                     <span className={styles.codeLine} data-testid="code-line">
-                      {"  Vehicle:"}
+                      {"  "}
+                      {"Vehicle:"}
                     </span>
                     {"\n"}
                     <span className={styles.codeLine} data-testid="code-line">
-                      {"    description: "}
+                      {"    "}
+                      {"description: "}
                       <span className="hljs-string" data-token="string">
                         {'"車両。色とナンバーの一部を持つ"'}
                       </span>
@@ -4055,11 +4091,13 @@ export default function Page() {
                     </span>
                     {"\n"}
                     <span className={styles.codeLine} data-testid="code-line">
-                      {"  OWNS:"}
+                      {"  "}
+                      {"OWNS:"}
                     </span>
                     {"\n"}
                     <span className={styles.codeLine} data-testid="code-line">
-                      {"    description: "}
+                      {"    "}
+                      {"description: "}
                       <span className="hljs-string" data-token="string">
                         {'"人物が車両を所有している"'}
                       </span>
@@ -4070,7 +4108,8 @@ export default function Page() {
                     </span>
                     {"\n"}
                     <span className={styles.codeLine} data-testid="code-line">
-                      {"  - InternalAuditLog   "}
+                      {"  "}
+                      {"- InternalAuditLog   "}
                       <span className="hljs-comment" data-token="comment">
                         {"# ノイズになるため LLM には見せない"}
                       </span>
@@ -4078,13 +4117,13 @@ export default function Page() {
                   </code>
                 </pre>{" "}
               </div>{" "}
-              <div className={[styles["code-block"]].join(" ")} data-testid="code-block">
+              <div className={styles["code-block"]} data-testid="code-block">
                 {" "}
-                <div className={[styles["code-block__bar"]].join(" ")}>
+                <div className={styles["code-block__bar"]}>
                   {" "}
-                  <span className={[styles["code-block__lang"]].join(" ")}>{"python"}</span>
+                  <span className={styles["code-block__lang"]}>{"python"}</span>
                   <button
-                    className={[styles["code-block__copy"]].join(" ")}
+                    className={styles["code-block__copy"]}
                     type="button"
                     data-copy-target="code-0"
                   >
@@ -4205,7 +4244,7 @@ export default function Page() {
                 {" "}
                 <strong>
                   {"安全面の注意 "}
-                  <span className={[styles["badge"], styles["badge--supplement"]].join(" ")}>
+                  <span className={[styles.badge, styles["badge--supplement"]].join(" ")}>
                     {"補足"}
                   </span>
                   {":"}
@@ -4222,9 +4261,7 @@ export default function Page() {
                 {" "}
                 <strong>
                   {"関連研究 "}
-                  <span className={[styles["badge"], styles["badge--trend"]].join(" ")}>
-                    {"動向"}
-                  </span>
+                  <span className={[styles.badge, styles["badge--trend"]].join(" ")}>{"動向"}</span>
                   {":"}
                 </strong>
                 {
@@ -4232,7 +4269,7 @@ export default function Page() {
                 }
               </p>{" "}
               <h4>{"つまずきポイント"}</h4>{" "}
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 {" "}
                 <table>
                   <thead>
@@ -4285,7 +4322,7 @@ export default function Page() {
                 {"Step 10: LangGraph で QA エージェントを実装する（Part 5 / 第15章）"}
               </h3>{" "}
               <h4>
-                <span className={[styles["badge"], styles["badge--source"]].join(" ")}>
+                <span className={[styles.badge, styles["badge--source"]].join(" ")}>
                   {"書籍情報"}
                 </span>
                 {" 第15章の要点 [S6][S7]"}
@@ -4336,11 +4373,11 @@ export default function Page() {
               </ul>{" "}
               <h4>
                 {"やさしい説明 "}
-                <span className={[styles["badge"], styles["badge--supplement"]].join(" ")}>
+                <span className={[styles.badge, styles["badge--supplement"]].join(" ")}>
                   {"補足"}
                 </span>
               </h4>{" "}
-              <div className={[styles["mermaid-container"]].join(" ")}>
+              <div className={styles["mermaid-container"]}>
                 <div id="mermaid-15" className={styles["mermaid-target"]}>
                   <MermaidDiagram
                     id="kgllm-chart-15"
@@ -4354,7 +4391,7 @@ export default function Page() {
                 {" "}
                 <strong>
                   {"LangGraph の考え方（"}
-                  <span className={[styles["badge"], styles["badge--supplement"]].join(" ")}>
+                  <span className={[styles.badge, styles["badge--supplement"]].join(" ")}>
                     {"補足"}
                   </span>
                   {"）:"}
@@ -4368,13 +4405,13 @@ export default function Page() {
               <p>
                 <strong>{"学習用の独自サンプル: 状態とリトライを持つ最小の擬似実装"}</strong>
               </p>{" "}
-              <div className={[styles["code-block"]].join(" ")} data-testid="code-block">
+              <div className={styles["code-block"]} data-testid="code-block">
                 {" "}
-                <div className={[styles["code-block__bar"]].join(" ")}>
+                <div className={styles["code-block__bar"]}>
                   {" "}
-                  <span className={[styles["code-block__lang"]].join(" ")}>{"python"}</span>
+                  <span className={styles["code-block__lang"]}>{"python"}</span>
                   <button
-                    className={[styles["code-block__copy"]].join(" ")}
+                    className={styles["code-block__copy"]}
                     type="button"
                     data-copy-target="code-12"
                   >
@@ -4423,27 +4460,33 @@ export default function Page() {
                     </span>
                     {"\n"}
                     <span className={styles.codeLine} data-testid="code-line">
-                      {"    question: str"}
+                      {"    "}
+                      {"question: str"}
                     </span>
                     {"\n"}
                     <span className={styles.codeLine} data-testid="code-line">
-                      {"    cypher: str"}
+                      {"    "}
+                      {"cypher: str"}
                     </span>
                     {"\n"}
                     <span className={styles.codeLine} data-testid="code-line">
-                      {"    result: list"}
+                      {"    "}
+                      {"result: list"}
                     </span>
                     {"\n"}
                     <span className={styles.codeLine} data-testid="code-line">
-                      {"    error: str"}
+                      {"    "}
+                      {"error: str"}
                     </span>
                     {"\n"}
                     <span className={styles.codeLine} data-testid="code-line">
-                      {"    summary: str"}
+                      {"    "}
+                      {"summary: str"}
                     </span>
                     {"\n"}
                     <span className={styles.codeLine} data-testid="code-line">
-                      {"    retries: int"}
+                      {"    "}
+                      {"retries: int"}
                     </span>
                     {"\n"}
                     <span className={styles.codeLine} data-testid="code-line"></span>
@@ -4458,14 +4501,14 @@ export default function Page() {
                     </span>
                     {"\n"}
                     <span className={styles.codeLine} data-testid="code-line">
-                      {"    "}
+                      {"   "}{" "}
                       <span className="hljs-comment" data-token="comment">
                         {"# LLMでCypherを生成(実際にはスキーマ・注釈を注入する)"}
                       </span>
                     </span>
                     {"\n"}
                     <span className={styles.codeLine} data-testid="code-line">
-                      {"    "}
+                      {"   "}{" "}
                       <span className="hljs-keyword" data-token="keyword">
                         {"return"}
                       </span>
@@ -4492,18 +4535,19 @@ export default function Page() {
                     </span>
                     {"\n"}
                     <span className={styles.codeLine} data-testid="code-line">
-                      {"    try:"}
+                      {"    "}
+                      {"try:"}
                     </span>
                     {"\n"}
                     <span className={styles.codeLine} data-testid="code-line">
-                      {"        "}
+                      {"       "}{" "}
                       <span className="hljs-comment" data-token="comment">
                         {"# 実際にはDBで実行し、結果を辞書のリストで返す"}
                       </span>
                     </span>
                     {"\n"}
                     <span className={styles.codeLine} data-testid="code-line">
-                      {"        "}
+                      {"       "}{" "}
                       <span className="hljs-keyword" data-token="keyword">
                         {"return"}
                       </span>
@@ -4523,7 +4567,8 @@ export default function Page() {
                     </span>
                     {"\n"}
                     <span className={styles.codeLine} data-testid="code-line">
-                      {"    except Exception "}
+                      {"    "}
+                      {"except Exception "}
                       <span className="hljs-keyword" data-token="keyword">
                         {"as"}
                       </span>
@@ -4534,7 +4579,7 @@ export default function Page() {
                     </span>
                     {"\n"}
                     <span className={styles.codeLine} data-testid="code-line">
-                      {"        "}
+                      {"       "}{" "}
                       <span className="hljs-keyword" data-token="keyword">
                         {"return"}
                       </span>
@@ -4573,7 +4618,7 @@ export default function Page() {
                     </span>
                     {"\n"}
                     <span className={styles.codeLine} data-testid="code-line">
-                      {"    "}
+                      {"   "}{" "}
                       <span className="hljs-keyword" data-token="keyword">
                         {"return"}
                       </span>
@@ -4600,7 +4645,7 @@ export default function Page() {
                     </span>
                     {"\n"}
                     <span className={styles.codeLine} data-testid="code-line">
-                      {"    "}
+                      {"   "}{" "}
                       <span className="hljs-keyword" data-token="keyword">
                         {"if"}
                       </span>
@@ -4624,7 +4669,7 @@ export default function Page() {
                     </span>
                     {"\n"}
                     <span className={styles.codeLine} data-testid="code-line">
-                      {"        "}
+                      {"       "}{" "}
                       <span className="hljs-keyword" data-token="keyword">
                         {"return"}
                       </span>{" "}
@@ -4634,7 +4679,7 @@ export default function Page() {
                     </span>
                     {"\n"}
                     <span className={styles.codeLine} data-testid="code-line">
-                      {"    "}
+                      {"   "}{" "}
                       <span className="hljs-keyword" data-token="keyword">
                         {"return"}
                       </span>{" "}
@@ -4702,7 +4747,7 @@ export default function Page() {
                     </span>
                     {"\n"}
                     <span className={styles.codeLine} data-testid="code-line">
-                      {"    "}
+                      {"   "}{" "}
                       <span className="hljs-string" data-token="string">
                         {'"execute_query"'}
                       </span>
@@ -4710,11 +4755,13 @@ export default function Page() {
                     </span>
                     {"\n"}
                     <span className={styles.codeLine} data-testid="code-line">
-                      {"    route_after_execute,"}
+                      {"    "}
+                      {"route_after_execute,"}
                     </span>
                     {"\n"}
                     <span className={styles.codeLine} data-testid="code-line">
-                      {"    {"}
+                      {"    "}
+                      {"{"}
                       <span className="hljs-string" data-token="string">
                         {'"retry"'}
                       </span>
@@ -4822,10 +4869,10 @@ export default function Page() {
               </details>{" "}
               <hr />{" "}
             </section>{" "}
-            <section className={[styles["section"]].join(" ")}>
+            <section className={styles.section}>
               {" "}
               <h2 id="sec-8">{"8. 付録（A〜C）の使い方"}</h2>{" "}
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 {" "}
                 <table>
                   <thead>
@@ -4872,19 +4919,19 @@ export default function Page() {
                 {" "}
                 <strong>
                   {"Cypher の最初の 3 文（"}
-                  <span className={[styles["badge"], styles["badge--supplement"]].join(" ")}>
+                  <span className={[styles.badge, styles["badge--supplement"]].join(" ")}>
                     {"補足"}
                   </span>
                   {" 学習用）"}
                 </strong>{" "}
               </p>{" "}
-              <div className={[styles["code-block"]].join(" ")} data-testid="code-block">
+              <div className={styles["code-block"]} data-testid="code-block">
                 {" "}
-                <div className={[styles["code-block__bar"]].join(" ")}>
+                <div className={styles["code-block__bar"]}>
                   {" "}
-                  <span className={[styles["code-block__lang"]].join(" ")}>{"cypher"}</span>
+                  <span className={styles["code-block__lang"]}>{"cypher"}</span>
                   <button
-                    className={[styles["code-block__copy"]].join(" ")}
+                    className={styles["code-block__copy"]}
                     type="button"
                     data-copy-target="code-13"
                   >
@@ -4951,7 +4998,7 @@ export default function Page() {
               </div>{" "}
               <hr />{" "}
             </section>{" "}
-            <section className={[styles["section"]].join(" ")}>
+            <section className={styles.section}>
               {" "}
               <h2 id="sec-9">{"9. 書籍の外側の最新動向（2026年9月21日時点で確認できた範囲）"}</h2>{" "}
               <p>
@@ -4960,7 +5007,7 @@ export default function Page() {
                 }
               </p>{" "}
               <h3 id="heading-16">{"9.1 動向の整理"}</h3>{" "}
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 {" "}
                 <table>
                   <thead>
@@ -5081,7 +5128,7 @@ export default function Page() {
                 </table>{" "}
               </div>{" "}
               <h3 id="heading-17">{"9.2 読み解くときの注意点"}</h3>{" "}
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 {" "}
                 <table>
                   <thead>
@@ -5166,7 +5213,7 @@ export default function Page() {
               </blockquote>{" "}
               <hr />{" "}
             </section>{" "}
-            <section className={[styles["section"]].join(" ")}>
+            <section className={styles.section}>
               {" "}
               <h2 id="sec-10">{"10. 学習ロードマップ（8 週間の目安）"}</h2>{" "}
               <p>
@@ -5174,7 +5221,7 @@ export default function Page() {
                 <strong>{"提案例"}</strong>
                 {"です（週 5〜8 時間を想定）。"}
               </p>{" "}
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 {" "}
                 <table>
                   <thead>
@@ -5237,7 +5284,7 @@ export default function Page() {
                   </tbody>
                 </table>{" "}
               </div>{" "}
-              <div className={[styles["mermaid-container"]].join(" ")}>
+              <div className={styles["mermaid-container"]}>
                 <div id="mermaid-16" className={styles["mermaid-target"]}>
                   <MermaidDiagram
                     id="kgllm-chart-16"
@@ -5249,12 +5296,12 @@ export default function Page() {
               </div>{" "}
               <hr />{" "}
             </section>{" "}
-            <section className={[styles["section"]].join(" ")}>
+            <section className={styles.section}>
               {" "}
               <h2 id="sec-11">{"11. 実務での判断: KG を使うべきか、どう失敗を避けるか"}</h2>{" "}
               <h3 id="heading-19">
                 {"11.1 判断フロー（"}
-                <span className={[styles["badge"], styles["badge--supplement"]].join(" ")}>
+                <span className={[styles.badge, styles["badge--supplement"]].join(" ")}>
                   {"補足"}
                 </span>
                 {" 筆者の整理）"}
@@ -5266,7 +5313,7 @@ export default function Page() {
                 <strong>{"独自の判断フロー"}</strong>
                 {"です。書籍の結論とは異なる可能性があるため、本文と併せて検討してください。 "}
               </p>{" "}
-              <div className={[styles["mermaid-container"]].join(" ")}>
+              <div className={styles["mermaid-container"]}>
                 <div id="mermaid-17" className={styles["mermaid-target"]}>
                   <MermaidDiagram
                     id="kgllm-chart-17"
@@ -5277,7 +5324,7 @@ export default function Page() {
                 </div>
               </div>{" "}
               <h3 id="heading-20">{"11.2 よくある落とし穴と対策"}</h3>{" "}
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 {" "}
                 <table>
                   <thead>
@@ -5332,7 +5379,7 @@ export default function Page() {
               </div>{" "}
               <hr />{" "}
             </section>{" "}
-            <section className={[styles["section"]].join(" ")}>
+            <section className={styles.section}>
               {" "}
               <h2 id="sec-12">{"12. 総合確認問題"}</h2>{" "}
               <details>
@@ -5427,7 +5474,7 @@ export default function Page() {
               </details>{" "}
               <hr />{" "}
             </section>{" "}
-            <section className={[styles["section"]].join(" ")}>
+            <section className={styles.section}>
               {" "}
               <h2 id="sec-13">{"13. 参考文献・ソース URL"}</h2>{" "}
               <p>
@@ -5810,7 +5857,7 @@ export default function Page() {
               </ul>{" "}
             </section>{" "}
           </div>{" "}
-          <footer className={[styles["footer"]].join(" ")}>
+          <footer className={styles.footer}>
             {" "}
             <p>
               {
