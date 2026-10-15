@@ -73,6 +73,10 @@ function matchKey(raw) {
  */
 function decodeEntities(raw) {
   return raw
+    .replace(/&#(?:x([0-9a-f]+)|(\d+));/gi, (match, hex, decimal) => {
+      const point = Number.parseInt(hex ?? decimal, hex === undefined ? 10 : 16);
+      return point <= 0x10ffff ? String.fromCodePoint(point) : match;
+    })
     .replace(/&lt;/g, "<")
     .replace(/&gt;/g, ">")
     .replace(/&quot;/g, '"')
@@ -95,7 +99,7 @@ function decodeEntities(raw) {
  * @returns {string} The decoded display text: tags and identifier expressions are removed, while
  *   the literal text of string expressions is kept.
  */
-function stripMarkup(fragment) {
+function stripMarkup(fragment, jsx = true) {
   // JSX 文字列式の中身は「そのまま表示されるテキスト」であり、HTML に見える断片も本文の一部。
   // タグ除去より前にプレースホルダへ退避しないと、原本側の &lt;style&gt; は（エンティティ復号が
   // 最後なので）生き残るのに page 側の {"<style>"} だけが消え、一致している内容が漏れとして
@@ -108,14 +112,15 @@ function stripMarkup(fragment) {
     `\u0000JSXSTR${preserved.push(text.replace(/<br\s*\/?>/gi, " ")) - 1}\u0000`;
   const placeholderRe = /\u0000JSXSTR(\d+)\u0000/g;
 
-  let text = fragment
-    .replace(/\{\/\*[\s\S]*?\*\/\}/g, "")
-    .replace(/\{\s*"\\n"\s*\}|\{\s*'\\n'\s*\}|\{\s*`\\n`\s*\}/g, "\n")
-    .replace(/\{\s*"([^"]*)"\s*\}/g, (_match, value) => stash(value))
-    .replace(/\{\s*'([^']*)'\s*\}/g, (_match, value) => stash(value))
-    .replace(/\{\s*`([^`]*)`\s*\}/g, (_match, value) => stash(value))
-    .replace(/\{\s*(?:styles\.[A-Za-z0-9_-]+|[A-Za-z_$][\w$]*)\s*\}/g, "")
-    .replace(/<[^>]*>/g, "");
+  let text = fragment;
+  if (jsx) {
+    text = text
+      .replace(/\{\/\*[\s\S]*?\*\/\}/g, "")
+      .replace(/\{\s*(?:"((?:[^"\\]|\\.)*)"|'((?:[^'\\]|\\.)*)'|`((?:[^`\\]|\\.)*)`)\s*\}/g,
+        (_match, double, single, template) => stash(decodeQuotedEntryEscapes(double ?? single ?? template)))
+      .replace(/\{\s*(?:styles\.[A-Za-z0-9_-]+|[A-Za-z_$][\w$]*)\s*\}/g, "");
+  }
+  text = text.replace(/<[^>]*>/g, "");
 
   // 退避は入れ子になりうる（テンプレートリテラル式の中に "..." 式がある等）。
   // String.replace は差し込んだ文字列を再走査しないため、1 回では内側のプレースホルダが
@@ -146,8 +151,8 @@ function stripMarkdownInline(raw) {
  * @param {string} raw - Element content that may contain HTML or JSX markup.
  * @returns {string} Text with markup and JSX whitespace expressions removed.
  */
-function normalizeElementContent(raw) {
-  return normalize(stripMarkup(raw));
+function normalizeElementContent(raw, jsx = true) {
+  return normalize(stripMarkup(raw, jsx));
 }
 
 /**
@@ -348,7 +353,8 @@ function collectStringConstants(src) {
     /\bconst\s+([A-Za-z_$][\w$]*)\s*=\s*(?:String\.raw\s*)?(`([\s\S]*?)`|"([^"\\]*(?:\\.[^"\\]*)*)"|'([^'\\]*(?:\\.[^'\\]*)*)')\s*;/g;
   let constant = constantRe.exec(src);
   while (constant !== null) {
-    constants.set(constant[1], constant[3] ?? constant[4] ?? constant[5] ?? "");
+    const value = constant[3] ?? constant[4] ?? constant[5] ?? "";
+    constants.set(constant[1], constant[3] !== undefined || constant[0].includes("String.raw") ? value : decodeQuotedEntryEscapes(value));
     constant = constantRe.exec(src);
   }
   return constants;
@@ -387,6 +393,8 @@ function decodeQuotedEntryEscapes(raw) {
         out += "\n";
       } else if (next === "r") {
         out += "\r";
+      } else if (next === "t") {
+        out += "\t";
       } else if (next === "'" || next === '"' || next === "`" || next === "\\" || next === "$") {
         out += next;
       } else {
@@ -436,6 +444,15 @@ function collectHtmlMermaidSources(src) {
     const raw = decodeQuotedEntryEscapes(entry[1] ?? entry[2] ?? entry[3] ?? "");
     sources.push({ index: entry.index, source: normalizeMermaidSource(raw) });
     entry = diagramEntryRe.exec(src);
+  }
+
+  // Plain string arrays are used by standalone guides; parse strings without executing source JS.
+  const arrayRe = /\b(?:const|let|var)\s+DIAGRAMS\s*=\s*\[((?:\s*(?:"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|`(?:[^`\\]|\\.)*`)\s*,?)+)\s*\]\s*;/g;
+  for (const array of src.matchAll(arrayRe)) {
+    const stringRe = /"((?:[^"\\]|\\.)*)"|'((?:[^'\\]|\\.)*)'|`((?:[^`\\]|\\.)*)`/g;
+    for (const value of array[1].matchAll(stringRe)) {
+      sources.push({ index: array.index + value.index, source: normalizeMermaidSource(decodeQuotedEntryEscapes(value[1] ?? value[2] ?? value[3])) });
+    }
   }
 
   return sources
@@ -819,7 +836,7 @@ function inventoryHtml(src) {
   const headingRe = /<h([1-6])\b[^>]*>([\s\S]*?)<\/h\1>/gi;
   let match = headingRe.exec(body);
   while (match !== null) {
-    headings.push({ level: Number(match[1]), text: normalize(stripMarkup(match[2])) });
+    headings.push({ level: Number(match[1]), text: normalize(stripMarkup(match[2], false)) });
     match = headingRe.exec(body);
   }
 
@@ -827,18 +844,18 @@ function inventoryHtml(src) {
   const liRe = /<li\b[^>]*>([\s\S]*?)<\/li>/gi;
   let li = liRe.exec(body);
   while (li !== null) {
-    listTexts.push(normalize(stripMarkup(li[1])));
+    listTexts.push(normalize(stripMarkup(li[1], false)));
     li = liRe.exec(body);
   }
 
   const codeBlockTexts = extractElementContents(body, (openingTag) =>
     /^<pre\b/i.test(openingTag) && !/\bclass=["'][^"']*\bmermaid\b/i.test(openingTag)
-  ).map(({ content }) => normalizeElementContent(content));
+  ).map(({ content }) => normalizeElementContent(content, false));
   const tableRowTexts = extractTagContents(body, "tr").map(({ content }) =>
-    normalizeElementContent(content)
+    normalizeElementContent(content, false)
   );
   const paragraphTexts = extractTagContents(body, "p").map(({ content }) =>
-    normalizeElementContent(content)
+    normalizeElementContent(content, false)
   );
 
   return {
@@ -906,7 +923,7 @@ function inventoryTsx(src) {
     mermaidSources: collectTsxMermaidSources(src),
     svgElements: collectSvgElements(src),
     calloutElements: collectMarkupCalloutElements(src),
-    externalLinks: collectUrls(src),
+    externalLinks: collectUrls(`${src}\n${stripMarkup(src.replace(/>\s+</g, "><").replace(/\}\s*(?=<|\{)/g, "}").replace(/>\s*(?=\{)/g, ">"))}`),
   };
 }
 
