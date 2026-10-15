@@ -1,0 +1,611 @@
+/* Original HTML style block (lines 25–594), scoped to this guide. Shared chrome is owned by globals.css. */
+
+.layout {
+  --color-background-primary: #07111e;
+  --color-background-secondary: #0d1a2e;
+  --color-background-tertiary: #122238;
+  --color-background-info: #10233f;
+  --color-background-success: #0f2a24;
+  --color-background-warning: #2c2210;
+  --color-background-danger: #2a1418;
+
+  --color-text-primary: #e8edf6;
+  --color-text-secondary: #a9b8cf;
+  --color-text-tertiary: #71839e;
+  --color-text-info: #8fb4ff;
+  --color-text-success: #6bd8b8;
+  --color-text-warning: #e8c473;
+  --color-text-danger: #ef97a1;
+
+  --color-border-primary: rgba(232, 237, 246, 0.16);
+  --color-border-secondary: rgba(232, 237, 246, 0.1);
+  --color-border-tertiary: rgba(232, 237, 246, 0.06);
+
+  --accent: #7c9eff;
+  --accent-soft: #4a5f99;
+
+  --font-sans:
+    "Hiragino Sans", "Noto Sans JP", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: "SFMono-Regular", "Menlo", "Consolas", "Noto Sans Mono", monospace;
+
+  --border-radius-md: 8px;
+  --border-radius-lg: 12px;
+  --border-radius-xl: 16px;
+
+  --sidebar-width: 320px;
+}
+
+.layout :global(*) {
+  box-sizing: border-box;
+}
+
+.layout {
+  scroll-behavior: smooth;
+  scroll-padding-top: 24px;
+}
+
+.layout {
+  margin: 0;
+  background: var(--color-background-primary);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.7;
+  font-weight: 400;
+}
+
+.layout :global(a) {
+  color: var(--accent);
+  text-decoration: none;
+}
+.layout :global(a):hover {
+  text-decoration: underline;
+}
+
+.layout {
+  display: block;
+}
+
+/* ---------- Sidebar ---------- */
+.layout .sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: var(--sidebar-width);
+  height: 100vh;
+  overflow-y: auto;
+  background: var(--color-background-secondary);
+  border-right: 1px solid var(--color-border-secondary);
+  padding: 28px 20px 40px;
+  z-index: 10;
+}
+
+.layout .sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--color-border-tertiary);
+}
+
+.layout .sidebar-brand-mark {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--border-radius-md);
+  background: var(--color-background-tertiary);
+  border: 1px solid var(--color-border-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent);
+  font-size: 18px;
+  flex: none;
+}
+
+.layout .sidebar-brand-text {
+  font-size: 13px;
+  color: var(--color-text-tertiary);
+  line-height: 1.4;
+}
+
+.layout .sidebar-brand-text :global(strong) {
+  display: block;
+  color: var(--color-text-primary);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.layout .sidebar-meta {
+  font-size: 13px;
+  color: var(--color-text-tertiary);
+  margin-bottom: 18px;
+  line-height: 1.6;
+}
+
+.layout :global(nav).toc {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.layout :global(nav).toc :global(a) {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 7px 10px;
+  border-radius: var(--border-radius-md);
+  color: var(--color-text-secondary);
+  font-size: 14px;
+  line-height: 1.4;
+  text-decoration: none;
+  border-left: 2px solid transparent;
+}
+
+.layout :global(nav).toc :global(a) .toc-num {
+  flex: none;
+  color: var(--color-text-tertiary);
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+  min-width: 26px;
+}
+
+.layout :global(nav).toc :global(a):hover {
+  background: var(--color-background-tertiary);
+  color: var(--color-text-primary);
+}
+
+.layout :global(nav).toc :global(a).active {
+  background: var(--color-background-tertiary);
+  color: var(--color-text-primary);
+  border-left-color: var(--accent);
+  font-weight: 500;
+}
+
+.layout :global(nav).toc :global(a).active .toc-num {
+  color: var(--accent);
+}
+
+/* ---------- Main content ---------- */
+.layout .content {
+  margin-left: var(--sidebar-width);
+  padding: 56px 64px 120px;
+}
+
+.layout .hero {
+  max-width: none;
+  margin-bottom: 48px;
+  padding-bottom: 36px;
+  border-bottom: 1px solid var(--color-border-secondary);
+}
+
+.layout .hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--color-text-info);
+  background: var(--color-background-info);
+  border: 1px solid var(--color-border-secondary);
+  padding: 5px 12px;
+  border-radius: 999px;
+  margin-bottom: 18px;
+}
+
+.layout :global(h1).hero-title {
+  font-size: 30px;
+  line-height: 1.4;
+  font-weight: 500;
+  margin: 0 0 20px;
+  color: var(--color-text-primary);
+}
+
+.layout .hero-quote {
+  margin: 0;
+  padding: 18px 20px;
+  background: var(--color-background-secondary);
+  border: 1px solid var(--color-border-secondary);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--border-radius-md);
+  color: var(--color-text-secondary);
+  font-size: 15px;
+  line-height: 1.9;
+}
+
+.layout .hero-quote :global(p) {
+  margin: 0;
+}
+.layout .hero-quote :global(em) {
+  font-style: italic;
+  color: var(--color-text-primary);
+}
+
+/* ---------- Section / prose ---------- */
+.layout .chapter {
+  padding-top: 40px;
+  margin-top: 24px;
+  border-top: 1px solid var(--color-border-tertiary);
+}
+
+.layout .chapter:first-of-type {
+  padding-top: 0;
+  margin-top: 0;
+  border-top: none;
+}
+
+.layout .chapter :global(h2) {
+  font-size: 24px;
+  line-height: 1.4;
+  font-weight: 500;
+  margin: 0 0 20px;
+  color: var(--color-text-primary);
+  scroll-margin-top: 24px;
+}
+
+.layout .chapter :global(h3) {
+  font-size: 18px;
+  line-height: 1.5;
+  font-weight: 500;
+  margin: 34px 0 14px;
+  color: var(--color-text-primary);
+  scroll-margin-top: 24px;
+}
+
+.layout .chapter :global(p) {
+  margin: 0 0 16px;
+  color: var(--color-text-secondary);
+}
+.layout .chapter :global(strong) {
+  color: var(--color-text-primary);
+  font-weight: 500;
+}
+.layout .chapter :global(em) {
+  color: var(--color-text-primary);
+}
+
+.layout .chapter :global(ul),
+.layout .chapter :global(ol) {
+  margin: 0 0 16px;
+  padding-left: 24px;
+  color: var(--color-text-secondary);
+}
+.layout .chapter :global(li) {
+  margin-bottom: 6px;
+}
+.layout .chapter :global(li) > :global(p) {
+  margin-bottom: 6px;
+}
+
+.layout .chapter :global(code) {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  background: var(--color-background-tertiary);
+  border: 1px solid var(--color-border-tertiary);
+  border-radius: 4px;
+  padding: 1px 6px;
+  color: var(--color-text-info);
+}
+
+/* ---------- Tags ---------- */
+.layout .tag {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 2px 9px;
+  border-radius: 999px;
+  margin-right: 4px;
+  vertical-align: middle;
+}
+.layout .tag-scope {
+  background: var(--color-background-success);
+  color: var(--color-text-success);
+  border: 1px solid rgba(107, 216, 184, 0.3);
+}
+.layout .tag-note {
+  background: var(--color-background-warning);
+  color: var(--color-text-warning);
+  border: 1px solid rgba(232, 196, 115, 0.3);
+}
+.layout .tag-premise {
+  background: var(--color-background-info);
+  color: var(--color-text-info);
+  border: 1px solid rgba(143, 180, 255, 0.3);
+}
+
+/* ---------- Callouts ---------- */
+.layout .callout {
+  display: flex;
+  gap: 12px;
+  padding: 16px 18px;
+  border-radius: var(--border-radius-lg);
+  margin: 0 0 24px;
+  border: 1px solid var(--color-border-secondary);
+}
+.layout .callout-icon {
+  font-size: 18px;
+  flex: none;
+  margin-top: 1px;
+}
+.layout .callout-body {
+  flex: 1;
+  min-width: 0;
+}
+.layout .callout-body :global(p):last-child {
+  margin-bottom: 0;
+}
+
+.layout .callout-intro {
+  background: var(--color-background-info);
+  border-color: rgba(143, 180, 255, 0.25);
+}
+.layout .callout-intro .callout-icon {
+  color: var(--color-text-info);
+}
+.layout .callout-intro .callout-body {
+  color: #cfe0ff;
+}
+
+.layout .callout-glossary {
+  background: var(--color-background-secondary);
+  border-color: var(--color-border-secondary);
+}
+.layout .callout-glossary .callout-icon {
+  color: var(--color-text-tertiary);
+}
+.layout .callout-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-tertiary);
+  text-transform: none;
+  letter-spacing: 0.02em;
+  margin: 0 0 10px !important;
+}
+.layout .glossary-list {
+  margin: 0 !important;
+  padding-left: 20px;
+  columns: 2;
+  column-gap: 28px;
+}
+.layout .glossary-list :global(li) {
+  break-inside: avoid;
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  margin-bottom: 8px !important;
+}
+.layout .glossary-list :global(strong) {
+  color: var(--color-text-primary);
+}
+
+/* ---------- Tables ---------- */
+.layout .chapter :global(table) {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0 0 24px;
+  font-size: 14px;
+  background: var(--color-background-secondary);
+  border: 1px solid var(--color-border-secondary);
+  border-radius: var(--border-radius-md);
+  overflow: hidden;
+}
+.layout .chapter :global(th),
+.layout .chapter :global(td) {
+  padding: 10px 14px;
+  text-align: left;
+  border-bottom: 1px solid var(--color-border-tertiary);
+  vertical-align: top;
+  color: var(--color-text-secondary);
+}
+.layout .chapter :global(th) {
+  background: var(--color-background-tertiary);
+  color: var(--color-text-primary);
+  font-weight: 500;
+  font-size: 13px;
+}
+.layout .chapter :global(tr):last-child :global(td) {
+  border-bottom: none;
+}
+.layout .chapter :global(table) :global(code) {
+  font-size: 13px;
+}
+
+.layout .table-scroll {
+  overflow-x: auto;
+  margin-bottom: 24px;
+}
+.layout .table-scroll :global(table) {
+  margin-bottom: 0;
+}
+
+/* ---------- Blockquote ---------- */
+.layout .chapter :global(blockquote) {
+  margin: 0 0 20px;
+  padding: 14px 18px;
+  border-left: 3px solid var(--color-border-primary);
+  background: var(--color-background-secondary);
+  color: var(--color-text-tertiary);
+  border-radius: 0 var(--border-radius-md) var(--border-radius-md) 0;
+}
+.layout .chapter :global(blockquote) :global(p) {
+  margin: 0;
+  color: inherit;
+}
+
+/* ---------- Code blocks ---------- */
+.layout .code-block {
+  position: relative;
+  margin: 0 0 24px;
+  border-radius: var(--border-radius-lg);
+  border: 1px solid var(--color-border-secondary);
+  overflow: hidden;
+  background: #0a1526;
+}
+.layout .code-lang {
+  position: absolute;
+  top: 10px;
+  right: 14px;
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  color: var(--color-text-tertiary);
+  font-family: var(--font-mono);
+  z-index: 2;
+  pointer-events: none;
+}
+.layout .code-block :global(pre) {
+  margin: 0;
+  padding: 18px 20px;
+  overflow-x: auto;
+}
+.layout .code-block :global(code) {
+  font-family: var(--font-mono);
+  font-size: 13.5px;
+  line-height: 1.65;
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--color-text-secondary);
+}
+.layout .code-block :global(pre) :global(code).hljs {
+  background: none;
+  padding: 0;
+}
+
+/* ---------- Mermaid ---------- */
+.layout .mermaid-wrap {
+  margin: 8px 0 24px;
+  padding: 20px;
+  background: var(--color-background-secondary);
+  border: 1px solid var(--color-border-secondary);
+  border-radius: var(--border-radius-lg);
+  overflow-x: auto;
+}
+
+/* ---------- Diagram caption ---------- */
+.layout .chapter :global(p) + .mermaid-wrap,
+.layout .mermaid-wrap + :global(p) {
+  margin-top: -4px;
+}
+
+/* ---------- Source list (chapter 20) ---------- */
+.layout :global(#sec-20) .chapter :global(table) :global(a) {
+  word-break: break-all;
+}
+
+/* ---------- Footer ---------- */
+.layout .footer {
+  margin-top: 64px;
+  padding-top: 28px;
+  border-top: 1px solid var(--color-border-secondary);
+  color: var(--color-text-tertiary);
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+/* ---------- Back to top ---------- */
+.layout .back-to-top {
+  position: fixed;
+  right: 28px;
+  bottom: 28px;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--color-background-tertiary);
+  border: 1px solid var(--color-border-primary);
+  color: var(--color-text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+  z-index: 20;
+}
+.layout .back-to-top.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+.layout .back-to-top:hover {
+  color: var(--color-text-primary);
+  border-color: var(--accent);
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 980px) {
+  .layout .sidebar {
+    position: static;
+    width: auto;
+    height: auto;
+    border-right: none;
+    border-bottom: 1px solid var(--color-border-secondary);
+  }
+  .layout .content {
+    margin-left: 0;
+    padding: 40px 24px 100px;
+  }
+  .layout .glossary-list {
+    columns: 1;
+  }
+}
+
+.layout {
+  width: 100%;
+  max-width: 100%;
+  color-scheme: dark;
+  box-sizing: border-box;
+}
+.layout .content {
+  min-width: 0;
+  width: calc(100% - var(--sidebar-width));
+}
+.layout .sidebar {
+  top: calc(var(--header-height, 60px) + var(--ch-disclaimer-height, 0px));
+  height: calc(100dvh - var(--header-height, 60px) - var(--ch-disclaimer-height, 0px));
+}
+.layout :global(ul) {
+  list-style-type: disc;
+}
+.layout :global(ol) {
+  list-style-type: decimal;
+}
+.layout :global(ul ul),
+.layout :global(ol ul) {
+  list-style-type: circle;
+}
+.layout :global(ul ul ul),
+.layout :global(ul ol ul),
+.layout :global(ol ul ul),
+.layout :global(ol ol ul) {
+  list-style-type: square;
+}
+.layout :global(th),
+.layout :global(td),
+.layout :global(thead th:not(:first-child)) {
+  text-align: left !important;
+}
+.layout .chapter :global(h2),
+.layout .chapter :global(h3),
+.layout :global(section) {
+  scroll-margin-top: calc(var(--header-height, 60px) + 80px);
+}
+.layout :global(pre code) {
+  background: none;
+  border: none;
+  padding: 0;
+  white-space: pre;
+}
+.layout .codeLine {
+  white-space: pre;
+}
+.layout .mermaid-diagram {
+  min-width: 0;
+}
+@media (max-width: 980px) {
+  .layout .content {
+    width: 100%;
+  }
+  .layout .sidebar {
+    top: auto;
+    height: auto;
+  }
+}

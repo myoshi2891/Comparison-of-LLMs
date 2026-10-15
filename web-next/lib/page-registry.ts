@@ -257,6 +257,18 @@ const entries: PageEntry[] = [
     lastReviewed: "2026-10-14",
   },
   {
+    slug: "/books/knowledge-graphs-fundamentals-techniques",
+    title: "Knowledge Graphs 基礎・技法・応用ガイド",
+    description:
+      "Knowledge Graphs: Fundamentals, Techniques, and Applicationsを土台に、RDF・情報抽出・照合・表現学習・SPARQL・質問応答・GraphRAGを段階的に学ぶ初学者向けガイド。",
+    group: "推薦書籍",
+    topics: ["book", "knowledge-graph", "rdf", "sparql", "llm", "graphrag"],
+    summary:
+      "Knowledge Graphs: Fundamentals, Techniques, and Applicationsを土台に、RDF・情報抽出・照合・表現学習・SPARQL・質問応答・GraphRAGを段階的に学ぶ初学者向けガイド。",
+    addedAt: "2026-10-15",
+    lastReviewed: "2026-10-15",
+  },
+  {
     slug: "/books/knowledge-graphs-and-llms-in-action",
     title: "Knowledge Graphs and LLMs in Action 完全ガイド",
     description:

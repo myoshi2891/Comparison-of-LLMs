@@ -1700,3 +1700,45 @@ body:has([data-page="knowledge-graphs-and-llms-in-action"]) nav[aria-label="関�
     padding-right: 24px;
   }
 }
+
+/* Knowledge Graphs fundamentals: shared chrome follows the original dark guide. */
+body:has([data-page="knowledge-graphs-fundamentals-techniques"]) {
+  background: #07111e;
+}
+body:has([data-page="knowledge-graphs-fundamentals-techniques"]) #site-freshness-bar {
+  box-sizing: border-box;
+  max-width: none;
+  width: calc(100% - 320px);
+  margin-left: 320px;
+  margin-right: 0;
+  padding-right: 64px;
+  background: #07111e;
+  color: #a9b8cf;
+  justify-content: flex-end;
+}
+body:has([data-page="knowledge-graphs-fundamentals-techniques"]) #site-freshness-bar time {
+  color: #e8edf6;
+}
+body:has([data-page="knowledge-graphs-fundamentals-techniques"]) nav[aria-label="関連ページ"] {
+  --line: rgba(232, 237, 246, 0.16);
+  --card: #0d1a2e;
+  --fg: #e8edf6;
+  --muted: #a9b8cf;
+  --accent: #7c9eff;
+  box-sizing: border-box;
+  max-width: none;
+  width: calc(100% - 320px);
+  margin-left: 320px;
+  margin-right: 0;
+  padding-left: 64px;
+  padding-right: 64px;
+}
+@media (max-width: 980px) {
+  body:has([data-page="knowledge-graphs-fundamentals-techniques"]) #site-freshness-bar,
+  body:has([data-page="knowledge-graphs-fundamentals-techniques"]) nav[aria-label="関連ページ"] {
+    width: 100%;
+    margin-left: 0;
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+}
