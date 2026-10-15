@@ -35,6 +35,7 @@ const DIAGRAM_14 =
   'flowchart LR\n    KG["Knowledge Graph 事実を明示"]\n    LLM["LLM 言語の理解と生成"]\n    KG -->|"1 外部知識を与える"| LLM\n    LLM -->|"2 構築と補完を助ける"| KG\n    KG <-->|"3 相互に補い合う"| LLM';
 const DIAGRAM_15 =
   'flowchart TD\n    Doc["文書"]\n    Ext["LLM で実体と関係を抽出"]\n    Graph["KG を構築"]\n    Comm["コミュニティの階層を作る"]\n    Sum["各コミュニティの要約を作る"]\n    Ans["質問に応じて要約と関連部分を使い LLM が回答"]\n    Doc --> Ext --> Graph --> Comm --> Sum --> Ans';
+// Keep the DOM variant explicit without conflating it with source callout classes in the audit.
 const INTRO_VARIANT = "info";
 const THEME_VARS = {
   background: "#07111e",
@@ -58,7 +59,7 @@ export const metadata: Metadata = {
 export default function Page() {
   return (
     <div
-      className={[styles.layout].join(" ")}
+      className={styles.layout}
       data-testid="layout-root"
       data-page="knowledge-graphs-fundamentals-techniques"
     >
@@ -78,25 +79,25 @@ export default function Page() {
         rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css"
       />{" "}
-      <aside className={[styles.sidebar].join(" ")}>
+      <aside className={styles.sidebar}>
         {" "}
-        <div className={[styles["sidebar-brand"]].join(" ")}>
+        <div className={styles["sidebar-brand"]}>
           {" "}
-          <div className={[styles["sidebar-brand-mark"]].join(" ")}>
+          <div className={styles["sidebar-brand-mark"]}>
             <i className={["ti", "ti-affiliate"].join(" ")} aria-hidden="true"></i>
           </div>{" "}
-          <div className={[styles["sidebar-brand-text"]].join(" ")}>
+          <div className={styles["sidebar-brand-text"]}>
             {" "}
             <strong>{"Knowledge Graphs"}</strong>
             {"Fundamentals, Techniques, and Applications "}
           </div>{" "}
         </div>{" "}
-        <div className={[styles["sidebar-meta"]].join(" ")}>
+        <div className={styles["sidebar-meta"]}>
           {" 初学者向けステップバイステップ解説"}
           <br />
           {" 基準日：2026年9月21日 "}
         </div>{" "}
-        <nav className={[styles.toc].join(" ")} aria-label="目次" data-testid="sidebar-nav">
+        <nav className={styles.toc} aria-label="目次" data-testid="sidebar-nav">
           {" "}
           <a
             href="#sec-0"
@@ -106,8 +107,8 @@ export default function Page() {
             className={styles.active}
             aria-current="location"
           >
-            <span className={[styles["toc-num"]].join(" ")}>{"0"}</span>
-            <span className={[styles["toc-label"]].join(" ")}>
+            <span className={styles["toc-num"]}>{"0"}</span>
+            <span className={styles["toc-label"]}>
               {"このガイドの読み方（必ず最初に読んでください）"}
             </span>
           </a>{" "}
@@ -117,8 +118,8 @@ export default function Page() {
             data-testid="sidebar-nav-link"
             data-nav-target="sec-0-5"
           >
-            <span className={[styles["toc-num"]].join(" ")}>{"0.5"}</span>
-            <span className={[styles["toc-label"]].join(" ")}>{"書籍の全体マップ"}</span>
+            <span className={styles["toc-num"]}>{"0.5"}</span>
+            <span className={styles["toc-label"]}>{"書籍の全体マップ"}</span>
           </a>{" "}
           <a
             href="#sec-1"
@@ -126,8 +127,8 @@ export default function Page() {
             data-testid="sidebar-nav-link"
             data-nav-target="sec-1"
           >
-            <span className={[styles["toc-num"]].join(" ")}>{"1"}</span>
-            <span className={[styles["toc-label"]].join(" ")}>{"ナレッジグラフとは何か"}</span>
+            <span className={styles["toc-num"]}>{"1"}</span>
+            <span className={styles["toc-label"]}>{"ナレッジグラフとは何か"}</span>
           </a>{" "}
           <a
             href="#sec-2"
@@ -135,8 +136,8 @@ export default function Page() {
             data-testid="sidebar-nav-link"
             data-nav-target="sec-2"
           >
-            <span className={[styles["toc-num"]].join(" ")}>{"2"}</span>
-            <span className={[styles["toc-label"]].join(" ")}>
+            <span className={styles["toc-num"]}>{"2"}</span>
+            <span className={styles["toc-label"]}>
               {"KG のモデル化と表現（RDF・プロパティグラフ・Wikidata）"}
             </span>
           </a>{" "}
@@ -146,10 +147,8 @@ export default function Page() {
             data-testid="sidebar-nav-link"
             data-nav-target="sec-3"
           >
-            <span className={[styles["toc-num"]].join(" ")}>{"3"}</span>
-            <span className={[styles["toc-label"]].join(" ")}>
-              {"ドメイン発見（Domain Discovery）"}
-            </span>
+            <span className={styles["toc-num"]}>{"3"}</span>
+            <span className={styles["toc-label"]}>{"ドメイン発見（Domain Discovery）"}</span>
           </a>{" "}
           <a
             href="#sec-4"
@@ -157,8 +156,8 @@ export default function Page() {
             data-testid="sidebar-nav-link"
             data-nav-target="sec-4"
           >
-            <span className={[styles["toc-num"]].join(" ")}>{"4"}</span>
-            <span className={[styles["toc-label"]].join(" ")}>
+            <span className={styles["toc-num"]}>{"4"}</span>
+            <span className={styles["toc-label"]}>
               {"固有表現認識（Named Entity Recognition, NER）"}
             </span>
           </a>{" "}
@@ -168,8 +167,8 @@ export default function Page() {
             data-testid="sidebar-nav-link"
             data-nav-target="sec-5"
           >
-            <span className={[styles["toc-num"]].join(" ")}>{"5"}</span>
-            <span className={[styles["toc-label"]].join(" ")}>
+            <span className={styles["toc-num"]}>{"5"}</span>
+            <span className={styles["toc-label"]}>
               {"Web からの情報抽出（Web Information Extraction）"}
             </span>
           </a>{" "}
@@ -179,10 +178,8 @@ export default function Page() {
             data-testid="sidebar-nav-link"
             data-nav-target="sec-6"
           >
-            <span className={[styles["toc-num"]].join(" ")}>{"6"}</span>
-            <span className={[styles["toc-label"]].join(" ")}>
-              {"関係抽出（Relation Extraction）"}
-            </span>
+            <span className={styles["toc-num"]}>{"6"}</span>
+            <span className={styles["toc-label"]}>{"関係抽出（Relation Extraction）"}</span>
           </a>{" "}
           <a
             href="#sec-7"
@@ -190,8 +187,8 @@ export default function Page() {
             data-testid="sidebar-nav-link"
             data-nav-target="sec-7"
           >
-            <span className={[styles["toc-num"]].join(" ")}>{"7"}</span>
-            <span className={[styles["toc-label"]].join(" ")}>
+            <span className={styles["toc-num"]}>{"7"}</span>
+            <span className={styles["toc-label"]}>
               {"非伝統的な情報抽出（Nontraditional Information Extraction）"}
             </span>
           </a>{" "}
@@ -201,10 +198,8 @@ export default function Page() {
             data-testid="sidebar-nav-link"
             data-nav-target="sec-8"
           >
-            <span className={[styles["toc-num"]].join(" ")}>{"8"}</span>
-            <span className={[styles["toc-label"]].join(" ")}>
-              {"インスタンス照合（Instance Matching）"}
-            </span>
+            <span className={styles["toc-num"]}>{"8"}</span>
+            <span className={styles["toc-label"]}>{"インスタンス照合（Instance Matching）"}</span>
           </a>{" "}
           <a
             href="#sec-9"
@@ -212,8 +207,8 @@ export default function Page() {
             data-testid="sidebar-nav-link"
             data-nav-target="sec-9"
           >
-            <span className={[styles["toc-num"]].join(" ")}>{"9"}</span>
-            <span className={[styles["toc-label"]].join(" ")}>
+            <span className={styles["toc-num"]}>{"9"}</span>
+            <span className={styles["toc-label"]}>
               {"統計的関係学習（Statistical Relational Learning, SRL）"}
             </span>
           </a>{" "}
@@ -223,8 +218,8 @@ export default function Page() {
             data-testid="sidebar-nav-link"
             data-nav-target="sec-10"
           >
-            <span className={[styles["toc-num"]].join(" ")}>{"10"}</span>
-            <span className={[styles["toc-label"]].join(" ")}>
+            <span className={styles["toc-num"]}>{"10"}</span>
+            <span className={styles["toc-label"]}>
               {"KG の表現学習（Knowledge Graph Embeddings）"}
             </span>
           </a>{" "}
@@ -234,10 +229,8 @@ export default function Page() {
             data-testid="sidebar-nav-link"
             data-nav-target="sec-11"
           >
-            <span className={[styles["toc-num"]].join(" ")}>{"11"}</span>
-            <span className={[styles["toc-label"]].join(" ")}>
-              {"推論と検索（Reasoning and Retrieval）"}
-            </span>
+            <span className={styles["toc-num"]}>{"11"}</span>
+            <span className={styles["toc-label"]}>{"推論と検索（Reasoning and Retrieval）"}</span>
           </a>{" "}
           <a
             href="#sec-12"
@@ -245,10 +238,8 @@ export default function Page() {
             data-testid="sidebar-nav-link"
             data-nav-target="sec-12"
           >
-            <span className={[styles["toc-num"]].join(" ")}>{"12"}</span>
-            <span className={[styles["toc-label"]].join(" ")}>
-              {"構造化問い合わせ（Structured Querying）"}
-            </span>
+            <span className={styles["toc-num"]}>{"12"}</span>
+            <span className={styles["toc-label"]}>{"構造化問い合わせ（Structured Querying）"}</span>
           </a>{" "}
           <a
             href="#sec-13"
@@ -256,10 +247,8 @@ export default function Page() {
             data-testid="sidebar-nav-link"
             data-nav-target="sec-13"
           >
-            <span className={[styles["toc-num"]].join(" ")}>{"13"}</span>
-            <span className={[styles["toc-label"]].join(" ")}>
-              {"質問応答（Question Answering, QA）"}
-            </span>
+            <span className={styles["toc-num"]}>{"13"}</span>
+            <span className={styles["toc-label"]}>{"質問応答（Question Answering, QA）"}</span>
           </a>{" "}
           <a
             href="#sec-14"
@@ -267,8 +256,8 @@ export default function Page() {
             data-testid="sidebar-nav-link"
             data-nav-target="sec-14"
           >
-            <span className={[styles["toc-num"]].join(" ")}>{"14"}</span>
-            <span className={[styles["toc-label"]].join(" ")}>{"Linked Data"}</span>
+            <span className={styles["toc-num"]}>{"14"}</span>
+            <span className={styles["toc-label"]}>{"Linked Data"}</span>
           </a>{" "}
           <a
             href="#sec-15"
@@ -276,10 +265,8 @@ export default function Page() {
             data-testid="sidebar-nav-link"
             data-nav-target="sec-15"
           >
-            <span className={[styles["toc-num"]].join(" ")}>{"15"}</span>
-            <span className={[styles["toc-label"]].join(" ")}>
-              {"企業と政府（Enterprise and Government）"}
-            </span>
+            <span className={styles["toc-num"]}>{"15"}</span>
+            <span className={styles["toc-label"]}>{"企業と政府（Enterprise and Government）"}</span>
           </a>{" "}
           <a
             href="#sec-16"
@@ -287,10 +274,8 @@ export default function Page() {
             data-testid="sidebar-nav-link"
             data-nav-target="sec-16"
           >
-            <span className={[styles["toc-num"]].join(" ")}>{"16"}</span>
-            <span className={[styles["toc-label"]].join(" ")}>
-              {"科学分野の KG とオントロジー"}
-            </span>
+            <span className={styles["toc-num"]}>{"16"}</span>
+            <span className={styles["toc-label"]}>{"科学分野の KG とオントロジー"}</span>
           </a>{" "}
           <a
             href="#sec-17"
@@ -298,10 +283,8 @@ export default function Page() {
             data-testid="sidebar-nav-link"
             data-nav-target="sec-17"
           >
-            <span className={[styles["toc-num"]].join(" ")}>{"17"}</span>
-            <span className={[styles["toc-label"]].join(" ")}>
-              {"領域特化の社会的インパクトを目指す KG"}
-            </span>
+            <span className={styles["toc-num"]}>{"17"}</span>
+            <span className={styles["toc-label"]}>{"領域特化の社会的インパクトを目指す KG"}</span>
           </a>{" "}
           <a
             href="#sec-18"
@@ -309,8 +292,8 @@ export default function Page() {
             data-testid="sidebar-nav-link"
             data-nav-target="sec-18"
           >
-            <span className={[styles["toc-num"]].join(" ")}>{"18"}</span>
-            <span className={[styles["toc-label"]].join(" ")}>
+            <span className={styles["toc-num"]}>{"18"}</span>
+            <span className={styles["toc-label"]}>
               {"本書のあとの世界：LLM 時代の KG（2026年9月時点）"}
             </span>
           </a>{" "}
@@ -320,8 +303,8 @@ export default function Page() {
             data-testid="sidebar-nav-link"
             data-nav-target="sec-19"
           >
-            <span className={[styles["toc-num"]].join(" ")}>{"19"}</span>
-            <span className={[styles["toc-label"]].join(" ")}>{"学習ロードマップと確認問題"}</span>
+            <span className={styles["toc-num"]}>{"19"}</span>
+            <span className={styles["toc-label"]}>{"学習ロードマップと確認問題"}</span>
           </a>{" "}
           <a
             href="#sec-20"
@@ -329,27 +312,25 @@ export default function Page() {
             data-testid="sidebar-nav-link"
             data-nav-target="sec-20"
           >
-            <span className={[styles["toc-num"]].join(" ")}>{"20"}</span>
-            <span className={[styles["toc-label"]].join(" ")}>
-              {"参考文献・根拠となるソース URL"}
-            </span>
+            <span className={styles["toc-num"]}>{"20"}</span>
+            <span className={styles["toc-label"]}>{"参考文献・根拠となるソース URL"}</span>
           </a>{" "}
         </nav>{" "}
       </aside>{" "}
-      <main className={[styles.content].join(" ")}>
+      <main className={styles.content}>
         {" "}
-        <header className={[styles.hero].join(" ")}>
+        <header className={styles.hero}>
           {" "}
-          <span className={[styles["hero-eyebrow"]].join(" ")}>
+          <span className={styles["hero-eyebrow"]}>
             <i className={["ti", "ti-book"].join(" ")} aria-hidden="true"></i>
             {" 初学者向け学習ガイド"}
           </span>{" "}
-          <h1 className={[styles["hero-title"]].join(" ")}>
+          <h1 className={styles["hero-title"]}>
             {
               " Knowledge Graphs: Fundamentals, Techniques, and Applications 初学者向けステップバイステップ解説 "
             }
           </h1>{" "}
-          <blockquote className={[styles["hero-quote"]].join(" ")} data-testid="voice">
+          <blockquote className={styles["hero-quote"]} data-testid="voice">
             {" "}
             <p>
               {
@@ -364,7 +345,7 @@ export default function Page() {
             </p>{" "}
           </blockquote>{" "}
         </header>{" "}
-        <section id="sec-0" className={[styles.chapter].join(" ")}>
+        <section id="sec-0" className={styles.chapter}>
           {" "}
           <h2 id="sec-0-heading">{"0. このガイドの読み方（必ず最初に読んでください）"}</h2>{" "}
           <div
@@ -376,7 +357,7 @@ export default function Page() {
               className={["ti", "ti-bulb", styles["callout-icon"]].join(" ")}
               aria-hidden="true"
             ></i>{" "}
-            <div className={[styles["callout-body"]].join(" ")}>
+            <div className={styles["callout-body"]}>
               {
                 " この章では、ガイドの位置づけ、書籍の全体像、章ごとの読み進め方を説明します。ここを読んでおくと、後の章で「いま全体のどこを学んでいるのか」が分かります。 "
               }
@@ -492,12 +473,10 @@ export default function Page() {
               className={["ti", "ti-book-2", styles["callout-icon"]].join(" ")}
               aria-hidden="true"
             ></i>{" "}
-            <div className={[styles["callout-body"]].join(" ")}>
+            <div className={styles["callout-body"]}>
               {" "}
-              <p className={[styles["callout-title"]].join(" ")}>
-                {"このセクションで登場した用語"}
-              </p>{" "}
-              <ul className={[styles["glossary-list"]].join(" ")}>
+              <p className={styles["callout-title"]}>{"このセクションで登場した用語"}</p>{" "}
+              <ul className={styles["glossary-list"]}>
                 {" "}
                 <li>
                   {" "}
@@ -515,7 +494,7 @@ export default function Page() {
             </div>{" "}
           </div>{" "}
         </section>{" "}
-        <section id="sec-0-5" className={[styles.chapter].join(" ")}>
+        <section id="sec-0-5" className={styles.chapter}>
           {" "}
           <h2 id="sec-0-5-heading">{"0.5 書籍の全体マップ"}</h2>{" "}
           <div
@@ -527,7 +506,7 @@ export default function Page() {
               className={["ti", "ti-bulb", styles["callout-icon"]].join(" ")}
               aria-hidden="true"
             ></i>{" "}
-            <div className={[styles["callout-body"]].join(" ")}>
+            <div className={styles["callout-body"]}>
               {
                 " この章では、17章の構成を5つのパートに分けて俯瞰します。地図を先に見ておくと、細かい話で迷子になりません。 "
               }
@@ -550,7 +529,7 @@ export default function Page() {
               " この図は、本書の章がどのパートに属し、どの順番で学ぶかを表しています。上から下へ読み進めてください。 "
             }
           </p>{" "}
-          <div className={[styles["mermaid-wrap"]].join(" ")}>
+          <div className={styles["mermaid-wrap"]}>
             {" "}
             <div id="mmd-0" className={styles["mermaid-diagram"]} role="img" aria-label="図">
               <MermaidDiagram
@@ -585,7 +564,7 @@ export default function Page() {
               " この図は、KG のライフサイクル（＝作成から運用までの一連の流れ）を表しています。時計回りに読んでください。 "
             }
           </p>{" "}
-          <div className={[styles["mermaid-wrap"]].join(" ")}>
+          <div className={styles["mermaid-wrap"]}>
             {" "}
             <div id="mmd-1" className={styles["mermaid-diagram"]} role="img" aria-label="図">
               <MermaidDiagram
@@ -647,12 +626,10 @@ export default function Page() {
               className={["ti", "ti-book-2", styles["callout-icon"]].join(" ")}
               aria-hidden="true"
             ></i>{" "}
-            <div className={[styles["callout-body"]].join(" ")}>
+            <div className={styles["callout-body"]}>
               {" "}
-              <p className={[styles["callout-title"]].join(" ")}>
-                {"このセクションで登場した用語"}
-              </p>{" "}
-              <ul className={[styles["glossary-list"]].join(" ")}>
+              <p className={styles["callout-title"]}>{"このセクションで登場した用語"}</p>{" "}
+              <ul className={styles["glossary-list"]}>
                 {" "}
                 <li>
                   {" "}
@@ -668,7 +645,7 @@ export default function Page() {
             </div>{" "}
           </div>{" "}
         </section>{" "}
-        <section id="sec-1" className={[styles.chapter].join(" ")}>
+        <section id="sec-1" className={styles.chapter}>
           {" "}
           <h2 id="sec-1-heading">{"1. 第1章：ナレッジグラフとは何か"}</h2>{" "}
           <div
@@ -680,7 +657,7 @@ export default function Page() {
               className={["ti", "ti-bulb", styles["callout-icon"]].join(" ")}
               aria-hidden="true"
             ></i>{" "}
-            <div className={[styles["callout-body"]].join(" ")}>
+            <div className={styles["callout-body"]}>
               {
                 " この章では、本書の Chapter 1「Introduction to Knowledge Graphs」に相当する内容として、KG の基本イメージ、グラフの基礎、実世界の例を説明します。 "
               }
@@ -760,7 +737,7 @@ export default function Page() {
             }
           </p>{" "}
           <p>{"次の図は、小さな KG の例です。矢印のラベルが関係の名前を表しています。"}</p>{" "}
-          <div className={[styles["mermaid-wrap"]].join(" ")}>
+          <div className={styles["mermaid-wrap"]}>
             {" "}
             <div id="mmd-2" className={styles["mermaid-diagram"]} role="img" aria-label="図">
               <MermaidDiagram
@@ -870,12 +847,10 @@ export default function Page() {
               className={["ti", "ti-book-2", styles["callout-icon"]].join(" ")}
               aria-hidden="true"
             ></i>{" "}
-            <div className={[styles["callout-body"]].join(" ")}>
+            <div className={styles["callout-body"]}>
               {" "}
-              <p className={[styles["callout-title"]].join(" ")}>
-                {"このセクションで登場した用語"}
-              </p>{" "}
-              <ul className={[styles["glossary-list"]].join(" ")}>
+              <p className={styles["callout-title"]}>{"このセクションで登場した用語"}</p>{" "}
+              <ul className={styles["glossary-list"]}>
                 {" "}
                 <li>
                   <strong>{"ノード"}</strong>
@@ -902,7 +877,7 @@ export default function Page() {
             </div>{" "}
           </div>{" "}
         </section>{" "}
-        <section id="sec-2" className={[styles.chapter].join(" ")}>
+        <section id="sec-2" className={styles.chapter}>
           {" "}
           <h2 id="sec-2-heading">
             {"2. 第2章：KG のモデル化と表現（RDF・プロパティグラフ・Wikidata）"}
@@ -916,7 +891,7 @@ export default function Page() {
               className={["ti", "ti-bulb", styles["callout-icon"]].join(" ")}
               aria-hidden="true"
             ></i>{" "}
-            <div className={[styles["callout-body"]].join(" ")}>
+            <div className={styles["callout-body"]}>
               {
                 " この章では、Chapter 2「Modeling and Representing Knowledge Graphs」に相当する内容として、KG をコンピュータで扱うためのデータの書き方（モデル）を説明します。KG を作る際の最初の設計判断がここで決まります。 "
               }
@@ -986,9 +961,9 @@ export default function Page() {
               " 次のコードは、第1章の東京と大阪の KG を、RDF の書き方の一つである Turtle 形式で書いたものです。人が読み書きしやすい形式なので、学習用に向いています。 "
             }
           </p>{" "}
-          <div className={[styles["code-block"]].join(" ")}>
+          <div className={styles["code-block"]}>
             {" "}
-            <span className={[styles["code-lang"]].join(" ")}>{"Turtle"}</span>{" "}
+            <span className={styles["code-lang"]}>{"Turtle"}</span>{" "}
             <pre data-testid="code-block">
               <code className={["language-turtle"].join(" ")}>
                 <span className={styles.codeLine} data-testid="code-line">
@@ -1133,7 +1108,7 @@ export default function Page() {
             }
           </p>{" "}
           <p>{"この図は、A-Box と T-Box が rdf:type でつながる様子を表しています。"}</p>{" "}
-          <div className={[styles["mermaid-wrap"]].join(" ")}>
+          <div className={styles["mermaid-wrap"]}>
             {" "}
             <div id="mmd-3" className={styles["mermaid-diagram"]} role="img" aria-label="図">
               <MermaidDiagram
@@ -1310,12 +1285,10 @@ export default function Page() {
               className={["ti", "ti-book-2", styles["callout-icon"]].join(" ")}
               aria-hidden="true"
             ></i>{" "}
-            <div className={[styles["callout-body"]].join(" ")}>
+            <div className={styles["callout-body"]}>
               {" "}
-              <p className={[styles["callout-title"]].join(" ")}>
-                {"このセクションで登場した用語"}
-              </p>{" "}
-              <ul className={[styles["glossary-list"]].join(" ")}>
+              <p className={styles["callout-title"]}>{"このセクションで登場した用語"}</p>{" "}
+              <ul className={styles["glossary-list"]}>
                 {" "}
                 <li>
                   {" "}
@@ -1368,7 +1341,7 @@ export default function Page() {
             </div>{" "}
           </div>{" "}
         </section>{" "}
-        <section id="sec-3" className={[styles.chapter].join(" ")}>
+        <section id="sec-3" className={styles.chapter}>
           {" "}
           <h2 id="sec-3-heading">{"3. 第3章：ドメイン発見（Domain Discovery）"}</h2>{" "}
           <div
@@ -1380,7 +1353,7 @@ export default function Page() {
               className={["ti", "ti-bulb", styles["callout-icon"]].join(" ")}
               aria-hidden="true"
             ></i>{" "}
-            <div className={[styles["callout-body"]].join(" ")}>
+            <div className={styles["callout-body"]}>
               {
                 " この章では、Chapter 3 に相当する内容として、KG を作る材料になるデータを、どうやって探し集めるかを説明します。Part II（構築）の入り口です。 "
               }
@@ -1473,7 +1446,7 @@ export default function Page() {
               " この図は、フォーカスト・クローリングの処理の流れを表しています。上から下へ読み進めてください。 "
             }
           </p>{" "}
-          <div className={[styles["mermaid-wrap"]].join(" ")}>
+          <div className={styles["mermaid-wrap"]}>
             {" "}
             <div id="mmd-4" className={styles["mermaid-diagram"]} role="img" aria-label="図">
               <MermaidDiagram
@@ -1514,12 +1487,10 @@ export default function Page() {
               className={["ti", "ti-book-2", styles["callout-icon"]].join(" ")}
               aria-hidden="true"
             ></i>{" "}
-            <div className={[styles["callout-body"]].join(" ")}>
+            <div className={styles["callout-body"]}>
               {" "}
-              <p className={[styles["callout-title"]].join(" ")}>
-                {"このセクションで登場した用語"}
-              </p>{" "}
-              <ul className={[styles["glossary-list"]].join(" ")}>
+              <p className={styles["callout-title"]}>{"このセクションで登場した用語"}</p>{" "}
+              <ul className={styles["glossary-list"]}>
                 {" "}
                 <li>
                   <strong>{"ドメイン"}</strong>
@@ -1546,7 +1517,7 @@ export default function Page() {
             </div>{" "}
           </div>{" "}
         </section>{" "}
-        <section id="sec-4" className={[styles.chapter].join(" ")}>
+        <section id="sec-4" className={styles.chapter}>
           {" "}
           <h2 id="sec-4-heading">{"4. 第4章：固有表現認識（Named Entity Recognition, NER）"}</h2>{" "}
           <div
@@ -1558,7 +1529,7 @@ export default function Page() {
               className={["ti", "ti-bulb", styles["callout-icon"]].join(" ")}
               aria-hidden="true"
             ></i>{" "}
-            <div className={[styles["callout-body"]].join(" ")}>
+            <div className={styles["callout-body"]}>
               {
                 " この章では、Chapter 4 に相当する内容として、文章から「人名」「組織名」「地名」などの名前を見つけ出す技術を説明します。文章を KG のノードに変える最初の一歩です。 "
               }
@@ -1756,12 +1727,10 @@ export default function Page() {
               className={["ti", "ti-book-2", styles["callout-icon"]].join(" ")}
               aria-hidden="true"
             ></i>{" "}
-            <div className={[styles["callout-body"]].join(" ")}>
+            <div className={styles["callout-body"]}>
               {" "}
-              <p className={[styles["callout-title"]].join(" ")}>
-                {"このセクションで登場した用語"}
-              </p>{" "}
-              <ul className={[styles["glossary-list"]].join(" ")}>
+              <p className={styles["callout-title"]}>{"このセクションで登場した用語"}</p>{" "}
+              <ul className={styles["glossary-list"]}>
                 {" "}
                 <li>
                   {" "}
@@ -1789,7 +1758,7 @@ export default function Page() {
             </div>{" "}
           </div>{" "}
         </section>{" "}
-        <section id="sec-5" className={[styles.chapter].join(" ")}>
+        <section id="sec-5" className={styles.chapter}>
           {" "}
           <h2 id="sec-5-heading">{"5. 第5章：Web からの情報抽出（Web Information Extraction）"}</h2>{" "}
           <div
@@ -1801,7 +1770,7 @@ export default function Page() {
               className={["ti", "ti-bulb", styles["callout-icon"]].join(" ")}
               aria-hidden="true"
             ></i>{" "}
-            <div className={[styles["callout-body"]].join(" ")}>
+            <div className={styles["callout-body"]}>
               {
                 " この章では、Chapter 5 に相当する内容として、Web ページの構造を手がかりにデータを取り出す方法を説明します。文章だけでなく、商品一覧のような「型のあるページ」から効率よく事実を集められます。 "
               }
@@ -1845,7 +1814,7 @@ export default function Page() {
               " この図は、ラッパー生成から KG への変換までの流れを表しています。左から右へ読み進めてください。 "
             }
           </p>{" "}
-          <div className={[styles["mermaid-wrap"]].join(" ")}>
+          <div className={styles["mermaid-wrap"]}>
             {" "}
             <div id="mmd-5" className={styles["mermaid-diagram"]} role="img" aria-label="図">
               <MermaidDiagram
@@ -1871,9 +1840,9 @@ export default function Page() {
               " XPath とは、HTML の中の位置を指定する書き方です。次の式は、商品ブロックの中にある価格の文字を取り出します。 "
             }
           </p>{" "}
-          <div className={[styles["code-block"]].join(" ")}>
+          <div className={styles["code-block"]}>
             {" "}
-            <span className={[styles["code-lang"]].join(" ")}>{"TEXT"}</span>{" "}
+            <span className={styles["code-lang"]}>{"TEXT"}</span>{" "}
             <pre data-testid="code-block">
               <code className={["language-text"].join(" ")}>
                 <span className={styles.codeLine} data-testid="code-line">
@@ -1941,12 +1910,10 @@ export default function Page() {
               className={["ti", "ti-book-2", styles["callout-icon"]].join(" ")}
               aria-hidden="true"
             ></i>{" "}
-            <div className={[styles["callout-body"]].join(" ")}>
+            <div className={styles["callout-body"]}>
               {" "}
-              <p className={[styles["callout-title"]].join(" ")}>
-                {"このセクションで登場した用語"}
-              </p>{" "}
-              <ul className={[styles["glossary-list"]].join(" ")}>
+              <p className={styles["callout-title"]}>{"このセクションで登場した用語"}</p>{" "}
+              <ul className={styles["glossary-list"]}>
                 {" "}
                 <li>
                   <strong>{"ラッパー"}</strong>
@@ -1969,7 +1936,7 @@ export default function Page() {
             </div>{" "}
           </div>{" "}
         </section>{" "}
-        <section id="sec-6" className={[styles.chapter].join(" ")}>
+        <section id="sec-6" className={styles.chapter}>
           {" "}
           <h2 id="sec-6-heading">{"6. 第6章：関係抽出（Relation Extraction）"}</h2>{" "}
           <div
@@ -1981,7 +1948,7 @@ export default function Page() {
               className={["ti", "ti-bulb", styles["callout-icon"]].join(" ")}
               aria-hidden="true"
             ></i>{" "}
-            <div className={[styles["callout-body"]].join(" ")}>
+            <div className={styles["callout-body"]}>
               {
                 " この章では、Chapter 6 に相当する内容として、文章から「AとBはどんな関係か」を取り出す技術を説明します。第4章で見つけた名前どうしを、線でつなぐ工程です。 "
               }
@@ -2071,7 +2038,7 @@ export default function Page() {
               " この図は、文章から関係を取り出して KG に加えるまでの流れを表しています。上から下へ読み進めてください。 "
             }
           </p>{" "}
-          <div className={[styles["mermaid-wrap"]].join(" ")}>
+          <div className={styles["mermaid-wrap"]}>
             {" "}
             <div id="mmd-6" className={styles["mermaid-diagram"]} role="img" aria-label="図">
               <MermaidDiagram
@@ -2110,12 +2077,10 @@ export default function Page() {
               className={["ti", "ti-book-2", styles["callout-icon"]].join(" ")}
               aria-hidden="true"
             ></i>{" "}
-            <div className={[styles["callout-body"]].join(" ")}>
+            <div className={styles["callout-body"]}>
               {" "}
-              <p className={[styles["callout-title"]].join(" ")}>
-                {"このセクションで登場した用語"}
-              </p>{" "}
-              <ul className={[styles["glossary-list"]].join(" ")}>
+              <p className={styles["callout-title"]}>{"このセクションで登場した用語"}</p>{" "}
+              <ul className={styles["glossary-list"]}>
                 {" "}
                 <li>
                   <strong>{"関係抽出"}</strong>
@@ -2142,7 +2107,7 @@ export default function Page() {
             </div>{" "}
           </div>{" "}
         </section>{" "}
-        <section id="sec-7" className={[styles.chapter].join(" ")}>
+        <section id="sec-7" className={styles.chapter}>
           {" "}
           <h2 id="sec-7-heading">
             {"7. 第7章：非伝統的な情報抽出（Nontraditional Information Extraction）"}
@@ -2156,7 +2121,7 @@ export default function Page() {
               className={["ti", "ti-bulb", styles["callout-icon"]].join(" ")}
               aria-hidden="true"
             ></i>{" "}
-            <div className={[styles["callout-body"]].join(" ")}>
+            <div className={styles["callout-body"]}>
               {
                 " この章では、Chapter 7 に相当する内容として、事前に関係の種類を決められない場合や、SNS のような荒れた文章から知識を取り出す方法を説明します。 "
               }
@@ -2243,12 +2208,10 @@ export default function Page() {
               className={["ti", "ti-book-2", styles["callout-icon"]].join(" ")}
               aria-hidden="true"
             ></i>{" "}
-            <div className={[styles["callout-body"]].join(" ")}>
+            <div className={styles["callout-body"]}>
               {" "}
-              <p className={[styles["callout-title"]].join(" ")}>
-                {"このセクションで登場した用語"}
-              </p>{" "}
-              <ul className={[styles["glossary-list"]].join(" ")}>
+              <p className={styles["callout-title"]}>{"このセクションで登場した用語"}</p>{" "}
+              <ul className={styles["glossary-list"]}>
                 {" "}
                 <li>
                   {" "}
@@ -2267,7 +2230,7 @@ export default function Page() {
             </div>{" "}
           </div>{" "}
         </section>{" "}
-        <section id="sec-8" className={[styles.chapter].join(" ")}>
+        <section id="sec-8" className={styles.chapter}>
           {" "}
           <h2 id="sec-8-heading">{"8. 第8章：インスタンス照合（Instance Matching）"}</h2>{" "}
           <div
@@ -2279,7 +2242,7 @@ export default function Page() {
               className={["ti", "ti-bulb", styles["callout-icon"]].join(" ")}
               aria-hidden="true"
             ></i>{" "}
-            <div className={[styles["callout-body"]].join(" ")}>
+            <div className={styles["callout-body"]}>
               {
                 " この章では、Chapter 8 に相当する内容として、別々のデータ源にある「同じ実体を指すレコード」を見つけて結びつける技術を説明します。Part III（知識の追加・改良）の中心です。 "
               }
@@ -2345,7 +2308,7 @@ export default function Page() {
             </tbody>
           </table>{" "}
           <p>{"この図は、2段階パイプラインの流れを表しています。左から右へ読み進めてください。"}</p>{" "}
-          <div className={[styles["mermaid-wrap"]].join(" ")}>
+          <div className={styles["mermaid-wrap"]}>
             {" "}
             <div id="mmd-7" className={styles["mermaid-diagram"]} role="img" aria-label="図">
               <MermaidDiagram
@@ -2432,12 +2395,10 @@ export default function Page() {
               className={["ti", "ti-book-2", styles["callout-icon"]].join(" ")}
               aria-hidden="true"
             ></i>{" "}
-            <div className={[styles["callout-body"]].join(" ")}>
+            <div className={styles["callout-body"]}>
               {" "}
-              <p className={[styles["callout-title"]].join(" ")}>
-                {"このセクションで登場した用語"}
-              </p>{" "}
-              <ul className={[styles["glossary-list"]].join(" ")}>
+              <p className={styles["callout-title"]}>{"このセクションで登場した用語"}</p>{" "}
+              <ul className={styles["glossary-list"]}>
                 {" "}
                 <li>
                   {" "}
@@ -2464,7 +2425,7 @@ export default function Page() {
             </div>{" "}
           </div>{" "}
         </section>{" "}
-        <section id="sec-9" className={[styles.chapter].join(" ")}>
+        <section id="sec-9" className={styles.chapter}>
           {" "}
           <h2 id="sec-9-heading">
             {"9. 第9章：統計的関係学習（Statistical Relational Learning, SRL）"}
@@ -2478,7 +2439,7 @@ export default function Page() {
               className={["ti", "ti-bulb", styles["callout-icon"]].join(" ")}
               aria-hidden="true"
             ></i>{" "}
-            <div className={[styles["callout-body"]].join(" ")}>
+            <div className={styles["callout-body"]}>
               {
                 " この章では、Chapter 9 に相当する内容として、KG の事実が「確実ではなく、確率的に正しい」という前提で、事実どうしの依存関係を使って正しさを判定する方法を説明します。 "
               }
@@ -2526,7 +2487,7 @@ export default function Page() {
           <p>
             {"この図は、KG identification の考え方を表しています。上から下へ読み進めてください。"}
           </p>{" "}
-          <div className={[styles["mermaid-wrap"]].join(" ")}>
+          <div className={styles["mermaid-wrap"]}>
             {" "}
             <div id="mmd-8" className={styles["mermaid-diagram"]} role="img" aria-label="図">
               <MermaidDiagram
@@ -2569,12 +2530,10 @@ export default function Page() {
               className={["ti", "ti-book-2", styles["callout-icon"]].join(" ")}
               aria-hidden="true"
             ></i>{" "}
-            <div className={[styles["callout-body"]].join(" ")}>
+            <div className={styles["callout-body"]}>
               {" "}
-              <p className={[styles["callout-title"]].join(" ")}>
-                {"このセクションで登場した用語"}
-              </p>{" "}
-              <ul className={[styles["glossary-list"]].join(" ")}>
+              <p className={styles["callout-title"]}>{"このセクションで登場した用語"}</p>{" "}
+              <ul className={styles["glossary-list"]}>
                 {" "}
                 <li>
                   <strong>{"SRL"}</strong>
@@ -2597,7 +2556,7 @@ export default function Page() {
             </div>{" "}
           </div>{" "}
         </section>{" "}
-        <section id="sec-10" className={[styles.chapter].join(" ")}>
+        <section id="sec-10" className={styles.chapter}>
           {" "}
           <h2 id="sec-10-heading">{"10. 第10章：KG の表現学習（Knowledge Graph Embeddings）"}</h2>{" "}
           <div
@@ -2609,7 +2568,7 @@ export default function Page() {
               className={["ti", "ti-bulb", styles["callout-icon"]].join(" ")}
               aria-hidden="true"
             ></i>{" "}
-            <div className={[styles["callout-body"]].join(" ")}>
+            <div className={styles["callout-body"]}>
               {
                 " この章では、Chapter 10 に相当する内容として、KG のノードと関係を数値ベクトルに変換して、機械学習で扱えるようにする方法を説明します。欠けた事実を予測する（リンク予測）ときの土台です。 "
               }
@@ -2646,9 +2605,9 @@ export default function Page() {
             }
           </p>{" "}
           <p>{"考え方は次の式で書けます。"}</p>{" "}
-          <div className={[styles["code-block"]].join(" ")}>
+          <div className={styles["code-block"]}>
             {" "}
-            <span className={[styles["code-lang"]].join(" ")}>{"TEXT"}</span>{" "}
+            <span className={styles["code-lang"]}>{"TEXT"}</span>{" "}
             <pre data-testid="code-block">
               <code className={["language-text"].join(" ")}>
                 <span className={styles.codeLine} data-testid="code-line">
@@ -2726,9 +2685,9 @@ export default function Page() {
             <code>{"sum((p - q) ** 2 for p, q in zip(pred, entity[t])) ** 0.5"}</code>
             {"）に置き換えると標準ライブラリだけで動作します。 "}
           </p>{" "}
-          <div className={[styles["code-block"]].join(" ")}>
+          <div className={styles["code-block"]}>
             {" "}
-            <span className={[styles["code-lang"]].join(" ")}>{"Python"}</span>{" "}
+            <span className={styles["code-lang"]}>{"Python"}</span>{" "}
             <pre data-testid="code-block">
               <code className={["language-python"].join(" ")}>
                 <span className={styles.codeLine} data-testid="code-line">
@@ -2914,7 +2873,7 @@ export default function Page() {
               " この図は、埋め込みを使った欠けた事実の予測の流れを表しています。左から右へ読み進めてください。 "
             }
           </p>{" "}
-          <div className={[styles["mermaid-wrap"]].join(" ")}>
+          <div className={styles["mermaid-wrap"]}>
             {" "}
             <div id="mmd-9" className={styles["mermaid-diagram"]} role="img" aria-label="図">
               <MermaidDiagram
@@ -2953,12 +2912,10 @@ export default function Page() {
               className={["ti", "ti-book-2", styles["callout-icon"]].join(" ")}
               aria-hidden="true"
             ></i>{" "}
-            <div className={[styles["callout-body"]].join(" ")}>
+            <div className={styles["callout-body"]}>
               {" "}
-              <p className={[styles["callout-title"]].join(" ")}>
-                {"このセクションで登場した用語"}
-              </p>{" "}
-              <ul className={[styles["glossary-list"]].join(" ")}>
+              <p className={styles["callout-title"]}>{"このセクションで登場した用語"}</p>{" "}
+              <ul className={styles["glossary-list"]}>
                 {" "}
                 <li>
                   {" "}
@@ -2981,7 +2938,7 @@ export default function Page() {
             </div>{" "}
           </div>{" "}
         </section>{" "}
-        <section id="sec-11" className={[styles.chapter].join(" ")}>
+        <section id="sec-11" className={styles.chapter}>
           {" "}
           <h2 id="sec-11-heading">{"11. 第11章：推論と検索（Reasoning and Retrieval）"}</h2>{" "}
           <div
@@ -2993,7 +2950,7 @@ export default function Page() {
               className={["ti", "ti-bulb", styles["callout-icon"]].join(" ")}
               aria-hidden="true"
             ></i>{" "}
-            <div className={[styles["callout-body"]].join(" ")}>
+            <div className={styles["callout-body"]}>
               {
                 " この章では、Chapter 11 に相当する内容として、KG に書かれていない事実を「導き出す」推論と、必要な情報を「探し出す」検索を説明します。Part IV（KG へのアクセス）の入り口です。 "
               }
@@ -3038,7 +2995,7 @@ export default function Page() {
           <p>
             {"この図は、推移性のルールによる推論を表しています。上から下へ読み進めてください。"}
           </p>{" "}
-          <div className={[styles["mermaid-wrap"]].join(" ")}>
+          <div className={styles["mermaid-wrap"]}>
             {" "}
             <div id="mmd-10" className={styles["mermaid-diagram"]} role="img" aria-label="図">
               <MermaidDiagram
@@ -3114,12 +3071,10 @@ export default function Page() {
               className={["ti", "ti-book-2", styles["callout-icon"]].join(" ")}
               aria-hidden="true"
             ></i>{" "}
-            <div className={[styles["callout-body"]].join(" ")}>
+            <div className={styles["callout-body"]}>
               {" "}
-              <p className={[styles["callout-title"]].join(" ")}>
-                {"このセクションで登場した用語"}
-              </p>{" "}
-              <ul className={[styles["glossary-list"]].join(" ")}>
+              <p className={styles["callout-title"]}>{"このセクションで登場した用語"}</p>{" "}
+              <ul className={styles["glossary-list"]}>
                 {" "}
                 <li>
                   <strong>{"推論"}</strong>
@@ -3137,7 +3092,7 @@ export default function Page() {
             </div>{" "}
           </div>{" "}
         </section>{" "}
-        <section id="sec-12" className={[styles.chapter].join(" ")}>
+        <section id="sec-12" className={styles.chapter}>
           {" "}
           <h2 id="sec-12-heading">{"12. 第12章：構造化問い合わせ（Structured Querying）"}</h2>{" "}
           <div
@@ -3149,7 +3104,7 @@ export default function Page() {
               className={["ti", "ti-bulb", styles["callout-icon"]].join(" ")}
               aria-hidden="true"
             ></i>{" "}
-            <div className={[styles["callout-body"]].join(" ")}>
+            <div className={styles["callout-body"]}>
               {
                 " この章では、Chapter 12 に相当する内容として、KG から欲しい情報を取り出すための問い合わせ言語（SPARQL、SQL、グラフ DB の言語）を説明します。実務で最もよく使う章です。 "
               }
@@ -3180,9 +3135,9 @@ export default function Page() {
             {"で始まる名前）にしたものです。 "}
           </p>{" "}
           <p>{"先ほどの Turtle データに対する問い合わせ例です。"}</p>{" "}
-          <div className={[styles["code-block"]].join(" ")}>
+          <div className={styles["code-block"]}>
             {" "}
-            <span className={[styles["code-lang"]].join(" ")}>{"SPARQL"}</span>{" "}
+            <span className={styles["code-lang"]}>{"SPARQL"}</span>{" "}
             <pre data-testid="code-block">
               <code className={["language-sparql"].join(" ")}>
                 <span className={styles.codeLine} data-testid="code-line">
@@ -3260,9 +3215,9 @@ export default function Page() {
             <code>{"Tokyo"}</code>
             {" の2件でした。 "}
           </p>{" "}
-          <div className={[styles["code-block"]].join(" ")}>
+          <div className={styles["code-block"]}>
             {" "}
-            <span className={[styles["code-lang"]].join(" ")}>{"Python"}</span>{" "}
+            <span className={styles["code-lang"]}>{"Python"}</span>{" "}
             <pre data-testid="code-block">
               <code className={["language-python"].join(" ")}>
                 <span className={styles.codeLine} data-testid="code-line">
@@ -3599,9 +3554,9 @@ export default function Page() {
               " 実際のトリプルストアは、IRI とリテラルを別の列や別の表に分け、辞書表で整数 ID に置き換えるのが普通です。ここでは比較を分かりやすくするために、すべてを1つの文字列列に潰しています。 "
             }
           </p>{" "}
-          <div className={[styles["code-block"]].join(" ")}>
+          <div className={styles["code-block"]}>
             {" "}
-            <span className={[styles["code-lang"]].join(" ")}>{"SQL"}</span>{" "}
+            <span className={styles["code-lang"]}>{"SQL"}</span>{" "}
             <pre data-testid="code-block">
               <code className={["language-sql"].join(" ")}>
                 <span className={styles.codeLine} data-testid="code-line">
@@ -3763,9 +3718,9 @@ export default function Page() {
           <p>{"条件が増えるほど自己結合が増え、処理が重くなる点が、この方式の課題です。"}</p>{" "}
           <h3 id="sec-12-5">{"12.5 ステップ3：グラフデータベースと NoSQL（12.4節）"}</h3>{" "}
           <p>{"プロパティグラフの問い合わせ言語の例として、Cypher 風の書き方を示します。"}</p>{" "}
-          <div className={[styles["code-block"]].join(" ")}>
+          <div className={styles["code-block"]}>
             {" "}
-            <span className={[styles["code-lang"]].join(" ")}>{"TEXT"}</span>{" "}
+            <span className={styles["code-lang"]}>{"TEXT"}</span>{" "}
             <pre data-testid="code-block">
               <code className={["language-text"].join(" ")}>
                 <span className={styles.codeLine} data-testid="code-line">
@@ -3862,12 +3817,10 @@ export default function Page() {
               className={["ti", "ti-book-2", styles["callout-icon"]].join(" ")}
               aria-hidden="true"
             ></i>{" "}
-            <div className={[styles["callout-body"]].join(" ")}>
+            <div className={styles["callout-body"]}>
               {" "}
-              <p className={[styles["callout-title"]].join(" ")}>
-                {"このセクションで登場した用語"}
-              </p>{" "}
-              <ul className={[styles["glossary-list"]].join(" ")}>
+              <p className={styles["callout-title"]}>{"このセクションで登場した用語"}</p>{" "}
+              <ul className={styles["glossary-list"]}>
                 {" "}
                 <li>
                   <strong>{"SPARQL"}</strong>
@@ -3900,7 +3853,7 @@ export default function Page() {
             </div>{" "}
           </div>{" "}
         </section>{" "}
-        <section id="sec-13" className={[styles.chapter].join(" ")}>
+        <section id="sec-13" className={styles.chapter}>
           {" "}
           <h2 id="sec-13-heading">{"13. 第13章：質問応答（Question Answering, QA）"}</h2>{" "}
           <div
@@ -3912,7 +3865,7 @@ export default function Page() {
               className={["ti", "ti-bulb", styles["callout-icon"]].join(" ")}
               aria-hidden="true"
             ></i>{" "}
-            <div className={[styles["callout-body"]].join(" ")}>
+            <div className={styles["callout-body"]}>
               {
                 " この章では、Chapter 13 に相当する内容として、自然な言葉の質問に、KG を使って答える仕組みを説明します。第12章の問い合わせ言語を、利用者が意識せずに使えるようにする層です。 "
               }
@@ -3960,7 +3913,7 @@ export default function Page() {
               " この図は、質問から答えが返るまでの流れを表しています。上から下へ読み進めてください。 "
             }
           </p>{" "}
-          <div className={[styles["mermaid-wrap"]].join(" ")}>
+          <div className={styles["mermaid-wrap"]}>
             {" "}
             <div id="mmd-11" className={styles["mermaid-diagram"]} role="img" aria-label="図">
               <MermaidDiagram
@@ -3980,9 +3933,9 @@ export default function Page() {
             <br />
             {" - 「問い合わせを組み立てる」：次のような SPARQL に変換する "}
           </p>{" "}
-          <div className={[styles["code-block"]].join(" ")}>
+          <div className={styles["code-block"]}>
             {" "}
-            <span className={[styles["code-lang"]].join(" ")}>{"SPARQL"}</span>{" "}
+            <span className={styles["code-lang"]}>{"SPARQL"}</span>{" "}
             <pre data-testid="code-block">
               <code className={["language-sparql"].join(" ")}>
                 <span className={styles.codeLine} data-testid="code-line">
@@ -4050,12 +4003,10 @@ export default function Page() {
               className={["ti", "ti-book-2", styles["callout-icon"]].join(" ")}
               aria-hidden="true"
             ></i>{" "}
-            <div className={[styles["callout-body"]].join(" ")}>
+            <div className={styles["callout-body"]}>
               {" "}
-              <p className={[styles["callout-title"]].join(" ")}>
-                {"このセクションで登場した用語"}
-              </p>{" "}
-              <ul className={[styles["glossary-list"]].join(" ")}>
+              <p className={styles["callout-title"]}>{"このセクションで登場した用語"}</p>{" "}
+              <ul className={styles["glossary-list"]}>
                 {" "}
                 <li>
                   <strong>{"QA"}</strong>
@@ -4075,7 +4026,7 @@ export default function Page() {
             </div>{" "}
           </div>{" "}
         </section>{" "}
-        <section id="sec-14" className={[styles.chapter].join(" ")}>
+        <section id="sec-14" className={styles.chapter}>
           {" "}
           <h2 id="sec-14-heading">{"14. 第14章：Linked Data"}</h2>{" "}
           <div
@@ -4087,7 +4038,7 @@ export default function Page() {
               className={["ti", "ti-bulb", styles["callout-icon"]].join(" ")}
               aria-hidden="true"
             ></i>{" "}
-            <div className={[styles["callout-body"]].join(" ")}>
+            <div className={styles["callout-body"]}>
               {
                 " この章では、Chapter 14 に相当する内容として、世界中の KG を Web でつなぎ合わせる考え方を説明します。Part V（エコシステム）の最初の章です。 "
               }
@@ -4147,7 +4098,7 @@ export default function Page() {
               " この図は、複数の公開 KG が、同じ実体を指す IRI どうしをリンクでつなぐ様子を表しています。 "
             }
           </p>{" "}
-          <div className={[styles["mermaid-wrap"]].join(" ")}>
+          <div className={styles["mermaid-wrap"]}>
             {" "}
             <div id="mmd-12" className={styles["mermaid-diagram"]} role="img" aria-label="図">
               <MermaidDiagram
@@ -4184,12 +4135,10 @@ export default function Page() {
               className={["ti", "ti-book-2", styles["callout-icon"]].join(" ")}
               aria-hidden="true"
             ></i>{" "}
-            <div className={[styles["callout-body"]].join(" ")}>
+            <div className={styles["callout-body"]}>
               {" "}
-              <p className={[styles["callout-title"]].join(" ")}>
-                {"このセクションで登場した用語"}
-              </p>{" "}
-              <ul className={[styles["glossary-list"]].join(" ")}>
+              <p className={styles["callout-title"]}>{"このセクションで登場した用語"}</p>{" "}
+              <ul className={styles["glossary-list"]}>
                 {" "}
                 <li>
                   <strong>{"Linked Data"}</strong>
@@ -4208,7 +4157,7 @@ export default function Page() {
             </div>{" "}
           </div>{" "}
         </section>{" "}
-        <section id="sec-15" className={[styles.chapter].join(" ")}>
+        <section id="sec-15" className={styles.chapter}>
           {" "}
           <h2 id="sec-15-heading">{"15. 第15章：企業と政府（Enterprise and Government）"}</h2>{" "}
           <div
@@ -4220,7 +4169,7 @@ export default function Page() {
               className={["ti", "ti-bulb", styles["callout-icon"]].join(" ")}
               aria-hidden="true"
             ></i>{" "}
-            <div className={[styles["callout-body"]].join(" ")}>
+            <div className={styles["callout-body"]}>
               {
                 " この章では、Chapter 15 に相当する内容として、企業と政府が KG をどう使うかを説明します。 "
               }
@@ -4293,12 +4242,10 @@ export default function Page() {
               className={["ti", "ti-book-2", styles["callout-icon"]].join(" ")}
               aria-hidden="true"
             ></i>{" "}
-            <div className={[styles["callout-body"]].join(" ")}>
+            <div className={styles["callout-body"]}>
               {" "}
-              <p className={[styles["callout-title"]].join(" ")}>
-                {"このセクションで登場した用語"}
-              </p>{" "}
-              <ul className={[styles["glossary-list"]].join(" ")}>
+              <p className={styles["callout-title"]}>{"このセクションで登場した用語"}</p>{" "}
+              <ul className={styles["glossary-list"]}>
                 {" "}
                 <li>
                   {" "}
@@ -4313,7 +4260,7 @@ export default function Page() {
             </div>{" "}
           </div>{" "}
         </section>{" "}
-        <section id="sec-16" className={[styles.chapter].join(" ")}>
+        <section id="sec-16" className={styles.chapter}>
           {" "}
           <h2 id="sec-16-heading">{"16. 第16章：科学分野の KG とオントロジー"}</h2>{" "}
           <div
@@ -4325,7 +4272,7 @@ export default function Page() {
               className={["ti", "ti-bulb", styles["callout-icon"]].join(" ")}
               aria-hidden="true"
             ></i>{" "}
-            <div className={[styles["callout-body"]].join(" ")}>
+            <div className={styles["callout-body"]}>
               {
                 " この章では、Chapter 16 に相当する内容として、生物学・化学・地球科学のような科学分野で KG とオントロジーがどう使われるかを説明します。 "
               }
@@ -4390,12 +4337,10 @@ export default function Page() {
               className={["ti", "ti-book-2", styles["callout-icon"]].join(" ")}
               aria-hidden="true"
             ></i>{" "}
-            <div className={[styles["callout-body"]].join(" ")}>
+            <div className={styles["callout-body"]}>
               {" "}
-              <p className={[styles["callout-title"]].join(" ")}>
-                {"このセクションで登場した用語"}
-              </p>{" "}
-              <ul className={[styles["glossary-list"]].join(" ")}>
+              <p className={styles["callout-title"]}>{"このセクションで登場した用語"}</p>{" "}
+              <ul className={styles["glossary-list"]}>
                 {" "}
                 <li>
                   {" "}
@@ -4410,7 +4355,7 @@ export default function Page() {
             </div>{" "}
           </div>{" "}
         </section>{" "}
-        <section id="sec-17" className={[styles.chapter].join(" ")}>
+        <section id="sec-17" className={styles.chapter}>
           {" "}
           <h2 id="sec-17-heading">{"17. 第17章：領域特化の社会的インパクトを目指す KG"}</h2>{" "}
           <div
@@ -4422,7 +4367,7 @@ export default function Page() {
               className={["ti", "ti-bulb", styles["callout-icon"]].join(" ")}
               aria-hidden="true"
             ></i>{" "}
-            <div className={[styles["callout-body"]].join(" ")}>
+            <div className={styles["callout-body"]}>
               {
                 " この章では、Chapter 17 に相当する内容として、特定の領域の課題に絞って、Web から情報を集めて KG にし、分析に役立てる考え方を説明します。 "
               }
@@ -4450,7 +4395,7 @@ export default function Page() {
               " この図は、領域特化の KG を作り、分析に使うまでの流れを、これまでの章と結びつけて表しています。上から下へ読み進めてください。 "
             }
           </p>{" "}
-          <div className={[styles["mermaid-wrap"]].join(" ")}>
+          <div className={styles["mermaid-wrap"]}>
             {" "}
             <div id="mmd-13" className={styles["mermaid-diagram"]} role="img" aria-label="図">
               <MermaidDiagram
@@ -4495,12 +4440,10 @@ export default function Page() {
               className={["ti", "ti-book-2", styles["callout-icon"]].join(" ")}
               aria-hidden="true"
             ></i>{" "}
-            <div className={[styles["callout-body"]].join(" ")}>
+            <div className={styles["callout-body"]}>
               {" "}
-              <p className={[styles["callout-title"]].join(" ")}>
-                {"このセクションで登場した用語"}
-              </p>{" "}
-              <ul className={[styles["glossary-list"]].join(" ")}>
+              <p className={styles["callout-title"]}>{"このセクションで登場した用語"}</p>{" "}
+              <ul className={styles["glossary-list"]}>
                 {" "}
                 <li>
                   <strong>{"領域特化"}</strong>
@@ -4515,7 +4458,7 @@ export default function Page() {
             </div>{" "}
           </div>{" "}
         </section>{" "}
-        <section id="sec-18" className={[styles.chapter].join(" ")}>
+        <section id="sec-18" className={styles.chapter}>
           {" "}
           <h2 id="sec-18-heading">{"18. 本書のあとの世界：LLM 時代の KG（2026年9月時点）"}</h2>{" "}
           <div
@@ -4527,7 +4470,7 @@ export default function Page() {
               className={["ti", "ti-bulb", styles["callout-icon"]].join(" ")}
               aria-hidden="true"
             ></i>{" "}
-            <div className={[styles["callout-body"]].join(" ")}>
+            <div className={styles["callout-body"]}>
               {
                 " この章では、本書の出版（2021年）以降に大きく動いた、LLM（大規模言語モデル）と KG の関係、標準の動きを説明します。本書の各章が今どこで役立つかも整理します。 "
               }
@@ -4573,7 +4516,7 @@ export default function Page() {
             }
           </p>{" "}
           <p>{"この図は、3つの枠組みの関係を表しています。"}</p>{" "}
-          <div className={[styles["mermaid-wrap"]].join(" ")}>
+          <div className={styles["mermaid-wrap"]}>
             {" "}
             <div id="mmd-14" className={styles["mermaid-diagram"]} role="img" aria-label="図">
               <MermaidDiagram
@@ -4609,7 +4552,7 @@ export default function Page() {
             }
           </p>{" "}
           <p>{"この図は、GraphRAG の処理の流れを表しています。上から下へ読み進めてください。"}</p>{" "}
-          <div className={[styles["mermaid-wrap"]].join(" ")}>
+          <div className={styles["mermaid-wrap"]}>
             {" "}
             <div id="mmd-15" className={styles["mermaid-diagram"]} role="img" aria-label="図">
               <MermaidDiagram
@@ -4738,12 +4681,10 @@ export default function Page() {
               className={["ti", "ti-book-2", styles["callout-icon"]].join(" ")}
               aria-hidden="true"
             ></i>{" "}
-            <div className={[styles["callout-body"]].join(" ")}>
+            <div className={styles["callout-body"]}>
               {" "}
-              <p className={[styles["callout-title"]].join(" ")}>
-                {"このセクションで登場した用語"}
-              </p>{" "}
-              <ul className={[styles["glossary-list"]].join(" ")}>
+              <p className={styles["callout-title"]}>{"このセクションで登場した用語"}</p>{" "}
+              <ul className={styles["glossary-list"]}>
                 {" "}
                 <li>
                   <strong>{"LLM"}</strong>
@@ -4776,7 +4717,7 @@ export default function Page() {
             </div>{" "}
           </div>{" "}
         </section>{" "}
-        <section id="sec-19" className={[styles.chapter].join(" ")}>
+        <section id="sec-19" className={styles.chapter}>
           {" "}
           <h2 id="sec-19-heading">{"19. 学習ロードマップと確認問題"}</h2>{" "}
           <div
@@ -4788,7 +4729,7 @@ export default function Page() {
               className={["ti", "ti-bulb", styles["callout-icon"]].join(" ")}
               aria-hidden="true"
             ></i>{" "}
-            <div className={[styles["callout-body"]].join(" ")}>
+            <div className={styles["callout-body"]}>
               {
                 " この章では、ここまでの内容を、実際の学習の進め方と、理解度の確認問題にまとめます。 "
               }
@@ -4877,12 +4818,10 @@ export default function Page() {
               className={["ti", "ti-book-2", styles["callout-icon"]].join(" ")}
               aria-hidden="true"
             ></i>{" "}
-            <div className={[styles["callout-body"]].join(" ")}>
+            <div className={styles["callout-body"]}>
               {" "}
-              <p className={[styles["callout-title"]].join(" ")}>
-                {"このセクションで登場した用語"}
-              </p>{" "}
-              <ul className={[styles["glossary-list"]].join(" ")}>
+              <p className={styles["callout-title"]}>{"このセクションで登場した用語"}</p>{" "}
+              <ul className={styles["glossary-list"]}>
                 {" "}
                 <li>
                   <strong>{"ロードマップ"}</strong>
@@ -4892,7 +4831,7 @@ export default function Page() {
             </div>{" "}
           </div>{" "}
         </section>{" "}
-        <section id="sec-20" className={[styles.chapter].join(" ")}>
+        <section id="sec-20" className={styles.chapter}>
           {" "}
           <h2 id="sec-20-heading">{"20. 参考文献・根拠となるソース URL"}</h2>{" "}
           <div
@@ -4904,7 +4843,7 @@ export default function Page() {
               className={["ti", "ti-bulb", styles["callout-icon"]].join(" ")}
               aria-hidden="true"
             ></i>{" "}
-            <div className={[styles["callout-body"]].join(" ")}>
+            <div className={styles["callout-body"]}>
               {
                 " この章では、本ガイドの根拠にした情報源の URL を、種類別にまとめます。確認日はすべて2026年9月21日です。 "
               }
@@ -5460,12 +5399,10 @@ export default function Page() {
               className={["ti", "ti-book-2", styles["callout-icon"]].join(" ")}
               aria-hidden="true"
             ></i>{" "}
-            <div className={[styles["callout-body"]].join(" ")}>
+            <div className={styles["callout-body"]}>
               {" "}
-              <p className={[styles["callout-title"]].join(" ")}>
-                {"このセクションで登場した用語"}
-              </p>{" "}
-              <ul className={[styles["glossary-list"]].join(" ")}>
+              <p className={styles["callout-title"]}>{"このセクションで登場した用語"}</p>{" "}
+              <ul className={styles["glossary-list"]}>
                 {" "}
                 <li>
                   {" "}
@@ -5480,7 +5417,7 @@ export default function Page() {
             </div>{" "}
           </div>{" "}
         </section>{" "}
-        <footer className={[styles.footer].join(" ")}>
+        <footer className={styles.footer}>
           {" "}
           <p>
             {
@@ -5491,7 +5428,7 @@ export default function Page() {
       </main>{" "}
       <button
         id="back-to-top"
-        className={[styles["back-to-top"]].join(" ")}
+        className={styles["back-to-top"]}
         aria-label="ページ上部に戻る"
         type="button"
       >
