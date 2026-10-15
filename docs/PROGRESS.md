@@ -10,7 +10,7 @@
 
 - **フェーズ**: 保守・機能改善・品質強化フェーズ
 - **ブランチ**: `dev`
-- **最新実装 HEAD**: `631b0d87`（Knowledge Graphs and LLMs in Action移行。Red `8dc7ffdd` → Green `93a028d7` → Refactor `631b0d87`。監査形式対応は Red `274d72d8` → Green `9e0d4b45`）
+- **最新実装 HEAD**: `797947d4`（Knowledge Graphs and LLMs in Actionの目次CSS競合・スクロール追従修正。Red `25f1d505` → Green `6e36150c` → Refactor `797947d4`）
 - **次の作業**: `/books/knowledge-graphs-and-llms-in-action` の目視確認（ユーザー担当。開発サーバーはポート3002）。既存の Hands-On LLM／Enterprise RAG の目視確認もユーザー担当のまま。npm・ビルドは禁止、スクレイパー検証は今回対象外。
 - **ルート実数**: `page.tsx` 92 件、registry 93 エントリ（RSS の `/rss.xml` を含む）。全ルート登録・ナビ導出テストは合格。
 - **動作検証**:
@@ -18,13 +18,20 @@
   - `bun run typecheck` ✅（`tsc --noEmit`。2026-10-15 実測）
   - `bun run lint` ✅（Biome check / 553 files / 0 diagnostics。2026-10-15 実測）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: Node 24で `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000` を実行し、Vitest **201 files / 2030 tests すべて合格**（2026-10-15 実測）。整理後の対象44契約、typecheck・lint（553 files／0 diagnostics）・Knowledge Graphs and LLMs in ActionのHTML原本監査exit 0・監査スクリプト38件も成功。
-    - 今回の開始時ベースラインは **199 files / 1986 tests**。既存環境の `localStorage` 問題を避ける実行時オプションを継続使用し、依存・設定ファイルは変更していない。
+  - **フロントエンド (`web-next/`)**: Node 24で `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000` を実行し、Vitest **201 files / 2039 tests すべて合格**（2026-10-15 実測）。修正後の対象53契約、typecheck・lint（553 files／0 diagnostics）・Knowledge Graphs and LLMs in ActionのHTML原本監査exit 0・監査スクリプト38件も成功。
+    - 今回のサイドバー修正前のベースラインは **201 files / 2030 tests**。既存環境の `localStorage` 問題を避ける実行時オプションを継続使用し、依存・設定ファイルは変更していない。
     - `load(sourceHtml)` をモジュール初期化時に呼ぶ `governance/ai-governance/GuideContent.tsx` と
       `local-llm/finetuning-best-practices/GuideContent.tsx` は、import スモークでも読み込み可能であることを確認済み
   - **バックエンド (`scraper/`)**: 今回はユーザー指定で検証対象外。実行していない。過去の成功記録は104件（2026-10-04）であり、今回の実測値ではない。
 
 ## 最近の追加内容
+
+- **Knowledge Graphs and LLMs in ActionのサイドバーCSS・スクロール追従修正（2026-10-15）**:
+  - `.layout a`／`.layout a:hover` の詳細度が元の目次クラスを上回り、通常リンクの灰色とホバー時の装飾を上書きしていた。原本CSSの固定オラクルは変更せず、サイドバー内へ限定した詳細度の高い補正で、通常・ホバー・アクティブの原本色と下線なしを復元した。CSS変数だけを固定パレットへ置換し、jsdomのCSSエンジンで実際のカスケードを検証する2契約を追加。
+  - 原本の重複ID解消後は監視対象が長いsectionから短い見出しへ変わり、狭いIntersectionObserver帯域を飛び越すスクロールでは更新が起きなかった。スクロール・リサイズ・初期表示時に見出しのviewport座標をアンカー余白（ヘッダー高＋80px）と比較して現在位置を決定する。交差通知も同じ再計算を使い、通知順に依存しない。アクティブクラスと `aria-current` を同期する。
+  - 大きな上下移動、見出し間の保持、次の親セクションへの遷移、途中位置での初期表示、リサイズ、IntersectionObserver非対応、通知順、イベント解除の7操作契約を追加。追加9件が修正前に失敗し、修正後は33ページ契約＋20操作契約の全53件成功。現在位置が変わらない場合のDOM属性更新も省く。
+  - 全体Vitest **201 files / 2039 tests**、typecheck・lint（553 files／0 diagnostics）、HTML原本監査exit 0が成功。操作処理のV8カバレッジは行100%・関数100%・分岐85.71%。カバレッジ計測時だけ既述の一時ローダーを使用し、依存・設定は変更していない。
+  - 分離履歴: Red `25f1d505` → Green `6e36150c` → Refactor `797947d4`。CSSキャッシュを退避し、同リポジトリの既存開発サーバーがポート3002で更新後のCSSとHTTP 200を返すことを確認。目視はユーザー担当。npm・ビルドは未実行。
 
 - **Knowledge Graphs and LLMs in Action完全ガイドの移行（2026-10-15）**:
   - `/books/knowledge-graphs-and-llms-in-action` に全1 H1・14 H2・36 H3・44 H4・80段落・53リスト／157項目・31表／195行・14コード例・18 Mermaid図解・14引用・18折りたたみ・46根拠バッジをPure JSXで転写。参考文献22リンクを含む本文23リンク、目次24リンク、フッターも原本から固定した期待値と照合する。
@@ -406,12 +413,12 @@
 
 ```text
 AGENTS.md → CODEX.md → CLAUDE.md → docs/PROGRESS.md → Phase A–F 計画の順で読む。
-最新実装 HEAD: 631b0d87（Knowledge Graphs and LLMs in Action移行。Red: 8dc7ffdd、Green: 93a028d7、Refactor: 631b0d87）
+最新実装 HEAD: 797947d4（Knowledge Graphs and LLMs in Action目次修正。Red: 25f1d505、Green: 6e36150c、Refactor: 797947d4）
 次の作業: /books/knowledge-graphs-and-llms-in-action の目視確認（リストの点・番号、コピー、折りたたみ、18図解、960px前後の目次配置。ユーザー担当）。開発サーバーはポート3002。
 Hands-On LLM／Enterprise RAGの目視確認も引き続きユーザー担当。
 Knowledge-graphs-and-llms-in-action-guide.html は archive/html/books/、Markdown は archive/md/books/ に内容無変更で退避保存済み。
 指定HTMLの原本監査exit 0、18図解はMermaid 10.9.8の構文解析成功。Markdownには異なる記述があるため期待値へ混ぜない。
-全体 Vitest 201 files / 2030 tests、整理後の44契約、typecheck・lint（553 files / 0 diagnostics）が成功。監査テスト38件成功。pytestは今回対象外。
+全体 Vitest 201 files / 2039 tests、修正後の53契約、typecheck・lint（553 files / 0 diagnostics）が成功。監査テスト38件成功。pytestは今回対象外。
 この実行環境ではNode 24で NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000 を使用する。
 原本の期待値を移植先に合わせて変更しない。指定HTMLが正本。
 全列左寄せ、コードインデント、アンカー見出しめり込み防止を徹底。今回のMermaidは原本どおりdarkテーマと暗色変数を保持する。

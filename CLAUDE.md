@@ -10,6 +10,13 @@ AIモデルの時間別コスト計算機 + AI ツール導入ガイド群。Pyt
 
 ## アーキテクチャ
 
+同ページのサイドバー保守（2026-10-15）: `.layout a` の詳細度が目次の通常色・ホバー装飾を上書きする
+競合をページ内で補正。CSSエンジンによるカスケード2契約とスクロール操作7契約を追加し、
+原本の固定期待値を変えず計53契約で検証する。短い見出しの交差通知を取りこぼす問題は、
+スクロール・リサイズ・初期表示時のviewport座標による位置判定で修正。通知順にも依存しない。
+全体Vitest **201 files / 2039 tests**、typecheck・lint（553 files／0 diagnostics）・原本監査exit 0が成功。
+npm・ビルドは未実行、目視はユーザー担当。
+
 推薦書籍 `/books/knowledge-graphs-and-llms-in-action` を追加（2026-10-15）。指定HTMLの全95見出し・
 80段落・53リスト／157項目・31表／195行・14コード例・18 Mermaid図解・14引用・18折りたたみ・
 46根拠バッジをPure JSXへ転写。31ページ契約と13操作契約で本文・構造・CSS・コピー・目次追従を照合する。
@@ -402,7 +409,7 @@ Build:     cd web-next && bun run build
 以下を全て確認してからコミットすること：
 
 1. `cd web-next && bun run build` が成功（※Antigravityサンドボックス環境では実行禁止。他環境やCIでは必須）
-2. `cd web-next && bun run test` が完全に成功（201 files / 2030 tests pass、2026-10-15実測。Node 24で `NODE_OPTIONS=--no-experimental-webstorage` と `--maxWorkers=1 --testTimeout=30000` を使用。収集失敗もブロッキング失敗として原因を調査する）
+2. `cd web-next && bun run test` が完全に成功（201 files / 2039 tests pass、2026-10-15実測。Node 24で `NODE_OPTIONS=--no-experimental-webstorage` と `--maxWorkers=1 --testTimeout=30000` を使用。収集失敗もブロッキング失敗として原因を調査する）
 3. `cd web-next && bun run typecheck` が成功
 4. `cd web-next && bun run lint` が成功
 5. `cd scraper && uv run pytest` が成功

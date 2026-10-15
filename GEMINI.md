@@ -15,6 +15,11 @@ GEMINI.md は Gemini CLI / Gemini Code Assist 向けの入り口。
 @./CLAUDE.md
 @docs/PROGRESS.md
 
+2026-10-15 の同ページ保守で、サイドバーのCSS詳細度競合とスクロール追従の取りこぼしを修正。
+原本の固定期待値を変えず9契約を追加し、対象53契約・全体Vitest **201 files／2039 tests**、
+typecheck・lint（553 files／0 diagnostics）・原本監査exit 0が成功。npm・ビルドは未実行。
+目視確認はユーザー担当（ポート3002）。原因と分離履歴は `docs/PROGRESS.md` を参照。
+
 2026-10-15 に `/books/knowledge-graphs-and-llms-in-action` を推薦書籍へ追加。
 指定HTMLの95見出し・53リスト・31表・14コード例・18図解を含む本文とCSSを固定期待値で照合する。
 31ページ契約と13操作契約を追加し、HTML監査exit 0、全体Vitest **201 files／2030 tests**、
@@ -126,7 +131,7 @@ Vitest 185 files／1779 tests、typecheck・lint・pytest 104件が成功。復�
 ## 検証コマンド
 
 ```bash
-(cd web-next && NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000) # Node 24 / 201 files / 2030 tests pass（2026-10-15 実測）
+(cd web-next && NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000) # Node 24 / 201 files / 2039 tests pass（2026-10-15 実測）
 (cd web-next && bun run typecheck)   # OK（2026-10-15 実測）
 # ビルドは今回ユーザー指定で未実行（過去: 2026-09-18 に89静的ページ生成）
 (cd web-next && bun run lint)        # OK（553 files / 0 diagnostics。2026-10-15 実測）
