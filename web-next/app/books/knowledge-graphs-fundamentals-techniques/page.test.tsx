@@ -29,7 +29,14 @@ const dir = "app/books/knowledge-graphs-fundamentals-techniques";
 const normalize = (value: string) => value.replace(/\s+/g, " ").trim();
 const text = (element: Element) => normalize(element.textContent ?? "");
 const nodes = (root: ParentNode, selector: string) => Array.from(root.querySelectorAll(selector));
-const main = () => render(<Page />).container.querySelector("main") as HTMLElement;
+// Additive study aids are verified in ReviewSections.test.tsx; preserve the frozen original oracle here.
+const main = () => {
+  const root = render(<Page />).container.querySelector("main") as HTMLElement;
+  nodes(root, "[data-study-addition]").forEach((element) => {
+    element.remove();
+  });
+  return root;
+};
 const cssNorm = (s: string) =>
   normalize(s)
     .replace(/'/g, '"')
