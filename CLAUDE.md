@@ -17,11 +17,11 @@ AIモデルの時間別コスト計算機 + AI ツール導入ガイド群。Pyt
 原本の300px固定常駐目次、スクロール連動ハイライト、表の全列左寄せ、アンカー移動の見出しめり込み防止を保持。
 全12箇所のMermaid図解に原本準拠のライトテーマ変数を反映し、classDef明色テキストの保護でコントラストを復元。
 サイト全体の13pxベースと調和するようH1・見出し・目次・ベースフォント（15px）を上品に最適化。
-チェックリスト10項目の進捗カウンター連動（0/10）を実装。
+チェックリスト10項目の進捗カウンター連動（0/10）およびクリック連動・取り消し線スタイルを修復。
 共有クロームの補正（globals.css集約: ヘッダー・免責バナー不透明化、鮮度バー非表示、共通フッターの白背景・300pxオフセット）を適用。
 HTML／Markdownはarchive/html/books/／archive/md/books/へ内容無変更で保存（SHA-256一致）。
-全体Vitest **208 files / 2149 tests**、対象26契約、typecheck・lint（572 files / 0 diagnostics）が成功。
-分離履歴: 移行 Red `908a6769` → Green `0170db70` → Refactor `927a9174`、改善 Red `b20dfcb1` → Green `d8a8b268`。
+全体Vitest **208 files / 2150 tests**、対象27契約、typecheck・lint（572 files / 0 diagnostics）が成功。
+分離履歴: 移行 Red `908a6769` → Green `0170db70` → Refactor `927a9174`、改善 Red `b20dfcb1` → Green `d8a8b268`、チェックリスト修正 Red `cd400014` → Green `8adaec5b` → Refactor `5fe96d4b`。
 npm・ビルドは未実行、目視確認はユーザー担当（ポート3000/3001）。
 
 推薦書籍 `/books/langchain-in-your-pocket` を追加（2026-10-15）。

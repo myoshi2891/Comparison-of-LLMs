@@ -10,21 +10,37 @@
 
 - **フェーズ**: 保守・機能改善・品質強化フェーズ
 - **ブランチ**: `dev`
-- **最新実装 HEAD**: `d8a8b268`（Reliable Machine Learning ガイドのタイポグラフィ最適化・Mermaidコントラスト修復・共有クローム完全統合。移行 Red `908a6769` → Green `0170db70` → Refactor `927a9174`、改善 Red `b20dfcb1` → Green `d8a8b268`）
-- **次の作業**: `/books/reliable-machine-learning` の目視確認（ユーザー担当。ポート3000/3001）。12箇所の Mermaid 図解（ライトテーマ・コントラスト保護）、300px 固定常駐目次サイドバー、テーブルの左寄せ、チェックリスト（10項目）の進捗カウンター連動、白背景と調和した共通フッター、不透明ヘッダー・免責バナー、モバイル表示を確認する。既存ページ全体の目視も引き続きユーザー担当。npm・ビルドは禁止。
+- **最新実装 HEAD**: `5fe96d4b`（Reliable Machine Learning ガイドの学習チェックリスト連動・カウンター更新・取り消し線スタイルの修復。移行 Red `908a6769` → Green `0170db70` → Refactor `927a9174`、改善 Red `b20dfcb1` → Green `d8a8b268`、チェックリスト修正 Red `cd400014` → Green `8adaec5b` → Refactor `5fe96d4b`）
+- **次の作業**: `/books/reliable-machine-learning` の目視確認（ユーザー担当。ポート3000/3001）。12箇所の Mermaid 図解（ライトテーマ・コントラスト保護）、300px 固定常駐目次サイドバー、テーブルの左寄せ、学習チェックリスト（10項目）のチェックボックスON/OFF連動（右上の進捗バッジ 0/10〜10/10 リアルタイム更新、チェック項目の line-through 取り消し線スタイル反映）、白背景と調和した共通フッター、不透明ヘッダー・免責バナー、モバイル表示を確認する。既存ページ全体の目視も引き続きユーザー担当。npm・ビルドは禁止。
 - **ルート実数**: `page.tsx` 95 件、registry 96 エントリ（RSS の `/rss.xml` を含む）。全ルート登録・ナビ導出テストは合格。
 - **動作検証**:
   - ビルド: 今回はユーザー指定で未実行。過去の成功記録は 2026-09-17 の 90 静的ページであり、今回の変更を検証した値ではない。
   - `bun run typecheck` ✅（`tsc --noEmit`。2026-10-15 実測）
   - `bun run lint` ✅（Biome check / 572 files / 0 diagnostics。2026-10-15 実測）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000` でVitest **208 files / 2149 tests すべて合格**（2026-10-15 実測）。対象26契約（22ページ契約 + 4操作契約）、typecheck・lint（0 diagnostics）、HTML原本監査exit 0が成功。
-    - 今回の開始時は対象26契約が成功、直前の全体検証は **208 files / 2146 tests**、開始HEADは `927a9174`。依存・設定・ロック・アーカイブ原本・既存の固定期待値は変更していない。
+  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000` でVitest **208 files / 2150 tests すべて合格**（2026-10-15 実測）。対象27契約（22ページ契約 + 5操作契約）、typecheck・lint（0 diagnostics）、HTML原本監査exit 0が成功。
+    - 今回の開始時は対象26契約が成功、直前の全体検証は **208 files / 2149 tests**、開始HEADは `0fbf1a72`。依存・設定・ロック・アーカイブ原本・既存の固定期待値は変更していない。
     - `load(sourceHtml)` をモジュール初期化時に呼ぶ `governance/ai-governance/GuideContent.tsx` と
       `local-llm/finetuning-best-practices/GuideContent.tsx` は、import スモークでも読み込み可能であることを確認済み
   - **バックエンド (`scraper/`)**: 今回はユーザー指定で検証対象外。実行していない。過去の成功記録は104件（2026-10-04）であり、今回の実測値ではない。
 
 ## 最近の追加内容
+
+- **Reliable Machine Learning 学習チェックリスト連動バグ修正（2026-10-15）**:
+  - `/books/reliable-machine-learning` の第13章「学習チェックリスト」において、チェックボックスをクリックしても右上の進捗カウンター（`.checklist-done` / `0/10`）が更新されず、取り消し線（`line-through`）スタイルも反映されない問題を精査・修正。
+  - **根本原因**:
+    1. `TocObserver.tsx` が `.checklist-card` クラス名で DOM クエリを行っていたが、`page.tsx` で CSS Modules クラス名（`styles.checklistCard`）のみ付与されておりハッシュ化されたクラス名になっていたため、要素取得結果が空配列になりイベントリスナーが未登録となっていた。
+    2. チェックボックスの完了スタイルが CSS Modules の `:has(.checklistCheckbox:checked)` に依存していたため、フォールバックの `done` クラスおよび `input[type="checkbox"]:checked` セレクタが欠如していた。
+  - **修正内容**:
+    1. `TocObserver.tsx` で `styles.checklistCard` と `.checklist-card`、`styles.checklistCheckbox` と `.checklist-checkbox`、`styles.checklistDone` と `.checklist-done` の両セレクタに対応。チェック時に親 `li` に `styles.done` および `done` クラスをトグル付与。
+    2. `page.tsx` のチェックリスト要素に CSS Modules クラス（`styles.*`）と原本クラス名（`checklist-card`, `checklist-header`, `checklist-counter`, `checklist-done`, `checklist-list`, `checklist-item`, `checklist-checkbox`, `checklist-text`）を併記。
+    3. `page.module.css` に `.checklistItem:has(input[type="checkbox"]:checked) .checklistText`, `.checklistItem.done .checklistText`, `.checklistItem:global(.done) .checklistText` を追加し、二重三重の耐障害性を確保。
+  - **検証証跡**:
+    - 原本照合監査スクリプト `audit_source_parity.mjs` で **`exit=0`** を維持。
+    - ユニットテスト `TocObserver.test.tsx` に O-5（CSS Modules レンダリング時のチェックリスト連動契約）を追加し、Red（`cd400014`）→ Green（`8adaec5b`）→ Refactor（`5fe96d4b`）の TDD Mandatory Cycle を完遂。
+    - `page.test.tsx` の D-10 テストを強化し原本クラス名と CSS Modules クラス名の両方を検証。
+    - ブラウザサブエージェント（Chromium）による実機検証で、チェックボックスのクリック連動（0/10 → 3/10）および取り消し線（line-through）のスタイル適用を目視確認（スクショ: `checklist_badge_3_of_10`）。
+    - 全体テスト: **208 files / 2150 tests すべて合格**。`tsc --noEmit` および Biome check も 0 diagnostics で成功。
 
 - **Reliable Machine Learning 初学者向け完全ガイドの移行とデザイン・コントラスト改善（2026-10-15）**:
   - Cathy Chen, Niall Richard Murphy, Kranti Parisa, D. Sculley, Todd Underwood著『Reliable Machine Learning: Applying SRE Principles to ML in Production』を土台とした初学者向け完全ガイドを `/books/reliable-machine-learning` に Pure JSX へ完全転写。
