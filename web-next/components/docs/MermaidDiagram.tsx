@@ -357,7 +357,15 @@ export default function MermaidDiagram({
                 themeVariables?.primaryTextColor ?? (theme === "dark" ? "#e2e8f0" : "#000000");
               tempEl.querySelectorAll("foreignObject *").forEach((el) => {
                 const htmlElement = el as HTMLElement;
-                htmlElement.style.setProperty("color", textColor, "important");
+                const parentNode = htmlElement.closest(".node");
+                const hasCustomClass =
+                  parentNode &&
+                  Array.from(parentNode.classList).some(
+                    (cls) => cls !== "node" && cls !== "default"
+                  );
+                if (!hasCustomClass) {
+                  htmlElement.style.setProperty("color", textColor, "important");
+                }
                 htmlElement.style.setProperty("line-height", "1.2", "important");
               });
 

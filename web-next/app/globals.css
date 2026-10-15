@@ -1788,3 +1788,58 @@ body:has([data-page="langchain-in-your-pocket"]) nav[aria-label="関連ページ
   }
 }
 
+/* /books/reliable-machine-learning: 共有クローム（body / 日付バー / 関連ページ）を
+   ページ固有の固定サイドバー（300px）と白背景（#ffffff）に合わせる。 */
+body:has([data-page="reliable-machine-learning"]).has-common-header,
+body:has([data-page="reliable-machine-learning"]) {
+  margin-top: calc(var(--ch-height, 60px) + var(--ch-disclaimer-height, 0px)) !important;
+  background: #ffffff !important;
+}
+body:has([data-page="reliable-machine-learning"]) .ch-nav {
+  background-color: #0d1117 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+body:has([data-page="reliable-machine-learning"]) .ch-disclaimer {
+  background: #1a1712 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+body:has([data-page="reliable-machine-learning"]) #site-freshness-bar {
+  display: none !important;
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+body:has([data-page="reliable-machine-learning"]) nav[aria-label="関連ページ"] {
+  box-sizing: border-box !important;
+  margin-left: 300px !important;
+  margin-right: 0 !important;
+  margin-top: 0 !important;
+  max-width: none !important;
+  width: calc(100% - 300px) !important;
+  padding-left: 3.2rem !important;
+  padding-right: 3.2rem !important;
+  padding-bottom: 4rem !important;
+  background: #ffffff !important;
+  --line: #d3dae6;
+  --card: #f5f7fb;
+  --fg: #16213d;
+  --muted: #4c5972;
+  --accent: #2f56c8;
+}
+body:has([data-page="reliable-machine-learning"]) nav[aria-label="関連ページ"] a:hover {
+  border-color: #2f56c8 !important;
+  box-shadow: 0 4px 14px rgba(47, 86, 200, 0.12) !important;
+}
+@media (max-width: 900px) {
+  body:has([data-page="reliable-machine-learning"]) nav[aria-label="関連ページ"] {
+    width: 100% !important;
+    margin-left: 0 !important;
+    padding-left: 1.2rem !important;
+    padding-right: 1.2rem !important;
+  }
+}
+
+
