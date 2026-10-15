@@ -473,7 +473,7 @@
 .layout :global(summary::before) {
   content: "\ea61";
   /* biome-ignore lint/a11y/useGenericFontNames: exact icon font; fallback glyphs would change the accordion icon. */
-  font-family: "tabler-icons";
+  font-family: "tabler-icons"; /* NOSONAR: 原本固定のアイコンフォント指定（契約テストで照合） */
   font-size: 16px;
   transition: none;
   flex-shrink: 0;

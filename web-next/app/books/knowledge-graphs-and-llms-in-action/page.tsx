@@ -1816,7 +1816,7 @@ export default function Page() {
                         {" が "}
                         <code>
                           <a
-                            href="http://purl.obolibrary.org/obo/HP_"
+                            href="http://purl.obolibrary.org/obo/HP_" // NOSONAR: RDF の URI 接頭辞（原本どおり）
                             target="_blank"
                             rel="noopener noreferrer"
                           >

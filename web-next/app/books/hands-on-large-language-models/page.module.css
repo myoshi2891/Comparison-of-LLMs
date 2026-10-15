@@ -36,22 +36,11 @@
   min-height: 100vh;
 }
 
-/* グローバル黒帯鮮度バーの非表示（ヒーロー直結）と body マージン補正 */
+/* body・日付バー・関連ページの共有クローム補正は globals.css が担当する。
+   ここでは .layout の兄弟である .sidebarToggle が参照する変数のみ body 側に定義する。 */
 :global(body:has([data-page="hands-on-large-language-models"])) {
-  --sidebar-w: 340px;
-  /* .layout の兄弟である .sidebarToggle からも参照できるよう body 側にも定義する */
   --panel: #0d1a2e;
   --text: #dbe4f5;
-  background: #07111e !important;
-  margin-top: calc(var(--ch-height, 60px) + var(--ch-disclaimer-height, 0px)) !important;
-}
-
-:global(body:has([data-page="hands-on-large-language-models"]) #site-freshness-bar) {
-  display: none !important;
-  height: 0 !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  overflow: hidden !important;
 }
 
 /* ---------- Sidebar ---------- */
@@ -483,13 +472,6 @@ p.disclaimer em,
   text-decoration: underline;
 }
 
-/* ---------- 関連ページフッターのオフセット ---------- */
-:global(body:has([data-page="hands-on-large-language-models"]))
-  :global(nav[aria-label="関連ページ"]) {
-  margin-left: 340px;
-  width: calc(100% - 340px);
-}
-
 /* ---------- Responsive ---------- */
 @media (max-width: 900px) {
   .sidebar {
@@ -510,10 +492,5 @@ p.disclaimer em,
   }
   .sidebarBrand {
     padding-left: 66px;
-  }
-  :global(body:has([data-page="hands-on-large-language-models"]))
-    :global(nav[aria-label="関連ページ"]) {
-    margin-left: 0;
-    width: 100%;
   }
 }
