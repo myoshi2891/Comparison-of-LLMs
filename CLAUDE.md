@@ -13,14 +13,16 @@ AIモデルの時間別コスト計算機 + AI ツール導入ガイド群。Pyt
 推薦書籍 `/books/langchain-in-your-pocket` を追加（2026-10-15）。
 指定HTMLの全1 H1・19 H2・37 H3・55段落・8リスト項目・9表67行・18コード例・
 12 Mermaid図解・16 callout・41外部リンクをPure JSXへ完全転写。
-21ページ契約と4操作契約で原本照合し、HTML原本監査exit 0を確認。
+26ページ契約と4操作契約で原本照合し、HTML原本監査exit 0を確認。
 原本の320px固定目次、スクロール連動ハイライト、表の全列左寄せ、コードの行構造化インデント、
-アンカー移動の見出しめり込み防止を保持。共有クロームの補正（鮮度バー非表示、白背景、
-関連ページフッターの340pxオフセット）を適用。
+アンカー移動の見出しめり込み防止を保持。
+全18コードブロックに highlight.js 11.9.0（atom-one-dark）による静的トークン化を適用。
+全12箇所のMermaid図解に原本準拠のダークテーマ変数（lineColor/borderColor: #3b5b8c 等）を反映。
+共有クロームの補正（鮮度バーの右寄せとヒーロー背景色同期、共通フッターの288px !important オフセット）を適用。
 HTML／Markdownはarchive/html/books/／archive/md/books/へ内容無変更で保存（SHA-256一致）。
-全体Vitest **206 files / 2118 tests**、対象25契約、typecheck・lint（0 diagnostics）が成功。
-分離履歴: Red `12ebd87c` → Green `a9f19779` → Refactor `5f681c9a`。
-npm・ビルドは未実行、目視確認はユーザー担当（ポート3000）。
+全体Vitest **206 files / 2123 tests**、対象30契約、typecheck・lint（0 diagnostics）が成功。
+分離履歴: 移行 Red `12ebd87c` → Green `a9f19779` → Refactor `5f681c9a`、改善 Red `1d3e8a51` → Green `37f72143` → Red `ec013559` → Green `4c860e6e`。
+npm・ビルドは未実行、目視確認はユーザー担当（ポート3001）。
 
 推薦書籍 `/books/knowledge-graphs-fundamentals-techniques` を追加（2026-10-15）。
 指定HTMLの全22 H2・121 H3・190段落・32リスト／129項目・40表／195行・9コード例・
@@ -444,7 +446,7 @@ Build:     cd web-next && bun run build
 以下を全て確認してからコミットすること：
 
 1. `cd web-next && bun run build` が成功（※Antigravityサンドボックス環境では実行禁止。他環境やCIでは必須）
-2. `cd web-next && bun run test` が完全に成功（206 files / 2118 tests pass、2026-10-15実測。`NODE_OPTIONS=--no-experimental-webstorage` と `--maxWorkers=1 --testTimeout=30000` を使用。収集失敗もブロッキング失敗として原因を調査する）
+2. `cd web-next && bun run test` が完全に成功（206 files / 2123 tests pass、2026-10-15実測。`NODE_OPTIONS=--no-experimental-webstorage` と `--maxWorkers=1 --testTimeout=30000` を使用。収集失敗もブロッキング失敗として原因を調査する）
 3. `cd web-next && bun run typecheck` が成功
 4. `cd web-next && bun run lint` が成功
 5. `cd scraper && uv run pytest` が成功

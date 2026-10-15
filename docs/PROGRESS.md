@@ -10,35 +10,35 @@
 
 - **フェーズ**: 保守・機能改善・品質強化フェーズ
 - **ブランチ**: `dev`
-- **最新実装 HEAD**: `5f681c9a`（LangChain in your Pocket完全読解ガイドの移行。Red `12ebd87c` → Green `a9f19779` → Refactor `5f681c9a`）
-- **次の作業**: `/books/langchain-in-your-pocket` の目視確認（ユーザー担当。ポート3000）。Mermaid図解の描画、320px固定目次のスクロール追従、テーブルの左寄せ、コードブロックのインデント、外部リンク、モバイル表示を確認する。既存ページ全体の目視も引き続きユーザー担当。npm・ビルドは禁止。
+- **最新実装 HEAD**: `4c860e6e`（LangChain in your Pocket完全読解ガイドの移行とスタイリング・構文ハイライト改善。移行Red `12ebd87c` → Green `a9f19779` → Refactor `5f681c9a`、改善Red `1d3e8a51` → Green `37f72143` → Red `ec013559` → Green `4c860e6e`）
+- **次の作業**: `/books/langchain-in-your-pocket` の目視確認（ユーザー担当。ポート3001）。Mermaid図解のダークテーマ描画、コードブロックのシンタックスハイライト、鮮度バーの右寄せとヒーロー背景同期、共通フッターの重なり解消、320px固定目次のスクロール追従、テーブルの左寄せ、外部リンク、モバイル表示を確認する。既存ページ全体の目視も引き続きユーザー担当。npm・ビルドは禁止。
 - **ルート実数**: `page.tsx` 94 件、registry 95 エントリ（RSS の `/rss.xml` を含む）。全ルート登録・ナビ導出テストは合格。
 - **動作検証**:
   - ビルド: 今回はユーザー指定で未実行。過去の成功記録は 2026-09-17 の 90 静的ページであり、今回の変更を検証した値ではない。
   - `bun run typecheck` ✅（`tsc --noEmit`。2026-10-15 実測）
-  - `bun run lint` ✅（Biome check / 562 files / 0 diagnostics。2026-10-15 実測）
+  - `bun run lint` ✅（Biome check / 567 files / 0 diagnostics。2026-10-15 実測）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000` でVitest **206 files / 2118 tests すべて合格**（2026-10-15 実測）。対象25契約、typecheck・lint（0 diagnostics）、HTML原本監査exit 0が成功。
-    - 今回の開始時は対象25契約が成功、直前の全体検証は **204 files / 2093 tests**、開始HEADは `909335c5`。依存・設定・ロック・アーカイブ原本・既存の固定期待値は変更していない。
+  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000` でVitest **206 files / 2123 tests すべて合格**（2026-10-15 実測）。対象30契約（26ページ契約 + 4操作契約）、typecheck・lint（0 diagnostics）、HTML原本監査exit 0が成功。
+    - 今回の開始時は対象30契約が成功、直前の全体検証は **206 files / 2118 tests**、開始HEADは `5f681c9a`。依存・設定・ロック・アーカイブ原本・既存の固定期待値は変更していない。
     - `load(sourceHtml)` をモジュール初期化時に呼ぶ `governance/ai-governance/GuideContent.tsx` と
       `local-llm/finetuning-best-practices/GuideContent.tsx` は、import スモークでも読み込み可能であることを確認済み
   - **バックエンド (`scraper/`)**: 今回はユーザー指定で検証対象外。実行していない。過去の成功記録は104件（2026-10-04）であり、今回の実測値ではない。
 
 ## 最近の追加内容
 
-- **LangChain in your Pocket完全読解ガイドの移行（2026-10-15）**:
+- **LangChain in your Pocket完全読解ガイドの移行とスタイリング・構文ハイライト改善（2026-10-15）**:
   - Mehul Gupta著『LangChain in your Pocket』の全16章を基にした完全読解ガイドを `/books/langchain-in-your-pocket` に Pure JSX へ完全転写。
   - 指定HTML原本 `Langchain-in-your-pocket-guide.html`（SHA-256: `a94d5e02f7ca828f8934c7dd1115d26cefc11e3cf495c7c23a2fb117656c1a8b`）および対応Markdown `Langchain-in-your-pocket-guide.md`（SHA-256: `03a1f5bd728cce99a8565cf60362d3f4a0006ebecee1a29750b72fd9263a3d57`）は内容無変更で `archive/html/books/` および `archive/md/books/` へ `git mv` 退避（移動前後のSHA-256一致）。指定HTMLを正本とする。
   - 原本照合監査スクリプト `audit_source_parity.mjs` で **`exit=0`**（漏れなし）を確認。全1 H1、19 H2、37 H3、55段落、8リスト項目、9表67行、18コードブロック、12 Mermaid図解、16 callout、41外部リンク（原本本文20件＋参考ソース19件＋書籍リンク2件）を100%転写。
-  - スタイリング防犯原則 R2 に準拠：
+  - スタイリング防犯原則 R2 に準拠およびスタイリング・構文ハイライト改善：
     1. 表の全列左寄せ（`:global(th), :global(td)` で `text-align: left !important`）。
-    2. コードブロックの行単位構造化（`<span className="codeLine code-line">`）によるインデントと改行の完全担保。
-    3. 全12箇所の Mermaid 図解に淡色パレット（`theme="base"`, `themeVariables`）を適用し、共有コンポーネント `MermaidDiagram` で遅延描画。
+    2. 全18個のコードブロック（Python 16件、Bash 2件）に原本準拠の highlight.js 11.9.0（atom-one-dark）による静的トークン化（`hljs-keyword`, `hljs-string`, `hljs-comment`, `hljs-built_in` 等）を行単位構造化（`<span className="codeLine code-line">`）のまま適用。
+    3. 全12箇所の Mermaid 図解に原本準拠の暗色パレット（`theme="dark"`、`themeVariables`: `primaryTextColor: "#e8edf5"`, `lineColor: "#3b5b8c"`, `primaryBorderColor: "#3b5b8c"` 等）を適用し、共有コンポーネント `MermaidDiagram` で遅延描画。
     4. 320px 固定目次サイドバーとスクロール連動アクティブハイライト（`TocObserver`）、アンカー移動時のめり込み防止（`scroll-margin-top: calc(var(--header-height, 60px) + var(--ch-disclaimer-height, 0px) + 80px)`）。
-    5. 共通クローム（黒帯鮮度バー非表示、白背景統一、関連ページフッターの340pxオフセットと980px以下全幅化）。
-  - 21件の契約テスト（S-1〜S-4 原本照合、C-1〜C-6 コンテンツ、D-1, D-2, D-5〜D-10 デザイン、Q-1〜Q-3 品質契約）および 4件の TocObserver 操作テストを追加（合計25契約すべて合格）。
-  - 全体テスト: **206 files / 2118 tests すべて合格**。`tsc --noEmit` および Biome check も 0 diagnostics で成功。
-  - 分離履歴: Red `12ebd87c` → Green `a9f19779` → Refactor `5f681c9a`。
+    5. 共有クロームの最適化：鮮度バー（最終確認・公開日）を右寄せにしヒーローセクション背景色（`#0b0f19`）と完全同期、共通フッター（`RelatedPages`）のサイドバー潜り込みを `margin-left: 288px !important` および `width: calc(100% - 288px) !important` で解消（900px以下は全幅復元）。
+  - 26件のページ契約テスト（S-1〜S-4 原本照合、C-1〜C-6 コンテンツ、D-1, D-2, D-5〜D-15 デザイン・テーマ・構文色契約、Q-1〜Q-3 品質契約）および 4件の TocObserver 操作テストを追加（合計30契約すべて合格）。
+  - 全体テスト: **206 files / 2123 tests すべて合格**。`tsc --noEmit` および Biome check も 0 diagnostics で成功。
+  - 分離履歴: 移行 Red `12ebd87c` → Green `a9f19779` → Refactor `5f681c9a`、改善 Red `1d3e8a51` → Green `37f72143` → Red `ec013559` → Green `4c860e6e`。
 
 - **19.2 確認問題・19.3 解答のブラッシュアップ（2026-10-15）**:
   - 元の8問・8解答を全文・順序・番号リストごと保持し、問題カードへテーマ・分野・確認するポイントを追加。解答はHTML標準のdetails／summaryで個別に開閉でき、初期状態では閉じる。追加のJavaScriptや依存は不要。
@@ -443,11 +443,11 @@
 
 ```text
 AGENTS.md → CODEX.md → CLAUDE.md → docs/PROGRESS.md → Phase A–F 計画の順で読む。
-最新実装 HEAD: 5f681c9a（LangChain in your Pocket完全読解ガイド。Red 12ebd87c → Green a9f19779 → Refactor 5f681c9a）
-次の作業: /books/langchain-in-your-pocket の目視確認（ユーザー担当）。開発サーバーはポート3000。
-Mermaid図解12箇所の描画、320px固定目次のスクロール追従、テーブルの左寄せ、コードブロックのインデント、外部リンク、モバイル表示を確認する。
+最新実装 HEAD: 4c860e6e（LangChain in your Pocket完全読解ガイド。移行Red 12ebd87c → Green a9f19779 → Refactor 5f681c9a、改善Red 1d3e8a51 → Green 37f72143 → Red ec013559 → Green 4c860e6e）
+次の作業: /books/langchain-in-your-pocket の目視確認（ユーザー担当）。開発サーバーはポート3001。
+Mermaid図解12箇所のダークテーマ描画、全18コードブロックのシンタックスハイライト、鮮度バー右寄せ・ヒーロー背景同期、共通フッターの重なり解消、320px固定目次のスクロール追従、テーブルの左寄せ、外部リンク、モバイル表示を確認する。
 原本2形式（HTMLおよびMarkdown）はarchive/へ退避済み（SHA-256一致）。
-HTML原本監査exit 0、対象25契約、全体Vitest 206 files / 2118 tests、typecheck・lint（0 diagnostics）が成功。
+HTML原本監査exit 0、対象30契約、全体Vitest 206 files / 2123 tests、typecheck・lint（0 diagnostics）が成功。
 NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000 を使用する。
 共有クロームの補正はglobals.cssへ集約。依存・設定・ロック・監査スクリプトは変更していない。
 サンドボックスではnpmとビルドを実行しない。修正もRed → Green → Refactor → Docsの分離コミットを守る。
