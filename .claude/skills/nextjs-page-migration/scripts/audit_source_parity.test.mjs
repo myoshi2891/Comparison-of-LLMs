@@ -215,6 +215,24 @@ export default function Page() {
 	assert.equal(result.json.mermaidSourcesMatch, true);
 });
 
+test("decodes numeric whitespace references in the class attribute before matching the mermaid token", () => {
+	// &#9; は 1 回の復号でタブになり "mermaid" は独立トークン。
+	// &amp;#9; は 1 回の復号で文字列 "&#9;" になるだけなので図解ではない（二重復号しない）。
+	const source = `<div class="diagram&#9;mermaid">graph TD
+A --> B</div>
+<div class="diagram&amp;#9;mermaid">graph TD
+C --> D</div>`;
+	const page = `const CHART = \`graph TD
+A --> B\`;
+export default function Page() {
+  return <MermaidDiagram chart={CHART} />;
+}`;
+	const result = audit(source, page);
+	assert.deepEqual(result.json.sourceMermaidSources, ["graph TD\nA --> B"]);
+	assert.equal(result.json.mermaidSourcesMatch, true);
+	assert.equal(result.status, 0);
+});
+
 test("does not treat a Markdown Mermaid fence as a normal code block", () => {
 	const source = `Intro paragraph.
 

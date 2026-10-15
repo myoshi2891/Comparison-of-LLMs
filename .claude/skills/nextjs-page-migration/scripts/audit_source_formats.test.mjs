@@ -4,8 +4,9 @@ import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
+import { fileURLToPath } from "node:url";
 
-const script = new URL("./audit_source_parity.mjs", import.meta.url).pathname;
+const script = fileURLToPath(new URL("./audit_source_parity.mjs", import.meta.url));
 function audit(source, page) {
 	const dir = mkdtempSync(join(tmpdir(), "source-formats-"));
 	try {

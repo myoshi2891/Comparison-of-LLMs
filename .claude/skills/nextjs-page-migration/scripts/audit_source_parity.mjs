@@ -409,6 +409,32 @@ function decodeQuotedEntryEscapes(raw) {
 }
 
 /**
+ * Decodes HTML character references in an attribute value in a single pass, including numeric references.
+ *
+ * Each reference is decoded exactly once, so `&amp;#9;` becomes the literal text `&#9;` rather than a tab.
+ * @param {string} raw - The raw attribute value.
+ * @returns {string} The decoded attribute value.
+ */
+function decodeAttributeValue(raw) {
+  return raw.replace(/&(?:#(\d+)|#[xX]([0-9A-Fa-f]+)|[A-Za-z]+);/g, (match, decimal, hex) => {
+    if (decimal === undefined && hex === undefined) return decodeEntities(match);
+    const codePoint = decimal === undefined ? Number.parseInt(hex, 16) : Number(decimal);
+    return codePoint <= 0x10ffff ? String.fromCodePoint(codePoint) : match;
+  });
+}
+
+/**
+ * Determines whether a class attribute value contains the `mermaid` token after decoding it as a browser would.
+ * @param {string} rawClass - The raw class attribute value.
+ * @returns {boolean} True when one of the whitespace-separated class tokens is `mermaid`.
+ */
+function hasMermaidClassToken(rawClass) {
+  return decodeAttributeValue(rawClass)
+    .split(/[\t\n\f\r ]+/)
+    .some((token) => token.toLowerCase() === "mermaid");
+}
+
+/**
  * Extracts Mermaid diagram declarations from HTML in document order.
  * @param {string} src - The complete HTML source.
  * @returns {string[]} Normalized Mermaid diagram sources found in supported HTML containers, scripts, and definitions.
@@ -416,10 +442,15 @@ function decodeQuotedEntryEscapes(raw) {
 function collectHtmlMermaidSources(src) {
   const sources = [];
   const divRe =
-    /<(?:div|pre)\b([^>]*\bclass=["'][^"']*(?<=["'\t\n\f\r ])mermaid(?=["'\t\n\f\r ])[^"']*["'][^>]*)>([\s\S]*?)<\/(?:div|pre)\s*>/gi;
+    /<(?:div|pre)\b([^>]*?\bclass=(["'])([^"']*)\2[^>]*)>([\s\S]*?)<\/(?:div|pre)\s*>/gi;
   let div = divRe.exec(src);
   while (div !== null) {
-    sources.push({ index: div.index, source: normalizeMermaidSource(div[2]) });
+    if (hasMermaidClassToken(div[3])) {
+      sources.push({ index: div.index, source: normalizeMermaidSource(div[4]) });
+    } else {
+      // 非 Mermaid の要素で本文ごと読み飛ばすと、入れ子の Mermaid 図解を見落とす。
+      divRe.lastIndex = div.index + 1;
+    }
     div = divRe.exec(src);
   }
 
