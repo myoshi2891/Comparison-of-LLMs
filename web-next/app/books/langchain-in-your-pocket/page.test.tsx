@@ -1,12 +1,31 @@
 // @vitest-environment jsdom
+import fs from "node:fs";
+import path from "node:path";
 import { render } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import Page, { metadata } from "./page";
 import styles from "./page.module.css";
 
 vi.mock("@/components/docs/MermaidDiagram", () => ({
-  default: ({ chart, id, theme }: { chart: string; id?: string; theme?: string }) => (
-    <div data-testid="mermaid-diagram" data-chart={chart} data-theme={theme} id={id}>
+  default: ({
+    chart,
+    id,
+    theme,
+    themeVariables,
+  }: {
+    chart: string;
+    id?: string;
+    theme?: string;
+    themeVariables?: Record<string, string>;
+  }) => (
+    <div
+      data-testid="mermaid-diagram"
+      data-chart={chart}
+      data-theme={theme}
+      data-has-theme-vars={themeVariables ? "true" : "false"}
+      data-primary-color={themeVariables?.primaryColor}
+      id={id}
+    >
       {chart}
     </div>
   ),
@@ -302,6 +321,31 @@ describe("LangChain in your Pocket guide — source parity and design contracts"
   it("D-10: mounts TocObserver client component", () => {
     render(<Page />);
     expect(tocObserver).toHaveBeenCalled();
+  });
+
+  it("D-11: all 12 Mermaid diagrams use theme='dark' and pass original DIAGRAM_THEME variables", () => {
+    const { container } = render(<Page />);
+    const diagrams = nodes(container, '[data-testid="mermaid-diagram"]');
+    expect(diagrams).toHaveLength(12);
+    for (const diagram of diagrams) {
+      expect(diagram.getAttribute("data-theme")).toBe("dark");
+      expect(diagram.getAttribute("data-has-theme-vars")).toBe("true");
+      expect(diagram.getAttribute("data-primary-color")).toBe("#16233a");
+    }
+  });
+
+  it("D-12: layout root defines data-page='langchain-in-your-pocket' for shared chrome synchronization", () => {
+    const { container } = render(<Page />);
+    const root = container.querySelector('[data-page="langchain-in-your-pocket"]');
+    expect(root).not.toBeNull();
+  });
+
+  it("D-13: globals.css contains matching selector for body:has([data-page='langchain-in-your-pocket']) with dark background and freshness bar offset", () => {
+    const globalsCssPath = path.resolve(process.cwd(), "app/globals.css");
+    const globalsCss = fs.readFileSync(globalsCssPath, "utf-8");
+    expect(globalsCss).toContain('body:has([data-page="langchain-in-your-pocket"])');
+    expect(globalsCss).toContain('body:has([data-page="langchain-in-your-pocket"]) #site-freshness-bar');
+    expect(globalsCss).toContain("calc(100% - 288px)");
   });
 
   // Q. 品質契約 (3件・必須)
