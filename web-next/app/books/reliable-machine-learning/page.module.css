@@ -577,16 +577,6 @@
   font-style: italic;
 }
 
-/* ---------- 共通クローム補正 ---------- */
-:global(body:has([data-page="reliable-machine-learning"])) :global(#site-freshness-bar) {
-  display: none !important;
-}
-
-:global(body:has([data-page="reliable-machine-learning"])) :global(nav[aria-label="関連ページ"]) {
-  margin-left: 300px !important;
-  width: calc(100% - 300px) !important;
-}
-
 /* ---------- レスポンシブ ---------- */
 @media (max-width: 900px) {
   .sidebarToggle {
