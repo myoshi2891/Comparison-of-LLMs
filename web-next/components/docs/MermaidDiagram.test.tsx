@@ -681,6 +681,78 @@ describe("MermaidDiagram 失敗時と世代管理", () => {
     });
   });
 
+  /**
+   * foreignObject ラベルを指定クラスの .node 内へ移し、jsdom で空になる
+   * `foreignObject *` の検索結果をラベルへ差し替える。
+   */
+  const mockNodeLabelRun = (nodeClasses: string[]) => {
+    const defaultRun = vi.mocked(mermaid.run).getMockImplementation();
+    expect(defaultRun).toBeDefined();
+    vi.mocked(mermaid.run).mockImplementationOnce(async (args) => {
+      await defaultRun?.(args);
+      const target = args?.nodes?.[0] as HTMLElement;
+      const foreignObject = target.querySelector("foreignObject");
+      const label = target.querySelector("foreignObject div");
+      const node = document.createElementNS("http://www.w3.org/2000/svg", "g");
+      node.classList.add("node", ...nodeClasses);
+      if (foreignObject) {
+        foreignObject.replaceWith(node);
+        node.appendChild(foreignObject);
+      }
+      const querySelectorAll = target.querySelectorAll.bind(target);
+      vi.spyOn(target, "querySelectorAll").mockImplementation((selectors: string) => {
+        if (selectors === "foreignObject *" && label) {
+          return [label] as unknown as NodeListOf<Element>;
+        }
+        return querySelectorAll(selectors);
+      });
+    });
+  };
+
+  it("classDef で color を明示したクラスのノードは設定色で上書きしない", async () => {
+    // Arrange
+    mockNodeLabelRun(["accent"]);
+
+    // Act
+    const { container } = render(
+      <MermaidDiagram
+        chart={"graph TD\nA:::accent\nclassDef accent fill:#fef,color:#ff0000"}
+        theme="base"
+        themeVariables={{ primaryTextColor: "#123456" }}
+      />
+    );
+
+    // Assert
+    await waitFor(() => {
+      const label = container.querySelector("foreignObject div") as HTMLElement;
+      expect(label.style.lineHeight).toBe("1.2");
+      expect(label.style.color).toBe("");
+    });
+  });
+
+  it("color を持たない classDef のノードには設定色を適用する", async () => {
+    // Arrange
+    mockNodeLabelRun(["muted"]);
+
+    // Act
+    const { container } = render(
+      <MermaidDiagram
+        chart={
+          "graph TD\nA:::muted\nclassDef muted fill:#eee,stroke:#333\nclassDef other color:#f00"
+        }
+        theme="base"
+        themeVariables={{ primaryTextColor: "#123456" }}
+      />
+    );
+
+    // Assert
+    await waitFor(() => {
+      expect((container.querySelector("foreignObject div") as HTMLElement).style.color).toBe(
+        "rgb(18, 52, 86)"
+      );
+    });
+  });
+
   it("一時要素が描画中に外された場合は cleanup で二重削除しない", async () => {
     const consoleError = vi.spyOn(console, "error").mockImplementation(() => undefined);
     const removeChildSpy = vi.spyOn(document.body, "removeChild");
