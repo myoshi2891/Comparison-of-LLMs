@@ -89,6 +89,25 @@ function normalizeError(err: unknown, chartInfo?: string): Error {
 }
 
 /**
+ * Collects class names whose Mermaid `classDef` explicitly declares a text `color`.
+ *
+ * @param chart - Mermaid diagram source text.
+ * @returns Class names that own an explicit label color.
+ */
+function collectClassDefsWithColor(chart: string): Set<string> {
+  const names = new Set<string>();
+  for (const statement of chart.split(/[\n;]/)) {
+    const match = /^\s*classDef\s+(\S+)\s+(.+)$/.exec(statement);
+    if (!match) continue;
+    if (!/(?:^|[,\s])color\s*:/.test(match[2])) continue;
+    for (const name of match[1].split(",")) {
+      names.add(name.trim());
+    }
+  }
+  return names;
+}
+
+/**
  * Applies theme and configurable color overrides to sequence diagram elements.
  *
  * @param root - The container element holding the sequence diagram SVG.
@@ -355,9 +374,16 @@ export default function MermaidDiagram({
             if (theme === "base" || theme === "dark" || themeVariables !== undefined) {
               const textColor =
                 themeVariables?.primaryTextColor ?? (theme === "dark" ? "#e2e8f0" : "#000000");
+              const colorClasses = collectClassDefsWithColor(chart);
               tempEl.querySelectorAll("foreignObject *").forEach((el) => {
                 const htmlElement = el as HTMLElement;
-                htmlElement.style.setProperty("color", textColor, "important");
+                const parentNode = htmlElement.closest(".node");
+                const hasExplicitColor =
+                  parentNode !== null &&
+                  Array.from(parentNode.classList).some((cls) => colorClasses.has(cls));
+                if (!hasExplicitColor) {
+                  htmlElement.style.setProperty("color", textColor, "important");
+                }
                 htmlElement.style.setProperty("line-height", "1.2", "important");
               });
 

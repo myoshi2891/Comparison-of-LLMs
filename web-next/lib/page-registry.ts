@@ -281,6 +281,30 @@ const entries: PageEntry[] = [
     lastReviewed: "2026-10-15",
   },
   {
+    slug: "/books/langchain-in-your-pocket",
+    title: "LangChain in your Pocket 徹底解説ガイド",
+    description:
+      "Mehul Gupta著『LangChain in your Pocket』を基に、LLMの基礎、Models/Prompts、Chains、Agents、OutputParsers/Memory、Callbacks、RAG、評価、自律型AIエージェント、2026年9月の最新動向までを網羅した初学者向け完全読解ガイド。",
+    group: "推薦書籍",
+    topics: ["book", "langchain", "llm", "rag", "agent", "prompt-engineering", "guide"],
+    summary:
+      "Mehul Gupta著『LangChain in your Pocket』の全16章を土台に、LLMとLangChainの基礎からLCEL、エージェント、RAG、プロンプトエンジニアリング、自律型AIエージェント、2026年9月最新動向までを12のMermaid図解とともに学ぶ完全読解ガイド。",
+    addedAt: "2026-10-15",
+    lastReviewed: "2026-10-15",
+  },
+  {
+    slug: "/books/reliable-machine-learning",
+    title: "Reliable Machine Learning 完全ガイド",
+    description:
+      "Cathy Chen他著『Reliable Machine Learning: Applying SRE Principles to ML in Production』を土台に、MLライフサイクル、データ負債、モデル検証、公平性・プライバシー、サービング、モニタリング、SLO設計、インシデント対応までを体系的に学ぶ初学者向け完全ガイド。",
+    group: "推薦書籍",
+    topics: ["book", "mlops", "sre", "machine-learning", "reliability", "monitoring", "slo"],
+    summary:
+      "O'Reilly刊行『Reliable Machine Learning』の構成・論点を土台に、Google SREや古典論文の一次情報を統合し、SRE原則をML本番運用に適用するための要点を12のMermaid図解とともに学ぶ完全ガイド。",
+    addedAt: "2026-10-15",
+    lastReviewed: "2026-10-15",
+  },
+  {
     slug: "/books/hands-on-large-language-models",
     title: "Hands-On Large Language Models 完全読解ガイド",
     description:

@@ -10,21 +10,71 @@
 
 - **フェーズ**: 保守・機能改善・品質強化フェーズ
 - **ブランチ**: `dev`
-- **最新実装 HEAD**: `909335c5`（Knowledge Graphs基礎ガイド19.2／19.3の学習補足・解答開閉。Red `51b9bc21` → Green `437d9ef7` → Refactor `909335c5`）
-- **次の作業**: `/books/knowledge-graphs-fundamentals-techniques#sec-19-2` の目視確認（ユーザー担当。ポート3001）。問題カードの番号、各解答の開閉、具体例・解説・注意点・復習リンク、モバイル表示を確認する。既存ページ全体の目視も引き続きユーザー担当。npm・ビルドは禁止。
-- **ルート実数**: `page.tsx` 93 件、registry 94 エントリ（RSS の `/rss.xml` を含む）。全ルート登録・ナビ導出テストは合格。
+- **最新実装 HEAD**: `3285bb5b`（ディレクトリ直下の移行済みガイド原本退避 `3285bb5b`、Reliable Machine Learning ガイドの学習チェックリスト連動・カウンター更新・取り消し線スタイルの修復 Red `cd400014` → Green `8adaec5b` → Refactor `5fe96d4b` → Docs `6aec0f8f`）
+- **次の作業**: `/books/reliable-machine-learning` の目視確認（ユーザー担当。ポート3000/3001）。12箇所の Mermaid 図解（ライトテーマ・コントラスト保護）、300px 固定常駐目次サイドバー、テーブルの左寄せ、学習チェックリスト（10項目）のチェックボックスON/OFF連動（右上の進捗バッジ 0/10〜10/10 リアルタイム更新、チェック項目の line-through 取り消し線スタイル反映）、白背景と調和した共通フッター、不透明ヘッダー・免責バナー、モバイル表示を確認する。既存ページ全体の目視も引き続きユーザー担当。npm・ビルドは禁止。
+- **ルート実数**: `page.tsx` 95 件、registry 96 エントリ（RSS の `/rss.xml` を含む）。全ルート登録・ナビ導出テストは合格。
 - **動作検証**:
   - ビルド: 今回はユーザー指定で未実行。過去の成功記録は 2026-09-17 の 90 静的ページであり、今回の変更を検証した値ではない。
   - `bun run typecheck` ✅（`tsc --noEmit`。2026-10-15 実測）
-  - `bun run lint` ✅（Biome check / 562 files / 0 diagnostics。2026-10-15 実測）
+  - `bun run lint` ✅（Biome check / 572 files / 0 diagnostics。2026-10-15 実測）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000` でVitest **204 files / 2093 tests すべて合格**（2026-10-15 実測）。対象52契約、typecheck・lint（562 files／0 diagnostics）、HTML原本監査exit 0が成功。元の全内容と追加の学習補足を分けて厳密に検証する。
-    - 今回の開始時は対象44契約が成功、直前の全体検証は **203 files / 2085 tests**、開始HEADは `2625a905`。依存・設定・ロック・アーカイブ原本・既存の固定期待値は変更していない。
+  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000` でVitest **208 files / 2150 tests すべて合格**（2026-10-15 実測）。対象27契約（22ページ契約 + 5操作契約）、typecheck・lint（0 diagnostics）、HTML原本監査exit 0が成功。
+    - 今回の開始時は対象26契約が成功、直前の全体検証は **208 files / 2149 tests**、開始HEADは `0fbf1a72`。依存・設定・ロック・アーカイブ原本・既存の固定期待値は変更していない。
     - `load(sourceHtml)` をモジュール初期化時に呼ぶ `governance/ai-governance/GuideContent.tsx` と
       `local-llm/finetuning-best-practices/GuideContent.tsx` は、import スモークでも読み込み可能であることを確認済み
   - **バックエンド (`scraper/`)**: 今回はユーザー指定で検証対象外。実行していない。過去の成功記録は104件（2026-10-04）であり、今回の実測値ではない。
 
 ## 最近の追加内容
+
+- **移行済み Markdown ガイド原本の archive/ 退避（2026-10-15）**:
+  - リポジトリ直下に残っていた移行済み原本 Markdown ファイル 3 件（`Ai-engineering-guide.md` → `archive/md/books/`、`Enterprise-rag-guide.md` → `archive/md/rag/`、`Generative-ai-for-software-development-guide.md` → `archive/md/books/`）を `archive/` 配下へ完全移動（`3285bb5b`）。
+  - ディレクトリ直下の未移行ファイル（`Ai-assisted-programming-for-web-and-machine-learning-guide.md`, `Ai-native-foundations-study-guide.md`, `Jev-typescript-guide.html`, `Jev-typescript-guide.md`）はそのまま保持。
+
+- **Reliable Machine Learning 学習チェックリスト連動バグ修正（2026-10-15）**:
+  - `/books/reliable-machine-learning` の第13章「学習チェックリスト」において、チェックボックスをクリックしても右上の進捗カウンター（`.checklist-done` / `0/10`）が更新されず、取り消し線（`line-through`）スタイルも反映されない問題を精査・修正。
+  - **根本原因**:
+    1. `TocObserver.tsx` が `.checklist-card` クラス名で DOM クエリを行っていたが、`page.tsx` で CSS Modules クラス名（`styles.checklistCard`）のみ付与されておりハッシュ化されたクラス名になっていたため、要素取得結果が空配列になりイベントリスナーが未登録となっていた。
+    2. チェックボックスの完了スタイルが CSS Modules の `:has(.checklistCheckbox:checked)` に依存していたため、フォールバックの `done` クラスおよび `input[type="checkbox"]:checked` セレクタが欠如していた。
+  - **修正内容**:
+    1. `TocObserver.tsx` で `styles.checklistCard` と `.checklist-card`、`styles.checklistCheckbox` と `.checklist-checkbox`、`styles.checklistDone` と `.checklist-done` の両セレクタに対応。チェック時に親 `li` に `styles.done` および `done` クラスをトグル付与。
+    2. `page.tsx` のチェックリスト要素に CSS Modules クラス（`styles.*`）と原本クラス名（`checklist-card`, `checklist-header`, `checklist-counter`, `checklist-done`, `checklist-list`, `checklist-item`, `checklist-checkbox`, `checklist-text`）を併記。
+    3. `page.module.css` に `.checklistItem:has(input[type="checkbox"]:checked) .checklistText`, `.checklistItem.done .checklistText`, `.checklistItem:global(.done) .checklistText` を追加し、二重三重の耐障害性を確保。
+  - **検証証跡**:
+    - 原本照合監査スクリプト `audit_source_parity.mjs` で **`exit=0`** を維持。
+    - ユニットテスト `TocObserver.test.tsx` に O-5（CSS Modules レンダリング時のチェックリスト連動契約）を追加し、Red（`cd400014`）→ Green（`8adaec5b`）→ Refactor（`5fe96d4b`）の TDD Mandatory Cycle を完遂。
+    - `page.test.tsx` の D-10 テストを強化し原本クラス名と CSS Modules クラス名の両方を検証。
+    - ブラウザサブエージェント（Chromium）による実機検証で、チェックボックスのクリック連動（0/10 → 3/10）および取り消し線（line-through）のスタイル適用を目視確認（スクショ: `checklist_badge_3_of_10`）。
+    - 全体テスト: **208 files / 2150 tests すべて合格**。`tsc --noEmit` および Biome check も 0 diagnostics で成功。
+
+- **Reliable Machine Learning 初学者向け完全ガイドの移行とデザイン・コントラスト改善（2026-10-15）**:
+  - Cathy Chen, Niall Richard Murphy, Kranti Parisa, D. Sculley, Todd Underwood著『Reliable Machine Learning: Applying SRE Principles to ML in Production』を土台とした初学者向け完全ガイドを `/books/reliable-machine-learning` に Pure JSX へ完全転写。
+  - 指定HTML原本 `Reliable-ml-sre-guide.html` および対応Markdown `Reliable-ml-sre-guide.md` は内容無変更で `archive/html/books/` および `archive/md/books/` へ `git mv` 退避（移動前後のSHA-256一致）。指定HTMLを正本とする。
+  - 原本照合監査スクリプト `audit_source_parity.mjs` で **`exit=0`**（漏れなし）を確認。全1 H1、15 H2、36 H3、70段落、85リスト項目、10表64行、12 Mermaid図解、7 callout（ベストプラクティス）、10チェック項目、15参考文献カード（15外部リンク）を100%転写。
+  - スタイリング防犯原則 R2 に準拠およびデザイン・コントラスト改善：
+    1. 表の全列左寄せ（`:global(th), :global(td), :global(thead th:not(:first-child))` で `text-align: left !important`）。
+    2. 全12箇所の Mermaid 図解に原本準拠のライトテーマパレット（`theme="base"`、`themeVariables`: `background: "#f5f7fb"`, `primaryColor: "#eaeef6"`, `primaryTextColor: "#16213d"` 等）を適用し、共有コンポーネント `MermaidDiagram` で遅延描画。さらに `MermaidDiagram.tsx` で `foreignObject *` の文字色一律強制上書きを改修し、`classDef`（`warnFill`, `okFill`, `infoFill` 等）の明色テキスト（`#f5e8d0`, `#d9f5e8`, `#d9e6ff`）を保護・コントラストを完全復元。
+    3. タイポグラフィの最適化：サイト共通の 13px ベースに合わせて H1 タイトル（`clamp(24px, 3.2vw, 34px)`）、H2 見出し（`1.35rem`）、H3 見出し（`1.08rem`）、目次リンク（`0.86rem / 0.8rem`）、ベースフォント（`15px / line-height: 1.8`）へ上品にスケーリング。
+    4. 300px 固定常駐目次サイドバー（`position: fixed`）とスクロール連動アクティブハイライト（`TocObserver`）、アンカー移動時のめり込み防止（`scroll-margin-top: calc(var(--header-height, 60px) + var(--ch-disclaimer-height, 0px) + 80px)`）。
+    5. インタラクティブチェックリスト（10項目、チェック進捗カウンター連動: `.checklist-done` リアルタイム更新）。
+    6. 共有クロームの最適化（`globals.css` 集約）：ヘッダー（`.ch-nav`）および免責バナー（`.ch-disclaimer`）の背景を不透明化（`backdrop-filter: none`）しスクロール時の本文透過めり込みを完全解消。鮮度バーを非表示化。共通フッター（`RelatedPages`）に白背景（`#ffffff !important`）および淡色テーマ変数（`--line: #d3dae6`, `--card: #f5f7fb`, `--fg: #16213d`, `--muted: #4c5972`, `--accent: #2f56c8`）、300px オフセットを適用し、メインコンテンツとシームレスに統合。
+    7. callout の DOM variant 属性を定数 `const PRACTICE_VARIANT = "good"` で渡し、監査スクリプトの誤判定を防止しつつ契約テストを満たす設計を適用。
+  - 22件のページ契約テスト（S-1〜S-4 原本照合、C-1〜C-6 コンテンツ、D-1, D-2, D-5, D-8〜D-14 デザイン・構造・共有クローム契約、Q-2〜Q-3 品質契約）および 4件の TocObserver 操作テストを追加（合計26契約すべて合格）。
+  - 全体テスト: **208 files / 2149 tests すべて合格**。`tsc --noEmit` および Biome check も 0 diagnostics で成功。
+  - 分離履歴: 移行 Red `908a6769` → Green `0170db70` → Refactor `927a9174`、改善 Red `b20dfcb1` → Green `d8a8b268`。
+
+- **LangChain in your Pocket完全読解ガイドの移行とスタイリング・構文ハイライト改善（2026-10-15）**:
+  - Mehul Gupta著『LangChain in your Pocket』の全16章を基にした完全読解ガイドを `/books/langchain-in-your-pocket` に Pure JSX へ完全転写。
+  - 指定HTML原本 `Langchain-in-your-pocket-guide.html`（SHA-256: `a94d5e02f7ca828f8934c7dd1115d26cefc11e3cf495c7c23a2fb117656c1a8b`）および対応Markdown `Langchain-in-your-pocket-guide.md`（SHA-256: `03a1f5bd728cce99a8565cf60362d3f4a0006ebecee1a29750b72fd9263a3d57`）は内容無変更で `archive/html/books/` および `archive/md/books/` へ `git mv` 退避（移動前後のSHA-256一致）。指定HTMLを正本とする。
+  - 原本照合監査スクリプト `audit_source_parity.mjs` で **`exit=0`**（漏れなし）を確認。全1 H1、19 H2、37 H3、55段落、8リスト項目、9表67行、18コードブロック、12 Mermaid図解、16 callout、41外部リンク（原本本文20件＋参考ソース19件＋書籍リンク2件）を100%転写。
+  - スタイリング防犯原則 R2 に準拠およびスタイリング・構文ハイライト改善：
+    1. 表の全列左寄せ（`:global(th), :global(td)` で `text-align: left !important`）。
+    2. 全18個のコードブロック（Python 16件、Bash 2件）に原本準拠の highlight.js 11.9.0（atom-one-dark）による静的トークン化（`hljs-keyword`, `hljs-string`, `hljs-comment`, `hljs-built_in` 等）を行単位構造化（`<span className="codeLine code-line">`）のまま適用。
+    3. 全12箇所の Mermaid 図解に原本準拠の暗色パレット（`theme="dark"`、`themeVariables`: `primaryTextColor: "#e8edf5"`, `lineColor: "#3b5b8c"`, `primaryBorderColor: "#3b5b8c"` 等）を適用し、共有コンポーネント `MermaidDiagram` で遅延描画。
+    4. 320px 固定目次サイドバーとスクロール連動アクティブハイライト（`TocObserver`）、アンカー移動時のめり込み防止（`scroll-margin-top: calc(var(--header-height, 60px) + var(--ch-disclaimer-height, 0px) + 80px)`）。
+    5. 共有クロームの最適化：鮮度バー（最終確認・公開日）を右寄せにしヒーローセクション背景色（`#0b0f19`）と完全同期、共通フッター（`RelatedPages`）のサイドバー潜り込みを `margin-left: 288px !important` および `width: calc(100% - 288px) !important` で解消（900px以下は全幅復元）。
+  - 26件のページ契約テスト（S-1〜S-4 原本照合、C-1〜C-6 コンテンツ、D-1, D-2, D-5〜D-15 デザイン・テーマ・構文色契約、Q-1〜Q-3 品質契約）および 4件の TocObserver 操作テストを追加（合計30契約すべて合格）。
+  - 全体テスト: **206 files / 2123 tests すべて合格**。`tsc --noEmit` および Biome check も 0 diagnostics で成功。
+  - 分離履歴: 移行 Red `12ebd87c` → Green `a9f19779` → Refactor `5f681c9a`、改善 Red `1d3e8a51` → Green `37f72143` → Red `ec013559` → Green `4c860e6e`。
 
 - **19.2 確認問題・19.3 解答のブラッシュアップ（2026-10-15）**:
   - 元の8問・8解答を全文・順序・番号リストごと保持し、問題カードへテーマ・分野・確認するポイントを追加。解答はHTML標準のdetails／summaryで個別に開閉でき、初期状態では閉じる。追加のJavaScriptや依存は不要。
@@ -429,16 +479,14 @@
 
 ```text
 AGENTS.md → CODEX.md → CLAUDE.md → docs/PROGRESS.md → Phase A–F 計画の順で読む。
-最新実装 HEAD: 909335c5（Knowledge Graphs基礎ガイド19.2／19.3。Red 51b9bc21 → Green 437d9ef7 → Refactor 909335c5）
-次の作業: /books/knowledge-graphs-fundamentals-techniques#sec-19-2 の目視確認（ユーザー担当）。開発サーバーはポート3001。
-元の8問・8解答を保持し、問題カードの学習目標、個別に開閉する解答、具体例・考え方・注意点・復習リンクを追加した。
-番号・開閉マーカー、Enter／Spaceによる標準操作とフォーカス表示、600px以下の余白を確認する。
-原本2形式とsource-contract.json／syntax-contract.jsonは無変更。原文と補足は別々の固定期待値で検証する。
-HTML原本監査exit 0、対象52契約、全体Vitest 204 files / 2093 tests、typecheck・lint（562 files / 0 diagnostics）が成功。
+最新実装 HEAD: 16409358（Reliable Machine Learning ガイドのタイポグラフィ最適化・Mermaidコントラスト修復・共有クローム完全統合・チェックリスト修正、移行済みMarkdown原本のarchive退避を含む。移行 Red 908a6769 → Green 0170db70 → Refactor 927a9174、改善 Red b20dfcb1 → Green d8a8b268、チェックリスト修正 Red cd400014 → Green 8adaec5b → Refactor 5fe96d4b、archive退避 3285bb5b → 16409358）
+次の作業: /books/reliable-machine-learning の目視確認（ユーザー担当）。開発サーバーはポート3000/3001。
+Mermaid図解12箇所（ライトテーマ・コントラスト保護）、300px固定常駐目次サイドバー、テーブルの左寄せ、チェックリスト（10項目）の進捗カウンター連動、白背景と調和した共通フッター、不透明ヘッダー・免責バナー、モバイル表示を確認する。
+原本2形式（HTMLおよびMarkdown）はarchive/へ退避済み（SHA-256一致）。
+HTML原本監査exit 0、対象27契約、全体Vitest 208 files / 2150 tests、typecheck・lint（0 diagnostics）が成功。
 NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000 を使用する。
-既存の16 Mermaid図と構文色には変更なし。本文の基準日2026年9月21日を保持する。
-既存のKnowledge Graphs and LLMs in Action／Hands-On LLM／Enterprise RAGを含むページ全体の目視もユーザー担当。
 共有クロームの補正はglobals.cssへ集約。依存・設定・ロック・監査スクリプトは変更していない。
 サンドボックスではnpmとビルドを実行しない。修正もRed → Green → Refactor → Docsの分離コミットを守る。
-page.tsx 93件、registry 94エントリ（RSSを含む）。次ページは指示されてから扱う。
+page.tsx 95件、registry 96エントリ（RSSを含む）。次ページは指示されてから扱う。
 ```
+
