@@ -85,7 +85,14 @@ export default function TocObserver() {
     for (const a of navLinks) {
       const href = a.getAttribute("href");
       if (href?.startsWith("#")) {
-        const id = decodeURIComponent(href.slice(1));
+        const fragment = href.slice(1);
+        let id = fragment;
+        try {
+          id = decodeURIComponent(fragment);
+        } catch (err) {
+          // 不正なパーセントエスケープは生のフラグメントで照合する
+          if (!(err instanceof URIError)) throw err;
+        }
         const el = document.getElementById(id);
         if (el) map.set(el, a);
       }
