@@ -167,6 +167,34 @@ describe("Reliable Machine Learning ガイド TocObserver", () => {
     expect(active()).toEqual([["#ch1", "location"]]);
   });
 
+  it("O-6: 不正なパーセントエスケープのフラグメントでも例外を出さず、生のフラグメントで対応付ける", () => {
+    // Arrange
+    const rawId = "%E0%A4%A";
+    const view = render(
+      <div>
+        <nav id="sidebar" className={styles.sidebar}>
+          <a href="#intro" className={`${styles.navLink} ${styles.active}`}>
+            Intro
+          </a>
+          <a href={`#${rawId}`} className={styles.navLink}>
+            Broken
+          </a>
+        </nav>
+        <header id="intro" />
+        <section id={rawId} />
+        <TocObserver />
+      </div>
+    );
+
+    // Act
+    intersect([{ id: rawId, isIntersecting: true }]);
+
+    // Assert
+    expect(active()).toEqual([[`#${rawId}`, "location"]]);
+    view.unmount();
+    expect(disconnect).toHaveBeenCalled();
+  });
+
   it("O-5: CSS Modules クラス (styles.checklistCard) でレンダリングされた場合でもカウンターと完了スタイルが連動する", () => {
     render(
       <div>
