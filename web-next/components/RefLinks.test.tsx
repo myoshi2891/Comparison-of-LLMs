@@ -48,10 +48,10 @@ describe("RefLinks - root structure", () => {
 });
 
 describe("RefLinks - cards", () => {
-  it("renders exactly 18 ref-cards", () => {
+  it("renders exactly 20 ref-cards", () => {
     const { container } = render(<RefLinks lang="ja" />);
     const cards = container.querySelectorAll(".ref-card");
-    expect(cards.length).toBe(18);
+    expect(cards.length).toBe(20);
   });
 
   it("includes Moonshot(Kimi) and Zhipu(GLM) provider cards", () => {
@@ -61,6 +61,20 @@ describe("RefLinks - cards", () => {
     expect(text).toContain("platform.moonshot.ai/docs/pricing");
     expect(text).toContain("Zhipu");
     expect(text).toContain("docs.z.ai/guides/overview/pricing");
+  });
+
+  it("includes Meta and Microsoft provider cards with official pricing links", () => {
+    const { container } = render(<RefLinks lang="ja" />);
+    const headings = Array.from(container.querySelectorAll(".ref-card h5")).map(
+      (h) => h.textContent
+    );
+    expect(headings).toContain("🦙 Meta (Muse)");
+    expect(headings).toContain("🪟 Microsoft (MAI)");
+    const hrefs = Array.from(container.querySelectorAll(".ref-card a")).map((a) =>
+      a.getAttribute("href")
+    );
+    expect(hrefs).toContain("https://dev.meta.ai/docs/pricing-rate-limits");
+    expect(hrefs).toContain("https://ai.azure.com/catalog/models/MAI-Thinking-1");
   });
 
   it("each card has h5 heading and .ref-link body", () => {

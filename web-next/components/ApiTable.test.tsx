@@ -341,6 +341,65 @@ describe("ApiTable - provider group colors", () => {
     expect(cell?.style.color).toBe("rgb(244, 114, 182)");
     expect(cell?.style.borderLeft).toContain("rgb(244, 114, 182)");
   });
+  // Meta / Microsoft（2026-10 追加）。未登録だと既定色 #aaa に落ちる。
+  const newProviderModels: ApiModel[] = [
+    {
+      provider: "Meta",
+      name: "Muse Spark 1.3",
+      tag: "最新 Spark",
+      cls: "tag-bal",
+      price_in: 1.25,
+      price_out: 4.25,
+      sub_ja: "推奨モデル",
+      sub_en: "Recommended",
+      scrape_status: "fallback",
+    },
+    {
+      provider: "Microsoft",
+      name: "MAI-Thinking-1",
+      tag: "Preview",
+      cls: "tag-flag",
+      price_in: 2,
+      price_out: 8,
+      sub_ja: "推論モデル",
+      sub_en: "Reasoning model",
+      scrape_status: "fallback",
+    },
+  ];
+
+  it("renders Meta group header in lime (#a3e635)", () => {
+    const { container } = render(
+      <ApiTable
+        lang="ja"
+        models={newProviderModels}
+        inputTokens={INPUT_TOKENS}
+        outputTokens={OUTPUT_TOKENS}
+        jpyRate={JPY_RATE}
+      />
+    );
+    const cell = groupHeaderFor(container, "Meta");
+    expect(cell).toBeDefined();
+    // #a3e635 → rgb(163, 230, 53)
+    expect(cell?.style.color).toBe("rgb(163, 230, 53)");
+    expect(cell?.style.borderLeft).toContain("rgb(163, 230, 53)");
+  });
+
+  it("renders Microsoft group header in orange (#f97316)", () => {
+    const { container } = render(
+      <ApiTable
+        lang="ja"
+        models={newProviderModels}
+        inputTokens={INPUT_TOKENS}
+        outputTokens={OUTPUT_TOKENS}
+        jpyRate={JPY_RATE}
+      />
+    );
+    const cell = groupHeaderFor(container, "Microsoft");
+    expect(cell).toBeDefined();
+    // #f97316 → rgb(249, 115, 22)
+    expect(cell?.style.color).toBe("rgb(249, 115, 22)");
+    expect(cell?.style.borderLeft).toContain("rgb(249, 115, 22)");
+  });
 });
 
 describe("ApiTable - model cell", () => {
