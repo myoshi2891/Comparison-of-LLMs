@@ -411,6 +411,15 @@ export default function OpenAICodexGuidePage() {
                         Codexの既定モデルに。サブエージェント・MCP・Hooks・自動レビュー等が出揃った転換点と評される
                       </td>
                     </tr>
+                    <tr>
+                      <td>
+                        <b>GPT-6.1 Sol(2026年10月)</b>
+                      </td>
+                      <td>
+                        GPT-5.5のCodex退役(2026年10月14日、ChatGPTサインイン時)に伴う後継の推奨モデル。最上位はAstra(gpt-6-astra)、軽量版は6
+                        Luna(gpt-6-luna)
+                      </td>
+                    </tr>
                   </tbody>
                 </table>
               </div>
@@ -872,7 +881,7 @@ export default function OpenAICodexGuidePage() {
               <pre className={styles.codeBlock}>
                 <div className={styles.codeLine}>
                   <span className={styles.cv}>model</span> ={" "}
-                  <span className={styles.cs}>"gpt-5.5"</span>
+                  <span className={styles.cs}>"gpt-6.1-sol"</span>
                 </div>
                 <div className={styles.codeLine}>
                   <span className={styles.cv}>approval_policy</span> ={" "}
@@ -1522,7 +1531,7 @@ export default function OpenAICodexGuidePage() {
                   <label htmlFor="chk-7">
                     サブエージェントのデフォルトモデル設定を各<code>config.toml</code>の
                     <code>agents.default_subagent_model</code>で確認・指定し、
-                    <code>gpt-5.6</code>または<code>gpt-5.6-terra</code>を設定しているか
+                    <code>gpt-6.1-sol</code>または<code>gpt-6-luna</code>を設定しているか
                   </label>
                 </li>
                 <li>
