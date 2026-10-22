@@ -998,7 +998,8 @@ export default function Page() {
                   className={styles.checklistCheckbox}
                 />
                 <label htmlFor="checklist-9">
-                  旧「Claude in Slack」利用企業は、2026年8月3日の自動移行後の設定を棚卸しした
+                  旧「Claude in
+                  Slack」利用企業は、2026年8月3日に予定されていた自動移行が実施されたかを管理コンソールで確認し、実施済みの場合のみ移行後の設定を棚卸しした
                 </label>
               </li>
               <li>

@@ -80,7 +80,10 @@ describe("/claude/fable-5-best-practices - page structure (Step 1)", () => {
 
   it("uses the latest timeline date and current model comparison", () => {
     const { container } = render(<Page />);
-    expect(container.querySelector("aside")?.textContent).toContain("最終更新: 2026-10-22");
+    const sidebarMeta = container.querySelector(`.${styles.sidebarMeta}`);
+    expect(sidebarMeta?.textContent?.replace(/\s+/g, " ").trim()).toBe(
+      "最終更新: 2026-10-22対象: Claude Code 中〜上級者"
+    );
     expect(container.querySelector(`.${styles.heroMeta}`)?.textContent).toContain("2026年7月26日");
     expect(container.textContent).toContain("Claude Opus 5 / Opus 4.8");
   });
