@@ -239,7 +239,7 @@ export default function OpenAICodexGuidePage() {
                       strokeLinecap="round"
                     />
                   </svg>
-                  2026年7月28日時点の情報を集約
+                  2026年7月28日時点の情報を集約（2026年10月にモデル情報を更新）
                 </span>
                 <h1 className={styles.title}>
                   OpenAI Codex
