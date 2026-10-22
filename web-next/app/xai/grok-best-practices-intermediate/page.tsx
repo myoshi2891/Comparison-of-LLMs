@@ -248,13 +248,13 @@ export default function GrokBestPracticesIntermediatePage() {
                 <tr>
                   <td>コード生成</td>
                   <td>
-                    <code>grok-4.5</code>
+                    <code>grok-4.7</code>
                   </td>
                 </tr>
                 <tr>
                   <td>チャット・汎用対話</td>
                   <td>
-                    <code>grok-4.5</code>
+                    <code>grok-4.7</code>
                   </td>
                 </tr>
                 <tr>

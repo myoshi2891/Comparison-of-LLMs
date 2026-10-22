@@ -364,11 +364,11 @@ export default function GrokBestPracticesPage() {
             <tbody>
               <tr>
                 <td>コード生成・デバッグ</td>
-                <td>grok-4.5</td>
+                <td>grok-4.7</td>
               </tr>
               <tr>
                 <td>一般的なチャット・質問応答</td>
-                <td>grok-4.5</td>
+                <td>grok-4.7</td>
               </tr>
               <tr>
                 <td>画像生成</td>
