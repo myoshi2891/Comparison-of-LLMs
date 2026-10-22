@@ -302,6 +302,19 @@ export default function GrokBestPracticesPage() {
             <tbody>
               <tr>
                 <td>
+                  <strong>grok-4.7</strong>（2026年10月時点のフラッグシップ）
+                </td>
+                <td>500k</td>
+                <td>$2.00 (&lt;200k) / $4.00 (≥200k)</td>
+                <td>$0.50 (&lt;200k) / $1.00 (≥200k)</td>
+                <td>$6.00 (&lt;200k) / $12.00 (≥200k)</td>
+                <td>
+                  2026年9月21日登場の grok-4.5 後継。プロンプトが 200k
+                  トークン以上のリクエストは全トークンに高い単価を適用
+                </td>
+              </tr>
+              <tr>
+                <td>
                   <strong>grok-4.5</strong>（2026年7月時点のフラッグシップ。2026年10月時点の最新は
                   grok-4.7）
                 </td>

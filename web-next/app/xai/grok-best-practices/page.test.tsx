@@ -58,4 +58,26 @@ describe("xAI Grok Best Practices Page", () => {
     const diagrams = container.querySelectorAll("[data-testid='mermaid-diagram']");
     expect(diagrams.length).toBe(5);
   });
+
+  it("1.1 モデル比較表に grok-4.7 の行が grok-4.5 の直前に同じ列構成で並ぶ", () => {
+    const { container } = render(<Page />);
+    const h3 = Array.from(container.querySelectorAll("h3")).find((h) =>
+      h.textContent?.startsWith("1.1 ")
+    );
+    const table = h3?.nextElementSibling;
+    const rows = Array.from(table?.querySelectorAll("tbody tr") ?? []).map((tr) =>
+      Array.from(tr.querySelectorAll("td")).map((td) =>
+        (td.textContent ?? "").replace(/\s+/g, " ").trim()
+      )
+    );
+    expect(rows[0]).toEqual([
+      "grok-4.7（2026年10月時点のフラッグシップ）",
+      "500k",
+      "$2.00 (<200k) / $4.00 (≥200k)",
+      "$0.50 (<200k) / $1.00 (≥200k)",
+      "$6.00 (<200k) / $12.00 (≥200k)",
+      "2026年9月21日登場の grok-4.5 後継。プロンプトが 200k トークン以上のリクエストは全トークンに高い単価を適用",
+    ]);
+    expect(rows[1][0]).toContain("grok-4.5");
+  });
 });
