@@ -25,6 +25,17 @@ describe("ZaiGlmBestPracticesPage", () => {
     expect(h2s.length).toBe(17);
   });
 
+  it("軽量タスクの指針で GLM-5.3 の強制 thinking を他モデルの disabled と区別する", async () => {
+    const page = await Page();
+    const { container } = render(page);
+    const item = Array.from(container.querySelectorAll("li")).find((li) =>
+      li.textContent?.startsWith("単純なFAQ応答や定型フォーマット変換")
+    );
+    expect(item?.textContent?.replace(/\s+/g, " ").trim()).toBe(
+      '単純なFAQ応答や定型フォーマット変換のような軽量タスクでは、GLM-5.3 系以外のモデルなら thinking: {"type": "disabled"} にして応答速度とコストを最適化する。GLM-5.3 / GLM-5.3-Flash は thinking が強制で無効化できない(thinking.type は enabled のまま)ため、代わりに reasoning_effort: "low" を指定して思考量を抑える。'
+    );
+  });
+
   it("renders 8 mermaid diagrams", async () => {
     const page = await Page();
     const { container } = render(page);
