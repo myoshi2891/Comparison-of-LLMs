@@ -2352,6 +2352,18 @@ export default function Page() {
               </code>
             </pre>
           </div>
+          <div className={`${styles.ca} ${styles.caA}`}>
+            <span className={styles.caI}>📌</span>
+            <p>
+              <strong>Memory を使う場合：</strong> <code>--read-only</code>{" "}
+              ではルートファイルシステムに書き込めないため、SDK ワーカーがメモリストアを同期する{" "}
+              <code>mount_path</code> にも書き込み可能なマウントが必要です。上記の <code>/tmp</code>{" "}
+              と <code>/mnt/session/outputs</code> に加えて、
+              <code>-v /host/memory:&lt;mount_path&gt;</code>(永続化する場合)または{" "}
+              <code>--tmpfs &lt;mount_path&gt;</code>(セッション内のみ)を追加するか、
+              <code>mount_path</code> を書き込み可能なマウント配下に設定してください。
+            </p>
+          </div>
         </section>
 
         {/* 12. Monitoring */}

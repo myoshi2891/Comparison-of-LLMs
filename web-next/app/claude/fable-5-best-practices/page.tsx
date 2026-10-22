@@ -557,6 +557,18 @@ export default function Fable5BestPracticesPage() {
               にもそのまま適用できるが、 新規採用時のモデル ID・価格は公式の Models overview
               で確認すること。
             </p>
+            <p>
+              ただし Fable 5.1 では thinking ブロックが生成したモデルに紐づくため、Fable 5.1 の
+              thinking
+              ブロックを別モデル(評価モデルなど)へ渡すクロスモデル評価フローでは、受け取ったモデル側でブロックが無視される。また過去のターンを編集して再送すると、それ以降の
+              thinking
+              ブロックが無効になる(2026年8月31日以降に作成されたアカウントでは編集済み履歴が 400
+              エラーになる)。会話履歴は追記のみで扱う設計にし、移行時は公式の{" "}
+              <Ext href="https://platform.claude.com/docs/en/about-claude/models/migration-guide">
+                Migration guide
+              </Ext>{" "}
+              の Fable 5.1 の項を確認すること。
+            </p>
           </div>
 
           <p>
