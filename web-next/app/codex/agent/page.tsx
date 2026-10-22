@@ -239,7 +239,8 @@ export default function CodexAgentPage() {
             対象読者: Codex CLI / Codex Cloud を使ったチーム開発の経験がある中級〜上級エンジニア
           </p>
           <p className={styles.heroLine}>
-            最終更新: 2026年7月29日時点の公式ドキュメント・コミュニティ記事に基づく
+            最終更新: 2026年7月29日時点の公式ドキュメント・コミュニティ記事に基づく（GPT-6
+            系のモデル推奨・設定例は2026年10月22日時点）
           </p>
         </div>
 
