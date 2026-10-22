@@ -302,7 +302,8 @@ export default function GrokBestPracticesPage() {
             <tbody>
               <tr>
                 <td>
-                  <strong>grok-4.5</strong>（フラッグシップ・最新）
+                  <strong>grok-4.5</strong>（2026年7月時点のフラッグシップ。2026年10月時点の最新は
+                  grok-4.7）
                 </td>
                 <td>500k</td>
                 <td>$2.00</td>

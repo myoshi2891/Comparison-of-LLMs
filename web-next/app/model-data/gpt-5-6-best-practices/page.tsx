@@ -258,9 +258,11 @@ export default function Gpt56BestPracticesPage() {
             </div>
             <h1>OpenAI GPT-5.6 完全ガイド — Sol / Terra / Luna 実践ベストプラクティス</h1>
             <p className={styles.subtitle}>
-              2026年7月に一般提供（GA）されたOpenAI GPT-5.6の最新アーキテクチャ、Reasoning Effort /
+              2026年7月に一般提供（GA）されたOpenAI GPT-5.6のアーキテクチャ、Reasoning Effort /
               Modeのダイヤル制御、Programmatic Tool Calling（PTC）、Multi-agent機能、Prompt
               Cachingの改定、およびプロンプト簡素化のベストプラクティスを体系的に解説します。
+              （2026年10月追記: 後継の GPT-6 系 — Astra / GPT-6.1 Sol / 6 Luna — が Codex
+              の推奨モデルとなりました。GPT-5.6 系はロールアウト期間中も引き続き利用できます。）
             </p>
           </header>
 

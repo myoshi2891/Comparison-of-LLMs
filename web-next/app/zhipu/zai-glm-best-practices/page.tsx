@@ -149,7 +149,9 @@ export default function ZaiGlmBestPracticesPage() {
             <strong>GLM-5.2</strong>
             であり、1M(100万)トークンという実用レベルのコンテキスト長と、長時間タスク(long-horizon
             task)を安定して遂行できる点を最大の特徴として打ち出している。GLM-5.2
-            は要件定義からデプロイ可能な成果物までの開発ワークフロー全体を、単一タスクの中で完結させることを狙って設計されたモデルである。
+            は要件定義からデプロイ可能な成果物までの開発ワークフロー全体を、単一タスクの中で完結させることを狙って設計されたモデルである。なお2026年10月時点では後継の
+            <strong>GLM-5.3</strong>(入力 $1.4 / 出力 $4.4 per 1M、GLM-5.2 と同価格)と、軽量版の
+            GLM-5.3-Flash / GLM-5.3-FlashX が公開されている。
           </p>
 
           <div className={styles.tableWrap}>
@@ -167,7 +169,9 @@ export default function ZaiGlmBestPracticesPage() {
                   <td>
                     <code className={styles.codeInline}>glm-5.2</code>
                   </td>
-                  <td>最新の旗艦モデル。長時間タスク・エージェント型コーディングに最適化</td>
+                  <td>
+                    2026年7月時点の旗艦モデル(2026年10月時点の最新はGLM-5.3)。長時間タスク・エージェント型コーディングに最適化
+                  </td>
                   <td>1M トークン</td>
                   <td>128K(=131,072)トークン</td>
                 </tr>

@@ -284,6 +284,14 @@ export default function DeepSeekLlmPage() {
             </div>
           </div>
 
+          <p>
+            <strong>2026年10月追記:</strong> 2026年9月10日に DeepSeek-V4.1-Flash
+            がリリースされ(10月17日に V4.1-Flash-1017 へ更新)、API ではモデル名{" "}
+            <code>deepseek-flash</code> で最新の V4.1 Flash を呼び出します。旧 V4 Flash
+            は提供終了し、<code>deepseek-v4-flash</code> は暫定的に V4.1 Flash へ転送されています。
+            <code>deepseek-v4-pro</code> は2026年9月14日以降も提供が継続されています。
+          </p>
+
           <h3>現行モデル比較表（2026年7月16日時点）</h3>
           <div className={styles.tableWrap}>
             <table>
