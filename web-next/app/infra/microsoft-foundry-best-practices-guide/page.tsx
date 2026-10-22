@@ -418,11 +418,17 @@ export default function MicrosoftFoundryBestPracticesPage() {
                   </tr>
                   <tr>
                     <td>GPT-4.1</td>
-                    <td>本番ワークロード向けの性能とコストのバランス</td>
+                    <td>
+                      本番ワークロード向けの性能とコストのバランス（2026年10月時点でDeprecated＝新規顧客はデプロイ不可。移行先の例はGPT-5.6
+                      Terra）
+                    </td>
                   </tr>
                   <tr>
                     <td>GPT-4.1 mini</td>
-                    <td>低遅延・高スループットが必要な場面</td>
+                    <td>
+                      低遅延・高スループットが必要な場面（同じくDeprecated。移行先の例はGPT-5.6
+                      Luna）
+                    </td>
                   </tr>
                   <tr>
                     <td>Claude</td>
@@ -438,7 +444,9 @@ export default function MicrosoftFoundryBestPracticesPage() {
                   </tr>
                   <tr>
                     <td>DeepSeek-R1</td>
-                    <td>オープンウェイトでの大規模推論</td>
+                    <td>
+                      オープンウェイトでの大規模推論（Foundryでは2026年8月13日に提供終了。後継はDeepSeek-V4-Pro）
+                    </td>
                   </tr>
                   <tr>
                     <td>Phi-4</td>
