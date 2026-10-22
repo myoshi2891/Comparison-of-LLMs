@@ -2637,7 +2637,7 @@ export default function MicrosoftFoundryBestPracticesIntermediatePage() {
               Learnの一次情報を最新版で確認してください。また、コミュニティブログやサードパーティ記事で紹介されている数値（コスト削減率、性能向上率など）は、各執筆者の検証環境に依存するものであり、自社のワークロードでの実測値とは異なる可能性がある点にご留意ください。
             </p>
             <p style={{ marginTop: "24px" }}>
-              Microsoft Foundry 実践ベストプラクティスガイド ／ 最終更新: 2026年7月17日
+              Microsoft Foundry 実践ベストプラクティスガイド ／ 最終更新: 2026年10月22日
             </p>
           </footer>
         </main>

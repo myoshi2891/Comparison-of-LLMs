@@ -1,7 +1,14 @@
 import type { Metadata } from "next";
 import MermaidDiagram from "@/components/docs/MermaidDiagram";
+import { findBySlug } from "@/lib/page-registry";
 import styles from "./page.module.css";
 import { TocObserver } from "./TocObserver";
+
+const pageEntry = findBySlug("/infra/microsoft-foundry-best-practices-guide");
+if (!pageEntry) {
+  throw new Error("Page registry entry missing for /infra/microsoft-foundry-best-practices-guide");
+}
+const lastReviewed = pageEntry.lastReviewed;
 
 export const metadata: Metadata = {
   title: "Microsoft Foundry 活用ガイド — 初学者のためのステップバイステップ・ベストプラクティス",
@@ -184,7 +191,7 @@ export default function MicrosoftFoundryBestPracticesPage() {
             初学者のためのステップバイステップ・ベストプラクティス
           </h1>
           <p>
-            最終更新:
+            最終確認日: {lastReviewed} ／ 情報基準日:
             2026年7月18日時点の公開情報（Microsoft公式ドキュメント・公式ブログ・著名開発者の技術記事）をもとに作成。Foundryは頻繁にアップデートされるプラットフォームのため、実装時は必ず{" "}
             <Ext href="https://learn.microsoft.com/en-us/azure/foundry/">Microsoft Learn</Ext>{" "}
             の最新情報をご確認ください。
