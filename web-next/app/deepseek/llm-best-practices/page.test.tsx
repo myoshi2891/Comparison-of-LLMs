@@ -60,4 +60,17 @@ describe("DeepSeek LLM Best Practices Page", () => {
     const diagrams = container.querySelectorAll("[data-testid='mermaid-diagram']");
     expect(diagrams.length).toBe(8);
   });
+
+  it("移行チェックリストは Flash の正式 ID deepseek-flash を案内する", () => {
+    const { container } = render(<Page />);
+    const items = Array.from(container.querySelectorAll("#migration li")).map((li) =>
+      li.textContent?.replace(/\s+/g, " ").trim()
+    );
+    expect(items).toEqual([
+      "[ ] deepseek-chat の記述を deepseek-flash または deepseek-v4-pro へ変更",
+      "[ ] deepseek-reasoner の記述を deepseek-v4-pro (Thinking Mode) へ変更",
+      "[ ] API Base URL が https://api.deepseek.com であることを確認",
+      "[ ] 2026年7月24日の完全廃止後に新モデル環境での動作検証を完了",
+    ]);
+  });
 });

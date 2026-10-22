@@ -31,4 +31,14 @@ describe("GrokBestPracticesIntermediatePage", () => {
       expect(rel.includes("noreferrer")).toBe(true);
     }
   });
+
+  it("本番チェックリストの汎用モデルは grok-4.7 で、grok-4.5 は互換維持用", () => {
+    const { container } = render(<GrokBestPracticesIntermediatePage />);
+    const label = Array.from(container.querySelectorAll("label")).find((el) =>
+      el.textContent?.includes("モデル選定:")
+    );
+    expect(label?.textContent?.replace(/\s+/g, " ").trim()).toBe(
+      "モデル選定: grok-4.7（汎用。既存システムの互換性維持なら grok-4.5）/ grok-4.3（長文脈・低コスト）/ grok-4.20-multi-agent（ディープリサーチ）を用途で使い分けたか"
+    );
+  });
 });

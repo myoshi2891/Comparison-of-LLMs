@@ -63,4 +63,24 @@ describe("ZaiGlmBestPracticesPage", () => {
       expect(link.getAttribute("href")).not.toContain(".html");
     }
   });
+
+  it("第7章の reasoning_effort 表で GLM-5.3 の low と high を区別する", async () => {
+    const page = await Page();
+    const { container } = render(page);
+    const table = Array.from(container.querySelectorAll("#s7 table"))[0];
+    const rows = Array.from(table.querySelectorAll("tbody tr")).map((tr) =>
+      Array.from(tr.querySelectorAll("td")).map((td) => td.textContent?.replace(/\s+/g, " ").trim())
+    );
+    expect(rows).toEqual([
+      ["max(デフォルト・推奨)", "最も深い推論。精度重視、コストと遅延は最大"],
+      ["xhigh", "内部的にmaxとして扱われる"],
+      ["high", "拡張推論。精度とコストのバランス型"],
+      ["medium", "内部的にhighとして扱われる(GLM-5.3 / GLM-5.3-Flash は非対応)"],
+      [
+        "low",
+        "GLM-5.3 / GLM-5.3-Flash では high より浅い軽量推論として区別され、思考量・コスト・遅延を抑えられる。それ以前のモデルでは内部的にhighとして扱われる",
+      ],
+      ["minimal / none", "思考をスキップし、即座に応答を生成"],
+    ]);
+  });
 });

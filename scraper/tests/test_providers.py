@@ -331,6 +331,15 @@ class TestXai:
             models = xai.scrape()
         _assert_all_fallback(models, xai._FALLBACKS, "xAI")
 
+    def test_long_context_rate_threshold_is_inclusive(self):
+        # $4/$12 の長文脈料金はプロンプト 200K トークン「以上」で適用される
+        assert xai._SUB_JA["Grok 4.6"] == "前旗艦 / 500K ctx / 入力200K以上は $4/$12"
+        assert xai._SUB_JA["Grok 4.5"] == "前々旗艦 / 500K ctx / 入力200K以上は $4/$12"
+        assert xai._SUB_EN["Grok 4.6"] == "Prev flagship / 500K ctx / $4/$12 at 200K+ prompt tokens"
+        assert xai._SUB_EN["Grok 4.5"] == (
+            "Two gens back flagship / 500K ctx / $4/$12 at 200K+ prompt tokens"
+        )
+
 
 # --------------------------------------------------------------------------- #
 # AWS（httpx + Pricing JSON。per-1M 単位・USE1 リージョンを模した JSON）

@@ -82,4 +82,12 @@ describe("xAI Grok Best Practices Page", () => {
       "grok-4.5（2026年7月時点のフラッグシップ。2026年10月時点の最新は grok-4.7）"
     );
   });
+
+  it("総まとめチェックリストの基本モデルは grok-4.7", () => {
+    const { container } = render(<Page />);
+    const item = Array.from(container.querySelectorAll("li")).find((li) =>
+      li.textContent?.includes("用途に応じて適切なモデル")
+    );
+    expect(item?.textContent?.replace(/\s+/g, " ").trim()).toBe("用途に応じて適切なモデル（基本は grok-4.7）を選定した");
+  });
 });
