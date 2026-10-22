@@ -537,7 +537,8 @@ export default function CopilotAgentPage() {
               <span className={styles.cs}>&apos;Accessibility Expert&apos;</span>
             </div>
             <div className={styles.codeLine}>
-              <span className={styles.ck}>model</span>: <span className={styles.cw}>GPT-5.2</span>
+              <span className={styles.ck}>model</span>:{" "}
+              <span className={styles.cw}>GPT-6.1 Sol</span>
             </div>
             <div className={styles.codeLine}>
               <span className={styles.ck}>tools</span>: [
@@ -826,7 +827,7 @@ export default function CopilotAgentPage() {
             <div className={styles.codeLine}>
               {"    "}
               <span className={styles.ck}>model</span>:{" "}
-              <span className={styles.cs}>GPT-5.2 (copilot)</span>
+              <span className={styles.cs}>GPT-6.1 Sol (copilot)</span>
             </div>
             <div className={styles.codeLine}>
               <span className={styles.ck}>---</span>
@@ -862,8 +863,8 @@ export default function CopilotAgentPage() {
             </div>
             <div className={styles.codeLine}>
               <span className={styles.ck}>model</span>: [
-              <span className={styles.cs}>&apos;Claude Opus 4.5&apos;</span>,{" "}
-              <span className={styles.cs}>&apos;GPT-5.2&apos;</span>]
+              <span className={styles.cs}>&apos;Claude Opus 5.5&apos;</span>,{" "}
+              <span className={styles.cs}>&apos;GPT-6.1 Sol&apos;</span>]
             </div>
             <div className={styles.codeLine}>
               <span className={styles.ck}>handoffs</span>:
@@ -1730,8 +1731,8 @@ export default function CopilotAgentPage() {
             </div>
             <div className={styles.codeLine}>
               <span className={styles.ck}>model</span>: [
-              <span className={styles.cs}>&apos;Claude Haiku 4.5 (copilot)&apos;</span>,{" "}
-              <span className={styles.cs}>&apos;Gemini 3 Flash (Preview) (copilot)&apos;</span>]
+              <span className={styles.cs}>&apos;Claude Haiku 5.5 (copilot)&apos;</span>,{" "}
+              <span className={styles.cs}>&apos;Gemini 3.8 Flash (copilot)&apos;</span>]
             </div>
             <div className={styles.codeLine}>
               <span className={styles.ck}>---</span>
