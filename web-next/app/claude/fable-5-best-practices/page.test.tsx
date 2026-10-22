@@ -88,13 +88,23 @@ describe("/claude/fable-5-best-practices - page structure (Step 1)", () => {
     expect(container.textContent).toContain("Claude Opus 5 / Opus 4.8");
   });
 
-  it("thinking ブロックの注意書きで Mythos 5.1 の読み取り可否とクロスモデル評価を区別する", () => {
+  it("Fable 5.1 への互換性はプロンプティングの考え方に限定し、API 連携は移行チェックを求める", () => {
     const { container } = render(<Page />);
     const paragraph = Array.from(container.querySelectorAll("p")).find((p) =>
-      p.textContent?.startsWith("ただし Fable 5.1 では thinking")
+      p.textContent?.startsWith("2026年10月追記")
     );
     expect(paragraph?.textContent?.replace(/\s+/g, " ").trim()).toBe(
-      "ただし Fable 5.1 では thinking ブロックが生成したモデルに紐づく。Claude Mythos 5.1 は、それを生成した会話の中であれば Fable 5.1 の thinking ブロックを読めるが、それ以外のモデル(評価モデルなど)へ渡すクロスモデル評価フローでは、受け取ったモデル側でブロックが無視される。また過去のターンを編集して再送すると、それ以降の thinking ブロックが無効になる(2026年8月31日以降に作成されたアカウントでは編集済み履歴が 400 エラーになる)。会話履歴は追記のみで扱う設計にし、移行時は公式の Migration guide の Fable 5.1 の項を確認すること。"
+      "2026年10月追記: 2026年9月に後継の Claude Fable 5.1（claude-fable-5-1、入力 $10 / 出力 $50 per 1M tokens、1M コンテキスト）と Mythos 5.1 が登場し、Fable 5 はレガシーモデルとなった。あわせて Opus 5.5 / Sonnet 5.5 / Haiku 5.5 も提供が始まっている。本ガイドのプロンプティングの考え方（ゴール・境界・検証基準を渡す）は Fable 5.1 にもそのまま適用できるが、既存の API 連携は次の移行チェックを済ませるまでそのままでは動かない場合がある。新規採用時のモデル ID・価格は公式の Models overview で確認すること。"
+    );
+  });
+
+  it("API 移行チェックで強制 tool_choice の制限と thinking ブロックの例外を示す", () => {
+    const { container } = render(<Page />);
+    const paragraph = Array.from(container.querySelectorAll("p")).find((p) =>
+      p.textContent?.startsWith("API 連携の移行チェック")
+    );
+    expect(paragraph?.textContent?.replace(/\s+/g, " ").trim()).toBe(
+      "API 連携の移行チェック: Fable 5.1 では強制ツール使用（tool_choice の any / tool）が 400 エラーになるため、auto とプロンプトでのツール指定、strict: true、または構造化出力に置き換える。また thinking ブロックは生成したモデルに紐づく。Claude Mythos 5.1 は、それを生成した会話の中であれば Fable 5.1 の thinking ブロックを読めるが、それ以外のモデル(評価モデルなど)へ渡すクロスモデル評価フローでは、受け取ったモデル側でブロックが無視される。また過去のターンを編集して再送すると、それ以降の thinking ブロックが無効になる(2026年8月31日以降に作成されたアカウントでは編集済み履歴が 400 エラーになる)。会話履歴は追記のみで扱う設計にし、移行時は公式の Migration guide の Fable 5.1 の項を確認すること。"
     );
   });
 
