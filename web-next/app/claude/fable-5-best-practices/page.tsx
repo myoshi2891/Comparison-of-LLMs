@@ -553,13 +553,19 @@ export default function Fable5BestPracticesPage() {
               <strong>2026年10月追記:</strong> 2026年9月に後継の <strong>Claude Fable 5.1</strong>（
               <code>claude-fable-5-1</code>、入力 $10 / 出力 $50 per 1M tokens、1M コンテキスト）と
               Mythos 5.1 が登場し、Fable 5 はレガシーモデルとなった。あわせて Opus 5.5 / Sonnet 5.5
-              / Haiku 5.5 も提供が始まっている。本ガイドの考え方は Fable 5.1
-              にもそのまま適用できるが、 新規採用時のモデル ID・価格は公式の Models overview
-              で確認すること。
+              / Haiku 5.5
+              も提供が始まっている。本ガイドのプロンプティングの考え方（ゴール・境界・検証基準を渡す）は
+              Fable 5.1 にもそのまま適用できるが、既存の API
+              連携は次の移行チェックを済ませるまでそのままでは動かない場合がある。新規採用時のモデル
+              ID・価格は公式の Models overview で確認すること。
             </p>
             <p>
-              ただし Fable 5.1 では thinking ブロックが生成したモデルに紐づく。Claude Mythos 5.1
-              は、それを生成した会話の中であれば Fable 5.1 の thinking
+              <strong>API 連携の移行チェック:</strong> Fable 5.1 では強制ツール使用（
+              <code>tool_choice</code> の <code>any</code> / <code>tool</code>）が 400
+              エラーになるため、<code>auto</code> とプロンプトでのツール指定、
+              <code>strict: true</code>
+              、または構造化出力に置き換える。また thinking ブロックは生成したモデルに紐づく。Claude
+              Mythos 5.1 は、それを生成した会話の中であれば Fable 5.1 の thinking
               ブロックを読めるが、それ以外のモデル(評価モデルなど)へ渡すクロスモデル評価フローでは、受け取ったモデル側でブロックが無視される。また過去のターンを編集して再送すると、それ以降の
               thinking
               ブロックが無効になる(2026年8月31日以降に作成されたアカウントでは編集済み履歴が 400

@@ -1722,6 +1722,13 @@ export default function GrokBestPracticesPage() {
             </thead>
             <tbody>
               <tr>
+                <td>grok-4.7</td>
+                <td>500k</td>
+                <td>$2.00 (&lt;200k) / $4.00 (≥200k)</td>
+                <td>$0.50 (&lt;200k) / $1.00 (≥200k)</td>
+                <td>$6.00 (&lt;200k) / $12.00 (≥200k)</td>
+              </tr>
+              <tr>
                 <td>grok-4.5</td>
                 <td>500k</td>
                 <td>$2.00</td>

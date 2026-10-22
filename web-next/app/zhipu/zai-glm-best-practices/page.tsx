@@ -932,7 +932,8 @@ export default function ZaiGlmBestPracticesPage() {
     B -->|"enabled"| C{"reasoning_effort"}
     B -->|"disabled"| D["即時応答(CoTなし)"]
     C -->|"max または xhigh"| E["最大推論(高精度・高コスト)"]
-    C -->|"high, medium, low"| F["拡張推論(高相当にマップ)"]
+    C -->|"high"| F["拡張推論(精度とコストのバランス)"]
+    C -->|"low"| G["軽量推論(high より浅く低コスト・低遅延)"]
     C -->|"minimal または none"| D`}
             />
           </div>
