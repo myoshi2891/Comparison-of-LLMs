@@ -686,7 +686,7 @@ export default function Page() {
                 </div>
                 <div className={styles.codeLine}>
                   {" "}
-                  model=<span className={styles.cs}>"gemini-2.5-flash"</span>,
+                  model=<span className={styles.cs}>"gemini-3.8-flash"</span>,
                 </div>
                 <div className={styles.codeLine}>
                   {" "}

@@ -798,9 +798,17 @@ export default function Page() {
                   <td>マルチエージェントのオーケストレーション層</td>
                 </tr>
                 <tr>
-                  <td>Gemini 2.5 Pro / 3.1 Pro</td>
-                  <td>高度な推論・100万トークン級コンテキスト</td>
+                  <td>Gemini 3.1 Pro</td>
+                  <td>
+                    高度な推論・100万トークン級コンテキスト（Gemini 2.5 Pro
+                    は2026年10月20日に提供終了）
+                  </td>
                   <td>複雑な推論・コーディング、最終品質チェック</td>
+                </tr>
+                <tr>
+                  <td>Gemini 4 Argon</td>
+                  <td>2026年10月13日にGAとなった最新のフロンティアモデル（gemini-4-argon）</td>
+                  <td>最高難度の推論・長時間のエージェントタスク</td>
                 </tr>
               </tbody>
             </table>
