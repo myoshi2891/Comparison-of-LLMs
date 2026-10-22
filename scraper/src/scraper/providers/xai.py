@@ -47,7 +47,7 @@ _CLS = {
     "Grok 4.1 Fast":   "tag-leg",
 }
 _SUB_JA = {
-    _GROK_4_7:         "最新旗艦 / 200K超は $4/$12",
+    _GROK_4_7:         "最新旗艦 / 入力200K以上は $4/$12",
     _GROK_4_6:         "前旗艦 / 500K ctx / 200K超は $4/$12",
     "Grok 4.5":        "前々旗艦 / 500K ctx / 200K超は $4/$12",
     "Grok 4.3":        "1M ctx / 200K超は $2.5/$5",
@@ -56,7 +56,7 @@ _SUB_JA = {
     "Grok 4.1 Fast":   "公式料金表から削除 (提供終了)",
 }
 _SUB_EN = {
-    _GROK_4_7:         "Latest flagship / $4/$12 above 200K",
+    _GROK_4_7:         "Latest flagship / $4/$12 at 200K+ prompt tokens",
     _GROK_4_6:         "Prev flagship / 500K ctx / $4/$12 above 200K",
     "Grok 4.5":        "Two gens back flagship / 500K ctx / $4/$12 above 200K",
     "Grok 4.3":        "1M ctx / $2.5/$5 above 200K",
