@@ -1179,7 +1179,7 @@ export default function GithubCopilotPage() {
         <hr />
         <h2 id="12-モデル選定戦略">12. モデル選定戦略</h2>
         <p>
-          Copilotのモデルピッカーには、Anthropic・OpenAI・Google・xAIなど複数プロバイダーのモデルが並びます。2026年10月時点で確認できる代表的なラインナップは以下の通りです(
+          Copilotのモデルピッカーには、Anthropic・OpenAI・Google・xAIなど複数プロバイダーのモデルが並びます。本ガイドの情報基準日（2026年7月31日）以降、2026年10月にモデル情報を更新した代表的なラインナップは以下の通りです(
           <strong>
             プランや管理者設定により利用可否が変わるため、必ず実際のモデルピッカーで確認してください
           </strong>
