@@ -111,7 +111,7 @@ export default function CopilotAgentPage() {
             </li>
           </ul>
         </nav>
-        <div className={styles.updated}>最終更新: 2026年7月31日時点の公開情報に基づく</div>
+        <div className={styles.updated}>最終更新: 2026年10月22日</div>
       </aside>
 
       <main className={styles.content}>
@@ -521,7 +521,9 @@ export default function CopilotAgentPage() {
           </div>
 
           <h3>2.5 基本サンプル</h3>
-          <span className={styles.codeLabel}>accessibility.agent.md</span>
+          <span className={styles.codeLabel}>
+            accessibility.agent.md（model は2026年10月時点の例）
+          </span>
           <pre className={styles.codeBlock}>
             <div className={styles.codeLine}>
               <span className={styles.ck}>---</span>
