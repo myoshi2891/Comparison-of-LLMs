@@ -933,7 +933,8 @@ export default function ZaiGlmBestPracticesPage() {
     B -->|"disabled"| D["即時応答(CoTなし)"]
     C -->|"max または xhigh"| E["最大推論(高精度・高コスト)"]
     C -->|"high"| F["拡張推論(精度とコストのバランス)"]
-    C -->|"low"| G["軽量推論(high より浅く低コスト・低遅延)"]
+    C -->|"low(GLM-5.3 / GLM-5.3-Flash)"| G["軽量推論(high より浅く低コスト・低遅延)"]
+    C -->|"low(それ以前のモデル)"| F
     C -->|"minimal または none"| D`}
             />
           </div>

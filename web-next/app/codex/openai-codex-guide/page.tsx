@@ -880,6 +880,16 @@ export default function OpenAICodexGuidePage() {
               <p className={styles.codeLabel}>~/.codex/config.toml — 個人のデフォルト例</p>
               <pre className={styles.codeBlock}>
                 <div className={styles.codeLine}>
+                  <span className={styles.cc}>
+                    # Enterprise / Edu では管理者が GPT-6.1 Sol を有効化するまで利用できない
+                  </span>
+                </div>
+                <div className={styles.codeLine}>
+                  <span className={styles.cc}>
+                    # 未有効化なら /model に表示される利用可能なモデルへ置き換える
+                  </span>
+                </div>
+                <div className={styles.codeLine}>
                   <span className={styles.cv}>model</span> ={" "}
                   <span className={styles.cs}>"gpt-6.1-sol"</span>
                 </div>
