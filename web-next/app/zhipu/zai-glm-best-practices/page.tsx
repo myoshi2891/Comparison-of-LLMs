@@ -349,7 +349,7 @@ export default function ZaiGlmBestPracticesPage() {
             <MermaidDiagram
               chart={`flowchart TD
     A["タスクの性質を確認"] --> B{"複雑な推論や長時間の<br/>エージェント型タスクか?"}
-    B -->|"Yes"| C["GLM-5.2<br/>(1Mコンテキスト, reasoning_effort=max)"]
+    B -->|"Yes"| C["GLM-5.3<br/>(2026年10月時点の最新旗艦)"]
     B -->|"No"| D{"コストを最優先したいか?"}
     D -->|"Yes"| E["GLM-4.5-Flash / GLM-4.7-Flash<br/>(無料枠)"]
     D -->|"No"| F{"画像や動画の理解が必要か?"}
@@ -359,7 +359,8 @@ export default function ZaiGlmBestPracticesPage() {
           </div>
 
           <p className={styles.p}>
-            GLM-5.2
+            複雑なコーディングや長時間タスクには、2026年10月時点の最新旗艦である GLM-5.3
+            を第一候補とする(GLM-5.2 と同価格)。GLM-5.2
             は、プロジェクト全体のコードベース理解、長期リファクタリング、実機デバッグ、研究論文の再現実装など、複数ステップにわたる開発ワークフローを1タスクで完結させることを想定して設計されている。一方、軽量なQ&amp;Aや定型処理では、無料枠のFlash系モデルや廉価なGLM-4.5-Airのほうがコスト効率がよい。
           </p>
 
