@@ -50,4 +50,18 @@ describe("/claude/code-slash-commands", () => {
     const codeBlocks = container.querySelectorAll("pre, code");
     expect(codeBlocks.length).toBeGreaterThan(0);
   });
+
+  it("/model のエイリアス説明は固定バージョンを示さず、ピッカー説明は維持する", () => {
+    const { container } = render(<Page />);
+    const pre = Array.from(container.querySelectorAll("pre")).find((p) =>
+      p.textContent?.includes("/model opus")
+    );
+    const lines = (pre?.textContent ?? "").split("\n").map((l) => l.trim().replace(/\s+/g, " "));
+    expect(lines).toEqual([
+      "/model opus # Claude Opus（解決先のバージョンはプロバイダーにより異なる）— 高精度・複雑タスク向け",
+      "/model sonnet # Claude Sonnet（解決先のバージョンはプロバイダーにより異なる）— バランス型・日常タスク向け",
+      "/model haiku # Claude Haiku（解決先のバージョンはプロバイダーにより異なる）— 高速・軽量タスク向け",
+      "/model # モデルピッカー UI を開く",
+    ]);
+  });
 });

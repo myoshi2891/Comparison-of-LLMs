@@ -916,21 +916,28 @@ export default function SlashCommandsGuideClient() {
                 使用例
               </span>
               <CodeCopyButton
-                text={`/model opus    # Claude Opus 5.5 — 高精度・複雑タスク向け\n/model sonnet  # Claude Sonnet 5.5 — バランス型・日常タスク向け\n/model haiku   # Claude Haiku 5.5 — 高速・軽量タスク向け\n/model         # モデルピッカー UI を開く`}
+                text={`/model opus    # Claude Opus（解決先のバージョンはプロバイダーにより異なる）— 高精度・複雑タスク向け\n/model sonnet  # Claude Sonnet（解決先のバージョンはプロバイダーにより異なる）— バランス型・日常タスク向け\n/model haiku   # Claude Haiku（解決先のバージョンはプロバイダーにより異なる）— 高速・軽量タスク向け\n/model         # モデルピッカー UI を開く`}
               />
             </div>
             <pre>
               <code>
                 <span className={styles.tCmd}>/model</span> opus{" "}
-                <span className={styles.tCmt}># Claude Opus 5.5 — 高精度・複雑タスク向け</span>
+                <span className={styles.tCmt}>
+                  # Claude Opus（解決先のバージョンはプロバイダーにより異なる）—
+                  高精度・複雑タスク向け
+                </span>
                 {"\n"}
                 <span className={styles.tCmd}>/model</span> sonnet{" "}
                 <span className={styles.tCmt}>
-                  # Claude Sonnet 5.5 — バランス型・日常タスク向け
+                  # Claude Sonnet（解決先のバージョンはプロバイダーにより異なる）—
+                  バランス型・日常タスク向け
                 </span>
                 {"\n"}
                 <span className={styles.tCmd}>/model</span> haiku{" "}
-                <span className={styles.tCmt}># Claude Haiku 5.5 — 高速・軽量タスク向け</span>
+                <span className={styles.tCmt}>
+                  # Claude Haiku（解決先のバージョンはプロバイダーにより異なる）—
+                  高速・軽量タスク向け
+                </span>
                 {"\n"}
                 <span className={styles.tCmd}>/model</span>{" "}
                 <span className={styles.tCmt}># モデルピッカー UI を開く</span>
