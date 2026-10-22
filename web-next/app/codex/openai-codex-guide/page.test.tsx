@@ -249,3 +249,22 @@ describe("/codex/openai-codex-guide (2026 Best Practices)", () => {
     );
   });
 });
+
+describe("個人のデフォルト config.toml 例のモデル利用条件", () => {
+  it("GPT-6.1 Sol の Enterprise / Edu 管理者有効化と、未有効化時のフォールバックを先頭行で示す", () => {
+    const { container } = render(<Page />);
+    const label = Array.from(container.querySelectorAll("p")).find(
+      (p) => p.textContent === "~/.codex/config.toml — 個人のデフォルト例"
+    );
+    const lines = Array.from(
+      label?.nextElementSibling?.querySelectorAll(`.${styles.codeLine}`) ?? []
+    )
+      .slice(0, 3)
+      .map((line) => line.textContent);
+    expect(lines).toEqual([
+      "# Enterprise / Edu では管理者が GPT-6.1 Sol を有効化するまで利用できない",
+      "# 未有効化なら /model に表示される利用可能なモデルへ置き換える",
+      'model = "gpt-6.1-sol"',
+    ]);
+  });
+});

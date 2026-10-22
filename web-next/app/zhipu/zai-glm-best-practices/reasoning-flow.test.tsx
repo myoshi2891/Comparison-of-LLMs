@@ -9,7 +9,7 @@ vi.mock("@/components/docs/MermaidDiagram", () => ({
 }));
 
 describe("第7章 reasoning_effort フローチャート", () => {
-  it("low を high より軽い独立した推論として示し、medium を対応値として示さない", async () => {
+  it("low の軽量推論を GLM-5.3 / GLM-5.3-Flash に限定し、それ以前のモデルの low を high 扱いとして示し、medium を対応値として示さない", async () => {
     const page = await Page();
     const { container } = render(page);
     const chart = container
@@ -21,7 +21,8 @@ describe("第7章 reasoning_effort フローチャート", () => {
     B -->|"disabled"| D["即時応答(CoTなし)"]
     C -->|"max または xhigh"| E["最大推論(高精度・高コスト)"]
     C -->|"high"| F["拡張推論(精度とコストのバランス)"]
-    C -->|"low"| G["軽量推論(high より浅く低コスト・低遅延)"]
+    C -->|"low(GLM-5.3 / GLM-5.3-Flash)"| G["軽量推論(high より浅く低コスト・低遅延)"]
+    C -->|"low(それ以前のモデル)"| F
     C -->|"minimal または none"| D`);
   });
 });
