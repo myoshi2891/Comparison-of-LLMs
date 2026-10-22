@@ -79,4 +79,14 @@ describe("/claude/self-hosted-sandboxes 契約テスト", () => {
     fireEvent.keyDown(firstCheckbox, { key: "Enter", code: "Enter" });
     expect(firstCheckbox.getAttribute("aria-checked")).toBe("false");
   });
+
+  it("Memory 利用時は mount_path ではなく書き込み可能な親ディレクトリをマウントするよう案内する", () => {
+    const { container } = render(<Page />);
+    const note = Array.from(container.querySelectorAll("p")).find((p) =>
+      p.textContent?.startsWith("Memory を使う場合")
+    );
+    expect(note?.textContent?.replace(/\s+/g, " ").trim()).toBe(
+      "Memory を使う場合： --read-only ではルートファイルシステムに書き込めないため、SDK ワーカーがメモリストアを同期する親ディレクトリ（例: /mnt/memory）にも書き込み可能なマウントが必要です。上記の /tmp と /mnt/session/outputs に加えて、-v /host/memory:/mnt/memory または --tmpfs /mnt/memory を追加し、ワーカーを実行するユーザーがこの親ディレクトリに書き込めるようにしてください。各ストアの mount_path のディレクトリはワーカーがセッション開始時に作成し終了時に削除するため、mount_path に直接マウントしないでください（パスが既に存在するとワーカーはセッションの処理を開始しません）。"
+    );
+  });
 });
