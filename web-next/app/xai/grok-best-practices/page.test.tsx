@@ -78,6 +78,6 @@ describe("xAI Grok Best Practices Page", () => {
       "$6.00 (<200k) / $12.00 (≥200k)",
       "2026年9月21日登場の grok-4.5 後継。プロンプトが 200k トークン以上のリクエストは全トークンに高い単価を適用",
     ]);
-    expect(rows[1][0]).toContain("grok-4.5");
+    expect(rows[1][0]).toBe("grok-4.5（2026年7月時点のフラッグシップ。2026年10月時点の最新は grok-4.7）");
   });
 });
