@@ -1306,8 +1306,8 @@
       "cls": "tag-flag",
       "price_in": 2.0,
       "price_out": 6.0,
-      "sub_ja": "前旗艦 / 500K ctx / 200K超は $4/$12",
-      "sub_en": "Prev flagship / 500K ctx / $4/$12 above 200K",
+      "sub_ja": "前旗艦 / 500K ctx / 入力200K以上は $4/$12",
+      "sub_en": "Prev flagship / 500K ctx / $4/$12 at 200K+ prompt tokens",
       "scrape_status": "fallback",
       "provenance": {
         "origin": "hardcoded",
@@ -1322,8 +1322,8 @@
       "cls": "tag-flag",
       "price_in": 2.0,
       "price_out": 6.0,
-      "sub_ja": "前々旗艦 / 500K ctx / 200K超は $4/$12",
-      "sub_en": "Two gens back flagship / 500K ctx / $4/$12 above 200K",
+      "sub_ja": "前々旗艦 / 500K ctx / 入力200K以上は $4/$12",
+      "sub_en": "Two gens back flagship / 500K ctx / $4/$12 at 200K+ prompt tokens",
       "scrape_status": "fallback",
       "provenance": {
         "origin": "hardcoded",

@@ -48,8 +48,8 @@ _CLS = {
 }
 _SUB_JA = {
     _GROK_4_7:         "最新旗艦 / 入力200K以上は $4/$12",
-    _GROK_4_6:         "前旗艦 / 500K ctx / 200K超は $4/$12",
-    "Grok 4.5":        "前々旗艦 / 500K ctx / 200K超は $4/$12",
+    _GROK_4_6:         "前旗艦 / 500K ctx / 入力200K以上は $4/$12",
+    "Grok 4.5":        "前々旗艦 / 500K ctx / 入力200K以上は $4/$12",
     "Grok 4.3":        "1M ctx / 200K超は $2.5/$5",
     _GROK_4_20:        "1M ctx / 値下げ ($2/$6→$1.25/$2.5)",
     _GROK_BUILD_0_1:   "256K ctx / 軽量ビルド向け",
@@ -57,8 +57,8 @@ _SUB_JA = {
 }
 _SUB_EN = {
     _GROK_4_7:         "Latest flagship / $4/$12 at 200K+ prompt tokens",
-    _GROK_4_6:         "Prev flagship / 500K ctx / $4/$12 above 200K",
-    "Grok 4.5":        "Two gens back flagship / 500K ctx / $4/$12 above 200K",
+    _GROK_4_6:         "Prev flagship / 500K ctx / $4/$12 at 200K+ prompt tokens",
+    "Grok 4.5":        "Two gens back flagship / 500K ctx / $4/$12 at 200K+ prompt tokens",
     "Grok 4.3":        "1M ctx / $2.5/$5 above 200K",
     _GROK_4_20:        "1M ctx / price cut ($2/$6 to $1.25/$2.5)",
     _GROK_BUILD_0_1:   "256K ctx / lightweight build tier",

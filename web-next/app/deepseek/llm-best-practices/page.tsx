@@ -1259,7 +1259,7 @@ export default function DeepSeekLlmPage() {
           <ul>
             <li>
               [ ] <code className={styles.inlineCode}>deepseek-chat</code> の記述を{" "}
-              <code className={styles.inlineCode}>deepseek-v4-flash</code> または{" "}
+              <code className={styles.inlineCode}>deepseek-flash</code> または{" "}
               <code className={styles.inlineCode}>deepseek-v4-pro</code> へ変更
             </li>
             <li>

@@ -2149,7 +2149,7 @@ export default function GrokBestPracticesPage() {
           <ul className={styles.checklist}>
             <li>
               <i className="ti ti-square" />
-              用途に応じて適切なモデル（基本は grok-4.5）を選定した
+              用途に応じて適切なモデル（基本は grok-4.7）を選定した
             </li>
             <li>
               <i className="ti ti-square" />

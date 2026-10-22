@@ -2157,8 +2157,8 @@ export default function GrokBestPracticesIntermediatePage() {
           <ul className={styles.checklist}>
             <li>
               <label>
-                <input type="checkbox" disabled /> モデル選定: <code>grok-4.5</code>（汎用）/{" "}
-                <code>grok-4.3</code>
+                <input type="checkbox" disabled /> モデル選定: <code>grok-4.7</code>
+                （汎用。既存システムの互換性維持なら <code>grok-4.5</code>）/ <code>grok-4.3</code>
                 （長文脈・低コスト）/ <code>grok-4.20-multi-agent</code>
                 （ディープリサーチ）を用途で使い分けたか
               </label>

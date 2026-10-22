@@ -75,7 +75,7 @@ grep -nE 'toBe\(|toContain|toMatch' app/<path>/page.test.tsx
 
 ```bash
 cd web-next
-grep -noE "(gpt-[0-9][a-z0-9.-]*|gemini-[0-9][a-z0-9.-]*|claude-[a-z]+-[0-9-]+|grok-[0-9][a-z0-9.-]*|deepseek-[a-z0-9.-]+|glm-[0-9][a-z0-9.-]*)" app/<path>/*.tsx | sort -u
+grep -noE "(gpt-[0-9][a-z0-9.-]*|gemini-[0-9][a-z0-9.-]*|claude-[a-z]+-[0-9][a-z0-9.-]*|grok-[0-9][a-z0-9.-]*|deepseek-[a-z0-9.-]+|glm-[0-9][a-z0-9.-]*)" app/<path>/*.tsx | sort -u
 ```
 
 | 参照先（一次情報） | 確認内容 |
