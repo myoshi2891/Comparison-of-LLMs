@@ -174,8 +174,8 @@ const CARDS: readonly RefCard[] = [
       {
         href: "https://dev.meta.ai/docs/pricing-rate-limits",
         label: "dev.meta.ai/docs/pricing-rate-limits",
-        desc_ja: "Muse Spark / Muse Wonder API料金 (Standard / Contributor)",
-        desc_en: "Muse Spark / Muse Wonder API pricing (Standard / Contributor)",
+        desc_ja: "Muse Spark 1.3 / 1.2: Standard・Contributor ／ Spark 1.1・Wonder: Standard のみ",
+        desc_en: "Muse Spark 1.3 / 1.2: Standard & Contributor / Spark 1.1 & Wonder: Standard only",
       },
       {
         href: "https://dev.meta.ai/docs/models",
