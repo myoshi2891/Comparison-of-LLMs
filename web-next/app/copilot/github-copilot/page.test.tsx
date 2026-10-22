@@ -123,9 +123,9 @@ const EXPECTED_MERMAID_SOURCES = [
     Task["タスクの性質を評価"] --> Simple{"構文・定型文・<br/>ボイラープレート程度か?"}
     Simple -- "はい" --> Fast["高速・低コストモデル<br/>(Haiku系 / Grok Code Fast 等)"]
     Simple -- "いいえ" --> Mid{"標準的な機能実装・<br/>アルゴリズムか?"}
-    Mid -- "はい" --> Balanced["バランス型モデル<br/>(Sonnet系 / GPT-5.4系等)を<br/>中程度の推論レベルで"]
+    Mid -- "はい" --> Balanced["バランス型モデル<br/>(Sonnet系 / GPT-6.1 Sol・GPT-6 Sol等)を<br/>中程度の推論レベルで"]
     Mid -- "いいえ" --> Hard{"アーキテクチャ設計・<br/>ミッションクリティカルな判断か?"}
-    Hard -- "はい" --> Premium["フラッグシップモデル<br/>(Opus系 / GPT-5.5系等)"]
+    Hard -- "はい" --> Premium["フラッグシップモデル<br/>(Opus系 / GPT-6 Astra等)"]
     Hard -- "いいえ" --> Context{"非常に大きな<br/>コンテキストが必要か?"}
     Context -- "はい" --> LargeCtx["大規模コンテキスト対応モデル<br/>(Gemini Pro系等)"]
     Context -- "いいえ" --> Balanced`,
