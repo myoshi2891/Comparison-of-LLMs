@@ -28,7 +28,7 @@ const MERMAID_DIAGRAM_1 = `flowchart TD
     A["タスクの性質は?"] --> B{"テキスト/コード生成か?"}
     B -- はい --> C{"深いリサーチ・複数視点の統合が必要か?"}
     C -- はい --> D["grok-4.20-multi-agent (4 or 16 エージェント)"]
-    C -- いいえ --> E["grok-4.5 (reasoning_effort で調整)"]
+    C -- いいえ --> E["grok-4.7<br/>(既存の挙動を維持するなら grok-4.5)"]
     B -- いいえ --> F{"モダリティは?"}
     F -- 画像生成/編集 --> G["Grok Imagine: image / image-quality"]
     F -- 動画生成/編集 --> H["Grok Imagine: video / video-1.5"]
@@ -349,8 +349,9 @@ export default function GrokBestPracticesIntermediatePage() {
           </div>
 
           <div className={styles.callout}>
-            <strong>ベストプラクティス:</strong> 迷ったら <code>grok-4.5</code>
-            （エイリアス）を使用。
+            <strong>ベストプラクティス:</strong> 迷ったら <code>grok-4.7</code>
+            （2026年10月時点の旗艦モデル）を使用。既存システムで挙動を変えたくない場合は{" "}
+            <code>grok-4.5</code> を継続でき、
             <code>grok-4.5-latest</code> は最新版に自動追従し、<code>grok-4.5-&lt;日付&gt;</code>{" "}
             は特定バージョンに固定されます。本番環境で挙動の一貫性を優先するなら日付固定版、最新機能を優先するなら{" "}
             <code>-latest</code> を使い分けてください。

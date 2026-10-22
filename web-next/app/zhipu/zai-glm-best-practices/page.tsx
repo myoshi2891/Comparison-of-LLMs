@@ -960,11 +960,17 @@ export default function ZaiGlmBestPracticesPage() {
                 を組み合わせる。
               </li>
               <li className={styles.li}>
-                単純なFAQ応答や定型フォーマット変換のような軽量タスクでは
+                単純なFAQ応答や定型フォーマット変換のような軽量タスクでは、GLM-5.3
+                系以外のモデルなら{" "}
                 <code className={styles.codeInline}>
                   thinking: &#123;&quot;type&quot;: &quot;disabled&quot;&#125;
-                </code>
-                にして応答速度とコストを最適化する。
+                </code>{" "}
+                にして応答速度とコストを最適化する。GLM-5.3 / GLM-5.3-Flash は thinking
+                が強制で無効化できない(
+                <code className={styles.codeInline}>thinking.type</code> は enabled
+                のまま)ため、代わりに{" "}
+                <code className={styles.codeInline}>reasoning_effort: &quot;low&quot;</code>{" "}
+                を指定して思考量を抑える。
               </li>
               <li className={styles.li}>
                 ストリーミング時は<code className={styles.codeInline}>delta.reasoning_content</code>
