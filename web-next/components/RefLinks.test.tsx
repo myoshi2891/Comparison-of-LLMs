@@ -116,6 +116,23 @@ describe("RefLinks - cards", () => {
     ).toBeTruthy();
   });
 
+  it("Meta pricing link distinguishes Standard / Contributor support per model", () => {
+    // Spark 1.3 / 1.2 は Standard・Contributor 両対応、Spark 1.1 と Wonder は Standard のみ
+    const cases = [
+      ["ja", "Muse Spark 1.3 / 1.2: Standard・Contributor ／ Spark 1.1・Wonder: Standard のみ"],
+      ["en", "Muse Spark 1.3 / 1.2: Standard & Contributor / Spark 1.1 & Wonder: Standard only"],
+    ] as const;
+    for (const [lang, expected] of cases) {
+      const { container, unmount } = render(<RefLinks lang={lang} />);
+      const metaCard = cardFor(container, "🦙 Meta (Muse)");
+      const labels = Array.from(metaCard?.querySelectorAll(".ref-label") ?? []).map(
+        (l) => l.textContent
+      );
+      expect(labels[0]).toBe(expected);
+      unmount();
+    }
+  });
+
   it("each card has h5 heading and .ref-link body", () => {
     const { container } = render(<RefLinks lang="ja" />);
     const cards = container.querySelectorAll(".ref-card");
