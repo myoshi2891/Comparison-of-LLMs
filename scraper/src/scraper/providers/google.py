@@ -23,6 +23,8 @@ _FLASH_PROMO_NAMES = {"Gemini 3.8 Flash", "Gemini 3.6 Flash"}
 _FLASH_STANDARD_PRICE = (1.50, 7.50)
 
 # Gemini 4 Argon の $2/$10 導入価格はこの日付まで。2026-12-01 以降は標準価格 $4/$20。
+# 切り替えは実行時判定のため、配信中の pricing.json へ反映するには 2026-12-01 以降に
+# update.sh を実行して生成物をコミットする必要がある（月次更新で実施）。
 _ARGON_NAME = "Gemini 4 Argon"
 _ARGON_PROMO_EXPIRY = date(2026, 11, 30)
 _ARGON_STANDARD_PRICE = (4.00, 20.00)
