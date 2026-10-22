@@ -536,7 +536,7 @@ const entries: PageEntry[] = [
     provider: "codex",
     topics: ["guide"],
     summary:
-      "2026-06-29 最新版 (v0.142.4)。初学者から中級者まで、GPT-5.5 / GPT-5-Codex を搭載した AI コーディングエージェントを最大限に活かすベストプラクティスをステップバイステップで解説します（Codex Remote GA 対応）。",
+      "2026-10-22 確認版。初学者から中級者まで、AI コーディングエージェント OpenAI Codex を最大限に活かすベストプラクティスをステップバイステップで解説します（GPT-5.5 の Codex 退役に伴い、推奨モデルは GPT-6.1 Sol）。",
     addedAt: "2026-05-08",
     lastReviewed: "2026-10-22",
   },
