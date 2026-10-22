@@ -88,6 +88,16 @@ describe("/claude/fable-5-best-practices - page structure (Step 1)", () => {
     expect(container.textContent).toContain("Claude Opus 5 / Opus 4.8");
   });
 
+  it("thinking ブロックの注意書きで Mythos 5.1 の読み取り可否とクロスモデル評価を区別する", () => {
+    const { container } = render(<Page />);
+    const paragraph = Array.from(container.querySelectorAll("p")).find((p) =>
+      p.textContent?.startsWith("ただし Fable 5.1 では thinking")
+    );
+    expect(paragraph?.textContent?.replace(/\s+/g, " ").trim()).toBe(
+      "ただし Fable 5.1 では thinking ブロックが生成したモデルに紐づく。Claude Mythos 5.1 は、それを生成した会話の中であれば Fable 5.1 の thinking ブロックを読めるが、それ以外のモデル(評価モデルなど)へ渡すクロスモデル評価フローでは、受け取ったモデル側でブロックが無視される。また過去のターンを編集して再送すると、それ以降の thinking ブロックが無効になる(2026年8月31日以降に作成されたアカウントでは編集済み履歴が 400 エラーになる)。会話履歴は追記のみで扱う設計にし、移行時は公式の Migration guide の Fable 5.1 の項を確認すること。"
+    );
+  });
+
   it("opens and closes the mobile sidebar from an accessible button", () => {
     const { container } = render(<Page />);
     const sidebar = container.querySelector("aside");
