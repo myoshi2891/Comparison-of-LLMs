@@ -88,6 +88,8 @@ describe("xAI Grok Best Practices Page", () => {
     const item = Array.from(container.querySelectorAll("li")).find((li) =>
       li.textContent?.includes("用途に応じて適切なモデル")
     );
-    expect(item?.textContent?.replace(/\s+/g, " ").trim()).toBe("用途に応じて適切なモデル（基本は grok-4.7）を選定した");
+    expect(item?.textContent?.replace(/\s+/g, " ").trim()).toBe(
+      "用途に応じて適切なモデル（基本は grok-4.7）を選定した"
+    );
   });
 });
