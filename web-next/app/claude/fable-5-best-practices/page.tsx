@@ -158,7 +158,7 @@ export default function Fable5BestPracticesPage() {
           <div className={styles.heroMeta}>
             <div>初出: 2026年7月4日</div>
             <div>
-              改訂: <span>2026年7月26日公式ドキュメント対応版</span>
+              改訂: <span>2026年7月26日公式ドキュメント対応版（2026年10月22日追記）</span>
             </div>
             <div>
               対象: <span>Claude Code 中〜上級エンジニア</span>
@@ -548,6 +548,14 @@ export default function Fable5BestPracticesPage() {
               に近い性能を約半額で提供しており、コスト優先のユースケースでは Opus 5
               がフォールバック先の有力候補となる。最新情報は <code>support.claude.com</code>{" "}
               の「Claude Fable 5 Promotional Access」記事で確認すること。
+            </p>
+            <p>
+              <strong>2026年10月追記:</strong> 2026年9月に後継の <strong>Claude Fable 5.1</strong>（
+              <code>claude-fable-5-1</code>、入力 $10 / 出力 $50 per 1M tokens、1M コンテキスト）と
+              Mythos 5.1 が登場し、Fable 5 はレガシーモデルとなった。あわせて Opus 5.5 / Sonnet 5.5
+              / Haiku 5.5 も提供が始まっている。本ガイドの考え方は Fable 5.1
+              にもそのまま適用できるが、 新規採用時のモデル ID・価格は公式の Models overview
+              で確認すること。
             </p>
           </div>
 

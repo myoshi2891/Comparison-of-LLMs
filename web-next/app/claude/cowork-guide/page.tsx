@@ -218,7 +218,7 @@ export default function Page() {
               Coworkの基本概念からセットアップ、安全な運用、応用までを順を追って解説します。
             </p>
             <div className={styles.heroMeta}>
-              <span className={styles.metaChip}>最終更新：2026年7月26日</span>
+              <span className={styles.metaChip}>最終更新：2026年10月22日</span>
               <span className={styles.metaChip}>対象：初めてClaude Coworkに触れる方</span>
               <span className={styles.metaChip}>形式：全12ステップ + チェックリスト</span>
             </div>
@@ -234,7 +234,7 @@ export default function Page() {
               Codeが持つ「自律的にタスクをこなすエージェント機能」を、ターミナルを使わずに非エンジニアの知識労働（書類作成、リサーチ、データ整理など）向けに開放したものです。ユーザーは「欲しい結果」を説明してその場を離れ、後から完成した成果物（整形済みドキュメント、整理されたファイル、まとめられたリサーチなど）を受け取る、という使い方をします。
             </p>
             <p>
-              Coworkのセッションは基本的にAnthropicのサーバー上でリモート実行されるため、作業内容やファイルはユーザーのClaudeアカウントに紐づき、デスクトップ・Web・モバイルのどこからでも続きを確認できます。Chat（通常の会話）とCoworkは同じメッセージ入力欄を共有しており、入力欄で「Cowork」を選ぶだけで切り替えられます。
+              Coworkのセッションは基本的にAnthropicのサーバー上でリモート実行されるため、作業内容やファイルはユーザーのClaudeアカウントに紐づき、デスクトップ・Web・モバイルのどこからでも続きを確認できます。Chat（通常の会話）とCoworkは同じメッセージ入力欄を共有しており、入力欄で「Cowork」を選ぶだけで切り替えられます。さらに2026年9月16日から、Coworkの機能をどの会話からでも呼び出せる新しい体験が順次展開されています（チャット・Coworkタスク・プロジェクト・コネクタ・スキルは引き継がれます）。
             </p>
 
             <h3>Coworkが1つのタスクをこなす流れ</h3>
@@ -971,7 +971,8 @@ export default function Page() {
                   <tr>
                     <td>Coworkでの記憶が引き継がれない</td>
                     <td>
-                      Chatでの記憶は現時点でCoworkセッションに引き継がれません。Cowork内で記憶が使えるのはProjects機能を使った場合のみです
+                      2026年8月25日以降、メモリはChatとクラウド上のCoworkで共通に機能します。引き継がれない場合は設定でメモリが有効か確認してください（機微な話題は「Include
+                      sensitive topics in memory」を有効にしない限り記憶されません）
                     </td>
                   </tr>
                   <tr>

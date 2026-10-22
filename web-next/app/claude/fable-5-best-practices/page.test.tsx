@@ -80,7 +80,7 @@ describe("/claude/fable-5-best-practices - page structure (Step 1)", () => {
 
   it("uses the latest timeline date and current model comparison", () => {
     const { container } = render(<Page />);
-    expect(container.querySelector("aside")?.textContent).toContain("最終更新: 2026-07-26");
+    expect(container.querySelector("aside")?.textContent).toContain("最終更新: 2026-10-22");
     expect(container.querySelector(`.${styles.heroMeta}`)?.textContent).toContain("2026年7月26日");
     expect(container.textContent).toContain("Claude Opus 5 / Opus 4.8");
   });
@@ -129,6 +129,6 @@ describe("/claude/fable-5-best-practices - registration", () => {
 
   it("uses the latest timeline date in the page registry", () => {
     const entry = pageRegistry.find(({ slug }) => slug === "/claude/fable-5-best-practices");
-    expect(entry?.lastReviewed).toBe("2026-07-26");
+    expect(entry?.lastReviewed).toBe("2026-10-22");
   });
 });

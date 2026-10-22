@@ -228,13 +228,14 @@ export default function Page() {
           </p>
           <div className={styles.hMeta}>
             <span className={styles.hMetaI}>
-              🤖 <strong>対象モデル</strong>: Claude Opus 4 系最新版（2026年時点）を含む最新モデル
+              🤖 <strong>対象モデル</strong>: Claude Opus 5.5 / Fable 5.1
+              などの最新モデル（2026年10月時点）
             </span>
             <span className={styles.hMetaI}>
               📋 <strong>ステータス</strong>: Public Beta
             </span>
             <span className={styles.hMetaI}>
-              📅 <strong>更新日</strong>: 2026年6月30日
+              📅 <strong>更新日</strong>: 2026年10月22日
             </span>
           </div>
         </section>
@@ -1604,8 +1605,12 @@ export default function Page() {
             <div className={`${styles.ca} ${styles.caR}`}>
               <span className={styles.caI}>🚫</span>
               <p>
-                <strong>制限：</strong> Self-hosted サンドボックスでは現在{" "}
-                <strong>Memory（永続メモリ）</strong> はサポートされていません。
+                <strong>制限：</strong> Self-hosted サンドボックスの{" "}
+                <strong>Memory（永続メモリ）</strong> は
+                2026年8月19日から利用可能になりました。Python / TypeScript / Go の SDK
+                ワーカーが、アタッチされたメモリストアを <code>mount_path</code>{" "}
+                にダウンロードし、変更をストアへ同期します（Claude Platform on AWS
+                では引き続き利用不可）。
               </p>
             </div>
           </div>
@@ -2262,7 +2267,7 @@ export default function Page() {
               "work.stop によるグレースフルシャットダウン手順を整備した",
               "--workdir を変更した場合、エージェントのシステムプロンプトも更新した",
               "モニタリング呼び出しはワーカーホストではなく別の運用ツールから行っている",
-              "Memory は Self-hosted では現在未サポートであることを把握している",
+              "Memory ストアは SDK ワーカー経由で同期される（AWS では利用不可）ことを把握している",
             ]}
           />
 
@@ -2813,8 +2818,8 @@ export default function Page() {
 
         <footer className={styles.footer}>
           <p>
-            📌 本ガイドは公式ドキュメント（取得日: 2026年6月30日）を基に作成しています。Claude
-            Managed Agents は Public Beta のため、API
+            📌 本ガイドは公式ドキュメント（取得日: 2026年6月30日。2026年10月22日に Memory
+            対応などを追記）を基に作成しています。Claude Managed Agents は Public Beta のため、API
             仕様は予告なく変更される可能性があります。最新情報は
             <Ext href="https://platform.claude.com/docs/en/managed-agents/self-hosted-sandboxes">
               公式ドキュメント

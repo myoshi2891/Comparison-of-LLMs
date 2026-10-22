@@ -1151,10 +1151,10 @@ style FM fill:#1c2a1c,stroke:#3fb950,color:#e6edf3`}
               <span className={styles.calloutIcon}>💡</span>
               <p>
                 Agent Teams (<code>--team</code>) 利用時は <code>/effort</code> コマンドで思考深度を{" "}
-                <code>low</code>・<code>medium</code>・<code>high</code>・<code>xhigh</code>{" "}
-                から選択できます（Opus 4.7 で <code>xhigh</code> が追加）。スキル内に{" "}
-                <code>effort: high</code> を frontmatter で指定することも可能です（Opus 4.7
-                以降推奨）。<code>/loop</code>{" "}
+                <code>low</code>・<code>medium</code>・<code>high</code>・<code>xhigh</code>・
+                <code>max</code> から選択できます（Opus 4.7 で <code>xhigh</code>{" "}
+                が追加）。スキル内に <code>effort: high</code> を frontmatter
+                で指定することも可能です（Opus 4.7 以降推奨）。<code>/loop</code>{" "}
                 コマンドを使えばスキルを定期的に繰り返し実行させることもできます。Opus 4.8
                 （2026-05-28）では claude.ai 上でもエフォート量を制御できるようになり、Claude Code
                 には大規模問題に対応する「dynamic workflows」が追加されています。
@@ -1745,7 +1745,7 @@ style B fill:#2a1c1c,stroke:#f85149,color:#e6edf3`}
                 fontFamily: "'JetBrains Mono', monospace",
               }}
             >
-              最終更新: 2026年6月 · Claude Code 最新版 · SKILL.md 完全解説ガイド
+              最終更新: 2026年10月 · Claude Code 最新版 · SKILL.md 完全解説ガイド
             </p>
           </section>
         </main>
