@@ -1572,7 +1572,7 @@ web-next/app/claude/tag-best-practices/page.tsx を読んでください。
 期日を過ぎた「予定」表記（移行日など）は「予定されていた（YYYY年M月時点で期日経過済み）」の形に改め、
 チェックリストの文言も期日後の行動に合わせてください。
 稼働モデル名は公式で確認できた場合のみ更新し、確認できない場合は据え置いて報告してください。
-h2 数（契約テストは 15 固定）と metadata（registry の title / description と toBe で一致）は変更しないこと。
+h2 見出し（契約テストは件数固定ではなく、EXPECTED_H2 と toEqual で順序込みの完全一致を検証する）と metadata（registry の title / description と toBe で一致）は変更しないこと。
 ```
 
 ### 検証チェックリスト

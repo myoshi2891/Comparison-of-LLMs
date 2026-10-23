@@ -453,13 +453,15 @@ Claude は「できたように見える」時点で止まります。**テス�
       {
         "matcher": "Edit|Write",
         "hooks": [
-          { "type": "command", "command": "npx prettier --write \"$CLAUDE_FILE_PATH\"" }
+          { "type": "command", "command": "jq -r '.tool_input.file_path // empty' | xargs -r npx prettier --write" }
         ]
       }
     ]
   }
 }
 ```
+
+フックには編集対象のパスが環境変数ではなく、標準入力の JSON（`tool_input.file_path`）で渡されます。上の例は `jq` でそのパスを取り出して Prettier に渡しています。
 
 > Claude にフックを書かせることもできます。「ファイル編集のたびに eslint を実行するフックを書いて」「migrations フォルダへの書き込みをブロックするフックを書いて」と依頼します。
 
