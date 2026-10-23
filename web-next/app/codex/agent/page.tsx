@@ -576,6 +576,12 @@ export default function CodexAgentPage() {
         <p>
           以下は、上記キーの一部を実際に組み合わせた <code>~/.codex/config.toml</code> の例です。
         </p>
+        <p>
+          モデルの利用可否: 例の <code>gpt-6-sol</code>(GPT-6 Sol)と <code>gpt-6.1-sol</code>
+          (GPT-6.1 Sol)は、プランやワークスペースの設定によっては利用できません(Enterprise / Edu
+          では管理者が有効化するまで使えません)。コピーする際は、Codex のモデルピッカー(
+          <code>/model</code>)に表示される利用可能なモデルを選んで置き換えてください。
+        </p>
         <div className={styles.codeBlock}>
           <div className={styles.codeBar}>
             <span>~/.codex/config.toml</span>

@@ -1643,7 +1643,7 @@
       "cls": "tag-bal",
       "note_ja": "1席あたり + 基本料 $80/月 | 管理機能",
       "note_en": "Per seat + $80/mo base fee | admin features",
-      "scrape_status": "success"
+      "scrape_status": "fallback"
     },
     {
       "group": "Claude Code",

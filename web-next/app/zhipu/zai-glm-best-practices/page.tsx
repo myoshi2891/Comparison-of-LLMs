@@ -886,7 +886,8 @@ export default function ZaiGlmBestPracticesPage() {
                     <code className={styles.codeInline}>xhigh</code>
                   </td>
                   <td>
-                    内部的に<code className={styles.codeInline}>max</code>として扱われる
+                    それ以前のモデルのみ。内部的に<code className={styles.codeInline}>max</code>
+                    として扱われる
                   </td>
                 </tr>
                 <tr>
@@ -919,23 +920,30 @@ export default function ZaiGlmBestPracticesPage() {
                     <code className={styles.codeInline}>minimal</code> /{" "}
                     <code className={styles.codeInline}>none</code>
                   </td>
-                  <td>思考をスキップし、即座に応答を生成</td>
+                  <td>それ以前のモデルのみ。思考をスキップし、即座に応答を生成</td>
                 </tr>
               </tbody>
             </table>
           </div>
+          <p className={styles.p}>
+            GLM-5.3 系(GLM-5.3 / GLM-5.3-Flash / GLM-5.3-FlashX)で指定する値は low・high・max
+            の3つのみ。xhigh・minimal・none はそれ以前のモデル向けの値として扱う。
+          </p>
 
           <div className={styles.diagramWrap}>
             <MermaidDiagram
               chart={`flowchart LR
     A["リクエスト受信"] --> B{"thinking.type"}
-    B -->|"enabled"| C{"reasoning_effort"}
-    B -->|"disabled"| D["即時応答(CoTなし)"]
-    C -->|"max または xhigh"| E["最大推論(高精度・高コスト)"]
-    C -->|"high"| F["拡張推論(精度とコストのバランス)"]
-    C -->|"low(GLM-5.3 / GLM-5.3-Flash)"| G["軽量推論(high より浅く低コスト・低遅延)"]
-    C -->|"low(それ以前のモデル)"| F
-    C -->|"minimal または none"| D`}
+    B -->|"enabled"| M{"モデル"}
+    B -->|"disabled(GLM-5.3 系以外)"| D["即時応答(CoTなし)"]
+    M -->|"GLM-5.3 系"| C1{"reasoning_effort"}
+    M -->|"それ以前のモデル"| C2{"reasoning_effort"}
+    C1 -->|"max"| E["最大推論(高精度・高コスト)"]
+    C1 -->|"high"| F["拡張推論(精度とコストのバランス)"]
+    C1 -->|"low"| G["軽量推論(high より浅く低コスト・低遅延)"]
+    C2 -->|"max または xhigh"| E
+    C2 -->|"high または low"| F
+    C2 -->|"minimal または none"| D`}
             />
           </div>
 
@@ -977,8 +985,8 @@ export default function ZaiGlmBestPracticesPage() {
                 <code className={styles.codeInline}>
                   thinking: &#123;&quot;type&quot;: &quot;disabled&quot;&#125;
                 </code>{" "}
-                にして応答速度とコストを最適化する。GLM-5.3 / GLM-5.3-Flash は thinking
-                が強制で無効化できない(
+                にして応答速度とコストを最適化する。GLM-5.3 / GLM-5.3-Flash / GLM-5.3-FlashX は
+                thinking が強制で無効化できない(
                 <code className={styles.codeInline}>thinking.type</code> は enabled
                 のまま)ため、代わりに{" "}
                 <code className={styles.codeInline}>reasoning_effort: &quot;low&quot;</code>{" "}

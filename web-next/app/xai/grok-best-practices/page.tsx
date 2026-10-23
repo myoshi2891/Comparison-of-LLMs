@@ -319,9 +319,9 @@ export default function GrokBestPracticesPage() {
                   grok-4.7）
                 </td>
                 <td>500k</td>
-                <td>$2.00</td>
+                <td>$2.00 (&lt;200k) / $4.00 (≥200k)</td>
                 <td>$0.30 (&lt;200k) / $0.60 (≥200k)</td>
-                <td>$6.00</td>
+                <td>$6.00 (&lt;200k) / $12.00 (≥200k)</td>
                 <td>エージェント型ツール呼び出し、幻覚が少ない、推論強度を調整可能</td>
               </tr>
               <tr>
@@ -1731,9 +1731,9 @@ export default function GrokBestPracticesPage() {
               <tr>
                 <td>grok-4.5</td>
                 <td>500k</td>
-                <td>$2.00</td>
+                <td>$2.00 (&lt;200k) / $4.00 (≥200k)</td>
                 <td>$0.30 (&lt;200k) / $0.60 (≥200k)</td>
-                <td>$6.00</td>
+                <td>$6.00 (&lt;200k) / $12.00 (≥200k)</td>
               </tr>
               <tr>
                 <td>grok-4.3</td>
