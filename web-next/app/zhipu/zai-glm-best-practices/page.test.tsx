@@ -32,7 +32,7 @@ describe("ZaiGlmBestPracticesPage", () => {
       li.textContent?.startsWith("単純なFAQ応答や定型フォーマット変換")
     );
     expect(item?.textContent?.replace(/\s+/g, " ").trim()).toBe(
-      '単純なFAQ応答や定型フォーマット変換のような軽量タスクでは、GLM-5.3 系以外のモデルなら thinking: {"type": "disabled"} にして応答速度とコストを最適化する。GLM-5.3 / GLM-5.3-Flash は thinking が強制で無効化できない(thinking.type は enabled のまま)ため、代わりに reasoning_effort: "low" を指定して思考量を抑える。'
+      '単純なFAQ応答や定型フォーマット変換のような軽量タスクでは、GLM-5.3 系以外のモデルなら thinking: {"type": "disabled"} にして応答速度とコストを最適化する。GLM-5.3 / GLM-5.3-Flash / GLM-5.3-FlashX は thinking が強制で無効化できない(thinking.type は enabled のまま)ため、代わりに reasoning_effort: "low" を指定して思考量を抑える。'
     );
   });
 
@@ -73,14 +73,17 @@ describe("ZaiGlmBestPracticesPage", () => {
     );
     expect(rows).toEqual([
       ["max(デフォルト・推奨)", "最も深い推論。精度重視、コストと遅延は最大"],
-      ["xhigh", "内部的にmaxとして扱われる"],
+      ["xhigh", "それ以前のモデルのみ。内部的にmaxとして扱われる"],
       ["high", "拡張推論。精度とコストのバランス型"],
       ["medium", "内部的にhighとして扱われる(GLM-5.3 / GLM-5.3-Flash は非対応)"],
       [
         "low",
         "GLM-5.3 / GLM-5.3-Flash では high より浅い軽量推論として区別され、思考量・コスト・遅延を抑えられる。それ以前のモデルでは内部的にhighとして扱われる",
       ],
-      ["minimal / none", "思考をスキップし、即座に応答を生成"],
+      ["minimal / none", "それ以前のモデルのみ。思考をスキップし、即座に応答を生成"],
     ]);
+    expect(table.closest("div")?.nextElementSibling?.textContent?.replace(/\s+/g, " ").trim()).toBe(
+      "GLM-5.3 系(GLM-5.3 / GLM-5.3-Flash / GLM-5.3-FlashX)で指定する値は low・high・max の3つのみ。xhigh・minimal・none はそれ以前のモデル向けの値として扱う。"
+    );
   });
 });
