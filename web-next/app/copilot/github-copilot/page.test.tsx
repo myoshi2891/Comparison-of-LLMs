@@ -357,10 +357,15 @@ describe("/copilot/github-copilot Contract Tests", () => {
 describe("10月のモデルラインナップ（Grok）", () => {
   it("2026-10-19 に退役した Grok 4.5 を選択肢から外し、現行の Grok 4.7 / 4.6 を残す", () => {
     const { container } = render(<GithubCopilotPage />);
-    const cells = Array.from(container.querySelectorAll("td")).map((td) =>
-      (td.textContent ?? "").trim()
-    );
-    expect(cells).toContain("Grok 4.7 / 4.6");
-    expect(cells).not.toContain("Grok 4.7 / 4.6 / 4.5");
+    // 部分一致では「Grok 4.5」だけの行・セルを追加しても素通りするため、
+    // Grok を含む行を全件集め、行の全セルを順序込みで完全一致させる。
+    const grokRows = Array.from(container.querySelectorAll("tr"))
+      .filter((tr) => /Grok/.test(tr.textContent ?? ""))
+      .map((tr) =>
+        Array.from(tr.querySelectorAll("td")).map((td) => (td.textContent ?? "").trim())
+      );
+    expect(grokRows).toEqual([
+      ["Grok 4.7 / 4.6", "xAI", "高速・日常的な軽量タスク", "ゼロデータ保持ポリシーでホスティング"],
+    ]);
   });
 });
