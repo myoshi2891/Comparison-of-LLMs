@@ -327,25 +327,25 @@ export default function GrokBestPracticesPage() {
               <tr>
                 <td>grok-4.3</td>
                 <td>1M</td>
-                <td>$1.25</td>
-                <td>$0.20</td>
-                <td>$2.50</td>
+                <td>$1.25 (&lt;200k) / $2.50 (≥200k)</td>
+                <td>$0.20 (&lt;200k) / $0.40 (≥200k)</td>
+                <td>$2.50 (&lt;200k) / $5.00 (≥200k)</td>
                 <td>長文コンテキスト向け</td>
               </tr>
               <tr>
                 <td>grok-4.20-0309-reasoning / non-reasoning</td>
                 <td>1M</td>
-                <td>$1.25</td>
-                <td>$0.20</td>
-                <td>$2.50</td>
+                <td>$1.25 (&lt;200k) / $2.50 (≥200k)</td>
+                <td>$0.20 (&lt;200k) / $0.40 (≥200k)</td>
+                <td>$2.50 (&lt;200k) / $5.00 (≥200k)</td>
                 <td>推論あり／なしを選択可能</td>
               </tr>
               <tr>
                 <td>grok-4.20-multi-agent-0309</td>
                 <td>1M</td>
-                <td>$1.25</td>
-                <td>$0.20</td>
-                <td>$2.50</td>
+                <td>$1.25 (&lt;200k) / $2.50 (≥200k)</td>
+                <td>$0.20 (&lt;200k) / $0.40 (≥200k)</td>
+                <td>$2.50 (&lt;200k) / $5.00 (≥200k)</td>
                 <td>複数エージェント（4体 or 16体）が協調して回答を生成</td>
               </tr>
               <tr>
@@ -1738,16 +1738,16 @@ export default function GrokBestPracticesPage() {
               <tr>
                 <td>grok-4.3</td>
                 <td>1M</td>
-                <td>$1.25</td>
-                <td>$0.20</td>
-                <td>$2.50</td>
+                <td>$1.25 (&lt;200k) / $2.50 (≥200k)</td>
+                <td>$0.20 (&lt;200k) / $0.40 (≥200k)</td>
+                <td>$2.50 (&lt;200k) / $5.00 (≥200k)</td>
               </tr>
               <tr>
                 <td>grok-4.20 系（reasoning/non-reasoning/multi-agent）</td>
                 <td>1M</td>
-                <td>$1.25</td>
-                <td>$0.20</td>
-                <td>$2.50</td>
+                <td>$1.25 (&lt;200k) / $2.50 (≥200k)</td>
+                <td>$0.20 (&lt;200k) / $0.40 (≥200k)</td>
+                <td>$2.50 (&lt;200k) / $5.00 (≥200k)</td>
               </tr>
             </tbody>
           </table>

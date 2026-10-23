@@ -1608,9 +1608,9 @@ export default function Page() {
                 <strong>制限：</strong> Self-hosted サンドボックスの{" "}
                 <strong>Memory（永続メモリ）</strong> は
                 2026年8月19日から利用可能になりました。Python / TypeScript / Go の SDK
-                ワーカーが、アタッチされたメモリストアを <code>mount_path</code>{" "}
-                にダウンロードし、変更をストアへ同期します（Claude Platform on AWS
-                では引き続き利用不可）。
+                ワーカー、または ant CLI 1.33.0 以降が、アタッチされたメモリストアを{" "}
+                <code>mount_path</code> にダウンロードし、変更をストアへ同期します（1.33.0 より前の
+                ant CLI は要件を満たしません。Claude Platform on AWS では引き続き利用不可）。
               </p>
             </div>
           </div>

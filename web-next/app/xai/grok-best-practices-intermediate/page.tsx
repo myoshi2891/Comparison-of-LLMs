@@ -313,27 +313,27 @@ export default function GrokBestPracticesIntermediatePage() {
                     <code>grok-4.3</code>
                   </td>
                   <td>1M</td>
-                  <td>$1.25</td>
-                  <td>$0.20</td>
-                  <td>$2.50</td>
+                  <td>$1.25 (&lt;200k) / $2.50 (≥200k)</td>
+                  <td>$0.20 (&lt;200k) / $0.40 (≥200k)</td>
+                  <td>$2.50 (&lt;200k) / $5.00 (≥200k)</td>
                 </tr>
                 <tr>
                   <td>
                     <code>grok-4.20-multi-agent-0309</code>
                   </td>
                   <td>1M</td>
-                  <td>$1.25</td>
-                  <td>$0.20</td>
-                  <td>$2.50</td>
+                  <td>$1.25 (&lt;200k) / $2.50 (≥200k)</td>
+                  <td>$0.20 (&lt;200k) / $0.40 (≥200k)</td>
+                  <td>$2.50 (&lt;200k) / $5.00 (≥200k)</td>
                 </tr>
                 <tr>
                   <td>
                     <code>grok-4.20-0309-reasoning</code>
                   </td>
                   <td>1M</td>
-                  <td>$1.25</td>
-                  <td>$0.20</td>
-                  <td>$2.50</td>
+                  <td>$1.25 (&lt;200k) / $2.50 (≥200k)</td>
+                  <td>$0.20 (&lt;200k) / $0.40 (≥200k)</td>
+                  <td>$2.50 (&lt;200k) / $5.00 (≥200k)</td>
                 </tr>
                 <tr>
                   <td>
