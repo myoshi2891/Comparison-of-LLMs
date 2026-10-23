@@ -353,3 +353,14 @@ describe("/copilot/github-copilot Contract Tests", () => {
     }
   });
 });
+
+describe("10月のモデルラインナップ（Grok）", () => {
+  it("2026-10-19 に退役した Grok 4.5 を選択肢から外し、現行の Grok 4.7 / 4.6 を残す", () => {
+    const { container } = render(<GithubCopilotPage />);
+    const cells = Array.from(container.querySelectorAll("td")).map((td) =>
+      (td.textContent ?? "").trim()
+    );
+    expect(cells).toContain("Grok 4.7 / 4.6");
+    expect(cells).not.toContain("Grok 4.7 / 4.6 / 4.5");
+  });
+});
