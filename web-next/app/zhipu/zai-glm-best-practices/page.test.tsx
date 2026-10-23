@@ -86,4 +86,25 @@ describe("ZaiGlmBestPracticesPage", () => {
       "GLM-5.3 系(GLM-5.3 / GLM-5.3-Flash / GLM-5.3-FlashX)で指定する値は low・high・max の3つのみ。xhigh・minimal・none はそれ以前のモデル向けの値として扱う。"
     );
   });
+
+  it("導入・バッジ・フッターの検証日は 7月16日の原本検証と 10月のモデル状況更新を区別する", async () => {
+    const page = await Page();
+    const { container } = render(page);
+    const norm = (t: string | null | undefined) => t?.replace(/\s+/g, " ").trim();
+    const intro = Array.from(container.querySelectorAll("p")).find((p) =>
+      p.textContent?.startsWith("これから Z.ai")
+    );
+    expect(norm(intro?.textContent)).toBe(
+      "これから Z.ai の GLM モデル API を触り始めるエンジニア向けに、アカウント作成から本番運用のエラーハンドリング・コスト最適化までを順を追って解説する。当初の内容は 2026年7月16日時点で docs.z.ai / z.ai の公式ドキュメントを直接確認し、検証済みである。GLM-5.3 系など2026年10月時点のモデル状況はその後の更新で追記したものであり、7月16日の検証には含まれない。"
+    );
+    const badge = Array.from(container.querySelectorAll("div")).find((d) =>
+      d.textContent?.startsWith("✓公式ドキュメント")
+    );
+    expect(norm(badge?.textContent)).toBe(
+      "✓公式ドキュメント docs.z.ai / z.ai を直接確認して作成(2026年7月16日時点。2026年10月時点のモデル状況は後日追記)"
+    );
+    expect(norm(container.querySelector("footer")?.textContent)).toBe(
+      "本ガイドはZ.ai公式ドキュメント(docs.z.ai / z.ai)を一次情報源とし、2026年7月16日時点ですべての参照先に直接アクセスして内容を検証したうえで作成している。2026年10月時点のモデル状況(GLM-5.3 系など)はその後の更新で追記したものであり、7月16日の検証範囲には含まれない。API仕様・料金・モデルラインナップ・プラン内容は頻繁に更新されるため、実装前に必ず公式ドキュメントの最新版を確認すること。"
+    );
+  });
 });

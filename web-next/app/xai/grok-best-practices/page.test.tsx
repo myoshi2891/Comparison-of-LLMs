@@ -138,4 +138,12 @@ describe("xAI Grok Best Practices Page", () => {
       ],
     ]);
   });
+
+  it("Step1 の導入文は grok-4.7 を現在の汎用の基本モデルとして示す", () => {
+    const { container } = render(<Page />);
+    const intro = container.querySelector("#step1 > p");
+    expect(intro?.textContent?.replace(/\s+/g, " ").trim()).toBe(
+      "xAI は用途別に複数のモデルファミリーを提供しています。汎用のテキスト用途では、2026年10月時点のフラッグシップである Grok 4.7 を基本に選べばよい、という単純な整理ができるのが大きな特徴です。"
+    );
+  });
 });

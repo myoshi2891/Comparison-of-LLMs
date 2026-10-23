@@ -14,7 +14,7 @@ fallback パスしか通らない**。本ファイルは get_page_text / httpx.g
 from __future__ import annotations
 
 import logging
-from datetime import date
+from datetime import date, datetime
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -200,12 +200,7 @@ class TestGoogle:
         境界値検証は test_flash_promo_* / test_argon_promo_* が別途担う。
         """
 
-        class _FrozenDate(date):
-            @classmethod
-            def today(cls):
-                return date(2026, 11, 30)
-
-        with patch("scraper.providers.google.date", _FrozenDate):
+        with patch("scraper.providers.google._today_utc", return_value=date(2026, 11, 30)):
             models = google.scrape()
         # _FALLBACKS の値は 7-tuple（[0]=price_in, [1]=price_out）
         assert len(models) == len(google._FALLBACKS)
@@ -224,12 +219,7 @@ class TestGoogle:
     def test_flash_promo_price_on_expiry_date(self):
         """終了日(2026-12-31)当日はまだプロモ価格 $0.75/$3.75 を維持する（`>` 判定の境界値）。"""
 
-        class _FrozenDate(date):
-            @classmethod
-            def today(cls):
-                return date(2026, 12, 31)
-
-        with patch("scraper.providers.google.date", _FrozenDate):
+        with patch("scraper.providers.google._today_utc", return_value=date(2026, 12, 31)):
             models = google.scrape()
         for name in google._FLASH_PROMO_NAMES:
             m = _find(models, name)
@@ -239,12 +229,7 @@ class TestGoogle:
     def test_flash_promo_price_after_expiry(self):
         """終了日の翌日(2027-01-01)以降は標準価格 $1.50/$7.50 に切り替わる。"""
 
-        class _FrozenDate(date):
-            @classmethod
-            def today(cls):
-                return date(2027, 1, 1)
-
-        with patch("scraper.providers.google.date", _FrozenDate):
+        with patch("scraper.providers.google._today_utc", return_value=date(2027, 1, 1)):
             models = google.scrape()
         for name in google._FLASH_PROMO_NAMES:
             m = _find(models, name)
@@ -254,12 +239,7 @@ class TestGoogle:
     def test_argon_promo_price_on_expiry_date(self):
         """終了日(2026-11-30)当日の Gemini 4 Argon はまだプロモ価格 $2/$10 を維持する。"""
 
-        class _FrozenDate(date):
-            @classmethod
-            def today(cls):
-                return date(2026, 11, 30)
-
-        with patch("scraper.providers.google.date", _FrozenDate):
+        with patch("scraper.providers.google._today_utc", return_value=date(2026, 11, 30)):
             models = google.scrape()
         m = _find(models, "Gemini 4 Argon")
         assert m.price_in == 2.00
@@ -268,12 +248,34 @@ class TestGoogle:
     def test_argon_promo_price_after_expiry(self):
         """終了日の翌日(2026-12-01)以降の Gemini 4 Argon は標準価格 $4/$20 に切り替わる。"""
 
-        class _FrozenDate(date):
+        with patch("scraper.providers.google._today_utc", return_value=date(2026, 12, 1)):
+            models = google.scrape()
+        m = _find(models, "Gemini 4 Argon")
+        assert m.price_in == 4.00
+        assert m.price_out == 20.00
+
+    def test_argon_promo_expiry_uses_utc_date(self):
+        """期限判定はホストのローカル日付ではなく UTC 日付で行う。
+
+        UTC では 2026-12-01 だがローカルではまだ 2026-11-30 の瞬間でも、標準価格 $4/$20 に切り替わる。
+        """
+
+        class _FrozenDatetime(datetime):
+            @classmethod
+            def now(cls, tz=None):
+                if tz is None:
+                    return datetime(2026, 11, 30, 18, 30)
+                return datetime(2026, 12, 1, 0, 30, tzinfo=tz)
+
             @classmethod
             def today(cls):
-                return date(2026, 12, 1)
+                return cls.now()
 
-        with patch("scraper.providers.google.date", _FrozenDate):
+        with (
+            patch("scraper.providers.google.datetime", _FrozenDatetime, create=True),
+            patch("scraper.providers.google.date") as mock_date,
+        ):
+            mock_date.today.return_value = date(2026, 11, 30)
             models = google.scrape()
         m = _find(models, "Gemini 4 Argon")
         assert m.price_in == 4.00
