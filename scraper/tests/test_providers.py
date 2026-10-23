@@ -281,6 +281,23 @@ class TestGoogle:
         assert m.price_in == 4.00
         assert m.price_out == 20.00
 
+    def test_deprecated_flash_aliases_route_to_newer_models(self):
+        """3.7 / 3.5 Flash は提供終了ではなく非推奨エイリアス（後継モデルへ自動ルーティング）。"""
+        expected = {
+            "Gemini 3.7 Flash": (
+                "非推奨エイリアス / Gemini 3.8 Flash へ自動ルーティング (提供終了ではない)",
+                "Deprecated alias / auto-routes to Gemini 3.8 Flash (not shut down)",
+            ),
+            "Gemini 3.5 Flash": (
+                "非推奨エイリアス / Gemini 3.6 Flash へ自動ルーティング (提供終了ではない)",
+                "Deprecated alias / auto-routes to Gemini 3.6 Flash (not shut down)",
+            ),
+        }
+        models = google.scrape()
+        for name, (sub_ja, sub_en) in expected.items():
+            m = _find(models, name)
+            assert (m.tag, m.cls, m.sub_ja, m.sub_en) == ("Deprecated", "tag-leg", sub_ja, sub_en)
+
 
 # --------------------------------------------------------------------------- #
 # DeepSeek
