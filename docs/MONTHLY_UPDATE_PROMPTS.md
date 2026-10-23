@@ -75,7 +75,7 @@ grep -nE 'toBe\(|toContain|toMatch' app/<path>/page.test.tsx
 
 ```bash
 cd web-next
-grep -noE "(gpt-[0-9][a-z0-9.-]*|gemini-[0-9][a-z0-9.-]*|claude-([a-z]+-)?[0-9][a-z0-9.-]*|grok-[a-z0-9][a-z0-9.-]*|deepseek-[a-z0-9.-]+|glm-[0-9][a-z0-9.-]*)" app/<path>/*.tsx | sort -u
+grep -rnoE --include='*.tsx' --include='*.ts' --include='*.json' "(gpt-[0-9][a-z0-9.-]*|gemini-[0-9][a-z0-9.-]*|claude-([a-z]+-)?[0-9][a-z0-9.-]*|grok-[a-z0-9][a-z0-9.-]*|deepseek-[a-z0-9.-]+|glm-[0-9][a-z0-9.-]*|kimi-[a-z0-9][a-z0-9.-]*|llama-?[0-9][a-z0-9.-]*|phi-[0-9][a-z0-9.-]*)" app/<path>/ | sort -u
 ```
 
 | 参照先（一次情報） | 確認内容 |
@@ -101,9 +101,9 @@ grep -noE "(gpt-[0-9][a-z0-9.-]*|gemini-[0-9][a-z0-9.-]*|claude-([a-z]+-)?[0-9][
 
 ```bash
 cd web-next
-# 旧月表記が残っていないか（例: 前月が 5 月なら "2026年5月" "May 2026" を検索）
+# 旧月表記が残っていないか（今回のサイクルで更新対象になる月をすべて含める。例: 2026年10月サイクルなら 6〜9 月）
 # 「指摘5」で維持と定めた記録日（情報基準日・「YYYY年M月時点」）は残し、更新が必要なヒットだけを潰す
-grep -rnE '(2026年5月|May 2026|Mar 2026)' app/<path>/
+grep -rnE '(2026年[6-9]月|(Jun|Jul|Aug|Sep)[a-z]* 2026)' app/<path>/
 bun run test app/<path> >/tmp/t.log 2>&1; echo "exit=$?"   # tail はexit code を隠すため必ず echo で確認
 ```
 
@@ -1717,8 +1717,10 @@ web-next/app/google/gemma-best-practices-guide/page.tsx を読んでください
 
 ```
 web-next/app/google/multi-agent-best-practices/page.tsx を読んでください。
-本ページはコードを文字列定数（CODE_TEXT_*）と JSX の両方に持つため、モデル ID を置き換えるときは
-両方を同時に更新してください（ファイル全体に対する置換で漏れを防ぐ）。
+モデル ID は、現行の推奨として示す箇所とコピーされるコード例の箇所だけを置き換えてください。
+日付付きの過去の事実、移行例（移行元の ID）、比較の注記にある ID は残してください（ファイル全体の一括置換はしない）。
+本ページはコードを文字列定数（CODE_TEXT_*）と JSX の両方に持つため、置き換える箇所では両方を同時に更新し、
+CODE_TEXT_* の値と表示中の JSX を一致させてください。
 原本固定の契約テストがあるため、本文の言い換えは行わないこと。
 ```
 

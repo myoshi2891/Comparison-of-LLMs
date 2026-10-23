@@ -143,6 +143,8 @@ from openai import OpenAI
 
 client = OpenAI()
 
+log_text = "2026-10-23T09:12:04Z ERROR db: connection pool exhausted"  # 分析対象のログ(例)
+
 response = client.responses.create(
     model="gpt-6.1-sol",
     input="次のログから根本原因の候補を3つ挙げ、確認手順を示してください。\n\n" + log_text,
@@ -185,7 +187,7 @@ flowchart TD
   E -- いいえ --> G["通常の再送で可"]
 ```
 
-- GPT-5.6以降は**推論の持ち越し**(`reasoning.context`)が既定で `all_turns` です。前のターンの推論をモデルが参照できるため、マルチターンの品質とキャッシュ効率が上がります。
+- GPT-5.6では**推論の持ち越し**(`reasoning.context`)が既定で `all_turns` です。前のターンの推論をモデルが参照できるため、マルチターンの品質とキャッシュ効率が上がります。ターンをまたぐ推論が必要なら、モデルの既定に頼らず `reasoning={"context": "all_turns"}` を明示します。
 - `all_turns` を活かすには `previous_response_id` を使います。手動管理なら、過去の入力と**すべての出力アイテム**を欠落なく再送します。
 - 以前の目標・前提が無関係になったら `current_turn` に切り替えます。
 
@@ -287,7 +289,8 @@ OpenAIは、社内のコーディングエージェント評価で、プロン�
 **(2) 優先順位の明示(指示ファイルが多い環境向け)**
 
 ```markdown
-ユーザーの明示的な指示は、skillやAGENTS.mdの指針より優先する。
+指示の優先順位は、実行環境の指示階層(システム・開発者の指示)と、適用されるskill・AGENTS.mdの指示に従う。
+ユーザーの明示的な依頼だけでは、これらの指示を上書きしない。
 skillが原因で確認を求めたり作業を中断したりする場合は、
 該当ファイル名と該当箇所を示し、明示要件と自分の解釈を区別して説明する。
 ```
@@ -310,6 +313,8 @@ skillが原因で確認を求めたり作業を中断したりする場合は、
 ### 4-D. 詳細度は `text.verbosity` で一元管理
 
 ```python
+user_query = "Responses APIとChat Completionsの違いを教えてください。"  # ユーザーの質問(例)
+
 response = client.responses.create(
     model="gpt-6.1-sol",
     input=user_query,
@@ -461,6 +466,8 @@ flowchart TD
 | Batch / Flex | 各ガイド参照 | 非同期・低優先で割安 | 即時性が不要な処理向け |
 
 ```python
+prompt = "この関数の名前をより分かりやすく変えてください。"  # 入力(例)
+
 fast = client.responses.create(
     model="gpt-6.1-sol",
     input=prompt,
@@ -496,7 +503,7 @@ flowchart TD
 | # | 項目 | やること |
 | --- | --- | --- |
 | 1 | モデルID | `gpt-6-astra` / `gpt-6.1-sol` / `gpt-6-luna` のいずれかに設定 |
-| 2 | API | ツール呼び出しは Responses API へ(Chat Completionsは不可) |
+| 2 | API | Astra / 6.1 Sol のツール呼び出しは Responses API へ(Chat Completionsは不可)。Luna は `reasoning_effort: "none"` のときのみ Chat Completions で関数呼び出し可(Step 2) |
 | 3 | エフォート | 現行値を保持。Astra/6.1 Solで `none` は `low` へ、`minimal` も `low` から比較 |
 | 4 | サンプリング | エフォートが `none` 以外なら `temperature` / `top_p` / `top_logprobs` を削除 |
 | 5 | キャッシュ | `prompt_cache_retention` → `prompt_cache_options.ttl`。書き込み課金を確認 |
@@ -623,7 +630,7 @@ flowchart LR
 | Ultrafastの倍率(約6倍) | Vercelの更新情報(Astra向け)の記載 | 6.1 Solの倍率は公式Pricingで確認 |
 | 6.1 SolのUltrafast | 発表当初は「近日」との記事がある一方、10月8日のChangelogで提供開始 | Changelogを正とする |
 | GPT-5.6の価格 | ソースにより値が異なる(販促価格・通常価格の混在) | 本ガイドでは数値を採用しない |
-| GPT-6 Pro(ChatGPT) | トラッカー記載。API設計にそのまま適用できるか不明 | APIでは `reasoning.mode: "pro"` を基準に |
+| GPT-6 Pro(ChatGPT) | トラッカー記載。API設計にそのまま適用できるか不明 | API側の設定は未確認。公式ドキュメントで確認できるまで、APIの基準設定として扱わない |
 | 「GPT-6 Luna Decisions」・Decisions API | 一覧情報とドキュメント目次で存在を確認できたが、詳細は未確認 | 利用前に公式の Decisions API ガイドを確認 |
 | ベンチマークの数値 | 公式主張と独立計測が混在 | 自分の評価セットで再現してから採用 |
 | ChatGPTのプラン別提供 | 情報源により更新時期が異なる | 公式の最新情報で確認 |
