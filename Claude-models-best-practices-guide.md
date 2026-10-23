@@ -699,6 +699,10 @@ def extract_text(response) -> str:
         category = getattr(response, "stop_details", None)
         raise RuntimeError(f"リクエストが拒否されました: {category}")
 
+    # max_tokens で打ち切られた応答は空または途中までなので、正常な回答として返さない
+    if response.stop_reason == "max_tokens":
+        raise RuntimeError("max_tokens に達して応答が途中で切れました。max_tokens を増やして再実行してください")
+
     return "".join(b.text for b in response.content if b.type == "text")
 ```
 

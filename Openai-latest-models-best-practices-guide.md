@@ -134,7 +134,7 @@ OpenAIは6.1 Solを「Astraに近い性能を約1/5の価格で」と位置づ�
 
 ## Step 2. Responses APIで最小構成を作る
 
-GPT-6世代では、**推論・ツール呼び出し・マルチターンはResponses APIが前提**です。Chat Completionsはツールなしのリクエストに限り使えます(Astra / 6.1 Sol)。Sol / Lunaは `reasoning_effort: "none"` のときのみChat Completionsで関数呼び出しが可能です。
+GPT-6世代では、**推論・ツール呼び出し・マルチターンはResponses APIが前提**です。Chat Completionsはツールなしのリクエストに限り使えます(Astra / 6.1 Sol)。`gpt-6-sol` と `gpt-6-luna` は `reasoning_effort: "none"` のときのみChat Completionsで関数呼び出しが可能です。
 
 ### 2-A. 最小リクエスト
 
@@ -429,7 +429,7 @@ flowchart TD
 | 項目 | 内容 |
 | --- | --- |
 | キャッシュ読み取り | 6.1 Sol: 入力の5%($0.10)。Astra: $1。Luna: $0.01 |
-| キャッシュ書き込み | 通常入力の1.25倍(6.1 Sol: $2.50 / Astra: $12.50) |
+| キャッシュ書き込み | TTLで単価が異なる。30分(`"30m"`、既定): 通常入力の1.25倍(6.1 Sol: $2.50 / Astra: $12.50)。12時間(`"12h"`、2026-10-20追加): 通常入力の2.5倍(6.1 Sol: $5.00 / Astra: $25.00) |
 | 暗黙モード | 最新の対象メッセージ末尾に1つのブレークポイントを置く |
 | 明示モード | 再利用する先頭部分を**自分で指定**して不要な書き込みを避ける |
 | 移行時の変更 | GPT-5.5以前の `prompt_cache_retention` は `prompt_cache_options.ttl`(例: `"30m"`)に置換 |
