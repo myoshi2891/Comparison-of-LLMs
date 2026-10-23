@@ -146,4 +146,15 @@ describe("xAI Grok Best Practices Page", () => {
       "xAI は用途別に複数のモデルファミリーを提供しています。汎用のテキスト用途では、2026年10月時点のフラッグシップである Grok 4.7 を基本に選べばよい、という単純な整理ができるのが大きな特徴です。"
     );
   });
+  it("1.1 比較表と Step11 の価格出典は 7月3日を旧モデルの基準時点とし grok-4.7 の確認日を区別する", () => {
+    const { container } = render(<Page />);
+    const norm = (el: Element | null | undefined) => el?.textContent?.replace(/\s+/g, " ").trim();
+    const step1Note = container.querySelector("#step1 table")?.nextElementSibling;
+    const step11Note = container.querySelector("#step11")?.lastElementChild;
+    const grok47 = "grok-4.7 の価格は同 Pricing ページで2026年10月23日に確認";
+    expect([norm(step1Note), norm(step11Note)]).toEqual([
+      `出典: Models | xAI Docs（最終更新 2026年7月9日）、Pricing | xAI Docs（最終更新 2026年7月3日。grok-4.5 以前のモデルの価格の基準時点）。${grok47}`,
+      `出典: Pricing | xAI Docs（最終更新 2026年7月3日。grok-4.5 以前のモデルの価格の基準時点）。${grok47}`,
+    ]);
+  });
 });
