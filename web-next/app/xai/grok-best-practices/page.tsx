@@ -364,7 +364,8 @@ export default function GrokBestPracticesPage() {
             出典: <Ext href="https://docs.x.ai/developers/models">Models | xAI Docs</Ext>
             （最終更新 2026年7月9日）、
             <Ext href="https://docs.x.ai/developers/pricing">Pricing | xAI Docs</Ext>
-            （最終更新 2026年7月3日）
+            （最終更新 2026年7月3日。grok-4.5 以前のモデルの価格の基準時点）。grok-4.7 の価格は同
+            Pricing ページで2026年10月23日に確認
           </div>
 
           <h3>1.2 用途別モデル選定ガイド</h3>
@@ -1887,7 +1888,8 @@ export default function GrokBestPracticesPage() {
           <div className={styles.sourceNote}>
             <i className="ti ti-external-link" />
             出典: <Ext href="https://docs.x.ai/developers/pricing">Pricing | xAI Docs</Ext>
-            （最終更新 2026年7月3日）
+            （最終更新 2026年7月3日。grok-4.5 以前のモデルの価格の基準時点）。grok-4.7 の価格は同
+            Pricing ページで2026年10月23日に確認
           </div>
         </section>
 
