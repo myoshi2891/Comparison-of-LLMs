@@ -7,7 +7,7 @@
 
 from __future__ import annotations
 import logging
-from datetime import date
+from datetime import date, datetime, timezone
 
 from scraper.browser import get_page_text
 from scraper.models import ApiModel, PriceProvenance
@@ -30,10 +30,16 @@ _ARGON_PROMO_EXPIRY = date(2026, 11, 30)
 _ARGON_STANDARD_PRICE = (4.00, 20.00)
 
 
+def _today_utc() -> date:
+    # 実行ホストのタイムゾーン（JST 等）で期限判定が前倒しされないよう UTC 日付で判定する。
+    return datetime.now(timezone.utc).date()
+
+
 def _resolve_price(name: str, price_in: float, price_out: float) -> tuple[float, float]:
-    if name in _FLASH_PROMO_NAMES and date.today() > _FLASH_PROMO_EXPIRY:
+    today = _today_utc()
+    if name in _FLASH_PROMO_NAMES and today > _FLASH_PROMO_EXPIRY:
         return _FLASH_STANDARD_PRICE
-    if name == _ARGON_NAME and date.today() > _ARGON_PROMO_EXPIRY:
+    if name == _ARGON_NAME and today > _ARGON_PROMO_EXPIRY:
         return _ARGON_STANDARD_PRICE
     return price_in, price_out
 
