@@ -610,7 +610,7 @@ flowchart LR
 | --- | --- | --- |
 | 6.1 Solに替えたら400エラー | `none` / `minimal` エフォートを指定している | `low` に置換して再評価 |
 | 温度指定でエラー | 推論あり(`none`以外)では `temperature` 等が非対応 | パラメータを削除 |
-| ツール付きでChat Completionsが失敗 | ツール呼び出しはResponses API必須 | Responses APIへ移行 |
+| ツール付きでChat Completionsが失敗 | ツール呼び出しは原則Responses API必須。ただし `gpt-6-sol` / `gpt-6-luna` は `reasoning_effort: "none"` のときのみChat Completionsで関数呼び出し可 | 上記以外はResponses APIへ移行(該当モデルは `reasoning_effort` を `"none"` に設定) |
 | すぐ確認を求めて止まる | Astraは必要時に質問する傾向。過去の強い禁止文言が効きすぎ | 権限と完了条件を明記し、過去の禁止文言を緩める |
 | 小さな修正で大量のテストを走らせる | Astraは検証が徹底的 | 検証の強度を指示 |
 | 気づくと料金が倍近くに | 入力が272Kを超え、全体が長文料金に | 圧縮・検索で絞る。サブエージェントの文脈肥大も確認 |
