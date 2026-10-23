@@ -1007,7 +1007,7 @@ export default function SlashCommandsGuideClient() {
                 <td>
                   <code>xhigh</code>
                 </td>
-                <td>最高レベル（Opus 5.5 推奨）</td>
+                <td>最高レベル（測定で効果が確認できた場合のみ）</td>
                 <td>難解なバグ修正、アーキテクチャ設計</td>
               </tr>
               <tr
@@ -1029,7 +1029,7 @@ export default function SlashCommandsGuideClient() {
                 使用例
               </span>
               <CodeCopyButton
-                text={`/effort high    # 高精度推論に設定\n/effort xhigh   # 最高精度（Opus 5.5 推奨）\n/effort         # インタラクティブスライダーを開く\n/fast on        # 素早い・簡潔な回答に切り替え\n/fast off       # 通常モードに戻す`}
+                text={`/effort high    # 高精度推論に設定\n/effort xhigh   # 最高精度（測定で効果が確認できた場合のみ）\n/effort         # インタラクティブスライダーを開く\n/fast on        # 素早い・簡潔な回答に切り替え\n/fast off       # 通常モードに戻す`}
               />
             </div>
             <pre>
@@ -1038,7 +1038,7 @@ export default function SlashCommandsGuideClient() {
                 <span className={styles.tCmt}># 高精度推論に設定</span>
                 {"\n"}
                 <span className={styles.tCmd}>/effort</span> xhigh{" "}
-                <span className={styles.tCmt}># 最高精度（Opus 5.5 推奨）</span>
+                <span className={styles.tCmt}># 最高精度（測定で効果が確認できた場合のみ）</span>
                 {"\n"}
                 <span className={styles.tCmd}>/effort</span>{" "}
                 <span className={styles.tCmt}># インタラクティブスライダーを開く</span>
