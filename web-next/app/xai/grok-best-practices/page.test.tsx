@@ -98,7 +98,7 @@ describe("xAI Grok Best Practices Page", () => {
     );
   });
 
-  it("11.1 Chat API の料金表に grok-4.7 と grok-4.5 の2段階料金を載せる", () => {
+  it("11.1 Chat API の料金表に全モデルの2段階料金を載せる", () => {
     const { container } = render(<Page />);
     const heading = Array.from(container.querySelectorAll("h3")).find(
       (h) => h.textContent === "11.1 Chat API（テキストモデル）"
@@ -122,8 +122,20 @@ describe("xAI Grok Best Practices Page", () => {
         "$0.30 (<200k) / $0.60 (≥200k)",
         "$6.00 (<200k) / $12.00 (≥200k)",
       ],
-      ["grok-4.3", "1M", "$1.25", "$0.20", "$2.50"],
-      ["grok-4.20 系（reasoning/non-reasoning/multi-agent）", "1M", "$1.25", "$0.20", "$2.50"],
+      [
+        "grok-4.3",
+        "1M",
+        "$1.25 (<200k) / $2.50 (≥200k)",
+        "$0.20 (<200k) / $0.40 (≥200k)",
+        "$2.50 (<200k) / $5.00 (≥200k)",
+      ],
+      [
+        "grok-4.20 系（reasoning/non-reasoning/multi-agent）",
+        "1M",
+        "$1.25 (<200k) / $2.50 (≥200k)",
+        "$0.20 (<200k) / $0.40 (≥200k)",
+        "$2.50 (<200k) / $5.00 (≥200k)",
+      ],
     ]);
   });
 });

@@ -89,4 +89,14 @@ describe("/claude/self-hosted-sandboxes 契約テスト", () => {
       "Memory を使う場合： --read-only ではルートファイルシステムに書き込めないため、SDK ワーカーがメモリストアを同期する親ディレクトリ（例: /mnt/memory）にも書き込み可能なマウントが必要です。上記の /tmp と /mnt/session/outputs に加えて、-v /host/memory:/mnt/memory または --tmpfs /mnt/memory を追加し、ワーカーを実行するユーザーがこの親ディレクトリに書き込めるようにしてください。各ストアの mount_path のディレクトリはワーカーがセッション開始時に作成し終了時に削除するため、mount_path に直接マウントしないでください（パスが既に存在するとワーカーはセッションの処理を開始しません）。同じ /host/memory を複数のセッションで共有すると、同時に動くセッションが同じストアのパスを奪い合って競合します。セッションが重なる場合は、セッションごとに別のファイルシステムを割り当てるか、コンテナごとに独立した --tmpfs /mnt/memory を使ってください。"
     );
   });
+
+  it("Memory の制限 callout は ant CLI 1.33.0 以降でも対応すると案内する", () => {
+    const { container } = render(<Page />);
+    const note = Array.from(container.querySelectorAll("p")).find((p) =>
+      p.textContent?.startsWith("制限：")
+    );
+    expect(note?.textContent?.replace(/\s+/g, " ").trim()).toBe(
+      "制限： Self-hosted サンドボックスの Memory（永続メモリ） は 2026年8月19日から利用可能になりました。Python / TypeScript / Go の SDK ワーカー、または ant CLI 1.33.0 以降が、アタッチされたメモリストアを mount_path にダウンロードし、変更をストアへ同期します（1.33.0 より前の ant CLI は要件を満たしません。Claude Platform on AWS では引き続き利用不可）。"
+    );
+  });
 });
