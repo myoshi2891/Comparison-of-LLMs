@@ -81,7 +81,7 @@ describe("/claude/cowork-guide 契約テスト", () => {
   it("ヒーローの日付ラベルが初版の情報基準日と 10 月 22 日の更新を区別する", () => {
     const { container } = render(<Page />);
     const chips = Array.from(container.querySelectorAll("header span")).map((el) =>
-      el.textContent?.trim(),
+      el.textContent?.trim()
     );
     expect(chips).toEqual([
       "情報基準日：2026年7月26日（初版）",
