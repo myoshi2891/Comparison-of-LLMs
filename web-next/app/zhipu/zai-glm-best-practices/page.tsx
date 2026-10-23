@@ -2097,7 +2097,10 @@ export default function ZaiGlmBestPracticesPage() {
                   <td>
                     複雑な推論タスクでのみ
                     <code className={styles.codeInline}>reasoning_effort=max</code>
-                    を使い、軽量タスクではthinkingを無効化しているか
+                    を使い、軽量タスクではGLM-5.3 系以外ならthinkingを無効化、GLM-5.3
+                    系ならthinkingを有効のまま
+                    <code className={styles.codeInline}>reasoning_effort: "low"</code>
+                    にしているか
                   </td>
                   <td>7, 13</td>
                 </tr>

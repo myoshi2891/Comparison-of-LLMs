@@ -562,10 +562,12 @@ export default function Fable5BestPracticesPage() {
             <p>
               <strong>API 連携の移行チェック:</strong> Fable 5.1 では強制ツール使用（
               <code>tool_choice</code> の <code>any</code> / <code>tool</code>）が 400
-              エラーになるため、<code>auto</code> とプロンプトでのツール指定、
-              <code>strict: true</code>
-              、または構造化出力に置き換える。また thinking ブロックは生成したモデルに紐づく。Claude
-              Mythos 5.1 は、それを生成した会話の中であれば Fable 5.1 の thinking
+              エラーになるため、<code>tool_choice: auto</code>{" "}
+              にしてプロンプトで使うツールを明示し、応答に必要な <code>tool_use</code>{" "}
+              が含まれるかを確認する。<code>strict: true</code>{" "}
+              は任意の入力スキーマ検証であり、呼び出しを強制するものではない。整形済みデータを得るためにツール呼び出しを使っていた場合は、構造化出力も代替になる。また
+              thinking ブロックは生成したモデルに紐づく。Claude Mythos 5.1
+              は、それを生成した会話の中であれば Fable 5.1 の thinking
               ブロックを読めるが、それ以外のモデル(評価モデルなど)へ渡すクロスモデル評価フローでは、受け取ったモデル側でブロックが無視される。また過去のターンを編集して再送すると、それ以降の
               thinking
               ブロックが無効になる(2026年8月31日以降に作成されたアカウントでは編集済み履歴が 400
