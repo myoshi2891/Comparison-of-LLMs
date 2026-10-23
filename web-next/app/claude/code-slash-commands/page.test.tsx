@@ -85,9 +85,7 @@ describe("/claude/code-slash-commands", () => {
     const block = Array.from(container.querySelectorAll("pre")).find((p) =>
       p.textContent?.includes("/effort xhigh")
     );
-    const lines = (block?.textContent ?? "")
-      .split("\n")
-      .map((l) => l.trim().replace(/\s+/g, " "));
+    const lines = (block?.textContent ?? "").split("\n").map((l) => l.trim().replace(/\s+/g, " "));
     const expected = [
       "/effort high # 高精度推論に設定",
       "/effort xhigh # 最高精度（測定で効果が確認できた場合のみ）",
