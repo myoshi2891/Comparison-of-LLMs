@@ -1610,7 +1610,12 @@ export default function Page() {
                 2026年8月19日から利用可能になりました。Python / TypeScript / Go の SDK
                 ワーカー、または ant CLI 1.33.0 以降が、アタッチされたメモリストアを{" "}
                 <code>mount_path</code> にダウンロードし、変更をストアへ同期します（1.33.0 より前の
-                ant CLI は要件を満たしません。Claude Platform on AWS では引き続き利用不可）。
+                ant CLI は要件を満たしません）。Claude Platform on AWS と Claude Models on Google
+                Cloud（Anthropic managed）では、Self-hosted
+                環境のセッションにメモリストアを利用できません。また、ant CLI と Python / TypeScript
+                / Go SDK の組み込みワーカーは Claude Models on Google Cloud（Anthropic
+                managed）に対応していないため、同環境では Environments Work
+                エンドポイントを直接呼ぶ独自ワーカーを実装してください。
               </p>
             </div>
           </div>
@@ -2359,9 +2364,13 @@ export default function Page() {
               ではルートファイルシステムに書き込めないため、SDK
               ワーカーがメモリストアを同期する親ディレクトリ（例: <code>/mnt/memory</code>
               ）にも書き込み可能なマウントが必要です。上記の <code>/tmp</code> と{" "}
-              <code>/mnt/session/outputs</code> に加えて、
-              <code>-v /host/memory:/mnt/memory</code> または <code>--tmpfs /mnt/memory</code>{" "}
-              を追加し、ワーカーを実行するユーザーがこの親ディレクトリに書き込めるようにしてください。各ストアの{" "}
+              <code>/mnt/session/outputs</code>{" "}
+              に加えて、書き込み可能なマウントを追加し、ワーカーを実行するユーザーがこの親ディレクトリに書き込めるようにしてください。使い捨てのサンドボックスでは{" "}
+              <code>--tmpfs /mnt/memory</code>{" "}
+              を推奨します（ワーカーがサンドボックス終了前に内容をストアへ同期するため、ホストへのマウントは不要です）。
+              <code>-v /host/memory:/mnt/memory</code>{" "}
+              でホストのディレクトリを使う場合は、ワーカーを実行するユーザー以外が読み書きできないようアクセスを制限し、ワーカーが異常終了した後は残ったストアのディレクトリを削除してください（kill
+              されたワーカーは終了処理を実行しないため、未同期の変更は失われ、ディレクトリが残ります）。各ストアの{" "}
               <code>mount_path</code>{" "}
               のディレクトリはワーカーがセッション開始時に作成し終了時に削除するため、
               <code>mount_path</code>{" "}
