@@ -218,6 +218,7 @@ export default function Page() {
               Coworkの基本概念からセットアップ、安全な運用、応用までを順を追って解説します。
             </p>
             <div className={styles.heroMeta}>
+              <span className={styles.metaChip}>情報基準日：2026年7月26日（初版）</span>
               <span className={styles.metaChip}>最終更新：2026年10月22日</span>
               <span className={styles.metaChip}>対象：初めてClaude Coworkに触れる方</span>
               <span className={styles.metaChip}>形式：全12ステップ + チェックリスト</span>
