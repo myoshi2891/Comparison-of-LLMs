@@ -36,6 +36,22 @@ describe("ZaiGlmBestPracticesPage", () => {
     );
   });
 
+  it("チェックリストの軽量タスク項目で GLM-5.3 系は thinking を有効のまま low にすると区別する", async () => {
+    const page = await Page();
+    const { container } = render(page);
+    const row = Array.from(container.querySelectorAll("tr")).find((tr) =>
+      tr.querySelector("td")?.textContent?.startsWith("複雑な推論タスクでのみ")
+    );
+    expect(
+      Array.from(row?.querySelectorAll("td") ?? []).map((td) =>
+        td.textContent?.replace(/\s+/g, " ").trim()
+      )
+    ).toEqual([
+      '複雑な推論タスクでのみreasoning_effort=maxを使い、軽量タスクではGLM-5.3 系以外ならthinkingを無効化、GLM-5.3 系ならthinkingを有効のままreasoning_effort: "low"にしているか',
+      "7, 13",
+    ]);
+  });
+
   it("renders 8 mermaid diagrams", async () => {
     const page = await Page();
     const { container } = render(page);

@@ -104,7 +104,7 @@ describe("/claude/fable-5-best-practices - page structure (Step 1)", () => {
       p.textContent?.startsWith("API 連携の移行チェック")
     );
     expect(paragraph?.textContent?.replace(/\s+/g, " ").trim()).toBe(
-      "API 連携の移行チェック: Fable 5.1 では強制ツール使用（tool_choice の any / tool）が 400 エラーになるため、auto とプロンプトでのツール指定、strict: true、または構造化出力に置き換える。また thinking ブロックは生成したモデルに紐づく。Claude Mythos 5.1 は、それを生成した会話の中であれば Fable 5.1 の thinking ブロックを読めるが、それ以外のモデル(評価モデルなど)へ渡すクロスモデル評価フローでは、受け取ったモデル側でブロックが無視される。また過去のターンを編集して再送すると、それ以降の thinking ブロックが無効になる(2026年8月31日以降に作成されたアカウントでは編集済み履歴が 400 エラーになる)。会話履歴は追記のみで扱う設計にし、移行時は公式の Migration guide の Fable 5.1 の項を確認すること。"
+      "API 連携の移行チェック: Fable 5.1 では強制ツール使用（tool_choice の any / tool）が 400 エラーになるため、tool_choice: auto にしてプロンプトで使うツールを明示し、応答に必要な tool_use が含まれるかを確認する。strict: true は任意の入力スキーマ検証であり、呼び出しを強制するものではない。整形済みデータを得るためにツール呼び出しを使っていた場合は、構造化出力も代替になる。また thinking ブロックは生成したモデルに紐づく。Claude Mythos 5.1 は、それを生成した会話の中であれば Fable 5.1 の thinking ブロックを読めるが、それ以外のモデル(評価モデルなど)へ渡すクロスモデル評価フローでは、受け取ったモデル側でブロックが無視される。また過去のターンを編集して再送すると、それ以降の thinking ブロックが無効になる(2026年8月31日以降に作成されたアカウントでは編集済み履歴が 400 エラーになる)。会話履歴は追記のみで扱う設計にし、移行時は公式の Migration guide の Fable 5.1 の項を確認すること。"
     );
   });
 
