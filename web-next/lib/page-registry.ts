@@ -560,7 +560,7 @@ const entries: PageEntry[] = [
     provider: "microsoft",
     topics: ["agent"],
     summary:
-      "GitHub Copilot .agent.md の完全ベストプラクティスガイド。フロントマター全仕様・ステップバイステップ作成・Handoffs（エージェント連鎖）・Subagents（サブエージェント）・MCP統合・マルチエージェント設計パターン・トラブルシューティングを 2026年6月最新版の公式ドキュメント準拠で解説。Cloud agent GA・組織/エンタープライズエージェント（JetBrains）・Copilot code review の AGENTS.md 対応に対応。",
+      "GitHub Copilot .agent.md の完全ベストプラクティスガイド。フロントマター全仕様・ステップバイステップ作成・Handoffs（エージェント連鎖）・Subagents（サブエージェント）・MCP統合・マルチエージェント設計パターン・トラブルシューティングを 2026年7月31日時点の公式ドキュメント準拠で解説。2026年6月時点の更新（Cloud agent GA・組織/エンタープライズエージェント（JetBrains）・Copilot code review の AGENTS.md 対応）は当時の情報として収録。",
     addedAt: "2026-04-27",
     lastReviewed: "2026-10-22",
   },
@@ -596,7 +596,7 @@ const entries: PageEntry[] = [
     provider: "microsoft",
     topics: ["skill"],
     summary:
-      "GitHub Copilot Coding Agent / VS Code Agent Mode / Copilot CLI 対応の SKILL.md ガイド。フロントマター完全仕様・Progressive Disclosure 3段階ローディング・ステップバイステップ作成・実践テンプレート集・トラブルシューティングを 2026年6月最新版の公式ドキュメント根拠付きで徹底解説。Copilot code review は AGENTS.md 対応（2026-06-18）、Cloud agent は GA。",
+      "GitHub Copilot Coding Agent / VS Code Agent Mode / Copilot CLI 対応の SKILL.md ガイド。フロントマター完全仕様・Progressive Disclosure 3段階ローディング・ステップバイステップ作成・実践テンプレート集・トラブルシューティングを公式ドキュメント根拠付きで徹底解説。2026-07-29 に Copilot code review での Agent Skills / MCP 対応が GA。2026年6月時点の更新（Copilot code review の AGENTS.md 対応（2026-06-18）、Cloud agent GA）は当時の情報として収録。",
     addedAt: "2026-04-18",
     lastReviewed: "2026-10-22",
   },

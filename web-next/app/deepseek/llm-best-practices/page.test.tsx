@@ -82,7 +82,7 @@ describe("DeepSeek 新規開発の既定モデル", () => {
     const { container } = render(<Page />);
     const texts = Array.from(container.querySelectorAll("p")).map((p) => norm(p.textContent));
     expect(texts).toContain(
-      "旧モデルエイリアスである deepseek-chat （DeepSeek-V3実体）および deepseek-reasoner （DeepSeek-R1実体）は、2026年7月24日をもって提供終了（完全廃止）となりました。現在は利用できません。新規開発では必ず deepseek-flash または deepseek-v4-pro を指定してください。"
+      "旧モデルエイリアスである deepseek-chat（DeepSeek-V3実体）および deepseek-reasoner（DeepSeek-R1実体）は、2026年7月24日をもって提供終了（完全廃止）となりました。現在は利用できません。新規開発では必ず deepseek-flash または deepseek-v4-pro を指定してください。"
     );
   });
 

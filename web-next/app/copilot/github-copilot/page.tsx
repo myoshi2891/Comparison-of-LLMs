@@ -1235,7 +1235,7 @@ export default function GithubCopilotPage() {
                 <td>Gemini 4 Argonは2026年10月13日GA(Pro+ / Max / Business / Enterprise)</td>
               </tr>
               <tr className="odd">
-                <td>Grok 4.7 / 4.6 / 4.5</td>
+                <td>Grok 4.7 / 4.6</td>
                 <td>xAI</td>
                 <td>高速・日常的な軽量タスク</td>
                 <td>ゼロデータ保持ポリシーでホスティング</td>

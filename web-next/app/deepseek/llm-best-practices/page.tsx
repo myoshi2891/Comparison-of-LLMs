@@ -354,7 +354,7 @@ export default function DeepSeekLlmPage() {
               （DeepSeek-V3実体）および <code className={styles.inlineCode}>deepseek-reasoner</code>
               （DeepSeek-R1実体）は、<strong>2026年7月24日をもって提供終了（完全廃止）</strong>
               となりました。現在は利用できません。新規開発では必ず{" "}
-              <code className={styles.inlineCode}>deepseek-v4-flash</code> または{" "}
+              <code className={styles.inlineCode}>deepseek-flash</code> または{" "}
               <code className={styles.inlineCode}>deepseek-v4-pro</code> を指定してください。
             </p>
           </div>
@@ -450,7 +450,7 @@ export default function DeepSeekLlmPage() {
                 response = client.chat.completions.<span className={styles.fn}>create</span>(
               </div>
               <div className={styles.codeLine}>
-                {"  "}model=<span className={styles.cs}>"deepseek-v4-flash"</span>,
+                {"  "}model=<span className={styles.cs}>"deepseek-flash"</span>,
               </div>
               <div className={styles.codeLine}>{"  "}messages=[</div>
               <div className={styles.codeLine}>

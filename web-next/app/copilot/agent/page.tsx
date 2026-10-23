@@ -866,7 +866,8 @@ export default function CopilotAgentPage() {
             <div className={styles.codeLine}>
               <span className={styles.ck}>model</span>: [
               <span className={styles.cs}>&apos;Claude Opus 5.5&apos;</span>,{" "}
-              <span className={styles.cs}>&apos;GPT-6.1 Sol&apos;</span>]
+              <span className={styles.cs}>&apos;GPT-6.1 Sol&apos;</span>,{" "}
+              <span className={styles.cs}>&apos;Claude Sonnet 5.5&apos;</span>]
             </div>
             <div className={styles.codeLine}>
               <span className={styles.ck}>handoffs</span>:
