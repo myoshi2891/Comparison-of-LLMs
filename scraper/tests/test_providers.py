@@ -205,7 +205,8 @@ class TestGoogle:
         # _FALLBACKS の値は 7-tuple（[0]=price_in, [1]=price_out）
         assert len(models) == len(google._FALLBACKS)
         for m in models:
-            fb = google._FALLBACKS[m.name]
+            # 非推奨エイリアスはルーティング先モデルの価格を採用する
+            fb = google._FALLBACKS[google._FLASH_ALIAS_TARGETS.get(m.name, m.name)]
             assert m.price_in == fb[0]
             assert m.price_out == fb[1]
             assert m.scrape_status == "fallback"
@@ -297,6 +298,17 @@ class TestGoogle:
         for name, (sub_ja, sub_en) in expected.items():
             m = _find(models, name)
             assert (m.tag, m.cls, m.sub_ja, m.sub_en) == ("Deprecated", "tag-leg", sub_ja, sub_en)
+
+    def test_flash_35_alias_follows_36_price_through_promo_expiry(self):
+        """3.5 Flash エイリアスは 3.6 Flash と同額で、2026-12-31 の期限後も同じく標準価格へ移る。"""
+        cases = {date(2026, 12, 31): (0.75, 3.75), date(2027, 1, 1): (1.50, 7.50)}
+        for today, expected in cases.items():
+            with patch("scraper.providers.google._today_utc", return_value=today):
+                models = google.scrape()
+            alias = _find(models, "Gemini 3.5 Flash")
+            target = _find(models, "Gemini 3.6 Flash")
+            assert (alias.price_in, alias.price_out) == expected
+            assert (alias.price_in, alias.price_out) == (target.price_in, target.price_out)
 
 
 # --------------------------------------------------------------------------- #
