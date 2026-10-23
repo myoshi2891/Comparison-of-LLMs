@@ -37,7 +37,7 @@
 | SOURCES セクションのラベル | `参考ソース一覧 — 2026年X月更新版` |
 | フッター | `Last updated: June 2026` / `最終更新: 2026年X月` |
 
-**事前 grep（対象 page.tsx で必ず実行し、ヒットを全て更新）**:
+**事前 grep（対象 page.tsx で必ず実行し、全ヒットを確認）**: 下記「指摘5」で維持と定めた日付（情報基準日・「YYYY年M月時点」などの記録日）は残し、当月への更新が必要な日付だけを書き換える。
 
 ```bash
 cd web-next
@@ -75,7 +75,7 @@ grep -nE 'toBe\(|toContain|toMatch' app/<path>/page.test.tsx
 
 ```bash
 cd web-next
-grep -noE "(gpt-[0-9][a-z0-9.-]*|gemini-[0-9][a-z0-9.-]*|claude-([a-z]+-)?[0-9][a-z0-9.-]*|grok-[0-9][a-z0-9.-]*|deepseek-[a-z0-9.-]+|glm-[0-9][a-z0-9.-]*)" app/<path>/*.tsx | sort -u
+grep -noE "(gpt-[0-9][a-z0-9.-]*|gemini-[0-9][a-z0-9.-]*|claude-([a-z]+-)?[0-9][a-z0-9.-]*|grok-[a-z0-9][a-z0-9.-]*|deepseek-[a-z0-9.-]+|glm-[0-9][a-z0-9.-]*)" app/<path>/*.tsx | sort -u
 ```
 
 | 参照先（一次情報） | 確認内容 |
@@ -102,7 +102,8 @@ grep -noE "(gpt-[0-9][a-z0-9.-]*|gemini-[0-9][a-z0-9.-]*|claude-([a-z]+-)?[0-9][
 ```bash
 cd web-next
 # 旧月表記が残っていないか（例: 前月が 5 月なら "2026年5月" "May 2026" を検索）
-grep -rnE '(2026年5月|May 2026|Mar 2026)' app/<path>/  # 空になるまで潰す
+# 「指摘5」で維持と定めた記録日（情報基準日・「YYYY年M月時点」）は残し、更新が必要なヒットだけを潰す
+grep -rnE '(2026年5月|May 2026|Mar 2026)' app/<path>/
 bun run test app/<path> >/tmp/t.log 2>&1; echo "exit=$?"   # tail はexit code を隠すため必ず echo で確認
 ```
 

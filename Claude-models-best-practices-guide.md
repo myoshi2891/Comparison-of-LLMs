@@ -531,12 +531,14 @@ model: opus
 ```bash
 # 1. 対象ファイル一覧を Claude に作らせて files.txt に保存しておく
 # 2. 少数のファイルで試して、プロンプトを調整してから全件に回す
-for file in $(cat files.txt); do
+while IFS= read -r file <&3; do
   claude -p "$file を Python 2 から Python 3 に移行して。OK か FAIL だけを返して。" \
     --allowedTools "Edit,Bash(git commit *)" \
     --permission-mode dontAsk
-done
+done 3< files.txt
 ```
+
+`while IFS= read -r` で 1 行ずつ読むため、スペースを含むファイル名も 1 つのパスのまま扱えます（`$(cat files.txt)` は空白で分割されます）。一覧をファイル記述子 3 から読むのは、`claude` が標準入力を消費して残りの行を読み飛ばすのを防ぐためです。
 
 `--allowedTools` で必要なツールを事前許可し、`--permission-mode dontAsk` で**それ以外は拒否**します（無人実行で重要）。
 
