@@ -88,3 +88,29 @@ describe("Gemini Enterprise Agent Platform (Intermediate) Page Contract", () => 
     expect(entry?.category).toBe("Google");
   });
 });
+
+describe("Gemini Enterprise Agent Platform (Intermediate) 日付表示", () => {
+  const norm = (s: string | null | undefined) => (s ?? "").replace(/\s+/g, " ").trim();
+
+  it("サイドバーは基準日 2026-07-17 と Argon 追記の更新日 2026-10-22 を区別して示す", () => {
+    const { container } = render(<Page />);
+    const tags = Array.from(container.querySelectorAll("[class*='brandTag']")).map((el) =>
+      norm(el.textContent)
+    );
+    expect(tags).toEqual(["2026-07-17 基準 ／ 2026-10-22 更新（Gemini 4 Argon）"]);
+  });
+
+  it("ヒーローは基準日とモデル更新日を別々のピルで示す", () => {
+    const { container } = render(<Page />);
+    const pills = Array.from(container.querySelectorAll("[class*='metaRow'] [class*='pill']")).map(
+      (el) => norm(el.textContent)
+    );
+    expect(pills).toEqual([
+      "2026年7月17日時点の情報に基づく",
+      "2026年10月22日更新: Gemini 4 Argon（2026年10月13日GA）を追記",
+      "Vertex AI からの刷新版",
+      "Mermaid 図解 7点",
+      "一次情報源・URL付き",
+    ]);
+  });
+});

@@ -91,7 +91,7 @@ describe("ZaiGlmBestPracticesPage", () => {
       ["max(デフォルト・推奨)", "最も深い推論。精度重視、コストと遅延は最大"],
       ["xhigh", "それ以前のモデルのみ。内部的にmaxとして扱われる"],
       ["high", "拡張推論。精度とコストのバランス型"],
-      ["medium", "内部的にhighとして扱われる(GLM-5.3 / GLM-5.3-Flash は非対応)"],
+      ["medium", "内部的にhighとして扱われる(GLM-5.3 / GLM-5.3-Flash / GLM-5.3-FlashX は非対応)"],
       [
         "low",
         "GLM-5.3 / GLM-5.3-Flash / GLM-5.3-FlashX では high より浅い軽量推論として区別され、思考量・コスト・遅延を抑えられる。それ以前のモデルでは内部的にhighとして扱われる",

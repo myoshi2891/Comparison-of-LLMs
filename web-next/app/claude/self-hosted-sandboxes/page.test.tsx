@@ -106,7 +106,7 @@ describe("/claude/self-hosted-sandboxes 契約テスト", () => {
       li.textContent?.includes("Memory ストアは")
     );
     expect(item?.textContent?.replace(/\s+/g, " ").trim()).toBe(
-      "Memory ストアは SDK ワーカーまたは ant CLI（1.33.0 以降）経由で同期される（AWS では利用不可）ことを把握している"
+      "Memory ストアは SDK ワーカーまたは ant CLI（1.33.0 以降）経由で同期される（AWS と Claude Models on Google Cloud（Anthropic managed）では利用不可）ことを把握している"
     );
   });
 });
