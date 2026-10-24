@@ -1237,7 +1237,10 @@ export default function GithubCopilotPage() {
               <tr className="odd">
                 <td>Grok 4.7 / 4.6</td>
                 <td>xAI</td>
-                <td>高速・日常的な軽量タスク</td>
+                <td>
+                  Grok 4.7は複雑なマルチステップのエージェント作業、Grok
+                  4.6は汎用的なコーディングと推論
+                </td>
                 <td>ゼロデータ保持ポリシーでホスティング</td>
               </tr>
               <tr className="even">
