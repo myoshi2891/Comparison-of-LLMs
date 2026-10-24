@@ -185,6 +185,16 @@ class TestWindsurf:
         assert "$95/月" in teams.note_ja and "$80" not in teams.note_ja
         assert "$95/mo" in teams.note_en and "$80" not in teams.note_en
 
+    def test_teams_is_fallback_when_base_fee_falls_back(self):
+        # Arrange: 席単価は抽出できるが基本料の表記がない
+        html = "<p>Teams $45/month per full developer seat</p>"
+        # Act
+        teams = _find(_run(windsurf, html), "Teams")
+        # Assert: 基本料がフォールバック値なら行全体を fallback として扱う
+        assert teams.monthly == 45
+        assert teams.base_fee == 80
+        assert teams.scrape_status == "fallback"
+
 
 class TestGithubCopilot:
     def test_success_extracts_business_price(self):

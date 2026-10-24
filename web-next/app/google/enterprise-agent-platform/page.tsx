@@ -255,8 +255,8 @@ export default function Page() {
             を初めて触るエンジニア向けに、概念の理解から最初のエージェント構築、マルチエージェント設計、セキュリティ・ガバナンス、保存した会話コンテキストの維持と本番運用までをステップバイステップで解説します。
           </p>
           <div className={styles.meta}>
-            最終更新: 2026年7月18日時点の公開情報に基づく ／ 図解はすべて Mermaid
-            で記述（ASCIIアートは不使用）
+            作成: 2026年7月18日時点の公開情報に基づく ／ モデル更新: 2026年10月22日（ADK の例を
+            gemini-3.8-flash に変更） ／ 図解はすべて Mermaid で記述（ASCIIアートは不使用）
           </div>
         </div>
 
@@ -686,7 +686,7 @@ export default function Page() {
                 </div>
                 <div className={styles.codeLine}>
                   {" "}
-                  model=<span className={styles.cs}>"gemini-2.5-flash"</span>,
+                  model=<span className={styles.cs}>"gemini-3.8-flash"</span>,
                 </div>
                 <div className={styles.codeLine}>
                   {" "}
@@ -1727,7 +1727,8 @@ export default function Page() {
 
         <footer className={styles.pageFooter}>
           Gemini Enterprise Agent Platform 完全ガイド ／
-          初学者向けステップバイステップ・ベストプラクティス ／ 最終更新: 2026年7月18日
+          初学者向けステップバイステップ・ベストプラクティス ／ 作成: 2026年7月18日 ／ モデル更新:
+          2026年10月22日
         </footer>
       </main>
     </div>

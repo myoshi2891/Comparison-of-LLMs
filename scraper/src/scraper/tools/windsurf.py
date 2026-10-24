@@ -37,14 +37,18 @@ _BASE_FEE_PATTERNS: dict[str, list[str]] = {
 }
 
 
-def _extract_base_fee(html: str, name: str) -> float | None:
-    """基本料をページから抽出し、失敗時は _BASE_FEES の値を返す。"""
+def _extract_base_fee(html: str, name: str) -> tuple[float | None, str]:
+    """基本料をページから抽出し (値, status) を返す。失敗時は _BASE_FEES の値と "fallback"。
+
+    基本料を持たないプランは status が行の判定に影響しないよう "success" を返す。
+    """
     fallback = _BASE_FEES.get(name)
+    if fallback is None:
+        return None, "success"
     patterns = _BASE_FEE_PATTERNS.get(name)
-    if fallback is None or patterns is None:
-        return fallback
-    fee, _ = sanity_check(extract_price(html, patterns), f"Windsurf/{name}/base_fee", fallback)
-    return fee
+    if patterns is None:
+        return fallback, "fallback"
+    return sanity_check(extract_price(html, patterns), f"Windsurf/{name}/base_fee", fallback)
 
 
 def _format_note(note: str, base_fee: float | None) -> str:
@@ -82,7 +86,10 @@ def scrape(existing: list[SubTool] | None = None) -> list[SubTool]:
             cur_m = new_m
             status = s
 
-        base_fee = _extract_base_fee(html, name)
+        base_fee, fee_status = _extract_base_fee(html, name)
+        # 月額・基本料のどちらかがフォールバックなら行全体を fallback とする
+        if fee_status == "fallback":
+            status = "fallback"
         tools.append(SubTool(
             group=group, name=name,
             monthly=cur_m, annual=fb_a, base_fee=base_fee,

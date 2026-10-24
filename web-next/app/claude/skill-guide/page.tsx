@@ -209,8 +209,9 @@ style EXT fill:#1a2535,stroke:#3b5270,color:#e6edf3`}
               <span className={styles.calloutIcon}>ℹ️</span>
               <p>
                 旧バージョンの <code>.claude/commands/</code> によるスラッシュコマンドは現在{" "}
-                <code>skills/</code> に統合されています。<code>invocation: explicit</code>
-                を指定することで同等の手動呼び出し動作が得られます。
+                <code>skills/</code> に統合されています。
+                <code>disable-model-invocation: true</code>
+                を指定して自動呼び出しを無効化することで、同等の手動呼び出し動作が得られます。
               </p>
             </div>
             <h3>各要素の役割比較</h3>
@@ -684,7 +685,7 @@ CC->>U: 手順に従ったコードレビュー結果`}
                 </div>
               </div>
             </div>
-            <h3>invocation フィールドで制御する</h3>
+            <h3>disable-model-invocation フィールドで制御する</h3>
             <div className={styles.codeBlock}>
               <div className={styles.codeBlockHeader}>
                 <div className={styles.codeBlockDots}>
@@ -698,17 +699,17 @@ CC->>U: 手順に従ったコードレビュー結果`}
                 <code>
                   <span className={styles.cmt}># Claude が自動判断（デフォルト）</span>
                   {"\n"}
-                  <span className={styles.key}>invocation</span>
+                  <span className={styles.key}>disable-model-invocation</span>
                   {": "}
-                  <span className={styles.val}>automatic</span>
+                  <span className={styles.val}>false</span>
                   {"\n\n"}
                   <span className={styles.cmt}>
-                    # /deploy と入力したときのみ実行（破壊的操作に推奨）
+                    # 自動呼び出しを無効化し、/deploy と入力したときのみ実行（破壊的操作に推奨）
                   </span>
                   {"\n"}
-                  <span className={styles.key}>invocation</span>
+                  <span className={styles.key}>disable-model-invocation</span>
                   {": "}
-                  <span className={styles.val}>explicit</span>
+                  <span className={styles.val}>true</span>
                 </code>
               </pre>
             </div>
@@ -1151,10 +1152,10 @@ style FM fill:#1c2a1c,stroke:#3fb950,color:#e6edf3`}
               <span className={styles.calloutIcon}>💡</span>
               <p>
                 Agent Teams (<code>--team</code>) 利用時は <code>/effort</code> コマンドで思考深度を{" "}
-                <code>low</code>・<code>medium</code>・<code>high</code>・<code>xhigh</code>{" "}
-                から選択できます（Opus 4.7 で <code>xhigh</code> が追加）。スキル内に{" "}
-                <code>effort: high</code> を frontmatter で指定することも可能です（Opus 4.7
-                以降推奨）。<code>/loop</code>{" "}
+                <code>low</code>・<code>medium</code>・<code>high</code>・<code>xhigh</code>・
+                <code>max</code> から選択できます（Opus 4.7 で <code>xhigh</code>{" "}
+                が追加）。スキル内に <code>effort: high</code> を frontmatter
+                で指定することも可能です（Opus 4.7 以降推奨）。<code>/loop</code>{" "}
                 コマンドを使えばスキルを定期的に繰り返し実行させることもできます。Opus 4.8
                 （2026-05-28）では claude.ai 上でもエフォート量を制御できるようになり、Claude Code
                 には大規模問題に対応する「dynamic workflows」が追加されています。
@@ -1745,7 +1746,7 @@ style B fill:#2a1c1c,stroke:#f85149,color:#e6edf3`}
                 fontFamily: "'JetBrains Mono', monospace",
               }}
             >
-              最終更新: 2026年6月 · Claude Code 最新版 · SKILL.md 完全解説ガイド
+              最終更新: 2026年10月 · Claude Code 最新版 · SKILL.md 完全解説ガイド
             </p>
           </section>
         </main>

@@ -119,9 +119,10 @@ export default function ZaiGlmBestPracticesPage() {
             style={{ fontSize: "16px", color: "var(--color-text-secondary)" }}
           >
             これから Z.ai の GLM モデル API
-            を触り始めるエンジニア向けに、アカウント作成から本番運用のエラーハンドリング・コスト最適化までを順を追って解説する。全項目は
+            を触り始めるエンジニア向けに、アカウント作成から本番運用のエラーハンドリング・コスト最適化までを順を追って解説する。当初の内容は
             2026年7月16日時点で docs.z.ai / z.ai
-            の公式ドキュメントを直接確認し、内容を検証済みである。
+            の公式ドキュメントを直接確認し、検証済みである。GLM-5.3
+            系など2026年10月時点のモデル状況はその後の更新で追記したものであり、7月16日の検証には含まれない。
           </p>
           <div
             style={{
@@ -134,7 +135,7 @@ export default function ZaiGlmBestPracticesPage() {
             }}
           >
             <span style={{ color: "var(--color-text-success)" }}>✓</span>公式ドキュメント docs.z.ai
-            / z.ai を直接確認して作成(2026年7月16日時点)
+            / z.ai を直接確認して作成(2026年7月16日時点。2026年10月時点のモデル状況は後日追記)
           </div>
         </div>
 
@@ -149,7 +150,9 @@ export default function ZaiGlmBestPracticesPage() {
             <strong>GLM-5.2</strong>
             であり、1M(100万)トークンという実用レベルのコンテキスト長と、長時間タスク(long-horizon
             task)を安定して遂行できる点を最大の特徴として打ち出している。GLM-5.2
-            は要件定義からデプロイ可能な成果物までの開発ワークフロー全体を、単一タスクの中で完結させることを狙って設計されたモデルである。
+            は要件定義からデプロイ可能な成果物までの開発ワークフロー全体を、単一タスクの中で完結させることを狙って設計されたモデルである。なお2026年10月時点では後継の
+            <strong>GLM-5.3</strong>(入力 $1.4 / 出力 $4.4 per 1M、GLM-5.2 と同価格)と、軽量版の
+            GLM-5.3-Flash / GLM-5.3-FlashX が公開されている。
           </p>
 
           <div className={styles.tableWrap}>
@@ -167,7 +170,9 @@ export default function ZaiGlmBestPracticesPage() {
                   <td>
                     <code className={styles.codeInline}>glm-5.2</code>
                   </td>
-                  <td>最新の旗艦モデル。長時間タスク・エージェント型コーディングに最適化</td>
+                  <td>
+                    2026年7月時点の旗艦モデル(2026年10月時点の最新はGLM-5.3)。長時間タスク・エージェント型コーディングに最適化
+                  </td>
                   <td>1M トークン</td>
                   <td>128K(=131,072)トークン</td>
                 </tr>
@@ -345,7 +350,7 @@ export default function ZaiGlmBestPracticesPage() {
             <MermaidDiagram
               chart={`flowchart TD
     A["タスクの性質を確認"] --> B{"複雑な推論や長時間の<br/>エージェント型タスクか?"}
-    B -->|"Yes"| C["GLM-5.2<br/>(1Mコンテキスト, reasoning_effort=max)"]
+    B -->|"Yes"| C["GLM-5.3<br/>(2026年10月時点の最新旗艦)"]
     B -->|"No"| D{"コストを最優先したいか?"}
     D -->|"Yes"| E["GLM-4.5-Flash / GLM-4.7-Flash<br/>(無料枠)"]
     D -->|"No"| F{"画像や動画の理解が必要か?"}
@@ -355,7 +360,8 @@ export default function ZaiGlmBestPracticesPage() {
           </div>
 
           <p className={styles.p}>
-            GLM-5.2
+            複雑なコーディングや長時間タスクには、2026年10月時点の最新旗艦である GLM-5.3
+            を第一候補とする(GLM-5.2 と同価格)。GLM-5.2
             は、プロジェクト全体のコードベース理解、長期リファクタリング、実機デバッグ、研究論文の再現実装など、複数ステップにわたる開発ワークフローを1タスクで完結させることを想定して設計されている。一方、軽量なQ&amp;Aや定型処理では、無料枠のFlash系モデルや廉価なGLM-4.5-Airのほうがコスト効率がよい。
           </p>
 
@@ -881,7 +887,8 @@ export default function ZaiGlmBestPracticesPage() {
                     <code className={styles.codeInline}>xhigh</code>
                   </td>
                   <td>
-                    内部的に<code className={styles.codeInline}>max</code>として扱われる
+                    それ以前のモデルのみ。内部的に<code className={styles.codeInline}>max</code>
+                    として扱われる
                   </td>
                 </tr>
                 <tr>
@@ -892,11 +899,22 @@ export default function ZaiGlmBestPracticesPage() {
                 </tr>
                 <tr>
                   <td>
-                    <code className={styles.codeInline}>medium</code> /{" "}
+                    <code className={styles.codeInline}>medium</code>
+                  </td>
+                  <td>
+                    内部的に<code className={styles.codeInline}>high</code>
+                    として扱われる(GLM-5.3 / GLM-5.3-Flash / GLM-5.3-FlashX は非対応)
+                  </td>
+                </tr>
+                <tr>
+                  <td>
                     <code className={styles.codeInline}>low</code>
                   </td>
                   <td>
-                    内部的に<code className={styles.codeInline}>high</code>として扱われる
+                    GLM-5.3 / GLM-5.3-Flash / GLM-5.3-FlashX では{" "}
+                    <code className={styles.codeInline}>high</code>{" "}
+                    より浅い軽量推論として区別され、思考量・コスト・遅延を抑えられる。それ以前のモデルでは内部的に
+                    <code className={styles.codeInline}>high</code>として扱われる
                   </td>
                 </tr>
                 <tr>
@@ -904,21 +922,30 @@ export default function ZaiGlmBestPracticesPage() {
                     <code className={styles.codeInline}>minimal</code> /{" "}
                     <code className={styles.codeInline}>none</code>
                   </td>
-                  <td>思考をスキップし、即座に応答を生成</td>
+                  <td>それ以前のモデルのみ。思考をスキップし、即座に応答を生成</td>
                 </tr>
               </tbody>
             </table>
           </div>
+          <p className={styles.p}>
+            GLM-5.3 系(GLM-5.3 / GLM-5.3-Flash / GLM-5.3-FlashX)で指定する値は low・high・max
+            の3つのみ。xhigh・minimal・none はそれ以前のモデル向けの値として扱う。
+          </p>
 
           <div className={styles.diagramWrap}>
             <MermaidDiagram
               chart={`flowchart LR
     A["リクエスト受信"] --> B{"thinking.type"}
-    B -->|"enabled"| C{"reasoning_effort"}
-    B -->|"disabled"| D["即時応答(CoTなし)"]
-    C -->|"max または xhigh"| E["最大推論(高精度・高コスト)"]
-    C -->|"high, medium, low"| F["拡張推論(高相当にマップ)"]
-    C -->|"minimal または none"| D`}
+    B -->|"enabled"| M{"モデル"}
+    B -->|"disabled(GLM-5.3 系以外)"| D["即時応答(CoTなし)"]
+    M -->|"GLM-5.3 系"| C1{"reasoning_effort"}
+    M -->|"それ以前のモデル"| C2{"reasoning_effort"}
+    C1 -->|"max"| E["最大推論(高精度・高コスト)"]
+    C1 -->|"high"| F["拡張推論(精度とコストのバランス)"]
+    C1 -->|"low"| G["軽量推論(high より浅く低コスト・低遅延)"]
+    C2 -->|"max または xhigh"| E
+    C2 -->|"high または low"| F
+    C2 -->|"minimal または none"| D`}
             />
           </div>
 
@@ -955,11 +982,20 @@ export default function ZaiGlmBestPracticesPage() {
                 を組み合わせる。
               </li>
               <li className={styles.li}>
-                単純なFAQ応答や定型フォーマット変換のような軽量タスクでは
+                単純なFAQ応答や定型フォーマット変換のような軽量タスクでは、GLM-4.6
+                以降(GLM-5.3 系を除く)のモデルなら{" "}
                 <code className={styles.codeInline}>
                   thinking: &#123;&quot;type&quot;: &quot;disabled&quot;&#125;
-                </code>
-                にして応答速度とコストを最適化する。
+                </code>{" "}
+                にして応答速度とコストを最適化する。GLM-4.5-Flash
+                など GLM-4.6 より前のモデルでは{" "}
+                <code className={styles.codeInline}>thinking</code>{" "}
+                パラメータを指定せず省略する。GLM-5.3 / GLM-5.3-Flash / GLM-5.3-FlashX は
+                thinking が強制で無効化できない(
+                <code className={styles.codeInline}>thinking.type</code> は enabled
+                のまま)ため、代わりに{" "}
+                <code className={styles.codeInline}>reasoning_effort: &quot;low&quot;</code>{" "}
+                を指定して思考量を抑える。
               </li>
               <li className={styles.li}>
                 ストリーミング時は<code className={styles.codeInline}>delta.reasoning_content</code>
@@ -2065,7 +2101,12 @@ export default function ZaiGlmBestPracticesPage() {
                   <td>
                     複雑な推論タスクでのみ
                     <code className={styles.codeInline}>reasoning_effort=max</code>
-                    を使い、軽量タスクではthinkingを無効化しているか
+                    を使い、軽量タスクではGLM-4.6
+                    以降(GLM-5.3 系を除く)ならthinkingを無効化、GLM-4.6
+                    より前のモデルはthinkingを省略、GLM-5.3
+                    系ならthinkingを有効のまま
+                    <code className={styles.codeInline}>reasoning_effort: "low"</code>
+                    にしているか
                   </td>
                   <td>7, 13</td>
                 </tr>
@@ -2197,7 +2238,8 @@ export default function ZaiGlmBestPracticesPage() {
           }}
         >
           本ガイドはZ.ai公式ドキュメント(docs.z.ai /
-          z.ai)を一次情報源とし、2026年7月16日時点ですべての参照先に直接アクセスして内容を検証したうえで作成している。API仕様・料金・モデルラインナップ・プラン内容は頻繁に更新されるため、実装前に必ず公式ドキュメントの最新版を確認すること。
+          z.ai)を一次情報源とし、2026年7月16日時点ですべての参照先に直接アクセスして内容を検証したうえで作成している。2026年10月時点のモデル状況(GLM-5.3
+          系など)はその後の更新で追記したものであり、7月16日の検証範囲には含まれない。API仕様・料金・モデルラインナップ・プラン内容は頻繁に更新されるため、実装前に必ず公式ドキュメントの最新版を確認すること。
         </footer>
       </main>
     </div>

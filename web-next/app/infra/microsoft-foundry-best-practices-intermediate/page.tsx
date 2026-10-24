@@ -863,11 +863,17 @@ export default function MicrosoftFoundryBestPracticesIntermediatePage() {
                   </tr>
                   <tr>
                     <td>GPT-4.1</td>
-                    <td>本番ワークロードにおける性能とコストのバランスが最良</td>
+                    <td>
+                      本番ワークロードにおける性能とコストのバランスが最良（2026年10月時点でDeprecated＝新規顧客はデプロイ不可。移行先の例はGPT-5.6
+                      Terra）
+                    </td>
                   </tr>
                   <tr>
                     <td>GPT-4.1 mini</td>
-                    <td>最速。低レイテンシ・高スループットが求められるシナリオ</td>
+                    <td>
+                      最速。低レイテンシ・高スループットが求められるシナリオ（同じくDeprecated。移行先の例はGPT-5.6
+                      Luna）
+                    </td>
                   </tr>
                   <tr>
                     <td>Claude</td>
@@ -883,7 +889,9 @@ export default function MicrosoftFoundryBestPracticesIntermediatePage() {
                   </tr>
                   <tr>
                     <td>DeepSeek-R1</td>
-                    <td>オープンウェイトの大規模推論</td>
+                    <td>
+                      オープンウェイトの大規模推論（Foundryでは2026年8月13日に提供終了。後継はDeepSeek-V4-Pro）
+                    </td>
                   </tr>
                   <tr>
                     <td>Phi-4</td>
@@ -2629,7 +2637,7 @@ export default function MicrosoftFoundryBestPracticesIntermediatePage() {
               Learnの一次情報を最新版で確認してください。また、コミュニティブログやサードパーティ記事で紹介されている数値（コスト削減率、性能向上率など）は、各執筆者の検証環境に依存するものであり、自社のワークロードでの実測値とは異なる可能性がある点にご留意ください。
             </p>
             <p style={{ marginTop: "24px" }}>
-              Microsoft Foundry 実践ベストプラクティスガイド ／ 最終更新: 2026年7月17日
+              Microsoft Foundry 実践ベストプラクティスガイド ／ 最終更新: 2026年10月22日
             </p>
           </footer>
         </main>

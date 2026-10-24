@@ -1,8 +1,8 @@
 # 月次更新プロンプト集
 
 > **用途**: 毎月最低 1 回、各画面の情報を最新状態に保つためのプロンプトテンプレート集。  
-> **最終更新**: 2026-06-30  
-> **次回予定**: 2026-07-01 以降
+> **最終更新**: 2026-10-24  
+> **次回予定**: 2026-11-01 以降
 
 ---
 
@@ -37,11 +37,11 @@
 | SOURCES セクションのラベル | `参考ソース一覧 — 2026年X月更新版` |
 | フッター | `Last updated: June 2026` / `最終更新: 2026年X月` |
 
-**事前 grep（対象 page.tsx で必ず実行し、ヒットを全て更新）**:
+**事前 grep（対象ページのディレクトリで必ず実行し、全ヒットを確認。`Sidebar.tsx` 等の関連ファイルにも日付があるため `page.tsx` だけに絞らない）**: 下記「指摘5」で維持と定めた日付（情報基準日・「YYYY年M月時点」などの記録日）は残し、当月への更新が必要な日付だけを書き換える。
 
 ```bash
 cd web-next
-grep -nE '(20[0-9]{2}年[0-9]{1,2}月|(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]* 20[0-9]{2}|Last updated|最終更新|更新版|時点|as of|情報基準日)' app/<path>/page.tsx
+grep -rnE '(20[0-9]{2}年[0-9]{1,2}月|20[0-9]{2}-[0-9]{2}-[0-9]{2}|(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]* 20[0-9]{2}|Last updated|最終更新|更新版|時点|as of|情報基準日)' app/<path>/
 ```
 
 英語月名（`May`→`June`）と和文（`2026年5月`→`2026年6月`）の**両方**を揃えること。
@@ -68,12 +68,42 @@ grep -nE '(20[0-9]{2}年[0-9]{1,2}月|(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|N
 grep -nE 'toBe\(|toContain|toMatch' app/<path>/page.test.tsx
 ```
 
+### 指摘4: 退役・非推奨になったモデル ID がコード例に残る（2026-10 サイクルで多発）
+
+本文の説明は正しくても、**コード例・config 例・Mermaid のノード名に退役済みのモデル ID が残る**と、読者がコピーした時点で動かない。
+着手前に対象ページのモデル ID を洗い出し、各社の公式ライフサイクル表と突き合わせる:
+
+```bash
+cd web-next
+grep -rnoiE --include='*.tsx' --include='*.ts' --include='*.json' "(gpt-[0-9][a-z0-9.-]*|gemini-[0-9][a-z0-9.-]*|claude-([a-z]+-)?[0-9][a-z0-9.-]*|grok-[a-z0-9][a-z0-9.-]*|deepseek-[a-z0-9.-]+|glm-[0-9][a-z0-9.-]*|kimi-[a-z0-9][a-z0-9.-]*|llama-?[0-9][a-z0-9.-]*|phi-[0-9][a-z0-9.-]*|\bo[0-9][a-z0-9.-]*|codex-[a-z0-9.-]+|mai-[a-z0-9.-]+)" app/<path>/ | sort -u
+```
+
+| 参照先（一次情報） | 確認内容 |
+|---|---|
+| platform.claude.com の Models overview / Model deprecations | 現行・レガシーの Claude モデル ID |
+| code.claude.com の Model configuration | `opus` / `sonnet` / `haiku` / `fable` エイリアスの解決先 |
+| learn.chatgpt.com の Codex Models | Codex の推奨モデルと退役日 |
+| ai.google.dev の Deprecations / Agent Platform の Model versions | Gemini の停止日（**両者で日付が異なる**ためページの文脈に合う方を使う） |
+| docs.github.com の Supported AI models | Copilot のモデルピッカーに残っているモデル |
+| Microsoft Learn の Model retirement schedule | Foundry の Deprecated（新規顧客不可）/ Retired（410 Gone） |
+
+- コピー用の文字列定数（`CODE_TEXT_*` / `text={...}`）と表示用 JSX の**両方**を置き換える
+- 公式が後継を指定していない場合に移行先を書くときは「移行先の例」と表記し、公式指定と区別する
+
+### 指摘5: 「情報基準日」と「最終更新」を混同しない
+
+- **情報基準日・「YYYY年M月時点」**: 原本を書いた時点の記録。原本固定の契約テストやページ移行時の決定（CLAUDE.md）で維持されているため、**月次確認だけでは書き換えない**
+- **最終更新・更新日**: 本文を実際に編集したときだけ更新する
+- **確認日**: registry の `lastReviewed`（ページ上部の鮮度バッジに表示される）で表す。内容に変更がなくても確認したら更新する
+- 期日を過ぎた「予定」は「予定されていた（YYYY年M月時点で期日経過済み）」のように事実ベースへ改める。結果を一次情報で確認できない場合は、完了したと断定しない
+
 ### コミット前の最終スイープ
 
 ```bash
 cd web-next
-# 旧月表記が残っていないか（例: 前月が 5 月なら "2026年5月" "May 2026" を検索）
-grep -rnE '(2026年5月|May 2026|Mar 2026)' app/<path>/  # 空になるまで潰す
+# 旧月表記が残っていないか（今回のサイクルで更新対象になる月をすべて含める。例: 2026年10月サイクルなら 6〜9 月）
+# 「指摘5」で維持と定めた記録日（情報基準日・「YYYY年M月時点」）は残し、更新が必要なヒットだけを潰す
+grep -rnE '(2026年[6-9]月|2026-0[6-9]-[0-9]{2}|(Jun|Jul|Aug|Sep)[a-z]* 2026)' app/<path>/
 bun run test app/<path> >/tmp/t.log 2>&1; echo "exit=$?"   # tail はexit code を隠すため必ず echo で確認
 ```
 
@@ -81,43 +111,62 @@ bun run test app/<path> >/tmp/t.log 2>&1; echo "exit=$?"   # tail はexit code �
 
 ## 画面一覧
 
-| # | URL | ページタイトル（概要） | 更新日 |
-|---|-----|----------------------|--------|
-| 1 | `/` | AIモデル 時間別コスト 計算機（ホーム） | 2026-06-29 |
-| 2 | `/claude/skill` | Claude Code AI仕様駆動開発 — マークダウンファイル完全ガイド | 2026-06-30 |
-| 3 | `/claude/skill-guide` | SKILL.md 完全解説ガイド — Claude Code | 2026-06-30 |
-| 4 | `/claude/skill-guide-intermediate` | SKILL.md 中級者完全攻略ガイド — Claude Code | 2026-06-30 |
-| 5 | `/claude/agent` | Claude Code サブエージェント Markdown ベストプラクティス | 2026-06-30 |
-| 6 | `/claude/cowork-guide` | Claude Cowork 完全入門ガイド | 2026-06-30 |
-| 7 | `/google/skill` | Google Antigravity × Gemini — マークダウンファイル完全ガイド | 2026-06-30 |
-| 8 | `/google/skill-guide` | SKILL.md 完全解剖ガイド（Gemini CLI 中級者以上向け） | 2026-06-30 |
-| 9 | `/google/skill-guide-intermediate` | SKILL.md 完全ガイド — Gemini CLI & Antigravity | 2026-06-30 |
-| 10 | `/google/agent` | Gemini マルチエージェント開発（ADK / A2A） | 2026-06-30 |
-| 11 | `/google/antigravity-guide` | Google Antigravity — AI仕様駆動開発 ベストプラクティス完全ガイド | 2026-06-30 |
-| 12 | `/codex/skill` | OpenAI Codex — AI仕様駆動開発 マークダウンファイル完全ガイド | 2026-06-30 |
-| 13 | `/codex/agent` | OpenAI Codex エージェント開発ガイド | 2026-06-30 |
-| 14 | `/codex/openai-codex-guide` | OpenAI Codex 完全ガイド 2026 | 2026-06-30 |
-| 15 | `/copilot/skill` | GitHub Copilot SKILL.md 完全ベストプラクティスガイド | 2026-06-30 |
-| 16 | `/copilot/agent` | GitHub Copilot コーディングエージェント開発ガイド | 2026-06-30 |
-| 17 | `/copilot/github-copilot` | GitHub Copilot 完全ガイド 2026 | 2026-06-30 |
-| 18 | `/copilot/markdown-file-guide` | GitHub Copilot — AI仕様駆動開発 マークダウンファイル完全ガイド | 2026-06-30 |
-| 19 | `/git-worktree` | git worktree × 4プラットフォーム ドキュメント並列開発ガイド | 2026-06-30 |
-| 20 | `/code-review/tool-pricing` | Code Review ツール料金比較ページ | 2026-06-30 |
-| 21 | `/code-review/sonar-qube` | SonarQube Code Review 実践ガイド | 2026-06-30 |
-| 22 | `/code-review/copilot-code-review` | GitHub Copilot Code Review 完全活用ガイド | 2026-06-30 |
-| 23 | `/code-review/coderabbit-guide` | CodeRabbit 完全活用ガイド | 2026-06-30 |
-| 24 | `/claude/code-slash-commands` | Claude Code スラッシュコマンド完全ガイド 2026 | 2026-06-30 |
-| 25 | `/claude/harness-engineering` | ハーネスエンジニアリング完全ガイド 2026 | 2026-06-30 |
-| 26 | `/claude/managed-agents` | Claude Managed Agents 完全ガイド | 2026-06-30 |
-| 27 | `/google/agent-harness-engineering` | Gemini Agent Harness Engineering 完全ガイド 2026 | 2026-06-30 |
-| 28 | `/google/antigravity-slash-commands-guide` | Antigravity スラッシュコマンド完全ガイド | 2026-06-30 |
-| 29 | `/google/harness-engineering` | ハーネスエンジニアリング完全ガイド 2026 (Gemini CLI & Antigravity) | 2026-06-30 |
-| 30 | `/codex/harness-engineering` | OpenAI Codex ハーネスエンジニアリング完全ガイド | 2026-06-30 |
-| 31 | `/google/sandbox-best-practices` | Google AI Sandbox ベストプラクティス完全ガイド 2026 | 2026-06-30 |
-| 32 | `/agent/hermes-agent-advanced-guide` | Hermes Agent 中級・上級者向け完全ガイド | 2026-06-30 |
-| 33 | `/agent/openclaw-advanced-agent-security-guide` | OpenClaw Agent 高度活用 & セキュリティ完全ガイド | 2026-06-30 |
-| 34 | `/claude/self-hosted-sandboxes` | Claude セルフホスト型サンドボックス完全ガイド | 2026-06-30 |
-| 35 | `/vercel/sandbox` | Vercel Sandbox 完全入門ガイド 2026 | 2026-06-30 |
+| # | URL | ページタイトル（概要） | 区分 | 確認日（registry `lastReviewed`） |
+|---|-----|----------------------|------|--------|
+| 1 | `/` | AIモデル 時間別コスト 計算機（ホーム） | Home | 2026-10-24 |
+| 2 | `/claude/skill` | Claude Code AI仕様駆動開発 — マークダウンファイル完全ガイド | Providers / Claude | 2026-10-22 |
+| 3 | `/claude/skill-guide` | SKILL.md 完全解説ガイド — Claude Code | Providers / Claude | 2026-10-22 |
+| 4 | `/claude/skill-guide-intermediate` | SKILL.md 中級者完全攻略ガイド — Claude Code | Providers / Claude | 2026-10-22 |
+| 5 | `/claude/agent` | Claude Code サブエージェント Markdown ベストプラクティス | Providers / Claude | 2026-10-22 |
+| 6 | `/claude/cowork-guide` | Claude Cowork 完全入門ガイド | Providers / Claude | 2026-10-22 |
+| 7 | `/google/skill` | Google Antigravity × Gemini — マークダウンファイル完全ガイド | Providers / Google | 2026-10-22 |
+| 8 | `/google/skill-guide` | SKILL.md 完全解剖ガイド（Gemini CLI 中級者以上向け） | Providers / Google | 2026-10-22 |
+| 9 | `/google/antigravity-best-practices` | Google Antigravity ベストプラクティス（旧 `/google/skill-guide-intermediate` の後継） | Providers / Google | 2026-10-22 |
+| 10 | `/google/agent` | Gemini マルチエージェント開発（ADK / A2A） | Providers / Google | 2026-10-22 |
+| 11 | `/google/antigravity-guide` | Google Antigravity — AI仕様駆動開発 ベストプラクティス完全ガイド | Providers / Google | 2026-10-22 |
+| 12 | `/codex/skill` | OpenAI Codex — AI仕様駆動開発 マークダウンファイル完全ガイド | Providers / Codex | 2026-10-22 |
+| 13 | `/codex/agent` | OpenAI Codex エージェント開発ガイド | Providers / Codex | 2026-10-22 |
+| 14 | `/codex/openai-codex-guide` | OpenAI Codex 完全ガイド 2026 | Providers / Codex | 2026-10-22 |
+| 15 | `/copilot/skill` | GitHub Copilot SKILL.md 完全ベストプラクティスガイド | Providers / Microsoft | 2026-10-22 |
+| 16 | `/copilot/agent` | GitHub Copilot コーディングエージェント開発ガイド | Providers / Microsoft | 2026-10-22 |
+| 17 | `/copilot/github-copilot` | GitHub Copilot 完全ガイド 2026 | Providers / Microsoft | 2026-10-22 |
+| 18 | `/copilot/markdown-file-guide` | GitHub Copilot — AI仕様駆動開発 マークダウンファイル完全ガイド | Providers / Microsoft | 2026-10-22 |
+| 19 | `/git-worktree` | git worktree × 4プラットフォーム ドキュメント並列開発ガイド | 開発プロセス | 2026-08-07 |
+| 20 | `/code-review/tool-pricing` | Code Review ツール料金比較ページ | 開発プロセス | 2026-07-01 |
+| 21 | `/code-review/sonar-qube` | SonarQube Code Review 実践ガイド | 開発プロセス | 2026-08-07 |
+| 22 | `/code-review/copilot-code-review` | GitHub Copilot Code Review 完全活用ガイド | 開発プロセス | 2026-08-19 |
+| 23 | `/code-review/coderabbit-guide` | CodeRabbit 完全活用ガイド | 開発プロセス | 2026-08-07 |
+| 24 | `/claude/code-slash-commands` | Claude Code スラッシュコマンド完全ガイド 2026 | Providers / Claude | 2026-05-31（保留） |
+| 25 | `/claude/harness-engineering` | ハーネスエンジニアリング完全ガイド 2026 | Providers / Claude | 2026-10-22 |
+| 26 | `/claude/managed-agents` | Claude Managed Agents 完全ガイド | Providers / Claude | 2026-10-22 |
+| 27 | `/google/agent-harness-engineering` | Gemini Agent Harness Engineering 完全ガイド 2026 | Providers / Google | 2026-10-22 |
+| 28 | `/google/antigravity-slash-commands-guide` | Antigravity スラッシュコマンド完全ガイド | Providers / Google | 2026-07-01（保留） |
+| 29 | `/google/harness-engineering` | ハーネスエンジニアリング完全ガイド 2026 (Gemini CLI & Antigravity) | Providers / Google | 2026-10-22 |
+| 30 | `/codex/harness-engineering` | OpenAI Codex ハーネスエンジニアリング完全ガイド | Providers / Codex | 2026-10-22 |
+| 31 | `/google/sandbox-best-practices` | Google AI Sandbox ベストプラクティス完全ガイド 2026 | Providers / Google | 2026-10-22 |
+| 32 | `/agent/hermes-agent-advanced-guide` | Hermes Agent 中級・上級者向け完全ガイド | Agent 開発 | 2026-08-10 |
+| 33 | `/agent/openclaw-advanced-agent-security-guide` | OpenClaw Agent 高度活用 & セキュリティ完全ガイド | Agent 開発 | 2026-08-01 |
+| 34 | `/claude/self-hosted-sandboxes` | Claude セルフホスト型サンドボックス完全ガイド | Providers / Claude | 2026-10-22 |
+| 35 | `/vercel/sandbox` | Vercel Sandbox 完全入門ガイド 2026 | Agent 開発 | 2026-07-01 |
+| 36 | `/claude/fable-5-best-practices` | Fable 5 Best Practices | Providers / Claude | 2026-10-22 |
+| 37 | `/claude/tag-best-practices` | Claude Tag 活用ガイド ― 中級者〜上級者向けベストプラクティス | Providers / Claude | 2026-10-22 |
+| 38 | `/google/adk-best-practices` | ADK Best Practices | Providers / Google | 2026-10-22 |
+| 39 | `/google/enterprise-agent-platform` | Gemini Enterprise Agent Platform | Providers / Google | 2026-10-22 |
+| 40 | `/google/enterprise-agent-platform-intermediate` | Gemini Enterprise Agent Platform (中級) | Providers / Google | 2026-10-22 |
+| 41 | `/google/gemma-best-practices-guide` | Gemma Best Practices Guide | Providers / Google | 2026-10-22 |
+| 42 | `/google/multi-agent-best-practices` | Gemini マルチエージェント開発 ベストプラクティス完全ガイド | Providers / Google | 2026-10-22 |
+| 43 | `/google/notebook-lm` | NotebookLM Guide | Providers / Google | 2026-10-22 |
+| 44 | `/google/stitch-guide` | Stitch Guide | Providers / Google | 2026-10-22 |
+| 45 | `/model-data/gpt-5-6-best-practices` | GPT-5.6 Best Practices | Providers / Codex | 2026-10-22 |
+| 46 | `/infra/microsoft-foundry-best-practices-guide` | Microsoft Foundry 活用ガイド | Providers / Microsoft | 2026-10-22 |
+| 47 | `/infra/microsoft-foundry-best-practices-intermediate` | Microsoft Foundry 実践ベストプラクティスガイド | Providers / Microsoft | 2026-10-22 |
+| 48 | `/moonshot/kimi-llm-best-practices` | Kimi LLM 徹底ガイド | Providers / Moonshot | 2026-10-22 |
+| 49 | `/deepseek/llm-best-practices` | DeepSeek LLM ガイド | Providers / DeepSeek | 2026-10-22 |
+| 50 | `/xai/grok-best-practices` | xAI Grok ガイド | Providers / xAI | 2026-10-22 |
+| 51 | `/xai/grok-best-practices-intermediate` | xAI Grok API 実践ベストプラクティスガイド | Providers / xAI | 2026-10-22 |
+| 52 | `/zhipu/zai-glm-best-practices` | Z.ai (GLM) ベストプラクティス | Providers / Zhipu(GLM) | 2026-10-22 |
+
+Providers ナビ（`group: "Providers"`）の 43 ページのうち 41 ページは 2026-10-22 に月次確認済み。画面 24・28（スラッシュコマンドの 2 ガイド）は**保留**: 基準バージョン（Claude Code v2.1.196 / Gemini CLI v0.44.1）以降のコマンド差分（2026-10 時点の最新は Claude Code v2.1.309 / Gemini CLI v0.65.0（安定版。比較対象は安定版のみとし、`-preview` / `-nightly` タグは除外する）。コマンド差分の検証開始時にリリース一覧で最新の安定版を再確認する）を未検証のため、確認日を据え置いている。なお画面 24 は `/model` のエイリアス解決先（Opus 5.5 等）だけを先行更新しており、ヘッダーの日付バッジ（2026-06-30）・バージョンバッジとの整合はコマンド差分の検証時にあわせて取る。区分・確認日は `web-next/lib/page-registry.ts` から生成した値で、一覧にない registry 登録ページは末尾の「その他の画面」を参照。
 
 ---
 
@@ -131,7 +180,8 @@ bun run test app/<path> >/tmp/t.log 2>&1; echo "exit=$?"   # tail はexit code �
 
 ```
 WebSearch で以下を確認してからプロンプトを実行する:
-- Anthropic / OpenAI / Google / AWS / DeepSeek / xAI の最新 API 価格変更
+- Anthropic / OpenAI / Google / AWS / DeepSeek / xAI / Moonshot / Zhipu / Meta / Microsoft の最新 API 価格変更
+  （scraper/src/scraper/providers/ の全プロバイダー。google / meta / microsoft は _FALLBACKS 固定のため手動更新）
 - 新しく登場した主要 LLM モデル（年を併記）
 - USD/JPY レート（自動取得だが大幅変動時は手動確認）
 ```
@@ -478,42 +528,33 @@ web-next/app/google/skill-guide/page.tsx を読んでください。
 
 ---
 
-## 画面 9 — `/google/skill-guide-intermediate`（SKILL.md 完全ガイド — Gemini CLI 入門）
+## 画面 9 — `/google/antigravity-best-practices`（Google Antigravity ベストプラクティス）
 
-**ファイル**: `web-next/app/google/skill-guide-intermediate/page.tsx`  
-**URL**: `/google/skill-guide-intermediate`  
+> 旧 `/google/skill-guide-intermediate` は `acc461c0` で本ページに置き換えられ、旧 URL は `netlify.toml` でリダイレクト済み。
+
+**ファイル**: `web-next/app/google/antigravity-best-practices/page.tsx`  
+**URL**: `/google/antigravity-best-practices`  
 **更新頻度**: 毎月
 
 ### 事前確認
 
 ```
 以下を WebSearch で確認する:
-- Gemini CLI 最新バージョンとインストールコマンドの変更
-- SKILL.md のインストール手順（gemini skills install 等）の変更
-- 公式サンプルスキルの更新
+- Google Antigravity（IDE / CLI / デスクトップアプリ）の最新版と対応モデル（latest 2026）
+- サンドボックス・権限設定の対応 OS とプレビュー状態
 ```
 
 ### 更新プロンプト
 
 ```
-web-next/app/google/skill-guide-intermediate/page.tsx を読んでください。
-
-以下を更新してください:
-
-1. metadata のバージョン・年月を更新する
-
-2. インストール手順コードブロック内のコマンド:
-   - `gemini` CLI のバージョン指定やコマンド名が変わっていれば修正する
-   - npm / brew / pipx 等インストール方法の変更があれば修正する
-
-3. SOURCES のリンク切れ修正
-
-変更は metadata・コードブロック内コマンド・SOURCES のみ。
+web-next/app/google/antigravity-best-practices/page.tsx を読んでください。
+「YYYY年M月時点」と明記された記述は過去の事実として残し、「最新」「予定」「プレビュー」の主張だけを
+一次情報で検証して外科的に更新してください。SOURCES のリンク切れも修正してください。
 ```
 
 ### 検証チェックリスト
 
-- [ ] `bun run test` パス
+- [ ] `bun run test app/google/antigravity-best-practices` がパスする
 - [ ] `bun run build` 成功
 
 ---
@@ -1476,18 +1517,528 @@ h2 セクション数（契約テストは 15 見出し固定）は変更しな�
 
 ---
 
+## 画面 36 — `/claude/fable-5-best-practices`（Claude Fable 5 実践活用ガイド）
+
+**ファイル**: `web-next/app/claude/fable-5-best-practices/page.tsx` / `Sidebar.tsx`  
+**URL**: `/claude/fable-5-best-practices`  
+**更新頻度**: 毎月（Fable 系の後継モデル・価格・提供形態の変更時は随時）
+
+### 事前確認
+
+```
+以下を WebSearch / 公式ドキュメント（platform.claude.com の Models overview）で確認する:
+- Claude Fable の最新モデル（latest 2026）と API ID・価格・コンテキスト長
+- Fable / Mythos の提供形態（使用クレジット・限定提供）の変更
+- レガシー化したモデルと退役予定日（Model deprecations）
+```
+
+### 更新プロンプト
+
+```
+web-next/app/claude/fable-5-best-practices/page.tsx と Sidebar.tsx を読んでください。
+本文は Fable 5 時点の記述を残し、後継モデル・価格・提供形態の変化は
+「YYYY年M月追記」の段落として該当 callout 内に追加してください。
+ヒーローの「改訂」欄は原文の日付を残したまま「（YYYY年M月D日追記）」を併記し、
+Sidebar の「最終更新」を更新日に揃えてください。
+page.test.tsx は Sidebar の最終更新日と registry の lastReviewed を toContain / toBe で固定しているため、
+同じ変更でテストの期待値も同期してください。
+```
+
+### 検証チェックリスト
+
+- [ ] `bun run test app/claude/fable-5-best-practices` がパスする
+- [ ] 追記段落のモデル ID・価格が公式 Models overview と一致している
+
+---
+
+## 画面 37 — `/claude/tag-best-practices`（Claude Tag 活用ガイド）
+
+**ファイル**: `web-next/app/claude/tag-best-practices/page.tsx`  
+**URL**: `/claude/tag-best-practices`  
+**更新頻度**: 毎月（パブリックベータ中のため仕様変更が多い）
+
+### 事前確認
+
+```
+以下を WebSearch / support.claude.com のリリースノートで確認する:
+- Claude Tag（Slack 連携）の最新仕様・対応プラン・稼働モデル（latest 2026）
+- 旧「Claude in Slack」からの移行状況と期日
+- Slack 以外のワークプレイスツールへの拡張
+```
+
+### 更新プロンプト
+
+```
+web-next/app/claude/tag-best-practices/page.tsx を読んでください。
+期日を過ぎた「予定」表記（移行日など）は「予定されていた（YYYY年M月時点で期日経過済み）」の形に改め、
+チェックリストの文言も期日後の行動に合わせてください。
+稼働モデル名は公式で確認できた場合のみ更新し、確認できない場合は据え置いて報告してください。
+h2 見出し（契約テストは件数固定ではなく、EXPECTED_H2 と toEqual で順序込みの完全一致を検証する）と metadata（registry の title / description と toBe で一致）は変更しないこと。
+```
+
+### 検証チェックリスト
+
+- [ ] `bun run test app/claude/tag-best-practices` がパスする
+- [ ] 期日を過ぎた「予定」表記が残っていない
+
+---
+
+## 画面 38 — `/google/adk-best-practices`（ADK ベストプラクティス）
+
+**ファイル**: `web-next/app/google/adk-best-practices/page.tsx`  
+**URL**: `/google/adk-best-practices`  
+**更新頻度**: 毎月（ADK の各言語版リリース時）
+
+### 事前確認
+
+```
+以下を WebSearch / PyPI（google-adk）/ GitHub releases で確認する:
+- Google Agent Development Kit の最新版（Python / TypeScript / Go / Java / Kotlin。latest 2026）
+- 破壊的変更・非推奨 API・評価（ADK Eval）機能の変更
+```
+
+### 更新プロンプト
+
+```
+web-next/app/google/adk-best-practices/page.tsx を読んでください。
+本ページは原本固定の契約テスト（archive/ 参照）を持つため、本文の言い換えは行わず、
+コード例のモデル ID・API 名が退役/非推奨になっていないかだけを確認して外科的に修正してください。
+SOURCES のリンク切れがあれば修正してください。
+```
+
+### 検証チェックリスト
+
+- [ ] `bun run test app/google/adk-best-practices` がパスする
+- [ ] コード例に退役済みのモデル ID が残っていない
+
+---
+
+## 画面 39 — `/google/enterprise-agent-platform`（Gemini Enterprise Agent Platform）
+
+**ファイル**: `web-next/app/google/enterprise-agent-platform/page.tsx`  
+**URL**: `/google/enterprise-agent-platform`  
+**更新頻度**: 毎月
+
+### 事前確認
+
+```
+以下を Google Cloud の公式ドキュメントで確認する:
+- Gemini Enterprise Agent Platform のリリースノート（latest 2026）
+- Model versions and lifecycle ページの退役日・推奨後継モデル
+  （Agent Platform と Gemini API では退役日が異なるため、ページの文脈に合う方を参照する）
+```
+
+### 更新プロンプト
+
+```
+web-next/app/google/enterprise-agent-platform/page.tsx を読んでください。
+コード例の model= に退役済みの Gemini モデル ID があれば、公式ライフサイクル表の推奨後継へ置き換えてください。
+本文の機能説明は、リリースノートで変更が確認できたものだけを外科的に更新してください。
+```
+
+### 検証チェックリスト
+
+- [ ] `bun run test app/google/enterprise-agent-platform` がパスする
+- [ ] `grep -nE 'gemini-[0-9]' app/google/enterprise-agent-platform/page.tsx` の全 ID が提供中である
+
+---
+
+## 画面 40 — `/google/enterprise-agent-platform-intermediate`（Gemini Enterprise Agent Platform 中級）
+
+**ファイル**: `web-next/app/google/enterprise-agent-platform-intermediate/page.tsx`  
+**URL**: `/google/enterprise-agent-platform-intermediate`  
+**更新頻度**: 毎月
+
+### 事前確認
+
+```
+画面 39 と同じ確認に加え、以下を確認する:
+- 最新の Gemini フロンティアモデル（latest 2026）の GA 状況
+- Memory Bank などエージェント基盤機能の既定モデルの変更
+```
+
+### 更新プロンプト
+
+```
+web-next/app/google/enterprise-agent-platform-intermediate/page.tsx を読んでください。
+モデル選定表から退役済みモデルを外すか退役日を併記し、新たに GA となったモデルがあれば行を追加してください。
+「YYYY年M月時点」と明記された過去の事実（既定モデルの変更履歴など）は書き換えないこと。
+```
+
+### 検証チェックリスト
+
+- [ ] `bun run test app/google/enterprise-agent-platform-intermediate` がパスする
+
+---
+
+## 画面 41 — `/google/gemma-best-practices-guide`（Gemma ベストプラクティスガイド）
+
+**ファイル**: `web-next/app/google/gemma-best-practices-guide/page.tsx`  
+**URL**: `/google/gemma-best-practices-guide`  
+**更新頻度**: 毎月（Gemma の新世代・新サイズ追加時）
+
+### 事前確認
+
+```
+以下を WebSearch / Google の公式ブログで確認する:
+- Gemma の最新世代とモデルサイズ（latest open model 2026）
+- ライセンス・対応ランタイム（Ollama / vLLM / LiteRT 等）の変更
+```
+
+### 更新プロンプト
+
+```
+web-next/app/google/gemma-best-practices-guide/page.tsx を読んでください。
+新しい世代またはサイズが追加されていれば、ヒーローの「ベース」表記とサイズ比較表を外科的に更新してください。
+変更がなければ編集せず、registry の lastReviewed のみ更新してください。
+```
+
+### 検証チェックリスト
+
+- [ ] `bun run test app/google/gemma-best-practices-guide` がパスする
+
+---
+
+## 画面 42 — `/google/multi-agent-best-practices`（Gemini マルチエージェント開発 ベストプラクティス）
+
+**ファイル**: `web-next/app/google/multi-agent-best-practices/page.tsx`  
+**URL**: `/google/multi-agent-best-practices`  
+**更新頻度**: 毎月
+
+### 事前確認
+
+```
+以下を確認する:
+- ADK / A2A の最新仕様（latest 2026）
+- Gemini API の Deprecations ページで、コード例のモデル ID の停止日と後継
+```
+
+### 更新プロンプト
+
+```
+web-next/app/google/multi-agent-best-practices/page.tsx を読んでください。
+モデル ID は、現行の推奨として示す箇所とコピーされるコード例の箇所だけを置き換えてください。
+日付付きの過去の事実、移行例（移行元の ID）、比較の注記にある ID は残してください（ファイル全体の一括置換はしない）。
+本ページはコードを文字列定数（CODE_TEXT_*）と JSX の両方に持つため、置き換える箇所では両方を同時に更新し、
+CODE_TEXT_* の値と表示中の JSX を一致させてください。
+原本固定の契約テストがあるため、本文の言い換えは行わないこと。
+```
+
+### 検証チェックリスト
+
+- [ ] `bun run test app/google/multi-agent-best-practices` がパスする
+- [ ] コピー用文字列と表示用 JSX のモデル ID が一致している
+
+---
+
+## 画面 43 — `/google/notebook-lm`（NotebookLM ガイド）
+
+**ファイル**: `web-next/app/google/notebook-lm/page.tsx`  
+**URL**: `/google/notebook-lm`  
+**更新頻度**: 毎月
+
+### 事前確認
+
+```
+以下を Google の公式ブログ（blog.google の NotebookLM カテゴリ）で確認する:
+- NotebookLM の新機能・提供プラン・基盤モデル（latest 2026）
+- 名称やブランドの変更（第三者報道だけで判断せず、公式発表で確認する）
+```
+
+### 更新プロンプト
+
+```
+web-next/app/google/notebook-lm/page.tsx を読んでください。
+公式発表で確認できた新機能だけを外科的に追記し、日付付きの過去の記述は残してください。
+第三者報道のみの情報は反映しないこと。
+```
+
+### 検証チェックリスト
+
+- [ ] `bun run test app/google/notebook-lm` がパスする
+
+---
+
+## 画面 44 — `/google/stitch-guide`（Google Stitch ガイド）
+
+**ファイル**: `web-next/app/google/stitch-guide/page.tsx`  
+**URL**: `/google/stitch-guide`  
+**更新頻度**: 毎月
+
+### 事前確認
+
+```
+以下を WebSearch / Google Labs の公式情報で確認する:
+- Stitch の最新機能・利用上限（クレジット制）・基盤モデル（latest 2026）
+```
+
+### 更新プロンプト
+
+```
+web-next/app/google/stitch-guide/page.tsx を読んでください。
+利用上限の表は「報告時期」ごとの行で構成されているため、既存行は書き換えず、新しい報告があれば行を追加してください。
+原本固定の契約テストがあるため、セクション ID・本文の言い換えは行わないこと。
+```
+
+### 検証チェックリスト
+
+- [ ] `bun run test app/google/stitch-guide` がパスする
+
+---
+
+## 画面 45 — `/model-data/gpt-5-6-best-practices`（OpenAI GPT-5.6 完全ガイド）
+
+**ファイル**: `web-next/app/model-data/gpt-5-6-best-practices/page.tsx`  
+**URL**: `/model-data/gpt-5-6-best-practices`  
+**更新頻度**: 毎月（OpenAI の後継モデル登場時は随時）
+
+### 事前確認
+
+```
+以下を Codex / OpenAI の公式モデルページで確認する:
+- 最新の推奨モデル（latest 2026）と GPT-5.6 系の提供状況・退役予定
+```
+
+### 更新プロンプト
+
+```
+web-next/app/model-data/gpt-5-6-best-practices/page.tsx を読んでください。
+本ページは GPT-5.6 の解説として残し、後継モデルの登場や退役予定はヒーロー説明文の
+「（YYYY年M月追記: ...）」として追記してください。「最新」という語が GPT-5.6 を指して残っていないか確認すること。
+metadata.title（toBe で固定）は変更しないこと。
+```
+
+### 検証チェックリスト
+
+- [ ] `bun run test app/model-data/gpt-5-6-best-practices` がパスする
+
+---
+
+## 画面 46 — `/infra/microsoft-foundry-best-practices-guide`（Microsoft Foundry 活用ガイド）
+
+**ファイル**: `web-next/app/infra/microsoft-foundry-best-practices-guide/page.tsx`  
+**URL**: `/infra/microsoft-foundry-best-practices-guide`  
+**更新頻度**: 毎月
+
+### 事前確認
+
+```
+以下を Microsoft Learn で確認する:
+- Foundry の Model retirement schedule（Deprecated = 新規顧客はデプロイ不可、Retired = 410 Gone）
+- What's new in Microsoft Foundry（latest 2026）
+```
+
+### 更新プロンプト
+
+```
+web-next/app/infra/microsoft-foundry-best-practices-guide/page.tsx を読んでください。
+モデル表の行は差し替えず、Deprecated / Retired になったモデルには備考で状態と日付を追記してください。
+公式の Replacement 欄が空のモデルについて移行先を書く場合は「移行先の例」と表記し、公式の後継指定と区別すること。
+```
+
+### 検証チェックリスト
+
+- [ ] `bun run test app/infra/microsoft-foundry-best-practices-guide` がパスする
+
+---
+
+## 画面 47 — `/infra/microsoft-foundry-best-practices-intermediate`（Microsoft Foundry 実践ベストプラクティス）
+
+**ファイル**: `web-next/app/infra/microsoft-foundry-best-practices-intermediate/page.tsx`  
+**URL**: `/infra/microsoft-foundry-best-practices-intermediate`  
+**更新頻度**: 毎月
+
+### 事前確認
+
+```
+画面 46 と同じ確認に加え、Foundry Agent Service の新機能（Routines・Tool Search・ネットワーク出口制御など）を確認する。
+```
+
+### 更新プロンプト
+
+```
+web-next/app/infra/microsoft-foundry-best-practices-intermediate/page.tsx を読んでください。
+画面 46 と同じ方針でモデル表に状態を追記し、Agent Service の GA / プレビュー状態の変化があれば該当箇所のみ更新してください。
+```
+
+### 検証チェックリスト
+
+- [ ] `bun run test app/infra/microsoft-foundry-best-practices-intermediate` がパスする
+
+---
+
+## 画面 48 — `/moonshot/kimi-llm-best-practices`（Kimi LLM 徹底ガイド）
+
+**ファイル**: `web-next/app/moonshot/kimi-llm-best-practices/page.tsx`  
+**URL**: `/moonshot/kimi-llm-best-practices`  
+**更新頻度**: 毎月
+
+### 事前確認
+
+```
+以下を Moonshot AI の公式プラットフォーム（platform.moonshot.ai）で確認する:
+- Kimi の最新フラッグシップ（latest 2026）とモデル ID・価格
+```
+
+### 更新プロンプト
+
+```
+web-next/app/moonshot/kimi-llm-best-practices/page.tsx を読んでください。
+後継モデルが出ていれば「YYYY年M月時点の最新」表記の直後に後継の情報を追記してください。変更がなければ編集しないこと。
+```
+
+### 検証チェックリスト
+
+- [ ] `bun run test app/moonshot/kimi-llm-best-practices` がパスする
+
+---
+
+## 画面 49 — `/deepseek/llm-best-practices`（DeepSeek LLM ガイド）
+
+**ファイル**: `web-next/app/deepseek/llm-best-practices/page.tsx`  
+**URL**: `/deepseek/llm-best-practices`  
+**更新頻度**: 毎月（DeepSeek はモデル ID の付け替えが多いため要注意）
+
+### 事前確認
+
+```
+以下を DeepSeek API の Change Log（api-docs.deepseek.com/updates）で確認する:
+- 最新モデルと API のモデル名（latest 2026）
+- 退役したモデル名と、暫定的に転送されている旧モデル名
+```
+
+### 更新プロンプト
+
+```
+web-next/app/deepseek/llm-best-practices/page.tsx を読んでください。
+「現行モデル比較表（YYYY年M月D日時点）」は時点付きの表として残し、
+その直前に「YYYY年M月追記」の段落で新モデル・モデル名の変更・退役を追記してください。
+```
+
+### 検証チェックリスト
+
+- [ ] `bun run test app/deepseek/llm-best-practices` がパスする
+
+---
+
+## 画面 50 — `/xai/grok-best-practices`（xAI Grok ガイド）
+
+**ファイル**: `web-next/app/xai/grok-best-practices/page.tsx`  
+**URL**: `/xai/grok-best-practices`  
+**更新頻度**: 毎月
+
+### 事前確認
+
+```
+以下を docs.x.ai の Models ページで確認する:
+- 最新のフラッグシップモデル（latest 2026）とコンテキスト長・価格
+- 非推奨（Deprecated）表示のあるモデル
+```
+
+### 更新プロンプト
+
+```
+web-next/app/xai/grok-best-practices/page.tsx を読んでください。
+モデル表で「最新」「フラッグシップ」と書かれたモデルが現行の最新でなければ、
+「YYYY年M月時点のフラッグシップ。YYYY年M月時点の最新は <ID>」の形に改めてください。
+```
+
+### 検証チェックリスト
+
+- [ ] `bun run test app/xai/grok-best-practices` がパスする
+
+---
+
+## 画面 51 — `/xai/grok-best-practices-intermediate`（xAI Grok API 実践ベストプラクティス）
+
+**ファイル**: `web-next/app/xai/grok-best-practices-intermediate/page.tsx`  
+**URL**: `/xai/grok-best-practices-intermediate`  
+**更新頻度**: 毎月
+
+### 事前確認
+
+```
+画面 50 と同じ確認を行う。
+```
+
+### 更新プロンプト
+
+```
+web-next/app/xai/grok-best-practices-intermediate/page.tsx を読んでください。
+「YYYY年M月時点で、…旗艦モデルは」の段落の末尾に後継モデルの情報を追記してください。
+コード例のモデル ID は、旧モデルが提供中であれば変更しないこと。
+```
+
+### 検証チェックリスト
+
+- [ ] `bun run test app/xai/grok-best-practices-intermediate` がパスする
+
+---
+
+## 画面 52 — `/zhipu/zai-glm-best-practices`（Z.ai GLM ベストプラクティス）
+
+**ファイル**: `web-next/app/zhipu/zai-glm-best-practices/page.tsx`  
+**URL**: `/zhipu/zai-glm-best-practices`  
+**更新頻度**: 毎月
+
+### 事前確認
+
+```
+以下を docs.z.ai の Pricing ページで確認する（第三者の価格まとめサイトは旧価格を流用していることがあるため使わない）:
+- GLM の最新モデル（latest 2026）と価格・軽量版
+```
+
+### 更新プロンプト
+
+```
+web-next/app/zhipu/zai-glm-best-practices/page.tsx を読んでください。
+「YYYY年M月時点の旗艦モデル」段落の末尾と、モデル表の「最新の旗艦モデル」セルに後継モデルを追記してください。
+```
+
+### 検証チェックリスト
+
+- [ ] `bun run test app/zhipu/zai-glm-best-practices` がパスする
+
+---
+
+## その他の画面（Providers 以外の registry 登録ページ）
+
+推薦書籍・資格試験・Agent 開発・運用・品質など、上記一覧にない registry 登録ページは画面別プロンプトを持たない。
+月次確認の対象にする場合は、以下の汎用テンプレートを使う。確認日は registry の `lastReviewed` が正となる。
+
+```
+web-next/app/<path>/page.tsx を読んでください。
+1. 「頻出レビュー指摘」の grep で時点表記を洗い出し、時点付きの過去の事実は残す
+2. 「最新」「現時点」「予定」と書かれた主張だけを一次情報で検証し、古くなったものを外科的に更新する
+3. ページ固有の価格・API 仕様(パラメータ名・既定値・上限など)・SOURCES の参考リンクを一次情報と照合し、古くなった箇所だけを更新する(リンク切れ・移転先も確認する)
+4. 推薦書籍など原本固定の契約テストを持つページは本文を変えず、変更が必要な場合はユーザーに確認する
+5. 確認を終えたら web-next/lib/page-registry.ts の lastReviewed を当日に更新する
+```
+
+---
+
 ## 全画面一括更新フロー（月次メンテナンス）
 
 月次更新を効率よく行うための推奨フロー:
 
 ```
 1. [情報収集] 各プロバイダーの changelog を確認（約 30 分）
-   - Anthropic: https://docs.anthropic.com/changelog
-   - Google AI: https://developers.googleblog.com/
-   - OpenAI: https://platform.openai.com/docs/changelog
+   - Anthropic: https://platform.claude.com/docs/en/release-notes/overview
+     / https://code.claude.com/docs/en/changelog / https://support.claude.com/en/articles/12138966-release-notes
+   - Google AI: https://ai.google.dev/gemini-api/docs/changelog
+     / https://docs.cloud.google.com/gemini-enterprise-agent-platform/release-notes
+   - OpenAI: https://learn.chatgpt.com/docs/models（Codex のモデルと退役日）
    - GitHub: https://github.blog/changelog/
+   - Microsoft Foundry: https://learn.microsoft.com/en-us/azure/foundry/openai/concepts/model-retirement-schedule
+   - DeepSeek / xAI / Z.ai: https://api-docs.deepseek.com/updates/ / https://docs.x.ai/docs/models
+     / https://docs.z.ai/guides/overview/pricing
+   - AWS (Amazon Bedrock): https://docs.aws.amazon.com/bedrock/latest/userguide/doc-history.html
+     / https://aws.amazon.com/bedrock/pricing/（価格は scraper/src/scraper/providers/aws.py の Price List API）
+   - Moonshot (Kimi): https://platform.moonshot.ai/docs/pricing（scraper/src/scraper/providers/moonshot.py と同じ取得元）
+   - Meta (Llama API): https://dev.meta.ai/docs/pricing-rate-limits（scraper/src/scraper/providers/meta.py と同じ取得元）
 
 2. [優先度判定] 変更が大きい画面から着手する
+   推奨: プロバイダー単位で一次情報を一度だけ調べ、同じプロバイダーの画面をまとめて更新する
    高優先: バージョン番号が古い・リンク切れが多い画面
    低優先: 変更のない画面（スキップ可）
 
@@ -1496,7 +2047,8 @@ h2 セクション数（契約テストは 15 見出し固定）は変更しな�
 
 4. [検証] 全画面更新後に一括チェック
    cd web-next && bun run build && bun run test && bun run typecheck && bun run lint
-   ※ 各ページ着手時に「頻出レビュー指摘」の grep（日付表記の全箇所洗い出し）を必ず実行する
+   ※ 各ページ着手時に「頻出レビュー指摘」の grep（日付表記の全箇所洗い出し・モデル ID の洗い出し）を必ず実行する
+   ※ 確認を終えたページは web-next/lib/page-registry.ts の lastReviewed を当日に更新する
 
 5. [コミット] /commit-commands:commit-push-pr スキルを使用
    コミットメッセージ例: "docs(guide): monthly update YYYY-MM"
@@ -1504,4 +2056,6 @@ h2 セクション数（契約テストは 15 見出し固定）は変更しな�
 
 ---
 
-*最終更新: 2026-07-01 — 「頻出レビュー指摘 & 事前チェック」節を追加（日付表記の全箇所洗い出し grep / JSX 空白 `{" "}` / 契約テスト toBe 同期）。2026-06 サイクルで別途修正コミット（`5846931`）が必要になった取りこぼしを再発防止するための追記。*
+*最終更新: 2026-10-22 — 画面一覧を registry から再生成（52 画面。Providers 全 43 ページを網羅し、うち 41 ページを確認済み・2 ページ保留）。旧画面 9 を `/google/antigravity-best-practices` に差し替え、画面 36〜52 と「その他の画面」の汎用テンプレートを追加。頻出レビュー指摘に「退役モデル ID」「情報基準日と最終更新の区別」を追記し、一括フローの一次情報 URL を現行のものへ更新。*
+
+*2026-07-01 — 「頻出レビュー指摘 & 事前チェック」節を追加（日付表記の全箇所洗い出し grep / JSX 空白 `{" "}` / 契約テスト toBe 同期）。2026-06 サイクルで別途修正コミット（`5846931`）が必要になった取りこぼしを再発防止するための追記。*

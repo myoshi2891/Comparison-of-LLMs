@@ -78,4 +78,16 @@ describe("/claude/cowork-guide 契約テスト", () => {
       expect(label?.textContent?.trim().length).toBeGreaterThan(0);
     }
   });
+  it("ヒーローの日付ラベルが初版の情報基準日と 10 月 22 日の更新を区別する", () => {
+    const { container } = render(<Page />);
+    const chips = Array.from(container.querySelectorAll("header span")).map((el) =>
+      el.textContent?.trim()
+    );
+    expect(chips).toEqual([
+      "情報基準日：2026年7月26日（初版）",
+      "最終更新：2026年10月22日",
+      "対象：初めてClaude Coworkに触れる方",
+      "形式：全12ステップ + チェックリスト",
+    ]);
+  });
 });

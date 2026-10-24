@@ -253,7 +253,7 @@ data_analyst = RemoteA2aAgent(
 
 orchestrator = Agent(
     name="Orchestrator",
-    model="gemini-2.0-flash",
+    model="gemini-3.5-flash-lite",
     instruction="データ分析タスクはDataAnalystに委譲すること。",
     sub_agents=[data_analyst]
 )`;
@@ -2616,7 +2616,7 @@ export default function GeminiMultiAgentBestPracticesPage() {
               <div className={styles.codeLine}>
                 {"  "}
                 <span className={styles.cv}>model</span>=
-                <span className={styles.cs}>&quot;gemini-2.0-flash&quot;</span>,
+                <span className={styles.cs}>&quot;gemini-3.5-flash-lite&quot;</span>,
               </div>
               <div className={styles.codeLine}>
                 {"  "}

@@ -284,6 +284,14 @@ export default function DeepSeekLlmPage() {
             </div>
           </div>
 
+          <p>
+            <strong>2026年10月追記:</strong> 2026年9月10日に DeepSeek-V4.1-Flash
+            がリリースされ(10月17日に V4.1-Flash-1017 へ更新)、API ではモデル名{" "}
+            <code>deepseek-flash</code> で最新の V4.1 Flash を呼び出します。旧 V4 Flash
+            は提供終了し、<code>deepseek-v4-flash</code> は暫定的に V4.1 Flash へ転送されています。
+            <code>deepseek-v4-pro</code> は2026年9月14日以降も提供が継続されています。
+          </p>
+
           <h3>現行モデル比較表（2026年7月16日時点）</h3>
           <div className={styles.tableWrap}>
             <table>
@@ -346,7 +354,7 @@ export default function DeepSeekLlmPage() {
               （DeepSeek-V3実体）および <code className={styles.inlineCode}>deepseek-reasoner</code>
               （DeepSeek-R1実体）は、<strong>2026年7月24日をもって提供終了（完全廃止）</strong>
               となりました。現在は利用できません。新規開発では必ず{" "}
-              <code className={styles.inlineCode}>deepseek-v4-flash</code> または{" "}
+              <code className={styles.inlineCode}>deepseek-flash</code> または{" "}
               <code className={styles.inlineCode}>deepseek-v4-pro</code> を指定してください。
             </p>
           </div>
@@ -442,7 +450,7 @@ export default function DeepSeekLlmPage() {
                 response = client.chat.completions.<span className={styles.fn}>create</span>(
               </div>
               <div className={styles.codeLine}>
-                {"  "}model=<span className={styles.cs}>"deepseek-v4-flash"</span>,
+                {"  "}model=<span className={styles.cs}>"deepseek-flash"</span>,
               </div>
               <div className={styles.codeLine}>{"  "}messages=[</div>
               <div className={styles.codeLine}>
@@ -1251,7 +1259,7 @@ export default function DeepSeekLlmPage() {
           <ul>
             <li>
               [ ] <code className={styles.inlineCode}>deepseek-chat</code> の記述を{" "}
-              <code className={styles.inlineCode}>deepseek-v4-flash</code> または{" "}
+              <code className={styles.inlineCode}>deepseek-flash</code> または{" "}
               <code className={styles.inlineCode}>deepseek-v4-pro</code> へ変更
             </li>
             <li>

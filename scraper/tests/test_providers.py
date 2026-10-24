@@ -14,13 +14,15 @@ fallback パスしか通らない**。本ファイルは get_page_text / httpx.g
 from __future__ import annotations
 
 import logging
-from datetime import date
+from datetime import date, datetime
 from unittest.mock import MagicMock, patch
 
 import pytest
 
 from scraper.models import ApiModel, PriceProvenance
-from scraper.providers import anthropic, aws, deepseek, google, moonshot, openai, xai, zhipu
+from scraper.providers import (
+    anthropic, aws, deepseek, google, meta, microsoft, moonshot, openai, xai, zhipu,
+)
 
 
 @pytest.fixture(autouse=True)
@@ -193,23 +195,18 @@ class TestGoogle:
         誤値を静かに混入させるより、WebSearch 確定値の _FALLBACKS を決定論的に採用する。
         価格改定は月次で _FALLBACKS を更新して反映する。
 
-        Flash プロモ価格の期限（2026-12-31）到来後は _resolve_price が標準価格へ
-        切り替えるため、日付を固定しないと本テストは期限後に失敗する。境界値検証は
-        test_flash_promo_price_on_expiry_date / test_flash_promo_price_after_expiry
-        が別途担う。
+        Argon（2026-11-30）/ Flash（2026-12-31）のプロモ価格期限到来後は _resolve_price が
+        標準価格へ切り替えるため、両プロモが有効な日付に固定しないと本テストは期限後に失敗する。
+        境界値検証は test_flash_promo_* / test_argon_promo_* が別途担う。
         """
 
-        class _FrozenDate(date):
-            @classmethod
-            def today(cls):
-                return date(2026, 12, 31)
-
-        with patch("scraper.providers.google.date", _FrozenDate):
+        with patch("scraper.providers.google._today_utc", return_value=date(2026, 11, 30)):
             models = google.scrape()
         # _FALLBACKS の値は 7-tuple（[0]=price_in, [1]=price_out）
         assert len(models) == len(google._FALLBACKS)
         for m in models:
-            fb = google._FALLBACKS[m.name]
+            # 非推奨エイリアスはルーティング先モデルの価格を採用する
+            fb = google._FALLBACKS[google._FLASH_ALIAS_TARGETS.get(m.name, m.name)]
             assert m.price_in == fb[0]
             assert m.price_out == fb[1]
             assert m.scrape_status == "fallback"
@@ -223,12 +220,7 @@ class TestGoogle:
     def test_flash_promo_price_on_expiry_date(self):
         """終了日(2026-12-31)当日はまだプロモ価格 $0.75/$3.75 を維持する（`>` 判定の境界値）。"""
 
-        class _FrozenDate(date):
-            @classmethod
-            def today(cls):
-                return date(2026, 12, 31)
-
-        with patch("scraper.providers.google.date", _FrozenDate):
+        with patch("scraper.providers.google._today_utc", return_value=date(2026, 12, 31)):
             models = google.scrape()
         for name in google._FLASH_PROMO_NAMES:
             m = _find(models, name)
@@ -238,17 +230,104 @@ class TestGoogle:
     def test_flash_promo_price_after_expiry(self):
         """終了日の翌日(2027-01-01)以降は標準価格 $1.50/$7.50 に切り替わる。"""
 
-        class _FrozenDate(date):
-            @classmethod
-            def today(cls):
-                return date(2027, 1, 1)
-
-        with patch("scraper.providers.google.date", _FrozenDate):
+        with patch("scraper.providers.google._today_utc", return_value=date(2027, 1, 1)):
             models = google.scrape()
         for name in google._FLASH_PROMO_NAMES:
             m = _find(models, name)
             assert m.price_in == 1.50
             assert m.price_out == 7.50
+
+    def test_argon_promo_price_on_expiry_date(self):
+        """終了日(2026-11-30)当日の Gemini 4 Argon はまだプロモ価格 $2/$10 を維持する。"""
+
+        with patch("scraper.providers.google._today_utc", return_value=date(2026, 11, 30)):
+            models = google.scrape()
+        m = _find(models, "Gemini 4 Argon")
+        assert m.price_in == 2.00
+        assert m.price_out == 10.00
+
+    def test_argon_promo_price_after_expiry(self):
+        """終了日の翌日(2026-12-01)以降の Gemini 4 Argon は標準価格 $4/$20 に切り替わる。"""
+
+        with patch("scraper.providers.google._today_utc", return_value=date(2026, 12, 1)):
+            models = google.scrape()
+        m = _find(models, "Gemini 4 Argon")
+        assert m.price_in == 4.00
+        assert m.price_out == 20.00
+
+    def test_argon_promo_expiry_uses_utc_date(self):
+        """期限判定はホストのローカル日付ではなく UTC 日付で行う。
+
+        UTC では 2026-12-01 だがローカルではまだ 2026-11-30 の瞬間でも、標準価格 $4/$20 に切り替わる。
+        """
+
+        class _FrozenDatetime(datetime):
+            @classmethod
+            def now(cls, tz=None):
+                if tz is None:
+                    return datetime(2026, 11, 30, 18, 30)
+                return datetime(2026, 12, 1, 0, 30, tzinfo=tz)
+
+            @classmethod
+            def today(cls):
+                return cls.now()
+
+        with (
+            patch("scraper.providers.google.datetime", _FrozenDatetime, create=True),
+            patch("scraper.providers.google.date") as mock_date,
+        ):
+            mock_date.today.return_value = date(2026, 11, 30)
+            models = google.scrape()
+        m = _find(models, "Gemini 4 Argon")
+        assert m.price_in == 4.00
+        assert m.price_out == 20.00
+
+    def test_deprecated_flash_aliases_route_to_newer_models(self):
+        """3.7 / 3.5 Flash は提供終了ではなく非推奨エイリアス（後継モデルへ自動ルーティング）。"""
+        expected = {
+            "Gemini 3.7 Flash": (
+                "非推奨エイリアス / Gemini 3.8 Flash へ自動ルーティング (提供終了ではない)",
+                "Deprecated alias / auto-routes to Gemini 3.8 Flash (not shut down)",
+            ),
+            "Gemini 3.5 Flash": (
+                "非推奨エイリアス / Gemini 3.6 Flash へ自動ルーティング (提供終了ではない)",
+                "Deprecated alias / auto-routes to Gemini 3.6 Flash (not shut down)",
+            ),
+        }
+        models = google.scrape()
+        for name, (sub_ja, sub_en) in expected.items():
+            m = _find(models, name)
+            assert (m.tag, m.cls, m.sub_ja, m.sub_en) == ("Deprecated", "tag-leg", sub_ja, sub_en)
+
+    def test_flash_35_alias_follows_36_price_through_promo_expiry(self):
+        """3.5 Flash エイリアスは 3.6 Flash と同額で、2026-12-31 の期限後も同じく標準価格へ移る。"""
+        cases = {date(2026, 12, 31): (0.75, 3.75), date(2027, 1, 1): (1.50, 7.50)}
+        for today, expected in cases.items():
+            with patch("scraper.providers.google._today_utc", return_value=today):
+                models = google.scrape()
+            alias = _find(models, "Gemini 3.5 Flash")
+            target = _find(models, "Gemini 3.6 Flash")
+            assert (alias.price_in, alias.price_out) == expected
+            assert (alias.price_in, alias.price_out) == (target.price_in, target.price_out)
+
+    def test_omni_flash_ga_and_deprecated_preview(self):
+        """Omni Flash は GA 版を追加し、Preview は提供終了予告付きの非推奨エントリとして残す。"""
+        expected = {
+            "Gemini Omni 1.1 Flash": (
+                1.50, 9.00, "Multimodal", "tag-bal",
+                "GA / マルチモーダル生成 / テキスト出力 (動画出力は $17.5)",
+                "GA / Multimodal generation / text output (video output $17.5)",
+            ),
+            "Gemini Omni Flash Preview": (
+                1.50, 9.00, "Deprecated", "tag-leg",
+                "非推奨 Preview / 2026-10-22以降に提供終了 / 後継は Gemini Omni 1.1 Flash",
+                "Deprecated preview / shutdown on or after 2026-10-22 / replaced by Gemini Omni 1.1 Flash",
+            ),
+        }
+        models = google.scrape()
+        for name, values in expected.items():
+            m = _find(models, name)
+            assert (m.price_in, m.price_out, m.tag, m.cls, m.sub_ja, m.sub_en) == values
 
 
 # --------------------------------------------------------------------------- #
@@ -301,6 +380,15 @@ class TestXai:
         with patch("scraper.providers.xai.get_page_text", return_value="<html></html>"):
             models = xai.scrape()
         _assert_all_fallback(models, xai._FALLBACKS, "xAI")
+
+    def test_long_context_rate_threshold_is_inclusive(self):
+        # $4/$12 の長文脈料金はプロンプト 200K トークン「以上」で適用される
+        assert xai._SUB_JA["Grok 4.6"] == "前旗艦 / 500K ctx / 入力200K以上は $4/$12"
+        assert xai._SUB_JA["Grok 4.5"] == "前々旗艦 / 500K ctx / 入力200K以上は $4/$12"
+        assert xai._SUB_EN["Grok 4.6"] == "Prev flagship / 500K ctx / $4/$12 at 200K+ prompt tokens"
+        assert xai._SUB_EN["Grok 4.5"] == (
+            "Two gens back flagship / 500K ctx / $4/$12 at 200K+ prompt tokens"
+        )
 
 
 # --------------------------------------------------------------------------- #
@@ -749,3 +837,69 @@ def test_partial_extraction_falls_back_as_pair():
 
     m2 = _find(second, name)
     assert (m2.price_in, m2.price_out) == (_STALE_IN, _STALE_OUT)
+
+
+# --------------------------------------------------------------------------- #
+# Meta / Microsoft（Google と同じくライブ抽出なし。公式確認値の _FALLBACKS を固定採用）
+# --------------------------------------------------------------------------- #
+class TestMeta:
+    # dev.meta.ai/docs/pricing-rate-limits（2026-10-21 確認。Standard モード）
+    _EXPECTED = [
+        ("Muse Wonder 1.0", 4.00, 20.00),
+        ("Muse Spark 1.3", 1.25, 4.25),
+        ("Muse Spark 1.2", 1.25, 4.25),
+        ("Muse Spark 1.1", 1.25, 4.25),
+    ]
+
+    def test_returns_official_prices_in_order(self):
+        """公式料金の全モデルを、表示順・価格とも完全一致で返す。"""
+        # Arrange / Act
+        models = meta.scrape()
+
+        # Assert
+        assert [(m.name, m.price_in, m.price_out) for m in models] == self._EXPECTED
+        assert {m.provider for m in models} == {"Meta"}
+        assert {m.scrape_status for m in models} == {"fallback"}
+        assert all(m.provenance is not None and m.provenance.origin == "hardcoded" for m in models)
+
+    def test_has_bilingual_labels(self):
+        """tag / cls / sub_ja / sub_en が全モデルで空でない（日英ペア必須）。"""
+        models = meta.scrape()
+        for m in models:
+            assert m.tag and m.cls and m.sub_ja and m.sub_en, m.name
+
+    def test_does_not_fetch_network(self):
+        """ライブ抽出を行わない（ページを取得しない）。"""
+        with patch("scraper.providers.meta.get_page_text") as mock_fetch:
+            meta.scrape()
+        mock_fetch.assert_not_called()
+
+
+class TestMicrosoft:
+    # Microsoft Foundry ブログ（MAI-Thinking-1 は $2/$8 から。Preview）
+    _EXPECTED = [
+        ("MAI-Thinking-1", 2.00, 8.00),
+    ]
+
+    def test_returns_official_prices_in_order(self):
+        """公式料金の全モデルを、表示順・価格とも完全一致で返す。"""
+        # Arrange / Act
+        models = microsoft.scrape()
+
+        # Assert
+        assert [(m.name, m.price_in, m.price_out) for m in models] == self._EXPECTED
+        assert {m.provider for m in models} == {"Microsoft"}
+        assert {m.scrape_status for m in models} == {"fallback"}
+        assert all(m.provenance is not None and m.provenance.origin == "hardcoded" for m in models)
+
+    def test_has_bilingual_labels(self):
+        """tag / cls / sub_ja / sub_en が全モデルで空でない（日英ペア必須）。"""
+        models = microsoft.scrape()
+        for m in models:
+            assert m.tag and m.cls and m.sub_ja and m.sub_en, m.name
+
+    def test_does_not_fetch_network(self):
+        """ライブ抽出を行わない（ページを取得しない）。"""
+        with patch("scraper.providers.microsoft.get_page_text") as mock_fetch:
+            microsoft.scrape()
+        mock_fetch.assert_not_called()

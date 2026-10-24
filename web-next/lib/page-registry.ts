@@ -70,8 +70,8 @@ const entries: PageEntry[] = [
     topics: [],
     summary:
       "AI モデルの API 料金とコーディングツールのサブスク料金を時間別に比較するコスト計算機。",
-    addedAt: "2026-10-03",
-    lastReviewed: "2026-10-03",
+    addedAt: "2026-10-24",
+    lastReviewed: "2026-10-24",
   },
   {
     slug: "/agent/context-engineering-best-practices",
@@ -345,7 +345,7 @@ const entries: PageEntry[] = [
     summary:
       "サブエージェント & Agent Teams 開発における CLAUDE.md・エージェント定義・MEMORY.md・README.md の役割と書き方を体系化したベストプラクティスガイド。",
     addedAt: "2026-04-19",
-    lastReviewed: "2026-07-26",
+    lastReviewed: "2026-10-22",
   },
   {
     slug: "/claude/code-slash-commands",
@@ -369,7 +369,7 @@ const entries: PageEntry[] = [
     summary:
       "初学者がClaude Coworkを使いこなすためのステップバイステップ・ベストプラクティス。基礎から高度な運用、Scheduled Tasks、Dispatch、10の自衛対策まで完全解説。",
     addedAt: "2026-05-03",
-    lastReviewed: "2026-07-29",
+    lastReviewed: "2026-10-22",
   },
   {
     slug: "/claude/fable-5-best-practices",
@@ -381,7 +381,7 @@ const entries: PageEntry[] = [
     summary:
       "Claude Codeエンジニアのための中級〜上級者向けベストプラクティス。「指示を積み上げる」から「ゴールと検証基準を渡して任せる」へ ― Fable 5に最適化された思考法をステップバイステップで解説します。",
     addedAt: "2026-07-05",
-    lastReviewed: "2026-07-26",
+    lastReviewed: "2026-10-22",
   },
   {
     slug: "/claude/harness-engineering",
@@ -392,7 +392,7 @@ const entries: PageEntry[] = [
     topics: ["harness"],
     summary: "AIエージェントが安定して動作するための「環境設計（ハーネス）」完全ガイド。",
     addedAt: "2026-05-28",
-    lastReviewed: "2026-06-30",
+    lastReviewed: "2026-10-22",
   },
   {
     slug: "/claude/managed-agents",
@@ -404,7 +404,7 @@ const entries: PageEntry[] = [
     summary:
       "初学者でもわかるステップバイステップ解説。エージェントの作成から本番運用まで、ベストプラクティスを網羅します。",
     addedAt: "2026-05-31",
-    lastReviewed: "2026-06-30",
+    lastReviewed: "2026-10-22",
   },
   {
     slug: "/claude/self-hosted-sandboxes",
@@ -416,7 +416,7 @@ const entries: PageEntry[] = [
     summary:
       "AIエージェントのツール実行環境を自社インフラに移動する方法を、初学者から実務者まで使えるようにステップバイステップで解説します。",
     addedAt: "2026-06-11",
-    lastReviewed: "2026-07-01",
+    lastReviewed: "2026-10-22",
   },
   {
     slug: "/claude/skill",
@@ -428,7 +428,7 @@ const entries: PageEntry[] = [
     summary:
       "CLAUDE.mdからrequirements.md、design.md、tasks.mdまで。各Markdownファイルの役割・構造・ベストプラクティスを、初学者でも迷わないようステップバイステップで解説します。",
     addedAt: "2026-04-18",
-    lastReviewed: "2026-08-06",
+    lastReviewed: "2026-10-22",
   },
   {
     slug: "/claude/skill-guide",
@@ -440,7 +440,7 @@ const entries: PageEntry[] = [
     summary:
       "Claude Code に「専門的なスキル」を追加するための設定ファイル SKILL.md の概念・構造・活用方法を理解するための初学者向け完全ガイドです。",
     addedAt: "2026-05-01",
-    lastReviewed: "2026-06-30",
+    lastReviewed: "2026-10-22",
   },
   {
     slug: "/claude/skill-guide-intermediate",
@@ -452,7 +452,7 @@ const entries: PageEntry[] = [
     summary:
       "Claude Code を業務で使い込んでいる中級者〜上級者向けに、SKILL.md の設計思想・書き方・Claude Code固有のフロントマター・評価運用フローまでをステップバイステップで解説する実践ガイドです。",
     addedAt: "2026-05-02",
-    lastReviewed: "2026-07-29",
+    lastReviewed: "2026-10-22",
   },
   {
     slug: "/claude/skills-sh",
@@ -514,7 +514,7 @@ const entries: PageEntry[] = [
     summary:
       "AGENTS.md・AGENTS.override.md・SKILL.md・config.toml・requirements.toml で構築するマルチエージェントワークフローの完全ガイド。",
     addedAt: "2026-04-26",
-    lastReviewed: "2026-07-30",
+    lastReviewed: "2026-10-22",
   },
   {
     slug: "/codex/harness-engineering",
@@ -526,7 +526,7 @@ const entries: PageEntry[] = [
     summary:
       "OpenAI Codexにおける評価基盤の7層モデルと非対話型CI/CD品質ゲート(codex exec)の実装ガイド。",
     addedAt: "2026-05-29",
-    lastReviewed: "2026-08-10",
+    lastReviewed: "2026-10-22",
   },
   {
     slug: "/codex/openai-codex-guide",
@@ -536,9 +536,9 @@ const entries: PageEntry[] = [
     provider: "codex",
     topics: ["guide"],
     summary:
-      "2026-06-29 最新版 (v0.142.4)。初学者から中級者まで、GPT-5.5 / GPT-5-Codex を搭載した AI コーディングエージェントを最大限に活かすベストプラクティスをステップバイステップで解説します（Codex Remote GA 対応）。",
+      "2026-10-22 確認版。初学者から中級者まで、AI コーディングエージェント OpenAI Codex を最大限に活かすベストプラクティスをステップバイステップで解説します（GPT-5.5 の Codex 退役に伴い、推奨モデルは GPT-6.1 Sol）。",
     addedAt: "2026-05-08",
-    lastReviewed: "2026-07-01",
+    lastReviewed: "2026-10-22",
   },
   {
     slug: "/codex/skill",
@@ -550,7 +550,7 @@ const entries: PageEntry[] = [
     summary:
       "GitHub Spec Kit・AWS Kiro・Claude Code・AGENTS.md・Agent Skillsなど、2026年時点の主要なSDDツール群が共通して採用する「Markdownで仕様を書き、AIエージェントに実装させる」ワークフローを体系化した実践ガイド。EARS記法、ファイル構成、Mermaid図解の作法まで一気通貫で解説。",
     addedAt: "2026-04-18",
-    lastReviewed: "2026-07-28",
+    lastReviewed: "2026-10-22",
   },
   {
     slug: "/copilot/agent",
@@ -560,9 +560,9 @@ const entries: PageEntry[] = [
     provider: "microsoft",
     topics: ["agent"],
     summary:
-      "GitHub Copilot .agent.md の完全ベストプラクティスガイド。フロントマター全仕様・ステップバイステップ作成・Handoffs（エージェント連鎖）・Subagents（サブエージェント）・MCP統合・マルチエージェント設計パターン・トラブルシューティングを 2026年6月最新版の公式ドキュメント準拠で解説。Cloud agent GA・組織/エンタープライズエージェント（JetBrains）・Copilot code review の AGENTS.md 対応に対応。",
+      "GitHub Copilot .agent.md の完全ベストプラクティスガイド。フロントマター全仕様・ステップバイステップ作成・Handoffs（エージェント連鎖）・Subagents（サブエージェント）・MCP統合・マルチエージェント設計パターン・トラブルシューティングを 2026年7月31日時点の公式ドキュメント準拠で解説。2026年6月時点の更新（Cloud agent GA・組織/エンタープライズエージェント（JetBrains）・Copilot code review の AGENTS.md 対応）は当時の情報として収録。",
     addedAt: "2026-04-27",
-    lastReviewed: "2026-08-12",
+    lastReviewed: "2026-10-22",
   },
   {
     slug: "/copilot/github-copilot",
@@ -574,7 +574,7 @@ const entries: PageEntry[] = [
     summary:
       "GitHub Copilot 実践ベストプラクティスガイド — 3つのChatモード、カスタムインストラクションの3層構造、Copilot Spaces、8ステップワークフロー、CLI、Coding Agent、Copilot Code Review (Agent Skills/MCP GA)、モデル選定、セキュリティ、AI Credits管理を網羅。",
     addedAt: "2026-05-08",
-    lastReviewed: "2026-08-19",
+    lastReviewed: "2026-10-22",
   },
   {
     slug: "/copilot/markdown-file-guide",
@@ -586,7 +586,7 @@ const entries: PageEntry[] = [
     summary:
       "copilot-instructions.md / .instructions.md / .prompt.md / .chatmode.md / .agent.md / SKILL.md / MCP / Plan Mode — GitHub Copilot AI仕様駆動開発（SDD）ベストプラクティスガイド。全体像・ファイル使い分けフロー・Spec Kit・セキュリティ・成熟度モデルを徹底解説。",
     addedAt: "2026-05-08",
-    lastReviewed: "2026-08-19",
+    lastReviewed: "2026-10-22",
   },
   {
     slug: "/copilot/skill",
@@ -596,9 +596,9 @@ const entries: PageEntry[] = [
     provider: "microsoft",
     topics: ["skill"],
     summary:
-      "GitHub Copilot Coding Agent / VS Code Agent Mode / Copilot CLI 対応の SKILL.md ガイド。フロントマター完全仕様・Progressive Disclosure 3段階ローディング・ステップバイステップ作成・実践テンプレート集・トラブルシューティングを 2026年6月最新版の公式ドキュメント根拠付きで徹底解説。Copilot code review は AGENTS.md 対応（2026-06-18）、Cloud agent は GA。",
+      "GitHub Copilot Coding Agent / VS Code Agent Mode / Copilot CLI 対応の SKILL.md ガイド。フロントマター完全仕様・Progressive Disclosure 3段階ローディング・ステップバイステップ作成・実践テンプレート集・トラブルシューティングを公式ドキュメント根拠付きで徹底解説。2026-07-29 に Copilot code review での Agent Skills / MCP 対応が GA。2026年6月時点の更新（Copilot code review の AGENTS.md 対応（2026-06-18）、Cloud agent GA）は当時の情報として収録。",
     addedAt: "2026-04-18",
-    lastReviewed: "2026-08-09",
+    lastReviewed: "2026-10-22",
   },
   {
     slug: "/cursor/complete-guide",
@@ -660,7 +660,7 @@ const entries: PageEntry[] = [
     summary:
       "Google Agent Development Kit (ADK) を用いた、マルチエージェント設計、状態管理、コンテキスト最適化、コールバック、評価、可観測性、デプロイメントのステップバイステップ実践ガイド。",
     addedAt: "2026-07-11",
-    lastReviewed: "2026-07-13",
+    lastReviewed: "2026-10-22",
   },
   {
     slug: "/google/enterprise-agent-platform",
@@ -672,7 +672,7 @@ const entries: PageEntry[] = [
     summary:
       "Google Cloud の Gemini Enterprise Agent Platform の全体像を理解し、エージェント構築からマルチエージェント設計、セキュリティ、本番運用までを網羅した初学者向け実践ガイド。",
     addedAt: "2026-07-19",
-    lastReviewed: "2026-07-19",
+    lastReviewed: "2026-10-22",
   },
   {
     slug: "/google/agent",
@@ -684,7 +684,7 @@ const entries: PageEntry[] = [
     summary:
       "AIエージェントIDE「Google Antigravity」が扱う4種類のMarkdownファイル（Rules / Skills / Workflows / Artifacts）の役割・置き場所・書き方・ベストプラクティスを体系化した完全ガイド。",
     addedAt: "2026-04-24",
-    lastReviewed: "2026-07-29",
+    lastReviewed: "2026-10-22",
   },
   {
     slug: "/google/agent-harness-engineering",
@@ -696,7 +696,7 @@ const entries: PageEntry[] = [
     summary:
       "Google ADKとGeminiを組み合わせたAIエージェント評価ハーネスの設計思想、実装パターン、テストダブル、LLM-as-Judge、CI統合のベストプラクティスを解説する完全ガイドです。",
     addedAt: "2026-05-30",
-    lastReviewed: "2026-07-01",
+    lastReviewed: "2026-10-22",
   },
   {
     slug: "/google/antigravity-guide",
@@ -708,7 +708,7 @@ const entries: PageEntry[] = [
     summary:
       "Antigravity CLI (agy) の全スラッシュコマンド、キーバインド、設定ファイル (settings.json)、自動化・CI/CD連携、セキュリティモデルを包括的に解説した完全ガイド。",
     addedAt: "2026-05-08",
-    lastReviewed: "2026-07-28",
+    lastReviewed: "2026-10-22",
   },
   {
     slug: "/google/antigravity-slash-commands-guide",
@@ -732,7 +732,7 @@ const entries: PageEntry[] = [
     summary:
       "Googleが実践するテストハーネス設計の技術とベストプラクティスを解説する完全ガイドです。",
     addedAt: "2026-05-28",
-    lastReviewed: "2026-07-01",
+    lastReviewed: "2026-10-22",
   },
   {
     slug: "/google/notebook-lm",
@@ -744,7 +744,7 @@ const entries: PageEntry[] = [
     summary:
       "Google NotebookLM を実務や研究で使いこなすための中〜上級者向け完全ガイド。アーキテクチャの理解からソース設計、カスタムインストラクション、Studio活用、Gemini連携、セキュリティ・Enterprise導入、トラブルシューティングまで網羅。",
     addedAt: "2026-07-10",
-    lastReviewed: "2026-07-11",
+    lastReviewed: "2026-10-22",
   },
   {
     slug: "/google/sandbox-best-practices",
@@ -756,7 +756,7 @@ const entries: PageEntry[] = [
     summary:
       "AIエージェント・API・コンテナ・C/C++・ブラウザ、5領域のサンドボックス技術のベストプラクティスをステップバイステップで解説する完全ガイド。",
     addedAt: "2026-06-12",
-    lastReviewed: "2026-08-09",
+    lastReviewed: "2026-10-22",
   },
   {
     slug: "/google/skill",
@@ -768,7 +768,7 @@ const entries: PageEntry[] = [
     summary:
       "Antigravity IDE における SKILL.md の設計思想・アーキテクチャ・実装パターン・運用を中級〜上級エンジニア向けにステップバイステップで解説する実践ガイド。",
     addedAt: "2026-04-18",
-    lastReviewed: "2026-07-29",
+    lastReviewed: "2026-10-22",
   },
   {
     slug: "/google/skill-guide",
@@ -778,9 +778,9 @@ const entries: PageEntry[] = [
     provider: "google",
     topics: ["skill", "guide"],
     summary:
-      "AIエージェントに「専門知識の教科書」を渡す仕組み — SKILL.md の構造・書き方・インストール手順を Gemini CLI v0.43.0 (最終版) & Antigravity v2.0.1 対応版で完全解説。Google I/O 2026 発表内容対応。Gemini CLI は 2026-06-18 に AI Pro/Ultra/無料 Code Assist 向けサンセット済（→ Antigravity CLI へ移行）。",
+      "AIエージェントに「専門知識の教科書」を渡す仕組み — SKILL.md の構造・書き方・インストール手順を Gemini CLI v0.43.0 & Antigravity v2.0.1 対応版で完全解説。Google I/O 2026 発表内容対応。2026-06-18 に AI Pro/Ultra/無料 Code Assist の個人アカウント向け提供が終了（→ Antigravity CLI へ移行）したが、Gemini CLI 自体のリリースは継続しており、2026-10-20 に安定版 v0.65.0 が公開されている。",
     addedAt: "2026-05-07",
-    lastReviewed: "2026-07-01",
+    lastReviewed: "2026-10-22",
   },
   {
     slug: "/google/antigravity-best-practices",
@@ -792,7 +792,7 @@ const entries: PageEntry[] = [
     summary:
       "Google Antigravity IDE・CLI の設計思想、アーキテクチャ、Rules (GEMINI.md)、Skills (SKILL.md)、Workflows、Artifacts、Permissions、Claude Code との比較・共存戦略まで、仕様駆動開発を支えるエコシステム全容を網羅。",
     addedAt: "2026-05-07",
-    lastReviewed: "2026-07-29",
+    lastReviewed: "2026-10-22",
   },
   {
     slug: "/google/stitch-guide",
@@ -804,7 +804,7 @@ const entries: PageEntry[] = [
     summary:
       "Google Labsが提供する無料のAIデザインツール「Google Stitch」の実践ガイド。Vibe Design、無限キャンバス、DESIGN.mdによるデザインシステム管理、MCP・SDK統合、プロンプト設計などのベストプラクティスを解説。",
     addedAt: "2026-07-12",
-    lastReviewed: "2026-07-12",
+    lastReviewed: "2026-10-22",
   },
   {
     slug: "/governance/ai-governance",
@@ -860,7 +860,7 @@ const entries: PageEntry[] = [
     summary:
       "Microsoft Foundry（旧Azure AI Studio/Azure AI Foundry）を用いたAIアプリ・エージェント開発のステップバイステップ・ベストプラクティスガイド。",
     addedAt: "2026-07-31",
-    lastReviewed: "2026-07-31",
+    lastReviewed: "2026-10-22",
   },
   {
     slug: "/infra/microsoft-foundry-best-practices-intermediate",
@@ -874,7 +874,7 @@ const entries: PageEntry[] = [
     summary:
       "Foundry Agent Service、Hosted Agent、Foundry Local、Foundry IQ などを活用したエンタープライズ AI エージェント開発・アクセスの設計と運用の実践ガイド。",
     addedAt: "2026-07-31",
-    lastReviewed: "2026-07-31",
+    lastReviewed: "2026-10-22",
   },
   {
     slug: "/llm-ops/evaluation-observability",
@@ -946,7 +946,7 @@ const entries: PageEntry[] = [
     summary:
       "OpenAI GPT-5.6 Sol / Terra / Luna のモデル選定、Reasoning、Programmatic Tool Calling、移行、コスト最適化を体系的に解説する実践ガイド。",
     addedAt: "2026-07-16",
-    lastReviewed: "2026-07-16",
+    lastReviewed: "2026-10-22",
   },
   {
     slug: "/multimodal/generation-best-practices",
@@ -1063,7 +1063,7 @@ const entries: PageEntry[] = [
     summary:
       "Slack上でチームがClaudeをタグ付けして仕事を委任できる新機能「Claude Tag」について、公式ドキュメントやコミュニティ発信をもとにまとめた中級者〜上級者向け実践ガイド。",
     addedAt: "2026-07-19",
-    lastReviewed: "2026-07-19",
+    lastReviewed: "2026-10-22",
   },
   {
     slug: "/google/enterprise-agent-platform-intermediate",
@@ -1075,7 +1075,7 @@ const entries: PageEntry[] = [
     summary:
       "Gemini Enterprise Agent Platform を実務レベルで使いこなすため、ADK・Agent Runtime・Memory Bank・A2A/MCP・ガバナンス機能などの設計指針を解説する中級〜上級者向け実践ガイド。",
     addedAt: "2026-07-19",
-    lastReviewed: "2026-07-19",
+    lastReviewed: "2026-10-22",
   },
   {
     slug: "/google/gemma-best-practices-guide",
@@ -1089,7 +1089,7 @@ const entries: PageEntry[] = [
     summary:
       "2026年4月に登場した新世代Gemma 4の制御トークン体系、Thinkingモード、Function Calling、量子化(QAT)戦略、ファインチューニング、デプロイ、安全性まで一次情報に基づいて網羅した実践ガイド。",
     addedAt: "2026-07-22",
-    lastReviewed: "2026-07-22",
+    lastReviewed: "2026-10-22",
   },
   {
     slug: "/google/multi-agent-best-practices",
@@ -1103,7 +1103,7 @@ const entries: PageEntry[] = [
     summary:
       "GEMINI.md・AGENTS.md・agent.py・.geminiignore・settings.json・A2A・Agent Engine まで、Gemini エコシステムでのマルチエージェント開発を網羅した完全実践ガイド。",
     addedAt: "2026-07-26",
-    lastReviewed: "2026-07-26",
+    lastReviewed: "2026-10-22",
   },
   {
     slug: "/moonshot/kimi-llm-best-practices",
@@ -1117,7 +1117,7 @@ const entries: PageEntry[] = [
     summary:
       "Moonshot AI が開発する Kimi K1.5 / K2 / K3 の超長文文脈（Long Context）処理、思考モード（Kimi Thinking）、Function Calling、マルチモーダル等の活用方法とベストプラクティスを解説する完全ガイド。",
     addedAt: "2026-07-22",
-    lastReviewed: "2026-07-22",
+    lastReviewed: "2026-10-22",
   },
   {
     slug: "/deepseek/llm-best-practices",
@@ -1131,7 +1131,7 @@ const entries: PageEntry[] = [
     summary:
       "DeepSeek-V3 / R1 / V4 などのモデル選定、Thinking Mode（思考モード）、Context Caching、Function Calling、Anthropic API互換連携までの初学者向け実践ベストプラクティスガイド。",
     addedAt: "2026-07-30",
-    lastReviewed: "2026-07-30",
+    lastReviewed: "2026-10-22",
   },
   {
     slug: "/xai/grok-best-practices",
@@ -1145,7 +1145,7 @@ const entries: PageEntry[] = [
     summary:
       "xAI API（Grok モデル群）をこれから使い始めるエンジニア・QAエンジニア向けに、モデル選定からセキュリティ運用まで、ステップバイステップで解説します。",
     addedAt: "2026-07-30",
-    lastReviewed: "2026-07-30",
+    lastReviewed: "2026-10-22",
   },
   {
     slug: "/xai/grok-best-practices-intermediate",
@@ -1169,7 +1169,7 @@ const entries: PageEntry[] = [
     summary:
       "モデル選定からエージェント型ツール、マルチエージェントリサーチ、Prompt Caching、コスト最適化まで、xAI Grok APIの本番導入・実践ベストプラクティスガイド。",
     addedAt: "2026-07-30",
-    lastReviewed: "2026-07-30",
+    lastReviewed: "2026-10-22",
   },
   {
     slug: "/zhipu/zai-glm-best-practices",
@@ -1191,7 +1191,7 @@ const entries: PageEntry[] = [
     summary:
       "Z.ai(GLM) LLMの初学者向け実践ベストプラクティスガイド。モデル選定、API仕様、Deep Thinking、Structured Output、Context Caching、GLM Coding Planまで徹底解説。",
     addedAt: "2026-07-30",
-    lastReviewed: "2026-07-30",
+    lastReviewed: "2026-10-22",
   },
 ];
 

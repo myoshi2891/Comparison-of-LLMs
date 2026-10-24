@@ -27,6 +27,8 @@ from scraper.providers import (
     scrape_moonshot,
     scrape_xai,
     scrape_zhipu,
+    scrape_meta,
+    scrape_microsoft,
 )
 from scraper.tools import (
     scrape_github_copilot,
@@ -99,6 +101,8 @@ def _scrape_all(
         (lambda: scrape_moonshot(existing_api),  "Moonshot(Kimi)"),
         (lambda: scrape_zhipu(existing_api),     "Zhipu(GLM)"),
         (lambda: scrape_xai(existing_api),       "xAI"),
+        (lambda: scrape_meta(existing_api),      "Meta"),
+        (lambda: scrape_microsoft(existing_api), "Microsoft"),
     ]:
         _run_scraper(fn, label, api_models)
 

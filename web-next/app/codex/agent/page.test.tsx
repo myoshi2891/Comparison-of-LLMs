@@ -219,3 +219,16 @@ describe("/codex/agent - static source safety", () => {
     expect(source.includes(needle)).toBe(false);
   });
 });
+
+describe("/codex/agent - model availability note", () => {
+  it("config.toml のモデル設定例の直前に、モデルピッカーで利用可能なモデルを選ぶ注記を置く", () => {
+    const { container } = render(<Page />);
+    const block = Array.from(container.querySelectorAll(`.${styles.codeBlock}`)).find(
+      (el) => el.querySelector(`.${styles.codeBar} span`)?.textContent === "~/.codex/config.toml"
+    );
+    const note = block?.previousElementSibling?.textContent?.replace(/\s+/g, " ").trim();
+    expect(note).toBe(
+      "モデルの利用可否: 例の gpt-6-sol(GPT-6 Sol)と gpt-6.1-sol(GPT-6.1 Sol)は、プランやワークスペースの設定によっては利用できません(Enterprise / Edu では管理者が有効化するまで使えません)。コピーする際は、Codex のモデルピッカー(/model)に表示される利用可能なモデルを選んで置き換えてください。"
+    );
+  });
+});

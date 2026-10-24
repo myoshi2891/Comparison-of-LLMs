@@ -47,11 +47,49 @@ describe("RefLinks - root structure", () => {
   });
 });
 
+/** カード見出しの期待値（表示順込み・ja）。カードの追加・脱落・並び替えを検知する。 */
+const EXPECTED_HEADINGS_JA = [
+  "🔌 OpenAI",
+  "🟣 Anthropic",
+  "🔵 Google AI Studio",
+  "🔷 Vertex AI (GCP)",
+  "⚡ xAI (Grok)",
+  "🌊 DeepSeek",
+  "🌙 Moonshot(Kimi)",
+  "💎 Zhipu(GLM)",
+  "🦙 Meta (Muse)",
+  "🪟 Microsoft (MAI)",
+  "🟠 AWS (Bedrock)",
+  "🐙 GitHub Copilot",
+  "🟣 Cursor",
+  "🌊 Windsurf",
+  "🟣 Claude Code",
+  "🧠 JetBrains AI",
+  "🤖 Junie (JetBrains)",
+  "🚀 Antigravity (Google)",
+  "🔵 Google One AI Plans",
+  "💱 為替レート参考",
+] as const;
+
+/** 見出しが完全一致するカードを返す（URL をカード単位で検証するため）。 */
+const cardFor = (container: HTMLElement, heading: string): Element | undefined =>
+  Array.from(container.querySelectorAll(".ref-card")).find(
+    (card) => card.querySelector("h5")?.textContent === heading
+  );
+
 describe("RefLinks - cards", () => {
-  it("renders exactly 18 ref-cards", () => {
+  it("renders exactly 20 ref-cards", () => {
     const { container } = render(<RefLinks lang="ja" />);
     const cards = container.querySelectorAll(".ref-card");
-    expect(cards.length).toBe(18);
+    expect(cards.length).toBe(20);
+  });
+
+  it("renders card headings in the expected order", () => {
+    const { container } = render(<RefLinks lang="ja" />);
+    const headings = Array.from(container.querySelectorAll(".ref-card h5")).map(
+      (h) => h.textContent
+    );
+    expect(headings).toEqual([...EXPECTED_HEADINGS_JA]);
   });
 
   it("includes Moonshot(Kimi) and Zhipu(GLM) provider cards", () => {
@@ -61,6 +99,38 @@ describe("RefLinks - cards", () => {
     expect(text).toContain("platform.moonshot.ai/docs/pricing");
     expect(text).toContain("Zhipu");
     expect(text).toContain("docs.z.ai/guides/overview/pricing");
+  });
+
+  it("includes Meta and Microsoft provider cards with official pricing links", () => {
+    const { container } = render(<RefLinks lang="ja" />);
+    const metaCard = cardFor(container, "🦙 Meta (Muse)");
+    const microsoftCard = cardFor(container, "🪟 Microsoft (MAI)");
+    expect(metaCard).toBeDefined();
+    expect(microsoftCard).toBeDefined();
+    // 各 URL が「正しいカード」に載っていることを検証する（ページ全体の検索では取り違えを見逃す）
+    expect(
+      metaCard?.querySelector('a[href="https://dev.meta.ai/docs/pricing-rate-limits"]')
+    ).toBeTruthy();
+    expect(
+      microsoftCard?.querySelector('a[href="https://ai.azure.com/catalog/models/MAI-Thinking-1"]')
+    ).toBeTruthy();
+  });
+
+  it("Meta pricing link distinguishes Standard / Contributor support per model", () => {
+    // Spark 1.3 / 1.2 は Standard・Contributor 両対応、Spark 1.1 と Wonder は Standard のみ
+    const cases = [
+      ["ja", "Muse Spark 1.3 / 1.2: Standard・Contributor ／ Spark 1.1・Wonder: Standard のみ"],
+      ["en", "Muse Spark 1.3 / 1.2: Standard & Contributor / Spark 1.1 & Wonder: Standard only"],
+    ] as const;
+    for (const [lang, expected] of cases) {
+      const { container, unmount } = render(<RefLinks lang={lang} />);
+      const metaCard = cardFor(container, "🦙 Meta (Muse)");
+      const labels = Array.from(metaCard?.querySelectorAll(".ref-label") ?? []).map(
+        (l) => l.textContent
+      );
+      expect(labels[0]).toBe(expected);
+      unmount();
+    }
   });
 
   it("each card has h5 heading and .ref-link body", () => {

@@ -122,3 +122,23 @@ describe("/google/enterprise-agent-platform - external link safety", () => {
     }
   });
 });
+
+describe("Gemini Enterprise Agent Platform 日付表示", () => {
+  const norm = (s: string | null | undefined) => (s ?? "").replace(/\s+/g, " ").trim();
+
+  it("ヒーローは作成日 2026-07-18 と ADK 例のモデル更新日 2026-10-22 を区別する", () => {
+    const { container } = render(<Page />);
+    const meta = container.querySelector("[class*='hero'] [class*='meta']");
+    expect(norm(meta?.textContent)).toBe(
+      "作成: 2026年7月18日時点の公開情報に基づく ／ モデル更新: 2026年10月22日（ADK の例を gemini-3.8-flash に変更） ／ 図解はすべて Mermaid で記述（ASCIIアートは不使用）"
+    );
+  });
+
+  it("フッターは作成日とモデル更新日を区別する", () => {
+    const { container } = render(<Page />);
+    const footer = container.querySelector("footer[class*='pageFooter']");
+    expect(norm(footer?.textContent)).toBe(
+      "Gemini Enterprise Agent Platform 完全ガイド ／ 初学者向けステップバイステップ・ベストプラクティス ／ 作成: 2026年7月18日 ／ モデル更新: 2026年10月22日"
+    );
+  });
+});

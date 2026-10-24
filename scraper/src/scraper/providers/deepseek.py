@@ -37,13 +37,13 @@ _CLS = {
     "DeepSeek-R1":        "tag-leg",
 }
 _SUB_JA = {
-    _DEEPSEEK_V4_1_FLASH: "V4 Flash の後継 / 画像理解対応 / off-peak は 50% 引き",
+    _DEEPSEEK_V4_1_FLASH: "V4 Flash の後継 / 2026-10-17 更新版 (1017) / 画像理解対応 / off-peak は 50% 引き",
     _DEEPSEEK_V4_PRO:     "高度推論 / 1.6T MoE / MIT / off-peak は 50% 引き",
     _DEEPSEEK_V3_2:       "公式料金表から削除 (提供終了)",
     "DeepSeek-R1":        "公式料金表から削除 (提供終了)",
 }
 _SUB_EN = {
-    _DEEPSEEK_V4_1_FLASH: "Successor to V4 Flash / vision / 50% off during off-peak",
+    _DEEPSEEK_V4_1_FLASH: "Successor to V4 Flash / Oct 17, 2026 update (1017) / vision / 50% off during off-peak",
     _DEEPSEEK_V4_PRO:     "Advanced reasoning / 1.6T MoE / MIT / 50% off during off-peak",
     _DEEPSEEK_V3_2:       "Removed from the official price list (retired)",
     "DeepSeek-R1":        "Removed from the official price list (retired)",

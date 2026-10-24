@@ -127,6 +127,25 @@ describe("/model-data/gpt-5-6-best-practices - contract", () => {
     );
   });
 
+  it("labels plan availability as a GA-time snapshot instead of the current default", () => {
+    const { container } = render(<Page />);
+    const section = container.querySelector("#availability");
+    const normalize = (el: Element) => el.textContent?.replace(/\s+/g, " ").trim();
+    const freeRow = Array.from(section?.querySelectorAll("tbody tr") ?? []).find(
+      (tr) => tr.querySelector("td")?.textContent === "Free / Go"
+    );
+    expect(Array.from(freeRow?.querySelectorAll("td") ?? []).map(normalize)).toEqual([
+      "Free / Go",
+      "GA時点はGPT-5.5 Instantがデフォルト。Solは利用不可",
+      "一部機能のみ",
+    ]);
+    expect(Array.from(section?.querySelectorAll("p") ?? []).map(normalize)).toEqual([
+      "※ 以下の表と説明は、GPT-5.6 の一般提供（GA）開始時点（2026年7月）のスナップショットです。現在の各プランの既定モデルは ChatGPT の公式情報で確認してください。",
+      "GA時点の標準のChatGPT会話では、日常応答のデフォルトはGPT-5.5 Instantであり、GPT-5.6 SolはMedium以上のreasoningオプションを選択した場合にのみ使用されていました。Terra/Lunaは標準チャットでは選択できず、ChatGPT Work・Codex・APIから利用します。",
+      "ChatGPT Workは、GPT-5.6を基盤としたエージェント型ワークスペース製品で、ローカルファイル・アプリ・ブラウザを横断したマルチステップタスクの自動実行を目的としています。",
+    ]);
+  });
+
   it("left-aligns every Markdown table header", () => {
     const css = readFileSync(`${__dirname}/page.module.css`, "utf8");
     expect(css).toMatch(/\.tableWrap th\s*\{\s*text-align: left !important;/);

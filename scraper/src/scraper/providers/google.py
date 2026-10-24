@@ -7,7 +7,7 @@
 
 from __future__ import annotations
 import logging
-from datetime import date
+from datetime import date, datetime, timezone
 
 from scraper.browser import get_page_text
 from scraper.models import ApiModel, PriceProvenance
@@ -19,27 +19,55 @@ _URL_VERTEX = "https://cloud.google.com/vertex-ai/generative-ai/pricing"
 
 # 3.6/3.7/3.8 Flash の $0.75/$3.75 特価はこの日付まで。以降は自動的に標準価格 $1.50/$7.50 へ切り替える。
 _FLASH_PROMO_EXPIRY = date(2026, 12, 31)
-_FLASH_PROMO_NAMES = {"Gemini 3.8 Flash", "Gemini 3.7 Flash", "Gemini 3.6 Flash"}
+_FLASH_PROMO_NAMES = {"Gemini 3.8 Flash", "Gemini 3.6 Flash"}
 _FLASH_STANDARD_PRICE = (1.50, 7.50)
+
+# 非推奨エイリアス → ルーティング先モデル。エイリアスは後継モデルとして課金されるため、
+# 価格（期限後の切り替えを含む）はルーティング先の _FALLBACKS から導出する。
+_FLASH_ALIAS_TARGETS = {"Gemini 3.5 Flash": "Gemini 3.6 Flash"}
+
+# Gemini 4 Argon の $2/$10 導入価格はこの日付まで。2026-12-01 以降は標準価格 $4/$20。
+# 切り替えは実行時判定のため、配信中の pricing.json へ反映するには 2026-12-01 以降に
+# update.sh を実行して生成物をコミットする必要がある（月次更新で実施）。
+_ARGON_NAME = "Gemini 4 Argon"
+_ARGON_PROMO_EXPIRY = date(2026, 11, 30)
+_ARGON_STANDARD_PRICE = (4.00, 20.00)
+
+
+def _today_utc() -> date:
+    # 実行ホストのタイムゾーン（JST 等）で期限判定が前倒しされないよう UTC 日付で判定する。
+    return datetime.now(timezone.utc).date()
 
 
 def _resolve_price(name: str, price_in: float, price_out: float) -> tuple[float, float]:
-    if name in _FLASH_PROMO_NAMES and date.today() > _FLASH_PROMO_EXPIRY:
+    target = _FLASH_ALIAS_TARGETS.get(name)
+    if target is not None:
+        target_in, target_out = _FALLBACKS[target][:2]
+        return _resolve_price(target, target_in, target_out)
+    today = _today_utc()
+    if name in _FLASH_PROMO_NAMES and today > _FLASH_PROMO_EXPIRY:
         return _FLASH_STANDARD_PRICE
+    if name == _ARGON_NAME and today > _ARGON_PROMO_EXPIRY:
+        return _ARGON_STANDARD_PRICE
     return price_in, price_out
 
 
 _FALLBACKS: dict[str, tuple[float, float, str, str, str, str, str]] = {
     # name: (price_in, price_out, provider, tag, cls, sub_ja, sub_en)
-    "Gemini 3.1 Pro Preview": (2.00,  12.00, "Google AI", "Preview",  "tag-flag", "最新世代 / 1M ctx",            "Latest generation / 1M ctx"),
+    _ARGON_NAME:              (2.00,  10.00, "Google AI", "最新 Flagship", "tag-flag", "最新旗艦 / 2026-11-30までの特価 (以降 $4/$20) / キャッシュ入力95%引き", "Latest flagship / promo through 2026-11-30 (then $4/$20) / 95% off cached input"),
+    "Gemini 3.1 Pro Preview": (2.00,  12.00, "Google AI", "Preview",  "tag-flag", "前世代 Pro / 1M ctx / 200K超は $4/$18", "Prev-gen Pro / 1M ctx / $4/$18 above 200K"),
     "Gemini 3.8 Flash":       (0.75,   3.75, "Google AI", "最新 Flash", "tag-bal", "最新Flash / 1M ctx / 2026-12-31までの特価 (以降 $1.5/$7.5)", "Latest Flash / 1M ctx / promo through 2026-12-31 (then $1.5/$7.5)"),
-    "Gemini 3.7 Flash":       (0.75,   3.75, "Google AI", "Fast",     "tag-bal",  "前Flash / 1M ctx / 2026-12-31までの特価 (以降 $1.5/$7.5)", "Prev Flash / 1M ctx / promo through 2026-12-31 (then $1.5/$7.5)"),
+    "Gemini 3.7 Flash":       (0.75,   3.75, "Google AI", "Deprecated", "tag-leg", "非推奨エイリアス / Gemini 3.8 Flash へ自動ルーティング (提供終了ではない)", "Deprecated alias / auto-routes to Gemini 3.8 Flash (not shut down)"),
     "Gemini 3.6 Flash":       (0.75,   3.75, "Google AI", "Fast",     "tag-bal",  "1M ctx / 2026-12-31までの特価 (以降 $1.5/$7.5)", "1M ctx / promo through 2026-12-31 (then $1.5/$7.5)"),
-    "Gemini 3.5 Flash":       (1.50,   9.00, "Google AI", "Fast",     "tag-bal",  "前Flash / 1M ctx / 高速推論",  "Prev Flash / 1M ctx / fast inference"),
+    "Gemini Omni 1.1 Flash":  (1.50,   9.00, "Google AI", "Multimodal", "tag-bal", "GA / マルチモーダル生成 / テキスト出力 (動画出力は $17.5)", "GA / Multimodal generation / text output (video output $17.5)"),
+    # 提供終了日は「最短」の予告日（Google の deprecations ページ準拠）。実際の停止日は別途告知される。
+    "Gemini Omni Flash Preview": (1.50,   9.00, "Google AI", "Deprecated", "tag-leg", "非推奨 Preview / 2026-10-22以降に提供終了 / 後継は Gemini Omni 1.1 Flash", "Deprecated preview / shutdown on or after 2026-10-22 / replaced by Gemini Omni 1.1 Flash"),
+    # 価格は _FLASH_ALIAS_TARGETS 経由で 3.6 Flash から導出する（下記の値は同額の写し）
+    "Gemini 3.5 Flash":       (0.75,   3.75, "Google AI", "Deprecated", "tag-leg", "非推奨エイリアス / Gemini 3.6 Flash へ自動ルーティング (提供終了ではない)", "Deprecated alias / auto-routes to Gemini 3.6 Flash (not shut down)"),
     "Gemini 3.5 Flash-Lite":  (0.30,   2.50, "Google AI", "Budget",   "tag-mini", "2026-07-21 新バジェット枠 / 1M ctx / 大量処理", "Jul 2026 new budget tier / 1M ctx / high-volume"),
     "Gemini 3.1 Flash-Lite":  (0.25,   1.50, "Google AI", "Budget",   "tag-mini", "バジェット枠 / 1M ctx / 音声入力は $0.50", "Budget tier / 1M ctx / audio input $0.50"),
     "Gemini 2.5 Pro":         (1.25,  10.00, "Google AI", "Flagship", "tag-flag", "コーディング最強 / 1M ctx",    "Top coding model / 1M ctx"),
-    "Gemini 3 Flash Preview": (0.50,   3.00, "Google AI", "Retired",  "tag-leg",  "公式料金表から削除 (提供終了)",   "Removed from the official price list (retired)"),
+    "Gemini 3 Flash Preview": (0.50,   3.00, "Google AI", "Legacy",   "tag-leg",  "レガシー Preview (料金表に残存)", "Legacy preview (still on the price list)"),
     "Gemini 2.5 Flash":       (0.30,   2.50, "Google AI", "Fast",     "tag-bal",  "バランス高速 / 1M ctx",         "Balanced & fast / 1M ctx"),
     "Gemini 2.5 Flash-Lite":  (0.10,   0.40, "Google AI", "Budget",   "tag-mini", "超低コスト / 1M ctx",           "Ultra low cost / 1M ctx"),
     "Gemini 2.5 Pro (Vertex)":        (1.25,  10.00, "Vertex AI", "GCP Enterprise", "tag-vtx",

@@ -283,8 +283,9 @@ export default function GrokBestPracticesPage() {
             <span className={styles.stepNumber}>1</span>Step1：モデルを選ぶ
           </h2>
           <p>
-            xAI は用途別に複数のモデルファミリーを提供しています。「何でも Grok 4.5
-            を使えばよい」という単純な整理がされているのが大きな特徴です。
+            xAI
+            は用途別に複数のモデルファミリーを提供しています。汎用のテキスト用途では、2026年10月時点のフラッグシップである
+            Grok 4.7 を基本に選べばよい、という単純な整理ができるのが大きな特徴です。
           </p>
 
           <h3>1.1 テキスト（チャット・コード）モデル比較表</h3>
@@ -302,36 +303,50 @@ export default function GrokBestPracticesPage() {
             <tbody>
               <tr>
                 <td>
-                  <strong>grok-4.5</strong>（フラッグシップ・最新）
+                  <strong>grok-4.7</strong>（2026年10月時点のフラッグシップ）
                 </td>
                 <td>500k</td>
-                <td>$2.00</td>
+                <td>$2.00 (&lt;200k) / $4.00 (≥200k)</td>
+                <td>$0.50 (&lt;200k) / $1.00 (≥200k)</td>
+                <td>$6.00 (&lt;200k) / $12.00 (≥200k)</td>
+                <td>
+                  2026年9月21日登場の grok-4.5 後継。プロンプトが 200k
+                  トークン以上のリクエストは全トークンに高い単価を適用
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <strong>grok-4.5</strong>（2026年7月時点のフラッグシップ。2026年10月時点の最新は
+                  grok-4.7）
+                </td>
+                <td>500k</td>
+                <td>$2.00 (&lt;200k) / $4.00 (≥200k)</td>
                 <td>$0.30 (&lt;200k) / $0.60 (≥200k)</td>
-                <td>$6.00</td>
+                <td>$6.00 (&lt;200k) / $12.00 (≥200k)</td>
                 <td>エージェント型ツール呼び出し、幻覚が少ない、推論強度を調整可能</td>
               </tr>
               <tr>
                 <td>grok-4.3</td>
                 <td>1M</td>
-                <td>$1.25</td>
-                <td>$0.20</td>
-                <td>$2.50</td>
+                <td>$1.25 (&lt;200k) / $2.50 (≥200k)</td>
+                <td>$0.20 (&lt;200k) / $0.40 (≥200k)</td>
+                <td>$2.50 (&lt;200k) / $5.00 (≥200k)</td>
                 <td>長文コンテキスト向け</td>
               </tr>
               <tr>
                 <td>grok-4.20-0309-reasoning / non-reasoning</td>
                 <td>1M</td>
-                <td>$1.25</td>
-                <td>$0.20</td>
-                <td>$2.50</td>
+                <td>$1.25 (&lt;200k) / $2.50 (≥200k)</td>
+                <td>$0.20 (&lt;200k) / $0.40 (≥200k)</td>
+                <td>$2.50 (&lt;200k) / $5.00 (≥200k)</td>
                 <td>推論あり／なしを選択可能</td>
               </tr>
               <tr>
                 <td>grok-4.20-multi-agent-0309</td>
                 <td>1M</td>
-                <td>$1.25</td>
-                <td>$0.20</td>
-                <td>$2.50</td>
+                <td>$1.25 (&lt;200k) / $2.50 (≥200k)</td>
+                <td>$0.20 (&lt;200k) / $0.40 (≥200k)</td>
+                <td>$2.50 (&lt;200k) / $5.00 (≥200k)</td>
                 <td>複数エージェント（4体 or 16体）が協調して回答を生成</td>
               </tr>
               <tr>
@@ -349,7 +364,8 @@ export default function GrokBestPracticesPage() {
             出典: <Ext href="https://docs.x.ai/developers/models">Models | xAI Docs</Ext>
             （最終更新 2026年7月9日）、
             <Ext href="https://docs.x.ai/developers/pricing">Pricing | xAI Docs</Ext>
-            （最終更新 2026年7月3日）
+            （最終更新 2026年7月3日。grok-4.5 以前のモデルの価格の基準時点）。grok-4.7 の価格は同
+            Pricing ページで2026年10月23日に確認
           </div>
 
           <h3>1.2 用途別モデル選定ガイド</h3>
@@ -363,11 +379,11 @@ export default function GrokBestPracticesPage() {
             <tbody>
               <tr>
                 <td>コード生成・デバッグ</td>
-                <td>grok-4.5</td>
+                <td>grok-4.7</td>
               </tr>
               <tr>
                 <td>一般的なチャット・質問応答</td>
-                <td>grok-4.5</td>
+                <td>grok-4.7</td>
               </tr>
               <tr>
                 <td>画像生成</td>
@@ -1708,25 +1724,32 @@ export default function GrokBestPracticesPage() {
             </thead>
             <tbody>
               <tr>
+                <td>grok-4.7</td>
+                <td>500k</td>
+                <td>$2.00 (&lt;200k) / $4.00 (≥200k)</td>
+                <td>$0.50 (&lt;200k) / $1.00 (≥200k)</td>
+                <td>$6.00 (&lt;200k) / $12.00 (≥200k)</td>
+              </tr>
+              <tr>
                 <td>grok-4.5</td>
                 <td>500k</td>
-                <td>$2.00</td>
+                <td>$2.00 (&lt;200k) / $4.00 (≥200k)</td>
                 <td>$0.30 (&lt;200k) / $0.60 (≥200k)</td>
-                <td>$6.00</td>
+                <td>$6.00 (&lt;200k) / $12.00 (≥200k)</td>
               </tr>
               <tr>
                 <td>grok-4.3</td>
                 <td>1M</td>
-                <td>$1.25</td>
-                <td>$0.20</td>
-                <td>$2.50</td>
+                <td>$1.25 (&lt;200k) / $2.50 (≥200k)</td>
+                <td>$0.20 (&lt;200k) / $0.40 (≥200k)</td>
+                <td>$2.50 (&lt;200k) / $5.00 (≥200k)</td>
               </tr>
               <tr>
                 <td>grok-4.20 系（reasoning/non-reasoning/multi-agent）</td>
                 <td>1M</td>
-                <td>$1.25</td>
-                <td>$0.20</td>
-                <td>$2.50</td>
+                <td>$1.25 (&lt;200k) / $2.50 (≥200k)</td>
+                <td>$0.20 (&lt;200k) / $0.40 (≥200k)</td>
+                <td>$2.50 (&lt;200k) / $5.00 (≥200k)</td>
               </tr>
             </tbody>
           </table>
@@ -1753,7 +1776,7 @@ export default function GrokBestPracticesPage() {
                 <td>
                   <code>x_search</code>
                 </td>
-                <td>$5</td>
+                <td>$5（ポスト取得 1,000件あたり）/ $10（ユーザープロフィール取得 1,000件あたり）</td>
               </tr>
               <tr>
                 <td>Code Execution</td>
@@ -1828,7 +1851,7 @@ export default function GrokBestPracticesPage() {
             </tbody>
           </table>
           <p className={styles.muted}>
-            grok-4.3・grok-4.20系は20%割引、それ以外のモデルは割引対象外です。
+            grok-4.7・grok-4.6・grok-4.5・grok-4.3・grok-4.20系は20%割引、それ以外のモデルは割引対象外です。
           </p>
 
           <h3>11.4 Priority Processing（優先処理）</h3>
@@ -1865,7 +1888,8 @@ export default function GrokBestPracticesPage() {
           <div className={styles.sourceNote}>
             <i className="ti ti-external-link" />
             出典: <Ext href="https://docs.x.ai/developers/pricing">Pricing | xAI Docs</Ext>
-            （最終更新 2026年7月3日）
+            （最終更新 2026年7月3日。grok-4.5 以前のモデルの価格の基準時点）。grok-4.7 の価格は同
+            Pricing ページで2026年10月23日に確認
           </div>
         </section>
 
@@ -2135,7 +2159,7 @@ export default function GrokBestPracticesPage() {
           <ul className={styles.checklist}>
             <li>
               <i className="ti ti-square" />
-              用途に応じて適切なモデル（基本は grok-4.5）を選定した
+              用途に応じて適切なモデル（基本は grok-4.7）を選定した
             </li>
             <li>
               <i className="ti ti-square" />

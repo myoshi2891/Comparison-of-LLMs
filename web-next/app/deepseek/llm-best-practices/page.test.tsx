@@ -60,4 +60,40 @@ describe("DeepSeek LLM Best Practices Page", () => {
     const diagrams = container.querySelectorAll("[data-testid='mermaid-diagram']");
     expect(diagrams.length).toBe(8);
   });
+
+  it("移行チェックリストは Flash の正式 ID deepseek-flash を案内する", () => {
+    const { container } = render(<Page />);
+    const items = Array.from(container.querySelectorAll("#migration li")).map((li) =>
+      li.textContent?.replace(/\s+/g, " ").trim()
+    );
+    expect(items).toEqual([
+      "[ ] deepseek-chat の記述を deepseek-flash または deepseek-v4-pro へ変更",
+      "[ ] deepseek-reasoner の記述を deepseek-v4-pro (Thinking Mode) へ変更",
+      "[ ] API Base URL が https://api.deepseek.com であることを確認",
+      "[ ] 2026年7月24日の完全廃止後に新モデル環境での動作検証を完了",
+    ]);
+  });
+});
+
+describe("DeepSeek 新規開発の既定モデル", () => {
+  const norm = (s: string | null | undefined) => (s ?? "").replace(/\s+/g, " ").trim();
+
+  it("旧モデル廃止 callout は新規開発に deepseek-flash と deepseek-v4-pro を指定させる", () => {
+    const { container } = render(<Page />);
+    const texts = Array.from(
+      container.querySelectorAll("#model-lineup [class*='calloutWarn'] p")
+    ).map((p) => norm(p.textContent));
+    expect(texts).toEqual([
+      "旧モデルエイリアスである deepseek-chat（DeepSeek-V3実体）および deepseek-reasoner（DeepSeek-R1実体）は、2026年7月24日をもって提供終了（完全廃止）となりました。現在は利用できません。新規開発では必ず deepseek-flash または deepseek-v4-pro を指定してください。",
+    ]);
+  });
+
+  it("first_call.py は暫定エイリアスではなく deepseek-flash を呼び出す", () => {
+    const { container } = render(<Page />);
+    const lines = Array.from(container.querySelectorAll("[class*='codeLine']")).map((l) =>
+      norm(l.textContent)
+    );
+    expect(lines).toContain('model="deepseek-flash",');
+    expect(lines).not.toContain('model="deepseek-v4-flash",');
+  });
 });

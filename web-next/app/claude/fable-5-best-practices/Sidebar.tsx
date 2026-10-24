@@ -16,7 +16,7 @@ export default function Sidebar() {
           </div>
         </a>
         <div className={styles.sidebarMeta}>
-          最終更新: 2026-07-26
+          最終更新: 2026-10-22
           <br />
           対象: Claude Code 中〜上級者
         </div>

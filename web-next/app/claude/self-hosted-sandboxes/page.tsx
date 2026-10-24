@@ -228,13 +228,14 @@ export default function Page() {
           </p>
           <div className={styles.hMeta}>
             <span className={styles.hMetaI}>
-              🤖 <strong>対象モデル</strong>: Claude Opus 4 系最新版（2026年時点）を含む最新モデル
+              🤖 <strong>対象モデル</strong>: Claude Opus 5.5 / Fable 5.1
+              などの最新モデル（2026年10月時点）
             </span>
             <span className={styles.hMetaI}>
               📋 <strong>ステータス</strong>: Public Beta
             </span>
             <span className={styles.hMetaI}>
-              📅 <strong>更新日</strong>: 2026年6月30日
+              📅 <strong>更新日</strong>: 2026年10月22日
             </span>
           </div>
         </section>
@@ -1604,8 +1605,17 @@ export default function Page() {
             <div className={`${styles.ca} ${styles.caR}`}>
               <span className={styles.caI}>🚫</span>
               <p>
-                <strong>制限：</strong> Self-hosted サンドボックスでは現在{" "}
-                <strong>Memory（永続メモリ）</strong> はサポートされていません。
+                <strong>制限：</strong> Self-hosted サンドボックスの{" "}
+                <strong>Memory（永続メモリ）</strong> は
+                2026年8月19日から利用可能になりました。Python / TypeScript / Go の SDK
+                ワーカー、または ant CLI 1.33.0 以降が、アタッチされたメモリストアを{" "}
+                <code>mount_path</code> にダウンロードし、変更をストアへ同期します（1.33.0 より前の
+                ant CLI は要件を満たしません）。Claude Platform on AWS と Claude Models on Google
+                Cloud（Anthropic managed）では、Self-hosted
+                環境のセッションにメモリストアを利用できません。また、ant CLI と Python / TypeScript
+                / Go SDK の組み込みワーカーは Claude Models on Google Cloud（Anthropic
+                managed）に対応していないため、同環境では Environments Work
+                エンドポイントを直接呼ぶ独自ワーカーを実装してください。
               </p>
             </div>
           </div>
@@ -2262,7 +2272,7 @@ export default function Page() {
               "work.stop によるグレースフルシャットダウン手順を整備した",
               "--workdir を変更した場合、エージェントのシステムプロンプトも更新した",
               "モニタリング呼び出しはワーカーホストではなく別の運用ツールから行っている",
-              "Memory は Self-hosted では現在未サポートであることを把握している",
+              "Memory ストアは SDK ワーカーまたは ant CLI（1.33.0 以降）経由で同期される（AWS と Claude Models on Google Cloud（Anthropic managed）では利用不可）ことを把握している",
             ]}
           />
 
@@ -2346,6 +2356,29 @@ export default function Page() {
                 <div className={styles.codeLine}>{"  "}my-worker-image:latest</div>
               </code>
             </pre>
+          </div>
+          <div className={`${styles.ca} ${styles.caA}`}>
+            <span className={styles.caI}>📌</span>
+            <p>
+              <strong>Memory を使う場合：</strong> <code>--read-only</code>{" "}
+              ではルートファイルシステムに書き込めないため、SDK
+              ワーカーがメモリストアを同期する親ディレクトリ（例: <code>/mnt/memory</code>
+              ）にも書き込み可能なマウントが必要です。上記の <code>/tmp</code> と{" "}
+              <code>/mnt/session/outputs</code>{" "}
+              に加えて、書き込み可能なマウントを追加し、ワーカーを実行するユーザーがこの親ディレクトリに書き込めるようにしてください。使い捨てのサンドボックスでは{" "}
+              <code>--tmpfs /mnt/memory</code>{" "}
+              を推奨します（ワーカーがサンドボックス終了前に内容をストアへ同期するため、ホストへのマウントは不要です）。
+              <code>-v /host/memory:/mnt/memory</code>{" "}
+              でホストのディレクトリを使う場合は、ワーカーを実行するユーザー以外が読み書きできないようアクセスを制限し、ワーカーが異常終了した後は残ったストアのディレクトリを削除してください（kill
+              されたワーカーは終了処理を実行しないため、未同期の変更は失われ、ディレクトリが残ります）。各ストアの{" "}
+              <code>mount_path</code>{" "}
+              のディレクトリはワーカーがセッション開始時に作成し終了時に削除するため、
+              <code>mount_path</code>{" "}
+              に直接マウントしないでください（パスが既に存在するとワーカーはセッションの処理を開始しません）。同じ{" "}
+              <code>/host/memory</code>{" "}
+              を複数のセッションで共有すると、同時に動くセッションが同じストアのパスを奪い合って競合します。セッションが重なる場合は、セッションごとに別のファイルシステムを割り当てるか、コンテナごとに独立した{" "}
+              <code>--tmpfs /mnt/memory</code> を使ってください。
+            </p>
           </div>
         </section>
 
@@ -2813,8 +2846,8 @@ export default function Page() {
 
         <footer className={styles.footer}>
           <p>
-            📌 本ガイドは公式ドキュメント（取得日: 2026年6月30日）を基に作成しています。Claude
-            Managed Agents は Public Beta のため、API
+            📌 本ガイドは公式ドキュメント（取得日: 2026年6月30日。2026年10月22日に Memory
+            対応などを追記）を基に作成しています。Claude Managed Agents は Public Beta のため、API
             仕様は予告なく変更される可能性があります。最新情報は
             <Ext href="https://platform.claude.com/docs/en/managed-agents/self-hosted-sandboxes">
               公式ドキュメント

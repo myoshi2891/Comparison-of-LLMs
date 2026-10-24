@@ -916,21 +916,28 @@ export default function SlashCommandsGuideClient() {
                 使用例
               </span>
               <CodeCopyButton
-                text={`/model opus    # Claude Opus 4.8 — 高精度・複雑タスク向け\n/model sonnet  # Claude Sonnet 4.6 — バランス型・日常タスク向け\n/model haiku   # Claude Haiku 4.5 — 高速・軽量タスク向け\n/model         # モデルピッカー UI を開く`}
+                text={`/model opus    # Claude Opus（解決先のバージョンはプロバイダーにより異なる）— 高精度・複雑タスク向け\n/model sonnet  # Claude Sonnet（解決先のバージョンはプロバイダーにより異なる）— バランス型・日常タスク向け\n/model haiku   # Claude Haiku（解決先のバージョンはプロバイダーにより異なる）— 高速・軽量タスク向け\n/model         # モデルピッカー UI を開く`}
               />
             </div>
             <pre>
               <code>
                 <span className={styles.tCmd}>/model</span> opus{" "}
-                <span className={styles.tCmt}># Claude Opus 4.8 — 高精度・複雑タスク向け</span>
+                <span className={styles.tCmt}>
+                  # Claude Opus（解決先のバージョンはプロバイダーにより異なる）—
+                  高精度・複雑タスク向け
+                </span>
                 {"\n"}
                 <span className={styles.tCmd}>/model</span> sonnet{" "}
                 <span className={styles.tCmt}>
-                  # Claude Sonnet 4.6 — バランス型・日常タスク向け
+                  # Claude Sonnet（解決先のバージョンはプロバイダーにより異なる）—
+                  バランス型・日常タスク向け
                 </span>
                 {"\n"}
                 <span className={styles.tCmd}>/model</span> haiku{" "}
-                <span className={styles.tCmt}># Claude Haiku 4.5 — 高速・軽量タスク向け</span>
+                <span className={styles.tCmt}>
+                  # Claude Haiku（解決先のバージョンはプロバイダーにより異なる）—
+                  高速・軽量タスク向け
+                </span>
                 {"\n"}
                 <span className={styles.tCmd}>/model</span>{" "}
                 <span className={styles.tCmt}># モデルピッカー UI を開く</span>
@@ -1000,7 +1007,7 @@ export default function SlashCommandsGuideClient() {
                 <td>
                   <code>xhigh</code>
                 </td>
-                <td>最高レベル（Opus 4.8 推奨）</td>
+                <td>最高レベル（測定で効果が確認できた場合のみ）</td>
                 <td>難解なバグ修正、アーキテクチャ設計</td>
               </tr>
               <tr
@@ -1022,7 +1029,7 @@ export default function SlashCommandsGuideClient() {
                 使用例
               </span>
               <CodeCopyButton
-                text={`/effort high    # 高精度推論に設定\n/effort xhigh   # 最高精度（Opus 4.8 推奨）\n/effort         # インタラクティブスライダーを開く\n/fast on        # 素早い・簡潔な回答に切り替え\n/fast off       # 通常モードに戻す`}
+                text={`/effort high    # 高精度推論に設定\n/effort xhigh   # 最高精度（測定で効果が確認できた場合のみ）\n/effort         # インタラクティブスライダーを開く\n/fast on        # 素早い・簡潔な回答に切り替え\n/fast off       # 通常モードに戻す`}
               />
             </div>
             <pre>
@@ -1031,7 +1038,7 @@ export default function SlashCommandsGuideClient() {
                 <span className={styles.tCmt}># 高精度推論に設定</span>
                 {"\n"}
                 <span className={styles.tCmd}>/effort</span> xhigh{" "}
-                <span className={styles.tCmt}># 最高精度（Opus 4.8 推奨）</span>
+                <span className={styles.tCmt}># 最高精度（測定で効果が確認できた場合のみ）</span>
                 {"\n"}
                 <span className={styles.tCmd}>/effort</span>{" "}
                 <span className={styles.tCmt}># インタラクティブスライダーを開く</span>
