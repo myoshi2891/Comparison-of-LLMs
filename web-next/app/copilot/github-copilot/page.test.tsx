@@ -365,7 +365,12 @@ describe("10月のモデルラインナップ（Grok）", () => {
         Array.from(tr.querySelectorAll("td")).map((td) => (td.textContent ?? "").trim())
       );
     expect(grokRows).toEqual([
-      ["Grok 4.7 / 4.6", "xAI", "高速・日常的な軽量タスク", "ゼロデータ保持ポリシーでホスティング"],
+      [
+        "Grok 4.7 / 4.6",
+        "xAI",
+        "Grok 4.7は複雑なマルチステップのエージェント作業、Grok 4.6は汎用的なコーディングと推論",
+        "ゼロデータ保持ポリシーでホスティング",
+      ],
     ]);
   });
 });
