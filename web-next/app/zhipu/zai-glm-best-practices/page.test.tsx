@@ -94,7 +94,7 @@ describe("ZaiGlmBestPracticesPage", () => {
       ["medium", "内部的にhighとして扱われる(GLM-5.3 / GLM-5.3-Flash は非対応)"],
       [
         "low",
-        "GLM-5.3 / GLM-5.3-Flash では high より浅い軽量推論として区別され、思考量・コスト・遅延を抑えられる。それ以前のモデルでは内部的にhighとして扱われる",
+        "GLM-5.3 / GLM-5.3-Flash / GLM-5.3-FlashX では high より浅い軽量推論として区別され、思考量・コスト・遅延を抑えられる。それ以前のモデルでは内部的にhighとして扱われる",
       ],
       ["minimal / none", "それ以前のモデルのみ。思考をスキップし、即座に応答を生成"],
     ]);
