@@ -121,7 +121,7 @@ const EXPECTED_MERMAID_SOURCES = [
     Comment --> Attribution["コメントにSkill/MCPの<br/>出典を明示(Attribution)"]`,
   `flowchart TD
     Task["タスクの性質を評価"] --> Simple{"構文・定型文・<br/>ボイラープレート程度か?"}
-    Simple -- "はい" --> Fast["高速・低コストモデル<br/>(Haiku系 / Grok Code Fast 等)"]
+    Simple -- "はい" --> Fast["高速・低コストモデル<br/>(Haiku系 / Gemini 3.8 Flash 等)"]
     Simple -- "いいえ" --> Mid{"標準的な機能実装・<br/>アルゴリズムか?"}
     Mid -- "はい" --> Balanced["バランス型モデル<br/>(Sonnet系 / GPT-6.1 Sol・GPT-6 Sol等)を<br/>中程度の推論レベルで"]
     Mid -- "いいえ" --> Hard{"アーキテクチャ設計・<br/>ミッションクリティカルな判断か?"}
