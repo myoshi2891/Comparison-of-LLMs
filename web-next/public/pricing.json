@@ -821,7 +821,7 @@
     },
     {
       "provider": "Google AI",
-      "name": "Gemini Omni Flash",
+      "name": "Gemini Omni Flash Preview",
       "tag": "Multimodal",
       "cls": "tag-bal",
       "price_in": 1.5,
