@@ -2044,8 +2044,9 @@ export default function GrokBestPracticesIntermediatePage() {
           <h3>12.1 Batch API（非同期処理割引）</h3>
           <p>
             リアルタイム性が不要な大量処理は Batch API で最大 <strong>20%</strong>{" "}
-            の割引を受けられます（対象: <code>grok-4.3</code>, <code>grok-4.20-0309-reasoning</code>
-            , <code>grok-4.20-0309-non-reasoning</code>, <code>grok-4.20-multi-agent-0309</code>）。
+            の割引を受けられます（対象: <code>grok-4.7</code>, <code>grok-4.6</code>,{" "}
+            <code>grok-4.5</code>, <code>grok-4.3</code>, <code>grok-4.20-0309-reasoning</code>,{" "}
+            <code>grok-4.20-0309-non-reasoning</code>, <code>grok-4.20-multi-agent-0309</code>）。
           </p>
 
           <div className={styles.tableWrap}>

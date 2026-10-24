@@ -41,4 +41,15 @@ describe("GrokBestPracticesIntermediatePage", () => {
       "モデル選定: grok-4.7（汎用。既存システムの互換性維持なら grok-4.5）/ grok-4.3（長文脈・低コスト）/ grok-4.20-multi-agent（ディープリサーチ）を用途で使い分けたか"
     );
   });
+
+  it("12.1 Batch API の対象モデル一覧に grok-4.7, grok-4.6, grok-4.5 を含む", () => {
+    const { container } = render(<GrokBestPracticesIntermediatePage />);
+    const heading = Array.from(container.querySelectorAll("h3")).find(
+      (h) => h.textContent === "12.1 Batch API（非同期処理割引）"
+    );
+    const paragraph = heading?.nextElementSibling;
+    expect(paragraph?.textContent?.replace(/\s+/g, " ").trim()).toBe(
+      "リアルタイム性が不要な大量処理は Batch API で最大 20% の割引を受けられます（対象: grok-4.7, grok-4.6, grok-4.5, grok-4.3, grok-4.20-0309-reasoning, grok-4.20-0309-non-reasoning, grok-4.20-multi-agent-0309）。"
+    );
+  });
 });

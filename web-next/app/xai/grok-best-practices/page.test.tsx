@@ -157,4 +157,15 @@ describe("xAI Grok Best Practices Page", () => {
       `出典: Pricing | xAI Docs（最終更新 2026年7月3日。grok-4.5 以前のモデルの価格の基準時点）。${grok47}`,
     ]);
   });
+
+  it("11.3 Batch API の割引注記に grok-4.7・grok-4.6・grok-4.5・grok-4.3・grok-4.20系の 20% 割引と他モデルの対象外を記載する", () => {
+    const { container } = render(<Page />);
+    const heading = Array.from(container.querySelectorAll("h3")).find(
+      (h) => h.textContent === "11.3 Batch API（非同期・割引あり）"
+    );
+    const note = heading?.nextElementSibling?.nextElementSibling?.nextElementSibling;
+    expect(note?.textContent?.replace(/\s+/g, " ").trim()).toBe(
+      "grok-4.7・grok-4.6・grok-4.5・grok-4.3・grok-4.20系は20%割引、それ以外のモデルは割引対象外です。"
+    );
+  });
 });

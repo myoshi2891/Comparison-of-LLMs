@@ -1851,7 +1851,7 @@ export default function GrokBestPracticesPage() {
             </tbody>
           </table>
           <p className={styles.muted}>
-            grok-4.3・grok-4.20系は20%割引、それ以外のモデルは割引対象外です。
+            grok-4.7・grok-4.6・grok-4.5・grok-4.3・grok-4.20系は20%割引、それ以外のモデルは割引対象外です。
           </p>
 
           <h3>11.4 Priority Processing（優先処理）</h3>
