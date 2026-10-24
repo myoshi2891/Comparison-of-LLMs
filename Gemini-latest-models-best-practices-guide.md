@@ -363,6 +363,13 @@ while interaction.status in ("in_progress", "queued"):
     time.sleep(5)
     interaction = client.interactions.get(id=interaction.id)
 
+# completed 以外(incomplete / failed / cancelled など)は部分出力を返さず、再試行・エラー処理へ回す
+if interaction.status != "completed":
+    raise RuntimeError(
+        f"Interaction {interaction.id} ended with status={interaction.status}; "
+        "incomplete は max_output_tokens を上げて再実行、failed は再試行する"
+    )
+
 # ホップごとに model_output ステップが増えるので、すべて連結する
 text = "".join(
     content.text
@@ -560,7 +567,7 @@ interaction = client.interactions.create(
 
 ### 何をするか
 
-Gemini 3 以降は、**推論状態を暗号化した Thought Signature** を次のリクエストに返す必要があります。Interactions API の**ステートフル運用(`previous_interaction_id`)**を使えば、サーバーが管理するため手作業は最小になります。
+Gemini 3 以降は、**推論状態を暗号化した Thought Signature** を次のリクエストに返す必要があります。手動での受け渡しが必要なのは、**`generateContent` と、履歴を自前で管理するステートレス運用**だけです(受け取った署名・思考ブロックを改変せずに再送する)。Interactions API の**ステートフル運用(`store: true` + `previous_interaction_id`)**では署名をサーバーが管理するため、手動での署名処理は不要です。
 
 ### なぜか
 
