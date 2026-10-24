@@ -25,18 +25,18 @@ describe("ZaiGlmBestPracticesPage", () => {
     expect(h2s.length).toBe(17);
   });
 
-  it("軽量タスクの指針で GLM-5.3 の強制 thinking を他モデルの disabled と区別する", async () => {
+  it("軽量タスクの指針で thinking disabled を GLM-4.6 以降に限定し、GLM-5.3 の強制 thinking と区別する", async () => {
     const page = await Page();
     const { container } = render(page);
     const item = Array.from(container.querySelectorAll("li")).find((li) =>
       li.textContent?.startsWith("単純なFAQ応答や定型フォーマット変換")
     );
     expect(item?.textContent?.replace(/\s+/g, " ").trim()).toBe(
-      '単純なFAQ応答や定型フォーマット変換のような軽量タスクでは、GLM-5.3 系以外のモデルなら thinking: {"type": "disabled"} にして応答速度とコストを最適化する。GLM-5.3 / GLM-5.3-Flash / GLM-5.3-FlashX は thinking が強制で無効化できない(thinking.type は enabled のまま)ため、代わりに reasoning_effort: "low" を指定して思考量を抑える。'
+      '単純なFAQ応答や定型フォーマット変換のような軽量タスクでは、GLM-4.6 以降(GLM-5.3 系を除く)のモデルなら thinking: {"type": "disabled"} にして応答速度とコストを最適化する。GLM-4.5-Flash など GLM-4.6 より前のモデルでは thinking パラメータを指定せず省略する。GLM-5.3 / GLM-5.3-Flash / GLM-5.3-FlashX は thinking が強制で無効化できない(thinking.type は enabled のまま)ため、代わりに reasoning_effort: "low" を指定して思考量を抑える。'
     );
   });
 
-  it("チェックリストの軽量タスク項目で GLM-5.3 系は thinking を有効のまま low にすると区別する", async () => {
+  it("チェックリストの軽量タスク項目で GLM-4.6 以降のみ無効化し、より前は省略、GLM-5.3 系は有効のまま low にすると区別する", async () => {
     const page = await Page();
     const { container } = render(page);
     const row = Array.from(container.querySelectorAll("tr")).find((tr) =>
@@ -47,7 +47,7 @@ describe("ZaiGlmBestPracticesPage", () => {
         td.textContent?.replace(/\s+/g, " ").trim()
       )
     ).toEqual([
-      '複雑な推論タスクでのみreasoning_effort=maxを使い、軽量タスクではGLM-5.3 系以外ならthinkingを無効化、GLM-5.3 系ならthinkingを有効のままreasoning_effort: "low"にしているか',
+      '複雑な推論タスクでのみreasoning_effort=maxを使い、軽量タスクではGLM-4.6 以降(GLM-5.3 系を除く)ならthinkingを無効化、GLM-4.6 より前のモデルはthinkingを省略、GLM-5.3 系ならthinkingを有効のままreasoning_effort: "low"にしているか',
       "7, 13",
     ]);
   });

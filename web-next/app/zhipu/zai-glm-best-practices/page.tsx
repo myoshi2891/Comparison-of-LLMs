@@ -982,12 +982,15 @@ export default function ZaiGlmBestPracticesPage() {
                 を組み合わせる。
               </li>
               <li className={styles.li}>
-                単純なFAQ応答や定型フォーマット変換のような軽量タスクでは、GLM-5.3
-                系以外のモデルなら{" "}
+                単純なFAQ応答や定型フォーマット変換のような軽量タスクでは、GLM-4.6
+                以降(GLM-5.3 系を除く)のモデルなら{" "}
                 <code className={styles.codeInline}>
                   thinking: &#123;&quot;type&quot;: &quot;disabled&quot;&#125;
                 </code>{" "}
-                にして応答速度とコストを最適化する。GLM-5.3 / GLM-5.3-Flash / GLM-5.3-FlashX は
+                にして応答速度とコストを最適化する。GLM-4.5-Flash
+                など GLM-4.6 より前のモデルでは{" "}
+                <code className={styles.codeInline}>thinking</code>{" "}
+                パラメータを指定せず省略する。GLM-5.3 / GLM-5.3-Flash / GLM-5.3-FlashX は
                 thinking が強制で無効化できない(
                 <code className={styles.codeInline}>thinking.type</code> は enabled
                 のまま)ため、代わりに{" "}
@@ -2098,7 +2101,9 @@ export default function ZaiGlmBestPracticesPage() {
                   <td>
                     複雑な推論タスクでのみ
                     <code className={styles.codeInline}>reasoning_effort=max</code>
-                    を使い、軽量タスクではGLM-5.3 系以外ならthinkingを無効化、GLM-5.3
+                    を使い、軽量タスクではGLM-4.6
+                    以降(GLM-5.3 系を除く)ならthinkingを無効化、GLM-4.6
+                    より前のモデルはthinkingを省略、GLM-5.3
                     系ならthinkingを有効のまま
                     <code className={styles.codeInline}>reasoning_effort: "low"</code>
                     にしているか
