@@ -112,7 +112,7 @@ flowchart LR
 | キャッシュ | **明示キャッシュ(`cachedContents` / `caches.create`)は非対応でエラー**。**暗黙キャッシュのみ**(4,096トークン以上のプロンプトで有効、キャッシュヒット入力は95%割引) |
 | 提供 | 有料 Gemini API、Google AI Studio、Antigravity、対象の Gemini Enterprise。**無料枠では使えない** |
 | 新機能 | エージェント型動画理解が GA、Managed Agents(Antigravity)で利用可 |
-| タイムアウト | 難しいプロンプトは数分かかる。**HTTPクライアントのタイムアウトは15分以上**、または background 実行 |
+| タイムアウト | 難しいプロンプトは数分かかる。**HTTPクライアントのタイムアウトは20分**、または background 実行 |
 
 ### 1.5 ベンチマークの読み方(ベンダー報告と独立評価を分けて見る)
 
@@ -315,7 +315,7 @@ flowchart TD
 ### よくある失敗
 
 - 「トークンを減らしたい」ときに `max_output_tokens` を下げる → **思考で使い切って答えが空になる**。トークンを減らすなら `thinking_level` を下げる(公式の注意)。
-- Gemini 3.5 以前の `thinking_budget` を残す → 3.6 以降は `thinking_level`(文字列)へ置換する。
+- `thinking_budget` を残す → `thinking_budget` は Gemini 2.5 系向け。Gemini 3.5 Flash / 3.5 Flash-Lite を含む新しいモデルは `thinking_level`(文字列)へ置換する。
 
 ---
 
@@ -423,7 +423,7 @@ flowchart TD
 | すべての `event_id` を保存 | テキスト差分だけでなく `status_update` にも付く |
 | 再接続は `last_event_id` で | 最後の `event_id` を指定して `get` を `stream` で呼ぶ |
 | 読み切ってから状態確認 | 再接続後はストリームを最後まで読む(取りこぼしイベントは再送される) |
-| 読み取りタイムアウト | **15〜20分** |
+| 読み取りタイムアウト | **20分**(公式推奨は1ストリームあたり15〜20分の範囲) |
 | 最初の64K以降 | 約5,000トークンの塊で届く。**間が空いても止まっていない** |
 
 ### トークン数の数え方(落とし穴)
@@ -451,7 +451,7 @@ Gemini 3.6 以降(および今後のすべての世代)で適用される API �
 | 7 | モデルターンの事前入力(prefill) | 廃止。`system_instruction` や構造化出力で代替 | **400エラー**(最後の非空ターンが model の場合) |
 | 8 | `candidate_count` | 削除(Gemini 3以降非対応) | エラーまたは無視 |
 | 9 | `max_output_tokens` | 32,768以上へ引き上げ(Argonは思考に枠を使う) | 空応答・途中切れ |
-| 10 | タイムアウト | HTTPクライアントを15分以上、または背景実行 | 難問で切断 |
+| 10 | タイムアウト | HTTPクライアントを20分、または背景実行 | 難問で切断 |
 | 11 | 会話状態 | `previous_interaction_id` でサーバー側に保持 | 署名欠落・履歴不整合 |
 | 12 | 関数呼び出し | 応答の対応(`id` / `name` / 件数)を厳密に一致させる | 400エラー(Step 7) |
 
@@ -795,7 +795,7 @@ flowchart TD
 
 | 項目 | ベストプラクティス |
 | --- | --- |
-| タイムアウト | HTTP は **15分以上**。難問は背景実行 + ポーリング / ストリーム再接続 |
+| タイムアウト | HTTP は **20分**。難問は背景実行 + ポーリング / ストリーム再接続 |
 | フォールバック | Argon が使えない・レート制限・到達不可のとき **3.8 Flash へ自動フォールバック**するラッパーを用意(Argon は無料枠不可) |
 | 空応答の監視 | `incomplete` かつ本文が空 → 思考で上限を使い切った兆候。`max_output_tokens` と思考水準を見直す |
 | 非推奨の追跡 | モデルごとの退役日(提供面で異なる)を CI で定期チェック |
@@ -803,7 +803,7 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    A["リクエスト"] --> B["Argon で実行<br/>タイムアウト15分以上"]
+    A["リクエスト"] --> B["Argon で実行<br/>タイムアウト20分"]
     B --> C{"成功?"}
     C -->|"はい"| D["usage とキャッシュ率を記録"]
     C -->|"レート制限・到達不可"| E["gemini-3.8-flash へフォールバック"]
@@ -855,8 +855,8 @@ flowchart TD
 | 症状 | 原因 | 対処 |
 | --- | --- | --- |
 | 応答が空だが課金される | 思考で `max_output_tokens` を使い切った(`incomplete`) | 上限を32,768以上に。必要なら思考水準を下げる |
-| 出力が64Kで止まる | `background` が `false`、または上限未設定 | `background: true` + `max_output_tokens` > 65,536 |
-| 400: `max_output_tokens` > 65536 は `background=false` で未対応 | Long Decode は背景実行が前提 | `background: true` にする |
+| 出力が64Kで止まる | Interactions API: `background` が `false`、または上限未設定。GenerateContent API: 自動継続を無効化した、または上限未設定 | Interactions API: `background: true` + `max_output_tokens` > 65,536。GenerateContent API: 最新 SDK の自動継続(既定で有効)に任せるか、`finish_reason` が `CONTINUATION` のとき `continuation_token` を付けて再送する(`background` は GenerateContent のパラメータではない) |
+| 400(Interactions API): `max_output_tokens` > 65536 は `background=false` で未対応 | Interactions API の Long Decode は背景実行が前提 | `background: true` にする(GenerateContent API では自動継続または `continuation_token` を使う) |
 | 400: `store=true is required` | 背景実行は保存が必須 | `store: true` |
 | `temperature` を変えても出力が変わらない | Argon は無視する | 引数を削除し、`system_instruction` で制御 |
 | `caches.create` でエラー | Argon は明示キャッシュ非対応 | 削除し、暗黙キャッシュ設計へ |
@@ -865,7 +865,7 @@ flowchart TD
 | 関数呼び出しで400 | 署名欠落、または応答の `id` / `name` / 件数の不一致 | 状態管理を Interactions API に寄せる。応答を厳密に対応づける |
 | `Malformed_Function_Call` | ツール前のテキスト要件 | 公式の回避策ページに従う |
 | 想定よりコストが高い | キャッシュ不発(プレフィックスの変動)/ 出力トークン過多 | `total_cached_tokens` を確認。共通部分を先頭へ。思考水準を下げる |
-| 長いストリームが途中で切れる | 接続断は起こりうる | `event_id` を保存し `last_event_id` で再接続。タイムアウト15〜20分 |
+| 長いストリームが途中で切れる | 接続断は起こりうる | `event_id` を保存し `last_event_id` で再接続。タイムアウト20分 |
 | コンテキスト圧縮が早すぎる | `total_input_tokens`(各ホップ入力の合計)を実サイズと誤認 | 実サイズ = プロンプト + 出力 + 思考 で推定 |
 | Antigravity で自分のツール解析が壊れた | 09-2026版でツール引数・編集方式が変更 | PascalCase引数・行範囲置換へ対応 |
 | 無料キーで Argon が呼べない | 無料枠対象外 | 課金有効なプロジェクトのキーを使う |
@@ -888,7 +888,7 @@ flowchart TD
 - [ ] `thinking_budget` を `thinking_level` に置換した
 - [ ] 明示キャッシュ(`caches.create`)を削除した
 - [ ] `max_output_tokens` を32,768以上にした
-- [ ] HTTPタイムアウトを15分以上にした(または背景実行)
+- [ ] HTTPタイムアウトを20分にした(または背景実行)
 
 ### C. 設計
 
@@ -983,6 +983,7 @@ flowchart TD
 | Gemini 4 Argon 発表(Google ブログ) | https://blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-gemini-4-argon/ |
 | Gemini 4 Argon 開発者ガイド(AI Studio) | https://aistudio.google.com/learn/gemini-4-argon-developer-guide |
 | Long decode ガイド | https://ai.google.dev/gemini-api/docs/long-decode |
+| Long decode ガイド(GenerateContent API・クライアント側継続) | https://ai.google.dev/gemini-api/docs/generate-content/long-decode |
 | What's new in Gemini 3.8 Flash | https://ai.google.dev/gemini-api/docs/whats-new-gemini-3.8 |
 | What's new in Gemini 3.6 Flash and 3.5 Flash-Lite | https://ai.google.dev/gemini-api/docs/whats-new-gemini-3.6 |
 | What's new in Gemini 3.7 Flash | https://ai.google.dev/gemini-api/docs/whats-new-gemini-3.7 |
