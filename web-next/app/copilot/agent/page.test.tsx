@@ -126,9 +126,20 @@ describe("/copilot/agent - static source safety", () => {
 describe("Planner 例のモデル優先リスト", () => {
   it("Copilot Pro でも選択できる Claude Sonnet 5.5 を含む", () => {
     const { container } = render(<CopilotAgentPage />);
-    const lines = Array.from(container.querySelectorAll("[class*='codeLine']")).map((l) =>
-      (l.textContent ?? "").replace(/\s+/g, " ").trim()
+    // ページ全体の部分一致では別ブロックや追加の model 行を見逃すため、
+    // planner.agent.md ラベル直後の pre に絞り、model 行の全モデルを順序込みで照合する。
+    const label = Array.from(container.querySelectorAll("[class*='codeLabel']")).find(
+      (el) => el.textContent?.trim() === "planner.agent.md"
     );
-    expect(lines).toContain("model: ['Claude Opus 5.5', 'GPT-6.1 Sol', 'Claude Sonnet 5.5']");
+    const block = label?.nextElementSibling;
+    expect(block?.tagName).toBe("PRE");
+    const modelLines = Array.from(block?.querySelectorAll("[class*='codeLine']") ?? []).filter(
+      (l) => (l.textContent ?? "").trim().startsWith("model:")
+    );
+    expect(modelLines).toHaveLength(1);
+    const models = Array.from(modelLines[0]?.querySelectorAll("[class*='cs']") ?? []).map((s) =>
+      (s.textContent ?? "").trim()
+    );
+    expect(models).toEqual(["'Claude Opus 5.5'", "'GPT-6.1 Sol'", "'Claude Sonnet 5.5'"]);
   });
 });
