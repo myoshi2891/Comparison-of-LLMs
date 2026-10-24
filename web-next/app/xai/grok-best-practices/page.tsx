@@ -1776,7 +1776,7 @@ export default function GrokBestPracticesPage() {
                 <td>
                   <code>x_search</code>
                 </td>
-                <td>$5</td>
+                <td>$5（ポスト取得 1,000件あたり）/ $10（ユーザープロフィール取得 1,000件あたり）</td>
               </tr>
               <tr>
                 <td>Code Execution</td>
