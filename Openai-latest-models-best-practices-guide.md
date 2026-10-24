@@ -525,8 +525,9 @@ flowchart TD
 
 公式は、OpenAI Docsスキルを使ったCodexでの機械的な移行を案内しています。
 
-```bash
-# Codex上で実行(OpenAI Docsスキルが必要)
+Codex に入力するプロンプト例(シェルでは実行しません。OpenAI Docsスキルが必要):
+
+```text
 $openai-docs migrate this project to the GPT-6 model family
 ```
 
