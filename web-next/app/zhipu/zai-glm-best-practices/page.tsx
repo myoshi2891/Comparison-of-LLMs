@@ -911,7 +911,8 @@ export default function ZaiGlmBestPracticesPage() {
                     <code className={styles.codeInline}>low</code>
                   </td>
                   <td>
-                    GLM-5.3 / GLM-5.3-Flash では <code className={styles.codeInline}>high</code>{" "}
+                    GLM-5.3 / GLM-5.3-Flash / GLM-5.3-FlashX では{" "}
+                    <code className={styles.codeInline}>high</code>{" "}
                     より浅い軽量推論として区別され、思考量・コスト・遅延を抑えられる。それ以前のモデルでは内部的に
                     <code className={styles.codeInline}>high</code>として扱われる
                   </td>
