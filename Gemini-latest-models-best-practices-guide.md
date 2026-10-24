@@ -597,7 +597,7 @@ flowchart TD
 | マルチモーダル | 画像などは**応答ペイロードの中**に入れる(別パートにしない) |
 | 追加指示 | 関数応答テキストの末尾に **`\n\n` 区切りで追記**(別パートにしない) |
 | `Malformed_Function_Call` | ツール前のテキスト要件に起因する場合は、公式の回避策ページに従う |
-| `generateContent` を使う場合のみ | すべての `FunctionResponse` に `call_id` と `name` を含める |
+| `generateContent` を使う場合のみ | 各 `FunctionResponse` の **`id`** に元の `functionCall.id` を設定して対応付け、`name` も含める(`call_id` は Interactions API の `function_result` 側のフィールド) |
 
 ```python
 # 追加指示は「応答テキストの末尾」に \n\n で付ける
