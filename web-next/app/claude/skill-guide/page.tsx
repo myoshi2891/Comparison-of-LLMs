@@ -209,8 +209,9 @@ style EXT fill:#1a2535,stroke:#3b5270,color:#e6edf3`}
               <span className={styles.calloutIcon}>ℹ️</span>
               <p>
                 旧バージョンの <code>.claude/commands/</code> によるスラッシュコマンドは現在{" "}
-                <code>skills/</code> に統合されています。<code>invocation: explicit</code>
-                を指定することで同等の手動呼び出し動作が得られます。
+                <code>skills/</code> に統合されています。
+                <code>disable-model-invocation: true</code>
+                を指定して自動呼び出しを無効化することで、同等の手動呼び出し動作が得られます。
               </p>
             </div>
             <h3>各要素の役割比較</h3>
@@ -684,7 +685,7 @@ CC->>U: 手順に従ったコードレビュー結果`}
                 </div>
               </div>
             </div>
-            <h3>invocation フィールドで制御する</h3>
+            <h3>disable-model-invocation フィールドで制御する</h3>
             <div className={styles.codeBlock}>
               <div className={styles.codeBlockHeader}>
                 <div className={styles.codeBlockDots}>
@@ -698,17 +699,17 @@ CC->>U: 手順に従ったコードレビュー結果`}
                 <code>
                   <span className={styles.cmt}># Claude が自動判断（デフォルト）</span>
                   {"\n"}
-                  <span className={styles.key}>invocation</span>
+                  <span className={styles.key}>disable-model-invocation</span>
                   {": "}
-                  <span className={styles.val}>automatic</span>
+                  <span className={styles.val}>false</span>
                   {"\n\n"}
                   <span className={styles.cmt}>
-                    # /deploy と入力したときのみ実行（破壊的操作に推奨）
+                    # 自動呼び出しを無効化し、/deploy と入力したときのみ実行（破壊的操作に推奨）
                   </span>
                   {"\n"}
-                  <span className={styles.key}>invocation</span>
+                  <span className={styles.key}>disable-model-invocation</span>
                   {": "}
-                  <span className={styles.val}>explicit</span>
+                  <span className={styles.val}>true</span>
                 </code>
               </pre>
             </div>
