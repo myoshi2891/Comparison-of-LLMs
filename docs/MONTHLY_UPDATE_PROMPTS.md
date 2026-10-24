@@ -75,7 +75,7 @@ grep -nE 'toBe\(|toContain|toMatch' app/<path>/page.test.tsx
 
 ```bash
 cd web-next
-grep -rnoE --include='*.tsx' --include='*.ts' --include='*.json' "(gpt-[0-9][a-z0-9.-]*|gemini-[0-9][a-z0-9.-]*|claude-([a-z]+-)?[0-9][a-z0-9.-]*|grok-[a-z0-9][a-z0-9.-]*|deepseek-[a-z0-9.-]+|glm-[0-9][a-z0-9.-]*|kimi-[a-z0-9][a-z0-9.-]*|llama-?[0-9][a-z0-9.-]*|phi-[0-9][a-z0-9.-]*)" app/<path>/ | sort -u
+grep -rnoiE --include='*.tsx' --include='*.ts' --include='*.json' "(gpt-[0-9][a-z0-9.-]*|gemini-[0-9][a-z0-9.-]*|claude-([a-z]+-)?[0-9][a-z0-9.-]*|grok-[a-z0-9][a-z0-9.-]*|deepseek-[a-z0-9.-]+|glm-[0-9][a-z0-9.-]*|kimi-[a-z0-9][a-z0-9.-]*|llama-?[0-9][a-z0-9.-]*|phi-[0-9][a-z0-9.-]*|\bo[0-9][a-z0-9.-]*|codex-[a-z0-9.-]+|mai-[a-z0-9.-]+)" app/<path>/ | sort -u
 ```
 
 | 参照先（一次情報） | 確認内容 |
