@@ -13,7 +13,7 @@ Trigger: 月次更新, 価格アップデート, monthly update, 価格改定の
 
 ## Goal
 
-`docs/MONTHLY_UPDATE_PROMPTS.md` の画面一覧に掲載した52画面（Providers ナビ全43ページを含む）と、一覧外の registry 登録ページ（全件は `web-next/lib/page-registry.ts` が正。同ファイル末尾の汎用テンプレートで扱う）（AIモデルコスト計算機、各種AIエージェントガイド、スラッシュコマンド完全ガイド、Code Review ツール料金比較ページなど）の価格データ、API仕様、バージョン番号、一次情報源リンクを毎月最新に保ち、不整合を防ぐ。
+`docs/MONTHLY_UPDATE_PROMPTS.md` の画面一覧に掲載した52画面（AIモデルコスト計算機、各種AIエージェントガイド、スラッシュコマンド完全ガイド、Code Review ツール料金比較ページ、Providers ナビ全43ページなど）と、一覧外の registry 登録ページ（推薦書籍 `/books/*` など。全件は `web-next/lib/page-registry.ts` が正。同ファイル末尾の汎用テンプレートで扱う）の価格データ、API仕様、バージョン番号、一次情報源リンクを毎月最新に保ち、不整合を防ぐ。
 
 > **必読**: 画面別の具体プロンプト・検証チェックリスト・**「頻出レビュー指摘 & 事前チェック」**は
 > `docs/MONTHLY_UPDATE_PROMPTS.md` に集約。本スキルは全体ワークフローのガイド。

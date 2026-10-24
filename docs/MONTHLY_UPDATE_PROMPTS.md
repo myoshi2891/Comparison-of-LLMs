@@ -37,11 +37,11 @@
 | SOURCES セクションのラベル | `参考ソース一覧 — 2026年X月更新版` |
 | フッター | `Last updated: June 2026` / `最終更新: 2026年X月` |
 
-**事前 grep（対象 page.tsx で必ず実行し、全ヒットを確認）**: 下記「指摘5」で維持と定めた日付（情報基準日・「YYYY年M月時点」などの記録日）は残し、当月への更新が必要な日付だけを書き換える。
+**事前 grep（対象ページのディレクトリで必ず実行し、全ヒットを確認。`Sidebar.tsx` 等の関連ファイルにも日付があるため `page.tsx` だけに絞らない）**: 下記「指摘5」で維持と定めた日付（情報基準日・「YYYY年M月時点」などの記録日）は残し、当月への更新が必要な日付だけを書き換える。
 
 ```bash
 cd web-next
-grep -nE '(20[0-9]{2}年[0-9]{1,2}月|(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]* 20[0-9]{2}|Last updated|最終更新|更新版|時点|as of|情報基準日)' app/<path>/page.tsx
+grep -rnE '(20[0-9]{2}年[0-9]{1,2}月|(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]* 20[0-9]{2}|Last updated|最終更新|更新版|時点|as of|情報基準日)' app/<path>/
 ```
 
 英語月名（`May`→`June`）と和文（`2026年5月`→`2026年6月`）の**両方**を揃えること。
@@ -2031,6 +2031,10 @@ web-next/app/<path>/page.tsx を読んでください。
    - Microsoft Foundry: https://learn.microsoft.com/en-us/azure/foundry/openai/concepts/model-retirement-schedule
    - DeepSeek / xAI / Z.ai: https://api-docs.deepseek.com/updates/ / https://docs.x.ai/docs/models
      / https://docs.z.ai/guides/overview/pricing
+   - AWS (Amazon Bedrock): https://docs.aws.amazon.com/bedrock/latest/userguide/doc-history.html
+     / https://aws.amazon.com/bedrock/pricing/（価格は scraper/src/scraper/providers/aws.py の Price List API）
+   - Moonshot (Kimi): https://platform.moonshot.ai/docs/pricing（scraper/src/scraper/providers/moonshot.py と同じ取得元）
+   - Meta (Llama API): https://dev.meta.ai/docs/pricing-rate-limits（scraper/src/scraper/providers/meta.py と同じ取得元）
 
 2. [優先度判定] 変更が大きい画面から着手する
    推奨: プロバイダー単位で一次情報を一度だけ調べ、同じプロバイダーの画面をまとめて更新する
