@@ -109,7 +109,9 @@ export default function Page() {
       </button>
       <aside className={styles.sidebar} id="sidebar">
         <div className={styles.sidebarBrand}>
-          <span className={styles.brandTag}>2026-07-17 時点</span>
+          <span className={styles.brandTag}>
+            2026-07-17 基準 ／ 2026-10-22 更新（Gemini 4 Argon）
+          </span>
           <div className={styles.brandTitle}>
             Gemini Enterprise
             <br />
@@ -178,6 +180,9 @@ export default function Page() {
           <div className={styles.metaRow}>
             <span className={`${styles.pill} ${styles.pillStrong}`}>
               2026年7月17日時点の情報に基づく
+            </span>
+            <span className={styles.pill}>
+              2026年10月22日更新: Gemini 4 Argon（2026年10月13日GA）を追記
             </span>
             <span className={styles.pill}>Vertex AI からの刷新版</span>
             <span className={styles.pill}>Mermaid 図解 7点</span>

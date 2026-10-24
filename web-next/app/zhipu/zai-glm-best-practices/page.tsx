@@ -903,7 +903,7 @@ export default function ZaiGlmBestPracticesPage() {
                   </td>
                   <td>
                     内部的に<code className={styles.codeInline}>high</code>
-                    として扱われる(GLM-5.3 / GLM-5.3-Flash は非対応)
+                    として扱われる(GLM-5.3 / GLM-5.3-Flash / GLM-5.3-FlashX は非対応)
                   </td>
                 </tr>
                 <tr>
