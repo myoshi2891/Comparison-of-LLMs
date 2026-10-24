@@ -139,9 +139,11 @@ flowchart LR
 ## Step 1: 環境を整える(Interactions API を軸にする)
 
 ### 何をするか
+
 Gemini 3 世代以降の新機能(サーバー側の会話状態管理、背景実行、Managed Agents、Long Decode)は **Interactions API** を中心に提供されています。まず SDK と認証、最小の呼び出しを確立します。
 
 ### なぜか
+
 - Interactions API は **モデルとエージェントを同じインターフェースで扱う**統一API。
 - `previous_interaction_id` で **会話状態と Thought Signatures をサーバー側で保持**でき、クライアントの履歴管理ミスを減らせる(Philipp Schmid の解説でも「再送不要・署名の自動管理」が利点として挙げられています)。
 - Argon の Long Decode(1Mトークン出力)は **背景実行(background)を前提**にした仕組み。
@@ -180,6 +182,8 @@ first = client.interactions.create(
 second = client.interactions.create(
     model="gemini-4-argon",
     input="では、トランザクションロックを安全に書き直して。",
+    # system_instruction は会話履歴として引き継がれないため、各リクエストで指定し直す
+    system_instruction="あなたはシニアのバックエンドエンジニアです。根拠のない断定はしないでください。",
     previous_interaction_id=first.id,   # サーバー側の状態を引き継ぐ
 )
 print(second.output_text)
@@ -208,6 +212,7 @@ sequenceDiagram
 ```
 
 ### 確認方法
+
 - 最小リクエストが成功し、`interaction.output_text` が返る。
 - 2回目の呼び出しで、1回目の文脈が踏まえられている。
 
@@ -218,9 +223,11 @@ sequenceDiagram
 ## Step 2: ワークロードに合うモデルを選ぶ
 
 ### 何をするか
+
 「最上位を常用する」のではなく、**難所だけ Argon、量をこなす部分は Flash / Flash-Lite** という階層設計にします。
 
 ### なぜか
+
 - Argon は導入価格でも Flash より高く、**12/1 以降は単価が2倍**。
 - 独立評価でもトークン消費は多め(Intelligence Index 1タスクあたり出力約62kトークンという報告)で、**1トークン単価ではなく1タスク単価**で判断する必要がある。
 - Google 自身が **Argon を計画役・レビュー役、3.8 Flash を並列のサブエージェント**にする構成を提案している、と提供各社のドキュメントが伝えています。
@@ -263,9 +270,11 @@ flowchart TD
 ## Step 3: thinking_level を設計する
 
 ### 何をするか
+
 `thinking_level` を「品質・遅延・トークン消費」の**主要ダイヤル**として扱い、**3水準すべてで自社評価を回し、基準を満たす最低の水準**を採用します。
 
 ### なぜか
+
 - 公式が「`low` / `medium` / `high` の3水準で評価し、品質基準を満たす最低水準を選ぶ」と明記しています。
 - 個人ベンチ(paddo.dev)でも、**努力水準を上げても常に良くなるわけではない**ことが報告されています(Claude / GPT 系での実測で、既定の medium が最適だった例。他社モデルの結果なので Gemini にそのまま当てはまるとは限らず、**自社で測る**のが原則)。
 
@@ -304,6 +313,7 @@ flowchart TD
 ```
 
 ### よくある失敗
+
 - 「トークンを減らしたい」ときに `max_output_tokens` を下げる → **思考で使い切って答えが空になる**。トークンを減らすなら `thinking_level` を下げる(公式の注意)。
 - Gemini 3.5 以前の `thinking_budget` を残す → 3.6 以降は `thinking_level`(文字列)へ置換する。
 
@@ -312,9 +322,11 @@ flowchart TD
 ## Step 4: max_output_tokens と Long Decode を使いこなす
 
 ### 何をするか
+
 `max_output_tokens` を「**思考+出力の合計上限**」として設計し、64Kを超える必要があるときだけ **Long Decode(背景実行)** を使います。
 
 ### なぜか
+
 - Argon は思考にも出力枠を使うため、**低い上限だと思考だけで切れて空の応答**になりうる。
 - Long Decode は **64Kトークンずつの「ホップ」** で続きを生成し、サーバーが自動で連結する。使いすぎるとコストと時間が膨らむ。
 
@@ -338,7 +350,8 @@ client = genai.Client()
 interaction = client.interactions.create(
     model="gemini-4-argon",
     input="素数定理の完全で厳密な証明を書いてください。",
-    background=True,                      # Long Decode は背景実行が前提(store: true が必要)
+    background=True,                      # Long Decode は背景実行が前提
+    store=True,                           # 背景実行には store=True が必要(store=False とは併用不可)
     generation_config={
         "max_output_tokens": 262144,      # 65,536 を超える値を必ず設定する
         "thinking_level": "high",
@@ -407,6 +420,7 @@ flowchart TD
 | 最初の64K以降 | 約5,000トークンの塊で届く。**間が空いても止まっていない** |
 
 ### トークン数の数え方(落とし穴)
+
 `usage.total_input_tokens` は **各ホップの入力の合計**で、実際のコンテキスト長ではありません。たとえば1,000トークンのプロンプトで20万トークンを生成すると、入力合計は約39.7万トークンと表示されますが、実コンテキストは約20.1万トークンです。**要約・圧縮(コンテキスト圧縮)の判断に `total_input_tokens` を使わない**でください。実サイズの推定は「プロンプト + `total_output_tokens` + `total_thought_tokens`」です。
 
 ---
@@ -414,6 +428,7 @@ flowchart TD
 ## Step 5: 旧モデルからの移行で壊れやすい点を先に潰す
 
 ### 何をするか
+
 Gemini 3.6 以降(および今後のすべての世代)で適用される API 変更を、**移行前に洗い出して修正**します。多くは「エラーにならず挙動だけ変わる」ため、静かに品質が落ちます。
 
 ### 移行チェックリスト(Argon / 3.8 Flash 共通を中心に)
@@ -424,7 +439,7 @@ Gemini 3.6 以降(および今後のすべての世代)で適用される API �
 | 2 | サンプリング引数 | `temperature` / `top_p` / `top_k` を**削除** | Argon では無視される(将来の世代では400エラー) |
 | 3 | 決定性の確保 | 引数ではなく **`system_instruction` に明示的なルール**を書く | 出力の揺れが残る |
 | 4 | 明示キャッシュ | `cachedContents` / `caches.create` を**削除**(Argon) | **エラー**。暗黙キャッシュへ切替 |
-| 5 | 思考指定 | `thinking_budget` → `thinking_level`(文字列) | 指定が効かない |
+| 5 | 思考指定 | `thinking_budget` → `thinking_level`(文字列) | 後方互換で受け付けられるが非推奨で、挙動を予測しにくい。`thinking_level` と併用すると400エラー |
 | 6 | `minimal` | Argon / 3.8 Flash では使わない | エラー |
 | 7 | モデルターンの事前入力(prefill) | 廃止。`system_instruction` や構造化出力で代替 | **400エラー**(最後の非空ターンが model の場合) |
 | 8 | `candidate_count` | 削除(Gemini 3以降非対応) | エラーまたは無視 |
@@ -466,9 +481,11 @@ interaction = client.interactions.create(
 ## Step 6: プロンプトとコンテキストを設計する
 
 ### 何をするか
+
 Argon / 3.8 Flash は「**長く自律的に走らせる**」ことに強みがあります。細かいターンごとの指示ではなく、**ゴール・制約・検証基準・使える道具**を最初に渡す設計へ切り替えます。
 
 ### なぜか
+
 - 公式の開発者ガイド(AI Studio)は、Argon の長期タスクでの性能が出る条件として「**実際のフィードバックループで自分の変更を検証できること**」を挙げています。
 - Gemini 3.8 Flash は **難しい多段タスクで意図的に多くのトークンを使う**(小さな推論ステップ、反復的なツール呼び出し、途中検証)。日常タスクでは思考水準を下げて抑える、と公式が明記。
 - Philipp Schmid(Google DeepMind)は「コンテキストエンジニアリングとは、文脈を増やすことではなく**次のステップに必要な最小の有効コンテキスト**を見つけること」と整理しています。
@@ -542,9 +559,11 @@ interaction = client.interactions.create(
 ## Step 7: 関数呼び出しと Thought Signatures
 
 ### 何をするか
+
 Gemini 3 以降は、**推論状態を暗号化した Thought Signature** を次のリクエストに返す必要があります。Interactions API の**ステートフル運用(`previous_interaction_id`)**を使えば、サーバーが管理するため手作業は最小になります。
 
 ### なぜか
+
 - 署名がないと、ツール実行の間にモデルが**自分の推論ステップを「忘れる」**。
 - 関数呼び出しでは、現在のターンで署名が欠けると **400エラー**(`generateContent` の厳格検証)。通常のテキストでは厳格には検証されないが、**品質が落ちる**。
 - 画像の会話型編集でも署名は重要。
@@ -574,7 +593,7 @@ flowchart TD
 
 | 項目 | 推奨 |
 | --- | --- |
-| 応答の対応 | `id` / `name` / 件数が直前の呼び出しと**一致**(Interactions API は不一致をエラーにする) |
+| 応答の対応 | Interactions API の `function_result` は呼び出しの `id` を **`call_id`** に指定する(GenerateContent の `FunctionResponse` は `id`)。`call_id` / `name` / 件数が直前の呼び出しと**一致**(Interactions API は不一致をエラーにする) |
 | マルチモーダル | 画像などは**応答ペイロードの中**に入れる(別パートにしない) |
 | 追加指示 | 関数応答テキストの末尾に **`\n\n` 区切りで追記**(別パートにしない) |
 | `Malformed_Function_Call` | ツール前のテキスト要件に起因する場合は、公式の回避策ページに従う |
@@ -593,6 +612,7 @@ function_response_text = f"{result_text}\n\n次は、この結果を根拠に3�
 ## Step 8: エージェント設計(Managed Agents / サブエージェント)
 
 ### 何をするか
+
 (1)まずは **Managed Agents の Antigravity エージェント**で素早く立ち上げ、(2)必要に応じて**サブエージェントの型**を段階的に重くします。
 
 ### 8.1 Managed Agents(Antigravity)の基本
@@ -689,9 +709,11 @@ flowchart LR
 ## Step 9: コスト最適化(タスク単価で測る)
 
 ### 何をするか
+
 **「1トークン単価」ではなく「1タスクを解く総コスト」**で評価し、キャッシュを効かせ、価格改定(12/1)を織り込んだ見積もりを作ります。
 
 ### なぜか
+
 - Simon Willison は発表当日に「重要なのは、エージェント環境でゴールに到達するまでにモデルが使うトークン数だ」と指摘しています。
 - Artificial Analysis の測定では、Argon の導入価格でのタスク単価は $1.99(標準価格では $3.98)。一方、個人ベンチ(paddo.dev)では **トークン単価は Opus 5.5 の半分でも、出力トークンが約2.8倍で総コストは上回った**という結果も報告されています(単一ベンチ・Claude Code 経由)。**独立評価と個人ベンチで傾向が異なるため、自社タスクで測る**のが唯一確実な方法です。
 
@@ -847,11 +869,13 @@ flowchart TD
 ## 導入チェックリスト
 
 ### A. 準備
+
 - [ ] 課金が有効なプロジェクトの API キーを用意した(Argon は無料枠不可)
 - [ ] 最新の `google-genai` SDK を導入した
 - [ ] Interactions API で最小リクエストが成功した
 
 ### B. 移行(旧モデルがある場合)
+
 - [ ] `temperature` / `top_p` / `top_k` / `candidate_count` を削除した
 - [ ] prefill(最後が model ターン)を排除した
 - [ ] `thinking_budget` を `thinking_level` に置換した
@@ -860,12 +884,14 @@ flowchart TD
 - [ ] HTTPタイムアウトを15分以上にした(または背景実行)
 
 ### C. 設計
+
 - [ ] モデル階層(難所は Argon、量は Flash / Flash-Lite)を決めた
 - [ ] 3水準(`low` / `medium` / `high`)で評価し、基準を満たす最低水準を採用した
 - [ ] 検証スクリプト(合否基準)と、不可逆操作の承認ゲートを用意した
 - [ ] 関数呼び出しの応答対応(`id` / `name` / 件数)と署名の扱いを確認した
 
 ### D. 運用
+
 - [ ] `usage`(入力・キャッシュ・出力・思考)とキャッシュヒット率を記録している
 - [ ] **標準価格(12/1以降)**で1タスク単価を再計算した
 - [ ] フォールバック(Argon → 3.8 Flash)を実装した
@@ -879,50 +905,62 @@ flowchart TD
 > 以下は公式ドキュメント以外の、著名な開発者・独立評価機関の発信から抽出した実践知です。**根拠URLは各項に併記**し、全URLは [参考URL](#参考url根拠ソース一覧) にも再掲しています。個人ベンチの数値は単一ケースとして扱ってください。
 
 ### S-1. 「トークン単価」ではなく「ゴール到達までのトークン」で比較する(Simon Willison)
+
 - **内容**: エージェント環境では、モデルが目標に到達するまでに使う総トークンが支配的。Artificial Analysis が公開する「ベンチマーク全体の実行コスト」(Argon は約$2,407)のような**総コスト指標**を見る。
 - **根拠**: Simon Willison's Weblog(2026-10-13)https://simonwillison.net/ / llm-gemini の Argon 対応 https://github.com/simonw/llm-gemini
 
 ### S-2. 最小の有効コンテキストと小さなツールセット(Philipp Schmid, Google DeepMind)
+
 - **内容**: コンテキストの圧縮・要約、共有は「通信」で行う、ツールセットを小さく、「エージェント=ツール」は構造化スキーマで。
 - **根拠**: https://www.philschmid.de/context-engineering / https://x.com/_philschmid/status/1996654346386526697 / https://www.philschmid.de/building-agents
 
 ### S-3. サブエージェントは「パターン1から」(Philipp Schmid)
+
 - **内容**: 上位パターンほど高性能モデルが必要。小型モデルならパターン1〜2。
 - **根拠**: https://www.philschmid.de/subagent-patterns-2026
 
 ### S-4. サーバー側状態 + 自動署名管理(Philipp Schmid)
+
 - **内容**: `previous_interaction_id` を使い、履歴再送と署名管理を省く。
 - **根拠**: https://www.philschmid.de/building-agents-interactions-api / https://x.com/_philschmid/status/2007157689999340002
 
 ### S-5. Managed Agents で秘密情報をサンドボックスに入れない(Philipp Schmid)
+
 - **内容**: 認証情報はサンドボックス外で管理し、実行時に注入する。
 - **根拠**: https://www.philschmid.de/gemini-managed-agents-developer-guide / https://www.philschmid.de/managed-agents-credentials
 
 ### S-6. 仕様→計画→小さな実装→検証の規律(Addy Osmani)
+
 - **内容**: `/spec` → `/plan` → `/build` → `/test` → `/review` → `/ship`。「仕様が先、コードは後」「テストは証拠」。承認は計画に1回、検証は各タスクで維持。Gemini CLI / Antigravity CLI 向けアダプタも提供。
 - **根拠**: https://github.com/addyosmani/agent-skills
 
 ### S-7. 第三者ハーネスではキャッシュヒット率を先に確認(paddo.dev)
+
 - **内容**: プレフィックスが毎回変わると暗黙キャッシュが効かず、コストが6倍以上に。ヒット率を見てから価格を判断。
 - **根拠**: https://paddo.dev/blog/gemini-4-argon/
 
 ### S-8. 回帰(既存テストを壊さない)と視覚タスクの個別評価(paddo.dev)
+
 - **内容**: 実モノレポの変更で Argon は「既存テストを壊さない」点が強かった一方、スクリーンショット→HTML再現では最下位。**用途別に評価**する。
 - **根拠**: https://paddo.dev/blog/gemini-4-argon/
 
 ### S-9. 独立評価の使い方(Artificial Analysis)
+
 - **内容**: 知能指数だけでなく、**タスク単価・出力トークン数・導入価格/標準価格の差**を見る。Argon は導入価格で優位だが標準価格では差が縮む。
 - **根拠**: https://artificialanalysis.ai/articles/gemini-4-argon-google-top-three-labs / https://artificialanalysis.ai/models/gemini-4-argon
 
 ### S-10. 大規模実運用の移行ノウハウ(各ゲートウェイ・開発者コミュニティ)
+
 - **内容**: 長い生成は「合計の許容出力トークン」をホップ全体で指定、継続中に新規ユーザーメッセージを挟まない(OpenRouter)。サンプリング引数の無視・明示キャッシュ廃止・思考水準の既定変更・低い出力上限による空応答の課金(DEV Community の移行解説)。
 - **根拠**: https://openrouter.ai/docs/cookbook/evaluate-and-optimize/model-migrations/gemini-4.md / https://dev.to/aihubmix/moving-gemini-3x-code-to-gemini-4-argon-failure-modes-and-fixes-4h1p
 
 ### S-11. SDK・エコシステムでの対応状況(Guillaume Laforge ほか)
+
 - **内容**: Java の Interactions SDK v2.1.0 が Argon・Long Decode・再開可能なSSEストリーム・`continuationToken` による継続に対応。Vercel AI Gateway は `reasoning` で思考水準を指定。
 - **根拠**: https://github.com/glaforge/gemini-interactions-api-sdk/releases/tag/v2.1.0 / https://vercel.com/changelog/gemini-4-argon-now-available-on-ai-gateway
 
 ### S-12. グローバルなスキルの再利用(Google Developer Expert の実践)
+
 - **内容**: `~/.agents/skills` をシンボリックリンクで Antigravity のグローバルスキルに読み込ませ、旧 `~/.gemini` の移行用フォルダを整理する。
 - **根拠**: https://dev.to/gde/google-antigravity-gemini-4-argon-how-to-load-your-global-agents-skills-2cek
 
