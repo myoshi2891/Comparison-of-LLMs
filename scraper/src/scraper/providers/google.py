@@ -59,7 +59,9 @@ _FALLBACKS: dict[str, tuple[float, float, str, str, str, str, str]] = {
     "Gemini 3.8 Flash":       (0.75,   3.75, "Google AI", "最新 Flash", "tag-bal", "最新Flash / 1M ctx / 2026-12-31までの特価 (以降 $1.5/$7.5)", "Latest Flash / 1M ctx / promo through 2026-12-31 (then $1.5/$7.5)"),
     "Gemini 3.7 Flash":       (0.75,   3.75, "Google AI", "Deprecated", "tag-leg", "非推奨エイリアス / Gemini 3.8 Flash へ自動ルーティング (提供終了ではない)", "Deprecated alias / auto-routes to Gemini 3.8 Flash (not shut down)"),
     "Gemini 3.6 Flash":       (0.75,   3.75, "Google AI", "Fast",     "tag-bal",  "1M ctx / 2026-12-31までの特価 (以降 $1.5/$7.5)", "1M ctx / promo through 2026-12-31 (then $1.5/$7.5)"),
-    "Gemini Omni Flash Preview": (1.50,   9.00, "Google AI", "Multimodal", "tag-bal", "マルチモーダル生成 / テキスト出力 (動画出力は $17.5)", "Multimodal generation / text output (video output $17.5)"),
+    "Gemini Omni 1.1 Flash":  (1.50,   9.00, "Google AI", "Multimodal", "tag-bal", "GA / マルチモーダル生成 / テキスト出力 (動画出力は $17.5)", "GA / Multimodal generation / text output (video output $17.5)"),
+    # 提供終了日は「最短」の予告日（Google の deprecations ページ準拠）。実際の停止日は別途告知される。
+    "Gemini Omni Flash Preview": (1.50,   9.00, "Google AI", "Deprecated", "tag-leg", "非推奨 Preview / 2026-10-22以降に提供終了 / 後継は Gemini Omni 1.1 Flash", "Deprecated preview / shutdown on or after 2026-10-22 / replaced by Gemini Omni 1.1 Flash"),
     # 価格は _FLASH_ALIAS_TARGETS 経由で 3.6 Flash から導出する（下記の値は同額の写し）
     "Gemini 3.5 Flash":       (0.75,   3.75, "Google AI", "Deprecated", "tag-leg", "非推奨エイリアス / Gemini 3.6 Flash へ自動ルーティング (提供終了ではない)", "Deprecated alias / auto-routes to Gemini 3.6 Flash (not shut down)"),
     "Gemini 3.5 Flash-Lite":  (0.30,   2.50, "Google AI", "Budget",   "tag-mini", "2026-07-21 新バジェット枠 / 1M ctx / 大量処理", "Jul 2026 new budget tier / 1M ctx / high-volume"),

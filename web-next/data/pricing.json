@@ -821,13 +821,29 @@
     },
     {
       "provider": "Google AI",
-      "name": "Gemini Omni Flash Preview",
+      "name": "Gemini Omni 1.1 Flash",
       "tag": "Multimodal",
       "cls": "tag-bal",
       "price_in": 1.5,
       "price_out": 9.0,
-      "sub_ja": "マルチモーダル生成 / テキスト出力 (動画出力は $17.5)",
-      "sub_en": "Multimodal generation / text output (video output $17.5)",
+      "sub_ja": "GA / マルチモーダル生成 / テキスト出力 (動画出力は $17.5)",
+      "sub_en": "GA / Multimodal generation / text output (video output $17.5)",
+      "scrape_status": "fallback",
+      "provenance": {
+        "origin": "hardcoded",
+        "fallback_in": 1.5,
+        "fallback_out": 9.0
+      }
+    },
+    {
+      "provider": "Google AI",
+      "name": "Gemini Omni Flash Preview",
+      "tag": "Deprecated",
+      "cls": "tag-leg",
+      "price_in": 1.5,
+      "price_out": 9.0,
+      "sub_ja": "非推奨 Preview / 2026-10-22以降に提供終了 / 後継は Gemini Omni 1.1 Flash",
+      "sub_en": "Deprecated preview / shutdown on or after 2026-10-22 / replaced by Gemini Omni 1.1 Flash",
       "scrape_status": "fallback",
       "provenance": {
         "origin": "hardcoded",
