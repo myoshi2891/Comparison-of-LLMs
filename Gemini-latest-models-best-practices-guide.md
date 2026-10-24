@@ -751,7 +751,7 @@ def argon_cost(usage, today: date | None = None, assume_standard: bool = False) 
 # print(argon_cost(interaction.usage, assume_standard=True))
 ```
 
-> 上記は考え方を示すための簡易コードです。`usage` のフィールド名と、`total_output_tokens` に思考トークンが含まれるかどうかは、必ず公式の `usage` 説明と**実際のレスポンス**で確認して調整してください(含まれる場合は二重計上になります)。
+> 上記は考え方を示すための簡易コードです。Interactions API の `usage` は `total_output_tokens` と `total_thought_tokens` を**別々に**報告するため、出力トークンの総使用量は両者を**足し合わせて**算出します。思考トークンも出力料金として課金される点に注意してください。
 
 ### キャッシュを効かせる設計
 
@@ -843,7 +843,7 @@ flowchart TD
 | **動画理解** | エージェント型動画理解(GA)で、時刻・フレーム・音声を必要に応じて取得させる。長尺で特に有効 |
 | **画像生成・編集** | Nano Banana 2.1 で会話的に編集。**Thought Signatures を必ず返す**(会話型編集では署名が重要)。極端な縦横比(1:4〜8:1)や文字描画が改善 |
 | **動画生成** | Omni Flash:延長・補間・解像度指定。1080p/4K はアップスケール出力である点を成果物仕様に明記 |
-| **音声(リアルタイム)** | 低遅延は `gemini-3.8-live`、背景推論が必要なら `…-live-extended-thinking`。同期でなく**非同期関数呼び出しが既定** |
+| **音声(リアルタイム)** | 低遅延は `gemini-3.8-live`、背景推論が必要なら `…-live-extended-thinking`。`gemini-3.8-live` は同期(`BLOCKING`)・非同期(`NON_BLOCKING`、既定)の両方に対応。`gemini-3.8-live-extended-thinking` は**`NON_BLOCKING` が必須**(同期呼び出しはエラー) |
 | **TTS** | 高品質は Flash TTS、大量・リアルタイムは Flash-Lite TTS。Voices エンドポイントで音声デザイン/複製(**複製は同意確認が前提**) |
 | **文字起こし** | 非ストリーミングは `gemini-3.5-transcribe`、ストリーミングは `…-live`。語彙バイアス(最大1,000語)で固有名詞を安定化 |
 | **ロボティクス** | Argon は ERQA 87% と報告。プレビューの `gemini-robotics-er-2-*` は物理動作を伴うため**ブロッキング関数呼び出し**で安全に |

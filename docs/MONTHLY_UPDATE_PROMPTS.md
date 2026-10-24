@@ -41,7 +41,7 @@
 
 ```bash
 cd web-next
-grep -rnE '(20[0-9]{2}年[0-9]{1,2}月|(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]* 20[0-9]{2}|Last updated|最終更新|更新版|時点|as of|情報基準日)' app/<path>/
+grep -rnE '(20[0-9]{2}年[0-9]{1,2}月|20[0-9]{2}-[0-9]{2}-[0-9]{2}|(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]* 20[0-9]{2}|Last updated|最終更新|更新版|時点|as of|情報基準日)' app/<path>/
 ```
 
 英語月名（`May`→`June`）と和文（`2026年5月`→`2026年6月`）の**両方**を揃えること。
@@ -103,7 +103,7 @@ grep -rnoiE --include='*.tsx' --include='*.ts' --include='*.json' "(gpt-[0-9][a-
 cd web-next
 # 旧月表記が残っていないか（今回のサイクルで更新対象になる月をすべて含める。例: 2026年10月サイクルなら 6〜9 月）
 # 「指摘5」で維持と定めた記録日（情報基準日・「YYYY年M月時点」）は残し、更新が必要なヒットだけを潰す
-grep -rnE '(2026年[6-9]月|(Jun|Jul|Aug|Sep)[a-z]* 2026)' app/<path>/
+grep -rnE '(2026年[6-9]月|2026-0[6-9]-[0-9]{2}|(Jun|Jul|Aug|Sep)[a-z]* 2026)' app/<path>/
 bun run test app/<path> >/tmp/t.log 2>&1; echo "exit=$?"   # tail はexit code を隠すため必ず echo で確認
 ```
 
@@ -113,7 +113,7 @@ bun run test app/<path> >/tmp/t.log 2>&1; echo "exit=$?"   # tail はexit code �
 
 | # | URL | ページタイトル（概要） | 区分 | 確認日（registry `lastReviewed`） |
 |---|-----|----------------------|------|--------|
-| 1 | `/` | AIモデル 時間別コスト 計算機（ホーム） | Home | 2026-10-21 |
+| 1 | `/` | AIモデル 時間別コスト 計算機（ホーム） | Home | 2026-10-24 |
 | 2 | `/claude/skill` | Claude Code AI仕様駆動開発 — マークダウンファイル完全ガイド | Providers / Claude | 2026-10-22 |
 | 3 | `/claude/skill-guide` | SKILL.md 完全解説ガイド — Claude Code | Providers / Claude | 2026-10-22 |
 | 4 | `/claude/skill-guide-intermediate` | SKILL.md 中級者完全攻略ガイド — Claude Code | Providers / Claude | 2026-10-22 |
