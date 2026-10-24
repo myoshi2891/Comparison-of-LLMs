@@ -310,6 +310,25 @@ class TestGoogle:
             assert (alias.price_in, alias.price_out) == expected
             assert (alias.price_in, alias.price_out) == (target.price_in, target.price_out)
 
+    def test_omni_flash_ga_and_deprecated_preview(self):
+        """Omni Flash は GA 版を追加し、Preview は提供終了予告付きの非推奨エントリとして残す。"""
+        expected = {
+            "Gemini Omni 1.1 Flash": (
+                1.50, 9.00, "Multimodal", "tag-bal",
+                "GA / マルチモーダル生成 / テキスト出力 (動画出力は $17.5)",
+                "GA / Multimodal generation / text output (video output $17.5)",
+            ),
+            "Gemini Omni Flash Preview": (
+                1.50, 9.00, "Deprecated", "tag-leg",
+                "非推奨 Preview / 2026-10-22以降に提供終了 / 後継は Gemini Omni 1.1 Flash",
+                "Deprecated preview / shutdown on or after 2026-10-22 / replaced by Gemini Omni 1.1 Flash",
+            ),
+        }
+        models = google.scrape()
+        for name, values in expected.items():
+            m = _find(models, name)
+            assert (m.price_in, m.price_out, m.tag, m.cls, m.sub_ja, m.sub_en) == values
+
 
 # --------------------------------------------------------------------------- #
 # DeepSeek
