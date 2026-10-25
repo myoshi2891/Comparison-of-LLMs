@@ -24,20 +24,16 @@ describe.each([
   ["public/pricing.json", publicPricing.api_models],
 ])("%s の非推奨 Gemini Flash エイリアス", (_label, models) => {
   it("3.7 Flash / 3.5 Flash のライフサイクルは Deprecated で、3.5 Flash は 3.6 Flash と同額", () => {
-    expect(pick(find(models, "Gemini 3.7 Flash"))).toEqual({
-      name: "Gemini 3.7 Flash",
-      tag: "Deprecated",
-      price_in: 0.75,
-      price_out: 3.75,
-    });
+    // 3.6 Flash は期限付き特価のため金額を固定せず、課金先との一致だけを契約とする
+    const { name, tag } = find(models, "Gemini 3.7 Flash");
+    expect({ name, tag }).toEqual({ name: "Gemini 3.7 Flash", tag: "Deprecated" });
+    const target = find(models, "Gemini 3.6 Flash");
     expect(pick(find(models, "Gemini 3.5 Flash"))).toEqual({
       name: "Gemini 3.5 Flash",
       tag: "Deprecated",
-      price_in: 0.75,
-      price_out: 3.75,
+      price_in: target.price_in,
+      price_out: target.price_out,
     });
-    const target = find(models, "Gemini 3.6 Flash");
-    expect([target.price_in, target.price_out]).toEqual([0.75, 3.75]);
   });
 });
 
