@@ -537,9 +537,9 @@ export default function DeepSeekLlmPage() {
                 <tr>
                   <td>高頻度なチャット、リアルタイム要約、コスト重視タスク</td>
                   <td>
-                    <code className={styles.inlineCode}>deepseek-v4-flash</code>
+                    <code className={styles.inlineCode}>deepseek-flash</code>
                   </td>
-                  <td>超高速かつ超低コスト（入力 $0.075 / 出力 $0.30）。</td>
+                  <td>高速かつ低コスト（入力 $0.30 / 出力 $1.20、V4.1 Flash）。</td>
                 </tr>
                 <tr>
                   <td>難解な数学問題、アルゴリズム開発、論理検証</td>
@@ -1231,7 +1231,7 @@ export default function DeepSeekLlmPage() {
                   <td>モデル選定</td>
                   <td>標準は Flash、高度タスクは Pro</td>
                   <td>
-                    基本は <code className={styles.inlineCode}>deepseek-v4-flash</code>{" "}
+                    基本は <code className={styles.inlineCode}>deepseek-flash</code>{" "}
                     で十分。厳密な思考やコード生成のみ Pro を採用。
                   </td>
                 </tr>
