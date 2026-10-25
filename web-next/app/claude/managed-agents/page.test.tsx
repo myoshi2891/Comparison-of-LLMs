@@ -53,7 +53,7 @@ describe("/claude/managed-agents 契約テスト", () => {
     );
     const note = section?.lastElementChild;
     expect(note?.textContent?.replace(/\s+/g, " ").trim()).toBe(
-      "always_ask を選んだ場合や auto が ask と判定した場合、セッションはツール実行の直前で一時停止し、user.tool_confirmation イベントによる承認・拒否を待ちます。セクション5の sessions.stream() の例はイベントを表示するだけで確認イベントを返さないため、always_ask / auto と組み合わせると停止したままになります。この例では always_allow を使いますが、always_allow では bash や write_file も確認なしで実行されるため、信頼できる環境でファイル書き込みを伴わないストリーム例に限って使用してください。承認を挟んで再開する場合は always_ask / auto を選び、user.tool_confirmation を送信してセッションを再開する処理を実装してください（Events and streaming の公式ドキュメントを参照）。"
+      "always_ask を選んだ場合や auto が ask と判定した場合、セッションはツール実行の直前で一時停止し、user.tool_confirmation イベントによる承認・拒否を待ちます。セクション5の sessions.stream() の例はイベントを表示するだけで確認イベントを返さないため、always_ask / auto と組み合わせると停止したままになります。この例では always_allow を使いますが、always_allow では bash や write_file も確認なしで実行されます。セクション5の例は fibonacci.txt を書き込むファイル書き込みの例であるため、always_allow のまま実行するのは入力が信頼できる場合に限ってください。信頼できない入力を扱う場合は always_ask / auto を選び、user.tool_confirmation を送信して承認後にセッションを再開する処理を実装してください（Events and streaming の公式ドキュメントを参照）。"
     );
   });
 });

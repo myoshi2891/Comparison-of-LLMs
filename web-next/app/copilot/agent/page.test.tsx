@@ -123,6 +123,20 @@ describe("/copilot/agent - static source safety", () => {
   });
 });
 
+describe("GPT-6.1 Sol を使うコード例の利用可能プラン注記", () => {
+  it("accessibility 例と Handoffs 構文例のラベルが Pro では選べないことを明記する", () => {
+    const { container } = render(<CopilotAgentPage />);
+    // GPT-6.1 Sol を model に持つ 2 つの pre の直前ラベルを、出現順込みで完全一致照合する。
+    const labels = Array.from(container.querySelectorAll("[class*='codeLabel']"))
+      .filter((el) => el.nextElementSibling?.textContent?.match(/model:\s*GPT-6\.1 Sol/))
+      .map((el) => (el.textContent ?? "").replace(/\s+/g, " ").trim());
+    expect(labels).toEqual([
+      "accessibility.agent.md（model は2026年10月時点の例。GPT-6.1 Sol は Copilot Pro+ / Max / Business / Enterprise で選択可能）",
+      "frontmatter（model の GPT-6.1 Sol は Copilot Pro+ / Max / Business / Enterprise で選択可能。省略すると選択中のモデルを維持）",
+    ]);
+  });
+});
+
 describe("Planner 例のモデル優先リスト", () => {
   it("Copilot Pro でも選択できる Claude Sonnet 5.5 を含む", () => {
     const { container } = render(<CopilotAgentPage />);
