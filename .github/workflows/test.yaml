@@ -4,6 +4,10 @@ on:
   push:
   pull_request:
 
+# 既定は読み取り専用。権限を明示しないジョブ(scraper-test)にはこの既定が適用される
+permissions:
+  contents: read
+
 jobs:
   # -------------------------
   # 変更ファイル検出（最重要）
