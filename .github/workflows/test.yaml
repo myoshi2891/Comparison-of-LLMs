@@ -36,6 +36,9 @@ jobs:
     needs: changes
     if: needs.changes.outputs.web == 'true'
     runs-on: ubuntu-latest
+    # チェックアウトとテスト実行のみのため、リポジトリの読み取り権限(contents: read)だけを付与
+    permissions:
+      contents: read
 
     steps:
       - uses: actions/checkout@v4
