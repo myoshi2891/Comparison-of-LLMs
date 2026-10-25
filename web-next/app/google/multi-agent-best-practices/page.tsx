@@ -244,6 +244,8 @@ remote_agent_from_file = RemoteA2aAgent(
 
 const CODE_TEXT_17 = `from google.adk.agents.remote_a2a_agent import RemoteA2aAgent
 from google.adk import Agent
+from google.adk.planners import BuiltInPlanner
+from google.genai import types
 
 data_analyst = RemoteA2aAgent(
     name="DataAnalyst",
@@ -254,6 +256,10 @@ data_analyst = RemoteA2aAgent(
 orchestrator = Agent(
     name="Orchestrator",
     model="gemini-3.5-flash-lite",
+    # 委譲判断を伴う自律的なツール利用のため、思考レベルを明示的に指定する
+    planner=BuiltInPlanner(
+        thinking_config=types.ThinkingConfig(thinking_level="medium")
+    ),
     instruction="データ分析タスクはDataAnalystに委譲すること。",
     sub_agents=[data_analyst]
 )`;
@@ -2582,6 +2588,14 @@ export default function GeminiMultiAgentBestPracticesPage() {
                 <span className={styles.ck}>from</span> google.adk{" "}
                 <span className={styles.ck}>import</span> Agent
               </div>
+              <div className={styles.codeLine}>
+                <span className={styles.ck}>from</span> google.adk.planners{" "}
+                <span className={styles.ck}>import</span> BuiltInPlanner
+              </div>
+              <div className={styles.codeLine}>
+                <span className={styles.ck}>from</span> google.genai{" "}
+                <span className={styles.ck}>import</span> types
+              </div>
               <div className={styles.codeLine}>&nbsp;</div>
               <div className={styles.codeLine}>
                 <span className={styles.cv}>data_analyst</span> = RemoteA2aAgent(
@@ -2618,6 +2632,23 @@ export default function GeminiMultiAgentBestPracticesPage() {
                 <span className={styles.cv}>model</span>=
                 <span className={styles.cs}>&quot;gemini-3.5-flash-lite&quot;</span>,
               </div>
+              <div className={styles.codeLine}>
+                {"  "}
+                <span className={styles.cc}>
+                  # 委譲判断を伴う自律的なツール利用のため、思考レベルを明示的に指定する
+                </span>
+              </div>
+              <div className={styles.codeLine}>
+                {"  "}
+                <span className={styles.cv}>planner</span>=BuiltInPlanner(
+              </div>
+              <div className={styles.codeLine}>
+                {"    "}
+                <span className={styles.cv}>thinking_config</span>=types.ThinkingConfig(
+                <span className={styles.cv}>thinking_level</span>=
+                <span className={styles.cs}>&quot;medium&quot;</span>)
+              </div>
+              <div className={styles.codeLine}>{"  "}),</div>
               <div className={styles.codeLine}>
                 {"  "}
                 <span className={styles.cv}>instruction</span>=
