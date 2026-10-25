@@ -125,7 +125,7 @@ bun run test app/<path> >/tmp/t.log 2>&1; echo "exit=$?"   # tail はexit code �
 | 7 | `/google/skill` | Google Antigravity × Gemini — マークダウンファイル完全ガイド | Providers / Google | 2026-10-22 |
 | 8 | `/google/skill-guide` | SKILL.md 完全解剖ガイド（Gemini CLI 中級者以上向け） | Providers / Google | 2026-10-22 |
 | 9 | `/google/antigravity-best-practices` | Google Antigravity ベストプラクティス（旧 `/google/skill-guide-intermediate` の後継） | Providers / Google | 2026-10-22 |
-| 10 | `/google/agent` | Gemini マルチエージェント開発（ADK / A2A） | Providers / Google | 2026-10-22 |
+| 10 | `/google/agent` | Google Antigravity — Rules / Skills / Workflows / Artifacts 徹底ガイド | Providers / Google | 2026-10-22 |
 | 11 | `/google/antigravity-guide` | Google Antigravity — AI仕様駆動開発 ベストプラクティス完全ガイド | Providers / Google | 2026-10-22 |
 | 12 | `/codex/skill` | OpenAI Codex — AI仕様駆動開発 マークダウンファイル完全ガイド | Providers / Codex | 2026-10-22 |
 | 13 | `/codex/agent` | OpenAI Codex エージェント開発ガイド | Providers / Codex | 2026-10-22 |
@@ -562,21 +562,21 @@ web-next/app/google/antigravity-best-practices/page.tsx を読んでください
 
 ---
 
-## 画面 10 — `/google/agent`（Gemini マルチエージェント開発）
+## 画面 10 — `/google/agent`（Google Antigravity — Rules / Skills / Workflows / Artifacts）
 
 **ファイル**: `web-next/app/google/agent/page.tsx`  
 **URL**: `/google/agent`  
-**更新頻度**: 毎月（ADK / A2A プロトコルは頻繁に変更あり）
+**更新頻度**: 毎月（Antigravity のリリースで Markdown ファイルの仕様が変わりやすい）
 
 ### 事前確認
 
 ```
 以下を WebSearch で確認する:
-- Google ADK（Agent Development Kit）最新バージョンと破壊的変更
-- A2A / AP2 / A2UI プロトコルの最新仕様変更
-- AgentEngine（旧 Vertex AI Agent Builder）の新機能
-- Gemini CLI の最新エージェント関連コマンド
-- GEMINI.md / AGENTS.md / agent.json の最新スキーマ変更
+- Google Antigravity の最新リリースノート（latest 2026）と破壊的変更
+- Rules（グローバル / ワークスペース）の置き場所・ファイル名・適用モードの変更
+- Skills（SKILL.md）のディレクトリ構成・frontmatter 項目・読み込み条件の変更
+- Workflows（スラッシュコマンド）の置き場所・呼び出し方法・ネスト可否の変更
+- Artifacts（実装計画・タスクリスト・ウォークスルー等）の種類とレビュー / コメント機能の変更
 ```
 
 ### 更新プロンプト
@@ -586,17 +586,18 @@ web-next/app/google/agent/page.tsx を読んでください。
 
 以下を更新してください:
 
-1. metadata のバージョン（"as of 2026-03" 等の日付表記）を
-   "as of 2026-XX" に更新する
+1. 「2026年7月26日時点」などの情報基準日は時点付きの過去の事実として残し、
+   更新した箇所には「2026年XX月時点」の追記で区別する
 
-2. ADK のバージョン番号・import パス（python / npm）が変わっていれば
-   コードブロック内を修正する
+2. Rules / Skills / Workflows / Artifacts の置き場所（ディレクトリ・ファイル名）や
+   frontmatter 項目が変わっていれば、本文とコードブロックを修正する
 
-3. A2A / AP2 プロトコルで非推奨・変更されたフィールドがあれば修正する
+3. ベストプラクティス・チェックリストとアンチパターンのうち、
+   最新仕様と矛盾する項目だけを外科的に修正する
 
-4. SOURCES のリンク切れ修正・ADK CHANGELOG の最新エントリ追加
+4. 参考文献・情報源のリンク切れ修正・Antigravity 公式ドキュメントの最新ページ追加
 
-変更は metadata・バージョン番号テキスト・コードブロック・SOURCES のみ。
+変更は本文の該当箇所・コードブロック・参考文献のみ。
 JSX 構造（コンポーネント定義）は変更しない。
 ```
 
@@ -604,7 +605,7 @@ JSX 構造（コンポーネント定義）は変更しない。
 
 - [ ] `bun run test web-next/app/google/agent` (agent ページの契約テスト) がパスする
 - [ ] `bun run build` が成功する
-- [ ] ローカルホスト (`http://localhost:3000/google/agent`) を開き、エージェント定義コードブロックや参考文献リンクが壊れていないか目視確認
+- [ ] ローカルホスト (`http://localhost:3000/google/agent`) を開き、Rules / Skills / Workflows のコードブロックや参考文献リンクが壊れていないか目視確認
 
 ---
 
@@ -2007,7 +2008,8 @@ web-next/app/zhipu/zai-glm-best-practices/page.tsx を読んでください。
 ## その他の画面（Providers 以外の registry 登録ページ）
 
 推薦書籍・資格試験・Agent 開発・運用・品質など、上記一覧にない registry 登録ページは画面別プロンプトを持たない。
-月次確認の対象にする場合は、以下の汎用テンプレートを使う。確認日は registry の `lastReviewed` が正となる。
+月次確認では、これらも**必ず**対象にする。`web-next/lib/page-registry.ts` の全エントリから上記 52 画面を除いた残りを列挙し、
+1 ページずつ以下の汎用テンプレートで確認する。確認日は registry の `lastReviewed` が正となる（この文書の一覧の日付ではない）。
 
 ```
 web-next/app/<path>/page.tsx を読んでください。
