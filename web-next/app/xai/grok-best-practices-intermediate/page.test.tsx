@@ -55,7 +55,8 @@ describe("GrokBestPracticesIntermediatePage", () => {
 
   it("7月の基準日を保ちつつ、ページ単位の日付ラベルに10月の更新日を示す", () => {
     const { container } = render(<GrokBestPracticesIntermediatePage />);
-    const text = (sel: string) => container.querySelector(sel)?.textContent?.replace(/\s+/g, " ").trim();
+    const text = (sel: string) =>
+      container.querySelector(sel)?.textContent?.replace(/\s+/g, " ").trim();
     expect(text("#grok-sidebar > div:last-child")).toBe(
       "docs.x.ai / grok.com2026年7月15日時点の情報に基づく（2026年10月24日更新）"
     );

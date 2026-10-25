@@ -12,7 +12,12 @@ const find = (models: ApiModelLike[], name: string): ApiModelLike => {
   return model;
 };
 
-const pick = ({ name, tag, price_in, price_out }: ApiModelLike) => ({ name, tag, price_in, price_out });
+const pick = ({ name, tag, price_in, price_out }: ApiModelLike) => ({
+  name,
+  tag,
+  price_in,
+  price_out,
+});
 
 describe.each([
   ["data/pricing.json", dataPricing.api_models],
