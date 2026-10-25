@@ -539,7 +539,10 @@ export default function DeepSeekLlmPage() {
                   <td>
                     <code className={styles.inlineCode}>deepseek-flash</code>
                   </td>
-                  <td>高速かつ低コスト（入力 $0.30 / 出力 $1.20、V4.1 Flash）。</td>
+                  <td>
+                    高速かつ低コスト（V4.1 Flash。ピーク時 入力 $0.30 / 出力 $1.20、オフピーク時は
+                    50% 引きの入力 $0.15 / 出力 $0.60。per 1M）。
+                  </td>
                 </tr>
                 <tr>
                   <td>難解な数学問題、アルゴリズム開発、論理検証</td>

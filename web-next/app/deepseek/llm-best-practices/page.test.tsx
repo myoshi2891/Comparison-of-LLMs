@@ -88,6 +88,18 @@ describe("DeepSeek 新規開発の既定モデル", () => {
     ]);
   });
 
+  it("選定基準表の deepseek-flash 行はピーク時とオフピーク時の料金を区別する", () => {
+    const { container } = render(<Page />);
+    const rows = Array.from(container.querySelectorAll("#step3 tbody tr")).map((tr) =>
+      Array.from(tr.querySelectorAll("td")).map((td) => norm(td.textContent))
+    );
+    expect(rows[1]).toEqual([
+      "高頻度なチャット、リアルタイム要約、コスト重視タスク",
+      "deepseek-flash",
+      "高速かつ低コスト（V4.1 Flash。ピーク時 入力 $0.30 / 出力 $1.20、オフピーク時は 50% 引きの入力 $0.15 / 出力 $0.60。per 1M）。",
+    ]);
+  });
+
   it("first_call.py は暫定エイリアスではなく deepseek-flash を呼び出す", () => {
     const { container } = render(<Page />);
     const block = Array.from(container.querySelectorAll("[class*='codeBlock']")).find((el) =>
