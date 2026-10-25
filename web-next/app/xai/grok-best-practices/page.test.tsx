@@ -58,4 +58,153 @@ describe("xAI Grok Best Practices Page", () => {
     const diagrams = container.querySelectorAll("[data-testid='mermaid-diagram']");
     expect(diagrams.length).toBe(5);
   });
+
+  it("1.1 モデル比較表に grok-4.7 の行が grok-4.5 の直前に同じ列構成で並ぶ", () => {
+    const { container } = render(<Page />);
+    const h3 = Array.from(container.querySelectorAll("h3")).find((h) =>
+      h.textContent?.startsWith("1.1 ")
+    );
+    const table = h3?.nextElementSibling;
+    const rows = Array.from(table?.querySelectorAll("tbody tr") ?? []).map((tr) =>
+      Array.from(tr.querySelectorAll("td")).map((td) =>
+        (td.textContent ?? "").replace(/\s+/g, " ").trim()
+      )
+    );
+    expect(rows[0]).toEqual([
+      "grok-4.7（2026年10月時点のフラッグシップ）",
+      "500k",
+      "$2.00 (<200k) / $4.00 (≥200k)",
+      "$0.50 (<200k) / $1.00 (≥200k)",
+      "$6.00 (<200k) / $12.00 (≥200k)",
+      "2026年9月21日登場の grok-4.5 後継。プロンプトが 200k トークン以上のリクエストは全トークンに高い単価を適用",
+    ]);
+    expect(rows[1]).toEqual([
+      "grok-4.5（2026年7月時点のフラッグシップ。2026年10月時点の最新は grok-4.7）",
+      "500k",
+      "$2.00 (<200k) / $4.00 (≥200k)",
+      "$0.30 (<200k) / $0.60 (≥200k)",
+      "$6.00 (<200k) / $12.00 (≥200k)",
+      "エージェント型ツール呼び出し、幻覚が少ない、推論強度を調整可能",
+    ]);
+  });
+
+  it("総まとめチェックリストの基本モデルは grok-4.7", () => {
+    const { container } = render(<Page />);
+    const item = Array.from(container.querySelectorAll("li")).find((li) =>
+      li.textContent?.includes("用途に応じて適切なモデル")
+    );
+    expect(item?.textContent?.replace(/\s+/g, " ").trim()).toBe(
+      "用途に応じて適切なモデル（基本は grok-4.7）を選定した"
+    );
+  });
+
+  it("11.1 Chat API の料金表に全モデルの2段階料金を載せる", () => {
+    const { container } = render(<Page />);
+    const heading = Array.from(container.querySelectorAll("h3")).find(
+      (h) => h.textContent === "11.1 Chat API（テキストモデル）"
+    );
+    const table = heading?.nextElementSibling;
+    const rows = Array.from(table?.querySelectorAll("tbody tr") ?? []).map((tr) =>
+      Array.from(tr.querySelectorAll("td")).map((td) => td.textContent?.replace(/\s+/g, " ").trim())
+    );
+    expect(rows).toEqual([
+      [
+        "grok-4.7",
+        "500k",
+        "$2.00 (<200k) / $4.00 (≥200k)",
+        "$0.50 (<200k) / $1.00 (≥200k)",
+        "$6.00 (<200k) / $12.00 (≥200k)",
+      ],
+      [
+        "grok-4.5",
+        "500k",
+        "$2.00 (<200k) / $4.00 (≥200k)",
+        "$0.30 (<200k) / $0.60 (≥200k)",
+        "$6.00 (<200k) / $12.00 (≥200k)",
+      ],
+      [
+        "grok-4.3",
+        "1M",
+        "$1.25 (<200k) / $2.50 (≥200k)",
+        "$0.20 (<200k) / $0.40 (≥200k)",
+        "$2.50 (<200k) / $5.00 (≥200k)",
+      ],
+      [
+        "grok-4.20 系（reasoning/non-reasoning/multi-agent）",
+        "1M",
+        "$1.25 (<200k) / $2.50 (≥200k)",
+        "$0.20 (<200k) / $0.40 (≥200k)",
+        "$2.50 (<200k) / $5.00 (≥200k)",
+      ],
+    ]);
+  });
+
+  it("Step1 の導入文は grok-4.7 を現在の汎用の基本モデルとして示す", () => {
+    const { container } = render(<Page />);
+    const intro = container.querySelector("#step1 > p");
+    expect(intro?.textContent?.replace(/\s+/g, " ").trim()).toBe(
+      "xAI は用途別に複数のモデルファミリーを提供しています。汎用のテキスト用途では、2026年10月時点のフラッグシップである Grok 4.7 を基本に選べばよい、という単純な整理ができるのが大きな特徴です。"
+    );
+  });
+  it("1.1 比較表と Step11 の価格出典は 7月3日を旧モデルの基準時点とし grok-4.7 の確認日を区別する", () => {
+    const { container } = render(<Page />);
+    const norm = (el: Element | null | undefined) => el?.textContent?.replace(/\s+/g, " ").trim();
+    const step1Note = container.querySelector("#step1 table")?.nextElementSibling;
+    const step11Note = container.querySelector("#step11")?.lastElementChild;
+    const grok47 = "grok-4.7 の価格は同 Pricing ページで2026年10月23日に確認";
+    expect([norm(step1Note), norm(step11Note)]).toEqual([
+      `出典: Models | xAI Docs（最終更新 2026年7月9日）、Pricing | xAI Docs（最終更新 2026年7月3日。grok-4.5 以前のモデルの価格の基準時点）。${grok47}`,
+      `出典: Pricing | xAI Docs（最終更新 2026年7月3日。grok-4.5 以前のモデルの価格の基準時点）。${grok47}`,
+    ]);
+  });
+
+  it("11.3 Batch API の割引注記に grok-4.7・grok-4.6・grok-4.5・grok-4.3・grok-4.20系の 20% 割引と他モデルの対象外を記載する", () => {
+    const { container } = render(<Page />);
+    const heading = Array.from(container.querySelectorAll("h3")).find(
+      (h) => h.textContent === "11.3 Batch API（非同期・割引あり）"
+    );
+    const note = heading?.nextElementSibling?.nextElementSibling?.nextElementSibling;
+    expect(note?.textContent?.replace(/\s+/g, " ").trim()).toBe(
+      "grok-4.7・grok-4.6・grok-4.5・grok-4.3・grok-4.20系は20%割引、それ以外のモデルは割引対象外です。"
+    );
+  });
+  it("情報時点・参考資料の導入文・脚注は 7月15日の基準と grok-4.7 の10月追記を区別する", () => {
+    const { container } = render(<Page />);
+    const norm = (el: Element | null | undefined) => el?.textContent?.replace(/\s+/g, " ").trim();
+    const chip = Array.from(container.querySelectorAll("span")).find((el) =>
+      el.textContent?.includes("情報時点:")
+    );
+    const refsIntro = Array.from(container.querySelectorAll("h2")).find((h) =>
+      h.textContent?.includes("16. 参考資料・出典URL一覧")
+    )?.nextElementSibling;
+    expect([norm(chip), norm(refsIntro), norm(container.querySelector("footer"))]).toEqual([
+      "情報時点: 2026年7月15日（grok-4.7 関連は2026年10月23日に追記）",
+      "本ガイドの各セクションは、以下の一次情報源（xAI公式ドキュメント）を参照して作成しました（すべて2026年7月15日時点でアクセス可能な内容。grok-4.7 関連の記載は2026年10月23日に確認して追記）。",
+      "xAI の LLM（Grok）完全ガイド ― 初学者のためのベストプラクティス / 出典: docs.x.ai 公式ドキュメント（2026年7月15日時点。grok-4.7 関連は2026年10月23日に追記）",
+    ]);
+  });
+
+  it("Step3 の最初のリクエスト例は2つとも推奨モデル grok-4.7 を指定する", () => {
+    const { container } = render(<Page />);
+    const modelLines = Array.from(container.querySelectorAll("#step3 pre"))
+      .flatMap((pre) => Array.from(pre.querySelectorAll("div")))
+      .map((line) => line.textContent?.replace(/\s+/g, " ").trim() ?? "")
+      .filter((text) => text.includes('model="'));
+    expect(modelLines).toEqual([
+      'chat = client.chat.create(model="grok-4.7")',
+      'model="grok-4.7",',
+    ]);
+  });
+
+  it("ツール料金表の見出しは X Search の取得件数単位と矛盾しない", () => {
+    const { container } = render(<Page />);
+    const row = Array.from(container.querySelectorAll("tr")).find(
+      (tr) => tr.querySelector("td")?.textContent === "X Search"
+    );
+    const header = row?.closest("table")?.querySelectorAll("thead th")[2];
+    expect([header?.textContent, row?.querySelectorAll("td")[2]?.textContent]).toEqual([
+      "料金（特記なしは1,000回あたり）",
+      "$5（ポスト取得 1,000件あたり）/ $10（ユーザープロフィール取得 1,000件あたり）",
+    ]);
+  });
 });

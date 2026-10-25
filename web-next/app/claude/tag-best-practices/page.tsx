@@ -260,7 +260,8 @@ export default function Page() {
                     <td>
                       旧「Claude in
                       Slack」アプリを置き換え。既存ユーザーは30日以内に移行選択可能で、
-                      <strong>2026年8月3日に自動移行</strong>が予定されている
+                      <strong>2026年8月3日に自動移行</strong>
+                      が予定されていた(2026年10月時点で期日経過済み。移行状態は管理コンソールで確認)
                     </td>
                   </tr>
                   <tr>
@@ -835,7 +836,7 @@ export default function Page() {
             </div>
             <div className={`${styles.callout} ${styles.calloutWarn}`}>
               なお、旧「Claude in Slack」アプリは<strong>2026年8月3日</strong>に自動的にClaude
-              Tagへ移行される予定であるため、既存導入企業はそれまでに設定内容(権限・チャンネル・利用ポリシー)を確認しておくことが推奨されます。
+              Tagへ移行される予定でした(2026年10月時点で期日経過済み)。既存導入企業は、移行後の設定内容(権限・チャンネル・利用ポリシー)が意図どおりかを確認しておくことが推奨されます。
             </div>
           </section>
 
@@ -997,7 +998,8 @@ export default function Page() {
                   className={styles.checklistCheckbox}
                 />
                 <label htmlFor="checklist-9">
-                  旧「Claude in Slack」利用企業は、2026年8月3日の自動移行前に設定を棚卸しした
+                  旧「Claude in
+                  Slack」利用企業は、2026年8月3日に予定されていた自動移行が実施されたかを管理コンソールで確認し、実施済みの場合のみ移行後の設定を棚卸しした
                 </label>
               </li>
               <li>

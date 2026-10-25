@@ -21,6 +21,7 @@ _CLAUDE_OPUS_5_5 = "Claude Opus 5.5"
 _CLAUDE_OPUS_5 = "Claude Opus 5"
 _CLAUDE_OPUS_4_5 = "Claude Opus 4.5"
 _CLAUDE_SONNET_4_5 = "Claude Sonnet 4.5"
+_CLAUDE_HAIKU_5_5 = "Claude Haiku 5.5"
 
 # フォールバック価格(ハードコード最終手段)
 _FALLBACKS: dict[str, tuple[float, float]] = {
@@ -36,6 +37,7 @@ _FALLBACKS: dict[str, tuple[float, float]] = {
     _CLAUDE_SONNET_5:           (2.00,  10.00),
     "Claude Sonnet 4.6":        (3.00,  15.00),
     _CLAUDE_SONNET_4_5:         (3.00,  15.00),
+    _CLAUDE_HAIKU_5_5:          (0.10,   0.50),
     "Claude Haiku 4.5":         (1.00,   5.00),
     "Claude Haiku 3.5":         (0.80,   4.00),
     "Claude Opus 4.1 (Legacy)": (15.00, 75.00),
@@ -193,7 +195,8 @@ _TAG = {
     _CLAUDE_SONNET_5_5:         "最新 Sonnet",
     _CLAUDE_SONNET_5:           "Stable",
     "Claude Sonnet 4.6":        "Stable",
-    _CLAUDE_SONNET_4_5:         "Stable",
+    _CLAUDE_SONNET_4_5:         "Deprecated",
+    _CLAUDE_HAIKU_5_5:          "最新 Haiku",
     "Claude Haiku 4.5":         "Fast",
     "Claude Haiku 3.5":         "Retired",
     "Claude Opus 4.1 (Legacy)": "Retired",
@@ -210,7 +213,8 @@ _CLS = {
     _CLAUDE_SONNET_5_5:         "tag-flag",
     _CLAUDE_SONNET_5:           "tag-flag",
     "Claude Sonnet 4.6":        "tag-flag",
-    _CLAUDE_SONNET_4_5:         "tag-flag",
+    _CLAUDE_SONNET_4_5:         "tag-leg",
+    _CLAUDE_HAIKU_5_5:          "tag-mini",
     "Claude Haiku 4.5":         "tag-mini",
     "Claude Haiku 3.5":         "tag-leg",
     "Claude Opus 4.1 (Legacy)": "tag-leg",
@@ -228,7 +232,8 @@ _SUB_JA = {
     _CLAUDE_SONNET_5:           "前世代Sonnet / 200K ctx / $2/$10 が恒久価格に確定",
     "Claude Sonnet 4.6":        "バランス最適 / 200K ctx / 前世代",
     _CLAUDE_SONNET_4_5:         "バランス型 / 200K ctx / 前々世代",
-    "Claude Haiku 4.5":         "高速・高ボリューム向け",
+    _CLAUDE_HAIKU_5_5:          "最新Haiku / 100K超は $0.5/$2.5 / キャッシュ読取0.1x",
+    "Claude Haiku 4.5":         "前世代Haiku / 高速・高ボリューム向け",
     "Claude Haiku 3.5":         "提供終了 (Bedrock/Google Cloud のみ継続)",
     "Claude Opus 4.1 (Legacy)": "提供終了 (Bedrock/Google Cloud のみ継続)",
 }
@@ -245,7 +250,8 @@ _SUB_EN = {
     _CLAUDE_SONNET_5:           "Prev Sonnet / 200K ctx / $2/$10 now permanent",
     "Claude Sonnet 4.6":        "Optimal balance / 200K ctx / prev-gen",
     _CLAUDE_SONNET_4_5:         "Balanced / 200K ctx / two gens back",
-    "Claude Haiku 4.5":         "Fast / high-volume use cases",
+    _CLAUDE_HAIKU_5_5:          "Latest Haiku / $0.5/$2.5 above 100K / 0.1x cache reads",
+    "Claude Haiku 4.5":         "Prev Haiku / fast / high-volume use cases",
     "Claude Haiku 3.5":         "Retired (Bedrock / Google Cloud only)",
     "Claude Opus 4.1 (Legacy)": "Retired (Bedrock / Google Cloud only)",
 }

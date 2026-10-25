@@ -96,11 +96,11 @@ style H fill:#0a2926,stroke:#14b8a6,color:#e2e8f0`;
 const DIAG_6 = `flowchart TD
 Q([ツール実行の許可方式を選ぶ]) --> A{信頼レベル}
 A -->|高い — 自動化パイプライン| B[always_allow\\n常に自動許可]
-A -->|中程度 — 人間の監視あり| C[ask_human\\n実行前に人間が確認]
-A -->|低い — 安全最優先| D[always_deny\\n常に拒否]
+A -->|中程度 — サーバー評価に委ねる| D[auto\\n呼び出しごとにサーバーが評価]
+A -->|低い — 人間の監視必須| C[always_ask\\n実行前に人間が確認]
 style B fill:#0a2926,stroke:#14b8a6,color:#e2e8f0
 style C fill:#3d1a04,stroke:#f59e0b,color:#e2e8f0
-style D fill:#300e14,stroke:#f43f5e,color:#e2e8f0`;
+style D fill:#1e1b4b,stroke:#8b5cf6,color:#e2e8f0`;
 
 const DIAG_7 = `flowchart LR
 A([アプリ]) -->|セッション開始| B[Managed Agents API]
@@ -716,7 +716,7 @@ export default function Page() {
                       <span className={styles.codeLang}>CLI</span>
                       <CodeCopyButton
                         className={styles.codeCopy}
-                        text={`ant beta:agents create \\\n  --name "Coding Assistant" \\\n  --model '{id: claude-opus-4-8}' \\\n  --system "You are a helpful coding assistant. Write clean, well-documented code." \\\n  --tool '{type: agent_toolset_20260401}'`}
+                        text={`ant beta:agents create \\\n  --name "Coding Assistant" \\\n  --model '{id: claude-opus-5-5}' \\\n  --system "You are a helpful coding assistant. Write clean, well-documented code." \\\n  --tool '{type: agent_toolset_20260401}'`}
                       />
                     </div>
                     <pre>
@@ -727,7 +727,7 @@ export default function Page() {
                         </div>
                         <div className={styles.codeLine}>
                           {"  "}--model{" "}
-                          <span className={styles.st}>'{`{id: claude-opus-4-8}`}'</span> \
+                          <span className={styles.st}>'{`{id: claude-opus-5-5}`}'</span> \
                         </div>
                         <div className={styles.codeLine}>
                           {"  "}--system{" "}
@@ -749,7 +749,7 @@ export default function Page() {
                       <span className={styles.codeLang}>Python</span>
                       <CodeCopyButton
                         className={styles.codeCopy}
-                        text={`import anthropic\n\nclient = anthropic.Anthropic()\n\nagent = client.beta.agents.create(\n    name="Coding Assistant",\n    model={"id": "claude-opus-4-8"},\n    system="You are a helpful coding assistant. Write clean, well-documented code.",\n    tools=[{"type": "agent_toolset_20260401"}],\n    betas=["managed-agents-2026-04-01"],\n)\n\n# このIDを環境変数やDBに保存する\nprint(f"Agent ID: {agent.id}")`}
+                        text={`import anthropic\n\nclient = anthropic.Anthropic()\n\nagent = client.beta.agents.create(\n    name="Coding Assistant",\n    model={"id": "claude-opus-5-5"},\n    system="You are a helpful coding assistant. Write clean, well-documented code.",\n    tools=[{"type": "agent_toolset_20260401"}],\n    betas=["managed-agents-2026-04-01"],\n)\n\n# このIDを環境変数やDBに保存する\nprint(f"Agent ID: {agent.id}")`}
                       />
                     </div>
                     <pre>
@@ -771,7 +771,7 @@ export default function Page() {
                         <div className={styles.codeLine}>
                           {"    "}model={"{"}
                           <span className={styles.st}>"id"</span>:{" "}
-                          <span className={styles.st}>"claude-opus-4-8"</span>
+                          <span className={styles.st}>"claude-opus-5-5"</span>
                           {"}"},
                         </div>
                         <div className={styles.codeLine}>
@@ -1136,7 +1136,7 @@ export default function Page() {
                 <span className={styles.codeLang}>Python — 権限ポリシー設定</span>
                 <CodeCopyButton
                   className={styles.codeCopy}
-                  text={`agent = client.beta.agents.create(\n    name="Safe Agent",\n    model={"id": "claude-opus-4-8"},\n    system="...",\n    tools=[{\n        "type": "agent_toolset_20260401",\n        "default_config": {\n            "permission_policy": {\n                "type": "always_allow" # or "always_deny", "ask_human"\n            }\n        }\n    }],\n    betas=["managed-agents-2026-04-01"],\n)`}
+                  text={`agent = client.beta.agents.create(\n    name="Safe Agent",\n    model={"id": "claude-opus-5-5"},\n    system="...",\n    tools=[{\n        "type": "agent_toolset_20260401",\n        "default_config": {\n            "permission_policy": {\n                "type": "always_allow" # or "always_ask", "auto"\n            }\n        }\n    }],\n    betas=["managed-agents-2026-04-01"],\n)`}
                 />
               </div>
               <pre>
@@ -1150,7 +1150,7 @@ export default function Page() {
                   <div className={styles.codeLine}>
                     {"    "}model={"{"}
                     <span className={styles.st}>"id"</span>:{" "}
-                    <span className={styles.st}>"claude-opus-4-8"</span>
+                    <span className={styles.st}>"claude-opus-5-5"</span>
                     {"}"},
                   </div>
                   <div className={styles.codeLine}>
@@ -1176,7 +1176,7 @@ export default function Page() {
                     {"                "}
                     <span className={styles.st}>"type"</span>:{" "}
                     <span className={styles.st}>"always_allow"</span>{" "}
-                    <span className={styles.cm}># or "always_deny", "ask_human"</span>
+                    <span className={styles.cm}># or "always_ask", "auto"</span>
                   </div>
                   <div className={styles.codeLine}>
                     {"            "}
@@ -1197,6 +1197,28 @@ export default function Page() {
                 </code>
               </pre>
             </div>
+
+            <p>
+              <code>always_ask</code> を選んだ場合や <code>auto</code> が <code>ask</code>{" "}
+              と判定した場合、セッションはツール実行の直前で一時停止し、
+              <code>user.tool_confirmation</code> イベントによる承認・拒否を待ちます。セクション5の{" "}
+              <code>sessions.stream()</code>{" "}
+              の例はイベントを表示するだけで確認イベントを返さないため、<code>always_ask</code> /{" "}
+              <code>auto</code> と組み合わせると停止したままになります。この例では{" "}
+              <code>always_allow</code> を使いますが、<code>always_allow</code> では{" "}
+              <code>bash</code> や <code>write_file</code>{" "}
+              も確認なしで実行されます。セクション5の例は <code>fibonacci.txt</code>{" "}
+              を書き込むファイル書き込みの例であるため、<code>always_allow</code>{" "}
+              のまま実行するのは入力が信頼できる場合に限ってください。信頼できない入力を扱う場合は、人間の確認が必要なツールに{" "}
+              <code>always_ask</code> を設定し、
+              <code>user.tool_confirmation</code>{" "}
+              を送信して承認後にセッションを再開する処理を実装してください（
+              <Ext href="https://platform.claude.com/docs/en/managed-agents/events-and-streaming">
+                Events and streaming
+              </Ext>{" "}
+              の公式ドキュメントを参照）。<code>auto</code>{" "}
+              は、モデルの判定による自動実行を許容できる場合に限って選んでください。
+            </p>
           </section>
 
           {/* Webhook */}
@@ -1311,7 +1333,7 @@ export default function Page() {
                 <span className={styles.codeLang}>Python — コーディネーター作成</span>
                 <CodeCopyButton
                   className={styles.codeCopy}
-                  text={`coordinator = client.beta.agents.create(\n    name="Engineering Lead",\n    model={"id": "claude-opus-4-8"},\n    system="You coordinate engineering work. Delegate to specialist agents.",\n    tools=[{"type": "agent_toolset_20260401"}],\n    multiagent={\n        "type": "coordinator",\n        "agents": [\n            {"type": "agent", "id": REVIEWER_AGENT_ID},\n            {"type": "agent", "id": TEST_WRITER_AGENT_ID}\n        ]\n    },\n    betas=["managed-agents-2026-04-01"],\n)`}
+                  text={`coordinator = client.beta.agents.create(\n    name="Engineering Lead",\n    model={"id": "claude-opus-5-5"},\n    system="You coordinate engineering work. Delegate to specialist agents.",\n    tools=[{"type": "agent_toolset_20260401"}],\n    multiagent={\n        "type": "coordinator",\n        "agents": [\n            {"type": "agent", "id": REVIEWER_AGENT_ID},\n            {"type": "agent", "id": TEST_WRITER_AGENT_ID}\n        ]\n    },\n    betas=["managed-agents-2026-04-01"],\n)`}
                 />
               </div>
               <pre>
@@ -1325,7 +1347,7 @@ export default function Page() {
                   <div className={styles.codeLine}>
                     {"    "}model={"{"}
                     <span className={styles.st}>"id"</span>:{" "}
-                    <span className={styles.st}>"claude-opus-4-8"</span>
+                    <span className={styles.st}>"claude-opus-5-5"</span>
                     {"}"},
                   </div>
                   <div className={styles.codeLine}>
@@ -1656,8 +1678,7 @@ export default function Page() {
               <div className={styles.checkGroupTitle}>本番運用前</div>
               <div className={styles.checkItem}>
                 <div className={styles.checkBox} />
-                権限ポリシー（<code>always_allow</code> / <code>ask_human</code> /
-                <code>always_deny</code>
+                権限ポリシー（<code>always_allow</code> / <code>always_ask</code> /<code>auto</code>
                 ）を適切に設定した
               </div>
               <div className={styles.checkItem}>

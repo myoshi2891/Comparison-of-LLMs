@@ -121,11 +121,11 @@ const EXPECTED_MERMAID_SOURCES = [
     Comment --> Attribution["コメントにSkill/MCPの<br/>出典を明示(Attribution)"]`,
   `flowchart TD
     Task["タスクの性質を評価"] --> Simple{"構文・定型文・<br/>ボイラープレート程度か?"}
-    Simple -- "はい" --> Fast["高速・低コストモデル<br/>(Haiku系 / Grok Code Fast 等)"]
+    Simple -- "はい" --> Fast["高速・低コストモデル<br/>(Haiku系 / Gemini 3.8 Flash 等)"]
     Simple -- "いいえ" --> Mid{"標準的な機能実装・<br/>アルゴリズムか?"}
-    Mid -- "はい" --> Balanced["バランス型モデル<br/>(Sonnet系 / GPT-5.4系等)を<br/>中程度の推論レベルで"]
+    Mid -- "はい" --> Balanced["バランス型モデル<br/>(Sonnet系 / GPT-6.1 Sol・GPT-6 Sol等)を<br/>中程度の推論レベルで"]
     Mid -- "いいえ" --> Hard{"アーキテクチャ設計・<br/>ミッションクリティカルな判断か?"}
-    Hard -- "はい" --> Premium["フラッグシップモデル<br/>(Opus系 / GPT-5.5系等)"]
+    Hard -- "はい" --> Premium["フラッグシップモデル<br/>(Opus系 / GPT-6 Astra等)"]
     Hard -- "いいえ" --> Context{"非常に大きな<br/>コンテキストが必要か?"}
     Context -- "はい" --> LargeCtx["大規模コンテキスト対応モデル<br/>(Gemini Pro系等)"]
     Context -- "いいえ" --> Balanced`,
@@ -351,5 +351,26 @@ describe("/copilot/github-copilot Contract Tests", () => {
       }
       prevLevel = level;
     }
+  });
+});
+
+describe("10月のモデルラインナップ（Grok）", () => {
+  it("2026-10-19 に退役した Grok 4.5 を選択肢から外し、現行の Grok 4.7 / 4.6 を残す", () => {
+    const { container } = render(<GithubCopilotPage />);
+    // 部分一致では「Grok 4.5」だけの行・セルを追加しても素通りするため、
+    // Grok を含む行を全件集め、行の全セルを順序込みで完全一致させる。
+    const grokRows = Array.from(container.querySelectorAll("tr"))
+      .filter((tr) => /Grok/.test(tr.textContent ?? ""))
+      .map((tr) =>
+        Array.from(tr.querySelectorAll("td")).map((td) => (td.textContent ?? "").trim())
+      );
+    expect(grokRows).toEqual([
+      [
+        "Grok 4.7 / 4.6",
+        "xAI",
+        "Grok 4.7は複雑なマルチステップのエージェント作業、Grok 4.6は汎用的なコーディングと推論",
+        "ゼロデータ保持ポリシーでホスティング",
+      ],
+    ]);
   });
 });

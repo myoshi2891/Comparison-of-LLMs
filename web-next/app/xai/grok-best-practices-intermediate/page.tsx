@@ -28,7 +28,7 @@ const MERMAID_DIAGRAM_1 = `flowchart TD
     A["タスクの性質は?"] --> B{"テキスト/コード生成か?"}
     B -- はい --> C{"深いリサーチ・複数視点の統合が必要か?"}
     C -- はい --> D["grok-4.20-multi-agent (4 or 16 エージェント)"]
-    C -- いいえ --> E["grok-4.5 (reasoning_effort で調整)"]
+    C -- いいえ --> E["grok-4.7<br/>(既存の挙動を維持するなら grok-4.5)"]
     B -- いいえ --> F{"モダリティは?"}
     F -- 画像生成/編集 --> G["Grok Imagine: image / image-quality"]
     F -- 動画生成/編集 --> H["Grok Imagine: video / video-1.5"]
@@ -197,7 +197,7 @@ export default function GrokBestPracticesIntermediatePage() {
         <div className={styles.sidebarFooter}>
           docs.x.ai / grok.com
           <br />
-          2026年7月15日時点の情報に基づく
+          2026年7月15日時点の情報に基づく（2026年10月24日更新）
         </div>
       </aside>
 
@@ -216,7 +216,7 @@ export default function GrokBestPracticesIntermediatePage() {
           <div className={styles.metaBox}>
             本ガイドは <Ext href="https://docs.x.ai/overview">docs.x.ai</Ext> および{" "}
             <Ext href="https://grok.com/">grok.com</Ext>{" "}
-            の公式情報（2026年7月15日時点）を実際に調査した上で作成しています。xAI
+            の公式情報（2026年7月15日時点、2026年10月24日更新）を実際に調査した上で作成しています。xAI
             のドキュメントは更新頻度が高いため、本番投入前に第15章のリンクから最新版を再確認してください。
           </div>
         </div>
@@ -229,7 +229,11 @@ export default function GrokBestPracticesIntermediatePage() {
           <p>
             2026年7月時点で、コード生成・チャット・汎用タスクの旗艦モデルは <code>grok-4.5</code>{" "}
             です。xAI は「画像・動画・音声には専用モデル、それ以外はすべて Grok
-            4.5」という明確な方針を打ち出しています。
+            4.5」という明確な方針を打ち出しています。なお2026年9月21日に後継の <code>grok-4.7</code>
+            （500k コンテキスト。料金は入力 200k トークン未満で入力 $2.00 / 出力 $6.00、200k
+            以上で入力 $4.00 / 出力 $12.00 per
+            1M）が登場し、2026年10月時点の旗艦モデルはこちらです（
+            <code>grok-4.5</code> も引き続き提供されています）。
           </p>
 
           <h3>1.1 用途別モデル選定表</h3>
@@ -245,13 +249,13 @@ export default function GrokBestPracticesIntermediatePage() {
                 <tr>
                   <td>コード生成</td>
                   <td>
-                    <code>grok-4.5</code>
+                    <code>grok-4.7</code>
                   </td>
                 </tr>
                 <tr>
                   <td>チャット・汎用対話</td>
                   <td>
-                    <code>grok-4.5</code>
+                    <code>grok-4.7</code>
                   </td>
                 </tr>
                 <tr>
@@ -309,27 +313,27 @@ export default function GrokBestPracticesIntermediatePage() {
                     <code>grok-4.3</code>
                   </td>
                   <td>1M</td>
-                  <td>$1.25</td>
-                  <td>$0.20</td>
-                  <td>$2.50</td>
+                  <td>$1.25 (&lt;200k) / $2.50 (≥200k)</td>
+                  <td>$0.20 (&lt;200k) / $0.40 (≥200k)</td>
+                  <td>$2.50 (&lt;200k) / $5.00 (≥200k)</td>
                 </tr>
                 <tr>
                   <td>
                     <code>grok-4.20-multi-agent-0309</code>
                   </td>
                   <td>1M</td>
-                  <td>$1.25</td>
-                  <td>$0.20</td>
-                  <td>$2.50</td>
+                  <td>$1.25 (&lt;200k) / $2.50 (≥200k)</td>
+                  <td>$0.20 (&lt;200k) / $0.40 (≥200k)</td>
+                  <td>$2.50 (&lt;200k) / $5.00 (≥200k)</td>
                 </tr>
                 <tr>
                   <td>
                     <code>grok-4.20-0309-reasoning</code>
                   </td>
                   <td>1M</td>
-                  <td>$1.25</td>
-                  <td>$0.20</td>
-                  <td>$2.50</td>
+                  <td>$1.25 (&lt;200k) / $2.50 (≥200k)</td>
+                  <td>$0.20 (&lt;200k) / $0.40 (≥200k)</td>
+                  <td>$2.50 (&lt;200k) / $5.00 (≥200k)</td>
                 </tr>
                 <tr>
                   <td>
@@ -345,8 +349,9 @@ export default function GrokBestPracticesIntermediatePage() {
           </div>
 
           <div className={styles.callout}>
-            <strong>ベストプラクティス:</strong> 迷ったら <code>grok-4.5</code>
-            （エイリアス）を使用。
+            <strong>ベストプラクティス:</strong> 迷ったら <code>grok-4.7</code>
+            （2026年10月時点の旗艦モデル）を使用。既存システムで挙動を変えたくない場合は{" "}
+            <code>grok-4.5</code> を継続でき、
             <code>grok-4.5-latest</code> は最新版に自動追従し、<code>grok-4.5-&lt;日付&gt;</code>{" "}
             は特定バージョンに固定されます。本番環境で挙動の一貫性を優先するなら日付固定版、最新機能を優先するなら{" "}
             <code>-latest</code> を使い分けてください。
@@ -2039,8 +2044,9 @@ export default function GrokBestPracticesIntermediatePage() {
           <h3>12.1 Batch API（非同期処理割引）</h3>
           <p>
             リアルタイム性が不要な大量処理は Batch API で最大 <strong>20%</strong>{" "}
-            の割引を受けられます（対象: <code>grok-4.3</code>, <code>grok-4.20-0309-reasoning</code>
-            , <code>grok-4.20-0309-non-reasoning</code>, <code>grok-4.20-multi-agent-0309</code>）。
+            の割引を受けられます（対象: <code>grok-4.7</code>, <code>grok-4.6</code>,{" "}
+            <code>grok-4.5</code>, <code>grok-4.3</code>, <code>grok-4.20-0309-reasoning</code>,{" "}
+            <code>grok-4.20-0309-non-reasoning</code>, <code>grok-4.20-multi-agent-0309</code>）。
           </p>
 
           <div className={styles.tableWrap}>
@@ -2152,8 +2158,8 @@ export default function GrokBestPracticesIntermediatePage() {
           <ul className={styles.checklist}>
             <li>
               <label>
-                <input type="checkbox" disabled /> モデル選定: <code>grok-4.5</code>（汎用）/{" "}
-                <code>grok-4.3</code>
+                <input type="checkbox" disabled /> モデル選定: <code>grok-4.7</code>
+                （汎用。既存システムの互換性維持なら <code>grok-4.5</code>）/ <code>grok-4.3</code>
                 （長文脈・低コスト）/ <code>grok-4.20-multi-agent</code>
                 （ディープリサーチ）を用途で使い分けたか
               </label>
@@ -2235,7 +2241,7 @@ export default function GrokBestPracticesIntermediatePage() {
           </h2>
           <p>
             本ガイドの内容はすべて以下の xAI
-            公式ドキュメント（2026年7月時点）および公式サイトを参照して作成しています。
+            公式ドキュメント（2026年7月時点、2026年10月24日更新）および公式サイトを参照して作成しています。
           </p>
 
           <div className={styles.refs}>
@@ -2381,7 +2387,7 @@ export default function GrokBestPracticesIntermediatePage() {
             xAI
             のドキュメントは頻繁に更新されます。本番導入前には必ず上記リンクから最新版をご確認ください。
             <br />
-            Generated: 2026年7月15日時点の公開情報に基づく。
+            Generated: 2026年7月15日時点の公開情報に基づく（2026年10月24日更新）。
           </footer>
         </section>
       </main>

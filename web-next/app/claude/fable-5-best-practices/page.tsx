@@ -158,7 +158,7 @@ export default function Fable5BestPracticesPage() {
           <div className={styles.heroMeta}>
             <div>初出: 2026年7月4日</div>
             <div>
-              改訂: <span>2026年7月26日公式ドキュメント対応版</span>
+              改訂: <span>2026年7月26日公式ドキュメント対応版（2026年10月22日追記）</span>
             </div>
             <div>
               対象: <span>Claude Code 中〜上級エンジニア</span>
@@ -548,6 +548,34 @@ export default function Fable5BestPracticesPage() {
               に近い性能を約半額で提供しており、コスト優先のユースケースでは Opus 5
               がフォールバック先の有力候補となる。最新情報は <code>support.claude.com</code>{" "}
               の「Claude Fable 5 Promotional Access」記事で確認すること。
+            </p>
+            <p>
+              <strong>2026年10月追記:</strong> 2026年9月に後継の <strong>Claude Fable 5.1</strong>（
+              <code>claude-fable-5-1</code>、入力 $10 / 出力 $50 per 1M tokens、1M コンテキスト）と
+              Mythos 5.1 が登場し、Fable 5 はレガシーモデルとなった。あわせて Opus 5.5 / Sonnet 5.5
+              / Haiku 5.5
+              も提供が始まっている。本ガイドのプロンプティングの考え方（ゴール・境界・検証基準を渡す）は
+              Fable 5.1 にもそのまま適用できるが、既存の API
+              連携は次の移行チェックを済ませるまでそのままでは動かない場合がある。新規採用時のモデル
+              ID・価格は公式の Models overview で確認すること。
+            </p>
+            <p>
+              <strong>API 連携の移行チェック:</strong> Fable 5.1 では強制ツール使用（
+              <code>tool_choice</code> の <code>any</code> / <code>tool</code>）が 400
+              エラーになるため、<code>tool_choice: auto</code>{" "}
+              にしてプロンプトで使うツールを明示し、応答に必要な <code>tool_use</code>{" "}
+              が含まれるかを確認する。<code>strict: true</code>{" "}
+              は任意の入力スキーマ検証であり、呼び出しを強制するものではない。整形済みデータを得るためにツール呼び出しを使っていた場合は、構造化出力も代替になる。また
+              thinking ブロックは生成したモデルに紐づく。Claude Mythos 5.1
+              は、それを生成した会話の中であれば Fable 5.1 の thinking
+              ブロックを読めるが、それ以外のモデル(評価モデルなど)へ渡すクロスモデル評価フローでは、受け取ったモデル側でブロックが無視される。また過去のターンを編集して再送すると、それ以降の
+              thinking
+              ブロックが無効になる(2026年8月31日以降に作成されたアカウントでは編集済み履歴が 400
+              エラーになる)。会話履歴は追記のみで扱う設計にし、移行時は公式の{" "}
+              <Ext href="https://platform.claude.com/docs/en/about-claude/models/migration-guide">
+                Migration guide
+              </Ext>{" "}
+              の Fable 5.1 の項を確認すること。
             </p>
           </div>
 

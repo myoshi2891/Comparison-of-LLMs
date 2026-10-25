@@ -86,10 +86,10 @@ const DIAGRAM_13 = `flowchart TB
 
 const DIAGRAM_14 = `flowchart TB
     A["サブエージェントのタスク性質は？"] --> B{"曖昧・多段階・要検証？"}
-    B -- Yes --> C["gpt-5.5（高能力の起点として推奨）"]
+    B -- Yes --> C["gpt-6.1-sol（高能力の起点として推奨）"]
     B -- No --> D{"低遅延・大量の対話的反復が必要？"}
-    D -- Yes --> E["gpt-5.3-codex-spark（Cerebras上で高速動作）"]
-    D -- No --> F["gpt-5.4（安定版の既定ワークフロー）"]`;
+    D -- Yes --> E["gpt-6-luna（高速・大量処理向けの効率モデル）"]
+    D -- No --> F["gpt-6-sol（安定版の既定ワークフロー）"]`;
 
 /**
  * Renders a comprehensive Japanese guide to OpenAI Codex subagent development.
@@ -239,7 +239,8 @@ export default function CodexAgentPage() {
             対象読者: Codex CLI / Codex Cloud を使ったチーム開発の経験がある中級〜上級エンジニア
           </p>
           <p className={styles.heroLine}>
-            最終更新: 2026年7月29日時点の公式ドキュメント・コミュニティ記事に基づく
+            最終更新: 2026年7月29日時点の公式ドキュメント・コミュニティ記事に基づく（GPT-6
+            系のモデル推奨・設定例は2026年10月22日時点）
           </p>
         </div>
 
@@ -575,6 +576,12 @@ export default function CodexAgentPage() {
         <p>
           以下は、上記キーの一部を実際に組み合わせた <code>~/.codex/config.toml</code> の例です。
         </p>
+        <p>
+          モデルの利用可否: 例の <code>gpt-6-sol</code>(GPT-6 Sol)と <code>gpt-6.1-sol</code>
+          (GPT-6.1 Sol)は、プランやワークスペースの設定によっては利用できません(Enterprise / Edu
+          では管理者が有効化するまで使えません)。コピーする際は、Codex のモデルピッカー(
+          <code>/model</code>)に表示される利用可能なモデルを選んで置き換えてください。
+        </p>
         <div className={styles.codeBlock}>
           <div className={styles.codeBar}>
             <span>~/.codex/config.toml</span>
@@ -589,11 +596,11 @@ export default function CodexAgentPage() {
             <div className={styles.codeLine}> </div>
             <div className={styles.codeLine}>
               <span className={styles.ck}>model</span> ={" "}
-              <span className={styles.cs}>&quot;gpt-5.4&quot;</span>
+              <span className={styles.cs}>&quot;gpt-6-sol&quot;</span>
             </div>
             <div className={styles.codeLine}>
               <span className={styles.ck}>review_model</span> ={" "}
-              <span className={styles.cs}>&quot;gpt-5.5&quot;</span>
+              <span className={styles.cs}>&quot;gpt-6.1-sol&quot;</span>
             </div>
             <div className={styles.codeLine}>
               <span className={styles.ck}>model_reasoning_effort</span> ={" "}
@@ -842,7 +849,7 @@ export default function CodexAgentPage() {
         <p>
           組み込みの3エージェントに加えて、<code>~/.codex/agents/</code> 配下に TOML
           ファイルを置くことで独自のサブエージェントを定義できます。名前を指定して呼び出せるほか、エージェントごとに異なるモデルを割り当てることも可能です(例:
-          高速性を優先するなら <code>gpt-5.3-codex-spark</code> を指定するなど)。
+          高速性を優先するなら <code>gpt-6-luna</code> を指定するなど)。
         </p>
         <p>
           サブエージェントのオーケストレーションは Codex
@@ -924,7 +931,7 @@ export default function CodexAgentPage() {
             </div>
             <div className={styles.codeLine}>
               <span className={styles.ck}>model</span> ={" "}
-              <span className={styles.cs}>&quot;gpt-5.5&quot;</span>
+              <span className={styles.cs}>&quot;gpt-6.1-sol&quot;</span>
             </div>
             <div className={styles.codeLine}>
               <span className={styles.ck}>model_reasoning_effort</span> ={" "}

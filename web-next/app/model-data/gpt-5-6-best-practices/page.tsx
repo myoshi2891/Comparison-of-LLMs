@@ -258,9 +258,11 @@ export default function Gpt56BestPracticesPage() {
             </div>
             <h1>OpenAI GPT-5.6 完全ガイド — Sol / Terra / Luna 実践ベストプラクティス</h1>
             <p className={styles.subtitle}>
-              2026年7月に一般提供（GA）されたOpenAI GPT-5.6の最新アーキテクチャ、Reasoning Effort /
+              2026年7月に一般提供（GA）されたOpenAI GPT-5.6のアーキテクチャ、Reasoning Effort /
               Modeのダイヤル制御、Programmatic Tool Calling（PTC）、Multi-agent機能、Prompt
               Cachingの改定、およびプロンプト簡素化のベストプラクティスを体系的に解説します。
+              （2026年10月追記: 後継の GPT-6 系 — GPT-6 Astra / GPT-6.1 Sol / GPT-6 Luna — が Codex
+              の推奨モデルとなりました。GPT-5.6 系はロールアウト期間中も引き続き利用できます。）
             </p>
           </header>
 
@@ -1095,6 +1097,12 @@ export default function Gpt56BestPracticesPage() {
               ChatGPT / Codex / ChatGPT Workでの利用可能性
             </h2>
 
+            <p>
+              ※ 以下の表と説明は、GPT-5.6
+              の一般提供（GA）開始時点（2026年7月）のスナップショットです。現在の各プランの既定モデルは
+              ChatGPT の公式情報で確認してください。
+            </p>
+
             <div className={styles.tableWrap}>
               <table>
                 <thead>
@@ -1107,7 +1115,7 @@ export default function Gpt56BestPracticesPage() {
                 <tbody>
                   <tr>
                     <td>Free / Go</td>
-                    <td>GPT-5.5 Instantがデフォルト。Solは利用不可</td>
+                    <td>GA時点はGPT-5.5 Instantがデフォルト。Solは利用不可</td>
                     <td>一部機能のみ</td>
                   </tr>
                   <tr>
@@ -1130,8 +1138,8 @@ export default function Gpt56BestPracticesPage() {
             </div>
 
             <p>
-              標準のChatGPT会話では、日常応答のデフォルトは引き続きGPT-5.5 Instantであり、GPT-5.6
-              SolはMedium以上のreasoningオプションを選択した場合にのみ使用されます。Terra/Lunaは標準チャットでは選択できず、ChatGPT
+              GA時点の標準のChatGPT会話では、日常応答のデフォルトはGPT-5.5 Instantであり、GPT-5.6
+              SolはMedium以上のreasoningオプションを選択した場合にのみ使用されていました。Terra/Lunaは標準チャットでは選択できず、ChatGPT
               Work・Codex・APIから利用します。
             </p>
             <p>

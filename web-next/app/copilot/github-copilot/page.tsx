@@ -122,11 +122,11 @@ const CHART_8 = `flowchart TD
 
 const CHART_9 = `flowchart TD
     Task["タスクの性質を評価"] --> Simple{"構文・定型文・<br/>ボイラープレート程度か?"}
-    Simple -- "はい" --> Fast["高速・低コストモデル<br/>(Haiku系 / Grok Code Fast 等)"]
+    Simple -- "はい" --> Fast["高速・低コストモデル<br/>(Haiku系 / Gemini 3.8 Flash 等)"]
     Simple -- "いいえ" --> Mid{"標準的な機能実装・<br/>アルゴリズムか?"}
-    Mid -- "はい" --> Balanced["バランス型モデル<br/>(Sonnet系 / GPT-5.4系等)を<br/>中程度の推論レベルで"]
+    Mid -- "はい" --> Balanced["バランス型モデル<br/>(Sonnet系 / GPT-6.1 Sol・GPT-6 Sol等)を<br/>中程度の推論レベルで"]
     Mid -- "いいえ" --> Hard{"アーキテクチャ設計・<br/>ミッションクリティカルな判断か?"}
-    Hard -- "はい" --> Premium["フラッグシップモデル<br/>(Opus系 / GPT-5.5系等)"]
+    Hard -- "はい" --> Premium["フラッグシップモデル<br/>(Opus系 / GPT-6 Astra等)"]
     Hard -- "いいえ" --> Context{"非常に大きな<br/>コンテキストが必要か?"}
     Context -- "はい" --> LargeCtx["大規模コンテキスト対応モデル<br/>(Gemini Pro系等)"]
     Context -- "いいえ" --> Balanced`;
@@ -718,7 +718,7 @@ export default function GithubCopilotPage() {
           </div>
           <div className={styles.codeLine}>
             <span className={styles.ck}>model</span>:{" "}
-            <span className={styles.cs}>&apos;Claude Sonnet 4.5&apos;</span>
+            <span className={styles.cs}>&apos;Claude Sonnet 5.5&apos;</span>
           </div>
           <div className={styles.codeLine}>
             <span className={styles.ck}>target</span>:{" "}
@@ -1179,7 +1179,7 @@ export default function GithubCopilotPage() {
         <hr />
         <h2 id="12-モデル選定戦略">12. モデル選定戦略</h2>
         <p>
-          Copilotのモデルピッカーには、Anthropic・OpenAI・Google・xAIなど複数プロバイダーのモデルが並びます。2026年7月時点で確認できる代表的なラインナップは以下の通りです(
+          Copilotのモデルピッカーには、Anthropic・OpenAI・Google・xAIなど複数プロバイダーのモデルが並びます。本ガイドの情報基準日（2026年7月31日）以降、2026年10月にモデル情報を更新した代表的なラインナップは以下の通りです(
           <strong>
             プランや管理者設定により利用可否が変わるため、必ず実際のモデルピッカーで確認してください
           </strong>
@@ -1197,28 +1197,30 @@ export default function GithubCopilotPage() {
             </thead>
             <tbody>
               <tr className="odd">
-                <td>Claude Sonnet 4.5 / 4.6</td>
+                <td>Claude Sonnet 5.5 / 5 / 4.6</td>
                 <td>Anthropic</td>
                 <td>日常のコーディング全般、Agentモードの既定選択肢になりやすい</td>
                 <td>バランスの取れた品質とコスト</td>
               </tr>
               <tr className="even">
-                <td>Claude Opus 4.7 / 4.8</td>
+                <td>Claude Opus 5.5 / 5 / 4.8</td>
                 <td>Anthropic</td>
                 <td>複雑な設計判断、難易度の高いマルチファイル作業</td>
                 <td>コスト高めで、上位プラン限定になりやすい</td>
               </tr>
               <tr className="odd">
-                <td>Claude Haiku 4.5</td>
+                <td>Claude Haiku 5.5 / 4.5</td>
                 <td>Anthropic</td>
                 <td>高速・軽量なタスク</td>
                 <td>低コスト</td>
               </tr>
               <tr className="even">
-                <td>GPT-5.4 / GPT-5.5</td>
+                <td>GPT-6.1 Sol / GPT-6 Sol / GPT-6 Astra / GPT-6 Luna</td>
                 <td>OpenAI</td>
                 <td>実装・レビュー・深い分析</td>
-                <td>GPT-5.5はOpenAI側の「価値の効くフラッグシップ」的な位置づけ</td>
+                <td>
+                  GPT-6 AstraがOpenAI側の最上位。GPT-5.4 / GPT-5.5は2026年10月時点の一覧から外れた
+                </td>
               </tr>
               <tr className="odd">
                 <td>GPT-5.6(Luna / Sol / Terra)</td>
@@ -1227,19 +1229,22 @@ export default function GithubCopilotPage() {
                 <td>2026年7月10日GA。VS Code 1.128以上が必要</td>
               </tr>
               <tr className="even">
-                <td>Gemini 3 / 3.1 Pro、Gemini 3 Flash</td>
+                <td>Gemini 4 Argon、Gemini 3.8 Flash</td>
                 <td>Google</td>
                 <td>非常に大きなコンテキストが必要なタスク</td>
-                <td>Copilot on Web では提供範囲が縮小(2026年5月時点)</td>
+                <td>Gemini 4 Argonは2026年10月13日GA(Pro+ / Max / Business / Enterprise)</td>
               </tr>
               <tr className="odd">
-                <td>Grok 4.5 / Grok Code Fast 1</td>
+                <td>Grok 4.7 / 4.6</td>
                 <td>xAI</td>
-                <td>高速・日常的な軽量タスク</td>
+                <td>
+                  Grok 4.7は複雑なマルチステップのエージェント作業、Grok
+                  4.6は汎用的なコーディングと推論
+                </td>
                 <td>ゼロデータ保持ポリシーでホスティング</td>
               </tr>
               <tr className="even">
-                <td>Claude Fable 5</td>
+                <td>Claude Fable 5.1 / 5</td>
                 <td>Anthropic(Mythos系)</td>
                 <td>追加の安全対策を備えたモデル</td>
                 <td>

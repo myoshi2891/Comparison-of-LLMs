@@ -72,8 +72,8 @@ const CARDS: readonly RefCard[] = [
       {
         href: "https://ai.google.dev/pricing",
         label: "ai.google.dev/pricing",
-        desc_ja: "Gemini API料金 (2.5 Pro / Flash / Flash-Lite)",
-        desc_en: "Gemini API pricing (2.5 Pro / Flash / Flash-Lite)",
+        desc_ja: "Gemini API料金 (4 Argon / 3.8 Flash / Flash-Lite 等)",
+        desc_en: "Gemini API pricing (4 Argon / 3.8 Flash / Flash-Lite, etc.)",
       },
       {
         href: "https://ai.google.dev/gemini-api/docs/models/gemini",
@@ -165,6 +165,40 @@ const CARDS: readonly RefCard[] = [
         label: "z.ai/model-api",
         desc_ja: "GLM モデル一覧・コンテキスト長",
         desc_en: "GLM model list & context lengths",
+      },
+    ],
+  },
+  {
+    title: "🦙 Meta (Muse)",
+    links: [
+      {
+        href: "https://dev.meta.ai/docs/pricing-rate-limits",
+        label: "dev.meta.ai/docs/pricing-rate-limits",
+        desc_ja: "Muse Spark 1.3 / 1.2: Standard・Contributor ／ Spark 1.1・Wonder: Standard のみ",
+        desc_en: "Muse Spark 1.3 / 1.2: Standard & Contributor / Spark 1.1 & Wonder: Standard only",
+      },
+      {
+        href: "https://dev.meta.ai/docs/models",
+        label: "dev.meta.ai/docs/models",
+        desc_ja: "Meta Model API モデル一覧",
+        desc_en: "Meta Model API model list",
+      },
+    ],
+  },
+  {
+    title: "🪟 Microsoft (MAI)",
+    links: [
+      {
+        href: "https://ai.azure.com/catalog/models/MAI-Thinking-1",
+        label: "ai.azure.com/catalog/models/MAI-Thinking-1",
+        desc_ja: "MAI-Thinking-1 (Foundry Preview / 256K ctx)",
+        desc_en: "MAI-Thinking-1 (Foundry preview / 256K ctx)",
+      },
+      {
+        href: "https://techcommunity.microsoft.com/blog/azure-ai-foundry-blog/new-mai-models-in-microsoft-foundry-across-text-image-voice-and-speech/4524632",
+        label: "techcommunity.microsoft.com (Foundry Blog)",
+        desc_ja: "MAI モデルの Foundry 提供・料金発表",
+        desc_en: "MAI models in Foundry: availability & pricing",
       },
     ],
   },

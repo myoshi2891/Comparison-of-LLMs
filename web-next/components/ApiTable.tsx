@@ -31,6 +31,8 @@ const PROVIDER_COLORS: Record<string, string> = {
   AWS: "#facc15",
   "Moonshot(Kimi)": "#818cf8",
   "Zhipu(GLM)": "#f472b6",
+  Meta: "#a3e635",
+  Microsoft: "#f97316",
 };
 
 interface Props {

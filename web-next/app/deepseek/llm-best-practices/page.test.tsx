@@ -60,4 +60,77 @@ describe("DeepSeek LLM Best Practices Page", () => {
     const diagrams = container.querySelectorAll("[data-testid='mermaid-diagram']");
     expect(diagrams.length).toBe(8);
   });
+
+  it("移行チェックリストは Flash の正式 ID deepseek-flash を案内する", () => {
+    const { container } = render(<Page />);
+    const items = Array.from(container.querySelectorAll("#migration li")).map((li) =>
+      li.textContent?.replace(/\s+/g, " ").trim()
+    );
+    expect(items).toEqual([
+      "[ ] deepseek-chat の記述を deepseek-flash または deepseek-v4-pro へ変更",
+      "[ ] deepseek-reasoner の記述を deepseek-v4-pro (Thinking Mode) へ変更",
+      "[ ] API Base URL が https://api.deepseek.com であることを確認",
+      "[ ] 2026年7月24日の完全廃止後に新モデル環境での動作検証を完了",
+    ]);
+  });
+});
+
+describe("DeepSeek 新規開発の既定モデル", () => {
+  const norm = (s: string | null | undefined) => (s ?? "").replace(/\s+/g, " ").trim();
+
+  it("旧モデル廃止 callout は新規開発に deepseek-flash と deepseek-v4-pro を指定させる", () => {
+    const { container } = render(<Page />);
+    const texts = Array.from(
+      container.querySelectorAll("#model-lineup [class*='calloutWarn'] p")
+    ).map((p) => norm(p.textContent));
+    expect(texts).toEqual([
+      "旧モデルエイリアスである deepseek-chat（DeepSeek-V3実体）および deepseek-reasoner（DeepSeek-R1実体）は、2026年7月24日をもって提供終了（完全廃止）となりました。現在は利用できません。新規開発では必ず deepseek-flash または deepseek-v4-pro を指定してください。",
+    ]);
+  });
+
+  it("選定基準表の deepseek-flash 行はピーク時とオフピーク時の料金を区別する", () => {
+    const { container } = render(<Page />);
+    const rows = Array.from(container.querySelectorAll("#step3 tbody tr")).map((tr) =>
+      Array.from(tr.querySelectorAll("td")).map((td) => norm(td.textContent))
+    );
+    expect(rows[1]).toEqual([
+      "高頻度なチャット、リアルタイム要約、コスト重視タスク",
+      "deepseek-flash",
+      "高速かつ低コスト（V4.1 Flash。ピーク時 入力 $0.30 / 出力 $1.20、オフピーク時は 50% 引きの入力 $0.15 / 出力 $0.60。per 1M）。",
+    ]);
+  });
+
+  it("ヒーローの最終更新は2026年10月の更新日を示し、7月30日の初版を基準として残す", () => {
+    const { container } = render(<Page />);
+    const items = Array.from(container.querySelectorAll("#overview [class*='metaItem']")).map(
+      (el) => norm(el.textContent)
+    );
+    expect(items).toEqual([
+      "対象者:初学者 〜 中級エンジニア",
+      "対応API:DeepSeek API v3 / v4 (OpenAI/Anthropic互換)",
+      "最終更新:2026年10月22日（初版: 2026年7月30日）",
+    ]);
+  });
+
+  it("first_call.py は暫定エイリアスではなく deepseek-flash を呼び出す", () => {
+    const { container } = render(<Page />);
+    const block = Array.from(container.querySelectorAll("[class*='codeBlock']")).find((el) =>
+      el.querySelector("[class*='codeBar']")?.textContent?.includes("first_call.py")
+    );
+    const lines = Array.from(block?.querySelectorAll("[class*='codeLine']") ?? []).map((l) =>
+      norm(l.textContent)
+    );
+    expect(lines.slice(lines.indexOf("response = client.chat.completions.create("))).toEqual([
+      "response = client.chat.completions.create(",
+      'model="deepseek-flash",',
+      "messages=[",
+      '{"role": "system", "content": "あなたは優秀なアシスタントです。"},',
+      '{"role": "user", "content": "DeepSeek APIの特徴を簡潔に教えてください。"}',
+      "],",
+      "stream=False",
+      ")",
+      "",
+      "print(response.choices[0].message.content)",
+    ]);
+  });
 });

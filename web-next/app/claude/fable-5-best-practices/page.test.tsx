@@ -80,9 +80,32 @@ describe("/claude/fable-5-best-practices - page structure (Step 1)", () => {
 
   it("uses the latest timeline date and current model comparison", () => {
     const { container } = render(<Page />);
-    expect(container.querySelector("aside")?.textContent).toContain("最終更新: 2026-07-26");
+    const sidebarMeta = container.querySelector(`.${styles.sidebarMeta}`);
+    expect(sidebarMeta?.textContent?.replace(/\s+/g, " ").trim()).toBe(
+      "最終更新: 2026-10-22対象: Claude Code 中〜上級者"
+    );
     expect(container.querySelector(`.${styles.heroMeta}`)?.textContent).toContain("2026年7月26日");
     expect(container.textContent).toContain("Claude Opus 5 / Opus 4.8");
+  });
+
+  it("Fable 5.1 への互換性はプロンプティングの考え方に限定し、API 連携は移行チェックを求める", () => {
+    const { container } = render(<Page />);
+    const paragraph = Array.from(container.querySelectorAll("p")).find((p) =>
+      p.textContent?.startsWith("2026年10月追記")
+    );
+    expect(paragraph?.textContent?.replace(/\s+/g, " ").trim()).toBe(
+      "2026年10月追記: 2026年9月に後継の Claude Fable 5.1（claude-fable-5-1、入力 $10 / 出力 $50 per 1M tokens、1M コンテキスト）と Mythos 5.1 が登場し、Fable 5 はレガシーモデルとなった。あわせて Opus 5.5 / Sonnet 5.5 / Haiku 5.5 も提供が始まっている。本ガイドのプロンプティングの考え方（ゴール・境界・検証基準を渡す）は Fable 5.1 にもそのまま適用できるが、既存の API 連携は次の移行チェックを済ませるまでそのままでは動かない場合がある。新規採用時のモデル ID・価格は公式の Models overview で確認すること。"
+    );
+  });
+
+  it("API 移行チェックで強制 tool_choice の制限と thinking ブロックの例外を示す", () => {
+    const { container } = render(<Page />);
+    const paragraph = Array.from(container.querySelectorAll("p")).find((p) =>
+      p.textContent?.startsWith("API 連携の移行チェック")
+    );
+    expect(paragraph?.textContent?.replace(/\s+/g, " ").trim()).toBe(
+      "API 連携の移行チェック: Fable 5.1 では強制ツール使用（tool_choice の any / tool）が 400 エラーになるため、tool_choice: auto にしてプロンプトで使うツールを明示し、応答に必要な tool_use が含まれるかを確認する。strict: true は任意の入力スキーマ検証であり、呼び出しを強制するものではない。整形済みデータを得るためにツール呼び出しを使っていた場合は、構造化出力も代替になる。また thinking ブロックは生成したモデルに紐づく。Claude Mythos 5.1 は、それを生成した会話の中であれば Fable 5.1 の thinking ブロックを読めるが、それ以外のモデル(評価モデルなど)へ渡すクロスモデル評価フローでは、受け取ったモデル側でブロックが無視される。また過去のターンを編集して再送すると、それ以降の thinking ブロックが無効になる(2026年8月31日以降に作成されたアカウントでは編集済み履歴が 400 エラーになる)。会話履歴は追記のみで扱う設計にし、移行時は公式の Migration guide の Fable 5.1 の項を確認すること。"
+    );
   });
 
   it("opens and closes the mobile sidebar from an accessible button", () => {
@@ -129,6 +152,6 @@ describe("/claude/fable-5-best-practices - registration", () => {
 
   it("uses the latest timeline date in the page registry", () => {
     const entry = pageRegistry.find(({ slug }) => slug === "/claude/fable-5-best-practices");
-    expect(entry?.lastReviewed).toBe("2026-07-26");
+    expect(entry?.lastReviewed).toBe("2026-10-22");
   });
 });

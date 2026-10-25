@@ -15,7 +15,7 @@ const EXPECTED_CHECKLIST_LABELS = [
   "チームの規約・検証手順をAGENTS.mdに書き、プロンプトで毎回繰り返していないか",
   "~/.codex/config.tomlと.codex/config.tomlで個人設定とプロジェクト設定を役割分担しているか",
   "V1ではagents.max_concurrent_threads_per_session(agents.max_threadsは別名)で親スレッドを除くサブエージェント同時実行上限を設定し、MultiAgentV2ではfeatures.multi_agent_v2.max_concurrent_threads_per_sessionで主スレッドを含む上限を設定して、サブエージェント実効上限が設定値−1になることとagents.max_threadsが設定エラーになることを確認したか。agents.max_depthはV1の実行時深さ制限としては適用されないが、lineageとtask-pathの深さ計算に使用される",
-  "サブエージェントのデフォルトモデル設定を各config.tomlのagents.default_subagent_modelで確認・指定し、gpt-5.6またはgpt-5.6-terraを設定しているか",
+  "サブエージェントのデフォルトモデル設定を各config.tomlのagents.default_subagent_modelで確認・指定し、gpt-6.1-solまたはgpt-6-lunaを設定しているか",
   "Skillが利用するMCPツールをagents/openai.yamlのdependencies.toolsに具体的な依存関係として宣言しているか",
   "サンドボックス・承認ポリシーを用途(初回調査/通常開発/CI)に応じて使い分けているか",
   "テスト・Lint・差分レビューをワークフローに組み込み、/reviewやAGENTS.md経由のレビュー観点を活用しているか",
@@ -247,5 +247,24 @@ describe("/codex/openai-codex-guide (2026 Best Practices)", () => {
     expect(metadata.description).toContain(
       "2026年最新情報に基づくOpenAI Codexベストプラクティスガイド"
     );
+  });
+});
+
+describe("個人のデフォルト config.toml 例のモデル利用条件", () => {
+  it("GPT-6.1 Sol の Enterprise / Edu 管理者有効化と、未有効化時のフォールバックを先頭行で示す", () => {
+    const { container } = render(<Page />);
+    const label = Array.from(container.querySelectorAll("p")).find(
+      (p) => p.textContent === "~/.codex/config.toml — 個人のデフォルト例"
+    );
+    const lines = Array.from(
+      label?.nextElementSibling?.querySelectorAll(`.${styles.codeLine}`) ?? []
+    )
+      .slice(0, 3)
+      .map((line) => line.textContent);
+    expect(lines).toEqual([
+      "# Enterprise / Edu では管理者が GPT-6.1 Sol を有効化するまで利用できない",
+      "# 未有効化なら /model に表示される利用可能なモデルへ置き換える",
+      'model = "gpt-6.1-sol"',
+    ]);
   });
 });

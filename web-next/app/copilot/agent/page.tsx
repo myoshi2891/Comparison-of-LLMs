@@ -111,7 +111,7 @@ export default function CopilotAgentPage() {
             </li>
           </ul>
         </nav>
-        <div className={styles.updated}>最終更新: 2026年7月31日時点の公開情報に基づく</div>
+        <div className={styles.updated}>最終更新: 2026年10月22日</div>
       </aside>
 
       <main className={styles.content}>
@@ -521,7 +521,10 @@ export default function CopilotAgentPage() {
           </div>
 
           <h3>2.5 基本サンプル</h3>
-          <span className={styles.codeLabel}>accessibility.agent.md</span>
+          <span className={styles.codeLabel}>
+            accessibility.agent.md（model は2026年10月時点の例。GPT-6.1 Sol は Copilot Pro+ / Max /
+            Business / Enterprise で選択可能）
+          </span>
           <pre className={styles.codeBlock}>
             <div className={styles.codeLine}>
               <span className={styles.ck}>---</span>
@@ -537,7 +540,8 @@ export default function CopilotAgentPage() {
               <span className={styles.cs}>&apos;Accessibility Expert&apos;</span>
             </div>
             <div className={styles.codeLine}>
-              <span className={styles.ck}>model</span>: <span className={styles.cw}>GPT-5.2</span>
+              <span className={styles.ck}>model</span>:{" "}
+              <span className={styles.cw}>GPT-6.1 Sol</span>
             </div>
             <div className={styles.codeLine}>
               <span className={styles.ck}>tools</span>: [
@@ -788,7 +792,10 @@ export default function CopilotAgentPage() {
 
             <h3>4.2 フロントマター構文</h3>
           </div>
-          <span className={styles.codeLabel}>frontmatter</span>
+          <span className={styles.codeLabel}>
+            frontmatter（model の GPT-6.1 Sol は Copilot Pro+ / Max / Business / Enterprise
+            で選択可能。省略すると選択中のモデルを維持）
+          </span>
           <pre className={styles.codeBlock}>
             <div className={styles.codeLine}>
               <span className={styles.ck}>---</span>
@@ -826,7 +833,7 @@ export default function CopilotAgentPage() {
             <div className={styles.codeLine}>
               {"    "}
               <span className={styles.ck}>model</span>:{" "}
-              <span className={styles.cs}>GPT-5.2 (copilot)</span>
+              <span className={styles.cs}>GPT-6.1 Sol (copilot)</span>
             </div>
             <div className={styles.codeLine}>
               <span className={styles.ck}>---</span>
@@ -862,8 +869,9 @@ export default function CopilotAgentPage() {
             </div>
             <div className={styles.codeLine}>
               <span className={styles.ck}>model</span>: [
-              <span className={styles.cs}>&apos;Claude Opus 4.5&apos;</span>,{" "}
-              <span className={styles.cs}>&apos;GPT-5.2&apos;</span>]
+              <span className={styles.cs}>&apos;Claude Opus 5.5&apos;</span>,{" "}
+              <span className={styles.cs}>&apos;GPT-6.1 Sol&apos;</span>,{" "}
+              <span className={styles.cs}>&apos;Claude Sonnet 5.5&apos;</span>]
             </div>
             <div className={styles.codeLine}>
               <span className={styles.ck}>handoffs</span>:
@@ -1730,8 +1738,8 @@ export default function CopilotAgentPage() {
             </div>
             <div className={styles.codeLine}>
               <span className={styles.ck}>model</span>: [
-              <span className={styles.cs}>&apos;Claude Haiku 4.5 (copilot)&apos;</span>,{" "}
-              <span className={styles.cs}>&apos;Gemini 3 Flash (Preview) (copilot)&apos;</span>]
+              <span className={styles.cs}>&apos;Claude Haiku 5.5 (copilot)&apos;</span>,{" "}
+              <span className={styles.cs}>&apos;Gemini 3.8 Flash (copilot)&apos;</span>]
             </div>
             <div className={styles.codeLine}>
               <span className={styles.ck}>---</span>

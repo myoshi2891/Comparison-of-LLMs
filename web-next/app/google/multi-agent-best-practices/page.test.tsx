@@ -450,4 +450,44 @@ describe("Gemini Multi-Agent Best Practices Page Contract Tests", () => {
       }
     });
   });
+
+  it("Orchestrator 例は Flash-Lite の思考レベルを明示し、表示とコピー内容が一致する", () => {
+    const EXPECTED_LINES = [
+      "from google.adk.agents.remote_a2a_agent import RemoteA2aAgent",
+      "from google.adk import Agent",
+      "from google.adk.planners import BuiltInPlanner",
+      "from google.genai import types",
+      "",
+      "data_analyst = RemoteA2aAgent(",
+      'name="DataAnalyst",',
+      'description="データセットを分析する。",',
+      'agent_card="https://agent-b.run.app/.well-known/agent.json"',
+      ")",
+      "",
+      "orchestrator = Agent(",
+      'name="Orchestrator",',
+      'model="gemini-3.5-flash-lite",',
+      "# 委譲判断を伴う自律的なツール利用のため、思考レベルを明示的に指定する",
+      "planner=BuiltInPlanner(",
+      'thinking_config=types.ThinkingConfig(thinking_level="medium")',
+      "),",
+      'instruction="データ分析タスクはDataAnalystに委譲すること。",',
+      "sub_agents=[data_analyst]",
+      ")",
+    ];
+    const { container } = render(<Page />);
+    const block = Array.from(container.querySelectorAll('[data-testid="code-block"]')).find((el) =>
+      el.textContent?.includes('"Orchestrator"')
+    );
+    const displayed = Array.from(block?.querySelectorAll("code > div") ?? []).map((line) =>
+      (line.textContent ?? "").trim()
+    );
+    const copied = (
+      block?.querySelector('[data-testid="code-copy-button"]')?.getAttribute("data-code") ?? ""
+    )
+      .split("\n")
+      .map((line) => line.trim());
+    expect(displayed).toEqual(EXPECTED_LINES);
+    expect(copied).toEqual(EXPECTED_LINES);
+  });
 });
