@@ -75,8 +75,11 @@ grep -nE 'toBe\(|toContain|toMatch' app/<path>/page.test.tsx
 
 ```bash
 cd web-next
-grep -rnoiE --include='*.tsx' --include='*.ts' --include='*.json' "(gpt-[0-9][a-z0-9.-]*|gemini-[0-9][a-z0-9.-]*|claude-([a-z]+-)?[0-9][a-z0-9.-]*|grok-[a-z0-9][a-z0-9.-]*|deepseek-[a-z0-9.-]+|glm-[0-9][a-z0-9.-]*|kimi-[a-z0-9][a-z0-9.-]*|llama-?[0-9][a-z0-9.-]*|phi-[0-9][a-z0-9.-]*|\bo[0-9][a-z0-9.-]*|codex-[a-z0-9.-]+|mai-[a-z0-9.-]+)" app/<path>/ | sort -u
+grep -rnoiE --include='*.tsx' --include='*.ts' --include='*.json' "(gpt-[0-9][a-z0-9.-]*|gemini-[0-9][a-z0-9.-]*|claude-([a-z]+-)?[0-9][a-z0-9.-]*|grok-[a-z0-9][a-z0-9.-]*|deepseek-[a-z0-9.-]+|glm-[0-9][a-z0-9.-]*|kimi-[a-z0-9][a-z0-9.-]*|llama-?[0-9][a-z0-9.-]*|phi-[0-9][a-z0-9.-]*|(^|[^a-z0-9])o[0-9][a-z0-9.-]*|codex-[a-z0-9.-]+|mai-[a-z0-9.-]+)" app/<path>/ \
+  | sed -E 's/^([^:]+:[0-9]+:)[^A-Za-z0-9]/\1/' | sort -u
 ```
+
+`\b` は POSIX ERE で未定義で、BSD grep(macOS 標準)では期待どおり動かない場合があるため、OpenAI の `o3` / `o4-mini` は `(^|[^a-z0-9])` で前置文字を明示して拾う。`-o` の出力にはその前置文字(`"` や空白)が含まれるので、`sed` で `ファイル:行:` 直後の1文字を取り除く。
 
 | 参照先（一次情報） | 確認内容 |
 |---|---|
