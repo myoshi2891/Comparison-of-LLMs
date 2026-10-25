@@ -522,7 +522,8 @@ export default function CopilotAgentPage() {
 
           <h3>2.5 基本サンプル</h3>
           <span className={styles.codeLabel}>
-            accessibility.agent.md（model は2026年10月時点の例）
+            accessibility.agent.md（model は2026年10月時点の例。GPT-6.1 Sol は Copilot Pro+ / Max /
+            Business / Enterprise で選択可能）
           </span>
           <pre className={styles.codeBlock}>
             <div className={styles.codeLine}>
@@ -791,7 +792,10 @@ export default function CopilotAgentPage() {
 
             <h3>4.2 フロントマター構文</h3>
           </div>
-          <span className={styles.codeLabel}>frontmatter</span>
+          <span className={styles.codeLabel}>
+            frontmatter（model の GPT-6.1 Sol は Copilot Pro+ / Max / Business / Enterprise
+            で選択可能。省略すると選択中のモデルを維持）
+          </span>
           <pre className={styles.codeBlock}>
             <div className={styles.codeLine}>
               <span className={styles.ck}>---</span>
