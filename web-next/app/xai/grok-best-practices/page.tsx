@@ -537,7 +537,7 @@ export default function GrokBestPracticesPage() {
             <div className={styles.codeLine} />
             <div className={styles.codeLine}>
               chat = client.chat.<span className={styles.fn}>create</span>(model=
-              <span className={styles.cs}>&quot;grok-4.5&quot;</span>)
+              <span className={styles.cs}>&quot;grok-4.7&quot;</span>)
             </div>
             <div className={styles.codeLine}>
               chat.<span className={styles.fn}>append</span>(<span className={styles.fn}>user</span>
@@ -579,7 +579,7 @@ export default function GrokBestPracticesPage() {
               response = client.responses.<span className={styles.fn}>create</span>(
             </div>
             <div className={styles.codeLine}>
-              {"    "}model=<span className={styles.cs}>&quot;grok-4.5&quot;</span>,
+              {"    "}model=<span className={styles.cs}>&quot;grok-4.7&quot;</span>,
             </div>
             <div className={styles.codeLine}>
               {"    "}input=
