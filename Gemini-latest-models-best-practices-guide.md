@@ -160,13 +160,17 @@ export GEMINI_API_KEY="あなたのAPIキー"
 
 ```python
 # 3) 最小の呼び出し(Interactions API)
+# API 単体ではリポジトリを読めないため、レビュー対象のコードを入力に含める(テキストのみのレビュー)
+from pathlib import Path
+
 from google import genai
 
 client = genai.Client()
+code = Path("payments/retry.py").read_text(encoding="utf-8")
 
 interaction = client.interactions.create(
     model="gemini-4-argon",
-    input="このリポジトリの設計上のリスクを3つ挙げて、根拠も示してください。",
+    input=f"次のコードの設計上のリスクを3つ挙げて、根拠も示してください。\n\n<code>\n{code}\n</code>",
 )
 print(interaction.output_text)
 ```
@@ -510,6 +514,8 @@ Argon / 3.8 Flash は「**長く自律的に走らせる**」ことに強みが�
 ### プロンプトの骨格(コピーして使える雛形)
 
 ```python
+from pathlib import Path
+
 SYSTEM = """\
 あなたは大規模なコードベースを担当するシニアエンジニアです。
 
@@ -531,13 +537,22 @@ SYSTEM = """\
 4. 最後に、学んだこと(最短経路・つまずき)を3点にまとめる。
 """
 
+# この呼び出しはファイル編集もコマンド実行もできない(テキストのみ)。
+# 実際に編集・pytest を反復させるには、リポジトリへのアクセスとシェル実行を提供する
+# エージェント環境(Gemini CLI など)にこの雛形を渡す。ここでは該当コードを渡し、変更案を出させる。
+code = Path("payments/retry.py").read_text(encoding="utf-8")
+
 interaction = client.interactions.create(
     model="gemini-4-argon",
     system_instruction=SYSTEM.format(
         goal="決済リトライ処理の競合状態を解消する",
         verification_command="pytest -q tests/payments",
     ),
-    input="上記の進め方で、リポジトリの該当部分から着手してください。",
+    input=(
+        "上記の進め方に沿って、次のコードへの変更案(差分)と、検証コマンドで確認すべき点を"
+        "テキストで示してください。ファイルの編集やコマンドの実行はできない前提で答えてください。"
+        f"\n\n<code>\n{code}\n</code>"
+    ),
     generation_config={"thinking_level": "medium", "max_output_tokens": 65536},
 )
 ```
