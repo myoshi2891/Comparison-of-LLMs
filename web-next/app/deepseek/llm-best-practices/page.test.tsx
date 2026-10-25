@@ -100,6 +100,18 @@ describe("DeepSeek 新規開発の既定モデル", () => {
     ]);
   });
 
+  it("ヒーローの最終更新は2026年10月の更新日を示し、7月30日の初版を基準として残す", () => {
+    const { container } = render(<Page />);
+    const items = Array.from(container.querySelectorAll("#overview [class*='metaItem']")).map(
+      (el) => norm(el.textContent)
+    );
+    expect(items).toEqual([
+      "対象者:初学者 〜 中級エンジニア",
+      "対応API:DeepSeek API v3 / v4 (OpenAI/Anthropic互換)",
+      "最終更新:2026年10月22日（初版: 2026年7月30日）",
+    ]);
+  });
+
   it("first_call.py は暫定エイリアスではなく deepseek-flash を呼び出す", () => {
     const { container } = render(<Page />);
     const block = Array.from(container.querySelectorAll("[class*='codeBlock']")).find((el) =>
