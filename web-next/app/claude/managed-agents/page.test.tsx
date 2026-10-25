@@ -46,4 +46,14 @@ describe("/claude/managed-agents 契約テスト", () => {
       expect(a.getAttribute("href")).not.toMatch(/\.html$/);
     }
   });
+  it("権限ポリシーの例は always_ask / auto の承認待ちと stream 例の制約を明記する", () => {
+    const { container } = render(<Page />);
+    const section = Array.from(container.querySelectorAll("section")).find(
+      (el) => el.querySelector("h2")?.textContent === "権限ポリシー"
+    );
+    const note = section?.lastElementChild;
+    expect(note?.textContent?.replace(/\s+/g, " ").trim()).toBe(
+      "always_ask を選んだ場合や auto が ask と判定した場合、セッションはツール実行の直前で一時停止し、user.tool_confirmation イベントによる承認・拒否を待ちます。セクション5の sessions.stream() の例はイベントを表示するだけで確認イベントを返さないため、always_ask / auto と組み合わせると停止したままになります。この例では always_allow を使い、always_ask / auto を使う場合は user.tool_confirmation を送信してセッションを再開する処理を実装してください（Events and streaming の公式ドキュメントを参照）。"
+    );
+  });
 });
