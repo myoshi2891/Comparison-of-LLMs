@@ -90,10 +90,23 @@ describe("DeepSeek 新規開発の既定モデル", () => {
 
   it("first_call.py は暫定エイリアスではなく deepseek-flash を呼び出す", () => {
     const { container } = render(<Page />);
-    const lines = Array.from(container.querySelectorAll("[class*='codeLine']")).map((l) =>
+    const block = Array.from(container.querySelectorAll("[class*='codeBlock']")).find((el) =>
+      el.querySelector("[class*='codeBar']")?.textContent?.includes("first_call.py")
+    );
+    const lines = Array.from(block?.querySelectorAll("[class*='codeLine']") ?? []).map((l) =>
       norm(l.textContent)
     );
-    expect(lines).toContain('model="deepseek-flash",');
-    expect(lines).not.toContain('model="deepseek-v4-flash",');
+    expect(lines.slice(lines.indexOf("response = client.chat.completions.create("))).toEqual([
+      "response = client.chat.completions.create(",
+      'model="deepseek-flash",',
+      "messages=[",
+      '{"role": "system", "content": "あなたは優秀なアシスタントです。"},',
+      '{"role": "user", "content": "DeepSeek APIの特徴を簡潔に教えてください。"}',
+      "],",
+      "stream=False",
+      ")",
+      "",
+      "print(response.choices[0].message.content)",
+    ]);
   });
 });
