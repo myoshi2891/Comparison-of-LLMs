@@ -1205,8 +1205,11 @@ export default function Page() {
               <code>sessions.stream()</code>{" "}
               の例はイベントを表示するだけで確認イベントを返さないため、<code>always_ask</code> /{" "}
               <code>auto</code> と組み合わせると停止したままになります。この例では{" "}
-              <code>always_allow</code> を使い、<code>always_ask</code> / <code>auto</code>{" "}
-              を使う場合は <code>user.tool_confirmation</code>{" "}
+              <code>always_allow</code> を使いますが、<code>always_allow</code> では{" "}
+              <code>bash</code> や <code>write_file</code>{" "}
+              も確認なしで実行されるため、信頼できる環境でファイル書き込みを伴わないストリーム例に限って使用してください。承認を挟んで再開する場合は{" "}
+              <code>always_ask</code> / <code>auto</code> を選び、
+              <code>user.tool_confirmation</code>{" "}
               を送信してセッションを再開する処理を実装してください（
               <Ext href="https://platform.claude.com/docs/en/managed-agents/events-and-streaming">
                 Events and streaming
