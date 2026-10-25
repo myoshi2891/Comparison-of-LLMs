@@ -169,7 +169,7 @@ bun run test app/<path> >/tmp/t.log 2>&1; echo "exit=$?"   # tail はexit code �
 | 51 | `/xai/grok-best-practices-intermediate` | xAI Grok API 実践ベストプラクティスガイド | Providers / xAI | 2026-10-22 |
 | 52 | `/zhipu/zai-glm-best-practices` | Z.ai (GLM) ベストプラクティス | Providers / Zhipu(GLM) | 2026-10-22 |
 
-Providers ナビ（`group: "Providers"`）の 43 ページのうち 41 ページは 2026-10-22 に月次確認済み。画面 24・28（スラッシュコマンドの 2 ガイド）は**保留**: 基準バージョン（Claude Code v2.1.196 / Gemini CLI v0.44.1）以降のコマンド差分（2026-10 時点の最新は Claude Code v2.1.309 / Gemini CLI v0.65.0（安定版。比較対象は安定版のみとし、`-preview` / `-nightly` タグは除外する）。コマンド差分の検証開始時にリリース一覧で最新の安定版を再確認する）を未検証のため、確認日を据え置いている。なお画面 24 は `/model` のエイリアス解決先（Opus 5.5 等）だけを先行更新しており、ヘッダーの日付バッジ（2026-06-30）・バージョンバッジとの整合はコマンド差分の検証時にあわせて取る。区分・確認日は `web-next/lib/page-registry.ts` から生成した値で、一覧にない registry 登録ページは末尾の「その他の画面」を参照。
+Providers ナビ（`group: "Providers"`）の 43 ページのうち 41 ページは 2026-10-22 に月次確認済み。画面 24・28（スラッシュコマンドの 2 ガイド）は**保留**: 基準バージョン（Claude Code v2.1.196 / Gemini CLI v0.44.1）以降のコマンド差分（2026-10 時点の最新は Claude Code v2.1.310 / Gemini CLI v0.65.0（安定版。比較対象は安定版のみとし、`-preview` / `-nightly` タグは除外する）。コマンド差分の検証開始時にリリース一覧で最新の安定版を再確認する）を未検証のため、確認日を据え置いている。なお画面 24 は `/model` のエイリアス解決先（Opus 5.5 等）だけを先行更新しており、ヘッダーの日付バッジ（2026-06-30）・バージョンバッジとの整合はコマンド差分の検証時にあわせて取る。区分・確認日は `web-next/lib/page-registry.ts` から生成した値で、一覧にない registry 登録ページは末尾の「その他の画面」を参照。
 
 ---
 
