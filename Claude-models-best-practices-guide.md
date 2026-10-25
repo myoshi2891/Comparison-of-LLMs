@@ -192,8 +192,19 @@ response = client.beta.messages.create(
     output_config={"effort": "high"},
     messages=[
         {"role": "user", "content": "SQLite から PostgreSQL への移行計画を 3 ステップで。"},
-        {"role": "assistant", "content": "1. エクスポート 2. スキーマ作成 3. インポートと検証"},
-        # effort だけを変更する system メッセージ（次の user ターンから有効）
+        {
+            "role": "assistant",
+            "content": [
+                {
+                    "type": "text",
+                    "text": "1. エクスポート 2. スキーマ作成 3. インポートと検証",
+                    # ここまでの安定したプレフィックスをキャッシュする
+                    # （実運用では最小キャッシュ可能長を超える長さが必要）
+                    "cache_control": {"type": "ephemeral"},
+                }
+            ],
+        },
+        # キャッシュ済みプレフィックスの後ろで effort だけを変更する system メッセージ（次の user ターンから有効）
         {"role": "system", "content": [], "output_config": {"effort": "low"}},
         {"role": "user", "content": "その計画を 1 文で要約して。"},
     ],
