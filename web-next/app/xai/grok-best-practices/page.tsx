@@ -187,7 +187,7 @@ export default function GrokBestPracticesPage() {
           <div className={styles.metaRow}>
             <span className={styles.metaChip}>
               <i className="ti ti-calendar" />
-              情報時点: 2026年7月15日
+              情報時点: 2026年7月15日（grok-4.7 関連は2026年10月23日に追記）
             </span>
             <span className={styles.metaChip}>
               <i className="ti ti-users" />
@@ -1760,7 +1760,7 @@ export default function GrokBestPracticesPage() {
               <tr>
                 <th>ツール</th>
                 <th>ツール名</th>
-                <th>料金（1,000回あたり）</th>
+                <th>料金（特記なしは1,000回あたり）</th>
               </tr>
             </thead>
             <tbody>
@@ -1776,7 +1776,9 @@ export default function GrokBestPracticesPage() {
                 <td>
                   <code>x_search</code>
                 </td>
-                <td>$5（ポスト取得 1,000件あたり）/ $10（ユーザープロフィール取得 1,000件あたり）</td>
+                <td>
+                  $5（ポスト取得 1,000件あたり）/ $10（ユーザープロフィール取得 1,000件あたり）
+                </td>
               </tr>
               <tr>
                 <td>Code Execution</td>
@@ -2211,7 +2213,8 @@ export default function GrokBestPracticesPage() {
             16. 参考資料・出典URL一覧
           </h2>
           <p>
-            本ガイドの各セクションは、以下の一次情報源（xAI公式ドキュメント）を参照して作成しました（すべて2026年7月15日時点でアクセス可能な内容）。
+            本ガイドの各セクションは、以下の一次情報源（xAI公式ドキュメント）を参照して作成しました（すべて2026年7月15日時点でアクセス可能な内容。grok-4.7
+            関連の記載は2026年10月23日に確認して追記）。
           </p>
           <table>
             <thead>
@@ -2363,7 +2366,8 @@ export default function GrokBestPracticesPage() {
           <div className={`${styles.callout} ${styles.calloutInfo}`}>
             <i className="ti ti-pin" />
             <div className={styles.calloutBody}>
-              本ガイドは執筆時点（2026年7月15日）の情報に基づいています。xAI
+              本ガイドは執筆時点（2026年7月15日）の情報に基づき、grok-4.7
+              関連の記載は2026年10月23日時点の情報で追記しています。xAI
               は頻繁にモデルやAPI機能を更新するため、本番導入前に必ず{" "}
               <Ext href="https://docs.x.ai/">docs.x.ai</Ext>{" "}
               の最新情報をご確認ください。ドキュメントページ右上の「View as Markdown」リンクや{" "}
@@ -2375,7 +2379,7 @@ export default function GrokBestPracticesPage() {
 
         <footer className={styles.pageFooter}>
           xAI の LLM（Grok）完全ガイド ― 初学者のためのベストプラクティス / 出典: docs.x.ai
-          公式ドキュメント（2026年7月15日時点）
+          公式ドキュメント（2026年7月15日時点。grok-4.7 関連は2026年10月23日に追記）
         </footer>
       </main>
     </div>

@@ -168,4 +168,31 @@ describe("xAI Grok Best Practices Page", () => {
       "grok-4.7・grok-4.6・grok-4.5・grok-4.3・grok-4.20系は20%割引、それ以外のモデルは割引対象外です。"
     );
   });
+  it("情報時点・参考資料の導入文・脚注は 7月15日の基準と grok-4.7 の10月追記を区別する", () => {
+    const { container } = render(<Page />);
+    const norm = (el: Element | null | undefined) => el?.textContent?.replace(/\s+/g, " ").trim();
+    const chip = Array.from(container.querySelectorAll("span")).find((el) =>
+      el.textContent?.includes("情報時点:")
+    );
+    const refsIntro = Array.from(container.querySelectorAll("h2")).find((h) =>
+      h.textContent?.includes("16. 参考資料・出典URL一覧")
+    )?.nextElementSibling;
+    expect([norm(chip), norm(refsIntro), norm(container.querySelector("footer"))]).toEqual([
+      "情報時点: 2026年7月15日（grok-4.7 関連は2026年10月23日に追記）",
+      "本ガイドの各セクションは、以下の一次情報源（xAI公式ドキュメント）を参照して作成しました（すべて2026年7月15日時点でアクセス可能な内容。grok-4.7 関連の記載は2026年10月23日に確認して追記）。",
+      "xAI の LLM（Grok）完全ガイド ― 初学者のためのベストプラクティス / 出典: docs.x.ai 公式ドキュメント（2026年7月15日時点。grok-4.7 関連は2026年10月23日に追記）",
+    ]);
+  });
+
+  it("ツール料金表の見出しは X Search の取得件数単位と矛盾しない", () => {
+    const { container } = render(<Page />);
+    const row = Array.from(container.querySelectorAll("tr")).find(
+      (tr) => tr.querySelector("td")?.textContent === "X Search"
+    );
+    const header = row?.closest("table")?.querySelectorAll("thead th")[2];
+    expect([header?.textContent, row?.querySelectorAll("td")[2]?.textContent]).toEqual([
+      "料金（特記なしは1,000回あたり）",
+      "$5（ポスト取得 1,000件あたり）/ $10（ユーザープロフィール取得 1,000件あたり）",
+    ]);
+  });
 });
