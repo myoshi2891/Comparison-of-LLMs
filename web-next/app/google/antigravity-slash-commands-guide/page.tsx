@@ -2508,7 +2508,7 @@ export default function AntigravitySlashCommandsGuidePage() {
               <div className="ref-cat">GitHub リリース</div>
               <div className="ref-title">
                 Gemini CLI v0.44.1 リリース — 本ガイドの基準バージョン（2026年10月時点の最新は
-                v0.64.0）
+                v0.65.0。コマンド例は v0.44.1 で検証）
               </div>
               <div className="ref-url">
                 github.com/google-gemini/gemini-cli/releases/tag/v0.44.1
