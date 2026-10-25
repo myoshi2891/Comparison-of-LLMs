@@ -235,7 +235,7 @@ export default function DeepSeekLlmPage() {
             </div>
             <div className={styles.metaItem}>
               <span className={styles.metaLabel}>最終更新:</span>
-              <span className={styles.metaVal}>2026年7月30日</span>
+              <span className={styles.metaVal}>2026年10月22日（初版: 2026年7月30日）</span>
             </div>
           </div>
         </header>
