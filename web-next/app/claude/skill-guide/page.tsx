@@ -1018,7 +1018,7 @@ FM["--- YAMLフロントマター ---"]
 FM --> N["📛 name\\nスキル名・/slash-commandの名前になる\\n最大64文字、小文字・数字・ハイフンのみ"]
 FM --> D["📝 description\\n最重要 いつ使うかをClaudeが判断する\\n最大1024文字。具体的なトリガーワードを含める"]
 FM --> AT["🔒 allowed-tools\\nスキルで使えるツールを制限\\n例: Read, Write, Bash, Grep, Glob"]
-FM --> INV["⚡ invocation\\nautomatic: Claude自動判断（デフォルト）\\nexplicit: /コマンドのみ実行"]
+FM --> INV["⚡ disable-model-invocation\\nfalse: Claude自動判断（デフォルト）\\ntrue: /deploy 等の手動呼び出しのみ実行"]
 FM --> CTX["🔀 context\\nfork: 独立したコンテキストで実行\\ninherit: メイン会話を引き継ぐ（デフォルト）"]
 FM --> AG["🤖 agent\\ngeneral-purpose（デフォルト）\\nExplore / Plan / カスタム"]
 FM --> VER["🏷️ version\\nスキルのバージョン管理\\n例: version: 1.0.0"]
@@ -1066,9 +1066,9 @@ style FM fill:#1c2a1c,stroke:#3fb950,color:#e6edf3`}
                   {"  - "}
                   <span className={styles.val}>Glob</span>
                   {"\n"}
-                  <span className={styles.key}>invocation</span>
+                  <span className={styles.key}>disable-model-invocation</span>
                   {": "}
-                  <span className={styles.val}>automatic</span>
+                  <span className={styles.val}>false</span>
                   {"\n"}
                   <span className={styles.key}>context</span>
                   {": "}
