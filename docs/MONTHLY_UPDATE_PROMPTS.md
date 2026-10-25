@@ -2030,8 +2030,8 @@ web-next/app/<path>/page.tsx を読んでください。
      / https://code.claude.com/docs/en/changelog / https://support.claude.com/en/articles/12138966-release-notes
    - Google AI: https://ai.google.dev/gemini-api/docs/changelog
      / https://docs.cloud.google.com/gemini-enterprise-agent-platform/release-notes
-   - OpenAI: https://platform.openai.com/docs/changelog（API changelog）
-     / https://openai.com/api/pricing/（API 価格。scraper/src/scraper/providers/openai.py と同じ取得元）
+   - OpenAI: https://developers.openai.com/api/docs/changelog（API changelog）
+     / https://developers.openai.com/api/docs/pricing（API のモデル別価格）
      / https://learn.chatgpt.com/docs/models（Codex のモデルと退役日）
    - GitHub: https://github.blog/changelog/
    - Microsoft Foundry: https://learn.microsoft.com/en-us/azure/foundry/openai/concepts/model-retirement-schedule
