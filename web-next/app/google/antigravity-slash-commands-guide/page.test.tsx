@@ -40,4 +40,14 @@ describe("/google/antigravity-slash-commands-guide", () => {
     expect(title).toContain("スラッシュコマンド");
     expect(metadata.description).toBeDefined();
   });
+
+  it("参考リンクの最新版ラベルは v0.65.0 で、検証基準は v0.44.1 のまま区別する", () => {
+    const { container } = render(<Page />);
+    const card = container.querySelector(
+      'a[href="https://github.com/google-gemini/gemini-cli/releases/tag/v0.44.1"]'
+    );
+    expect(card?.querySelector(".ref-title")?.textContent).toBe(
+      "Gemini CLI v0.44.1 リリース — 本ガイドの基準バージョン（2026年10月時点の最新は v0.65.0。コマンド例は v0.44.1 で検証）"
+    );
+  });
 });
