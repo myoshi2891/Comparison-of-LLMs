@@ -1209,14 +1209,15 @@ export default function Page() {
               <code>bash</code> や <code>write_file</code>{" "}
               も確認なしで実行されます。セクション5の例は <code>fibonacci.txt</code>{" "}
               を書き込むファイル書き込みの例であるため、<code>always_allow</code>{" "}
-              のまま実行するのは入力が信頼できる場合に限ってください。信頼できない入力を扱う場合は{" "}
-              <code>always_ask</code> / <code>auto</code> を選び、
+              のまま実行するのは入力が信頼できる場合に限ってください。信頼できない入力を扱う場合は、人間の確認が必要なツールに{" "}
+              <code>always_ask</code> を設定し、
               <code>user.tool_confirmation</code>{" "}
               を送信して承認後にセッションを再開する処理を実装してください（
               <Ext href="https://platform.claude.com/docs/en/managed-agents/events-and-streaming">
                 Events and streaming
               </Ext>{" "}
-              の公式ドキュメントを参照）。
+              の公式ドキュメントを参照）。<code>auto</code>{" "}
+              は、モデルの判定による自動実行を許容できる場合に限って選んでください。
             </p>
           </section>
 

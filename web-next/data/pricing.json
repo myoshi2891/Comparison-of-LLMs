@@ -856,15 +856,15 @@
       "name": "Gemini 3.5 Flash",
       "tag": "Deprecated",
       "cls": "tag-leg",
-      "price_in": 1.5,
-      "price_out": 9.0,
+      "price_in": 0.75,
+      "price_out": 3.75,
       "sub_ja": "非推奨エイリアス / Gemini 3.6 Flash へ自動ルーティング (提供終了ではない)",
       "sub_en": "Deprecated alias / auto-routes to Gemini 3.6 Flash (not shut down)",
       "scrape_status": "fallback",
       "provenance": {
         "origin": "hardcoded",
-        "fallback_in": 1.5,
-        "fallback_out": 9.0
+        "fallback_in": 0.75,
+        "fallback_out": 3.75
       }
     },
     {

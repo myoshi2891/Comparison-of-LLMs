@@ -197,7 +197,7 @@ export default function GrokBestPracticesIntermediatePage() {
         <div className={styles.sidebarFooter}>
           docs.x.ai / grok.com
           <br />
-          2026年7月15日時点の情報に基づく
+          2026年7月15日時点の情報に基づく（2026年10月24日更新）
         </div>
       </aside>
 
@@ -216,7 +216,7 @@ export default function GrokBestPracticesIntermediatePage() {
           <div className={styles.metaBox}>
             本ガイドは <Ext href="https://docs.x.ai/overview">docs.x.ai</Ext> および{" "}
             <Ext href="https://grok.com/">grok.com</Ext>{" "}
-            の公式情報（2026年7月15日時点）を実際に調査した上で作成しています。xAI
+            の公式情報（2026年7月15日時点、2026年10月24日更新）を実際に調査した上で作成しています。xAI
             のドキュメントは更新頻度が高いため、本番投入前に第15章のリンクから最新版を再確認してください。
           </div>
         </div>
@@ -2241,7 +2241,7 @@ export default function GrokBestPracticesIntermediatePage() {
           </h2>
           <p>
             本ガイドの内容はすべて以下の xAI
-            公式ドキュメント（2026年7月時点）および公式サイトを参照して作成しています。
+            公式ドキュメント（2026年7月時点、2026年10月24日更新）および公式サイトを参照して作成しています。
           </p>
 
           <div className={styles.refs}>
@@ -2387,7 +2387,7 @@ export default function GrokBestPracticesIntermediatePage() {
             xAI
             のドキュメントは頻繁に更新されます。本番導入前には必ず上記リンクから最新版をご確認ください。
             <br />
-            Generated: 2026年7月15日時点の公開情報に基づく。
+            Generated: 2026年7月15日時点の公開情報に基づく（2026年10月24日更新）。
           </footer>
         </section>
       </main>
