@@ -184,6 +184,18 @@ describe("xAI Grok Best Practices Page", () => {
     ]);
   });
 
+  it("Step3 の最初のリクエスト例は2つとも推奨モデル grok-4.7 を指定する", () => {
+    const { container } = render(<Page />);
+    const modelLines = Array.from(container.querySelectorAll("#step3 pre"))
+      .flatMap((pre) => Array.from(pre.querySelectorAll("div")))
+      .map((line) => line.textContent?.replace(/\s+/g, " ").trim() ?? "")
+      .filter((text) => text.includes('model="'));
+    expect(modelLines).toEqual([
+      'chat = client.chat.create(model="grok-4.7")',
+      'model="grok-4.7",',
+    ]);
+  });
+
   it("ツール料金表の見出しは X Search の取得件数単位と矛盾しない", () => {
     const { container } = render(<Page />);
     const row = Array.from(container.querySelectorAll("tr")).find(
