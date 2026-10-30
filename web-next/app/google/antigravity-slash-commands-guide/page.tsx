@@ -2569,7 +2569,7 @@ export default function AntigravitySlashCommandsGuidePage() {
         <div className="footer-brand">Gemini CLI / Antigravity CLI</div>
         <p>スラッシュコマンド完全ガイド — CLI v0.44.1 / Antigravity CLI 1.0.3 / IDE Commit 2.0.3</p>
         <p style={{ marginTop: "6px" }}>
-          最終更新: 2026年5月31日 &nbsp;|&nbsp;
+          本文の最終更新: 2026年5月31日（最新バージョンの確認: 2026年10月）&nbsp;|&nbsp;
           <a href="https://geminicli.com/docs" target="_blank" rel="noopener noreferrer">
             公式ドキュメント ↗
           </a>
