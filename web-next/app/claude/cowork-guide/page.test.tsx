@@ -101,8 +101,8 @@ describe("/claude/cowork-guide 契約テスト", () => {
 
     expect(list?.tagName).toBe("OL");
     expect(Array.from(list?.querySelectorAll("li") ?? []).map((li) => li.textContent)).toEqual([
-      "統合体験の場合は Settings > Your Claude を、従来のインターフェースの場合は Settings > Cowork を開く",
-      "統合体験では「Instructions for Claude」、従来のインターフェースでは「Global instructions」の横にある「Edit」をクリック",
+      "統合体験の場合は表示に応じて Settings > Account または Settings > Your Claude を、従来のインターフェースの場合は Settings > Cowork を開く",
+      "統合体験では Settings > Account の「Instructions for Claude」または Settings > Your Claude の「Instructions」、従来のインターフェースでは「Global instructions」の横にある「Edit」をクリック",
       "指示文を入力し「Save」をクリック",
     ]);
     expect(note?.textContent).toBe(
