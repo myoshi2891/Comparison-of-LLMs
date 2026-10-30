@@ -1310,7 +1310,8 @@ export default function AntigravitySlashCommandsGuidePage() {
             <pre className="code-body">
               <span className="code-comment"># 起動時に Plan Mode で開始する</span>
               {"\n"}
-              <span className="code-cmd">gemini</span> <span className="code-keyword">--plan</span>
+              <span className="code-cmd">gemini</span>{" "}
+              <span className="code-keyword">--approval-mode=plan</span>
               {"\n\n"}
               <span className="code-comment"># または /settings から手動で切り替え</span>
               {"\n"}
@@ -1481,7 +1482,7 @@ export default function AntigravitySlashCommandsGuidePage() {
 
           <h3>8.2 引数を受け取るコマンド</h3>
           <p>
-            <code>&lt;args&gt;</code> プレースホルダーを使ってユーザーの入力を受け取れます。
+            <code>{"{{args}}"}</code> プレースホルダーを使ってユーザーの入力を受け取れます。
           </p>
           <div className="code-block">
             <div className="code-bar">
@@ -1505,7 +1506,7 @@ export default function AntigravitySlashCommandsGuidePage() {
               <span className="code-keyword">prompt</span>
               {" = "}
               <span className="code-string">
-                &quot;以下の問題に対するコード修正案を提供してください: {"<args>"}&quot;
+                &quot;以下の問題に対するコード修正案を提供してください: {"{{args}}"}&quot;
               </span>
             </pre>
           </div>
@@ -1562,7 +1563,7 @@ export default function AntigravitySlashCommandsGuidePage() {
               {"\n\n"}
               <span className="code-keyword">prompt</span>
               {" = "}
-              <span className="code-string">{`"""\n以下のコードをレビューしてください: <args>\n以下のベストプラクティスに従ってレビューすること:\n@{docs/best-practices.md}\n"""`}</span>
+              <span className="code-string">{`"""\n以下のコードをレビューしてください: {{args}}\n以下のベストプラクティスに従ってレビューすること:\n@{docs/best-practices.md}\n"""`}</span>
             </pre>
           </div>
 
@@ -2067,9 +2068,9 @@ export default function AntigravitySlashCommandsGuidePage() {
                 </tr>
                 <tr>
                   <td>カスタムコマンドで引数が反映されない</td>
-                  <td>&lt;args&gt; プレースホルダーがない</td>
+                  <td>{"{{args}}"} プレースホルダーがない</td>
                   <td>
-                    <code>prompt</code> 内に <code>&lt;args&gt;</code> を記述する
+                    <code>prompt</code> 内に <code>{"{{args}}"}</code> を記述する
                   </td>
                 </tr>
                 <tr>
@@ -2347,10 +2348,10 @@ export default function AntigravitySlashCommandsGuidePage() {
                 <tr>
                   <td>引数受け取り</td>
                   <td>
-                    <code>prompt</code> 内に <code>&lt;args&gt;</code>
+                    <code>prompt</code> 内に <code>{"{{args}}"}</code>
                   </td>
                   <td>
-                    <code>prompt = "修正して: &lt;args&gt;"</code>
+                    <code>prompt = "修正して: {"{{args}}"}"</code>
                   </td>
                 </tr>
                 <tr>
@@ -2508,7 +2509,7 @@ export default function AntigravitySlashCommandsGuidePage() {
               <div className="ref-cat">GitHub リリース</div>
               <div className="ref-title">
                 Gemini CLI v0.44.1 リリース — 本ガイドの基準バージョン（2026年10月時点の最新は
-                v0.66.0。コマンド例は v0.44.1 で検証）
+                v0.66.0）
               </div>
               <div className="ref-url">
                 github.com/google-gemini/gemini-cli/releases/tag/v0.44.1

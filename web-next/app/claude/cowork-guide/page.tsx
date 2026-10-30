@@ -454,8 +454,7 @@ export default function Page() {
             <ol className={styles.plain}>
               <li>
                 統合体験で <code>Settings &gt; Account</code> が表示される場合：「Instructions for
-                Claude」欄に指示文を直接入力する（入力内容は自動で保存され、Edit・Save
-                ボタンはない）
+                Claude」欄に指示文を入力し、画面に表示される操作に従って保存する
               </li>
               <li>
                 統合体験で <code>Settings &gt; Your Claude</code>{" "}
