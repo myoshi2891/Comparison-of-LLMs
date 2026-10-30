@@ -153,7 +153,7 @@ flowchart LR
 
 | 項目 | 内容 |
 |------|------|
-| **対象プラン** | 有料の個人向け Cursor プラン、または Cursor Teams / 個人の SuperGrok・SuperGrok Plus・SuperGrok Heavy を Cursor アカウントに連携 / 自己登録型 Grok Business のシート |
+| **対象プラン** | 有料の個人向け Cursor プラン、または Cursor Teams / 個人の SuperGrok・SuperGrok Plus・SuperGrok Heavy を Cursor アカウントに連携 / 自己登録型 Grok Business のシート / The X Subscription の Premium・Super・Ultra プラン(Plus は対象外)/ X Premium+ を Cursor アカウントに連携 |
 | **アプリ** | macOS / Windows / Linux 用の Grok Bot デスクトップアプリ(モバイルもあり) |
 | **最初の題材** | Bot が実際に役に立てる「アプリやWebサイト」 |
 
