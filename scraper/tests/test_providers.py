@@ -312,6 +312,7 @@ class TestGoogle:
 
     def test_flash_37_alias_follows_38_price_through_promo_expiry(self):
         """3.7 Flash エイリアスは 3.8 Flash として課金されるため、期限後も 3.8 Flash と同じ標準価格へ移る。"""
+        assert google._FLASH_ALIAS_TARGETS["Gemini 3.7 Flash"] == "Gemini 3.8 Flash"
         cases = {date(2026, 12, 31): (0.75, 3.75), date(2027, 1, 1): (1.50, 7.50)}
         for today, expected in cases.items():
             with patch("scraper.providers.google._today_utc", return_value=today):
