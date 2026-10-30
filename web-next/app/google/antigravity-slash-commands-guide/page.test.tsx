@@ -50,4 +50,12 @@ describe("/google/antigravity-slash-commands-guide", () => {
       "Gemini CLI v0.44.1 リリース — 本ガイドの基準バージョン（2026年10月時点の最新は v0.65.0。コマンド例は v0.44.1 で検証）"
     );
   });
+
+  it("フッターは本文の更新日と最新版の確認時期を区別して表示する", () => {
+    const { container } = render(<Page />);
+    const paragraphs = Array.from(container.querySelectorAll("footer p"));
+    expect(paragraphs[1]?.textContent?.replace(/\u00a0/g, " ")).toBe(
+      "本文の最終更新: 2026年5月31日（最新バージョンの確認: 2026年10月） | 公式ドキュメント ↗"
+    );
+  });
 });
