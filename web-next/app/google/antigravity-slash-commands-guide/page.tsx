@@ -1333,17 +1333,19 @@ export default function AntigravitySlashCommandsGuidePage() {
                 <div className="cd" style={{ background: "#ffbd2e" }}></div>
                 <div className="cd" style={{ background: "#28c840" }}></div>
               </div>
-              <span className="code-title">起動方法（Antigravity CLI 1.0.3）</span>
+              <span className="code-title">起動方法（Antigravity CLI 1.1.0 以降）</span>
             </div>
             <pre className="code-body">
               <span className="code-comment">
-                # Antigravity CLI 1.0.3: 起動時に Plan Mode で開始する
+                # Antigravity CLI 1.1.0 以降: 起動時に Plan Mode で開始する
               </span>
               {"\n"}
               <span className="code-cmd">agy</span>{" "}
-              <span className="code-keyword">--approval-mode=plan</span>
+              <span className="code-keyword">--mode=plan</span>
               {"\n\n"}
-              <span className="code-comment"># 1.1 以降は --mode plan。agy --help で確認する</span>
+              <span className="code-comment">
+                # 1.0.x は --approval-mode=plan。agy --help で確認する
+              </span>
             </pre>
           </div>
 

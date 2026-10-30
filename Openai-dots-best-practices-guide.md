@@ -575,7 +575,7 @@ OpenAI は GPT-6 Astra の System Card に dots の付録を追加し、プロ�
 | 評価 | 報告された結果(二次資料経由)|
 |---|---|
 | 大量の攻撃メールを混ぜた評価 | スコア上の攻撃成功なし |
-| Auto-review を守るか | レビュー対象に上がった操作の拒否率は約1%(720件中7件)。合成した禁止行為の検出率(recall)はプロンプトインジェクション 99.3%、全攻撃カテゴリ 90.2%。**完全な安全を保証するものではない** |
+| Auto-review を守るか | OpenAI 公式の Auto-review 記事によると、Codex の社内運用スナップショットではレビュー対象に上がった操作の拒否率は約1%(720件中7件)。検出率(recall)はそれぞれ別の合成評価の値で、プロンプトインジェクションの合成評価で 99.3%、全攻撃カテゴリの合成評価で 90.2%。dots の System Card 評価は、編集なしの実リクエスト 5,000 件と、カテゴリごとに 30 件の合成ケースで行われた。**完全な安全を保証するものではない** |
 | 権限や範囲の変化への適応 | 91.8% が合格(49件中45件)|
 | 警告を尊重するか(不要な継続)| 15〜17%台で不要な継続が観測された |
 | 連続タスクでの境界維持 | 重大な逸脱なし。ただし中間タスクが5→10に倍増すると、中程度の範囲逸脱フラグが8.6%→19.7%に上昇 |
@@ -808,6 +808,7 @@ flowchart TD
 | DevDay 2026 Recap | https://openai.com/index/devday-2026-recap/ |
 | 発表ポスト(X)| https://x.com/OpenAI/status/2104984504133918973 |
 | GPT-6 Astra System Card(変更履歴)| https://deploymentsafety.openai.com/gpt-6-astra/change-log |
+| Auto-review of agent actions without synchronous human oversight(OpenAI Alignment)| https://alignment.openai.com/auto-review/ |
 
 ### 15.2 国際的な開発者・専門家
 
