@@ -2095,8 +2095,10 @@ export default function AntigravitySlashCommandsGuidePage() {
                   </td>
                 </tr>
                 <tr>
-                  <td>カスタムコマンドで引数が反映されない</td>
-                  <td>{"{{args}}"} プレースホルダーがない</td>
+                  <td>カスタムコマンドで引数が意図した位置に入らない</td>
+                  <td>
+                    {"{{args}}"} プレースホルダーがないため、引数がプロンプトの末尾に追加される
+                  </td>
                   <td>
                     <code>prompt</code> 内に <code>{"{{args}}"}</code> を記述する
                   </td>

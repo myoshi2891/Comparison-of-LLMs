@@ -163,7 +163,7 @@ flowchart LR
 
 | 項目 | 内容 |
 |------|------|
-| **対象プラン** | 有料の個人向け Cursor プラン / Cursor Teams(別枠の対象プラン)/ The X Subscription のチームシート(Premium・Super・Ultra。Grok Bot を含み、Grok アカウントの連携は不要。Plus は対象外)/ 個人の SuperGrok・SuperGrok Plus・SuperGrok Heavy または X Premium+ を Cursor アカウントに連携 / 自己登録型 Grok Business のシート(**Sign in with Grok** でサインイン)|
+| **対象プラン** | 有料の個人向け Cursor プラン / Cursor Teams(別枠の対象プラン)/ The X Subscription のチームシート(Premium・Super・Ultra。Grok Bot を含み、Grok アカウントの連携は不要。Plus は対象外)/ 個人の SuperGrok・SuperGrok Plus・SuperGrok Heavy または X Premium+ をレガシーの Cursor アカウントに連携(特定の Cursor プランは不要)/ 自己登録型 Grok Business のシート(**Sign in with Grok** でサインイン)|
 | **アプリ** | macOS / Windows / Linux 用の Grok Bot デスクトップアプリ(モバイルもあり) |
 | **最初の題材** | Bot が実際に役に立てる「アプリやWebサイト」 |
 
@@ -220,7 +220,7 @@ uname -m
 4. 契約経路に応じて、次の手順を行う。
    - **The X Subscription の Premium・Super・Ultra** の場合: Grok Bot が含まれるため、Grok アカウントの連携は不要。
    - **SuperGrok** の場合: 案内に従って Grok アカウントを連携する。
-   - **X Premium+** の場合: **Link Grok Account** を選び、X Premium+ の Grok アカウントを連携する。
+   - **X Premium+** の場合: デスクトップアプリで **Settings → Usage & Billing → Get Access with Grok** を開き、X Premium+ の Grok アカウントでサインインする。
    - **セルフサーブの Grok Business** の場合: **Sign in with Grok** を選び、開いたブラウザでサインインを完了する。
 
 初回は短いイントロのあと、裏側でコンピュータのセットアップが走り、**「Grok Bot」という名前の最初の Bot** が作られてチャットが開きます。
@@ -336,8 +336,10 @@ flowchart TD
     C --> D["パスワード等を自分で入力"]
     D --> E["I'm done を選ぶ"]
     E --> F["Bot に続行を指示"]
-    F --> G["ブラウザセッションは共有PCに保持される"]
+    F --> G["ブラウザセッションは Bot が使うコンピュータに保持される<br/>個人 Bot: 共有PC / Shared Bot: 状況により異なる"]
 ```
+
+> **Shared Bot のセッション保存先**: メンバー個人のチャットでは通常そのメンバーのコンピュータ、チャンネル・スレッド・グループ DM・グループチャットでは Shared Bot のコンピュータにセッションが残ります。プライバシー設定によって別のコンピュータが選ばれる場合もあるため、常に共有PCに残るとは限りません。
 
 ### 9.2 守ること
 
@@ -707,7 +709,7 @@ flowchart LR
 ### 16.1 Team Bot
 
 - Cursor チームでは、サイドバーの **+ → Create a Bot** で Bot を作り、チャットの Bot 名メニューの **Share** からチームに共有すると、メンバーが話しかけられる Bot になります。
-- **チームで共有する Bot** では、オーナーが追加したアプリ・シークレット・スキル・ファイルが、**各メンバーのチャットでも利用可能**になります。認証情報や顧客データは追加しないでください。
+- **チームで共有する Bot** では、オーナーまたは Manager が追加したアプリ・シークレット・スキル・ファイルが、**各メンバーのチャットでも利用可能**になります。オーナーと Manager のどちらが追加する場合も、認証情報や顧客データは追加しないでください。
 - 一方、Bot の**公開テンプレート**としての共有は設定のコピーであり、**ログインの共有ではない**ことに注意。
 
 ### 16.2 管理者が知っておくこと(公式・第三者資料より)
