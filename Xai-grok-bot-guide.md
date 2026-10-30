@@ -111,7 +111,12 @@ flowchart TB
         FS["ファイルと workspace"]
         CLI["コマンドライン資格情報"]
     end
-    APP["外部アプリ・MCP・Slack・GitHub など"]
+    WEB["Webサイト・コマンドの接続先(ブラウザ/ターミナルの通信)"]
+    subgraph BE["Cursor バックエンド(PC の外)"]
+        MCP["リモート MCP 接続の発信元"]
+        CON["コネクタ: 接続アプリの OAuth トークンを保管"]
+    end
+    APP["接続アプリ・リモート MCP サーバー(Slack・GitHub など)"]
     U --> B1
     U --> B2
     U --> B3
@@ -121,12 +126,17 @@ flowchart TB
     PC --> BR
     PC --> FS
     PC --> CLI
-    PC --> APP
+    BR --> WEB
+    CLI --> WEB
+    BOTS --> BE
+    MCP --> APP
+    CON --> APP
 ```
 
 **読み取るべきポイント**
 
 - Bot は複数作れますが、**すべて同じクラウドコンピュータを使います**。
+- ブラウザとターミナルの通信は**共有クラウドコンピュータから**出ますが、リモート MCP 接続は **Cursor バックエンドから**発信され、接続アプリの OAuth トークンは**コネクタのバックエンドに留まり** PC には置かれません。
 - したがって「Bot を分ければ権限も分かれる」わけでは**ありません**(公式ドキュメントも「別々の Bot をセキュリティ境界として使わない」と明記しています)。詳細は [14章](#14-セキュリティの境界を理解する)。
 
 ### 3.2 学習の道筋
@@ -153,7 +163,7 @@ flowchart LR
 
 | 項目 | 内容 |
 |------|------|
-| **対象プラン** | 有料の個人向け Cursor プラン、または Cursor Teams / The X Subscription の Premium・Super・Ultra プラン(Grok Bot を含み、Grok アカウントの連携は不要。Plus は対象外)/ 個人の SuperGrok・SuperGrok Plus・SuperGrok Heavy または X Premium+ を Cursor アカウントに連携 / 自己登録型 Grok Business のシート(**Sign in with Grok** でサインイン)|
+| **対象プラン** | 有料の個人向け Cursor プラン / Cursor Teams(別枠の対象プラン)/ The X Subscription のチームシート(Premium・Super・Ultra。Grok Bot を含み、Grok アカウントの連携は不要。Plus は対象外)/ 個人の SuperGrok・SuperGrok Plus・SuperGrok Heavy または X Premium+ を Cursor アカウントに連携 / 自己登録型 Grok Business のシート(**Sign in with Grok** でサインイン)|
 | **アプリ** | macOS / Windows / Linux 用の Grok Bot デスクトップアプリ(モバイルもあり) |
 | **最初の題材** | Bot が実際に役に立てる「アプリやWebサイト」 |
 
@@ -407,7 +417,7 @@ Skill 保存の依頼例(公式例の意訳):
 そして「顧客への連絡は必ず承認が必要」というルールを含めてください。
 ```
 
-- デスクトップの入力欄で `/` を打つと保存済み Skill を呼び出せ、`@` で Bot・グループ・Routine・アプリを参照できます。
+- 保存済み Skill は、依頼文の中で **Skill 名を指定する**と呼び出せます(`/` メニューは対応しているインターフェースでのみ使えます)。`@` で Bot・グループ・Routine・アプリを参照できます。
 - Skill は**全 Bot で共有されるライブラリ**ですが、Bot にそのアプリやログインがないと使えない場合があります。
 - 現在の Bot で Private Skill が表示されない場合は、**Connect apps** を開き、接続済みの項目から **Private skills** を有効にします。
 - 提供されている場合、**Teach a task** でブラウザ操作を一度やって見せて Skill を作れます(最大10分間の画面操作を記録。マイク音声は記録しない)。作られた Skill は**下書き**なので、判断ルール・失敗時の扱い・承認境界を必ず追記してください。

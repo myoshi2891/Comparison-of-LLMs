@@ -58,7 +58,8 @@ describe("/google/antigravity-slash-commands-guide", () => {
     );
     const planBlocks = blocks.filter((text) => text.includes("Plan Mode で開始する"));
     expect(planBlocks).toEqual([
-      "# 起動時に Plan Mode で開始する\ngemini --approval-mode=plan\n\n# または /settings から手動で切り替え\n/settings\n# → Plan Mode の ON/OFF を切り替え",
+      "# Gemini CLI v0.44.1: 起動時に Plan Mode で開始する\ngemini --approval-mode=plan\n\n# 現在のセッションで Plan Mode に入る\n/plan\n# または Shift+Tab で承認モードを切り替え\n\n# /settings で利用可否を変えた場合は再起動が必要",
+      "# Antigravity CLI 1.0.3: 起動時に Plan Mode で開始する\nagy --approval-mode=plan\n\n# 1.1 以降は --mode plan。agy --help で確認する",
     ]);
     const tomlPrompts = blocks
       .filter((text) => text.startsWith("description = ") && text.includes("{{args}}"))

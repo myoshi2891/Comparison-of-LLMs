@@ -1292,9 +1292,10 @@ export default function AntigravitySlashCommandsGuidePage() {
           <div className="alert alert-warn">
             <span className="alert-icon">⚠️</span>
             <div>
-              <strong>起動方法（v0.44.x）</strong>: Plan Mode は独立したスラッシュコマンドではなく、
-              <code>/settings</code>
-              から切り替えるか、起動時フラグで有効化します。
+              <strong>起動方法（v0.44.x）</strong>: 現在のセッションでは <code>/plan</code> または{" "}
+              <code>Shift+Tab</code>（承認モードの切り替え）で Plan Mode に入ります。
+              <code>/settings</code> で Plan Mode の利用可否を変更した場合は、CLI
+              の再起動が必要です。
             </div>
           </div>
 
@@ -1308,16 +1309,41 @@ export default function AntigravitySlashCommandsGuidePage() {
               <span className="code-title">起動方法</span>
             </div>
             <pre className="code-body">
-              <span className="code-comment"># 起動時に Plan Mode で開始する</span>
+              <span className="code-comment">
+                # Gemini CLI v0.44.1: 起動時に Plan Mode で開始する
+              </span>
               {"\n"}
               <span className="code-cmd">gemini</span>{" "}
               <span className="code-keyword">--approval-mode=plan</span>
               {"\n\n"}
-              <span className="code-comment"># または /settings から手動で切り替え</span>
+              <span className="code-comment"># 現在のセッションで Plan Mode に入る</span>
               {"\n"}
-              <span className="code-green">/settings</span>
+              <span className="code-green">/plan</span>
               {"\n"}
-              <span className="code-comment"># → Plan Mode の ON/OFF を切り替え</span>
+              <span className="code-comment"># または Shift+Tab で承認モードを切り替え</span>
+              {"\n\n"}
+              <span className="code-comment"># /settings で利用可否を変えた場合は再起動が必要</span>
+            </pre>
+          </div>
+
+          <div className="code-block">
+            <div className="code-bar">
+              <div className="code-code-dots">
+                <div className="cd" style={{ background: "#ff5f57" }}></div>
+                <div className="cd" style={{ background: "#ffbd2e" }}></div>
+                <div className="cd" style={{ background: "#28c840" }}></div>
+              </div>
+              <span className="code-title">起動方法（Antigravity CLI 1.0.3）</span>
+            </div>
+            <pre className="code-body">
+              <span className="code-comment">
+                # Antigravity CLI 1.0.3: 起動時に Plan Mode で開始する
+              </span>
+              {"\n"}
+              <span className="code-cmd">agy</span>{" "}
+              <span className="code-keyword">--approval-mode=plan</span>
+              {"\n\n"}
+              <span className="code-comment"># 1.1 以降は --mode plan。agy --help で確認する</span>
             </pre>
           </div>
 
