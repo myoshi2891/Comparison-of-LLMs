@@ -53,20 +53,28 @@ describe("/google/antigravity-slash-commands-guide", () => {
 
   it("Plan Mode の起動例とカスタムコマンドの引数は v0.44.1 の書式を使う", () => {
     const { container } = render(<Page />);
-    const codeText = Array.from(container.querySelectorAll("pre.code-body"))
-      .map((pre) => pre.textContent ?? "")
-      .join("\n");
-    expect(codeText).toContain("gemini --approval-mode=plan");
-    expect(codeText).not.toMatch(/gemini --plan\b/);
-    expect(codeText).toContain("{{args}}");
-    expect(container.textContent).not.toContain("<args>");
+    const blocks = Array.from(container.querySelectorAll("pre.code-body")).map(
+      (pre) => pre.textContent ?? ""
+    );
+    const planBlocks = blocks.filter((text) => text.includes("Plan Mode で開始する"));
+    expect(planBlocks).toEqual([
+      "# 起動時に Plan Mode で開始する\ngemini --approval-mode=plan\n\n# または /settings から手動で切り替え\n/settings\n# → Plan Mode の ON/OFF を切り替え",
+    ]);
+    const tomlPrompts = blocks
+      .filter((text) => text.startsWith("description = ") && text.includes("{{args}}"))
+      .map((text) => text.slice(text.indexOf("prompt = ")));
+    expect(tomlPrompts).toEqual([
+      'prompt = "以下の問題に対するコード修正案を提供してください: {{args}}"',
+      'prompt = """\n以下のコードをレビューしてください: {{args}}\n以下のベストプラクティスに従ってレビューすること:\n@{docs/best-practices.md}\n"""',
+    ]);
+    expect(blocks.filter((text) => /gemini --plan\b|<args>/.test(text))).toEqual([]);
   });
 
-  it("フッターは本文の更新日と最新版の確認時期を区別して表示する", () => {
+  it("フッターは本文の基準日と最新版の確認時期を区別して表示する", () => {
     const { container } = render(<Page />);
     const paragraphs = Array.from(container.querySelectorAll("footer p"));
     expect(paragraphs[1]?.textContent?.replace(/\u00a0/g, " ")).toBe(
-      "本文の最終更新: 2026年5月31日（最新バージョンの確認: 2026年10月） | 公式ドキュメント ↗"
+      "本文の基準日: 2026年5月31日（最新バージョンの確認: 2026年10月） | 公式ドキュメント ↗"
     );
   });
 });
