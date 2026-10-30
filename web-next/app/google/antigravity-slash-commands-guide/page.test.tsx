@@ -47,8 +47,19 @@ describe("/google/antigravity-slash-commands-guide", () => {
       'a[href="https://github.com/google-gemini/gemini-cli/releases/tag/v0.44.1"]'
     );
     expect(card?.querySelector(".ref-title")?.textContent).toBe(
-      "Gemini CLI v0.44.1 リリース — 本ガイドの基準バージョン（2026年10月時点の最新は v0.66.0。コマンド例は v0.44.1 で検証）"
+      "Gemini CLI v0.44.1 リリース — 本ガイドの基準バージョン（2026年10月時点の最新は v0.66.0）"
     );
+  });
+
+  it("Plan Mode の起動例とカスタムコマンドの引数は v0.44.1 の書式を使う", () => {
+    const { container } = render(<Page />);
+    const codeText = Array.from(container.querySelectorAll("pre.code-body"))
+      .map((pre) => pre.textContent ?? "")
+      .join("\n");
+    expect(codeText).toContain("gemini --approval-mode=plan");
+    expect(codeText).not.toMatch(/gemini --plan\b/);
+    expect(codeText).toContain("{{args}}");
+    expect(container.textContent).not.toContain("<args>");
   });
 
   it("フッターは本文の更新日と最新版の確認時期を区別して表示する", () => {

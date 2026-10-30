@@ -101,7 +101,7 @@ describe("/claude/cowork-guide 契約テスト", () => {
 
     expect(list?.tagName).toBe("OL");
     expect(Array.from(list?.querySelectorAll("li") ?? []).map((li) => li.textContent)).toEqual([
-      "統合体験で Settings > Account が表示される場合：「Instructions for Claude」欄に指示文を直接入力する（入力内容は自動で保存され、Edit・Save ボタンはない）",
+      "統合体験で Settings > Account が表示される場合：「Instructions for Claude」欄に指示文を入力し、画面に表示される操作に従って保存する",
       "統合体験で Settings > Your Claude が表示される場合：その画面の「Instructions」欄に指示文を入力し、画面に表示される操作に従って保存する",
       "従来のインターフェースの場合：Settings > Cowork を開き、「Global instructions」の横にある「Edit」をクリックして指示文を入力し「Save」をクリック",
     ]);
