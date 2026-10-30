@@ -153,7 +153,7 @@ flowchart LR
 
 | 項目 | 内容 |
 |------|------|
-| **対象プラン** | 有料の個人向け Cursor プラン、または Cursor Teams / 個人の SuperGrok・SuperGrok Plus・SuperGrok Heavy を Cursor アカウントに連携 / 自己登録型 Grok Business のシート / The X Subscription の Premium・Super・Ultra プラン(Plus は対象外)/ X Premium+ を Cursor アカウントに連携 |
+| **対象プラン** | 有料の個人向け Cursor プラン、または Cursor Teams / The X Subscription の Premium・Super・Ultra プラン(Grok Bot を含み、Grok アカウントの連携は不要。Plus は対象外)/ 個人の SuperGrok・SuperGrok Plus・SuperGrok Heavy または X Premium+ を Cursor アカウントに連携 / 自己登録型 Grok Business のシート(**Sign in with Grok** でサインイン)|
 | **アプリ** | macOS / Windows / Linux 用の Grok Bot デスクトップアプリ(モバイルもあり) |
 | **最初の題材** | Bot が実際に役に立てる「アプリやWebサイト」 |
 
@@ -207,7 +207,8 @@ uname -m
 1. ウェルカム画面で **Sign in** を選ぶ(アプリ内なら Settings の **Sign In with Cursor**)。
 2. 開いたブラウザで認証を完了する。
 3. アプリに戻る。
-4. 契約経路に応じて、次のいずれかで Grok アカウントを連携・サインインする。
+4. 契約経路に応じて、次の手順を行う。
+   - **The X Subscription の Premium・Super・Ultra** の場合: Grok Bot が含まれるため、Grok アカウントの連携は不要。
    - **SuperGrok** の場合: 案内に従って Grok アカウントを連携する。
    - **X Premium+** の場合: **Link Grok Account** を選び、X Premium+ の Grok アカウントを連携する。
    - **セルフサーブの Grok Business** の場合: **Sign in with Grok** を選び、開いたブラウザでサインインを完了する。
@@ -255,7 +256,7 @@ flowchart LR
 ### 7.3 Bot を増やすタイミング
 
 - 仕事の種類が**自然に分かれた**とき(例: 分析 / 調査 / 資料)。
-- 追加は **New → Create new Bot**。
+- 追加はサイドバーの **+**(または **New Bot**)から。チームのユーザーはメニューから **Create a Bot** を選ぶ。
 - Cursor チームでチームメイトと共有したい場合は、サイドバーの **+ → Create a Bot** で Bot を作り、チャットの Bot 名メニューにある **Share** からチームに共有します。
 
 ---
@@ -317,7 +318,10 @@ Bot がログインを必要とするアプリに到達すると、まず **Vaul
 
 ```mermaid
 flowchart TD
-    A["Bot が認証画面に到達"] --> B["Take over を依頼"]
+    A["Bot が認証画面に到達"] --> V["Vault・パスワードマネージャ・<br/>Secure Form を試す"]
+    V --> Q{"フォームで処理できる?"}
+    Q -- "できる" --> OK["Bot が続行"]
+    Q -- "できない" --> B["Take over を依頼"]
     B --> C["あなたが Take over を選ぶ"]
     C --> D["パスワード等を自分で入力"]
     D --> E["I'm done を選ぶ"]
@@ -700,9 +704,9 @@ flowchart LR
 | 項目 | 内容 |
 |------|------|
 | 設定の所在 | Grok Bot の製品設定は **Cursor のダッシュボード / Admin API / Organization API** にある。docs.x.ai はそのページを写し、Cursor に戻るリンクを持つ |
-| Auto Review の強制 | 管理者が強制すると、編集不可のチームルールが全員に適用される。個人ルールはより厳しくのみ可能 |
+| Auto Review の強制 | **Enterprise プランのみ**。Enterprise の管理者が Enforce Auto-review とチーム全体の Auto-review ルールを設定すると、編集不可のチームルールが全員に適用される。個人ルールはより厳しくのみ可能 |
 | ローカル実行の上限 | 管理者がチーム全体の上限を設定できる(厳しい方が優先) |
-| Bot の ID | Bot 自身は固有のIDを持たず、**サインインしているメンバーとして**動く |
+| Bot の ID | Bot には識別用の ID があるが、独立した認証アイデンティティや資格情報は持たず、**サインインしているメンバーとして**動く |
 | 実行環境 | 第三者の調査では、Cursor がホストするマシン上でのみ動作しオンプレミスの選択肢はない(OneWave の読み込みによる) |
 | 認証・準拠 | 公式のセキュリティページは **ISO/IEC 27001** と **ISO/IEC 42001** の認証取得を示している。なお、第三者(eesel)は過去に「ドキュメントが認証取得の主張をしていない」と指摘していた(調査日 2026年10月24日時点の記事。現在は公式ページで最新の認証状況を確認する) |
 
@@ -794,9 +798,8 @@ flowchart TD
 | 14 | プライバシー設定は Cursor 側設定が支配する。Privacy Mode の挙動は公式フォーラムの回答で確認する | Cursor の Privacy Mode が Grok Bot にも適用される旨の説明 | Cursor 公式フォーラム | https://forum.cursor.com/t/privacy-and-term-of-use-of-grok-bot-with-cursor-account/168075 |
 | 15 | 見えない文字による隠し指示(Unicode)を検査する OSS コネクタを併用する選択肢 | 実際のアプリ上で検証した開発者の報告(個人開発者。実績は要自己確認) | PixelRainbow(X の投稿) | https://x.com/PixelRainbowNFT/status/2112021936662270175 |
 | 16 | 悪意あるWebコンテンツが共有コンピュータ上で何を可能にするか、シナリオで理解する | Web閲覧型エージェントのプロンプトインジェクション解説 | DEV Community | https://dev.to/aiza-hextyx/grok-bot-prompt-injection-how-malicious-web-content-can-hijack-an-ai-agent-2elh |
-| 17 | 製品の変更が速いので、ドキュメントの更新履歴(changelog)を定期的に見る | ドキュメントセット公開日などを追跡している | Tech Dev Notes | https://techdevnotes.com/releases/xai-docs/20260811-181704Z-cb236dea6e3d |
-| 18 | Bot の使い方の実例を開発者の投稿から学ぶ(中身は各自で確認) | Grok Bot 関連の開発者投稿のアーカイブ(Lingxi Li 氏の投稿) | Lingxi Li(X の投稿のアーカイブ) | https://archive.codenewsletter.ai/2094493172516966781 |
-| 19 | 導入ガイドと技術解説を併読する | 常時稼働型 AI チームメイトの仕組みの解説 | Composio | https://composio.dev/content/guide-to-frok-bot |
+| 17 | Bot の使い方の実例を開発者の投稿から学ぶ(中身は各自で確認) | Grok Bot 関連の開発者投稿のアーカイブ(Lingxi Li 氏の投稿) | Lingxi Li(X の投稿のアーカイブ) | https://archive.codenewsletter.ai/2094493172516966781 |
+| 18 | 導入ガイドと技術解説を併読する | 常時稼働型 AI チームメイトの仕組みの解説 | Composio | https://composio.dev/content/guide-to-frok-bot |
 
 ### 19.2 ソースの信頼度の目安
 
@@ -846,7 +849,6 @@ flowchart TD
 | Cursor フォーラム: Privacy and Terms | https://forum.cursor.com/t/privacy-and-term-of-use-of-grok-bot-with-cursor-account/168075 |
 | Composio: Guide to Grok Bot | https://composio.dev/content/guide-to-frok-bot |
 | DEV Community: Grok Bot Prompt Injection | https://dev.to/aiza-hextyx/grok-bot-prompt-injection-how-malicious-web-content-can-hijack-an-ai-agent-2elh |
-| Tech Dev Notes: xAI Docs リリースノート | https://techdevnotes.com/releases/xai-docs/20260811-181704Z-cb236dea6e3d |
 | Lingxi Li 氏の投稿(アーカイブ) | https://archive.codenewsletter.ai/2094493172516966781 |
 | PixelRainbow: VeilBreaker 投稿 | https://x.com/PixelRainbowNFT/status/2112021936662270175 |
 
