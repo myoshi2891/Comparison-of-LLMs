@@ -453,17 +453,18 @@ export default function Page() {
             </p>
             <ol className={styles.plain}>
               <li>
-                統合体験の場合は表示に応じて <code>Settings &gt; Account</code> または{" "}
-                <code>Settings &gt; Your Claude</code> を、従来のインターフェースの場合は{" "}
-                <code>Settings &gt; Cowork</code> を開く
+                統合体験で <code>Settings &gt; Account</code> が表示される場合：「Instructions for
+                Claude」欄に指示文を直接入力する（入力内容は自動で保存され、Edit・Save
+                ボタンはない）
               </li>
               <li>
-                統合体験では <code>Settings &gt; Account</code> の「Instructions for Claude」または{" "}
-                <code>Settings &gt; Your Claude</code>{" "}
-                の「Instructions」、従来のインターフェースでは「Global
-                instructions」の横にある「Edit」をクリック
+                統合体験で <code>Settings &gt; Your Claude</code>{" "}
+                が表示される場合：その画面の「Instructions」欄に指示文を入力し、画面に表示される操作に従って保存する
               </li>
-              <li>指示文を入力し「Save」をクリック</li>
+              <li>
+                従来のインターフェースの場合：<code>Settings &gt; Cowork</code> を開き、「Global
+                instructions」の横にある「Edit」をクリックして指示文を入力し「Save」をクリック
+              </li>
             </ol>
             <p className={styles.muted}>
               統合体験では、ここに書いた指示はCoworkタスクに限らずすべての会話に適用されます。
