@@ -271,7 +271,7 @@ dot がアプリ経由で読める情報や実行できる操作は、あなた�
 | 挙動 | 意味 | 向いている行為 |
 |---|---|---|
 | 確認なしで実行 | 聞かずにやる | 調査・整理・下書き・自分だけが見るチェックリスト更新 |
-| 事前承認があれば実行 | あなたがプロンプトで**明示的に依頼した行為**だけ実行 | 「この請求書を今日送って」と指定した送信 |
+| 事前承認があれば実行 | あなたがプロンプトで**明示的に依頼した行為**だけ実行 | 「明日9時に、A社の経理担当(billing@example.com)へ、請求書 INV-1024 を添付し、確認済みの文面で送って」のように、宛先・内容・送信時刻(または条件)を指定した送信 |
 | 実行前に確認 | 毎回聞く | 社内への連絡、予定の変更 |
 | あなたに引き渡す | あなたが自分で行う | 社外への公開、金銭、パスワード、権限変更 |
 
@@ -448,7 +448,7 @@ flowchart TD
 | ChatGPT(デスクトップ・Web・モバイル)| そのまま | 通話もできる。ローンチ時点では dot からあなたへ**発信はできない** | ◎ |
 | Slack | デスクトップで連携を設定 | チャンネルに追加しただけでは監視は始まらない。**何を監視するか指定し、繰り返しタスクを確認**する必要がある | ◎ / ○ |
 | Microsoft Teams | 組織の設定が必要。Enterprise 管理ガイドでは招待制のアルファと記載されている | 管理者の許可が必要 | ○ |
-| テキストメッセージ | ChatGPT モバイルアプリ、デスクトップアプリ、またはデスクトップ Web の dot プロフィールから電話を接続 | 限定ベータ(米国の一部 Pro のみ)。**iMessage または RCS が必要で、SMS には非対応**。第三者プロバイダー経由なので、**機微な情報の送信には注意**。`STOP` と返信すると dot からの送信が止まる | ◎ |
+| テキストメッセージ | ChatGPT モバイルアプリ、デスクトップアプリ、またはデスクトップ Web の dot プロフィールから電話を接続 | 限定ベータ(米国の一部 Pro のみ)。**iMessage または RCS が必要で、SMS には非対応**。**iMessage や RCS を使っても、テキストメッセージはエンドツーエンド暗号化されない**。第三者プロバイダー経由なので、**機微な情報の送信には注意**。`STOP` と返信すると dot からの送信が止まる | ◎ |
 
 > **覚えておくこと**: 通話を終えても、**頼んだ作業が止まるとは限りません**。作業を止めたいときは、Pause やタスクの停止を使いましょう。○
 
@@ -807,7 +807,7 @@ flowchart TD
 | Dots privacy, security, and safety FAQs | https://help.openai.com/en/articles/20001529-dots-privacy-security-and-safety-faqs |
 | DevDay 2026 Recap | https://openai.com/index/devday-2026-recap/ |
 | 発表ポスト(X)| https://x.com/OpenAI/status/2104984504133918973 |
-| GPT-6 Astra System Card(変更履歴)| https://deploymentsafety.openai.com/gpt-6-astra/change-log |
+| GPT-6 Astra System Card(dots の評価付録)| https://deploymentsafety.openai.com/gpt-6-astra#sec:appendix-sol-luna |
 | Auto-review of agent actions without synchronous human oversight(OpenAI Alignment)| https://alignment.openai.com/auto-review/ |
 
 ### 15.2 国際的な開発者・専門家
