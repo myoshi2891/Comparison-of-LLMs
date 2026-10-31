@@ -1347,10 +1347,6 @@ export default function AntigravitySlashCommandsGuidePage() {
               {"\n"}
               <span className="code-cmd">agy</span>{" "}
               <span className="code-keyword">--mode=plan</span>
-              {"\n\n"}
-              <span className="code-comment">
-                # 1.0.x は --approval-mode=plan。agy --help で確認する
-              </span>
             </pre>
           </div>
 
