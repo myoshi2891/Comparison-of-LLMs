@@ -215,7 +215,7 @@ uname -m
 ## 6. Step 2: サインインする
 
 1. ウェルカム画面で **Sign in** を選ぶ(Grok Bot は Cursor アカウントを使い、専用のログインはない)。
-2. 開いたブラウザで認証を完了する。
+2. 開いたブラウザで認証を完了する。通常は Cursor アカウントで認証する。セルフサーブの Grok Business のシートで使う場合は、ブラウザで **Sign in with Grok** を選び、シートを持つ Grok アカウントで認証する。
 3. アプリに戻る。
 4. 契約経路に応じて、次の手順を行う。
    - **The X Subscription の Premium・Super・Ultra** の場合: Grok Bot が含まれるため、Grok アカウントの連携は不要。
@@ -223,7 +223,7 @@ uname -m
    - **X Premium+** の場合:
      - デスクトップ: **Settings → Usage & Billing → Get Access with Grok** を開き、X Premium+ の Grok アカウントでサインインする。
      - iPhone / Android: アクセス画面で **Link Grok Account** を選んで連携し、終わったら **Finished Linking? Refresh My Status** を選ぶ。
-   - **セルフサーブの Grok Business** の場合: **Sign in with Grok** を選び、開いたブラウザでサインインを完了する。
+   - **セルフサーブの Grok Business** で、先に Cursor アカウントで認証してしまった場合: いったんサインアウトし、**Sign in with Grok** でシートを持つ Grok アカウントを使って認証し直す。
 
 初回は短いイントロのあと、裏側でコンピュータのセットアップが走り、**「Grok Bot」という名前の最初の Bot** が作られてチャットが開きます。
 
