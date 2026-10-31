@@ -129,4 +129,15 @@ describe("/google/antigravity-slash-commands-guide", () => {
       'Q7 --> R7["Gemini CLI: Plan Mode を有効化<br />既定は read-only（ポリシー次第）<br />Antigravity CLI: agy --mode=plan<br />read-only は強制されない<br />使う前に権限設定を確認"]',
     ]);
   });
+
+  it("Plan Mode 動作フローの分析ノードは Gemini CLI の既定 read-only をポリシー依存として示す", () => {
+    const { getAllByTestId } = render(<Page />);
+    const chart = getAllByTestId("mermaid")
+      .map((el) => el.textContent ?? "")
+      .find((text) => text.includes('A["Plan Mode 有効化"]'));
+    const cLines = (chart ?? "").split("\n").filter((line) => line.startsWith('C["'));
+    expect(cLines).toEqual([
+      'C["エージェントがコードベースを分析<br />Gemini CLI: 既定は read-only（ポリシー次第）<br />Antigravity CLI --mode=plan:<br />権限次第で変更も可能"]',
+    ]);
+  });
 });
