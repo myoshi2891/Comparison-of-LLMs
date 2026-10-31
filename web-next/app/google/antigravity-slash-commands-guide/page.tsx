@@ -1281,8 +1281,13 @@ export default function AntigravitySlashCommandsGuidePage() {
           </div>
 
           <p>
-            <strong>定義</strong>: Plan Mode は<strong>コードを一切変更せず</strong>{" "}
+            <strong>定義</strong>: Gemini CLI の Plan Mode は<strong>コードを一切変更せず</strong>{" "}
             に、変更計画だけを安全に立案できる read-only モードです。
+          </p>
+          <p>
+            Antigravity CLI の <code>--mode=plan</code> は計画立案を促すモードですが、
+            <strong>read-only を強制しません</strong>。
+            設定された権限によってはコードが変更される可能性があるため、権限設定もあわせて確認してください。
           </p>
           <p>
             <strong>理由</strong>:
@@ -1354,7 +1359,7 @@ export default function AntigravitySlashCommandsGuidePage() {
             <div id="diag-6" className={styles.mermaid}>
               <MermaidDiagram
                 chart={
-                  'flowchart TD\nA["Plan Mode 有効化"]\nB["作業内容を自然言語で伝える<br />例:<br />JWT認証をOAuth2に移行したい"]\nC["エージェントが read-only で<br />コードベースを分析"]\nD["Implementation Plan を生成<br />変更ファイル・変更内容・影響範囲・リスク"]\nE{"人間がレビュー"}\nF["Plan Mode を無効化して<br />通常モードで実装を依頼"]\nG["計画を修正して<br />再立案"]\nA --> B\nB --> C\nC --> D\nD --> E\nE --> |承認| F\nE --> |修正| G\nG --> B\nstyle A fill:#0d1e2a,stroke:#00d4ff,color:#00d4ff\nstyle D fill:#0d2e1a,stroke:#00ff88,color:#00ff88\nstyle F fill:#2a1a0d,stroke:#f0b429,color:#f0b429'
+                  'flowchart TD\nA["Plan Mode 有効化"]\nB["作業内容を自然言語で伝える<br />例:<br />JWT認証をOAuth2に移行したい"]\nC["エージェントがコードベースを分析<br />Gemini CLI: read-only<br />Antigravity CLI --mode=plan:<br />権限次第で変更も可能"]\nD["Implementation Plan を生成<br />変更ファイル・変更内容・影響範囲・リスク"]\nE{"人間がレビュー"}\nF["Plan Mode を無効化して<br />通常モードで実装を依頼"]\nG["計画を修正して<br />再立案"]\nA --> B\nB --> C\nC --> D\nD --> E\nE --> |承認| F\nE --> |修正| G\nG --> B\nstyle A fill:#0d1e2a,stroke:#00d4ff,color:#00d4ff\nstyle D fill:#0d2e1a,stroke:#00ff88,color:#00ff88\nstyle F fill:#2a1a0d,stroke:#f0b429,color:#f0b429'
                 }
               />
             </div>
