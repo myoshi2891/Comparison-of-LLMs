@@ -453,11 +453,21 @@ export default function Page() {
             </p>
             <ol className={styles.plain}>
               <li>
-                <code>Settings &gt; Cowork</code> を開く
+                統合体験で <code>Settings &gt; Account</code> が表示される場合：「Instructions for
+                Claude」欄に指示文を入力し、画面に表示される操作に従って保存する
               </li>
-              <li>「Global instructions」の横にある「Edit」をクリック</li>
-              <li>指示文を入力し「Save」をクリック</li>
+              <li>
+                統合体験で <code>Settings &gt; Your Claude</code>{" "}
+                が表示される場合：その画面の「Instructions」欄に指示文を入力し、画面に表示される操作に従って保存する
+              </li>
+              <li>
+                従来のインターフェースの場合：<code>Settings &gt; Cowork</code> を開き、「Global
+                instructions」の横にある「Edit」をクリックして指示文を入力し「Save」をクリック
+              </li>
             </ol>
+            <p className={styles.muted}>
+              統合体験では、ここに書いた指示はCoworkタスクに限らずすべての会話に適用されます。
+            </p>
 
             <h3>Folder Instructions（フォルダ単位の指示）</h3>
             <p>
