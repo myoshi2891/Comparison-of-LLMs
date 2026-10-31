@@ -1,6 +1,12 @@
 import { render } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import Page, { metadata } from "./page";
+
+vi.mock("@/components/docs/MermaidDiagram", () => ({
+  default: function DummyMermaidDiagram({ chart }: { chart: string }) {
+    return <pre data-testid="mermaid">{chart}</pre>;
+  },
+}));
 
 describe("/google/antigravity-slash-commands-guide", () => {
   it("h1 の見出しテキストが一致する", () => {
@@ -110,6 +116,17 @@ describe("/google/antigravity-slash-commands-guide", () => {
       ["コードの計画立案・提案", "できる", "できる", "できる"],
       ["ファイルの書き込み・変更", "既定ではできない（ポリシー次第）", "権限次第", "できる"],
       ["シェルコマンドの実行", "ポリシーで許可されたもののみ", "権限次第", "できる"],
+    ]);
+  });
+
+  it("コマンド選択フローの計画立案ノードは Antigravity CLI が read-only を強制しないことを示す", () => {
+    const { getAllByTestId } = render(<Page />);
+    const chart = getAllByTestId("mermaid")
+      .map((el) => el.textContent ?? "")
+      .find((text) => text.includes('Q7["コードを変えず計画だけ立てたい"]'));
+    const r7Lines = (chart ?? "").split("\n").filter((line) => line.startsWith("Q7 --> R7["));
+    expect(r7Lines).toEqual([
+      'Q7 --> R7["Gemini CLI: Plan Mode を有効化<br />既定は read-only（ポリシー次第）<br />Antigravity CLI: agy --mode=plan<br />read-only は強制されない<br />使う前に権限設定を確認"]',
     ]);
   });
 });
