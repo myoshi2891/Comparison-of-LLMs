@@ -40,9 +40,9 @@ describe("ZaiGlmBestPracticesPage", () => {
       'GLM-5.3 / GLM-5.3-Flash / GLM-5.3-FlashX: thinking が強制で無効化できない(thinking.type は enabled のまま)ため、代わりに reasoning_effort: "low" を指定して思考量を抑える。',
       "GLM-4.5-Flash など GLM-4.6 より前のモデル: thinking パラメータの対象外のため、指定せず省略する。",
     ];
-    expect(Array.from(item?.querySelectorAll("li") ?? []).map((li) => norm(li.textContent))).toEqual(
-      matrix
-    );
+    expect(
+      Array.from(item?.querySelectorAll("li") ?? []).map((li) => norm(li.textContent))
+    ).toEqual(matrix);
     expect(norm(item?.textContent)).toBe(intro + matrix.join(""));
   });
 
