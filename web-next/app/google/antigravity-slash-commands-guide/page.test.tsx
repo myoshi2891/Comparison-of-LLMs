@@ -58,7 +58,8 @@ describe("/google/antigravity-slash-commands-guide", () => {
     );
     const planBlocks = blocks.filter((text) => text.includes("Plan Mode で開始する"));
     expect(planBlocks).toEqual([
-      "# 起動時に Plan Mode で開始する\ngemini --approval-mode=plan\n\n# または /settings から手動で切り替え\n/settings\n# → Plan Mode の ON/OFF を切り替え",
+      "# Gemini CLI v0.44.1: 起動時に Plan Mode で開始する\ngemini --approval-mode=plan\n\n# 現在のセッションで Plan Mode に入る\n/plan\n# または Shift+Tab で承認モードを切り替え\n\n# /settings で利用可否を変えた場合は再起動が必要",
+      "# Antigravity CLI 1.1.0 以降: 起動時に Plan Mode で開始する\nagy --mode=plan\n\n# 1.0.x は --approval-mode=plan。agy --help で確認する",
     ]);
     const tomlPrompts = blocks
       .filter((text) => text.startsWith("description = ") && text.includes("{{args}}"))
@@ -76,5 +77,39 @@ describe("/google/antigravity-slash-commands-guide", () => {
     expect(paragraphs[1]?.textContent?.replace(/\u00a0/g, " ")).toBe(
       "本文の基準日: 2026年5月31日（最新バージョンの確認: 2026年10月） | 公式ドキュメント ↗"
     );
+  });
+  it("Plan Mode の定義は既定動作とポリシー依存を明記する", () => {
+    const { container } = render(<Page />);
+    const definition = Array.from(container.querySelectorAll("p")).find((p) =>
+      p.textContent?.startsWith("定義: Gemini CLI の Plan Mode")
+    );
+    expect(definition?.textContent?.replace(/\s+/g, " ")).toBe(
+      "定義: Gemini CLI の Plan Mode は、既定では read-only で動作し、コードを変更せずに変更計画を立案するモードです。ただし実際の動作は有効なポリシーに従います。ポリシーで許可されたシェルコマンドがコードを変更する可能性もあるため、適用中のポリシーを確認してください。"
+    );
+  });
+
+  it("Plan Mode の可否表は Gemini CLI と Antigravity CLI を区別する", () => {
+    const { container } = render(<Page />);
+    const table = Array.from(container.querySelectorAll("table")).find((t) =>
+      t.textContent?.includes("ファイルの書き込み・変更")
+    );
+    const headers = Array.from(table?.querySelectorAll("thead th") ?? []).map(
+      (th) => th.textContent
+    );
+    expect(headers).toEqual([
+      "操作",
+      "Gemini CLI Plan Mode",
+      "Antigravity CLI --mode=plan",
+      "通常モード",
+    ]);
+    const rows = Array.from(table?.querySelectorAll("tbody tr") ?? []).map((tr) =>
+      Array.from(tr.querySelectorAll("td")).map((td) => td.textContent)
+    );
+    expect(rows).toEqual([
+      ["ファイルの読み取り・分析", "できる", "できる", "できる"],
+      ["コードの計画立案・提案", "できる", "できる", "できる"],
+      ["ファイルの書き込み・変更", "既定ではできない（ポリシー次第）", "権限次第", "できる"],
+      ["シェルコマンドの実行", "ポリシーで許可されたもののみ", "権限次第", "できる"],
+    ]);
   });
 });

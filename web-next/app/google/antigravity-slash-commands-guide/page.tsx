@@ -1281,8 +1281,13 @@ export default function AntigravitySlashCommandsGuidePage() {
           </div>
 
           <p>
-            <strong>定義</strong>: Plan Mode は<strong>コードを一切変更せず</strong>{" "}
-            に、変更計画だけを安全に立案できる read-only モードです。
+            <strong>定義</strong>: Gemini CLI の Plan Mode は、<strong>既定では read-only</strong>{" "}
+            で動作し、コードを変更せずに変更計画を立案するモードです。ただし実際の動作は有効なポリシーに従います。ポリシーで許可されたシェルコマンドがコードを変更する可能性もあるため、適用中のポリシーを確認してください。
+          </p>
+          <p>
+            Antigravity CLI の <code>--mode=plan</code> は計画立案を促すモードですが、
+            <strong>read-only を強制しません</strong>。
+            設定された権限によってはコードが変更される可能性があるため、権限設定もあわせて確認してください。
           </p>
           <p>
             <strong>理由</strong>:
@@ -1292,9 +1297,10 @@ export default function AntigravitySlashCommandsGuidePage() {
           <div className="alert alert-warn">
             <span className="alert-icon">⚠️</span>
             <div>
-              <strong>起動方法（v0.44.x）</strong>: Plan Mode は独立したスラッシュコマンドではなく、
-              <code>/settings</code>
-              から切り替えるか、起動時フラグで有効化します。
+              <strong>起動方法（v0.44.x）</strong>: 現在のセッションでは <code>/plan</code> または{" "}
+              <code>Shift+Tab</code>（承認モードの切り替え）で Plan Mode に入ります。
+              <code>/settings</code> で Plan Mode の利用可否を変更した場合は、CLI
+              の再起動が必要です。
             </div>
           </div>
 
@@ -1308,16 +1314,43 @@ export default function AntigravitySlashCommandsGuidePage() {
               <span className="code-title">起動方法</span>
             </div>
             <pre className="code-body">
-              <span className="code-comment"># 起動時に Plan Mode で開始する</span>
+              <span className="code-comment">
+                # Gemini CLI v0.44.1: 起動時に Plan Mode で開始する
+              </span>
               {"\n"}
               <span className="code-cmd">gemini</span>{" "}
               <span className="code-keyword">--approval-mode=plan</span>
               {"\n\n"}
-              <span className="code-comment"># または /settings から手動で切り替え</span>
+              <span className="code-comment"># 現在のセッションで Plan Mode に入る</span>
               {"\n"}
-              <span className="code-green">/settings</span>
+              <span className="code-green">/plan</span>
               {"\n"}
-              <span className="code-comment"># → Plan Mode の ON/OFF を切り替え</span>
+              <span className="code-comment"># または Shift+Tab で承認モードを切り替え</span>
+              {"\n\n"}
+              <span className="code-comment"># /settings で利用可否を変えた場合は再起動が必要</span>
+            </pre>
+          </div>
+
+          <div className="code-block">
+            <div className="code-bar">
+              <div className="code-code-dots">
+                <div className="cd" style={{ background: "#ff5f57" }}></div>
+                <div className="cd" style={{ background: "#ffbd2e" }}></div>
+                <div className="cd" style={{ background: "#28c840" }}></div>
+              </div>
+              <span className="code-title">起動方法（Antigravity CLI 1.1.0 以降）</span>
+            </div>
+            <pre className="code-body">
+              <span className="code-comment">
+                # Antigravity CLI 1.1.0 以降: 起動時に Plan Mode で開始する
+              </span>
+              {"\n"}
+              <span className="code-cmd">agy</span>{" "}
+              <span className="code-keyword">--mode=plan</span>
+              {"\n\n"}
+              <span className="code-comment">
+                # 1.0.x は --approval-mode=plan。agy --help で確認する
+              </span>
             </pre>
           </div>
 
@@ -1326,7 +1359,7 @@ export default function AntigravitySlashCommandsGuidePage() {
             <div id="diag-6" className={styles.mermaid}>
               <MermaidDiagram
                 chart={
-                  'flowchart TD\nA["Plan Mode 有効化"]\nB["作業内容を自然言語で伝える<br />例:<br />JWT認証をOAuth2に移行したい"]\nC["エージェントが read-only で<br />コードベースを分析"]\nD["Implementation Plan を生成<br />変更ファイル・変更内容・影響範囲・リスク"]\nE{"人間がレビュー"}\nF["Plan Mode を無効化して<br />通常モードで実装を依頼"]\nG["計画を修正して<br />再立案"]\nA --> B\nB --> C\nC --> D\nD --> E\nE --> |承認| F\nE --> |修正| G\nG --> B\nstyle A fill:#0d1e2a,stroke:#00d4ff,color:#00d4ff\nstyle D fill:#0d2e1a,stroke:#00ff88,color:#00ff88\nstyle F fill:#2a1a0d,stroke:#f0b429,color:#f0b429'
+                  'flowchart TD\nA["Plan Mode 有効化"]\nB["作業内容を自然言語で伝える<br />例:<br />JWT認証をOAuth2に移行したい"]\nC["エージェントがコードベースを分析<br />Gemini CLI: read-only<br />Antigravity CLI --mode=plan:<br />権限次第で変更も可能"]\nD["Implementation Plan を生成<br />変更ファイル・変更内容・影響範囲・リスク"]\nE{"人間がレビュー"}\nF["Plan Mode を無効化して<br />通常モードで実装を依頼"]\nG["計画を修正して<br />再立案"]\nA --> B\nB --> C\nC --> D\nD --> E\nE --> |承認| F\nE --> |修正| G\nG --> B\nstyle A fill:#0d1e2a,stroke:#00d4ff,color:#00d4ff\nstyle D fill:#0d2e1a,stroke:#00ff88,color:#00ff88\nstyle F fill:#2a1a0d,stroke:#f0b429,color:#f0b429'
                 }
               />
             </div>
@@ -1338,13 +1371,17 @@ export default function AntigravitySlashCommandsGuidePage() {
               <thead>
                 <tr>
                   <th>操作</th>
-                  <th>Plan Mode</th>
+                  <th>Gemini CLI Plan Mode</th>
+                  <th>Antigravity CLI --mode=plan</th>
                   <th>通常モード</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
                   <td>ファイルの読み取り・分析</td>
+                  <td>
+                    <span className="badge badge-g">できる</span>
+                  </td>
                   <td>
                     <span className="badge badge-g">できる</span>
                   </td>
@@ -1360,11 +1397,17 @@ export default function AntigravitySlashCommandsGuidePage() {
                   <td>
                     <span className="badge badge-g">できる</span>
                   </td>
+                  <td>
+                    <span className="badge badge-g">できる</span>
+                  </td>
                 </tr>
                 <tr>
                   <td>ファイルの書き込み・変更</td>
                   <td>
-                    <span className="badge badge-r">できない</span>
+                    <span className="badge badge-r">既定ではできない（ポリシー次第）</span>
+                  </td>
+                  <td>
+                    <span className="badge badge-r">権限次第</span>
                   </td>
                   <td>
                     <span className="badge badge-g">できる</span>
@@ -1373,7 +1416,10 @@ export default function AntigravitySlashCommandsGuidePage() {
                 <tr>
                   <td>シェルコマンドの実行</td>
                   <td>
-                    <span className="badge badge-r">できない</span>
+                    <span className="badge badge-r">ポリシーで許可されたもののみ</span>
+                  </td>
+                  <td>
+                    <span className="badge badge-r">権限次第</span>
                   </td>
                   <td>
                     <span className="badge badge-g">できる</span>
@@ -2067,8 +2113,10 @@ export default function AntigravitySlashCommandsGuidePage() {
                   </td>
                 </tr>
                 <tr>
-                  <td>カスタムコマンドで引数が反映されない</td>
-                  <td>{"{{args}}"} プレースホルダーがない</td>
+                  <td>カスタムコマンドで引数が意図した位置に入らない</td>
+                  <td>
+                    {"{{args}}"} プレースホルダーがないため、引数がプロンプトの末尾に追加される
+                  </td>
                   <td>
                     <code>prompt</code> 内に <code>{"{{args}}"}</code> を記述する
                   </td>
