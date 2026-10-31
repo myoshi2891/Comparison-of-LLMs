@@ -208,7 +208,8 @@ uname -m
 ```
 
 - 配布元: [x.ai/bot](https://x.ai/bot)
-- 自動アップデート対応。手動は **Settings → Updates → Check for Updates**。
+- 自動アップデート対応。手動は **Settings → Updates → Check for Updates** を選び、更新が見つかったら通常は **Restart to Update** を選んで適用する。
+- Linux の `.deb` / `.rpm` 版では、更新画面は新しいバージョンの通知のみ。更新はパッケージマネージャー(`apt` / `dnf` など)で行う。
 
 ---
 
@@ -569,7 +570,7 @@ X の投稿は**第三者が書いた信頼できない入力**です。@bot で
 
 ### 13.3 Auto Review の設定
 
-ルールの追加場所はプラットフォームで異なります。デスクトップは **Settings → General → Auto-review**、iPhone と Android は **Settings → Bot** から設定します。
+ルールの追加場所はプラットフォームで異なります。デスクトップは **Settings → General** の **Bot** セクションにある **Auto-review**、iPhone と Android は **Settings → Bot** から設定します。
 
 ```mermaid
 flowchart TD
