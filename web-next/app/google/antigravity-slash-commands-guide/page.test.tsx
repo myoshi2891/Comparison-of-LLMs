@@ -93,7 +93,9 @@ describe("/google/antigravity-slash-commands-guide", () => {
     const table = Array.from(container.querySelectorAll("table")).find((t) =>
       t.textContent?.includes("ファイルの書き込み・変更")
     );
-    const headers = Array.from(table?.querySelectorAll("thead th") ?? []).map((th) => th.textContent);
+    const headers = Array.from(table?.querySelectorAll("thead th") ?? []).map(
+      (th) => th.textContent
+    );
     expect(headers).toEqual([
       "操作",
       "Gemini CLI Plan Mode",

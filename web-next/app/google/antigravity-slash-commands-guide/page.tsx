@@ -1281,8 +1281,8 @@ export default function AntigravitySlashCommandsGuidePage() {
           </div>
 
           <p>
-            <strong>定義</strong>: Gemini CLI の Plan Mode は<strong>コードを一切変更せず</strong>{" "}
-            に、変更計画だけを安全に立案できる read-only モードです。
+            <strong>定義</strong>: Gemini CLI の Plan Mode は、<strong>既定では read-only</strong>{" "}
+            で動作し、コードを変更せずに変更計画を立案するモードです。ただし実際の動作は有効なポリシーに従います。ポリシーで許可されたシェルコマンドがコードを変更する可能性もあるため、適用中のポリシーを確認してください。
           </p>
           <p>
             Antigravity CLI の <code>--mode=plan</code> は計画立案を促すモードですが、
@@ -1371,13 +1371,17 @@ export default function AntigravitySlashCommandsGuidePage() {
               <thead>
                 <tr>
                   <th>操作</th>
-                  <th>Plan Mode</th>
+                  <th>Gemini CLI Plan Mode</th>
+                  <th>Antigravity CLI --mode=plan</th>
                   <th>通常モード</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
                   <td>ファイルの読み取り・分析</td>
+                  <td>
+                    <span className="badge badge-g">できる</span>
+                  </td>
                   <td>
                     <span className="badge badge-g">できる</span>
                   </td>
@@ -1393,11 +1397,17 @@ export default function AntigravitySlashCommandsGuidePage() {
                   <td>
                     <span className="badge badge-g">できる</span>
                   </td>
+                  <td>
+                    <span className="badge badge-g">できる</span>
+                  </td>
                 </tr>
                 <tr>
                   <td>ファイルの書き込み・変更</td>
                   <td>
-                    <span className="badge badge-r">できない</span>
+                    <span className="badge badge-r">既定ではできない（ポリシー次第）</span>
+                  </td>
+                  <td>
+                    <span className="badge badge-r">権限次第</span>
                   </td>
                   <td>
                     <span className="badge badge-g">できる</span>
@@ -1406,7 +1416,10 @@ export default function AntigravitySlashCommandsGuidePage() {
                 <tr>
                   <td>シェルコマンドの実行</td>
                   <td>
-                    <span className="badge badge-r">できない</span>
+                    <span className="badge badge-r">ポリシーで許可されたもののみ</span>
+                  </td>
+                  <td>
+                    <span className="badge badge-r">権限次第</span>
                   </td>
                   <td>
                     <span className="badge badge-g">できる</span>
