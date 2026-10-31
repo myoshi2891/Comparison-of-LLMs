@@ -220,7 +220,9 @@ uname -m
 4. 契約経路に応じて、次の手順を行う。
    - **The X Subscription の Premium・Super・Ultra** の場合: Grok Bot が含まれるため、Grok アカウントの連携は不要。
    - **SuperGrok** の場合: 案内に従って Grok アカウントを連携する。
-   - **X Premium+** の場合: デスクトップアプリで **Settings → Usage & Billing → Get Access with Grok** を開き、X Premium+ の Grok アカウントでサインインする。
+   - **X Premium+** の場合:
+     - デスクトップ: **Settings → Usage & Billing → Get Access with Grok** を開き、X Premium+ の Grok アカウントでサインインする。
+     - iPhone / Android: アクセス画面で **Link Grok Account** を選んで連携し、終わったら **Finished Linking? Refresh My Status** を選ぶ。
    - **セルフサーブの Grok Business** の場合: **Sign in with Grok** を選び、開いたブラウザでサインインを完了する。
 
 初回は短いイントロのあと、裏側でコンピュータのセットアップが走り、**「Grok Bot」という名前の最初の Bot** が作られてチャットが開きます。
@@ -809,7 +811,7 @@ flowchart TD
 | 10 | 代替製品と比較し、監査性を重視して選ぶ | プライバシーモードの扱い・承認の性質を比較 | eesel AI | https://www.eesel.ai/blog/grok-bot-alternatives |
 | 11 | 導入前にセキュリティ FAQ を読み、ホスト先・オンプレの可否などを質問リスト化する | 発売直後にセキュリティドキュメントを読み込んだ企業コンサルの整理 | OneWave AI | https://www.onewave-ai.com/blog/grok-bot-explained-what-it-means-for-business |
 | 12 | パーソナルエージェント(Grok Bot / Muse / Dots)の共通構造(記憶・自分のコンピュータ・自律起動)を理解し、副作用の審査範囲(例: メモリ書き込み)を確認する | 3製品の比較解説。1ユーザー1つのマイクロVM を全 Bot が共有する説明を含む | Projeckt AI | https://projecktai.substack.com/p/personal-ai-agents-explained |
-| 13 | ローカル実行は「Never allowed」から始める | 実践ガイドの推奨 | Vantaige | https://vantaige.io/blog/grok-bot-complete-guide-2026 |
+| 13 | ローカル実行は「Never allow」から始める | 実践ガイドの推奨 | Vantaige | https://vantaige.io/blog/grok-bot-complete-guide-2026 |
 | 14 | プライバシー設定は Cursor 側設定が支配する。Privacy Mode の挙動は公式フォーラムの回答で確認する | Cursor の Privacy Mode が Grok Bot にも適用される旨の説明 | Cursor 公式フォーラム | https://forum.cursor.com/t/privacy-and-term-of-use-of-grok-bot-with-cursor-account/168075 |
 | 15 | 見えない文字による隠し指示(Unicode)を検査する OSS コネクタを併用する選択肢 | 実際のアプリ上で検証した開発者の報告(個人開発者。実績は要自己確認) | PixelRainbow(X の投稿) | https://x.com/PixelRainbowNFT/status/2112021936662270175 |
 | 16 | 悪意あるWebコンテンツが共有コンピュータ上で何を可能にするか、シナリオで理解する | Web閲覧型エージェントのプロンプトインジェクション解説 | DEV Community | https://dev.to/aiza-hextyx/grok-bot-prompt-injection-how-malicious-web-content-can-hijack-an-ai-agent-2elh |
