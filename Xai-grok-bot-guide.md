@@ -153,7 +153,7 @@ flowchart LR
 
 | 項目 | 内容 |
 |------|------|
-| **対象プラン** | 有料の個人向け Cursor プラン、または Cursor Teams / The X Subscription の Premium・Super・Ultra プラン(Grok Bot を含み、Grok アカウントの連携は不要。Plus は対象外)/ 個人の SuperGrok・SuperGrok Plus・SuperGrok Heavy または X Premium+ を Cursor アカウントに連携 / 自己登録型 Grok Business のシート(**Sign in with Grok** でサインイン)|
+| **対象プラン** | レガシー Cursor プランの有料個人プラン、または Cursor Teams / The X Subscription の Premium・Super・Ultra プラン(個人シート・チームシートとも対象。Grok Bot を含み、Grok アカウントの連携は不要。Plus は対象外)/ 個人の SuperGrok・SuperGrok Plus・SuperGrok Heavy または X Premium+ を Cursor アカウントに連携 / 自己登録型 Grok Business のシート(**Sign in with Grok** でサインイン)|
 | **アプリ** | macOS / Windows / Linux 用の Grok Bot デスクトップアプリ(モバイルもあり) |
 | **最初の題材** | Bot が実際に役に立てる「アプリやWebサイト」 |
 
@@ -204,7 +204,7 @@ uname -m
 
 ## 6. Step 2: サインインする
 
-1. ウェルカム画面で **Sign in** を選ぶ(アプリ内なら Settings の **Sign In with Cursor**)。
+1. ウェルカム画面で **Sign in** を選ぶ(Grok Bot は Cursor アカウントを使い、専用のログインはない)。
 2. 開いたブラウザで認証を完了する。
 3. アプリに戻る。
 4. 契約経路に応じて、次の手順を行う。
