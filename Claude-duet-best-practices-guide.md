@@ -95,10 +95,10 @@ flowchart TD
 |---|---|
 | 公開日 | 2026-10-21（リサーチプレビュー） |
 | 入手方法 | **ウェイトリスト**（順次招待） |
-| 対象プラン | **Pro / Max**（Team / Enterprise は未対応） |
+| 対象プラン | **Pro / Max / Ultra**（Team / Enterprise は未対応） |
 | 対象地域 | **米国のみ**（米国の Claude アカウントが必要） |
 | 搭載モデル | Claude Opus 5.5（**モデルの選択は不可**。作業量は Duet が判断） |
-| 料金 | 研究プレビュー中は Pro / Max に追加料金なし。**使用上限は他の Claude と共有** |
+| 料金 | 研究プレビュー中は Pro / Max / Ultra に追加料金なし。**使用上限は他の Claude と共有** |
 | 接続できるもの | 6,000 以上のコネクタとプラグイン（Gmail・Google Calendar・Slack・QuickBooks・Stripe・HubSpot・Docusign・Gusto・Notion・Canva など） |
 
 【公式】出典: 製品ページ、発表記事、ヘルプセンター「Claude Duet を始める」
@@ -159,7 +159,7 @@ flowchart LR
 
 ```mermaid
 flowchart TD
-  S["開始"] --> P{"Pro か Max プラン?"}
+  S["開始"] --> P{"Pro か Max か Ultra プラン?"}
   P -->|"いいえ"| X1["現時点では対象外<br/>Team と Enterprise は未対応"]
   P -->|"はい"| R{"米国の Claude<br/>アカウント?"}
   R -->|"いいえ"| X2["現時点では対象外<br/>続報を待つ"]
@@ -732,7 +732,7 @@ Claire Vo（ChatPRD 創業者、Lenny's Newsletter / How I AI のホスト）は
 | メール・予定・請求・会議準備など、**文脈が接続アプリにある**仕事 | 緊急性が極めて高く、**確認の遅れが致命的**な業務 |
 | 結果を**人が最後に確認**できる業務 | 承認なしで完結させたい自動処理 |
 | 定型的で、成果物が**検証しやすい**業務 | 個人的な予約・手配が中心の用途 |
-| 米国の Pro / Max ユーザー | Team / Enterprise、米国外のアカウント |
+| 米国の Pro / Max / Ultra ユーザー | Team / Enterprise、米国外のアカウント |
 
 ---
 
@@ -798,7 +798,7 @@ flowchart TD
 | 防御に頼りきらず、**そもそも危険なデータ・道具を渡さない**設計（Willison の姿勢） | 5章・10章。接続を絞る |
 | 繰り返し作業は、**ループやルーティン**として自動化する流れ（Boris Cherny の近年の発言、二次報道） | 定型業務を1つ決めて Duet に任せ、**結果が検証しやすい**ものから広げる |
 
-> 【公式】Anthropic の auto mode に関する公開記事（[Claude Code auto mode の分類器](https://www.anthropic.com/engineering/claude-code-auto-mode)）によると、有害な操作を拒否できた人間は **13.6%**、auto mode なら **89%** を止められました。ただしこの評価は、**研究用の環境で有料ユーザーの開発者 1,053 人**を対象に、**各セッションで危険なコマンドを1つ差し替えて提示**したもので、**その操作は実際には実行されていません**。Willison もこの数字を紹介しています。同時に Willison は、残りの約 11% が止められないこと、悪意のあるパッケージのような攻撃への懸念、さらなる独立した検証を求める姿勢も示しています。**この数字は Claude Code の auto mode の評価であり、Duet そのものの数値ではありません。** また、この結果は自動チェックが人間の注意深いレビューの代わりになることを意味しません。
+> 【公式】Claude のブログ記事（[Auto mode is now the default in Claude Code](https://claude.com/blog/auto-mode-default-in-claude-code)）によると、有害な操作を拒否できた人間は **13.6%**、auto mode なら **89%** を止められました。ただしこの評価は、**研究会社を通じて募集した有償のエキスパートテスター 1,053 人**が、**研究用の環境で**参加したもので、**各セッションで危険なコマンドを1つ差し替えて提示**したもので、**その操作は実際には実行されていません**。Willison もこの数字を紹介しています。同時に Willison は、残りの約 11% が止められないこと、悪意のあるパッケージのような攻撃への懸念、さらなる独立した検証を求める姿勢も示しています。**この数字は Claude Code の auto mode の評価であり、Duet そのものの数値ではありません。** また、この結果は自動チェックが人間の注意深いレビューの代わりになることを意味しません。
 
 ### 16-3. Duet と Claude Code の使い分け【分析】
 
@@ -814,7 +814,7 @@ flowchart TD
 
 ### 17-1. 使い始める前
 
-- [ ] Pro / Max プランで、米国の Claude アカウントを持っている
+- [ ] Pro / Max / Ultra プランで、米国の Claude アカウントを持っている
 - [ ] ウェイトリストに、Claude アカウントと同じメールアドレスで登録した
 - [ ] 招待メールを開くスマホの Apple / Google アカウントが、そのメールに紐づいている
 - [ ] 接続するアプリを最大2つに絞った
@@ -848,10 +848,10 @@ flowchart TD
 ## 18. FAQ
 
 **Q1. 日本から使えますか？**
-A. 現時点では、リサーチプレビューは**米国の Pro / Max ユーザーのみ**が対象で、米国の Claude アカウントが必要です。【公式】対象拡大の時期は、確認できた範囲では示されていません。
+A. 現時点では、リサーチプレビューは**米国の Pro / Max / Ultra ユーザーのみ**が対象で、米国の Claude アカウントが必要です。【公式】対象拡大の時期は、確認できた範囲では示されていません。
 
 **Q2. 追加料金はかかりますか？**
-A. 研究プレビュー中は Pro / Max に追加料金なしで含まれます。ただし、**使用上限は共有**で、裏の作業も消費します。【公式】
+A. 研究プレビュー中は Pro / Max / Ultra に追加料金なしで含まれます。ただし、**使用上限は共有**で、裏の作業も消費します。【公式】
 
 **Q3. パソコンの電源を切っても動きますか？**
 A. 動きます。Duet は**クラウド上の専用 PC**で作業するため、スマホや PC の電源に依存しません。【公式】
@@ -908,7 +908,7 @@ A. Claude アカウントを共有しますが、**別の独立したアプリ**
 | 同・英語版 | https://support.claude.com/en/articles/17631495 | 検索結果で確認 |
 | Trustworthy agents（Duet の記事が参照） | https://www.anthropic.com/research/trustworthy-agents | リンクのみ（本文は未取得） |
 | Managed Agents の設計（認証情報の分離） | https://www.anthropic.com/engineering/managed-agents | リンクのみ（本文は未取得） |
-| Claude Code auto mode の分類器（1,053 人の評価の一次情報） | https://www.anthropic.com/engineering/claude-code-auto-mode | 16章の評価数値の出典。研究環境・1セッション1件の差し替え・非実行という条件付き |
+| Auto mode is now the default in Claude Code（Claude ブログ・1,053 人の評価の一次情報） | https://claude.com/blog/auto-mode-default-in-claude-code | 16章の評価数値の出典。研究環境・1セッション1件の差し替え・非実行という条件付き |
 | ブラウザ利用でのプロンプトインジェクション対策 | https://www.anthropic.com/research/prompt-injection-defenses | リンクのみ（本文は未取得） |
 | バグバウンティ（HackerOne） | https://hackerone.com/anthropic | リンクのみ |
 
