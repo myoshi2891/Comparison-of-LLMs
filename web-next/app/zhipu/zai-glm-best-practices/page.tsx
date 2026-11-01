@@ -862,7 +862,10 @@ export default function ZaiGlmBestPracticesPage() {
             Thinking」機能を備えている。<code className={styles.codeInline}>thinking.type</code>
             で有効/無効を切り替え、GLM-5.2以降ではさらに
             <code className={styles.codeInline}>reasoning_effort</code>
-            で思考の深さを段階的に制御できる。GLM-5.2/5.1/5ではthinkingが既定で有効で、モデルがタスクの難易度を見て思考の要否を自動判断する。GLM-4.7系もthinkingが既定で有効だが、enabledのときは自動判断せず必ず思考する(強制thinking)。これに対し、GLM-4.6のようなハイブリッドモデルは既定で無効という違いがある点に注意する。
+            で思考の深さを段階的に制御できる。GLM-5.2/5.1/5ではthinkingが既定で有効で、モデルがタスクの難易度を見て思考の要否を自動判断する。GLM-4.7系もthinkingが既定で有効だが、enabledのときは自動判断せず必ず思考する(強制thinking)。GLM-4.6のようなハイブリッドモデルもハイブリッド思考が既定で有効で、無効にするには
+            <code className={styles.codeInline}>thinking.type</code>に
+            <code className={styles.codeInline}>disabled</code>
+            を明示的に指定する必要がある点に注意する。
           </p>
 
           <div className={styles.tableWrap}>

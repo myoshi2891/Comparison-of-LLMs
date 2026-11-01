@@ -6,13 +6,17 @@ export default function TocObserver() {
     const sidebar = document.getElementById("guide-sidebar"),
       menu = document.getElementById("menu");
     const links = Array.from(sidebar?.querySelectorAll<HTMLAnchorElement>("nav a") ?? []);
+    // aria-expanded と状態依存の aria-label を常に同期する
+    const sync = (open: boolean) => {
+      menu?.setAttribute("aria-expanded", String(open));
+      menu?.setAttribute("aria-label", open ? "目次を閉じる" : "目次を開く");
+    };
     const close = () => {
       sidebar?.classList.remove(styles.open);
-      menu?.setAttribute("aria-expanded", "false");
+      sync(false);
     };
     const toggle = () => {
-      const open = sidebar?.classList.toggle(styles.open);
-      menu?.setAttribute("aria-expanded", String(Boolean(open)));
+      sync(Boolean(sidebar?.classList.toggle(styles.open)));
     };
     const key = (e: KeyboardEvent) => {
       if (e.key === "Escape") close();

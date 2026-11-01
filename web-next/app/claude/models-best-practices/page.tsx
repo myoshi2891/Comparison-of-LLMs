@@ -73,7 +73,7 @@ export default function Page() {
   return (
     <div className={styles.root} data-testid="layout-root" data-page="claude-models">
       <link
-        href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Source+Serif+4:wght@600;700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@600;700&display=swap"
         rel="stylesheet"
       />
       <link
@@ -85,7 +85,7 @@ export default function Page() {
         {"\n      "}
         <button
           id="menu"
-          aria-label="menu"
+          aria-label="目次を開く"
           type="button"
           aria-controls="guide-sidebar"
           aria-expanded="false"
