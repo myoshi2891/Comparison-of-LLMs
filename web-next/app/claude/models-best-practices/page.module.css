@@ -417,3 +417,17 @@
   border: none;
   white-space: pre;
 }
+
+/* Restore the source browser defaults removed by the shared Tailwind reset. */
+.root :global(p) {
+  margin-block: 1em;
+}
+.root :global(ul),
+.root :global(ol) {
+  margin-block: 1em;
+}
+.root :global(h3),
+.root :global(h4),
+.root :global(strong) {
+  font-weight: 700;
+}
