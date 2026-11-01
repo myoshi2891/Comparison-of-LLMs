@@ -163,7 +163,7 @@ flowchart LR
 
 | 項目 | 内容 |
 |------|------|
-| **対象プラン** | レガシー Cursor プランの有料個人プラン / Cursor Teams / The X Subscription の Premium・Super・Ultra プラン(個人シート・チームシートとも対象。Grok Bot を含み、Grok アカウントの連携は不要。Plus は対象外)/ 個人の SuperGrok・SuperGrok Plus・SuperGrok Heavy または X Premium+ をレガシーの Cursor アカウントに連携(特定の Cursor プランは不要)/ 自己登録型 Grok Business のシート(**Sign in with Grok** でサインイン)|
+| **対象プラン** | レガシー Cursor プランの有料個人プラン / Cursor Teams / Cursor Enterprise(管理者によるチームへの有効化が必要。アカウント担当者に相談し、使用量は管理者が管理。個人の SuperGrok 連携は不可)/ The X Subscription の Premium・Super・Ultra プラン(個人シート・チームシートとも対象。Grok Bot を含み、Grok アカウントの連携は不要。Plus は対象外)/ 個人の SuperGrok・SuperGrok Plus・SuperGrok Heavy または X Premium+ をレガシーの Cursor アカウントに連携(特定の Cursor プランは不要)/ 自己登録型 Grok Business のシート(**Sign in with Grok** でサインイン)|
 | **アプリ** | macOS / Windows / Linux 用の Grok Bot デスクトップアプリ(モバイルもあり) |
 | **最初の題材** | Bot が実際に役に立てる「アプリやWebサイト」 |
 
@@ -220,7 +220,9 @@ uname -m
 3. アプリに戻る。
 4. 契約経路に応じて、次の手順を行う。
    - **The X Subscription の Premium・Super・Ultra** の場合: Grok Bot が含まれるため、Grok アカウントの連携は不要。
-   - **SuperGrok** の場合: 案内に従って Grok アカウントを連携する。
+   - **SuperGrok** の場合:
+     - デスクトップ: **Settings → Usage & Billing → Get Access with Grok** を開き、SuperGrok の Grok アカウントでサインインする。
+     - iPhone / Android: アクセス画面で **Link Grok Account** を選んで連携し、終わったら **Finished Linking? Refresh My Status** を選ぶ。
    - **X Premium+** の場合:
      - デスクトップ: **Settings → Usage & Billing → Get Access with Grok** を開き、X Premium+ の Grok アカウントでサインインする。
      - iPhone / Android: アクセス画面で **Link Grok Account** を選んで連携し、終わったら **Finished Linking? Refresh My Status** を選ぶ。
