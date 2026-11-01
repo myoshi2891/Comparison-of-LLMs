@@ -407,10 +407,10 @@
   scroll-margin-top: calc(var(--header-height, 60px) + 80px);
 }
 .root .sidebar {
-  top: calc(var(--header-height, 60px) + 80px);
+  top: calc(var(--ch-height, 60px) + var(--ch-disclaimer-height, 0px));
 }
 .root .mobile-bar {
-  top: var(--header-height, 60px);
+  top: calc(var(--ch-height, 60px) + var(--ch-disclaimer-height, 0px));
 }
 .root :global(pre code) {
   background: none;

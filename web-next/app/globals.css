@@ -1843,3 +1843,39 @@ body:has([data-page="reliable-machine-learning"]) nav[aria-label="関連ペー�
 }
 
 
+
+/* Claude models: align shared chrome with the guide's fixed sidebar and hero. */
+body:has([data-page="claude-models"]).has-common-header {
+  margin-top: calc(var(--ch-height, 60px) + var(--ch-disclaimer-height, 0px));
+  background: #f7f3ea;
+}
+body:has([data-page="claude-models"]) #site-freshness-bar {
+  box-sizing: border-box;
+  max-width: none;
+  width: calc(100% - 272px);
+  margin: 0 0 0 272px;
+  padding: 8px 48px;
+  background: linear-gradient(135deg, #2f3e8f, #6b3a5e);
+  color: #fff;
+}
+body:has([data-page="claude-models"]) #site-freshness-bar time {
+  color: #fff;
+}
+body:has([data-page="claude-models"]) .ch-disclaimer {
+  background: #26231c;
+}
+body:has([data-page="claude-models"]) nav[aria-label="関連ページ"] {
+  margin-left: 272px;
+  margin-top: 0;
+  max-width: none;
+  background: #f7f3ea;
+}
+@media (max-width: 900px) {
+  body:has([data-page="claude-models"]) #site-freshness-bar,
+  body:has([data-page="claude-models"]) nav[aria-label="関連ページ"] {
+    width: 100%;
+    margin-left: 0;
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+}

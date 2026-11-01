@@ -31,7 +31,11 @@ for (const selector of [
     const { container } = render(<Page />);
     expect(
       Array.from(container.querySelectorAll(selector)).map((e) =>
-        selector === "pre code" ? e.textContent : text(e)
+        selector === "pre code"
+          ? e.textContent
+          : selector === "tr"
+            ? Array.from(e.children).map(text).join(" ").trim()
+            : text(e)
       )
     ).toEqual(expected[selector as keyof typeof expected]);
   });

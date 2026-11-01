@@ -20,7 +20,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ja" className={`${jetbrainsMono.variable} ${syne.variable}`}>
+    <html
+      data-scroll-behavior="smooth"
+      lang="ja"
+      className={`${jetbrainsMono.variable} ${syne.variable}`}
+    >
       <body className="has-common-header">
         {/* Noto Sans JP は自前ホスト。React 19 が precedence 付き stylesheet を
             <head> へ巻き上げる (next/font と違いビルド時の外部取得が起きない)。 */}
