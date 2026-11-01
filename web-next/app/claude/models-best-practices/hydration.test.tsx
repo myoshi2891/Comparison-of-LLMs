@@ -20,7 +20,7 @@ it("共有クロームのオフセットと公開日背景をページ限定で�
   const css = fs.readFileSync("app/globals.css", "utf8");
   expect(css).toContain('body:has([data-page="claude-models"]).has-common-header');
   expect(css).toContain('body:has([data-page="claude-models"]) #site-freshness-bar');
-  const rules = [...css.matchAll(/([^{}]+)\{([^{}]*)\}/g)];
+  const rules = [...css.replace(/\/\*[\s\S]*?\*\//g, "").matchAll(/([^{}]+)\{([^{}]*)\}/g)];
   const rule = (selector: string) => rules.find((match) => match[1].trim() === selector)?.[2] ?? "";
   const bodyRule = rule('body:has([data-page="claude-models"]).has-common-header');
   expect(bodyRule).toMatch(
