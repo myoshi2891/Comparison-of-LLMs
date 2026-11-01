@@ -72,7 +72,7 @@ const entries: PageEntry[] = [
     topics: ["claude", "prompting", "agents"],
     summary: "最新モデルの選択、effort・thinking、Claude Code と長時間エージェントの実践ガイド。",
     addedAt: "2026-11-01",
-    lastReviewed: "2026-10-23",
+    lastReviewed: "2026-11-01",
   },
   {
     slug: "/",
