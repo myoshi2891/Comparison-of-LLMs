@@ -1,6 +1,6 @@
 # GEMINI.md
 
-Updated 2026-10-15
+Updated 2026-11-01
 
 GEMINI.md は Gemini CLI / Gemini Code Assist 向けの入り口。
 本リポジトリでは **CLAUDE.md が正本** とし、GEMINI.md はその委譲 pointer として機能する。
@@ -11,6 +11,8 @@ GEMINI.md は Gemini CLI / Gemini Code Assist 向けの入り口。
 2. [`CLAUDE.md`](CLAUDE.md) — リポジトリ全体の AI 編集ルール・アーキテクチャ・禁止事項
 3. [`docs/PROGRESS.md`](docs/PROGRESS.md) — 最新の進捗状況・テスト実行・ネクストアクションと再開プロンプト（移行時の詳細は [`docs/archive/MIGRATION_PROGRESS.md`](docs/archive/MIGRATION_PROGRESS.md)）
 4. [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](docs/archive/NEXTJS_PHASE_A_F_PLAN.md) — Phase A–F の全体計画書（全完了済み）
+
+Claude 最新モデルガイドの移行仕様・検証結果はCLAUDE.mdとdocs/PROGRESS.mdを参照。目視確認はlocalhost:3000。
 
 @./CLAUDE.md
 @docs/PROGRESS.md

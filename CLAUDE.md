@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Updated 2026-10-15
+Updated 2026-11-01
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
@@ -9,6 +9,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 AIモデルの時間別コスト計算機 + AI ツール導入ガイド群。Python スクレイパーが各社料金ページから価格を自動取得し `pricing.json` を生成、**Next.js 16 App Router（SSG / `output: 'export'`）** がそれを読み込んで Netlify CDN へ配信する。Phase 1–14 でコスト計算機ページが Next.js 化済み。18 枚のガイドページ（旧 `legacy/` 配下）は Phase A–F で **全移行完了**（計画書は [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](docs/archive/NEXTJS_PHASE_A_F_PLAN.md) に保存）。さらに追加移行ページとして `/claude/managed-agents` や `/code-review/coderabbit-guide` 等を設置。
 
 ## アーキテクチャ
+
+Claude 最新モデルガイド `/claude/models-best-practices` を追加（2026-11-01）。
+HTMLの全61見出し・66段落・36リスト項目・233表行・12コード例・5図をPure JSXへ転写。
+19原本契約・確認日1契約とregistry／ナビを含む67関連契約が成功。原本監査exit 0、全体Vitest 215 files／2240 tests、型チェック・lint成功。
+原本の目次追従・モバイル開閉・チェックリスト進捗とCSSを保持し、highlight.js 11.11.1で静的トークン化。
+registryからナビを導出。HTML／MarkdownはAnthropicのarchiveへ内容無変更で保存（SHA-256一致）。
+情報基準日2026-10-23を保持し、目視確認はユーザー担当（localhost:3000）。npm・ビルド未実行。
 
 推薦書籍 `/books/reliable-machine-learning` を追加（2026-10-15）。
 指定HTMLの全1 H1・15 H2・36 H3・70段落・85リスト項目・10表64行・12 Mermaid図解・
