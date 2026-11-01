@@ -1,0 +1,2852 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>OpenAI 最新モデル ベストプラクティス完全ガイド</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/styles/atom-one-dark.min.css"
+    />
+    <style>
+      :root {
+        --paper: #faf7f0;
+        --paper-alt: #f1ecdf;
+        --card: #ffffff;
+        --ink: #1d1c24;
+        --ink-soft: #4a4858;
+        --border: #ddd5c2;
+        --indigo: #343a93;
+        --indigo-soft: #e9ebf8;
+        --gold: #a87a12;
+        --gold-soft: #f7edd0;
+        --forest: #2b6a4d;
+        --forest-soft: #e2f0e8;
+        --plum: #6d3470;
+        --plum-soft: #f1e3f2;
+        --sidebar-w: 300px;
+        --font-sans:
+          'Noto Sans JP', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', Meiryo, system-ui, sans-serif;
+        --font-serif: 'Source Serif 4', 'Noto Sans JP', Georgia, serif;
+        --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+        scroll-padding-top: 24px;
+      }
+      body {
+        margin: 0;
+        background: var(--paper);
+        color: var(--ink);
+        font-family: var(--font-sans);
+        font-size: 1.0625rem;
+        line-height: 1.85;
+        -webkit-text-size-adjust: 100%;
+      }
+      button {
+        font-family: inherit;
+        font-size: 1rem;
+      }
+      a {
+        color: var(--indigo);
+        text-decoration: underline;
+        text-underline-offset: 3px;
+        overflow-wrap: anywhere;
+      }
+      a:hover {
+        color: var(--plum);
+      }
+
+      /* progress bar */
+      #progress {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 4px;
+        width: 0;
+        background: linear-gradient(90deg, var(--indigo), var(--gold));
+        z-index: 60;
+      }
+
+      /* sidebar */
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: var(--sidebar-w);
+        background: var(--card);
+        border-right: 1px solid var(--border);
+        overflow-y: auto;
+        padding: 28px 18px 40px;
+        z-index: 50;
+      }
+      .brand {
+        font-family: var(--font-serif);
+        font-weight: 700;
+        font-size: 1.125rem;
+        line-height: 1.5;
+        color: var(--indigo);
+        margin: 0 6px 4px;
+      }
+      .brand-sub {
+        font-size: 1rem;
+        color: var(--ink-soft);
+        margin: 0 6px 20px;
+        line-height: 1.6;
+      }
+      .nav-a {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        padding: 9px 12px;
+        margin: 2px 0;
+        border-radius: 8px;
+        text-decoration: none;
+        color: var(--ink);
+        border-left: 3px solid transparent;
+        line-height: 1.5;
+      }
+      .nav-a:hover {
+        background: var(--paper-alt);
+        color: var(--ink);
+      }
+      .nav-a.active {
+        background: var(--indigo-soft);
+        border-left-color: var(--indigo);
+      }
+      .nav-k {
+        font-family: var(--font-mono);
+        font-size: 1rem;
+        color: var(--gold);
+        font-weight: 500;
+        letter-spacing: 0.04em;
+      }
+      .nav-t {
+        font-size: 1rem;
+        font-weight: 500;
+      }
+
+      /* mobile bar */
+      .mobile-bar {
+        display: none;
+      }
+      .mobile-bar button {
+        font-size: 1rem;
+      }
+      .overlay {
+        display: none;
+      }
+
+      /* main */
+      .layout {
+        display: block;
+        margin-left: var(--sidebar-w);
+      }
+      .main {
+        width: 100%;
+        min-width: 0;
+      }
+
+      .hero {
+        background: linear-gradient(135deg, #2a2f7e 0%, #4a2f77 60%, #6d3470 100%);
+        color: #fff;
+        padding: 72px 56px 56px;
+      }
+      .hero .kicker {
+        font-family: var(--font-mono);
+        font-size: 1rem;
+        letter-spacing: 0.14em;
+        color: #f3d98b;
+        text-transform: uppercase;
+      }
+      .hero h1 {
+        font-family: var(--font-serif);
+        font-size: 2.4rem;
+        line-height: 1.35;
+        margin: 10px 0 6px;
+        font-weight: 700;
+      }
+      .hero .sub {
+        display: inline-block;
+        margin-top: 6px;
+        padding: 4px 14px;
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        border-radius: 999px;
+        font-size: 1rem;
+      }
+      .meta-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 14px;
+        margin-top: 32px;
+      }
+      .meta-card {
+        background: rgba(255, 255, 255, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        border-radius: 12px;
+        padding: 14px 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .meta-k {
+        font-size: 1rem;
+        color: #f3d98b;
+        font-weight: 700;
+      }
+      .meta-v {
+        font-size: 1rem;
+        line-height: 1.7;
+      }
+
+      .section {
+        padding: 44px 56px;
+      }
+      .sec-head {
+        margin-bottom: 18px;
+      }
+      .eyebrow {
+        display: inline-block;
+        font-family: var(--font-mono);
+        font-size: 1rem;
+        letter-spacing: 0.14em;
+        color: var(--gold);
+        font-weight: 500;
+      }
+      .section h2 {
+        font-family: var(--font-serif);
+        font-size: 1.9rem;
+        line-height: 1.4;
+        margin: 2px 0 0;
+        color: var(--ink);
+      }
+      .section h3 {
+        font-size: 1.25rem;
+        line-height: 1.5;
+        margin: 36px 0 12px;
+        padding: 2px 0 2px 14px;
+        border-left: 5px solid var(--indigo);
+        color: var(--ink);
+      }
+      .section p {
+        margin: 0 0 1rem;
+        overflow-wrap: break-word;
+      }
+      .section ul,
+      .section ol {
+        padding-left: 1.5rem;
+        margin: 0 0 1.1rem;
+      }
+      .section li {
+        margin: 0.3rem 0;
+        overflow-wrap: break-word;
+      }
+      .section li::marker {
+        color: var(--gold);
+      }
+      strong {
+        color: var(--ink);
+        font-weight: 700;
+        background: linear-gradient(transparent 62%, var(--gold-soft) 62%);
+      }
+      code {
+        font-family: var(--font-mono);
+        font-size: 1rem;
+        background: var(--plum-soft);
+        color: var(--plum);
+        padding: 1px 6px;
+        border-radius: 5px;
+        overflow-wrap: anywhere;
+      }
+
+      /* tables */
+      .table-wrap {
+        overflow-x: auto;
+        margin: 14px 0 22px;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        background: var(--card);
+        min-width: 0;
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+      }
+      thead th {
+        background: var(--indigo);
+        color: #fff;
+        text-align: left;
+        font-weight: 700;
+        padding: 11px 14px;
+        white-space: nowrap;
+        font-size: 1rem;
+      }
+      tbody td {
+        padding: 11px 14px;
+        border-bottom: 1px solid var(--border);
+        vertical-align: top;
+        font-size: 1rem;
+        line-height: 1.7;
+        overflow-wrap: anywhere;
+        min-width: 7rem;
+      }
+      tbody tr:last-child td {
+        border-bottom: none;
+      }
+      tbody tr:hover {
+        background: var(--paper-alt);
+      }
+      td code {
+        white-space: normal;
+      }
+
+      /* code */
+      .code-block {
+        margin: 14px 0 22px;
+        border-radius: 10px;
+        overflow: hidden;
+        background: #282c34;
+        border: 1px solid #1b1e24;
+      }
+      .code-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 6px 14px;
+        background: #21252b;
+        color: #b6bdca;
+      }
+      .code-lang {
+        font-family: var(--font-mono);
+        font-size: 1rem;
+        letter-spacing: 0.06em;
+      }
+      .copy-btn {
+        background: #353b45;
+        color: #e6e9ef;
+        border: 1px solid #4a5160;
+        border-radius: 6px;
+        padding: 3px 12px;
+        cursor: pointer;
+      }
+      .copy-btn:hover {
+        background: #434b59;
+      }
+      .copy-btn.done {
+        background: var(--forest);
+        border-color: var(--forest);
+        color: #fff;
+      }
+      .code-block pre {
+        margin: 0;
+        overflow-x: auto;
+        padding: 0;
+      }
+      .code-block pre code,
+      .code-block pre code.hljs {
+        display: block;
+        padding: 16px 18px;
+        background: transparent;
+        border-radius: 0;
+        font-family: var(--font-mono);
+        font-size: 1rem;
+        line-height: 1.7;
+        color: #abb2bf;
+        white-space: pre;
+        overflow-wrap: normal;
+      }
+
+      /* callout */
+      .callout {
+        margin: 12px 0 20px;
+        padding: 12px 18px;
+        background: var(--gold-soft);
+        border-left: 5px solid var(--gold);
+        border-radius: 8px;
+      }
+      .callout p {
+        margin: 0;
+      }
+      .closing {
+        margin: 8px 56px 56px;
+        padding: 22px 26px;
+        background: var(--indigo-soft);
+        border: 1px solid #c9cdee;
+        border-left: 6px solid var(--indigo);
+        border-radius: 12px;
+      }
+      .closing p {
+        margin: 6px 0 0;
+      }
+
+      /* diagrams */
+      .diagram-card {
+        margin: 16px 0 26px;
+        padding: 18px 14px;
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        min-width: 0;
+      }
+      .diagram-wrap {
+        overflow-x: auto;
+        display: flex;
+        justify-content: safe center;
+        width: 100%;
+        min-width: 0;
+      }
+      .diagram-wrap > * {
+        min-width: 0;
+      }
+      .diagram-canvas {
+        min-width: 0;
+      }
+      .diagram-canvas svg {
+        max-width: none;
+        flex-shrink: 0;
+      }
+      .diagram-err {
+        font-family: var(--font-mono);
+        font-size: 1rem;
+        white-space: pre;
+        overflow-x: auto;
+        color: var(--ink-soft);
+      }
+      .mermaidTooltip {
+        font-size: 1rem !important;
+      }
+
+      .footer {
+        padding: 28px 56px 60px;
+        color: var(--ink-soft);
+        font-size: 1rem;
+        border-top: 1px solid var(--border);
+      }
+
+      @media (max-width: 900px) {
+        .sidebar {
+          transform: translateX(-100%);
+          transition: transform 0.25s ease;
+          box-shadow: none;
+        }
+        body.nav-open .sidebar {
+          transform: translateX(0);
+          box-shadow: 0 0 40px rgba(0, 0, 0, 0.3);
+        }
+        body.nav-open .overlay {
+          display: block;
+          position: fixed;
+          inset: 0;
+          background: rgba(20, 20, 30, 0.45);
+          z-index: 40;
+        }
+        .layout {
+          margin-left: 0;
+        }
+        .mobile-bar {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          position: sticky;
+          top: 0;
+          z-index: 30;
+          background: var(--card);
+          border-bottom: 1px solid var(--border);
+          padding: 10px 16px;
+        }
+        .mobile-bar button {
+          background: var(--indigo);
+          color: #fff;
+          border: none;
+          border-radius: 8px;
+          padding: 8px 14px;
+          cursor: pointer;
+        }
+        .mobile-bar span {
+          font-weight: 700;
+          font-size: 1rem;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+        .hero {
+          padding: 44px 20px 36px;
+        }
+        .hero h1 {
+          font-size: 1.7rem;
+        }
+        .section {
+          padding: 32px 20px;
+        }
+        .section h2 {
+          font-size: 1.5rem;
+        }
+        .closing {
+          margin: 8px 20px 40px;
+        }
+        .footer {
+          padding: 24px 20px 48px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="progress"></div>
+    <div class="overlay" id="overlay"></div>
+    <nav class="sidebar" id="sidebar" aria-label="目次">
+      <p class="brand">OpenAI 最新モデル<br />ベストプラクティス</p>
+      <p class="brand-sub">中級〜上級者向け / 2026-10-23時点</p>
+      <a class="nav-a" href="#sec-0"
+        ><span class="nav-k">PART 0</span><span class="nav-t">このガイドの読み方と前提</span></a
+      ><a class="nav-a" href="#sec-1"
+        ><span class="nav-k">PART 1</span
+        ><span class="nav-t">全体像: 2026年のOpenAIモデル地図</span></a
+      ><a class="nav-a" href="#sec-2"
+        ><span class="nav-k">STEP 1</span><span class="nav-t">モデルを選ぶ</span></a
+      ><a class="nav-a" href="#sec-3"
+        ><span class="nav-k">STEP 2</span
+        ><span class="nav-t">Responses APIで最小構成を作る</span></a
+      ><a class="nav-a" href="#sec-4"
+        ><span class="nav-k">STEP 3</span><span class="nav-t">reasoning effortを設計する</span></a
+      ><a class="nav-a" href="#sec-5"
+        ><span class="nav-k">STEP 4</span
+        ><span class="nav-t">プロンプトを「薄く」「境界を明確に」する</span></a
+      ><a class="nav-a" href="#sec-6"
+        ><span class="nav-k">STEP 5</span
+        ><span class="nav-t">ツール・エージェント機能を使いこなす</span></a
+      ><a class="nav-a" href="#sec-7"
+        ><span class="nav-k">STEP 6</span><span class="nav-t">コストと速度を最適化する</span></a
+      ><a class="nav-a" href="#sec-8"
+        ><span class="nav-k">STEP 7</span><span class="nav-t">移行チェックリスト</span></a
+      ><a class="nav-a" href="#sec-9"
+        ><span class="nav-k">STEP 8</span><span class="nav-t">評価と安全性を運用に組み込む</span></a
+      ><a class="nav-a" href="#sec-10"
+        ><span class="nav-k">APPENDIX A</span
+        ><span class="nav-t">著名開発者・コミュニティの知見</span></a
+      ><a class="nav-a" href="#sec-11"
+        ><span class="nav-k">APPENDIX B</span><span class="nav-t">よくある落とし穴 FAQ</span></a
+      ><a class="nav-a" href="#sec-12"
+        ><span class="nav-k">APPENDIX C</span><span class="nav-t">情報の確度と注意点</span></a
+      ><a class="nav-a" href="#sec-13"
+        ><span class="nav-k">REFERENCES</span><span class="nav-t">参考URL一覧(根拠ソース)</span></a
+      >
+    </nav>
+    <div class="layout">
+      <div class="mobile-bar">
+        <button type="button" id="menu-btn" aria-label="目次を開く">目次</button
+        ><span>OpenAI 最新モデル ベストプラクティス</span>
+      </div>
+      <main class="main">
+        <header class="hero">
+          <div class="kicker">OpenAI GPT-6 Family Guide</div>
+          <h1>OpenAI 最新モデル ベストプラクティス完全ガイド</h1>
+          <span class="sub">中級〜上級者向け</span>
+          <div class="meta-row">
+            <div class="meta-card">
+              <span class="meta-k">対象読者</span
+              ><span class="meta-v"
+                >すでにOpenAI APIを使ったことがあり、GPT-6世代へ移行・最適化したいエンジニア</span
+              >
+            </div>
+            <div class="meta-card">
+              <span class="meta-k">調査基準日</span
+              ><span class="meta-v">2026年10月23日(この日までに公開された情報をもとに作成)</span>
+            </div>
+            <div class="meta-card">
+              <span class="meta-k">ゴール</span
+              ><span class="meta-v"
+                >「どのモデルを選び、どう呼び、どう評価し、どうコストを抑えるか」を8ステップで身につける</span
+              >
+            </div>
+          </div>
+        </header>
+
+        <section class="section" id="sec-0">
+          <div class="sec-head">
+            <span class="eyebrow">PART 0</span>
+            <h2>このガイドの読み方と前提</h2>
+          </div>
+          <h3 id="sec-0-1">0-1. 情報の優先順位</h3>
+          <p>このガイドは次の優先順位で情報を扱います。</p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>優先度</th>
+                  <th>種別</th>
+                  <th>例</th>
+                  <th>扱い</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1</td>
+                  <td>OpenAI公式ドキュメント・公式ブログ</td>
+                  <td>Using GPT-6、API Changelog</td>
+                  <td>仕様・パラメータの根拠として採用</td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td>著名な開発者・計測者の一次発信</td>
+                  <td>Simon Willison、OpenAI開発者ブログ著者</td>
+                  <td>実測値・運用知見として採用</td>
+                </tr>
+                <tr>
+                  <td>3</td>
+                  <td>ゲートウェイ・解析企業の技術ブログ</td>
+                  <td>LiteLLM、Vercel、Endor Labs</td>
+                  <td>公式を補う実装情報として採用</td>
+                </tr>
+                <tr>
+                  <td>4</td>
+                  <td>比較サイト・まとめ記事</td>
+                  <td>価格比較サイト</td>
+                  <td>数値は複数ソースで一致したもののみ採用</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <h3 id="sec-0-2">0-2. 前提</h3>
+          <ul>
+            <li>
+              価格・上限値・対応状況は<strong>頻繁に変わります</strong>。本番投入前に必ず公式の
+              <a
+                href="https://developers.openai.com/api/docs/pricing"
+                target="_blank"
+                rel="noopener noreferrer"
+                >Pricing</a
+              >
+              と各モデルページで再確認してください。
+            </li>
+            <li>「補足C」に、ソース間で食い違いがあった点をまとめています。</li>
+            <li>コードは Python(<code>openai</code> SDK)を中心に示します。</li>
+          </ul>
+        </section>
+        <section class="section" id="sec-1">
+          <div class="sec-head">
+            <span class="eyebrow">PART 1</span>
+            <h2>全体像: 2026年のOpenAIモデル地図</h2>
+          </div>
+          <h3 id="sec-1-1">1-1. リリースの流れ</h3>
+          <figure class="diagram-card">
+            <div class="diagram-wrap"><div class="diagram-canvas" data-diagram-id="d0"></div></div>
+          </figure>
+          <p>
+            ポイントは<strong>わずか2か月弱で世代が一気に進んだ</strong>ことです。モデルIDを固定しつつ、評価基盤(Step
+            8)を先に整えておかないと、追従コストが膨らみます。
+          </p>
+          <h3 id="sec-1-2">1-2. 現行ラインナップ(API)</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>モデル</th>
+                  <th>API ID</th>
+                  <th>位置づけ</th>
+                  <th>入力 / キャッシュ入力 / 出力(100万トークン)</th>
+                  <th>コンテキスト</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>GPT-6 Astra</td>
+                  <td><code>gpt-6-astra</code></td>
+                  <td>最高知能。最難関の推論・コーディング・コンピュータ操作</td>
+                  <td>$10 / $1 / $50</td>
+                  <td>1.05M(最大出力128K)</td>
+                </tr>
+                <tr>
+                  <td>GPT-6.1 Sol</td>
+                  <td><code>gpt-6.1-sol</code></td>
+                  <td>Astraに迫る性能を約1/5の単価で。<strong>新規開発の既定候補</strong></td>
+                  <td>$2 / $0.10 / $10</td>
+                  <td>1.05M</td>
+                </tr>
+                <tr>
+                  <td>GPT-6 Sol</td>
+                  <td><code>gpt-6-sol</code></td>
+                  <td>6.1 Solの前版(同価格、キャッシュ入力は$0.20)</td>
+                  <td>$2 / $0.20 / $10</td>
+                  <td>1.05M</td>
+                </tr>
+                <tr>
+                  <td>GPT-6 Luna</td>
+                  <td><code>gpt-6-luna</code></td>
+                  <td>高ボリューム・定型・低コスト</td>
+                  <td>$0.10 / $0.01 / $0.50</td>
+                  <td>1.05M</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>補足:</p>
+          <ul>
+            <li>
+              上記は<strong>短いコンテキスト(入力272K以下)の標準料金</strong>です。272Kを超えると、そのリクエスト全体に長文用の割増料金が掛かります(Step
+              6参照)。
+            </li>
+            <li>
+              知識カットオフは、Astra と 6.1 Sol が 2026年4月30日と報告されています(GPT-6
+              Solは4月20日との報告あり)。
+            </li>
+            <li>
+              入力は<strong>テキストと画像</strong>、推論エフォートは
+              <code>low</code>〜<code>max</code>(Sol/Lunaの一部は <code>none</code> も可)です。
+            </li>
+          </ul>
+          <h3 id="sec-1-3">1-3. 周辺プロダクト・モデル</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>領域</th>
+                  <th>内容</th>
+                  <th>要点</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>音声</td>
+                  <td>GPT-Live-1(API一般提供)、GPT-Live-1.1(10月15日、ChatGPT Voice)</td>
+                  <td>新しい音声が追加され、多言語・アクセントが改善</td>
+                </tr>
+                <tr>
+                  <td>画像</td>
+                  <td>GPT Image 2.5(9月8日、Sunburst / Flare系)</td>
+                  <td>Image APIとResponses APIの画像生成ツールで利用</td>
+                </tr>
+                <tr>
+                  <td>高速化</td>
+                  <td>Fast mode / Ultrafast mode</td>
+                  <td><code>service_tier</code> で切替(Step 6)</td>
+                </tr>
+                <tr>
+                  <td>エージェント</td>
+                  <td>Multi-agent(β)、Agents API、Agents SDK</td>
+                  <td>サブエージェントへの委任(Step 5)</td>
+                </tr>
+                <tr>
+                  <td>ChatGPT側</td>
+                  <td>GPT-6 Proの並列エージェント(10月16日)、Slides</td>
+                  <td>プロダクト機能。API設計とは分けて考える</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+        <section class="section" id="sec-2">
+          <div class="sec-head">
+            <span class="eyebrow">STEP 1</span>
+            <h2>モデルを選ぶ</h2>
+          </div>
+          <h3 id="sec-2-1">1-A. 選定フロー</h3>
+          <figure class="diagram-card">
+            <div class="diagram-wrap"><div class="diagram-canvas" data-diagram-id="d1"></div></div>
+          </figure>
+          <h3 id="sec-2-2">1-B. 「Astraか6.1 Solか」の判断材料</h3>
+          <p>
+            OpenAIは6.1
+            Solを「Astraに近い性能を約1/5の価格で」と位置づけ、<strong>自分のタスクで比較して品質とコストのトレードオフを評価する</strong>ことを勧めています。外部の実測も同じ方向です。
+          </p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>観点</th>
+                  <th>実測・報告</th>
+                  <th>出典</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>タスクあたりコスト</td>
+                  <td>
+                    6.1 Solは Astra の4分の1未満(指数タスクあたり約$0.72 対
+                    約$3.26、指数スコアは52対53)
+                  </td>
+                  <td>DataCamp</td>
+                </tr>
+                <tr>
+                  <td>保守タスク(未使用コード調査)</td>
+                  <td>
+                    6.1 Sol Ultraは Astra Ultra
+                    の92%の検出数を、14%のコストで達成。1件あたりコストは Astra Ultra $0.77、6.1 Sol
+                    Ultra $0.12、6.1 Sol Medium $0.06
+                  </td>
+                  <td>OpenAI開発者ブログ</td>
+                </tr>
+                <tr>
+                  <td>セキュアなコード生成</td>
+                  <td>Codex上で6.1 SolとAstraはほぼ互角(安全に解けたタスクの差は7件対6件)</td>
+                  <td>Endor Labs</td>
+                </tr>
+                <tr>
+                  <td>最難関領域</td>
+                  <td>サイバー・生物・科学の最難関評価ではAstraが依然上位との報告</td>
+                  <td>DataCamp</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p><strong>実務の結論</strong></p>
+          <ol>
+            <li>まず <code>gpt-6.1-sol</code> で全評価セットを回す。</li>
+            <li>失敗が集中するタスク群だけを <code>gpt-6-astra</code> で再実行して差分を測る。</li>
+            <li>
+              差分が小さければ6.1
+              Solのまま、大きい領域だけAstraへ<strong>ルーティング</strong>する。
+            </li>
+            <li>
+              大量・定型の前段処理(分類、抽出、要約の下書き)は <code>gpt-6-luna</code> に落とす。
+            </li>
+          </ol>
+          <h3 id="sec-2-3">1-C. ルーティング設計のコツ</h3>
+          <ul>
+            <li>
+              モデル名を直書きせず、<strong
+                >用途名(例: <code>triage</code> / <code>main_agent</code> /
+                <code>hard_case</code>)から解決する設定層</strong
+              >を作る。世代交代が速いため、差し替えコストを下げられます。
+            </li>
+            <li>
+              6.1 Solは <code>none</code>/<code>minimal</code> エフォートに非対応です。Luna・GPT-6
+              Solからの置換時にエフォート設定の変換が要ります(Step 3)。
+            </li>
+            <li>
+              OpenAI開発者ブログには、プロバイダ障害時のフェイルオーバー設計記事もあります(参考URL一覧)。
+            </li>
+          </ul>
+        </section>
+        <section class="section" id="sec-3">
+          <div class="sec-head">
+            <span class="eyebrow">STEP 2</span>
+            <h2>Responses APIで最小構成を作る</h2>
+          </div>
+          <p>
+            GPT-6世代では、<strong>推論・ツール呼び出し・マルチターンはResponses APIが前提</strong
+            >です。Chat Completionsはツールなしのリクエストに限り使えます(Astra / 6.1 Sol)。<code
+              >gpt-6-sol</code
+            >
+            と <code>gpt-6-luna</code> は <code>reasoning_effort: "none"</code> のときのみChat
+            Completionsで関数呼び出しが可能です。
+          </p>
+          <h3 id="sec-3-1">2-A. 最小リクエスト</h3>
+          <div class="code-block">
+            <div class="code-head">
+              <span class="code-lang">Python</span
+              ><button type="button" class="copy-btn">コピー</button>
+            </div>
+            <pre><code class="language-python">from openai import OpenAI
+
+client = OpenAI()
+
+log_text = &quot;2026-10-23T09:12:04Z ERROR db: connection pool exhausted&quot;  # 分析対象のログ(例)
+
+response = client.responses.create(
+    model=&quot;gpt-6.1-sol&quot;,
+    input=&quot;次のログから根本原因の候補を3つ挙げ、確認手順を示してください。\n\n&quot; + log_text,
+    reasoning={&quot;effort&quot;: &quot;medium&quot;},      # 既定はmedium
+    text={&quot;verbosity&quot;: &quot;medium&quot;},        # 詳細度の既定値
+)
+
+print(response.output_text)
+</code></pre>
+          </div>
+          <h3 id="sec-3-2">2-B. サンプリングパラメータに注意</h3>
+          <p>
+            推論エフォートが
+            <code>none</code> 以外のとき、次のパラメータは<strong>削除</strong>します。
+          </p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>削除するもの</th>
+                  <th>API</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>temperature</code>, <code>top_p</code>, <code>top_logprobs</code></td>
+                  <td>共通</td>
+                </tr>
+                <tr>
+                  <td><code>logprobs</code></td>
+                  <td>Chat Completions</td>
+                </tr>
+                <tr>
+                  <td><code>message.output_text.logprobs</code>(<code>include</code>内)</td>
+                  <td>Responses</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="code-block">
+            <div class="code-head">
+              <span class="code-lang">Python</span
+              ><button type="button" class="copy-btn">コピー</button>
+            </div>
+            <pre><code class="language-python"># NG: エフォートがnone以外で温度を指定している
+client.responses.create(
+    model=&quot;gpt-6.1-sol&quot;,
+    input=&quot;...&quot;,
+    reasoning={&quot;effort&quot;: &quot;high&quot;},
+    temperature=0.2,   # 非対応。削除する
+)
+</code></pre>
+          </div>
+          <h3 id="sec-3-3">2-C. 会話状態の持ち方</h3>
+          <figure class="diagram-card">
+            <div class="diagram-wrap"><div class="diagram-canvas" data-diagram-id="d2"></div></div>
+          </figure>
+          <ul>
+            <li>
+              GPT-5.6では<strong>推論の持ち越し</strong>(<code>reasoning.context</code>)が既定で
+              <code>all_turns</code>
+              です。前のターンの推論をモデルが参照できるため、マルチターンの品質とキャッシュ効率が上がります。ターンをまたぐ推論が必要なら、モデルの既定に頼らず
+              <code>reasoning={"context": "all_turns"}</code> を明示します。
+            </li>
+            <li>
+              <code>all_turns</code> を活かすには
+              <code>previous_response_id</code>
+              を使います。手動管理なら、過去の入力と<strong>すべての出力アイテム</strong>を欠落なく再送します。
+            </li>
+            <li>以前の目標・前提が無関係になったら <code>current_turn</code> に切り替えます。</li>
+          </ul>
+        </section>
+        <section class="section" id="sec-4">
+          <div class="sec-head">
+            <span class="eyebrow">STEP 3</span>
+            <h2>reasoning effortを設計する</h2>
+          </div>
+          <h3 id="sec-4-1">3-A. 対応状況</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>モデル</th>
+                  <th>指定できる値</th>
+                  <th>既定</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>gpt-6-astra</code></td>
+                  <td>low / medium / high / xhigh / max</td>
+                  <td>medium</td>
+                </tr>
+                <tr>
+                  <td><code>gpt-6.1-sol</code></td>
+                  <td>low / medium / high / xhigh / max</td>
+                  <td>medium</td>
+                </tr>
+                <tr>
+                  <td><code>gpt-6-sol</code></td>
+                  <td>none を含む(minimalは非対応)</td>
+                  <td>medium</td>
+                </tr>
+                <tr>
+                  <td><code>gpt-6-luna</code></td>
+                  <td>none を含む(minimalは非対応)</td>
+                  <td>medium</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            ※ Astraと6.1 Solは <code>none</code> / <code>minimal</code> 非対応。既存コードに
+            <code>none</code> や <code>minimal</code> がある場合は、まず
+            <code>low</code> に置き換えてレイテンシを比較します。
+          </p>
+          <h3 id="sec-4-2">3-B. チューニング手順</h3>
+          <figure class="diagram-card">
+            <div class="diagram-wrap"><div class="diagram-canvas" data-diagram-id="d3"></div></div>
+          </figure>
+          <p>運用ルール:</p>
+          <ol>
+            <li><strong>高いほど良い、ではない</strong>。medium起点で、上げる根拠を計測で示す。</li>
+            <li>
+              <code>max</code> は最難関で品質最優先のタスクに限定する。<code>xhigh</code>
+              との差を必ず比較する。
+            </li>
+            <li>
+              推論トークンは<strong>出力トークン単価で課金</strong>されます。high / max
+              では出力コストが跳ねます。
+            </li>
+            <li>
+              旧世代(GPT-5.5 /
+              5.4)から移すときは、現行エフォートを基準に<strong>同じ値と1段下</strong>を比較します。GPT-5.6世代はトークン効率が高く、低いエフォートでも同等品質になることがあります。
+            </li>
+          </ol>
+          <h3 id="sec-4-3">3-C. 会話の途中でエフォートを変える(キャッシュを壊さない)</h3>
+          <p>
+            GPT-6世代の新機能として、<code>configuration_update</code>
+            という入力アイテムを足すと、<strong>プロンプトの先頭部分を書き換えずに</strong>エフォートを上げ下げできます。難しい局面だけ上げ、定型の追い質問は下げる、といった使い分けでキャッシュを保てます。
+          </p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>守ること</th>
+                  <th>理由</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    リクエストレベルの
+                    <code>reasoning.effort</code> は<strong>固定のまま</strong>にする
+                  </td>
+                  <td>先頭部分が変わるとキャッシュが外れる</td>
+                </tr>
+                <tr>
+                  <td>標準の<strong>単一エージェント</strong>リクエストで使う</td>
+                  <td>マルチエージェントとは併用不可の制約あり</td>
+                </tr>
+                <tr>
+                  <td><code>truncation: "auto"</code> と併用しない</td>
+                  <td>互換制限(公式のReasoningガイドで確認)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            正確な入力アイテムの形は、公式の「Change reasoning
+            mid-conversation」を参照してください(参考URL一覧)。
+          </p>
+          <h3 id="sec-4-4">3-D. Proモード</h3>
+          <p>
+            GPT-5.6世代以降、<code>reasoning.mode</code> を
+            <code>pro</code>
+            にすると、モデルがより多くの作業をしてから<strong>単一の最終回答</strong>を返します。別のProモデルIDに切り替える方式ではありません。
+          </p>
+          <ul>
+            <li>向く: 複雑な最適化、価値の高いレビュー、評価基準が明確な深い分析</li>
+            <li>向かない: 低遅延が必要な処理、高ボリューム処理、評価で改善が確認できない処理</li>
+            <li>エフォートとは独立。標準モードと同じ設定を基準に比較する</li>
+          </ul>
+        </section>
+        <section class="section" id="sec-5">
+          <div class="sec-head">
+            <span class="eyebrow">STEP 4</span>
+            <h2>プロンプトを「薄く」「境界を明確に」する</h2>
+          </div>
+          <h3 id="sec-5-1">4-A. 基本方針(公式の移行ガイドより)</h3>
+          <ol>
+            <li>
+              <strong>新しいベースラインから始める</strong
+              >。古いプロンプトの指示を全部持ち越さない。
+            </li>
+            <li>
+              製品要件を守る<strong>最小のプロンプト</strong>から始め、エフォート・詳細度・ツール説明・出力形式を代表例で調整する。
+            </li>
+            <li>同じ指示を繰り返さない。<strong>各指示は1回だけ</strong>書く。</li>
+            <li>関係するツールだけを公開し、説明は簡潔かつ正確に。</li>
+          </ol>
+          <p>
+            OpenAIは、社内のコーディングエージェント評価で、プロンプトを薄くした構成が<strong>スコア約10〜15%向上、総トークン41〜66%減、コスト33〜67%減</strong>になった例を示しています(傾向値であり、自分のワークロードで検証が必要)。
+          </p>
+          <h3 id="sec-5-2">4-B. Astra世代の挙動と対処</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>挙動の傾向</th>
+                  <th>症状</th>
+                  <th>対処の方向性</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>より協調的で、重要な不明点を質問しやすい</td>
+                  <td>「ユーザーが推測して進めてほしい場面」で止まる</td>
+                  <td>権限が暗黙に与えられている依頼は実行まで進める、と明文化</td>
+                </tr>
+                <tr>
+                  <td>指示への感度が高い</td>
+                  <td>skillsや <code>AGENTS.md</code> の矛盾・曖昧さで作業が止まる</td>
+                  <td>指示の優先順位を明示。ファイル群を監査</td>
+                </tr>
+                <tr>
+                  <td>書式が多め(箇条書き・表・Markdown)</td>
+                  <td>製品UIに合わない</td>
+                  <td>文体と構造を明示指定</td>
+                </tr>
+                <tr>
+                  <td>委譲が控えめ</td>
+                  <td>サブエージェントを使わない</td>
+                  <td>いつ・どれだけ並列化するか指定</td>
+                </tr>
+                <tr>
+                  <td>テストが徹底的</td>
+                  <td>小さな変更に広すぎるテスト</td>
+                  <td>変更規模に応じた検証範囲を指定</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <h3 id="sec-5-3">4-C. すぐ使えるテンプレート(自分用に書き直した版)</h3>
+          <p><strong>(1) 自律性と承認境界</strong></p>
+          <div class="code-block">
+            <div class="code-head">
+              <span class="code-lang">Markdown</span
+              ><button type="button" class="copy-btn">コピー</button>
+            </div>
+            <pre><code class="language-markdown"># 権限の考え方
+- 「説明・レビュー・診断・計画」の依頼: 関連資料を調べて報告する。依頼がない限り変更は実装しない。
+- 「変更・構築・修正」の依頼: 範囲内のローカル変更と、非破壊の検証を、確認なしで実行する。
+- 次の場合だけ事前確認を取る: 外部への書き込み、破壊的操作、購入・課金、依頼範囲の実質的な拡大。
+
+# 完了の定義
+- 実装、起動確認、結果の検査、失敗の修正までを依頼に含める。
+- 最初の実装が動いた時点で止まらず、受け入れ基準を満たすまで進める。
+</code></pre>
+          </div>
+          <p><strong>(2) 優先順位の明示(指示ファイルが多い環境向け)</strong></p>
+          <div class="code-block">
+            <div class="code-head">
+              <span class="code-lang">Markdown</span
+              ><button type="button" class="copy-btn">コピー</button>
+            </div>
+            <pre><code class="language-markdown">指示の優先順位は、実行環境の指示階層(システム・開発者の指示)と、適用されるskill・AGENTS.mdの指示に従う。
+ユーザーの明示的な依頼だけでは、これらの指示を上書きしない。
+skillが原因で確認を求めたり作業を中断したりする場合は、
+該当ファイル名と該当箇所を示し、明示要件と自分の解釈を区別して説明する。
+</code></pre>
+          </div>
+          <p><strong>(3) 出力スタイル(散文中心にしたい場合)</strong></p>
+          <div class="code-block">
+            <div class="code-head">
+              <span class="code-lang">Markdown</span
+              ><button type="button" class="copy-btn">コピー</button>
+            </div>
+            <pre><code class="language-markdown">結論を冒頭で述べ、段落ごとに1つの論点を展開する。
+箇条書きや表は、並列・手順・比較として本当に有効な場合だけ使う。
+専門用語は必要最小限にし、読者の前提知識に合わせて説明の深さを調整する。
+</code></pre>
+          </div>
+          <p><strong>(4) 検証の強度</strong></p>
+          <div class="code-block">
+            <div class="code-head">
+              <span class="code-lang">Markdown</span
+              ><button type="button" class="copy-btn">コピー</button>
+            </div>
+            <pre><code class="language-markdown">可逆で影響の小さい変更には、実装をなぞるだけのテストを書かない。
+変更に見合う検証を行い、通った後は、新たな失敗や懸念がない限り検証を広げず完了に向かう。
+</code></pre>
+          </div>
+          <h3 id="sec-5-4">4-D. 詳細度は <code>text.verbosity</code> で一元管理</h3>
+          <div class="code-block">
+            <div class="code-head">
+              <span class="code-lang">Python</span
+              ><button type="button" class="copy-btn">コピー</button>
+            </div>
+            <pre><code class="language-python">user_query = &quot;Responses APIとChat Completionsの違いを教えてください。&quot;  # ユーザーの質問(例)
+
+response = client.responses.create(
+    model=&quot;gpt-6.1-sol&quot;,
+    input=user_query,
+    reasoning={&quot;effort&quot;: &quot;medium&quot;},
+    text={&quot;verbosity&quot;: &quot;low&quot;},  # low / medium / high
+)
+</code></pre>
+          </div>
+          <ul>
+            <li>
+              「簡潔に」だけの指示は、必要な情報まで削る場合があります。<strong>残すべき内容(結論・根拠・注意点・次の行動)と、削ってよい内容</strong>を指定します。
+            </li>
+            <li>
+              「親切に」「共感的に」などの曖昧な語は避け、<strong>書き方の選択</strong>(結論の出し方、問題への触れ方、締めの有無)で定義します。
+            </li>
+          </ul>
+        </section>
+        <section class="section" id="sec-6">
+          <div class="sec-head">
+            <span class="eyebrow">STEP 5</span>
+            <h2>ツール・エージェント機能を使いこなす</h2>
+          </div>
+          <h3 id="sec-6-1">5-A. 機能マップ</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>機能</th>
+                  <th>何ができるか</th>
+                  <th>使いどころ</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>非同期ツール呼び出し(Async tool calling)</td>
+                  <td>
+                    ツール実行中も、モデルが推論・他ツール呼び出し・独立部分の回答を続けられる
+                  </td>
+                  <td>実行が遅い外部API、並行できる調査</td>
+                </tr>
+                <tr>
+                  <td>途中介入(Mid-turn steering)</td>
+                  <td>実行中に追加指示を送れる。完了済みの作業は保持される(WebSocket接続)</td>
+                  <td>長時間タスクの軌道修正</td>
+                </tr>
+                <tr>
+                  <td>Programmatic Tool Calling</td>
+                  <td>
+                    モデルがJavaScriptで複数ツールを呼び、中間結果を処理して小さな結果だけ返す
+                  </td>
+                  <td>絞り込み・結合・集計などの定型処理</td>
+                </tr>
+                <tr>
+                  <td>Multi-agent(β)</td>
+                  <td>サブエージェントに委任して並列に進める</td>
+                  <td>独立した作業に分割できる大きなタスク</td>
+                </tr>
+                <tr>
+                  <td>圧縮(Compaction)</td>
+                  <td>長い会話を圧縮して継続</td>
+                  <td>長時間エージェント</td>
+                </tr>
+                <tr>
+                  <td>ツール検索・Skills・MCP</td>
+                  <td>ツール数が多い環境の整理、再利用可能な手順</td>
+                  <td>大規模なツール群</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <h3 id="sec-6-2">5-B. 非同期ツール呼び出しのシーケンス</h3>
+          <figure class="diagram-card">
+            <div class="diagram-wrap"><div class="diagram-canvas" data-diagram-id="d4"></div></div>
+          </figure>
+          <div class="code-block">
+            <div class="code-head">
+              <span class="code-lang">Python</span
+              ><button type="button" class="copy-btn">コピー</button>
+            </div>
+            <pre><code class="language-python">tools = [
+    {
+        &quot;type&quot;: &quot;function&quot;,
+        &quot;name&quot;: &quot;fetch_report&quot;,
+        &quot;description&quot;: &quot;売上レポートを取得する。完了まで数十秒かかる。&quot;,
+        &quot;parameters&quot;: {
+            &quot;type&quot;: &quot;object&quot;,
+            &quot;properties&quot;: {&quot;quarter&quot;: {&quot;type&quot;: &quot;string&quot;}},
+            &quot;required&quot;: [&quot;quarter&quot;],
+            &quot;additionalProperties&quot;: False,
+        },
+        &quot;strict&quot;: True,
+        &quot;async&quot;: True,   # 結果がすぐ要らないツールにだけ付ける
+    }
+]
+</code></pre>
+          </div>
+          <ul>
+            <li>
+              実行と保留中ジョブの管理は<strong>アプリ側の責任</strong>です。結果は必ず<strong
+                >元の <code>call_id</code></strong
+              >
+              で返します。
+            </li>
+            <li>結果をすぐ必要とするツールに <code>async</code> を付けない。</li>
+          </ul>
+          <h3 id="sec-6-3">5-C. Programmatic Tool Calling の使い分け</h3>
+          <p>向く条件:</p>
+          <ul>
+            <li>
+              呼び出しが<strong>境界のある</strong>ワークフロー(絞り込み、結合、重複排除、集計、検証)
+            </li>
+            <li>大きな中間出力を処理して、<strong>はるかに小さい構造化結果</strong>だけ返したい</li>
+          </ul>
+          <p>直接のツール呼び出しを選ぶ条件:</p>
+          <ul>
+            <li>1回の呼び出しで足りる</li>
+            <li>中間出力がすでに小さい</li>
+            <li>各結果が次の判断を変える(モデルの判断が毎回必要)</li>
+            <li>承認が必要な操作</li>
+            <li>最終出力に引用やネイティブな成果物を残す必要がある</li>
+          </ul>
+          <p>
+            ルーティングは<strong>タスク固有に書く</strong>(どの段階で使うか、使えるツール、出力スキーマ、並行数・再試行・停止条件、直接呼び出しに残す作業)。ツールの説明には返却フィールド・型・エラー挙動を書きます。返却の形が事前に分からないなら、直接呼び出しで中身を見てから判断させます。
+          </p>
+          <p>
+            <strong>評価の注意</strong>:
+            <code>program_output</code>
+            と最終メッセージは別物です。プログラムの結果が正しくても、最終回答で必須項目や引用が抜けることがあります。両方をテストします。
+          </p>
+          <h3 id="sec-6-4">5-D. マルチエージェントの設計</h3>
+          <ul>
+            <li>
+              委譲の頻度・条件は<strong>プロンプトで調整</strong>する。Astraは委譲が控えめになりやすく、逆に中規模タスクで委譲しすぎる(Sol系)という報告もあります。
+            </li>
+            <li>
+              子エージェントのコンテキストと推論も課金対象です。<strong>サブエージェントに自分の成果物を監査させる</strong>運用は、気づかないうちにコストと長文料金帯に入ります(Step
+              6)。
+            </li>
+            <li>
+              エージェント間のメッセージは人間が読むこともあるため、スペースや区切りが崩れないよう指示します。
+            </li>
+          </ul>
+        </section>
+        <section class="section" id="sec-7">
+          <div class="sec-head">
+            <span class="eyebrow">STEP 6</span>
+            <h2>コストと速度を最適化する</h2>
+          </div>
+          <h3 id="sec-7-1">6-A. コストの4つのてこ</h3>
+          <figure class="diagram-card">
+            <div class="diagram-wrap"><div class="diagram-canvas" data-diagram-id="d5"></div></div>
+          </figure>
+          <p>
+            <strong>単価ではなく「1タスク完了あたりの総コスト」で比較する</strong
+            >のが鉄則です。Astraは単価が高くても、出力トークンが少なくて済み、タスクあたりでは安い場合があるとOpenAIは述べています。
+          </p>
+          <h3 id="sec-7-2">6-B. プロンプトキャッシュ</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>項目</th>
+                  <th>内容</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>キャッシュ読み取り</td>
+                  <td>6.1 Sol: 入力の5%($0.10)。Astra: $1。Luna: $0.01</td>
+                </tr>
+                <tr>
+                  <td>キャッシュ書き込み</td>
+                  <td>
+                    TTLで単価が異なる。30分(<code>"30m"</code>、既定): 通常入力の1.25倍(6.1 Sol:
+                    $2.50 / Astra: $12.50)。12時間(<code>"12h"</code>、2026-10-20追加):
+                    通常入力の2.5倍(6.1 Sol: $5.00 / Astra: $25.00)
+                  </td>
+                </tr>
+                <tr>
+                  <td>暗黙モード</td>
+                  <td>最新の対象メッセージ末尾に1つのブレークポイントを置く</td>
+                </tr>
+                <tr>
+                  <td>明示モード</td>
+                  <td>再利用する先頭部分を<strong>自分で指定</strong>して不要な書き込みを避ける</td>
+                </tr>
+                <tr>
+                  <td>移行時の変更</td>
+                  <td>
+                    GPT-5.5以前の <code>prompt_cache_retention</code> は
+                    <code>prompt_cache_options.ttl</code>(例: <code>"30m"</code>)に置換
+                  </td>
+                </tr>
+                <tr>
+                  <td>計測</td>
+                  <td>
+                    <code>cached_tokens</code> と
+                    <code>cache_write_tokens</code> を追跡して<strong>正味コスト</strong>を見る
+                  </td>
+                </tr>
+                <tr>
+                  <td>診断</td>
+                  <td>Prompt Cache Diagnostics が一般提供。キャッシュミスの原因を確認できる</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>設計のコツ:</p>
+          <ol>
+            <li>
+              システムプロンプト、ツール定義、固定の参考資料を<strong>先頭に固定</strong>し、変動部分を後ろに置く。
+            </li>
+            <li>ツール定義の順序や文言を毎回変えない(先頭が変わるとミスする)。</li>
+            <li>
+              エフォートを途中で変えるなら <code>configuration_update</code> を使う(Step 3-C)。
+            </li>
+            <li>書き込み課金があるため、再利用されない部分にまでブレークポイントを置かない。</li>
+          </ol>
+          <h3 id="sec-7-3">6-C. 272Kコンテキストの「崖」</h3>
+          <p>
+            1.05Mトークンのコンテキストが使えても、<strong>入力が272Kを超えたリクエストは全体が長文料金</strong>になります。
+          </p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>モデル</th>
+                  <th>短いコンテキスト(入力 / 出力)</th>
+                  <th>長文(入力 / 出力)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>6.1 Sol</td>
+                  <td>$2 / $10</td>
+                  <td>$4 / $15</td>
+                </tr>
+                <tr>
+                  <td>GPT-6 Luna</td>
+                  <td>$0.10 / $0.50</td>
+                  <td>$0.20 / $0.75</td>
+                </tr>
+                <tr>
+                  <td>GPT-6 Astra</td>
+                  <td>$10 / $50</td>
+                  <td>約$20 / 約$75(報告値)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <ul>
+            <li>
+              「入れられる」ことと「入れるべき」ことは別です。検索で絞る、圧縮(Compaction)を使う、不要なツール出力を落とす、で272K以下に収めます。
+            </li>
+            <li>
+              実際の課金閾値は提供元で異なる場合があります(例: GitHub
+              Copilotは200K閾値という報告)。<strong>API直と他社経由で料金帯の仕様が違う</strong>前提で確認します。
+            </li>
+          </ul>
+          <h3 id="sec-7-4">6-D. 処理ティア</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>ティア</th>
+                  <th>指定</th>
+                  <th>特徴</th>
+                  <th>注意</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Standard</td>
+                  <td>指定なし(<code>default</code>)</td>
+                  <td>既定</td>
+                  <td>-</td>
+                </tr>
+                <tr>
+                  <td>Fast mode</td>
+                  <td><code>service_tier: "priority"</code></td>
+                  <td>優先処理(旧Priority processingの改称)</td>
+                  <td>
+                    AstraのFastにはレイテンシSLAなし。EUデータ所在地はSol/Lunaで対応、Astraは非対応
+                  </td>
+                </tr>
+                <tr>
+                  <td>Ultrafast mode</td>
+                  <td><code>service_tier: "ultrafast"</code></td>
+                  <td>出力トークン間の時間を短縮。Responses APIで利用</td>
+                  <td>
+                    別枠のレート上限。Astraは標準単価の約6倍課金の報告。6.1
+                    SolのUltrafastは米国・EU・グローバル処理に対応
+                  </td>
+                </tr>
+                <tr>
+                  <td>Batch / Flex</td>
+                  <td>各ガイド参照</td>
+                  <td>非同期・低優先で割安</td>
+                  <td>即時性が不要な処理向け</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="code-block">
+            <div class="code-head">
+              <span class="code-lang">Python</span
+              ><button type="button" class="copy-btn">コピー</button>
+            </div>
+            <pre><code class="language-python">prompt = &quot;この関数の名前をより分かりやすく変えてください。&quot;  # 入力(例)
+
+fast = client.responses.create(
+    model=&quot;gpt-6.1-sol&quot;,
+    input=prompt,
+    service_tier=&quot;ultrafast&quot;,   # 対話・高速なコーディング反復向け
+)
+</code></pre>
+          </div>
+          <ul>
+            <li>
+              ツール呼び出しが多いワークフローは、<strong>WebSocket上のResponses API</strong
+              >でターン間のオーバーヘッドを減らすことをOpenAIが推奨しています。
+            </li>
+            <li>
+              Ultrafastは<strong>生成速度</strong>を上げるもので、モデルの推論能力は変わりません。周辺のワークフロー(ツール待ち、人の確認)がボトルネックのままだと体感は伸びません。
+            </li>
+          </ul>
+        </section>
+        <section class="section" id="sec-8">
+          <div class="sec-head">
+            <span class="eyebrow">STEP 7</span>
+            <h2>移行チェックリスト</h2>
+          </div>
+          <h3 id="sec-8-1">7-A. 移行フロー</h3>
+          <figure class="diagram-card">
+            <div class="diagram-wrap"><div class="diagram-canvas" data-diagram-id="d6"></div></div>
+          </figure>
+          <h3 id="sec-8-2">7-B. 項目別チェック</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>項目</th>
+                  <th>やること</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1</td>
+                  <td>モデルID</td>
+                  <td>
+                    <code>gpt-6-astra</code> / <code>gpt-6.1-sol</code> /
+                    <code>gpt-6-luna</code> のいずれかに設定
+                  </td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td>API</td>
+                  <td>
+                    Astra / 6.1 Sol のツール呼び出しは Responses API へ(Chat
+                    Completionsは不可)。Luna は <code>reasoning_effort: "none"</code> のときのみ
+                    Chat Completions で関数呼び出し可(Step 2)
+                  </td>
+                </tr>
+                <tr>
+                  <td>3</td>
+                  <td>エフォート</td>
+                  <td>
+                    現行値を保持。Astra/6.1 Solで <code>none</code> は <code>low</code> へ、<code
+                      >minimal</code
+                    >
+                    も <code>low</code> から比較
+                  </td>
+                </tr>
+                <tr>
+                  <td>4</td>
+                  <td>サンプリング</td>
+                  <td>
+                    エフォートが <code>none</code> 以外なら <code>temperature</code> /
+                    <code>top_p</code> / <code>top_logprobs</code> を削除
+                  </td>
+                </tr>
+                <tr>
+                  <td>5</td>
+                  <td>キャッシュ</td>
+                  <td>
+                    <code>prompt_cache_retention</code> →
+                    <code>prompt_cache_options.ttl</code>。書き込み課金を確認
+                  </td>
+                </tr>
+                <tr>
+                  <td>6</td>
+                  <td>承認の停止</td>
+                  <td>不要な確認で止まる場合は、自律性・承認境界のプロンプトを見直す(Step 4)</td>
+                </tr>
+                <tr>
+                  <td>7</td>
+                  <td>データ所在地</td>
+                  <td>AstraのFastはEU非対応。要件と突き合わせる</td>
+                </tr>
+                <tr>
+                  <td>8</td>
+                  <td>ユーザー識別</td>
+                  <td>
+                    エンドユーザー向けなら、安定でプライバシーに配慮した
+                    <code>safety_identifier</code> を送る
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <h3 id="sec-8-3">7-C. GPT-6 Sol → GPT-6.1 Sol の落とし穴</h3>
+          <p>「1行置換で価格も同じ」に見えますが、コミュニティの検証記事は次の点を挙げています。</p>
+          <ul>
+            <li>
+              <code>none</code> / <code>minimal</code> エフォートが使えない(6
+              Solでは動いていたコードが落ちる)
+            </li>
+            <li>ツール呼び出しはResponses APIが必須</li>
+            <li>暗黙キャッシュの挙動(ブレークポイントの置き方)の違い</li>
+            <li>6.1 Solは持続性が高く、長く走る傾向がある(コストと時間の見積りを更新)</li>
+            <li>Ultrafast・Fastとデータ所在地の組み合わせに制約がある</li>
+          </ul>
+          <h3 id="sec-8-4">7-D. Codexでの自動移行</h3>
+          <p>公式は、OpenAI Docsスキルを使ったCodexでの機械的な移行を案内しています。</p>
+          <p>Codex に入力するプロンプト例(シェルでは実行しません。OpenAI Docsスキルが必要):</p>
+          <div class="code-block">
+            <div class="code-head">
+              <span class="code-lang">Text</span
+              ><button type="button" class="copy-btn">コピー</button>
+            </div>
+            <pre><code class="language-plaintext">$openai-docs migrate this project to the GPT-6 model family
+</code></pre>
+          </div>
+          <p>
+            なお、旧世代を使い続ける場合も、<strong>GPT-5.6には11月に価格引き上げが予定されている</strong>(Simon
+            Willisonの記事による)ため、コスト試算を更新してください。
+          </p>
+        </section>
+        <section class="section" id="sec-9">
+          <div class="sec-head">
+            <span class="eyebrow">STEP 8</span>
+            <h2>評価と安全性を運用に組み込む</h2>
+          </div>
+          <h3 id="sec-9-1">8-A. 評価ループ</h3>
+          <figure class="diagram-card">
+            <div class="diagram-wrap"><div class="diagram-canvas" data-diagram-id="d7"></div></div>
+          </figure>
+          <p>測る指標(最低限):</p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>指標</th>
+                  <th>理由</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>タスク成功率</td>
+                  <td>品質の主指標</td>
+                </tr>
+                <tr>
+                  <td>完全性・必須の根拠・引用の有無</td>
+                  <td>最終回答の抜けを検出</td>
+                </tr>
+                <tr>
+                  <td>総トークン(入力 / 推論 / 出力 / キャッシュ)</td>
+                  <td>コスト構造の把握</td>
+                </tr>
+                <tr>
+                  <td>レイテンシ(最初のトークン、総所要時間)</td>
+                  <td>体験の把握</td>
+                </tr>
+                <tr>
+                  <td>ツール呼び出し回数・再試行・ターン数</td>
+                  <td>効率の把握</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            <strong
+              >「呼び出し回数やターン数が減った」は、最終回答が品質基準を満たす場合に限り改善と数える。</strong
+            >
+          </p>
+          <h3 id="sec-9-2">8-B. 安全性の運用</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>論点</th>
+                  <th>公式・報告ベースの要点</th>
+                  <th>実装での対応</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>指示階層</td>
+                  <td>2026年10月更新のGPT-6 Sol/Lunaは指示階層評価でほぼ飽和(99.99% / 99.79%)</td>
+                  <td>システム指示とユーザー指示の役割を分けて設計する</td>
+                </tr>
+                <tr>
+                  <td>プロンプトインジェクション</td>
+                  <td>高い頑健性が報告されている</td>
+                  <td>それでも外部コンテンツは<strong>データとして扱う</strong>境界を維持する</td>
+                </tr>
+                <tr>
+                  <td>過剰な拒否・注意書き</td>
+                  <td>無害な依頼への拒否や余計な注意書きは減少</td>
+                  <td>製品として必要な注意だけを自前で付ける</td>
+                </tr>
+                <tr>
+                  <td>誤作動監視</td>
+                  <td>Astraは非同期でミスアラインメントを監視し、必要時にアラートを出す</td>
+                  <td>監視アラートの扱いを運用フローに組み込む</td>
+                </tr>
+                <tr>
+                  <td>高リスク領域の分類器</td>
+                  <td>サイバー・生物の誤用検知で、ブロックや生成の一時停止が起こりうる</td>
+                  <td>正当な防御・研究用途は、公式の信頼アクセス情報を確認</td>
+                </tr>
+                <tr>
+                  <td>ユーザー識別</td>
+                  <td>エンドユーザー向けは <code>safety_identifier</code> を推奨</td>
+                  <td>安定した匿名ID(ハッシュ化など)を付与</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <h3 id="sec-9-3">
+            8-C. Codex・エージェント運用の整理術(Eric Provencher / OpenAI開発者ブログ)
+          </h3>
+          <ol>
+            <li>
+              <strong>Skillsの説明は短く</strong
+              >、「いつ使うか」を明確に。「データベース関連なら常に」のような広い書き方は避け、「マイグレーションを追加・変更するとき」のように限定する。
+            </li>
+            <li>
+              Skillは<strong>段階的開示</strong>にする。ルート文書は最小の振り分け役にして、詳細は別ファイルやスクリプトへ。
+            </li>
+            <li>
+              手順を細かく縛る<strong>レシピ型の指示は見直す</strong>。高性能モデルでは過剰な制約が逆効果になりうる。
+            </li>
+            <li>
+              <code>AGENTS.md</code>
+              は「作業前に全ドキュメントを読む」ではなく、<strong>用途別に参照先を示す</strong>。
+            </li>
+            <li>
+              以前のモデルを抑えるために書いた強い禁止・確認の文言は、Astraでは<strong>効きすぎて</strong>止まることがある。見直す。
+            </li>
+            <li>
+              完了の定義(起動、検査、失敗の修正まで)を依頼に含める。逆に「最初の実装後に必ずレビューで止まる」要件は、早期停止を誘発する。
+            </li>
+            <li>
+              安全と分かっている作業(使い捨てフィクスチャのローカルテストなど)は、<code
+                >AGENTS.md</code
+              >
+              で<strong>明示的に許可</strong>を与える。
+            </li>
+            <li>整理自体もAstraに依頼し、監査させる。</li>
+          </ol>
+        </section>
+        <section class="section" id="sec-10">
+          <div class="sec-head">
+            <span class="eyebrow">APPENDIX A</span>
+            <h2>著名開発者・コミュニティの知見</h2>
+          </div>
+          <div class="callout">
+            <p>
+              注意:
+              X(旧Twitter)の投稿本体は直接取得できなかったため、ブログ本文または二次要約で確認できた内容に限って記載します。
+            </p>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>発信者</th>
+                  <th>内容</th>
+                  <th>実務への示唆</th>
+                  <th>URL</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Simon Willison</strong>(Django共同作者、LLM CLI作者)</td>
+                  <td>
+                    「ペリカン自転車SVG」ベンチをAstraの全エフォート(low〜max)とGPT-5.6の各階層で比較。<strong
+                      >Astraはlowでも5.6 Solの全描画を上回る</strong
+                    >、という観察。maxでは1枚あたり出力12,638トークンで約63セント
+                  </td>
+                  <td>エフォートはコストが桁で変わる。まず低めで品質を確認する</td>
+                  <td>
+                    <a
+                      href="https://simonwillison.net/2026/Sep/4/astra-pelicans/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >Pelican comparison grid for Astra</a
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>Simon Willison</strong></td>
+                  <td>
+                    GPT-6 Sol /
+                    Lunaの価格を整理。<strong>5.6の半額</strong>(5.6の販促価格に対して)。AstraとClaude
+                    Fable 5.1は同じ$10 / $50
+                  </td>
+                  <td>価格戦争が中位帯で起きている。ベンダー比較の再評価時期</td>
+                  <td>
+                    <a
+                      href="https://simonwillison.net/2026/Sep/22/opus-and-sol-and-luna/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >Claude Opus 5.5, GPT-6 Sol, GPT-6 Luna, and a new price war</a
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>Simon Willison</strong></td>
+                  <td>
+                    ChatGPT
+                    WorkでAstra(Max)に「自宅から5K/10Kのコース」を依頼。27分でGPX・GeoJSON・HTML地図を生成。ただし<strong>圧縮(compaction)後に実行コードが取り出せず</strong>、これを「反機能」と批判
+                  </td>
+                  <td>圧縮前の履歴を保存し、エージェントが読み戻せる設計にする</td>
+                  <td>
+                    <a
+                      href="https://ai-tldr.dev/releases/simonw-astra-running-routes-sep12/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >二次要約: AI/TLDR</a
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>Eric Provencher</strong>(OpenAI開発者ブログ著者)</td>
+                  <td>Skills・<code>AGENTS.md</code>・タスクプロンプトの棚卸し指針(Step 8-C)</td>
+                  <td>指示の肥大化がAstraでは性能低下と停止の原因になる</td>
+                  <td>
+                    <a
+                      href="https://developers.openai.com/blog/rethinking-skills-and-prompts-for-gpt-6-astra"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >Rethinking skills and prompts for GPT-6 Astra</a
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>OpenAI開発者ブログ</strong></td>
+                  <td>保守作業での6.1 Sol対Astra比較(1件あたりコスト)</td>
+                  <td>検出漏れの種類は異なる。重要な監査は併用も検討</td>
+                  <td>
+                    <a
+                      href="https://developers.openai.com/blog/maintaining-software-with-the-gpt-6-family"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >Maintaining software with the GPT-6 family</a
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>minimaxir(Hacker Newsのユーザー名)ほか</strong>(HN上のコメント)</td>
+                  <td>
+                    6.1
+                    Solの発表で重要なのは<strong>キャッシュ入力が半額</strong>になった点、という指摘。Codexでは400K・1Mのコンテキストも使えるが、一定量超過は2倍課金の指摘
+                  </td>
+                  <td>長時間エージェントはキャッシュ単価が支配的</td>
+                  <td>
+                    <a
+                      href="https://news.ycombinator.com/item?id=49896586"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >Hacker News</a
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>Latent Space(swyx)とゲスト</strong>(Ben Davisら)</td>
+                  <td>
+                    6.1
+                    Solは「評価が低すぎる」「価格が良い」。サブエージェントの並列実行は、キャッシュ最適化で「大幅に速く」なった(Codexチーム談)
+                  </td>
+                  <td>並列化はモデルのプロンプトで増やせる(「もっと生成して」と指示)</td>
+                  <td>
+                    <a
+                      href="https://finance.biggo.com/podcast/6d84f9c6b690be03"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >Latent Space要約</a
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>Latent Space AINews</strong></td>
+                  <td>
+                    Astra発表時の整理。Responses
+                    APIの非同期関数呼び出し・途中介入・エフォート変更(@reach_vb、@nikunjhandaの発信)。外部評価でAstraは5.6
+                    Solより<strong>約70%トークン効率が高い</strong>など
+                  </td>
+                  <td>公式主張と独立計測を区別して読む</td>
+                  <td>
+                    <a
+                      href="https://www.latent.space/p/ainews-gpt-6-astra-openais-biggest"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >AINews</a
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>Endor Labs</strong></td>
+                  <td>Codex上のセキュリティ評価で6.1 SolはAstraとほぼ同等、約3分の1高速</td>
+                  <td>セキュアコーディング用途の根拠データ</td>
+                  <td>
+                    <a
+                      href="https://www.endorlabs.com/learn/gpt-6-1-sol-on-codex-astra-level-security-a-third-faster-zero-cheating"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >Endor Labs</a
+                    >
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+        <section class="section" id="sec-11">
+          <div class="sec-head">
+            <span class="eyebrow">APPENDIX B</span>
+            <h2>よくある落とし穴 FAQ</h2>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>症状</th>
+                  <th>原因</th>
+                  <th>対処</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>6.1 Solに替えたら400エラー</td>
+                  <td><code>none</code> / <code>minimal</code> エフォートを指定している</td>
+                  <td><code>low</code> に置換して再評価</td>
+                </tr>
+                <tr>
+                  <td>温度指定でエラー</td>
+                  <td>推論あり(<code>none</code>以外)では <code>temperature</code> 等が非対応</td>
+                  <td>パラメータを削除</td>
+                </tr>
+                <tr>
+                  <td>ツール付きでChat Completionsが失敗</td>
+                  <td>
+                    ツール呼び出しは原則Responses API必須。ただし <code>gpt-6-sol</code> /
+                    <code>gpt-6-luna</code> は <code>reasoning_effort: "none"</code> のときのみChat
+                    Completionsで関数呼び出し可
+                  </td>
+                  <td>
+                    上記以外はResponses APIへ移行(該当モデルは <code>reasoning_effort</code> を
+                    <code>"none"</code> に設定)
+                  </td>
+                </tr>
+                <tr>
+                  <td>すぐ確認を求めて止まる</td>
+                  <td>Astraは必要時に質問する傾向。過去の強い禁止文言が効きすぎ</td>
+                  <td>権限と完了条件を明記し、過去の禁止文言を緩める</td>
+                </tr>
+                <tr>
+                  <td>小さな修正で大量のテストを走らせる</td>
+                  <td>Astraは検証が徹底的</td>
+                  <td>検証の強度を指示</td>
+                </tr>
+                <tr>
+                  <td>気づくと料金が倍近くに</td>
+                  <td>入力が272Kを超え、全体が長文料金に</td>
+                  <td>圧縮・検索で絞る。サブエージェントの文脈肥大も確認</td>
+                </tr>
+                <tr>
+                  <td>キャッシュが効かない</td>
+                  <td>先頭部分が毎回変わる、エフォートをリクエストレベルで変更している</td>
+                  <td>先頭を固定し、<code>configuration_update</code> を使う。Diagnosticsで確認</td>
+                </tr>
+                <tr>
+                  <td>Fast / Ultrafastが期待通りにならない</td>
+                  <td>データ所在地の制約(EUなど)でStandardに落ちる</td>
+                  <td>実際に提供されたティアの課金・速度を確認</td>
+                </tr>
+                <tr>
+                  <td>回答が箇条書きだらけ</td>
+                  <td>Astraは書式を多用する傾向</td>
+                  <td>文体・構造の指示を明記</td>
+                </tr>
+                <tr>
+                  <td>圧縮後に過去のコードが追えない</td>
+                  <td>圧縮で履歴が失われる</td>
+                  <td>圧縮前の記録を別に保存</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+        <section class="section" id="sec-12">
+          <div class="sec-head">
+            <span class="eyebrow">APPENDIX C</span>
+            <h2>情報の確度と注意点</h2>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>項目</th>
+                  <th>状況</th>
+                  <th>取り扱い</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Astraの価格</td>
+                  <td>
+                    複数の情報源で $10 / $50 / キャッシュ$1 が一致。1つの比較サイトのみ別の値を表示
+                  </td>
+                  <td>公式Pricingで確認。外れ値は不採用</td>
+                </tr>
+                <tr>
+                  <td>Astraの長文料金($20 / $75)</td>
+                  <td>1つの解説記事のみ</td>
+                  <td>公式Pricingで要確認</td>
+                </tr>
+                <tr>
+                  <td>Ultrafastの倍率(約6倍)</td>
+                  <td>Vercelの更新情報(Astra向け)の記載</td>
+                  <td>6.1 Solの倍率は公式Pricingで確認</td>
+                </tr>
+                <tr>
+                  <td>6.1 SolのUltrafast</td>
+                  <td>発表当初は「近日」との記事がある一方、10月8日のChangelogで提供開始</td>
+                  <td>Changelogを正とする</td>
+                </tr>
+                <tr>
+                  <td>GPT-5.6の価格</td>
+                  <td>ソースにより値が異なる(販促価格・通常価格の混在)</td>
+                  <td>本ガイドでは数値を採用しない</td>
+                </tr>
+                <tr>
+                  <td>GPT-6 Pro(ChatGPT)</td>
+                  <td>トラッカー記載。API設計にそのまま適用できるか不明</td>
+                  <td>
+                    API側の設定は未確認。公式ドキュメントで確認できるまで、APIの基準設定として扱わない
+                  </td>
+                </tr>
+                <tr>
+                  <td>「GPT-6 Luna Decisions」・Decisions API</td>
+                  <td>一覧情報とドキュメント目次で存在を確認できたが、詳細は未確認</td>
+                  <td>利用前に公式の Decisions API ガイドを確認</td>
+                </tr>
+                <tr>
+                  <td>ベンチマークの数値</td>
+                  <td>公式主張と独立計測が混在</td>
+                  <td>自分の評価セットで再現してから採用</td>
+                </tr>
+                <tr>
+                  <td>ChatGPTのプラン別提供</td>
+                  <td>情報源により更新時期が異なる</td>
+                  <td>公式の最新情報で確認</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+        <section class="section" id="sec-13">
+          <div class="sec-head">
+            <span class="eyebrow">REFERENCES</span>
+            <h2>参考URL一覧(根拠ソース)</h2>
+          </div>
+          <h3 id="sec-13-1">公式ドキュメント・公式ブログ</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>タイトル</th>
+                  <th>URL</th>
+                  <th>根拠にした内容</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1</td>
+                  <td>Using GPT-6(OpenAI API)</td>
+                  <td>
+                    <a
+                      href="https://developers.openai.com/api/docs/guides/latest-model"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://developers.openai.com/api/docs/guides/latest-model</a
+                    >
+                  </td>
+                  <td>モデル構成、エフォート対応、移行手順、プロンプト指針、GPT-5.6の新機能</td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td>API Changelog</td>
+                  <td>
+                    <a
+                      href="https://developers.openai.com/api/docs/changelog"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://developers.openai.com/api/docs/changelog</a
+                    >
+                  </td>
+                  <td>リリース日、Ultrafast、6.1 Sol、Multi-agent(β)</td>
+                </tr>
+                <tr>
+                  <td>3</td>
+                  <td>Rethinking skills and prompts for GPT-6 Astra</td>
+                  <td>
+                    <a
+                      href="https://developers.openai.com/blog/rethinking-skills-and-prompts-for-gpt-6-astra"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://developers.openai.com/blog/rethinking-skills-and-prompts-for-gpt-6-astra</a
+                    >
+                  </td>
+                  <td>Skills・AGENTS.mdの棚卸し</td>
+                </tr>
+                <tr>
+                  <td>4</td>
+                  <td>Maintaining software with the GPT-6 family</td>
+                  <td>
+                    <a
+                      href="https://developers.openai.com/blog/maintaining-software-with-the-gpt-6-family"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://developers.openai.com/blog/maintaining-software-with-the-gpt-6-family</a
+                    >
+                  </td>
+                  <td>6.1 SolとAstraの1件あたりコスト比較</td>
+                </tr>
+                <tr>
+                  <td>5</td>
+                  <td>GPT-6 Sol and GPT-6 Luna: October 2026 update</td>
+                  <td>
+                    <a
+                      href="https://deploymentsafety.openai.com/gpt-6-october"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://deploymentsafety.openai.com/gpt-6-october</a
+                    >
+                  </td>
+                  <td>指示階層・プロンプトインジェクション・拒否傾向の評価</td>
+                </tr>
+                <tr>
+                  <td>6</td>
+                  <td>Prompt caching</td>
+                  <td>
+                    <a
+                      href="https://developers.openai.com/api/docs/guides/prompt-caching"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://developers.openai.com/api/docs/guides/prompt-caching</a
+                    >
+                  </td>
+                  <td>キャッシュ設計(公式)</td>
+                </tr>
+                <tr>
+                  <td>7</td>
+                  <td>Reasoning(エフォート・Proモード・途中変更)</td>
+                  <td>
+                    <a
+                      href="https://developers.openai.com/api/docs/guides/reasoning"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://developers.openai.com/api/docs/guides/reasoning</a
+                    >
+                  </td>
+                  <td><code>configuration_update</code> の正確な仕様</td>
+                </tr>
+                <tr>
+                  <td>8</td>
+                  <td>Ultrafast mode</td>
+                  <td>
+                    <a
+                      href="https://developers.openai.com/api/docs/guides/ultrafast-mode"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://developers.openai.com/api/docs/guides/ultrafast-mode</a
+                    >
+                  </td>
+                  <td>高速ティアの仕様</td>
+                </tr>
+                <tr>
+                  <td>9</td>
+                  <td>Fast mode</td>
+                  <td>
+                    <a
+                      href="https://developers.openai.com/api/docs/guides/fast-mode"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://developers.openai.com/api/docs/guides/fast-mode</a
+                    >
+                  </td>
+                  <td>Fast modeの仕様</td>
+                </tr>
+                <tr>
+                  <td>10</td>
+                  <td>Async tool calling</td>
+                  <td>
+                    <a
+                      href="https://developers.openai.com/api/docs/guides/async-tool-calling"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://developers.openai.com/api/docs/guides/async-tool-calling</a
+                    >
+                  </td>
+                  <td>非同期ツール呼び出し</td>
+                </tr>
+                <tr>
+                  <td>11</td>
+                  <td>Mid-turn steering</td>
+                  <td>
+                    <a
+                      href="https://developers.openai.com/api/docs/guides/steering"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://developers.openai.com/api/docs/guides/steering</a
+                    >
+                  </td>
+                  <td>途中介入</td>
+                </tr>
+                <tr>
+                  <td>12</td>
+                  <td>Programmatic tool calling</td>
+                  <td>
+                    <a
+                      href="https://developers.openai.com/api/docs/guides/tools-programmatic-tool-calling"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://developers.openai.com/api/docs/guides/tools-programmatic-tool-calling</a
+                    >
+                  </td>
+                  <td>PTCの使い分け</td>
+                </tr>
+                <tr>
+                  <td>13</td>
+                  <td>Multi-agent</td>
+                  <td>
+                    <a
+                      href="https://developers.openai.com/api/docs/guides/responses-multi-agent"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://developers.openai.com/api/docs/guides/responses-multi-agent</a
+                    >
+                  </td>
+                  <td>マルチエージェント(β)</td>
+                </tr>
+                <tr>
+                  <td>14</td>
+                  <td>Safety best practices</td>
+                  <td>
+                    <a
+                      href="https://developers.openai.com/api/docs/guides/safety-best-practices"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://developers.openai.com/api/docs/guides/safety-best-practices</a
+                    >
+                  </td>
+                  <td><code>safety_identifier</code></td>
+                </tr>
+                <tr>
+                  <td>15</td>
+                  <td>Pricing</td>
+                  <td>
+                    <a
+                      href="https://developers.openai.com/api/docs/pricing"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://developers.openai.com/api/docs/pricing</a
+                    >
+                  </td>
+                  <td>最新料金(必ず確認)</td>
+                </tr>
+                <tr>
+                  <td>16</td>
+                  <td>Evaluation best practices</td>
+                  <td>
+                    <a
+                      href="https://developers.openai.com/api/docs/guides/evaluation-best-practices"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://developers.openai.com/api/docs/guides/evaluation-best-practices</a
+                    >
+                  </td>
+                  <td>評価設計</td>
+                </tr>
+                <tr>
+                  <td>17</td>
+                  <td>Cost optimization</td>
+                  <td>
+                    <a
+                      href="https://developers.openai.com/api/docs/guides/cost-optimization"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://developers.openai.com/api/docs/guides/cost-optimization</a
+                    >
+                  </td>
+                  <td>コスト最適化</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <h3 id="sec-13-2">著名開発者・計測者・コミュニティ</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>発信者</th>
+                  <th>URL</th>
+                  <th>内容</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>18</td>
+                  <td>Simon Willison</td>
+                  <td>
+                    <a
+                      href="https://simonwillison.net/2026/Sep/4/astra-pelicans/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://simonwillison.net/2026/Sep/4/astra-pelicans/</a
+                    >
+                  </td>
+                  <td>Astraのエフォート別比較</td>
+                </tr>
+                <tr>
+                  <td>19</td>
+                  <td>Simon Willison</td>
+                  <td>
+                    <a
+                      href="https://simonwillison.net/2026/Sep/5/introducing-gpt-6-astra-for-developers/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://simonwillison.net/2026/Sep/5/introducing-gpt-6-astra-for-developers/</a
+                    >
+                  </td>
+                  <td>Astra紹介動画へのコメント</td>
+                </tr>
+                <tr>
+                  <td>20</td>
+                  <td>Simon Willison</td>
+                  <td>
+                    <a
+                      href="https://simonwillison.net/2026/Sep/22/opus-and-sol-and-luna/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://simonwillison.net/2026/Sep/22/opus-and-sol-and-luna/</a
+                    >
+                  </td>
+                  <td>価格整理</td>
+                </tr>
+                <tr>
+                  <td>21</td>
+                  <td>Simon Willison(二次要約)</td>
+                  <td>
+                    <a
+                      href="https://ai-tldr.dev/releases/simonw-astra-running-routes-sep12/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://ai-tldr.dev/releases/simonw-astra-running-routes-sep12/</a
+                    >
+                  </td>
+                  <td>圧縮でコードが失われた事例</td>
+                </tr>
+                <tr>
+                  <td>22</td>
+                  <td>Latent Space</td>
+                  <td>
+                    <a
+                      href="https://www.latent.space/p/ainews-gpt-6-astra-openais-biggest"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://www.latent.space/p/ainews-gpt-6-astra-openais-biggest</a
+                    >
+                  </td>
+                  <td>Astra発表の整理</td>
+                </tr>
+                <tr>
+                  <td>23</td>
+                  <td>Latent Space(ポッドキャスト要約)</td>
+                  <td>
+                    <a
+                      href="https://finance.biggo.com/podcast/6d84f9c6b690be03"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://finance.biggo.com/podcast/6d84f9c6b690be03</a
+                    >
+                  </td>
+                  <td>6.1 Solの評価、サブエージェント</td>
+                </tr>
+                <tr>
+                  <td>24</td>
+                  <td>Hacker News</td>
+                  <td>
+                    <a
+                      href="https://news.ycombinator.com/item?id=49896586"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://news.ycombinator.com/item?id=49896586</a
+                    >
+                  </td>
+                  <td>6.1 Solの発表への開発者コメント</td>
+                </tr>
+                <tr>
+                  <td>25</td>
+                  <td>Endor Labs</td>
+                  <td>
+                    <a
+                      href="https://www.endorlabs.com/learn/gpt-6-1-sol-on-codex-astra-level-security-a-third-faster-zero-cheating"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://www.endorlabs.com/learn/gpt-6-1-sol-on-codex-astra-level-security-a-third-faster-zero-cheating</a
+                    >
+                  </td>
+                  <td>セキュリティ評価</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <h3 id="sec-13-3">実装情報・価格・ベンチマーク解説(補助)</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>提供元</th>
+                  <th>URL</th>
+                  <th>内容</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>26</td>
+                  <td>LiteLLM</td>
+                  <td>
+                    <a
+                      href="https://docs.litellm.ai/blog/gpt_6_sol_luna"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://docs.litellm.ai/blog/gpt_6_sol_luna</a
+                    >
+                  </td>
+                  <td>Sol / Lunaの価格表(短文・長文)、1.05M・922K入力・128K出力</td>
+                </tr>
+                <tr>
+                  <td>27</td>
+                  <td>LiteLLM</td>
+                  <td>
+                    <a
+                      href="https://docs.litellm.ai/docs/providers/openai/ultrafast"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://docs.litellm.ai/docs/providers/openai/ultrafast</a
+                    >
+                  </td>
+                  <td>Fast / Ultrafastの実装例</td>
+                </tr>
+                <tr>
+                  <td>28</td>
+                  <td>Vercel</td>
+                  <td>
+                    <a
+                      href="https://vercel.com/changelog/openai-ultrafast-mode-now-available-on-ai-gateway"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://vercel.com/changelog/openai-ultrafast-mode-now-available-on-ai-gateway</a
+                    >
+                  </td>
+                  <td>Ultrafastの課金倍率・データ所在地</td>
+                </tr>
+                <tr>
+                  <td>29</td>
+                  <td>OpenRouter</td>
+                  <td>
+                    <a
+                      href="https://openrouter.ai/docs/cookbook/evaluate-and-optimize/model-migrations/gpt-6"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://openrouter.ai/docs/cookbook/evaluate-and-optimize/model-migrations/gpt-6</a
+                    >
+                  </td>
+                  <td>移行チェックリスト、<code>configuration_update</code></td>
+                </tr>
+                <tr>
+                  <td>30</td>
+                  <td>DataCamp</td>
+                  <td>
+                    <a
+                      href="https://www.datacamp.com/blog/gpt-6-1-sol"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://www.datacamp.com/blog/gpt-6-1-sol</a
+                    >
+                  </td>
+                  <td>6.1 Solの価格・タスクあたりコスト</td>
+                </tr>
+                <tr>
+                  <td>31</td>
+                  <td>The Next Web</td>
+                  <td>
+                    <a
+                      href="https://thenextweb.com/news/openai-gpt-6-1-sol-price-astra-devday"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://thenextweb.com/news/openai-gpt-6-1-sol-price-astra-devday</a
+                    >
+                  </td>
+                  <td>DevDay発表の価格・ベンチマーク</td>
+                </tr>
+                <tr>
+                  <td>32</td>
+                  <td>Codersera</td>
+                  <td>
+                    <a
+                      href="https://codersera.com/blog/gpt-6-1-sol-complete-guide-2026/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://codersera.com/blog/gpt-6-1-sol-complete-guide-2026/</a
+                    >
+                  </td>
+                  <td>長文料金の比較表</td>
+                </tr>
+                <tr>
+                  <td>33</td>
+                  <td>DEV Community(AIHubMix)</td>
+                  <td>
+                    <a
+                      href="https://dev.to/aihubmix/migrating-to-gpt-61-sol-9-things-that-can-go-wrong-1ff1"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://dev.to/aihubmix/migrating-to-gpt-61-sol-9-things-that-can-go-wrong-1ff1</a
+                    >
+                  </td>
+                  <td>6 Sol→6.1 Solの落とし穴</td>
+                </tr>
+                <tr>
+                  <td>34</td>
+                  <td>Kingy AI</td>
+                  <td>
+                    <a
+                      href="https://kingy.ai/blog/gpt-6-1-sol-ultrafast-speed-pricing-value/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://kingy.ai/blog/gpt-6-1-sol-ultrafast-speed-pricing-value/</a
+                    >
+                  </td>
+                  <td>Ultrafastの実測</td>
+                </tr>
+                <tr>
+                  <td>35</td>
+                  <td>Remio</td>
+                  <td>
+                    <a
+                      href="https://www.remio.ai/post/openai-gpt-6-1-sol-ultrafast-cuts-latency-but-moves-the-bottleneck"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://www.remio.ai/post/openai-gpt-6-1-sol-ultrafast-cuts-latency-but-moves-the-bottleneck</a
+                    >
+                  </td>
+                  <td>Ultrafastのボトルネック考察</td>
+                </tr>
+                <tr>
+                  <td>36</td>
+                  <td>Requesty</td>
+                  <td>
+                    <a
+                      href="https://www.requesty.ai/blog/gpt-6-sol-luna-pricing-release-api"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://www.requesty.ai/blog/gpt-6-sol-luna-pricing-release-api</a
+                    >
+                  </td>
+                  <td>Sol / Lunaの価格</td>
+                </tr>
+                <tr>
+                  <td>37</td>
+                  <td>DataLearner</td>
+                  <td>
+                    <a
+                      href="https://www.datalearner.com/en/ai-models/pretrained-models/gpt-6-astra"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://www.datalearner.com/en/ai-models/pretrained-models/gpt-6-astra</a
+                    >
+                  </td>
+                  <td>Astraの仕様(コンテキスト・カットオフ)</td>
+                </tr>
+                <tr>
+                  <td>38</td>
+                  <td>Releasebot</td>
+                  <td>
+                    <a
+                      href="https://releasebot.io/updates/openai"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://releasebot.io/updates/openai</a
+                    >
+                  </td>
+                  <td>10月のリリースノート(GPT-Live-1.1、Codex更新)</td>
+                </tr>
+                <tr>
+                  <td>39</td>
+                  <td>GitHub(openai/codex)</td>
+                  <td>
+                    <a
+                      href="https://github.com/openai/codex/issues/32486"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://github.com/openai/codex/issues/32486</a
+                    >
+                  </td>
+                  <td>長文料金帯に入りやすい事例(GPT-5.6)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+        <div class="closing">
+          <span class="eyebrow">POINT</span>
+          <p>
+            世代交代は速く、数値は動きます。このガイドの核は、「(1)用途ごとにモデルを分ける、(2)エフォートは計測で決める、(3)プロンプトは薄く境界は明確に、(4)キャッシュと272K境界を意識する、(5)評価ループを先に作る」の5点です。各数値は、公式Pricingと自分の評価セットで再確認してから採用してください。
+          </p>
+        </div>
+        <footer class="footer">
+          調査基準日: 2026年10月23日。価格・仕様は公式ドキュメントで必ず再確認してください。
+        </footer>
+      </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@11.14.0/dist/mermaid.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/highlight.min.js"></script>
+    <script>
+      (function () {
+        var DIAGRAMS = {
+          d0: `flowchart TB
+  A["2026-04-23<br/>GPT-5.5"] --> B["2026-08<br/>GPT-5.6<br/>Sol / Terra / Luna"]
+  B --> C["2026-09-03<br/>GPT-6 Astra"]
+  C --> D["2026-09-22<br/>GPT-6 Sol / Luna"]
+  D --> E["2026-09-29<br/>GPT-6.1 Sol<br/>DevDay"]
+  E --> F["2026-10-08<br/>6.1 Sol Ultrafast"]
+  F --> G["2026-10-15<br/>GPT-Live-1.1"]`,
+          d1: `flowchart TD
+  S["タスクを定義する"] --> Q1{"音声・リアルタイム対話か"}
+  Q1 -- はい --> L["GPT-Live 系を検討"]
+  Q1 -- いいえ --> Q2{"画像の生成・編集か"}
+  Q2 -- はい --> I["GPT Image 2.5 系を検討"]
+  Q2 -- いいえ --> Q3{"高ボリュームの定型処理で<br/>コスト最優先か"}
+  Q3 -- はい --> LU["gpt-6-luna"]
+  Q3 -- いいえ --> Q4{"6.1 Solで品質が足りない<br/>最難関タスクか"}
+  Q4 -- はい --> AS["gpt-6-astra"]
+  Q4 -- いいえ --> SO["gpt-6.1-sol を既定にする"]`,
+          d2: `flowchart TD
+  A["会話を続けたい"] --> B{"状態をどこに持つか"}
+  B -- "OpenAI側に持つ" --> C["previous_response_id を渡す"]
+  B -- "自前で管理する" --> D["入力と全出力アイテムを再送する"]
+  D --> E{"store:false または<br/>Zero Data Retention か"}
+  E -- はい --> F["暗号化された推論アイテムも<br/>そのまま再送する"]
+  E -- いいえ --> G["通常の再送で可"]`,
+          d3: `flowchart TD
+  A["現行のエフォートを基準にする"] --> B["代表タスクで評価する"]
+  B --> C{"品質は十分か"}
+  C -- はい --> D["1段下げて再評価する"]
+  D --> C
+  C -- いいえ --> E["1段上げて再評価する"]
+  E --> F{"改善幅がコストに見合うか"}
+  F -- はい --> G["採用する"]
+  F -- いいえ --> H["プロンプトとツール設計を見直す"]
+  H --> B`,
+          d4: `sequenceDiagram
+  participant App as アプリ
+  participant M as モデル
+  participant T as 外部ツール
+  App->>M: リクエスト送信
+  M-->>App: 非同期ツール呼び出し(call_id)
+  App->>T: 実行開始
+  M->>M: 独立した部分の推論を継続
+  T-->>App: 結果
+  App->>M: 元のcall_idで結果を返す
+  M-->>App: 最終回答`,
+          d5: `flowchart TD
+  C["コスト最適化"] --> A["モデル選択<br/>Luna / 6.1 Sol / Astra"]
+  C --> B["エフォート調整<br/>出力トークンを抑える"]
+  C --> D["プロンプトキャッシュ<br/>先頭を固定する"]
+  C --> E["処理ティア<br/>Batch / Flex / Fast / Ultrafast"]
+  A --> F["代表タスクで1タスクあたりの総コストを測る"]
+  B --> F
+  D --> F
+  E --> F`,
+          d6: `flowchart TD
+  S["現行モデルを確認"] --> A["モデルIDを置換"]
+  A --> B["ツール利用はResponses APIへ"]
+  B --> C["エフォートを変換して比較"]
+  C --> D["非対応パラメータを削除"]
+  D --> E["キャッシュ設定を見直し"]
+  E --> F["プロンプトとAGENTS.mdを棚卸し"]
+  F --> G["評価セットで回帰テスト"]
+  G --> H{"品質・コスト・遅延は許容内か"}
+  H -- はい --> I["カナリア公開"]
+  H -- いいえ --> C`,
+          d7: `flowchart TB
+  A["代表タスク集を作る"] --> B["ベースライン測定"]
+  B --> C["変更を1つだけ加える"]
+  C --> D["再測定"]
+  D --> E{"成功率・コスト・遅延が改善か"}
+  E -- はい --> F["採用して記録"]
+  E -- いいえ --> G["差し戻す"]
+  F --> C
+  G --> C`,
+        };
+
+        /* ---------- code highlighting ---------- */
+        try {
+          if (window.hljs) {
+            document.querySelectorAll('pre code').forEach(function (el) {
+              window.hljs.highlightElement(el);
+            });
+          }
+        } catch (e) {
+          console.error('hljs', e);
+        }
+
+        /* ---------- copy buttons ---------- */
+        document.querySelectorAll('.copy-btn').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            var code = btn.closest('.code-block').querySelector('code').textContent;
+            var done = function () {
+              btn.textContent = 'コピー済み';
+              btn.classList.add('done');
+              setTimeout(function () {
+                btn.textContent = 'コピー';
+                btn.classList.remove('done');
+              }, 1600);
+            };
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+              navigator.clipboard.writeText(code).then(done, function () {});
+            } else {
+              var t = document.createElement('textarea');
+              t.value = code;
+              document.body.appendChild(t);
+              t.select();
+              try {
+                document.execCommand('copy');
+                done();
+              } catch (e) {}
+              document.body.removeChild(t);
+            }
+          });
+        });
+
+        /* ---------- mermaid (live client-side render) ---------- */
+        function post(svg, src) {
+          var vb = (svg.getAttribute('viewBox') || '').split(/\s+/).map(Number);
+          if (vb.length === 4 && vb[2] > 0) {
+            var pad = /^\s*sequenceDiagram/.test(src) ? 110 : 15;
+            vb[3] += pad;
+            svg.setAttribute('viewBox', vb.join(' '));
+            svg.removeAttribute('width');
+            svg.removeAttribute('height');
+            svg.style.width = vb[2] + 'px';
+            svg.style.maxWidth = 'none';
+            svg.style.height = 'auto';
+            svg.style.overflow = 'visible';
+            svg.style.flexShrink = '0';
+          }
+        }
+        async function renderAll() {
+          var canvases = document.querySelectorAll('.diagram-canvas');
+          if (!window.mermaid) {
+            canvases.forEach(function (c) {
+              var s = DIAGRAMS[c.dataset.diagramId] || '';
+              c.innerHTML = '<div class="diagram-err"></div>';
+              c.firstChild.textContent = s;
+            });
+            return;
+          }
+          window.mermaid.initialize({
+            startOnLoad: false,
+            securityLevel: 'strict',
+            theme: 'base',
+            flowchart: {
+              useMaxWidth: false,
+              htmlLabels: true,
+              curve: 'basis',
+              padding: 14,
+              nodeSpacing: 40,
+              rankSpacing: 48,
+            },
+            sequence: { useMaxWidth: false, mirrorActors: false, actorMargin: 50 },
+            themeVariables: {
+              fontFamily:
+                '"Noto Sans JP","Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif',
+              fontSize: '16px',
+              primaryColor: '#e9ebf8',
+              primaryBorderColor: '#343a93',
+              primaryTextColor: '#1d1c24',
+              lineColor: '#343a93',
+              secondaryColor: '#f7edd0',
+              tertiaryColor: '#faf7f0',
+              noteBkgColor: '#f7edd0',
+              actorBkg: '#e9ebf8',
+              actorBorder: '#343a93',
+              actorTextColor: '#1d1c24',
+              signalColor: '#343a93',
+              signalTextColor: '#1d1c24',
+              labelBoxBkgColor: '#f7edd0',
+            },
+          });
+          var n = 0;
+          for (var i = 0; i < canvases.length; i++) {
+            var c = canvases[i],
+              id = c.dataset.diagramId,
+              src = DIAGRAMS[id];
+            try {
+              var r = await window.mermaid.render('mmd-' + id + '-' + n++, src);
+              c.innerHTML = r.svg;
+              var svg = c.querySelector('svg');
+              if (svg) post(svg, src);
+            } catch (e) {
+              console.error('mermaid', id, e);
+              c.innerHTML = '<div class="diagram-err"></div>';
+              c.firstChild.textContent = src;
+            }
+          }
+        }
+        var fontsReady =
+          document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve();
+        fontsReady
+          .then(function () {
+            return renderAll();
+          })
+          .then(function () {
+            document.body.setAttribute('data-diagrams', 'done');
+          });
+
+        /* ---------- sidebar: active section + progress ---------- */
+        var links = Array.prototype.slice.call(document.querySelectorAll('.nav-a'));
+        var secs = links.map(function (a) {
+          return document.getElementById(a.getAttribute('href').slice(1));
+        });
+        var ticking = false;
+        function onScroll() {
+          ticking = false;
+          var h = document.documentElement;
+          var max = h.scrollHeight - h.clientHeight;
+          document.getElementById('progress').style.width =
+            (max > 0 ? (h.scrollTop / max) * 100 : 0) + '%';
+          var limit = window.innerHeight * 0.25,
+            cur = 0;
+          for (var i = 0; i < secs.length; i++) {
+            if (secs[i] && secs[i].getBoundingClientRect().top <= limit) cur = i;
+          }
+          links.forEach(function (a, i) {
+            a.classList.toggle('active', i === cur);
+          });
+        }
+        window.addEventListener(
+          'scroll',
+          function () {
+            if (!ticking) {
+              ticking = true;
+              requestAnimationFrame(onScroll);
+            }
+          },
+          { passive: true },
+        );
+        window.addEventListener('resize', onScroll);
+        onScroll();
+
+        /* ---------- mobile drawer ---------- */
+        var body = document.body;
+        document.getElementById('menu-btn').addEventListener('click', function () {
+          body.classList.toggle('nav-open');
+        });
+        document.getElementById('overlay').addEventListener('click', function () {
+          body.classList.remove('nav-open');
+        });
+        links.forEach(function (a) {
+          a.addEventListener('click', function () {
+            body.classList.remove('nav-open');
+          });
+        });
+      })();
+    </script>
+  </body>
+</html>
