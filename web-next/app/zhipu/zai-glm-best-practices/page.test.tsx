@@ -36,6 +36,7 @@ describe("ZaiGlmBestPracticesPage", () => {
       "単純なFAQ応答や定型フォーマット変換のような軽量タスクでは、Z.ai の Chat Completions API で対象モデルごとに thinking の扱いを分ける。";
     const matrix = [
       'GLM-5.2 / GLM-5.1 / GLM-5 / GLM-4.6: thinking: {"type": "disabled"} で無効化でき、応答速度とコストを最適化できる。',
+      'GLM-5-Turbo: thinking は既定で有効(enabled)だが、thinking: {"type": "disabled"} で無効化できるため、軽量なターンでは無効化する。',
       'GLM-4.7 / GLM-4.7-Flash / GLM-4.7-FlashX: thinking.type が enabled(既定)のときは強制 thinking(必ず思考する)になるが、thinking: {"type": "disabled"} で無効化できるため、軽量なターンでは無効化する。',
       'GLM-5.3 / GLM-5.3-Flash / GLM-5.3-FlashX: thinking が強制で無効化できない(thinking.type は enabled のまま)ため、代わりに reasoning_effort: "low" を指定して思考量を抑える。',
       "GLM-4.5-Flash など GLM-4.6 より前のモデル: thinking パラメータの対象外のため、指定せず省略する。",
@@ -57,9 +58,20 @@ describe("ZaiGlmBestPracticesPage", () => {
         td.textContent?.replace(/\s+/g, " ").trim()
       )
     ).toEqual([
-      '複雑な推論タスクでのみreasoning_effort=maxを使い、軽量タスクではモデル別に、GLM-5.2 / GLM-5.1 / GLM-5 / GLM-4.6はthinkingを無効化、GLM-4.7 / GLM-4.7-Flash / GLM-4.7-FlashXもenabled時は強制thinkingだがdisabledで無効化、GLM-5.3 系はthinkingを有効のままreasoning_effort: "low"、GLM-4.6 より前のモデルはthinkingを省略、と使い分けているか',
+      '複雑な推論タスクでのみreasoning_effort=maxを使い、軽量タスクではモデル別に、GLM-5.2 / GLM-5.1 / GLM-5 / GLM-4.6はthinkingを無効化、GLM-5-Turboも既定でenabledだがdisabledで無効化、GLM-4.7 / GLM-4.7-Flash / GLM-4.7-FlashXもenabled時は強制thinkingだがdisabledで無効化、GLM-5.3 系はthinkingを有効のままreasoning_effort: "low"、GLM-4.6 より前のモデルはthinkingを省略、と使い分けているか',
       "7, 13",
     ]);
+  });
+
+  it("Deep Thinking の既定説明で GLM-4.7 系を自動判断のモデルから除外し、enabled 時は必ず思考すると示す", async () => {
+    const page = await Page();
+    const { container } = render(page);
+    const para = Array.from(container.querySelectorAll("#s7 > p")).find((p) =>
+      p.textContent?.startsWith("GLM-4.5以降のモデルは")
+    );
+    expect(para?.textContent?.replace(/\s+/g, " ").trim()).toBe(
+      "GLM-4.5以降のモデルは、回答前に内部で段階的な思考(Chain-of-Thought)を行う「Deep Thinking」機能を備えている。thinking.typeで有効/無効を切り替え、GLM-5.2以降ではさらにreasoning_effortで思考の深さを段階的に制御できる。GLM-5.2/5.1/5ではthinkingが既定で有効で、モデルがタスクの難易度を見て思考の要否を自動判断する。GLM-4.7系もthinkingが既定で有効だが、enabledのときは自動判断せず必ず思考する(強制thinking)。これに対し、GLM-4.6のようなハイブリッドモデルは既定で無効という違いがある点に注意する。"
+    );
   });
 
   it("renders 8 mermaid diagrams", async () => {
