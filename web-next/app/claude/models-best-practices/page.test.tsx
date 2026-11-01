@@ -132,10 +132,72 @@ it("リスト・表・アンカー・幅のCSS契約", () => {
   expect(css).toMatch(/width: 100%/);
   expect(styles.layout).toBeTruthy();
 });
+// @media ブロックを波括弧の対応で切り出す（宣言がどのブレークポイントに属するかを判定するため）
+const MOBILE_QUERY = "@media (max-width: 900px) {";
+const mediaRanges = (css: string): Array<{ query: string; start: number; end: number }> => {
+  const ranges: Array<{ query: string; start: number; end: number }> = [];
+  for (let at = css.indexOf("@media"); at !== -1; at = css.indexOf("@media", at + 1)) {
+    const open = css.indexOf("{", at);
+    let depth = 0;
+    let end = open;
+    for (; end < css.length; end++) {
+      if (css[end] === "{") depth++;
+      if (css[end] === "}" && --depth === 0) break;
+    }
+    ranges.push({ query: css.slice(at, open + 1), start: at, end: end + 1 });
+  }
+  return ranges;
+};
+// 指定セレクタの全ルールを出現順に返す（所属する media クエリ付き。トップレベルは null）
+const rulesFor = (css: string, selector: string) => {
+  const ranges = mediaRanges(css);
+  const escaped = selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return Array.from(css.matchAll(new RegExp(`(?:^|\\n)\\s*${escaped} \\{([^}]*)\\}`, "g"))).map(
+    (m) => ({
+      body: m[1],
+      index: m.index ?? 0,
+      media: ranges.find((r) => (m.index ?? 0) > r.start && (m.index ?? 0) < r.end)?.query ?? null,
+    })
+  );
+};
 it("モバイル目次の閉状態は不可視・操作不能、開状態で復元するCSS契約", () => {
   const css = fs.readFileSync("app/claude/models-best-practices/page.module.css", "utf8");
-  expect(css).toMatch(/\.sidebar \{[^}]*visibility: hidden;[^}]*pointer-events: none;/);
-  expect(css).toMatch(/\.sidebar\.open \{[^}]*visibility: visible;[^}]*pointer-events: auto;/);
+  const sidebar = rulesFor(css, ".root .sidebar");
+  const open = rulesFor(css, ".root .sidebar.open");
+  // 900px 超（デスクトップ）: トップレベルのサイドバーは不可視・操作不能にしてはならない
+  const desktop = sidebar.filter((r) => r.media === null).map((r) => r.body);
+  expect(desktop.length).toBeGreaterThan(0);
+  expect(desktop.join("\n")).not.toMatch(/visibility:\s*hidden|pointer-events:\s*none/);
+  // 900px 以下（モバイル）: 閉状態は hidden / none、開状態で visible / auto に戻す
+  const mobile = sidebar.filter((r) => r.media === MOBILE_QUERY).map((r) => r.body);
+  expect(mobile.join("\n")).toMatch(/visibility: hidden;[^}]*pointer-events: none;/);
+  const mobileOpen = open.filter((r) => r.media === MOBILE_QUERY).map((r) => r.body);
+  expect(mobileOpen.join("\n")).toMatch(/visibility: visible;[^}]*pointer-events: auto;/);
+  expect(open.filter((r) => r.media === null)).toEqual([]);
+});
+it("モバイルバーは開いたサイドバーより前面にあり、サイドバーはバーの下から始まるCSS契約", () => {
+  const css = fs.readFileSync("app/claude/models-best-practices/page.module.css", "utf8");
+  const zIndex = (rules: ReturnType<typeof rulesFor>) =>
+    rules
+      .map((r) => r.body.match(/z-index:\s*(\d+)/)?.[1])
+      .filter((v): v is string => v !== undefined)
+      .map(Number)
+      .at(-1);
+  const sidebarZ = zIndex(rulesFor(css, ".root .sidebar"));
+  const barZ = zIndex(rulesFor(css, ".root .mobile-bar").filter((r) => r.media === MOBILE_QUERY));
+  expect(sidebarZ).toBe(20);
+  expect(barZ).toBeGreaterThan(sidebarZ ?? Number.POSITIVE_INFINITY);
+  // カスケード上で最後に効く top 指定が、モバイルではバーの高さ分だけ下げたものであること
+  const tops = rulesFor(css, ".root .sidebar").filter((r) => /(^|\s|;)top:/.test(r.body));
+  const desktopTop = tops.filter((r) => r.media === null).at(-1);
+  const mobileTop = tops.filter((r) => r.media === MOBILE_QUERY).at(-1);
+  expect(desktopTop?.body).toMatch(
+    /top: calc\(var\(--ch-height, 60px\) \+ var\(--ch-disclaimer-height, 0px\)\);/
+  );
+  expect(mobileTop?.body).toMatch(
+    /top: calc\(\s*var\(--ch-height, 60px\)\s*\+\s*var\(--ch-disclaimer-height, 0px\)\s*\+\s*var\(--mobile-bar-height\)\s*\);/
+  );
+  expect(mobileTop?.index ?? -1).toBeGreaterThan(desktopTop?.index ?? Number.POSITIVE_INFINITY);
 });
 it("図解ラッパーは横スクロールのみ担当し、配置・幅はMermaidDiagramへ委譲するCSS契約", () => {
   const css = fs.readFileSync("app/claude/models-best-practices/page.module.css", "utf8");
