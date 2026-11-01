@@ -64,6 +64,17 @@ export type PageEntry = z.infer<typeof PageEntrySchema>;
 
 const entries: PageEntry[] = [
   {
+    slug: "/claude/models-best-practices",
+    title: "Claude 最新モデル & Claude Code",
+    group: "Providers",
+    category: "Claude",
+    provider: "claude",
+    topics: ["claude", "prompting", "agents"],
+    summary: "最新モデルの選択、effort・thinking、Claude Code と長時間エージェントの実践ガイド。",
+    addedAt: "2026-11-01",
+    lastReviewed: "2026-10-23",
+  },
+  {
     slug: "/",
     title: "Home",
     group: "Home",
