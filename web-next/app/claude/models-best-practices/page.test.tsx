@@ -121,7 +121,25 @@ it("リスト・表・アンカー・幅のCSS契約", () => {
   expect(css).toMatch(/list-style-type: disc/);
   expect(css).toMatch(/list-style-type: decimal/);
   expect(css).toMatch(/text-align: left !important/);
-  expect(css).toMatch(/scroll-margin-top: calc\(var\(--header-height, 60px\) \+ 80px\)/);
+  // 共有ヘッダー・折り返す免責バナー・モバイルバーの実測高さでアンカー位置を補正する
+  expect(css).toMatch(
+    /scroll-margin-top: calc\(var\(--ch-height, 60px\) \+ var\(--ch-disclaimer-height, 0px\) \+ 24px\)/
+  );
+  expect(css).toMatch(
+    /scroll-margin-top: calc\(\s*var\(--ch-height, 60px\) \+ var\(--ch-disclaimer-height, 0px\) \+ var\(--mobile-bar-height\) \+ 16px\s*\)/
+  );
+  expect(css).not.toMatch(/--header-height/);
   expect(css).toMatch(/width: 100%/);
   expect(styles.layout).toBeTruthy();
+});
+it("モバイル目次の閉状態は不可視・操作不能、開状態で復元するCSS契約", () => {
+  const css = fs.readFileSync("app/claude/models-best-practices/page.module.css", "utf8");
+  expect(css).toMatch(/\.sidebar \{[^}]*visibility: hidden;[^}]*pointer-events: none;/);
+  expect(css).toMatch(/\.sidebar\.open \{[^}]*visibility: visible;[^}]*pointer-events: auto;/);
+});
+it("図解ラッパーは横スクロールのみ担当し、配置・幅はMermaidDiagramへ委譲するCSS契約", () => {
+  const css = fs.readFileSync("app/claude/models-best-practices/page.module.css", "utf8");
+  const block = css.match(/\.diagram-wrap \{([^}]*)\}/)?.[1] ?? "";
+  expect(block).toMatch(/overflow-x: auto;/);
+  expect(block).not.toMatch(/display:|justify-content:|(^|[^-])width:/);
 });
