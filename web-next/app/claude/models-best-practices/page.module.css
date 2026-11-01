@@ -203,9 +203,6 @@
 }
 .root .diagram-wrap {
   overflow-x: auto;
-  display: flex;
-  justify-content: safe center;
-  width: 100%;
   min-width: 0;
 }
 .root .diagram-wrap > * {
@@ -229,10 +226,16 @@
 @media (max-width: 900px) {
   .root .sidebar {
     transform: translateX(-100%);
-    transition: transform 0.25s;
+    visibility: hidden;
+    pointer-events: none;
+    transition:
+      transform 0.25s,
+      visibility 0.25s;
   }
   .root .sidebar.open {
     transform: none;
+    visibility: visible;
+    pointer-events: auto;
     box-shadow: 0 0 30px rgba(0, 0, 0, 0.3);
   }
   .root .mobile-bar {
@@ -404,7 +407,23 @@
 .root :global(h2),
 .root :global(h3),
 .root :global(h4) {
-  scroll-margin-top: calc(var(--header-height, 60px) + 80px);
+  /* 共有ヘッダーと折り返し可能な免責バナーの実測高さに追従させる */
+  scroll-margin-top: calc(var(--ch-height, 60px) + var(--ch-disclaimer-height, 0px) + 24px);
+}
+@media (max-width: 900px) {
+  .root {
+    --mobile-bar-height: 58px;
+  }
+  .root :global(h2),
+  .root :global(h3),
+  .root :global(h4) {
+    scroll-margin-top: calc(
+      var(--ch-height, 60px) +
+      var(--ch-disclaimer-height, 0px) +
+      var(--mobile-bar-height) +
+      16px
+    );
+  }
 }
 .root .sidebar {
   top: calc(var(--ch-height, 60px) + var(--ch-disclaimer-height, 0px));

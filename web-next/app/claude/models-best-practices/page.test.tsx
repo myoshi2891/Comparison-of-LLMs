@@ -126,7 +126,7 @@ it("リスト・表・アンカー・幅のCSS契約", () => {
     /scroll-margin-top: calc\(var\(--ch-height, 60px\) \+ var\(--ch-disclaimer-height, 0px\) \+ 24px\)/
   );
   expect(css).toMatch(
-    /scroll-margin-top: calc\(\s*var\(--ch-height, 60px\) \+ var\(--ch-disclaimer-height, 0px\) \+ var\(--mobile-bar-height\) \+ 16px\s*\)/
+    /scroll-margin-top: calc\(\s*var\(--ch-height, 60px\)\s*\+\s*var\(--ch-disclaimer-height, 0px\)\s*\+\s*var\(--mobile-bar-height\)\s*\+\s*16px\s*\)/
   );
   expect(css).not.toMatch(/--header-height/);
   expect(css).toMatch(/width: 100%/);
