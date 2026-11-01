@@ -63,14 +63,14 @@ describe("ZaiGlmBestPracticesPage", () => {
     ]);
   });
 
-  it("Deep Thinking の既定説明で GLM-4.7 系を自動判断のモデルから除外し、enabled 時は必ず思考すると示す", async () => {
+  it("Deep Thinking の既定説明で GLM-4.7 系を自動判断のモデルから除外し、enabled 時は必ず思考すると示し、GLM-4.6 はハイブリッド思考が既定で有効で disabled 指定で無効化すると示す", async () => {
     const page = await Page();
     const { container } = render(page);
     const para = Array.from(container.querySelectorAll("#s7 > p")).find((p) =>
       p.textContent?.startsWith("GLM-4.5以降のモデルは")
     );
     expect(para?.textContent?.replace(/\s+/g, " ").trim()).toBe(
-      "GLM-4.5以降のモデルは、回答前に内部で段階的な思考(Chain-of-Thought)を行う「Deep Thinking」機能を備えている。thinking.typeで有効/無効を切り替え、GLM-5.2以降ではさらにreasoning_effortで思考の深さを段階的に制御できる。GLM-5.2/5.1/5ではthinkingが既定で有効で、モデルがタスクの難易度を見て思考の要否を自動判断する。GLM-4.7系もthinkingが既定で有効だが、enabledのときは自動判断せず必ず思考する(強制thinking)。これに対し、GLM-4.6のようなハイブリッドモデルは既定で無効という違いがある点に注意する。"
+      "GLM-4.5以降のモデルは、回答前に内部で段階的な思考(Chain-of-Thought)を行う「Deep Thinking」機能を備えている。thinking.typeで有効/無効を切り替え、GLM-5.2以降ではさらにreasoning_effortで思考の深さを段階的に制御できる。GLM-5.2/5.1/5ではthinkingが既定で有効で、モデルがタスクの難易度を見て思考の要否を自動判断する。GLM-4.7系もthinkingが既定で有効だが、enabledのときは自動判断せず必ず思考する(強制thinking)。GLM-4.6のようなハイブリッドモデルもハイブリッド思考が既定で有効で、無効にするにはthinking.typeにdisabledを明示的に指定する必要がある点に注意する。"
     );
   });
 

@@ -82,15 +82,19 @@ it("メタデータと階層", () => {
 });
 it("メニュー開閉とリンク選択", () => {
   const { container, getByRole } = render(<Page />);
-  const b = getByRole("button", { name: "menu" });
+  const b = getByRole("button", { name: "目次を開く" });
   expect(b.getAttribute("aria-expanded")).toBe("false");
   fireEvent.click(b);
   expect(b.getAttribute("aria-expanded")).toBe("true");
+  expect(b.getAttribute("aria-label")).toBe("目次を閉じる");
   fireEvent.click(container.querySelector("aside a") as HTMLAnchorElement);
   expect(b.getAttribute("aria-expanded")).toBe("false");
+  expect(b.getAttribute("aria-label")).toBe("目次を開く");
   fireEvent.click(b);
+  expect(b.getAttribute("aria-label")).toBe("目次を閉じる");
   fireEvent.keyDown(window, { key: "Escape" });
   expect(b.getAttribute("aria-expanded")).toBe("false");
+  expect(b.getAttribute("aria-label")).toBe("目次を開く");
 });
 it("チェック全件と解除", () => {
   const { container } = render(<Page />);
