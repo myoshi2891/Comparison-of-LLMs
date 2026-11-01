@@ -505,7 +505,7 @@ AGENTS.md → CODEX.md → CLAUDE.md → docs/PROGRESS.md → Phase A–F 計画
 次の作業: /claude/models-best-practices の目視確認（ユーザー担当）。localhost:3000。
 Mermaid図解5箇所、272px固定目次、モバイル開閉、表の左寄せ、リストの点と番号、12コード例の構文色、チェックリスト10項目の進捗を確認する。
 原本2形式（HTMLおよびMarkdown）はarchive/へ退避済み（SHA-256一致）。
-HTML原本監査exit 0、対象19契約と関連45契約、typecheck・lint（0 diagnostics）が成功。全体テストの最新結果は本書冒頭を参照。
+HTML原本監査exit 0、対象19契約と関連67契約、typecheck・lint（0 diagnostics）が成功。全体テストの最新結果は本書冒頭を参照。
 NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000 を使用する。
 本ページのCSSはページ内に閉じ、図解レイアウトは共有コンポーネントへ委譲。依存・設定・ロック・監査スクリプトは変更していない。
 サンドボックスではnpmとビルドを実行しない。修正もRed → Green → Refactor → Docsの分離コミットを守る。
