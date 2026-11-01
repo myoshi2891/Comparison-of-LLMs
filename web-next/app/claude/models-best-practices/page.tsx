@@ -538,7 +538,7 @@ export default function Page() {
                 {"\n              "}
                 <strong>{"注意"}</strong>
                 {
-                  ": ZDR(Zero Data\n              Retention)の適用可否はモデルごとに異なります。「Covered Models」の扱いは公式の [API\n              and data retention] ページで確認してください。\n            "
+                  ": Fable 5.1 は 30 日間のデータ保持が必須の「Covered Model」で、Anthropic が明示的に許可しない限り\n              ZDR(Zero Data Retention)では利用できません。詳細は公式の [API and data retention] ページ(Part 8 の URL 一覧)で確認してください。\n            "
                 }
               </p>
               {"\n          "}
@@ -3848,6 +3848,16 @@ export default function Page() {
                     <td>{"Claude Haiku 5.5 モデル概要"}</td>
 
                     <td>{"https://platform.claude.com/docs/en/models/haiku-5-5/overview"}</td>
+                  </tr>
+
+                  <tr>
+                    <td>{"API とデータ保持(Covered Models・ZDR)"}</td>
+
+                    <td>
+                      {
+                        "https://platform.claude.com/docs/en/manage-claude/api-and-data-retention#model-specific-data-retention-requirements"
+                      }
+                    </td>
                   </tr>
 
                   <tr>

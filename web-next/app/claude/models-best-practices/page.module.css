@@ -431,6 +431,16 @@
 .root .mobile-bar {
   top: calc(var(--ch-height, 60px) + var(--ch-disclaimer-height, 0px));
 }
+/* 開いたサイドバー（z-index: 20）にメニューボタンが覆われないよう、バーを前面に置き、
+   サイドバーはバーの下から始めて先頭項目を見せる。上の共通 top より後に置いてカスケードで勝たせる */
+@media (max-width: 900px) {
+  .root .mobile-bar {
+    z-index: 25;
+  }
+  .root .sidebar {
+    top: calc(var(--ch-height, 60px) + var(--ch-disclaimer-height, 0px) + var(--mobile-bar-height));
+  }
+}
 .root :global(pre code) {
   background: none;
   border: none;
