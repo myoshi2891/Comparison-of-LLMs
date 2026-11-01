@@ -993,7 +993,8 @@ export default function ZaiGlmBestPracticesPage() {
                     で無効化でき、応答速度とコストを最適化できる。
                   </li>
                   <li className={styles.li}>
-                    GLM-4.7: <code className={styles.codeInline}>thinking.type</code> が
+                    GLM-4.7 / GLM-4.7-Flash / GLM-4.7-FlashX:{" "}
+                    <code className={styles.codeInline}>thinking.type</code> が
                     enabled(既定)のときは強制 thinking(必ず思考する)になるが、
                     <code className={styles.codeInline}>
                       thinking: &#123;&quot;type&quot;: &quot;disabled&quot;&#125;
@@ -2119,7 +2120,8 @@ export default function ZaiGlmBestPracticesPage() {
                     複雑な推論タスクでのみ
                     <code className={styles.codeInline}>reasoning_effort=max</code>
                     を使い、軽量タスクではモデル別に、GLM-5.2 / GLM-5.1 / GLM-5 /
-                    GLM-4.6はthinkingを無効化、GLM-4.7もenabled時は強制thinkingだがdisabledで無効化、GLM-5.3
+                    GLM-4.6はthinkingを無効化、GLM-4.7 / GLM-4.7-Flash /
+                    GLM-4.7-FlashXもenabled時は強制thinkingだがdisabledで無効化、GLM-5.3
                     系はthinkingを有効のまま
                     <code className={styles.codeInline}>reasoning_effort: "low"</code>
                     、GLM-4.6 より前のモデルはthinkingを省略、と使い分けているか
