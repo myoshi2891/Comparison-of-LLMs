@@ -10,6 +10,10 @@ AIモデルの時間別コスト計算機 + AI ツール導入ガイド群。Pyt
 
 ## アーキテクチャ
 
+2026-11-01: Claudeモデルガイドの表構造直下の空白文字列を除去しhydration不整合を修正。
+公開日バーの背景と本文幅をヒーローへ揃え、共有bodyの追加余白とサイドバーの固定値を実測ヘッダー高さへ補正。
+root htmlにdata-scroll-behavior="smooth"を宣言。対象23契約・全体216 files／2243 tests・原本監査・型・lint成功。
+
 Claude 最新モデルガイド `/claude/models-best-practices` を追加（2026-11-01）。
 HTMLの全61見出し・66段落・36リスト項目・233表行・12コード例・5図をPure JSXへ転写。
 19原本契約・確認日1契約とregistry／ナビを含む67関連契約が成功。原本監査exit 0、全体Vitest 215 files／2240 tests、型チェック・lint成功。

@@ -6,6 +6,16 @@
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
 
+## Claudeモデルガイドのhydration・共有クローム修正（2026-11-01）
+
+- 原因: HTML整形用空白をJSX文字列として転写し、table／thead／tbody／tr直下にもテキストノードを生成していた。構造タグ直下の空白だけを除去し、セル本文とコードの空白は保持。
+- 233表行の固定期待値は変更せず、セルを空白で区切って比較する検証へ補正。表内の不正テキストノードが0件であることを追加検証。
+- bodyの追加10px余白とサイドバーの固定オフセットを修正。免責バナーの実測高さを用い、公開日バーを本文幅に合わせヒーローと同じグラデーション・白文字へ統合。モバイルは全幅に戻す。
+- Next.jsのsmooth-scroll警告はroot htmlのdata-scroll-behavior宣言で対応。
+- 対象23契約、全体216 files／2243 tests、型チェック、lint（584 files／0 diagnostics）、原本監査exit 0が成功。CSSキャッシュを退避しlocalhost:3000の対象ルートHTTP 200を確認。目視はユーザー担当。
+- Red `23ed1960` → Green `8eb66f60` → テストパーサー補正 `86701eaf`。Green時点で追加CSS検証のコメント誤読1件を残してコミットした手順不備を報告し、履歴を取り消さず補正後23契約を再確認した。
+- npm・ビルドは未実行。原本・依存・設定は変更していない。
+
 ## Claude 最新モデルガイド移行（2026-11-01）
 
 - ルート: `/claude/models-best-practices`。指定HTMLを正本とし、情報基準日2026-10-23を保持。
@@ -22,15 +32,15 @@
 
 - **フェーズ**: 保守・機能改善・品質強化フェーズ
 - **ブランチ**: `dev`
-- **最新実装 HEAD**: `0b7a683c`（移行 Red `5e0e3658` → Green `f91777e1`、確認日修正 Red `3fb6ca7e` → Green `d9bbc313`、Refactor `402a4a96`・`0b7a683c`）
+- **最新実装 HEAD**: `86701eaf`（hydration・共有クローム修正 Red `23ed1960` → Green `8eb66f60` → 検証補正 `86701eaf`）
 - **次の作業**: `/claude/models-best-practices` の目視確認（ユーザー担当、localhost:3000）。目次追従・モバイル開閉、リストの点と番号、12コード例の構文色、5図、10項目の進捗表示を確認する。npm・ビルドは未実行。
 - **ルート実数**: `page.tsx` 96 件、registry 96 エントリ（現行ファイルから実測）。
 - **動作検証**:
   - ビルド: 今回はユーザー指定で未実行。過去の成功記録は 2026-09-17 の 90 静的ページであり、今回の変更を検証した値ではない。
   - `bun run typecheck` ✅（`tsc --noEmit`。2026-11-01 実測）
-  - `bun run lint` ✅（Biome check / 583 files / 0 diagnostics。2026-11-01 実測）
+  - `bun run lint` ✅（Biome check / 584 files / 0 diagnostics。2026-11-01 実測）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=2 --testTimeout=30000` でVitest **215 files / 2240 tests すべて合格**（2026-11-01 実測）。対象19原本契約＋1確認日契約、関連67契約、typecheck・lint、HTML原本監査exit 0が成功。
+  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=2 --testTimeout=30000` でVitest **216 files / 2243 tests すべて合格**（2026-11-01 実測）。対象19原本契約＋1確認日契約、関連67契約、typecheck・lint、HTML原本監査exit 0が成功。
     - 初回全体検証は2239件中registryの日付不変条件1件が失敗。専用Red／Greenで修正後、全体を再実行して成功。依存・設定・ロックは変更していない。
     - `load(sourceHtml)` をモジュール初期化時に呼ぶ `governance/ai-governance/GuideContent.tsx` と
       `local-llm/finetuning-best-practices/GuideContent.tsx` は、import スモークでも読み込み可能であることを確認済み
@@ -491,7 +501,7 @@
 
 ```text
 AGENTS.md → CODEX.md → CLAUDE.md → docs/PROGRESS.md → Phase A–F 計画の順で読む。
-最新実装 HEAD: 0b7a683c（移行 Red 5e0e3658 → Green f91777e1、確認日修正 Red 3fb6ca7e → Green d9bbc313、Refactor 402a4a96・0b7a683c）
+最新実装 HEAD: 86701eaf（hydration・共有クローム修正とCSS検証補正）
 次の作業: /claude/models-best-practices の目視確認（ユーザー担当）。localhost:3000。
 Mermaid図解5箇所、272px固定目次、モバイル開閉、表の左寄せ、リストの点と番号、12コード例の構文色、チェックリスト10項目の進捗を確認する。
 原本2形式（HTMLおよびMarkdown）はarchive/へ退避済み（SHA-256一致）。
