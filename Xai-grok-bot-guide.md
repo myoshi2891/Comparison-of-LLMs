@@ -220,12 +220,13 @@ uname -m
 3. アプリに戻る。
 4. 契約経路に応じて、次の手順を行う。
    - **The X Subscription の Premium・Super・Ultra** の場合: Grok Bot が含まれるため、Grok アカウントの連携は不要。
-   - **SuperGrok** の場合:
+   - **SuperGrok** の場合(**Cursor Enterprise のユーザーは対象外**。次の Enterprise の手順に従う):
      - デスクトップ: **Settings → Usage & Billing → Get Access with Grok** を開き、SuperGrok の Grok アカウントでサインインする。
      - iPhone / Android: アクセス画面で **Link Grok Account** を選んで連携し、終わったら **Finished Linking? Refresh My Status** を選ぶ。
    - **X Premium+** の場合:
      - デスクトップ: **Settings → Usage & Billing → Get Access with Grok** を開き、X Premium+ の Grok アカウントでサインインする。
      - iPhone / Android: アクセス画面で **Link Grok Account** を選んで連携し、終わったら **Finished Linking? Refresh My Status** を選ぶ。
+   - **Cursor Enterprise** の場合: 管理者がチームに対して Grok Bot を有効化する必要がある。個人の SuperGrok アカウントは連携しない。利用可否や使用量は、管理者またはアカウント担当者に確認する。
    - **セルフサーブの Grok Business** で、先に Cursor アカウントで認証してしまった場合: いったんサインアウトし、**Sign in with Grok** でシートを持つ Grok アカウントを使って認証し直す。
 
 初回は短いイントロのあと、裏側でコンピュータのセットアップが走り、**「Grok Bot」という名前の最初の Bot** が作られてチャットが開きます。
@@ -722,7 +723,7 @@ flowchart LR
 ### 16.1 Team Bot
 
 - Cursor チームでは、サイドバーの **+ → Create a Bot** で Bot を作り、チャットの Bot 名メニューの **Share** からチームに共有すると、メンバーが話しかけられる Bot になります。
-- **チームで共有する Bot** では、オーナーまたは Manager が追加したアプリ・シークレット・スキル・ファイルが、**各メンバーのチャットでも利用可能**になります。オーナーと Manager のどちらが追加する場合も、認証情報や顧客データは追加しないでください。
+- **チームで共有する Bot** では、オーナーまたは Manager が追加したアプリ・シークレット・スキル・ファイル・**メモリ**が、**各メンバーのチャットでも利用可能**になります。メモリは**チーム全体のための学習内容**を保存するため、あるメンバーとの会話で覚えた内容がほかのメンバーとのチャットにも反映されます。オーナーと Manager のどちらが追加する場合も、認証情報や顧客データは追加しないでください。また、**個人情報や顧客情報をメモリに保存させない**でください。
 - 一方、Bot の**公開テンプレート**としての共有は**ログインの共有ではありません**（コンピュータ・ログイン・会話履歴は共有されない）。ただし設定だけでなく、Bot の ID（名前など）・説明・**Skill**・**Routine** といった共有用の構成が公開されます。公開する前に Bot の詳細で共有される中身を確認し、API キー・社内URL・顧客データなどの機密を取り除いてください。公開後は Share メニューの **View template details** で中身を確認できます。
 
 ### 16.2 管理者が知っておくこと(公式・第三者資料より)
