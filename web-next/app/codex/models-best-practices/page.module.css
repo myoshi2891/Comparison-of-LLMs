@@ -564,6 +564,9 @@
     border: 0;
     padding: 0;
     width: 100%;
+  }
+  /* 開状態の inset: 0 より後に置き、共有ヘッダー分の top を優先させる */
+  .root.open .overlay {
     top: calc(var(--ch-height, 60px) + var(--ch-disclaimer-height, 0px));
   }
 }
