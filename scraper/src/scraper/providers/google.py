@@ -24,7 +24,10 @@ _FLASH_STANDARD_PRICE = (1.50, 7.50)
 
 # 非推奨エイリアス → ルーティング先モデル。エイリアスは後継モデルとして課金されるため、
 # 価格（期限後の切り替えを含む）はルーティング先の _FALLBACKS から導出する。
-_FLASH_ALIAS_TARGETS = {"Gemini 3.5 Flash": "Gemini 3.6 Flash"}
+_FLASH_ALIAS_TARGETS = {
+    "Gemini 3.7 Flash": "Gemini 3.8 Flash",
+    "Gemini 3.5 Flash": "Gemini 3.6 Flash",
+}
 
 # Gemini 4 Argon の $2/$10 導入価格はこの日付まで。2026-12-01 以降は標準価格 $4/$20。
 # 切り替えは実行時判定のため、配信中の pricing.json へ反映するには 2026-12-01 以降に
@@ -57,6 +60,7 @@ _FALLBACKS: dict[str, tuple[float, float, str, str, str, str, str]] = {
     _ARGON_NAME:              (2.00,  10.00, "Google AI", "最新 Flagship", "tag-flag", "最新旗艦 / 2026-11-30までの特価 (以降 $4/$20) / キャッシュ入力95%引き", "Latest flagship / promo through 2026-11-30 (then $4/$20) / 95% off cached input"),
     "Gemini 3.1 Pro Preview": (2.00,  12.00, "Google AI", "Preview",  "tag-flag", "前世代 Pro / 1M ctx / 200K超は $4/$18", "Prev-gen Pro / 1M ctx / $4/$18 above 200K"),
     "Gemini 3.8 Flash":       (0.75,   3.75, "Google AI", "最新 Flash", "tag-bal", "最新Flash / 1M ctx / 2026-12-31までの特価 (以降 $1.5/$7.5)", "Latest Flash / 1M ctx / promo through 2026-12-31 (then $1.5/$7.5)"),
+    # 価格は _FLASH_ALIAS_TARGETS 経由で 3.8 Flash から導出する（下記の値は同額の写し）
     "Gemini 3.7 Flash":       (0.75,   3.75, "Google AI", "Deprecated", "tag-leg", "非推奨エイリアス / Gemini 3.8 Flash へ自動ルーティング (提供終了ではない)", "Deprecated alias / auto-routes to Gemini 3.8 Flash (not shut down)"),
     "Gemini 3.6 Flash":       (0.75,   3.75, "Google AI", "Fast",     "tag-bal",  "1M ctx / 2026-12-31までの特価 (以降 $1.5/$7.5)", "1M ctx / promo through 2026-12-31 (then $1.5/$7.5)"),
     "Gemini Omni 1.1 Flash":  (1.50,   9.00, "Google AI", "Multimodal", "tag-bal", "GA / マルチモーダル生成 / テキスト出力 (動画出力は $17.5)", "GA / Multimodal generation / text output (video output $17.5)"),

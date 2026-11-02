@@ -25,18 +25,29 @@ describe("ZaiGlmBestPracticesPage", () => {
     expect(h2s.length).toBe(17);
   });
 
-  it("軽量タスクの指針で thinking disabled を GLM-4.6 以降に限定し、GLM-5.3 の強制 thinking と区別する", async () => {
+  it("軽量タスクの指針で thinking の扱いをモデル別マトリクスで示し、GLM-4.7 系(Flash / FlashX 含む)の enabled 時の強制 thinking と disabled による無効化を区別する", async () => {
     const page = await Page();
     const { container } = render(page);
+    const norm = (t: string | null | undefined) => t?.replace(/\s+/g, " ").trim();
     const item = Array.from(container.querySelectorAll("li")).find((li) =>
       li.textContent?.startsWith("単純なFAQ応答や定型フォーマット変換")
     );
-    expect(item?.textContent?.replace(/\s+/g, " ").trim()).toBe(
-      '単純なFAQ応答や定型フォーマット変換のような軽量タスクでは、GLM-4.6 以降(GLM-5.3 系を除く)のモデルなら thinking: {"type": "disabled"} にして応答速度とコストを最適化する。GLM-4.5-Flash など GLM-4.6 より前のモデルでは thinking パラメータを指定せず省略する。GLM-5.3 / GLM-5.3-Flash / GLM-5.3-FlashX は thinking が強制で無効化できない(thinking.type は enabled のまま)ため、代わりに reasoning_effort: "low" を指定して思考量を抑える。'
-    );
+    const intro =
+      "単純なFAQ応答や定型フォーマット変換のような軽量タスクでは、Z.ai の Chat Completions API で対象モデルごとに thinking の扱いを分ける。";
+    const matrix = [
+      'GLM-5.2 / GLM-5.1 / GLM-5 / GLM-4.6: thinking: {"type": "disabled"} で無効化でき、応答速度とコストを最適化できる。',
+      'GLM-5-Turbo: thinking は既定で有効(enabled)だが、thinking: {"type": "disabled"} で無効化できるため、軽量なターンでは無効化する。',
+      'GLM-4.7 / GLM-4.7-Flash / GLM-4.7-FlashX: thinking.type が enabled(既定)のときは強制 thinking(必ず思考する)になるが、thinking: {"type": "disabled"} で無効化できるため、軽量なターンでは無効化する。',
+      'GLM-5.3 / GLM-5.3-Flash / GLM-5.3-FlashX: thinking が強制で無効化できない(thinking.type は enabled のまま)ため、代わりに reasoning_effort: "low" を指定して思考量を抑える。',
+      'GLM-4.5 / GLM-4.5-Air / GLM-4.5-Flash: GLM-4.5 シリーズは thinking パラメータに対応しているため、軽量なターンでは thinking: {"type": "disabled"} で無効化する。GLM-4.5 より前のモデルは対象外のため、thinking を指定せず省略する。',
+    ];
+    expect(
+      Array.from(item?.querySelectorAll("li") ?? []).map((li) => norm(li.textContent))
+    ).toEqual(matrix);
+    expect(norm(item?.textContent)).toBe(intro + matrix.join(""));
   });
 
-  it("チェックリストの軽量タスク項目で GLM-4.6 以降のみ無効化し、より前は省略、GLM-5.3 系は有効のまま low にすると区別する", async () => {
+  it("チェックリストの軽量タスク項目でモデル別の thinking の扱いを区別し、GLM-4.7 / GLM-4.7-Flash / GLM-4.7-FlashX も disabled で無効化できると示す", async () => {
     const page = await Page();
     const { container } = render(page);
     const row = Array.from(container.querySelectorAll("tr")).find((tr) =>
@@ -47,9 +58,20 @@ describe("ZaiGlmBestPracticesPage", () => {
         td.textContent?.replace(/\s+/g, " ").trim()
       )
     ).toEqual([
-      '複雑な推論タスクでのみreasoning_effort=maxを使い、軽量タスクではGLM-4.6 以降(GLM-5.3 系を除く)ならthinkingを無効化、GLM-4.6 より前のモデルはthinkingを省略、GLM-5.3 系ならthinkingを有効のままreasoning_effort: "low"にしているか',
+      '複雑な推論タスクでのみreasoning_effort=maxを使い、軽量タスクではモデル別に、GLM-5.2 / GLM-5.1 / GLM-5 / GLM-4.6はthinkingを無効化、GLM-5-Turboも既定でenabledだがdisabledで無効化、GLM-4.7 / GLM-4.7-Flash / GLM-4.7-FlashXもenabled時は強制thinkingだがdisabledで無効化、GLM-5.3 系はthinkingを有効のままreasoning_effort: "low"、GLM-4.5 / GLM-4.5-Air / GLM-4.5-Flashはthinkingを無効化、GLM-4.5 より前のモデルはthinkingを省略、と使い分けているか',
       "7, 13",
     ]);
+  });
+
+  it("Deep Thinking の既定説明で GLM-4.7 系を自動判断のモデルから除外し、enabled 時は必ず思考すると示し、GLM-4.6 はハイブリッド思考が既定で有効で disabled 指定で無効化すると示す", async () => {
+    const page = await Page();
+    const { container } = render(page);
+    const para = Array.from(container.querySelectorAll("#s7 > p")).find((p) =>
+      p.textContent?.startsWith("GLM-4.5以降のモデルは")
+    );
+    expect(para?.textContent?.replace(/\s+/g, " ").trim()).toBe(
+      "GLM-4.5以降のモデルは、回答前に内部で段階的な思考(Chain-of-Thought)を行う「Deep Thinking」機能を備えている。thinking.typeで有効/無効を切り替え、GLM-5.2以降ではさらにreasoning_effortで思考の深さを段階的に制御できる。GLM-5.2/5.1/5ではthinkingが既定で有効で、モデルがタスクの難易度を見て思考の要否を自動判断する。GLM-4.7系もthinkingが既定で有効だが、enabledのときは自動判断せず必ず思考する(強制thinking)。GLM-4.6のようなハイブリッドモデルもハイブリッド思考が既定で有効で、無効にするにはthinking.typeにdisabledを明示的に指定する必要がある点に注意する。"
+    );
   });
 
   it("renders 8 mermaid diagrams", async () => {

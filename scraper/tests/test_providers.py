@@ -310,6 +310,26 @@ class TestGoogle:
             assert (alias.price_in, alias.price_out) == expected
             assert (alias.price_in, alias.price_out) == (target.price_in, target.price_out)
 
+    def test_flash_37_alias_follows_38_price_through_promo_expiry(self):
+        """3.7 Flash エイリアスは 3.8 Flash として課金されるため、期限後も 3.8 Flash と同じ標準価格へ移る。"""
+        assert google._FLASH_ALIAS_TARGETS["Gemini 3.7 Flash"] == "Gemini 3.8 Flash"
+        # 期限前は 3.6 Flash と異なる 3.8 Flash 価格を与え、3.7 が 3.6 ではなく 3.8 に追従することを区別する
+        distinct_38 = (0.90, 4.20)
+        patched = dict(google._FALLBACKS)
+        patched["Gemini 3.8 Flash"] = distinct_38 + google._FALLBACKS["Gemini 3.8 Flash"][2:]
+        assert distinct_38 != google._FALLBACKS["Gemini 3.6 Flash"][:2]
+        cases = {date(2026, 12, 31): distinct_38, date(2027, 1, 1): (1.50, 7.50)}
+        for today, expected in cases.items():
+            with (
+                patch("scraper.providers.google._today_utc", return_value=today),
+                patch.dict(google._FALLBACKS, patched),
+            ):
+                models = google.scrape()
+            alias = _find(models, "Gemini 3.7 Flash")
+            target = _find(models, "Gemini 3.8 Flash")
+            assert (alias.price_in, alias.price_out) == expected
+            assert (alias.price_in, alias.price_out) == (target.price_in, target.price_out)
+
     def test_omni_flash_ga_and_deprecated_preview(self):
         """Omni Flash は GA 版を追加し、Preview は提供終了予告付きの非推奨エントリとして残す。"""
         expected = {

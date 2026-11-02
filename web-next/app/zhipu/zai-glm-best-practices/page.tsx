@@ -862,7 +862,10 @@ export default function ZaiGlmBestPracticesPage() {
             Thinking」機能を備えている。<code className={styles.codeInline}>thinking.type</code>
             で有効/無効を切り替え、GLM-5.2以降ではさらに
             <code className={styles.codeInline}>reasoning_effort</code>
-            で思考の深さを段階的に制御できる。GLM-5.2/5.1/5/4.7系ではthinkingが既定で有効(モデルがタスクの難易度を見て思考の要否を自動判断)であるのに対し、GLM-4.6のようなハイブリッドモデルは既定で無効という違いがある点に注意する。
+            で思考の深さを段階的に制御できる。GLM-5.2/5.1/5ではthinkingが既定で有効で、モデルがタスクの難易度を見て思考の要否を自動判断する。GLM-4.7系もthinkingが既定で有効だが、enabledのときは自動判断せず必ず思考する(強制thinking)。GLM-4.6のようなハイブリッドモデルもハイブリッド思考が既定で有効で、無効にするには
+            <code className={styles.codeInline}>thinking.type</code>に
+            <code className={styles.codeInline}>disabled</code>
+            を明示的に指定する必要がある点に注意する。
           </p>
 
           <div className={styles.tableWrap}>
@@ -982,20 +985,50 @@ export default function ZaiGlmBestPracticesPage() {
                 を組み合わせる。
               </li>
               <li className={styles.li}>
-                単純なFAQ応答や定型フォーマット変換のような軽量タスクでは、GLM-4.6
-                以降(GLM-5.3 系を除く)のモデルなら{" "}
-                <code className={styles.codeInline}>
-                  thinking: &#123;&quot;type&quot;: &quot;disabled&quot;&#125;
-                </code>{" "}
-                にして応答速度とコストを最適化する。GLM-4.5-Flash
-                など GLM-4.6 より前のモデルでは{" "}
-                <code className={styles.codeInline}>thinking</code>{" "}
-                パラメータを指定せず省略する。GLM-5.3 / GLM-5.3-Flash / GLM-5.3-FlashX は
-                thinking が強制で無効化できない(
-                <code className={styles.codeInline}>thinking.type</code> は enabled
-                のまま)ため、代わりに{" "}
-                <code className={styles.codeInline}>reasoning_effort: &quot;low&quot;</code>{" "}
-                を指定して思考量を抑える。
+                単純なFAQ応答や定型フォーマット変換のような軽量タスクでは、Z.ai の Chat Completions
+                API で対象モデルごとに thinking の扱いを分ける。
+                <ul className={styles.ul}>
+                  <li className={styles.li}>
+                    GLM-5.2 / GLM-5.1 / GLM-5 / GLM-4.6:{" "}
+                    <code className={styles.codeInline}>
+                      thinking: &#123;&quot;type&quot;: &quot;disabled&quot;&#125;
+                    </code>{" "}
+                    で無効化でき、応答速度とコストを最適化できる。
+                  </li>
+                  <li className={styles.li}>
+                    GLM-5-Turbo: thinking は既定で有効(enabled)だが、
+                    <code className={styles.codeInline}>
+                      thinking: &#123;&quot;type&quot;: &quot;disabled&quot;&#125;
+                    </code>{" "}
+                    で無効化できるため、軽量なターンでは無効化する。
+                  </li>
+                  <li className={styles.li}>
+                    GLM-4.7 / GLM-4.7-Flash / GLM-4.7-FlashX:{" "}
+                    <code className={styles.codeInline}>thinking.type</code> が
+                    enabled(既定)のときは強制 thinking(必ず思考する)になるが、
+                    <code className={styles.codeInline}>
+                      thinking: &#123;&quot;type&quot;: &quot;disabled&quot;&#125;
+                    </code>{" "}
+                    で無効化できるため、軽量なターンでは無効化する。
+                  </li>
+                  <li className={styles.li}>
+                    GLM-5.3 / GLM-5.3-Flash / GLM-5.3-FlashX: thinking が強制で無効化できない(
+                    <code className={styles.codeInline}>thinking.type</code> は enabled
+                    のまま)ため、代わりに{" "}
+                    <code className={styles.codeInline}>reasoning_effort: &quot;low&quot;</code>{" "}
+                    を指定して思考量を抑える。
+                  </li>
+                  <li className={styles.li}>
+                    GLM-4.5 / GLM-4.5-Air / GLM-4.5-Flash: GLM-4.5 シリーズは{" "}
+                    <code className={styles.codeInline}>thinking</code>{" "}
+                    パラメータに対応しているため、軽量なターンでは{" "}
+                    <code className={styles.codeInline}>
+                      thinking: &#123;&quot;type&quot;: &quot;disabled&quot;&#125;
+                    </code>{" "}
+                    で無効化する。GLM-4.5 より前のモデルは対象外のため、
+                    <code className={styles.codeInline}>thinking</code> を指定せず省略する。
+                  </li>
+                </ul>
               </li>
               <li className={styles.li}>
                 ストリーミング時は<code className={styles.codeInline}>delta.reasoning_content</code>
@@ -2101,12 +2134,14 @@ export default function ZaiGlmBestPracticesPage() {
                   <td>
                     複雑な推論タスクでのみ
                     <code className={styles.codeInline}>reasoning_effort=max</code>
-                    を使い、軽量タスクではGLM-4.6
-                    以降(GLM-5.3 系を除く)ならthinkingを無効化、GLM-4.6
-                    より前のモデルはthinkingを省略、GLM-5.3
-                    系ならthinkingを有効のまま
+                    を使い、軽量タスクではモデル別に、GLM-5.2 / GLM-5.1 / GLM-5 /
+                    GLM-4.6はthinkingを無効化、GLM-5-Turboも既定でenabledだがdisabledで無効化、GLM-4.7
+                    / GLM-4.7-Flash /
+                    GLM-4.7-FlashXもenabled時は強制thinkingだがdisabledで無効化、GLM-5.3
+                    系はthinkingを有効のまま
                     <code className={styles.codeInline}>reasoning_effort: "low"</code>
-                    にしているか
+                    、GLM-4.5 / GLM-4.5-Air / GLM-4.5-Flashはthinkingを無効化、GLM-4.5
+                    より前のモデルはthinkingを省略、と使い分けているか
                   </td>
                   <td>7, 13</td>
                 </tr>

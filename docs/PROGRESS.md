@@ -2,24 +2,46 @@
 
 > 本ファイルは Next.js 移行完了後の保守・改善フェーズにおける開発の進捗（特にテスト関連）および品質チェックのルールを記録する。
 >
-> - 最終更新日: **Updated 2026-10-15**
+> - 最終更新日: **Updated 2026-11-01**
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
+
+## Claudeモデルガイドのhydration・共有クローム修正（2026-11-01）
+
+- 原因: HTML整形用空白をJSX文字列として転写し、table／thead／tbody／tr直下にもテキストノードを生成していた。構造タグ直下の空白だけを除去し、セル本文とコードの空白は保持。
+- 233表行の固定期待値は変更せず、セルを空白で区切って比較する検証へ補正。表内の不正テキストノードが0件であることを追加検証。
+- bodyの追加10px余白とサイドバーの固定オフセットを修正。免責バナーの実測高さを用い、公開日バーを本文幅に合わせヒーローと同じグラデーション・白文字へ統合。モバイルは全幅に戻す。
+- Next.jsのsmooth-scroll警告はroot htmlのdata-scroll-behavior宣言で対応。
+- 対象23契約、全体216 files／2243 tests、型チェック、lint（584 files／0 diagnostics）、原本監査exit 0が成功。CSSキャッシュを退避しlocalhost:3000の対象ルートHTTP 200を確認。目視はユーザー担当。
+- Red `23ed1960` → Green `8eb66f60` → テストパーサー補正 `86701eaf`。Green時点で追加CSS検証のコメント誤読1件を残してコミットした手順不備を報告し、履歴を取り消さず補正後23契約を再確認した。
+- npm・ビルドは未実行。原本・依存・設定は変更していない。
+
+## Claude 最新モデルガイド移行（2026-11-01）
+
+- ルート: `/claude/models-best-practices`。指定HTMLを正本とし、情報基準日2026-10-23を保持。
+- 全1 H1・11 H2・35 H3・14 H4・66段落・36リスト項目・233表行・21引用・12コード例・5図をPure JSXへ転写。
+- 固定期待値19契約と確認日1契約、目次・進捗チェック操作、registry／ナビを含む関連67契約が成功。全体Vitest 215 files／2240 tests、型チェックとlint（583 files／0 diagnostics）、HTML原本監査exit 0、Mermaid 5図の構文解析が成功。
+- 原本CSSをページ内に閉じ、リストの点／番号、表の左寄せ、アンカー余白、272px目次と900pxモバイル開閉、チェックリストの進捗・取り消し線を保持。
+- 原本と同じhighlight.js 11.11.1で12コード例を静的トークン化。図解のサイズ調整は共有MermaidDiagramに委譲。
+- HTML／Markdownはarchive/html/Anthropic/／archive/md/Anthropic/へ内容無変更で退避（それぞれSHA-256一致）。
+- Red `5e0e3658` → Green `f91777e1`。CSSキャッシュを退避し、既存localhost:3000で対象ルートHTTP 200を確認。目視はユーザー担当。
+- registryの確認日は移行確認日2026-11-01、本文の情報基準日は2026-10-23として区別。全体検証で検出した日付不変条件を専用Red／Greenで修正。共有CSSリセットによる原本余白・太字の消失もページ内で補正。
+- npm・ビルド・スクレイパー検証は未実行。依存・設定・ロックは変更していない。
 
 ## 現在のステータス
 
 - **フェーズ**: 保守・機能改善・品質強化フェーズ
 - **ブランチ**: `dev`
-- **最新実装 HEAD**: `3285bb5b`（ディレクトリ直下の移行済みガイド原本退避 `3285bb5b`、Reliable Machine Learning ガイドの学習チェックリスト連動・カウンター更新・取り消し線スタイルの修復 Red `cd400014` → Green `8adaec5b` → Refactor `5fe96d4b` → Docs `6aec0f8f`）
-- **次の作業**: `/books/reliable-machine-learning` の目視確認（ユーザー担当。ポート3000/3001）。12箇所の Mermaid 図解（ライトテーマ・コントラスト保護）、300px 固定常駐目次サイドバー、テーブルの左寄せ、学習チェックリスト（10項目）のチェックボックスON/OFF連動（右上の進捗バッジ 0/10〜10/10 リアルタイム更新、チェック項目の line-through 取り消し線スタイル反映）、白背景と調和した共通フッター、不透明ヘッダー・免責バナー、モバイル表示を確認する。既存ページ全体の目視も引き続きユーザー担当。npm・ビルドは禁止。
-- **ルート実数**: `page.tsx` 95 件、registry 96 エントリ（RSS の `/rss.xml` を含む）。全ルート登録・ナビ導出テストは合格。
+- **最新実装 HEAD**: `86701eaf`（hydration・共有クローム修正 Red `23ed1960` → Green `8eb66f60` → 検証補正 `86701eaf`）
+- **次の作業**: `/claude/models-best-practices` の目視確認（ユーザー担当、localhost:3000）。目次追従・モバイル開閉、リストの点と番号、12コード例の構文色、5図、10項目の進捗表示を確認する。npm・ビルドは未実行。
+- **ルート実数**: `page.tsx` 96 件、registry 96 エントリ（現行ファイルから実測）。
 - **動作検証**:
   - ビルド: 今回はユーザー指定で未実行。過去の成功記録は 2026-09-17 の 90 静的ページであり、今回の変更を検証した値ではない。
-  - `bun run typecheck` ✅（`tsc --noEmit`。2026-10-15 実測）
-  - `bun run lint` ✅（Biome check / 572 files / 0 diagnostics。2026-10-15 実測）
+  - `bun run typecheck` ✅（`tsc --noEmit`。2026-11-01 実測）
+  - `bun run lint` ✅（Biome check / 584 files / 0 diagnostics。2026-11-01 実測）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000` でVitest **208 files / 2150 tests すべて合格**（2026-10-15 実測）。対象27契約（22ページ契約 + 5操作契約）、typecheck・lint（0 diagnostics）、HTML原本監査exit 0が成功。
-    - 今回の開始時は対象26契約が成功、直前の全体検証は **208 files / 2149 tests**、開始HEADは `0fbf1a72`。依存・設定・ロック・アーカイブ原本・既存の固定期待値は変更していない。
+  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=2 --testTimeout=30000` でVitest **216 files / 2243 tests すべて合格**（2026-11-01 実測）。対象19原本契約＋1確認日契約、関連67契約、typecheck・lint、HTML原本監査exit 0が成功。
+    - 初回全体検証は2239件中registryの日付不変条件1件が失敗。専用Red／Greenで修正後、全体を再実行して成功。依存・設定・ロックは変更していない。
     - `load(sourceHtml)` をモジュール初期化時に呼ぶ `governance/ai-governance/GuideContent.tsx` と
       `local-llm/finetuning-best-practices/GuideContent.tsx` は、import スモークでも読み込み可能であることを確認済み
   - **バックエンド (`scraper/`)**: 今回はユーザー指定で検証対象外。実行していない。過去の成功記録は104件（2026-10-04）であり、今回の実測値ではない。
@@ -479,14 +501,13 @@
 
 ```text
 AGENTS.md → CODEX.md → CLAUDE.md → docs/PROGRESS.md → Phase A–F 計画の順で読む。
-最新実装 HEAD: 16409358（Reliable Machine Learning ガイドのタイポグラフィ最適化・Mermaidコントラスト修復・共有クローム完全統合・チェックリスト修正、移行済みMarkdown原本のarchive退避を含む。移行 Red 908a6769 → Green 0170db70 → Refactor 927a9174、改善 Red b20dfcb1 → Green d8a8b268、チェックリスト修正 Red cd400014 → Green 8adaec5b → Refactor 5fe96d4b、archive退避 3285bb5b → 16409358）
-次の作業: /books/reliable-machine-learning の目視確認（ユーザー担当）。開発サーバーはポート3000/3001。
-Mermaid図解12箇所（ライトテーマ・コントラスト保護）、300px固定常駐目次サイドバー、テーブルの左寄せ、チェックリスト（10項目）の進捗カウンター連動、白背景と調和した共通フッター、不透明ヘッダー・免責バナー、モバイル表示を確認する。
+最新実装 HEAD: 86701eaf（hydration・共有クローム修正とCSS検証補正）
+次の作業: /claude/models-best-practices の目視確認（ユーザー担当）。localhost:3000。
+Mermaid図解5箇所、272px固定目次、モバイル開閉、表の左寄せ、リストの点と番号、12コード例の構文色、チェックリスト10項目の進捗を確認する。
 原本2形式（HTMLおよびMarkdown）はarchive/へ退避済み（SHA-256一致）。
-HTML原本監査exit 0、対象27契約、全体Vitest 208 files / 2150 tests、typecheck・lint（0 diagnostics）が成功。
+HTML原本監査exit 0、対象19契約と関連67契約、typecheck・lint（0 diagnostics）が成功。全体テストの最新結果は本書冒頭を参照。
 NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000 を使用する。
-共有クロームの補正はglobals.cssへ集約。依存・設定・ロック・監査スクリプトは変更していない。
+本ページのCSSはページ内に閉じ、図解レイアウトは共有コンポーネントへ委譲。依存・設定・ロック・監査スクリプトは変更していない。
 サンドボックスではnpmとビルドを実行しない。修正もRed → Green → Refactor → Docsの分離コミットを守る。
-page.tsx 95件、registry 96エントリ（RSSを含む）。次ページは指示されてから扱う。
+page.tsx 96件、registry 96エントリ（現行ファイルから実測）。次ページは指示されてから扱う。
 ```
-

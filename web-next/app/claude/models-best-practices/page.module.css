@@ -1,0 +1,462 @@
+.root {
+  --paper: #f7f3ea;
+  --paper-alt: #efe9da;
+  --ink: #1d1b16;
+  --ink-2: #4a463c;
+  --indigo: #2f3e8f;
+  --gold: #b8862b;
+  --forest: #2f6b4f;
+  --plum: #6b3a5e;
+  --border: #ddd5c2;
+  --sb: 272px;
+}
+.root * {
+  box-sizing: border-box;
+}
+.root {
+  scroll-behavior: smooth;
+  scroll-padding-top: 16px;
+}
+.root {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font:
+    1rem / 1.85 "Noto Sans JP",
+    system-ui,
+    sans-serif;
+  -webkit-text-size-adjust: 100%;
+}
+.root .layout {
+  display: block;
+}
+.root .sidebar {
+  position: fixed;
+  inset: 0 auto 0 0;
+  width: var(--sb);
+  background: #fff;
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  padding: 24px 16px;
+  z-index: 20;
+}
+.root .sidebar .brand {
+  font:
+    700 1.15rem / 1.4 "Source Serif 4",
+    "Noto Sans JP",
+    serif;
+  color: var(--indigo);
+  margin: 0 0 16px;
+}
+.root .sidebar :global(a) {
+  display: block;
+  padding: 8px 12px;
+  border-radius: 8px;
+  color: var(--ink-2);
+  text-decoration: none;
+  font-size: 1rem;
+  line-height: 1.5;
+  margin: 2px 0;
+}
+.root .sidebar :global(a):hover {
+  background: var(--paper-alt);
+}
+.root .sidebar :global(a).active {
+  background: var(--indigo);
+  color: #fff;
+}
+.root .mobile-bar {
+  display: none;
+  font-size: 1rem;
+}
+.root .mobile-bar :global(button) {
+  font-size: 1rem;
+}
+.root .main {
+  margin-left: var(--sb);
+}
+.root .hero {
+  background: linear-gradient(135deg, var(--indigo), var(--plum));
+  color: #fff;
+  padding: 64px 48px;
+}
+.root .hero :global(h1) {
+  font:
+    700 2.3rem / 1.3 "Source Serif 4",
+    "Noto Sans JP",
+    serif;
+  margin: 0 0 20px;
+  overflow-wrap: break-word;
+}
+.root .hero :global(blockquote) {
+  background: rgba(255, 255, 255, 0.12);
+  border: 0;
+  color: #fff;
+  margin: 0;
+}
+.root .hero :global(blockquote) :global(p) {
+  margin: 6px 0;
+}
+.root .section {
+  padding: 34px 48px;
+}
+.root :global(h2) {
+  font:
+    700 1.7rem / 1.4 "Source Serif 4",
+    "Noto Sans JP",
+    serif;
+  color: var(--indigo);
+  margin: 0 0 20px;
+  padding-left: 14px;
+  border-left: 6px solid var(--gold);
+}
+.root :global(h3) {
+  font-size: 1.3rem;
+  color: var(--forest);
+  margin: 32px 0 12px;
+}
+.root :global(h4) {
+  font-size: 1.1rem;
+  color: var(--plum);
+  margin: 24px 0 8px;
+}
+.root :global(p),
+.root :global(li) {
+  overflow-wrap: break-word;
+}
+.root :global(a) {
+  color: var(--indigo);
+}
+.root :global(code) {
+  font:
+    0.95rem / 1.6 ui-monospace,
+    Menlo,
+    Consolas,
+    monospace;
+  background: var(--paper-alt);
+  padding: 2px 6px;
+  border-radius: 5px;
+  overflow-wrap: anywhere;
+}
+.root :global(pre).code-block {
+  background: #282c34;
+  border-radius: 10px;
+  overflow-x: auto;
+  margin: 16px 0;
+}
+.root :global(pre).code-block :global(code) {
+  background: none;
+  color: #abb2bf;
+  padding: 16px;
+  display: block;
+  font-size: 1rem;
+  overflow-wrap: normal;
+}
+.root :global(blockquote) {
+  margin: 18px 0;
+  padding: 6px 18px;
+  background: #fff;
+  border-left: 5px solid var(--gold);
+  border-radius: 0 8px 8px 0;
+  color: var(--ink-2);
+}
+.root .table-wrap {
+  overflow-x: auto;
+  margin: 18px 0;
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #fff;
+}
+.root :global(table) {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+.root :global(th) {
+  background: var(--indigo);
+  color: #fff;
+  text-align: left;
+  padding: 10px 14px;
+  white-space: nowrap;
+}
+.root :global(td) {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+  overflow-wrap: anywhere;
+}
+.root :global(td) :global(code) {
+  overflow-wrap: anywhere;
+}
+.root :global(tr):hover :global(td) {
+  background: var(--paper-alt);
+}
+.root .diagram-card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  margin: 22px 0;
+  min-width: 0;
+}
+.root .diagram-wrap {
+  overflow-x: auto;
+  min-width: 0;
+}
+.root .diagram-wrap > * {
+  min-width: 0;
+}
+.root .mermaidTooltip {
+  font-size: 1rem !important;
+}
+.root :global(ul),
+.root :global(ol) {
+  padding-left: 1.5em;
+}
+.root :global(li) {
+  margin: 4px 0;
+}
+.root .footer {
+  padding: 32px 48px;
+  color: var(--ink-2);
+  border-top: 1px solid var(--border);
+}
+@media (max-width: 900px) {
+  .root .sidebar {
+    transform: translateX(-100%);
+    visibility: hidden;
+    pointer-events: none;
+    transition:
+      transform 0.25s,
+      visibility 0.25s;
+  }
+  .root .sidebar.open {
+    transform: none;
+    visibility: visible;
+    pointer-events: auto;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.3);
+  }
+  .root .mobile-bar {
+    display: flex;
+    position: sticky;
+    top: 0;
+    z-index: 15;
+    background: #fff;
+    border-bottom: 1px solid var(--border);
+    padding: 10px 16px;
+    align-items: center;
+    gap: 12px;
+  }
+  .root .mobile-bar :global(button) {
+    border: 1px solid var(--border);
+    background: var(--paper);
+    border-radius: 8px;
+    padding: 6px 12px;
+  }
+  .root .main {
+    margin-left: 0;
+  }
+  .root .hero,
+  .root .section,
+  .root .footer {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+  .root .hero :global(h1) {
+    font-size: 1.7rem;
+  }
+  .root :global(h2) {
+    font-size: 1.4rem;
+  }
+}
+.root .checklist-card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 22px 24px;
+  margin: 20px 0;
+  box-shadow: 0 2px 10px rgba(47, 62, 143, 0.06);
+}
+.root .ck-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-size: 1.1rem;
+  color: var(--indigo);
+}
+.root .ck-count {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--forest);
+  background: #e6f1ea;
+  border-radius: 999px;
+  padding: 4px 14px;
+}
+.root .ck-bar {
+  height: 10px;
+  background: var(--paper-alt);
+  border-radius: 999px;
+  overflow: hidden;
+  margin: 14px 0 18px;
+}
+.root :global(#ckFill) {
+  height: 100%;
+  width: 0;
+  background: linear-gradient(90deg, var(--gold), var(--forest));
+  border-radius: 999px;
+  transition: width 0.3s;
+}
+.root :global(ul).checklist {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 10px;
+}
+.root :global(ul).checklist :global(li) {
+  margin: 0;
+}
+.root .ck {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--paper);
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
+  font-size: 1rem;
+}
+.root .ck:hover {
+  background: var(--paper-alt);
+  border-color: var(--indigo);
+}
+.root .ck :global(input) {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  font-size: 1rem;
+}
+.root .ck-box {
+  flex: 0 0 26px;
+  width: 26px;
+  height: 26px;
+  border: 2px solid var(--indigo);
+  border-radius: 7px;
+  background: #fff;
+  position: relative;
+  margin-top: 1px;
+}
+.root .ck-box::after {
+  content: "";
+  position: absolute;
+  left: 8px;
+  top: 2px;
+  width: 7px;
+  height: 14px;
+  border: solid #fff;
+  border-width: 0 3px 3px 0;
+  transform: rotate(45deg) scale(0);
+  transition: transform 0.15s;
+}
+.root .ck :global(input):checked + .ck-box {
+  background: var(--forest);
+  border-color: var(--forest);
+}
+.root .ck :global(input):checked + .ck-box::after {
+  transform: rotate(45deg) scale(1);
+}
+.root .ck :global(input):focus-visible + .ck-box {
+  outline: 3px solid var(--gold);
+  outline-offset: 2px;
+}
+.root .ck :global(input):checked ~ .ck-text {
+  color: #6d6858;
+  text-decoration: line-through;
+  text-decoration-color: var(--forest);
+}
+.root .ck-text {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.layout {
+  width: 100%;
+}
+.root :global(ul) {
+  list-style-type: disc;
+}
+.root :global(ol) {
+  list-style-type: decimal;
+}
+.root :global(ul).checklist {
+  list-style: none;
+}
+.root :global(th),
+.root :global(td) {
+  text-align: left !important;
+}
+.root :global(h2),
+.root :global(h3),
+.root :global(h4) {
+  /* 共有ヘッダーと折り返し可能な免責バナーの実測高さに追従させる */
+  scroll-margin-top: calc(var(--ch-height, 60px) + var(--ch-disclaimer-height, 0px) + 24px);
+}
+@media (max-width: 900px) {
+  .root {
+    --mobile-bar-height: 58px;
+  }
+  .root :global(h2),
+  .root :global(h3),
+  .root :global(h4) {
+    scroll-margin-top: calc(
+      var(--ch-height, 60px) +
+      var(--ch-disclaimer-height, 0px) +
+      var(--mobile-bar-height) +
+      16px
+    );
+  }
+}
+.root .sidebar {
+  top: calc(var(--ch-height, 60px) + var(--ch-disclaimer-height, 0px));
+}
+.root .mobile-bar {
+  top: calc(var(--ch-height, 60px) + var(--ch-disclaimer-height, 0px));
+}
+/* 開いたサイドバー（z-index: 20）にメニューボタンが覆われないよう、バーを前面に置き、
+   サイドバーはバーの下から始めて先頭項目を見せる。上の共通 top より後に置いてカスケードで勝たせる */
+@media (max-width: 900px) {
+  .root .mobile-bar {
+    z-index: 25;
+  }
+  .root .sidebar {
+    top: calc(var(--ch-height, 60px) + var(--ch-disclaimer-height, 0px) + var(--mobile-bar-height));
+  }
+}
+.root :global(pre code) {
+  background: none;
+  border: none;
+  white-space: pre;
+}
+
+/* Restore the source browser defaults removed by the shared Tailwind reset. */
+.root :global(p) {
+  margin-block: 1em;
+}
+.root :global(ul),
+.root :global(ol) {
+  margin-block: 1em;
+}
+.root :global(h3),
+.root :global(h4),
+.root :global(strong) {
+  font-weight: 700;
+}

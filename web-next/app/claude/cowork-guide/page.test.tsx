@@ -90,4 +90,23 @@ describe("/claude/cowork-guide 契約テスト", () => {
       "形式：全12ステップ + チェックリスト",
     ]);
   });
+
+  it("Step 3 の Global Instructions 設定手順が統合体験と従来のインターフェースの経路を区別する", () => {
+    const { container } = render(<Page />);
+    const heading = Array.from(container.querySelectorAll("#step3 h3")).find(
+      (el) => el.textContent === "Global Instructions（全セッション共通の指示）"
+    );
+    const list = heading?.nextElementSibling?.nextElementSibling;
+    const note = list?.nextElementSibling;
+
+    expect(list?.tagName).toBe("OL");
+    expect(Array.from(list?.querySelectorAll("li") ?? []).map((li) => li.textContent)).toEqual([
+      "統合体験で Settings > Account が表示される場合：「Instructions for Claude」欄に指示文を入力し、画面に表示される操作に従って保存する",
+      "統合体験で Settings > Your Claude が表示される場合：その画面の「Instructions」欄に指示文を入力し、画面に表示される操作に従って保存する",
+      "従来のインターフェースの場合：Settings > Cowork を開き、「Global instructions」の横にある「Edit」をクリックして指示文を入力し「Save」をクリック",
+    ]);
+    expect(note?.textContent).toBe(
+      "統合体験では、ここに書いた指示はCoworkタスクに限らずすべての会話に適用されます。"
+    );
+  });
 });
