@@ -198,7 +198,7 @@ export default function Page() {
       {"\n"}
       {"   "}{" "}
       <button
-        className={[styles["menu-btn"]].join(" ")}
+        className={styles["menu-btn"]}
         type="button"
         aria-label="目次を開く"
         aria-expanded="false"
@@ -221,24 +221,24 @@ export default function Page() {
       />
       {"\n"}
       {"   "}{" "}
-      <div className={[styles.layout].join(" ")} data-testid="layout-root">
+      <div className={styles.layout} data-testid="layout-root">
         {"\n"}
         {"     "}{" "}
-        <aside className={[styles.sidebar].join(" ")} id="gemini-sidebar" data-testid="sidebar-nav">
+        <aside className={styles.sidebar} id="gemini-sidebar" data-testid="sidebar-nav">
           {"\n"}
           {"       "}{" "}
-          <div className={[styles["sidebar-brand"]].join(" ")}>
+          <div className={styles["sidebar-brand"]}>
             {"\n"}
             {"         "}{" "}
-            <div className={[styles["brand-icon"]].join(" ")}>
+            <div className={styles["brand-icon"]}>
               <i className={["ti", "ti-sparkles"].join(" ")}></i>
             </div>
             {"\n"}
             {"         "}{" "}
-            <div className={[styles["brand-text"]].join(" ")}>
+            <div className={styles["brand-text"]}>
               {"Gemini ガイド"}
               <br />
-              <span className={[styles.badge].join(" ")}>{"2026-10-23"}</span>
+              <span className={styles.badge}>{"2026-10-23"}</span>
             </div>
             {"\n"}
             {"       "}{" "}
@@ -247,7 +247,7 @@ export default function Page() {
           {"       "}{" "}
           <nav>
             {"\n"}
-            {"         "} <div className={[styles["nav-group"]].join(" ")}>{"はじめに"}</div>
+            {"         "} <div className={styles["nav-group"]}>{"はじめに"}</div>
             {"\n"}
             {"         "}{" "}
             <a
@@ -261,130 +261,101 @@ export default function Page() {
             </a>
             {"\n"}
             {"         "}{" "}
-            <a className={[styles["nav-link"]].join(" ")} href="#s1" data-testid="sidebar-nav-link">
+            <a className={styles["nav-link"]} href="#s1" data-testid="sidebar-nav-link">
               <i className={["ti", "ti-map-2"].join(" ")}></i>
               <span>{"1. 2026年10月時点の全体像"}</span>
             </a>
             {"\n"}
-            {"         "}{" "}
-            <div className={[styles["nav-group"]].join(" ")}>{"ステップ別ガイド"}</div>
+            {"         "} <div className={styles["nav-group"]}>{"ステップ別ガイド"}</div>
             {"\n"}
             {"         "}{" "}
-            <a className={[styles["nav-link"]].join(" ")} href="#s2" data-testid="sidebar-nav-link">
+            <a className={styles["nav-link"]} href="#s2" data-testid="sidebar-nav-link">
               <i className={["ti", "ti-plug-connected"].join(" ")}></i>
               <span>{"Step 1: 環境を整える(Interactions API を軸にする)"}</span>
             </a>
             {"\n"}
             {"         "}{" "}
-            <a className={[styles["nav-link"]].join(" ")} href="#s3" data-testid="sidebar-nav-link">
+            <a className={styles["nav-link"]} href="#s3" data-testid="sidebar-nav-link">
               <i className={["ti", "ti-switch-horizontal"].join(" ")}></i>
               <span>{"Step 2: ワークロードに合うモデルを選ぶ"}</span>
             </a>
             {"\n"}
             {"         "}{" "}
-            <a className={[styles["nav-link"]].join(" ")} href="#s4" data-testid="sidebar-nav-link">
+            <a className={styles["nav-link"]} href="#s4" data-testid="sidebar-nav-link">
               <i className={["ti", "ti-brain"].join(" ")}></i>
               <span>{"Step 3: thinking_level を設計する"}</span>
             </a>
             {"\n"}
             {"         "}{" "}
-            <a className={[styles["nav-link"]].join(" ")} href="#s5" data-testid="sidebar-nav-link">
+            <a className={styles["nav-link"]} href="#s5" data-testid="sidebar-nav-link">
               <i className={["ti", "ti-arrows-exchange"].join(" ")}></i>
               <span>{"Step 4: max_output_tokens と Long Decode を使いこなす"}</span>
             </a>
             {"\n"}
             {"         "}{" "}
-            <a className={[styles["nav-link"]].join(" ")} href="#s6" data-testid="sidebar-nav-link">
+            <a className={styles["nav-link"]} href="#s6" data-testid="sidebar-nav-link">
               <i className={["ti", "ti-route"].join(" ")}></i>
               <span>{"Step 5: 旧モデルからの移行で壊れやすい点を先に潰す"}</span>
             </a>
             {"\n"}
             {"         "}{" "}
-            <a className={[styles["nav-link"]].join(" ")} href="#s7" data-testid="sidebar-nav-link">
+            <a className={styles["nav-link"]} href="#s7" data-testid="sidebar-nav-link">
               <i className={["ti", "ti-message-chatbot"].join(" ")}></i>
               <span>{"Step 6: プロンプトとコンテキストを設計する"}</span>
             </a>
             {"\n"}
             {"         "}{" "}
-            <a className={[styles["nav-link"]].join(" ")} href="#s8" data-testid="sidebar-nav-link">
+            <a className={styles["nav-link"]} href="#s8" data-testid="sidebar-nav-link">
               <i className={["ti", "ti-function"].join(" ")}></i>
               <span>{"Step 7: 関数呼び出しと Thought Signatures"}</span>
             </a>
             {"\n"}
             {"         "}{" "}
-            <a className={[styles["nav-link"]].join(" ")} href="#s9" data-testid="sidebar-nav-link">
+            <a className={styles["nav-link"]} href="#s9" data-testid="sidebar-nav-link">
               <i className={["ti", "ti-robot"].join(" ")}></i>
               <span>{"Step 8: エージェント設計(Managed Agents / サブエージェント)"}</span>
             </a>
             {"\n"}
             {"         "}{" "}
-            <a
-              className={[styles["nav-link"]].join(" ")}
-              href="#s10"
-              data-testid="sidebar-nav-link"
-            >
+            <a className={styles["nav-link"]} href="#s10" data-testid="sidebar-nav-link">
               <i className={["ti", "ti-coin"].join(" ")}></i>
               <span>{"Step 9: コスト最適化(タスク単価で測る)"}</span>
             </a>
             {"\n"}
             {"         "}{" "}
-            <a
-              className={[styles["nav-link"]].join(" ")}
-              href="#s11"
-              data-testid="sidebar-nav-link"
-            >
+            <a className={styles["nav-link"]} href="#s11" data-testid="sidebar-nav-link">
               <i className={["ti", "ti-shield-check"].join(" ")}></i>
               <span>{"Step 10: 本番運用(信頼性・安全性・評価)"}</span>
             </a>
             {"\n"}
             {"         "}{" "}
-            <a
-              className={[styles["nav-link"]].join(" ")}
-              href="#s12"
-              data-testid="sidebar-nav-link"
-            >
+            <a className={styles["nav-link"]} href="#s12" data-testid="sidebar-nav-link">
               <i className={["ti", "ti-photo"].join(" ")}></i>
               <span>{"Step 11: マルチモーダル・周辺モデルの使いどころ"}</span>
             </a>
             {"\n"}
-            {"         "} <div className={[styles["nav-group"]].join(" ")}>{"付録・参考"}</div>
+            {"         "} <div className={styles["nav-group"]}>{"付録・参考"}</div>
             {"\n"}
             {"         "}{" "}
-            <a
-              className={[styles["nav-link"]].join(" ")}
-              href="#s13"
-              data-testid="sidebar-nav-link"
-            >
+            <a className={styles["nav-link"]} href="#s13" data-testid="sidebar-nav-link">
               <i className={["ti", "ti-bug"].join(" ")}></i>
               <span>{"よくある落とし穴と対処(トラブルシューティング表)"}</span>
             </a>
             {"\n"}
             {"         "}{" "}
-            <a
-              className={[styles["nav-link"]].join(" ")}
-              href="#s14"
-              data-testid="sidebar-nav-link"
-            >
+            <a className={styles["nav-link"]} href="#s14" data-testid="sidebar-nav-link">
               <i className={["ti", "ti-checklist"].join(" ")}></i>
               <span>{"導入チェックリスト"}</span>
             </a>
             {"\n"}
             {"         "}{" "}
-            <a
-              className={[styles["nav-link"]].join(" ")}
-              href="#s15"
-              data-testid="sidebar-nav-link"
-            >
+            <a className={styles["nav-link"]} href="#s15" data-testid="sidebar-nav-link">
               <i className={["ti", "ti-bulb"].join(" ")}></i>
               <span>{"補足: 著名開発者・独立評価から得られる追加のベストプラクティス"}</span>
             </a>
             {"\n"}
             {"         "}{" "}
-            <a
-              className={[styles["nav-link"]].join(" ")}
-              href="#s16"
-              data-testid="sidebar-nav-link"
-            >
+            <a className={styles["nav-link"]} href="#s16" data-testid="sidebar-nav-link">
               <i className={["ti", "ti-link"].join(" ")}></i>
               <span>{"参考URL(根拠ソース一覧)"}</span>
             </a>
@@ -396,13 +367,13 @@ export default function Page() {
         </aside>
         {"\n"}
         {"     "}{" "}
-        <div className={[styles.main].join(" ")}>
+        <div className={styles.main}>
           {"\n"}
           {"       "}{" "}
-          <header className={[styles.hero].join(" ")}>
+          <header className={styles.hero}>
             {"\n"}
             {"         "}{" "}
-            <div className={[styles["hero-eyebrow"]].join(" ")}>
+            <div className={styles["hero-eyebrow"]}>
               {"\n"}
               {"           "} <i className={["ti", "ti-rocket"].join(" ")}></i>
               <span>{"Google Gemini · 中級〜上級"}</span>
@@ -413,7 +384,7 @@ export default function Page() {
             {"         "} <h1>{"Google Gemini 最新モデル ベストプラクティス完全ガイド"}</h1>
             {"\n"}
             {"         "}{" "}
-            <div className={[styles["hero-meta"]].join(" ")}>
+            <div className={styles["hero-meta"]}>
               {"\n"}
               {"           "}{" "}
               <p>
@@ -448,7 +419,7 @@ export default function Page() {
             </div>
             {"\n"}
             {"         "}{" "}
-            <div className={[styles["hero-chips"]].join(" ")}>
+            <div className={styles["hero-chips"]}>
               {"\n"}
               {"           "} <span>{"Gemini 4 Argon"}</span>
               <span>{"Gemini 3.8 Flash"}</span>
@@ -462,13 +433,13 @@ export default function Page() {
           </header>
           {"\n"}
           {"       "}{" "}
-          <section className={[styles.section].join(" ")} id="s0">
+          <section className={styles.section} id="s0">
             {"\n"}
             {"         "}{" "}
-            <div className={[styles["section-head"]].join(" ")}>
+            <div className={styles["section-head"]}>
               {"\n"}
               {"           "}{" "}
-              <div className={[styles["section-icon"]].join(" ")}>
+              <div className={styles["section-icon"]}>
                 <i className={["ti", "ti-compass"].join(" ")}></i>
               </div>
               {"\n"}
@@ -491,7 +462,7 @@ export default function Page() {
             </p>
             {"\n"}
             {"         "}{" "}
-            <div className={[styles["table-wrap"]].join(" ")}>
+            <div className={styles["table-wrap"]}>
               {"\n"}
               {"           "}{" "}
               <table>
@@ -534,7 +505,7 @@ export default function Page() {
             </p>
             {"\n"}
             {"         "}{" "}
-            <div className={[styles["table-wrap"]].join(" ")}>
+            <div className={styles["table-wrap"]}>
               {"\n"}
               {"           "}{" "}
               <table>
@@ -586,7 +557,7 @@ export default function Page() {
               {"           "} <i className={["ti", "ti-info-circle"].join(" ")}></i>
               {"\n"}
               {"           "}{" "}
-              <div className={[styles["callout-body"]].join(" ")}>
+              <div className={styles["callout-body"]}>
                 {"\n"}
                 {"             "}{" "}
                 <p>
@@ -610,13 +581,13 @@ export default function Page() {
           </section>
           {"\n"}
           {"       "}{" "}
-          <section className={[styles.section].join(" ")} id="s1">
+          <section className={styles.section} id="s1">
             {"\n"}
             {"         "}{" "}
-            <div className={[styles["section-head"]].join(" ")}>
+            <div className={styles["section-head"]}>
               {"\n"}
               {"           "}{" "}
-              <div className={[styles["section-icon"]].join(" ")}>
+              <div className={styles["section-icon"]}>
                 <i className={["ti", "ti-map-2"].join(" ")}></i>
               </div>
               {"\n"}
@@ -629,7 +600,7 @@ export default function Page() {
             <h3 id="gemini-subheading-2">{"1.1 一枚で把握する「現行ラインナップ」"}</h3>
             {"\n"}
             {"         "}{" "}
-            <div className={[styles["table-wrap"]].join(" ")}>
+            <div className={styles["table-wrap"]}>
               {"\n"}
               {"           "}{" "}
               <table>
@@ -766,7 +737,7 @@ export default function Page() {
               <i className={["ti", "ti-alert-triangle"].join(" ")} data-testid="callout-label"></i>
               {"\n"}
               {"           "}{" "}
-              <div className={[styles["callout-body"]].join(" ")}>
+              <div className={styles["callout-body"]}>
                 {"\n"}
                 {"             "}{" "}
                 <p>
@@ -791,7 +762,7 @@ export default function Page() {
             {"         "} <h3 id="gemini-subheading-3">{"1.2 周辺モデル(用途別)"}</h3>
             {"\n"}
             {"         "}{" "}
-            <div className={[styles["table-wrap"]].join(" ")}>
+            <div className={styles["table-wrap"]}>
               {"\n"}
               {"           "}{" "}
               <table>
@@ -917,10 +888,10 @@ export default function Page() {
             <h3 id="gemini-subheading-4">{"1.3 リリースの流れ(把握しておきたい時系列)"}</h3>
             {"\n"}
             {"         "}{" "}
-            <div className={[styles["diagram-card"]].join(" ")}>
+            <div className={styles["diagram-card"]}>
               {"\n"}
               {"           "}{" "}
-              <div className={[styles["diagram-title"]].join(" ")}>
+              <div className={styles["diagram-title"]}>
                 {"\n"}
                 {"             "} <i className={["ti", "ti-route"].join(" ")}></i>
                 <span>{"図1　Gemini のリリースの流れ"}</span>
@@ -929,7 +900,7 @@ export default function Page() {
               </div>
               {"\n"}
               {"           "}{" "}
-              <div className={[styles["diagram-wrap"]].join(" ")}>
+              <div className={styles["diagram-wrap"]}>
                 <MermaidDiagram chart={DIAGRAM_0} theme="base" themeVariables={THEME} />
               </div>
               {"\n"}
@@ -942,7 +913,7 @@ export default function Page() {
               {"           "} <i className={["ti", "ti-info-circle"].join(" ")}></i>
               {"\n"}
               {"           "}{" "}
-              <div className={[styles["callout-body"]].join(" ")}>
+              <div className={styles["callout-body"]}>
                 {"\n"}
                 {"             "}{" "}
                 <p>
@@ -961,7 +932,7 @@ export default function Page() {
             <h3 id="gemini-subheading-5">{"1.4 Argon の公式な要点(最低限これだけは押さえる)"}</h3>
             {"\n"}
             {"         "}{" "}
-            <div className={[styles["table-wrap"]].join(" ")}>
+            <div className={styles["table-wrap"]}>
               {"\n"}
               {"           "}{" "}
               <table>
@@ -1074,7 +1045,7 @@ export default function Page() {
             </h3>
             {"\n"}
             {"         "}{" "}
-            <div className={[styles["table-wrap"]].join(" ")}>
+            <div className={styles["table-wrap"]}>
               {"\n"}
               {"           "}{" "}
               <table>
@@ -1193,13 +1164,13 @@ export default function Page() {
           </section>
           {"\n"}
           {"       "}{" "}
-          <section className={[styles.section].join(" ")} id="s2">
+          <section className={styles.section} id="s2">
             {"\n"}
             {"         "}{" "}
-            <div className={[styles["section-head"]].join(" ")}>
+            <div className={styles["section-head"]}>
               {"\n"}
               {"           "}{" "}
-              <div className={[styles["section-icon"]].join(" ")}>
+              <div className={styles["section-icon"]}>
                 <i className={["ti", "ti-plug-connected"].join(" ")}></i>
               </div>
               {"\n"}
@@ -1261,10 +1232,10 @@ export default function Page() {
             {"         "} <h3 id="gemini-subheading-9">{"どうやるか"}</h3>
             {"\n"}
             {"         "}{" "}
-            <div className={[styles["code-block"]].join(" ")} data-testid="code-block">
+            <div className={styles["code-block"]} data-testid="code-block">
               {"\n"}
               {"           "}{" "}
-              <div className={[styles["cb-head"]].join(" ")}>
+              <div className={styles["cb-head"]}>
                 <i className={["ti", "ti-code"].join(" ")}></i>
                 <span>{"bash"}</span>
               </div>
@@ -1292,10 +1263,10 @@ export default function Page() {
             </div>
             {"\n"}
             {"         "}{" "}
-            <div className={[styles["code-block"]].join(" ")} data-testid="code-block">
+            <div className={styles["code-block"]} data-testid="code-block">
               {"\n"}
               {"           "}{" "}
-              <div className={[styles["cb-head"]].join(" ")}>
+              <div className={styles["cb-head"]}>
                 <i className={["ti", "ti-code"].join(" ")}></i>
                 <span>{"python"}</span>
               </div>
@@ -1344,10 +1315,10 @@ export default function Page() {
             </div>
             {"\n"}
             {"         "}{" "}
-            <div className={[styles["code-block"]].join(" ")} data-testid="code-block">
+            <div className={styles["code-block"]} data-testid="code-block">
               {"\n"}
               {"           "}{" "}
-              <div className={[styles["cb-head"]].join(" ")}>
+              <div className={styles["cb-head"]}>
                 <i className={["ti", "ti-code"].join(" ")}></i>
                 <span>{"python"}</span>
               </div>
@@ -1411,10 +1382,10 @@ export default function Page() {
             </div>
             {"\n"}
             {"         "}{" "}
-            <div className={[styles["code-block"]].join(" ")} data-testid="code-block">
+            <div className={styles["code-block"]} data-testid="code-block">
               {"\n"}
               {"           "}{" "}
-              <div className={[styles["cb-head"]].join(" ")}>
+              <div className={styles["cb-head"]}>
                 <i className={["ti", "ti-code"].join(" ")}></i>
                 <span>{"bash"}</span>
               </div>
@@ -1439,10 +1410,10 @@ export default function Page() {
             </div>
             {"\n"}
             {"         "}{" "}
-            <div className={[styles["diagram-card"]].join(" ")}>
+            <div className={styles["diagram-card"]}>
               {"\n"}
               {"           "}{" "}
-              <div className={[styles["diagram-title"]].join(" ")}>
+              <div className={styles["diagram-title"]}>
                 {"\n"}
                 {"             "} <i className={["ti", "ti-route"].join(" ")}></i>
                 <span>{"図2　Interactions API の会話の流れ"}</span>
@@ -1451,7 +1422,7 @@ export default function Page() {
               </div>
               {"\n"}
               {"           "}{" "}
-              <div className={[styles["diagram-wrap"]].join(" ")}>
+              <div className={styles["diagram-wrap"]}>
                 <MermaidDiagram chart={DIAGRAM_1} theme="base" themeVariables={THEME} />
               </div>
               {"\n"}
@@ -1480,7 +1451,7 @@ export default function Page() {
               {"           "} <i className={["ti", "ti-bulb"].join(" ")}></i>
               {"\n"}
               {"           "}{" "}
-              <div className={[styles["callout-body"]].join(" ")}>
+              <div className={styles["callout-body"]}>
                 {"\n"}
                 {"             "}{" "}
                 <p>
@@ -1516,13 +1487,13 @@ export default function Page() {
           </section>
           {"\n"}
           {"       "}{" "}
-          <section className={[styles.section].join(" ")} id="s3">
+          <section className={styles.section} id="s3">
             {"\n"}
             {"         "}{" "}
-            <div className={[styles["section-head"]].join(" ")}>
+            <div className={styles["section-head"]}>
               {"\n"}
               {"           "}{" "}
-              <div className={[styles["section-icon"]].join(" ")}>
+              <div className={styles["section-icon"]}>
                 <i className={["ti", "ti-switch-horizontal"].join(" ")}></i>
               </div>
               {"\n"}
@@ -1580,10 +1551,10 @@ export default function Page() {
             {"         "} <h3 id="gemini-subheading-13">{"モデル選定フロー"}</h3>
             {"\n"}
             {"         "}{" "}
-            <div className={[styles["diagram-card"]].join(" ")}>
+            <div className={styles["diagram-card"]}>
               {"\n"}
               {"           "}{" "}
-              <div className={[styles["diagram-title"]].join(" ")}>
+              <div className={styles["diagram-title"]}>
                 {"\n"}
                 {"             "} <i className={["ti", "ti-route"].join(" ")}></i>
                 <span>{"図3　モデル選定フロー"}</span>
@@ -1592,7 +1563,7 @@ export default function Page() {
               </div>
               {"\n"}
               {"           "}{" "}
-              <div className={[styles["diagram-wrap"]].join(" ")}>
+              <div className={styles["diagram-wrap"]}>
                 <MermaidDiagram chart={DIAGRAM_2} theme="base" themeVariables={THEME} />
               </div>
               {"\n"}
@@ -1602,7 +1573,7 @@ export default function Page() {
             {"         "} <h3 id="gemini-subheading-14">{"選定の目安(表)"}</h3>
             {"\n"}
             {"         "}{" "}
-            <div className={[styles["table-wrap"]].join(" ")}>
+            <div className={styles["table-wrap"]}>
               {"\n"}
               {"           "}{" "}
               <table>
@@ -1687,13 +1658,13 @@ export default function Page() {
           </section>
           {"\n"}
           {"       "}{" "}
-          <section className={[styles.section].join(" ")} id="s4">
+          <section className={styles.section} id="s4">
             {"\n"}
             {"         "}{" "}
-            <div className={[styles["section-head"]].join(" ")}>
+            <div className={styles["section-head"]}>
               {"\n"}
               {"           "}{" "}
-              <div className={[styles["section-icon"]].join(" ")}>
+              <div className={styles["section-icon"]}>
                 <i className={["ti", "ti-brain"].join(" ")}></i>
               </div>
               {"\n"}
@@ -1754,7 +1725,7 @@ export default function Page() {
             {"         "} <h3 id="gemini-subheading-17">{"水準の使い分け"}</h3>
             {"\n"}
             {"         "}{" "}
-            <div className={[styles["table-wrap"]].join(" ")}>
+            <div className={styles["table-wrap"]}>
               {"\n"}
               {"           "}{" "}
               <table>
@@ -1814,10 +1785,10 @@ export default function Page() {
             </div>
             {"\n"}
             {"         "}{" "}
-            <div className={[styles["code-block"]].join(" ")} data-testid="code-block">
+            <div className={styles["code-block"]} data-testid="code-block">
               {"\n"}
               {"           "}{" "}
-              <div className={[styles["cb-head"]].join(" ")}>
+              <div className={styles["cb-head"]}>
                 <i className={["ti", "ti-code"].join(" ")}></i>
                 <span>{"python"}</span>
               </div>
@@ -1855,10 +1826,10 @@ export default function Page() {
             {"         "} <h3 id="gemini-subheading-18">{"水準の決め方(評価ループ)"}</h3>
             {"\n"}
             {"         "}{" "}
-            <div className={[styles["diagram-card"]].join(" ")}>
+            <div className={styles["diagram-card"]}>
               {"\n"}
               {"           "}{" "}
-              <div className={[styles["diagram-title"]].join(" ")}>
+              <div className={styles["diagram-title"]}>
                 {"\n"}
                 {"             "} <i className={["ti", "ti-route"].join(" ")}></i>
                 <span>{"図4　thinking_level の決め方"}</span>
@@ -1867,7 +1838,7 @@ export default function Page() {
               </div>
               {"\n"}
               {"           "}{" "}
-              <div className={[styles["diagram-wrap"]].join(" ")}>
+              <div className={styles["diagram-wrap"]}>
                 <MermaidDiagram chart={DIAGRAM_3} theme="base" themeVariables={THEME} />
               </div>
               {"\n"}
@@ -1909,13 +1880,13 @@ export default function Page() {
           </section>
           {"\n"}
           {"       "}{" "}
-          <section className={[styles.section].join(" ")} id="s5">
+          <section className={styles.section} id="s5">
             {"\n"}
             {"         "}{" "}
-            <div className={[styles["section-head"]].join(" ")}>
+            <div className={styles["section-head"]}>
               {"\n"}
               {"           "}{" "}
-              <div className={[styles["section-icon"]].join(" ")}>
+              <div className={styles["section-icon"]}>
                 <i className={["ti", "ti-arrows-exchange"].join(" ")}></i>
               </div>
               {"\n"}
@@ -1970,7 +1941,7 @@ export default function Page() {
             {"         "} <h3 id="gemini-subheading-22">{"設定の目安(公式)"}</h3>
             {"\n"}
             {"         "}{" "}
-            <div className={[styles["table-wrap"]].join(" ")}>
+            <div className={styles["table-wrap"]}>
               {"\n"}
               {"           "}{" "}
               <table>
@@ -2024,10 +1995,10 @@ export default function Page() {
             {"         "} <h3 id="gemini-subheading-23">{"Long Decode の実装例"}</h3>
             {"\n"}
             {"         "}{" "}
-            <div className={[styles["code-block"]].join(" ")} data-testid="code-block">
+            <div className={styles["code-block"]} data-testid="code-block">
               {"\n"}
               {"           "}{" "}
-              <div className={[styles["cb-head"]].join(" ")}>
+              <div className={styles["cb-head"]}>
                 <i className={["ti", "ti-code"].join(" ")}></i>
                 <span>{"python"}</span>
               </div>
@@ -2156,10 +2127,10 @@ export default function Page() {
             </div>
             {"\n"}
             {"         "}{" "}
-            <div className={[styles["diagram-card"]].join(" ")}>
+            <div className={styles["diagram-card"]}>
               {"\n"}
               {"           "}{" "}
-              <div className={[styles["diagram-title"]].join(" ")}>
+              <div className={styles["diagram-title"]}>
                 {"\n"}
                 {"             "} <i className={["ti", "ti-route"].join(" ")}></i>
                 <span>{"図5　Long Decode のホップと終了状態"}</span>
@@ -2168,7 +2139,7 @@ export default function Page() {
               </div>
               {"\n"}
               {"           "}{" "}
-              <div className={[styles["diagram-wrap"]].join(" ")}>
+              <div className={styles["diagram-wrap"]}>
                 <MermaidDiagram chart={DIAGRAM_4} theme="base" themeVariables={THEME} />
               </div>
               {"\n"}
@@ -2178,7 +2149,7 @@ export default function Page() {
             {"         "} <h3 id="gemini-subheading-24">{"ステータスの扱い"}</h3>
             {"\n"}
             {"         "}{" "}
-            <div className={[styles["table-wrap"]].join(" ")}>
+            <div className={styles["table-wrap"]}>
               {"\n"}
               {"           "}{" "}
               <table>
@@ -2246,7 +2217,7 @@ export default function Page() {
             <h3 id="gemini-subheading-25">{"Long Decode を使うべきでない場面(公式)"}</h3>
             {"\n"}
             {"         "}{" "}
-            <div className={[styles["table-wrap"]].join(" ")}>
+            <div className={styles["table-wrap"]}>
               {"\n"}
               {"           "}{" "}
               <table>
@@ -2292,7 +2263,7 @@ export default function Page() {
             </h3>
             {"\n"}
             {"         "}{" "}
-            <div className={[styles["table-wrap"]].join(" ")}>
+            <div className={styles["table-wrap"]}>
               {"\n"}
               {"           "}{" "}
               <table>
@@ -2381,13 +2352,13 @@ export default function Page() {
           </section>
           {"\n"}
           {"       "}{" "}
-          <section className={[styles.section].join(" ")} id="s6">
+          <section className={styles.section} id="s6">
             {"\n"}
             {"         "}{" "}
-            <div className={[styles["section-head"]].join(" ")}>
+            <div className={styles["section-head"]}>
               {"\n"}
               {"           "}{" "}
-              <div className={[styles["section-icon"]].join(" ")}>
+              <div className={styles["section-icon"]}>
                 <i className={["ti", "ti-route"].join(" ")}></i>
               </div>
               {"\n"}
@@ -2416,7 +2387,7 @@ export default function Page() {
             </h3>
             {"\n"}
             {"         "}{" "}
-            <div className={[styles["table-wrap"]].join(" ")}>
+            <div className={styles["table-wrap"]}>
               {"\n"}
               {"           "}{" "}
               <table>
@@ -2569,10 +2540,10 @@ export default function Page() {
             {"         "} <h3 id="gemini-subheading-30">{"prefill の置き換え例"}</h3>
             {"\n"}
             {"         "}{" "}
-            <div className={[styles["code-block"]].join(" ")} data-testid="code-block">
+            <div className={styles["code-block"]} data-testid="code-block">
               {"\n"}
               {"           "}{" "}
-              <div className={[styles["cb-head"]].join(" ")}>
+              <div className={styles["cb-head"]}>
                 <i className={["ti", "ti-code"].join(" ")}></i>
                 <span>{"python"}</span>
               </div>
@@ -2628,7 +2599,7 @@ export default function Page() {
             {"         "} <h3 id="gemini-subheading-31">{"暗黙キャッシュへの切替(Argon)"}</h3>
             {"\n"}
             {"         "}{" "}
-            <div className={[styles["table-wrap"]].join(" ")}>
+            <div className={styles["table-wrap"]}>
               {"\n"}
               {"           "}{" "}
               <table>
@@ -2685,7 +2656,7 @@ export default function Page() {
               {"           "} <i className={["ti", "ti-info-circle"].join(" ")}></i>
               {"\n"}
               {"           "}{" "}
-              <div className={[styles["callout-body"]].join(" ")}>
+              <div className={styles["callout-body"]}>
                 {"\n"}
                 {"             "}{" "}
                 <p>
@@ -2706,13 +2677,13 @@ export default function Page() {
           </section>
           {"\n"}
           {"       "}{" "}
-          <section className={[styles.section].join(" ")} id="s7">
+          <section className={styles.section} id="s7">
             {"\n"}
             {"         "}{" "}
-            <div className={[styles["section-head"]].join(" ")}>
+            <div className={styles["section-head"]}>
               {"\n"}
               {"           "}{" "}
-              <div className={[styles["section-icon"]].join(" ")}>
+              <div className={styles["section-icon"]}>
                 <i className={["ti", "ti-message-chatbot"].join(" ")}></i>
               </div>
               {"\n"}
@@ -2778,7 +2749,7 @@ export default function Page() {
             </h3>
             {"\n"}
             {"         "}{" "}
-            <div className={[styles["table-wrap"]].join(" ")}>
+            <div className={styles["table-wrap"]}>
               {"\n"}
               {"           "}{" "}
               <table>
@@ -2861,10 +2832,10 @@ export default function Page() {
             <h3 id="gemini-subheading-35">{"プロンプトの骨格(コピーして使える雛形)"}</h3>
             {"\n"}
             {"         "}{" "}
-            <div className={[styles["code-block"]].join(" ")} data-testid="code-block">
+            <div className={styles["code-block"]} data-testid="code-block">
               {"\n"}
               {"           "}{" "}
-              <div className={[styles["cb-head"]].join(" ")}>
+              <div className={styles["cb-head"]}>
                 <i className={["ti", "ti-code"].join(" ")}></i>
                 <span>{"python"}</span>
               </div>
@@ -2955,7 +2926,7 @@ export default function Page() {
             </h3>
             {"\n"}
             {"         "}{" "}
-            <div className={[styles["table-wrap"]].join(" ")}>
+            <div className={styles["table-wrap"]}>
               {"\n"}
               {"           "}{" "}
               <table>
@@ -2999,7 +2970,7 @@ export default function Page() {
             {"         "} <h3 id="gemini-subheading-37">{"モデル特性に合わせた補正"}</h3>
             {"\n"}
             {"         "}{" "}
-            <div className={[styles["table-wrap"]].join(" ")}>
+            <div className={styles["table-wrap"]}>
               {"\n"}
               {"           "}{" "}
               <table>
@@ -3046,13 +3017,13 @@ export default function Page() {
           </section>
           {"\n"}
           {"       "}{" "}
-          <section className={[styles.section].join(" ")} id="s8">
+          <section className={styles.section} id="s8">
             {"\n"}
             {"         "}{" "}
-            <div className={[styles["section-head"]].join(" ")}>
+            <div className={styles["section-head"]}>
               {"\n"}
               {"           "}{" "}
-              <div className={[styles["section-icon"]].join(" ")}>
+              <div className={styles["section-icon"]}>
                 <i className={["ti", "ti-function"].join(" ")}></i>
               </div>
               {"\n"}
@@ -3123,7 +3094,7 @@ export default function Page() {
             <h3 id="gemini-subheading-40">{"署名の扱いルール(GenerateContent を直接使う場合)"}</h3>
             {"\n"}
             {"         "}{" "}
-            <div className={[styles["table-wrap"]].join(" ")}>
+            <div className={styles["table-wrap"]}>
               {"\n"}
               {"           "}{" "}
               <table>
@@ -3179,10 +3150,10 @@ export default function Page() {
             </div>
             {"\n"}
             {"         "}{" "}
-            <div className={[styles["diagram-card"]].join(" ")}>
+            <div className={styles["diagram-card"]}>
               {"\n"}
               {"           "}{" "}
-              <div className={[styles["diagram-title"]].join(" ")}>
+              <div className={styles["diagram-title"]}>
                 {"\n"}
                 {"             "} <i className={["ti", "ti-route"].join(" ")}></i>
                 <span>{"図6　関数呼び出しと Thought Signature の扱い"}</span>
@@ -3191,7 +3162,7 @@ export default function Page() {
               </div>
               {"\n"}
               {"           "}{" "}
-              <div className={[styles["diagram-wrap"]].join(" ")}>
+              <div className={styles["diagram-wrap"]}>
                 <MermaidDiagram chart={DIAGRAM_5} theme="base" themeVariables={THEME} />
               </div>
               {"\n"}
@@ -3201,7 +3172,7 @@ export default function Page() {
             {"         "} <h3 id="gemini-subheading-41">{"関数応答の作法(3.x 共通の公式推奨)"}</h3>
             {"\n"}
             {"         "}{" "}
-            <div className={[styles["table-wrap"]].join(" ")}>
+            <div className={styles["table-wrap"]}>
               {"\n"}
               {"           "}{" "}
               <table>
@@ -3290,10 +3261,10 @@ export default function Page() {
             </div>
             {"\n"}
             {"         "}{" "}
-            <div className={[styles["code-block"]].join(" ")} data-testid="code-block">
+            <div className={styles["code-block"]} data-testid="code-block">
               {"\n"}
               {"           "}{" "}
-              <div className={[styles["cb-head"]].join(" ")}>
+              <div className={styles["cb-head"]}>
                 <i className={["ti", "ti-code"].join(" ")}></i>
                 <span>{"python"}</span>
               </div>
@@ -3327,13 +3298,13 @@ export default function Page() {
           </section>
           {"\n"}
           {"       "}{" "}
-          <section className={[styles.section].join(" ")} id="s9">
+          <section className={styles.section} id="s9">
             {"\n"}
             {"         "}{" "}
-            <div className={[styles["section-head"]].join(" ")}>
+            <div className={styles["section-head"]}>
               {"\n"}
               {"           "}{" "}
-              <div className={[styles["section-icon"]].join(" ")}>
+              <div className={styles["section-icon"]}>
                 <i className={["ti", "ti-robot"].join(" ")}></i>
               </div>
               {"\n"}
@@ -3362,7 +3333,7 @@ export default function Page() {
             <h3 id="gemini-subheading-43">{"8.1 Managed Agents(Antigravity)の基本"}</h3>
             {"\n"}
             {"         "}{" "}
-            <div className={[styles["table-wrap"]].join(" ")}>
+            <div className={styles["table-wrap"]}>
               {"\n"}
               {"           "}{" "}
               <table>
@@ -3430,10 +3401,10 @@ export default function Page() {
             </div>
             {"\n"}
             {"         "}{" "}
-            <div className={[styles["code-block"]].join(" ")} data-testid="code-block">
+            <div className={styles["code-block"]} data-testid="code-block">
               {"\n"}
               {"           "}{" "}
-              <div className={[styles["cb-head"]].join(" ")}>
+              <div className={styles["cb-head"]}>
                 <i className={["ti", "ti-code"].join(" ")}></i>
                 <span>{"python"}</span>
               </div>
@@ -3490,7 +3461,7 @@ export default function Page() {
               <i className={["ti", "ti-alert-triangle"].join(" ")} data-testid="callout-label"></i>
               {"\n"}
               {"           "}{" "}
-              <div className={[styles["callout-body"]].join(" ")}>
+              <div className={styles["callout-body"]}>
                 {"\n"}
                 {"             "}{" "}
                 <p>
@@ -3526,7 +3497,7 @@ export default function Page() {
             </h3>
             {"\n"}
             {"         "}{" "}
-            <div className={[styles["table-wrap"]].join(" ")}>
+            <div className={styles["table-wrap"]}>
               {"\n"}
               {"           "}{" "}
               <table>
@@ -3584,10 +3555,10 @@ export default function Page() {
             </div>
             {"\n"}
             {"         "}{" "}
-            <div className={[styles["diagram-card"]].join(" ")}>
+            <div className={styles["diagram-card"]}>
               {"\n"}
               {"           "}{" "}
-              <div className={[styles["diagram-title"]].join(" ")}>
+              <div className={styles["diagram-title"]}>
                 {"\n"}
                 {"             "} <i className={["ti", "ti-route"].join(" ")}></i>
                 <span>{"図7　サブエージェントのパターン選択"}</span>
@@ -3596,7 +3567,7 @@ export default function Page() {
               </div>
               {"\n"}
               {"           "}{" "}
-              <div className={[styles["diagram-wrap"]].join(" ")}>
+              <div className={styles["diagram-wrap"]}>
                 <MermaidDiagram chart={DIAGRAM_6} theme="base" themeVariables={THEME} />
               </div>
               {"\n"}
@@ -3629,10 +3600,10 @@ export default function Page() {
             </p>
             {"\n"}
             {"         "}{" "}
-            <div className={[styles["code-block"]].join(" ")} data-testid="code-block">
+            <div className={styles["code-block"]} data-testid="code-block">
               {"\n"}
               {"           "}{" "}
-              <div className={[styles["cb-head"]].join(" ")}>
+              <div className={styles["cb-head"]}>
                 <i className={["ti", "ti-code"].join(" ")}></i>
                 <span>{"python"}</span>
               </div>
@@ -3726,10 +3697,10 @@ export default function Page() {
             </div>
             {"\n"}
             {"         "}{" "}
-            <div className={[styles["diagram-card"]].join(" ")}>
+            <div className={styles["diagram-card"]}>
               {"\n"}
               {"           "}{" "}
-              <div className={[styles["diagram-title"]].join(" ")}>
+              <div className={styles["diagram-title"]}>
                 {"\n"}
                 {"             "} <i className={["ti", "ti-route"].join(" ")}></i>
                 <span>{"図8　Argon を計画役、Flash を実働にする階層構成"}</span>
@@ -3738,7 +3709,7 @@ export default function Page() {
               </div>
               {"\n"}
               {"           "}{" "}
-              <div className={[styles["diagram-wrap"]].join(" ")}>
+              <div className={styles["diagram-wrap"]}>
                 <MermaidDiagram chart={DIAGRAM_7} theme="base" themeVariables={THEME} />
               </div>
               {"\n"}
@@ -3749,13 +3720,13 @@ export default function Page() {
           </section>
           {"\n"}
           {"       "}{" "}
-          <section className={[styles.section].join(" ")} id="s10">
+          <section className={styles.section} id="s10">
             {"\n"}
             {"         "}{" "}
-            <div className={[styles["section-head"]].join(" ")}>
+            <div className={styles["section-head"]}>
               {"\n"}
               {"           "}{" "}
-              <div className={[styles["section-icon"]].join(" ")}>
+              <div className={styles["section-icon"]}>
                 <i className={["ti", "ti-coin"].join(" ")}></i>
               </div>
               {"\n"}
@@ -3809,10 +3780,10 @@ export default function Page() {
             {"         "} <h3 id="gemini-subheading-48">{"コスト見積もりの実装"}</h3>
             {"\n"}
             {"         "}{" "}
-            <div className={[styles["code-block"]].join(" ")} data-testid="code-block">
+            <div className={styles["code-block"]} data-testid="code-block">
               {"\n"}
               {"           "}{" "}
-              <div className={[styles["cb-head"]].join(" ")}>
+              <div className={styles["cb-head"]}>
                 <i className={["ti", "ti-code"].join(" ")}></i>
                 <span>{"python"}</span>
               </div>
@@ -3934,7 +3905,7 @@ export default function Page() {
               {"           "} <i className={["ti", "ti-info-circle"].join(" ")}></i>
               {"\n"}
               {"           "}{" "}
-              <div className={[styles["callout-body"]].join(" ")}>
+              <div className={styles["callout-body"]}>
                 {"\n"}
                 {"             "}{" "}
                 <p>
@@ -3964,7 +3935,7 @@ export default function Page() {
             {"         "} <h3 id="gemini-subheading-49">{"キャッシュを効かせる設計"}</h3>
             {"\n"}
             {"         "}{" "}
-            <div className={[styles["table-wrap"]].join(" ")}>
+            <div className={styles["table-wrap"]}>
               {"\n"}
               {"           "}{" "}
               <table>
@@ -4029,10 +4000,10 @@ export default function Page() {
             </p>
             {"\n"}
             {"         "}{" "}
-            <div className={[styles["diagram-card"]].join(" ")}>
+            <div className={styles["diagram-card"]}>
               {"\n"}
               {"           "}{" "}
-              <div className={[styles["diagram-title"]].join(" ")}>
+              <div className={styles["diagram-title"]}>
                 {"\n"}
                 {"             "} <i className={["ti", "ti-route"].join(" ")}></i>
                 <span>{"図9　コスト評価のループ"}</span>
@@ -4041,7 +4012,7 @@ export default function Page() {
               </div>
               {"\n"}
               {"           "}{" "}
-              <div className={[styles["diagram-wrap"]].join(" ")}>
+              <div className={styles["diagram-wrap"]}>
                 <MermaidDiagram chart={DIAGRAM_8} theme="base" themeVariables={THEME} />
               </div>
               {"\n"}
@@ -4051,7 +4022,7 @@ export default function Page() {
             {"         "} <h3 id="gemini-subheading-50">{"その他のコスト削減レバー"}</h3>
             {"\n"}
             {"         "}{" "}
-            <div className={[styles["table-wrap"]].join(" ")}>
+            <div className={styles["table-wrap"]}>
               {"\n"}
               {"           "}{" "}
               <table>
@@ -4100,13 +4071,13 @@ export default function Page() {
           </section>
           {"\n"}
           {"       "}{" "}
-          <section className={[styles.section].join(" ")} id="s11">
+          <section className={styles.section} id="s11">
             {"\n"}
             {"         "}{" "}
-            <div className={[styles["section-head"]].join(" ")}>
+            <div className={styles["section-head"]}>
               {"\n"}
               {"           "}{" "}
-              <div className={[styles["section-icon"]].join(" ")}>
+              <div className={styles["section-icon"]}>
                 <i className={["ti", "ti-shield-check"].join(" ")}></i>
               </div>
               {"\n"}
@@ -4118,7 +4089,7 @@ export default function Page() {
             {"         "} <h3 id="gemini-subheading-51">{"10.1 信頼性"}</h3>
             {"\n"}
             {"         "}{" "}
-            <div className={[styles["table-wrap"]].join(" ")}>
+            <div className={styles["table-wrap"]}>
               {"\n"}
               {"           "}{" "}
               <table>
@@ -4184,10 +4155,10 @@ export default function Page() {
             </div>
             {"\n"}
             {"         "}{" "}
-            <div className={[styles["diagram-card"]].join(" ")}>
+            <div className={styles["diagram-card"]}>
               {"\n"}
               {"           "}{" "}
-              <div className={[styles["diagram-title"]].join(" ")}>
+              <div className={styles["diagram-title"]}>
                 {"\n"}
                 {"             "} <i className={["ti", "ti-route"].join(" ")}></i>
                 <span>{"図10　フォールバックを含む本番リクエストの流れ"}</span>
@@ -4196,7 +4167,7 @@ export default function Page() {
               </div>
               {"\n"}
               {"           "}{" "}
-              <div className={[styles["diagram-wrap"]].join(" ")}>
+              <div className={styles["diagram-wrap"]}>
                 <MermaidDiagram chart={DIAGRAM_9} theme="base" themeVariables={THEME} />
               </div>
               {"\n"}
@@ -4206,7 +4177,7 @@ export default function Page() {
             {"         "} <h3 id="gemini-subheading-52">{"10.2 安全性"}</h3>
             {"\n"}
             {"         "}{" "}
-            <div className={[styles["table-wrap"]].join(" ")}>
+            <div className={styles["table-wrap"]}>
               {"\n"}
               {"           "}{" "}
               <table>
@@ -4291,7 +4262,7 @@ export default function Page() {
             </h3>
             {"\n"}
             {"         "}{" "}
-            <div className={[styles["table-wrap"]].join(" ")}>
+            <div className={styles["table-wrap"]}>
               {"\n"}
               {"           "}{" "}
               <table>
@@ -4358,13 +4329,13 @@ export default function Page() {
           </section>
           {"\n"}
           {"       "}{" "}
-          <section className={[styles.section].join(" ")} id="s12">
+          <section className={styles.section} id="s12">
             {"\n"}
             {"         "}{" "}
-            <div className={[styles["section-head"]].join(" ")}>
+            <div className={styles["section-head"]}>
               {"\n"}
               {"           "}{" "}
-              <div className={[styles["section-icon"]].join(" ")}>
+              <div className={styles["section-icon"]}>
                 <i className={["ti", "ti-photo"].join(" ")}></i>
               </div>
               {"\n"}
@@ -4375,7 +4346,7 @@ export default function Page() {
             </div>
             {"\n"}
             {"         "}{" "}
-            <div className={[styles["table-wrap"]].join(" ")}>
+            <div className={styles["table-wrap"]}>
               {"\n"}
               {"           "}{" "}
               <table>
@@ -4518,13 +4489,13 @@ export default function Page() {
           </section>
           {"\n"}
           {"       "}{" "}
-          <section className={[styles.section].join(" ")} id="s13">
+          <section className={styles.section} id="s13">
             {"\n"}
             {"         "}{" "}
-            <div className={[styles["section-head"]].join(" ")}>
+            <div className={styles["section-head"]}>
               {"\n"}
               {"           "}{" "}
-              <div className={[styles["section-icon"]].join(" ")}>
+              <div className={styles["section-icon"]}>
                 <i className={["ti", "ti-bug"].join(" ")}></i>
               </div>
               {"\n"}
@@ -4535,7 +4506,7 @@ export default function Page() {
             </div>
             {"\n"}
             {"         "}{" "}
-            <div className={[styles["table-wrap"]].join(" ")}>
+            <div className={styles["table-wrap"]}>
               {"\n"}
               {"           "}{" "}
               <table>
@@ -4720,13 +4691,13 @@ export default function Page() {
           </section>
           {"\n"}
           {"       "}{" "}
-          <section className={[styles.section].join(" ")} id="s14">
+          <section className={styles.section} id="s14">
             {"\n"}
             {"         "}{" "}
-            <div className={[styles["section-head"]].join(" ")}>
+            <div className={styles["section-head"]}>
               {"\n"}
               {"           "}{" "}
-              <div className={[styles["section-icon"]].join(" ")}>
+              <div className={styles["section-icon"]}>
                 <i className={["ti", "ti-checklist"].join(" ")}></i>
               </div>
               {"\n"}
@@ -4736,16 +4707,16 @@ export default function Page() {
             </div>
             {"\n"}
             {"         "}{" "}
-            <div className={[styles["chk-progress"]].join(" ")}>
+            <div className={styles["chk-progress"]}>
               {"\n"}
               {"           "}{" "}
-              <span className={[styles.count].join(" ")}>
+              <span className={styles.count}>
                 <span id="chkCount">{"0"}</span> {"/ "}
                 <span id="chkTotal">{"0"}</span> {"完了"}
               </span>
               {"\n"}
               {"           "}{" "}
-              <div className={[styles.bar].join(" ")}>
+              <div className={styles.bar}>
                 <i id="chkBar"></i>
               </div>
               {"\n"}
@@ -4755,13 +4726,13 @@ export default function Page() {
             {"         "} <h3 id="gemini-subheading-54">{"A. 準備"}</h3>
             {"\n"}
             {"         "}{" "}
-            <ul className={[styles["chk-list"]].join(" ")}>
+            <ul className={styles["chk-list"]}>
               {"\n"}
               {"           "}{" "}
               <li>
                 {"\n"}
                 {"             "}{" "}
-                <label className={[styles.chk].join(" ")}>
+                <label className={styles.chk}>
                   <input type="checkbox" data-guide-check />
                   <span>{"課金が有効なプロジェクトの API キーを用意した(Argon は無料枠不可)"}</span>
                 </label>
@@ -4773,7 +4744,7 @@ export default function Page() {
               <li>
                 {"\n"}
                 {"             "}{" "}
-                <label className={[styles.chk].join(" ")}>
+                <label className={styles.chk}>
                   <input type="checkbox" data-guide-check />
                   <span>
                     {"最新の "}
@@ -4788,7 +4759,7 @@ export default function Page() {
               <li>
                 {"\n"}
                 {"             "}{" "}
-                <label className={[styles.chk].join(" ")}>
+                <label className={styles.chk}>
                   <input type="checkbox" data-guide-check />
                   <span>{"Interactions API で最小リクエストが成功した"}</span>
                 </label>
@@ -4802,13 +4773,13 @@ export default function Page() {
             {"         "} <h3 id="gemini-subheading-55">{"B. 移行(旧モデルがある場合)"}</h3>
             {"\n"}
             {"         "}{" "}
-            <ul className={[styles["chk-list"]].join(" ")}>
+            <ul className={styles["chk-list"]}>
               {"\n"}
               {"           "}{" "}
               <li>
                 {"\n"}
                 {"             "}{" "}
-                <label className={[styles.chk].join(" ")}>
+                <label className={styles.chk}>
                   <input type="checkbox" data-guide-check />
                   <span>
                     <code>{"temperature"}</code> {"/ "}
@@ -4825,7 +4796,7 @@ export default function Page() {
               <li>
                 {"\n"}
                 {"             "}{" "}
-                <label className={[styles.chk].join(" ")}>
+                <label className={styles.chk}>
                   <input type="checkbox" data-guide-check />
                   <span>{"prefill(最後が model ターン)を排除した"}</span>
                 </label>
@@ -4837,7 +4808,7 @@ export default function Page() {
               <li>
                 {"\n"}
                 {"             "}{" "}
-                <label className={[styles.chk].join(" ")}>
+                <label className={styles.chk}>
                   <input type="checkbox" data-guide-check />
                   <span>
                     <code>{"thinking_budget"}</code> {"を "}
@@ -4852,7 +4823,7 @@ export default function Page() {
               <li>
                 {"\n"}
                 {"             "}{" "}
-                <label className={[styles.chk].join(" ")}>
+                <label className={styles.chk}>
                   <input type="checkbox" data-guide-check />
                   <span>
                     {"明示キャッシュ("}
@@ -4868,7 +4839,7 @@ export default function Page() {
               <li>
                 {"\n"}
                 {"             "}{" "}
-                <label className={[styles.chk].join(" ")}>
+                <label className={styles.chk}>
                   <input type="checkbox" data-guide-check />
                   <span>
                     <code>{"max_output_tokens"}</code> {"を32,768以上にした"}
@@ -4882,7 +4853,7 @@ export default function Page() {
               <li>
                 {"\n"}
                 {"             "}{" "}
-                <label className={[styles.chk].join(" ")}>
+                <label className={styles.chk}>
                   <input type="checkbox" data-guide-check />
                   <span>{"HTTPタイムアウトを20分にした(または背景実行)"}</span>
                 </label>
@@ -4896,13 +4867,13 @@ export default function Page() {
             {"         "} <h3 id="gemini-subheading-56">{"C. 設計"}</h3>
             {"\n"}
             {"         "}{" "}
-            <ul className={[styles["chk-list"]].join(" ")}>
+            <ul className={styles["chk-list"]}>
               {"\n"}
               {"           "}{" "}
               <li>
                 {"\n"}
                 {"             "}{" "}
-                <label className={[styles.chk].join(" ")}>
+                <label className={styles.chk}>
                   <input type="checkbox" data-guide-check />
                   <span>{"モデル階層(難所は Argon、量は Flash / Flash-Lite)を決めた"}</span>
                 </label>
@@ -4914,7 +4885,7 @@ export default function Page() {
               <li>
                 {"\n"}
                 {"             "}{" "}
-                <label className={[styles.chk].join(" ")}>
+                <label className={styles.chk}>
                   <input type="checkbox" data-guide-check />
                   <span>
                     {"3水準("}
@@ -4932,7 +4903,7 @@ export default function Page() {
               <li>
                 {"\n"}
                 {"             "}{" "}
-                <label className={[styles.chk].join(" ")}>
+                <label className={styles.chk}>
                   <input type="checkbox" data-guide-check />
                   <span>{"検証スクリプト(合否基準)と、不可逆操作の承認ゲートを用意した"}</span>
                 </label>
@@ -4944,7 +4915,7 @@ export default function Page() {
               <li>
                 {"\n"}
                 {"             "}{" "}
-                <label className={[styles.chk].join(" ")}>
+                <label className={styles.chk}>
                   <input type="checkbox" data-guide-check />
                   <span>
                     {"関数呼び出しの応答対応("}
@@ -4962,13 +4933,13 @@ export default function Page() {
             {"         "} <h3 id="gemini-subheading-57">{"D. 運用"}</h3>
             {"\n"}
             {"         "}{" "}
-            <ul className={[styles["chk-list"]].join(" ")}>
+            <ul className={styles["chk-list"]}>
               {"\n"}
               {"           "}{" "}
               <li>
                 {"\n"}
                 {"             "}{" "}
-                <label className={[styles.chk].join(" ")}>
+                <label className={styles.chk}>
                   <input type="checkbox" data-guide-check />
                   <span>
                     <code>{"usage"}</code>
@@ -4983,7 +4954,7 @@ export default function Page() {
               <li>
                 {"\n"}
                 {"             "}{" "}
-                <label className={[styles.chk].join(" ")}>
+                <label className={styles.chk}>
                   <input type="checkbox" data-guide-check />
                   <span>
                     <strong>{"標準価格(12/1以降)"}</strong>
@@ -4998,7 +4969,7 @@ export default function Page() {
               <li>
                 {"\n"}
                 {"             "}{" "}
-                <label className={[styles.chk].join(" ")}>
+                <label className={styles.chk}>
                   <input type="checkbox" data-guide-check />
                   <span>{"フォールバック(Argon → 3.8 Flash)を実装した"}</span>
                 </label>
@@ -5010,7 +4981,7 @@ export default function Page() {
               <li>
                 {"\n"}
                 {"             "}{" "}
-                <label className={[styles.chk].join(" ")}>
+                <label className={styles.chk}>
                   <input type="checkbox" data-guide-check />
                   <span>{"提供面ごとの非推奨・退役スケジュールを定期確認する仕組みがある"}</span>
                 </label>
@@ -5022,7 +4993,7 @@ export default function Page() {
               <li>
                 {"\n"}
                 {"             "}{" "}
-                <label className={[styles.chk].join(" ")}>
+                <label className={styles.chk}>
                   <input type="checkbox" data-guide-check />
                   <span>{"自社タスクの評価セットで週次の回帰テストを回している"}</span>
                 </label>
@@ -5037,13 +5008,13 @@ export default function Page() {
           </section>
           {"\n"}
           {"       "}{" "}
-          <section className={[styles.section].join(" ")} id="s15">
+          <section className={styles.section} id="s15">
             {"\n"}
             {"         "}{" "}
-            <div className={[styles["section-head"]].join(" ")}>
+            <div className={styles["section-head"]}>
               {"\n"}
               {"           "}{" "}
-              <div className={[styles["section-icon"]].join(" ")}>
+              <div className={styles["section-icon"]}>
                 <i className={["ti", "ti-bulb"].join(" ")}></i>
               </div>
               {"\n"}
@@ -5061,7 +5032,7 @@ export default function Page() {
               {"           "} <i className={["ti", "ti-info-circle"].join(" ")}></i>
               {"\n"}
               {"           "}{" "}
-              <div className={[styles["callout-body"]].join(" ")}>
+              <div className={styles["callout-body"]}>
                 {"\n"}
                 {"             "}{" "}
                 <p>
@@ -5109,7 +5080,7 @@ export default function Page() {
                 {"             "} <strong>{"根拠"}</strong>
                 {": Simon Willison's Weblog(2026-10-13)"}
                 <a
-                  className={[styles["ref-url"]].join(" ")}
+                  className={styles["ref-url"]}
                   href="https://simonwillison.net/"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -5120,7 +5091,7 @@ export default function Page() {
                 {"              "}
                 {"/ llm-gemini の Argon 対応\n              "}
                 <a
-                  className={[styles["ref-url"]].join(" ")}
+                  className={styles["ref-url"]}
                   href="https://github.com/simonw/llm-gemini"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -5157,7 +5128,7 @@ export default function Page() {
                 {"             "} <strong>{"根拠"}</strong>
                 {":\n              "}
                 <a
-                  className={[styles["ref-url"]].join(" ")}
+                  className={styles["ref-url"]}
                   href="https://www.philschmid.de/context-engineering"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -5168,7 +5139,7 @@ export default function Page() {
                 {"              "}
                 {"/\n              "}
                 <a
-                  className={[styles["ref-url"]].join(" ")}
+                  className={styles["ref-url"]}
                   href="https://x.com/_philschmid/status/1996654346386526697"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -5179,7 +5150,7 @@ export default function Page() {
                 {"              "}
                 {"/\n              "}
                 <a
-                  className={[styles["ref-url"]].join(" ")}
+                  className={styles["ref-url"]}
                   href="https://www.philschmid.de/building-agents"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -5216,7 +5187,7 @@ export default function Page() {
                 {"             "} <strong>{"根拠"}</strong>
                 {":\n              "}
                 <a
-                  className={[styles["ref-url"]].join(" ")}
+                  className={styles["ref-url"]}
                   href="https://www.philschmid.de/subagent-patterns-2026"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -5253,7 +5224,7 @@ export default function Page() {
                 {"             "} <strong>{"根拠"}</strong>
                 {":\n              "}
                 <a
-                  className={[styles["ref-url"]].join(" ")}
+                  className={styles["ref-url"]}
                   href="https://www.philschmid.de/building-agents-interactions-api"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -5264,7 +5235,7 @@ export default function Page() {
                 {"              "}
                 {"/\n              "}
                 <a
-                  className={[styles["ref-url"]].join(" ")}
+                  className={styles["ref-url"]}
                   href="https://x.com/_philschmid/status/2007157689999340002"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -5298,7 +5269,7 @@ export default function Page() {
                 {"             "} <strong>{"根拠"}</strong>
                 {":\n              "}
                 <a
-                  className={[styles["ref-url"]].join(" ")}
+                  className={styles["ref-url"]}
                   href="https://www.philschmid.de/gemini-managed-agents-developer-guide"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -5309,7 +5280,7 @@ export default function Page() {
                 {"              "}
                 {"/\n              "}
                 <a
-                  className={[styles["ref-url"]].join(" ")}
+                  className={styles["ref-url"]}
                   href="https://www.philschmid.de/managed-agents-credentials"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -5351,7 +5322,7 @@ export default function Page() {
                 {"             "} <strong>{"根拠"}</strong>
                 {":\n              "}
                 <a
-                  className={[styles["ref-url"]].join(" ")}
+                  className={styles["ref-url"]}
                   href="https://github.com/addyosmani/agent-skills"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -5388,7 +5359,7 @@ export default function Page() {
                 {"             "} <strong>{"根拠"}</strong>
                 {":\n              "}
                 <a
-                  className={[styles["ref-url"]].join(" ")}
+                  className={styles["ref-url"]}
                   href="https://paddo.dev/blog/gemini-4-argon/"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -5427,7 +5398,7 @@ export default function Page() {
                 {"             "} <strong>{"根拠"}</strong>
                 {":\n              "}
                 <a
-                  className={[styles["ref-url"]].join(" ")}
+                  className={styles["ref-url"]}
                   href="https://paddo.dev/blog/gemini-4-argon/"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -5464,7 +5435,7 @@ export default function Page() {
                 {"             "} <strong>{"根拠"}</strong>
                 {":\n              "}
                 <a
-                  className={[styles["ref-url"]].join(" ")}
+                  className={styles["ref-url"]}
                   href="https://artificialanalysis.ai/articles/gemini-4-argon-google-top-three-labs"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -5475,7 +5446,7 @@ export default function Page() {
                 {"              "}
                 {"/\n              "}
                 <a
-                  className={[styles["ref-url"]].join(" ")}
+                  className={styles["ref-url"]}
                   href="https://artificialanalysis.ai/models/gemini-4-argon"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -5512,7 +5483,7 @@ export default function Page() {
                 {"             "} <strong>{"根拠"}</strong>
                 {":\n              "}
                 <a
-                  className={[styles["ref-url"]].join(" ")}
+                  className={styles["ref-url"]}
                   href="https://openrouter.ai/docs/cookbook/evaluate-and-optimize/model-migrations/gemini-4.md"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -5525,7 +5496,7 @@ export default function Page() {
                 {"              "}
                 {"/\n              "}
                 <a
-                  className={[styles["ref-url"]].join(" ")}
+                  className={styles["ref-url"]}
                   href="https://dev.to/aihubmix/moving-gemini-3x-code-to-gemini-4-argon-failure-modes-and-fixes-4h1p"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -5569,7 +5540,7 @@ export default function Page() {
                 {"             "} <strong>{"根拠"}</strong>
                 {":\n              "}
                 <a
-                  className={[styles["ref-url"]].join(" ")}
+                  className={styles["ref-url"]}
                   href="https://github.com/glaforge/gemini-interactions-api-sdk/releases/tag/v2.1.0"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -5580,7 +5551,7 @@ export default function Page() {
                 {"              "}
                 {"/\n              "}
                 <a
-                  className={[styles["ref-url"]].join(" ")}
+                  className={styles["ref-url"]}
                   href="https://vercel.com/changelog/gemini-4-argon-now-available-on-ai-gateway"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -5620,7 +5591,7 @@ export default function Page() {
                 {"             "} <strong>{"根拠"}</strong>
                 {":\n              "}
                 <a
-                  className={[styles["ref-url"]].join(" ")}
+                  className={styles["ref-url"]}
                   href="https://dev.to/gde/google-antigravity-gemini-4-argon-how-to-load-your-global-agents-skills-2cek"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -5640,13 +5611,13 @@ export default function Page() {
           </section>
           {"\n"}
           {"       "}{" "}
-          <section className={[styles.section].join(" ")} id="s16">
+          <section className={styles.section} id="s16">
             {"\n"}
             {"         "}{" "}
-            <div className={[styles["section-head"]].join(" ")}>
+            <div className={styles["section-head"]}>
               {"\n"}
               {"           "}{" "}
-              <div className={[styles["section-icon"]].join(" ")}>
+              <div className={styles["section-icon"]}>
                 <i className={["ti", "ti-link"].join(" ")}></i>
               </div>
               {"\n"}
@@ -5658,7 +5629,7 @@ export default function Page() {
             {"         "} <h3 id="gemini-subheading-70">{"A. Google 公式(一次情報)"}</h3>
             {"\n"}
             {"         "}{" "}
-            <div className={[styles["table-wrap"]].join(" ")}>
+            <div className={styles["table-wrap"]}>
               {"\n"}
               {"           "}{" "}
               <table>
@@ -5675,7 +5646,7 @@ export default function Page() {
                       {"\n"}
                       {"                   "}{" "}
                       <a
-                        className={[styles["ref-url"]].join(" ")}
+                        className={styles["ref-url"]}
                         href="https://ai.google.dev/gemini-api/docs/latest-model"
                         target="_blank"
                         rel="noopener noreferrer"
@@ -5692,7 +5663,7 @@ export default function Page() {
                       {"\n"}
                       {"                   "}{" "}
                       <a
-                        className={[styles["ref-url"]].join(" ")}
+                        className={styles["ref-url"]}
                         href="https://blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-gemini-4-argon/"
                         target="_blank"
                         rel="noopener noreferrer"
@@ -5711,7 +5682,7 @@ export default function Page() {
                       {"\n"}
                       {"                   "}{" "}
                       <a
-                        className={[styles["ref-url"]].join(" ")}
+                        className={styles["ref-url"]}
                         href="https://aistudio.google.com/learn/gemini-4-argon-developer-guide"
                         target="_blank"
                         rel="noopener noreferrer"
@@ -5728,7 +5699,7 @@ export default function Page() {
                       {"\n"}
                       {"                   "}{" "}
                       <a
-                        className={[styles["ref-url"]].join(" ")}
+                        className={styles["ref-url"]}
                         href="https://ai.google.dev/gemini-api/docs/long-decode"
                         target="_blank"
                         rel="noopener noreferrer"
@@ -5745,7 +5716,7 @@ export default function Page() {
                       {"\n"}
                       {"                   "}{" "}
                       <a
-                        className={[styles["ref-url"]].join(" ")}
+                        className={styles["ref-url"]}
                         href="https://ai.google.dev/gemini-api/docs/generate-content/long-decode"
                         target="_blank"
                         rel="noopener noreferrer"
@@ -5762,7 +5733,7 @@ export default function Page() {
                       {"\n"}
                       {"                   "}{" "}
                       <a
-                        className={[styles["ref-url"]].join(" ")}
+                        className={styles["ref-url"]}
                         href="https://ai.google.dev/gemini-api/docs/whats-new-gemini-3.8"
                         target="_blank"
                         rel="noopener noreferrer"
@@ -5779,7 +5750,7 @@ export default function Page() {
                       {"\n"}
                       {"                   "}{" "}
                       <a
-                        className={[styles["ref-url"]].join(" ")}
+                        className={styles["ref-url"]}
                         href="https://ai.google.dev/gemini-api/docs/whats-new-gemini-3.6"
                         target="_blank"
                         rel="noopener noreferrer"
@@ -5796,7 +5767,7 @@ export default function Page() {
                       {"\n"}
                       {"                   "}{" "}
                       <a
-                        className={[styles["ref-url"]].join(" ")}
+                        className={styles["ref-url"]}
                         href="https://ai.google.dev/gemini-api/docs/whats-new-gemini-3.7"
                         target="_blank"
                         rel="noopener noreferrer"
@@ -5813,7 +5784,7 @@ export default function Page() {
                       {"\n"}
                       {"                   "}{" "}
                       <a
-                        className={[styles["ref-url"]].join(" ")}
+                        className={styles["ref-url"]}
                         href="https://ai.google.dev/gemini-api/docs/antigravity-agent"
                         target="_blank"
                         rel="noopener noreferrer"
@@ -5830,7 +5801,7 @@ export default function Page() {
                       {"\n"}
                       {"                   "}{" "}
                       <a
-                        className={[styles["ref-url"]].join(" ")}
+                        className={styles["ref-url"]}
                         href="https://ai.google.dev/gemini-api/docs/interactions/gemini-3"
                         target="_blank"
                         rel="noopener noreferrer"
@@ -5847,7 +5818,7 @@ export default function Page() {
                       {"\n"}
                       {"                   "}{" "}
                       <a
-                        className={[styles["ref-url"]].join(" ")}
+                        className={styles["ref-url"]}
                         href="https://ai.google.dev/gemini-api/docs/changelog"
                         target="_blank"
                         rel="noopener noreferrer"
@@ -5864,7 +5835,7 @@ export default function Page() {
                       {"\n"}
                       {"                   "}{" "}
                       <a
-                        className={[styles["ref-url"]].join(" ")}
+                        className={styles["ref-url"]}
                         href="https://ai.google.dev/gemini-api/docs/thinking"
                         target="_blank"
                         rel="noopener noreferrer"
@@ -5881,7 +5852,7 @@ export default function Page() {
                       {"\n"}
                       {"                   "}{" "}
                       <a
-                        className={[styles["ref-url"]].join(" ")}
+                        className={styles["ref-url"]}
                         href="https://ai.google.dev/gemini-api/docs/thought-signatures"
                         target="_blank"
                         rel="noopener noreferrer"
@@ -5898,7 +5869,7 @@ export default function Page() {
                       {"\n"}
                       {"                   "}{" "}
                       <a
-                        className={[styles["ref-url"]].join(" ")}
+                        className={styles["ref-url"]}
                         href="https://ai.google.dev/gemini-api/docs/caching"
                         target="_blank"
                         rel="noopener noreferrer"
@@ -5915,7 +5886,7 @@ export default function Page() {
                       {"\n"}
                       {"                   "}{" "}
                       <a
-                        className={[styles["ref-url"]].join(" ")}
+                        className={styles["ref-url"]}
                         href="https://ai.google.dev/gemini-api/docs/pricing"
                         target="_blank"
                         rel="noopener noreferrer"
@@ -5932,7 +5903,7 @@ export default function Page() {
                       {"\n"}
                       {"                   "}{" "}
                       <a
-                        className={[styles["ref-url"]].join(" ")}
+                        className={styles["ref-url"]}
                         href="https://ai.google.dev/gemini-api/docs/prompting-strategies"
                         target="_blank"
                         rel="noopener noreferrer"
@@ -5949,7 +5920,7 @@ export default function Page() {
                       {"\n"}
                       {"                   "}{" "}
                       <a
-                        className={[styles["ref-url"]].join(" ")}
+                        className={styles["ref-url"]}
                         href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/model-versions"
                         target="_blank"
                         rel="noopener noreferrer"
@@ -5968,7 +5939,7 @@ export default function Page() {
                       {"\n"}
                       {"                   "}{" "}
                       <a
-                        className={[styles["ref-url"]].join(" ")}
+                        className={styles["ref-url"]}
                         href="https://gemini.google/release-notes/"
                         target="_blank"
                         rel="noopener noreferrer"
@@ -5985,7 +5956,7 @@ export default function Page() {
                       {"\n"}
                       {"                   "}{" "}
                       <a
-                        className={[styles["ref-url"]].join(" ")}
+                        className={styles["ref-url"]}
                         href="https://developers.googleblog.com/gemini-4-argon-for-robotics/"
                         target="_blank"
                         rel="noopener noreferrer"
@@ -6002,7 +5973,7 @@ export default function Page() {
                       {"\n"}
                       {"                   "}{" "}
                       <a
-                        className={[styles["ref-url"]].join(" ")}
+                        className={styles["ref-url"]}
                         href="https://developers.googleblog.com/new-gemini-api-updates-for-gemini-3/"
                         target="_blank"
                         rel="noopener noreferrer"
@@ -6022,7 +5993,7 @@ export default function Page() {
             {"         "} <h3 id="gemini-subheading-71">{"B. 著名な国際的開発者の発信"}</h3>
             {"\n"}
             {"         "}{" "}
-            <div className={[styles["table-wrap"]].join(" ")}>
+            <div className={styles["table-wrap"]}>
               {"\n"}
               {"           "}{" "}
               <table>
@@ -6041,7 +6012,7 @@ export default function Page() {
                       {"\n"}
                       {"                   "}{" "}
                       <a
-                        className={[styles["ref-url"]].join(" ")}
+                        className={styles["ref-url"]}
                         href="https://simonwillison.net/"
                         target="_blank"
                         rel="noopener noreferrer"
@@ -6059,7 +6030,7 @@ export default function Page() {
                       {"\n"}
                       {"                   "}{" "}
                       <a
-                        className={[styles["ref-url"]].join(" ")}
+                        className={styles["ref-url"]}
                         href="https://github.com/simonw/llm-gemini"
                         target="_blank"
                         rel="noopener noreferrer"
@@ -6077,7 +6048,7 @@ export default function Page() {
                       {"\n"}
                       {"                   "}{" "}
                       <a
-                        className={[styles["ref-url"]].join(" ")}
+                        className={styles["ref-url"]}
                         href="https://www.philschmid.de/"
                         target="_blank"
                         rel="noopener noreferrer"
@@ -6095,7 +6066,7 @@ export default function Page() {
                       {"\n"}
                       {"                   "}{" "}
                       <a
-                        className={[styles["ref-url"]].join(" ")}
+                        className={styles["ref-url"]}
                         href="https://www.philschmid.de/subagent-patterns-2026"
                         target="_blank"
                         rel="noopener noreferrer"
@@ -6113,7 +6084,7 @@ export default function Page() {
                       {"\n"}
                       {"                   "}{" "}
                       <a
-                        className={[styles["ref-url"]].join(" ")}
+                        className={styles["ref-url"]}
                         href="https://www.philschmid.de/gemini-managed-agents-developer-guide"
                         target="_blank"
                         rel="noopener noreferrer"
@@ -6131,7 +6102,7 @@ export default function Page() {
                       {"\n"}
                       {"                   "}{" "}
                       <a
-                        className={[styles["ref-url"]].join(" ")}
+                        className={styles["ref-url"]}
                         href="https://www.philschmid.de/building-agents-interactions-api"
                         target="_blank"
                         rel="noopener noreferrer"
@@ -6149,7 +6120,7 @@ export default function Page() {
                       {"\n"}
                       {"                   "}{" "}
                       <a
-                        className={[styles["ref-url"]].join(" ")}
+                        className={styles["ref-url"]}
                         href="https://www.philschmid.de/building-agents"
                         target="_blank"
                         rel="noopener noreferrer"
@@ -6167,7 +6138,7 @@ export default function Page() {
                       {"\n"}
                       {"                   "}{" "}
                       <a
-                        className={[styles["ref-url"]].join(" ")}
+                        className={styles["ref-url"]}
                         href="https://www.philschmid.de/context-engineering"
                         target="_blank"
                         rel="noopener noreferrer"
@@ -6185,7 +6156,7 @@ export default function Page() {
                       {"\n"}
                       {"                   "}{" "}
                       <a
-                        className={[styles["ref-url"]].join(" ")}
+                        className={styles["ref-url"]}
                         href="https://www.philschmid.de/managed-agents-credentials"
                         target="_blank"
                         rel="noopener noreferrer"
@@ -6203,7 +6174,7 @@ export default function Page() {
                       {"\n"}
                       {"                   "}{" "}
                       <a
-                        className={[styles["ref-url"]].join(" ")}
+                        className={styles["ref-url"]}
                         href="https://x.com/_philschmid/status/1996654346386526697"
                         target="_blank"
                         rel="noopener noreferrer"
@@ -6221,7 +6192,7 @@ export default function Page() {
                       {"\n"}
                       {"                   "}{" "}
                       <a
-                        className={[styles["ref-url"]].join(" ")}
+                        className={styles["ref-url"]}
                         href="https://x.com/_philschmid/status/2007157689999340002"
                         target="_blank"
                         rel="noopener noreferrer"
@@ -6239,7 +6210,7 @@ export default function Page() {
                       {"\n"}
                       {"                   "}{" "}
                       <a
-                        className={[styles["ref-url"]].join(" ")}
+                        className={styles["ref-url"]}
                         href="https://github.com/addyosmani/agent-skills"
                         target="_blank"
                         rel="noopener noreferrer"
@@ -6257,7 +6228,7 @@ export default function Page() {
                       {"\n"}
                       {"                   "}{" "}
                       <a
-                        className={[styles["ref-url"]].join(" ")}
+                        className={styles["ref-url"]}
                         href="https://github.com/glaforge/gemini-interactions-api-sdk/releases/tag/v2.1.0"
                         target="_blank"
                         rel="noopener noreferrer"
@@ -6279,7 +6250,7 @@ export default function Page() {
             {"         "} <h3 id="gemini-subheading-72">{"C. 独立評価・実測・解説"}</h3>
             {"\n"}
             {"         "}{" "}
-            <div className={[styles["table-wrap"]].join(" ")}>
+            <div className={styles["table-wrap"]}>
               {"\n"}
               {"           "}{" "}
               <table>
@@ -6296,7 +6267,7 @@ export default function Page() {
                       {"\n"}
                       {"                   "}{" "}
                       <a
-                        className={[styles["ref-url"]].join(" ")}
+                        className={styles["ref-url"]}
                         href="https://artificialanalysis.ai/articles/gemini-4-argon-google-top-three-labs"
                         target="_blank"
                         rel="noopener noreferrer"
@@ -6315,7 +6286,7 @@ export default function Page() {
                       {"\n"}
                       {"                   "}{" "}
                       <a
-                        className={[styles["ref-url"]].join(" ")}
+                        className={styles["ref-url"]}
                         href="https://artificialanalysis.ai/models/gemini-4-argon"
                         target="_blank"
                         rel="noopener noreferrer"
@@ -6332,7 +6303,7 @@ export default function Page() {
                       {"\n"}
                       {"                   "}{" "}
                       <a
-                        className={[styles["ref-url"]].join(" ")}
+                        className={styles["ref-url"]}
                         href="https://paddo.dev/blog/gemini-4-argon/"
                         target="_blank"
                         rel="noopener noreferrer"
@@ -6349,7 +6320,7 @@ export default function Page() {
                       {"\n"}
                       {"                   "}{" "}
                       <a
-                        className={[styles["ref-url"]].join(" ")}
+                        className={styles["ref-url"]}
                         href="https://venturebeat.com/technology/google-unveils-gemini-4-argon-retaking-benchmark-lead-over-openai-and-anthropic-but-in-limited-release"
                         target="_blank"
                         rel="noopener noreferrer"
@@ -6368,7 +6339,7 @@ export default function Page() {
                       {"\n"}
                       {"                   "}{" "}
                       <a
-                        className={[styles["ref-url"]].join(" ")}
+                        className={styles["ref-url"]}
                         href="https://venturebeat.com/technology/google-makes-gemini-4-argon-broadly-available-with-limited-time-low-api-pricing-of-2-10-per-1m-token"
                         target="_blank"
                         rel="noopener noreferrer"
@@ -6387,7 +6358,7 @@ export default function Page() {
                       {"\n"}
                       {"                   "}{" "}
                       <a
-                        className={[styles["ref-url"]].join(" ")}
+                        className={styles["ref-url"]}
                         href="https://9to5google.com/2026/09/30/gemini-4-argon-announcement/"
                         target="_blank"
                         rel="noopener noreferrer"
@@ -6404,7 +6375,7 @@ export default function Page() {
                       {"\n"}
                       {"                   "}{" "}
                       <a
-                        className={[styles["ref-url"]].join(" ")}
+                        className={styles["ref-url"]}
                         href="https://releasebot.io/updates/google/gemini-api"
                         target="_blank"
                         rel="noopener noreferrer"
@@ -6424,7 +6395,7 @@ export default function Page() {
             {"         "} <h3 id="gemini-subheading-73">{"D. 移行・統合の実践ガイド"}</h3>
             {"\n"}
             {"         "}{" "}
-            <div className={[styles["table-wrap"]].join(" ")}>
+            <div className={styles["table-wrap"]}>
               {"\n"}
               {"           "}{" "}
               <table>
@@ -6441,7 +6412,7 @@ export default function Page() {
                       {"\n"}
                       {"                   "}{" "}
                       <a
-                        className={[styles["ref-url"]].join(" ")}
+                        className={styles["ref-url"]}
                         href="https://openrouter.ai/docs/cookbook/evaluate-and-optimize/model-migrations/gemini-4.md"
                         target="_blank"
                         rel="noopener noreferrer"
@@ -6460,7 +6431,7 @@ export default function Page() {
                       {"\n"}
                       {"                   "}{" "}
                       <a
-                        className={[styles["ref-url"]].join(" ")}
+                        className={styles["ref-url"]}
                         href="https://vercel.com/changelog/gemini-4-argon-now-available-on-ai-gateway"
                         target="_blank"
                         rel="noopener noreferrer"
@@ -6477,7 +6448,7 @@ export default function Page() {
                       {"\n"}
                       {"                   "}{" "}
                       <a
-                        className={[styles["ref-url"]].join(" ")}
+                        className={styles["ref-url"]}
                         href="https://dev.to/aihubmix/moving-gemini-3x-code-to-gemini-4-argon-failure-modes-and-fixes-4h1p"
                         target="_blank"
                         rel="noopener noreferrer"
@@ -6496,7 +6467,7 @@ export default function Page() {
                       {"\n"}
                       {"                   "}{" "}
                       <a
-                        className={[styles["ref-url"]].join(" ")}
+                        className={styles["ref-url"]}
                         href="https://dev.to/gde/google-antigravity-gemini-4-argon-how-to-load-your-global-agents-skills-2cek"
                         target="_blank"
                         rel="noopener noreferrer"
@@ -6515,7 +6486,7 @@ export default function Page() {
                       {"\n"}
                       {"                   "}{" "}
                       <a
-                        className={[styles["ref-url"]].join(" ")}
+                        className={styles["ref-url"]}
                         href="https://dev.to/googleai/gemini-35-flash-developer-guide-1i46"
                         target="_blank"
                         rel="noopener noreferrer"
@@ -6536,7 +6507,7 @@ export default function Page() {
           </section>
           {"\n"}
           {"       "}{" "}
-          <footer className={[styles.footer].join(" ")}>
+          <footer className={styles.footer}>
             {"\n"}
             {"         "}{" "}
             <p>
