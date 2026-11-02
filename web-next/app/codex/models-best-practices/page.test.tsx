@@ -319,3 +319,23 @@ it("免責バナーとヒーロー間の重複余白・外部日付バーを無�
   expect(dates["flex-wrap"]).toBe("wrap");
   expect(dates.color).toBe("inherit");
 });
+
+it("共有リセットで失われる原本の見出し既定太字を復元する", () => {
+  const ast = postcss.parse(css());
+  for (const heading of ["h2", "h3"]) {
+    const weights: string[] = [];
+    ast.walkRules((rule) => {
+      if (
+        !rule.selector
+          .split(",")
+          .map((s) => s.trim())
+          .includes(`.root .section :global(${heading})`)
+      )
+        return;
+      rule.walkDecls("font-weight", (decl) => {
+        weights.push(decl.value);
+      });
+    });
+    expect(weights.at(-1)).toBe("700");
+  }
+});
