@@ -271,6 +271,32 @@ it("モバイル目次の不可視・操作不能・復元と共有ヘッダー�
   const globals = fs.readFileSync("app/globals.css", "utf8");
   expect(globals).toContain('body:has([data-page="openai-models"]) nav[aria-label="関連ページ"]');
 });
+it("開いたモバイル目次のoverlayはinset: 0より後で共有ヘッダー分のtopを適用する", () => {
+  // 900px以下の規則を出現順に走査し、同一セレクタ内の後勝ちカスケードを再現する
+  const mobileDecls = (selector: string) => {
+    const decls: Array<[string, string]> = [];
+    postcss.parse(css()).walkAtRules("media", (m) => {
+      if (m.params !== "(max-width: 900px)") return;
+      m.walkRules((r) => {
+        if (r.selector !== selector) return;
+        r.walkDecls((d) => {
+          decls.push([d.prop, d.value]);
+        });
+      });
+    });
+    return decls;
+  };
+  const resolvedTop = mobileDecls(".root.open .overlay").reduce<string | undefined>(
+    (top, [prop, value]) => (prop === "top" || prop === "inset" ? value : top),
+    undefined
+  );
+  expect(resolvedTop).toBe("calc(var(--ch-height, 60px) + var(--ch-disclaimer-height, 0px))");
+  expect(mobileDecls(".root .overlay")).toEqual([
+    ["border", "0"],
+    ["padding", "0"],
+    ["width", "100%"],
+  ]);
+});
 it("生HTML注入・実行script・表直下の空白・図解サイズ強制を禁止", () => {
   const src = fs.readFileSync("app/codex/models-best-practices/page.tsx", "utf8");
   expect(src).not.toContain(["danger", "ously", "Set", "Inner", "HTML"].join(""));
