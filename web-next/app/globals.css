@@ -1882,17 +1882,12 @@ body:has([data-page="claude-models"]) nav[aria-label="関連ページ"] {
 
 /* Gemini model guide: shared chrome follows the original paper palette and 288px sidebar. */
 body:has([data-page="gemini-models"]).has-common-header {
+  margin-top: 0;
   padding-top: calc(var(--ch-height, 60px) + var(--ch-disclaimer-height, 0px));
   background: #faf7f0;
 }
 body:has([data-page="gemini-models"]) #site-freshness-bar {
-  margin-left: 288px;
-  background: linear-gradient(135deg, #161d42 0%, #263172 55%, #33417f 100%);
-  color: #fff;
-  border-bottom: 0;
-}
-body:has([data-page="gemini-models"]) #site-freshness-bar time {
-  color: #fff;
+  display: none;
 }
 body:has([data-page="gemini-models"]) nav[aria-label="関連ページ"] {
   margin-left: 288px !important;
@@ -1906,7 +1901,6 @@ body:has([data-page="gemini-models"]) nav[aria-label="関連ページ"] a {
   border-color: #e3dccb;
 }
 @media (max-width: 900px) {
-  body:has([data-page="gemini-models"]) #site-freshness-bar,
   body:has([data-page="gemini-models"]) nav[aria-label="関連ページ"] {
     margin-left: 0 !important;
   }

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import MermaidDiagram from "@/components/docs/MermaidDiagram";
+import { findBySlug } from "@/lib/page-registry";
 import styles from "./page.module.css";
 import TocObserver from "./TocObserver";
 export const metadata: Metadata = {
@@ -177,6 +178,8 @@ const THEME = {
   edgeLabelBackground: "#ffffff",
 };
 export default function Page() {
+  const entry = findBySlug("/google/models-best-practices");
+  if (!entry) throw new Error("Gemini guide is missing from the page registry");
   return (
     <div id="gemini-guide" className={styles.root} data-page="gemini-models">
       <link
@@ -371,6 +374,14 @@ export default function Page() {
           {"\n"}
           {"       "}{" "}
           <header className={styles.hero}>
+            <div className={styles.heroDates} data-testid="hero-dates">
+              <span>
+                最終確認日 <time dateTime={entry.lastReviewed}>{entry.lastReviewed}</time>
+              </span>{" "}
+              <span>
+                公開日 <time dateTime={entry.addedAt}>{entry.addedAt}</time>
+              </span>
+            </div>
             {"\n"}
             {"         "}{" "}
             <div className={styles["hero-eyebrow"]}>

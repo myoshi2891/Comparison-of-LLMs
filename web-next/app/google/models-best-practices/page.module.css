@@ -57,6 +57,16 @@
   display: block;
 }
 
+.root .heroDates {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px 24px;
+  margin-bottom: 24px;
+  color: inherit;
+  font-size: 0.8rem;
+}
+
 /* ---------- sidebar ---------- */
 .root .sidebar {
   position: fixed;
