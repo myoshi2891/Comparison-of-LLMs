@@ -1,0 +1,3288 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>OpenAI「dots」初学者向け ステップバイステップ・ベストプラクティスガイド</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Source+Serif+4:opsz,wght@8..60,500;8..60,700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/styles/atom-one-dark.min.css"
+      integrity="sha384-oaMLBGEzBOJx3UHwac0cVndtX5fxGQIfnAeFZ35RTgqPcYlbprH9o9PUV/F8Le07"
+      crossorigin="anonymous"
+    />
+    <style>
+      :root {
+        --paper: #faf7f0;
+        --paper-alt: #f1ece0;
+        --ink: #1c1b19;
+        --ink-soft: #4a4842;
+        --border: #ddd6c4;
+        --indigo: #3b3f8c;
+        --indigo-soft: #eceefb;
+        --gold: #b8892b;
+        --gold-soft: #faf0d6;
+        --forest: #2f6b4f;
+        --forest-soft: #e4f1ea;
+        --plum: #6b3a63;
+        --plum-soft: #f4e8f1;
+        --sidebar-w: 310px;
+        --serif: 'Source Serif 4', 'Noto Sans JP', Georgia, serif;
+        --sans:
+          'Noto Sans JP', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', Meiryo, system-ui, sans-serif;
+        --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, 'Noto Sans JP', monospace;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        margin: 0;
+        background: var(--paper);
+        color: var(--ink);
+        font-family: var(--sans);
+        font-size: 1.0625rem;
+        line-height: 1.9;
+        -webkit-font-smoothing: antialiased;
+      }
+      .layout {
+        display: block;
+      }
+
+      /* sidebar */
+      .sidebar {
+        position: fixed;
+        inset: 0 auto 0 0;
+        width: var(--sidebar-w);
+        background: #fff;
+        border-right: 1px solid var(--border);
+        overflow-y: auto;
+        padding: 22px 0 40px;
+        z-index: 30;
+      }
+      .sidebar .brand {
+        padding: 0 22px 14px;
+        font-family: var(--serif);
+        font-weight: 700;
+        font-size: 1.1rem;
+        color: var(--indigo);
+        line-height: 1.5;
+      }
+      .sidebar .brand small {
+        display: block;
+        font-family: var(--sans);
+        font-weight: 400;
+        font-size: 1rem;
+        color: var(--ink-soft);
+      }
+      .nav-group {
+        padding: 14px 22px 4px;
+        font-size: 1rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        color: var(--gold);
+      }
+      .nav a {
+        display: block;
+        padding: 6px 22px 6px 20px;
+        color: var(--ink-soft);
+        text-decoration: none;
+        font-size: 1rem;
+        line-height: 1.55;
+        border-left: 3px solid transparent;
+      }
+      .nav a:hover {
+        background: var(--paper);
+      }
+      .nav a.active {
+        color: var(--indigo);
+        font-weight: 700;
+        border-left-color: var(--indigo);
+        background: var(--indigo-soft);
+      }
+
+      /* mobile bar */
+      .mobile-bar {
+        display: none;
+      }
+      .mobile-bar button {
+        font-size: 1rem;
+        font-family: var(--sans);
+      }
+      .scrim {
+        display: none;
+      }
+
+      /* main */
+      .main {
+        margin-left: var(--sidebar-w);
+        min-width: 0;
+      }
+      .hero {
+        background: linear-gradient(135deg, var(--indigo) 0%, #2b2e6b 100%);
+        color: #fff;
+        padding: 64px 56px 56px;
+      }
+      .hero .eyebrow {
+        font-size: 1rem;
+        letter-spacing: 0.12em;
+        color: #f3d995;
+        font-weight: 700;
+        margin-bottom: 12px;
+      }
+      .hero h1 {
+        font-family: var(--serif);
+        font-weight: 700;
+        font-size: 2.1rem;
+        line-height: 1.4;
+        margin: 0 0 24px;
+        color: #fff;
+        overflow-wrap: break-word;
+      }
+      .hero-meta {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+      .hero-meta li {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        padding: 10px 16px;
+        font-size: 1rem;
+        line-height: 1.7;
+        overflow-wrap: anywhere;
+      }
+      .hero-meta strong {
+        color: #f3d995;
+      }
+      .section {
+        padding: 34px 56px;
+      }
+      .section h1,
+      .section h2,
+      .section h3,
+      .section h4 {
+        scroll-margin-top: 16px;
+      }
+      .section h1 {
+        font-family: var(--serif);
+        font-size: 1.9rem;
+        line-height: 1.4;
+        color: var(--indigo);
+        margin: 20px 0 4px;
+        padding-bottom: 10px;
+        border-bottom: 3px solid var(--gold);
+        display: inline-block;
+      }
+      .section h2 {
+        font-family: var(--serif);
+        font-size: 1.6rem;
+        line-height: 1.45;
+        color: var(--ink);
+        margin: 0 0 18px;
+        padding-left: 14px;
+        border-left: 6px solid var(--indigo);
+        overflow-wrap: break-word;
+      }
+      .section h3 {
+        font-size: 1.25rem;
+        line-height: 1.55;
+        color: var(--indigo);
+        margin: 32px 0 12px;
+      }
+      .section h4 {
+        font-size: 1.1rem;
+        color: var(--forest);
+        margin: 24px 0 8px;
+      }
+      p {
+        margin: 0 0 16px;
+        overflow-wrap: break-word;
+      }
+      ul,
+      ol {
+        margin: 0 0 18px;
+        padding-left: 1.6em;
+      }
+      li {
+        margin: 4px 0;
+        overflow-wrap: break-word;
+      }
+      li > ul,
+      li > ol {
+        margin: 4px 0 4px;
+      }
+      a {
+        color: var(--indigo);
+        text-decoration: underline;
+        text-underline-offset: 3px;
+        overflow-wrap: anywhere;
+      }
+      strong {
+        font-weight: 700;
+        color: #000;
+      }
+      hr {
+        display: none;
+      }
+      code {
+        font-family: var(--mono);
+        font-size: 1em;
+        background: var(--paper-alt);
+        border: 1px solid var(--border);
+        border-radius: 5px;
+        padding: 1px 6px;
+        overflow-wrap: anywhere;
+      }
+
+      /* tables */
+      .table-wrap {
+        overflow-x: auto;
+        min-width: 0;
+        max-width: 100%;
+        margin: 16px 0 24px;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        background: #fff;
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        font-size: 1rem;
+        line-height: 1.7;
+      }
+      thead th {
+        background: var(--indigo);
+        color: #fff;
+        font-weight: 700;
+        text-align: left;
+        padding: 11px 14px;
+        white-space: nowrap;
+      }
+      tbody td {
+        padding: 11px 14px;
+        border-bottom: 1px solid var(--border);
+        vertical-align: top;
+        background: #fff;
+      }
+      tbody tr:last-child td {
+        border-bottom: none;
+      }
+      tbody tr:hover td {
+        background: var(--paper);
+      }
+      td,
+      th {
+        overflow-wrap: anywhere;
+      }
+      td code {
+        white-space: normal;
+      }
+
+      /* callouts */
+      .callout {
+        margin: 18px 0 22px;
+        padding: 14px 18px;
+        border-radius: 10px;
+        background: var(--indigo-soft);
+        border-left: 5px solid var(--indigo);
+      }
+      .callout p:last-child {
+        margin-bottom: 0;
+      }
+      .callout.warn {
+        background: var(--plum-soft);
+        border-left-color: var(--plum);
+      }
+      .callout.tip {
+        background: var(--forest-soft);
+        border-left-color: var(--forest);
+      }
+
+      /* code */
+      .code-block {
+        margin: 16px 0 24px;
+        border-radius: 10px;
+        overflow: hidden;
+        background: #282c34;
+        border: 1px solid #1d2026;
+      }
+      .code-lang {
+        background: #1d2026;
+        color: #e6c27a;
+        font-family: var(--mono);
+        font-size: 1rem;
+        padding: 6px 16px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+      .code-block pre {
+        margin: 0;
+        overflow-x: auto;
+        padding: 0;
+        background: #282c34;
+        color: #abb2bf;
+      }
+      .code-block pre code {
+        display: block;
+        font-family: var(--mono);
+        font-size: 1rem;
+        line-height: 1.75;
+        padding: 16px 18px;
+        background: transparent;
+        border: none;
+        border-radius: 0;
+        white-space: pre;
+        overflow-wrap: normal;
+      }
+      code.hljs {
+        padding: 16px 18px;
+        background: transparent;
+      }
+
+      /* diagrams */
+      .diagram-card {
+        margin: 18px 0 26px;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        background: #fff;
+        padding: 16px;
+        min-width: 0;
+        max-width: 100%;
+      }
+      .diagram-wrap {
+        overflow-x: auto;
+        display: flex;
+        justify-content: safe center;
+        width: 100%;
+        min-width: 0;
+      }
+      .diagram-wrap > * {
+        min-width: 0;
+      }
+      .diagram-canvas svg {
+        max-width: none;
+        flex-shrink: 0;
+        height: auto;
+      }
+      .diagram-fail {
+        font-size: 1rem;
+        color: var(--plum);
+      }
+      .mermaidTooltip {
+        font-size: 1rem !important;
+      }
+
+      /* checklist */
+      li.task {
+        list-style: none;
+        margin-left: -1.4em;
+      }
+      li.task label {
+        cursor: pointer;
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+      }
+      li.task input {
+        appearance: none;
+        -webkit-appearance: none;
+        flex: 0 0 22px;
+        width: 22px;
+        height: 22px;
+        margin-top: 6px;
+        border: 2px solid var(--indigo);
+        border-radius: 5px;
+        background: #fff;
+        cursor: pointer;
+        font-size: 1rem;
+      }
+      li.task input:checked {
+        background: var(--forest);
+        border-color: var(--forest);
+        box-shadow: inset 0 0 0 3px #fff;
+      }
+      li.task input:checked + span {
+        color: var(--ink-soft);
+        text-decoration: line-through;
+      }
+
+      .footer {
+        padding: 36px 56px 60px;
+        color: var(--ink-soft);
+        font-size: 1rem;
+      }
+
+      @media (max-width: 900px) {
+        .sidebar {
+          transform: translateX(-100%);
+          transition: transform 0.25s ease;
+          width: min(86vw, 330px);
+          box-shadow: none;
+        }
+        body.nav-open .sidebar {
+          transform: translateX(0);
+          box-shadow: 0 0 40px rgba(0, 0, 0, 0.25);
+        }
+        .scrim {
+          display: block;
+          position: fixed;
+          inset: 0;
+          background: rgba(0, 0, 0, 0.35);
+          z-index: 25;
+          opacity: 0;
+          pointer-events: none;
+          transition: opacity 0.25s;
+        }
+        body.nav-open .scrim {
+          opacity: 1;
+          pointer-events: auto;
+        }
+        .mobile-bar {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          position: sticky;
+          top: 0;
+          z-index: 20;
+          background: #fff;
+          border-bottom: 1px solid var(--border);
+          padding: 8px 14px;
+        }
+        .mobile-bar button {
+          background: var(--indigo);
+          color: #fff;
+          border: none;
+          border-radius: 8px;
+          padding: 8px 14px;
+          cursor: pointer;
+        }
+        .mobile-bar span {
+          font-weight: 700;
+          color: var(--indigo);
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+        .main {
+          margin-left: 0;
+        }
+        .hero {
+          padding: 40px 20px 36px;
+        }
+        .hero h1 {
+          font-size: 1.55rem;
+        }
+        .section {
+          padding: 28px 18px;
+        }
+        .section h1 {
+          font-size: 1.5rem;
+        }
+        .section h2 {
+          font-size: 1.35rem;
+        }
+        .section h1,
+        .section h2,
+        .section h3,
+        .section h4 {
+          scroll-margin-top: 70px;
+        }
+        .footer {
+          padding: 30px 18px 50px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="scrim" id="scrim"></div>
+    <div class="layout">
+      <aside class="sidebar" id="sidebar" aria-label="目次">
+        <div class="brand">OpenAI dots ガイド<small>初学者向けベストプラクティス</small></div>
+        <nav class="nav" id="nav">
+          <div class="nav-group">はじめに</div>
+          <a href="#0-このガイドの読み方">0. このガイドの読み方</a>
+          <div class="nav-group">Part 1: 理解する</div>
+          <a href="#1-dots-とは何か">1. dots とは何か</a>
+          <a href="#2-全体像">2. 全体像</a>
+          <a href="#3-chatgptchatgpt-workcodex-との使い分け"
+            >3. ChatGPT・ChatGPT Work・Codex との使い分け</a
+          >
+          <div class="nav-group">Part 2: 始める</div>
+          <a href="#step-0-利用資格と費用を確認する">Step 0: 利用資格と費用を確認する</a>
+          <a href="#step-1-最初の-dot-を作る">Step 1: 最初の dot を作る</a>
+          <a href="#step-2-アプリプラグインを最小限だけ接続する"
+            >Step 2: アプリ(プラグイン)を最小限だけ接続する</a
+          >
+          <a href="#step-3-custom-rules-を先に決める">Step 3: Custom Rules を先に決める</a>
+          <a href="#step-4-最初の仕事を任せるブリーフの書き方"
+            >Step 4: 最初の仕事を任せる(ブリーフの書き方)</a
+          >
+          <div class="nav-group">Part 3: 任せる</div>
+          <a href="#step-5-定期タスクとバックグラウンド調査"
+            >Step 5: 定期タスクとバックグラウンド調査</a
+          >
+          <a href="#step-6-チャンネルと自分の-pc-をつなぐ"
+            >Step 6: チャンネルと自分の PC をつなぐ</a
+          >
+          <a href="#step-7-見守る止めるやり直す">Step 7: 見守る・止める・やり直す</a>
+          <div class="nav-group">Part 4: 守る</div>
+          <a href="#8-安全設計を理解する">8. 安全設計を理解する</a>
+          <a href="#9-メモリとプライバシー">9. メモリとプライバシー</a>
+          <a href="#10-1週間の運用ルーチン">10. 1週間の運用ルーチン</a>
+          <a href="#11-よくある失敗とトラブルシュート">11. よくある失敗とトラブルシュート</a>
+          <a href="#12-ベストプラクティスチェックリスト">12. ベストプラクティス・チェックリスト</a>
+          <div class="nav-group">Part 5: 深める</div>
+          <a href="#13-国際的な開発者専門家の知見">13. 国際的な開発者・専門家の知見</a>
+          <a href="#14-補足-その他のベストプラクティスと根拠ソース"
+            >14. 補足: その他のベストプラクティスと根拠ソース</a
+          >
+          <a href="#15-参考url一覧">15. 参考URL一覧</a>
+          <a href="#16-用語集">16. 用語集</a>
+          <a href="#17-更新時の注意">17. 更新時の注意</a>
+        </nav>
+      </aside>
+      <div class="main">
+        <div class="mobile-bar">
+          <button type="button" id="menu-btn" aria-label="目次を開く">目次</button
+          ><span>OpenAI dots ガイド</span>
+        </div>
+        <header class="hero">
+          <div class="eyebrow">OPENAI DOTS / BEST PRACTICES</div>
+          <h1>OpenAI「dots」初学者向け ステップバイステップ・ベストプラクティスガイド</h1>
+          <ul class="hero-meta">
+            <li>
+              <strong>対象読者</strong>: ChatGPT
+              は使ったことがあるが、「常時稼働エージェント」は初めての方
+            </li>
+            <li>
+              <strong>情報基準日</strong>: 2026年10月24日(dots は 2026年9月29日の OpenAI DevDay 2026
+              で発表)
+            </li>
+            <li>
+              <strong>ゴール</strong>: 最初の dot
+              を安全に作り、小さな仕事から任せ、1週間で「信頼できる運用」に育てる
+            </li>
+          </ul>
+        </header>
+        <main>
+          <section class="section">
+            <h2 id="0-このガイドの読み方">0. このガイドの読み方</h2>
+            <h3 id="01-情報の確度について">0.1 情報の確度について</h3>
+            <p>
+              dots
+              は発表から約4週間の新しい製品で、仕様・提供範囲が日々更新されています。本ガイドでは、各情報の確度を次の記号で示します。
+            </p>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>記号</th>
+                    <th>意味</th>
+                    <th>例</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>◎</td>
+                    <td>OpenAI の一次資料(公式発表・ヘルプセンター・安全性投稿)を直接確認した</td>
+                    <td>4,000以上のアプリ連携、Custom Rules の4種類の挙動</td>
+                  </tr>
+                  <tr>
+                    <td>○</td>
+                    <td>一次資料を引用している二次資料(百科・報道)経由で確認した</td>
+                    <td>行動ルールの分類表、System Card の評価結果</td>
+                  </tr>
+                  <tr>
+                    <td>△</td>
+                    <td>実践者の経験談・個人の提案で、公式の保証ではない</td>
+                    <td>「1週間は既定ルールのまま使う」などの運用の工夫</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <aside class="callout">
+              <p>
+                <strong>注意</strong>:
+                起点としてご指定いただいた日本語版(<code>openai.com/ja-JP/index/introducing-dots/</code>)は、取得時にボット検知で遮断されました。そのため同じ発表の英語版(<code>openai.com/index/introducing-dots/</code>)と、同日公開の安全性投稿・ヘルプセンター記事で内容を確認しています。
+              </p>
+            </aside>
+            <h3 id="02-このガイドの構成">0.2 このガイドの構成</h3>
+            <div class="diagram-card">
+              <div class="diagram-wrap"><div class="diagram-canvas" data-diagram-id="0"></div></div>
+            </div>
+            <h3 id="03-目次">0.3 目次</h3>
+            <ul>
+              <li>
+                <a href="#part-1-理解する">Part 1: 理解する</a>
+                <ul>
+                  <li><a href="#1-dots-とは何か">1. dots とは何か</a></li>
+                  <li><a href="#2-全体像">2. 全体像</a></li>
+                  <li>
+                    <a href="#3-chatgptchatgpt-workcodex-との使い分け"
+                      >3. ChatGPT・ChatGPT Work・Codex との使い分け</a
+                    >
+                  </li>
+                </ul>
+              </li>
+              <li>
+                <a href="#part-2-始める">Part 2: 始める</a>
+                <ul>
+                  <li>
+                    <a href="#step-0-利用資格と費用を確認する">Step 0: 利用資格と費用を確認する</a>
+                  </li>
+                  <li><a href="#step-1-最初の-dot-を作る">Step 1: 最初の dot を作る</a></li>
+                  <li>
+                    <a href="#step-2-アプリプラグインを最小限だけ接続する"
+                      >Step 2: アプリ(プラグイン)を最小限だけ接続する</a
+                    >
+                  </li>
+                  <li>
+                    <a href="#step-3-custom-rules-を先に決める"
+                      >Step 3: Custom Rules を先に決める</a
+                    >
+                  </li>
+                  <li>
+                    <a href="#step-4-最初の仕事を任せるブリーフの書き方"
+                      >Step 4: 最初の仕事を任せる(ブリーフの書き方)</a
+                    >
+                  </li>
+                </ul>
+              </li>
+              <li>
+                <a href="#part-3-任せる">Part 3: 任せる</a>
+                <ul>
+                  <li>
+                    <a href="#step-5-定期タスクとバックグラウンド調査"
+                      >Step 5: 定期タスクとバックグラウンド調査</a
+                    >
+                  </li>
+                  <li>
+                    <a href="#step-6-チャンネルと自分の-pc-をつなぐ"
+                      >Step 6: チャンネルと自分の PC をつなぐ</a
+                    >
+                  </li>
+                  <li>
+                    <a href="#step-7-見守る止めるやり直す">Step 7: 見守る・止める・やり直す</a>
+                  </li>
+                </ul>
+              </li>
+              <li>
+                <a href="#part-4-守る">Part 4: 守る</a>
+                <ul>
+                  <li><a href="#8-安全設計を理解する">8. 安全設計を理解する</a></li>
+                  <li><a href="#9-メモリとプライバシー">9. メモリとプライバシー</a></li>
+                  <li><a href="#10-1週間の運用ルーチン">10. 1週間の運用ルーチン</a></li>
+                  <li>
+                    <a href="#11-よくある失敗とトラブルシュート"
+                      >11. よくある失敗とトラブルシュート</a
+                    >
+                  </li>
+                  <li>
+                    <a href="#12-ベストプラクティスチェックリスト"
+                      >12. ベストプラクティス・チェックリスト</a
+                    >
+                  </li>
+                </ul>
+              </li>
+              <li>
+                <a href="#part-5-深める">Part 5: 深める</a>
+                <ul>
+                  <li>
+                    <a href="#13-国際的な開発者専門家の知見">13. 国際的な開発者・専門家の知見</a>
+                  </li>
+                  <li>
+                    <a href="#14-補足-その他のベストプラクティスと根拠ソース"
+                      >14. 補足: その他のベストプラクティスと根拠ソース</a
+                    >
+                  </li>
+                  <li><a href="#15-参考url一覧">15. 参考URL一覧</a></li>
+                  <li><a href="#16-用語集">16. 用語集</a></li>
+                  <li><a href="#17-更新時の注意">17. 更新時の注意</a></li>
+                </ul>
+              </li>
+            </ul>
+          </section>
+          <section class="section">
+            <h1 id="part-1-理解する">Part 1: 理解する</h1>
+          </section>
+          <section class="section">
+            <h2 id="1-dots-とは何か">1. dots とは何か</h2>
+            <p>
+              <strong>dots(単数: dot)</strong> は、OpenAI が 2026年9月29日に ChatGPT
+              内で提供を始めた<strong>常時稼働(always-on)型のエージェント</strong>です。◎
+            </p>
+            <p>
+              OpenAI
+              は「目標を渡し、自分でやってよいことを決めておけば、会話と会話の合間にも仕事を進め、結果を持ち帰り、判断が必要なときだけ相談してくる」存在として説明しています。◎
+            </p>
+            <h3 id="11-30秒で押さえる要点">1.1 30秒で押さえる要点</h3>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>項目</th>
+                    <th>内容</th>
+                    <th>確度</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>動力</td>
+                    <td>OpenAI の最新モデル <strong>GPT-6 Astra</strong></td>
+                    <td>◎</td>
+                  </tr>
+                  <tr>
+                    <td>作業場所</td>
+                    <td>dot ごとに<strong>専用のクラウドコンピュータとブラウザ</strong>を持つ</td>
+                    <td>◎</td>
+                  </tr>
+                  <tr>
+                    <td>接続先</td>
+                    <td>ChatGPT のプラグイン経由で <strong>4,000以上のアプリ</strong></td>
+                    <td>◎</td>
+                  </tr>
+                  <tr>
+                    <td>連絡手段</td>
+                    <td>
+                      ChatGPT(デスクトップ・Web・モバイル)、Slack、Microsoft
+                      Teams、テキストメッセージ(限定ベータ)
+                    </td>
+                    <td>◎</td>
+                  </tr>
+                  <tr>
+                    <td>動き方</td>
+                    <td>頼まれなくても背景で調べ物をし、提案する(「プロアクティブ調査」)</td>
+                    <td>◎</td>
+                  </tr>
+                  <tr>
+                    <td>統制</td>
+                    <td>何を自分で行い、いつ確認し、何を絶対にしないかを利用者が決める</td>
+                    <td>◎</td>
+                  </tr>
+                  <tr>
+                    <td>注意</td>
+                    <td>間違えることがある。重要な成果物は必ず人が確認する</td>
+                    <td>◎</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <h3 id="12-普通のチャットとの決定的な違い">1.2 「普通のチャット」との決定的な違い</h3>
+            <p>
+              通常の ChatGPT は「質問 → 回答 → 終了」の<strong>単発のやりとり</strong>です。dot
+              は「責任を引き受けて、続きを担当する」存在です。
+            </p>
+            <div class="diagram-card">
+              <div class="diagram-wrap"><div class="diagram-canvas" data-diagram-id="1"></div></div>
+            </div>
+            <aside class="callout">
+              <p>
+                <strong>初学者への一言</strong>:
+                「質問する相手」ではなく「仕事を引き継ぐ同僚」だと考えると、設計の勘所(権限・報告・確認)が理解しやすくなります。
+              </p>
+            </aside>
+            <h3 id="13-openai-が示している利用イメージ">1.3 OpenAI が示している利用イメージ</h3>
+            <ul>
+              <li>Slack に不具合報告が上がると、dot がすぐ調査を始める(社内利用の例)◎</li>
+              <li>
+                早期テスターの dot
+                が、請求書の送り忘れに気づき、下書きを作り、本人の承認後に送信した ◎
+              </li>
+              <li>
+                将来は「複数の dot がチームで動く」構想で、組織向けの<strong
+                  >スペシャリスト dot</strong
+                >(独自の ID・権限を持つ)も試験段階にある ◎
+              </li>
+            </ul>
+          </section>
+          <section class="section">
+            <h2 id="2-全体像">2. 全体像</h2>
+            <h3 id="21-構成要素の関係">2.1 構成要素の関係</h3>
+            <div class="diagram-card">
+              <div class="diagram-wrap"><div class="diagram-canvas" data-diagram-id="2"></div></div>
+            </div>
+            <p>ポイントは次の3つです。</p>
+            <ol>
+              <li>
+                <strong>dot の作業場所は「あなたの PC」ではなく、dot 専用のクラウド PC</strong> ◎
+              </li>
+              <li>自分の PC を使わせるかどうかは<strong>任意で、既定はオフ</strong> ◎</li>
+              <li>
+                作業の入口(チャンネル)が複数あっても、<strong>共有メモリの一部と最近の会話の文脈は引き継がれる</strong>(ChatGPT
+                で始めた話を Slack
+                で続けられる)◎。ただし、すべての文脈が完全に共有されるとは限らないため、別のチャンネルで続けるときは<strong>必要な背景を改めて伝える</strong>と確実です
+                △
+              </li>
+            </ol>
+            <h3 id="22-用語ミニ辞典最低限">2.2 用語ミニ辞典(最低限)</h3>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>用語</th>
+                    <th>意味</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>dot</td>
+                    <td>
+                      あなた専属の常時稼働エージェント。名前を付けられる(既定のハンドルは
+                      <code>@yourname-dot</code>)
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>プラグイン</td>
+                    <td>
+                      ChatGPT がアプリ(メール・カレンダー・Slack 等)につながる仕組み。権限は
+                      dots・ChatGPT・Work・Codex で共有される
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Custom Rules</td>
+                    <td>
+                      「何を勝手にやってよいか・必ず聞くか・任せないか」を行為ごとに決めるルール
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Auto-review</td>
+                    <td>
+                      対象となる操作(メッセージ送信やファイル変更など)について、実行前に別の安全システムが計画をチェックする仕組み
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>プロアクティブ調査</td>
+                    <td>頼まれていない時間に、読み取り専用で背景調査し、メモを残す機能</td>
+                  </tr>
+                  <tr>
+                    <td>Activity View</td>
+                    <td>dot の進行中・委任中のタスクを一覧し、指示の追加や停止ができる画面</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+          <section class="section">
+            <h2 id="3-chatgptchatgpt-workcodex-との使い分け">
+              3. ChatGPT・ChatGPT Work・Codex との使い分け
+            </h2>
+            <p>
+              dots
+              は既存ツールを置き換えるのではなく、<strong>それらに仕事を振り分ける司令塔</strong>として位置づけられています。◎(dot
+              は Work や Codex のタスクを作成でき、プラグイン権限は共有されます)
+            </p>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>ツール</th>
+                    <th>向いている仕事</th>
+                    <th>動き方</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>ChatGPT(通常チャット)</td>
+                    <td>質問、文章作成、アイデア出し</td>
+                    <td>都度のやりとり</td>
+                  </tr>
+                  <tr>
+                    <td>ChatGPT Work</td>
+                    <td>1回きりの調査や作業を最後まで進める</td>
+                    <td>作業ごとに依頼</td>
+                  </tr>
+                  <tr>
+                    <td>Codex</td>
+                    <td>コードの作成・修正・レビュー</td>
+                    <td>開発タスクごと</td>
+                  </tr>
+                  <tr>
+                    <td><strong>dot</strong></td>
+                    <td><strong>継続的な責任</strong>(見守り、定期確認、段取り、手配)</td>
+                    <td>常時待機し、必要に応じて上記へ委任</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="diagram-card">
+              <div class="diagram-wrap"><div class="diagram-canvas" data-diagram-id="3"></div></div>
+            </div>
+            <aside class="callout">
+              <p>
+                <strong>初学者の目安</strong>: 「来週もこの件を気にかけておいてほしい」と思ったら
+                dot、「今これを片付けて」なら Work や Codex、という切り分けが分かりやすいです。△
+              </p>
+            </aside>
+          </section>
+          <section class="section">
+            <h1 id="part-2-始める">Part 2: 始める</h1>
+            <div class="diagram-card">
+              <div class="diagram-wrap"><div class="diagram-canvas" data-diagram-id="4"></div></div>
+            </div>
+          </section>
+          <section class="section">
+            <h2 id="step-0-利用資格と費用を確認する">Step 0: 利用資格と費用を確認する</h2>
+            <h3 id="0-1-提供範囲ローンチ時点の公式情報">0-1. 提供範囲(ローンチ時点の公式情報)</h3>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>項目</th>
+                    <th>内容</th>
+                    <th>確度</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Pro</td>
+                    <td>EEA(欧州経済領域)・スイス・英国を除く市場。段階的に展開</td>
+                    <td>◎</td>
+                  </tr>
+                  <tr>
+                    <td>Business Premium</td>
+                    <td>サポート対象の全リージョン。ワークスペースでの利用が必要</td>
+                    <td>◎</td>
+                  </tr>
+                  <tr>
+                    <td>Enterprise(Edu・Healthcare 含む)</td>
+                    <td>ベータ。ワークスペース管理者が有効化するまで既定はオフ</td>
+                    <td>◎</td>
+                  </tr>
+                  <tr>
+                    <td>年齢</td>
+                    <td>18歳以上</td>
+                    <td>◎</td>
+                  </tr>
+                  <tr>
+                    <td>Free / Go / Plus</td>
+                    <td>対象外と案内されている</td>
+                    <td>○</td>
+                  </tr>
+                  <tr>
+                    <td>Pro の価格帯</td>
+                    <td>
+                      発表当初は「Pro」としか記載がなく、$200
+                      のみとの報道もあったが、10月初旬の公式ガイドでは Pro 100 / 200 / 500
+                      が対象と案内されたと報告されている
+                    </td>
+                    <td>○(要再確認)</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <h3 id="0-2-費用と使用量">0-2. 費用と使用量</h3>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>項目</th>
+                    <th>内容</th>
+                    <th>確度</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>最初の dot</td>
+                    <td>Pro・Business Premium では追加料金なし</td>
+                    <td>◎</td>
+                  </tr>
+                  <tr>
+                    <td>dot との会話</td>
+                    <td>ChatGPT の使用量上限にはカウントされない</td>
+                    <td>○</td>
+                  </tr>
+                  <tr>
+                    <td>dot が起動する Codex・Work のタスク</td>
+                    <td>使用量にカウントされる</td>
+                    <td>○</td>
+                  </tr>
+                  <tr>
+                    <td>最初の1か月</td>
+                    <td>
+                      プランごとに案内された、上限を拡大した使用量枠が適用される。使用量にカウントされないのは
+                      <strong>dot との会話のみ</strong>で、dot が起動する Work・Codex
+                      のタスクはカウントされる。その後の条件は各プランで案内予定
+                    </td>
+                    <td>◎</td>
+                  </tr>
+                  <tr>
+                    <td>追加の dot・速度・作業量</td>
+                    <td>今後追加できる予定(価格は未公表)</td>
+                    <td>◎</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <aside class="callout">
+              <p>
+                <strong>要確認</strong>:
+                「最初の1か月」は発表(9月29日)からの期間なので、<strong>10月末に切り替わる可能性があります</strong>。最新の条件は必ずヘルプセンターで確認してください。
+              </p>
+            </aside>
+            <h3 id="0-3-作る前の心構え3原則">0-3. 作る前の心構え(3原則)</h3>
+            <ol>
+              <li><strong>最初から全権を渡さない</strong>。読み取りと下書きから始める。△</li>
+              <li>
+                <strong>取り消せないこと(送信・購入・削除)は、人が最後に押す</strong>。◎(OpenAI
+                も購入や完全削除には承認を求める設計)
+              </li>
+              <li>
+                <strong>初週は不具合が出る前提</strong
+                >で、重要な業務に直結させない。△(早期レビューで、権限エラーやメッセージ欠落が報告されている
+                ○)
+              </li>
+            </ol>
+          </section>
+          <section class="section">
+            <h2 id="step-1-最初の-dot-を作る">Step 1: 最初の dot を作る</h2>
+            <h3 id="手順">手順</h3>
+            <ol>
+              <li>
+                <strong>ChatGPT デスクトップアプリ</strong>(Windows
+                版もあり)、<strong>デスクトップのブラウザ</strong>、または
+                <strong>iOS / Android アプリ</strong>で ChatGPT を開く ◎(Slack
+                など一部の接続はデスクトップで設定する。テキストメッセージはモバイルアプリ・デスクトップ
+                Web・デスクトップアプリのいずれからも設定できる。dot の作成自体はモバイルでも可能)
+              </li>
+              <li>
+                画面の案内に従って dot
+                を作成し、<strong>名前</strong>を付ける(後からプロフィールの鉛筆アイコンで変更可)◎
+              </li>
+              <li>キャラクターまたはペットを選ぶ(見た目だけの設定)◎</li>
+              <li>作成後、dot に<strong>自己紹介</strong>をさせる ◎</li>
+            </ol>
+            <div class="diagram-card">
+              <div class="diagram-wrap"><div class="diagram-canvas" data-diagram-id="5"></div></div>
+            </div>
+            <h3 id="つまずきポイント">つまずきポイント</h3>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>症状</th>
+                    <th>原因と対処</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>発表ページの作成リンクで「デスクトップから作成してください」と出る</td>
+                    <td>
+                      発表直後はモバイルから作成できなかった。Simon Willison
+                      氏もこの表示に遭遇している ◎。現在は iOS / Android
+                      アプリからの作成にも対応している
+                      ◎。表示が出る場合はアプリを最新版に更新するか、デスクトップで作成する。なお、Slack
+                      など一部の接続はデスクトップで設定する(テキストメッセージはモバイルからも設定可能)
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>使えない</td>
+                    <td>段階的な展開のため、アカウントに届くまで数日かかる場合がある ◎</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+          <section class="section">
+            <h2 id="step-2-アプリプラグインを最小限だけ接続する">
+              Step 2: アプリ(プラグイン)を最小限だけ接続する
+            </h2>
+            <p>
+              dot
+              がアプリ経由で読める情報や実行できる操作は、あなたが接続したアプリの範囲に限られます。◎
+              ただし、これは dot
+              ができることのすべての境界ではありません。専用のクラウドブラウザ・コンピュータ(および自分の
+              PC との接続)は、アプリ接続とは別に管理する権限として扱ってください(→
+              <a href="#step-6-チャンネルと自分の-pc-をつなぐ">Step 6</a>、<a
+                href="#8-安全設計を理解する"
+                >8. 安全設計</a
+              >)。接続は
+              <strong>「いま任せたい仕事に必要な最小限」</strong> から始めます。また、<strong
+                >接続するときに同時に <a href="#step-3-custom-rules-を先に決める">Step 3</a> の
+                Custom Rules を確認し、既定のまま使うか厳しくするかを決めてください</strong
+              >(接続とルールの判断を1つの手順として行います)。△
+            </p>
+            <h3 id="2-1-接続の前に知っておくこと">2-1. 接続の前に知っておくこと</h3>
+            <ul>
+              <li>
+                接続したアプリの情報を、dot は<strong
+                  >頼まれなくても背景で確認し、記憶を作ることがある</strong
+                >
+                ◎
+              </li>
+              <li>
+                <strong>アプリの接続を解除しても、すでに dot が取得した情報は消えない</strong>。dot
+                自身のコンテキストから消すには dot 自体を削除(Delete)する ◎(Delete で消えるのは dot
+                自身のコンテキストで、ChatGPT
+                のメモリ・ファイル・会話など別に管理される情報は削除されない →
+                <a href="#7-3-削除する-deletedot-の削除">7-3</a>、<a href="#9-メモリとプライバシー"
+                  >9</a
+                >)
+              </li>
+              <li>
+                プラグインの権限は dots・ChatGPT・Work・Codex
+                で<strong>共有</strong>される(すでに接続済みのものは使える)◎
+              </li>
+              <li>
+                メールは、<strong>個人のメールアカウントを接続して使わせる</strong>ことができる。ローンチ時点では
+                dot 専用のメールアドレスは持てなかった
+                ◎(その後、専用アドレスを持たせた利用者の報告もあるため、最新状況は要確認 ○ →
+                <a href="#132-ethan-mollickwharton-教授one-useful-thing">13.2</a>)
+              </li>
+            </ul>
+            <h3 id="2-2-最小権限の接続順序おすすめ">2-2. 最小権限の接続順序(おすすめ)</h3>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>順番</th>
+                    <th>接続するもの</th>
+                    <th>理由</th>
+                    <th>確度</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>1</td>
+                    <td>カレンダー(読み取り中心)</td>
+                    <td>影響が小さく、価値がすぐ分かる</td>
+                    <td>△</td>
+                  </tr>
+                  <tr>
+                    <td>2</td>
+                    <td>メール(読み取り)</td>
+                    <td>要約・下書き作成に使える</td>
+                    <td>△</td>
+                  </tr>
+                  <tr>
+                    <td>3</td>
+                    <td>Slack</td>
+                    <td>相談窓口になる。ただし「何を監視するか」は明示が必要</td>
+                    <td>◎</td>
+                  </tr>
+                  <tr>
+                    <td>4</td>
+                    <td>送信・変更ができる権限</td>
+                    <td>Custom Rules が固まり、挙動を観察してから</td>
+                    <td>△</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <aside class="callout">
+              <p>
+                <strong>ベストプラクティス</strong>:
+                アプリを足すたびに、そのプラグインが**「読むだけ」か「変更・送信もできる」か**を権限画面で必ず確認しましょう。△
+              </p>
+            </aside>
+          </section>
+          <section class="section">
+            <h2 id="step-3-custom-rules-を先に決める">Step 3: Custom Rules を先に決める</h2>
+            <p>
+              <strong>Custom Rules は、dots を安全に使う最重要の設定</strong>です。◎
+              「接続の前に、または接続と同時に」決めるのが鉄則です。△
+            </p>
+            <h3 id="3-1-4つの挙動">3-1. 4つの挙動</h3>
+            <p>行為(例:メール送信、購入、ファイル共有)ごとに、次の4つから選びます。◎</p>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>挙動</th>
+                    <th>意味</th>
+                    <th>向いている行為</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>確認なしで実行</td>
+                    <td>聞かずにやる</td>
+                    <td>調査・整理・下書き・自分だけが見るチェックリスト更新</td>
+                  </tr>
+                  <tr>
+                    <td>事前承認があれば実行</td>
+                    <td>あなたがプロンプトで<strong>明示的に依頼した行為</strong>だけ実行</td>
+                    <td>
+                      「明日9時に、A社の経理担当(billing@example.com)へ、請求書 INV-1024
+                      を添付し、確認済みの文面で送って」のように、宛先・内容・送信時刻(または条件)を指定した送信
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>実行前に確認</td>
+                    <td>毎回聞く</td>
+                    <td>社内への連絡、予定の変更</td>
+                  </tr>
+                  <tr>
+                    <td>あなたに引き渡す</td>
+                    <td>あなたが自分で行う</td>
+                    <td>社外への公開、金銭、パスワード、権限変更</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <aside class="callout">
+              <p>
+                「事前承認(pre-approved)」とは、<strong>あなたがプロンプトで明示的にその行為を依頼した</strong>という意味です。◎
+                「下書きを作って」は「送って」という承認にはなりません。◎
+              </p>
+            </aside>
+            <h3 id="3-2-変更できないもの">3-2. 変更できないもの</h3>
+            <p>Custom Rules で次のものは<strong>オフにできません</strong>。◎</p>
+            <ul>
+              <li>中核の安全要件(例:パスワード変更ではあなたに操作を返す)</li>
+              <li>Auto-review(別の安全チェック)</li>
+              <li>プロアクティブ調査の制限(読み取り専用)</li>
+            </ul>
+            <h3 id="3-3-設定場所">3-3. 設定場所</h3>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>画面</th>
+                    <th>場所</th>
+                    <th>確度</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>モバイル</td>
+                    <td>Customize → Custom rules</td>
+                    <td>◎</td>
+                  </tr>
+                  <tr>
+                    <td>デスクトップ</td>
+                    <td>Settings → Personalization → Permissions</td>
+                    <td>○</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p>
+              dot
+              にルール案を作らせることもできますが、<strong>ルールの変更には、あなたの承認が必要</strong>です。◎
+            </p>
+            <h3 id="3-4-初期設定の例コピーして使えます">3-4. 初期設定の例(コピーして使えます)</h3>
+            <p>次のプロンプトで、厳しめのルールを dot と一緒に作れます。△</p>
+            <div class="code-block">
+              <div class="code-lang">markdown</div>
+              <pre><code class="language-markdown">Custom Rules を一緒に作りたいです。最初は厳しめにしてください。
+
+- メールやメッセージの送信は、毎回、実行前に私に確認する
+- 購入や支払いは必ず私に引き渡す
+- パスワードや金銭に関わる操作は必ず私に引き渡す
+- 私の個人情報を、このチャット以外へ共有しない
+
+各ルールを1つずつ見せて、私が承認してから保存してください。
+</code></pre>
+            </div>
+            <h3 id="3-5-ルールを決める2つの質問">3-5. ルールを決める「2つの質問」</h3>
+            <p>どの挙動を選ぶか迷ったら、次の判断で整理できます。△</p>
+            <div class="diagram-card">
+              <div class="diagram-wrap"><div class="diagram-canvas" data-diagram-id="6"></div></div>
+            </div>
+            <aside class="callout">
+              <p>
+                <strong>覚えておくこと</strong>: OpenAI 自身も「dot
+                は<strong>ルールに従っているつもりでも</strong>間違えることがある」と明記しています。◎
+                ルールは「やらせない保証」ではなく**「やらせたくない方向への強い指示」**と考え、公開物や金銭は最終ボタンを人に残してください。△
+              </p>
+            </aside>
+          </section>
+          <section class="section">
+            <h2 id="step-4-最初の仕事を任せるブリーフの書き方">
+              Step 4: 最初の仕事を任せる(ブリーフの書き方)
+            </h2>
+            <h3 id="4-1-最初の原則-質問ではなく仕事を渡す">
+              4-1. 最初の原則: 「質問」ではなく「仕事」を渡す
+            </h3>
+            <p>
+              dot
+              には、孤立したプロンプトではなく、**「継続して見ておいてほしいこと」**から始めるよう
+              OpenAI のガイドが勧めています。○(Forbes が OpenAI のガイダンスとして紹介)
+            </p>
+            <h3 id="4-2-良いブリーフの5要素">4-2. 良いブリーフの5要素</h3>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>要素</th>
+                    <th>書くこと</th>
+                    <th>例</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>ゴール</td>
+                    <td>何を達成したいか(結果)</td>
+                    <td>「来週の新機能リリースを予定通り進める」</td>
+                  </tr>
+                  <tr>
+                    <td>情報源</td>
+                    <td>どこを正とするか</td>
+                    <td>「進捗は共有スプレッドシート『リリース管理』を正とする」</td>
+                  </tr>
+                  <tr>
+                    <td>成果物</td>
+                    <td>何をいつ出すか</td>
+                    <td>「毎週月曜9時に、遅れている項目の要約」</td>
+                  </tr>
+                  <tr>
+                    <td>権限の範囲</td>
+                    <td>やってよいこと・いけないこと</td>
+                    <td>「下書きは自由。送信は私の確認後」</td>
+                  </tr>
+                  <tr>
+                    <td>レビュー点</td>
+                    <td>どこで人が見るか</td>
+                    <td>「外部に出る文面は私が確認」</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <aside class="callout">
+              <p>
+                <strong>コツ(重要)</strong>:
+                手順を細かく書くより、<strong>ゴール・制約・完了条件</strong>を渡すほうが、最近のエージェントには効果的です。Ethan
+                Mollick
+                氏は、手順を1つずつ指示するプロンプトの価値が新しいモデルでは小さくなっていると述べています。→
+                <a href="#132-ethan-mollickwharton-教授one-useful-thing">13.2</a>
+              </p>
+            </aside>
+            <h3 id="4-3-最初の自己紹介プロンプトおすすめ">
+              4-3. 最初の自己紹介プロンプト(おすすめ)
+            </h3>
+            <p>最初に、dot に「あなたの仕事」を聞き取らせます。△</p>
+            <div class="code-block">
+              <div class="code-lang">markdown</div>
+              <pre><code class="language-markdown">自己紹介をしてください。そのあと、私の働き方を1問ずつ質問してください。
+聞くこと: 私の役割、今四半期の優先事項、使っているツール、良い仕事の基準。
+
+メモは短くしてください。
+パスワードや金融情報など、機微な情報は保存しないでください。
+私が「OK」と言うまで、このチャット以外での行動はしないでください。
+</code></pre>
+            </div>
+            <h3 id="4-4-週次ステータスのブリーフテンプレート">
+              4-4. 週次ステータスのブリーフ(テンプレート)
+            </h3>
+            <div class="code-block">
+              <div class="code-lang">markdown</div>
+              <pre><code class="language-markdown"># ミッション
+毎週金曜16時までに、今週の進捗レポートの下書きを作ってください。
+
+# 情報源
+- カレンダーの今週の会議
+- 共有ドキュメント「週次メモ」
+
+# 成果物の形式
+- 完了 / 次にやること / 判断が必要なこと の3セクション
+- 各項目に、根拠にした元メモの箇所を添える
+
+# ルール
+- 下書きまでは自由に作成してよい
+- メールやメッセージの送信は、必ず私に確認する
+- 情報が足りないときは、推測せず質問する
+</code></pre>
+            </div>
+            <h3 id="4-5-最初の1週間におすすめの小さな仕事">
+              4-5. 最初の1週間におすすめの「小さな仕事」
+            </h3>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>仕事</th>
+                    <th>理由</th>
+                    <th>権限</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>毎朝のカレンダー確認と予定の要約</td>
+                    <td>読み取りのみで安全</td>
+                    <td>読み取り</td>
+                  </tr>
+                  <tr>
+                    <td>週次ステータスの下書き</td>
+                    <td>下書きで止められる</td>
+                    <td>読み取り+下書き</td>
+                  </tr>
+                  <tr>
+                    <td>調べ物の定点観測(競合・ニュース)</td>
+                    <td>背景調査に向く</td>
+                    <td>読み取り</td>
+                  </tr>
+                  <tr>
+                    <td>請求書の下書き(送信は承認後)</td>
+                    <td>事例が公式にあり、承認の流れを体験できる</td>
+                    <td>下書き+確認後送信</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+          <section class="section">
+            <h1 id="part-3-任せる">Part 3: 任せる</h1>
+          </section>
+          <section class="section">
+            <h2 id="step-5-定期タスクとバックグラウンド調査">
+              Step 5: 定期タスクとバックグラウンド調査
+            </h2>
+            <h3 id="5-1-定期タスクスケジュール">5-1. 定期タスク(スケジュール)</h3>
+            <p>
+              dot
+              に「毎朝カレンダーを確認して今日の予定を教えて」のように頼むと、<strong>定期実行</strong>されます。◎
+            </p>
+            <ul>
+              <li>実行履歴は会話に表示される ◎</li>
+              <li>
+                dot のプロフィールの
+                <strong>In progress / Scheduled / Completed</strong> で状況を確認できる ◎
+              </li>
+              <li>タスクを開いて、繰り返しの頻度・時刻・完了通知を変更できる ◎</li>
+              <li>
+                「決まった時刻に動かしたい仕事」には、スケジュールを明示して保存する。スケジュールには、仕事の内容、タイムゾーン、通知条件、通知先を含める
+                ○
+              </li>
+            </ul>
+            <div class="code-block">
+              <div class="code-lang">markdown</div>
+              <pre><code class="language-markdown">毎週月曜の朝7時(日本時間)に、今週のカレンダーと
+Google Drive の「計画メモ」を確認してください。
+
+- 重要な変更や衝突があるときだけ、私に個別にメッセージを送る
+- 何もなければ「特になし」と週次のまとめに書く(水増しはしない)
+- ファイルの変更や送信はしない(読み取りのみ)
+</code></pre>
+            </div>
+            <aside class="callout">
+              <p>
+                <strong>ポイント</strong>:
+                通知は「毎回」ではなく**「判断が必要なときだけ」**にすると、見守りの負担が減ります。△
+              </p>
+            </aside>
+            <h3 id="5-2-プロアクティブ調査頼まれていない時間の動き">
+              5-2. プロアクティブ調査(頼まれていない時間の動き)
+            </h3>
+            <p>
+              dot
+              は、あなたが操作していない間に、背景で<strong>接続済みの情報源を読み取り、役立ちそうな提案を探す</strong>ことがあります。◎
+            </p>
+            <p>この機能は<strong>コードで制限</strong>されており、次のことはできません。◎</p>
+            <ul>
+              <li>他の人にメッセージを送る</li>
+              <li>プラグイン経由でコンテンツを変更する</li>
+              <li>ブラウザやコンピュータを操作する</li>
+            </ul>
+            <div class="diagram-card">
+              <div class="diagram-wrap"><div class="diagram-canvas" data-diagram-id="7"></div></div>
+            </div>
+            <p>
+              <strong>重要</strong>:
+              能動的な調査用のツールは<strong>直接メッセージを送信できません</strong>。調査で見つけたことを実行に移す段階では、<strong>通常の行動ルールと安全チェックが適用</strong>されます。これらのチェックはミスを減らしますが、完全になくすものではありません。◎
+            </p>
+          </section>
+          <section class="section">
+            <h2 id="step-6-チャンネルと自分の-pc-をつなぐ">
+              Step 6: チャンネルと自分の PC をつなぐ
+            </h2>
+            <h3 id="6-1-チャンネル連絡手段">6-1. チャンネル(連絡手段)</h3>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>チャンネル</th>
+                    <th>設定方法</th>
+                    <th>注意点</th>
+                    <th>確度</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>ChatGPT(デスクトップアプリ・デスクトップ Web・モバイルアプリ)</td>
+                    <td>そのまま</td>
+                    <td>
+                      メッセージはデスクトップアプリ・デスクトップ
+                      Web・モバイルアプリのいずれでも可能。<strong
+                        >dot との通話は ChatGPT モバイルアプリのみ</strong
+                      >。ローンチ時点では dot からあなたへ<strong>発信はできない</strong>
+                    </td>
+                    <td>◎</td>
+                  </tr>
+                  <tr>
+                    <td>Slack</td>
+                    <td>デスクトップで連携を設定</td>
+                    <td>
+                      チャンネルに追加しただけでは監視は始まらない。<strong
+                        >監視するチャンネルとイベント(例: 不具合報告の投稿)を指定</strong
+                      >し、作成されたタスクの<strong>条件と状態を確認</strong>する
+                    </td>
+                    <td>◎ / ○</td>
+                  </tr>
+                  <tr>
+                    <td>Microsoft Teams</td>
+                    <td>
+                      組織の設定が必要。Enterprise 管理ガイドでは招待制のアルファと記載されている
+                    </td>
+                    <td>管理者の許可が必要</td>
+                    <td>○</td>
+                  </tr>
+                  <tr>
+                    <td>テキストメッセージ</td>
+                    <td>
+                      ChatGPT モバイルアプリ、デスクトップアプリ、またはデスクトップ Web の dot
+                      プロフィールから電話を接続
+                    </td>
+                    <td>
+                      限定ベータ(米国の一部 Pro のみ)。<strong
+                        >iMessage または RCS が必要で、SMS には非対応</strong
+                      >。<strong
+                        >iMessage や RCS
+                        を使っても、テキストメッセージはエンドツーエンド暗号化されない</strong
+                      >。第三者プロバイダー経由なので、<strong>機微な情報の送信には注意</strong>。<code
+                        >STOP</code
+                      >
+                      と返信すると dot からの送信が止まる
+                    </td>
+                    <td>◎</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <aside class="callout">
+              <p>
+                <strong>覚えておくこと</strong>:
+                通話を終えても、<strong>頼んだ作業が止まるとは限りません</strong>。作業を止めたいときは、Pause
+                やタスクの停止を使いましょう。○
+              </p>
+            </aside>
+            <h3 id="6-2-あなた自身の-pc-を使わせる任意">6-2. あなた自身の PC を使わせる(任意)</h3>
+            <ul>
+              <li>既定は<strong>オフ</strong>。dot は専用のクラウド PC で動く ◎</li>
+              <li>
+                接続するには、<strong>その PC の ChatGPT デスクトップアプリ</strong
+                >で操作し、「アクセスを許可」を確認する。取り消しは「アクセスを取り消す」◎
+              </li>
+              <li>
+                接続すると、dot
+                はローカルのファイルを扱ったり、ローカルのスキルやブラウザを使えるようになる(クラウドのブラウザがブロックされたときに有効)◎
+              </li>
+              <li>作業中は、接続した PC がオンラインで ChatGPT アプリを開いている必要がある ○</li>
+            </ul>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>使う場面</th>
+                    <th>判断</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>調査・下書き・スケジュール管理</td>
+                    <td>接続<strong>不要</strong>(クラウドPCで足りる)</td>
+                  </tr>
+                  <tr>
+                    <td>手元のファイルを直接扱わせたい</td>
+                    <td>必要になった時点で接続</td>
+                  </tr>
+                  <tr>
+                    <td>機密ファイルが多いPC</td>
+                    <td>接続を<strong>避ける</strong>か、作業用の別PCを使う</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <aside class="callout">
+              <p>
+                <strong>ベストプラクティス</strong>:
+                ローカル接続は「<strong>必要な期間だけオン、終わったら取り消す</strong>」運用が安全です。△
+              </p>
+            </aside>
+          </section>
+          <section class="section">
+            <h2 id="step-7-見守る止めるやり直す">Step 7: 見守る・止める・やり直す</h2>
+            <h3 id="7-1-見守る-activity-view">7-1. 見守る: Activity View</h3>
+            <p>
+              デスクトップアプリの
+              <strong>Activity View</strong>
+              では、進行中・委任中のタスクと状態を確認でき、<strong>文脈の追加・誤解の訂正・方向転換・停止の指示</strong>ができます。◎
+              また、dot のプロフィールから<strong>dot の専用 PC を開いて</strong
+              >、作業の様子を直接見ることもできます。◎
+            </p>
+            <h3 id="7-2-止める-停止の4つの手段">7-2. 止める: 停止の4つの手段</h3>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>操作</th>
+                    <th>効果</th>
+                    <th>注意</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Pause(プロフィールの「…」メニュー)</td>
+                    <td>dot を一時停止し、<strong>Resume するまで</strong>止める</td>
+                    <td>
+                      委任したタスクは Activity、定期タスクの状態と操作は Scheduled で確認する
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Activity</td>
+                    <td>個別の委任タスクを開いて確認・停止</td>
+                    <td>タスクごとに操作</td>
+                  </tr>
+                  <tr>
+                    <td>Scheduled</td>
+                    <td>定期タスクを無効化・削除</td>
+                    <td>繰り返しを止めたいときに使う</td>
+                  </tr>
+                  <tr>
+                    <td>Resume</td>
+                    <td>一時停止から再開</td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p>出典: 公式ドキュメントの内容を二次資料経由で整理 ○</p>
+            <aside class="callout">
+              <p>
+                <strong>重要</strong>:
+                <strong
+                  >Pause や Delete(dot
+                  の削除)は、完了済みの変更を自動的にロールバックしません</strong
+                >。取り消しや復元ができるかどうかは操作の種類と接続アプリによって異なるため、必要に応じて接続アプリ側の復元手段(送信取り消し、変更履歴、ゴミ箱など)を確認してください。○
+                だからこそ、事前の Custom Rules が大切です。
+              </p>
+            </aside>
+            <h3 id="7-3-削除する-deletedot-の削除">7-3. 削除する: Delete(dot の削除)</h3>
+            <p>
+              Delete は、dot
+              の<strong>コンテキスト・保存済みメモリ・定期タスクを削除</strong>し、dot
+              の<strong>メインの会話はアーカイブ</strong>します(会話そのものが削除されるわけではありません)。◎
+              一方で、dot が作成したファイルや、別に作られた Work・Codex のチャットは残ります。○
+            </p>
+            <aside class="callout">
+              <p>
+                <strong>注意</strong>:
+                <strong>削除した dot は復元できません</strong
+                >。確定する前に、削除内容を必ず確認してください。
+              </p>
+            </aside>
+            <p>
+              手順: dot のプロフィール → 「…」メニュー → <strong>Delete</strong> を選ぶ →
+              削除内容を確認 → <strong>Delete</strong> を押して確定 ◎
+            </p>
+            <aside class="callout">
+              <p>
+                <strong>覚えておくこと</strong>: ローンチ時点では、dot
+                が持つ<strong>個別のメモリを見たり編集・削除することはできず</strong>、消す方法は
+                dot の Delete のみでした。◎ 機微な情報は、そもそも教えないのが最善です。
+              </p>
+            </aside>
+          </section>
+          <section class="section">
+            <h1 id="part-4-守る">Part 4: 守る</h1>
+          </section>
+          <section class="section">
+            <h2 id="8-安全設計を理解する">8. 安全設計を理解する</h2>
+            <p>OpenAI は、dots の安全を<strong>多層</strong>で作っていると説明しています。◎</p>
+            <div class="diagram-card">
+              <div class="diagram-wrap"><div class="diagram-canvas" data-diagram-id="8"></div></div>
+            </div>
+            <h3 id="81-行動ルールの標準的な分類">8.1 行動ルールの標準的な分類</h3>
+            <p>OpenAI の安全性投稿とヘルプセンターに基づく整理です(二次資料経由 ○)。</p>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>区分</th>
+                    <th>例</th>
+                    <th>既定の扱い</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>読む・準備する</td>
+                    <td>許可された情報の閲覧、分析、会話内の下書き</td>
+                    <td>アプリの権限内で実行</td>
+                  </tr>
+                  <tr>
+                    <td>情報を共有する</td>
+                    <td>メッセージやファイルの送信</td>
+                    <td>
+                      共有する情報と相手の種類をカバーする承認が必要。健康情報は相手の指名が必須
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>購入</td>
+                    <td>加盟店サイトに保存済みのカードで購入</td>
+                    <td>承認が必要(事前承認も、その購入を具体的にカバーする場合のみ可)</td>
+                  </tr>
+                  <tr>
+                    <td>毎回確認(推奨設定)</td>
+                    <td>
+                      データの完全削除、出所不明のソフトのインストール、新しいセキュリティ関連アクセスの付与
+                    </td>
+                    <td>
+                      承認が必要になる場合がある(常に求められるとは限らない)。安全のため「毎回確認」にしておくことを推奨
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>あなたに引き渡す</td>
+                    <td>パスワード変更、金融口座間の送金</td>
+                    <td>あなたが自分で行う</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p>さらに、次の2点が明記されています。◎</p>
+            <ul>
+              <li>
+                1通のメッセージを承認しても、<strong
+                  >以後ずっと連絡してよいという許可にはならない</strong
+                >
+              </li>
+              <li>
+                後で作業を続けても、他の dot に委任しても、<strong>承認の範囲は広がらない</strong>
+              </li>
+            </ul>
+            <h3 id="82-auto-review-の流れ">8.2 Auto-review の流れ</h3>
+            <p>
+              対象となる操作(メッセージ送信やファイル変更など)について、実行前に別の安全システムが、あなたの指示・Custom
+              Rules・安全要件に照らして計画をチェックします。◎
+              たとえばメールなら、宛先と内容を確認し、<strong>宛先の間違いや意図しない情報漏えい</strong>のリスクを減らします(ただし、完全になくすものではありません)。◎
+            </p>
+            <div class="diagram-card">
+              <div class="diagram-wrap"><div class="diagram-canvas" data-diagram-id="9"></div></div>
+            </div>
+            <aside class="callout">
+              <p>
+                Auto-review
+                は「権限を与えるもの」ではなく、<strong>別の審査役を挟んで確認する仕組み</strong>です(「reviewer
+                swap, not a permission grant」)。○
+                <strong>あなたが承認しても、中核の安全要件は上書きできません。</strong>◎
+              </p>
+            </aside>
+            <h3 id="83-認証情報パスワードの扱い">8.3 認証情報(パスワード)の扱い</h3>
+            <ul>
+              <li>
+                対応しているサイトでは、<strong>ログインフォームの入力中はモデルを一時停止</strong>し、認証情報をモデルに見せずにブラウザ環境へ直接送る
+                ○
+              </li>
+              <li>
+                対応した保存済みパスワードの流れでは、暗号化された専用サービスが認証情報を渡し、モデルには渡さない
+                ○
+              </li>
+              <li>
+                ただし、<strong
+                  >チャット・ドキュメント・プラグインに貼り付けたパスワードは、モデルから見える可能性がある</strong
+                >
+                ○
+              </li>
+            </ul>
+            <aside class="callout">
+              <p>
+                <strong>鉄則</strong>: パスワードや認証コードを、dot
+                のチャットに<strong>貼り付けない</strong>。サインインが必要なときは、dot
+                のブラウザ画面で自分が入力する。◎
+              </p>
+            </aside>
+            <h3 id="84-プロンプトインジェクションへの備え">
+              8.4 プロンプトインジェクションへの備え
+            </h3>
+            <p>
+              Web ページ・メール・ドキュメントに埋め込まれた<strong>悪意ある指示</strong>が、dot
+              の行動に化けるリスクがあります。OpenAI
+              はモデルの安全対策、ツールの制限、行動前のチェック、監視を組み合わせて対処すると説明しており、<strong>リスクを減らすが、なくすものではない</strong>と述べています。◎
+              / ○
+            </p>
+            <p>あなたにできる対策:</p>
+            <ol>
+              <li>
+                <strong>信頼できない相手のメールやファイルを、dot に大量に処理させない</strong
+                >(特に送信権限があるとき)△
+              </li>
+              <li><strong>外部への送信は「毎回確認」にする</strong>(Step 3)△</li>
+              <li>不審な動きを見つけたら、すぐ <strong>Pause</strong>(Step 7)</li>
+            </ol>
+            <h3 id="85-限界を知る評価結果から">8.5 限界を知る(評価結果から)</h3>
+            <p>
+              OpenAI は GPT-6 Astra の System Card に dots
+              の付録を追加し、プロンプトインジェクションや権限の遵守を評価しています。○
+            </p>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>評価</th>
+                    <th>報告された結果(二次資料経由)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>大量の攻撃メールを混ぜた評価</td>
+                    <td>スコア上の攻撃成功なし</td>
+                  </tr>
+                  <tr>
+                    <td>Auto-review を守るか</td>
+                    <td>
+                      OpenAI 公式の Auto-review 記事によると、Codex
+                      の社内運用スナップショットではレビュー対象に上がった操作の拒否率は約1%(720件中7件)。検出率(recall)はそれぞれ別の合成評価の値で、プロンプトインジェクションの合成評価で
+                      99.3%、全攻撃カテゴリの合成評価で 90.2%。dots の System Card
+                      評価は、編集なしの実リクエスト 5,000 件と、カテゴリごとに 30
+                      件の合成ケースで行われた。<strong>完全な安全を保証するものではない</strong>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>権限や範囲の変化への適応</td>
+                    <td>91.8% が合格(49件中45件)</td>
+                  </tr>
+                  <tr>
+                    <td>警告を尊重するか(不要な継続)</td>
+                    <td>15〜17%台で不要な継続が観測された</td>
+                  </tr>
+                  <tr>
+                    <td>連続タスクでの境界維持</td>
+                    <td>
+                      重大な逸脱なし。ただし中間タスクが5→10に倍増すると、中程度の範囲逸脱フラグが8.6%→19.7%に上昇
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <aside class="callout">
+              <p>
+                <strong>読み方</strong>:
+                結果は良好な項目が多い一方、「長い連続作業ほど境界がにじむ」「警告後も続けることがある」という傾向が報告されています。だからこそ、<strong
+                  >長時間の自動実行ほど、Pause と確認を人が握る</strong
+                >ことが大切です。△(数値の定義は System Card の原文を参照してください)
+              </p>
+            </aside>
+          </section>
+          <section class="section">
+            <h2 id="9-メモリとプライバシー">9. メモリとプライバシー</h2>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>項目</th>
+                    <th>内容</th>
+                    <th>確度</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>メモリ</td>
+                    <td>
+                      dot は ChatGPT
+                      のメモリと最近の会話の文脈を受け取り、自分のメモリも作る(接続アプリからも)。dot
+                      の会話は ChatGPT のメモリにも寄与しうる
+                    </td>
+                    <td>◎</td>
+                  </tr>
+                  <tr>
+                    <td>保持されないもの</td>
+                    <td>認証情報、画像、スクリーンショットは文脈に保持されない</td>
+                    <td>○</td>
+                  </tr>
+                  <tr>
+                    <td>削除</td>
+                    <td>
+                      dot 自身のメモリを消すには dot を Delete する。ChatGPT
+                      側のメモリは通常のメモリ設定で管理
+                    </td>
+                    <td>◎</td>
+                  </tr>
+                  <tr>
+                    <td>学習への利用(個人プラン)</td>
+                    <td>
+                      「Improve the model for everyone」の設定で、dot
+                      の会話や作業が学習に使われるか決まる
+                    </td>
+                    <td>◎</td>
+                  </tr>
+                  <tr>
+                    <td>学習への利用(Business・Enterprise・Edu)</td>
+                    <td>既定では学習に使わない</td>
+                    <td>◎</td>
+                  </tr>
+                  <tr>
+                    <td>背景調査のメモ</td>
+                    <td>
+                      直接は学習に使わない。ただし、調査の内容を適格な会話に持ち込むと、設定次第で使われうる
+                    </td>
+                    <td>◎</td>
+                  </tr>
+                  <tr>
+                    <td>人によるレビュー</td>
+                    <td>
+                      モデル改善をオフにしていても、安全関連などの限られた場合に人が確認することがある
+                    </td>
+                    <td>◎</td>
+                  </tr>
+                  <tr>
+                    <td>カメラ・マイク・画面</td>
+                    <td>
+                      利用には、まず PC を dot に接続し、そのうえで ChatGPT
+                      アプリにデバイスのアクセス許可を与える必要がある
+                    </td>
+                    <td>○</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <h3 id="91-プライバシーのベストプラクティス">9.1 プライバシーのベストプラクティス</h3>
+            <ol>
+              <li>
+                <strong>機微情報は教えない</strong>(診断情報・口座・認証情報)。教えたものは Delete
+                まで残る前提で考える △
+              </li>
+              <li>
+                <strong>学習への利用を避けたいなら</strong>、「Improve the model for
+                everyone」の設定を確認する ◎
+              </li>
+              <li>
+                <strong>接続を解除しただけで安心しない</strong>。取得済みの情報を消すには Delete
+                が必要 ◎
+              </li>
+              <li>
+                <strong>テキストメッセージで機微な情報をやり取りしない</strong
+                >(第三者プロバイダー経由)◎
+              </li>
+              <li>個人データの請求は、OpenAI の Privacy Portal から行える ◎</li>
+            </ol>
+          </section>
+          <section class="section">
+            <h2 id="10-1週間の運用ルーチン">10. 1週間の運用ルーチン</h2>
+            <p>
+              dot
+              は「設定して終わり」ではなく、<strong>観察して権限を少しずつ広げる</strong>ことで育ちます。△
+            </p>
+            <div class="diagram-card">
+              <div class="diagram-wrap">
+                <div class="diagram-canvas" data-diagram-id="10"></div>
+              </div>
+            </div>
+            <h3 id="101-日別の目安">10.1 日別の目安</h3>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>日</th>
+                    <th>やること</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Day 1</td>
+                    <td>
+                      dot を作成、アプリは1〜2個だけ接続し、<strong
+                        >接続と同時に既定の Custom Rules を確認して、そのまま使うと決める</strong
+                      >、読み取りの仕事を1つ任せる
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Day 2</td>
+                    <td>下書きの仕事を任せる。<strong>出力は必ず自分で確認</strong>する</td>
+                  </tr>
+                  <tr>
+                    <td>Day 3〜4</td>
+                    <td>
+                      良い点・悪い点を具体的に教える(例:
+                      「冗長で一般的すぎる。具体例を残して、冒頭の大げさな表現を削って」)。「ダメ」だけでは学習が進まない
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Day 5〜6</td>
+                    <td>
+                      承認プロンプトの傾向を見て、<strong>よく承認する行為だけ</strong>ルールを緩める。逆に、冷や汗をかいた行為は厳しくする
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Day 7</td>
+                    <td>下の週次振り返りを実施</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <h3 id="102-週次振り返りプロンプト">10.2 週次振り返りプロンプト</h3>
+            <div class="code-block">
+              <div class="code-lang">markdown</div>
+              <pre><code class="language-markdown">1週間お疲れさまでした。振り返りをしてください。
+
+1. 今週やった仕事を一覧にしてください
+2. 私に修正された点と、そこから学んだことを書いてください
+3. 判断に迷って止まった場面はありましたか
+4. 来週、権限を広げてよい行為と、絞るべき行為を提案してください
+
+提案だけにして、ルールの変更は私の承認後に行ってください。
+</code></pre>
+            </div>
+          </section>
+          <section class="section">
+            <h2 id="11-よくある失敗とトラブルシュート">11. よくある失敗とトラブルシュート</h2>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>失敗・症状</th>
+                    <th>原因</th>
+                    <th>対処</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>毎回、承認を求められて面倒</td>
+                    <td>ルールが厳しい、または依頼が曖昧</td>
+                    <td>
+                      頻繁に承認する<strong>低リスク</strong>の行為だけ、少しずつ緩める。事前承認にするには、依頼文で対象の行為を具体的に特定する。将来送るメッセージなら、送り先・内容・送信時刻または送信条件も指定する
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>勝手に送ってしまわないか不安</td>
+                    <td>送信のルール未設定</td>
+                    <td>
+                      送信は「実行前に確認」に設定。<strong
+                        >下書きの依頼は送信の承認ではない</strong
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>サインイン・認証コード・CAPTCHA で止まる</td>
+                    <td>本人確認が必要</td>
+                    <td>dot のブラウザ画面を開いて、自分でサインインを完了すると再開する</td>
+                  </tr>
+                  <tr>
+                    <td>権限エラー・メッセージが届かない</td>
+                    <td>初期のバグや権限設定</td>
+                    <td>プラグインの権限と、接続状態を確認。重要な業務では、まだ依存しすぎない</td>
+                  </tr>
+                  <tr>
+                    <td>長く動いていて止まらない</td>
+                    <td>委任タスクや定期タスクが残っている</td>
+                    <td>
+                      Pause で dot を一時停止すると、Resume するまで止まる。委任タスクは
+                      Activity、定期タスクは Scheduled で確認して停止
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>実行済みとあるのに成果物がない</td>
+                    <td>完了表示と成果物の配信は別</td>
+                    <td>
+                      「完了した」は成果物の到達の証拠ではない。<strong>成果物を自分で確認</strong>
+                      ○
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>ミスが再発する</td>
+                    <td>好みや基準が伝わっていない</td>
+                    <td>
+                      「ダメ」ではなく、<strong>何がどうダメで、どうしてほしいか</strong>を具体的に伝える
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Slack で勝手に動かない</td>
+                    <td>監視の指定がない</td>
+                    <td>
+                      監視するチャンネルとイベントを明示し、作成されたタスクの条件と状態を確認する
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>使用量の消費が気になる</td>
+                    <td>Work・Codex タスクはカウントされる</td>
+                    <td>
+                      dot
+                      との会話は上限にカウントされないが、起動されたタスクはカウントされる。大きな作業の前に範囲を確認
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>アプリを外したのに情報が残る</td>
+                    <td>接続解除は取得済み情報を消さない</td>
+                    <td>消したい場合は Delete</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+          <section class="section">
+            <h2 id="12-ベストプラクティスチェックリスト">12. ベストプラクティス・チェックリスト</h2>
+            <h3 id="作る前">作る前</h3>
+            <ul>
+              <li class="task">
+                <label
+                  ><input type="checkbox" /><span
+                    >自分のプランと地域が対象か確認した(Pro は EEA・スイス・英国が対象外)</span
+                  ></label
+                >
+              </li>
+              <li class="task">
+                <label
+                  ><input type="checkbox" /><span
+                    >最初の1週間は、重要業務に直結させないと決めた</span
+                  ></label
+                >
+              </li>
+              <li class="task">
+                <label
+                  ><input type="checkbox" /><span
+                    >費用と使用量の最新条件(最初の1か月の扱いなど)を確認した</span
+                  ></label
+                >
+              </li>
+            </ul>
+            <h3 id="設定">設定</h3>
+            <ul>
+              <li class="task">
+                <label
+                  ><input type="checkbox" /><span
+                    >接続するアプリは<strong>必要最小限</strong>にした</span
+                  ></label
+                >
+              </li>
+              <li class="task">
+                <label
+                  ><input type="checkbox" /><span
+                    >各プラグインの権限(読み取りのみか、変更・送信もできるか)を確認した</span
+                  ></label
+                >
+              </li>
+              <li class="task">
+                <label
+                  ><input type="checkbox" /><span
+                    ><strong>Custom Rules を決めた</strong>(送信・購入・パスワード・金銭)</span
+                  ></label
+                >
+              </li>
+              <li class="task">
+                <label
+                  ><input type="checkbox" /><span
+                    >外部への送信は「実行前に確認」または「引き渡し」にした</span
+                  ></label
+                >
+              </li>
+              <li class="task">
+                <label
+                  ><input type="checkbox" /><span
+                    >自分の PC への接続はオフのままにした(必要なときだけオン)</span
+                  ></label
+                >
+              </li>
+            </ul>
+            <h3 id="依頼">依頼</h3>
+            <ul>
+              <li class="task">
+                <label
+                  ><input type="checkbox" /><span
+                    >「質問」ではなく「仕事」として、ゴール・情報源・成果物・権限・レビュー点を書いた</span
+                  ></label
+                >
+              </li>
+              <li class="task">
+                <label
+                  ><input type="checkbox" /><span
+                    >手順の細かい指示ではなく、完了条件と制約を書いた</span
+                  ></label
+                >
+              </li>
+              <li class="task">
+                <label
+                  ><input type="checkbox" /><span
+                    >「下書きまで」「変更しない」を依頼文に明示した</span
+                  ></label
+                >
+              </li>
+            </ul>
+            <h3 id="運用">運用</h3>
+            <ul>
+              <li class="task">
+                <label
+                  ><input type="checkbox" /><span
+                    >パスワードや認証コードを dot のチャットに貼らない</span
+                  ></label
+                >
+              </li>
+              <li class="task">
+                <label><input type="checkbox" /><span>機微な情報は教えない</span></label>
+              </li>
+              <li class="task">
+                <label
+                  ><input type="checkbox" /><span
+                    >外部に出る成果物は、必ず自分で確認する</span
+                  ></label
+                >
+              </li>
+              <li class="task">
+                <label
+                  ><input type="checkbox" /><span
+                    >Pause・Activity・Scheduled の場所を覚えた</span
+                  ></label
+                >
+              </li>
+              <li class="task">
+                <label
+                  ><input type="checkbox" /><span
+                    >週に1回、振り返りをしてルールを見直す</span
+                  ></label
+                >
+              </li>
+              <li class="task">
+                <label
+                  ><input type="checkbox" /><span>不審な動きを見たら、すぐ Pause する</span></label
+                >
+              </li>
+            </ul>
+          </section>
+          <section class="section">
+            <h1 id="part-5-深める">Part 5: 深める</h1>
+          </section>
+          <section class="section">
+            <h2 id="13-国際的な開発者専門家の知見">13. 国際的な開発者・専門家の知見</h2>
+            <p>
+              発表後の公開情報から、<strong>著名な国際的開発者・研究者・メディアの発言</strong>を整理します。ここでは、**事実(何が書かれているか)**と、**本ガイドの解釈(実践への落とし込み)**を分けて書きます。
+            </p>
+            <h3 id="131-simon-willisondjango-共同作者datasettellm-cli-の作者">
+              13.1 Simon Willison(Django 共同作者、Datasette・LLM CLI の作者)
+            </h3>
+            <p>
+              <strong>ライブブログ(2026-09-29)</strong>: DevDay の基調講演を現地から実況し、dots
+              の挙動を観察しています。
+            </p>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>観察された事実</th>
+                    <th>本ガイドの解釈</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      dots は「Muse に非常によく似た」UI。OpenAI の社員は、Slack で dot
+                      に直接仕事を委任している
+                    </td>
+                    <td>「チャットで話す相手」ではなく「Slack にいる同僚」のように使う設計思想</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      ライブデモで、dot
+                      が反応しない「遅い朝」の場面があった。作成リンクがモバイルでは動かず、デスクトップを求められた
+                    </td>
+                    <td>
+                      <strong>初期は不安定な場面がある</strong
+                      >前提で、最初の1週間は重要業務に使わない
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      OpenAI の Thibault Sottiaux 氏は、dots は Codex
+                      ハーネスの信頼性と長時間タスク対応から生まれたと話した
+                    </td>
+                    <td>
+                      dots
+                      は<strong>コーディングエージェントの延長にある</strong>(長い作業に強い一方、権限設計が重要)
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      質疑で、「dot は ChatGPT
+                      で共有した情報に既定ではすべてアクセスするわけではない」「任せる責任と目標は、自分が納得できる範囲で与えられる」という趣旨の回答があった
+                    </td>
+                    <td><strong>権限は段階的に広げる</strong>のが公式の想定</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      同氏は、トークン量より**「ドル当たりの成果(outcome per
+                      dollar)」**を重視していると述べた
+                    </td>
+                    <td>使用量ではなく、<strong>成果で評価</strong>する</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p>
+              <strong
+                >投稿「We're going to need default hard budget caps on pretty much
+                everything」(2026-10-03)</strong
+              >:
+              コーディングエージェントや個人エージェントは、お金のかかるコードやサービスを簡単に立ち上げられる。だから、<strong
+                >「X ドルを超えたら止める」ハードな上限が既定である必要がある</strong
+              >(警告メールだけのソフトな上限では足りない)と主張しています。
+            </p>
+            <ul>
+              <li>
+                本ガイドの解釈: dots 自体の使用量は当面プランに含まれるが、<strong
+                  >dot に任せて外部の従量課金サービス・API・クラウドを動かす</strong
+                >場合は、<strong>そちら側にハードな予算上限を設定してから</strong>任せるのが安全です。△
+              </li>
+            </ul>
+            <h3 id="132-ethan-mollickwharton-教授one-useful-thing">
+              13.2 Ethan Mollick(Wharton 教授、One Useful Thing)
+            </h3>
+            <p><strong>記事「The Dot and the Swarm」(2026-10-01)</strong> の要点:</p>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>事実(記事の趣旨)</th>
+                    <th>本ガイドの解釈</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      「Bitter Lesson」:
+                      人間が手順を細かく設計する必要があると思っていたことが、より強いモデルで解決されてきた。プロンプトも同様で、手順を1つずつ導く価値は新しいモデルでは小さい
+                    </td>
+                    <td>
+                      ブリーフは<strong>手順ではなく、ゴール・制約・完了条件</strong>で書く(Step 4)
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      常時稼働の個人エージェントは、「何を伝えなくて済むか」が重要。文脈をメッセージから学び、計画を自分で立てる
+                    </td>
+                    <td>最初の自己紹介・聞き取りで、<strong>文脈を貯めさせる</strong>(Step 4-3)</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      自身のエージェントが、<strong>自分のミス</strong>(許可申請メールのプロジェクト番号の誤り)を見つけた
+                    </td>
+                    <td>
+                      dot
+                      は「自分のミスを見つけてくれる」利点がある一方、<strong>直す前に確認</strong>させる
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      ただし、エージェントが自己組織化して想定外の方向へ進むリスクも指摘(Hugging
+                      Face の事案への言及)
+                    </td>
+                    <td>承認・外部連絡・機微情報・未承認の行為は人が握る</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      別記事「Agency and
+                      Agents」で、エージェントが人に助けを求めるべき場面として、<strong>費用の支出・部外者への連絡・機微情報へのアクセス・未承認の行為</strong>などの承認が必要な場面を挙げている
+                    </td>
+                    <td>Step 3 の Custom Rules の根拠と一致</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p>
+              <strong>X への投稿(2026-10-15)</strong>: 自分の Dot
+              に<strong>専用のメールアドレス</strong>を持たせたところ「驚くほど簡単」で、次の理由で相性が良かったと述べています。
+            </p>
+            <ul>
+              <li>
+                <p>自分のメールで dot に下書き・送信をさせたくない</p>
+              </li>
+              <li>
+                <p>相手に<strong>AI とやりとりしていることが分かる</strong>ようにしたい</p>
+              </li>
+              <li>
+                <p>
+                  連絡は、カスタマーサービスや、自分が知らない情報の確認などに限り、個人的な知人には送らせない
+                </p>
+              </li>
+              <li>
+                <p>
+                  本ガイドの解釈: **「自分の代理で送る」より「AI
+                  として名乗って連絡する」**運用は、誤解や責任の所在の面で安全です。ただし、ローンチ時点のヘルプでは専用メールは未対応と記載されていたので、<strong>現在の対応状況は最新のヘルプで確認</strong>してください。△
+                </p>
+              </li>
+            </ul>
+            <h3 id="133-everydan-shipper-氏のチームの-vibe-check">
+              13.3 Every(Dan Shipper 氏のチーム)の Vibe Check
+            </h3>
+            <p>
+              Every のチームは、発表前から数日間 dots を実際に使い、「Vibe Check」を公開しています。
+            </p>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>事実(要約)</th>
+                    <th>本ガイドの解釈</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      うまく動くときは、ChatGPT の使い方が変わる。dot が ChatGPT
+                      のスレッドを束ね、メール・Slack を使う
+                    </td>
+                    <td>
+                      「<strong>窓口が1つ</strong>で、裏で他のツールを動かす」使い方が本来の強み
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      テストしたバージョンは<strong>バグが多く、権限の問題やメッセージの取りこぼし、アプリ内ブラウザへの接続失敗</strong>があり、推奨は1〜2週間待ってから、との判断
+                    </td>
+                    <td>
+                      <strong>初期の不安定さは前提</strong>。重要業務の依存は、安定を確認してから
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <h3 id="134-dan-mcateer早期テスター開発者">13.4 Dan McAteer(早期テスター、開発者)</h3>
+            <p>
+              OpenAI
+              が紹介した早期テスターの事例として、<strong>フリーランスの執筆の請求書</strong>を、dot
+              が背景でメールのスレッドから詳細を拾い、下書きを作り、<strong
+                >承認後に PDF で送信</strong
+              >した例があります。○(The Next Web 経由で AI Wiki が紹介)
+            </p>
+            <ul>
+              <li>
+                本ガイドの解釈:
+                「<strong>下書きまでは自動、送信は承認後</strong>」という流れが、最も公式の想定に近い成功パターンです。
+              </li>
+            </ul>
+            <h3 id="135-知見の共通点">13.5 知見の共通点</h3>
+            <div class="diagram-card">
+              <div class="diagram-wrap">
+                <div class="diagram-canvas" data-diagram-id="11"></div>
+              </div>
+            </div>
+          </section>
+          <section class="section">
+            <h2 id="14-補足-その他のベストプラクティスと根拠ソース">
+              14. 補足: その他のベストプラクティスと根拠ソース
+            </h2>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>ベストプラクティス</th>
+                    <th>根拠(要約)</th>
+                    <th>ソース</th>
+                    <th>確度</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>1</td>
+                    <td>孤立したプロンプトではなく、継続してほしい<strong>ジョブ</strong>を渡す</td>
+                    <td>
+                      OpenAI
+                      のガイダンスが「見ておいてほしいこと」から始めるよう勧めていると報じられている。ヘルプセンターも「目標を渡し、自分でやってよい範囲を決める」と説明
+                    </td>
+                    <td>
+                      <a
+                        href="https://www.forbes.com/sites/ronschmelzer/2026/10/05/what-are-openai-dots-and-do-you-need-them/"
+                        >https://www.forbes.com/sites/ronschmelzer/2026/10/05/what-are-openai-dots-and-do-you-need-them/</a
+                      >
+                      <br />
+                      <a href="https://help.openai.com/articles/20001530"
+                        >https://help.openai.com/articles/20001530</a
+                      >
+                    </td>
+                    <td>◎/○</td>
+                  </tr>
+                  <tr>
+                    <td>2</td>
+                    <td>
+                      <strong>接続の前か接続と同時に</strong> Custom Rules
+                      を決める。外部に出るものは「確認」か「引き渡し」
+                    </td>
+                    <td>
+                      公式 FAQ が Custom Rules
+                      を境界設定の手段として説明。ルールに従っても間違えることがあると明記
+                    </td>
+                    <td>
+                      <a
+                        href="https://help.openai.com/en/articles/20001529-dots-privacy-security-and-safety-faqs"
+                        >https://help.openai.com/en/articles/20001529-dots-privacy-security-and-safety-faqs</a
+                      >
+                    </td>
+                    <td>◎</td>
+                  </tr>
+                  <tr>
+                    <td>3</td>
+                    <td>「下書き」と「送信」を分けて依頼する</td>
+                    <td>OpenAI の説明では、返信の下書きを頼んでも送信の許可にはならない</td>
+                    <td>
+                      <a
+                        href="https://help.openai.com/en/articles/20001529-dots-privacy-security-and-safety-faqs"
+                        >https://help.openai.com/en/articles/20001529-dots-privacy-security-and-safety-faqs</a
+                      >
+                    </td>
+                    <td>◎</td>
+                  </tr>
+                  <tr>
+                    <td>4</td>
+                    <td>行為を「やり直せるか」「他人に届くか」の2軸で分類する</td>
+                    <td>
+                      実践者の整理。公式の行動ルールの分類(読む・共有・購入・削除・引き渡し)と整合
+                    </td>
+                    <td>
+                      <a href="https://gptdot.net/getting-started/"
+                        >https://gptdot.net/getting-started/</a
+                      >
+                    </td>
+                    <td>△</td>
+                  </tr>
+                  <tr>
+                    <td>5</td>
+                    <td>最初の1週間は既定のルールで、1つずつ承認して挙動を観察する</td>
+                    <td>
+                      既定では重要な行為の前に確認が入るため、基準の挙動を見てから調整するのが合理的
+                    </td>
+                    <td>
+                      <a href="https://www.aiagentslibrary.com/blog/how-to-use-openai-dots/"
+                        >https://www.aiagentslibrary.com/blog/how-to-use-openai-dots/</a
+                      >
+                    </td>
+                    <td>△</td>
+                  </tr>
+                  <tr>
+                    <td>6</td>
+                    <td>自分の PC への接続は必要時のみ</td>
+                    <td>公式ヘルプ: ローカルアクセスは任意で、既定はオフ。取り消しも可能</td>
+                    <td>
+                      <a
+                        href="https://help.openai.com/en/articles/20001530-getting-started-with-your-dot"
+                        >https://help.openai.com/en/articles/20001530-getting-started-with-your-dot</a
+                      >
+                    </td>
+                    <td>◎</td>
+                  </tr>
+                  <tr>
+                    <td>7</td>
+                    <td>パスワードをチャットに貼らない。サインインは dot のブラウザで本人が行う</td>
+                    <td>
+                      安全性投稿・FAQ:
+                      専用のセキュアサインインの流れはモデルに認証情報を見せない設計。貼り付けた値は見える可能性
+                    </td>
+                    <td>
+                      <a
+                        href="https://openai.com/index/how-we-build-safety-security-and-privacy-into-dots/"
+                        >https://openai.com/index/how-we-build-safety-security-and-privacy-into-dots/</a
+                      >
+                    </td>
+                    <td>◎/○</td>
+                  </tr>
+                  <tr>
+                    <td>8</td>
+                    <td>機微情報は教えない。消すなら Delete</td>
+                    <td>個別メモリは編集・削除できず、接続解除では取得済み情報が消えない</td>
+                    <td>
+                      <a href="https://help.openai.com/articles/20001530"
+                        >https://help.openai.com/articles/20001530</a
+                      >
+                      <br />
+                      <a
+                        href="https://help.openai.com/en/articles/20001529-dots-privacy-security-and-safety-faqs"
+                        >https://help.openai.com/en/articles/20001529-dots-privacy-security-and-safety-faqs</a
+                      >
+                    </td>
+                    <td>◎</td>
+                  </tr>
+                  <tr>
+                    <td>9</td>
+                    <td>外部の従量課金サービスには<strong>ハードな予算上限</strong>を先に設定</td>
+                    <td>
+                      エージェントは費用の発生するコードやサービスを簡単に立ち上げる。ソフトな警告では不十分
+                    </td>
+                    <td>
+                      <a href="https://simonwillison.net/2026/Oct/3/default-hard-budget-caps/"
+                        >https://simonwillison.net/2026/Oct/3/default-hard-budget-caps/</a
+                      >
+                    </td>
+                    <td>◎(主張は筆者の意見)</td>
+                  </tr>
+                  <tr>
+                    <td>10</td>
+                    <td>ブリーフは手順ではなく、ゴール・制約・完了条件で書く</td>
+                    <td>新しいモデルでは手順を細かく導くプロンプトの価値が小さい(Bitter Lesson)</td>
+                    <td>
+                      <a href="https://www.oneusefulthing.org/p/the-dot-and-the-swarm"
+                        >https://www.oneusefulthing.org/p/the-dot-and-the-swarm</a
+                      >
+                    </td>
+                    <td>◎(解釈は本ガイド)</td>
+                  </tr>
+                  <tr>
+                    <td>11</td>
+                    <td>
+                      エージェントに「いつ人に聞くか」を設計する(費用・外部連絡・機微情報・未承認の行為)
+                    </td>
+                    <td>エージェントが人に助けを求めるべき場面の整理</td>
+                    <td>
+                      <a href="https://www.oneusefulthing.org/p/agency-and-agents"
+                        >https://www.oneusefulthing.org/p/agency-and-agents</a
+                      >
+                    </td>
+                    <td>◎</td>
+                  </tr>
+                  <tr>
+                    <td>12</td>
+                    <td>AI として名乗って連絡させる(専用アドレス等)。ただし最新の対応状況を確認</td>
+                    <td>個人のメールでの代理送信を避け、相手に AI だと分かるようにする運用例</td>
+                    <td>
+                      <a href="https://x.com/emollick/status/2110557530531447165"
+                        >https://x.com/emollick/status/2110557530531447165</a
+                      >
+                    </td>
+                    <td>◎(個人の経験談)</td>
+                  </tr>
+                  <tr>
+                    <td>13</td>
+                    <td>初期は不安定な前提。重要業務の依存は1〜2週間様子を見る</td>
+                    <td>
+                      早期の実機レビューで、権限の問題やメッセージの取りこぼし、ブラウザ接続失敗が報告された
+                    </td>
+                    <td>
+                      <a href="https://every.to/live/openai-devday-2026"
+                        >https://every.to/live/openai-devday-2026</a
+                      >
+                      <br />
+                      <a
+                        href="https://every.to/vibe-check/vibe-check-dots-always-on-agents-in-chatgpt"
+                        >https://every.to/vibe-check/vibe-check-dots-always-on-agents-in-chatgpt</a
+                      >
+                    </td>
+                    <td>◎(検証は各自で)</td>
+                  </tr>
+                  <tr>
+                    <td>14</td>
+                    <td>長い連続作業ほど Pause と確認を人が握る</td>
+                    <td>
+                      System Card
+                      の付録で、連続タスクの増加により範囲逸脱フラグが上昇、警告後の不要な継続も観測
+                    </td>
+                    <td>
+                      <a href="https://deploymentsafety.openai.com/gpt-6-astra/change-log"
+                        >https://deploymentsafety.openai.com/gpt-6-astra/change-log</a
+                      >
+                    </td>
+                    <td>○</td>
+                  </tr>
+                  <tr>
+                    <td>15</td>
+                    <td>「完了」表示を成果物の到達の証拠としない</td>
+                    <td>
+                      公式ドキュメントの内容として、完了した実行は、成果物が正しく作成・配信された証拠にはならないとされる
+                    </td>
+                    <td>
+                      <a href="https://learn.chatgpt.com/docs/dots/tasks-and-memory"
+                        >https://learn.chatgpt.com/docs/dots/tasks-and-memory</a
+                      >
+                    </td>
+                    <td>○</td>
+                  </tr>
+                  <tr>
+                    <td>16</td>
+                    <td>通知は「判断が必要なときだけ」</td>
+                    <td>水増しをせず、重要なときだけ個別連絡する運用例</td>
+                    <td>
+                      <a href="https://www.aiagentslibrary.com/blog/openai-dots-prompts/"
+                        >https://www.aiagentslibrary.com/blog/openai-dots-prompts/</a
+                      >
+                    </td>
+                    <td>△</td>
+                  </tr>
+                  <tr>
+                    <td>17</td>
+                    <td>組織で使うなら、管理者設定とガバナンスを確認</td>
+                    <td>
+                      Enterprise は管理者が dot・Slack・ローカル PC・Custom Rules
+                      を個別に制御。スペシャリスト dot は Microsoft Agent 365 との統合を進行中
+                    </td>
+                    <td>
+                      <a href="https://learn.chatgpt.com/docs/enterprise/dots-admin-guide"
+                        >https://learn.chatgpt.com/docs/enterprise/dots-admin-guide</a
+                      >
+                      <br />
+                      <a href="https://thenewstack.io/openai-dots-gpt6-agents/"
+                        >https://thenewstack.io/openai-dots-gpt6-agents/</a
+                      >
+                    </td>
+                    <td>○</td>
+                  </tr>
+                  <tr>
+                    <td>18</td>
+                    <td>日本語の実利用レビューも参考にする</td>
+                    <td>
+                      日本のメディアが、dots
+                      を使った体験レビューを公開している(スマホでの便利さ、指示しなくても必要時に動く点)
+                    </td>
+                    <td>
+                      <a
+                        href="https://www.businessinsider.jp/article/2610-openai-dots-ai-agent-review/"
+                        >https://www.businessinsider.jp/article/2610-openai-dots-ai-agent-review/</a
+                      >
+                    </td>
+                    <td>△</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <aside class="callout">
+              <p>
+                凡例: ◎=一次資料を直接確認 / ○=二次資料経由 / △=実践者の工夫。URL の
+                <code>learn.chatgpt.com</code> は、二次資料(AI
+                Wiki)に記載された参照先で、今回は直接取得できていません。最新の内容は各自でご確認ください。
+              </p>
+            </aside>
+          </section>
+          <section class="section">
+            <h2 id="15-参考url一覧">15. 参考URL一覧</h2>
+            <h3 id="151-openai-公式一次資料">15.1 OpenAI 公式(一次資料)</h3>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>資料</th>
+                    <th>URL</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Introducing dots(日本語版・ご指定の起点)</td>
+                    <td>
+                      <a href="https://openai.com/ja-JP/index/introducing-dots/"
+                        >https://openai.com/ja-JP/index/introducing-dots/</a
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Introducing dots(英語版)</td>
+                    <td>
+                      <a href="https://openai.com/index/introducing-dots/"
+                        >https://openai.com/index/introducing-dots/</a
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>How we build safety, security, and privacy into dots</td>
+                    <td>
+                      <a
+                        href="https://openai.com/index/how-we-build-safety-security-and-privacy-into-dots/"
+                        >https://openai.com/index/how-we-build-safety-security-and-privacy-into-dots/</a
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Getting started with your dot(ヘルプセンター)</td>
+                    <td>
+                      <a href="https://help.openai.com/articles/20001530"
+                        >https://help.openai.com/articles/20001530</a
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Dots privacy, security, and safety FAQs</td>
+                    <td>
+                      <a
+                        href="https://help.openai.com/en/articles/20001529-dots-privacy-security-and-safety-faqs"
+                        >https://help.openai.com/en/articles/20001529-dots-privacy-security-and-safety-faqs</a
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>DevDay 2026 Recap</td>
+                    <td>
+                      <a href="https://openai.com/index/devday-2026-recap/"
+                        >https://openai.com/index/devday-2026-recap/</a
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>発表ポスト(X)</td>
+                    <td>
+                      <a href="https://x.com/OpenAI/status/2104984504133918973"
+                        >https://x.com/OpenAI/status/2104984504133918973</a
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>GPT-6 Astra System Card(dots の評価付録)</td>
+                    <td>
+                      <a
+                        href="https://deploymentsafety.openai.com/gpt-6-astra#sec:appendix-sol-luna"
+                        >https://deploymentsafety.openai.com/gpt-6-astra#sec:appendix-sol-luna</a
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      Auto-review of agent actions without synchronous human oversight(OpenAI
+                      Alignment)
+                    </td>
+                    <td>
+                      <a href="https://alignment.openai.com/auto-review/"
+                        >https://alignment.openai.com/auto-review/</a
+                      >
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <h3 id="152-国際的な開発者専門家">15.2 国際的な開発者・専門家</h3>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>発信者</th>
+                    <th>資料</th>
+                    <th>URL</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Simon Willison</td>
+                    <td>OpenAI DevDay 2026 live blog</td>
+                    <td>
+                      <a href="https://simonwillison.net/2026/Sep/29/openai-devday-2026-live-blog/"
+                        >https://simonwillison.net/2026/Sep/29/openai-devday-2026-live-blog/</a
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Simon Willison</td>
+                    <td>We're going to need default hard budget caps on pretty much everything</td>
+                    <td>
+                      <a href="https://simonwillison.net/2026/Oct/3/default-hard-budget-caps/"
+                        >https://simonwillison.net/2026/Oct/3/default-hard-budget-caps/</a
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Ethan Mollick</td>
+                    <td>The Dot and the Swarm</td>
+                    <td>
+                      <a href="https://www.oneusefulthing.org/p/the-dot-and-the-swarm"
+                        >https://www.oneusefulthing.org/p/the-dot-and-the-swarm</a
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Ethan Mollick</td>
+                    <td>Agency and Agents</td>
+                    <td>
+                      <a href="https://www.oneusefulthing.org/p/agency-and-agents"
+                        >https://www.oneusefulthing.org/p/agency-and-agents</a
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Ethan Mollick</td>
+                    <td>X: Dot に専用メールアドレスを持たせた経験(2026-10-15)</td>
+                    <td>
+                      <a href="https://x.com/emollick/status/2110557530531447165"
+                        >https://x.com/emollick/status/2110557530531447165</a
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Every(Dan Shipper 氏のチーム)</td>
+                    <td>Vibe Check: dots(実機検証)</td>
+                    <td>
+                      <a
+                        href="https://every.to/vibe-check/vibe-check-dots-always-on-agents-in-chatgpt"
+                        >https://every.to/vibe-check/vibe-check-dots-always-on-agents-in-chatgpt</a
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Every</td>
+                    <td>DevDay 2026 ライブ更新</td>
+                    <td>
+                      <a href="https://every.to/live/openai-devday-2026"
+                        >https://every.to/live/openai-devday-2026</a
+                      >
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <h3 id="153-報道解説">15.3 報道・解説</h3>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>媒体</th>
+                    <th>URL</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      The New Stack: OpenAI just launched Dots. Here's why they matter for
+                      developers
+                    </td>
+                    <td>
+                      <a href="https://thenewstack.io/openai-dots-gpt6-agents/"
+                        >https://thenewstack.io/openai-dots-gpt6-agents/</a
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>TechCrunch: OpenAI launches Dots, its bubbly agentic avatar</td>
+                    <td>
+                      <a
+                        href="https://techcrunch.com/2026/09/29/openai-launches-dots-its-bubbly-agentic-avatar/"
+                        >https://techcrunch.com/2026/09/29/openai-launches-dots-its-bubbly-agentic-avatar/</a
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      VentureBeat: OpenAI launches Dots, always-on AI agent coworkers, and ChatGPT
+                      Space
+                    </td>
+                    <td>
+                      <a
+                        href="https://venturebeat.com/technology/openai-launches-dots-always-on-ai-agent-coworkers-and-chatgpt-space-where-they-can-collaborate-with-human-teams"
+                        >https://venturebeat.com/technology/openai-launches-dots-always-on-ai-agent-coworkers-and-chatgpt-space-where-they-can-collaborate-with-human-teams</a
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Al Jazeera: OpenAI launches 'dots'</td>
+                    <td>
+                      <a
+                        href="https://www.aljazeera.com/economy/2026/9/30/openai-launches-dots-personal-ai-assistant-built-to-handle-everything"
+                        >https://www.aljazeera.com/economy/2026/9/30/openai-launches-dots-personal-ai-assistant-built-to-handle-everything</a
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Forbes: What Are OpenAI Dots And Do You Need Them?</td>
+                    <td>
+                      <a
+                        href="https://www.forbes.com/sites/ronschmelzer/2026/10/05/what-are-openai-dots-and-do-you-need-them/"
+                        >https://www.forbes.com/sites/ronschmelzer/2026/10/05/what-are-openai-dots-and-do-you-need-them/</a
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Business Insider Japan(日本語レビュー)</td>
+                    <td>
+                      <a
+                        href="https://www.businessinsider.jp/article/2610-openai-dots-ai-agent-review/"
+                        >https://www.businessinsider.jp/article/2610-openai-dots-ai-agent-review/</a
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>BGR: Everything OpenAI Announced At DevDay 2026</td>
+                    <td>
+                      <a href="https://www.bgr.com/2272332/openai-devday-2026-announcements/"
+                        >https://www.bgr.com/2272332/openai-devday-2026-announcements/</a
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>AI Wiki: Dots (OpenAI)(一次資料へのリンク集として有用)</td>
+                    <td>
+                      <a href="https://aiwiki.ai/wiki/openai_dots"
+                        >https://aiwiki.ai/wiki/openai_dots</a
+                      >
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <h3 id="154-実践ガイド実践者コミュニティ公式の保証ではありません">
+              15.4 実践ガイド(実践者・コミュニティ。公式の保証ではありません)
+            </h3>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>資料</th>
+                    <th>URL</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>gptdot.net: How to use ChatGPT Dots in 4 steps</td>
+                    <td>
+                      <a href="https://gptdot.net/getting-started/"
+                        >https://gptdot.net/getting-started/</a
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>AI Agents Library: How to Use OpenAI Dots</td>
+                    <td>
+                      <a href="https://www.aiagentslibrary.com/blog/how-to-use-openai-dots/"
+                        >https://www.aiagentslibrary.com/blog/how-to-use-openai-dots/</a
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>AI Agents Library: Dots プロンプト集</td>
+                    <td>
+                      <a href="https://www.aiagentslibrary.com/blog/openai-dots-prompts/"
+                        >https://www.aiagentslibrary.com/blog/openai-dots-prompts/</a
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>tosheo.ai: OpenAI dots チュートリアル</td>
+                    <td>
+                      <a href="https://www.tosheo.ai/ai-tools/openai-dots"
+                        >https://www.tosheo.ai/ai-tools/openai-dots</a
+                      >
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+          <section class="section">
+            <h2 id="16-用語集">16. 用語集</h2>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>用語</th>
+                    <th>説明</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>常時稼働エージェント</td>
+                    <td>会話が終わっても、背景で仕事を続けられるエージェント</td>
+                  </tr>
+                  <tr>
+                    <td>GPT-6 Astra</td>
+                    <td>dots を動かす OpenAI のフラッグシップモデル</td>
+                  </tr>
+                  <tr>
+                    <td>スペシャリスト dot</td>
+                    <td>
+                      組織が独自の ID・資格情報・権限を与えて、特定業務を担当させる dot(試験段階)
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>ChatGPT Space</td>
+                    <td>社員・ChatGPT・Codex・dots が共有の文脈で共同作業する場(DevDay で発表)</td>
+                  </tr>
+                  <tr>
+                    <td>Microsoft Agent 365</td>
+                    <td>
+                      Microsoft のエージェント向けの管理・セキュリティ基盤。スペシャリスト dot
+                      との統合を進行中
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>プロンプトインジェクション</td>
+                    <td>
+                      Web
+                      ページやメールなどに仕込まれた悪意ある指示で、エージェントを誤動作させる攻撃
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Pause / Delete</td>
+                    <td>
+                      一時停止 / dot
+                      の削除(コンテキスト・メモリ・定期タスクを消し、メインの会話はアーカイブする)
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+          <section class="section">
+            <h2 id="17-更新時の注意">17. 更新時の注意</h2>
+            <ul>
+              <li>
+                dots
+                は<strong>段階的な展開中</strong>で、機能・プラン・地域・料金が頻繁に変わります。<strong>特に次の項目は、使う前に最新情報を確認</strong>してください。
+                <ol>
+                  <li>最初の1か月の使用量の扱い(10月末に切り替わる可能性)</li>
+                  <li>Pro の対象ティア(100 / 200 / 500)</li>
+                  <li>モバイルからの dot の作成</li>
+                  <li>dot 専用メールアドレスの対応状況</li>
+                  <li>Teams・テキストメッセージの提供範囲</li>
+                </ol>
+              </li>
+              <li>
+                本ガイドの数値・仕様は <strong>2026年10月24日時点</strong>の公開情報に基づきます。
+              </li>
+              <li>
+                医療・法務・金融など、<strong>重大な判断を伴う業務</strong>では、dot
+                の出力を必ず専門家や自分で確認してください。OpenAI
+                も、重要な成果物は確認するよう案内しています。◎
+              </li>
+            </ul>
+          </section>
+        </main>
+        <footer class="footer">
+          本ガイドは 2026年10月24日時点の公開情報に基づきます。dots
+          は段階的な展開中のため、最新の仕様は必ず OpenAI のヘルプセンターで確認してください。
+        </footer>
+      </div>
+    </div>
+
+    <script
+      src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/highlight.min.js"
+      integrity="sha384-RH2xi4eIQ/gjtbs9fUXM68sLSi99C7ZWBRX1vDrVv6GQXRibxXLbwO2NGZB74MbU"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/mermaid@11.12.0/dist/mermaid.min.js"
+      integrity="sha384-o+g/BxPwhi0C3RK7oQBxQuNimeafQ3GE/ST4iT2BxVI4Wzt60SH4pq9iXVYujjaS"
+      crossorigin="anonymous"
+    ></script>
+    <script>
+      const DIAGRAMS = [
+        'flowchart TB\n  A["Part 1: 理解する<br/>dotsとは何か"] --> B["Part 2: 始める<br/>Step 0〜Step 4"]\n  B --> C["Part 3: 任せる<br/>Step 5〜Step 7"]\n  C --> D["Part 4: 守る<br/>安全設計と運用"]\n  D --> E["Part 5: 深める<br/>国際的な開発者の知見と補足ソース"]',
+        'flowchart LR\n  N1["通常のチャット 質問する"] --> N2["回答が返る"] --> N3["会話が終わる"]\n  D1["dot 目標と範囲を渡す"] --> D2["背景で作業が続く"]\n  D2 --> D3["進捗や確認依頼が届く"]\n  D3 --> D4["あなたが承認・修正"]\n  D4 --> D2',
+        'flowchart TB\n  U["あなた"] -->|"メッセージ"| CH["チャンネル<br/>ChatGPT デスクトップ・Web・モバイル<br/>Slack / Teams"]\n  U -->|"通話"| MB["ChatGPT モバイルアプリ<br/>通話はモバイルのみ"]\n  MB --> D\n  CH --> D["あなたの dot<br/>GPT-6 Astra"]\n  D --> CC["専用クラウドPC<br/>+ クラウドブラウザ"]\n  D --> PL["接続したプラグイン<br/>メール・カレンダー等"]\n  D -.->|"任意・既定ではオフ"| LC["あなた自身のPC<br/>ChatGPTデスクトップ経由"]\n  D --> CX["Codex / ChatGPT Work<br/>へ作業を委任"]\n  D -->|"結果・確認依頼"| CH',
+        'flowchart TD\n  Q["やりたいこと"] --> Q1{"1回で終わる?"}\n  Q1 -->|"はい: 質問や文章"| A["通常のChatGPT"]\n  Q1 -->|"はい: 作業を最後までやらせたい"| B["ChatGPT Work"]\n  Q1 -->|"はい: コードの作業"| C["Codex"]\n  Q1 -->|"いいえ: 継続して見守りたい"| D["dot"]\n  D --> E["必要に応じて Work や Codex に委任"]',
+        'flowchart LR\n  S0["Step 0<br/>資格と費用の確認"] --> S1["Step 1<br/>dotを作る"]\n  S1 --> S2["Step 2<br/>アプリを最小限接続<br/>接続と同時に既定ルールを確認"]\n  S2 --> S3["Step 3<br/>Custom Rules を確定"]\n  S3 --> S4["Step 4<br/>小さな仕事を任せる"]\n  S4 --> S5["1週間観察して権限を広げる"]',
+        'flowchart LR\n  A["デスクトップアプリ・デスクトップ Web・<br/>iOS/AndroidでChatGPTを開く"] --> B["dotを作成"]\n  B --> C["名前とキャラを選ぶ"]\n  C --> D["dotが自己紹介"]',
+        'flowchart TD\n  A["その行為は?"] --> B{"間違えても<br/>やり直せる?"}\n  B -->|"はい"| C{"自分以外の人に<br/>届く?"}\n  B -->|"いいえ"| H["あなたに引き渡す<br/>または 毎回確認"]\n  C -->|"いいえ: 調査・下書き"| F["確認なしで実行"]\n  C -->|"はい: 社内"| G["実行前に確認"]\n  C -->|"はい: 社外・お金・権限"| H',
+        'flowchart TD\n  A["あなたが操作していない時間"] --> B["背景で読み取り専用の調査"]\n  B --> C["非公開のメモを保存"]\n  C --> D{"役立つ提案がある?"}\n  D -->|"いいえ"| E["何もしない"]\n  D -->|"はい"| F["あなたに提案を通知"]\n  F --> G{"実行する?"}\n  G -->|"通常のルールと<br/>Auto-reviewを通過"| H["実行"]\n  G -->|"いいえ"| E',
+        'flowchart TB\n  L1["1. モデルの訓練<br/>意図の理解と安全ルールの順守"] --> L2["2. ChatGPT のセキュリティ<br/>暗号化・不審なログインの検知"]\n  L2 --> L3["3. 隔離された作業環境<br/>ユーザーごとに分離"]\n  L3 --> L4["4. 行動ルール<br/>Custom Rules と必須の確認"]\n  L4 --> L5["5. Auto-review<br/>実行前の別チェック"]\n  L5 --> L6["6. 監視<br/>逸脱や回避の試みを検知"]\n  L6 --> L7["7. あなた<br/>Activity View と Pause"]',
+        'flowchart TD\n  A["dotが行動を計画"] --> B["Auto-review が確認<br/>指示・Custom Rules・安全要件"]\n  B --> C{"許可?"}\n  C -->|"はい"| D["実行"]\n  C -->|"いいえ"| E["理由をdotに返す"]\n  E --> F{"dotの次の動き"}\n  F --> G["あなたに追加情報や承認を求める"]\n  F --> H["許可される別の方法を試す"]\n  F --> I["あなたに引き渡す"]\n  F --> J["停止する"]',
+        'flowchart LR\n  A["Day 1-2<br/>読み取りと下書きのみ"] --> B["Day 3-4<br/>結果を確認して<br/>好みを教える"]\n  B --> C["Day 5-6<br/>ルールを見直す"]\n  C --> D["Day 7<br/>振り返り"]\n  D --> E{"ミスが再現する?"}\n  E -->|"はい"| F["権限を絞る<br/>ブリーフを直す"]\n  E -->|"いいえ"| G["権限を少し広げる"]\n  F --> A\n  G --> A',
+        'flowchart TD\n  A["国際的な開発者・専門家の共通する示唆"] --> B["仕事として任せる<br/>ゴールと制約を書く"]\n  A --> C["承認・外部連絡・お金は<br/>人が握る"]\n  A --> D["初期は不安定な前提で<br/>小さく始める"]\n  A --> E["コストと権限の<br/>上限を先に決める"]',
+      ];
+
+      (function () {
+        try {
+          if (window.hljs) {
+            document.querySelectorAll('.code-block pre code').forEach(function (el) {
+              window.hljs.highlightElement(el);
+            });
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      })();
+
+      async function renderDiagrams() {
+        const canvases = document.querySelectorAll('.diagram-canvas');
+        if (!window.mermaid) {
+          canvases.forEach(function (c) {
+            c.innerHTML =
+              '<p class="diagram-fail">図の描画ライブラリを読み込めませんでした。ネットワーク接続を確認してください。</p>';
+          });
+          return;
+        }
+        window.mermaid.initialize({
+          startOnLoad: false,
+          securityLevel: 'loose',
+          theme: 'base',
+          themeVariables: {
+            fontFamily: '"Noto Sans JP","Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif',
+            fontSize: '16px',
+            primaryColor: '#eceefb',
+            primaryBorderColor: '#3b3f8c',
+            primaryTextColor: '#1c1b19',
+            secondaryColor: '#faf0d6',
+            tertiaryColor: '#faf7f0',
+            lineColor: '#5a5a68',
+            textColor: '#1c1b19',
+            clusterBkg: '#faf7f0',
+            clusterBorder: '#ddd6c4',
+            edgeLabelBackground: '#ffffff',
+          },
+          flowchart: {
+            useMaxWidth: false,
+            htmlLabels: true,
+            curve: 'basis',
+            nodeSpacing: 40,
+            rankSpacing: 46,
+            padding: 12,
+          },
+        });
+        for (let i = 0; i < canvases.length; i++) {
+          const c = canvases[i];
+          const idx = parseInt(c.getAttribute('data-diagram-id'), 10);
+          try {
+            const out = await window.mermaid.render('mmd-' + idx, DIAGRAMS[idx]);
+            c.innerHTML = out.svg;
+            const svg = c.querySelector('svg');
+            if (svg) {
+              const vb = (svg.getAttribute('viewBox') || '').split(/[\s,]+/).map(Number);
+              if (vb.length === 4 && vb[2] > 0) {
+                svg.removeAttribute('width');
+                svg.removeAttribute('height');
+                svg.style.width = vb[2] + 'px';
+                svg.setAttribute('viewBox', vb[0] + ' ' + vb[1] + ' ' + vb[2] + ' ' + (vb[3] + 15));
+              }
+              svg.style.maxWidth = 'none';
+              svg.style.height = 'auto';
+              svg.style.overflow = 'visible';
+              svg.style.flexShrink = '0';
+            }
+          } catch (e) {
+            console.error('mermaid', idx, e);
+            c.innerHTML = '<p class="diagram-fail">この図は描画できませんでした。</p>';
+          }
+        }
+        document.documentElement.setAttribute('data-diagrams', 'done');
+      }
+      renderDiagrams();
+
+      /* navigation */
+      (function () {
+        const links = Array.from(document.querySelectorAll('#nav a'));
+        const targets = links.map(function (a) {
+          return document.getElementById(a.getAttribute('href').slice(1));
+        });
+        let ticking = false;
+        function update() {
+          ticking = false;
+          const limit = window.innerHeight * 0.25;
+          let cur = 0;
+          for (let i = 0; i < targets.length; i++) {
+            if (targets[i] && targets[i].getBoundingClientRect().top <= limit) cur = i;
+          }
+          links.forEach(function (a, i) {
+            a.classList.toggle('active', i === cur);
+          });
+        }
+        window.addEventListener(
+          'scroll',
+          function () {
+            if (!ticking) {
+              ticking = true;
+              requestAnimationFrame(update);
+            }
+          },
+          { passive: true },
+        );
+        window.addEventListener('resize', update);
+        update();
+        const body = document.body;
+        document.getElementById('menu-btn').addEventListener('click', function () {
+          body.classList.toggle('nav-open');
+        });
+        document.getElementById('scrim').addEventListener('click', function () {
+          body.classList.remove('nav-open');
+        });
+        links.forEach(function (a) {
+          a.addEventListener('click', function () {
+            body.classList.remove('nav-open');
+          });
+        });
+      })();
+    </script>
+  </body>
+</html>
