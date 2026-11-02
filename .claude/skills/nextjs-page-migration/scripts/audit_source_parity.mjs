@@ -200,6 +200,9 @@ function normalizeCalloutElement(openingTag, content) {
     const value = marker[0].toLowerCase();
     markers.add(value === "warning" ? "warn" : value === "note" ? "info" : value === "good" ? "tip" : value);
   }
+  if (!["warn", "info", "tip", "success"].some((variant) => markers.has(variant))) {
+    markers.add("info");
+  }
   return `${[...markers].sort().join("|")}::${matchKey(stripMarkup(content))}`;
 }
 
