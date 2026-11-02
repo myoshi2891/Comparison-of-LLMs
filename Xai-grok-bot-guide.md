@@ -173,7 +173,7 @@ flowchart LR
 
 - Grok Bot は **クラウドへのデータ保存が必須**で、Cursor の **Legacy Privacy Mode は非対応**です。
 - Legacy Privacy Mode のアカウントは、対応するデータ設定へ切り替えないと開始できません。
-- 学習利用のオプトアウトは、該当する Cursor アカウントのプライバシー設定に従います。
+- 学習利用のオプトアウトは、個人アカウントではそのアカウントのプライバシー設定に、チームのメンバーではチームの Privacy Mode(Team Settings で確認)に従います。
 
 ```mermaid
 flowchart TD
