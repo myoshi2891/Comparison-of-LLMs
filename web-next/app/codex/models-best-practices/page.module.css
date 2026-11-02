@@ -573,3 +573,10 @@
 .root .section :global(h3) {
   font-weight: 700;
 }
+
+/* 視差効果を減らす設定では、モバイル目次ドロワーの開閉アニメーションを止める。 */
+@media (prefers-reduced-motion: reduce) {
+  .root .sidebar {
+    transition: none;
+  }
+}

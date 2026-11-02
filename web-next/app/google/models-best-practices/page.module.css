@@ -726,3 +726,11 @@
     padding: 0;
   }
 }
+
+/* 視差効果を減らす設定では、モバイル目次ドロワーとチェックリスト進捗バーのアニメーションを止める。 */
+@media (prefers-reduced-motion: reduce) {
+  .root .sidebar,
+  .root .chk-progress .bar > :global(i) {
+    transition: none;
+  }
+}
