@@ -39,7 +39,7 @@ describe("ZaiGlmBestPracticesPage", () => {
       'GLM-5-Turbo: thinking は既定で有効(enabled)だが、thinking: {"type": "disabled"} で無効化できるため、軽量なターンでは無効化する。',
       'GLM-4.7 / GLM-4.7-Flash / GLM-4.7-FlashX: thinking.type が enabled(既定)のときは強制 thinking(必ず思考する)になるが、thinking: {"type": "disabled"} で無効化できるため、軽量なターンでは無効化する。',
       'GLM-5.3 / GLM-5.3-Flash / GLM-5.3-FlashX: thinking が強制で無効化できない(thinking.type は enabled のまま)ため、代わりに reasoning_effort: "low" を指定して思考量を抑える。',
-      "GLM-4.5-Flash など GLM-4.6 より前のモデル: thinking パラメータの対象外のため、指定せず省略する。",
+      'GLM-4.5 / GLM-4.5-Air / GLM-4.5-Flash: GLM-4.5 シリーズは thinking パラメータに対応しているため、軽量なターンでは thinking: {"type": "disabled"} で無効化する。GLM-4.5 より前のモデルは対象外のため、thinking を指定せず省略する。',
     ];
     expect(
       Array.from(item?.querySelectorAll("li") ?? []).map((li) => norm(li.textContent))
@@ -58,7 +58,7 @@ describe("ZaiGlmBestPracticesPage", () => {
         td.textContent?.replace(/\s+/g, " ").trim()
       )
     ).toEqual([
-      '複雑な推論タスクでのみreasoning_effort=maxを使い、軽量タスクではモデル別に、GLM-5.2 / GLM-5.1 / GLM-5 / GLM-4.6はthinkingを無効化、GLM-5-Turboも既定でenabledだがdisabledで無効化、GLM-4.7 / GLM-4.7-Flash / GLM-4.7-FlashXもenabled時は強制thinkingだがdisabledで無効化、GLM-5.3 系はthinkingを有効のままreasoning_effort: "low"、GLM-4.6 より前のモデルはthinkingを省略、と使い分けているか',
+      '複雑な推論タスクでのみreasoning_effort=maxを使い、軽量タスクではモデル別に、GLM-5.2 / GLM-5.1 / GLM-5 / GLM-4.6はthinkingを無効化、GLM-5-Turboも既定でenabledだがdisabledで無効化、GLM-4.7 / GLM-4.7-Flash / GLM-4.7-FlashXもenabled時は強制thinkingだがdisabledで無効化、GLM-5.3 系はthinkingを有効のままreasoning_effort: "low"、GLM-4.5 / GLM-4.5-Air / GLM-4.5-Flashはthinkingを無効化、GLM-4.5 より前のモデルはthinkingを省略、と使い分けているか',
       "7, 13",
     ]);
   });
