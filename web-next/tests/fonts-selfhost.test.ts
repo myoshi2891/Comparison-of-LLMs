@@ -114,9 +114,10 @@ describe("self-hosted Noto Sans JP - wiring", () => {
     expect(fontsTs).not.toContain("notoSansJp");
   });
 
-  it("keeps the latin-only fonts on next/font/google", () => {
-    expect(fontsTs).toContain("JetBrains_Mono");
-    expect(fontsTs).toContain("Syne");
+  it("keeps the latin fonts local without Google font resolution", () => {
+    expect(fontsTs).toContain("next/font/local");
+    expect(fontsTs).toContain("JetBrainsMono-Variable.ttf");
+    expect(fontsTs).toContain("Syne-Variable.ttf");
   });
 
   it("defines --font-sans in globals.css :root instead of next/font", () => {

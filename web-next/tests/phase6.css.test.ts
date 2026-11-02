@@ -166,8 +166,8 @@ describe("Phase 6 - globals.css color scale classes", () => {
 });
 
 describe("Phase 6 - fonts configuration (lib/fonts.ts)", () => {
-  it("imports from next/font/google", () => {
-    expect(fontsTs).toContain("next/font/google");
+  it("imports from next/font/local", () => {
+    expect(fontsTs).toContain("next/font/local");
   });
 
   it("does not configure Noto Sans JP via next/font/google", () => {
@@ -181,12 +181,12 @@ describe("Phase 6 - fonts configuration (lib/fonts.ts)", () => {
   });
 
   it("configures JetBrains Mono and exposes --font-mono variable", () => {
-    expect(fontsTs).toContain("JetBrains_Mono");
+    expect(fontsTs).toContain("JetBrainsMono-Variable.ttf");
     expect(fontsTs).toContain("--font-mono");
   });
 
   it("configures Syne and exposes --font-display variable", () => {
-    expect(fontsTs).toContain("Syne");
+    expect(fontsTs).toContain("Syne-Variable.ttf");
     expect(fontsTs).toContain("--font-display");
   });
 });
