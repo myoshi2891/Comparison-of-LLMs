@@ -152,3 +152,30 @@ test("plain callouts use the default info variant without accepting missing cont
  assert.equal(audit(source,page.replace('Full original explanation.','Short.')).status,1);
  assert.equal(audit(source,page.replace('data-variant="info"','data-variant="warn"')).status,1);
 });
+
+test("does not infer a good variant from unrelated attributes such as id", () => {
+ const source='<div class="callout" id="good-practices"><p>Original guidance text.</p></div>';
+ const page='<div className={styles.callout}><p>Original guidance text.</p></div>';
+ assert.equal(audit(source,page).status,0);
+ assert.equal(audit(source,page.replace('styles.callout}','styles.callout} data-variant="warn"')).status,1);
+});
+
+test("resolves text/plain data-for scripts whose attributes are unquoted", () => {
+ const source='<pre><code id="demo"></code></pre><script type=text/plain data-for=demo>print("payload")</script>';
+ const page='<pre><code>{"print(\\"payload\\")"}</code></pre>';
+ assert.equal(audit(source,page).status,0);
+ assert.equal(audit(source,page.replace('payload','other')).status,1);
+});
+
+test("matches a code id only for the id attribute, not data-id", () => {
+ const source='<pre><code data-id="demo">kept text</code></pre><script type="text/plain" data-for="demo">replaced</script>';
+ const page='<pre><code>kept text</code></pre>';
+ assert.equal(audit(source,page).status,0);
+});
+
+test("keeps literal entities in JSX strings equal to detached textContent payloads", () => {
+ const source='<pre><code id="e"></code></pre><script type="text/plain" data-for="e">a &lt; b &amp;&amp; c</script>';
+ const page='<pre><code>{"a &lt; b &amp;&amp; c"}</code></pre>';
+ assert.equal(audit(source,page).status,0);
+ assert.equal(audit(source,'<pre><code>{"a < b && c"}</code></pre>').status,1);
+});

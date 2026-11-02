@@ -122,6 +122,9 @@ function stripMarkup(fragment, jsx = true) {
       .replace(/\{\s*(?:styles\.[A-Za-z0-9_-]+|[A-Za-z_$][\w$]*)\s*\}/g, "");
   }
   text = text.replace(/<[^>]*>/g, "");
+  // エンティティ復号は JSX 文字列の復元より前に行う。React は {"&lt;"} を復号せず文字どおり表示するため、
+  // 復元後に復号すると text/plain 由来の原本（textContent でそのまま表示）と食い違う。
+  text = decodeEntities(text);
 
   // 退避は入れ子になりうる（テンプレートリテラル式の中に "..." 式がある等）。
   // String.replace は差し込んだ文字列を再走査しないため、1 回では内側のプレースホルダが
@@ -132,7 +135,7 @@ function stripMarkup(fragment, jsx = true) {
     text = text.replace(placeholderRe, (_match, index) => preserved[Number(index)]);
   }
 
-  return decodeEntities(text);
+  return text;
 }
 
 /**
@@ -196,9 +199,16 @@ function normalizeSvgElement(raw) {
 function normalizeCalloutElement(openingTag, content) {
   const markers = new Set();
   const markerSource = `${openingTag} ${openingTag.match(/styles\.([\w-]+)/g)?.join(" ") ?? ""}`;
-  for (const marker of markerSource.matchAll(/(?:callout|alert|warning|warn|note|info|tip|success|good)/gi)) {
+  for (const marker of markerSource.matchAll(/(?:callout|alert|warning|warn|note|info|tip|success)/gi)) {
     const value = marker[0].toLowerCase();
-    markers.add(value === "warning" ? "warn" : value === "note" ? "info" : value === "good" ? "tip" : value);
+    markers.add(value === "warning" ? "warn" : value === "note" ? "info" : value);
+  }
+  // good は "good-practices" 等の id にも含まれやすいため、variant 系属性の完全一致トークンに限って tip とみなす。
+  const variantAttributeRe =
+    /(?:^|\s)(?:class|className|variant|data-variant|data-testid)\s*=\s*(?:"([^"]*)"|'([^']*)'|\{([^}]*)\})/gi;
+  for (const attribute of openingTag.matchAll(variantAttributeRe)) {
+    const tokens = (attribute[1] ?? attribute[2] ?? attribute[3]).split(/[^\w-]+/);
+    if (tokens.some((token) => token.toLowerCase() === "good")) markers.add("tip");
   }
   if (!["warn", "info", "tip", "success"].some((variant) => markers.has(variant))) {
     markers.add("info");
@@ -851,17 +861,26 @@ function inventoryMarkdown(src) {
  * @param {string} src - The HTML source to inspect.
  * @return {Object} The inventory of headings, lists, code blocks, table rows, paragraphs, Mermaid sources, SVG elements, callouts, and external links.
  */
+function readHtmlAttribute(attributes, name) {
+  // 属性名は先頭か空白の直後に限る（`\b` だと data-id= の id にも一致する）。値は引用符の有無を問わない。
+  const match = new RegExp(
+    `(?:^|\\s)${name}\\s*=\\s*(?:"([^"]*)"|'([^']*)'|([^\\s"'=<>\`]+))`,
+    "i"
+  ).exec(attributes);
+  return match === null ? undefined : (match[1] ?? match[2] ?? match[3]);
+}
+
 function inventoryHtml(src) {
   // Detached text/plain payloads are displayed via code.textContent, not HTML parsing.
   // Resolve by data-for/id rather than script order and escape literal markup before inventorying.
   const detachedCode = new Map();
   for (const script of src.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script\s*>/gi)) {
-    if (!/\btype\s*=\s*["']text\/plain["']/i.test(script[1])) continue;
-    const target = script[1].match(/\bdata-for\s*=\s*["']([^"']+)["']/i)?.[1];
+    if (readHtmlAttribute(script[1], "type")?.toLowerCase() !== "text/plain") continue;
+    const target = readHtmlAttribute(script[1], "data-for");
     if (target) detachedCode.set(target, script[2]);
   }
   src = src.replace(/<code\b([^>]*)>([\s\S]*?)<\/code\s*>/gi, (full, attrs) => {
-    const id = attrs.match(/\bid\s*=\s*["']([^"']+)["']/i)?.[1];
+    const id = readHtmlAttribute(attrs, "id");
     if (!detachedCode.has(id)) return full;
     const value = detachedCode.get(id).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
     return `<code${attrs}>${value}</code>`;
