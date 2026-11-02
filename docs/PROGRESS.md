@@ -2,9 +2,17 @@
 
 > 本ファイルは Next.js 移行完了後の保守・改善フェーズにおける開発の進捗（特にテスト関連）および品質チェックのルールを記録する。
 >
-> - 最終更新日: **Updated 2026-11-02**
+> - 最終更新日: **Updated 2026-11-03**
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
+
+## レビュー指摘対応: WOFF2フォント・監査・テスト・Grok Botガイド（2026-11-03）
+
+- フォント: `lib/fonts.ts` のJetBrains Mono／Syneを上流可変TTFの可逆WOFF2（fonttools 4.68.0 + brotli 1.2.1）へ置換しTTFを削除。fonttoolsでcmap・グリフ順・wght軸の一致を確認、差分はWOFF2仕様で除去されるDSIGのみ。187KB→72KB、147KB→61KB。テストはWOFF2コンテナをnode:zlibで解析し、maxp.numGlyphs（1179／711）とfvarのwght範囲を検証。Red `4e20eccd` → Green `ccc3a47e`。`bun run dev` で配信 `/_next/static/media/*.woff2` が `font/woff2`・SHA-256一致。
+- 監査: variant属性のJSX式が最初の `}` で切れ、テンプレートリテラル内の `styles.good` を取りこぼす問題を修正（1段の入れ子波括弧を許容）。Red `59a3bab7` → Green `2858fcfa`、監査51テスト成功。`codex/skill`・`codex/openai-codex-guide` の原本はlegacy（ローカル不在）のため再監査未実施。
+- `/google/models-best-practices` のテスト: 内部 `.html` リンク判定をjsdom解決済み `a.href` から生のhref属性へ変更（従来は常に空で無効な検証）。現ページに該当リンクがなくRed不可 `000cc09a`。
+- `Xai-grok-bot-guide.md` 16.1: 認証情報の警告をメンバーのチャットで使う指示・ファイル・メモリに限定し、ログイン／キーは9.1のTeam Bot専用Vault／Secretsへ誘導 `24a1698e`。
+- 全体Vitest **221 files／2348 tests**、typecheckが成功。npm・ビルドは未実行。
 
 ## OpenAI 最新モデルガイド移行（2026-11-02）
 
@@ -91,7 +99,7 @@
   - `bun run typecheck` ✅（`tsc --noEmit`。2026-11-02 実測）
   - `bun run lint` ✅（Biome check / 597 files / 0 diagnostics。2026-11-02 実測）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=2 --testTimeout=30000` でVitest **221 files / 2347 tests すべて合格**（2026-11-02 実測）。OpenAI対象50契約、関連76契約、typecheck・lint、HTML原本監査exit 0が成功。
+  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=2 --testTimeout=30000` でVitest **221 files / 2348 tests すべて合格**（2026-11-03 実測）。typecheck・lint（変更パス）成功。
     - 初回全体検証は2239件中registryの日付不変条件1件が失敗。専用Red／Greenで修正後、全体を再実行して成功。依存・設定・ロックは変更していない。
     - `load(sourceHtml)` をモジュール初期化時に呼ぶ `governance/ai-governance/GuideContent.tsx` と
       `local-llm/finetuning-best-practices/GuideContent.tsx` は、import スモークでも読み込み可能であることを確認済み

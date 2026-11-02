@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Updated 2026-11-02
+Updated 2026-11-03
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
@@ -33,6 +33,9 @@ npm・ビルドは未実行。CSSキャッシュ更新後、通常devのlocalhos
 原本固定期待値は保持し、追加メタ情報を別契約で検証。対象43契約、全体219 files／2297 tests、
 型・lint（591 files／0 diagnostics）、HTML原本監査exit 0、再起動後HTTP 200が成功。
 npm・ビルドは未実行。目視はユーザー担当。
+
+2026-11-03: JetBrains Mono／SyneをWOFF2へ置換（可逆変換、cmap・グリフ順・wght軸一致、TTFは削除）。
+変換手順・ハッシュは `web-next/public/fonts/latin/README.md`。全体Vitest **221 files／2348 tests**、監査51テスト成功。
 
 2026-11-02: Turbopackの共通Googleフォント解決エラーを修正。
 `lib/fonts.ts` のJetBrains Mono／Syneを `next/font/local` に切り替え、公式可変TTFとOFLを
@@ -517,7 +520,7 @@ Build:     cd web-next && bun run build
 以下を全て確認してからコミットすること：
 
 1. `cd web-next && bun run build` が成功（※Antigravityサンドボックス環境では実行禁止。他環境やCIでは必須）
-2. `cd web-next && bun run test` が完全に成功（221 files / 2347 tests pass、2026-11-02実測。`NODE_OPTIONS=--no-experimental-webstorage` と `--maxWorkers=1 --testTimeout=30000` を使用。収集失敗もブロッキング失敗として原因を調査する）
+2. `cd web-next && bun run test` が完全に成功（221 files / 2348 tests pass、2026-11-03実測。`NODE_OPTIONS=--no-experimental-webstorage` と `--maxWorkers=1 --testTimeout=30000` を使用。収集失敗もブロッキング失敗として原因を調査する）
 3. `cd web-next && bun run typecheck` が成功
 4. `cd web-next && bun run lint` が成功
 5. `cd scraper && uv run pytest` が成功
