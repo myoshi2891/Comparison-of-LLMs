@@ -516,6 +516,18 @@ const entries: PageEntry[] = [
     lastReviewed: "2026-07-01",
   },
   {
+    slug: "/codex/models-best-practices",
+    title: "OpenAI 最新モデル ベストプラクティス",
+    group: "Providers",
+    category: "Codex",
+    provider: "codex",
+    topics: ["openai", "prompting", "agents"],
+    summary:
+      "OpenAI のモデル選択、Responses API、reasoning effort、ツールとコスト最適化の実践ガイド。",
+    addedAt: "2026-11-02",
+    lastReviewed: "2026-11-02",
+  },
+  {
     slug: "/codex/agent",
     title: "OpenAI Codex サブエージェント開発ガイド",
     group: "Providers",
