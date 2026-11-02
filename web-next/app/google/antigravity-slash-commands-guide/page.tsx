@@ -1412,7 +1412,14 @@ export default function AntigravitySlashCommandsGuidePage() {
                 <tr>
                   <td>シェルコマンドの実行</td>
                   <td>
-                    <span className="badge badge-r">ポリシーで許可されたもののみ</span>
+                    <span className="badge badge-r">
+                      エージェントのシェルツール呼び出しはポリシーで許可されたもののみ
+                    </span>
+                    <br />
+                    <small>
+                      ※ ユーザーが入力する <code>!</code> コマンドは Plan Mode
+                      でもユーザーの端末権限で実行される
+                    </small>
                   </td>
                   <td>
                     <span className="badge badge-r">権限次第</span>
