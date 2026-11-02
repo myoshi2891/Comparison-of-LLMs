@@ -1019,9 +1019,15 @@ export default function ZaiGlmBestPracticesPage() {
                     を指定して思考量を抑える。
                   </li>
                   <li className={styles.li}>
-                    GLM-4.5-Flash など GLM-4.6 より前のモデル:{" "}
+                    GLM-4.5 / GLM-4.5-Air / GLM-4.5-Flash: GLM-4.5 シリーズは{" "}
                     <code className={styles.codeInline}>thinking</code>{" "}
-                    パラメータの対象外のため、指定せず省略する。
+                    パラメータに対応しているため、軽量なターンでは{" "}
+                    <code className={styles.codeInline}>
+                      thinking: &#123;&quot;type&quot;: &quot;disabled&quot;&#125;
+                    </code>{" "}
+                    で無効化する。GLM-4.5 より前のモデルは対象外のため、
+                    <code className={styles.codeInline}>thinking</code>{" "}
+                    を指定せず省略する。
                   </li>
                 </ul>
               </li>
@@ -2135,7 +2141,8 @@ export default function ZaiGlmBestPracticesPage() {
                     GLM-4.7-FlashXもenabled時は強制thinkingだがdisabledで無効化、GLM-5.3
                     系はthinkingを有効のまま
                     <code className={styles.codeInline}>reasoning_effort: "low"</code>
-                    、GLM-4.6 より前のモデルはthinkingを省略、と使い分けているか
+                    、GLM-4.5 / GLM-4.5-Air / GLM-4.5-Flashはthinkingを無効化、GLM-4.5
+                    より前のモデルはthinkingを省略、と使い分けているか
                   </td>
                   <td>7, 13</td>
                 </tr>
