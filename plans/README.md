@@ -1,6 +1,6 @@
 # Plans — プラットフォーム拡張検討ドキュメント
 
-Updated 2026-10-15
+Updated 2026-11-02
 
 `.agent/skills/improve/SKILL.md` により生成・維持している方向性ドキュメント群。
 対象は web-next（Next.js 16 SSG）の「AI 最新情報キャッチアップ・プラットフォーム」化。
@@ -11,6 +11,12 @@ Updated 2026-10-15
 - 照合 v2: 2026-07-12（004〜006, commit `45940fd`）— 154 コミットのドリフトを 004 で照合済み
 
 基準コミット（drift 検出用）: `45940fd`
+
+保守同期（2026-11-02）: `/google/models-best-practices` を既存のGoogleカテゴリへ登録。
+007〜009のDONE状態は維持し、新規基盤プランは起票していない。41契約を追加し、
+全体Vitest **218 files／2288 tests**、typecheck・lint（590 files／0 diagnostics）、
+原本監査exit 0、Mermaid 10図の解析、pytest 122件が成功。npm・ビルドは未実行。
+原本2形式は内容無変更で保存し、次の作業はユーザーの目視確認。履歴は `docs/PROGRESS.md` を参照。
 
 保守同期（2026-10-15）: 推薦書籍 `/books/knowledge-graphs-fundamentals-techniques` を追加。
 既存007〜009のDONE状態を維持し、新規の基盤プランは起票していない。

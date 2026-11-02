@@ -2,9 +2,25 @@
 
 > 本ファイルは Next.js 移行完了後の保守・改善フェーズにおける開発の進捗（特にテスト関連）および品質チェックのルールを記録する。
 >
-> - 最終更新日: **Updated 2026-11-01**
+> - 最終更新日: **Updated 2026-11-02**
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
+
+## Gemini 最新モデルガイド移行（2026-11-02）
+
+- ルート: `/google/models-best-practices`。指定HTMLを正本とし、本文の情報基準日2026-10-23を保持。
+- 全1 H1・17 H2・74 H3・28段落・67リスト項目（25 ul／1 ol）・32表246行・12コード例・10図・8 callout・18チェック項目・65外部リンクをPure JSXへ完全転写。
+- 原本由来の固定期待値を保存し、本文・表セルの結合と順序・リスト型と入れ子・CDN・ハイライト全トークン・目次・104 CSS規則・操作処理を41契約で照合。件数だけの検証へ置換していない。
+- 全体Vitest **218 files／2288 tests**、型チェック、lint（590 files／0 diagnostics）、原本HTML監査exit 0、Mermaid 10.9.8で10図の構文解析、pytest **122件**が成功。
+- TocObserver単体13テスト。行／関数カバレッジ100%、分岐91.66%、文98.86%。モバイル開閉・背景・Escape・リンク選択・resize・inert・フォーカス・スクロール・最下部・目次内追従・チェック進捗・cleanupを検証。
+- 288px固定目次、900px以下のドロワー、原本の箇条書き・番号・チェックリスト、表の全列左寄せ、アンカー余白を保持。固定目次のtopは共有ヘッダー／免責バナーの実測高さへ補正。図解の配置と縮小は共有MermaidDiagramへ委譲するため、原本のdiagram-canvas／svgサイズ強制とtooltip規則は移植しない。
+- highlight.js **11.12.0**を一時取得して12コード例を静的トークン化。依存・設定・ロックの変更なし。構文ハイライトの複数行トークンとコード空白は明示的なJSX文字列で保持。
+- 監査に原本のtext/plain／data-for形式をRed `7d7fd686` → Green `489a05fe`で追加。同義のgood／tipマーカーはRed `a461367c` → Green `74f337d4`で対応。監査45テスト成功。
+- ページRed `b1a1d2a3` → テストの仮想座標・CSS整形差補正 `a461367c` → テスト型・整形 `e2c647d4` → Green `34afaf50` → Refactor `9d8152fd` → 原本保存 `cfeecc96`。本文固定期待値は実装に合わせて変更していない。
+- HTML／Markdownをarchive/html/Google/／archive/md/Google/へ内容無変更で退避。SHA-256はHTML `9dc12cd8c514b3d0a60a530c177d08fd30d6ea34cb9bf0bc09c67d668a31b794`、Markdown `77b7ffc34d4c057a51722929da8eddf11ee1776c536e7da5478fb56fe8ff0ae7`（移動前後一致）。
+- Markdown側の監査差分は独立した「目次」H2と図解10件。時系列図のLR／TB、API往復のsequenceDiagram／flowchart、改行タグ・ラベル・classDef等がHTMLと異なる。指定HTMLを正本とし、両形式を混在させない。
+- CSSキャッシュを一時退避。Turbopack devは既存共通フォントの「next/font/google queries have exactly one entry」でHTTP 500のため、設定を変更せず `bun run dev --webpack` で起動し、`http://localhost:3000/google/models-best-practices` のHTTP 200を確認。目視はユーザー担当。
+- npm・ビルドはユーザー指定で未実行。開始前からの別ガイドの未コミット変更は保持。
 
 ## Claudeモデルガイドのhydration・共有クローム修正（2026-11-01）
 
@@ -32,19 +48,19 @@
 
 - **フェーズ**: 保守・機能改善・品質強化フェーズ
 - **ブランチ**: `dev`
-- **最新実装 HEAD**: `86701eaf`（hydration・共有クローム修正 Red `23ed1960` → Green `8eb66f60` → 検証補正 `86701eaf`）
-- **次の作業**: `/claude/models-best-practices` の目視確認（ユーザー担当、localhost:3000）。目次追従・モバイル開閉、リストの点と番号、12コード例の構文色、5図、10項目の進捗表示を確認する。npm・ビルドは未実行。
-- **ルート実数**: `page.tsx` 96 件、registry 96 エントリ（現行ファイルから実測）。
+- **最新実装 HEAD**: `9d8152fd`（Gemini完全移植 Green `34afaf50` → Refactor `9d8152fd`、原本保存 `cfeecc96`）
+- **次の作業**: `/google/models-best-practices` の目視確認（ユーザー担当）。原本のリスト記号・番号、32表、12コード例の色と字下げ、10図、目次追従、モバイル開閉、18チェック項目の進捗を確認。npm・ビルドは未実行。
+- **ルート実数**: `page.tsx` 97 件、registry 97 エントリ（現行ファイルから実測）。
 - **動作検証**:
   - ビルド: 今回はユーザー指定で未実行。過去の成功記録は 2026-09-17 の 90 静的ページであり、今回の変更を検証した値ではない。
-  - `bun run typecheck` ✅（`tsc --noEmit`。2026-11-01 実測）
-  - `bun run lint` ✅（Biome check / 584 files / 0 diagnostics。2026-11-01 実測）
+  - `bun run typecheck` ✅（`tsc --noEmit`。2026-11-02 実測）
+  - `bun run lint` ✅（Biome check / 590 files / 0 diagnostics。2026-11-02 実測）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=2 --testTimeout=30000` でVitest **216 files / 2243 tests すべて合格**（2026-11-01 実測）。対象19原本契約＋1確認日契約、関連67契約、typecheck・lint、HTML原本監査exit 0が成功。
+  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=2 --testTimeout=30000` でVitest **218 files / 2288 tests すべて合格**（2026-11-02 実測）。Gemini対象41契約、registry／ナビを含む関連67契約、typecheck・lint、HTML原本監査exit 0が成功。
     - 初回全体検証は2239件中registryの日付不変条件1件が失敗。専用Red／Greenで修正後、全体を再実行して成功。依存・設定・ロックは変更していない。
     - `load(sourceHtml)` をモジュール初期化時に呼ぶ `governance/ai-governance/GuideContent.tsx` と
       `local-llm/finetuning-best-practices/GuideContent.tsx` は、import スモークでも読み込み可能であることを確認済み
-  - **バックエンド (`scraper/`)**: 今回はユーザー指定で検証対象外。実行していない。過去の成功記録は104件（2026-10-04）であり、今回の実測値ではない。
+  - **バックエンド (`scraper/`)**: `uv run pytest` で122件成功（2026-11-02実測）。
 
 ## 最近の追加内容
 
@@ -501,13 +517,16 @@
 
 ```text
 AGENTS.md → CODEX.md → CLAUDE.md → docs/PROGRESS.md → Phase A–F 計画の順で読む。
-最新実装 HEAD: 86701eaf（hydration・共有クローム修正とCSS検証補正）
-次の作業: /claude/models-best-practices の目視確認（ユーザー担当）。localhost:3000。
-Mermaid図解5箇所、272px固定目次、モバイル開閉、表の左寄せ、リストの点と番号、12コード例の構文色、チェックリスト10項目の進捗を確認する。
-原本2形式（HTMLおよびMarkdown）はarchive/へ退避済み（SHA-256一致）。
-HTML原本監査exit 0、対象19契約と関連67契約、typecheck・lint（0 diagnostics）が成功。全体テストの最新結果は本書冒頭を参照。
-NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000 を使用する。
-本ページのCSSはページ内に閉じ、図解レイアウトは共有コンポーネントへ委譲。依存・設定・ロック・監査スクリプトは変更していない。
+最新実装 HEAD: 9d8152fd（Gemini完全移植 Green 34afaf50 → Refactor 9d8152fd、原本保存 cfeecc96）
+次の作業: /google/models-best-practices の目視確認（ユーザー担当）。http://localhost:3000/google/models-best-practices
+10図、288px固定目次、900px以下の開閉、32表の左寄せ、リストの点と番号、12コード例の構文色・字下げ、18項目の進捗を確認する。
+原本2形式はarchive/へ退避済み（SHA-256一致）。指定HTMLを正本とし、Markdownの目次・図形式の差は本書冒頭に記録した。
+HTML原本監査exit 0、対象41契約と関連67契約、全218 files／2288 tests、typecheck・lint、pytest122件が成功。
+NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=2 --testTimeout=30000 を使用する。
+本ページのCSSはページ内に閉じ、図解レイアウトは共有コンポーネントへ委譲。依存・設定・ロックは変更していない。
+監査はtext/plainのdata-for形式とgood／tip同義マーカーに対応し、45監査テストで検証済み。
 サンドボックスではnpmとビルドを実行しない。修正もRed → Green → Refactor → Docsの分離コミットを守る。
-page.tsx 96件、registry 96エントリ（現行ファイルから実測）。次ページは指示されてから扱う。
+page.tsx 97件、registry 97エントリ（現行ファイルから実測）。次ページは指示されてから扱う。
+開発サーバーは bun run dev --webpack でlocalhost:3000に起動済み、対象ルートHTTP 200確認済み。
+Turbopackには共通フォント解決エラーがあるため、依存・設定は変えず開発時のみWebpackを使用する。
 ```
