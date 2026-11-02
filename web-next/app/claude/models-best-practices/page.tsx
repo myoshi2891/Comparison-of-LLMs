@@ -3286,6 +3286,24 @@ export default function Page() {
                   }
                 </span>
                 {")\n\n    "}
+                <span className="hljs-comment">
+                  {
+                    "# コンテキストウィンドウの上限で打ち切られた応答も途中までなので、正常な回答として返さない"
+                  }
+                </span>
+                {"\n    "}
+                <span className="hljs-keyword">{"if"}</span>
+                {" response.stop_reason == "}
+                <span className="hljs-string">{'"model_context_window_exceeded"'}</span>
+                {":\n        "}
+                <span className="hljs-keyword">{"raise"}</span>
+                {" RuntimeError("}
+                <span className="hljs-string">
+                  {
+                    '"コンテキストウィンドウの上限に達して応答が途中で切れました。入力を減らして再実行してください"'
+                  }
+                </span>
+                {")\n\n    "}
                 <span className="hljs-keyword">{"return"}</span>{" "}
                 <span className="hljs-string">{'""'}</span>
                 {".join(b.text "}
