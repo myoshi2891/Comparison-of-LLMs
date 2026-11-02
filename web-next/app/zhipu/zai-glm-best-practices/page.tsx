@@ -1026,8 +1026,7 @@ export default function ZaiGlmBestPracticesPage() {
                       thinking: &#123;&quot;type&quot;: &quot;disabled&quot;&#125;
                     </code>{" "}
                     で無効化する。GLM-4.5 より前のモデルは対象外のため、
-                    <code className={styles.codeInline}>thinking</code>{" "}
-                    を指定せず省略する。
+                    <code className={styles.codeInline}>thinking</code> を指定せず省略する。
                   </li>
                 </ul>
               </li>
