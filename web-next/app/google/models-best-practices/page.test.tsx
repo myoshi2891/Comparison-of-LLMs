@@ -60,7 +60,15 @@ for (const cls of ["callout", "diagram-title", "chk-list label", "hero", "footer
   it(`原本の複合要素本文を保持: ${cls}`, () => {
     const { container } = render(<Page />);
     const selector = cls === "chk-list label" ? `.${styles["chk-list"]} label` : `.${styles[cls]}`;
-    expect(Array.from(container.querySelectorAll(selector)).map(text)).toEqual(expected[`.${cls}`]);
+    // Requested site metadata is additional UI; keep the original hero copy contract intact.
+    const originalText = (element: Element) => {
+      const copy = element.cloneNode(true) as Element;
+      copy.querySelector('[data-testid="hero-dates"]')?.remove();
+      return text(copy);
+    };
+    expect(Array.from(container.querySelectorAll(selector)).map(originalText)).toEqual(
+      expected[`.${cls}`]
+    );
   });
 it("全32表のセル型・結合・全文・行順序を保持", () => {
   const { container } = render(<Page />);
@@ -270,4 +278,47 @@ it("生HTML注入・実行script・表直下の空白・図解サイズ強制を
   expect(src).not.toContain(["danger", "ously", "Set", "Inner", "HTML"].join(""));
   expect(src).not.toContain("<script");
   expect(css()).not.toMatch(/\.diagram-canvas|:global\(svg\)/);
+});
+
+it("最終確認日と公開日はregistryを参照してヒーロー内に表示する", () => {
+  const { container, getByTestId } = render(<Page />);
+  const dates = getByTestId("hero-dates");
+  expect(dates.closest("header")).toBe(container.querySelector(`.${styles.hero}`));
+  expect(text(dates)).toBe("最終確認日 2026-11-02 公開日 2026-11-02");
+  expect(
+    Array.from(dates.querySelectorAll("time")).map((e) => [e.dateTime, e.textContent])
+  ).toEqual([
+    ["2026-11-02", "2026-11-02"],
+    ["2026-11-02", "2026-11-02"],
+  ]);
+});
+it("免責バナーとヒーロー間の重複余白・外部日付バーを無くす", () => {
+  const ast = postcss.parse(fs.readFileSync("app/globals.css", "utf8"));
+  const values = (selector: string) => {
+    const result: Record<string, string> = {};
+    ast.walkRules((r) => {
+      if (r.selector !== selector) return;
+      r.walkDecls((d) => {
+        result[d.prop] = d.value;
+      });
+    });
+    return result;
+  };
+  const body = values('body:has([data-page="gemini-models"]).has-common-header');
+  expect(body["margin-top"]).toBe("0");
+  expect(body["padding-top"]).toBe(
+    "calc(var(--ch-height, 60px) + var(--ch-disclaimer-height, 0px))"
+  );
+  expect(values('body:has([data-page="gemini-models"]) #site-freshness-bar').display).toBe("none");
+  const page = postcss.parse(css());
+  const dates: Record<string, string> = {};
+  page.walkRules((r) => {
+    if (r.selector !== ".root .heroDates") return;
+    r.walkDecls((d) => {
+      dates[d.prop] = d.value;
+    });
+  });
+  expect(dates.display).toBe("flex");
+  expect(dates["flex-wrap"]).toBe("wrap");
+  expect(dates.color).toBe("inherit");
 });
