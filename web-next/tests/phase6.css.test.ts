@@ -181,12 +181,12 @@ describe("Phase 6 - fonts configuration (lib/fonts.ts)", () => {
   });
 
   it("configures JetBrains Mono and exposes --font-mono variable", () => {
-    expect(fontsTs).toContain("JetBrainsMono-Variable.ttf");
+    expect(fontsTs).toContain("JetBrainsMono-Variable.woff2");
     expect(fontsTs).toContain("--font-mono");
   });
 
   it("configures Syne and exposes --font-display variable", () => {
-    expect(fontsTs).toContain("Syne-Variable.ttf");
+    expect(fontsTs).toContain("Syne-Variable.woff2");
     expect(fontsTs).toContain("--font-display");
   });
 });
