@@ -21,11 +21,17 @@ export default function TocObserver() {
     const key = (e: KeyboardEvent) => {
       if (e.key === "Escape") close();
     };
+    // 目次リンクで移動した見出しは scroll-margin-top の位置に止まるため、
+    // ビューポートの 25% とアンカー余白（+1px は小数ピクセルの丸め誤差分）の大きい方を閾値にする
+    const threshold = (el: HTMLElement) => {
+      const margin = Number.parseFloat(window.getComputedStyle(el).scrollMarginTop);
+      return Math.max(window.innerHeight * 0.25, (Number.isFinite(margin) ? margin : 0) + 1);
+    };
     const update = () => {
       let current = 0;
       links.forEach((a, i) => {
         const el = document.getElementById(a.hash.slice(1));
-        if (el && el.getBoundingClientRect().top <= window.innerHeight * 0.25) current = i;
+        if (el && el.getBoundingClientRect().top <= threshold(el)) current = i;
       });
       links.forEach((a, i) => {
         a.classList.toggle(styles.active, i === current);
