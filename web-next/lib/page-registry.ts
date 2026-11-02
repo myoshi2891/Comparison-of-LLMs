@@ -662,6 +662,17 @@ const entries: PageEntry[] = [
     lastReviewed: "2026-07-26",
   },
   {
+    slug: "/google/models-best-practices",
+    title: "Gemini 最新モデル ベストプラクティス",
+    group: "Providers",
+    category: "Google",
+    provider: "google",
+    topics: ["google", "prompting", "agents"],
+    summary: "Gemini のモデル選択、思考水準、Long Decode、API移行と本番運用の実践ガイド。",
+    addedAt: "2026-11-02",
+    lastReviewed: "2026-11-02",
+  },
+  {
     slug: "/google/adk-best-practices",
     title: "ADK Best Practices",
     group: "Providers",
