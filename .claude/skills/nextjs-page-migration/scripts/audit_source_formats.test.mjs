@@ -145,6 +145,13 @@ test("treats good and tip callout markers as the same semantic variant", () => {
  assert.equal(audit(source,page.replace('styles.tip','styles.warn')).status,1);
 });
 
+test("detects styles.good inside a template-literal className", () => {
+ const source='<div class="callout good"><p>Keep the complete explanation.</p></div>';
+ const page='<div className={`${styles.callout} ${styles.good}`}><p>Keep the complete explanation.</p></div>';
+ assert.equal(audit(source,page).status,0);
+ assert.equal(audit(source,page.replace('styles.good','styles.warn')).status,1);
+});
+
 test("plain callouts use the default info variant without accepting missing content", () => {
  const source='<div class="callout"><p>Full original explanation.</p></div>';
  const page='<div className={styles.callout} data-variant="info"><p>Full original explanation.</p></div>';
