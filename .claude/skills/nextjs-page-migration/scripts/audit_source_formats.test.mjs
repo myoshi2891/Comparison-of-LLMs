@@ -124,3 +124,15 @@ test("reads every DIAGRAMS entry when comments sit between entries", () => {
 	assert.deepEqual(match.data.counts.mermaidSources, { source: 2, page: 2 });
 	assert.equal(audit(source, page([first])).status, 1);
 });
+
+test("resolves text/plain data-for scripts into their target code blocks", () => {
+ const first = 'if ready:\n    print("<schema>", {"x": 1})';
+ const second = 'print("second")';
+ const source = `<pre><code id="a"></code></pre><pre><code id="b"></code></pre><script type="text/plain" data-for="b">${second}</script><script data-for="a" type="text/plain">${first}</script>`;
+ const page = `<pre><code>{${JSON.stringify(first)}}</code></pre><pre><code>{${JSON.stringify(second)}}</code></pre>`;
+ const match = audit(source, page);
+ assert.equal(match.status, 0);
+ assert.deepEqual(match.data.counts.codeBlocks, {source:2,page:2});
+ assert.equal(audit(source, page.replace('schema', 'missing')).status, 1);
+ assert.equal(audit(source, page.replace(JSON.stringify(second), '""')).status, 1);
+});
