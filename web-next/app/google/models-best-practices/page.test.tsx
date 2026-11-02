@@ -36,6 +36,12 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 const text = (e: Element) => (e.textContent ?? "").replace(/\s+/g, " ").trim();
+// Additional site dates are checked separately; preserve the full original hero copy contract.
+const originalHeroText = (element: Element) => {
+  const copy = element.cloneNode(true) as Element;
+  copy.querySelector('[data-testid="hero-dates"]')?.remove();
+  return text(copy);
+};
 for (const selector of [
   "h1",
   "h2",
@@ -60,15 +66,9 @@ for (const cls of ["callout", "diagram-title", "chk-list label", "hero", "footer
   it(`原本の複合要素本文を保持: ${cls}`, () => {
     const { container } = render(<Page />);
     const selector = cls === "chk-list label" ? `.${styles["chk-list"]} label` : `.${styles[cls]}`;
-    // Requested site metadata is additional UI; keep the original hero copy contract intact.
-    const originalText = (element: Element) => {
-      const copy = element.cloneNode(true) as Element;
-      copy.querySelector('[data-testid="hero-dates"]')?.remove();
-      return text(copy);
-    };
-    expect(Array.from(container.querySelectorAll(selector)).map(originalText)).toEqual(
-      expected[`.${cls}`]
-    );
+    expect(
+      Array.from(container.querySelectorAll(selector)).map(cls === "hero" ? originalHeroText : text)
+    ).toEqual(expected[`.${cls}`]);
   });
 it("全32表のセル型・結合・全文・行順序を保持", () => {
   const { container } = render(<Page />);
