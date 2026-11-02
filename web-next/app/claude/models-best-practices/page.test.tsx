@@ -105,16 +105,59 @@ it("チェック全件と解除", () => {
   fireEvent.click(boxes[0]);
   expect(container.querySelector("#ckCount")?.textContent).toBe("9 / 10 完了");
 });
+// 目次の各見出しを文書上 1000px 間隔に置き、仮想スクロール位置からの相対座標を返す
+const mockHeadingPositions = (ids: string[], viewport: { scrollY: number }) =>
+  vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(function (
+    this: HTMLElement
+  ) {
+    const index = ids.indexOf(this.id);
+    return { top: index === -1 ? 0 : index * 1000 - viewport.scrollY } as DOMRect;
+  });
+const tocIds = expected["aside nav a"].map(([href]) => (href ?? "").slice(1));
+const activeLinks = (links: Element[]) =>
+  links.filter((e) => e.getAttribute("aria-current") === "location");
 it("初期目次とスクロール追従・cleanup", () => {
-  const { container, unmount } = render(<Page />);
-  const links = Array.from(container.querySelectorAll("aside a"));
-  expect(links.filter((e) => e.getAttribute("aria-current") === "location")).toEqual([links[10]]);
-  const h = container.querySelector("#sec10") as HTMLElement;
-  vi.spyOn(h, "getBoundingClientRect").mockReturnValue({ top: 9999 } as DOMRect);
-  fireEvent.scroll(window);
-  expect(links.filter((e) => e.getAttribute("aria-current") === "location")).toEqual([links[9]]);
-  unmount();
-  fireEvent.scroll(window);
+  const viewport = { scrollY: 0 };
+  const rect = mockHeadingPositions(tocIds, viewport);
+  try {
+    const { container, unmount } = render(<Page />);
+    const links = Array.from(container.querySelectorAll("aside nav a"));
+    expect(activeLinks(links)).toEqual([links[0]]);
+    viewport.scrollY = 5000;
+    fireEvent.scroll(window);
+    expect(activeLinks(links)).toEqual([links[5]]);
+    unmount();
+    fireEvent.scroll(window);
+  } finally {
+    rect.mockRestore();
+  }
+});
+it("目次リンクで移動した見出しは scroll-margin-top がビューポートの25%を超えても選択される", () => {
+  const viewport = { scrollY: 0 };
+  const rect = mockHeadingPositions(tocIds, viewport);
+  const originalHeight = window.innerHeight;
+  const original = window.getComputedStyle.bind(window);
+  // 低い画面（25% = 100px）で、固定ヘッダー分のアンカー余白が 180px のケース
+  Object.defineProperty(window, "innerHeight", { value: 400, configurable: true });
+  const style = vi
+    .spyOn(window, "getComputedStyle")
+    .mockImplementation((el: Element, pseudo?: string | null) =>
+      tocIds.includes(el.id)
+        ? ({ scrollMarginTop: "180px" } as CSSStyleDeclaration)
+        : original(el, pseudo)
+    );
+  try {
+    const { container } = render(<Page />);
+    const links = Array.from(container.querySelectorAll("aside nav a"));
+    // 目次リンク選択後、ブラウザは見出しを scroll-margin-top の位置へ止める
+    viewport.scrollY = 3 * 1000 - 180;
+    fireEvent.scroll(window);
+    expect(activeLinks(links)).toEqual([links[3]]);
+  } finally {
+    style.mockRestore();
+    rect.mockRestore();
+    Object.defineProperty(window, "innerHeight", { value: originalHeight, configurable: true });
+  }
 });
 it("リスト・表・アンカー・幅のCSS契約", () => {
   const css = fs.readFileSync("app/claude/models-best-practices/page.module.css", "utf8");
