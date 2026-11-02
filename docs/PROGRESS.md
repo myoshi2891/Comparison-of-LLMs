@@ -6,6 +6,15 @@
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
 
+## Geminiガイドのヒーロー余白・日付表示修正（2026-11-02）
+
+- 原因: `body.has-common-header` のmargin-topとGemini専用padding-topが両方とも固定クロームの高さを確保し、共通の日付バーもヒーロー外に表示されていた。
+- 当該ページだけbody margin-topを0にし、ヘッダー／免責バナーの実測高さをpadding-topで一度だけ確保。共有の外部日付バーを非表示とし、registryの最終確認日・公開日をヒーロー内のtime要素へ表示。日付は折り返せる白文字の右寄せ行。
+- 日付の本文・datetime・親要素と、bodyのmargin／padding、共有バーの非表示を2契約で検証。ヒーロー本文の固定期待値は変更せず、追加日付UIだけ別契約で検証する。
+- 対象43契約、全体Vitest **219 files／2297 tests**、型チェック、lint（591 files／0 diagnostics）、HTML原本監査exit 0が成功。バックエンドは変更なし・今回は未実行（前回122件成功）。
+- CSSキャッシュ退避後に通常の `bun run dev` を再起動し、`http://localhost:3000/google/models-best-practices` のHTTP 200とヒーロー内の2日付を確認。目視はユーザー担当。npm・ビルドは未実行。
+- Red `76c54f34` → Green `5c2c17ac` → Refactor `6cbe0015`。元の原本と他ページのレイアウトは変更していない。
+
 ## 共通フォントのTurbopack解決エラー修正（2026-11-02）
 
 - 症状: `next/font/google queries have exactly one entry` により共通レイアウトのJetBrains Mono CSSを解決できず、ブラウザでModule not foundが発生。前回のWebpack切替は一時回避だった。
@@ -58,15 +67,15 @@
 
 - **フェーズ**: 保守・機能改善・品質強化フェーズ
 - **ブランチ**: `dev`
-- **最新実装 HEAD**: `f203974a`（共通フォント修正 Red `3d9ea9d5` → Green `3ef97086` → Refactor `f203974a`）
-- **次の作業**: `/google/models-best-practices` の目視確認（ユーザー担当）。原本のリスト記号・番号、32表、12コード例の色と字下げ、10図、目次追従、モバイル開閉、18チェック項目の進捗を確認。npm・ビルドは未実行。
+- **最新実装 HEAD**: `6cbe0015`（Gemini余白・日付 Red `76c54f34` → Green `5c2c17ac` → Refactor `6cbe0015`）
+- **次の作業**: `/google/models-best-practices` の目視確認（ユーザー担当、localhost:3000）。免責バナーとヒーロー間の余白、ヒーロー内の最終確認日・公開日、モバイルでの日付折り返しを確認する。npm・ビルドは未実行。
 - **ルート実数**: `page.tsx` 97 件、registry 97 エントリ（現行ファイルから実測）。
 - **動作検証**:
   - ビルド: 今回はユーザー指定で未実行。過去の成功記録は 2026-09-17 の 90 静的ページであり、今回の変更を検証した値ではない。
   - `bun run typecheck` ✅（`tsc --noEmit`。2026-11-02 実測）
   - `bun run lint` ✅（Biome check / 591 files / 0 diagnostics。2026-11-02 実測）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=2 --testTimeout=30000` でVitest **219 files / 2295 tests すべて合格**（2026-11-02 実測）。フォント関連108契約と新規7契約、typecheck・lint、HTML原本監査exit 0が成功。
+  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=2 --testTimeout=30000` でVitest **219 files / 2297 tests すべて合格**（2026-11-02 実測）。Gemini対象43契約（余白・日付2契約を含む）、typecheck・lint、HTML原本監査exit 0が成功。
     - 初回全体検証は2239件中registryの日付不変条件1件が失敗。専用Red／Greenで修正後、全体を再実行して成功。依存・設定・ロックは変更していない。
     - `load(sourceHtml)` をモジュール初期化時に呼ぶ `governance/ai-governance/GuideContent.tsx` と
       `local-llm/finetuning-best-practices/GuideContent.tsx` は、import スモークでも読み込み可能であることを確認済み
@@ -527,11 +536,12 @@
 
 ```text
 AGENTS.md → CODEX.md → CLAUDE.md → docs/PROGRESS.md → Phase A–F 計画の順で読む。
-最新実装 HEAD: f203974a（共通フォント Red 3d9ea9d5 → Green 3ef97086 → Refactor f203974a）
+最新実装 HEAD: 6cbe0015（Gemini余白・日付 Red 76c54f34 → Green 5c2c17ac → Refactor 6cbe0015）
 次の作業: /google/models-best-practices の目視確認（ユーザー担当）。http://localhost:3000/google/models-best-practices
+免責バナー直下の余白解消と、ヒーロー内の最終確認日・公開日、モバイルでの日付折り返しを確認する。
 10図、288px固定目次、900px以下の開閉、32表の左寄せ、リストの点と番号、12コード例の構文色・字下げ、18項目の進捗を確認する。
 原本2形式はarchive/へ退避済み（SHA-256一致）。指定HTMLを正本とし、Markdownの目次・図形式の差は本書冒頭に記録した。
-HTML原本監査exit 0、対象41契約と関連67契約、全219 files／2295 tests、typecheck・lintが成功。pytest122件は前回の実測値。
+HTML原本監査exit 0、Gemini対象43契約、全219 files／2297 tests、typecheck・lintが成功。pytest122件は前回の実測値。
 NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=2 --testTimeout=30000 を使用する。
 本ページのCSSはページ内に閉じ、図解レイアウトは共有コンポーネントへ委譲。依存・設定・ロックは変更していない。
 監査はtext/plainのdata-for形式とgood／tip同義マーカーに対応し、45監査テストで検証済み。

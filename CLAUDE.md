@@ -10,6 +10,13 @@ AIモデルの時間別コスト計算機 + AI ツール導入ガイド群。Pyt
 
 ## アーキテクチャ
 
+2026-11-02: Geminiモデルガイドの免責バナー直下の重複余白を解消し、日付をヒーロー内へ移動。
+ページ限定のbody margin-topを0にし、固定ヘッダー／免責バナーの実測高さはpaddingで一度だけ確保する。
+共有の日付バーは当該ページで非表示にし、最終確認日・公開日をregistryからヒーローへ表示。
+原本固定期待値は保持し、追加メタ情報を別契約で検証。対象43契約、全体219 files／2297 tests、
+型・lint（591 files／0 diagnostics）、HTML原本監査exit 0、再起動後HTTP 200が成功。
+npm・ビルドは未実行。目視はユーザー担当。
+
 2026-11-02: Turbopackの共通Googleフォント解決エラーを修正。
 `lib/fonts.ts` のJetBrains Mono／Syneを `next/font/local` に切り替え、公式可変TTFとOFLを
 `public/fonts/latin/` に保存した。CSS変数・公開export・swap・従来ウェイトを保持し、
@@ -493,7 +500,7 @@ Build:     cd web-next && bun run build
 以下を全て確認してからコミットすること：
 
 1. `cd web-next && bun run build` が成功（※Antigravityサンドボックス環境では実行禁止。他環境やCIでは必須）
-2. `cd web-next && bun run test` が完全に成功（219 files / 2295 tests pass、2026-11-02実測。`NODE_OPTIONS=--no-experimental-webstorage` と `--maxWorkers=1 --testTimeout=30000` を使用。収集失敗もブロッキング失敗として原因を調査する）
+2. `cd web-next && bun run test` が完全に成功（219 files / 2297 tests pass、2026-11-02実測。`NODE_OPTIONS=--no-experimental-webstorage` と `--maxWorkers=1 --testTimeout=30000` を使用。収集失敗もブロッキング失敗として原因を調査する）
 3. `cd web-next && bun run typecheck` が成功
 4. `cd web-next && bun run lint` が成功
 5. `cd scraper && uv run pytest` が成功
