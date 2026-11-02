@@ -24,14 +24,14 @@
 import localFont from "next/font/local";
 
 export const jetbrainsMono = localFont({
-  src: "../public/fonts/latin/JetBrainsMono-Variable.ttf",
+  src: "../public/fonts/latin/JetBrainsMono-Variable.woff2",
   variable: "--font-mono",
   weight: "300 700",
   display: "swap",
 });
 
 export const syne = localFont({
-  src: "../public/fonts/latin/Syne-Variable.ttf",
+  src: "../public/fonts/latin/Syne-Variable.woff2",
   variable: "--font-display",
   weight: "400 800",
   display: "swap",
