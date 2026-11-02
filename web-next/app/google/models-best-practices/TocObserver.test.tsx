@@ -45,9 +45,9 @@ function Harness() {
     </div>
   );
 }
-const menu = () => document.getElementById("gemini-menu")!;
-const sidebar = () => document.getElementById("gemini-sidebar")!;
-const root = () => document.getElementById("gemini-guide")!;
+const menu = () => document.getElementById("gemini-menu") as HTMLElement;
+const sidebar = () => document.getElementById("gemini-sidebar") as HTMLElement;
+const root = () => document.getElementById("gemini-guide") as HTMLElement;
 const active = () =>
   Array.from(sidebar().querySelectorAll("a"))
     .filter((e) => e.getAttribute("aria-current") === "location")
@@ -96,13 +96,13 @@ it("トグル往復でaria・クラス・inertを同期", () => {
 it("背景クリックで閉じる", () => {
   render(<Harness />);
   fireEvent.click(menu());
-  fireEvent.click(document.getElementById("gemini-backdrop")!);
+  fireEvent.click(document.getElementById("gemini-backdrop") as HTMLElement);
   state(false);
 });
 it("Escapeのみで閉じフォーカスを戻す", () => {
   render(<Harness />);
   fireEvent.click(menu());
-  sidebar().querySelector("a")!.focus();
+  (sidebar().querySelector("a") as HTMLAnchorElement).focus();
   fireEvent.keyDown(document, { key: "Enter" });
   state(true);
   fireEvent.keyDown(document, { key: "Escape" });
@@ -112,7 +112,7 @@ it("Escapeのみで閉じフォーカスを戻す", () => {
 it("目次リンクで閉じる", () => {
   render(<Harness />);
   fireEvent.click(menu());
-  fireEvent.click(sidebar().querySelector("a")!);
+  fireEvent.click(sidebar().querySelector("a") as HTMLAnchorElement);
   state(false);
 });
 it("900pxを跨いでdesktopのinertを解除しmobileへ戻す", () => {
@@ -152,8 +152,11 @@ it("最下部では最後のセクションを選択", () => {
 });
 it("目次の選択リンクが可視範囲外なら目次内スクロール", () => {
   render(<Harness />);
-  const link = sidebar().querySelector("a")!;
-  Object.defineProperty(link, "getBoundingClientRect", {value:()=>({top:900,bottom:950,height:50} as DOMRect),configurable:true});
+  const link = sidebar().querySelector("a") as HTMLAnchorElement;
+  Object.defineProperty(link, "getBoundingClientRect", {
+    value: () => ({ top: 900, bottom: 950, height: 50 }) as DOMRect,
+    configurable: true,
+  });
   const initial = sidebar().scrollTop;
   fireEvent.scroll(window);
   expect(sidebar().scrollTop).toBeGreaterThan(initial);
@@ -178,8 +181,8 @@ it("unmountで全リスナー・inert・開状態を解除", () => {
   const r = root(),
     s = sidebar(),
     b = menu(),
-    count = document.getElementById("chkCount")!,
-    box = document.querySelector("input")!;
+    count = document.getElementById("chkCount") as HTMLElement,
+    box = document.querySelector("input") as HTMLInputElement;
   fireEvent.click(b);
   unmount();
   expect(s.inert).toBe(false);

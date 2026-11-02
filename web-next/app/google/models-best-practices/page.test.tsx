@@ -24,12 +24,17 @@ vi.mock("@/components/docs/MermaidDiagram", () => ({
   ),
 }));
 beforeEach(() => {
-  vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(function(this: HTMLElement) {
-    const i=expected.sections.indexOf(this.id);
-    return {top:i<0?100:i*1000,bottom:200,height:600} as DOMRect;
+  vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(function (
+    this: HTMLElement
+  ) {
+    const i = expected.sections.indexOf(this.id);
+    return { top: i < 0 ? 100 : i * 1000, bottom: 200, height: 600 } as DOMRect;
   });
 });
-afterEach(() => {cleanup();vi.restoreAllMocks();});
+afterEach(() => {
+  cleanup();
+  vi.restoreAllMocks();
+});
 const text = (e: Element) => (e.textContent ?? "").replace(/\s+/g, " ").trim();
 for (const selector of [
   "h1",
@@ -195,7 +200,8 @@ it("レジストリからGoogleの導線へ登録し移行確認日を記録", (
     lastReviewed: "2026-11-02",
   });
 });
-const cssValue=(v:unknown)=>typeof v === 'string'?v.replace(/\s+/g,' ').trim().replace(/'/g,'"'):v;
+const cssValue = (v: unknown) =>
+  typeof v === "string" ? v.replace(/\s+/g, " ").trim().replace(/'/g, '"') : v;
 const css = () => fs.readFileSync("app/google/models-best-practices/page.module.css", "utf8");
 // 元CSSを独立した固定期待値として保存。共有図解への委譲とルート・開閉スコープだけ明示変換する。
 const scoped = (s: string) =>
@@ -206,7 +212,7 @@ const scoped = (s: string) =>
       if ([":root", "body", "html"].includes(s)) return ".root";
       s = s.replace(/^body\.menu-open /, ".root.open ");
       s = s.replace(/(^|[ >+~])([a-z][a-z0-9-]*)(?=[\s.#:[>+~]|$)/g, "$1:global($2)");
-      return s.startsWith(".root") ? s : ".root " + s;
+      return s.startsWith(".root") ? s : `.root ${s}`;
     })
     .join(", ")
     .replace(/\s+/g, " ");
@@ -233,7 +239,7 @@ it("原本104 CSS規則の宣言・メディア条件を漏れなく転写", () 
           })
       ),
       source.selector
-    ).toContainEqual(source.declarations.map(d=>d.map(cssValue)));
+    ).toContainEqual(source.declarations.map((d) => d.map(cssValue)));
   }
 });
 it("リストの点・番号とチェックリスト例外、表・アンカー・コードリセット", () => {
