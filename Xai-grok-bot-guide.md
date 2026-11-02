@@ -216,7 +216,7 @@ uname -m
 ## 6. Step 2: サインインする
 
 1. ウェルカム画面で **Sign in** を選ぶ(Grok Bot は Cursor アカウントを使い、専用のログインはない)。
-2. 開いたブラウザで認証を完了する。通常は Cursor アカウントで認証する。セルフサーブの Grok Business のシートで使う場合は、ブラウザで **Sign in with Grok** を選び、シートを持つ Grok アカウントで認証する。
+2. 開いたブラウザで認証を完了する。Cursor から始めた場合でも、Cursor または Grok が xAI 共通のサインインページを開くことがあり、そのページには Grok や xAI のロゴ・名称が表示される場合がある。複数のアカウントを持っている場合は、使うつもりのアカウントを選ぶ。通常は Cursor アカウントで認証する。セルフサーブの Grok Business のシートで使う場合は、ブラウザで **Sign in with Grok** を選び、シートを持つ Grok アカウントで認証する。
 3. アプリに戻る。
 4. 契約経路に応じて、次の手順を行う。
    - **The X Subscription の Premium・Super・Ultra** の場合: Grok Bot が含まれるため、Grok アカウントの連携は不要。
