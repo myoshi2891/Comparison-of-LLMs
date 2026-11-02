@@ -1,0 +1,2516 @@
+{
+  "h1": ["OpenAI 最新モデル ベストプラクティス完全ガイド"],
+  "h2": [
+    "このガイドの読み方と前提",
+    "全体像: 2026年のOpenAIモデル地図",
+    "モデルを選ぶ",
+    "Responses APIで最小構成を作る",
+    "reasoning effortを設計する",
+    "プロンプトを「薄く」「境界を明確に」する",
+    "ツール・エージェント機能を使いこなす",
+    "コストと速度を最適化する",
+    "移行チェックリスト",
+    "評価と安全性を運用に組み込む",
+    "著名開発者・コミュニティの知見",
+    "よくある落とし穴 FAQ",
+    "情報の確度と注意点",
+    "参考URL一覧(根拠ソース)"
+  ],
+  "h3": [
+    "0-1. 情報の優先順位",
+    "0-2. 前提",
+    "1-1. リリースの流れ",
+    "1-2. 現行ラインナップ(API)",
+    "1-3. 周辺プロダクト・モデル",
+    "1-A. 選定フロー",
+    "1-B. 「Astraか6.1 Solか」の判断材料",
+    "1-C. ルーティング設計のコツ",
+    "2-A. 最小リクエスト",
+    "2-B. サンプリングパラメータに注意",
+    "2-C. 会話状態の持ち方",
+    "3-A. 対応状況",
+    "3-B. チューニング手順",
+    "3-C. 会話の途中でエフォートを変える(キャッシュを壊さない)",
+    "3-D. Proモード",
+    "4-A. 基本方針(公式の移行ガイドより)",
+    "4-B. Astra世代の挙動と対処",
+    "4-C. すぐ使えるテンプレート(自分用に書き直した版)",
+    "4-D. 詳細度は text.verbosity で一元管理",
+    "5-A. 機能マップ",
+    "5-B. 非同期ツール呼び出しのシーケンス",
+    "5-C. Programmatic Tool Calling の使い分け",
+    "5-D. マルチエージェントの設計",
+    "6-A. コストの4つのてこ",
+    "6-B. プロンプトキャッシュ",
+    "6-C. 272Kコンテキストの「崖」",
+    "6-D. 処理ティア",
+    "7-A. 移行フロー",
+    "7-B. 項目別チェック",
+    "7-C. GPT-6 Sol → GPT-6.1 Sol の落とし穴",
+    "7-D. Codexでの自動移行",
+    "8-A. 評価ループ",
+    "8-B. 安全性の運用",
+    "8-C. Codex・エージェント運用の整理術(Eric Provencher / OpenAI開発者ブログ)",
+    "公式ドキュメント・公式ブログ",
+    "著名開発者・計測者・コミュニティ",
+    "実装情報・価格・ベンチマーク解説(補助)"
+  ],
+  "h4": [],
+  "p": [
+    "OpenAI 最新モデルベストプラクティス",
+    "中級〜上級者向け / 2026-10-23時点",
+    "このガイドは次の優先順位で情報を扱います。",
+    "ポイントはわずか2か月弱で世代が一気に進んだことです。モデルIDを固定しつつ、評価基盤(Step 8)を先に整えておかないと、追従コストが膨らみます。",
+    "補足:",
+    "OpenAIは6.1 Solを「Astraに近い性能を約1/5の価格で」と位置づけ、自分のタスクで比較して品質とコストのトレードオフを評価することを勧めています。外部の実測も同じ方向です。",
+    "実務の結論",
+    "GPT-6世代では、推論・ツール呼び出し・マルチターンはResponses APIが前提です。Chat Completionsはツールなしのリクエストに限り使えます(Astra / 6.1 Sol)。gpt-6-sol と gpt-6-luna は reasoning_effort: \"none\" のときのみChat Completionsで関数呼び出しが可能です。",
+    "推論エフォートが none 以外のとき、次のパラメータは削除します。",
+    "※ Astraと6.1 Solは none / minimal 非対応。既存コードに none や minimal がある場合は、まず low に置き換えてレイテンシを比較します。",
+    "運用ルール:",
+    "GPT-6世代の新機能として、configuration_update という入力アイテムを足すと、プロンプトの先頭部分を書き換えずにエフォートを上げ下げできます。難しい局面だけ上げ、定型の追い質問は下げる、といった使い分けでキャッシュを保てます。",
+    "正確な入力アイテムの形は、公式の「Change reasoning mid-conversation」を参照してください(参考URL一覧)。",
+    "GPT-5.6世代以降、reasoning.mode を pro にすると、モデルがより多くの作業をしてから単一の最終回答を返します。別のProモデルIDに切り替える方式ではありません。",
+    "OpenAIは、社内のコーディングエージェント評価で、プロンプトを薄くした構成がスコア約10〜15%向上、総トークン41〜66%減、コスト33〜67%減になった例を示しています(傾向値であり、自分のワークロードで検証が必要)。",
+    "(1) 自律性と承認境界",
+    "(2) 優先順位の明示(指示ファイルが多い環境向け)",
+    "(3) 出力スタイル(散文中心にしたい場合)",
+    "(4) 検証の強度",
+    "向く条件:",
+    "直接のツール呼び出しを選ぶ条件:",
+    "ルーティングはタスク固有に書く(どの段階で使うか、使えるツール、出力スキーマ、並行数・再試行・停止条件、直接呼び出しに残す作業)。ツールの説明には返却フィールド・型・エラー挙動を書きます。返却の形が事前に分からないなら、直接呼び出しで中身を見てから判断させます。",
+    "評価の注意: program_output と最終メッセージは別物です。プログラムの結果が正しくても、最終回答で必須項目や引用が抜けることがあります。両方をテストします。",
+    "単価ではなく「1タスク完了あたりの総コスト」で比較するのが鉄則です。Astraは単価が高くても、出力トークンが少なくて済み、タスクあたりでは安い場合があるとOpenAIは述べています。",
+    "設計のコツ:",
+    "1.05Mトークンのコンテキストが使えても、入力が272Kを超えたリクエストは全体が長文料金になります。",
+    "「1行置換で価格も同じ」に見えますが、コミュニティの検証記事は次の点を挙げています。",
+    "公式は、OpenAI Docsスキルを使ったCodexでの機械的な移行を案内しています。",
+    "Codex に入力するプロンプト例(シェルでは実行しません。OpenAI Docsスキルが必要):",
+    "なお、旧世代を使い続ける場合も、GPT-5.6には11月に価格引き上げが予定されている(Simon Willisonの記事による)ため、コスト試算を更新してください。",
+    "測る指標(最低限):",
+    "「呼び出し回数やターン数が減った」は、最終回答が品質基準を満たす場合に限り改善と数える。",
+    "注意: X(旧Twitter)の投稿本体は直接取得できなかったため、ブログ本文または二次要約で確認できた内容に限って記載します。",
+    "世代交代は速く、数値は動きます。このガイドの核は、「(1)用途ごとにモデルを分ける、(2)エフォートは計測で決める、(3)プロンプトは薄く境界は明確に、(4)キャッシュと272K境界を意識する、(5)評価ループを先に作る」の5点です。各数値は、公式Pricingと自分の評価セットで再確認してから採用してください。"
+  ],
+  "li": [
+    "価格・上限値・対応状況は頻繁に変わります。本番投入前に必ず公式の Pricing と各モデルページで再確認してください。",
+    "「補足C」に、ソース間で食い違いがあった点をまとめています。",
+    "コードは Python(openai SDK)を中心に示します。",
+    "上記は短いコンテキスト(入力272K以下)の標準料金です。272Kを超えると、そのリクエスト全体に長文用の割増料金が掛かります(Step 6参照)。",
+    "知識カットオフは、Astra と 6.1 Sol が 2026年4月30日と報告されています(GPT-6 Solは4月20日との報告あり)。",
+    "入力はテキストと画像、推論エフォートは low〜max(Sol/Lunaの一部は none も可)です。",
+    "まず gpt-6.1-sol で全評価セットを回す。",
+    "失敗が集中するタスク群だけを gpt-6-astra で再実行して差分を測る。",
+    "差分が小さければ6.1 Solのまま、大きい領域だけAstraへルーティングする。",
+    "大量・定型の前段処理(分類、抽出、要約の下書き)は gpt-6-luna に落とす。",
+    "モデル名を直書きせず、用途名(例: triage / main_agent / hard_case)から解決する設定層を作る。世代交代が速いため、差し替えコストを下げられます。",
+    "6.1 Solは none/minimal エフォートに非対応です。Luna・GPT-6 Solからの置換時にエフォート設定の変換が要ります(Step 3)。",
+    "OpenAI開発者ブログには、プロバイダ障害時のフェイルオーバー設計記事もあります(参考URL一覧)。",
+    "GPT-5.6では推論の持ち越し(reasoning.context)が既定で all_turns です。前のターンの推論をモデルが参照できるため、マルチターンの品質とキャッシュ効率が上がります。ターンをまたぐ推論が必要なら、モデルの既定に頼らず reasoning={\"context\": \"all_turns\"} を明示します。",
+    "all_turns を活かすには previous_response_id を使います。手動管理なら、過去の入力とすべての出力アイテムを欠落なく再送します。",
+    "以前の目標・前提が無関係になったら current_turn に切り替えます。",
+    "高いほど良い、ではない。medium起点で、上げる根拠を計測で示す。",
+    "max は最難関で品質最優先のタスクに限定する。xhigh との差を必ず比較する。",
+    "推論トークンは出力トークン単価で課金されます。high / max では出力コストが跳ねます。",
+    "旧世代(GPT-5.5 / 5.4)から移すときは、現行エフォートを基準に同じ値と1段下を比較します。GPT-5.6世代はトークン効率が高く、低いエフォートでも同等品質になることがあります。",
+    "向く: 複雑な最適化、価値の高いレビュー、評価基準が明確な深い分析",
+    "向かない: 低遅延が必要な処理、高ボリューム処理、評価で改善が確認できない処理",
+    "エフォートとは独立。標準モードと同じ設定を基準に比較する",
+    "新しいベースラインから始める。古いプロンプトの指示を全部持ち越さない。",
+    "製品要件を守る最小のプロンプトから始め、エフォート・詳細度・ツール説明・出力形式を代表例で調整する。",
+    "同じ指示を繰り返さない。各指示は1回だけ書く。",
+    "関係するツールだけを公開し、説明は簡潔かつ正確に。",
+    "「簡潔に」だけの指示は、必要な情報まで削る場合があります。残すべき内容(結論・根拠・注意点・次の行動)と、削ってよい内容を指定します。",
+    "「親切に」「共感的に」などの曖昧な語は避け、書き方の選択(結論の出し方、問題への触れ方、締めの有無)で定義します。",
+    "実行と保留中ジョブの管理はアプリ側の責任です。結果は必ず元の call_id で返します。",
+    "結果をすぐ必要とするツールに async を付けない。",
+    "呼び出しが境界のあるワークフロー(絞り込み、結合、重複排除、集計、検証)",
+    "大きな中間出力を処理して、はるかに小さい構造化結果だけ返したい",
+    "1回の呼び出しで足りる",
+    "中間出力がすでに小さい",
+    "各結果が次の判断を変える(モデルの判断が毎回必要)",
+    "承認が必要な操作",
+    "最終出力に引用やネイティブな成果物を残す必要がある",
+    "委譲の頻度・条件はプロンプトで調整する。Astraは委譲が控えめになりやすく、逆に中規模タスクで委譲しすぎる(Sol系)という報告もあります。",
+    "子エージェントのコンテキストと推論も課金対象です。サブエージェントに自分の成果物を監査させる運用は、気づかないうちにコストと長文料金帯に入ります(Step 6)。",
+    "エージェント間のメッセージは人間が読むこともあるため、スペースや区切りが崩れないよう指示します。",
+    "システムプロンプト、ツール定義、固定の参考資料を先頭に固定し、変動部分を後ろに置く。",
+    "ツール定義の順序や文言を毎回変えない(先頭が変わるとミスする)。",
+    "エフォートを途中で変えるなら configuration_update を使う(Step 3-C)。",
+    "書き込み課金があるため、再利用されない部分にまでブレークポイントを置かない。",
+    "「入れられる」ことと「入れるべき」ことは別です。検索で絞る、圧縮(Compaction)を使う、不要なツール出力を落とす、で272K以下に収めます。",
+    "実際の課金閾値は提供元で異なる場合があります(例: GitHub Copilotは200K閾値という報告)。API直と他社経由で料金帯の仕様が違う前提で確認します。",
+    "ツール呼び出しが多いワークフローは、WebSocket上のResponses APIでターン間のオーバーヘッドを減らすことをOpenAIが推奨しています。",
+    "Ultrafastは生成速度を上げるもので、モデルの推論能力は変わりません。周辺のワークフロー(ツール待ち、人の確認)がボトルネックのままだと体感は伸びません。",
+    "none / minimal エフォートが使えない(6 Solでは動いていたコードが落ちる)",
+    "ツール呼び出しはResponses APIが必須",
+    "暗黙キャッシュの挙動(ブレークポイントの置き方)の違い",
+    "6.1 Solは持続性が高く、長く走る傾向がある(コストと時間の見積りを更新)",
+    "Ultrafast・Fastとデータ所在地の組み合わせに制約がある",
+    "Skillsの説明は短く、「いつ使うか」を明確に。「データベース関連なら常に」のような広い書き方は避け、「マイグレーションを追加・変更するとき」のように限定する。",
+    "Skillは段階的開示にする。ルート文書は最小の振り分け役にして、詳細は別ファイルやスクリプトへ。",
+    "手順を細かく縛るレシピ型の指示は見直す。高性能モデルでは過剰な制約が逆効果になりうる。",
+    "AGENTS.md は「作業前に全ドキュメントを読む」ではなく、用途別に参照先を示す。",
+    "以前のモデルを抑えるために書いた強い禁止・確認の文言は、Astraでは効きすぎて止まることがある。見直す。",
+    "完了の定義(起動、検査、失敗の修正まで)を依頼に含める。逆に「最初の実装後に必ずレビューで止まる」要件は、早期停止を誘発する。",
+    "安全と分かっている作業(使い捨てフィクスチャのローカルテストなど)は、AGENTS.md で明示的に許可を与える。",
+    "整理自体もAstraに依頼し、監査させる。"
+  ],
+  "ul": [
+    "価格・上限値・対応状況は頻繁に変わります。本番投入前に必ず公式の Pricing と各モデルページで再確認してください。 「補足C」に、ソース間で食い違いがあった点をまとめています。 コードは Python(openai SDK)を中心に示します。",
+    "上記は短いコンテキスト(入力272K以下)の標準料金です。272Kを超えると、そのリクエスト全体に長文用の割増料金が掛かります(Step 6参照)。 知識カットオフは、Astra と 6.1 Sol が 2026年4月30日と報告されています(GPT-6 Solは4月20日との報告あり)。 入力はテキストと画像、推論エフォートは low〜max(Sol/Lunaの一部は none も可)です。",
+    "モデル名を直書きせず、用途名(例: triage / main_agent / hard_case)から解決する設定層を作る。世代交代が速いため、差し替えコストを下げられます。 6.1 Solは none/minimal エフォートに非対応です。Luna・GPT-6 Solからの置換時にエフォート設定の変換が要ります(Step 3)。 OpenAI開発者ブログには、プロバイダ障害時のフェイルオーバー設計記事もあります(参考URL一覧)。",
+    "GPT-5.6では推論の持ち越し(reasoning.context)が既定で all_turns です。前のターンの推論をモデルが参照できるため、マルチターンの品質とキャッシュ効率が上がります。ターンをまたぐ推論が必要なら、モデルの既定に頼らず reasoning={\"context\": \"all_turns\"} を明示します。 all_turns を活かすには previous_response_id を使います。手動管理なら、過去の入力とすべての出力アイテムを欠落なく再送します。 以前の目標・前提が無関係になったら current_turn に切り替えます。",
+    "向く: 複雑な最適化、価値の高いレビュー、評価基準が明確な深い分析 向かない: 低遅延が必要な処理、高ボリューム処理、評価で改善が確認できない処理 エフォートとは独立。標準モードと同じ設定を基準に比較する",
+    "「簡潔に」だけの指示は、必要な情報まで削る場合があります。残すべき内容(結論・根拠・注意点・次の行動)と、削ってよい内容を指定します。 「親切に」「共感的に」などの曖昧な語は避け、書き方の選択(結論の出し方、問題への触れ方、締めの有無)で定義します。",
+    "実行と保留中ジョブの管理はアプリ側の責任です。結果は必ず元の call_id で返します。 結果をすぐ必要とするツールに async を付けない。",
+    "呼び出しが境界のあるワークフロー(絞り込み、結合、重複排除、集計、検証) 大きな中間出力を処理して、はるかに小さい構造化結果だけ返したい",
+    "1回の呼び出しで足りる 中間出力がすでに小さい 各結果が次の判断を変える(モデルの判断が毎回必要) 承認が必要な操作 最終出力に引用やネイティブな成果物を残す必要がある",
+    "委譲の頻度・条件はプロンプトで調整する。Astraは委譲が控えめになりやすく、逆に中規模タスクで委譲しすぎる(Sol系)という報告もあります。 子エージェントのコンテキストと推論も課金対象です。サブエージェントに自分の成果物を監査させる運用は、気づかないうちにコストと長文料金帯に入ります(Step 6)。 エージェント間のメッセージは人間が読むこともあるため、スペースや区切りが崩れないよう指示します。",
+    "「入れられる」ことと「入れるべき」ことは別です。検索で絞る、圧縮(Compaction)を使う、不要なツール出力を落とす、で272K以下に収めます。 実際の課金閾値は提供元で異なる場合があります(例: GitHub Copilotは200K閾値という報告)。API直と他社経由で料金帯の仕様が違う前提で確認します。",
+    "ツール呼び出しが多いワークフローは、WebSocket上のResponses APIでターン間のオーバーヘッドを減らすことをOpenAIが推奨しています。 Ultrafastは生成速度を上げるもので、モデルの推論能力は変わりません。周辺のワークフロー(ツール待ち、人の確認)がボトルネックのままだと体感は伸びません。",
+    "none / minimal エフォートが使えない(6 Solでは動いていたコードが落ちる) ツール呼び出しはResponses APIが必須 暗黙キャッシュの挙動(ブレークポイントの置き方)の違い 6.1 Solは持続性が高く、長く走る傾向がある(コストと時間の見積りを更新) Ultrafast・Fastとデータ所在地の組み合わせに制約がある"
+  ],
+  "ol": [
+    "まず gpt-6.1-sol で全評価セットを回す。 失敗が集中するタスク群だけを gpt-6-astra で再実行して差分を測る。 差分が小さければ6.1 Solのまま、大きい領域だけAstraへルーティングする。 大量・定型の前段処理(分類、抽出、要約の下書き)は gpt-6-luna に落とす。",
+    "高いほど良い、ではない。medium起点で、上げる根拠を計測で示す。 max は最難関で品質最優先のタスクに限定する。xhigh との差を必ず比較する。 推論トークンは出力トークン単価で課金されます。high / max では出力コストが跳ねます。 旧世代(GPT-5.5 / 5.4)から移すときは、現行エフォートを基準に同じ値と1段下を比較します。GPT-5.6世代はトークン効率が高く、低いエフォートでも同等品質になることがあります。",
+    "新しいベースラインから始める。古いプロンプトの指示を全部持ち越さない。 製品要件を守る最小のプロンプトから始め、エフォート・詳細度・ツール説明・出力形式を代表例で調整する。 同じ指示を繰り返さない。各指示は1回だけ書く。 関係するツールだけを公開し、説明は簡潔かつ正確に。",
+    "システムプロンプト、ツール定義、固定の参考資料を先頭に固定し、変動部分を後ろに置く。 ツール定義の順序や文言を毎回変えない(先頭が変わるとミスする)。 エフォートを途中で変えるなら configuration_update を使う(Step 3-C)。 書き込み課金があるため、再利用されない部分にまでブレークポイントを置かない。",
+    "Skillsの説明は短く、「いつ使うか」を明確に。「データベース関連なら常に」のような広い書き方は避け、「マイグレーションを追加・変更するとき」のように限定する。 Skillは段階的開示にする。ルート文書は最小の振り分け役にして、詳細は別ファイルやスクリプトへ。 手順を細かく縛るレシピ型の指示は見直す。高性能モデルでは過剰な制約が逆効果になりうる。 AGENTS.md は「作業前に全ドキュメントを読む」ではなく、用途別に参照先を示す。 以前のモデルを抑えるために書いた強い禁止・確認の文言は、Astraでは効きすぎて止まることがある。見直す。 完了の定義(起動、検査、失敗の修正まで)を依頼に含める。逆に「最初の実装後に必ずレビューで止まる」要件は、早期停止を誘発する。 安全と分かっている作業(使い捨てフィクスチャのローカルテストなど)は、AGENTS.md で明示的に許可を与える。 整理自体もAstraに依頼し、監査させる。"
+  ],
+  "blockquote": [],
+  "pre code": [
+    "from openai import OpenAI\n\nclient = OpenAI()\n\nlog_text = \"2026-10-23T09:12:04Z ERROR db: connection pool exhausted\"  # 分析対象のログ(例)\n\nresponse = client.responses.create(\n    model=\"gpt-6.1-sol\",\n    input=\"次のログから根本原因の候補を3つ挙げ、確認手順を示してください。\\n\\n\" + log_text,\n    reasoning={\"effort\": \"medium\"},      # 既定はmedium\n    text={\"verbosity\": \"medium\"},        # 詳細度の既定値\n)\n\nprint(response.output_text)\n",
+    "# NG: エフォートがnone以外で温度を指定している\nclient.responses.create(\n    model=\"gpt-6.1-sol\",\n    input=\"...\",\n    reasoning={\"effort\": \"high\"},\n    temperature=0.2,   # 非対応。削除する\n)\n",
+    "# 権限の考え方\n- 「説明・レビュー・診断・計画」の依頼: 関連資料を調べて報告する。依頼がない限り変更は実装しない。\n- 「変更・構築・修正」の依頼: 範囲内のローカル変更と、非破壊の検証を、確認なしで実行する。\n- 次の場合だけ事前確認を取る: 外部への書き込み、破壊的操作、購入・課金、依頼範囲の実質的な拡大。\n\n# 完了の定義\n- 実装、起動確認、結果の検査、失敗の修正までを依頼に含める。\n- 最初の実装が動いた時点で止まらず、受け入れ基準を満たすまで進める。\n",
+    "指示の優先順位は、実行環境の指示階層(システム・開発者の指示)と、適用されるskill・AGENTS.mdの指示に従う。\nユーザーの明示的な依頼だけでは、これらの指示を上書きしない。\nskillが原因で確認を求めたり作業を中断したりする場合は、\n該当ファイル名と該当箇所を示し、明示要件と自分の解釈を区別して説明する。\n",
+    "結論を冒頭で述べ、段落ごとに1つの論点を展開する。\n箇条書きや表は、並列・手順・比較として本当に有効な場合だけ使う。\n専門用語は必要最小限にし、読者の前提知識に合わせて説明の深さを調整する。\n",
+    "可逆で影響の小さい変更には、実装をなぞるだけのテストを書かない。\n変更に見合う検証を行い、通った後は、新たな失敗や懸念がない限り検証を広げず完了に向かう。\n",
+    "user_query = \"Responses APIとChat Completionsの違いを教えてください。\"  # ユーザーの質問(例)\n\nresponse = client.responses.create(\n    model=\"gpt-6.1-sol\",\n    input=user_query,\n    reasoning={\"effort\": \"medium\"},\n    text={\"verbosity\": \"low\"},  # low / medium / high\n)\n",
+    "tools = [\n    {\n        \"type\": \"function\",\n        \"name\": \"fetch_report\",\n        \"description\": \"売上レポートを取得する。完了まで数十秒かかる。\",\n        \"parameters\": {\n            \"type\": \"object\",\n            \"properties\": {\"quarter\": {\"type\": \"string\"}},\n            \"required\": [\"quarter\"],\n            \"additionalProperties\": False,\n        },\n        \"strict\": True,\n        \"async\": True,   # 結果がすぐ要らないツールにだけ付ける\n    }\n]\n",
+    "prompt = \"この関数の名前をより分かりやすく変えてください。\"  # 入力(例)\n\nfast = client.responses.create(\n    model=\"gpt-6.1-sol\",\n    input=prompt,\n    service_tier=\"ultrafast\",   # 対話・高速なコーディング反復向け\n)\n",
+    "$openai-docs migrate this project to the GPT-6 model family\n"
+  ],
+  ".callout": [
+    "注意: X(旧Twitter)の投稿本体は直接取得できなかったため、ブログ本文または二次要約で確認できた内容に限って記載します。"
+  ],
+  ".closing": [
+    "POINT 世代交代は速く、数値は動きます。このガイドの核は、「(1)用途ごとにモデルを分ける、(2)エフォートは計測で決める、(3)プロンプトは薄く境界は明確に、(4)キャッシュと272K境界を意識する、(5)評価ループを先に作る」の5点です。各数値は、公式Pricingと自分の評価セットで再確認してから採用してください。"
+  ],
+  ".hero": [
+    "OpenAI GPT-6 Family Guide OpenAI 最新モデル ベストプラクティス完全ガイド 中級〜上級者向け 対象読者すでにOpenAI APIを使ったことがあり、GPT-6世代へ移行・最適化したいエンジニア 調査基準日2026年10月23日(この日までに公開された情報をもとに作成) ゴール「どのモデルを選び、どう呼び、どう評価し、どうコストを抑えるか」を8ステップで身につける"
+  ],
+  ".footer": ["調査基準日: 2026年10月23日。価格・仕様は公式ドキュメントで必ず再確認してください。"],
+  ".meta-card": [
+    "対象読者すでにOpenAI APIを使ったことがあり、GPT-6世代へ移行・最適化したいエンジニア",
+    "調査基準日2026年10月23日(この日までに公開された情報をもとに作成)",
+    "ゴール「どのモデルを選び、どう呼び、どう評価し、どうコストを抑えるか」を8ステップで身につける"
+  ],
+  ".code-head": [
+    "Pythonコピー",
+    "Pythonコピー",
+    "Markdownコピー",
+    "Markdownコピー",
+    "Markdownコピー",
+    "Markdownコピー",
+    "Pythonコピー",
+    "Pythonコピー",
+    "Pythonコピー",
+    "Textコピー"
+  ],
+  "tables": [
+    [
+      [
+        ["th", null, null, "優先度"],
+        ["th", null, null, "種別"],
+        ["th", null, null, "例"],
+        ["th", null, null, "扱い"]
+      ],
+      [
+        ["td", null, null, "1"],
+        ["td", null, null, "OpenAI公式ドキュメント・公式ブログ"],
+        ["td", null, null, "Using GPT-6、API Changelog"],
+        ["td", null, null, "仕様・パラメータの根拠として採用"]
+      ],
+      [
+        ["td", null, null, "2"],
+        ["td", null, null, "著名な開発者・計測者の一次発信"],
+        ["td", null, null, "Simon Willison、OpenAI開発者ブログ著者"],
+        ["td", null, null, "実測値・運用知見として採用"]
+      ],
+      [
+        ["td", null, null, "3"],
+        ["td", null, null, "ゲートウェイ・解析企業の技術ブログ"],
+        ["td", null, null, "LiteLLM、Vercel、Endor Labs"],
+        ["td", null, null, "公式を補う実装情報として採用"]
+      ],
+      [
+        ["td", null, null, "4"],
+        ["td", null, null, "比較サイト・まとめ記事"],
+        ["td", null, null, "価格比較サイト"],
+        ["td", null, null, "数値は複数ソースで一致したもののみ採用"]
+      ]
+    ],
+    [
+      [
+        ["th", null, null, "モデル"],
+        ["th", null, null, "API ID"],
+        ["th", null, null, "位置づけ"],
+        ["th", null, null, "入力 / キャッシュ入力 / 出力(100万トークン)"],
+        ["th", null, null, "コンテキスト"]
+      ],
+      [
+        ["td", null, null, "GPT-6 Astra"],
+        ["td", null, null, "gpt-6-astra"],
+        ["td", null, null, "最高知能。最難関の推論・コーディング・コンピュータ操作"],
+        ["td", null, null, "$10 / $1 / $50"],
+        ["td", null, null, "1.05M(最大出力128K)"]
+      ],
+      [
+        ["td", null, null, "GPT-6.1 Sol"],
+        ["td", null, null, "gpt-6.1-sol"],
+        ["td", null, null, "Astraに迫る性能を約1/5の単価で。新規開発の既定候補"],
+        ["td", null, null, "$2 / $0.10 / $10"],
+        ["td", null, null, "1.05M"]
+      ],
+      [
+        ["td", null, null, "GPT-6 Sol"],
+        ["td", null, null, "gpt-6-sol"],
+        ["td", null, null, "6.1 Solの前版(同価格、キャッシュ入力は$0.20)"],
+        ["td", null, null, "$2 / $0.20 / $10"],
+        ["td", null, null, "1.05M"]
+      ],
+      [
+        ["td", null, null, "GPT-6 Luna"],
+        ["td", null, null, "gpt-6-luna"],
+        ["td", null, null, "高ボリューム・定型・低コスト"],
+        ["td", null, null, "$0.10 / $0.01 / $0.50"],
+        ["td", null, null, "1.05M"]
+      ]
+    ],
+    [
+      [["th", null, null, "領域"], ["th", null, null, "内容"], ["th", null, null, "要点"]],
+      [
+        ["td", null, null, "音声"],
+        ["td", null, null, "GPT-Live-1(API一般提供)、GPT-Live-1.1(10月15日、ChatGPT Voice)"],
+        ["td", null, null, "新しい音声が追加され、多言語・アクセントが改善"]
+      ],
+      [
+        ["td", null, null, "画像"],
+        ["td", null, null, "GPT Image 2.5(9月8日、Sunburst / Flare系)"],
+        ["td", null, null, "Image APIとResponses APIの画像生成ツールで利用"]
+      ],
+      [
+        ["td", null, null, "高速化"],
+        ["td", null, null, "Fast mode / Ultrafast mode"],
+        ["td", null, null, "service_tier で切替(Step 6)"]
+      ],
+      [
+        ["td", null, null, "エージェント"],
+        ["td", null, null, "Multi-agent(β)、Agents API、Agents SDK"],
+        ["td", null, null, "サブエージェントへの委任(Step 5)"]
+      ],
+      [
+        ["td", null, null, "ChatGPT側"],
+        ["td", null, null, "GPT-6 Proの並列エージェント(10月16日)、Slides"],
+        ["td", null, null, "プロダクト機能。API設計とは分けて考える"]
+      ]
+    ],
+    [
+      [["th", null, null, "観点"], ["th", null, null, "実測・報告"], ["th", null, null, "出典"]],
+      [
+        ["td", null, null, "タスクあたりコスト"],
+        [
+          "td",
+          null,
+          null,
+          "6.1 Solは Astra の4分の1未満(指数タスクあたり約$0.72 対 約$3.26、指数スコアは52対53)"
+        ],
+        ["td", null, null, "DataCamp"]
+      ],
+      [
+        ["td", null, null, "保守タスク(未使用コード調査)"],
+        [
+          "td",
+          null,
+          null,
+          "6.1 Sol Ultraは Astra Ultra の92%の検出数を、14%のコストで達成。1件あたりコストは Astra Ultra $0.77、6.1 Sol Ultra $0.12、6.1 Sol Medium $0.06"
+        ],
+        ["td", null, null, "OpenAI開発者ブログ"]
+      ],
+      [
+        ["td", null, null, "セキュアなコード生成"],
+        ["td", null, null, "Codex上で6.1 SolとAstraはほぼ互角(安全に解けたタスクの差は7件対6件)"],
+        ["td", null, null, "Endor Labs"]
+      ],
+      [
+        ["td", null, null, "最難関領域"],
+        ["td", null, null, "サイバー・生物・科学の最難関評価ではAstraが依然上位との報告"],
+        ["td", null, null, "DataCamp"]
+      ]
+    ],
+    [
+      [["th", null, null, "削除するもの"], ["th", null, null, "API"]],
+      [["td", null, null, "temperature, top_p, top_logprobs"], ["td", null, null, "共通"]],
+      [["td", null, null, "logprobs"], ["td", null, null, "Chat Completions"]],
+      [
+        ["td", null, null, "message.output_text.logprobs(include内)"],
+        ["td", null, null, "Responses"]
+      ]
+    ],
+    [
+      [
+        ["th", null, null, "モデル"],
+        ["th", null, null, "指定できる値"],
+        ["th", null, null, "既定"]
+      ],
+      [
+        ["td", null, null, "gpt-6-astra"],
+        ["td", null, null, "low / medium / high / xhigh / max"],
+        ["td", null, null, "medium"]
+      ],
+      [
+        ["td", null, null, "gpt-6.1-sol"],
+        ["td", null, null, "low / medium / high / xhigh / max"],
+        ["td", null, null, "medium"]
+      ],
+      [
+        ["td", null, null, "gpt-6-sol"],
+        ["td", null, null, "none を含む(minimalは非対応)"],
+        ["td", null, null, "medium"]
+      ],
+      [
+        ["td", null, null, "gpt-6-luna"],
+        ["td", null, null, "none を含む(minimalは非対応)"],
+        ["td", null, null, "medium"]
+      ]
+    ],
+    [
+      [["th", null, null, "守ること"], ["th", null, null, "理由"]],
+      [
+        ["td", null, null, "リクエストレベルの reasoning.effort は固定のままにする"],
+        ["td", null, null, "先頭部分が変わるとキャッシュが外れる"]
+      ],
+      [
+        ["td", null, null, "標準の単一エージェントリクエストで使う"],
+        ["td", null, null, "マルチエージェントとは併用不可の制約あり"]
+      ],
+      [
+        ["td", null, null, "truncation: \"auto\" と併用しない"],
+        ["td", null, null, "互換制限(公式のReasoningガイドで確認)"]
+      ]
+    ],
+    [
+      [
+        ["th", null, null, "挙動の傾向"],
+        ["th", null, null, "症状"],
+        ["th", null, null, "対処の方向性"]
+      ],
+      [
+        ["td", null, null, "より協調的で、重要な不明点を質問しやすい"],
+        ["td", null, null, "「ユーザーが推測して進めてほしい場面」で止まる"],
+        ["td", null, null, "権限が暗黙に与えられている依頼は実行まで進める、と明文化"]
+      ],
+      [
+        ["td", null, null, "指示への感度が高い"],
+        ["td", null, null, "skillsや AGENTS.md の矛盾・曖昧さで作業が止まる"],
+        ["td", null, null, "指示の優先順位を明示。ファイル群を監査"]
+      ],
+      [
+        ["td", null, null, "書式が多め(箇条書き・表・Markdown)"],
+        ["td", null, null, "製品UIに合わない"],
+        ["td", null, null, "文体と構造を明示指定"]
+      ],
+      [
+        ["td", null, null, "委譲が控えめ"],
+        ["td", null, null, "サブエージェントを使わない"],
+        ["td", null, null, "いつ・どれだけ並列化するか指定"]
+      ],
+      [
+        ["td", null, null, "テストが徹底的"],
+        ["td", null, null, "小さな変更に広すぎるテスト"],
+        ["td", null, null, "変更規模に応じた検証範囲を指定"]
+      ]
+    ],
+    [
+      [
+        ["th", null, null, "機能"],
+        ["th", null, null, "何ができるか"],
+        ["th", null, null, "使いどころ"]
+      ],
+      [
+        ["td", null, null, "非同期ツール呼び出し(Async tool calling)"],
+        [
+          "td",
+          null,
+          null,
+          "ツール実行中も、モデルが推論・他ツール呼び出し・独立部分の回答を続けられる"
+        ],
+        ["td", null, null, "実行が遅い外部API、並行できる調査"]
+      ],
+      [
+        ["td", null, null, "途中介入(Mid-turn steering)"],
+        ["td", null, null, "実行中に追加指示を送れる。完了済みの作業は保持される(WebSocket接続)"],
+        ["td", null, null, "長時間タスクの軌道修正"]
+      ],
+      [
+        ["td", null, null, "Programmatic Tool Calling"],
+        [
+          "td",
+          null,
+          null,
+          "モデルがJavaScriptで複数ツールを呼び、中間結果を処理して小さな結果だけ返す"
+        ],
+        ["td", null, null, "絞り込み・結合・集計などの定型処理"]
+      ],
+      [
+        ["td", null, null, "Multi-agent(β)"],
+        ["td", null, null, "サブエージェントに委任して並列に進める"],
+        ["td", null, null, "独立した作業に分割できる大きなタスク"]
+      ],
+      [
+        ["td", null, null, "圧縮(Compaction)"],
+        ["td", null, null, "長い会話を圧縮して継続"],
+        ["td", null, null, "長時間エージェント"]
+      ],
+      [
+        ["td", null, null, "ツール検索・Skills・MCP"],
+        ["td", null, null, "ツール数が多い環境の整理、再利用可能な手順"],
+        ["td", null, null, "大規模なツール群"]
+      ]
+    ],
+    [
+      [["th", null, null, "項目"], ["th", null, null, "内容"]],
+      [
+        ["td", null, null, "キャッシュ読み取り"],
+        ["td", null, null, "6.1 Sol: 入力の5%($0.10)。Astra: $1。Luna: $0.01"]
+      ],
+      [
+        ["td", null, null, "キャッシュ書き込み"],
+        [
+          "td",
+          null,
+          null,
+          "TTLで単価が異なる。30分(\"30m\"、既定): 通常入力の1.25倍(6.1 Sol: $2.50 / Astra: $12.50)。12時間(\"12h\"、2026-10-20追加): 通常入力の2.5倍(6.1 Sol: $5.00 / Astra: $25.00)"
+        ]
+      ],
+      [
+        ["td", null, null, "暗黙モード"],
+        ["td", null, null, "最新の対象メッセージ末尾に1つのブレークポイントを置く"]
+      ],
+      [
+        ["td", null, null, "明示モード"],
+        ["td", null, null, "再利用する先頭部分を自分で指定して不要な書き込みを避ける"]
+      ],
+      [
+        ["td", null, null, "移行時の変更"],
+        [
+          "td",
+          null,
+          null,
+          "GPT-5.5以前の prompt_cache_retention は prompt_cache_options.ttl(例: \"30m\")に置換"
+        ]
+      ],
+      [
+        ["td", null, null, "計測"],
+        ["td", null, null, "cached_tokens と cache_write_tokens を追跡して正味コストを見る"]
+      ],
+      [
+        ["td", null, null, "診断"],
+        ["td", null, null, "Prompt Cache Diagnostics が一般提供。キャッシュミスの原因を確認できる"]
+      ]
+    ],
+    [
+      [
+        ["th", null, null, "モデル"],
+        ["th", null, null, "短いコンテキスト(入力 / 出力)"],
+        ["th", null, null, "長文(入力 / 出力)"]
+      ],
+      [
+        ["td", null, null, "6.1 Sol"],
+        ["td", null, null, "$2 / $10"],
+        ["td", null, null, "$4 / $15"]
+      ],
+      [
+        ["td", null, null, "GPT-6 Luna"],
+        ["td", null, null, "$0.10 / $0.50"],
+        ["td", null, null, "$0.20 / $0.75"]
+      ],
+      [
+        ["td", null, null, "GPT-6 Astra"],
+        ["td", null, null, "$10 / $50"],
+        ["td", null, null, "約$20 / 約$75(報告値)"]
+      ]
+    ],
+    [
+      [
+        ["th", null, null, "ティア"],
+        ["th", null, null, "指定"],
+        ["th", null, null, "特徴"],
+        ["th", null, null, "注意"]
+      ],
+      [
+        ["td", null, null, "Standard"],
+        ["td", null, null, "指定なし(default)"],
+        ["td", null, null, "既定"],
+        ["td", null, null, "-"]
+      ],
+      [
+        ["td", null, null, "Fast mode"],
+        ["td", null, null, "service_tier: \"priority\""],
+        ["td", null, null, "優先処理(旧Priority processingの改称)"],
+        [
+          "td",
+          null,
+          null,
+          "AstraのFastにはレイテンシSLAなし。EUデータ所在地はSol/Lunaで対応、Astraは非対応"
+        ]
+      ],
+      [
+        ["td", null, null, "Ultrafast mode"],
+        ["td", null, null, "service_tier: \"ultrafast\""],
+        ["td", null, null, "出力トークン間の時間を短縮。Responses APIで利用"],
+        [
+          "td",
+          null,
+          null,
+          "別枠のレート上限。Astraは標準単価の約6倍課金の報告。6.1 SolのUltrafastは米国・EU・グローバル処理に対応"
+        ]
+      ],
+      [
+        ["td", null, null, "Batch / Flex"],
+        ["td", null, null, "各ガイド参照"],
+        ["td", null, null, "非同期・低優先で割安"],
+        ["td", null, null, "即時性が不要な処理向け"]
+      ]
+    ],
+    [
+      [["th", null, null, "#"], ["th", null, null, "項目"], ["th", null, null, "やること"]],
+      [
+        ["td", null, null, "1"],
+        ["td", null, null, "モデルID"],
+        ["td", null, null, "gpt-6-astra / gpt-6.1-sol / gpt-6-luna のいずれかに設定"]
+      ],
+      [
+        ["td", null, null, "2"],
+        ["td", null, null, "API"],
+        [
+          "td",
+          null,
+          null,
+          "Astra / 6.1 Sol のツール呼び出しは Responses API へ(Chat Completionsは不可)。Luna は reasoning_effort: \"none\" のときのみ Chat Completions で関数呼び出し可(Step 2)"
+        ]
+      ],
+      [
+        ["td", null, null, "3"],
+        ["td", null, null, "エフォート"],
+        ["td", null, null, "現行値を保持。Astra/6.1 Solで none は low へ、minimal も low から比較"]
+      ],
+      [
+        ["td", null, null, "4"],
+        ["td", null, null, "サンプリング"],
+        ["td", null, null, "エフォートが none 以外なら temperature / top_p / top_logprobs を削除"]
+      ],
+      [
+        ["td", null, null, "5"],
+        ["td", null, null, "キャッシュ"],
+        ["td", null, null, "prompt_cache_retention → prompt_cache_options.ttl。書き込み課金を確認"]
+      ],
+      [
+        ["td", null, null, "6"],
+        ["td", null, null, "承認の停止"],
+        ["td", null, null, "不要な確認で止まる場合は、自律性・承認境界のプロンプトを見直す(Step 4)"]
+      ],
+      [
+        ["td", null, null, "7"],
+        ["td", null, null, "データ所在地"],
+        ["td", null, null, "AstraのFastはEU非対応。要件と突き合わせる"]
+      ],
+      [
+        ["td", null, null, "8"],
+        ["td", null, null, "ユーザー識別"],
+        [
+          "td",
+          null,
+          null,
+          "エンドユーザー向けなら、安定でプライバシーに配慮した safety_identifier を送る"
+        ]
+      ]
+    ],
+    [
+      [["th", null, null, "指標"], ["th", null, null, "理由"]],
+      [["td", null, null, "タスク成功率"], ["td", null, null, "品質の主指標"]],
+      [
+        ["td", null, null, "完全性・必須の根拠・引用の有無"],
+        ["td", null, null, "最終回答の抜けを検出"]
+      ],
+      [
+        ["td", null, null, "総トークン(入力 / 推論 / 出力 / キャッシュ)"],
+        ["td", null, null, "コスト構造の把握"]
+      ],
+      [
+        ["td", null, null, "レイテンシ(最初のトークン、総所要時間)"],
+        ["td", null, null, "体験の把握"]
+      ],
+      [["td", null, null, "ツール呼び出し回数・再試行・ターン数"], ["td", null, null, "効率の把握"]]
+    ],
+    [
+      [
+        ["th", null, null, "論点"],
+        ["th", null, null, "公式・報告ベースの要点"],
+        ["th", null, null, "実装での対応"]
+      ],
+      [
+        ["td", null, null, "指示階層"],
+        [
+          "td",
+          null,
+          null,
+          "2026年10月更新のGPT-6 Sol/Lunaは指示階層評価でほぼ飽和(99.99% / 99.79%)"
+        ],
+        ["td", null, null, "システム指示とユーザー指示の役割を分けて設計する"]
+      ],
+      [
+        ["td", null, null, "プロンプトインジェクション"],
+        ["td", null, null, "高い頑健性が報告されている"],
+        ["td", null, null, "それでも外部コンテンツはデータとして扱う境界を維持する"]
+      ],
+      [
+        ["td", null, null, "過剰な拒否・注意書き"],
+        ["td", null, null, "無害な依頼への拒否や余計な注意書きは減少"],
+        ["td", null, null, "製品として必要な注意だけを自前で付ける"]
+      ],
+      [
+        ["td", null, null, "誤作動監視"],
+        ["td", null, null, "Astraは非同期でミスアラインメントを監視し、必要時にアラートを出す"],
+        ["td", null, null, "監視アラートの扱いを運用フローに組み込む"]
+      ],
+      [
+        ["td", null, null, "高リスク領域の分類器"],
+        ["td", null, null, "サイバー・生物の誤用検知で、ブロックや生成の一時停止が起こりうる"],
+        ["td", null, null, "正当な防御・研究用途は、公式の信頼アクセス情報を確認"]
+      ],
+      [
+        ["td", null, null, "ユーザー識別"],
+        ["td", null, null, "エンドユーザー向けは safety_identifier を推奨"],
+        ["td", null, null, "安定した匿名ID(ハッシュ化など)を付与"]
+      ]
+    ],
+    [
+      [
+        ["th", null, null, "発信者"],
+        ["th", null, null, "内容"],
+        ["th", null, null, "実務への示唆"],
+        ["th", null, null, "URL"]
+      ],
+      [
+        ["td", null, null, "Simon Willison(Django共同作者、LLM CLI作者)"],
+        [
+          "td",
+          null,
+          null,
+          "「ペリカン自転車SVG」ベンチをAstraの全エフォート(low〜max)とGPT-5.6の各階層で比較。Astraはlowでも5.6 Solの全描画を上回る、という観察。maxでは1枚あたり出力12,638トークンで約63セント"
+        ],
+        ["td", null, null, "エフォートはコストが桁で変わる。まず低めで品質を確認する"],
+        ["td", null, null, "Pelican comparison grid for Astra"]
+      ],
+      [
+        ["td", null, null, "Simon Willison"],
+        [
+          "td",
+          null,
+          null,
+          "GPT-6 Sol / Lunaの価格を整理。5.6の半額(5.6の販促価格に対して)。AstraとClaude Fable 5.1は同じ$10 / $50"
+        ],
+        ["td", null, null, "価格戦争が中位帯で起きている。ベンダー比較の再評価時期"],
+        ["td", null, null, "Claude Opus 5.5, GPT-6 Sol, GPT-6 Luna, and a new price war"]
+      ],
+      [
+        ["td", null, null, "Simon Willison"],
+        [
+          "td",
+          null,
+          null,
+          "ChatGPT WorkでAstra(Max)に「自宅から5K/10Kのコース」を依頼。27分でGPX・GeoJSON・HTML地図を生成。ただし圧縮(compaction)後に実行コードが取り出せず、これを「反機能」と批判"
+        ],
+        ["td", null, null, "圧縮前の履歴を保存し、エージェントが読み戻せる設計にする"],
+        ["td", null, null, "二次要約: AI/TLDR"]
+      ],
+      [
+        ["td", null, null, "Eric Provencher(OpenAI開発者ブログ著者)"],
+        ["td", null, null, "Skills・AGENTS.md・タスクプロンプトの棚卸し指針(Step 8-C)"],
+        ["td", null, null, "指示の肥大化がAstraでは性能低下と停止の原因になる"],
+        ["td", null, null, "Rethinking skills and prompts for GPT-6 Astra"]
+      ],
+      [
+        ["td", null, null, "OpenAI開発者ブログ"],
+        ["td", null, null, "保守作業での6.1 Sol対Astra比較(1件あたりコスト)"],
+        ["td", null, null, "検出漏れの種類は異なる。重要な監査は併用も検討"],
+        ["td", null, null, "Maintaining software with the GPT-6 family"]
+      ],
+      [
+        ["td", null, null, "minimaxir(Hacker Newsのユーザー名)ほか(HN上のコメント)"],
+        [
+          "td",
+          null,
+          null,
+          "6.1 Solの発表で重要なのはキャッシュ入力が半額になった点、という指摘。Codexでは400K・1Mのコンテキストも使えるが、一定量超過は2倍課金の指摘"
+        ],
+        ["td", null, null, "長時間エージェントはキャッシュ単価が支配的"],
+        ["td", null, null, "Hacker News"]
+      ],
+      [
+        ["td", null, null, "Latent Space(swyx)とゲスト(Ben Davisら)"],
+        [
+          "td",
+          null,
+          null,
+          "6.1 Solは「評価が低すぎる」「価格が良い」。サブエージェントの並列実行は、キャッシュ最適化で「大幅に速く」なった(Codexチーム談)"
+        ],
+        ["td", null, null, "並列化はモデルのプロンプトで増やせる(「もっと生成して」と指示)"],
+        ["td", null, null, "Latent Space要約"]
+      ],
+      [
+        ["td", null, null, "Latent Space AINews"],
+        [
+          "td",
+          null,
+          null,
+          "Astra発表時の整理。Responses APIの非同期関数呼び出し・途中介入・エフォート変更(@reach_vb、@nikunjhandaの発信)。外部評価でAstraは5.6 Solより約70%トークン効率が高いなど"
+        ],
+        ["td", null, null, "公式主張と独立計測を区別して読む"],
+        ["td", null, null, "AINews"]
+      ],
+      [
+        ["td", null, null, "Endor Labs"],
+        ["td", null, null, "Codex上のセキュリティ評価で6.1 SolはAstraとほぼ同等、約3分の1高速"],
+        ["td", null, null, "セキュアコーディング用途の根拠データ"],
+        ["td", null, null, "Endor Labs"]
+      ]
+    ],
+    [
+      [["th", null, null, "症状"], ["th", null, null, "原因"], ["th", null, null, "対処"]],
+      [
+        ["td", null, null, "6.1 Solに替えたら400エラー"],
+        ["td", null, null, "none / minimal エフォートを指定している"],
+        ["td", null, null, "low に置換して再評価"]
+      ],
+      [
+        ["td", null, null, "温度指定でエラー"],
+        ["td", null, null, "推論あり(none以外)では temperature 等が非対応"],
+        ["td", null, null, "パラメータを削除"]
+      ],
+      [
+        ["td", null, null, "ツール付きでChat Completionsが失敗"],
+        [
+          "td",
+          null,
+          null,
+          "ツール呼び出しは原則Responses API必須。ただし gpt-6-sol / gpt-6-luna は reasoning_effort: \"none\" のときのみChat Completionsで関数呼び出し可"
+        ],
+        [
+          "td",
+          null,
+          null,
+          "上記以外はResponses APIへ移行(該当モデルは reasoning_effort を \"none\" に設定)"
+        ]
+      ],
+      [
+        ["td", null, null, "すぐ確認を求めて止まる"],
+        ["td", null, null, "Astraは必要時に質問する傾向。過去の強い禁止文言が効きすぎ"],
+        ["td", null, null, "権限と完了条件を明記し、過去の禁止文言を緩める"]
+      ],
+      [
+        ["td", null, null, "小さな修正で大量のテストを走らせる"],
+        ["td", null, null, "Astraは検証が徹底的"],
+        ["td", null, null, "検証の強度を指示"]
+      ],
+      [
+        ["td", null, null, "気づくと料金が倍近くに"],
+        ["td", null, null, "入力が272Kを超え、全体が長文料金に"],
+        ["td", null, null, "圧縮・検索で絞る。サブエージェントの文脈肥大も確認"]
+      ],
+      [
+        ["td", null, null, "キャッシュが効かない"],
+        ["td", null, null, "先頭部分が毎回変わる、エフォートをリクエストレベルで変更している"],
+        ["td", null, null, "先頭を固定し、configuration_update を使う。Diagnosticsで確認"]
+      ],
+      [
+        ["td", null, null, "Fast / Ultrafastが期待通りにならない"],
+        ["td", null, null, "データ所在地の制約(EUなど)でStandardに落ちる"],
+        ["td", null, null, "実際に提供されたティアの課金・速度を確認"]
+      ],
+      [
+        ["td", null, null, "回答が箇条書きだらけ"],
+        ["td", null, null, "Astraは書式を多用する傾向"],
+        ["td", null, null, "文体・構造の指示を明記"]
+      ],
+      [
+        ["td", null, null, "圧縮後に過去のコードが追えない"],
+        ["td", null, null, "圧縮で履歴が失われる"],
+        ["td", null, null, "圧縮前の記録を別に保存"]
+      ]
+    ],
+    [
+      [["th", null, null, "項目"], ["th", null, null, "状況"], ["th", null, null, "取り扱い"]],
+      [
+        ["td", null, null, "Astraの価格"],
+        [
+          "td",
+          null,
+          null,
+          "複数の情報源で $10 / $50 / キャッシュ$1 が一致。1つの比較サイトのみ別の値を表示"
+        ],
+        ["td", null, null, "公式Pricingで確認。外れ値は不採用"]
+      ],
+      [
+        ["td", null, null, "Astraの長文料金($20 / $75)"],
+        ["td", null, null, "1つの解説記事のみ"],
+        ["td", null, null, "公式Pricingで要確認"]
+      ],
+      [
+        ["td", null, null, "Ultrafastの倍率(約6倍)"],
+        ["td", null, null, "Vercelの更新情報(Astra向け)の記載"],
+        ["td", null, null, "6.1 Solの倍率は公式Pricingで確認"]
+      ],
+      [
+        ["td", null, null, "6.1 SolのUltrafast"],
+        ["td", null, null, "発表当初は「近日」との記事がある一方、10月8日のChangelogで提供開始"],
+        ["td", null, null, "Changelogを正とする"]
+      ],
+      [
+        ["td", null, null, "GPT-5.6の価格"],
+        ["td", null, null, "ソースにより値が異なる(販促価格・通常価格の混在)"],
+        ["td", null, null, "本ガイドでは数値を採用しない"]
+      ],
+      [
+        ["td", null, null, "GPT-6 Pro(ChatGPT)"],
+        ["td", null, null, "トラッカー記載。API設計にそのまま適用できるか不明"],
+        [
+          "td",
+          null,
+          null,
+          "API側の設定は未確認。公式ドキュメントで確認できるまで、APIの基準設定として扱わない"
+        ]
+      ],
+      [
+        ["td", null, null, "「GPT-6 Luna Decisions」・Decisions API"],
+        ["td", null, null, "一覧情報とドキュメント目次で存在を確認できたが、詳細は未確認"],
+        ["td", null, null, "利用前に公式の Decisions API ガイドを確認"]
+      ],
+      [
+        ["td", null, null, "ベンチマークの数値"],
+        ["td", null, null, "公式主張と独立計測が混在"],
+        ["td", null, null, "自分の評価セットで再現してから採用"]
+      ],
+      [
+        ["td", null, null, "ChatGPTのプラン別提供"],
+        ["td", null, null, "情報源により更新時期が異なる"],
+        ["td", null, null, "公式の最新情報で確認"]
+      ]
+    ],
+    [
+      [
+        ["th", null, null, "#"],
+        ["th", null, null, "タイトル"],
+        ["th", null, null, "URL"],
+        ["th", null, null, "根拠にした内容"]
+      ],
+      [
+        ["td", null, null, "1"],
+        ["td", null, null, "Using GPT-6(OpenAI API)"],
+        ["td", null, null, "https://developers.openai.com/api/docs/guides/latest-model"],
+        ["td", null, null, "モデル構成、エフォート対応、移行手順、プロンプト指針、GPT-5.6の新機能"]
+      ],
+      [
+        ["td", null, null, "2"],
+        ["td", null, null, "API Changelog"],
+        ["td", null, null, "https://developers.openai.com/api/docs/changelog"],
+        ["td", null, null, "リリース日、Ultrafast、6.1 Sol、Multi-agent(β)"]
+      ],
+      [
+        ["td", null, null, "3"],
+        ["td", null, null, "Rethinking skills and prompts for GPT-6 Astra"],
+        [
+          "td",
+          null,
+          null,
+          "https://developers.openai.com/blog/rethinking-skills-and-prompts-for-gpt-6-astra"
+        ],
+        ["td", null, null, "Skills・AGENTS.mdの棚卸し"]
+      ],
+      [
+        ["td", null, null, "4"],
+        ["td", null, null, "Maintaining software with the GPT-6 family"],
+        [
+          "td",
+          null,
+          null,
+          "https://developers.openai.com/blog/maintaining-software-with-the-gpt-6-family"
+        ],
+        ["td", null, null, "6.1 SolとAstraの1件あたりコスト比較"]
+      ],
+      [
+        ["td", null, null, "5"],
+        ["td", null, null, "GPT-6 Sol and GPT-6 Luna: October 2026 update"],
+        ["td", null, null, "https://deploymentsafety.openai.com/gpt-6-october"],
+        ["td", null, null, "指示階層・プロンプトインジェクション・拒否傾向の評価"]
+      ],
+      [
+        ["td", null, null, "6"],
+        ["td", null, null, "Prompt caching"],
+        ["td", null, null, "https://developers.openai.com/api/docs/guides/prompt-caching"],
+        ["td", null, null, "キャッシュ設計(公式)"]
+      ],
+      [
+        ["td", null, null, "7"],
+        ["td", null, null, "Reasoning(エフォート・Proモード・途中変更)"],
+        ["td", null, null, "https://developers.openai.com/api/docs/guides/reasoning"],
+        ["td", null, null, "configuration_update の正確な仕様"]
+      ],
+      [
+        ["td", null, null, "8"],
+        ["td", null, null, "Ultrafast mode"],
+        ["td", null, null, "https://developers.openai.com/api/docs/guides/ultrafast-mode"],
+        ["td", null, null, "高速ティアの仕様"]
+      ],
+      [
+        ["td", null, null, "9"],
+        ["td", null, null, "Fast mode"],
+        ["td", null, null, "https://developers.openai.com/api/docs/guides/fast-mode"],
+        ["td", null, null, "Fast modeの仕様"]
+      ],
+      [
+        ["td", null, null, "10"],
+        ["td", null, null, "Async tool calling"],
+        ["td", null, null, "https://developers.openai.com/api/docs/guides/async-tool-calling"],
+        ["td", null, null, "非同期ツール呼び出し"]
+      ],
+      [
+        ["td", null, null, "11"],
+        ["td", null, null, "Mid-turn steering"],
+        ["td", null, null, "https://developers.openai.com/api/docs/guides/steering"],
+        ["td", null, null, "途中介入"]
+      ],
+      [
+        ["td", null, null, "12"],
+        ["td", null, null, "Programmatic tool calling"],
+        [
+          "td",
+          null,
+          null,
+          "https://developers.openai.com/api/docs/guides/tools-programmatic-tool-calling"
+        ],
+        ["td", null, null, "PTCの使い分け"]
+      ],
+      [
+        ["td", null, null, "13"],
+        ["td", null, null, "Multi-agent"],
+        ["td", null, null, "https://developers.openai.com/api/docs/guides/responses-multi-agent"],
+        ["td", null, null, "マルチエージェント(β)"]
+      ],
+      [
+        ["td", null, null, "14"],
+        ["td", null, null, "Safety best practices"],
+        ["td", null, null, "https://developers.openai.com/api/docs/guides/safety-best-practices"],
+        ["td", null, null, "safety_identifier"]
+      ],
+      [
+        ["td", null, null, "15"],
+        ["td", null, null, "Pricing"],
+        ["td", null, null, "https://developers.openai.com/api/docs/pricing"],
+        ["td", null, null, "最新料金(必ず確認)"]
+      ],
+      [
+        ["td", null, null, "16"],
+        ["td", null, null, "Evaluation best practices"],
+        [
+          "td",
+          null,
+          null,
+          "https://developers.openai.com/api/docs/guides/evaluation-best-practices"
+        ],
+        ["td", null, null, "評価設計"]
+      ],
+      [
+        ["td", null, null, "17"],
+        ["td", null, null, "Cost optimization"],
+        ["td", null, null, "https://developers.openai.com/api/docs/guides/cost-optimization"],
+        ["td", null, null, "コスト最適化"]
+      ]
+    ],
+    [
+      [
+        ["th", null, null, "#"],
+        ["th", null, null, "発信者"],
+        ["th", null, null, "URL"],
+        ["th", null, null, "内容"]
+      ],
+      [
+        ["td", null, null, "18"],
+        ["td", null, null, "Simon Willison"],
+        ["td", null, null, "https://simonwillison.net/2026/Sep/4/astra-pelicans/"],
+        ["td", null, null, "Astraのエフォート別比較"]
+      ],
+      [
+        ["td", null, null, "19"],
+        ["td", null, null, "Simon Willison"],
+        [
+          "td",
+          null,
+          null,
+          "https://simonwillison.net/2026/Sep/5/introducing-gpt-6-astra-for-developers/"
+        ],
+        ["td", null, null, "Astra紹介動画へのコメント"]
+      ],
+      [
+        ["td", null, null, "20"],
+        ["td", null, null, "Simon Willison"],
+        ["td", null, null, "https://simonwillison.net/2026/Sep/22/opus-and-sol-and-luna/"],
+        ["td", null, null, "価格整理"]
+      ],
+      [
+        ["td", null, null, "21"],
+        ["td", null, null, "Simon Willison(二次要約)"],
+        ["td", null, null, "https://ai-tldr.dev/releases/simonw-astra-running-routes-sep12/"],
+        ["td", null, null, "圧縮でコードが失われた事例"]
+      ],
+      [
+        ["td", null, null, "22"],
+        ["td", null, null, "Latent Space"],
+        ["td", null, null, "https://www.latent.space/p/ainews-gpt-6-astra-openais-biggest"],
+        ["td", null, null, "Astra発表の整理"]
+      ],
+      [
+        ["td", null, null, "23"],
+        ["td", null, null, "Latent Space(ポッドキャスト要約)"],
+        ["td", null, null, "https://finance.biggo.com/podcast/6d84f9c6b690be03"],
+        ["td", null, null, "6.1 Solの評価、サブエージェント"]
+      ],
+      [
+        ["td", null, null, "24"],
+        ["td", null, null, "Hacker News"],
+        ["td", null, null, "https://news.ycombinator.com/item?id=49896586"],
+        ["td", null, null, "6.1 Solの発表への開発者コメント"]
+      ],
+      [
+        ["td", null, null, "25"],
+        ["td", null, null, "Endor Labs"],
+        [
+          "td",
+          null,
+          null,
+          "https://www.endorlabs.com/learn/gpt-6-1-sol-on-codex-astra-level-security-a-third-faster-zero-cheating"
+        ],
+        ["td", null, null, "セキュリティ評価"]
+      ]
+    ],
+    [
+      [
+        ["th", null, null, "#"],
+        ["th", null, null, "提供元"],
+        ["th", null, null, "URL"],
+        ["th", null, null, "内容"]
+      ],
+      [
+        ["td", null, null, "26"],
+        ["td", null, null, "LiteLLM"],
+        ["td", null, null, "https://docs.litellm.ai/blog/gpt_6_sol_luna"],
+        ["td", null, null, "Sol / Lunaの価格表(短文・長文)、1.05M・922K入力・128K出力"]
+      ],
+      [
+        ["td", null, null, "27"],
+        ["td", null, null, "LiteLLM"],
+        ["td", null, null, "https://docs.litellm.ai/docs/providers/openai/ultrafast"],
+        ["td", null, null, "Fast / Ultrafastの実装例"]
+      ],
+      [
+        ["td", null, null, "28"],
+        ["td", null, null, "Vercel"],
+        [
+          "td",
+          null,
+          null,
+          "https://vercel.com/changelog/openai-ultrafast-mode-now-available-on-ai-gateway"
+        ],
+        ["td", null, null, "Ultrafastの課金倍率・データ所在地"]
+      ],
+      [
+        ["td", null, null, "29"],
+        ["td", null, null, "OpenRouter"],
+        [
+          "td",
+          null,
+          null,
+          "https://openrouter.ai/docs/cookbook/evaluate-and-optimize/model-migrations/gpt-6"
+        ],
+        ["td", null, null, "移行チェックリスト、configuration_update"]
+      ],
+      [
+        ["td", null, null, "30"],
+        ["td", null, null, "DataCamp"],
+        ["td", null, null, "https://www.datacamp.com/blog/gpt-6-1-sol"],
+        ["td", null, null, "6.1 Solの価格・タスクあたりコスト"]
+      ],
+      [
+        ["td", null, null, "31"],
+        ["td", null, null, "The Next Web"],
+        ["td", null, null, "https://thenextweb.com/news/openai-gpt-6-1-sol-price-astra-devday"],
+        ["td", null, null, "DevDay発表の価格・ベンチマーク"]
+      ],
+      [
+        ["td", null, null, "32"],
+        ["td", null, null, "Codersera"],
+        ["td", null, null, "https://codersera.com/blog/gpt-6-1-sol-complete-guide-2026/"],
+        ["td", null, null, "長文料金の比較表"]
+      ],
+      [
+        ["td", null, null, "33"],
+        ["td", null, null, "DEV Community(AIHubMix)"],
+        [
+          "td",
+          null,
+          null,
+          "https://dev.to/aihubmix/migrating-to-gpt-61-sol-9-things-that-can-go-wrong-1ff1"
+        ],
+        ["td", null, null, "6 Sol→6.1 Solの落とし穴"]
+      ],
+      [
+        ["td", null, null, "34"],
+        ["td", null, null, "Kingy AI"],
+        ["td", null, null, "https://kingy.ai/blog/gpt-6-1-sol-ultrafast-speed-pricing-value/"],
+        ["td", null, null, "Ultrafastの実測"]
+      ],
+      [
+        ["td", null, null, "35"],
+        ["td", null, null, "Remio"],
+        [
+          "td",
+          null,
+          null,
+          "https://www.remio.ai/post/openai-gpt-6-1-sol-ultrafast-cuts-latency-but-moves-the-bottleneck"
+        ],
+        ["td", null, null, "Ultrafastのボトルネック考察"]
+      ],
+      [
+        ["td", null, null, "36"],
+        ["td", null, null, "Requesty"],
+        ["td", null, null, "https://www.requesty.ai/blog/gpt-6-sol-luna-pricing-release-api"],
+        ["td", null, null, "Sol / Lunaの価格"]
+      ],
+      [
+        ["td", null, null, "37"],
+        ["td", null, null, "DataLearner"],
+        [
+          "td",
+          null,
+          null,
+          "https://www.datalearner.com/en/ai-models/pretrained-models/gpt-6-astra"
+        ],
+        ["td", null, null, "Astraの仕様(コンテキスト・カットオフ)"]
+      ],
+      [
+        ["td", null, null, "38"],
+        ["td", null, null, "Releasebot"],
+        ["td", null, null, "https://releasebot.io/updates/openai"],
+        ["td", null, null, "10月のリリースノート(GPT-Live-1.1、Codex更新)"]
+      ],
+      [
+        ["td", null, null, "39"],
+        ["td", null, null, "GitHub(openai/codex)"],
+        ["td", null, null, "https://github.com/openai/codex/issues/32486"],
+        ["td", null, null, "長文料金帯に入りやすい事例(GPT-5.6)"]
+      ]
+    ]
+  ],
+  "lists": [
+    [
+      "ul",
+      null,
+      [
+        [
+          "li",
+          "価格・上限値・対応状況は頻繁に変わります。本番投入前に必ず公式の Pricing と各モデルページで再確認してください。"
+        ],
+        ["li", "「補足C」に、ソース間で食い違いがあった点をまとめています。"],
+        ["li", "コードは Python(openai SDK)を中心に示します。"]
+      ],
+      []
+    ],
+    [
+      "ul",
+      null,
+      [
+        [
+          "li",
+          "上記は短いコンテキスト(入力272K以下)の標準料金です。272Kを超えると、そのリクエスト全体に長文用の割増料金が掛かります(Step 6参照)。"
+        ],
+        [
+          "li",
+          "知識カットオフは、Astra と 6.1 Sol が 2026年4月30日と報告されています(GPT-6 Solは4月20日との報告あり)。"
+        ],
+        ["li", "入力はテキストと画像、推論エフォートは low〜max(Sol/Lunaの一部は none も可)です。"]
+      ],
+      []
+    ],
+    [
+      "ol",
+      null,
+      [
+        ["li", "まず gpt-6.1-sol で全評価セットを回す。"],
+        ["li", "失敗が集中するタスク群だけを gpt-6-astra で再実行して差分を測る。"],
+        ["li", "差分が小さければ6.1 Solのまま、大きい領域だけAstraへルーティングする。"],
+        ["li", "大量・定型の前段処理(分類、抽出、要約の下書き)は gpt-6-luna に落とす。"]
+      ],
+      []
+    ],
+    [
+      "ul",
+      null,
+      [
+        [
+          "li",
+          "モデル名を直書きせず、用途名(例: triage / main_agent / hard_case)から解決する設定層を作る。世代交代が速いため、差し替えコストを下げられます。"
+        ],
+        [
+          "li",
+          "6.1 Solは none/minimal エフォートに非対応です。Luna・GPT-6 Solからの置換時にエフォート設定の変換が要ります(Step 3)。"
+        ],
+        [
+          "li",
+          "OpenAI開発者ブログには、プロバイダ障害時のフェイルオーバー設計記事もあります(参考URL一覧)。"
+        ]
+      ],
+      []
+    ],
+    [
+      "ul",
+      null,
+      [
+        [
+          "li",
+          "GPT-5.6では推論の持ち越し(reasoning.context)が既定で all_turns です。前のターンの推論をモデルが参照できるため、マルチターンの品質とキャッシュ効率が上がります。ターンをまたぐ推論が必要なら、モデルの既定に頼らず reasoning={\"context\": \"all_turns\"} を明示します。"
+        ],
+        [
+          "li",
+          "all_turns を活かすには previous_response_id を使います。手動管理なら、過去の入力とすべての出力アイテムを欠落なく再送します。"
+        ],
+        ["li", "以前の目標・前提が無関係になったら current_turn に切り替えます。"]
+      ],
+      []
+    ],
+    [
+      "ol",
+      null,
+      [
+        ["li", "高いほど良い、ではない。medium起点で、上げる根拠を計測で示す。"],
+        ["li", "max は最難関で品質最優先のタスクに限定する。xhigh との差を必ず比較する。"],
+        [
+          "li",
+          "推論トークンは出力トークン単価で課金されます。high / max では出力コストが跳ねます。"
+        ],
+        [
+          "li",
+          "旧世代(GPT-5.5 / 5.4)から移すときは、現行エフォートを基準に同じ値と1段下を比較します。GPT-5.6世代はトークン効率が高く、低いエフォートでも同等品質になることがあります。"
+        ]
+      ],
+      []
+    ],
+    [
+      "ul",
+      null,
+      [
+        ["li", "向く: 複雑な最適化、価値の高いレビュー、評価基準が明確な深い分析"],
+        ["li", "向かない: 低遅延が必要な処理、高ボリューム処理、評価で改善が確認できない処理"],
+        ["li", "エフォートとは独立。標準モードと同じ設定を基準に比較する"]
+      ],
+      []
+    ],
+    [
+      "ol",
+      null,
+      [
+        ["li", "新しいベースラインから始める。古いプロンプトの指示を全部持ち越さない。"],
+        [
+          "li",
+          "製品要件を守る最小のプロンプトから始め、エフォート・詳細度・ツール説明・出力形式を代表例で調整する。"
+        ],
+        ["li", "同じ指示を繰り返さない。各指示は1回だけ書く。"],
+        ["li", "関係するツールだけを公開し、説明は簡潔かつ正確に。"]
+      ],
+      []
+    ],
+    [
+      "ul",
+      null,
+      [
+        [
+          "li",
+          "「簡潔に」だけの指示は、必要な情報まで削る場合があります。残すべき内容(結論・根拠・注意点・次の行動)と、削ってよい内容を指定します。"
+        ],
+        [
+          "li",
+          "「親切に」「共感的に」などの曖昧な語は避け、書き方の選択(結論の出し方、問題への触れ方、締めの有無)で定義します。"
+        ]
+      ],
+      []
+    ],
+    [
+      "ul",
+      null,
+      [
+        ["li", "実行と保留中ジョブの管理はアプリ側の責任です。結果は必ず元の call_id で返します。"],
+        ["li", "結果をすぐ必要とするツールに async を付けない。"]
+      ],
+      []
+    ],
+    [
+      "ul",
+      null,
+      [
+        ["li", "呼び出しが境界のあるワークフロー(絞り込み、結合、重複排除、集計、検証)"],
+        ["li", "大きな中間出力を処理して、はるかに小さい構造化結果だけ返したい"]
+      ],
+      []
+    ],
+    [
+      "ul",
+      null,
+      [
+        ["li", "1回の呼び出しで足りる"],
+        ["li", "中間出力がすでに小さい"],
+        ["li", "各結果が次の判断を変える(モデルの判断が毎回必要)"],
+        ["li", "承認が必要な操作"],
+        ["li", "最終出力に引用やネイティブな成果物を残す必要がある"]
+      ],
+      []
+    ],
+    [
+      "ul",
+      null,
+      [
+        [
+          "li",
+          "委譲の頻度・条件はプロンプトで調整する。Astraは委譲が控えめになりやすく、逆に中規模タスクで委譲しすぎる(Sol系)という報告もあります。"
+        ],
+        [
+          "li",
+          "子エージェントのコンテキストと推論も課金対象です。サブエージェントに自分の成果物を監査させる運用は、気づかないうちにコストと長文料金帯に入ります(Step 6)。"
+        ],
+        [
+          "li",
+          "エージェント間のメッセージは人間が読むこともあるため、スペースや区切りが崩れないよう指示します。"
+        ]
+      ],
+      []
+    ],
+    [
+      "ol",
+      null,
+      [
+        [
+          "li",
+          "システムプロンプト、ツール定義、固定の参考資料を先頭に固定し、変動部分を後ろに置く。"
+        ],
+        ["li", "ツール定義の順序や文言を毎回変えない(先頭が変わるとミスする)。"],
+        ["li", "エフォートを途中で変えるなら configuration_update を使う(Step 3-C)。"],
+        ["li", "書き込み課金があるため、再利用されない部分にまでブレークポイントを置かない。"]
+      ],
+      []
+    ],
+    [
+      "ul",
+      null,
+      [
+        [
+          "li",
+          "「入れられる」ことと「入れるべき」ことは別です。検索で絞る、圧縮(Compaction)を使う、不要なツール出力を落とす、で272K以下に収めます。"
+        ],
+        [
+          "li",
+          "実際の課金閾値は提供元で異なる場合があります(例: GitHub Copilotは200K閾値という報告)。API直と他社経由で料金帯の仕様が違う前提で確認します。"
+        ]
+      ],
+      []
+    ],
+    [
+      "ul",
+      null,
+      [
+        [
+          "li",
+          "ツール呼び出しが多いワークフローは、WebSocket上のResponses APIでターン間のオーバーヘッドを減らすことをOpenAIが推奨しています。"
+        ],
+        [
+          "li",
+          "Ultrafastは生成速度を上げるもので、モデルの推論能力は変わりません。周辺のワークフロー(ツール待ち、人の確認)がボトルネックのままだと体感は伸びません。"
+        ]
+      ],
+      []
+    ],
+    [
+      "ul",
+      null,
+      [
+        ["li", "none / minimal エフォートが使えない(6 Solでは動いていたコードが落ちる)"],
+        ["li", "ツール呼び出しはResponses APIが必須"],
+        ["li", "暗黙キャッシュの挙動(ブレークポイントの置き方)の違い"],
+        ["li", "6.1 Solは持続性が高く、長く走る傾向がある(コストと時間の見積りを更新)"],
+        ["li", "Ultrafast・Fastとデータ所在地の組み合わせに制約がある"]
+      ],
+      []
+    ],
+    [
+      "ol",
+      null,
+      [
+        [
+          "li",
+          "Skillsの説明は短く、「いつ使うか」を明確に。「データベース関連なら常に」のような広い書き方は避け、「マイグレーションを追加・変更するとき」のように限定する。"
+        ],
+        [
+          "li",
+          "Skillは段階的開示にする。ルート文書は最小の振り分け役にして、詳細は別ファイルやスクリプトへ。"
+        ],
+        [
+          "li",
+          "手順を細かく縛るレシピ型の指示は見直す。高性能モデルでは過剰な制約が逆効果になりうる。"
+        ],
+        ["li", "AGENTS.md は「作業前に全ドキュメントを読む」ではなく、用途別に参照先を示す。"],
+        [
+          "li",
+          "以前のモデルを抑えるために書いた強い禁止・確認の文言は、Astraでは効きすぎて止まることがある。見直す。"
+        ],
+        [
+          "li",
+          "完了の定義(起動、検査、失敗の修正まで)を依頼に含める。逆に「最初の実装後に必ずレビューで止まる」要件は、早期停止を誘発する。"
+        ],
+        [
+          "li",
+          "安全と分かっている作業(使い捨てフィクスチャのローカルテストなど)は、AGENTS.md で明示的に許可を与える。"
+        ],
+        ["li", "整理自体もAstraに依頼し、監査させる。"]
+      ],
+      []
+    ]
+  ],
+  "toc": [
+    ["#sec-0", "PART 0このガイドの読み方と前提"],
+    ["#sec-1", "PART 1全体像: 2026年のOpenAIモデル地図"],
+    ["#sec-2", "STEP 1モデルを選ぶ"],
+    ["#sec-3", "STEP 2Responses APIで最小構成を作る"],
+    ["#sec-4", "STEP 3reasoning effortを設計する"],
+    ["#sec-5", "STEP 4プロンプトを「薄く」「境界を明確に」する"],
+    ["#sec-6", "STEP 5ツール・エージェント機能を使いこなす"],
+    ["#sec-7", "STEP 6コストと速度を最適化する"],
+    ["#sec-8", "STEP 7移行チェックリスト"],
+    ["#sec-9", "STEP 8評価と安全性を運用に組み込む"],
+    ["#sec-10", "APPENDIX A著名開発者・コミュニティの知見"],
+    ["#sec-11", "APPENDIX Bよくある落とし穴 FAQ"],
+    ["#sec-12", "APPENDIX C情報の確度と注意点"],
+    ["#sec-13", "REFERENCES参考URL一覧(根拠ソース)"]
+  ],
+  "external": [
+    ["https://developers.openai.com/api/docs/pricing", "Pricing"],
+    ["https://simonwillison.net/2026/Sep/4/astra-pelicans/", "Pelican comparison grid for Astra"],
+    [
+      "https://simonwillison.net/2026/Sep/22/opus-and-sol-and-luna/",
+      "Claude Opus 5.5, GPT-6 Sol, GPT-6 Luna, and a new price war"
+    ],
+    ["https://ai-tldr.dev/releases/simonw-astra-running-routes-sep12/", "二次要約: AI/TLDR"],
+    [
+      "https://developers.openai.com/blog/rethinking-skills-and-prompts-for-gpt-6-astra",
+      "Rethinking skills and prompts for GPT-6 Astra"
+    ],
+    [
+      "https://developers.openai.com/blog/maintaining-software-with-the-gpt-6-family",
+      "Maintaining software with the GPT-6 family"
+    ],
+    ["https://news.ycombinator.com/item?id=49896586", "Hacker News"],
+    ["https://finance.biggo.com/podcast/6d84f9c6b690be03", "Latent Space要約"],
+    ["https://www.latent.space/p/ainews-gpt-6-astra-openais-biggest", "AINews"],
+    [
+      "https://www.endorlabs.com/learn/gpt-6-1-sol-on-codex-astra-level-security-a-third-faster-zero-cheating",
+      "Endor Labs"
+    ],
+    [
+      "https://developers.openai.com/api/docs/guides/latest-model",
+      "https://developers.openai.com/api/docs/guides/latest-model"
+    ],
+    [
+      "https://developers.openai.com/api/docs/changelog",
+      "https://developers.openai.com/api/docs/changelog"
+    ],
+    [
+      "https://developers.openai.com/blog/rethinking-skills-and-prompts-for-gpt-6-astra",
+      "https://developers.openai.com/blog/rethinking-skills-and-prompts-for-gpt-6-astra"
+    ],
+    [
+      "https://developers.openai.com/blog/maintaining-software-with-the-gpt-6-family",
+      "https://developers.openai.com/blog/maintaining-software-with-the-gpt-6-family"
+    ],
+    [
+      "https://deploymentsafety.openai.com/gpt-6-october",
+      "https://deploymentsafety.openai.com/gpt-6-october"
+    ],
+    [
+      "https://developers.openai.com/api/docs/guides/prompt-caching",
+      "https://developers.openai.com/api/docs/guides/prompt-caching"
+    ],
+    [
+      "https://developers.openai.com/api/docs/guides/reasoning",
+      "https://developers.openai.com/api/docs/guides/reasoning"
+    ],
+    [
+      "https://developers.openai.com/api/docs/guides/ultrafast-mode",
+      "https://developers.openai.com/api/docs/guides/ultrafast-mode"
+    ],
+    [
+      "https://developers.openai.com/api/docs/guides/fast-mode",
+      "https://developers.openai.com/api/docs/guides/fast-mode"
+    ],
+    [
+      "https://developers.openai.com/api/docs/guides/async-tool-calling",
+      "https://developers.openai.com/api/docs/guides/async-tool-calling"
+    ],
+    [
+      "https://developers.openai.com/api/docs/guides/steering",
+      "https://developers.openai.com/api/docs/guides/steering"
+    ],
+    [
+      "https://developers.openai.com/api/docs/guides/tools-programmatic-tool-calling",
+      "https://developers.openai.com/api/docs/guides/tools-programmatic-tool-calling"
+    ],
+    [
+      "https://developers.openai.com/api/docs/guides/responses-multi-agent",
+      "https://developers.openai.com/api/docs/guides/responses-multi-agent"
+    ],
+    [
+      "https://developers.openai.com/api/docs/guides/safety-best-practices",
+      "https://developers.openai.com/api/docs/guides/safety-best-practices"
+    ],
+    [
+      "https://developers.openai.com/api/docs/pricing",
+      "https://developers.openai.com/api/docs/pricing"
+    ],
+    [
+      "https://developers.openai.com/api/docs/guides/evaluation-best-practices",
+      "https://developers.openai.com/api/docs/guides/evaluation-best-practices"
+    ],
+    [
+      "https://developers.openai.com/api/docs/guides/cost-optimization",
+      "https://developers.openai.com/api/docs/guides/cost-optimization"
+    ],
+    [
+      "https://simonwillison.net/2026/Sep/4/astra-pelicans/",
+      "https://simonwillison.net/2026/Sep/4/astra-pelicans/"
+    ],
+    [
+      "https://simonwillison.net/2026/Sep/5/introducing-gpt-6-astra-for-developers/",
+      "https://simonwillison.net/2026/Sep/5/introducing-gpt-6-astra-for-developers/"
+    ],
+    [
+      "https://simonwillison.net/2026/Sep/22/opus-and-sol-and-luna/",
+      "https://simonwillison.net/2026/Sep/22/opus-and-sol-and-luna/"
+    ],
+    [
+      "https://ai-tldr.dev/releases/simonw-astra-running-routes-sep12/",
+      "https://ai-tldr.dev/releases/simonw-astra-running-routes-sep12/"
+    ],
+    [
+      "https://www.latent.space/p/ainews-gpt-6-astra-openais-biggest",
+      "https://www.latent.space/p/ainews-gpt-6-astra-openais-biggest"
+    ],
+    [
+      "https://finance.biggo.com/podcast/6d84f9c6b690be03",
+      "https://finance.biggo.com/podcast/6d84f9c6b690be03"
+    ],
+    [
+      "https://news.ycombinator.com/item?id=49896586",
+      "https://news.ycombinator.com/item?id=49896586"
+    ],
+    [
+      "https://www.endorlabs.com/learn/gpt-6-1-sol-on-codex-astra-level-security-a-third-faster-zero-cheating",
+      "https://www.endorlabs.com/learn/gpt-6-1-sol-on-codex-astra-level-security-a-third-faster-zero-cheating"
+    ],
+    ["https://docs.litellm.ai/blog/gpt_6_sol_luna", "https://docs.litellm.ai/blog/gpt_6_sol_luna"],
+    [
+      "https://docs.litellm.ai/docs/providers/openai/ultrafast",
+      "https://docs.litellm.ai/docs/providers/openai/ultrafast"
+    ],
+    [
+      "https://vercel.com/changelog/openai-ultrafast-mode-now-available-on-ai-gateway",
+      "https://vercel.com/changelog/openai-ultrafast-mode-now-available-on-ai-gateway"
+    ],
+    [
+      "https://openrouter.ai/docs/cookbook/evaluate-and-optimize/model-migrations/gpt-6",
+      "https://openrouter.ai/docs/cookbook/evaluate-and-optimize/model-migrations/gpt-6"
+    ],
+    ["https://www.datacamp.com/blog/gpt-6-1-sol", "https://www.datacamp.com/blog/gpt-6-1-sol"],
+    [
+      "https://thenextweb.com/news/openai-gpt-6-1-sol-price-astra-devday",
+      "https://thenextweb.com/news/openai-gpt-6-1-sol-price-astra-devday"
+    ],
+    [
+      "https://codersera.com/blog/gpt-6-1-sol-complete-guide-2026/",
+      "https://codersera.com/blog/gpt-6-1-sol-complete-guide-2026/"
+    ],
+    [
+      "https://dev.to/aihubmix/migrating-to-gpt-61-sol-9-things-that-can-go-wrong-1ff1",
+      "https://dev.to/aihubmix/migrating-to-gpt-61-sol-9-things-that-can-go-wrong-1ff1"
+    ],
+    [
+      "https://kingy.ai/blog/gpt-6-1-sol-ultrafast-speed-pricing-value/",
+      "https://kingy.ai/blog/gpt-6-1-sol-ultrafast-speed-pricing-value/"
+    ],
+    [
+      "https://www.remio.ai/post/openai-gpt-6-1-sol-ultrafast-cuts-latency-but-moves-the-bottleneck",
+      "https://www.remio.ai/post/openai-gpt-6-1-sol-ultrafast-cuts-latency-but-moves-the-bottleneck"
+    ],
+    [
+      "https://www.requesty.ai/blog/gpt-6-sol-luna-pricing-release-api",
+      "https://www.requesty.ai/blog/gpt-6-sol-luna-pricing-release-api"
+    ],
+    [
+      "https://www.datalearner.com/en/ai-models/pretrained-models/gpt-6-astra",
+      "https://www.datalearner.com/en/ai-models/pretrained-models/gpt-6-astra"
+    ],
+    ["https://releasebot.io/updates/openai", "https://releasebot.io/updates/openai"],
+    ["https://github.com/openai/codex/issues/32486", "https://github.com/openai/codex/issues/32486"]
+  ],
+  "stylesheets": [
+    "https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&family=JetBrains+Mono:wght@400;500&display=swap",
+    "https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/styles/atom-one-dark.min.css"
+  ],
+  "sections": [
+    "sec-0",
+    "sec-1",
+    "sec-2",
+    "sec-3",
+    "sec-4",
+    "sec-5",
+    "sec-6",
+    "sec-7",
+    "sec-8",
+    "sec-9",
+    "sec-10",
+    "sec-11",
+    "sec-12",
+    "sec-13"
+  ],
+  "diagrams": [
+    "flowchart TB\n  A[\"2026-04-23<br/>GPT-5.5\"] --> B[\"2026-08<br/>GPT-5.6<br/>Sol / Terra / Luna\"]\n  B --> C[\"2026-09-03<br/>GPT-6 Astra\"]\n  C --> D[\"2026-09-22<br/>GPT-6 Sol / Luna\"]\n  D --> E[\"2026-09-29<br/>GPT-6.1 Sol<br/>DevDay\"]\n  E --> F[\"2026-10-08<br/>6.1 Sol Ultrafast\"]\n  F --> G[\"2026-10-15<br/>GPT-Live-1.1\"]",
+    "flowchart TD\n  S[\"タスクを定義する\"] --> Q1{\"音声・リアルタイム対話か\"}\n  Q1 -- はい --> L[\"GPT-Live 系を検討\"]\n  Q1 -- いいえ --> Q2{\"画像の生成・編集か\"}\n  Q2 -- はい --> I[\"GPT Image 2.5 系を検討\"]\n  Q2 -- いいえ --> Q3{\"高ボリュームの定型処理で<br/>コスト最優先か\"}\n  Q3 -- はい --> LU[\"gpt-6-luna\"]\n  Q3 -- いいえ --> Q4{\"6.1 Solで品質が足りない<br/>最難関タスクか\"}\n  Q4 -- はい --> AS[\"gpt-6-astra\"]\n  Q4 -- いいえ --> SO[\"gpt-6.1-sol を既定にする\"]",
+    "flowchart TD\n  A[\"会話を続けたい\"] --> B{\"状態をどこに持つか\"}\n  B -- \"OpenAI側に持つ\" --> C[\"previous_response_id を渡す\"]\n  B -- \"自前で管理する\" --> D[\"入力と全出力アイテムを再送する\"]\n  D --> E{\"store:false または<br/>Zero Data Retention か\"}\n  E -- はい --> F[\"暗号化された推論アイテムも<br/>そのまま再送する\"]\n  E -- いいえ --> G[\"通常の再送で可\"]",
+    "flowchart TD\n  A[\"現行のエフォートを基準にする\"] --> B[\"代表タスクで評価する\"]\n  B --> C{\"品質は十分か\"}\n  C -- はい --> D[\"1段下げて再評価する\"]\n  D --> C\n  C -- いいえ --> E[\"1段上げて再評価する\"]\n  E --> F{\"改善幅がコストに見合うか\"}\n  F -- はい --> G[\"採用する\"]\n  F -- いいえ --> H[\"プロンプトとツール設計を見直す\"]\n  H --> B",
+    "sequenceDiagram\n  participant App as アプリ\n  participant M as モデル\n  participant T as 外部ツール\n  App->>M: リクエスト送信\n  M-->>App: 非同期ツール呼び出し(call_id)\n  App->>T: 実行開始\n  M->>M: 独立した部分の推論を継続\n  T-->>App: 結果\n  App->>M: 元のcall_idで結果を返す\n  M-->>App: 最終回答",
+    "flowchart TD\n  C[\"コスト最適化\"] --> A[\"モデル選択<br/>Luna / 6.1 Sol / Astra\"]\n  C --> B[\"エフォート調整<br/>出力トークンを抑える\"]\n  C --> D[\"プロンプトキャッシュ<br/>先頭を固定する\"]\n  C --> E[\"処理ティア<br/>Batch / Flex / Fast / Ultrafast\"]\n  A --> F[\"代表タスクで1タスクあたりの総コストを測る\"]\n  B --> F\n  D --> F\n  E --> F",
+    "flowchart TD\n  S[\"現行モデルを確認\"] --> A[\"モデルIDを置換\"]\n  A --> B[\"ツール利用はResponses APIへ\"]\n  B --> C[\"エフォートを変換して比較\"]\n  C --> D[\"非対応パラメータを削除\"]\n  D --> E[\"キャッシュ設定を見直し\"]\n  E --> F[\"プロンプトとAGENTS.mdを棚卸し\"]\n  F --> G[\"評価セットで回帰テスト\"]\n  G --> H{\"品質・コスト・遅延は許容内か\"}\n  H -- はい --> I[\"カナリア公開\"]\n  H -- いいえ --> C",
+    "flowchart TB\n  A[\"代表タスク集を作る\"] --> B[\"ベースライン測定\"]\n  B --> C[\"変更を1つだけ加える\"]\n  C --> D[\"再測定\"]\n  D --> E{\"成功率・コスト・遅延が改善か\"}\n  E -- はい --> F[\"採用して記録\"]\n  E -- いいえ --> G[\"差し戻す\"]\n  F --> C\n  G --> C"
+  ],
+  "theme": {
+    "fontFamily": "\"Noto Sans JP\",\"Hiragino Kaku Gothic ProN\",\"Yu Gothic\",Meiryo,sans-serif",
+    "fontSize": "16px",
+    "primaryColor": "#e9ebf8",
+    "primaryBorderColor": "#343a93",
+    "primaryTextColor": "#1d1c24",
+    "lineColor": "#343a93",
+    "secondaryColor": "#f7edd0",
+    "tertiaryColor": "#faf7f0",
+    "noteBkgColor": "#f7edd0",
+    "actorBkg": "#e9ebf8",
+    "actorBorder": "#343a93",
+    "actorTextColor": "#1d1c24",
+    "signalColor": "#343a93",
+    "signalTextColor": "#1d1c24",
+    "labelBoxBkgColor": "#f7edd0"
+  },
+  "css": [
+    {
+      "selector": ":root",
+      "media": null,
+      "declarations": [
+        ["--paper", "#faf7f0", false],
+        ["--paper-alt", "#f1ecdf", false],
+        ["--card", "#ffffff", false],
+        ["--ink", "#1d1c24", false],
+        ["--ink-soft", "#4a4858", false],
+        ["--border", "#ddd5c2", false],
+        ["--indigo", "#343a93", false],
+        ["--indigo-soft", "#e9ebf8", false],
+        ["--gold", "#a87a12", false],
+        ["--gold-soft", "#f7edd0", false],
+        ["--forest", "#2b6a4d", false],
+        ["--forest-soft", "#e2f0e8", false],
+        ["--plum", "#6d3470", false],
+        ["--plum-soft", "#f1e3f2", false],
+        ["--sidebar-w", "300px", false],
+        [
+          "--font-sans",
+          "'Noto Sans JP', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', Meiryo, system-ui, sans-serif",
+          false
+        ],
+        ["--font-serif", "'Source Serif 4', 'Noto Sans JP', Georgia, serif", false],
+        [
+          "--font-mono",
+          "'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace",
+          false
+        ]
+      ]
+    },
+    {
+      "selector": "*",
+      "media": null,
+      "declarations": [["box-sizing", "border-box", false]]
+    },
+    {
+      "selector": "html",
+      "media": null,
+      "declarations": [["scroll-behavior", "smooth", false], ["scroll-padding-top", "24px", false]]
+    },
+    {
+      "selector": "body",
+      "media": null,
+      "declarations": [
+        ["margin", "0", false],
+        ["background", "var(--paper)", false],
+        ["color", "var(--ink)", false],
+        ["font-family", "var(--font-sans)", false],
+        ["font-size", "1.0625rem", false],
+        ["line-height", "1.85", false],
+        ["-webkit-text-size-adjust", "100%", false]
+      ]
+    },
+    {
+      "selector": "button",
+      "media": null,
+      "declarations": [["font-family", "inherit", false], ["font-size", "1rem", false]]
+    },
+    {
+      "selector": "a",
+      "media": null,
+      "declarations": [
+        ["color", "var(--indigo)", false],
+        ["text-decoration", "underline", false],
+        ["text-underline-offset", "3px", false],
+        ["overflow-wrap", "anywhere", false]
+      ]
+    },
+    {
+      "selector": "a:hover",
+      "media": null,
+      "declarations": [["color", "var(--plum)", false]]
+    },
+    {
+      "selector": "#progress",
+      "media": null,
+      "declarations": [
+        ["position", "fixed", false],
+        ["top", "0", false],
+        ["left", "0", false],
+        ["height", "4px", false],
+        ["width", "0", false],
+        ["background", "linear-gradient(90deg, var(--indigo), var(--gold))", false],
+        ["z-index", "60", false]
+      ]
+    },
+    {
+      "selector": ".sidebar",
+      "media": null,
+      "declarations": [
+        ["position", "fixed", false],
+        ["top", "0", false],
+        ["left", "0", false],
+        ["bottom", "0", false],
+        ["width", "var(--sidebar-w)", false],
+        ["background", "var(--card)", false],
+        ["border-right", "1px solid var(--border)", false],
+        ["overflow-y", "auto", false],
+        ["padding", "28px 18px 40px", false],
+        ["z-index", "50", false]
+      ]
+    },
+    {
+      "selector": ".brand",
+      "media": null,
+      "declarations": [
+        ["font-family", "var(--font-serif)", false],
+        ["font-weight", "700", false],
+        ["font-size", "1.125rem", false],
+        ["line-height", "1.5", false],
+        ["color", "var(--indigo)", false],
+        ["margin", "0 6px 4px", false]
+      ]
+    },
+    {
+      "selector": ".brand-sub",
+      "media": null,
+      "declarations": [
+        ["font-size", "1rem", false],
+        ["color", "var(--ink-soft)", false],
+        ["margin", "0 6px 20px", false],
+        ["line-height", "1.6", false]
+      ]
+    },
+    {
+      "selector": ".nav-a",
+      "media": null,
+      "declarations": [
+        ["display", "flex", false],
+        ["flex-direction", "column", false],
+        ["gap", "0", false],
+        ["padding", "9px 12px", false],
+        ["margin", "2px 0", false],
+        ["border-radius", "8px", false],
+        ["text-decoration", "none", false],
+        ["color", "var(--ink)", false],
+        ["border-left", "3px solid transparent", false],
+        ["line-height", "1.5", false]
+      ]
+    },
+    {
+      "selector": ".nav-a:hover",
+      "media": null,
+      "declarations": [["background", "var(--paper-alt)", false], ["color", "var(--ink)", false]]
+    },
+    {
+      "selector": ".nav-a.active",
+      "media": null,
+      "declarations": [
+        ["background", "var(--indigo-soft)", false],
+        ["border-left-color", "var(--indigo)", false]
+      ]
+    },
+    {
+      "selector": ".nav-k",
+      "media": null,
+      "declarations": [
+        ["font-family", "var(--font-mono)", false],
+        ["font-size", "1rem", false],
+        ["color", "var(--gold)", false],
+        ["font-weight", "500", false],
+        ["letter-spacing", "0.04em", false]
+      ]
+    },
+    {
+      "selector": ".nav-t",
+      "media": null,
+      "declarations": [["font-size", "1rem", false], ["font-weight", "500", false]]
+    },
+    {
+      "selector": ".mobile-bar",
+      "media": null,
+      "declarations": [["display", "none", false]]
+    },
+    {
+      "selector": ".mobile-bar button",
+      "media": null,
+      "declarations": [["font-size", "1rem", false]]
+    },
+    {
+      "selector": ".overlay",
+      "media": null,
+      "declarations": [["display", "none", false]]
+    },
+    {
+      "selector": ".layout",
+      "media": null,
+      "declarations": [["display", "block", false], ["margin-left", "var(--sidebar-w)", false]]
+    },
+    {
+      "selector": ".main",
+      "media": null,
+      "declarations": [["width", "100%", false], ["min-width", "0", false]]
+    },
+    {
+      "selector": ".hero",
+      "media": null,
+      "declarations": [
+        ["background", "linear-gradient(135deg, #2a2f7e 0%, #4a2f77 60%, #6d3470 100%)", false],
+        ["color", "#fff", false],
+        ["padding", "72px 56px 56px", false]
+      ]
+    },
+    {
+      "selector": ".hero .kicker",
+      "media": null,
+      "declarations": [
+        ["font-family", "var(--font-mono)", false],
+        ["font-size", "1rem", false],
+        ["letter-spacing", "0.14em", false],
+        ["color", "#f3d98b", false],
+        ["text-transform", "uppercase", false]
+      ]
+    },
+    {
+      "selector": ".hero h1",
+      "media": null,
+      "declarations": [
+        ["font-family", "var(--font-serif)", false],
+        ["font-size", "2.4rem", false],
+        ["line-height", "1.35", false],
+        ["margin", "10px 0 6px", false],
+        ["font-weight", "700", false]
+      ]
+    },
+    {
+      "selector": ".hero .sub",
+      "media": null,
+      "declarations": [
+        ["display", "inline-block", false],
+        ["margin-top", "6px", false],
+        ["padding", "4px 14px", false],
+        ["border", "1px solid rgba(255, 255, 255, 0.5)", false],
+        ["border-radius", "999px", false],
+        ["font-size", "1rem", false]
+      ]
+    },
+    {
+      "selector": ".meta-row",
+      "media": null,
+      "declarations": [
+        ["display", "grid", false],
+        ["grid-template-columns", "repeat(auto-fit, minmax(240px, 1fr))", false],
+        ["gap", "14px", false],
+        ["margin-top", "32px", false]
+      ]
+    },
+    {
+      "selector": ".meta-card",
+      "media": null,
+      "declarations": [
+        ["background", "rgba(255, 255, 255, 0.12)", false],
+        ["border", "1px solid rgba(255, 255, 255, 0.25)", false],
+        ["border-radius", "12px", false],
+        ["padding", "14px 18px", false],
+        ["display", "flex", false],
+        ["flex-direction", "column", false],
+        ["gap", "4px", false]
+      ]
+    },
+    {
+      "selector": ".meta-k",
+      "media": null,
+      "declarations": [
+        ["font-size", "1rem", false],
+        ["color", "#f3d98b", false],
+        ["font-weight", "700", false]
+      ]
+    },
+    {
+      "selector": ".meta-v",
+      "media": null,
+      "declarations": [["font-size", "1rem", false], ["line-height", "1.7", false]]
+    },
+    {
+      "selector": ".section",
+      "media": null,
+      "declarations": [["padding", "44px 56px", false]]
+    },
+    {
+      "selector": ".sec-head",
+      "media": null,
+      "declarations": [["margin-bottom", "18px", false]]
+    },
+    {
+      "selector": ".eyebrow",
+      "media": null,
+      "declarations": [
+        ["display", "inline-block", false],
+        ["font-family", "var(--font-mono)", false],
+        ["font-size", "1rem", false],
+        ["letter-spacing", "0.14em", false],
+        ["color", "var(--gold)", false],
+        ["font-weight", "500", false]
+      ]
+    },
+    {
+      "selector": ".section h2",
+      "media": null,
+      "declarations": [
+        ["font-family", "var(--font-serif)", false],
+        ["font-size", "1.9rem", false],
+        ["line-height", "1.4", false],
+        ["margin", "2px 0 0", false],
+        ["color", "var(--ink)", false]
+      ]
+    },
+    {
+      "selector": ".section h3",
+      "media": null,
+      "declarations": [
+        ["font-size", "1.25rem", false],
+        ["line-height", "1.5", false],
+        ["margin", "36px 0 12px", false],
+        ["padding", "2px 0 2px 14px", false],
+        ["border-left", "5px solid var(--indigo)", false],
+        ["color", "var(--ink)", false]
+      ]
+    },
+    {
+      "selector": ".section p",
+      "media": null,
+      "declarations": [["margin", "0 0 1rem", false], ["overflow-wrap", "break-word", false]]
+    },
+    {
+      "selector": ".section ul,\n      .section ol",
+      "media": null,
+      "declarations": [["padding-left", "1.5rem", false], ["margin", "0 0 1.1rem", false]]
+    },
+    {
+      "selector": ".section li",
+      "media": null,
+      "declarations": [["margin", "0.3rem 0", false], ["overflow-wrap", "break-word", false]]
+    },
+    {
+      "selector": ".section li::marker",
+      "media": null,
+      "declarations": [["color", "var(--gold)", false]]
+    },
+    {
+      "selector": "strong",
+      "media": null,
+      "declarations": [
+        ["color", "var(--ink)", false],
+        ["font-weight", "700", false],
+        ["background", "linear-gradient(transparent 62%, var(--gold-soft) 62%)", false]
+      ]
+    },
+    {
+      "selector": "code",
+      "media": null,
+      "declarations": [
+        ["font-family", "var(--font-mono)", false],
+        ["font-size", "1rem", false],
+        ["background", "var(--plum-soft)", false],
+        ["color", "var(--plum)", false],
+        ["padding", "1px 6px", false],
+        ["border-radius", "5px", false],
+        ["overflow-wrap", "anywhere", false]
+      ]
+    },
+    {
+      "selector": ".table-wrap",
+      "media": null,
+      "declarations": [
+        ["overflow-x", "auto", false],
+        ["margin", "14px 0 22px", false],
+        ["border", "1px solid var(--border)", false],
+        ["border-radius", "10px", false],
+        ["background", "var(--card)", false],
+        ["min-width", "0", false]
+      ]
+    },
+    {
+      "selector": "table",
+      "media": null,
+      "declarations": [["border-collapse", "collapse", false], ["width", "100%", false]]
+    },
+    {
+      "selector": "thead th",
+      "media": null,
+      "declarations": [
+        ["background", "var(--indigo)", false],
+        ["color", "#fff", false],
+        ["text-align", "left", false],
+        ["font-weight", "700", false],
+        ["padding", "11px 14px", false],
+        ["white-space", "nowrap", false],
+        ["font-size", "1rem", false]
+      ]
+    },
+    {
+      "selector": "tbody td",
+      "media": null,
+      "declarations": [
+        ["padding", "11px 14px", false],
+        ["border-bottom", "1px solid var(--border)", false],
+        ["vertical-align", "top", false],
+        ["font-size", "1rem", false],
+        ["line-height", "1.7", false],
+        ["overflow-wrap", "anywhere", false],
+        ["min-width", "7rem", false]
+      ]
+    },
+    {
+      "selector": "tbody tr:last-child td",
+      "media": null,
+      "declarations": [["border-bottom", "none", false]]
+    },
+    {
+      "selector": "tbody tr:hover",
+      "media": null,
+      "declarations": [["background", "var(--paper-alt)", false]]
+    },
+    {
+      "selector": "td code",
+      "media": null,
+      "declarations": [["white-space", "normal", false]]
+    },
+    {
+      "selector": ".code-block",
+      "media": null,
+      "declarations": [
+        ["margin", "14px 0 22px", false],
+        ["border-radius", "10px", false],
+        ["overflow", "hidden", false],
+        ["background", "#282c34", false],
+        ["border", "1px solid #1b1e24", false]
+      ]
+    },
+    {
+      "selector": ".code-head",
+      "media": null,
+      "declarations": [
+        ["display", "flex", false],
+        ["justify-content", "space-between", false],
+        ["align-items", "center", false],
+        ["padding", "6px 14px", false],
+        ["background", "#21252b", false],
+        ["color", "#b6bdca", false]
+      ]
+    },
+    {
+      "selector": ".code-lang",
+      "media": null,
+      "declarations": [
+        ["font-family", "var(--font-mono)", false],
+        ["font-size", "1rem", false],
+        ["letter-spacing", "0.06em", false]
+      ]
+    },
+    {
+      "selector": ".copy-btn",
+      "media": null,
+      "declarations": [
+        ["background", "#353b45", false],
+        ["color", "#e6e9ef", false],
+        ["border", "1px solid #4a5160", false],
+        ["border-radius", "6px", false],
+        ["padding", "3px 12px", false],
+        ["cursor", "pointer", false]
+      ]
+    },
+    {
+      "selector": ".copy-btn:hover",
+      "media": null,
+      "declarations": [["background", "#434b59", false]]
+    },
+    {
+      "selector": ".copy-btn.done",
+      "media": null,
+      "declarations": [
+        ["background", "var(--forest)", false],
+        ["border-color", "var(--forest)", false],
+        ["color", "#fff", false]
+      ]
+    },
+    {
+      "selector": ".code-block pre",
+      "media": null,
+      "declarations": [
+        ["margin", "0", false],
+        ["overflow-x", "auto", false],
+        ["padding", "0", false]
+      ]
+    },
+    {
+      "selector": ".code-block pre code,\n      .code-block pre code.hljs",
+      "media": null,
+      "declarations": [
+        ["display", "block", false],
+        ["padding", "16px 18px", false],
+        ["background", "transparent", false],
+        ["border-radius", "0", false],
+        ["font-family", "var(--font-mono)", false],
+        ["font-size", "1rem", false],
+        ["line-height", "1.7", false],
+        ["color", "#abb2bf", false],
+        ["white-space", "pre", false],
+        ["overflow-wrap", "normal", false]
+      ]
+    },
+    {
+      "selector": ".callout",
+      "media": null,
+      "declarations": [
+        ["margin", "12px 0 20px", false],
+        ["padding", "12px 18px", false],
+        ["background", "var(--gold-soft)", false],
+        ["border-left", "5px solid var(--gold)", false],
+        ["border-radius", "8px", false]
+      ]
+    },
+    {
+      "selector": ".callout p",
+      "media": null,
+      "declarations": [["margin", "0", false]]
+    },
+    {
+      "selector": ".closing",
+      "media": null,
+      "declarations": [
+        ["margin", "8px 56px 56px", false],
+        ["padding", "22px 26px", false],
+        ["background", "var(--indigo-soft)", false],
+        ["border", "1px solid #c9cdee", false],
+        ["border-left", "6px solid var(--indigo)", false],
+        ["border-radius", "12px", false]
+      ]
+    },
+    {
+      "selector": ".closing p",
+      "media": null,
+      "declarations": [["margin", "6px 0 0", false]]
+    },
+    {
+      "selector": ".diagram-card",
+      "media": null,
+      "declarations": [
+        ["margin", "16px 0 26px", false],
+        ["padding", "18px 14px", false],
+        ["background", "var(--card)", false],
+        ["border", "1px solid var(--border)", false],
+        ["border-radius", "12px", false],
+        ["min-width", "0", false]
+      ]
+    },
+    {
+      "selector": ".diagram-wrap",
+      "media": null,
+      "declarations": [
+        ["overflow-x", "auto", false],
+        ["display", "flex", false],
+        ["justify-content", "safe center", false],
+        ["width", "100%", false],
+        ["min-width", "0", false]
+      ]
+    },
+    {
+      "selector": ".diagram-wrap > *",
+      "media": null,
+      "declarations": [["min-width", "0", false]]
+    },
+    {
+      "selector": ".diagram-canvas",
+      "media": null,
+      "declarations": [["min-width", "0", false]]
+    },
+    {
+      "selector": ".diagram-canvas svg",
+      "media": null,
+      "declarations": [["max-width", "none", false], ["flex-shrink", "0", false]]
+    },
+    {
+      "selector": ".diagram-err",
+      "media": null,
+      "declarations": [
+        ["font-family", "var(--font-mono)", false],
+        ["font-size", "1rem", false],
+        ["white-space", "pre", false],
+        ["overflow-x", "auto", false],
+        ["color", "var(--ink-soft)", false]
+      ]
+    },
+    {
+      "selector": ".mermaidTooltip",
+      "media": null,
+      "declarations": [["font-size", "1rem", true]]
+    },
+    {
+      "selector": ".footer",
+      "media": null,
+      "declarations": [
+        ["padding", "28px 56px 60px", false],
+        ["color", "var(--ink-soft)", false],
+        ["font-size", "1rem", false],
+        ["border-top", "1px solid var(--border)", false]
+      ]
+    },
+    {
+      "selector": ".sidebar",
+      "media": "(max-width: 900px)",
+      "declarations": [
+        ["transform", "translateX(-100%)", false],
+        ["transition", "transform 0.25s ease", false],
+        ["box-shadow", "none", false]
+      ]
+    },
+    {
+      "selector": "body.nav-open .sidebar",
+      "media": "(max-width: 900px)",
+      "declarations": [
+        ["transform", "translateX(0)", false],
+        ["box-shadow", "0 0 40px rgba(0, 0, 0, 0.3)", false]
+      ]
+    },
+    {
+      "selector": "body.nav-open .overlay",
+      "media": "(max-width: 900px)",
+      "declarations": [
+        ["display", "block", false],
+        ["position", "fixed", false],
+        ["inset", "0", false],
+        ["background", "rgba(20, 20, 30, 0.45)", false],
+        ["z-index", "40", false]
+      ]
+    },
+    {
+      "selector": ".layout",
+      "media": "(max-width: 900px)",
+      "declarations": [["margin-left", "0", false]]
+    },
+    {
+      "selector": ".mobile-bar",
+      "media": "(max-width: 900px)",
+      "declarations": [
+        ["display", "flex", false],
+        ["align-items", "center", false],
+        ["gap", "12px", false],
+        ["position", "sticky", false],
+        ["top", "0", false],
+        ["z-index", "30", false],
+        ["background", "var(--card)", false],
+        ["border-bottom", "1px solid var(--border)", false],
+        ["padding", "10px 16px", false]
+      ]
+    },
+    {
+      "selector": ".mobile-bar button",
+      "media": "(max-width: 900px)",
+      "declarations": [
+        ["background", "var(--indigo)", false],
+        ["color", "#fff", false],
+        ["border", "none", false],
+        ["border-radius", "8px", false],
+        ["padding", "8px 14px", false],
+        ["cursor", "pointer", false]
+      ]
+    },
+    {
+      "selector": ".mobile-bar span",
+      "media": "(max-width: 900px)",
+      "declarations": [
+        ["font-weight", "700", false],
+        ["font-size", "1rem", false],
+        ["overflow", "hidden", false],
+        ["text-overflow", "ellipsis", false],
+        ["white-space", "nowrap", false]
+      ]
+    },
+    {
+      "selector": ".hero",
+      "media": "(max-width: 900px)",
+      "declarations": [["padding", "44px 20px 36px", false]]
+    },
+    {
+      "selector": ".hero h1",
+      "media": "(max-width: 900px)",
+      "declarations": [["font-size", "1.7rem", false]]
+    },
+    {
+      "selector": ".section",
+      "media": "(max-width: 900px)",
+      "declarations": [["padding", "32px 20px", false]]
+    },
+    {
+      "selector": ".section h2",
+      "media": "(max-width: 900px)",
+      "declarations": [["font-size", "1.5rem", false]]
+    },
+    {
+      "selector": ".closing",
+      "media": "(max-width: 900px)",
+      "declarations": [["margin", "8px 20px 40px", false]]
+    },
+    {
+      "selector": ".footer",
+      "media": "(max-width: 900px)",
+      "declarations": [["padding", "24px 20px 48px", false]]
+    }
+  ],
+  "tokens": [
+    [
+      ["hljs-keyword", "from"],
+      ["hljs-keyword", "import"],
+      ["hljs-string", "\"2026-10-23T09:12:04Z ERROR db: connection pool exhausted\""],
+      ["hljs-comment", "# 分析対象のログ(例)"],
+      ["hljs-string", "\"gpt-6.1-sol\""],
+      ["hljs-built_in", "input"],
+      ["hljs-string", "\"次のログから根本原因の候補を3つ挙げ、確認手順を示してください。\\n\\n\""],
+      ["hljs-string", "\"effort\""],
+      ["hljs-string", "\"medium\""],
+      ["hljs-comment", "# 既定はmedium"],
+      ["hljs-string", "\"verbosity\""],
+      ["hljs-string", "\"medium\""],
+      ["hljs-comment", "# 詳細度の既定値"],
+      ["hljs-built_in", "print"]
+    ],
+    [
+      ["hljs-comment", "# NG: エフォートがnone以外で温度を指定している"],
+      ["hljs-string", "\"gpt-6.1-sol\""],
+      ["hljs-built_in", "input"],
+      ["hljs-string", "\"...\""],
+      ["hljs-string", "\"effort\""],
+      ["hljs-string", "\"high\""],
+      ["hljs-number", "0.2"],
+      ["hljs-comment", "# 非対応。削除する"]
+    ],
+    [
+      ["hljs-section", "# 権限の考え方"],
+      ["hljs-bullet", "-"],
+      ["hljs-bullet", "-"],
+      ["hljs-bullet", "-"],
+      ["hljs-section", "# 完了の定義"],
+      ["hljs-bullet", "-"],
+      ["hljs-bullet", "-"]
+    ],
+    [],
+    [],
+    [],
+    [
+      ["hljs-string", "\"Responses APIとChat Completionsの違いを教えてください。\""],
+      ["hljs-comment", "# ユーザーの質問(例)"],
+      ["hljs-string", "\"gpt-6.1-sol\""],
+      ["hljs-built_in", "input"],
+      ["hljs-string", "\"effort\""],
+      ["hljs-string", "\"medium\""],
+      ["hljs-string", "\"verbosity\""],
+      ["hljs-string", "\"low\""],
+      ["hljs-comment", "# low / medium / high"]
+    ],
+    [
+      ["hljs-string", "\"type\""],
+      ["hljs-string", "\"function\""],
+      ["hljs-string", "\"name\""],
+      ["hljs-string", "\"fetch_report\""],
+      ["hljs-string", "\"description\""],
+      ["hljs-string", "\"売上レポートを取得する。完了まで数十秒かかる。\""],
+      ["hljs-string", "\"parameters\""],
+      ["hljs-string", "\"type\""],
+      ["hljs-string", "\"object\""],
+      ["hljs-string", "\"properties\""],
+      ["hljs-string", "\"quarter\""],
+      ["hljs-string", "\"type\""],
+      ["hljs-string", "\"string\""],
+      ["hljs-string", "\"required\""],
+      ["hljs-string", "\"quarter\""],
+      ["hljs-string", "\"additionalProperties\""],
+      ["hljs-literal", "False"],
+      ["hljs-string", "\"strict\""],
+      ["hljs-literal", "True"],
+      ["hljs-string", "\"async\""],
+      ["hljs-literal", "True"],
+      ["hljs-comment", "# 結果がすぐ要らないツールにだけ付ける"]
+    ],
+    [
+      ["hljs-string", "\"この関数の名前をより分かりやすく変えてください。\""],
+      ["hljs-comment", "# 入力(例)"],
+      ["hljs-string", "\"gpt-6.1-sol\""],
+      ["hljs-built_in", "input"],
+      ["hljs-string", "\"ultrafast\""],
+      ["hljs-comment", "# 対話・高速なコーディング反復向け"]
+    ],
+    []
+  ]
+}

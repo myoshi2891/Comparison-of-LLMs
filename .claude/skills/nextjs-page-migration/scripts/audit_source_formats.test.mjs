@@ -144,3 +144,11 @@ test("treats good and tip callout markers as the same semantic variant", () => {
  assert.equal(audit(source,page.replace('complete explanation','summary')).status,1);
  assert.equal(audit(source,page.replace('styles.tip','styles.warn')).status,1);
 });
+
+test("plain callouts use the default info variant without accepting missing content", () => {
+ const source='<div class="callout"><p>Full original explanation.</p></div>';
+ const page='<div className={styles.callout} data-variant="info"><p>Full original explanation.</p></div>';
+ assert.equal(audit(source,page).status,0);
+ assert.equal(audit(source,page.replace('Full original explanation.','Short.')).status,1);
+ assert.equal(audit(source,page.replace('data-variant="info"','data-variant="warn"')).status,1);
+});
