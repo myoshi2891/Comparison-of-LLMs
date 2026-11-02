@@ -153,7 +153,7 @@ it("最下部では最後のセクションを選択", () => {
 it("目次の選択リンクが可視範囲外なら目次内スクロール", () => {
   render(<Harness />);
   const link = sidebar().querySelector("a")!;
-  vi.spyOn(link, "getBoundingClientRect").mockReturnValue({ top: 900, bottom: 950 } as DOMRect);
+  Object.defineProperty(link, "getBoundingClientRect", {value:()=>({top:900,bottom:950,height:50} as DOMRect),configurable:true});
   const initial = sidebar().scrollTop;
   fireEvent.scroll(window);
   expect(sidebar().scrollTop).toBeGreaterThan(initial);

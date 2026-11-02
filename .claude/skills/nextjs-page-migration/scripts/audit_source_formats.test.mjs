@@ -136,3 +136,11 @@ test("resolves text/plain data-for scripts into their target code blocks", () =>
  assert.equal(audit(source, page.replace('schema', 'missing')).status, 1);
  assert.equal(audit(source, page.replace(JSON.stringify(second), '""')).status, 1);
 });
+
+test("treats good and tip callout markers as the same semantic variant", () => {
+ const source='<div class="callout tip"><p>Keep the complete explanation.</p></div>';
+ const page='<div className={styles.callout + styles.tip} data-variant="good"><p>Keep the complete explanation.</p></div>';
+ assert.equal(audit(source,page).status,0);
+ assert.equal(audit(source,page.replace('complete explanation','summary')).status,1);
+ assert.equal(audit(source,page.replace('styles.tip','styles.warn')).status,1);
+});

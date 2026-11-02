@@ -2,7 +2,7 @@
 import fs from "node:fs";
 import { cleanup, render } from "@testing-library/react";
 import postcss from "postcss";
-import { afterEach, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { pageRegistry } from "@/lib/page-registry";
 import Page, { metadata } from "./page";
 import styles from "./page.module.css";
@@ -23,7 +23,13 @@ vi.mock("@/components/docs/MermaidDiagram", () => ({
     </div>
   ),
 }));
-afterEach(cleanup);
+beforeEach(() => {
+  vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(function(this: HTMLElement) {
+    const i=expected.sections.indexOf(this.id);
+    return {top:i<0?100:i*1000,bottom:200,height:600} as DOMRect;
+  });
+});
+afterEach(() => {cleanup();vi.restoreAllMocks();});
 const text = (e: Element) => (e.textContent ?? "").replace(/\s+/g, " ").trim();
 for (const selector of [
   "h1",
@@ -189,6 +195,7 @@ it("レジストリからGoogleの導線へ登録し移行確認日を記録", (
     lastReviewed: "2026-11-02",
   });
 });
+const cssValue=(v:unknown)=>typeof v === 'string'?v.replace(/\s+/g,' ').trim().replace(/'/g,'"'):v;
 const css = () => fs.readFileSync("app/google/models-best-practices/page.module.css", "utf8");
 // 元CSSを独立した固定期待値として保存。共有図解への委譲とルート・開閉スコープだけ明示変換する。
 const scoped = (s: string) =>
@@ -222,11 +229,11 @@ it("原本104 CSS規則の宣言・メディア条件を漏れなく転写", () 
           .filter((n) => n.type === "decl")
           .map((n) => {
             const d = n as postcss.Declaration;
-            return [d.prop, d.value, !!d.important];
+            return [d.prop, cssValue(d.value), !!d.important];
           })
       ),
       source.selector
-    ).toContainEqual(source.declarations);
+    ).toContainEqual(source.declarations.map(d=>d.map(cssValue)));
   }
 });
 it("リストの点・番号とチェックリスト例外、表・アンカー・コードリセット", () => {
