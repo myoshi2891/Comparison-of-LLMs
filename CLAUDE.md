@@ -10,6 +10,23 @@ AIモデルの時間別コスト計算機 + AI ツール導入ガイド群。Pyt
 
 ## アーキテクチャ
 
+OpenAI 最新モデルガイド `/codex/models-best-practices` を追加（2026-11-02）。
+指定HTMLの全52見出し（H1×1／H2×14／H3×37）、34段落、62リスト項目、21表159行、
+10コード例、8図、1 callout、49外部リンクをPure JSXへ転写。80原本CSS規則を固定し、
+リストの点・番号・入れ子・marker色、表全列左寄せ、コード字下げ・highlight.js 11.11.1の全トークンを照合。
+50契約（ページ32／操作18）と関連76契約が成功。全体Vitest **221 files／2347 tests**、
+型・lint（597 files／0 diagnostics）、原本HTML監査exit 0、Mermaid 8図の解析、pytest 122件が成功。
+目次・コピー・読書進捗処理は行／関数100%、分岐90.62%。コピー拒否・fallback・タイマー解除も検証。
+300px固定目次と900pxモバイル開閉、実測バー高さ・inert・フォーカスを保持し、
+共有ヘッダーの余白は一度だけ確保。確認日・公開日はregistryからヒーロー内へ表示する。
+原本のブラウザ既定太字は共有リセットをページ内で補正。図の配置・サイズは共有コンポーネントへ委譲。
+Codexカテゴリのregistryからナビ・検索・RSSへ導出。本文の情報基準日2026-10-23を維持する。
+HTML／Markdownはarchive/html/OpenAI/／archive/md/OpenAI/へ内容無変更で保存（SHA-256一致）。
+Markdownは見出し表記、独立目次、図3件に差があるため混在させず指定HTMLを正本とする。
+無指定calloutを既定infoとして照合する監査対応を追加し、監査46テスト成功。
+npm・ビルドは未実行。CSSキャッシュ更新後、通常devのlocalhost:3000で新規ルートHTTP 200を確認。
+目視はユーザー担当。分離履歴は `docs/PROGRESS.md` を参照。
+
 2026-11-02: Geminiモデルガイドの免責バナー直下の重複余白を解消し、日付をヒーロー内へ移動。
 ページ限定のbody margin-topを0にし、固定ヘッダー／免責バナーの実測高さはpaddingで一度だけ確保する。
 共有の日付バーは当該ページで非表示にし、最終確認日・公開日をregistryからヒーローへ表示。
@@ -500,7 +517,7 @@ Build:     cd web-next && bun run build
 以下を全て確認してからコミットすること：
 
 1. `cd web-next && bun run build` が成功（※Antigravityサンドボックス環境では実行禁止。他環境やCIでは必須）
-2. `cd web-next && bun run test` が完全に成功（219 files / 2297 tests pass、2026-11-02実測。`NODE_OPTIONS=--no-experimental-webstorage` と `--maxWorkers=1 --testTimeout=30000` を使用。収集失敗もブロッキング失敗として原因を調査する）
+2. `cd web-next && bun run test` が完全に成功（221 files / 2347 tests pass、2026-11-02実測。`NODE_OPTIONS=--no-experimental-webstorage` と `--maxWorkers=1 --testTimeout=30000` を使用。収集失敗もブロッキング失敗として原因を調査する）
 3. `cd web-next && bun run typecheck` が成功
 4. `cd web-next && bun run lint` が成功
 5. `cd scraper && uv run pytest` が成功

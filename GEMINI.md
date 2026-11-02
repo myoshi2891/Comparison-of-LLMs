@@ -5,6 +5,12 @@ Updated 2026-11-02
 GEMINI.md は Gemini CLI / Gemini Code Assist 向けの入り口。
 本リポジトリでは **CLAUDE.md が正本** とし、GEMINI.md はその委譲 pointer として機能する。
 
+2026-11-02: `/codex/models-best-practices` を追加。指定HTMLの全要素・80 CSS規則を固定期待値で照合。
+50契約、全体221 files／2347 tests、型・lint（597 files／0 diagnostics）、原本監査exit 0、
+8図の構文解析とpytest 122件が成功。コピー・目次・進捗処理の行／関数100%。
+原本2形式は内容無変更で保存。npm・ビルドは未実行、目視はユーザー担当（localhost:3000）。
+原本差分・分離履歴・再開手順は `docs/PROGRESS.md` を参照。
+
 2026-11-02: Geminiガイドの重複余白を解消し、registryの最終確認日・公開日をヒーロー内へ移動。
 対象43契約、全体219 files／2297 tests、型・lint、原本監査exit 0、HTTP 200が成功。目視はユーザー担当。
 
@@ -197,10 +203,10 @@ Vitest 185 files／1779 tests、typecheck・lint・pytest 104件が成功。復�
 ## 検証コマンド
 
 ```bash
-(cd web-next && NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000) # 219 files / 2297 tests pass（2026-11-02 実測）
+(cd web-next && NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000) # 221 files / 2347 tests pass（2026-11-02 実測）
 (cd web-next && bun run typecheck)   # OK（2026-11-02 実測）
 # ビルドは今回ユーザー指定で未実行（過去: 2026-09-18 に89静的ページ生成）
-(cd web-next && bun run lint)        # OK（591 files / 0 diagnostics。2026-11-02 実測）
+(cd web-next && bun run lint)        # OK（597 files / 0 diagnostics。2026-11-02 実測）
 (cd scraper && uv run pytest)        # 122件成功（2026-11-02 実測）
 ```
 

@@ -12,6 +12,12 @@ Updated 2026-11-02
 
 基準コミット（drift 検出用）: `45940fd`
 
+保守同期（2026-11-02）: `/codex/models-best-practices` を既存のCodexカテゴリへ登録。
+007〜009のDONE状態を維持し、新規基盤プランは起票していない。原本照合・操作50契約、
+全体Vitest **221 files／2347 tests**、型・lint（597 files／0 diagnostics）、原本監査exit 0、
+Mermaid 8図の解析とpytest 122件が成功。原本2形式は内容無変更で保存。
+npm・ビルドは未実行。次の作業はユーザーの目視確認。履歴は `docs/PROGRESS.md` を参照。
+
 保守同期（2026-11-02）: `/google/models-best-practices` を既存のGoogleカテゴリへ登録。
 007〜009のDONE状態は維持し、新規基盤プランは起票していない。41契約を追加し、
 全体Vitest **218 files／2288 tests**、typecheck・lint（590 files／0 diagnostics）、

@@ -6,6 +6,22 @@
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
 
+## OpenAI 最新モデルガイド移行（2026-11-02）
+
+- ルート: `/codex/models-best-practices`。指定HTMLを正本とし、本文の情報基準日2026-10-23を保持。registryはCodexカテゴリへ追加し、ナビ・検索・RSS・関連リンクを導出する。
+- 全1 H1・14 H2・37 H3・34段落・62リスト項目（13 ul／5 ol）・21表159行・10コード例・8図・1 callout・49外部リンクをPure JSXへ完全転写。全要素の順序・重複・表のセル結合・リスト型と入れ子・構文トークンを原本由来の固定期待値で照合する。
+- 80原本CSS規則を固定。図解のサイズ・配置とsvg／tooltip制御は共有MermaidDiagramへ委譲するため該当規則・プロパティを明示除外。それ以外の宣言・media条件、marker色・リスト記号・太字・表全列左寄せ・コード字下げ・アンカー余白を検証する。
+- 50契約（ページ32／操作18）、registry／ナビを含む関連76契約が成功。全体Vitest **221 files／2347 tests**、型チェック、lint（597 files／0 diagnostics）、HTML原本監査exit 0、Mermaid 10.9.8で全8図の構文解析、pytest **122件**が成功。
+- TocObserverは読書進捗、目次追従・最下部、目次内スクロール、モバイル開閉、背景・Escape・リンク選択、resize・inert・フォーカス、実測バー高さ、コピー成功・拒否・fallback・cleanupを18テストで検証。行／関数100%、分岐90.62%、文98.4%。
+- コピー10件の表示と1600ms後の復元を保持。highlight.js 11.11.1で全コード例を静的トークン化し、複数行トークンと先頭空白を保持。依存・設定・ロックは変更しない。
+- 300px固定目次、900px以下のモバイルバーとドロワーを保持。共有ヘッダー／免責バナーの高さに目次・進捗バーを合わせ、mobileバーを実測する。bodyの余白は一度だけ確保し、registryの確認日・公開日はヒーロー内へ表示する。
+- 共有リセットで失われる見出しの既定太字は追加Red `5a3d2735` から復元。無指定calloutをinfoとして照合する監査対応はRed `02f0a4a4` → Green `d25a67a4`、監査46テスト成功。元のcallout配色は保持し、本文や警告種別の改変は失敗する。
+- ページRed `02f0a4a4` → 既定太字Red `5a3d2735` → Green `f2f96dc9` → Refactor `a6fbe7c9` → 原本保存 `40bf6203`。原本の固定期待値は実装に合わせて変更していない。
+- HTML／Markdownをarchive/html/OpenAI/／archive/md/OpenAI/へ内容無変更で退避。HTML SHA-256 `1758e14fc853bc18f62361a52750cdc277604203e7e800eb3b457f868d0be469`、Markdown `24e40dbab0b63ec47781f88470a0402e1724c8564290aea95f97e296ef078129`（移動前後一致）。
+- Markdown監査との差分: 読者タグ付きH1・独立目次・Step 1〜8／補足A〜Cのプレフィックスによる見出し13件、目次の補足A〜Cリスト3件。HTMLはStep／APPENDIXを装飾eyebrowへ分離している。図0と7はLR／TB、図4はautonumber有無の差がある。指定HTMLを正本とし、両形式を混在させない。
+- CSSキャッシュを退避して通常の `bun run dev` を再起動し、`http://localhost:3000/codex/models-best-practices` のHTTP 200とヒーロー内の2日付を確認。目視はユーザー担当。npm・ビルドは未実行。
+- 開始前からの別ガイドの未コミット変更は保持した。
+
 ## Geminiガイドのヒーロー余白・日付表示修正（2026-11-02）
 
 - 原因: `body.has-common-header` のmargin-topとGemini専用padding-topが両方とも固定クロームの高さを確保し、共通の日付バーもヒーロー外に表示されていた。
@@ -67,15 +83,15 @@
 
 - **フェーズ**: 保守・機能改善・品質強化フェーズ
 - **ブランチ**: `dev`
-- **最新実装 HEAD**: `6cbe0015`（Gemini余白・日付 Red `76c54f34` → Green `5c2c17ac` → Refactor `6cbe0015`）
-- **次の作業**: `/google/models-best-practices` の目視確認（ユーザー担当、localhost:3000）。免責バナーとヒーロー間の余白、ヒーロー内の最終確認日・公開日、モバイルでの日付折り返しを確認する。npm・ビルドは未実行。
-- **ルート実数**: `page.tsx` 97 件、registry 97 エントリ（現行ファイルから実測）。
+- **最新実装 HEAD**: `a6fbe7c9`（OpenAI移行 Green `f2f96dc9` → Refactor `a6fbe7c9`、原本保存 `40bf6203`）
+- **次の作業**: `/codex/models-best-practices` の目視確認（ユーザー担当、localhost:3000）。300px固定目次と900pxモバイル開閉、リストの点・番号、21表、10コード例の構文色・字下げ・コピー、8図、読書進捗、ヒーロー内の日付を確認する。npm・ビルドは未実行。
+- **ルート実数**: `page.tsx` 98 件、registry 98 エントリ（現行ファイルから実測）。
 - **動作検証**:
   - ビルド: 今回はユーザー指定で未実行。過去の成功記録は 2026-09-17 の 90 静的ページであり、今回の変更を検証した値ではない。
   - `bun run typecheck` ✅（`tsc --noEmit`。2026-11-02 実測）
-  - `bun run lint` ✅（Biome check / 591 files / 0 diagnostics。2026-11-02 実測）
+  - `bun run lint` ✅（Biome check / 597 files / 0 diagnostics。2026-11-02 実測）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=2 --testTimeout=30000` でVitest **219 files / 2297 tests すべて合格**（2026-11-02 実測）。Gemini対象43契約（余白・日付2契約を含む）、typecheck・lint、HTML原本監査exit 0が成功。
+  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=2 --testTimeout=30000` でVitest **221 files / 2347 tests すべて合格**（2026-11-02 実測）。OpenAI対象50契約、関連76契約、typecheck・lint、HTML原本監査exit 0が成功。
     - 初回全体検証は2239件中registryの日付不変条件1件が失敗。専用Red／Greenで修正後、全体を再実行して成功。依存・設定・ロックは変更していない。
     - `load(sourceHtml)` をモジュール初期化時に呼ぶ `governance/ai-governance/GuideContent.tsx` と
       `local-llm/finetuning-best-practices/GuideContent.tsx` は、import スモークでも読み込み可能であることを確認済み
@@ -536,17 +552,17 @@
 
 ```text
 AGENTS.md → CODEX.md → CLAUDE.md → docs/PROGRESS.md → Phase A–F 計画の順で読む。
-最新実装 HEAD: 6cbe0015（Gemini余白・日付 Red 76c54f34 → Green 5c2c17ac → Refactor 6cbe0015）
-次の作業: /google/models-best-practices の目視確認（ユーザー担当）。http://localhost:3000/google/models-best-practices
-免責バナー直下の余白解消と、ヒーロー内の最終確認日・公開日、モバイルでの日付折り返しを確認する。
-10図、288px固定目次、900px以下の開閉、32表の左寄せ、リストの点と番号、12コード例の構文色・字下げ、18項目の進捗を確認する。
-原本2形式はarchive/へ退避済み（SHA-256一致）。指定HTMLを正本とし、Markdownの目次・図形式の差は本書冒頭に記録した。
-HTML原本監査exit 0、Gemini対象43契約、全219 files／2297 tests、typecheck・lintが成功。pytest122件は前回の実測値。
+最新実装 HEAD: a6fbe7c9（OpenAI移行 Green f2f96dc9 → Refactor a6fbe7c9、原本保存 40bf6203）
+次の作業: /codex/models-best-practices の目視確認（ユーザー担当）。http://localhost:3000/codex/models-best-practices
+300px目次、900px以下の開閉、21表の左寄せ、リストの点・番号・marker色、10コード例の構文色・字下げ・コピー、8図と読書進捗を確認する。
+免責バナー直下の余白を一度だけ確保し、最終確認日・公開日はヒーロー内に表示する。
+指定HTMLを正本とし、原本2形式はarchive/へ退避済み（SHA-256一致）。Markdownの見出し・目次・図3件の差分は本書冒頭に記録。
+HTML原本監査exit 0、OpenAI対象50契約と関連76契約、全221 files／2347 tests、型・lint、pytest122件が成功。
 NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=2 --testTimeout=30000 を使用する。
-本ページのCSSはページ内に閉じ、図解レイアウトは共有コンポーネントへ委譲。依存・設定・ロックは変更していない。
-監査はtext/plainのdata-for形式とgood／tip同義マーカーに対応し、45監査テストで検証済み。
+図解レイアウトは共有MermaidDiagramへ委譲。依存・設定・ロックは変更していない。
+監査は無指定calloutの既定infoを正規化し、本文欠落・warn変更を検出する。監査46テスト成功。
 サンドボックスではnpmとビルドを実行しない。修正もRed → Green → Refactor → Docsの分離コミットを守る。
-page.tsx 97件、registry 97エントリ（現行ファイルから実測）。次ページは指示されてから扱う。
-開発サーバーは通常の bun run dev（Turbopack）でlocalhost:3000に起動中。GeminiとホームのHTTP 200確認済み。
-共通フォントは next/font/local と保存済みTTFを使用。Webpack指定は不要。ブラウザに旧エラーが残る場合はページを再読み込みする。
+page.tsx 98件、registry 98エントリ（実測）。次ページは指示されてから扱う。
+通常の bun run dev（Turbopack）がlocalhost:3000で起動中。OpenAIルートHTTP 200確認済み。
+共通フォントは next/font/local と保存済みTTFを使用する。Webpack指定は不要。
 ```
