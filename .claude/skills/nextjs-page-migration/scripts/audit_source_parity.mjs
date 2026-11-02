@@ -204,8 +204,10 @@ function normalizeCalloutElement(openingTag, content) {
     markers.add(value === "warning" ? "warn" : value === "note" ? "info" : value);
   }
   // good は "good-practices" 等の id にも含まれやすいため、variant 系属性の完全一致トークンに限って tip とみなす。
+  // JSX 式はテンプレートリテラルの `${…}` を 1 段まで含みうる。`[^}]*` だと最初の `}` で切れ、
+  // 後続の styles.good を取りこぼすため、1 段の入れ子波括弧を許容する。
   const variantAttributeRe =
-    /(?:^|\s)(?:class|className|variant|data-variant|data-testid)\s*=\s*(?:"([^"]*)"|'([^']*)'|\{([^}]*)\})/gi;
+    /(?:^|\s)(?:class|className|variant|data-variant|data-testid)\s*=\s*(?:"([^"]*)"|'([^']*)'|\{((?:[^{}]|\{[^{}]*\})*)\})/gi;
   for (const attribute of openingTag.matchAll(variantAttributeRe)) {
     const tokens = (attribute[1] ?? attribute[2] ?? attribute[3]).split(/[^\w-]+/);
     if (tokens.some((token) => token.toLowerCase() === "good")) markers.add("tip");
