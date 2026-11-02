@@ -10,6 +10,14 @@ AIモデルの時間別コスト計算機 + AI ツール導入ガイド群。Pyt
 
 ## アーキテクチャ
 
+2026-11-02: Turbopackの共通Googleフォント解決エラーを修正。
+`lib/fonts.ts` のJetBrains Mono／Syneを `next/font/local` に切り替え、公式可変TTFとOFLを
+`public/fonts/latin/` に保存した。CSS変数・公開export・swap・従来ウェイトを保持し、
+Noto Sans JPは既存の自前ホスト方式を継続。通常の `bun run dev` でGeminiガイドとホームがHTTP 200、
+配信2フォントのSHA-256が保存資産と一致。Webpackへの切り替えは不要。
+新規7契約を含め全体Vitest **219 files／2295 tests**、関連108契約、型・lint（591 files／0 diagnostics）が成功。
+npm・ビルド、依存・設定の変更はなし。出典・ハッシュは `web-next/public/fonts/latin/README.md` に記録。
+
 Gemini 最新モデルガイド `/google/models-best-practices` を追加（2026-11-02）。
 指定HTMLの全92見出し（H1×1／H2×17／H3×74）、28段落、67リスト項目、32表246行、
 12コード例、10図解、8 callout、18チェック項目、65外部リンクをPure JSXへ転写。
@@ -236,7 +244,7 @@ update.sh  ← オーケストレーター (scrape → copy)
 │   │   ├── cost.ts              純粋関数 (calcApiCost / calcSubCost / colorIndex / fmtUSD / fmtJPY)
 │   │   ├── pricing.ts           Zod スキーマ + コンパイル時パリティアサート
 │   │   ├── i18n.tsx             T オブジェクト + t() + tRich() (React 要素ファクトリ)
-│   │   ├── fonts.ts             next/font/google (JetBrains Mono / Syne。Noto Sans JP は自前ホスト)
+│   │   ├── fonts.ts             next/font/local (JetBrains Mono / Syne。Noto Sans JP は自前ホスト)
 │   │   ├── noto-sans-jp-preload.ts  自動生成 (latin slice の preload 対象)
 │   │   ├── metadata.ts          静的 Metadata / Viewport
 │   │   └── site-url.ts          サイト URL 解決ユーティリティ (resolveSiteUrl / NEXT_PUBLIC_SITE_URL)
@@ -485,7 +493,7 @@ Build:     cd web-next && bun run build
 以下を全て確認してからコミットすること：
 
 1. `cd web-next && bun run build` が成功（※Antigravityサンドボックス環境では実行禁止。他環境やCIでは必須）
-2. `cd web-next && bun run test` が完全に成功（218 files / 2288 tests pass、2026-11-02実測。`NODE_OPTIONS=--no-experimental-webstorage` と `--maxWorkers=1 --testTimeout=30000` を使用。収集失敗もブロッキング失敗として原因を調査する）
+2. `cd web-next && bun run test` が完全に成功（219 files / 2295 tests pass、2026-11-02実測。`NODE_OPTIONS=--no-experimental-webstorage` と `--maxWorkers=1 --testTimeout=30000` を使用。収集失敗もブロッキング失敗として原因を調査する）
 3. `cd web-next && bun run typecheck` が成功
 4. `cd web-next && bun run lint` が成功
 5. `cd scraper && uv run pytest` が成功

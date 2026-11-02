@@ -6,6 +6,16 @@
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
 
+## 共通フォントのTurbopack解決エラー修正（2026-11-02）
+
+- 症状: `next/font/google queries have exactly one entry` により共通レイアウトのJetBrains Mono CSSを解決できず、ブラウザでModule not foundが発生。前回のWebpack切替は一時回避だった。
+- 対応: Google Fonts公式リポジトリのJetBrains Mono／Syne可変TTFとOFLを `web-next/public/fonts/latin/` へ保存し、`lib/fonts.ts` を `next/font/local` へ切り替えた。公開export・CSS変数・swap・従来のウェイト範囲を保持し、Noto Sans JPは変更しない。依存・設定・ロックは変更していない。
+- 新規7契約でローカルimport、設定全体、実TTFのSFNT／fvarウェイト軸、同梱OFLを検証。既存のGoogleローダー固定契約は今回の修正仕様に合わせてローカル資産へ変更し、ガイド本文の原本期待値は変更していない。
+- 関連108契約、全体Vitest **219 files／2295 tests**、型チェック、lint（591 files／0 diagnostics）が成功。直前のバックエンド122件成功記録は今回のフロントエンド修正では再実行していない。
+- 通常起動の `next dev`（Turbopack、localhost:3000）で `/google/models-best-practices` と `/` のHTTP 200を確認。生成CSSのsrcは `../media/*.ttf`（配信先 `/_next/static/media/`）。2フォントの配信バイト列は保存資産とSHA-256一致。Webpack指定とブラウザ自動化は不要。
+- 上流URL・ハッシュ・ライセンスは `web-next/public/fonts/latin/README.md` に記録。OFLは原文バイト列を保存し、Syne-OFL.txtの上流由来の末尾空白1箇所も改変していない。
+- Red `3d9ea9d5`（11失敗確認）→ Green `3ef97086` → Refactor `f203974a`。npm・ビルドは未実行。目視確認はユーザー担当。
+
 ## Gemini 最新モデルガイド移行（2026-11-02）
 
 - ルート: `/google/models-best-practices`。指定HTMLを正本とし、本文の情報基準日2026-10-23を保持。
@@ -48,15 +58,15 @@
 
 - **フェーズ**: 保守・機能改善・品質強化フェーズ
 - **ブランチ**: `dev`
-- **最新実装 HEAD**: `9d8152fd`（Gemini完全移植 Green `34afaf50` → Refactor `9d8152fd`、原本保存 `cfeecc96`）
+- **最新実装 HEAD**: `f203974a`（共通フォント修正 Red `3d9ea9d5` → Green `3ef97086` → Refactor `f203974a`）
 - **次の作業**: `/google/models-best-practices` の目視確認（ユーザー担当）。原本のリスト記号・番号、32表、12コード例の色と字下げ、10図、目次追従、モバイル開閉、18チェック項目の進捗を確認。npm・ビルドは未実行。
 - **ルート実数**: `page.tsx` 97 件、registry 97 エントリ（現行ファイルから実測）。
 - **動作検証**:
   - ビルド: 今回はユーザー指定で未実行。過去の成功記録は 2026-09-17 の 90 静的ページであり、今回の変更を検証した値ではない。
   - `bun run typecheck` ✅（`tsc --noEmit`。2026-11-02 実測）
-  - `bun run lint` ✅（Biome check / 590 files / 0 diagnostics。2026-11-02 実測）
+  - `bun run lint` ✅（Biome check / 591 files / 0 diagnostics。2026-11-02 実測）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=2 --testTimeout=30000` でVitest **218 files / 2288 tests すべて合格**（2026-11-02 実測）。Gemini対象41契約、registry／ナビを含む関連67契約、typecheck・lint、HTML原本監査exit 0が成功。
+  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=2 --testTimeout=30000` でVitest **219 files / 2295 tests すべて合格**（2026-11-02 実測）。フォント関連108契約と新規7契約、typecheck・lint、HTML原本監査exit 0が成功。
     - 初回全体検証は2239件中registryの日付不変条件1件が失敗。専用Red／Greenで修正後、全体を再実行して成功。依存・設定・ロックは変更していない。
     - `load(sourceHtml)` をモジュール初期化時に呼ぶ `governance/ai-governance/GuideContent.tsx` と
       `local-llm/finetuning-best-practices/GuideContent.tsx` は、import スモークでも読み込み可能であることを確認済み
@@ -517,16 +527,16 @@
 
 ```text
 AGENTS.md → CODEX.md → CLAUDE.md → docs/PROGRESS.md → Phase A–F 計画の順で読む。
-最新実装 HEAD: 9d8152fd（Gemini完全移植 Green 34afaf50 → Refactor 9d8152fd、原本保存 cfeecc96）
+最新実装 HEAD: f203974a（共通フォント Red 3d9ea9d5 → Green 3ef97086 → Refactor f203974a）
 次の作業: /google/models-best-practices の目視確認（ユーザー担当）。http://localhost:3000/google/models-best-practices
 10図、288px固定目次、900px以下の開閉、32表の左寄せ、リストの点と番号、12コード例の構文色・字下げ、18項目の進捗を確認する。
 原本2形式はarchive/へ退避済み（SHA-256一致）。指定HTMLを正本とし、Markdownの目次・図形式の差は本書冒頭に記録した。
-HTML原本監査exit 0、対象41契約と関連67契約、全218 files／2288 tests、typecheck・lint、pytest122件が成功。
+HTML原本監査exit 0、対象41契約と関連67契約、全219 files／2295 tests、typecheck・lintが成功。pytest122件は前回の実測値。
 NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=2 --testTimeout=30000 を使用する。
 本ページのCSSはページ内に閉じ、図解レイアウトは共有コンポーネントへ委譲。依存・設定・ロックは変更していない。
 監査はtext/plainのdata-for形式とgood／tip同義マーカーに対応し、45監査テストで検証済み。
 サンドボックスではnpmとビルドを実行しない。修正もRed → Green → Refactor → Docsの分離コミットを守る。
 page.tsx 97件、registry 97エントリ（現行ファイルから実測）。次ページは指示されてから扱う。
-開発サーバーは bun run dev --webpack でlocalhost:3000に起動済み、対象ルートHTTP 200確認済み。
-Turbopackには共通フォント解決エラーがあるため、依存・設定は変えず開発時のみWebpackを使用する。
+開発サーバーは通常の bun run dev（Turbopack）でlocalhost:3000に起動中。GeminiとホームのHTTP 200確認済み。
+共通フォントは next/font/local と保存済みTTFを使用。Webpack指定は不要。ブラウザに旧エラーが残る場合はページを再読み込みする。
 ```
