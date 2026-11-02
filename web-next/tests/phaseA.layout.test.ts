@@ -15,7 +15,7 @@
  *   描画される (legacy body 冒頭挿入の互換)。
  * - `<body>` に `className="has-common-header"` が付与される
  *   (legacy common-header.js:331 のクラス名を継承)。
- * - 既存の next/font 変数注入 (notoSansJp / jetbrainsMono / syne) は
+ * - 既存の next/font 変数注入 (jetbrainsMono / syne) は
  *   破壊されない。
  */
 
@@ -79,7 +79,7 @@ describe("Phase A - body composition", () => {
 describe("Phase A - regression guards", () => {
   it("still imports the next/font variables from @/lib/fonts", () => {
     // Noto Sans JP は自前ホストへ移行済み (tests/fonts-selfhost.test.ts)。
-    // next/font 経由で残るのは latin のみの JetBrains Mono / Syne。
+    // next/font/local 経由で JetBrains Mono / Syne のローカル資産を読み込む。
     const namedImport =
       /import\s*\{([^}]*)\}\s*from\s*["']@\/lib\/fonts["']/.exec(layoutSrc)?.[1] ?? "";
     const importedFonts = namedImport

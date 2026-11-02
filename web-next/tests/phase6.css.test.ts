@@ -3,16 +3,16 @@
  *
  * 検証方針:
  * - vitest は css: false なので computed style は使えない。
- * - next/font/google は Next.js のビルドタイム loader で vitest から
+ * - next/font/local は Next.js のコンパイル時 loader で vitest から
  *   直接 import すると loader コンテキスト未設定でクラッシュする。
  * - したがって「ファイル内容の文字列契約」でポートの事実を固定する。
  *
  * 対象:
  * 1. app/globals.css   - legacy web/src/index.css の design tokens と
  *                        全クラスが移植されていること
- * 2. lib/fonts.ts      - next/font/google で 3 フォントが設定され、
- *                        CSS 変数名 (--font-sans/mono/display) が
- *                        公開されていること
+ * 2. lib/fonts.ts      - next/font/local で2フォントが設定され、
+ *                        --font-mono/display が公開されていること。
+ *                        --font-sans は自前ホストのNoto用にCSSで定義する
  * 3. app/layout.tsx    - lib/fonts.ts 経由でフォントを読み込み、
  *                        Geist scaffold が残っていないこと
  */
