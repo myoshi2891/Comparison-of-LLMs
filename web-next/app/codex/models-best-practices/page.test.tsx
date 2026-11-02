@@ -126,7 +126,8 @@ it("外部49リンクの本文・URL・順序・安全属性", () => {
   }
   expect(
     Array.from(container.querySelectorAll("a")).filter(
-      (a) => !a.href.startsWith("http") && a.getAttribute("href")?.includes(".html")
+      (a) =>
+        !/^https?:/.test(a.getAttribute("href") ?? "") && a.getAttribute("href")?.includes(".html")
     )
   ).toEqual([]);
 });
