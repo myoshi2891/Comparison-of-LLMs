@@ -780,7 +780,7 @@ flowchart TD
 | 3 | 「下書き」と「送信」を分けて依頼する | OpenAI の説明では、返信の下書きを頼んでも送信の許可にはならない | https://help.openai.com/en/articles/20001529-dots-privacy-security-and-safety-faqs | ◎ |
 | 4 | 行為を「やり直せるか」「他人に届くか」の2軸で分類する | 実践者の整理。公式の行動ルールの分類(読む・共有・購入・削除・引き渡し)と整合 | https://gptdot.net/getting-started/ | △ |
 | 5 | 最初の1週間は既定のルールで、1つずつ承認して挙動を観察する | 既定では重要な行為の前に確認が入るため、基準の挙動を見てから調整するのが合理的 | https://www.aiagentslibrary.com/blog/how-to-use-openai-dots/ | △ |
-| 6 | 自分の PC への接続は必要時のみ | 公式ヘルプ: ローカルアクセスは任意で、既定はオフ。取り消しも可能 | https://help.openai.com/ar/articles/20001530-getting-started-with-your-dot | ◎ |
+| 6 | 自分の PC への接続は必要時のみ | 公式ヘルプ: ローカルアクセスは任意で、既定はオフ。取り消しも可能 | https://help.openai.com/en/articles/20001530-getting-started-with-your-dot | ◎ |
 | 7 | パスワードをチャットに貼らない。サインインは dot のブラウザで本人が行う | 安全性投稿・FAQ: 専用のセキュアサインインの流れはモデルに認証情報を見せない設計。貼り付けた値は見える可能性 | https://openai.com/index/how-we-build-safety-security-and-privacy-into-dots/ | ◎/○ |
 | 8 | 機微情報は教えない。消すなら Delete | 個別メモリは編集・削除できず、接続解除では取得済み情報が消えない | https://help.openai.com/articles/20001530 <br> https://help.openai.com/en/articles/20001529-dots-privacy-security-and-safety-faqs | ◎ |
 | 9 | 外部の従量課金サービスには**ハードな予算上限**を先に設定 | エージェントは費用の発生するコードやサービスを簡単に立ち上げる。ソフトな警告では不十分 | https://simonwillison.net/2026/Oct/3/default-hard-budget-caps/ | ◎(主張は筆者の意見)|

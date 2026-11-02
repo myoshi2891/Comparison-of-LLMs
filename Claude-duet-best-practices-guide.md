@@ -101,7 +101,7 @@ flowchart TD
 | 料金 | 研究プレビュー中は Pro / Max / Ultra に追加料金なし。**使用上限は他の Claude と共有** |
 | 接続できるもの | 6,000 以上のコネクタとプラグイン（Gmail・Google Calendar・Slack・QuickBooks・Stripe・HubSpot・Docusign・Gusto・Notion・Canva など） |
 
-【公式】出典: 製品ページ、発表記事、ヘルプセンター「Claude Duet を始める」
+【公式】出典: 対象プラン（Pro / Max / Ultra）の現状は、製品ページとヘルプセンター「Claude Duet を始める」で確認。発表記事（2026-10-21）は、公開時点の対象プランを Pro / Max と記載している。その他の項目は製品ページ、発表記事、ヘルプセンター「Claude Duet を始める」
 
 ---
 
