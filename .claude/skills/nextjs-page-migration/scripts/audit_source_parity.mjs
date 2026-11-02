@@ -198,7 +198,7 @@ function normalizeCalloutElement(openingTag, content) {
   const markerSource = `${openingTag} ${openingTag.match(/styles\.([\w-]+)/g)?.join(" ") ?? ""}`;
   for (const marker of markerSource.matchAll(/(?:callout|alert|warning|warn|note|info|tip|success|good)/gi)) {
     const value = marker[0].toLowerCase();
-    markers.add(value === "warning" ? "warn" : value === "note" ? "info" : value);
+    markers.add(value === "warning" ? "warn" : value === "note" ? "info" : value === "good" ? "tip" : value);
   }
   return `${[...markers].sort().join("|")}::${matchKey(stripMarkup(content))}`;
 }
