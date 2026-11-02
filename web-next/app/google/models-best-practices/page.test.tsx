@@ -125,9 +125,11 @@ it("外部65リンクの本文・URL・順序・安全属性", () => {
     expect(a.getAttribute("rel")).toBe("noopener noreferrer");
   }
   expect(
-    Array.from(container.querySelectorAll("a")).filter(
-      (a) => !a.href.startsWith("http") && a.getAttribute("href")?.includes(".html")
-    )
+    // jsdom の a.href は相対URLを http://localhost… へ解決するため、生の href 属性で内部リンクを判定する。
+    Array.from(container.querySelectorAll("a")).filter((a) => {
+      const href = a.getAttribute("href") ?? "";
+      return !href.startsWith("http") && href.includes(".html");
+    })
   ).toEqual([]);
 });
 it("図解10件の全文・順序・テーマ・専用ラッパー", () => {
