@@ -849,6 +849,20 @@ function inventoryMarkdown(src) {
  * @return {Object} The inventory of headings, lists, code blocks, table rows, paragraphs, Mermaid sources, SVG elements, callouts, and external links.
  */
 function inventoryHtml(src) {
+  // Detached text/plain payloads are displayed via code.textContent, not HTML parsing.
+  // Resolve by data-for/id rather than script order and escape literal markup before inventorying.
+  const detachedCode = new Map();
+  for (const script of src.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script\s*>/gi)) {
+    if (!/\btype\s*=\s*["']text\/plain["']/i.test(script[1])) continue;
+    const target = script[1].match(/\bdata-for\s*=\s*["']([^"']+)["']/i)?.[1];
+    if (target) detachedCode.set(target, script[2]);
+  }
+  src = src.replace(/<code\b([^>]*)>([\s\S]*?)<\/code\s*>/gi, (full, attrs) => {
+    const id = attrs.match(/\bid\s*=\s*["']([^"']+)["']/i)?.[1];
+    if (!detachedCode.has(id)) return full;
+    const value = detachedCode.get(id).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    return `<code${attrs}>${value}</code>`;
+  });
   // data-code スクリプトの中身は「表示されるコードブロック」なので保存する。
   // ただし中身自体が <style> 等を含みうるため、いったん不透明なプレースホルダへ退避し、
   // script/style/link の除去が終わってから <code> として復元する。
