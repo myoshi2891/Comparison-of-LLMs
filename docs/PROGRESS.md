@@ -91,7 +91,7 @@
 
 - **フェーズ**: 保守・機能改善・品質強化フェーズ
 - **ブランチ**: `dev`
-- **最新実装 HEAD**: `a6fbe7c9`（OpenAI移行 Green `f2f96dc9` → Refactor `a6fbe7c9`、原本保存 `40bf6203`）
+- **最新実装 HEAD**: `38765e62`（レビュー対応: 監査 Red `d640a9fa` → `4201c669` → Fix `e9bb2cbc`、テスト強化 `38765e62`。OpenAI移行 Green `f2f96dc9` → Refactor `a6fbe7c9`）
 - **次の作業**: `/codex/models-best-practices` の目視確認（ユーザー担当、localhost:3000）。300px固定目次と900pxモバイル開閉、リストの点・番号、21表、10コード例の構文色・字下げ・コピー、8図、読書進捗、ヒーロー内の日付を確認する。npm・ビルドは未実行。
 - **ルート実数**: `page.tsx` 98 件、registry 98 エントリ（現行ファイルから実測）。
 - **動作検証**:
@@ -560,7 +560,7 @@
 
 ```text
 AGENTS.md → CODEX.md → CLAUDE.md → docs/PROGRESS.md → Phase A–F 計画の順で読む。
-最新実装 HEAD: a6fbe7c9（OpenAI移行 Green f2f96dc9 → Refactor a6fbe7c9、原本保存 40bf6203）
+最新実装 HEAD: 38765e62（レビュー対応 Fix e9bb2cbc・テスト強化 38765e62。OpenAI移行 Green f2f96dc9 → Refactor a6fbe7c9）
 次の作業: /codex/models-best-practices の目視確認（ユーザー担当）。http://localhost:3000/codex/models-best-practices
 300px目次、900px以下の開閉、21表の左寄せ、リストの点・番号・marker色、10コード例の構文色・字下げ・コピー、8図と読書進捗を確認する。
 免責バナー直下の余白を一度だけ確保し、最終確認日・公開日はヒーロー内に表示する。
@@ -568,9 +568,9 @@ AGENTS.md → CODEX.md → CLAUDE.md → docs/PROGRESS.md → Phase A–F 計画
 HTML原本監査exit 0、OpenAI対象50契約と関連76契約、全221 files／2347 tests、型・lint、pytest122件が成功。
 NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=2 --testTimeout=30000 を使用する。
 図解レイアウトは共有MermaidDiagramへ委譲。依存・設定・ロックは変更していない。
-監査は無指定calloutの既定infoを正規化し、本文欠落・warn変更を検出する。監査46テスト成功。
+監査は無指定calloutの既定infoを正規化し、本文欠落・warn変更を検出する。script／code開始タグは引用値内の>を消費して data-for／id を解決。監査53テスト成功。
 サンドボックスではnpmとビルドを実行しない。修正もRed → Green → Refactor → Docsの分離コミットを守る。
 page.tsx 98件、registry 98エントリ（実測）。次ページは指示されてから扱う。
 通常の bun run dev（Turbopack）がlocalhost:3000で起動中。OpenAIルートHTTP 200確認済み。
-共通フォントは next/font/local と保存済みTTFを使用する。Webpack指定は不要。
+共通フォントは next/font/local と保存済みWOFF2（public/fonts/latin/、SHA-256はREADMEで照合）を使用する。Webpack指定は不要。
 ```
