@@ -217,3 +217,13 @@ test("matches data-for and id after decoding differently encoded character refer
  const hex='<pre><code id="a&#x26;b"></code></pre><script type="text/plain" data-for="a&amp;b">print("payload")</script>';
  assert.deepEqual(audit(hex,"").data.missingCodeBlocks,['print("payload")']);
 });
+
+test("does not let an unclosed <code> inside a detached script payload consume a later displayed block", () => {
+ // 置換の一致が script 内の "<code>" から始まると、後続の表示ブロックの </code> まで食い、
+ // そのブロックへ payload が差し込まれず空のまま残る。空ページとの照合が通ってしまう。
+ const source='<script type="text/plain" data-for="demo">Use <code>x to start</script><pre><code id="demo"></code></pre>';
+ assert.deepEqual(audit(source,"").data.missingCodeBlocks,["Use <code>x to start"]);
+ assert.equal(audit(source,"").status,1);
+ assert.equal(audit(source,'<pre><code></code></pre>').status,1);
+ assert.equal(audit(source,'<pre><code>{"Use <code>x to start"}</code></pre>').status,0);
+});
