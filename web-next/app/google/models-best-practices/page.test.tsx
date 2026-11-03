@@ -180,7 +180,9 @@ it("CDNスタイルシート全件と原本順序", () => {
 });
 it("メタデータ・見出し階層・全幅外殻・callout種別", () => {
   expect(metadata.title).toBe(expected.h1[0]);
-  expect(metadata.description).toMatch(/Gemini/);
+  expect(metadata.description).toBe(
+    "Gemini のモデル選択、思考水準、Long Decode、API移行と本番運用の実践ガイド。情報基準日2026-10-23。"
+  );
   const { container, getByTestId } = render(<Page />);
   expect(getByTestId("layout-root").classList.contains(styles.layout)).toBe(true);
   let level = 0;
