@@ -206,3 +206,14 @@ test("reads the real id attribute, not id=… text inside another attribute's qu
  const decoy='<pre><code title="x id=demo">kept text</code></pre><script type="text/plain" data-for="demo">replaced</script>';
  assert.equal(audit(decoy,'<pre><code>kept text</code></pre>').status,0);
 });
+
+test("matches data-for and id after decoding differently encoded character references", () => {
+ // data-for="a&amp;b" と id="a&#38;b" はどちらもブラウザ上で "a&b" に復号され、同じ要素を指す。
+ const source='<pre><code id="a&#38;b"></code></pre><script type="text/plain" data-for="a&amp;b">print("payload")</script>';
+ assert.deepEqual(audit(source,"").data.missingCodeBlocks,['print("payload")']);
+ const page='<pre><code>{"print(\\"payload\\")"}</code></pre>';
+ assert.equal(audit(source,page).status,0);
+ assert.equal(audit(source,page.replace('payload','other')).status,1);
+ const hex='<pre><code id="a&#x26;b"></code></pre><script type="text/plain" data-for="a&amp;b">print("payload")</script>';
+ assert.deepEqual(audit(hex,"").data.missingCodeBlocks,['print("payload")']);
+});
