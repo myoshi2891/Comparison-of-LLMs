@@ -305,15 +305,18 @@ it("生HTML注入・実行script・表直下の空白・図解サイズ強制を
 });
 
 it("最終確認日と公開日はregistryを参照してヒーロー内に表示する", () => {
+  const entry = pageRegistry.find((p) => p.slug === "/codex/models-best-practices");
+  if (entry === undefined) throw new Error("pageRegistry に /codex/models-best-practices がない");
+  const { lastReviewed, addedAt } = entry;
   const { container, getByTestId } = render(<Page />);
   const dates = getByTestId("hero-dates");
   expect(dates.closest("header")).toBe(container.querySelector(`.${styles.hero}`));
-  expect(text(dates)).toBe("最終確認日 2026-11-02 公開日 2026-11-02");
+  expect(text(dates)).toBe(`最終確認日 ${lastReviewed} 公開日 ${addedAt}`);
   expect(
     Array.from(dates.querySelectorAll("time")).map((e) => [e.dateTime, e.textContent])
   ).toEqual([
-    ["2026-11-02", "2026-11-02"],
-    ["2026-11-02", "2026-11-02"],
+    [lastReviewed, lastReviewed],
+    [addedAt, addedAt],
   ]);
 });
 it("免責バナーとヒーロー間の重複余白・外部日付バーを無くす", () => {

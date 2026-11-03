@@ -283,15 +283,21 @@ it("生HTML注入・実行script・表直下の空白・図解サイズ強制を
 });
 
 it("最終確認日と公開日はregistryを参照してヒーロー内に表示する", () => {
+  // 期待値は registry の当該エントリから導出する。月次更新では registry の lastReviewed と、
+  // 上の registry 完全一致テストの期待値を同時に更新すること。
+  const entry = pageRegistry.find((p) => p.slug === "/google/models-best-practices");
+  expect(entry, "pageRegistry に /google/models-best-practices がない").toBeDefined();
+  if (entry === undefined) return;
+  const { lastReviewed, addedAt } = entry;
   const { container, getByTestId } = render(<Page />);
   const dates = getByTestId("hero-dates");
   expect(dates.closest("header")).toBe(container.querySelector(`.${styles.hero}`));
-  expect(text(dates)).toBe("最終確認日 2026-11-02 公開日 2026-11-02");
+  expect(text(dates)).toBe(`最終確認日 ${lastReviewed} 公開日 ${addedAt}`);
   expect(
     Array.from(dates.querySelectorAll("time")).map((e) => [e.dateTime, e.textContent])
   ).toEqual([
-    ["2026-11-02", "2026-11-02"],
-    ["2026-11-02", "2026-11-02"],
+    [lastReviewed, lastReviewed],
+    [addedAt, addedAt],
   ]);
 });
 it("免責バナーとヒーロー間の重複余白・外部日付バーを無くす", () => {

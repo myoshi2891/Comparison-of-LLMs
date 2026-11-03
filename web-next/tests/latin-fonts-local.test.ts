@@ -1,5 +1,6 @@
+import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
-import { join } from "node:path";
+import { basename, join } from "node:path";
 import { brotliDecompressSync } from "node:zlib";
 import ts from "typescript";
 import { expect, it } from "vitest";
@@ -177,6 +178,14 @@ for (const font of fonts) {
     expect(flavor).toBe(0x00010000);
     // 上流 TTF の maxp.numGlyphs を固定値として照合し、変換でグリフが欠けていないことを保証する。
     expect(tables.get("maxp")?.readUInt16BE(4)).toBe(font.numGlyphs);
+    // README の資産表に記録した SHA-256 を基準とし、変換済み WOFF2 の世代が一致することを保証する。
+    const readme = readFileSync(join(root, "public/fonts/latin/README.md"), "utf8");
+    const row = readme
+      .split("\n")
+      .find((line) => line.startsWith(`| ${basename(font.src)} |`))
+      ?.match(/`([0-9a-f]{64})`/);
+    expect(row, `README に ${basename(font.src)} の SHA-256 がない`).toBeDefined();
+    expect(createHash("sha256").update(file).digest("hex")).toBe(row?.[1]);
     const data = tables.get("fvar");
     expect(data).toBeDefined();
     if (data === undefined) return;
