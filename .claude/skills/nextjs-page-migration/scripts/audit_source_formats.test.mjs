@@ -231,8 +231,8 @@ test("does not let an unclosed <code> inside a detached script payload consume a
 test("ignores <code> text inside a quoted attribute when inserting a detached payload into the displayed block", () => {
  // 引用属性値の中の "<code>" から一致が始まると、後続の表示ブロックの開始タグを本文として食い、
  // そのブロックへ payload が差し込まれず空のまま残る。
- const source='<p title="<code>x">intro</p><pre><code id="demo"></code></pre><script type="text/plain" data-for="demo">print("payload")</script>';
+ const source='<span title="<code>x">intro</span><pre><code id="demo"></code></pre><script type="text/plain" data-for="demo">print("payload")</script>';
  assert.deepEqual(audit(source,"").data.missingCodeBlocks,['print("payload")']);
- assert.equal(audit(source,'<p>intro</p><pre><code></code></pre>').status,1);
- assert.equal(audit(source,'<p>intro</p><pre><code>{"print(\\"payload\\")"}</code></pre>').status,0);
+ assert.equal(audit(source,'<pre><code></code></pre>').status,1);
+ assert.equal(audit(source,'<pre><code>{"print(\\"payload\\")"}</code></pre>').status,0);
 });

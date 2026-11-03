@@ -892,8 +892,10 @@ function inventoryHtml(src) {
   }
   // script 要素は先頭の分岐で丸ごと消費する。payload 内の未閉じ <code> から一致が始まると、
   // 後続の表示ブロックの </code> まで食ってそのブロックへの差し込みを取りこぼす。
+  // それ以外のタグ・コメントも末尾の分岐で 1 単位として消費する。走査が title="<code>x" のような
+  // 引用値の内側へ進むと、そこから一致が始まって表示ブロックの開始タグを本文として食ってしまう。
   const scriptOrCodeRe = new RegExp(
-    String.raw`<script\b${attrs}>[\s\S]*?<\/script\s*>|<code\b${attrs}>([\s\S]*?)<\/code\s*>`,
+    String.raw`<script\b${attrs}>[\s\S]*?<\/script\s*>|<code\b${attrs}>([\s\S]*?)<\/code\s*>|<!--[\s\S]*?-->|<\/?[A-Za-z](?:[^>"']|"[^"]*"|'[^']*')*>`,
     "gi"
   );
   src = src.replace(scriptOrCodeRe, (full, _scriptAttrs, codeAttrs) => {
