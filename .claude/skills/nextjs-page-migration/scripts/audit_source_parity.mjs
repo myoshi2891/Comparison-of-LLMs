@@ -121,7 +121,9 @@ function stripMarkup(fragment, jsx = true) {
         (_match, double, single, template) => stash(decodeQuotedEntryEscapes(double ?? single ?? template)))
       .replace(/\{\s*(?:styles\.[A-Za-z0-9_-]+|[A-Za-z_$][\w$]*)\s*\}/g, "");
   }
-  text = text.replace(/<[^>]*>/g, "");
+  // 引用値は 1 単位で消費する。`[^>]*` だと title="a>b" の `>` でタグが閉じたと誤認し、
+  // 残りの属性（`b" id="demo">`）が本文として混入する。
+  text = text.replace(/<(?:[^>"']|"[^"]*"|'[^']*')*>/g, "");
   // エンティティ復号は JSX 文字列の復元より前に行う。React は {"&lt;"} を復号せず文字どおり表示するため、
   // 復元後に復号すると text/plain 由来の原本（textContent でそのまま表示）と食い違う。
   text = decodeEntities(text);
@@ -864,12 +866,14 @@ function inventoryMarkdown(src) {
  * @return {Object} The inventory of headings, lists, code blocks, table rows, paragraphs, Mermaid sources, SVG elements, callouts, and external links.
  */
 function readHtmlAttribute(attributes, name) {
-  // 属性名は先頭か空白の直後に限る（`\b` だと data-id= の id にも一致する）。値は引用符の有無を問わない。
-  const match = new RegExp(
-    `(?:^|\\s)${name}\\s*=\\s*(?:"([^"]*)"|'([^']*)'|([^\\s"'=<>\`]+))`,
-    "i"
-  ).exec(attributes);
-  return match === null ? undefined : (match[1] ?? match[2] ?? match[3]);
+  // 属性を左から順に「名前＋値」の 1 組ずつ消費してから名前を比較する。名前の検索だと
+  // title="x id=other" の引用値内の id= に一致し、data-id= の id にも一致しうる。
+  const attributeRe = /([^\s"'>/=]+)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'=<>`]+)))?/g;
+  const wanted = name.toLowerCase();
+  for (const match of attributes.matchAll(attributeRe)) {
+    if (match[1].toLowerCase() === wanted) return match[2] ?? match[3] ?? match[4] ?? "";
+  }
+  return undefined;
 }
 
 function inventoryHtml(src) {
