@@ -10,9 +10,9 @@
  * 対象:
  * 1. app/globals.css   - legacy web/src/index.css の design tokens と
  *                        全クラスが移植されていること
- * 2. lib/fonts.ts      - next/font/local で2フォントが設定され、
- *                        --font-mono/display が公開されていること。
- *                        --font-sans は自前ホストのNoto用にCSSで定義する
+ * 2. lib/fonts.ts      - Noto Sans JP を next/font で扱わず、--font-sans を
+ *                        自前ホストのNoto用にCSSで定義すること。2フォントの
+ *                        localFont 設定は tests/latin-fonts-local.test.ts が検証する
  * 3. app/layout.tsx    - lib/fonts.ts 経由でフォントを読み込み、
  *                        Geist scaffold が残っていないこと
  */
@@ -166,9 +166,8 @@ describe("Phase 6 - globals.css color scale classes", () => {
 });
 
 describe("Phase 6 - fonts configuration (lib/fonts.ts)", () => {
-  it("imports from next/font/local", () => {
-    expect(fontsTs).toContain("next/font/local");
-  });
+  // next/font/local の import と JetBrains Mono / Syne の src・variable 等は
+  // tests/latin-fonts-local.test.ts が AST で完全一致検証する。部分一致はコメントアウトでも通るため置かない。
 
   it("does not configure Noto Sans JP via next/font/google", () => {
     // Noto Sans JP は 496 @font-face をビルド時に外部取得するため自前ホストへ移行した。
@@ -178,16 +177,6 @@ describe("Phase 6 - fonts configuration (lib/fonts.ts)", () => {
 
     expect(fontsTs).not.toContain("Noto_Sans_JP");
     expect(fontSansValue).toBe('"Noto Sans JP"');
-  });
-
-  it("configures JetBrains Mono and exposes --font-mono variable", () => {
-    expect(fontsTs).toContain("JetBrainsMono-Variable.woff2");
-    expect(fontsTs).toContain("--font-mono");
-  });
-
-  it("configures Syne and exposes --font-display variable", () => {
-    expect(fontsTs).toContain("Syne-Variable.woff2");
-    expect(fontsTs).toContain("--font-display");
   });
 });
 
