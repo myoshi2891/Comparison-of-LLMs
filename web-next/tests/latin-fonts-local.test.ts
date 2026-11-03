@@ -138,6 +138,17 @@ function readWoff2(file: Buffer): { flavor: number; tables: Map<string, Buffer> 
   expect(offset).toBe(stream.length);
   return { flavor: file.readUInt32BE(4), tables };
 }
+
+/** README の資産表から、指定ファイル名の行に記録された SHA-256 を返す。 */
+function recordedSha256(fileName: string): string {
+  const readme = readFileSync(join(root, "public/fonts/latin/README.md"), "utf8");
+  const hash = readme
+    .split("\n")
+    .find((line) => line.startsWith(`| ${fileName} |`))
+    ?.match(/`([0-9a-f]{64})`/)?.[1];
+  if (hash === undefined) throw new Error(`README に ${fileName} の SHA-256 がない`);
+  return hash;
+}
 it("uses only the local font loader and never Google-generated URLs", () => {
   const imports = ast.statements
     .filter(ts.isImportDeclaration)
@@ -179,13 +190,9 @@ for (const font of fonts) {
     // 上流 TTF の maxp.numGlyphs を固定値として照合し、変換でグリフが欠けていないことを保証する。
     expect(tables.get("maxp")?.readUInt16BE(4)).toBe(font.numGlyphs);
     // README の資産表に記録した SHA-256 を基準とし、変換済み WOFF2 の世代が一致することを保証する。
-    const readme = readFileSync(join(root, "public/fonts/latin/README.md"), "utf8");
-    const row = readme
-      .split("\n")
-      .find((line) => line.startsWith(`| ${basename(font.src)} |`))
-      ?.match(/`([0-9a-f]{64})`/);
-    expect(row, `README に ${basename(font.src)} の SHA-256 がない`).toBeDefined();
-    expect(createHash("sha256").update(file).digest("hex")).toBe(row?.[1]);
+    expect(createHash("sha256").update(file).digest("hex")).toBe(
+      recordedSha256(basename(font.src))
+    );
     const data = tables.get("fvar");
     expect(data).toBeDefined();
     if (data === undefined) return;
@@ -206,8 +213,11 @@ for (const font of fonts) {
     expect(axis?.max).toBeGreaterThanOrEqual(Number(font.weight.split(" ")[1]));
   });
   it(`${font.name}: retains its upstream redistribution license`, () => {
-    const license = readFileSync(join(root, "public/fonts/latin", font.license), "utf8");
+    const file = readFileSync(join(root, "public/fonts/latin", font.license));
+    const license = file.toString("utf8");
     expect(license).toContain("SIL OPEN FONT LICENSE Version 1.1");
     expect(license).toMatch(/Copyright/i);
+    // 部分一致だけでは条文の欠落・改変を見逃すため、ファイル全体を README 記録の SHA-256 と照合する。
+    expect(createHash("sha256").update(file).digest("hex")).toBe(recordedSha256(font.license));
   });
 }
