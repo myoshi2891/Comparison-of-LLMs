@@ -890,7 +890,14 @@ function inventoryHtml(src) {
     const target = readHtmlAttribute(script[1], "data-for");
     if (target) detachedCode.set(target, script[2]);
   }
-  src = src.replace(new RegExp(String.raw`<code\b${attrs}>([\s\S]*?)<\/code\s*>`, "gi"), (full, codeAttrs) => {
+  // script 要素は先頭の分岐で丸ごと消費する。payload 内の未閉じ <code> から一致が始まると、
+  // 後続の表示ブロックの </code> まで食ってそのブロックへの差し込みを取りこぼす。
+  const scriptOrCodeRe = new RegExp(
+    String.raw`<script\b${attrs}>[\s\S]*?<\/script\s*>|<code\b${attrs}>([\s\S]*?)<\/code\s*>`,
+    "gi"
+  );
+  src = src.replace(scriptOrCodeRe, (full, _scriptAttrs, codeAttrs) => {
+    if (codeAttrs === undefined) return full;
     const id = readHtmlAttribute(codeAttrs, "id");
     if (!detachedCode.has(id)) return full;
     const value = detachedCode.get(id).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
