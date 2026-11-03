@@ -29,6 +29,7 @@ function Harness() {
           ))}
         </nav>
       </aside>
+      <main />
       {[0, 1, 2].map((i) => (
         <section key={i} id={`s${i}`} />
       ))}
@@ -49,6 +50,8 @@ function Harness() {
 const menu = () => document.getElementById("openai-menu") as HTMLElement;
 const sidebar = () => document.getElementById("openai-sidebar") as HTMLElement;
 const root = () => document.getElementById("openai-guide") as HTMLElement;
+const main = () => document.querySelector("main") as HTMLElement;
+const links = () => Array.from(sidebar().querySelectorAll("a"));
 const active = () =>
   Array.from(sidebar().querySelectorAll("a"))
     .filter((e) => e.getAttribute("aria-current") === "location")
@@ -288,4 +291,43 @@ it("マークアップが無い場合もmount・cleanup可能", () => {
   fireEvent.scroll(window);
   fireEvent.resize(window);
   unmount();
+});
+
+it("モバイルで開く遷移時だけ先頭リンクへフォーカスし、開いている間は本文をinertにする", () => {
+  render(<Harness />);
+  expect(main().inert).toBe(false);
+  fireEvent.click(menu());
+  expect(document.activeElement).toBe(links()[0]);
+  expect(main().inert).toBe(true);
+  // 開いたままの再同期（resize）では利用者のフォーカス位置を奪わない
+  links()[2].focus();
+  fireEvent.resize(window);
+  expect(document.activeElement).toBe(links()[2]);
+  expect(main().inert).toBe(true);
+  fireEvent.keyDown(document, { key: "Escape" });
+  expect(main().inert).toBe(false);
+  expect(document.activeElement).toBe(menu());
+});
+it("デスクトップ幅ではフォーカス移動も本文のinert化も行わない", () => {
+  Object.defineProperty(window, "innerWidth", { value: 901, configurable: true });
+  render(<Harness />);
+  menu().focus();
+  fireEvent.click(menu());
+  expect(document.activeElement).toBe(menu());
+  expect(main().inert).toBe(false);
+});
+it("開いた状態でmobileからdesktopへ広げると本文のinertを解除する", () => {
+  render(<Harness />);
+  fireEvent.click(menu());
+  Object.defineProperty(window, "innerWidth", { value: 901, configurable: true });
+  fireEvent.resize(window);
+  expect(main().inert).toBe(false);
+});
+it("unmountで本文のinertを解除する", () => {
+  const { unmount } = render(<Harness />);
+  fireEvent.click(menu());
+  const m = main();
+  expect(m.inert).toBe(true);
+  unmount();
+  expect(m.inert).toBe(false);
 });

@@ -330,3 +330,42 @@ it("免責バナーとヒーロー間の重複余白・外部日付バーを無�
   expect(dates["flex-wrap"]).toBe("wrap");
   expect(dates.color).toBe("inherit");
 });
+
+it("紙色テーマの関連ページカードは文字色・境界・強調色を可読な値で宣言する", () => {
+  const ast = postcss.parse(fs.readFileSync("app/globals.css", "utf8"));
+  const decls = (selector: string) => {
+    const result: Record<string, string> = {};
+    ast.walkRules((r) => {
+      if (r.selector !== selector) return;
+      r.walkDecls((d) => {
+        result[d.prop] = d.value;
+      });
+    });
+    return result;
+  };
+  const nav = 'body:has([data-page="gemini-models"]) nav[aria-label="関連ページ"]';
+  const vars = decls(nav);
+  const link = decls(`${nav} a`);
+  // 既存の境界色・リンク色・カード背景とテーマ変数を一致させる
+  expect(vars["--line"]).toBe(vars["border-color"]);
+  expect(vars["--accent"]).toBe(link.color);
+  expect(vars["--card"]).toBe(link.background);
+  // WCAG 相対輝度によるコントラスト比（本文サイズ 4.5:1 以上）
+  const luminance = (hex: string) => {
+    const h = hex.replace("#", "");
+    const full = h.length === 3 ? [...h].map((c) => c + c).join("") : h;
+    const [r, g, b] = [0, 2, 4].map((i) => {
+      const c = Number.parseInt(full.slice(i, i + 2), 16) / 255;
+      return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+    });
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  };
+  const contrast = (a: string, b: string) => {
+    const [hi, lo] = [luminance(a), luminance(b)].sort((x, y) => y - x);
+    return (hi + 0.05) / (lo + 0.05);
+  };
+  for (const name of ["--fg", "--muted", "--accent"]) {
+    expect(vars[name], name).toMatch(/^#[0-9a-f]{3,6}$/i);
+    expect(contrast(vars[name], vars["--card"]), name).toBeGreaterThanOrEqual(4.5);
+  }
+});
