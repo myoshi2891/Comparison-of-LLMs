@@ -22,17 +22,25 @@ export default function TocObserver() {
     const backdrop = document.getElementById("openai-backdrop");
     const mobileBar = document.getElementById("openai-mobile-bar");
     const links = Array.from(sidebar?.querySelectorAll<HTMLAnchorElement>("a") ?? []);
+    const main = root?.querySelector("main") ?? null;
     let alive = true;
+    let wasOpen = false;
     const timers = new Set<ReturnType<typeof setTimeout>>();
     const sync = (open: boolean) => {
       root?.classList.toggle(styles.open, open);
       menu?.setAttribute("aria-expanded", String(open));
       menu?.setAttribute("aria-label", open ? "目次を閉じる" : "目次を開く");
+      const mobile = window.innerWidth <= 900;
       if (sidebar) {
-        const hidden = window.innerWidth <= 900 && !open;
+        const hidden = mobile && !open;
         if (hidden && sidebar.contains(document.activeElement)) menu?.focus();
         sidebar.inert = hidden;
       }
+      // モバイルのドロワー表示中は背後の本文を操作不能にし、フォーカスを目次内へ閉じ込める。
+      if (main) main.inert = mobile && open;
+      // 先頭リンクへの移動は閉→開の遷移時だけ。resize の再同期で利用者のフォーカス位置を奪わない。
+      if (mobile && open && !wasOpen) links[0]?.focus();
+      wasOpen = open;
     };
     const close = () => sync(false);
     const toggle = () => sync(!root?.classList.contains(styles.open));
@@ -149,6 +157,7 @@ export default function TocObserver() {
       root?.classList.remove(styles.open);
       root?.style.removeProperty("--mobile-bar-height");
       if (sidebar) sidebar.inert = false;
+      if (main) main.inert = false;
     };
   }, []);
   return null;

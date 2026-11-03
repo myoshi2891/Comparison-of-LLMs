@@ -1894,6 +1894,11 @@ body:has([data-page="gemini-models"]) nav[aria-label="関連ページ"] {
   background: #faf7f0;
   color: #26231e;
   border-color: #e3dccb;
+  --line: #e3dccb;
+  --card: #fff;
+  --fg: #26231e;
+  --muted: #5f584b;
+  --accent: #34439a;
 }
 body:has([data-page="gemini-models"]) nav[aria-label="関連ページ"] a {
   color: #34439a;
@@ -1923,6 +1928,11 @@ body:has([data-page="openai-models"]) nav[aria-label="関連ページ"] {
   background: #faf7f0;
   color: #1d1c24;
   border-color: #ddd5c2;
+  --line: #ddd5c2;
+  --card: #fff;
+  --fg: #1d1c24;
+  --muted: #5b5666;
+  --accent: #343a93;
 }
 body:has([data-page="openai-models"]) nav[aria-label="関連ページ"] a {
   color: #343a93;
