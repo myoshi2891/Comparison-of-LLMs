@@ -2,6 +2,18 @@
 import { useEffect } from "react";
 import styles from "./page.module.css";
 
+/** コピー成功表示を出し、1600ms 後に元へ戻す。タイマーは解除用の Set で追跡する。 */
+function showCopied(button: HTMLButtonElement, timers: Set<ReturnType<typeof setTimeout>>) {
+  button.textContent = "コピー済み";
+  button.classList.add(styles.done);
+  const timer = setTimeout(() => {
+    button.textContent = "コピー";
+    button.classList.remove(styles.done);
+    timers.delete(timer);
+  }, 1600);
+  timers.add(timer);
+}
+
 export default function TocObserver() {
   useEffect(() => {
     const root = document.getElementById("openai-guide");
@@ -84,14 +96,7 @@ export default function TocObserver() {
         if (!code) return;
         const done = () => {
           if (!alive) return;
-          button.textContent = "コピー済み";
-          button.classList.add(styles.done);
-          const timer = setTimeout(() => {
-            button.textContent = "コピー";
-            button.classList.remove(styles.done);
-            timers.delete(timer);
-          }, 1600);
-          timers.add(timer);
+          showCopied(button, timers);
         };
         if (navigator.clipboard?.writeText) {
           void navigator.clipboard.writeText(code.textContent ?? "").then(done, () => undefined);
