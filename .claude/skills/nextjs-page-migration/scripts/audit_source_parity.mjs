@@ -875,17 +875,20 @@ function readHtmlAttribute(attributes, name) {
 function inventoryHtml(src) {
   // Detached text/plain payloads are displayed via code.textContent, not HTML parsing.
   // Resolve by data-for/id rather than script order and escape literal markup before inventorying.
+  // 開始タグの属性部は引用値を 1 単位で消費する。`[^>]*` だと title="a>b" の `>` で
+  // タグが閉じたと誤認し、後続の data-for / id を読めず本文が監査から外れる。
+  const attrs = String.raw`((?:[^>"']|"[^"]*"|'[^']*')*)`;
   const detachedCode = new Map();
-  for (const script of src.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script\s*>/gi)) {
+  for (const script of src.matchAll(new RegExp(String.raw`<script\b${attrs}>([\s\S]*?)<\/script\s*>`, "gi"))) {
     if (readHtmlAttribute(script[1], "type")?.toLowerCase() !== "text/plain") continue;
     const target = readHtmlAttribute(script[1], "data-for");
     if (target) detachedCode.set(target, script[2]);
   }
-  src = src.replace(/<code\b([^>]*)>([\s\S]*?)<\/code\s*>/gi, (full, attrs) => {
-    const id = readHtmlAttribute(attrs, "id");
+  src = src.replace(new RegExp(String.raw`<code\b${attrs}>([\s\S]*?)<\/code\s*>`, "gi"), (full, codeAttrs) => {
+    const id = readHtmlAttribute(codeAttrs, "id");
     if (!detachedCode.has(id)) return full;
     const value = detachedCode.get(id).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-    return `<code${attrs}>${value}</code>`;
+    return `<code${codeAttrs}>${value}</code>`;
   });
   // data-code スクリプトの中身は「表示されるコードブロック」なので保存する。
   // ただし中身自体が <style> 等を含みうるため、いったん不透明なプレースホルダへ退避し、
