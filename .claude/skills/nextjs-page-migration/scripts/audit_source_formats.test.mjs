@@ -186,3 +186,10 @@ test("keeps literal entities in JSX strings equal to detached textContent payloa
  assert.equal(audit(source,page).status,0);
  assert.equal(audit(source,'<pre><code>{"a < b && c"}</code></pre>').status,1);
 });
+
+test("resolves data-for and id when earlier quoted attribute values contain >", () => {
+ const source='<pre><code title="a>b" data-x=\'c>d\' id="demo"></code></pre><script data-note="x>y" type="text/plain" data-for="demo">print("payload")</script>';
+ const page='<pre><code>{"print(\\"payload\\")"}</code></pre>';
+ assert.equal(audit(source,page).status,0);
+ assert.equal(audit(source,page.replace('payload','other')).status,1);
+});
