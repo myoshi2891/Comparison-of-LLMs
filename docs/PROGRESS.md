@@ -19,7 +19,7 @@
 - フォントテスト: `fonts-selfhost`・`phase6.css` の `lib/fonts.ts` に対する部分一致の肯定アサーション4件は、設定をコメントアウトしても通るため削除し、ASTで完全一致を検証する `latin-fonts-local.test.ts` へ一本化（変異で失敗を確認）`64fc10c7`。全体Vitest **221 files／2344 tests**（2348から意図的に4件減）、typecheck・lint（597 files／0 diagnostics）が成功。
 - `tests/latin-fonts-local.test.ts`: OFLライセンス2件をREADME記録のSHA-256で全体照合 `c06a93f5`（1バイト改変で失敗を確認）。
 - 追加レビュー対応3: 監査の `<code>` 置換正規表現が引用属性値内の `<code>`（`title="<code>x"`）から一致を始め、後続の表示ブロックへの payload 差し込みを取りこぼす問題を修正（他のタグ・コメントも 1 単位で消費）。Red `65ede58f` → Green `f2561355`、監査57テスト成功、OpenAI／Gemini原本監査exit 0。回帰フィクスチャは `<span>` を使う（段落抽出 `extractTagContents` の開始タグ照合も引用値内の `>` に未対応で別課題として残置）。
-- `/codex/models-best-practices` の `TocObserver`: 900px以下でドロワーを開く閉→開の遷移時のみ先頭目次リンクへフォーカスし、開いている間は `<main>` を inert、cleanup で解除。Gemini／OpenAI紙色テーマの関連ページに `--line/--card/--fg/--muted/--accent` を宣言（白カード上で4.5:1以上をWCAG輝度で検証）。Red `8065f673` → Green `936d8a91`。metadata.description を完全一致で検証 `69473f50`（基準日削除の変異で失敗を確認）。全体Vitest **221 files／2350 tests**、typecheck・lint（597 files／0 diagnostics）が成功。npm・ビルドは未実行、目視はユーザー担当。
+- `/codex/models-best-practices` の `TocObserver`: 900px以下でドロワーを開く閉→開の遷移時のみ先頭目次リンクへフォーカスし、開いている間は `<main>` を inert、cleanup で解除。Gemini／OpenAI紙色テーマの関連ページに `--line/--card/--fg/--muted/--accent` を宣言（白カード上で4.5:1以上をWCAG輝度で検証）。Red `8065f673` → Green `936d8a91`。metadata.description を完全一致で検証 OpenAI `69473f50`・Gemini `ba4ddc53`（いずれも基準日削除の変異で失敗を確認）。全体Vitest **221 files／2350 tests**、typecheck・lint（597 files／0 diagnostics）が成功。npm・ビルドは未実行、目視はユーザー担当。
 - `Xai-grok-bot-guide.md`: Team Bot専用Vaultの情報を第三者転載・X投稿由来の暫定情報と明記、個人アカウント登録を禁止しチーム所有・最小権限アカウントを指示、21章を初回調査日／追加確認日に分離 `fa6be2c0`。
 
 ## OpenAI 最新モデルガイド移行（2026-11-02）
