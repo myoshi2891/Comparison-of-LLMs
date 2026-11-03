@@ -13,6 +13,10 @@
 - `/google/models-best-practices` のテスト: 内部 `.html` リンク判定をjsdom解決済み `a.href` から生のhref属性へ変更（従来は常に空で無効な検証）。現ページに該当リンクがなくRed不可 `000cc09a`。
 - `Xai-grok-bot-guide.md` 16.1: 認証情報の警告をメンバーのチャットで使う指示・ファイル・メモリに限定し、ログイン／キーは9.1のTeam Bot専用Vault／Secretsへ誘導 `24a1698e`。
 - 全体Vitest **221 files／2348 tests**、typecheckが成功。npm・ビルドは未実行。
+- 追加レビュー対応: 監査の `readHtmlAttribute` が属性値を文字参照復号してから返し、`data-for="a&amp;b"` と `id="a&#38;b"` を同一視。Red `a8a009d7` → Green `68ef60f8`、監査55テスト成功、OpenAI／Gemini原本監査exit 0。
+- `/codex/models-best-practices` の `TocObserver` のコピー済み表示とタイマー処理をモジュール関数 `showCopied` へ抽出（alive判定・1600ms・timers Setは維持）Refactor `a7b6995c`。
+- `tests/latin-fonts-local.test.ts`: OFLライセンス2件をREADME記録のSHA-256で全体照合 `c06a93f5`（1バイト改変で失敗を確認）。
+- `Xai-grok-bot-guide.md`: Team Bot専用Vaultの情報を第三者転載・X投稿由来の暫定情報と明記、個人アカウント登録を禁止しチーム所有・最小権限アカウントを指示、21章を初回調査日／追加確認日に分離 `fa6be2c0`。
 
 ## OpenAI 最新モデルガイド移行（2026-11-02）
 
@@ -560,7 +564,7 @@
 
 ```text
 AGENTS.md → CODEX.md → CLAUDE.md → docs/PROGRESS.md → Phase A–F 計画の順で読む。
-最新実装 HEAD: a03d6ad4（監査 Red 6ab71a07 → Green a03d6ad4、レビュー対応 Fix e9bb2cbc・テスト強化 38765e62。OpenAI移行 Green f2f96dc9 → Refactor a6fbe7c9）
+最新実装 HEAD: fa6be2c0（監査 Red a8a009d7 → Green 68ef60f8、Refactor a7b6995c、テスト c06a93f5、ガイド fa6be2c0。前回 監査 Red 6ab71a07 → Green a03d6ad4、レビュー対応 Fix e9bb2cbc・テスト強化 38765e62。OpenAI移行 Green f2f96dc9 → Refactor a6fbe7c9）
 次の作業: /codex/models-best-practices の目視確認（ユーザー担当）。http://localhost:3000/codex/models-best-practices
 300px目次、900px以下の開閉、21表の左寄せ、リストの点・番号・marker色、10コード例の構文色・字下げ・コピー、8図と読書進捗を確認する。
 免責バナー直下の余白を一度だけ確保し、最終確認日・公開日はヒーロー内に表示する。
@@ -568,7 +572,7 @@ AGENTS.md → CODEX.md → CLAUDE.md → docs/PROGRESS.md → Phase A–F 計画
 HTML原本監査exit 0、OpenAI対象50契約と関連76契約、全221 files／2348 tests、型・lint、pytest122件が成功。
 NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=2 --testTimeout=30000 を使用する。
 図解レイアウトは共有MermaidDiagramへ委譲。依存・設定・ロックは変更していない。
-監査は無指定calloutの既定infoを正規化し、本文欠落・warn変更を検出する。script／code開始タグとタグ除去は引用値内の>を消費し、属性は左から名前＋値の組で読んで data-for／id を解決。監査54テスト成功。
+監査は無指定calloutの既定infoを正規化し、本文欠落・warn変更を検出する。script／code開始タグとタグ除去は引用値内の>を消費し、属性は左から名前＋値の組で読んで data-for／id を文字参照復号後に解決。監査55テスト成功。
 サンドボックスではnpmとビルドを実行しない。修正もRed → Green → Refactor → Docsの分離コミットを守る。
 page.tsx 98件、registry 98エントリ（実測）。次ページは指示されてから扱う。
 通常の bun run dev（Turbopack）がlocalhost:3000で起動中。OpenAIルートHTTP 200確認済み。
