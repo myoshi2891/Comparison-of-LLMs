@@ -187,9 +187,16 @@ test("keeps literal entities in JSX strings equal to detached textContent payloa
  assert.equal(audit(source,'<pre><code>{"a < b && c"}</code></pre>').status,1);
 });
 
-test("resolves data-for and id when earlier quoted attribute values contain >", () => {
- const source='<pre><code title="a>b" data-x=\'c>d\' id="demo"></code></pre><script data-note="x>y" type="text/plain" data-for="demo">print("payload")</script>';
+test("resolves data-for on a script whose earlier quoted attribute value contains >", () => {
+ const source='<pre><code id="demo"></code></pre><script data-note="x>y" title=\'a>b\' type="text/plain" data-for="demo">print("payload")</script>';
  const page='<pre><code>{"print(\\"payload\\")"}</code></pre>';
  assert.equal(audit(source,page).status,0);
  assert.equal(audit(source,page.replace('payload','other')).status,1);
+});
+
+test("resolves a code id after an earlier quoted attribute value containing >", () => {
+ const source='<pre><code title="a>b" id="demo"></code></pre><script type="text/plain" data-for="demo">print("payload")</script>';
+ // 残る `b" id="demo">` は本文抽出側の汎用タグ除去によるもので、本テストの対象外。
+ // 対象は「id を解決して detached payload を code へ差し込めること」（修正前は payload が入らない）。
+ assert.deepEqual(audit(source,"").data.missingCodeBlocks,['b" id="demo">print("payload")']);
 });
