@@ -871,7 +871,9 @@ function readHtmlAttribute(attributes, name) {
   const attributeRe = /([^\s"'>/=]+)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'=<>`]+)))?/g;
   const wanted = name.toLowerCase();
   for (const match of attributes.matchAll(attributeRe)) {
-    if (match[1].toLowerCase() === wanted) return match[2] ?? match[3] ?? match[4] ?? "";
+    // 値はブラウザと同じく文字参照を復号してから返す。data-for="a&amp;b" と id="a&#38;b" は
+    // どちらも "a&b" を指すため、生の値で比較すると対応するコード本文が監査から外れる。
+    if (match[1].toLowerCase() === wanted) return decodeAttributeValue(match[2] ?? match[3] ?? match[4] ?? "");
   }
   return undefined;
 }
