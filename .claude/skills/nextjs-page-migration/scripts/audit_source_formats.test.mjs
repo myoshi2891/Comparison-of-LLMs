@@ -196,7 +196,13 @@ test("resolves data-for on a script whose earlier quoted attribute value contain
 
 test("resolves a code id after an earlier quoted attribute value containing >", () => {
  const source='<pre><code title="a>b" id="demo"></code></pre><script type="text/plain" data-for="demo">print("payload")</script>';
- // 残る `b" id="demo">` は本文抽出側の汎用タグ除去によるもので、本テストの対象外。
- // 対象は「id を解決して detached payload を code へ差し込めること」（修正前は payload が入らない）。
- assert.deepEqual(audit(source,"").data.missingCodeBlocks,['b" id="demo">print("payload")']);
+ // id 解決に加え、本文抽出のタグ除去も引用値内の > で開始タグを打ち切らないこと。
+ assert.deepEqual(audit(source,"").data.missingCodeBlocks,['print("payload")']);
+});
+
+test("reads the real id attribute, not id=… text inside another attribute's quoted value", () => {
+ const source='<pre><code title="x id=other" id="demo"></code></pre><script type="text/plain" data-for="demo">print("payload")</script>';
+ assert.deepEqual(audit(source,"").data.missingCodeBlocks,['print("payload")']);
+ const decoy='<pre><code title="x id=demo">kept text</code></pre><script type="text/plain" data-for="demo">replaced</script>';
+ assert.equal(audit(decoy,'<pre><code>kept text</code></pre>').status,0);
 });
