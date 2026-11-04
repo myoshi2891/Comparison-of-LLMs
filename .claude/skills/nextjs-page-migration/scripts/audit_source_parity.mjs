@@ -96,10 +96,12 @@ function decodeEntities(raw) {
 /**
  * Extracts display text from an HTML or JSX fragment.
  * @param {string} fragment - The markup fragment containing tags or JSX expressions.
+ * @param {boolean} [jsx=true] - Whether the fragment is JSX rather than HTML.
+ * @param {boolean} [literalBreaks=false] - Whether `<br>` in JSX strings is displayed code text.
  * @returns {string} The decoded display text: tags and identifier expressions are removed, while
  *   the literal text of string expressions is kept.
  */
-function stripMarkup(fragment, jsx = true) {
+function stripMarkup(fragment, jsx = true, literalBreaks = false) {
   // JSX 文字列式の中身は「そのまま表示されるテキスト」であり、HTML に見える断片も本文の一部。
   // タグ除去より前にプレースホルダへ退避しないと、原本側の &lt;style&gt; は（エンティティ復号が
   // 最後なので）生き残るのに page 側の {"<style>"} だけが消え、一致している内容が漏れとして
@@ -107,9 +109,10 @@ function stripMarkup(fragment, jsx = true) {
   //
   // 例外は <br>。図解ラベルの改行指示として頻出し、原本側でも除去されるため、
   // 文字どおりのテキストではなく空白として扱う（比較キーは空白を落とすので原本と一致する）。
+  // ただしコードブロックの <br> は表示される文字列そのものなので literalBreaks で保持する。
   const preserved = [];
   const stash = (text) =>
-    `\u0000JSXSTR${preserved.push(text.replace(/<br\s*\/?>/gi, " ")) - 1}\u0000`;
+    `\u0000JSXSTR${preserved.push(literalBreaks ? text : text.replace(/<br\s*\/?>/gi, " ")) - 1}\u0000`;
   const placeholderRe = /\u0000JSXSTR(\d+)\u0000/g;
 
   let text = fragment;
@@ -155,10 +158,12 @@ function stripMarkdownInline(raw) {
 /**
  * Normalize code block or table row content for markup-independent comparison.
  * @param {string} raw - Element content that may contain HTML or JSX markup.
+ * @param {boolean} [jsx=true] - Whether the content is JSX rather than HTML.
+ * @param {boolean} [literalBreaks=false] - Whether `<br>` in JSX strings is displayed code text.
  * @returns {string} Text with markup and JSX whitespace expressions removed.
  */
-function normalizeElementContent(raw, jsx = true) {
-  return normalize(stripMarkup(raw, jsx));
+function normalizeElementContent(raw, jsx = true, literalBreaks = false) {
+  return normalize(stripMarkup(raw, jsx, literalBreaks));
 }
 
 /**
@@ -884,21 +889,23 @@ function inventoryHtml(src) {
   // 開始タグの属性部は引用値を 1 単位で消費する。`[^>]*` だと title="a>b" の `>` で
   // タグが閉じたと誤認し、後続の data-for / id を読めず本文が監査から外れる。
   const attrs = String.raw`((?:[^>"']|"[^"]*"|'[^']*')*)`;
-  const detachedCode = new Map();
-  for (const script of src.matchAll(new RegExp(String.raw`<script\b${attrs}>([\s\S]*?)<\/script\s*>`, "gi"))) {
-    if (readHtmlAttribute(script[1], "type")?.toLowerCase() !== "text/plain") continue;
-    const target = readHtmlAttribute(script[1], "data-for");
-    if (target) detachedCode.set(target, script[2]);
-  }
+  // payload の収集と差し込みは同じ走査を使う。別々に走査すると、コメントアウトされた script を
+  // 実 script として拾い、後勝ちの Map で本物の payload を上書きしてしまう。
   // script 要素は先頭の分岐で丸ごと消費する。payload 内の未閉じ <code> から一致が始まると、
   // 後続の表示ブロックの </code> まで食ってそのブロックへの差し込みを取りこぼす。
   // それ以外のタグ・コメントも末尾の分岐で 1 単位として消費する。走査が title="<code>x" のような
   // 引用値の内側へ進むと、そこから一致が始まって表示ブロックの開始タグを本文として食ってしまう。
   const scriptOrCodeRe = new RegExp(
-    String.raw`<script\b${attrs}>[\s\S]*?<\/script\s*>|<code\b${attrs}>([\s\S]*?)<\/code\s*>|<!--[\s\S]*?-->|<\/?[A-Za-z](?:[^>"']|"[^"]*"|'[^']*')*>`,
+    String.raw`<script\b${attrs}>([\s\S]*?)<\/script\s*>|<code\b${attrs}>([\s\S]*?)<\/code\s*>|<!--[\s\S]*?-->|<\/?[A-Za-z](?:[^>"']|"[^"]*"|'[^']*')*>`,
     "gi"
   );
-  src = src.replace(scriptOrCodeRe, (full, _scriptAttrs, codeAttrs) => {
+  const detachedCode = new Map();
+  for (const [, scriptAttrs, payload] of src.matchAll(scriptOrCodeRe)) {
+    if (readHtmlAttribute(scriptAttrs ?? "", "type")?.toLowerCase() !== "text/plain") continue;
+    const target = readHtmlAttribute(scriptAttrs, "data-for");
+    if (target) detachedCode.set(target, payload);
+  }
+  src = src.replace(scriptOrCodeRe, (full, _scriptAttrs, _payload, codeAttrs) => {
     if (codeAttrs === undefined) return full;
     const id = readHtmlAttribute(codeAttrs, "id");
     if (!detachedCode.has(id)) return full;
@@ -997,7 +1004,7 @@ function inventoryTsx(src) {
   );
   const codeBlockTexts = [...preBlocks, ...styledBlocks]
     .sort((a, b) => a.index - b.index)
-    .map(({ content }) => normalizeElementContent(resolveStringConstants(content, constants)));
+    .map(({ content }) => normalizeElementContent(resolveStringConstants(content, constants), true, true));
   const tableRowTexts = extractTagContents(src, "tr").map(({ content }) =>
     normalizeElementContent(content)
   );
