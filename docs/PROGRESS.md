@@ -31,6 +31,8 @@
 - 追加レビュー対応: `/google/models-best-practices` の `TocObserver` で、開いたモバイルドロワーのTab／Shift+Tabを `#gemini-menu` と目次リンクの間でDOM順に循環。Codexとは順序が逆（メニューがサイドバーより前）で、backdropは `tabIndex={-1}` のため対象外。ガイド外・bodyからの復帰も検証。Red `7f23b032` → Green `857d631e`。
 - 監査: コードブロック内の文字列 `<br>` を保持（図解ラベルの空白置換は維持）。text/plain payload の収集を差し込みと同じ走査に統一し、コメントアウトされたscriptを除外。Red `ee4d6ef9` → Green `ca7a9ea3`。定数経由のコードブロックも文字列式のまま解決し、タグ様の本文を保持。Red `f266e3fb` → Green `bbaba338`。監査64テスト成功。原本・ページ57組の監査JSONは修正前後で完全一致。
 - 全体Vitest **221 files／2377 tests**、typecheck・lint（597 files／0 diagnostics）・pytest 122件・ビルドが成功。目視はユーザー担当。
+- 追加レビュー対応（2026-11-04）: `/codex/models-best-practices` の `TocObserver` で、背景クリック等でフォーカスが目次外へ移っていても閉じるとメニューへ戻す（Googleと同じ `wasOpen` 判定）。Red `f903e4ee` → Green `8591cc6f`。`/google/models-best-practices` のチェックリストのフォーカス枠は転写規則を残し、後続規則で `outline-color: var(--indigo)` へ補強（順序も契約化）。Red `ac3d67f1` → Green `acbec05c`。
+- 全体Vitest **221 files／2379 tests**、typecheck・lint（597 files／0 diagnostics）・pytest 122件、OpenAI／Gemini原本監査exit 0。ビルドは未実行、目視はユーザー担当。
 - 既知の差分（本対応とは無関係）: `/claude/models-best-practices` の原本監査は修正前からexit 1（コード例1件・ZDR段落1件が原本と不一致）。
 
 ## OpenAI 最新モデルガイド移行（2026-11-02）
@@ -587,7 +589,7 @@ AGENTS.md → CODEX.md → CLAUDE.md → docs/PROGRESS.md → Phase A–F 計画
 HTML原本監査exit 0、OpenAI対象50契約と関連76契約、全221 files／2344 tests、型・lint、pytest122件が成功。
 NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=2 --testTimeout=30000 を使用する。
 図解レイアウトは共有MermaidDiagramへ委譲。依存・設定・ロックは変更していない。
-監査は無指定calloutの既定infoを正規化し、本文欠落・warn変更を検出する。script／code開始タグとタグ除去は引用値内の>を消費し、属性は左から名前＋値の組で読んで data-for／id を文字参照復号後に解決。script 要素は丸ごと消費し、payload 内の未閉じ <code> が表示ブロックを食わない。監査56テスト成功。
+監査は無指定calloutの既定infoを正規化し、本文欠落・warn変更を検出する。script／code開始タグとタグ除去は引用値内の>を消費し、属性は左から名前＋値の組で読んで data-for／id を文字参照復号後に解決。script 要素は丸ごと消費し、payload 内の未閉じ <code> が表示ブロックを食わない。監査64テスト成功。
 サンドボックスではnpmとビルドを実行しない。修正もRed → Green → Refactor → Docsの分離コミットを守る。
 page.tsx 98件、registry 98エントリ（実測）。次ページは指示されてから扱う。
 通常の bun run dev（Turbopack）がlocalhost:3000で起動中。OpenAIルートHTTP 200確認済み。
