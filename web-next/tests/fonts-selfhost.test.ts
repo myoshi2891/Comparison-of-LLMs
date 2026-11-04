@@ -114,10 +114,8 @@ describe("self-hosted Noto Sans JP - wiring", () => {
     expect(fontsTs).not.toContain("notoSansJp");
   });
 
-  it("keeps the latin-only fonts on next/font/google", () => {
-    expect(fontsTs).toContain("JetBrains_Mono");
-    expect(fontsTs).toContain("Syne");
-  });
+  // latin フォントのローカル読み込み（import と localFont 設定）は
+  // tests/latin-fonts-local.test.ts が AST で完全一致検証する。部分一致はコメントアウトでも通るため置かない。
 
   it("defines --font-sans in globals.css :root instead of next/font", () => {
     const rootBlock = /:root\s*\{([\s\S]*?)\n\}/.exec(globalsCss)?.[1] ?? "";

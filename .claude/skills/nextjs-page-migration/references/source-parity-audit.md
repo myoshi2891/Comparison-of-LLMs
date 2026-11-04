@@ -1,6 +1,6 @@
 # 原本照合監査（Source Parity Audit）— 移行漏れの機械検知
 
-(最終更新日: 2026-10-15)
+(最終更新日: 2026-11-02)
 
 **目的**: ガイドページ移植で最も多い不具合である**移行漏れ（セクション・リスト項目・
 参考リンクの脱落）を、目視ではなくスクリプトとテストで検知する**。
@@ -83,6 +83,10 @@ HTMLコード内の `{schema}` などをJSX式として除去せず、数値文�
 ハイライトで複数spanに分割された表示URLも照合する。
 形式の回帰検証は `bun test ./.claude/skills/nextjs-page-migration/scripts/audit_source_formats.test.mjs` で実行する。
 これは監査専用のBunテストであり、`web-next` のVitestは引き続き `bun run test` を使用する。
+
+HTMLの `script[type="text/plain"][data-for]` に分離されたコード本文は、対象code要素のidへ対応付けて検証する。
+scriptの並び順へ依存せず、リテラルの `<schema>` 等も保持する。calloutの `good` と `tip` は
+同義として照合し、型指定のないcalloutは既定のinfoとして照合する。本文や警告種別の欠落は引き続き失敗する。形式・監査の回帰テストは全46件成功（2026-11-02）。
 
 ### 判定ゲート（ブロッキング）と参考値の区別
 

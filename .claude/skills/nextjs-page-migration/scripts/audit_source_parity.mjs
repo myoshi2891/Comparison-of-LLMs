@@ -96,10 +96,12 @@ function decodeEntities(raw) {
 /**
  * Extracts display text from an HTML or JSX fragment.
  * @param {string} fragment - The markup fragment containing tags or JSX expressions.
+ * @param {boolean} [jsx=true] - Whether the fragment is JSX rather than HTML.
+ * @param {boolean} [literalBreaks=false] - Whether `<br>` in JSX strings is displayed code text.
  * @returns {string} The decoded display text: tags and identifier expressions are removed, while
  *   the literal text of string expressions is kept.
  */
-function stripMarkup(fragment, jsx = true) {
+function stripMarkup(fragment, jsx = true, literalBreaks = false) {
   // JSX 文字列式の中身は「そのまま表示されるテキスト」であり、HTML に見える断片も本文の一部。
   // タグ除去より前にプレースホルダへ退避しないと、原本側の &lt;style&gt; は（エンティティ復号が
   // 最後なので）生き残るのに page 側の {"<style>"} だけが消え、一致している内容が漏れとして
@@ -107,21 +109,31 @@ function stripMarkup(fragment, jsx = true) {
   //
   // 例外は <br>。図解ラベルの改行指示として頻出し、原本側でも除去されるため、
   // 文字どおりのテキストではなく空白として扱う（比較キーは空白を落とすので原本と一致する）。
+  // ただしコードブロックの <br> は表示される文字列そのものなので literalBreaks で保持する。
   const preserved = [];
   const stash = (text) =>
-    `\u0000JSXSTR${preserved.push(text.replace(/<br\s*\/?>/gi, " ")) - 1}\u0000`;
+    `\u0000JSXSTR${preserved.push(literalBreaks ? text : text.replace(/<br\s*\/?>/gi, " ")) - 1}\u0000`;
   const placeholderRe = /\u0000JSXSTR(\d+)\u0000/g;
 
   let text = fragment;
   if (jsx) {
     text = text
-      .replace(/\{\/\*[\s\S]*?\*\/\}/g, "")
+      // 文字列式と JSX コメントは同じ走査で左から消費する。コメント除去を先に別走査すると、
+      // 文字列として表示される `{/* … */}` まで消える。
       // 式内のブロックコメント（`{"http://…" /* NOSONAR */}` 等）は表示されないため読み飛ばす。
-      .replace(/\{\s*(?:\/\*[\s\S]*?\*\/\s*)*(?:"((?:[^"\\]|\\.)*)"|'((?:[^'\\]|\\.)*)'|`((?:[^`\\]|\\.)*)`)\s*(?:\/\*[\s\S]*?\*\/\s*)*\}/g,
-        (_match, double, single, template) => stash(decodeQuotedEntryEscapes(double ?? single ?? template)))
+      .replace(/\{\s*(?:\/\*[\s\S]*?\*\/\s*)*(?:"((?:[^"\\]|\\.)*)"|'((?:[^'\\]|\\.)*)'|`((?:[^`\\]|\\.)*)`)\s*(?:\/\*[\s\S]*?\*\/\s*)*\}|\{\/\*[\s\S]*?\*\/\}/g,
+        (_match, double, single, template) => {
+          const literal = double ?? single ?? template;
+          return literal === undefined ? "" : stash(decodeQuotedEntryEscapes(literal));
+        })
       .replace(/\{\s*(?:styles\.[A-Za-z0-9_-]+|[A-Za-z_$][\w$]*)\s*\}/g, "");
   }
-  text = text.replace(/<[^>]*>/g, "");
+  // 引用値は 1 単位で消費する。`[^>]*` だと title="a>b" の `>` でタグが閉じたと誤認し、
+  // 残りの属性（`b" id="demo">`）が本文として混入する。
+  text = text.replace(/<(?:[^>"']|"[^"]*"|'[^']*')*>/g, "");
+  // エンティティ復号は JSX 文字列の復元より前に行う。React は {"&lt;"} を復号せず文字どおり表示するため、
+  // 復元後に復号すると text/plain 由来の原本（textContent でそのまま表示）と食い違う。
+  text = decodeEntities(text);
 
   // 退避は入れ子になりうる（テンプレートリテラル式の中に "..." 式がある等）。
   // String.replace は差し込んだ文字列を再走査しないため、1 回では内側のプレースホルダが
@@ -132,7 +144,7 @@ function stripMarkup(fragment, jsx = true) {
     text = text.replace(placeholderRe, (_match, index) => preserved[Number(index)]);
   }
 
-  return decodeEntities(text);
+  return text;
 }
 
 /**
@@ -150,10 +162,12 @@ function stripMarkdownInline(raw) {
 /**
  * Normalize code block or table row content for markup-independent comparison.
  * @param {string} raw - Element content that may contain HTML or JSX markup.
+ * @param {boolean} [jsx=true] - Whether the content is JSX rather than HTML.
+ * @param {boolean} [literalBreaks=false] - Whether `<br>` in JSX strings is displayed code text.
  * @returns {string} Text with markup and JSX whitespace expressions removed.
  */
-function normalizeElementContent(raw, jsx = true) {
-  return normalize(stripMarkup(raw, jsx));
+function normalizeElementContent(raw, jsx = true, literalBreaks = false) {
+  return normalize(stripMarkup(raw, jsx, literalBreaks));
 }
 
 /**
@@ -187,6 +201,21 @@ function normalizeSvgElement(raw) {
   return JSON.stringify({ tags, text: normalize(stripMarkup(raw)) });
 }
 
+/** JS の文字列リテラル。\x60 はバッククォートで、テンプレートの `${…}` も文字列本体として読み飛ばす。 */
+const JS_STRING_LITERAL = String.raw`"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|\x60(?:[^\x60\\]|\\.)*\x60`;
+
+/** JSX 式。文字列内の `}` で閉じたと誤認しないよう文字列を 1 単位で消費し、波括弧の入れ子は 1 段まで許容する。 */
+const JSX_EXPRESSION = String.raw`\{(?:[^{}"'\x60]|${JS_STRING_LITERAL}|\{(?:[^{}"'\x60]|${JS_STRING_LITERAL})*\})*\}`;
+
+/** 開始タグの属性 1 組（名前なしの `{...props}` を含む）。値の種類ごとに捕捉する。 */
+const TAG_ATTRIBUTE_RE = new RegExp(
+  String.raw`${JSX_EXPRESSION}|([^\s"'<>/={}]+)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|(${JSX_EXPRESSION})|([^\s"'=<>\x60{}]+)))?`,
+  "g"
+);
+
+/** good トークンを variant 指定として扱う属性名（小文字）。 */
+const VARIANT_ATTRIBUTE_NAMES = new Set(["class", "classname", "variant", "data-variant", "data-testid"]);
+
 /**
  * Creates a markup-independent comparison key for a callout or alert element.
  * @param {string} openingTag - The element's opening tag, including its type markers.
@@ -196,9 +225,20 @@ function normalizeSvgElement(raw) {
 function normalizeCalloutElement(openingTag, content) {
   const markers = new Set();
   const markerSource = `${openingTag} ${openingTag.match(/styles\.([\w-]+)/g)?.join(" ") ?? ""}`;
-  for (const marker of markerSource.matchAll(/(?:callout|alert|warning|warn|note|info|tip|success|good)/gi)) {
+  for (const marker of markerSource.matchAll(/(?:callout|alert|warning|warn|note|info|tip|success)/gi)) {
     const value = marker[0].toLowerCase();
     markers.add(value === "warning" ? "warn" : value === "note" ? "info" : value);
+  }
+  // good は "good-practices" 等の id にも含まれやすいため、variant 系属性の完全一致トークンに限って tip とみなす。
+  // 属性は左から 1 組ずつ消費してから名前を比較する。名前の検索だと title='x class="good"' の
+  // 引用値内にも一致し、他の属性の説明文から tip が付いてしまう。
+  for (const attribute of openingTag.matchAll(TAG_ATTRIBUTE_RE)) {
+    if (!VARIANT_ATTRIBUTE_NAMES.has(attribute[1]?.toLowerCase())) continue;
+    const value = attribute[2] ?? attribute[3] ?? attribute[4] ?? attribute[5] ?? "";
+    if (value.split(/[^\w-]+/).some((token) => token.toLowerCase() === "good")) markers.add("tip");
+  }
+  if (!["warn", "info", "tip", "success"].some((variant) => markers.has(variant))) {
+    markers.add("info");
   }
   return `${[...markers].sort().join("|")}::${matchKey(stripMarkup(content))}`;
 }
@@ -367,12 +407,16 @@ function collectStringConstants(src) {
  * Resolves simple string constant references embedded in JSX content.
  * @param {string} content - The JSX element content.
  * @param {Map<string, string>} constants - The string constants available for resolution.
+ * @param {boolean} [asStringExpression=false] - Whether to keep values as JSX string expressions.
  * @returns {string} The content with recognized constant references replaced by their values.
  */
-function resolveStringConstants(content, constants) {
-  return content.replace(/\{\s*([A-Za-z_$][\w$]*)\s*\}/g, (expression, name) =>
-    constants.has(name) ? constants.get(name) : expression
-  );
+function resolveStringConstants(content, constants, asStringExpression = false) {
+  return content.replace(/\{\s*([A-Za-z_$][\w$]*)\s*\}/g, (expression, name) => {
+    if (!constants.has(name)) return expression;
+    const value = constants.get(name);
+    // コード本文の定数は表示テキストなので、タグとして除去されないよう文字列式のまま渡す。
+    return asStringExpression ? `{${JSON.stringify(value)}}` : value;
+  });
 }
 
 /**
@@ -848,7 +892,48 @@ function inventoryMarkdown(src) {
  * @param {string} src - The HTML source to inspect.
  * @return {Object} The inventory of headings, lists, code blocks, table rows, paragraphs, Mermaid sources, SVG elements, callouts, and external links.
  */
+function readHtmlAttribute(attributes, name) {
+  // 属性を左から順に「名前＋値」の 1 組ずつ消費してから名前を比較する。名前の検索だと
+  // title="x id=other" の引用値内の id= に一致し、data-id= の id にも一致しうる。
+  const attributeRe = /([^\s"'>/=]+)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'=<>`]+)))?/g;
+  const wanted = name.toLowerCase();
+  for (const match of attributes.matchAll(attributeRe)) {
+    // 値はブラウザと同じく文字参照を復号してから返す。data-for="a&amp;b" と id="a&#38;b" は
+    // どちらも "a&b" を指すため、生の値で比較すると対応するコード本文が監査から外れる。
+    if (match[1].toLowerCase() === wanted) return decodeAttributeValue(match[2] ?? match[3] ?? match[4] ?? "");
+  }
+  return undefined;
+}
+
 function inventoryHtml(src) {
+  // Detached text/plain payloads are displayed via code.textContent, not HTML parsing.
+  // Resolve by data-for/id rather than script order and escape literal markup before inventorying.
+  // 開始タグの属性部は引用値を 1 単位で消費する。`[^>]*` だと title="a>b" の `>` で
+  // タグが閉じたと誤認し、後続の data-for / id を読めず本文が監査から外れる。
+  const attrs = String.raw`((?:[^>"']|"[^"]*"|'[^']*')*)`;
+  // payload の収集と差し込みは同じ走査を使う。別々に走査すると、コメントアウトされた script を
+  // 実 script として拾い、後勝ちの Map で本物の payload を上書きしてしまう。
+  // script 要素は先頭の分岐で丸ごと消費する。payload 内の未閉じ <code> から一致が始まると、
+  // 後続の表示ブロックの </code> まで食ってそのブロックへの差し込みを取りこぼす。
+  // それ以外のタグ・コメントも末尾の分岐で 1 単位として消費する。走査が title="<code>x" のような
+  // 引用値の内側へ進むと、そこから一致が始まって表示ブロックの開始タグを本文として食ってしまう。
+  const scriptOrCodeRe = new RegExp(
+    String.raw`<script\b${attrs}>([\s\S]*?)<\/script\s*>|<code\b${attrs}>([\s\S]*?)<\/code\s*>|<!--[\s\S]*?-->|<\/?[A-Za-z](?:[^>"']|"[^"]*"|'[^']*')*>`,
+    "gi"
+  );
+  const detachedCode = new Map();
+  for (const [, scriptAttrs, payload] of src.matchAll(scriptOrCodeRe)) {
+    if (readHtmlAttribute(scriptAttrs ?? "", "type")?.toLowerCase() !== "text/plain") continue;
+    const target = readHtmlAttribute(scriptAttrs, "data-for");
+    if (target) detachedCode.set(target, payload);
+  }
+  src = src.replace(scriptOrCodeRe, (full, _scriptAttrs, _payload, codeAttrs) => {
+    if (codeAttrs === undefined) return full;
+    const id = readHtmlAttribute(codeAttrs, "id");
+    if (!detachedCode.has(id)) return full;
+    const value = detachedCode.get(id).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    return `<code${codeAttrs}>${value}</code>`;
+  });
   // data-code スクリプトの中身は「表示されるコードブロック」なので保存する。
   // ただし中身自体が <style> 等を含みうるため、いったん不透明なプレースホルダへ退避し、
   // script/style/link の除去が終わってから <code> として復元する。
@@ -941,7 +1026,7 @@ function inventoryTsx(src) {
   );
   const codeBlockTexts = [...preBlocks, ...styledBlocks]
     .sort((a, b) => a.index - b.index)
-    .map(({ content }) => normalizeElementContent(resolveStringConstants(content, constants)));
+    .map(({ content }) => normalizeElementContent(resolveStringConstants(content, constants, true), true, true));
   const tableRowTexts = extractTagContents(src, "tr").map(({ content }) =>
     normalizeElementContent(content)
   );

@@ -1879,3 +1879,71 @@ body:has([data-page="claude-models"]) nav[aria-label="関連ページ"] {
     padding-right: 20px;
   }
 }
+
+/* Gemini model guide: shared chrome follows the original paper palette and 288px sidebar. */
+body:has([data-page="gemini-models"]).has-common-header {
+  margin-top: 0;
+  padding-top: calc(var(--ch-height, 60px) + var(--ch-disclaimer-height, 0px));
+  background: #faf7f0;
+}
+body:has([data-page="gemini-models"]) #site-freshness-bar {
+  display: none;
+}
+body:has([data-page="gemini-models"]) .ch-disclaimer {
+  background: #26231c;
+}
+body:has([data-page="gemini-models"]) nav[aria-label="関連ページ"] {
+  margin-left: 288px !important;
+  background: #faf7f0;
+  color: #26231e;
+  border-color: #e3dccb;
+  --line: #e3dccb;
+  --card: #fff;
+  --fg: #26231e;
+  --muted: #5f584b;
+  --accent: #34439a;
+}
+body:has([data-page="gemini-models"]) nav[aria-label="関連ページ"] a {
+  color: #34439a;
+  background: #fff;
+  border-color: #e3dccb;
+}
+@media (max-width: 900px) {
+  body:has([data-page="gemini-models"]) nav[aria-label="関連ページ"] {
+    margin-left: 0 !important;
+  }
+}
+
+/* OpenAI models: one shared-header offset; dates are part of the original hero. */
+body:has([data-page="openai-models"]).has-common-header {
+  margin-top: 0;
+  padding-top: calc(var(--ch-height, 60px) + var(--ch-disclaimer-height, 0px));
+  background: #faf7f0;
+}
+body:has([data-page="openai-models"]) #site-freshness-bar {
+  display: none;
+}
+body:has([data-page="openai-models"]) .ch-disclaimer {
+  background: #26231c;
+}
+body:has([data-page="openai-models"]) nav[aria-label="関連ページ"] {
+  margin-left: 300px !important;
+  background: #faf7f0;
+  color: #1d1c24;
+  border-color: #ddd5c2;
+  --line: #ddd5c2;
+  --card: #fff;
+  --fg: #1d1c24;
+  --muted: #5b5666;
+  --accent: #343a93;
+}
+body:has([data-page="openai-models"]) nav[aria-label="関連ページ"] a {
+  color: #343a93;
+  background: #fff;
+  border-color: #ddd5c2;
+}
+@media (max-width: 900px) {
+  body:has([data-page="openai-models"]) nav[aria-label="関連ページ"] {
+    margin-left: 0 !important;
+  }
+}

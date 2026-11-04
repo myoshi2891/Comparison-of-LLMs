@@ -1,9 +1,28 @@
 # GEMINI.md
 
-Updated 2026-11-01
+Updated 2026-11-04
 
 GEMINI.md は Gemini CLI / Gemini Code Assist 向けの入り口。
 本リポジトリでは **CLAUDE.md が正本** とし、GEMINI.md はその委譲 pointer として機能する。
+
+2026-11-02: `/codex/models-best-practices` を追加。指定HTMLの全要素・80 CSS規則を固定期待値で照合。
+50契約、全体221 files／2347 tests、型・lint（597 files／0 diagnostics）、原本監査exit 0、
+8図の構文解析とpytest 122件が成功。コピー・目次・進捗処理の行／関数100%。
+原本2形式は内容無変更で保存。npm・ビルドは未実行、目視はユーザー担当（localhost:3000）。
+原本差分・分離履歴・再開手順は `docs/PROGRESS.md` を参照。
+
+2026-11-02: Geminiガイドの重複余白を解消し、registryの最終確認日・公開日をヒーロー内へ移動。
+対象43契約、全体219 files／2297 tests、型・lint、原本監査exit 0、HTTP 200が成功。目視はユーザー担当。
+
+2026-11-02: 共通フォントのTurbopack解決エラーをローカルTTFと `next/font/local` で修正。
+通常の `bun run dev` でGeminiガイドとホームがHTTP 200。Webpack切替不要。
+全体219 files／2295 tests、型・lint（591 files／0 diagnostics）が成功。
+フォント資産とOFLの出典・ハッシュは `web-next/public/fonts/latin/README.md`、履歴は `docs/PROGRESS.md` を参照。
+
+2026-11-02: `/google/models-best-practices` をGoogleカテゴリへ追加。registryから全導線を導出。
+原本照合41契約、全体218 files／2288 tests、型・lint（590 files／0 diagnostics）、
+HTML監査exit 0、10図の構文解析、pytest 122件が成功。原本2形式は内容無変更で保存。
+npm・ビルドは未実行。目視はユーザー担当。詳細と履歴は `CLAUDE.md` と `docs/PROGRESS.md` を参照。
 
 ## 必読（順序固定、作業開始前に 4 点すべてを読むこと）
 
@@ -184,11 +203,11 @@ Vitest 185 files／1779 tests、typecheck・lint・pytest 104件が成功。復�
 ## 検証コマンド
 
 ```bash
-(cd web-next && NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000) # 208 files / 2150 tests pass（2026-10-15 実測）
-(cd web-next && bun run typecheck)   # OK（2026-10-15 実測）
+(cd web-next && NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000) # 221 files / 2380 tests pass（2026-11-04 実測）
+(cd web-next && bun run typecheck)   # OK（2026-11-02 実測）
 # ビルドは今回ユーザー指定で未実行（過去: 2026-09-18 に89静的ページ生成）
-(cd web-next && bun run lint)        # OK（572 files / 0 diagnostics。2026-10-15 実測）
-(cd scraper && uv run pytest)        # 今回対象外。過去の成功は104件（2026-10-04）
+(cd web-next && bun run lint)        # OK（597 files / 0 diagnostics。2026-11-02 実測）
+(cd scraper && uv run pytest)        # 122件成功（2026-11-02 実測）
 ```
 
 ## 次セッション再開プロンプト

@@ -3,16 +3,16 @@
  *
  * 検証方針:
  * - vitest は css: false なので computed style は使えない。
- * - next/font/google は Next.js のビルドタイム loader で vitest から
+ * - next/font/local は Next.js のコンパイル時 loader で vitest から
  *   直接 import すると loader コンテキスト未設定でクラッシュする。
  * - したがって「ファイル内容の文字列契約」でポートの事実を固定する。
  *
  * 対象:
  * 1. app/globals.css   - legacy web/src/index.css の design tokens と
  *                        全クラスが移植されていること
- * 2. lib/fonts.ts      - next/font/google で 3 フォントが設定され、
- *                        CSS 変数名 (--font-sans/mono/display) が
- *                        公開されていること
+ * 2. lib/fonts.ts      - Noto Sans JP を next/font で扱わず、--font-sans を
+ *                        自前ホストのNoto用にCSSで定義すること。2フォントの
+ *                        localFont 設定は tests/latin-fonts-local.test.ts が検証する
  * 3. app/layout.tsx    - lib/fonts.ts 経由でフォントを読み込み、
  *                        Geist scaffold が残っていないこと
  */
@@ -166,9 +166,8 @@ describe("Phase 6 - globals.css color scale classes", () => {
 });
 
 describe("Phase 6 - fonts configuration (lib/fonts.ts)", () => {
-  it("imports from next/font/google", () => {
-    expect(fontsTs).toContain("next/font/google");
-  });
+  // next/font/local の import と JetBrains Mono / Syne の src・variable 等は
+  // tests/latin-fonts-local.test.ts が AST で完全一致検証する。部分一致はコメントアウトでも通るため置かない。
 
   it("does not configure Noto Sans JP via next/font/google", () => {
     // Noto Sans JP は 496 @font-face をビルド時に外部取得するため自前ホストへ移行した。
@@ -178,16 +177,6 @@ describe("Phase 6 - fonts configuration (lib/fonts.ts)", () => {
 
     expect(fontsTs).not.toContain("Noto_Sans_JP");
     expect(fontSansValue).toBe('"Noto Sans JP"');
-  });
-
-  it("configures JetBrains Mono and exposes --font-mono variable", () => {
-    expect(fontsTs).toContain("JetBrains_Mono");
-    expect(fontsTs).toContain("--font-mono");
-  });
-
-  it("configures Syne and exposes --font-display variable", () => {
-    expect(fontsTs).toContain("Syne");
-    expect(fontsTs).toContain("--font-display");
   });
 });
 

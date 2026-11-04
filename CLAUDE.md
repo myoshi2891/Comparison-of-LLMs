@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Updated 2026-11-01
+Updated 2026-11-04
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
@@ -9,6 +9,55 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 AIモデルの時間別コスト計算機 + AI ツール導入ガイド群。Python スクレイパーが各社料金ページから価格を自動取得し `pricing.json` を生成、**Next.js 16 App Router（SSG / `output: 'export'`）** がそれを読み込んで Netlify CDN へ配信する。Phase 1–14 でコスト計算機ページが Next.js 化済み。18 枚のガイドページ（旧 `legacy/` 配下）は Phase A–F で **全移行完了**（計画書は [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](docs/archive/NEXTJS_PHASE_A_F_PLAN.md) に保存）。さらに追加移行ページとして `/claude/managed-agents` や `/code-review/coderabbit-guide` 等を設置。
 
 ## アーキテクチャ
+
+OpenAI 最新モデルガイド `/codex/models-best-practices` を追加（2026-11-02）。
+指定HTMLの全52見出し（H1×1／H2×14／H3×37）、34段落、62リスト項目、21表159行、
+10コード例、8図、1 callout、49外部リンクをPure JSXへ転写。80原本CSS規則を固定し、
+リストの点・番号・入れ子・marker色、表全列左寄せ、コード字下げ・highlight.js 11.11.1の全トークンを照合。
+50契約（ページ32／操作18）と関連76契約が成功。全体Vitest **221 files／2347 tests**、
+型・lint（597 files／0 diagnostics）、原本HTML監査exit 0、Mermaid 8図の解析、pytest 122件が成功。
+目次・コピー・読書進捗処理は行／関数100%、分岐90.62%。コピー拒否・fallback・タイマー解除も検証。
+300px固定目次と900pxモバイル開閉、実測バー高さ・inert・フォーカスを保持し、
+共有ヘッダーの余白は一度だけ確保。確認日・公開日はregistryからヒーロー内へ表示する。
+原本のブラウザ既定太字は共有リセットをページ内で補正。図の配置・サイズは共有コンポーネントへ委譲。
+Codexカテゴリのregistryからナビ・検索・RSSへ導出。本文の情報基準日2026-10-23を維持する。
+HTML／Markdownはarchive/html/OpenAI/／archive/md/OpenAI/へ内容無変更で保存（SHA-256一致）。
+Markdownは見出し表記、独立目次、図3件に差があるため混在させず指定HTMLを正本とする。
+無指定calloutを既定infoとして照合する監査対応を追加し、監査46テスト成功。
+npm・ビルドは未実行。CSSキャッシュ更新後、通常devのlocalhost:3000で新規ルートHTTP 200を確認。
+目視はユーザー担当。分離履歴は `docs/PROGRESS.md` を参照。
+
+2026-11-02: Geminiモデルガイドの免責バナー直下の重複余白を解消し、日付をヒーロー内へ移動。
+ページ限定のbody margin-topを0にし、固定ヘッダー／免責バナーの実測高さはpaddingで一度だけ確保する。
+共有の日付バーは当該ページで非表示にし、最終確認日・公開日をregistryからヒーローへ表示。
+原本固定期待値は保持し、追加メタ情報を別契約で検証。対象43契約、全体219 files／2297 tests、
+型・lint（591 files／0 diagnostics）、HTML原本監査exit 0、再起動後HTTP 200が成功。
+npm・ビルドは未実行。目視はユーザー担当。
+
+2026-11-03: JetBrains Mono／SyneをWOFF2へ置換（可逆変換、cmap・グリフ順・wght軸一致、TTFは削除）。
+変換手順・ハッシュは `web-next/public/fonts/latin/README.md`。全体Vitest **221 files／2348 tests**、監査51テスト成功。
+
+2026-11-02: Turbopackの共通Googleフォント解決エラーを修正。
+`lib/fonts.ts` のJetBrains Mono／Syneを `next/font/local` に切り替え、公式可変TTFとOFLを
+`public/fonts/latin/` に保存した。CSS変数・公開export・swap・従来ウェイトを保持し、
+Noto Sans JPは既存の自前ホスト方式を継続。通常の `bun run dev` でGeminiガイドとホームがHTTP 200、
+配信2フォントのSHA-256が保存資産と一致。Webpackへの切り替えは不要。
+新規7契約を含め全体Vitest **219 files／2295 tests**、関連108契約、型・lint（591 files／0 diagnostics）が成功。
+npm・ビルド、依存・設定の変更はなし。出典・ハッシュは `web-next/public/fonts/latin/README.md` に記録。
+
+Gemini 最新モデルガイド `/google/models-best-practices` を追加（2026-11-02）。
+指定HTMLの全92見出し（H1×1／H2×17／H3×74）、28段落、67リスト項目、32表246行、
+12コード例、10図解、8 callout、18チェック項目、65外部リンクをPure JSXへ転写。
+原本由来の固定期待値と104 CSS規則を照合する41契約を追加し、全体Vitest **218 files／2288 tests**、
+typecheck・lint（590 files／0 diagnostics）、HTML原本監査exit 0、Mermaid 10図の構文解析、pytest 122件が成功。
+目次・モバイル開閉・進捗処理は行／関数100%、分岐91.66%。構文色は原本のhighlight.js 11.12.0で静的トークン化。
+原本の288px固定目次、900pxモバイル開閉、リストの点・番号・入れ子、表全列左寄せを保持。
+共有ヘッダーの実測高さに合わせて目次・アンカー・公開日バー・関連ページを補正し、図の配置は共有コンポーネントへ委譲。
+registryのGoogleカテゴリからナビ・検索・RSSへ導出。本文の情報基準日2026-10-23を維持し、移行確認日は2026-11-02。
+HTML／Markdownはarchive/html/Google/／archive/md/Google/へ内容無変更で保存（SHA-256一致）。
+監査はtext/plainのdata-for形式とgood／tip同義マーカーに対応し、45監査テストで検証。
+Markdownは独立した目次見出しと図の方向・表現が異なるため混在させず、指定HTMLを正本とする。
+npm・ビルドは未実行、目視確認はユーザー担当。分離履歴と開発サーバーの状態は `docs/PROGRESS.md` を参照。
 
 2026-11-01: Claudeモデルガイドの表構造直下の空白文字列を除去しhydration不整合を修正。
 公開日バーの背景と本文幅をヒーローへ揃え、共有bodyの追加余白とサイドバーの固定値を実測ヘッダー高さへ補正。
@@ -222,7 +271,7 @@ update.sh  ← オーケストレーター (scrape → copy)
 │   │   ├── cost.ts              純粋関数 (calcApiCost / calcSubCost / colorIndex / fmtUSD / fmtJPY)
 │   │   ├── pricing.ts           Zod スキーマ + コンパイル時パリティアサート
 │   │   ├── i18n.tsx             T オブジェクト + t() + tRich() (React 要素ファクトリ)
-│   │   ├── fonts.ts             next/font/google (JetBrains Mono / Syne。Noto Sans JP は自前ホスト)
+│   │   ├── fonts.ts             next/font/local (JetBrains Mono / Syne。Noto Sans JP は自前ホスト)
 │   │   ├── noto-sans-jp-preload.ts  自動生成 (latin slice の preload 対象)
 │   │   ├── metadata.ts          静的 Metadata / Viewport
 │   │   └── site-url.ts          サイト URL 解決ユーティリティ (resolveSiteUrl / NEXT_PUBLIC_SITE_URL)
@@ -471,7 +520,7 @@ Build:     cd web-next && bun run build
 以下を全て確認してからコミットすること：
 
 1. `cd web-next && bun run build` が成功（※Antigravityサンドボックス環境では実行禁止。他環境やCIでは必須）
-2. `cd web-next && bun run test` が完全に成功（208 files / 2156 tests pass、2026-10-21実測。`NODE_OPTIONS=--no-experimental-webstorage` と `--maxWorkers=1 --testTimeout=30000` を使用。収集失敗もブロッキング失敗として原因を調査する）
+2. `cd web-next && bun run test` が完全に成功（221 files / 2380 tests pass、2026-11-04実測。`NODE_OPTIONS=--no-experimental-webstorage` と `--maxWorkers=1 --testTimeout=30000` を使用。収集失敗もブロッキング失敗として原因を調査する）
 3. `cd web-next && bun run typecheck` が成功
 4. `cd web-next && bun run lint` が成功
 5. `cd scraper && uv run pytest` が成功

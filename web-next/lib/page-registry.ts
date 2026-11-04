@@ -516,6 +516,18 @@ const entries: PageEntry[] = [
     lastReviewed: "2026-07-01",
   },
   {
+    slug: "/codex/models-best-practices",
+    title: "OpenAI 最新モデル ベストプラクティス",
+    group: "Providers",
+    category: "Codex",
+    provider: "codex",
+    topics: ["openai", "prompting", "agents"],
+    summary:
+      "OpenAI のモデル選択、Responses API、reasoning effort、ツールとコスト最適化の実践ガイド。",
+    addedAt: "2026-11-02",
+    lastReviewed: "2026-11-02",
+  },
+  {
     slug: "/codex/agent",
     title: "OpenAI Codex サブエージェント開発ガイド",
     group: "Providers",
@@ -660,6 +672,17 @@ const entries: PageEntry[] = [
       "バイブコーディング脱却からマルチエージェント検証、EARS記法、GitHub Spec Kit・AWS Kiro・BMAD実践まで網羅した、中級・上級エンジニア向け仕様駆動開発の実践ガイド。",
     addedAt: "2026-07-26",
     lastReviewed: "2026-07-26",
+  },
+  {
+    slug: "/google/models-best-practices",
+    title: "Gemini 最新モデル ベストプラクティス",
+    group: "Providers",
+    category: "Google",
+    provider: "google",
+    topics: ["google", "prompting", "agents"],
+    summary: "Gemini のモデル選択、思考水準、Long Decode、API移行と本番運用の実践ガイド。",
+    addedAt: "2026-11-02",
+    lastReviewed: "2026-11-02",
   },
   {
     slug: "/google/adk-best-practices",
