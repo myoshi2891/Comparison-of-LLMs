@@ -29,18 +29,20 @@ function Harness() {
           ))}
         </nav>
       </aside>
-      {[0, 1, 2].map((i) => (
-        <section key={i} id={`s${i}`} />
-      ))}
-      <label>
-        <input type="checkbox" data-guide-check />A
-      </label>
-      <label>
-        <input type="checkbox" data-guide-check />B
-      </label>
-      <span id="chkCount">0</span>
-      <span id="chkTotal">0</span>
-      <i id="chkBar" />
+      <div className={styles.main} data-testid="guide-content">
+        {[0, 1, 2].map((i) => (
+          <section key={i} id={`s${i}`} />
+        ))}
+        <label>
+          <input type="checkbox" data-guide-check />A
+        </label>
+        <label>
+          <input type="checkbox" data-guide-check />B
+        </label>
+        <span id="chkCount">0</span>
+        <span id="chkTotal">0</span>
+        <i id="chkBar" />
+      </div>
       <TocObserver />
     </div>
   );
@@ -48,6 +50,8 @@ function Harness() {
 const menu = () => document.getElementById("gemini-menu") as HTMLElement;
 const sidebar = () => document.getElementById("gemini-sidebar") as HTMLElement;
 const root = () => document.getElementById("gemini-guide") as HTMLElement;
+const guideContent = () => document.querySelector('[data-testid="guide-content"]') as HTMLElement;
+const links = () => Array.from(sidebar().querySelectorAll("a"));
 const active = () =>
   Array.from(sidebar().querySelectorAll("a"))
     .filter((e) => e.getAttribute("aria-current") === "location")
@@ -198,4 +202,74 @@ it("マークアップが無い場合もmount・cleanup可能", () => {
   fireEvent.scroll(window);
   fireEvent.resize(window);
   unmount();
+});
+it("モバイルで開くと先頭リンクへ移動し、チェックリストを含む本文をinertにする", () => {
+  render(<Harness />);
+  menu().focus();
+  expect(guideContent().inert).toBe(false);
+  fireEvent.click(menu());
+  expect(document.activeElement).toBe(links()[0]);
+  expect(guideContent().inert).toBe(true);
+  expect(guideContent().contains(document.querySelector("input[data-guide-check]"))).toBe(true);
+  expect(sidebar().inert).toBe(false);
+});
+it("開いたままのresizeでは利用者のフォーカス位置を奪わない", () => {
+  render(<Harness />);
+  fireEvent.click(menu());
+  links()[2].focus();
+  fireEvent.resize(window);
+  expect(document.activeElement).toBe(links()[2]);
+  expect(guideContent().inert).toBe(true);
+});
+it.each([
+  ["Escape", () => fireEvent.keyDown(document, { key: "Escape" })],
+  ["メニュー", () => fireEvent.click(menu())],
+  ["目次リンク", () => fireEvent.click(links()[0])],
+])("%sで閉じると本文のinertを解除し開いた要素へフォーカスを戻す", (_label, closeDrawer) => {
+  render(<Harness />);
+  fireEvent.click(menu());
+  closeDrawer();
+  expect(guideContent().inert).toBe(false);
+  expect(document.activeElement).toBe(menu());
+});
+it("背景クリックでフォーカスが背景へ移っていても開いた要素へ戻す", () => {
+  render(<Harness />);
+  fireEvent.click(menu());
+  const backdrop = document.getElementById("gemini-backdrop") as HTMLElement;
+  backdrop.focus();
+  fireEvent.click(backdrop);
+  expect(guideContent().inert).toBe(false);
+  expect(document.activeElement).toBe(menu());
+});
+it("閉じた状態のEscapeでは本文のフォーカスを奪わない", () => {
+  render(<Harness />);
+  const box = document.querySelector("input[data-guide-check]") as HTMLInputElement;
+  box.focus();
+  fireEvent.keyDown(document, { key: "Escape" });
+  expect(document.activeElement).toBe(box);
+});
+it("デスクトップ幅ではフォーカス移動も本文のinert化も行わない", () => {
+  Object.defineProperty(window, "innerWidth", { value: 901, configurable: true });
+  render(<Harness />);
+  menu().focus();
+  fireEvent.click(menu());
+  expect(document.activeElement).toBe(menu());
+  expect(guideContent().inert).toBe(false);
+});
+it("開いた状態でdesktopへ広げると本文のinertを解除しフォーカスを動かさない", () => {
+  render(<Harness />);
+  fireEvent.click(menu());
+  links()[1].focus();
+  Object.defineProperty(window, "innerWidth", { value: 901, configurable: true });
+  fireEvent.resize(window);
+  expect(guideContent().inert).toBe(false);
+  expect(document.activeElement).toBe(links()[1]);
+});
+it("unmountで本文のinertを解除する", () => {
+  const { unmount } = render(<Harness />);
+  fireEvent.click(menu());
+  const content = guideContent();
+  expect(content.inert).toBe(true);
+  unmount();
+  expect(content.inert).toBe(false);
 });

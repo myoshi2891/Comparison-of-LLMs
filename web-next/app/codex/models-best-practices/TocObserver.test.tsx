@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { cleanup, fireEvent, render } from "@testing-library/react";
-import { afterEach, beforeEach, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import styles from "./page.module.css";
 import TocObserver from "./TocObserver";
 
@@ -330,4 +330,81 @@ it("unmountで本文のinertを解除する", () => {
   expect(m.inert).toBe(true);
   unmount();
   expect(m.inert).toBe(false);
+});
+describe("モバイルドロワーのTabフォーカス閉じ込め", () => {
+  /** layout.tsx が #openai-guide の外へ描画する RelatedPages の代役を含めて描画する。 */
+  const renderWithRelated = () =>
+    render(
+      <>
+        <Harness />
+        <button id="related-page" type="button">
+          関連ページ
+        </button>
+      </>
+    );
+  const related = () => document.getElementById("related-page") as HTMLElement;
+  /** Tab を送り、ブラウザ既定の移動を止めたかどうかを返す。 */
+  const pressTab = (shiftKey = false) => !fireEvent.keyDown(document, { key: "Tab", shiftKey });
+
+  it("最後のメニューからTabで先頭リンクへ戻す", () => {
+    renderWithRelated();
+    fireEvent.click(menu());
+    menu().focus();
+    expect(pressTab()).toBe(true);
+    expect(document.activeElement).toBe(links()[0]);
+  });
+  it("先頭リンクからShift+Tabで最後のメニューへ戻す", () => {
+    renderWithRelated();
+    fireEvent.click(menu());
+    expect(document.activeElement).toBe(links()[0]);
+    expect(pressTab(true)).toBe(true);
+    expect(document.activeElement).toBe(menu());
+  });
+  it("ドロワー外のRelatedPagesへ出たフォーカスを先頭リンクへ戻す", () => {
+    renderWithRelated();
+    fireEvent.click(menu());
+    related().focus();
+    expect(pressTab()).toBe(true);
+    expect(document.activeElement).toBe(links()[0]);
+  });
+  it("ドロワー外からのShift+Tabは最後のメニューへ戻す", () => {
+    renderWithRelated();
+    fireEvent.click(menu());
+    related().focus();
+    expect(pressTab(true)).toBe(true);
+    expect(document.activeElement).toBe(menu());
+  });
+  it("目次リンクの途中ではブラウザ既定のTab移動を妨げない", () => {
+    renderWithRelated();
+    fireEvent.click(menu());
+    links()[1].focus();
+    expect(pressTab()).toBe(false);
+    expect(pressTab(true)).toBe(false);
+    expect(document.activeElement).toBe(links()[1]);
+  });
+  it("閉じると閉じ込めを解除し、inertとフォーカス復帰を維持する", () => {
+    renderWithRelated();
+    fireEvent.click(menu());
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(main().inert).toBe(false);
+    expect(document.activeElement).toBe(menu());
+    related().focus();
+    expect(pressTab()).toBe(false);
+    expect(document.activeElement).toBe(related());
+  });
+  it("デスクトップ幅では開状態でもTabを妨げない", () => {
+    Object.defineProperty(window, "innerWidth", { value: 901, configurable: true });
+    renderWithRelated();
+    fireEvent.click(menu());
+    menu().focus();
+    expect(pressTab()).toBe(false);
+    expect(document.activeElement).toBe(menu());
+  });
+  it("Tab以外のキーは開状態でも妨げない", () => {
+    renderWithRelated();
+    fireEvent.click(menu());
+    menu().focus();
+    expect(fireEvent.keyDown(document, { key: "Enter" })).toBe(true);
+    expect(document.activeElement).toBe(menu());
+  });
 });
