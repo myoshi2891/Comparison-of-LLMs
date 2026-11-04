@@ -7,3 +7,5 @@ This version has breaking changes — APIs, conventions, and file structure may 
 This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
 
 <!-- END:nextjs-agent-rules -->
+
+Before changing this directory, read the repository-level guidance in this order: [`../CODEX.md`](../CODEX.md), then [`../CLAUDE.md`](../CLAUDE.md). Follow both, especially their TDD and page-registry requirements.
