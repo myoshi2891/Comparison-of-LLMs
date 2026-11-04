@@ -389,12 +389,16 @@ function collectStringConstants(src) {
  * Resolves simple string constant references embedded in JSX content.
  * @param {string} content - The JSX element content.
  * @param {Map<string, string>} constants - The string constants available for resolution.
+ * @param {boolean} [asStringExpression=false] - Whether to keep values as JSX string expressions.
  * @returns {string} The content with recognized constant references replaced by their values.
  */
-function resolveStringConstants(content, constants) {
-  return content.replace(/\{\s*([A-Za-z_$][\w$]*)\s*\}/g, (expression, name) =>
-    constants.has(name) ? constants.get(name) : expression
-  );
+function resolveStringConstants(content, constants, asStringExpression = false) {
+  return content.replace(/\{\s*([A-Za-z_$][\w$]*)\s*\}/g, (expression, name) => {
+    if (!constants.has(name)) return expression;
+    const value = constants.get(name);
+    // コード本文の定数は表示テキストなので、タグとして除去されないよう文字列式のまま渡す。
+    return asStringExpression ? `{${JSON.stringify(value)}}` : value;
+  });
 }
 
 /**
@@ -1004,7 +1008,7 @@ function inventoryTsx(src) {
   );
   const codeBlockTexts = [...preBlocks, ...styledBlocks]
     .sort((a, b) => a.index - b.index)
-    .map(({ content }) => normalizeElementContent(resolveStringConstants(content, constants), true, true));
+    .map(({ content }) => normalizeElementContent(resolveStringConstants(content, constants, true), true, true));
   const tableRowTexts = extractTagContents(src, "tr").map(({ content }) =>
     normalizeElementContent(content)
   );
