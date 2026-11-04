@@ -297,6 +297,22 @@ it("チェックリストのフォーカス枠は転写値を保持し、後続�
     [["outline-color", "var(--indigo)"]],
   ]);
 });
+it("免責バナーは淡色の本文背景に透けず、共有の黄色文字が読める暗色背景を持つ", () => {
+  const rules: postcss.Rule[] = [];
+  postcss
+    .parse(fs.readFileSync("app/globals.css", "utf8"))
+    .walkRules('body:has([data-page="gemini-models"]) .ch-disclaimer', (r) => {
+      rules.push(r);
+    });
+  expect(
+    rules.map((r) =>
+      r.nodes.map((n) => {
+        const d = n as postcss.Declaration;
+        return [d.prop, d.value];
+      })
+    )
+  ).toEqual([[["background", "#26231c"]]]);
+});
 it("生HTML注入・実行script・表直下の空白・図解サイズ強制を禁止", () => {
   const src = fs.readFileSync("app/google/models-best-practices/page.tsx", "utf8");
   expect(src).not.toContain(["danger", "ously", "Set", "Inner", "HTML"].join(""));
