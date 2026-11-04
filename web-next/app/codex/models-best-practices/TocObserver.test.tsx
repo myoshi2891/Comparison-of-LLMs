@@ -107,6 +107,15 @@ it("背景クリックで閉じる", () => {
   fireEvent.click(document.getElementById("openai-backdrop") as HTMLElement);
   state(false);
 });
+it("背景クリックでフォーカスが背景へ移っていても開いた要素へ戻す", () => {
+  render(<Harness />);
+  fireEvent.click(menu());
+  const backdrop = document.getElementById("openai-backdrop") as HTMLElement;
+  backdrop.focus();
+  fireEvent.click(backdrop);
+  state(false);
+  expect(document.activeElement).toBe(menu());
+});
 it("Escapeのみで閉じフォーカスを戻す", () => {
   render(<Harness />);
   fireEvent.click(menu());
