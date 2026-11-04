@@ -157,9 +157,16 @@ it("uses only the local font loader and never Google-generated URLs", () => {
 });
 for (const font of fonts) {
   it(`${font.name}: preserves its public export, CSS variable, swap and weight coverage`, () => {
-    const calls: Array<{ name: string; loader: string; config: Record<string, string> }> = [];
+    const calls: Array<{
+      name: string;
+      exported: boolean;
+      loader: string;
+      config: Record<string, string>;
+    }> = [];
     for (const statement of ast.statements) {
       if (!ts.isVariableStatement(statement)) continue;
+      const exported =
+        statement.modifiers?.some((m) => m.kind === ts.SyntaxKind.ExportKeyword) ?? false;
       for (const declaration of statement.declarationList.declarations) {
         const call = declaration.initializer;
         if (!call || !ts.isCallExpression(call) || !ts.isObjectLiteralExpression(call.arguments[0]))
@@ -171,6 +178,7 @@ for (const font of fonts) {
         }
         calls.push({
           name: declaration.name.getText(ast),
+          exported,
           loader: call.expression.getText(ast),
           config,
         });
@@ -178,6 +186,7 @@ for (const font of fonts) {
     }
     expect(calls.find((c) => c.name === font.name)).toEqual({
       name: font.name,
+      exported: true,
       loader: "localFont",
       config: { src: font.src, variable: font.variable, weight: font.weight, display: "swap" },
     });
