@@ -36,7 +36,7 @@ export default function TocObserver() {
         if (hidden && sidebar.contains(document.activeElement)) menu?.focus();
         sidebar.inert = hidden;
       }
-      // モバイルのドロワー表示中は背後の本文を操作不能にし、フォーカスを目次内へ閉じ込める。
+      // モバイルのドロワー表示中は背後の本文を操作不能にする。Tab の循環は containFocus が担当する。
       if (main) main.inert = mobile && open;
       // 先頭リンクへの移動は閉→開の遷移時だけ。resize の再同期で利用者のフォーカス位置を奪わない。
       if (mobile && open && !wasOpen) links[0]?.focus();
@@ -44,8 +44,22 @@ export default function TocObserver() {
     };
     const close = () => sync(false);
     const toggle = () => sync(!root?.classList.contains(styles.open));
+    /** 開いたモバイルドロワーでは、Tab 移動を目次リンクとメニューの間で循環させる。 */
+    const containFocus = (event: KeyboardEvent) => {
+      if (!menu || !wasOpen || window.innerWidth > 900) return;
+      const stops = [...links, menu];
+      const first = stops[0];
+      const last = stops[stops.length - 1];
+      const edge = event.shiftKey ? first : last;
+      const active = document.activeElement;
+      // 範囲内かつ端以外ならブラウザ既定の移動に任せる。
+      if (active !== edge && stops.some((stop) => stop === active)) return;
+      event.preventDefault();
+      (event.shiftKey ? last : first).focus();
+    };
     const key = (event: KeyboardEvent) => {
       if (event.key === "Escape") close();
+      if (event.key === "Tab") containFocus(event);
     };
     const measure = () => {
       if (mobileBar)

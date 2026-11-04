@@ -9,15 +9,24 @@ export default function TocObserver() {
     const menu = document.getElementById("gemini-menu");
     const backdrop = document.getElementById("gemini-backdrop");
     const links = Array.from(sidebar?.querySelectorAll<HTMLAnchorElement>("nav a") ?? []);
+    const guideContent = root?.querySelector<HTMLElement>(`.${styles.main}`) ?? null;
+    let wasOpen = false;
     const sync = (open: boolean) => {
       root?.classList.toggle(styles.open, open);
       menu?.setAttribute("aria-expanded", String(open));
       menu?.setAttribute("aria-label", open ? "目次を閉じる" : "目次を開く");
+      const mobile = window.innerWidth <= 900;
       if (sidebar) {
-        const hidden = window.innerWidth <= 900 && !open;
-        if (hidden && sidebar.contains(document.activeElement)) menu?.focus();
+        const hidden = mobile && !open;
+        // 背景クリック等でフォーカスが目次外へ移っていても、閉じたら開いた要素へ戻す。
+        if (hidden && (wasOpen || sidebar.contains(document.activeElement))) menu?.focus();
         sidebar.inert = hidden;
       }
+      // モバイルのドロワー表示中は、チェックリストを含む本文をキーボード操作の対象から外す。
+      if (guideContent) guideContent.inert = mobile && open;
+      // 先頭リンクへの移動は閉→開の遷移時だけ。resize の再同期で利用者のフォーカス位置を奪わない。
+      if (mobile && open && !wasOpen) links[0]?.focus();
+      wasOpen = open;
     };
     const close = () => sync(false);
     const toggle = () => sync(!root?.classList.contains(styles.open));
@@ -98,6 +107,7 @@ export default function TocObserver() {
       });
       root?.classList.remove(styles.open);
       if (sidebar) sidebar.inert = false;
+      if (guideContent) guideContent.inert = false;
     };
   }, []);
   return null;
