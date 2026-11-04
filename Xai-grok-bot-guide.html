@@ -1,0 +1,3380 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Grok Bot(xAI)初学者向けステップバイステップ・ベストプラクティスガイド</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Noto+Sans+JP:wght@400;500;700&family=Source+Serif+4:wght@600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/styles/atom-one-dark.min.css"
+      integrity="sha384-oaMLBGEzBOJx3UHwac0cVndtX5fxGQIfnAeFZ35RTgqPcYlbprH9o9PUV/F8Le07"
+      crossorigin="anonymous"
+    />
+    <style>
+      :root {
+        --paper: #faf7f0;
+        --paper-alt: #f1ece0;
+        --ink: #1f2430;
+        --ink-soft: #4a5160;
+        --indigo: #3b4a9c;
+        --indigo-soft: #e8eaf6;
+        --gold: #b8892b;
+        --forest: #2f6b4f;
+        --plum: #7a3b6b;
+        --border: #ddd6c6;
+        --sidebar-w: 300px;
+        --sans: 'Noto Sans JP', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', Meiryo, sans-serif;
+        --serif: 'Source Serif 4', 'Noto Sans JP', Georgia, serif;
+        --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+        scroll-padding-top: 24px;
+      }
+      body {
+        margin: 0;
+        background: var(--paper);
+        color: var(--ink);
+        font-family: var(--sans);
+        font-size: 1rem;
+        line-height: 1.85;
+      }
+      button {
+        font-size: 1rem;
+        font-family: inherit;
+      }
+      input {
+        font-size: 1rem;
+      }
+      .layout {
+        display: block;
+      }
+      /* sidebar */
+      .sidebar {
+        position: fixed;
+        inset: 0 auto 0 0;
+        width: var(--sidebar-w);
+        background: #fff;
+        border-right: 1px solid var(--border);
+        overflow-y: auto;
+        padding: 24px 14px 40px;
+        z-index: 30;
+      }
+      .brand {
+        font-family: var(--serif);
+        font-weight: 700;
+        color: var(--indigo);
+        font-size: 1.15rem;
+        line-height: 1.4;
+        padding: 0 10px 14px;
+        margin-bottom: 10px;
+        border-bottom: 2px solid var(--gold);
+      }
+      .brand small {
+        display: block;
+        font-family: var(--sans);
+        font-weight: 400;
+        color: var(--ink-soft);
+        font-size: 1rem;
+        margin-top: 4px;
+      }
+      .nav-a {
+        display: flex;
+        gap: 10px;
+        align-items: baseline;
+        padding: 7px 10px;
+        border-radius: 8px;
+        color: var(--ink);
+        text-decoration: none;
+        font-size: 1rem;
+        line-height: 1.5;
+        border-left: 3px solid transparent;
+      }
+      .nav-a:hover {
+        background: var(--paper-alt);
+      }
+      .nav-a.active {
+        background: var(--indigo-soft);
+        border-left-color: var(--indigo);
+        color: var(--indigo);
+        font-weight: 700;
+      }
+      .n-num {
+        flex: 0 0 1.9em;
+        font-family: var(--serif);
+        font-weight: 700;
+        color: var(--gold);
+        text-align: right;
+      }
+      .nav-a.active .n-num {
+        color: var(--indigo);
+      }
+      .mobile-bar {
+        display: none;
+      }
+      .scrim {
+        display: none;
+      }
+      /* main */
+      .main {
+        margin-left: var(--sidebar-w);
+        min-width: 0;
+      }
+      .hero {
+        background: linear-gradient(135deg, #2b3678, #3b4a9c 60%, #5a4b8c);
+        color: #fff;
+        padding: 64px 56px 52px;
+      }
+      .hero .eyebrow {
+        font-family: var(--serif);
+        letter-spacing: 0.08em;
+        color: #e9d9a6;
+        font-weight: 600;
+        margin: 0 0 10px;
+      }
+      .hero h1 {
+        font-family: var(--serif);
+        font-size: clamp(1.9rem, 3.4vw, 2.8rem);
+        line-height: 1.35;
+        margin: 0 0 26px;
+        font-weight: 700;
+        overflow-wrap: break-word;
+      }
+      .meta {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        border-radius: 12px;
+        padding: 6px 18px;
+      }
+      .meta-row {
+        display: flex;
+        gap: 16px;
+        padding: 10px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+      }
+      .meta-row:last-child {
+        border-bottom: 0;
+      }
+      .meta-k {
+        flex: 0 0 7.5em;
+        font-weight: 700;
+        color: #e9d9a6;
+      }
+      .meta-v {
+        min-width: 0;
+        overflow-wrap: anywhere;
+      }
+      .meta a {
+        color: #fff;
+        text-decoration: underline;
+      }
+      .section {
+        padding: 34px 56px;
+      }
+      .section h2 {
+        font-family: var(--serif);
+        font-size: clamp(1.5rem, 2.4vw, 2rem);
+        line-height: 1.4;
+        margin: 0 0 20px;
+        color: var(--ink);
+        display: flex;
+        gap: 14px;
+        align-items: baseline;
+        padding-bottom: 10px;
+        border-bottom: 3px solid var(--indigo);
+      }
+      .section h2 .num {
+        font-size: 1em;
+        color: #fff;
+        background: var(--indigo);
+        border-radius: 8px;
+        padding: 0 12px;
+        line-height: 1.6;
+        flex: 0 0 auto;
+      }
+      .section h3 {
+        font-family: var(--serif);
+        font-size: 1.3rem;
+        margin: 34px 0 12px;
+        color: var(--indigo);
+        padding-left: 12px;
+        border-left: 5px solid var(--gold);
+        line-height: 1.5;
+      }
+      .section h4 {
+        font-size: 1.05rem;
+        margin: 24px 0 8px;
+      }
+      p,
+      li {
+        overflow-wrap: break-word;
+      }
+      .section p {
+        margin: 0 0 14px;
+      }
+      .section ul,
+      .section ol {
+        padding-left: 1.6em;
+        margin: 0 0 16px;
+      }
+      .section li {
+        margin: 4px 0;
+      }
+      .section li.check {
+        list-style: none;
+        margin-left: -1.3em;
+      }
+      .section li.check label {
+        cursor: pointer;
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+      }
+      .section li.check input {
+        appearance: none;
+        -webkit-appearance: none;
+        flex: 0 0 22px;
+        width: 22px;
+        height: 22px;
+        margin-top: 5px;
+        border: 2px solid var(--indigo);
+        border-radius: 6px;
+        background: #fff;
+        cursor: pointer;
+        position: relative;
+      }
+      .section li.check input:checked {
+        background: var(--forest);
+        border-color: var(--forest);
+      }
+      .section li.check input:checked::after {
+        content: '';
+        position: absolute;
+        left: 6px;
+        top: 1px;
+        width: 6px;
+        height: 12px;
+        border: solid #fff;
+        border-width: 0 3px 3px 0;
+        transform: rotate(45deg);
+      }
+      .section li.check:has(input:checked) {
+        color: var(--ink-soft);
+      }
+      .section a {
+        color: var(--indigo);
+        text-underline-offset: 3px;
+        overflow-wrap: anywhere;
+      }
+      .section strong {
+        color: #1a1f33;
+      }
+      .section code {
+        font-family: var(--mono);
+        font-size: 1rem;
+        background: var(--paper-alt);
+        border: 1px solid var(--border);
+        border-radius: 5px;
+        padding: 1px 6px;
+        overflow-wrap: anywhere;
+      }
+      .section pre {
+        margin: 0 0 20px;
+        border-radius: 12px;
+        overflow-x: auto;
+        background: #282c34;
+        border: 1px solid #1d2026;
+      }
+      .section pre code {
+        display: block;
+        background: transparent;
+        border: 0;
+        padding: 16px 20px;
+        font-size: 1rem;
+        line-height: 1.7;
+        color: #abb2bf;
+        overflow-wrap: normal;
+        white-space: pre;
+      }
+      .section pre code.hljs {
+        padding: 16px 20px;
+        background: transparent;
+      }
+      .section blockquote {
+        margin: 0 0 18px;
+        padding: 12px 18px;
+        background: #fff8e6;
+        border-left: 5px solid var(--gold);
+        border-radius: 0 10px 10px 0;
+        color: #3d3520;
+      }
+      .section blockquote p:last-child {
+        margin-bottom: 0;
+      }
+      /* tables */
+      .table-wrap {
+        overflow-x: auto;
+        margin: 0 0 22px;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        background: #fff;
+        max-width: 100%;
+        min-width: 0;
+      }
+      .table-wrap table {
+        border-collapse: collapse;
+        width: 100%;
+        min-width: 560px;
+      }
+      .table-wrap th {
+        background: var(--indigo);
+        color: #fff;
+        text-align: left;
+        font-weight: 700;
+        padding: 10px 14px;
+        white-space: nowrap;
+      }
+      .table-wrap td {
+        padding: 10px 14px;
+        border-bottom: 1px solid var(--border);
+        vertical-align: top;
+        overflow-wrap: anywhere;
+        min-width: 7em;
+      }
+      .table-wrap td:first-child {
+        min-width: 0;
+      }
+      .table-wrap tr:last-child td {
+        border-bottom: 0;
+      }
+      .table-wrap tbody tr:hover {
+        background: var(--paper-alt);
+      }
+      /* diagrams */
+      .diagram-card {
+        margin: 6px 0 24px;
+        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 18px 12px;
+      }
+      .diagram-wrap {
+        overflow-x: auto;
+        display: flex;
+        justify-content: safe center;
+        width: 100%;
+        min-width: 0;
+      }
+      .diagram-wrap > * {
+        min-width: 0;
+      }
+      .diagram-canvas {
+        display: flex;
+        justify-content: safe center;
+        width: 100%;
+      }
+      .diagram-canvas svg {
+        flex-shrink: 0;
+        max-width: none;
+        height: auto;
+        overflow: visible;
+      }
+      .diagram-canvas .nodeLabel,
+      .diagram-canvas .edgeLabel {
+        font-size: 1rem;
+      }
+      .mermaidTooltip {
+        font-size: 1rem !important;
+      }
+      .footer {
+        padding: 30px 56px 60px;
+        color: var(--ink-soft);
+      }
+      /* responsive */
+      @media (max-width: 960px) {
+        .sidebar {
+          transform: translateX(-100%);
+          transition: transform 0.25s ease;
+          width: min(86vw, 320px);
+          box-shadow: none;
+        }
+        body.nav-open .sidebar {
+          transform: none;
+          box-shadow: 0 0 40px rgba(0, 0, 0, 0.3);
+        }
+        body.nav-open .scrim {
+          display: block;
+          position: fixed;
+          inset: 0;
+          background: rgba(0, 0, 0, 0.35);
+          z-index: 25;
+        }
+        .main {
+          margin-left: 0;
+        }
+        .mobile-bar {
+          display: flex;
+          position: sticky;
+          top: 0;
+          z-index: 20;
+          align-items: center;
+          gap: 12px;
+          background: #fff;
+          border-bottom: 1px solid var(--border);
+          padding: 10px 14px;
+        }
+        .mobile-bar button {
+          font-size: 1rem;
+          background: var(--indigo);
+          color: #fff;
+          border: 0;
+          border-radius: 8px;
+          padding: 8px 14px;
+          cursor: pointer;
+        }
+        .mobile-bar span {
+          font-weight: 700;
+          color: var(--indigo);
+          min-width: 0;
+          overflow-wrap: anywhere;
+        }
+        .hero {
+          padding: 40px 20px 36px;
+        }
+        .section {
+          padding: 28px 18px;
+        }
+        .footer {
+          padding: 24px 18px 48px;
+        }
+        .meta-row {
+          flex-direction: column;
+          gap: 2px;
+        }
+        .meta-k {
+          flex: none;
+        }
+        .section h2 {
+          flex-direction: column;
+          gap: 8px;
+          align-items: flex-start;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="layout">
+      <nav class="sidebar" id="sidebar" aria-label="目次">
+        <div class="brand">Grok Bot ガイド<small>初学者向けベストプラクティス</small></div>
+        <a class="nav-a" href="#sec-1"
+          ><span class="n-num">1</span><span class="n-t">このガイドの使い方と前提</span></a
+        >
+        <a class="nav-a" href="#sec-2"
+          ><span class="n-num">2</span><span class="n-t">Grok Bot とは何か</span></a
+        >
+        <a class="nav-a" href="#sec-3"
+          ><span class="n-num">3</span><span class="n-t">全体像をつかむ</span></a
+        >
+        <a class="nav-a" href="#sec-4"
+          ><span class="n-num">4</span><span class="n-t">Step 0: 始める前の準備</span></a
+        >
+        <a class="nav-a" href="#sec-5"
+          ><span class="n-num">5</span><span class="n-t">Step 1: アプリをインストールする</span></a
+        >
+        <a class="nav-a" href="#sec-6"
+          ><span class="n-num">6</span><span class="n-t">Step 2: サインインする</span></a
+        >
+        <a class="nav-a" href="#sec-7"
+          ><span class="n-num">7</span><span class="n-t">Step 3: 最初の Bot を設定する</span></a
+        >
+        <a class="nav-a" href="#sec-8"
+          ><span class="n-num">8</span><span class="n-t">Step 4: 良い依頼の書き方(5要素)</span></a
+        >
+        <a class="nav-a" href="#sec-9"
+          ><span class="n-num">9</span
+          ><span class="n-t">Step 5: ログインは自分で行う(Take over)</span></a
+        >
+        <a class="nav-a" href="#sec-10"
+          ><span class="n-num">10</span><span class="n-t">Step 6: 結果をレビューして育てる</span></a
+        >
+        <a class="nav-a" href="#sec-11"
+          ><span class="n-num">11</span><span class="n-t">Step 7: Skill 化 → Routine 化</span></a
+        >
+        <a class="nav-a" href="#sec-12"
+          ><span class="n-num">12</span
+          ><span class="n-t">Step 8: X から @bot でタスクを渡す</span></a
+        >
+        <a class="nav-a" href="#sec-13"
+          ><span class="n-num">13</span
+          ><span class="n-t">承認(Approvals)と Auto Review の設計</span></a
+        >
+        <a class="nav-a" href="#sec-14"
+          ><span class="n-num">14</span><span class="n-t">セキュリティの境界を理解する</span></a
+        >
+        <a class="nav-a" href="#sec-15"
+          ><span class="n-num">15</span
+          ><span class="n-t">最小権限セットアップ・チェックリスト</span></a
+        >
+        <a class="nav-a" href="#sec-16"
+          ><span class="n-num">16</span><span class="n-t">チーム・組織で使うとき</span></a
+        >
+        <a class="nav-a" href="#sec-17"
+          ><span class="n-num">17</span><span class="n-t">トラブルシュート</span></a
+        >
+        <a class="nav-a" href="#sec-18"
+          ><span class="n-num">18</span
+          ><span class="n-t">よくある失敗と対策(アンチパターン集)</span></a
+        >
+        <a class="nav-a" href="#sec-19"
+          ><span class="n-num">19</span
+          ><span class="n-t">補足: その他のベストプラクティスと根拠ソース</span></a
+        >
+        <a class="nav-a" href="#sec-20"
+          ><span class="n-num">20</span><span class="n-t">参考URL一覧</span></a
+        >
+        <a class="nav-a" href="#sec-21"
+          ><span class="n-num">21</span><span class="n-t">検証メモと限界</span></a
+        >
+      </nav>
+      <div class="scrim" id="scrim"></div>
+      <div class="main">
+        <div class="mobile-bar">
+          <button id="menuBtn" type="button" aria-label="目次を開く">目次</button
+          ><span>Grok Bot ガイド</span>
+        </div>
+        <header class="hero">
+          <p class="eyebrow">xAI / GROK BOT BEST PRACTICES</p>
+          <h1>Grok Bot(xAI)初学者向けステップバイステップ・ベストプラクティスガイド</h1>
+          <div class="meta">
+            <div class="meta-row">
+              <div class="meta-k">対象読者</div>
+              <div class="meta-v">
+                AIエージェントを初めて業務に使う方、Grok Bot を安全に使い始めたい方
+              </div>
+            </div>
+            <div class="meta-row">
+              <div class="meta-k">情報時点</div>
+              <div class="meta-v">
+                2026年10月24日(Grok Bot は
+                <strong>ベータ</strong
+                >で、仕様は頻繁に変わります。最新は必ず公式ドキュメントで確認してください)
+              </div>
+            </div>
+            <div class="meta-row">
+              <div class="meta-k">アンカー記事</div>
+              <div class="meta-v">
+                <a
+                  href="https://x.ai/news/introducing-grok-bot"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >Introducing Grok Bot(x.ai)</a
+                >
+              </div>
+            </div>
+            <div class="meta-row">
+              <div class="meta-k">表記について</div>
+              <div class="meta-v">
+                xAI の公式サイトは現在 「SpaceXSI /
+                SpaceXAI」表記が混在しています。本ガイドでは便宜上「xAI」と書きます。
+              </div>
+            </div>
+          </div>
+        </header>
+        <section class="section" id="sec-1">
+          <h2><span class="num">1</span>このガイドの使い方と前提</h2>
+          <h3 id="s1-1">1.1 学習ゴール</h3>
+          <p>このガイドを読み終えると、次のことができるようになります。</p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>できること</th>
+                  <th>対応する章</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1</td>
+                  <td>Grok Bot が「何者で」「どこで動くか」を説明できる</td>
+                  <td>2〜3章</td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td>インストールから最初のタスク完了までを自力で行える</td>
+                  <td>4〜10章</td>
+                </tr>
+                <tr>
+                  <td>3</td>
+                  <td>成功したタスクを Skill / Routine にして自動化できる</td>
+                  <td>11〜12章</td>
+                </tr>
+                <tr>
+                  <td>4</td>
+                  <td>承認ルールと最小権限で事故を防げる</td>
+                  <td>13〜15章</td>
+                </tr>
+                <tr>
+                  <td>5</td>
+                  <td>困ったときに原因を切り分けられる</td>
+                  <td>17〜18章</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <h3 id="s1-2">1.2 一次情報と二次情報の区別</h3>
+          <p>本ガイドでは情報源を次のように区別しています。</p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>区分</th>
+                  <th>意味</th>
+                  <th>例</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>公式(一次)</strong></td>
+                  <td>xAI / Cursor の公式ドキュメント・発表</td>
+                  <td><code>docs.x.ai</code>, <code>x.ai/news</code></td>
+                </tr>
+                <tr>
+                  <td><strong>第三者(二次)</strong></td>
+                  <td>解説記事、レビュー、開発者のブログや投稿</td>
+                  <td>Composio, eesel, 各種ブログ</td>
+                </tr>
+                <tr>
+                  <td><strong>筆者の整理</strong></td>
+                  <td>上記をもとにした推奨(根拠を併記)</td>
+                  <td>各章の「ベストプラクティス」</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <blockquote>
+            <p>
+              <strong>重要</strong>:
+              第三者の意見は参考情報です。製品の挙動・料金・制限は公式の最新ページで確認してください。
+            </p>
+          </blockquote>
+        </section>
+
+        <section class="section" id="sec-2">
+          <h2><span class="num">2</span>Grok Bot とは何か</h2>
+          <h3 id="s2-1">2.1 ひとことで言うと</h3>
+          <p>
+            <strong
+              >Grok Bot
+              は、あなた専用の「クラウド上のコンピュータ」を持ち、名前付きの役割(Bot)として継続的に仕事をしてくれる
+              AI チームメイト</strong
+            >です。ブラウザ、ターミナル、ファイル、アプリ連携(MCP
+            を含む)を使って作業し、スケジュールやイベントで自律的に動かすこともできます。
+          </p>
+          <h3 id="s2-2">2.2 チャット型 AI との違い</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>観点</th>
+                  <th>一般的なチャット AI</th>
+                  <th>Grok Bot</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>動く場所</td>
+                  <td>会話ウィンドウの中</td>
+                  <td><strong>永続するクラウドコンピュータ</strong></td>
+                </tr>
+                <tr>
+                  <td>記憶</td>
+                  <td>会話ごと(機能による)</td>
+                  <td>Bot ごとに役割・やり方を覚えさせる</td>
+                </tr>
+                <tr>
+                  <td>操作できるもの</td>
+                  <td>主にテキスト</td>
+                  <td>ブラウザ・ファイル・ターミナル・連携アプリ</td>
+                </tr>
+                <tr>
+                  <td>起動のきっかけ</td>
+                  <td>あなたの発言</td>
+                  <td>発言 + <strong>スケジュール / イベント / X での @bot</strong></td>
+                </tr>
+                <tr>
+                  <td>リスク</td>
+                  <td>回答の誤り中心</td>
+                  <td><strong>実際の操作(送信・変更・削除)による被害</strong></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <h3 id="s2-3">2.3 用語集</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>用語</th>
+                  <th>意味</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Bot</strong></td>
+                  <td>役割を持った AI の個体。1 Bot = 1 つの主な仕事が基本</td>
+                </tr>
+                <tr>
+                  <td><strong>共有クラウドコンピュータ</strong></td>
+                  <td>
+                    あなたのアカウントに 1 台割り当てられる計算環境。<strong
+                      >あなたの個人 Bot はすべてこれを共有</strong
+                    >する。Shared Bot
+                    は、メンバー自身のチャットではそのメンバーのコンピュータを、Slack
+                    チャンネルやグループチャットでは Shared Bot 側のコンピュータを使う
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>Skill</strong></td>
+                  <td>作業手順・判断ルール・出力形式をまとめた再利用可能な指示</td>
+                </tr>
+                <tr>
+                  <td><strong>Routine</strong></td>
+                  <td>「いつ(スケジュール/イベント)」「どの Bot が」「何を」実行するかの定義</td>
+                </tr>
+                <tr>
+                  <td><strong>Approval(承認)</strong></td>
+                  <td>重要な操作の前にあなたに確認を求める仕組み</td>
+                </tr>
+                <tr>
+                  <td><strong>Auto Review</strong></td>
+                  <td>実行前にモデルがツール呼び出しやPC操作を審査する機能</td>
+                </tr>
+                <tr>
+                  <td><strong>Take over</strong></td>
+                  <td>パスワード入力などをあなた自身が行うための操作引き継ぎ</td>
+                </tr>
+                <tr>
+                  <td><strong>Team Bot</strong></td>
+                  <td>Cursor チームのメンバーが一緒に話しかけられる共有 Bot</td>
+                </tr>
+                <tr>
+                  <td><strong>@bot</strong></td>
+                  <td>X(旧Twitter)の投稿から自分の Grok Bot にタスクを渡す宛先</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="section" id="sec-3">
+          <h2><span class="num">3</span>全体像をつかむ</h2>
+          <h3 id="s3-1">3.1 構成図</h3>
+          <div class="diagram-card">
+            <div class="diagram-wrap">
+              <div class="diagram-canvas" data-diagram-id="diag-0"></div>
+            </div>
+          </div>
+
+          <p><strong>読み取るべきポイント</strong></p>
+          <ul>
+            <li>
+              Bot は複数作れますが、<strong>すべて同じクラウドコンピュータを使います</strong>。
+            </li>
+            <li>
+              ブラウザとターミナルの通信は<strong>共有クラウドコンピュータから</strong>出ますが、リモート
+              MCP 接続は <strong>Cursor バックエンドから</strong>発信され、接続アプリの OAuth
+              トークンは<strong>コネクタのバックエンドに留まり</strong> PC には置かれません。
+            </li>
+            <li>
+              したがって「Bot
+              を分ければ権限も分かれる」わけでは<strong>ありません</strong>(公式ドキュメントも「別々の
+              Bot をセキュリティ境界として使わない」と明記しています)。詳細は
+              <a href="#sec-14">14章</a>。
+            </li>
+          </ul>
+          <h3 id="s3-2">3.2 学習の道筋</h3>
+          <div class="diagram-card">
+            <div class="diagram-wrap">
+              <div class="diagram-canvas" data-diagram-id="diag-1"></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="sec-4">
+          <h2><span class="num">4</span>Step 0: 始める前の準備</h2>
+          <h3 id="s4-1">4.1 必要なもの</h3>
+          <p>公式の「Get started」によると、次が必要です。</p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>項目</th>
+                  <th>内容</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>対象プラン</strong></td>
+                  <td>
+                    レガシー Cursor プランの有料個人プラン / Cursor Teams / Cursor
+                    Enterprise(管理者によるチームへの有効化が必要。アカウント担当者に相談し、使用量は管理者が管理。個人の
+                    SuperGrok 連携は不可)/ The X Subscription の Premium・Super・Ultra
+                    プラン(個人シート・チームシートとも対象。Grok Bot を含み、Grok
+                    アカウントの連携は不要。Plus は対象外)/ 個人の SuperGrok・SuperGrok
+                    Plus・SuperGrok Heavy または X Premium+ をレガシーの Cursor
+                    アカウントに連携(特定の Cursor プランは不要)/ 自己登録型 Grok Business
+                    のシート(<strong>Sign in with Grok</strong> でサインイン)
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>アプリ</strong></td>
+                  <td>macOS / Windows / Linux 用の Grok Bot デスクトップアプリ(モバイルもあり)</td>
+                </tr>
+                <tr>
+                  <td><strong>最初の題材</strong></td>
+                  <td>Bot が実際に役に立てる「アプリやWebサイト」</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <blockquote>
+            <p>
+              <strong>料金は変わります</strong>。最新は公式のプラン案内(Cursor の Grok Bot plans
+              ページ)で確認してください。
+            </p>
+          </blockquote>
+          <h3 id="s4-2">4.2 プライバシー設定(最初に確認)</h3>
+          <ul>
+            <li>
+              Grok Bot は <strong>クラウドへのデータ保存が必須</strong>で、Cursor の
+              <strong>Legacy Privacy Mode は非対応</strong>です。
+            </li>
+            <li>
+              Legacy Privacy Mode のアカウントは、対応するデータ設定へ切り替えないと開始できません。
+            </li>
+            <li>
+              学習利用のオプトアウトは、個人アカウントではそのアカウントのプライバシー設定に、チームのメンバーではチームの
+              Privacy Mode(Team Settings で確認)に従います。
+            </li>
+          </ul>
+          <div class="diagram-card">
+            <div class="diagram-wrap">
+              <div class="diagram-canvas" data-diagram-id="diag-2"></div>
+            </div>
+          </div>
+
+          <h3 id="s4-3">4.3 ベストプラクティス</h3>
+          <ol>
+            <li>
+              <strong>本番データや機密を扱う前に</strong
+              >、プライバシーとセキュリティの公式ページを読む。
+            </li>
+            <li>最初の1週間は「練習用の安全なデータ」だけで試す。</li>
+            <li>
+              会社で使うなら、<strong>社内のセキュリティ部門に先に相談</strong>する(Cursor
+              側にホスト、オンプレ不可という前提も確認事項)。
+            </li>
+          </ol>
+        </section>
+
+        <section class="section" id="sec-5">
+          <h2><span class="num">5</span>Step 1: アプリをインストールする</h2>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>OS</th>
+                  <th>手順の要点</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>macOS</strong></td>
+                  <td>
+                    Apple silicon / Intel を選び、ディスクイメージから
+                    <strong>Applications</strong> へドラッグ。初回起動で確認が出たら
+                    <strong>Open</strong>
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>Windows</strong></td>
+                  <td>x64 / Arm64 を選びインストーラを実行。スタートメニューから起動</td>
+                </tr>
+                <tr>
+                  <td><strong>Linux</strong></td>
+                  <td>
+                    <code>.deb</code
+                    >(Debian/Ubuntu)、<code>.rpm</code>(Fedora/RHEL)、AppImage(その他)から選択
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>アーキテクチャの確認コマンド(Linux):</p>
+          <pre><code class="language-bash"># x86_64 なら x64、aarch64 なら Arm64 版を選ぶ
+uname -m
+</code></pre>
+          <ul>
+            <li>
+              配布元:
+              <a href="https://x.ai/bot" target="_blank" rel="noopener noreferrer">x.ai/bot</a>
+            </li>
+            <li>
+              自動アップデート対応。手動は
+              <strong>Settings → Updates → Check for Updates</strong>
+              を選び、更新が見つかったら通常は <strong>Restart to Update</strong> を選んで適用する。
+            </li>
+            <li>
+              Linux の <code>.deb</code> /
+              <code>.rpm</code>
+              版では、更新画面は新しいバージョンの通知のみ。更新はパッケージマネージャー(<code
+                >apt</code
+              >
+              / <code>dnf</code> など)で行う。
+            </li>
+          </ul>
+        </section>
+
+        <section class="section" id="sec-6">
+          <h2><span class="num">6</span>Step 2: サインインする</h2>
+          <ol>
+            <li>
+              ウェルカム画面で <strong>Sign in</strong> を選ぶ(Grok Bot は Cursor
+              アカウントを使い、専用のログインはない)。
+            </li>
+            <li>
+              開いたブラウザで認証を完了する。Cursor から始めた場合でも、Cursor または Grok が xAI
+              共通のサインインページを開くことがあり、そのページには Grok や xAI
+              のロゴ・名称が表示される場合がある。複数のアカウントを持っている場合は、使うつもりのアカウントを選ぶ。通常は
+              Cursor アカウントで認証する。セルフサーブの Grok Business
+              のシートで使う場合は、ブラウザで
+              <strong>Sign in with Grok</strong> を選び、シートを持つ Grok アカウントで認証する。
+            </li>
+            <li>アプリに戻る。</li>
+            <li>
+              契約経路に応じて、次の手順を行う。
+              <ul>
+                <li>
+                  <strong>The X Subscription の Premium・Super・Ultra</strong> の場合: Grok Bot
+                  が含まれるため、Grok アカウントの連携は不要。
+                </li>
+                <li>
+                  <strong>SuperGrok</strong> の場合(<strong
+                    >Cursor Enterprise のユーザーは対象外</strong
+                  >。次の Enterprise の手順に従う):
+                  <ul>
+                    <li>
+                      デスクトップ:
+                      <strong>Settings → Usage &amp; Billing → Get Access with Grok</strong>
+                      を開き、SuperGrok の Grok アカウントでサインインする。
+                    </li>
+                    <li>
+                      iPhone / Android: アクセス画面で
+                      <strong>Link Grok Account</strong> を選んで連携し、終わったら
+                      <strong>Finished Linking? Refresh My Status</strong> を選ぶ。
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <strong>X Premium+</strong> の場合:
+                  <ul>
+                    <li>
+                      デスクトップ:
+                      <strong>Settings → Usage &amp; Billing → Get Access with Grok</strong>
+                      を開き、X Premium+ の Grok アカウントでサインインする。
+                    </li>
+                    <li>
+                      iPhone / Android: アクセス画面で
+                      <strong>Link Grok Account</strong> を選んで連携し、終わったら
+                      <strong>Finished Linking? Refresh My Status</strong> を選ぶ。
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <strong>Cursor Enterprise</strong> の場合: 管理者がチームに対して Grok Bot
+                  を有効化する必要がある。個人の SuperGrok
+                  アカウントは連携しない。利用可否や使用量は、管理者またはアカウント担当者に確認する。
+                </li>
+                <li>
+                  <strong>セルフサーブの Grok Business</strong> で、先に Cursor
+                  アカウントで認証してしまった場合: いったんサインアウトし、<strong
+                    >Sign in with Grok</strong
+                  >
+                  でシートを持つ Grok アカウントを使って認証し直す。
+                </li>
+              </ul>
+            </li>
+          </ol>
+          <p>
+            初回は短いイントロのあと、裏側でコンピュータのセットアップが走り、<strong
+              >「Grok Bot」という名前の最初の Bot</strong
+            >
+            が作られてチャットが開きます。
+          </p>
+          <blockquote>
+            <p>組織で SSO が必須の場合は、通常の組織サインインを完了してください。</p>
+          </blockquote>
+        </section>
+
+        <section class="section" id="sec-7">
+          <h2><span class="num">7</span>Step 3: 最初の Bot を設定する</h2>
+          <h3 id="s7-1">7.1 原則: 1つの Bot に 1つの主な仕事</h3>
+          <p>
+            公式ガイドは「<strong>焦点を絞った Bot のほうが有用な文脈を蓄積する</strong
+            >」と述べています。万能 Bot 1体より、役割別の Bot を勧めています。
+          </p>
+          <div class="diagram-card">
+            <div class="diagram-wrap">
+              <div class="diagram-canvas" data-diagram-id="diag-3"></div>
+            </div>
+          </div>
+
+          <h3 id="s7-2">7.2 最初のメッセージの型</h3>
+          <p>最初のメッセージで「役割」「やり方」「禁止事項」「覚えること」を伝えます。</p>
+          <pre><code class="language-markdown">あなたの担当はプロダクトの性能分析です。
+監視ツールを使って性能に関する質問を調べてください。
+リンクとスクリーンショットを残し、「証拠」と「仮説」を分けて書き、
+影響が最大の問題から先に報告してください。
+本番設定は絶対に変更しないでください。
+これを今後の作業のために覚えておいてください。
+</code></pre>
+          <blockquote>
+            <p>上記は公式ガイドの例を日本語に意訳したものです。</p>
+          </blockquote>
+          <h3 id="s7-3">7.3 Bot を増やすタイミング</h3>
+          <ul>
+            <li>仕事の種類が<strong>自然に分かれた</strong>とき(例: 分析 / 調査 / 資料)。</li>
+            <li>
+              追加はサイドバーの <strong>+</strong>(または
+              <strong>New Bot</strong>)から。チームのユーザーはメニューから
+              <strong>Create a Bot</strong> を選ぶ。
+            </li>
+            <li>
+              Cursor チームでチームメイトと共有したい場合は、サイドバーの
+              <strong>+ → Create a Bot</strong> で Bot を作り、チャットの Bot 名メニューにある
+              <strong>Share</strong> からチームに共有します。
+            </li>
+          </ul>
+        </section>
+
+        <section class="section" id="sec-8">
+          <h2><span class="num">8</span>Step 4: 良い依頼の書き方(5要素)</h2>
+          <h3 id="s8-1">8.1 5要素テンプレート</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>要素</th>
+                  <th>問い</th>
+                  <th>例</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1</td>
+                  <td><strong>Outcome(成果)</strong></td>
+                  <td>何が完了していればよいか</td>
+                  <td>「先週の新規ユーザー活性化率を過去4週と比較」</td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td><strong>Sources(情報源)</strong></td>
+                  <td>どのアプリ/サイト/ファイルを見るか</td>
+                  <td>「分析ダッシュボード」</td>
+                </tr>
+                <tr>
+                  <td>3</td>
+                  <td><strong>Constraints(制約)</strong></td>
+                  <td>やってはいけないこと、事前確認すること</td>
+                  <td>「ダッシュボードは変更しない」</td>
+                </tr>
+                <tr>
+                  <td>4</td>
+                  <td><strong>Deliverable(成果物)</strong></td>
+                  <td>何を返すか</td>
+                  <td>「最大変化のステップと調査計画案」</td>
+                </tr>
+                <tr>
+                  <td>5</td>
+                  <td><strong>Review point(確認点)</strong></td>
+                  <td>どこで止まってあなたに見せるか</td>
+                  <td>「計画案の時点で一度止まる」</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <h3 id="s8-2">8.2 5分でできる最初の練習(ログイン不要)</h3>
+          <p>文書を1つ添付して、次のように依頼します(公式例の意訳)。</p>
+          <pre><code class="language-markdown">この文書を5つの箇条書きで要約してください。
+日付・決定事項・未解決の質問は、別セクションにすべて列挙してください。
+各項目にページまたはセクションを引用元として付けてください。
+元ファイルは変更しないでください。
+</code></pre>
+          <h3 id="s8-3">8.3 ツールを使う2つ目の練習</h3>
+          <pre><code class="language-markdown">分析ダッシュボードを開き、今週の新規ユーザー活性化率を
+過去4週と比較してください。
+最も変化が大きいステップを特定し、
+関連するグラフへのリンク付きで簡単な調査計画案を作ってください。
+ダッシュボードは一切変更しないでください。
+必要ならログインを私に依頼してください。
+</code></pre>
+          <h3 id="s8-4">8.4 悪い依頼と良い依頼</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>悪い例</th>
+                  <th>問題</th>
+                  <th>良い例</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>「売上を見といて」</td>
+                  <td>成果・範囲・形式が不明</td>
+                  <td>「先月の売上を地域別に集計し、前年同月比を表で。数値の出典リンク付き」</td>
+                </tr>
+                <tr>
+                  <td>「メール返しといて」</td>
+                  <td>送信までやってしまう恐れ</td>
+                  <td>
+                    「返信<strong>案</strong>を3パターン作成。<strong>送信しない</strong>。承認を求める」
+                  </td>
+                </tr>
+                <tr>
+                  <td>「いい感じに整理して」</td>
+                  <td>基準がない</td>
+                  <td>
+                    「ファイル名を <code>YYYY-MM-DD_内容</code> に統一。リネーム前に一覧で確認を」
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <h3 id="s8-5">8.5 音声入力</h3>
+          <ul>
+            <li>
+              デスクトップは <code>Cmd/Ctrl+D</code> で音声入力、<strong>Start voice chat</strong>
+              でライブ会話。
+            </li>
+            <li>モバイルは <strong>Start dictation</strong>。</li>
+          </ul>
+        </section>
+
+        <section class="section" id="sec-9">
+          <h2><span class="num">9</span>Step 5: ログインは自分で行う(Take over)</h2>
+          <h3 id="s9-1">9.1 なぜ引き継ぐのか</h3>
+          <p>
+            Bot
+            がログインを必要とするアプリに到達すると、まず安全な方法で処理しようとします。<strong
+              >個人 Bot</strong
+            >
+            は
+            <strong
+              >Vault、接続済みのパスワードマネージャ、または安全なシークレット入力フォーム(Secure
+              Form)</strong
+            >
+            を使います。<strong>Shared Bot では、メンバー個人の Vault は使いません</strong>(公式の
+            Vault ページは「Vault は Shared Bot では非対応」とし、キーは Shared Bot の
+            <strong>Secrets</strong>
+            に追加するよう案内しています)。代わりに、接続済みのパスワードマネージャまたは Secure
+            Form で処理します。ただし
+            <strong>v0.78.1</strong>(2026年10月27日リリース。チーム向けの変更)の changelog
+            では、<strong>Manager</strong> が <strong>Configure → Tools</strong> から
+            <strong>Team Bot 専用の Vault</strong> にログインを追加でき、Bot
+            はそのログインでチームとしてサインインできるとされています。同じリリースで管理画面の名称が「Shared
+            Bots」に変わっているため、ここでの Team Bot はチームで共有する Bot(Shared
+            Bot)と同じ範囲とみられます。この機能は
+            <strong>アプリ v0.78.1 以降</strong
+            >が必要で、段階的に配信(rollout)されているため、すべてのチームですぐ使えるとは限りません。Vault
+            のドキュメントはまだこの変更を反映していないため、利用前にアプリのバージョンと Configure
+            画面で確認してください。Shared Bot
+            が<strong>応答しているメンバー本人の個人アカウント</strong>を使う場合は、<strong>使う前にそのメンバーへ確認を求めます</strong>。オーナーまたは
+            Manager が Shared Bot
+            に追加したアプリやシークレットを使う場合は、この確認は求められません。SSO・パスキー・CAPTCHA
+            など、フォームでは扱えない手順がある場合にだけ、<strong
+              >あなたにコンピュータ操作を引き継ぐ(Take over)よう依頼</strong
+            >します。引き継いだときは、パスワード・パスキー・2要素コード・CAPTCHA・決済確認などの機密情報や確認事項を<strong>自分で</strong>入力します。
+          </p>
+          <div class="diagram-card">
+            <div class="diagram-wrap">
+              <div class="diagram-canvas" data-diagram-id="diag-4"></div>
+            </div>
+          </div>
+
+          <blockquote>
+            <p>
+              <strong>Shared Bot のセッション保存先</strong>: Slack の DM
+              では通常そのメンバーのコンピュータ、Slack のチャンネル・スレッド・グループ
+              DM・グループチャットでは Shared Bot
+              のコンピュータにセッションが残ります。プライバシー設定によって別のコンピュータが選ばれる場合もあるため、常に共有PCに残るとは限りません。
+            </p>
+          </blockquote>
+          <h3 id="s9-2">9.2 守ること</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>やる</th>
+                  <th>やらない</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Take over</strong> で自分が入力する</td>
+                  <td>チャットにパスワードやワンタイムコードを書く</td>
+                </tr>
+                <tr>
+                  <td>
+                    Bot
+                    が出す<strong>安全なシークレット入力フォーム</strong>に入力する(値はマスクされ、トランスクリプトとモデルから除外)
+                  </td>
+                  <td>Bot を汎用のパスワードマネージャとして使う</td>
+                </tr>
+                <tr>
+                  <td>不要になったらサービスから<strong>サインアウト</strong></td>
+                  <td>ログインしたまま放置する</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <h3 id="s9-3">9.3 ハードウェアセキュリティキー</h3>
+          <ul>
+            <li>
+              YubiKey などは、<strong>Settings → General → Security Key</strong> の
+              <strong>Use hardware security keys</strong> が有効なら、デスクトップに挿したキーを Bot
+              のブラウザで使えます。
+            </li>
+            <li>
+              macOS / Windows ではデフォルトでオン、Linux は未対応、使用のたびに承認が必要です。
+            </li>
+          </ul>
+          <blockquote>
+            <p>
+              <strong>注意</strong>: ログイン済みのセッションは共有コンピュータに残り、<strong
+                >他の Bot も使える</strong
+              >可能性があります(14章)。
+            </p>
+          </blockquote>
+        </section>
+
+        <section class="section" id="sec-10">
+          <h2><span class="num">10</span>Step 6: 結果をレビューして育てる</h2>
+          <h3 id="s10-1">10.1 レビューの観点</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>観点</th>
+                  <th>確認すること</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>正確性</td>
+                  <td>数値・日付に<strong>出典リンク</strong>があるか</td>
+                </tr>
+                <tr>
+                  <td>範囲</td>
+                  <td>頼んでいないことまでやっていないか</td>
+                </tr>
+                <tr>
+                  <td>形式</td>
+                  <td>指定したフォーマットか</td>
+                </tr>
+                <tr>
+                  <td>停止位置</td>
+                  <td>承認ポイントで止まったか</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <h3 id="s10-2">10.2 「恒久的な好み」は明示して覚えさせる</h3>
+          <pre><code class="language-markdown">今後の週次レポートはこの形式にしてください:
+箇条書き5つ、出典リンクは本文中にインライン、
+最後に「要判断事項」というセクションを付ける。
+</code></pre>
+          <ul>
+            <li>
+              一回限りの修正と、今後も守ってほしい好みを<strong>区別して言葉にする</strong>のがコツです。
+            </li>
+            <li>
+              手順が安定したら、<strong>Skill 化</strong>または
+              <strong>Routine 化</strong>します(次章)。
+            </li>
+          </ul>
+        </section>
+
+        <section class="section" id="sec-11">
+          <h2><span class="num">11</span>Step 7: Skill 化 → Routine 化</h2>
+          <h3 id="s11-1">11.1 自動化の正しい順番</h3>
+          <p>
+            公式ドキュメントの原則は「<strong
+              >まず一回限りのタスクで始め、信頼できるようにし、手順を Skill
+              として保存し、それから自動化する</strong
+            >」です。
+          </p>
+          <div class="diagram-card">
+            <div class="diagram-wrap">
+              <div class="diagram-canvas" data-diagram-id="diag-5"></div>
+            </div>
+          </div>
+
+          <h3 id="s11-2">11.2 良い Skill に書くこと(6項目)</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>項目</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1</td>
+                  <td>いつ使うか</td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td>必要な入力とアクセス</td>
+                </tr>
+                <tr>
+                  <td>3</td>
+                  <td>作業の順序</td>
+                </tr>
+                <tr>
+                  <td>4</td>
+                  <td>結果の検証方法</td>
+                </tr>
+                <tr>
+                  <td>5</td>
+                  <td>返すもの</td>
+                </tr>
+                <tr>
+                  <td>6</td>
+                  <td>承認が必要なこと</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>Skill 保存の依頼例(公式例の意訳):</p>
+          <pre><code class="language-markdown">いまの手順を「Weekly account health」という Skill として保存してください。
+参照するシステム、リスクの定義、出力形式、
+そして「顧客への連絡は必ず承認が必要」というルールを含めてください。
+</code></pre>
+          <ul>
+            <li>
+              保存済み Skill は、依頼文の中で
+              <strong>Skill 名を指定する</strong>と呼び出せます(<code>/</code>
+              メニューは対応しているインターフェースでのみ使えます)。<code>@</code> で
+              Bot・グループ・Routine・アプリを参照できます。
+            </li>
+            <li>
+              Skill は<strong>全 Bot で共有されるライブラリ</strong>ですが、Bot
+              にそのアプリやログインがないと使えない場合があります。
+            </li>
+            <li>
+              現在の Bot で Private Skill が表示されない場合は、<strong>Connect apps</strong>
+              を開き、接続済みの項目から <strong>Private skills</strong> を有効にします。
+            </li>
+            <li>
+              提供されている場合、<strong>Teach a task</strong> でブラウザ操作を一度やって見せて
+              Skill を作れます(最大10分間の画面操作を記録。マイク音声は記録しない)。作られた Skill
+              は<strong>下書き</strong>なので、判断ルール・失敗時の扱い・承認境界を必ず追記してください。
+            </li>
+          </ul>
+          <h3 id="s11-3">11.3 Routine の作り方</h3>
+          <p>Routine を所有させたい Bot に頼みます(公式例の意訳)。</p>
+          <pre><code class="language-markdown">平日の毎朝8時に、現在のアカウント一覧に対して
+「Daily customer-risk」Skill を実行してください。
+リンク付きのウォッチリストをこの会話に投稿してください。
+顧客には連絡しないでください。
+元データが取得できない場合は、古いデータを使わず失敗を報告してください。
+</code></pre>
+          <p>
+            <strong>必ず確認する6点</strong>: 所有 Bot / スケジュールとタイムゾーン / 入力元 /
+            期待する結果 / 承認境界 / ソース欠落時の動作
+          </p>
+          <h3 id="s11-4">11.4 Routine の制限(公式記載)</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>項目</th>
+                  <th>内容</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1 Bot あたりの Routine 数</td>
+                  <td>最大 50</td>
+                </tr>
+                <tr>
+                  <td>実行記録</td>
+                  <td>Routine ごとに直近 20 件</td>
+                </tr>
+                <tr>
+                  <td>スケジュール間隔</td>
+                  <td>最短 5 分</td>
+                </tr>
+                <tr>
+                  <td>削除</td>
+                  <td>即時・元に戻せない。Bot を削除するとその Bot の Routine も消える</td>
+                </tr>
+                <tr>
+                  <td>長期不在</td>
+                  <td>応答がなければ Routine が一時停止されることがある</td>
+                </tr>
+                <tr>
+                  <td>1時間あたりの実行数</td>
+                  <td>
+                    全 Routine 合計で 300 回、Routine ごとに 200
+                    回まで。超過分の実行は失敗し、<strong>自動では再試行されない</strong>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <h3 id="s11-5">11.5 イベントトリガー</h3>
+          <p>
+            Slack のメッセージや GitHub の通知をきっかけに Routine を動かせます(Cursor
+            アカウントの連携。Slack/GitHub アプリとは別の接続が必要な場合あり)。
+          </p>
+          <pre><code class="language-markdown">#customer-escalations チャンネルに、サポートチケットへのリンクと
+「needs repro」という語を含むメッセージが来たら、
+チケットを開き、ステージング環境で再現し、
+再現パックをこの会話に投稿してください。
+承認なしに Slack へ投稿し返すことは絶対にしないでください。
+</code></pre>
+          <blockquote>
+            <p>
+              <strong>「新着メッセージすべて」のような広すぎるトリガーは避ける</strong
+              >。ノイズが増え、使用量を消費し、無関係な入力に反応するリスクが上がります。
+            </p>
+          </blockquote>
+          <h3 id="s11-6">11.6 Test の注意点</h3>
+          <blockquote>
+            <p>
+              <strong>Test 実行は本物の作業を行います</strong
+              >(Webサイトの操作、ファイル変更、連携ツールの呼び出し)。安全な入力を使い、書き込み系は承認の後ろに置いてください。
+            </p>
+          </blockquote>
+          <p>
+            第三者のレビュー記事(eesel)も「ドライランモードはなく、テストは実行そのもの」と指摘しています。
+          </p>
+          <h3 id="s11-7">11.7 信頼できる Routine の設計7原則</h3>
+          <ol>
+            <li>実行より<strong>準備を自動化</strong>する</li>
+            <li>まず<strong>下書き・突合・推奨</strong>を作らせる</li>
+            <li>送信・購入・削除・公開・本番変更は<strong>承認必須</strong></li>
+            <li><strong>データなし/古いデータ</strong>のときの方針を書く</li>
+            <li>リトライは<strong>冪等</strong>に(二重実行しても安全に)</li>
+            <li><strong>部分完了</strong>の報告先を指定する</li>
+            <li>Webサイトやデータ形式が変わったら<strong>再テスト</strong></li>
+          </ol>
+        </section>
+
+        <section class="section" id="sec-12">
+          <h2><span class="num">12</span>Step 8: X から @bot でタスクを渡す</h2>
+          <h3 id="s12-1">12.1 何ができるか</h3>
+          <p>
+            X の投稿やリプライで
+            <a href="https://x.com/bot" target="_blank" rel="noopener noreferrer">@bot</a>
+            をタグ付けすると、その投稿を<strong>あなたの Grok Bot へのタスク</strong
+            >として渡せます。
+          </p>
+          <pre><code class="language-markdown">@bot このスレッドを要約して、要点を私の Slack に送って
+</code></pre>
+          <ul>
+            <li>
+              @bot は X 上では<strong>短い受領返信のみ</strong>。実際の作業と結果は Grok Bot
+              アプリの Bot の会話に残ります。
+            </li>
+            <li>
+              Bot
+              が受け取るのは、あなたの投稿・返信先の投稿・それらが引用する投稿(静止画を含む)です。
+            </li>
+            <li>
+              初回は、タグ付き依頼が<strong>自動で作業を開始し、Grok Bot の使用量を消費する</strong
+              >旨の通知が X から届きます。
+            </li>
+          </ul>
+          <div class="diagram-card">
+            <div class="diagram-wrap">
+              <div class="diagram-canvas" data-diagram-id="diag-6"></div>
+            </div>
+          </div>
+
+          <h3 id="s12-2">12.2 前提条件</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>条件</th>
+                  <th>内容</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Grok アカウントと X の連携</td>
+                  <td>
+                    grok.com の <strong>Settings → Account</strong> で <strong>𝕏 Account</strong> を
+                    Connect
+                  </td>
+                </tr>
+                <tr>
+                  <td>Grok Bot の利用権</td>
+                  <td>同じ Grok アカウントで有効</td>
+                </tr>
+                <tr>
+                  <td>自分の Bot</td>
+                  <td><strong>少なくとも1体</strong>(共有された Bot ではタグ依頼を受けられない)</td>
+                </tr>
+                <tr>
+                  <td>地域</td>
+                  <td>X に登録された国が対象地域であること</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <h3 id="s12-3">12.3 利用できない地域(公式記載)</h3>
+          <ul>
+            <li>
+              オーストラリア、英国、EU、アイスランド、リヒテンシュタイン、ノルウェーの X
+              アカウントでは<strong>現時点で未対応</strong>。
+            </li>
+            <li>
+              判定は X に登録されている国で行われ、<strong>現在地や VPN は無関係</strong>です。
+            </li>
+            <li>国が広域(例: South Asia)や未設定の場合も未対応です。</li>
+          </ul>
+          <h3 id="s12-4">12.4 セキュリティ上の注意</h3>
+          <p>
+            X の投稿は<strong>第三者が書いた信頼できない入力</strong>です。@bot
+            で渡す投稿やスレッドには、プロンプトインジェクション(隠れた指示)が含まれる可能性があります。<strong>外部送信を伴う指示(Slack送信など)は承認境界を必ず設定</strong>してください(13〜14章)。
+          </p>
+        </section>
+
+        <section class="section" id="sec-13">
+          <h2><span class="num">13</span>承認(Approvals)と Auto Review の設計</h2>
+          <h3 id="s13-1">13.1 まず「依頼文の中の境界」が最強</h3>
+          <p>
+            公式ドキュメントは「<strong>最も強い境界は依頼そのものの中にある</strong>」としています。
+          </p>
+          <pre><code class="language-markdown">キャンペーンデータを突合し、予算変更の推奨案を作成してください。
+キャンペーンの変更や代理店へのメッセージ送信はしないでください。
+現在値・提案値・想定インパクトを示したうえで承認を求めてください。
+</code></pre>
+          <p><strong>明示的な境界を置くべき操作</strong></p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>操作</th>
+                  <th>例</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>メッセージ・招待の送信</td>
+                  <td>メール、Slack、カレンダー招待</td>
+                </tr>
+                <tr>
+                  <td>コンテンツの公開</td>
+                  <td>ブログ、SNS投稿</td>
+                </tr>
+                <tr>
+                  <td>購入・資金移動</td>
+                  <td>決済、送金</td>
+                </tr>
+                <tr>
+                  <td>削除・上書き</td>
+                  <td>ファイル、データ</td>
+                </tr>
+                <tr>
+                  <td>権限変更</td>
+                  <td>共有設定、ロール</td>
+                </tr>
+                <tr>
+                  <td>本番変更</td>
+                  <td>設定、デプロイ</td>
+                </tr>
+                <tr>
+                  <td>法的条件への同意</td>
+                  <td>利用規約、契約</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <h3 id="s13-2">13.2 承認カードの読み方</h3>
+          <p>承認が必要になると、会話に<strong>提案された操作とその入力</strong>が表示されます。</p>
+          <p>
+            表示されるボタンは<strong>操作やカードによって異なり</strong>、次の 3
+            つが常にそろうわけではありません。カードによっては
+            <strong>Allow</strong>・<strong>Skip</strong>・<strong>Not now</strong>
+            などのラベルで表示されます。
+          </p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>ボタンの例</th>
+                  <th>動作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Allow once</strong> / <strong>Allow</strong></td>
+                  <td>その操作だけ続行</td>
+                </tr>
+                <tr>
+                  <td><strong>Always allow</strong></td>
+                  <td>一致するルールを保存(カードがルールを提案している場合のみ表示。慎重に)</td>
+                </tr>
+                <tr>
+                  <td><strong>Deny</strong> / <strong>Skip</strong> / <strong>Not now</strong></td>
+                  <td>その操作を実行しない</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p><strong>Shared Bot の承認権限</strong>: 承認できる人は場所によって限られます。</p>
+          <ul>
+            <li>
+              <strong>Slack のスレッド</strong>: カードには
+              <strong>Allow once</strong>・<strong>Deny</strong>・<strong>View details</strong>
+              が表示され、操作できるのは<strong>依頼した本人だけ</strong>です。
+            </li>
+            <li>
+              <strong>グループチャット</strong>: 承認できるのは、<strong
+                >Bot が応答している対象メッセージの投稿者だけ</strong
+              >です。<strong>Always allow</strong> は表示されません。
+            </li>
+            <li>
+              どちらの場合も、<strong>ほかの参加者は承認できません</strong>(カードが誰の回答待ちかだけが表示されます)。
+            </li>
+          </ul>
+          <p>重要な性質:</p>
+          <ul>
+            <li>
+              <strong
+                >承認は「提案された操作」を制御するもので、すでに完了した作業を元に戻すものではありません。</strong
+              >
+            </li>
+            <li>
+              <strong>対象や効果を特定できない操作は承認しない</strong
+              >。平易な言葉で説明させるか、下書きを先に作らせる。
+            </li>
+            <li>
+              承認カードの期限は<strong>作業を起こしたきっかけ</strong>で決まります。チャットのメッセージから始まった作業のカードは、この
+              30
+              分のタイマーでは期限切れになりません。一方、Routine・受信メッセージ・その他のバックグラウンド処理が作成したカードは<strong>30分で期限切れ</strong>になり、操作は実行されません。再実行は
+              Bot に依頼し直します。
+            </li>
+          </ul>
+          <h3 id="s13-3">13.3 Auto Review の設定</h3>
+          <p>
+            ルールの追加場所はプラットフォームで異なります。デスクトップは
+            <strong>Settings → General</strong> の <strong>Bot</strong> セクションにある
+            <strong>Auto-review</strong>、iPhone と Android は
+            <strong>Settings → Bot</strong> から設定します。
+          </p>
+          <div class="diagram-card">
+            <div class="diagram-wrap">
+              <div class="diagram-canvas" data-diagram-id="diag-7"></div>
+            </div>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>ルール種別</th>
+                  <th>動作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Ask first</strong></td>
+                  <td>一致する操作は<strong>常に</strong>あなたの確認で止まる</td>
+                </tr>
+                <tr>
+                  <td><strong>Allow automatically</strong></td>
+                  <td>一致し、かつ自動レビューが他の停止理由を見つけない場合のみ通過</td>
+                </tr>
+                <tr>
+                  <td>両方に一致</td>
+                  <td><strong>Ask first が優先</strong></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            チーム管理者が Auto Review
+            を強制している場合、編集不可の<strong>チームルール</strong>も表示されます。個人ルールは<strong>その上に重なり、より厳しくする方向にのみ</strong>働きます。
+          </p>
+          <h3 id="s13-4">13.4 ルールの書き方</h3>
+          <p><strong>狭く、対象とスコープを限定する</strong>(公式の例):</p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>良いルール</th>
+                  <th>理由</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>外部メールを送る前に必ず確認(Ask first)</td>
+                  <td>外部送信は取り消せない</td>
+                </tr>
+                <tr>
+                  <td>本番ダッシュボードを変更する前に確認(Ask first)</td>
+                  <td>影響が大きい</td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>/workspace/reports</code> で
+                    <code>git status</code> を実行する場合は自動許可
+                  </td>
+                  <td>対象・コマンドが明確で読み取り中心</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            <strong>避けるべき広いルール</strong>:
+            「ブラウザ内のことはすべて許可」。Webサイトやツールの挙動は時間とともに変わるためです。
+          </p>
+          <blockquote>
+            <p>
+              Auto Review
+              は<strong>モデルによる判断</strong>です。最小権限と明示的な承認境界を<strong>置き換えるものではなく補完するもの</strong>と公式も位置づけています。第三者の分析(howtoharden,
+              eesel)は、承認がユーザーの自由記述に依存する点・自動レビューが全副作用(例:
+              メモリ書き込み)を審査しない点を指摘しています。
+            </p>
+          </blockquote>
+          <h3 id="s13-5">13.5 ローカルPCへのアクセス</h3>
+          <p>
+            クラウド上の共有コンピュータとは<strong>別の能力</strong>として、手元の Mac/Windows
+            での実行が設定できます。
+          </p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>設定(Settings → Computer → Your computer)</th>
+                  <th>意味</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Ask every time</strong>(デフォルト)</td>
+                  <td>毎回確認</td>
+                </tr>
+                <tr>
+                  <td><strong>Always allow</strong></td>
+                  <td>常に許可</td>
+                </tr>
+                <tr>
+                  <td><strong>Never allow</strong></td>
+                  <td>常に拒否</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <ul>
+            <li>
+              手元のファイルで作業させる明確な理由がなければ
+              <strong>Never allow</strong> を推奨(公式)。
+            </li>
+            <li>チーム管理者がより厳しい上限を設定している場合は、そちらが優先されます。</li>
+          </ul>
+        </section>
+
+        <section class="section" id="sec-14">
+          <h2><span class="num">14</span>セキュリティの境界を理解する</h2>
+          <h3 id="s14-1">14.1 共有コンピュータの境界(最重要)</h3>
+          <p>公式ドキュメントの要点:</p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>事実</th>
+                  <th>意味</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    あなたの<strong>個人 Bot はすべて 1 台のクラウドコンピュータ</strong>を共有
+                  </td>
+                  <td>
+                    ファイル・ブラウザセッション・コマンドライン資格情報が<strong
+                      >全個人 Bot で利用可能</strong
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>Shared Bot はどこで使うかで使用するコンピュータが変わる</td>
+                  <td>
+                    メンバー自身のチャットでは<strong>そのメンバーのコンピュータ</strong>、Slack
+                    チャンネルやグループチャットでは
+                    <strong>Shared Bot のコンピュータ</strong>を使う
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>別々の Bot をセキュリティ境界として使わない</strong></td>
+                  <td>「経理用 Bot」「公開用 Bot」で権限が分かれるわけではない</td>
+                </tr>
+                <tr>
+                  <td>Bot の公開共有リンク</td>
+                  <td>
+                    設定をコピーされるだけで、あなたの PC やログインは共有されない。ただし<strong
+                      >秘密情報・顧客データ・社内URLを共有 Bot に入れない</strong
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>Bot を削除しても</td>
+                  <td><strong>共有PC上のファイルやブラウザセッションは消えない</strong></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <h3 id="s14-2">14.2 プロンプトインジェクションとの関係</h3>
+          <div class="diagram-card">
+            <div class="diagram-wrap">
+              <div class="diagram-canvas" data-diagram-id="diag-8"></div>
+            </div>
+          </div>
+
+          <p>
+            Django 共同開発者の <strong>Simon Willison</strong> は、AI
+            エージェントが危険になる3条件を「<strong>致命的な三つ組(lethal trifecta)</strong
+            >」と呼んでいます。
+          </p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>条件</th>
+                  <th>Grok Bot での例</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>① 私的データへのアクセス</td>
+                  <td>メール・ドライブ・ログイン済みセッション・ファイル</td>
+                </tr>
+                <tr>
+                  <td>② 信頼できない内容への接触</td>
+                  <td>Webページ・受信メール・X の投稿・Slack メッセージ</td>
+                </tr>
+                <tr>
+                  <td>③ 外部へ送信する手段</td>
+                  <td>メール送信、Slack 投稿、ブラウザからの POST</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            <strong>3つが同時に揃うと、隠れた指示でデータが持ち出される恐れがあります。</strong> xAI
+            のドキュメントも、外部コンテンツを信頼できないものとして扱う層と、Auto
+            Review・ネットワークポリシー・操作ごとの承認を重ねつつ、これらは<strong>リスクを減らすが排除はしない</strong>としています(第三者の整理による)。
+          </p>
+          <p><strong>対策の考え方(三つ組を崩す)</strong></p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>崩す対象</th>
+                  <th>具体策</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>①を減らす</td>
+                  <td>
+                    必要なツールだけ接続。スコープ付きサービスアカウント。読み取り専用から開始
+                  </td>
+                </tr>
+                <tr>
+                  <td>②を減らす</td>
+                  <td>信頼できないサイトを閲覧させる Routine を作らない。広いトリガーを避ける</td>
+                </tr>
+                <tr>
+                  <td>③を止める</td>
+                  <td>送信・公開・購入・削除・本番変更は<strong>常に承認の後ろ</strong></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <h3 id="s14-3">14.3 アクセスを撤回するとき(公式の手順)</h3>
+          <ol>
+            <li>関連する Routine を一時停止/削除</li>
+            <li>共有コンピュータ上のWebサイトからサインアウト</li>
+            <li>コネクタをアンインストールし、<strong>元のサービス側で認可を取り消す</strong></li>
+            <li><code>/workspace</code> から機密ファイルを削除</li>
+            <li>不要な Bot を非表示/削除</li>
+            <li>必要なら Cursor アカウント削除フローへ</li>
+          </ol>
+        </section>
+
+        <section class="section" id="sec-15">
+          <h2><span class="num">15</span>最小権限セットアップ・チェックリスト</h2>
+          <p>公式の「Use a least-privilege setup」に基づく実践リストです。</p>
+          <h3 id="s15-1">15.1 導入時</h3>
+          <ul>
+            <li class="check">
+              <label><input type="checkbox" /> 必要なツールだけを接続している</label>
+            </li>
+            <li class="check">
+              <label
+                ><input type="checkbox" />
+                可能なものは<strong>スコープ付きサービスアカウント</strong>を使っている</label
+              >
+            </li>
+            <li class="check">
+              <label
+                ><input type="checkbox" />
+                最初は<strong>読み取り専用タスク</strong>と<strong>下書き出力</strong>から始めた</label
+              >
+            </li>
+            <li class="check">
+              <label
+                ><input type="checkbox" />
+                送信・公開・購入・削除・本番変更を<strong>承認の後ろ</strong>に置いた</label
+              >
+            </li>
+            <li class="check">
+              <label
+                ><input type="checkbox" /> ローカル実行を <strong>Never allow</strong>(または Ask
+                every time)にしている</label
+              >
+            </li>
+            <li class="check">
+              <label
+                ><input type="checkbox" /> パスワード・コードは
+                <strong>Take over</strong> で入力している</label
+              >
+            </li>
+          </ul>
+          <h3 id="s15-2">15.2 運用時</h3>
+          <ul>
+            <li class="check">
+              <label
+                ><input type="checkbox" /> インストール済みコネクタと有効な Routine
+                を<strong>定期的にレビュー</strong>している</label
+              >
+            </li>
+            <li class="check">
+              <label
+                ><input type="checkbox" /> 連携元システムや想定フローが変わったら Routine
+                を<strong>一時停止</strong>した</label
+              >
+            </li>
+            <li class="check">
+              <label
+                ><input type="checkbox" />
+                重要な判断について<strong>出典リンクと操作ログ</strong>を残している</label
+              >
+            </li>
+            <li class="check">
+              <label
+                ><input type="checkbox" /> 作業完了後に、機密の一時ファイルを削除している</label
+              >
+            </li>
+            <li class="check">
+              <label><input type="checkbox" /> 不要になったサービスからサインアウトしている</label>
+            </li>
+          </ul>
+          <h3 id="s15-3">15.3 週次の見直し(おすすめ)</h3>
+          <div class="diagram-card">
+            <div class="diagram-wrap">
+              <div class="diagram-canvas" data-diagram-id="diag-9"></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="sec-16">
+          <h2><span class="num">16</span>チーム・組織で使うとき</h2>
+          <h3 id="s16-1">16.1 Team Bot</h3>
+          <ul>
+            <li>
+              Cursor チームでは、サイドバーの <strong>+ → Create a Bot</strong> で Bot
+              を作り、チャットの Bot 名メニューの
+              <strong>Share</strong> からチームに共有すると、メンバーが話しかけられる Bot
+              になります。
+            </li>
+            <li>
+              <strong>チームで共有する Bot</strong> では、オーナーまたは Manager
+              が追加したアプリ・シークレット・スキル・ファイル・<strong>メモリ</strong>が、<strong>各メンバーのチャットでも利用可能</strong>になります。メモリには
+              2 種類あります。Bot
+              が<strong>チーム全体のために保存したメモリ</strong>はほかのメンバーとのチャットでも使われ、保存したときは
+              Bot がその旨を伝えます。一方、<strong
+                >各メンバーとの作業について覚えたことはそのメンバーと Bot の間に留まり</strong
+              >、メンバー個人に関する内容はチームのメモリには保存されません。オーナーと Manager
+              のどちらが追加する場合も、<strong>各メンバーのチャットで使われる指示・ファイル・メモリ</strong>には認証情報や顧客データを書き込まないでください。Bot
+              に必要なログインやキーは、<a href="#s9-1">9.1</a> の手順に従い、ログインは
+              <strong>Team Bot 専用の Vault</strong>(v0.78.1
+              以降・段階配信のため未提供のチームもある)、キーは Shared Bot の
+              <strong>Secrets</strong>
+              に登録します。また、<strong>個人情報や顧客情報をメモリに保存させない</strong>でください。
+            </li>
+            <li>
+              一方、Bot
+              の<strong>公開テンプレート</strong>としての共有は<strong>ログインの共有ではありません</strong>(コンピュータ・ログイン・会話履歴は共有されない)。ただし設定だけでなく、Bot
+              の ID(名前など)・説明・<strong>Skill</strong>・<strong>Routine</strong>
+              といった共有用の構成が公開されます。公開する前に Bot
+              の詳細で共有される中身を確認し、API
+              キー・社内URL・顧客データなどの機密を取り除いてください。公開後は Share メニューの
+              <strong>View template details</strong> で中身を確認できます。
+            </li>
+          </ul>
+          <h3 id="s16-2">16.2 管理者が知っておくこと(公式・第三者資料より)</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>項目</th>
+                  <th>内容</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>設定の所在</td>
+                  <td>
+                    Grok Bot の主要な管理設定は
+                    <strong>Cursor のダッシュボード</strong>にある。一部の設定は
+                    <strong>Team Settings・Team Marketplace・ID プロバイダー(IdP)</strong>
+                    側にもある。docs.x.ai はそのページを写し、Cursor に戻るリンクを持つ
+                  </td>
+                </tr>
+                <tr>
+                  <td>Auto Review の強制</td>
+                  <td>
+                    <strong>Enterprise プランのみ</strong>。Enterprise の管理者が Enforce
+                    Auto-review とチーム全体の Auto-review ルールを設定すると、<strong
+                      >Auto-review を有効にしているメンバー</strong
+                    >には編集不可のチームルールが適用される。個人ルールはより厳しくする方向にのみ追加できる。グループに
+                    <code>Don't enforce for this group</code> を設定すると、そのグループでは Enforce
+                    Auto-review の設定がロック解除され、メンバーが Auto-review
+                    をオフにできるようになる(チームルールが編集可能になったり削除されたりするわけではない)
+                  </td>
+                </tr>
+                <tr>
+                  <td>ローカル実行の上限</td>
+                  <td>管理者がチーム全体の上限を設定できる(厳しい方が優先)</td>
+                </tr>
+                <tr>
+                  <td>Bot の ID</td>
+                  <td>
+                    Bot には識別用の ID
+                    があるが、独立した認証アイデンティティや資格情報は持たず、原則として<strong>サインインしているメンバーとして</strong>動く。例外として、<strong>チーム管理のコネクタはチームまたはサービスアカウントの資格情報を使う場合がある</strong>。コネクタが使う資格情報と、監査ログに操作者として記録される
+                    ID は別物として扱う(公式ドキュメントは、どの ID
+                    が操作者として記録されるかを明記していないため、導入前に確認する)
+                  </td>
+                </tr>
+                <tr>
+                  <td>実行環境</td>
+                  <td>
+                    第三者の調査では、Cursor
+                    がホストするマシン上でのみ動作しオンプレミスの選択肢はない(OneWave
+                    の読み込みによる)
+                  </td>
+                </tr>
+                <tr>
+                  <td>認証・準拠</td>
+                  <td>
+                    公式のセキュリティページは <strong>ISO/IEC 27001</strong> と
+                    <strong>ISO/IEC 42001</strong>
+                    の認証取得を示している。なお、第三者(eesel)は過去に「ドキュメントが認証取得の主張をしていない」と指摘していた(調査日
+                    2026年10月24日時点の記事。現在は公式ページで最新の認証状況を確認する)
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <blockquote>
+            <p>
+              組織導入の際は、公式の「Grok Bot for Teams and Enterprises」と「Grok Bot security
+              FAQ」から始めるよう公式が案内しています。
+            </p>
+          </blockquote>
+        </section>
+
+        <section class="section" id="sec-17">
+          <h2><span class="num">17</span>トラブルシュート</h2>
+          <h3 id="s17-1">17.1 まず試すこと</h3>
+          <p>
+            <strong>アプリを完全に終了して開き直す</strong
+            >(公式:セットアップの問題の多くはこれで解消)。解決しない場合は、公式の Troubleshooting
+            ページと support に問い合わせます。
+          </p>
+          <h3 id="s17-2">17.2 @bot が返信しない場合(公式の原因一覧)</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>原因</th>
+                  <th>対処</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>X アカウントの国が未対応</td>
+                  <td>現時点では対処不可(対応待ち)</td>
+                </tr>
+                <tr>
+                  <td>すでに @bot を含むスレッドに、自分では @bot をタグ付けせず返信した</td>
+                  <td><strong>自分の投稿で明示的に @bot を付ける</strong></td>
+                </tr>
+                <tr>
+                  <td>投稿が @grok も同時にタグ付けしている</td>
+                  <td>@bot のみにする</td>
+                </tr>
+                <tr>
+                  <td>投稿・返信先・引用先に<strong>動画や GIF</strong> がある</td>
+                  <td>静止画またはテキストにする</td>
+                </tr>
+                <tr>
+                  <td>内部モデレーションを通過しない</td>
+                  <td>内容を見直す</td>
+                </tr>
+                <tr>
+                  <td>Grok Bot が Grok アカウントに未連携、または今週の使用量を使い切った</td>
+                  <td>連携・使用量を確認</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <h3 id="s17-3">17.3 @bot の返信の意味</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>@bot の返信</th>
+                  <th>意味</th>
+                  <th>対処</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>依頼を Grok Bot に送ったという短い返信</td>
+                  <td>メイン Bot が受領</td>
+                  <td>Grok Bot アプリで進捗を確認</td>
+                </tr>
+                <tr>
+                  <td>「Sign up for Grok Bot」案内</td>
+                  <td>X アカウントに Grok アカウントが未連携</td>
+                  <td>grok.com で X を連携し、再度タグ付け</td>
+                </tr>
+                <tr>
+                  <td>「Grok Bot isn't set up yet」案内</td>
+                  <td>アカウントは連携済みだが自分の Bot がない</td>
+                  <td>アプリで Bot を作成し、再度タグ付け</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <h3 id="s17-4">17.4 Routine が動かない・空振りする</h3>
+          <div class="diagram-card">
+            <div class="diagram-wrap">
+              <div class="diagram-canvas" data-diagram-id="diag-10"></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="sec-18">
+          <h2><span class="num">18</span>よくある失敗と対策(アンチパターン集)</h2>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>失敗</th>
+                  <th>なぜ危険か</th>
+                  <th>対策</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1</td>
+                  <td>何でも屋 Bot を1体だけ作る</td>
+                  <td>文脈が散らかり品質が下がる</td>
+                  <td>役割ごとに Bot を分ける</td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td>Bot を分ければ安全だと思う</td>
+                  <td>共有コンピュータで資格情報が共有される</td>
+                  <td>Bot 分割をセキュリティ境界にしない</td>
+                </tr>
+                <tr>
+                  <td>3</td>
+                  <td>「ブラウザ内は全部許可」のルールを作る</td>
+                  <td>サイトの挙動変化で想定外の操作が通る</td>
+                  <td>狭い対象・コマンドのルールにする</td>
+                </tr>
+                <tr>
+                  <td>4</td>
+                  <td>いきなり Routine 化する</td>
+                  <td>不安定な手順が毎日誤動作する</td>
+                  <td>1回限りで安定 → Skill → Test → Routine</td>
+                </tr>
+                <tr>
+                  <td>5</td>
+                  <td>Test を「安全な練習」だと思う</td>
+                  <td>本物の操作が実行される</td>
+                  <td>安全な入力+書き込みは承認の後ろ</td>
+                </tr>
+                <tr>
+                  <td>6</td>
+                  <td>「新着メッセージすべて」で起動する</td>
+                  <td>ノイズ・使用量増・無関係入力への反応</td>
+                  <td>狭い一致条件にする</td>
+                </tr>
+                <tr>
+                  <td>7</td>
+                  <td>パスワードをチャットに貼る</td>
+                  <td>記録に残る</td>
+                  <td>Take over か安全なシークレット入力</td>
+                </tr>
+                <tr>
+                  <td>8</td>
+                  <td>対象不明の承認を押す</td>
+                  <td>取り返しがつかない操作が走る</td>
+                  <td>説明/下書きを先に求める</td>
+                </tr>
+                <tr>
+                  <td>9</td>
+                  <td>機密を共有 Bot に入れる</td>
+                  <td>共有リンクで設定がコピーされる</td>
+                  <td>秘密・顧客データ・社内URLを入れない</td>
+                </tr>
+                <tr>
+                  <td>10</td>
+                  <td>Bot を削除すれば痕跡が消えると思う</td>
+                  <td>共有PCのファイルとセッションは残る</td>
+                  <td>14.3 の撤回手順を実施</td>
+                </tr>
+                <tr>
+                  <td>11</td>
+                  <td>古いデータで定時レポートを出す</td>
+                  <td>誤判断を招く</td>
+                  <td>「ソース欠落時は失敗を報告」と明記</td>
+                </tr>
+                <tr>
+                  <td>12</td>
+                  <td>ローカル実行を常時許可</td>
+                  <td>手元ファイルへの影響範囲が拡大</td>
+                  <td>Never allow / Ask every time</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="section" id="sec-19">
+          <h2><span class="num">19</span>補足: その他のベストプラクティスと根拠ソース</h2>
+          <blockquote>
+            <p>
+              <strong>調査方針</strong>:
+              2026年10月24日時点でウェブ検索を行い、公式ドキュメントを一次情報とし、国際的に知られた開発者・セキュリティ研究者の発信と、独立した第三者の分析を補足としました。
+              <strong>正直な限界</strong>: Grok Bot
+              に特化して著名な国際的開発者が書いた一次的な長文解説は、検索範囲では多くありませんでした。そのため、(a)
+              Simon Willison
+              のように<strong>エージェント安全性の一般原則</strong>を示す著名開発者の資料と、(b)
+              Grok Bot を直接扱った独立した解説・開発者投稿、(c)
+              公式ドキュメント、を組み合わせています。
+            </p>
+          </blockquote>
+          <h3 id="s19-1">19.1 補足ベストプラクティス一覧(根拠付き)</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>ベストプラクティス</th>
+                  <th>根拠・要点</th>
+                  <th>発信元</th>
+                  <th>URL</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1</td>
+                  <td>
+                    「致命的な三つ組」を崩す設計にする(私的データ・信頼できない入力・外部送信を同居させない)
+                  </td>
+                  <td>
+                    AIエージェントが情報を持ち出される3条件の整理。Grok Bot
+                    の第三者解説でも引用されている
+                  </td>
+                  <td><strong>Simon Willison</strong>(Django 共同開発者、Datasette 作者)</td>
+                  <td>
+                    <a
+                      href="https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/</a
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td>
+                    X
+                    上の信頼できない投稿を読むエージェントは間接プロンプトインジェクションを前提に設計する
+                  </td>
+                  <td>
+                    Grok 3 が X
+                    の投稿を検索して回答する構造について、間接プロンプトインジェクションへの脆弱性を指摘
+                  </td>
+                  <td><strong>Simon Willison</strong>(ブログのタグ集)</td>
+                  <td>
+                    <a
+                      href="https://simonwillison.net/tags/prompt-injection/?page=3"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://simonwillison.net/tags/prompt-injection/?page=3</a
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>3</td>
+                  <td>Bot を分けても権限は分かれない。ログインは全個人 Bot で利用可能と考える</td>
+                  <td>共有コンピュータ上でファイル・ブラウザセッション・資格情報が共有される</td>
+                  <td>xAI 公式ドキュメント</td>
+                  <td>
+                    <a
+                      href="https://docs.x.ai/grok-bot/approvals-security-and-privacy"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://docs.x.ai/grok-bot/approvals-security-and-privacy</a
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>4</td>
+                  <td>承認ルールは狭く書き、広い許可を避ける</td>
+                  <td>Auto Review はモデルベースで、最小権限の代替ではない</td>
+                  <td>xAI 公式ドキュメント</td>
+                  <td>
+                    <a
+                      href="https://docs.x.ai/grok-bot/approvals-security-and-privacy"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://docs.x.ai/grok-bot/approvals-security-and-privacy</a
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>5</td>
+                  <td>自動化は「一回限り → Skill → Test → Routine」の順</td>
+                  <td>公式が順序を明記</td>
+                  <td>xAI 公式ドキュメント</td>
+                  <td>
+                    <a
+                      href="https://docs.x.ai/grok-bot/skills-routines-and-automations"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://docs.x.ai/grok-bot/skills-routines-and-automations</a
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>6</td>
+                  <td>最初の1回は5要素(成果・情報源・制約・成果物・確認点)で依頼する</td>
+                  <td>公式の「強い依頼」の定義</td>
+                  <td>xAI 公式ドキュメント</td>
+                  <td>
+                    <a
+                      href="https://docs.x.ai/grok-bot/get-started"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://docs.x.ai/grok-bot/get-started</a
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>7</td>
+                  <td>@bot 経由の依頼は地域・動画/GIF・@grok の同時タグなどの制約を先に確認する</td>
+                  <td>無反応の原因が公式に一覧化されている</td>
+                  <td>xAI 公式ドキュメント</td>
+                  <td>
+                    <a
+                      href="https://docs.x.ai/grok-bot/tag-on-x"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://docs.x.ai/grok-bot/tag-on-x</a
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>8</td>
+                  <td>
+                    管理者は Auto Review 強制・ローカル実行の上限・シート割り当てなどを使い分ける
+                  </td>
+                  <td>設定の所在が Cursor ダッシュボード側にある点を整理</td>
+                  <td>How to Harden(ハードニングガイド)</td>
+                  <td>
+                    <a
+                      href="https://howtoharden.com/guides/grok-bot/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://howtoharden.com/guides/grok-bot/</a
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>9</td>
+                  <td>
+                    承認が自由記述ルールに依存する点・ドライランがない点を理解して導入判断する(認証は公式セキュリティページで
+                    ISO/IEC 27001・ISO/IEC 42001 を確認。eesel の「認証主張がない」との指摘は調査日
+                    2026年10月24日時点の過去の評価)
+                  </td>
+                  <td>ドキュメント読み込みによる批判的レビュー</td>
+                  <td>eesel AI(独立レビュー)</td>
+                  <td>
+                    <a
+                      href="https://www.eesel.ai/blog/grok-bot"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://www.eesel.ai/blog/grok-bot</a
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>10</td>
+                  <td>代替製品と比較し、監査性を重視して選ぶ</td>
+                  <td>プライバシーモードの扱い・承認の性質を比較</td>
+                  <td>eesel AI</td>
+                  <td>
+                    <a
+                      href="https://www.eesel.ai/blog/grok-bot-alternatives"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://www.eesel.ai/blog/grok-bot-alternatives</a
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>11</td>
+                  <td>
+                    導入前にセキュリティ FAQ を読み、ホスト先・オンプレの可否などを質問リスト化する
+                  </td>
+                  <td>発売直後にセキュリティドキュメントを読み込んだ企業コンサルの整理</td>
+                  <td>OneWave AI</td>
+                  <td>
+                    <a
+                      href="https://www.onewave-ai.com/blog/grok-bot-explained-what-it-means-for-business"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://www.onewave-ai.com/blog/grok-bot-explained-what-it-means-for-business</a
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>12</td>
+                  <td>
+                    パーソナルエージェント(Grok Bot / Muse /
+                    Dots)の共通構造(記憶・自分のコンピュータ・自律起動)を理解し、副作用の審査範囲(例:
+                    メモリ書き込み)を確認する
+                  </td>
+                  <td>3製品の比較解説。1ユーザー1つのマイクロVM を全 Bot が共有する説明を含む</td>
+                  <td>Projeckt AI</td>
+                  <td>
+                    <a
+                      href="https://projecktai.substack.com/p/personal-ai-agents-explained"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://projecktai.substack.com/p/personal-ai-agents-explained</a
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>13</td>
+                  <td>ローカル実行は「Never allowed」から始める</td>
+                  <td>実践ガイドの推奨</td>
+                  <td>Vantaige</td>
+                  <td>
+                    <a
+                      href="https://vantaige.io/blog/grok-bot-complete-guide-2026"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://vantaige.io/blog/grok-bot-complete-guide-2026</a
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>14</td>
+                  <td>
+                    プライバシー設定は Cursor 側設定が支配する。Privacy Mode
+                    の挙動は公式フォーラムの回答で確認する
+                  </td>
+                  <td>Cursor の Privacy Mode が Grok Bot にも適用される旨の説明</td>
+                  <td>Cursor 公式フォーラム</td>
+                  <td>
+                    <a
+                      href="https://forum.cursor.com/t/privacy-and-term-of-use-of-grok-bot-with-cursor-account/168075"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://forum.cursor.com/t/privacy-and-term-of-use-of-grok-bot-with-cursor-account/168075</a
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>15</td>
+                  <td>
+                    見えない文字による隠し指示(Unicode)を検査する OSS コネクタを併用する選択肢
+                  </td>
+                  <td>実際のアプリ上で検証した開発者の報告(個人開発者。実績は要自己確認)</td>
+                  <td>PixelRainbow(X の投稿)</td>
+                  <td>
+                    <a
+                      href="https://x.com/PixelRainbowNFT/status/2112021936662270175"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://x.com/PixelRainbowNFT/status/2112021936662270175</a
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>16</td>
+                  <td>
+                    悪意あるWebコンテンツが共有コンピュータ上で何を可能にするか、シナリオで理解する
+                  </td>
+                  <td>Web閲覧型エージェントのプロンプトインジェクション解説</td>
+                  <td>DEV Community</td>
+                  <td>
+                    <a
+                      href="https://dev.to/aiza-hextyx/grok-bot-prompt-injection-how-malicious-web-content-can-hijack-an-ai-agent-2elh"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://dev.to/aiza-hextyx/grok-bot-prompt-injection-how-malicious-web-content-can-hijack-an-ai-agent-2elh</a
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>17</td>
+                  <td>製品の変更が速いので、ドキュメントの更新履歴(changelog)を定期的に見る</td>
+                  <td>ドキュメントセット公開日などを追跡している</td>
+                  <td>Tech Dev Notes</td>
+                  <td>
+                    <a
+                      href="https://techdevnotes.com/releases/xai-docs/20260811-181704Z-cb236dea6e3d"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://techdevnotes.com/releases/xai-docs/20260811-181704Z-cb236dea6e3d</a
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>18</td>
+                  <td>Bot の使い方の実例を開発者の投稿から学ぶ(中身は各自で確認)</td>
+                  <td>Grok Bot 関連の開発者投稿のアーカイブ(Lingxi Li 氏の投稿)</td>
+                  <td>Lingxi Li(X の投稿のアーカイブ)</td>
+                  <td>
+                    <a
+                      href="https://archive.codenewsletter.ai/2094493172516966781"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://archive.codenewsletter.ai/2094493172516966781</a
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>19</td>
+                  <td>導入ガイドと技術解説を併読する</td>
+                  <td>常時稼働型 AI チームメイトの仕組みの解説</td>
+                  <td>Composio</td>
+                  <td>
+                    <a
+                      href="https://composio.dev/content/guide-to-frok-bot"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://composio.dev/content/guide-to-frok-bot</a
+                    >
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <h3 id="s19-2">19.2 ソースの信頼度の目安</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>区分</th>
+                  <th>該当</th>
+                  <th>読み方</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>★★★ 一次情報</td>
+                  <td>docs.x.ai、x.ai/news、Cursor 公式</td>
+                  <td>仕様の根拠として使う</td>
+                </tr>
+                <tr>
+                  <td>★★☆ 著名開発者の一般原則</td>
+                  <td>Simon Willison</td>
+                  <td>設計原則の根拠(Grok Bot 固有の検証ではない)</td>
+                </tr>
+                <tr>
+                  <td>★★☆ 独立した分析</td>
+                  <td>eesel、How to Harden、OneWave、Projeckt AI</td>
+                  <td>批判的視点。数値・仕様は公式で再確認</td>
+                </tr>
+                <tr>
+                  <td>★☆☆ 個人発信</td>
+                  <td>X の投稿、DEV Community</td>
+                  <td>事例・仮説として扱い、鵜呑みにしない</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="section" id="sec-20">
+          <h2><span class="num">20</span>参考URL一覧</h2>
+          <h3 id="s20-1">20.1 公式</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>名称</th>
+                  <th>URL</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Introducing Grok Bot(アンカー記事)</td>
+                  <td>
+                    <a
+                      href="https://x.ai/news/introducing-grok-bot"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://x.ai/news/introducing-grok-bot</a
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>Grok Bot ダウンロード/トップ</td>
+                  <td>
+                    <a href="https://x.ai/bot" target="_blank" rel="noopener noreferrer"
+                      >https://x.ai/bot</a
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>Grok Bot ガイド集</td>
+                  <td>
+                    <a href="https://x.ai/bot/guides" target="_blank" rel="noopener noreferrer"
+                      >https://x.ai/bot/guides</a
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>Grok Bot 101</td>
+                  <td>
+                    <a
+                      href="https://x.ai/bot/guides/grok-bot-101"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://x.ai/bot/guides/grok-bot-101</a
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>Templates for Grok Bot</td>
+                  <td>
+                    <a
+                      href="https://x.ai/bot/guides/templates-for-grok-bot"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://x.ai/bot/guides/templates-for-grok-bot</a
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>Grok Bot for Work</td>
+                  <td>
+                    <a
+                      href="https://x.ai/bot/guides/grok-bot-for-work"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://x.ai/bot/guides/grok-bot-for-work</a
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>ドキュメント: Get started</td>
+                  <td>
+                    <a
+                      href="https://docs.x.ai/grok-bot/get-started"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://docs.x.ai/grok-bot/get-started</a
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>ドキュメント: Skills and routines</td>
+                  <td>
+                    <a
+                      href="https://docs.x.ai/grok-bot/skills-routines-and-automations"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://docs.x.ai/grok-bot/skills-routines-and-automations</a
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>ドキュメント: Approvals, security, and privacy</td>
+                  <td>
+                    <a
+                      href="https://docs.x.ai/grok-bot/approvals-security-and-privacy"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://docs.x.ai/grok-bot/approvals-security-and-privacy</a
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>ドキュメント: Tag @bot on X</td>
+                  <td>
+                    <a
+                      href="https://docs.x.ai/grok-bot/tag-on-x"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://docs.x.ai/grok-bot/tag-on-x</a
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>ドキュメント: FAQ</td>
+                  <td>
+                    <a
+                      href="https://docs.x.ai/grok-bot/faq"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://docs.x.ai/grok-bot/faq</a
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>ドキュメント: Teams and enterprises(Cursor)</td>
+                  <td>
+                    <a
+                      href="https://cursor.com/docs/grok-bot/teams"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://cursor.com/docs/grok-bot/teams</a
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>ドキュメント: セキュリティ(Markdown 版)</td>
+                  <td>
+                    <a
+                      href="https://docs.x.ai/grok-bot/security.md"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://docs.x.ai/grok-bot/security.md</a
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>Cursor プライバシーポリシー</td>
+                  <td>
+                    <a href="https://cursor.com/privacy" target="_blank" rel="noopener noreferrer"
+                      >https://cursor.com/privacy</a
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>Cursor セキュリティ情報</td>
+                  <td>
+                    <a href="https://cursor.com/security" target="_blank" rel="noopener noreferrer"
+                      >https://cursor.com/security</a
+                    >
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <h3 id="s20-2">20.2 第三者・開発者</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>名称</th>
+                  <th>URL</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Simon Willison: The lethal trifecta</td>
+                  <td>
+                    <a
+                      href="https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/</a
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>Simon Willison: prompt-injection タグ</td>
+                  <td>
+                    <a
+                      href="https://simonwillison.net/tags/prompt-injection/?page=3"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://simonwillison.net/tags/prompt-injection/?page=3</a
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>How to Harden: Grok Bot Hardening Guide</td>
+                  <td>
+                    <a
+                      href="https://howtoharden.com/guides/grok-bot/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://howtoharden.com/guides/grok-bot/</a
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>eesel: Grok Bot explained</td>
+                  <td>
+                    <a
+                      href="https://www.eesel.ai/blog/grok-bot"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://www.eesel.ai/blog/grok-bot</a
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>eesel: Grok Bot alternatives</td>
+                  <td>
+                    <a
+                      href="https://www.eesel.ai/blog/grok-bot-alternatives"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://www.eesel.ai/blog/grok-bot-alternatives</a
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>OneWave AI: What it means for business</td>
+                  <td>
+                    <a
+                      href="https://www.onewave-ai.com/blog/grok-bot-explained-what-it-means-for-business"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://www.onewave-ai.com/blog/grok-bot-explained-what-it-means-for-business</a
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>Projeckt AI: Personal AI Agents Explained</td>
+                  <td>
+                    <a
+                      href="https://projecktai.substack.com/p/personal-ai-agents-explained"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://projecktai.substack.com/p/personal-ai-agents-explained</a
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>Vantaige: Grok Bot Complete Guide</td>
+                  <td>
+                    <a
+                      href="https://vantaige.io/blog/grok-bot-complete-guide-2026"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://vantaige.io/blog/grok-bot-complete-guide-2026</a
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>Cursor フォーラム: Privacy and Terms</td>
+                  <td>
+                    <a
+                      href="https://forum.cursor.com/t/privacy-and-term-of-use-of-grok-bot-with-cursor-account/168075"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://forum.cursor.com/t/privacy-and-term-of-use-of-grok-bot-with-cursor-account/168075</a
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>Composio: Guide to Grok Bot</td>
+                  <td>
+                    <a
+                      href="https://composio.dev/content/guide-to-frok-bot"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://composio.dev/content/guide-to-frok-bot</a
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>DEV Community: Grok Bot Prompt Injection</td>
+                  <td>
+                    <a
+                      href="https://dev.to/aiza-hextyx/grok-bot-prompt-injection-how-malicious-web-content-can-hijack-an-ai-agent-2elh"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://dev.to/aiza-hextyx/grok-bot-prompt-injection-how-malicious-web-content-can-hijack-an-ai-agent-2elh</a
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>Tech Dev Notes: xAI Docs リリースノート</td>
+                  <td>
+                    <a
+                      href="https://techdevnotes.com/releases/xai-docs/20260811-181704Z-cb236dea6e3d"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://techdevnotes.com/releases/xai-docs/20260811-181704Z-cb236dea6e3d</a
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>Lingxi Li 氏の投稿(アーカイブ)</td>
+                  <td>
+                    <a
+                      href="https://archive.codenewsletter.ai/2094493172516966781"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://archive.codenewsletter.ai/2094493172516966781</a
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>PixelRainbow: VeilBreaker 投稿</td>
+                  <td>
+                    <a
+                      href="https://x.com/PixelRainbowNFT/status/2112021936662270175"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >https://x.com/PixelRainbowNFT/status/2112021936662270175</a
+                    >
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="section" id="sec-21">
+          <h2><span class="num">21</span>検証メモと限界</h2>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>項目</th>
+                  <th>内容</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>調査日</td>
+                  <td>2026年10月24日</td>
+                </tr>
+                <tr>
+                  <td>一次確認できたページ</td>
+                  <td>
+                    Get started / Skills and routines / Approvals, security, and privacy / Tag @bot
+                    on X(いずれも公式ドキュメント。最終更新は 2026年10月7日〜22日と記載)
+                  </td>
+                </tr>
+                <tr>
+                  <td>アンカー記事・ガイド集</td>
+                  <td>
+                    取得は行ったが、本ガイドの数値・仕様の根拠は主に
+                    <code>docs.x.ai</code> の確認済みページに置いた
+                  </td>
+                </tr>
+                <tr>
+                  <td>取得できなかったもの</td>
+                  <td>
+                    公式
+                    changelog(<code>x.ai/changelog/bot</code>)はボット検知でブロックされ内容を確認できていない。v0.78.1
+                    の Team Bot 専用 Vault の記述は、changelog の転載サイト(gradually.ai)と xAI
+                    関係者の X 投稿(stable 版を段階配信中)で確認した(2026年11月2日)
+                  </td>
+                </tr>
+                <tr>
+                  <td>第三者資料の扱い</td>
+                  <td>見出し・要旨レベルで参照。仕様の断定は公式側の記述に限定</td>
+                </tr>
+                <tr>
+                  <td>Grok Bot 固有の著名開発者による詳細解説</td>
+                  <td>
+                    検索範囲では限定的。Simon Willison の記事は<strong>一般原則</strong>であり、Grok
+                    Bot の個別検証ではない
+                  </td>
+                </tr>
+                <tr>
+                  <td>料金・対応プラン・地域</td>
+                  <td>変更が速い。<strong>必ず公式の最新ページで確認</strong></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <blockquote>
+            <p>
+              <strong>免責</strong>:
+              本ガイドは情報提供を目的とし、製品の動作を保証しません。業務での本格導入前に、公式ドキュメントと組織のセキュリティ要件を確認してください。
+            </p>
+          </blockquote>
+        </section>
+        <footer class="footer">
+          Grok Bot
+          はベータ版です。仕様・料金・対応地域は変更されるため、必ず公式ドキュメントで最新情報を確認してください。
+        </footer>
+      </div>
+    </div>
+
+    <script
+      src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/highlight.min.js"
+      integrity="sha384-RH2xi4eIQ/gjtbs9fUXM68sLSi99C7ZWBRX1vDrVv6GQXRibxXLbwO2NGZB74MbU"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/mermaid@11.14.0/dist/mermaid.min.js"
+      integrity="sha384-1CMXl090wj8Dd6YfnzSQUOgWbE6suWCaenYG7pox5AX7apTpY3PmJMeS2oPql4Gk"
+      crossorigin="anonymous"
+    ></script>
+    <script>
+      const DIAGRAMS = {
+        'diag-0': `flowchart TB
+    U["あなた"]
+    B1["Bot A"]
+    B2["Bot B"]
+    B3["Bot C"]
+    PC["共有クラウドPC 個人Botで1台を共有"]
+    BR["ブラウザのログイン状態"]
+    FS["ファイルと workspace"]
+    CLI["コマンドライン資格情報"]
+    WEB["Webサイトやコマンドの接続先"]
+    BE["Cursorバックエンド リモートMCPの発信元"]
+    TOK["OAuthトークンはコネクタ側に保管"]
+    APP["接続アプリ Slack GitHubなど"]
+    U --> B1
+    U --> B2
+    U --> B3
+    B1 --> PC
+    B2 --> PC
+    B3 --> PC
+    PC --> BR
+    PC --> FS
+    PC --> CLI
+    BR --> WEB
+    CLI --> WEB
+    PC --> BE
+    WEB ~~~ BE
+    BE --> TOK
+    BE --> APP
+    class U,B1,B2,B3,BR,FS,CLI,WEB,TOK box
+    class PC,BE hub
+    class APP done
+
+classDef box fill:#ffffff,stroke:#3b4a9c,stroke-width:1.5px,color:#1f2430
+classDef hub fill:#3b4a9c,stroke:#3b4a9c,color:#ffffff
+classDef done fill:#2f6b4f,stroke:#2f6b4f,color:#ffffff
+`,
+        'diag-1': `flowchart TB
+    S0["準備"] --> S1["インストール"]
+    S1 --> S2["サインイン"]
+    S2 --> S3["最初のBot"]
+    S3 --> S4["依頼を書く"]
+    S4 --> S5["ログインは自分で"]
+    S5 --> S6["レビュー"]
+    S6 --> S7["Skill化"]
+    S7 --> S8["Routine化"]
+    class S0,S1,S2,S3,S4,S5,S6,S7 box
+    class S8 done
+
+classDef box fill:#ffffff,stroke:#3b4a9c,stroke-width:1.5px,color:#1f2430
+classDef hub fill:#3b4a9c,stroke:#3b4a9c,color:#ffffff
+classDef done fill:#2f6b4f,stroke:#2f6b4f,color:#ffffff
+`,
+        'diag-2': `flowchart TD
+    A["Grok Bot を使いたい"] --> B{"Cursorのデータ設定は Legacy Privacy Mode か"}
+    B -->|"はい"| C["対応するデータ設定へ変更する"]
+    B -->|"いいえ"| D["そのまま開始できる"]
+    C --> D
+    D --> E["学習利用の可否はCursor側設定で確認"]
+    class A,B,C,E box
+    class D done
+
+classDef box fill:#ffffff,stroke:#3b4a9c,stroke-width:1.5px,color:#1f2430
+classDef hub fill:#3b4a9c,stroke:#3b4a9c,color:#ffffff
+classDef done fill:#2f6b4f,stroke:#2f6b4f,color:#ffffff
+`,
+        'diag-3': `flowchart TB
+    NG["何でも屋 Bot 1体 避けたい構成"] --> NG2["文脈が散らかり品質が下がる"]
+    OKH["役割別に分ける 推奨構成"] --> P["分析担当"]
+    OKH --> Q["調査担当"]
+    OKH --> R["資料担当"]
+    NG2 ~~~ OKH
+    class NG,NG2,P,Q,R box
+    class OKH hub
+
+classDef box fill:#ffffff,stroke:#3b4a9c,stroke-width:1.5px,color:#1f2430
+classDef hub fill:#3b4a9c,stroke:#3b4a9c,color:#ffffff
+classDef done fill:#2f6b4f,stroke:#2f6b4f,color:#ffffff
+`,
+        'diag-4': `flowchart TD
+    A["Bot が認証画面に到達"] --> V{"個人Botか Shared Botか"}
+    V -->|"個人Bot"| P1["Vault パスワードマネージャ Secure Form を使う"]
+    V -->|"Shared Bot"| P2["個人Vaultは使わず パスワードマネージャ Secure Form を使う"]
+    P2 --> P3["Managerが追加したTeam Bot専用Vault v0.78.1以降 段階配信"]
+    P1 --> Q{"フォームで処理できるか"}
+    P3 --> Q
+    Q -->|"できる"| OK["Bot が続行"]
+    Q -->|"できない"| B["Take over を依頼"]
+    B --> C["あなたが Take over を選ぶ"]
+    C --> D["パスワード等を自分で入力"]
+    D --> E["I'm done を選ぶ"]
+    E --> F["Bot に続行を指示"]
+    F --> G["セッションはBotが使うコンピュータに保持"]
+    class A,V,P1,P2,P3,Q,B,C,D,E,F box
+    class OK,G done
+
+classDef box fill:#ffffff,stroke:#3b4a9c,stroke-width:1.5px,color:#1f2430
+classDef hub fill:#3b4a9c,stroke:#3b4a9c,color:#ffffff
+classDef done fill:#2f6b4f,stroke:#2f6b4f,color:#ffffff
+`,
+        'diag-5': `flowchart TD
+    A["1回限りのタスクで試す"] --> B{"結果は毎回安定しているか"}
+    B -->|"いいえ"| A
+    B -->|"はい"| C["Skill として保存"]
+    C --> D["安全な入力で Test 実行"]
+    D --> E{"承認ポイントで止まるか"}
+    E -->|"いいえ"| C
+    E -->|"はい"| F["Routine として自動化"]
+    F --> G["実行履歴を定期的に確認"]
+    class A,B,C,D,E,G box
+    class F done
+
+classDef box fill:#ffffff,stroke:#3b4a9c,stroke-width:1.5px,color:#1f2430
+classDef hub fill:#3b4a9c,stroke:#3b4a9c,color:#ffffff
+classDef done fill:#2f6b4f,stroke:#2f6b4f,color:#ffffff
+`,
+        'diag-6': `flowchart TB
+    X1["Xで @bot をタグ付け"] --> X2["@bot が受領返信"]
+    X2 --> X3["メインBotが作業開始"]
+    X3 --> X4["アプリの会話に結果"]
+    class X1,X2,X3 box
+    class X4 done
+
+classDef box fill:#ffffff,stroke:#3b4a9c,stroke-width:1.5px,color:#1f2430
+classDef hub fill:#3b4a9c,stroke:#3b4a9c,color:#ffffff
+classDef done fill:#2f6b4f,stroke:#2f6b4f,color:#ffffff
+`,
+        'diag-7': `flowchart TD
+    A["Bot が操作を実行しようとする"] --> B{"Ask first ルールに一致するか"}
+    B -->|"はい"| C["必ずあなたに確認する"]
+    B -->|"いいえ"| D{"Allow automatically ルールに一致するか"}
+    D -->|"はい"| E{"自動レビューが別の停止理由を見つけたか"}
+    E -->|"はい"| C
+    E -->|"いいえ"| F["自動で実行"]
+    D -->|"いいえ"| G["通常の承認フロー"]
+    class A,B,D,E,G box
+    class C hub
+    class F done
+
+classDef box fill:#ffffff,stroke:#3b4a9c,stroke-width:1.5px,color:#1f2430
+classDef hub fill:#3b4a9c,stroke:#3b4a9c,color:#ffffff
+classDef done fill:#2f6b4f,stroke:#2f6b4f,color:#ffffff
+`,
+        'diag-8': `flowchart TD
+    W["悪意のあるWebページ メール 投稿"] --> A["Bot が閲覧や読み取りをする"]
+    A --> P["隠れた指示を実行しかける"]
+    P --> S["共有コンピュータ"]
+    S --> F["ファイル"]
+    S --> L["ログイン済みセッション"]
+    S --> C["連携サービス"]
+    A --> G["防御は承認境界と最小権限と外部送信の禁止"]
+    class W,A,P,F,L,C box
+    class S hub
+    class G done
+
+classDef box fill:#ffffff,stroke:#3b4a9c,stroke-width:1.5px,color:#1f2430
+classDef hub fill:#3b4a9c,stroke:#3b4a9c,color:#ffffff
+classDef done fill:#2f6b4f,stroke:#2f6b4f,color:#ffffff
+`,
+        'diag-9': `flowchart TB
+    W1["Routine の実行履歴を確認"] --> W2["失敗や空振りを修正"]
+    W2 --> W3["使っていないコネクタを削除"]
+    W3 --> W4["Auto-review ルールを見直す"]
+    W4 --> W5["共有PCの機密ファイルを掃除"]
+    class W1,W2,W3,W4 box
+    class W5 done
+
+classDef box fill:#ffffff,stroke:#3b4a9c,stroke-width:1.5px,color:#1f2430
+classDef hub fill:#3b4a9c,stroke:#3b4a9c,color:#ffffff
+classDef done fill:#2f6b4f,stroke:#2f6b4f,color:#ffffff
+`,
+        'diag-10': `flowchart TD
+    R0["Routine が期待通り動かない"] --> R1{"一時停止されていないか"}
+    R1 -->|"停止中"| R2["Resume する"]
+    R1 -->|"動作中"| R3{"サイトのログインが切れていないか"}
+    R3 -->|"切れている"| R4["Take over で再ログイン"]
+    R3 -->|"有効"| R5{"Webサイトや入力形式が変わっていないか"}
+    R5 -->|"変わった"| R6["Skill を修正して Test で再確認"]
+    R5 -->|"変わらない"| R7["実行履歴と承認の期限切れを確認"]
+    class R0,R1,R3,R5,R2,R4,R6 box
+    class R7 done
+
+classDef box fill:#ffffff,stroke:#3b4a9c,stroke-width:1.5px,color:#1f2430
+classDef hub fill:#3b4a9c,stroke:#3b4a9c,color:#ffffff
+classDef done fill:#2f6b4f,stroke:#2f6b4f,color:#ffffff
+`,
+      };
+
+      /* syntax highlighting */
+      if (window.hljs) {
+        document.querySelectorAll('pre code').forEach(function (el) {
+          try {
+            window.hljs.highlightElement(el);
+          } catch (e) {}
+        });
+      }
+
+      /* mobile drawer */
+      (function () {
+        var body = document.body;
+        document.getElementById('menuBtn').addEventListener('click', function () {
+          body.classList.toggle('nav-open');
+        });
+        document.getElementById('scrim').addEventListener('click', function () {
+          body.classList.remove('nav-open');
+        });
+        document.querySelectorAll('.nav-a').forEach(function (a) {
+          a.addEventListener('click', function () {
+            body.classList.remove('nav-open');
+          });
+        });
+      })();
+
+      /* sidebar active highlight (scroll-position comparison) */
+      (function () {
+        var links = Array.prototype.slice.call(document.querySelectorAll('.nav-a'));
+        var secs = links.map(function (a) {
+          return document.querySelector(a.getAttribute('href'));
+        });
+        var ticking = false;
+        function update() {
+          ticking = false;
+          var line = window.innerHeight * 0.25,
+            cur = 0;
+          secs.forEach(function (s, i) {
+            if (s && s.getBoundingClientRect().top <= line) cur = i;
+          });
+          links.forEach(function (a, i) {
+            a.classList.toggle('active', i === cur);
+          });
+          var act = links[cur];
+          var sb = document.getElementById('sidebar');
+          if (act && sb.scrollHeight > sb.clientHeight) {
+            var r = act.getBoundingClientRect(),
+              sr = sb.getBoundingClientRect();
+            if (r.top < sr.top + 40 || r.bottom > sr.bottom - 40) {
+              sb.scrollTop += r.top - sr.top - sr.height / 2;
+            }
+          }
+        }
+        window.addEventListener(
+          'scroll',
+          function () {
+            if (!ticking) {
+              ticking = true;
+              requestAnimationFrame(update);
+            }
+          },
+          { passive: true },
+        );
+        window.addEventListener('resize', update);
+        update();
+      })();
+
+      /* mermaid: live client-side rendering */
+      (async function () {
+        if (!window.mermaid) return;
+        mermaid.initialize({
+          startOnLoad: false,
+          theme: 'base',
+          securityLevel: 'strict',
+          themeVariables: {
+            fontFamily: '"Noto Sans JP","Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif',
+            fontSize: '16px',
+            primaryColor: '#ffffff',
+            primaryBorderColor: '#3b4a9c',
+            primaryTextColor: '#1f2430',
+            lineColor: '#4a5160',
+            textColor: '#1f2430',
+          },
+          flowchart: {
+            htmlLabels: true,
+            useMaxWidth: false,
+            curve: 'basis',
+            nodeSpacing: 36,
+            rankSpacing: 46,
+            padding: 12,
+          },
+        });
+        var canvases = document.querySelectorAll('.diagram-canvas');
+        for (var i = 0; i < canvases.length; i++) {
+          var el = canvases[i],
+            id = el.getAttribute('data-diagram-id'),
+            src = DIAGRAMS[id];
+          if (!src) continue;
+          try {
+            var out = await mermaid.render('svg-' + id, src);
+            el.innerHTML = out.svg;
+            var svg = el.querySelector('svg');
+            if (svg) {
+              var vb = (svg.getAttribute('viewBox') || '').split(/\s+/).map(Number);
+              if (vb.length === 4) {
+                vb[3] += 15;
+                svg.setAttribute('viewBox', vb.join(' '));
+                svg.removeAttribute('width');
+                svg.removeAttribute('height');
+                svg.style.width = vb[2] + 'px';
+              }
+              svg.style.maxWidth = 'none';
+              svg.style.height = 'auto';
+              svg.style.overflow = 'visible';
+              svg.style.flexShrink = '0';
+            }
+          } catch (e) {
+            el.textContent = '図を表示できませんでした: ' + id;
+          }
+        }
+      })();
+    </script>
+  </body>
+</html>
