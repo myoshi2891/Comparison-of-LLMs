@@ -180,6 +180,18 @@ test("matches a code id only for the id attribute, not data-id", () => {
  assert.equal(audit(source,page).status,0);
 });
 
+test("keeps JSX comment syntax that is displayed text inside string expressions", () => {
+	const source = "<pre><code>{/* keep */}</code></pre>";
+	const viaConstant = 'const CODE = "{/* keep */}";\n<pre>{CODE}</pre>';
+	const viaExpression = '<pre>{"{/* keep */}"}</pre>';
+	assert.equal(audit(source, viaConstant).status, 0);
+	assert.equal(audit(source, viaExpression).status, 0);
+	// 文字列を守っても、本物の JSX コメントは従来どおり表示されない。
+	assert.equal(audit("<pre><code>a</code></pre>", '<pre>{/* hide */}{"a"}</pre>').status, 0);
+	assert.equal(audit(source, '<pre>{/* {"{/* keep */}"}</pre>').status, 1);
+	assert.equal(audit(source, 'const CODE = "";\n<pre>{CODE}</pre>').status, 1);
+});
+
 test("keeps literal entities in JSX strings equal to detached textContent payloads", () => {
  const source='<pre><code id="e"></code></pre><script type="text/plain" data-for="e">a &lt; b &amp;&amp; c</script>';
  const page='<pre><code>{"a &lt; b &amp;&amp; c"}</code></pre>';
