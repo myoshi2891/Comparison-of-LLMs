@@ -285,3 +285,12 @@ test("finds a real detached script after a comment holding an unclosed script ta
 	assert.deepEqual(match.data.missingCodeBlocks, []);
 	assert.equal(match.status, 0);
 });
+
+test("keeps literal markup in code blocks rendered from a string constant", () => {
+	const source = '<pre><code id="demo"></code></pre><script type="text/plain" data-for="demo">a<br>b <div>c</div></script>';
+	const page = 'const CODE = "a<br>b <div>c</div>";\n<pre><code>{CODE}</code></pre>';
+	const match = audit(source, page);
+	assert.deepEqual(match.data.missingCodeBlocks, []);
+	assert.equal(match.status, 0);
+	assert.equal(audit(source, 'const CODE = "ab c";\n<pre><code>{CODE}</code></pre>').status, 1);
+});
