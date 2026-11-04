@@ -64,6 +64,17 @@ export type PageEntry = z.infer<typeof PageEntrySchema>;
 
 const entries: PageEntry[] = [
   {
+    slug: "/claude/duet-best-practices",
+    title: "Claude Duet ベストプラクティス",
+    group: "Providers",
+    category: "Claude",
+    provider: "claude",
+    topics: ["claude", "agents", "security"],
+    summary: "Claude Duet の導入、依頼、承認、接続アプリと使用量管理を学ぶ初学者向けガイド。",
+    addedAt: "2026-11-04",
+    lastReviewed: "2026-11-04",
+  },
+  {
     slug: "/claude/models-best-practices",
     title: "Claude 最新モデル & Claude Code",
     group: "Providers",
