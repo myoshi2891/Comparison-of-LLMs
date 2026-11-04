@@ -29,7 +29,7 @@
 - `Xai-grok-bot-guide.md` 16.1: Shared Bot Secretsにも個人アカウントのログイン・APIキー・認証情報の登録を禁止し、チーム所有・最小権限に限定 `ccf23112`。
 - 全体Vitest **221 files／2368 tests**、typecheck・lint（597 files／0 diagnostics）・pytest成功。npm・ビルドは未実行、目視はユーザー担当。
 - 追加レビュー対応: `/google/models-best-practices` の `TocObserver` で、開いたモバイルドロワーのTab／Shift+Tabを `#gemini-menu` と目次リンクの間でDOM順に循環。Codexとは順序が逆（メニューがサイドバーより前）で、backdropは `tabIndex={-1}` のため対象外。ガイド外・bodyからの復帰も検証。Red `7f23b032` → Green `857d631e`。
-- 監査: コードブロック内の文字列 `<br>` を保持（図解ラベルの空白置換は維持）。text/plain payload の収集を差し込みと同じ走査に統一し、コメントアウトされたscriptを除外。Red `ee4d6ef9` → Green `ca7a9ea3`。定数経由のコードブロックも文字列式のまま解決し、タグ様の本文を保持。Red `bbaba338` → Green `bbaba338`。監査64テスト成功。原本・ページ57組の監査JSONは修正前後で完全一致。
+- 監査: コードブロック内の文字列 `<br>` を保持（図解ラベルの空白置換は維持）。text/plain payload の収集を差し込みと同じ走査に統一し、コメントアウトされたscriptを除外。Red `ee4d6ef9` → Green `ca7a9ea3`。定数経由のコードブロックも文字列式のまま解決し、タグ様の本文を保持。Red `f266e3fb` → Green `bbaba338`。監査64テスト成功。原本・ページ57組の監査JSONは修正前後で完全一致。
 - 全体Vitest **221 files／2377 tests**、typecheck・lint（597 files／0 diagnostics）・pytest 122件・ビルドが成功。目視はユーザー担当。
 - 既知の差分（本対応とは無関係）: `/claude/models-best-practices` の原本監査は修正前からexit 1（コード例1件・ZDR段落1件が原本と不一致）。
 
