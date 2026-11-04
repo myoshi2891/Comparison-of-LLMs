@@ -112,15 +112,15 @@
 
 - **フェーズ**: 保守・機能改善・品質強化フェーズ
 - **ブランチ**: `dev`
-- **最新実装 HEAD**: `64fc10c7`（フォントテスト整理 `64fc10c7`、監査 script内code修正 Red `4e8c1f3c` → Green `fc804748`。前回 監査 Red `a8a009d7` → Green `68ef60f8`、Refactor `a7b6995c`、テスト `c06a93f5`、ガイド `fa6be2c0`。それ以前 レビュー対応2: タグ除去の引用値内>・属性の左→右走査 Red `6ab71a07` → Green `a03d6ad4`。レビュー対応1: 監査 Red `d640a9fa` → `4201c669` → Fix `e9bb2cbc`、テスト強化 `38765e62`。OpenAI移行 Green `f2f96dc9` → Refactor `a6fbe7c9`）
-- **次の作業**: `/codex/models-best-practices` の目視確認（ユーザー担当、localhost:3000）。300px固定目次と900pxモバイル開閉、リストの点・番号、21表、10コード例の構文色・字下げ・コピー、8図、読書進捗、ヒーロー内の日付を確認する。npm・ビルドは未実行。
+- **最新実装 HEAD**: `acbec05c`（レビュー対応 Codexフォーカス復帰 Red `f903e4ee` → Green `8591cc6f`、Geminiフォーカス枠 Red `ac3d67f1` → Green `acbec05c`。前回 フォントテスト整理 `64fc10c7`、監査 script内code修正 Red `4e8c1f3c` → Green `fc804748`。前回 監査 Red `a8a009d7` → Green `68ef60f8`、Refactor `a7b6995c`、テスト `c06a93f5`、ガイド `fa6be2c0`。それ以前 レビュー対応2: タグ除去の引用値内>・属性の左→右走査 Red `6ab71a07` → Green `a03d6ad4`。レビュー対応1: 監査 Red `d640a9fa` → `4201c669` → Fix `e9bb2cbc`、テスト強化 `38765e62`。OpenAI移行 Green `f2f96dc9` → Refactor `a6fbe7c9`）
+- **次の作業**: `/codex/models-best-practices` の目視確認（ユーザー担当、localhost:3001）。300px固定目次と900pxモバイル開閉、リストの点・番号、21表、10コード例の構文色・字下げ・コピー、8図、読書進捗、ヒーロー内の日付を確認する。npm・ビルドは未実行。
 - **ルート実数**: `page.tsx` 98 件、registry 98 エントリ（現行ファイルから実測）。
 - **動作検証**:
   - ビルド: 今回はユーザー指定で未実行。過去の成功記録は 2026-09-17 の 90 静的ページであり、今回の変更を検証した値ではない。
   - `bun run typecheck` ✅（`tsc --noEmit`。2026-11-02 実測）
   - `bun run lint` ✅（Biome check / 597 files / 0 diagnostics。2026-11-02 実測）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=2 --testTimeout=30000` でVitest **221 files / 2344 tests すべて合格**（2026-11-03 実測。冗長なフォント部分一致テスト4件を削除）。typecheck・lint（変更パス）成功。
+  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=2 --testTimeout=30000` でVitest **221 files / 2379 tests すべて合格**（2026-11-04 実測）。typecheck・lint（変更パス）成功。
     - 初回全体検証は2239件中registryの日付不変条件1件が失敗。専用Red／Greenで修正後、全体を再実行して成功。依存・設定・ロックは変更していない。
     - `load(sourceHtml)` をモジュール初期化時に呼ぶ `governance/ai-governance/GuideContent.tsx` と
       `local-llm/finetuning-best-practices/GuideContent.tsx` は、import スモークでも読み込み可能であることを確認済み
@@ -581,17 +581,17 @@
 
 ```text
 AGENTS.md → CODEX.md → CLAUDE.md → docs/PROGRESS.md → Phase A–F 計画の順で読む。
-最新実装 HEAD: 64fc10c7（フォントテスト整理 64fc10c7、監査 script内code修正 Red 4e8c1f3c → Green fc804748。前回 監査 Red a8a009d7 → Green 68ef60f8、Refactor a7b6995c、テスト c06a93f5、ガイド fa6be2c0。それ以前 監査 Red 6ab71a07 → Green a03d6ad4、レビュー対応 Fix e9bb2cbc・テスト強化 38765e62。OpenAI移行 Green f2f96dc9 → Refactor a6fbe7c9）
-次の作業: /codex/models-best-practices の目視確認（ユーザー担当）。http://localhost:3000/codex/models-best-practices
+最新実装 HEAD: acbec05c（レビュー対応 Codexフォーカス復帰 Red f903e4ee → Green 8591cc6f、Geminiフォーカス枠 Red ac3d67f1 → Green acbec05c。前回 フォントテスト整理 64fc10c7、監査 script内code修正 Red 4e8c1f3c → Green fc804748。前回 監査 Red a8a009d7 → Green 68ef60f8、Refactor a7b6995c、テスト c06a93f5、ガイド fa6be2c0。それ以前 監査 Red 6ab71a07 → Green a03d6ad4、レビュー対応 Fix e9bb2cbc・テスト強化 38765e62。OpenAI移行 Green f2f96dc9 → Refactor a6fbe7c9）
+次の作業: /codex/models-best-practices の目視確認（ユーザー担当）。http://localhost:3001/codex/models-best-practices
 300px目次、900px以下の開閉、21表の左寄せ、リストの点・番号・marker色、10コード例の構文色・字下げ・コピー、8図と読書進捗を確認する。
 免責バナー直下の余白を一度だけ確保し、最終確認日・公開日はヒーロー内に表示する。
 指定HTMLを正本とし、原本2形式はarchive/へ退避済み（SHA-256一致）。Markdownの見出し・目次・図3件の差分は本書冒頭に記録。
-HTML原本監査exit 0、OpenAI対象50契約と関連76契約、全221 files／2344 tests、型・lint、pytest122件が成功。
+HTML原本監査exit 0、OpenAI対象50契約と関連76契約、全221 files／2379 tests、型・lint、pytest122件が成功。
 NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=2 --testTimeout=30000 を使用する。
 図解レイアウトは共有MermaidDiagramへ委譲。依存・設定・ロックは変更していない。
 監査は無指定calloutの既定infoを正規化し、本文欠落・warn変更を検出する。script／code開始タグとタグ除去は引用値内の>を消費し、属性は左から名前＋値の組で読んで data-for／id を文字参照復号後に解決。script 要素は丸ごと消費し、payload 内の未閉じ <code> が表示ブロックを食わない。監査64テスト成功。
 サンドボックスではnpmとビルドを実行しない。修正もRed → Green → Refactor → Docsの分離コミットを守る。
 page.tsx 98件、registry 98エントリ（実測）。次ページは指示されてから扱う。
-通常の bun run dev（Turbopack）がlocalhost:3000で起動中。OpenAIルートHTTP 200確認済み。
+localhost:3000は別プロジェクトのdevが使用中のため、起動元を確認してから止めること。本リポジトリのdevはbun run dev --port 3001で起動し、OpenAI／GeminiルートのHTTP 200を確認済み。
 共通フォントは next/font/local と保存済みWOFF2（public/fonts/latin/、SHA-256はREADMEで照合）を使用する。Webpack指定は不要。
 ```
