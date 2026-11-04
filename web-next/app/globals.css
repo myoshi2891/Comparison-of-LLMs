@@ -1889,6 +1889,9 @@ body:has([data-page="gemini-models"]).has-common-header {
 body:has([data-page="gemini-models"]) #site-freshness-bar {
   display: none;
 }
+body:has([data-page="gemini-models"]) .ch-disclaimer {
+  background: #26231c;
+}
 body:has([data-page="gemini-models"]) nav[aria-label="関連ページ"] {
   margin-left: 288px !important;
   background: #faf7f0;
