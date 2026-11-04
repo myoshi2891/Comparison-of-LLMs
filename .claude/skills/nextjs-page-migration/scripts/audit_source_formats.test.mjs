@@ -167,6 +167,25 @@ test("does not infer a good variant from unrelated attributes such as id", () =>
  assert.equal(audit(source,page.replace('styles.callout}','styles.callout} data-variant="warn"')).status,1);
 });
 
+test("does not infer a good variant from text inside another attribute's value", () => {
+ const page='<div className={styles.callout}><p>Original guidance text.</p></div>';
+ for (const attribute of [`title='see class="good"'`,`title="see data-variant='good'"`]) {
+  assert.equal(audit(`<div class="callout" ${attribute}><p>Original guidance text.</p></div>`,page).status,0,attribute);
+ }
+ const source='<div class="callout"><p>Original guidance text.</p></div>';
+ for (const attribute of [`title={"see className='good'"}`,`title={"a}b className='good'"}`,`{...{ title: "see className='good'" }}`]) {
+  assert.equal(audit(source,page.replace('styles.callout}',`styles.callout} ${attribute}`)).status,0,attribute);
+ }
+});
+
+test("still reads a good variant declared after other attributes", () => {
+ const source='<div class="callout tip"><p>Keep the complete explanation.</p></div>';
+ const page='<div className={styles.callout}><p>Keep the complete explanation.</p></div>';
+ for (const attributes of [`title="plain" data-variant="good"`,`title={"a}b"} data-variant='good'`,`{...rest} class=good`]) {
+  assert.equal(audit(source,page.replace('styles.callout}',`styles.callout} ${attributes}`)).status,0,attributes);
+ }
+});
+
 test("resolves text/plain data-for scripts whose attributes are unquoted", () => {
  const source='<pre><code id="demo"></code></pre><script type=text/plain data-for=demo>print("payload")</script>';
  const page='<pre><code>{"print(\\"payload\\")"}</code></pre>';

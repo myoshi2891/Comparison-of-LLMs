@@ -201,6 +201,21 @@ function normalizeSvgElement(raw) {
   return JSON.stringify({ tags, text: normalize(stripMarkup(raw)) });
 }
 
+/** JS の文字列リテラル。\x60 はバッククォートで、テンプレートの `${…}` も文字列本体として読み飛ばす。 */
+const JS_STRING_LITERAL = String.raw`"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|\x60(?:[^\x60\\]|\\.)*\x60`;
+
+/** JSX 式。文字列内の `}` で閉じたと誤認しないよう文字列を 1 単位で消費し、波括弧の入れ子は 1 段まで許容する。 */
+const JSX_EXPRESSION = String.raw`\{(?:[^{}"'\x60]|${JS_STRING_LITERAL}|\{(?:[^{}"'\x60]|${JS_STRING_LITERAL})*\})*\}`;
+
+/** 開始タグの属性 1 組（名前なしの `{...props}` を含む）。値の種類ごとに捕捉する。 */
+const TAG_ATTRIBUTE_RE = new RegExp(
+  String.raw`${JSX_EXPRESSION}|([^\s"'<>/={}]+)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|(${JSX_EXPRESSION})|([^\s"'=<>\x60{}]+)))?`,
+  "g"
+);
+
+/** good トークンを variant 指定として扱う属性名（小文字）。 */
+const VARIANT_ATTRIBUTE_NAMES = new Set(["class", "classname", "variant", "data-variant", "data-testid"]);
+
 /**
  * Creates a markup-independent comparison key for a callout or alert element.
  * @param {string} openingTag - The element's opening tag, including its type markers.
@@ -215,13 +230,12 @@ function normalizeCalloutElement(openingTag, content) {
     markers.add(value === "warning" ? "warn" : value === "note" ? "info" : value);
   }
   // good は "good-practices" 等の id にも含まれやすいため、variant 系属性の完全一致トークンに限って tip とみなす。
-  // JSX 式はテンプレートリテラルの `${…}` を 1 段まで含みうる。`[^}]*` だと最初の `}` で切れ、
-  // 後続の styles.good を取りこぼすため、1 段の入れ子波括弧を許容する。
-  const variantAttributeRe =
-    /(?:^|\s)(?:class|className|variant|data-variant|data-testid)\s*=\s*(?:"([^"]*)"|'([^']*)'|\{((?:[^{}]|\{[^{}]*\})*)\})/gi;
-  for (const attribute of openingTag.matchAll(variantAttributeRe)) {
-    const tokens = (attribute[1] ?? attribute[2] ?? attribute[3]).split(/[^\w-]+/);
-    if (tokens.some((token) => token.toLowerCase() === "good")) markers.add("tip");
+  // 属性は左から 1 組ずつ消費してから名前を比較する。名前の検索だと title='x class="good"' の
+  // 引用値内にも一致し、他の属性の説明文から tip が付いてしまう。
+  for (const attribute of openingTag.matchAll(TAG_ATTRIBUTE_RE)) {
+    if (!VARIANT_ATTRIBUTE_NAMES.has(attribute[1]?.toLowerCase())) continue;
+    const value = attribute[2] ?? attribute[3] ?? attribute[4] ?? attribute[5] ?? "";
+    if (value.split(/[^\w-]+/).some((token) => token.toLowerCase() === "good")) markers.add("tip");
   }
   if (!["warn", "info", "tip", "success"].some((variant) => markers.has(variant))) {
     markers.add("info");
