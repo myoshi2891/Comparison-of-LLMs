@@ -234,7 +234,7 @@ it("原本143 CSS規則の宣言・メディア条件を漏れなく転写", () 
     const rules: postcss.Rule[] = [];
     ast.walkRules((r) => {
       if (
-        r.selector.replace(/\s+/g, " ") === scoped(source.selector) &&
+        cssValue(r.selector.replace(/\s+/g, " ")) === cssValue(scoped(source.selector)) &&
         (r.parent?.type === "atrule" ? (r.parent as postcss.AtRule).params : null) === source.media
       )
         rules.push(r);
