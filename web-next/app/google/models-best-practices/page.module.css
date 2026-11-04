@@ -559,6 +559,10 @@
   outline: 3px solid #9aa6e8;
   outline-offset: 2px;
 }
+/* 原本の #9aa6e8 は淡色背景とのコントラストが不足するため、転写規則を残して色だけ後続で補強する。 */
+.root .chk :global(input):focus-visible {
+  outline-color: var(--indigo);
+}
 .root .chk :global(span) {
   min-width: 0;
 }
