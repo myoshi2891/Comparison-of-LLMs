@@ -324,6 +324,7 @@ it("日本語と数字のアンカーをpercent encoded hashと混同せず追�
   expect(active()).toEqual(["#step-1-最初の-dot"]);
 });
 it("unmount時にscroll・resize・クリック・キー監視を解除", () => {
+  const removeWindow = vi.spyOn(window, "removeEventListener");
   const remove = vi.spyOn(EventTarget.prototype, "removeEventListener");
   const { unmount } = render(<Harness />);
   const r = root(),
@@ -334,7 +335,8 @@ it("unmount時にscroll・resize・クリック・キー監視を解除", () => 
   expect(r.classList.contains(styles.open)).toBe(false);
   expect(s.inert).toBe(false);
   expect(m.inert).toBe(false);
-  expect(remove.mock.calls.map((c) => c[0])).toEqual(
-    expect.arrayContaining(["scroll", "resize", "click", "keydown"])
+  expect(remove.mock.calls.map((c) => c[0])).toEqual(expect.arrayContaining(["click", "keydown"]));
+  expect(removeWindow.mock.calls.map((c) => c[0])).toEqual(
+    expect.arrayContaining(["scroll", "resize"])
   );
 });

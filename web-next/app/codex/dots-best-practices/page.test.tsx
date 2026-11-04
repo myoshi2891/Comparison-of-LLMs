@@ -302,6 +302,7 @@ it("原本80 CSS規則の全宣言・media条件を保持（図の配置は共�
 const declarations = (source: string, selector: string) => {
   const result: Record<string, string> = {};
   postcss.parse(source).walkRules((r) => {
+    if (r.parent?.type === "atrule") return;
     if (
       !r.selector
         .split(",")
@@ -365,4 +366,20 @@ it("生HTML注入・実行script・ページ側SVGサイズ強制を禁止", () 
   expect(source).not.toContain(["danger", "ously", "Set", "Inner", "HTML"].join(""));
   expect(source).not.toContain("<script");
   expect(css()).not.toMatch(/:global\(svg\)/);
+});
+
+it("モバイル目次とscrimは実測バーの下に配置しトグルを覆わない", () => {
+  const tops: Record<string, string> = {};
+  postcss.parse(css()).walkAtRules("media", (media) => {
+    if (media.params !== "(max-width: 900px)") return;
+    media.walkRules((rule) => {
+      rule.walkDecls("top", (decl) => {
+        tops[rule.selector] = decl.value;
+      });
+    });
+  });
+  for (const selector of [".root .sidebar", ".root .scrim"])
+    expect(tops[selector]).toBe(
+      "calc(var(--ch-height, 60px) + var(--ch-disclaimer-height, 0px) + var(--mobile-bar-height))"
+    );
 });
