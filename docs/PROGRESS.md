@@ -34,6 +34,9 @@
 - 追加レビュー対応（2026-11-04）: `/codex/models-best-practices` の `TocObserver` で、背景クリック等でフォーカスが目次外へ移っていても閉じるとメニューへ戻す（Googleと同じ `wasOpen` 判定）。Red `f903e4ee` → Green `8591cc6f`。`/google/models-best-practices` のチェックリストのフォーカス枠は転写規則を残し、後続規則で `outline-color: var(--indigo)` へ補強（順序も契約化）。Red `ac3d67f1` → Green `acbec05c`。
 - 全体Vitest **221 files／2379 tests**、typecheck・lint（597 files／0 diagnostics）・pytest 122件、OpenAI／Gemini原本監査exit 0。ビルドは未実行、目視はユーザー担当。
 - 追加レビュー対応（2026-11-04）: `latin-fonts-local.test.ts` がテスト名どおり `export` 修飾子を検証するよう強化 `8c8f87b6`。コードが正しいためRedコミットはなく、`jetbrainsMono`／`syne` それぞれの `export` を外す変異で対象テストのみ失敗することを確認（`lib/fonts.ts` は無変更）。件数は2379のまま。`CLAUDE.md` のコミット前チェックの基準値も同値へ更新。
+- 追加レビュー対応（2026-11-04）: 監査は文字列式とJSXコメントを同じ走査で消費し、表示文字列の `{/* … */}` を保持。Red `57c68b87` → Green `8298cf70`、監査65テスト成功、OpenAI／Gemini原本監査exit 0。`/google/models-best-practices` の免責バナーへ暗色背景 `#26231c` を指定。Red `b2e7b6a6` → Green `5ef6120f`。`Xai-grok-bot-guide.md` は公式changelogのv0.78.1記載を反映 `ec595ab4`（ページ直接取得は403のため検索経由の抜粋で確認。公式Vaultドキュメント未反映のため暫定扱いを維持）。
+- `/codex/models-best-practices` の `.root .layout` は `.root.layout` へ変更しない。`page.tsx` の内側 `.layout` に一致しており、原本の適用先と原本照合の `scoped()` を維持するため。
+- 全体Vitest **221 files／2380 tests**、typecheck・lint（597 files／0 diagnostics）・pytest 122件が成功。ビルドは未実行、目視はユーザー担当。
 - 既知の差分（本対応とは無関係）: `/claude/models-best-practices` の原本監査は修正前からexit 1（コード例1件・ZDR段落1件が原本と不一致）。
 
 ## OpenAI 最新モデルガイド移行（2026-11-02）
@@ -113,7 +116,7 @@
 
 - **フェーズ**: 保守・機能改善・品質強化フェーズ
 - **ブランチ**: `dev`
-- **最新実装 HEAD**: `8c8f87b6`（フォントexport検証 `8c8f87b6`、レビュー対応 Codexフォーカス復帰 Red `f903e4ee` → Green `8591cc6f`、Geminiフォーカス枠 Red `ac3d67f1` → Green `acbec05c`。前回 フォントテスト整理 `64fc10c7`、監査 script内code修正 Red `4e8c1f3c` → Green `fc804748`。前回 監査 Red `a8a009d7` → Green `68ef60f8`、Refactor `a7b6995c`、テスト `c06a93f5`、ガイド `fa6be2c0`。それ以前 レビュー対応2: タグ除去の引用値内>・属性の左→右走査 Red `6ab71a07` → Green `a03d6ad4`。レビュー対応1: 監査 Red `d640a9fa` → `4201c669` → Fix `e9bb2cbc`、テスト強化 `38765e62`。OpenAI移行 Green `f2f96dc9` → Refactor `a6fbe7c9`）
+- **最新実装 HEAD**: `ec595ab4`（Grokガイド `ec595ab4`、監査 JSXコメント保持 Red `57c68b87` → Green `8298cf70`、Gemini免責バナー Red `b2e7b6a6` → Green `5ef6120f`、フォントexport検証 `8c8f87b6`、レビュー対応 Codexフォーカス復帰 Red `f903e4ee` → Green `8591cc6f`、Geminiフォーカス枠 Red `ac3d67f1` → Green `acbec05c`。前回 フォントテスト整理 `64fc10c7`、監査 script内code修正 Red `4e8c1f3c` → Green `fc804748`。前回 監査 Red `a8a009d7` → Green `68ef60f8`、Refactor `a7b6995c`、テスト `c06a93f5`、ガイド `fa6be2c0`。それ以前 レビュー対応2: タグ除去の引用値内>・属性の左→右走査 Red `6ab71a07` → Green `a03d6ad4`。レビュー対応1: 監査 Red `d640a9fa` → `4201c669` → Fix `e9bb2cbc`、テスト強化 `38765e62`。OpenAI移行 Green `f2f96dc9` → Refactor `a6fbe7c9`）
 - **次の作業**: `/codex/models-best-practices` の目視確認（ユーザー担当、localhost:3001）。300px固定目次と900pxモバイル開閉、リストの点・番号、21表、10コード例の構文色・字下げ・コピー、8図、読書進捗、ヒーロー内の日付を確認する。npm・ビルドは未実行。
 - **ルート実数**: `page.tsx` 98 件、registry 98 エントリ（現行ファイルから実測）。
 - **動作検証**:
@@ -121,7 +124,7 @@
   - `bun run typecheck` ✅（`tsc --noEmit`。2026-11-02 実測）
   - `bun run lint` ✅（Biome check / 597 files / 0 diagnostics。2026-11-02 実測）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=2 --testTimeout=30000` でVitest **221 files / 2379 tests すべて合格**（2026-11-04 実測）。typecheck・lint（変更パス）成功。
+  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=2 --testTimeout=30000` でVitest **221 files / 2380 tests すべて合格**（2026-11-04 実測）。typecheck・lint（変更パス）成功。
     - 初回全体検証は2239件中registryの日付不変条件1件が失敗。専用Red／Greenで修正後、全体を再実行して成功。依存・設定・ロックは変更していない。
     - `load(sourceHtml)` をモジュール初期化時に呼ぶ `governance/ai-governance/GuideContent.tsx` と
       `local-llm/finetuning-best-practices/GuideContent.tsx` は、import スモークでも読み込み可能であることを確認済み
@@ -582,15 +585,15 @@
 
 ```text
 AGENTS.md → CODEX.md → CLAUDE.md → docs/PROGRESS.md → Phase A–F 計画の順で読む。
-最新実装 HEAD: 8c8f87b6（フォントexport検証 8c8f87b6、レビュー対応 Codexフォーカス復帰 Red f903e4ee → Green 8591cc6f、Geminiフォーカス枠 Red ac3d67f1 → Green acbec05c。前回 フォントテスト整理 64fc10c7、監査 script内code修正 Red 4e8c1f3c → Green fc804748。前回 監査 Red a8a009d7 → Green 68ef60f8、Refactor a7b6995c、テスト c06a93f5、ガイド fa6be2c0。それ以前 監査 Red 6ab71a07 → Green a03d6ad4、レビュー対応 Fix e9bb2cbc・テスト強化 38765e62。OpenAI移行 Green f2f96dc9 → Refactor a6fbe7c9）
+最新実装 HEAD: ec595ab4（Grokガイド ec595ab4、監査 JSXコメント保持 Red 57c68b87 → Green 8298cf70、Gemini免責バナー Red b2e7b6a6 → Green 5ef6120f、フォントexport検証 8c8f87b6、レビュー対応 Codexフォーカス復帰 Red f903e4ee → Green 8591cc6f、Geminiフォーカス枠 Red ac3d67f1 → Green acbec05c。前回 フォントテスト整理 64fc10c7、監査 script内code修正 Red 4e8c1f3c → Green fc804748。前回 監査 Red a8a009d7 → Green 68ef60f8、Refactor a7b6995c、テスト c06a93f5、ガイド fa6be2c0。それ以前 監査 Red 6ab71a07 → Green a03d6ad4、レビュー対応 Fix e9bb2cbc・テスト強化 38765e62。OpenAI移行 Green f2f96dc9 → Refactor a6fbe7c9）
 次の作業: /codex/models-best-practices の目視確認（ユーザー担当）。http://localhost:3001/codex/models-best-practices
 300px目次、900px以下の開閉、21表の左寄せ、リストの点・番号・marker色、10コード例の構文色・字下げ・コピー、8図と読書進捗を確認する。
 免責バナー直下の余白を一度だけ確保し、最終確認日・公開日はヒーロー内に表示する。
 指定HTMLを正本とし、原本2形式はarchive/へ退避済み（SHA-256一致）。Markdownの見出し・目次・図3件の差分は本書冒頭に記録。
-HTML原本監査exit 0、OpenAI対象50契約と関連76契約、全221 files／2379 tests、型・lint、pytest122件が成功。
+HTML原本監査exit 0、OpenAI対象50契約と関連76契約、全221 files／2380 tests、型・lint、pytest122件が成功。
 NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=2 --testTimeout=30000 を使用する。
 図解レイアウトは共有MermaidDiagramへ委譲。依存・設定・ロックは変更していない。
-監査は無指定calloutの既定infoを正規化し、本文欠落・warn変更を検出する。script／code開始タグとタグ除去は引用値内の>を消費し、属性は左から名前＋値の組で読んで data-for／id を文字参照復号後に解決。script 要素は丸ごと消費し、payload 内の未閉じ <code> が表示ブロックを食わない。監査64テスト成功。
+監査は無指定calloutの既定infoを正規化し、本文欠落・warn変更を検出する。script／code開始タグとタグ除去は引用値内の>を消費し、属性は左から名前＋値の組で読んで data-for／id を文字参照復号後に解決。script 要素は丸ごと消費し、payload 内の未閉じ <code> が表示ブロックを食わない。監査65テスト成功。
 サンドボックスではnpmとビルドを実行しない。修正もRed → Green → Refactor → Docsの分離コミットを守る。
 page.tsx 98件、registry 98エントリ（実測）。次ページは指示されてから扱う。
 localhost:3000は別プロジェクトのdevが使用中のため、起動元を確認してから止めること。本リポジトリのdevはbun run dev --port 3001で起動し、OpenAI／GeminiルートのHTTP 200を確認済み。
