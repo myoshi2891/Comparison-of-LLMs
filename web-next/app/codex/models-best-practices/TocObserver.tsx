@@ -33,7 +33,8 @@ export default function TocObserver() {
       const mobile = window.innerWidth <= 900;
       if (sidebar) {
         const hidden = mobile && !open;
-        if (hidden && sidebar.contains(document.activeElement)) menu?.focus();
+        // 背景クリック等でフォーカスが目次外へ移っていても、閉じたら開いた要素へ戻す。
+        if (hidden && (wasOpen || sidebar.contains(document.activeElement))) menu?.focus();
         sidebar.inert = hidden;
       }
       // モバイルのドロワー表示中は背後の本文を操作不能にする。Tab の循環は containFocus が担当する。
