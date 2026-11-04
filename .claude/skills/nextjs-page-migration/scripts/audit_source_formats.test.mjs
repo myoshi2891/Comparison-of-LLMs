@@ -236,3 +236,52 @@ test("ignores <code> text inside a quoted attribute when inserting a detached pa
  assert.equal(audit(source,'<pre><code></code></pre>').status,1);
  assert.equal(audit(source,'<pre><code>{"print(\\"payload\\")"}</code></pre>').status,0);
 });
+
+test("keeps a literal <br> in detached and page-side code blocks", () => {
+	// コード本文の <br> は改行指示ではなく表示される文字列。消すと同一ブロックが不一致になる。
+	const code = 'const html = "a<br>b<br/>c";';
+	const detached = `<pre><code id="demo"></code></pre><script type="text/plain" data-for="demo">${code}</script>`;
+	const page = `<pre><code>{${JSON.stringify(code)}}</code></pre>`;
+	const match = audit(detached, page);
+	assert.deepEqual(match.data.missingCodeBlocks, []);
+	assert.equal(match.status, 0);
+
+	const inline = '<pre><code>a&lt;br&gt;b</code></pre>';
+	assert.equal(audit(inline, '<pre><code>{"a<br>b"}</code></pre>').status, 0);
+});
+
+test("detects a literal <br> dropped from a page-side code block", () => {
+	const source = '<pre><code>a&lt;br&gt;b</code></pre>';
+	for (const page of ['<pre><code>{"ab"}</code></pre>', '<pre><code>{"a b"}</code></pre>']) {
+		const result = audit(source, page);
+		assert.equal(result.status, 1);
+		assert.equal(result.data.missingCodeBlocks.length, 1);
+	}
+});
+
+test("keeps replacing <br> in non-code diagram labels", () => {
+	const result = audit("<p>Step9 cost</p>", '<p>{"Step9<br/>cost"}</p>');
+	assert.deepEqual(result.data.missingParagraphs, []);
+	assert.equal(result.status, 0);
+});
+
+test("ignores a commented-out detached script that follows the real one", () => {
+	const source = '<pre><code id="demo"></code></pre><script type="text/plain" data-for="demo">real payload</script><!-- <script type="text/plain" data-for="demo">stale payload</script> -->';
+	const match = audit(source, '<pre><code>{"real payload"}</code></pre>');
+	assert.deepEqual(match.data.missingCodeBlocks, []);
+	assert.equal(match.status, 0);
+	assert.equal(audit(source, '<pre><code>{"stale payload"}</code></pre>').status, 1);
+});
+
+test("does not inject a detached script that exists only in a comment", () => {
+	const source = '<pre><code id="demo">kept text</code></pre><!-- <script type="text/plain" data-for="demo">stale payload</script> -->';
+	assert.equal(audit(source, '<pre><code>{"kept text"}</code></pre>').status, 0);
+	assert.equal(audit(source, '<pre><code>{"stale payload"}</code></pre>').status, 1);
+});
+
+test("finds a real detached script after a comment holding an unclosed script tag", () => {
+	const source = '<pre><code id="demo"></code></pre><!-- <script> --><script type="text/plain" data-for="demo">real payload</script>';
+	const match = audit(source, '<pre><code>{"real payload"}</code></pre>');
+	assert.deepEqual(match.data.missingCodeBlocks, []);
+	assert.equal(match.status, 0);
+});
