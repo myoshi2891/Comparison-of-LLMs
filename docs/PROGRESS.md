@@ -2,9 +2,24 @@
 
 > 本ファイルは Next.js 移行完了後の保守・改善フェーズにおける開発の進捗（特にテスト関連）および品質チェックのルールを記録する。
 >
-> - 最終更新日: **Updated 2026-11-04**
+> - 最終更新日: **Updated 2026-11-05**
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
+
+## Claude Duet ガイド移行（2026-11-05）
+
+- ルート: `/claude/duet-best-practices`。指定HTMLを正本とし、本文の情報基準日2026-10-25を保持。registryは着手日の2026-11-04でClaudeカテゴリへ登録し、ナビ・検索・RSS・関連リンクを導出する。
+- 全1 H1・21 H2・58 H3・4 H4・63段落・50リスト項目（9 ul／4 ol）・35表215行・8コード例・13図・9 callout・19チェック項目・9 FAQ・26外部リンクをPure JSXへ完全転写。
+- Redで原本から固定した `source-contract.json` により本文・見出し・表セル型／結合／順序・リスト型／開始番号／入れ子・CDN・構文トークン・143 CSS規則を全件照合。通常リストの点／番号／gold色、チェックリストのマーカーなし、全列左寄せ、アンカー余白、ブラウザ既定太字も検証する。
+- ページ40契約＋操作43契約の83件、registry／ナビを含む関連109件が成功。全体Vitest **223 files／2463 tests**、typecheck、lint **603 files／0 diagnostics**、pytest **122件**が成功。全13図はMermaid 10.9.8で解析成功、HTML原本監査はexit 0。
+- 操作処理の行・関数100%、分岐93.1%、文99.12%。チェック保存／復元／不正JSON／保存拒否／全完了／リセット、FAQ質問・回答検索／大文字小文字／該当なし／一括開閉、目次開閉／900px境界／inert／Tab循環／フォーカス／コピー／cleanupを検証。
+- 原本の300px固定目次と900pxモバイルドロワーを保持し、共有ヘッダー＋免責バナーと実測モバイルバーを避ける。日付はregistryからヒーローへ表示し、bodyの余白を一度だけ確保。図の配置・サイズとtooltipは共有MermaidDiagramへ委譲し、該当CSS規則・配置宣言のみ契約で明示除外する。
+- highlight.js 11.11.1の原本バージョンで8コード例を静的トークン化。先頭空白・改行・複数行トークンを保持し、依存・設定・ロックは変更していない。
+- Red `bd83bb80` → CSSセレクタ比較の引用符正規化 `82e38859` → Green `5193d811` → Refactor `9dc46b81`。固定の原本期待値は変更せず、CSS属性セレクタの整形時引用符差だけを比較処理で吸収した。
+- HTML／Markdownは `archive/html/Anthropic/Claude-duet-best-practices-guide.html`／`archive/md/Anthropic/Claude-duet-best-practices-guide.md` へ内容無変更で保存。HTML SHA-256 `d58c7595775ef0f97cafcf20eab38dbd2e0bc66f20b51cf027ae42bcf58ab99c`、Markdown `794c7312e05f0e520cda5461f4fb611f73dee0701d84f4ffad62a492cc37ae31`（移動前後一致）。
+- 保存時の経緯: `archive/` がGit除外対象であるため初回addは追加側に失敗し、`8d86a03f` は移動元削除のみを記録した。直ちにユーザーへ報告し、保存済み原本を `git add -f` で追加した修正 `2101e2dc` を分離。最終ツリーでは両原本を追跡済みで、履歴のresetは行っていない。
+- Markdown版も監査したがexit 1。H1・独立目次による見出し2件、冒頭メタ情報／目次表29行、出典・FAQ構造等11段落、図1・2・5・6・10・12に差がある。指定HTMLの本文と図を正本とし、Markdownから異なる内容を混ぜない。外部リンク・リスト・通常コードの欠落はない。
+- CSSキャッシュは起動前に存在しなかった。通常の `bun run dev --port 3001` を起動し、`http://localhost:3001/claude/duet-best-practices` のHTTP 200を確認。npm・ビルド・ブラウザ自動確認は未実行。目視確認はユーザー担当。
 
 ## レビュー指摘対応: WOFF2フォント・監査・テスト・Grok Botガイド（2026-11-03）
 
@@ -116,19 +131,19 @@
 
 - **フェーズ**: 保守・機能改善・品質強化フェーズ
 - **ブランチ**: `dev`
-- **最新実装 HEAD**: `ec595ab4`（Grokガイド `ec595ab4`、監査 JSXコメント保持 Red `57c68b87` → Green `8298cf70`、Gemini免責バナー Red `b2e7b6a6` → Green `5ef6120f`、フォントexport検証 `8c8f87b6`、レビュー対応 Codexフォーカス復帰 Red `f903e4ee` → Green `8591cc6f`、Geminiフォーカス枠 Red `ac3d67f1` → Green `acbec05c`。前回 フォントテスト整理 `64fc10c7`、監査 script内code修正 Red `4e8c1f3c` → Green `fc804748`。前回 監査 Red `a8a009d7` → Green `68ef60f8`、Refactor `a7b6995c`、テスト `c06a93f5`、ガイド `fa6be2c0`。それ以前 レビュー対応2: タグ除去の引用値内>・属性の左→右走査 Red `6ab71a07` → Green `a03d6ad4`。レビュー対応1: 監査 Red `d640a9fa` → `4201c669` → Fix `e9bb2cbc`、テスト強化 `38765e62`。OpenAI移行 Green `f2f96dc9` → Refactor `a6fbe7c9`）
-- **次の作業**: `/codex/models-best-practices` の目視確認（ユーザー担当、localhost:3001）。300px固定目次と900pxモバイル開閉、リストの点・番号、21表、10コード例の構文色・字下げ・コピー、8図、読書進捗、ヒーロー内の日付を確認する。npm・ビルドは未実行。
-- **ルート実数**: `page.tsx` 98 件、registry 98 エントリ（現行ファイルから実測）。
+- **最新実装 HEAD**: `9dc46b81`（Claude Duet: Red `bd83bb80` → 比較処理 `82e38859` → Green `5193d811` → Refactor `9dc46b81`。原本保存 `8d86a03f` → `2101e2dc`）。
+- **次の作業**: `/claude/duet-best-practices` の目視確認（ユーザー担当、localhost:3001）。300px固定目次と900pxモバイル開閉、35表、リストの点・番号、8コード例とコピー、13図、19チェックの保存・リセット、FAQ検索・開閉を確認する。npm・ビルドは未実行。
+- **ルート実数**: `page.tsx` 99 件、registry 99 エントリ（現行ファイルから実測）。
 - **動作検証**:
   - ビルド: 今回はユーザー指定で未実行。過去の成功記録は 2026-09-17 の 90 静的ページであり、今回の変更を検証した値ではない。
-  - `bun run typecheck` ✅（`tsc --noEmit`。2026-11-02 実測）
-  - `bun run lint` ✅（Biome check / 597 files / 0 diagnostics。2026-11-02 実測）
+  - `bun run typecheck` ✅（`tsc --noEmit`。2026-11-05 実測）
+  - `bun run lint` ✅（Biome check / 603 files / 0 diagnostics。2026-11-05 実測）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=2 --testTimeout=30000` でVitest **221 files / 2380 tests すべて合格**（2026-11-04 実測）。typecheck・lint（変更パス）成功。
-    - 初回全体検証は2239件中registryの日付不変条件1件が失敗。専用Red／Greenで修正後、全体を再実行して成功。依存・設定・ロックは変更していない。
+  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000` でVitest **223 files / 2463 tests すべて合格**（2026-11-05完了）。Refactor後の関連109契約、typecheck・lint（603 files／0 diagnostics）も成功。
+    - 過去のClaudeモデルガイド初回全体検証では2239件中registryの日付不変条件1件が失敗し、専用Red／Greenで修正済み。今回の全体2463件はすべて成功。依存・設定・ロックは変更していない。
     - `load(sourceHtml)` をモジュール初期化時に呼ぶ `governance/ai-governance/GuideContent.tsx` と
       `local-llm/finetuning-best-practices/GuideContent.tsx` は、import スモークでも読み込み可能であることを確認済み
-  - **バックエンド (`scraper/`)**: `uv run pytest` で122件成功（2026-11-02実測）。
+  - **バックエンド (`scraper/`)**: `uv run pytest` で122件成功（2026-11-05実測）。
 
 ## 最近の追加内容
 
@@ -585,17 +600,15 @@
 
 ```text
 AGENTS.md → CODEX.md → CLAUDE.md → docs/PROGRESS.md → Phase A–F 計画の順で読む。
-最新実装 HEAD: ec595ab4（Grokガイド ec595ab4、監査 JSXコメント保持 Red 57c68b87 → Green 8298cf70、Gemini免責バナー Red b2e7b6a6 → Green 5ef6120f、フォントexport検証 8c8f87b6、レビュー対応 Codexフォーカス復帰 Red f903e4ee → Green 8591cc6f、Geminiフォーカス枠 Red ac3d67f1 → Green acbec05c。前回 フォントテスト整理 64fc10c7、監査 script内code修正 Red 4e8c1f3c → Green fc804748。前回 監査 Red a8a009d7 → Green 68ef60f8、Refactor a7b6995c、テスト c06a93f5、ガイド fa6be2c0。それ以前 監査 Red 6ab71a07 → Green a03d6ad4、レビュー対応 Fix e9bb2cbc・テスト強化 38765e62。OpenAI移行 Green f2f96dc9 → Refactor a6fbe7c9）
-次の作業: /codex/models-best-practices の目視確認（ユーザー担当）。http://localhost:3001/codex/models-best-practices
-300px目次、900px以下の開閉、21表の左寄せ、リストの点・番号・marker色、10コード例の構文色・字下げ・コピー、8図と読書進捗を確認する。
-免責バナー直下の余白を一度だけ確保し、最終確認日・公開日はヒーロー内に表示する。
-指定HTMLを正本とし、原本2形式はarchive/へ退避済み（SHA-256一致）。Markdownの見出し・目次・図3件の差分は本書冒頭に記録。
-HTML原本監査exit 0、OpenAI対象50契約と関連76契約、全221 files／2380 tests、型・lint、pytest122件が成功。
-NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=2 --testTimeout=30000 を使用する。
-図解レイアウトは共有MermaidDiagramへ委譲。依存・設定・ロックは変更していない。
-監査は無指定calloutの既定infoを正規化し、本文欠落・warn変更を検出する。script／code開始タグとタグ除去は引用値内の>を消費し、属性は左から名前＋値の組で読んで data-for／id を文字参照復号後に解決。script 要素は丸ごと消費し、payload 内の未閉じ <code> が表示ブロックを食わない。監査65テスト成功。
+最新実装 HEAD: 9dc46b81（Claude Duet: Red bd83bb80 → 比較処理82e38859 → Green5193d811 → Refactor9dc46b81。原本保存8d86a03f → 2101e2dc）
+次の作業: /claude/duet-best-practices の目視確認（ユーザー担当）。http://localhost:3001/claude/duet-best-practices
+300px固定目次と900pxモバイル開閉、35表の左寄せ、リストの点・番号・marker色、8コード例の構文色・字下げ・コピー、13図、19チェックの保存・復元・リセット、9 FAQの検索・一括開閉を確認する。
+指定HTMLを正本とし、本文の情報基準日2026-10-25を保持。HTML／Markdownはarchiveへ内容無変更で保存（SHA-256一致）。Markdownの冒頭表・FAQ構造・6図の差は本書冒頭を参照。
+HTML原本監査exit 0、対象83契約（ページ40／操作43）、関連109契約、全体223 files／2463 tests、型・lint603 files、pytest122件が成功。
+操作処理の行／関数100%、分岐93.1%。図の配置・サイズは共有MermaidDiagramへ委譲。依存・設定・ロックは変更していない。
+NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000 を使用。
 サンドボックスではnpmとビルドを実行しない。修正もRed → Green → Refactor → Docsの分離コミットを守る。
-page.tsx 98件、registry 98エントリ（実測）。次ページは指示されてから扱う。
-localhost:3000は別プロジェクトのdevが使用中のため、起動元を確認してから止めること。本リポジトリのdevはbun run dev --port 3001で起動し、OpenAI／GeminiルートのHTTP 200を確認済み。
-共通フォントは next/font/local と保存済みWOFF2（public/fonts/latin/、SHA-256はREADMEで照合）を使用する。Webpack指定は不要。
+page.tsx 99件、pageRegistry配列99件（実測）。次ページは指示されてから扱う。
+通常devをbun run dev --port 3001で起動済み、新規ルートHTTP 200を確認。CSSキャッシュは起動前に存在しなかった。
+開始前から存在する未追跡Xai-grok-bot-guide.htmlは変更・コミットしていない。
 ```

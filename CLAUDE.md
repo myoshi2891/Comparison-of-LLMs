@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Updated 2026-11-04
+Updated 2026-11-05
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
@@ -9,6 +9,22 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 AIモデルの時間別コスト計算機 + AI ツール導入ガイド群。Python スクレイパーが各社料金ページから価格を自動取得し `pricing.json` を生成、**Next.js 16 App Router（SSG / `output: 'export'`）** がそれを読み込んで Netlify CDN へ配信する。Phase 1–14 でコスト計算機ページが Next.js 化済み。18 枚のガイドページ（旧 `legacy/` 配下）は Phase A–F で **全移行完了**（計画書は [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](docs/archive/NEXTJS_PHASE_A_F_PLAN.md) に保存）。さらに追加移行ページとして `/claude/managed-agents` や `/code-review/coderabbit-guide` 等を設置。
 
 ## アーキテクチャ
+
+Claude Duet ガイド `/claude/duet-best-practices` を追加（2026-11-04開始、2026-11-05完了）。
+指定HTMLの全84見出し（H1×1／H2×21／H3×58／H4×4）、63段落、50リスト項目、35表215行、
+8コード例、13図、9 callout、19チェック項目、9 FAQ、26外部リンクをPure JSXへ完全転写。
+原本由来の固定期待値で143 CSS規則、リストの点・番号・marker色、表の全列左寄せ、
+コード字下げとhighlight.js 11.11.1の全トークン、目次・チェック保存・FAQ検索を照合する。
+83契約（ページ40／操作43）と関連109契約、全体Vitest **223 files／2463 tests**、型・lint（603 files／0 diagnostics）、
+HTML原本監査exit 0、Mermaid 10.9.8で全13図の解析、pytest 122件が成功。
+操作部分の行／関数100%、分岐93.1%。300px固定目次と900pxモバイル開閉、
+inert・Tab循環・フォーカス復帰、コピー成功／失敗／cleanup、保存拒否・リセットを検証。
+共有ヘッダーの実測高さへ目次と進捗バーを補正し、registryの日付はヒーロー内へ表示。
+registryのClaudeカテゴリから導線を導出。追加・確認日は着手日の2026-11-04、本文の情報基準日2026-10-25を保持。
+HTML／Markdownはarchive/html/Anthropic/／archive/md/Anthropic/へ内容無変更で保存（SHA-256一致）。
+Markdown版との構造・図6件・出典段落の差があるため指定HTMLを正本とし、両形式を混在させない。
+npm・ビルドは未実行。CSSキャッシュは起動前に存在せず、通常devのlocalhost:3001でHTTP 200を確認。
+目視はユーザー担当。分離履歴は `docs/PROGRESS.md` を参照。
 
 OpenAI 最新モデルガイド `/codex/models-best-practices` を追加（2026-11-02）。
 指定HTMLの全52見出し（H1×1／H2×14／H3×37）、34段落、62リスト項目、21表159行、
@@ -520,7 +536,7 @@ Build:     cd web-next && bun run build
 以下を全て確認してからコミットすること：
 
 1. `cd web-next && bun run build` が成功（※Antigravityサンドボックス環境では実行禁止。他環境やCIでは必須）
-2. `cd web-next && bun run test` が完全に成功（221 files / 2380 tests pass、2026-11-04実測。`NODE_OPTIONS=--no-experimental-webstorage` と `--maxWorkers=1 --testTimeout=30000` を使用。収集失敗もブロッキング失敗として原因を調査する）
+2. `cd web-next && bun run test` が完全に成功（223 files / 2463 tests pass、2026-11-05実測。`NODE_OPTIONS=--no-experimental-webstorage` と `--maxWorkers=1 --testTimeout=30000` を使用。収集失敗もブロッキング失敗として原因を調査する）
 3. `cd web-next && bun run typecheck` が成功
 4. `cd web-next && bun run lint` が成功
 5. `cd scraper && uv run pytest` が成功
