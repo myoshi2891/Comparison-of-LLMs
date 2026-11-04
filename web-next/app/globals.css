@@ -1981,3 +1981,37 @@ body:has([data-page="claude-duet"]) nav[aria-label="関連ページ"] a {
     margin-left: 0 !important;
   }
 }
+
+/* OpenAI dots: isolate shared chrome from the source paper theme. */
+body:has([data-page="openai-dots"]).has-common-header {
+  margin-top: 0;
+  padding-top: calc(var(--ch-height, 60px) + var(--ch-disclaimer-height, 0px));
+  background: #faf7f0;
+}
+body:has([data-page="openai-dots"]) #site-freshness-bar {
+  display: none;
+}
+body:has([data-page="openai-dots"]) .ch-disclaimer {
+  background: #26231c;
+}
+body:has([data-page="openai-dots"]) nav[aria-label="関連ページ"] {
+  margin-left: 310px !important;
+  background: #faf7f0;
+  color: #1c1b19;
+  border-color: #ddd6c4;
+  --line: #ddd6c4;
+  --card: #fff;
+  --fg: #1c1b19;
+  --muted: #5b5666;
+  --accent: #3b3f8c;
+}
+body:has([data-page="openai-dots"]) nav[aria-label="関連ページ"] a {
+  color: #3b3f8c;
+  background: #fff;
+  border-color: #ddd6c4;
+}
+@media (max-width: 900px) {
+  body:has([data-page="openai-dots"]) nav[aria-label="関連ページ"] {
+    margin-left: 0 !important;
+  }
+}

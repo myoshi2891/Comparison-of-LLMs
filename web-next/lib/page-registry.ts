@@ -64,6 +64,18 @@ export type PageEntry = z.infer<typeof PageEntrySchema>;
 
 const entries: PageEntry[] = [
   {
+    slug: "/codex/dots-best-practices",
+    title: "OpenAI dots ベストプラクティス",
+    group: "Providers",
+    category: "Codex",
+    provider: "codex",
+    topics: ["openai", "agents", "security"],
+    summary:
+      "OpenAI dots の導入、Custom Rules、ブリーフ、安全設計と継続運用を学ぶ初学者向けガイド。",
+    addedAt: "2026-11-05",
+    lastReviewed: "2026-11-05",
+  },
+  {
     slug: "/claude/duet-best-practices",
     title: "Claude Duet ベストプラクティス",
     group: "Providers",
