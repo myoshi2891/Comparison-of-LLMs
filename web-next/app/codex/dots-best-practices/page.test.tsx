@@ -383,3 +383,42 @@ it("モバイル目次とscrimは実測バーの下に配置しトグルを覆�
       "calc(var(--ch-height, 60px) + var(--ch-disclaimer-height, 0px) + var(--mobile-bar-height))"
     );
 });
+
+it("原本の高詳細度アンカー規則を補正し全見出しの実効余白を確保する", () => {
+  const ast = postcss.parse(css());
+  for (const mobile of [false, true]) {
+    for (const heading of ["h1", "h2", "h3"]) {
+      const host = document.createElement("div");
+      host.className = "root";
+      const section = document.createElement("section");
+      section.className = "section";
+      const node = document.createElement(heading);
+      host.append(section);
+      section.append(node);
+      let value = "",
+        specificity = -1;
+      ast.walkRules((rule) => {
+        if (
+          rule.parent?.type === "atrule" &&
+          (!mobile || (rule.parent as postcss.AtRule).params !== "(max-width: 900px)")
+        )
+          return;
+        for (const source of rule.selector.split(",")) {
+          const selector = source.trim().replace(/:global\(([^)]+)\)/g, "$1");
+          if (!node.matches(selector)) continue;
+          const rank =
+            (selector.match(/\.[\w-]+/g) ?? []).length * 100 +
+            (selector.match(/(?:^|\s)[a-z][\w-]*/g) ?? []).length;
+          rule.walkDecls("scroll-margin-top", (decl) => {
+            const score = rank + (decl.important ? 10000 : 0);
+            if (score >= specificity) {
+              specificity = score;
+              value = decl.value;
+            }
+          });
+        }
+      });
+      expect(value, `${heading}, mobile=${mobile}`).toBe("calc(var(--header-height, 60px) + 80px)");
+    }
+  }
+});
