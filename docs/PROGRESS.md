@@ -33,6 +33,7 @@
 - 全体Vitest **221 files／2377 tests**、typecheck・lint（597 files／0 diagnostics）・pytest 122件・ビルドが成功。目視はユーザー担当。
 - 追加レビュー対応（2026-11-04）: `/codex/models-best-practices` の `TocObserver` で、背景クリック等でフォーカスが目次外へ移っていても閉じるとメニューへ戻す（Googleと同じ `wasOpen` 判定）。Red `f903e4ee` → Green `8591cc6f`。`/google/models-best-practices` のチェックリストのフォーカス枠は転写規則を残し、後続規則で `outline-color: var(--indigo)` へ補強（順序も契約化）。Red `ac3d67f1` → Green `acbec05c`。
 - 全体Vitest **221 files／2379 tests**、typecheck・lint（597 files／0 diagnostics）・pytest 122件、OpenAI／Gemini原本監査exit 0。ビルドは未実行、目視はユーザー担当。
+- 追加レビュー対応（2026-11-04）: `latin-fonts-local.test.ts` がテスト名どおり `export` 修飾子を検証するよう強化 `8c8f87b6`。コードが正しいためRedコミットはなく、`jetbrainsMono`／`syne` それぞれの `export` を外す変異で対象テストのみ失敗することを確認（`lib/fonts.ts` は無変更）。件数は2379のまま。`CLAUDE.md` のコミット前チェックの基準値も同値へ更新。
 - 既知の差分（本対応とは無関係）: `/claude/models-best-practices` の原本監査は修正前からexit 1（コード例1件・ZDR段落1件が原本と不一致）。
 
 ## OpenAI 最新モデルガイド移行（2026-11-02）
@@ -112,7 +113,7 @@
 
 - **フェーズ**: 保守・機能改善・品質強化フェーズ
 - **ブランチ**: `dev`
-- **最新実装 HEAD**: `acbec05c`（レビュー対応 Codexフォーカス復帰 Red `f903e4ee` → Green `8591cc6f`、Geminiフォーカス枠 Red `ac3d67f1` → Green `acbec05c`。前回 フォントテスト整理 `64fc10c7`、監査 script内code修正 Red `4e8c1f3c` → Green `fc804748`。前回 監査 Red `a8a009d7` → Green `68ef60f8`、Refactor `a7b6995c`、テスト `c06a93f5`、ガイド `fa6be2c0`。それ以前 レビュー対応2: タグ除去の引用値内>・属性の左→右走査 Red `6ab71a07` → Green `a03d6ad4`。レビュー対応1: 監査 Red `d640a9fa` → `4201c669` → Fix `e9bb2cbc`、テスト強化 `38765e62`。OpenAI移行 Green `f2f96dc9` → Refactor `a6fbe7c9`）
+- **最新実装 HEAD**: `8c8f87b6`（フォントexport検証 `8c8f87b6`、レビュー対応 Codexフォーカス復帰 Red `f903e4ee` → Green `8591cc6f`、Geminiフォーカス枠 Red `ac3d67f1` → Green `acbec05c`。前回 フォントテスト整理 `64fc10c7`、監査 script内code修正 Red `4e8c1f3c` → Green `fc804748`。前回 監査 Red `a8a009d7` → Green `68ef60f8`、Refactor `a7b6995c`、テスト `c06a93f5`、ガイド `fa6be2c0`。それ以前 レビュー対応2: タグ除去の引用値内>・属性の左→右走査 Red `6ab71a07` → Green `a03d6ad4`。レビュー対応1: 監査 Red `d640a9fa` → `4201c669` → Fix `e9bb2cbc`、テスト強化 `38765e62`。OpenAI移行 Green `f2f96dc9` → Refactor `a6fbe7c9`）
 - **次の作業**: `/codex/models-best-practices` の目視確認（ユーザー担当、localhost:3001）。300px固定目次と900pxモバイル開閉、リストの点・番号、21表、10コード例の構文色・字下げ・コピー、8図、読書進捗、ヒーロー内の日付を確認する。npm・ビルドは未実行。
 - **ルート実数**: `page.tsx` 98 件、registry 98 エントリ（現行ファイルから実測）。
 - **動作検証**:
@@ -581,7 +582,7 @@
 
 ```text
 AGENTS.md → CODEX.md → CLAUDE.md → docs/PROGRESS.md → Phase A–F 計画の順で読む。
-最新実装 HEAD: acbec05c（レビュー対応 Codexフォーカス復帰 Red f903e4ee → Green 8591cc6f、Geminiフォーカス枠 Red ac3d67f1 → Green acbec05c。前回 フォントテスト整理 64fc10c7、監査 script内code修正 Red 4e8c1f3c → Green fc804748。前回 監査 Red a8a009d7 → Green 68ef60f8、Refactor a7b6995c、テスト c06a93f5、ガイド fa6be2c0。それ以前 監査 Red 6ab71a07 → Green a03d6ad4、レビュー対応 Fix e9bb2cbc・テスト強化 38765e62。OpenAI移行 Green f2f96dc9 → Refactor a6fbe7c9）
+最新実装 HEAD: 8c8f87b6（フォントexport検証 8c8f87b6、レビュー対応 Codexフォーカス復帰 Red f903e4ee → Green 8591cc6f、Geminiフォーカス枠 Red ac3d67f1 → Green acbec05c。前回 フォントテスト整理 64fc10c7、監査 script内code修正 Red 4e8c1f3c → Green fc804748。前回 監査 Red a8a009d7 → Green 68ef60f8、Refactor a7b6995c、テスト c06a93f5、ガイド fa6be2c0。それ以前 監査 Red 6ab71a07 → Green a03d6ad4、レビュー対応 Fix e9bb2cbc・テスト強化 38765e62。OpenAI移行 Green f2f96dc9 → Refactor a6fbe7c9）
 次の作業: /codex/models-best-practices の目視確認（ユーザー担当）。http://localhost:3001/codex/models-best-practices
 300px目次、900px以下の開閉、21表の左寄せ、リストの点・番号・marker色、10コード例の構文色・字下げ・コピー、8図と読書進捗を確認する。
 免責バナー直下の余白を一度だけ確保し、最終確認日・公開日はヒーロー内に表示する。
