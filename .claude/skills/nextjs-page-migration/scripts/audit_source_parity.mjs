@@ -118,10 +118,14 @@ function stripMarkup(fragment, jsx = true, literalBreaks = false) {
   let text = fragment;
   if (jsx) {
     text = text
-      .replace(/\{\/\*[\s\S]*?\*\/\}/g, "")
+      // 文字列式と JSX コメントは同じ走査で左から消費する。コメント除去を先に別走査すると、
+      // 文字列として表示される `{/* … */}` まで消える。
       // 式内のブロックコメント（`{"http://…" /* NOSONAR */}` 等）は表示されないため読み飛ばす。
-      .replace(/\{\s*(?:\/\*[\s\S]*?\*\/\s*)*(?:"((?:[^"\\]|\\.)*)"|'((?:[^'\\]|\\.)*)'|`((?:[^`\\]|\\.)*)`)\s*(?:\/\*[\s\S]*?\*\/\s*)*\}/g,
-        (_match, double, single, template) => stash(decodeQuotedEntryEscapes(double ?? single ?? template)))
+      .replace(/\{\s*(?:\/\*[\s\S]*?\*\/\s*)*(?:"((?:[^"\\]|\\.)*)"|'((?:[^'\\]|\\.)*)'|`((?:[^`\\]|\\.)*)`)\s*(?:\/\*[\s\S]*?\*\/\s*)*\}|\{\/\*[\s\S]*?\*\/\}/g,
+        (_match, double, single, template) => {
+          const literal = double ?? single ?? template;
+          return literal === undefined ? "" : stash(decodeQuotedEntryEscapes(literal));
+        })
       .replace(/\{\s*(?:styles\.[A-Za-z0-9_-]+|[A-Za-z_$][\w$]*)\s*\}/g, "");
   }
   // 引用値は 1 単位で消費する。`[^>]*` だと title="a>b" の `>` でタグが閉じたと誤認し、
