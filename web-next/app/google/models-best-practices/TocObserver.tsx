@@ -30,8 +30,22 @@ export default function TocObserver() {
     };
     const close = () => sync(false);
     const toggle = () => sync(!root?.classList.contains(styles.open));
+    /** 開いたモバイルドロワーでは、Tab 移動をメニューと目次リンクの間で DOM 順に循環させる。 */
+    const containFocus = (event: KeyboardEvent) => {
+      if (!menu || !wasOpen || window.innerWidth > 900) return;
+      const stops = [menu, ...links];
+      const first = stops[0];
+      const last = stops[stops.length - 1];
+      const edge = event.shiftKey ? first : last;
+      const active = document.activeElement;
+      // 範囲内かつ端以外ならブラウザ既定の移動に任せる。
+      if (active !== edge && stops.some((stop) => stop === active)) return;
+      event.preventDefault();
+      (event.shiftKey ? last : first).focus();
+    };
     const key = (e: KeyboardEvent) => {
       if (e.key === "Escape") close();
+      if (e.key === "Tab") containFocus(e);
     };
     const update = () => {
       let current = 0;
