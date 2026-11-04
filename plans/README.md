@@ -12,6 +12,12 @@ Updated 2026-11-05
 
 基準コミット（drift 検出用）: `45940fd`
 
+保守同期（2026-11-05）: `/codex/dots-best-practices` を既存Codexカテゴリへ登録。
+007〜009のDONE状態を維持し、新規基盤プランは起票していない。原本照合・操作62契約、
+関連88件、全体Vitest **225 files／2525 tests**、型・lint（609 files／0 diagnostics）、
+HTML原本監査exit 0、Mermaid 12図の解析とpytest122件が成功。原本2形式は100%リネームで保存。
+npm・ビルドは未実行。次の作業はユーザーの目視確認（localhost:3000）。履歴は `docs/PROGRESS.md` を参照。
+
 保守同期（2026-11-05）: `/claude/duet-best-practices` を既存のClaudeカテゴリへ登録。
 007〜009のDONE状態を維持し、新規基盤プランは起票していない。原本照合・操作83契約、
 関連109契約、全体Vitest **223 files／2463 tests**、型・lint（603 files／0 diagnostics）、

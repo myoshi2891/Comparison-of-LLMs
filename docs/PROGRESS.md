@@ -6,6 +6,20 @@
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
 
+## OpenAI dots ガイド移行（2026-11-05）
+
+- ルート: `/codex/dots-best-practices`。指定HTMLを正本として、本文の情報基準日2026-10-24を保持。registryは2026-11-05でCodexカテゴリへ追加し、ナビ・検索・RSS・関連リンクを導出する。
+- 原本の全6 H1（hero＋5 Part見出し）・22 H2・52 H3・60段落・78リスト項目（17 ul／6 ol）・29表190行・5コード例・12図・18 callout・17チェック項目・外部リンク50件（32 URL）をPure JSXへ完全転写。27セクションの境界と日本語・数字の既存IDも保持。
+- Redで固定した `source-contract.json` により全文・順序・重複・表セル型と結合・リストの開始番号と入れ子・CDNのSRI／crossorigin・highlight.js 11.11.1の全トークン・80 CSS規則とmedia条件を照合。リストのdisc／decimal／circle／square、heroマーカーなし、チェックの取消線、全列左寄せを検証する。
+- ページ35契約＋操作27契約の計62件、registry／ナビを含む関連88件が成功。全体Vitest **225 files／2525 tests**、typecheck、lint **609 files／0 diagnostics**、pytest **122件**が成功。全12図をMermaid10.9.8で解析し、HTML原本監査はexit 0。全体テスト後のクラス整理も関連88件・型・lint・監査で成功。
+- TocObserverの行／関数100%、分岐94.8%、文99.06%。日本語をpercent encodeする `link.hash` を使わず、生href属性からIDを解決する。スクロール・最下部・目次内追従・900px境界・トグル／背景／Escape／リンク・実測バー高さ・inert・フォーカス復帰・Tab循環・cleanupを検証。
+- 原本の310px固定目次・900pxモバイル開閉を保持し、ヘッダー＋免責バナーの実測高さへ配置を補正。モバイルの目次とscrimは実測バーの下へ置き、トグルを覆わない。原本のアンカー規則（16px／mobile70px）が優先される不具合を詳細度・適用順の契約で検出し、同詳細度の後続規則でヘッダー高＋80pxへ補正した。
+- 原本チェックリストは通常のlabel／checkboxとしてクリックと取消し、CSSのチェック済み装飾を保持。保存・集計・コピーなど原本にない操作は追加していない。図のサイズと配置・tooltipは共有MermaidDiagramへ委譲するため、該当CSS規則・配置宣言のみ明示除外する。
+- 分離履歴: 初回Red `d43d0642` → モバイル配置追加Red／イベント監視補正 `fb630c9e` → アンカー実効余白追加Red `cf10adec` → Green `29a7e1ec` → Refactor `3395fbbd`。期待値は実装に合わせて変更していない。windowのイベント解除はjsdomのDOM EventTargetとは別にwindow自身をspyして検証するよう補正した。
+- 原本保存 `529e3272`: HTML／Markdownを `archive/html/OpenAI/Openai-dots-best-practices-guide.html`／`archive/md/OpenAI/Openai-dots-best-practices-guide.md` へgit mvで100%リネーム。HTML SHA-256 `05539d515aca79d8f03d80fb26e06cf44b1d77badcc2406f9c774241f19963dc`、Markdown `88c935ead8db60c36ef4fb81074f22fa5641819239b9eab43c5259034d38efea`（移動前後一致）。
+- Markdown版も監査したがexit 1。独立した `h3: 0.3 目次` と図1件（図1のsubgraphの有無・ラベル表記）に差がある。リンク・リスト・通常コード・表行・段落に欠落はない。指定HTMLを正本とし、異なる目次や図を混在させない。
+- CSSキャッシュを一時領域へ退避し、起動元が本リポジトリであることを確認した既存ポート3000のdevを再起動。通常 `bun run dev --port 3000` で `http://localhost:3000/codex/dots-best-practices` がHTTP 200。npm・ビルド・ブラウザ自動確認は未実行。目視確認はユーザー担当。
+
 ## Claude Duet ガイド移行（2026-11-05）
 
 - ルート: `/claude/duet-best-practices`。指定HTMLを正本とし、本文の情報基準日2026-10-25を保持。registryは着手日の2026-11-04でClaudeカテゴリへ登録し、ナビ・検索・RSS・関連リンクを導出する。
@@ -131,16 +145,16 @@
 
 - **フェーズ**: 保守・機能改善・品質強化フェーズ
 - **ブランチ**: `dev`
-- **最新実装 HEAD**: `9dc46b81`（Claude Duet: Red `bd83bb80` → 比較処理 `82e38859` → Green `5193d811` → Refactor `9dc46b81`。原本保存 `8d86a03f` → `2101e2dc`）。
-- **次の作業**: `/claude/duet-best-practices` の目視確認（ユーザー担当、localhost:3001）。300px固定目次と900pxモバイル開閉、35表、リストの点・番号、8コード例とコピー、13図、19チェックの保存・リセット、FAQ検索・開閉を確認する。npm・ビルドは未実行。
-- **ルート実数**: `page.tsx` 99 件、registry 99 エントリ（現行ファイルから実測）。
+- **最新実装 HEAD**: `3395fbbd`（OpenAI dots: Red `d43d0642` → 追加Red `fb630c9e`／`cf10adec` → Green `29a7e1ec` → Refactor `3395fbbd`。原本保存 `529e3272`）。
+- **次の作業**: `/codex/dots-best-practices` の目視確認（ユーザー担当、localhost:3000）。310px固定目次・900pxモバイル開閉・日本語アンカー・入れ子の点と番号・29表・5コード例・12図・17チェックを確認する。npm・ビルドは未実行。
+- **ルート実数**: `page.tsx` 100 件、registry 100 エントリ（現行ファイルから実測）。
 - **動作検証**:
   - ビルド: 今回はユーザー指定で未実行。過去の成功記録は 2026-09-17 の 90 静的ページであり、今回の変更を検証した値ではない。
   - `bun run typecheck` ✅（`tsc --noEmit`。2026-11-05 実測）
-  - `bun run lint` ✅（Biome check / 603 files / 0 diagnostics。2026-11-05 実測）
+  - `bun run lint` ✅（Biome check / 609 files / 0 diagnostics。2026-11-05 実測）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000` でVitest **223 files / 2463 tests すべて合格**（2026-11-05完了）。Refactor後の関連109契約、typecheck・lint（603 files／0 diagnostics）も成功。
-    - 過去のClaudeモデルガイド初回全体検証では2239件中registryの日付不変条件1件が失敗し、専用Red／Greenで修正済み。今回の全体2463件はすべて成功。依存・設定・ロックは変更していない。
+  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000` でVitest **225 files / 2525 tests すべて合格**（2026-11-05実測）。Refactor後の関連88契約、typecheck・lint（609 files／0 diagnostics）も成功。
+    - 過去のClaudeモデルガイド初回全体検証では2239件中registryの日付不変条件1件が失敗し、専用Red／Greenで修正済み。今回の全体2525件はすべて成功。依存・設定・ロックは変更していない。
     - `load(sourceHtml)` をモジュール初期化時に呼ぶ `governance/ai-governance/GuideContent.tsx` と
       `local-llm/finetuning-best-practices/GuideContent.tsx` は、import スモークでも読み込み可能であることを確認済み
   - **バックエンド (`scraper/`)**: `uv run pytest` で122件成功（2026-11-05実測）。
@@ -600,15 +614,16 @@
 
 ```text
 AGENTS.md → CODEX.md → CLAUDE.md → docs/PROGRESS.md → Phase A–F 計画の順で読む。
-最新実装 HEAD: 9dc46b81（Claude Duet: Red bd83bb80 → 比較処理82e38859 → Green5193d811 → Refactor9dc46b81。原本保存8d86a03f → 2101e2dc）
-次の作業: /claude/duet-best-practices の目視確認（ユーザー担当）。http://localhost:3001/claude/duet-best-practices
-300px固定目次と900pxモバイル開閉、35表の左寄せ、リストの点・番号・marker色、8コード例の構文色・字下げ・コピー、13図、19チェックの保存・復元・リセット、9 FAQの検索・一括開閉を確認する。
-指定HTMLを正本とし、本文の情報基準日2026-10-25を保持。HTML／Markdownはarchiveへ内容無変更で保存（SHA-256一致）。Markdownの冒頭表・FAQ構造・6図の差は本書冒頭を参照。
-HTML原本監査exit 0、対象83契約（ページ40／操作43）、関連109契約、全体223 files／2463 tests、型・lint603 files、pytest122件が成功。
-操作処理の行／関数100%、分岐93.1%。図の配置・サイズは共有MermaidDiagramへ委譲。依存・設定・ロックは変更していない。
+最新実装 HEAD: 3395fbbd（OpenAI dots: Red d43d0642 → 追加Red fb630c9e／cf10adec → Green29a7e1ec → Refactor3395fbbd。原本保存529e3272）
+次の作業: /codex/dots-best-practices の目視確認（ユーザー担当）。http://localhost:3000/codex/dots-best-practices
+310px目次・900pxモバイル開閉・日本語アンカー・全Part見出し・入れ子の点と番号・29表の左寄せ・5コード例の構文色と字下げ・12図・17チェックの装飾を確認。
+指定HTMLを正本とし、情報基準日2026-10-24を保持。原本2形式はarchiveへ100%リネームで保存（SHA-256一致）。Markdownの独立目次と図1件の差は本書冒頭を参照。
+HTML原本監査exit 0、対象62契約（ページ35／操作27）、関連88件、全225 files／2525 tests、型・lint609 files、pytest122件が成功。
+操作の行／関数100%、分岐94.8%。CSSの詳細度・適用順も検証済み。図の配置・サイズは共有MermaidDiagramへ委譲。依存・設定・ロックは変更していない。
 NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000 を使用。
 サンドボックスではnpmとビルドを実行しない。修正もRed → Green → Refactor → Docsの分離コミットを守る。
-page.tsx 99件、pageRegistry配列99件（実測）。次ページは指示されてから扱う。
-通常devをbun run dev --port 3001で起動済み、新規ルートHTTP 200を確認。CSSキャッシュは起動前に存在しなかった。
+page.tsx 100件、pageRegistry配列100件（実測）。次ページは指示されてから扱う。
+既存ポート3000の起動元を確認し、CSSキャッシュ退避後bun run dev --port 3000で再起動済み。新規ルートHTTP 200。
+前回の /claude/duet-best-practices の移行・目視項目は本書の同名節を参照。
 開始前から存在する未追跡Xai-grok-bot-guide.htmlは変更・コミットしていない。
 ```

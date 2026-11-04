@@ -10,6 +10,22 @@ AIモデルの時間別コスト計算機 + AI ツール導入ガイド群。Pyt
 
 ## アーキテクチャ
 
+OpenAI dots ガイド `/codex/dots-best-practices` を追加（2026-11-05）。
+指定HTMLの全80見出し（H1×6／H2×22／H3×52）、60段落、78リスト項目、29表190行、
+5コード例、12図、18 callout、17チェック項目、外部リンク50件（32 URL）をPure JSXへ完全転写。
+原本から固定した本文・構造・80 CSS規則を62契約（ページ35／操作27）で照合。
+全体Vitest **225 files／2525 tests**、関連88契約、型・lint（609 files／0 diagnostics）、
+HTML原本監査exit 0、Mermaid 10.9.8の全12図解析、pytest122件が成功。
+操作部分の行／関数100%、分岐94.8%。入れ子の点・番号、heroのマーカーなし、
+チェック装飾、全列左寄せ、コード字下げとhighlight.js 11.11.1の全トークンを保持。
+310px固定目次と900pxモバイル開閉を維持し、日本語アンカー・inert・Tab循環・フォーカス・cleanupを検証。
+原本の高詳細度CSSに勝つアンカー余白と、開閉ボタンを覆わない実測バー下の配置を追加Redから修正。
+registryのCodexカテゴリから全導線を導出し、日付をヒーローへ表示。本文の情報基準日2026-10-24を保持。
+原本HTML／Markdownはarchive/html/OpenAI/／archive/md/OpenAI/へ100%リネームで保存（SHA-256一致）。
+Markdown版は独立目次と図1件に差があるため、指定HTMLを正本とし混在させない。
+npm・ビルドは未実行。CSSキャッシュ退避後、通常devのlocalhost:3000でHTTP 200を確認。
+目視はユーザー担当。分離履歴は `docs/PROGRESS.md` を参照。
+
 Claude Duet ガイド `/claude/duet-best-practices` を追加（2026-11-04開始、2026-11-05完了）。
 指定HTMLの全84見出し（H1×1／H2×21／H3×58／H4×4）、63段落、50リスト項目、35表215行、
 8コード例、13図、9 callout、19チェック項目、9 FAQ、26外部リンクをPure JSXへ完全転写。
@@ -536,7 +552,7 @@ Build:     cd web-next && bun run build
 以下を全て確認してからコミットすること：
 
 1. `cd web-next && bun run build` が成功（※Antigravityサンドボックス環境では実行禁止。他環境やCIでは必須）
-2. `cd web-next && bun run test` が完全に成功（223 files / 2463 tests pass、2026-11-05実測。`NODE_OPTIONS=--no-experimental-webstorage` と `--maxWorkers=1 --testTimeout=30000` を使用。収集失敗もブロッキング失敗として原因を調査する）
+2. `cd web-next && bun run test` が完全に成功（225 files / 2525 tests pass、2026-11-05実測。`NODE_OPTIONS=--no-experimental-webstorage` と `--maxWorkers=1 --testTimeout=30000` を使用。収集失敗もブロッキング失敗として原因を調査する）
 3. `cd web-next && bun run typecheck` が成功
 4. `cd web-next && bun run lint` が成功
 5. `cd scraper && uv run pytest` が成功
