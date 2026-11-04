@@ -277,6 +277,26 @@ it("モバイル目次の不可視・操作不能・復元と共有ヘッダー�
   const globals = fs.readFileSync("app/globals.css", "utf8");
   expect(globals).toContain('body:has([data-page="gemini-models"]) nav[aria-label="関連ページ"]');
 });
+it("チェックリストのフォーカス枠は転写値を保持し、後続規則で濃色へ補強する", () => {
+  const rules: postcss.Rule[] = [];
+  postcss.parse(css()).walkRules(".root .chk :global(input):focus-visible", (r) => {
+    rules.push(r);
+  });
+  const declarations = rules.map((r) =>
+    r.nodes.map((n) => {
+      const d = n as postcss.Declaration;
+      return [d.prop, d.value];
+    })
+  );
+  // 同じ詳細度のため順序も契約に含める。補強が先に来ると outline の短縮指定に打ち消される。
+  expect(declarations).toEqual([
+    [
+      ["outline", "3px solid #9aa6e8"],
+      ["outline-offset", "2px"],
+    ],
+    [["outline-color", "var(--indigo)"]],
+  ]);
+});
 it("生HTML注入・実行script・表直下の空白・図解サイズ強制を禁止", () => {
   const src = fs.readFileSync("app/google/models-best-practices/page.tsx", "utf8");
   expect(src).not.toContain(["danger", "ously", "Set", "Inner", "HTML"].join(""));
