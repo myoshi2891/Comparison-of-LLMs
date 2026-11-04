@@ -2,7 +2,7 @@
 
 > 本ファイルは Next.js 移行完了後の保守・改善フェーズにおける開発の進捗（特にテスト関連）および品質チェックのルールを記録する。
 >
-> - 最終更新日: **Updated 2026-11-03**
+> - 最終更新日: **Updated 2026-11-04**
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
 
@@ -21,6 +21,13 @@
 - 追加レビュー対応3: 監査の `<code>` 置換正規表現が引用属性値内の `<code>`（`title="<code>x"`）から一致を始め、後続の表示ブロックへの payload 差し込みを取りこぼす問題を修正（他のタグ・コメントも 1 単位で消費）。Red `65ede58f` → Green `f2561355`、監査57テスト成功、OpenAI／Gemini原本監査exit 0。回帰フィクスチャは `<span>` を使う（段落抽出 `extractTagContents` の開始タグ照合も引用値内の `>` に未対応で別課題として残置）。
 - `/codex/models-best-practices` の `TocObserver`: 900px以下でドロワーを開く閉→開の遷移時のみ先頭目次リンクへフォーカスし、開いている間は `<main>` を inert、cleanup で解除。Gemini／OpenAI紙色テーマの関連ページに `--line/--card/--fg/--muted/--accent` を宣言（白カード上で4.5:1以上をWCAG輝度で検証）。Red `8065f673` → Green `936d8a91`。metadata.description を完全一致で検証 OpenAI `69473f50`・Gemini `ba4ddc53`（いずれも基準日削除の変異で失敗を確認）。全体Vitest **221 files／2350 tests**、typecheck・lint（597 files／0 diagnostics）が成功。npm・ビルドは未実行、目視はユーザー担当。
 - `Xai-grok-bot-guide.md`: Team Bot専用Vaultの情報を第三者転載・X投稿由来の暫定情報と明記、個人アカウント登録を禁止しチーム所有・最小権限アカウントを指示、21章を初回調査日／追加確認日に分離 `fa6be2c0`。
+
+## レビュー指摘対応: モバイル目次のフォーカス・Shared Bot Secrets（2026-11-04）
+
+- `/codex/models-best-practices` の `TocObserver`: 開いたモバイルドロワーでTab／Shift+Tabを目次リンクとメニューの間で循環させ、`layout.tsx` が描画するRelatedPagesへ出ないようにした。閉じると無効化し、既存のinertは維持。Red `4bb7025e` → Green `14708dba`。
+- `/google/models-best-practices` の `TocObserver`: 900px以下で開くと先頭目次リンクへ移動し、チェックリストを含む `.main` をinert化。閉じると解除してメニューへフォーカスを戻す（背景クリックでフォーカスが背景へ移った場合も含む）。デスクトップの挙動は不変。Tab循環は指摘範囲外のため未追加で、最後の目次リンクからのTabはRelatedPagesへ出る。
+- `Xai-grok-bot-guide.md` 16.1: Shared Bot Secretsにも個人アカウントのログイン・APIキー・認証情報の登録を禁止し、チーム所有・最小権限に限定 `ccf23112`。
+- 全体Vitest **221 files／2368 tests**、typecheck・lint（597 files／0 diagnostics）・pytest成功。npm・ビルドは未実行、目視はユーザー担当。
 
 ## OpenAI 最新モデルガイド移行（2026-11-02）
 
