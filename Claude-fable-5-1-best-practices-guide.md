@@ -10,7 +10,7 @@
 ## 目次
 
 - [0. このガイドの読み方と情報の鮮度](#0-このガイドの読み方と情報の鮮度)
-- [1. Fable とは何か(位置づけと基本スペック)](#1-fable-とは何かの位置づけと基本スペック)
+- [1. Fable とは何か(位置づけと基本スペック)](#1-fable-とは何か位置づけと基本スペック)
 - [2. Fable 5.1 の挙動の特徴(旧モデルとの違い)](#2-fable-51-の挙動の特徴旧モデルとの違い)
 - [3. ステップ1: モデル選定](#3-ステップ1-モデル選定)
 - [4. ステップ2: API 基本設定とブレイキングチェンジ対応](#4-ステップ2-api-基本設定とブレイキングチェンジ対応)
@@ -786,7 +786,7 @@ flowchart TD
 
 | 項目 | 内容 |
 | --- | --- |
-| 設定 | `fallbacks: "default"`(beta)で、そのカテゴリに推奨されるモデルへ再試行 |
+| 設定 | Claude API などでは `fallbacks: "default"`(beta)で、そのカテゴリに推奨されるモデルへ再試行。**Amazon Bedrock、Google Cloud の Google 管理モデル、Microsoft Foundry では利用不可**のため、SDK ミドルウェアまたはクライアント側のリトライで実装する |
 | thinking の扱い | モデルが変わると、Fable 5.1 の thinking は引き継がれない(第4章) |
 | 課金 | 出力前の refusal も、誤検知が少ないカテゴリでは課金される(2026-09-24 以降)。ストリーム途中の refusal は、入力と出力済み分が通常料金で課金。**fallback credit** で、モデル切り替えに伴うキャッシュコストが返金される |
 
@@ -927,7 +927,7 @@ flowchart TD
 - [ ] `prefix_mismatch_behavior` を明示し、`input_transformations` を監視している
 - [ ] 進捗表示に `thinking.display: "updates"`(beta)を使うか、不要か判断した
 - [ ] `max_tokens` が、思考+本文の合計に十分な余裕を持つ
-- [ ] refusal を処理し、fallback(Opus 4.8 / Opus 5)を設定した
+- [ ] refusal を処理し、fallback(Opus 4.8 / Opus 5)を設定した(Amazon Bedrock、Google Cloud の Google 管理モデル、Microsoft Foundry では `fallbacks: "default"` を使えないため、SDK ミドルウェアまたはクライアント側のリトライを使う)
 
 ### B.2 プロンプト
 
