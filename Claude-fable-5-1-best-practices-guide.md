@@ -134,7 +134,7 @@ flowchart TD
 | --- | --- | --- |
 | **執拗なまでの主体性** | Simon Willison は Fable 5 を「relentlessly proactive」と表現。スクリーンショット1枚と1行の指示から、依存関係を調べ、一時サーバーを立て、ブラウザを操作して原因を特定した | 放置運用に強い一方、**スコープ逸脱と安全面のリスク**が増える |
 | **薄いシステムプロンプトを好む** | Thariq Shihipar(Anthropic 当時)は、Claude Code のシステムプロンプトを約80%削減したと発言。例示は「より想像力のあるモデルを縛る」場合がある | プロンプトは**短く、ゴールと制約中心**に |
-| **常時 thinking** | `thinking: disabled` は 400 エラー。`temperature` / `top_p` / `top_k` 指定、アシスタントのプレフィル、も 400 エラー | 旧来の制御パラメータに頼らない設計へ |
+| **常時 thinking** | `thinking: disabled` とアシスタントのプレフィルは 400 エラー。Claude API では `temperature` / `top_p` / `top_k` の指定も 400 エラー。例外として Microsoft Foundry の公式資料では、`top_p` は 0.99 以上なら受け付けられる(省略時は 0.99。`temperature` / `top_k` は非対応) | 旧来の制御パラメータに頼らない設計へ |
 
 ### 2.2 Fable 5.1 で変わった点(Fable 5 → 5.1)
 
@@ -230,7 +230,7 @@ for block in response.content:
 
 | # | 変更 | 症状 | 対処 |
 | --- | --- | --- | --- |
-| 1 | **強制ツール使用の廃止** | `tool_choice` が `any` / `tool` だと 400 エラー | `auto`(既定)に戻し、スキーマ保証は **strict tool use** か **structured outputs** へ。ツールを使わせたい場面はプロンプトで明示 |
+| 1 | **強制ツール使用の廃止** | `tool_choice` が `any` / `tool` だと 400 エラー | `auto`(既定)に戻し、スキーマ保証は **strict tool use** か **structured outputs** へ。ツールを使わせたい場面はプロンプトで明示。**CMEK 組織**の Fable / Mythos では structured outputs(`strict: true` を含む)を使えないため、`tool_choice: auto` のままプロンプトでツールの使用を明示して依頼する(スキーマは保証されない) |
 | 2 | **thinking ブロックがモデルに束縛される** | Fable 5.1 の thinking を読めるのは Fable 5.1 と Mythos 5.1 のみ | フォールバックやルーターでモデルを切り替えると、その間の推論は失われる(ブロックは自動で破棄され課金されない) |
 | 3 | **履歴編集で thinking が無効化** | thinking ブロックが無効化される。結果は設定で変わり、`prefix_mismatch_behavior: "error"` は 400 エラー(`bound to a different conversation`)、`"drop_block"` は該当ブロック以降を破棄して成功。未設定時の挙動はアカウント作成日で変わる(6.5節) | **履歴は append-only**(第6章) |
 | 4 | **advisor ツールの組み合わせ制限** | 実行側が Fable 5.1 のとき、Opus 5.5 / Opus 5 / Fable 5 の advisor は 400 エラー | advisor は **実行側以上の能力**を選ぶ |
@@ -618,7 +618,7 @@ flowchart TD
 | --- | --- | --- |
 | 既定 effort | Claude Code では Fable 5.1 の既定は **high**。ほかの Claude 画面では medium が既定という報告もある(二次情報) | wavect、remio |
 | 切り替え | `/effort` で変更。環境変数 `CLAUDE_CODE_EFFORT_LEVEL` が最優先 | 二次解説(mejba) |
-| 1ターンだけ上げる | プロンプトに `ultrathink` を含める(「think hard」は通常の文として扱われる) | 同上 |
+| 1ターンだけ上げる | プロンプトに `ultrathink` を含めると、そのターンだけ深い推論を指示できる(セッションの effort は変わらない。「think hard」は通常の文として扱われる)。**Claude Code v2.1.311 以降**のターミナルでは、そのターンの effort を `xhigh` へ上げられる場合があり、上がるときは単語が虹色で表示される。`CLAUDE_CODE_EFFORT_LEVEL`、`maxEffortLevel`、組織の effort 上限のいずれかが `xhigh` 未満だと上がらない。Amazon Bedrock ではキーワードで上がらないため、effort を直接設定する。Fable 5.1 の `xhigh` は `high` よりコストとレイテンシが大きい(5.3節)ので、難所のターンで改善を見込めるときに限って使う | 公式(Claude Code の Model configuration) |
 | モデル指定 | `/model claude-fable-5-1` | wavect |
 
 ```bash
@@ -786,13 +786,13 @@ flowchart TD
 
 | 項目 | 内容 |
 | --- | --- |
-| 設定 | Claude API などでは `fallbacks: "default"`(beta)で、そのカテゴリに推奨されるモデルへ再試行。**Amazon Bedrock、Google Cloud の Google 管理モデル、Microsoft Foundry では利用不可**のため、SDK ミドルウェアまたはクライアント側のリトライで実装する |
+| 設定 | Claude API などでは beta ヘッダー `server-side-fallback-2026-07-01` を付けた `fallbacks: "default"` で、そのカテゴリに推奨されるモデルへ再試行。**Amazon Bedrock、Google Cloud の Google 管理モデル、Microsoft Foundry では利用不可**のため、SDK ミドルウェアまたはクライアント側のリトライで実装する |
 | thinking の扱い | 切り替えの方向で異なる(第4章)。Opus 5 / Fable 5 / Mythos 5 から Fable 5.1 へ切り替えると thinking は引き継がれる。Fable 5.1 から別のモデルへ切り替えると引き継がれない(例外は Mythos 5.1) |
 | 課金 | 出力前の refusal も、誤検知が少ないカテゴリでは課金される(2026-09-24 以降)。ストリーム途中の refusal は、入力と出力済み分が通常料金で課金。**fallback credit** で、モデル切り替えに伴うキャッシュコストが返金される |
 
 ### 11.5 コンテンツの出自表示
 
-Fable 5.1 / Mythos 5.1 が生成するテキストには、**統計的なウォーターマーク**が付与されます(トークン追加や隠し文字はなし)。Files API で取得する画像・動画・音声には **C2PA のコンテンツクレデンシャル**が付きます。コンテンツの透明性を求める組織では、運用ポリシーに反映してください。
+Fable 5.1 / Mythos 5.1 が生成するテキストには、**統計的なウォーターマーク**が付与されます(トークン追加や隠し文字はなし)。Claude が生成した対応形式の画像・動画・音声のファイルを Claude API の Files API で取得すると、署名付きの **C2PA のコンテンツクレデンシャル**が付きます(入力として渡したファイルや他社が生成したメディアに付与するものではありません)。コンテンツの透明性を求める組織では、運用ポリシーに反映してください。
 
 ---
 
@@ -928,7 +928,7 @@ flowchart TD
 - [ ] `prefix_mismatch_behavior` を明示し、`input_transformations` を監視している
 - [ ] 進捗表示に `thinking.display: "updates"`(beta)を使うか、不要か判断した
 - [ ] `max_tokens` が、思考+本文の合計に十分な余裕を持つ
-- [ ] refusal を処理し、fallback(Opus 4.8 / Opus 5)を設定した(Amazon Bedrock、Google Cloud の Google 管理モデル、Microsoft Foundry では `fallbacks: "default"` を使えないため、SDK ミドルウェアまたはクライアント側のリトライを使う)
+- [ ] refusal を処理し、fallback(Opus 4.8 / Opus 5)を設定した(`fallbacks: "default"` には beta ヘッダー `server-side-fallback-2026-07-01` が必要。Amazon Bedrock、Google Cloud の Google 管理モデル、Microsoft Foundry では `fallbacks: "default"` を使えないため、SDK ミドルウェアまたはクライアント側のリトライを使う)
 
 ### B.2 プロンプト
 
