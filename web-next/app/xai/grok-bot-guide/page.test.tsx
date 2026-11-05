@@ -444,3 +444,15 @@ it("共通bodyクラスと鮮度バーIDをCSS Modulesでハッシュ化しな�
     selectors.some((s) => s.includes(").has-common-header") || s.includes(") #site-freshness-bar"))
   ).toBe(false);
 });
+
+it("引用段落とチェック項目は原本の親要素から文字色を継承する", () => {
+  // Root already supplies the normal ink; leaf overrides would erase quote/check colors.
+  const sheet = css();
+  for (const selector of [".root .section :global(p)", ".root .section :global(li)"]) {
+    expect(declarations(sheet, selector).color ?? "inherit").toBe("inherit");
+  }
+  expect(declarations(sheet, ".root .section :global(blockquote)").color).toBe("#3d3520");
+  expect(
+    declarations(sheet, ".root .section :global(li).check:has(:global(input):checked)").color
+  ).toBe("var(--ink-soft)");
+});
