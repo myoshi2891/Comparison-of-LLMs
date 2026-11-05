@@ -21,6 +21,12 @@
 - 分離履歴: Red `35b8bf87` → 追加Red `3d9c9acb`／`b5b98436` → Green `0b5db2f5` → Refactor `57dd9d24` → 原本保存 `1a3ffe6e`。原本の固定期待値は変更していない。追加RedのCSS抽出では:global()を比較時だけ正規化し、既存の期待値を維持した。
 - CSSキャッシュを一時領域へ退避し、通常 `bun run dev --port 3000` で `http://localhost:3000/xai/grok-bot-guide` がHTTP 200。目視はユーザー担当。npm・ビルド・ブラウザ自動確認は未実行。依存・設定・ロックは無変更。
 
+## postcss の devDependencies 追加（2026-11-05）
+
+- `b99b83dc`（15:37）で `web-next/package.json` の devDependencies に `postcss` `^8.5.18` を追加し、`web-next/bun.lock` の宣言へ同じ1行を追加した。解決版は既存エントリの8.5.23。Grok Bot移行の完了後の変更であり、同移行の「依存・設定・ロックは無変更」は移行範囲の記述として正しい。
+- コミット本文に追加理由の記載はなく、リポジトリ内に `postcss` の直接importはない。`postcss.config.mjs` は `@tailwindcss/postcss` のみを指定する。
+- ユーザー承認の記録は未確認。マージ前に明示的な承認を確認し、ここへ記録する。既存のロックファイルエントリは承認の代わりにならない。
+
 ## registryのagentトピック補正（2026-11-05）
 
 - `/codex/dots-best-practices`／`/claude/duet-best-practices` の `topics` に、既存の `agents` を残して完全一致の `agent` を追加。タグ検索と関連ページは完全一致で比較するため、`agents` だけでは `agent` タグの一覧と関連候補に含まれなかった。
@@ -645,6 +651,6 @@ HTML原本監査exit 0、対象62契約（ページ36／操作26）、関連89�
 操作の行／関数100%、分岐94.8%。78 CSS規則・全装飾クラスと表の不正空白ノード不在も検証済み。図の配置・サイズは共有MermaidDiagramへ委譲。
 NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000 を使用。
 サンドボックスではnpmとビルドを実行しない。Red → Green → Refactor → Docsの分離コミットを守る。
-page.tsxとpageRegistryは101件ずつ（実測）。次ページは指示されてから扱う。依存・設定・ロックは変更していない。
+page.tsxとpageRegistryは101件ずつ（実測）。次ページは指示されてから扱う。移行では依存・設定・ロックを変更していないが、移行後の `b99b83dc` で `postcss` をdevDependenciesへ追加済み（承認は未確認。本書の同名節を参照）。
 CSSキャッシュ退避後、通常bun run dev --port 3000で起動しHTTP 200。目視はユーザー担当。
 ```
