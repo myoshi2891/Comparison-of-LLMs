@@ -69,7 +69,7 @@ const entries: PageEntry[] = [
     group: "Providers",
     category: "Codex",
     provider: "codex",
-    topics: ["openai", "agents", "security"],
+    topics: ["openai", "agent", "agents", "security"],
     summary:
       "OpenAI dots の導入、Custom Rules、ブリーフ、安全設計と継続運用を学ぶ初学者向けガイド。",
     addedAt: "2026-11-05",
@@ -81,7 +81,7 @@ const entries: PageEntry[] = [
     group: "Providers",
     category: "Claude",
     provider: "claude",
-    topics: ["claude", "agents", "security"],
+    topics: ["claude", "agent", "agents", "security"],
     summary: "Claude Duet の導入、依頼、承認、接続アプリと使用量管理を学ぶ初学者向けガイド。",
     addedAt: "2026-11-04",
     lastReviewed: "2026-11-04",
