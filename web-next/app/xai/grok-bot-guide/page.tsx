@@ -204,7 +204,7 @@ const THEME = {
 };
 export default function Page() {
   const entry = findBySlug("/xai/grok-bot-guide");
-  if (!entry) throw new Error("dots guide is missing from the page registry");
+  if (!entry) throw new Error("Grok Bot guide is missing from the page registry");
   return (
     <div
       id="grok-guide"
@@ -224,18 +224,18 @@ export default function Page() {
       />
       {"\n"}
       {"    "}
-      <div className={[styles.layout].join(" ")}>
+      <div className={styles.layout}>
         {"\n"}
         {"      "}
         <nav
-          className={[styles.sidebar].join(" ")}
+          className={styles.sidebar}
           id="grok-sidebar"
           aria-label="目次"
           data-testid="sidebar-nav"
         >
           {"\n"}
           {"        "}
-          <div className={[styles.brand].join(" ")}>
+          <div className={styles.brand}>
             {"Grok Bot ガイド"}
             <small>{"初学者向けベストプラクティス"}</small>
           </div>
@@ -247,151 +247,139 @@ export default function Page() {
             data-testid="sidebar-nav-link"
             aria-current="location"
           >
-            <span className={[styles["n-num"]].join(" ")}>{"1"}</span>
-            <span className={[styles["n-t"]].join(" ")}>{"このガイドの使い方と前提"}</span>
+            <span className={styles["n-num"]}>{"1"}</span>
+            <span className={styles["n-t"]}>{"このガイドの使い方と前提"}</span>
           </a>
           {"\n"}
           {"        "}
-          <a className={[styles["nav-a"]].join(" ")} href="#sec-2" data-testid="sidebar-nav-link">
-            <span className={[styles["n-num"]].join(" ")}>{"2"}</span>
-            <span className={[styles["n-t"]].join(" ")}>{"Grok Bot とは何か"}</span>
+          <a className={styles["nav-a"]} href="#sec-2" data-testid="sidebar-nav-link">
+            <span className={styles["n-num"]}>{"2"}</span>
+            <span className={styles["n-t"]}>{"Grok Bot とは何か"}</span>
           </a>
           {"\n"}
           {"        "}
-          <a className={[styles["nav-a"]].join(" ")} href="#sec-3" data-testid="sidebar-nav-link">
-            <span className={[styles["n-num"]].join(" ")}>{"3"}</span>
-            <span className={[styles["n-t"]].join(" ")}>{"全体像をつかむ"}</span>
+          <a className={styles["nav-a"]} href="#sec-3" data-testid="sidebar-nav-link">
+            <span className={styles["n-num"]}>{"3"}</span>
+            <span className={styles["n-t"]}>{"全体像をつかむ"}</span>
           </a>
           {"\n"}
           {"        "}
-          <a className={[styles["nav-a"]].join(" ")} href="#sec-4" data-testid="sidebar-nav-link">
-            <span className={[styles["n-num"]].join(" ")}>{"4"}</span>
-            <span className={[styles["n-t"]].join(" ")}>{"Step 0: 始める前の準備"}</span>
+          <a className={styles["nav-a"]} href="#sec-4" data-testid="sidebar-nav-link">
+            <span className={styles["n-num"]}>{"4"}</span>
+            <span className={styles["n-t"]}>{"Step 0: 始める前の準備"}</span>
           </a>
           {"\n"}
           {"        "}
-          <a className={[styles["nav-a"]].join(" ")} href="#sec-5" data-testid="sidebar-nav-link">
-            <span className={[styles["n-num"]].join(" ")}>{"5"}</span>
-            <span className={[styles["n-t"]].join(" ")}>{"Step 1: アプリをインストールする"}</span>
+          <a className={styles["nav-a"]} href="#sec-5" data-testid="sidebar-nav-link">
+            <span className={styles["n-num"]}>{"5"}</span>
+            <span className={styles["n-t"]}>{"Step 1: アプリをインストールする"}</span>
           </a>
           {"\n"}
           {"        "}
-          <a className={[styles["nav-a"]].join(" ")} href="#sec-6" data-testid="sidebar-nav-link">
-            <span className={[styles["n-num"]].join(" ")}>{"6"}</span>
-            <span className={[styles["n-t"]].join(" ")}>{"Step 2: サインインする"}</span>
+          <a className={styles["nav-a"]} href="#sec-6" data-testid="sidebar-nav-link">
+            <span className={styles["n-num"]}>{"6"}</span>
+            <span className={styles["n-t"]}>{"Step 2: サインインする"}</span>
           </a>
           {"\n"}
           {"        "}
-          <a className={[styles["nav-a"]].join(" ")} href="#sec-7" data-testid="sidebar-nav-link">
-            <span className={[styles["n-num"]].join(" ")}>{"7"}</span>
-            <span className={[styles["n-t"]].join(" ")}>{"Step 3: 最初の Bot を設定する"}</span>
+          <a className={styles["nav-a"]} href="#sec-7" data-testid="sidebar-nav-link">
+            <span className={styles["n-num"]}>{"7"}</span>
+            <span className={styles["n-t"]}>{"Step 3: 最初の Bot を設定する"}</span>
           </a>
           {"\n"}
           {"        "}
-          <a className={[styles["nav-a"]].join(" ")} href="#sec-8" data-testid="sidebar-nav-link">
-            <span className={[styles["n-num"]].join(" ")}>{"8"}</span>
-            <span className={[styles["n-t"]].join(" ")}>{"Step 4: 良い依頼の書き方(5要素)"}</span>
+          <a className={styles["nav-a"]} href="#sec-8" data-testid="sidebar-nav-link">
+            <span className={styles["n-num"]}>{"8"}</span>
+            <span className={styles["n-t"]}>{"Step 4: 良い依頼の書き方(5要素)"}</span>
           </a>
           {"\n"}
           {"        "}
-          <a className={[styles["nav-a"]].join(" ")} href="#sec-9" data-testid="sidebar-nav-link">
-            <span className={[styles["n-num"]].join(" ")}>{"9"}</span>
-            <span className={[styles["n-t"]].join(" ")}>
-              {"Step 5: ログインは自分で行う(Take over)"}
-            </span>
+          <a className={styles["nav-a"]} href="#sec-9" data-testid="sidebar-nav-link">
+            <span className={styles["n-num"]}>{"9"}</span>
+            <span className={styles["n-t"]}>{"Step 5: ログインは自分で行う(Take over)"}</span>
           </a>
           {"\n"}
           {"        "}
-          <a className={[styles["nav-a"]].join(" ")} href="#sec-10" data-testid="sidebar-nav-link">
-            <span className={[styles["n-num"]].join(" ")}>{"10"}</span>
-            <span className={[styles["n-t"]].join(" ")}>{"Step 6: 結果をレビューして育てる"}</span>
+          <a className={styles["nav-a"]} href="#sec-10" data-testid="sidebar-nav-link">
+            <span className={styles["n-num"]}>{"10"}</span>
+            <span className={styles["n-t"]}>{"Step 6: 結果をレビューして育てる"}</span>
           </a>
           {"\n"}
           {"        "}
-          <a className={[styles["nav-a"]].join(" ")} href="#sec-11" data-testid="sidebar-nav-link">
-            <span className={[styles["n-num"]].join(" ")}>{"11"}</span>
-            <span className={[styles["n-t"]].join(" ")}>{"Step 7: Skill 化 → Routine 化"}</span>
+          <a className={styles["nav-a"]} href="#sec-11" data-testid="sidebar-nav-link">
+            <span className={styles["n-num"]}>{"11"}</span>
+            <span className={styles["n-t"]}>{"Step 7: Skill 化 → Routine 化"}</span>
           </a>
           {"\n"}
           {"        "}
-          <a className={[styles["nav-a"]].join(" ")} href="#sec-12" data-testid="sidebar-nav-link">
-            <span className={[styles["n-num"]].join(" ")}>{"12"}</span>
-            <span className={[styles["n-t"]].join(" ")}>
-              {"Step 8: X から @bot でタスクを渡す"}
-            </span>
+          <a className={styles["nav-a"]} href="#sec-12" data-testid="sidebar-nav-link">
+            <span className={styles["n-num"]}>{"12"}</span>
+            <span className={styles["n-t"]}>{"Step 8: X から @bot でタスクを渡す"}</span>
           </a>
           {"\n"}
           {"        "}
-          <a className={[styles["nav-a"]].join(" ")} href="#sec-13" data-testid="sidebar-nav-link">
-            <span className={[styles["n-num"]].join(" ")}>{"13"}</span>
-            <span className={[styles["n-t"]].join(" ")}>
-              {"承認(Approvals)と Auto Review の設計"}
-            </span>
+          <a className={styles["nav-a"]} href="#sec-13" data-testid="sidebar-nav-link">
+            <span className={styles["n-num"]}>{"13"}</span>
+            <span className={styles["n-t"]}>{"承認(Approvals)と Auto Review の設計"}</span>
           </a>
           {"\n"}
           {"        "}
-          <a className={[styles["nav-a"]].join(" ")} href="#sec-14" data-testid="sidebar-nav-link">
-            <span className={[styles["n-num"]].join(" ")}>{"14"}</span>
-            <span className={[styles["n-t"]].join(" ")}>{"セキュリティの境界を理解する"}</span>
+          <a className={styles["nav-a"]} href="#sec-14" data-testid="sidebar-nav-link">
+            <span className={styles["n-num"]}>{"14"}</span>
+            <span className={styles["n-t"]}>{"セキュリティの境界を理解する"}</span>
           </a>
           {"\n"}
           {"        "}
-          <a className={[styles["nav-a"]].join(" ")} href="#sec-15" data-testid="sidebar-nav-link">
-            <span className={[styles["n-num"]].join(" ")}>{"15"}</span>
-            <span className={[styles["n-t"]].join(" ")}>
-              {"最小権限セットアップ・チェックリスト"}
-            </span>
+          <a className={styles["nav-a"]} href="#sec-15" data-testid="sidebar-nav-link">
+            <span className={styles["n-num"]}>{"15"}</span>
+            <span className={styles["n-t"]}>{"最小権限セットアップ・チェックリスト"}</span>
           </a>
           {"\n"}
           {"        "}
-          <a className={[styles["nav-a"]].join(" ")} href="#sec-16" data-testid="sidebar-nav-link">
-            <span className={[styles["n-num"]].join(" ")}>{"16"}</span>
-            <span className={[styles["n-t"]].join(" ")}>{"チーム・組織で使うとき"}</span>
+          <a className={styles["nav-a"]} href="#sec-16" data-testid="sidebar-nav-link">
+            <span className={styles["n-num"]}>{"16"}</span>
+            <span className={styles["n-t"]}>{"チーム・組織で使うとき"}</span>
           </a>
           {"\n"}
           {"        "}
-          <a className={[styles["nav-a"]].join(" ")} href="#sec-17" data-testid="sidebar-nav-link">
-            <span className={[styles["n-num"]].join(" ")}>{"17"}</span>
-            <span className={[styles["n-t"]].join(" ")}>{"トラブルシュート"}</span>
+          <a className={styles["nav-a"]} href="#sec-17" data-testid="sidebar-nav-link">
+            <span className={styles["n-num"]}>{"17"}</span>
+            <span className={styles["n-t"]}>{"トラブルシュート"}</span>
           </a>
           {"\n"}
           {"        "}
-          <a className={[styles["nav-a"]].join(" ")} href="#sec-18" data-testid="sidebar-nav-link">
-            <span className={[styles["n-num"]].join(" ")}>{"18"}</span>
-            <span className={[styles["n-t"]].join(" ")}>
-              {"よくある失敗と対策(アンチパターン集)"}
-            </span>
+          <a className={styles["nav-a"]} href="#sec-18" data-testid="sidebar-nav-link">
+            <span className={styles["n-num"]}>{"18"}</span>
+            <span className={styles["n-t"]}>{"よくある失敗と対策(アンチパターン集)"}</span>
           </a>
           {"\n"}
           {"        "}
-          <a className={[styles["nav-a"]].join(" ")} href="#sec-19" data-testid="sidebar-nav-link">
-            <span className={[styles["n-num"]].join(" ")}>{"19"}</span>
-            <span className={[styles["n-t"]].join(" ")}>
-              {"補足: その他のベストプラクティスと根拠ソース"}
-            </span>
+          <a className={styles["nav-a"]} href="#sec-19" data-testid="sidebar-nav-link">
+            <span className={styles["n-num"]}>{"19"}</span>
+            <span className={styles["n-t"]}>{"補足: その他のベストプラクティスと根拠ソース"}</span>
           </a>
           {"\n"}
           {"        "}
-          <a className={[styles["nav-a"]].join(" ")} href="#sec-20" data-testid="sidebar-nav-link">
-            <span className={[styles["n-num"]].join(" ")}>{"20"}</span>
-            <span className={[styles["n-t"]].join(" ")}>{"参考URL一覧"}</span>
+          <a className={styles["nav-a"]} href="#sec-20" data-testid="sidebar-nav-link">
+            <span className={styles["n-num"]}>{"20"}</span>
+            <span className={styles["n-t"]}>{"参考URL一覧"}</span>
           </a>
           {"\n"}
           {"        "}
-          <a className={[styles["nav-a"]].join(" ")} href="#sec-21" data-testid="sidebar-nav-link">
-            <span className={[styles["n-num"]].join(" ")}>{"21"}</span>
-            <span className={[styles["n-t"]].join(" ")}>{"検証メモと限界"}</span>
+          <a className={styles["nav-a"]} href="#sec-21" data-testid="sidebar-nav-link">
+            <span className={styles["n-num"]}>{"21"}</span>
+            <span className={styles["n-t"]}>{"検証メモと限界"}</span>
           </a>
           {"\n"}
           {"      "}
         </nav>
         {"\n"}
         {"      "}
-        <div className={[styles.scrim].join(" ")} id="grok-backdrop" aria-hidden="true"></div>
+        <div className={styles.scrim} id="grok-backdrop" aria-hidden="true"></div>
         {"\n"}
         {"      "}
-        <div className={[styles.main].join(" ")}>
-          <div className={[styles["mobile-bar"]].join(" ")} id="grok-mobile-bar">
+        <div className={styles.main}>
+          <div className={styles["mobile-bar"]} id="grok-mobile-bar">
             {"\n"}
             {"          "}
             <button
@@ -412,7 +400,7 @@ export default function Page() {
             {"        "}
             {"\n"}
             {"        "}
-            <header className={[styles.hero].join(" ")}>
+            <header className={styles.hero}>
               <div className={styles.heroDates} data-testid="hero-dates">
                 <span>
                   最終確認日 <time dateTime={entry.lastReviewed}>{entry.lastReviewed}</time>
@@ -423,22 +411,22 @@ export default function Page() {
               </div>
               {"\n"}
               {"          "}
-              <p className={[styles.eyebrow].join(" ")}>{"xAI / GROK BOT BEST PRACTICES"}</p>
+              <p className={styles.eyebrow}>{"xAI / GROK BOT BEST PRACTICES"}</p>
               {"\n"}
               {"          "}
               <h1>{"Grok Bot(xAI)初学者向けステップバイステップ・ベストプラクティスガイド"}</h1>
               {"\n"}
               {"          "}
-              <div className={[styles.meta].join(" ")}>
+              <div className={styles.meta}>
                 {"\n"}
                 {"            "}
-                <div className={[styles["meta-row"]].join(" ")}>
+                <div className={styles["meta-row"]}>
                   {"\n"}
                   {"              "}
-                  <div className={[styles["meta-k"]].join(" ")}>{"対象読者"}</div>
+                  <div className={styles["meta-k"]}>{"対象読者"}</div>
                   {"\n"}
                   {"              "}
-                  <div className={[styles["meta-v"]].join(" ")}>
+                  <div className={styles["meta-v"]}>
                     {"\n"}
                     {"                "}
                     {"AIエージェントを初めて業務に使う方、Grok Bot を安全に使い始めたい方"}
@@ -450,13 +438,13 @@ export default function Page() {
                 </div>
                 {"\n"}
                 {"            "}
-                <div className={[styles["meta-row"]].join(" ")}>
+                <div className={styles["meta-row"]}>
                   {"\n"}
                   {"              "}
-                  <div className={[styles["meta-k"]].join(" ")}>{"情報時点"}</div>
+                  <div className={styles["meta-k"]}>{"情報時点"}</div>
                   {"\n"}
                   {"              "}
-                  <div className={[styles["meta-v"]].join(" ")}>
+                  <div className={styles["meta-v"]}>
                     {"\n"}
                     {"                "}
                     {"2026年10月24日(Grok Bot は"}
@@ -472,13 +460,13 @@ export default function Page() {
                 </div>
                 {"\n"}
                 {"            "}
-                <div className={[styles["meta-row"]].join(" ")}>
+                <div className={styles["meta-row"]}>
                   {"\n"}
                   {"              "}
-                  <div className={[styles["meta-k"]].join(" ")}>{"アンカー記事"}</div>
+                  <div className={styles["meta-k"]}>{"アンカー記事"}</div>
                   {"\n"}
                   {"              "}
-                  <div className={[styles["meta-v"]].join(" ")}>
+                  <div className={styles["meta-v"]}>
                     {"\n"}
                     {"                "}
                     <a
@@ -496,13 +484,13 @@ export default function Page() {
                 </div>
                 {"\n"}
                 {"            "}
-                <div className={[styles["meta-row"]].join(" ")}>
+                <div className={styles["meta-row"]}>
                   {"\n"}
                   {"              "}
-                  <div className={[styles["meta-k"]].join(" ")}>{"表記について"}</div>
+                  <div className={styles["meta-k"]}>{"表記について"}</div>
                   {"\n"}
                   {"              "}
-                  <div className={[styles["meta-v"]].join(" ")}>
+                  <div className={styles["meta-v"]}>
                     {"\n"}
                     {"                "}
                     {"xAI の公式サイトは現在 「SpaceXSI /"}
@@ -523,11 +511,11 @@ export default function Page() {
             </header>
             {"\n"}
             {"        "}
-            <section className={[styles.section].join(" ")} id="sec-1">
+            <section className={styles.section} id="sec-1">
               {"\n"}
               {"          "}
               <h2 id="sec-1-heading">
-                <span className={[styles.num].join(" ")}>{"1"}</span>
+                <span className={styles.num}>{"1"}</span>
                 {"このガイドの使い方と前提"}
               </h2>
               {"\n"}
@@ -538,7 +526,7 @@ export default function Page() {
               <p>{"このガイドを読み終えると、次のことができるようになります。"}</p>
               {"\n"}
               {"          "}
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 {"\n"}
                 {"            "}
                 <table>
@@ -588,7 +576,7 @@ export default function Page() {
               <p>{"本ガイドでは情報源を次のように区別しています。"}</p>
               {"\n"}
               {"          "}
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 {"\n"}
                 {"            "}
                 <table>
@@ -657,11 +645,11 @@ export default function Page() {
             {"\n"}
             {"\n"}
             {"        "}
-            <section className={[styles.section].join(" ")} id="sec-2">
+            <section className={styles.section} id="sec-2">
               {"\n"}
               {"          "}
               <h2 id="sec-2-heading">
-                <span className={[styles.num].join(" ")}>{"2"}</span>
+                <span className={styles.num}>{"2"}</span>
                 {"Grok Bot とは何か"}
               </h2>
               {"\n"}
@@ -695,7 +683,7 @@ export default function Page() {
               <h3 id="s2-2">{"2.2 チャット型 AI との違い"}</h3>
               {"\n"}
               {"          "}
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 {"\n"}
                 {"            "}
                 <table>
@@ -749,7 +737,7 @@ export default function Page() {
               <h3 id="s2-3">{"2.3 用語集"}</h3>
               {"\n"}
               {"          "}
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 {"\n"}
                 {"            "}
                 <table>
@@ -841,11 +829,11 @@ export default function Page() {
             {"\n"}
             {"\n"}
             {"        "}
-            <section className={[styles.section].join(" ")} id="sec-3">
+            <section className={styles.section} id="sec-3">
               {"\n"}
               {"          "}
               <h2 id="sec-3-heading">
-                <span className={[styles.num].join(" ")}>{"3"}</span>
+                <span className={styles.num}>{"3"}</span>
                 {"全体像をつかむ"}
               </h2>
               {"\n"}
@@ -853,13 +841,13 @@ export default function Page() {
               <h3 id="s3-1">{"3.1 構成図"}</h3>
               {"\n"}
               {"          "}
-              <div className={[styles["diagram-card"]].join(" ")}>
+              <div className={styles["diagram-card"]}>
                 {"\n"}
                 {"            "}
-                <div className={[styles["diagram-wrap"]].join(" ")}>
+                <div className={styles["diagram-wrap"]}>
                   {"\n"}
                   {"              "}
-                  <div className={[styles["diagram-canvas"]].join(" ")} data-diagram-id="diag-0">
+                  <div className={styles["diagram-canvas"]} data-diagram-id="diag-0">
                     <MermaidDiagram
                       chart={DIAGRAM_0}
                       theme="base"
@@ -942,13 +930,13 @@ export default function Page() {
               <h3 id="s3-2">{"3.2 学習の道筋"}</h3>
               {"\n"}
               {"          "}
-              <div className={[styles["diagram-card"]].join(" ")}>
+              <div className={styles["diagram-card"]}>
                 {"\n"}
                 {"            "}
-                <div className={[styles["diagram-wrap"]].join(" ")}>
+                <div className={styles["diagram-wrap"]}>
                   {"\n"}
                   {"              "}
-                  <div className={[styles["diagram-canvas"]].join(" ")} data-diagram-id="diag-1">
+                  <div className={styles["diagram-canvas"]} data-diagram-id="diag-1">
                     <MermaidDiagram
                       chart={DIAGRAM_1}
                       theme="base"
@@ -968,11 +956,11 @@ export default function Page() {
             {"\n"}
             {"\n"}
             {"        "}
-            <section className={[styles.section].join(" ")} id="sec-4">
+            <section className={styles.section} id="sec-4">
               {"\n"}
               {"          "}
               <h2 id="sec-4-heading">
-                <span className={[styles.num].join(" ")}>{"4"}</span>
+                <span className={styles.num}>{"4"}</span>
                 {"Step 0: 始める前の準備"}
               </h2>
               {"\n"}
@@ -983,7 +971,7 @@ export default function Page() {
               <p>{"公式の「Get started」によると、次が必要です。"}</p>
               {"\n"}
               {"          "}
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 {"\n"}
                 {"            "}
                 <table>
@@ -1119,13 +1107,13 @@ export default function Page() {
               </ul>
               {"\n"}
               {"          "}
-              <div className={[styles["diagram-card"]].join(" ")}>
+              <div className={styles["diagram-card"]}>
                 {"\n"}
                 {"            "}
-                <div className={[styles["diagram-wrap"]].join(" ")}>
+                <div className={styles["diagram-wrap"]}>
                   {"\n"}
                   {"              "}
-                  <div className={[styles["diagram-canvas"]].join(" ")} data-diagram-id="diag-2">
+                  <div className={styles["diagram-canvas"]} data-diagram-id="diag-2">
                     <MermaidDiagram
                       chart={DIAGRAM_2}
                       theme="base"
@@ -1182,16 +1170,16 @@ export default function Page() {
             {"\n"}
             {"\n"}
             {"        "}
-            <section className={[styles.section].join(" ")} id="sec-5">
+            <section className={styles.section} id="sec-5">
               {"\n"}
               {"          "}
               <h2 id="sec-5-heading">
-                <span className={[styles.num].join(" ")}>{"5"}</span>
+                <span className={styles.num}>{"5"}</span>
                 {"Step 1: アプリをインストールする"}
               </h2>
               {"\n"}
               {"          "}
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 {"\n"}
                 {"            "}
                 <table>
@@ -1326,11 +1314,11 @@ export default function Page() {
             {"\n"}
             {"\n"}
             {"        "}
-            <section className={[styles.section].join(" ")} id="sec-6">
+            <section className={styles.section} id="sec-6">
               {"\n"}
               {"          "}
               <h2 id="sec-6-heading">
-                <span className={[styles.num].join(" ")}>{"6"}</span>
+                <span className={styles.num}>{"6"}</span>
                 {"Step 2: サインインする"}
               </h2>
               {"\n"}
@@ -1566,11 +1554,11 @@ export default function Page() {
             {"\n"}
             {"\n"}
             {"        "}
-            <section className={[styles.section].join(" ")} id="sec-7">
+            <section className={styles.section} id="sec-7">
               {"\n"}
               {"          "}
               <h2 id="sec-7-heading">
-                <span className={[styles.num].join(" ")}>{"7"}</span>
+                <span className={styles.num}>{"7"}</span>
                 {"Step 3: 最初の Bot を設定する"}
               </h2>
               {"\n"}
@@ -1589,13 +1577,13 @@ export default function Page() {
               </p>
               {"\n"}
               {"          "}
-              <div className={[styles["diagram-card"]].join(" ")}>
+              <div className={styles["diagram-card"]}>
                 {"\n"}
                 {"            "}
-                <div className={[styles["diagram-wrap"]].join(" ")}>
+                <div className={styles["diagram-wrap"]}>
                   {"\n"}
                   {"              "}
-                  <div className={[styles["diagram-canvas"]].join(" ")} data-diagram-id="diag-3">
+                  <div className={styles["diagram-canvas"]} data-diagram-id="diag-3">
                     <MermaidDiagram
                       chart={DIAGRAM_3}
                       theme="base"
@@ -1701,11 +1689,11 @@ export default function Page() {
             {"\n"}
             {"\n"}
             {"        "}
-            <section className={[styles.section].join(" ")} id="sec-8">
+            <section className={styles.section} id="sec-8">
               {"\n"}
               {"          "}
               <h2 id="sec-8-heading">
-                <span className={[styles.num].join(" ")}>{"8"}</span>
+                <span className={styles.num}>{"8"}</span>
                 {"Step 4: 良い依頼の書き方(5要素)"}
               </h2>
               {"\n"}
@@ -1713,7 +1701,7 @@ export default function Page() {
               <h3 id="s8-1">{"8.1 5要素テンプレート"}</h3>
               {"\n"}
               {"          "}
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 {"\n"}
                 {"            "}
                 <table>
@@ -1821,7 +1809,7 @@ export default function Page() {
               <h3 id="s8-4">{"8.4 悪い依頼と良い依頼"}</h3>
               {"\n"}
               {"          "}
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 {"\n"}
                 {"            "}
                 <table>
@@ -1908,11 +1896,11 @@ export default function Page() {
             {"\n"}
             {"\n"}
             {"        "}
-            <section className={[styles.section].join(" ")} id="sec-9">
+            <section className={styles.section} id="sec-9">
               {"\n"}
               {"          "}
               <h2 id="sec-9-heading">
-                <span className={[styles.num].join(" ")}>{"9"}</span>
+                <span className={styles.num}>{"9"}</span>
                 {"Step 5: ログインは自分で行う(Take over)"}
               </h2>
               {"\n"}
@@ -2026,13 +2014,13 @@ export default function Page() {
               </p>
               {"\n"}
               {"          "}
-              <div className={[styles["diagram-card"]].join(" ")}>
+              <div className={styles["diagram-card"]}>
                 {"\n"}
                 {"            "}
-                <div className={[styles["diagram-wrap"]].join(" ")}>
+                <div className={styles["diagram-wrap"]}>
                   {"\n"}
                   {"              "}
-                  <div className={[styles["diagram-canvas"]].join(" ")} data-diagram-id="diag-4">
+                  <div className={styles["diagram-canvas"]} data-diagram-id="diag-4">
                     <MermaidDiagram
                       chart={DIAGRAM_4}
                       theme="base"
@@ -2079,7 +2067,7 @@ export default function Page() {
               <h3 id="s9-2">{"9.2 守ること"}</h3>
               {"\n"}
               {"          "}
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 {"\n"}
                 {"            "}
                 <table>
@@ -2184,11 +2172,11 @@ export default function Page() {
             {"\n"}
             {"\n"}
             {"        "}
-            <section className={[styles.section].join(" ")} id="sec-10">
+            <section className={styles.section} id="sec-10">
               {"\n"}
               {"          "}
               <h2 id="sec-10-heading">
-                <span className={[styles.num].join(" ")}>{"10"}</span>
+                <span className={styles.num}>{"10"}</span>
                 {"Step 6: 結果をレビューして育てる"}
               </h2>
               {"\n"}
@@ -2196,7 +2184,7 @@ export default function Page() {
               <h3 id="s10-1">{"10.1 レビューの観点"}</h3>
               {"\n"}
               {"          "}
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 {"\n"}
                 {"            "}
                 <table>
@@ -2287,11 +2275,11 @@ export default function Page() {
             {"\n"}
             {"\n"}
             {"        "}
-            <section className={[styles.section].join(" ")} id="sec-11">
+            <section className={styles.section} id="sec-11">
               {"\n"}
               {"          "}
               <h2 id="sec-11-heading">
-                <span className={[styles.num].join(" ")}>{"11"}</span>
+                <span className={styles.num}>{"11"}</span>
                 {"Step 7: Skill 化 → Routine 化"}
               </h2>
               {"\n"}
@@ -2315,13 +2303,13 @@ export default function Page() {
               </p>
               {"\n"}
               {"          "}
-              <div className={[styles["diagram-card"]].join(" ")}>
+              <div className={styles["diagram-card"]}>
                 {"\n"}
                 {"            "}
-                <div className={[styles["diagram-wrap"]].join(" ")}>
+                <div className={styles["diagram-wrap"]}>
                   {"\n"}
                   {"              "}
-                  <div className={[styles["diagram-canvas"]].join(" ")} data-diagram-id="diag-5">
+                  <div className={styles["diagram-canvas"]} data-diagram-id="diag-5">
                     <MermaidDiagram
                       chart={DIAGRAM_5}
                       theme="base"
@@ -2341,7 +2329,7 @@ export default function Page() {
               <h3 id="s11-2">{"11.2 良い Skill に書くこと(6項目)"}</h3>
               {"\n"}
               {"          "}
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 {"\n"}
                 {"            "}
                 <table>
@@ -2515,7 +2503,7 @@ export default function Page() {
               <h3 id="s11-4">{"11.4 Routine の制限(公式記載)"}</h3>
               {"\n"}
               {"          "}
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 {"\n"}
                 {"            "}
                 <table>
@@ -2708,11 +2696,11 @@ export default function Page() {
             {"\n"}
             {"\n"}
             {"        "}
-            <section className={[styles.section].join(" ")} id="sec-12">
+            <section className={styles.section} id="sec-12">
               {"\n"}
               {"          "}
               <h2 id="sec-12-heading">
-                <span className={[styles.num].join(" ")}>{"12"}</span>
+                <span className={styles.num}>{"12"}</span>
                 {"Step 8: X から @bot でタスクを渡す"}
               </h2>
               {"\n"}
@@ -2794,13 +2782,13 @@ export default function Page() {
               </ul>
               {"\n"}
               {"          "}
-              <div className={[styles["diagram-card"]].join(" ")}>
+              <div className={styles["diagram-card"]}>
                 {"\n"}
                 {"            "}
-                <div className={[styles["diagram-wrap"]].join(" ")}>
+                <div className={styles["diagram-wrap"]}>
                   {"\n"}
                   {"              "}
-                  <div className={[styles["diagram-canvas"]].join(" ")} data-diagram-id="diag-6">
+                  <div className={styles["diagram-canvas"]} data-diagram-id="diag-6">
                     <MermaidDiagram
                       chart={DIAGRAM_6}
                       theme="base"
@@ -2820,7 +2808,7 @@ export default function Page() {
               <h3 id="s12-2">{"12.2 前提条件"}</h3>
               {"\n"}
               {"          "}
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 {"\n"}
                 {"            "}
                 <table>
@@ -2930,11 +2918,11 @@ export default function Page() {
             {"\n"}
             {"\n"}
             {"        "}
-            <section className={[styles.section].join(" ")} id="sec-13">
+            <section className={styles.section} id="sec-13">
               {"\n"}
               {"          "}
               <h2 id="sec-13-heading">
-                <span className={[styles.num].join(" ")}>{"13"}</span>
+                <span className={styles.num}>{"13"}</span>
                 {"承認(Approvals)と Auto Review の設計"}
               </h2>
               {"\n"}
@@ -2972,7 +2960,7 @@ export default function Page() {
               </p>
               {"\n"}
               {"          "}
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 {"\n"}
                 {"            "}
                 <table>
@@ -3052,7 +3040,7 @@ export default function Page() {
               </p>
               {"\n"}
               {"          "}
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 {"\n"}
                 {"            "}
                 <table>
@@ -3230,13 +3218,13 @@ export default function Page() {
               </p>
               {"\n"}
               {"          "}
-              <div className={[styles["diagram-card"]].join(" ")}>
+              <div className={styles["diagram-card"]}>
                 {"\n"}
                 {"            "}
-                <div className={[styles["diagram-wrap"]].join(" ")}>
+                <div className={styles["diagram-wrap"]}>
                   {"\n"}
                   {"              "}
-                  <div className={[styles["diagram-canvas"]].join(" ")} data-diagram-id="diag-7">
+                  <div className={styles["diagram-canvas"]} data-diagram-id="diag-7">
                     <MermaidDiagram
                       chart={DIAGRAM_7}
                       theme="base"
@@ -3253,7 +3241,7 @@ export default function Page() {
               {"\n"}
               {"\n"}
               {"          "}
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 {"\n"}
                 {"            "}
                 <table>
@@ -3318,7 +3306,7 @@ export default function Page() {
               </p>
               {"\n"}
               {"          "}
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 {"\n"}
                 {"            "}
                 <table>
@@ -3417,7 +3405,7 @@ export default function Page() {
               </p>
               {"\n"}
               {"          "}
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 {"\n"}
                 {"            "}
                 <table>
@@ -3481,11 +3469,11 @@ export default function Page() {
             {"\n"}
             {"\n"}
             {"        "}
-            <section className={[styles.section].join(" ")} id="sec-14">
+            <section className={styles.section} id="sec-14">
               {"\n"}
               {"          "}
               <h2 id="sec-14-heading">
-                <span className={[styles.num].join(" ")}>{"14"}</span>
+                <span className={styles.num}>{"14"}</span>
                 {"セキュリティの境界を理解する"}
               </h2>
               {"\n"}
@@ -3496,7 +3484,7 @@ export default function Page() {
               <p>{"公式ドキュメントの要点:"}</p>
               {"\n"}
               {"          "}
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 {"\n"}
                 {"            "}
                 <table>
@@ -3578,13 +3566,13 @@ export default function Page() {
               <h3 id="s14-2">{"14.2 プロンプトインジェクションとの関係"}</h3>
               {"\n"}
               {"          "}
-              <div className={[styles["diagram-card"]].join(" ")}>
+              <div className={styles["diagram-card"]}>
                 {"\n"}
                 {"            "}
-                <div className={[styles["diagram-wrap"]].join(" ")}>
+                <div className={styles["diagram-wrap"]}>
                   {"\n"}
                   {"              "}
-                  <div className={[styles["diagram-canvas"]].join(" ")} data-diagram-id="diag-8">
+                  <div className={styles["diagram-canvas"]} data-diagram-id="diag-8">
                     <MermaidDiagram
                       chart={DIAGRAM_8}
                       theme="base"
@@ -3616,7 +3604,7 @@ export default function Page() {
               </p>
               {"\n"}
               {"          "}
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 {"\n"}
                 {"            "}
                 <table>
@@ -3671,7 +3659,7 @@ export default function Page() {
               </p>
               {"\n"}
               {"          "}
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 {"\n"}
                 {"            "}
                 <table>
@@ -3750,11 +3738,11 @@ export default function Page() {
             {"\n"}
             {"\n"}
             {"        "}
-            <section className={[styles.section].join(" ")} id="sec-15">
+            <section className={styles.section} id="sec-15">
               {"\n"}
               {"          "}
               <h2 id="sec-15-heading">
-                <span className={[styles.num].join(" ")}>{"15"}</span>
+                <span className={styles.num}>{"15"}</span>
                 {"最小権限セットアップ・チェックリスト"}
               </h2>
               {"\n"}
@@ -3768,7 +3756,7 @@ export default function Page() {
               <ul>
                 {"\n"}
                 {"            "}
-                <li className={[styles.check].join(" ")}>
+                <li className={styles.check}>
                   {"\n"}
                   {"              "}
                   <label>
@@ -3779,7 +3767,7 @@ export default function Page() {
                 </li>
                 {"\n"}
                 {"            "}
-                <li className={[styles.check].join(" ")}>
+                <li className={styles.check}>
                   {"\n"}
                   {"              "}
                   <label>
@@ -3795,7 +3783,7 @@ export default function Page() {
                 </li>
                 {"\n"}
                 {"            "}
-                <li className={[styles.check].join(" ")}>
+                <li className={styles.check}>
                   {"\n"}
                   {"              "}
                   <label>
@@ -3813,7 +3801,7 @@ export default function Page() {
                 </li>
                 {"\n"}
                 {"            "}
-                <li className={[styles.check].join(" ")}>
+                <li className={styles.check}>
                   {"\n"}
                   {"              "}
                   <label>
@@ -3829,7 +3817,7 @@ export default function Page() {
                 </li>
                 {"\n"}
                 {"            "}
-                <li className={[styles.check].join(" ")}>
+                <li className={styles.check}>
                   {"\n"}
                   {"              "}
                   <label>
@@ -3845,7 +3833,7 @@ export default function Page() {
                 </li>
                 {"\n"}
                 {"            "}
-                <li className={[styles.check].join(" ")}>
+                <li className={styles.check}>
                   {"\n"}
                   {"              "}
                   <label>
@@ -3868,7 +3856,7 @@ export default function Page() {
               <ul>
                 {"\n"}
                 {"            "}
-                <li className={[styles.check].join(" ")}>
+                <li className={styles.check}>
                   {"\n"}
                   {"              "}
                   <label>
@@ -3884,7 +3872,7 @@ export default function Page() {
                 </li>
                 {"\n"}
                 {"            "}
-                <li className={[styles.check].join(" ")}>
+                <li className={styles.check}>
                   {"\n"}
                   {"              "}
                   <label>
@@ -3900,7 +3888,7 @@ export default function Page() {
                 </li>
                 {"\n"}
                 {"            "}
-                <li className={[styles.check].join(" ")}>
+                <li className={styles.check}>
                   {"\n"}
                   {"              "}
                   <label>
@@ -3916,7 +3904,7 @@ export default function Page() {
                 </li>
                 {"\n"}
                 {"            "}
-                <li className={[styles.check].join(" ")}>
+                <li className={styles.check}>
                   {"\n"}
                   {"              "}
                   <label>
@@ -3927,7 +3915,7 @@ export default function Page() {
                 </li>
                 {"\n"}
                 {"            "}
-                <li className={[styles.check].join(" ")}>
+                <li className={styles.check}>
                   {"\n"}
                   {"              "}
                   <label>
@@ -3944,13 +3932,13 @@ export default function Page() {
               <h3 id="s15-3">{"15.3 週次の見直し(おすすめ)"}</h3>
               {"\n"}
               {"          "}
-              <div className={[styles["diagram-card"]].join(" ")}>
+              <div className={styles["diagram-card"]}>
                 {"\n"}
                 {"            "}
-                <div className={[styles["diagram-wrap"]].join(" ")}>
+                <div className={styles["diagram-wrap"]}>
                   {"\n"}
                   {"              "}
-                  <div className={[styles["diagram-canvas"]].join(" ")} data-diagram-id="diag-9">
+                  <div className={styles["diagram-canvas"]} data-diagram-id="diag-9">
                     <MermaidDiagram
                       chart={DIAGRAM_9}
                       theme="base"
@@ -3970,11 +3958,11 @@ export default function Page() {
             {"\n"}
             {"\n"}
             {"        "}
-            <section className={[styles.section].join(" ")} id="sec-16">
+            <section className={styles.section} id="sec-16">
               {"\n"}
               {"          "}
               <h2 id="sec-16-heading">
-                <span className={[styles.num].join(" ")}>{"16"}</span>
+                <span className={styles.num}>{"16"}</span>
                 {"チーム・組織で使うとき"}
               </h2>
               {"\n"}
@@ -4104,7 +4092,7 @@ export default function Page() {
               <h3 id="s16-2">{"16.2 管理者が知っておくこと(公式・第三者資料より)"}</h3>
               {"\n"}
               {"          "}
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 {"\n"}
                 {"            "}
                 <table>
@@ -4265,11 +4253,11 @@ export default function Page() {
             {"\n"}
             {"\n"}
             {"        "}
-            <section className={[styles.section].join(" ")} id="sec-17">
+            <section className={styles.section} id="sec-17">
               {"\n"}
               {"          "}
               <h2 id="sec-17-heading">
-                <span className={[styles.num].join(" ")}>{"17"}</span>
+                <span className={styles.num}>{"17"}</span>
                 {"トラブルシュート"}
               </h2>
               {"\n"}
@@ -4295,7 +4283,7 @@ export default function Page() {
               <h3 id="s17-2">{"17.2 @bot が返信しない場合(公式の原因一覧)"}</h3>
               {"\n"}
               {"          "}
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 {"\n"}
                 {"            "}
                 <table>
@@ -4349,7 +4337,7 @@ export default function Page() {
               <h3 id="s17-3">{"17.3 @bot の返信の意味"}</h3>
               {"\n"}
               {"          "}
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 {"\n"}
                 {"            "}
                 <table>
@@ -4386,13 +4374,13 @@ export default function Page() {
               <h3 id="s17-4">{"17.4 Routine が動かない・空振りする"}</h3>
               {"\n"}
               {"          "}
-              <div className={[styles["diagram-card"]].join(" ")}>
+              <div className={styles["diagram-card"]}>
                 {"\n"}
                 {"            "}
-                <div className={[styles["diagram-wrap"]].join(" ")}>
+                <div className={styles["diagram-wrap"]}>
                   {"\n"}
                   {"              "}
-                  <div className={[styles["diagram-canvas"]].join(" ")} data-diagram-id="diag-10">
+                  <div className={styles["diagram-canvas"]} data-diagram-id="diag-10">
                     <MermaidDiagram
                       chart={DIAGRAM_10}
                       theme="base"
@@ -4412,16 +4400,16 @@ export default function Page() {
             {"\n"}
             {"\n"}
             {"        "}
-            <section className={[styles.section].join(" ")} id="sec-18">
+            <section className={styles.section} id="sec-18">
               {"\n"}
               {"          "}
               <h2 id="sec-18-heading">
-                <span className={[styles.num].join(" ")}>{"18"}</span>
+                <span className={styles.num}>{"18"}</span>
                 {"よくある失敗と対策(アンチパターン集)"}
               </h2>
               {"\n"}
               {"          "}
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 {"\n"}
                 {"            "}
                 <table>
@@ -4517,11 +4505,11 @@ export default function Page() {
             {"\n"}
             {"\n"}
             {"        "}
-            <section className={[styles.section].join(" ")} id="sec-19">
+            <section className={styles.section} id="sec-19">
               {"\n"}
               {"          "}
               <h2 id="sec-19-heading">
-                <span className={[styles.num].join(" ")}>{"19"}</span>
+                <span className={styles.num}>{"19"}</span>
                 {"補足: その他のベストプラクティスと根拠ソース"}
               </h2>
               {"\n"}
@@ -4573,7 +4561,7 @@ export default function Page() {
               <h3 id="s19-1">{"19.1 補足ベストプラクティス一覧(根拠付き)"}</h3>
               {"\n"}
               {"          "}
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 {"\n"}
                 {"            "}
                 <table>
@@ -5096,7 +5084,7 @@ export default function Page() {
               <h3 id="s19-2">{"19.2 ソースの信頼度の目安"}</h3>
               {"\n"}
               {"          "}
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 {"\n"}
                 {"            "}
                 <table>
@@ -5139,11 +5127,11 @@ export default function Page() {
             {"\n"}
             {"\n"}
             {"        "}
-            <section className={[styles.section].join(" ")} id="sec-20">
+            <section className={styles.section} id="sec-20">
               {"\n"}
               {"          "}
               <h2 id="sec-20-heading">
-                <span className={[styles.num].join(" ")}>{"20"}</span>
+                <span className={styles.num}>{"20"}</span>
                 {"参考URL一覧"}
               </h2>
               {"\n"}
@@ -5151,7 +5139,7 @@ export default function Page() {
               <h3 id="s20-1">{"20.1 公式"}</h3>
               {"\n"}
               {"          "}
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 {"\n"}
                 {"            "}
                 <table>
@@ -5404,7 +5392,7 @@ export default function Page() {
               <h3 id="s20-2">{"20.2 第三者・開発者"}</h3>
               {"\n"}
               {"          "}
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 {"\n"}
                 {"            "}
                 <table>
@@ -5658,16 +5646,16 @@ export default function Page() {
             {"\n"}
             {"\n"}
             {"        "}
-            <section className={[styles.section].join(" ")} id="sec-21">
+            <section className={styles.section} id="sec-21">
               {"\n"}
               {"          "}
               <h2 id="sec-21-heading">
-                <span className={[styles.num].join(" ")}>{"21"}</span>
+                <span className={styles.num}>{"21"}</span>
                 {"検証メモと限界"}
               </h2>
               {"\n"}
               {"          "}
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 {"\n"}
                 {"            "}
                 <table>
@@ -5790,7 +5778,7 @@ export default function Page() {
             </section>
             {"\n"}
             {"        "}
-            <footer className={[styles.footer].join(" ")}>
+            <footer className={styles.footer}>
               {"\n"}
               {"          "}
               {"Grok Bot"}
