@@ -299,8 +299,8 @@ const declarations = (source: string, selector: string) => {
     if (
       !r.selector
         .split(",")
-        .map((s) => s.trim())
-        .includes(selector)
+        .map((s) => s.trim().replace(/:global\(([^)]+)\)/g, "$1"))
+        .includes(selector.replace(/:global\(([^)]+)\)/g, "$1"))
     )
       return;
     r.walkDecls((d) => {
@@ -431,4 +431,16 @@ it("目次リンクの通常・hover・active色は共有リンク規則より�
   expect(declarations(sheet, ".root .nav-a:hover").background).toBe("var(--paper-alt)");
   expect(declarations(sheet, ".root .nav-a.active").color).toBe("var(--indigo)");
   expect(declarations(sheet, ".root .nav-a.active")["border-left-color"]).toBe("var(--indigo)");
+});
+
+it("共通bodyクラスと鮮度バーIDをCSS Modulesでハッシュ化しない", () => {
+  const selectors: string[] = [];
+  postcss.parse(css()).walkRules((rule) => {
+    if (rule.selector.startsWith("body:has(.root)")) selectors.push(rule.selector);
+  });
+  expect(selectors).toContain("body:has(.root):global(.has-common-header)");
+  expect(selectors).toContain("body:has(.root) :global(#site-freshness-bar)");
+  expect(
+    selectors.some((s) => s.includes(").has-common-header") || s.includes(") #site-freshness-bar"))
+  ).toBe(false);
 });
