@@ -235,7 +235,7 @@ it("registryへCodexカテゴリで登録し全導線へ導出", () => {
     group: "Providers",
     category: "Codex",
     provider: "codex",
-    topics: ["openai", "agents", "security"],
+    topics: ["openai", "agent", "agents", "security"],
     summary:
       "OpenAI dots の導入、Custom Rules、ブリーフ、安全設計と継続運用を学ぶ初学者向けガイド。",
     addedAt: "2026-11-05",

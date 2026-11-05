@@ -205,7 +205,7 @@ it("レジストリからClaudeの導線へ登録し移行確認日を記録", (
     group: "Providers",
     category: "Claude",
     provider: "claude",
-    topics: ["claude", "agents", "security"],
+    topics: ["claude", "agent", "agents", "security"],
     summary: "Claude Duet の導入、依頼、承認、接続アプリと使用量管理を学ぶ初学者向けガイド。",
     addedAt: "2026-11-04",
     lastReviewed: "2026-11-04",
