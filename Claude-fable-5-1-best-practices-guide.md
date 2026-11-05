@@ -232,7 +232,7 @@ for block in response.content:
 | --- | --- | --- | --- |
 | 1 | **強制ツール使用の廃止** | `tool_choice` が `any` / `tool` だと 400 エラー | `auto`(既定)に戻し、スキーマ保証は **strict tool use** か **structured outputs** へ。ツールを使わせたい場面はプロンプトで明示 |
 | 2 | **thinking ブロックがモデルに束縛される** | Fable 5.1 の thinking を読めるのは Fable 5.1 と Mythos 5.1 のみ | フォールバックやルーターでモデルを切り替えると、その間の推論は失われる(ブロックは自動で破棄され課金されない) |
-| 3 | **履歴編集で thinking が無効化** | `bound to a different conversation` の 400 エラー | **履歴は append-only**(第6章) |
+| 3 | **履歴編集で thinking が無効化** | thinking ブロックが無効化される。結果は設定で変わり、`prefix_mismatch_behavior: "error"` は 400 エラー(`bound to a different conversation`)、`"drop_block"` は該当ブロック以降を破棄して成功。未設定時の挙動はアカウント作成日で変わる(6.5節) | **履歴は append-only**(第6章) |
 | 4 | **advisor ツールの組み合わせ制限** | 実行側が Fable 5.1 のとき、Opus 5.5 / Opus 5 / Fable 5 の advisor は 400 エラー | advisor は **実行側以上の能力**を選ぶ |
 
 ### 4.3 変えてはいけない前提(Fable 5 から不変)
@@ -787,7 +787,7 @@ flowchart TD
 | 項目 | 内容 |
 | --- | --- |
 | 設定 | Claude API などでは `fallbacks: "default"`(beta)で、そのカテゴリに推奨されるモデルへ再試行。**Amazon Bedrock、Google Cloud の Google 管理モデル、Microsoft Foundry では利用不可**のため、SDK ミドルウェアまたはクライアント側のリトライで実装する |
-| thinking の扱い | モデルが変わると、Fable 5.1 の thinking は引き継がれない(第4章) |
+| thinking の扱い | 切り替えの方向で異なる(第4章)。Opus 5 / Fable 5 / Mythos 5 から Fable 5.1 へ切り替えると thinking は引き継がれる。Fable 5.1 から別のモデルへ切り替えると引き継がれない(例外は Mythos 5.1) |
 | 課金 | 出力前の refusal も、誤検知が少ないカテゴリでは課金される(2026-09-24 以降)。ストリーム途中の refusal は、入力と出力済み分が通常料金で課金。**fallback credit** で、モデル切り替えに伴うキャッシュコストが返金される |
 
 ### 11.5 コンテンツの出自表示
@@ -921,6 +921,7 @@ flowchart TD
 ### B.1 導入前(API 利用者)
 
 - [ ] モデル ID が `claude-fable-5-1` になっている
+- [ ] Priority Tier への依存がないか確認した(Fable 5.1 は Priority Tier 非対応で、既存の Priority Tier 契約は適用されない)
 - [ ] `tool_choice` の `any` / `tool` を撤去した(strict tool use / structured outputs へ移行)
 - [ ] `temperature` / `top_p` / `top_k`、プレフィル、`thinking: disabled` を使っていない
 - [ ] 履歴を **append-only** にしている(過去ターンの編集・注入と削除がない)
