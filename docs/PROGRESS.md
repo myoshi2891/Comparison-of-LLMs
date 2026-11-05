@@ -10,6 +10,8 @@
 
 - `/codex/dots-best-practices`／`/claude/duet-best-practices` の `topics` に、既存の `agents` を残して完全一致の `agent` を追加。タグ検索と関連ページは完全一致で比較するため、`agents` だけでは `agent` タグの一覧と関連候補に含まれなかった。
 - 分離履歴: Red `86363a7c`（両ページの固定期待値をレビュー指示に基づき更新し、対象75件中2件の失敗を確認）→ Green `d159c4f0`。全体Vitest **225 files／2525 tests**、typecheck、lint（609 files／0 diagnostics）、pytest 122件が成功。テスト数は不変。ビルド・npmは未実行。
+- 続けて `/claude/models-best-practices`／`/codex/models-best-practices`／`/google/models-best-practices` にも `agent` を追加。Claude版は `topics` の固定契約がないため、`agents` を持つ全エントリに `agent` を要求する不変条件を `tests/page-registry-coverage.test.ts` へ追加して再発も検知する。
+- 分離履歴: Red `81a2cfa7`（対象75件中3件の失敗を確認）→ Green `ad25ee38`。全体Vitest **225 files／2526 tests**、typecheck、lint（609 files／0 diagnostics）、pytest 122件が成功。ビルド・npmは未実行。
 
 ## OpenAI dots ガイド移行（2026-11-05）
 
@@ -150,7 +152,7 @@
 
 - **フェーズ**: 保守・機能改善・品質強化フェーズ
 - **ブランチ**: `dev`
-- **最新実装 HEAD**: `d159c4f0`（registryのagentトピック補正: Red `86363a7c` → Green `d159c4f0`）。その前は `3395fbbd`（OpenAI dots: Red `d43d0642` → 追加Red `fb630c9e`／`cf10adec` → Green `29a7e1ec` → Refactor `3395fbbd`。原本保存 `529e3272`）。
+- **最新実装 HEAD**: `ad25ee38`（registryのagentトピック補正: Red `86363a7c` → Green `d159c4f0`、Red `81a2cfa7` → Green `ad25ee38`）。その前は `3395fbbd`（OpenAI dots: Red `d43d0642` → 追加Red `fb630c9e`／`cf10adec` → Green `29a7e1ec` → Refactor `3395fbbd`。原本保存 `529e3272`）。
 - **次の作業**: `/codex/dots-best-practices` の目視確認（ユーザー担当、localhost:3000）。310px固定目次・900pxモバイル開閉・日本語アンカー・入れ子の点と番号・29表・5コード例・12図・17チェックを確認する。npm・ビルドは未実行。
 - **ルート実数**: `page.tsx` 100 件、registry 100 エントリ（現行ファイルから実測）。
 - **動作検証**:
@@ -158,8 +160,8 @@
   - `bun run typecheck` ✅（`tsc --noEmit`。2026-11-05 実測）
   - `bun run lint` ✅（Biome check / 609 files / 0 diagnostics。2026-11-05 実測）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000` でVitest **225 files / 2525 tests すべて合格**（2026-11-05実測）。Refactor後の関連88契約、typecheck・lint（609 files／0 diagnostics）も成功。
-    - 過去のClaudeモデルガイド初回全体検証では2239件中registryの日付不変条件1件が失敗し、専用Red／Greenで修正済み。今回の全体2525件はすべて成功。依存・設定・ロックは変更していない。
+  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000` でVitest **225 files / 2526 tests すべて合格**（2026-11-05実測）。Refactor後の関連88契約、typecheck・lint（609 files／0 diagnostics）も成功。
+    - 過去のClaudeモデルガイド初回全体検証では2239件中registryの日付不変条件1件が失敗し、専用Red／Greenで修正済み。今回の全体2526件はすべて成功。依存・設定・ロックは変更していない。
     - `load(sourceHtml)` をモジュール初期化時に呼ぶ `governance/ai-governance/GuideContent.tsx` と
       `local-llm/finetuning-best-practices/GuideContent.tsx` は、import スモークでも読み込み可能であることを確認済み
   - **バックエンド (`scraper/`)**: `uv run pytest` で122件成功（2026-11-05実測）。
