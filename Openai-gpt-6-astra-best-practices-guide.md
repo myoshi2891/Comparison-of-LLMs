@@ -20,7 +20,7 @@
 | **報道** | 大手報道機関や二次情報による報告 | TechCrunch、CNBC、Reuters 系の報道 |
 | **要検証** | 単発の測定や、出典間で数値が食い違う情報 | 個別ベンチマークの再現値など |
 
-> **重要**: ベンチマーク値は多くがベンダー自己申告で、ハーネス(評価環境)にも依存します。本ガイドの数値は「方向性の把握」に使い、採用可否は**自社タスクでの評価**で決めてください(第10章)。
+> **重要**: ベンチマーク値は多くがベンダー自己申告で、ハーネス(評価環境)にも依存します。本ガイドの数値は「方向性の把握」に使い、採用可否は**自社タスクでの評価**で決めてください(第11章)。
 
 ### 0.2 目次
 
@@ -136,6 +136,8 @@ flowchart TB
   class A,B,C,D pick
   class S,E,F step
 ```
+
+> **GPT-6 Sol をフローに含めない理由**: 公式モデルページが、新しい Sol モデルとして GPT-6.1 Sol を案内しているためです。**公式** 新規採用では GPT-6.1 Sol を候補にしてください。すでに GPT-6 Sol で運用している場合は、同じ評価セットで GPT-6.1 Sol と比較してから移行を判断します。
 
 ### 2.3 選ぶときの原則
 
@@ -589,7 +591,7 @@ flowchart TB
 
 1. **最小権限**: 操作できるサイトとデスクトップアプリを許可リストで限定する。企業向けには、許可サイト・アプリの制限、アップロード・ダウンロードの管理、閲覧履歴の制御などの管理者機能が用意されている。**公式**
 2. **確認ポリシー**: 結果が重大な操作(外部への送信、削除、購入、公開など)は承認を必須にする。ChatGPT Work と Codex には、確認ポリシーと、安全でない・未承認のツール呼び出しの自動レビューが含まれる。**公式**
-3. **段階的な展開**: 制限の強い構成から始め、実績に応じて権限を広げる。**公式** 企業向けでは、**Astra はデフォルトで無効**で、管理者が有効化する。**公式**
+3. **段階的な展開**: 制限の強い構成から始め、実績に応じて権限を広げる。**公式** 対象の ChatGPT Enterprise / Edu ワークスペースでは、**Astra は提供開始時にデフォルトで無効**で、アクセスは別途設定する形だった。**公式** 現在の利用可否はワークスペース設定と RBAC(ロールベースのアクセス制御)によって変わるため、自社の現在の設定を確認する。
 4. **隔離**: 本番の認証情報や個人データが画面に映らない環境で動かす。画面上の情報はすべてモデルに見えると考える
 5. **証跡**: スクリーンショットと操作ログを自前で保存する(第7.5節の透明性の教訓)
 6. **安全評価の位置づけ**: OpenAI は内部のコンピュータ利用安全ベンチマークで、Astra は意図しない結果が GPT-5.6 Sol より 89% 少なかったと報告している。**公式** ただし**ベンダー自己評価**であり、自社の業務シナリオでの検証が必要。
@@ -861,6 +863,8 @@ flowchart TB
 | Astra の発表(業務向け・顧客事例・料金・安全) | https://openai.com/index/gpt-6-astra-next-generation-work/ |
 | 開発者向け: Using GPT-6(Astra の行動特性・移行・新機能) | https://developers.openai.com/api/docs/guides/latest-model?model=gpt-6-astra |
 | モデルページ(仕様・料金・割増・レート制限) | https://developers.openai.com/api/docs/models/gpt-6-astra |
+| GPT-6 Sol のモデルページ(GPT-6.1 Sol への案内) | https://developers.openai.com/api/docs/models/gpt-6-sol |
+| ChatGPT の RBAC(Astra の既定設定とアクセス設定、ドイツ語版で確認) | https://help.openai.com/de-de/articles/11750701-managing-feature-access-with-role-based-access-control-in-chatgpt |
 | スキルとプロンプトの見直し(Eric Provencher) | https://developers.openai.com/blog/rethinking-skills-and-prompts-for-gpt-6-astra |
 | 中間操縦(Mid-turn steering) | https://developers.openai.com/api/docs/guides/steering |
 | 非同期ツール呼び出し | https://developers.openai.com/api/docs/guides/async-tool-calling |
