@@ -6,6 +6,11 @@
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
 
+## registryのagentトピック補正（2026-11-05）
+
+- `/codex/dots-best-practices`／`/claude/duet-best-practices` の `topics` に、既存の `agents` を残して完全一致の `agent` を追加。タグ検索と関連ページは完全一致で比較するため、`agents` だけでは `agent` タグの一覧と関連候補に含まれなかった。
+- 分離履歴: Red `86363a7c`（両ページの固定期待値をレビュー指示に基づき更新し、対象75件中2件の失敗を確認）→ Green `d159c4f0`。全体Vitest **225 files／2525 tests**、typecheck、lint（609 files／0 diagnostics）、pytest 122件が成功。テスト数は不変。ビルド・npmは未実行。
+
 ## OpenAI dots ガイド移行（2026-11-05）
 
 - ルート: `/codex/dots-best-practices`。指定HTMLを正本として、本文の情報基準日2026-10-24を保持。registryは2026-11-05でCodexカテゴリへ追加し、ナビ・検索・RSS・関連リンクを導出する。
@@ -145,7 +150,7 @@
 
 - **フェーズ**: 保守・機能改善・品質強化フェーズ
 - **ブランチ**: `dev`
-- **最新実装 HEAD**: `3395fbbd`（OpenAI dots: Red `d43d0642` → 追加Red `fb630c9e`／`cf10adec` → Green `29a7e1ec` → Refactor `3395fbbd`。原本保存 `529e3272`）。
+- **最新実装 HEAD**: `d159c4f0`（registryのagentトピック補正: Red `86363a7c` → Green `d159c4f0`）。その前は `3395fbbd`（OpenAI dots: Red `d43d0642` → 追加Red `fb630c9e`／`cf10adec` → Green `29a7e1ec` → Refactor `3395fbbd`。原本保存 `529e3272`）。
 - **次の作業**: `/codex/dots-best-practices` の目視確認（ユーザー担当、localhost:3000）。310px固定目次・900pxモバイル開閉・日本語アンカー・入れ子の点と番号・29表・5コード例・12図・17チェックを確認する。npm・ビルドは未実行。
 - **ルート実数**: `page.tsx` 100 件、registry 100 エントリ（現行ファイルから実測）。
 - **動作検証**:
