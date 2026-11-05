@@ -105,7 +105,7 @@ Claude は現在、次の階層で提供されています。
 | --- | --- | --- | --- | --- |
 | Terminal-Bench-Science 0.1 | **52.6%** | 24.7% | 29.0% | 22.4% |
 | Terminal-Bench 4.0 | 55.8% | 42.0% | 52.3% | 37.3% |
-| CursorBench 3.2.0 | 73.4% | 70.5% | — | — |
+| CursorBench 3.2.0 | 73.4% | 70.5% | 70.0% | 67.2% |
 
 - Mythos 5.1 は Terminal-Bench 4.0 で 60.9%(より緩い安全フィルター下)と報告されています。
 - 改善幅が最も大きいのは **科学研究系のターミナルタスク**です。コーディング系の伸びは相対的に控えめです。
@@ -233,7 +233,7 @@ for block in response.content:
 | 1 | **強制ツール使用の廃止** | `tool_choice` が `any` / `tool` だと 400 エラー | `auto`(既定)に戻し、スキーマ保証は **strict tool use** か **structured outputs** へ。ツールを使わせたい場面はプロンプトで明示。**CMEK 組織**の Fable / Mythos では structured outputs(`strict: true` を含む)を使えないため、`tool_choice: auto` のままプロンプトでツールの使用を明示して依頼する(スキーマは保証されない) |
 | 2 | **thinking ブロックがモデルに束縛される** | Fable 5.1 の thinking を読めるのは Fable 5.1 と Mythos 5.1 のみ | フォールバックやルーターでモデルを切り替えると、その間の推論は失われる(ブロックは自動で破棄され課金されない) |
 | 3 | **履歴編集で thinking が無効化** | thinking ブロックが無効化される。結果は設定で変わり、`prefix_mismatch_behavior: "error"` は 400 エラー(`bound to a different conversation`)、`"drop_block"` は該当ブロック以降を破棄して成功。未設定時の挙動はアカウント作成日で変わる(6.5節) | **履歴は append-only**(第6章) |
-| 4 | **advisor ツールの組み合わせ制限** | 実行側が Fable 5.1 のとき、Opus 5.5 / Opus 5 / Fable 5 の advisor は 400 エラー | advisor は **実行側以上の能力**を選ぶ |
+| 4 | **advisor ツールの組み合わせ制限** | 実行側が Fable 5.1 のとき、Opus 5.5 / Opus 5 / Fable 5 / Mythos 5 の advisor は 400 エラー | advisor は **実行側以上の能力**を選ぶ |
 
 ### 4.3 変えてはいけない前提(Fable 5 から不変)
 
@@ -925,6 +925,7 @@ flowchart TD
 ### B.1 導入前(API 利用者)
 
 - [ ] モデル ID が `claude-fable-5-1` になっている
+- [ ] 組織またはワークスペースが Fable 5.1 の30日保持要件を満たしている、または ZDR について Anthropic の明示的な許可を得ていることを導入前に確認した
 - [ ] Priority Tier への依存がないか確認した(Fable 5.1 は Priority Tier 非対応で、既存の Priority Tier 契約は適用されない)
 - [ ] `tool_choice` の `any` / `tool` を撤去した(strict tool use / structured outputs へ移行)
 - [ ] `temperature` / `top_p` / `top_k`、プレフィル、`thinking: disabled` を使っていない
