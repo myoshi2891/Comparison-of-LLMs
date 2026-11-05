@@ -64,6 +64,18 @@ export type PageEntry = z.infer<typeof PageEntrySchema>;
 
 const entries: PageEntry[] = [
   {
+    slug: "/xai/grok-bot-guide",
+    title: "Grok Bot 初学者ガイド",
+    group: "Providers",
+    category: "xAI",
+    provider: "xai",
+    topics: ["xai", "grok", "agent", "security", "automation"],
+    summary:
+      "Grok Bot の導入、依頼の書き方、Skill・Routine、承認と最小権限を学ぶ初学者向けガイド。",
+    addedAt: "2026-11-05",
+    lastReviewed: "2026-11-05",
+  },
+  {
     slug: "/codex/dots-best-practices",
     title: "OpenAI dots ベストプラクティス",
     group: "Providers",
