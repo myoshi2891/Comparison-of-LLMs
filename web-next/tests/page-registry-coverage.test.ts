@@ -75,4 +75,11 @@ describe("page-registry nav metadata", () => {
       .map((e) => e.slug);
     expect(stray).toEqual([]);
   });
+
+  it("agents を持つエントリは完全一致の agent も持つ（タグ検索・関連ページからの脱落防止）", () => {
+    const missing = pageRegistry
+      .filter((e) => e.topics.includes("agents") && !e.topics.includes("agent"))
+      .map((e) => e.slug);
+    expect(missing).toEqual([]);
+  });
 });
