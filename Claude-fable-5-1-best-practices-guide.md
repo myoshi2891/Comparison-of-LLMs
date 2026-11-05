@@ -792,6 +792,8 @@ flowchart TD
 | --- | --- |
 | 設定 | Claude API などでは beta ヘッダー `server-side-fallback-2026-07-01` を付けた `fallbacks: "default"` で、そのカテゴリに推奨されるモデルへ再試行。**Amazon Bedrock、Google Cloud の Google 管理モデル、Microsoft Foundry では利用不可**のため、SDK ミドルウェアまたはクライアント側のリトライで実装する |
 | thinking の扱い | 切り替えの方向で異なる(第4章)。Opus 5 / Fable 5 / Mythos 5 から Fable 5.1 へ切り替えると thinking は引き継がれる。Fable 5.1 から別のモデルへ切り替えると引き継がれない(例外は Mythos 5.1) |
+| 応答の判別と記録 | fallback 先が応答しても `stop_reason` は `end_turn` などの通常値のままなので、`stop_reason` だけでは判別できない。トップレベルの `response.model`(実際に応答したモデル)、`content` 内の `fallback` ブロック(切り替え地点。`from` / `to` / `trigger` を持つ)、`usage.iterations` 内の `fallback_message` エントリで判別し、ログに記録する。sticky routing(約1時間、ベストエフォート)で fallback 先が直接応答したターンには `fallback` ブロックが付かないため、`fallback_message` と `response.model` で判別する。チェーン全体が拒否した場合も末尾は `fallback_message` になるので、「`fallback_message` があり、かつ `stop_reason` が `refusal` でない」ことを条件にする。ストリーミングの出力途中で切り替わると `message_start` は元のモデル名のままなので、`fallback` ブロックの `to.model` と最終 `message_delta` の `usage.iterations` を読む |
+| 次ターンへの返送 | assistant の `content` は受け取った順序のまま返す。**`fallback` ブロックは削除も移動もしない**(API がこの位置を基準に前後の thinking ブロックを検証するため、境界の両側の thinking を返しているリクエストで省略・移動すると拒否される)。ただし出力途中の切り替えでは、**最後の `fallback` ブロックより前**の `thinking` / `redacted_thinking` / `connector_text`、クライアント側の `tool_use`、結果と対になっていない `server_tool_use` は除く。`text`、結果と対になった `server_tool_use`、最後の `fallback` ブロックより後のブロックは順序を保って残す |
 | 課金 | 出力前の refusal も、誤検知が少ないカテゴリでは課金される(2026-09-24 以降)。ストリーム途中の refusal は、入力と出力済み分が通常料金で課金。**fallback credit** で、モデル切り替えに伴うキャッシュコストが返金される |
 
 ### 11.5 コンテンツの出自表示
