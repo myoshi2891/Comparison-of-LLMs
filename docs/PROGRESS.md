@@ -6,6 +6,21 @@
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
 
+## Grok Bot ガイド移行（2026-11-05）
+
+- ルート: `/xai/grok-bot-guide`。指定HTMLを正本とし、情報基準日2026-10-24と本文に含まれる2026-11-02の確認記録を保持。registryは2026-11-05で既存xAIカテゴリへ登録し、ナビ・検索・RSS・関連ページを導出。
+- 全1 H1・21 H2・55 H3・49段落・79リスト項目（19 ul／4 ol）・30表205行・10コード例・11図・12引用・11チェック・51外部リンク（30 URL）をPure JSXへ完全転写。
+- Redで固定したsource-contract.jsonにより全文・順序・重複・全装飾クラスの適用先・見出しID・セクション境界・表のセル型と結合・リスト型／開始番号／入れ子・CDNのSRI／crossorigin・構文トークン・78 CSS規則とmedia条件を照合。表構造直下の空白ノードは0件。
+- ページ36契約＋操作26契約＝62件、registry／ナビを含む関連89件が成功。全体Vitest **227 files／2588 tests**、typecheck、lint **615 files／0 diagnostics**、pytest **122件**、HTML原本監査exit 0、Mermaid10.9.8で全11図の構文解析が成功。
+- 操作処理は行／関数100%、分岐94.8%、文99.06%。スクロール・最下部・目次内追従・960px境界・トグル／背景／Escape／リンク・実測バー高さ・inert・Tab循環・フォーカス復帰・cleanupを検証。300px固定目次と960pxモバイル開閉を保持し、目次・scrimは実測モバイルバーの下へ配置。
+- 点・番号・入れ子のcircle／square、11チェックの形状と色、全列左寄せ、先頭空白・改行、highlight.js11.11.1の全トークンを保持。ブラウザ既定太字とリンク下線をページ内で復元。引用段落とチェック済み項目の継承色も追加Redから保護。チェック保存・集計・コピーなど原本にない機能は追加していない。
+- 共通ヘッダー／免責バナーは実測高で一度だけ余白を確保。日付をregistryからヒーローへ表示し、共通鮮度バーを非表示化。共通bodyクラスと鮮度バーIDは:global()でCSS Modulesのハッシュ化を防ぎ、追加Redで検証。
+- 原本の図解CSSのうちsvg幾何・tooltip・ラベルとフレームの配置宣言は共有MermaidDiagramへ委譲し、契約の明示除外として記録。図ソースとclassDef配色・themeVariablesは完全一致。SVGラベルを使ってclassDefの明色文字を維持。
+- 原本保存: HTML `archive/html/xAI/Xai-grok-bot-guide.html`（SHA-256 `bc681fa9792fe63e8b5ee47521def51fccd52a9c180b905861cc66baa62f3bcb`）、Markdown `archive/md/xAI/Xai-grok-bot-guide.md`（`584ab1cd33dcd9db657f5cdcdaa92ef95ff9ea23031678ee4af749a0d3134193`）。移動前後一致、内容無変更、100%リネーム。
+- Markdown監査はexit 1。独立目次とH2の句点による見出し22件、表6行（リンク表示3行と初回／追加確認日・取得可否3行）、認証情報の説明3段落に差がある。Team Bot専用Vaultの暫定情報・Secrets／個人アカウントの注意はMarkdown側が後日更新されている。HTMLを指定された移行のため内容更新はせず、原本同士を混在させない。リンク・リスト・コード・SVG・calloutに欠落はなく、11図は一致。
+- 分離履歴: Red `35b8bf87` → 追加Red `3d9c9acb`／`b5b98436` → Green `0b5db2f5` → Refactor `57dd9d24` → 原本保存 `1a3ffe6e`。原本の固定期待値は変更していない。追加RedのCSS抽出では:global()を比較時だけ正規化し、既存の期待値を維持した。
+- CSSキャッシュを一時領域へ退避し、通常 `bun run dev --port 3000` で `http://localhost:3000/xai/grok-bot-guide` がHTTP 200。目視はユーザー担当。npm・ビルド・ブラウザ自動確認は未実行。依存・設定・ロックは無変更。
+
 ## registryのagentトピック補正（2026-11-05）
 
 - `/codex/dots-best-practices`／`/claude/duet-best-practices` の `topics` に、既存の `agents` を残して完全一致の `agent` を追加。タグ検索と関連ページは完全一致で比較するため、`agents` だけでは `agent` タグの一覧と関連候補に含まれなかった。
@@ -152,16 +167,16 @@
 
 - **フェーズ**: 保守・機能改善・品質強化フェーズ
 - **ブランチ**: `dev`
-- **最新実装 HEAD**: `ad25ee38`（registryのagentトピック補正: Red `86363a7c` → Green `d159c4f0`、Red `81a2cfa7` → Green `ad25ee38`）。その前は `3395fbbd`（OpenAI dots: Red `d43d0642` → 追加Red `fb630c9e`／`cf10adec` → Green `29a7e1ec` → Refactor `3395fbbd`。原本保存 `529e3272`）。
-- **次の作業**: `/codex/dots-best-practices` の目視確認（ユーザー担当、localhost:3000）。310px固定目次・900pxモバイル開閉・日本語アンカー・入れ子の点と番号・29表・5コード例・12図・17チェックを確認する。npm・ビルドは未実行。
-- **ルート実数**: `page.tsx` 100 件、registry 100 エントリ（現行ファイルから実測）。
+- **最新実装 HEAD**: `57dd9d24`（Grok Botガイド。Red `35b8bf87`／追加Red `3d9c9acb`／`b5b98436`、上記分離履歴を参照）。
+- **次の作業**: `/xai/grok-bot-guide` の目視確認（ユーザー担当、localhost:3000）。300px目次・960pxモバイル開閉・21章・リストの点と番号・30表・10コード例・11図・11チェックを確認。npm・ビルドは未実行。
+- **ルート実数**: `page.tsx` 101 件、registry 101 エントリ（現行ファイルから実測）。
 - **動作検証**:
   - ビルド: 今回はユーザー指定で未実行。過去の成功記録は 2026-09-17 の 90 静的ページであり、今回の変更を検証した値ではない。
   - `bun run typecheck` ✅（`tsc --noEmit`。2026-11-05 実測）
-  - `bun run lint` ✅（Biome check / 609 files / 0 diagnostics。2026-11-05 実測）
+  - `bun run lint` ✅（Biome check / 615 files / 0 diagnostics。2026-11-05 実測）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000` でVitest **225 files / 2526 tests すべて合格**（2026-11-05実測）。Refactor後の関連88契約、typecheck・lint（609 files／0 diagnostics）も成功。
-    - 過去のClaudeモデルガイド初回全体検証では2239件中registryの日付不変条件1件が失敗し、専用Red／Greenで修正済み。今回の全体2526件はすべて成功。依存・設定・ロックは変更していない。
+  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000` でVitest **227 files / 2588 tests すべて合格**（2026-11-05実測）。Grok Botの関連89契約、typecheck・lint（615 files／0 diagnostics）も成功。
+    - 過去のClaudeモデルガイド初回全体検証では2239件中registryの日付不変条件1件が失敗し、専用Red／Greenで修正済み。今回の全体2588件はすべて成功。依存・設定・ロックは変更していない。
     - `load(sourceHtml)` をモジュール初期化時に呼ぶ `governance/ai-governance/GuideContent.tsx` と
       `local-llm/finetuning-best-practices/GuideContent.tsx` は、import スモークでも読み込み可能であることを確認済み
   - **バックエンド (`scraper/`)**: `uv run pytest` で122件成功（2026-11-05実測）。
@@ -621,16 +636,15 @@
 
 ```text
 AGENTS.md → CODEX.md → CLAUDE.md → docs/PROGRESS.md → Phase A–F 計画の順で読む。
-最新実装 HEAD: 3395fbbd（OpenAI dots: Red d43d0642 → 追加Red fb630c9e／cf10adec → Green29a7e1ec → Refactor3395fbbd。原本保存529e3272）
-次の作業: /codex/dots-best-practices の目視確認（ユーザー担当）。http://localhost:3000/codex/dots-best-practices
-310px目次・900pxモバイル開閉・日本語アンカー・全Part見出し・入れ子の点と番号・29表の左寄せ・5コード例の構文色と字下げ・12図・17チェックの装飾を確認。
-指定HTMLを正本とし、情報基準日2026-10-24を保持。原本2形式はarchiveへ100%リネームで保存（SHA-256一致）。Markdownの独立目次と図1件の差は本書冒頭を参照。
-HTML原本監査exit 0、対象62契約（ページ35／操作27）、関連88件、全225 files／2525 tests、型・lint609 files、pytest122件が成功。
-操作の行／関数100%、分岐94.8%。CSSの詳細度・適用順も検証済み。図の配置・サイズは共有MermaidDiagramへ委譲。依存・設定・ロックは変更していない。
+最新実装 HEAD: 57dd9d24（Grok Botガイド。Red 35b8bf87 → 追加Red 3d9c9acb／b5b98436。分離履歴は同名節を参照）
+次の作業: /xai/grok-bot-guide の目視確認（ユーザー担当）。http://localhost:3000/xai/grok-bot-guide
+300px目次・960pxモバイル開閉・21章・点と番号と入れ子・30表205行の左寄せ・10コード例の構文色と空白・11図・11チェックを確認。
+指定HTMLを正本とし、情報基準日2026-10-24を保持。HTML／Markdownはarchive/html/xAI/／archive/md/xAI/へ100%リネームで保存（SHA-256一致）。
+Markdownの認証情報・検証メモ等との差分は本書の同名節を参照。本文更新は行わず両形式を混在させていない。
+HTML原本監査exit 0、対象62契約（ページ36／操作26）、関連89件、全227 files／2588 tests、型・lint615 files、pytest122件が成功。
+操作の行／関数100%、分岐94.8%。78 CSS規則・全装飾クラスと表の不正空白ノード不在も検証済み。図の配置・サイズは共有MermaidDiagramへ委譲。
 NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000 を使用。
-サンドボックスではnpmとビルドを実行しない。修正もRed → Green → Refactor → Docsの分離コミットを守る。
-page.tsx 100件、pageRegistry配列100件（実測）。次ページは指示されてから扱う。
-既存ポート3000の起動元を確認し、CSSキャッシュ退避後bun run dev --port 3000で再起動済み。新規ルートHTTP 200。
-前回の /claude/duet-best-practices の移行・目視項目は本書の同名節を参照。
-開始前から存在する未追跡Xai-grok-bot-guide.htmlは変更・コミットしていない。
+サンドボックスではnpmとビルドを実行しない。Red → Green → Refactor → Docsの分離コミットを守る。
+page.tsxとpageRegistryは101件ずつ（実測）。次ページは指示されてから扱う。依存・設定・ロックは変更していない。
+CSSキャッシュ退避後、通常bun run dev --port 3000で起動しHTTP 200。目視はユーザー担当。
 ```

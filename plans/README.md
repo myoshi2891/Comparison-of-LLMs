@@ -12,6 +12,12 @@ Updated 2026-11-05
 
 基準コミット（drift 検出用）: `45940fd`
 
+保守同期（2026-11-05）: `/xai/grok-bot-guide` を既存xAIカテゴリへ登録。
+007〜009のDONE状態を維持し、新規基盤プランは起票していない。原本照合・操作62契約、
+関連89件、全体Vitest **227 files／2588 tests**、型・lint（615 files／0 diagnostics）、
+HTML監査exit 0、Mermaid11図の解析、pytest122件が成功。原本2形式は内容無変更で保存。
+npm・ビルドは未実行。次はユーザーの目視確認（localhost:3000）。履歴は `docs/PROGRESS.md` を参照。
+
 保守同期（2026-11-05）: `/codex/dots-best-practices` を既存Codexカテゴリへ登録。
 007〜009のDONE状態を維持し、新規基盤プランは起票していない。原本照合・操作62契約、
 関連88件、全体Vitest **225 files／2525 tests**、型・lint（609 files／0 diagnostics）、

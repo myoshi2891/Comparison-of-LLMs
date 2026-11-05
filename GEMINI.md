@@ -5,6 +5,22 @@ Updated 2026-11-05
 GEMINI.md は Gemini CLI / Gemini Code Assist 向けの入り口。
 本リポジトリでは **CLAUDE.md が正本** とし、GEMINI.md はその委譲 pointer として機能する。
 
+Grok Bot ガイド `/xai/grok-bot-guide` を追加（2026-11-05）。
+指定HTMLの全77見出し（H1×1／H2×21／H3×55）、49段落、79リスト項目、30表205行、
+10コード例、11図、12引用、11チェック項目、51外部リンク（30 URL）をPure JSXへ完全転写。
+原本固定の本文・構造・全装飾クラス・78 CSS規則を62契約（ページ36／操作26）で照合。
+全体Vitest **227 files／2588 tests**、関連89契約、型・lint（615 files／0 diagnostics）、
+HTML原本監査exit 0、Mermaid10.9.8の11図解析、pytest122件が成功。
+操作の行／関数100%、分岐94.8%。点・番号・入れ子・チェック装飾、表全列左寄せ、
+コードの空白とhighlight.js11.11.1の全トークン、300px目次と960pxモバイル開閉を保持。
+目次・実測バー・inert・Tab循環・フォーカス復帰・cleanupを検証し、共通クロームはページ内へ限定。
+CSS Modulesの共通クラス／IDのハッシュ化を追加Redから防止し、日付をregistryからヒーローへ表示。
+registryのxAIカテゴリからナビ・検索・RSS・関連ページを導出。本文の情報基準日2026-10-24を保持。
+HTML／Markdownはarchive/html/xAI/／archive/md/xAI/へ内容無変更で保存（SHA-256一致）。
+両形式には認証情報・検証メモ等の差があるため、指定HTMLを正本とし混在させない。
+npm・ビルドは未実行。CSSキャッシュ退避後、通常devのlocalhost:3000でHTTP 200。
+目視はユーザー担当。分離履歴・原本差分の詳細は `docs/PROGRESS.md` を参照。
+
 OpenAI dots ガイド `/codex/dots-best-practices` を追加（2026-11-05）。
 指定HTMLの全80見出し（H1×6／H2×22／H3×52）、60段落、78リスト項目、29表190行、
 5コード例、12図、18 callout、17チェック項目、外部リンク50件（32 URL）をPure JSXへ完全転写。
