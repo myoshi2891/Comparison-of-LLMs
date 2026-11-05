@@ -755,7 +755,7 @@ flowchart TD
 
 ### 11.1 仕組み
 
-Fable 5.1 には安全分類器があり、リクエストが拒否されると **HTTP 200 で `stop_reason: "refusal"`** が返り、`stop_details` に方針領域が入ります。
+Fable 5.1 には安全分類器があり、リクエストが拒否されると **HTTP 200 で `stop_reason: "refusal"`** が返り、`stop_details.category` に方針領域が入ります。ただし、名前付きのカテゴリに対応しない refusal では、`category` と `explanation` はどちらも `null` です(正常な値)。拒否の判定は `stop_reason` で行い、`category` がない refusal は汎用の処理へ回します。
 
 ### 11.2 対応フロー
 
@@ -763,12 +763,16 @@ Fable 5.1 には安全分類器があり、リクエストが拒否されると 
 flowchart TD
     A["リクエスト送信"] --> B{"stop_reason が refusal か"}
     B -- "いいえ" --> OK["通常処理"]
-    B -- "はい" --> C["stop_details のカテゴリを確認"]
-    C --> D{"誤検知の可能性が高いか"}
+    B -- "はい" --> C["stop_details.category を確認"]
+    C --> N{"category は null か"}
+    N -- "はい" --> U["汎用処理: 記録し、別モデルへの再試行かプロンプトの見直しを判断"]
+    N -- "いいえ" --> D{"誤検知の可能性が高いか"}
     D -- "はい" --> E["表現・文脈を調整して再送 11.3"]
-    D -- "いいえ" --> F["fallback を実行"]
+    D -- "いいえ" --> R{"カテゴリに推奨 fallback があるか"}
+    R -- "はい" --> F["fallback を実行"]
+    R -- "いいえ" --> P["refusal は確定。カテゴリ別に対応 (例: reasoning_extraction はプロンプトを見直す)"]
     F --> G["サーバー側 fallback / SDK ミドルウェア / 自前リトライ"]
-    G --> H["許可される fallback 先: Opus 4.8 または Opus 5"]
+    G --> H["fallback 先はカテゴリで変わる。許可される先: Opus 4.8 または Opus 5"]
     style F fill:#fff4e6,stroke:#e8590c,color:#111
 ```
 
