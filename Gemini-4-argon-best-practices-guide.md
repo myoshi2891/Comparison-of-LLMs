@@ -78,8 +78,9 @@ flowchart LR
 | サンプリング | `temperature` / `top_p` / `top_k` は無視される。`candidate_count` / `frequency_penalty` / `presence_penalty` は Gemini Enterprise Agent Platform で **HTTP 400** になるため、移行前に削除する |
 | キャッシュ | 明示キャッシュ(`cachedContents`)は非対応、**暗黙キャッシュ**のみ(4,096トークン以上、ヒット時95%割引) |
 | 入力モダリティ | テキスト・画像・動画・音声・PDF(出力はテキスト) |
-| 価格(導入価格) | **2026年11月30日まで**(100万トークンあたり)。Gemini API と global: 入力 $2 / 出力 $10。Gemini Enterprise Agent Platform の non-global リージョン: 入力 $2.20 / 出力 $11 |
-| 価格(12/1以降) | **2026年12月1日から**(100万トークンあたり)。Gemini API と global: 入力 $4 / 出力 $20。Gemini Enterprise Agent Platform の non-global リージョン: 入力 $4.40 / 出力 $22 |
+| 価格(Standard・導入価格) | **2026年11月30日まで**(100万トークンあたり)。Gemini API と global: 入力 $2 / 出力 $10。Gemini Enterprise Agent Platform の non-global リージョン: 入力 $2.20 / 出力 $11 |
+| 価格(Standard・12/1以降) | **2026年12月1日から**(100万トークンあたり)。Gemini API と global: 入力 $4 / 出力 $20。Gemini Enterprise Agent Platform の non-global リージョン: 入力 $4.40 / 出力 $22 |
+| 価格(Priority) | 上の2行は **Standard の単価で、Priority の見積りには使えない**(100万トークンあたり)。Gemini API と global: 11月30日まで入力 $3.60 / 出力 $18、12月1日から入力 $7.20 / 出力 $36。Gemini Enterprise Agent Platform の non-global リージョン: 11月30日まで入力 $3.96 / 出力 $19.80、12月1日から入力 $7.92 / 出力 $39.60。Batch / Flex も単価が異なる |
 | 安全面の公表値 | 間接プロンプトインジェクション攻撃成功率0.7%(Gray Swan IPI、15回の適応的試行) |
 | 公表されている総合評価 | Vals Indexで1位(68.9%)と発表されている |
 
@@ -104,9 +105,9 @@ flowchart TD
     NEW -->|"既存資産あり"| GC["GenerateContent API\nLegacy扱いだが継続利用可"]
 ```
 
-- 公式ドキュメントでは、**新規プロジェクトには Interactions API が推奨**されています。Gemini API の Interactions API ではサーバー側がバックグラウンド実行でLong Decodeを代行します。これは **Gemini API に限った経路**で、Gemini Enterprise Agent Platform の Interactions API は Long Decode に対応していません。Google Cloud で Long Decode を使う場合は GenerateContent(`v1beta1`)を使ってください。
-- Gemini API の Interactions API でバックグラウンド実行を使うと、リクエストと応答がサーバーに保存されます。バックグラウンド実行には `store=true` が必須で(既定で `true`、`store=false` とは併用不可)、有料ティアの保持期間は55日です。保持期間は AI Studio で7・14・28・55日から設定でき、期間が過ぎると自動で削除されます。それより前に消すには、インタラクションIDを指定して `delete` メソッドを呼ぶか、AI Studio の Logs ページから削除します。インタラクションを保持できない場合は、GenerateContent を使ってください。ただし、これで避けられるのは Interactions の状態保存だけで、ゼロデータ保持は保証されません。有料サービスでも、プロンプトと応答は不正利用の検出のため一定期間ログに記録されます。保証されたゼロデータ保持が必要な場合、Google は Vertex AI の利用を案内しています。また、Google 検索と Google マップのグラウンディングには別の保持ルールがあり、プロンプトや生成結果などが30日間保存され、この保存は無効にできません。
-- 既存のGenerateContent APIは「Legacy」と表記されていますが、Argonでも利用可能で、**クライアント側で細かく継続制御したい場合(再試行・バックオフ・保存しない運用)はGenerateContent側が現状唯一の選択肢**です(Interactions APIへのクライアント側継続は「近日対応」と案内)。
+- 公式ドキュメントでは、**新規プロジェクトには Interactions API が推奨**されています。Interactions API の Long Decode には2つの経路があります。**バックグラウンド実行**(`background=true`)はサーバー側が継続を代行し、`store=true` が必須です。**クライアント側継続**(SDK の自動継続、または `continuation_token` の自前ループ)は、保存あり(`store=true`)でもステートレス(`store=false`)でも使えます。どちらも Gemini API と Gemini Enterprise Agent Platform の Interactions API(`v1beta1`)で使えます。Google Cloud では、Interactions API と GenerateContent のどちらでも `v1beta1` が必要で、`v1` では Long Decode を使えません。
+- Gemini API の Interactions API でバックグラウンド実行を使うと、リクエストと応答がサーバーに保存されます。バックグラウンド実行には `store=true` が必須で(既定で `true`、`store=false` とは併用不可)、有料ティアの保持期間は55日です。保持期間は AI Studio で7・14・28・55日から設定でき、期間が過ぎると自動で削除されます。それより前に消すには、インタラクションIDを指定して `delete` メソッドを呼ぶか、AI Studio の Logs ページから削除します。インタラクションを保持できない場合は、`store=false` のクライアント側継続か、GenerateContent を使ってください。ただし、これで避けられるのは Interactions の状態保存だけで、ゼロデータ保持は保証されません。有料サービスでも、プロンプトと応答は不正利用の検出のため一定期間ログに記録されます。保証されたゼロデータ保持が必要な場合、Google は Vertex AI の利用を案内しています。また、Google 検索と Google マップのグラウンディングには別の保持ルールがあり、プロンプトや生成結果などが30日間保存され、この保存は無効にできません。
+- 既存のGenerateContent APIは「Legacy」と表記されていますが、Argonでも利用可能です。**クライアント側で細かく継続制御したい場合(再試行・バックオフ・保存しない運用)は、Interactions API のクライアント側継続と GenerateContent のどちらでも実装できます**。Interactions API で `store=false` にする場合は、前回のインタラクションIDの代わりにプロンプトを再送します。
 
 ### 1.2 ベストプラクティス
 
@@ -128,6 +129,8 @@ Long Decode の自動継続を使うには、**SDKのバージョン要件**が�
 | Java | 1.77.0 |
 | .NET | 1.26.0 |
 | Kotlin | 1.6.0 |
+
+上の表は GenerateContent の要件です。**Interactions API の自動継続はより新しいSDKが必要**で、Python 2.34.0、JavaScript 2.32.0、Go 1.77.0、Java 1.80.0 以上です。
 
 Python の 2.31.0 では、自動継続時のグラウンディングメタデータの結合が修正されました([CHANGELOG](https://github.com/googleapis/python-genai/blob/main/CHANGELOG.md))。グラウンディングを使うワークロードでは 2.31.0 以上を入れてください。
 
@@ -289,11 +292,13 @@ if usage:
     print("Billed tokens:", usage.total_token_count)
 ```
 
-10分以内に終わるとわかっている処理は、`client.models.generate_content` のままでかまいません(Step 2 のクイックスタート)。クライアントで接続を保持し続けたくない長時間の処理は、次の 4.5 のバックグラウンド実行を使います(Gemini API のみ。Gemini Enterprise Agent Platform ではストリーミングを使います)。
+10分以内に終わるとわかっている処理は、`client.models.generate_content` のままでかまいません(Step 2 のクイックスタート)。クライアントで接続を保持し続けたくない長時間の処理は、次の 4.5 のバックグラウンド実行を使います。
 
-### 4.5 Interactions API(バックグラウンド実行・Gemini API のみ)
+### 4.5 Interactions API(バックグラウンド実行)
 
-Gemini Enterprise Agent Platform の Interactions API では使えません(Step 1 を参照)。
+バックグラウンド実行は `store=true` が必須です。接続を保持する場合や保存しない場合は、クライアント側継続を使います(Step 1 を参照)。
+
+Gemini Enterprise Agent Platform で使う場合は、クライアントを `genai.Client(enterprise=True, project="PROJECT_ID", location="global")` で作り、`v1beta1` を使います(SDK の既定)。保存されたセグメントのTTLは7日で、Step 1 の Gemini API の保持期間とは異なります。
 
 ```python
 import time
@@ -302,7 +307,7 @@ from google import genai
 
 client = genai.Client()
 
-# 64K超を生成するには background=True と max_output_tokens > 65536
+# バックグラウンド実行で64K超を生成するには max_output_tokens > 65536 を指定する
 # max_output_tokens を指定しないと、サーバーは64Kで停止する
 interaction = client.interactions.create(
     model="gemini-4-argon",
@@ -404,7 +409,7 @@ print("".join(p.text for p in parts if p.text and not p.thought))
 print("Finish reason:", candidate.finish_reason)
 ```
 
-この例は非ストリーミングなので、1リクエストの上限は32,768トークン、時間は10分です。1ホップが10分を超えそうな処理は、`generate_content_stream` のループにするか、4.5 のバックグラウンド実行(Gemini API のみ)を使ってください。Gemini Enterprise Agent Platform ではストリーミングを使います。
+この例は非ストリーミングなので、1リクエストの上限は32,768トークン、時間は10分です。1ホップが10分を超えそうな処理は、`generate_content_stream` のループにするか、4.5 のバックグラウンド実行を使ってください。
 
 **ストリーミングの自前ループ**では追加ルールがあります: 最初の32,768トークン以降は5,000トークンごとにチェックポイントのトークンが届きます。未確定チャンクは保留リストに溜め、トークンを受け取った時点で確定出力へ移します。ストリームが切れたら保留分を捨て、最後のトークンから再開します。
 
@@ -425,9 +430,9 @@ SDKの自動継続では `usage_metadata` が **全ホップの合計** を返�
 ### 5.3 課金の理解
 
 - **全ホップの全トークンが課金対象**(思考のみのホップも含む)。
-- 各ホップの繰り返し入力は暗黙キャッシュで**95%割引**(global の導入価格では1Mあたり$0.10、12/1以降は$0.20。non-global はそれぞれ$0.11、$0.22)。ただしキャッシュは**15〜20分使われないと失効**するため、ホップ間に長い停止があると全額に戻ります。
+- 各ホップの繰り返し入力は暗黙キャッシュで**95%割引**(Standard の global の導入価格では1Mあたり$0.10、12/1以降は$0.20。non-global はそれぞれ$0.11、$0.22)。ただしキャッシュは**15〜20分使われないと失効**するため、ホップ間に長い停止があると全額に戻ります。
 - 失敗した非ストリーミングのホップは**課金されない**。ストリームが32K未満で切れた場合も課金なし(以降は最後のチェックポイントまで課金)。
-- **導入価格は2026年11月30日までで、2026年12月1日から倍になる予定**(global は入力 $2→$4、出力 $10→$20。Gemini Enterprise Agent Platform の non-global は入力 $2.20→$4.40、出力 $11→$22)。予算を組む際は12月以降の単価で試算してください。
+- **導入価格は2026年11月30日までで、2026年12月1日から倍になる予定**(Standard の global は入力 $2→$4、出力 $10→$20。Gemini Enterprise Agent Platform の non-global は入力 $2.20→$4.40、出力 $11→$22)。予算を組む際は12月以降の単価で試算してください。
 
 ---
 
@@ -440,7 +445,7 @@ Gemini 3.x系から移行する場合のチェックリストです(公式の移
 | 1 | モデルID | `gemini-4-argon` に変更。Gemini Enterprise Agent Platform では、リクエスト履歴から prefill した `model` ターンも削除する(非対応で、履歴の末尾を `model` ターンにできない) |
 | 2 | `max_output_tokens` | 明示的に設定。既定は64K(ストリーミング/SDK)、32K(非ストリーミングREST) |
 | 3 | 32K未満の上限 | 32,768以上へ。トークン節約は `thinking_level` で |
-| 4 | Long Decode計画 | 上限超のタスクは最新SDKか `continuation_token` ループ。Gemini Enterprise Agent Platform の `GenerateContent` では API バージョン **`v1beta1`** が必須で、最新SDKやループを使っても `v1` では動かない(SDKの既定は `v1beta1` なので、`api_version="v1"` を指定していないか確認する) |
+| 4 | Long Decode計画 | 上限超のタスクは最新SDKか `continuation_token` ループ。Gemini Enterprise Agent Platform の Interactions API と `GenerateContent` では API バージョン **`v1beta1`** が必須で、最新SDKやループを使っても `v1` では動かない(SDKの既定は `v1beta1` なので、`api_version="v1"` を指定していないか確認する) |
 | 5 | `thinking_budget` | `thinking_level` に置き換え(3レベルで評価) |
 | 6 | 明示コンテキストキャッシュ | **非対応でエラー**。`cachedContents` / `caches.create` / `cached_content` を削除。暗黙キャッシュ(4,096トークン以上・95%割引)へ |
 | 7 | サンプリングパラメータ | `temperature` / `top_p` / `top_k` を削除(指定しても無視)。`candidate_count` / `frequency_penalty` / `presence_penalty` も削除(Gemini Enterprise Agent Platform では HTTP 400) |
@@ -607,14 +612,14 @@ flowchart TD
 ### 10.2 本番投入チェックリスト
 
 - [ ] モデルID `gemini-4-argon` を使用、請求アカウント有効(有料ティア)
-- [ ] SDKが最低バージョン以上(Python 2.30.1、グラウンディング利用時は 2.31.0 / JS 2.29.1 ほか)
+- [ ] SDKが最低バージョン以上(Python 2.30.1、グラウンディング利用時は 2.31.0 / JS 2.29.1 ほか。Interactions API の自動継続は Python 2.34.0 / JS 2.32.0 ほか)
 - [ ] `max_output_tokens` を明示。32K未満の旧設定は引き上げ
 - [ ] `thinking_level` を3レベルで評価済み。`thinking_budget`、サンプリング引数は削除
 - [ ] 明示キャッシュの呼び出しを撤去、暗黙キャッシュ前提の設計(共通プレフィックス先頭固定)
 - [ ] HTTP読み取りタイムアウト20分、ホップ単位のリトライ・バックオフ
 - [ ] コンテキスト判定に `initial_prompt_token_count` + `candidates_token_count` + `thoughts_token_count` を使用
 - [ ] Thought Signatureを含む完全な履歴を返送
-- [ ] 12/1の価格改定(global は入力$4・出力$20、non-global は入力$4.40・出力$22)を織り込んだ予算
+- [ ] 12/1の価格改定(Standard の global は入力$4・出力$20、non-global は入力$4.40・出力$22)を織り込んだ予算
 - [ ] 不可逆操作の承認ゲート、最小権限、サンドボックス
 - [ ] cost per successful task の計測基盤(トレース・思考トークン)
 - [ ] 本番に近い環境での評価(評価認識の影響を考慮)
