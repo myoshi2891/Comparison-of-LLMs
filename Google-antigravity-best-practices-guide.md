@@ -322,7 +322,6 @@ CLIは、**実行モード**と `toolPermission` と詳細ルール(allow / ask 
     "allow": [
       "command(git status)",
       "command(git diff)",
-      "command(regex:npm run (build|lint|test))",
       "write_file(src/)",
       "read_url(developer.mozilla.org)",
       "mcp(linter/*)"
@@ -337,13 +336,17 @@ CLIは、**実行モード**と `toolPermission` と詳細ルール(allow / ask 
       "command(sudo)",
       "command(regex:curl .*)",
       "write_file(.git/)",
-      "write_file(/home/johndoe/.ssh)"
+      "write_file(<HOME>/.ssh)"
     ]
   }
 }
 ```
 
 出典: [公式] の設定例を元に、`toolPermission` と `read_url` の許可範囲を絞って構成(**[筆者推奨]**)。
+
+- `<HOME>` は、`echo "$HOME"` で確認した自分のホームディレクトリの絶対パスに置き換えてください。公式の例も絶対パスで、`write_file` が `~` を展開するとは書かれていません [公式]。
+- `command` の `allow` ルールは、サンドボックスの**内外を問わず**確認なしの実行を許可します [公式]。`proceed-in-sandbox` ならサンドボックス内のコマンドは自動で実行され、外で実行するときは確認が出るので、`npm run` の `allow` ルールは入れていません(**[筆者推奨]**)。
+- この例の `curl` は `deny` なので、`allow` で例外を作れません。例外が必要な場合は `ask` へ移します(Step 15.3)。
 
 ### 2.7 コマンドマッチの落とし穴
 
@@ -1070,9 +1073,9 @@ flowchart LR
 | 資格情報 | **エージェントから見える資格情報は、非本番・厳しい利用上限付き**にする | [開発者] Simon Willison |
 | 資格情報 | `.env` をワークスペース外へ置く、または `read_file` / `write_file` の `deny` に入れる | [筆者推奨] |
 | 通信 | `read_url` の許可は**必要なドメインだけ**(サンドボックスの外向き通信に直結) | [公式] |
-| 通信 | `command(regex:curl .*)` を `deny`、必要なときだけ個別に許可 | [公式]の例 |
+| 通信 | `command(regex:curl .*)` を `ask` に入れ、実行のたびに確認する。優先順位は Deny > Ask > Allow なので、`deny` や `ask` を個別の `allow` で緩めることはできない。例外を認めない場合だけ `deny` にする | [公式]の優先順位 [筆者推奨] |
 | 実行 | Default / Auto を使い、Turboを避ける | [公式] |
-| 破壊 | `command(rm -rf)`、`command(sudo)`、`write_file(.git/)`、`write_file(~/.ssh)` を `deny` | [公式]の例 |
+| 破壊 | `command(rm -rf)`、`command(sudo)`、`write_file(.git/)`、`write_file(<HOME>/.ssh)`(`<HOME>` は自分のホームの絶対パス)を `deny` | [公式]の例 |
 | ブラウザ | `execute_url`(クリック・入力)は既定で確認。本番コンソールは `ask` に固定 | [公式] |
 | ブラウザ | 組み込みブラウザは、自分のChromeプロファイルとは別のCookie・ログインを持つ | [公式] |
 | 入力 | 外部ドキュメント・Issue・READMEは**信頼できない入力**として扱い、読ませた直後は書き込み権限を絞る | [開発者][筆者推奨] |
@@ -1185,7 +1188,7 @@ flowchart LR
 |:--|:--|
 | ☐ | ダミーリポジトリで `agy` を起動し、認証を完了した |
 | ☐ | 権限プリセット(Default または Request Review)を明示的に選んだ |
-| ☐ | `deny` に `rm -rf` / `sudo` / `.git/` / `~/.ssh` を入れた |
+| ☐ | `deny` に `rm -rf` / `sudo` / `.git/` / ホームの絶対パスで書いた `.ssh` を入れた |
 | ☐ | `AGENTS.md` に「テスト・Lintコマンド」「触らない場所」「完了の定義」を書いた |
 | ☐ | `/plan /grill-me` で小さな機能を1本通した |
 | ☐ | テストを先に書かせ、実行結果を貼らせた |
