@@ -2,7 +2,7 @@
 
 > 本ファイルは Next.js 移行完了後の保守・改善フェーズにおける開発の進捗（特にテスト関連）および品質チェックのルールを記録する。
 >
-> - 最終更新日: **Updated 2026-11-05**
+> - 最終更新日: **Updated 2026-11-06**
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
 
@@ -24,7 +24,7 @@
 ## postcss の devDependencies 追加（2026-11-05）
 
 - `b99b83dc`（15:37）で `web-next/package.json` の devDependencies に `postcss` `^8.5.18` を追加し、`web-next/bun.lock` の宣言へ同じ1行を追加した。解決版は既存エントリの8.5.23。Grok Bot移行の完了後の変更であり、同移行の「依存・設定・ロックは無変更」は移行範囲の記述として正しい。
-- コミット本文に追加理由の記載はなく、リポジトリ内に `postcss` の直接importはない。`postcss.config.mjs` は `@tailwindcss/postcss` のみを指定する。
+- コミット本文に追加理由の記載はない。`web-next/app/` 配下のテスト14ファイル（`xai/grok-bot-guide/page.test.tsx` を含む）が `postcss` を直接importしている（テスト以外の直接importはない）。`postcss.config.mjs` は `@tailwindcss/postcss` のみを指定する。
 - ユーザー承認の記録は未確認。マージ前に明示的な承認を確認し、ここへ記録する。既存のロックファイルエントリは承認の代わりにならない。
 
 ## registryのagentトピック補正（2026-11-05）
