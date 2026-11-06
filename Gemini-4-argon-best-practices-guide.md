@@ -75,7 +75,7 @@ flowchart LR
 | 1リクエストの出力上限 | ストリーミング/SDK: **64K**、非ストリーミングREST: **32K** |
 | Long Decode | 上限を超えて最大「1M − 入力」まで、継続トークンで複数ホップ生成 |
 | 思考制御 | `thinking_level`: `low` / `medium`(既定)/ `high`(`minimal` は非対応) |
-| サンプリング | `temperature` / `top_p` / `top_k` は無視される。`candidate_count` は Gemini Enterprise Agent Platform で **HTTP 400** になるため、移行前に削除する |
+| サンプリング | `temperature` / `top_p` / `top_k` は無視される。`candidate_count` / `frequency_penalty` / `presence_penalty` は Gemini Enterprise Agent Platform で **HTTP 400** になるため、移行前に削除する |
 | キャッシュ | 明示キャッシュ(`cachedContents`)は非対応、**暗黙キャッシュ**のみ(4,096トークン以上、ヒット時95%割引) |
 | 入力モダリティ | テキスト・画像・動画・音声・PDF(出力はテキスト) |
 | 価格(導入価格) | 入力 $2 / 出力 $10(100万トークンあたり)、**2026年11月30日まで** |
@@ -105,6 +105,7 @@ flowchart TD
 ```
 
 - 公式ドキュメントでは、**新規プロジェクトには Interactions API が推奨**されています。Gemini API の Interactions API ではサーバー側がバックグラウンド実行でLong Decodeを代行します。これは **Gemini API に限った経路**で、Gemini Enterprise Agent Platform の Interactions API は Long Decode に対応していません。Google Cloud で Long Decode を使う場合は GenerateContent(`v1beta1`)を使ってください。
+- Gemini API の Interactions API でバックグラウンド実行を使うと、リクエストと応答がサーバーに保存されます。バックグラウンド実行には `store=true` が必須で(既定で `true`、`store=false` とは併用不可)、有料ティアの保持期間は55日です。保持期間は AI Studio で7・14・28・55日から設定でき、期間が過ぎると自動で削除されます。それより前に消すには、インタラクションIDを指定して `delete` メソッドを呼ぶか、AI Studio の Logs ページから削除します。インタラクションを保持できない場合は、GenerateContent を使ってください。
 - 既存のGenerateContent APIは「Legacy」と表記されていますが、Argonでも利用可能で、**クライアント側で細かく継続制御したい場合(再試行・バックオフ・保存しない運用)はGenerateContent側が現状唯一の選択肢**です(Interactions APIへのクライアント側継続は「近日対応」と案内)。
 
 ### 1.2 ベストプラクティス
@@ -301,6 +302,15 @@ while interaction.status in ("in_progress", "queued"):
     time.sleep(5)
     interaction = client.interactions.get(id=interaction.id)
 
+# 部分テキストを完了した出力として扱わない
+# incomplete: previous_interaction_id・continuation_token・より大きい max_output_tokens で再開する
+# failed: リクエストを再試行する / cancelled: usage で課金済みトークンを確認する
+if interaction.status != "completed":
+    raise RuntimeError(
+        f"未完了で終了しました: id={interaction.id} "
+        f"status={interaction.status} usage={interaction.usage}"
+    )
+
 # ホップごとに model_output ステップが増えるので、すべてのテキストを結合する
 text = "".join(
     content.text
@@ -333,11 +343,11 @@ SDK自動継続を使えない(REST直叩き、独自ハーネス、古い言語
 
 ### 5.1 ループの5つのルール
 
-1. **毎ホップ、同じリクエストを送る**(`contents` / `system_instruction` / `tools` / `generation_config`、`max_output_tokens` も同値)。
+1. **毎ホップ、同じリクエストを送る**(`contents` / `system_instruction` / `tools` / `generation_config`、`max_output_tokens` も同値。`MAX_TOKENS` で止まった生成を `continuation_token` で再開するときだけ、`max_output_tokens` を引き上げる)。
 2. **部分出力を `contents` に足さない**(`continuation_token` がモデルの状態=思考を含めて保持している)。
 3. **最新のトークンだけ送る**(各トークンに過去の進捗がすべて含まれる)。
 4. **`finish_reason` が `CONTINUATION` の間だけ継続**する。他の終了理由で停止。
-5. **最後に全ホップのpartsを結合して1つのモデルターン**として会話履歴に入れる。
+5. **`STOP` で完了したときだけ、全ホップのpartsを結合して1つのモデルターン**として会話履歴に入れる。`MAX_TOKENS` で止まった場合、未完了のターンは履歴に入れない。`continuation_token` があれば `max_output_tokens` を引き上げて再開し、なければ未完了として報告する。
 
 ```python
 from google import genai
@@ -368,6 +378,10 @@ while True:
     token = candidate.continuation_token
     if candidate.finish_reason != types.FinishReason.CONTINUATION or not token:
         break
+
+# 未完了のターンは、完了した出力として扱わない
+if candidate.finish_reason != types.FinishReason.STOP:
+    raise RuntimeError(f"生成が未完了です: finish_reason={candidate.finish_reason}")
 
 print("".join(p.text for p in parts if p.text and not p.thought))
 print("Finish reason:", candidate.finish_reason)
@@ -410,7 +424,7 @@ Gemini 3.x系から移行する場合のチェックリストです(公式の移
 | 4 | Long Decode計画 | 上限超のタスクは最新SDKか `continuation_token` ループ。Gemini Enterprise Agent Platform の `GenerateContent` では API バージョン **`v1beta1`** が必須で、最新SDKやループを使っても `v1` では動かない(SDKの既定は `v1beta1` なので、`api_version="v1"` を指定していないか確認する) |
 | 5 | `thinking_budget` | `thinking_level` に置き換え(3レベルで評価) |
 | 6 | 明示コンテキストキャッシュ | **非対応でエラー**。`cachedContents` / `caches.create` / `cached_content` を削除。暗黙キャッシュ(4,096トークン以上・95%割引)へ |
-| 7 | サンプリングパラメータ | `temperature` / `top_p` / `top_k` を削除(指定しても無視)。`candidate_count` も削除(Gemini Enterprise Agent Platform では HTTP 400) |
+| 7 | サンプリングパラメータ | `temperature` / `top_p` / `top_k` を削除(指定しても無視)。`candidate_count` / `frequency_penalty` / `presence_penalty` も削除(Gemini Enterprise Agent Platform では HTTP 400) |
 | 8 | クライアントタイムアウト | 20分以上に |
 | 9 | Thought Signature | マルチターン・関数呼び出しでは**署名を含む完全な会話履歴**を返す |
 | 10 | コスト見積り | 思考トークン、グラウンディング時の内部ツール指示・関数宣言もすべて課金対象 |
@@ -600,7 +614,7 @@ flowchart TD
 | `thinking_level: "minimal"` で400 | Argonは `minimal` 非対応。`low`/`medium`/`high` を使う |
 | `thinking_budget` と `thinking_level` の同時指定でエラー | どちらか一方のみ指定 |
 | `temperature` 等の警告 | 無視される。パラメータを削除 |
-| `candidate_count` でHTTP 400 | Gemini Enterprise Agent Platform では非対応。パラメータを削除 |
+| `candidate_count` / `frequency_penalty` / `presence_penalty` でHTTP 400 | Gemini Enterprise Agent Platform では非対応。パラメータを削除 |
 | 3〜5分でリクエストが切れる | クライアントタイムアウトが短い。20分に設定 |
 | コンテキスト圧縮が早すぎる | ハーネスが合算された `prompt_token_count` を見ている。`initial_prompt_token_count` + `candidates_token_count` + `thoughts_token_count` で見積もる |
 | 明示キャッシュでエラー | Argonは非対応。暗黙キャッシュへ移行 |
