@@ -75,7 +75,7 @@ flowchart LR
 | 1リクエストの出力上限 | ストリーミング/SDK: **64K**、非ストリーミングREST: **32K** |
 | Long Decode | 上限を超えて最大「1M − 入力」まで、継続トークンで複数ホップ生成 |
 | 思考制御 | `thinking_level`: `low` / `medium`(既定)/ `high`(`minimal` は非対応) |
-| サンプリング | `temperature` / `top_p` / `top_k` / `candidate_count` は無視される |
+| サンプリング | `temperature` / `top_p` / `top_k` は無視される。`candidate_count` は Gemini Enterprise Agent Platform で **HTTP 400** になるため、移行前に削除する |
 | キャッシュ | 明示キャッシュ(`cachedContents`)は非対応、**暗黙キャッシュ**のみ(4,096トークン以上、ヒット時95%割引) |
 | 入力モダリティ | テキスト・画像・動画・音声・PDF(出力はテキスト) |
 | 価格(導入価格) | 入力 $2 / 出力 $10(100万トークンあたり)、**2026年11月30日まで** |
@@ -104,7 +104,7 @@ flowchart TD
     NEW -->|"既存資産あり"| GC["GenerateContent API\nLegacy扱いだが継続利用可"]
 ```
 
-- 公式ドキュメントでは、**新規プロジェクトには Interactions API が推奨**されています。Interactions API ではサーバー側がバックグラウンド実行でLong Decodeを代行します。
+- 公式ドキュメントでは、**新規プロジェクトには Interactions API が推奨**されています。Gemini API の Interactions API ではサーバー側がバックグラウンド実行でLong Decodeを代行します。これは **Gemini API に限った経路**で、Gemini Enterprise Agent Platform の Interactions API は Long Decode に対応していません。Google Cloud で Long Decode を使う場合は GenerateContent(`v1beta1`)を使ってください。
 - 既存のGenerateContent APIは「Legacy」と表記されていますが、Argonでも利用可能で、**クライアント側で細かく継続制御したい場合(再試行・バックオフ・保存しない運用)はGenerateContent側が現状唯一の選択肢**です(Interactions APIへのクライアント側継続は「近日対応」と案内)。
 
 ### 1.2 ベストプラクティス
@@ -189,7 +189,7 @@ flowchart TD
 ### 3.2 ベストプラクティス
 
 1. **3レベルすべてで自分の評価セットを回す**(公式推奨)。その際、`max_output_tokens` は高めにして「上限による打ち切り」が結果を歪めないようにする。そのうえで**品質基準を満たす最小のレベル**を採用する。
-2. `thinking_budget` は互換的に動作するが警告が出て、最寄りのレベルに写像される。**`thinking_level` に置き換える**。両方同時指定はエラー。
+2. `thinking_budget` の扱いは API 面で異なる。Gemini Enterprise Agent Platform では **HTTP 400** になり、レベルへ写像されない。Gemini API の GenerateContent では互換的に動作するが警告が出て、最寄りのレベルに写像される。どの面でも **`thinking_level` に置き換える**。両方同時指定はエラー。
 3. `MINIMAL` は**400エラー**。
 4. 公式ブログ(コスト最適化記事)の実験でも、**まず軽い思考設定(low)で足りるかを確かめてから、ルーターなどの複雑な仕組みを足す**ことが推奨されています(Step 8)。
 
@@ -264,6 +264,8 @@ response = client.models.generate_content(
     ),
 )
 
+if not response.candidates:
+    raise RuntimeError(f"候補が返りませんでした: {response.prompt_feedback}")
 print(response.text)
 print("Finish reason:", response.candidates[0].finish_reason)
 # ホップを跨いだ「実際のプロンプトサイズ」はこちらを使う
@@ -271,20 +273,45 @@ print("Prompt size:", response.usage_metadata.initial_prompt_token_count)
 print("Billed tokens:", response.usage_metadata.total_token_count)
 ```
 
-### 4.5 Interactions API(バックグラウンド実行)
+### 4.5 Interactions API(バックグラウンド実行・Gemini API のみ)
+
+Gemini Enterprise Agent Platform の Interactions API では使えません(Step 1 を参照)。
 
 ```python
+import time
+
 from google import genai
 
 client = genai.Client()
 
 # 64K超を生成するには background=True と max_output_tokens > 65536
+# max_output_tokens を指定しないと、サーバーは64Kで停止する
 interaction = client.interactions.create(
     model="gemini-4-argon",
     input="大規模なマルチファイル差分とテストスイートを一括で出力してください。",
     background=True,
-    # generation_config 等で max_output_tokens=131072 以上を設定(詳細は公式ドキュメント参照)
+    generation_config={
+        "max_output_tokens": 262_144,
+        "thinking_level": "high",
+    },
 )
+
+# 完了までポーリングする
+while interaction.status in ("in_progress", "queued"):
+    time.sleep(5)
+    interaction = client.interactions.get(id=interaction.id)
+
+# ホップごとに model_output ステップが増えるので、すべてのテキストを結合する
+text = "".join(
+    content.text
+    for step in interaction.steps
+    if step.type == "model_output"
+    for content in step.content
+    if content.type == "text"
+)
+print(text)
+print("Status:", interaction.status)
+print("Usage:", interaction.usage)
 ```
 
 > 上のInteractions APIの引数の細部はドキュメント側で更新されやすい部分です。実装前に必ず[公式ドキュメント](https://ai.google.dev/gemini-api/docs/generate-content/latest-model)で最新のシグネチャを確認してください。
@@ -332,6 +359,9 @@ while True:
             continuation_token=token,
         ),
     )
+    # 候補が空なのはプロンプトに問題があるとき。理由は prompt_feedback で確認する
+    if not response.candidates:
+        raise RuntimeError(f"候補が返りませんでした: {response.prompt_feedback}")
     candidate = response.candidates[0]
     if candidate.content and candidate.content.parts:
         parts.extend(candidate.content.parts)
@@ -351,11 +381,11 @@ SDKの自動継続では `usage_metadata` が **全ホップの合計** を返�
 
 | 項目 | 実際のコンテキストサイズ | `prompt_token_count`(合計) |
 |---|---|---|
-| 例: 1,000トークンのプロンプト → 20万トークンを生成(4ホップ) | 約20.1万 | 約39.7万(繰り返し入力を暗黙キャッシュで95%割引後) |
+| 例: 1,000トークンのプロンプト → 20万トークンを生成(4ホップ) | 約20.1万 | 約39.7万(各ホップの入力の累計で、割引前のトークン数。95%割引が適用されるのはキャッシュ入力の料金で、トークン数は減らない) |
 
 **そのため**:
 
-- コンテキスト圧縮(compaction)や上限判定には **`initial_prompt_token_count`**(JSでは `initialPromptTokenCount`)を使う。合算された `prompt_token_count` を使うと圧縮が早すぎるタイミングで始まります。
+- コンテキスト圧縮(compaction)や上限判定では、**`initial_prompt_token_count` + `candidates_token_count` + `thoughts_token_count`** でコンテキストサイズを見積もる(JSでは `initialPromptTokenCount` / `candidatesTokenCount` / `thoughtsTokenCount`)。`initial_prompt_token_count` だけでは、今のターンで生成した分が入りません。合算された `prompt_token_count` を使うと圧縮が早すぎるタイミングで始まります。圧縮は `continuation_token` がなくなり、生成が完了してから行ってください。
 - REST自前ループでは、**各ホップの値を足してコストを算出**し、プロンプトサイズは**最初のホップの `promptTokenCount`** を保持する。
 - `initial_prompt_token_count` はSDKがクライアント側で計算する値で、REST応答や `model_dump()` のJSONには出ません。必要なら別途保存してください。
 
@@ -374,13 +404,13 @@ Gemini 3.x系から移行する場合のチェックリストです(公式の移
 
 | # | 項目 | 内容 |
 |---|---|---|
-| 1 | モデルID | `gemini-4-argon` に変更 |
+| 1 | モデルID | `gemini-4-argon` に変更。Gemini Enterprise Agent Platform では、リクエスト履歴から prefill した `model` ターンも削除する(非対応で、履歴の末尾を `model` ターンにできない) |
 | 2 | `max_output_tokens` | 明示的に設定。既定は64K(ストリーミング/SDK)、32K(非ストリーミングREST) |
 | 3 | 32K未満の上限 | 32,768以上へ。トークン節約は `thinking_level` で |
-| 4 | Long Decode計画 | 上限超のタスクは最新SDKか `continuation_token` ループ |
+| 4 | Long Decode計画 | 上限超のタスクは最新SDKか `continuation_token` ループ。Gemini Enterprise Agent Platform の `GenerateContent` では API バージョン **`v1beta1`** が必須で、最新SDKやループを使っても `v1` では動かない(SDKの既定は `v1beta1` なので、`api_version="v1"` を指定していないか確認する) |
 | 5 | `thinking_budget` | `thinking_level` に置き換え(3レベルで評価) |
 | 6 | 明示コンテキストキャッシュ | **非対応でエラー**。`cachedContents` / `caches.create` / `cached_content` を削除。暗黙キャッシュ(4,096トークン以上・95%割引)へ |
-| 7 | サンプリングパラメータ | `temperature` / `top_p` / `top_k` / `candidate_count` を削除(指定しても無視) |
+| 7 | サンプリングパラメータ | `temperature` / `top_p` / `top_k` を削除(指定しても無視)。`candidate_count` も削除(Gemini Enterprise Agent Platform では HTTP 400) |
 | 8 | クライアントタイムアウト | 20分以上に |
 | 9 | Thought Signature | マルチターン・関数呼び出しでは**署名を含む完全な会話履歴**を返す |
 | 10 | コスト見積り | 思考トークン、グラウンディング時の内部ツール指示・関数宣言もすべて課金対象 |
@@ -521,7 +551,7 @@ Googleは、Argonに対して**多層防御**を実施したと説明してい�
 Zvi氏の解説によれば、安全性報告書(217ページ)ではArgonは**評価環境であることを認識する割合(評価認識)が従来モデルより大幅に高い**と報告されています。
 
 - 実務への含意: **社内ベンチマークの結果が本番の挙動と一致しない可能性**があるため、評価は**できるだけ本番に近い環境・データ**で行い、本番運用でも継続的に監視する。
-- 推論(思考)は既定で読める形式で出力される点は、デバッグ・監査にとって有利。ただし**推論の要約は監視用であって、内部状態の完全な説明ではない**前提で扱う。
+- 思考の要約は既定では返らないため、デバッグ・監査に使うなら明示的に有効にする。GenerateContent では `include_thoughts=True`、Interactions API では `generation_config` の `thinking_summaries="auto"` を指定する。ただし**推論の要約は監視用であって、内部状態の完全な説明ではない**前提で扱う。
 
 ---
 
@@ -549,7 +579,7 @@ flowchart TD
 - [ ] `thinking_level` を3レベルで評価済み。`thinking_budget`、サンプリング引数は削除
 - [ ] 明示キャッシュの呼び出しを撤去、暗黙キャッシュ前提の設計(共通プレフィックス先頭固定)
 - [ ] HTTP読み取りタイムアウト20分、ホップ単位のリトライ・バックオフ
-- [ ] コンテキスト判定に `initial_prompt_token_count` を使用
+- [ ] コンテキスト判定に `initial_prompt_token_count` + `candidates_token_count` + `thoughts_token_count` を使用
 - [ ] Thought Signatureを含む完全な履歴を返送
 - [ ] 12/1の価格改定(入力$4・出力$20)を織り込んだ予算
 - [ ] 不可逆操作の承認ゲート、最小権限、サンドボックス
@@ -570,8 +600,9 @@ flowchart TD
 | `thinking_level: "minimal"` で400 | Argonは `minimal` 非対応。`low`/`medium`/`high` を使う |
 | `thinking_budget` と `thinking_level` の同時指定でエラー | どちらか一方のみ指定 |
 | `temperature` 等の警告 | 無視される。パラメータを削除 |
+| `candidate_count` でHTTP 400 | Gemini Enterprise Agent Platform では非対応。パラメータを削除 |
 | 3〜5分でリクエストが切れる | クライアントタイムアウトが短い。20分に設定 |
-| コンテキスト圧縮が早すぎる | ハーネスが合算された `prompt_token_count` を見ている。`initial_prompt_token_count` を使う |
+| コンテキスト圧縮が早すぎる | ハーネスが合算された `prompt_token_count` を見ている。`initial_prompt_token_count` + `candidates_token_count` + `thoughts_token_count` で見積もる |
 | 明示キャッシュでエラー | Argonは非対応。暗黙キャッシュへ移行 |
 | OpenAI互換エンドポイントで長文が切れる | Long Decode非対応。ネイティブAPIを使う |
 
