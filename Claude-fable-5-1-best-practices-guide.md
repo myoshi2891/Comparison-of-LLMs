@@ -823,7 +823,7 @@ flowchart TD
 | thinking の扱い | 切り替えの方向で異なる(第4章)。Opus 5 / Fable 5 / Mythos 5 から Fable 5.1 へ切り替えると thinking は引き継がれる。Fable 5.1 から別のモデルへ切り替えると引き継がれない(例外は Mythos 5.1) |
 | 応答の判別と記録 | fallback 先が応答しても `stop_reason` は `end_turn` などの通常値のままなので、`stop_reason` だけでは判別できない。トップレベルの `response.model`(実際に応答したモデル)、`content` 内の `fallback` ブロック(切り替え地点。`from` / `to` / `trigger` を持つ)、`usage.iterations` 内の `fallback_message` エントリで判別し、ログに記録する。sticky routing(約1時間、ベストエフォート)で fallback 先が直接応答したターンには `fallback` ブロックが付かないため、`fallback_message` と `response.model` で判別する。チェーン全体が拒否した場合も末尾は `fallback_message` になるので、「`fallback_message` があり、かつ `stop_reason` が `refusal` でない」ことを条件にする。ストリーミングの出力途中で切り替わると `message_start` は元のモデル名のままなので、`fallback` ブロックの `to.model` と最終 `message_delta` の `usage.iterations` を読む |
 | 次ターンへの返送 | assistant の `content` は受け取った順序のまま返す。**`fallback` ブロックは削除も移動もしない**(API がこの位置を基準に前後の thinking ブロックを検証するため、境界の両側の thinking を返しているリクエストで省略・移動すると拒否される)。ただし出力途中の切り替えでは、**最後の `fallback` ブロックより前**の `thinking` / `redacted_thinking` / `connector_text`、クライアント側の `tool_use`、結果と対になっていない `server_tool_use` は除く。`text`、結果と対になった `server_tool_use`、最後の `fallback` ブロックより後のブロックは順序を保って残す |
-| 課金 | 出力前の refusal も、誤検知が少ないカテゴリでは課金される(2026-09-24 以降)。ストリーム途中の refusal は、入力と出力済み分が通常料金で課金。**fallback credit** は、対象となる Messages API の直接リクエスト(バッチ以外)で、モデル切り替えに伴うキャッシュコストを返金する。サーバー側 fallback と SDK ミドルウェアは credit を自動で適用するが、**自前のリトライには自動で適用されない**。自前で実装する場合は、最初のリクエストに beta ヘッダー `fallback-credit-2026-07-01` を付け、refusal の `stop_details.fallback_credit_token` を、同じヘッダーを付けたリトライのトップレベルパラメータとして渡す(トークンの有効期限は5分)。**同じモデルへ元の本文をそのまま再送しない**(たいてい再度拒否される)。`model` は許可された fallback 先(Fable 5.1 では Opus 4.8 または Opus 5)へ変え、以降のターンもそのモデルを使い続ける。credit を受けるには、`system` / `messages` / `tools` / `tool_choice` / `thinking` / `cache_control`(使う場合は `output_config` / `mcp_servers` / `context_management` / `container` も)を拒否されたリクエストと完全に一致させ、`anthropic-beta` ヘッダーも揃える(`server-side-fallback-*` は外してよい)。変更できるのは `model` / `max_tokens` / `stop_sequences` / `stream` / `metadata` / `service_tier` のみ。リトライ本文の形は `stop_details.fallback_has_prefill_claim` で決める。`true` または未設定なら、元の本文の `messages` 末尾に、拒否された応答の `content` をそのまま入れた assistant メッセージを1件だけ追加する(最後の `text` ブロック末尾の空白は除き、結果のないクライアント側 `tool_use` は含めない)。この形なら続きから生成され、完了済みのサーバーツールは再実行されない。`false` なら `model` 以外は元の本文のまま送る。サーバーツールの実行後に拒否された場合は、元の本文のままでは credit を受けられないので、追記する形を使う。エラーメッセージが `redemption temporarily unavailable` の 400 は一時的なもので、本文の形の問題ではない。どの段階で返っても次の手順へ進まず、同じ本文と同じトークンのまま、トークンの有効期限内に再試行する。それ以外の 400 で追記した形が拒否されたら、トークンを付けたまま `model` 以外は元の本文のものを送り、それも `fallback_credit_token` を名指しする 400 で拒否されたらトークンなしで送る(credit は失われ、サーバーツールは再実行・再課金される)。この手順を省くと、fallback 先のキャッシュ書き込みは通常料金で課金される。**Message Batches の refusal にはクレジットトークンが発行されず**(`stop_details` に `fallback_credit_token` は含まれない)、バッチのリクエストにトークンを渡しても無視される。そのためバッチで拒否された項目の再送に credit は適用されず、再送先の通常料金(新しいバッチならバッチ料金、個別リクエストなら標準料金)で課金される |
+| 課金 | 出力前の refusal も、誤検知が少ないカテゴリでは課金される(2026-09-24 以降)。ストリーム途中の refusal は、入力と出力済み分が通常料金で課金。**fallback credit** は、対象となる Messages API の直接リクエスト(バッチ以外)で、モデル切り替えに伴うキャッシュコストを返金する。サーバー側 fallback と SDK ミドルウェアは credit を自動で適用するが、**自前のリトライには自動で適用されない**。自前で実装する場合は、最初のリクエストに beta ヘッダー `fallback-credit-2026-07-01` を付け、refusal の `stop_details.fallback_credit_token` を、同じヘッダーを付けたリトライのトップレベルパラメータとして渡す(トークンの有効期限は5分)。**同じモデルへ元の本文をそのまま再送しない**(たいてい再度拒否される)。`model` は許可された fallback 先(Fable 5.1 では Opus 4.8 または Opus 5)へ変え、以降のターンもそのモデルを使い続ける。credit を受けるには、`system` / `messages` / `tools` / `tool_choice` / `thinking` / `cache_control`(使う場合は `output_config` / `mcp_servers` / `context_management` / `container` も)を拒否されたリクエストと完全に一致させ、`anthropic-beta` ヘッダーも揃える。リトライでは本文の `fallbacks` パラメータを必ず削除する(`fallbacks: "default"` も同じ)。このとき `server-side-fallback-*` ヘッダーも一緒に外してよい。それ以外に変更できるのは `model` / `max_tokens` / `stop_sequences` / `stream` / `metadata` / `service_tier` のみ。リトライ本文の形は `stop_details.fallback_has_prefill_claim` で決める。`true` または未設定なら、元の本文の `messages` 末尾に、拒否された応答の `content` をそのまま入れた assistant メッセージを1件だけ追加する(最後の `text` ブロック末尾の空白は除き、結果のないクライアント側 `tool_use` は含めない)。この形なら続きから生成され、完了済みのサーバーツールは再実行されない。`false` なら `model` 以外は元の本文のまま送る。サーバーツールの実行後に拒否された場合は、元の本文のままでは credit を受けられないので、追記する形を使う。エラーメッセージが `redemption temporarily unavailable` の 400 は一時的なもので、本文の形の問題ではない。どの段階で返っても次の手順へ進まず、同じ本文と同じトークンのまま、トークンの有効期限内に再試行する。それ以外の 400 で追記した形が拒否されたら、トークンを付けたまま `model` 以外は元の本文のものを送り、それも `fallback_credit_token` を名指しする 400 で拒否されたらトークンなしで送る(credit は失われ、サーバーツールは再実行・再課金される)。この手順を省くと、fallback 先のキャッシュ書き込みは通常料金で課金される。**Message Batches の refusal にはクレジットトークンが発行されず**(`stop_details` に `fallback_credit_token` は含まれない)、バッチのリクエストにトークンを渡しても無視される。そのためバッチで拒否された項目の再送に credit は適用されず、再送先の通常料金(新しいバッチならバッチ料金、個別リクエストなら標準料金)で課金される |
 
 ### 11.5 コンテンツの出自表示
 
@@ -852,7 +852,7 @@ flowchart TD
 | 指標 | 理由 |
 | --- | --- |
 | タスク成功率 | 品質の基準 |
-| 総コスト(思考+出力+キャッシュ) | 単価が高いので必須 |
+| 総コスト(通常入力+キャッシュ読み取り+キャッシュ書き込み+出力) | 単価が高いので必須。区分ごとの単価で計算する。thinking は出力に含まれるので別に足さない。fallback を使う場合は、`usage.iterations` で試行ごとの課金も合算する |
 | 所要時間・ターン数 | `xhigh` / `max` で急増する |
 | スコープ逸脱の件数 | Fable の主体性の副作用 |
 | 途中停止・許可待ちの件数 | 自律実行の指示の効きを測る |
@@ -905,7 +905,7 @@ flowchart TD
 - 終了前に最後の段落を点検する。計画、質問、次の手順の列挙、未実施の約束であれば、今すぐ実行する
 - 一部が詰まったら、残りを完成させ、何を・なぜ残したかを明記する
 - 依頼にない修正や拡張は行わず、フォローアップとして報告する
-- 破壊的な操作(削除、再起動、設定変更)の前に、その操作を支持する証拠があるか確認する
+- 破壊的な操作(削除、再起動、設定変更)は、支持する証拠があっても、明示的な承認なしに実行しない。承認を得られない場合は実行せず、止まって報告する
 
 # 確認が必須の操作
 - {本番デプロイ、課金、外部への送信など}
