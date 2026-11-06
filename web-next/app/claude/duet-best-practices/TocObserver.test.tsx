@@ -15,6 +15,29 @@ const faqs = () => Array.from(document.querySelectorAll<HTMLDetailsElement>("det
 const filter = (value: string) =>
   fireEvent.input(document.getElementById("faq-filter") as HTMLElement, { target: { value } });
 
+type ListenerRecord = { target: unknown; type: unknown; callback: unknown; capture: boolean };
+/** spy の呼び出しを「対象・種別・コールバック・capture」の組へ正規化する。 */
+const listenerRecords = ({ mock }: { mock: { calls: unknown[][]; contexts: unknown[] } }) =>
+  mock.calls.map(
+    ([type, callback, options], i): ListenerRecord => ({
+      target: mock.contexts[i],
+      type,
+      callback,
+      capture:
+        typeof options === "boolean"
+          ? options
+          : typeof options === "object" &&
+            options !== null &&
+            "capture" in options &&
+            Boolean(options.capture),
+    })
+  );
+const isSameListener = (a: ListenerRecord, b: ListenerRecord) =>
+  a.target === b.target &&
+  a.type === b.type &&
+  a.callback === b.callback &&
+  a.capture === b.capture;
+
 let width: number;
 let rect: ReturnType<typeof vi.spyOn>;
 let position = 0;
@@ -546,15 +569,32 @@ it("該当なし表示と表示中のみの一括展開・全閉じ", () => {
   expect(document.getElementById("faq-hit")?.textContent).toBe("0 件");
   expect(document.getElementById("faq-none")?.hidden).toBe(false);
 });
-it("チェックとFAQイベントはunmount時にすべて解除", () => {
+it("チェックとFAQイベントはunmount時に登録と同じ組で解除", () => {
+  const add = vi.spyOn(EventTarget.prototype, "addEventListener");
   const remove = vi.spyOn(EventTarget.prototype, "removeEventListener");
   const { unmount } = render(<Page />);
-  const box = boxes()[0],
-    input = document.getElementById("faq-filter");
+  const byId = (id: string) => document.getElementById(id) as HTMLElement;
+  const box = boxes()[0];
+  const expected: Array<[EventTarget, string]> = [
+    ...boxes().map((b): [EventTarget, string] => [b, "change"]),
+    [byId("faq-filter"), "input"],
+    [byId("check-reset"), "click"],
+    [byId("faq-open"), "click"],
+    [byId("faq-close"), "click"],
+  ];
+  // React が親要素へ張る委譲リスナーは解除されないため、期待する対象と種別に絞る。
+  const registered = listenerRecords(add).filter((r) =>
+    expected.some(([target, type]) => r.target === target && r.type === type)
+  );
+  for (const [target, type] of expected) {
+    expect(registered.filter((r) => r.target === target && r.type === type)).not.toEqual([]);
+  }
   unmount();
-  expect(remove.mock.calls.some((c) => c[0] === "change")).toBe(true);
-  expect(remove.mock.calls.some((c) => c[0] === "input")).toBe(true);
-  fireEvent.click(box);
+  const removed = listenerRecords(remove);
+  const leaked = registered.filter((r) => !removed.some((x) => isSameListener(r, x)));
+  expect(leaked.map((r) => r.type)).toEqual([]);
+  // 切り離した要素では click が change を発火しないため、change を直接送って保存されないことを確かめる。
+  box.checked = true;
+  box.dispatchEvent(new Event("change"));
   expect(localStorage.getItem("duet-guide-checks-v1")).toBeNull();
-  expect(input).not.toBeNull();
 });

@@ -5,6 +5,29 @@ import styles from "./page.module.css";
 import TocObserver from "./TocObserver";
 
 const sectionIds = ["0-このガイドの読み方", "step-1-最初の-dot", "12-チェックリスト"];
+type ListenerRecord = { target: unknown; type: unknown; callback: unknown; capture: boolean };
+/** spy の呼び出しを「対象・種別・コールバック・capture」の組へ正規化する。 */
+const listenerRecords = ({ mock }: { mock: { calls: unknown[][]; contexts: unknown[] } }) =>
+  mock.calls.map(
+    ([type, callback, options], i): ListenerRecord => ({
+      target: mock.contexts[i],
+      type,
+      callback,
+      capture:
+        typeof options === "boolean"
+          ? options
+          : typeof options === "object" &&
+            options !== null &&
+            "capture" in options &&
+            Boolean(options.capture),
+    })
+  );
+const isSameListener = (a: ListenerRecord, b: ListenerRecord) =>
+  a.target === b.target &&
+  a.type === b.type &&
+  a.callback === b.callback &&
+  a.capture === b.capture;
+
 let width: number;
 let rect: ReturnType<typeof vi.spyOn>;
 let position = 0;
@@ -323,20 +346,51 @@ it("日本語と数字のアンカーをpercent encoded hashと混同せず追�
   fireEvent.scroll(window);
   expect(active()).toEqual(["#step-1-最初の-dot"]);
 });
-it("unmount時にscroll・resize・クリック・キー監視を解除", () => {
+it("unmount時にscroll・resize・クリック・キー監視を登録と同じ組で解除", () => {
+  const addWindow = vi.spyOn(window, "addEventListener");
   const removeWindow = vi.spyOn(window, "removeEventListener");
+  const add = vi.spyOn(EventTarget.prototype, "addEventListener");
   const remove = vi.spyOn(EventTarget.prototype, "removeEventListener");
   const { unmount } = render(<Harness />);
   const r = root(),
     s = sidebar(),
-    m = main();
-  fireEvent.click(menu());
+    m = main(),
+    button = menu();
+  const expected: Array<[EventTarget, string]> = [
+    [button, "click"],
+    [document.getElementById("dots-backdrop") as HTMLElement, "click"],
+    [document, "keydown"],
+    ...links().map((a): [EventTarget, string] => [a, "click"]),
+  ];
+  fireEvent.click(button);
+  // React が親要素へ張る委譲リスナーは解除されないため、期待する対象と種別に絞る。
+  const registered = listenerRecords(add).filter((x) =>
+    expected.some(([target, type]) => x.target === target && x.type === type)
+  );
+  for (const [target, type] of expected) {
+    expect(registered.filter((x) => x.target === target && x.type === type)).not.toEqual([]);
+  }
+  const windowRegistered = listenerRecords(addWindow).filter(
+    (x) => x.type === "scroll" || x.type === "resize"
+  );
+  expect(windowRegistered.map((x) => x.type).sort()).toEqual(["resize", "scroll"]);
   unmount();
   expect(r.classList.contains(styles.open)).toBe(false);
   expect(s.inert).toBe(false);
   expect(m.inert).toBe(false);
-  expect(remove.mock.calls.map((c) => c[0])).toEqual(expect.arrayContaining(["click", "keydown"]));
-  expect(removeWindow.mock.calls.map((c) => c[0])).toEqual(
-    expect.arrayContaining(["scroll", "resize"])
-  );
+  const removed = listenerRecords(remove);
+  const windowRemoved = listenerRecords(removeWindow);
+  expect(
+    registered.filter((x) => !removed.some((y) => isSameListener(x, y))).map((x) => x.type)
+  ).toEqual([]);
+  expect(
+    windowRegistered
+      .filter((x) => !windowRemoved.some((y) => isSameListener(x, y)))
+      .map((x) => x.type)
+  ).toEqual([]);
+  // 残ったクリック処理は切り離したメニューでも動くため、開閉クラスが付かないことで解除を確かめる。
+  button.click();
+  expect(r.classList.contains(styles.open)).toBe(false);
+  // 残ったキー処理は開状態のままTabをpreventDefaultするため、既定動作が保たれることを確かめる。
+  expect(fireEvent.keyDown(document, { key: "Tab" })).toBe(true);
 });
