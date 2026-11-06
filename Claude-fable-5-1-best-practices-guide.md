@@ -243,6 +243,36 @@ for block in response.content:
         print(block.text)
 ```
 
+この非ストリーミングの呼び出しは、`max_tokens` が 21,333 以下で収まる処理に使います。Python SDK は `3600 × max_tokens ÷ 128,000` 秒で所要時間を見積もり、10分を超えると判定すると、リクエストを送る前に `ValueError` を発生させます。そのため `max_tokens` が 21,333 を超えるとエラーになります。`timeout` を上書きするとこのエラーは出なくなりますが、長時間応答のない接続はネットワークの途中で切られることがあるので、解決策にはしないでください。
+
+`xhigh` / `max` の長い出力では、`.stream()` と `get_final_message()` を使います。
+
+```python
+with client.beta.messages.stream(
+    model="claude-fable-5-1",
+    max_tokens=64000,  # 思考と本文の合計。モデルの上限は 128k
+    output_config={"effort": "xhigh"},
+    messages=[
+        {
+            "role": "user",
+            "content": f"次の認証モジュールの詳細な設計レビューを書いて\n\n<code>\n{auth_code}\n</code>",
+        }
+    ],
+) as stream:
+    response = stream.get_final_message()
+
+# 拒否や打ち切りを、完了したレビューとして表示しない
+if response.stop_reason == "refusal":
+    category = response.stop_details.category if response.stop_details else None
+    raise RuntimeError(f"リクエストが拒否されました: category={category}")
+if response.stop_reason == "max_tokens":
+    raise RuntimeError("max_tokens で打ち切られたため、レビューは未完了です")
+
+for block in response.content:
+    if block.type == "text":
+        print(block.text)
+```
+
 ### 4.2 Fable 5 から移行する際の4つのブレイキングチェンジ
 
 | # | 変更 | 症状 | 対処 |
@@ -367,7 +397,7 @@ response = client.beta.messages.create(
 | 対策 | 内容 |
 | --- | --- |
 | まず `high` で実行 | 公式が推奨する出発点 |
-| `max_tokens` に余裕を持たせる | 思考と本文の**合計**が上限に含まれる |
+| `max_tokens` に余裕を持たせる | 思考と本文の**合計**が上限に含まれる。Python SDK の非ストリーミングでは、21,333 を超える値は送信前に `ValueError` になるので、4.1 のストリーミングを使う |
 | 上限を伝える | 「思考と本文の合計が約N トークンの上限に入る。成果物を2回書かず、思考では構造と難しい判断に集中して」といった趣旨の注意をユーザーメッセージ末尾に追加 |
 
 ### 5.6.1 `low` で検索が減る問題
@@ -855,7 +885,7 @@ flowchart TD
 | 指標 | 理由 |
 | --- | --- |
 | タスク成功率 | 品質の基準 |
-| 総コスト(通常入力+キャッシュ読み取り+キャッシュ書き込み+出力) | 単価が高いので必須。区分ごとの単価で計算する。thinking は出力に含まれるので別に足さない。fallback を使う場合は、`usage.iterations` の試行のうち**課金対象の試行だけ**に、その試行のモデルの単価を掛けて合算する。出力前に拒否された試行(`output_tokens` が 0 のエントリ。通常は `message` で、チェーン全体が拒否した場合は末尾の `fallback_message` も含む)は、カテゴリが `bio` / `frontier_llm` / `reasoning_extraction` のときだけ課金され、`cyber` / `general_harms` / `null` は課金されないのに、トークン数は記録される。エントリにカテゴリはないので、`fallback` ブロックの `trigger.category`(チェーン全体が拒否した場合は `stop_details.category`)と照合する。出力後の拒否は課金対象。課金カテゴリは変わることがあるので、[公式のカテゴリ表](https://platform.claude.com/docs/en/build-with-claude/refusals-and-fallback#refusal-response)を確認する |
+| 総コスト(通常入力+キャッシュ読み取り+キャッシュ書き込み+出力+サーバーツールの利用料) | 単価が高いので必須。区分ごとの単価で計算する。thinking は出力に含まれるので別に足さない。fallback を使う場合は、`usage.iterations` の試行のうち**課金対象の試行だけ**に、その試行のモデルの単価を掛けて合算する。出力前に拒否された試行(`output_tokens` が 0 のエントリ。通常は `message` で、チェーン全体が拒否した場合は末尾の `fallback_message` も含む)は、カテゴリが `bio` / `frontier_llm` / `reasoning_extraction` のときだけ課金され、`cyber` / `general_harms` / `null` は課金されないのに、トークン数は記録される。エントリにカテゴリはないので、`fallback` ブロックの `trigger.category`(チェーン全体が拒否した場合は `stop_details.category`)と照合する。出力後の拒否は課金対象。課金カテゴリは変わることがあるので、[公式のカテゴリ表](https://platform.claude.com/docs/en/build-with-claude/refusals-and-fallback#refusal-response)を確認する。サーバーツールの利用料は、トークン料金とは別に足す。Web search は1,000回あたり $10 で、回数は `usage.server_tool_use.web_search_requests` で確認する(エラーになった検索は課金されない)。Web fetch に追加料金はなく、取得内容のトークン料金だけがかかる。コード実行は `web_search_20260209` / `web_fetch_20260209` 以降と併用すると追加料金がなく、併用しない場合は組織ごとに月1,550時間の無料枠を超えた分が、コンテナ1時間あたり $0.05 で課金される(実行時間の最小は5分)。fallback の再試行でサーバーツールが再実行されると、再度課金される。単価は[公式の料金表](https://platform.claude.com/docs/en/about-claude/pricing)を確認する |
 | 所要時間・ターン数 | `xhigh` / `max` で急増する |
 | スコープ逸脱の件数 | Fable の主体性の副作用 |
 | 途中停止・許可待ちの件数 | 自律実行の指示の効きを測る |
