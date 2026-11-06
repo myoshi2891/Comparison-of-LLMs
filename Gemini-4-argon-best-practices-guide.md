@@ -60,7 +60,7 @@ flowchart LR
 |---|---|---|
 | Gemini API(AI Studio / Android Studio) | 開発者 | **有料ティアのみ**(無料ティア非対応) |
 | Gemini Enterprise Agent Platform(Google Cloud) | 企業 | `gemini-4-argon` を選択 |
-| Google Antigravity | Google AI Ultra購読者・適格なエンタープライズ | デスクトップアプリ/CLI |
+| Google Antigravity | 有料のGoogle AI Pro・Google AI Ultra購読者、適格なGemini Enterprise | デスクトップアプリ/CLI。AI Proの試用は対象のプレミアムデバイスのみで、FreeとGoogle AI Plusは対象外 |
 | Geminiアプリ・Search の AI Mode | Google AI Pro / Ultra購読者 | 一般ユーザー向け |
 | Fairwind Program | 認定サイバー防御者 | ガードレールなし版(`gemini-4-argon-cyber-permissive`)へのアクセス |
 
@@ -76,7 +76,7 @@ flowchart LR
 | Long Decode | 上限を超えて最大「1M − 入力」まで、継続トークンで複数ホップ生成 |
 | 思考制御 | `thinking_level`: `low` / `medium`(既定)/ `high`(`minimal` は非対応) |
 | サンプリング | `temperature` / `top_p` / `top_k` は無視される。`candidate_count` / `frequency_penalty` / `presence_penalty` は Gemini Enterprise Agent Platform で **HTTP 400** になるため、移行前に削除する |
-| キャッシュ | 明示キャッシュ(`cachedContents`)は非対応、**暗黙キャッシュ**のみ(4,096トークン以上、ヒット時95%割引) |
+| キャッシュ | 明示キャッシュ(`cachedContents`)は非対応、**暗黙キャッシュ**のみ(4,096トークン以上、ヒット時95%割引)。Gemini Enterprise Agent Platform の Argon では**永続キャッシュ(durable caching)が既定で有効**で、暗号化されたキャッシュデータが最大24時間保存されることがある(CMEK は非対応)。保存を認めないポリシーの場合は、プロジェクトの `cacheConfig` で永続キャッシュを無効にする。`retentionConfig.retentionType` を `EPHEMERAL` にするとメモリ内キャッシュだけが残り、`disableCache` を `true` にするとキャッシュをすべて止められる(どちらも `roles/aiplatform.admin` が必要。組織全体の無効化はアカウントチームへ連絡)。[公式の手順](https://docs.cloud.google.com/gemini-enterprise-agent-platform/resources/zero-data-retention)を確認する |
 | 入力モダリティ | テキスト・画像・動画・音声・PDF(出力はテキスト) |
 | 価格(Standard・導入価格) | **2026年11月30日まで**(100万トークンあたり)。Gemini API と global: 入力 $2 / 出力 $10。Gemini Enterprise Agent Platform の non-global リージョン: 入力 $2.20 / 出力 $11 |
 | 価格(Standard・12/1以降) | **2026年12月1日から**(100万トークンあたり)。Gemini API と global: 入力 $4 / 出力 $20。Gemini Enterprise Agent Platform の non-global リージョン: 入力 $4.40 / 出力 $22 |
@@ -96,7 +96,7 @@ flowchart LR
 flowchart TD
     S["Argonを使いたい"] --> Q1{"利用形態は?"}
     Q1 -->|"自社アプリに組み込む"| Q2{"クラウド基盤は?"}
-    Q1 -->|"コーディングエージェントとして使う"| ANT["Google Antigravity\nAI Ultra または適格なEnterprise"]
+    Q1 -->|"コーディングエージェントとして使う"| ANT["Google Antigravity\n有料AI Pro、AI Ultra\nまたは適格なEnterprise"]
     Q1 -->|"一般的なチャット"| APP["Geminiアプリ / AI Mode\nAI Pro以上"]
     Q2 -->|"Google AI Studio系"| API["Gemini API 有料ティア"]
     Q2 -->|"Google Cloud統合"| ENT["Gemini Enterprise Agent Platform"]
@@ -106,7 +106,7 @@ flowchart TD
 ```
 
 - 公式ドキュメントでは、**新規プロジェクトには Interactions API が推奨**されています。Interactions API の Long Decode には2つの経路があります。**バックグラウンド実行**(`background=true`)はサーバー側が継続を代行し、`store=true` が必須です。**クライアント側継続**(SDK の自動継続、または `continuation_token` の自前ループ)は、保存あり(`store=true`)でもステートレス(`store=false`)でも使えます。どちらも Gemini API と Gemini Enterprise Agent Platform の Interactions API(`v1beta1`)で使えます。Google Cloud では、Interactions API と GenerateContent のどちらでも `v1beta1` が必要で、`v1` では Long Decode を使えません。
-- Gemini API の Interactions API でバックグラウンド実行を使うと、リクエストと応答がサーバーに保存されます。バックグラウンド実行には `store=true` が必須で(既定で `true`、`store=false` とは併用不可)、有料ティアの保持期間は55日です。保持期間は AI Studio で7・14・28・55日から設定でき、期間が過ぎると自動で削除されます。それより前に消すには、インタラクションIDを指定して `delete` メソッドを呼ぶか、AI Studio の Logs ページから削除します。インタラクションを保持できない場合は、`store=false` のクライアント側継続か、GenerateContent を使ってください。ただし、これで避けられるのは Interactions の状態保存だけで、ゼロデータ保持は保証されません。有料サービスでも、プロンプトと応答は不正利用の検出のため一定期間ログに記録されます。保証されたゼロデータ保持が必要な場合、Google は Vertex AI の利用を案内しています。また、Google 検索と Google マップのグラウンディングには別の保持ルールがあり、プロンプトや生成結果などが30日間保存され、この保存は無効にできません。
+- Gemini API の Interactions API でバックグラウンド実行を使うと、リクエストと応答がサーバーに保存されます。バックグラウンド実行には `store=true` が必須で(既定で `true`、`store=false` とは併用不可)、有料ティアの保持期間は55日です。保持期間は AI Studio で7・14・28・55日から設定でき、期間が過ぎると自動で削除されます。それより前に消すには、インタラクションIDを指定して `delete` メソッドを呼ぶか、AI Studio の Logs ページから削除します。インタラクションを保持できない場合は、`store=false` のクライアント側継続か、GenerateContent を使ってください。ただし、これで避けられるのは Interactions の状態保存だけで、ゼロデータ保持は保証されません。有料サービスでも、プロンプトと応答は不正利用の検出のため一定期間ログに記録されます。保証されたゼロデータ保持が必要な場合、Google は Vertex AI の利用を案内しています。また、Google 検索と Google マップのグラウンディングには別の保持ルールがあり、プロンプトや生成結果などが30日間保存され、この保存は無効にできません。なお、Gemini Enterprise Agent Platform でも永続キャッシュは既定で有効です。無効にする方法は第2章の「キャッシュ」を参照してください。
 - 既存のGenerateContent APIは「Legacy」と表記されていますが、Argonでも利用可能です。**クライアント側で細かく継続制御したい場合(再試行・バックオフ・保存しない運用)は、Interactions API のクライアント側継続と GenerateContent のどちらでも実装できます**。Interactions API で `store=false` にする場合は、前回のインタラクションIDの代わりにプロンプトを再送します。
 
 ### 1.2 ベストプラクティス
@@ -520,7 +520,7 @@ flowchart TD
 
 ### 7.4 Antigravityの利用条件
 
-- デスクトップアプリ/CLIでのArgon利用は、Google AI Ultra購読者、または適格なGemini Enterpriseが対象です。
+- デスクトップアプリ/CLIでのArgon利用は、有料のGoogle AI Pro・Google AI Ultra購読者、または適格なGemini Enterpriseが対象です。AI Proの試用は対象のプレミアムデバイスのみで、FreeとGoogle AI Plusは対象外です。
 - 研究者向けに、Antigravityの最上位使用枠を6か月無償で提供するプログラム(選抜制)が案内されています。
 
 ---
@@ -678,6 +678,8 @@ Argonを導入する際は、提供元の発表と第三者の評価の両方を
 | `.agents/skills`・`/goal`・無人実行・人間レビューの実例 | Google Developers Blog(George Weale ほか, 2026-10-13) | https://developers.googleblog.com/optimizing-a-200000-line-python-codebase-overnight-with-gemini-4-argon/ |
 | cost per task、軽い設定からの開始、ルーティング、キャッシュとの関係 | Google Developers Blog(Sergio Villani, 2026-11-03) | https://developers.googleblog.com/cost-per-task-using-cheap-classifiers-to-route-across-gemini-models-and-thinking-levels/ |
 | AntigravityでのArgon利用 | Antigravity公式ブログ(2026-10-13) | https://antigravity.google/blog/gemini-4-argon-in-google-antigravity |
+| Antigravityのプラン別モデル提供範囲 | Antigravity「Models」 | https://antigravity.google/docs/models |
+| 永続キャッシュの保存期間と無効化 | Zero Data Retention(Gemini Enterprise Agent Platform) | https://docs.cloud.google.com/gemini-enterprise-agent-platform/resources/zero-data-retention |
 | Argon後継(Carbon)の位置づけ・限定提供 | Google公式ブログ(Koray Kavukcuoglu, 2026-10-28) | https://blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-gemini-4-carbon/ |
 | Gemini API 開発者ガイド(thinking_level、Long Decode、実用Tips) | Google AI Studio「Gemini 4 Argon: Developer Guide」 | https://aistudio.google.com/learn/gemini-4-argon-developer-guide |
 | ロボティクス(動画→シミュレーション→実機) | Google Developers Blog | https://developers.googleblog.com/gemini-4-argon-for-robotics |
@@ -721,6 +723,8 @@ Argonを導入する際は、提供元の発表と第三者の評価の両方を
 - https://developers.googleblog.com/optimizing-a-200000-line-python-codebase-overnight-with-gemini-4-argon/
 - https://developers.googleblog.com/cost-per-task-using-cheap-classifiers-to-route-across-gemini-models-and-thinking-levels/
 - https://antigravity.google/blog/gemini-4-argon-in-google-antigravity
+- https://antigravity.google/docs/models
+- https://docs.cloud.google.com/gemini-enterprise-agent-platform/resources/zero-data-retention
 - https://storage.googleapis.com/deepmind-media/Model-Cards/Gemini-4-Argon-Model-Card.pdf
 - https://storage.googleapis.com/deepmind-media/gemini/gemini_4_safety_report.pdf
 

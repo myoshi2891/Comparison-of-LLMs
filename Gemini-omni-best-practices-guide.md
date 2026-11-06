@@ -11,7 +11,7 @@
 | 項目 | 内容 |
 | --- | --- |
 | 表記の補正 | 依頼文の「Googlei」は **Google** と解釈しました。 |
-| Omni の正体 | Gemini Omni は **「何を入力しても動画を出力する」any-to-any 型の生成メディアモデルファミリー**です。テキスト・画像・音声・動画を入力し、現時点の出力は **音声付き動画**です。 |
+| Omni の正体 | Gemini Omni は **「何を入力しても動画を出力する」any-to-any 型の生成メディアモデルファミリー**です。ファミリーとしてはテキスト・画像・音声・動画を扱いますが、現行の Gemini API で入力できるのはテキスト・画像・動画で、**音声入力・音声参照のアップロードは非対応**です(参照動画の音声も無視されます)。現時点の出力は **音声付き動画**です。 |
 | 混同しやすい点 | Google の最新フラッグシップ推論 LLM は別モデル(Gemini 4 Argon)です。Omni は LLM ではなく **動画の生成・編集モデル**です。 |
 | 情報の確度 | 一次情報(Google 公式ドキュメント・公式ブログ)を軸にし、報道・サードパーティ情報は **二次情報**として明記します。筆者の推論は「推論」と書きます。 |
 | 独立ベンチマーク | Omni 1.1 Flash について、公開リーダーボード上の独立ベンチマークは調査時点で確認できませんでした。品質面の優位性の主張は **ベンダー側の発表**として扱ってください。 |
@@ -89,7 +89,7 @@ flowchart LR
 
 ### 1.1 公式の既定方針
 
-Gemini API の動画概要ページは **「動画生成の既定は Omni Flash」**としています。理由として、動画の一貫性、複数入力(テキスト・画像・音声・動画)の同時推論、キャラクター一貫性、事実の正確さ、多ターンの対話型編集を挙げています。Veo 3.1 は、レガシーなパイプラインとの統合などが必要な場合の選択肢という位置づけです。
+Gemini API の動画概要ページは **「動画生成の既定は Omni Flash」**としています。理由として、動画の一貫性、複数入力(テキスト・画像・音声・動画)の同時推論、キャラクター一貫性、事実の正確さ、多ターンの対話型編集を挙げています。Gemini API の Veo 3.1 Preview は 2026-10-22 に終了しました。Veo 3.1 を使う場合の GA モデル(`veo-3.1-generate-001` / `veo-3.1-fast-generate-001`)は、**Gemini API とは別のプラットフォーム**である Gemini Enterprise Agent Platform で提供されています。
 
 > **注意(情報の食い違い)**: 動画概要ページには、Veo 3.1 の用途として「シーン拡張」「末尾フレーム指定」を挙げる記述が残っています。一方、Omni の公式ページ(2026-09-23 更新)では Omni 1.1 でも **拡張と先頭/末尾フレーム指定をサポート**しています。概要ページの記述が古い可能性があるため、**Omni のページを正**として扱い、実機で検証してください。
 
@@ -100,10 +100,10 @@ flowchart TD
     S["動画生成の要件が発生"] --> Q1{"既存動画の部分編集や<br/>会話での反復が必要?"}
     Q1 -->|はい| O["Omni 1.1 Flash を採用"]
     Q1 -->|いいえ| Q2{"既存の本番パイプラインが<br/>Veo 3.1 前提?"}
-    Q2 -->|はい| V["Veo 3.1 を継続<br/>移行は段階的に検証"]
+    Q2 -->|はい| V["Gemini API の Veo 3.1 Preview は終了済み<br/>Omni Flash へ移行するか<br/>別プラットフォームの Agent Platform で<br/>Veo 3.1 GA を使う"]
     Q2 -->|いいえ| Q3{"複数の参照素材で<br/>人物や物の一貫性が重要?"}
     Q3 -->|はい| O
-    Q3 -->|いいえ| AB["同一プロンプトで<br/>Omni と Veo 3.1 を A/B 比較"]
+    Q3 -->|いいえ| AB["Omni Flash を既定にする<br/>Veo 3.1 も候補なら<br/>別プラットフォームの Agent Platform の<br/>GA モデルと同一プロンプトで A/B 比較"]
 ```
 
 ### 1.3 Omni と Veo 3.1 の比較
@@ -111,7 +111,7 @@ flowchart TD
 | 観点 | Gemini Omni 1.1 Flash | Veo 3.1 |
 | --- | --- | --- |
 | 強み | 対話型編集・複数入力の推論・参照による一貫性 | 専用の動画生成モデル。サードパーティ解説では「写実性の専門家」と評されることが多い(二次情報) |
-| API 形態 | **Interactions API** | `generateContent` API |
+| API 形態 | **Interactions API** | `client.models.generate_videos`。長時間実行オペレーションを `client.operations.get` でポーリングして完了を待つ(Gemini Enterprise Agent Platform の GA モデル) |
 | 出力解像度 | 360p / 720p(既定)/ 1080p(アップスケール)/ 4K(アップスケール) | 4K アップスケールと報じられている(二次情報) |
 | 編集 | 会話で反復編集(最重要の差別化点) | 会話型の反復編集は公式の訴求点ではない(Omni 側の差別化点) |
 | 音声 | 動画と同期した音声を生成。プロンプトで制御 | ネイティブ音声あり |
@@ -211,15 +211,19 @@ interaction = client.interactions.create(
         "type": "video",
         "aspect_ratio": "9:16",
         "resolution": "1080p",
+        "delivery": "uri",
     },
 )
 ```
+
+この例は URI 配信なので、生成結果は `interaction.output_video.data` ではなく、次の 3.2 の手順で `interaction.output_video.uri` から取得します。
 
 ### 3.2 大きな動画は URI 配信で取得する
 
 公式の推奨は、**4MB を超える動画(720p 超など)では `delivery="uri"`** を使うことです。返ってくる Google ホストの URI が `ACTIVE` になるまでポーリングしてからダウンロードします。
 
 ```python
+import re
 import time
 from google import genai
 
@@ -232,7 +236,11 @@ interaction = client.interactions.create(
 )
 
 video_output = interaction.output_video
-file_name = video_output.uri.split("/")[-1]
+# URI の末尾には :download?alt=media が付くので、ファイル ID だけを取り出す
+match = re.search(r"/files/([^/:?]+)", video_output.uri)
+if match is None:
+    raise RuntimeError(f"URI からファイル ID を取得できません: {video_output.uri}")
+file_name = match.group(1)
 
 while True:
     info = client.files.get(name=f"files/{file_name}")
@@ -244,6 +252,8 @@ while True:
 
 client.files.download(file=video_output.uri, destination="output.mp4")
 ```
+
+公式の Python サンプルは `uri.split("/")[-1]` で ID を取り出していますが、公式の REST 例の URI は `:download?alt=media` で終わるため、この方法では末尾が ID に残ります。上の例では ID だけを取り出しています。
 
 > **落とし穴**: `GET /v1beta/interactions/{id}` で後から取得すると、最初に `delivery: "uri"` で作成していても **動画は base64 のインラインデータで返ります**。`uri` フィールドが確実にあるのは、作成直後のレスポンスか SSE ストリームです。**作成直後に URI を保存**してください。
 
@@ -385,7 +395,7 @@ Use Image1 as the starting frame. Use Image2 as a reference for the video genera
 | --- | --- |
 | 動画参照 | 最大 3 クリップ、各 3 秒まで。参照動画の **音声は無視される** |
 | 動画参照の向き | 見た目(顔や外観)の保持に向く |
-| 音声参照のアップロード | 現行 API バージョンでは **非対応** |
+| 音声入力・音声参照のアップロード | 現行 API バージョンでは **非対応** |
 | 複数動画をまたぐ推論 | **非対応**(精度低下や予期しない出力の恐れ) |
 
 ---
@@ -647,7 +657,7 @@ flowchart TD
 | --- | --- |
 | 生成長 | 1 回あたり最大 10 秒。拡張で累計 40 秒 |
 | 制御パラメータ | システム指示・`temperature`・`top_p`・停止シーケンス・ネガティブプロンプト欄は **非対応** |
-| 音声 | 声の編集は非対応。音声参照のアップロードも非対応 |
+| 音声 | 声の編集は非対応。音声入力・音声参照のアップロードも非対応 |
 | 動画参照 | 最大 3 クリップ・各 3 秒。複数動画をまたぐ推論は非対応 |
 | 入力動画 | 編集・拡張は 10 秒以下 |
 | 拡張位置 | 末尾のみ |
@@ -679,7 +689,7 @@ flowchart TD
 
 **設計**
 
-- [ ] Omni と Veo 3.1 の選定基準を決め、同一プロンプトで A/B 比較した
+- [ ] Omni を既定とし、Veo 3.1 も候補なら Agent Platform の GA モデルと同一プロンプトで A/B 比較した
 - [ ] 編集・拡張の要否を決め、保存設定(`store`)を設計した
 - [ ] 英語プロンプトのテンプレートを整備した
 
@@ -756,7 +766,7 @@ flowchart TD
 | --- | --- |
 | 台詞は **引用符で囲み**、音楽・効果音・環境音は別途記述する | Replicate のモデルページ(上の C 表) |
 | 編集結果が崩れたら、再生成する前にまず指示を「1 動詞 + 1 対象」まで短縮し、「Keep everything else the same」を付ける | 公式ドキュメント+Eachlabs |
-| 新規ジョブは Omni を既定にし、既存 Veo 資産は **段階移行**で比較する | 公式の動画概要ページ |
+| 新規ジョブは Omni を既定にする。Gemini API の Veo 3.1 Preview を使っていた資産は、Omni か Agent Platform の Veo 3.1 GA へ移行する | 公式の動画概要ページ |
 | ComfyUI などのノードベース環境では、同一ノードで全モードを切り替えてワークフロー化する | ComfyUI ブログ |
 | コーディングエージェント(Claude Code・Gemini CLI 等)には、公式 Skill を読ませて実装する | 公式 GitHub の gemini-skills |
 
