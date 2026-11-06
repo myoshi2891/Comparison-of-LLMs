@@ -208,16 +208,24 @@ flowchart TD
 公式サンプルは `client.beta.messages.create` を使っています(effort の mid-conversation 機能などが beta のため)。SDK のバージョンによって型が異なるので、手元の SDK で確認してください。
 
 ```python
+from pathlib import Path
+
 import anthropic
 
 client = anthropic.Anthropic()
+
+# モデルはリポジトリを読めないので、対象のコードをメッセージに含める
+auth_code = Path("src/auth.py").read_text(encoding="utf-8")
 
 response = client.beta.messages.create(
     model="claude-fable-5-1",
     max_tokens=16000,
     output_config={"effort": "high"},  # 既定値。評価で上下させる
     messages=[
-        {"role": "user", "content": "このリポジトリの認証モジュールの設計上のリスクを洗い出して"}
+        {
+            "role": "user",
+            "content": f"次の認証モジュールの設計上のリスクを洗い出して\n\n<code>\n{auth_code}\n</code>",
+        }
     ],
 )
 
@@ -308,7 +316,7 @@ flowchart TD
 
 ### 5.5 会話の途中で effort を変える(beta)
 
-Fable 5.1 は、**プロンプトキャッシュを壊さずに**会話の途中で effort を変更できます。難所だけ上げ、定型工程は下げる運用が低コストでできます。
+Fable 5.1 は、**プロンプトキャッシュを壊さずに**会話の途中で effort を変更できます。難所だけ上げ、定型工程は下げる運用が低コストでできます。ただし、effort の変更と append-only の履歴更新は既存のキャッシュを保つだけで、キャッシュを有効にはしません。有効にする手順は、この節の末尾にまとめています。
 
 - beta ヘッダー: `mid-conversation-output-config-2026-07-01`
 - 空の system メッセージに `output_config` を付けて、次のユーザーターンから有効にします。
@@ -328,6 +336,18 @@ response = client.beta.messages.create(
     ],
 )
 ```
+
+#### キャッシュを有効にする
+
+キャッシュは、リクエストに `cache_control` を指定したときだけ動きます。
+
+| 項目 | 内容 |
+| --- | --- |
+| 自動で有効にする | リクエストのトップレベルに `cache_control={"type": "ephemeral"}` を指定する。ブレークポイントは最後のキャッシュ可能なブロックに置かれ、会話が伸びると前へ移動する |
+| 明示的に指定する | 個々のコンテンツブロックに `cache_control` を指定する(最大4か所)。自動と併用でき、自動のブレークポイントも4か所の1つに数える |
+| 最小長 | 512 トークン。未満のプロンプトは、エラーにならず、キャッシュなしで処理される |
+| TTL | 既定は5分で、書き込みまたは読み取りを行ったリクエストの開始時点から数える。キャッシュを使うたびに追加料金なしで更新される。`"ttl": "1h"` で1時間に延ばせる(書き込みは $20 / MTok) |
+| 読み取りの確認 | `usage.cache_read_input_tokens` が 0 より大きければ、キャッシュを読み取っている。`usage.cache_creation_input_tokens` は書き込み量。両方が 0 ならキャッシュされておらず、最小長に満たないことが主な原因 |
 
 ### 5.6 `xhigh` / `max` で長い成果物を作るときの注意
 
@@ -574,7 +594,8 @@ flowchart TD
 
 | やりたいこと | 代替 |
 | --- | --- |
-| スキーマに合った JSON を確実に得たい | `tool_choice: auto` + **strict tool use**、または **structured outputs** |
+| スキーマに合った JSON を応答として得たい | **structured outputs** の JSON outputs(`output_config.format` に `type: "json_schema"` を指定)。`stop_reason` が `refusal` や `max_tokens` の応答はスキーマに合わないことがあるので、応答を検証し、これらの例外を処理する |
+| ツール入力をスキーマに合わせたい | ツール定義に `strict: true` を付ける **strict tool use**。`tool_choice: auto` はツール呼び出し自体を保証しないので、ツールが呼ばれなかった場合も処理する |
 | 必ずツールを使わせたい | プロンプトで「〜にはこのツールを使うこと」と適用場面を明記(Fable 5.1 は明示的なツール指示によく従う) |
 
 ### 8.3 サブエージェント
@@ -794,7 +815,7 @@ flowchart TD
 | thinking の扱い | 切り替えの方向で異なる(第4章)。Opus 5 / Fable 5 / Mythos 5 から Fable 5.1 へ切り替えると thinking は引き継がれる。Fable 5.1 から別のモデルへ切り替えると引き継がれない(例外は Mythos 5.1) |
 | 応答の判別と記録 | fallback 先が応答しても `stop_reason` は `end_turn` などの通常値のままなので、`stop_reason` だけでは判別できない。トップレベルの `response.model`(実際に応答したモデル)、`content` 内の `fallback` ブロック(切り替え地点。`from` / `to` / `trigger` を持つ)、`usage.iterations` 内の `fallback_message` エントリで判別し、ログに記録する。sticky routing(約1時間、ベストエフォート)で fallback 先が直接応答したターンには `fallback` ブロックが付かないため、`fallback_message` と `response.model` で判別する。チェーン全体が拒否した場合も末尾は `fallback_message` になるので、「`fallback_message` があり、かつ `stop_reason` が `refusal` でない」ことを条件にする。ストリーミングの出力途中で切り替わると `message_start` は元のモデル名のままなので、`fallback` ブロックの `to.model` と最終 `message_delta` の `usage.iterations` を読む |
 | 次ターンへの返送 | assistant の `content` は受け取った順序のまま返す。**`fallback` ブロックは削除も移動もしない**(API がこの位置を基準に前後の thinking ブロックを検証するため、境界の両側の thinking を返しているリクエストで省略・移動すると拒否される)。ただし出力途中の切り替えでは、**最後の `fallback` ブロックより前**の `thinking` / `redacted_thinking` / `connector_text`、クライアント側の `tool_use`、結果と対になっていない `server_tool_use` は除く。`text`、結果と対になった `server_tool_use`、最後の `fallback` ブロックより後のブロックは順序を保って残す |
-| 課金 | 出力前の refusal も、誤検知が少ないカテゴリでは課金される(2026-09-24 以降)。ストリーム途中の refusal は、入力と出力済み分が通常料金で課金。**fallback credit** は、対象となる Messages API の直接リクエスト(バッチ以外)で、モデル切り替えに伴うキャッシュコストを返金する。**Message Batches の refusal にはクレジットトークンが発行されず**(`stop_details` に `fallback_credit_token` は含まれない)、バッチのリクエストにトークンを渡しても無視される。そのためバッチで拒否された項目の再送に credit は適用されず、再送先の通常料金(新しいバッチならバッチ料金、個別リクエストなら標準料金)で課金される |
+| 課金 | 出力前の refusal も、誤検知が少ないカテゴリでは課金される(2026-09-24 以降)。ストリーム途中の refusal は、入力と出力済み分が通常料金で課金。**fallback credit** は、対象となる Messages API の直接リクエスト(バッチ以外)で、モデル切り替えに伴うキャッシュコストを返金する。サーバー側 fallback と SDK ミドルウェアは credit を自動で適用するが、**自前のリトライには自動で適用されない**。自前で実装する場合は、最初のリクエストに beta ヘッダー `fallback-credit-2026-07-01` を付け、refusal の `stop_details.fallback_credit_token` を、同じヘッダーを付けたリトライのトップレベルパラメータとして渡す(トークンの有効期限は5分)。この手順を省くと、fallback 先のキャッシュ書き込みは通常料金で課金される。**Message Batches の refusal にはクレジットトークンが発行されず**(`stop_details` に `fallback_credit_token` は含まれない)、バッチのリクエストにトークンを渡しても無視される。そのためバッチで拒否された項目の再送に credit は適用されず、再送先の通常料金(新しいバッチならバッチ料金、個別リクエストなら標準料金)で課金される |
 
 ### 11.5 コンテンツの出自表示
 
