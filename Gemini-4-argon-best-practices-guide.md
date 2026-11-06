@@ -72,14 +72,14 @@ flowchart LR
 |---|---|
 | モデルID | `gemini-4-argon`(安定版)。サイバー防御者向けに別IDが存在 |
 | コンテキスト/出力 | **入力・思考・出力で共有する統合1Mトークン(1,048,576)** |
-| 1リクエストの出力上限 | ストリーミング/SDK: **64K**、非ストリーミングREST: **32K** |
+| 1ホップの出力上限 | ストリーミング: **64K**、非ストリーミング: **32K**(REST か SDK かは問わない)。SDK の自動継続はホップをつないで `max_output_tokens` まで生成する |
 | Long Decode | 上限を超えて最大「1M − 入力」まで、継続トークンで複数ホップ生成 |
 | 思考制御 | `thinking_level`: `low` / `medium`(既定)/ `high`(`minimal` は非対応) |
 | サンプリング | `temperature` / `top_p` / `top_k` は無視される。`candidate_count` / `frequency_penalty` / `presence_penalty` は Gemini Enterprise Agent Platform で **HTTP 400** になるため、移行前に削除する |
 | キャッシュ | 明示キャッシュ(`cachedContents`)は非対応、**暗黙キャッシュ**のみ(4,096トークン以上、ヒット時95%割引) |
 | 入力モダリティ | テキスト・画像・動画・音声・PDF(出力はテキスト) |
-| 価格(導入価格) | 入力 $2 / 出力 $10(100万トークンあたり)、**2026年11月30日まで** |
-| 価格(12/1以降) | 入力 $4 / 出力 $20(100万トークンあたり) |
+| 価格(導入価格) | **2026年11月30日まで**(100万トークンあたり)。Gemini API と global: 入力 $2 / 出力 $10。Gemini Enterprise Agent Platform の non-global リージョン: 入力 $2.20 / 出力 $11 |
+| 価格(12/1以降) | **2026年12月1日から**(100万トークンあたり)。Gemini API と global: 入力 $4 / 出力 $20。Gemini Enterprise Agent Platform の non-global リージョン: 入力 $4.40 / 出力 $22 |
 | 安全面の公表値 | 間接プロンプトインジェクション攻撃成功率0.7%(Gray Swan IPI、15回の適応的試行) |
 | 公表されている総合評価 | Vals Indexで1位(68.9%)と発表されている |
 
@@ -122,16 +122,18 @@ Long Decode の自動継続を使うには、**SDKのバージョン要件**が�
 
 | 言語 | 最低バージョン |
 |---|---|
-| Python (`google-genai`) | 2.30.1 |
+| Python (`google-genai`) | 2.30.1(グラウンディングを使う場合は 2.31.0) |
 | JavaScript (`@google/genai`) | 2.29.1 |
 | Go | 1.74.0 |
 | Java | 1.77.0 |
 | .NET | 1.26.0 |
 | Kotlin | 1.6.0 |
 
+Python の 2.31.0 では、自動継続時のグラウンディングメタデータの結合が修正されました([CHANGELOG](https://github.com/googleapis/python-genai/blob/main/CHANGELOG.md))。グラウンディングを使うワークロードでは 2.31.0 以上を入れてください。
+
 ```bash
-# Python
-pip install -U "google-genai>=2.30.1"
+# Python(グラウンディングを使う場合。使わない場合の最低バージョンは 2.30.1)
+pip install -U "google-genai>=2.31.0"
 
 # JavaScript / TypeScript
 npm install "@google/genai@>=2.29.1"
@@ -201,7 +203,8 @@ flowchart TD
 ### 4.1 仕組み(必ず理解しておく)
 
 - 入力・思考・関数呼び出し・最終応答は**ひとつの1Mトークン窓を共有**します。出力に使えるのは「1,048,576 − 入力トークン」まで。
-- 1リクエスト(1ホップ)で返せるのは **ストリーミング/SDKで最大65,536、非ストリーミングRESTで最大32,768** トークン。
+- 1リクエスト(1ホップ)で返せるのは **ストリーミングで最大65,536、非ストリーミングで最大32,768** トークン。上限を決めるのは通信方式で、REST か SDK かではありません。SDK を使っていても、非ストリーミングの自前ループは1リクエスト32,768までです。
+- SDK の自動継続は、1回の呼び出しでホップをつないで `max_output_tokens` まで生成します。1ホップの上限は同じで、`generate_content_stream` は65,536、`generate_content` は32,768です。
 - 上限に達してまだ続きがある場合、`finish_reason: CONTINUATION` と **暗号化された `continuation_token`** が返る。同じリクエストにこのトークンを付けて再送すると、続きから生成される。
 - `max_output_tokens` は **全ホップ合計の思考+出力の上限**。
 - 難問では、**1ホップ全部が思考に費やされ、テキストが空のまま `continuation_token` だけ返る**ことがある。これは正常動作で、最終回答は後続ホップで届く。
@@ -251,11 +254,12 @@ from google import genai
 from google.genai import types
 
 client = genai.Client(
-    # 20分のタイムアウト(ミリ秒)。短すぎるタイムアウトは途中切断の原因になる
+    # 1ホップあたり20分のタイムアウト(ミリ秒)。短すぎるタイムアウトは途中切断の原因になる
     http_options=types.HttpOptions(timeout=1_200_000)
 )
 
-response = client.models.generate_content(
+# 1ホップが10分を超えることがあるので、ストリーミングで呼ぶ(非ストリーミングは10分で切断される)
+stream = client.models.generate_content_stream(
     model="gemini-4-argon",
     contents="素数定理の完全で厳密な証明を書いてください。",
     config=types.GenerateContentConfig(
@@ -265,14 +269,27 @@ response = client.models.generate_content(
     ),
 )
 
-if not response.candidates:
-    raise RuntimeError(f"候補が返りませんでした: {response.prompt_feedback}")
-print(response.text)
-print("Finish reason:", response.candidates[0].finish_reason)
+finish_reason = None
+usage = None
+for chunk in stream:
+    # 候補が空なのはプロンプトに問題があるとき。理由は prompt_feedback で確認する
+    if not chunk.candidates and chunk.prompt_feedback:
+        raise RuntimeError(f"候補が返りませんでした: {chunk.prompt_feedback}")
+    if chunk.candidates and chunk.candidates[0].finish_reason:
+        finish_reason = chunk.candidates[0].finish_reason
+    if chunk.usage_metadata:
+        usage = chunk.usage_metadata  # 最後のチャンクに全ホップの合計が入る
+    if chunk.text:  # 思考だけのチャンクでは text が空になる
+        print(chunk.text, end="")
+
+print("\nFinish reason:", finish_reason)
 # ホップを跨いだ「実際のプロンプトサイズ」はこちらを使う
-print("Prompt size:", response.usage_metadata.initial_prompt_token_count)
-print("Billed tokens:", response.usage_metadata.total_token_count)
+if usage:
+    print("Prompt size:", usage.initial_prompt_token_count)
+    print("Billed tokens:", usage.total_token_count)
 ```
+
+10分以内に終わるとわかっている処理は、`client.models.generate_content` のままでかまいません(Step 2 のクイックスタート)。クライアントで接続を保持し続けたくない長時間の処理は、次の 4.5 のバックグラウンド実行を使います(Gemini API のみ。Gemini Enterprise Agent Platform ではストリーミングを使います)。
 
 ### 4.5 Interactions API(バックグラウンド実行・Gemini API のみ)
 
@@ -387,6 +404,8 @@ print("".join(p.text for p in parts if p.text and not p.thought))
 print("Finish reason:", candidate.finish_reason)
 ```
 
+この例は非ストリーミングなので、1リクエストの上限は32,768トークン、時間は10分です。1ホップが10分を超えそうな処理は、`generate_content_stream` のループにするか、4.5 のバックグラウンド実行(Gemini API のみ)を使ってください。Gemini Enterprise Agent Platform ではストリーミングを使います。
+
 **ストリーミングの自前ループ**では追加ルールがあります: 最初の32,768トークン以降は5,000トークンごとにチェックポイントのトークンが届きます。未確定チャンクは保留リストに溜め、トークンを受け取った時点で確定出力へ移します。ストリームが切れたら保留分を捨て、最後のトークンから再開します。
 
 ### 5.2 トークン計測の落とし穴(エージェントハーネスで特に重要)
@@ -406,9 +425,9 @@ SDKの自動継続では `usage_metadata` が **全ホップの合計** を返�
 ### 5.3 課金の理解
 
 - **全ホップの全トークンが課金対象**(思考のみのホップも含む)。
-- 各ホップの繰り返し入力は暗黙キャッシュで**95%割引**(導入価格では1Mあたり$0.10、12/1以降は$0.20)。ただしキャッシュは**15〜20分使われないと失効**するため、ホップ間に長い停止があると全額に戻ります。
+- 各ホップの繰り返し入力は暗黙キャッシュで**95%割引**(global の導入価格では1Mあたり$0.10、12/1以降は$0.20。non-global はそれぞれ$0.11、$0.22)。ただしキャッシュは**15〜20分使われないと失効**するため、ホップ間に長い停止があると全額に戻ります。
 - 失敗した非ストリーミングのホップは**課金されない**。ストリームが32K未満で切れた場合も課金なし(以降は最後のチェックポイントまで課金)。
-- **導入価格は2026年11月30日までで、2026年12月1日から倍になる予定**(入力 $2→$4、出力 $10→$20)。予算を組む際は12月以降の単価で試算してください。
+- **導入価格は2026年11月30日までで、2026年12月1日から倍になる予定**(global は入力 $2→$4、出力 $10→$20。Gemini Enterprise Agent Platform の non-global は入力 $2.20→$4.40、出力 $11→$22)。予算を組む際は12月以降の単価で試算してください。
 
 ---
 
@@ -588,14 +607,14 @@ flowchart TD
 ### 10.2 本番投入チェックリスト
 
 - [ ] モデルID `gemini-4-argon` を使用、請求アカウント有効(有料ティア)
-- [ ] SDKが最低バージョン以上(Python 2.30.1 / JS 2.29.1 ほか)
+- [ ] SDKが最低バージョン以上(Python 2.30.1、グラウンディング利用時は 2.31.0 / JS 2.29.1 ほか)
 - [ ] `max_output_tokens` を明示。32K未満の旧設定は引き上げ
 - [ ] `thinking_level` を3レベルで評価済み。`thinking_budget`、サンプリング引数は削除
 - [ ] 明示キャッシュの呼び出しを撤去、暗黙キャッシュ前提の設計(共通プレフィックス先頭固定)
 - [ ] HTTP読み取りタイムアウト20分、ホップ単位のリトライ・バックオフ
 - [ ] コンテキスト判定に `initial_prompt_token_count` + `candidates_token_count` + `thoughts_token_count` を使用
 - [ ] Thought Signatureを含む完全な履歴を返送
-- [ ] 12/1の価格改定(入力$4・出力$20)を織り込んだ予算
+- [ ] 12/1の価格改定(global は入力$4・出力$20、non-global は入力$4.40・出力$22)を織り込んだ予算
 - [ ] 不可逆操作の承認ゲート、最小権限、サンドボックス
 - [ ] cost per successful task の計測基盤(トレース・思考トークン)
 - [ ] 本番に近い環境での評価(評価認識の影響を考慮)
@@ -657,6 +676,8 @@ Argonを導入する際は、提供元の発表と第三者の評価の両方を
 | Argon後継(Carbon)の位置づけ・限定提供 | Google公式ブログ(Koray Kavukcuoglu, 2026-10-28) | https://blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-gemini-4-carbon/ |
 | Gemini API 開発者ガイド(thinking_level、Long Decode、実用Tips) | Google AI Studio「Gemini 4 Argon: Developer Guide」 | https://aistudio.google.com/learn/gemini-4-argon-developer-guide |
 | ロボティクス(動画→シミュレーション→実機) | Google Developers Blog | https://developers.googleblog.com/gemini-4-argon-for-robotics |
+| global / non-global 別の料金 | Agent Platform pricing | https://cloud.google.com/gemini-enterprise-agent-platform/generative-ai/pricing |
+| Python SDK 2.31.0 のグラウンディング修正 | python-genai CHANGELOG | https://github.com/googleapis/python-genai/blob/main/CHANGELOG.md |
 
 ### B. 著名な開発者・評論家・報道(第三者の視点)
 
@@ -686,6 +707,8 @@ Argonを導入する際は、提供元の発表と第三者の評価の両方を
 - https://ai.google.dev/gemini-api/docs/generate-content/long-decode
 - https://ai.google.dev/gemini-api/docs/models/gemini-4-argon
 - https://ai.google.dev/gemini-api/docs/pricing
+- https://cloud.google.com/gemini-enterprise-agent-platform/generative-ai/pricing
+- https://github.com/googleapis/python-genai/blob/main/CHANGELOG.md
 - https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/guides/gemini-4-argon
 - https://blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-gemini-4-argon/
 - https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-4-argon/
