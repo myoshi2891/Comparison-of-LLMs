@@ -56,7 +56,7 @@
 - ページ40契約＋操作43契約の83件、registry／ナビを含む関連109件が成功。全体Vitest **223 files／2463 tests**、typecheck、lint **603 files／0 diagnostics**、pytest **122件**が成功。全13図はMermaid 10.9.8で解析成功、HTML原本監査はexit 0。
 - 操作処理の行・関数100%、分岐93.1%、文99.12%。チェック保存／復元／不正JSON／保存拒否／全完了／リセット、FAQ質問・回答検索／大文字小文字／該当なし／一括開閉、目次開閉／900px境界／inert／Tab循環／フォーカス／コピー／cleanupを検証。
 - 原本の300px固定目次と900pxモバイルドロワーを保持し、共有ヘッダー＋免責バナーと実測モバイルバーを避ける。日付はregistryからヒーローへ表示し、bodyの余白を一度だけ確保。図の配置・サイズとtooltipは共有MermaidDiagramへ委譲し、該当CSS規則・配置宣言のみ契約で明示除外する。
-- highlight.js 11.11.1の原本バージョンで8コード例を静的トークン化。先頭空白・改行・複数行トークンを保持し、依存・設定・ロックは変更していない。
+- highlight.js 11.11.1の原本バージョンで8コード例を静的トークン化。先頭空白・改行・複数行トークンを保持し、依存・設定・ロックは変更していない。ただし `page.test.tsx` は `postcss` を直接importしており、Duetの各コミット時点の `web-next/package.json` では `postcss` が `overrides` にしかなく、直接宣言は後の `b99b83dc` で `devDependencies` へ追加された。
 - Red `bd83bb80` → CSSセレクタ比較の引用符正規化 `82e38859` → Green `5193d811` → Refactor `9dc46b81`。固定の原本期待値は変更せず、CSS属性セレクタの整形時引用符差だけを比較処理で吸収した。
 - HTML／Markdownは `archive/html/Anthropic/Claude-duet-best-practices-guide.html`／`archive/md/Anthropic/Claude-duet-best-practices-guide.md` へ内容無変更で保存。HTML SHA-256 `d58c7595775ef0f97cafcf20eab38dbd2e0bc66f20b51cf027ae42bcf58ab99c`、Markdown `794c7312e05f0e520cda5461f4fb611f73dee0701d84f4ffad62a492cc37ae31`（移動前後一致）。
 - 保存時の経緯: `archive/` がGit除外対象であるため初回addは追加側に失敗し、`8d86a03f` は移動元削除のみを記録した。直ちにユーザーへ報告し、保存済み原本を `git add -f` で追加した修正 `2101e2dc` を分離。最終ツリーでは両原本を追跡済みで、履歴のresetは行っていない。
