@@ -470,27 +470,17 @@ messages.append(
 Foundry での代替は次のとおりです(本ガイドの推奨)。
 
 - 全ターンで変わらない指示は、会話の開始時からトップレベルの `system` に置きます。
-- ターンごとのリマインダーは、`tool_result` と同じユーザーターンの末尾に text ブロックとして追加します。
+- ツール結果を返すユーザーメッセージは `tool_result` ブロックだけにし、text ブロックを足しません。サーバーツールの結果が残っていない場合も同じです。
+- 特定のターンだけ伝えたい内容は、ターンの完了後に次のユーザーメッセージで送ります。
 
-このリマインダーは履歴に残り、以後のリクエストで入力トークンを消費し続けます。ただし、過去のメッセージを書き換えないので、キャッシュは壊れません。頻度は必要な場面に絞ってください。
-
-**サーバーツールの結果が未完了のターンでは、リマインダーを足さないでください。** 応答の `stop_reason` が `tool_use` で、Claude が直接呼び出したサーバーツールの結果がまだない場合、次のユーザーメッセージは `tool_result` ブロックだけにします。text ブロックを足すと assistant ターンが終わったと扱われ、未解決のサーバーツール呼び出しが残るので、HTTP 400(`invalid_request_error`)になります。リマインダーはターンの完了後に回します。下の例は、未完了のサーバーツールの結果がないときだけ使えます([公式](https://platform.claude.com/docs/en/agents-and-tools/tool-use/server-tools))。
+text ブロックを足さない理由は2つあります。ツール結果の直後に text があると、履歴に「ツール結果のたびにユーザー入力が続く」パターンができ、Claude が空の応答でターンを終えることがあります([公式](https://platform.claude.com/docs/en/build-with-claude/handling-stop-reasons))。また、`stop_reason` が `tool_use` で、Claude が直接呼び出したサーバーツールの結果がまだない応答に text を足すと、未解決のサーバーツール呼び出しが残り、HTTP 400(`invalid_request_error`)になります([公式](https://platform.claude.com/docs/en/agents-and-tools/tool-use/server-tools))。
 
 ```python
-# Microsoft Foundry: 未完了のサーバーツールの結果がないときだけ、ツール結果の後ろに追加する
-# 過去のメッセージは書き換えない
-messages.append(
-    {
-        "role": "user",
-        "content": [
-            *tool_results,
-            {
-                "type": "text",
-                "text": "次に必要なものを先に列挙し、互いに依存しないものは1回の応答でまとめて要求すること。",
-            },
-        ],
-    }
-)
+# Microsoft Foundry: 固定の指示は、会話の開始時からトップレベルの system に置く
+system = "次に必要なものを先に列挙し、互いに依存しないものは1回の応答でまとめて要求すること。"
+
+# ツール結果を返すターンは tool_result だけにする
+messages.append({"role": "user", "content": tool_results})
 ```
 
 ### 6.5 履歴の編集を検出する
@@ -898,7 +888,7 @@ flowchart TD
 | --- | --- |
 | 設定 | Claude API などでは beta ヘッダー `server-side-fallback-2026-07-01` を付けた `fallbacks: "default"` で、そのカテゴリに推奨されるモデルへ再試行。**Amazon Bedrock、Google Cloud の Google 管理モデル、Microsoft Foundry では利用不可**のため、SDK ミドルウェアまたはクライアント側のリトライで実装する。**Message Batches API でも利用不可**で、`fallbacks` を含む項目はエラーになるためバッチのリクエストに含めない。バッチで拒否された項目(`result.type` が `succeeded` で `stop_reason` が `refusal`)は結果から集め、fallback モデルを指定して個別のリクエストまたは新しいバッチで再送する |
 | thinking の扱い | 切り替えの方向で異なる(第4章)。Opus 5 / Fable 5 / Mythos 5 から Fable 5.1 へ切り替えると thinking は引き継がれる。Fable 5.1 から別のモデルへ切り替えると引き継がれない(例外は Mythos 5.1) |
-| 応答の判別と記録 | fallback 先が応答しても `stop_reason` は `end_turn` などの通常値のままなので、`stop_reason` だけでは判別できない。トップレベルの `response.model`(実際に応答したモデル)、`content` 内の `fallback` ブロック(切り替え地点。`from` / `to` / `trigger` を持つ)、`usage.iterations` 内の `fallback_message` エントリで判別し、ログに記録する。sticky routing(約1時間、ベストエフォート)で fallback 先が直接応答したターンには `fallback` ブロックが付かないため、`fallback_message` と `response.model` で判別する。チェーン全体が拒否した場合も末尾は `fallback_message` になるので、「`fallback_message` があり、かつ `stop_reason` が `refusal` でない」ことを条件にする。ストリーミングの出力途中で切り替わると `message_start` は元のモデル名のままなので、`fallback` ブロックの `to.model` と最終 `message_delta` の `usage.iterations` を読む |
+| 応答の判別と記録 | fallback 先が応答しても `stop_reason` は `end_turn` などの通常値のままなので、`stop_reason` だけでは判別できない。トップレベルの `response.model`(実際に応答したモデル)、`content` 内の `fallback` ブロック(切り替え地点。`from` / `to` / `trigger` を持つ)、`usage.iterations` 内の `fallback_message` エントリで判別し、ログに記録する。sticky routing(約1時間、ベストエフォート)で fallback 先が直接応答したターンには `fallback` ブロックが付かないため、`fallback_message` と `response.model` で判別する。チェーン全体が拒否した場合も末尾は `fallback_message` になるので、「`fallback_message` があり、かつ `stop_reason` が `refusal` でない」ことを条件にする。Python SDK のミドルウェアの非ストリーミング応答では、`usage` は応答したモデルの値のままで、`usage.iterations` に `fallback_message` が入らないことがあるので、`content` 内の `fallback` ブロックと `response.model` で判別する。拒否された試行のコストはこの `usage` から分からないので、試行ごとの記録または使用量レポートで照合する。ストリーミングの出力途中で切り替わると `message_start` は元のモデル名のままなので、`fallback` ブロックの `to.model` と最終 `message_delta` の `usage.iterations` を読む |
 | 次ターンへの返送 | assistant の `content` は受け取った順序のまま返す。**`fallback` ブロックは削除も移動もしない**(API がこの位置を基準に前後の thinking ブロックを検証するため、境界の両側の thinking を返しているリクエストで省略・移動すると拒否される)。ただし出力途中の切り替えでは、**最後の `fallback` ブロックより前**の `thinking` / `redacted_thinking` / `connector_text`、クライアント側の `tool_use`、結果と対になっていない `server_tool_use` は除く。`text`、結果と対になった `server_tool_use`、最後の `fallback` ブロックより後のブロックは順序を保って残す |
 | 課金 | 出力前の refusal も、誤検知が少ないカテゴリでは課金される(2026-09-24 以降)。ストリーム途中の refusal は、入力と出力済み分が通常料金で課金。**fallback credit** は、対象となる Messages API の直接リクエスト(バッチ以外)で、モデル切り替えに伴うキャッシュコストを返金する。サーバー側 fallback と SDK ミドルウェアは credit を自動で適用するが、**自前のリトライには自動で適用されない**。自前で実装する場合は、最初のリクエストに beta ヘッダー `fallback-credit-2026-07-01` を付け、refusal の `stop_details.fallback_credit_token` を、同じヘッダーを付けたリトライのトップレベルパラメータとして渡す(トークンの有効期限は5分)。**同じモデルへ元の本文をそのまま再送しない**(たいてい再度拒否される)。`model` は、最後に拒否したモデルに許可された fallback 先へ変え、以降のターンもそのモデルを使い続ける。Fable 5.1 の refusal の許可先は Opus 4.8 または Opus 5、Opus 5 の refusal の許可先は Opus 4.8 だけ(Fable 5.1 からの fallback 先の Opus 5 が拒否した場合も含む。最後に拒否したモデルは `response.model` で確認する)。Haiku 5.5 の refusal には credit がなく、再試行では fallback 先のキャッシュ書き込みを通常料金で支払う。credit を受けるには、`system` / `messages` / `tools` / `tool_choice` / `thinking` / `cache_control`(使う場合は `output_config` / `mcp_servers` / `context_management` / `container` も)を拒否されたリクエストと完全に一致させ、`anthropic-beta` ヘッダーも揃える。リトライでは本文の `fallbacks` パラメータを必ず削除する(`fallbacks: "default"` も同じ)。このとき `server-side-fallback-*` ヘッダーも一緒に外してよい。それ以外に変更できるのは `model` / `max_tokens` / `stop_sequences` / `stream` / `metadata` / `service_tier` のみ。**履歴に per-message effort(5.5節の `output_config` 付き system メッセージ)があるときは、再試行先を選ぶ前に確認する**。Opus 4.8 は per-message effort に対応せず、Amazon Bedrock の Opus 5 も対応しない。この2つへ元の本文を送ると、トークンの有無にかかわらず 400 になる(エラーは `fallback_credit_token` を名指ししないので、後述の 400 の手順では解決しない)。互換にするために `messages` を変えると拒否されたリクエストと一致しなくなり、credit は受けられない。Fable 5.1 の refusal では、Opus 5 が per-message effort に対応する Claude API、Claude Platform on AWS、Google Cloud なら、fallback 先に Opus 5 を選ぶ。Opus 5.5 も per-message effort に対応するが、Fable 5.1 の fallback 先としては許可されていない。Amazon Bedrock では許可された fallback 先のどちらも対応しないので、互換の fallback 先がない(Microsoft Foundry は公式の対応表に記載がなく要確認)。Opus 5 の refusal は許可先が Opus 4.8 だけなので、per-message effort が履歴にあると、どの環境でも互換の fallback 先がない。互換の fallback 先がなければ、**credit なしの再試行**であることをログなどで明示して送る。トークンを付けず、対象モデルが受け付ける形へ履歴を変える。Opus 4.8 や Amazon Bedrock の Opus 5 では effort だけの system メッセージを削除し、実効の effort をトップレベルの `output_config.effort` で指定する。fallback 先のキャッシュ書き込みは通常料金で課金される。サーバーツールを実行済みのリクエストでは再実行・再課金されるので、そのコストを呼び出し側へ通知するか、エラーを返す。リトライ本文の形は `stop_details.fallback_has_prefill_claim` で決める。`true` または未設定なら、元の本文の `messages` 末尾に、拒否された応答の `content` をそのまま入れた assistant メッセージを1件だけ追加する(最後の `text` ブロック末尾の空白は除き、結果のないクライアント側 `tool_use` は含めない)。この形なら続きから生成され、完了済みのサーバーツールは再実行されない。`false` なら `model` 以外は元の本文のまま送る。サーバーツールの実行後に拒否された場合は、元の本文のままでは credit を受けられないので、追記する形を使う。ただし、リクエストに `output_config.format` または tool_use を強制する `tool_choice` があると追記する形も使えないため、**どちらの形でも credit を受けられない**(Fable 5.1 は強制 `tool_choice` 自体が 400 になるので、実際に該当するのは `output_config.format`)。元の本文での再試行が、トークンは部分応答の継続でしか使えないとする 400 で拒否されたら、トークンを破棄する。トークンなしの再送は通るが、完了済みのサーバーツールが再実行・再課金されるので、黙って再試行せず、**そのコストを呼び出し側へ通知するか、エラーを返す**。エラーメッセージが `redemption temporarily unavailable` の 400 は一時的なもので、本文の形の問題ではない。どの段階で返っても次の手順へ進まず、同じ本文と同じトークンのまま、トークンの有効期限内に再試行する。それ以外の 400 で追記した形が拒否されたら、トークンを付けたまま `model` 以外は元の本文のものを送り、それも `fallback_credit_token` を名指しする 400 で拒否されたらトークンなしで送る(credit は失われる。サーバーツールを実行済みのリクエストでは再実行・再課金されるので、黙って送らず、コストを呼び出し側へ通知するか、エラーを返す)。この手順を省くと、fallback 先のキャッシュ書き込みは通常料金で課金される。**Message Batches の refusal にはクレジットトークンが発行されず**(`stop_details` に `fallback_credit_token` は含まれない)、バッチのリクエストにトークンを渡しても無視される。そのためバッチで拒否された項目の再送に credit は適用されず、再送先の通常料金(新しいバッチならバッチ料金、個別リクエストなら標準料金)で課金される |
 
