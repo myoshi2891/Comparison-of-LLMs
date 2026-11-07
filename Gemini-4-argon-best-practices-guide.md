@@ -319,6 +319,7 @@ interaction = client.interactions.create(
     model="gemini-4-argon",
     input="大規模なマルチファイル差分とテストスイートを一括で出力してください。",
     background=True,
+    store=True,  # バックグラウンド実行に必須(既定値も True。False だと 400 になる)
     generation_config={
         "max_output_tokens": 262_144,
         "thinking_level": "high",

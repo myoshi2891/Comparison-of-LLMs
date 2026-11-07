@@ -497,7 +497,7 @@ if video_file.state.name != "ACTIVE":
     raise RuntimeError(f"File is not usable: state={video_file.state.name}")
 
 interaction = client.interactions.create(
-    model="gemini-omni-1.1-flash",
+    model="gemini-omni-1.2-flash",
     input=[
         {"type": "video", "uri": video_file.uri},
         {"type": "text", "text": "Change the lighting to be more dramatic. Keep everything else the same."},
@@ -706,7 +706,7 @@ flowchart TD
 | 入力動画 | 編集はアップロード動画もモデル生成動画も 15 秒以下。拡張は 15 秒の動画を含めて 1 回 3〜10 秒ずつ、全長 30 秒まで(Omni 1.2) |
 | 拡張位置 | 末尾のみ |
 | YouTube | YouTube 動画をメディアソースとして使うことは非対応 |
-| スループット | Provisioned Throughput は非対応 |
+| スループット | Provisioned Throughput は Gemini API では非対応。[Gemini Enterprise Agent Platform](https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/gemini/omni-1-2-flash) では Omni 1.2 Flash(`gemini-omni-1.2-flash`)で利用可能 |
 | 言語 | 英語は完全サポート。他言語は未評価 |
 | 地域 | アップロード動画の編集・拡張は EEA・スイス・英国で提供なし |
 
