@@ -422,3 +422,25 @@ it("原本の高詳細度アンカー規則を補正し全見出しの実効余�
     }
   }
 });
+it("実ページのモバイル目次を開いている間だけ #dots-guide 内の main を inert にする", () => {
+  // Arrange
+  const initialWidth = window.innerWidth;
+  Object.defineProperty(window, "innerWidth", { configurable: true, value: 800 });
+  try {
+    const { container } = render(<Page />);
+    const main = container.querySelector<HTMLElement>("#dots-guide main");
+    const menu = container.querySelector<HTMLElement>("#dots-menu");
+    if (!main || !menu) throw new Error("実ページの main または目次ボタンがありません");
+    expect(main.inert).toBe(false);
+
+    // Act / Assert: 開く
+    fireEvent.click(menu);
+    expect(main.inert).toBe(true);
+
+    // Act / Assert: 閉じる
+    fireEvent.click(menu);
+    expect(main.inert).toBe(false);
+  } finally {
+    Object.defineProperty(window, "innerWidth", { configurable: true, value: initialWidth });
+  }
+});
