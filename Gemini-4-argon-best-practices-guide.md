@@ -123,7 +123,7 @@ Long Decode の自動継続を使うには、**SDKのバージョン要件**が�
 
 | 言語 | 最低バージョン |
 |---|---|
-| Python (`google-genai`) | 2.30.1(グラウンディングを使う場合は 2.31.0) |
+| Python (`google-genai`) | 2.31.0 |
 | JavaScript (`@google/genai`) | 2.29.1 |
 | Go | 1.74.0 |
 | Java | 1.77.0 |
@@ -132,10 +132,10 @@ Long Decode の自動継続を使うには、**SDKのバージョン要件**が�
 
 上の表は GenerateContent の要件です。**Interactions API の自動継続はより新しいSDKが必要**で、Python 2.34.0、JavaScript 2.32.0、Go 1.77.0、Java 1.80.0 以上です。
 
-Python の 2.31.0 では、自動継続時のグラウンディングメタデータの結合が修正されました([CHANGELOG](https://github.com/googleapis/python-genai/blob/main/CHANGELOG.md))。グラウンディングを使うワークロードでは 2.31.0 以上を入れてください。
+公式の Long Decode ページが挙げる Python の下限は 2.30.1 ですが、本ガイドでは 2.31.0 を最低バージョンとします。2.31.0 では、候補なしで返った継続ホップの処理、途切れたホップの再試行、自動継続時のグラウンディングメタデータの結合が修正されました([CHANGELOG](https://github.com/googleapis/python-genai/blob/main/CHANGELOG.md))。
 
 ```bash
-# Python(グラウンディングを使う場合。使わない場合の最低バージョンは 2.30.1)
+# Python
 pip install -U "google-genai>=2.31.0"
 
 # JavaScript / TypeScript
@@ -325,6 +325,9 @@ interaction = client.interactions.create(
     },
 )
 
+# ポーリングが失敗しても後から取得・キャンセルできるよう、作成直後に ID を保存する
+print("Interaction ID:", interaction.id)
+
 # 完了までポーリングする
 while interaction.status in ("in_progress", "queued"):
     time.sleep(5)
@@ -351,6 +354,8 @@ print(text)
 print("Status:", interaction.status)
 print("Usage:", interaction.usage)
 ```
+
+ポーリングが途中で失敗したら、保存した ID を `client.interactions.get(id=...)` に渡して状態と結果を取得します。不要になった実行は `client.interactions.cancel(id=...)` で止めます(`cancelled` への反映は遅れることがあります)。
 
 > 上のInteractions APIの引数の細部はドキュメント側で更新されやすい部分です。実装前に必ず[公式ドキュメント](https://ai.google.dev/gemini-api/docs/generate-content/latest-model)で最新のシグネチャを確認してください。
 
@@ -429,7 +434,7 @@ SDKの自動継続では `usage_metadata` が **全ホップの合計** を返�
 
 **そのため**:
 
-- コンテキスト圧縮(compaction)や上限判定では、**`initial_prompt_token_count` + `candidates_token_count` + `thoughts_token_count`** でコンテキストサイズを見積もる(JSでは `initialPromptTokenCount` / `candidatesTokenCount` / `thoughtsTokenCount`)。`initial_prompt_token_count` だけでは、今のターンで生成した分が入りません。合算された `prompt_token_count` を使うと圧縮が早すぎるタイミングで始まります。圧縮は `continuation_token` がなくなり、生成が完了してから行ってください。
+- コンテキスト圧縮(compaction)や上限判定では、**`initial_prompt_token_count` + `tool_use_prompt_token_count` + `candidates_token_count` + `thoughts_token_count`** でコンテキストサイズを見積もる(JSでは `initialPromptTokenCount` / `toolUsePromptTokenCount` / `candidatesTokenCount` / `thoughtsTokenCount`)。`tool_use_prompt_token_count` はツールの実行結果としてモデルへ渡す入力のトークン数で、値がなければ 0 として扱います(公式の Long Decode ページの式にはなく、SDK の型定義の説明に基づく近似です)。`initial_prompt_token_count` だけでは、今のターンで生成した分が入りません。合算された `prompt_token_count` を使うと圧縮が早すぎるタイミングで始まります。圧縮は `continuation_token` がなくなり、生成が完了してから行ってください。
 - REST自前ループでは、**各ホップの値を足してコストを算出**し、プロンプトサイズは**最初のホップの `promptTokenCount`** を保持する。
 - `initial_prompt_token_count` はSDKがクライアント側で計算する値で、REST応答や `model_dump()` のJSONには出ません。必要なら別途保存してください。
 
@@ -618,12 +623,12 @@ flowchart TD
 ### 10.2 本番投入チェックリスト
 
 - [ ] モデルID `gemini-4-argon` を使用、請求アカウント有効(有料ティア)
-- [ ] SDKが最低バージョン以上(Python 2.30.1、グラウンディング利用時は 2.31.0 / JS 2.29.1 ほか。Interactions API の自動継続は Python 2.34.0 / JS 2.32.0 ほか)
+- [ ] SDKが最低バージョン以上(Python 2.31.0 / JS 2.29.1 ほか。Interactions API の自動継続は Python 2.34.0 / JS 2.32.0 ほか)
 - [ ] `max_output_tokens` を明示。32K未満の旧設定は引き上げ
 - [ ] `thinking_level` を3レベルで評価済み。`thinking_budget`、サンプリング引数は削除
 - [ ] 明示キャッシュの呼び出しを撤去、暗黙キャッシュ前提の設計(共通プレフィックス先頭固定)
 - [ ] HTTP読み取りタイムアウト20分、ホップ単位のリトライ・バックオフ
-- [ ] コンテキスト判定に `initial_prompt_token_count` + `candidates_token_count` + `thoughts_token_count` を使用
+- [ ] コンテキスト判定に `initial_prompt_token_count` + `tool_use_prompt_token_count` + `candidates_token_count` + `thoughts_token_count` を使用
 - [ ] Thought Signatureを含む完全な履歴を返送
 - [ ] 12/1の価格改定(Standard の global は入力$4・出力$20、non-global は入力$4.40・出力$22)を織り込んだ予算
 - [ ] 不可逆操作の承認ゲート、最小権限、サンドボックス
@@ -646,7 +651,7 @@ flowchart TD
 | `temperature` 等の警告 | 無視される。パラメータを削除 |
 | `candidate_count` / `frequency_penalty` / `presence_penalty` でHTTP 400 | Gemini Enterprise Agent Platform では非対応。パラメータを削除 |
 | 3〜5分でリクエストが切れる | クライアントタイムアウトが短い。20分に設定 |
-| コンテキスト圧縮が早すぎる | ハーネスが合算された `prompt_token_count` を見ている。`initial_prompt_token_count` + `candidates_token_count` + `thoughts_token_count` で見積もる |
+| コンテキスト圧縮が早すぎる | ハーネスが合算された `prompt_token_count` を見ている。`initial_prompt_token_count` + `tool_use_prompt_token_count` + `candidates_token_count` + `thoughts_token_count` で見積もる |
 | 明示キャッシュでエラー | Argonは非対応。暗黙キャッシュへ移行 |
 | OpenAI互換エンドポイントで長文が切れる | Long Decode非対応。ネイティブAPIを使う |
 
