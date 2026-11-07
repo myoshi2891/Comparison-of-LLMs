@@ -211,6 +211,7 @@ print("interaction id:", interaction.id)  # 後続の編集・拡張で使う
 | `aspect_ratio` | `"16:9"`(既定)/ `"9:16"` | 縦動画は `9:16` |
 | `resolution` | `"360p"` / `"720p"`(既定)/ `"1080p"` / `"4k"` | 1080p と 4K は **アップスケール出力** |
 | `delivery` | `"uri"` | 4MB 超の動画は URI 配信を使う |
+| `duration` | `"3s"`〜`"15s"`(整数の秒。既定は `"10s"`) | Omni 1.2 で確認した仕様。プロンプト内の長さの指定より優先され、15 秒を超えるとエラーになる。先頭/末尾フレーム補間は 3〜10 秒(10 秒を超えるとエラー)、拡張は 1 回 3〜10 秒まで |
 
 ```python
 interaction = client.interactions.create(
@@ -227,48 +228,57 @@ interaction = client.interactions.create(
 
 この例は URI 配信なので、生成結果は `interaction.output_video.data` ではなく、次の 3.2 の手順で `interaction.output_video.uri` から取得します。
 
+Omni 1.2 では、生成の長さを `duration` で指定できます。省略すると 10 秒です。次の例は 15 秒の動画を生成します。
+
+```python
+long_interaction = client.interactions.create(
+    model="gemini-omni-1.2-flash",
+    input="A slow aerial shot of a coastal town at sunrise. Single continuous shot, no scene cuts.",
+    response_format={"type": "video", "duration": "15s", "delivery": "uri"},
+)
+```
+
 ### 3.2 大きな動画は URI 配信で取得する
 
-公式の推奨は、**4MB を超える動画(720p 超など)では `delivery="uri"`** を使うことです。返ってくる Google ホストの URI が `ACTIVE` になるまでポーリングしてからダウンロードします。
+公式の推奨は、**4MB を超える動画(720p 超など)では `delivery="uri"`** を使うことです。返ってくる Google ホストの URI が `ACTIVE` になるまでポーリングしてからダウンロードします。次の例は、3.1 の `client` と `interaction` をそのまま使うので、動画を生成し直しません。
 
 ```python
 import re
 import time
-from google import genai
 
-client = genai.Client()
 
-interaction = client.interactions.create(
-    model="gemini-omni-1.1-flash",
-    input="A beautiful sunset over a calm ocean.",
-    response_format={"type": "video", "delivery": "uri"},
-)
+def download_uri_video(interaction, path: str) -> None:
+    """URI 配信の動画を ACTIVE まで待って保存する。生成はやり直さない。"""
+    video_output = interaction.output_video
+    if video_output is None or not video_output.uri:
+        raise RuntimeError(f"No video returned: status={interaction.status}")
+    # URI の末尾には :download?alt=media が付くので、ファイル ID だけを取り出す
+    match = re.search(r"/files/([^/:?]+)", video_output.uri)
+    if match is None:
+        raise RuntimeError(f"URI からファイル ID を取得できません: {video_output.uri}")
+    file_name = f"files/{match.group(1)}"
 
-video_output = interaction.output_video
-if video_output is None or not video_output.uri:
-    raise RuntimeError(f"No video returned: status={interaction.status}")
-# URI の末尾には :download?alt=media が付くので、ファイル ID だけを取り出す
-match = re.search(r"/files/([^/:?]+)", video_output.uri)
-if match is None:
-    raise RuntimeError(f"URI からファイル ID を取得できません: {video_output.uri}")
-file_name = match.group(1)
+    deadline = time.monotonic() + 600  # 待ち時間の上限(秒)
+    while True:
+        info = client.files.get(name=file_name)
+        if info.state.name == "ACTIVE":
+            break
+        # FAILED や STATE_UNSPECIFIED など、想定外の状態では待ち続けない
+        if info.state.name != "PROCESSING":
+            raise RuntimeError(f"Generation failed: state={info.state.name}")
+        if time.monotonic() >= deadline:
+            raise TimeoutError(f"Timed out waiting for {info.name}")
+        time.sleep(5)
 
-deadline = time.monotonic() + 600  # 待ち時間の上限(秒)
-while True:
-    info = client.files.get(name=f"files/{file_name}")
-    if info.state.name == "ACTIVE":
-        break
-    # FAILED や STATE_UNSPECIFIED など、想定外の状態では待ち続けない
-    if info.state.name != "PROCESSING":
-        raise RuntimeError(f"Generation failed: state={info.state.name}")
-    if time.monotonic() >= deadline:
-        raise TimeoutError(f"Timed out waiting for {info.name}")
-    time.sleep(5)
+    # ハイフンを含む ID が切り詰められないよう、URI ではなく files/ 付きの ID を渡す
+    client.files.download(file=file_name, destination=path)
 
-client.files.download(file=video_output.uri, destination="output.mp4")
+
+# 3.1 で delivery="uri" を指定して作成した interaction をそのまま渡す
+download_uri_video(interaction, "output.mp4")
 ```
 
-公式の Python サンプルは `uri.split("/")[-1]` で ID を取り出していますが、公式の REST 例の URI は `:download?alt=media` で終わるため、この方法では末尾が ID に残ります。上の例では ID だけを取り出しています。
+公式の Python サンプルは `uri.split("/")[-1]` で ID を取り出していますが、公式の REST 例の URI は `:download?alt=media` で終わるため、この方法では末尾が ID に残ります。上の例では ID だけを取り出しています。また、公式の Python サンプルは `client.files.download` にも URI をそのまま渡しますが、SDK は `https://` で始まる URI から `[a-z0-9]+` に一致する部分だけを ID として取り出すため、ハイフンを含む ID は途中で切れます。`files/` 付きの ID を渡せば、ID はそのまま保たれます。
 
 > **落とし穴**: `GET /v1beta/interactions/{id}` で後から取得すると、最初に `delivery: "uri"` で作成していても **動画は base64 のインラインデータで返ります**。`uri` フィールドが確実にあるのは、作成直後のレスポンスか SSE ストリームです。**作成直後に URI を保存**してください。
 
@@ -367,7 +377,7 @@ flowchart TD
 | --- | --- | --- |
 | text-to-video | テキスト | 単一ショット・音・禁止事項を明記 |
 | image-to-video | 画像 + テキスト | 高解像度の画像と、**具体的な動きの記述**が有効。「make it move」のような曖昧指示は弱い(公式) |
-| 先頭/末尾フレーム補間 | 画像 2 枚 + テキスト | 2 枚を `input` に並べ、遷移を記述する |
+| 先頭/末尾フレーム補間 | 画像 2 枚 + テキスト | 2 枚を `input` に並べ、遷移を記述する。長さは 3〜10 秒まで |
 | subject reference | 参照画像 + テキスト | 複数の被写体画像(例: 猫と毛糸玉)を組み合わせて 1 本の動画にできる |
 | edit | 動画 + テキスト | 短い指示 + 「他は維持」(Step 6) |
 | extend | 動画 + テキスト | 末尾から最大 10 秒を追加(Step 7) |
