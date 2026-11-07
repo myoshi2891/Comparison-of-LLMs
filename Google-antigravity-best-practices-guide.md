@@ -272,7 +272,7 @@ flowchart TB
 注意点:
 
 - **Auto** は macOS / Linux は v2.23.0 以降、Windows は v2.26.0 以降で、サンドボックスが使える場合に利用可能。**企業・ビジネスアカウントでは現状使えません** [公式]。
-- Defaultのサンドボックスは、既定で**ネットワーク接続なし**、アクセスはワークスペースと一時ディレクトリに限られます [公式]。
+- Defaultのサンドボックスは、既定で**ネットワーク接続なし**です。コマンドが書き込めるのはワークスペース、一時ディレクトリ、共有ビルドキャッシュです。`/usr` や `/etc` などのシステムディレクトリは読み取れますが、`~/.ssh` や `.env` などの機密ファイルはブロックされます [公式]([Terminal sandbox](https://antigravity.google/docs/sandbox/))。
 - `read_url` に許可したドメインは、そのまま**サンドボックスの外向き通信許可リストにコンパイルされます** [公式]。つまり `read_url(*)` は、サンドボックスの外向き通信を事実上全開にします。
 
 ### 2.4 プリセットの選び方
@@ -345,6 +345,8 @@ CLIは、**実行モード**と `toolPermission` と詳細ルール(allow / ask 
 - `<HOME>` は、`echo "$HOME"` で確認した自分のホームディレクトリの絶対パスに置き換えてください。公式の例も絶対パスで、`write_file` が `~` を展開するとは書かれていません [公式]。
 - `command` の `allow` ルールは、サンドボックスの**内外を問わず**確認なしの実行を許可します [公式]。`proceed-in-sandbox` ならサンドボックス内のコマンドは自動で実行され、外で実行するときは確認が出るので、`npm run` の `allow` ルールは入れていません(**[筆者推奨]**)。
 - この例の `curl` は `deny` なので、`allow` で例外を作れません。例外が必要な場合は `ask` へ移します(Step 15.3)。
+- `command(...)` は既定で単語・トークンの前方一致です [公式]。そのため `command(git push)` は `git -C /path push` のような別の書き方を捕まえません(前方一致の仕様からの帰結)。別の書き方はこの `ask` に一致しないので、サンドボックスからリモートと必要な資格情報へ到達できる場合は、確認なしで push される可能性があります。すべてのコマンドで確認が必要なら、`ask` に `command(*)` を設定します。`ask` は `allow` より優先されます [公式]。
+- `command(rm -rf)` の保護も同じ前方一致の範囲に限られ、`rm -fr` のようにオプションの順序を変えた形には一致しません(前方一致の仕様からの帰結)。また、サンドボックス内でもワークスペースへは書き込めるので、この `deny` を入れていても、サンドボックス内のコマンドがワークスペースのファイルを削除する可能性はあります。
 
 ### 2.7 コマンドマッチの落とし穴
 
@@ -413,8 +415,17 @@ description: "DBマイグレーションやSQLスキーマ変更を書く・レ�
 |:--|:--|:--|
 | `always_on` | 毎ターン全文を注入 | 絶対に外せない制約(`AGENTS.md` に直接書く方が簡単) |
 | `model_decision` | パスと `description` だけ先に注入し、必要時に全文を読む | 詳細なドメイン別ガイド |
-| `glob` | 一致するファイルを触るとき自動で有効化 | 言語別・領域別の規約(例: `*.proto`) |
+| `glob` | 必須の `globs` のパターンに一致するファイルを扱うときだけ自動で有効化 | 言語別・領域別の規約(例: `*.proto`) |
 | `manual` | `@` メンションしたときだけ読み込む | リリースチェックリスト、監査基準(CLIはルールのメンション非対応) |
+
+`glob` の frontmatter は次のように書きます。`globs` はカンマ区切りの文字列で、`*` で始まるパターンは引用符で囲みます [公式]。
+
+```markdown
+---
+trigger: glob
+globs: "*.proto, **/*.pb.go"
+---
+```
 
 ### 3.4 AGENTS.md の雛形
 
@@ -891,12 +902,18 @@ agy plugin validate /path/to/plugin   # 自作・外部プラグインの検証(
 ```bash
 # Remote Control
 agy --remote-control              # 新規セッションで有効化
-agy remote-control start          # 常時待機のヘッドレスCLI
-# セッション中は /remote-control と /remote-control off
+agy remote-control start          # 常時待機のヘッドレスCLI(OSのサービスとして登録)
+agy remote-control stop           # 常時待機サービスを停止し、登録も解除
+# 現在のセッションだけ: /remote-control で有効化、/remote-control off で解除
 
 # Remote Agents
 agy --remote-agent --project <remote_project_id>
 ```
+
+- **Remote Controlの止め方**: 常時待機サービスを止めるのは `agy remote-control stop` です。`/remote-control off` は現在のセッションのトンネルを切断するだけで、公式の説明にサービスの停止は含まれません [公式]。
+- **Remote Agentsの権限**: リモートセッションの権限はローカルとは別で、リモートエージェントの設定に従います。既定のプリセットは `always-proceed (turbo)` なので、ローカルの `deny` ルールが適用されるとは限りません。リモートセッションで `/config` の Remote Agent タブからプリセットを、`/permissions` からリモートのルールを確認してください [公式]。
+
+出典: [公式] `https://antigravity.google/docs/remote-control/`、`https://antigravity.google/docs/remote-agents/`
 
 ### 11.2 選び方
 
@@ -1177,7 +1194,7 @@ flowchart LR
 | 使用量 | `/usage` | 5時間枠・週次 |
 | Appへ送る | `/export` | GUIで続行 |
 | 音声 | `/voice live`(`F6`)/ `/voice dictate`(`F5`) | 企業アカウントの音声入力は不可 |
-| 遠隔操作 | `/remote-control` | 解除は `/remote-control off` |
+| 遠隔操作 | `/remote-control` | 現在のセッションの解除は `/remote-control off`。常時待機サービスの停止は `agy remote-control stop` |
 | 検索パレット(App) | `Cmd`/`Ctrl` + `K` | 会話・ファイル・コマンド |
 
 出典: [公式] `https://antigravity.google/docs/features/`、`https://antigravity.google/docs/subagents/`、[二次] DEV Community(権限コマンド)
