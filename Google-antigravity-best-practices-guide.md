@@ -142,7 +142,7 @@ flowchart TB
 
 | モデル | Free / Plus | Pro | Ultra | Enterprise | 備考 |
 |:--|:--:|:--:|:--:|:--:|:--|
-| Gemini 4 Argon | 不可 | 有料Proのみ | 可 | 可 | 最上位。Low / Medium / High |
+| Gemini 4 Argon | 不可 | 有料Pro、または対象プレミアムデバイスの試用 | 可 | 可 | 最上位。Low / Medium / High |
 | Gemini 3.8 Flash | 可 | 可 | 可 | 可 | 標準の常用モデル |
 | Gemini 3.7 Flash / 3.6 Flash | 不可 | 不可 | 不可 | 可 | |
 | Gemini 3.1 Pro | 不可 | 不可 | 不可 | 可 | |
@@ -320,8 +320,6 @@ CLIは、**実行モード**と `toolPermission` と詳細ルール(allow / ask 
   "enableTerminalSandbox": true,
   "permissions": {
     "allow": [
-      "command(git status)",
-      "command(git diff)",
       "write_file(src/)",
       "read_url(developer.mozilla.org)",
       "mcp(linter/*)"
@@ -689,13 +687,15 @@ skills:
 ```mermaid
 flowchart TB
   A["メインエージェント (計画・調整)"] --> B["実装サブエージェント (branch: 隔離worktree)"]
-  A --> C["検証サブエージェント (code-auditor・読み取り中心)"]
   B --> D["実装完了を親へ報告"]
-  D --> C
+  D --> G["親が実装worktreeの変更を親ワークスペースへ取り込む"]
+  G --> C["検証サブエージェント (code-auditor・読み取り中心)"]
   C --> E{"問題あり?"}
   E -- "はい" --> B
   E -- "いいえ" --> F["親が結果を統合して人間に報告"]
 ```
+
+> **[筆者推奨]** `branch` の変更が親ワークスペースへ自動で戻るとは、公式に書かれていません。親と同じワークスペースで検証するなら、古いコードを検証しないよう、検証の前に変更を取り込んでください。
 
 ### 7.4 ライフサイクルと操作
 
@@ -909,7 +909,7 @@ flowchart TB
   D -- "いいえ" --> C
 ```
 
-> **[筆者推奨]** 機密性の高いコードは、データ取り扱いの規約を確認するまでRemote Agentsに載せず、Remote Controlで運用してください。
+> **[筆者推奨]** 機密性の高いコードは、Remote Agents でも Remote Control でも、適用される利用規約と組織のポリシーを確認してから扱ってください。Remote Control はローカルで実行しますが、データがローカルにとどまることを保証するものではありません。
 
 ### 11.3 Voice mode(2026-11-03〜、段階的展開)
 
@@ -987,7 +987,7 @@ agy -p "このgit diffをレビューして、Conventional Commits形式のコ�
 
 | CIでの注意 | 理由 | 根拠 |
 |:--|:--|:--|
-| 非対話で止まらないよう、**必要な許可ルールだけ**を事前に定義する | 承認待ちで固まる | [筆者推奨] |
+| **必要な許可ルールだけ**を事前に定義し、実行後は `stderr` の拒否通知を確認する | 承認できない操作は待たずに soft-deny され、実行は続いて終了コード `0` で終わるため、終了コードだけでは拒否を検知できない(公式のヘッドレス文書の記載。v1.4.12 の変更履歴には個別の記載なし) | [公式][筆者推奨] |
 | `always-proceed` / `--dangerously-skip-permissions` を使わない | 承認を丸ごと切るため | [公式][二次] |
 | 出力をそのままマージ判断に使わない | 検証は別のゲート(テスト・人間)で行う | [開発者] |
 | 印刷モードでスラッシュコマンド展開を止めたいなら `--disable-slash-commands` | 想定外のスキル展開を避ける | [二次] |
@@ -1135,7 +1135,7 @@ flowchart LR
 | スキルが出てこない | 配置場所の違い、CLI実行中に追加した | `.agents/skills/` を確認し、`/skills reload` か新規会話 | [公式] |
 | サブエージェントが固まる | `tools` に未対応・綴り違いの名前 | `view_file`、`run_command` など正確な名前に | [公式] |
 | `command(git)` を許可したのに確認が出る | `$(...)` など完全一致が必要な構文を含む | 行全体の完全一致ルール、または `regex:` を使う | [公式] |
-| Windowsでコマンドルールが効かない | 単語に分割できないコマンドは完全一致が必要 | `command(regex:git .*)` のように指定 | [公式] |
+| Windowsでコマンドルールが効かない | 単語に分割できないコマンドは完全一致が必要 | 必要なコマンド行だけを、その行全体と一致するルールで許可する(`git` 全体を許可しない) | [公式][筆者推奨] |
 | Autoが選べない | 企業・ビジネスアカウント、サンドボックス非対応、版が古い | 版(v2.23.0+ / Windowsはv2.26.0+)とアカウント種別を確認 | [公式] |
 | CLIで `proceed-in-sandbox` が確認になる | サンドボックスが使えない環境(v1.4.4以降) | `request-review` と同様に動作する仕様 | [公式] |
 | Voice mode / Remote Agents が出ない | 段階的展開、Pro / Ultra限定 | 最新版に更新、アカウントと権限を確認 | [公式][二次] |
