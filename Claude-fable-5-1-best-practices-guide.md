@@ -823,18 +823,25 @@ Fable 5.1 には安全分類器があり、リクエストが拒否されると 
 
 ```mermaid
 flowchart TD
-    A["リクエスト送信"] --> B{"stop_reason が refusal か"}
-    B -- "いいえ" --> OK["通常処理"]
+    S["呼び出し前に設定: サーバー側 fallback か SDK ミドルウェアのどちらか一方 (併用しない)"] --> A["リクエスト送信: 設定した fallback は同じ呼び出しの中で試行される"]
+    A --> B{"最終応答の stop_reason が refusal か"}
+    B -- "いいえ" --> OK["通常処理 (fallback 先が応答した場合を含む)"]
     B -- "はい" --> C["stop_details.category を確認"]
     C --> N{"category は null か"}
     N -- "はい" --> U["汎用処理: 記録し、別モデルへの再試行かプロンプトの見直しを判断"]
     N -- "いいえ" --> D{"誤検知の可能性が高いか"}
     D -- "はい" --> E["表現・文脈を調整して再送 11.3"]
     D -- "いいえ" --> R{"カテゴリに推奨 fallback があるか"}
-    R -- "はい" --> F["fallback を実行"]
+    R -- "はい" --> T["試行済みモデルを確認 (usage.iterations、fallback ブロック、response.model)"]
     R -- "いいえ" --> P["refusal は確定。カテゴリ別に対応 (例: reasoning_extraction はプロンプトを見直す)"]
-    F --> G["サーバー側 fallback / SDK ミドルウェア / 自前リトライ"]
-    G --> H["fallback 先はカテゴリで変わる。許可される先: Opus 4.8 または Opus 5"]
+    T --> K{"stop_details.recommended_model があるか"}
+    K -- "はい: fallback は rate limit や過負荷でスキップされた" --> M{"recommended_model は未試行か"}
+    K -- "いいえ: 設定済みの fallback 先まで試行済み、または fallback 未設定" --> L{"許可された fallback 先に未試行のモデルが残るか"}
+    M -- "はい" --> F["アプリ側の自前リトライ: 未試行のモデルだけへ送る。recommended_model は保証ではなくヒント"]
+    M -- "いいえ" --> L
+    L -- "はい" --> F
+    L -- "いいえ" --> Z["refusal は確定。試行済みの経路へ再送しない"]
+    F --> H["fallback 先はカテゴリで変わる。許可される先: Opus 4.8 または Opus 5"]
     style F fill:#fff4e6,stroke:#e8590c,color:#111
 ```
 
