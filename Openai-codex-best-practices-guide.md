@@ -740,7 +740,7 @@ project_id = "your-project-id"  # 省略時は GOOGLE_CLOUD_PROJECT
 location = "global"             # 省略時は GOOGLE_CLOUD_LOCATION(それもなければ global)
 ```
 
-前提として Google Cloud CLI を導入し、`gcloud auth application-default login` で ADC(Application Default Credentials)を設定します。根拠: 【公式】[Advanced Configuration](https://developers.openai.com/codex/config-advanced)、【公式】[Configuration Reference](https://developers.openai.com/codex/config-reference)
+前提として Google Cloud CLI を導入し、`gcloud auth application-default login` で ADC(Application Default Credentials)を設定します。ただし、これらの手順だけではモデルへのアクセス権は付与されません。Google Cloud 経由の OpenAI モデル(`gpt-6.1-sol` を含む)は**プライベートプレビュー**なので、アクセスを申請し、対象プロジェクトでモデルを利用できることを確認してください。そのうえで、利用できるモデルを `model` に指定します。根拠: 【公式】[Advanced Configuration](https://developers.openai.com/codex/config-advanced)、【公式】[Configuration Reference](https://developers.openai.com/codex/config-reference)、【公式】[OpenAI on Google Cloud](https://developers.openai.com/api/docs/guides/google-cloud)
 
 ### 10-3. チーム運用の注意(二次情報の指摘)
 

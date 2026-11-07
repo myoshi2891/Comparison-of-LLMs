@@ -170,11 +170,19 @@ resp = client.responses.create(
     ],
 )
 
+# 失敗した応答は、エラーの内容を示して止める
+if resp.status == "failed":
+    raise RuntimeError(f"応答に失敗しました: error={resp.error}")
+
 # 途中で打ち切られた出力を、完了した回答として扱わない
 if resp.status == "incomplete":
     details = resp.incomplete_details
     reason = details.reason if details else "unknown"
     raise RuntimeError(f"応答が未完了です: reason={reason}")
+
+# completed のときだけ成功として扱う
+if resp.status != "completed":
+    raise RuntimeError(f"応答が完了していません: status={resp.status}")
 
 print(resp.output_text)
 ```
@@ -490,7 +498,7 @@ flowchart TB
 | 機能 | 何ができるか | 使う場面 |
 |---|---|---|
 | **非同期ツール呼び出し** | ツールの実行中も、モデルが推論を続け、独立した部分に回答する。OpenAI API の Responses API で利用でき、**Amazon Bedrock では利用不可** | 数十秒かかる検索・ビルド・外部 API |
-| **中間操縦(Mid-turn steering)** | 作業の途中で修正や要件変更を送る。OpenAI API の WebSocket モードで利用でき、**Amazon Bedrock では利用不可** | 長時間エージェント、ユーザーの割り込み |
+| **中間操縦(Mid-turn steering)** | 作業の途中で修正や要件変更を送る。OpenAI API の WebSocket モードで利用でき、**Amazon Bedrock では利用不可**。対象はシングルエージェントの応答のみ(7.3 を参照) | 長時間エージェント、ユーザーの割り込み |
 | **`configuration_update`** | キャッシュを壊さず推論強度を変更。OpenAI API の Responses API で利用でき、**Amazon Bedrock では利用不可** | 難所だけ強度を上げる |
 | **ミスアラインメント監視** | 非同期の監視で、必要時にアラートを出す | 本番のエージェント運用 |
 | **プログラマティック・ツール呼び出し(PTC)** | モデルが書いた JavaScript で複数ツールを呼び、中間結果を絞る | 絞り込み・集計・突合などの定型処理 |
@@ -546,6 +554,8 @@ sequenceDiagram
 ### 7.3 中間操縦(Mid-turn steering)
 
 作業中のモデルに、修正や追加要件を送れます。**GPT-6 ファミリーの対応モデルで、WebSocket モードのみ**利用でき、GPT-5.6 以前は対応しません。**公式** **開発者**
+
+中間操縦を使えるのは**シングルエージェントの応答だけ**です。Conversation に紐づく応答と、自動コンパクションを使う応答は対応しません。**公式** 中間操縦が必要な処理では、`conversation` と自動コンパクションを使わず、`previous_response_id` または全履歴の再送で会話の状態を管理します。圧縮が必要なら、`/responses/compact` で明示的に圧縮し、圧縮後のウィンドウを `input` にして新しい応答を作成します。**公式** Conversation や自動コンパクションを使い続ける構成では、応答の完了を待ち、次のターンで指示を送ります(この構成の選び方は本ガイドの推奨です)。[WebSocket イベントリファレンス](https://developers.openai.com/api/reference/resources/responses/websocket-events)
 
 ```mermaid
 flowchart TB
