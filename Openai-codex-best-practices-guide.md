@@ -102,7 +102,7 @@ Codex は単一のツールではなく、複数の入口を持つ製品ファ�
 
 ### 1-3. 設定の優先順位と全体構造
 
-CLI・IDE・アプリは**同じ設定レイヤーを共有**します。つまり一度整えた `config.toml` と `AGENTS.md` は全サーフェスで効きます。
+CLI・IDE・アプリは**同じ設定レイヤーを共有**します。つまり一度整えた `~/.codex/config.toml` はこの3つで効き、`AGENTS.md` は全サーフェスで効きます。Codex Cloud は OpenAI が管理するマシンで動くので、ローカルの `~/.codex/config.toml` の設定が適用されるとは考えないでください。
 
 ```mermaid
 flowchart LR
@@ -226,6 +226,7 @@ codex doctor --network-only
 
 ```toml
 # ~/.codex/config.toml(個人既定値の例)
+# 使えるモデルはプランやワークスペースの設定で異なる。/model で確認する
 model = "gpt-6.1-sol"
 model_reasoning_effort = "medium"
 
@@ -435,7 +436,7 @@ flowchart TB
 
 公式も「同じミスを2回したら振り返りを依頼して AGENTS.md を更新する」「ルールは繰り返しの失敗を見てから足す」「大きくなったら本体は簡潔にし、計画やレビュー用の別 Markdown を参照させる」と述べています。
 
-> **棚卸しの検証質問**(他社の公式ガイドにも見られる汎用的な基準): 「この行を消したらエージェントはミスをするか?」答えが「いいえ」なら消す。
+> **棚卸しの検証質問**(筆者の推奨): 「この行を消したらエージェントはミスをするか?」答えが「いいえ」なら消す。
 
 根拠: 【公式】[Best practices](https://developers.openai.com/codex/learn/best-practices)、【公式】[AGENTS.md ガイド](https://developers.openai.com/codex/guides/agents-md)、【公式ブログ】[Rethinking skills and prompts for GPT-6 Astra](https://developers.openai.com/blog/rethinking-skills-and-prompts-for-gpt-6-astra)、【研究】[arXiv 2602.11988](https://arxiv.org/abs/2602.11988)、【二次】[KIberblick の解説](https://kiberblick.de/aktuell/2026/2026-09-14-openai-skills-agents-md-astra/)、【二次】[Upsun: AGENTS.md less is more](https://developer.upsun.com/posts/ai/agents-md-less-is-more)
 
@@ -562,7 +563,7 @@ flowchart TB
 | 特定コミット | 後追い確認 |
 | カスタム指示 | 観点を指定(セキュリティ、性能など) |
 
-チームで `code_review.md` を作り、`AGENTS.md` から参照すると、レビューの観点がリポジトリや担当者を跨いで揃います。GitHub 連携では PR への自動レビューや `@codex review` が使え、OpenAI 社内では Codex が全 PR をレビューしているとのことです。
+チームで `code_review.md` を作り、`AGENTS.md` から参照すると、レビューの観点がリポジトリや担当者を跨いで揃います。GitHub 連携では PR への自動レビューや `@codex review` が使え、OpenAI 社内では Codex が全 PR をレビューしていると公式が述べています(【公式】[Best practices](https://developers.openai.com/codex/learn/best-practices))。
 
 ```markdown
 ## Review guidelines
@@ -740,9 +741,9 @@ location = "global"             # 省略時は GOOGLE_CLOUD_LOCATION(それも�
 
 前提として Google Cloud CLI を導入し、`gcloud auth application-default login` で ADC(Application Default Credentials)を設定します。根拠: 【公式】[Advanced Configuration](https://developers.openai.com/codex/config-advanced)、【公式】[Configuration Reference](https://developers.openai.com/codex/config-reference)
 
-### 10-3. チーム運用の注意(開発者の指摘)
+### 10-3. チーム運用の注意(二次情報の指摘)
 
-【開発者】AI コーディングツールを配布しても**配信速度が変わらない**のは、コード生成の1ノードだけが自動化され、周辺の計画・レビュー・テスト・デリバリーが従来のままだからだ、という分析があります(HackerNoon 記事、Steinberger 氏の記事を引用)。個人では推論時間が律速になりますが、チームではタスクを生み出すプロセスが律速になります。**プロセス側(テスト、レビュー、ドキュメント)に投資**してください。
+【二次】AI コーディングツールを配布しても**配信速度が変わらない**のは、コード生成の1ノードだけが自動化され、周辺の計画・レビュー・テスト・デリバリーが従来のままだからだ、という分析があります(HackerNoon 記事、Steinberger 氏の記事を引用)。個人では推論時間が律速になりますが、チームではタスクを生み出すプロセスが律速になります。**プロセス側(テスト、レビュー、ドキュメント)に投資**してください。
 
 根拠: 【公式】[Best practices](https://developers.openai.com/codex/learn/best-practices)、【公式】[Automations](https://developers.openai.com/codex/app/automations)、【二次】[HackerNoon](https://hackernoon.com/ai-coding-tools-wont-fix-a-broken-development-process)、【二次】[Releasebot: Codex 変更履歴](https://releasebot.io/updates/openai/codex)
 

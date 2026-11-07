@@ -279,8 +279,14 @@ flowchart TB
 | 機能 | 内容 | 注意点 |
 |---|---|---|
 | **Fast モード** | API の速度は標準処理の最大 **2.5 倍**。標準の **2倍**の料金 | Astra では**遅延 SLA なし**、**EU データレジデンシー非対応**。**公式** |
-| **Ultrafast モード** | さらに高速な新モード | Astra は **US レジデンシーとグローバル処理のみ**。EU・その他の地域エンドポイントは非対応。**公式** |
+| **Ultrafast モード** | API の最速の処理ティアで、`service_tier: "ultrafast"` を指定する(API に速度の数値は記載なし)。Codex では Astra Ultrafast のトークン生成が Standard の最大 **8 倍**速。**公式** 短いコンテキストの料金は入力 $60、キャッシュ読み取り $6、出力 $300(100万トークンあたり。第9.2節) | Astra は **US レジデンシーとグローバル処理のみ**。EU・その他の地域エンドポイントは非対応。**公式** 下の注記の利用条件も確認する |
 | **プロモード** | より多くのモデル作業を行い、1 つの最終回答を返す | レイテンシとトークンが増える。品質向上が評価で確認できる難問に限定。`configuration_update` とは併用不可 |
+
+**Ultrafast の利用条件**(2026-11-07 に公式で確認):
+
+- **API**: すべての API ユーザーが利用でき、レート制限は Standard / Fast とは別です。Astra の既定は、Usage tier が Build で 50 万、Launch で 100 万、Grow で 500 万トークン/分です。**公式**
+- **ChatGPT Work / Codex**: Pro $500 と、対象の Enterprise / Edu プランで利用できます。ほかのセルフサーブプランは、クレジットを購入しても提供開始時点では使えません。公式は Pro $100 / Pro $200 を名指ししていませんが、この「ほかのセルフサーブプラン」に当たります。**公式**
+- **Codex の消費**: 含まれる使用量は Standard の 8 倍、購入クレジットと Enterprise の従量課金は 6 倍です。API キーで使う場合は API の料金が適用されます。**公式**
 
 > **判断軸**: 「ユーザーが待つ」場面は Fast / Ultrafast を検討し、「裏で走る」バッチ的な作業は Batch / Flex(標準の 50%)を検討します(第9章)。
 
@@ -658,6 +664,7 @@ OpenAI は、Astra が少ないトークン・少ないリトライでタスク�
 | キャッシュ書き込み | 最低保持期間で異なる。最低30分(`"30m"`)は標準入力の 1.25倍、最低12時間(`"12h"`。Responses API)は 2.5倍。読み取りは 1/10。`"30m"` / `"12h"` はキャッシュ読み取り料金の対象となる最低期間で、削除期限ではなく、これより長く残ることがある。最大保持期間は別に定められている(GPU ローカルストレージの暗号化テンソルは最大24時間)**公式** |
 | Batch / Flex | 標準の 50% **公式** |
 | Fast | 2倍 **公式** |
+| Ultrafast | 短いコンテキスト(入力 272K トークン以下)で入力 $60、キャッシュ読み取り $6、キャッシュ書き込み $75(最低30分)/ $150(最低12時間)、出力 $300(100万トークンあたり)**公式** 倍率は公式に明記がなく、入力・読み取り・出力の単価から算出すると標準の 6 倍。272K 超は別の単価なので、公式の料金ページで確認する |
 
 ### 9.3 計算例
 
@@ -695,7 +702,7 @@ flowchart TB
   E --> F
   F -- "いいえ" --> G["Batch または Flex<br/>標準の 50%"]
   F -- "はい" --> H{"速度が価値を生むか"}
-  H -- "はい" --> I["Fast または Ultrafast<br/>Fast は 2倍・Ultrafast は 6倍<br/>SLA と地域を確認"]
+  H -- "はい" --> I["Fast または Ultrafast<br/>Fast は 2倍・Ultrafast は 6倍<br/>(Ultrafast は料金表の単価から算出)<br/>SLA と地域を確認"]
   H -- "いいえ" --> J["標準のまま"]
   classDef ok fill:#e3f4e8,stroke:#2d7a46,color:#111
   class G,I,J ok
@@ -933,6 +940,7 @@ flowchart TB
 | 推論(強度の途中変更・推論モード) | https://developers.openai.com/api/docs/guides/reasoning |
 | Fast モード | https://developers.openai.com/api/docs/guides/fast-mode |
 | Ultrafast モード | https://developers.openai.com/api/docs/guides/ultrafast-mode |
+| Codex の速度モード(Ultrafast の対象プランと消費倍率) | https://learn.chatgpt.com/docs/agent-configuration/speed |
 | プロンプトキャッシュ | https://developers.openai.com/api/docs/guides/prompt-caching |
 | プログラマティック・ツール呼び出し | https://developers.openai.com/api/docs/guides/tools-programmatic-tool-calling |
 | コンピュータ利用 | https://developers.openai.com/api/docs/guides/tools-computer-use |
