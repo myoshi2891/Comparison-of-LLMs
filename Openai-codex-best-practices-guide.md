@@ -638,7 +638,7 @@ model_reasoning_effort = "medium"
 
 | コマンド | 用途 |
 |---|---|
-| `/agent` | 並列エージェントのスレッド切替 |
+| `/subagents` | 並列エージェントのスレッド切替 |
 | `/fork` | 元の履歴を保ったまま新スレッドへ分岐 |
 | `/resume` | 保存済み会話の再開 |
 | `/side` | 横道の会話。スレッド切替後に戻れる |
@@ -698,7 +698,8 @@ flowchart TB
 - **記録をファイルへ**: OpenAI の Codex 責任者 Thibault Sottiaux 氏は、自分の考えや目標をファイルに書いて Codex に参照させる習慣があると語っています(Latent Space のプロフィール)。長期運用では TODO・意思決定・ブロッカーを同期フォルダに置く方法も紹介されています。
 - **「理解」まで委譲しない**: Sottiaux 氏は、実行だけでなく理解まで委ねると、利用者自身の把握が弱くなる危険を警告しています。PR の説明は必ず自分で読んでください。
 - **キュー**: `codex queue --resume` で、メッセージをキューに積んだ後にスレッドを再開できます(0.166.0)。作業中に追加の指示を送って即座に舵を切る(Steer)こともできます(0.163.0)。
-- **Codex Cloud**: PC がスリープしても動くので、長時間・非同期の仕事に向きます。モバイルの Remote タブで承認・進捗確認ができます。
+- **Codex Cloud**: PC がスリープしても動くので、長時間・非同期の仕事に向きます。モバイルでは **Cloud** と環境を直接選んでタスクを実行できます。
+- **Remote**: 接続した PC のチャットをモバイルから操作します。Codex Cloud と違い、接続先の PC が起動していてスリープせず、オンラインである必要があります。
 
 根拠: 【公式】[Prompting](https://developers.openai.com/codex/prompting)、【二次】[FoneArena: GPT-6 Astra の機能](https://www.fonearena.com/blog/491506/openai-gpt-6-astra-features.html)、【開発者】[Latent Space: Thibault Sottiaux](https://latent.space/wiki/thibault-sottiaux/)、【開発者】[Simon Willison: GPT-5.1-Codex-Max](https://simonwillison.net/tags/gpt/)、【二次】[Releasebot: Codex 変更履歴](https://releasebot.io/updates/openai/codex)
 
@@ -718,7 +719,7 @@ flowchart TB
 | CI 失敗の確認 | 原因の一次切り分け |
 | 定期的な分析 | スケジュール実行 |
 
-アプリの Automations タブで、プロジェクト・プロンプト(Skill の呼び出し可)・頻度・実行環境(専用 worktree かローカルか)を選べます。**振り返りにも使う**と効果的です。最近のセッションを要約させ、繰り返す摩擦を AGENTS.md や Skill の改善に反映させます。
+アプリの Automations タブで、プロジェクト・プロンプト(Skill の呼び出し可)・頻度・実行環境(専用 worktree かローカルか)を選べます。ローカルプロジェクトの定期実行には、PC の電源が入っていて、アプリが起動している必要があります。専用 worktree を選んでも条件は同じです。スリープ中の扱いは公式に明記がないので、実行されない場合があると考えて設計してください(本ガイドの推論)。**振り返りにも使う**と効果的です。最近のセッションを要約させ、繰り返す摩擦を AGENTS.md や Skill の改善に反映させます。
 
 ### 10-2. 非対話実行
 
