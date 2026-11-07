@@ -89,7 +89,7 @@ Claude は現在、次の階層で提供されています。
 | コンテキスト | 1M トークン(デフォルトかつ最大。全域で標準単価) |
 | 最大出力 | 128k トークン |
 | 思考(thinking) | **常時オンの adaptive thinking のみ**。深さは `effort` で制御 |
-| effort | `low` / `medium` / `high`(デフォルト) / `xhigh` / `max` の5段階 |
+| effort | Claude API・AWS・Google Cloud: `low` / `medium` / `high`(デフォルト) / `xhigh` / `max` の5段階。Microsoft Foundry: `max` を除く4段階(`max` は非対応) |
 | 入力単価 | $10 / MTok |
 | 出力単価 | $50 / MTok |
 | キャッシュ書き込み | 5分: $12.50 / MTok、1時間: $20 / MTok |
@@ -313,7 +313,7 @@ for block in response.content:
 **effort は Fable 5.1 での知能・レイテンシ・コストの主要なトレードオフ調整つまみ**です。公式の推奨は次のとおりです。
 
 1. **既定の `high` から始める**。
-2. 自社評価で `low` / `medium` / `xhigh` / `max` を試す。
+2. 自社評価で `low` / `medium` / `xhigh` / `max` を試す。Microsoft Foundry の Fable 5.1 は `max` 非対応なので、`max` を試さず `xhigh` を上限にする([Microsoft のモデル別一覧](https://learn.microsoft.com/en-us/azure/foundry/foundry-models/concepts/claude-models#thinking-and-effort)。同じ一覧は、`xhigh` と `max` は同じ結果になると説明している)。
 3. **Fable 5 で評価済みでも再実行する**(同じ名前のレベルでも、モデル間で思考量が一致しないため)。
 
 ### 5.2 レベル別の目安
@@ -339,6 +339,8 @@ for block in response.content:
 | `max` | 約65,900 | 約13分54秒 | 約$3.30 |
 
 > 教訓: **`xhigh` / `max` は「安全のために上げる」設定ではなく、測定した問題を解くための設定**です(Alex McFarland も同趣旨)。
+>
+> Microsoft Foundry では `max` を指定できないので、この表の `max` の行は再現できません。Foundry では `xhigh` までを計測します。
 
 ### 5.4 effort 選択のフローチャート
 
@@ -435,7 +437,7 @@ Claude Code、claude.ai、Managed Agents、Claude Agent SDK は履歴を自動�
 ```mermaid
 flowchart TD
     A["履歴に手を入れたい"] --> B{"何をしたいか"}
-    B -- "毎ターンのリマインダー" --> C["ターン限定 system メッセージ clear_at: next_user_message"]
+    B -- "毎ターンのリマインダー" --> C["ターン限定 system メッセージ clear_at: next_user_message (Microsoft Foundry は非対応: 6.4節)"]
     B -- "指示やツールの変更" --> D["会話途中の system メッセージ / ツール変更"]
     B -- "古い履歴を減らす" --> E["サーバー側 compaction / context editing"]
     B -- "クライアント側で要約したい" --> F["履歴全体を要約1通+新しいユーザーターンに置換"]
@@ -459,6 +461,31 @@ messages.append(
         "role": "system",
         "clear_at": "next_user_message",
         "content": "次に必要なものを先に列挙し、互いに依存しないものは1回の応答でまとめて要求すること。",
+    }
+)
+```
+
+**Microsoft Foundry では使えません**。[公式の対応プラットフォーム](https://platform.claude.com/docs/en/build-with-claude/mid-conversation-system-messages)に Microsoft Foundry はありません。Foundry では `clear_at` を付けたターン限定 system メッセージを送らないでください。`clear_at` を外した会話途中の `role: "system"` も対応プラットフォームの対象外なので、代わりにはなりません。上の手順は、対応プラットフォームではそのまま使えます。
+
+Foundry での代替は次のとおりです(本ガイドの推奨)。
+
+- 全ターンで変わらない指示は、会話の開始時からトップレベルの `system` に置きます。
+- ターンごとのリマインダーは、`tool_result` と同じユーザーターンの末尾に text ブロックとして追加します。
+
+このリマインダーは履歴に残り、以後のリクエストで入力トークンを消費し続けます。ただし、過去のメッセージを書き換えないので、キャッシュは壊れません。頻度は必要な場面に絞ってください。
+
+```python
+# Microsoft Foundry: ツール結果の後ろに追加し、過去のメッセージは書き換えない
+messages.append(
+    {
+        "role": "user",
+        "content": [
+            *tool_results,
+            {
+                "type": "text",
+                "text": "次に必要なものを先に列挙し、互いに依存しないものは1回の応答でまとめて要求すること。",
+            },
+        ],
     }
 )
 ```
@@ -831,7 +858,7 @@ flowchart TD
     A --> B{"最終応答の stop_reason は何か"}
     B -- "end_turn / stop_sequence / tool_use" --> OK["通常処理 (fallback 先が応答した場合を含む)"]
     B -- "max_tokens / model_context_window_exceeded" --> IN["未完了: 完了した応答として扱わない"]
-    B -- "pause_turn" --> PT["継続が必要: 応答をそのまま返送して再送し、残りの応答を得る"]
+    B -- "pause_turn" --> PT["継続が必要: 応答をそのまま返送して再送し、残りの応答を得る。応答に container があれば response.container.id も渡し、同じコンテナを再利用する"]
     PT --> A
     B -- "refusal" --> C["stop_details.category を確認"]
     C --> N{"category は null か"}
@@ -1023,7 +1050,7 @@ flowchart TD
 
 ### B.3 運用・評価
 
-- [ ] effort を `high` から始め、`low` / `medium` / `xhigh` / `max` で自社評価した
+- [ ] effort を `high` から始め、`low` / `medium` / `xhigh` / `max` で自社評価した(Microsoft Foundry は `max` 非対応なので `xhigh` までで評価する)
 - [ ] Opus 5.5 と比較し、Fable が本当に必要な工程だけに使っている
 - [ ] コスト、時間、成功率、スコープ逸脱、refusal を記録している
 - [ ] サンドボックス、権限の最小化、予算の上限を設定した
