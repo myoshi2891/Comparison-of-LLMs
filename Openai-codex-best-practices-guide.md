@@ -83,7 +83,7 @@ Codex は単一のツールではなく、複数の入口を持つ製品ファ�
 | GitHub 連携 | PR への自動レビュー、`@codex review` | チームのレビュー標準化 |
 | モバイル(Remote) | デスクトップのチャットを遠隔操作 | 外出先での承認・進捗確認 |
 
-根拠: 【公式】[Best practices](https://developers.openai.com/codex/learn/best-practices.md)、【公式】[ChatGPT Work and Codex(ヘルプ)](https://help.openai.com/en/articles/20001275-chatgpt-work)、【二次】[Wikipedia: OpenAI Codex](https://en.wikipedia.org/wiki/OpenAI_Codex_(AI_agent))
+根拠: 【公式】[Best practices](https://developers.openai.com/codex/learn/best-practices)、【公式】[ChatGPT Work and Codex(ヘルプ)](https://help.openai.com/en/articles/20001275-chatgpt-work)、【二次】[Wikipedia: OpenAI Codex](https://en.wikipedia.org/wiki/OpenAI_Codex_(AI_agent))
 
 ### 1-2. ここ1年の流れ(押さえるべき転換点)
 
@@ -136,7 +136,7 @@ OpenAI のモデル階級は **Luna < Terra < Sol < Astra**(大きいほど高�
 補足:
 
 - Sol / Terra / Luna / Astra は、**ChatGPT の通常チャットではなく Work と Codex 向け**に提供されるモデルがあります(Sol 6.1 と Terra 6.1 は発表時点で通常 Chat 非対応)。
-- API のコンテキストは 1.05M トークン(272K 超の入力は割増)ですが、**ChatGPT Work / Codex 上の GPT-6.1 Sol の既定コンテキストは 500K トークン**です。
+- API のコンテキストは 1.05M トークンです。API では、入力が 272K トークンを超えるリクエストは、**リクエスト全体**が入力・キャッシュ入力は2倍、出力は1.5倍の料金になります。**ChatGPT Work / Codex 上の GPT-6.1 Sol の既定コンテキストは 500K トークン**で、これらのサブスクリプションの使用量に長いコンテキストの割増はありません。
 - Terra はデスクトップアプリ・CLI・API で選べますが、IDE 拡張では当面対象外と報じられています(【二次】)。
 
 根拠: 【公式】[GPT-6.1 Sol](https://openai.com/index/introducing-gpt-6-1-sol/)、【公式】[ヘルプ: ChatGPT Work and Codex](https://help.openai.com/en/articles/20001275-chatgpt-work)、【開発者】[Simon Willison: GPT-6.1 Terra](https://simonwillison.net/2026/Oct/26/gpt-61-terra/)、【二次】[Enjoy Agentic Industries: Terra](https://enjoy.dev/blog/gpt-6-1-terra/)、【二次】[everruns モデルプロファイル](https://docs.rs/crate/everruns-contracts/latest/source/src/model_profile_data/profiles/gpt6.rs)
@@ -243,7 +243,7 @@ max_threads = 4       # サブエージェントの同時数(既定は 6)
 max_depth = 1         # V1 の入れ子の深さ(V2 では無視。既定は 1。上げるとコストが乗算される)
 ```
 
-根拠: 【公式】[Best practices](https://developers.openai.com/codex/learn/best-practices.md)、【公式】[Sample configuration](https://developers.openai.com/codex/config-sample)、【公式】[Subagents](https://developers.openai.com/codex/subagents)、【二次】[Releasebot: Codex 変更履歴](https://releasebot.io/updates/openai/codex)
+根拠: 【公式】[Best practices](https://developers.openai.com/codex/learn/best-practices)、【公式】[Sample configuration](https://developers.openai.com/codex/config-sample)、【公式】[Subagents](https://developers.openai.com/codex/subagents)、【二次】[Releasebot: Codex 変更履歴](https://releasebot.io/updates/openai/codex)
 
 ---
 
@@ -284,9 +284,9 @@ flowchart TB
 
 ### 2-3. サブエージェントと権限
 
-サブエージェントは**親セッションのサンドボックスと承認設定を継承**し、カスタムエージェントのファイルでは置き換えられません。「ファイルを編集しないで」と指示しても、それは**お願いであって鍵ではありません**。カスタムエージェントの `sandbox_mode` も親セッションの権限を変えません。委任するサブエージェントを確実に読み取り専用にするには、委任前に親セッションを読み取り専用にします。
+サブエージェントは**親セッションのサンドボックスと承認設定を継承**し、カスタムエージェントのファイルでは置き換えられません。「ファイルを編集しないで」と指示しても、それは**お願いであって鍵ではありません**。カスタムエージェントの `sandbox_mode` も親セッションの権限を変えません。委任前に親セッションを読み取り専用にすると、サブエージェントはその読み取り専用のサンドボックスを継承します。ただし、サンドボックスの設定だけでは読み取り専用の動作は保証されません。サブエージェントは親の MCP サーバーも継承するので、書き込みのできるツールが使える状態なら別途の対策が必要です。MCP ツールの呼び出しには承認の設定(`default_tools_approval_mode` など)が適用されるので、書き込みのできるツールは外すか、承認を求める設定にします。
 
-根拠: 【公式】[Best practices](https://developers.openai.com/codex/learn/best-practices.md)、【公式】[Subagents](https://developers.openai.com/codex/subagents)、【二次】[Releasebot: Codex 変更履歴](https://releasebot.io/updates/openai/codex)、【二次】[flaviocopes: subagents](https://flaviocopes.com/ai-glossary/subagents/)
+根拠: 【公式】[Best practices](https://developers.openai.com/codex/learn/best-practices)、【公式】[Subagents](https://developers.openai.com/codex/subagents)、【二次】[Releasebot: Codex 変更履歴](https://releasebot.io/updates/openai/codex)、【二次】[flaviocopes: subagents](https://flaviocopes.com/ai-glossary/subagents/)
 
 ---
 
@@ -342,7 +342,7 @@ flowchart TB
 
 アプリの音声ディクテーションで依頼を話すと、文脈を長く詰め込みやすくなります(公式のヒント)。
 
-根拠: 【公式】[Best practices](https://developers.openai.com/codex/learn/best-practices.md)、【公式】[Prompting](https://developers.openai.com/codex/prompting)、【開発者】[Steinberger: Shipping at Inference-Speed](https://steipete.me/posts/2025/shipping-at-inference-speed)
+根拠: 【公式】[Best practices](https://developers.openai.com/codex/learn/best-practices)、【公式】[Prompting](https://developers.openai.com/codex/prompting)、【開発者】[Steinberger: Shipping at Inference-Speed](https://steipete.me/posts/2025/shipping-at-inference-speed)
 
 ---
 
@@ -361,7 +361,7 @@ flowchart TB
 | 制約と禁止事項 | 本番データに触れない |
 | 完了の定義と検証方法 | テストと型チェックが通ること |
 
-配置は3層です。`~/.codex` のグローバル、リポジトリ直下、サブディレクトリ。**現在地に近いファイルが優先**されます。
+配置は3層です。`~/.codex` のグローバル、リポジトリ直下、サブディレクトリ。Codex はプロジェクトルートから起動ディレクトリまでを順に読むので、サブディレクトリの AGENTS.md が常に読み込まれるとは限りません。適用されるのは、基本的にそのディレクトリか配下で起動したときです。リポジトリ直下で起動したときの挙動は、使っている Codex CLI の版の公式ドキュメントで確認してください。読み込まれたファイルのうち、**現在地に近いファイルが優先**されます。
 
 ### 4-2. 重要な新常識: 「長いほど良い」は誤り
 
@@ -437,7 +437,7 @@ flowchart TB
 
 > **棚卸しの検証質問**(他社の公式ガイドにも見られる汎用的な基準): 「この行を消したらエージェントはミスをするか?」答えが「いいえ」なら消す。
 
-根拠: 【公式】[Best practices](https://developers.openai.com/codex/learn/best-practices.md)、【公式】[AGENTS.md ガイド](https://developers.openai.com/codex/guides/agents-md)、【公式ブログ】[Rethinking skills and prompts for GPT-6 Astra](https://developers.openai.com/blog/rethinking-skills-and-prompts-for-gpt-6-astra)、【研究】[arXiv 2602.11988](https://arxiv.org/abs/2602.11988)、【二次】[KIberblick の解説](https://kiberblick.de/aktuell/2026/2026-09-14-openai-skills-agents-md-astra/)、【二次】[Upsun: AGENTS.md less is more](https://developer.upsun.com/posts/ai/agents-md-less-is-more)
+根拠: 【公式】[Best practices](https://developers.openai.com/codex/learn/best-practices)、【公式】[AGENTS.md ガイド](https://developers.openai.com/codex/guides/agents-md)、【公式ブログ】[Rethinking skills and prompts for GPT-6 Astra](https://developers.openai.com/blog/rethinking-skills-and-prompts-for-gpt-6-astra)、【研究】[arXiv 2602.11988](https://arxiv.org/abs/2602.11988)、【二次】[KIberblick の解説](https://kiberblick.de/aktuell/2026/2026-09-14-openai-skills-agents-md-astra/)、【二次】[Upsun: AGENTS.md less is more](https://developer.upsun.com/posts/ai/agents-md-less-is-more)
 
 ---
 
@@ -485,7 +485,7 @@ description: DB マイグレーションを追加・変更するときだけ使�
 
 雛形は `$skill-creator` で作ります。最初はローカルで反復し、広く共有する段階でプラグイン化します。リポジトリの Skill は**他のメンバーのエージェント(別モデルかもしれない)**も導くため、「どのモデルが使うか」を意識して書きます。
 
-根拠: 【公式】[Agent Skills](https://developers.openai.com/codex/skills)、【公式】[Best practices](https://developers.openai.com/codex/learn/best-practices.md)、【公式ブログ】[Rethinking skills and prompts for GPT-6 Astra](https://developers.openai.com/blog/rethinking-skills-and-prompts-for-gpt-6-astra)、【公式】[openai/skills](https://github.com/openai/skills)、[Agent Skills 仕様](https://agentskills.io/specification)
+根拠: 【公式】[Agent Skills](https://developers.openai.com/codex/skills)、【公式】[Best practices](https://developers.openai.com/codex/learn/best-practices)、【公式ブログ】[Rethinking skills and prompts for GPT-6 Astra](https://developers.openai.com/blog/rethinking-skills-and-prompts-for-gpt-6-astra)、【公式】[openai/skills](https://github.com/openai/skills)、[Agent Skills 仕様](https://agentskills.io/specification)
 
 ---
 
@@ -525,7 +525,7 @@ codex mcp add example --url https://mcp.example.com
 url = "https://developers.openai.com/mcp"
 ```
 
-根拠: 【公式】[Best practices](https://developers.openai.com/codex/learn/best-practices.md)、【公式】[MCP](https://developers.openai.com/codex/mcp)、【二次】[Releasebot: Codex 変更履歴](https://releasebot.io/updates/openai/codex)
+根拠: 【公式】[Best practices](https://developers.openai.com/codex/learn/best-practices)、【公式】[MCP](https://developers.openai.com/codex/mcp)、【二次】[Releasebot: Codex 変更履歴](https://releasebot.io/updates/openai/codex)
 
 ---
 
@@ -584,7 +584,7 @@ Simon Willison 氏は、Codex Desktop(GPT-5.6 Sol Ultra、サブエージェン�
 2. 一発で作らせた後の**短い追撃プロンプト**が非常に効く。
 3. 検証コストは、使用量見積もり(API 換算)に含めて考える。
 
-根拠: 【公式】[Best practices](https://developers.openai.com/codex/learn/best-practices.md)、【公式】[GitHub Code Reviews](https://developers.openai.com/codex/use-cases/github-code-reviews)、【開発者】[Simon Willison: Moonlight & Mayhem](https://simonwillison.net/2026/Aug/7/moonlight-mayhem/)(上記 gpt タグ一覧内の記事)
+根拠: 【公式】[Best practices](https://developers.openai.com/codex/learn/best-practices)、【公式】[GitHub Code Reviews](https://developers.openai.com/codex/use-cases/github-code-reviews)、【開発者】[Simon Willison: Moonlight & Mayhem](https://simonwillison.net/2026/Aug/7/moonlight-mayhem/)(上記 gpt タグ一覧内の記事)
 
 ---
 
@@ -630,7 +630,7 @@ model_reasoning_effort = "medium"
 - 既定は `agents.max_threads = 6`、`agents.max_depth = 1`。`agents.max_depth` は V1 の設定で、V2 では無視されます。**深さを上げるとコストが乗算**されるので、多くのワークフローは深さ 1 で十分です。
 - カスタムエージェントは**狭く、意見を持たせる**(1つの明確な仕事)のが公式の助言です。
 - 使うモデルの目安: 曖昧で多段の仕事には `gpt-6.1-sol`、速く狭く大量の仕事には `gpt-6-luna`(公式ドキュメントの提案を二次情報が要約)。
-- **サブエージェントは明示的に頼んだときだけ**使われ、各子が独自にモデルとツールを使うため、単一エージェントより多くのトークンを消費します。
+- **サブエージェントが起動するのは、利用者が明示的に頼んだときか、適用される AGENTS.md や Skill が委任を指示しているとき**です。各子が独自にモデルとツールを使うため、単一エージェントより多くのトークンを消費します。
 - 推論レベル `ultra` は、分割しやすい大タスクでサブエージェントへ展開します。
 
 ### 8-3. セッション管理のコマンド
@@ -646,7 +646,7 @@ model_reasoning_effort = "medium"
 
 **1つの作業単位に1つのスレッド**が原則です。同じ問題の続きなら同じスレッドで推論の軌跡を保ち、本当に枝分かれするときだけフォークします。
 
-根拠: 【公式】[Subagents](https://developers.openai.com/codex/subagents)、【公式】[Best practices](https://developers.openai.com/codex/learn/best-practices.md)、【開発者】[Simon Willison: サブエージェント GA](https://simonwillison.net/2026/Mar/16/codex-subagents)、【二次】[flaviocopes: subagents](https://flaviocopes.com/ai-glossary/subagents/)
+根拠: 【公式】[Subagents](https://developers.openai.com/codex/subagents)、【公式】[Best practices](https://developers.openai.com/codex/learn/best-practices)、【開発者】[Simon Willison: サブエージェント GA](https://simonwillison.net/2026/Mar/16/codex-subagents)、【二次】[flaviocopes: subagents](https://flaviocopes.com/ai-glossary/subagents/)
 
 ---
 
@@ -722,22 +722,29 @@ flowchart TB
 ### 10-2. 非対話実行
 
 ```bash
-# CI などでの一発実行(モデル指定)
-codex exec -m gpt-6.1-sol "失敗している統合テストの根本原因を調べて修正して"
+# CI などでの一発実行(モデル指定。codex exec の既定は読み取り専用なので、修正を保存するには書き込みを許可する)
+codex exec -m gpt-6.1-sol --sandbox workspace-write "失敗している統合テストの根本原因を調べて修正して"
 ```
 
 SDK(TypeScript など)からの呼び出しにも対応しています。企業環境では、Vertex AI(`model_provider = "gcp"`)や Amazon Bedrock も使えます。
 
 ```toml
+# ~/.codex/config.toml に書く(プロジェクトの .codex/config.toml ではプロバイダ設定は無視される)
 # Vertex AI を使う例(0.165.0 で追加された組み込みプロバイダ)
 model_provider = "gcp"
+
+[model_providers.gcp]
+project_id = "your-project-id"  # 省略時は GOOGLE_CLOUD_PROJECT
+location = "global"             # 省略時は GOOGLE_CLOUD_LOCATION(それもなければ global)
 ```
+
+前提として Google Cloud CLI を導入し、`gcloud auth application-default login` で ADC(Application Default Credentials)を設定します。根拠: 【公式】[Advanced Configuration](https://developers.openai.com/codex/config-advanced)、【公式】[Configuration Reference](https://developers.openai.com/codex/config-reference)
 
 ### 10-3. チーム運用の注意(開発者の指摘)
 
 【開発者】AI コーディングツールを配布しても**配信速度が変わらない**のは、コード生成の1ノードだけが自動化され、周辺の計画・レビュー・テスト・デリバリーが従来のままだからだ、という分析があります(HackerNoon 記事、Steinberger 氏の記事を引用)。個人では推論時間が律速になりますが、チームではタスクを生み出すプロセスが律速になります。**プロセス側(テスト、レビュー、ドキュメント)に投資**してください。
 
-根拠: 【公式】[Best practices](https://developers.openai.com/codex/learn/best-practices.md)、【公式】[Automations](https://developers.openai.com/codex/app/automations)、【二次】[HackerNoon](https://hackernoon.com/ai-coding-tools-wont-fix-a-broken-development-process)、【二次】[Releasebot: Codex 変更履歴](https://releasebot.io/updates/openai/codex)
+根拠: 【公式】[Best practices](https://developers.openai.com/codex/learn/best-practices)、【公式】[Automations](https://developers.openai.com/codex/app/automations)、【二次】[HackerNoon](https://hackernoon.com/ai-coding-tools-wont-fix-a-broken-development-process)、【二次】[Releasebot: Codex 変更履歴](https://releasebot.io/updates/openai/codex)
 
 ---
 
@@ -889,8 +896,8 @@ flowchart TB
 
 | # | ベストプラクティス | 要点 | 根拠 URL | 種別 |
 |---|---|---|---|---|
-| 1 | 4要素のプロンプト | Goal / Context / Constraints / Done when | https://developers.openai.com/codex/learn/best-practices.md | 公式 |
-| 2 | Plan モードとインタビュー | `/plan`、Shift+Tab。曖昧なら質問させてから計画 | https://developers.openai.com/codex/learn/best-practices.md | 公式 |
+| 1 | 4要素のプロンプト | Goal / Context / Constraints / Done when | https://developers.openai.com/codex/learn/best-practices | 公式 |
+| 2 | Plan モードとインタビュー | `/plan`、Shift+Tab。曖昧なら質問させてから計画 | https://developers.openai.com/codex/learn/best-practices | 公式 |
 | 3 | 実行計画テンプレート | 長期・多段は PLANS.md | https://developers.openai.com/cookbook/articles/codex_exec_plans | 公式 |
 | 4 | AGENTS.md の3層配置 | グローバル、リポジトリ、サブディレクトリ。近いものが優先 | https://developers.openai.com/codex/guides/agents-md | 公式 |
 | 5 | AGENTS.md を最小化 | 発見できない情報だけ。足すのは失敗の後 | https://arxiv.org/abs/2602.11988 | 研究 |
@@ -898,8 +905,8 @@ flowchart TB
 | 7 | Skill は1仕事・段階的開示 | ルートを案内役にし詳細は参照へ | https://developers.openai.com/codex/skills | 公式 |
 | 8 | プラグインで配布 | 複数 Skill や連携の同梱 | https://developers.openai.com/codex/plugins/build | 公式 |
 | 9 | MCP は必要最小限 | 外部・変動データ。最初は1〜2個 | https://developers.openai.com/codex/mcp | 公式 |
-| 10 | 権限は既定から段階的に | 承認とサンドボックスの2つのつまみ | https://developers.openai.com/codex/learn/best-practices.md | 公式 |
-| 11 | `/review` と `code_review.md` | レビュー観点の標準化 | https://developers.openai.com/codex/learn/best-practices.md | 公式 |
+| 10 | 権限は既定から段階的に | 承認とサンドボックスの2つのつまみ | https://developers.openai.com/codex/learn/best-practices | 公式 |
+| 11 | `/review` と `code_review.md` | レビュー観点の標準化 | https://developers.openai.com/codex/learn/best-practices | 公式 |
 | 12 | GitHub の自動レビュー | `@codex review`、近い AGENTS.md の指針を適用 | https://developers.openai.com/codex/use-cases/github-code-reviews | 公式 |
 | 13 | サブエージェントの権限継承 | 読み取り専用は親セッションで設定(カスタムエージェントの sandbox_mode では変わらない) | https://developers.openai.com/codex/subagents | 公式 |
 | 14 | worktree で並列隔離 | 同一ファイルの並行編集を避ける | https://developers.openai.com/codex/app/worktrees | 公式 |
@@ -917,7 +924,7 @@ flowchart TB
 
 **公式(OpenAI)**
 
-- https://developers.openai.com/codex/learn/best-practices.md
+- https://developers.openai.com/codex/learn/best-practices
 - https://developers.openai.com/codex/prompting
 - https://developers.openai.com/codex/guides/agents-md
 - https://developers.openai.com/codex/skills

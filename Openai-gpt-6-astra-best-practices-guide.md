@@ -170,6 +170,12 @@ resp = client.responses.create(
     ],
 )
 
+# 途中で打ち切られた出力を、完了した回答として扱わない
+if resp.status == "incomplete":
+    details = resp.incomplete_details
+    reason = details.reason if details else "unknown"
+    raise RuntimeError(f"応答が未完了です: reason={reason}")
+
 print(resp.output_text)
 ```
 
@@ -240,15 +246,18 @@ flowchart TB
   D -- "いいえ" --> F["medium を採用"]
   B -- "いいえ" --> G["high で再測定"]
   G --> K{"high は品質要件を満たすか"}
-  K -- "いいえ" --> R["high を採用せず<br/>プロンプト・ツール設計や<br/>より高い強度を再評価"]
+  K -- "いいえ" --> X["xhigh または max で再測定<br/>難所に限定する"]
+  X --> Y{"品質要件を満たすか"}
+  Y -- "はい" --> Z["xhigh または max を<br/>難所だけに採用"]
+  Y -- "いいえ" --> R["強度では解決しない<br/>プロンプト・ツール設計を見直す"]
   R --> A
   K -- "はい" --> H{"改善は費用に見合うか"}
   H -- "はい" --> I["high を採用"]
-  H -- "いいえ" --> J["xhigh または max は<br/>難所だけに限定"]
+  H -- "いいえ" --> J["high を採用せず<br/>モデルや設計を再評価<br/>xhigh・max は難所だけに限定"]
   classDef ok fill:#e3f4e8,stroke:#2d7a46,color:#111
   classDef warn fill:#fdeaea,stroke:#a33b3b,color:#111
-  class E,F,I,J ok
-  class R warn
+  class E,F,I,Z ok
+  class J,R warn
 ```
 
 ### 4.3 会話の途中で強度を変える(`configuration_update`)
@@ -269,7 +278,7 @@ flowchart TB
 
 | 機能 | 内容 | 注意点 |
 |---|---|---|
-| **Fast モード** | 最速の API 速度。標準の **2倍**の料金 | Astra では**遅延 SLA なし**、**EU データレジデンシー非対応**。**公式** |
+| **Fast モード** | API の速度は標準処理の最大 **2.5 倍**。標準の **2倍**の料金 | Astra では**遅延 SLA なし**、**EU データレジデンシー非対応**。**公式** |
 | **Ultrafast モード** | さらに高速な新モード | Astra は **US レジデンシーとグローバル処理のみ**。EU・その他の地域エンドポイントは非対応。**公式** |
 | **プロモード** | より多くのモデル作業を行い、1 つの最終回答を返す | レイテンシとトークンが増える。品質向上が評価で確認できる難問に限定。`configuration_update` とは併用不可 |
 
@@ -523,7 +532,7 @@ sequenceDiagram
 
 - アプリが**実行する関数・カスタムツール**が対象。ホスト型の組み込みツールや PTC には使わない
 - 元の応答は、ジョブの完了を待たずに終わることがある。アプリが実行中のジョブを管理し、完了したら新しい Responses リクエストで結果を送る。ジョブは並列に実行してよいが、同じ会話へ結果を返す継続リクエストは直列にする。各応答の完了を待ち、その応答 ID を次のリクエストの `previous_response_id` に指定し、元の `instructions` とツール設定もリクエストに含める
-- ZDR または `store: false` では応答がサーバーに保存されないため、`previous_response_id` だけでは継続できない。ジョブが完了したら、新しい Responses リクエストの `input` に会話履歴全体を入れて送る。`store` はリクエスト単位の設定なので、履歴全体を再送する継続リクエストを含め、新しい Responses リクエストごとに `store: false` を指定する。履歴には過去の入力、暗号化された推論アイテムと元の `function_call` を含むすべての出力アイテム、元の `call_id` の `function_call_output` を含め、`instructions` とツール設定も指定する。`previous_response_id` は省略する。WebSocket モードでは応答が接続ローカルのキャッシュに残る間だけ参照できるが、切断や 60 分の接続上限で失われる(`previous_response_not_found`)ので、長時間のジョブはこの再送を前提に設計する
+- ZDR または `store: false` では応答がサーバーに保存されないため、`previous_response_id` だけでは継続できない。ジョブが完了したら、新しい Responses リクエストの `input` に会話履歴全体を入れて送る。`store` はリクエスト単位の設定なので、履歴全体を再送する継続リクエストを含め、新しい Responses リクエストごとに `store: false` を指定する。履歴には過去の入力、暗号化された推論アイテムと元の `function_call` を含むすべての出力アイテム、元の `call_id` の `function_call_output` を含める。カスタムツールでは、元の `custom_tool_call` と、同じ `call_id` の `custom_tool_call_output`(`function_call_output` とは別の型)を含める。`instructions` とツール設定も指定する。`previous_response_id` は省略する。WebSocket モードでは応答が接続ローカルのキャッシュに残る間だけ参照できるが、切断や 60 分の接続上限で失われる(`previous_response_not_found`)ので、長時間のジョブはこの再送を前提に設計する
 - 結果は**元の `call_id`** で返す。待機専用の関数を使う場合は、同じリクエストの `input` に、新たに完了した結果を元の `call_id` で先に入れ、続けて待機呼び出しの状態をその `call_id` で入れる
 - 複数の非同期呼び出しを発行し、**必要になった結果だけ待つ**「待機ツール」パターンは、開発者が自分で定義する関数として実装する(公式ガイドに手順あり)
 - マルチエージェントモードでは、非同期ツールと並列ツール呼び出しを併用しない
