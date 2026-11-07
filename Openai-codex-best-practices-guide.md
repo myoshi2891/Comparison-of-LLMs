@@ -26,7 +26,7 @@
 16. [新モデルへの移行チェックリスト](#13-新モデルへの移行チェックリスト)
 17. [アンチパターン集](#14-アンチパターン集)
 18. [著名な国際的開発者の知見まとめ](#15-著名な国際的開発者の知見まとめ)
-19. [補足: その他のベストプラクティスと根拠ソース URL](#16-補足その他のベストプラクティスと根拠ソース-url)
+19. [補足: その他のベストプラクティスと根拠ソース URL](#16-補足-その他のベストプラクティスと根拠ソース-url)
 20. [未確認事項と今後の確認ポイント](#17-未確認事項と今後の確認ポイント)
 21. [最終チェックリスト](#18-最終チェックリスト)
 
@@ -44,7 +44,7 @@ Codex は「モデル」「アプリ」「CLI」「クラウド」が毎月の�
 | 【二次】 | 解説記事・集計サイト | 公式で裏取りしてから採用 |
 | 【筆者見解】 | 上記から導いた本ガイドの推論 | 自分の環境で検証 |
 
-> **鮮度に関する注意**: 筆者が確認できた Codex CLI の最新安定版は `0.166.0`(2026-10-29)でした。実際の画面・コマンドは `codex --version` と [公式変更履歴](https://developers.openai.com/codex/changelog/) で必ず照合してください。
+> **鮮度に関する注意**: 筆者が確認できた Codex CLI の最新安定版は `0.167.0`(2026-11-06)でした。実際の画面・コマンドは `codex --version` と [公式変更履歴](https://developers.openai.com/codex/changelog/) で必ず照合してください。
 
 ```mermaid
 flowchart TB
@@ -169,8 +169,8 @@ flowchart TB
 | `high` | 複雑な変更・デバッグ | 原因不明のバグ |
 | `xhigh` / `max` | 長時間・推論重視 | 大規模リファクタ |
 | `ultra` | 単一エージェントを超え、サブエージェントに分割 | 分割しやすい大タスク |
-| Fast モード | 含まれる使用量を 2.5 倍のレートで消費して高速化 | 急ぎのとき |
-| Ultrafast | 最大 8 倍速のトークン生成。発売時は Pro $500 など一部プラン限定 | レイテンシ最優先 |
+| Fast モード | 含まれる使用量を 2.5 倍、購入クレジットと Enterprise の従量課金を 2 倍のレートで消費して高速化 | 急ぎのとき |
+| Ultrafast | 最大 8 倍速のトークン生成。消費は含まれる使用量で 8 倍、購入クレジットと Enterprise の従量課金で 6 倍。発売時は Pro $500 など一部プラン限定 | レイテンシ最優先 |
 
 CLI での指定例です。
 
@@ -240,7 +240,7 @@ goals = true          # /goal を有効化(Step 9)
 
 [agents]
 max_threads = 4       # サブエージェントの同時数(既定は 6)
-max_depth = 1         # 入れ子の深さ(既定は 1。上げるとコストが乗算される)
+max_depth = 1         # V1 の入れ子の深さ(V2 では無視。既定は 1。上げるとコストが乗算される)
 ```
 
 根拠: 【公式】[Best practices](https://developers.openai.com/codex/learn/best-practices.md)、【公式】[Sample configuration](https://developers.openai.com/codex/config-sample)、【公式】[Subagents](https://developers.openai.com/codex/subagents)、【二次】[Releasebot: Codex 変更履歴](https://releasebot.io/updates/openai/codex)
@@ -284,7 +284,7 @@ flowchart TB
 
 ### 2-3. サブエージェントと権限
 
-サブエージェントは**親セッションのサンドボックスと承認設定を継承**し、カスタムエージェントのファイルでは置き換えられません。「ファイルを編集しないで」と指示しても、それは**お願いであって鍵ではありません**。読み取り専用にしたい場合は、そのエージェントに明示的に `sandbox_mode = "read-only"` を設定します。
+サブエージェントは**親セッションのサンドボックスと承認設定を継承**し、カスタムエージェントのファイルでは置き換えられません。「ファイルを編集しないで」と指示しても、それは**お願いであって鍵ではありません**。カスタムエージェントの `sandbox_mode` も親セッションの権限を変えません。委任するサブエージェントを確実に読み取り専用にするには、委任前に親セッションを読み取り専用にします。
 
 根拠: 【公式】[Best practices](https://developers.openai.com/codex/learn/best-practices.md)、【公式】[Subagents](https://developers.openai.com/codex/subagents)、【二次】[Releasebot: Codex 変更履歴](https://releasebot.io/updates/openai/codex)、【二次】[flaviocopes: subagents](https://flaviocopes.com/ai-glossary/subagents/)
 
@@ -503,8 +503,11 @@ description: DB マイグレーションを追加・変更するときだけ使�
 STDIO と、OAuth 付きの Streamable HTTP の両方に対応します。
 
 ```bash
-# カスタムサーバーを追加(名前・URL などを指定)
-codex mcp add
+# STDIO サーバーを追加(名前と起動コマンドを指定)
+codex mcp add context7 -- npx -y @upstash/context7-mcp
+
+# Streamable HTTP サーバーを追加(名前と URL を指定)
+codex mcp add example --url https://mcp.example.com
 
 # セッション中にサーバーへサインイン(0.161.0 以降)
 # /mcp login <名前>
@@ -618,13 +621,13 @@ flowchart TB
 ```toml
 # .codex/agents/pr-explorer.toml(例)
 name = "pr_explorer"
-description = "PR の変更点を読み取り専用で調べ、影響範囲を要約する担当。"
+description = "PR の変更点を調べ、影響範囲を要約する担当。"
 developer_instructions = "コードを編集しない。根拠となるファイルと行を挙げて要約する。"
-sandbox_mode = "read-only"
 model_reasoning_effort = "medium"
 ```
 
-- 既定は `agents.max_threads = 6`、`agents.max_depth = 1`。**深さを上げるとコストが乗算**されるので、多くのワークフローは深さ 1 で十分です。
+- `developer_instructions` の編集禁止は指示であり、読み取り専用のサンドボックスは作りません。ファイルに `sandbox_mode` を書いても親の設定は上書きされないので、権限は親セッションで設定します(Step 2-3)。
+- 既定は `agents.max_threads = 6`、`agents.max_depth = 1`。`agents.max_depth` は V1 の設定で、V2 では無視されます。**深さを上げるとコストが乗算**されるので、多くのワークフローは深さ 1 で十分です。
 - カスタムエージェントは**狭く、意見を持たせる**(1つの明確な仕事)のが公式の助言です。
 - 使うモデルの目安: 曖昧で多段の仕事には `gpt-6.1-sol`、速く狭く大量の仕事には `gpt-6-luna`(公式ドキュメントの提案を二次情報が要約)。
 - **サブエージェントは明示的に頼んだときだけ**使われ、各子が独自にモデルとツールを使うため、単一エージェントより多くのトークンを消費します。
@@ -745,7 +748,7 @@ model_provider = "gcp"
 - ChatGPT アカウントでのサインインは**プランの使用量**を消費し、API キーは API 料金です。
 - Astra は GPT-5.6 Sol より**使用量を速く消費**する場合があります(タスク、入出力サイズ、推論レベル、速度設定で変わる)。
 - Terra は同じ使用量枠で、GPT-5.6 Terra より多くの作業ができ、Sol 6.1 や Astra よりも大幅に多くできるとされています(固定倍率は公式に明記なし)。
-- Fast モードは 2.5 倍レートで消費します。Ultrafast は最大 8 倍速で、発売時は Pro $500 や一部の企業プランに限定されていました。
+- Fast モードは、プランに含まれる使用量を同じモデルの Standard の 2.5 倍、購入クレジットと Enterprise の従量課金を 2 倍のレートで消費します。Ultrafast は最大 8 倍速のトークン生成で、消費は含まれる使用量で Standard の 8 倍、購入クレジットと Enterprise の従量課金で 6 倍です。発売時は Pro $500 や一部の企業プランに限定されていました。
 
 ### 11-2. コスト削減の優先順位
 
@@ -762,7 +765,7 @@ flowchart TB
 ```
 
 - GPT-6.1 Sol のキャッシュ入力は $0.10/100万トークンで、入力の 5%、GPT-6 Sol より半額です。**エージェントの長い会話ほど効く**ため、プレフィックス(システム指示・AGENTS.md・ツール定義)を安定させるのが有効です(Hacker News のコメントも「Codex では実利が大きい」と評価)。
-- GPT-5.6 以降は、キャッシュ書き込みが非キャッシュ入力の 1.25 倍、読み取りが 90% 割引という課金体系になっています。
+- GPT-5.6 以降の API 料金では、キャッシュ書き込みは既定の 30 分保持で非キャッシュ入力の 1.25 倍、Responses API の 12 時間保持で 2.5 倍です。読み取りは大半のモデルで 90% 割引、GPT-6.1 Sol と GPT-6.1 Terra で 95% 割引です。Codex のクレジット課金には別途のキャッシュ書き込み料金がなく、API キーでの利用は API 料金に従います。
 - **一次情報で確認**: Plus プランのメッセージ上限などは変動するため、公式の料金ページで最新値を確認してください。
 
 根拠: 【公式】[GPT-6.1 Sol](https://openai.com/index/introducing-gpt-6-1-sol/)、【公式】[ヘルプ: ChatGPT Work and Codex](https://help.openai.com/en/articles/20001275-chatgpt-work)、【公式コミュニティ】[GPT-6.1 Terra 発表](https://community.openai.com/t/gpt-6-1-terra-delivering-fast-and-capable-computer-use-at-a-lower-price/1409900)、【二次】[Handy AI: GPT-6.1 Sol](https://handyai.substack.com/p/model-drop-gpt-61-sol)、【開発者】[Simon Willison: 2026-06-26 の引用](https://simonwillison.net/tags/gpt/)
@@ -898,12 +901,12 @@ flowchart TB
 | 10 | 権限は既定から段階的に | 承認とサンドボックスの2つのつまみ | https://developers.openai.com/codex/learn/best-practices.md | 公式 |
 | 11 | `/review` と `code_review.md` | レビュー観点の標準化 | https://developers.openai.com/codex/learn/best-practices.md | 公式 |
 | 12 | GitHub の自動レビュー | `@codex review`、近い AGENTS.md の指針を適用 | https://developers.openai.com/codex/use-cases/github-code-reviews | 公式 |
-| 13 | サブエージェントの権限継承 | 読み取り専用は sandbox_mode で明示 | https://developers.openai.com/codex/subagents | 公式 |
+| 13 | サブエージェントの権限継承 | 読み取り専用は親セッションで設定(カスタムエージェントの sandbox_mode では変わらない) | https://developers.openai.com/codex/subagents | 公式 |
 | 14 | worktree で並列隔離 | 同一ファイルの並行編集を避ける | https://developers.openai.com/codex/app/worktrees | 公式 |
 | 15 | 自動化は安定後に | スキルが方法、自動化がスケジュール | https://developers.openai.com/codex/app/automations | 公式 |
 | 16 | `/goal` で完了条件を固定 | 測定可能な目標。`features.goals` | https://developers.openai.com/codex/prompting | 公式 |
 | 17 | Astra 向けの棚卸し | 過剰手順の削除、停止基準の見直し | https://developers.openai.com/blog/rethinking-skills-and-prompts-for-gpt-6-astra | 公式ブログ |
-| 18 | 使用量・モデル別の消費 | Fast 2.5 倍、Ultrafast 8 倍、Astra は重め | https://help.openai.com/en/articles/20001275-chatgpt-work | 公式 |
+| 18 | 使用量・モデル別の消費 | 含まれる使用量で Fast 2.5 倍、Ultrafast 8 倍(購入クレジットと Enterprise の従量課金は 2 倍、6 倍)、Astra は重め | https://help.openai.com/en/articles/20001275-chatgpt-work | 公式 |
 | 19 | Terra の位置づけ | 画面操作・文章・視覚に強い中位 | https://simonwillison.net/2026/Oct/26/gpt-61-terra/ | 開発者 |
 | 20 | 検証で見た目のバグを拾う | 人間の確認と具体的な追撃プロンプト | https://simonwillison.net/2026/Aug/7/moonlight-mayhem/ | 開発者 |
 | 21 | キューで複数プロジェクトを並行 | 計画してキューに入れ、戻ってレビュー | https://steipete.me/posts/2025/shipping-at-inference-speed | 開発者 |
