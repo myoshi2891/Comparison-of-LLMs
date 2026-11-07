@@ -49,7 +49,7 @@ Omni は、Veo(動画)・Imagen(画像)・別系統の音声といった **分�
 
 | 能力 | 意味 | 実装への含意 |
 | --- | --- | --- |
-| ネイティブ・マルチモーダル | テキスト・画像・音声・動画を同時に処理し、整合性の高い出力を作る | 参照素材を足すほど制御しやすいが、タグで役割を明示する必要がある |
+| ネイティブ・マルチモーダル | テキスト・画像・音声・動画を同時に処理し、整合性の高い出力を作る | 参照素材を足すほど制御しやすいが、各素材の役割を自然言語で明示する必要がある |
 | 対話型編集 | Interactions API で「ここだけ直して」を繰り返せる | 状態は `previous_interaction_id` で引き継ぐ |
 | 世界知識 | 物理の理解に Gemini の歴史・科学・文化の知識を組み合わせる | 説明的・物語的なカットでも破綻しにくい設計(ただし検証は必須) |
 
@@ -346,9 +346,9 @@ prompt = (
 flowchart TD
     A["手元の素材は?"] --> B{"素材の種類"}
     B -->|"テキストのみ"| T["text_to_video"]
-    B -->|"画像1枚を動かす"| I["image_to_video<br/>FIRST_FRAME"]
+    B -->|"画像1枚を動かす"| I["image_to_video<br/>開始フレームに指定"]
     B -->|"始点と終点の2枚"| F["先頭と末尾フレームの補間"]
-    B -->|"人物・物・画風の参照"| R["reference_to_video<br/>IMAGE_REF / VIDEO_REF"]
+    B -->|"人物・物・画風の参照"| R["reference_to_video<br/>参照画像 / 参照動画"]
     B -->|"既存動画を直したい"| E["edit<br/>短い指示で変更"]
     B -->|"続きを作りたい"| X["extend<br/>末尾に追加"]
 ```
@@ -368,23 +368,14 @@ flowchart TD
 
 `generation_config.video_config.task` に `text_to_video` / `image_to_video` / `reference_to_video` / `edit` / `extend` を指定できますが、公式は **まずプロンプトで解決し、うまくいかないときだけ `task` で明示**することを推奨しています。`task` を使うと **追加の制約がかかる**ためです。
 
-### 5.4 タグで画像・動画の「役割」を縛る
+### 5.4 画像・動画の「役割」を自然言語で指定する
 
-素材が複数あるときは、タグで役割を明示します。
-
-| タグ | 意味 |
-| --- | --- |
-| `<FIRST_FRAME>` | 画像を動画の開始フレームにする |
-| `<LAST_FRAME>` | 画像を最終フレームにする(`<FIRST_FRAME>` と併用が必須) |
-| `<IMAGE_REF_N>` | 画像を参照にする(N は 0 から) |
-| `<VIDEO_REF_N>` | 動画を人物・物の参照にする(N は 0 から) |
-
-**宣言形式(素材が多い・役割が複雑な場合)**: プロンプトの先頭で素材を宣言します。
+素材が複数あるときは、各素材の役割を自然言語で明示します。公式は、`<FIRST_FRAME>`、`<LAST_FRAME>`、`<IMAGE_REF_0>`、`<VIDEO_REF_0>` のような制御文字列をプロンプトに**入れない**よう案内しています(非推奨で、今後のモデルでは非対応)。素材は `input` に渡し、並び順や内容で指し示します。
 
 ```markdown
-[# Sources <FIRST_FRAME>@Image1] [# References <IMAGE_REF_0>@Image2]
-A woman <IMAGE_REF_0> is walking along a beach at sunset.
-Use Image1 as the starting frame. Use Image2 as a reference for the video generation.
+A woman is walking along a beach at sunset.
+Use the first image as the starting frame.
+Use the second image as a reference for the woman's appearance, not as a literal frame.
 ```
 
 **末尾に添える誘導文(公式の推奨)**:
@@ -392,6 +383,7 @@ Use Image1 as the starting frame. Use Image2 as a reference for the video genera
 | 目的 | 末尾に書く内容 |
 | --- | --- |
 | 開始フレームとして使う | 「Use this image as the starting frame.」 |
+| 開始と最終のフレームを指定する | 「Use the first image as the starting frame and the second image as the last frame.」 |
 | ループ動画にする | 「Use this image as the first frame and the last frame.」 |
 | 参照画像として使う | 「…should not be used as literal initial frames.」の趣旨を書く |
 | 参照動画として使う | 「Do not use them as a source for video editing.」の趣旨を書く |
@@ -547,7 +539,7 @@ with open("extended.mp4", "wb") as f:
 | --- | --- |
 | 音を変えたい | 「The music continues into the chorus」のように **音の変化を明示** |
 | 同じシーンか、カットか | 「Show the same characters in the next scene」で別シーンへ |
-| 新キャラ追加 | 参照画像・動画を一緒に渡し、`<IMAGE_REF_0>` / `<VIDEO_REF_0>` で参照 |
+| 新キャラ追加 | Omni 1.2 では、参照画像を `input` に一緒に渡し、「The person shown in the reference image enters the scene」のように自然言語で指定する(参照動画は拡張に使えない) |
 | 時間指定 | タイムコードの **0s は「拡張部分の先頭」**。10 秒の動画を拡張して「After 2s cut」と書くと、全体では 12 秒地点でカットが入る |
 
 ### 7.4 拡張の制約
@@ -677,7 +669,7 @@ flowchart TD
     Q3 -->|はい| A3["No dialogue や音楽の種類を具体指定"]
     Q3 -->|いいえ| Q4{"モードを誤認している?"}
     Q4 -->|はい| A4["task パラメータで明示<br/>最後の手段"]
-    Q4 -->|いいえ| A5["参照素材のタグ付けと<br/>上限を確認"]
+    Q4 -->|いいえ| A5["各素材の役割の説明と<br/>上限を確認"]
 ```
 
 ---
