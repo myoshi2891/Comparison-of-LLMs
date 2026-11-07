@@ -242,12 +242,16 @@ if match is None:
     raise RuntimeError(f"URI からファイル ID を取得できません: {video_output.uri}")
 file_name = match.group(1)
 
+deadline = time.monotonic() + 600  # 待ち時間の上限(秒)
 while True:
     info = client.files.get(name=f"files/{file_name}")
     if info.state.name == "ACTIVE":
         break
-    if info.state.name == "FAILED":
-        raise RuntimeError("Generation failed.")
+    # FAILED や STATE_UNSPECIFIED など、想定外の状態では待ち続けない
+    if info.state.name != "PROCESSING":
+        raise RuntimeError(f"Generation failed: state={info.state.name}")
+    if time.monotonic() >= deadline:
+        raise TimeoutError(f"Timed out waiting for {info.name}")
     time.sleep(5)
 
 client.files.download(file=video_output.uri, destination="output.mp4")
@@ -453,7 +457,7 @@ flowchart TD
 
 ### 6.4 自前の動画をアップロードして編集する
 
-Files API でアップロードし、`PROCESSING` が終わるまで待ってから `uri` を渡します。
+Files API でアップロードし、状態が `ACTIVE` になったことを確認してから `uri` を渡します。
 
 ```python
 import base64
@@ -462,13 +466,17 @@ from google import genai
 
 client = genai.Client()
 
+deadline = time.monotonic() + 600  # 待ち時間の上限(秒)
 video_file = client.files.upload(file="Video.mp4")
-while video_file.state == "PROCESSING":
+while video_file.state.name == "PROCESSING":
+    if time.monotonic() >= deadline:
+        raise TimeoutError(f"Timed out waiting for {video_file.name}")
     time.sleep(10)
     video_file = client.files.get(name=video_file.name)
 
-if video_file.state == "FAILED":
-    raise ValueError(video_file.state)
+# FAILED や STATE_UNSPECIFIED では止め、ACTIVE のときだけ uri を渡す
+if video_file.state.name != "ACTIVE":
+    raise RuntimeError(f"File is not usable: state={video_file.state.name}")
 
 interaction = client.interactions.create(
     model="gemini-omni-1.1-flash",
@@ -478,8 +486,14 @@ interaction = client.interactions.create(
     ],
 )
 
+# 動画が返らないときやデコードに失敗したときに既存ファイルを壊さないよう、先に検証する
+output_video = interaction.output_video
+if output_video is None or not output_video.data:
+    raise RuntimeError(f"No video returned: status={interaction.status}")
+video_bytes = base64.b64decode(output_video.data)
+
 with open("edited.mp4", "wb") as f:
-    f.write(base64.b64decode(interaction.output_video.data))
+    f.write(video_bytes)
 ```
 
 ### 6.5 編集でできないこと
@@ -562,24 +576,40 @@ with open("extended.mp4", "wb") as f:
 ### 8.2 見積もり関数(筆者案)
 
 ```python
+USD_PER_M_INPUT_TOKENS = 1.50    # 公式料金ページ
 USD_PER_M_VIDEO_TOKENS = 17.50   # 公式料金ページ
 TOKENS_PER_SEC_720P = 5792       # 公式料金ページ
+# 思考トークンは出力料金に含まれる。動画時の適用単価は明記がないため、高いほうで見積もる
+USD_PER_M_THINKING_TOKENS = 17.50
 # 360p は Google が約 1/3 と公表。1080p / 4K は報道・再販価格からの逆算(要確認)
 RES_MULTIPLIER = {"360p": 1 / 3, "720p": 1.0, "1080p": 1.5, "4k": 3.0}
 
 
-def estimate_cost(seconds: float, resolution: str = "720p", attempts: int = 1) -> float:
-    """出力動画の概算コスト(USD)。attempts は採用までの試行回数。"""
+def estimate_cost(
+    seconds: float,
+    resolution: str = "720p",
+    attempts: int = 1,
+    input_tokens: int = 0,
+    thinking_tokens: int = 0,
+) -> float:
+    """概算コスト(USD)。入力・思考トークンは 1 試行あたりの値で、attempts は採用までの試行回数。"""
     per_sec = TOKENS_PER_SEC_720P * USD_PER_M_VIDEO_TOKENS / 1_000_000
-    return seconds * per_sec * RES_MULTIPLIER[resolution] * attempts
+    video_cost = seconds * per_sec * RES_MULTIPLIER[resolution]
+    input_cost = input_tokens * USD_PER_M_INPUT_TOKENS / 1_000_000
+    thinking_cost = thinking_tokens * USD_PER_M_THINKING_TOKENS / 1_000_000
+    return (video_cost + input_cost + thinking_cost) * attempts
 
 
 print(f"10s 720p x1      : ${estimate_cost(10):.2f}")
 print(f"10s 360p x5 + 4K : ${estimate_cost(10, '360p', 5) + estimate_cost(10, '4k'):.2f}")
 print(f"10s x4 拡張 720p : ${estimate_cost(10, '720p', 4):.2f}")
+# 入力と思考のトークン数は、実際の応答の使用量から設定する(下の値は例)
+print(f"10s 720p x3 入力・思考込み: ${estimate_cost(10, attempts=3, input_tokens=2_000, thinking_tokens=5_000):.2f}")
 ```
 
 ### 8.3 コスト目安(720p 基準・筆者計算)
+
+次の表は動画出力の料金だけです。入力と思考トークンの料金は含みません。
 
 | シナリオ | 概算 |
 | --- | --- |
@@ -607,7 +637,7 @@ flowchart TD
 ### 8.5 ドラフト運用の注意(推論を含む)
 
 - **ドラフトと本番は別の生成になる可能性があります。** 公式は `temperature`・`top_p`・システム指示などのサンプリング制御を **非対応**としており、同じプロンプトでも結果が変わりえます。「360p で確定した構図が、720p 以上で再生成しても再現される」と仮定せず、**本番の解像度でも採用判定をする**運用にしてください(推論。実測で確認を)。
-- **上限の把握**: 見積もりは「秒数 × 単価 × 成功までの試行回数」で考えます。コストを決めるのは動画の長さより **試行回数**です。
+- **上限の把握**: 見積もりは「(動画の秒数 × 単価 + 入力料金 + 思考トークン料金) × 成功までの試行回数」で考えます。コストを決めるのは動画の長さより **試行回数**です。
 
 ---
 
@@ -617,7 +647,7 @@ flowchart TD
 
 | 領域 | ベストプラクティス | 根拠 |
 | --- | --- | --- |
-| ID の永続化 | 編集・拡張の可能性があるジョブは `interaction.id` を DB に保存 | 状態は `previous_interaction_id` で引き継ぐ(公式) |
+| ID の永続化 | 編集・拡張の可能性があるジョブは `interaction.id` を DB に保存。サーバー側のインタラクションは無期限には保持されない(有料枠の既定は 55 日で、AI Studio で 7・14・28 日に短縮できる)。保持期間の後も再開が必要なジョブは、完成動画・プロンプト・参照素材を自前で保存し、アップロード動画として編集・拡張し直す復旧手順を用意する(10 秒以下の入力制限と地域制約に注意) | 状態は `previous_interaction_id` で引き継ぐ。保持期間は Interactions API の概要ページ(公式) |
 | 保存設定 | 後続編集が必要なら `store=false` にしない | `store=false` の動画は編集不可(公式) |
 | 大容量出力 | 4MB 超は URI 配信。作成直後に URI を保存 | 後から GET するとインライン base64 で返る(公式) |
 | 生成待ち | `FAILED` を含む状態遷移を処理し、ポーリング間隔と上限時間を設ける | 生成時間は長さ・解像度・負荷で変動(公式) |

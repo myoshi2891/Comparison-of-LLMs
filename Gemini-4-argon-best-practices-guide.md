@@ -290,6 +290,10 @@ print("\nFinish reason:", finish_reason)
 if usage:
     print("Prompt size:", usage.initial_prompt_token_count)
     print("Billed tokens:", usage.total_token_count)
+
+# 未完了や安全性による停止を、完了した出力として扱わない
+if finish_reason != types.FinishReason.STOP:
+    raise RuntimeError(f"生成が未完了です: finish_reason={finish_reason}")
 ```
 
 10分以内に終わるとわかっている処理は、`client.models.generate_content` のままでかまいません(Step 2 のクイックスタート)。クライアントで接続を保持し続けたくない長時間の処理は、次の 4.5 のバックグラウンド実行を使います。
@@ -430,7 +434,7 @@ SDKの自動継続では `usage_metadata` が **全ホップの合計** を返�
 ### 5.3 課金の理解
 
 - **全ホップの全トークンが課金対象**(思考のみのホップも含む)。
-- 各ホップの繰り返し入力は暗黙キャッシュで**95%割引**(Standard の global の導入価格では1Mあたり$0.10、12/1以降は$0.20。non-global はそれぞれ$0.11、$0.22)。ただしキャッシュは**15〜20分使われないと失効**するため、ホップ間に長い停止があると全額に戻ります。
+- 各ホップの繰り返し入力のうち、**暗黙キャッシュにヒットした分だけが95%割引**です(Standard の global の導入価格では1Mあたり$0.10、12/1以降は$0.20。non-global はそれぞれ$0.11、$0.22)。キャッシュを無効にしている場合や、ホップがキャッシュミスした場合は割引されません。コストは想定のヒット率ではなく、応答が報告するキャッシュ済みトークン数(`usage_metadata.cached_content_token_count` など)で見積もってください。キャッシュは**15〜20分使われないと失効**するため、ホップ間に長い停止があると全額に戻ります。
 - 失敗した非ストリーミングのホップは**課金されない**。ストリームが32K未満で切れた場合も課金なし(以降は最後のチェックポイントまで課金)。
 - **導入価格は2026年11月30日までで、2026年12月1日から倍になる予定**(Standard の global は入力 $2→$4、出力 $10→$20。Gemini Enterprise Agent Platform の non-global は入力 $2.20→$4.40、出力 $11→$22)。予算を組む際は12月以降の単価で試算してください。
 
