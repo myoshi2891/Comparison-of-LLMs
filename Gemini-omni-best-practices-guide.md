@@ -479,7 +479,6 @@ flowchart TD
 Files API でアップロードし、状態が `ACTIVE` になったことを確認してから `uri` を渡します。
 
 ```python
-import base64
 import time
 from google import genai
 
@@ -503,16 +502,11 @@ interaction = client.interactions.create(
         {"type": "video", "uri": video_file.uri},
         {"type": "text", "text": "Change the lighting to be more dramatic. Keep everything else the same."},
     ],
+    response_format={"delivery": "uri"},
 )
 
-# 動画が返らないときやデコードに失敗したときに既存ファイルを壊さないよう、先に検証する
-output_video = interaction.output_video
-if output_video is None or not output_video.data:
-    raise RuntimeError(f"No video returned: status={interaction.status}")
-video_bytes = base64.b64decode(output_video.data)
-
-with open("edited.mp4", "wb") as f:
-    f.write(video_bytes)
+# 3.2 の download_uri_video で保存する
+download_uri_video(interaction, "edited.mp4")
 ```
 
 ### 6.5 編集でできないこと
@@ -537,7 +531,6 @@ with open("edited.mp4", "wb") as f:
 ### 7.2 拡張の実装
 
 ```python
-import base64
 from google import genai
 
 client = genai.Client()
@@ -550,17 +543,11 @@ second = client.interactions.create(
     model=MODEL,
     previous_interaction_id=first.id,
     input=[{"type": "text", "text": "Continue the scene. The music builds."}],
-    response_format={"resolution": "360p"},  # まずドラフトで確認する
+    response_format={"resolution": "360p", "delivery": "uri"},  # まずドラフトで確認する
 )
 
-# 動画が返らないときやデコードに失敗したときに既存ファイルを壊さないよう、先に検証する
-output_video = second.output_video
-if output_video is None or not output_video.data:
-    raise RuntimeError(f"No video returned: status={second.status}")
-video_bytes = base64.b64decode(output_video.data)
-
-with open("extended.mp4", "wb") as f:
-    f.write(video_bytes)
+# 3.2 の download_uri_video で保存する
+download_uri_video(second, "extended.mp4")
 ```
 
 ### 7.3 拡張のプロンプトのコツ
@@ -579,7 +566,7 @@ with open("extended.mp4", "wb") as f:
 | 追加位置 | **末尾のみ**。先頭への追加や中間の延長は不可 |
 | アップロード動画の台詞 | 人物が話しているアップロード動画に **台詞を追加する拡張はできない**(無言のままか、台詞を足さない指示なら可) |
 | モデル生成動画の台詞 | 多ターン(`previous_interaction_id`)での拡張なら台詞・音声の生成が可能 |
-| 入力長 | アップロード動画は 15 秒以下(多ターンの場合は対象外)。拡張後の全長は 30 秒まで(Omni 1.2) |
+| 入力長 | 公式が 15 秒以下と定めているのは編集の入力動画。拡張は、アップロード動画もモデル生成動画も、15 秒の動画を含めて 1 回 3〜10 秒ずつ追加でき、全長は 30 秒まで(Omni 1.2)。15 秒を超えるアップロード動画の拡張は公式に明記がないので、15 秒を超えた動画の続きは多ターン(`previous_interaction_id`)で作る |
 | 地域 | アップロード動画の拡張は EEA・スイス・英国では提供なし(モデル生成動画の拡張は全提供地域で可) |
 
 ---
@@ -674,7 +661,7 @@ flowchart TD
 
 | 領域 | ベストプラクティス | 根拠 |
 | --- | --- | --- |
-| ID の永続化 | 編集・拡張の可能性があるジョブは `interaction.id` を DB に保存。サーバー側のインタラクションは無期限には保持されない(有料枠の既定は 55 日で、AI Studio で 7・14・28 日に短縮できる)。保持期間の後も再開が必要なジョブは、完成動画・プロンプト・参照素材を自前で保存し、復旧手順を用意する。15 秒以下の完成動画はアップロード動画として編集・拡張し直せる(地域制約に注意)。15 秒を超える完成動画は再アップロードで編集・拡張できないので、保存したプロンプトと参照素材から再生成する | 状態は `previous_interaction_id` で引き継ぐ。保持期間は Interactions API の概要ページ(公式) |
+| ID の永続化 | 編集・拡張の可能性があるジョブは `interaction.id` を DB に保存。サーバー側のインタラクションは無期限には保持されない(有料枠の既定は 55 日で、AI Studio で 7・14・28 日に短縮できる)。保持期間の後も再開が必要なジョブは、完成動画・プロンプト・参照素材を自前で保存し、復旧手順を用意する。15 秒以下の完成動画はアップロード動画として編集・拡張し直せる(地域制約に注意)。15 秒を超える完成動画は再アップロードで編集できず、拡張も公式に明記がないので、保存したプロンプトと参照素材から再生成する | 状態は `previous_interaction_id` で引き継ぐ。保持期間は Interactions API の概要ページ(公式) |
 | 保存設定 | 後続編集が必要なら `store=false` にしない | `store=false` の動画は編集不可(公式) |
 | 大容量出力 | 4MB 超は URI 配信。作成直後に URI を保存 | 後から GET するとインライン base64 で返る(公式) |
 | 生成待ち | `FAILED` を含む状態遷移を処理し、ポーリング間隔と上限時間を設ける | 生成時間は長さ・解像度・負荷で変動(公式) |
@@ -716,7 +703,7 @@ flowchart TD
 | 制御パラメータ | システム指示・`temperature`・`top_p`・停止シーケンス・ネガティブプロンプト欄は **非対応** |
 | 音声 | 声の編集は非対応。音声入力・音声参照のアップロードも非対応 |
 | 動画参照(Omni 1.2) | 3〜10 秒の生成は最大 3 クリップ、11〜15 秒の生成は最大 1 クリップ(各 3 秒まで)。複数動画をまたぐ推論は非対応 |
-| 入力動画 | 編集はアップロード動画もモデル生成動画も 15 秒以下。拡張のアップロード動画は 15 秒以下で、拡張後の全長は 30 秒まで(Omni 1.2) |
+| 入力動画 | 編集はアップロード動画もモデル生成動画も 15 秒以下。拡張は 15 秒の動画を含めて 1 回 3〜10 秒ずつ、全長 30 秒まで(Omni 1.2) |
 | 拡張位置 | 末尾のみ |
 | YouTube | YouTube 動画をメディアソースとして使うことは非対応 |
 | スループット | Provisioned Throughput は非対応 |
