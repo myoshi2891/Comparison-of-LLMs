@@ -184,7 +184,15 @@ if resp.status == "incomplete":
 if resp.status != "completed":
     raise RuntimeError(f"応答が完了していません: status={resp.status}")
 
-print(resp.output_text)
+# 完了した応答にも拒否が含まれることがある。output_text には拒否の本文は入らない
+refusals = [
+    part.refusal
+    for item in resp.output
+    if item.type == "message"
+    for part in item.content
+    if part.type == "refusal"
+]
+print("\n".join(refusals) if refusals else resp.output_text)
 ```
 
 ### 3.2 GPT-5.6 / 旧モデルからの移行チェック
@@ -555,7 +563,7 @@ sequenceDiagram
 
 作業中のモデルに、修正や追加要件を送れます。**GPT-6 ファミリーの対応モデルで、WebSocket モードのみ**利用でき、GPT-5.6 以前は対応しません。**公式** **開発者**
 
-中間操縦を使えるのは**シングルエージェントの応答だけ**です。Conversation に紐づく応答と、自動コンパクションを使う応答は対応しません。**公式** 中間操縦が必要な処理では、`conversation` と自動コンパクションを使わず、`previous_response_id` または全履歴の再送で会話の状態を管理します。圧縮が必要なら、`/responses/compact` で明示的に圧縮し、圧縮後のウィンドウを `input` にして新しい応答を作成します。**公式** Conversation や自動コンパクションを使い続ける構成では、応答の完了を待ち、次のターンで指示を送ります(この構成の選び方は本ガイドの推奨です)。[WebSocket イベントリファレンス](https://developers.openai.com/api/reference/resources/responses/websocket-events)
+中間操縦を使えるのは**シングルエージェントの応答だけ**です。Conversation に紐づく応答と、自動コンパクションを使う応答は対応しません。**公式** 中間操縦が必要な処理では、`conversation` と自動コンパクションを使わず、`previous_response_id` または全履歴の再送で会話の状態を管理します。圧縮が必要なら、`/responses/compact` で明示的に圧縮し、圧縮後のウィンドウを `input` にして新しい応答を作成します。ただし、`configuration_update` を含む履歴は `/responses/compact` が拒否します。その場合は `/responses` のリクエストに `compaction_trigger` アイテムを入れて圧縮し、次のユーザーメッセージの前に新しい `configuration_update` を入れて、変更した設定を再指定します。**公式** Conversation や自動コンパクションを使い続ける構成では、応答の完了を待ち、次のターンで指示を送ります(この構成の選び方は本ガイドの推奨です)。[WebSocket イベントリファレンス](https://developers.openai.com/api/reference/resources/responses/websocket-events)
 
 ```mermaid
 flowchart TB
@@ -721,7 +729,7 @@ flowchart TB
 ### 9.5 ベストプラクティス
 
 1. **プロンプトを短く保つ**。GPT-5.6 の公式検証では、系統立てて削った軽量なシステムプロンプトで、評価スコアの向上とトークン・コスト削減が両立した例が示されている(数値は方向性の参考)。**公式**
-2. **キャッシュしやすい構造にする**。変わらない指示・ツール定義・長い資料を先頭に、変わる入力を後ろに置く。固定部分の末尾、変わるユーザー入力の前に `prompt_cache_breakpoint` を置くと、暗黙キャッシュでは再利用できない独立したリクエストの間でも固定プレフィックスを再利用できる。再利用する固定プレフィックスは 1,024 トークン以上必要で、プレフィックスが一致していても、ルーティングや保持期限切れのためキャッシュヒットは保証されない。`cached_tokens` と `cache_write_tokens` を追跡し、**正味**のコストで判断する。**公式**
+2. **キャッシュしやすい構造にする**。変わらない指示・ツール定義・長い資料を先頭に、変わる入力を後ろに置く。固定部分の末尾、変わるユーザー入力の前に `prompt_cache_breakpoint` を置くと、暗黙キャッシュでは再利用できない独立したリクエストの間でも固定プレフィックスを再利用できる。トップレベルの `instructions` には `prompt_cache_breakpoint` を置けないので、固定の指示は developer メッセージの `input_text` ブロックに入れ、そのブロックに指定する。再利用する固定プレフィックスは 1,024 トークン以上必要で、プレフィックスが一致していても、ルーティングや保持期限切れのためキャッシュヒットは保証されない。`cached_tokens` と `cache_write_tokens` を追跡し、**正味**のコストで判断する。**公式**
 3. **強度を下げて再比較する**。移行時は「現行と同じ強度」と「1 段階下」を同じタスクで比べる。**公式**
 4. **階層化する**。計画・難所だけ Astra、定型処理は下位モデル(第2章)。
 5. **速度とコストを切り分ける**。Latent Space の実測では、Astra は約 33 トークン/秒で、最大単価の出力を出し続けても**1 時間あたり約 $6** 程度だった(プレビュー時の測定。大量並列や最高強度では桁が変わる)。**開発者**
