@@ -1,7 +1,7 @@
 # Gemini Omni 実践ガイド:中級〜上級者向けステップバイステップ・ベストプラクティス
 
 > **対象読者**: 動画生成 API / 生成メディアのプロダクト実装経験がある中級〜上級の開発者・AIエンジニア
-> **調査時点**: 2026年11月5日までの公開情報(執筆日 2026-11-06)
+> **調査時点**: 2026年11月7日までの公開情報(公式ページの確認日も 2026-11-07)
 > **対象モデル**: Gemini Omni Flash(`gemini-omni-1.1-flash`)
 > **1.2 への自動移行(2026-11-07 に公式で確認)**: Omni 1.2 Flash(`gemini-omni-1.2-flash`)は 2026-11-05 に一般提供されました。`gemini-omni-1.1-flash` は 4 週間の移行期間中は利用でき、**2026-12-03 からはリクエストが `gemini-omni-1.2-flash` へ自動で転送**されます。コード変更は不要で、課金は 1.2 の料金になります。1.2 の**拡張の上限は累計 30 秒**で、動画出力は $12.00 / 100 万トークンです(720p で約 $0.07 / 秒)。本ガイドの拡張とコストの例はこの値に合わせています。1.2 では生成が最大 15 秒、編集の入力動画が 15 秒以下、参照画像が最大 6 枚にも変わっていますが、それ以外の章は 1.1 の記述のままなので、実装前に[公式ドキュメント](https://ai.google.dev/gemini-api/docs/omni)を確認してください。
 
@@ -57,8 +57,8 @@ Omni は、Veo(動画)・Imagen(画像)・別系統の音声といった **分�
 
 ```mermaid
 flowchart LR
-    A["入力<br/>テキスト / 画像 / 音声 / 動画"] --> B["Gemini Omni Flash<br/>any-to-any ファミリーの第1弾"]
-    B --> C["出力<br/>音声付き動画<br/>1回あたり最大10秒"]
+    A["入力<br/>テキスト / 画像 / 動画"] --> B["Gemini Omni Flash<br/>any-to-any ファミリーの第1弾"]
+    B --> C["出力<br/>音声付き動画<br/>1回あたり最大15秒"]
     C --> D["シーン拡張<br/>10秒単位で累計30秒"]
     B -.-> E["今後の計画<br/>画像・音声出力 / Omni Pro"]
 ```
@@ -147,8 +147,14 @@ MODEL = "gemini-omni-1.1-flash"
 
 def save_video(interaction, path: str) -> None:
     """SDK 専用の便利フィールド output_video から mp4 を保存する。"""
+    # 動画が返らないときやデコードに失敗したときに既存ファイルを壊さないよう、先に検証する
+    output_video = interaction.output_video
+    if output_video is None or not output_video.data:
+        raise RuntimeError(f"No video returned: status={interaction.status}")
+    video_bytes = base64.b64decode(output_video.data)
+
     with open(path, "wb") as f:
-        f.write(base64.b64decode(interaction.output_video.data))
+        f.write(video_bytes)
 
 
 interaction = client.interactions.create(
@@ -239,6 +245,8 @@ interaction = client.interactions.create(
 )
 
 video_output = interaction.output_video
+if video_output is None or not video_output.uri:
+    raise RuntimeError(f"No video returned: status={interaction.status}")
 # URI の末尾には :download?alt=media が付くので、ファイル ID だけを取り出す
 match = re.search(r"/files/([^/:?]+)", video_output.uri)
 if match is None:
@@ -392,7 +400,7 @@ Use the second image as a reference for the woman's appearance, not as a literal
 
 | 項目 | 公式の記述 |
 | --- | --- |
-| 動画参照 | 3〜10 秒の生成は最大 3 クリップ、11〜15 秒の生成は最大 1 クリップ(各 3 秒まで)。参照動画の **音声は無視される** |
+| 動画参照(Omni 1.2) | 3〜10 秒の生成は最大 3 クリップ、11〜15 秒の生成は最大 1 クリップ(各 3 秒まで)。参照動画の **音声は無視される** |
 | 動画参照の向き | 見た目(顔や外観)の保持に向く |
 | 音声入力・音声参照のアップロード | 現行 API バージョンでは **非対応** |
 | 複数動画をまたぐ推論 | **非対応**(精度低下や予期しない出力の恐れ) |
@@ -422,8 +430,14 @@ res2 = client.interactions.create(
     input="Make the violin invisible. Keep everything else the same.",
 )
 
+# 動画が返らないときやデコードに失敗したときに既存ファイルを壊さないよう、先に検証する
+output_video = res2.output_video
+if output_video is None or not output_video.data:
+    raise RuntimeError(f"No video returned: status={res2.status}")
+video_bytes = base64.b64decode(output_video.data)
+
 with open("edited.mp4", "wb") as f:
-    f.write(base64.b64decode(res2.output_video.data))
+    f.write(video_bytes)
 ```
 
 ### 6.2 編集のループ設計
@@ -529,8 +543,14 @@ second = client.interactions.create(
     response_format={"resolution": "360p"},  # まずドラフトで確認する
 )
 
+# 動画が返らないときやデコードに失敗したときに既存ファイルを壊さないよう、先に検証する
+output_video = second.output_video
+if output_video is None or not output_video.data:
+    raise RuntimeError(f"No video returned: status={second.status}")
+video_bytes = base64.b64decode(output_video.data)
+
 with open("extended.mp4", "wb") as f:
-    f.write(base64.b64decode(second.output_video.data))
+    f.write(video_bytes)
 ```
 
 ### 7.3 拡張のプロンプトのコツ
@@ -648,7 +668,7 @@ flowchart TD
 | 保存設定 | 後続編集が必要なら `store=false` にしない | `store=false` の動画は編集不可(公式) |
 | 大容量出力 | 4MB 超は URI 配信。作成直後に URI を保存 | 後から GET するとインライン base64 で返る(公式) |
 | 生成待ち | `FAILED` を含む状態遷移を処理し、ポーリング間隔と上限時間を設ける | 生成時間は長さ・解像度・負荷で変動(公式) |
-| モデル ID | プレビュー ID から `gemini-omni-1.1-flash` へ移行 | プレビュー ID は廃止予定(二次情報。公式で確認) |
+| モデル ID | 新規実装は `gemini-omni-1.2-flash` を使う。`gemini-omni-1.1-flash` は既存コードの移行先としてだけ残す(プレビュー ID からの移行を含む。2026-12-03 からは 1.2 へ転送される) | `gemini-omni-1.1-flash` は移行期間のみ(公式)。プレビュー ID は廃止予定(二次情報。公式で確認) |
 | 動画の起点管理 | 参照・編集に使う素材はバージョン管理し、どの素材がどの出力を生んだか追跡 | 運用上の推奨(筆者) |
 
 ### 9.2 安全性・ガバナンス
@@ -685,7 +705,7 @@ flowchart TD
 | 生成長 | 1 回あたり最大 10 秒(Omni 1.2 は最大 15 秒)。拡張で累計 30 秒 |
 | 制御パラメータ | システム指示・`temperature`・`top_p`・停止シーケンス・ネガティブプロンプト欄は **非対応** |
 | 音声 | 声の編集は非対応。音声入力・音声参照のアップロードも非対応 |
-| 動画参照 | 3〜10 秒の生成は最大 3 クリップ、11〜15 秒の生成は最大 1 クリップ(各 3 秒まで)。複数動画をまたぐ推論は非対応 |
+| 動画参照(Omni 1.2) | 3〜10 秒の生成は最大 3 クリップ、11〜15 秒の生成は最大 1 クリップ(各 3 秒まで)。複数動画をまたぐ推論は非対応 |
 | 入力動画 | 編集はアップロード動画もモデル生成動画も 15 秒以下。拡張のアップロード動画は 15 秒以下で、拡張後の全長は 30 秒まで(Omni 1.2) |
 | 拡張位置 | 末尾のみ |
 | YouTube | YouTube 動画をメディアソースとして使うことは非対応 |
@@ -722,7 +742,7 @@ flowchart TD
 
 **実装**
 
-- [ ] `gemini-omni-1.1-flash` を使い、旧プレビュー ID を使っていない
+- [ ] 新規実装は `gemini-omni-1.2-flash` を使い、`gemini-omni-1.1-flash` は既存コードの移行先に限っている。旧プレビュー ID は使っていない
 - [ ] 4MB 超は URI 配信で、作成直後に URI を保存している
 - [ ] `PROCESSING` と `FAILED` を処理するポーリングを実装した
 - [ ] `interaction.id` を永続化している
@@ -743,7 +763,7 @@ flowchart TD
 
 ## 補足: 追加ベストプラクティスと根拠ソース URL
 
-調査時点は 2026-11-05 まで。**一次情報(公式)→ 著名開発者・主要メディア → サードパーティ**の順に整理しています。
+調査時点は 2026-11-07 まで。**一次情報(公式)→ 著名開発者・主要メディア → サードパーティ**の順に整理しています。
 
 ### A. 一次情報(Google 公式)
 
@@ -821,4 +841,4 @@ flowchart TD
 
 ---
 
-*以上。本ガイドは 2026 年 11 月 5 日時点までの公開情報に基づきます。価格・制限・モデル ID は変わりやすいため、実装前に必ず公式ドキュメントで再確認してください。*
+*以上。本ガイドは 2026 年 11 月 7 日時点までの公開情報に基づきます。価格・制限・モデル ID は変わりやすいため、実装前に必ず公式ドキュメントで再確認してください。*

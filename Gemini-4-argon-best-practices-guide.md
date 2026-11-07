@@ -388,6 +388,9 @@ from google.genai import types
 
 client = genai.Client()
 PROMPT = "素数定理の完全で厳密な証明を書いてください。"
+# 実際に使える上限は「1,048,576 − 入力トークン」で、超えた分はエラーになりうる
+OUTPUT_TOKEN_LIMIT = 1_048_576
+max_output_tokens = 262_144  # 全リクエストで再利用する
 parts = []
 token = None
 
@@ -396,7 +399,7 @@ while True:
         model="gemini-4-argon",
         contents=PROMPT,  # 毎回オリジナルのcontents
         config=types.GenerateContentConfig(
-            max_output_tokens=262_144,  # 毎回同じ合計値
+            max_output_tokens=max_output_tokens,  # MAX_TOKENS から再開するときだけ変わる合計値
             thinking_config=types.ThinkingConfig(thinking_level="high"),
             automatic_continuation=False,  # 自前でループする
             continuation_token=token,
@@ -409,8 +412,18 @@ while True:
     if candidate.content and candidate.content.parts:
         parts.extend(candidate.content.parts)
     token = candidate.continuation_token
-    if candidate.finish_reason != types.FinishReason.CONTINUATION or not token:
+    if not token:
         break
+    if candidate.finish_reason == types.FinishReason.CONTINUATION:
+        continue
+    # MAX_TOKENS でもトークンが返るので、使用済みトークン数より大きい上限で再開する
+    if (
+        candidate.finish_reason == types.FinishReason.MAX_TOKENS
+        and max_output_tokens < OUTPUT_TOKEN_LIMIT
+    ):
+        max_output_tokens = min(max_output_tokens * 2, OUTPUT_TOKEN_LIMIT)
+        continue
+    break
 
 # 未完了のターンは、完了した出力として扱わない
 if candidate.finish_reason != types.FinishReason.STOP:
@@ -420,7 +433,7 @@ print("".join(p.text for p in parts if p.text and not p.thought))
 print("Finish reason:", candidate.finish_reason)
 ```
 
-この例は非ストリーミングなので、1リクエストの上限は32,768トークン、時間は10分です。1ホップが10分を超えそうな処理は、`generate_content_stream` のループにするか、4.5 のバックグラウンド実行を使ってください。
+`MAX_TOKENS` から再開するたびに全ホップが課金されるので(5.3)、実運用では上限の引き上げ幅を予算に合わせて決めてください。この例は非ストリーミングなので、1リクエストの上限は32,768トークン、時間は10分です。1ホップが10分を超えそうな処理は、`generate_content_stream` のループにするか、4.5 のバックグラウンド実行を使ってください。
 
 **ストリーミングの自前ループ**では追加ルールがあります: 最初の32,768トークン以降は5,000トークンごとにチェックポイントのトークンが届きます。未確定チャンクは保留リストに溜め、トークンを受け取った時点で確定出力へ移します。`finish_reason` が `STOP` でストリームが正常に完了したら、チェックポイントのトークンが届かなくても、保留リストに残るチャンクをすべて確定出力へ移します(ループのルール4・5からの帰結で、公式のストリーミングの説明には明記がありません)。`STOP` 以外の終了理由は、ルール5のとおり完了として扱いません。チェックポイントのトークンが届いた後にストリームが切れたら、保留分を捨て、最後のトークンから再開します。最初のチェックポイントが届く前に切れたら、再開に使えるトークンがないので、保留分を捨てて元のリクエストを再送します。
 
