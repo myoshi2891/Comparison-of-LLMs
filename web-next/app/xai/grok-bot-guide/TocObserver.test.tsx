@@ -5,6 +5,30 @@ import styles from "./page.module.css";
 import TocObserver from "./TocObserver";
 
 const sectionIds = ["sec-1", "sec-2", "sec-3"];
+
+type ListenerRecord = { target: unknown; type: unknown; callback: unknown; capture: boolean };
+/** spy の呼び出しを「対象・種別・コールバック・capture」の組へ正規化する。 */
+const listenerRecords = ({ mock }: { mock: { calls: unknown[][]; contexts: unknown[] } }) =>
+  mock.calls.map(
+    ([type, callback, options], i): ListenerRecord => ({
+      target: mock.contexts[i],
+      type,
+      callback,
+      capture:
+        typeof options === "boolean"
+          ? options
+          : typeof options === "object" &&
+            options !== null &&
+            "capture" in options &&
+            Boolean(options.capture),
+    })
+  );
+const isSameListener = (a: ListenerRecord, b: ListenerRecord) =>
+  a.target === b.target &&
+  a.type === b.type &&
+  a.callback === b.callback &&
+  a.capture === b.capture;
+
 let width: number;
 let rect: ReturnType<typeof vi.spyOn>;
 let position = 0;
@@ -316,19 +340,36 @@ describe("モバイルドロワーのTabフォーカス閉じ込め", () => {
 });
 
 it("unmount時にscroll・resize・クリック・キー監視を解除", () => {
+  // window の登録は EventTarget.prototype の spy を通らないため、window にも spy を張る。
+  const addWindow = vi.spyOn(window, "addEventListener");
   const removeWindow = vi.spyOn(window, "removeEventListener");
+  const add = vi.spyOn(EventTarget.prototype, "addEventListener");
   const remove = vi.spyOn(EventTarget.prototype, "removeEventListener");
   const { unmount } = render(<Harness />);
   const r = root(),
     s = sidebar(),
     m = main();
+  const expected: Array<[EventTarget, string]> = [
+    [window, "scroll"],
+    [window, "resize"],
+    [menu(), "click"],
+    [document.getElementById("grok-backdrop") as HTMLElement, "click"],
+    [document, "keydown"],
+    ...links().map((link): [EventTarget, string] => [link, "click"]),
+  ];
+  // React が親要素へ張る委譲リスナーは解除されないため、期待する対象と種別に絞る。
+  const registered = [...listenerRecords(add), ...listenerRecords(addWindow)].filter((a) =>
+    expected.some(([target, type]) => a.target === target && a.type === type)
+  );
+  for (const [target, type] of expected) {
+    expect(registered.filter((a) => a.target === target && a.type === type)).not.toEqual([]);
+  }
   fireEvent.click(menu());
   unmount();
   expect(r.classList.contains(styles.open)).toBe(false);
   expect(s.inert).toBe(false);
   expect(m.inert).toBe(false);
-  expect(remove.mock.calls.map((c) => c[0])).toEqual(expect.arrayContaining(["click", "keydown"]));
-  expect(removeWindow.mock.calls.map((c) => c[0])).toEqual(
-    expect.arrayContaining(["scroll", "resize"])
-  );
+  const removed = [...listenerRecords(remove), ...listenerRecords(removeWindow)];
+  const leaked = registered.filter((a) => !removed.some((x) => isSameListener(a, x)));
+  expect(leaked.map((a) => a.type)).toEqual([]);
 });

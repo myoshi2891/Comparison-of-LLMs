@@ -291,11 +291,30 @@ it("unmountはイベントとタイマーを解除し遅延コピー結果を無
       })
   );
   Object.defineProperty(navigator, "clipboard", { value: { writeText }, configurable: true });
-  const remove = vi.spyOn(window, "removeEventListener");
+  // window の登録は EventTarget.prototype の spy を通らないため、window にも spy を張る。
+  const addWindow = vi.spyOn(window, "addEventListener");
+  const removeWindow = vi.spyOn(window, "removeEventListener");
+  const add = vi.spyOn(EventTarget.prototype, "addEventListener");
+  const remove = vi.spyOn(EventTarget.prototype, "removeEventListener");
   const { unmount } = render(<Harness />);
   const r = root(),
     s = sidebar(),
     button = document.querySelector("[data-copy-code]") as HTMLButtonElement;
+  const expected: Array<[EventTarget, string]> = [
+    [window, "scroll"],
+    [window, "resize"],
+    [menu(), "click"],
+    [document.getElementById("duet-backdrop") as HTMLElement, "click"],
+    [document, "keydown"],
+    ...links().map((link): [EventTarget, string] => [link, "click"]),
+  ];
+  // React が親要素へ張る委譲リスナーは解除されないため、期待する対象と種別に絞る。
+  const registered = [...listenerRecords(add), ...listenerRecords(addWindow)].filter((a) =>
+    expected.some(([target, type]) => a.target === target && a.type === type)
+  );
+  for (const [target, type] of expected) {
+    expect(registered.filter((a) => a.target === target && a.type === type)).not.toEqual([]);
+  }
   fireEvent.click(menu());
   fireEvent.click(button);
   unmount();
@@ -305,7 +324,9 @@ it("unmountはイベントとタイマーを解除し遅延コピー結果を無
   expect(button.textContent).toBe("コピー");
   expect(s.inert).toBe(false);
   expect(r.classList.contains(styles.open)).toBe(false);
-  expect(remove.mock.calls.map((c) => c[0])).toEqual(expect.arrayContaining(["scroll", "resize"]));
+  const removed = [...listenerRecords(remove), ...listenerRecords(removeWindow)];
+  const leaked = registered.filter((a) => !removed.some((x) => isSameListener(a, x)));
+  expect(leaked.map((a) => a.type)).toEqual([]);
   vi.useRealTimers();
 });
 it("モバイルバーの実測高さとResizeObserver cleanup", () => {
