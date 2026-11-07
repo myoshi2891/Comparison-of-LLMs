@@ -243,7 +243,9 @@ long_interaction = client.interactions.create(
 公式の推奨は、**4MB を超える動画(720p 超など)では `delivery="uri"`** を使うことです。返ってくる Google ホストの URI が `ACTIVE` になるまでポーリングしてからダウンロードします。次の例は、3.1 の `client` と `interaction` をそのまま使うので、動画を生成し直しません。
 
 ```python
+import os
 import re
+import tempfile
 import time
 
 
@@ -271,7 +273,12 @@ def download_uri_video(interaction, path: str) -> None:
         time.sleep(5)
 
     # ハイフンを含む ID が切り詰められないよう、URI ではなく files/ 付きの ID を渡す
-    client.files.download(file=file_name, destination=path)
+    # 中断しても既存ファイルが残るよう、同じディレクトリの一時ファイルへ保存してから置き換える
+    directory = os.path.dirname(os.path.abspath(path))
+    with tempfile.TemporaryDirectory(dir=directory) as temp_dir:
+        temp_path = os.path.join(temp_dir, "video.mp4")
+        client.files.download(file=file_name, destination=temp_path)
+        os.replace(temp_path, path)
 
 
 # 3.1 で delivery="uri" を指定して作成した interaction をそのまま渡す

@@ -448,7 +448,7 @@ SDKの自動継続では `usage_metadata` が **全ホップの合計** を返�
 
 **そのため**:
 
-- コンテキスト圧縮(compaction)や上限判定では、**`initial_prompt_token_count` + `tool_use_prompt_token_count` + `candidates_token_count` + `thoughts_token_count`** でコンテキストサイズを見積もる(JSでは `initialPromptTokenCount` / `toolUsePromptTokenCount` / `candidatesTokenCount` / `thoughtsTokenCount`)。`tool_use_prompt_token_count` はツールの実行結果としてモデルへ渡す入力のトークン数で、値がなければ 0 として扱います(公式の Long Decode ページの式にはなく、SDK の型定義の説明に基づく近似です)。`initial_prompt_token_count` だけでは、今のターンで生成した分が入りません。合算された `prompt_token_count` を使うと圧縮が早すぎるタイミングで始まります。圧縮は `continuation_token` がなくなり、生成が完了してから行ってください。
+- コンテキスト圧縮(compaction)や上限判定では、**`initial_prompt_token_count` + `tool_use_prompt_token_count` + `candidates_token_count` + `thoughts_token_count`** でコンテキストサイズを見積もる(JSでは `initialPromptTokenCount` / `toolUsePromptTokenCount` / `candidatesTokenCount` / `thoughtsTokenCount`)。`tool_use_prompt_token_count` はツールの実行結果としてモデルへ渡す入力のトークン数です(公式の Long Decode ページの式にはなく、SDK の型定義の説明に基づく近似です)。`tool_use_prompt_token_count`、`candidates_token_count`、`thoughts_token_count` は、値がなければ 0 として扱います。`initial_prompt_token_count` だけでは、今のターンで生成した分が入りません。合算された `prompt_token_count` を使うと圧縮が早すぎるタイミングで始まります。圧縮は `continuation_token` がなくなり、生成が完了してから行ってください。
 - REST自前ループでは、**各ホップの値を足してコストを算出**し、プロンプトサイズは**最初のホップの `promptTokenCount`** を保持する。
 - `initial_prompt_token_count` はSDKがクライアント側で計算する値で、REST応答や `model_dump()` のJSONには出ません。必要なら別途保存してください。
 
