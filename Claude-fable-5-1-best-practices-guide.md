@@ -237,6 +237,8 @@ if response.stop_reason == "refusal":
     raise RuntimeError(f"リクエストが拒否されました: category={category}")
 if response.stop_reason == "max_tokens":
     raise RuntimeError("max_tokens で打ち切られたため、レビューは未完了です")
+if response.stop_reason == "model_context_window_exceeded":
+    raise RuntimeError("コンテキストウィンドウの上限に達したため、レビューは未完了です")
 
 for block in response.content:
     if block.type == "text":
@@ -267,6 +269,8 @@ if response.stop_reason == "refusal":
     raise RuntimeError(f"リクエストが拒否されました: category={category}")
 if response.stop_reason == "max_tokens":
     raise RuntimeError("max_tokens で打ち切られたため、レビューは未完了です")
+if response.stop_reason == "model_context_window_exceeded":
+    raise RuntimeError("コンテキストウィンドウの上限に達したため、レビューは未完了です")
 
 for block in response.content:
     if block.type == "text":
@@ -933,8 +937,8 @@ flowchart TD
 
 ```markdown
 あなたは自律的に作業しています。ユーザーはリアルタイムで見ておらず、作業中の質問には答えられません。
-「〜しましょうか?」と許可を求めると作業が止まるため、依頼から導かれる可逆な作業は確認せずに進めてください。
-止まってよいのは、破壊的な操作と、ユーザーが判断すべきスコープ変更だけです。
+「〜しましょうか?」と許可を求めると作業が止まるため、依頼から導かれる可逆な作業は確認せずに進めてください。ただし「確認が必須の操作」は、可逆でも確認なしに実行しません。
+止まってよいのは、破壊的な操作、「確認が必須の操作」、ユーザーが判断すべきスコープ変更だけです。
 
 # 完了の定義
 - 成果: {最終的に何ができていればよいか}
@@ -945,7 +949,7 @@ flowchart TD
 - 終了前に最後の段落を点検する。計画、質問、次の手順の列挙、未実施の約束であれば、今すぐ実行する
 - 一部が詰まったら、残りを完成させ、何を・なぜ残したかを明記する
 - 依頼にない修正や拡張は行わず、フォローアップとして報告する
-- 破壊的な操作(削除、再起動、設定変更)は、支持する証拠があっても、明示的な承認なしに実行しない。承認を得られない場合は実行せず、止まって報告する
+- 破壊的な操作(削除、再起動、設定変更)と「確認が必須の操作」は、支持する証拠があっても、明示的な承認なしに実行しない。承認を得られない場合は実行せず、止まって報告する
 
 # 確認が必須の操作
 - {本番デプロイ、課金、外部への送信など}
