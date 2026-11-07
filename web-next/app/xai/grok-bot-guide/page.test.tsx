@@ -260,6 +260,8 @@ it("原本78 CSS規則の全宣言・media条件を保持（図の配置は共�
         ".diagram-canvas svg",
         ".mermaidTooltip",
         ".diagram-canvas .nodeLabel,\n      .diagram-canvas .edgeLabel",
+        // 原本のhtml規則はページのスクロール領域に効く規則で、globals.cssのhtml規則が担当する
+        "html",
       ].includes(source.selector)
     )
       continue;
@@ -291,6 +293,19 @@ it("原本78 CSS規則の全宣言・media条件を保持（図の配置は共�
         .map((d) => d.map((v) => (typeof v === "string" ? normalized(v) : v)))
     );
   }
+});
+it("スムーススクロールはglobals.cssのhtml規則へ委譲し、ページ側で再宣言しない", () => {
+  // Arrange
+  const pageCss = css();
+  const globalCss = fs.readFileSync("app/globals.css", "utf8");
+  // Act
+  const pageProps: string[] = [];
+  postcss.parse(pageCss).walkDecls(/^scroll-(behavior|padding-top)$/, (d) => {
+    pageProps.push(d.prop);
+  });
+  // Assert
+  expect(pageProps).toEqual([]);
+  expect(globalCss).toMatch(/html\s*\{[^}]*scroll-behavior:\s*smooth/);
 });
 const declarations = (source: string, selector: string) => {
   const result: Record<string, string> = {};
