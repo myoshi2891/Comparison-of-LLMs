@@ -391,7 +391,7 @@ flowchart TD
 
 ### 5.3 `task` パラメータは最後の手段
 
-`generation_config.video_config.task` に `text_to_video` / `image_to_video` / `reference_to_video` / `edit` / `extend` を指定できますが、公式は **まずプロンプトで解決し、うまくいかないときだけ `task` で明示**することを推奨しています。`task` を使うと **追加の制約がかかる**ためです。
+`generation_config.video_config.task` に `text_to_video` / `image_to_video` / `reference_to_video` / `edit` / `extend` を指定できますが、公式は **まずプロンプトで解決し、うまくいかないときだけ `task` で明示**することを推奨しています。`task` を使うと **追加の制約がかかる**ためです。また、`previous_interaction_id` を使う多ターン編集では `task` を併用しないでください。`task` を省き、編集内容をプロンプトで説明します。
 
 ### 5.4 画像・動画の「役割」を自然言語で指定する
 
@@ -696,7 +696,7 @@ flowchart TD
     Q2 -->|いいえ| Q3{"音が不要または不自然?"}
     Q3 -->|はい| A3["No dialogue や音楽の種類を具体指定"]
     Q3 -->|いいえ| Q4{"モードを誤認している?"}
-    Q4 -->|はい| A4["task パラメータで明示<br/>最後の手段"]
+    Q4 -->|はい| A4["task パラメータで明示<br/>最後の手段<br/>多ターン編集では指定しない"]
     Q4 -->|いいえ| A5["各素材の役割の説明と<br/>上限を確認"]
 ```
 
