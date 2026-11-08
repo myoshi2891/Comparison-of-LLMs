@@ -189,8 +189,10 @@ codex exec -m gpt-6.1-sol "現在の変更をレビューして"
 
 ```toml
 model = "gpt-6.1-sol"
-model_reasoning_effort = "medium"   # low / medium / high / xhigh / max / ultra
+model_reasoning_effort = "medium"   # 選べる値はモデルで異なる(/model で確認)
 ```
+
+選べる推論レベルはモデルごとに異なり、2-3 の表のすべてのレベルを使えるとは限りません。GPT-6 Luna を使う場合も `ultra` に対応しているとは限らないので、`/model` で Luna の対応レベルを確認してから値を決めてください。
 
 バージョン 0.165.0 以降、対応モデルでは**会話の途中で推論レベルを変更**できるのが既定になりました。「最初は medium で探索し、詰まったら high に上げる」が手軽にできます(【二次】Releasebot の要約。詳細は公式 GitHub リリースで確認)。
 
