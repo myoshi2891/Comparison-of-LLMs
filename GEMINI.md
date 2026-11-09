@@ -1,9 +1,17 @@
 # GEMINI.md
 
-Updated 2026-11-05
+Updated 2026-11-09
 
 GEMINI.md は Gemini CLI / Gemini Code Assist 向けの入り口。
 本リポジトリでは **CLAUDE.md が正本** とし、GEMINI.md はその委譲 pointer として機能する。
+
+Claude Fable 5.1 `/claude/fable-5-1-best-practices` の移行を実装中（2026-11-09）。
+本文・構造・60 CSS規則を原本固定で照合し、HTML監査exit 0、対象64契約・関連91件、
+型・lint621 files・Mermaid10図解析・pytest122件が成功。直前の全体は229 files／2653 tests成功。
+ただし原本の8・5・5項目のリスト別進捗を、全18項目一括としてテスト・実装した誤りが残る。
+期待値訂正のユーザー確認待ちでGreen未作成。実装3ファイルとregistryは未コミット。
+HTML／Markdownは02208430で内容無変更・100%リネーム保存。詳細と再開手順はdocs/PROGRESS.md。
+npm・ビルド未実行。目視はユーザー担当（localhost:3000）。
 
 Grok Bot ガイド `/xai/grok-bot-guide` を追加（2026-11-05）。
 指定HTMLの全77見出し（H1×1／H2×21／H3×55）、49段落、79リスト項目、30表205行、
