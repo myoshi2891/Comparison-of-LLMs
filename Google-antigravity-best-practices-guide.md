@@ -553,7 +553,7 @@ agy plugin install ./my-skills-plugin
 
 - `/grill-me <タスク>` は、エージェントが**1問ずつ質問し、各質問に推奨回答を添えて**、作業前に判断事項を詰めます [公式]。
 - 回答を計画に変えるには、`/plan` と重ねて使います [公式]。
-- `/plan` は、コードベース探索 → 要件確認 → レビュー可能な計画の作成を行い、**承認後に初めて変更を書きます** [二次]。
+- `/plan` は、コードベース探索 → 要件確認 → レビュー可能な計画の作成を行います。ただし、**変更前に対話的な承認を待つとは限りません**。CLI v1.4.12 では、`/config` の **Artifact Review** が `always-proceed` ならレビューは自動で進み、ヘッドレス実行でも保存済みのレビュー設定が適用されます [公式]。対話実行で承認を必須にするには、Artifact Review を `asks-for-review` に明示設定し、「承認を得るまで編集しない」と依頼します。CI では人が計画を確認してから実装ジョブを起動する**別の承認ゲート**を設けます [筆者推奨]。根拠: [公式の設定](https://antigravity.google/docs/settings?tab=cli)、[CLI変更履歴](https://antigravity.google/docs/changelog?tab=cli)
 
 ```markdown
 /plan /grill-me ユーザー単位のレート制限をブックマークAPIに追加する
@@ -666,7 +666,6 @@ description: セキュリティ監査・静的解析・品質レビュー用の�
 tools:
   - view_file
   - grep_search
-  - run_command
 subagent: true
 mainAgent: false
 model: pro
@@ -685,6 +684,8 @@ skills:
 ```
 
 出典: [公式] の例(`https://antigravity.google/docs/subagents/`)を、検証担当として使う想定に**[筆者推奨]** で調整。
+
+この検証担当はファイル閲覧・検索だけで足りるため、`run_command` を許可していません。`commandExecutionPolicy: sandbox` は共有ワークスペースへの書き込みを禁止する設定ではありません。シェルが必要な検証は、ワークスペースを読み取り専用でマウントし、書き込み先を使い捨て領域へ分離した既存のコンテナや CI 環境で実行します。プロンプトの「編集しない」だけに依存しないでください [筆者推奨]。
 
 | frontmatter | 既定値 | 説明 |
 |:--|:--|:--|
