@@ -125,20 +125,20 @@ Long Decode の自動継続を使うには、**SDKのバージョン要件**が�
 
 | 言語 | 最低バージョン |
 |---|---|
-| Python (`google-genai`) | 2.31.0 |
+| Python (`google-genai`) | 2.34.0 |
 | JavaScript (`@google/genai`) | 2.29.1 |
 | Go | 1.74.0 |
 | Java | 1.77.0 |
 | .NET | 1.26.0 |
 | Kotlin | 1.6.0 |
 
-上の表は GenerateContent の要件です。**Interactions API の自動継続はより新しいSDKが必要**で、Python 2.34.0、JavaScript 2.32.0、Go 1.77.0、Java 1.80.0 以上です。
+上の表は GenerateContent の要件です。ただし Python は、本ガイドの Interactions API の継続フロー(`previous_interaction_id`、`continuation_token`、`max_output_tokens`)も使える **`google-genai` 2.34.0 以上**を要件にしています。**Interactions API の自動継続**には、Python 2.34.0、JavaScript 2.32.0、Go 1.77.0、Java 1.80.0 以上が必要です([公式](https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/guides/gemini-4-argon))。
 
-公式の Long Decode ページが挙げる Python の下限は 2.30.1 ですが、本ガイドでは 2.31.0 を最低バージョンとします。2.31.0 では、候補なしで返った継続ホップの処理、途切れたホップの再試行、自動継続時のグラウンディングメタデータの結合が修正されました([CHANGELOG](https://github.com/googleapis/python-genai/blob/main/CHANGELOG.md))。
+公式の Long Decode ページが挙げる GenerateContent 用の Python の下限は 2.30.1 です。2.31.0 では、候補なしで返った継続ホップの処理、途切れたホップの再試行、自動継続時のグラウンディングメタデータの結合が修正されました。本ガイドでは、これらの修正と Interactions API の継続対応を含む 2.34.0 以上を使います([CHANGELOG](https://github.com/googleapis/python-genai/blob/main/CHANGELOG.md))。
 
 ```bash
 # Python
-pip install -U "google-genai>=2.31.0"
+pip install -U "google-genai>=2.34.0"
 
 # JavaScript / TypeScript
 npm install "@google/genai@>=2.29.1"
@@ -639,7 +639,7 @@ flowchart TD
 ### 10.2 本番投入チェックリスト
 
 - [ ] モデルID `gemini-4-argon` を使用、請求アカウント有効(有料ティア)
-- [ ] SDKが最低バージョン以上(Python 2.31.0 / JS 2.29.1 ほか。Interactions API の自動継続は Python 2.34.0 / JS 2.32.0 ほか)
+- [ ] SDKが最低バージョン以上(Python 2.34.0 / JS 2.29.1 ほか。Interactions API の自動継続は Python 2.34.0 / JS 2.32.0 ほか)
 - [ ] `max_output_tokens` を明示。32K未満の旧設定は引き上げ
 - [ ] `thinking_level` を3レベルで評価済み。`thinking_budget`、サンプリング引数は削除
 - [ ] 明示キャッシュの呼び出しを撤去、暗黙キャッシュ前提の設計(共通プレフィックス先頭固定)
