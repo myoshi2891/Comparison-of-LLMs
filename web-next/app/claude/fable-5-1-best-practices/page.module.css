@@ -1,0 +1,511 @@
+/* Faithful source styles; diagram geometry belongs to MermaidDiagram. */
+
+.root {
+  --paper: #faf7f0;
+  --paper-alt: #f1ece0;
+  --ink: #1f2430;
+  --ink-soft: #4a5064;
+  --indigo: #3b4a9c;
+  --gold: #b8862b;
+  --forest: #2f6b4f;
+  --plum: #7a3b69;
+  --border: #ddd5c3;
+  --side: 264px;
+}
+.root * {
+  box-sizing: border-box;
+}
+.root {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "Noto Sans JP", "Hiragino Sans", "Yu Gothic", system-ui, sans-serif;
+  font-size: 1rem;
+  line-height: 1.85;
+}
+.root .layout {
+  display: block;
+}
+.root .sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: var(--side);
+  overflow-y: auto;
+  background: #fff;
+  border-right: 1px solid var(--border);
+  padding: 20px 0;
+}
+.root .brand {
+  padding: 0 20px 14px;
+  font-family: "Source Serif 4", "Noto Serif JP", serif;
+  font-weight: 700;
+  color: var(--indigo);
+  font-size: 1.1rem;
+  line-height: 1.4;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 10px;
+}
+.root .nav-a {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 7px 20px;
+  color: var(--ink-soft);
+  text-decoration: none;
+  font-size: 1rem;
+  line-height: 1.5;
+  border-left: 3px solid transparent;
+}
+.root .nav-a .n-dot {
+  flex: 0 0 8px;
+  height: 8px;
+  margin-top: 9px;
+  border-radius: 50%;
+  background: var(--border);
+}
+.root .nav-a:hover {
+  background: var(--paper-alt);
+}
+.root .nav-a.active {
+  color: var(--indigo);
+  font-weight: 700;
+  border-left-color: var(--indigo);
+  background: var(--paper-alt);
+}
+.root .nav-a.active .n-dot {
+  background: var(--indigo);
+}
+.root .main {
+  margin-left: var(--side);
+  min-width: 0;
+}
+.root .hero {
+  background: linear-gradient(135deg, #2c3777, #3b4a9c 60%, #5a4a8c);
+  color: #fff;
+  padding: 56px 56px 44px;
+}
+.root .hero :global(h1) {
+  font-family: "Source Serif 4", "Noto Serif JP", serif;
+  margin: 0 0 18px;
+  font-size: 2rem;
+  line-height: 1.4;
+  color: #fff;
+}
+.root .hero :global(ul) {
+  margin: 0;
+  padding-left: 1.2em;
+  color: #e8ebff;
+}
+.root .hero :global(strong) {
+  color: #ffe29a;
+}
+.root .section {
+  padding: 40px 56px;
+}
+.root .section :global(h2) {
+  font-family: "Source Serif 4", "Noto Serif JP", serif;
+  color: var(--indigo);
+  font-size: 1.6rem;
+  margin: 0 0 18px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--gold);
+}
+.root .prose {
+  overflow-wrap: break-word;
+  min-width: 0;
+}
+.root .prose :global(h3) {
+  font-size: 1.25rem;
+  color: var(--plum);
+  margin: 30px 0 10px;
+}
+.root .prose :global(h4) {
+  font-size: 1.1rem;
+  color: var(--forest);
+  margin: 22px 0 8px;
+}
+.root .prose :global(p),
+.root .prose :global(li) {
+  overflow-wrap: break-word;
+}
+.root .prose :global(a) {
+  color: var(--indigo);
+  word-break: break-all;
+}
+.root .prose :global(code) {
+  font-family: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+  font-size: 1rem;
+  background: var(--paper-alt);
+  padding: 1px 6px;
+  border-radius: 4px;
+  overflow-wrap: anywhere;
+}
+.root .prose :global(pre) {
+  background: #282c34;
+  color: #abb2bf;
+  border-radius: 8px;
+  padding: 16px 18px;
+  overflow-x: auto;
+  margin: 16px 0;
+  line-height: 1.6;
+}
+.root .prose :global(pre) :global(code) {
+  background: none;
+  padding: 0;
+  color: inherit;
+  overflow-wrap: normal;
+  white-space: pre;
+}
+.root .prose :global(pre) :global(code).hljs {
+  padding: 0;
+  background: transparent;
+}
+.root .prose :global(blockquote) {
+  margin: 16px 0;
+  padding: 12px 18px;
+  background: #fff8e6;
+  border-left: 4px solid var(--gold);
+  border-radius: 0 6px 6px 0;
+  color: var(--ink);
+}
+.root .prose :global(blockquote) :global(p) {
+  margin: 4px 0;
+}
+.root .table-wrap {
+  overflow-x: auto;
+  margin: 16px 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
+  min-width: 0;
+  max-width: 100%;
+}
+.root .table-wrap :global(table) {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 1rem;
+}
+.root .table-wrap :global(th) {
+  background: var(--indigo);
+  color: #fff;
+  text-align: left;
+  padding: 10px 14px;
+  font-weight: 700;
+}
+.root .table-wrap :global(td) {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+  overflow-wrap: anywhere;
+}
+.root .table-wrap :global(tr):hover :global(td) {
+  background: var(--paper-alt);
+}
+.root .diagram-card {
+  margin: 20px 0;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 18px;
+  min-width: 0;
+}
+.root .diagram-wrap {
+  overflow-x: auto;
+  min-width: 0;
+}
+.root .diagram-wrap > * {
+  min-width: 0;
+}
+.root .diagram-err {
+  color: #a33;
+  white-space: pre-wrap;
+  font-size: 1rem;
+}
+.root :global(ul).checklist {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0;
+}
+.root :global(li).chk {
+  margin: 8px 0;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  transition: 0.15s;
+}
+.root :global(li).chk :global(label) {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 10px 14px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+.root :global(li).chk :global(input) {
+  appearance: none;
+  -webkit-appearance: none;
+  flex: 0 0 22px;
+  height: 22px;
+  margin-top: 4px;
+  border: 2px solid var(--indigo);
+  border-radius: 5px;
+  background: #fff;
+  cursor: pointer;
+  font-size: 1rem;
+}
+.root :global(li).chk :global(input):checked {
+  background: var(--forest);
+  border-color: var(--forest);
+  box-shadow: inset 0 0 0 3px #fff;
+}
+.root :global(li).chk.done {
+  background: #eef7f1;
+  border-color: var(--forest);
+}
+.root :global(li).chk.done :global(span) {
+  color: var(--ink-soft);
+  text-decoration: line-through;
+}
+.root .progress {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 14px 0 4px;
+  font-size: 1rem;
+  color: var(--ink-soft);
+}
+.root .progress .bar {
+  flex: 1;
+  height: 10px;
+  background: var(--paper-alt);
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+.root .progress .bar :global(i) {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: var(--forest);
+  transition: width 0.2s;
+}
+.root .footer {
+  padding: 28px 56px 60px;
+  color: var(--ink-soft);
+  border-top: 1px solid var(--border);
+}
+.root .menu-btn {
+  display: none;
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  z-index: 30;
+  background: var(--indigo);
+  color: #fff;
+  border: 0;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+@media (max-width: 900px) {
+  .root .sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.2s;
+    z-index: 25;
+    box-shadow: 2px 0 12px rgba(0, 0, 0, 0.2);
+  }
+  .root.open .sidebar {
+    transform: none;
+  }
+  .root .main {
+    margin-left: 0;
+  }
+  .root .menu-btn {
+    display: block;
+  }
+  .root .hero {
+    padding: 64px 20px 32px;
+  }
+  .root .section {
+    padding: 28px 16px;
+  }
+  .root .footer {
+    padding: 24px 16px 48px;
+  }
+}
+
+.layout {
+  width: 100%;
+}
+.root {
+  width: 100%;
+  color-scheme: light;
+}
+.root .main {
+  width: calc(100% - var(--side));
+}
+.root :global(h1),
+.root :global(h2),
+.root :global(h3),
+.root :global(h4),
+.root :global(strong) {
+  font-weight: 700;
+}
+.root :global(p) {
+  margin: 1em 0;
+}
+.root :global(ul),
+.root :global(ol) {
+  padding-left: 40px;
+  margin: 1em 0;
+}
+.root :global(ul) {
+  list-style-type: disc;
+}
+.root :global(ol) {
+  list-style-type: decimal;
+}
+.root :global(ul) :global(ul) {
+  list-style-type: circle;
+}
+.root :global(ul) :global(ul) :global(ul) {
+  list-style-type: square;
+}
+.root .hero :global(ul) {
+  margin: 0;
+  padding-left: 1.2em;
+}
+.root :global(ul).checklist {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0;
+}
+.root .prose :global(a) {
+  text-decoration: underline;
+}
+.root :global(th),
+.root :global(td) {
+  text-align: left !important;
+}
+.root .section,
+.root :global(h1),
+.root :global(h2),
+.root :global(h3) {
+  scroll-margin-top: calc(var(--header-height, 60px) + 80px);
+}
+.root .sidebar {
+  top: calc(var(--ch-height, 60px) + var(--ch-disclaimer-height, 0px));
+  z-index: 61;
+}
+.root .menu-btn {
+  top: calc(var(--ch-height, 60px) + var(--ch-disclaimer-height, 0px) + 10px);
+  z-index: 63;
+}
+.root :global(pre code) {
+  background: none;
+  border: none;
+  color: inherit;
+}
+.codeLine {
+  white-space: pre;
+}
+.root .heroDates {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px 24px;
+  margin-bottom: 24px;
+  color: inherit;
+  font-size: 0.8rem;
+}
+.root .scrim {
+  display: none;
+}
+.root :global(button:focus-visible),
+.root :global(a:focus-visible),
+.root :global(input:focus-visible) {
+  outline: 3px solid var(--indigo);
+  outline-offset: 3px;
+}
+@media (max-width: 900px) {
+  .root .sidebar {
+    visibility: hidden;
+    pointer-events: none;
+  }
+  .root.open .sidebar {
+    visibility: visible;
+    pointer-events: auto;
+  }
+  .root .main {
+    width: 100%;
+  }
+  .root.open .scrim {
+    display: block;
+    position: fixed;
+    inset: 0;
+    top: calc(var(--ch-height, 60px) + var(--ch-disclaimer-height, 0px));
+    background: rgb(0 0 0 / 30%);
+    border: 0;
+    z-index: 60;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .root .sidebar {
+    transition: none;
+  }
+}
+body:has(.root):global(.has-common-header) {
+  margin-top: 0;
+  padding-top: calc(var(--ch-height, 60px) + var(--ch-disclaimer-height, 0px));
+  background: #faf7f0;
+  color-scheme: light;
+}
+body:has(.root) :global(#site-freshness-bar) {
+  display: none;
+}
+body:has(.root) :global(nav[aria-label="関連ページ"]) {
+  margin-left: 264px !important;
+  background: #faf7f0;
+  color: #1f2430;
+  border-color: #ddd5c3;
+  --line: #ddd5c3;
+  --card: #fff;
+  --fg: #1f2430;
+  --muted: #4a5064;
+  --accent: #3b4a9c;
+}
+body:has(.root) :global(nav[aria-label="関連ページ"] a) {
+  color: #3b4a9c;
+  background: #fff;
+  border-color: #ddd5c3;
+}
+@media (max-width: 900px) {
+  body:has(.root) :global(nav[aria-label="関連ページ"]) {
+    margin-left: 0 !important;
+  }
+}
+/* Restore source document defaults overridden by calculator-wide table rules. */
+.root .table-wrap :global(thead) {
+  position: static;
+}
+.root .table-wrap :global(th) {
+  font-family: inherit;
+  font-size: inherit;
+  text-transform: none;
+  letter-spacing: normal;
+  white-space: normal;
+  min-width: 0;
+  border-bottom: none;
+}
+.root .table-wrap :global(td) {
+  font-family: inherit;
+}
+.root .table-wrap :global(tbody tr) {
+  border-bottom: none;
+}
+.root .table-wrap :global(tbody tr:hover) {
+  background: transparent;
+}
