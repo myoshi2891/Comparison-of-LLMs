@@ -108,7 +108,7 @@ flowchart TD
 - 公式ドキュメントでは、**新規プロジェクトには Interactions API が推奨**されています。Interactions API の Long Decode には2つの経路があります。**バックグラウンド実行**(`background=true`)はサーバー側が継続を代行し、`store=true` が必須です。**クライアント側継続**(SDK の自動継続、または `continuation_token` の自前ループ)は、保存あり(`store=true`)でもステートレス(`store=false`)でも使えます。どちらも Gemini API と Gemini Enterprise Agent Platform の Interactions API(`v1beta1`)で使えます。Google Cloud では、Interactions API と GenerateContent のどちらでも `v1beta1` が必要で、`v1` では Long Decode を使えません。
 - Gemini API の Interactions API でバックグラウンド実行を使うと、リクエストと応答がサーバーに保存されます。バックグラウンド実行には `store=true` が必須で(既定で `true`、`store=false` とは併用不可)、有料ティアの保持期間は55日です。保持期間は AI Studio で7・14・28・55日から設定でき、期間が過ぎると自動で削除されます。それより前に消すには、インタラクションIDを指定して `delete` メソッドを呼ぶか、AI Studio の Logs ページから削除します。インタラクションを保持できない場合は、`store=false` のクライアント側継続か、GenerateContent を使ってください。ただし、これで避けられるのは Interactions の状態保存だけです。[プロジェクトのログ](https://ai.google.dev/gemini-api/docs/logs-policy)が有効なら、Interactions から GenerateContent へ切り替えても、プロンプトと応答は保存されます。このログは、Interactions API の呼び出しと、2026年10月26日以降に作成したプロジェクトの GenerateContent の呼び出しで既定で有効です(既定の最大保持期間は55日)。
   GenerateContent のリクエスト単位の `store=true` はプロジェクトのログ設定に優先するため、プロジェクト側を無効にしていても保存されます。保存を避けるには、プロジェクトのオーナーが AI Studio の Logs and Datasets ページでログを無効にするだけでなく、既存の呼び出し・共通設定・ラッパーも確認し、リクエストの `store=true` を無効にして `store=false` を明示します([公式のリクエスト単位の store](https://ai.google.dev/api/generate-content#request-body))。これで止まるのはプロジェクトのログだけで、不正利用の監視用のログは別です。ゼロデータ保持は保証されません。有料サービスでも、プロンプトと応答は不正利用の検出のため一定期間ログに記録されます。保証されたゼロデータ保持が必要な場合、Google は Vertex AI の利用を案内しています。
-  ただし、Vertex AI に移るだけでゼロデータ保持になるわけではありません。移行を決める前に、不正利用の監視用ログについて適用される契約条件、Google 検索のグラウンディングの保持、関連するログ・キャッシュの設定を確認してください。また、Google 検索と Google マップのグラウンディングには別の保持ルールがあり、プロンプトや生成結果などが30日間保存され、この保存は無効にできません。なお、Gemini Enterprise Agent Platform でも永続キャッシュは既定で有効です。無効にする方法は第2章の「キャッシュ」を参照してください。
+  ただし、Vertex AI に移るだけでゼロデータ保持になるわけではありません。移行を決める前に、不正利用の監視用ログについて適用される契約条件、Google 検索のグラウンディングの保持、関連するログ・キャッシュの設定を確認してください。また、Google Search のグラウンディングの保持期間は利用経路で異なります。Gemini API ではプロンプト・文脈情報・生成結果などを30日間保存します([Gemini API 利用規約](https://ai.google.dev/gemini-api/terms#grounding-with-google-search))。Gemini Enterprise Agent Platform では、検索クエリと関連する文脈情報などを最大3日間保存します。Google Maps のグラウンディングは別に、プロンプト・文脈情報・生成結果を30日間保存します。これらのグラウンディング用の保存は無効にできません([Agent Platform の保持条件](https://docs.cloud.google.com/gemini-enterprise-agent-platform/resources/zero-data-retention))。なお、Gemini Enterprise Agent Platform でも永続キャッシュは既定で有効です。無効にする方法は第2章の「キャッシュ」を参照してください。
 - 既存のGenerateContent APIは「Legacy」と表記されていますが、Argonでも利用可能です。**クライアント側で細かく継続制御したい場合(再試行・バックオフ・保存しない運用)は、Interactions API のクライアント側継続と GenerateContent のどちらでも実装できます**。Interactions API で `store=false` にする場合は、前回のインタラクションIDの代わりにプロンプトを再送します。
 
 ### 1.2 ベストプラクティス
@@ -137,7 +137,7 @@ Long Decode の自動継続を使うには、**SDKのバージョン要件**が�
 公式の Long Decode ページが挙げる GenerateContent 用の Python の下限は 2.30.1 です。2.31.0 では、候補なしで返った継続ホップの処理、途切れたホップの再試行、自動継続時のグラウンディングメタデータの結合が修正されました。本ガイドでは、これらの修正と Interactions API の継続対応を含む 2.34.0 以上を使います([CHANGELOG](https://github.com/googleapis/python-genai/blob/main/CHANGELOG.md))。
 
 ```bash
-# Python
+# Python 3.11 以上が必要
 pip install -U "google-genai>=2.34.0"
 
 # JavaScript / TypeScript
@@ -477,7 +477,7 @@ Gemini 3.x系から移行する場合のチェックリストです(公式の移
 | 6 | 明示コンテキストキャッシュ | **非対応でエラー**。`cachedContents` / `caches.create` / `cached_content` を削除。暗黙キャッシュ(4,096トークン以上・95%割引)へ |
 | 7 | サンプリングパラメータ | `temperature` / `top_p` / `top_k` を削除(指定しても無視)。`candidate_count` / `frequency_penalty` / `presence_penalty` も削除(Gemini Enterprise Agent Platform では HTTP 400) |
 | 8 | クライアントタイムアウト | 20分以上に |
-| 9 | Thought Signature | マルチターン・関数呼び出しでは**署名を含む完全な会話履歴**を返す |
+| 9 | Thought Signature | マルチターン・関数呼び出しでは**署名を含む完全な会話履歴**を返す。各関数結果は呼び出しの `id` と `name` の両方を一致させ、元の呼び出し順に返す。`id` がない場合も `name` と呼び出し順を保って対応付ける([公式の関数呼び出し規則](https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/guides/gemini-4-argon#parameters-function-calling-and-chat-validation)) |
 | 10 | コスト見積り | 思考トークン、グラウンディング時の内部ツール指示・関数宣言もすべて課金対象 |
 | 11 | OpenAI互換エンドポイント | **Long Decode非対応**(出力は1リクエスト上限で止まる) |
 

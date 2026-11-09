@@ -240,7 +240,7 @@ long_interaction = client.interactions.create(
 
 ### 3.2 大きな動画は URI 配信で取得する
 
-公式の推奨は、**4MB を超える動画(720p 超など)では `delivery="uri"`** を使うことです。返ってくる Google ホストの URI が `ACTIVE` になるまでポーリングしてからダウンロードします。次の例は、3.1 の `client` と `interaction` をそのまま使うので、動画を生成し直しません。
+公式の推奨は、**4MB を超える動画(720p 超など)では `delivery="uri"`** を使うことです。返ってくる Google ホストの URI が `ACTIVE` になるまでポーリングしてからダウンロードします。次の例は、3.1 の `client`、`interaction` と15秒の `long_interaction` をそのまま使うので、動画を生成し直しません。
 
 ```python
 import os
@@ -295,6 +295,7 @@ def download_uri_video(interaction, path: str) -> None:
 
 # 3.1 で delivery="uri" を指定して作成した interaction をそのまま渡す
 download_uri_video(interaction, "output.mp4")
+download_uri_video(long_interaction, "long.mp4")
 ```
 
 状態取得は1回あたり最大30秒かつ600秒の残り時間以内に制限し、SDK内部の再試行は無効にしています。待機間隔も残り時間に収めます。通信が停止した場合はHTTPタイムアウトの例外を呼び出し側へ返し、無期限に待ちません。アップロード後の状態取得(6.4節)も同じ方針です。[公式SDKのHTTP設定・再試行・GetFileConfig](https://github.com/googleapis/python-genai/blob/main/google/genai/types.py)
