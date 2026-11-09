@@ -374,3 +374,25 @@ it("原本の全装飾クラスを同じタグへ同じ順序で適用", () => {
     ).toEqual(tags);
   }
 });
+it("共有計算機の表専用スタイルが原本の本文書体・折返し・ヘッダー位置へ漏れない", () => {
+  const expectedDefaults: Record<string, Record<string, string>> = {
+    ".root .table-wrap :global(thead)": { position: "static" },
+    ".root .table-wrap :global(th)": {
+      "font-family": "inherit",
+      "font-size": "inherit",
+      "text-transform": "none",
+      "letter-spacing": "normal",
+      "white-space": "normal",
+      "min-width": "0",
+      "border-bottom": "none",
+    },
+    ".root .table-wrap :global(td)": { "font-family": "inherit" },
+    ".root .table-wrap :global(tbody tr)": { "border-bottom": "none" },
+    ".root .table-wrap :global(tbody tr:hover)": { background: "transparent" },
+  };
+  for (const [selector, props] of Object.entries(expectedDefaults)) {
+    const actual = declarations(selector);
+    for (const [prop, value] of Object.entries(props))
+      expect(actual[prop], `${selector} ${prop}`).toBe(value);
+  }
+});
