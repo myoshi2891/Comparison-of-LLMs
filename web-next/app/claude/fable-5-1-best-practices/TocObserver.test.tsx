@@ -33,19 +33,55 @@ function Harness() {
         {[0, 1, 2].map((i) => (
           <section key={i} id={`s${i}`} />
         ))}
-        <li className={styles.chk}>
-          <label>
-            <input type="checkbox" data-guide-check />A
-          </label>
-        </li>
-        <li className={styles.chk}>
-          <label>
-            <input type="checkbox" data-guide-check />B
-          </label>
-        </li>
-        <span id="chkCount">0</span>
-        <span id="chkTotal">0</span>
-        <i id="chkBar" />
+        <div className={styles.progress}>
+          <span>
+            <span id="chkCount" data-check-count>
+              0
+            </span>
+            {" / "}
+            <span id="chkTotal" data-check-total>
+              0
+            </span>
+            {" 完了"}
+          </span>
+          <div className={styles.bar}>
+            <i id="chkBar" data-check-bar />
+          </div>
+        </div>
+        <ul id="checks-a" className={styles.checklist}>
+          <li className={styles.chk}>
+            <label>
+              <input type="checkbox" data-guide-check />A
+            </label>
+          </li>
+          <li className={styles.chk}>
+            <label>
+              <input type="checkbox" data-guide-check />B
+            </label>
+          </li>
+        </ul>
+        <div className={styles.progress}>
+          <span>
+            <span id="bCount" data-check-count>
+              0
+            </span>
+            {" / "}
+            <span id="bTotal" data-check-total>
+              0
+            </span>
+            {" 完了"}
+          </span>
+          <div className={styles.bar}>
+            <i id="bBar" data-check-bar />
+          </div>
+        </div>
+        <ul id="checks-b" className={styles.checklist}>
+          <li className={styles.chk}>
+            <label>
+              <input type="checkbox" data-guide-check />C
+            </label>
+          </li>
+        </ul>
       </div>
       <TocObserver />
     </div>
@@ -171,7 +207,7 @@ it("目次の選択リンクが可視範囲外なら目次内スクロール", (
 });
 it("チェック全件・解除でカウンターと幅を更新", () => {
   render(<Harness />);
-  const boxes = Array.from(document.querySelectorAll("input"));
+  const boxes = Array.from(document.querySelectorAll("#checks-a input"));
   expect(document.getElementById("chkTotal")?.textContent).toBe("2");
   expect(document.getElementById("chkBar")?.style.width).toBe("0%");
   fireEvent.click(boxes[0]);
@@ -370,11 +406,47 @@ describe("モバイルドロワーのTabフォーカス閉じ込め", () => {
 
 it("チェックの完了背景と取消線用クラスを全件同期し解除する", () => {
   render(<Harness />);
-  const boxes = Array.from(document.querySelectorAll("input"));
+  const boxes = Array.from(document.querySelectorAll("#checks-a input"));
   fireEvent.click(boxes[0]);
   expect(boxes.map((b) => b.closest("li")?.classList.contains(styles.done))).toEqual([true, false]);
   fireEvent.click(boxes[1]);
   expect(boxes.map((b) => b.closest("li")?.classList.contains(styles.done))).toEqual([true, true]);
   fireEvent.click(boxes[0]);
   expect(boxes.map((b) => b.closest("li")?.classList.contains(styles.done))).toEqual([false, true]);
+});
+
+it("各リストのカウンター・バー・完了クラスが互いに独立する", () => {
+  render(<Harness />);
+  const a = Array.from(document.querySelectorAll<HTMLInputElement>("#checks-a input"));
+  const b = document.querySelector<HTMLInputElement>("#checks-b input") as HTMLInputElement;
+  const state = () =>
+    ["chkCount", "chkTotal", "chkBar", "bCount", "bTotal", "bBar"].map((id) => {
+      const e = document.getElementById(id) as HTMLElement;
+      return id.endsWith("Bar") ? e.style.width : e.textContent;
+    });
+  expect(state()).toEqual(["0", "2", "0%", "0", "1", "0%"]);
+  fireEvent.click(a[0]);
+  expect(state()).toEqual(["1", "2", "50%", "0", "1", "0%"]);
+  fireEvent.click(b);
+  expect(state()).toEqual(["1", "2", "50%", "1", "1", "100%"]);
+  expect(b.closest("li")?.classList.contains(styles.done)).toBe(true);
+  fireEvent.click(a[1]);
+  fireEvent.click(b);
+  expect(state()).toEqual(["2", "2", "100%", "0", "1", "0%"]);
+  expect(b.closest("li")?.classList.contains(styles.done)).toBe(false);
+});
+it("unmount後は全リストのchangeリスナーを解除する", () => {
+  const { unmount } = render(<Harness />);
+  const boxes = Array.from(document.querySelectorAll("input"));
+  const counts = ["chkCount", "bCount"].map((id) => document.getElementById(id) as HTMLElement);
+  const bars = ["chkBar", "bBar"].map((id) => document.getElementById(id) as HTMLElement);
+  unmount();
+  for (const box of boxes) fireEvent.click(box);
+  expect(counts.map((e) => e.textContent)).toEqual(["0", "0"]);
+  expect(bars.map((e) => e.style.width)).toEqual(["0%", "0%"]);
+  expect(boxes.map((b) => b.closest("li")?.classList.contains(styles.done))).toEqual([
+    false,
+    false,
+    false,
+  ]);
 });

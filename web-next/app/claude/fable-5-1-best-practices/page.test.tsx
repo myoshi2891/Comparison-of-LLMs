@@ -186,30 +186,50 @@ it("原本の外部stylesheetを全件保持", () => {
     ])
   ).toEqual(expected.stylesheets);
 });
-it("18チェック全文・label構造と完了カウンター・取消線クラスを同期", () => {
+// ユーザー承認（2026-11-09）: 原本スクリプトのUL単位の8・5・5集計に訂正。
+it("18チェック全文・3リスト別の進捗・完了クラスを原本どおり同期", () => {
   const { container } = render(<Page />);
   const labels = Array.from(container.querySelectorAll(`li.${styles.chk} label`));
   expect(labels.map(text)).toEqual(expected["li.chk label"]);
   const boxes = labels.map((l) => l.querySelector("input") as HTMLInputElement);
   expect(boxes.map((b) => [b.type, b.checked])).toEqual(Array(18).fill(["checkbox", false]));
-  expect(container.querySelector('[data-testid="check-progress"]')?.textContent).toBe(
-    "0 / 18 完了"
-  );
-  boxes.forEach((b) => {
-    fireEvent.click(b);
-  });
-  expect(container.querySelector('[data-testid="check-progress"]')?.textContent).toBe(
-    "18 / 18 完了"
-  );
+  const groups = Array.from(container.querySelectorAll(`ul.${styles.checklist}`));
+  expect(groups.map((g) => g.querySelectorAll("input").length)).toEqual([8, 5, 5]);
+  const counts = () =>
+    Array.from(container.querySelectorAll('[data-testid="check-progress"]')).map(
+      (e) => e.textContent
+    );
+  expect(counts()).toEqual(["0 / 8 完了", "0 / 5 完了", "0 / 5 完了"]);
+  for (const b of boxes.slice(0, 8)) fireEvent.click(b);
+  expect(counts()).toEqual(["8 / 8 完了", "0 / 5 完了", "0 / 5 完了"]);
+  fireEvent.click(boxes[8]);
+  expect(counts()).toEqual(["8 / 8 完了", "1 / 5 完了", "0 / 5 完了"]);
+  fireEvent.click(boxes[13]);
+  expect(counts()).toEqual(["8 / 8 完了", "1 / 5 完了", "1 / 5 完了"]);
+  for (const b of boxes.slice(9, 13).concat(boxes.slice(14))) fireEvent.click(b);
+  expect(counts()).toEqual(["8 / 8 完了", "5 / 5 完了", "5 / 5 完了"]);
   expect(boxes.map((b) => b.closest("li")?.classList.contains(styles.done))).toEqual(
     Array(18).fill(true)
   );
-  boxes.forEach((b) => {
-    fireEvent.click(b);
-  });
-  expect(container.querySelector('[data-testid="check-progress"]')?.textContent).toBe(
-    "0 / 18 完了"
+  for (const b of boxes) fireEvent.click(b);
+  expect(counts()).toEqual(["0 / 8 完了", "0 / 5 完了", "0 / 5 完了"]);
+  expect(boxes.map((b) => b.closest("li")?.classList.contains(styles.done))).toEqual(
+    Array(18).fill(false)
   );
+});
+it("チェック進捗を含む全IDが一意で、各進捗表示は対象リストの直前に置かれる", () => {
+  const { container } = render(<Page />);
+  const ids = Array.from(container.querySelectorAll("[id]")).map((e) => e.id);
+  expect(ids).toEqual([...new Set(ids)]);
+  const groups = Array.from(container.querySelectorAll(`ul.${styles.checklist}`));
+  expect(groups.map((g) => g.previousElementSibling?.className)).toEqual(
+    Array(3).fill(styles.progress)
+  );
+  expect(
+    groups.map(
+      (g) => g.previousElementSibling?.querySelector('[data-testid="check-progress"]')?.textContent
+    )
+  ).toEqual(["0 / 8 完了", "0 / 5 完了", "0 / 5 完了"]);
 });
 it("metadataと全幅の外殻を保持", () => {
   expect(metadata.title).toBe(expected.h1[0]);
