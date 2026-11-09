@@ -10,13 +10,16 @@ AIモデルの時間別コスト計算機 + AI ツール導入ガイド群。Pyt
 
 ## アーキテクチャ
 
-Claude Fable 5.1 `/claude/fable-5-1-best-practices` の移行を実装中（2026-11-09）。
-本文・構造・60 CSS規則を原本固定で照合し、HTML監査exit 0、対象64契約・関連91件、
-型・lint621 files・Mermaid10図解析・pytest122件が成功。直前の全体は229 files／2653 tests成功。
-ただし原本の8・5・5項目のリスト別進捗を、全18項目一括としてテスト・実装した誤りが残る。
-期待値訂正のユーザー確認待ちでGreen未作成。実装3ファイルとregistryは未コミット。
-HTML／Markdownは02208430で内容無変更・100%リネーム保存。詳細と再開手順はdocs/PROGRESS.md。
-npm・ビルド未実行。目視はユーザー担当（localhost:3000）。
+Claude Fable 5.1 `/claude/fable-5-1-best-practices` を追加（2026-11-09）。
+指定HTMLの93見出し、48段落、56リスト項目、40表251行、12コード例、10図と18チェックをPure JSXへ転写。
+本文・構造・60 CSS規則・highlight.js11.9.0全トークンを原本固定の67契約で照合する。
+全体Vitest **229 files／2657 tests**、関連94件、型・lint621 files、HTML監査exit 0、Mermaid10図解析、pytest122件が成功。
+原本の264px目次と900pxモバイル開閉、点・番号・入れ子、全列左寄せ、コード空白を保持。
+チェック進捗の誤った一括集計契約はユーザー承認後に訂正し、原本の8・5・5項目のリスト別集計へ修正。
+全ID一意性・各進捗の独立・cleanupを検証。操作の行／関数100%、分岐89.87%。
+registryのClaudeカテゴリから全導線を導出し、日付はヒーロー内へ表示。本文の情報基準日2026-11-05を保持。
+HTML／Markdownは内容無変更・100%リネームで保存。両形式は後日更新内容が異なるため混在させない。
+npm・ビルド未実行、依存・設定・ロックは無変更。目視はユーザー担当（localhost:3000）。分離履歴はdocs/PROGRESS.md。
 
 Grok Bot ガイド `/xai/grok-bot-guide` を追加（2026-11-05）。
 指定HTMLの全77見出し（H1×1／H2×21／H3×55）、49段落、79リスト項目、30表205行、
@@ -576,7 +579,7 @@ Build:     cd web-next && bun run build
 以下を全て確認してからコミットすること：
 
 1. `cd web-next && bun run build` が成功（※Antigravityサンドボックス環境では実行禁止。他環境やCIでは必須）
-2. `cd web-next && bun run test` が完全に成功（227 files / 2588 tests pass、2026-11-05実測。`NODE_OPTIONS=--no-experimental-webstorage` と `--maxWorkers=1 --testTimeout=30000` を使用。収集失敗もブロッキング失敗として原因を調査する）
+2. `cd web-next && bun run test` が完全に成功（229 files / 2657 tests pass、2026-11-09実測。`NODE_OPTIONS=--no-experimental-webstorage` と `--maxWorkers=1 --testTimeout=30000` を使用。収集失敗もブロッキング失敗として原因を調査する）
 3. `cd web-next && bun run typecheck` が成功
 4. `cd web-next && bun run lint` が成功
 5. `cd scraper && uv run pytest` が成功

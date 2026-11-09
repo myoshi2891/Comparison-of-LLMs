@@ -6,16 +6,18 @@
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
 
-## Claude Fable 5.1 ガイド移行・操作契約の訂正確認待ち（2026-11-09）
+## Claude Fable 5.1 ガイド移行（2026-11-09）
 
-- 移行先: `/claude/fable-5-1-best-practices`。実装3ファイルとregistryの追加は作業ツリーに保持し、Greenコミットは未作成。指定HTMLを正本とし、本文の情報基準日2026-11-05を維持。
-- 全93見出し（H1×1／H2×17／H3×75）、48段落、56リスト項目、40表251行、12コード例、10図、18チェック項目と60 CSS規則を原本から固定。本文・順序・重複・リスト型・表セル・構文トークン・装飾クラスを照合する。
-- Red `c7cf3105`（未実装import失敗を確認）→ テストの言語クラス判定補正 `357a66e9` → 共有計算機の表スタイル漏れを防ぐ追加Red `bd76daa6`（position期待値の失敗を確認）。本文・構造・CSSの固定期待値は変更していない。
-- 検証済み: HTML原本監査exit 0、対象64契約とregistry／ナビを含む関連91件、typecheck、lint（621 files／0 diagnostics）、Mermaid10.9.8の全10図解析、pytest122件。直前の全体テストは229 files／2653 tests成功（追加した表保護1契約はその後の関連91件で確認）。操作カバレッジは行／関数100%、分岐93.67%。
-- **未解決**: 原本のスクリプトはチェックリスト3組をそれぞれ8・5・5項目で集計する。作成した操作テストと実装は全18項目の一括集計となっており、複数進捗表示のIDも重複する。`.claude/rules/tdd-mandatory-cycle.md` の「期待値の変更が必要だと考えた場合は、独断で変更せずユーザーに根拠を提示して確認を取ること」に従い、操作契約の訂正をユーザーへ確認中。回答前に当該訂正・依存する実装修正・Greenコミットへ進まない。
-- 次の作業: 訂正承認後、原本どおりのリスト別集計と一意なIDをRedから検証し、集計・表示・完了クラスとcleanupを修正。対象／全体テスト・型・lint・監査を再確認してGreen → Refactor → Docsを分離コミットする。目視はユーザー担当。
-- HTML／Markdownは原本保存 `02208430` によりarchive/html/Anthropic/／archive/md/Anthropic/へ100%リネーム。HTML SHA-256 `f4a38b1d4e54d46d6f7f0a61ff9961e8dff043e64e9d44150d9ed339a1cc59bd`、Markdown `74b4b23052b866f1599c50eec09677cbd709e5199ee83b3e443a88f5a1ca309d`（移動前後一致）。Markdownは独立目次・キャッシュ見出し、9 URL、11リスト項目、6コード例、27表行、13段落に差があり、本文を混在させていない。
-- CSSキャッシュ退避後に通常devを起動し、localhost:3000の移行ルートはHTTP 200。npm・ビルド・ブラウザ自動化は未実行。依存・設定・ロックは変更していない。作業ツリーは102ルート／registry102エントリ（実importで確認）。
+- ルート: `/claude/fable-5-1-best-practices`。指定HTMLを正本とし、本文の情報基準日2026-11-05を保持。registryは2026-11-09で既存Claudeカテゴリへ登録し、ナビ・検索・RSS・関連ページを導出。
+- 全93見出し（H1×1／H2×17／H3×75）、48段落、56リスト項目（13 ul／4 ol）、40表251行、12コード例、10図、18チェック項目と60 CSS規則をPure JSXへ転写。原本のURLはテキスト表示を維持し、リンク要素へ変えていない。
+- Redで固定したsource-contract.jsonにより全文・順序・重複・全装飾クラス・セクション境界・表セル型と結合・リスト型／開始番号／入れ子・CDN・highlight.js11.9.0全トークン・CSS宣言とmedia条件を照合。表構造直下の不正空白ノードは0件。
+- 原本CSSのhtmlスクロール規則、図解の配置／幅宣言、svg寸法とtooltip規則は共有実装へ委譲。原本60規則のうち、上記の委譲分を除く宣言は固定期待値で照合。点・番号・入れ子とチェックのマーカーなし、全列左寄せ、コード空白、アンカー余白を保持。共有計算機の表スタイル（等幅書体・nowrap・stickyヘッダー・文字間隔）が漏れないよう追加Redからページ内へ補正。
+- 264px固定目次と900px以下のモバイル開閉を保持。目次追従・最下部・目次内スクロール・トグル／背景／Escape／リンク・resize・inert・Tab循環・フォーカス復帰・cleanupを検証。共有ヘッダー／免責バナーの実測高で余白を一度だけ確保し、日付をregistryからヒーロー内へ表示。共通body・鮮度バー・関連ページの補正は本ページへ限定。
+- **操作契約の訂正（ユーザー承認済み）**: 当初作成したテストと実装は誤って全18項目を一括集計していた。2026-11-09の明示承認後、原本スクリプトどおり8・5・5項目の3リスト別集計へ訂正。追加Red `8bd6f832`で5件の失敗を確認し、リスト別のカウンター・バー・完了クラス・全ID一意性・全changeリスナーの解除を検証して修正。本文・構造・CSSの固定期待値は変更していない。
+- 検証: 対象67契約、registry／ナビを含む関連94件、全体Vitest **229 files／2657 tests**、typecheck、lint **621 files／0 diagnostics**、HTML原本監査exit 0、Mermaid10.9.8で全10図解析、pytest **122件**が成功。操作の行／関数100%、分岐89.87%、文99.16%。
+- 原本保存: `02208430`でHTML／Markdownをarchive/html/Anthropic/／archive/md/Anthropic/へ内容無変更・100%リネーム。HTML SHA-256 `f4a38b1d4e54d46d6f7f0a61ff9961e8dff043e64e9d44150d9ed339a1cc59bd`、Markdown `74b4b23052b866f1599c50eec09677cbd709e5199ee83b3e443a88f5a1ca309d`（移動前後一致）。Markdown監査はexit 1で、独立目次・キャッシュ見出し、9 URL、11リスト項目、6コード例、27表行、13段落に差がある。後日更新されたMarkdownのFoundry・保持条件・キャッシュ・ツール運用等の追記をHTMLの内容と混在させていない。
+- 分離履歴: 初回Red `c7cf3105` → 言語クラス判定補正 `357a66e9` → 表保護Red `bd76daa6` → 原本保存 `02208430` → 確認待ち記録 `fbaa89af` → 承認済み操作契約Red `8bd6f832` → Green `89197131` → Refactor `351b9af8`。
+- CSSキャッシュ退避後、通常devの `http://localhost:3000/claude/fable-5-1-best-practices` でHTTP 200。訂正後の配信HTMLで3組の初期進捗と全112 IDの一意性を確認。目視はユーザー担当。npm・ビルド・ブラウザ自動化は未実行。依存・設定・ロックは無変更。
 
 ## 再レビュー: Ultra・地域制限・既存修正の確認（2026-11-09）
 
@@ -206,17 +208,16 @@
 
 - **フェーズ**: 保守・機能改善・品質強化フェーズ
 - **ブランチ**: `dev`
-- **今回の最新作業 HEAD**: `02208430`（Fable 5.1の原本保存。実装は未コミット、Green未作成）。
-- **前回の最新実装 HEAD**: `57dd9d24`（Grok Botガイド。Red `35b8bf87`／追加Red `3d9c9acb`／`b5b98436`、上記分離履歴を参照）。
-- **次の作業**: Claude Fable 5.1移行の操作契約の訂正確認待ち。承認後、原本の8・5・5項目のリスト別集計を実装・検証し、Green → Refactor → Docsを完了する。上記同名節を参照。
-- **ルート実数**: 作業ツリーは`page.tsx` 102 件、registry 102 エントリ（2026-11-09実測）。Fable 5.1実装とregistryは未コミット。
+- **最新実装 HEAD**: `351b9af8`（Claude Fable 5.1ガイド。Green `89197131`、分離履歴は冒頭の同名節を参照）。
+- **次の作業**: `/claude/fable-5-1-best-practices` の目視確認（ユーザー担当、localhost:3000）。264px目次・900pxモバイル開閉・17章・点と番号・40表・12コード例・10図・3組のチェック進捗を確認。npm・ビルドは未実行。
+- **ルート実数**: `page.tsx` 102件、registry 102エントリ（2026-11-09実測）。
 - **動作検証**:
   - ビルド: 今回はユーザー指定で未実行。過去の成功記録は 2026-09-17 の 90 静的ページであり、今回の変更を検証した値ではない。
   - `bun run typecheck` ✅（`tsc --noEmit`。2026-11-09 実測）
   - `bun run lint` ✅（Biome check / 621 files / 0 diagnostics。2026-11-09 実測）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000` でVitest **229 files / 2653 testsすべて合格**（2026-11-09実測）。追加の表保護1契約は関連91件で成功。Fable 5.1の操作契約には冒頭記載の誤りが残り、完了判定は保留。
-    - 過去のClaudeモデルガイド初回全体検証では2239件中registryの日付不変条件1件が失敗し、専用Red／Greenで修正済み。今回の全体2588件はすべて成功。Grok Bot移行の範囲では依存・設定・ロックを変更していないが、移行後の `b99b83dc` で `web-next/package.json` の devDependencies へ `postcss` を追加し、`web-next/bun.lock` も変更した（承認は未確認。本書の「postcss の devDependencies 追加」節を参照）。
+  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000` でVitest **229 files / 2657 testsすべて合格**（2026-11-09実測）。Fable 5.1の対象67契約・関連94件、typecheck・lint（621 files／0 diagnostics）も成功。
+    - 過去のClaudeモデルガイド初回全体検証では2239件中registryの日付不変条件1件が失敗し、専用Red／Greenで修正済み。2026-11-05の全体2588件はすべて成功。Grok Bot移行の範囲では依存・設定・ロックを変更していないが、移行後の `b99b83dc` で `web-next/package.json` の devDependencies へ `postcss` を追加し、`web-next/bun.lock` も変更した（承認は未確認。本書の「postcss の devDependencies 追加」節を参照）。
     - `load(sourceHtml)` をモジュール初期化時に呼ぶ `governance/ai-governance/GuideContent.tsx` と
       `local-llm/finetuning-best-practices/GuideContent.tsx` は、import スモークでも読み込み可能であることを確認済み
   - **バックエンド (`scraper/`)**: `uv run pytest` で122件成功（2026-11-09実測、UV_CACHE_DIRを一時領域へ指定）。
@@ -676,17 +677,17 @@
 
 ```text
 AGENTS.md → CODEX.md → CLAUDE.md → docs/PROGRESS.md → Phase A–F計画の順で読む。
-今回の最新作業HEAD: 02208430（原本保存）。実装は未コミット、Green未作成。
-Claude Fable 5.1のRed: c7cf3105／357a66e9／bd76daa6。
-次の作業: 操作契約を全18項目一括から原本の8・5・5項目のリスト別集計へ訂正する確認の回答を取得する。
-未回答なら当該訂正・依存する実装修正を進めない。承認後は重複IDも防ぐRedを追加し、集計・表示を修正する。
-固定した本文・構造・CSSの期待値は無変更。詳細は本書冒頭のFable 5.1節を参照。
-対象64契約、関連91件、HTML監査exit 0、型・lint621 files、Mermaid10図解析、pytest122件が成功。
-直前の全体テストは229 files／2653 tests成功。追加の表保護1契約は関連91件で確認済み。
-訂正後に対象／全体テスト・型・lint・監査とカバレッジを再確認し、Green → Refactor → Docsを分離コミットする。
-HTML／Markdownはarchive/html/Anthropic/／archive/md/Anthropic/に内容無変更で保存。
-指定HTMLが正本。Markdownの後日更新内容とは混在させない。
-作業ツリーのルートとregistryは102件ずつ。実装3ファイルとregistryの変更を保持する。
+最新実装HEAD: 351b9af8（Claude Fable 5.1。Green 89197131、分離履歴は冒頭の同名節を参照）。
+次の作業: /claude/fable-5-1-best-practices の目視確認（ユーザー担当）。
+http://localhost:3000/claude/fable-5-1-best-practices
+264px目次・900pxモバイル開閉・17章・点と番号・40表251行・12コード例・10図・3組のチェック進捗を確認。
+指定HTMLを正本とし、情報基準日2026-11-05を保持。HTML／Markdownはarchive/html/Anthropic/／archive/md/Anthropic/に内容無変更で保存。
+Markdownの後日追記との相違は本書同名節を参照。本文は混在させない。
+チェック進捗の契約訂正はユーザー承認済み。原本の8・5・5項目のリスト別集計へ修正済み。
+固定した本文・構造・CSSの期待値は無変更。全ID一意性・グループ独立・cleanupも検証する。
+HTML監査exit 0、対象67契約・関連94件、全229 files／2657 tests、型・lint621 files、Mermaid10図解析、pytest122件が成功。
+操作の行／関数100%、分岐89.87%。ルートとregistryは102件ずつ。
 NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000 を使用。
-npm・ビルドは禁止。目視はユーザー担当。通常devのlocalhost:3000で移行ルートHTTP 200を確認済み。
+npm・ビルドは禁止。Red → Green → Refactor → Docsの分離コミットを守る。
+CSSキャッシュ退避後の通常devでHTTP 200と配信HTMLの初期進捗・ID一意性を確認済み。目視はユーザー担当。
 ```
