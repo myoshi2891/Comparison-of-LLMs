@@ -847,17 +847,26 @@ Fable 5.1 には安全分類器があり、リクエストが拒否されると 
 
 `pause_turn` の再送回数を呼び出し全体で数え、事前に有限の上限を決めます。以下は最大3回の例です(本ガイドの推奨)。上限に達した後は再送せず、得られた応答を未完了として呼び出し元へ返します。
 
+`stop_reason: "compaction"` は圧縮後の継続が必要です。`stop_reason` だけでなく、応答内の `compaction` ブロックを先に確認します。要約があれば、そのブロックを含む `response.content` 全体を assistant メッセージとして履歴に追加し、その履歴から再開します。要約が拒否された場合は `stop_reason: "refusal"`、`compaction.content: null` となるため、`stop_details` を記録し、元の履歴を保持します。以下の例では、要約がない場合は履歴を置換せず、未完了として返します(この停止方針は本ガイドの推奨)。[公式の圧縮後の継続・要約拒否](https://platform.claude.com/docs/en/build-with-claude/compaction-threshold#pause-after-compaction)
+
 ```mermaid
 flowchart TD
     S["呼び出し前に設定: サーバー側 fallback か SDK ミドルウェアのどちらか一方 (併用しない)。pause_turn の再送回数を 0 に初期化"] --> A["リクエスト送信: 設定した fallback は同じ呼び出しの中で試行される"]
     A --> B{"最終応答の stop_reason は何か"}
+    B -- "compaction" --> CS{"compaction ブロックがあり、content が null でないか"}
+    CS -- "はい" --> CH["compaction ブロックを含む response.content 全体を assistant として履歴に追加し、その履歴から再開"]
+    CH --> A
+    CS -- "いいえ" --> CN["要約なし・ブロック欠落: 元の履歴を保持。stop_reason が refusal なら要約拒否として stop_details を記録。要約で履歴を置換しない"]
+    CN --> IN
     B -- "end_turn / stop_sequence / tool_use" --> OK["通常処理 (fallback 先が応答した場合を含む)"]
     B -- "max_tokens / model_context_window_exceeded" --> IN["未完了として呼び出し元へ返す: 完了した応答として扱わない"]
     B -- "pause_turn" --> PC{"pause_turn の再送回数は 3 未満か"}
     PC -- "いいえ: 上限に到達" --> IN
     PC -- "はい: 再送回数を 1 増やす" --> PT["継続が必要: 応答をそのまま返送して再送し、残りの応答を得る。応答に container があれば response.container.id も渡し、同じコンテナを再利用する"]
     PT --> A
-    B -- "refusal" --> C["stop_details.category を確認"]
+    B -- "refusal" --> CB{"応答に compaction ブロックがあるか"}
+    CB -- "はい" --> CS
+    CB -- "いいえ" --> C["stop_details.category を確認"]
     C --> N{"category は null か"}
     N -- "はい" --> U["汎用処理: 記録し、別モデルへの再試行かプロンプトの見直しを判断"]
     N -- "いいえ" --> D{"誤検知の可能性が高いか"}
@@ -923,7 +932,7 @@ flowchart TD
 | 指標 | 理由 |
 | --- | --- |
 | タスク成功率 | 品質の基準 |
-| 総コスト(通常入力+キャッシュ読み取り+キャッシュ書き込み+出力+compaction+サーバーツールの利用料) | 単価が高いので必須。区分ごとの単価で計算する。thinking は出力に含まれるので別に足さない。fallback を使う場合は、`usage.iterations` の `message` / `fallback_message` のうち**課金対象の試行だけ**に、その試行のモデルの単価を掛けて合算する。compaction を使う場合は、トップレベルの `usage` に含まれない `type: "compaction"` の入力・出力を別に集計し、その費用も加える。`compaction` エントリには `model` フィールドがないため、iteration の `model` から単価を推定せず、リクエスト設定・利用プラットフォームの公式仕様と料金表で適用モデルと課金基準を確認する。トップレベルのトークン数と対応する iteration を二重に加算しない。[公式の compaction 使用量](https://platform.claude.com/docs/en/build-with-claude/compaction-threshold#understanding-usage)を参照。出力前に拒否された試行(`output_tokens` が 0 のエントリ。通常は `message` で、チェーン全体が拒否した場合は末尾の `fallback_message` も含む)は、カテゴリが `bio` / `frontier_llm` / `reasoning_extraction` のときだけ課金され、`cyber` / `general_harms` / `null` は課金されないのに、トークン数は記録される。エントリにカテゴリはないので、`fallback` ブロックの `trigger.category`(チェーン全体が拒否した場合は `stop_details.category`)と照合する。ただし、`output_tokens` が 0 というだけでは拒否と判定しない。`max_tokens: 0` でキャッシュを事前に書き込むリクエストでも、最後の試行の `output_tokens` は 0 になる。途中の試行は `fallback` ブロックの `trigger` で、最後の試行はトップレベルの `stop_reason` で区別する。`refusal` なら拒否として扱い、`max_tokens` なら拒否ではないので、通常のリクエストと同じく、その試行の入力・キャッシュ読み取り・キャッシュ書き込みを課金対象に含める(`cache_creation_input_tokens` があれば書き込み料金がかかり、出力は 0)。出力後の拒否は課金対象。課金カテゴリは変わることがあるので、[公式のカテゴリ表](https://platform.claude.com/docs/en/build-with-claude/refusals-and-fallback#refusal-response)を確認する。サーバーツールの利用料は、トークン料金とは別に足す。Web search は1,000回あたり $10 で、回数は `usage.server_tool_use.web_search_requests` で確認する(エラーになった検索は課金されない)。ただしトップレベルの `usage` は、返されたメッセージを生成した試行だけを表すので、この回数に以前の試行の検索は含まれない。`usage.iterations` の各エントリにも検索回数のフィールドはない(メッセージ試行は `type` / `model` とトークン数、compaction は `model` なし。2026-11-09 に公式の compaction 使用量例と照合)ため、エントリを合算して求めることはできない。fallback が走ったリクエストでは、トップレベルの回数を下限として扱い、課金対象の試行を含む検索回数は請求・使用量のレポートで照合する。Web fetch に追加料金はなく、取得内容のトークン料金だけがかかる。コード実行は `web_search_20260209` / `web_fetch_20260209` 以降と併用すると追加料金がなく、併用しない場合は組織ごとに月1,550時間の無料枠を超えた分が、コンテナ1時間あたり $0.05 で課金される(実行時間の最小は5分)。fallback の再試行でサーバーツールが再実行されると、再度課金される。単価は[公式の料金表](https://platform.claude.com/docs/en/about-claude/pricing)を確認する |
+| 総コスト(通常入力+キャッシュ読み取り+キャッシュ書き込み+出力+advisor+compaction+サーバーツールの利用料) | 単価が高いので必須。区分ごとの単価で計算する。thinking は出力に含まれるので別に足さない。fallback を使う場合は、`usage.iterations` の `message` / `fallback_message` のうち**課金対象の試行だけ**に、その試行のモデルの単価を掛けて合算する。`usage.iterations` の `type: "advisor_message"` もトップレベルの `usage` に含まれないため、既存の実行モデルの使用量とは別枠で集計する。各エントリの入力・キャッシュ読み取り・キャッシュ書き込み・出力トークンに、その `model` が示す advisor モデルの適用単価を掛け、advisor 費用を総コストへ一度だけ加える。iteration 全件からすでに計算した advisor 費用を再加算しない([公式の advisor 使用量](https://platform.claude.com/docs/en/agents-and-tools/tool-use/advisor-tool#usage-and-billing))。compaction を使う場合は、トップレベルの `usage` に含まれない `type: "compaction"` の入力・出力を別に集計し、その費用も加える。`compaction` エントリには `model` フィールドがないため、iteration の `model` から単価を推定せず、リクエスト設定・利用プラットフォームの公式仕様と料金表で適用モデルと課金基準を確認する。トップレベルのトークン数と対応する iteration を二重に加算しない。[公式の compaction 使用量](https://platform.claude.com/docs/en/build-with-claude/compaction-threshold#understanding-usage)を参照。出力前に拒否された試行(`output_tokens` が 0 のエントリ。通常は `message` で、チェーン全体が拒否した場合は末尾の `fallback_message` も含む)は、カテゴリが `bio` / `frontier_llm` / `reasoning_extraction` のときだけ課金され、`cyber` / `general_harms` / `null` は課金されないのに、トークン数は記録される。エントリにカテゴリはないので、`fallback` ブロックの `trigger.category`(チェーン全体が拒否した場合は `stop_details.category`)と照合する。ただし、`output_tokens` が 0 というだけでは拒否と判定しない。`max_tokens: 0` でキャッシュを事前に書き込むリクエストでも、最後の試行の `output_tokens` は 0 になる。途中の試行は `fallback` ブロックの `trigger` で、最後の試行はトップレベルの `stop_reason` で区別する。`refusal` なら拒否として扱い、`max_tokens` なら拒否ではないので、通常のリクエストと同じく、その試行の入力・キャッシュ読み取り・キャッシュ書き込みを課金対象に含める(`cache_creation_input_tokens` があれば書き込み料金がかかり、出力は 0)。出力後の拒否は課金対象。課金カテゴリは変わることがあるので、[公式のカテゴリ表](https://platform.claude.com/docs/en/build-with-claude/refusals-and-fallback#refusal-response)を確認する。サーバーツールの利用料は、トークン料金とは別に足す。Web search は1,000回あたり $10 で、回数は `usage.server_tool_use.web_search_requests` で確認する(エラーになった検索は課金されない)。ただしトップレベルの `usage` は、返されたメッセージを生成した試行だけを表すので、この回数に以前の試行の検索は含まれない。`usage.iterations` の各エントリにも検索回数のフィールドはない(メッセージ試行は `type` / `model` とトークン数、compaction は `model` なし。2026-11-09 に公式の compaction 使用量例と照合)ため、エントリを合算して求めることはできない。fallback が走ったリクエストでは、トップレベルの回数を下限として扱い、課金対象の試行を含む検索回数は請求・使用量のレポートで照合する。Web fetch に追加料金はなく、取得内容のトークン料金だけがかかる。コード実行は `web_search_20260209` / `web_fetch_20260209` 以降と併用すると追加料金がなく、併用しない場合は組織ごとに月1,550時間の無料枠を超えた分が、コンテナ1時間あたり $0.05 で課金される(実行時間の最小は5分)。fallback の再試行でサーバーツールが再実行されると、再度課金される。単価は[公式の料金表](https://platform.claude.com/docs/en/about-claude/pricing)を確認する |
 | 所要時間・ターン数 | `xhigh` / `max` で急増する |
 | スコープ逸脱の件数 | Fable の主体性の副作用 |
 | 途中停止・許可待ちの件数 | 自律実行の指示の効きを測る |
@@ -973,7 +982,7 @@ flowchart TD
 - 守る制約: {変更禁止範囲、互換性、期限}
 
 # 進め方
-- 終了前に最後の段落を点検する。計画、質問、次の手順の列挙、未実施の約束であれば、今すぐ実行する
+- 終了前に最後の段落を点検する。ユーザーが実行を依頼した作業について、計画、質問、次の手順の列挙、未実施の約束で終わっていれば、その依頼範囲の作業を今すぐ実行する。ただし質問のみ・レビューのみの依頼では、分析やフィードバックを報告して終了し、提案した変更を承認なく適用しない
 - 一部が詰まったら、残りを完成させ、何を・なぜ残したかを明記する
 - 依頼にない修正や拡張は行わず、フォローアップとして報告する
 - 破壊的な操作(削除、再起動、設定変更)と「確認が必須の操作」は、支持する証拠があっても、明示的な承認なしに実行しない。承認を得られない場合は実行せず、止まって報告する
