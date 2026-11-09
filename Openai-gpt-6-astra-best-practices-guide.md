@@ -157,6 +157,8 @@ Astra で**ツールを使う場合は Responses API が前提**です。Chat Co
 
 接続を長時間保持しない場合は、同じ `responses.create` に `background=True` を指定し、返された `resp.id` をすぐ保存します。`queued` / `in_progress` の間は間隔と最大待機時間を決めて `resp = client.responses.retrieve(resp.id)` でポーリングし、終了後は下の失敗・未完了・完了判定へ進みます。取得の失敗や待機上限では新しい生成を作り直さず、保存した ID で状態を確認します。待機を打ち切るだけではジョブは止まらないため、不要なら `client.responses.cancel(resp.id)` でキャンセルします。[公式のバックグラウンド実行](https://developers.openai.com/api/docs/guides/background)
 
+**保存要件の例外**: バックグラウンド応答はポーリングのため約10分間ディスクへ一時保存されます。ZDR のプロジェクトや `store=False` のリクエストでもこの一時保存は発生するため、一時的なディスク保存も禁止する要件では `background=True` を使わないでください。Modified Abuse Monitoring(拡張版を含む)では、バックグラウンド実行で `store` を省略または `False` にすると、この一時保持期間の後に応答が削除されます。期限前に結果を自前で保存するか、保持要件が許す場合だけ `store=True` を明示して通常の保持期間を使います。ZDR では `store=True` を指定しても `False` として扱われます。[公式のバックグラウンド保存条件](https://developers.openai.com/api/docs/guides/background)、[データ保持](https://developers.openai.com/api/docs/guides/your-data)
+
 ```python
 from openai import OpenAI
 
@@ -558,7 +560,7 @@ sequenceDiagram
 
 - アプリが**実行する関数・カスタムツール**が対象。ホスト型の組み込みツールや PTC には使わない
 - 元の応答は、ジョブの完了を待たずに終わることがある。アプリが実行中のジョブを管理し、完了したら新しい Responses リクエストで結果を送る。ジョブは並列に実行してよいが、同じ会話へ結果を返す継続リクエストは直列にする。各応答の完了を待ち、その応答 ID を次のリクエストの `previous_response_id` に指定し、元の `instructions` とツール設定もリクエストに含める
-- ZDR または `store: false` では応答がサーバーに保存されないため、`previous_response_id` だけでは継続できない。ジョブが完了したら、新しい Responses リクエストの `input` に会話履歴全体を入れて送る。`store` はリクエスト単位の設定なので、履歴全体を再送する継続リクエストを含め、新しい Responses リクエストごとに `store: false` を指定する。履歴には過去の入力、暗号化された推論アイテムと元の `function_call` を含むすべての出力アイテム、元の `call_id` の `function_call_output` を含める。カスタムツールでは、元の `custom_tool_call` と、同じ `call_id` の `custom_tool_call_output`(`function_call_output` とは別の型)を含める。`instructions` とツール設定も指定する。`previous_response_id` は省略する。WebSocket モードでは応答が接続ローカルのキャッシュに残る間だけ参照できるが、切断や 60 分の接続上限で失われる(`previous_response_not_found`)ので、長時間のジョブはこの再送を前提に設計する
+- ZDR または `store: false` では通常のサーバー側の応答保存を利用できないため、長時間ジョブの継続を `previous_response_id` だけに依存しない。ただし `background=True` の応答は例外として約10分間ディスクへ一時保存される。一時保存も禁止する要件ではバックグラウンド実行を使わない(第3.1節)。ジョブが完了したら、新しい Responses リクエストの `input` に会話履歴全体を入れて送る。`store` はリクエスト単位の設定なので、履歴全体を再送する継続リクエストを含め、新しい Responses リクエストごとに `store: false` を指定する。履歴には過去の入力、暗号化された推論アイテムと元の `function_call` を含むすべての出力アイテム、元の `call_id` の `function_call_output` を含める。カスタムツールでは、元の `custom_tool_call` と、同じ `call_id` の `custom_tool_call_output`(`function_call_output` とは別の型)を含める。`instructions` とツール設定も指定する。`previous_response_id` は省略する。WebSocket モードでは応答が接続ローカルのキャッシュに残る間だけ参照できるが、切断や 60 分の接続上限で失われる(`previous_response_not_found`)ので、長時間のジョブはこの再送を前提に設計する
 - 結果は**元の `call_id`** で返す。待機専用の関数を使う場合は、同じリクエストの `input` に、新たに完了した結果を元の `call_id` で先に入れ、続けて待機呼び出しの状態をその `call_id` で入れる
 - 複数の非同期呼び出しを発行し、**必要になった結果だけ待つ**「待機ツール」パターンは、開発者が自分で定義する関数として実装する(公式ガイドに手順あり)。`wait_for_tasks` のような待機ツールは組み込みではなく、`async` を付けない通常の関数にする。`run_slow_report` などの非同期ツールには `task_handle` 引数を追加し、モデルが呼び出しごとに一意の値を付けて、待機ツールへ渡せるようにする。値は完了済みのタスクを含めて、会話全体で重複させない。アプリは `task_handle` を元の `call_id` と実行中のジョブに対応付けて記録し、この対応表を会話が終わるまで保持する。待機呼び出しを処理するときは、指定された `task_handle` のジョブだけを待ち、結果は元の `call_id` で返す。待機ツール自体には状態だけを返す
 - マルチエージェントモードでは、非同期ツールと並列ツール呼び出しを併用しない
@@ -572,11 +574,13 @@ sequenceDiagram
 ```mermaid
 flowchart TB
   A["response.create で作業を開始"] --> B["response.created を受信"]
-  B --> C["同じ接続で response.steer イベントを送信<br/>(response.create ではない)<br/>input に操縦入力、<br/>previous_response_id にその応答 ID を指定"]
+  B --> C["送信開始時に120秒の期限を設定し<br/>同じ接続で response.steer イベントを送信<br/>(response.create ではない)<br/>input に操縦入力、<br/>previous_response_id にその応答 ID を指定"]
+  C -- "送信エラー・接続切断・期限切れ" --> R
   C --> S{"操縦入力の結果"}
+  S -- "error / response.failed<br/>接続切断 / 期限切れ" --> R
   S -- "response.steer.accepted" --> T["キューに入っただけで適用は未確定<br/>開始済みのツールは<br/>自動ではキャンセルされない"]
   S -- "response.steer.failed" --> F["適用されず、後から自動でも適用されない<br/>steer.id と error を記録し<br/>自動で再送せず、アプリ側で対応を決める"]
-  T --> P{"次のイベントを待つ<br/>(accepted から最大120秒。<br/>直後に pending が未着でも判断しない)"}
+  T --> P{"送信開始から120秒の残り時間で<br/>次のイベントを待つ<br/>(直後に pending が未着でも判断しない)"}
   P -- "元の応答の response.incomplete<br/>reason: steered は通常の操縦遷移" --> P
   P -- "継続応答の response.created" --> D["API が作る継続応答を<br/>response.created の ID で追跡し<br/>response.completed を待つ"]
   P -- "response.steer.failed<br/>(同じ steer.id)" --> F
@@ -600,7 +604,7 @@ flowchart TB
 >
 > `response.created` やテキストのdeltaは完了を意味しません。`D` では追跡中の継続応答IDと一致する `response.completed` まで待ち、継続応答の `response.incomplete` は部分的な結果として復旧へ回します。一方、**元の応答ID**の `response.incomplete` で `incomplete_details.reason: "steered"` の場合は通常の操縦遷移なので、失敗扱いせず継続応答を待ちます。**公式**
 >
-> `P` でも `response.failed`、`error`、元の応答の `reason: "steered"` 以外の `response.incomplete`、接続切断は `R` の復旧へ回します。待機全体には `response.steer.accepted` から最大120秒という期限を設けます(本ガイドの例。タスクに合わせて調整)。途中のイベントで期限を延長せず、`P` から `W` / `D` へ進んだ後も残り時間だけ待ち、期限切れ・接続切断では `R` へ進みます。[公式の操縦イベント・期限付き待機の例](https://developers.openai.com/api/docs/guides/steering)
+> `P` でも `response.failed`、`error`、元の応答の `reason: "steered"` 以外の `response.incomplete`、接続切断は `R` の復旧へ回します。期限は **`response.steer` の送信開始時**から最大120秒とし、送信処理と受理待ちも含めます(本ガイドの例。タスクに合わせて調整)。`response.steer.accepted` の前に送信エラー・`error`・`response.failed`・接続切断・期限切れが起きても `R` へ進みます。受理や途中のイベントで期限を延長せず、`P` から `W` / `D` へ進んだ後も残り時間だけ待ち、期限切れ・接続切断では `R` へ進みます。[公式の操縦イベント・期限付き待機の例](https://developers.openai.com/api/docs/guides/steering)
 >
 > `W` の `response.create` は、`response.created` の前に `error` を返すことがあり、作成後に `response.failed` で終わることもあります。どちらも待機を打ち切り、エラーと応答状態を処理します。**公式** 復旧時は、応答履歴と `steer.id` ごとの入力・ツール結果の送信記録を照合し、未反映の入力だけを再送候補にします。接続切れや `previous_response_not_found` などで継続できない場合は、必要な全履歴を復元して `previous_response_id` を省略した新しい応答を作成し、元の `instructions`・ツール設定も指定します。操縦入力やツール実行を無条件に再送・再実行しないことは本ガイドの推奨です。[公式の WebSocket エラー・復旧](https://developers.openai.com/api/docs/guides/websocket-mode)、[操縦のイベント処理](https://developers.openai.com/api/docs/guides/steering)
 >

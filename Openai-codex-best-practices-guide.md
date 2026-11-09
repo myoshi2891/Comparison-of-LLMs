@@ -729,6 +729,8 @@ flowchart TB
 
 ### 10-2. 非対話実行
 
+GitHub Actions では、認証情報の保護を含む実行方法が用意された [Codex GitHub Action](https://learn.chatgpt.com/docs/github-action)を推奨します。他の CI で `codex exec` を使う場合は、API キーや認証トークンを必要なステップだけに渡し、ジョブ全体の環境変数や共有ファイルを通じてテスト・ビルドスクリプトへ露出させないでください。認証情報を使う処理とテスト・ビルドを分離し、各ステップに必要な資格情報だけを与えます。
+
 ```bash
 # CI などでの一発実行(モデル指定。codex exec の既定は読み取り専用なので、修正を保存するには書き込みを許可する)
 codex exec -m gpt-6.1-sol --sandbox workspace-write "失敗している統合テストの根本原因を調べて修正して"
@@ -745,6 +747,8 @@ codex exec -m gpt-6.1-sol --sandbox workspace-write \
   -c 'features.network_proxy.domains={ "api.integration.example.com" = "allow" }' \
   "失敗している統合テストの根本原因を調べて修正して"
 ```
+
+管理者が `experimental_network.managed_allowed_domains_only = true` を強制している場合、コマンドラインの `allow` 指定では、管理者の許可リストにない接続先を追加できません。実効ポリシーを確認し、テストの接続先が管理者の許可リストに含まれていなければ、管理者へ許可を依頼してください。[公式の管理者ネットワーク要件](https://learn.chatgpt.com/docs/enterprise/managed-configuration)
 
 ドメインの制限には **`network_proxy` の有効化も必要**です。`network_access = true` だけでは直接の外向き通信を広く許可し、コードや依存スクリプトによる秘密情報の流出・意図しない外部サービスへのアクセスを招きます。**ホスト名を許可しても、その名前がプライベート IP に解決される場合は接続できません**。ローカルのテストサーバーには `localhost`、プライベートネットワークの接続先には必要な IP アドレスそのものを完全一致で個別に許可し、同じ実行時の `domains` に追加します。利用するクライアントや版で対応できない場合は、必要な接続先だけに通信を制限した CI 環境で統合テストを実行してください。[公式のローカル・プライベート接続先](https://learn.chatgpt.com/docs/agent-approvals-security#local-and-private-destinations)
 
