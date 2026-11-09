@@ -247,6 +247,7 @@ import os
 import re
 import tempfile
 import time
+from google.genai import types
 
 
 def download_uri_video(interaction, path: str) -> None:
@@ -262,15 +263,26 @@ def download_uri_video(interaction, path: str) -> None:
 
     deadline = time.monotonic() + 600  # 待ち時間の上限(秒)
     while True:
-        info = client.files.get(name=file_name)
+        remaining_ms = int((deadline - time.monotonic()) * 1000)
+        if remaining_ms <= 0:
+            raise TimeoutError(f"Timed out waiting for {file_name}")
+        info = client.files.get(
+            name=file_name,
+            config=types.GetFileConfig(
+                http_options=types.HttpOptions(
+                    timeout=min(30_000, remaining_ms),  # ミリ秒。残り時間を超えない
+                    retry_options=types.HttpRetryOptions(attempts=1),
+                )
+            ),
+        )
+        if time.monotonic() >= deadline:
+            raise TimeoutError(f"Timed out waiting for {file_name}")
         if info.state.name == "ACTIVE":
             break
         # FAILED や STATE_UNSPECIFIED など、想定外の状態では待ち続けない
         if info.state.name != "PROCESSING":
             raise RuntimeError(f"Generation failed: state={info.state.name}")
-        if time.monotonic() >= deadline:
-            raise TimeoutError(f"Timed out waiting for {info.name}")
-        time.sleep(5)
+        time.sleep(min(5, max(0, deadline - time.monotonic())))
 
     # ハイフンを含む ID が切り詰められないよう、URI ではなく files/ 付きの ID を渡す
     # 中断しても既存ファイルが残るよう、同じディレクトリの一時ファイルへ保存してから置き換える
@@ -284,6 +296,8 @@ def download_uri_video(interaction, path: str) -> None:
 # 3.1 で delivery="uri" を指定して作成した interaction をそのまま渡す
 download_uri_video(interaction, "output.mp4")
 ```
+
+状態取得は1回あたり最大30秒かつ600秒の残り時間以内に制限し、SDK内部の再試行は無効にしています。待機間隔も残り時間に収めます。通信が停止した場合はHTTPタイムアウトの例外を呼び出し側へ返し、無期限に待ちません。アップロード後の状態取得(6.4節)も同じ方針です。[公式SDKのHTTP設定・再試行・GetFileConfig](https://github.com/googleapis/python-genai/blob/main/google/genai/types.py)
 
 公式の Python サンプルは `uri.split("/")[-1]` で ID を取り出していますが、公式の REST 例の URI は `:download?alt=media` で終わるため、この方法では末尾が ID に残ります。上の例では ID だけを取り出しています。また、公式の Python サンプルは `client.files.download` にも URI をそのまま渡しますが、SDK は `https://` で始まる URI から `[a-z0-9]+` に一致する部分だけを ID として取り出すため、ハイフンを含む ID は途中で切れます。`files/` 付きの ID を渡せば、ID はそのまま保たれます。
 
@@ -488,6 +502,7 @@ Files API でアップロードし、状態が `ACTIVE` になったことを確
 ```python
 import time
 from google import genai
+from google.genai import types
 
 client = genai.Client()
 
@@ -496,8 +511,21 @@ video_file = client.files.upload(file="Video.mp4")
 while video_file.state.name == "PROCESSING":
     if time.monotonic() >= deadline:
         raise TimeoutError(f"Timed out waiting for {video_file.name}")
-    time.sleep(10)
-    video_file = client.files.get(name=video_file.name)
+    time.sleep(min(10, max(0, deadline - time.monotonic())))
+    remaining_ms = int((deadline - time.monotonic()) * 1000)
+    if remaining_ms <= 0:
+        raise TimeoutError(f"Timed out waiting for {video_file.name}")
+    video_file = client.files.get(
+        name=video_file.name,
+        config=types.GetFileConfig(
+            http_options=types.HttpOptions(
+                timeout=min(30_000, remaining_ms),
+                retry_options=types.HttpRetryOptions(attempts=1),
+            )
+        ),
+    )
+    if time.monotonic() >= deadline:
+        raise TimeoutError(f"Timed out waiting for {video_file.name}")
 
 # FAILED や STATE_UNSPECIFIED では止め、ACTIVE のときだけ uri を渡す
 if video_file.state.name != "ACTIVE":
