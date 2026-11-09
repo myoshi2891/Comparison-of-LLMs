@@ -2,7 +2,7 @@
 
 > 本ファイルは Next.js 移行完了後の保守・改善フェーズにおける開発の進捗（特にテスト関連）および品質チェックのルールを記録する。
 >
-> - 最終更新日: **Updated 2026-11-06**
+> - 最終更新日: **Updated 2026-11-09**
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
 
@@ -17,7 +17,7 @@
 - 共通ヘッダー／免責バナーは実測高で一度だけ余白を確保。日付をregistryからヒーローへ表示し、共通鮮度バーを非表示化。共通bodyクラスと鮮度バーIDは:global()でCSS Modulesのハッシュ化を防ぎ、追加Redで検証。
 - 原本の図解CSSのうちsvg幾何・tooltip・ラベルとフレームの配置宣言は共有MermaidDiagramへ委譲し、契約の明示除外として記録。図ソースとclassDef配色・themeVariablesは完全一致。SVGラベルを使ってclassDefの明色文字を維持。
 - 原本保存: HTML `archive/html/xAI/Xai-grok-bot-guide.html`（SHA-256 `bc681fa9792fe63e8b5ee47521def51fccd52a9c180b905861cc66baa62f3bcb`）、Markdown `archive/md/xAI/Xai-grok-bot-guide.md`（`584ab1cd33dcd9db657f5cdcdaa92ef95ff9ea23031678ee4af749a0d3134193`）。移動前後一致、内容無変更、100%リネーム。
-- Markdown監査はexit 1。独立目次とH2の句点による見出し22件、表6行（リンク表示3行と初回／追加確認日・取得可否3行）、認証情報の説明3段落に差がある。Team Bot専用Vaultの暫定情報・Secrets／個人アカウントの注意はMarkdown側が後日更新されている。HTMLを指定された移行のため内容更新はせず、原本同士を混在させない。リンク・リスト・コード・SVG・calloutに欠落はなく、11図は一致。
+- Markdown監査はexit 1。独立目次とH2の句点による見出し22件、表6行（リンク表示3行と初回／追加確認日・取得可否3行）、認証情報の説明3段落に差がある。Team Bot専用Vaultの暫定情報・Secrets／個人アカウントの注意はMarkdown側が後日更新されている。図4も原本間で異なり、MarkdownはTeam Bot専用Vaultを暫定の選択肢として説明する一方、HTMLはShared BotをTeam Bot専用Vaultノードへ経由させている。HTMLを指定された移行のため内容更新はせず、原本同士を混在させない。リンク・リスト・コード・SVG・calloutに欠落はない。
 - 分離履歴: Red `35b8bf87` → 追加Red `3d9c9acb`／`b5b98436` → Green `0b5db2f5` → Refactor `57dd9d24` → 原本保存 `1a3ffe6e`。原本の固定期待値は変更していない。追加RedのCSS抽出では:global()を比較時だけ正規化し、既存の期待値を維持した。
 - CSSキャッシュを一時領域へ退避し、通常 `bun run dev --port 3000` で `http://localhost:3000/xai/grok-bot-guide` がHTTP 200。目視はユーザー担当。npm・ビルド・ブラウザ自動確認は未実行。依存・設定・ロックは無変更。
 
