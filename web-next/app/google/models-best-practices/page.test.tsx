@@ -206,7 +206,7 @@ it("レジストリからGoogleの導線へ登録し移行確認日を記録", (
     group: "Providers",
     category: "Google",
     provider: "google",
-    topics: ["google", "prompting", "agents"],
+    topics: ["google", "prompting", "agent", "agents"],
     summary: "Gemini のモデル選択、思考水準、Long Decode、API移行と本番運用の実践ガイド。",
     addedAt: "2026-11-02",
     lastReviewed: "2026-11-02",

@@ -194,7 +194,7 @@ it("レジストリからCodexの導線へ登録し移行確認日を記録", ()
     group: "Providers",
     category: "Codex",
     provider: "codex",
-    topics: ["openai", "prompting", "agents"],
+    topics: ["openai", "prompting", "agent", "agents"],
     summary:
       "OpenAI のモデル選択、Responses API、reasoning effort、ツールとコスト最適化の実践ガイド。",
     addedAt: "2026-11-02",

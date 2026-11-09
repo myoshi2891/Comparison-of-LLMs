@@ -1,6 +1,6 @@
 # Plans — プラットフォーム拡張検討ドキュメント
 
-Updated 2026-11-02
+Updated 2026-11-05
 
 `.agent/skills/improve/SKILL.md` により生成・維持している方向性ドキュメント群。
 対象は web-next（Next.js 16 SSG）の「AI 最新情報キャッチアップ・プラットフォーム」化。
@@ -11,6 +11,24 @@ Updated 2026-11-02
 - 照合 v2: 2026-07-12（004〜006, commit `45940fd`）— 154 コミットのドリフトを 004 で照合済み
 
 基準コミット（drift 検出用）: `45940fd`
+
+保守同期（2026-11-05）: `/xai/grok-bot-guide` を既存xAIカテゴリへ登録。
+007〜009のDONE状態を維持し、新規基盤プランは起票していない。原本照合・操作62契約、
+関連89件、全体Vitest **227 files／2588 tests**、型・lint（615 files／0 diagnostics）、
+HTML監査exit 0、Mermaid11図の解析、pytest122件が成功。原本2形式は内容無変更で保存。
+npm・ビルドは未実行。次はユーザーの目視確認（localhost:3000）。履歴は `docs/PROGRESS.md` を参照。
+
+保守同期（2026-11-05）: `/codex/dots-best-practices` を既存Codexカテゴリへ登録。
+007〜009のDONE状態を維持し、新規基盤プランは起票していない。原本照合・操作62契約、
+関連88件、全体Vitest **225 files／2525 tests**、型・lint（609 files／0 diagnostics）、
+HTML原本監査exit 0、Mermaid 12図の解析とpytest122件が成功。原本2形式は100%リネームで保存。
+npm・ビルドは未実行。次の作業はユーザーの目視確認（localhost:3000）。履歴は `docs/PROGRESS.md` を参照。
+
+保守同期（2026-11-05）: `/claude/duet-best-practices` を既存のClaudeカテゴリへ登録。
+007〜009のDONE状態を維持し、新規基盤プランは起票していない。原本照合・操作83契約、
+関連109契約、全体Vitest **223 files／2463 tests**、型・lint（603 files／0 diagnostics）、
+HTML原本監査exit 0、Mermaid 13図の解析とpytest 122件が成功。原本2形式は内容無変更で保存。
+npm・ビルドは未実行。次の作業はユーザーの目視確認（localhost:3001）。履歴は `docs/PROGRESS.md` を参照。
 
 保守同期（2026-11-02）: `/codex/models-best-practices` を既存のCodexカテゴリへ登録。
 007〜009のDONE状態を維持し、新規基盤プランは起票していない。原本照合・操作50契約、

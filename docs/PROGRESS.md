@@ -2,9 +2,81 @@
 
 > 本ファイルは Next.js 移行完了後の保守・改善フェーズにおける開発の進捗（特にテスト関連）および品質チェックのルールを記録する。
 >
-> - 最終更新日: **Updated 2026-11-04**
+> - 最終更新日: **Updated 2026-11-09**
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
+
+## 追加レビュー対応: 保持条件・圧縮・原稿例（2026-11-09）
+
+- 現行本文と公式資料を照合し、12件を修正。Claude は advisor 使用量を実行モデルと分けて料金計算し、圧縮で停止した応答の履歴追加・継続と要約拒否／欠落の処理を追加。質問のみ・レビューのみの依頼は報告して終了する例外をテンプレートへ明記。
+- Gemini は関数結果のID・名前・順序と署名を含む全履歴を保持し、Python 3.11以上を導入前提へ追加。Searchの保持はGemini APIの30日とAgent Platformの最大3日に分け、Mapsの30日を別記。Omniの既存ヘルパーで15秒の結果も `long.mp4` へ保存。
+- Codex はGitHub Actionの推奨とCI資格情報のステップ限定、管理者の許可リストをCLIでは拡張できない条件を追記。AstraはZDR／`store=False`でもバックグラウンド応答が約10分ディスクへ一時保存される例外と、Modified Abuse Monitoringで期限後も保持するには明示的な `store=True` が必要な条件を追記。操縦の期限は受理時から送信開始時へ移し、受理前の送信失敗・切断も復旧へ回す。
+- 1件スキップ: フロントエンド検証・再開コマンドの `--` 削除。Bun 1.3.12で実際と同じ `test: vitest run` の引数転送を比較し、区切りあり／なしとも `run --maxWorkers=1 --testTimeout=30000` が渡ることを確認。実際のVitest 4.1.12の `--help` でも転送を確認したため、コマンド2箇所と過去の実測結果は変更しない。
+- 検証: Omniの既存ヘルパー・従来の保存呼び出しをASTで照合し、2動画の保存をオフライン実行。変更2図をMermaid 10.9.8で解析し、圧縮・拒否・通常処理と操縦の受理前後の経路を検証。対象Markdownの整形・lintと差分検査を実施。アプリ・依存・設定・アーカイブは変更せず、アプリ全体テスト・型・ビルド・原本とJSXの監査は対象外。コミットは作成しない。
+
+## レビュー指摘対応: ガイド原稿5件（2026-11-09）
+
+- 現行本文と公式資料を照合し、8件すべての指摘を修正。Claude Fable 5.1 は `pause_turn` の再送を最大3回の例で制限し、上限時は未完了として返す。キャッシュの同一ブロックへの自動・明示指定はTTL一致が必要で、不一致なら400となることを追記。既存の最大4か所・検索範囲・TTL順序の説明を保持。
+- Gemini Argon は Python SDK の要件・導入コマンド・チェックリストを `google-genai>=2.34.0` に統一。Omni は既存の大容量出力の説明を残し、動画はFiles APIの48時間以内に自前ストレージへ保存し、URI保存だけでは不足すると明記。
+- OpenAI Codex はテスト用の通信設定を実行時の `-c` へ移し、プライベートIPへ解決されるホスト名は許可済みでも接続できないことと、必要なIPの完全一致許可または通信を制限したCI環境を案内。Astra は同期例に `timeout=3600.0`・`max_retries=0` を設定し、バックグラウンド実行とIDによるポーリングも説明。操縦の待機に失敗・未完了・接続切断の復旧分岐と、受理から120秒の期限を追加。
+- 検証: Python例の既存リクエスト・結果判定をASTで照合し、6ケースをオフライン実行。Codex例のbash構文と3つのTOMLオーバーライド、Mermaid 10.9.8による変更2図の構文・分岐、全5ガイドの見出し全文・順序とコードフェンス数の維持を確認。Markdown整形・対象6ファイルのmarkdownlint・`git diff --check` を実施。ガイド原稿と本記録だけを変更し、アプリ・依存・設定・原本アーカイブは変更していない。アプリのテスト・型・ビルド・原本とJSXの監査は今回の対象外。コミットは作成しない。
+
+## Grok Bot ガイド移行（2026-11-05）
+
+- ルート: `/xai/grok-bot-guide`。指定HTMLを正本とし、情報基準日2026-10-24と本文に含まれる2026-11-02の確認記録を保持。registryは2026-11-05で既存xAIカテゴリへ登録し、ナビ・検索・RSS・関連ページを導出。
+- 全1 H1・21 H2・55 H3・49段落・79リスト項目（19 ul／4 ol）・30表205行・10コード例・11図・12引用・11チェック・51外部リンク（30 URL）をPure JSXへ完全転写。
+- Redで固定したsource-contract.jsonにより全文・順序・重複・全装飾クラスの適用先・見出しID・セクション境界・表のセル型と結合・リスト型／開始番号／入れ子・CDNのSRI／crossorigin・構文トークン・78 CSS規則とmedia条件を照合。表構造直下の空白ノードは0件。
+- ページ36契約＋操作26契約＝62件、registry／ナビを含む関連89件が成功。全体Vitest **227 files／2588 tests**、typecheck、lint **615 files／0 diagnostics**、pytest **122件**、HTML原本監査exit 0、Mermaid10.9.8で全11図の構文解析が成功。
+- 操作処理は行／関数100%、分岐94.8%、文99.06%。スクロール・最下部・目次内追従・960px境界・トグル／背景／Escape／リンク・実測バー高さ・inert・Tab循環・フォーカス復帰・cleanupを検証。300px固定目次と960pxモバイル開閉を保持し、目次・scrimは実測モバイルバーの下へ配置。
+- 点・番号・入れ子のcircle／square、11チェックの形状と色、全列左寄せ、先頭空白・改行、highlight.js11.11.1の全トークンを保持。ブラウザ既定太字とリンク下線をページ内で復元。引用段落とチェック済み項目の継承色も追加Redから保護。チェック保存・集計・コピーなど原本にない機能は追加していない。
+- 共通ヘッダー／免責バナーは実測高で一度だけ余白を確保。日付をregistryからヒーローへ表示し、共通鮮度バーを非表示化。共通bodyクラスと鮮度バーIDは:global()でCSS Modulesのハッシュ化を防ぎ、追加Redで検証。
+- 原本の図解CSSのうちsvg幾何・tooltip・ラベルとフレームの配置宣言は共有MermaidDiagramへ委譲し、契約の明示除外として記録。図ソースとclassDef配色・themeVariablesは完全一致。SVGラベルを使ってclassDefの明色文字を維持。
+- 原本保存: HTML `archive/html/xAI/Xai-grok-bot-guide.html`（SHA-256 `bc681fa9792fe63e8b5ee47521def51fccd52a9c180b905861cc66baa62f3bcb`）、Markdown `archive/md/xAI/Xai-grok-bot-guide.md`（`584ab1cd33dcd9db657f5cdcdaa92ef95ff9ea23031678ee4af749a0d3134193`）。移動前後一致、内容無変更、100%リネーム。
+- Markdown監査はexit 1。独立目次とH2の句点による見出し22件、表6行（リンク表示3行と初回／追加確認日・取得可否3行）、認証情報の説明3段落に差がある。Team Bot専用Vaultの暫定情報・Secrets／個人アカウントの注意はMarkdown側が後日更新されている。図4も原本間で異なり、MarkdownはTeam Bot専用Vaultを暫定の選択肢として説明する一方、HTMLはShared BotをTeam Bot専用Vaultノードへ経由させている。HTMLを指定された移行のため内容更新はせず、原本同士を混在させない。リンク・リスト・コード・SVG・calloutに欠落はない。
+- 分離履歴: Red `35b8bf87` → 追加Red `3d9c9acb`／`b5b98436` → Green `0b5db2f5` → Refactor `57dd9d24` → 原本保存 `1a3ffe6e`。原本の固定期待値は変更していない。追加RedのCSS抽出では:global()を比較時だけ正規化し、既存の期待値を維持した。
+- CSSキャッシュを一時領域へ退避し、通常 `bun run dev --port 3000` で `http://localhost:3000/xai/grok-bot-guide` がHTTP 200。目視はユーザー担当。npm・ビルド・ブラウザ自動確認は未実行。依存・設定・ロックは無変更。
+
+## postcss の devDependencies 追加（2026-11-05）
+
+- `b99b83dc`（15:37）で `web-next/package.json` の devDependencies に `postcss` `^8.5.18` を追加し、`web-next/bun.lock` の宣言へ同じ1行を追加した。解決版は既存エントリの8.5.23。Grok Bot移行の完了後の変更であり、同移行の「依存・設定・ロックは無変更」は移行範囲の記述として正しい。
+- コミット本文に追加理由の記載はない。`web-next/app/` 配下のテスト14ファイル（`xai/grok-bot-guide/page.test.tsx` を含む）が `postcss` を直接importしている（テスト以外の直接importはない）。`postcss.config.mjs` は `@tailwindcss/postcss` のみを指定する。
+- ユーザー承認の記録は未確認。マージ前に明示的な承認を確認し、ここへ記録する。既存のロックファイルエントリは承認の代わりにならない。
+
+## registryのagentトピック補正（2026-11-05）
+
+- `/codex/dots-best-practices`／`/claude/duet-best-practices` の `topics` に、既存の `agents` を残して完全一致の `agent` を追加。タグ検索と関連ページは完全一致で比較するため、`agents` だけでは `agent` タグの一覧と関連候補に含まれなかった。
+- 分離履歴: Red `86363a7c`（両ページの固定期待値をレビュー指示に基づき更新し、対象75件中2件の失敗を確認）→ Green `d159c4f0`。全体Vitest **225 files／2525 tests**、typecheck、lint（609 files／0 diagnostics）、pytest 122件が成功。テスト数は不変。ビルド・npmは未実行。
+- 続けて `/claude/models-best-practices`／`/codex/models-best-practices`／`/google/models-best-practices` にも `agent` を追加。Claude版は `topics` の固定契約がないため、`agents` を持つ全エントリに `agent` を要求する不変条件を `tests/page-registry-coverage.test.ts` へ追加して再発も検知する。
+- 分離履歴: Red `81a2cfa7`（対象75件中3件の失敗を確認）→ Green `ad25ee38`。全体Vitest **225 files／2526 tests**、typecheck、lint（609 files／0 diagnostics）、pytest 122件が成功。ビルド・npmは未実行。
+
+## OpenAI dots ガイド移行（2026-11-05）
+
+- ルート: `/codex/dots-best-practices`。指定HTMLを正本として、本文の情報基準日2026-10-24を保持。registryは2026-11-05でCodexカテゴリへ追加し、ナビ・検索・RSS・関連リンクを導出する。
+- 原本の全6 H1（hero＋5 Part見出し）・22 H2・52 H3・60段落・78リスト項目（17 ul／6 ol）・29表190行・5コード例・12図・18 callout・17チェック項目・外部リンク50件（32 URL）をPure JSXへ完全転写。27セクションの境界と日本語・数字の既存IDも保持。
+- Redで固定した `source-contract.json` により全文・順序・重複・表セル型と結合・リストの開始番号と入れ子・CDNのSRI／crossorigin・highlight.js 11.11.1の全トークン・80 CSS規則とmedia条件を照合。リストのdisc／decimal／circle／square、heroマーカーなし、チェックの取消線、全列左寄せを検証する。
+- ページ35契約＋操作27契約の計62件、registry／ナビを含む関連88件が成功。全体Vitest **225 files／2525 tests**、typecheck、lint **609 files／0 diagnostics**、pytest **122件**が成功。全12図をMermaid10.9.8で解析し、HTML原本監査はexit 0。全体テスト後のクラス整理も関連88件・型・lint・監査で成功。
+- TocObserverの行／関数100%、分岐94.8%、文99.06%。日本語をpercent encodeする `link.hash` を使わず、生href属性からIDを解決する。スクロール・最下部・目次内追従・900px境界・トグル／背景／Escape／リンク・実測バー高さ・inert・フォーカス復帰・Tab循環・cleanupを検証。
+- 原本の310px固定目次・900pxモバイル開閉を保持し、ヘッダー＋免責バナーの実測高さへ配置を補正。モバイルの目次とscrimは実測バーの下へ置き、トグルを覆わない。原本のアンカー規則（16px／mobile70px）が優先される不具合を詳細度・適用順の契約で検出し、同詳細度の後続規則でヘッダー高＋80pxへ補正した。
+- 原本チェックリストは通常のlabel／checkboxとしてクリックと取消し、CSSのチェック済み装飾を保持。保存・集計・コピーなど原本にない操作は追加していない。図のサイズと配置・tooltipは共有MermaidDiagramへ委譲するため、該当CSS規則・配置宣言のみ明示除外する。
+- 分離履歴: 初回Red `d43d0642` → モバイル配置追加Red／イベント監視補正 `fb630c9e` → アンカー実効余白追加Red `cf10adec` → Green `29a7e1ec` → Refactor `3395fbbd`。期待値は実装に合わせて変更していない。windowのイベント解除はjsdomのDOM EventTargetとは別にwindow自身をspyして検証するよう補正した。
+- 原本保存 `529e3272`: HTML／Markdownを `archive/html/OpenAI/Openai-dots-best-practices-guide.html`／`archive/md/OpenAI/Openai-dots-best-practices-guide.md` へgit mvで100%リネーム。HTML SHA-256 `05539d515aca79d8f03d80fb26e06cf44b1d77badcc2406f9c774241f19963dc`、Markdown `88c935ead8db60c36ef4fb81074f22fa5641819239b9eab43c5259034d38efea`（移動前後一致）。
+- Markdown版も監査したがexit 1。独立した `h3: 0.3 目次` と図1件（図1のsubgraphの有無・ラベル表記）に差がある。リンク・リスト・通常コード・表行・段落に欠落はない。指定HTMLを正本とし、異なる目次や図を混在させない。
+- CSSキャッシュを一時領域へ退避し、起動元が本リポジトリであることを確認した既存ポート3000のdevを再起動。通常 `bun run dev --port 3000` で `http://localhost:3000/codex/dots-best-practices` がHTTP 200。npm・ビルド・ブラウザ自動確認は未実行。目視確認はユーザー担当。
+
+## Claude Duet ガイド移行（2026-11-05）
+
+- ルート: `/claude/duet-best-practices`。指定HTMLを正本とし、本文の情報基準日2026-10-25を保持。registryは着手日の2026-11-04でClaudeカテゴリへ登録し、ナビ・検索・RSS・関連リンクを導出する。
+- 全1 H1・21 H2・58 H3・4 H4・63段落・50リスト項目（9 ul／4 ol）・35表215行・8コード例・13図・9 callout・19チェック項目・9 FAQ・26外部リンクをPure JSXへ完全転写。
+- Redで原本から固定した `source-contract.json` により本文・見出し・表セル型／結合／順序・リスト型／開始番号／入れ子・CDN・構文トークン・143 CSS規則を全件照合。通常リストの点／番号／gold色、チェックリストのマーカーなし、全列左寄せ、アンカー余白、ブラウザ既定太字も検証する。
+- ページ40契約＋操作43契約の83件、registry／ナビを含む関連109件が成功。全体Vitest **223 files／2463 tests**、typecheck、lint **603 files／0 diagnostics**、pytest **122件**が成功。全13図はMermaid 10.9.8で解析成功、HTML原本監査はexit 0。
+- 操作処理の行・関数100%、分岐93.1%、文99.12%。チェック保存／復元／不正JSON／保存拒否／全完了／リセット、FAQ質問・回答検索／大文字小文字／該当なし／一括開閉、目次開閉／900px境界／inert／Tab循環／フォーカス／コピー／cleanupを検証。
+- 原本の300px固定目次と900pxモバイルドロワーを保持し、共有ヘッダー＋免責バナーと実測モバイルバーを避ける。日付はregistryからヒーローへ表示し、bodyの余白を一度だけ確保。図の配置・サイズとtooltipは共有MermaidDiagramへ委譲し、該当CSS規則・配置宣言のみ契約で明示除外する。
+- highlight.js 11.11.1の原本バージョンで8コード例を静的トークン化。先頭空白・改行・複数行トークンを保持し、依存・設定・ロックは変更していない。ただし `page.test.tsx` は `postcss` を直接importしており、Duetの各コミット時点の `web-next/package.json` では `postcss` が `overrides` にしかなく、直接宣言は後の `b99b83dc` で `devDependencies` へ追加された。
+- Red `bd83bb80` → CSSセレクタ比較の引用符正規化 `82e38859` → Green `5193d811` → Refactor `9dc46b81`。固定の原本期待値は変更せず、CSS属性セレクタの整形時引用符差だけを比較処理で吸収した。
+- HTML／Markdownは `archive/html/Anthropic/Claude-duet-best-practices-guide.html`／`archive/md/Anthropic/Claude-duet-best-practices-guide.md` へ内容無変更で保存。HTML SHA-256 `d58c7595775ef0f97cafcf20eab38dbd2e0bc66f20b51cf027ae42bcf58ab99c`、Markdown `794c7312e05f0e520cda5461f4fb611f73dee0701d84f4ffad62a492cc37ae31`（移動前後一致）。
+- 保存時の経緯: `archive/` がGit除外対象であるため初回addは追加側に失敗し、`8d86a03f` は移動元削除のみを記録した。直ちにユーザーへ報告し、保存済み原本を `git add -f` で追加した修正 `2101e2dc` を分離。最終ツリーでは両原本を追跡済みで、履歴のresetは行っていない。
+- Markdown版も監査したがexit 1。H1・独立目次による見出し2件、冒頭メタ情報／目次表29行、出典・FAQ構造等11段落、図1・2・5・6・10・12に差がある。指定HTMLの本文と図を正本とし、Markdownから異なる内容を混ぜない。外部リンク・リスト・通常コードの欠落はない。
+- CSSキャッシュは起動前に存在しなかった。通常の `bun run dev --port 3001` を起動し、`http://localhost:3001/claude/duet-best-practices` のHTTP 200を確認。npm・ビルド・ブラウザ自動確認は未実行。目視確認はユーザー担当。
 
 ## レビュー指摘対応: WOFF2フォント・監査・テスト・Grok Botガイド（2026-11-03）
 
@@ -116,19 +188,19 @@
 
 - **フェーズ**: 保守・機能改善・品質強化フェーズ
 - **ブランチ**: `dev`
-- **最新実装 HEAD**: `ec595ab4`（Grokガイド `ec595ab4`、監査 JSXコメント保持 Red `57c68b87` → Green `8298cf70`、Gemini免責バナー Red `b2e7b6a6` → Green `5ef6120f`、フォントexport検証 `8c8f87b6`、レビュー対応 Codexフォーカス復帰 Red `f903e4ee` → Green `8591cc6f`、Geminiフォーカス枠 Red `ac3d67f1` → Green `acbec05c`。前回 フォントテスト整理 `64fc10c7`、監査 script内code修正 Red `4e8c1f3c` → Green `fc804748`。前回 監査 Red `a8a009d7` → Green `68ef60f8`、Refactor `a7b6995c`、テスト `c06a93f5`、ガイド `fa6be2c0`。それ以前 レビュー対応2: タグ除去の引用値内>・属性の左→右走査 Red `6ab71a07` → Green `a03d6ad4`。レビュー対応1: 監査 Red `d640a9fa` → `4201c669` → Fix `e9bb2cbc`、テスト強化 `38765e62`。OpenAI移行 Green `f2f96dc9` → Refactor `a6fbe7c9`）
-- **次の作業**: `/codex/models-best-practices` の目視確認（ユーザー担当、localhost:3001）。300px固定目次と900pxモバイル開閉、リストの点・番号、21表、10コード例の構文色・字下げ・コピー、8図、読書進捗、ヒーロー内の日付を確認する。npm・ビルドは未実行。
-- **ルート実数**: `page.tsx` 98 件、registry 98 エントリ（現行ファイルから実測）。
+- **最新実装 HEAD**: `57dd9d24`（Grok Botガイド。Red `35b8bf87`／追加Red `3d9c9acb`／`b5b98436`、上記分離履歴を参照）。
+- **次の作業**: `/xai/grok-bot-guide` の目視確認（ユーザー担当、localhost:3000）。300px目次・960pxモバイル開閉・21章・リストの点と番号・30表・10コード例・11図・11チェックを確認。npm・ビルドは未実行。
+- **ルート実数**: `page.tsx` 101 件、registry 101 エントリ（現行ファイルから実測）。
 - **動作検証**:
   - ビルド: 今回はユーザー指定で未実行。過去の成功記録は 2026-09-17 の 90 静的ページであり、今回の変更を検証した値ではない。
-  - `bun run typecheck` ✅（`tsc --noEmit`。2026-11-02 実測）
-  - `bun run lint` ✅（Biome check / 597 files / 0 diagnostics。2026-11-02 実測）
+  - `bun run typecheck` ✅（`tsc --noEmit`。2026-11-05 実測）
+  - `bun run lint` ✅（Biome check / 615 files / 0 diagnostics。2026-11-05 実測）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=2 --testTimeout=30000` でVitest **221 files / 2380 tests すべて合格**（2026-11-04 実測）。typecheck・lint（変更パス）成功。
-    - 初回全体検証は2239件中registryの日付不変条件1件が失敗。専用Red／Greenで修正後、全体を再実行して成功。依存・設定・ロックは変更していない。
+  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000` でVitest **227 files / 2588 tests すべて合格**（2026-11-05実測）。Grok Botの関連89契約、typecheck・lint（615 files／0 diagnostics）も成功。
+    - 過去のClaudeモデルガイド初回全体検証では2239件中registryの日付不変条件1件が失敗し、専用Red／Greenで修正済み。今回の全体2588件はすべて成功。Grok Bot移行の範囲では依存・設定・ロックを変更していないが、移行後の `b99b83dc` で `web-next/package.json` の devDependencies へ `postcss` を追加し、`web-next/bun.lock` も変更した（承認は未確認。本書の「postcss の devDependencies 追加」節を参照）。
     - `load(sourceHtml)` をモジュール初期化時に呼ぶ `governance/ai-governance/GuideContent.tsx` と
       `local-llm/finetuning-best-practices/GuideContent.tsx` は、import スモークでも読み込み可能であることを確認済み
-  - **バックエンド (`scraper/`)**: `uv run pytest` で122件成功（2026-11-02実測）。
+  - **バックエンド (`scraper/`)**: `uv run pytest` で122件成功（2026-11-05実測）。
 
 ## 最近の追加内容
 
@@ -585,17 +657,15 @@
 
 ```text
 AGENTS.md → CODEX.md → CLAUDE.md → docs/PROGRESS.md → Phase A–F 計画の順で読む。
-最新実装 HEAD: ec595ab4（Grokガイド ec595ab4、監査 JSXコメント保持 Red 57c68b87 → Green 8298cf70、Gemini免責バナー Red b2e7b6a6 → Green 5ef6120f、フォントexport検証 8c8f87b6、レビュー対応 Codexフォーカス復帰 Red f903e4ee → Green 8591cc6f、Geminiフォーカス枠 Red ac3d67f1 → Green acbec05c。前回 フォントテスト整理 64fc10c7、監査 script内code修正 Red 4e8c1f3c → Green fc804748。前回 監査 Red a8a009d7 → Green 68ef60f8、Refactor a7b6995c、テスト c06a93f5、ガイド fa6be2c0。それ以前 監査 Red 6ab71a07 → Green a03d6ad4、レビュー対応 Fix e9bb2cbc・テスト強化 38765e62。OpenAI移行 Green f2f96dc9 → Refactor a6fbe7c9）
-次の作業: /codex/models-best-practices の目視確認（ユーザー担当）。http://localhost:3001/codex/models-best-practices
-300px目次、900px以下の開閉、21表の左寄せ、リストの点・番号・marker色、10コード例の構文色・字下げ・コピー、8図と読書進捗を確認する。
-免責バナー直下の余白を一度だけ確保し、最終確認日・公開日はヒーロー内に表示する。
-指定HTMLを正本とし、原本2形式はarchive/へ退避済み（SHA-256一致）。Markdownの見出し・目次・図3件の差分は本書冒頭に記録。
-HTML原本監査exit 0、OpenAI対象50契約と関連76契約、全221 files／2380 tests、型・lint、pytest122件が成功。
-NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=2 --testTimeout=30000 を使用する。
-図解レイアウトは共有MermaidDiagramへ委譲。依存・設定・ロックは変更していない。
-監査は無指定calloutの既定infoを正規化し、本文欠落・warn変更を検出する。script／code開始タグとタグ除去は引用値内の>を消費し、属性は左から名前＋値の組で読んで data-for／id を文字参照復号後に解決。script 要素は丸ごと消費し、payload 内の未閉じ <code> が表示ブロックを食わない。監査65テスト成功。
-サンドボックスではnpmとビルドを実行しない。修正もRed → Green → Refactor → Docsの分離コミットを守る。
-page.tsx 98件、registry 98エントリ（実測）。次ページは指示されてから扱う。
-localhost:3000は別プロジェクトのdevが使用中のため、起動元を確認してから止めること。本リポジトリのdevはbun run dev --port 3001で起動し、OpenAI／GeminiルートのHTTP 200を確認済み。
-共通フォントは next/font/local と保存済みWOFF2（public/fonts/latin/、SHA-256はREADMEで照合）を使用する。Webpack指定は不要。
+最新実装 HEAD: 57dd9d24（Grok Botガイド。Red 35b8bf87 → 追加Red 3d9c9acb／b5b98436。分離履歴は同名節を参照）
+次の作業: /xai/grok-bot-guide の目視確認（ユーザー担当）。http://localhost:3000/xai/grok-bot-guide
+300px目次・960pxモバイル開閉・21章・点と番号と入れ子・30表205行の左寄せ・10コード例の構文色と空白・11図・11チェックを確認。
+指定HTMLを正本とし、情報基準日2026-10-24を保持。HTML／Markdownはarchive/html/xAI/／archive/md/xAI/へ100%リネームで保存（SHA-256一致）。
+Markdownの認証情報・検証メモ等との差分は本書の同名節を参照。本文更新は行わず両形式を混在させていない。
+HTML原本監査exit 0、対象62契約（ページ36／操作26）、関連89件、全227 files／2588 tests、型・lint615 files、pytest122件が成功。
+操作の行／関数100%、分岐94.8%。78 CSS規則・全装飾クラスと表の不正空白ノード不在も検証済み。図の配置・サイズは共有MermaidDiagramへ委譲。
+NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000 を使用。
+サンドボックスではnpmとビルドを実行しない。Red → Green → Refactor → Docsの分離コミットを守る。
+page.tsxとpageRegistryは101件ずつ（実測）。次ページは指示されてから扱う。移行では依存・設定・ロックを変更していないが、移行後の `b99b83dc` で `postcss` をdevDependenciesへ追加済み（承認は未確認。本書の同名節を参照）。
+CSSキャッシュ退避後、通常bun run dev --port 3000で起動しHTTP 200。目視はユーザー担当。
 ```
