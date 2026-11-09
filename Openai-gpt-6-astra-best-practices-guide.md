@@ -573,14 +573,16 @@ flowchart TB
   S -- "response.steer.accepted" --> T["キューに入っただけで適用は未確定<br/>開始済みのツールは<br/>自動ではキャンセルされない"]
   S -- "response.steer.failed" --> F["適用されず、後から自動でも適用されない<br/>steer.id と error を記録し<br/>自動で再送せず、アプリ側で対応を決める"]
   T --> P{"次のイベントを待つ<br/>(accepted の直後に pending が<br/>未着でも判断しない)"}
-  P -- "継続応答の response.created" --> D["API が作る継続応答を<br/>response.created の ID で追跡する"]
+  P -- "元の応答の response.incomplete<br/>reason: steered は通常の操縦遷移" --> P
+  P -- "継続応答の response.created" --> D["API が作る継続応答を<br/>response.created の ID で追跡し<br/>response.completed を待つ"]
   P -- "response.steer.failed<br/>(同じ steer.id)" --> F
   P -- "response.steer.pending<br/>(required_input で入力を要求)" --> W["継続を待機させたまま<br/>同じ接続の response.create で<br/>元の応答 ID を previous_response_id にして<br/>元の instructions・ツール設定とともに<br/>ツール結果・承認を返す<br/>(操縦入力は再送しない)"]
   W -- "response.created" --> D
   W -- "response.create の error<br/>または response.failed" --> R["待機を打ち切り、エラー・応答 ID・steer.id を記録<br/>応答履歴と送信済みの操縦入力・ツール結果を照合"]
   D -- "response.failed または error" --> R
+  D -- "継続応答の response.incomplete" --> R
   R --> H["履歴・接続状態を復旧し<br/>必要なら全履歴で新しい応答を作成<br/>未反映の操縦入力を再送するか判断<br/>適用済み入力・実行済みツールは重複させない"]
-  D --> E["継続応答の内容と応答履歴を<br/>送信記録と突き合わせ<br/>操縦入力が反映されたか判断する"]
+  D -- "継続応答の response.completed" --> E["継続応答の内容と応答履歴を<br/>送信記録と突き合わせ<br/>操縦入力が反映されたか判断する"]
   classDef warn fill:#fff3d6,stroke:#a06a00,color:#111
   class T,F,W,E,R,H warn
 ```
@@ -588,6 +590,8 @@ flowchart TB
 > **実装上の注意**: `response.steer.accepted` はキューに入ったことを示すだけで、モデルが反映したことは意味しません。`response.steer.pending` が届かないことも、適用の証拠にはなりません。適用の成否は、継続応答と応答履歴で判断します。ツール結果は `response.steer.pending` を待たずに返してもかまいません。`response.steer.failed` は同じ `steer.id` で届き、その入力は後から自動で適用されません。自動の継続応答は元のリクエストの設定を引き継ぎますが、明示的な `response.create` はそのリクエスト自身の `instructions` やツール設定を使うため、元の値を指定します。**公式** 失敗した入力は適用済みとして扱わず、自動でも再送しないでください(再送するかはアプリ側で判断します。この点は本ガイドの推奨です)。
 >
 > キューにある操縦入力は**現在の接続にだけ存在**します。接続が切れた後も残ると仮定せず、送った入力を自分で記録して応答履歴と照合してください。**開発者**
+>
+> `response.created` やテキストのdeltaは完了を意味しません。`D` では追跡中の継続応答IDと一致する `response.completed` まで待ち、継続応答の `response.incomplete` は部分的な結果として復旧へ回します。一方、**元の応答ID**の `response.incomplete` で `incomplete_details.reason: "steered"` の場合は通常の操縦遷移なので、失敗扱いせず継続応答を待ちます。**公式**
 >
 > `W` の `response.create` は、`response.created` の前に `error` を返すことがあり、作成後に `response.failed` で終わることもあります。どちらも待機を打ち切り、エラーと応答状態を処理します。**公式** 復旧時は、応答履歴と `steer.id` ごとの入力・ツール結果の送信記録を照合し、未反映の入力だけを再送候補にします。接続切れや `previous_response_not_found` などで継続できない場合は、必要な全履歴を復元して `previous_response_id` を省略した新しい応答を作成し、元の `instructions`・ツール設定も指定します。操縦入力やツール実行を無条件に再送・再実行しないことは本ガイドの推奨です。[公式の WebSocket エラー・復旧](https://developers.openai.com/api/docs/guides/websocket-mode)、[操縦のイベント処理](https://developers.openai.com/api/docs/guides/steering)
 >
@@ -640,9 +644,9 @@ OpenAI は、ChatGPT Work と Codex で、Astra が**API のないアプリも�
 flowchart TB
   A["タスクと権限範囲を定義<br/>許可サイト・アプリを限定"] --> B["隔離環境で実行<br/>VM や隔離コンテナ<br/>(専用プロファイルはその中で併用)"]
   B --> C["Astra が画面を確認し<br/>次の操作を提案"]
-  C --> D{"重大な操作か<br/>外部書き込み・破壊<br/>購入・範囲拡大"}
+  C --> D{"重大な操作または機密情報の送信か<br/>機密情報を含む URL への移動も対象<br/>(GET を含む)<br/>外部書き込み・破壊・購入・範囲拡大"}
   D -- "はい" --> E["確認ポリシーで人の承認を依頼<br/>自動レビューだけでは進めない"]
-  D -- "いいえ" --> F["操作を実行"]
+  D -- "いいえ: 機密情報を送信しない" --> F["操作を実行"]
   E --> K{"人が承認したか"}
   K -- "はい" --> F
   K -- "いいえ" --> L["操作を実行せず中止<br/>理由を記録"]

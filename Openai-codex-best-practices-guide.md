@@ -749,6 +749,8 @@ domains = { "api.integration.example.com" = "allow" }
 
 ドメインの制限には **`network_proxy` の有効化も必要**です。`network_access = true` だけでは直接の外向き通信を広く許可し、コードや依存スクリプトによる秘密情報の流出・意図しない外部サービスへのアクセスを招きます。ローカルのテストサーバーが必要なら、公式仕様に従って `localhost` または対象 IP を個別に許可します。対応していない版では、接続先を制限した既存の CI 実行環境を用意してください。
 
+この `features.network_proxy` が制限するのは、**ローカルのコマンド用サンドボックス内で動くコマンド・子プロセスの通信**です。**MCPサーバーへの接続は制限しません**。Step 6 の MCP サーバーは、この許可リスト外にも接続できるため、統合テストで不要なら MCP を無効にし、必要なら MCP 側の接続先・資格情報と、独立したファイアウォールやプロキシの通信制御を別途設定します。[公式のプロキシ対象外の通信](https://learn.chatgpt.com/docs/agent-approvals-security#traffic-outside-the-command-network-proxy)
+
 SDK(TypeScript など)からの呼び出しにも対応しています。企業環境では、Vertex AI(`model_provider = "gcp"`)や Amazon Bedrock も使えます。
 
 ```toml
@@ -813,7 +815,7 @@ flowchart TB
 
 ### 12-2. Astra の安全装置を理解する
 
-GPT-6 Astra は OpenAI で初めて、サイバー面の Preparedness Framework で最高の **Critical** に分類されたモデルです。Codex では、安全装置が働くと**実行前にレビューを促す表示**が出ることがあり、無害な作業でも誤作動し得ると OpenAI 自身が認めています(API ではタスクが停止することもある)。0.166.0 では、**安全ブロックの説明と、より安全な後続プロンプトの選択肢**が TUI に追加されました。
+GPT-6 Astra は OpenAI で初めて、サイバー面の Preparedness Framework で最高の **Critical** に分類されたモデルです。ミスアラインメント監視は**非同期**で動き、問題を検知して停止するまでに、対象の操作が実行済みになることがあります。Codex でレビューを促す表示が出た場合は、**続行する前に**指摘と実行結果を確認します。無害な作業も検知され得ます(API では会話が停止することもある)。これは、承認が必要な個々の操作を**実行前に**審査する自動承認レビューとは別の仕組みです。監視はサンドボックスや実行前の承認に代わりません。[公式の監視と停止](https://learn.chatgpt.com/docs/agent-approvals-security#safety-monitoring-and-paused-tasks)、[ミスアラインメント監視](https://developers.openai.com/api/docs/guides/safety-checks/misalignment-monitoring)。0.166.0 では、**安全ブロックの説明と、より安全な後続プロンプトの選択肢**が TUI に追加されました。
 
 ```mermaid
 flowchart TB
