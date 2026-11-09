@@ -208,7 +208,7 @@ model_reasoning_effort = "medium"   # 選べる値はモデルで異なる(/mode
 
 1. **サインイン方式を決める**: ChatGPT アカウントでサインインするとプランの使用量・課金が適用され、API キーを使うと API 料金になります。
 2. **個人既定値**を `~/.codex/config.toml` に書く(モデル、推論レベル、承認・サンドボックス方針)。
-3. **リポジトリ固有の挙動**を `.codex/config.toml` に書く(MCP、サブエージェント数など)。このファイルは**信頼済みのプロジェクトでだけ読み込まれます**。未信頼のリポジトリでは、MCP の設定や `/goal` の有効化(`features.goals`)も適用されないので、先にプロジェクトを信頼済みにします。
+3. **リポジトリ固有の挙動**を `.codex/config.toml` に書く(MCP、サブエージェント数など)。このファイルは**信頼済みのプロジェクトでだけ読み込まれます**。リポジトリの入手元とプロジェクト設定を確認し、特に MCP の接続先・起動コマンド・権限を検証してから、信頼するかを判断します。確認できない場合は未信頼のまま進めます。その場合、プロジェクト側の MCP 設定や `/goal` の有効化(`features.goals`)は適用されませんが、信頼済みへの変更は作業開始の必須条件ではありません。根拠: [公式の設定レイヤー](https://developers.openai.com/codex/config-basic)
 4. **一時的な変更**だけを CLI 引数で上書きする。
 5. `/init` で `AGENTS.md` の雛形を作り、**必ず自分のチームの実態に合わせて編集**する。
 6. 診断: ネットワークまわりの不調は `codex doctor --network-only`(0.166.0 で追加)で切り分ける。
@@ -365,6 +365,10 @@ flowchart TB
 | 完了の定義と検証方法 | テストと型チェックが通ること |
 
 配置は3層です。`~/.codex` のグローバル、リポジトリ直下、サブディレクトリ。Codex はプロジェクトルートから起動ディレクトリまでを順に読むので、サブディレクトリの AGENTS.md が常に読み込まれるとは限りません。適用されるのは、基本的にそのディレクトリか配下で起動したときです。リポジトリ直下で起動したときの挙動は、使っている Codex CLI の版の公式ドキュメントで確認してください。読み込まれたファイルのうち、**現在地に近いファイルが優先**されます。
+
+ただし、プロジェクト指示の**合計読み込み上限は既定で 32 KiB(32,768 バイト)**です。ルートから順に上限まで読み込むため、上限を超えた指示は読み込まれず、**そのディレクトリで起動しても近い階層のルールが適用されない**ことがあります。必要なら `~/.codex/config.toml` のトップレベルで `project_doc_max_bytes = 65536` などに変更し、新しいセッションを開始します。
+
+読み込み結果は、公式手順の `codex --cd subdir --ask-for-approval never "Show which instruction files are active."` で確認します。監査には `codex -c log_dir=./.codex-log` で有効にした `./.codex-log/codex-tui.log`、またはセッションログを有効にしている場合の最新の `session-*.jsonl` を使い、実際に読み込まれた指示を照合してください。根拠: [公式の AGENTS.md 読み込み・設定・検証手順](https://developers.openai.com/codex/guides/agents-md)
 
 ### 4-2. 重要な新常識: 「長いほど良い」は誤り
 
@@ -729,6 +733,21 @@ flowchart TB
 # CI などでの一発実行(モデル指定。codex exec の既定は読み取り専用なので、修正を保存するには書き込みを許可する)
 codex exec -m gpt-6.1-sol --sandbox workspace-write "失敗している統合テストの根本原因を調べて修正して"
 ```
+
+`workspace-write` は既定でコマンドのネットワークアクセスを無効にします。`codex exec` は通常、承認を要求しないため、ネットワークが必要な統合テストも実行中の承認で解決すると想定しないでください。[公式の非対話実行](https://developers.openai.com/codex/noninteractive)
+
+実行前にテストの接続先を洗い出し、利用中の版が対応する[公式のネットワーク設定](https://learn.chatgpt.com/docs/agent-approvals-security#network-isolation)で必要な通信だけを許可します。たとえば、対応版の `~/.codex/config.toml` に次を設定し、接続先を実際のテスト用ホストへ置き換えます。
+
+```toml
+[sandbox_workspace_write]
+network_access = true
+
+[features.network_proxy]
+enabled = true
+domains = { "api.integration.example.com" = "allow" }
+```
+
+ドメインの制限には **`network_proxy` の有効化も必要**です。`network_access = true` だけでは直接の外向き通信を広く許可し、コードや依存スクリプトによる秘密情報の流出・意図しない外部サービスへのアクセスを招きます。ローカルのテストサーバーが必要なら、公式仕様に従って `localhost` または対象 IP を個別に許可します。対応していない版では、接続先を制限した既存の CI 実行環境を用意してください。
 
 SDK(TypeScript など)からの呼び出しにも対応しています。企業環境では、Vertex AI(`model_provider = "gcp"`)や Amazon Bedrock も使えます。
 
