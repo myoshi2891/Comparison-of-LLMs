@@ -153,10 +153,14 @@ flowchart TB
 
 Astra で**ツールを使う場合は Responses API が前提**です。Chat Completions はツールなしのリクエストのみ対応します。**公式**
 
+長時間の処理では、Python SDK の既定タイムアウト(10分)とタイムアウト時の自動再試行(既定2回)に注意します。待ち時間だけが切れてもサーバー側の処理が止まるとは限らず、再送は重複実行・追加課金につながる可能性があります。以下は同期実行の例として `timeout=3600.0`(秒)と `max_retries=0` を設定し、自動再送を止めています。タイムアウトは実測した所要時間に余裕を持たせて調整してください。[公式 Python SDK のタイムアウト・再試行](https://developers.openai.com/api/reference/python#timeouts)
+
+接続を長時間保持しない場合は、同じ `responses.create` に `background=True` を指定し、返された `resp.id` をすぐ保存します。`queued` / `in_progress` の間は間隔と最大待機時間を決めて `resp = client.responses.retrieve(resp.id)` でポーリングし、終了後は下の失敗・未完了・完了判定へ進みます。取得の失敗や待機上限では新しい生成を作り直さず、保存した ID で状態を確認します。待機を打ち切るだけではジョブは止まらないため、不要なら `client.responses.cancel(resp.id)` でキャンセルします。[公式のバックグラウンド実行](https://developers.openai.com/api/docs/guides/background)
+
 ```python
 from openai import OpenAI
 
-client = OpenAI()
+client = OpenAI(timeout=3600.0, max_retries=0)
 
 resp = client.responses.create(
     model="gpt-6-astra",
@@ -249,7 +253,7 @@ Astra は `low` から `max` までの 5 段階です。**公式** Astra 固有�
 | `medium`(既定) | まずのベースライン | 迷ったらここから |
 | `high` | 測定で品質向上が確認できるとき | 時間とトークンが増える |
 | `xhigh` | 難問、多段の検証が必要な作業 | 費用対効果を必ず測る |
-| `max` | 最も難しい品質優先の作業のみ | Simon Willison は Astra の `max` で、27分かけて道路データから走行ルートを生成させている。**開発者** 長時間化を前提に設計する |
+| `max` | 最も難しい品質優先の作業のみ | Simon Willison は Astra の `max` で、27分かけて道路データから走行ルートを生成させている。**開発者** 第3.1節のように十分な `timeout` と `max_retries=0` を設定するか、`background=True` と ID によるポーリングを使い、既定のタイムアウト・再試行による中断や重複課金を防ぐ |
 
 ### 4.2 強度を決めるフロー
 
@@ -572,10 +576,13 @@ flowchart TB
   C --> S{"操縦入力の結果"}
   S -- "response.steer.accepted" --> T["キューに入っただけで適用は未確定<br/>開始済みのツールは<br/>自動ではキャンセルされない"]
   S -- "response.steer.failed" --> F["適用されず、後から自動でも適用されない<br/>steer.id と error を記録し<br/>自動で再送せず、アプリ側で対応を決める"]
-  T --> P{"次のイベントを待つ<br/>(accepted の直後に pending が<br/>未着でも判断しない)"}
+  T --> P{"次のイベントを待つ<br/>(accepted から最大120秒。<br/>直後に pending が未着でも判断しない)"}
   P -- "元の応答の response.incomplete<br/>reason: steered は通常の操縦遷移" --> P
   P -- "継続応答の response.created" --> D["API が作る継続応答を<br/>response.created の ID で追跡し<br/>response.completed を待つ"]
   P -- "response.steer.failed<br/>(同じ steer.id)" --> F
+  P -- "response.failed または error" --> R
+  P -- "response.incomplete<br/>(元の応答の reason: steered 以外)" --> R
+  P -- "接続切断 または待機上限に到達" --> R
   P -- "response.steer.pending<br/>(required_input で入力を要求)" --> W["継続を待機させたまま<br/>同じ接続の response.create で<br/>元の応答 ID を previous_response_id にして<br/>元の instructions・ツール設定とともに<br/>ツール結果・承認を返す<br/>(操縦入力は再送しない)"]
   W -- "response.created" --> D
   W -- "response.create の error<br/>または response.failed" --> R["待機を打ち切り、エラー・応答 ID・steer.id を記録<br/>応答履歴と送信済みの操縦入力・ツール結果を照合"]
@@ -592,6 +599,8 @@ flowchart TB
 > キューにある操縦入力は**現在の接続にだけ存在**します。接続が切れた後も残ると仮定せず、送った入力を自分で記録して応答履歴と照合してください。**開発者**
 >
 > `response.created` やテキストのdeltaは完了を意味しません。`D` では追跡中の継続応答IDと一致する `response.completed` まで待ち、継続応答の `response.incomplete` は部分的な結果として復旧へ回します。一方、**元の応答ID**の `response.incomplete` で `incomplete_details.reason: "steered"` の場合は通常の操縦遷移なので、失敗扱いせず継続応答を待ちます。**公式**
+>
+> `P` でも `response.failed`、`error`、元の応答の `reason: "steered"` 以外の `response.incomplete`、接続切断は `R` の復旧へ回します。待機全体には `response.steer.accepted` から最大120秒という期限を設けます(本ガイドの例。タスクに合わせて調整)。途中のイベントで期限を延長せず、`P` から `W` / `D` へ進んだ後も残り時間だけ待ち、期限切れ・接続切断では `R` へ進みます。[公式の操縦イベント・期限付き待機の例](https://developers.openai.com/api/docs/guides/steering)
 >
 > `W` の `response.create` は、`response.created` の前に `error` を返すことがあり、作成後に `response.failed` で終わることもあります。どちらも待機を打ち切り、エラーと応答状態を処理します。**公式** 復旧時は、応答履歴と `steer.id` ごとの入力・ツール結果の送信記録を照合し、未反映の入力だけを再送候補にします。接続切れや `previous_response_not_found` などで継続できない場合は、必要な全履歴を復元して `previous_response_id` を省略した新しい応答を作成し、元の `instructions`・ツール設定も指定します。操縦入力やツール実行を無条件に再送・再実行しないことは本ガイドの推奨です。[公式の WebSocket エラー・復旧](https://developers.openai.com/api/docs/guides/websocket-mode)、[操縦のイベント処理](https://developers.openai.com/api/docs/guides/steering)
 >

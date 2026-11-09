@@ -736,18 +736,17 @@ codex exec -m gpt-6.1-sol --sandbox workspace-write "失敗している統合テ
 
 `workspace-write` は既定でコマンドのネットワークアクセスを無効にします。`codex exec` は通常、承認を要求しないため、ネットワークが必要な統合テストも実行中の承認で解決すると想定しないでください。[公式の非対話実行](https://developers.openai.com/codex/noninteractive)
 
-実行前にテストの接続先を洗い出し、利用中の版が対応する[公式のネットワーク設定](https://learn.chatgpt.com/docs/agent-approvals-security#network-isolation)で必要な通信だけを許可します。たとえば、対応版の `~/.codex/config.toml` に次を設定し、接続先を実際のテスト用ホストへ置き換えます。
+実行前にテストの接続先を洗い出し、利用中の版が対応する[公式のネットワーク設定](https://learn.chatgpt.com/docs/agent-approvals-security#network-isolation)で必要な通信だけを許可します。テスト固有の許可リストは永続的な `~/.codex/config.toml` に保存せず、そのテスト実行だけに適用する `-c` オーバーライドで指定します。次の接続先を実際に必要なテスト用ホストだけに置き換えます。
 
-```toml
-[sandbox_workspace_write]
-network_access = true
-
-[features.network_proxy]
-enabled = true
-domains = { "api.integration.example.com" = "allow" }
+```bash
+codex exec -m gpt-6.1-sol --sandbox workspace-write \
+  -c 'sandbox_workspace_write.network_access=true' \
+  -c 'features.network_proxy.enabled=true' \
+  -c 'features.network_proxy.domains={ "api.integration.example.com" = "allow" }' \
+  "失敗している統合テストの根本原因を調べて修正して"
 ```
 
-ドメインの制限には **`network_proxy` の有効化も必要**です。`network_access = true` だけでは直接の外向き通信を広く許可し、コードや依存スクリプトによる秘密情報の流出・意図しない外部サービスへのアクセスを招きます。ローカルのテストサーバーが必要なら、公式仕様に従って `localhost` または対象 IP を個別に許可します。対応していない版では、接続先を制限した既存の CI 実行環境を用意してください。
+ドメインの制限には **`network_proxy` の有効化も必要**です。`network_access = true` だけでは直接の外向き通信を広く許可し、コードや依存スクリプトによる秘密情報の流出・意図しない外部サービスへのアクセスを招きます。**ホスト名を許可しても、その名前がプライベート IP に解決される場合は接続できません**。ローカルのテストサーバーには `localhost`、プライベートネットワークの接続先には必要な IP アドレスそのものを完全一致で個別に許可し、同じ実行時の `domains` に追加します。利用するクライアントや版で対応できない場合は、必要な接続先だけに通信を制限した CI 環境で統合テストを実行してください。[公式のローカル・プライベート接続先](https://learn.chatgpt.com/docs/agent-approvals-security#local-and-private-destinations)
 
 この `features.network_proxy` が制限するのは、**ローカルのコマンド用サンドボックス内で動くコマンド・子プロセスの通信**です。**MCPサーバーへの接続は制限しません**。Step 6 の MCP サーバーは、この許可リスト外にも接続できるため、統合テストで不要なら MCP を無効にし、必要なら MCP 側の接続先・資格情報と、独立したファイアウォールやプロキシの通信制御を別途設定します。[公式のプロキシ対象外の通信](https://learn.chatgpt.com/docs/agent-approvals-security#traffic-outside-the-command-network-proxy)
 
