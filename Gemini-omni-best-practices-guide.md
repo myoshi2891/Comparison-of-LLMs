@@ -254,8 +254,8 @@ def download_uri_video(interaction, path: str) -> None:
     video_output = interaction.output_video
     if video_output is None or not video_output.uri:
         raise RuntimeError(f"No video returned: status={interaction.status}")
-    # URI の末尾には :download?alt=media が付くので、ファイル ID だけを取り出す
-    match = re.search(r"/files/([^/:?]+)", video_output.uri)
+    # files/ で始まる相対パスと /files/ を含む HTTPS URI に対応し、:download?alt=media 等を除く
+    match = re.search(r"(?:^|/)files/([^/:?]+)", video_output.uri)
     if match is None:
         raise RuntimeError(f"URI からファイル ID を取得できません: {video_output.uri}")
     file_name = f"files/{match.group(1)}"
