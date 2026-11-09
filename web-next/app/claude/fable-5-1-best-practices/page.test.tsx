@@ -363,7 +363,11 @@ it("原本の全装飾クラスを同じタグへ同じ順序で適用", () => {
   const layout = container.querySelector(`.${styles.root} > .${styles.layout}`) as Element;
   for (const [cls, tags] of Object.entries(expected.classElements)) {
     const nodes =
-      cls === "layout" ? [layout] : Array.from(layout.querySelectorAll(`.${styles[cls]}`));
+      cls === "layout"
+        ? [layout]
+        : Array.from(
+            layout.querySelectorAll(`.${cls.startsWith("language-") ? cls : styles[cls]}`)
+          );
     expect(
       nodes.map((e) => e.localName),
       cls
