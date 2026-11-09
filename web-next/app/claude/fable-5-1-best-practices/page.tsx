@@ -136,12 +136,12 @@ export default function Page() {
       />
       <div className={styles.layout} data-testid="layout-root">
         <nav
-          className={[styles.sidebar].join(" ")}
+          className={styles.sidebar}
           id="fable51-sidebar"
           aria-label="目次"
           data-testid="sidebar-nav"
         >
-          <div className={[styles.brand].join(" ")}>
+          <div className={styles.brand}>
             {"Claude Fable 5.1"}
             <br />
             {"ベストプラクティス"}
@@ -152,76 +152,76 @@ export default function Page() {
             aria-current="location"
             data-testid="sidebar-nav-link"
           >
-            <span className={[styles["n-dot"]].join(" ")}></span>
+            <span className={styles["n-dot"]}></span>
             <span>{"0. このガイドの読み方と情報の鮮度"}</span>
           </a>
-          <a className={[styles["nav-a"]].join(" ")} href="#sec-1" data-testid="sidebar-nav-link">
-            <span className={[styles["n-dot"]].join(" ")}></span>
+          <a className={styles["nav-a"]} href="#sec-1" data-testid="sidebar-nav-link">
+            <span className={styles["n-dot"]}></span>
             <span>{"1. Fable とは何か(位置づけと基本スペック)"}</span>
           </a>
-          <a className={[styles["nav-a"]].join(" ")} href="#sec-2" data-testid="sidebar-nav-link">
-            <span className={[styles["n-dot"]].join(" ")}></span>
+          <a className={styles["nav-a"]} href="#sec-2" data-testid="sidebar-nav-link">
+            <span className={styles["n-dot"]}></span>
             <span>{"2. Fable 5.1 の挙動の特徴(旧モデルとの違い)"}</span>
           </a>
-          <a className={[styles["nav-a"]].join(" ")} href="#sec-3" data-testid="sidebar-nav-link">
-            <span className={[styles["n-dot"]].join(" ")}></span>
+          <a className={styles["nav-a"]} href="#sec-3" data-testid="sidebar-nav-link">
+            <span className={styles["n-dot"]}></span>
             <span>{"3. ステップ1: モデル選定"}</span>
           </a>
-          <a className={[styles["nav-a"]].join(" ")} href="#sec-4" data-testid="sidebar-nav-link">
-            <span className={[styles["n-dot"]].join(" ")}></span>
+          <a className={styles["nav-a"]} href="#sec-4" data-testid="sidebar-nav-link">
+            <span className={styles["n-dot"]}></span>
             <span>{"4. ステップ2: API 基本設定とブレイキングチェンジ対応"}</span>
           </a>
-          <a className={[styles["nav-a"]].join(" ")} href="#sec-5" data-testid="sidebar-nav-link">
-            <span className={[styles["n-dot"]].join(" ")}></span>
+          <a className={styles["nav-a"]} href="#sec-5" data-testid="sidebar-nav-link">
+            <span className={styles["n-dot"]}></span>
             <span>{"5. ステップ3: effort 設計"}</span>
           </a>
-          <a className={[styles["nav-a"]].join(" ")} href="#sec-6" data-testid="sidebar-nav-link">
-            <span className={[styles["n-dot"]].join(" ")}></span>
+          <a className={styles["nav-a"]} href="#sec-6" data-testid="sidebar-nav-link">
+            <span className={styles["n-dot"]}></span>
             <span>{"6. ステップ4: 履歴の append-only 運用とキャッシュ"}</span>
           </a>
-          <a className={[styles["nav-a"]].join(" ")} href="#sec-7" data-testid="sidebar-nav-link">
-            <span className={[styles["n-dot"]].join(" ")}></span>
+          <a className={styles["nav-a"]} href="#sec-7" data-testid="sidebar-nav-link">
+            <span className={styles["n-dot"]}></span>
             <span>{"7. ステップ5: プロンプト設計(薄く、ゴールと制約で)"}</span>
           </a>
-          <a className={[styles["nav-a"]].join(" ")} href="#sec-8" data-testid="sidebar-nav-link">
-            <span className={[styles["n-dot"]].join(" ")}></span>
+          <a className={styles["nav-a"]} href="#sec-8" data-testid="sidebar-nav-link">
+            <span className={styles["n-dot"]}></span>
             <span>{"8. ステップ6: ツール呼び出しとエージェントループ"}</span>
           </a>
-          <a className={[styles["nav-a"]].join(" ")} href="#sec-9" data-testid="sidebar-nav-link">
-            <span className={[styles["n-dot"]].join(" ")}></span>
+          <a className={styles["nav-a"]} href="#sec-9" data-testid="sidebar-nav-link">
+            <span className={styles["n-dot"]}></span>
             <span>{"9. ステップ7: Claude Code 実践ワークフロー"}</span>
           </a>
-          <a className={[styles["nav-a"]].join(" ")} href="#sec-10" data-testid="sidebar-nav-link">
-            <span className={[styles["n-dot"]].join(" ")}></span>
+          <a className={styles["nav-a"]} href="#sec-10" data-testid="sidebar-nav-link">
+            <span className={styles["n-dot"]}></span>
             <span>{"10. ステップ8: コスト最適化"}</span>
           </a>
-          <a className={[styles["nav-a"]].join(" ")} href="#sec-11" data-testid="sidebar-nav-link">
-            <span className={[styles["n-dot"]].join(" ")}></span>
+          <a className={styles["nav-a"]} href="#sec-11" data-testid="sidebar-nav-link">
+            <span className={styles["n-dot"]}></span>
             <span>{"11. ステップ9: 安全装置・refusal・fallback"}</span>
           </a>
-          <a className={[styles["nav-a"]].join(" ")} href="#sec-12" data-testid="sidebar-nav-link">
-            <span className={[styles["n-dot"]].join(" ")}></span>
+          <a className={styles["nav-a"]} href="#sec-12" data-testid="sidebar-nav-link">
+            <span className={styles["n-dot"]}></span>
             <span>{"12. ステップ10: 評価の回し方"}</span>
           </a>
-          <a className={[styles["nav-a"]].join(" ")} href="#sec-13" data-testid="sidebar-nav-link">
-            <span className={[styles["n-dot"]].join(" ")}></span>
+          <a className={styles["nav-a"]} href="#sec-13" data-testid="sidebar-nav-link">
+            <span className={styles["n-dot"]}></span>
             <span>{"13. アンチパターン早見表"}</span>
           </a>
-          <a className={[styles["nav-a"]].join(" ")} href="#sec-14" data-testid="sidebar-nav-link">
-            <span className={[styles["n-dot"]].join(" ")}></span>
+          <a className={styles["nav-a"]} href="#sec-14" data-testid="sidebar-nav-link">
+            <span className={styles["n-dot"]}></span>
             <span>{"付録A: そのまま使えるテンプレート"}</span>
           </a>
-          <a className={[styles["nav-a"]].join(" ")} href="#sec-15" data-testid="sidebar-nav-link">
-            <span className={[styles["n-dot"]].join(" ")}></span>
+          <a className={styles["nav-a"]} href="#sec-15" data-testid="sidebar-nav-link">
+            <span className={styles["n-dot"]}></span>
             <span>{"付録B: 最小の実践チェックリスト"}</span>
           </a>
-          <a className={[styles["nav-a"]].join(" ")} href="#sec-16" data-testid="sidebar-nav-link">
-            <span className={[styles["n-dot"]].join(" ")}></span>
+          <a className={styles["nav-a"]} href="#sec-16" data-testid="sidebar-nav-link">
+            <span className={styles["n-dot"]}></span>
             <span>{"補足: 追加ベストプラクティスと根拠ソース URL"}</span>
           </a>
         </nav>
-        <main className={[styles.main].join(" ")}>
-          <header className={[styles.hero].join(" ")}>
+        <main className={styles.main}>
+          <header className={styles.hero}>
             <div className={styles.heroDates} data-testid="hero-dates">
               最終確認日: <time dateTime={entry?.lastReviewed}>{entry?.lastReviewed}</time>公開日:{" "}
               <time dateTime={entry?.addedAt}>{entry?.addedAt}</time>
@@ -254,11 +254,11 @@ export default function Page() {
               </li>
             </ul>
           </header>
-          <section className={[styles.section].join(" ")} id="sec-0">
+          <section className={styles.section} id="sec-0">
             <h2 id="fable51-heading-0">{"0. このガイドの読み方と情報の鮮度"}</h2>
-            <div className={[styles.prose].join(" ")}>
+            <div className={styles.prose}>
               <h3 id="fable51-heading-1">{"0.1 このガイドの構成"}</h3>
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 <table>
                   <thead>
                     <tr>
@@ -335,12 +335,12 @@ export default function Page() {
               </ul>
             </div>
           </section>
-          <section className={[styles.section].join(" ")} id="sec-1">
+          <section className={styles.section} id="sec-1">
             <h2 id="fable51-heading-3">{"1. Fable とは何か(位置づけと基本スペック)"}</h2>
-            <div className={[styles.prose].join(" ")}>
+            <div className={styles.prose}>
               <h3 id="fable51-heading-4">{"1.1 モデルラインナップにおける位置づけ"}</h3>
               <p>{"Claude は現在、次の階層で提供されています。"}</p>
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 <table>
                   <thead>
                     <tr>
@@ -405,7 +405,7 @@ export default function Page() {
                 {"。一般の開発者が使うのは Fable です。 "}
               </p>
               <h3 id="fable51-heading-5">{"1.2 タイムライン(主要イベント)"}</h3>
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 <table>
                   <thead>
                     <tr>
@@ -463,7 +463,7 @@ export default function Page() {
                 </p>
               </blockquote>
               <h3 id="fable51-heading-6">{"1.3 Fable 5.1 の基本スペック(公式ドキュメント)"}</h3>
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 <table>
                   <thead>
                     <tr>
@@ -559,7 +559,7 @@ export default function Page() {
                 </table>
               </div>
               <h3 id="fable51-heading-7">{"1.4 ベンチマーク(Anthropic 自己報告)"}</h3>
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 <table>
                   <thead>
                     <tr>
@@ -616,20 +616,20 @@ export default function Page() {
                 </li>
               </ul>
               <h3 id="fable51-heading-8">{"1.5 能力が伸びた領域(公式)"}</h3>
-              <div className={[styles["diagram-card"]].join(" ")}>
-                <div className={[styles["diagram-wrap"]].join(" ")}>
-                  <div className={[styles["diagram-canvas"]].join(" ")} data-diagram-id="0">
+              <div className={styles["diagram-card"]}>
+                <div className={styles["diagram-wrap"]}>
+                  <div className={styles["diagram-canvas"]} data-diagram-id="0">
                     <MermaidDiagram chart={DIAGRAM_0} theme="base" themeVariables={THEME_VARS} />
                   </div>
                 </div>
               </div>
             </div>
           </section>
-          <section className={[styles.section].join(" ")} id="sec-2">
+          <section className={styles.section} id="sec-2">
             <h2 id="fable51-heading-9">{"2. Fable 5.1 の挙動の特徴(旧モデルとの違い)"}</h2>
-            <div className={[styles.prose].join(" ")}>
+            <div className={styles.prose}>
               <h3 id="fable51-heading-10">{"2.1 Fable 5 から続く特徴"}</h3>
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 <table>
                   <thead>
                     <tr>
@@ -689,7 +689,7 @@ export default function Page() {
                 </table>
               </div>
               <h3 id="fable51-heading-11">{"2.2 Fable 5.1 で変わった点(Fable 5 → 5.1)"}</h3>
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 <table>
                   <thead>
                     <tr>
@@ -753,9 +753,9 @@ export default function Page() {
               </div>
             </div>
           </section>
-          <section className={[styles.section].join(" ")} id="sec-3">
+          <section className={styles.section} id="sec-3">
             <h2 id="fable51-heading-12">{"3. ステップ1: モデル選定"}</h2>
-            <div className={[styles.prose].join(" ")}>
+            <div className={styles.prose}>
               <h3 id="fable51-heading-13">{"3.1 公式の基本方針"}</h3>
               <p>{"公式ドキュメントの方針は次のとおりです。"}</p>
               <ol>
@@ -777,15 +777,15 @@ export default function Page() {
                 {"を前提にします。"}
               </p>
               <h3 id="fable51-heading-14">{"3.2 選定フローチャート"}</h3>
-              <div className={[styles["diagram-card"]].join(" ")}>
-                <div className={[styles["diagram-wrap"]].join(" ")}>
-                  <div className={[styles["diagram-canvas"]].join(" ")} data-diagram-id="1">
+              <div className={styles["diagram-card"]}>
+                <div className={styles["diagram-wrap"]}>
+                  <div className={styles["diagram-canvas"]} data-diagram-id="1">
                     <MermaidDiagram chart={DIAGRAM_1} theme="base" themeVariables={THEME_VARS} />
                   </div>
                 </div>
               </div>
               <h3 id="fable51-heading-15">{"3.3 Fable が特に効く場面"}</h3>
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 <table>
                   <thead>
                     <tr>
@@ -821,7 +821,7 @@ export default function Page() {
                 </table>
               </div>
               <h3 id="fable51-heading-16">{"3.4 ルーティングの実践例"}</h3>
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 <table>
                   <thead>
                     <tr>
@@ -863,11 +863,11 @@ export default function Page() {
               </blockquote>
             </div>
           </section>
-          <section className={[styles.section].join(" ")} id="sec-4">
+          <section className={styles.section} id="sec-4">
             <h2 id="fable51-heading-17">
               {"4. ステップ2: API 基本設定とブレイキングチェンジ対応"}
             </h2>
-            <div className={[styles.prose].join(" ")}>
+            <div className={styles.prose}>
               <h3 id="fable51-heading-18">{"4.1 最小の呼び出し"}</h3>
               <p>
                 {" 公式サンプルは "}
@@ -879,51 +879,77 @@ export default function Page() {
               <pre data-testid="code-block">
                 <code className="language-python hljs">
                   <span className={styles.codeLine}>
-                    <span className={["hljs-keyword"].join(" ")}>{"import"}</span>
-                    {
-                      " anthropic\n\nclient = anthropic.Anthropic()\n\nresponse = client.beta.messages.create(\n    model="
-                    }
-                    <span className={["hljs-string"].join(" ")}>{'"claude-fable-5-1"'}</span>
-                    {",\n    max_tokens="}
-                    <span className={["hljs-number"].join(" ")}>{"16000"}</span>
-                    {",\n    output_config={"}
-                    <span className={["hljs-string"].join(" ")}>{'"effort"'}</span>
+                    <span className="hljs-keyword">{"import"}</span> {"anthropic"}
+                    {"\n"}
+                    {"\n"}
+                    {"client = anthropic.Anthropic()"}
+                    {"\n"}
+                    {"\n"}
+                    {"response = client.beta.messages.create("}
+                    {"\n"}
+                    {"    "}
+                    {"model="}
+                    <span className="hljs-string">{'"claude-fable-5-1"'}</span>
+                    {","}
+                    {"\n"}
+                    {"    "}
+                    {"max_tokens="}
+                    <span className="hljs-number">{"16000"}</span>
+                    {","}
+                    {"\n"}
+                    {"    "}
+                    {"output_config={"}
+                    <span className="hljs-string">{'"effort"'}</span>
                     {": "}
-                    <span className={["hljs-string"].join(" ")}>{'"high"'}</span>
+                    <span className="hljs-string">{'"high"'}</span>
                     {"},  "}
-                    <span className={["hljs-comment"].join(" ")}>
-                      {"# 既定値。評価で上下させる"}
-                    </span>
-                    {"\n    messages=[\n        {"}
-                    <span className={["hljs-string"].join(" ")}>{'"role"'}</span>
+                    <span className="hljs-comment">{"# 既定値。評価で上下させる"}</span>
+                    {"\n"}
+                    {"    "}
+                    {"messages=["}
+                    {"\n"}
+                    {"        "}
+                    {"{"}
+                    <span className="hljs-string">{'"role"'}</span>
                     {": "}
-                    <span className={["hljs-string"].join(" ")}>{'"user"'}</span>
+                    <span className="hljs-string">{'"user"'}</span>
                     {", "}
-                    <span className={["hljs-string"].join(" ")}>{'"content"'}</span>
+                    <span className="hljs-string">{'"content"'}</span>
                     {": "}
-                    <span className={["hljs-string"].join(" ")}>
+                    <span className="hljs-string">
                       {'"このリポジトリの認証モジュールの設計上のリスクを洗い出して"'}
                     </span>
-                    {"}\n    ],\n)\n\n"}
-                    <span className={["hljs-keyword"].join(" ")}>{"for"}</span>
+                    {"}"}
+                    {"\n"}
+                    {"    "}
+                    {"],"}
+                    {"\n"}
+                    {")"}
+                    {"\n"}
+                    {"\n"}
+                    <span className="hljs-keyword">{"for"}</span>
                     {" block "}
-                    <span className={["hljs-keyword"].join(" ")}>{"in"}</span>
-                    {" response.content:\n    "}
-                    <span className={["hljs-keyword"].join(" ")}>{"if"}</span>
+                    <span className="hljs-keyword">{"in"}</span> {"response.content:"}
+                    {"\n"}
+                    {"    "}
+                    <span className="hljs-keyword">{"if"}</span>
                     {" block."}
-                    <span className={["hljs-built_in"].join(" ")}>{"type"}</span>
+                    <span className="hljs-built_in">{"type"}</span>
                     {" == "}
-                    <span className={["hljs-string"].join(" ")}>{'"text"'}</span>
-                    {":\n        "}
-                    <span className={["hljs-built_in"].join(" ")}>{"print"}</span>
-                    {"(block.text)\n"}
+                    <span className="hljs-string">{'"text"'}</span>
+                    {":"}
+                    {"\n"}
+                    {"        "}
+                    <span className="hljs-built_in">{"print"}</span>
+                    {"(block.text)"}
+                    {"\n"}
                   </span>
                 </code>
               </pre>
               <h3 id="fable51-heading-19">
                 {"4.2 Fable 5 から移行する際の4つのブレイキングチェンジ"}
               </h3>
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 <table>
                   <thead>
                     <tr>
@@ -1002,7 +1028,7 @@ export default function Page() {
                 </table>
               </div>
               <h3 id="fable51-heading-20">{"4.3 変えてはいけない前提(Fable 5 から不変)"}</h3>
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 <table>
                   <thead>
                     <tr>
@@ -1088,9 +1114,9 @@ export default function Page() {
               </ul>
             </div>
           </section>
-          <section className={[styles.section].join(" ")} id="sec-5">
+          <section className={styles.section} id="sec-5">
             <h2 id="fable51-heading-22">{"5. ステップ3: effort 設計"}</h2>
-            <div className={[styles.prose].join(" ")}>
+            <div className={styles.prose}>
               <h3 id="fable51-heading-23">{"5.1 基本方針"}</h3>
               <p>
                 <strong>
@@ -1124,7 +1150,7 @@ export default function Page() {
                 </li>
               </ol>
               <h3 id="fable51-heading-24">{"5.2 レベル別の目安"}</h3>
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 <table>
                   <thead>
                     <tr>
@@ -1190,7 +1216,7 @@ export default function Page() {
                 <strong>{"用途と単価が限定された1例"}</strong>
                 {"ですが、桁の違いを把握する助けになります。 "}
               </p>
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 <table>
                   <thead>
                     <tr>
@@ -1257,9 +1283,9 @@ export default function Page() {
                 </p>
               </blockquote>
               <h3 id="fable51-heading-26">{"5.4 effort 選択のフローチャート"}</h3>
-              <div className={[styles["diagram-card"]].join(" ")}>
-                <div className={[styles["diagram-wrap"]].join(" ")}>
-                  <div className={[styles["diagram-canvas"]].join(" ")} data-diagram-id="2">
+              <div className={styles["diagram-card"]}>
+                <div className={styles["diagram-wrap"]}>
+                  <div className={styles["diagram-canvas"]} data-diagram-id="2">
                     <MermaidDiagram chart={DIAGRAM_2} theme="base" themeVariables={THEME_VARS} />
                   </div>
                 </div>
@@ -1286,63 +1312,97 @@ export default function Page() {
               <pre data-testid="code-block">
                 <code className="language-python hljs">
                   <span className={styles.codeLine}>
-                    {"response = client.beta.messages.create(\n    model="}
-                    <span className={["hljs-string"].join(" ")}>{'"claude-fable-5-1"'}</span>
-                    {",\n    max_tokens="}
-                    <span className={["hljs-number"].join(" ")}>{"4096"}</span>
-                    {",\n    output_config={"}
-                    <span className={["hljs-string"].join(" ")}>{'"effort"'}</span>
+                    {"response = client.beta.messages.create("}
+                    {"\n"}
+                    {"    "}
+                    {"model="}
+                    <span className="hljs-string">{'"claude-fable-5-1"'}</span>
+                    {","}
+                    {"\n"}
+                    {"    "}
+                    {"max_tokens="}
+                    <span className="hljs-number">{"4096"}</span>
+                    {","}
+                    {"\n"}
+                    {"    "}
+                    {"output_config={"}
+                    <span className="hljs-string">{'"effort"'}</span>
                     {": "}
-                    <span className={["hljs-string"].join(" ")}>{'"high"'}</span>
-                    {"},\n    betas=["}
-                    <span className={["hljs-string"].join(" ")}>
+                    <span className="hljs-string">{'"high"'}</span>
+                    {"},"}
+                    {"\n"}
+                    {"    "}
+                    {"betas=["}
+                    <span className="hljs-string">
                       {'"mid-conversation-output-config-2026-07-01"'}
                     </span>
-                    {"],\n    messages=[\n        {"}
-                    <span className={["hljs-string"].join(" ")}>{'"role"'}</span>
+                    {"],"}
+                    {"\n"}
+                    {"    "}
+                    {"messages=["}
+                    {"\n"}
+                    {"        "}
+                    {"{"}
+                    <span className="hljs-string">{'"role"'}</span>
                     {": "}
-                    <span className={["hljs-string"].join(" ")}>{'"user"'}</span>
+                    <span className="hljs-string">{'"user"'}</span>
                     {", "}
-                    <span className={["hljs-string"].join(" ")}>{'"content"'}</span>
+                    <span className="hljs-string">{'"content"'}</span>
                     {": "}
-                    <span className={["hljs-string"].join(" ")}>
+                    <span className="hljs-string">
                       {'"SQLite から PostgreSQL への移行計画を3ステップで"'}
                     </span>
-                    {"},\n        {"}
-                    <span className={["hljs-string"].join(" ")}>{'"role"'}</span>
+                    {"},"}
+                    {"\n"}
+                    {"        "}
+                    {"{"}
+                    <span className="hljs-string">{'"role"'}</span>
                     {": "}
-                    <span className={["hljs-string"].join(" ")}>{'"assistant"'}</span>
+                    <span className="hljs-string">{'"assistant"'}</span>
                     {", "}
-                    <span className={["hljs-string"].join(" ")}>{'"content"'}</span>
+                    <span className="hljs-string">{'"content"'}</span>
                     {": "}
-                    <span className={["hljs-string"].join(" ")}>
+                    <span className="hljs-string">
                       {'"1. エクスポート 2. スキーマ作成 3. インポートと件数検証"'}
                     </span>
-                    {"},\n        "}
-                    <span className={["hljs-comment"].join(" ")}>
+                    {"},"}
+                    {"\n"}
+                    {"        "}
+                    <span className="hljs-comment">
                       {"# effort のみを変える system メッセージ(次のユーザーターンから有効)"}
                     </span>
-                    {"\n        {"}
-                    <span className={["hljs-string"].join(" ")}>{'"role"'}</span>
+                    {"\n"}
+                    {"        "}
+                    {"{"}
+                    <span className="hljs-string">{'"role"'}</span>
                     {": "}
-                    <span className={["hljs-string"].join(" ")}>{'"system"'}</span>
+                    <span className="hljs-string">{'"system"'}</span>
                     {", "}
-                    <span className={["hljs-string"].join(" ")}>{'"content"'}</span>
+                    <span className="hljs-string">{'"content"'}</span>
                     {": [], "}
-                    <span className={["hljs-string"].join(" ")}>{'"output_config"'}</span>
+                    <span className="hljs-string">{'"output_config"'}</span>
                     {": {"}
-                    <span className={["hljs-string"].join(" ")}>{'"effort"'}</span>
+                    <span className="hljs-string">{'"effort"'}</span>
                     {": "}
-                    <span className={["hljs-string"].join(" ")}>{'"low"'}</span>
-                    {"}},\n        {"}
-                    <span className={["hljs-string"].join(" ")}>{'"role"'}</span>
+                    <span className="hljs-string">{'"low"'}</span>
+                    {"}},"}
+                    {"\n"}
+                    {"        "}
+                    {"{"}
+                    <span className="hljs-string">{'"role"'}</span>
                     {": "}
-                    <span className={["hljs-string"].join(" ")}>{'"user"'}</span>
+                    <span className="hljs-string">{'"user"'}</span>
                     {", "}
-                    <span className={["hljs-string"].join(" ")}>{'"content"'}</span>
+                    <span className="hljs-string">{'"content"'}</span>
                     {": "}
-                    <span className={["hljs-string"].join(" ")}>{'"上の計画を1文で要約して"'}</span>
-                    {"},\n    ],\n)\n"}
+                    <span className="hljs-string">{'"上の計画を1文で要約して"'}</span>
+                    {"},"}
+                    {"\n"}
+                    {"    "}
+                    {"],"}
+                    {"\n"}
+                    {")"}
+                    {"\n"}
                   </span>
                 </code>
               </pre>
@@ -1358,7 +1418,7 @@ export default function Page() {
                 <strong>{"長い成果物を思考の中で書き上げてから、もう一度本文で書く"}</strong>
                 {"ことがあります。待ち時間と出力トークンが倍になります。対策は次のとおりです。 "}
               </p>
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 <table>
                   <thead>
                     <tr>
@@ -1420,9 +1480,9 @@ export default function Page() {
               </ol>
             </div>
           </section>
-          <section className={[styles.section].join(" ")} id="sec-6">
+          <section className={styles.section} id="sec-6">
             <h2 id="fable51-heading-30">{"6. ステップ4: 履歴の append-only 運用とキャッシュ"}</h2>
-            <div className={[styles.prose].join(" ")}>
+            <div className={styles.prose}>
               <h3 id="fable51-heading-31">{"6.1 なぜ重要か"}</h3>
               <p>
                 {" Fable 5.1 では、返ってきた thinking ブロックを送り返したとき、"}
@@ -1447,7 +1507,7 @@ export default function Page() {
                 {"です。 "}
               </p>
               <h3 id="fable51-heading-32">{"6.2 やってはいけない編集 / やってよい編集"}</h3>
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 <table>
                   <thead>
                     <tr>
@@ -1494,9 +1554,9 @@ export default function Page() {
                 </table>
               </div>
               <h3 id="fable51-heading-33">{"6.3 置き換えパターン"}</h3>
-              <div className={[styles["diagram-card"]].join(" ")}>
-                <div className={[styles["diagram-wrap"]].join(" ")}>
-                  <div className={[styles["diagram-canvas"]].join(" ")} data-diagram-id="3">
+              <div className={styles["diagram-card"]}>
+                <div className={styles["diagram-wrap"]}>
+                  <div className={styles["diagram-canvas"]} data-diagram-id="3">
                     <MermaidDiagram chart={DIAGRAM_3} theme="base" themeVariables={THEME_VARS} />
                   </div>
                 </div>
@@ -1525,39 +1585,57 @@ export default function Page() {
               <pre data-testid="code-block">
                 <code className="language-python hljs">
                   <span className={styles.codeLine}>
-                    <span className={["hljs-comment"].join(" ")}>
+                    <span className="hljs-comment">
                       {
                         "# ツール結果を返したあとに、毎回「新しいコピー」を末尾に追加する(古いコピーは触らない)"
                       }
                     </span>
-                    {"\nmessages.append({"}
-                    <span className={["hljs-string"].join(" ")}>{'"role"'}</span>
+                    {"\n"}
+                    {"messages.append({"}
+                    <span className="hljs-string">{'"role"'}</span>
                     {": "}
-                    <span className={["hljs-string"].join(" ")}>{'"user"'}</span>
+                    <span className="hljs-string">{'"user"'}</span>
                     {", "}
-                    <span className={["hljs-string"].join(" ")}>{'"content"'}</span>
-                    {": tool_results})\nmessages.append(\n    {\n        "}
-                    <span className={["hljs-string"].join(" ")}>{'"role"'}</span>
+                    <span className="hljs-string">{'"content"'}</span>
+                    {": tool_results})"}
+                    {"\n"}
+                    {"messages.append("}
+                    {"\n"}
+                    {"    "}
+                    {"{"}
+                    {"\n"}
+                    {"        "}
+                    <span className="hljs-string">{'"role"'}</span>
                     {": "}
-                    <span className={["hljs-string"].join(" ")}>{'"system"'}</span>
-                    {",\n        "}
-                    <span className={["hljs-string"].join(" ")}>{'"clear_at"'}</span>
+                    <span className="hljs-string">{'"system"'}</span>
+                    {","}
+                    {"\n"}
+                    {"        "}
+                    <span className="hljs-string">{'"clear_at"'}</span>
                     {": "}
-                    <span className={["hljs-string"].join(" ")}>{'"next_user_message"'}</span>
-                    {",\n        "}
-                    <span className={["hljs-string"].join(" ")}>{'"content"'}</span>
+                    <span className="hljs-string">{'"next_user_message"'}</span>
+                    {","}
+                    {"\n"}
+                    {"        "}
+                    <span className="hljs-string">{'"content"'}</span>
                     {": "}
-                    <span className={["hljs-string"].join(" ")}>
+                    <span className="hljs-string">
                       {
                         '"次に必要なものを先に列挙し、互いに依存しないものは1回の応答でまとめて要求すること。"'
                       }
                     </span>
-                    {",\n    }\n)\n"}
+                    {","}
+                    {"\n"}
+                    {"    "}
+                    {"}"}
+                    {"\n"}
+                    {")"}
+                    {"\n"}
                   </span>
                 </code>
               </pre>
               <h3 id="fable51-heading-35">{"6.5 履歴の編集を検出する"}</h3>
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 <table>
                   <thead>
                     <tr>
@@ -1604,32 +1682,50 @@ export default function Page() {
               <pre data-testid="code-block">
                 <code className="language-python hljs">
                   <span className={styles.codeLine}>
-                    {"response = client.beta.messages.create(\n    model="}
-                    <span className={["hljs-string"].join(" ")}>{'"claude-fable-5-1"'}</span>
-                    {",\n    max_tokens="}
-                    <span className={["hljs-number"].join(" ")}>{"16000"}</span>
-                    {",\n    betas=["}
-                    <span className={["hljs-string"].join(" ")}>
-                      {'"thinking-binding-controls-2026-08-01"'}
-                    </span>
-                    {"],\n    thinking={\n        "}
-                    <span className={["hljs-string"].join(" ")}>{'"type"'}</span>
+                    {"response = client.beta.messages.create("}
+                    {"\n"}
+                    {"    "}
+                    {"model="}
+                    <span className="hljs-string">{'"claude-fable-5-1"'}</span>
+                    {","}
+                    {"\n"}
+                    {"    "}
+                    {"max_tokens="}
+                    <span className="hljs-number">{"16000"}</span>
+                    {","}
+                    {"\n"}
+                    {"    "}
+                    {"betas=["}
+                    <span className="hljs-string">{'"thinking-binding-controls-2026-08-01"'}</span>
+                    {"],"}
+                    {"\n"}
+                    {"    "}
+                    {"thinking={"}
+                    {"\n"}
+                    {"        "}
+                    <span className="hljs-string">{'"type"'}</span>
                     {": "}
-                    <span className={["hljs-string"].join(" ")}>{'"adaptive"'}</span>
-                    {",\n        "}
-                    <span className={["hljs-string"].join(" ")}>{'"block_binding"'}</span>
+                    <span className="hljs-string">{'"adaptive"'}</span>
+                    {","}
+                    {"\n"}
+                    {"        "}
+                    <span className="hljs-string">{'"block_binding"'}</span>
                     {": {"}
-                    <span className={["hljs-string"].join(" ")}>
-                      {'"prefix_mismatch_behavior"'}
-                    </span>
+                    <span className="hljs-string">{'"prefix_mismatch_behavior"'}</span>
                     {": "}
-                    <span className={["hljs-string"].join(" ")}>{'"drop_block"'}</span>
+                    <span className="hljs-string">{'"drop_block"'}</span>
                     {"},  "}
-                    <span className={["hljs-comment"].join(" ")}>
-                      {"# 調査時。本番運用の方針は公式表で確認"}
-                    </span>
-                    {"\n    },\n    messages=messages,\n)\n"}
-                    <span className={["hljs-comment"].join(" ")}>
+                    <span className="hljs-comment">{"# 調査時。本番運用の方針は公式表で確認"}</span>
+                    {"\n"}
+                    {"    "}
+                    {"},"}
+                    {"\n"}
+                    {"    "}
+                    {"messages=messages,"}
+                    {"\n"}
+                    {")"}
+                    {"\n"}
+                    <span className="hljs-comment">
                       {"# 調査時は response の input_transformations をログに残す"}
                     </span>
                     {"\n"}
@@ -1678,11 +1774,11 @@ export default function Page() {
               </ul>
             </div>
           </section>
-          <section className={[styles.section].join(" ")} id="sec-7">
+          <section className={styles.section} id="sec-7">
             <h2 id="fable51-heading-37">{"7. ステップ5: プロンプト設計(薄く、ゴールと制約で)"}</h2>
-            <div className={[styles.prose].join(" ")}>
+            <div className={styles.prose}>
               <h3 id="fable51-heading-38">{"7.1 基本原則: 薄いプロンプトを好む"}</h3>
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 <table>
                   <thead>
                     <tr>
@@ -1731,7 +1827,7 @@ export default function Page() {
               </div>
               <h3 id="fable51-heading-39">{"7.2 「完了の定義」を書く"}</h3>
               <p>{"McFarland の整理を、本ガイド用に言い換えます。"}</p>
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 <table>
                   <thead>
                     <tr>
@@ -1812,12 +1908,15 @@ export default function Page() {
               <pre data-testid="code-block">
                 <code className="language-markdown hljs">
                   <span className={styles.codeLine}>
-                    <span className={["hljs-bullet"].join(" ")}>{"-"}</span>
-                    {" 箇条書きは、依頼があるとき、または多面的で整理に役立つときに使う\n"}
-                    <span className={["hljs-bullet"].join(" ")}>{"-"}</span>
-                    {" ユーザーが書式の最小化を明示したら、見出し・リスト・太字を使わない\n"}
-                    <span className={["hljs-bullet"].join(" ")}>{"-"}</span>
-                    {" 日常的・個人的・感情的な会話は、地の文だけで答える\n"}
+                    <span className="hljs-bullet">{"-"}</span>{" "}
+                    {"箇条書きは、依頼があるとき、または多面的で整理に役立つときに使う"}
+                    {"\n"}
+                    <span className="hljs-bullet">{"-"}</span>{" "}
+                    {"ユーザーが書式の最小化を明示したら、見出し・リスト・太字を使わない"}
+                    {"\n"}
+                    <span className="hljs-bullet">{"-"}</span>{" "}
+                    {"日常的・個人的・感情的な会話は、地の文だけで答える"}
+                    {"\n"}
                   </span>
                 </code>
               </pre>
@@ -1831,8 +1930,9 @@ export default function Page() {
                 <code className="language-markdown hljs">
                   <span className={styles.codeLine}>
                     {
-                      "比喩や気取った言い回しを使わず、意味を直接述べてください。リテラルな表現があるならそれを使うこと。\n"
+                      "比喩や気取った言い回しを使わず、意味を直接述べてください。リテラルな表現があるならそれを使うこと。"
                     }
+                    {"\n"}
                   </span>
                 </code>
               </pre>
@@ -1853,20 +1953,30 @@ export default function Page() {
               <pre data-testid="code-block">
                 <code className="language-markdown hljs">
                   <span className={styles.codeLine}>
-                    <span className={["hljs-bullet"].join(" ")}>{"-"}</span>
+                    <span className="hljs-bullet">{"-"}</span>{" "}
+                    {"作業中に見つけた既存のバグ、性能上の懸念、依頼に書かれていない挙動は、"}
+                    {"\n"}
+                    {"  "}
                     {
-                      " 作業中に見つけた既存のバグ、性能上の懸念、依頼に書かれていない挙動は、\n  依頼された機能が動くのに必須でない限り、この変更では直さず、フォローアップとして報告する\n"
+                      "依頼された機能が動くのに必須でない限り、この変更では直さず、フォローアップとして報告する"
                     }
-                    <span className={["hljs-bullet"].join(" ")}>{"-"}</span>
+                    {"\n"}
+                    <span className="hljs-bullet">{"-"}</span>{" "}
                     {
-                      " 曖昧な点は、文面と周辺コードが最も直接的に支持する解釈で実装し、その仮定を要約に書く(他の解釈向けの作り込みはしない)\n"
+                      "曖昧な点は、文面と周辺コードが最も直接的に支持する解釈で実装し、その仮定を要約に書く(他の解釈向けの作り込みはしない)"
                     }
-                    <span className={["hljs-bullet"].join(" ")}>{"-"}</span>
+                    {"\n"}
+                    <span className="hljs-bullet">{"-"}</span>{" "}
+                    {"検証用の使い捨てスクリプトは残さなくてよい。テストは、依頼があるか、"}
+                    {"\n"}
+                    {"  "}
                     {
-                      " 検証用の使い捨てスクリプトは残さなくてよい。テストは、依頼があるか、\n  同種の変更に既存リポジトリがテストを持つ場合のみ、隣接ファイルと同程度の規模でコミットする\n"
+                      "同種の変更に既存リポジトリがテストを持つ場合のみ、隣接ファイルと同程度の規模でコミットする"
                     }
-                    <span className={["hljs-bullet"].join(" ")}>{"-"}</span>
-                    {" これは「余計なもの」の話。依頼された挙動はすべて完全に実装する\n"}
+                    {"\n"}
+                    <span className="hljs-bullet">{"-"}</span>{" "}
+                    {"これは「余計なもの」の話。依頼された挙動はすべて完全に実装する"}
+                    {"\n"}
                   </span>
                 </code>
               </pre>
@@ -1899,7 +2009,7 @@ export default function Page() {
                   " 公式は2種類の追記を併用することを勧めています(趣旨のみ要約。全文は公式ページを参照)。 "
                 }
               </p>
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 <table>
                   <thead>
                     <tr>
@@ -1959,7 +2069,7 @@ export default function Page() {
                 <strong>{"必ず残す"}</strong>
                 {"よう指示します(公式の趣旨)。 "}
               </p>
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 <table>
                   <thead>
                     <tr>
@@ -2024,20 +2134,20 @@ export default function Page() {
                 <li>{"公式の cookbook に「crop tool recipe」がある(補足の URL 参照)"}</li>
               </ul>
               <h3 id="fable51-heading-49">{"7.12 プロンプト設計のフロー"}</h3>
-              <div className={[styles["diagram-card"]].join(" ")}>
-                <div className={[styles["diagram-wrap"]].join(" ")}>
-                  <div className={[styles["diagram-canvas"]].join(" ")} data-diagram-id="4">
+              <div className={styles["diagram-card"]}>
+                <div className={styles["diagram-wrap"]}>
+                  <div className={styles["diagram-canvas"]} data-diagram-id="4">
                     <MermaidDiagram chart={DIAGRAM_4} theme="base" themeVariables={THEME_VARS} />
                   </div>
                 </div>
               </div>
             </div>
           </section>
-          <section className={[styles.section].join(" ")} id="sec-8">
+          <section className={styles.section} id="sec-8">
             <h2 id="fable51-heading-50">{"8. ステップ6: ツール呼び出しとエージェントループ"}</h2>
-            <div className={[styles.prose].join(" ")}>
+            <div className={styles.prose}>
               <h3 id="fable51-heading-51">{"8.1 並列ツール呼び出し"}</h3>
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 <table>
                   <thead>
                     <tr>
@@ -2082,7 +2192,7 @@ export default function Page() {
                 {"、削除や書き換えをしません(履歴編集になるため)。 "}
               </p>
               <h3 id="fable51-heading-52">{"8.2 強制ツール使用の代替"}</h3>
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 <table>
                   <thead>
                     <tr>
@@ -2113,7 +2223,7 @@ export default function Page() {
                 </table>
               </div>
               <h3 id="fable51-heading-53">{"8.3 サブエージェント"}</h3>
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 <table>
                   <thead>
                     <tr>
@@ -2189,18 +2299,18 @@ export default function Page() {
                 </p>
               </blockquote>
               <h3 id="fable51-heading-54">{"8.4 エージェントループの全体像"}</h3>
-              <div className={[styles["diagram-card"]].join(" ")}>
-                <div className={[styles["diagram-wrap"]].join(" ")}>
-                  <div className={[styles["diagram-canvas"]].join(" ")} data-diagram-id="5">
+              <div className={styles["diagram-card"]}>
+                <div className={styles["diagram-wrap"]}>
+                  <div className={styles["diagram-canvas"]} data-diagram-id="5">
                     <MermaidDiagram chart={DIAGRAM_5} theme="base" themeVariables={THEME_VARS} />
                   </div>
                 </div>
               </div>
             </div>
           </section>
-          <section className={[styles.section].join(" ")} id="sec-9">
+          <section className={styles.section} id="sec-9">
             <h2 id="fable51-heading-55">{"9. ステップ7: Claude Code 実践ワークフロー"}</h2>
-            <div className={[styles.prose].join(" ")}>
+            <div className={styles.prose}>
               <blockquote data-testid="voice">
                 <p>
                   <strong>{"注意"}</strong>
@@ -2212,7 +2322,7 @@ export default function Page() {
                 </p>
               </blockquote>
               <h3 id="fable51-heading-56">{"9.1 Fable 5.1 での出発設定"}</h3>
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 <table>
                   <thead>
                     <tr>
@@ -2264,15 +2374,13 @@ export default function Page() {
                 <code className="language-bash hljs">
                   <span className={styles.codeLine}>
                     {"/effort high                       "}
-                    <span className={["hljs-comment"].join(" ")}>
-                      {"# セッション内で設定(最初に確認)"}
-                    </span>
-                    {"\nclaude --effort high               "}
-                    <span className={["hljs-comment"].join(" ")}>{"# このセッションのみ"}</span>
-                    {"\nCLAUDE_CODE_EFFORT_LEVEL=medium claude   "}
-                    <span className={["hljs-comment"].join(" ")}>
-                      {"# 環境変数が全設定より優先"}
-                    </span>
+                    <span className="hljs-comment">{"# セッション内で設定(最初に確認)"}</span>
+                    {"\n"}
+                    {"claude --effort high               "}
+                    <span className="hljs-comment">{"# このセッションのみ"}</span>
+                    {"\n"}
+                    {"CLAUDE_CODE_EFFORT_LEVEL=medium claude   "}
+                    <span className="hljs-comment">{"# 環境変数が全設定より優先"}</span>
                     {"\n"}
                   </span>
                 </code>
@@ -2285,37 +2393,42 @@ export default function Page() {
               <pre data-testid="code-block">
                 <code className="language-json hljs">
                   <span className={styles.codeLine}>
-                    <span className={["hljs-punctuation"].join(" ")}>{"{"}</span>
-                    {"\n  "}
-                    <span className={["hljs-attr"].join(" ")}>{'"effortLevel"'}</span>
-                    <span className={["hljs-punctuation"].join(" ")}>{":"}</span>{" "}
-                    <span className={["hljs-string"].join(" ")}>{'"medium"'}</span>
-                    <span className={["hljs-punctuation"].join(" ")}>{","}</span>
-                    {"\n  "}
-                    <span className={["hljs-attr"].join(" ")}>{'"modelSettings"'}</span>
-                    <span className={["hljs-punctuation"].join(" ")}>{":"}</span>{" "}
-                    <span className={["hljs-punctuation"].join(" ")}>{"{"}</span>
-                    {"\n    "}
-                    <span className={["hljs-attr"].join(" ")}>{'"claude-fable-5-1"'}</span>
-                    <span className={["hljs-punctuation"].join(" ")}>{":"}</span>{" "}
-                    <span className={["hljs-punctuation"].join(" ")}>{"{"}</span>{" "}
-                    <span className={["hljs-attr"].join(" ")}>{'"effortLevel"'}</span>
-                    <span className={["hljs-punctuation"].join(" ")}>{":"}</span>{" "}
-                    <span className={["hljs-string"].join(" ")}>{'"high"'}</span>{" "}
-                    <span className={["hljs-punctuation"].join(" ")}>{"}"}</span>
-                    <span className={["hljs-punctuation"].join(" ")}>{","}</span>
-                    {"\n    "}
-                    <span className={["hljs-attr"].join(" ")}>{'"claude-opus-5-5"'}</span>
-                    <span className={["hljs-punctuation"].join(" ")}>{":"}</span>{" "}
-                    <span className={["hljs-punctuation"].join(" ")}>{"{"}</span>{" "}
-                    <span className={["hljs-attr"].join(" ")}>{'"effortLevel"'}</span>
-                    <span className={["hljs-punctuation"].join(" ")}>{":"}</span>{" "}
-                    <span className={["hljs-string"].join(" ")}>{'"medium"'}</span>{" "}
-                    <span className={["hljs-punctuation"].join(" ")}>{"}"}</span>
-                    {"\n  "}
-                    <span className={["hljs-punctuation"].join(" ")}>{"}"}</span>
+                    <span className="hljs-punctuation">{"{"}</span>
                     {"\n"}
-                    <span className={["hljs-punctuation"].join(" ")}>{"}"}</span>
+                    {"  "}
+                    <span className="hljs-attr">{'"effortLevel"'}</span>
+                    <span className="hljs-punctuation">{":"}</span>{" "}
+                    <span className="hljs-string">{'"medium"'}</span>
+                    <span className="hljs-punctuation">{","}</span>
+                    {"\n"}
+                    {"  "}
+                    <span className="hljs-attr">{'"modelSettings"'}</span>
+                    <span className="hljs-punctuation">{":"}</span>{" "}
+                    <span className="hljs-punctuation">{"{"}</span>
+                    {"\n"}
+                    {"    "}
+                    <span className="hljs-attr">{'"claude-fable-5-1"'}</span>
+                    <span className="hljs-punctuation">{":"}</span>{" "}
+                    <span className="hljs-punctuation">{"{"}</span>{" "}
+                    <span className="hljs-attr">{'"effortLevel"'}</span>
+                    <span className="hljs-punctuation">{":"}</span>{" "}
+                    <span className="hljs-string">{'"high"'}</span>{" "}
+                    <span className="hljs-punctuation">{"}"}</span>
+                    <span className="hljs-punctuation">{","}</span>
+                    {"\n"}
+                    {"    "}
+                    <span className="hljs-attr">{'"claude-opus-5-5"'}</span>
+                    <span className="hljs-punctuation">{":"}</span>{" "}
+                    <span className="hljs-punctuation">{"{"}</span>{" "}
+                    <span className="hljs-attr">{'"effortLevel"'}</span>
+                    <span className="hljs-punctuation">{":"}</span>{" "}
+                    <span className="hljs-string">{'"medium"'}</span>{" "}
+                    <span className="hljs-punctuation">{"}"}</span>
+                    {"\n"}
+                    {"  "}
+                    <span className="hljs-punctuation">{"}"}</span>
+                    {"\n"}
+                    <span className="hljs-punctuation">{"}"}</span>
                     {"\n"}
                   </span>
                 </code>
@@ -2330,7 +2443,7 @@ export default function Page() {
                 <strong>{"間違ったアプローチを救うものではありません"}</strong>
                 {"。 "}
               </p>
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 <table>
                   <thead>
                     <tr>
@@ -2378,14 +2491,14 @@ export default function Page() {
                 </strong>
                 {"になりつつあると述べています。実装の前に未知を洗い出す工程を置く型です。 "}
               </p>
-              <div className={[styles["diagram-card"]].join(" ")}>
-                <div className={[styles["diagram-wrap"]].join(" ")}>
-                  <div className={[styles["diagram-canvas"]].join(" ")} data-diagram-id="6">
+              <div className={styles["diagram-card"]}>
+                <div className={styles["diagram-wrap"]}>
+                  <div className={styles["diagram-canvas"]} data-diagram-id="6">
                     <MermaidDiagram chart={DIAGRAM_6} theme="base" themeVariables={THEME_VARS} />
                   </div>
                 </div>
               </div>
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 <table>
                   <thead>
                     <tr>
@@ -2454,7 +2567,7 @@ export default function Page() {
               <h3 id="fable51-heading-59">
                 {"9.4 Claude Code の定番運用(Boris Cherny らの公開知見)"}
               </h3>
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 <table>
                   <thead>
                     <tr>
@@ -2535,7 +2648,7 @@ export default function Page() {
                 </strong>
                 {"べきだとしています。 "}
               </p>
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 <table>
                   <thead>
                     <tr>
@@ -2577,11 +2690,11 @@ export default function Page() {
               </p>
             </div>
           </section>
-          <section className={[styles.section].join(" ")} id="sec-10">
+          <section className={styles.section} id="sec-10">
             <h2 id="fable51-heading-62">{"10. ステップ8: コスト最適化"}</h2>
-            <div className={[styles.prose].join(" ")}>
+            <div className={styles.prose}>
               <h3 id="fable51-heading-63">{"10.1 コスト構造を理解する"}</h3>
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 <table>
                   <thead>
                     <tr>
@@ -2626,14 +2739,14 @@ export default function Page() {
                 }
               </p>
               <h3 id="fable51-heading-64">{"10.2 コストを下げる順番"}</h3>
-              <div className={[styles["diagram-card"]].join(" ")}>
-                <div className={[styles["diagram-wrap"]].join(" ")}>
-                  <div className={[styles["diagram-canvas"]].join(" ")} data-diagram-id="7">
+              <div className={styles["diagram-card"]}>
+                <div className={styles["diagram-wrap"]}>
+                  <div className={styles["diagram-canvas"]} data-diagram-id="7">
                     <MermaidDiagram chart={DIAGRAM_7} theme="base" themeVariables={THEME_VARS} />
                   </div>
                 </div>
               </div>
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 <table>
                   <thead>
                     <tr>
@@ -2694,9 +2807,9 @@ export default function Page() {
               </ul>
             </div>
           </section>
-          <section className={[styles.section].join(" ")} id="sec-11">
+          <section className={styles.section} id="sec-11">
             <h2 id="fable51-heading-66">{"11. ステップ9: 安全装置・refusal・fallback"}</h2>
-            <div className={[styles.prose].join(" ")}>
+            <div className={styles.prose}>
               <h3 id="fable51-heading-67">{"11.1 仕組み"}</h3>
               <p>
                 {" Fable 5.1 には安全分類器があり、リクエストが拒否されると "}
@@ -2709,9 +2822,9 @@ export default function Page() {
                 {" に方針領域が入ります。 "}
               </p>
               <h3 id="fable51-heading-68">{"11.2 対応フロー"}</h3>
-              <div className={[styles["diagram-card"]].join(" ")}>
-                <div className={[styles["diagram-wrap"]].join(" ")}>
-                  <div className={[styles["diagram-canvas"]].join(" ")} data-diagram-id="8">
+              <div className={styles["diagram-card"]}>
+                <div className={styles["diagram-wrap"]}>
+                  <div className={styles["diagram-canvas"]} data-diagram-id="8">
                     <MermaidDiagram chart={DIAGRAM_8} theme="base" themeVariables={THEME_VARS} />
                   </div>
                 </div>
@@ -2722,7 +2835,7 @@ export default function Page() {
                 <strong>{"ソースコードの脆弱性発見は許可されています"}</strong>
                 {"。それでも起こりうる3つの状況は次のとおりです。 "}
               </p>
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 <table>
                   <thead>
                     <tr>
@@ -2751,7 +2864,7 @@ export default function Page() {
                 </table>
               </div>
               <h3 id="fable51-heading-70">{"11.4 フォールバック運用の要点"}</h3>
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 <table>
                   <thead>
                     <tr>
@@ -2798,19 +2911,19 @@ export default function Page() {
               </p>
             </div>
           </section>
-          <section className={[styles.section].join(" ")} id="sec-12">
+          <section className={styles.section} id="sec-12">
             <h2 id="fable51-heading-72">{"12. ステップ10: 評価の回し方"}</h2>
-            <div className={[styles.prose].join(" ")}>
+            <div className={styles.prose}>
               <h3 id="fable51-heading-73">{"12.1 effort × モデルのスイープ"}</h3>
-              <div className={[styles["diagram-card"]].join(" ")}>
-                <div className={[styles["diagram-wrap"]].join(" ")}>
-                  <div className={[styles["diagram-canvas"]].join(" ")} data-diagram-id="9">
+              <div className={styles["diagram-card"]}>
+                <div className={styles["diagram-wrap"]}>
+                  <div className={styles["diagram-canvas"]} data-diagram-id="9">
                     <MermaidDiagram chart={DIAGRAM_9} theme="base" themeVariables={THEME_VARS} />
                   </div>
                 </div>
               </div>
               <h3 id="fable51-heading-74">{"12.2 見るべき指標"}</h3>
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 <table>
                   <thead>
                     <tr>
@@ -2862,10 +2975,10 @@ export default function Page() {
               </ul>
             </div>
           </section>
-          <section className={[styles.section].join(" ")} id="sec-13">
+          <section className={styles.section} id="sec-13">
             <h2 id="fable51-heading-76">{"13. アンチパターン早見表"}</h2>
-            <div className={[styles.prose].join(" ")}>
-              <div className={[styles["table-wrap"]].join(" ")}>
+            <div className={styles.prose}>
+              <div className={styles["table-wrap"]}>
                 <table>
                   <thead>
                     <tr>
@@ -2963,9 +3076,9 @@ export default function Page() {
               </div>
             </div>
           </section>
-          <section className={[styles.section].join(" ")} id="sec-14">
+          <section className={styles.section} id="sec-14">
             <h2 id="fable51-heading-77">{"付録A: そのまま使えるテンプレート"}</h2>
-            <div className={[styles.prose].join(" ")}>
+            <div className={styles.prose}>
               <h3 id="fable51-heading-78">{"A.1 長時間タスク用のシステムプロンプト(骨子)"}</h3>
               <p>
                 {" 公式の自律実行ガイダンスを、本ガイド用に自分の言葉で再構成した骨子です。"}
@@ -2976,34 +3089,52 @@ export default function Page() {
                 <code className="language-markdown hljs">
                   <span className={styles.codeLine}>
                     {
-                      "あなたは自律的に作業しています。ユーザーはリアルタイムで見ておらず、作業中の質問には答えられません。\n「〜しましょうか?」と許可を求めると作業が止まるため、依頼から導かれる可逆な作業は確認せずに進めてください。\n止まってよいのは、破壊的な操作と、ユーザーが判断すべきスコープ変更だけです。\n\n"
+                      "あなたは自律的に作業しています。ユーザーはリアルタイムで見ておらず、作業中の質問には答えられません。"
                     }
-                    <span className={["hljs-section"].join(" ")}>{"# 完了の定義"}</span>
                     {"\n"}
-                    <span className={["hljs-bullet"].join(" ")}>{"-"}</span>
-                    {" 成果: {最終的に何ができていればよいか}\n"}
-                    <span className={["hljs-bullet"].join(" ")}>{"-"}</span>
-                    {" 成功条件: {テストが通る、画面で動く、など観測可能な条件}\n"}
-                    <span className={["hljs-bullet"].join(" ")}>{"-"}</span>
-                    {" 守る制約: {変更禁止範囲、互換性、期限}\n\n"}
-                    <span className={["hljs-section"].join(" ")}>{"# 進め方"}</span>
-                    {"\n"}
-                    <span className={["hljs-bullet"].join(" ")}>{"-"}</span>
                     {
-                      " 終了前に最後の段落を点検する。計画、質問、次の手順の列挙、未実施の約束であれば、今すぐ実行する\n"
+                      "「〜しましょうか?」と許可を求めると作業が止まるため、依頼から導かれる可逆な作業は確認せずに進めてください。"
                     }
-                    <span className={["hljs-bullet"].join(" ")}>{"-"}</span>
-                    {" 一部が詰まったら、残りを完成させ、何を・なぜ残したかを明記する\n"}
-                    <span className={["hljs-bullet"].join(" ")}>{"-"}</span>
-                    {" 依頼にない修正や拡張は行わず、フォローアップとして報告する\n"}
-                    <span className={["hljs-bullet"].join(" ")}>{"-"}</span>
-                    {
-                      " 破壊的な操作(削除、再起動、設定変更)の前に、その操作を支持する証拠があるか確認する\n\n"
-                    }
-                    <span className={["hljs-section"].join(" ")}>{"# 確認が必須の操作"}</span>
                     {"\n"}
-                    <span className={["hljs-bullet"].join(" ")}>{"-"}</span>
-                    {" {本番デプロイ、課金、外部への送信など}\n"}
+                    {"止まってよいのは、破壊的な操作と、ユーザーが判断すべきスコープ変更だけです。"}
+                    {"\n"}
+                    {"\n"}
+                    <span className="hljs-section">{"# 完了の定義"}</span>
+                    {"\n"}
+                    <span className="hljs-bullet">{"-"}</span>{" "}
+                    {"成果: {最終的に何ができていればよいか}"}
+                    {"\n"}
+                    <span className="hljs-bullet">{"-"}</span>{" "}
+                    {"成功条件: {テストが通る、画面で動く、など観測可能な条件}"}
+                    {"\n"}
+                    <span className="hljs-bullet">{"-"}</span>{" "}
+                    {"守る制約: {変更禁止範囲、互換性、期限}"}
+                    {"\n"}
+                    {"\n"}
+                    <span className="hljs-section">{"# 進め方"}</span>
+                    {"\n"}
+                    <span className="hljs-bullet">{"-"}</span>{" "}
+                    {
+                      "終了前に最後の段落を点検する。計画、質問、次の手順の列挙、未実施の約束であれば、今すぐ実行する"
+                    }
+                    {"\n"}
+                    <span className="hljs-bullet">{"-"}</span>{" "}
+                    {"一部が詰まったら、残りを完成させ、何を・なぜ残したかを明記する"}
+                    {"\n"}
+                    <span className="hljs-bullet">{"-"}</span>{" "}
+                    {"依頼にない修正や拡張は行わず、フォローアップとして報告する"}
+                    {"\n"}
+                    <span className="hljs-bullet">{"-"}</span>{" "}
+                    {
+                      "破壊的な操作(削除、再起動、設定変更)の前に、その操作を支持する証拠があるか確認する"
+                    }
+                    {"\n"}
+                    {"\n"}
+                    <span className="hljs-section">{"# 確認が必須の操作"}</span>
+                    {"\n"}
+                    <span className="hljs-bullet">{"-"}</span>{" "}
+                    {"{本番デプロイ、課金、外部への送信など}"}
+                    {"\n"}
                   </span>
                 </code>
               </pre>
@@ -3011,34 +3142,48 @@ export default function Page() {
               <pre data-testid="code-block">
                 <code className="language-markdown hljs">
                   <span className={styles.codeLine}>
-                    <span className={["hljs-section"].join(" ")}>{"## ゴール"}</span>
-                    {"\n{何を実現したいか。1〜3文}\n\n"}
-                    <span className={["hljs-section"].join(" ")}>{"## 背景・理由"}</span>
-                    {"\n{なぜ必要か。判断の拠り所になる情報}\n\n"}
-                    <span className={["hljs-section"].join(" ")}>{"## 成功条件(観測可能)"}</span>
+                    <span className="hljs-section">{"## ゴール"}</span>
                     {"\n"}
-                    <span className={["hljs-bullet"].join(" ")}>{"-"}</span>
-                    {" {例: 該当のテストがすべて通る}\n"}
-                    <span className={["hljs-bullet"].join(" ")}>{"-"}</span>
-                    {" {例: 画面 X で Y が表示される}\n\n"}
-                    <span className={["hljs-section"].join(" ")}>{"## 制約"}</span>
+                    {"{何を実現したいか。1〜3文}"}
                     {"\n"}
-                    <span className={["hljs-bullet"].join(" ")}>{"-"}</span>
-                    {" 変更してよい範囲: {ディレクトリ・ファイル}\n"}
-                    <span className={["hljs-bullet"].join(" ")}>{"-"}</span>
-                    {" 変更しない範囲: {DBスキーマ、公開API など}\n"}
-                    <span className={["hljs-bullet"].join(" ")}>{"-"}</span>
-                    {" 既存の挙動を変えない: {互換性の条件}\n\n"}
-                    <span className={["hljs-section"].join(" ")}>{"## 進め方の希望"}</span>
                     {"\n"}
-                    <span className={["hljs-bullet"].join(" ")}>{"-"}</span>
-                    {" 最初に未知の洗い出し(blindspot pass)をしてから、計画を提示してください\n"}
-                    <span className={["hljs-bullet"].join(" ")}>{"-"}</span>
+                    <span className="hljs-section">{"## 背景・理由"}</span>
+                    {"\n"}
+                    {"{なぜ必要か。判断の拠り所になる情報}"}
+                    {"\n"}
+                    {"\n"}
+                    <span className="hljs-section">{"## 成功条件(観測可能)"}</span>
+                    {"\n"}
+                    <span className="hljs-bullet">{"-"}</span> {"{例: 該当のテストがすべて通る}"}
+                    {"\n"}
+                    <span className="hljs-bullet">{"-"}</span> {"{例: 画面 X で Y が表示される}"}
+                    {"\n"}
+                    {"\n"}
+                    <span className="hljs-section">{"## 制約"}</span>
+                    {"\n"}
+                    <span className="hljs-bullet">{"-"}</span>{" "}
+                    {"変更してよい範囲: {ディレクトリ・ファイル}"}
+                    {"\n"}
+                    <span className="hljs-bullet">{"-"}</span>{" "}
+                    {"変更しない範囲: {DBスキーマ、公開API など}"}
+                    {"\n"}
+                    <span className="hljs-bullet">{"-"}</span>{" "}
+                    {"既存の挙動を変えない: {互換性の条件}"}
+                    {"\n"}
+                    {"\n"}
+                    <span className="hljs-section">{"## 進め方の希望"}</span>
+                    {"\n"}
+                    <span className="hljs-bullet">{"-"}</span>{" "}
+                    {"最初に未知の洗い出し(blindspot pass)をしてから、計画を提示してください"}
+                    {"\n"}
+                    <span className="hljs-bullet">{"-"}</span>{" "}
                     {
-                      " 判断に迷った点は implementation-notes.md に記録し、保守的な選択肢で継続してください\n"
+                      "判断に迷った点は implementation-notes.md に記録し、保守的な選択肢で継続してください"
                     }
-                    <span className={["hljs-bullet"].join(" ")}>{"-"}</span>
-                    {" 見つけた既存の問題は、直さずに要約でフォローアップとして報告してください\n"}
+                    {"\n"}
+                    <span className="hljs-bullet">{"-"}</span>{" "}
+                    {"見つけた既存の問題は、直さずに要約でフォローアップとして報告してください"}
+                    {"\n"}
                   </span>
                 </code>
               </pre>
@@ -3048,30 +3193,49 @@ export default function Page() {
                   <span className={styles.codeLine}>
                     {"会話を "}
                     <span className={["language-xml"].join(" ")}>
-                      <span className={["hljs-tag"].join(" ")}>
+                      <span className="hljs-tag">
                         {"<"}
-                        <span className={["hljs-name"].join(" ")}>{"summary"}</span>
+                        <span className="hljs-name">{"summary"}</span>
                         {">"}
                       </span>
                     </span>
                     <span className={["language-xml"].join(" ")}>
-                      <span className={["hljs-tag"].join(" ")}>
+                      <span className="hljs-tag">
                         {"</"}
-                        <span className={["hljs-name"].join(" ")}>{"summary"}</span>
+                        <span className="hljs-name">{"summary"}</span>
                         {">"}
                       </span>
-                    </span>
+                    </span>{" "}
                     {
-                      " タグ内に要約してください。新しいコンテキストで、作業のやり直しや制約の再提示なしに続けられるようにします。\n次の6点は、長くなっても必ず残してください。\n(1) 発生した問題と、その対処・解決\n(2) 検討・試行・却下した選択肢と、その理由\n(3) 依頼・決定・合意・排除・制約・好みを、正確な文言で\n(4) 現在の正確な状態(どこまで終わり、何が確定したか)\n(5) 未解決事項、約束、次にやること\n(6) 再構築しにくい詳細(名前、数値、日付、リンクなど)を、そのまま\nユーザーの発言は原文に近く、あなた自身の説明は結論や成果まで圧縮してください。\n"
+                      "タグ内に要約してください。新しいコンテキストで、作業のやり直しや制約の再提示なしに続けられるようにします。"
                     }
+                    {"\n"}
+                    {"次の6点は、長くなっても必ず残してください。"}
+                    {"\n"}
+                    {"(1) 発生した問題と、その対処・解決"}
+                    {"\n"}
+                    {"(2) 検討・試行・却下した選択肢と、その理由"}
+                    {"\n"}
+                    {"(3) 依頼・決定・合意・排除・制約・好みを、正確な文言で"}
+                    {"\n"}
+                    {"(4) 現在の正確な状態(どこまで終わり、何が確定したか)"}
+                    {"\n"}
+                    {"(5) 未解決事項、約束、次にやること"}
+                    {"\n"}
+                    {"(6) 再構築しにくい詳細(名前、数値、日付、リンクなど)を、そのまま"}
+                    {"\n"}
+                    {
+                      "ユーザーの発言は原文に近く、あなた自身の説明は結論や成果まで圧縮してください。"
+                    }
+                    {"\n"}
                   </span>
                 </code>
               </pre>
             </div>
           </section>
-          <section className={[styles.section].join(" ")} id="sec-15">
+          <section className={styles.section} id="sec-15">
             <h2 id="fable51-heading-81">{"付録B: 最小の実践チェックリスト"}</h2>
-            <div className={[styles.prose].join(" ")}>
+            <div className={styles.prose}>
               <h3 id="fable51-heading-82">{"B.1 導入前(API 利用者)"}</h3>
               <div className={styles.progress}>
                 <span data-testid="check-progress">
@@ -3084,8 +3248,8 @@ export default function Page() {
                   <i data-check-bar />
                 </div>
               </div>
-              <ul className={[styles.checklist].join(" ")}>
-                <li className={[styles.chk].join(" ")}>
+              <ul className={styles.checklist}>
+                <li className={styles.chk}>
                   <label>
                     <input type="checkbox" data-guide-check="" />
                     <span>
@@ -3095,7 +3259,7 @@ export default function Page() {
                     </span>
                   </label>
                 </li>{" "}
-                <li className={[styles.chk].join(" ")}>
+                <li className={styles.chk}>
                   <label>
                     <input type="checkbox" data-guide-check="" />
                     <span>
@@ -3108,7 +3272,7 @@ export default function Page() {
                     </span>
                   </label>
                 </li>{" "}
-                <li className={[styles.chk].join(" ")}>
+                <li className={styles.chk}>
                   <label>
                     <input type="checkbox" data-guide-check="" />
                     <span>
@@ -3123,7 +3287,7 @@ export default function Page() {
                     </span>
                   </label>
                 </li>{" "}
-                <li className={[styles.chk].join(" ")}>
+                <li className={styles.chk}>
                   <label>
                     <input type="checkbox" data-guide-check="" />
                     <span>
@@ -3133,7 +3297,7 @@ export default function Page() {
                     </span>
                   </label>
                 </li>{" "}
-                <li className={[styles.chk].join(" ")}>
+                <li className={styles.chk}>
                   <label>
                     <input type="checkbox" data-guide-check="" />
                     <span>
@@ -3144,7 +3308,7 @@ export default function Page() {
                     </span>
                   </label>
                 </li>{" "}
-                <li className={[styles.chk].join(" ")}>
+                <li className={styles.chk}>
                   <label>
                     <input type="checkbox" data-guide-check="" />
                     <span>
@@ -3154,7 +3318,7 @@ export default function Page() {
                     </span>
                   </label>
                 </li>{" "}
-                <li className={[styles.chk].join(" ")}>
+                <li className={styles.chk}>
                   <label>
                     <input type="checkbox" data-guide-check="" />
                     <span>
@@ -3163,7 +3327,7 @@ export default function Page() {
                     </span>
                   </label>
                 </li>{" "}
-                <li className={[styles.chk].join(" ")}>
+                <li className={styles.chk}>
                   <label>
                     <input type="checkbox" data-guide-check="" />
                     <span>{"refusal を処理し、fallback(Opus 4.8 / Opus 5)を設定した"}</span>
@@ -3182,32 +3346,32 @@ export default function Page() {
                   <i data-check-bar />
                 </div>
               </div>
-              <ul className={[styles.checklist].join(" ")}>
-                <li className={[styles.chk].join(" ")}>
+              <ul className={styles.checklist}>
+                <li className={styles.chk}>
                   <label>
                     <input type="checkbox" data-guide-check="" />
                     <span>{"ゴール・理由・成功条件・制約を書き、経路の細部指示は削った"}</span>
                   </label>
                 </li>{" "}
-                <li className={[styles.chk].join(" ")}>
+                <li className={styles.chk}>
                   <label>
                     <input type="checkbox" data-guide-check="" />
                     <span>{"旧モデル用の書式抑制・無言指示を撤去または条件付きにした"}</span>
                   </label>
                 </li>{" "}
-                <li className={[styles.chk].join(" ")}>
+                <li className={styles.chk}>
                   <label>
                     <input type="checkbox" data-guide-check="" />
                     <span>{"自律実行する場合、7.9 の指示を入れ、確認必須の操作を明記した"}</span>
                   </label>
                 </li>{" "}
-                <li className={[styles.chk].join(" ")}>
+                <li className={styles.chk}>
                   <label>
                     <input type="checkbox" data-guide-check="" />
                     <span>{"スコープ逸脱対策(7.7)と差分編集(7.8)を入れた"}</span>
                   </label>
                 </li>{" "}
-                <li className={[styles.chk].join(" ")}>
+                <li className={styles.chk}>
                   <label>
                     <input type="checkbox" data-guide-check="" />
                     <span>{"「推論を書き出せ」という指示がない"}</span>
@@ -3226,8 +3390,8 @@ export default function Page() {
                   <i data-check-bar />
                 </div>
               </div>
-              <ul className={[styles.checklist].join(" ")}>
-                <li className={[styles.chk].join(" ")}>
+              <ul className={styles.checklist}>
+                <li className={styles.chk}>
                   <label>
                     <input type="checkbox" data-guide-check="" />
                     <span>
@@ -3245,25 +3409,25 @@ export default function Page() {
                     </span>
                   </label>
                 </li>{" "}
-                <li className={[styles.chk].join(" ")}>
+                <li className={styles.chk}>
                   <label>
                     <input type="checkbox" data-guide-check="" />
                     <span>{"Opus 5.5 と比較し、Fable が本当に必要な工程だけに使っている"}</span>
                   </label>
                 </li>{" "}
-                <li className={[styles.chk].join(" ")}>
+                <li className={styles.chk}>
                   <label>
                     <input type="checkbox" data-guide-check="" />
                     <span>{"コスト、時間、成功率、スコープ逸脱、refusal を記録している"}</span>
                   </label>
                 </li>{" "}
-                <li className={[styles.chk].join(" ")}>
+                <li className={styles.chk}>
                   <label>
                     <input type="checkbox" data-guide-check="" />
                     <span>{"サンドボックス、権限の最小化、予算の上限を設定した"}</span>
                   </label>
                 </li>{" "}
-                <li className={[styles.chk].join(" ")}>
+                <li className={styles.chk}>
                   <label>
                     <input type="checkbox" data-guide-check="" />
                     <span>{"公式ドキュメントと更新履歴を定期的に確認している"}</span>
@@ -3272,9 +3436,9 @@ export default function Page() {
               </ul>
             </div>
           </section>
-          <section className={[styles.section].join(" ")} id="sec-16">
+          <section className={styles.section} id="sec-16">
             <h2 id="fable51-heading-85">{"補足: 追加ベストプラクティスと根拠ソース URL"}</h2>
-            <div className={[styles.prose].join(" ")}>
+            <div className={styles.prose}>
               <blockquote data-testid="voice">
                 <p>
                   <strong>{"凡例"}</strong>
@@ -3286,7 +3450,7 @@ export default function Page() {
                 </p>
               </blockquote>
               <h3 id="fable51-heading-86">{"S.1 公式ドキュメント(最優先)"}</h3>
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 <table>
                   <thead>
                     <tr>
@@ -3353,7 +3517,7 @@ export default function Page() {
                 </table>
               </div>
               <h3 id="fable51-heading-87">{"S.2 著名な国際的開発者・Anthropic 関係者の発信"}</h3>
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 <table>
                   <thead>
                     <tr>
@@ -3456,7 +3620,7 @@ export default function Page() {
                 </table>
               </div>
               <h3 id="fable51-heading-88">{"S.3 単一エージェントとサブエージェントの設計"}</h3>
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 <table>
                   <thead>
                     <tr>
@@ -3488,7 +3652,7 @@ export default function Page() {
                 </table>
               </div>
               <h3 id="fable51-heading-89">{"S.4 Claude Code・運用の実践記事(二次)"}</h3>
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 <table>
                   <thead>
                     <tr>
@@ -3558,7 +3722,7 @@ export default function Page() {
                 </table>
               </div>
               <h3 id="fable51-heading-90">{"S.5 モデル階層・最新動向の確認用"}</h3>
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 <table>
                   <thead>
                     <tr>
@@ -3607,7 +3771,7 @@ export default function Page() {
               <h3 id="fable51-heading-91">
                 {"S.6 この補足から導かれる「追加ベストプラクティス」の要約"}
               </h3>
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 <table>
                   <thead>
                     <tr>
@@ -3686,7 +3850,7 @@ export default function Page() {
               </p>
             </div>
           </section>
-          <footer className={[styles.footer].join(" ")}>
+          <footer className={styles.footer}>
             {" 最終更新: 2026年11月5日 / 数値・仕様は公式ドキュメントで再確認してください "}
           </footer>
         </main>
