@@ -703,6 +703,6 @@ Markdownの後日追記と図7件の相違は本書同名節を参照。本文�
 HTML監査exit 0、対象68契約・関連95件、全231 files／2725 tests、型・lint627 files、Mermaid12図解析、pytest122件が成功。
 操作の行／関数100%、分岐89.87%。ルートとregistryは103件ずつ。固定した本文・構造・CSSの期待値は無変更。
 NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000 を使用。
-npm・ビルドは禁止。Red → Green → Refactor → Docsの分離コミットを守る。
+今回の移行依頼に限り、ユーザー指定でnpm・ビルドは実行しない。通常のコミット前ビルド確認（Antigravityサンドボックス外で必須）はCLAUDE.mdの既存規則を維持する。Red → Green → Refactor → Docsの分離コミットを守る。
 CSSキャッシュ退避後の通常devでHTTP 200と配信HTMLの初期進捗・ID一意性を確認済み。目視はユーザー担当。
 ```
